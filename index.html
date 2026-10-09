@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#08090D">
+<meta name="description" content="ABYSSAL, jeu de cartes à collectionner dark fantasy : ouvre des boosters et reconstitue le Bestiaire interdit.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ABYSSAL">
+<title>ABYSSAL — Le Bestiaire interdit</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700;800&family=Alegreya:ital@0;1&family=Cinzel:wght@600;700;900&display=swap">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/card.css">
+<link rel="stylesheet" href="css/screens.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar"></header>
+  <main id="view" tabindex="-1"></main>
+  <nav id="tabbar" aria-label="Navigation principale"></nav>
+</div>
+<div id="overlay-root"></div>
+<div id="toasts"></div>
+<div id="boot" class="boot" role="status">
+  <div>
+    <svg class="emblem" viewBox="0 0 100 100" aria-hidden="true"><g fill="none" stroke="#C8A45D" stroke-width="1.6"><circle cx="50" cy="50" r="46"/><circle cx="50" cy="50" r="40" stroke-dasharray="2 3"/><path d="M50 12 79.7 66.5 16.6 34.1H83.4L20.3 66.5Z"/><path d="M28 50s9-11 22-11 22 11 22 11-9 11-22 11-22-11-22-11z"/></g><circle cx="50" cy="50" r="6.5" fill="#C8A45D"/></svg>
+    <p>Ouverture du Bestiaire…</p>
+    <p class="err"></p>
+  </div>
+</div>
+<noscript><p style="padding:24px;color:#ECE6DA">ABYSSAL a besoin de JavaScript pour fonctionner.</p></noscript>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

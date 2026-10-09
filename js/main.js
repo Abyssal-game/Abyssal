@@ -1,0 +1,190 @@
+// Point d'entrée : chargement des données, état du joueur, navigation.
+import { loadCatalogData, createCatalog } from './core/catalog.js';
+import { Game } from './core/game.js';
+import { loadArtManifest, artUrl, hasRealArt } from './art/assets.js';
+import { setCardCatalog } from './ui/card.js';
+import { icon, EMBLEM } from './ui/icons.js';
+import { toast, esc, fmt, reducedMotion, closeTopSheet } from './ui/dom.js';
+import { sfx, configureSound } from './ui/sound.js';
+import { VERSION } from './config.js';
+import { openCardDetail } from './screens/detail.js';
+
+import homeScreen from './screens/home.js';
+import collectionScreen from './screens/collection.js';
+import shopScreen from './screens/shop.js';
+import bestiaryScreen from './screens/bestiary.js';
+import factionsScreen from './screens/factions.js';
+import achievementsScreen from './screens/achievements.js';
+import profileScreen from './screens/profile.js';
+import settingsScreen from './screens/settings.js';
+import arenaScreen from './screens/arena.js';
+
+const ROUTES = {
+  '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,
+  factions: factionsScreen, faction: factionsScreen, succes: achievementsScreen, profil: profileScreen,
+  parametres: settingsScreen, arene: arenaScreen,
+};
+const TABS = [
+  ['antre', 'home', 'Antre'], ['collection', 'cards', 'Collection'], ['boutique', 'booster', 'Boosters'],
+  ['bestiaire', 'book', 'Bestiaire'], ['profil', 'user', 'Profil'],
+];
+const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', bestiaire: 'bestiaire', factions: 'antre', faction: 'antre', succes: 'profil', profil: 'profil', parametres: 'profil', arene: 'antre' };
+
+function storageOrMemory() {
+  try {
+    const k = '__abyssal_test__';
+    localStorage.setItem(k, '1'); localStorage.removeItem(k);
+    return { storage: localStorage, persistent: true };
+  } catch (e) {
+    const m = new Map();
+    return { storage: { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k) }, persistent: false };
+  }
+}
+
+const app = {
+  route: '', params: [], cleanup: null, state: {}, version: VERSION,
+  go(path) { location.hash = '#/' + path; },
+  back() { history.length > 1 ? history.back() : app.go(''); },
+  openCard(id, opts) { return openCardDetail(app, id, opts); },
+  reduced() { return reducedMotion(app.game.s.settings); },
+  sfx,
+  hasRealArt,
+  refresh() { render(); },
+};
+window.__abyssal = app; // accès pour les tests automatisés
+
+function applySettings() {
+  const s = app.game.s.settings;
+  document.documentElement.classList.toggle('text-large', s.textSize === 'large');
+  document.documentElement.classList.toggle('contrast', !!s.contrast);
+  document.documentElement.classList.toggle('reduce-motion', s.motion === 'reduced');
+  configureSound(s);
+}
+
+function renderChrome() {
+  const g = app.game, s = g.s, lv = g.levelInfo();
+  const avatarCard = s.avatar && g.catalog.get(s.avatar);
+  const top = document.getElementById('topbar');
+  top.innerHTML = `
+    <a class="top-brand" href="#/profil" aria-label="Profil : niveau ${lv.level}, ${esc(s.title)}">
+      <span class="top-avatar pf pf-${s.frame}">${avatarCard ? `<img alt="" src="${artUrl(avatarCard, { lite: true })}">` : EMBLEM}<span class="lv">${lv.level}</span></span>
+      <span class="top-meta"><b>${esc(s.title)}</b><span class="xpbar" aria-hidden="true"><i style="width:${(lv.into / lv.need) * 100}%"></i></span></span>
+    </a>
+    <div class="wallet">
+      <a class="pill shards" href="#/boutique" title="Éclats" aria-label="${fmt(s.shards)} éclats">${icon('crystal')}<span>${fmt(s.shards)}</span></a>
+      <a class="pill ash" href="#/collection" title="Cendres" aria-label="${fmt(s.ash)} cendres">${icon('ash')}<span>${fmt(s.ash)}</span></a>
+    </div>`;
+  const tab = TAB_OF[app.route] ?? 'antre';
+  const nNew = g.newCount();
+  const ticketCount = Object.values(s.tickets).reduce((a, b) => a + b, 0);
+  document.getElementById('tabbar').innerHTML = TABS.map(([key, ic, label]) => {
+    const cur = key === tab ? ' aria-current="page"' : '';
+    const badge = key === 'collection' && nNew ? `<span class="badge">${nNew > 99 ? '99+' : nNew}</span>` : key === 'boutique' && ticketCount ? `<span class="badge">${ticketCount}</span>` : key === 'antre' && g.canDailyClaim() ? '<span class="badge">!</span>' : '';
+    if (key === 'boutique') return `<a class="tab tab-main" href="#/boutique"${cur}><span class="orb">${icon(ic)}</span>${label}${badge}</a>`;
+    return `<a class="tab" href="#/${key}"${cur}>${icon(ic)}${label}${badge}</a>`;
+  }).join('');
+}
+
+let lastShards = null;
+function pulseWallet() {
+  const s = app.game.s;
+  if (lastShards !== null && s.shards !== lastShards) document.querySelector('.pill.shards')?.classList.add('bump');
+  lastShards = s.shards;
+}
+
+function render() {
+  const [route, ...params] = (location.hash.replace(/^#\/?/, '') || '').split('/');
+  const screen = ROUTES[route] || homeScreen;
+  if (app.cleanup) { try { app.cleanup(); } catch (e) { /* rien */ } app.cleanup = null; }
+  app.route = ROUTES[route] ? route : '';
+  app.params = params.map(decodeURIComponent);
+  renderChrome();
+  const view = document.getElementById('view');
+  view.classList.remove('view-in');
+  void view.offsetWidth;
+  view.classList.add('view-in');
+  view.innerHTML = '';
+  app.cleanup = screen(app, view, app.params) || null;
+  view.focus({ preventScroll: true });
+}
+
+// Notifications de progression (succès, ensembles, niveaux)
+function rewardText(r = {}) {
+  const parts = [];
+  if (r.shards) parts.push(`${fmt(r.shards)} éclats`);
+  for (const [k, n] of Object.entries(r.tickets || {})) parts.push(`${n} ticket${n > 1 ? 's' : ''} ${k === 'premium' ? 'premium' : 'standard'}`);
+  if (r.title) parts.push(`titre « ${esc(r.title)} »`);
+  if (r.frame) parts.push('un cadre de profil');
+  if (r.special) parts.push('une Édition des Sceaux');
+  return parts.join(', ');
+}
+app.rewardText = rewardText;
+function onProgress(events) {
+  if (events.length > 2) {
+    const names = events.map((e) => (e.kind === 'level' ? `niveau ${e.level}` : esc(e.name)));
+    const total = events.reduce((t, e) => t + (e.reward?.shards || 0), 0);
+    toast(`<b>${events.length} récompenses</b> : ${names.join(', ')}<br><span class="small muted">+${fmt(total)} éclats au total. Détails dans Succès.</span>`, { kind: 'epic', icon: 'trophy', ms: 6000 });
+    sfx.achievement();
+    return;
+  }
+  events.forEach((e, i) => setTimeout(() => {
+    if (e.kind === 'achievement') toast(`Succès débloqué : <b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'epic', icon: 'trophy', ms: 4200 });
+    if (e.kind === 'set') toast(`Ensemble complété : <b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'epic', icon: 'star', ms: 5000 });
+    if (e.kind === 'faction') toast(`Faction complétée : <b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'epic', icon: 'shield', ms: 5000 });
+    if (e.kind === 'level') toast(`Niveau <b>${e.level}</b> atteint !<br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'success', icon: 'sparkle', ms: 3800 });
+    sfx.achievement();
+  }, (app.holdToasts ? 0 : 300) + i * 650));
+}
+
+async function boot() {
+  const bootEl = document.getElementById('boot');
+  try {
+    const [data] = await Promise.all([loadCatalogData('./'), loadArtManifest('./')]);
+    const catalog = createCatalog(data);
+    setCardCatalog(catalog);
+    const { storage, persistent } = storageOrMemory();
+    app.catalog = catalog;
+    app.game = new Game(catalog, storage);
+    app.persistent = persistent;
+    app.game.on('change', () => { renderChrome(); pulseWallet(); });
+    app.game.on('progress', (ev) => (app.pendingProgress ? app.pendingProgress.push(...ev) : onProgress(ev)));
+    app.game.on('error', (m) => toast(esc(m), { kind: 'error', icon: 'info', ms: 6000 }));
+    app.flushProgress = () => { const ev = app.pendingProgress || []; app.pendingProgress = null; if (ev.length) onProgress(ev); };
+    app.applySettings = applySettings;
+    if (new URLSearchParams(location.search).has('dev')) app.game.s.settings.dev = true;
+    applySettings();
+    lastShards = app.game.s.shards;
+    window.addEventListener('hashchange', render);
+    render();
+    bootEl.classList.add('out');
+    setTimeout(() => bootEl.remove(), 600);
+    if (!persistent) toast('Le stockage local est désactivé dans ce navigateur : ta progression ne sera pas conservée après fermeture.', { kind: 'error', icon: 'info', ms: 9000 });
+    if (app.game.loadedFrom && app.game.loadedFrom.endsWith('backup')) toast('La sauvegarde principale était abîmée : la copie de secours a été restaurée.', { kind: 'error', icon: 'info', ms: 8000 });
+    document.addEventListener('pointerdown', () => configureSound(app.game.s.settings), { once: true });
+  } catch (e) {
+    console.error(e);
+    bootEl.querySelector('.err').textContent = `Impossible d’ouvrir le Bestiaire : ${e.message}. Vérifie ta connexion puis recharge la page.`;
+  }
+}
+
+// Service worker et mises à jour
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then((reg) => {
+      const notify = (w) => {
+        toast('Une nouvelle version d’ABYSSAL est prête. <b>Touche ici pour l’installer.</b>', { icon: 'refresh', ms: 15000 });
+        document.getElementById('toasts').lastElementChild?.addEventListener('click', () => w.postMessage('skipWaiting'));
+      };
+      if (reg.waiting && navigator.serviceWorker.controller) notify(reg.waiting);
+      reg.addEventListener('updatefound', () => {
+        const w = reg.installing;
+        w && w.addEventListener('statechange', () => { if (w.state === 'installed' && navigator.serviceWorker.controller) notify(w); });
+      });
+    }).catch(() => {});
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => { if (!reloaded) { reloaded = true; location.reload(); } });
+  });
+}
+
+window.addEventListener('popstate', () => closeTopSheet());
+boot();

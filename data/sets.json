@@ -1,0 +1,267 @@
+[
+ {
+  "key": "peches",
+  "name": "Les Sept Péchés capitaux",
+  "desc": "Orgueil, avarice, luxure, envie, gourmandise, colère, paresse : un prince pour chaque faute.",
+  "reward": {
+   "shards": 500,
+   "title": "Pécheur accompli",
+   "special": "INF-052"
+  },
+  "cards": [
+   "INF-039",
+   "INF-040",
+   "INF-044",
+   "INF-045",
+   "INF-047",
+   "INF-052",
+   "ABY-045"
+  ]
+ },
+ {
+  "key": "titans",
+  "name": "Les Douze Titans",
+  "desc": "Les enfants d’Ouranos et de Gaïa, maîtres du monde avant les dieux.",
+  "reward": {
+   "shards": 600,
+   "title": "Héritier de la Titanomachie",
+   "frame": "titan",
+   "special": "PRI-050"
+  },
+  "cards": [
+   "PRI-015",
+   "PRI-016",
+   "PRI-017",
+   "PRI-018",
+   "PRI-030",
+   "PRI-031",
+   "PRI-032",
+   "PRI-033",
+   "PRI-034",
+   "PRI-035",
+   "PRI-044",
+   "PRI-050"
+  ]
+ },
+ {
+  "key": "souverains",
+  "name": "Les Souverains infernaux",
+  "desc": "Ceux qui règnent sur les cercles de l’Enfer, et qui se haïssent tous.",
+  "reward": {
+   "shards": 500,
+   "title": "Vassal des Enfers",
+   "frame": "infernal",
+   "special": "INF-053"
+  },
+  "cards": [
+   "INF-033",
+   "INF-034",
+   "INF-044",
+   "INF-045",
+   "INF-046",
+   "INF-047",
+   "INF-051",
+   "INF-052",
+   "INF-053"
+  ]
+ },
+ {
+  "key": "dragons",
+  "name": "Les Dragons primordiaux",
+  "desc": "Serpents et wyrms nés avant le temps, gardiens des trésors et du chaos.",
+  "reward": {
+   "shards": 500,
+   "tickets": {
+    "premium": 1
+   },
+   "title": "Dompteur de wyrms",
+   "special": "PRI-051"
+  },
+  "cards": [
+   "PRI-019",
+   "PRI-028",
+   "PRI-029",
+   "PRI-038",
+   "PRI-042",
+   "PRI-043",
+   "PRI-048",
+   "PRI-049",
+   "PRI-051"
+  ]
+ },
+ {
+  "key": "firmament",
+  "name": "Les Gardiens du firmament",
+  "desc": "Les sentinelles des sept cieux, qui veillent sur des portes que nul ne franchit.",
+  "reward": {
+   "shards": 500,
+   "title": "Porteur d’auréole",
+   "frame": "celeste",
+   "special": "CEL-043"
+  },
+  "cards": [
+   "CEL-017",
+   "CEL-024",
+   "CEL-025",
+   "CEL-029",
+   "CEL-030",
+   "CEL-034",
+   "CEL-036",
+   "CEL-038",
+   "CEL-043",
+   "CEL-044"
+  ]
+ },
+ {
+  "key": "fleaux",
+  "name": "Les Treize Fléaux",
+  "desc": "Treize monstres qui ont ravagé le monde et dont les héros ont chanté la chute.",
+  "reward": {
+   "shards": 600,
+   "title": "Chasseur de fléaux",
+   "frame": "sauvage",
+   "special": "SAU-044"
+  },
+  "cards": [
+   "INF-049",
+   "ABY-030",
+   "ABY-031",
+   "ABY-034",
+   "ABY-039",
+   "SAU-034",
+   "SAU-036",
+   "SAU-037",
+   "SAU-038",
+   "SAU-042",
+   "SAU-044",
+   "NEC-037",
+   "PRI-039"
+  ]
+ },
+ {
+  "key": "oublies",
+  "name": "Les Dieux oubliés",
+  "desc": "Ils furent adorés. Leurs temples sont tombés. Leur colère est restée intacte.",
+  "reward": {
+   "shards": 450,
+   "title": "Dernier fidèle",
+   "frame": "primordial",
+   "special": "NEC-043"
+  },
+  "cards": [
+   "INF-041",
+   "ABY-040",
+   "NEC-041",
+   "NEC-043",
+   "PRI-037",
+   "PRI-048",
+   "PRI-049",
+   "PRI-050"
+  ]
+ },
+ {
+  "key": "seigneurs",
+  "name": "Les Seigneurs des abysses",
+  "desc": "Les maîtres des fosses, des tourbillons et des mers sans fond.",
+  "reward": {
+   "shards": 500,
+   "title": "Souverain des fosses",
+   "frame": "abyssal",
+   "special": "ABY-039"
+  },
+  "cards": [
+   "ABY-030",
+   "ABY-031",
+   "ABY-032",
+   "ABY-033",
+   "ABY-039",
+   "ABY-040",
+   "ABY-041",
+   "ABY-045",
+   "ABY-046",
+   "ABY-047"
+  ]
+ },
+ {
+  "key": "plaies",
+  "name": "Les Huit Plaies",
+  "desc": "Quand le premier sceau se brisa, huit fléaux se répandirent sur les royaumes.",
+  "reward": {
+   "shards": 400,
+   "title": "Témoin des plaies",
+   "frame": "necrotique",
+   "special": "CEL-030"
+  },
+  "cards": [
+   "INF-010",
+   "INF-050",
+   "ABY-029",
+   "CEL-030",
+   "CEL-042",
+   "SAU-029",
+   "NEC-027",
+   "NEC-033"
+  ]
+ },
+ {
+  "key": "neant",
+  "name": "Les Entités du Néant",
+  "desc": "Ce qui existait avant les sept royaumes, et ce qui existera après.",
+  "reward": {
+   "shards": 700,
+   "tickets": {
+    "premium": 1
+   },
+   "title": "Celui qui a regardé le Néant",
+   "frame": "neant",
+   "special": "PRI-052"
+  },
+  "cards": [
+   "ABY-042",
+   "ABY-048",
+   "PRI-024",
+   "PRI-052",
+   "PRI-053",
+   "ART-036",
+   "ART-041"
+  ]
+ },
+ {
+  "key": "pactes",
+  "name": "Les Pactes scellés",
+  "desc": "Signatures, dîmes et promesses : la comptabilité de l’Enfer.",
+  "reward": {
+   "shards": 300,
+   "title": "Signataire",
+   "special": "INF-038"
+  },
+  "cards": [
+   "INF-001",
+   "INF-005",
+   "INF-006",
+   "INF-017",
+   "INF-038",
+   "INF-048",
+   "INF-049"
+  ]
+ },
+ {
+  "key": "goetie",
+  "name": "La Goétie",
+  "desc": "Quelques-uns des esprits recensés par la Petite Clé de Salomon.",
+  "reward": {
+   "shards": 300,
+   "title": "Lecteur de la Goétie",
+   "frame": "artificiel",
+   "special": "INF-036"
+  },
+  "cards": [
+   "INF-023",
+   "INF-024",
+   "INF-025",
+   "INF-029",
+   "INF-033",
+   "INF-036"
+  ]
+ }
+]

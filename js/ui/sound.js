@@ -1,0 +1,75 @@
+// Effets sonores synthétisés (Web Audio) : aucun fichier audio à télécharger.
+let ctx = null, master = null, enabled = true, volume = 0.7;
+
+function ensure() {
+  if (!enabled) return null;
+  if (!ctx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    ctx = new AC();
+    master = ctx.createGain();
+    master.gain.value = volume * 0.5;
+    master.connect(ctx.destination);
+  }
+  if (ctx.state === 'suspended') ctx.resume();
+  return ctx;
+}
+
+export function configureSound({ sound, volume: v }) {
+  enabled = sound !== false;
+  if (typeof v === 'number') volume = v;
+  if (master) master.gain.value = volume * 0.5;
+}
+
+function tone(freq, { type = 'sine', dur = 0.25, gain = 0.3, delay = 0, attack = 0.01, slide = 0 } = {}) {
+  const c = ensure(); if (!c) return;
+  const t = c.currentTime + delay;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type;
+  o.frequency.setValueAtTime(freq, t);
+  if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, freq + slide), t + dur);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(gain, t + attack);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(master);
+  o.start(t); o.stop(t + dur + 0.05);
+}
+
+function noise({ dur = 0.3, gain = 0.2, freq = 1200, q = 0.8, delay = 0, sweep = 0 } = {}) {
+  const c = ensure(); if (!c) return;
+  const t = c.currentTime + delay;
+  const buf = c.createBuffer(1, Math.floor(c.sampleRate * dur), c.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  const src = c.createBufferSource(); src.buffer = buf;
+  const f = c.createBiquadFilter(); f.type = 'bandpass'; f.frequency.setValueAtTime(freq, t); f.Q.value = q;
+  if (sweep) f.frequency.exponentialRampToValueAtTime(freq + sweep, t + dur);
+  const g = c.createGain();
+  g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  src.connect(f).connect(g).connect(master);
+  src.start(t);
+}
+
+const CHORDS = {
+  C: [392], PC: [392, 494], R: [392, 494, 587], HR: [330, 415, 494, 659],
+  M: [262, 330, 392, 523, 659, 784], S: [233, 294, 349, 466, 587, 698, 932],
+};
+
+export const sfx = {
+  tap() { tone(660, { type: 'triangle', dur: 0.06, gain: 0.08 }); },
+  error() { tone(180, { type: 'sawtooth', dur: 0.2, gain: 0.08, slide: -60 }); },
+  coin() { tone(988, { type: 'square', dur: 0.08, gain: 0.06 }); tone(1319, { type: 'square', dur: 0.14, gain: 0.06, delay: 0.07 }); },
+  tear() { noise({ dur: 0.45, gain: 0.35, freq: 900, sweep: 3000, q: 0.6 }); tone(80, { type: 'sine', dur: 0.5, gain: 0.25, slide: -30 }); },
+  flip() { noise({ dur: 0.16, gain: 0.18, freq: 2400, q: 1.2 }); },
+  reveal(r) {
+    const notes = CHORDS[r] || CHORDS.C;
+    const big = r === 'M' || r === 'S';
+    notes.forEach((f, i) => tone(f, { type: big ? 'sawtooth' : 'triangle', dur: big ? 1.8 : 0.6, gain: big ? 0.07 : 0.12, delay: i * (big ? 0.06 : 0.05), attack: big ? 0.15 : 0.01 }));
+    if (big) { tone(65, { dur: 2, gain: 0.3, slide: 30 }); noise({ dur: 1.4, gain: 0.08, freq: 6000, q: 0.4 }); }
+    if (r === 'HR') tone(110, { dur: 0.8, gain: 0.2 });
+  },
+  discover() { tone(784, { type: 'sine', dur: 0.3, gain: 0.1 }); tone(1175, { type: 'sine', dur: 0.5, gain: 0.08, delay: 0.08 }); },
+  achievement() { [523, 659, 784, 1047].forEach((f, i) => tone(f, { type: 'triangle', dur: 0.35, gain: 0.1, delay: i * 0.09 })); },
+  hit() { noise({ dur: 0.12, gain: 0.25, freq: 500 }); tone(120, { dur: 0.15, gain: 0.2, slide: -50 }); },
+  summon() { tone(220, { type: 'triangle', dur: 0.4, gain: 0.12, slide: 220 }); },
+};

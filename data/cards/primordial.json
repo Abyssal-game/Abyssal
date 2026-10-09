@@ -1,0 +1,2556 @@
+[
+ {
+  "id": "PRI-001",
+  "number": 1,
+  "name": "Dragonnet de Lave",
+  "title": "Premier souffle",
+  "faction": "primordial",
+  "rarity": "C",
+  "category": "Dragon",
+  "power": 2,
+  "role": "S",
+  "stats": {
+   "atk": 5,
+   "def": 0,
+   "spd": 5,
+   "mag": 1,
+   "hp": 7,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 1
+   }
+  ],
+  "visual": "Jeune dragon aux écailles encore molles et rougeoyantes, ailes trop grandes pour lui, fumée aux naseaux.",
+  "lore": "Il crache plus de fumée que de feu. Laissez-lui mille ans.",
+  "evolution": {
+   "line": "magma",
+   "name": "Lignée du Magma",
+   "stage": 1,
+   "stages": 3
+  },
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "dragon",
+   "legs": 4,
+   "scale": 0.7,
+   "scene": "volcano"
+  },
+  "image": "assets/art/PRI-001.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Dragonnet de Lave — Jeune dragon aux écailles encore molles et rougeoyantes, ailes trop grandes pour lui, fumée aux naseaux. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-002",
+  "number": 2,
+  "name": "Élémentaire de Magma",
+  "title": "La roche qui coule",
+  "faction": "primordial",
+  "rarity": "C",
+  "category": "Élémentaire",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 2,
+   "mag": 1,
+   "hp": 11,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "regen",
+    "value": 1
+   }
+  ],
+  "visual": "Masse de roche en fusion qui s’écoule et se reforme sans cesse, deux yeux jaunes dans la croûte noire.",
+  "lore": "Il n’a pas de forme. Il a seulement une direction : vers le bas, vers le cœur du monde.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "blob",
+   "eyes": 2,
+   "mouths": 1,
+   "tint": "#ff8a30",
+   "scene": "volcano"
+  },
+  "image": "assets/art/PRI-002.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Élémentaire de Magma — Masse de roche en fusion qui s’écoule et se reforme sans cesse, deux yeux jaunes dans la croûte noire. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-003",
+  "number": 3,
+  "name": "Wyverne des Cendres",
+  "title": "Deux pattes, mille lieues",
+  "faction": "primordial",
+  "rarity": "C",
+  "category": "Dragon",
+  "power": 3,
+  "role": "S",
+  "stats": {
+   "atk": 6,
+   "def": 0,
+   "spd": 6,
+   "mag": 1,
+   "hp": 9,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Dragon bipède aux ailes membraneuses noircies, queue terminée par un dard, plumage de cendre sur la nuque.",
+  "lore": "Les héraldistes la distinguent du dragon par ses deux pattes. Elle, ne distingue pas les héraldistes des autres proies.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "dragon",
+   "legs": 2,
+   "scale": 0.8,
+   "scene": "volcano"
+  },
+  "image": "assets/art/PRI-003.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Wyverne des Cendres — Dragon bipède aux ailes membraneuses noircies, queue terminée par un dard, plumage de cendre sur la nuque. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-004",
+  "number": 4,
+  "name": "Géant des Glaces",
+  "title": "Fils du givre",
+  "faction": "primordial",
+  "rarity": "C",
+  "category": "Géant",
+  "power": 3,
+  "role": "T",
+  "stats": {
+   "atk": 4,
+   "def": 2,
+   "spd": 1,
+   "mag": 2,
+   "hp": 13,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Géant à la peau bleue craquelée de givre, barbe de stalactites, souffle qui gèle l’herbe à ses pieds.",
+  "lore": "Les mythes nordiques le disent descendant d’Ymir. Il a hérité de son caractère.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "bulky",
+   "arms": "down",
+   "scale": 1.05,
+   "scene": "ice"
+  },
+  "image": "assets/art/PRI-004.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Géant des Glaces — Géant à la peau bleue craquelée de givre, barbe de stalactites, souffle qui gèle l’herbe à ses pieds. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-005",
+  "number": 5,
+  "name": "Cyclope Forgeron",
+  "title": "L’œil de l’enclume",
+  "faction": "primordial",
+  "rarity": "C",
+  "category": "Géant",
+  "power": 3,
+  "role": "B",
+  "stats": {
+   "atk": 5,
+   "def": 1,
+   "spd": 3,
+   "mag": 1,
+   "hp": 11,
+   "cost": 4
+  },
+  "abilities": [],
+  "visual": "Géant à l’œil unique, tablier de cuir brûlé, marteau énorme sur l’épaule, bras couverts d’étincelles.",
+  "lore": "Hésiode raconte qu’ils forgèrent la foudre de Zeus. Celui-ci forge encore, mais pour qui ?",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "eyes": 1,
+   "body": "bulky",
+   "arms": "staff",
+   "scene": "volcano"
+  },
+  "image": "assets/art/PRI-005.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Cyclope Forgeron — Géant à l’œil unique, tablier de cuir brûlé, marteau énorme sur l’épaule, bras couverts d’étincelles. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-006",
+  "number": 6,
+  "name": "Tortue des Âges",
+  "title": "Le temps sur son dos",
+  "faction": "primordial",
+  "rarity": "C",
+  "category": "Bête primordiale",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 2,
+   "mag": 2,
+   "hp": 10,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Tortue colossale à la carapace couverte de lichens millénaires et de ruines minuscules.",
+  "lore": "Des civilisations entières ont vécu sur son dos. Elle ne s’en est pas aperçue.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lizard",
+   "size": "big",
+   "tail": "none",
+   "spikes": true
+  },
+  "image": "assets/art/PRI-006.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Tortue des Âges — Tortue colossale à la carapace couverte de lichens millénaires et de ruines minuscules. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-007",
+  "number": 7,
+  "name": "Feu Originel",
+  "title": "La première flamme",
+  "faction": "primordial",
+  "rarity": "C",
+  "category": "Élémentaire",
+  "power": 1,
+  "role": "S",
+  "stats": {
+   "atk": 4,
+   "def": 1,
+   "spd": 4,
+   "mag": 0,
+   "hp": 6,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Essaim de flammèches dorées qui tournoient en spirale, chacune contenant un minuscule soleil.",
+  "lore": "Prométhée n’a pas inventé le feu. Il l’a seulement volé à ceux-là.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "swarm",
+   "kind": "wisp",
+   "count": 22,
+   "tint": "#ffa040",
+   "scene": "volcano"
+  },
+  "image": "assets/art/PRI-007.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Feu Originel — Essaim de flammèches dorées qui tournoient en spirale, chacune contenant un minuscule soleil. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-008",
+  "number": 8,
+  "name": "Serpent de Lave",
+  "title": "Rivière vivante",
+  "faction": "primordial",
+  "rarity": "C",
+  "category": "Dragon",
+  "power": 2,
+  "role": "B",
+  "stats": {
+   "atk": 5,
+   "def": 1,
+   "spd": 4,
+   "mag": 1,
+   "hp": 9,
+   "cost": 3
+  },
+  "abilities": [],
+  "visual": "Serpent de roche en fusion dont les écailles se figent et se brisent à chaque ondulation.",
+  "lore": "Il nage dans le magma comme d’autres nagent dans l’eau.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "serpent",
+   "scale": 0.82,
+   "scene": "volcano"
+  },
+  "image": "assets/art/PRI-008.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Serpent de Lave — Serpent de roche en fusion dont les écailles se figent et se brisent à chaque ondulation. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-009",
+  "number": 9,
+  "name": "Pierre Levée Vivante",
+  "title": "Menhir éveillé",
+  "faction": "primordial",
+  "rarity": "C",
+  "category": "Élémentaire",
+  "power": 3,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 2,
+   "mag": 1,
+   "hp": 14,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Menhir gravé de spirales anciennes qui s’est dressé sur des jambes de roche, un feu pâle en guise de cœur.",
+  "lore": "Les anciens l’ont dressé pour marquer quelque chose. Il a oublié quoi, mais il garde l’endroit.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "golem",
+   "head": "none",
+   "runes": true,
+   "scene": "mountain"
+  },
+  "image": "assets/art/PRI-009.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Pierre Levée Vivante — Menhir gravé de spirales anciennes qui s’est dressé sur des jambes de roche, un feu pâle en guise de cœur. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-010",
+  "number": 10,
+  "name": "Jötunn des Montagnes",
+  "title": "Celui qui lance les rochers",
+  "faction": "primordial",
+  "rarity": "C",
+  "category": "Géant",
+  "power": 3,
+  "role": "B",
+  "stats": {
+   "atk": 7,
+   "def": 1,
+   "spd": 4,
+   "mag": 2,
+   "hp": 11,
+   "cost": 4
+  },
+  "abilities": [],
+  "visual": "Géant de pierre et de lichen, massue taillée dans un tronc entier, cheveux comme des éboulis.",
+  "lore": "Dans les mythes nordiques, les géants furent là avant les dieux. Ils ne l’ont pas oublié.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "bulky",
+   "arms": "staff",
+   "scale": 1.08,
+   "scene": "mountain"
+  },
+  "image": "assets/art/PRI-010.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Jötunn des Montagnes — Géant de pierre et de lichen, massue taillée dans un tronc entier, cheveux comme des éboulis. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-011",
+  "number": 11,
+  "name": "Scarabée Solaire",
+  "title": "Il pousse le soleil",
+  "faction": "primordial",
+  "rarity": "C",
+  "category": "Insecte sacré",
+  "power": 2,
+  "role": "U",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 3,
+   "mag": 2,
+   "hp": 11,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 1
+   }
+  ],
+  "visual": "Scarabée d’or et de lapis poussant devant lui un disque solaire flamboyant.",
+  "lore": "Les Égyptiens voyaient Khépri pousser le soleil chaque matin. Ce scarabée-ci l’aide un peu.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "insect",
+   "type": "scarab",
+   "sun": true,
+   "scene": "temple"
+  },
+  "image": "assets/art/PRI-011.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Scarabée Solaire — Scarabée d’or et de lapis poussant devant lui un disque solaire flamboyant. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-012",
+  "number": 12,
+  "name": "Éclat d’Étoile",
+  "title": "Fragment tombé",
+  "faction": "primordial",
+  "rarity": "C",
+  "category": "Élémentaire",
+  "power": 1,
+  "role": "M",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 3,
+   "mag": 1,
+   "hp": 7,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Cristal d’étoile tombé du ciel, encore brûlant, dont les facettes reflètent des constellations disparues.",
+  "lore": "Une étoile est morte pour qu’il existe. Il essaie de s’en montrer digne.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "orb",
+   "type": "crystal",
+   "scale": 0.78,
+   "scene": "cosmos"
+  },
+  "image": "assets/art/PRI-012.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Éclat d’Étoile — Cristal d’étoile tombé du ciel, encore brûlant, dont les facettes reflètent des constellations disparues. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-013",
+  "number": 13,
+  "name": "Drake de Magma",
+  "title": "L’âge des écailles",
+  "faction": "primordial",
+  "rarity": "PC",
+  "category": "Dragon",
+  "power": 4,
+  "role": "B",
+  "stats": {
+   "atk": 7,
+   "def": 1,
+   "spd": 3,
+   "mag": 1,
+   "hp": 14,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 2
+   }
+  ],
+  "visual": "Dragon adolescent aux écailles noires veinées de lave, cornes recourbées, gueule pleine de braises.",
+  "lore": "Le dragonnet de lave a survécu à ses premiers siècles. Il commence à se souvenir du feu originel.",
+  "evolution": {
+   "line": "magma",
+   "name": "Lignée du Magma",
+   "stage": 2,
+   "stages": 3
+  },
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "dragon",
+   "legs": 4,
+   "scale": 0.88,
+   "scene": "volcano"
+  },
+  "image": "assets/art/PRI-013.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Drake de Magma — Dragon adolescent aux écailles noires veinées de lave, cornes recourbées, gueule pleine de braises. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-014",
+  "number": 14,
+  "name": "Gigas",
+  "title": "Né du sang d’Ouranos",
+  "faction": "primordial",
+  "rarity": "PC",
+  "category": "Géant",
+  "power": 5,
+  "role": "B",
+  "stats": {
+   "atk": 9,
+   "def": 2,
+   "spd": 4,
+   "mag": 1,
+   "hp": 15,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Géant aux jambes remplacées par deux serpents enroulés, brandissant un rocher au-dessus de sa tête.",
+  "lore": "Les Gigantes défièrent les dieux de l’Olympe. Il fallut un mortel pour les vaincre. Ils en gardent rancune.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "bulky",
+   "arms": "up",
+   "tail": true,
+   "hair": true,
+   "scale": 1.08,
+   "scene": "mountain"
+  },
+  "image": "assets/art/PRI-014.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Gigas — Géant aux jambes remplacées par deux serpents enroulés, brandissant un rocher au-dessus de sa tête. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-015",
+  "number": 15,
+  "name": "Coeos",
+  "title": "L’axe des cieux",
+  "faction": "primordial",
+  "rarity": "PC",
+  "category": "Titan",
+  "power": 5,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 2,
+   "spd": 5,
+   "mag": 7,
+   "hp": 13,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Titan au regard triple tenant au-dessus de lui l’axe autour duquel tournent les étoiles.",
+  "lore": "Titan de l’intelligence et de l’axe céleste. Il a compris la Titanomachie avant qu’elle ne commence.",
+  "evolution": null,
+  "sets": [
+   "titans"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "robe",
+   "arms": "up",
+   "eyes": 3,
+   "scale": 1.12,
+   "scene": "cosmos"
+  },
+  "image": "assets/art/PRI-015.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Coeos — Titan au regard triple tenant au-dessus de lui l’axe autour duquel tournent les étoiles. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-016",
+  "number": 16,
+  "name": "Crios",
+  "title": "Le bélier des constellations",
+  "faction": "primordial",
+  "rarity": "PC",
+  "category": "Titan",
+  "power": 5,
+  "role": "B",
+  "stats": {
+   "atk": 8,
+   "def": 3,
+   "spd": 4,
+   "mag": 2,
+   "hp": 15,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Titan cuirassé aux cornes de bélier, constellations tatouées sur la peau qui s’allument au crépuscule.",
+  "lore": "Il commande aux constellations. Elles lui obéissent avec un retard de quelques millénaires.",
+  "evolution": null,
+  "sets": [
+   "titans"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "horns": "ram",
+   "body": "armor",
+   "arms": "spread",
+   "scale": 1.12,
+   "scene": "cosmos"
+  },
+  "image": "assets/art/PRI-016.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Crios — Titan cuirassé aux cornes de bélier, constellations tatouées sur la peau qui s’allument au crépuscule. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-017",
+  "number": 17,
+  "name": "Phœbé",
+  "title": "La lune prophétique",
+  "faction": "primordial",
+  "rarity": "PC",
+  "category": "Titanide",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 4,
+   "def": 2,
+   "spd": 3,
+   "mag": 4,
+   "hp": 10,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "bless",
+    "value": 1
+   }
+  ],
+  "visual": "Titanide au visage pâle comme la lune, longue chevelure d’argent, auréole lunaire derrière la tête.",
+  "lore": "Elle tint l’oracle de Delphes avant Apollon. Elle le lui offrit. Elle aurait dû lire l’avenir avant.",
+  "evolution": null,
+  "sets": [
+   "titans"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "gown",
+   "hair": true,
+   "halo": "ring",
+   "arms": "down",
+   "scale": 1.1,
+   "scene": "cosmos"
+  },
+  "image": "assets/art/PRI-017.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Phœbé — Titanide au visage pâle comme la lune, longue chevelure d’argent, auréole lunaire derrière la tête. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-018",
+  "number": 18,
+  "name": "Mnémosyne",
+  "title": "Mère des Muses",
+  "faction": "primordial",
+  "rarity": "PC",
+  "category": "Titanide",
+  "power": 4,
+  "role": "U",
+  "stats": {
+   "atk": 5,
+   "def": 2,
+   "spd": 3,
+   "mag": 4,
+   "hp": 12,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "relic"
+   }
+  ],
+  "visual": "Titanide aux yeux clos, robe couverte d’écritures anciennes qui défilent lentement sur le tissu.",
+  "lore": "Titanide de la mémoire. Elle se souvient de toutes les cartes, même de celles qui n’ont pas encore été tirées.",
+  "evolution": null,
+  "sets": [
+   "titans"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "gown",
+   "hair": true,
+   "arms": "pray",
+   "scale": 1.1,
+   "scene": "temple"
+  },
+  "image": "assets/art/PRI-018.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Mnémosyne — Titanide aux yeux clos, robe couverte d’écritures anciennes qui défilent lentement sur le tissu. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-019",
+  "number": 19,
+  "name": "Ladon",
+  "title": "Le gardien des pommes d’or",
+  "faction": "primordial",
+  "rarity": "PC",
+  "category": "Dragon",
+  "power": 5,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 4,
+   "spd": 2,
+   "mag": 2,
+   "hp": 18,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Serpent-dragon aux têtes multiples enroulé autour d’un pommier aux fruits d’or, veillant sans jamais dormir.",
+  "lore": "Il gardait le jardin des Hespérides. Héraclès le tua. Le jardin, lui, attend toujours son gardien.",
+  "evolution": null,
+  "sets": [
+   "dragons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "serpent",
+   "heads": 5,
+   "frill": true,
+   "scene": "forest"
+  },
+  "image": "assets/art/PRI-019.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ladon — Serpent-dragon aux têtes multiples enroulé autour d’un pommier aux fruits d’or, veillant sans jamais dormir. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-020",
+  "number": 20,
+  "name": "Lindworm",
+  "title": "Le ver aux deux bras",
+  "faction": "primordial",
+  "rarity": "PC",
+  "category": "Dragon",
+  "power": 4,
+  "role": "B",
+  "stats": {
+   "atk": 7,
+   "def": 2,
+   "spd": 3,
+   "mag": 2,
+   "hp": 12,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Long dragon sans ailes à deux pattes antérieures, corps de serpent, gueule venimeuse et barbillons.",
+  "lore": "Les légendes scandinaves racontent qu’un prince lindworm épousa une bergère. Il dévora les épouses précédentes.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "dragon",
+   "legs": 2,
+   "wings": "none",
+   "scene": "forest"
+  },
+  "image": "assets/art/PRI-020.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Lindworm — Long dragon sans ailes à deux pattes antérieures, corps de serpent, gueule venimeuse et barbillons. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-021",
+  "number": 21,
+  "name": "Drake des Tempêtes",
+  "title": "Il chevauche l’orage",
+  "faction": "primordial",
+  "rarity": "PC",
+  "category": "Dragon",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 6,
+   "def": 1,
+   "spd": 7,
+   "mag": 2,
+   "hp": 9,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   },
+   {
+    "key": "strike",
+    "value": 1
+   }
+  ],
+  "visual": "Dragon gris-bleu aux ailes chargées d’électricité, éclairs crépitant entre ses cornes.",
+  "lore": "Il naît au cœur des orages. Quand il se tait, le ciel se tait aussi.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "dragon",
+   "legs": 4,
+   "scale": 0.88,
+   "scene": "sky",
+   "tint": "#9fd8ff"
+  },
+  "image": "assets/art/PRI-021.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Drake des Tempêtes — Dragon gris-bleu aux ailes chargées d’électricité, éclairs crépitant entre ses cornes. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-022",
+  "number": 22,
+  "name": "Smok Wawelski",
+  "title": "Le dragon de Cracovie",
+  "faction": "primordial",
+  "rarity": "PC",
+  "category": "Dragon",
+  "power": 4,
+  "role": "B",
+  "stats": {
+   "atk": 7,
+   "def": 1,
+   "spd": 3,
+   "mag": 2,
+   "hp": 12,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Dragon trapu à la panse énorme, sortant d’une grotte sous un château, gueule fumante.",
+  "lore": "La légende polonaise dit qu’on le tua avec un mouton farci de soufre. Il a appris à se méfier des moutons.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "dragon",
+   "legs": 4,
+   "scene": "ruins"
+  },
+  "image": "assets/art/PRI-022.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Smok Wawelski — Dragon trapu à la panse énorme, sortant d’une grotte sous un château, gueule fumante. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-023",
+  "number": 23,
+  "name": "Roc",
+  "title": "L’oiseau qui porte les éléphants",
+  "faction": "primordial",
+  "rarity": "PC",
+  "category": "Créature mythologique",
+  "power": 4,
+  "role": "B",
+  "stats": {
+   "atk": 7,
+   "def": 1,
+   "spd": 4,
+   "mag": 1,
+   "hp": 13,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Oiseau gigantesque aux plumes brunes et or, serres capables d’emporter un éléphant.",
+  "lore": "Sindbad le marin s’accrocha à sa patte. Le Roc ne le remarqua même pas.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "eagle",
+   "scene": "mountain"
+  },
+  "image": "assets/art/PRI-023.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Roc — Oiseau gigantesque aux plumes brunes et or, serres capables d’emporter un éléphant. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-024",
+  "number": 24,
+  "name": "Le Murmure du Néant",
+  "title": "Ce qui parle entre les étoiles",
+  "faction": "primordial",
+  "rarity": "PC",
+  "category": "Entité du Néant",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 4,
+   "def": 1,
+   "spd": 4,
+   "mag": 5,
+   "hp": 12,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 2
+   }
+  ],
+  "visual": "Tache d’obscurité aux contours mouvants, constellée d’yeux minuscules qui s’ouvrent et se ferment.",
+  "lore": "Il ne dit qu’une chose, en boucle. Personne n’a encore voulu l’entendre jusqu’au bout.",
+  "evolution": null,
+  "sets": [
+   "neant"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "orb",
+   "type": "void",
+   "scene": "void"
+  },
+  "image": "assets/art/PRI-024.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Murmure du Néant — Tache d’obscurité aux contours mouvants, constellée d’yeux minuscules qui s’ouvrent et se ferment. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-025",
+  "number": 25,
+  "name": "Wyrm des Fournaises Originelles",
+  "title": "Il a vu le monde brûler",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Dragon",
+  "power": 7,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 3,
+   "spd": 6,
+   "mag": 2,
+   "hp": 18,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 2
+   },
+   {
+    "key": "cataclysm",
+    "value": 1
+   }
+  ],
+  "visual": "Dragon adulte aux écailles d’obsidienne, poitrail fendu de lave, ailes comme des voiles de forge.",
+  "lore": "Le dernier stade du dragonnet. Il ne crache plus du feu : il crache l’origine du feu.",
+  "evolution": {
+   "line": "magma",
+   "name": "Lignée du Magma",
+   "stage": 3,
+   "stages": 3
+  },
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "dragon",
+   "legs": 4,
+   "fire": true,
+   "scene": "volcano"
+  },
+  "image": "assets/art/PRI-025.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Wyrm des Fournaises Originelles — Dragon adulte aux écailles d’obsidienne, poitrail fendu de lave, ailes comme des voiles de forge. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-026",
+  "number": 26,
+  "name": "Atlas",
+  "title": "Celui qui porte le ciel",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Titan",
+  "power": 7,
+  "role": "T",
+  "stats": {
+   "atk": 6,
+   "def": 5,
+   "spd": 3,
+   "mag": 4,
+   "hp": 23,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Titan aux muscles tendus à l’extrême, soutenant sur ses épaules une sphère céleste gravée.",
+  "lore": "Condamné à porter le ciel. Il a cessé de compter les siècles, pas les étoiles.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "bulky",
+   "arms": "up",
+   "globe": true,
+   "scale": 1.15,
+   "scene": "mountain"
+  },
+  "image": "assets/art/PRI-026.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Atlas — Titan aux muscles tendus à l’extrême, soutenant sur ses épaules une sphère céleste gravée. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-027",
+  "number": 27,
+  "name": "Prométhée",
+  "title": "Le voleur de feu",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Titan",
+  "power": 6,
+  "role": "U",
+  "stats": {
+   "atk": 6,
+   "def": 3,
+   "spd": 4,
+   "mag": 6,
+   "hp": 17,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 2
+   },
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Titan enchaîné à un rocher, brandissant une torche, flanc marqué de cicatrices d’aigle.",
+  "lore": "Il donna le feu aux hommes. Un aigle lui mangea le foie chaque jour pendant des siècles. Il ne regrette rien.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "lean",
+   "arms": "up",
+   "chains": true,
+   "fire": true,
+   "scene": "mountain"
+  },
+  "image": "assets/art/PRI-027.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Prométhée — Titan enchaîné à un rocher, brandissant une torche, flanc marqué de cicatrices d’aigle. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-028",
+  "number": 28,
+  "name": "Níðhöggr",
+  "title": "Celui qui ronge les racines",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Dragon",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 9,
+   "def": 3,
+   "spd": 4,
+   "mag": 3,
+   "hp": 16,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Dragon noir aux ailes déchirées, gueule plantée dans les racines d’un arbre colossal.",
+  "lore": "L’Edda dit qu’il ronge les racines d’Yggdrasil. L’arbre tient encore. Pour combien de temps ?",
+  "evolution": null,
+  "sets": [
+   "dragons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "dragon",
+   "legs": 2,
+   "wings": "tatter",
+   "scene": "crypt"
+  },
+  "image": "assets/art/PRI-028.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Níðhöggr — Dragon noir aux ailes déchirées, gueule plantée dans les racines d’un arbre colossal. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-029",
+  "number": 29,
+  "name": "Zmey Gorynych",
+  "title": "Le dragon aux trois têtes",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Dragon",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 2,
+   "spd": 5,
+   "mag": 3,
+   "hp": 15,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Dragon vert à trois têtes crachant le feu, ailes immenses, griffes de fer.",
+  "lore": "Les bylines russes le font combattre Dobrynia. Chaque tête se souvient d’une défaite différente.",
+  "evolution": null,
+  "sets": [
+   "dragons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "dragon",
+   "heads": 3,
+   "legs": 4,
+   "scene": "sky"
+  },
+  "image": "assets/art/PRI-029.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Zmey Gorynych — Dragon vert à trois têtes crachant le feu, ailes immenses, griffes de fer. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-030",
+  "number": 30,
+  "name": "Thémis",
+  "title": "La loi divine",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Titanide",
+  "power": 6,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 2,
+   "spd": 4,
+   "mag": 7,
+   "hp": 13,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 2
+   },
+   {
+    "key": "aegis"
+   }
+  ],
+  "visual": "Titanide au visage masqué, bras écartés, balance d’or suspendue entre ses doigts.",
+  "lore": "Titanide de l’ordre et de la justice. Elle a jugé les dieux eux-mêmes, et les a parfois condamnés.",
+  "evolution": null,
+  "sets": [
+   "titans"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "mask",
+   "body": "robe",
+   "arms": "spread",
+   "halo": "ring",
+   "scale": 1.12,
+   "scene": "temple"
+  },
+  "image": "assets/art/PRI-030.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Thémis — Titanide au visage masqué, bras écartés, balance d’or suspendue entre ses doigts. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-031",
+  "number": 31,
+  "name": "Théia",
+  "title": "La vue lumineuse",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Titanide",
+  "power": 6,
+  "role": "U",
+  "stats": {
+   "atk": 6,
+   "def": 4,
+   "spd": 4,
+   "mag": 6,
+   "hp": 17,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 2
+   }
+  ],
+  "visual": "Titanide rayonnante, troisième œil ouvert, faisant naître la lumière entre ses mains levées.",
+  "lore": "Mère du Soleil, de la Lune et de l’Aurore. Elle a donné l’éclat à l’or et aux yeux.",
+  "evolution": null,
+  "sets": [
+   "titans"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "gown",
+   "arms": "up",
+   "halo": "ring",
+   "eyes": 3,
+   "scale": 1.12,
+   "scene": "sky"
+  },
+  "image": "assets/art/PRI-031.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Théia — Titanide rayonnante, troisième œil ouvert, faisant naître la lumière entre ses mains levées. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-032",
+  "number": 32,
+  "name": "Téthys",
+  "title": "Mère des fleuves",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Titanide",
+  "power": 6,
+  "role": "U",
+  "stats": {
+   "atk": 5,
+   "def": 3,
+   "spd": 5,
+   "mag": 6,
+   "hp": 16,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "regen",
+    "value": 2
+   },
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Titanide aux cheveux d’eau vive, robe d’écume, entourée de mille fleuves qui coulent de ses doigts.",
+  "lore": "Elle enfanta trois mille fleuves et trois mille océanides. Elle connaît le nom de chacun.",
+  "evolution": null,
+  "sets": [
+   "titans"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "gown",
+   "hair": true,
+   "arms": "spread",
+   "scale": 1.12,
+   "scene": "ocean"
+  },
+  "image": "assets/art/PRI-032.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Téthys — Titanide aux cheveux d’eau vive, robe d’écume, entourée de mille fleuves qui coulent de ses doigts. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-033",
+  "number": 33,
+  "name": "Japet",
+  "title": "Le perceur",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Titan",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 2,
+   "spd": 5,
+   "mag": 2,
+   "hp": 17,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Titan en armure de bronze, lance de pierre noire, regard tourné vers l’ouest.",
+  "lore": "Père d’Atlas et de Prométhée. Titan de la mortalité, dit-on. Il n’a jamais trouvé cela drôle.",
+  "evolution": null,
+  "sets": [
+   "titans"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "body": "armor",
+   "arms": "sword",
+   "scale": 1.12,
+   "scene": "mountain"
+  },
+  "image": "assets/art/PRI-033.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Japet — Titan en armure de bronze, lance de pierre noire, regard tourné vers l’ouest. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-034",
+  "number": 34,
+  "name": "Océan",
+  "title": "Le fleuve qui entoure le monde",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Titan",
+  "power": 7,
+  "role": "T",
+  "stats": {
+   "atk": 6,
+   "def": 5,
+   "spd": 4,
+   "mag": 3,
+   "hp": 23,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Titan barbu aux cornes de taureau, corps finissant en queue de poisson, entouré d’un fleuve circulaire.",
+  "lore": "Il fut le seul Titan à ne pas prendre part à la guerre. Il entoure le monde et regarde.",
+  "evolution": null,
+  "sets": [
+   "titans"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "horns": "bull",
+   "body": "bulky",
+   "tail": true,
+   "hair": true,
+   "arms": "spread",
+   "scale": 1.12,
+   "scene": "ocean"
+  },
+  "image": "assets/art/PRI-034.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Océan — Titan barbu aux cornes de taureau, corps finissant en queue de poisson, entouré d’un fleuve circulaire. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-035",
+  "number": 35,
+  "name": "Rhéa",
+  "title": "Mère des dieux",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Titanide",
+  "power": 6,
+  "role": "U",
+  "stats": {
+   "atk": 5,
+   "def": 4,
+   "spd": 4,
+   "mag": 7,
+   "hp": 18,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 3
+   }
+  ],
+  "visual": "Titanide couronnée de tours, robe de terre et de montagnes, mains jointes sur une pierre emmaillotée.",
+  "lore": "Elle donna une pierre à Cronos à la place de Zeus. Le plus grand mensonge de l’histoire du monde.",
+  "evolution": null,
+  "sets": [
+   "titans"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "crown",
+   "body": "gown",
+   "arms": "pray",
+   "scale": 1.12,
+   "scene": "mountain"
+  },
+  "image": "assets/art/PRI-035.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Rhéa — Titanide couronnée de tours, robe de terre et de montagnes, mains jointes sur une pierre emmaillotée. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-036",
+  "number": 36,
+  "name": "Briarée",
+  "title": "Aux cent bras",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Géant",
+  "power": 7,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 3,
+   "spd": 6,
+   "mag": 2,
+   "hp": 19,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Géant aux innombrables bras déployés en éventail, chacun tenant un rocher prêt à être lancé.",
+  "lore": "Les Hécatonchires lancèrent trois cents rochers à la fois contre les Titans. Ils visent encore très bien.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "bulky",
+   "arms": "spread",
+   "multi": 4,
+   "scale": 1.08,
+   "scene": "mountain"
+  },
+  "image": "assets/art/PRI-036.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Briarée — Géant aux innombrables bras déployés en éventail, chacun tenant un rocher prêt à être lancé. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-037",
+  "number": 37,
+  "name": "Nergal",
+  "title": "Seigneur de la peste et de la guerre",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Divinité mésopotamienne",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 9,
+   "def": 3,
+   "spd": 5,
+   "mag": 2,
+   "hp": 16,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   },
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Dieu barbu couronné de cornes, cimeterre à tête de lion, ombre portée qui rampe vers les vivants.",
+  "lore": "Dieu des épidémies et des enfers, époux d’Ereshkigal. Ses temples sont tombés, sa colère est restée.",
+  "evolution": null,
+  "sets": [
+   "oublies"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "crown",
+   "body": "armor",
+   "arms": "sword",
+   "horns": "bull",
+   "scene": "temple"
+  },
+  "image": "assets/art/PRI-037.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Nergal — Dieu barbu couronné de cornes, cimeterre à tête de lion, ombre portée qui rampe vers les vivants. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-038",
+  "number": 38,
+  "name": "Fafnir",
+  "title": "Le gardien du trésor maudit",
+  "faction": "primordial",
+  "rarity": "HR",
+  "category": "Dragon",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 6,
+   "def": 6,
+   "spd": 3,
+   "mag": 3,
+   "hp": 26,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "armor",
+    "value": 2
+   }
+  ],
+  "visual": "Dragon sans ailes lové sur un amas d’or maudit, écailles incrustées de bijoux, regard jaloux.",
+  "lore": "Il était un nain avant que l’or ne le change. L’or change toujours ceux qui le gardent.",
+  "evolution": null,
+  "sets": [
+   "dragons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "dragon",
+   "legs": 4,
+   "wings": "none",
+   "scene": "ruins"
+  },
+  "image": "assets/art/PRI-038.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Fafnir — Dragon sans ailes lové sur un amas d’or maudit, écailles incrustées de bijoux, regard jaloux. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-039",
+  "number": 39,
+  "name": "Typhon",
+  "title": "Père des monstres",
+  "faction": "primordial",
+  "rarity": "HR",
+  "category": "Géant",
+  "power": 9,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 3,
+   "spd": 7,
+   "mag": 4,
+   "hp": 23,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "cataclysm",
+    "value": 2
+   }
+  ],
+  "visual": "Géant colossal dont les épaules portent cent têtes de serpents, ailes immenses, jambes de vipères enroulées.",
+  "lore": "Zeus lui-même fut vaincu par lui une fois. Il l’enferma sous l’Etna, qui gronde encore.",
+  "evolution": null,
+  "sets": [
+   "fleaux"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "wings": "bat",
+   "body": "bulky",
+   "arms": "spread",
+   "tail": true,
+   "horns": "many",
+   "scale": 1.15,
+   "scene": "volcano"
+  },
+  "image": "assets/art/PRI-039.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Typhon — Géant colossal dont les épaules portent cent têtes de serpents, ailes immenses, jambes de vipères enroulées. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-040",
+  "number": 40,
+  "name": "Ymir",
+  "title": "Le premier géant",
+  "faction": "primordial",
+  "rarity": "HR",
+  "category": "Géant",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 8,
+   "def": 6,
+   "spd": 3,
+   "mag": 4,
+   "hp": 25,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "regen",
+    "value": 2
+   }
+  ],
+  "visual": "Géant primordial dont le corps semble fait de montagnes enneigées, barbe de glaciers, yeux de ciel gelé.",
+  "lore": "Les dieux nordiques bâtirent le monde avec son corps : ses os, les montagnes ; son sang, la mer.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "bulky",
+   "arms": "down",
+   "hair": true,
+   "scale": 1.28,
+   "dy": 20,
+   "scene": "ice"
+  },
+  "image": "assets/art/PRI-040.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ymir — Géant primordial dont le corps semble fait de montagnes enneigées, barbe de glaciers, yeux de ciel gelé. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-041",
+  "number": 41,
+  "name": "Surtr",
+  "title": "Le Noir du Muspellheim",
+  "faction": "primordial",
+  "rarity": "HR",
+  "category": "Géant",
+  "power": 9,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 7,
+   "mag": 4,
+   "hp": 23,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "cataclysm",
+    "value": 2
+   }
+  ],
+  "visual": "Géant de feu noir à l’épée flamboyante plus brillante que le soleil, ailes de flammes rugissantes.",
+  "lore": "Au Ragnarök, il embrasera le monde. Il s’entraîne déjà.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "armor",
+   "arms": "sword",
+   "wings": "flame",
+   "scale": 1.18,
+   "scene": "volcano"
+  },
+  "image": "assets/art/PRI-041.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Surtr — Géant de feu noir à l’épée flamboyante plus brillante que le soleil, ailes de flammes rugissantes. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-042",
+  "number": 42,
+  "name": "Quetzalcóatl",
+  "title": "Le Serpent à plumes",
+  "faction": "primordial",
+  "rarity": "HR",
+  "category": "Divinité aztèque",
+  "power": 8,
+  "role": "U",
+  "stats": {
+   "atk": 7,
+   "def": 5,
+   "spd": 5,
+   "mag": 8,
+   "hp": 22,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 2
+   },
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Serpent couvert de plumes de quetzal vert émeraude, collerette d’or, ailes de plumes déployées.",
+  "lore": "Dieu du vent et du savoir dans les traditions de Mésoamérique. Il est parti vers l’est en promettant de revenir.",
+  "evolution": null,
+  "sets": [
+   "dragons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "serpent",
+   "frill": true,
+   "fins": true,
+   "wings": "feather",
+   "scene": "temple"
+  },
+  "image": "assets/art/PRI-042.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Quetzalcóatl — Serpent couvert de plumes de quetzal vert émeraude, collerette d’or, ailes de plumes déployées. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-043",
+  "number": 43,
+  "name": "Yamata no Orochi",
+  "title": "Le serpent aux huit têtes",
+  "faction": "primordial",
+  "rarity": "HR",
+  "category": "Dragon",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 3,
+   "spd": 6,
+   "mag": 3,
+   "hp": 20,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "frenzy"
+   },
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Serpent gigantesque à huit têtes et huit queues, yeux rouges comme des cerises, ventre couvert de sang.",
+  "lore": "Le Kojiki raconte que Susanoo l’enivra avec huit cuves de saké. Il ne boit plus.",
+  "evolution": null,
+  "sets": [
+   "dragons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "serpent",
+   "heads": 8,
+   "scene": "volcano"
+  },
+  "image": "assets/art/PRI-043.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Yamata no Orochi — Serpent gigantesque à huit têtes et huit queues, yeux rouges comme des cerises, ventre couvert de sang. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-044",
+  "number": 44,
+  "name": "Hypérion",
+  "title": "Celui qui marche en haut",
+  "faction": "primordial",
+  "rarity": "HR",
+  "category": "Titan",
+  "power": 8,
+  "role": "M",
+  "stats": {
+   "atk": 7,
+   "def": 3,
+   "spd": 7,
+   "mag": 10,
+   "hp": 17,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 3
+   }
+  ],
+  "visual": "Titan couronné de rayons, ailes de feu, armure d’or blanc qui éblouit à regarder.",
+  "lore": "Titan de la lumière céleste, père du Soleil. Il avance toujours au zénith.",
+  "evolution": null,
+  "sets": [
+   "titans"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "crown",
+   "wings": "flame",
+   "body": "armor",
+   "arms": "spread",
+   "scale": 1.15,
+   "scene": "sky"
+  },
+  "image": "assets/art/PRI-044.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Hypérion — Titan couronné de rayons, ailes de feu, armure d’or blanc qui éblouit à regarder. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-045",
+  "number": 45,
+  "name": "Le Titan du Premier Feu",
+  "title": "L’étincelle géante",
+  "faction": "primordial",
+  "rarity": "HR",
+  "category": "Titan",
+  "power": 9,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 7,
+   "mag": 4,
+   "hp": 22,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "cataclysm",
+    "value": 1
+   },
+   {
+    "key": "command",
+    "value": 1
+   }
+  ],
+  "visual": "Titan de lave aux ailes de flammes, une étoile ardente à la place de la tête, poings fumants.",
+  "lore": "Il alluma le premier feu au fond du Néant. Il a passé l’éternité à l’entretenir.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "void",
+   "wings": "flame",
+   "body": "bulky",
+   "arms": "spread",
+   "scale": 1.18,
+   "scene": "volcano"
+  },
+  "image": "assets/art/PRI-045.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Titan du Premier Feu — Titan de lave aux ailes de flammes, une étoile ardente à la place de la tête, poings fumants. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-046",
+  "number": 46,
+  "name": "Le Colosse des Origines",
+  "title": "La première montagne",
+  "faction": "primordial",
+  "rarity": "HR",
+  "category": "Élémentaire",
+  "power": 9,
+  "role": "T",
+  "stats": {
+   "atk": 7,
+   "def": 8,
+   "spd": 4,
+   "mag": 4,
+   "hp": 26,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "armor",
+    "value": 2
+   }
+  ],
+  "visual": "Colosse de roche primitive aux veines de cristal, si grand que les nuages s’accrochent à ses épaules.",
+  "lore": "Le premier sol sur lequel on ait marché, c’était lui. Il s’est relevé.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "colossus",
+   "head": "none",
+   "cores": 1,
+   "scene": "mountain"
+  },
+  "image": "assets/art/PRI-046.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Colosse des Origines — Colosse de roche primitive aux veines de cristal, si grand que les nuages s’accrochent à ses épaules. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-047",
+  "number": 47,
+  "name": "Pangu",
+  "title": "Celui qui sépara le ciel et la terre",
+  "faction": "primordial",
+  "rarity": "HR",
+  "category": "Géant",
+  "power": 9,
+  "role": "T",
+  "stats": {
+   "atk": 7,
+   "def": 7,
+   "spd": 5,
+   "mag": 4,
+   "hp": 26,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "aegis"
+   },
+   {
+    "key": "bless",
+    "value": 2
+   }
+  ],
+  "visual": "Géant cornu et velu, tenant une hache de lumière, repoussant le ciel au-dessus de sa tête.",
+  "lore": "Le mythe chinois le fait naître d’un œuf cosmique. Il poussa le ciel pendant dix-huit mille ans.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "bulky",
+   "arms": "up",
+   "hair": true,
+   "horns": "short",
+   "scale": 1.2,
+   "scene": "cosmos"
+  },
+  "image": "assets/art/PRI-047.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Pangu — Géant cornu et velu, tenant une hache de lumière, repoussant le ciel au-dessus de sa tête. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-048",
+  "number": 48,
+  "name": "Tiamat",
+  "title": "La Mère du Chaos",
+  "faction": "primordial",
+  "rarity": "M",
+  "category": "Dragon primordial",
+  "power": 10,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 7,
+   "mag": 4,
+   "hp": 24,
+   "cost": 10
+  },
+  "abilities": [
+   {
+    "key": "cataclysm",
+    "value": 3
+   }
+  ],
+  "visual": "Dragon primordial aux cinq têtes dressées vers un ciel cosmique, corps fait d’eaux salées et de ténèbres.",
+  "lore": "L’Enuma Elish dit que Marduk la coupa en deux pour faire le ciel et la terre. Elle s’en souvient.",
+  "evolution": null,
+  "sets": [
+   "dragons",
+   "oublies"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "dragon",
+   "heads": 5,
+   "legs": 4,
+   "fire": true,
+   "scene": "cosmos"
+  },
+  "image": "assets/art/PRI-048.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Tiamat — Dragon primordial aux cinq têtes dressées vers un ciel cosmique, corps fait d’eaux salées et de ténèbres. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-049",
+  "number": 49,
+  "name": "Apophis",
+  "title": "Le Serpent du Chaos",
+  "faction": "primordial",
+  "rarity": "M",
+  "category": "Serpent primordial",
+  "power": 10,
+  "role": "T",
+  "stats": {
+   "atk": 8,
+   "def": 8,
+   "spd": 4,
+   "mag": 4,
+   "hp": 26,
+   "cost": 10
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   },
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Serpent démesuré aux écailles d’ombre, qui chaque nuit tente d’avaler la barque du Soleil.",
+  "lore": "Les Égyptiens récitaient des formules pour qu’il échoue chaque nuit. Plus personne ne les récite.",
+  "evolution": null,
+  "sets": [
+   "dragons",
+   "oublies"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "serpent",
+   "fins": true,
+   "horns": "back",
+   "scale": 1.15,
+   "scene": "temple"
+  },
+  "image": "assets/art/PRI-049.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Apophis — Serpent démesuré aux écailles d’ombre, qui chaque nuit tente d’avaler la barque du Soleil. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-050",
+  "number": 50,
+  "name": "Cronos",
+  "title": "Le Dévoreur du temps",
+  "faction": "primordial",
+  "rarity": "M",
+  "category": "Titan",
+  "power": 10,
+  "role": "M",
+  "stats": {
+   "atk": 9,
+   "def": 3,
+   "spd": 7,
+   "mag": 10,
+   "hp": 19,
+   "cost": 10
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   },
+   {
+    "key": "cataclysm",
+    "value": 2
+   }
+  ],
+  "visual": "Titan barbu à la faucille de diamant, manteau d’étoiles, regard affamé posé sur ses propres enfants.",
+  "lore": "Il dévora ses enfants pour garder le pouvoir. L’un d’eux lui échappa. Le temps lui échappe aussi.",
+  "evolution": null,
+  "sets": [
+   "titans",
+   "oublies"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral",
+   "special"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "cloak",
+   "arms": "scythe",
+   "horns": "short",
+   "scale": 1.18,
+   "scene": "cosmos"
+  },
+  "image": "assets/art/PRI-050.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Cronos — Titan barbu à la faucille de diamant, manteau d’étoiles, regard affamé posé sur ses propres enfants. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-051",
+  "number": 51,
+  "name": "Le Dragon de l’Éternité",
+  "title": "Il était là avant",
+  "faction": "primordial",
+  "rarity": "M",
+  "category": "Dragon primordial",
+  "power": 10,
+  "role": "T",
+  "stats": {
+   "atk": 9,
+   "def": 8,
+   "spd": 5,
+   "mag": 5,
+   "hp": 26,
+   "cost": 10
+  },
+  "abilities": [
+   {
+    "key": "aegis"
+   },
+   {
+    "key": "regen",
+    "value": 3
+   },
+   {
+    "key": "command",
+    "value": 1
+   }
+  ],
+  "visual": "Dragon d’or et de nuit dont les écailles reflètent des étoiles disparues, cornes comme des comètes.",
+  "lore": "Il a assisté au premier souffle. Il assistera au dernier. Entre les deux, il dort beaucoup.",
+  "evolution": null,
+  "sets": [
+   "dragons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral",
+   "special"
+  ],
+  "art": {
+   "form": "dragon",
+   "legs": 4,
+   "horns": "long",
+   "scene": "cosmos"
+  },
+  "image": "assets/art/PRI-051.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Dragon de l’Éternité — Dragon d’or et de nuit dont les écailles reflètent des étoiles disparues, cornes comme des comètes. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-052",
+  "number": 52,
+  "name": "L’Astreophage",
+  "title": "Le mangeur d’étoiles",
+  "faction": "primordial",
+  "rarity": "M",
+  "category": "Entité du Néant",
+  "power": 10,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 7,
+   "mag": 3,
+   "hp": 22,
+   "cost": 10
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   },
+   {
+    "key": "cataclysm",
+    "value": 2
+   }
+  ],
+  "visual": "Étoile noire entourée d’une couronne de lumière, d’où sortent des bras longs comme des nébuleuses.",
+  "lore": "Chaque étoile qui disparaît du ciel, c’est lui. Le ciel est déjà moins peuplé qu’avant.",
+  "evolution": null,
+  "sets": [
+   "neant"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral",
+   "special"
+  ],
+  "art": {
+   "form": "orb",
+   "type": "star",
+   "hands": true,
+   "scene": "cosmos"
+  },
+  "image": "assets/art/PRI-052.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : L’Astreophage — Étoile noire entourée d’une couronne de lumière, d’où sortent des bras longs comme des nébuleuses. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "PRI-053",
+  "number": 53,
+  "name": "Le Premier Souffle",
+  "title": "Ce qui s’éveilla",
+  "faction": "primordial",
+  "rarity": "S",
+  "category": "Entité du Néant",
+  "power": 10,
+  "role": "M",
+  "stats": {
+   "atk": 9,
+   "def": 3,
+   "spd": 7,
+   "mag": 10,
+   "hp": 19,
+   "cost": 10
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "bless",
+    "value": 3
+   },
+   {
+    "key": "cataclysm",
+    "value": 2
+   }
+  ],
+  "visual": "Un portail d’or dans le Néant, d’où s’échappe le premier souffle du monde, chargé de sept couleurs.",
+  "lore": "Avant le temps, il n’existait que le Néant. Puis quelque chose s’éveilla. Le voici.",
+  "evolution": null,
+  "sets": [
+   "neant"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "orb",
+   "type": "portal",
+   "scene": "void"
+  },
+  "image": "assets/art/PRI-053.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Premier Souffle — Un portail d’or dans le Néant, d’où s’échappe le premier souffle du monde, chargé de sept couleurs. Ambiance de la faction Primordial : or ancien, noir, rouge volcanique et blanc minéral ; volcans, cosmos, échelle titanesque. variante de collection : gravure dorée à l’eau-forte sur fond noir, finition luxueuse. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ }
+]

@@ -1,0 +1,23 @@
+{
+ "charge":    { "name": "Charge",           "desc": "Peut attaquer dès son invocation." },
+ "guard":     { "name": "Gardien",          "desc": "Les ennemis doivent attaquer les Gardiens en priorité." },
+ "drain":     { "name": "Drain",            "desc": "Rend à votre héros autant de PV que les dégâts infligés en attaquant." },
+ "first":     { "name": "Première frappe",  "desc": "Frappe avant la riposte : si la cible meurt, elle ne riposte pas." },
+ "strike":    { "name": "Éruption",         "desc": "À l’invocation, inflige {v} dégâts à la créature ennemie la plus dangereuse." },
+ "curse":     { "name": "Malédiction",      "desc": "À l’invocation, inflige {v} dégâts au héros adverse." },
+ "bless":     { "name": "Bénédiction",      "desc": "À l’invocation, rend {v} PV à votre héros et à vos créatures." },
+ "aegis":     { "name": "Égide",            "desc": "Annule les premiers dégâts subis." },
+ "death":     { "name": "Dernier souffle",  "desc": "À sa mort, inflige {v} dégâts à toutes les créatures ennemies." },
+ "relic":     { "name": "Reliquat",         "desc": "À sa mort, laisse un Reste 1/2 sur le terrain." },
+ "command":   { "name": "Commandement",     "desc": "À l’invocation, donne +{v} ATQ à vos autres créatures." },
+ "drown":     { "name": "Engloutir",        "desc": "À l’invocation, la créature ennemie la plus dangereuse ne peut pas attaquer à son prochain tour." },
+ "regen":     { "name": "Régénération",     "desc": "Récupère {v} PV au début de votre tour." },
+ "venom":     { "name": "Venin",            "desc": "Une créature blessée par elle perd 1 PV au début de chacun de ses tours." },
+ "frenzy":    { "name": "Frénésie",         "desc": "Peut attaquer deux fois par tour." },
+ "armor":     { "name": "Blindage",         "desc": "Réduit de {v} chaque dégât subi." },
+ "omen":      { "name": "Présage",          "desc": "À l’invocation, piochez une carte." },
+ "cataclysm": { "name": "Cataclysme",       "desc": "À l’invocation, inflige {v} dégâts à toutes les autres créatures, alliées comprises." },
+ "elusive":   { "name": "Insaisissable",    "desc": "Ne peut pas être prise pour cible tant qu’elle n’a pas attaqué." },
+ "devour":    { "name": "Dévoreur",         "desc": "Quand elle détruit une créature en attaquant, gagne +1 ATQ et +2 PV." },
+ "fear":      { "name": "Effroi",           "desc": "Les créatures ayant 2 ATQ ou moins ne peuvent pas l’attaquer." }
+}

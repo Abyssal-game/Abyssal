@@ -1,0 +1,2558 @@
+[
+ {
+  "id": "INF-001",
+  "number": 1,
+  "name": "Diablotin des Braises",
+  "title": "Étincelle des forges",
+  "faction": "infernal",
+  "rarity": "C",
+  "category": "Démon",
+  "power": 1,
+  "role": "S",
+  "stats": {
+   "atk": 2,
+   "def": 0,
+   "spd": 4,
+   "mag": 1,
+   "hp": 5,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Minuscule démon aux ailes de cuir troué, la peau craquelée de braises, un sourire trop large pour son visage.",
+  "lore": "On les invoque par erreur. On ne s’en débarrasse jamais tout à fait.",
+  "evolution": {
+   "line": "braise",
+   "name": "Lignée de la Braise",
+   "stage": 1,
+   "stages": 3
+  },
+  "sets": [
+   "pactes"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "horns": "short",
+   "wings": "bat",
+   "tail": true,
+   "body": "lean",
+   "scale": 0.72
+  },
+  "image": "assets/art/INF-001.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Diablotin des Braises — Minuscule démon aux ailes de cuir troué, la peau craquelée de braises, un sourire trop large pour son visage. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-002",
+  "number": 2,
+  "name": "Molosse de Soufre",
+  "title": "Flaireur de promesses",
+  "faction": "infernal",
+  "rarity": "C",
+  "category": "Bête infernale",
+  "power": 2,
+  "role": "B",
+  "stats": {
+   "atk": 3,
+   "def": 0,
+   "spd": 3,
+   "mag": 1,
+   "hp": 6,
+   "cost": 2
+  },
+  "abilities": [],
+  "visual": "Chien des fournaises à la gueule fumante, côtes saillantes sous une peau de cendre, échine hérissée de pointes.",
+  "lore": "Il flaire les promesses rompues à trois lieues, et ne lâche jamais une piste.",
+  "evolution": {
+   "line": "soufre",
+   "name": "Lignée du Soufre",
+   "stage": 1,
+   "stages": 2
+  },
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "dog",
+   "spikes": true,
+   "tail": "normal"
+  },
+  "image": "assets/art/INF-002.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Molosse de Soufre — Chien des fournaises à la gueule fumante, côtes saillantes sous une peau de cendre, échine hérissée de pointes. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-003",
+  "number": 3,
+  "name": "Larve de Géhenne",
+  "title": "Ce qui deviendra démon",
+  "faction": "infernal",
+  "rarity": "C",
+  "category": "Démon",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 2,
+   "def": 2,
+   "spd": 1,
+   "mag": 1,
+   "hp": 10,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "regen",
+    "value": 1
+   }
+  ],
+  "visual": "Masse grouillante et translucide où palpitent des visages à demi digérés, bouches ouvertes sur des dents de verre.",
+  "lore": "Tout démon commence ainsi : affamé, aveugle, et terriblement patient.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "blob",
+   "eyes": 7,
+   "mouths": 2
+  },
+  "image": "assets/art/INF-003.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Larve de Géhenne — Masse grouillante et translucide où palpitent des visages à demi digérés, bouches ouvertes sur des dents de verre. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-004",
+  "number": 4,
+  "name": "Bourreau à Chaînes",
+  "title": "Le Muet du Puits",
+  "faction": "infernal",
+  "rarity": "C",
+  "category": "Démon",
+  "power": 3,
+  "role": "B",
+  "stats": {
+   "atk": 6,
+   "def": 2,
+   "spd": 4,
+   "mag": 1,
+   "hp": 8,
+   "cost": 3
+  },
+  "abilities": [],
+  "visual": "Colosse encapuchonné aux épaules de bœuf, dont les poignets traînent des chaînes rougies au feu.",
+  "lore": "Il ne parle jamais. Les chaînes le font pour lui.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "hood",
+   "body": "bulky",
+   "arms": "down",
+   "chains": true
+  },
+  "image": "assets/art/INF-004.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Bourreau à Chaînes — Colosse encapuchonné aux épaules de bœuf, dont les poignets traînent des chaînes rougies au feu. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-005",
+  "number": 5,
+  "name": "Scribe des Pactes",
+  "title": "Greffier du Septième Cercle",
+  "faction": "infernal",
+  "rarity": "C",
+  "category": "Démon",
+  "power": 2,
+  "role": "M",
+  "stats": {
+   "atk": 1,
+   "def": 0,
+   "spd": 2,
+   "mag": 3,
+   "hp": 6,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Démon au crâne de bouc, voûté sur un registre relié de peau, une plume de fer fichée derrière la corne.",
+  "lore": "Chaque signature est recopiée deux fois : une pour l’Enfer, une pour l’éternité.",
+  "evolution": null,
+  "sets": [
+   "pactes"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "goat",
+   "horns": "short",
+   "body": "robe",
+   "arms": "staff"
+  },
+  "image": "assets/art/INF-005.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Scribe des Pactes — Démon au crâne de bouc, voûté sur un registre relié de peau, une plume de fer fichée derrière la corne. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-006",
+  "number": 6,
+  "name": "Collecteur de Dîme",
+  "title": "Main tendue",
+  "faction": "infernal",
+  "rarity": "C",
+  "category": "Démon",
+  "power": 2,
+  "role": "U",
+  "stats": {
+   "atk": 1,
+   "def": 0,
+   "spd": 2,
+   "mag": 2,
+   "hp": 7,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   }
+  ],
+  "visual": "Silhouette maigre au masque d’or terni, tendant une main gantée vers les vivants depuis un manteau sans corps.",
+  "lore": "Il ne prend qu’un dixième. Mais il revient chaque nuit.",
+  "evolution": null,
+  "sets": [
+   "pactes"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "mask",
+   "body": "cloak",
+   "arms": "reach"
+  },
+  "image": "assets/art/INF-006.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Collecteur de Dîme — Silhouette maigre au masque d’or terni, tendant une main gantée vers les vivants depuis un manteau sans corps. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-007",
+  "number": 7,
+  "name": "Âme Damnée",
+  "title": "Celle qui brûle encore",
+  "faction": "infernal",
+  "rarity": "C",
+  "category": "Spectre",
+  "power": 1,
+  "role": "E",
+  "stats": {
+   "atk": 3,
+   "def": 0,
+   "spd": 2,
+   "mag": 1,
+   "hp": 4,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "relic"
+   }
+  ],
+  "visual": "Spectre écorché par les flammes, bras levés vers un ciel qui ne répond pas, chevelure de fumée.",
+  "lore": "Elle a oublié son nom. Elle se souvient de chaque brûlure.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "spectre",
+   "head": "woman",
+   "arms": "up",
+   "hair": true
+  },
+  "image": "assets/art/INF-007.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Âme Damnée — Spectre écorché par les flammes, bras levés vers un ciel qui ne répond pas, chevelure de fumée. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-008",
+  "number": 8,
+  "name": "Cracheur de Braise",
+  "title": "Salamandre du Phlégéthon",
+  "faction": "infernal",
+  "rarity": "C",
+  "category": "Bête infernale",
+  "power": 2,
+  "role": "S",
+  "stats": {
+   "atk": 4,
+   "def": 1,
+   "spd": 5,
+   "mag": 1,
+   "hp": 6,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 1
+   }
+  ],
+  "visual": "Salamandre trapue aux écailles de charbon, la gorge gonflée de lave, crête dorsale rougeoyante.",
+  "lore": "Ce qu’il crache refroidit en pierre noire. Ce qu’il touche, non.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lizard",
+   "tail": "normal",
+   "fire": true,
+   "size": "small",
+   "legs": 4
+  },
+  "image": "assets/art/INF-008.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Cracheur de Braise — Salamandre trapue aux écailles de charbon, la gorge gonflée de lave, crête dorsale rougeoyante. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-009",
+  "number": 9,
+  "name": "Bouc Noir du Sabbat",
+  "title": "Témoin des messes noires",
+  "faction": "infernal",
+  "rarity": "C",
+  "category": "Bête infernale",
+  "power": 1,
+  "role": "T",
+  "stats": {
+   "atk": 1,
+   "def": 1,
+   "spd": 1,
+   "mag": 0,
+   "hp": 7,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Bouc aux yeux d’ambre et à la toison charbonneuse, cornes torsadées gravées de signes oubliés.",
+  "lore": "Il assiste à tous les sabbats. Personne ne se souvient de l’y avoir invité.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "goat",
+   "hooves": true,
+   "size": "small",
+   "tail": "none"
+  },
+  "image": "assets/art/INF-009.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Bouc Noir du Sabbat — Bouc aux yeux d’ambre et à la toison charbonneuse, cornes torsadées gravées de signes oubliés. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-010",
+  "number": 10,
+  "name": "Nuée de Mouches",
+  "title": "Messagères du Seigneur",
+  "faction": "infernal",
+  "rarity": "C",
+  "category": "Essaim",
+  "power": 1,
+  "role": "S",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 5,
+   "mag": 0,
+   "hp": 4,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Nuée bourdonnante de mouches aux yeux rouges qui, par instants, dessine un visage.",
+  "lore": "Où elles se posent, quelque chose finit toujours par pourrir.",
+  "evolution": null,
+  "sets": [
+   "plaies"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "swarm",
+   "kind": "fly",
+   "count": 46,
+   "leader": false
+  },
+  "image": "assets/art/INF-010.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Nuée de Mouches — Nuée bourdonnante de mouches aux yeux rouges qui, par instants, dessine un visage. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-011",
+  "number": 11,
+  "name": "Lanterne Hurlante",
+  "title": "Guide des égarés",
+  "faction": "infernal",
+  "rarity": "C",
+  "category": "Objet maudit",
+  "power": 2,
+  "role": "M",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 3,
+   "mag": 3,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 1
+   }
+  ],
+  "visual": "Lanterne de papier huilé dont l’âme captive hurle par une bouche déchirée, langue pendante.",
+  "lore": "Les voyageurs la suivent pour sortir des enfers. Elle les y ramène.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "object",
+   "kind": "lantern"
+  },
+  "image": "assets/art/INF-011.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Lanterne Hurlante — Lanterne de papier huilé dont l’âme captive hurle par une bouche déchirée, langue pendante. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-012",
+  "number": 12,
+  "name": "Gardien des Portes de Dis",
+  "title": "Sentinelle sans repos",
+  "faction": "infernal",
+  "rarity": "C",
+  "category": "Démon",
+  "power": 3,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 3,
+   "spd": 2,
+   "mag": 1,
+   "hp": 12,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Sentinelle en armure noire rivetée, heaume fendu d’une unique fente incandescente, épée plantée devant elle.",
+  "lore": "La cité de Dis n’a qu’une porte. Elle n’a jamais été franchie dans le bon sens.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "body": "armor",
+   "arms": "sword"
+  },
+  "image": "assets/art/INF-012.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Gardien des Portes de Dis — Sentinelle en armure noire rivetée, heaume fendu d’une unique fente incandescente, épée plantée devant elle. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-013",
+  "number": 13,
+  "name": "Tortionnaire Cornu",
+  "title": "Artisan de la douleur",
+  "faction": "infernal",
+  "rarity": "C",
+  "category": "Démon",
+  "power": 3,
+  "role": "B",
+  "stats": {
+   "atk": 7,
+   "def": 1,
+   "spd": 4,
+   "mag": 1,
+   "hp": 9,
+   "cost": 3
+  },
+  "abilities": [],
+  "visual": "Démon émacié aux griffes démesurées, cornes brisées net, sourire en forme de lame.",
+  "lore": "Il appelle cela de l’art. Ses œuvres ne s’en remettent jamais.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "short",
+   "body": "lean",
+   "arms": "reach",
+   "claws": true
+  },
+  "image": "assets/art/INF-013.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Tortionnaire Cornu — Démon émacié aux griffes démesurées, cornes brisées net, sourire en forme de lame. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-014",
+  "number": 14,
+  "name": "Chauves-souris de Cendre",
+  "title": "Nées des bûchers",
+  "faction": "infernal",
+  "rarity": "C",
+  "category": "Essaim",
+  "power": 1,
+  "role": "S",
+  "stats": {
+   "atk": 3,
+   "def": 0,
+   "spd": 4,
+   "mag": 0,
+   "hp": 3,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Essaim de chauves-souris faites de cendre compacte, qui se défont en volutes grises à chaque battement d’aile.",
+  "lore": "Elles naissent des bûchers et retournent aux bûchers, emportant un peu de chaque condamné.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "swarm",
+   "kind": "bat",
+   "count": 20
+  },
+  "image": "assets/art/INF-014.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Chauves-souris de Cendre — Essaim de chauves-souris faites de cendre compacte, qui se défont en volutes grises à chaque battement d’aile. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-015",
+  "number": 15,
+  "name": "Pénitent Brûlé",
+  "title": "Fidèle du mauvais dieu",
+  "faction": "infernal",
+  "rarity": "C",
+  "category": "Damné",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 2,
+   "def": 2,
+   "spd": 1,
+   "mag": 0,
+   "hp": 10,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Moine de cendre agenouillé, la robe encore fumante, un chapelet de dents serré entre les doigts.",
+  "lore": "Il a prié le mauvais dieu avec une ferveur parfaitement sincère.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "hood",
+   "body": "robe",
+   "arms": "pray"
+  },
+  "image": "assets/art/INF-015.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Pénitent Brûlé — Moine de cendre agenouillé, la robe encore fumante, un chapelet de dents serré entre les doigts. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-016",
+  "number": 16,
+  "name": "Fileuse de Chaînes",
+  "title": "Araignée de la forge",
+  "faction": "infernal",
+  "rarity": "C",
+  "category": "Bête infernale",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 2,
+   "mag": 0,
+   "hp": 8,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Araignée de fer noirci dont les filières tissent des maillons rougis, toile de chaînes tendue dans la fumée.",
+  "lore": "Ses toiles retiennent les âmes qui tentent de remonter.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "insect",
+   "type": "spider"
+  },
+  "image": "assets/art/INF-016.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Fileuse de Chaînes — Araignée de fer noirci dont les filières tissent des maillons rougis, toile de chaînes tendue dans la fumée. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-017",
+  "number": 17,
+  "name": "Diable des Carrefours",
+  "title": "Celui qui attend à minuit",
+  "faction": "infernal",
+  "rarity": "C",
+  "category": "Démon",
+  "power": 2,
+  "role": "M",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 2,
+   "mag": 2,
+   "hp": 6,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Gentilhomme élancé au manteau noir, ombre beaucoup trop longue, yeux de braise sous un front cornu.",
+  "lore": "Il attend à la croisée des chemins. Il a toujours une meilleure offre.",
+  "evolution": null,
+  "sets": [
+   "pactes"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "horns": "short",
+   "body": "cloak",
+   "arms": "down"
+  },
+  "image": "assets/art/INF-017.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Diable des Carrefours — Gentilhomme élancé au manteau noir, ombre beaucoup trop longue, yeux de braise sous un front cornu. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-018",
+  "number": 18,
+  "name": "Succube des Seuils",
+  "title": "Murmure derrière la porte",
+  "faction": "infernal",
+  "rarity": "PC",
+  "category": "Démon",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 2,
+   "spd": 4,
+   "mag": 4,
+   "hp": 9,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   }
+  ],
+  "visual": "Démone aux ailes repliées comme une cape, longue chevelure noire, cornes recourbées ornées d’anneaux d’or.",
+  "lore": "Elle ne franchit jamais un seuil sans y avoir été invitée. Elle sait se faire inviter.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "horns": "curl",
+   "wings": "bat",
+   "body": "gown",
+   "arms": "reach",
+   "hair": true
+  },
+  "image": "assets/art/INF-018.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Succube des Seuils — Démone aux ailes repliées comme une cape, longue chevelure noire, cornes recourbées ornées d’anneaux d’or. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-019",
+  "number": 19,
+  "name": "Incube des Songes",
+  "title": "Visiteur des nuits closes",
+  "faction": "infernal",
+  "rarity": "PC",
+  "category": "Démon",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 4,
+   "def": 2,
+   "spd": 4,
+   "mag": 4,
+   "hp": 10,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Démon longiligne aux ailes en lambeaux, cornes effilées, silhouette qui se dédouble quand on la fixe.",
+  "lore": "Au réveil, on croit avoir rêvé. Les marques de griffes disent le contraire.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "horns": "long",
+   "wings": "tatter",
+   "body": "lean",
+   "arms": "spread"
+  },
+  "image": "assets/art/INF-019.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Incube des Songes — Démon longiligne aux ailes en lambeaux, cornes effilées, silhouette qui se dédouble quand on la fixe. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-020",
+  "number": 20,
+  "name": "Ifrit des Sables Rouges",
+  "title": "Fumée et brasier",
+  "faction": "infernal",
+  "rarity": "PC",
+  "category": "Djinn",
+  "power": 5,
+  "role": "B",
+  "stats": {
+   "atk": 9,
+   "def": 1,
+   "spd": 4,
+   "mag": 1,
+   "hp": 12,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 2
+   }
+  ],
+  "visual": "Géant de fumée au torse de braise, cornes d’obsidienne, le bas du corps dissous en tourbillon incandescent.",
+  "lore": "Les djinns furent créés d’un feu sans fumée. Lui a gardé la fumée.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "long",
+   "wings": "flame",
+   "body": "tatter",
+   "arms": "spread",
+   "scene": "temple"
+  },
+  "image": "assets/art/INF-020.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ifrit des Sables Rouges — Géant de fumée au torse de braise, cornes d’obsidienne, le bas du corps dissous en tourbillon incandescent. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-021",
+  "number": 21,
+  "name": "Oni du Mont Ōe",
+  "title": "Festoyeur des cimes",
+  "faction": "infernal",
+  "rarity": "PC",
+  "category": "Oni",
+  "power": 5,
+  "role": "B",
+  "stats": {
+   "atk": 8,
+   "def": 2,
+   "spd": 4,
+   "mag": 2,
+   "hp": 14,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Ogre colossal à la peau rouge sombre, deux cornes courtes, massue de fer cloutée posée sur l’épaule.",
+  "lore": "Dans la tradition japonaise, les oni du mont Ōe festoyaient jusqu’à l’aube. Ils ont gardé l’appétit.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "short",
+   "body": "bulky",
+   "arms": "staff"
+  },
+  "image": "assets/art/INF-021.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Oni du Mont Ōe — Ogre colossal à la peau rouge sombre, deux cornes courtes, massue de fer cloutée posée sur l’épaule. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-022",
+  "number": 22,
+  "name": "Rakshasa aux Paumes Inversées",
+  "title": "Mangeur de sacrifices",
+  "faction": "infernal",
+  "rarity": "PC",
+  "category": "Démon",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 6,
+   "def": 1,
+   "spd": 6,
+   "mag": 2,
+   "hp": 8,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Démon félin en armure ciselée, mains retournées paumes vers l’extérieur, crocs d’ivoire sous un regard doré.",
+  "lore": "Les épopées indiennes le décrivent comme un dévoreur de rites. Il change de forme comme on change d’avis.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "claws": true,
+   "body": "armor",
+   "arms": "reach"
+  },
+  "image": "assets/art/INF-022.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Rakshasa aux Paumes Inversées — Démon félin en armure ciselée, mains retournées paumes vers l’extérieur, crocs d’ivoire sous un regard doré. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-023",
+  "number": 23,
+  "name": "Andras",
+  "title": "Marquis de la discorde",
+  "faction": "infernal",
+  "rarity": "PC",
+  "category": "Démon de la Goétie",
+  "power": 4,
+  "role": "B",
+  "stats": {
+   "atk": 7,
+   "def": 1,
+   "spd": 4,
+   "mag": 1,
+   "hp": 10,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Ange déchu à tête de corbeau, ailes de jais, épée nue à la main, cuirasse noire marquée d’un sceau.",
+  "lore": "Selon la Goétie, il sème la discorde et tue ceux qui l’invoquent sans précaution.",
+  "evolution": null,
+  "sets": [
+   "goetie"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "bird",
+   "wings": "feather",
+   "body": "armor",
+   "arms": "sword"
+  },
+  "image": "assets/art/INF-023.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Andras — Ange déchu à tête de corbeau, ailes de jais, épée nue à la main, cuirasse noire marquée d’un sceau. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-024",
+  "number": 24,
+  "name": "Marbas",
+  "title": "Président à la crinière",
+  "faction": "infernal",
+  "rarity": "PC",
+  "category": "Démon de la Goétie",
+  "power": 4,
+  "role": "E",
+  "stats": {
+   "atk": 6,
+   "def": 3,
+   "spd": 5,
+   "mag": 3,
+   "hp": 10,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "regen",
+    "value": 1
+   }
+  ],
+  "visual": "Lion démesuré à la crinière de cendre, regard trop humain, griffes noires plantées dans la roche brûlante.",
+  "lore": "On dit qu’il guérit les maladies qu’il a lui-même envoyées.",
+  "evolution": null,
+  "sets": [
+   "goetie"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lion",
+   "mane": true,
+   "tail": "lion",
+   "size": "big"
+  },
+  "image": "assets/art/INF-024.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Marbas — Lion démesuré à la crinière de cendre, regard trop humain, griffes noires plantées dans la roche brûlante. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-025",
+  "number": 25,
+  "name": "Furfur",
+  "title": "Comte des tempêtes",
+  "faction": "infernal",
+  "rarity": "PC",
+  "category": "Démon de la Goétie",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 7,
+   "def": 1,
+   "spd": 7,
+   "mag": 3,
+   "hp": 7,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 2
+   }
+  ],
+  "visual": "Grand cerf ailé à la queue enflammée, ramure noire crépitant d’éclairs.",
+  "lore": "Il ne dit la vérité qu’enfermé dans un triangle. Hors de lui, il appelle la foudre.",
+  "evolution": null,
+  "sets": [
+   "goetie"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "stag",
+   "wings": "feather",
+   "tail": "normal",
+   "hooves": true,
+   "scene": "sky"
+  },
+  "image": "assets/art/INF-025.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Furfur — Grand cerf ailé à la queue enflammée, ramure noire crépitant d’éclairs. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-026",
+  "number": 26,
+  "name": "Molosse de Géhenne",
+  "title": "La meute à deux gueules",
+  "faction": "infernal",
+  "rarity": "PC",
+  "category": "Bête infernale",
+  "power": 4,
+  "role": "B",
+  "stats": {
+   "atk": 8,
+   "def": 2,
+   "spd": 5,
+   "mag": 2,
+   "hp": 10,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Chien bicéphale aux mâchoires suintantes de soufre, musculature de forge et colliers de fer brisés.",
+  "lore": "Quand un Molosse de Soufre a assez mangé, il lui pousse une seconde faim.",
+  "evolution": {
+   "line": "soufre",
+   "name": "Lignée du Soufre",
+   "stage": 2,
+   "stages": 2
+  },
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "dog",
+   "heads": 2,
+   "spikes": true,
+   "tail": "normal",
+   "size": "big"
+  },
+  "image": "assets/art/INF-026.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Molosse de Géhenne — Chien bicéphale aux mâchoires suintantes de soufre, musculature de forge et colliers de fer brisés. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-027",
+  "number": 27,
+  "name": "Démon des Fournaises",
+  "title": "Ouvrier des brasiers",
+  "faction": "infernal",
+  "rarity": "PC",
+  "category": "Démon",
+  "power": 5,
+  "role": "B",
+  "stats": {
+   "atk": 9,
+   "def": 2,
+   "spd": 5,
+   "mag": 1,
+   "hp": 12,
+   "cost": 5
+  },
+  "abilities": [],
+  "visual": "Démon massif aux bras couverts de cicatrices de forge, ailes trouées, cornes rabattues comme des lames.",
+  "lore": "Le diablotin qui survit à mille ans de forge devient ceci. Peu survivent.",
+  "evolution": {
+   "line": "braise",
+   "name": "Lignée de la Braise",
+   "stage": 2,
+   "stages": 3
+  },
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "long",
+   "wings": "bat",
+   "body": "bulky",
+   "arms": "down",
+   "claws": true
+  },
+  "image": "assets/art/INF-027.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Démon des Fournaises — Démon massif aux bras couverts de cicatrices de forge, ailes trouées, cornes rabattues comme des lames. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-028",
+  "number": 28,
+  "name": "Lamashtu",
+  "title": "Celle qui vole les nouveau-nés",
+  "faction": "infernal",
+  "rarity": "PC",
+  "category": "Démone mésopotamienne",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 6,
+   "def": 1,
+   "spd": 6,
+   "mag": 1,
+   "hp": 8,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Démone à tête de lionne, serres d’oiseau à la place des pieds, corps décharné couvert de poils sombres.",
+  "lore": "Les amulettes de Pazuzu la tenaient à distance. Les amulettes se brisent.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "body": "lean",
+   "legs": "goat",
+   "claws": true,
+   "arms": "reach",
+   "scene": "temple"
+  },
+  "image": "assets/art/INF-028.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Lamashtu — Démone à tête de lionne, serres d’oiseau à la place des pieds, corps décharné couvert de poils sombres. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-029",
+  "number": 29,
+  "name": "Malphas",
+  "title": "Bâtisseur de tours",
+  "faction": "infernal",
+  "rarity": "PC",
+  "category": "Démon de la Goétie",
+  "power": 4,
+  "role": "T",
+  "stats": {
+   "atk": 4,
+   "def": 4,
+   "spd": 2,
+   "mag": 2,
+   "hp": 13,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Immense corbeau aux plumes d’encre, perché sur des remparts qu’il a lui-même élevés.",
+  "lore": "Il bâtit des tours pour ses alliés et abat celles de ses ennemis. Il change souvent d’alliés.",
+  "evolution": null,
+  "sets": [
+   "goetie"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "eagle",
+   "crest": true
+  },
+  "image": "assets/art/INF-029.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Malphas — Immense corbeau aux plumes d’encre, perché sur des remparts qu’il a lui-même élevés. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-030",
+  "number": 30,
+  "name": "Destrier de Cendres",
+  "title": "Monture des seigneurs",
+  "faction": "infernal",
+  "rarity": "PC",
+  "category": "Bête infernale",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 6,
+   "def": 1,
+   "spd": 7,
+   "mag": 2,
+   "hp": 8,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Cheval noir au crin de flammes, sabots qui laissent des empreintes fondues, naseaux fumants.",
+  "lore": "Aucun cavalier humain ne l’a monté deux fois.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "horse",
+   "hooves": true,
+   "fire": true,
+   "tail": "bushy"
+  },
+  "image": "assets/art/INF-030.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Destrier de Cendres — Cheval noir au crin de flammes, sabots qui laissent des empreintes fondues, naseaux fumants. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-031",
+  "number": 31,
+  "name": "Vierge de Fer",
+  "title": "Étreinte éternelle",
+  "faction": "infernal",
+  "rarity": "PC",
+  "category": "Construction maudite",
+  "power": 4,
+  "role": "T",
+  "stats": {
+   "atk": 4,
+   "def": 3,
+   "spd": 2,
+   "mag": 2,
+   "hp": 15,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Sarcophage de fer à visage de femme, hérissé de pointes intérieures, qui marche sur des jambes articulées.",
+  "lore": "Elle n’a jamais lâché ce qu’elle a enlacé.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "tall",
+   "head": "mask"
+  },
+  "image": "assets/art/INF-031.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Vierge de Fer — Sarcophage de fer à visage de femme, hérissé de pointes intérieures, qui marche sur des jambes articulées. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-032",
+  "number": 32,
+  "name": "Ronce du Phlégéthon",
+  "title": "Racines dans le fleuve de feu",
+  "faction": "infernal",
+  "rarity": "PC",
+  "category": "Plante infernale",
+  "power": 3,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 3,
+   "spd": 2,
+   "mag": 1,
+   "hp": 11,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "regen",
+    "value": 2
+   }
+  ],
+  "visual": "Arbre noueux aux épines de verre volcanique, racines trempant dans un fleuve de feu, visage creusé dans l’écorce.",
+  "lore": "Elle boit le Phlégéthon depuis la Chute et ne s’est jamais brûlée.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "tree",
+   "thorns": true,
+   "scene": "inferno"
+  },
+  "image": "assets/art/INF-032.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ronce du Phlégéthon — Arbre noueux aux épines de verre volcanique, racines trempant dans un fleuve de feu, visage creusé dans l’écorce. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-033",
+  "number": 33,
+  "name": "Astaroth",
+  "title": "Grand-Duc des Secrets",
+  "faction": "infernal",
+  "rarity": "R",
+  "category": "Démon de la Goétie",
+  "power": 6,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 3,
+   "spd": 5,
+   "mag": 8,
+   "hp": 11,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "curse",
+    "value": 2
+   }
+  ],
+  "visual": "Ange déchu au visage d’une beauté fanée, ailes en lambeaux, bâton coiffé d’un serpent, auréole hérissée.",
+  "lore": "Il connaît le passé et l’avenir, et le raconte volontiers. Son haleine, elle, tue.",
+  "evolution": null,
+  "sets": [
+   "souverains",
+   "goetie"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "wings": "tatter",
+   "body": "robe",
+   "halo": "spike",
+   "arms": "staff"
+  },
+  "image": "assets/art/INF-033.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Astaroth — Ange déchu au visage d’une beauté fanée, ailes en lambeaux, bâton coiffé d’un serpent, auréole hérissée. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-034",
+  "number": 34,
+  "name": "Bélial",
+  "title": "Le Sans-Maître",
+  "faction": "infernal",
+  "rarity": "R",
+  "category": "Démon",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 3,
+   "spd": 6,
+   "mag": 2,
+   "hp": 15,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Prince en armure d’ébène, cornes droites comme une couronne, épée longue et regard d’une froideur absolue.",
+  "lore": "Son nom signifierait « sans valeur ». Il a fait payer très cher cette traduction.",
+  "evolution": null,
+  "sets": [
+   "souverains"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "horns": "long",
+   "body": "armor",
+   "wings": "tatter",
+   "arms": "sword"
+  },
+  "image": "assets/art/INF-034.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Bélial — Prince en armure d’ébène, cornes droites comme une couronne, épée longue et regard d’une froideur absolue. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-035",
+  "number": 35,
+  "name": "Azazel",
+  "title": "Le Veilleur qui enseigna les armes",
+  "faction": "infernal",
+  "rarity": "R",
+  "category": "Ange déchu",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 2,
+   "spd": 5,
+   "mag": 2,
+   "hp": 15,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "command",
+    "value": 1
+   }
+  ],
+  "visual": "Déchu à tête de bouc, ailes sombres déployées, forge portative au flanc et épée trempée dans la nuit.",
+  "lore": "Le Livre d’Hénoch dit qu’il apprit aux humains à forger le fer. Il ne précise pas pourquoi.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "goat",
+   "wings": "feather",
+   "body": "armor",
+   "arms": "sword"
+  },
+  "image": "assets/art/INF-035.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Azazel — Déchu à tête de bouc, ailes sombres déployées, forge portative au flanc et épée trempée dans la nuit. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-036",
+  "number": 36,
+  "name": "Bael",
+  "title": "Roi aux Trois Têtes",
+  "faction": "infernal",
+  "rarity": "R",
+  "category": "Démon de la Goétie",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 6,
+   "def": 5,
+   "spd": 3,
+   "mag": 2,
+   "hp": 20,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Corps d’araignée colossale surmonté de trois têtes : un crapaud, un homme couronné et un chat.",
+  "lore": "Premier roi de la Goétie, il enseigne l’art de devenir invisible. Le sien est parfait.",
+  "evolution": null,
+  "sets": [
+   "goetie"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral",
+   "special"
+  ],
+  "art": {
+   "form": "insect",
+   "type": "spider",
+   "face": true
+  },
+  "image": "assets/art/INF-036.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Bael — Corps d’araignée colossale surmonté de trois têtes : un crapaud, un homme couronné et un chat. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-037",
+  "number": 37,
+  "name": "Pazuzu",
+  "title": "Roi des Vents Mauvais",
+  "faction": "infernal",
+  "rarity": "R",
+  "category": "Démon mésopotamien",
+  "power": 6,
+  "role": "S",
+  "stats": {
+   "atk": 9,
+   "def": 2,
+   "spd": 7,
+   "mag": 3,
+   "hp": 11,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 2
+   }
+  ],
+  "visual": "Démon à tête de chien grimaçante, quatre ailes, serres d’aigle et queue de scorpion, bras levé vers l’orage.",
+  "lore": "Il apporte la sécheresse du sud-ouest. Mais il chasse aussi Lamashtu, ce qui le rend presque désirable.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "wings": "feather",
+   "tail": true,
+   "legs": "goat",
+   "claws": true,
+   "arms": "up",
+   "scene": "temple"
+  },
+  "image": "assets/art/INF-037.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Pazuzu — Démon à tête de chien grimaçante, quatre ailes, serres d’aigle et queue de scorpion, bras levé vers l’orage. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-038",
+  "number": 38,
+  "name": "Méphistophélès",
+  "title": "Le Contractant",
+  "faction": "infernal",
+  "rarity": "R",
+  "category": "Démon",
+  "power": 5,
+  "role": "M",
+  "stats": {
+   "atk": 4,
+   "def": 1,
+   "spd": 4,
+   "mag": 6,
+   "hp": 9,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "drain"
+   }
+  ],
+  "visual": "Courtisan maigre au sourire mince, cape écarlate doublée de flammes, parchemin scellé à la main.",
+  "lore": "Il ne ment jamais dans un contrat. Il laisse seulement le lecteur se mentir.",
+  "evolution": null,
+  "sets": [
+   "pactes"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral",
+   "special"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "horns": "short",
+   "body": "cloak",
+   "arms": "staff"
+  },
+  "image": "assets/art/INF-038.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Méphistophélès — Courtisan maigre au sourire mince, cape écarlate doublée de flammes, parchemin scellé à la main. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-039",
+  "number": 39,
+  "name": "Mammon",
+  "title": "Prince de l’Avarice",
+  "faction": "infernal",
+  "rarity": "R",
+  "category": "Démon",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 6,
+   "def": 5,
+   "spd": 3,
+   "mag": 3,
+   "hp": 19,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   }
+  ],
+  "visual": "Démon obèse couronné d’or fondu, ventre ouvert sur un cœur de monnaies incandescentes.",
+  "lore": "Il a acheté tout ce qui pouvait l’être. Il s’attaque maintenant au reste.",
+  "evolution": null,
+  "sets": [
+   "peches"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "crown",
+   "body": "bulky",
+   "arms": "down",
+   "core": true
+  },
+  "image": "assets/art/INF-039.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Mammon — Démon obèse couronné d’or fondu, ventre ouvert sur un cœur de monnaies incandescentes. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-040",
+  "number": 40,
+  "name": "Belphégor",
+  "title": "Prince de la Paresse",
+  "faction": "infernal",
+  "rarity": "R",
+  "category": "Démon",
+  "power": 5,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 4,
+   "spd": 3,
+   "mag": 2,
+   "hp": 15,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "regen",
+    "value": 2
+   }
+  ],
+  "visual": "Démon barbu à cornes de bélier, avachi sur un trône percé, la barbe pleine de toiles et d’inventions oubliées.",
+  "lore": "Il souffle aux savants des découvertes si brillantes qu’ils ne trouvent plus la force de les achever.",
+  "evolution": null,
+  "sets": [
+   "peches"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "goat",
+   "horns": "curl",
+   "body": "bulky",
+   "arms": "down",
+   "legs": "goat"
+  },
+  "image": "assets/art/INF-040.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Belphégor — Démon barbu à cornes de bélier, avachi sur un trône percé, la barbe pleine de toiles et d’inventions oubliées. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-041",
+  "number": 41,
+  "name": "Moloch",
+  "title": "La Fournaise aux Bras Ouverts",
+  "faction": "infernal",
+  "rarity": "R",
+  "category": "Dieu oublié",
+  "power": 7,
+  "role": "T",
+  "stats": {
+   "atk": 6,
+   "def": 6,
+   "spd": 3,
+   "mag": 3,
+   "hp": 22,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Idole de bronze à tête de taureau, bras tendus en offrande, ventre ouvert sur un brasier vivant.",
+  "lore": "Les anciens textes le maudissent pour les sacrifices qu’on lui faisait. Il garde le souvenir de chacun.",
+  "evolution": null,
+  "sets": [
+   "oublies"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "bull",
+   "body": "bulky",
+   "arms": "spread",
+   "core": true,
+   "scene": "temple"
+  },
+  "image": "assets/art/INF-041.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Moloch — Idole de bronze à tête de taureau, bras tendus en offrande, ventre ouvert sur un brasier vivant. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-042",
+  "number": 42,
+  "name": "Le Juge de Cendres",
+  "title": "Il pèse ce qui reste",
+  "faction": "infernal",
+  "rarity": "R",
+  "category": "Démon",
+  "power": 6,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 3,
+   "spd": 5,
+   "mag": 8,
+   "hp": 12,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 3
+   }
+  ],
+  "visual": "Magistrat voilé au masque d’os sans bouche, balance de fer suspendue à son bâton, robe faite de cendre tassée.",
+  "lore": "Il ne juge pas les vivants. Il juge ce qu’il reste d’eux une fois brûlés.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "mask",
+   "body": "robe",
+   "arms": "staff",
+   "halo": "spike"
+  },
+  "image": "assets/art/INF-042.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Juge de Cendres — Magistrat voilé au masque d’os sans bouche, balance de fer suspendue à son bâton, robe faite de cendre tassée. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-043",
+  "number": 43,
+  "name": "Prince des Fournaises",
+  "title": "Couronné par le feu",
+  "faction": "infernal",
+  "rarity": "R",
+  "category": "Démon",
+  "power": 7,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 2,
+   "spd": 5,
+   "mag": 2,
+   "hp": 16,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "cataclysm",
+    "value": 1
+   }
+  ],
+  "visual": "Seigneur démon aux ailes de flammes vives, cornes de bélier noircies, poitrail fendu de lave.",
+  "lore": "Le dernier stade d’une braise. Celui où elle devient incendie.",
+  "evolution": {
+   "line": "braise",
+   "name": "Lignée de la Braise",
+   "stage": 3,
+   "stages": 3
+  },
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "ram",
+   "wings": "flame",
+   "body": "bulky",
+   "legs": "goat",
+   "arms": "spread",
+   "tail": true
+  },
+  "image": "assets/art/INF-043.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Prince des Fournaises — Seigneur démon aux ailes de flammes vives, cornes de bélier noircies, poitrail fendu de lave. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-044",
+  "number": 44,
+  "name": "Asmodée",
+  "title": "Prince de la Luxure",
+  "faction": "infernal",
+  "rarity": "HR",
+  "category": "Démon",
+  "power": 7,
+  "role": "M",
+  "stats": {
+   "atk": 7,
+   "def": 3,
+   "spd": 5,
+   "mag": 9,
+   "hp": 12,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   },
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Démon aux trois visages superposés (taureau, homme, bélier), pieds d’oie, queue de serpent et ailes déployées.",
+  "lore": "Dans le Livre de Tobie, il tua sept fiancés. Il ne s’est jamais excusé.",
+  "evolution": null,
+  "sets": [
+   "peches",
+   "souverains"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "horns": "ram",
+   "wings": "bat",
+   "body": "lean",
+   "legs": "goat",
+   "tail": true,
+   "arms": "spread"
+  },
+  "image": "assets/art/INF-044.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Asmodée — Démon aux trois visages superposés (taureau, homme, bélier), pieds d’oie, queue de serpent et ailes déployées. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-045",
+  "number": 45,
+  "name": "Belzébuth",
+  "title": "Seigneur des Mouches",
+  "faction": "infernal",
+  "rarity": "HR",
+  "category": "Démon",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 11,
+   "def": 2,
+   "spd": 6,
+   "mag": 3,
+   "hp": 16,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   },
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Colosse chitineux aux ailes de mouche translucides, couronne de neuf yeux à facettes, bouche en trompe.",
+  "lore": "Baal Zebub, « seigneur des mouches ». Il était un dieu avant d’être une insulte.",
+  "evolution": null,
+  "sets": [
+   "peches",
+   "souverains"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "wings": "insect",
+   "body": "bulky",
+   "eyes": 9,
+   "arms": "spread",
+   "claws": true
+  },
+  "image": "assets/art/INF-045.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Belzébuth — Colosse chitineux aux ailes de mouche translucides, couronne de neuf yeux à facettes, bouche en trompe. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-046",
+  "number": 46,
+  "name": "Baphomet",
+  "title": "Solve et Coagula",
+  "faction": "infernal",
+  "rarity": "HR",
+  "category": "Démon",
+  "power": 7,
+  "role": "M",
+  "stats": {
+   "atk": 6,
+   "def": 3,
+   "spd": 6,
+   "mag": 9,
+   "hp": 12,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "command",
+    "value": 1
+   },
+   {
+    "key": "regen",
+    "value": 1
+   }
+  ],
+  "visual": "Idole à tête de bouc, flamme entre les cornes, un bras levé vers le haut et l’autre vers le bas, ailes immenses.",
+  "lore": "Il incarne l’équilibre des contraires. Les fanatiques préfèrent n’en retenir que les cornes.",
+  "evolution": null,
+  "sets": [
+   "souverains"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "goat",
+   "horns": "long",
+   "wings": "feather",
+   "body": "bulky",
+   "legs": "goat",
+   "arms": "up",
+   "halo": "ring"
+  },
+  "image": "assets/art/INF-046.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Baphomet — Idole à tête de bouc, flamme entre les cornes, un bras levé vers le haut et l’autre vers le bas, ailes immenses. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-047",
+  "number": 47,
+  "name": "Satan",
+  "title": "L’Adversaire",
+  "faction": "infernal",
+  "rarity": "HR",
+  "category": "Démon",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 7,
+   "mag": 3,
+   "hp": 19,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Bête souveraine aux cornes de bélier, ailes de chauve-souris immenses, queue fouettant les flammes.",
+  "lore": "Son nom veut dire « adversaire ». Il a toujours pris ce rôle très au sérieux.",
+  "evolution": null,
+  "sets": [
+   "peches",
+   "souverains"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "ram",
+   "wings": "bat",
+   "body": "bulky",
+   "arms": "spread",
+   "tail": true,
+   "claws": true,
+   "legs": "goat"
+  },
+  "image": "assets/art/INF-047.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Satan — Bête souveraine aux cornes de bélier, ailes de chauve-souris immenses, queue fouettant les flammes. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-048",
+  "number": 48,
+  "name": "La Mariée des Enfers",
+  "title": "Promise à l’abîme",
+  "faction": "infernal",
+  "rarity": "HR",
+  "category": "Démone",
+  "power": 7,
+  "role": "M",
+  "stats": {
+   "atk": 7,
+   "def": 3,
+   "spd": 5,
+   "mag": 8,
+   "hp": 12,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   },
+   {
+    "key": "relic"
+   }
+  ],
+  "visual": "Femme en robe nuptiale noircie, voile de cendre, couronne d’épines dorées, bouquet de roses calcinées.",
+  "lore": "Elle a dit oui à un démon pour sauver sa sœur. Le démon a tenu parole. Elle aussi.",
+  "evolution": null,
+  "sets": [
+   "pactes"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "gown",
+   "arms": "pray",
+   "hair": true,
+   "horns": "crown",
+   "halo": "spike"
+  },
+  "image": "assets/art/INF-048.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : La Mariée des Enfers — Femme en robe nuptiale noircie, voile de cendre, couronne d’épines dorées, bouquet de roses calcinées. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-049",
+  "number": 49,
+  "name": "Le Dévoreur de Serments",
+  "title": "Faim de paroles",
+  "faction": "infernal",
+  "rarity": "HR",
+  "category": "Démon",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 3,
+   "spd": 5,
+   "mag": 3,
+   "hp": 18,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   },
+   {
+    "key": "cataclysm",
+    "value": 1
+   }
+  ],
+  "visual": "Gueule circulaire suspendue dans le vide, couronnes de crocs concentriques, langue faite de parchemins.",
+  "lore": "Chaque promesse trahie le nourrit. Il n’a jamais eu faim.",
+  "evolution": null,
+  "sets": [
+   "pactes",
+   "fleaux"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "orb",
+   "type": "maw",
+   "scene": "inferno"
+  },
+  "image": "assets/art/INF-049.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Dévoreur de Serments — Gueule circulaire suspendue dans le vide, couronnes de crocs concentriques, langue faite de parchemins. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-050",
+  "number": 50,
+  "name": "Abaddon",
+  "title": "L’Ange de l’Abîme",
+  "faction": "infernal",
+  "rarity": "HR",
+  "category": "Ange déchu",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 6,
+   "mag": 3,
+   "hp": 19,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "command",
+    "value": 2
+   }
+  ],
+  "visual": "Chevalier sans visage aux ailes de sauterelle, cuirasse couverte d’écailles, épée qui ouvre le sol.",
+  "lore": "L’Apocalypse le nomme roi des sauterelles. Il attend encore la cinquième trompette.",
+  "evolution": null,
+  "sets": [
+   "plaies"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "wings": "insect",
+   "body": "armor",
+   "arms": "sword"
+  },
+  "image": "assets/art/INF-050.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Abaddon — Chevalier sans visage aux ailes de sauterelle, cuirasse couverte d’écailles, épée qui ouvre le sol. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-051",
+  "number": 51,
+  "name": "Lilith",
+  "title": "Mère de la Nuit",
+  "faction": "infernal",
+  "rarity": "M",
+  "category": "Démone primordiale",
+  "power": 9,
+  "role": "M",
+  "stats": {
+   "atk": 8,
+   "def": 4,
+   "spd": 7,
+   "mag": 10,
+   "hp": 16,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   },
+   {
+    "key": "omen"
+   },
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Reine aux ailes de chouette, longue chevelure vivante, serpent enroulé au bras, regard d’une calme cruauté.",
+  "lore": "Elle refusa de se soumettre et quitta l’Éden. Les sceaux, elle les connaît tous : elle les a vus poser.",
+  "evolution": null,
+  "sets": [
+   "souverains"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "horns": "curl",
+   "wings": "feather",
+   "body": "gown",
+   "arms": "spread",
+   "hair": true,
+   "halo": "ring"
+  },
+  "image": "assets/art/INF-051.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Lilith — Reine aux ailes de chouette, longue chevelure vivante, serpent enroulé au bras, regard d’une calme cruauté. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-052",
+  "number": 52,
+  "name": "Lucifer",
+  "title": "L’Empereur Déchu",
+  "faction": "infernal",
+  "rarity": "M",
+  "category": "Ange déchu",
+  "power": 10,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 7,
+   "mag": 3,
+   "hp": 21,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "command",
+    "value": 2
+   },
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Empereur aux six ailes brûlées, couronne fondue sur un front cornu, armure noire veinée d’or incandescent.",
+  "lore": "Il fut le plus lumineux. Il est désormais le plus lourd.",
+  "evolution": null,
+  "sets": [
+   "peches",
+   "souverains"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral",
+   "special"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "crown",
+   "wings": "tatter",
+   "body": "armor",
+   "arms": "spread",
+   "halo": "spike",
+   "horns": "long"
+  },
+  "image": "assets/art/INF-052.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Lucifer — Empereur aux six ailes brûlées, couronne fondue sur un front cornu, armure noire veinée d’or incandescent. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-053",
+  "number": 53,
+  "name": "Le Roi aux Mille Cornes",
+  "title": "Couronne vivante",
+  "faction": "infernal",
+  "rarity": "M",
+  "category": "Démon",
+  "power": 10,
+  "role": "T",
+  "stats": {
+   "atk": 8,
+   "def": 8,
+   "spd": 4,
+   "mag": 5,
+   "hp": 26,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "cataclysm",
+    "value": 2
+   }
+  ],
+  "visual": "Titan démoniaque dont la tête disparaît sous une forêt de cornes torsadées, chacune prise à un vaincu.",
+  "lore": "Une corne par roi vaincu. Il n’a plus de place, et cela le met en colère.",
+  "evolution": null,
+  "sets": [
+   "souverains"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral",
+   "special"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "many",
+   "body": "bulky",
+   "wings": "bat",
+   "arms": "spread",
+   "legs": "goat",
+   "tail": true,
+   "hornScale": 1.3
+  },
+  "image": "assets/art/INF-053.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Roi aux Mille Cornes — Titan démoniaque dont la tête disparaît sous une forêt de cornes torsadées, chacune prise à un vaincu. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "INF-054",
+  "number": 54,
+  "name": "Lucifer, l’Étoile du Matin",
+  "title": "Avant la Chute",
+  "faction": "infernal",
+  "rarity": "S",
+  "category": "Ange",
+  "power": 10,
+  "role": "M",
+  "stats": {
+   "atk": 8,
+   "def": 3,
+   "spd": 8,
+   "mag": 10,
+   "hp": 16,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 3
+   },
+   {
+    "key": "aegis"
+   },
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "L’ange originel dans sa gloire première : six ailes immaculées, auréole d’aube, visage encore sans ombre.",
+  "lore": "Un fragment de mémoire scellé dans l’or. Le seul souvenir que l’Enfer n’a pas su brûler.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "wings": "six",
+   "body": "robe",
+   "arms": "spread",
+   "halo": "ring"
+  },
+  "image": "assets/art/INF-054.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Lucifer, l’Étoile du Matin — L’ange originel dans sa gloire première : six ailes immaculées, auréole d’aube, visage encore sans ombre. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. variante de collection : gravure dorée à l’eau-forte sur fond noir, finition luxueuse. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ }
+]

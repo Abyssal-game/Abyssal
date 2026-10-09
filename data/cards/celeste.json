@@ -1,0 +1,2110 @@
+[
+ {
+  "id": "CEL-001",
+  "number": 1,
+  "name": "Choriste de Lumière",
+  "title": "Voix du premier matin",
+  "faction": "celeste",
+  "rarity": "C",
+  "category": "Ange",
+  "power": 1,
+  "role": "U",
+  "stats": {
+   "atk": 1,
+   "def": 0,
+   "spd": 2,
+   "mag": 1,
+   "hp": 4,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 1
+   }
+  ],
+  "visual": "Petit ange aux ailes d’ivoire, mains jointes, bouche entrouverte sur un chant que l’on sent plus qu’on ne l’entend.",
+  "lore": "Le chœur céleste comptait des milliers de voix. Il en reste quelques-unes, et elles chantent faux de chagrin.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "robe",
+   "arms": "pray",
+   "wings": "feather",
+   "halo": "ring",
+   "scale": 0.8
+  },
+  "image": "assets/art/CEL-001.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Choriste de Lumière — Petit ange aux ailes d’ivoire, mains jointes, bouche entrouverte sur un chant que l’on sent plus qu’on ne l’entend. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-002",
+  "number": 2,
+  "name": "Héraut Ailé",
+  "title": "Porteur d’annonces",
+  "faction": "celeste",
+  "rarity": "C",
+  "category": "Ange",
+  "power": 2,
+  "role": "S",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 5,
+   "mag": 1,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Messager casqué aux ailes repliées en flèche, longue trompe d’argent tenue comme une lance.",
+  "lore": "Il porte toujours la nouvelle avant qu’elle n’arrive. Elle n’est jamais bonne.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "wings": "feather",
+   "body": "armor",
+   "arms": "staff"
+  },
+  "image": "assets/art/CEL-002.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Héraut Ailé — Messager casqué aux ailes repliées en flèche, longue trompe d’argent tenue comme une lance. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-003",
+  "number": 3,
+  "name": "Chouette du Zénith",
+  "title": "Veille de midi",
+  "faction": "celeste",
+  "rarity": "C",
+  "category": "Créature céleste",
+  "power": 1,
+  "role": "M",
+  "stats": {
+   "atk": 1,
+   "def": 0,
+   "spd": 3,
+   "mag": 2,
+   "hp": 5,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Chouette blanche aux plumes de nacre, yeux d’or trop grands, qui ne chasse qu’en plein soleil.",
+  "lore": "Elle voit ce que la lumière cache. C’est-à-dire presque tout.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "owl",
+   "scale": 0.78
+  },
+  "image": "assets/art/CEL-003.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Chouette du Zénith — Chouette blanche aux plumes de nacre, yeux d’or trop grands, qui ne chasse qu’en plein soleil. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-004",
+  "number": 4,
+  "name": "Cloche de l’Aube",
+  "title": "Elle sonne seule",
+  "faction": "celeste",
+  "rarity": "C",
+  "category": "Objet sacré",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 2,
+   "mag": 2,
+   "hp": 9,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Cloche de bronze patiné suspendue dans le vide, gravée de prières, battant en forme d’œil.",
+  "lore": "Elle sonne quand un sceau se fissure. Elle sonne beaucoup, ces temps-ci.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "object",
+   "kind": "bell",
+   "scene": "heaven"
+  },
+  "image": "assets/art/CEL-004.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Cloche de l’Aube — Cloche de bronze patiné suspendue dans le vide, gravée de prières, battant en forme d’œil. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-005",
+  "number": 5,
+  "name": "Sentinelle d’Ivoire",
+  "title": "Statue qui veille",
+  "faction": "celeste",
+  "rarity": "C",
+  "category": "Construction sacrée",
+  "power": 3,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 3,
+   "spd": 2,
+   "mag": 2,
+   "hp": 12,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Statue d’ivoire articulée au visage serein, joints d’or, lance tenue à la verticale.",
+  "lore": "Elle n’a ni cœur ni âme. Elle a une consigne, et c’est suffisant.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "tall",
+   "head": "mask",
+   "scene": "heaven"
+  },
+  "image": "assets/art/CEL-005.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Sentinelle d’Ivoire — Statue d’ivoire articulée au visage serein, joints d’or, lance tenue à la verticale. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-006",
+  "number": 6,
+  "name": "Pèlerin Auréolé",
+  "title": "Marcheur des nuées",
+  "faction": "celeste",
+  "rarity": "C",
+  "category": "Saint",
+  "power": 2,
+  "role": "U",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 3,
+   "mag": 4,
+   "hp": 7,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 1
+   }
+  ],
+  "visual": "Voyageur encapuchonné au bâton noueux, auréole pâle flottant au-dessus de sa capuche usée.",
+  "lore": "Il cherche le chemin du Septième Ciel depuis la Chute. Il est presque arrivé, croit-il.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "hood",
+   "body": "robe",
+   "arms": "staff",
+   "halo": "ring"
+  },
+  "image": "assets/art/CEL-006.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Pèlerin Auréolé — Voyageur encapuchonné au bâton noueux, auréole pâle flottant au-dessus de sa capuche usée. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-007",
+  "number": 7,
+  "name": "Chevalier du Zénith",
+  "title": "Lame de midi",
+  "faction": "celeste",
+  "rarity": "C",
+  "category": "Ange",
+  "power": 3,
+  "role": "B",
+  "stats": {
+   "atk": 6,
+   "def": 1,
+   "spd": 3,
+   "mag": 2,
+   "hp": 9,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Chevalier ailé en armure blanche ciselée, épée droite tenue pointe en bas, cape soulevée par la lumière.",
+  "lore": "Il frappe quand le soleil est le plus haut et que l’ombre est la plus courte.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "body": "armor",
+   "arms": "sword",
+   "wings": "feather"
+  },
+  "image": "assets/art/CEL-007.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Chevalier du Zénith — Chevalier ailé en armure blanche ciselée, épée droite tenue pointe en bas, cape soulevée par la lumière. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-008",
+  "number": 8,
+  "name": "Ange Mendiant",
+  "title": "Les ailes vendues",
+  "faction": "celeste",
+  "rarity": "C",
+  "category": "Ange déchu",
+  "power": 1,
+  "role": "E",
+  "stats": {
+   "atk": 2,
+   "def": 0,
+   "spd": 2,
+   "mag": 1,
+   "hp": 4,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "relic"
+   }
+  ],
+  "visual": "Ange amaigri aux ailes plumées par endroits, robe rapiécée, main tendue vers les passants.",
+  "lore": "Il a vendu ses plumes une à une pour nourrir des mortels. Les mortels ont oublié.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "tatter",
+   "arms": "reach",
+   "wings": "tatter"
+  },
+  "image": "assets/art/CEL-008.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ange Mendiant — Ange amaigri aux ailes plumées par endroits, robe rapiécée, main tendue vers les passants. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-009",
+  "number": 9,
+  "name": "Œil Veilleur",
+  "title": "Il ne cligne pas",
+  "faction": "celeste",
+  "rarity": "C",
+  "category": "Créature céleste",
+  "power": 2,
+  "role": "M",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 3,
+   "mag": 4,
+   "hp": 6,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Œil flottant entouré de rayons de lumière solide, iris doré, pupille en forme de serrure.",
+  "lore": "Il garde la porte d’une chambre que personne n’a ouverte depuis la Création.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "orb",
+   "type": "eye",
+   "scale": 0.68,
+   "scene": "heaven"
+  },
+  "image": "assets/art/CEL-009.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Œil Veilleur — Œil flottant entouré de rayons de lumière solide, iris doré, pupille en forme de serrure. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-010",
+  "number": 10,
+  "name": "Colombe du Déluge",
+  "title": "Le rameau rapporté",
+  "faction": "celeste",
+  "rarity": "C",
+  "category": "Créature céleste",
+  "power": 1,
+  "role": "S",
+  "stats": {
+   "atk": 2,
+   "def": 0,
+   "spd": 3,
+   "mag": 2,
+   "hp": 5,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Colombe d’une blancheur parfaite, un rameau d’olivier dans le bec, ailes qui laissent une traînée d’or.",
+  "lore": "Elle est revenue avec un rameau. Ce qu’elle a vu ailleurs, elle ne l’a jamais dit.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "eagle",
+   "scale": 0.74,
+   "scene": "sky"
+  },
+  "image": "assets/art/CEL-010.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Colombe du Déluge — Colombe d’une blancheur parfaite, un rameau d’olivier dans le bec, ailes qui laissent une traînée d’or. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-011",
+  "number": 11,
+  "name": "Moine du Silence",
+  "title": "Vœu éternel",
+  "faction": "celeste",
+  "rarity": "C",
+  "category": "Saint",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 2,
+   "def": 2,
+   "spd": 2,
+   "mag": 3,
+   "hp": 10,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Moine immobile dans les ruines d’un monastère, capuche basse, mains jointes sur un bréviaire scellé.",
+  "lore": "Il a fait vœu de silence. Ce qu’il sait ferait trembler les sept royaumes.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "hood",
+   "body": "robe",
+   "arms": "pray",
+   "scene": "ruins"
+  },
+  "image": "assets/art/CEL-011.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Moine du Silence — Moine immobile dans les ruines d’un monastère, capuche basse, mains jointes sur un bréviaire scellé. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-012",
+  "number": 12,
+  "name": "Psautier Vivant",
+  "title": "Il se lit seul",
+  "faction": "celeste",
+  "rarity": "C",
+  "category": "Objet sacré",
+  "power": 2,
+  "role": "M",
+  "stats": {
+   "atk": 2,
+   "def": 0,
+   "spd": 4,
+   "mag": 4,
+   "hp": 6,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Livre de prières ouvert dont les pages s’envolent comme des oiseaux, œil d’or au centre de la reliure.",
+  "lore": "Chaque psaume lu à voix haute l’affame un peu moins.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "object",
+   "kind": "book",
+   "scene": "heaven"
+  },
+  "image": "assets/art/CEL-012.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Psautier Vivant — Livre de prières ouvert dont les pages s’envolent comme des oiseaux, œil d’or au centre de la reliure. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-013",
+  "number": 13,
+  "name": "Archer de l’Aurore",
+  "title": "Flèche du premier rayon",
+  "faction": "celeste",
+  "rarity": "C",
+  "category": "Ange",
+  "power": 2,
+  "role": "S",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 5,
+   "mag": 2,
+   "hp": 4,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Ange svelte bandant un arc de lumière, ailes déployées, carquois de rayons solaires.",
+  "lore": "Ses flèches arrivent avant l’aube. On dit qu’elles l’apportent.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "body": "lean",
+   "arms": "spread",
+   "wings": "feather"
+  },
+  "image": "assets/art/CEL-013.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Archer de l’Aurore — Ange svelte bandant un arc de lumière, ailes déployées, carquois de rayons solaires. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-014",
+  "number": 14,
+  "name": "Étincelles Séraphiques",
+  "title": "Braises de pureté",
+  "faction": "celeste",
+  "rarity": "C",
+  "category": "Esprit céleste",
+  "power": 1,
+  "role": "S",
+  "stats": {
+   "atk": 3,
+   "def": 0,
+   "spd": 4,
+   "mag": 1,
+   "hp": 3,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Nuée de petites flammes blanches qui tournoient en chantant, chacune avec un minuscule visage.",
+  "lore": "Un séraphin qui s’ébroue en laisse tomber des centaines.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "swarm",
+   "kind": "wisp",
+   "count": 24,
+   "leader": false,
+   "scene": "heaven"
+  },
+  "image": "assets/art/CEL-014.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Étincelles Séraphiques — Nuée de petites flammes blanches qui tournoient en chantant, chacune avec un minuscule visage. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-015",
+  "number": 15,
+  "name": "Ange Gardien",
+  "title": "Toujours un pas derrière",
+  "faction": "celeste",
+  "rarity": "C",
+  "category": "Ange",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 2,
+   "def": 2,
+   "spd": 1,
+   "mag": 2,
+   "hp": 9,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Ange aux ailes larges ouvertes en bouclier, robe simple, regard tourné vers celui qu’il protège.",
+  "lore": "Chaque mortel en avait un. Les sceaux brisés en ont rappelé la plupart.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "robe",
+   "wings": "feather",
+   "arms": "spread",
+   "halo": "ring"
+  },
+  "image": "assets/art/CEL-015.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ange Gardien — Ange aux ailes larges ouvertes en bouclier, robe simple, regard tourné vers celui qu’il protège. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-016",
+  "number": 16,
+  "name": "Lumière Captive",
+  "title": "Prisme d’éternité",
+  "faction": "celeste",
+  "rarity": "C",
+  "category": "Esprit céleste",
+  "power": 2,
+  "role": "M",
+  "stats": {
+   "atk": 1,
+   "def": 0,
+   "spd": 3,
+   "mag": 4,
+   "hp": 6,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "aegis"
+   }
+  ],
+  "visual": "Cristal de lumière pure taillé en losange, au cœur duquel bat un œil doré.",
+  "lore": "Un fragment du premier jour, enfermé là pour que la nuit ne soit jamais totale.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "orb",
+   "type": "crystal",
+   "scale": 0.8,
+   "scene": "heaven"
+  },
+  "image": "assets/art/CEL-016.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Lumière Captive — Cristal de lumière pure taillé en losange, au cœur duquel bat un œil doré. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-017",
+  "number": 17,
+  "name": "Chérubin",
+  "title": "Les quatre visages",
+  "faction": "celeste",
+  "rarity": "PC",
+  "category": "Ange",
+  "power": 4,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 4,
+   "spd": 2,
+   "mag": 2,
+   "hp": 13,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "aegis"
+   }
+  ],
+  "visual": "Gardien aux quatre visages (homme, lion, bœuf, aigle) et aux quatre ailes, épée flamboyante à la main.",
+  "lore": "Ézéchiel les vit près du trône. Rien à voir avec les bambins joufflus des peintures.",
+  "evolution": null,
+  "sets": [
+   "firmament"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "wings": "six",
+   "body": "robe",
+   "arms": "spread",
+   "eyes": 3,
+   "halo": "ring"
+  },
+  "image": "assets/art/CEL-017.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Chérubin — Gardien aux quatre visages (homme, lion, bœuf, aigle) et aux quatre ailes, épée flamboyante à la main. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-018",
+  "number": 18,
+  "name": "Valkyrie",
+  "title": "Celle qui choisit les morts",
+  "faction": "celeste",
+  "rarity": "PC",
+  "category": "Esprit guerrier",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 6,
+   "def": 1,
+   "spd": 6,
+   "mag": 3,
+   "hp": 9,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Guerrière casquée aux ailes de cygne, lance et bouclier, cheveux tressés battant dans la tempête.",
+  "lore": "Dans les sagas, elle emporte les braves au Valhalla. Elle juge encore qui en est digne.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "body": "armor",
+   "arms": "sword",
+   "wings": "feather",
+   "scene": "sky"
+  },
+  "image": "assets/art/CEL-018.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Valkyrie — Guerrière casquée aux ailes de cygne, lance et bouclier, cheveux tressés battant dans la tempête. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-019",
+  "number": 19,
+  "name": "Tengu",
+  "title": "Ermite des sommets",
+  "faction": "celeste",
+  "rarity": "PC",
+  "category": "Yōkai",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 5,
+   "def": 1,
+   "spd": 7,
+   "mag": 2,
+   "hp": 8,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Être à bec de corbeau en robe d’ascète, ailes noires, éventail de plumes à la main.",
+  "lore": "Dans les monts du Japon, les tengu enseignaient l’escrime aux guerriers. Ils punissaient aussi les orgueilleux.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "bird",
+   "wings": "feather",
+   "body": "robe",
+   "arms": "staff",
+   "scene": "mountain"
+  },
+  "image": "assets/art/CEL-019.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Tengu — Être à bec de corbeau en robe d’ascète, ailes noires, éventail de plumes à la main. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-020",
+  "number": 20,
+  "name": "Huma",
+  "title": "L’oiseau qui ne se pose jamais",
+  "faction": "celeste",
+  "rarity": "PC",
+  "category": "Créature mythologique",
+  "power": 3,
+  "role": "U",
+  "stats": {
+   "atk": 2,
+   "def": 2,
+   "spd": 4,
+   "mag": 5,
+   "hp": 11,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 2
+   }
+  ],
+  "visual": "Grand oiseau aux plumes d’or pâle qui vole si haut qu’il ne touche jamais le sol.",
+  "lore": "La tradition persane dit que son ombre posée sur une tête la promet à la royauté.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "eagle",
+   "scene": "sky"
+  },
+  "image": "assets/art/CEL-020.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Huma — Grand oiseau aux plumes d’or pâle qui vole si haut qu’il ne touche jamais le sol. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-021",
+  "number": 21,
+  "name": "Veilleur Déchu",
+  "title": "Grigori",
+  "faction": "celeste",
+  "rarity": "PC",
+  "category": "Ange déchu",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 4,
+   "mag": 5,
+   "hp": 7,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "curse",
+    "value": 1
+   }
+  ],
+  "visual": "Ange gigantesque aux ailes grises en lambeaux, troisième œil ouvert au front, regard fixé sur le monde d’en bas.",
+  "lore": "Les Veilleurs devaient observer les humains. Ils finirent par trop les aimer, puis par trop leur apprendre.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "wings": "tatter",
+   "body": "robe",
+   "arms": "down",
+   "eyes": 3
+  },
+  "image": "assets/art/CEL-021.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Veilleur Déchu — Ange gigantesque aux ailes grises en lambeaux, troisième œil ouvert au front, regard fixé sur le monde d’en bas. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-022",
+  "number": 22,
+  "name": "Pégase",
+  "title": "Né du sang de Méduse",
+  "faction": "celeste",
+  "rarity": "PC",
+  "category": "Créature mythologique",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 5,
+   "def": 1,
+   "spd": 6,
+   "mag": 3,
+   "hp": 7,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   },
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Cheval ailé à la robe immaculée, ailes de cygne déployées, sabots qui font jaillir des sources.",
+  "lore": "Il naquit du cou tranché de Méduse. Il ne garde rien de sa mère, sauf peut-être le regard.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "horse",
+   "wings": "feather",
+   "hooves": true,
+   "tail": "bushy",
+   "scene": "sky"
+  },
+  "image": "assets/art/CEL-022.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Pégase — Cheval ailé à la robe immaculée, ailes de cygne déployées, sabots qui font jaillir des sources. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-023",
+  "number": 23,
+  "name": "Ange de la Balance",
+  "title": "La mesure exacte",
+  "faction": "celeste",
+  "rarity": "PC",
+  "category": "Ange",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 5,
+   "mag": 6,
+   "hp": 8,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 2
+   }
+  ],
+  "visual": "Ange au visage couvert d’un masque d’or lisse, bras écartés soutenant une balance invisible.",
+  "lore": "Il pèse les âmes au grain près. Il ne s’est jamais trompé, et cela le terrifie.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "mask",
+   "body": "robe",
+   "arms": "spread",
+   "halo": "ring"
+  },
+  "image": "assets/art/CEL-023.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ange de la Balance — Ange au visage couvert d’un masque d’or lisse, bras écartés soutenant une balance invisible. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-024",
+  "number": 24,
+  "name": "Trône",
+  "title": "La roue de feu",
+  "faction": "celeste",
+  "rarity": "PC",
+  "category": "Ange",
+  "power": 4,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 4,
+   "spd": 3,
+   "mag": 3,
+   "hp": 13,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "aegis"
+   }
+  ],
+  "visual": "Double roue de feu aux jantes couvertes d’yeux, tournant lentement dans le silence.",
+  "lore": "Les Trônes portent la gloire. Ils ne la regardent jamais en face.",
+  "evolution": null,
+  "sets": [
+   "firmament"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "wheel",
+   "rings": 2,
+   "eyes": 8,
+   "scale": 0.85
+  },
+  "image": "assets/art/CEL-024.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Trône — Double roue de feu aux jantes couvertes d’yeux, tournant lentement dans le silence. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-025",
+  "number": 25,
+  "name": "Gardienne du Seuil d’Or",
+  "title": "Porte du Premier Ciel",
+  "faction": "celeste",
+  "rarity": "PC",
+  "category": "Ange",
+  "power": 4,
+  "role": "T",
+  "stats": {
+   "atk": 4,
+   "def": 3,
+   "spd": 2,
+   "mag": 4,
+   "hp": 14,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "bless",
+    "value": 1
+   }
+  ],
+  "visual": "Ange en longue robe d’or, ailes repliées en voûte, clé de lumière tenue comme un sceptre.",
+  "lore": "Elle n’a refusé l’entrée qu’à une seule âme. Celle-ci attend toujours devant la porte.",
+  "evolution": null,
+  "sets": [
+   "firmament"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "gown",
+   "wings": "feather",
+   "arms": "staff",
+   "halo": "ring"
+  },
+  "image": "assets/art/CEL-025.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Gardienne du Seuil d’Or — Ange en longue robe d’or, ailes repliées en voûte, clé de lumière tenue comme un sceptre. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-026",
+  "number": 26,
+  "name": "Ba",
+  "title": "L’âme à visage humain",
+  "faction": "celeste",
+  "rarity": "PC",
+  "category": "Esprit égyptien",
+  "power": 3,
+  "role": "U",
+  "stats": {
+   "atk": 2,
+   "def": 2,
+   "spd": 3,
+   "mag": 3,
+   "hp": 9,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Oiseau au corps de faucon et à tête humaine, couronné d’un disque solaire, ailes d’or et de lapis.",
+  "lore": "Pour les anciens Égyptiens, le ba quittait la tombe chaque jour pour voir le soleil.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "human",
+   "hair": true,
+   "scene": "temple"
+  },
+  "image": "assets/art/CEL-026.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ba — Oiseau au corps de faucon et à tête humaine, couronné d’un disque solaire, ailes d’or et de lapis. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-027",
+  "number": 27,
+  "name": "Licorne de Lumière",
+  "title": "Pureté armée",
+  "faction": "celeste",
+  "rarity": "PC",
+  "category": "Créature mythologique",
+  "power": 4,
+  "role": "U",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 4,
+   "mag": 6,
+   "hp": 12,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 2
+   }
+  ],
+  "visual": "Licorne d’une blancheur aveuglante, corne spiralée d’ivoire, crinière d’argent ruisselante.",
+  "lore": "Les bestiaires médiévaux affirmaient que sa corne purifie l’eau empoisonnée. C’est exact.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "horse",
+   "hooves": true,
+   "mane": true,
+   "unicorn": true,
+   "tail": "bushy",
+   "scene": "heaven"
+  },
+  "image": "assets/art/CEL-027.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Licorne de Lumière — Licorne d’une blancheur aveuglante, corne spiralée d’ivoire, crinière d’argent ruisselante. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-028",
+  "number": 28,
+  "name": "Scribe Céleste",
+  "title": "Celui qui note tout",
+  "faction": "celeste",
+  "rarity": "PC",
+  "category": "Ange",
+  "power": 3,
+  "role": "M",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 3,
+   "mag": 5,
+   "hp": 7,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Ange aux cinq yeux penché sur un rouleau infini, plume de lumière à la main.",
+  "lore": "Il note chaque acte de chaque créature. Il est en retard de quelques siècles.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "robe",
+   "arms": "staff",
+   "eyes": 5,
+   "wings": "feather"
+  },
+  "image": "assets/art/CEL-028.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Scribe Céleste — Ange aux cinq yeux penché sur un rouleau infini, plume de lumière à la main. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-029",
+  "number": 29,
+  "name": "Séraphin",
+  "title": "Ceux qui brûlent",
+  "faction": "celeste",
+  "rarity": "R",
+  "category": "Ange",
+  "power": 6,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 2,
+   "spd": 6,
+   "mag": 9,
+   "hp": 12,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 2
+   },
+   {
+    "key": "strike",
+    "value": 2
+   }
+  ],
+  "visual": "Ange aux six ailes de flamme blanche : deux voilent son visage, deux ses pieds, deux le portent.",
+  "lore": "Leur nom signifie « ceux qui brûlent ». Les regarder suffit à le comprendre.",
+  "evolution": null,
+  "sets": [
+   "firmament"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "void",
+   "wings": "six",
+   "body": "robe",
+   "arms": "pray",
+   "halo": "ring"
+  },
+  "image": "assets/art/CEL-029.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Séraphin — Ange aux six ailes de flamme blanche : deux voilent son visage, deux ses pieds, deux le portent. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-030",
+  "number": 30,
+  "name": "Ange Exterminateur",
+  "title": "La Dixième Plaie",
+  "faction": "celeste",
+  "rarity": "R",
+  "category": "Ange",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 8,
+   "def": 2,
+   "spd": 5,
+   "mag": 3,
+   "hp": 13,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "first"
+   },
+   {
+    "key": "command",
+    "value": 1
+   }
+  ],
+  "visual": "Ange sans visage en armure d’argent, épée de lumière nue, ailes immenses qui assombrissent la nuit.",
+  "lore": "Il passa de maison en maison. Il n’a pas oublié les portes marquées.",
+  "evolution": null,
+  "sets": [
+   "firmament",
+   "plaies"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral",
+   "special"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "wings": "feather",
+   "body": "armor",
+   "arms": "sword",
+   "halo": "ring"
+  },
+  "image": "assets/art/CEL-030.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ange Exterminateur — Ange sans visage en armure d’argent, épée de lumière nue, ailes immenses qui assombrissent la nuit. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-031",
+  "number": 31,
+  "name": "Phénix",
+  "title": "Qui renaît des cendres",
+  "faction": "celeste",
+  "rarity": "R",
+  "category": "Créature mythologique",
+  "power": 6,
+  "role": "E",
+  "stats": {
+   "atk": 7,
+   "def": 3,
+   "spd": 5,
+   "mag": 6,
+   "hp": 13,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "relic"
+   },
+   {
+    "key": "bless",
+    "value": 2
+   }
+  ],
+  "visual": "Oiseau de feu aux plumes d’or et de pourpre, longue queue de flammes, regard serein au milieu du brasier.",
+  "lore": "Il meurt tous les cinq cents ans. Il a fini par trouver cela reposant.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "bird",
+   "flame": true,
+   "scene": "sky"
+  },
+  "image": "assets/art/CEL-031.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Phénix — Oiseau de feu aux plumes d’or et de pourpre, longue queue de flammes, regard serein au milieu du brasier. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-032",
+  "number": 32,
+  "name": "Fenghuang",
+  "title": "L’oiseau de l’harmonie",
+  "faction": "celeste",
+  "rarity": "R",
+  "category": "Créature mythologique",
+  "power": 5,
+  "role": "U",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 3,
+   "mag": 6,
+   "hp": 13,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 2
+   },
+   {
+    "key": "aegis"
+   }
+  ],
+  "visual": "Oiseau majestueux aux cinq couleurs, longues plumes caudales ondulantes, crête comme une couronne.",
+  "lore": "La tradition chinoise dit qu’il n’apparaît qu’en temps de paix. On ne l’a pas vu depuis longtemps.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "eagle",
+   "crest": true,
+   "scene": "heaven"
+  },
+  "image": "assets/art/CEL-032.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Fenghuang — Oiseau majestueux aux cinq couleurs, longues plumes caudales ondulantes, crête comme une couronne. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-033",
+  "number": 33,
+  "name": "Qilin",
+  "title": "Le pas qui ne froisse pas l’herbe",
+  "faction": "celeste",
+  "rarity": "R",
+  "category": "Créature mythologique",
+  "power": 5,
+  "role": "T",
+  "stats": {
+   "atk": 4,
+   "def": 3,
+   "spd": 3,
+   "mag": 4,
+   "hp": 16,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "aegis"
+   }
+  ],
+  "visual": "Créature au corps de cerf couvert d’écailles, tête de dragon, sabots qui ne froissent pas l’herbe, flammes douces.",
+  "lore": "Il annonce la naissance des sages. Il en annonce peu, ces derniers temps.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lizard",
+   "hooves": true,
+   "mane": true,
+   "unicorn": true,
+   "tail": "bushy",
+   "scene": "heaven"
+  },
+  "image": "assets/art/CEL-033.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Qilin — Créature au corps de cerf couvert d’écailles, tête de dragon, sabots qui ne froissent pas l’herbe, flammes douces. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-034",
+  "number": 34,
+  "name": "Lamassu",
+  "title": "Gardien des portes d’Assyrie",
+  "faction": "celeste",
+  "rarity": "R",
+  "category": "Créature mythologique",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 4,
+   "spd": 3,
+   "mag": 4,
+   "hp": 18,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Taureau ailé à tête d’homme barbu et couronné, ailes aux plumes alignées comme des pierres sculptées.",
+  "lore": "Ses statues gardaient les palais assyriens. Celui-ci a quitté la pierre.",
+  "evolution": null,
+  "sets": [
+   "firmament"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "human",
+   "wings": "feather",
+   "hooves": true,
+   "size": "big",
+   "scene": "temple"
+  },
+  "image": "assets/art/CEL-034.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Lamassu — Taureau ailé à tête d’homme barbu et couronné, ailes aux plumes alignées comme des pierres sculptées. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-035",
+  "number": 35,
+  "name": "Hræsvelgr",
+  "title": "Le Mangeur de cadavres",
+  "faction": "celeste",
+  "rarity": "R",
+  "category": "Géant",
+  "power": 6,
+  "role": "S",
+  "stats": {
+   "atk": 8,
+   "def": 1,
+   "spd": 7,
+   "mag": 3,
+   "hp": 11,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   },
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Géant à forme d’aigle perché au bord du monde, dont chaque battement d’ailes lève les vents.",
+  "lore": "L’Edda dit que tous les vents naissent de ses ailes. Il bat des ailes plus fort depuis la rupture des sceaux.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "eagle",
+   "storm": true,
+   "scene": "sky"
+  },
+  "image": "assets/art/CEL-035.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Hræsvelgr — Géant à forme d’aigle perché au bord du monde, dont chaque battement d’ailes lève les vents. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-036",
+  "number": 36,
+  "name": "Archange de la Septième Trompette",
+  "title": "Le dernier signal",
+  "faction": "celeste",
+  "rarity": "R",
+  "category": "Ange",
+  "power": 6,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 2,
+   "spd": 5,
+   "mag": 9,
+   "hp": 11,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "cataclysm",
+    "value": 1
+   }
+  ],
+  "visual": "Archange en armure claire levant une trompette d’or vers un ciel qui se déchire.",
+  "lore": "Il n’a pas encore soufflé. Il porte l’embouchure à ses lèvres depuis mille ans.",
+  "evolution": null,
+  "sets": [
+   "firmament"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "wings": "feather",
+   "body": "armor",
+   "arms": "up",
+   "halo": "ring"
+  },
+  "image": "assets/art/CEL-036.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Archange de la Septième Trompette — Archange en armure claire levant une trompette d’or vers un ciel qui se déchire. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-037",
+  "number": 37,
+  "name": "Le Cavalier Blanc",
+  "title": "Il partit en vainqueur",
+  "faction": "celeste",
+  "rarity": "R",
+  "category": "Cavalier",
+  "power": 6,
+  "role": "S",
+  "stats": {
+   "atk": 8,
+   "def": 3,
+   "spd": 8,
+   "mag": 3,
+   "hp": 10,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "first"
+   },
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Cavalier couronné sur un cheval blanc, arc à la main, cape d’ivoire flottant derrière lui.",
+  "lore": "Le premier des quatre. Les trois autres attendent son signal.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "horse",
+   "rider": true,
+   "hooves": true,
+   "mane": true,
+   "scene": "heaven"
+  },
+  "image": "assets/art/CEL-037.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Cavalier Blanc — Cavalier couronné sur un cheval blanc, arc à la main, cape d’ivoire flottant derrière lui. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-038",
+  "number": 38,
+  "name": "Ophanim",
+  "title": "Roues dans les roues",
+  "faction": "celeste",
+  "rarity": "HR",
+  "category": "Ange",
+  "power": 8,
+  "role": "M",
+  "stats": {
+   "atk": 6,
+   "def": 3,
+   "spd": 6,
+   "mag": 10,
+   "hp": 15,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "aegis"
+   },
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Roues d’or imbriquées les unes dans les autres, jantes couvertes d’yeux qui regardent dans toutes les directions.",
+  "lore": "Ils ne se tournent jamais pour avancer. Ils sont déjà face à tout.",
+  "evolution": null,
+  "sets": [
+   "firmament"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "wheel",
+   "rings": 3,
+   "eyes": 16
+  },
+  "image": "assets/art/CEL-038.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ophanim — Roues d’or imbriquées les unes dans les autres, jantes couvertes d’yeux qui regardent dans toutes les directions. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-039",
+  "number": 39,
+  "name": "Simurgh",
+  "title": "Reine des oiseaux",
+  "faction": "celeste",
+  "rarity": "HR",
+  "category": "Créature mythologique",
+  "power": 7,
+  "role": "U",
+  "stats": {
+   "atk": 5,
+   "def": 4,
+   "spd": 5,
+   "mag": 9,
+   "hp": 19,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 3
+   }
+  ],
+  "visual": "Oiseau colossal aux plumes cuivrées, tête de chien selon certains récits, nichant au sommet de l’arbre de toutes les graines.",
+  "lore": "Les poètes persans racontent que trente oiseaux partirent la chercher. Ils découvrirent qu’ils étaient elle.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "eagle",
+   "crest": true,
+   "scale": 1.1,
+   "scene": "mountain"
+  },
+  "image": "assets/art/CEL-039.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Simurgh — Oiseau colossal aux plumes cuivrées, tête de chien selon certains récits, nichant au sommet de l’arbre de toutes les graines. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-040",
+  "number": 40,
+  "name": "Le Séraphin Écarlate",
+  "title": "La flamme qui doute",
+  "faction": "celeste",
+  "rarity": "HR",
+  "category": "Ange",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 6,
+   "mag": 4,
+   "hp": 17,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "first"
+   },
+   {
+    "key": "cataclysm",
+    "value": 1
+   }
+  ],
+  "visual": "Séraphin aux six ailes rouge sang, flamme écarlate à la place du visage, auréole hérissée de pointes.",
+  "lore": "Il a pris parti pendant la Chute. Personne, pas même lui, ne sait lequel.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "void",
+   "wings": "six",
+   "body": "robe",
+   "arms": "spread",
+   "halo": "spike",
+   "tint": "#ff4a4a"
+  },
+  "image": "assets/art/CEL-040.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Séraphin Écarlate — Séraphin aux six ailes rouge sang, flamme écarlate à la place du visage, auréole hérissée de pointes. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-041",
+  "number": 41,
+  "name": "Le Porteur de l’Aube Noire",
+  "title": "Lumière à l’envers",
+  "faction": "celeste",
+  "rarity": "HR",
+  "category": "Ange déchu",
+  "power": 8,
+  "role": "M",
+  "stats": {
+   "atk": 6,
+   "def": 4,
+   "spd": 7,
+   "mag": 10,
+   "hp": 14,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 3
+   },
+   {
+    "key": "drain"
+   }
+  ],
+  "visual": "Ange en armure noircie, ailes déchirées, portant au bout d’une hampe un soleil noir qui aspire la lumière.",
+  "lore": "Il promettait une aube nouvelle. Il a tenu parole, mais personne n’en voulait.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "wings": "tatter",
+   "body": "armor",
+   "arms": "staff",
+   "halo": "spike",
+   "scene": "ruins"
+  },
+  "image": "assets/art/CEL-041.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Porteur de l’Aube Noire — Ange en armure noircie, ailes déchirées, portant au bout d’une hampe un soleil noir qui aspire la lumière. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-042",
+  "number": 42,
+  "name": "L’Ange de la Grêle",
+  "title": "La Septième Plaie",
+  "faction": "celeste",
+  "rarity": "HR",
+  "category": "Ange",
+  "power": 7,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 3,
+   "spd": 6,
+   "mag": 4,
+   "hp": 17,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "cataclysm",
+    "value": 2
+   }
+  ],
+  "visual": "Ange de glace aux ailes cristallines, bras levés appelant une pluie de grêle mêlée de feu.",
+  "lore": "Feu et grêle tombèrent ensemble. Il n’avait jamais vu le monde aussi beau.",
+  "evolution": null,
+  "sets": [
+   "plaies"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "wings": "feather",
+   "body": "armor",
+   "arms": "up",
+   "halo": "ring",
+   "scene": "sky"
+  },
+  "image": "assets/art/CEL-042.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : L’Ange de la Grêle — Ange de glace aux ailes cristallines, bras levés appelant une pluie de grêle mêlée de feu. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-043",
+  "number": 43,
+  "name": "Le Gardien du Septième Ciel",
+  "title": "La dernière porte",
+  "faction": "celeste",
+  "rarity": "M",
+  "category": "Ange",
+  "power": 10,
+  "role": "T",
+  "stats": {
+   "atk": 8,
+   "def": 8,
+   "spd": 5,
+   "mag": 5,
+   "hp": 26,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "aegis"
+   },
+   {
+    "key": "command",
+    "value": 2
+   }
+  ],
+  "visual": "Archange colossal aux six ailes d’or, armure gravée de sceaux, épée plantée devant une porte de lumière.",
+  "lore": "Il garde la porte du dernier ciel. Il ne sait plus s’il empêche d’entrer ou de sortir.",
+  "evolution": null,
+  "sets": [
+   "firmament"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral",
+   "special"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "wings": "six",
+   "body": "armor",
+   "arms": "sword",
+   "halo": "ring"
+  },
+  "image": "assets/art/CEL-043.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Gardien du Septième Ciel — Archange colossal aux six ailes d’or, armure gravée de sceaux, épée plantée devant une porte de lumière. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-044",
+  "number": 44,
+  "name": "L’Ange aux Mille Yeux",
+  "title": "Rien ne lui échappe",
+  "faction": "celeste",
+  "rarity": "M",
+  "category": "Ange",
+  "power": 9,
+  "role": "M",
+  "stats": {
+   "atk": 7,
+   "def": 4,
+   "spd": 7,
+   "mag": 10,
+   "hp": 16,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "fear"
+   },
+   {
+    "key": "strike",
+    "value": 3
+   }
+  ],
+  "visual": "Ange dont chaque plume, chaque pli de la robe et chaque doigt porte un œil ouvert, auréole d’un blanc absolu.",
+  "lore": "Il a vu la Chute sous mille angles. Il n’a jamais pu fermer les yeux.",
+  "evolution": null,
+  "sets": [
+   "firmament"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "void",
+   "wings": "six",
+   "body": "robe",
+   "arms": "spread",
+   "eyes": 40,
+   "halo": "ring"
+  },
+  "image": "assets/art/CEL-044.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : L’Ange aux Mille Yeux — Ange dont chaque plume, chaque pli de la robe et chaque doigt porte un œil ouvert, auréole d’un blanc absolu. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "CEL-045",
+  "number": 45,
+  "name": "L’Aube Avant la Lumière",
+  "title": "Premier jour",
+  "faction": "celeste",
+  "rarity": "S",
+  "category": "Entité céleste",
+  "power": 10,
+  "role": "U",
+  "stats": {
+   "atk": 6,
+   "def": 6,
+   "spd": 7,
+   "mag": 10,
+   "hp": 24,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 4
+   },
+   {
+    "key": "aegis"
+   }
+  ],
+  "visual": "Un soleil naissant, encore enveloppé de ténèbres, dont la première lueur dessine un visage.",
+  "lore": "Avant le premier rayon, il y eut une intention. Cette carte en est le souvenir.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "orb",
+   "type": "sun",
+   "scene": "heaven"
+  },
+  "image": "assets/art/CEL-045.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : L’Aube Avant la Lumière — Un soleil naissant, encore enveloppé de ténèbres, dont la première lueur dessine un visage. Ambiance de la faction Céleste : ivoire, or, argent et blanc spectral ; lumière divine, plumes, auréoles. variante de collection : gravure dorée à l’eau-forte sur fond noir, finition luxueuse. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ }
+]

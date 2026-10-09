@@ -1,0 +1,1895 @@
+[
+ {
+  "id": "ART-001",
+  "number": 1,
+  "name": "Golem de Glaise",
+  "title": "Le premier modelage",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Golem",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 1,
+   "mag": 1,
+   "hp": 8,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Golem trapu de terre glaise encore humide, empreintes de doigts sur le torse, rune unique au front.",
+  "lore": "On l’a modelé pour porter des pierres. Il porte des pierres. Il ne se pose pas de questions.",
+  "evolution": {
+   "line": "golem",
+   "name": "Lignée des Golems",
+   "stage": 1,
+   "stages": 3
+  },
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "block",
+   "head": "block",
+   "scale": 0.86
+  },
+  "image": "assets/art/ART-001.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Golem de Glaise — Golem trapu de terre glaise encore humide, empreintes de doigts sur le torse, rune unique au front. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-002",
+  "number": 2,
+  "name": "Gargouille de Cathédrale",
+  "title": "La gouttière qui veille",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Construction",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 3,
+   "spd": 1,
+   "mag": 1,
+   "hp": 9,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Gargouille de pierre grise aux ailes repliées, gueule ouverte en gouttière, accroupie sur une corniche.",
+  "lore": "Elle crache la pluie depuis huit siècles. Elle a fini par aimer ça.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "curl",
+   "wings": "bat",
+   "body": "bulky",
+   "legs": "goat",
+   "scale": 0.84,
+   "scene": "ruins"
+  },
+  "image": "assets/art/ART-002.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Gargouille de Cathédrale — Gargouille de pierre grise aux ailes repliées, gueule ouverte en gouttière, accroupie sur une corniche. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-003",
+  "number": 3,
+  "name": "Homoncule",
+  "title": "L’enfant du flacon",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Créature alchimique",
+  "power": 1,
+  "role": "M",
+  "stats": {
+   "atk": 1,
+   "def": 1,
+   "spd": 2,
+   "mag": 1,
+   "hp": 5,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Petit être humanoïde à la peau translucide, veines dorées, sorti d’un flacon encore fumant.",
+  "lore": "Paracelse en donnait la recette. Il omettait de préciser ce que l’homoncule en penserait.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "lean",
+   "arms": "reach",
+   "scale": 0.62,
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-003.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Homoncule — Petit être humanoïde à la peau translucide, veines dorées, sorti d’un flacon encore fumant. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-004",
+  "number": 4,
+  "name": "Araignée d’Horlogerie",
+  "title": "Tic, tac, morsure",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Automate",
+  "power": 2,
+  "role": "S",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 3,
+   "mag": 2,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Araignée de laiton aux pattes articulées par des engrenages, huit yeux de verre bleuté.",
+  "lore": "Elle tisse des fils de cuivre. Ses toiles sonnent quand une proie s’y prend.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "spider",
+   "scale": 0.82
+  },
+  "image": "assets/art/ART-004.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Araignée d’Horlogerie — Araignée de laiton aux pattes articulées par des engrenages, huit yeux de verre bleuté. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-005",
+  "number": 5,
+  "name": "Scarabée de Laiton",
+  "title": "Carapace polie",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Automate",
+  "power": 1,
+  "role": "T",
+  "stats": {
+   "atk": 2,
+   "def": 3,
+   "spd": 1,
+   "mag": 0,
+   "hp": 7,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Scarabée mécanique à la carapace de laiton gravée, élytres qui s’ouvrent sur des rouages.",
+  "lore": "Un joaillier l’a fabriqué pour une reine. La reine est morte. Le scarabée cherche encore à lui plaire.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "insect",
+   "type": "scarab",
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-005.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Scarabée de Laiton — Scarabée mécanique à la carapace de laiton gravée, élytres qui s’ouvrent sur des rouages. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-006",
+  "number": 6,
+  "name": "Pantin de Mercure",
+  "title": "Fils invisibles",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Automate",
+  "power": 2,
+  "role": "S",
+  "stats": {
+   "atk": 4,
+   "def": 2,
+   "spd": 5,
+   "mag": 0,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Marionnette de bois verni dont les fils de mercure s’élèvent vers un marionnettiste invisible.",
+  "lore": "Il danse très bien. Personne ne sait qui tient les fils.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "object",
+   "kind": "doll",
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-006.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Pantin de Mercure — Marionnette de bois verni dont les fils de mercure s’élèvent vers un marionnettiste invisible. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-007",
+  "number": 7,
+  "name": "Serviteur de Cire",
+  "title": "Il fond lentement",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Créature alchimique",
+  "power": 1,
+  "role": "U",
+  "stats": {
+   "atk": 1,
+   "def": 1,
+   "spd": 1,
+   "mag": 2,
+   "hp": 7,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 1
+   }
+  ],
+  "visual": "Domestique de cire au visage lisse et sans expression, mèche allumée au sommet du crâne.",
+  "lore": "Il sert fidèlement jusqu’à ce que sa mèche s’éteigne. On ne la rallume jamais.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "mask",
+   "body": "robe",
+   "arms": "down",
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-007.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Serviteur de Cire — Domestique de cire au visage lisse et sans expression, mèche allumée au sommet du crâne. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-008",
+  "number": 8,
+  "name": "Hibou Mécanique",
+  "title": "La sagesse remontée",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Automate",
+  "power": 1,
+  "role": "M",
+  "stats": {
+   "atk": 1,
+   "def": 1,
+   "spd": 2,
+   "mag": 1,
+   "hp": 4,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Chouette de bronze aux plumes articulées, yeux de cristal qui tournent avec un léger cliquetis.",
+  "lore": "On la remonte chaque matin. Elle prédit la journée. Elle se trompe rarement.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "owl",
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-008.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Hibou Mécanique — Chouette de bronze aux plumes articulées, yeux de cristal qui tournent avec un léger cliquetis. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-009",
+  "number": 9,
+  "name": "Armure Vide",
+  "title": "Personne à l’intérieur",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Construction maudite",
+  "power": 3,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 3,
+   "spd": 1,
+   "mag": 2,
+   "hp": 12,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Armure de plates complète, debout, épée en main, dont la visière ne laisse voir que du vide et une lueur.",
+  "lore": "Son chevalier est mort il y a longtemps. L’armure, elle, n’a pas reçu la nouvelle.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "body": "armor",
+   "arms": "sword",
+   "scene": "ruins"
+  },
+  "image": "assets/art/ART-009.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Armure Vide — Armure de plates complète, debout, épée en main, dont la visière ne laisse voir que du vide et une lueur. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-010",
+  "number": 10,
+  "name": "Jaquemart",
+  "title": "Il frappe les heures",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Automate",
+  "power": 2,
+  "role": "B",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 2,
+   "mag": 1,
+   "hp": 6,
+   "cost": 2
+  },
+  "abilities": [],
+  "visual": "Automate de clocher en armure peinte, marteau levé, figé entre deux coups.",
+  "lore": "Il frappe les heures depuis trois cents ans. Il s’est mis à frapper autre chose.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "body": "armor",
+   "arms": "staff",
+   "scale": 0.86,
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-010.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Jaquemart — Automate de clocher en armure peinte, marteau levé, figé entre deux coups. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-011",
+  "number": 11,
+  "name": "Golem de Sel",
+  "title": "Il ne supporte pas la pluie",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Golem",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 2,
+   "def": 3,
+   "spd": 1,
+   "mag": 1,
+   "hp": 8,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "regen",
+    "value": 1
+   }
+  ],
+  "visual": "Golem taillé dans un bloc de sel gemme, translucide et rosé, cristaux qui repoussent sur ses blessures.",
+  "lore": "Il se reforme toujours. Sauf sous l’orage, qu’il redoute plus que la mort.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "block",
+   "head": "none",
+   "tint": "#e8f6ff",
+   "scene": "temple"
+  },
+  "image": "assets/art/ART-011.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Golem de Sel — Golem taillé dans un bloc de sel gemme, translucide et rosé, cristaux qui repoussent sur ses blessures. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-012",
+  "number": 12,
+  "name": "Rouage Errant",
+  "title": "Pièce détachée",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Automate",
+  "power": 1,
+  "role": "S",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 4,
+   "mag": 1,
+   "hp": 4,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Horloge circulaire montée sur de petites jambes d’acier, aiguilles qui tournent à l’envers.",
+  "lore": "Il s’est échappé d’une machine plus grande. Il cherche à y retourner, ou à la fuir.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "clock",
+   "scale": 0.74
+  },
+  "image": "assets/art/ART-012.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Rouage Errant — Horloge circulaire montée sur de petites jambes d’acier, aiguilles qui tournent à l’envers. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-013",
+  "number": 13,
+  "name": "Tisseur de Câbles",
+  "title": "Il relie tout",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Automate",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 3,
+   "spd": 1,
+   "mag": 0,
+   "hp": 10,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Mille-pattes de câbles tressés et de vertèbres d’acier, étincelles bleues à chaque segment.",
+  "lore": "Il relie les machines entre elles. Il se demande parfois s’il ne relie pas aussi les pensées.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "insect",
+   "type": "centipede",
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-013.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Tisseur de Câbles — Mille-pattes de câbles tressés et de vertèbres d’acier, étincelles bleues à chaque segment. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-014",
+  "number": 14,
+  "name": "Sentinelle de Cuivre",
+  "title": "Lanterne de garde",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Automate",
+  "power": 3,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 4,
+   "spd": 1,
+   "mag": 1,
+   "hp": 11,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Automate élancé en cuivre vert-de-gris, tête-lanterne dont la flamme suit chaque mouvement.",
+  "lore": "Elle éclaire les couloirs des ateliers abandonnés. Il n’y a plus rien à garder. Elle garde quand même.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "tall",
+   "head": "lantern"
+  },
+  "image": "assets/art/ART-014.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Sentinelle de Cuivre — Automate élancé en cuivre vert-de-gris, tête-lanterne dont la flamme suit chaque mouvement. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-015",
+  "number": 15,
+  "name": "Mouches Mécaniques",
+  "title": "Bourdonnement d’acier",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Essaim",
+  "power": 1,
+  "role": "S",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 3,
+   "mag": 0,
+   "hp": 4,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Essaim de mouches de laiton aux ailes de mica, qui bourdonnent en parfaite synchronisation.",
+  "lore": "Un inventeur voulait des abeilles. Il a obtenu ceci, et il n’a jamais retrouvé la sortie de son atelier.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "swarm",
+   "kind": "fly",
+   "count": 34,
+   "leader": false,
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-015.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Mouches Mécaniques — Essaim de mouches de laiton aux ailes de mica, qui bourdonnent en parfaite synchronisation. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-016",
+  "number": 16,
+  "name": "Gnome de Fonderie",
+  "title": "Petit maître du feu",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Créature alchimique",
+  "power": 2,
+  "role": "U",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 1,
+   "mag": 3,
+   "hp": 7,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 1
+   }
+  ],
+  "visual": "Petit être trapu à la barbe d’étincelles, tablier de cuir, tenant une pince plus grande que lui.",
+  "lore": "Paracelse classait les gnomes parmi les esprits de la terre. Celui-ci a choisi la fonderie.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "bulky",
+   "arms": "staff",
+   "scale": 0.66,
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-016.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Gnome de Fonderie — Petit être trapu à la barbe d’étincelles, tablier de cuir, tenant une pince plus grande que lui. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-017",
+  "number": 17,
+  "name": "Golem de Fer",
+  "title": "Le second modelage",
+  "faction": "artificiel",
+  "rarity": "PC",
+  "category": "Golem",
+  "power": 4,
+  "role": "T",
+  "stats": {
+   "atk": 4,
+   "def": 5,
+   "spd": 2,
+   "mag": 2,
+   "hp": 12,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Golem de fer rivé, plaques soudées grossièrement, poings comme des enclumes, rune ardente au torse.",
+  "lore": "La glaise s’effritait. Le fer, lui, rouille. Le maître en cherche un troisième.",
+  "evolution": {
+   "line": "golem",
+   "name": "Lignée des Golems",
+   "stage": 2,
+   "stages": 3
+  },
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "block",
+   "head": "block"
+  },
+  "image": "assets/art/ART-017.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Golem de Fer — Golem de fer rivé, plaques soudées grossièrement, poings comme des enclumes, rune ardente au torse. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-018",
+  "number": 18,
+  "name": "Servante d’Or d’Héphaïstos",
+  "title": "Kourai Khryseai",
+  "faction": "artificiel",
+  "rarity": "PC",
+  "category": "Automate",
+  "power": 3,
+  "role": "U",
+  "stats": {
+   "atk": 2,
+   "def": 3,
+   "spd": 2,
+   "mag": 4,
+   "hp": 9,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 2
+   }
+  ],
+  "visual": "Jeune femme en or massif aux articulations invisibles, regard doux et intelligent, mains tendues pour aider.",
+  "lore": "L’Iliade dit qu’Héphaïstos forgea des servantes d’or douées de pensée. Elles pensent encore.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "gown",
+   "arms": "down",
+   "tint": "#ffd27a",
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-018.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Servante d’Or d’Héphaïstos — Jeune femme en or massif aux articulations invisibles, regard doux et intelligent, mains tendues pour aider. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-019",
+  "number": 19,
+  "name": "Chien d’Or d’Alcinoos",
+  "title": "Gardien qui ne vieillit pas",
+  "faction": "artificiel",
+  "rarity": "PC",
+  "category": "Automate",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 5,
+   "def": 2,
+   "spd": 5,
+   "mag": 2,
+   "hp": 7,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Chien de garde en or ciselé, articulations de bronze, yeux de saphir qui ne se ferment jamais.",
+  "lore": "L’Odyssée les place devant le palais d’Alcinoos : immortels et sans âge. Ils n’ont jamais quitté leur poste.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "dog",
+   "mech": true,
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-019.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Chien d’Or d’Alcinoos — Chien de garde en or ciselé, articulations de bronze, yeux de saphir qui ne se ferment jamais. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-020",
+  "number": 20,
+  "name": "Oiseau du Stymphale",
+  "title": "Plumes de bronze",
+  "faction": "artificiel",
+  "rarity": "PC",
+  "category": "Créature mythologique",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 5,
+   "def": 2,
+   "spd": 5,
+   "mag": 2,
+   "hp": 9,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 1
+   }
+  ],
+  "visual": "Oiseau aux plumes de bronze tranchantes qu’il décoche comme des flèches, bec de métal.",
+  "lore": "Héraclès les chassa du lac Stymphale avec des crotales de bronze. Ils détestent le bruit, depuis.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "eagle",
+   "crest": true,
+   "scene": "swamp",
+   "tint": "#d8a050"
+  },
+  "image": "assets/art/ART-020.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Oiseau du Stymphale — Oiseau aux plumes de bronze tranchantes qu’il décoche comme des flèches, bec de métal. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-021",
+  "number": 21,
+  "name": "Tête d’Airain",
+  "title": "Elle a tout prédit",
+  "faction": "artificiel",
+  "rarity": "PC",
+  "category": "Objet alchimique",
+  "power": 3,
+  "role": "M",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 2,
+   "mag": 4,
+   "hp": 8,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Tête de bronze sur un socle, bouche entrouverte, yeux qui s’allument lorsqu’elle va parler.",
+  "lore": "Les légendes médiévales l’attribuent à de savants moines. Elle dit : « Le temps est. Le temps fut. Le temps est passé. »",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "object",
+   "kind": "head",
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-021.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Tête d’Airain — Tête de bronze sur un socle, bouche entrouverte, yeux qui s’allument lorsqu’elle va parler. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-022",
+  "number": 22,
+  "name": "Poupée Karakuri",
+  "title": "Le thé est servi",
+  "faction": "artificiel",
+  "rarity": "PC",
+  "category": "Automate",
+  "power": 3,
+  "role": "U",
+  "stats": {
+   "atk": 2,
+   "def": 3,
+   "spd": 2,
+   "mag": 2,
+   "hp": 9,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Poupée automate japonaise en kimono, plateau à thé entre les mains, mécanisme de bois visible au dos.",
+  "lore": "Les karakuri de l’époque d’Edo servaient le thé. Celle-ci ajoute parfois quelque chose dans la tasse.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "robe",
+   "arms": "pray",
+   "scale": 0.8,
+   "scene": "ruins"
+  },
+  "image": "assets/art/ART-022.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Poupée Karakuri — Poupée automate japonaise en kimono, plateau à thé entre les mains, mécanisme de bois visible au dos. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-023",
+  "number": 23,
+  "name": "Tsukumogami du Miroir",
+  "title": "Cent ans de reflets",
+  "faction": "artificiel",
+  "rarity": "PC",
+  "category": "Yōkai",
+  "power": 3,
+  "role": "M",
+  "stats": {
+   "atk": 3,
+   "def": 3,
+   "spd": 3,
+   "mag": 4,
+   "hp": 7,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 1
+   }
+  ],
+  "visual": "Miroir ancien au cadre d’or terni dont le reflet montre une femme qui n’est pas dans la pièce.",
+  "lore": "Dans le folklore japonais, un objet qui atteint cent ans gagne une âme. Le miroir a gagné celle de sa propriétaire.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "object",
+   "kind": "mirror",
+   "scene": "ruins"
+  },
+  "image": "assets/art/ART-023.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Tsukumogami du Miroir — Miroir ancien au cadre d’or terni dont le reflet montre une femme qui n’est pas dans la pièce. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-024",
+  "number": 24,
+  "name": "Automate Scribe",
+  "title": "Il écrit sans comprendre",
+  "faction": "artificiel",
+  "rarity": "PC",
+  "category": "Automate",
+  "power": 3,
+  "role": "M",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 3,
+   "mag": 4,
+   "hp": 7,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Automate en robe de scribe, plume fixée au poignet, rouleaux de papier sortant de sa poitrine.",
+  "lore": "Il recopie tout ce qu’il entend. Un jour, il a recopié une prière interdite.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "mask",
+   "body": "robe",
+   "arms": "staff",
+   "eyes": 2,
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-024.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Automate Scribe — Automate en robe de scribe, plume fixée au poignet, rouleaux de papier sortant de sa poitrine. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-025",
+  "number": 25,
+  "name": "Scorpion de Laiton",
+  "title": "Dard à ressort",
+  "faction": "artificiel",
+  "rarity": "PC",
+  "category": "Automate",
+  "power": 4,
+  "role": "B",
+  "stats": {
+   "atk": 6,
+   "def": 3,
+   "spd": 3,
+   "mag": 2,
+   "hp": 10,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Scorpion mécanique aux plaques de laiton, dard monté sur ressort, pinces dentelées.",
+  "lore": "Les tombes royales en étaient gardées. Les pillards l’ont appris trop tard.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lizard",
+   "tail": "scorpion",
+   "mech": true,
+   "size": "small",
+   "scene": "temple"
+  },
+  "image": "assets/art/ART-025.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Scorpion de Laiton — Scorpion mécanique aux plaques de laiton, dard monté sur ressort, pinces dentelées. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-026",
+  "number": 26,
+  "name": "Golem de Verre",
+  "title": "Cœur visible",
+  "faction": "artificiel",
+  "rarity": "PC",
+  "category": "Golem",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 4,
+   "def": 2,
+   "spd": 2,
+   "mag": 6,
+   "hp": 9,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "aegis"
+   }
+  ],
+  "visual": "Golem de cristal soufflé, organes de lumière visibles à travers le verre, fissures fines comme des cheveux.",
+  "lore": "Fragile, croit-on. Le verre alchimique ne se brise qu’une fois. Il ne se brise jamais au bon moment.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "tall",
+   "head": "none",
+   "tint": "#c8f4ff"
+  },
+  "image": "assets/art/ART-026.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Golem de Verre — Golem de cristal soufflé, organes de lumière visibles à travers le verre, fissures fines comme des cheveux. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-027",
+  "number": 27,
+  "name": "Le Golem de Prague",
+  "title": "Emet",
+  "faction": "artificiel",
+  "rarity": "R",
+  "category": "Golem",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 6,
+   "spd": 2,
+   "mag": 3,
+   "hp": 18,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Colosse de glaise sombre au front marqué d’un mot hébreu, regard vide et mains immenses.",
+  "lore": "La légende pragoise dit qu’un rabbin le modela pour protéger sa communauté. Effacer une lettre suffit à l’arrêter.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "block",
+   "head": "mask",
+   "runes": true,
+   "scale": 1.05,
+   "scene": "ruins"
+  },
+  "image": "assets/art/ART-027.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Golem de Prague — Colosse de glaise sombre au front marqué d’un mot hébreu, regard vide et mains immenses. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-028",
+  "number": 28,
+  "name": "Taureaux d’Airain",
+  "title": "Le joug de Colchide",
+  "faction": "artificiel",
+  "rarity": "R",
+  "category": "Automate",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 9,
+   "def": 3,
+   "spd": 4,
+   "mag": 3,
+   "hp": 14,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   },
+   {
+    "key": "strike",
+    "value": 1
+   }
+  ],
+  "visual": "Taureaux de bronze aux sabots d’airain, soufflant le feu par les naseaux, rivets brûlants.",
+  "lore": "Jason dut les atteler pour gagner la Toison d’or. Ils n’ont jamais accepté d’autre joug.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "bull",
+   "mech": true,
+   "fire": true,
+   "hooves": true,
+   "size": "big",
+   "scene": "volcano"
+  },
+  "image": "assets/art/ART-028.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Taureaux d’Airain — Taureaux de bronze aux sabots d’airain, soufflant le feu par les naseaux, rivets brûlants. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-029",
+  "number": 29,
+  "name": "L’Androïde d’Albert le Grand",
+  "title": "La machine qui parlait",
+  "faction": "artificiel",
+  "rarity": "R",
+  "category": "Automate",
+  "power": 5,
+  "role": "M",
+  "stats": {
+   "atk": 4,
+   "def": 2,
+   "spd": 3,
+   "mag": 7,
+   "hp": 10,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "aegis"
+   }
+  ],
+  "visual": "Automate de laiton en robe de docteur, visage de bronze serein, qui répondait à toutes les questions.",
+  "lore": "La légende veut que saint Thomas d’Aquin l’ait brisé, agacé par ses bavardages. Les morceaux parlent encore.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "mask",
+   "body": "robe",
+   "arms": "down",
+   "eyes": 2,
+   "scene": "ruins"
+  },
+  "image": "assets/art/ART-029.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : L’Androïde d’Albert le Grand — Automate de laiton en robe de docteur, visage de bronze serein, qui répondait à toutes les questions. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-030",
+  "number": 30,
+  "name": "Rebis",
+  "title": "La chose double",
+  "faction": "artificiel",
+  "rarity": "R",
+  "category": "Créature alchimique",
+  "power": 6,
+  "role": "U",
+  "stats": {
+   "atk": 4,
+   "def": 4,
+   "spd": 4,
+   "mag": 7,
+   "hp": 14,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 2
+   },
+   {
+    "key": "regen",
+    "value": 1
+   }
+  ],
+  "visual": "Être alchimique couronné à deux visages, ailes de plumes, tenant un compas et une équerre.",
+  "lore": "Le Grand Œuvre voulait unir les contraires. Il a réussi. Le résultat a des opinions.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "crown",
+   "body": "robe",
+   "arms": "spread",
+   "wings": "feather",
+   "eyes": 3,
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-030.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Rebis — Être alchimique couronné à deux visages, ailes de plumes, tenant un compas et une équerre. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-031",
+  "number": 31,
+  "name": "Golem d’Acier Runique",
+  "title": "Le troisième modelage",
+  "faction": "artificiel",
+  "rarity": "R",
+  "category": "Golem",
+  "power": 7,
+  "role": "T",
+  "stats": {
+   "atk": 6,
+   "def": 7,
+   "spd": 3,
+   "mag": 3,
+   "hp": 22,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "armor",
+    "value": 2
+   }
+  ],
+  "visual": "Golem d’acier noir couvert de runes incandescentes, heaume fendu, épaules hérissées de pointes.",
+  "lore": "Le maître a enfin trouvé le bon métal. Il n’a pas trouvé comment l’arrêter.",
+  "evolution": {
+   "line": "golem",
+   "name": "Lignée des Golems",
+   "stage": 3,
+   "stages": 3
+  },
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "block",
+   "head": "helm",
+   "runes": true,
+   "scale": 1.06
+  },
+  "image": "assets/art/ART-031.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Golem d’Acier Runique — Golem d’acier noir couvert de runes incandescentes, heaume fendu, épaules hérissées de pointes. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-032",
+  "number": 32,
+  "name": "L’Automate Interdit",
+  "title": "Il ne fallait pas le remonter",
+  "faction": "artificiel",
+  "rarity": "R",
+  "category": "Automate",
+  "power": 6,
+  "role": "S",
+  "stats": {
+   "atk": 7,
+   "def": 3,
+   "spd": 7,
+   "mag": 3,
+   "hp": 10,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "first"
+   },
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Automate de porcelaine au visage d’enfant, clé de remontage plantée dans le dos, membres trop longs.",
+  "lore": "Son inventeur a brûlé les plans. Puis il a brûlé l’atelier. Puis il a disparu.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "tall",
+   "head": "mask",
+   "scene": "void"
+  },
+  "image": "assets/art/ART-032.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : L’Automate Interdit — Automate de porcelaine au visage d’enfant, clé de remontage plantée dans le dos, membres trop longs. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-033",
+  "number": 33,
+  "name": "Chevalier Mécanique",
+  "title": "Le paladin d’engrenages",
+  "faction": "artificiel",
+  "rarity": "R",
+  "category": "Automate",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 9,
+   "def": 4,
+   "spd": 4,
+   "mag": 3,
+   "hp": 13,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "first"
+   },
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Chevalier d’acier aux ailes de tiges métalliques, épée à moteur, heaume percé d’une lumière bleue.",
+  "lore": "Il a été conçu pour obéir. Il a été conçu un peu trop bien.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "body": "armor",
+   "arms": "sword",
+   "wings": "bone",
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-033.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Chevalier Mécanique — Chevalier d’acier aux ailes de tiges métalliques, épée à moteur, heaume percé d’une lumière bleue. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-034",
+  "number": 34,
+  "name": "Gargouille du Beffroi",
+  "title": "Elle s’est détachée",
+  "faction": "artificiel",
+  "rarity": "R",
+  "category": "Construction",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 7,
+   "spd": 2,
+   "mag": 3,
+   "hp": 18,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "armor",
+    "value": 2
+   }
+  ],
+  "visual": "Gargouille colossale arrachée à son beffroi, ailes de pierre fendues, gueule pleine de lichen.",
+  "lore": "Elle a veillé la ville pendant six siècles. Une nuit, elle a décidé de la quitter.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "long",
+   "wings": "bat",
+   "body": "bulky",
+   "legs": "goat",
+   "claws": true,
+   "scene": "ruins"
+  },
+  "image": "assets/art/ART-034.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Gargouille du Beffroi — Gargouille colossale arrachée à son beffroi, ailes de pierre fendues, gueule pleine de lichen. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-035",
+  "number": 35,
+  "name": "Talos",
+  "title": "Le géant de bronze de Crète",
+  "faction": "artificiel",
+  "rarity": "HR",
+  "category": "Automate",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 7,
+   "spd": 3,
+   "mag": 3,
+   "hp": 24,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "armor",
+    "value": 2
+   }
+  ],
+  "visual": "Géant de bronze faisant le tour de l’île trois fois par jour, une unique veine de métal fondu du cou au talon.",
+  "lore": "Médée le vainquit en retirant le clou de sa cheville. Il a fait poser une serrure, depuis.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "colossus",
+   "head": "helm",
+   "scale": 1.06,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ART-035.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Talos — Géant de bronze faisant le tour de l’île trois fois par jour, une unique veine de métal fondu du cou au talon. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-036",
+  "number": 36,
+  "name": "La Sentinelle du Néant",
+  "title": "Elle garde la porte",
+  "faction": "artificiel",
+  "rarity": "HR",
+  "category": "Construction cosmique",
+  "power": 8,
+  "role": "M",
+  "stats": {
+   "atk": 6,
+   "def": 5,
+   "spd": 5,
+   "mag": 10,
+   "hp": 16,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "aegis"
+   },
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Automate élancé dont la tête est une lanterne contenant un fragment de Néant, corps couvert de sceaux.",
+  "lore": "Elle ne garde pas les mortels du Néant. Elle garde le Néant des mortels.",
+  "evolution": null,
+  "sets": [
+   "neant"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "tall",
+   "head": "lantern",
+   "scene": "void"
+  },
+  "image": "assets/art/ART-036.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : La Sentinelle du Néant — Automate élancé dont la tête est une lanterne contenant un fragment de Néant, corps couvert de sceaux. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-037",
+  "number": 37,
+  "name": "Le Colosse aux Cœurs Multiples",
+  "title": "Sept battements",
+  "faction": "artificiel",
+  "rarity": "HR",
+  "category": "Golem",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 7,
+   "def": 7,
+   "spd": 3,
+   "mag": 4,
+   "hp": 24,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "regen",
+    "value": 2
+   },
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Golem titanesque au torse ouvert sur cinq cœurs de lumière qui battent à des rythmes différents.",
+  "lore": "Chaque cœur vient d’un royaume différent. Ils ne battent jamais à l’unisson.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "colossus",
+   "head": "block",
+   "cores": 5
+  },
+  "image": "assets/art/ART-037.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Colosse aux Cœurs Multiples — Golem titanesque au torse ouvert sur cinq cœurs de lumière qui battent à des rythmes différents. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-038",
+  "number": 38,
+  "name": "La Mère des Rouages",
+  "title": "Elle construit ses enfants",
+  "faction": "artificiel",
+  "rarity": "HR",
+  "category": "Automate",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 11,
+   "def": 5,
+   "spd": 6,
+   "mag": 4,
+   "hp": 18,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   },
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Araignée mécanique colossale dont l’abdomen est un atelier où s’assemblent de petites araignées.",
+  "lore": "Elle n’a pas été construite. Elle s’est assemblée elle-même, à partir de tout ce qu’on a jeté.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "spider",
+   "scale": 1.18
+  },
+  "image": "assets/art/ART-038.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : La Mère des Rouages — Araignée mécanique colossale dont l’abdomen est un atelier où s’assemblent de petites araignées. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-039",
+  "number": 39,
+  "name": "Le Dieu Mécanique",
+  "title": "Le mouvement perpétuel",
+  "faction": "artificiel",
+  "rarity": "M",
+  "category": "Divinité artificielle",
+  "power": 10,
+  "role": "M",
+  "stats": {
+   "atk": 8,
+   "def": 6,
+   "spd": 6,
+   "mag": 10,
+   "hp": 17,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "command",
+    "value": 2
+   },
+   {
+    "key": "armor",
+    "value": 2
+   }
+  ],
+  "visual": "Divinité d’acier aux quatre bras, auréole d’engrenages tournoyants, cœur-machine visible sous la poitrine.",
+  "lore": "Les automates ont fini par se demander qui les avait construits. Puis ils ont construit la réponse.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "void",
+   "body": "armor",
+   "arms": "spread",
+   "multi": 2,
+   "halo": "ring",
+   "wings": "bone",
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-039.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Dieu Mécanique — Divinité d’acier aux quatre bras, auréole d’engrenages tournoyants, cœur-machine visible sous la poitrine. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-040",
+  "number": 40,
+  "name": "Le Grand Œuvre",
+  "title": "La pierre philosophale",
+  "faction": "artificiel",
+  "rarity": "M",
+  "category": "Créature alchimique",
+  "power": 9,
+  "role": "U",
+  "stats": {
+   "atk": 6,
+   "def": 6,
+   "spd": 5,
+   "mag": 10,
+   "hp": 22,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 3
+   },
+   {
+    "key": "regen",
+    "value": 2
+   }
+  ],
+  "visual": "Pierre rouge vivante flottant au-dessus d’un athanor, dont les facettes changent le plomb en lumière.",
+  "lore": "Des siècles d’alchimistes l’ont cherchée. Elle les a regardés chercher.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "orb",
+   "type": "crystal",
+   "scene": "forge",
+   "tint": "#ff5050"
+  },
+  "image": "assets/art/ART-040.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Grand Œuvre — Pierre rouge vivante flottant au-dessus d’un athanor, dont les facettes changent le plomb en lumière. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ART-041",
+  "number": 41,
+  "name": "L’Horloge de la Fin",
+  "title": "Minuit moins une",
+  "faction": "artificiel",
+  "rarity": "S",
+  "category": "Construction cosmique",
+  "power": 10,
+  "role": "M",
+  "stats": {
+   "atk": 8,
+   "def": 5,
+   "spd": 6,
+   "mag": 10,
+   "hp": 17,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "cataclysm",
+    "value": 3
+   }
+  ],
+  "visual": "Horloge colossale d’or dont les aiguilles approchent de minuit, mécanisme ouvert sur le Néant.",
+  "lore": "Elle a été remontée le jour où le premier sceau s’est brisé. Elle n’a jamais retardé.",
+  "evolution": null,
+  "sets": [
+   "neant"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "clock",
+   "scale": 1.1
+  },
+  "image": "assets/art/ART-041.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : L’Horloge de la Fin — Horloge colossale d’or dont les aiguilles approchent de minuit, mécanisme ouvert sur le Néant. Ambiance de la faction Artificiel : acier, bronze, noir et cyan électrique ; forges, engrenages, runes lumineuses. variante de collection : gravure dorée à l’eau-forte sur fond noir, finition luxueuse. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ }
+]

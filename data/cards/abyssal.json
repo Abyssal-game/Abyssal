@@ -1,0 +1,2190 @@
+[
+ {
+  "id": "ABY-001",
+  "number": 1,
+  "name": "Anguille des Gouffres",
+  "title": "Ruban de nuit",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Créature marine",
+  "power": 1,
+  "role": "S",
+  "stats": {
+   "atk": 2,
+   "def": 0,
+   "spd": 3,
+   "mag": 0,
+   "hp": 7,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Anguille interminable à la peau noire et lisse, nageoires frangées de lumière bleue, yeux laiteux.",
+  "lore": "Elle se faufile dans les épaves et ressort toujours avec quelque chose.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "serpent",
+   "fins": true,
+   "scale": 0.72
+  },
+  "image": "assets/art/ABY-001.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Anguille des Gouffres — Anguille interminable à la peau noire et lisse, nageoires frangées de lumière bleue, yeux laiteux. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-002",
+  "number": 2,
+  "name": "Poisson-Lanterne",
+  "title": "Appât des égarés",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Créature marine",
+  "power": 2,
+  "role": "M",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 3,
+   "mag": 2,
+   "hp": 8,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Baudroie difforme à la gueule hérissée de dents de verre, une lanterne vivante pendue au front.",
+  "lore": "Dans le noir absolu, la seule lumière est toujours un piège.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "fish",
+   "lure": true,
+   "fins": false
+  },
+  "image": "assets/art/ABY-002.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Poisson-Lanterne — Baudroie difforme à la gueule hérissée de dents de verre, une lanterne vivante pendue au front. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-003",
+  "number": 3,
+  "name": "Méduse Funèbre",
+  "title": "Voile des noyés",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Créature marine",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 2,
+   "def": 2,
+   "spd": 2,
+   "mag": 2,
+   "hp": 12,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Ombrelle translucide veinée de bleu, filaments interminables où dérivent des bagues et des dents.",
+  "lore": "Elle garde ce que ses victimes portaient. Elle ne sait pas pourquoi.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "tentacle",
+   "core": "bell",
+   "count": 11
+  },
+  "image": "assets/art/ABY-003.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Méduse Funèbre — Ombrelle translucide veinée de bleu, filaments interminables où dérivent des bagues et des dents. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-004",
+  "number": 4,
+  "name": "Crabe Ossuaire",
+  "title": "Porteur de crânes",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Créature marine",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 1,
+   "def": 2,
+   "spd": 2,
+   "mag": 0,
+   "hp": 11,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Crabe géant dont la carapace est un assemblage de crânes humains soudés par le corail.",
+  "lore": "Il change de carapace tous les cent ans. La mer lui en fournit une nouvelle.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "insect",
+   "type": "scarab"
+  },
+  "image": "assets/art/ABY-004.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Crabe Ossuaire — Crabe géant dont la carapace est un assemblage de crânes humains soudés par le corail. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-005",
+  "number": 5,
+  "name": "Noyé des Profondeurs",
+  "title": "Celui qui remonte",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Mort-vivant",
+  "power": 2,
+  "role": "E",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 3,
+   "mag": 2,
+   "hp": 9,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "relic"
+   }
+  ],
+  "visual": "Marin décharné aux vêtements gonflés d’eau, algues dans les orbites, bras tendus vers la surface.",
+  "lore": "Il remonte chaque nuit. Il n’atteint jamais la surface.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "spectre",
+   "head": "skull",
+   "arms": "reach"
+  },
+  "image": "assets/art/ABY-005.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Noyé des Profondeurs — Marin décharné aux vêtements gonflés d’eau, algues dans les orbites, bras tendus vers la surface. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-006",
+  "number": 6,
+  "name": "Pieuvre Cavernicole",
+  "title": "Gardienne des grottes",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Créature marine",
+  "power": 2,
+  "role": "U",
+  "stats": {
+   "atk": 2,
+   "def": 2,
+   "spd": 3,
+   "mag": 2,
+   "hp": 9,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Pieuvre pâle aux yeux énormes, ventouses luminescentes, enroulée autour d’une stalactite engloutie.",
+  "lore": "Elle a appris à ouvrir les cages. Puis à les refermer derrière ses proies.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "tentacle",
+   "core": "mantle",
+   "count": 8,
+   "scale": 0.82
+  },
+  "image": "assets/art/ABY-006.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Pieuvre Cavernicole — Pieuvre pâle aux yeux énormes, ventouses luminescentes, enroulée autour d’une stalactite engloutie. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-007",
+  "number": 7,
+  "name": "Requin Aveugle",
+  "title": "Chasseur des fosses",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Créature marine",
+  "power": 3,
+  "role": "B",
+  "stats": {
+   "atk": 6,
+   "def": 0,
+   "spd": 3,
+   "mag": 1,
+   "hp": 11,
+   "cost": 3
+  },
+  "abilities": [],
+  "visual": "Requin sans yeux à la peau couturée de cicatrices, mâchoire de trois rangées de crocs blanchis.",
+  "lore": "Il ne voit rien. Il entend battre ton cœur.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "fish",
+   "spikes": true,
+   "fins": true
+  },
+  "image": "assets/art/ABY-007.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Requin Aveugle — Requin sans yeux à la peau couturée de cicatrices, mâchoire de trois rangées de crocs blanchis. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-008",
+  "number": 8,
+  "name": "Sirène des Récifs",
+  "title": "Chant sur les écueils",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Créature mythologique",
+  "power": 2,
+  "role": "M",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 3,
+   "mag": 3,
+   "hp": 7,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 1
+   }
+  ],
+  "visual": "Femme-oiseau aux ailes sombres perchée sur un écueil, comme les sirènes des mythes grecs, bouche ouverte sur un chant muet.",
+  "lore": "Les mythes grecs les décrivaient mi-femmes mi-oiseaux. Les marins ont oublié les ailes, pas le chant.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "human",
+   "hair": true,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-008.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Sirène des Récifs — Femme-oiseau aux ailes sombres perchée sur un écueil, comme les sirènes des mythes grecs, bouche ouverte sur un chant muet. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-009",
+  "number": 9,
+  "name": "Selkie des Brumes",
+  "title": "Peau de phoque",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Esprit marin",
+  "power": 1,
+  "role": "U",
+  "stats": {
+   "atk": 1,
+   "def": 1,
+   "spd": 2,
+   "mag": 1,
+   "hp": 7,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 1
+   }
+  ],
+  "visual": "Jeune femme au regard d’eau sombre, enveloppée dans une peau de phoque comme dans un manteau.",
+  "lore": "Dans les îles du Nord, on cache sa peau pour la retenir. Elle finit toujours par la retrouver.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "cloak",
+   "arms": "down",
+   "hair": true,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-009.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Selkie des Brumes — Jeune femme au regard d’eau sombre, enveloppée dans une peau de phoque comme dans un manteau. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-010",
+  "number": 10,
+  "name": "Ver des Évents",
+  "title": "Né de la chaleur",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Créature marine",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 2,
+   "def": 2,
+   "spd": 2,
+   "mag": 0,
+   "hp": 10,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "regen",
+    "value": 1
+   }
+  ],
+  "visual": "Ver segmenté géant surgissant d’une cheminée volcanique sous-marine, panache rouge vif en guise de tête.",
+  "lore": "Il vit là où rien ne devrait vivre, et il s’en porte très bien.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "insect",
+   "type": "centipede",
+   "scene": "abyss"
+  },
+  "image": "assets/art/ABY-010.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ver des Évents — Ver segmenté géant surgissant d’une cheminée volcanique sous-marine, panache rouge vif en guise de tête. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-011",
+  "number": 11,
+  "name": "Feux des Profondeurs",
+  "title": "Lueurs trompeuses",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Esprit marin",
+  "power": 1,
+  "role": "S",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 5,
+   "mag": 1,
+   "hp": 6,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Essaim de lumières bleues dérivant entre les épaves, chacune clignotant au rythme d’un cœur.",
+  "lore": "Les plongeurs croient suivre la surface. Ils suivent un banc de souvenirs.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "swarm",
+   "kind": "wisp",
+   "count": 26,
+   "leader": false,
+   "scene": "abyss"
+  },
+  "image": "assets/art/ABY-011.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Feux des Profondeurs — Essaim de lumières bleues dérivant entre les épaves, chacune clignotant au rythme d’un cœur. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-012",
+  "number": 12,
+  "name": "Hippocampe Noir",
+  "title": "Monture des tritons",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Créature mythologique",
+  "power": 2,
+  "role": "S",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 5,
+   "mag": 2,
+   "hp": 8,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Cheval à l’avant-train musclé et à la queue de poisson, crinière de nageoires effilochées.",
+  "lore": "Les Grecs les attelaient au char de Poséidon. Ceux-ci n’ont plus de maître.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "horse",
+   "tail": "snake",
+   "hooves": true,
+   "scene": "abyss"
+  },
+  "image": "assets/art/ABY-012.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Hippocampe Noir — Cheval à l’avant-train musclé et à la queue de poisson, crinière de nageoires effilochées. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-013",
+  "number": 13,
+  "name": "Matelot Englouti",
+  "title": "Équipage fantôme",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Mort-vivant",
+  "power": 2,
+  "role": "B",
+  "stats": {
+   "atk": 4,
+   "def": 2,
+   "spd": 3,
+   "mag": 1,
+   "hp": 10,
+   "cost": 2
+  },
+  "abilities": [],
+  "visual": "Squelette en lambeaux de vareuse, coutelas rouillé à la main, coquillages incrustés dans les côtes.",
+  "lore": "Son navire a sombré en 1702. Il ne l’a pas encore remarqué.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "skeleton",
+   "pose": "stand",
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-013.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Matelot Englouti — Squelette en lambeaux de vareuse, coutelas rouillé à la main, coquillages incrustés dans les côtes. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-014",
+  "number": 14,
+  "name": "Pêcheur d’Âmes",
+  "title": "La ligne et la lanterne",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Esprit marin",
+  "power": 2,
+  "role": "M",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 2,
+   "mag": 3,
+   "hp": 7,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   }
+  ],
+  "visual": "Silhouette voûtée dans une barque noire, canne à pêche d’os au bout de laquelle brille une âme captive.",
+  "lore": "Il ne pêche jamais de poissons.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "hood",
+   "body": "cloak",
+   "arms": "staff",
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-014.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Pêcheur d’Âmes — Silhouette voûtée dans une barque noire, canne à pêche d’os au bout de laquelle brille une âme captive. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-015",
+  "number": 15,
+  "name": "Limace des Abysses",
+  "title": "Lente et certaine",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Créature marine",
+  "power": 1,
+  "role": "T",
+  "stats": {
+   "atk": 1,
+   "def": 1,
+   "spd": 1,
+   "mag": 0,
+   "hp": 9,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "regen",
+    "value": 2
+   }
+  ],
+  "visual": "Gastéropode translucide gros comme une barque, organes luminescents visibles sous la peau.",
+  "lore": "Elle a le temps. Les fosses n’ont pas d’horloge.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "blob",
+   "eyes": 3,
+   "mouths": 1,
+   "scale": 0.78,
+   "scene": "abyss"
+  },
+  "image": "assets/art/ABY-015.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Limace des Abysses — Gastéropode translucide gros comme une barque, organes luminescents visibles sous la peau. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-016",
+  "number": 16,
+  "name": "Raie Abyssale",
+  "title": "Ombre planante",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Créature marine",
+  "power": 2,
+  "role": "S",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 5,
+   "mag": 0,
+   "hp": 8,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Raie géante aux ailes de velours noir ponctuées de taches lumineuses, longue queue en fouet.",
+  "lore": "Quand elle passe au-dessus de toi, la mer devient la nuit.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "eagle",
+   "scene": "abyss"
+  },
+  "image": "assets/art/ABY-016.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Raie Abyssale — Raie géante aux ailes de velours noir ponctuées de taches lumineuses, longue queue en fouet. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-017",
+  "number": 17,
+  "name": "Kappa",
+  "title": "Gardien des rivières",
+  "faction": "abyssal",
+  "rarity": "PC",
+  "category": "Yōkai",
+  "power": 3,
+  "role": "E",
+  "stats": {
+   "atk": 4,
+   "def": 1,
+   "spd": 3,
+   "mag": 2,
+   "hp": 11,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Petit être à bec et à carapace de tortue, une coupelle d’eau au sommet du crâne, mains palmées.",
+  "lore": "Dans le folklore japonais, il suffit de le saluer pour qu’il s’incline et renverse l’eau de son crâne.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "bird",
+   "body": "bulky",
+   "arms": "reach",
+   "claws": true,
+   "scale": 0.84,
+   "scene": "swamp"
+  },
+  "image": "assets/art/ABY-017.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Kappa — Petit être à bec et à carapace de tortue, une coupelle d’eau au sommet du crâne, mains palmées. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-018",
+  "number": 18,
+  "name": "Ningyo",
+  "title": "La chair qui n’oublie pas",
+  "faction": "abyssal",
+  "rarity": "PC",
+  "category": "Yōkai",
+  "power": 3,
+  "role": "U",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 3,
+   "mag": 3,
+   "hp": 12,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 2
+   }
+  ],
+  "visual": "Poisson à la bouche simiesque et aux écailles d’or terni, regard étrangement humain.",
+  "lore": "Les légendes japonaises disent que manger sa chair donne une longévité terrible.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "fish",
+   "whale": true,
+   "fins": true,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-018.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ningyo — Poisson à la bouche simiesque et aux écailles d’or terni, regard étrangement humain. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-019",
+  "number": 19,
+  "name": "Vodianoï",
+  "title": "Le Grand-Père des eaux",
+  "faction": "abyssal",
+  "rarity": "PC",
+  "category": "Esprit des eaux",
+  "power": 4,
+  "role": "T",
+  "stats": {
+   "atk": 4,
+   "def": 4,
+   "spd": 3,
+   "mag": 2,
+   "hp": 17,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Vieillard à face de grenouille, barbe d’algues verdâtres, peau couverte d’écailles et de vase.",
+  "lore": "Dans les contes slaves, il noie ceux qui se baignent après le coucher du soleil.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "body": "bulky",
+   "hair": true,
+   "arms": "reach",
+   "scene": "swamp"
+  },
+  "image": "assets/art/ABY-019.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Vodianoï — Vieillard à face de grenouille, barbe d’algues verdâtres, peau couverte d’écailles et de vase. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-020",
+  "number": 20,
+  "name": "Each-uisge",
+  "title": "Cheval des lochs",
+  "faction": "abyssal",
+  "rarity": "PC",
+  "category": "Créature mythologique",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 6,
+   "def": 1,
+   "spd": 7,
+   "mag": 2,
+   "hp": 8,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   },
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Cheval d’eau à la robe luisante comme une vague, crinière ruisselante, sabots qui ne laissent pas de trace.",
+  "lore": "Plus cruel que le kelpie, disent les Écossais. Ceux qui le montent ne descendent plus.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "horse",
+   "hooves": true,
+   "mane": true,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-020.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Each-uisge — Cheval d’eau à la robe luisante comme une vague, crinière ruisselante, sabots qui ne laissent pas de trace. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-021",
+  "number": 21,
+  "name": "Lusca",
+  "title": "Mi-pieuvre, mi-requin",
+  "faction": "abyssal",
+  "rarity": "PC",
+  "category": "Créature marine",
+  "power": 4,
+  "role": "B",
+  "stats": {
+   "atk": 7,
+   "def": 1,
+   "spd": 4,
+   "mag": 2,
+   "hp": 12,
+   "cost": 4
+  },
+  "abilities": [],
+  "visual": "Créature des trous bleus à la gueule de requin entourée de huit bras épais.",
+  "lore": "Les pêcheurs des Bahamas évitent les trous bleus à marée montante. Ils ont raison.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "tentacle",
+   "core": "maw",
+   "count": 9
+  },
+  "image": "assets/art/ABY-021.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Lusca — Créature des trous bleus à la gueule de requin entourée de huit bras épais. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-022",
+  "number": 22,
+  "name": "Isonade",
+  "title": "La queue aux crochets",
+  "faction": "abyssal",
+  "rarity": "PC",
+  "category": "Yōkai",
+  "power": 4,
+  "role": "B",
+  "stats": {
+   "atk": 6,
+   "def": 2,
+   "spd": 4,
+   "mag": 2,
+   "hp": 12,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Grand poisson à la nageoire caudale hérissée de crochets, invisible sous l’écume.",
+  "lore": "On ne le voit jamais. On voit seulement les marins disparaître du pont.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "fish",
+   "spikes": true
+  },
+  "image": "assets/art/ABY-022.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Isonade — Grand poisson à la nageoire caudale hérissée de crochets, invisible sous l’écume. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-023",
+  "number": 23,
+  "name": "Makara",
+  "title": "Gardien des seuils marins",
+  "faction": "abyssal",
+  "rarity": "PC",
+  "category": "Créature mythologique",
+  "power": 4,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 4,
+   "spd": 2,
+   "mag": 1,
+   "hp": 15,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Créature composite au museau de crocodile, à la trompe repliée et à la queue de poisson spiralée.",
+  "lore": "L’art indien le sculpte aux portes des temples. Il garde encore les seuils, sous la mer.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lizard",
+   "tail": "snake",
+   "spikes": true,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-023.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Makara — Créature composite au museau de crocodile, à la trompe repliée et à la queue de poisson spiralée. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-024",
+  "number": 24,
+  "name": "Ahuizotl",
+  "title": "Le chien à la main",
+  "faction": "abyssal",
+  "rarity": "PC",
+  "category": "Créature mythologique",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 5,
+   "def": 2,
+   "spd": 6,
+   "mag": 1,
+   "hp": 11,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Chien d’eau à la fourrure luisante, dont la queue se termine par une main humaine griffue.",
+  "lore": "Les Aztèques le craignaient près des lacs. Ses victimes revenaient sans yeux, sans dents ni ongles.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "dog",
+   "tail": "snake",
+   "size": "small",
+   "scene": "swamp"
+  },
+  "image": "assets/art/ABY-024.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ahuizotl — Chien d’eau à la fourrure luisante, dont la queue se termine par une main humaine griffue. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-025",
+  "number": 25,
+  "name": "Rusalka",
+  "title": "La noyée des saules",
+  "faction": "abyssal",
+  "rarity": "PC",
+  "category": "Esprit des eaux",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 4,
+   "def": 1,
+   "spd": 4,
+   "mag": 5,
+   "hp": 11,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 2
+   }
+  ],
+  "visual": "Jeune femme pâle aux cheveux verts ruisselants, couronne de joncs, assise sur une branche de saule.",
+  "lore": "Les récits slaves disent qu’elle danse sous la lune. Ceux qui dansent avec elle ne rentrent pas.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "spectre",
+   "head": "woman",
+   "hair": true,
+   "arms": "wrap",
+   "scene": "swamp"
+  },
+  "image": "assets/art/ABY-025.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Rusalka — Jeune femme pâle aux cheveux verts ruisselants, couronne de joncs, assise sur une branche de saule. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-026",
+  "number": 26,
+  "name": "Gardien du Phare Noir",
+  "title": "Lumière inversée",
+  "faction": "abyssal",
+  "rarity": "PC",
+  "category": "Esprit marin",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 4,
+   "def": 2,
+   "spd": 4,
+   "mag": 5,
+   "hp": 11,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Grand veilleur sans visage, une sphère de lumière à la place de la tête, bâton de fer planté dans le roc.",
+  "lore": "Son phare n’éclaire pas les récifs. Il les cache.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "void",
+   "body": "cloak",
+   "arms": "staff",
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-026.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Gardien du Phare Noir — Grand veilleur sans visage, une sphère de lumière à la place de la tête, bâton de fer planté dans le roc. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-027",
+  "number": 27,
+  "name": "Récif Vivant",
+  "title": "Archonte des coraux",
+  "faction": "abyssal",
+  "rarity": "PC",
+  "category": "Créature marine",
+  "power": 3,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 2,
+   "mag": 1,
+   "hp": 15,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "regen",
+    "value": 2
+   }
+  ],
+  "visual": "Massif de coraux noirs aux polypes luminescents, deux yeux pâles ouverts entre les branches.",
+  "lore": "Il grandit d’un doigt par siècle. Il a beaucoup de doigts.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "tree",
+   "type": "fungal",
+   "scene": "abyss"
+  },
+  "image": "assets/art/ABY-027.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Récif Vivant — Massif de coraux noirs aux polypes luminescents, deux yeux pâles ouverts entre les branches. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-028",
+  "number": 28,
+  "name": "Prêtre des Marées Basses",
+  "title": "Psalmodie des fonds",
+  "faction": "abyssal",
+  "rarity": "PC",
+  "category": "Créature marine",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 5,
+   "mag": 5,
+   "hp": 9,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "curse",
+    "value": 1
+   }
+  ],
+  "visual": "Être amphibien aux branchies béantes, chasuble couverte de coquillages, crosse sculptée dans une côte de baleine.",
+  "lore": "Il prie quelque chose sous la fosse. Quelque chose lui répond.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "body": "robe",
+   "arms": "staff",
+   "scene": "abyss"
+  },
+  "image": "assets/art/ABY-028.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Prêtre des Marées Basses — Être amphibien aux branchies béantes, chasuble couverte de coquillages, crosse sculptée dans une côte de baleine. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-029",
+  "number": 29,
+  "name": "Marée de Sang",
+  "title": "Première Plaie",
+  "faction": "abyssal",
+  "rarity": "PC",
+  "category": "Fléau",
+  "power": 4,
+  "role": "U",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 3,
+   "mag": 4,
+   "hp": 14,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   },
+   {
+    "key": "curse",
+    "value": 1
+   }
+  ],
+  "visual": "Méduse colossale d’un rouge profond qui teinte la mer sur des lieues, filaments couleur de veines.",
+  "lore": "Quand les sceaux cédèrent, les eaux devinrent sang. Cela, au moins, les vieux livres l’avaient prévu.",
+  "evolution": null,
+  "sets": [
+   "plaies"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "tentacle",
+   "core": "bell",
+   "count": 12,
+   "tint": "#e0303c"
+  },
+  "image": "assets/art/ABY-029.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Marée de Sang — Méduse colossale d’un rouge profond qui teinte la mer sur des lieues, filaments couleur de veines. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-030",
+  "number": 30,
+  "name": "Scylla",
+  "title": "Six gueules sur le détroit",
+  "faction": "abyssal",
+  "rarity": "R",
+  "category": "Créature mythologique",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 8,
+   "def": 2,
+   "spd": 6,
+   "mag": 3,
+   "hp": 17,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Nymphe changée en monstre : buste de femme, ceinture de six têtes de chiens, longs bras sinueux.",
+  "lore": "Ulysse choisit de lui sacrifier six marins plutôt que d’affronter Charybde. Elle s’en souvient.",
+  "evolution": null,
+  "sets": [
+   "seigneurs",
+   "fleaux"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "tentacle",
+   "core": "head",
+   "count": 10,
+   "dogs": 6,
+   "hair": true
+  },
+  "image": "assets/art/ABY-030.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Scylla — Nymphe changée en monstre : buste de femme, ceinture de six têtes de chiens, longs bras sinueux. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-031",
+  "number": 31,
+  "name": "Charybde",
+  "title": "Le Gouffre qui boit",
+  "faction": "abyssal",
+  "rarity": "R",
+  "category": "Créature mythologique",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 5,
+   "spd": 3,
+   "mag": 3,
+   "hp": 20,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "cataclysm",
+    "value": 1
+   }
+  ],
+  "visual": "Tourbillon colossal hérissé de crocs concentriques, au centre duquel brille un œil noyé.",
+  "lore": "Trois fois par jour, elle avale la mer. Trois fois par jour, elle la rend.",
+  "evolution": null,
+  "sets": [
+   "seigneurs",
+   "fleaux"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "orb",
+   "type": "maw",
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-031.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Charybde — Tourbillon colossal hérissé de crocs concentriques, au centre duquel brille un œil noyé. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-032",
+  "number": 32,
+  "name": "Umibōzu",
+  "title": "Le Moine de la mer",
+  "faction": "abyssal",
+  "rarity": "R",
+  "category": "Yōkai",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 4,
+   "def": 4,
+   "spd": 3,
+   "mag": 2,
+   "hp": 22,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Géant noir au crâne lisse surgissant des flots par nuit calme, deux yeux immenses et sans pupilles.",
+  "lore": "Les marins japonais lui tendaient un tonneau sans fond. Il essayait de les noyer avec, en vain.",
+  "evolution": null,
+  "sets": [
+   "seigneurs"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "robe",
+   "arms": "down",
+   "scale": 1.25,
+   "dy": 30,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-032.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Umibōzu — Géant noir au crâne lisse surgissant des flots par nuit calme, deux yeux immenses et sans pupilles. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-033",
+  "number": 33,
+  "name": "Hafgufa",
+  "title": "L’île qui respire",
+  "faction": "abyssal",
+  "rarity": "R",
+  "category": "Créature marine",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 4,
+   "spd": 3,
+   "mag": 3,
+   "hp": 21,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "regen",
+    "value": 2
+   }
+  ],
+  "visual": "Monstre marin si vaste que son dos passe pour une île, gueule béante qui attire les bancs de poissons.",
+  "lore": "Les sagas nordiques le confondent avec une terre. Les marins qui y accostent découvrent leur erreur.",
+  "evolution": null,
+  "sets": [
+   "seigneurs"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "fish",
+   "whale": true,
+   "fins": false,
+   "scale": 1.15,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-033.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Hafgufa — Monstre marin si vaste que son dos passe pour une île, gueule béante qui attire les bancs de poissons. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-034",
+  "number": 34,
+  "name": "Nuckelavee",
+  "title": "Le Démon sans peau",
+  "faction": "abyssal",
+  "rarity": "R",
+  "category": "Démon des îles",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 9,
+   "def": 2,
+   "spd": 4,
+   "mag": 2,
+   "hp": 16,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Centaure écorché des Orcades : cheval à l’œil unique et cavalier soudé à son dos, muscles et veines à nu.",
+  "lore": "Son souffle flétrit les récoltes. Seule l’eau douce l’arrête : il ne la supporte pas.",
+  "evolution": null,
+  "sets": [
+   "fleaux"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "horse",
+   "hooves": true,
+   "rider": true,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-034.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Nuckelavee — Centaure écorché des Orcades : cheval à l’œil unique et cavalier soudé à son dos, muscles et veines à nu. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-035",
+  "number": 35,
+  "name": "Cétos",
+  "title": "Le monstre d’Andromède",
+  "faction": "abyssal",
+  "rarity": "R",
+  "category": "Créature mythologique",
+  "power": 5,
+  "role": "B",
+  "stats": {
+   "atk": 8,
+   "def": 2,
+   "spd": 5,
+   "mag": 3,
+   "hp": 14,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Monstre marin à la gueule de chien et au corps de cétacé, nageoires dorsales en lames.",
+  "lore": "Persée le pétrifia avec la tête de Méduse. La pierre, sous l’eau, finit par s’effriter.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "fish",
+   "spikes": true,
+   "fins": true,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-035.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Cétos — Monstre marin à la gueule de chien et au corps de cétacé, nageoires dorsales en lames. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-036",
+  "number": 36,
+  "name": "Le Serpent des Abysses",
+  "title": "Gardien de la fosse",
+  "faction": "abyssal",
+  "rarity": "R",
+  "category": "Créature marine",
+  "power": 6,
+  "role": "S",
+  "stats": {
+   "atk": 7,
+   "def": 2,
+   "spd": 8,
+   "mag": 2,
+   "hp": 13,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Serpent marin aux nageoires de soie noire, collerette épineuse luminescente, crocs translucides.",
+  "lore": "Il patrouille la frontière entre la mer et ce qui est en dessous.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "serpent",
+   "fins": true,
+   "frill": true,
+   "horns": "back"
+  },
+  "image": "assets/art/ABY-036.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Serpent des Abysses — Serpent marin aux nageoires de soie noire, collerette épineuse luminescente, crocs translucides. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-037",
+  "number": 37,
+  "name": "Aspidochelone",
+  "title": "L’île-tortue",
+  "faction": "abyssal",
+  "rarity": "R",
+  "category": "Créature marine",
+  "power": 5,
+  "role": "T",
+  "stats": {
+   "atk": 4,
+   "def": 5,
+   "spd": 2,
+   "mag": 2,
+   "hp": 19,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Baleine-tortue au dos couvert de sable et d’arbres morts, que les marins prennent pour une île.",
+  "lore": "Les bestiaires médiévaux racontent qu’elle plonge dès qu’on allume un feu sur son dos.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "fish",
+   "whale": true,
+   "fins": false,
+   "scene": "ocean",
+   "flip": true
+  },
+  "image": "assets/art/ABY-037.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Aspidochelone — Baleine-tortue au dos couvert de sable et d’arbres morts, que les marins prennent pour une île. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-038",
+  "number": 38,
+  "name": "Bake-kujira",
+  "title": "La baleine-squelette",
+  "faction": "abyssal",
+  "rarity": "R",
+  "category": "Yōkai",
+  "power": 5,
+  "role": "E",
+  "stats": {
+   "atk": 6,
+   "def": 3,
+   "spd": 4,
+   "mag": 4,
+   "hp": 12,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "relic"
+   },
+   {
+    "key": "curse",
+    "value": 1
+   }
+  ],
+  "visual": "Squelette de baleine flottant à la surface, entouré d’oiseaux étranges et de poissons inconnus.",
+  "lore": "Dans les récits de Shimane, la voir annonçait une épidémie. Elle ne venait jamais seule.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "fish",
+   "whale": true,
+   "bones": true,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-038.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Bake-kujira — Squelette de baleine flottant à la surface, entouré d’oiseaux étranges et de poissons inconnus. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-039",
+  "number": 39,
+  "name": "Kraken",
+  "title": "Fléau des flottes",
+  "faction": "abyssal",
+  "rarity": "HR",
+  "category": "Créature marine",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 6,
+   "spd": 4,
+   "mag": 4,
+   "hp": 26,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "drown"
+   },
+   {
+    "key": "cataclysm",
+    "value": 1
+   }
+  ],
+  "visual": "Céphalopode colossal aux yeux d’or, bras capables d’envelopper un trois-mâts et de le briser comme du bois sec.",
+  "lore": "Les sagas norvégiennes le disaient grand comme une île. C’était un euphémisme.",
+  "evolution": null,
+  "sets": [
+   "seigneurs",
+   "fleaux"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral",
+   "special"
+  ],
+  "art": {
+   "form": "tentacle",
+   "core": "mantle",
+   "count": 10,
+   "scale": 1.1,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-039.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Kraken — Céphalopode colossal aux yeux d’or, bras capables d’envelopper un trois-mâts et de le briser comme du bois sec. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-040",
+  "number": 40,
+  "name": "Dagon",
+  "title": "Le Dieu-Poisson",
+  "faction": "abyssal",
+  "rarity": "HR",
+  "category": "Dieu oublié",
+  "power": 8,
+  "role": "M",
+  "stats": {
+   "atk": 6,
+   "def": 4,
+   "spd": 7,
+   "mag": 9,
+   "hp": 18,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "command",
+    "value": 2
+   }
+  ],
+  "visual": "Divinité au corps d’homme et à la queue de poisson, tiare de corail, regard immobile sous des paupières absentes.",
+  "lore": "Les Philistins l’adoraient. Son temple s’effondra. Ses fidèles, eux, ont appris à respirer sous l’eau.",
+  "evolution": null,
+  "sets": [
+   "oublies",
+   "seigneurs"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "body": "robe",
+   "arms": "spread",
+   "horns": "crown",
+   "scale": 1.05,
+   "scene": "abyss"
+  },
+  "image": "assets/art/ABY-040.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Dagon — Divinité au corps d’homme et à la queue de poisson, tiare de corail, regard immobile sous des paupières absentes. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-041",
+  "number": 41,
+  "name": "L’Avaleur de Marées",
+  "title": "Celui qui boit les océans",
+  "faction": "abyssal",
+  "rarity": "HR",
+  "category": "Créature marine",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 3,
+   "spd": 6,
+   "mag": 2,
+   "hp": 19,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Poisson titanesque à la mâchoire décrochée, dont chaque inspiration aspire la mer entière.",
+  "lore": "Quand la marée tarde, c’est qu’il a soif.",
+  "evolution": null,
+  "sets": [
+   "seigneurs"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "fish",
+   "fins": true,
+   "spikes": true,
+   "scale": 1.15,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-041.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : L’Avaleur de Marées — Poisson titanesque à la mâchoire décrochée, dont chaque inspiration aspire la mer entière. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-042",
+  "number": 42,
+  "name": "La Mâchoire du Monde",
+  "title": "Le fond n’existe pas",
+  "faction": "abyssal",
+  "rarity": "HR",
+  "category": "Entité abyssale",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 11,
+   "def": 3,
+   "spd": 5,
+   "mag": 4,
+   "hp": 21,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "cataclysm",
+    "value": 2
+   }
+  ],
+  "visual": "Gueule circulaire grande comme une cité au fond de la fosse, ceinte de bras qui fouillent les ténèbres.",
+  "lore": "Les cartes anciennes indiquaient « ici, la mer se termine ». Elle ne se termine pas : elle est mangée.",
+  "evolution": null,
+  "sets": [
+   "neant"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "tentacle",
+   "core": "maw",
+   "count": 12,
+   "scale": 1.1
+  },
+  "image": "assets/art/ABY-042.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : La Mâchoire du Monde — Gueule circulaire grande comme une cité au fond de la fosse, ceinte de bras qui fouillent les ténèbres. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-043",
+  "number": 43,
+  "name": "Bahamut",
+  "title": "Le Poisson qui porte le monde",
+  "faction": "abyssal",
+  "rarity": "HR",
+  "category": "Créature cosmique",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 7,
+   "spd": 4,
+   "mag": 3,
+   "hp": 25,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "aegis"
+   }
+  ],
+  "visual": "Poisson immense nageant dans le vide, portant sur son dos un taureau, un rocher et le monde entier.",
+  "lore": "Les cosmographies arabes le placent sous la Terre. Sous lui, il n’y a que la mer, et sous la mer, l’obscurité.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "fish",
+   "whale": true,
+   "fins": true,
+   "scale": 1.2,
+   "scene": "cosmos"
+  },
+  "image": "assets/art/ABY-043.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Bahamut — Poisson immense nageant dans le vide, portant sur son dos un taureau, un rocher et le monde entier. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-044",
+  "number": 44,
+  "name": "Céto",
+  "title": "Mère des Monstres",
+  "faction": "abyssal",
+  "rarity": "HR",
+  "category": "Divinité marine",
+  "power": 7,
+  "role": "U",
+  "stats": {
+   "atk": 5,
+   "def": 4,
+   "spd": 4,
+   "mag": 7,
+   "hp": 20,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "command",
+    "value": 1
+   },
+   {
+    "key": "regen",
+    "value": 2
+   }
+  ],
+  "visual": "Déesse marine au visage antique, chevelure de varech, bas du corps s’effilochant en queues de serpent.",
+  "lore": "Elle enfanta les Gorgones, les Grées et le dragon Ladon. Elle est fière de chacun.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "hair": true,
+   "body": "tatter",
+   "arms": "spread",
+   "tail": true,
+   "scene": "abyss"
+  },
+  "image": "assets/art/ABY-044.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Céto — Déesse marine au visage antique, chevelure de varech, bas du corps s’effilochant en queues de serpent. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-045",
+  "number": 45,
+  "name": "Léviathan",
+  "title": "Prince de l’Envie",
+  "faction": "abyssal",
+  "rarity": "M",
+  "category": "Serpent primordial",
+  "power": 10,
+  "role": "T",
+  "stats": {
+   "atk": 7,
+   "def": 8,
+   "spd": 5,
+   "mag": 4,
+   "hp": 26,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "aegis"
+   },
+   {
+    "key": "cataclysm",
+    "value": 2
+   }
+  ],
+  "visual": "Serpent marin cuirassé d’écailles impénétrables, collerette de lames, haleine qui fait bouillir la mer.",
+  "lore": "Le Livre de Job dit que nul ne peut le prendre à l’hameçon. Il envie seulement ce qu’il ne peut avaler.",
+  "evolution": null,
+  "sets": [
+   "peches",
+   "seigneurs"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "serpent",
+   "fins": true,
+   "frill": true,
+   "horns": "back",
+   "scale": 1.15,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-045.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Léviathan — Serpent marin cuirassé d’écailles impénétrables, collerette de lames, haleine qui fait bouillir la mer. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-046",
+  "number": 46,
+  "name": "Jörmungandr",
+  "title": "Le Serpent de Midgard",
+  "faction": "abyssal",
+  "rarity": "M",
+  "category": "Serpent primordial",
+  "power": 10,
+  "role": "T",
+  "stats": {
+   "atk": 8,
+   "def": 8,
+   "spd": 4,
+   "mag": 5,
+   "hp": 26,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Serpent si long qu’il encercle le monde et se mord la queue, écailles couvertes de coraux et d’épaves.",
+  "lore": "Quand il lâchera sa queue, le Ragnarök commencera. Il serre les dents.",
+  "evolution": null,
+  "sets": [
+   "seigneurs"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "serpent",
+   "bite": true,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-046.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Jörmungandr — Serpent si long qu’il encercle le monde et se mord la queue, écailles couvertes de coraux et d’épaves. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-047",
+  "number": 47,
+  "name": "Le Roi des Fosses",
+  "title": "Couronné de pression",
+  "faction": "abyssal",
+  "rarity": "M",
+  "category": "Entité abyssale",
+  "power": 9,
+  "role": "M",
+  "stats": {
+   "atk": 6,
+   "def": 4,
+   "spd": 6,
+   "mag": 10,
+   "hp": 18,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "drown"
+   },
+   {
+    "key": "command",
+    "value": 2
+   }
+  ],
+  "visual": "Souverain à la tête bulbeuse couronnée de corail noir, cinq yeux luisants, manteau de bras interminables.",
+  "lore": "Il règne là où la lumière n’est jamais arrivée. Il n’a jamais rien vu. Il voit tout.",
+  "evolution": null,
+  "sets": [
+   "seigneurs"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "tentacle",
+   "core": "head",
+   "count": 11,
+   "crown": true,
+   "eyes": 5,
+   "scale": 1.05
+  },
+  "image": "assets/art/ABY-047.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Roi des Fosses — Souverain à la tête bulbeuse couronnée de corail noir, cinq yeux luisants, manteau de bras interminables. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "ABY-048",
+  "number": 48,
+  "name": "Le Rêveur Sous la Fosse",
+  "title": "Ne pas réveiller",
+  "faction": "abyssal",
+  "rarity": "S",
+  "category": "Entité du Néant",
+  "power": 10,
+  "role": "M",
+  "stats": {
+   "atk": 7,
+   "def": 3,
+   "spd": 8,
+   "mag": 10,
+   "hp": 18,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "drown"
+   },
+   {
+    "key": "omen"
+   },
+   {
+    "key": "cataclysm",
+    "value": 2
+   }
+  ],
+  "visual": "Un œil unique, vaste comme une mer, entrouvert au fond du monde, cerné de racines de chair.",
+  "lore": "Il dort depuis avant le temps. Chaque carte de ce bestiaire est peut-être l’un de ses rêves.",
+  "evolution": null,
+  "sets": [
+   "neant"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "orb",
+   "type": "eye",
+   "scene": "abyss"
+  },
+  "image": "assets/art/ABY-048.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Rêveur Sous la Fosse — Un œil unique, vaste comme une mer, entrouvert au fond du monde, cerné de racines de chair. Ambiance de la faction Abyssal : bleu profond, cyan lumineux, noir et argent ; fosses océaniques, bioluminescence. variante de collection : gravure dorée à l’eau-forte sur fond noir, finition luxueuse. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ }
+]

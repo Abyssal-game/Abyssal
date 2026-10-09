@@ -1,0 +1,41 @@
+// Gestion des illustrations : une vraie image si elle est déclarée dans
+// assets/art/manifest.json (assets/art/<ID>.webp, ou <ID>-alt.webp pour
+// l'illustration alternative), sinon l'illustration procédurale provisoire.
+import { renderArt, renderMystery } from './procedural.js';
+
+let available = new Set();
+const cache = new Map();
+
+export async function loadArtManifest(base = './') {
+  try {
+    const r = await fetch(base + 'assets/art/manifest.json', { cache: 'no-cache' });
+    if (r.ok) available = new Set((await r.json()).available || []);
+  } catch (e) {
+    available = new Set();
+  }
+}
+
+export function hasRealArt(id, alt = false) { return available.has(alt ? `${id}-alt` : id); }
+
+// Les URL ne sont jamais révoquées : une image déjà affichée peut être
+// redécodée par le navigateur à tout moment (défilement, mise en cache).
+function remember(key, url) {
+  cache.set(key, url);
+  return url;
+}
+
+export function proceduralUrl(card, { alt = false, lite = false, mystery = false } = {}) {
+  const key = `${mystery ? 'm' : alt ? 'a' : lite ? 'l' : 'f'}:${card.id}`;
+  if (cache.has(key)) return cache.get(key);
+  const svg = mystery ? renderMystery(card) : renderArt(card, { alt, lite });
+  return remember(key, URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' })));
+}
+
+export function artUrl(card, { variant = 'normal', lite = false, mystery = false } = {}) {
+  if (!mystery) {
+    const alt = variant === 'alt';
+    if (hasRealArt(card.id, alt)) return `assets/art/${card.id}${alt ? '-alt' : ''}.webp`;
+    return proceduralUrl(card, { alt, lite });
+  }
+  return proceduralUrl(card, { mystery: true });
+}

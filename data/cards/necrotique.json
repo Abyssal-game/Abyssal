@@ -1,0 +1,2036 @@
+[
+ {
+  "id": "NEC-001",
+  "number": 1,
+  "name": "Squelette Sentinelle",
+  "title": "Garde éternelle",
+  "faction": "necrotique",
+  "rarity": "C",
+  "category": "Mort-vivant",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 2,
+   "mag": 1,
+   "hp": 8,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Squelette en armure rouillée, épée ébréchée plantée devant lui, flammes violettes dans les orbites.",
+  "lore": "On lui a ordonné de garder la crypte. Personne n’est jamais venu le relever.",
+  "evolution": {
+   "line": "tombe",
+   "name": "Lignée des Gibets",
+   "stage": 1,
+   "stages": 3
+  },
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "skeleton",
+   "pose": "stand"
+  },
+  "image": "assets/art/NEC-001.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Squelette Sentinelle — Squelette en armure rouillée, épée ébréchée plantée devant lui, flammes violettes dans les orbites. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-002",
+  "number": 2,
+  "name": "Rats de Charnier",
+  "title": "Les nettoyeurs",
+  "faction": "necrotique",
+  "rarity": "C",
+  "category": "Essaim",
+  "power": 1,
+  "role": "B",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 3,
+   "mag": 0,
+   "hp": 3,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Rats blafards aux queues pelées, yeux voilés de blanc, qui grouillent entre les ossements.",
+  "lore": "Ils mangent ce que les vers trouvent trop dur.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "swarm",
+   "kind": "rat",
+   "count": 28
+  },
+  "image": "assets/art/NEC-002.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Rats de Charnier — Rats blafards aux queues pelées, yeux voilés de blanc, qui grouillent entre les ossements. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-003",
+  "number": 3,
+  "name": "Fossoyeur Maudit",
+  "title": "Il creuse encore",
+  "faction": "necrotique",
+  "rarity": "C",
+  "category": "Mort-vivant",
+  "power": 2,
+  "role": "U",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 2,
+   "mag": 3,
+   "hp": 6,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "relic"
+   }
+  ],
+  "visual": "Vieillard décharné à la pelle rongée, capuche pleine de terre, lanterne accrochée à la ceinture.",
+  "lore": "Il a enterré tout un village. Il creuse maintenant sa propre tombe, très lentement.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "hood",
+   "body": "cloak",
+   "arms": "staff"
+  },
+  "image": "assets/art/NEC-003.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Fossoyeur Maudit — Vieillard décharné à la pelle rongée, capuche pleine de terre, lanterne accrochée à la ceinture. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-004",
+  "number": 4,
+  "name": "Corbeau des Gibets",
+  "title": "Témoin des pendus",
+  "faction": "necrotique",
+  "rarity": "C",
+  "category": "Bête",
+  "power": 1,
+  "role": "S",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 4,
+   "mag": 1,
+   "hp": 4,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Corbeau aux plumes grises de poussière, perché sur une corde de potence, œil d’argent.",
+  "lore": "Il connaît le dernier mot de chaque pendu. Il les répète, la nuit.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "eagle",
+   "scale": 0.76,
+   "scene": "crypt"
+  },
+  "image": "assets/art/NEC-004.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Corbeau des Gibets — Corbeau aux plumes grises de poussière, perché sur une corde de potence, œil d’argent. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-005",
+  "number": 5,
+  "name": "Pleureuse de Crypte",
+  "title": "Larmes de cire",
+  "faction": "necrotique",
+  "rarity": "C",
+  "category": "Spectre",
+  "power": 2,
+  "role": "U",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 3,
+   "mag": 2,
+   "hp": 7,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 1
+   }
+  ],
+  "visual": "Spectre de femme voilée de noir, mains jointes sur le visage, larmes de cire figées sur les joues.",
+  "lore": "Elle pleure les morts que personne n’a pleurés. Elle a beaucoup de travail.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "spectre",
+   "head": "woman",
+   "hair": true,
+   "arms": "wrap"
+  },
+  "image": "assets/art/NEC-005.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Pleureuse de Crypte — Spectre de femme voilée de noir, mains jointes sur le visage, larmes de cire figées sur les joues. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-006",
+  "number": 6,
+  "name": "Chevalier Décharné",
+  "title": "Serment au-delà de la mort",
+  "faction": "necrotique",
+  "rarity": "C",
+  "category": "Mort-vivant",
+  "power": 3,
+  "role": "B",
+  "stats": {
+   "atk": 5,
+   "def": 1,
+   "spd": 3,
+   "mag": 1,
+   "hp": 8,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Chevalier à l’armure percée, crâne visible sous le heaume ouvert, épée tenue avec une discipline intacte.",
+  "lore": "Il avait juré de servir jusqu’à la mort. Il a trouvé que ce n’était pas suffisant.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "skull",
+   "body": "armor",
+   "arms": "sword"
+  },
+  "image": "assets/art/NEC-006.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Chevalier Décharné — Chevalier à l’armure percée, crâne visible sous le heaume ouvert, épée tenue avec une discipline intacte. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-007",
+  "number": 7,
+  "name": "Goule des Ossuaires",
+  "title": "Faim souterraine",
+  "faction": "necrotique",
+  "rarity": "C",
+  "category": "Goule",
+  "power": 2,
+  "role": "B",
+  "stats": {
+   "atk": 5,
+   "def": 0,
+   "spd": 2,
+   "mag": 1,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Créature voûtée à la peau grise, mâchoire allongée, longues griffes noires couvertes de terre.",
+  "lore": "Les récits arabes la décrivent rôdant dans les cimetières. Elle n’a jamais aimé la lumière.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "body": "lean",
+   "arms": "reach",
+   "claws": true,
+   "scale": 0.86
+  },
+  "image": "assets/art/NEC-007.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Goule des Ossuaires — Créature voûtée à la peau grise, mâchoire allongée, longues griffes noires couvertes de terre. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-008",
+  "number": 8,
+  "name": "Feu Follet",
+  "title": "Lueur des marais",
+  "faction": "necrotique",
+  "rarity": "C",
+  "category": "Esprit",
+  "power": 1,
+  "role": "M",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 2,
+   "mag": 1,
+   "hp": 3,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 1
+   }
+  ],
+  "visual": "Flammes pâles dansant au ras des marais, chacune entourée d’un halo verdâtre.",
+  "lore": "Elles mènent aux trésors, disent les contes. Elles mènent aux tourbières, disent les noyés.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "swarm",
+   "kind": "wisp",
+   "count": 12,
+   "scene": "swamp"
+  },
+  "image": "assets/art/NEC-008.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Feu Follet — Flammes pâles dansant au ras des marais, chacune entourée d’un halo verdâtre. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-009",
+  "number": 9,
+  "name": "Poupée de Suaire",
+  "title": "Le jouet cousu",
+  "faction": "necrotique",
+  "rarity": "C",
+  "category": "Objet maudit",
+  "power": 2,
+  "role": "M",
+  "stats": {
+   "atk": 3,
+   "def": 0,
+   "spd": 2,
+   "mag": 3,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 1
+   }
+  ],
+  "visual": "Poupée de chiffon cousue dans un linceul, boutons de nacre à la place des yeux, fils tendus vers le ciel.",
+  "lore": "Elle était à une petite fille. La petite fille, maintenant, est à elle.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "object",
+   "kind": "doll",
+   "scene": "crypt"
+  },
+  "image": "assets/art/NEC-009.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Poupée de Suaire — Poupée de chiffon cousue dans un linceul, boutons de nacre à la place des yeux, fils tendus vers le ciel. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-010",
+  "number": 10,
+  "name": "Chien du Cimetière",
+  "title": "Le gardien noir",
+  "faction": "necrotique",
+  "rarity": "C",
+  "category": "Esprit",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 1,
+   "mag": 0,
+   "hp": 7,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Grand chien noir aux yeux de braise pâle, assis immobile au pied d’un clocher.",
+  "lore": "Le folklore anglais dit qu’on enterrait un chien noir sous chaque nouveau cimetière, pour le garder.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "dog",
+   "size": "small",
+   "tail": "normal",
+   "scene": "crypt"
+  },
+  "image": "assets/art/NEC-010.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Chien du Cimetière — Grand chien noir aux yeux de braise pâle, assis immobile au pied d’un clocher. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-011",
+  "number": 11,
+  "name": "Âme-en-Peine",
+  "title": "Elle cherche quelque chose",
+  "faction": "necrotique",
+  "rarity": "C",
+  "category": "Spectre",
+  "power": 1,
+  "role": "E",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 2,
+   "mag": 1,
+   "hp": 4,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Spectre translucide enveloppé d’un drap gris, bras tendus à tâtons, traîne effilochée.",
+  "lore": "Elle a perdu quelque chose avant de mourir. Elle a oublié quoi.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "spectre",
+   "head": "hood",
+   "arms": "reach"
+  },
+  "image": "assets/art/NEC-011.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Âme-en-Peine — Spectre translucide enveloppé d’un drap gris, bras tendus à tâtons, traîne effilochée. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-012",
+  "number": 12,
+  "name": "Zombi des Marais",
+  "title": "Remonté de la vase",
+  "faction": "necrotique",
+  "rarity": "C",
+  "category": "Mort-vivant",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 2,
+   "mag": 1,
+   "hp": 8,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "regen",
+    "value": 1
+   }
+  ],
+  "visual": "Cadavre gonflé couvert de vase et de lentilles d’eau, mâchoire pendante, démarche lente et obstinée.",
+  "lore": "Il est lent. Il est très, très patient.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "tatter",
+   "arms": "reach",
+   "scene": "swamp"
+  },
+  "image": "assets/art/NEC-012.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Zombi des Marais — Cadavre gonflé couvert de vase et de lentilles d’eau, mâchoire pendante, démarche lente et obstinée. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-013",
+  "number": 13,
+  "name": "Yūrei",
+  "title": "La rancune blanche",
+  "faction": "necrotique",
+  "rarity": "C",
+  "category": "Yōkai",
+  "power": 2,
+  "role": "M",
+  "stats": {
+   "atk": 3,
+   "def": 0,
+   "spd": 3,
+   "mag": 3,
+   "hp": 6,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 1
+   }
+  ],
+  "visual": "Spectre japonais vêtu d’un kimono funéraire blanc, longs cheveux noirs défaits, mains pendantes sans pieds.",
+  "lore": "Dans les contes japonais, elle reste attachée au monde par un sentiment trop fort. Ici, la colère.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "spectre",
+   "head": "woman",
+   "hair": true,
+   "arms": "down"
+  },
+  "image": "assets/art/NEC-013.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Yūrei — Spectre japonais vêtu d’un kimono funéraire blanc, longs cheveux noirs défaits, mains pendantes sans pieds. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-014",
+  "number": 14,
+  "name": "Larve de Tombe",
+  "title": "Vers de la dernière heure",
+  "faction": "necrotique",
+  "rarity": "C",
+  "category": "Mort-vivant",
+  "power": 1,
+  "role": "T",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 2,
+   "mag": 1,
+   "hp": 5,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Ver segmenté blafard aux mandibules d’os, qui fouit les cercueils en laissant des tunnels lisses.",
+  "lore": "Rien ne se perd. Tout se mange.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "insect",
+   "type": "centipede",
+   "scene": "crypt"
+  },
+  "image": "assets/art/NEC-014.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Larve de Tombe — Ver segmenté blafard aux mandibules d’os, qui fouit les cercueils en laissant des tunnels lisses. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-015",
+  "number": 15,
+  "name": "Gargouille Funéraire",
+  "title": "Elle pleure sur les tombes",
+  "faction": "necrotique",
+  "rarity": "C",
+  "category": "Construction maudite",
+  "power": 3,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 1,
+   "mag": 2,
+   "hp": 11,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Gargouille de pierre moussue aux joues creusées de larmes, ailes repliées, posée sur un mausolée.",
+  "lore": "Elle ne bouge que lorsque personne ne la regarde. Donc presque jamais : on la regarde beaucoup.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "golem",
+   "head": "gargoyle",
+   "shape": "tall",
+   "scene": "crypt"
+  },
+  "image": "assets/art/NEC-015.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Gargouille Funéraire — Gargouille de pierre moussue aux joues creusées de larmes, ailes repliées, posée sur un mausolée. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-016",
+  "number": 16,
+  "name": "Revenant",
+  "title": "Dette impayée",
+  "faction": "necrotique",
+  "rarity": "C",
+  "category": "Mort-vivant",
+  "power": 2,
+  "role": "E",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 4,
+   "mag": 1,
+   "hp": 6,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "relic"
+   }
+  ],
+  "visual": "Cadavre revenu de la tombe, manteau de voyage moisi, regard fixe sur une maison précise.",
+  "lore": "Il revient pour une seule raison. Quand elle sera réglée, il repartira. Peut-être.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "skull",
+   "body": "cloak",
+   "arms": "down"
+  },
+  "image": "assets/art/NEC-016.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Revenant — Cadavre revenu de la tombe, manteau de voyage moisi, regard fixe sur une maison précise. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-017",
+  "number": 17,
+  "name": "Banshee",
+  "title": "La pleureuse des Gaëls",
+  "faction": "necrotique",
+  "rarity": "PC",
+  "category": "Esprit",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 3,
+   "mag": 6,
+   "hp": 8,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 2
+   }
+  ],
+  "visual": "Femme spectrale aux cheveux blancs flottants, bouche ouverte sur un cri qui fait éclater les vitres.",
+  "lore": "Dans le folklore irlandais, son cri annonce une mort dans la famille. Elle crie de plus en plus souvent.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "spectre",
+   "head": "woman",
+   "hair": true,
+   "scream": true,
+   "arms": "up"
+  },
+  "image": "assets/art/NEC-017.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Banshee — Femme spectrale aux cheveux blancs flottants, bouche ouverte sur un cri qui fait éclater les vitres. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-018",
+  "number": 18,
+  "name": "Draugr",
+  "title": "Le mort du tumulus",
+  "faction": "necrotique",
+  "rarity": "PC",
+  "category": "Mort-vivant",
+  "power": 4,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 3,
+   "spd": 2,
+   "mag": 2,
+   "hp": 14,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Guerrier nordique mort, enflé et bleui, gardant son tumulus couvert d’or avec une hache encore tranchante.",
+  "lore": "Les sagas disent qu’il grossit à volonté et pèse comme un bœuf. On ne le vole pas impunément.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "skull",
+   "body": "bulky",
+   "arms": "sword",
+   "scene": "ice"
+  },
+  "image": "assets/art/NEC-018.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Draugr — Guerrier nordique mort, enflé et bleui, gardant son tumulus couvert d’or avec une hache encore tranchante. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-019",
+  "number": 19,
+  "name": "Strigoï",
+  "title": "Il revient la nuit",
+  "faction": "necrotique",
+  "rarity": "PC",
+  "category": "Vampire",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 6,
+   "def": 1,
+   "spd": 7,
+   "mag": 2,
+   "hp": 8,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   }
+  ],
+  "visual": "Revenant roumain à la peau grise, chevelure rousse, ongles longs et regard fiévreux sous la lune.",
+  "lore": "Le folklore roumain le dit capable de se changer en bête. Il préfère se changer en voisin.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "cloak",
+   "arms": "reach",
+   "claws": true,
+   "hair": true
+  },
+  "image": "assets/art/NEC-019.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Strigoï — Revenant roumain à la peau grise, chevelure rousse, ongles longs et regard fiévreux sous la lune. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-020",
+  "number": 20,
+  "name": "Jiangshi",
+  "title": "Le cadavre qui sautille",
+  "faction": "necrotique",
+  "rarity": "PC",
+  "category": "Mort-vivant",
+  "power": 4,
+  "role": "T",
+  "stats": {
+   "atk": 4,
+   "def": 3,
+   "spd": 2,
+   "mag": 1,
+   "hp": 14,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   }
+  ],
+  "visual": "Cadavre raidi en robe de mandarin, bras tendus devant lui, talisman de papier collé sur le front.",
+  "lore": "Dans les contes chinois, il se déplace en sautant et aspire le souffle des vivants.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "robe",
+   "arms": "spread",
+   "scene": "ruins"
+  },
+  "image": "assets/art/NEC-020.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Jiangshi — Cadavre raidi en robe de mandarin, bras tendus devant lui, talisman de papier collé sur le front. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-021",
+  "number": 21,
+  "name": "Vrykolakas",
+  "title": "Le loup des tombes",
+  "faction": "necrotique",
+  "rarity": "PC",
+  "category": "Vampire",
+  "power": 4,
+  "role": "B",
+  "stats": {
+   "atk": 6,
+   "def": 2,
+   "spd": 3,
+   "mag": 1,
+   "hp": 8,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   },
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Revenant grec au visage mi-homme mi-loup, peau tendue comme un tambour, crocs jaunis.",
+  "lore": "Les récits grecs disent qu’il frappe aux portes et appelle les vivants par leur nom.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "body": "cloak",
+   "arms": "reach",
+   "claws": true
+  },
+  "image": "assets/art/NEC-021.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Vrykolakas — Revenant grec au visage mi-homme mi-loup, peau tendue comme un tambour, crocs jaunis. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-022",
+  "number": 22,
+  "name": "Penanggalan",
+  "title": "La tête qui vole",
+  "faction": "necrotique",
+  "rarity": "PC",
+  "category": "Vampire",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 6,
+   "def": 1,
+   "spd": 6,
+   "mag": 1,
+   "hp": 6,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   },
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Tête de femme volant dans la nuit, entrailles luisantes pendant sous elle comme des lanternes.",
+  "lore": "Le folklore malais dit qu’elle laisse son corps dans un tonneau de vinaigre. Ne le renversez pas.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "spectre",
+   "head": "woman",
+   "hair": true,
+   "arms": "down",
+   "tint": "#ff4a6a"
+  },
+  "image": "assets/art/NEC-022.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Penanggalan — Tête de femme volant dans la nuit, entrailles luisantes pendant sous elle comme des lanternes. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-023",
+  "number": 23,
+  "name": "Mara",
+  "title": "Cavalière des cauchemars",
+  "faction": "necrotique",
+  "rarity": "PC",
+  "category": "Esprit",
+  "power": 3,
+  "role": "M",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 4,
+   "mag": 3,
+   "hp": 5,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 1
+   },
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Créature spectrale accroupie sur le torse d’un dormeur, masque blafard, cheveux comme de la fumée.",
+  "lore": "Elle a donné son nom au cauchemar. Elle trouve l’hommage modeste.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "spectre",
+   "head": "mask",
+   "arms": "wrap"
+  },
+  "image": "assets/art/NEC-023.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Mara — Créature spectrale accroupie sur le torse d’un dormeur, masque blafard, cheveux comme de la fumée. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-024",
+  "number": 24,
+  "name": "Nukekubi",
+  "title": "Le cou qui se détache",
+  "faction": "necrotique",
+  "rarity": "PC",
+  "category": "Yōkai",
+  "power": 3,
+  "role": "S",
+  "stats": {
+   "atk": 4,
+   "def": 0,
+   "spd": 6,
+   "mag": 1,
+   "hp": 6,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Corps endormi en kimono dont la tête manque, envolée dans la nuit pour chasser les insectes et pire.",
+  "lore": "Si l’on cache le corps, la tête ne peut plus revenir. Elle devient alors vraiment dangereuse.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "none",
+   "body": "robe",
+   "arms": "down"
+  },
+  "image": "assets/art/NEC-024.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Nukekubi — Corps endormi en kimono dont la tête manque, envolée dans la nuit pour chasser les insectes et pire. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-025",
+  "number": 25,
+  "name": "Ossuaire Rampant",
+  "title": "Mille crânes",
+  "faction": "necrotique",
+  "rarity": "PC",
+  "category": "Mort-vivant",
+  "power": 4,
+  "role": "T",
+  "stats": {
+   "atk": 4,
+   "def": 3,
+   "spd": 2,
+   "mag": 2,
+   "hp": 14,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "regen",
+    "value": 2
+   }
+  ],
+  "visual": "Amas mouvant d’ossements et de crânes, roulant sur lui-même, chaque orbite allumée d’un feu pâle.",
+  "lore": "Chaque crâne voulait un tombeau. Ils ont fini par en former un seul, qui marche.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "blob",
+   "eyes": 12,
+   "mouths": 3,
+   "scene": "crypt"
+  },
+  "image": "assets/art/NEC-025.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ossuaire Rampant — Amas mouvant d’ossements et de crânes, roulant sur lui-même, chaque orbite allumée d’un feu pâle. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-026",
+  "number": 26,
+  "name": "Chevalier des Gibets",
+  "title": "Au service des pendus",
+  "faction": "necrotique",
+  "rarity": "PC",
+  "category": "Mort-vivant",
+  "power": 4,
+  "role": "B",
+  "stats": {
+   "atk": 7,
+   "def": 2,
+   "spd": 5,
+   "mag": 1,
+   "hp": 9,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Chevalier noir aux ailes en lambeaux de corde et de linceul, heaume cerclé de nœuds coulants.",
+  "lore": "Promu par la mort elle-même. Elle l’a choisi pour son sens du devoir.",
+  "evolution": {
+   "line": "tombe",
+   "name": "Lignée des Gibets",
+   "stage": 2,
+   "stages": 3
+  },
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "body": "armor",
+   "arms": "sword",
+   "wings": "tatter"
+  },
+  "image": "assets/art/NEC-026.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Chevalier des Gibets — Chevalier noir aux ailes en lambeaux de corde et de linceul, heaume cerclé de nœuds coulants. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-027",
+  "number": 27,
+  "name": "Ténèbres Palpables",
+  "title": "Neuvième Plaie",
+  "faction": "necrotique",
+  "rarity": "PC",
+  "category": "Fléau",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 4,
+   "def": 2,
+   "spd": 3,
+   "mag": 5,
+   "hp": 6,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   },
+   {
+    "key": "curse",
+    "value": 1
+   }
+  ],
+  "visual": "Obscurité si épaisse qu’on peut la toucher, constellée d’yeux qui ne cillent pas.",
+  "lore": "Trois jours de ténèbres. Personne ne put voir son prochain. Elle, voyait tout le monde.",
+  "evolution": null,
+  "sets": [
+   "plaies"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "orb",
+   "type": "void",
+   "scene": "crypt"
+  },
+  "image": "assets/art/NEC-027.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ténèbres Palpables — Obscurité si épaisse qu’on peut la toucher, constellée d’yeux qui ne cillent pas. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-028",
+  "number": 28,
+  "name": "Dullahan",
+  "title": "Le Cavalier sans tête",
+  "faction": "necrotique",
+  "rarity": "R",
+  "category": "Esprit",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 2,
+   "spd": 5,
+   "mag": 2,
+   "hp": 12,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   },
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Cavalier irlandais sans tête, tenant la sienne à bout de bras, phosphorescente et grimaçante.",
+  "lore": "Quand il s’arrête, quelqu’un meurt. Il appelle le mourant par son nom.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "none",
+   "body": "armor",
+   "arms": "down"
+  },
+  "image": "assets/art/NEC-028.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Dullahan — Cavalier irlandais sans tête, tenant la sienne à bout de bras, phosphorescente et grimaçante. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-029",
+  "number": 29,
+  "name": "Liche",
+  "title": "L’âme dans le phylactère",
+  "faction": "necrotique",
+  "rarity": "R",
+  "category": "Mort-vivant",
+  "power": 6,
+  "role": "M",
+  "stats": {
+   "atk": 6,
+   "def": 2,
+   "spd": 5,
+   "mag": 7,
+   "hp": 9,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "relic"
+   },
+   {
+    "key": "strike",
+    "value": 2
+   }
+  ],
+  "visual": "Sorcier mort à la couronne de fer, robe pourpre en lambeaux, bâton coiffé d’une gemme où dort son âme.",
+  "lore": "Il a vaincu la mort par l’étude. Il a perdu le reste en chemin.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "skull",
+   "body": "robe",
+   "arms": "staff",
+   "horns": "crown"
+  },
+  "image": "assets/art/NEC-029.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Liche — Sorcier mort à la couronne de fer, robe pourpre en lambeaux, bâton coiffé d’une gemme où dort son âme. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-030",
+  "number": 30,
+  "name": "Onryō",
+  "title": "La vengeance qui attend",
+  "faction": "necrotique",
+  "rarity": "R",
+  "category": "Yōkai",
+  "power": 6,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 3,
+   "spd": 6,
+   "mag": 7,
+   "hp": 10,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 3
+   }
+  ],
+  "visual": "Spectre de femme aux cheveux noirs ruisselants qui cachent tout sauf un œil, kimono blanc taché.",
+  "lore": "Dans les récits japonais, la rancune d’une morte trahie peut tuer des générations entières.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "spectre",
+   "head": "woman",
+   "hair": true,
+   "arms": "reach"
+  },
+  "image": "assets/art/NEC-030.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Onryō — Spectre de femme aux cheveux noirs ruisselants qui cachent tout sauf un œil, kimono blanc taché. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-031",
+  "number": 31,
+  "name": "Ankou",
+  "title": "L’ouvrier de la mort",
+  "faction": "necrotique",
+  "rarity": "R",
+  "category": "Esprit",
+  "power": 6,
+  "role": "E",
+  "stats": {
+   "atk": 8,
+   "def": 3,
+   "spd": 5,
+   "mag": 4,
+   "hp": 13,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   },
+   {
+    "key": "relic"
+   }
+  ],
+  "visual": "Grand squelette en manteau et chapeau large, faux montée à l’envers, conduisant une charrette qui grince.",
+  "lore": "En Bretagne, le dernier mort de l’année devient l’Ankou de l’année suivante. C’est un emploi stable.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "skull",
+   "body": "cloak",
+   "arms": "scythe"
+  },
+  "image": "assets/art/NEC-031.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ankou — Grand squelette en manteau et chapeau large, faux montée à l’envers, conduisant une charrette qui grince. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-032",
+  "number": 32,
+  "name": "Ammit",
+  "title": "La Dévoreuse des morts",
+  "faction": "necrotique",
+  "rarity": "R",
+  "category": "Créature égyptienne",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 2,
+   "spd": 6,
+   "mag": 3,
+   "hp": 13,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Créature à tête de crocodile, avant-train de lion et arrière d’hippopotame, assise près d’une balance.",
+  "lore": "Les Égyptiens croyaient qu’elle dévorait le cœur trop lourd. Elle juge rarement un cœur assez léger.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lizard",
+   "mane": true,
+   "tail": "normal",
+   "size": "big",
+   "scene": "temple"
+  },
+  "image": "assets/art/NEC-032.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ammit — Créature à tête de crocodile, avant-train de lion et arrière d’hippopotame, assise près d’une balance. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-033",
+  "number": 33,
+  "name": "Le Saint de la Peste",
+  "title": "Patron des fièvres",
+  "faction": "necrotique",
+  "rarity": "R",
+  "category": "Mort-vivant",
+  "power": 6,
+  "role": "U",
+  "stats": {
+   "atk": 4,
+   "def": 4,
+   "spd": 5,
+   "mag": 6,
+   "hp": 14,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   },
+   {
+    "key": "bless",
+    "value": 2
+   }
+  ],
+  "visual": "Médecin au masque à long bec, robe cirée, auréole noircie et bâton de bois pour écarter les malades.",
+  "lore": "Il soignait les pestiférés. La peste l’a sanctifié à sa manière : il ne meurt plus.",
+  "evolution": null,
+  "sets": [
+   "plaies"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "bird",
+   "body": "robe",
+   "arms": "staff",
+   "halo": "ring"
+  },
+  "image": "assets/art/NEC-033.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Saint de la Peste — Médecin au masque à long bec, robe cirée, auréole noircie et bâton de bois pour écarter les malades. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-034",
+  "number": 34,
+  "name": "Charon",
+  "title": "Le Passeur",
+  "faction": "necrotique",
+  "rarity": "R",
+  "category": "Divinité grecque",
+  "power": 5,
+  "role": "U",
+  "stats": {
+   "atk": 4,
+   "def": 3,
+   "spd": 3,
+   "mag": 5,
+   "hp": 12,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "relic"
+   }
+  ],
+  "visual": "Vieillard émacié debout dans une barque noire, longue perche à la main, yeux comme des braises sous la capuche.",
+  "lore": "Une obole pour la traversée. Ceux qui n’ont rien errent cent ans sur la rive. Il compte toujours.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "hood",
+   "body": "cloak",
+   "arms": "staff",
+   "scene": "swamp"
+  },
+  "image": "assets/art/NEC-034.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Charon — Vieillard émacié debout dans une barque noire, longue perche à la main, yeux comme des braises sous la capuche. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-035",
+  "number": 35,
+  "name": "Nosferatu",
+  "title": "L’ombre aux longs doigts",
+  "faction": "necrotique",
+  "rarity": "R",
+  "category": "Vampire",
+  "power": 6,
+  "role": "S",
+  "stats": {
+   "atk": 8,
+   "def": 3,
+   "spd": 8,
+   "mag": 3,
+   "hp": 9,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   },
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Vampire chauve aux oreilles pointues, dents de rat, doigts interminables dont l’ombre monte l’escalier.",
+  "lore": "Il ne charme pas. Il ne séduit pas. Il entre.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "cloak",
+   "arms": "reach",
+   "claws": true,
+   "horns": "short"
+  },
+  "image": "assets/art/NEC-035.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Nosferatu — Vampire chauve aux oreilles pointues, dents de rat, doigts interminables dont l’ombre monte l’escalier. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-036",
+  "number": 36,
+  "name": "Roi des Gibets",
+  "title": "Couronné de cordes",
+  "faction": "necrotique",
+  "rarity": "R",
+  "category": "Mort-vivant",
+  "power": 7,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 2,
+   "spd": 6,
+   "mag": 2,
+   "hp": 15,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "command",
+    "value": 1
+   },
+   {
+    "key": "relic"
+   }
+  ],
+  "visual": "Squelette couronné de fer, cape de linceul, entouré de cordes de potence qui se balancent sans vent.",
+  "lore": "Le chevalier des gibets a fini par prendre la couronne. Les pendus le reconnaissent pour roi.",
+  "evolution": {
+   "line": "tombe",
+   "name": "Lignée des Gibets",
+   "stage": 3,
+   "stages": 3
+  },
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "skeleton",
+   "pose": "stand",
+   "crown": true
+  },
+  "image": "assets/art/NEC-036.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Roi des Gibets — Squelette couronné de fer, cape de linceul, entouré de cordes de potence qui se balancent sans vent. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-037",
+  "number": 37,
+  "name": "Gashadokuro",
+  "title": "Le squelette affamé",
+  "faction": "necrotique",
+  "rarity": "HR",
+  "category": "Yōkai",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 6,
+   "mag": 3,
+   "hp": 16,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   },
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Squelette colossal formé des os des morts de faim, mâchoire claquant dans la nuit, mains énormes.",
+  "lore": "Il naît des ossements de ceux que personne n’a enterrés. Il fait claquer ses dents pour qu’on l’entende venir.",
+  "evolution": null,
+  "sets": [
+   "fleaux"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "skeleton",
+   "pose": "giant"
+  },
+  "image": "assets/art/NEC-037.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Gashadokuro — Squelette colossal formé des os des morts de faim, mâchoire claquant dans la nuit, mains énormes. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-038",
+  "number": 38,
+  "name": "La Tisseuse d’Ossements",
+  "title": "Elle coud les morts",
+  "faction": "necrotique",
+  "rarity": "HR",
+  "category": "Mort-vivant",
+  "power": 8,
+  "role": "M",
+  "stats": {
+   "atk": 7,
+   "def": 2,
+   "spd": 7,
+   "mag": 10,
+   "hp": 13,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "relic"
+   },
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Araignée géante à corps de vertèbres et à visage de femme sereine, tissant une toile de tendons et d’os.",
+  "lore": "Elle recoud les morts pour en faire des serviteurs. Elle est très douée, et très lente.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "insect",
+   "type": "spider",
+   "face": true,
+   "scene": "crypt"
+  },
+  "image": "assets/art/NEC-038.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : La Tisseuse d’Ossements — Araignée géante à corps de vertèbres et à visage de femme sereine, tissant une toile de tendons et d’os. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-039",
+  "number": 39,
+  "name": "Le Faucheur des Souvenirs",
+  "title": "Il prend ce qui reste",
+  "faction": "necrotique",
+  "rarity": "HR",
+  "category": "Esprit",
+  "power": 8,
+  "role": "M",
+  "stats": {
+   "atk": 6,
+   "def": 3,
+   "spd": 6,
+   "mag": 10,
+   "hp": 14,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   },
+   {
+    "key": "curse",
+    "value": 2
+   }
+  ],
+  "visual": "Faucheur au crâne de verre où tourbillonnent des images, faux de lumière froide qui ne coupe pas la chair.",
+  "lore": "Il ne prend pas la vie. Il prend tout ce qu’on en avait fait.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "spectre",
+   "head": "skull",
+   "arms": "scythe"
+  },
+  "image": "assets/art/NEC-039.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Faucheur des Souvenirs — Faucheur au crâne de verre où tourbillonnent des images, faux de lumière froide qui ne coupe pas la chair. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-040",
+  "number": 40,
+  "name": "Comte Dracula",
+  "title": "Le Prince des ténèbres",
+  "faction": "necrotique",
+  "rarity": "HR",
+  "category": "Vampire",
+  "power": 8,
+  "role": "M",
+  "stats": {
+   "atk": 7,
+   "def": 3,
+   "spd": 7,
+   "mag": 10,
+   "hp": 14,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   },
+   {
+    "key": "command",
+    "value": 1
+   }
+  ],
+  "visual": "Aristocrate pâle en cape noire doublée de rouge, crocs fins, ailes de chauve-souris ouvertes derrière lui.",
+  "lore": "Bram Stoker l’a rendu célèbre. Il aurait préféré rester une rumeur.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "cloak",
+   "arms": "spread",
+   "wings": "bat"
+  },
+  "image": "assets/art/NEC-040.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Comte Dracula — Aristocrate pâle en cape noire doublée de rouge, crocs fins, ailes de chauve-souris ouvertes derrière lui. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-041",
+  "number": 41,
+  "name": "Hel",
+  "title": "Reine de Helheim",
+  "faction": "necrotique",
+  "rarity": "HR",
+  "category": "Divinité nordique",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 6,
+   "def": 7,
+   "spd": 3,
+   "mag": 4,
+   "hp": 23,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "relic"
+   },
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Reine dont la moitié du corps est vivante et belle, l’autre morte et bleuie, trône de glace derrière elle.",
+  "lore": "Elle reçoit ceux qui meurent de maladie ou de vieillesse. Ils sont bien plus nombreux que les héros.",
+  "evolution": null,
+  "sets": [
+   "oublies"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "gown",
+   "arms": "spread",
+   "hair": true,
+   "horns": "crown",
+   "scene": "ice"
+  },
+  "image": "assets/art/NEC-041.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Hel — Reine dont la moitié du corps est vivante et belle, l’autre morte et bleuie, trône de glace derrière elle. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-042",
+  "number": 42,
+  "name": "Le Roi Sans Tombe",
+  "title": "Personne n’a voulu de lui",
+  "faction": "necrotique",
+  "rarity": "M",
+  "category": "Mort-vivant",
+  "power": 10,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 7,
+   "mag": 4,
+   "hp": 18,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "command",
+    "value": 2
+   },
+   {
+    "key": "relic"
+   },
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Roi squelettique aux ailes d’os, couronne d’ombre, manteau fait de linceuls de mille rois.",
+  "lore": "Aucune terre n’a accepté son corps. Alors il marche, et toutes les tombes s’ouvrent sur son passage.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "skull",
+   "body": "cloak",
+   "arms": "spread",
+   "horns": "crown",
+   "wings": "bone",
+   "halo": "spike"
+  },
+  "image": "assets/art/NEC-042.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Roi Sans Tombe — Roi squelettique aux ailes d’os, couronne d’ombre, manteau fait de linceuls de mille rois. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-043",
+  "number": 43,
+  "name": "Ereshkigal",
+  "title": "Reine du Pays sans retour",
+  "faction": "necrotique",
+  "rarity": "M",
+  "category": "Divinité mésopotamienne",
+  "power": 9,
+  "role": "M",
+  "stats": {
+   "atk": 7,
+   "def": 4,
+   "spd": 6,
+   "mag": 10,
+   "hp": 16,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   },
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Déesse au teint de cendre, couronne à cornes, assise dans un palais de lapis enfoui sous la poussière.",
+  "lore": "Sa sœur Inanna descendit chez elle. Elle la suspendit à un crochet. Les dieux négocient encore.",
+  "evolution": null,
+  "sets": [
+   "oublies"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral",
+   "special"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "gown",
+   "arms": "up",
+   "hair": true,
+   "horns": "crown",
+   "halo": "ring",
+   "scene": "temple"
+  },
+  "image": "assets/art/NEC-043.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ereshkigal — Déesse au teint de cendre, couronne à cornes, assise dans un palais de lapis enfoui sous la poussière. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "NEC-044",
+  "number": 44,
+  "name": "La Dernière Veillée",
+  "title": "Quand tout s’éteint",
+  "faction": "necrotique",
+  "rarity": "S",
+  "category": "Entité",
+  "power": 10,
+  "role": "U",
+  "stats": {
+   "atk": 6,
+   "def": 6,
+   "spd": 7,
+   "mag": 10,
+   "hp": 21,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "relic"
+   },
+   {
+    "key": "bless",
+    "value": 3
+   },
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Une lanterne dorée posée sur une tombe sans nom, dont la flamme dessine tous les visages des morts.",
+  "lore": "Quelqu’un veille sur les morts que tout le monde a oubliés. Cette carte prouve qu’elle existe.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "object",
+   "kind": "lantern",
+   "scene": "crypt"
+  },
+  "image": "assets/art/NEC-044.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : La Dernière Veillée — Une lanterne dorée posée sur une tombe sans nom, dont la flamme dessine tous les visages des morts. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. variante de collection : gravure dorée à l’eau-forte sur fond noir, finition luxueuse. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ }
+]

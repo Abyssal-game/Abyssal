@@ -1,0 +1,139 @@
+/* ABYSSAL — cartes : cadres par rareté, variantes cosmétiques, effets. */
+.tcg {
+  --rc: #A3ADBD; --fc: #888; --mx: 50%; --my: 50%;
+  position: relative; aspect-ratio: 300 / 420; border-radius: 4.6% / 3.3%;
+  overflow: hidden; background: #050507; isolation: isolate;
+  container-type: inline-size; user-select: none; -webkit-user-select: none;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .55);
+  transition: transform .18s ease, box-shadow .25s;
+}
+.tcg-mini { cursor: pointer; }
+.tcg-mini:active { transform: scale(.97); }
+@media (hover: hover) { .tcg-mini:hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(0, 0, 0, .7), 0 0 18px color-mix(in srgb, var(--rc) 35%, transparent); } }
+.tcg-art { position: absolute; inset: 0; z-index: 0; }
+.tcg-art img { width: 100%; height: 100%; object-fit: cover; background: #0B0C12; }
+.tcg-full .tcg-art img { transform: scale(1.04); transition: transform .3s; }
+.tcg-full.tilting .tcg-art img { transform: scale(1.08) translate(calc((50% - var(--mx)) / 12), calc((50% - var(--my)) / 12)); }
+
+/* Cadre à dégradé (bordure par masque) */
+.tcg-frame {
+  position: absolute; inset: 0; z-index: 4; border-radius: inherit; pointer-events: none;
+  padding: 2.6cqw; background: var(--frame, linear-gradient(160deg, #6B7383, #C9D1DE 40%, #4B5260 70%, #9AA3B2));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+.tcg::after { content: ''; position: absolute; inset: 2.6cqw; z-index: 4; border-radius: 3.4% / 2.5%; pointer-events: none; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .7), inset 0 0 0 2px color-mix(in srgb, var(--rc) 40%, transparent); }
+.r-PC { --frame: linear-gradient(160deg, #1F5A3A, #7FE0A6 35%, #1B4A30 60%, #5FD08F); }
+.r-R  { --frame: linear-gradient(160deg, #24426E, #D4E4FF 30%, #3D6FB4 55%, #8FC4FF 80%, #24426E); }
+.r-HR { --frame: linear-gradient(160deg, #4A1670, #E6A8FF 28%, #8E1E44 55%, #C266FF 80%, #3A0E52); }
+.r-M  { --frame: conic-gradient(from var(--ang, 0deg), #F6E2A0, #C8A45D, #FFF6D6, #B98A3C, #FFE9A8, #8FD8FF, #F6E2A0); }
+.r-S  { --frame: linear-gradient(160deg, #0C0B08, #E6C879 18%, #0C0B08 34%, #F6E2A0 52%, #0C0B08 70%, #C8A45D 88%, #0C0B08); }
+.r-HR .tcg-frame { animation: hrPulse 3.5s ease-in-out infinite; }
+@keyframes hrPulse { 50% { filter: brightness(1.35) saturate(1.2); } }
+@property --ang { syntax: '<angle>'; inherits: true; initial-value: 0deg; }
+.r-M .tcg-frame { animation: spinFrame 6s linear infinite; }
+@keyframes spinFrame { to { --ang: 360deg; } }
+.r-M, .r-S { box-shadow: 0 6px 18px rgba(0, 0, 0, .6), 0 0 22px color-mix(in srgb, var(--rc) 40%, transparent); }
+
+/* Éléments de la miniature */
+.tcg-cost {
+  position: absolute; z-index: 5; top: 4.5cqw; left: 4.5cqw; width: 15cqw; height: 15cqw; border-radius: 50%;
+  display: grid; place-items: center; font: 900 8.5cqw/1 var(--f-display); color: #FFF2D2;
+  background: radial-gradient(circle at 40% 30%, #7A2A9E, #2A0C3C 70%); border: .9cqw solid var(--gold); box-shadow: 0 0 2cqw rgba(0, 0, 0, .8);
+}
+.tcg-sig { position: absolute; z-index: 5; top: 4.5cqw; right: 4.5cqw; width: 15cqw; height: 15cqw; border-radius: 50%; display: grid; place-items: center; color: var(--fc); background: rgba(5, 6, 9, .78); border: .6cqw solid color-mix(in srgb, var(--fc) 60%, #000); }
+.tcg-sig .sigil { width: 70%; height: 70%; }
+.tcg-plate {
+  position: absolute; z-index: 5; left: 2.6cqw; right: 2.6cqw; bottom: 2.6cqw; padding: 13cqw 4cqw 4.2cqw;
+  display: flex; align-items: center; gap: 2.5cqw;
+  background: linear-gradient(180deg, transparent, rgba(4, 5, 8, .88) 45%, rgba(4, 5, 8, .97));
+}
+.tcg-nm { font: 700 8cqw/1.1 var(--f-display); letter-spacing: .02em; color: #F6EFE0; text-shadow: 0 1px 3px #000; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.tcg-gem {
+  flex: none; display: inline-grid; place-items: center; min-width: 11cqw; height: 11cqw; padding: 0 1.5cqw; border-radius: 3cqw;
+  font: 900 5.4cqw/1 var(--f-display); color: #0B0A08; background: linear-gradient(160deg, #fff, var(--rc) 45%, color-mix(in srgb, var(--rc) 50%, #000));
+  box-shadow: 0 0 3cqw color-mix(in srgb, var(--rc) 70%, transparent);
+}
+.tcg-count { position: absolute; z-index: 6; right: 4cqw; bottom: 22cqw; padding: 1.2cqw 2.6cqw; border-radius: 9cqw; background: rgba(5, 6, 9, .85); border: 1px solid var(--line); font: 700 6.5cqw/1 var(--f-ui); color: var(--gold-hi); }
+.tcg-new { position: absolute; z-index: 6; left: 50%; top: 4cqw; transform: translateX(-50%); padding: 1.4cqw 3cqw; border-radius: 9cqw; background: var(--blood); border: 1px solid #FF8197; font: 800 5.4cqw/1 var(--f-ui); letter-spacing: .06em; text-transform: uppercase; color: #fff; box-shadow: 0 0 4cqw rgba(255, 60, 90, .6); }
+.tcg-lock { position: absolute; z-index: 5; top: 4.5cqw; left: 4.5cqw; width: 14cqw; height: 14cqw; display: grid; place-items: center; color: var(--mute); }
+.tcg-lock .ic { width: 70%; height: 70%; }
+.is-mystery .tcg-nm { color: var(--mute); }
+.is-mystery { filter: saturate(.7); }
+.is-mystery .tcg-frame { opacity: .45; }
+
+/* Grand format */
+.tcg-full { width: 100%; max-width: 380px; margin: 0 auto; border-radius: 4.2% / 3%; will-change: transform; }
+.tcg-full .tcg-cost { width: 13cqw; height: 13cqw; font-size: 7.5cqw; top: 5cqw; left: 5cqw; }
+.tcg-head { position: absolute; z-index: 5; top: 2.6cqw; left: 2.6cqw; right: 2.6cqw; padding: 3cqw 4cqw 9cqw 19cqw; min-height: 23cqw; background: linear-gradient(180deg, rgba(4, 5, 8, .92), rgba(4, 5, 8, .6) 65%, transparent); display: flex; align-items: flex-start; }
+.tcg-head .tcg-sig { position: absolute; top: 2.4cqw; right: 2.4cqw; width: 13cqw; height: 13cqw; }
+.tcg-titles { display: flex; flex-direction: column; gap: .8cqw; min-width: 0; padding-right: 13cqw; }
+.tcg-full .tcg-nm { font-size: 6.6cqw; }
+.tcg-sub { font: italic 4.2cqw/1.2 var(--f-lore); color: #D8CDB6; }
+.tcg-body { position: absolute; z-index: 5; left: 2.6cqw; right: 2.6cqw; bottom: 2.6cqw; padding: 16cqw 5cqw 3.6cqw; background: linear-gradient(180deg, transparent, rgba(4, 5, 8, .86) 22%, rgba(4, 5, 8, .97)); }
+.tcg-type { font: 700 3.6cqw/1.2 var(--f-display); letter-spacing: .1em; text-transform: uppercase; color: color-mix(in srgb, var(--rc) 70%, #fff); margin-bottom: 1.8cqw; }
+.tcg-abil p { margin: 0 0 1.2cqw; font-size: 3.7cqw; line-height: 1.3; color: #E4DDCF; }
+.tcg-abil b { color: var(--gold-hi); font-weight: 700; }
+.tcg-lore { font: italic 3.6cqw/1.3 var(--f-lore); color: #BDB4A4; margin: 1.4cqw 0 2.2cqw; }
+.tcg-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.4cqw; margin-bottom: 2.4cqw; }
+.tcg-stats .st { display: flex; flex-direction: column; align-items: center; padding: 1.3cqw 0; border-radius: 2cqw; background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .07); }
+.tcg-stats b { font: 900 5cqw/1 var(--f-display); color: #fff; }
+.tcg-stats i { font: 700 2.8cqw/1.3 var(--f-ui); font-style: normal; color: var(--mute); letter-spacing: .06em; }
+.tcg-foot { display: flex; align-items: center; justify-content: space-between; gap: 2cqw; font: 600 3.2cqw/1 var(--f-ui); color: var(--mute); letter-spacing: .05em; }
+.tcg-foot .tcg-gem { min-width: 9cqw; height: 9cqw; font-size: 4.4cqw; }
+.tcg-hidden { font: italic 4.4cqw/1.3 var(--f-lore); color: var(--mute); text-align: center; margin: 0 0 3cqw; }
+
+/* Reflets */
+.tcg-shine, .tcg-glare { position: absolute; inset: 0; z-index: 3; pointer-events: none; border-radius: inherit; }
+.tcg-glare { background: radial-gradient(circle at var(--mx) var(--my), rgba(255, 255, 255, .28), transparent 45%); mix-blend-mode: overlay; opacity: 0; transition: opacity .3s; }
+.tcg-full.tilting .tcg-glare { opacity: 1; }
+.r-M .tcg-shine, .r-S .tcg-shine {
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 236, 180, .32) 47%, rgba(255, 255, 255, .45) 50%, rgba(255, 236, 180, .32) 53%, transparent 65%);
+  background-size: 260% 260%; background-position: var(--mx) var(--my); mix-blend-mode: screen; animation: sweep 5.5s ease-in-out infinite;
+}
+@keyframes sweep { 0%, 100% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } }
+.tcg-full.tilting .tcg-shine { animation: none; }
+
+/* Variantes cosmétiques */
+.v-holo .tcg-shine {
+  background:
+    repeating-linear-gradient(110deg, rgba(255, 0, 140, 0) 0%, rgba(255, 70, 160, .38) 5%, rgba(70, 220, 255, .38) 10%, rgba(255, 240, 90, .34) 15%, rgba(140, 255, 160, .3) 20%, rgba(255, 0, 140, 0) 26%),
+    radial-gradient(circle at var(--mx) var(--my), rgba(255, 255, 255, .35), transparent 50%);
+  background-size: 400% 400%, 100% 100%; background-position: var(--mx) var(--my), 0 0;
+  mix-blend-mode: color-dodge; opacity: .6; animation: holo 7s linear infinite;
+}
+@keyframes holo { 0% { background-position: 0% 50%, 0 0; } 100% { background-position: 400% 50%, 0 0; } }
+.tcg-full.v-holo.tilting .tcg-shine { animation: none; opacity: .8; }
+.v-chroma .tcg-art img { filter: hue-rotate(var(--hue)) saturate(1.5) contrast(1.05); }
+.v-chroma .tcg-frame { filter: hue-rotate(var(--hue)) saturate(1.4); }
+.v-corrupt .tcg-art img { filter: invert(.88) hue-rotate(160deg) saturate(1.6) contrast(1.25); }
+.v-corrupt .tcg-shine { background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .25) 0 1px, transparent 1px 3px), linear-gradient(transparent 60%, rgba(160, 255, 80, .18)); animation: glitch 2.6s steps(2) infinite; }
+@keyframes glitch { 0%, 92%, 100% { transform: none; } 94% { transform: translateX(2%); filter: hue-rotate(90deg); } 96% { transform: translateX(-1.5%); } }
+.v-corrupt { --frame: linear-gradient(160deg, #13200C, #9BFF5A 25%, #3A0A12 50%, #FF3A5A 75%, #13200C); }
+.v-ancestral .tcg-art img { filter: sepia(.85) saturate(1.3) contrast(1.15) brightness(.95); }
+.v-ancestral .tcg-shine { background: radial-gradient(circle at 30% 20%, rgba(255, 230, 170, .15), transparent 60%), repeating-radial-gradient(circle at 50% 50%, rgba(80, 50, 20, .08) 0 2px, transparent 2px 5px); mix-blend-mode: multiply; }
+.v-ancestral { --frame: linear-gradient(160deg, #3A2410, #D9A86A 30%, #6A4320 55%, #F2D39B 80%, #3A2410); }
+.v-special { --frame: linear-gradient(160deg, #F6E2A0, #8A6526 20%, #FFF6D6 40%, #B98A3C 60%, #FFF0C2 80%, #8A6526); box-shadow: 0 0 26px rgba(240, 200, 100, .55); }
+.v-special .tcg-shine { background: linear-gradient(120deg, transparent 30%, rgba(255, 230, 150, .5) 50%, transparent 70%); background-size: 300% 300%; mix-blend-mode: screen; animation: sweep 3.5s ease-in-out infinite; }
+.v-alt .tcg-art img { filter: saturate(1.15); }
+
+/* Dos de carte */
+.tcg-back {
+  position: relative; aspect-ratio: 300 / 420; border-radius: 4.6% / 3.3%; container-type: inline-size; overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(104, 59, 186, .35), transparent 55%),
+    repeating-conic-gradient(from 0deg, rgba(200, 164, 93, .06) 0 6deg, transparent 6deg 12deg),
+    linear-gradient(160deg, #191020, #07070B);
+  border: 2.4cqw solid #1E1810; box-shadow: inset 0 0 0 1cqw rgba(200, 164, 93, .5), 0 8px 20px rgba(0, 0, 0, .6);
+  display: grid; place-items: center;
+}
+.tcg-back .emblem { width: 62%; height: auto; filter: drop-shadow(0 0 4cqw rgba(200, 164, 93, .4)); }
+.tcg-back::after { content: 'ABYSSAL'; position: absolute; bottom: 7cqw; font: 900 7cqw/1 var(--f-display); letter-spacing: .3em; color: var(--gold); opacity: .8; }
+
+/* Grilles */
+.grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; }
+@media (min-width: 520px) { .grid-cards { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 12px; } }
+.grid-cards > .tcg { content-visibility: auto; contain-intrinsic-size: 140px 196px; }
+.strip { display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px 10px; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.strip::-webkit-scrollbar { display: none; }
+.strip > .tcg { flex: 0 0 104px; scroll-snap-align: start; }

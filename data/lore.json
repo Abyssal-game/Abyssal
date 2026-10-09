@@ -1,0 +1,44 @@
+{
+ "genesis": {
+  "title": "Le Premier Souffle",
+  "text": [
+   "Avant le temps, il n’existait que le Néant. Puis quelque chose s’éveilla.",
+   "De son premier souffle naquirent sept forces, et chaque force se donna un royaume : le feu qui consume, l’eau qui engloutit, la lumière qui juge, la faim qui chasse, la mort qui garde, la matière qui fonde, et la main qui façonne.",
+   "Certaines créatures furent adorées comme des dieux. D’autres furent enfermées derrière des portes que personne ne devait ouvrir. Pour tenir ces portes closes, les sept royaumes forgèrent ensemble le Bestiaire : un livre dont chaque page était un sceau, et chaque sceau une créature.",
+   "Aujourd’hui, les sceaux se brisent. Les pages se détachent et dérivent jusqu’à toi. Chaque carte que tu trouves est une page du Bestiaire interdit, et chaque page retrouvée rend un peu de sens à ce qui se passe."
+  ]
+ },
+ "chronicles": [
+  { "at": 1, "title": "I. La première page", "text": "Une page se détache toujours en premier. On dit que c’est la plus légère, celle qui tenait le moins. Ceux qui la trouvent entendent, pendant une seconde, un battement de cœur qui n’est pas le leur. Le Bestiaire t’a remarqué." },
+  { "at": 10, "title": "II. Les Sept Sceaux", "text": "Le Bestiaire fut scellé par sept gardiens, un par royaume. Chacun posa sa main sur la reliure et promit de ne jamais l’ouvrir. Les livres anciens disent qu’un seul d’entre eux a menti. Ils ne disent pas lequel." },
+  { "at": 25, "title": "III. La Chute", "text": "Le premier conflit opposa la Lumière à elle-même. Une partie des Sept Cieux se jeta vers le bas, entraînant ses anges dans la Géhenne naissante. La Chute dura neuf jours. Depuis, l’Infernal et le Céleste parlent la même langue et se haïssent dans le même accent." },
+  { "at": 50, "title": "IV. La Titanomachie", "text": "Les Titans des Terres d’Avant régnaient sur un monde encore tiède. Leurs enfants se révoltèrent et les enfermèrent sous les montagnes. Les Primordiaux n’ont jamais reconnu cette défaite : pour eux, dix mille ans ne sont qu’un repos un peu long." },
+  { "at": 80, "title": "V. Le Traité des Fosses", "text": "Les Abyssaux n’ont jamais combattu. Ils ont attendu que les autres s’épuisent, puis ont proposé un traité : la mer garderait tout ce qui y tombe. Depuis, chaque navire coulé, chaque cité engloutie et chaque noyé appartiennent légalement aux Fosses." },
+  { "at": 120, "title": "VI. La Grande Chasse", "text": "Quand les hommes bâtirent leurs premières villes, la Forêt Première lança la Grande Chasse : une nuit où toutes les bêtes du monde coururent ensemble. Les remparts tinrent jusqu’à l’aube. Les loups disent qu’ils n’ont fait que s’échauffer." },
+  { "at": 160, "title": "VII. La Forge Sans Maître", "text": "Le dernier artisan de la Forge s’appelait, dit-on, l’Horloger. Il construisit tant de serviteurs qu’ils finirent par se construire entre eux. Un matin, l’Horloger n’était plus là. La Forge n’a jamais cessé de produire, et personne ne sait pour qui." },
+  { "at": 200, "title": "VIII. Le Pays sans Retour", "text": "Les Nécrotiques ne conquièrent rien : ils attendent. Tout finit par leur revenir. Mais depuis que les sceaux cèdent, des morts reviennent dans l’autre sens, et le Roi Sans Tombe s’est mis en marche. Même la mort, cette fois, semble inquiète." },
+  { "at": 250, "title": "IX. Le Menteur", "text": "Le gardien qui a menti n’a pas ouvert le Bestiaire. Il a fait pire : il y a glissé une page de trop, une créature qui n’appartenait à aucun royaume. C’est elle qui ronge les sceaux de l’intérieur. Les Entités du Néant la reconnaissent. Elles l’appellent « le Rêveur »." },
+  { "at": 300, "title": "X. Avant la Lumière", "text": "Celui qui rassemble assez de pages finit par voir le motif : les sept royaumes ne se sont jamais battus pour gagner. Ils se battaient pour rester éveillés. Car si tous s’endorment en même temps, le Rêveur se réveille, et il ne reste que le Néant." },
+  { "at": "all", "title": "XI. Le Bestiaire refermé", "text": "Toutes les pages sont retrouvées. Le livre pèse soudain très lourd dans tes mains. Tu peux le refermer, et les sceaux tiendront encore mille ans. Ou tu peux tourner la dernière page, celle qui est blanche, et écrire le premier nom d’une créature que personne n’a encore imaginée." }
+ ],
+ "conflicts": [
+  { "title": "La Guerre de la Chute", "sides": ["infernal", "celeste"], "text": "Neuf jours de guerre entre les Sept Cieux et ceux qui les quittèrent. Les deux camps revendiquent la victoire. Les ruines des deux camps se ressemblent." },
+  { "title": "La Titanomachie", "sides": ["primordial", "celeste"], "text": "Les Titans contre leurs enfants. Les cieux se fendirent, les montagnes servirent de prisons, et l’Etna gronde encore de ce qui y fut enfermé." },
+  { "title": "Le Traité des Fosses", "sides": ["abyssal", "necrotique"], "text": "Une querelle de propriété : à qui appartiennent les noyés, à la mer ou à la mort ? Le traité les partage. Les noyés n’ont pas été consultés." },
+  { "title": "La Grande Chasse", "sides": ["sauvage", "artificiel"], "text": "La forêt contre ce qui la coupe. Les bêtes de la Forêt Première haïssent tout ce qui est forgé, et la Forge n’a jamais compris pourquoi." },
+  { "title": "Le Siège de Dis", "sides": ["infernal", "necrotique"], "text": "Les morts voulurent reprendre les âmes vendues aux démons. Le siège dure encore. Les deux camps facturent les intérêts." }
+ ],
+ "figures": [
+  { "name": "Le Rêveur Sous la Fosse", "text": "La page en trop. Il dort au fond de toutes les mers à la fois, et ses rêves prennent forme dans le monde éveillé." },
+  { "name": "Lilith", "text": "Elle était présente lorsque les sceaux furent posés. Elle sait lequel des sept gardiens a menti, et elle attend qu’on lui pose la question correctement." },
+  { "name": "Le Roi Sans Tombe", "text": "Aucune terre n’a accepté son corps. Il marche vers le Bestiaire, et chaque sceau brisé raccourcit son chemin." },
+  { "name": "L’Horloger", "text": "Le dernier artisan de la Forge Sans Maître. Ses automates le cherchent encore. L’Horloge de la Fin, peut-être, est son testament." },
+  { "name": "Le Gardien du Septième Ciel", "text": "Il garde la dernière porte. Il a reçu l’ordre de ne jamais l’ouvrir, mais personne ne lui a dit de l’autre côté de quelle porte il se trouvait." }
+ ],
+ "mysteries": [
+  { "set": "neant", "title": "Le motif", "text": "Les Entités du Néant ne sont pas des créatures. Ce sont des absences qui ont pris une forme pour pouvoir être enfermées." },
+  { "set": "peches", "title": "Le huitième péché", "text": "Les sept princes des péchés gardent un secret : il existe un huitième péché, celui d’avoir posé les sceaux. Ils ne disent pas qui l’a commis." },
+  { "set": "titans", "title": "Le sommeil des Titans", "text": "Les douze Titans ne sont pas emprisonnés. Ils dorment, volontairement, parce que leur sommeil tient le Rêveur endormi." },
+  { "set": "plaies", "title": "Les plaies n’étaient pas des punitions", "text": "Chaque plaie libérée a été un signal. Quelqu’un essaie de réveiller les royaumes, pour qu’ils restent éveillés." }
+ ]
+}

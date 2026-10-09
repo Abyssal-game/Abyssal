@@ -1,0 +1,58 @@
+[
+ {
+  "key": "infernal", "name": "Infernal", "realm": "Le Royaume de la Géhenne", "prefix": "INF",
+  "motto": "Tout se signe. Tout se paie.",
+  "desc": "Démons, seigneurs des cercles, pactes et corruption. La Géhenne est une cité de cuivre bâtie sur un fleuve de feu, où chaque promesse est consignée et chaque dette finit par être réclamée.",
+  "colors": { "primary": "#9F1834", "secondary": "#C8642A", "accent": "#C8A45D" },
+  "passive": { "name": "Courroux", "desc": "Une créature infernale blessée gagne +2 ATQ." },
+  "featured": "INF-052"
+ },
+ {
+  "key": "abyssal", "name": "Abyssal", "realm": "Le Royaume des Fosses", "prefix": "ABY",
+  "motto": "Ce qui coule ne remonte pas.",
+  "desc": "Léviathans, monstres marins et entités englouties. Sous la dernière mer se trouvent les Fosses, où la pression broie la lumière et où des choses très anciennes rêvent sans jamais se réveiller.",
+  "colors": { "primary": "#1C6F95", "secondary": "#35BDE5", "accent": "#AEB9CC" },
+  "passive": { "name": "Emprise", "desc": "Une créature blessée par une créature abyssale ne peut pas attaquer à son prochain tour." },
+  "featured": "ABY-046"
+ },
+ {
+  "key": "celeste", "name": "Céleste", "realm": "Les Sept Cieux", "prefix": "CEL",
+  "motto": "La lumière juge. La lumière pardonne rarement.",
+  "desc": "Anges, séraphins, gardiens du firmament et créatures lumineuses. Les Sept Cieux sont empilés comme les marches d’un escalier dont personne n’a vu le sommet depuis la Chute.",
+  "colors": { "primary": "#C8A45D", "secondary": "#E8E1D4", "accent": "#AEB9CC" },
+  "passive": { "name": "Purification", "desc": "À l’invocation, retire Venin et Emprise de vos créatures et leur rend 1 PV." },
+  "featured": "CEL-043"
+ },
+ {
+  "key": "sauvage", "name": "Sauvage", "realm": "La Forêt Première", "prefix": "SAU",
+  "motto": "Rien n’est plus ancien que la faim.",
+  "desc": "Chimères, bêtes mythologiques, lycanthropes et prédateurs primitifs. La Forêt Première couvrait tout avant les villes ; elle a seulement reculé, et elle se souvient de chaque arbre abattu.",
+  "colors": { "primary": "#2F5A2A", "secondary": "#73C66A", "accent": "#D8A848" },
+  "passive": { "name": "Meute", "desc": "+1 ATQ pour chaque autre créature sauvage alliée (maximum +3)." },
+  "featured": "SAU-048"
+ },
+ {
+  "key": "necrotique", "name": "Nécrotique", "realm": "Le Pays sans Retour", "prefix": "NEC",
+  "motto": "Rien ne meurt tout à fait.",
+  "desc": "Morts-vivants, spectres, vampires, liches et faucheurs. Le Pays sans Retour s’étend sous toutes les terres : chaque tombe en est une porte, et beaucoup de portes sont mal fermées.",
+  "colors": { "primary": "#4A3470", "secondary": "#683BBA", "accent": "#AEB9CC" },
+  "passive": { "name": "Moisson", "desc": "Chaque fois qu’une créature meurt, vos créatures nécrotiques gagnent +1 ATQ." },
+  "featured": "NEC-042"
+ },
+ {
+  "key": "primordial", "name": "Primordial", "realm": "Les Terres d’Avant", "prefix": "PRI",
+  "motto": "Nous étions là avant le temps.",
+  "desc": "Titans, dragons anciens, divinités originelles et forces de la création. Les Terres d’Avant ne figurent sur aucune carte : elles sont la carte, le relief sur lequel les autres royaumes ont été posés.",
+  "colors": { "primary": "#8A3A12", "secondary": "#C8A45D", "accent": "#E8E1D4" },
+  "passive": { "name": "Écrasement", "desc": "Les dégâts excédentaires infligés à une créature sont reportés sur le héros adverse." },
+  "featured": "PRI-051"
+ },
+ {
+  "key": "artificiel", "name": "Artificiel", "realm": "La Forge Sans Maître", "prefix": "ART",
+  "motto": "Ce qui est construit obéit. Jusqu’au jour où.",
+  "desc": "Golems, automates, créatures alchimiques et constructions maudites. La Forge Sans Maître tourne toute seule depuis que son dernier artisan a disparu, et elle continue de produire.",
+  "colors": { "primary": "#3A4A56", "secondary": "#35BDE5", "accent": "#B0763A" },
+  "passive": { "name": "Engrenage", "desc": "Chaque autre créature artificielle alliée réduit de 1 les dégâts qu’elle subit (maximum 2)." },
+  "featured": "ART-039"
+ }
+]

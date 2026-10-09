@@ -1,0 +1,2322 @@
+[
+ {
+  "id": "SAU-001",
+  "number": 1,
+  "name": "Loup des Brumes",
+  "title": "Il hurle sans bruit",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Bête",
+  "power": 2,
+  "role": "S",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 7,
+   "mag": 1,
+   "hp": 4,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Loup efflanqué au pelage de brouillard, yeux jaunes qui flottent dans la brume avant le reste du corps.",
+  "lore": "Les chasseurs entendent la meute. Ils ne voient qu’un seul loup. C’est pire.",
+  "evolution": {
+   "line": "hiver",
+   "name": "Lignée des Derniers Hivers",
+   "stage": 1,
+   "stages": 3
+  },
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "dog",
+   "tail": "bushy"
+  },
+  "image": "assets/art/SAU-001.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Loup des Brumes — Loup efflanqué au pelage de brouillard, yeux jaunes qui flottent dans la brume avant le reste du corps. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-002",
+  "number": 2,
+  "name": "Corbeaux Charognards",
+  "title": "Ils comptent les morts",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Essaim",
+  "power": 1,
+  "role": "S",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 7,
+   "mag": 0,
+   "hp": 4,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Volée de corbeaux aux plumes déchiquetées, tournoyant au-dessus d’un champ que personne n’a récolté.",
+  "lore": "Ils arrivent avant la bataille. Ils savent déjà qui va tomber.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "swarm",
+   "kind": "crow",
+   "count": 16
+  },
+  "image": "assets/art/SAU-002.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Corbeaux Charognards — Volée de corbeaux aux plumes déchiquetées, tournoyant au-dessus d’un champ que personne n’a récolté. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-003",
+  "number": 3,
+  "name": "Sanglier Ferreux",
+  "title": "Défenses de fer",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Bête",
+  "power": 3,
+  "role": "B",
+  "stats": {
+   "atk": 5,
+   "def": 1,
+   "spd": 5,
+   "mag": 1,
+   "hp": 8,
+   "cost": 3
+  },
+  "abilities": [],
+  "visual": "Sanglier massif au dos hérissé de soies d’acier, défenses noircies, groin couvert de cicatrices.",
+  "lore": "Il a mangé une armure. Il en a gardé le goût du métal.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "boar",
+   "spikes": true,
+   "size": "big",
+   "tail": "none"
+  },
+  "image": "assets/art/SAU-003.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Sanglier Ferreux — Sanglier massif au dos hérissé de soies d’acier, défenses noircies, groin couvert de cicatrices. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-004",
+  "number": 4,
+  "name": "Araignée des Racines",
+  "title": "Tisseuse du sous-bois",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Bête",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 1,
+   "def": 1,
+   "spd": 4,
+   "mag": 0,
+   "hp": 10,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Araignée grosse comme un chien, couleur d’écorce, tissant entre les racines des toiles couvertes de rosée.",
+  "lore": "Sa toile ressemble à un chemin. C’est exactement le but.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "insect",
+   "type": "spider",
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-004.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Araignée des Racines — Araignée grosse comme un chien, couleur d’écorce, tissant entre les racines des toiles couvertes de rosée. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-005",
+  "number": 5,
+  "name": "Vipère des Ronces",
+  "title": "Morsure verte",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Bête",
+  "power": 2,
+  "role": "S",
+  "stats": {
+   "atk": 4,
+   "def": 1,
+   "spd": 6,
+   "mag": 1,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Vipère émeraude aux écailles épineuses, petites cornes au-dessus des yeux, langue couleur de mûre.",
+  "lore": "Elle se cache dans les ronces. Les ronces la protègent : elles lui doivent leurs épines.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "serpent",
+   "horns": "short",
+   "scale": 0.7,
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-005.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Vipère des Ronces — Vipère émeraude aux écailles épineuses, petites cornes au-dessus des yeux, langue couleur de mûre. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-006",
+  "number": 6,
+  "name": "Hibou Mangeur d’Yeux",
+  "title": "Le regard volé",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Bête",
+  "power": 2,
+  "role": "M",
+  "stats": {
+   "atk": 1,
+   "def": 1,
+   "spd": 5,
+   "mag": 2,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Grand-duc aux plumes ébouriffées dont le disque facial porte, en guise d’yeux, deux regards humains.",
+  "lore": "Il ne mange que les yeux. Il en a une collection, et il s’en sert.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "owl",
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-006.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Hibou Mangeur d’Yeux — Grand-duc aux plumes ébouriffées dont le disque facial porte, en guise d’yeux, deux regards humains. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-007",
+  "number": 7,
+  "name": "Bouquetin Noir",
+  "title": "Maître des falaises",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Bête",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 4,
+   "mag": 1,
+   "hp": 9,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Bouquetin aux cornes immenses annelées, pelage noir comme l’ardoise, debout sur un rocher impossible.",
+  "lore": "Il garde les cols. Il ne laisse passer que ceux qui grimpent mieux que lui.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "goat",
+   "hooves": true,
+   "tail": "none",
+   "scene": "mountain"
+  },
+  "image": "assets/art/SAU-007.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Bouquetin Noir — Bouquetin aux cornes immenses annelées, pelage noir comme l’ardoise, debout sur un rocher impossible. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-008",
+  "number": 8,
+  "name": "Chacal des Tertres",
+  "title": "Rôdeur des tombes",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Bête",
+  "power": 2,
+  "role": "S",
+  "stats": {
+   "atk": 4,
+   "def": 1,
+   "spd": 6,
+   "mag": 1,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Chacal maigre aux oreilles immenses, pelage sable, qui rôde entre les tombes au crépuscule.",
+  "lore": "Les anciens Égyptiens voyaient ses semblables rôder près des nécropoles. Ils en firent un dieu.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "dog",
+   "size": "small",
+   "tail": "bushy",
+   "scene": "temple"
+  },
+  "image": "assets/art/SAU-008.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Chacal des Tertres — Chacal maigre aux oreilles immenses, pelage sable, qui rôde entre les tombes au crépuscule. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-009",
+  "number": 9,
+  "name": "Ours des Tourbières",
+  "title": "Le dormeur",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Bête",
+  "power": 3,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 3,
+   "spd": 4,
+   "mag": 2,
+   "hp": 12,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Ours colossal couvert de mousse et de champignons, dormant à moitié enfoui dans la tourbe.",
+  "lore": "Il dort depuis trois siècles. Ne marchez pas sur la mousse.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "bear",
+   "size": "big",
+   "tail": "none",
+   "scene": "swamp"
+  },
+  "image": "assets/art/SAU-009.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ours des Tourbières — Ours colossal couvert de mousse et de champignons, dormant à moitié enfoui dans la tourbe. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-010",
+  "number": 10,
+  "name": "Scarabée Cornu",
+  "title": "Carapace de jais",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Insecte",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 2,
+   "def": 2,
+   "spd": 4,
+   "mag": 2,
+   "hp": 8,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Scarabée géant à la carapace de jais irisée, corne recourbée comme une lame de faux.",
+  "lore": "Il a poussé un rocher pendant mille ans. Le rocher a fini par céder.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "insect",
+   "type": "scarab",
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-010.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Scarabée Cornu — Scarabée géant à la carapace de jais irisée, corne recourbée comme une lame de faux. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-011",
+  "number": 11,
+  "name": "Mante Fantôme",
+  "title": "Prière d’un instant",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Insecte",
+  "power": 3,
+  "role": "S",
+  "stats": {
+   "atk": 4,
+   "def": 0,
+   "spd": 8,
+   "mag": 2,
+   "hp": 7,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Mante religieuse pâle comme un spectre, pattes ravisseuses aiguisées comme des faux, yeux noirs immenses.",
+  "lore": "Elle semble prier. Elle ne prie pas.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "insect",
+   "type": "mantis",
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-011.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Mante Fantôme — Mante religieuse pâle comme un spectre, pattes ravisseuses aiguisées comme des faux, yeux noirs immenses. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-012",
+  "number": 12,
+  "name": "Wolpertinger",
+  "title": "Le lièvre impossible",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Chimère",
+  "power": 1,
+  "role": "S",
+  "stats": {
+   "atk": 2,
+   "def": 0,
+   "spd": 6,
+   "mag": 1,
+   "hp": 5,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Lièvre à bois de chevreuil et à petites ailes de faisan, dents de renard, regard malicieux.",
+  "lore": "Les Bavarois jurent qu’il existe. Les naturalistes jurent le contraire. Il s’en amuse.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "fox",
+   "wings": "feather",
+   "horns": "antler",
+   "size": "small",
+   "tail": "bushy",
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-012.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Wolpertinger — Lièvre à bois de chevreuil et à petites ailes de faisan, dents de renard, regard malicieux. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-013",
+  "number": 13,
+  "name": "Lynx des Lisières",
+  "title": "Patte de velours",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Bête",
+  "power": 2,
+  "role": "S",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 6,
+   "mag": 2,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Lynx aux oreilles pinceautées, pelage tacheté de lumière lunaire, regard qui traverse les feuillages.",
+  "lore": "Il a vu passer les sept royaumes. Il ne s’est jamais intéressé à aucun.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "cat",
+   "size": "small",
+   "tail": "none",
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-013.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Lynx des Lisières — Lynx aux oreilles pinceautées, pelage tacheté de lumière lunaire, regard qui traverse les feuillages. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-014",
+  "number": 14,
+  "name": "Mandragore",
+  "title": "Le cri qui tue",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Plante",
+  "power": 2,
+  "role": "M",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 6,
+   "mag": 3,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 1
+   }
+  ],
+  "visual": "Racine à forme humaine, bouche ouverte sur un cri silencieux, feuilles larges sur le crâne.",
+  "lore": "On l’arrache avec un chien attaché et les oreilles bouchées. Le chien, lui, n’a pas de bouchons.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "tree",
+   "type": "mandrake",
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-014.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Mandragore — Racine à forme humaine, bouche ouverte sur un cri silencieux, feuilles larges sur le crâne. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-015",
+  "number": 15,
+  "name": "Champignons Hurleurs",
+  "title": "Le cercle des fées",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Plante",
+  "power": 1,
+  "role": "T",
+  "stats": {
+   "atk": 2,
+   "def": 0,
+   "spd": 4,
+   "mag": 0,
+   "hp": 8,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "regen",
+    "value": 1
+   }
+  ],
+  "visual": "Cercle de champignons pâles aux chapeaux piquetés de lumière, deux yeux ouverts dans le tronc du plus grand.",
+  "lore": "Ne franchissez pas le cercle. Ou alors, ne revenez pas pour vous plaindre.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "tree",
+   "type": "fungal",
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-015.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Champignons Hurleurs — Cercle de champignons pâles aux chapeaux piquetés de lumière, deux yeux ouverts dans le tronc du plus grand. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-016",
+  "number": 16,
+  "name": "Hippogriffe",
+  "title": "Fils de l’impossible",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Chimère",
+  "power": 3,
+  "role": "S",
+  "stats": {
+   "atk": 4,
+   "def": 1,
+   "spd": 8,
+   "mag": 1,
+   "hp": 7,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Créature à l’avant d’aigle et à l’arrière de cheval, ailes rousses, serres et sabots mêlés.",
+  "lore": "L’Arioste le fit naître d’un griffon et d’une jument. On disait l’union impossible : d’où son nom.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "bird",
+   "wings": "feather",
+   "hooves": true,
+   "tail": "bushy"
+  },
+  "image": "assets/art/SAU-016.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Hippogriffe — Créature à l’avant d’aigle et à l’arrière de cheval, ailes rousses, serres et sabots mêlés. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-017",
+  "number": 17,
+  "name": "Meute de Rats",
+  "title": "Ils trouvent toujours",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Essaim",
+  "power": 1,
+  "role": "B",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 4,
+   "mag": 1,
+   "hp": 6,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Grouillement de rats aux yeux rouges, queues emmêlées en nœuds vivants, dents jaunies.",
+  "lore": "Un rat est un nuisible. Mille rats sont une marée.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "swarm",
+   "kind": "rat",
+   "count": 34
+  },
+  "image": "assets/art/SAU-017.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Meute de Rats — Grouillement de rats aux yeux rouges, queues emmêlées en nœuds vivants, dents jaunies. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-018",
+  "number": 18,
+  "name": "Kelpie",
+  "title": "Cheval des eaux",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Esprit des eaux",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 6,
+   "def": 1,
+   "spd": 9,
+   "mag": 1,
+   "hp": 8,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Cheval noir à la crinière ruisselante d’algues, dont la peau colle aux mains de qui le touche.",
+  "lore": "Les contes écossais disent qu’il invite les enfants sur son dos, puis plonge.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "horse",
+   "hooves": true,
+   "mane": true,
+   "tail": "bushy",
+   "scene": "swamp"
+  },
+  "image": "assets/art/SAU-018.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Kelpie — Cheval noir à la crinière ruisselante d’algues, dont la peau colle aux mains de qui le touche. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-019",
+  "number": 19,
+  "name": "Loup-garou",
+  "title": "Sous la lune pleine",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Lycanthrope",
+  "power": 5,
+  "role": "B",
+  "stats": {
+   "atk": 8,
+   "def": 1,
+   "spd": 7,
+   "mag": 3,
+   "hp": 12,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Homme-loup aux épaules difformes, vêtements déchirés, griffes longues comme des couteaux, gueule baveuse.",
+  "lore": "Il se souvient de chaque nuit. C’est ce qu’il y a de pire.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "claws": true,
+   "body": "bulky",
+   "legs": "goat",
+   "arms": "reach",
+   "tail": true,
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-019.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Loup-garou — Homme-loup aux épaules difformes, vêtements déchirés, griffes longues comme des couteaux, gueule baveuse. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-020",
+  "number": 20,
+  "name": "Nian",
+  "title": "La bête du Nouvel An",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Créature mythologique",
+  "power": 4,
+  "role": "B",
+  "stats": {
+   "atk": 6,
+   "def": 1,
+   "spd": 6,
+   "mag": 2,
+   "hp": 10,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Bête à crinière rouge et à corne unique, gueule immense, qui descend des montagnes à la fin de l’année.",
+  "lore": "Dans la tradition chinoise, le rouge et le bruit le font fuir. D’où les pétards. D’où les lanternes.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lion",
+   "mane": true,
+   "horns": "short",
+   "size": "big",
+   "tail": "lion"
+  },
+  "image": "assets/art/SAU-020.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Nian — Bête à crinière rouge et à corne unique, gueule immense, qui descend des montagnes à la fin de l’année. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-021",
+  "number": 21,
+  "name": "Baku",
+  "title": "Mangeur de cauchemars",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Yōkai",
+  "power": 3,
+  "role": "U",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 5,
+   "mag": 3,
+   "hp": 10,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "aegis"
+   }
+  ],
+  "visual": "Chimère à trompe de tapir, pattes de tigre et yeux de rhinocéros, qui dévore les mauvais rêves.",
+  "lore": "Au Japon, on l’appelait trois fois au réveil d’un cauchemar. Il a de moins en moins faim.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "boar",
+   "size": "big",
+   "tail": "none",
+   "hooves": true
+  },
+  "image": "assets/art/SAU-021.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Baku — Chimère à trompe de tapir, pattes de tigre et yeux de rhinocéros, qui dévore les mauvais rêves. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-022",
+  "number": 22,
+  "name": "Raijū",
+  "title": "Bête de la foudre",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Yōkai",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 6,
+   "def": 2,
+   "spd": 9,
+   "mag": 2,
+   "hp": 8,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   },
+   {
+    "key": "strike",
+    "value": 1
+   }
+  ],
+  "visual": "Loup-chat fait d’éclairs bleus, pelage crépitant, qui bondit des nuages lors des orages.",
+  "lore": "Il aime dormir dans le nombril des humains. Restez couverts pendant les orages.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "cat",
+   "tail": "bushy",
+   "tint": "#9fd8ff",
+   "scene": "sky"
+  },
+  "image": "assets/art/SAU-022.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Raijū — Loup-chat fait d’éclairs bleus, pelage crépitant, qui bondit des nuages lors des orages. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-023",
+  "number": 23,
+  "name": "Peryton",
+  "title": "L’ombre d’un homme",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Chimère",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 6,
+   "def": 1,
+   "spd": 8,
+   "mag": 3,
+   "hp": 9,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Cerf ailé au plumage vert sombre, dont l’ombre portée a la forme d’un homme.",
+  "lore": "Il cherche l’ombre qui lui appartient. Il croit la trouver en tuant un homme.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "stag",
+   "wings": "feather",
+   "hooves": true,
+   "tail": "none"
+  },
+  "image": "assets/art/SAU-023.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Peryton — Cerf ailé au plumage vert sombre, dont l’ombre portée a la forme d’un homme. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-024",
+  "number": 24,
+  "name": "Amarok",
+  "title": "Le loup solitaire",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Bête",
+  "power": 5,
+  "role": "B",
+  "stats": {
+   "atk": 8,
+   "def": 3,
+   "spd": 6,
+   "mag": 1,
+   "hp": 13,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Loup gigantesque chassant seul dans la toundra, pelage blanc saupoudré de givre, souffle visible.",
+  "lore": "Le folklore inuit le décrit comme un loup qui ne chasse jamais en meute. Il n’en a pas besoin.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "dog",
+   "size": "big",
+   "tail": "bushy",
+   "scene": "ice"
+  },
+  "image": "assets/art/SAU-024.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Amarok — Loup gigantesque chassant seul dans la toundra, pelage blanc saupoudré de givre, souffle visible. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-025",
+  "number": 25,
+  "name": "Catoblépas",
+  "title": "Le regard qui tue",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Bête",
+  "power": 4,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 4,
+   "spd": 4,
+   "mag": 2,
+   "hp": 13,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Buffle à la tête si lourde qu’elle traîne au sol, crinière sale cachant des yeux mortels.",
+  "lore": "Pline écrit que son regard tue. Heureusement, il a trop de mal à relever la tête.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "bull",
+   "size": "big",
+   "tail": "normal"
+  },
+  "image": "assets/art/SAU-025.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Catoblépas — Buffle à la tête si lourde qu’elle traîne au sol, crinière sale cachant des yeux mortels. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-026",
+  "number": 26,
+  "name": "Sanglier d’Érymanthe",
+  "title": "La quatrième épreuve",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Créature mythologique",
+  "power": 4,
+  "role": "B",
+  "stats": {
+   "atk": 5,
+   "def": 2,
+   "spd": 7,
+   "mag": 1,
+   "hp": 10,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Sanglier gigantesque aux défenses d’ivoire jauni, poil dru givré, qui ravage les flancs de l’Érymanthe.",
+  "lore": "Héraclès devait le ramener vivant. Il le poussa dans la neige jusqu’à l’épuiser.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "boar",
+   "spikes": true,
+   "size": "big",
+   "tail": "none",
+   "scene": "mountain"
+  },
+  "image": "assets/art/SAU-026.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Sanglier d’Érymanthe — Sanglier gigantesque aux défenses d’ivoire jauni, poil dru givré, qui ravage les flancs de l’Érymanthe. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-027",
+  "number": 27,
+  "name": "Loup Gris des Neiges",
+  "title": "Le chef de meute",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Bête",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 6,
+   "def": 1,
+   "spd": 9,
+   "mag": 3,
+   "hp": 7,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   },
+   {
+    "key": "command",
+    "value": 1
+   }
+  ],
+  "visual": "Loup massif à la crinière givrée, cicatrices sur le museau, qui mène une meute dans la tempête.",
+  "lore": "Un loup des brumes qui a survécu à trop d’hivers ne craint plus le froid. Il le commande.",
+  "evolution": {
+   "line": "hiver",
+   "name": "Lignée des Derniers Hivers",
+   "stage": 2,
+   "stages": 3
+  },
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "dog",
+   "size": "big",
+   "tail": "bushy",
+   "mane": true,
+   "scene": "ice"
+  },
+  "image": "assets/art/SAU-027.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Loup Gris des Neiges — Loup massif à la crinière givrée, cicatrices sur le museau, qui mène une meute dans la tempête. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-028",
+  "number": 28,
+  "name": "Jorōgumo",
+  "title": "La tisseuse de la cascade",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Yōkai",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 6,
+   "mag": 5,
+   "hp": 9,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   },
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Araignée géante au visage de femme fardée, pattes rayées d’or, toile tendue au-dessus d’une cascade.",
+  "lore": "Dans les contes japonais, elle joue du biwa pour attirer les voyageurs. La musique est très belle.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "insect",
+   "type": "spider",
+   "face": true,
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-028.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Jorōgumo — Araignée géante au visage de femme fardée, pattes rayées d’or, toile tendue au-dessus d’une cascade. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-029",
+  "number": 29,
+  "name": "La Famine Grise",
+  "title": "Troisième Plaie",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Fléau",
+  "power": 4,
+  "role": "B",
+  "stats": {
+   "atk": 6,
+   "def": 2,
+   "spd": 7,
+   "mag": 1,
+   "hp": 11,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Marée de rats gris qui recouvre les champs comme une moisissure, ne laissant derrière elle que des tiges nues.",
+  "lore": "Les greniers se vidèrent en une nuit. Les rats, eux, ne grossirent pas d’un gramme.",
+  "evolution": null,
+  "sets": [
+   "plaies"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "swarm",
+   "kind": "rat",
+   "count": 48
+  },
+  "image": "assets/art/SAU-029.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : La Famine Grise — Marée de rats gris qui recouvre les champs comme une moisissure, ne laissant derrière elle que des tiges nues. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-030",
+  "number": 30,
+  "name": "Kitsune",
+  "title": "Renarde à une queue",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Yōkai",
+  "power": 3,
+  "role": "M",
+  "stats": {
+   "atk": 2,
+   "def": 0,
+   "spd": 6,
+   "mag": 4,
+   "hp": 7,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Renarde rousse aux yeux d’ambre, une flamme bleue flottant au-dessus de sa queue unique.",
+  "lore": "Dans le folklore japonais, chaque siècle lui donne une queue de plus, et un peu plus de sagesse.",
+  "evolution": {
+   "line": "kitsune",
+   "name": "Lignée de la Renarde",
+   "stage": 1,
+   "stages": 2
+  },
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "fox",
+   "tail": "bushy",
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-030.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Kitsune — Renarde rousse aux yeux d’ambre, une flamme bleue flottant au-dessus de sa queue unique. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-031",
+  "number": 31,
+  "name": "Manticore",
+  "title": "Visage d’homme, faim de lion",
+  "faction": "sauvage",
+  "rarity": "R",
+  "category": "Chimère",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 3,
+   "spd": 7,
+   "mag": 2,
+   "hp": 14,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Lion rouge à visage humain, triple rangée de dents, queue de scorpion qui décoche des épines.",
+  "lore": "Son nom perse signifie « mangeur d’hommes ». Il ne ment pas sur son nom.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "human",
+   "mane": true,
+   "tail": "scorpion",
+   "size": "big"
+  },
+  "image": "assets/art/SAU-031.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Manticore — Lion rouge à visage humain, triple rangée de dents, queue de scorpion qui décoche des épines. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-032",
+  "number": 32,
+  "name": "Griffon",
+  "title": "Gardien de l’or",
+  "faction": "sauvage",
+  "rarity": "R",
+  "category": "Chimère",
+  "power": 6,
+  "role": "S",
+  "stats": {
+   "atk": 7,
+   "def": 2,
+   "spd": 10,
+   "mag": 3,
+   "hp": 11,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Corps de lion, tête et ailes d’aigle, serres dorées serrant une pépite grosse comme un poing.",
+  "lore": "Hérodote raconte qu’ils gardent l’or du nord. Ils ne savent pas ce qu’est l’argent, seulement ce qui brille.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "bird",
+   "wings": "feather",
+   "tail": "lion",
+   "size": "big"
+  },
+  "image": "assets/art/SAU-032.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Griffon — Corps de lion, tête et ailes d’aigle, serres dorées serrant une pépite grosse comme un poing. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-033",
+  "number": 33,
+  "name": "Minotaure",
+  "title": "Prisonnier du labyrinthe",
+  "faction": "sauvage",
+  "rarity": "R",
+  "category": "Créature mythologique",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 8,
+   "def": 2,
+   "spd": 7,
+   "mag": 2,
+   "hp": 13,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Colosse à tête de taureau dans les ruines d’un labyrinthe, hache double sur l’épaule, naseaux fumants.",
+  "lore": "Il est né prisonnier. Il a tué tous ceux qu’on lui envoyait. Personne ne lui a jamais demandé son avis.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "bull",
+   "body": "bulky",
+   "legs": "goat",
+   "arms": "staff",
+   "scene": "ruins"
+  },
+  "image": "assets/art/SAU-033.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Minotaure — Colosse à tête de taureau dans les ruines d’un labyrinthe, hache double sur l’épaule, naseaux fumants. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-034",
+  "number": 34,
+  "name": "Wendigo",
+  "title": "La faim de l’hiver",
+  "faction": "sauvage",
+  "rarity": "R",
+  "category": "Esprit",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 8,
+   "def": 3,
+   "spd": 7,
+   "mag": 3,
+   "hp": 15,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Silhouette décharnée aux bois de cerf, crâne de cervidé, peau tendue sur les os, cœur de glace visible.",
+  "lore": "Les récits algonquiens parlent d’une faim qui ne s’apaise jamais. Plus il mange, plus il maigrit.",
+  "evolution": null,
+  "sets": [
+   "fleaux"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "skull",
+   "horns": "antler",
+   "body": "lean",
+   "arms": "reach",
+   "claws": true,
+   "scene": "ice"
+  },
+  "image": "assets/art/SAU-034.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Wendigo — Silhouette décharnée aux bois de cerf, crâne de cervidé, peau tendue sur les os, cœur de glace visible. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-035",
+  "number": 35,
+  "name": "Basilic",
+  "title": "Le roi des serpents",
+  "faction": "sauvage",
+  "rarity": "R",
+  "category": "Créature mythologique",
+  "power": 6,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 2,
+   "spd": 7,
+   "mag": 7,
+   "hp": 12,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "fear"
+   },
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Petit serpent couronné d’une crête blanche, dont le regard pétrifie et dont le souffle dessèche les plantes.",
+  "lore": "Pline le décrit minuscule. Les siècles l’ont fait grandir. Son regard, lui, n’a pas changé.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "serpent",
+   "horns": "crown",
+   "scene": "temple"
+  },
+  "image": "assets/art/SAU-035.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Basilic — Petit serpent couronné d’une crête blanche, dont le regard pétrifie et dont le souffle dessèche les plantes. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-036",
+  "number": 36,
+  "name": "Lion de Némée",
+  "title": "La peau impénétrable",
+  "faction": "sauvage",
+  "rarity": "R",
+  "category": "Créature mythologique",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 5,
+   "spd": 4,
+   "mag": 2,
+   "hp": 20,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "armor",
+    "value": 2
+   }
+  ],
+  "visual": "Lion colossal dont la peau dorée repousse le bronze et le fer, crinière comme une couronne de flammes.",
+  "lore": "Héraclès dut l’étrangler à mains nues, puis le dépecer avec ses propres griffes.",
+  "evolution": null,
+  "sets": [
+   "fleaux"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lion",
+   "mane": true,
+   "tail": "lion",
+   "size": "big",
+   "scene": "mountain"
+  },
+  "image": "assets/art/SAU-036.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Lion de Némée — Lion colossal dont la peau dorée repousse le bronze et le fer, crinière comme une couronne de flammes. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-037",
+  "number": 37,
+  "name": "Bête du Gévaudan",
+  "title": "Trois ans de terreur",
+  "faction": "sauvage",
+  "rarity": "R",
+  "category": "Bête",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 9,
+   "def": 3,
+   "spd": 8,
+   "mag": 1,
+   "hp": 13,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   },
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Bête énorme au pelage roux zébré de noir, gueule immense, échine hérissée, qui guette à la lisière.",
+  "lore": "De 1764 à 1767, elle terrifia le Gévaudan. On l’a tuée, dit-on. On l’a dit plusieurs fois.",
+  "evolution": null,
+  "sets": [
+   "fleaux"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "dog",
+   "spikes": true,
+   "size": "big",
+   "tail": "bushy",
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-037.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Bête du Gévaudan — Bête énorme au pelage roux zébré de noir, gueule immense, échine hérissée, qui guette à la lisière. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-038",
+  "number": 38,
+  "name": "Tarasque",
+  "title": "Le dragon du Rhône",
+  "faction": "sauvage",
+  "rarity": "R",
+  "category": "Créature mythologique",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 6,
+   "spd": 5,
+   "mag": 3,
+   "hp": 17,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Monstre à tête de lion, carapace de tortue hérissée de pointes, six pattes d’ours et queue de scorpion.",
+  "lore": "La légende provençale dit qu’une sainte l’apprivoisa avec de l’eau bénite. Les habitants l’ont achevée quand même.",
+  "evolution": null,
+  "sets": [
+   "fleaux"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lion",
+   "spikes": true,
+   "tail": "scorpion",
+   "legs": 8,
+   "scene": "swamp"
+  },
+  "image": "assets/art/SAU-038.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Tarasque — Monstre à tête de lion, carapace de tortue hérissée de pointes, six pattes d’ours et queue de scorpion. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-039",
+  "number": 39,
+  "name": "Nue",
+  "title": "Le nuage qui miaule",
+  "faction": "sauvage",
+  "rarity": "R",
+  "category": "Yōkai",
+  "power": 5,
+  "role": "S",
+  "stats": {
+   "atk": 6,
+   "def": 2,
+   "spd": 9,
+   "mag": 3,
+   "hp": 9,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 2
+   }
+  ],
+  "visual": "Chimère à face de singe, corps de tanuki, pattes de tigre et queue de serpent, enveloppée de nuée noire.",
+  "lore": "Il rendit l’empereur malade chaque nuit, jusqu’à ce qu’un archer le touche dans le nuage.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "cat",
+   "tail": "snake",
+   "size": "big",
+   "scene": "sky"
+  },
+  "image": "assets/art/SAU-039.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Nue — Chimère à face de singe, corps de tanuki, pattes de tigre et queue de serpent, enveloppée de nuée noire. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-040",
+  "number": 40,
+  "name": "Le Prédateur Sans Ombre",
+  "title": "Rien ne le trahit",
+  "faction": "sauvage",
+  "rarity": "R",
+  "category": "Bête",
+  "power": 6,
+  "role": "S",
+  "stats": {
+   "atk": 7,
+   "def": 2,
+   "spd": 10,
+   "mag": 3,
+   "hp": 11,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   },
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Grand félin dont la silhouette se découpe en creux, comme si la forêt avait oublié de l’éclairer.",
+  "lore": "Il n’a pas d’ombre. Il n’a pas d’odeur. Il a seulement faim.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "cat",
+   "size": "big",
+   "tail": "normal",
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-040.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Prédateur Sans Ombre — Grand félin dont la silhouette se découpe en creux, comme si la forêt avait oublié de l’éclairer. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-041",
+  "number": 41,
+  "name": "Sphinx",
+  "title": "L’énigme ou la mort",
+  "faction": "sauvage",
+  "rarity": "HR",
+  "category": "Créature mythologique",
+  "power": 7,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 3,
+   "spd": 7,
+   "mag": 8,
+   "hp": 14,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Lionne ailée à visage de femme, coiffe tressée, assise sur un rocher couvert d’ossements.",
+  "lore": "Œdipe a résolu son énigme. Elle en a préparé une autre, depuis. Bien plus difficile.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "human",
+   "wings": "feather",
+   "tail": "lion",
+   "size": "big",
+   "scene": "temple"
+  },
+  "image": "assets/art/SAU-041.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Sphinx — Lionne ailée à visage de femme, coiffe tressée, assise sur un rocher couvert d’ossements. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-042",
+  "number": 42,
+  "name": "Chimère",
+  "title": "Trois bêtes, une seule faim",
+  "faction": "sauvage",
+  "rarity": "HR",
+  "category": "Chimère",
+  "power": 7,
+  "role": "B",
+  "stats": {
+   "atk": 9,
+   "def": 2,
+   "spd": 8,
+   "mag": 3,
+   "hp": 17,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 2
+   }
+  ],
+  "visual": "Lion crachant le feu, avec une tête de chèvre dressée sur le dos et un serpent pour queue.",
+  "lore": "Bellérophon la tua du haut de Pégase. Ses trois têtes ne se sont jamais mises d’accord sur sa mort.",
+  "evolution": null,
+  "sets": [
+   "fleaux"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lion",
+   "mane": true,
+   "tail": "snake",
+   "goat": true,
+   "fire": true,
+   "size": "big"
+  },
+  "image": "assets/art/SAU-042.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Chimère — Lion crachant le feu, avec une tête de chèvre dressée sur le dos et un serpent pour queue. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-043",
+  "number": 43,
+  "name": "Cerbère",
+  "title": "Gardien des Enfers",
+  "faction": "sauvage",
+  "rarity": "HR",
+  "category": "Créature mythologique",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 6,
+   "def": 7,
+   "spd": 6,
+   "mag": 3,
+   "hp": 24,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Chien colossal à trois têtes, crinière de serpents, queue de dragon, assis devant une porte de bronze.",
+  "lore": "Il laisse entrer tout le monde. C’est en sortant qu’on le découvre vraiment.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "dog",
+   "heads": 3,
+   "tail": "snake",
+   "mane": true,
+   "size": "big",
+   "scene": "inferno"
+  },
+  "image": "assets/art/SAU-043.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Cerbère — Chien colossal à trois têtes, crinière de serpents, queue de dragon, assis devant une porte de bronze. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-044",
+  "number": 44,
+  "name": "Hydre de Lerne",
+  "title": "Deux têtes pour une",
+  "faction": "sauvage",
+  "rarity": "HR",
+  "category": "Créature mythologique",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 6,
+   "def": 7,
+   "spd": 6,
+   "mag": 3,
+   "hp": 24,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "regen",
+    "value": 3
+   }
+  ],
+  "visual": "Serpent d’eau aux têtes multiples dressées au-dessus du marais, chaque cou repoussant en double.",
+  "lore": "Couper une tête en fait pousser deux. Héraclès dut brûler chaque cou tranché.",
+  "evolution": null,
+  "sets": [
+   "fleaux"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral",
+   "special"
+  ],
+  "art": {
+   "form": "serpent",
+   "heads": 7,
+   "fins": true,
+   "scene": "swamp"
+  },
+  "image": "assets/art/SAU-044.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Hydre de Lerne — Serpent d’eau aux têtes multiples dressées au-dessus du marais, chaque cou repoussant en double. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-045",
+  "number": 45,
+  "name": "Kyūbi no Kitsune",
+  "title": "Renarde aux neuf queues",
+  "faction": "sauvage",
+  "rarity": "HR",
+  "category": "Yōkai",
+  "power": 7,
+  "role": "M",
+  "stats": {
+   "atk": 6,
+   "def": 2,
+   "spd": 8,
+   "mag": 8,
+   "hp": 13,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   },
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Renarde blanche aux neuf queues déployées en éventail, flammes bleues dansant au bout de chacune.",
+  "lore": "Mille ans de ruse. Elle a été impératrice, courtisane et pierre. Elle a préféré chacune de ces vies.",
+  "evolution": {
+   "line": "kitsune",
+   "name": "Lignée de la Renarde",
+   "stage": 2,
+   "stages": 2
+  },
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "fox",
+   "tail": "many",
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-045.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Kyūbi no Kitsune — Renarde blanche aux neuf queues déployées en éventail, flammes bleues dansant au bout de chacune. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-046",
+  "number": 46,
+  "name": "La Reine des Ronces",
+  "title": "Couronne d’épines",
+  "faction": "sauvage",
+  "rarity": "HR",
+  "category": "Esprit de la forêt",
+  "power": 7,
+  "role": "U",
+  "stats": {
+   "atk": 4,
+   "def": 3,
+   "spd": 7,
+   "mag": 7,
+   "hp": 16,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "command",
+    "value": 1
+   },
+   {
+    "key": "regen",
+    "value": 2
+   }
+  ],
+  "visual": "Reine sylvestre à la robe de ronces vivantes, couronne d’épines, longs cheveux mêlés de lierre.",
+  "lore": "Elle a fermé la forêt aux hommes le jour où ils y ont apporté le premier feu.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "horns": "thorns",
+   "body": "gown",
+   "arms": "spread",
+   "hair": true,
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-046.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : La Reine des Ronces — Reine sylvestre à la robe de ronces vivantes, couronne d’épines, longs cheveux mêlés de lierre. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-047",
+  "number": 47,
+  "name": "Le Cerf aux Bois Inversés",
+  "title": "Racines dans le ciel",
+  "faction": "sauvage",
+  "rarity": "HR",
+  "category": "Esprit de la forêt",
+  "power": 7,
+  "role": "M",
+  "stats": {
+   "atk": 6,
+   "def": 3,
+   "spd": 8,
+   "mag": 9,
+   "hp": 12,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Cerf blanc immense dont les bois poussent vers le bas, s’enfonçant dans le sol comme des racines.",
+  "lore": "Il porte la forêt à l’envers. Là où il passe, les arbres se souviennent d’avant les hommes.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "stag",
+   "horns": "inverted",
+   "hooves": true,
+   "size": "big",
+   "tail": "none",
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-047.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Cerf aux Bois Inversés — Cerf blanc immense dont les bois poussent vers le bas, s’enfonçant dans le sol comme des racines. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-048",
+  "number": 48,
+  "name": "Le Loup des Derniers Hivers",
+  "title": "Le froid qui mord",
+  "faction": "sauvage",
+  "rarity": "M",
+  "category": "Bête primordiale",
+  "power": 9,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 3,
+   "spd": 8,
+   "mag": 3,
+   "hp": 18,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   },
+   {
+    "key": "frenzy"
+   },
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Loup titanesque au pelage d’aurore boréale, souffle qui gèle l’air, yeux comme deux étoiles mourantes.",
+  "lore": "Il viendra à la fin, quand le dernier feu s’éteindra. Il attend patiemment.",
+  "evolution": {
+   "line": "hiver",
+   "name": "Lignée des Derniers Hivers",
+   "stage": 3,
+   "stages": 3
+  },
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "dog",
+   "tail": "bushy",
+   "size": "big",
+   "mane": true,
+   "scene": "ice"
+  },
+  "image": "assets/art/SAU-048.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Loup des Derniers Hivers — Loup titanesque au pelage d’aurore boréale, souffle qui gèle l’air, yeux comme deux étoiles mourantes. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-049",
+  "number": 49,
+  "name": "Fenrir",
+  "title": "Le Loup enchaîné",
+  "faction": "sauvage",
+  "rarity": "M",
+  "category": "Bête primordiale",
+  "power": 10,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 5,
+   "spd": 10,
+   "mag": 4,
+   "hp": 20,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   },
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Loup gigantesque entravé par un lien fin comme un ruban, gueule ouverte du ciel jusqu’à la terre.",
+  "lore": "Les dieux nordiques l’ont lié avec Gleipnir. Tyr y a laissé sa main. Le lien commence à s’effilocher.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "dog",
+   "spikes": true,
+   "size": "big",
+   "tail": "bushy",
+   "chains": true,
+   "scene": "volcano"
+  },
+  "image": "assets/art/SAU-049.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Fenrir — Loup gigantesque entravé par un lien fin comme un ruban, gueule ouverte du ciel jusqu’à la terre. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ },
+ {
+  "id": "SAU-050",
+  "number": 50,
+  "name": "Le Premier Prédateur",
+  "title": "Avant la faim",
+  "faction": "sauvage",
+  "rarity": "S",
+  "category": "Bête primordiale",
+  "power": 10,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 5,
+   "spd": 9,
+   "mag": 4,
+   "hp": 20,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   },
+   {
+    "key": "devour"
+   },
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Le premier fauve, gravé dans l’or : crinière de rayons, griffes de lumière, regard qui a vu naître la peur.",
+  "lore": "Avant lui, rien ne fuyait. Toutes les bêtes de ce bestiaire portent un peu de sa trace.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "chroma",
+   "corrupt",
+   "alt",
+   "ancestral"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lion",
+   "mane": true,
+   "spikes": true,
+   "size": "big",
+   "tail": "bushy"
+  },
+  "image": "assets/art/SAU-050.webp",
+  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Premier Prédateur — Le premier fauve, gravé dans l’or : crinière de rayons, griffes de lumière, regard qui a vu naître la peur. Ambiance de la faction Sauvage : vert sombre, brun, ivoire et ambre ; forêts maudites, brumes, clair de lune. variante de collection : gravure dorée à l’eau-forte sur fond noir, finition luxueuse. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+ }
+]
