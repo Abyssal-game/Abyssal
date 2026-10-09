@@ -50,7 +50,7 @@
    "scale": 0.72
   },
   "image": "assets/art/INF-001.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Diablotin des Braises — Minuscule démon aux ailes de cuir troué, la peau craquelée de braises, un sourire trop large pour son visage. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Diablotin des Braises — Minuscule démon aux ailes de cuir troué, la peau craquelée de braises, un sourire trop large pour son visage. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-002",
@@ -94,7 +94,7 @@
    "tail": "normal"
   },
   "image": "assets/art/INF-002.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Molosse de Soufre — Chien des fournaises à la gueule fumante, côtes saillantes sous une peau de cendre, échine hérissée de pointes. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Molosse de Soufre — Chien des fournaises à la gueule fumante, côtes saillantes sous une peau de cendre, échine hérissée de pointes. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-003",
@@ -137,7 +137,7 @@
    "mouths": 2
   },
   "image": "assets/art/INF-003.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Larve de Géhenne — Masse grouillante et translucide où palpitent des visages à demi digérés, bouches ouvertes sur des dents de verre. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Larve de Géhenne — Masse grouillante et translucide où palpitent des visages à demi digérés, bouches ouvertes sur des dents de verre. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-004",
@@ -177,7 +177,7 @@
    "chains": true
   },
   "image": "assets/art/INF-004.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Bourreau à Chaînes — Colosse encapuchonné aux épaules de bœuf, dont les poignets traînent des chaînes rougies au feu. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Bourreau à Chaînes — Colosse encapuchonné aux épaules de bœuf, dont les poignets traînent des chaînes rougies au feu. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-005",
@@ -223,7 +223,7 @@
    "arms": "staff"
   },
   "image": "assets/art/INF-005.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Scribe des Pactes — Démon au crâne de bouc, voûté sur un registre relié de peau, une plume de fer fichée derrière la corne. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Scribe des Pactes — Démon au crâne de bouc, voûté sur un registre relié de peau, une plume de fer fichée derrière la corne. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-006",
@@ -268,7 +268,7 @@
    "arms": "reach"
   },
   "image": "assets/art/INF-006.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Collecteur de Dîme — Silhouette maigre au masque d’or terni, tendant une main gantée vers les vivants depuis un manteau sans corps. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Collecteur de Dîme — Silhouette maigre au masque d’or terni, tendant une main gantée vers les vivants depuis un manteau sans corps. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-007",
@@ -311,7 +311,7 @@
    "hair": true
   },
   "image": "assets/art/INF-007.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Âme Damnée — Spectre écorché par les flammes, bras levés vers un ciel qui ne répond pas, chevelure de fumée. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Âme Damnée — Spectre écorché par les flammes, bras levés vers un ciel qui ne répond pas, chevelure de fumée. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-008",
@@ -357,7 +357,7 @@
    "legs": 4
   },
   "image": "assets/art/INF-008.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Cracheur de Braise — Salamandre trapue aux écailles de charbon, la gorge gonflée de lave, crête dorsale rougeoyante. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Cracheur de Braise — Salamandre trapue aux écailles de charbon, la gorge gonflée de lave, crête dorsale rougeoyante. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-009",
@@ -401,7 +401,7 @@
    "tail": "none"
   },
   "image": "assets/art/INF-009.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Bouc Noir du Sabbat — Bouc aux yeux d’ambre et à la toison charbonneuse, cornes torsadées gravées de signes oubliés. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Bouc Noir du Sabbat — Bouc aux yeux d’ambre et à la toison charbonneuse, cornes torsadées gravées de signes oubliés. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-010",
@@ -446,7 +446,7 @@
    "leader": false
   },
   "image": "assets/art/INF-010.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Nuée de Mouches — Nuée bourdonnante de mouches aux yeux rouges qui, par instants, dessine un visage. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Nuée de Mouches — Nuée bourdonnante de mouches aux yeux rouges qui, par instants, dessine un visage. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-011",
@@ -488,7 +488,7 @@
    "kind": "lantern"
   },
   "image": "assets/art/INF-011.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Lanterne Hurlante — Lanterne de papier huilé dont l’âme captive hurle par une bouche déchirée, langue pendante. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Lanterne Hurlante — Lanterne de papier huilé dont l’âme captive hurle par une bouche déchirée, langue pendante. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-012",
@@ -531,7 +531,7 @@
    "arms": "sword"
   },
   "image": "assets/art/INF-012.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Gardien des Portes de Dis — Sentinelle en armure noire rivetée, heaume fendu d’une unique fente incandescente, épée plantée devant elle. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Gardien des Portes de Dis — Sentinelle en armure noire rivetée, heaume fendu d’une unique fente incandescente, épée plantée devant elle. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-013",
@@ -572,7 +572,7 @@
    "claws": true
   },
   "image": "assets/art/INF-013.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Tortionnaire Cornu — Démon émacié aux griffes démesurées, cornes brisées net, sourire en forme de lame. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Tortionnaire Cornu — Démon émacié aux griffes démesurées, cornes brisées net, sourire en forme de lame. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-014",
@@ -614,7 +614,7 @@
    "count": 20
   },
   "image": "assets/art/INF-014.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Chauves-souris de Cendre — Essaim de chauves-souris faites de cendre compacte, qui se défont en volutes grises à chaque battement d’aile. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Chauves-souris de Cendre — Essaim de chauves-souris faites de cendre compacte, qui se défont en volutes grises à chaque battement d’aile. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-015",
@@ -657,7 +657,7 @@
    "arms": "pray"
   },
   "image": "assets/art/INF-015.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Pénitent Brûlé — Moine de cendre agenouillé, la robe encore fumante, un chapelet de dents serré entre les doigts. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Pénitent Brûlé — Moine de cendre agenouillé, la robe encore fumante, un chapelet de dents serré entre les doigts. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-016",
@@ -698,7 +698,7 @@
    "type": "spider"
   },
   "image": "assets/art/INF-016.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Fileuse de Chaînes — Araignée de fer noirci dont les filières tissent des maillons rougis, toile de chaînes tendue dans la fumée. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Fileuse de Chaînes — Araignée de fer noirci dont les filières tissent des maillons rougis, toile de chaînes tendue dans la fumée. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-017",
@@ -744,7 +744,7 @@
    "arms": "down"
   },
   "image": "assets/art/INF-017.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Diable des Carrefours — Gentilhomme élancé au manteau noir, ombre beaucoup trop longue, yeux de braise sous un front cornu. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Diable des Carrefours — Gentilhomme élancé au manteau noir, ombre beaucoup trop longue, yeux de braise sous un front cornu. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-018",
@@ -790,7 +790,7 @@
    "hair": true
   },
   "image": "assets/art/INF-018.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Succube des Seuils — Démone aux ailes repliées comme une cape, longue chevelure noire, cornes recourbées ornées d’anneaux d’or. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Succube des Seuils — Démone aux ailes repliées comme une cape, longue chevelure noire, cornes recourbées ornées d’anneaux d’or. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-019",
@@ -835,7 +835,7 @@
    "arms": "spread"
   },
   "image": "assets/art/INF-019.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Incube des Songes — Démon longiligne aux ailes en lambeaux, cornes effilées, silhouette qui se dédouble quand on la fixe. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Incube des Songes — Démon longiligne aux ailes en lambeaux, cornes effilées, silhouette qui se dédouble quand on la fixe. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-020",
@@ -882,7 +882,7 @@
    "scene": "temple"
   },
   "image": "assets/art/INF-020.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ifrit des Sables Rouges — Géant de fumée au torse de braise, cornes d’obsidienne, le bas du corps dissous en tourbillon incandescent. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Ifrit des Sables Rouges — Géant de fumée au torse de braise, cornes d’obsidienne, le bas du corps dissous en tourbillon incandescent. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-021",
@@ -926,7 +926,7 @@
    "arms": "staff"
   },
   "image": "assets/art/INF-021.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Oni du Mont Ōe — Ogre colossal à la peau rouge sombre, deux cornes courtes, massue de fer cloutée posée sur l’épaule. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Oni du Mont Ōe — Ogre colossal à la peau rouge sombre, deux cornes courtes, massue de fer cloutée posée sur l’épaule. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-022",
@@ -970,7 +970,7 @@
    "arms": "reach"
   },
   "image": "assets/art/INF-022.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Rakshasa aux Paumes Inversées — Démon félin en armure ciselée, mains retournées paumes vers l’extérieur, crocs d’ivoire sous un regard doré. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Rakshasa aux Paumes Inversées — Démon félin en armure ciselée, mains retournées paumes vers l’extérieur, crocs d’ivoire sous un regard doré. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-023",
@@ -1016,7 +1016,7 @@
    "arms": "sword"
   },
   "image": "assets/art/INF-023.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Andras — Ange déchu à tête de corbeau, ailes de jais, épée nue à la main, cuirasse noire marquée d’un sceau. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Andras — Ange déchu à tête de corbeau, ailes de jais, épée nue à la main, cuirasse noire marquée d’un sceau. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-024",
@@ -1063,7 +1063,7 @@
    "size": "big"
   },
   "image": "assets/art/INF-024.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Marbas — Lion démesuré à la crinière de cendre, regard trop humain, griffes noires plantées dans la roche brûlante. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Marbas — Lion démesuré à la crinière de cendre, regard trop humain, griffes noires plantées dans la roche brûlante. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-025",
@@ -1111,7 +1111,7 @@
    "scene": "sky"
   },
   "image": "assets/art/INF-025.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Furfur — Grand cerf ailé à la queue enflammée, ramure noire crépitant d’éclairs. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Furfur — Grand cerf ailé à la queue enflammée, ramure noire crépitant d’éclairs. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-026",
@@ -1161,7 +1161,7 @@
    "size": "big"
   },
   "image": "assets/art/INF-026.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Molosse de Géhenne — Chien bicéphale aux mâchoires suintantes de soufre, musculature de forge et colliers de fer brisés. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Molosse de Géhenne — Chien bicéphale aux mâchoires suintantes de soufre, musculature de forge et colliers de fer brisés. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-027",
@@ -1208,7 +1208,7 @@
    "claws": true
   },
   "image": "assets/art/INF-027.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Démon des Fournaises — Démon massif aux bras couverts de cicatrices de forge, ailes trouées, cornes rabattues comme des lames. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Démon des Fournaises — Démon massif aux bras couverts de cicatrices de forge, ailes trouées, cornes rabattues comme des lames. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-028",
@@ -1254,7 +1254,7 @@
    "scene": "temple"
   },
   "image": "assets/art/INF-028.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Lamashtu — Démone à tête de lionne, serres d’oiseau à la place des pieds, corps décharné couvert de poils sombres. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Lamashtu — Démone à tête de lionne, serres d’oiseau à la place des pieds, corps décharné couvert de poils sombres. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-029",
@@ -1298,7 +1298,7 @@
    "crest": true
   },
   "image": "assets/art/INF-029.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Malphas — Immense corbeau aux plumes d’encre, perché sur des remparts qu’il a lui-même élevés. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Malphas — Immense corbeau aux plumes d’encre, perché sur des remparts qu’il a lui-même élevés. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-030",
@@ -1342,7 +1342,7 @@
    "tail": "bushy"
   },
   "image": "assets/art/INF-030.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Destrier de Cendres — Cheval noir au crin de flammes, sabots qui laissent des empreintes fondues, naseaux fumants. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Destrier de Cendres — Cheval noir au crin de flammes, sabots qui laissent des empreintes fondues, naseaux fumants. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-031",
@@ -1385,7 +1385,7 @@
    "head": "mask"
   },
   "image": "assets/art/INF-031.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Vierge de Fer — Sarcophage de fer à visage de femme, hérissé de pointes intérieures, qui marche sur des jambes articulées. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Vierge de Fer — Sarcophage de fer à visage de femme, hérissé de pointes intérieures, qui marche sur des jambes articulées. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-032",
@@ -1428,7 +1428,7 @@
    "scene": "inferno"
   },
   "image": "assets/art/INF-032.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ronce du Phlégéthon — Arbre noueux aux épines de verre volcanique, racines trempant dans un fleuve de feu, visage creusé dans l’écorce. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Ronce du Phlégéthon — Arbre noueux aux épines de verre volcanique, racines trempant dans un fleuve de feu, visage creusé dans l’écorce. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-033",
@@ -1481,7 +1481,7 @@
    "arms": "staff"
   },
   "image": "assets/art/INF-033.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Astaroth — Ange déchu au visage d’une beauté fanée, ailes en lambeaux, bâton coiffé d’un serpent, auréole hérissée. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Astaroth — Ange déchu au visage d’une beauté fanée, ailes en lambeaux, bâton coiffé d’un serpent, auréole hérissée. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-034",
@@ -1529,7 +1529,7 @@
    "arms": "sword"
   },
   "image": "assets/art/INF-034.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Bélial — Prince en armure d’ébène, cornes droites comme une couronne, épée longue et regard d’une froideur absolue. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Bélial — Prince en armure d’ébène, cornes droites comme une couronne, épée longue et regard d’une froideur absolue. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-035",
@@ -1575,7 +1575,7 @@
    "arms": "sword"
   },
   "image": "assets/art/INF-035.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Azazel — Déchu à tête de bouc, ailes sombres déployées, forge portative au flanc et épée trempée dans la nuit. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Azazel — Déchu à tête de bouc, ailes sombres déployées, forge portative au flanc et épée trempée dans la nuit. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-036",
@@ -1621,7 +1621,7 @@
    "face": true
   },
   "image": "assets/art/INF-036.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Bael — Corps d’araignée colossale surmonté de trois têtes : un crapaud, un homme couronné et un chat. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Bael — Corps d’araignée colossale surmonté de trois têtes : un crapaud, un homme couronné et un chat. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-037",
@@ -1670,7 +1670,7 @@
    "scene": "temple"
   },
   "image": "assets/art/INF-037.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Pazuzu — Démon à tête de chien grimaçante, quatre ailes, serres d’aigle et queue de scorpion, bras levé vers l’orage. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Pazuzu — Démon à tête de chien grimaçante, quatre ailes, serres d’aigle et queue de scorpion, bras levé vers l’orage. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-038",
@@ -1721,7 +1721,7 @@
    "arms": "staff"
   },
   "image": "assets/art/INF-038.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Méphistophélès — Courtisan maigre au sourire mince, cape écarlate doublée de flammes, parchemin scellé à la main. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Méphistophélès — Courtisan maigre au sourire mince, cape écarlate doublée de flammes, parchemin scellé à la main. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-039",
@@ -1768,7 +1768,7 @@
    "core": true
   },
   "image": "assets/art/INF-039.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Mammon — Démon obèse couronné d’or fondu, ventre ouvert sur un cœur de monnaies incandescentes. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Mammon — Démon obèse couronné d’or fondu, ventre ouvert sur un cœur de monnaies incandescentes. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-040",
@@ -1820,7 +1820,7 @@
    "legs": "goat"
   },
   "image": "assets/art/INF-040.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Belphégor — Démon barbu à cornes de bélier, avachi sur un trône percé, la barbe pleine de toiles et d’inventions oubliées. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Belphégor — Démon barbu à cornes de bélier, avachi sur un trône percé, la barbe pleine de toiles et d’inventions oubliées. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-041",
@@ -1869,7 +1869,7 @@
    "scene": "temple"
   },
   "image": "assets/art/INF-041.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Moloch — Idole de bronze à tête de taureau, bras tendus en offrande, ventre ouvert sur un brasier vivant. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Moloch — Idole de bronze à tête de taureau, bras tendus en offrande, ventre ouvert sur un brasier vivant. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-042",
@@ -1915,7 +1915,7 @@
    "halo": "spike"
   },
   "image": "assets/art/INF-042.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Juge de Cendres — Magistrat voilé au masque d’os sans bouche, balance de fer suspendue à son bâton, robe faite de cendre tassée. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Le Juge de Cendres — Magistrat voilé au masque d’os sans bouche, balance de fer suspendue à son bâton, robe faite de cendre tassée. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-043",
@@ -1969,7 +1969,7 @@
    "tail": true
   },
   "image": "assets/art/INF-043.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Prince des Fournaises — Seigneur démon aux ailes de flammes vives, cornes de bélier noircies, poitrail fendu de lave. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Prince des Fournaises — Seigneur démon aux ailes de flammes vives, cornes de bélier noircies, poitrail fendu de lave. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-044",
@@ -2023,7 +2023,7 @@
    "arms": "spread"
   },
   "image": "assets/art/INF-044.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Asmodée — Démon aux trois visages superposés (taureau, homme, bélier), pieds d’oie, queue de serpent et ailes déployées. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Asmodée — Démon aux trois visages superposés (taureau, homme, bélier), pieds d’oie, queue de serpent et ailes déployées. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-045",
@@ -2076,7 +2076,7 @@
    "claws": true
   },
   "image": "assets/art/INF-045.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Belzébuth — Colosse chitineux aux ailes de mouche translucides, couronne de neuf yeux à facettes, bouche en trompe. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Belzébuth — Colosse chitineux aux ailes de mouche translucides, couronne de neuf yeux à facettes, bouche en trompe. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-046",
@@ -2131,7 +2131,7 @@
    "halo": "ring"
   },
   "image": "assets/art/INF-046.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Baphomet — Idole à tête de bouc, flamme entre les cornes, un bras levé vers le haut et l’autre vers le bas, ailes immenses. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Baphomet — Idole à tête de bouc, flamme entre les cornes, un bras levé vers le haut et l’autre vers le bas, ailes immenses. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-047",
@@ -2183,7 +2183,7 @@
    "legs": "goat"
   },
   "image": "assets/art/INF-047.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Satan — Bête souveraine aux cornes de bélier, ailes de chauve-souris immenses, queue fouettant les flammes. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Satan — Bête souveraine aux cornes de bélier, ailes de chauve-souris immenses, queue fouettant les flammes. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-048",
@@ -2235,7 +2235,7 @@
    "halo": "spike"
   },
   "image": "assets/art/INF-048.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : La Mariée des Enfers — Femme en robe nuptiale noircie, voile de cendre, couronne d’épines dorées, bouquet de roses calcinées. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "La Mariée des Enfers — Femme en robe nuptiale noircie, voile de cendre, couronne d’épines dorées, bouquet de roses calcinées. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-049",
@@ -2285,7 +2285,7 @@
    "scene": "inferno"
   },
   "image": "assets/art/INF-049.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Dévoreur de Serments — Gueule circulaire suspendue dans le vide, couronnes de crocs concentriques, langue faite de parchemins. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Le Dévoreur de Serments — Gueule circulaire suspendue dans le vide, couronnes de crocs concentriques, langue faite de parchemins. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-050",
@@ -2333,7 +2333,7 @@
    "arms": "sword"
   },
   "image": "assets/art/INF-050.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Abaddon — Chevalier sans visage aux ailes de sauterelle, cuirasse couverte d’écailles, épée qui ouvre le sol. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Abaddon — Chevalier sans visage aux ailes de sauterelle, cuirasse couverte d’écailles, épée qui ouvre le sol. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-051",
@@ -2389,7 +2389,7 @@
    "halo": "ring"
   },
   "image": "assets/art/INF-051.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Lilith — Reine aux ailes de chouette, longue chevelure vivante, serpent enroulé au bras, regard d’une calme cruauté. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Lilith — Reine aux ailes de chouette, longue chevelure vivante, serpent enroulé au bras, regard d’une calme cruauté. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-052",
@@ -2444,7 +2444,7 @@
    "horns": "long"
   },
   "image": "assets/art/INF-052.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Lucifer — Empereur aux six ailes brûlées, couronne fondue sur un front cornu, armure noire veinée d’or incandescent. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Lucifer — Empereur aux six ailes brûlées, couronne fondue sur un front cornu, armure noire veinée d’or incandescent. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-053",
@@ -2500,7 +2500,7 @@
    "hornScale": 1.3
   },
   "image": "assets/art/INF-053.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Roi aux Mille Cornes — Titan démoniaque dont la tête disparaît sous une forêt de cornes torsadées, chacune prise à un vaincu. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Le Roi aux Mille Cornes — Titan démoniaque dont la tête disparaît sous une forêt de cornes torsadées, chacune prise à un vaincu. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-054",
@@ -2553,6 +2553,6 @@
    "halo": "ring"
   },
   "image": "assets/art/INF-054.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Lucifer, l’Étoile du Matin — L’ange originel dans sa gloire première : six ailes immaculées, auréole d’aube, visage encore sans ombre. Ambiance de la faction Infernal : rouge sang, noir, cuivre et or brûlé ; flammes, pactes, corruption. variante de collection : gravure dorée à l’eau-forte sur fond noir, finition luxueuse. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Lucifer, l’Étoile du Matin — L’ange originel dans sa gloire première : six ailes immaculées, auréole d’aube, visage encore sans ombre. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

@@ -43,7 +43,7 @@
    "pose": "stand"
   },
   "image": "assets/art/NEC-001.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Squelette Sentinelle — Squelette en armure rouillée, épée ébréchée plantée devant lui, flammes violettes dans les orbites. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Squelette Sentinelle — Squelette en armure rouillée, épée ébréchée plantée devant lui, flammes violettes dans les orbites. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-002",
@@ -85,7 +85,7 @@
    "count": 28
   },
   "image": "assets/art/NEC-002.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Rats de Charnier — Rats blafards aux queues pelées, yeux voilés de blanc, qui grouillent entre les ossements. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Rats de Charnier — Rats blafards aux queues pelées, yeux voilés de blanc, qui grouillent entre les ossements. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-003",
@@ -128,7 +128,7 @@
    "arms": "staff"
   },
   "image": "assets/art/NEC-003.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Fossoyeur Maudit — Vieillard décharné à la pelle rongée, capuche pleine de terre, lanterne accrochée à la ceinture. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Fossoyeur Maudit — Vieillard décharné à la pelle rongée, capuche pleine de terre, lanterne accrochée à la ceinture. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-004",
@@ -171,7 +171,7 @@
    "scene": "crypt"
   },
   "image": "assets/art/NEC-004.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Corbeau des Gibets — Corbeau aux plumes grises de poussière, perché sur une corde de potence, œil d’argent. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Corbeau des Gibets — Corbeau aux plumes grises de poussière, perché sur une corde de potence, œil d’argent. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-005",
@@ -215,7 +215,7 @@
    "arms": "wrap"
   },
   "image": "assets/art/NEC-005.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Pleureuse de Crypte — Spectre de femme voilée de noir, mains jointes sur le visage, larmes de cire figées sur les joues. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Pleureuse de Crypte — Spectre de femme voilée de noir, mains jointes sur le visage, larmes de cire figées sur les joues. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-006",
@@ -258,7 +258,7 @@
    "arms": "sword"
   },
   "image": "assets/art/NEC-006.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Chevalier Décharné — Chevalier à l’armure percée, crâne visible sous le heaume ouvert, épée tenue avec une discipline intacte. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Chevalier Décharné — Chevalier à l’armure percée, crâne visible sous le heaume ouvert, épée tenue avec une discipline intacte. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-007",
@@ -303,7 +303,7 @@
    "scale": 0.86
   },
   "image": "assets/art/NEC-007.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Goule des Ossuaires — Créature voûtée à la peau grise, mâchoire allongée, longues griffes noires couvertes de terre. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Goule des Ossuaires — Créature voûtée à la peau grise, mâchoire allongée, longues griffes noires couvertes de terre. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-008",
@@ -347,7 +347,7 @@
    "scene": "swamp"
   },
   "image": "assets/art/NEC-008.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Feu Follet — Flammes pâles dansant au ras des marais, chacune entourée d’un halo verdâtre. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Feu Follet — Flammes pâles dansant au ras des marais, chacune entourée d’un halo verdâtre. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-009",
@@ -390,7 +390,7 @@
    "scene": "crypt"
   },
   "image": "assets/art/NEC-009.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Poupée de Suaire — Poupée de chiffon cousue dans un linceul, boutons de nacre à la place des yeux, fils tendus vers le ciel. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Poupée de Suaire — Poupée de chiffon cousue dans un linceul, boutons de nacre à la place des yeux, fils tendus vers le ciel. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-010",
@@ -434,7 +434,7 @@
    "scene": "crypt"
   },
   "image": "assets/art/NEC-010.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Chien du Cimetière — Grand chien noir aux yeux de braise pâle, assis immobile au pied d’un clocher. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Chien du Cimetière — Grand chien noir aux yeux de braise pâle, assis immobile au pied d’un clocher. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-011",
@@ -476,7 +476,7 @@
    "arms": "reach"
   },
   "image": "assets/art/NEC-011.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Âme-en-Peine — Spectre translucide enveloppé d’un drap gris, bras tendus à tâtons, traîne effilochée. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Âme-en-Peine — Spectre translucide enveloppé d’un drap gris, bras tendus à tâtons, traîne effilochée. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-012",
@@ -521,7 +521,7 @@
    "scene": "swamp"
   },
   "image": "assets/art/NEC-012.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Zombi des Marais — Cadavre gonflé couvert de vase et de lentilles d’eau, mâchoire pendante, démarche lente et obstinée. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Zombi des Marais — Cadavre gonflé couvert de vase et de lentilles d’eau, mâchoire pendante, démarche lente et obstinée. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-013",
@@ -565,7 +565,7 @@
    "arms": "down"
   },
   "image": "assets/art/NEC-013.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Yūrei — Spectre japonais vêtu d’un kimono funéraire blanc, longs cheveux noirs défaits, mains pendantes sans pieds. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Yūrei — Spectre japonais vêtu d’un kimono funéraire blanc, longs cheveux noirs défaits, mains pendantes sans pieds. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-014",
@@ -607,7 +607,7 @@
    "scene": "crypt"
   },
   "image": "assets/art/NEC-014.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Larve de Tombe — Ver segmenté blafard aux mandibules d’os, qui fouit les cercueils en laissant des tunnels lisses. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Larve de Tombe — Ver segmenté blafard aux mandibules d’os, qui fouit les cercueils en laissant des tunnels lisses. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-015",
@@ -651,7 +651,7 @@
    "scene": "crypt"
   },
   "image": "assets/art/NEC-015.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Gargouille Funéraire — Gargouille de pierre moussue aux joues creusées de larmes, ailes repliées, posée sur un mausolée. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Gargouille Funéraire — Gargouille de pierre moussue aux joues creusées de larmes, ailes repliées, posée sur un mausolée. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-016",
@@ -694,7 +694,7 @@
    "arms": "down"
   },
   "image": "assets/art/NEC-016.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Revenant — Cadavre revenu de la tombe, manteau de voyage moisi, regard fixe sur une maison précise. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. composition sobre, créature de taille moyenne. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Revenant — Cadavre revenu de la tombe, manteau de voyage moisi, regard fixe sur une maison précise. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-017",
@@ -739,7 +739,7 @@
    "arms": "up"
   },
   "image": "assets/art/NEC-017.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Banshee — Femme spectrale aux cheveux blancs flottants, bouche ouverte sur un cri qui fait éclater les vitres. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Banshee — Femme spectrale aux cheveux blancs flottants, bouche ouverte sur un cri qui fait éclater les vitres. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-018",
@@ -784,7 +784,7 @@
    "scene": "ice"
   },
   "image": "assets/art/NEC-018.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Draugr — Guerrier nordique mort, enflé et bleui, gardant son tumulus couvert d’or avec une hache encore tranchante. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Draugr — Guerrier nordique mort, enflé et bleui, gardant son tumulus couvert d’or avec une hache encore tranchante. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-019",
@@ -829,7 +829,7 @@
    "hair": true
   },
   "image": "assets/art/NEC-019.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Strigoï — Revenant roumain à la peau grise, chevelure rousse, ongles longs et regard fiévreux sous la lune. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Strigoï — Revenant roumain à la peau grise, chevelure rousse, ongles longs et regard fiévreux sous la lune. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-020",
@@ -873,7 +873,7 @@
    "scene": "ruins"
   },
   "image": "assets/art/NEC-020.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Jiangshi — Cadavre raidi en robe de mandarin, bras tendus devant lui, talisman de papier collé sur le front. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Jiangshi — Cadavre raidi en robe de mandarin, bras tendus devant lui, talisman de papier collé sur le front. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-021",
@@ -920,7 +920,7 @@
    "claws": true
   },
   "image": "assets/art/NEC-021.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Vrykolakas — Revenant grec au visage mi-homme mi-loup, peau tendue comme un tambour, crocs jaunis. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Vrykolakas — Revenant grec au visage mi-homme mi-loup, peau tendue comme un tambour, crocs jaunis. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-022",
@@ -967,7 +967,7 @@
    "tint": "#ff4a6a"
   },
   "image": "assets/art/NEC-022.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Penanggalan — Tête de femme volant dans la nuit, entrailles luisantes pendant sous elle comme des lanternes. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Penanggalan — Tête de femme volant dans la nuit, entrailles luisantes pendant sous elle comme des lanternes. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-023",
@@ -1013,7 +1013,7 @@
    "arms": "wrap"
   },
   "image": "assets/art/NEC-023.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Mara — Créature spectrale accroupie sur le torse d’un dormeur, masque blafard, cheveux comme de la fumée. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Mara — Créature spectrale accroupie sur le torse d’un dormeur, masque blafard, cheveux comme de la fumée. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-024",
@@ -1056,7 +1056,7 @@
    "arms": "down"
   },
   "image": "assets/art/NEC-024.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Nukekubi — Corps endormi en kimono dont la tête manque, envolée dans la nuit pour chasser les insectes et pire. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Nukekubi — Corps endormi en kimono dont la tête manque, envolée dans la nuit pour chasser les insectes et pire. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-025",
@@ -1100,7 +1100,7 @@
    "scene": "crypt"
   },
   "image": "assets/art/NEC-025.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ossuaire Rampant — Amas mouvant d’ossements et de crânes, roulant sur lui-même, chaque orbite allumée d’un feu pâle. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Ossuaire Rampant — Amas mouvant d’ossements et de crânes, roulant sur lui-même, chaque orbite allumée d’un feu pâle. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-026",
@@ -1149,7 +1149,7 @@
    "wings": "tatter"
   },
   "image": "assets/art/NEC-026.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Chevalier des Gibets — Chevalier noir aux ailes en lambeaux de corde et de linceul, heaume cerclé de nœuds coulants. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Chevalier des Gibets — Chevalier noir aux ailes en lambeaux de corde et de linceul, heaume cerclé de nœuds coulants. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-027",
@@ -1197,7 +1197,7 @@
    "scene": "crypt"
   },
   "image": "assets/art/NEC-027.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ténèbres Palpables — Obscurité si épaisse qu’on peut la toucher, constellée d’yeux qui ne cillent pas. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. quelques accents lumineux, pose plus dynamique. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Ténèbres Palpables — Obscurité si épaisse qu’on peut la toucher, constellée d’yeux qui ne cillent pas. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-028",
@@ -1244,7 +1244,7 @@
    "arms": "down"
   },
   "image": "assets/art/NEC-028.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Dullahan — Cavalier irlandais sans tête, tenant la sienne à bout de bras, phosphorescente et grimaçante. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Dullahan — Cavalier irlandais sans tête, tenant la sienne à bout de bras, phosphorescente et grimaçante. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-029",
@@ -1293,7 +1293,7 @@
    "horns": "crown"
   },
   "image": "assets/art/NEC-029.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Liche — Sorcier mort à la couronne de fer, robe pourpre en lambeaux, bâton coiffé d’une gemme où dort son âme. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Liche — Sorcier mort à la couronne de fer, robe pourpre en lambeaux, bâton coiffé d’une gemme où dort son âme. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-030",
@@ -1338,7 +1338,7 @@
    "arms": "reach"
   },
   "image": "assets/art/NEC-030.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Onryō — Spectre de femme aux cheveux noirs ruisselants qui cachent tout sauf un œil, kimono blanc taché. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Onryō — Spectre de femme aux cheveux noirs ruisselants qui cachent tout sauf un œil, kimono blanc taché. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-031",
@@ -1385,7 +1385,7 @@
    "arms": "scythe"
   },
   "image": "assets/art/NEC-031.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ankou — Grand squelette en manteau et chapeau large, faux montée à l’envers, conduisant une charrette qui grince. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Ankou — Grand squelette en manteau et chapeau large, faux montée à l’envers, conduisant une charrette qui grince. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-032",
@@ -1431,7 +1431,7 @@
    "scene": "temple"
   },
   "image": "assets/art/NEC-032.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ammit — Créature à tête de crocodile, avant-train de lion et arrière d’hippopotame, assise près d’une balance. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Ammit — Créature à tête de crocodile, avant-train de lion et arrière d’hippopotame, assise près d’une balance. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-033",
@@ -1482,7 +1482,7 @@
    "halo": "ring"
   },
   "image": "assets/art/NEC-033.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Saint de la Peste — Médecin au masque à long bec, robe cirée, auréole noircie et bâton de bois pour écarter les malades. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Le Saint de la Peste — Médecin au masque à long bec, robe cirée, auréole noircie et bâton de bois pour écarter les malades. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-034",
@@ -1530,7 +1530,7 @@
    "scene": "swamp"
   },
   "image": "assets/art/NEC-034.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Charon — Vieillard émacié debout dans une barque noire, longue perche à la main, yeux comme des braises sous la capuche. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Charon — Vieillard émacié debout dans une barque noire, longue perche à la main, yeux comme des braises sous la capuche. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-035",
@@ -1579,7 +1579,7 @@
    "horns": "short"
   },
   "image": "assets/art/NEC-035.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Nosferatu — Vampire chauve aux oreilles pointues, dents de rat, doigts interminables dont l’ombre monte l’escalier. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Nosferatu — Vampire chauve aux oreilles pointues, dents de rat, doigts interminables dont l’ombre monte l’escalier. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-036",
@@ -1631,7 +1631,7 @@
    "crown": true
   },
   "image": "assets/art/NEC-036.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Roi des Gibets — Squelette couronné de fer, cape de linceul, entouré de cordes de potence qui se balancent sans vent. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. éclairage spectaculaire, effets lumineux marqués. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Roi des Gibets — Squelette couronné de fer, cape de linceul, entouré de cordes de potence qui se balancent sans vent. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-037",
@@ -1678,7 +1678,7 @@
    "pose": "giant"
   },
   "image": "assets/art/NEC-037.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Gashadokuro — Squelette colossal formé des os des morts de faim, mâchoire claquant dans la nuit, mains énormes. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Gashadokuro — Squelette colossal formé des os des morts de faim, mâchoire claquant dans la nuit, mains énormes. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-038",
@@ -1725,7 +1725,7 @@
    "scene": "crypt"
   },
   "image": "assets/art/NEC-038.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : La Tisseuse d’Ossements — Araignée géante à corps de vertèbres et à visage de femme sereine, tissant une toile de tendons et d’os. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "La Tisseuse d’Ossements — Araignée géante à corps de vertèbres et à visage de femme sereine, tissant une toile de tendons et d’os. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-039",
@@ -1772,7 +1772,7 @@
    "arms": "scythe"
   },
   "image": "assets/art/NEC-039.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Faucheur des Souvenirs — Faucheur au crâne de verre où tourbillonnent des images, faux de lumière froide qui ne coupe pas la chair. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Le Faucheur des Souvenirs — Faucheur au crâne de verre où tourbillonnent des images, faux de lumière froide qui ne coupe pas la chair. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-040",
@@ -1821,7 +1821,7 @@
    "wings": "bat"
   },
   "image": "assets/art/NEC-040.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Comte Dracula — Aristocrate pâle en cape noire doublée de rouge, crocs fins, ailes de chauve-souris ouvertes derrière lui. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Comte Dracula — Aristocrate pâle en cape noire doublée de rouge, crocs fins, ailes de chauve-souris ouvertes derrière lui. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-041",
@@ -1873,7 +1873,7 @@
    "scene": "ice"
   },
   "image": "assets/art/NEC-041.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Hel — Reine dont la moitié du corps est vivante et belle, l’autre morte et bleuie, trône de glace derrière elle. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. illustration premium, détails métalliques, effets magiques intenses. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Hel — Reine dont la moitié du corps est vivante et belle, l’autre morte et bleuie, trône de glace derrière elle. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-042",
@@ -1927,7 +1927,7 @@
    "halo": "spike"
   },
   "image": "assets/art/NEC-042.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Le Roi Sans Tombe — Roi squelettique aux ailes d’os, couronne d’ombre, manteau fait de linceuls de mille rois. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Le Roi Sans Tombe — Roi squelettique aux ailes d’os, couronne d’ombre, manteau fait de linceuls de mille rois. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-043",
@@ -1981,7 +1981,7 @@
    "scene": "temple"
   },
   "image": "assets/art/NEC-043.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : Ereshkigal — Déesse au teint de cendre, couronne à cornes, assise dans un palais de lapis enfoui sous la poussière. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. illustration plein cadre grandiose, lumière prismatique dorée, échelle divine. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "Ereshkigal — Déesse au teint de cendre, couronne à cornes, assise dans un palais de lapis enfoui sous la poussière. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-044",
@@ -2031,6 +2031,6 @@
    "scene": "crypt"
   },
   "image": "assets/art/NEC-044.webp",
-  "artPrompt": "Illustration originale de carte à collectionner dark fantasy, format vertical 5:7, sans texte ni logo. Sujet : La Dernière Veillée — Une lanterne dorée posée sur une tombe sans nom, dont la flamme dessine tous les visages des morts. Ambiance de la faction Nécrotique : noir, violet, argent et rouge sombre ; cryptes, brouillard, lune pâle. variante de collection : gravure dorée à l’eau-forte sur fond noir, finition luxueuse. Éclairage cinématographique en contre-jour, profondeur de champ, détails riches."
+  "artPrompt": "La Dernière Veillée — Une lanterne dorée posée sur une tombe sans nom, dont la flamme dessine tous les visages des morts. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]
