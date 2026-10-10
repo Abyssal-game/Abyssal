@@ -50,7 +50,19 @@ export const BOOSTERS = {
 };
 
 // Probabilité (%) qu'une carte tirée soit une variante cosmétique (multipliée par variantMult).
-export const VARIANT_RATES = { holo: 6, chroma: 2.5, corrupt: 1.5, alt: 1.5, ancestral: 1, gold: 0.6, galaxy: 0.4 };
+// Chance (en %) qu'une carte tirée sorte dans chaque variante. Volontairement rare :
+// le Rituel d'élévation est l'autre moyen de les obtenir.
+export const VARIANT_RATES = { holo: 2.5, chroma: 1, corrupt: 0.8, alt: 0.8, ancestral: 0.5, gold: 0.25, galaxy: 0.12 };
+
+// Rituel d'élévation : une carte monte d'un cran sur l'échelle en sacrifiant des doublons.
+export const RITUAL = {
+  ladder: ['normal', 'holo', 'chroma', 'gold', 'galaxy'],
+  perPoint: { holo: 4, chroma: 2.5, gold: 1.5, galaxy: 0.8 },   // % de réussite par point d'offrande
+  points: { C: 1, PC: 2, R: 5, HR: 12, M: 30, S: 60 },          // valeur d'une offrande
+  rarityMult: { C: 1.25, PC: 1.1, R: 1, HR: 0.8, M: 0.6, S: 0.5 }, // plus la carte est rare, plus c'est dur
+  fervor: 8,          // % gagnés à chaque échec (jusqu'à la réussite)
+  cap: 90, forbiddenMult: 2, forbiddenCap: 97,
+};
 
 export const VARIANTS = {
   normal:    { name: 'Normale',                  short: 'Normale' },
@@ -126,6 +138,7 @@ export const MISSIONS = [
   { key: 'rare',     kind: 'rare',     n: 2, shards: 60, text: 'Obtiens 2 cartes Rares ou mieux' },
   { key: 'variant',  kind: 'variant',  n: 1, shards: 60, text: 'Obtiens une variante (holographique, or…)' },
   { key: 'fuse',     kind: 'fuse',     n: 1, shards: 50, text: 'Fusionne des doublons' },
+  { key: 'ritual',   kind: 'ritual',   n: 1, shards: 60, text: 'Tente un rituel d’élévation' },
   { key: 'offering', kind: 'daily',    n: 1, shards: 30, text: 'Récupère l’offrande du jour' },
 ];
 export const MISSION_BONUS = { tickets: { standard: 1 } }; // les 3 missions du jour accomplies

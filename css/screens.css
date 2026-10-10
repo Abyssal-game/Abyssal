@@ -503,3 +503,48 @@ input[type="range"] { width: 100%; accent-color: var(--gold); min-height: 32px; 
 .rarest { display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: center; }
 
 button.tile { font: inherit; text-align: left; cursor: pointer; }
+
+/* ——— Rituel d'élévation ——— */
+.ritual h2 { display: flex; align-items: center; gap: 8px; }
+.ri-cards { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 6px 0 14px; }
+.ri-c { width: 118px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.ri-c .tcg { width: 100%; pointer-events: none; }
+.ri-arrow { color: var(--gold); }
+.ri-arrow .ic { width: 28px; height: 28px; }
+.ri-to .tcg { box-shadow: 0 0 22px rgba(240, 200, 120, .45); }
+.ri-chance { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; padding: 12px; border-radius: 14px; background: rgba(200, 164, 93, .07); border: 1px solid var(--line); }
+.ri-chance.forbidden { background: rgba(159, 24, 52, .14); border-color: rgba(255, 58, 90, .45); }
+.ri-chance .ring { width: 78px; height: 78px; }
+.ri-chance p { margin: 2px 0 0; }
+.ri-off { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line-soft); }
+.ri-on { display: flex; flex-direction: column; line-height: 1.2; }
+.ri-step { display: flex; align-items: center; gap: 10px; }
+.ri-step b { min-width: 22px; text-align: center; font: 700 1.05rem/1 var(--f-display); }
+.ri-step .icon-btn { width: 40px; height: 40px; font: 700 1.3rem/1 var(--f-ui); }
+.ri-step .icon-btn[disabled] { opacity: .3; }
+.ri-forbid { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 14px 0 10px; padding: 12px; border-radius: 14px; border: 1px dashed rgba(255, 58, 90, .45); background: rgba(159, 24, 52, .08); }
+.ri-forbid.on { background: rgba(159, 24, 52, .2); border-style: solid; }
+.ri-forbid p { margin: 2px 0 0; }
+.ri-circle { position: relative; width: min(70vw, 280px); margin: 16px auto 14px; display: grid; place-items: center; }
+.ri-runes { position: absolute; width: 150%; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
+  background: repeating-conic-gradient(from 0deg, rgba(240, 200, 120, .55) 0 2deg, transparent 2deg 15deg), radial-gradient(closest-side, transparent 62%, rgba(240, 200, 120, .45) 64%, transparent 67%, transparent 78%, rgba(240, 200, 120, .35) 80%, transparent 83%);
+  -webkit-mask: radial-gradient(closest-side, transparent 55%, #000 58%); mask: radial-gradient(closest-side, transparent 55%, #000 58%); animation: spin 6s linear infinite; }
+.ri-circle.forbidden .ri-runes { filter: hue-rotate(-40deg) saturate(2.4); }
+.ri-card { position: relative; width: 100%; animation: charge .1s linear infinite; }
+.ri-circle.won .ri-card, .ri-circle.failed .ri-card, .ri-circle.burnt .ri-card { animation: none; }
+.ri-circle.won .ri-runes { animation-duration: 1.5s; filter: brightness(1.6); }
+.ri-circle.won .ri-card { animation: riWon .8s cubic-bezier(.2, .9, .3, 1.3); }
+.ri-circle.failed .ri-card { filter: grayscale(.8) brightness(.6); transition: filter .6s; }
+.ri-circle.failed .ri-runes, .ri-circle.burnt .ri-runes { opacity: .15; animation-play-state: paused; }
+.ri-circle.burnt .ri-card { animation: riBurn 1.4s ease-in forwards; }
+@keyframes riWon { from { transform: scale(.85); filter: brightness(2.2); } to { transform: none; filter: none; } }
+@keyframes riBurn { 30% { filter: brightness(1.8) sepia(1) hue-rotate(-30deg) saturate(3); } to { opacity: 0; transform: translateY(-14%) scale(.92); filter: brightness(.2) sepia(1); } }
+.ri-ok { color: var(--gold-hi); font-family: var(--f-display); }
+.ri-ko { color: #FF8197; font-family: var(--f-display); }
+.ri-end { justify-content: center; }
+.var-odds { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 14px; margin: 6px 0 0; }
+.var-odds div { display: flex; justify-content: space-between; gap: 8px; font-size: .85rem; padding: 4px 0; border-bottom: 1px solid var(--line-soft); }
+
+.ri-cta { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; }
+.ri-cta p { margin: 2px 0 0; }
+.ri-cta b { display: inline-flex; align-items: center; gap: 6px; }

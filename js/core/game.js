@@ -1,6 +1,6 @@
 // État du joueur et règles de progression. Toute modification passe par ici
 // et est enregistrée immédiatement : une carte affichée est une carte sauvegardée.
-import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, FUSION, LUCK_POINTS } from '../config.js';
+import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, FUSION, LUCK_POINTS, RITUAL } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
 
@@ -285,14 +285,12 @@ export class Game {
   // Un doublon = un exemplaire normal en plus du premier (les variantes sont gardées).
   spare(id) { const e = this.s.collection[id]; return e ? Math.max(0, (e.v.normal || 0) - 1) : 0; }
   spareCount(r) { return this.catalog.byRarity[r].reduce((a, c) => a + this.spare(c.id), 0); }
-  fuse(r) {
-    const next = FUSION.next[r];
-    if (!next) throw new Error('Cette rareté ne peut pas être fusionnée.');
-    if (this.spareCount(r) < FUSION.cost) throw new Error(`Il faut ${FUSION.cost} doublons.`);
-    const donors = this.catalog.byRarity[r].filter((c) => this.spare(c.id) > 0).sort((a, b) => this.spare(b.id) - this.spare(a.id));
+  // Retire n doublons d'une rareté (en commençant par les cartes les plus doublées).
+  takeSpares(r, n, exclude = null) {
+    const donors = this.catalog.byRarity[r].filter((c) => c.id !== exclude && this.spare(c.id) > 0).sort((a, b) => this.spare(b.id) - this.spare(a.id));
     const used = [];
-    let left = FUSION.cost;
-    while (left > 0) {
+    let left = n;
+    while (left > 0 && donors.some((c) => this.spare(c.id) > 0)) {
       for (const c of donors) {
         if (!left) break;
         if (!this.spare(c.id)) continue;
@@ -300,6 +298,13 @@ export class Game {
         e.v.normal--; e.n--; left--; used.push(c.id);
       }
     }
+    return used;
+  }
+  fuse(r) {
+    const next = FUSION.next[r];
+    if (!next) throw new Error('Cette rareté ne peut pas être fusionnée.');
+    if (this.spareCount(r) < FUSION.cost) throw new Error(`Il faut ${FUSION.cost} doublons.`);
+    const used = this.takeSpares(r, FUSION.cost);
     const pool = this.catalog.byRarity[next];
     const weights = pool.map((c) => (this.owns(c.id) ? 1 : FUSION.unownedWeight));
     let x = this.rng() * weights.reduce((a, b) => a + b, 0);
@@ -311,6 +316,60 @@ export class Game {
     const progress = this.checkProgress();
     this.persist();
     return { id: pick.id, used, ...r2, progress };
+  }
+
+  // Rituel d'élévation -----------------------------------------------------
+  ritualTarget(id, from) {
+    const card = this.catalog.get(id);
+    const i = RITUAL.ladder.indexOf(from);
+    if (i < 0) return null;
+    return RITUAL.ladder.slice(i + 1).find((v) => card.variants.includes(v)) || null;
+  }
+  ritualSpare(r, id) { return this.spareCount(r) - (this.catalog.get(id).rarity === r ? this.spare(id) : 0); }
+  ritualChance(id, from, offer = {}, forbidden = false) {
+    const to = this.ritualTarget(id, from);
+    if (!to) return 0;
+    const card = this.catalog.get(id);
+    const pts = Object.entries(offer).reduce((a, [r, n]) => a + (RITUAL.points[r] || 0) * (n || 0), 0);
+    if (!pts) return 0;
+    let c = pts * RITUAL.perPoint[to] * RITUAL.rarityMult[card.rarity] + (this.s.fervor[`${id}:${to}`] || 0) * RITUAL.fervor;
+    c = forbidden ? Math.min(RITUAL.forbiddenCap, c * RITUAL.forbiddenMult) : Math.min(RITUAL.cap, c);
+    return Math.round(c * 10) / 10;
+  }
+  ritual(id, from, offer = {}, forbidden = false) {
+    const e = this.s.collection[id];
+    if (!e || !(e.v[from] > 0)) throw new Error('Tu ne possèdes pas cette carte dans cette version.');
+    const to = this.ritualTarget(id, from);
+    if (!to) throw new Error('Cette carte ne peut plus être élevée.');
+    for (const [r, n] of Object.entries(offer)) if (n > this.ritualSpare(r, id)) throw new Error('Pas assez de doublons pour cette offrande.');
+    const chance = this.ritualChance(id, from, offer, forbidden);
+    if (!chance) throw new Error('Choisis au moins une offrande.');
+    const used = Object.entries(offer).flatMap(([r, n]) => (n ? this.takeSpares(r, n, id) : []));
+    const success = this.rng() * 100 < chance;
+    const key = `${id}:${to}`;
+    let lost = false;
+    this.s.stats.rituals++;
+    this.track('ritual', 1);
+    if (success) {
+      e.v[from]--; e.v[to] = (e.v[to] || 0) + 1; e.isNew = true;
+      delete this.s.fervor[key];
+      this.s.stats.ritualsWon++;
+      this.s.xp += 30;
+    } else {
+      this.s.fervor[key] = (this.s.fervor[key] || 0) + 1;
+      if (forbidden) {
+        e.v[from]--; e.n--;
+        if (e.n <= 0) {
+          lost = true;
+          delete this.s.collection[id];
+          if (this.s.avatar === id) this.s.avatar = null;
+          this.s.showcase = this.s.showcase.filter((x) => x !== id);
+        }
+      }
+    }
+    const progress = this.checkProgress();
+    this.persist();
+    return { success, chance, to, used, lost, progress };
   }
 
   setTitle(t) { if (this.s.titles.includes(t)) { this.s.title = t; this.persist(); } }

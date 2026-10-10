@@ -1,6 +1,7 @@
 // Vue détaillée d'une carte (fenêtre plein écran) : grand format, variantes,
 // lore, capacités, lignée, ensembles, actions.
-import { RARITY, VARIANTS, ECONOMY } from '../config.js';
+import { RARITY, VARIANTS, ECONOMY, VARIANT_RATES } from '../config.js';
+import { openRitual } from './ritual.js';
 import { cardHTML, enableTilt, gyroAvailable, gyroOn, setGyro } from '../ui/card.js';
 import { boosterOdds } from '../core/boosters.js';
 import { openSheet, esc, toast, confirmBox, fmt, bindActions } from '../ui/dom.js';
@@ -24,6 +25,20 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
   const sheet = openSheet('', { full: true, cls: 'detail-sheet', label: 'Carte', onClose: () => { stopTilt(); app.refreshView && app.refreshView(); } });
 
   const odds = (card) => `Une chance sur <b>${oddsFor(cat, card).toLocaleString('fr-FR')}</b> de la trouver dans un booster standard (sans compter les garanties).`;
+  function variantOdds(card) {
+    const pCard = 1 / oddsFor(cat, card);
+    return Object.entries(VARIANT_RATES).filter(([v]) => card.variants.includes(v)).map(([v, pct]) => {
+      const n = Math.round(1 / (pCard * pct / 100));
+      return `<div><span>${esc(VARIANTS[v].name)}</span><b>1 / ${n.toLocaleString('fr-FR')}</b></div>`;
+    }).join('');
+  }
+  // Version à élever : celle affichée si elle est sur l'échelle du rituel, sinon la version normale.
+  function ritualFrom() {
+    const e = g.entry(current);
+    if (!e) return null;
+    for (const v of [shownVariant, 'normal', 'holo', 'chroma', 'gold']) if (e.v[v] > 0 && g.ritualTarget(current, v)) return v;
+    return null;
+  }
   function draw() {
     stopTilt();
     const card = cat.get(current);
@@ -70,6 +85,9 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
         <p class="lore big">« ${esc(card.lore)} »</p>
         <h3 class="section-title">Rareté</h3>
         <p>${odds(card)}</p>
+        <p class="small muted">Chance de la trouver dans une version spéciale, par booster standard :</p>
+        <div class="var-odds">${variantOdds(card)}</div>
+        ${ritualFrom() ? `<div class="panel ri-cta"><div><b>${icon('sparkle')} Rituel d’élévation</b><p class="small muted">Sacrifie des doublons pour la faire passer en ${esc(VARIANTS[g.ritualTarget(current, ritualFrom())].name.toLowerCase())}.</p></div><button class="btn primary small" data-act="ritual">Élever</button></div>` : ''}
         ${line ? `<h3 class="section-title">${esc(line.name)}</h3><div class="strip">${line.cards.map((c) => cardHTML(c, { mystery: !g.owns(c.id), nameKnown: g.nameKnown(c.id) })).join('')}</div><p class="small muted">Stade ${card.evolution.stage} sur ${card.evolution.stages}. Les stades sont des cartes distinctes à collectionner.</p>` : ''}
         ${sets.length ? `<h3 class="section-title">Ensembles</h3><div class="stack">${sets.map((s) => { const p = g.setProgress(s.key); return `<a class="set-link panel" href="#/succes/ensembles"><b>${esc(s.name)}</b><span class="small muted">${p.owned} / ${p.total}${p.done ? ' · complété' : ''}</span><span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span></a>`; }).join('')}</div>` : ''}`;
     } else {
@@ -108,6 +126,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     variant(el) { shownVariant = el.dataset.v; draw(); },
     avatar() { g.setAvatar(current); toast('Avatar mis à jour.', { icon: 'user' }); draw(); },
     showcase() { g.toggleShowcase(current); draw(); },
+    ritual() { openRitual(app, current, ritualFrom(), { onClose: () => { shownVariant = null; draw(); } }); },
     async gyro() {
       const want = !gyroOn();
       const on = await setGyro(want);

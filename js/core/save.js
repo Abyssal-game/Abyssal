@@ -31,9 +31,10 @@ export function defaultSave(now = Date.now()) {
     showcase: [],         // jusqu'à 3 cartes mises en avant
     daily: { last: null, streak: 0 },
     freePack: { stock: 1, since: now }, // booster standard gratuit rechargeable
-    stats: { boosters: 0, cards: 0, crafted: 0, daily: 0, ashEarned: 0, shardsSpent: 0, fused: 0, pulls: { C: 0, PC: 0, R: 0, HR: 0, M: 0, S: 0 }, expHR: 0, gotHR: 0 },
+    stats: { boosters: 0, cards: 0, crafted: 0, daily: 0, ashEarned: 0, shardsSpent: 0, fused: 0, rituals: 0, ritualsWon: 0, pulls: { C: 0, PC: 0, R: 0, HR: 0, M: 0, S: 0 }, expHR: 0, gotHR: 0 },
     missions: { day: null, list: [], bonus: false }, // missions du jour
     best: [],             // plus belles ouvertures (score décroissant)
+    fervor: {},           // 'id:variante' -> échecs de rituel accumulés
     history: [],          // dernières ouvertures
     recent: [],           // dernières découvertes (ids)
     settings: { sound: true, volume: 0.7, motion: 'auto', quality: 'auto', fastOpen: false, textSize: 'normal', contrast: false, dev: false },

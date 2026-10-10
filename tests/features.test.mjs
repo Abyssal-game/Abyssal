@@ -65,3 +65,34 @@ test('chance : statistiques et plus belles ouvertures', () => {
   assert.ok(g.s.best.length === 5);
   for (let i = 1; i < 5; i++) assert.ok(g.s.best[i - 1].score >= g.s.best[i].score);
 });
+
+test('rituel : chance calculée, réussite transforme la carte, échec augmente la ferveur', () => {
+  const always = new Game(catalog, new MemoryStorage(), { rng: () => 0, clock: () => new Date(2026, 9, 10) });
+  const target = catalog.byRarity.R[0];
+  always.addCard(target.id);
+  const commons = catalog.byRarity.C.slice(0, 4);
+  commons.forEach((c) => { for (let i = 0; i < 4; i++) always.addCard(c.id); }); // 12 doublons C
+  assert.equal(always.ritualTarget(target.id, 'normal'), 'holo');
+  assert.equal(always.ritualChance(target.id, 'normal', {}), 0);
+  assert.equal(always.ritualChance(target.id, 'normal', { C: 5 }), 20);
+  const r = always.ritual(target.id, 'normal', { C: 5 });
+  assert.ok(r.success);
+  assert.equal(always.entry(target.id).v.holo, 1);
+  assert.equal(always.entry(target.id).v.normal, 0);
+  assert.equal(always.spareCount('C'), 7);
+
+  const never = new Game(catalog, new MemoryStorage(), { rng: () => 0.999, clock: () => new Date(2026, 9, 10) });
+  never.addCard(target.id);
+  commons.forEach((c) => { for (let i = 0; i < 4; i++) never.addCard(c.id); });
+  const r2 = never.ritual(target.id, 'normal', { C: 2 });
+  assert.ok(!r2.success);
+  assert.equal(never.s.fervor[`${target.id}:holo`], 1);
+  assert.ok(never.owns(target.id));
+  assert.equal(never.ritualChance(target.id, 'normal', { C: 2 }), 16);
+  // rituel interdit raté : la carte est consumée
+  const r3 = never.ritual(target.id, 'normal', { C: 2 }, true);
+  assert.ok(r3.lost);
+  assert.ok(!never.owns(target.id));
+  // les C et PC n'ont pas de feuille d'or : chroma -> cosmique
+  assert.equal(never.ritualTarget(commons[0].id, 'chroma'), 'galaxy');
+});
