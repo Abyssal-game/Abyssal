@@ -135,3 +135,28 @@ test('descente : torches, étages, défaite, blessures et descente maudite', asy
   assert.ok(fight(strong, weak, rngFrom('x')).won);
   assert.deepEqual(floorDoors('2026-10-10', 5), ['boss']);
 });
+
+test('boutique d’objets : achat, limite, soin, torche, encens', () => {
+  const day = new Date(2026, 9, 10, 12);
+  const g = new Game(catalog, new MemoryStorage(), { rng: () => 0.999, clock: () => day });
+  g.s.shards = 5000;
+  const id = catalog.byRarity.C[0].id;
+  g.addCard(id);
+  g.s.descent.wounds[id] = day.getTime() + 3600000;
+  assert.ok(g.isWounded(id));
+  g.buyItem('baume'); g.useItem('baume', id);
+  assert.ok(!g.isWounded(id));
+  assert.throws(() => g.useItem('baume', id));
+  g.buyItem('torche'); g.buyItem('torche');
+  assert.throws(() => g.buyItem('torche'));
+  g.useItem('torche');
+  assert.equal(g.torchesLeft(), 4);
+  const t = catalog.byRarity.R[0].id;
+  g.addCard(t);
+  catalog.byRarity.C.slice(1, 3).forEach((c) => { g.addCard(c.id); g.addCard(c.id); });
+  const before = g.ritualChance(t, 'normal', { C: 1 });
+  g.buyItem('encens'); g.useItem('encens');
+  assert.equal(g.ritualChance(t, 'normal', { C: 1 }), before + 15);
+  g.ritual(t, 'normal', { C: 1 });
+  assert.equal(g.s.ritualBoost, 0);
+});

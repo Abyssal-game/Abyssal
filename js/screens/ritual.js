@@ -37,6 +37,7 @@ export function openRitual(app, id, from, { onClose } = {}) {
       </div>
       <div class="ri-chance ${forbidden ? 'forbidden' : ''}"><div class="ring" style="--p:${chance};--c:${forbidden ? '#FF3A5A' : 'var(--gold)'}"><span>${String(chance).replace('.', ',')}%</span></div>
         <div><b>Chance de réussite</b><p class="small muted">${fervor ? `Ferveur : +${fervor * RITUAL.fervor} % grâce à ${fervor} échec${fervor > 1 ? 's' : ''} précédent${fervor > 1 ? 's' : ''}.` : 'Chaque échec ajoute de la ferveur : la tentative suivante sera plus facile.'}</p></div></div>
+      ${g.s.ritualBoost ? `<p class="small ri-boost">${icon('sparkle')} Un encens de ferveur brûle : +${g.s.ritualBoost} % pour ce rituel.</p>` : g.itemCount('encens') ? `<button class="btn small" data-ri="encens">${icon('sparkle')}Brûler un encens (+15 %) · ${g.itemCount('encens')} en stock</button>` : ''}
       <h3 class="section-title">Offrandes</h3>
       ${rows || '<p class="small muted">Tu n’as aucun doublon à offrir. Ouvre des boosters pour en obtenir.</p>'}
       <div class="ri-forbid ${forbidden ? 'on' : ''}"><div><b>Rituel interdit</b><p class="small">Chance doublée. Mais si le rituel échoue, <b>cet exemplaire de ${esc(card.name)} est consumé</b>.</p></div>
@@ -96,6 +97,7 @@ export function openRitual(app, id, from, { onClose } = {}) {
     if (a === 'plus') { offer[k]++; app.sfx.tap(); draw(); }
     if (a === 'minus') { offer[k] = Math.max(0, offer[k] - 1); app.sfx.tap(); draw(); }
     if (a === 'forbid') { forbidden = !forbidden; draw(); }
+    if (a === 'encens') { try { g.useItem('encens'); app.sfx.discover(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } draw(); }
     if (a === 'go') go();
     if (a === 'again' || a === 'next') draw();
     if (a === 'close') sheet.close();

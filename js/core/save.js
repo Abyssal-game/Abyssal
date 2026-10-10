@@ -35,6 +35,9 @@ export function defaultSave(now = Date.now()) {
     missions: { day: null, list: [], bonus: false }, // missions du jour
     best: [],             // plus belles ouvertures (score décroissant)
     fervor: {},           // 'id:variante' -> échecs de rituel accumulés
+    items: {},            // objets possédés : clé -> nombre
+    itemBuys: { day: null },
+    ritualBoost: 0,       // bonus d'encens pour le prochain rituel
     descent: { day: null, used: 0, bestToday: 0, best: 0, runs: 0, team: [], run: null, wounds: {}, xp: {}, cursed: false },
     history: [],          // dernières ouvertures
     recent: [],           // dernières découvertes (ids)

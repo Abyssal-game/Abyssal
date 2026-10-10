@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v24';
+const VERSION = 'abyssal-v25';
 const CORE = [
   './', 'index.html', 'manifest.webmanifest',
   'css/base.css', 'css/card.css', 'css/screens.css',
@@ -11,7 +11,7 @@ const CORE = [
   'js/ui/dom.js', 'js/ui/icons.js', 'js/ui/card.js', 'js/ui/sound.js',
   'js/screens/home.js', 'js/screens/collection.js', 'js/screens/shop.js', 'js/screens/opening.js', 'js/screens/detail.js',
   'js/screens/bestiary.js', 'js/screens/factions.js', 'js/screens/achievements.js', 'js/screens/profile.js',
-  'js/screens/settings.js', 'js/screens/fusion.js', 'js/screens/ritual.js', 'js/screens/descent.js', 'js/core/descent.js',
+  'js/screens/settings.js', 'js/screens/fusion.js', 'js/screens/ritual.js', 'js/screens/descent.js', 'js/screens/items.js', 'js/core/descent.js',
   'data/factions.json', 'data/sets.json', 'data/abilities.json', 'data/achievements.json', 'data/lore.json',
   'data/cards/infernal.json', 'data/cards/abyssal.json', 'data/cards/celeste.json', 'data/cards/sauvage.json',
   'data/cards/necrotique.json', 'data/cards/primordial.json', 'data/cards/artificiel.json',

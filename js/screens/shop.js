@@ -1,3 +1,4 @@
+import { itemsShopHTML, bindItemShop } from './items.js';
 // Boutique : boosters achetables avec la monnaie du jeu uniquement.
 import { BOOSTERS, RARITIES, PITY, FACTION_ORDER, ECONOMY } from '../config.js';
 import { boosterOdds } from '../core/boosters.js';
@@ -113,6 +114,7 @@ export default function shop(app, root) {
         ${card('event', `<p class="event-line"><b>${esc(ev.name)}</b> · ${ev.factions.map((f) => esc(cat.faction[f].name)).join(' et ')}<br><span class="small muted">${esc(ev.desc)} Encore ${ev.daysLeft} jour${ev.daysLeft > 1 ? 's' : ''}.</span></p>`)}
         ${card('premium')}
       </div>
+      ${itemsShopHTML(g)}
       <p class="small muted center">Gagne des éclats avec les découvertes, l’offrande du jour, les succès, les ensembles, les niveaux et les boosters gratuits.</p>
     `;
   }
@@ -125,6 +127,7 @@ export default function shop(app, root) {
       openPack(app, type, { faction: type === 'faction' ? st.faction : undefined, onDone: () => render() });
     },
   });
+  bindItemShop(app, root, render);
   app.refreshView = render;
   const timer = setInterval(() => { if (!document.querySelector('.opening')) render(); }, 60000);
   return () => { app.refreshView = null; clearInterval(timer); };

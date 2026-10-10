@@ -1,6 +1,6 @@
 // État du joueur et règles de progression. Toute modification passe par ici
 // et est enregistrée immédiatement : une carte affichée est une carte sauvegardée.
-import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, FUSION, LUCK_POINTS, RITUAL } from '../config.js';
+import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, FUSION, LUCK_POINTS, RITUAL, ITEMS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
 import { DESCENT, makeUnit, fight, floorDoors, floorEnemies, roomLoot, blessingChoices, factionBonus, cardLevel } from './descent.js';
@@ -333,7 +333,7 @@ export class Game {
     const card = this.catalog.get(id);
     const pts = Object.entries(offer).reduce((a, [r, n]) => a + (RITUAL.points[r] || 0) * (n || 0), 0);
     if (!pts) return 0;
-    let c = pts * RITUAL.perPoint[to] * RITUAL.rarityMult[card.rarity] + (this.s.fervor[`${id}:${to}`] || 0) * RITUAL.fervor;
+    let c = pts * RITUAL.perPoint[to] * RITUAL.rarityMult[card.rarity] + (this.s.fervor[`${id}:${to}`] || 0) * RITUAL.fervor + (this.s.ritualBoost || 0);
     c = forbidden ? Math.min(RITUAL.forbiddenCap, c * RITUAL.forbiddenMult) : Math.min(RITUAL.cap, c);
     return Math.round(c * 10) / 10;
   }
@@ -347,6 +347,7 @@ export class Game {
     if (!chance) throw new Error('Choisis au moins une offrande.');
     const used = Object.entries(offer).flatMap(([r, n]) => (n ? this.takeSpares(r, n, id) : []));
     const success = this.rng() * 100 < chance;
+    this.s.ritualBoost = 0;
     const key = `${id}:${to}`;
     let lost = false;
     this.s.stats.rituals++;
@@ -541,6 +542,35 @@ export class Game {
     this.checkProgress();
     this.persist();
     return summary;
+  }
+
+  // Boutique d'objets --------------------------------------------------------
+  itemCount(k) { return this.s.items[k] || 0; }
+  boughtToday(k) { const b = this.s.itemBuys; return b.day === today(this.clock()) ? b[k] || 0 : 0; }
+  buyItem(k) {
+    const it = ITEMS[k];
+    if (!it) throw new Error('Objet inconnu.');
+    if (it.limit && this.boughtToday(k) >= it.limit) throw new Error(`Limite atteinte : ${it.limit} par jour.`);
+    if (this.s.shards < it.price) throw new Error('Pas assez d’éclats.');
+    this.s.shards -= it.price;
+    this.s.stats.shardsSpent += it.price;
+    this.s.items[k] = this.itemCount(k) + 1;
+    const day = today(this.clock());
+    if (this.s.itemBuys.day !== day) this.s.itemBuys = { day };
+    this.s.itemBuys[k] = (this.s.itemBuys[k] || 0) + 1;
+    this.persist();
+  }
+  useItem(k, target = null) {
+    if (!this.itemCount(k)) throw new Error('Tu n’as pas cet objet.');
+    const d = this.descent();
+    if (k === 'baume') { if (!this.isWounded(target)) throw new Error('Cette carte n’est pas blessée.'); delete d.wounds[target]; }
+    else if (k === 'elixir') { const n = Object.keys(d.wounds).filter((id) => this.isWounded(id)).length; if (!n) throw new Error('Aucune carte blessée.'); d.wounds = {}; }
+    else if (k === 'torche') d.used--;
+    else if (k === 'encens') { if (this.s.ritualBoost) throw new Error('Un encens brûle déjà pour ton prochain rituel.'); this.s.ritualBoost = 15; }
+    else if (k === 'parchemin') { if (!this.owns(target)) throw new Error('Choisis une carte que tu possèdes.'); d.xp[target] = (d.xp[target] || 0) + 60; }
+    else throw new Error('Objet inconnu.');
+    this.s.items[k]--;
+    this.persist();
   }
 
   setTitle(t) { if (this.s.titles.includes(t)) { this.s.title = t; this.persist(); } }

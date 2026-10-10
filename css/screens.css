@@ -654,3 +654,21 @@ button.tile { font: inherit; text-align: left; cursor: pointer; }
 .dc-ord { position: absolute; z-index: 8; top: -6px; right: -6px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font: 900 .85rem/1 var(--f-display); background: var(--gold-hi); color: #1A1206; }
 .dc-pow { position: absolute; z-index: 7; top: 4px; left: 4px; padding: 2px 6px; border-radius: 8px; font: 700 .66rem/1.2 var(--f-ui); background: rgba(0, 0, 0, .75); color: #fff; }
 .dc-ok { position: sticky; bottom: calc(10px + var(--safe-b)); }
+
+/* ——— Objets ——— */
+.items { display: grid; gap: 10px; margin-bottom: 14px; }
+.item { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 12px 14px; }
+.item p { margin: 2px 0 4px; }
+.item-ic { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; color: var(--gold-hi); background: radial-gradient(circle at 40% 30%, rgba(200, 164, 93, .3), rgba(8, 9, 13, .9)); border: 1px solid var(--line); }
+.item-ic .ic { width: 26px; height: 26px; }
+.item-ic.sm { width: 32px; height: 32px; border-radius: 9px; }
+.item-ic.sm .ic { width: 18px; height: 18px; }
+.item .btn { white-space: nowrap; }
+.bag { margin-top: 12px; }
+.bag h3 { margin: 0; display: flex; align-items: center; gap: 6px; }
+.bag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.bag-it { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px 6px 6px; border-radius: 12px; color: var(--ink); background: rgba(255, 255, 255, .04); border: 1px solid var(--line); font-size: .85rem; }
+.bag-it b { color: var(--gold-hi); }
+.pick-c { position: relative; cursor: pointer; }
+.pick-c .tcg { pointer-events: none; }
+.ri-boost { color: var(--gold-hi); }

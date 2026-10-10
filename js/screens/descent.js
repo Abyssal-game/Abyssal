@@ -5,6 +5,7 @@ import { cardHTML, lazyArt } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
 import { icon } from '../ui/icons.js';
 import { esc, fmt, toast, openSheet, confirmBox, bindActions } from '../ui/dom.js';
+import { bagHTML, bindBag } from './items.js';
 
 const ROOM_ICON = { fight: 'swords', elite: 'skull', altar: 'star', rest: 'heart', treasure: 'crystal', boss: 'crown' };
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -41,6 +42,7 @@ export default function descent(app, root) {
       }).join('')}</div>
       <p class="small muted">${team.length ? `Puissance ${fmt(units.reduce((a, u) => a + unitPower(u), 0))}${fb.bonus ? ` · bonus ${esc(cat.faction[fb.faction].name)} +${Math.round(fb.bonus * 100)} % (${fb.n} cartes)` : ' · 3 cartes d’une même faction donnent un bonus'}` : 'Choisis jusqu’à 6 cartes. Les variantes et les niveaux rendent tes cartes plus fortes.'}</p>
       <button class="btn block" data-act="team">${icon('cards')}Composer l’équipe</button>
+      ${bagHTML(g)}
       <div class="ri-forbid dc-curse ${ui.cursed ? 'on' : ''}"><div><b>${icon('skull')} Descente maudite</b><p class="small">Butin <b>doublé</b>. Mais une carte qui tombe est <b>perdue</b> (un exemplaire quitte ta collection).</p></div>
         <button class="switch" role="switch" aria-checked="${ui.cursed}" data-act="curse" aria-label="Descente maudite"><i></i></button></div>
       <button class="btn ${ui.cursed ? 'danger' : 'primary'} block big-cta" data-act="start" ${torches && ready >= 3 ? '' : 'disabled'}>${icon('flame')}${torches ? 'Allumer une torche et descendre' : 'Plus de torche : reviens demain'}</button>
@@ -283,6 +285,7 @@ export default function descent(app, root) {
     share() { share(); },
     dismiss() { ui.outcome = null; render(); },
   });
+  bindBag(app, root, () => { if (!g.descent().run) render(); });
   render();
   app.refreshView = () => { if (!playing) render(); };
   return () => { app.refreshView = null; skip = true; };
