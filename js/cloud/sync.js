@@ -82,6 +82,7 @@ export function startSync(theApp) {
   app.game.on('change', () => { if (cloud.isLoggedIn() && sync.status !== 'paused') schedule(); });
   app.game.on('descentEnd', () => {
     if (!cloud.isLoggedIn() || !sync.profile?.pseudo) return;
+    if (app.game.s.settings.dev) return; // pas de score au classement en Mode Créateur
     const d = app.game.s.descent;
     cloud.submitScore(d.day || today(), d.bestToday, !!d.cursed).catch(() => {});
   });

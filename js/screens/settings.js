@@ -5,6 +5,8 @@ import { exportCode, importCode } from '../core/save.js';
 import { drawBooster } from '../core/boosters.js';
 import { RARITIES, RARITY_ORDER, BOOSTERS } from '../config.js';
 import { sfx } from '../ui/sound.js';
+import { sync } from '../cloud/sync.js';
+import { openCreator } from './creator.js';
 
 export default function settings(app, root) {
   const g = app.game;
@@ -44,7 +46,9 @@ export default function settings(app, root) {
         <h2>Zone sensible</h2>
         <button class="btn danger small" data-act="reset">${icon('trash')}Effacer toute la progression</button>
       </section>
-      ${s.dev ? devPanel() : ''}
+      ${sync.profile?.badge === 'createur' || s.dev ? `<section class="panel stack cr-entry"><h2>${icon('crown')} Mode Créateur</h2>
+        <p class="small muted">Réservé au badge Créateur : ressources, cartes, variantes, boosters imposés, rituels et Descente à volonté.</p>
+        <button class="btn gold block" data-act="creator">${s.dev ? 'Ouvrir les pouvoirs' : 'Activer le Mode Créateur'}</button></section>` : ''}
       <section class="panel stack about">
         <h2>À propos</h2>
         <p class="small">ABYSSAL — Le Bestiaire interdit. Créé par <b>Alexis Seguin</b>.</p>
@@ -118,6 +122,7 @@ export default function settings(app, root) {
       toast('Progression effacée.', { icon: 'trash' });
       app.go('');
     },
+    creator() { if (!g.s.settings.dev) g.setSetting('dev', true); render(); openCreator(app); },
     version() {
       if (++taps >= 7) { taps = 0; g.setSetting('dev', !g.s.settings.dev); toast(g.s.settings.dev ? 'Mode développeur activé.' : 'Mode développeur désactivé.', { icon: 'code' }); render(); }
     },

@@ -124,6 +124,16 @@ export class Game {
     const ev = this.event();
     const res = drawBooster(type, this.catalog, { rng: this.rng, pity: this.s.pity, faction, event: ev });
     this.s.pity = res.pity;
+    // Mode Créateur : rareté (et variante) imposées pour la dernière carte du prochain booster
+    if (this.s.settings.dev && this.s.devForce) {
+      const pool = this.catalog.byRarity[this.s.devForce.rarity] || [];
+      if (pool.length) {
+        const card = pool[Math.floor(this.rng() * pool.length)];
+        const v = this.s.devForce.variant && card.variants.includes(this.s.devForce.variant) ? this.s.devForce.variant : res.cards[res.cards.length - 1].variant;
+        res.cards[res.cards.length - 1] = { ...res.cards[res.cards.length - 1], id: card.id, rarity: card.rarity, variant: v };
+      }
+      this.s.devForce = null;
+    }
     this.s.stats.boosters++;
     const rewards = { shards: 0, ash: 0, xp: XP.booster };
     const cards = res.cards.map((d) => {
@@ -346,7 +356,7 @@ export class Game {
     const chance = this.ritualChance(id, from, offer, forbidden);
     if (!chance) throw new Error('Choisis au moins une offrande.');
     const used = Object.entries(offer).flatMap(([r, n]) => (n ? this.takeSpares(r, n, id) : []));
-    const success = this.rng() * 100 < chance;
+    const success = (this.s.settings.dev && this.s.devRitual) || this.rng() * 100 < chance;
     this.s.ritualBoost = 0;
     const key = `${id}:${to}`;
     let lost = false;
@@ -664,6 +674,29 @@ export class Game {
 
   // Outils de développement -----------------------------------------------
   devGrant(reward) { this.grant(reward); this.persist(); }
+  // ——— Pouvoirs du Créateur (mode développeur) ———
+  devGive(id, variant = 'normal', n = 1) {
+    const c = this.catalog.get(id);
+    if (!c) throw new Error('Carte inconnue.');
+    const v = c.variants.includes(variant) ? variant : 'normal';
+    for (let i = 0; i < n; i++) this.addCard(id, v, 'reward');
+    this.checkProgress(); this.persist();
+  }
+  devAllVariants() {
+    this.catalog.cards.forEach((c) => c.variants.forEach((v) => { if (!this.entry(c.id)?.v[v]) this.addCard(c.id, v, 'reward'); }));
+    this.checkProgress(); this.persist();
+  }
+  devDuplicates(n = 10) {
+    ['C', 'PC', 'R', 'HR', 'M'].forEach((r) => this.catalog.byRarity[r].slice(0, n).forEach((c) => { for (let i = 0; i < 2; i++) this.addCard(c.id, 'normal', 'reward'); }));
+    this.persist();
+  }
+  devMaxLevels() { Object.keys(this.s.collection).forEach((id) => { this.s.descent.xp[id] = 20 * 81; }); this.persist(); }
+  devHealAll() { this.s.descent.wounds = {}; this.persist(); }
+  devTorches() { this.descent().used = 0; this.persist(); }
+  devFreePacks() { this.s.freePack = { stock: FREE_PACK.max, since: Date.now() }; this.persist(); }
+  devMissions() { this.missions().list.forEach((x) => { x.p = x.n; }); this.persist(); }
+  devItems(n = 5) { Object.keys(ITEMS).forEach((k) => { this.s.items[k] = (this.s.items[k] || 0) + n; }); this.persist(); }
+  devFloor(n) { const run = this.s.descent.run; if (!run) throw new Error('Lance d’abord une Descente.'); run.floor = Math.max(1, n); run.phase = 'doors'; this.persist(); }
   devUnlockAll() {
     this.catalog.cards.forEach((c) => { if (!this.owns(c.id)) this.addCard(c.id, 'normal', 'reward'); });
     const progress = this.checkProgress();
