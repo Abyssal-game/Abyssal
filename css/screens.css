@@ -839,3 +839,5 @@ body.battle-mode .tb { min-height: calc(100dvh - var(--safe-t) - var(--safe-b) -
 .wl-dots i.on { background: var(--gold-hi); width: 18px; border-radius: 4px; }
 .wl-btns { justify-content: center; }
 .wl-btns .btn { flex: 1; max-width: 200px; }
+.shop-seg { display: flex; margin-bottom: 12px; }
+.shop-seg .seg-b { flex: 1; text-align: center; text-decoration: none; color: inherit; }

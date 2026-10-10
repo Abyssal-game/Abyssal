@@ -103,6 +103,7 @@ export default function shop(app, root, params = []) {
         <h1>Boosters</h1>
         <p class="muted">Choisis ton booster et tente ta chance.</p>
       </header>
+      <nav class="seg shop-seg" aria-label="Rayons"><a class="seg-b" href="#/boutique" aria-pressed="${params[0] !== 'objets'}">Boosters</a><a class="seg-b" href="#/boutique/objets" aria-pressed="${params[0] === 'objets'}">Objets</a></nav>
       <div class="panel pity">
         <div><span class="small muted">Garantie Hyper rare</span><b>${g.s.pity.sinceHR} / ${PITY.hr - 1}</b><span class="progress"><i style="width:${(g.s.pity.sinceHR / (PITY.hr - 1)) * 100}%;--bar:#C266FF"></i></span></div>
         <div><span class="small muted">Garantie Mythique</span><b>${g.s.pity.sinceM} / ${PITY.m - 1}</b><span class="progress"><i style="width:${(g.s.pity.sinceM / (PITY.m - 1)) * 100}%;--bar:#F0C75E"></i></span></div>
