@@ -46,7 +46,7 @@ export function openSheet(html, { cls = '', onClose, label = 'Fenêtre', full = 
       api.closed = true;
       wrap.classList.remove('in');
       const i = stack.indexOf(api); if (i >= 0) stack.splice(i, 1);
-      if (!stack.length) document.body.classList.remove('has-sheet');
+      if (!stack.length && !document.querySelector('.opening')) document.body.classList.remove('has-sheet');
       setTimeout(() => wrap.remove(), 260);
       onClose && onClose();
       prevFocus && prevFocus.focus && prevFocus.focus({ preventScroll: true });

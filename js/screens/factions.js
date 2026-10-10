@@ -37,7 +37,6 @@ function factionPage(app, root, key) {
   const top = cat.byFaction[key].slice().sort((a, b) => RI(b.rarity) - RI(a.rarity) || b.power - a.power).slice(0, 8);
   const conflicts = cat.lore.conflicts.filter((c) => c.sides.includes(key));
   root.innerHTML = `
-    <a class="back-link" href="#/factions">${icon('back')}Factions</a>
     <section class="fac-hero" style="--fc:${f.colors.secondary};--fp:${f.colors.primary}">
       <img alt="" class="${g.owns(feat.id) ? '' : 'veiled'}" src="${artUrl(feat, { mystery: !g.owns(feat.id) })}">
       <div class="fac-hero-veil"></div>

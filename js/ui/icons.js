@@ -12,6 +12,7 @@ export const ICONS = {
   shield: I('<path d="M12 3 5 6v5.5c0 4.4 3 7.8 7 9.5 4-1.7 7-5.1 7-9.5V6z"/><path d="M12 8v8M8.5 11.5h7"/>'),
   swords: I('<path d="m4 4 9.5 9.5M4 4v3.5L13 16.5M4 4h3.5L16.5 13"/><path d="m20 4-6 6M20 4v3M20 4h-3"/><path d="m13 15 3 3M15 13l3 3M17 19l2 2M19 17l2 2"/>'),
   search: I('<circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/>'),
+  menu: I('<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>'),
   plus: I('<path d="M12 5v14M5 12h14"/>'),
   skull: I('<path d="M12 3.5c-4.4 0-7.5 3-7.5 7 0 2.4 1.1 4.1 2.8 5.1V19h9.4v-3.4c1.7-1 2.8-2.7 2.8-5.1 0-4-3.1-7-7.5-7z"/><circle cx="9" cy="11" r="1.6"/><circle cx="15" cy="11" r="1.6"/><path d="M11 15h2M10 19v1.5M14 19v1.5"/>'),
   crown: I('<path d="M4 8l4 4 4-6 4 6 4-4-1.5 10h-13z"/><path d="M5.5 20.5h13"/>'),

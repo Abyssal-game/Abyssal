@@ -28,7 +28,7 @@ table.odds thead th { color: var(--mute); font-weight: 600; }
 .hero-art { position: absolute; inset: 0; }
 .hero.hero-empty { height: auto; min-height: 0; background: radial-gradient(70% 80% at 50% 30%, rgba(104, 59, 186, .3), transparent 70%); }
 .hero-empty .hero-content { position: relative; padding-bottom: 8px; }
-.hero-art img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; transform: scale(1.06); animation: heroDrift 22s ease-in-out infinite alternate; }
+.hero-art img { will-change: transform; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; transform: scale(1.06); animation: heroDrift 22s ease-in-out infinite alternate; }
 @keyframes heroDrift { to { transform: scale(1.14) translateY(-2%); } }
 .hero-veil { position: absolute; inset: 0; background: radial-gradient(90% 34% at 50% 30%, rgba(8, 9, 13, .55), transparent 75%), linear-gradient(180deg, rgba(8, 9, 13, .85) 0%, rgba(8, 9, 13, .35) 38%, rgba(8, 9, 13, .08) 58%, var(--abyss) 98%); }
 .hero-content { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: calc(var(--safe-t) + var(--top-h) + 14px) var(--gutter) 18px; text-align: center; }
@@ -798,3 +798,32 @@ body.battle-mode .tb { min-height: calc(100dvh - var(--safe-t) - var(--safe-b) -
 .tb-a.main { grid-column: 1 / -1; }
 .tb-bench { top: auto; bottom: -10px; right: 50%; transform: translateX(50%); }
 @media (max-width: 360px) { .tb-acts { grid-template-columns: 1fr 1fr; } }
+
+/* ——— Menu ——— */
+.top-back { flex: none; width: 38px; height: 38px; margin-right: -2px; display: grid; place-items: center; border-radius: 50%; color: var(--gold-hi); background: rgba(22, 26, 37, .9); border: 1px solid var(--line); }
+.top-back .ic { width: 22px; height: 22px; }
+.mn-me { display: flex; align-items: center; gap: 14px; text-decoration: none; color: var(--ink); margin-top: 4px; }
+.mn-me .avatar-big { width: 74px; height: 74px; }
+.mn-me-t { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
+.mn-me-t b { font: 700 1.15rem/1.15 var(--f-display); }
+.mn-me-t .xpbar { width: 100%; max-width: 220px; }
+.mn-list { display: flex; flex-direction: column; border-radius: 14px; overflow: hidden; border: 1px solid var(--line-soft); background: linear-gradient(180deg, rgba(22, 26, 37, .9), rgba(13, 15, 22, .92)); }
+.mn-t { display: flex; align-items: center; gap: 12px; padding: 12px 14px; min-height: 60px; text-decoration: none; color: var(--ink); background: none; border: 0; border-top: 1px solid var(--line-soft); font: inherit; text-align: left; width: 100%; }
+.mn-t:first-child { border-top: 0; }
+.mn-t:active { background: rgba(255, 255, 255, .04); }
+.mn-t > .ic { color: var(--mute); width: 18px; height: 18px; }
+.mn-ic { width: 38px; height: 38px; flex: none; display: grid; place-items: center; border-radius: 10px; color: var(--gold-hi); background: rgba(200, 164, 93, .1); border: 1px solid var(--line); }
+.mn-ic .ic { width: 22px; height: 22px; }
+.mn-tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.mn-tx b { font: 700 .92rem/1.2 var(--f-display); letter-spacing: .03em; }
+.mn-tx span { font-size: .8rem; color: var(--mute); }
+/* Accueil : deux grandes actions */
+.home-acts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0 16px; }
+.ha { position: relative; display: flex; flex-direction: column; gap: 4px; padding: 14px 12px; min-height: 108px; border-radius: 16px; text-decoration: none; color: #fff; border: 1px solid; }
+.ha .ic { width: 30px; height: 30px; margin-bottom: 2px; }
+.ha b { font: 700 .95rem/1.15 var(--f-display); letter-spacing: .04em; }
+.ha span { font-size: .76rem; opacity: .85; line-height: 1.2; }
+.ha-pack { background: linear-gradient(160deg, #B4203F, #5E0E20); border-color: #E05A72; box-shadow: 0 8px 22px rgba(159, 24, 52, .35); }
+.ha-dive { background: linear-gradient(160deg, #3B2470, #140B2A); border-color: #8A6BD8; box-shadow: 0 8px 22px rgba(104, 59, 186, .3); }
+.ha .cta-badge { top: -8px; right: 10px; opacity: 1; font-size: .72rem; }
+.ha:active { transform: scale(.97); }

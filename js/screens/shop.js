@@ -54,7 +54,7 @@ export function showOdds(app, type) {
     <p class="small">Un doublon exact rapporte des cendres (${RARITIES.map((r) => `${r.short} ${ECONOMY.duplicateAsh[r.key]}`).join(', ')}). Les cendres servent à invoquer une carte manquante.</p>`, { label: 'Probabilités' });
 }
 
-export default function shop(app, root) {
+export default function shop(app, root, params = []) {
   const g = app.game, cat = app.catalog;
   const st = (app.state.shop ||= { faction: 'infernal' });
   const ev = g.event();
@@ -128,6 +128,7 @@ export default function shop(app, root) {
     },
   });
   bindItemShop(app, root, render);
+  if (params[0] === 'objets') requestAnimationFrame(() => root.querySelector('#objets')?.scrollIntoView({ block: 'start' }));
   app.refreshView = render;
   const timer = setInterval(() => { if (!document.querySelector('.opening')) render(); }, 60000);
   return () => { app.refreshView = null; clearInterval(timer); };

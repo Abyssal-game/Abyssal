@@ -34,11 +34,6 @@ html, body { margin: 0; height: 100%; }
 html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
 body {
   background-color: var(--abyss);
-  background-image:
-    radial-gradient(120% 60% at 50% -10%, rgba(104, 59, 186, .22), transparent 60%),
-    radial-gradient(90% 50% at 50% 110%, rgba(159, 24, 52, .2), transparent 60%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .9 0 0 0 0 .85 0 0 0 0 .75 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-attachment: fixed;
   color: var(--ink);
   font: 400 1rem/1.5 var(--f-ui);
   overflow-x: clip;
@@ -46,6 +41,13 @@ body {
   touch-action: manipulation;
 }
 body.has-sheet { overflow: hidden; }
+/* Fond fixe sur un calque à part : le défilement ne force pas à repeindre le décor */
+body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background-image:
+    radial-gradient(120% 60% at 50% -10%, rgba(104, 59, 186, .22), transparent 60%),
+    radial-gradient(90% 50% at 50% 110%, rgba(159, 24, 52, .2), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .9 0 0 0 0 .85 0 0 0 0 .75 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
 img { max-width: 100%; display: block; }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
@@ -205,7 +207,7 @@ textarea.input { padding: 12px; min-height: 120px; font: .8rem/1.4 ui-monospace,
 .ring > span { width: calc(100% - 10px); height: calc(100% - 10px); border-radius: 50%; background: var(--night); display: grid; place-items: center; font: 700 .8rem/1 var(--f-display); }
 
 /* Fenêtres */
-.sheet-wrap { position: fixed; inset: 0; z-index: 50; display: flex; align-items: flex-end; justify-content: center; }
+.sheet-wrap { position: fixed; inset: 0; z-index: 70; display: flex; align-items: flex-end; justify-content: center; }
 .sheet-backdrop { position: absolute; inset: 0; background: rgba(3, 3, 6, .72); opacity: 0; transition: opacity .25s; }
 .sheet {
   position: relative; width: 100%; max-width: 640px; max-height: calc(100% - var(--safe-t) - 12px); overflow: auto; overscroll-behavior: contain;

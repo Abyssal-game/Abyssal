@@ -19,18 +19,21 @@ import profileScreen from './screens/profile.js';
 import settingsScreen from './screens/settings.js';
 import descentScreen from './screens/descent.js';
 import accountScreen from './screens/account.js';
+import menuScreen from './screens/menu.js';
 import { startSync } from './cloud/sync.js';
 
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,
   factions: factionsScreen, faction: factionsScreen, succes: achievementsScreen, profil: profileScreen,
-  parametres: settingsScreen, descente: descentScreen, compte: accountScreen,
+  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen,
 };
 const TABS = [
   ['antre', 'home', 'Antre'], ['collection', 'cards', 'Collection'], ['boutique', 'booster', 'Boosters'],
-  ['descente', 'swords', 'Descente'], ['profil', 'user', 'Profil'],
+  ['descente', 'swords', 'Descente'], ['menu', 'menu', 'Menu'],
 ];
-const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', bestiaire: 'antre', descente: 'descente', factions: 'antre', faction: 'antre', succes: 'profil', profil: 'profil', parametres: 'profil', compte: 'profil' };
+const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu' };
+// Page parente des sous-pages (bouton retour en haut)
+const PARENT = { bestiaire: 'menu', factions: 'menu', faction: 'factions', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu' };
 
 function storageOrMemory() {
   try {
@@ -65,7 +68,9 @@ function renderChrome() {
   const g = app.game, s = g.s, lv = g.levelInfo();
   const avatarCard = s.avatar && g.catalog.get(s.avatar);
   const top = document.getElementById('topbar');
+  const parent = PARENT[app.route];
   top.innerHTML = `
+    ${parent !== undefined ? `<a class="top-back" href="#/${parent}" aria-label="Retour">${icon('back')}</a>` : ''}
     <a class="top-brand" href="#/profil" aria-label="Profil : niveau ${lv.level}, ${esc(s.title)}">
       <span class="top-avatar pf pf-${s.frame}">${avatarCard ? `<img alt="" src="${artUrl(avatarCard, { lite: true })}">` : EMBLEM}<span class="lv">${lv.level}</span></span>
       <span class="top-meta"><b>${esc(s.title)}</b><span class="xpbar" aria-hidden="true"><i style="width:${(lv.into / lv.need) * 100}%"></i></span></span>

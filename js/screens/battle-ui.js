@@ -20,7 +20,7 @@ export function runBattle(app, root, { title, onEnd }) {
   const step = (ms) => (reduced ? Math.min(ms, 120) : ms) / ui.speed;
 
   root.innerHTML = `<div class="tb ${run.room}">
-    <div class="tb-top"><b>${esc(title)}</b><span class="row gap"><button class="btn small ghost ${ui.auto ? 'on' : ''}" data-b="auto">${icon('refresh')}Auto</button><button class="btn small ghost" data-b="speed">×${ui.speed}</button></span></div>
+    <div class="tb-top"><b>${esc(title)}</b><span class="row gap"><button class="btn small ghost" data-b="pause" aria-label="Pause">${icon('close')}</button><button class="btn small ghost ${ui.auto ? 'on' : ''}" data-b="auto">${icon('refresh')}Auto</button><button class="btn small ghost" data-b="speed">×${ui.speed}</button></span></div>
     <div class="tb-line" aria-label="Ordre des tours"></div>
     <div class="tb-side enemy"></div>
     <div class="tb-msg" aria-live="polite"></div>
@@ -31,6 +31,7 @@ export function runBattle(app, root, { title, onEnd }) {
   const lineEl = $('.tb-line'), enEl = $('.tb-side.enemy'), alEl = $('.tb-side.ally'), msgEl = $('.tb-msg'), cmdEl = $('.tb-cmd');
   root.querySelector('.tb-top').addEventListener('click', (e) => {
     const b = e.target.closest('[data-b]'); if (!b) return;
+    if (b.dataset.b === 'pause') { toast('Combat en pause : il t’attend dans la Descente.', { icon: 'swords' }); app.go(''); return; }
     if (b.dataset.b === 'auto') { ui.auto = !ui.auto; b.classList.toggle('on', ui.auto); if (ui.auto && pick) pick(null); }
     if (b.dataset.b === 'speed') { ui.speed = ui.speed === 1 ? 2 : ui.speed === 2 ? 3 : 1; b.textContent = `×${ui.speed}`; }
   });

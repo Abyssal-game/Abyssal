@@ -12,7 +12,6 @@ import { FUSION } from '../config.js';
 export default function home(app, root) {
   const g = app.game, cat = app.catalog, s = g.s;
   const total = g.total(), owned = g.uniqueCount();
-  // Créature du jour : une mythique possédée, sinon la silhouette d'une mythique
   // Créature du jour : la plus belle carte illustrée que le joueur possède déjà (rien n'est dévoilé).
   const ownedArt = cat.cards.filter((c) => g.owns(c.id) && hasRealArt(c.id));
   const best = ['S', 'M', 'HR', 'R'].map((r) => ownedArt.filter((c) => c.rarity === r)).find((l) => l.length);
@@ -26,7 +25,6 @@ export default function home(app, root) {
   const recent = s.recent.map((id) => cat.get(id)).filter(Boolean).slice(0, 10);
   const freeCount = Object.values(s.tickets).reduce((a, b) => a + b, 0) + g.freePack().stock;
 
-  const spare = ['C', 'PC', 'R', 'HR'].reduce((a, r) => a + g.spareCount(r), 0);
   function missionsHTML() {
     const m = g.missions();
     const end = new Date(); end.setHours(24, 0, 0, 0);
@@ -60,8 +58,9 @@ export default function home(app, root) {
       </div>
     </section>
 
-    <div class="home-cta">
-      <a class="btn primary block big-cta" href="#/boutique">${icon('booster')}Ouvrir un booster${freeCount ? `<span class="cta-badge">${freeCount} gratuit${freeCount > 1 ? 's' : ''}</span>` : ''}</a>
+    <div class="home-acts">
+      <a class="ha ha-pack" href="#/boutique">${icon('booster')}<b>Ouvrir un booster</b><span>${freeCount ? `${freeCount} offert${freeCount > 1 ? 's' : ''} t’attend${freeCount > 1 ? 'ent' : ''}` : 'Tente ta chance'}</span>${freeCount ? `<span class="cta-badge">${freeCount}</span>` : ''}</a>
+      <a class="ha ha-dive" href="#/descente">${icon('swords')}<b>La Descente</b><span>${g.descent().run ? `Expédition en cours · étage ${g.descent().run.floor}` : g.torchesLeft() ? `${g.torchesLeft()} torche${g.torchesLeft() > 1 ? 's' : ''} aujourd’hui` : 'Reviens demain'}</span></a>
     </div>
 
     ${g.canDailyClaim() ? `<div class="panel ornate daily">
@@ -80,14 +79,6 @@ export default function home(app, root) {
       </div>
     </div>
 
-    <nav class="home-grid" aria-label="Accès rapides">
-      <a class="tile" href="#/collection">${icon('cards')}<b>Collection</b><span>${owned} cartes</span></a>
-      <a class="tile" href="#/bestiaire">${icon('book')}<b>Bestiaire</b><span>Chroniques et lore</span></a>
-      <a class="tile" href="#/factions">${icon('shield')}<b>Factions</b><span>Sept royaumes</span></a>
-      <a class="tile" href="#/succes">${icon('trophy')}<b>Succès</b><span>${Object.keys(s.achievements).length} / ${cat.achievements.length}</span></a>
-      <a class="tile" href="#/parametres">${icon('gear')}<b>Réglages</b><span>Son, sauvegarde</span></a>
-      <button class="tile" data-act="fusion">${icon('sparkle')}<b>Fusion</b><span>${spare} doublon${spare > 1 ? 's' : ''}</span></button>
-    </nav>
 
     <a class="panel event-banner" href="#/boutique" style="--a:${cat.faction[ev.factions[0]].colors.secondary};--b:${cat.faction[ev.factions[1]].colors.secondary}">
       <span class="small muted">Événement de la semaine · encore ${ev.daysLeft} jour${ev.daysLeft > 1 ? 's' : ''}</span>
