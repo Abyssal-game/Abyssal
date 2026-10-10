@@ -827,3 +827,15 @@ body.battle-mode .tb { min-height: calc(100dvh - var(--safe-t) - var(--safe-b) -
 .ha-dive { background: linear-gradient(160deg, #3B2470, #140B2A); border-color: #8A6BD8; box-shadow: 0 8px 22px rgba(104, 59, 186, .3); }
 .ha .cta-badge { top: -8px; right: 10px; opacity: 1; font-size: .72rem; }
 .ha:active { transform: scale(.97); }
+/* ——— Bienvenue ——— */
+.wl { text-align: center; padding: 6px 4px 4px; }
+.wl-ic { width: 92px; height: 92px; margin: 4px auto 14px; display: grid; place-items: center; border-radius: 50%; color: var(--gold-hi); background: radial-gradient(circle, rgba(200, 164, 93, .22), transparent 70%); }
+.wl-ic .ic { width: 52px; height: 52px; }
+.wl-ic .emblem { width: 92px; height: 92px; }
+.wl h2 { color: var(--gold-hi); }
+.wl p { color: #D9D0BF; max-width: 420px; margin: 0 auto 16px; }
+.wl-dots { display: flex; justify-content: center; gap: 6px; margin-bottom: 16px; }
+.wl-dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, .18); }
+.wl-dots i.on { background: var(--gold-hi); width: 18px; border-radius: 4px; }
+.wl-btns { justify-content: center; }
+.wl-btns .btn { flex: 1; max-width: 200px; }

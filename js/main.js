@@ -21,6 +21,7 @@ import descentScreen from './screens/descent.js';
 import accountScreen from './screens/account.js';
 import menuScreen from './screens/menu.js';
 import { startSync } from './cloud/sync.js';
+import { showWelcome } from './screens/welcome.js';
 
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,
@@ -145,6 +146,8 @@ function rewardText(r = {}) {
 }
 app.rewardText = rewardText;
 function onProgress(events) {
+  const lv = events.filter((e) => e.kind === 'level');
+  if (lv.length > 1) events = [...events.filter((e) => e.kind !== 'level'), { kind: 'level', level: lv[lv.length - 1].level, reward: lv.reduce((r, e) => ({ shards: (r.shards || 0) + (e.reward?.shards || 0), tickets: { ...r.tickets, ...e.reward?.tickets }, title: e.reward?.title || r.title }), {}) }];
   if (events.length > 2) {
     const names = events.map((e) => (e.kind === 'level' ? `niveau ${e.level}` : esc(e.name)));
     const total = events.reduce((t, e) => t + (e.reward?.shards || 0), 0);
@@ -212,6 +215,7 @@ async function boot() {
     let done = false;
     const finish = () => { if (done) return; done = true; bootEl.classList.add('out'); setTimeout(() => bootEl.remove(), 900); };
     setTimeout(finish, wait);
+    setTimeout(() => showWelcome(app), wait + 700);
     bootEl.addEventListener('click', finish); // un toucher passe l'introduction
     if (!persistent) toast('Le stockage local est désactivé dans ce navigateur : ta progression ne sera pas conservée après fermeture.', { kind: 'error', icon: 'info', ms: 9000 });
     if (app.game.loadedFrom && app.game.loadedFrom.endsWith('backup')) toast('La sauvegarde principale était abîmée : la copie de secours a été restaurée.', { kind: 'error', icon: 'info', ms: 8000 });

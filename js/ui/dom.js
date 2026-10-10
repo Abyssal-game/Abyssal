@@ -21,7 +21,7 @@ export function toast(html, { kind = 'info', ms = 3200, icon: ic } = {}) {
   el.setAttribute('role', kind === 'error' ? 'alert' : 'status');
   el.innerHTML = `${ic ? `<span class="toast-ic">${icon(ic)}</span>` : ''}<div>${html}</div>`;
   root.appendChild(el);
-  while (root.children.length > 3) root.firstElementChild.remove();
+  while (root.children.length > 2) root.firstElementChild.remove();
   requestAnimationFrame(() => el.classList.add('in'));
   const close = () => { el.classList.remove('in'); setTimeout(() => el.remove(), 300); };
   el.addEventListener('click', close);

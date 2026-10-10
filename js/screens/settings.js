@@ -7,6 +7,7 @@ import { RARITIES, RARITY_ORDER, BOOSTERS } from '../config.js';
 import { sfx } from '../ui/sound.js';
 import { sync, onSync, refreshProfile } from '../cloud/sync.js';
 import { openCreator } from './creator.js';
+import { showWelcome } from './welcome.js';
 
 export default function settings(app, root) {
   const g = app.game;
@@ -51,6 +52,7 @@ export default function settings(app, root) {
       <section class="panel stack about">
         <h2>À propos</h2>
         <p class="small">ABYSSAL — Le Bestiaire interdit. Créé par <b>Alexis Seguin</b>.</p>
+        <button class="btn small" data-act="guide">${icon('info')}Revoir le guide de bienvenue</button>
         <p class="small muted">Version ${esc(app.version)} · ${app.catalog.cards.length} cartes</p>
       </section>`;
     root.querySelector('#vol')?.addEventListener('change', (e) => { g.setSetting('volume', Number(e.target.value)); app.applySettings(); sfx.tap(); });
@@ -104,6 +106,7 @@ export default function settings(app, root) {
       toast('Progression effacée.', { icon: 'trash' });
       app.go('');
     },
+    guide() { showWelcome(app, { force: true }); },
     creator() { if (!g.s.settings.dev) g.setSetting('dev', true); render(); openCreator(app); },
     dev(el) {
       const x = el.dataset.x;
