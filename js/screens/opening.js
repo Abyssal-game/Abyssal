@@ -320,9 +320,17 @@ export function openPack(app, type, { faction, onDone } = {}) {
     app.flushProgress();
   }
 
+  let closed = false;
   function close() {
+    if (closed) return;
+    closed = true;
     el.classList.add('out');
     document.body.classList.remove('has-sheet');
+    // Un second toucher (ou un toucher fantôme d'iOS) ne doit pas atteindre la page dessous,
+    // où se trouve souvent un bouton « Ouvrir » : on avale les touchers pendant un court instant.
+    const swallow = (e) => { e.stopPropagation(); e.preventDefault(); };
+    document.addEventListener('click', swallow, true);
+    setTimeout(() => document.removeEventListener('click', swallow, true), 700);
     setTimeout(() => el.remove(), 250);
     document.removeEventListener('keydown', onKey);
     if (app.pendingProgress) app.flushProgress();
@@ -340,6 +348,7 @@ export function openPack(app, type, { faction, onDone } = {}) {
     const a = e.target.closest('[data-op]');
     if (!a) return;
     if (a.dataset.op === 'all') summary();
+    if (closed) return;
     if (a.dataset.op === 'close') close();
     if (a.dataset.op === 'again') { close(); setTimeout(() => openPack(app, type, { faction, onDone }), 280); }
   });
