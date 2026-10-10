@@ -113,7 +113,7 @@ test('descente : torches, étages, défaite, blessures et descente maudite', asy
   let out;
   for (let i = 0; i < 60 && g.s.descent.run; i++) {
     const run = g.s.descent.run;
-    if (run.phase === 'doors') out = g.chooseDoor(g.doors().includes('elite') ? 'elite' : g.doors()[0]);
+    if (run.phase === 'doors') { out = g.chooseDoor(g.doors().includes('elite') ? 'elite' : g.doors()[0]); if (out.battle) out = g.autoResolve(); }
     else if (run.phase === 'altar') g.chooseBlessing(run.altar[0]);
     else g.nextFloor();
   }
@@ -159,4 +159,40 @@ test('boutique d’objets : achat, limite, soin, torche, encens', () => {
   assert.equal(g.ritualChance(t, 'normal', { C: 1 }), before + 15);
   g.ritual(t, 'normal', { C: 1 });
   assert.equal(g.s.ritualBoost, 0);
+});
+
+test('combat au tour par tour : frise, parade parfaite, compétences, fin de combat', async () => {
+  const B = await import('../js/core/battle.js');
+  const { makeUnit } = await import('../js/core/descent.js');
+  const allies = catalog.byRarity.HR.slice(0, 4).map((c) => makeUnit(c, { level: 3 }));
+  const enemies = catalog.byRarity.C.slice(0, 4).map((c) => makeUnit(c, { side: 'enemy', mult: 0.8 }));
+  const st = B.createBattle(allies, enemies, 42);
+  assert.equal(B.front(st, 'ally').length, 3);
+  assert.equal(B.bench(st, 'ally').length, 1);
+  assert.equal(B.timeline(st, 6).length, 6);
+  // une parade parfaite annule les dégâts et contre-attaque
+  const foe = B.front(st, 'enemy')[0], me = B.front(st, 'ally')[0];
+  me.st.shield = 0;
+  const hp = me.hp, foeHp = foe.hp;
+  st.now = foe.ct;
+  const ev = B.act(st, { actor: foe.uid, action: 'attack', target: me.uid, parry: 'perfect' });
+  assert.equal(me.hp, hp);
+  assert.ok(foe.hp < foeHp);
+  assert.ok(ev.some((e) => e.t === 'parry'));
+  // l'état est du JSON pur : il se sauvegarde et se reprend
+  const copy = JSON.parse(JSON.stringify(st));
+  B.autoBattle(copy, { strike: 'good', parry: 'good' });
+  assert.equal(copy.over, 'won');
+  // un combat interrompu reprend à l'identique
+  const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('tb'), clock: () => new Date(2026, 9, 10, 12) });
+  const ids = catalog.byRarity.R.slice(0, 6).map((c) => c.id);
+  ids.forEach((id) => g.addCard(id)); g.setTeam(ids); g.startRun();
+  const o = g.chooseDoor(g.doors()[0] === 'rest' ? g.doors()[1] : g.doors()[0]);
+  if (o.battle) {
+    const saved = JSON.parse(JSON.stringify(g.s));
+    assert.equal(saved.descent.run.phase, 'battle');
+    assert.ok(saved.descent.run.battle.units);
+    const r = g.autoResolve({ strike: 'good', parry: 'good' });
+    assert.ok(r.won || r.lost);
+  }
 });

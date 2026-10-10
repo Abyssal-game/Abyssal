@@ -3,6 +3,7 @@
 import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, FUSION, LUCK_POINTS, RITUAL, ITEMS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
+import { createBattle, autoBattle } from './battle.js';
 import { DESCENT, makeUnit, fight, floorDoors, floorEnemies, roomLoot, blessingChoices, factionBonus, cardLevel } from './descent.js';
 
 const RI = (r) => RARITY_ORDER.indexOf(r);
@@ -450,28 +451,15 @@ export class Game {
     if (!this.doors().includes(room)) throw new Error('Porte inconnue.');
     const out = { room };
     if (room === 'fight' || room === 'elite' || room === 'boss') {
+      // Le combat se joue au tour par tour : son état est gardé dans l'expédition (reprise exacte).
       const allies = this.runUnits();
       const enemies = floorEnemies(this.catalog, run.day, run.floor, room);
-      const res = fight(allies, enemies, this.rng);
-      out.fight = { allies, enemies, events: res.events, won: res.won };
-      // reporte les PV et les chutes sur l'équipe
-      const byId = Object.fromEntries(res.allies.filter((u) => !u.remnant).map((u) => [u.id, u]));
-      run.team.forEach((m) => {
-        const u = byId[m.id];
-        if (!u) return;
-        m.hp = Math.max(0, u.hp);
-        if (m.hp <= 0) m.fallen = true;
-        else { m.xp += DESCENT.xpPerFight * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1); }
-      });
-      if (res.won) {
-        out.loot = this.addLoot(roomLoot(run.floor, room, this.rng));
-        run.phase = 'cleared';
-        this.track('win', 1);
-      } else {
-        out.lost = true;
-        out.summary = this.endRun(true);
-        return out;
-      }
+      run.battle = createBattle(allies, enemies, Math.floor(this.rng() * 2 ** 31));
+      run.room = room;
+      run.phase = 'battle';
+      out.battle = true;
+      this.persist();
+      return out;
     } else if (room === 'rest') {
       run.team.forEach((m) => { if (!m.fallen) m.hp = Math.min(m.maxHp, m.hp + Math.ceil(m.maxHp * 0.4)); });
       run.phase = 'cleared';
@@ -486,6 +474,48 @@ export class Game {
     if (run.phase === 'cleared') { run.cleared = run.floor; this.recordDepth(run.floor); }
     this.persist();
     return out;
+  }
+  // Fin du combat : PV et chutes reportés sur l'équipe, butin ou défaite.
+  finishBattle() {
+    const run = this.s.descent.run;
+    if (!run || run.phase !== 'battle' || !run.battle?.over) throw new Error('Aucun combat terminé.');
+    const st = run.battle, room = run.room, won = st.over === 'won';
+    const byId = {};
+    Object.values(st.units).filter((u) => u.side === 'ally' && !u.remnant).forEach((u) => { byId[u.id] = u; });
+    run.team.forEach((m) => {
+      const u = byId[m.id];
+      if (!u) return;
+      m.hp = Math.max(0, Math.min(m.maxHp, u.hp));
+      if (m.hp <= 0) m.fallen = true;
+      else m.xp += DESCENT.xpPerFight * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1);
+    });
+    run.battle = null;
+    const out = { room, won };
+    if (won) {
+      out.loot = this.addLoot(roomLoot(run.floor, room, this.rng));
+      run.phase = 'cleared';
+      run.cleared = run.floor;
+      this.recordDepth(run.floor);
+      this.track('win', 1);
+      this.persist();
+    } else {
+      out.lost = true;
+      out.summary = this.endRun(true);
+    }
+    return out;
+  }
+  // Objet utilisé en plein combat (baume : 50 % des PV d'une carte ; élixir : 40 % à la première ligne).
+  battleItem(k) {
+    if (!['baume', 'elixir'].includes(k)) throw new Error('Objet inutilisable en combat.');
+    if (!this.itemCount(k)) throw new Error('Tu n’as pas cet objet.');
+    this.s.items[k]--;
+    return k === 'baume' ? { heal: 0.5 } : { healAll: 0.4 };
+  }
+  // Résolution automatique d'un combat en cours (simulations, mode rapide).
+  autoResolve(timing = {}) {
+    const run = this.s.descent.run;
+    autoBattle(run.battle, timing);
+    return this.finishBattle();
   }
   chooseBlessing(key) {
     const run = this.s.descent.run;

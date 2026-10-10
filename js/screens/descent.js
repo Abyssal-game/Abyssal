@@ -6,6 +6,7 @@ import { artUrl } from '../art/assets.js';
 import { icon } from '../ui/icons.js';
 import { esc, fmt, toast, openSheet, confirmBox, bindActions } from '../ui/dom.js';
 import { bagHTML, bindBag } from './items.js';
+import { runBattle } from './battle-ui.js';
 import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
 import { EMBLEM } from '../ui/icons.js';
@@ -55,7 +56,9 @@ export default function descent(app, root) {
         <ul class="small">
           <li>Chaque jour : ${DESCENT.torches} torches, donc ${DESCENT.torches} expéditions. Le donjon est le même pour tout le monde ce jour-là.</li>
           <li>À chaque étage, choisis une porte : combat, élite, autel, source, trésor. Tous les ${DESCENT.bossEvery} étages, un gardien garde le passage (et un booster).</li>
-          <li>Les combats sont automatiques : les 3 premières cartes se battent, les autres prennent la relève. Les PV ne remontent pas d’un étage à l’autre.</li>
+          <li>Les combats se jouent <b>au tour par tour</b> : la frise en haut montre qui joue ensuite. Attaque, compétences (elles coûtent de l’énergie ◆), défense, objets, relève.</li>
+          <li><b>Frappe en rythme</b> : quand le cercle doré se resserre sur la cible, touche l’écran au bon moment pour un coup critique. <b>Parade</b> : quand un ennemi t’attaque, le cercle rouge apparaît ; un toucher parfait annule les dégâts et contre-attaque.</li>
+          <li>Les 3 premières cartes combattent, les autres prennent la relève. Les PV ne remontent pas d’un étage à l’autre. Le bouton « Auto » joue à ta place.</li>
           <li>Après chaque étage : <b>remonter</b> avec le butin, ou <b>descendre</b> plus bas pour plus. Si toute l’équipe tombe, la moitié du butin est perdue.</li>
           <li>Une carte tombée se repose ${DESCENT.woundHours} h. En descente maudite, elle est perdue.</li>
           <li>Les cartes gagnent de l’expérience (niveau 10 maximum, +6 % par niveau). Les variantes donnent aussi de la force : holographique +5 %, chromatique +8 %, or +12 %, cosmique +16 %.</li>
@@ -134,80 +137,32 @@ export default function descent(app, root) {
     if (!run) return lobby();
     if (run.phase === 'doors') return doorsView(run);
     if (run.phase === 'altar') return altarView(run);
+    if (run.phase === 'battle') return battleView(run);
     return clearedView(run);
   }
 
-  // ——— Combat animé ——————————————————————————————————————————————————
-  async function playFight(f, room, run) {
-    playing = true; skip = false;
-    const units = new Map();
-    const allies = f.allies.map((u) => ({ ...u })), enemies = f.enemies.map((u) => ({ ...u }));
-    [...allies, ...enemies].forEach((u) => units.set(u.uid, u));
-    root.innerHTML = `<div class="dc-battle ${room}">
-      <div class="dc-bhead"><b>${room === 'boss' ? 'Gardien de l’étage' : room === 'elite' ? 'Combat d’élite' : 'Combat'} · étage ${run.floor}</b>
-        <span class="row gap"><button class="btn small ghost" data-b="speed">×${ui.speed}</button><button class="btn small ghost" data-b="skip">Passer</button></span></div>
-      <div class="dc-side enemy" id="dc-en"></div>
-      <div class="dc-vs"><span id="dc-round">Tour 1</span></div>
-      <div class="dc-side ally" id="dc-al"></div>
-      <div class="dc-bend" hidden></div>
-    </div>`;
-    const tile = (u) => { const c = cat.get(u.id); return `<div class="dc-u ${u.hp <= 0 ? 'dead' : ''} ${u.remnant ? 'remnant' : ''}" data-uid="${u.uid}" style="--rc:${RARITY[u.rarity]?.color || '#888'}">
-      <div class="dc-u-art"><img alt="" src="${artUrl(c, { lite: true })}"></div>
-      <div class="dc-u-info"><span class="dc-u-nm">${esc(u.remnant ? 'Reste' : u.name)}</span><span class="dc-u-st"><b class="atk">${u.atk}</b>${icon('swords')}<b class="hpn">${Math.max(0, u.hp)}</b>${icon('heart')}</span></div>
-      <span class="hpbar"><i style="width:${Math.max(0, u.hp / u.maxHp) * 100}%"></i></span></div>`; };
-    const drawSide = (list, el) => {
-      const alive = list.filter((u) => u.hp > 0);
-      const front = alive.slice(0, DESCENT.front), bench = alive.length - front.length;
-      el.innerHTML = front.map(tile).join('') + (bench > 0 ? `<span class="dc-bench">+${bench}</span>` : '');
-    };
-    const en = root.querySelector('#dc-en'), al = root.querySelector('#dc-al');
-    const redraw = () => { drawSide(enemies, en); drawSide(allies, al); };
-    redraw();
-    root.querySelector('.dc-battle').addEventListener('click', (e) => {
-      const b = e.target.closest('[data-b]'); if (!b) return;
-      if (b.dataset.b === 'skip') skip = true;
-      if (b.dataset.b === 'speed') { ui.speed = ui.speed === 1 ? 2 : ui.speed === 2 ? 4 : 1; b.textContent = `×${ui.speed}`; }
-    });
-    const float = (uid, txt, cls) => {
-      const el = root.querySelector(`[data-uid="${uid}"]`); if (!el || skip) return;
-      const f2 = document.createElement('span'); f2.className = `dc-float ${cls}`; f2.textContent = txt; el.appendChild(f2);
-      setTimeout(() => f2.remove(), 900);
-    };
-    const setHp = (u) => {
-      const el = root.querySelector(`[data-uid="${u.uid}"]`); if (!el) return;
-      el.querySelector('.hpbar i').style.width = `${Math.max(0, u.hp / u.maxHp) * 100}%`;
-      el.querySelector('.hpn').textContent = Math.max(0, u.hp);
-      el.querySelector('.atk').textContent = u.atk;
-    };
-    const reduced = app.reduced();
-    for (const e of f.events) {
-      const step = skip ? 0 : (reduced ? 120 : 330) / ui.speed;
-      const u = e.u && units.get(e.u);
-      switch (e.t) {
-        case 'round': root.querySelector('#dc-round').textContent = `Tour ${e.n}`; break;
-        case 'hit': case 'spell': case 'burst': case 'venom': {
-          if (!u) break;
-          u.hp = e.hp;
-          const a = e.a && root.querySelector(`[data-uid="${e.a}"]`);
-          if (a && !skip) { a.classList.remove('lunge'); void a.offsetWidth; a.classList.add('lunge'); }
-          const t = root.querySelector(`[data-uid="${e.u}"]`);
-          if (t && !skip) { t.classList.remove('struck'); void t.offsetWidth; t.classList.add('struck'); }
-          setHp(u); float(e.u, `-${e.d}`, e.t === 'venom' ? 'venom' : e.t === 'hit' ? 'dmg' : 'spell');
-          if (!skip && e.t === 'hit') app.sfx.hit();
-          await wait(step);
-          break;
-        }
-        case 'heal': if (u) { u.hp = e.hp; setHp(u); float(e.u, `+${e.d}`, 'heal'); await wait(step * 0.6); } break;
-        case 'block': float(e.u, 'Bloqué', 'spell'); await wait(step * 0.6); break;
-        case 'stun': case 'stunned': float(e.u, 'Étourdi', 'spell'); await wait(step * 0.5); break;
-        case 'grow': if (u) { u.atk = e.atk; u.hp = e.hp; setHp(u); float(e.u, '+ATQ', 'heal'); } break;
-        case 'die': if (u) { u.hp = 0; const t = root.querySelector(`[data-uid="${e.u}"]`); t?.classList.add('dead'); await wait(step * 1.2); redraw(); } break;
-        case 'summon': { const nu = { ...e.unit }; units.set(nu.uid, nu); const list = nu.side === 'ally' ? allies : enemies; const i = list.findIndex((x) => x.uid === e.after); list.splice(i + 1, 0, nu); redraw(); break; }
-        default: break;
+  // ——— Combat au tour par tour ————————————————————————————————————————
+  let battle = null;
+  function battleView(run) {
+    if (battle) return;
+    playing = true;
+    const room = run.room;
+    const title = `${room === 'boss' ? 'Gardien de l’étage' : room === 'elite' ? 'Combat d’élite' : 'Combat'} · étage ${run.floor}`;
+    battle = runBattle(app, root, { title, onEnd: () => {
+      battle = null; playing = false;
+      let out;
+      try { app.pendingProgress = []; out = g.finishBattle(); } catch (e) { app.pendingProgress = null; toast(esc(e.message), { kind: 'error' }); return render(); }
+      if (out.lost) {
+        app.sfx.error();
+        ui.outcome = out.summary;
+        render();
+      } else {
+        app.sfx.reveal(room === 'boss' ? 'M' : 'R');
+        clearedView(g.descent().run, `<p class="dc-event dc-win">${icon('swords')} <b>Victoire !</b> ${lootText(out.loot)}</p>`);
       }
-    }
-    redraw();
-    playing = false;
+      window.scrollTo(0, 0);
+      app.flushProgress();
+    } });
   }
 
   // ——— Actions ————————————————————————————————————————————————————————
@@ -217,19 +172,11 @@ export default function descent(app, root) {
     let out;
     try { app.pendingProgress = []; out = g.chooseDoor(room); }
     catch (e) { app.pendingProgress = null; toast(esc(e.message), { kind: 'error' }); return; }
-    if (out.fight) {
-      await playFight(out.fight, room, run);
-      const end = root.querySelector('.dc-bend');
-      if (out.lost) {
-        app.sfx.error();
-        end.innerHTML = `<h2 class="dc-bad">Défaite</h2><p class="small">L’Abysse a eu raison de ton équipe.</p><button class="btn primary block" data-act="after">Voir le bilan</button>`;
-        ui.outcome = out.summary;
-      } else {
-        app.sfx.reveal(room === 'boss' ? 'M' : 'R');
-        end.innerHTML = `<h2 class="dc-good">Victoire</h2><p class="small">${lootText(out.loot)}</p><button class="btn primary block" data-act="after">Continuer</button>`;
-      }
-      end.hidden = false;
-      end.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (out.battle) {
+      app.pendingProgress = null;
+      window.scrollTo(0, 0);
+      battleView(g.descent().run);
+      return;
     } else if (out.altar) {
       render();
     } else {
@@ -312,5 +259,5 @@ export default function descent(app, root) {
   bindBag(app, root, () => { if (!g.descent().run) render(); });
   render();
   app.refreshView = () => { if (!playing) render(); };
-  return () => { app.refreshView = null; skip = true; };
+  return () => { app.refreshView = null; skip = true; if (battle) { battle.stop(); battle = null; } };
 }
