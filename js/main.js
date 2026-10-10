@@ -17,18 +17,17 @@ import factionsScreen from './screens/factions.js';
 import achievementsScreen from './screens/achievements.js';
 import profileScreen from './screens/profile.js';
 import settingsScreen from './screens/settings.js';
-import arenaScreen from './screens/arena.js';
 
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,
   factions: factionsScreen, faction: factionsScreen, succes: achievementsScreen, profil: profileScreen,
-  parametres: settingsScreen, arene: arenaScreen,
+  parametres: settingsScreen,
 };
 const TABS = [
   ['antre', 'home', 'Antre'], ['collection', 'cards', 'Collection'], ['boutique', 'booster', 'Boosters'],
   ['bestiaire', 'book', 'Bestiaire'], ['profil', 'user', 'Profil'],
 ];
-const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', bestiaire: 'bestiaire', factions: 'antre', faction: 'antre', succes: 'profil', profil: 'profil', parametres: 'profil', arene: 'antre' };
+const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', bestiaire: 'bestiaire', factions: 'antre', faction: 'antre', succes: 'profil', profil: 'profil', parametres: 'profil' };
 
 function storageOrMemory() {
   try {
@@ -76,7 +75,7 @@ function renderChrome() {
     </div>`;
   const tab = TAB_OF[app.route] ?? 'antre';
   const nNew = g.newCount();
-  const ticketCount = Object.values(s.tickets).reduce((a, b) => a + b, 0);
+  const ticketCount = Object.values(s.tickets).reduce((a, b) => a + b, 0) + g.freePack().stock;
   document.getElementById('tabbar').innerHTML = TABS.map(([key, ic, label]) => {
     const cur = key === tab ? ' aria-current="page"' : '';
     const badge = key === 'collection' && nNew ? `<span class="badge">${nNew > 99 ? '99+' : nNew}</span>` : key === 'boutique' && ticketCount ? `<span class="badge">${ticketCount}</span>` : key === 'antre' && g.canDailyClaim() ? '<span class="badge">!</span>' : '';

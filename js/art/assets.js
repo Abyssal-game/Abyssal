@@ -35,6 +35,8 @@ export function artUrl(card, { variant = 'normal', lite = false, mystery = false
   if (!mystery) {
     const alt = variant === 'alt';
     if (hasRealArt(card.id, alt)) return `assets/art/${card.id}${alt ? '-alt' : ''}.webp`;
+    // Pas d'illustration alternative dédiée : on reprend la vraie image (retournée par le CSS).
+    if (alt && hasRealArt(card.id)) return `assets/art/${card.id}.webp`;
     return proceduralUrl(card, { alt, lite });
   }
   return proceduralUrl(card, { mystery: true });

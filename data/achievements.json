@@ -23,6 +23,6 @@
  { "key": "variant_15",    "name": "Galerie des reflets",     "desc": "Possède 15 variantes cosmétiques.",                "cond": { "type": "variants", "n": 15 },         "reward": { "shards": 250, "frame": "prisme" } },
  { "key": "craft_1",       "name": "Rituel d’invocation",     "desc": "Invoque une carte avec des cendres.",              "cond": { "type": "crafted", "n": 1 },           "reward": { "shards": 50 } },
  { "key": "daily_7",       "name": "Fidèle des sceaux",       "desc": "Récupère 7 offrandes quotidiennes.",               "cond": { "type": "daily", "n": 7 },             "reward": { "shards": 150 } },
- { "key": "arena_1",       "name": "Premier sang",            "desc": "Remporte un duel dans l’Arène.",                   "cond": { "type": "arena", "n": 1 },             "reward": { "shards": 80 } },
- { "key": "arena_10",      "name": "Champion de l’Arène",     "desc": "Remporte 10 duels dans l’Arène.",                  "cond": { "type": "arena", "n": 10 },            "reward": { "shards": 300, "title": "Champion de l’Arène" } }
+ { "key": "unique_150",    "name": "Cent cinquante noms",     "desc": "Découvre 150 cartes différentes.",                 "cond": { "type": "unique", "n": 150 },          "reward": { "shards": 300, "tickets": { "standard": 2 } } },
+ { "key": "boosters_300",  "name": "Gardien des Sceaux",      "desc": "Ouvre 300 boosters.",                              "cond": { "type": "boosters", "n": 300 },        "reward": { "shards": 1000, "title": "Gardien des Sceaux", "frame": "or" } }
 ]

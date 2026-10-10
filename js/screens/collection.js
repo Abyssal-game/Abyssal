@@ -23,7 +23,7 @@ export default function collection(app, root, params) {
       <div class="chips" role="group" aria-label="Filtrer par rareté">${RARITIES.map((r) => `<button class="chip" data-act="rar" data-v="${r.key}" style="--chip:${r.color}" aria-pressed="${st.rarities.includes(r.key)}"><span class="dot" style="background:${r.color}"></span>${r.name}</button>`).join('')}</div>
       <div class="row gap wrap col-row">
         <div class="seg" role="group" aria-label="Afficher">${[['all', 'Toutes'], ['owned', 'Possédées'], ['missing', 'Manquantes'], ['new', 'Nouvelles']].map(([k, l]) => `<button class="seg-b" data-act="show" data-v="${k}" aria-pressed="${st.show === k}">${l}</button>`).join('')}</div>
-        <label class="sort"><span class="sr">Trier par</span>${icon('sort')}<select class="input" id="col-sort">${[['num', 'Numéro'], ['name', 'Nom'], ['rarity', 'Rareté'], ['power', 'Puissance'], ['date', 'Date de découverte']].map(([k, l]) => `<option value="${k}" ${st.sort === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+        <label class="sort"><span class="sr">Trier par</span>${icon('sort')}<select class="input" id="col-sort">${[['num', 'Numéro'], ['name', 'Nom'], ['rarity', 'Rareté'], ['date', 'Date de découverte']].map(([k, l]) => `<option value="${k}" ${st.sort === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
       </div>
       <div class="row between small"><span id="col-count" class="muted" aria-live="polite"></span><span class="row gap"><button class="linkish" data-act="reset">Réinitialiser les filtres</button><button class="linkish" data-act="seen" id="col-seen">Tout marquer comme vu</button></span></div>
     </div>
@@ -61,7 +61,7 @@ export default function collection(app, root, params) {
   }
 
   function bestVariant(e) {
-    for (const v of ['special', 'ancestral', 'corrupt', 'chroma', 'holo', 'alt']) if (e.v[v]) return v;
+    for (const v of ['special', 'galaxy', 'gold', 'ancestral', 'corrupt', 'chroma', 'holo', 'alt']) if (e.v[v]) return v;
     return 'normal';
   }
 

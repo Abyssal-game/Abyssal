@@ -1,6 +1,6 @@
 // État du joueur et règles de progression. Toute modification passe par ici
 // et est enregistrée immédiatement : une carte affichée est une carte sauvegardée.
-import { BOOSTERS, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY } from '../config.js';
+import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
 
@@ -85,9 +85,21 @@ export class Game {
   }
 
   // Actions ----------------------------------------------------------------
+  // Boosters gratuits accumulés (un toutes les FREE_PACK.everyHours, FREE_PACK.max au plus).
+  freePack(now = this.clock().getTime()) {
+    const per = FREE_PACK.everyHours * 3600000;
+    let { stock, since } = this.s.freePack;
+    if (stock < FREE_PACK.max) {
+      const gained = Math.floor((now - since) / per);
+      if (gained > 0) { stock = Math.min(FREE_PACK.max, stock + gained); since += gained * per; }
+    }
+    if (stock >= FREE_PACK.max) since = now;
+    return { stock, since, nextAt: stock >= FREE_PACK.max ? null : since + per };
+  }
+
   canBuy(type) {
     const def = BOOSTERS[type];
-    return (this.s.tickets[type] || 0) > 0 || this.s.shards >= def.price;
+    return (this.s.tickets[type] || 0) > 0 || (type === 'standard' && this.freePack().stock > 0) || this.s.shards >= def.price;
   }
 
   openBooster(type, { faction } = {}) {
@@ -95,7 +107,9 @@ export class Game {
     if (!def) throw new Error('Booster inconnu');
     if (type === 'faction' && !FACTION_ORDER.includes(faction)) throw new Error('Choisis une faction.');
     let paidWith;
+    const free = type === 'standard' ? this.freePack() : null;
     if ((this.s.tickets[type] || 0) > 0) { this.s.tickets[type]--; paidWith = 'ticket'; }
+    else if (free && free.stock > 0) { this.s.freePack = { stock: free.stock - 1, since: free.since }; paidWith = 'free'; }
     else if (this.s.shards >= def.price) { this.s.shards -= def.price; this.s.stats.shardsSpent += def.price; paidWith = 'shards'; }
     else throw new Error('Pas assez d’éclats.');
 
@@ -194,17 +208,6 @@ export class Game {
     this.persist();
   }
 
-  arenaResult(result) {
-    const amount = ECONOMY.arena[result];
-    this.s.shards += amount;
-    if (result === 'win') { this.s.stats.arenaWins++; this.s.xp += XP.arenaWin; }
-    else if (result === 'loss') this.s.stats.arenaLosses++;
-    else this.s.stats.arenaDraws++;
-    const progress = this.checkProgress();
-    this.persist();
-    return { amount, progress };
-  }
-
   setTitle(t) { if (this.s.titles.includes(t)) { this.s.title = t; this.persist(); } }
   setFrame(f) { if (this.s.frames.includes(f)) { this.s.frame = f; this.persist(); } }
   setAvatar(id) { if (this.owns(id)) { this.s.avatar = id; this.persist(); } }
@@ -239,7 +242,6 @@ export class Game {
       case 'variants': return this.variantCount();
       case 'crafted': return this.s.stats.crafted;
       case 'daily': return this.s.stats.daily;
-      case 'arena': return this.s.stats.arenaWins;
       default: return 0;
     }
   }

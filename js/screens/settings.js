@@ -54,7 +54,6 @@ export default function settings(app, root) {
         <h2>À propos</h2>
         <p class="small">ABYSSAL est un jeu gratuit de collection. Les boosters s’achètent uniquement avec la monnaie du jeu ; il n’existe aucun achat en argent réel.</p>
         <p class="small">Les illustrations actuelles sont <b>provisoires</b> : elles sont générées par le jeu à partir de la description de chaque créature. Elles seront remplacées progressivement par des illustrations définitives.</p>
-        <p class="small">Le mode Arène est un <b>prototype</b> jouable : ses règles sont complètes mais l’équilibrage reste à affiner.</p>
         <p class="small muted" data-act="version">Version ${esc(app.version)} · ${app.catalog.cards.length} cartes</p>
       </section>`;
     root.querySelector('#vol')?.addEventListener('change', (e) => { g.setSetting('volume', Number(e.target.value)); app.applySettings(); sfx.tap(); });

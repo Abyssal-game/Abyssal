@@ -2,10 +2,10 @@
 // effets selon la rareté, récapitulatif. Les cartes sont déjà enregistrées
 // dans la sauvegarde avant la première animation.
 import { BOOSTERS, RARITY, VARIANTS } from '../config.js';
-import { cardHTML, lazyArt } from '../ui/card.js';
+import { cardHTML, enableTilt } from '../ui/card.js';
 import { icon, EMBLEM } from '../ui/icons.js';
 import { esc, fmt, toast } from '../ui/dom.js';
-import { packHTML } from './shop.js';
+import { packHTML, payLabel } from './shop.js';
 
 const RI = (r) => ['C', 'PC', 'R', 'HR', 'M', 'S'].indexOf(r);
 
@@ -101,14 +101,29 @@ export function openPack(app, type, { faction, onDone } = {}) {
     dots[index].style.background = RARITY[c.rarity].color;
     dots[index].classList.add('on');
     stage.querySelector('.op-label').innerHTML = statusLine(c);
+    enableTilt(btn, { reduced });
     if (RI(c.rarity) >= 4) epic(c.rarity);
     else app.sfx.reveal(c.rarity);
+    if (c.variant !== 'normal') shine(c.variant, RI(c.rarity) >= 4 ? 1400 : 200);
     if (c.isNewCard) setTimeout(() => app.sfx.discover(), 250);
     await wait(RI(c.rarity) >= 4 ? 900 : 250);
     busy = false;
     hint.textContent = index < opening.cards.length - 1 ? 'Touche pour la carte suivante.' : 'Touche pour voir le récapitulatif.';
     btn.setAttribute('aria-label', 'Carte suivante');
     btn.addEventListener('click', nextCard, { once: true });
+  }
+
+  // Annonce d'une variante cosmétique (holographique, or, cosmique…)
+  function shine(variant, delay) {
+    setTimeout(() => {
+      if (phase === 'summary') return;
+      const b = document.createElement('div');
+      b.className = `op-banner op-variant v-${variant}`;
+      b.textContent = VARIANTS[variant].name;
+      el.appendChild(b);
+      app.sfx.discover();
+      setTimeout(() => b.remove(), 2200);
+    }, delay);
   }
 
   function epic(r) {
@@ -160,7 +175,7 @@ export function openPack(app, type, { faction, onDone } = {}) {
       <p class="small muted center">Toutes ces cartes sont déjà dans ta collection. Touche une carte pour l’examiner.</p>
       <div class="op-actions">
         <button class="btn" data-op="close">Fermer</button>
-        ${canAgain ? `<button class="btn primary" data-op="again">${(g.s.tickets[type] || 0) > 0 ? `${icon('ticket')}Encore un (ticket)` : `Encore un · ${fmt(def.price)}`}</button>` : ''}
+        ${canAgain ? `<button class="btn primary" data-op="again">${payLabel(g, type, true)}</button>` : ''}
       </div>
     </div>`;
     hint.textContent = '';

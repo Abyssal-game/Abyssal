@@ -26,7 +26,7 @@ export default function profile(app, root) {
       <div class="row gap wrap"><a class="btn small" href="#/succes">${icon('trophy')}Succès</a><a class="btn small" href="#/parametres">${icon('gear')}Réglages et sauvegarde</a></div>
 
       <h2 class="section-title">Vitrine</h2>
-      ${show.length ? `<div class="showcase" id="showcase">${show.map((c) => { const e = g.entry(c.id); const v = ['special', 'ancestral', 'corrupt', 'chroma', 'holo', 'alt'].find((x) => e.v[x]) || 'normal'; return cardHTML(c, { variant: v }); }).join('')}</div><p class="small muted">${s.showcase.length ? 'Tes cartes mises en vitrine.' : 'Tes cartes les plus prestigieuses. Mets-en d’autres en vitrine depuis leur fiche.'}</p>` : '<p class="muted">Ta vitrine est vide : ouvre ton premier booster.</p>'}
+      ${show.length ? `<div class="showcase" id="showcase">${show.map((c) => { const e = g.entry(c.id); const v = ['special', 'galaxy', 'gold', 'ancestral', 'corrupt', 'chroma', 'holo', 'alt'].find((x) => e.v[x]) || 'normal'; return cardHTML(c, { variant: v }); }).join('')}</div><p class="small muted">${s.showcase.length ? 'Tes cartes mises en vitrine.' : 'Tes cartes les plus prestigieuses. Mets-en d’autres en vitrine depuis leur fiche.'}</p>` : '<p class="muted">Ta vitrine est vide : ouvre ton premier booster.</p>'}
 
       <h2 class="section-title">Statistiques</h2>
       <div class="stats-grid">
@@ -37,7 +37,7 @@ export default function profile(app, root) {
         <div class="panel stat"><b>${g.rarityCount('M')}</b><span>mythiques</span></div>
         <div class="panel stat"><b>${g.rarityCount('S')}</b><span>secrètes</span></div>
         <div class="panel stat"><b>${g.variantCount()}</b><span>variantes</span></div>
-        <div class="panel stat"><b>${s.stats.arenaWins}–${s.stats.arenaLosses}</b><span>duels (V–D)</span></div>
+        <div class="panel stat"><b>${fmt(s.stats.ashEarned)}</b><span>cendres gagnées</span></div>
       </div>
       <div class="panel">
         <h3>Par rareté</h3>

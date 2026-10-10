@@ -31,7 +31,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "serpent",
@@ -73,7 +74,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "fish",
@@ -115,7 +117,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "tentacle",
@@ -158,7 +161,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "insect",
@@ -199,7 +203,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "spectre",
@@ -241,7 +246,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "tentacle",
@@ -280,7 +286,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "fish",
@@ -323,7 +330,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "bird",
@@ -367,7 +375,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "hum",
@@ -413,7 +422,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "insect",
@@ -455,7 +465,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "swarm",
@@ -499,7 +510,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "beast",
@@ -539,7 +551,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "skeleton",
@@ -581,7 +594,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "hum",
@@ -626,7 +640,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "blob",
@@ -670,7 +685,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "bird",
@@ -712,7 +728,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "hum",
@@ -759,7 +776,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "fish",
@@ -802,7 +820,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "hum",
@@ -850,7 +869,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "beast",
@@ -890,7 +910,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "tentacle",
@@ -932,7 +953,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "fish",
@@ -973,7 +995,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "beast",
@@ -1017,7 +1040,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "beast",
@@ -1062,7 +1086,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "spectre",
@@ -1106,7 +1131,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "hum",
@@ -1151,7 +1177,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "tree",
@@ -1197,7 +1224,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "hum",
@@ -1247,7 +1275,8 @@
    "holo",
    "chroma",
    "corrupt",
-   "alt"
+   "alt",
+   "galaxy"
   ],
   "art": {
    "form": "tentacle",
@@ -1294,7 +1323,9 @@
    "chroma",
    "corrupt",
    "alt",
-   "ancestral"
+   "galaxy",
+   "ancestral",
+   "gold"
   ],
   "art": {
    "form": "tentacle",
@@ -1343,7 +1374,9 @@
    "chroma",
    "corrupt",
    "alt",
-   "ancestral"
+   "galaxy",
+   "ancestral",
+   "gold"
   ],
   "art": {
    "form": "orb",
@@ -1388,7 +1421,9 @@
    "chroma",
    "corrupt",
    "alt",
-   "ancestral"
+   "galaxy",
+   "ancestral",
+   "gold"
   ],
   "art": {
    "form": "hum",
@@ -1441,7 +1476,9 @@
    "chroma",
    "corrupt",
    "alt",
-   "ancestral"
+   "galaxy",
+   "ancestral",
+   "gold"
   ],
   "art": {
    "form": "fish",
@@ -1488,7 +1525,9 @@
    "chroma",
    "corrupt",
    "alt",
-   "ancestral"
+   "galaxy",
+   "ancestral",
+   "gold"
   ],
   "art": {
    "form": "beast",
@@ -1533,7 +1572,9 @@
    "chroma",
    "corrupt",
    "alt",
-   "ancestral"
+   "galaxy",
+   "ancestral",
+   "gold"
   ],
   "art": {
    "form": "fish",
@@ -1577,7 +1618,9 @@
    "chroma",
    "corrupt",
    "alt",
-   "ancestral"
+   "galaxy",
+   "ancestral",
+   "gold"
   ],
   "art": {
    "form": "serpent",
@@ -1624,7 +1667,9 @@
    "chroma",
    "corrupt",
    "alt",
-   "ancestral"
+   "galaxy",
+   "ancestral",
+   "gold"
   ],
   "art": {
    "form": "fish",
@@ -1673,7 +1718,9 @@
    "chroma",
    "corrupt",
    "alt",
-   "ancestral"
+   "galaxy",
+   "ancestral",
+   "gold"
   ],
   "art": {
    "form": "fish",
@@ -1724,7 +1771,9 @@
    "chroma",
    "corrupt",
    "alt",
+   "galaxy",
    "ancestral",
+   "gold",
    "special"
   ],
   "art": {
@@ -1774,7 +1823,9 @@
    "chroma",
    "corrupt",
    "alt",
-   "ancestral"
+   "galaxy",
+   "ancestral",
+   "gold"
   ],
   "art": {
    "form": "hum",
@@ -1823,7 +1874,9 @@
    "chroma",
    "corrupt",
    "alt",
-   "ancestral"
+   "galaxy",
+   "ancestral",
+   "gold"
   ],
   "art": {
    "form": "fish",
@@ -1871,7 +1924,9 @@
    "chroma",
    "corrupt",
    "alt",
-   "ancestral"
+   "galaxy",
+   "ancestral",
+   "gold"
   ],
   "art": {
    "form": "tentacle",
@@ -1918,7 +1973,9 @@
    "chroma",
    "corrupt",
    "alt",
-   "ancestral"
+   "galaxy",
+   "ancestral",
+   "gold"
   ],
   "art": {
    "form": "fish",
@@ -1968,7 +2025,9 @@
    "chroma",
    "corrupt",
    "alt",
-   "ancestral"
+   "galaxy",
+   "ancestral",
+   "gold"
   ],
   "art": {
    "form": "hum",
@@ -2022,7 +2081,9 @@
    "chroma",
    "corrupt",
    "alt",
-   "ancestral"
+   "galaxy",
+   "ancestral",
+   "gold"
   ],
   "art": {
    "form": "serpent",
@@ -2073,7 +2134,9 @@
    "chroma",
    "corrupt",
    "alt",
-   "ancestral"
+   "galaxy",
+   "ancestral",
+   "gold"
   ],
   "art": {
    "form": "serpent",
@@ -2122,7 +2185,9 @@
    "chroma",
    "corrupt",
    "alt",
-   "ancestral"
+   "galaxy",
+   "ancestral",
+   "gold"
   ],
   "art": {
    "form": "tentacle",
@@ -2177,7 +2242,9 @@
    "chroma",
    "corrupt",
    "alt",
-   "ancestral"
+   "galaxy",
+   "ancestral",
+   "gold"
   ],
   "art": {
    "form": "orb",

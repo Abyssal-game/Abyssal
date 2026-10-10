@@ -50,7 +50,7 @@ export const BOOSTERS = {
 };
 
 // Probabilité (%) qu'une carte tirée soit une variante cosmétique (multipliée par variantMult).
-export const VARIANT_RATES = { holo: 6, chroma: 2.5, corrupt: 1.5, alt: 1.5, ancestral: 1 };
+export const VARIANT_RATES = { holo: 6, chroma: 2.5, corrupt: 1.5, alt: 1.5, ancestral: 1, gold: 0.6, galaxy: 0.4 };
 
 export const VARIANTS = {
   normal:    { name: 'Normale',                  short: 'Normale' },
@@ -59,6 +59,8 @@ export const VARIANTS = {
   corrupt:   { name: 'Corrompue',                short: 'Corrompue' },
   alt:       { name: 'Illustration alternative', short: 'Alternative' },
   ancestral: { name: 'Ancestrale',               short: 'Ancestrale' },
+  gold:      { name: 'Feuille d’or',             short: 'Or' },
+  galaxy:    { name: 'Cosmique',                 short: 'Cosmique' },
   special:   { name: 'Édition des Sceaux',       short: 'Édition' },
 };
 
@@ -81,14 +83,12 @@ export const ECONOMY = {
   decipherAsh: 15,
   revealNamesAt: 0.5, // les noms d'une faction se révèlent à 50 % de complétion
   daily: { base: 80, perStreakDay: 10, maxStreakBonus: 60 },
-  arena: { win: 60, loss: 15, draw: 25 },
 };
 
 export const XP = {
   booster: 10,
   discovery: { C: 10, PC: 20, R: 40, HR: 80, M: 160, S: 300 },
   duplicate: 2,
-  arenaWin: 30,
   // XP nécessaire pour passer du niveau n au niveau n+1
   toNext: (n) => 150 + (n - 1) * 90,
   levelReward: (n) => (n % 5 === 0 ? { shards: 100, tickets: { premium: 1 } } : { shards: 60 }),
@@ -104,6 +104,9 @@ export const FRAMES = {
   infernal: 'Cadre infernal', abyssal: 'Cadre abyssal', celeste: 'Cadre céleste', sauvage: 'Cadre sauvage',
   necrotique: 'Cadre nécrotique', primordial: 'Cadre primordial', artificiel: 'Cadre artificiel',
 };
+
+// Booster standard gratuit qui se recharge avec le temps (aucune obligation de revenir).
+export const FREE_PACK = { everyHours: 6, max: 2 };
 
 export const FACTION_ORDER = ['infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel'];
 

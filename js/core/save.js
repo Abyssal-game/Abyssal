@@ -30,7 +30,8 @@ export function defaultSave(now = Date.now()) {
     avatar: null,         // id de carte possédée
     showcase: [],         // jusqu'à 3 cartes mises en avant
     daily: { last: null, streak: 0 },
-    stats: { boosters: 0, cards: 0, crafted: 0, daily: 0, arenaWins: 0, arenaLosses: 0, arenaDraws: 0, ashEarned: 0, shardsSpent: 0 },
+    freePack: { stock: 1, since: now }, // booster standard gratuit rechargeable
+    stats: { boosters: 0, cards: 0, crafted: 0, daily: 0, ashEarned: 0, shardsSpent: 0 },
     history: [],          // dernières ouvertures
     recent: [],           // dernières découvertes (ids)
     settings: { sound: true, volume: 0.7, motion: 'auto', quality: 'auto', fastOpen: false, textSize: 'normal', contrast: false, dev: false },

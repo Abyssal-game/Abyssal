@@ -1,9 +1,18 @@
 // Vue détaillée d'une carte (fenêtre plein écran) : grand format, variantes,
 // lore, capacités, lignée, ensembles, actions.
 import { RARITY, VARIANTS, ECONOMY } from '../config.js';
-import { cardHTML, enableTilt, abilityText } from '../ui/card.js';
+import { cardHTML, enableTilt } from '../ui/card.js';
+import { boosterOdds } from '../core/boosters.js';
 import { openSheet, esc, toast, confirmBox, fmt, bindActions } from '../ui/dom.js';
 import { icon, sigil } from '../ui/icons.js';
+
+// Chance réelle d'obtenir cette carte précise dans un booster standard.
+function oddsFor(cat, card) {
+  const o = boosterOdds('standard');
+  const n = cat.byRarity[card.rarity].length;
+  const p = 1 - o.slots.reduce((q, s) => q * (1 - s.odds[card.rarity] / 100 / n), 1);
+  return Math.round(1 / p);
+}
 
 const dateFr = (t) => new Date(t).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -14,6 +23,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
   let stopTilt = () => {};
   const sheet = openSheet('', { full: true, cls: 'detail-sheet', label: 'Carte', onClose: () => { stopTilt(); app.refreshView && app.refreshView(); } });
 
+  const odds = (card) => `Une chance sur <b>${oddsFor(cat, card).toLocaleString('fr-FR')}</b> de la trouver dans un booster standard (sans compter les garanties).`;
   function draw() {
     stopTilt();
     const card = cat.get(current);
@@ -35,7 +45,6 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
 
     let body;
     if (owned) {
-      const ab = card.abilities.map(abilityText);
       const line = card.evolution ? cat.lines[card.evolution.line] : null;
       const sets = card.sets.map((k) => cat.set[k]).filter(Boolean);
       const isAvatar = g.s.avatar === current;
@@ -59,10 +68,8 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
         <h3 class="section-title">Description</h3>
         <p class="lore big">« ${esc(card.lore)} »</p>
         <p>${esc(card.visual)}</p>
-        <h3 class="section-title">Combat</h3>
-        <div class="statbars">${[['atk', 'Attaque', 12], ['def', 'Défense', 8], ['spd', 'Vitesse', 10], ['mag', 'Magie', 10], ['hp', 'Points de vie', 26], ['cost', 'Coût d’invocation', 10]].map(([k, l, max]) => `<div class="sb"><span>${l}</span><span class="progress" aria-hidden="true"><i style="width:${(card.stats[k] / max) * 100}%;--bar:${r.color}"></i></span><b>${card.stats[k]}</b></div>`).join('')}</div>
-        ${ab.length ? `<ul class="abil-list">${ab.map((a) => `<li><b>${esc(a.name)}</b> — ${esc(a.desc)}</li>`).join('')}</ul>` : '<p class="muted">Aucune capacité particulière : sa force est dans ses statistiques.</p>'}
-        <p class="small"><b style="color:${fac.colors.secondary}">Passif ${esc(fac.name)} · ${esc(fac.passive.name)}</b> — ${esc(fac.passive.desc)}</p>
+        <h3 class="section-title">Rareté</h3>
+        <p>${odds(card)}</p>
         ${line ? `<h3 class="section-title">${esc(line.name)}</h3><div class="strip">${line.cards.map((c) => cardHTML(c, { mystery: !g.owns(c.id), nameKnown: g.nameKnown(c.id) })).join('')}</div><p class="small muted">Stade ${card.evolution.stage} sur ${card.evolution.stages}. Les stades sont des cartes distinctes à collectionner.</p>` : ''}
         ${sets.length ? `<h3 class="section-title">Ensembles</h3><div class="stack">${sets.map((s) => { const p = g.setProgress(s.key); return `<a class="set-link panel" href="#/succes/ensembles"><b>${esc(s.name)}</b><span class="small muted">${p.owned} / ${p.total}${p.done ? ' · complété' : ''}</span><span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span></a>`; }).join('')}</div>` : ''}
         <details class="prompt-box"><summary>${icon('scroll')} Fiche d’illustration</summary><p class="small">Illustration actuelle : ${card.image && app.hasRealArt?.(card.id) ? 'définitive' : 'provisoire, générée par le jeu'}. Fichier attendu : <code>${esc(card.image)}</code></p><p class="small muted">${esc(card.artPrompt)}</p></details>`;
@@ -78,6 +85,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
           </dl>
         </div>
         <p class="lore">Cette page du Bestiaire est encore scellée. Trouve la carte dans un booster${craft ? ', ou invoque-la avec des cendres' : ''}.</p>
+        <p class="small">${odds(card)}</p>
         <p class="small muted">Les noms d’une faction se révèlent quand tu en possèdes la moitié. Tu peux aussi déchiffrer un nom pour ${ECONOMY.decipherAsh} cendres.</p>
         <div class="row gap wrap">
           ${craft ? `<button class="btn primary" data-act="craft" ${g.s.ash < craft ? 'disabled' : ''}>${icon('ash')}Invoquer · ${fmt(craft)} cendres</button>` : '<p class="small muted">Les cartes secrètes ne peuvent pas être invoquées : seul le hasard les révèle.</p>'}

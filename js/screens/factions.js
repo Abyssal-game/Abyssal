@@ -43,8 +43,7 @@ function factionPage(app, root, key) {
       <div class="fac-hero-veil"></div>
       <div class="fac-hero-text"><span class="fac-sig big">${sigil(key)}</span><h1>${esc(f.name)}</h1><p class="lore">${esc(f.realm)} · « ${esc(f.motto)} »</p></div>
     </section>
-    <div class="panel"><p>${esc(f.desc)}</p>
-      <p class="small"><b style="color:${f.colors.secondary}">Passif de combat · ${esc(f.passive.name)}</b> — ${esc(f.passive.desc)}</p></div>
+    <div class="panel"><p>${esc(f.desc)}</p></div>
     <h2 class="section-title">Progression</h2>
     <div class="panel">
       <div class="row between"><b>${p.owned} / ${p.total} créatures</b><span class="muted">${pct(p.ratio)}</span></div>

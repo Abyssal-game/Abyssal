@@ -5,6 +5,19 @@ import { icon, sigil, EMBLEM } from '../ui/icons.js';
 import { esc, fmt, openSheet, bindActions, toast } from '../ui/dom.js';
 import { openPack } from './opening.js';
 
+export function waitText(ms) {
+  const m = Math.max(1, Math.ceil(ms / 60000));
+  return m >= 60 ? `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')}` : `${m} min`;
+}
+
+// Libellé du bouton d'ouverture : ticket, gratuit ou prix en éclats.
+export function payLabel(g, type, again = false) {
+  const t = g.s.tickets[type] || 0;
+  if (t > 0) return `${icon('ticket')}${again ? 'Encore un' : 'Ouvrir'} · ticket (${t})`;
+  if (type === 'standard') { const f = g.freePack(); if (f.stock > 0) return `${icon('sparkle')}${again ? 'Encore un' : 'Ouvrir'} · gratuit (${f.stock})`; }
+  return `${again ? 'Encore un' : 'Acheter'} <span class="price">${icon('crystal')}${fmt(BOOSTERS[type].price)}</span>`;
+}
+
 export function packHTML(type, cat, { faction, event } = {}) {
   const def = BOOSTERS[type];
   let a = '#9F1834', b = '#683BBA', label = def.name.replace('Booster ', '');
@@ -36,6 +49,12 @@ export default function shop(app, root) {
   const st = (app.state.shop ||= { faction: 'infernal' });
   const ev = g.event();
 
+  function freeLine() {
+    const f = g.freePack();
+    if (!f.nextAt) return `<p class="small free-line">${icon('sparkle')} Boosters gratuits au maximum (${f.stock}). Ouvre-les !</p>`;
+    return `<p class="small free-line">${icon('hourglass')} Prochain booster gratuit dans ${waitText(f.nextAt - Date.now())} (${f.stock} en réserve).</p>`;
+  }
+
   function render() {
     const s = g.s;
     const card = (type, extra = '') => {
@@ -50,11 +69,12 @@ export default function shop(app, root) {
           ${extra}
           <div class="row gap wrap">
             <button class="btn ${can ? 'primary' : ''}" data-act="buy" data-type="${type}" ${can ? '' : 'disabled'}>
-              ${tickets > 0 ? `${icon('ticket')}Ouvrir · ticket (${tickets})` : `Acheter <span class="price">${icon('crystal')}${fmt(def.price)}</span>`}
+              ${payLabel(g, type)}
             </button>
             <button class="btn ghost small" data-act="odds" data-type="${type}">${icon('info')}Probabilités</button>
           </div>
           ${!can ? `<p class="small muted">Il te manque ${fmt(def.price - s.shards)} éclats.</p>` : ''}
+          ${type === 'standard' ? freeLine() : ''}
         </div>
       </article>`;
     };
@@ -74,7 +94,7 @@ export default function shop(app, root) {
         ${card('event', `<p class="event-line"><b>${esc(ev.name)}</b> · ${ev.factions.map((f) => esc(cat.faction[f].name)).join(' et ')}<br><span class="small muted">${esc(ev.desc)} Encore ${ev.daysLeft} jour${ev.daysLeft > 1 ? 's' : ''}.</span></p>`)}
         ${card('premium')}
       </div>
-      <p class="small muted center">Gagne des éclats avec les découvertes, l’offrande du jour, les succès, les ensembles, les niveaux et l’Arène.</p>
+      <p class="small muted center">Gagne des éclats avec les découvertes, l’offrande du jour, les succès, les ensembles, les niveaux et les boosters gratuits.</p>
     `;
   }
   render();
@@ -87,5 +107,6 @@ export default function shop(app, root) {
     },
   });
   app.refreshView = render;
-  return () => { app.refreshView = null; };
+  const timer = setInterval(() => { if (!document.querySelector('.opening')) render(); }, 60000);
+  return () => { app.refreshView = null; clearInterval(timer); };
 }

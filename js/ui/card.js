@@ -1,20 +1,12 @@
 // Composant carte : miniature (grilles) et grand format (vue détaillée, ouverture).
 import { RARITY, VARIANTS } from '../config.js';
-import { artUrl } from '../art/assets.js';
+import { artUrl, hasRealArt } from '../art/assets.js';
 import { sigil, icon } from './icons.js';
 import { esc } from './dom.js';
 import { seeded } from '../art/geometry.js';
 
 let catalogRef = null;
 export function setCardCatalog(c) { catalogRef = c; }
-
-const STAT_LABELS = [['atk', 'ATQ'], ['def', 'DÉF'], ['spd', 'VIT'], ['mag', 'MAG'], ['hp', 'PV']];
-
-export function abilityText(a) {
-  const def = catalogRef?.abilities[a.key];
-  if (!def) return { name: a.key, desc: '' };
-  return { name: def.name + (a.value ? ` ${a.value}` : ''), desc: def.desc.replace('{v}', a.value ?? '') };
-}
 
 function hueFor(id) { return Math.floor(seeded('hue:' + id)() * 300) + 30; }
 
@@ -26,7 +18,7 @@ export function cardHTML(card, opts = {}) {
   const { size = 'mini', variant = 'normal', lazy = false, count = 0, isNew = false, mystery = false, nameKnown = false, tag = '' } = opts;
   const r = RARITY[card.rarity];
   const fc = catalogRef?.faction[card.faction]?.colors.secondary || '#888';
-  const cls = ['tcg', `tcg-${size}`, `r-${card.rarity}`, `f-${card.faction}`, mystery ? 'is-mystery' : `v-${variant}`].join(' ');
+  const cls = ['tcg', `tcg-${size}`, `r-${card.rarity}`, `f-${card.faction}`, mystery ? 'is-mystery' : `v-${variant}`, hasRealArt(card.id) ? 'real' : ''].join(' ');
   const style = `--rc:${r.color};--fc:${fc};--hue:${hueFor(card.id)}deg`;
   const lite = size === 'mini';
   const img = lazy
@@ -38,30 +30,25 @@ export function cardHTML(card, opts = {}) {
   if (size === 'mini') {
     return `<div class="${cls}" style="${style}" data-id="${card.id}" role="button" tabindex="0" aria-label="${esc(label)}">
       <div class="tcg-art">${img}</div><div class="tcg-shine"></div><div class="tcg-frame"></div>
-      ${mystery ? `<div class="tcg-lock">${icon('lock')}</div>` : `<span class="tcg-cost">${card.stats.cost}</span>`}
+      ${mystery ? `<div class="tcg-lock">${icon('lock')}</div>` : variant !== 'normal' ? `<span class="tcg-vbadge">${VARIANTS[variant].short}</span>` : ''}
       <span class="tcg-sig">${sigil(card.faction)}</span>
       <div class="tcg-plate"><span class="tcg-gem">${r.short}</span><span class="tcg-nm">${name}</span></div>
       ${count > 1 ? `<span class="tcg-count">×${count}</span>` : ''}${isNew ? '<span class="tcg-new">Nouveau</span>' : ''}${tag}
     </div>`;
   }
-  // Grand format
-  const ab = card.abilities.map(abilityText);
-  const stats = STAT_LABELS.map(([k, l]) => `<span class="st"><b>${card.stats[k]}</b><i>${l}</i></span>`).join('');
+  // Grand format : l'illustration d'abord, un bandeau de nom et un court texte.
+  const fac = catalogRef?.faction[card.faction];
+  const total = catalogRef ? catalogRef.byFaction[card.faction].length : 0;
   return `<div class="${cls}" style="${style}" data-id="${card.id}" aria-label="${esc(label)}">
     <div class="tcg-art">${img}</div><div class="tcg-shine"></div><div class="tcg-glare"></div><div class="tcg-frame"></div>
     <div class="tcg-head">
-      <span class="tcg-cost" title="Coût d’invocation">${card.stats.cost}</span>
       <span class="tcg-titles"><span class="tcg-nm">${name}</span>${mystery ? '' : `<span class="tcg-sub">${esc(card.title)}</span>`}</span>
-      <span class="tcg-sig" title="${esc(catalogRef?.faction[card.faction]?.name || '')}">${sigil(card.faction)}</span>
+      <span class="tcg-sig" title="${esc(fac?.name || '')}">${sigil(card.faction)}</span>
     </div>
-    ${mystery ? `<div class="tcg-body"><p class="tcg-hidden">Page scellée du Bestiaire</p><div class="tcg-foot"><span class="tcg-gem">${r.short}</span><span>${card.id}</span><span>${r.name}</span></div></div>` : `
     <div class="tcg-body">
-      <div class="tcg-type">${esc(card.category)} · Puissance ${card.power}</div>
-      ${ab.length ? `<div class="tcg-abil">${ab.map((a) => `<p><b>${esc(a.name)}</b> ${esc(a.desc)}</p>`).join('')}</div>` : '<div class="tcg-abil"><p class="muted">Aucune capacité particulière.</p></div>'}
-      <p class="tcg-lore">« ${esc(card.lore)} »</p>
-      <div class="tcg-stats">${stats}</div>
-      <div class="tcg-foot"><span class="tcg-gem">${r.short}</span><span>${card.id}</span><span>${variant !== 'normal' ? esc(VARIANTS[variant].name) : r.name}</span></div>
-    </div>`}
+      ${mystery ? '<p class="tcg-hidden">Page scellée du Bestiaire</p>' : `<div class="tcg-type">${esc(card.category)} · ${esc(fac?.name || '')}</div><p class="tcg-lore">« ${esc(card.lore)} »</p>`}
+      <div class="tcg-foot"><span class="tcg-gem">${r.short}</span><span>${card.id} · ${card.number}/${total}</span><span>${!mystery && variant !== 'normal' ? esc(VARIANTS[variant].name) : r.name}</span></div>
+    </div>
   </div>`;
 }
 

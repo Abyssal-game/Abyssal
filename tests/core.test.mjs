@@ -92,6 +92,7 @@ test('ouverture : monnaie débitée, cartes enregistrées, doublons en cendres',
   const store = new MemoryStorage();
   const g = new Game(catalog, store, { rng: rngFrom('game') });
   g.s.tickets.standard = 0;
+  g.s.freePack.stock = 0;
   const before = g.s.shards;
   const { opening, progress } = g.openBooster('standard');
   const bonus = progress.reduce((t, e) => t + (e.reward?.shards || 0), 0);
@@ -208,4 +209,20 @@ test('sauvegarde corrompue : repli sur la copie de secours', () => {
   const { save, source } = loadSave(store);
   assert.equal(save.shards, 777);
   assert.notEqual(source, SAVE_KEY);
+});
+
+test('booster gratuit : se recharge avec le temps, plafonné', () => {
+  let now = new Date(2026, 9, 10, 8);
+  const g = new Game(catalog, new MemoryStorage(), { clock: () => now, rng: rngFrom('free') });
+  g.s.freePack = { stock: 0, since: now.getTime() };
+  g.s.tickets.standard = 0; g.s.shards = 0;
+  assert.equal(g.canBuy('standard'), false);
+  now = new Date(2026, 9, 10, 14, 1);
+  assert.equal(g.freePack().stock, 1);
+  const { opening } = g.openBooster('standard');
+  assert.equal(opening.paidWith, 'free');
+  assert.equal(g.freePack().stock, 0);
+  now = new Date(2026, 9, 13, 8);
+  assert.equal(g.freePack().stock, 2, 'plafonné au maximum');
+  assert.equal(g.freePack().nextAt, null);
 });

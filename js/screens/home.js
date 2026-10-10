@@ -20,7 +20,7 @@ export default function home(app, root) {
   const ev = g.event();
   const daily = g.dailyAmount();
   const recent = s.recent.map((id) => cat.get(id)).filter(Boolean).slice(0, 10);
-  const tickets = Object.entries(s.tickets).filter(([, n]) => n > 0);
+  const freeCount = Object.values(s.tickets).reduce((a, b) => a + b, 0) + g.freePack().stock;
 
   root.innerHTML = `
     <section class="hero" style="--fc:${fac.colors.secondary}">
@@ -37,7 +37,7 @@ export default function home(app, root) {
     </section>
 
     <div class="home-cta">
-      <a class="btn primary block big-cta" href="#/boutique">${icon('booster')}Ouvrir un booster${tickets.length ? `<span class="cta-badge">${tickets.reduce((a, [, n]) => a + n, 0)} gratuit${tickets.reduce((a, [, n]) => a + n, 0) > 1 ? 's' : ''}</span>` : ''}</a>
+      <a class="btn primary block big-cta" href="#/boutique">${icon('booster')}Ouvrir un booster${freeCount ? `<span class="cta-badge">${freeCount} gratuit${freeCount > 1 ? 's' : ''}</span>` : ''}</a>
     </div>
 
     ${g.canDailyClaim() ? `<div class="panel ornate daily">
@@ -59,7 +59,6 @@ export default function home(app, root) {
       <a class="tile" href="#/bestiaire">${icon('book')}<b>Bestiaire</b><span>Chroniques et lore</span></a>
       <a class="tile" href="#/factions">${icon('shield')}<b>Factions</b><span>Sept royaumes</span></a>
       <a class="tile" href="#/succes">${icon('trophy')}<b>Succès</b><span>${Object.keys(s.achievements).length} / ${cat.achievements.length}</span></a>
-      <a class="tile" href="#/arene">${icon('swords')}<b>Arène</b><span>Duel (prototype)</span></a>
       <a class="tile" href="#/parametres">${icon('gear')}<b>Réglages</b><span>Son, sauvegarde</span></a>
     </nav>
 
