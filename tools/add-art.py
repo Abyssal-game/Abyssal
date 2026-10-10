@@ -1,7 +1,8 @@
 """Ajoute une illustration définitive : recadre au format 5:7, redimensionne en
 600 x 840, enregistre en WebP dans assets/art/<ID>.webp et met à jour le manifeste.
-Usage : python3 tools/add-art.py <ID> <image> [--alt] [--focus 0.3]
-(--focus : position verticale du recadrage, 0 = haut, 0.5 = centre)"""
+Usage : python3 tools/add-art.py <ID> <image> [--alt] [--focus 0.3] [--pad]
+(--focus : position verticale du recadrage, 0 = haut, 0.5 = centre ;
+ --pad : image entière sur fond noir au lieu de la recadrer, pour les images à cadre intégré)"""
 import json, sys, pathlib
 from PIL import Image
 
@@ -18,13 +19,18 @@ if card_id not in cards:
 im = Image.open(src).convert('RGB')
 w, h = im.size
 target = 5 / 7
-if w / h > target:
+if '--pad' in args:
+    im.thumbnail((600, 840), Image.LANCZOS)
+    bg = Image.new('RGB', (600, 840), im.getpixel((2, h // 2 * im.height // h)))
+    bg.paste(im, ((600 - im.width) // 2, (840 - im.height) // 2))
+    im = bg
+elif w / h > target:
     nw = round(h * target); x = (w - nw) // 2
     im = im.crop((x, 0, x + nw, h))
 else:
     nh = round(w / target); y = round((h - nh) * focus)
     im = im.crop((0, y, w, y + nh))
-im = im.resize((600, 840), Image.LANCZOS)
+im = im.resize((600, 840), Image.LANCZOS) if im.size != (600, 840) else im
 name = f'{card_id}-alt' if alt else card_id
 out = root / 'assets/art' / f'{name}.webp'
 im.save(out, 'WEBP', quality=84, method=6)
