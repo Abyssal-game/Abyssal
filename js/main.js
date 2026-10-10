@@ -17,17 +17,18 @@ import factionsScreen from './screens/factions.js';
 import achievementsScreen from './screens/achievements.js';
 import profileScreen from './screens/profile.js';
 import settingsScreen from './screens/settings.js';
+import descentScreen from './screens/descent.js';
 
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,
   factions: factionsScreen, faction: factionsScreen, succes: achievementsScreen, profil: profileScreen,
-  parametres: settingsScreen,
+  parametres: settingsScreen, descente: descentScreen,
 };
 const TABS = [
   ['antre', 'home', 'Antre'], ['collection', 'cards', 'Collection'], ['boutique', 'booster', 'Boosters'],
-  ['bestiaire', 'book', 'Bestiaire'], ['profil', 'user', 'Profil'],
+  ['descente', 'swords', 'Descente'], ['profil', 'user', 'Profil'],
 ];
-const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', bestiaire: 'bestiaire', factions: 'antre', faction: 'antre', succes: 'profil', profil: 'profil', parametres: 'profil' };
+const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', bestiaire: 'antre', descente: 'descente', factions: 'antre', faction: 'antre', succes: 'profil', profil: 'profil', parametres: 'profil' };
 
 function storageOrMemory() {
   try {
@@ -76,7 +77,7 @@ function renderChrome() {
   const ticketCount = Object.values(s.tickets).reduce((a, b) => a + b, 0) + g.freePack().stock;
   document.getElementById('tabbar').innerHTML = TABS.map(([key, ic, label]) => {
     const cur = key === tab ? ' aria-current="page"' : '';
-    const badge = key === 'collection' && nNew ? `<span class="badge">${nNew > 99 ? '99+' : nNew}</span>` : key === 'boutique' && ticketCount ? `<span class="badge">${ticketCount}</span>` : key === 'antre' && (g.canDailyClaim() || g.missionsToClaim()) ? '<span class="badge">!</span>' : '';
+    const badge = key === 'collection' && nNew ? `<span class="badge">${nNew > 99 ? '99+' : nNew}</span>` : key === 'boutique' && ticketCount ? `<span class="badge">${ticketCount}</span>` : key === 'antre' && (g.canDailyClaim() || g.missionsToClaim()) ? '<span class="badge">!</span>' : key === 'descente' && g.torchesLeft() ? `<span class="badge">${g.torchesLeft()}</span>` : '';
     if (key === 'boutique') return `<a class="tab tab-main" href="#/boutique"${cur}><span class="orb">${icon(ic)}</span>${label}${badge}</a>`;
     return `<a class="tab" href="#/${key}"${cur}>${icon(ic)}${label}${badge}</a>`;
   }).join('');

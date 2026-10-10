@@ -18,6 +18,12 @@ Application d’ouverture de boosters et de collection de cartes dark fantasy, j
 - **Les illustrations sont provisoires.** Elles sont générées par le jeu (silhouettes en contre-jour, décors propres à chaque faction) à partir de la fiche de chaque carte. Elles se remplacent une par une par de vraies images, sans toucher au code (voir plus bas).
 - **La sauvegarde est locale** (localStorage de l’appareil). Elle n’est synchronisée nulle part ; l’export/import de sauvegarde sert à la conserver ou à la transférer.
 
+## Boucle de jeu
+
+- **La Descente** (`js/core/descent.js`, écran `js/screens/descent.js`) : expédition quotidienne (3 torches par jour) avec une équipe de 6 cartes. Combats automatiques, portes à choisir, autels, gardiens tous les 5 étages, butin à ramener. Les cartes tombées se reposent 24 h ; en descente maudite (butin doublé), elles sont perdues. Les cartes gagnent des niveaux ; variantes et niveaux augmentent leurs statistiques.
+- **Rituel d’élévation** (`js/screens/ritual.js`) : sacrifier des doublons pour faire monter une carte d’un cran (normale → holographique → chromatique → or → cosmique), avec chance affichée, ferveur après un échec et rituel interdit risqué. Réglages dans `RITUAL` (`js/config.js`).
+- **Fusion** des doublons, **missions du jour**, **classeur** par faction et **statistiques de chance** dans le profil.
+
 ## Lancer le jeu
 
 Aucune installation n’est nécessaire : ce sont des fichiers statiques.

@@ -96,3 +96,42 @@ test('rituel : chance calculée, réussite transforme la carte, échec augmente 
   // les C et PC n'ont pas de feuille d'or : chroma -> cosmique
   assert.equal(never.ritualTarget(commons[0].id, 'chroma'), 'galaxy');
 });
+
+test('descente : torches, étages, défaite, blessures et descente maudite', async () => {
+  const { fight, makeUnit, floorDoors } = await import('../js/core/descent.js');
+  const day = new Date(2026, 9, 10, 12);
+  const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('d'), clock: () => day });
+  assert.throws(() => g.startRun());
+  const ids = catalog.byRarity.C.slice(0, 6).map((c) => c.id);
+  ids.forEach((id) => g.addCard(id));
+  g.setTeam(ids);
+  assert.equal(g.torchesLeft(), 3);
+  g.startRun();
+  assert.equal(g.torchesLeft(), 2);
+  assert.throws(() => g.startRun());
+  // on combat jusqu'à la défaite
+  let out;
+  for (let i = 0; i < 60 && g.s.descent.run; i++) {
+    const run = g.s.descent.run;
+    if (run.phase === 'doors') out = g.chooseDoor(g.doors().includes('elite') ? 'elite' : g.doors()[0]);
+    else if (run.phase === 'altar') g.chooseBlessing(run.altar[0]);
+    else g.nextFloor();
+  }
+  assert.ok(out.lost, 'une équipe de communes finit par tomber');
+  assert.ok(out.summary.fallen.length >= 1);
+  out.summary.fallen.forEach((id) => assert.ok(g.isWounded(id)));
+  assert.ok(g.s.descent.bestToday >= 1);
+  // descente maudite : une carte tombée est perdue
+  const g2 = new Game(catalog, new MemoryStorage(), { rng: rngFrom('m'), clock: () => day });
+  ids.forEach((id) => g2.addCard(id));
+  g2.setTeam(ids); g2.startRun({ cursed: true });
+  g2.s.descent.run.team[0].fallen = true; g2.s.descent.run.team[0].hp = 0;
+  const sum = g2.endRun(false);
+  assert.equal(sum.lostCards.length, 1);
+  assert.ok(!g2.owns(ids[0]));
+  // combat : une équipe forte bat une équipe faible
+  const strong = catalog.byRarity.M.slice(0, 3).map((c) => makeUnit(c, { level: 5 }));
+  const weak = catalog.byRarity.C.slice(0, 3).map((c) => makeUnit(c, { side: 'enemy', mult: 0.6 }));
+  assert.ok(fight(strong, weak, rngFrom('x')).won);
+  assert.deepEqual(floorDoors('2026-10-10', 5), ['boss']);
+});

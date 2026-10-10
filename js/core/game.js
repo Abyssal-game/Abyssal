@@ -3,6 +3,7 @@
 import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, FUSION, LUCK_POINTS, RITUAL } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
+import { DESCENT, makeUnit, fight, floorDoors, floorEnemies, roomLoot, blessingChoices, factionBonus, cardLevel } from './descent.js';
 
 const RI = (r) => RARITY_ORDER.indexOf(r);
 
@@ -255,7 +256,7 @@ export class Game {
     for (const x of this.missions().list) {
       if (x.kind !== kind || x.p >= x.n) continue;
       if (kind === 'faction' && x.faction !== faction) continue;
-      x.p = Math.min(x.n, x.p + amount);
+      x.p = kind === 'depth' ? Math.min(x.n, Math.max(x.p, amount)) : Math.min(x.n, x.p + amount);
     }
   }
   missionsToClaim() {
@@ -370,6 +371,176 @@ export class Game {
     const progress = this.checkProgress();
     this.persist();
     return { success, chance, to, used, lost, progress };
+  }
+
+  // La Descente -------------------------------------------------------------
+  descent() {
+    const d = this.s.descent;
+    const day = today(this.clock());
+    if (d.day !== day) { d.day = day; d.used = 0; d.bestToday = 0; }
+    return d;
+  }
+  torchesLeft() { return Math.max(0, DESCENT.torches - this.descent().used); }
+  isWounded(id) { return (this.s.descent.wounds[id] || 0) > this.clock().getTime(); }
+  woundLeft(id) { return Math.max(0, (this.s.descent.wounds[id] || 0) - this.clock().getTime()); }
+  cardLevel(id) { return cardLevel(this.s.descent.xp[id] || 0); }
+  // La variante possédée qui donne le plus de puissance
+  bestCombatVariant(id) {
+    const e = this.entry(id);
+    if (!e) return 'normal';
+    return Object.keys(e.v).filter((v) => e.v[v] > 0).sort((a, b) => (DESCENT.variantBonus[b] || 0) - (DESCENT.variantBonus[a] || 0))[0] || 'normal';
+  }
+  teamUnits(ids, blessings = []) {
+    const cards = ids.map((id) => this.catalog.get(id)).filter(Boolean);
+    const fb = factionBonus(cards);
+    return cards.map((c) => makeUnit(c, { level: this.cardLevel(c.id), variant: this.bestCombatVariant(c.id), bonus: c.faction === fb.faction ? fb.bonus : 0, blessings }));
+  }
+  setTeam(ids) {
+    const list = [...new Set(ids)].filter((id) => this.owns(id)).slice(0, DESCENT.teamSize);
+    this.descent().team = list;
+    this.persist();
+    return list;
+  }
+  startRun({ cursed = false } = {}) {
+    const d = this.descent();
+    if (d.run) throw new Error('Une expédition est déjà en cours.');
+    if (this.torchesLeft() <= 0) throw new Error('Plus de torche aujourd’hui : reviens demain.');
+    const team = d.team.filter((id) => this.owns(id) && !this.isWounded(id));
+    if (team.length < 3) throw new Error('Il faut au moins 3 cartes en état de combattre dans ton équipe.');
+    const units = this.teamUnits(team);
+    d.used++;
+    d.runs++;
+    d.cursed = cursed;
+    d.run = {
+      day: d.day, floor: 1, cleared: 0, cursed, phase: 'doors', blessings: [], altar: null,
+      team: units.map((u) => ({ id: u.id, variant: u.variant, hp: u.maxHp, maxHp: u.maxHp, fallen: false, xp: 0 })),
+      loot: { shards: 0, ash: 0, tickets: {} },
+    };
+    this.persist();
+    return d.run;
+  }
+  runUnits() {
+    const run = this.s.descent.run;
+    const units = this.teamUnits(run.team.map((m) => m.id), run.blessings);
+    return units.map((u, i) => ({ ...u, maxHp: run.team[i].maxHp, hp: run.team[i].hp, fallen: run.team[i].fallen })).filter((u) => !u.fallen && u.hp > 0);
+  }
+  doors() { const run = this.s.descent.run; return run ? floorDoors(run.day, run.floor) : []; }
+  addLoot(l) {
+    const run = this.s.descent.run;
+    const k = (run.blessings.includes('greed') ? 1.3 : 1) * (run.cursed ? DESCENT.cursedLoot : 1);
+    const got = { shards: Math.round((l.shards || 0) * k), ash: Math.round((l.ash || 0) * k), tickets: l.tickets || {} };
+    run.loot.shards += got.shards; run.loot.ash += got.ash;
+    for (const [t, n] of Object.entries(got.tickets)) run.loot.tickets[t] = (run.loot.tickets[t] || 0) + n;
+    return got;
+  }
+  chooseDoor(room) {
+    const run = this.s.descent.run;
+    if (!run || run.phase !== 'doors') throw new Error('Aucune porte à choisir.');
+    if (!this.doors().includes(room)) throw new Error('Porte inconnue.');
+    const out = { room };
+    if (room === 'fight' || room === 'elite' || room === 'boss') {
+      const allies = this.runUnits();
+      const enemies = floorEnemies(this.catalog, run.day, run.floor, room);
+      const res = fight(allies, enemies, this.rng);
+      out.fight = { allies, enemies, events: res.events, won: res.won };
+      // reporte les PV et les chutes sur l'équipe
+      const byId = Object.fromEntries(res.allies.filter((u) => !u.remnant).map((u) => [u.id, u]));
+      run.team.forEach((m) => {
+        const u = byId[m.id];
+        if (!u) return;
+        m.hp = Math.max(0, u.hp);
+        if (m.hp <= 0) m.fallen = true;
+        else { m.xp += DESCENT.xpPerFight * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1); }
+      });
+      if (res.won) {
+        out.loot = this.addLoot(roomLoot(run.floor, room, this.rng));
+        run.phase = 'cleared';
+        this.track('win', 1);
+      } else {
+        out.lost = true;
+        out.summary = this.endRun(true);
+        return out;
+      }
+    } else if (room === 'rest') {
+      run.team.forEach((m) => { if (!m.fallen) m.hp = Math.min(m.maxHp, m.hp + Math.ceil(m.maxHp * 0.4)); });
+      run.phase = 'cleared';
+    } else if (room === 'treasure') {
+      out.loot = this.addLoot(roomLoot(run.floor, room, this.rng));
+      run.phase = 'cleared';
+    } else if (room === 'altar') {
+      run.altar = blessingChoices(run.day, run.floor, run.blessings);
+      if (run.altar.length) { run.phase = 'altar'; out.altar = run.altar; }
+      else { run.altar = null; run.team.forEach((m) => { if (!m.fallen) m.hp = m.maxHp; }); run.phase = 'cleared'; out.healed = true; }
+    }
+    if (run.phase === 'cleared') { run.cleared = run.floor; this.recordDepth(run.floor); }
+    this.persist();
+    return out;
+  }
+  chooseBlessing(key) {
+    const run = this.s.descent.run;
+    if (!run || run.phase !== 'altar' || !run.altar.includes(key)) throw new Error('Bénédiction indisponible.');
+    run.blessings.push(key);
+    if (key === 'vigor') run.team.forEach((m) => { if (!m.fallen) { m.maxHp = Math.round(m.maxHp * 1.2); m.hp = m.maxHp; } });
+    run.altar = null;
+    run.phase = 'cleared';
+    run.cleared = run.floor;
+    this.recordDepth(run.floor);
+    this.persist();
+  }
+  recordDepth(floor) {
+    const d = this.s.descent;
+    d.bestToday = Math.max(d.bestToday, floor);
+    d.best = Math.max(d.best, floor);
+    this.track('depth', floor);
+  }
+  nextFloor() {
+    const run = this.s.descent.run;
+    if (!run || run.phase !== 'cleared') throw new Error('Termine d’abord cet étage.');
+    run.floor++;
+    run.phase = 'doors';
+    this.persist();
+    return run.floor;
+  }
+  // Fin d'expédition : butin (moitié perdue en cas de défaite), blessures ou pertes des cartes tombées.
+  endRun(wiped = false) {
+    const d = this.s.descent, run = d.run;
+    if (!run) throw new Error('Aucune expédition en cours.');
+    const loot = { ...run.loot, tickets: { ...run.loot.tickets } };
+    if (wiped) { loot.shards = Math.floor(loot.shards / 2); loot.ash = Math.floor(loot.ash / 2); loot.tickets = {}; }
+    this.s.shards += loot.shards;
+    this.s.ash += loot.ash;
+    for (const [t, n] of Object.entries(loot.tickets)) this.s.tickets[t] = (this.s.tickets[t] || 0) + n;
+    const now = this.clock().getTime();
+    const fallen = [], lostCards = [], levelUps = [];
+    for (const m of run.team) {
+      if (m.xp) {
+        const before = this.cardLevel(m.id);
+        d.xp[m.id] = (d.xp[m.id] || 0) + m.xp;
+        if (this.cardLevel(m.id) > before) levelUps.push({ id: m.id, level: this.cardLevel(m.id) });
+      }
+      if (!m.fallen) continue;
+      fallen.push(m.id);
+      if (run.cursed) {
+        const e = this.s.collection[m.id];
+        if (!e) continue;
+        const v = e.v[m.variant] > 0 ? m.variant : Object.keys(e.v).find((k) => e.v[k] > 0);
+        e.v[v]--; e.n--;
+        lostCards.push({ id: m.id, variant: v, gone: e.n <= 0 });
+        if (e.n <= 0) {
+          delete this.s.collection[m.id];
+          if (this.s.avatar === m.id) this.s.avatar = null;
+          this.s.showcase = this.s.showcase.filter((x) => x !== m.id);
+          d.team = d.team.filter((x) => x !== m.id);
+        }
+      } else d.wounds[m.id] = now + DESCENT.woundHours * 3600000;
+    }
+    const summary = { wiped, floor: run.cleared, loot, fallen, lostCards, levelUps, cursed: run.cursed };
+    d.last = summary;
+    d.run = null;
+    this.s.xp += run.cleared * 8;
+    this.checkProgress();
+    this.persist();
+    return summary;
   }
 
   setTitle(t) { if (this.s.titles.includes(t)) { this.s.title = t; this.persist(); } }

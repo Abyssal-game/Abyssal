@@ -139,6 +139,8 @@ export const MISSIONS = [
   { key: 'variant',  kind: 'variant',  n: 1, shards: 60, text: 'Obtiens une variante (holographique, or…)' },
   { key: 'fuse',     kind: 'fuse',     n: 1, shards: 50, text: 'Fusionne des doublons' },
   { key: 'ritual',   kind: 'ritual',   n: 1, shards: 60, text: 'Tente un rituel d’élévation' },
+  { key: 'depth4',   kind: 'depth',    n: 4, shards: 70, text: 'Atteins l’étage 4 de la Descente' },
+  { key: 'wins',     kind: 'win',      n: 5, shards: 60, text: 'Remporte 5 combats dans la Descente' },
   { key: 'offering', kind: 'daily',    n: 1, shards: 30, text: 'Récupère l’offrande du jour' },
 ];
 export const MISSION_BONUS = { tickets: { standard: 1 } }; // les 3 missions du jour accomplies
