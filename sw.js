@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v18';
+const VERSION = 'abyssal-v19';
 const CORE = [
   './', 'index.html', 'manifest.webmanifest',
   'css/base.css', 'css/card.css', 'css/screens.css',
