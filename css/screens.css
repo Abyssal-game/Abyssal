@@ -372,3 +372,8 @@ input[type="range"] { width: 100%; accent-color: var(--gold); min-height: 32px; 
 .opening .op-summary img { pointer-events: auto; }
 .opening.is-summary .op-bottom { display: none; }
 .opening.is-summary .op-stage { padding-bottom: calc(20px + var(--safe-b)); }
+
+/* Emballage provisoire sans illustration : grand sceau gravé */
+.pk-emblem { position: absolute; z-index: 1; left: 12%; right: 12%; top: 22%; aspect-ratio: 1; color: #F1DB9E; display: grid; place-items: center;
+  border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--pb) 45%, transparent), transparent 70%); filter: drop-shadow(0 0 4cqw color-mix(in srgb, var(--pb) 80%, transparent)); }
+.pk-emblem svg { width: 88%; height: 88%; }
