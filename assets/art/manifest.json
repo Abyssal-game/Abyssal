@@ -1,6 +1,15 @@
 {
   "comment": "Liste des illustrations définitives présentes dans ce dossier (identifiants de cartes). Exemple : [\"INF-052\", \"INF-052-alt\"]. Fichiers attendus : <ID>.webp, format 600 × 840. cardBack : chemin du dos de carte illustré (ex. \"assets/backs/back.webp\"), ou null pour le dos par défaut.",
   "available": [
+    "ABY-030",
+    "ABY-031",
+    "ABY-032",
+    "ABY-033",
+    "ABY-034",
+    "ABY-035",
+    "ABY-036",
+    "ABY-037",
+    "ABY-038",
     "ABY-039",
     "ABY-040",
     "ABY-041",
@@ -36,6 +45,7 @@
     "INF-040",
     "INF-041",
     "INF-042",
+    "INF-043",
     "INF-044",
     "INF-045",
     "INF-046",
