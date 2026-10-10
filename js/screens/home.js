@@ -11,10 +11,11 @@ export default function home(app, root) {
   const g = app.game, cat = app.catalog, s = g.s;
   const total = g.total(), owned = g.uniqueCount();
   // Créature du jour : une mythique possédée, sinon la silhouette d'une mythique
+  // Créature du jour : la plus belle carte illustrée que le joueur possède déjà (rien n'est dévoilé).
+  const ownedArt = cat.cards.filter((c) => g.owns(c.id) && hasRealArt(c.id));
+  const best = ['S', 'M', 'HR', 'R'].map((r) => ownedArt.filter((c) => c.rarity === r)).find((l) => l.length);
   const mythics = cat.cards.filter((c) => c.rarity === 'M');
-  const ownedM = mythics.filter((c) => g.owns(c.id));
-  const withArt = cat.cards.filter((c) => (c.rarity === 'M' || c.rarity === 'S') && hasRealArt(c.id));
-  const pool = withArt.length ? withArt : ownedM.length ? ownedM : mythics;
+  const pool = best || (ownedArt.length ? ownedArt : mythics);
   const hero = pool[Math.floor(seeded('jour:' + today())() * pool.length)];
   const heroOwned = g.owns(hero.id);
   const fac = cat.faction[hero.faction];
@@ -24,16 +25,16 @@ export default function home(app, root) {
   const freeCount = Object.values(s.tickets).reduce((a, b) => a + b, 0) + g.freePack().stock;
 
   root.innerHTML = `
-    <section class="hero" style="--fc:${fac.colors.secondary}">
-      <div class="hero-art"><img alt="" class="${heroOwned ? '' : 'veiled'}" src="${artUrl(hero, { mystery: !heroOwned })}"></div>
+    <section class="hero ${heroOwned ? '' : 'hero-empty'}" style="--fc:${fac.colors.secondary}">
+      ${heroOwned ? `<div class="hero-art"><img alt="" src="${artUrl(hero)}"></div>` : ''}
       <div class="hero-veil"></div>
       <div class="hero-content">
-        <div class="logo">${EMBLEM}<h1 class="wordmark">ABYSSAL</h1><p class="tagline">Le Bestiaire interdit</p></div>
-        <button class="hero-caption" data-act="hero" aria-label="Voir la créature du jour">
-          <span class="small muted">${heroOwned ? 'Créature du jour' : `Une ${hero.rarity === 'S' ? 'secrète' : 'mythique'} se cache dans les boosters`}</span>
-          <b>${heroOwned ? esc(hero.name) : '???'}</b>
+        <div class="logo">${EMBLEM}<h1 class="wordmark">ABYSSAL</h1><p class="tagline"><i></i>Le Bestiaire interdit<i></i></p></div>
+        ${heroOwned ? `<button class="hero-caption" data-act="hero" aria-label="Voir la créature du jour">
+          <span class="small muted">Créature du jour</span>
+          <b>${esc(hero.name)}</b>
           <span class="small" style="color:${fac.colors.secondary}">${sigil(hero.faction)} ${esc(fac.name)}</span>
-        </button>
+        </button>` : '<span></span>'}
       </div>
     </section>
 
@@ -71,10 +72,11 @@ export default function home(app, root) {
 
     ${recent.length ? `<h2 class="section-title">Dernières découvertes <a class="more" href="#/collection">Tout voir</a></h2>
     <div class="strip" id="recent">${recent.map((c) => cardHTML(c, { lazy: true, isNew: g.entry(c.id)?.isNew })).join('')}</div>` : ''}
+    <footer class="credit">ABYSSAL · Créé par <b>Alexis Seguin</b></footer>
   `;
   lazyArt(root);
   bindActions(root, {
-    hero() { heroOwned ? app.openCard(hero.id) : app.go('boutique'); },
+    hero() { app.openCard(hero.id); },
     daily() {
       try {
         const r = g.claimDaily();

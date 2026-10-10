@@ -11,7 +11,7 @@ Application d’ouverture de boosters et de collection de cartes dark fantasy, j
 - **Collection** avec recherche, filtres (faction, rareté, possédées, manquantes, nouvelles), tri (numéro, nom, rareté, puissance, date) et silhouettes mystérieuses pour les cartes non découvertes.
 - **Vue détaillée** : grand format inclinable, mode « illustration seule », variantes (holographique, chromatique, corrompue, illustration alternative, cosmique, ancestrale, feuille d’or, Édition des Sceaux), chance réelle d’obtenir la carte, lignée, ensembles.
 - **Bestiaire** (encyclopédie et Chroniques débloquées au fil des découvertes), **Factions**, **Succès** (26) et **12 ensembles** thématiques à récompenses, **Profil** (titres, cadres, vitrine, statistiques, historique), **Réglages** (son, animations, taille du texte, contraste, sauvegarde).
-- **Économie** : éclats (boosters) et cendres (obtenues avec les doublons, pour invoquer une carte manquante ou déchiffrer un nom). Offrande quotidienne facultative et booster standard gratuit qui se recharge toutes les 6 heures (2 en réserve au maximum), sans pénalité. **Aucun achat en argent réel.**
+- **Économie** : éclats (boosters) et cendres (obtenues avec les doublons, pour invoquer une carte manquante ou déchiffrer un nom). Offrande quotidienne facultative et booster standard gratuit qui se recharge toutes les 6 heures (2 en réserve au maximum), sans pénalité.
 
 ### Ce qui est provisoire
 

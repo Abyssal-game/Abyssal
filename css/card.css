@@ -12,8 +12,7 @@
 @media (hover: hover) { .tcg-mini:hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(0, 0, 0, .7), 0 0 18px color-mix(in srgb, var(--rc) 35%, transparent); } }
 .tcg-art { position: absolute; inset: 0; z-index: 0; }
 .tcg-art img { width: 100%; height: 100%; object-fit: cover; background: #0B0C12; }
-.tcg-full .tcg-art img { transform: scale(1.04); transition: transform .3s; }
-.tcg-full.tilting .tcg-art img { transform: scale(1.08) translate(calc((50% - var(--mx)) / 12), calc((50% - var(--my)) / 12)); }
+.tcg-full .tcg-art img { transform: scale(1.02); }
 
 /* Cadre à dégradé (bordure par masque) */
 .tcg-frame {
@@ -85,37 +84,13 @@
 
 /* Reflets */
 .tcg-shine, .tcg-glare { position: absolute; inset: 0; z-index: 3; pointer-events: none; border-radius: inherit; }
-.tcg-glare { background: radial-gradient(circle at var(--mx) var(--my), rgba(255, 255, 255, .28), transparent 45%); mix-blend-mode: overlay; opacity: 0; transition: opacity .3s; }
-.tcg-full.tilting .tcg-glare { opacity: 1; }
+.tcg-glare { background: radial-gradient(circle at var(--mx) var(--my), rgba(255, 255, 255, .34), transparent 48%); mix-blend-mode: overlay; opacity: 0; }
+.tiltable .tcg-glare { opacity: calc(.25 + var(--tilt, 0) * .9); }
 .r-M .tcg-shine, .r-S .tcg-shine {
   background: linear-gradient(115deg, transparent 35%, rgba(255, 236, 180, .32) 47%, rgba(255, 255, 255, .45) 50%, rgba(255, 236, 180, .32) 53%, transparent 65%);
   background-size: 260% 260%; background-position: var(--mx) var(--my); mix-blend-mode: screen; animation: sweep 5.5s ease-in-out infinite;
 }
 @keyframes sweep { 0%, 100% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } }
-.tcg-full.tilting .tcg-shine { animation: none; }
-
-/* Variantes cosmétiques */
-.v-holo .tcg-shine {
-  background:
-    repeating-linear-gradient(110deg, rgba(255, 0, 140, 0) 0%, rgba(255, 70, 160, .38) 5%, rgba(70, 220, 255, .38) 10%, rgba(255, 240, 90, .34) 15%, rgba(140, 255, 160, .3) 20%, rgba(255, 0, 140, 0) 26%),
-    radial-gradient(circle at var(--mx) var(--my), rgba(255, 255, 255, .35), transparent 50%);
-  background-size: 400% 400%, 100% 100%; background-position: var(--mx) var(--my), 0 0;
-  mix-blend-mode: color-dodge; opacity: .6; animation: holo 7s linear infinite;
-}
-@keyframes holo { 0% { background-position: 0% 50%, 0 0; } 100% { background-position: 400% 50%, 0 0; } }
-.tcg-full.v-holo.tilting .tcg-shine { animation: none; opacity: .8; }
-.v-chroma .tcg-art img { filter: hue-rotate(var(--hue)) saturate(1.5) contrast(1.05); }
-.v-chroma .tcg-frame { filter: hue-rotate(var(--hue)) saturate(1.4); }
-.v-corrupt .tcg-art img { filter: invert(.88) hue-rotate(160deg) saturate(1.6) contrast(1.25); }
-.v-corrupt .tcg-shine { background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .25) 0 1px, transparent 1px 3px), linear-gradient(transparent 60%, rgba(160, 255, 80, .18)); animation: glitch 2.6s steps(2) infinite; }
-@keyframes glitch { 0%, 92%, 100% { transform: none; } 94% { transform: translateX(2%); filter: hue-rotate(90deg); } 96% { transform: translateX(-1.5%); } }
-.v-corrupt { --frame: linear-gradient(160deg, #13200C, #9BFF5A 25%, #3A0A12 50%, #FF3A5A 75%, #13200C); }
-.v-ancestral .tcg-art img { filter: sepia(.85) saturate(1.3) contrast(1.15) brightness(.95); }
-.v-ancestral .tcg-shine { background: radial-gradient(circle at 30% 20%, rgba(255, 230, 170, .15), transparent 60%), repeating-radial-gradient(circle at 50% 50%, rgba(80, 50, 20, .08) 0 2px, transparent 2px 5px); mix-blend-mode: multiply; }
-.v-ancestral { --frame: linear-gradient(160deg, #3A2410, #D9A86A 30%, #6A4320 55%, #F2D39B 80%, #3A2410); }
-.v-special { --frame: linear-gradient(160deg, #F6E2A0, #8A6526 20%, #FFF6D6 40%, #B98A3C 60%, #FFF0C2 80%, #8A6526); box-shadow: 0 0 26px rgba(240, 200, 100, .55); }
-.v-special .tcg-shine { background: linear-gradient(120deg, transparent 30%, rgba(255, 230, 150, .5) 50%, transparent 70%); background-size: 300% 300%; mix-blend-mode: screen; animation: sweep 3.5s ease-in-out infinite; }
-.v-alt .tcg-art img { filter: saturate(1.15); }
 
 /* Dos de carte */
 .tcg-back {
@@ -133,7 +108,6 @@
 /* Grilles */
 .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; }
 @media (min-width: 520px) { .grid-cards { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 12px; } }
-.grid-cards > .tcg { content-visibility: auto; contain-intrinsic-size: 140px 196px; }
 .strip { display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px 10px; scroll-snap-type: x mandatory; scrollbar-width: none; }
 .strip::-webkit-scrollbar { display: none; }
 .strip > .tcg { flex: 0 0 104px; scroll-snap-align: start; }
@@ -157,47 +131,120 @@
 .v-ancestral .tcg-vbadge { background: linear-gradient(110deg, #F2D39B, #B07A3A); }
 .v-special .tcg-vbadge { background: linear-gradient(110deg, #FFF6D6, #C8A45D); }
 
-/* Paillettes holographiques */
-.v-holo .tcg-glare, .v-galaxy .tcg-glare, .v-gold .tcg-glare { opacity: .9; }
-.v-holo .tcg-art::after {
-  content: ''; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: color-dodge; opacity: .5;
-  background-image: radial-gradient(circle, rgba(255, 255, 255, .9) 0 .7px, transparent 1.2px), radial-gradient(circle, rgba(180, 240, 255, .8) 0 .6px, transparent 1.1px);
-  background-size: 9px 9px, 13px 13px; background-position: 0 0, 5px 7px; animation: glitter 3s steps(3) infinite;
-}
-@keyframes glitter { 50% { opacity: .25; background-position: 3px 2px, 2px 9px; } }
-.v-holo .tcg-frame { animation: holoFrame 4s linear infinite; }
-@keyframes holoFrame { to { filter: hue-rotate(360deg); } }
-
-/* Feuille d'or */
-.v-gold { --frame: linear-gradient(160deg, #FFF6D6, #C8A45D 25%, #FFF0C2 45%, #8A6526 70%, #FFE9A8); box-shadow: 0 0 24px rgba(240, 200, 100, .55); }
-.v-gold .tcg-art img { filter: sepia(.8) saturate(1.9) contrast(1.2) brightness(1.08) hue-rotate(-8deg); }
-.v-gold .tcg-shine {
-  background: linear-gradient(115deg, transparent 25%, rgba(255, 225, 140, .55) 45%, rgba(255, 255, 255, .7) 50%, rgba(255, 225, 140, .55) 55%, transparent 75%);
-  background-size: 300% 300%; background-position: var(--mx) var(--my); mix-blend-mode: overlay; animation: sweep 4s ease-in-out infinite;
-}
-
-/* Cosmique */
-.v-galaxy { --frame: conic-gradient(from var(--ang, 0deg), #3A1A7A, #FF5CC8, #35BDE5, #1A0B3A, #C266FF, #3A1A7A); animation: none; }
-.v-galaxy .tcg-frame { animation: spinFrame 5s linear infinite; }
-.v-galaxy .tcg-art img { filter: saturate(1.4) contrast(1.15) hue-rotate(-20deg); }
-.v-galaxy .tcg-shine {
-  mix-blend-mode: screen; opacity: .85;
-  background:
-    radial-gradient(circle, #fff 0 .8px, transparent 1.3px) 0 0 / 23px 23px,
-    radial-gradient(circle, #cfe8ff 0 .6px, transparent 1px) 11px 7px / 17px 17px,
-    radial-gradient(60% 40% at 20% 30%, rgba(255, 90, 200, .35), transparent 70%),
-    radial-gradient(50% 40% at 80% 70%, rgba(60, 190, 230, .35), transparent 70%);
-  animation: drift 12s linear infinite;
-}
-@keyframes drift { to { background-position: 46px 46px, 45px 41px, 0 0, 0 0; } }
-
-/* Illustration alternative d'une vraie image : retournée et étalonnée */
-.real.v-alt .tcg-art img { transform: scaleX(-1); filter: saturate(1.3) contrast(1.1) hue-rotate(-14deg); }
-.tcg-full.real.v-alt .tcg-art img { transform: scale(-1.04, 1.04); }
-
 /* Carte non découverte avec vraie illustration : simple silhouette sombre */
 .is-mystery.real .tcg-art img { filter: grayscale(1) brightness(.3) contrast(1.4) blur(2.5px); }
 
 /* Dos de carte illustré */
 .has-back .tcg-back { background: var(--card-back) center / 100% 100% no-repeat; border: 0; box-shadow: 0 8px 20px rgba(0, 0, 0, .6); }
 .has-back .tcg-back > *, .has-back .tcg-back::after { display: none; }
+
+/* ——— Inclinaison 3D (fiche détaillée) ——— */
+.tcg-full.tiltable { transition: none; touch-action: none; transform-style: flat; -webkit-touch-callout: none; }
+.tcg img { -webkit-user-drag: none; -webkit-touch-callout: none; }
+.tiltable img { pointer-events: none; }
+.tiltable .tcg-shine, .tiltable .tcg-art::after { animation: none !important; }
+.tiltable.r-M .tcg-shine, .tiltable.r-S .tcg-shine { opacity: calc(.45 + var(--tilt, 0) * .8); }
+
+/* ——— Variantes : l'illustration reste intacte, les effets se posent dessus ——— */
+.tcg-art::after { content: ''; position: absolute; inset: 0; pointer-events: none; }
+:is(.v-holo, .v-chroma, .v-corrupt, .v-ancestral, .v-gold, .v-special, .v-alt) .tcg-frame { background-size: 260% 260%; background-position: var(--mx) var(--my); }
+
+/* Holographique : feuille arc-en-ciel qui glisse avec l'angle, paillettes */
+.v-holo { --frame: linear-gradient(125deg, #FF8AD8, #8FE3FF 16%, #FFF29A 33%, #A8FFB8 50%, #FF8AD8 66%, #8FE3FF 83%, #FFF29A); box-shadow: 0 6px 18px rgba(0, 0, 0, .55), 0 0 18px rgba(170, 220, 255, .35); }
+.v-holo .tcg-art img { filter: saturate(1.15) contrast(1.05); }
+.v-holo .tcg-shine {
+  background: repeating-linear-gradient(115deg, rgba(255, 90, 200, .0) 0%, rgba(255, 90, 200, .55) 4%, rgba(90, 220, 255, .55) 8%, rgba(255, 245, 120, .5) 12%, rgba(120, 255, 170, .5) 16%, rgba(255, 90, 200, 0) 21%);
+  background-size: 300% 300%; background-position: var(--mx) var(--my); mix-blend-mode: color-dodge; opacity: .32; animation: holoSlide 9s linear infinite;
+}
+.v-holo .tcg-art::after {
+  mix-blend-mode: color-dodge; opacity: .7;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='1' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 14 0 0 0 -9.6'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23s)'/%3E%3C/svg%3E") 0 0 / 220px 220px, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='1' seed='8'/%3E%3CfeColorMatrix values='0 0 0 0 .7 0 0 0 0 .95 0 0 0 0 1 14 0 0 0 -9.6'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23s)'/%3E%3C/svg%3E") 40px 90px / 260px 260px;
+  animation: sparkle 3s ease-in-out infinite alternate;
+}
+.tiltable.v-holo .tcg-shine { opacity: calc(.22 + var(--tilt, 0) * .5); }
+@keyframes holoSlide { to { background-position: 300% 300%; } }
+@keyframes sparkle { to { opacity: .3; } }
+
+/* Chromatique : cadre chromé, prisme irisé sur les bords de l'image */
+.v-chroma { --frame: linear-gradient(135deg, #F4F7FC, #7E889B 18%, #FFFFFF 34%, #5D6678 52%, #E4EAF3 70%, #8C97AB 86%, #FFFFFF); box-shadow: 0 6px 18px rgba(0, 0, 0, .55), 0 0 16px rgba(220, 230, 255, .3); }
+.v-chroma .tcg-art img { filter: saturate(1.2) contrast(1.08); }
+.v-chroma .tcg-shine {
+  background: conic-gradient(from 200deg at var(--mx) var(--my), #FF4D6D, #FFD166, #06D6A0, #4CC9F0, #9D4EDD, #FF4D6D);
+  mix-blend-mode: overlay; opacity: .5;
+  -webkit-mask: radial-gradient(ellipse 70% 62% at 50% 45%, transparent 40%, #000 100%); mask: radial-gradient(ellipse 70% 62% at 50% 45%, transparent 40%, #000 100%);
+}
+.v-chroma .tcg-art::after { background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, .22) 48%, transparent 60%); background-size: 250% 250%; background-position: var(--mx) var(--my); mix-blend-mode: screen; }
+
+/* Corrompue : la créature est rongée — veines, lueur toxique, vignette, parasites */
+.v-corrupt { --frame: linear-gradient(160deg, #0D140A, #7DFF4A 14%, #1A0710 30%, #B0123A 48%, #0D140A 62%, #6BE03A 80%, #2A0614); box-shadow: 0 6px 18px rgba(0, 0, 0, .6), 0 0 18px rgba(120, 255, 80, .3); }
+.v-corrupt .tcg-art img { filter: saturate(1.25) contrast(1.15) brightness(.95); }
+.v-corrupt .tcg-art::after {
+  mix-blend-mode: multiply;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140' preserveAspectRatio='none'%3E%3Cpath d='M0 18l9 6 4 9 10 3 5 8M13 33l-3 10 4 7M0 96l8-3 7 5 9-2 6 6 3 9M15 98l2 9-4 8M100 30l-8 5-3 10-9 4-2 8M89 45l7 8M100 112l-9-4-6 6-10 1-4 9M85 114l2 10M38 140l3-9 8-4 2-8M49 127l8 3M60 0l-2 7 5 6-3 8M0 60l6 2 3 7M100 76l-7 1-4 6' fill='none' stroke='%232A0530' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 100% 100%,
+    radial-gradient(ellipse 72% 62% at 50% 45%, transparent 38%, rgba(45, 0, 55, .9) 100%);
+}
+.v-corrupt .tcg-shine { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140' preserveAspectRatio='none'%3E%3Cpath d='M0 18l9 6 4 9 10 3 5 8M13 33l-3 10 4 7M0 96l8-3 7 5 9-2 6 6 3 9M15 98l2 9-4 8M100 30l-8 5-3 10-9 4-2 8M89 45l7 8M100 112l-9-4-6 6-10 1-4 9M85 114l2 10M38 140l3-9 8-4 2-8M49 127l8 3M60 0l-2 7 5 6-3 8M0 60l6 2 3 7M100 76l-7 1-4 6' fill='none' stroke='%237DFF4A' stroke-width='.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 100% 100%, radial-gradient(120% 55% at 50% 115%, rgba(120, 255, 80, .5), transparent 60%), repeating-linear-gradient(0deg, rgba(0, 0, 0, .16) 0 1px, transparent 1px 3px); mix-blend-mode: screen; animation: glitch 3.2s steps(2) infinite; }
+.v-corrupt .tcg-art img { filter: saturate(1.1) contrast(1.2) brightness(.9) hue-rotate(-12deg); }
+.v-corrupt .tcg-frame { animation: corruptFlicker 2.8s steps(1) infinite; }
+@keyframes glitch { 0%, 90%, 100% { transform: none; } 92% { transform: translateX(1.5%); filter: hue-rotate(80deg); } 95% { transform: translateX(-1%); } }
+@keyframes corruptFlicker { 0%, 88%, 100% { filter: none; } 90% { filter: brightness(1.8) hue-rotate(60deg); } 94% { filter: brightness(.6); } }
+
+/* Ancestrale : bronze gravé, parchemin ancien sur les bords */
+.v-ancestral { --frame: repeating-linear-gradient(45deg, rgba(0, 0, 0, .18) 0 1px, transparent 1px 4px), linear-gradient(160deg, #3A2410, #E2B474 22%, #7A4E22 45%, #F6DCA4 66%, #8A5A2A 84%, #3A2410); box-shadow: 0 6px 18px rgba(0, 0, 0, .6), 0 0 16px rgba(226, 180, 116, .3); }
+.v-ancestral .tcg-art img { filter: sepia(.35) saturate(1.1) contrast(1.08); }
+.v-ancestral .tcg-art::after {
+  mix-blend-mode: multiply;
+  background:
+    radial-gradient(ellipse 80% 70% at 50% 45%, transparent 50%, rgba(90, 50, 15, .75) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .4 0 0 0 0 .22 0 0 0 .35 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.v-ancestral .tcg-shine { background: linear-gradient(115deg, transparent 35%, rgba(255, 220, 160, .35) 50%, transparent 65%); background-size: 260% 260%; background-position: var(--mx) var(--my); mix-blend-mode: soft-light; }
+
+/* Feuille d'or : cadre d'or massif, paillettes et éclat doré */
+.v-gold { --frame: linear-gradient(135deg, #FFF8DC, #D4A84B 15%, #FFF0B8 30%, #8A6022 48%, #FFE38A 64%, #A87A2E 80%, #FFF6D0); box-shadow: 0 6px 18px rgba(0, 0, 0, .55), 0 0 24px rgba(255, 205, 100, .5); }
+.v-gold .tcg-art img { filter: sepia(.22) saturate(1.25) contrast(1.06) brightness(1.03); }
+.v-gold .tcg-art::after {
+  mix-blend-mode: screen; opacity: .9;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='1' seed='5'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .82 0 0 0 0 .4 14 0 0 0 -9.6'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23s)'/%3E%3C/svg%3E") 0 0 / 220px 220px, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='1' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .95 0 0 0 0 .75 14 0 0 0 -9.6'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23s)'/%3E%3C/svg%3E") 70px 30px / 280px 280px;
+  animation: sparkle 3.4s ease-in-out infinite alternate;
+}
+.v-gold .tcg-shine { background: linear-gradient(115deg, transparent 28%, rgba(255, 210, 110, .55) 44%, rgba(255, 250, 220, .75) 50%, rgba(255, 210, 110, .55) 56%, transparent 72%); background-size: 280% 280%; background-position: var(--mx) var(--my); mix-blend-mode: overlay; animation: sweep 4.5s ease-in-out infinite; }
+
+/* Cosmique : un ciel étoilé apparaît dans les ombres de l'image */
+.v-galaxy { --frame: conic-gradient(from var(--ang, 0deg), #3A1A7A, #FF5CC8, #35BDE5, #1A0B3A, #C266FF, #3A1A7A); box-shadow: 0 6px 18px rgba(0, 0, 0, .6), 0 0 22px rgba(194, 102, 255, .4); }
+.v-galaxy .tcg-frame { background-size: 100% 100%; animation: spinFrame 6s linear infinite; }
+.v-galaxy .tcg-art img { filter: saturate(1.2) contrast(1.1); }
+.v-galaxy .tcg-art::after {
+  mix-blend-mode: screen; opacity: .9;
+  background:
+    radial-gradient(circle, #fff 0 .8px, transparent 1.4px) 0 0 / 23px 23px,
+    radial-gradient(circle, #CFE8FF 0 .6px, transparent 1.1px) 11px 7px / 17px 17px,
+    radial-gradient(circle, #FFD6F5 0 .5px, transparent 1px) 5px 13px / 13px 13px,
+    radial-gradient(55% 40% at 22% 28%, rgba(255, 90, 200, .38), transparent 70%),
+    radial-gradient(50% 42% at 80% 72%, rgba(60, 190, 230, .38), transparent 70%);
+  animation: drift 14s linear infinite;
+}
+.v-galaxy .tcg-shine { background: radial-gradient(circle at var(--mx) var(--my), rgba(200, 160, 255, .35), transparent 50%); mix-blend-mode: screen; }
+@keyframes drift { to { background-position: 46px 46px, 45px 41px, 31px 39px, 0 0, 0 0; } }
+
+/* Édition des Sceaux */
+.v-special { --frame: linear-gradient(160deg, #F6E2A0, #8A6526 20%, #FFF6D6 40%, #B98A3C 60%, #FFF0C2 80%, #8A6526); box-shadow: 0 0 26px rgba(240, 200, 100, .55); }
+.v-special .tcg-shine { background: linear-gradient(120deg, transparent 30%, rgba(255, 230, 150, .5) 50%, transparent 70%); background-size: 300% 300%; background-position: var(--mx) var(--my); mix-blend-mode: screen; animation: sweep 3.5s ease-in-out infinite; }
+
+/* Illustration alternative : image retournée et étalonnée, cadre argent bleuté */
+.v-alt { --frame: linear-gradient(150deg, #2A3550, #B9D3FF 30%, #4A5D86 55%, #E0ECFF 80%, #2A3550); }
+.v-alt .tcg-art img { filter: saturate(1.15); }
+.real.v-alt .tcg-art img { transform: scaleX(-1); filter: saturate(1.25) contrast(1.08) hue-rotate(-12deg); }
+.tcg-full.real.v-alt .tcg-art img { transform: scale(-1.02, 1.02); }
+
+/* Badges de variante */
+.v-corrupt .tcg-vbadge { background: linear-gradient(110deg, #9BFF5A, #FF3A5A); }
+.v-ancestral .tcg-vbadge { background: linear-gradient(110deg, #F2D39B, #B07A3A); }
+.v-special .tcg-vbadge, .v-gold .tcg-vbadge { background: linear-gradient(110deg, #FFF6D6, #C8A45D); }
+.v-chroma .tcg-vbadge { background: linear-gradient(110deg, #FFFFFF, #8C97AB 50%, #E4EAF3); }
+.v-galaxy .tcg-vbadge { background: linear-gradient(110deg, #FF5CC8, #C266FF 50%, #35BDE5); color: #fff; }
+
+/* ——— Fluidité : dans les grilles, effets figés (pas de repeinture continue) ——— */
+.tcg-mini .tcg-frame, .tcg-mini .tcg-shine, .tcg-mini .tcg-art::after { animation: none !important; }
+.tcg-mini.is-mystery.real .tcg-art img { filter: grayscale(1) brightness(.24) contrast(1.4); }

@@ -65,13 +65,32 @@ p { margin: 0 0 .75em; }
 .sigil { width: 1.4em; height: 1.4em; flex: none; }
 :focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 2px; border-radius: 6px; }
 
-/* Démarrage */
-.boot { position: fixed; inset: 0; display: grid; place-items: center; background: var(--abyss); z-index: 100; transition: opacity .5s; text-align: center; padding: 24px; }
-.boot.out { opacity: 0; pointer-events: none; }
-.boot .emblem { width: 110px; height: 110px; margin: 0 auto 16px; animation: spin 18s linear infinite; }
-.boot p { font-family: var(--f-display); letter-spacing: .2em; font-size: .8rem; color: var(--gold); }
-.boot .err { color: #ff9c9c; font-family: var(--f-ui); letter-spacing: 0; max-width: 340px; margin: 12px auto 0; }
+/* Démarrage : ouverture animée */
+.boot { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 24px; text-align: center; overflow: hidden;
+  background: radial-gradient(80% 60% at 50% 45%, #1A0F26, #08090D 70%); transition: opacity .8s ease, transform .9s ease; }
+.boot.out { opacity: 0; transform: scale(1.08); pointer-events: none; }
+.boot-glow { position: absolute; left: 50%; top: 42%; width: 140vmax; height: 140vmax; margin: -70vmax 0 0 -70vmax; border-radius: 50%;
+  background: radial-gradient(circle, rgba(200, 164, 93, .22), rgba(104, 59, 186, .16) 22%, transparent 45%); animation: bootGlow 2.6s ease-out both; }
+.boot-inner { position: relative; }
+.boot-emblem { width: 132px; height: 132px; margin: 0 auto 22px; filter: drop-shadow(0 0 18px rgba(200, 164, 93, .55)); animation: bootEmblem 1.1s cubic-bezier(.2, .8, .2, 1) both; }
+.boot-emblem .em-eye { transform-origin: 50px 50px; animation: bootEye .7s .55s cubic-bezier(.3, 1.4, .5, 1) both; }
+.boot-word { position: relative; margin: 0 0 12px .2em; font: 900 clamp(2.6rem, 13vw, 4.4rem)/1 var(--f-display); letter-spacing: .2em; overflow: hidden; }
+.boot-word span { display: block; background: linear-gradient(180deg, #FFF6DA 8%, #E8C987 45%, #9A7434 85%); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .9)); animation: bootWord 1s .7s cubic-bezier(.2, .8, .2, 1) both; }
+.boot-word::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgba(255, 250, 225, .85) 50%, transparent 65%); background-size: 250% 100%;
+  mix-blend-mode: overlay; animation: bootSweep 1.1s 1.5s ease-in-out both; }
+.boot-tag { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 0; font: 600 .74rem/1 var(--f-display); letter-spacing: .42em; text-transform: uppercase; color: var(--bone); animation: bootFade .8s 1.3s ease both; }
+.boot-tag i { display: block; width: 34px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold)); }
+.boot-tag i:last-child { transform: scaleX(-1); }
+.boot .err { color: #ff9c9c; font-family: var(--f-ui); letter-spacing: 0; max-width: 340px; margin: 16px auto 0; }
+@keyframes bootGlow { from { opacity: 0; transform: scale(.4); } 40% { opacity: 1; } to { opacity: .8; transform: scale(1); } }
+@keyframes bootEmblem { from { opacity: 0; transform: scale(.55) rotate(-40deg); filter: blur(8px) drop-shadow(0 0 0 transparent); } to { opacity: 1; transform: none; } }
+@keyframes bootEye { from { transform: scaleY(.05); } to { transform: none; } }
+@keyframes bootWord { from { opacity: 0; letter-spacing: .6em; transform: translateY(40%); } to { opacity: 1; letter-spacing: inherit; transform: none; } }
+@keyframes bootSweep { from { background-position: 120% 0; } to { background-position: -20% 0; } }
+@keyframes bootFade { from { opacity: 0; transform: translateY(6px); } to { opacity: .85; transform: none; } }
 @keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .boot *, .boot *::after { animation: none !important; } }
 
 /* Structure */
 #app { min-height: 100%; }

@@ -30,11 +30,6 @@ export default function settings(app, root) {
         ${toggle('fastOpen', 'Ouverture rapide des boosters', 'Affiche directement le récapitulatif, sans révéler les cartes une par une.')}
       </section>
       <section class="panel stack">
-        <h2>Affichage</h2>
-        ${seg('textSize', 'Taille du texte', [['normal', 'Normale'], ['large', 'Grande']])}
-        ${toggle('contrast', 'Contraste renforcé', 'Textes secondaires et bordures plus lumineux.')}
-      </section>
-      <section class="panel stack">
         <h2>Sauvegarde</h2>
         <p class="small">Ta progression est enregistrée <b>uniquement sur cet appareil</b>, dans ce navigateur, après chaque action. Elle n’est synchronisée nulle part. Pour la conserver ou la transférer, exporte-la régulièrement.</p>
         ${app.persistent ? '' : '<p class="small err">Le stockage local est indisponible : la progression sera perdue à la fermeture.</p>'}
@@ -52,8 +47,7 @@ export default function settings(app, root) {
       ${s.dev ? devPanel() : ''}
       <section class="panel stack about">
         <h2>À propos</h2>
-        <p class="small">ABYSSAL est un jeu gratuit de collection. Les boosters s’achètent uniquement avec la monnaie du jeu ; il n’existe aucun achat en argent réel.</p>
-        <p class="small">Les illustrations actuelles sont <b>provisoires</b> : elles sont générées par le jeu à partir de la description de chaque créature. Elles seront remplacées progressivement par des illustrations définitives.</p>
+        <p class="small">ABYSSAL — Le Bestiaire interdit. Créé par <b>Alexis Seguin</b>.</p>
         <p class="small muted" data-act="version">Version ${esc(app.version)} · ${app.catalog.cards.length} cartes</p>
       </section>`;
     root.querySelector('#vol')?.addEventListener('change', (e) => { g.setSetting('volume', Number(e.target.value)); app.applySettings(); sfx.tap(); });

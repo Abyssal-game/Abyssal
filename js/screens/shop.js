@@ -48,7 +48,7 @@ export function showOdds(app, type) {
     <h3>Garanties</h3>
     <ul class="small"><li>Après ${PITY.hr - 1} boosters d’affilée sans Hyper rare ou mieux, la dernière carte du suivant est <b>au moins Hyper rare</b>.</li><li>Après ${PITY.m - 1} boosters d’affilée sans Mythique ou mieux, la dernière carte du suivant est <b>au moins Mythique</b>.</li><li>Les compteurs sont communs à tous les boosters et repartent à zéro dès que la rareté est obtenue.</li></ul>
     <h3>Variantes</h3>
-    <p class="small">Chaque carte peut sortir en variante cosmétique (holographique, chromatique, corrompue, illustration alternative, ancestrale pour les Rares et mieux). Une variante ne change pas la carte en combat.${def.variantMult > 1 ? ` Ce booster multiplie leurs chances par ${String(def.variantMult).replace('.', ',')}.` : ''}</p>
+    <p class="small">Chaque carte peut sortir en variante cosmétique (holographique, chromatique, corrompue, illustration alternative, ancestrale pour les Rares et mieux). Une variante est purement visuelle.${def.variantMult > 1 ? ` Ce booster multiplie leurs chances par ${String(def.variantMult).replace('.', ',')}.` : ''}</p>
     <h3>Doublons</h3>
     <p class="small">Un doublon exact rapporte des cendres (${RARITIES.map((r) => `${r.short} ${ECONOMY.duplicateAsh[r.key]}`).join(', ')}). Les cendres servent à invoquer une carte manquante.</p>`, { label: 'Probabilités' });
 }
@@ -57,15 +57,6 @@ export default function shop(app, root) {
   const g = app.game, cat = app.catalog;
   const st = (app.state.shop ||= { faction: 'infernal' });
   const ev = g.event();
-
-  // Vitrine : les cartes les plus rares déjà illustrées, visibles par tous.
-  function treasures() {
-    const list = cat.cards.filter((c) => (c.rarity === 'S' || c.rarity === 'M') && hasRealArt(c.id)).sort((a, b) => (b.rarity === 'S') - (a.rarity === 'S'));
-    if (!list.length) return '';
-    return `<h2 class="section-title">Les trésors cachés</h2>
-      <div class="treasures">${list.map((c) => { const own = g.owns(c.id); return `<figure class="treasure r-${c.rarity} ${own ? 'owned' : ''}" style="--rc:${RARITY[c.rarity].color}"><img alt="" loading="lazy" class="${own ? '' : 'veiled'}" src="${artUrl(c, { mystery: !own })}"><figcaption><b>${own ? esc(c.name) : '???'}</b><span>${RARITY[c.rarity].name}${own ? ' · possédée' : ''}</span></figcaption></figure>`; }).join('')}</div>
-      <p class="small muted">Leur vrai visage ne se révèle qu’à celui qui les trouve. Les secrètes sortent environ une fois toutes les 330 cartes.</p>`;
-  }
 
   function freeLine() {
     const f = g.freePack();
@@ -109,9 +100,8 @@ export default function shop(app, root) {
     root.innerHTML = `
       <header class="screen-head">
         <h1>Boosters</h1>
-        <p class="muted">Tout s’achète avec les éclats gagnés en jouant. Aucun achat en argent réel.</p>
+        <p class="muted">Choisis ton booster et tente ta chance.</p>
       </header>
-      ${treasures()}
       <div class="panel pity">
         <div><span class="small muted">Garantie Hyper rare</span><b>${g.s.pity.sinceHR} / ${PITY.hr - 1}</b><span class="progress"><i style="width:${(g.s.pity.sinceHR / (PITY.hr - 1)) * 100}%;--bar:#C266FF"></i></span></div>
         <div><span class="small muted">Garantie Mythique</span><b>${g.s.pity.sinceM} / ${PITY.m - 1}</b><span class="progress"><i style="width:${(g.s.pity.sinceM / (PITY.m - 1)) * 100}%;--bar:#F0C75E"></i></span></div>

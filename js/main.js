@@ -54,8 +54,6 @@ window.__abyssal = app; // accès pour les tests automatisés
 
 function applySettings() {
   const s = app.game.s.settings;
-  document.documentElement.classList.toggle('text-large', s.textSize === 'large');
-  document.documentElement.classList.toggle('contrast', !!s.contrast);
   document.documentElement.classList.toggle('reduce-motion', s.motion === 'reduced');
   configureSound(s);
 }
@@ -91,20 +89,40 @@ function pulseWallet() {
   lastShards = s.shards;
 }
 
+// Mémoire de défilement : chaque page retrouve sa position quand on y revient.
+const scrollMem = new Map();
+let scrollKey = null;
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+let scrollRaf = 0;
+window.addEventListener('scroll', () => {
+  if (scrollRaf) return;
+  scrollRaf = requestAnimationFrame(() => { scrollRaf = 0; if (scrollKey !== null && !document.body.classList.contains('has-sheet')) scrollMem.set(scrollKey, window.scrollY); });
+}, { passive: true });
+
 function render() {
   const [route, ...params] = (location.hash.replace(/^#\/?/, '') || '').split('/');
+  const key = location.hash || '#/';
+  const same = key === scrollKey;
+  const keepY = same ? window.scrollY : (scrollMem.get(key) || 0);
+  scrollKey = null; // pas d'enregistrement pendant le changement de page
   const screen = ROUTES[route] || homeScreen;
   if (app.cleanup) { try { app.cleanup(); } catch (e) { /* rien */ } app.cleanup = null; }
   app.route = ROUTES[route] ? route : '';
   app.params = params.map(decodeURIComponent);
   renderChrome();
   const view = document.getElementById('view');
-  view.classList.remove('view-in');
-  void view.offsetWidth;
-  view.classList.add('view-in');
+  if (!same) {
+    view.classList.remove('view-in');
+    void view.offsetWidth;
+    view.classList.add('view-in');
+  }
   view.innerHTML = '';
   app.cleanup = screen(app, view, app.params) || null;
   view.focus({ preventScroll: true });
+  window.scrollTo(0, keepY);
+  scrollKey = key;
+  // les images différées peuvent encore ajuster la hauteur : on recolle une fois la page posée
+  if (keepY) requestAnimationFrame(() => { if (scrollKey === key && Math.abs(window.scrollY - keepY) > 2) window.scrollTo(0, keepY); });
 }
 
 // Notifications de progression (succès, ensembles, niveaux)
@@ -155,8 +173,11 @@ async function boot() {
     lastShards = app.game.s.shards;
     window.addEventListener('hashchange', render);
     render();
-    bootEl.classList.add('out');
-    setTimeout(() => bootEl.remove(), 600);
+    const wait = Math.max(0, (window.__introUntil || 0) - performance.now());
+    let done = false;
+    const finish = () => { if (done) return; done = true; bootEl.classList.add('out'); setTimeout(() => bootEl.remove(), 900); };
+    setTimeout(finish, wait);
+    bootEl.addEventListener('click', finish); // un toucher passe l'introduction
     if (!persistent) toast('Le stockage local est désactivé dans ce navigateur : ta progression ne sera pas conservée après fermeture.', { kind: 'error', icon: 'info', ms: 9000 });
     if (app.game.loadedFrom && app.game.loadedFrom.endsWith('backup')) toast('La sauvegarde principale était abîmée : la copie de secours a été restaurée.', { kind: 'error', icon: 'info', ms: 8000 });
     document.addEventListener('pointerdown', () => configureSound(app.game.s.settings), { once: true });

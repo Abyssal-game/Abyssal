@@ -28,13 +28,27 @@
 </div>
 <div id="overlay-root"></div>
 <div id="toasts"></div>
-<div id="boot" class="boot" role="status">
-  <div>
-    <svg class="emblem" viewBox="0 0 100 100" aria-hidden="true"><g fill="none" stroke="#C8A45D" stroke-width="1.6"><circle cx="50" cy="50" r="46"/><circle cx="50" cy="50" r="40" stroke-dasharray="2 3"/><path d="M50 12 79.7 66.5 16.6 34.1H83.4L20.3 66.5Z"/><path d="M28 50s9-11 22-11 22 11 22 11-9 11-22 11-22-11-22-11z"/></g><circle cx="50" cy="50" r="6.5" fill="#C8A45D"/></svg>
-    <p>Ouverture du Bestiaire…</p>
+<div id="boot" class="boot" role="status" aria-label="Chargement d’ABYSSAL">
+  <div class="boot-glow"></div>
+  <div class="boot-inner">
+    <svg class="emblem boot-emblem" viewBox="0 0 100 100" aria-hidden="true"><defs>
+<linearGradient id="emG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF4C8"/><stop offset=".35" stop-color="#E2BE6E"/><stop offset=".7" stop-color="#9C7330"/><stop offset="1" stop-color="#F3DA95"/></linearGradient>
+<radialGradient id="emI" cx=".5" cy=".45" r=".6"><stop offset="0" stop-color="#FFE9A0"/><stop offset=".45" stop-color="#E08A2A"/><stop offset=".8" stop-color="#7A1F12"/><stop offset="1" stop-color="#2A0808"/></radialGradient>
+<radialGradient id="emB" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#2A1240"/><stop offset="1" stop-color="#07060B"/></radialGradient></defs>
+<path d="M44.94 11.33Q48.04 7.04 50.00 0.50Q51.96 7.04 55.06 11.33ZM60.13 12.34Q64.63 9.57 67.22 8.43Q68.25 11.06 69.47 16.21ZM73.77 19.08Q78.99 18.24 85.00 15.00Q81.76 21.01 80.92 26.23ZM83.79 30.53Q88.94 31.75 91.57 32.78Q90.43 35.37 87.66 39.87ZM88.67 44.94Q92.96 48.04 99.50 50.00Q92.96 51.96 88.67 55.06ZM87.66 60.13Q90.43 64.63 91.57 67.22Q88.94 68.25 83.79 69.47ZM80.92 73.77Q81.76 78.99 85.00 85.00Q78.99 81.76 73.77 80.92ZM69.47 83.79Q68.25 88.94 67.22 91.57Q64.63 90.43 60.13 87.66ZM55.06 88.67Q51.96 92.96 50.00 99.50Q48.04 92.96 44.94 88.67ZM39.87 87.66Q35.37 90.43 32.78 91.57Q31.75 88.94 30.53 83.79ZM26.23 80.92Q21.01 81.76 15.00 85.00Q18.24 78.99 19.08 73.77ZM16.21 69.47Q11.06 68.25 8.43 67.22Q9.57 64.63 12.34 60.13ZM11.33 55.06Q7.04 51.96 0.50 50.00Q7.04 48.04 11.33 44.94ZM12.34 39.87Q9.57 35.37 8.43 32.78Q11.06 31.75 16.21 30.53ZM19.08 26.23Q18.24 21.01 15.00 15.00Q21.01 18.24 26.23 19.08ZM30.53 16.21Q31.75 11.06 32.78 8.43Q35.37 9.57 39.87 12.34Z" fill="url(#emG)" stroke="#5A3E14" stroke-width=".4"/>
+<circle cx="50" cy="50" r="40" fill="url(#emB)" stroke="url(#emG)" stroke-width="1.8"/>
+<circle cx="50" cy="50" r="36.5" fill="none" stroke="url(#emG)" stroke-width=".6" stroke-dasharray="1.2 2.2" opacity=".8"/>
+<path d="M50.00 17.00L82.17 57.34L35.68 79.73L24.20 29.42L75.80 29.42L64.32 79.73L17.83 57.34Z" fill="none" stroke="url(#emG)" stroke-width="1.3" stroke-linejoin="round" opacity=".9"/>
+<g class="em-eye"><path d="M24 50Q50 27 76 50Q50 73 24 50Z" fill="#0B0710" stroke="url(#emG)" stroke-width="2"/>
+<circle cx="50" cy="50" r="11" fill="url(#emI)"/>
+<path d="M50 39.5Q53.2 50 50 60.5Q46.8 50 50 39.5Z" fill="#050305"/>
+<circle cx="46.2" cy="45.5" r="1.7" fill="#FFF8E0" opacity=".85"/></g></svg>
+    <h1 class="boot-word"><span>ABYSSAL</span></h1>
+    <p class="boot-tag"><i></i>Le Bestiaire interdit<i></i></p>
     <p class="err"></p>
   </div>
 </div>
+<script>window.__introUntil = performance.now() + (matchMedia("(prefers-reduced-motion: reduce)").matches ? 300 : 2600);</script>
 <noscript><p style="padding:24px;color:#ECE6DA">ABYSSAL a besoin de JavaScript pour fonctionner.</p></noscript>
 <script type="module" src="js/main.js"></script>
 </body>

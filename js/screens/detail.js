@@ -1,7 +1,7 @@
 // Vue détaillée d'une carte (fenêtre plein écran) : grand format, variantes,
 // lore, capacités, lignée, ensembles, actions.
 import { RARITY, VARIANTS, ECONOMY } from '../config.js';
-import { cardHTML, enableTilt } from '../ui/card.js';
+import { cardHTML, enableTilt, gyroAvailable, gyroOn, setGyro } from '../ui/card.js';
 import { boosterOdds } from '../core/boosters.js';
 import { openSheet, esc, toast, confirmBox, fmt, bindActions } from '../ui/dom.js';
 import { icon, sigil } from '../ui/icons.js';
@@ -53,6 +53,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
         <div class="detail-actions row gap wrap">
           <button class="btn small ${isAvatar ? 'gold' : ''}" data-act="avatar">${icon('user')}${isAvatar ? 'Avatar actuel' : 'Choisir comme avatar'}</button>
           <button class="btn small" data-act="artonly">${icon('eye')}Voir l’illustration</button>
+          ${gyroAvailable() ? `<button class="btn small ${gyroOn() ? 'gold' : ''}" data-act="gyro">${icon('sparkle')}${gyroOn() ? 'Mouvement activé' : 'Bouger avec le téléphone'}</button>` : ''}
           <button class="btn small ${inShow ? 'gold' : ''}" data-act="showcase">${icon('pin')}${inShow ? 'En vitrine' : 'Mettre en vitrine'}</button>
         </div>
         <div class="panel detail-facts">
@@ -67,12 +68,10 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
         </div>
         <h3 class="section-title">Description</h3>
         <p class="lore big">« ${esc(card.lore)} »</p>
-        <p>${esc(card.visual)}</p>
         <h3 class="section-title">Rareté</h3>
         <p>${odds(card)}</p>
         ${line ? `<h3 class="section-title">${esc(line.name)}</h3><div class="strip">${line.cards.map((c) => cardHTML(c, { mystery: !g.owns(c.id), nameKnown: g.nameKnown(c.id) })).join('')}</div><p class="small muted">Stade ${card.evolution.stage} sur ${card.evolution.stages}. Les stades sont des cartes distinctes à collectionner.</p>` : ''}
-        ${sets.length ? `<h3 class="section-title">Ensembles</h3><div class="stack">${sets.map((s) => { const p = g.setProgress(s.key); return `<a class="set-link panel" href="#/succes/ensembles"><b>${esc(s.name)}</b><span class="small muted">${p.owned} / ${p.total}${p.done ? ' · complété' : ''}</span><span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span></a>`; }).join('')}</div>` : ''}
-        <details class="prompt-box"><summary>${icon('scroll')} Fiche d’illustration</summary><p class="small">Illustration actuelle : ${card.image && app.hasRealArt?.(card.id) ? 'définitive' : 'provisoire, générée par le jeu'}. Fichier attendu : <code>${esc(card.image)}</code></p><p class="small muted">${esc(card.artPrompt)}</p></details>`;
+        ${sets.length ? `<h3 class="section-title">Ensembles</h3><div class="stack">${sets.map((s) => { const p = g.setProgress(s.key); return `<a class="set-link panel" href="#/succes/ensembles"><b>${esc(s.name)}</b><span class="small muted">${p.owned} / ${p.total}${p.done ? ' · complété' : ''}</span><span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span></a>`; }).join('')}</div>` : ''}`;
     } else {
       const craft = ECONOMY.craftAsh[card.rarity];
       body = `
@@ -96,6 +95,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     sheet.setContent(`<div class="detail">
       ${nav}
       <div class="detail-card">${cardHTML(card, { size: 'full', variant: shownVariant, mystery: !owned, nameKnown: known })}</div>
+      ${owned ? '<p class="tilt-hint small muted">Fais glisser ton doigt sur la carte pour l’incliner.</p>' : ''}
       ${variantsRow}
       <div class="detail-info">${body}</div>
     </div>`);
@@ -108,6 +108,12 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     variant(el) { shownVariant = el.dataset.v; draw(); },
     avatar() { g.setAvatar(current); toast('Avatar mis à jour.', { icon: 'user' }); draw(); },
     showcase() { g.toggleShowcase(current); draw(); },
+    async gyro() {
+      const want = !gyroOn();
+      const on = await setGyro(want);
+      if (want && !on) toast('Le mouvement n’est pas disponible : autorise l’accès aux capteurs de mouvement.', { icon: 'info' });
+      draw();
+    },
     artonly(el) {
       const c = sheet.body.querySelector('.detail-card .tcg');
       const on = c.classList.toggle('art-only');

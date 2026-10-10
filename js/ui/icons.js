@@ -56,7 +56,29 @@ export const SIGILS = {
 };
 
 // Emblème du jeu : sceau à sept branches et œil.
-export const EMBLEM = `<svg class="emblem" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="emG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F3DFA2"/><stop offset=".5" stop-color="#C8A45D"/><stop offset="1" stop-color="#6B5226"/></linearGradient></defs><g fill="none" stroke="url(#emG)" stroke-width="1.6"><circle cx="50" cy="50" r="46"/><circle cx="50" cy="50" r="40" stroke-dasharray="2 3"/><path d="${(() => { let d = ''; for (let i = 0; i < 7; i++) { const a = -Math.PI / 2 + (i * 4 * Math.PI) / 7; d += `${i ? 'L' : 'M'}${(50 + Math.cos(a) * 38).toFixed(1)} ${(50 + Math.sin(a) * 38).toFixed(1)}`; } return d + 'Z'; })()}"/><path d="M28 50s9-11 22-11 22 11 22 11-9 11-22 11-22-11-22-11z"/></g><circle cx="50" cy="50" r="6.5" fill="url(#emG)"/><circle cx="50" cy="50" r="2.4" fill="#08090D"/></svg>`;
+// Emblème : œil reptilien dans un sceau à sept branches, couronne d'épines dorées.
+export const EMBLEM = (() => {
+  const P = (r, a) => `${(50 + Math.cos(a) * r).toFixed(2)} ${(50 + Math.sin(a) * r).toFixed(2)}`;
+  let crown = '';
+  for (let i = 0; i < 16; i++) {
+    const a = -Math.PI / 2 + (i * Math.PI) / 8, w = 0.13, r = i % 2 ? 45 : 49.5;
+    crown += `M${P(39, a - w)}Q${P(43, a - w * .35)} ${P(r, a)}Q${P(43, a + w * .35)} ${P(39, a + w)}Z`;
+  }
+  let star = '';
+  for (let i = 0; i < 7; i++) star += `${i ? 'L' : 'M'}${P(33, -Math.PI / 2 + (i * 4 * Math.PI) / 7)}`;
+  return `<svg class="emblem" viewBox="0 0 100 100" aria-hidden="true"><defs>
+<linearGradient id="emG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF4C8"/><stop offset=".35" stop-color="#E2BE6E"/><stop offset=".7" stop-color="#9C7330"/><stop offset="1" stop-color="#F3DA95"/></linearGradient>
+<radialGradient id="emI" cx=".5" cy=".45" r=".6"><stop offset="0" stop-color="#FFE9A0"/><stop offset=".45" stop-color="#E08A2A"/><stop offset=".8" stop-color="#7A1F12"/><stop offset="1" stop-color="#2A0808"/></radialGradient>
+<radialGradient id="emB" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#2A1240"/><stop offset="1" stop-color="#07060B"/></radialGradient></defs>
+<path d="${crown}" fill="url(#emG)" stroke="#5A3E14" stroke-width=".4"/>
+<circle cx="50" cy="50" r="40" fill="url(#emB)" stroke="url(#emG)" stroke-width="1.8"/>
+<circle cx="50" cy="50" r="36.5" fill="none" stroke="url(#emG)" stroke-width=".6" stroke-dasharray="1.2 2.2" opacity=".8"/>
+<path d="${star}Z" fill="none" stroke="url(#emG)" stroke-width="1.3" stroke-linejoin="round" opacity=".9"/>
+<g class="em-eye"><path d="M24 50Q50 27 76 50Q50 73 24 50Z" fill="#0B0710" stroke="url(#emG)" stroke-width="2"/>
+<circle cx="50" cy="50" r="11" fill="url(#emI)"/>
+<path d="M50 39.5Q53.2 50 50 60.5Q46.8 50 50 39.5Z" fill="#050305"/>
+<circle cx="46.2" cy="45.5" r="1.7" fill="#FFF8E0" opacity=".85"/></g></svg>`;
+})();
 
 export const icon = (name) => ICONS[name] || '';
 export const sigil = (faction) => SIGILS[faction] || '';

@@ -24,7 +24,7 @@ export function cardHTML(card, opts = {}) {
   const img = lazy
     ? `<img alt="" decoding="async" data-lazy="${lite ? 1 : 0}${mystery ? 1 : 0}" data-card="${card.id}" data-variant="${variant}">`
     : `<img alt="" decoding="async" src="${artUrl(card, { variant, lite, mystery })}" data-card="${card.id}" data-variant="${variant}">`;
-  const name = mystery ? (nameKnown ? esc(card.name) : '???') : esc(card.name);
+  const name = mystery ? (nameKnown ? esc(card.name) : 'Inconnue') : esc(card.name);
   const label = mystery ? `Carte non découverte ${card.id}${nameKnown ? ', ' + card.name : ''}` : `${card.name}, ${r.name}${variant !== 'normal' ? ', ' + VARIANTS[variant].name : ''}`;
 
   if (size === 'mini') {
@@ -70,31 +70,90 @@ export function lazyArt(root) {
   imgs.forEach((i) => io.observe(i));
 }
 
-// Inclinaison et reflet suivant le doigt ou la souris (grand format).
+// Inclinaison 3D de la carte entière (cadre compris) : au doigt, à la souris,
+// ou avec le gyroscope du téléphone. Mouvement amorti, retour en douceur.
+let gyro = { on: false, beta: null, gamma: null };
+function onOrient(e) { if (e.beta != null) { gyro.beta = e.beta; gyro.gamma = e.gamma; } }
+export function gyroAvailable() { return typeof window !== 'undefined' && 'DeviceOrientationEvent' in window && matchMedia('(pointer: coarse)').matches; }
+export function gyroOn() { return gyro.on; }
+export async function setGyro(on) {
+  if (on) {
+    try {
+      const D = window.DeviceOrientationEvent;
+      if (D && typeof D.requestPermission === 'function' && (await D.requestPermission()) !== 'granted') return false;
+    } catch (e) { return false; }
+    window.addEventListener('deviceorientation', onOrient);
+    gyro.on = true;
+  } else {
+    window.removeEventListener('deviceorientation', onOrient);
+    gyro = { on: false, beta: null, gamma: null };
+  }
+  return gyro.on;
+}
+
 export function enableTilt(el, { reduced = false } = {}) {
   const card = el.classList.contains('tcg') ? el : el.querySelector('.tcg');
   if (!card) return () => {};
-  let raf = 0;
-  const set = (x, y) => {
-    cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(() => {
-      card.style.setProperty('--mx', `${x * 100}%`);
-      card.style.setProperty('--my', `${y * 100}%`);
-      if (!reduced) card.style.transform = `perspective(900px) rotateY(${(x - 0.5) * 16}deg) rotateX(${(0.5 - y) * 16}deg)`;
-    });
+  const MAX = 24;
+  let cur = { x: 0, y: 0 }, tgt = { x: 0, y: 0 };
+  let touching = false, raf = 0, alive = true, start = null, moved = false, t0 = performance.now();
+  let base = null; // orientation de référence du téléphone
+  const apply = () => {
+    card.style.transform = reduced ? '' : `perspective(800px) rotateX(${cur.x.toFixed(2)}deg) rotateY(${cur.y.toFixed(2)}deg)`;
+    // le reflet suit l'angle : comme une vraie carte sous une lampe
+    card.style.setProperty('--mx', `${(50 + (cur.y / MAX) * 50).toFixed(1)}%`);
+    card.style.setProperty('--my', `${(50 - (cur.x / MAX) * 50).toFixed(1)}%`);
+    card.style.setProperty('--tilt', (Math.min(1, Math.hypot(cur.x, cur.y) / MAX)).toFixed(3));
+  };
+  const loop = (now) => {
+    if (!alive) return;
+    if (!touching) {
+      if (gyro.on && gyro.beta != null) {
+        if (!base) base = { b: gyro.beta, g: gyro.gamma };
+        base.b += (gyro.beta - base.b) * 0.004; base.g += (gyro.gamma - base.g) * 0.004; // se recentre lentement
+        tgt.x = Math.max(-MAX, Math.min(MAX, -(gyro.beta - base.b) * 0.9));
+        tgt.y = Math.max(-MAX, Math.min(MAX, (gyro.gamma - base.g) * 0.9));
+      } else if (!reduced) {
+        const t = (now - t0) / 1000; // léger balancement au repos pour faire vivre les reflets
+        tgt.x = Math.sin(t * 0.9) * 3.5; tgt.y = Math.cos(t * 0.7) * 5;
+      } else { tgt.x = 0; tgt.y = 0; }
+    }
+    const k = touching ? 0.35 : 0.08;
+    cur.x += (tgt.x - cur.x) * k; cur.y += (tgt.y - cur.y) * k;
+    apply();
+    raf = requestAnimationFrame(loop);
+  };
+  const fromPoint = (e) => {
+    const r = card.getBoundingClientRect();
+    const px = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), py = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
+    tgt.y = (px - 0.5) * 2 * MAX; tgt.x = (0.5 - py) * 2 * MAX;
+  };
+  const down = (e) => {
+    touching = true; moved = false; start = { x: e.clientX, y: e.clientY };
+    card.classList.add('tilting');
+    try { card.setPointerCapture(e.pointerId); } catch (err) { /* rien */ }
+    fromPoint(e);
   };
   const move = (e) => {
-    const r = card.getBoundingClientRect();
-    set(Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), Math.min(1, Math.max(0, (e.clientY - r.top) / r.height)));
+    if (e.pointerType === 'mouse' && !touching) { fromPoint(e); card.classList.add('tilting'); return; }
+    if (!touching) return;
+    if (start && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 8) moved = true;
+    fromPoint(e);
   };
-  const leave = () => { cancelAnimationFrame(raf); card.style.transform = ''; card.style.removeProperty('--mx'); card.style.removeProperty('--my'); card.classList.remove('tilting'); };
-  const down = () => card.classList.add('tilting');
-  card.addEventListener('pointermove', move);
+  const up = () => { touching = false; card.classList.remove('tilting'); tgt.x = 0; tgt.y = 0; t0 = performance.now(); };
+  const leave = (e) => { if (e.pointerType === 'mouse') up(); };
+  // un glissé ne doit pas compter comme un toucher (bascule de l'illustration)
+  const click = (e) => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } };
   card.addEventListener('pointerdown', down);
+  card.addEventListener('pointermove', move);
+  card.addEventListener('pointerup', up);
+  card.addEventListener('pointercancel', up);
   card.addEventListener('pointerleave', leave);
-  card.addEventListener('pointerup', leave);
-  card.addEventListener('pointercancel', leave);
-  return leave;
+  card.addEventListener('click', click, true);
+  card.addEventListener('dragstart', (e) => e.preventDefault());
+  card.classList.add('tiltable');
+  raf = requestAnimationFrame(loop);
+  return () => { alive = false; cancelAnimationFrame(raf); };
 }
 
 // Repli si une vraie illustration déclarée est introuvable.
