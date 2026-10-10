@@ -2,13 +2,14 @@
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { icon, sigil } from '../ui/icons.js';
 import { esc, bindActions, pct } from '../ui/dom.js';
-import { RARITIES, FACTION_ORDER, RARITY_ORDER } from '../config.js';
+import { RARITIES, FACTION_ORDER, RARITY_ORDER, RARITY } from '../config.js';
+import { openFusion } from './fusion.js';
 
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 export default function collection(app, root, params) {
   const g = app.game, cat = app.catalog;
-  const st = (app.state.col ||= { q: '', factions: [], rarities: [], show: 'all', sort: 'num' });
+  const st = (app.state.col ||= { q: '', factions: [], rarities: [], show: 'all', sort: 'num', view: 'grid', albumFac: 'infernal', albumPage: 0 });
   if (params[0] && FACTION_ORDER.includes(params[0])) { st.factions = [params[0]]; }
   const total = g.total();
 
@@ -17,6 +18,11 @@ export default function collection(app, root, params) {
       <h1>Collection</h1>
       <p class="muted" id="col-summary"></p>
     </header>
+    <div class="col-head-row">
+      <div class="seg" role="group" aria-label="Mode d’affichage">${[['grid', 'Grille'], ['album', 'Classeur']].map(([k, l]) => `<button class="seg-b" data-act="view" data-v="${k}" aria-pressed="${(st.view || 'grid') === k}">${l}</button>`).join('')}</div>
+      <button class="btn small" data-act="fusion">${icon('sparkle')}Fusion</button>
+    </div>
+    <div id="col-main">
     <div class="col-tools">
       <label class="input-wrap"><span class="sr">Rechercher une créature</span>${icon('search')}<input class="input" id="col-q" type="search" placeholder="Rechercher une créature…" value="${esc(st.q)}" autocomplete="off" enterkeyhint="search"></label>
       <div class="chips" role="group" aria-label="Filtrer par faction">${FACTION_ORDER.map((f) => `<button class="chip" data-act="fac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.factions.includes(f)}">${sigil(f)}${esc(cat.faction[f].name)}</button>`).join('')}</div>
@@ -29,6 +35,8 @@ export default function collection(app, root, params) {
     </div>
     <div class="grid-cards" id="col-grid"></div>
     <p class="empty muted center" id="col-empty" hidden>Aucune carte ne correspond à ces filtres.</p>
+    </div>
+    <div id="col-album" class="album-wrap" hidden></div>
   `;
 
   let ids = [];
@@ -81,6 +89,46 @@ export default function collection(app, root, params) {
     root.querySelector('#col-count').textContent = `${list.length} carte${list.length > 1 ? 's' : ''} affichée${list.length > 1 ? 's' : ''}`;
     root.querySelector('#col-seen').hidden = g.newCount() === 0;
   }
+  // Classeur : une faction, des pages de 9 emplacements numérotés.
+  function drawAlbum() {
+    const f = st.albumFac || 'infernal';
+    const fac = cat.faction[f];
+    const cards = [...cat.byFaction[f]].sort((a, b) => a.number - b.number);
+    const pages = [];
+    for (let i = 0; i < cards.length; i += 9) pages.push(cards.slice(i, i + 9));
+    const box = root.querySelector('#col-album');
+    box.innerHTML = `
+      <div class="chips" role="radiogroup" aria-label="Faction du classeur">${FACTION_ORDER.map((k) => { const p = g.factionProgress(k); return `<button class="chip" role="radio" data-act="afac" data-v="${k}" style="--chip:${cat.faction[k].colors.secondary}" aria-pressed="${k === f}" aria-checked="${k === f}">${sigil(k)}${esc(cat.faction[k].name)} <span class="muted">${p.owned}/${p.total}</span></button>`; }).join('')}</div>
+      <div class="album" style="--fc:${fac.colors.secondary}">${pages.map((pg, i) => `<section class="album-page" aria-label="Page ${i + 1}">
+        <div class="album-ph"><span>${sigil(f)} ${esc(fac.name)}</span><span>Page ${i + 1} / ${pages.length}</span></div>
+        <div class="album-grid">${pg.map((c) => { const e = g.entry(c.id); return e
+          ? `<div class="slot">${cardHTML(c, { lazy: true, isNew: e.isNew, variant: bestVariant(e) })}</div>`
+          : `<div class="slot slot-empty" role="button" tabindex="0" data-id="${c.id}" aria-label="Emplacement ${c.number} vide, ${RARITY[c.rarity].name}"><span class="slot-num">${c.number}</span><span class="fu-gem" style="--rc:${RARITY[c.rarity].color}">${RARITY[c.rarity].short}</span></div>`; }).join('')}</div>
+      </section>`).join('')}</div>
+      <div class="album-dots">${pages.map((_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</div>
+      <p class="small muted center">Glisse pour tourner les pages. ${g.factionProgress(f).owned} / ${cards.length} emplacements remplis.</p>`;
+    lazyArt(box);
+    const owned = g.uniqueCount();
+    root.querySelector('#col-summary').textContent = `${owned} créatures découvertes sur ${total} (${pct(owned / total)})`;
+    ids = cards.map((c) => c.id);
+    const al = box.querySelector('.album');
+    const dots = [...box.querySelectorAll('.album-dots i')];
+    const page = Math.min(st.albumPage || 0, pages.length - 1);
+    requestAnimationFrame(() => { al.scrollLeft = page * (al.clientWidth + 14); });
+    al.addEventListener('scroll', () => {
+      const i = Math.round(al.scrollLeft / (al.clientWidth + 14));
+      st.albumPage = i;
+      dots.forEach((d, k) => d.classList.toggle('on', k === i));
+    }, { passive: true });
+  }
+  function drawView() {
+    const album = st.view === 'album';
+    root.querySelector('#col-main').hidden = album;
+    root.querySelector('#col-album').hidden = !album;
+    root.querySelectorAll('[data-act="view"]').forEach((b) => b.setAttribute('aria-pressed', (st.view || 'grid') === b.dataset.v));
+    if (album) drawAlbum(); else drawGrid();
+  }
+
   function syncPressed() {
     root.querySelectorAll('[data-act="fac"]').forEach((b) => b.setAttribute('aria-pressed', st.factions.includes(b.dataset.v)));
     root.querySelectorAll('[data-act="rar"]').forEach((b) => b.setAttribute('aria-pressed', st.rarities.includes(b.dataset.v)));
@@ -94,15 +142,19 @@ export default function collection(app, root, params) {
     show(el) { st.show = el.dataset.v; syncPressed(); drawGrid(); },
     reset() { Object.assign(st, { q: '', factions: [], rarities: [], show: 'all', sort: 'num' }); root.querySelector('#col-q').value = ''; root.querySelector('#col-sort').value = 'num'; syncPressed(); drawGrid(); },
     seen() { g.markAllSeen(); drawGrid(); },
+    view(el) { st.view = el.dataset.v; drawView(); },
+    afac(el) { st.albumFac = el.dataset.v; st.albumPage = 0; drawAlbum(); },
+    fusion() { openFusion(app); },
   });
   let tq;
   root.querySelector('#col-q').addEventListener('input', (e) => { clearTimeout(tq); tq = setTimeout(() => { st.q = e.target.value; drawGrid(); }, 140); });
   root.querySelector('#col-sort').addEventListener('change', (e) => { st.sort = e.target.value; drawGrid(); });
-  const grid = root.querySelector('#col-grid');
   const open = (t) => app.openCard(t.dataset.id, { list: ids });
-  grid.addEventListener('click', (e) => { const t = e.target.closest('.tcg'); if (t) open(t); });
-  grid.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('tcg')) { e.preventDefault(); open(e.target); } });
-  drawGrid();
-  app.refreshView = () => { const y = window.scrollY; drawGrid(); window.scrollTo(0, y); };
+  for (const box of [root.querySelector('#col-grid'), root.querySelector('#col-album')]) {
+    box.addEventListener('click', (e) => { const t = e.target.closest('.tcg, .slot-empty'); if (t) open(t); });
+    box.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.tcg, .slot-empty')) { e.preventDefault(); open(e.target); } });
+  }
+  drawView();
+  app.refreshView = () => { const y = window.scrollY; drawView(); window.scrollTo(0, y); };
   return () => { app.refreshView = null; };
 }

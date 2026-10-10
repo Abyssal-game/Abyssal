@@ -70,6 +70,8 @@ export const sfx = {
     if (big) { tone(65, { dur: 2, gain: 0.3, slide: 30 }); noise({ dur: 1.4, gain: 0.08, freq: 6000, q: 0.4 }); }
     if (r === 'HR') tone(110, { dur: 0.8, gain: 0.2 });
   },
+  // Grondement qui monte avant une carte exceptionnelle
+  rumble(sec = 1) { tone(48, { type: 'sawtooth', dur: sec, gain: 0.12, attack: sec * 0.8, slide: 40 }); noise({ dur: sec, gain: 0.1, freq: 160, q: 0.5, sweep: 500 }); tone(96, { dur: sec, gain: 0.08, attack: sec * 0.9, slide: 120 }); },
   discover() { tone(784, { type: 'sine', dur: 0.3, gain: 0.1 }); tone(1175, { type: 'sine', dur: 0.5, gain: 0.08, delay: 0.08 }); },
   achievement() { [523, 659, 784, 1047].forEach((f, i) => tone(f, { type: 'triangle', dur: 0.35, gain: 0.1, delay: i * 0.09 })); },
   hit() { noise({ dur: 0.12, gain: 0.25, freq: 500 }); tone(120, { dur: 0.15, gain: 0.2, slide: -50 }); },

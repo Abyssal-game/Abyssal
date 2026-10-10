@@ -114,3 +114,24 @@ export const SAVE_KEY = 'abyssal.save';
 export const SAVE_BACKUP_KEY = 'abyssal.save.backup';
 export const SAVE_VERSION = 2;
 export const EXPORT_PREFIX = 'ABYSSAL1:';
+
+// Missions du jour : 3 tirées chaque jour parmi ces modèles (renouvelées à minuit).
+// kind : ce qui fait avancer la mission ; n : objectif ; shards : récompense.
+export const MISSIONS = [
+  { key: 'open2',    kind: 'booster',  n: 2, shards: 50, text: 'Ouvre 2 boosters' },
+  { key: 'open3',    kind: 'booster',  n: 3, shards: 70, text: 'Ouvre 3 boosters' },
+  { key: 'new3',     kind: 'new',      n: 3, shards: 50, text: 'Découvre 3 nouvelles créatures' },
+  { key: 'new5',     kind: 'new',      n: 5, shards: 70, text: 'Découvre 5 nouvelles créatures' },
+  { key: 'faction',  kind: 'faction',  n: 3, shards: 50, text: 'Obtiens 3 cartes {faction}' },
+  { key: 'rare',     kind: 'rare',     n: 2, shards: 60, text: 'Obtiens 2 cartes Rares ou mieux' },
+  { key: 'variant',  kind: 'variant',  n: 1, shards: 60, text: 'Obtiens une variante (holographique, or…)' },
+  { key: 'fuse',     kind: 'fuse',     n: 1, shards: 50, text: 'Fusionne des doublons' },
+  { key: 'offering', kind: 'daily',    n: 1, shards: 30, text: 'Récupère l’offrande du jour' },
+];
+export const MISSION_BONUS = { tickets: { standard: 1 } }; // les 3 missions du jour accomplies
+
+// Fusion : 5 doublons d'une rareté donnent 1 carte de la rareté au-dessus.
+export const FUSION = { cost: 5, next: { C: 'PC', PC: 'R', R: 'HR', HR: 'M' }, unownedWeight: 3 };
+
+// Points d'une ouverture, pour le classement des plus belles ouvertures.
+export const LUCK_POINTS = { C: 1, PC: 2, R: 6, HR: 20, M: 80, S: 200, variant: 8 };

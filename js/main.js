@@ -76,7 +76,7 @@ function renderChrome() {
   const ticketCount = Object.values(s.tickets).reduce((a, b) => a + b, 0) + g.freePack().stock;
   document.getElementById('tabbar').innerHTML = TABS.map(([key, ic, label]) => {
     const cur = key === tab ? ' aria-current="page"' : '';
-    const badge = key === 'collection' && nNew ? `<span class="badge">${nNew > 99 ? '99+' : nNew}</span>` : key === 'boutique' && ticketCount ? `<span class="badge">${ticketCount}</span>` : key === 'antre' && g.canDailyClaim() ? '<span class="badge">!</span>' : '';
+    const badge = key === 'collection' && nNew ? `<span class="badge">${nNew > 99 ? '99+' : nNew}</span>` : key === 'boutique' && ticketCount ? `<span class="badge">${ticketCount}</span>` : key === 'antre' && (g.canDailyClaim() || g.missionsToClaim()) ? '<span class="badge">!</span>' : '';
     if (key === 'boutique') return `<a class="tab tab-main" href="#/boutique"${cur}><span class="orb">${icon(ic)}</span>${label}${badge}</a>`;
     return `<a class="tab" href="#/${key}"${cur}>${icon(ic)}${label}${badge}</a>`;
   }).join('');
@@ -110,12 +110,13 @@ function render() {
   app.route = ROUTES[route] ? route : '';
   app.params = params.map(decodeURIComponent);
   renderChrome();
-  const view = document.getElementById('view');
-  if (!same) {
-    view.classList.remove('view-in');
-    void view.offsetWidth;
-    view.classList.add('view-in');
-  }
+  // Nouvel élément à chaque affichage : les écouteurs de l'écran précédent disparaissent avec lui
+  // (sinon ils s'accumulent et un toucher déclenche l'action plusieurs fois).
+  const old = document.getElementById('view');
+  const view = old.cloneNode(false);
+  old.replaceWith(view);
+  view.classList.remove('view-in');
+  if (!same) view.classList.add('view-in');
   view.innerHTML = '';
   app.cleanup = screen(app, view, app.params) || null;
   view.focus({ preventScroll: true });

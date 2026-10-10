@@ -86,6 +86,8 @@ export function openPack(app, type, { faction, onDone } = {}) {
     </div>`;
     hint.innerHTML = `${icon('sparkle')} Glisse le doigt le long de la ligne pour déchirer, ou touche le booster.`;
     const pack = stage.querySelector('.op-pack');
+    const top = opening.cards.reduce((m, c) => (RI(c.rarity) > RI(m) ? c.rarity : m), 'C');
+    if (RI(top) >= 3) { pack.classList.add('pk-aura', `pk-aura-${top}`); pack.style.setProperty('--aura', RARITY[top].color); }
     const sl = [...pack.querySelectorAll('.pk-slice')];
     const edge = pack.querySelector('.pk-edge path');
     let start = null, p = 0, dir = 1, lastTick = 0, done = false;
@@ -219,9 +221,25 @@ export function openPack(app, type, { faction, onDone } = {}) {
     const card = cat.get(c.id);
     const btn = stage.querySelector('.op-card');
     const inner = btn.querySelector('.op-flip');
+    const lvl = RI(c.rarity);
+    if (lvl >= 3 && !reduced) {
+      // Montée en tension : la carte tremble, la lumière monte, l'écran s'assombrit.
+      const big = lvl >= 4;
+      btn.classList.add('charging');
+      el.classList.add('hush');
+      if (big) el.classList.add('hush-big');
+      app.sfx.rumble(big ? 1.3 : 0.6);
+      try { navigator.vibrate?.(big ? [40, 60, 40, 60, 60, 40, 120] : [30, 50, 40]); } catch (e) { /* rien */ }
+      await wait(big ? 1300 : 600);
+      if (phase === 'summary') { busy = false; return; }
+      btn.classList.remove('charging');
+      el.classList.remove('hush', 'hush-big');
+      el.classList.add('flash');
+      setTimeout(() => el.classList.remove('flash'), 700);
+    }
     app.sfx.flip();
     inner.classList.add('half');
-    await wait(170);
+    await wait(lvl >= 4 ? 320 : 170);
     if (phase === 'summary') { busy = false; return; }
     inner.innerHTML = cardHTML(card, { size: 'full', variant: c.variant });
     inner.classList.remove('half');

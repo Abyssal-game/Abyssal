@@ -1,10 +1,17 @@
 // État du joueur et règles de progression. Toute modification passe par ici
 // et est enregistrée immédiatement : une carte affichée est une carte sauvegardée.
-import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY } from '../config.js';
-import { drawBooster, cryptoRandom, currentEvent } from './boosters.js';
+import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, FUSION, LUCK_POINTS } from '../config.js';
+import { drawBooster, cryptoRandom, currentEvent, boosterOdds } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
 
 const RI = (r) => RARITY_ORDER.indexOf(r);
+
+// Petit générateur déterministe (même missions pour une même journée).
+function seededRng(str) {
+  let h = 1779033703 ^ str.length;
+  for (let i = 0; i < str.length; i++) { h = Math.imul(h ^ str.charCodeAt(i), 3432918353); h = (h << 13) | (h >>> 19); }
+  return () => { h = Math.imul(h ^ (h >>> 16), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); h ^= h >>> 16; return (h >>> 0) / 4294967296; };
+}
 
 export function levelFromXp(xp) {
   let level = 1, rest = xp;
@@ -127,6 +134,21 @@ export class Game {
     const opening = { t: Date.now(), type, faction: faction || null, event: type === 'event' ? ev.key : null, paidWith, guaranteed: res.guaranteed, cards, rewards };
     this.s.history.unshift({ t: opening.t, type, faction: opening.faction, cards: cards.map((c) => ({ id: c.id, v: c.variant, n: c.isNewCard })) });
     this.s.history = this.s.history.slice(0, 30);
+    // Statistiques de chance
+    const st = this.s.stats;
+    cards.forEach((c) => { st.pulls[this.catalog.get(c.id).rarity]++; });
+    const hrKeys = ['HR', 'M', 'S'];
+    st.expHR += boosterOdds(type).slots.reduce((a, sl) => a + hrKeys.reduce((b, k) => b + sl.odds[k], 0) / 100, 0);
+    st.gotHR += cards.filter((c) => RI(this.catalog.get(c.id).rarity) >= RI('HR')).length;
+    const score = cards.reduce((a, c) => a + LUCK_POINTS[this.catalog.get(c.id).rarity] + (c.variant !== 'normal' ? LUCK_POINTS.variant : 0), 0);
+    this.s.best = [...this.s.best, { t: opening.t, type, faction: opening.faction, score, cards: cards.map((c) => ({ id: c.id, v: c.variant })) }]
+      .sort((a, b) => b.score - a.score || b.t - a.t).slice(0, 5);
+    // Missions du jour
+    this.track('booster', 1);
+    this.track('new', cards.filter((c) => c.isNewCard).length);
+    this.track('rare', cards.filter((c) => RI(this.catalog.get(c.id).rarity) >= RI('R')).length);
+    this.track('variant', cards.filter((c) => c.variant !== 'normal').length);
+    cards.forEach((c) => this.track('faction', 1, this.catalog.get(c.id).faction));
     const progress = this.checkProgress();
     this.persist();
     return { opening, progress };
@@ -180,6 +202,7 @@ export class Game {
     this.s.daily = { last: today(this.clock()), streak };
     this.s.shards += amount;
     this.s.stats.daily++;
+    this.track('daily', 1);
     const progress = this.checkProgress();
     this.persist();
     return { amount, streak, progress };
@@ -206,6 +229,88 @@ export class Game {
     this.s.ash -= ECONOMY.decipherAsh;
     this.s.deciphered[id] = true;
     this.persist();
+  }
+
+  // Missions du jour -------------------------------------------------------
+  missions() {
+    const day = today(this.clock());
+    const m = this.s.missions;
+    if (m.day !== day) {
+      const rnd = seededRng('missions:' + day);
+      const pool = [...MISSIONS];
+      const list = [];
+      while (list.length < 3 && pool.length) {
+        const def = pool.splice(Math.floor(rnd() * pool.length), 1)[0];
+        if (list.some((x) => x.kind === def.kind)) continue;
+        const faction = def.kind === 'faction' ? FACTION_ORDER[Math.floor(rnd() * FACTION_ORDER.length)] : null;
+        const fname = faction ? this.catalog.faction[faction]?.name || faction : '';
+        list.push({ key: def.key, kind: def.kind, n: def.n, shards: def.shards, faction, text: def.text.replace('{faction}', fname), p: 0, claimed: false });
+      }
+      this.s.missions = { day, list, bonus: false };
+    }
+    return this.s.missions;
+  }
+  track(kind, amount = 1, faction = null) {
+    if (!amount) return;
+    for (const x of this.missions().list) {
+      if (x.kind !== kind || x.p >= x.n) continue;
+      if (kind === 'faction' && x.faction !== faction) continue;
+      x.p = Math.min(x.n, x.p + amount);
+    }
+  }
+  missionsToClaim() {
+    const m = this.missions();
+    return m.list.filter((x) => x.p >= x.n && !x.claimed).length + (!m.bonus && m.list.every((x) => x.claimed) ? 1 : 0);
+  }
+  claimMission(i) {
+    const m = this.missions();
+    if (i === 'bonus') {
+      if (m.bonus || !m.list.every((x) => x.claimed)) throw new Error('Termine d’abord les trois missions.');
+      m.bonus = true;
+      this.grant(MISSION_BONUS);
+      this.persist();
+      return MISSION_BONUS;
+    }
+    const x = m.list[i];
+    if (!x || x.claimed || x.p < x.n) throw new Error('Mission pas encore accomplie.');
+    x.claimed = true;
+    this.s.shards += x.shards;
+    this.s.xp += 20;
+    const progress = this.checkProgress();
+    this.persist();
+    return { shards: x.shards, progress };
+  }
+
+  // Fusion de doublons -----------------------------------------------------
+  // Un doublon = un exemplaire normal en plus du premier (les variantes sont gardées).
+  spare(id) { const e = this.s.collection[id]; return e ? Math.max(0, (e.v.normal || 0) - 1) : 0; }
+  spareCount(r) { return this.catalog.byRarity[r].reduce((a, c) => a + this.spare(c.id), 0); }
+  fuse(r) {
+    const next = FUSION.next[r];
+    if (!next) throw new Error('Cette rareté ne peut pas être fusionnée.');
+    if (this.spareCount(r) < FUSION.cost) throw new Error(`Il faut ${FUSION.cost} doublons.`);
+    const donors = this.catalog.byRarity[r].filter((c) => this.spare(c.id) > 0).sort((a, b) => this.spare(b.id) - this.spare(a.id));
+    const used = [];
+    let left = FUSION.cost;
+    while (left > 0) {
+      for (const c of donors) {
+        if (!left) break;
+        if (!this.spare(c.id)) continue;
+        const e = this.s.collection[c.id];
+        e.v.normal--; e.n--; left--; used.push(c.id);
+      }
+    }
+    const pool = this.catalog.byRarity[next];
+    const weights = pool.map((c) => (this.owns(c.id) ? 1 : FUSION.unownedWeight));
+    let x = this.rng() * weights.reduce((a, b) => a + b, 0);
+    let pick = pool[pool.length - 1];
+    for (let i = 0; i < pool.length; i++) { x -= weights[i]; if (x < 0) { pick = pool[i]; break; } }
+    const r2 = this.addCard(pick.id, 'normal', 'fusion');
+    this.s.stats.fused++;
+    this.track('fuse', 1);
+    const progress = this.checkProgress();
+    this.persist();
+    return { id: pick.id, used, ...r2, progress };
   }
 
   setTitle(t) { if (this.s.titles.includes(t)) { this.s.title = t; this.persist(); } }

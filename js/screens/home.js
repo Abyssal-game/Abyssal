@@ -6,6 +6,8 @@ import { esc, fmt, toast, bindActions, pct } from '../ui/dom.js';
 import { FACTION_ORDER } from '../config.js';
 import { seeded } from '../art/geometry.js';
 import { today } from '../core/save.js';
+import { openFusion } from './fusion.js';
+import { FUSION } from '../config.js';
 
 export default function home(app, root) {
   const g = app.game, cat = app.catalog, s = g.s;
@@ -23,6 +25,26 @@ export default function home(app, root) {
   const daily = g.dailyAmount();
   const recent = s.recent.map((id) => cat.get(id)).filter(Boolean).slice(0, 10);
   const freeCount = Object.values(s.tickets).reduce((a, b) => a + b, 0) + g.freePack().stock;
+
+  const spare = ['C', 'PC', 'R', 'HR'].reduce((a, r) => a + g.spareCount(r), 0);
+  function missionsHTML() {
+    const m = g.missions();
+    const end = new Date(); end.setHours(24, 0, 0, 0);
+    const h = Math.max(1, Math.ceil((end - Date.now()) / 3600000));
+    const allClaimed = m.list.every((x) => x.claimed);
+    return `<section class="panel missions" aria-label="Missions du jour">
+      <div class="mi-head"><h3>Missions du jour</h3><span class="small muted">Nouvelles dans ${h} h</span></div>
+      ${m.list.map((x, i) => {
+        const done = x.p >= x.n;
+        return `<div class="mi ${x.claimed ? 'claimed' : ''}">
+          <span class="mi-t">${esc(x.text)}</span>
+          <span class="mi-r">${x.claimed ? `<span class="mi-ok">${icon('check')}Fait</span>` : done ? `<button class="btn small gold" data-act="mission" data-i="${i}">${icon('crystal')}+${x.shards}</button>` : `<span class="small muted">${icon('crystal')} ${x.shards}</span>`}</span>
+          <span><span class="progress"><i style="width:${(x.p / x.n) * 100}%"></i></span><span class="mi-n">${x.p} / ${x.n}</span></span>
+        </div>`;
+      }).join('')}
+      ${m.bonus ? '' : `<div class="mi-bonus"><span class="small">${allClaimed ? 'Les trois missions sont accomplies !' : 'Accomplis les trois missions pour gagner un <b>booster standard</b>.'}</span>${allClaimed ? `<button class="btn small primary" data-act="mbonus">${icon('ticket')}Récupérer</button>` : ''}</div>`}
+    </section>`;
+  }
 
   root.innerHTML = `
     <section class="hero ${heroOwned ? '' : 'hero-empty'}" style="--fc:${fac.colors.secondary}">
@@ -47,6 +69,8 @@ export default function home(app, root) {
       <button class="btn gold" data-act="daily">${icon('crystal')}+${daily.amount}</button>
     </div>` : ''}
 
+    ${missionsHTML()}
+
     <div class="panel progress-card">
       <div class="ring" style="--p:${(owned / total) * 100};--c:var(--gold)"><span>${Math.floor((owned / total) * 100)}%</span></div>
       <div class="pc-text">
@@ -62,6 +86,7 @@ export default function home(app, root) {
       <a class="tile" href="#/factions">${icon('shield')}<b>Factions</b><span>Sept royaumes</span></a>
       <a class="tile" href="#/succes">${icon('trophy')}<b>Succès</b><span>${Object.keys(s.achievements).length} / ${cat.achievements.length}</span></a>
       <a class="tile" href="#/parametres">${icon('gear')}<b>Réglages</b><span>Son, sauvegarde</span></a>
+      <button class="tile" data-act="fusion">${icon('sparkle')}<b>Fusion</b><span>${spare} doublon${spare > 1 ? 's' : ''}</span></button>
     </nav>
 
     <a class="panel event-banner" href="#/boutique" style="--a:${cat.faction[ev.factions[0]].colors.secondary};--b:${cat.faction[ev.factions[1]].colors.secondary}">
@@ -77,6 +102,15 @@ export default function home(app, root) {
   lazyArt(root);
   bindActions(root, {
     hero() { app.openCard(hero.id); },
+    fusion() { openFusion(app); },
+    mission(el) {
+      try { const r = g.claimMission(Number(el.dataset.i)); app.sfx.coin(); toast(`Mission accomplie : <b>+${r.shards} éclats</b>`, { kind: 'success', icon: 'crystal' }); app.refresh(); }
+      catch (e) { toast(esc(e.message), { kind: 'error' }); }
+    },
+    mbonus() {
+      try { g.claimMission('bonus'); app.sfx.achievement(); toast('Bonus des missions : <b>1 booster standard</b> offert !', { kind: 'epic', icon: 'ticket' }); app.refresh(); }
+      catch (e) { toast(esc(e.message), { kind: 'error' }); }
+    },
     daily() {
       try {
         const r = g.claimDaily();

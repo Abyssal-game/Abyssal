@@ -12,6 +12,7 @@ export const ICONS = {
   shield: I('<path d="M12 3 5 6v5.5c0 4.4 3 7.8 7 9.5 4-1.7 7-5.1 7-9.5V6z"/><path d="M12 8v8M8.5 11.5h7"/>'),
   swords: I('<path d="m4 4 9.5 9.5M4 4v3.5L13 16.5M4 4h3.5L16.5 13"/><path d="m20 4-6 6M20 4v3M20 4h-3"/><path d="m13 15 3 3M15 13l3 3M17 19l2 2M19 17l2 2"/>'),
   search: I('<circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/>'),
+  check: I('<path d="m5 12.5 4.5 4.5L19 7.5"/>'),
   close: I('<path d="M6 6l12 12M18 6 6 18"/>'),
   back: I('<path d="M15 5 8 12l7 7"/>'),
   next: I('<path d="m9 5 7 7-7 7"/>'),
