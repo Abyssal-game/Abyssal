@@ -43,6 +43,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
       body = `
         <div class="detail-actions row gap wrap">
           <button class="btn small ${isAvatar ? 'gold' : ''}" data-act="avatar">${icon('user')}${isAvatar ? 'Avatar actuel' : 'Choisir comme avatar'}</button>
+          <button class="btn small" data-act="artonly">${icon('eye')}Voir l’illustration</button>
           <button class="btn small ${inShow ? 'gold' : ''}" data-act="showcase">${icon('pin')}${inShow ? 'En vitrine' : 'Mettre en vitrine'}</button>
         </div>
         <div class="panel detail-facts">
@@ -99,6 +100,12 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     variant(el) { shownVariant = el.dataset.v; draw(); },
     avatar() { g.setAvatar(current); toast('Avatar mis à jour.', { icon: 'user' }); draw(); },
     showcase() { g.toggleShowcase(current); draw(); },
+    artonly(el) {
+      const c = sheet.body.querySelector('.detail-card .tcg');
+      const on = c.classList.toggle('art-only');
+      el.lastChild.textContent = on ? 'Afficher le texte' : 'Voir l’illustration';
+      if (on) sheet.el.scrollTo({ top: 0, behavior: 'smooth' });
+    },
     async craft() {
       const card = cat.get(current);
       const cost = ECONOMY.craftAsh[card.rarity];
@@ -110,6 +117,9 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
       try { g.decipher(current); toast(`Nom déchiffré : <b>${esc(cat.get(current).name)}</b>`, { icon: 'eye' }); draw(); }
       catch (err) { toast(esc(err.message), { kind: 'error' }); }
     },
+  });
+  sheet.body.addEventListener('click', (ev) => {
+    if (ev.target.closest('.detail-card .tcg') && g.owns(current)) sheet.body.querySelector('[data-act="artonly"]')?.click();
   });
   // Ouvre une carte de la lignée
   sheet.body.addEventListener('click', (ev) => {
