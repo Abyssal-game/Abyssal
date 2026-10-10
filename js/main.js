@@ -155,8 +155,35 @@ function onProgress(events) {
   }, (app.holdToasts ? 0 : 300) + i * 650));
 }
 
+// Accès restreint pendant la construction : un code est demandé une seule fois par appareil.
+// (Protection légère : elle tient les curieux à l'écart, la vraie protection viendra des comptes.)
+const ACCESS_HASH = '6016f8fa5aae569fac3bf7f8245f811cba41bade40f8d879c0bff10dce79a76a';
+async function sha(txt) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(txt));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+function accessGranted() { try { return localStorage.getItem('abyssal.access') === ACCESS_HASH; } catch (e) { return false; } }
+function askAccess(bootEl) {
+  return new Promise((resolve) => {
+    const box = document.createElement('form');
+    box.className = 'gate';
+    box.innerHTML = `<p class="gate-t">Accès réservé</p><p class="small muted">ABYSSAL est en construction. Entre le code d’accès.</p>
+      <input class="input" type="password" autocomplete="off" autocapitalize="characters" placeholder="Code d’accès" aria-label="Code d’accès">
+      <button class="btn primary block" type="submit">Entrer</button><p class="gate-err small"></p>`;
+    bootEl.querySelector('.boot-inner').appendChild(box);
+    const input = box.querySelector('input');
+    box.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const h = await sha('abyssal:' + input.value.trim().toUpperCase());
+      if (h === ACCESS_HASH) { try { localStorage.setItem('abyssal.access', h); } catch (err) { /* rien */ } box.remove(); resolve(); }
+      else { box.querySelector('.gate-err').textContent = 'Code incorrect.'; input.value = ''; }
+    });
+  });
+}
+
 async function boot() {
   const bootEl = document.getElementById('boot');
+  if (!accessGranted() && crypto.subtle) { await askAccess(bootEl); window.__introUntil = performance.now() + 300; }
   try {
     const [data] = await Promise.all([loadCatalogData('./'), loadArtManifest('./')]);
     const catalog = createCatalog(data);

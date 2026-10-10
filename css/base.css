@@ -92,6 +92,13 @@ p { margin: 0 0 .75em; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .boot *, .boot *::after { animation: none !important; } }
 
+/* Code d'accès (version en construction) */
+.gate { width: min(300px, 80vw); margin: 22px auto 0; display: flex; flex-direction: column; gap: 10px; animation: bootFade .5s ease both; }
+.gate-t { font-family: var(--f-display); letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin: 0; }
+.gate p { margin: 0; }
+.gate .input { text-align: center; letter-spacing: .2em; padding: 0 14px; }
+.gate-err { color: #ff9c9c; min-height: 1.2em; }
+
 /* Structure */
 #app { min-height: 100%; }
 #topbar {
