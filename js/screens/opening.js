@@ -2,7 +2,7 @@
 // effets selon la rareté, récapitulatif. Les cartes sont déjà enregistrées
 // dans la sauvegarde avant la première animation.
 import { BOOSTERS, RARITY, VARIANTS } from '../config.js';
-import { cardHTML, enableTilt } from '../ui/card.js';
+import { cardHTML } from '../ui/card.js';
 import { icon, EMBLEM } from '../ui/icons.js';
 import { esc, fmt, toast } from '../ui/dom.js';
 import { packHTML, payLabel } from './shop.js';
@@ -55,33 +55,141 @@ export function openPack(app, type, { faction, onDone } = {}) {
     return s;
   }
 
+  // Booster : déchirer en glissant le doigt sur la ligne, ou toucher pour l'ouvrir.
+  const zigzag = (top) => {
+    const pts = [];
+    for (let k = 0; k <= 16; k++) pts.push(`${(k / 16) * 100}% ${k % 2 ? 11.2 : 13.8}%`);
+    return top ? `polygon(0 0, 100% 0, ${pts.reverse().join(', ')})` : `polygon(${pts.join(', ')}, 100% 100%, 0 100%)`;
+  };
+
   function showPack() {
-    stage.innerHTML = `<button class="op-pack" aria-label="Briser le sceau du booster">${packHTML(type, cat, { faction, event: ev })}</button>`;
-    hint.textContent = 'Touche le booster pour briser le sceau.';
-    stage.querySelector('.op-pack').addEventListener('click', tear, { once: true });
+    const pk = packHTML(type, cat, { faction, event: ev });
+    stage.innerHTML = `<div class="op-pack" role="button" tabindex="0" aria-label="Ouvrir le booster : glisse le doigt le long de la ligne pointillée, ou touche-le">
+      <div class="pk-piece pk-body" style="clip-path:${zigzag(false)}">${pk}</div>
+      <div class="pk-piece pk-top" style="clip-path:${zigzag(true)}">${pk}</div>
+      <div class="pk-seam"><i></i></div><div class="pk-burst"></div>
+    </div>`;
+    hint.innerHTML = `${icon('sparkle')} Glisse le doigt le long de la ligne pour déchirer, ou touche le booster.`;
+    const pack = stage.querySelector('.op-pack');
+    const top = pack.querySelector('.pk-top');
+    const seam = pack.querySelector('.pk-seam');
+    let start = null, p = 0, dir = 1, lastTick = 0, done = false;
+    const setP = (v) => {
+      p = Math.max(0, Math.min(1, v));
+      pack.style.setProperty('--p', p);
+      seam.classList.toggle('rtl', dir < 0);
+      top.style.transformOrigin = dir > 0 ? '100% 12%' : '0 12%';
+      top.style.transform = `translateY(${-p * 3}%) rotate(${-dir * p * 5}deg)`;
+      if (p - lastTick > 0.07) { lastTick = p; app.sfx.rip(p); }
+    };
+    const finish = () => { if (!done) { done = true; tear(dir); } };
+    // Ouverture automatique (toucher) : la déchirure se dessine d'elle-même
+    const autoTear = () => {
+      if (done || busy) return;
+      busy = true;
+      if (reduced) { busy = false; return finish(); }
+      const t0 = performance.now();
+      const step = (t) => {
+        setP((t - t0) / 420);
+        if (p < 1) requestAnimationFrame(step); else { busy = false; finish(); }
+      };
+      requestAnimationFrame(step);
+    };
+    pack.addEventListener('pointerdown', (e) => {
+      if (done || busy) return;
+      const r = pack.getBoundingClientRect();
+      start = { x: e.clientX, y: e.clientY, w: r.width, moved: false };
+      pack.setPointerCapture(e.pointerId);
+    });
+    pack.addEventListener('pointermove', (e) => {
+      if (!start || done) return;
+      const dx = e.clientX - start.x;
+      if (!start.moved && Math.abs(dx) < 8) return;
+      if (!start.moved) { start.moved = true; dir = dx > 0 ? 1 : -1; pack.classList.add('dragging'); }
+      setP(Math.max(p, (dx * dir) / (start.w * 0.75)));
+      if (p >= 1) { start = null; pack.classList.remove('dragging'); finish(); }
+    });
+    const up = () => {
+      if (!start || done) return;
+      const moved = start.moved;
+      start = null;
+      pack.classList.remove('dragging');
+      if (!moved) return autoTear();
+      if (p > 0.6) { const from = p; const t0 = performance.now(); const step = (t) => { setP(from + (t - t0) / 200); if (p < 1) requestAnimationFrame(step); else finish(); }; requestAnimationFrame(step); }
+      else { pack.classList.add('snap'); setP(0); lastTick = 0; setTimeout(() => pack.classList.remove('snap'), 260); }
+    };
+    pack.addEventListener('pointerup', up);
+    pack.addEventListener('pointercancel', up);
+    pack.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); autoTear(); } });
   }
 
-  async function tear() {
-    if (busy) return;
+  async function tear(dir = 1) {
+    if (phase !== 'pack') return;
     busy = true;
     app.sfx.tear();
-    const p = stage.querySelector('.op-pack');
-    p.classList.add('tearing');
+    const pack = stage.querySelector('.op-pack');
+    pack.style.setProperty('--dir', dir);
+    pack.classList.add('torn');
+    await wait(260);
     el.classList.add('flash');
-    await wait(700);
+    pack.classList.add('open');
+    await wait(620);
     el.classList.remove('flash');
     busy = false;
     if (phase === 'summary') return;
     phase = 'reveal';
-    showBack();
+    showBack(true);
   }
 
-  function showBack() {
+  // Pile de cartes : la carte du dessus, les autres dos visibles derrière.
+  function showBack(first = false) {
     const c = opening.cards[index];
     const glow = RI(c.rarity) >= 2 ? `glow-${c.rarity}` : '';
-    stage.innerHTML = `<button class="op-card ${glow}" aria-label="Retourner la carte ${index + 1} sur ${opening.cards.length}"><div class="op-flip"><div class="tcg-back">${EMBLEM}</div></div></button><p class="op-label"></p>`;
+    const left = opening.cards.length - index - 1;
+    stage.innerHTML = `<div class="op-pile ${first ? 'rise' : ''}">
+      ${Array.from({ length: Math.min(left, 4) }, (_, k) => `<div class="op-under" style="--k:${k + 1}"><div class="tcg-back">${EMBLEM}</div></div>`).join('')}
+      <div class="op-card ${glow}" role="button" tabindex="0" aria-label="Retourner la carte ${index + 1} sur ${opening.cards.length}"><div class="op-flip"><div class="tcg-back">${EMBLEM}</div></div></div>
+    </div><p class="op-label"></p>`;
     hint.textContent = RI(c.rarity) >= 4 ? 'Quelque chose d’immense attend derrière ce sceau…' : RI(c.rarity) >= 3 ? 'Cette carte vibre sous tes doigts.' : 'Touche la carte pour la retourner.';
-    stage.querySelector('.op-card').addEventListener('click', flip, { once: true });
+    bindCard(stage.querySelector('.op-card'));
+  }
+
+  // Gestes sur la carte : toucher = retourner / suivante ; glisser (carte révélée) = suivante, façon Tinder.
+  function bindCard(card) {
+    let s = null;
+    card.addEventListener('pointerdown', (e) => {
+      if (busy) return;
+      s = { x: e.clientX, y: e.clientY, t: performance.now(), moved: false };
+      card.setPointerCapture(e.pointerId);
+    });
+    card.addEventListener('pointermove', (e) => {
+      if (!s || !card.classList.contains('revealed')) return;
+      const dx = e.clientX - s.x, dy = e.clientY - s.y;
+      if (!s.moved && Math.hypot(dx, dy) < 8) return;
+      s.moved = true;
+      card.classList.add('dragging');
+      card.style.transform = `translate(${dx}px, ${dy * 0.35}px) rotate(${dx * 0.06}deg)`;
+      card.style.setProperty('--swipe', Math.min(1, Math.abs(dx) / 120));
+    });
+    const up = (e) => {
+      if (!s) return;
+      const dx = e.clientX - s.x, dt = performance.now() - s.t;
+      const moved = s.moved;
+      s = null;
+      card.classList.remove('dragging');
+      if (!card.classList.contains('revealed')) { if (!busy) flip(); return; }
+      if (!moved) return nextCard(-1);
+      const fast = Math.abs(dx) / Math.max(dt, 1) > 0.6;
+      if (Math.abs(dx) > 90 || (fast && Math.abs(dx) > 30)) nextCard(dx > 0 ? 1 : -1, dx);
+      else { card.classList.add('snap'); card.style.transform = ''; card.style.removeProperty('--swipe'); setTimeout(() => card.classList.remove('snap'), 250); }
+    };
+    card.addEventListener('pointerup', up);
+    card.addEventListener('pointercancel', () => { s = null; card.classList.remove('dragging'); card.style.transform = ''; });
+    card.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      if (card.classList.contains('revealed')) nextCard(-1); else flip();
+    });
   }
 
   async function flip() {
@@ -101,16 +209,14 @@ export function openPack(app, type, { faction, onDone } = {}) {
     dots[index].style.background = RARITY[c.rarity].color;
     dots[index].classList.add('on');
     stage.querySelector('.op-label').innerHTML = statusLine(c);
-    enableTilt(btn, { reduced });
     if (RI(c.rarity) >= 4) epic(c.rarity);
     else app.sfx.reveal(c.rarity);
     if (c.variant !== 'normal') shine(c.variant, RI(c.rarity) >= 4 ? 1400 : 200);
     if (c.isNewCard) setTimeout(() => app.sfx.discover(), 250);
     await wait(RI(c.rarity) >= 4 ? 900 : 250);
     busy = false;
-    hint.textContent = index < opening.cards.length - 1 ? 'Touche pour la carte suivante.' : 'Touche pour voir le récapitulatif.';
+    hint.textContent = index < opening.cards.length - 1 ? 'Glisse la carte sur le côté, ou touche-la pour la suivante.' : 'Glisse ou touche pour voir le récapitulatif.';
     btn.setAttribute('aria-label', 'Carte suivante');
-    btn.addEventListener('click', nextCard, { once: true });
   }
 
   // Annonce d'une variante cosmétique (holographique, or, cosmique…)
@@ -143,10 +249,18 @@ export function openPack(app, type, { faction, onDone } = {}) {
     setTimeout(() => { banner.remove(); el.classList.remove('epic', `epic-${r}`); }, 2600);
   }
 
-  async function nextCard() {
+  async function nextCard(dir = -1, from = 0) {
     if (busy) return;
+    busy = true;
     const btn = stage.querySelector('.op-card');
-    if (!reduced) { btn.classList.add('away'); await wait(220); }
+    app.sfx.swipe();
+    if (!reduced) {
+      btn.classList.add('fly');
+      btn.style.transform = `translate(${dir * Math.max(window.innerWidth, 500) * 1.1}px, ${-40 + Math.abs(from) * 0.1}px) rotate(${dir * 28}deg)`;
+      btn.style.opacity = '0';
+      await wait(260);
+    }
+    busy = false;
     if (phase === 'summary') return;
     index++;
     if (index >= opening.cards.length) summary();
@@ -201,6 +315,7 @@ export function openPack(app, type, { faction, onDone } = {}) {
   }
   document.addEventListener('keydown', onKey);
 
+  el.addEventListener('dragstart', (e) => e.preventDefault());
   el.addEventListener('click', (e) => {
     const a = e.target.closest('[data-op]');
     if (!a) return;

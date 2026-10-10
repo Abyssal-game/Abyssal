@@ -20,6 +20,17 @@ export function payLabel(g, type, again = false) {
   return `${again ? 'Encore un' : 'Acheter'} <span class="price">${icon('crystal')}${fmt(BOOSTERS[type].price)}</span>`;
 }
 
+// Illustration mise en avant sur l'emballage du booster.
+function packCard(type, cat, faction, event) {
+  const pick = (list) => list[Math.floor(Date.now() / 86400000) % list.length];
+  const withArt = (list) => list.filter((c) => hasRealArt(c.id));
+  if (type === 'faction' && faction) return cat.get(cat.faction[faction].featured);
+  if (type === 'event' && event) return cat.get(cat.faction[event.factions[0]].featured);
+  if (type === 'premium') { const s = withArt(cat.byRarity.S); return s.length ? pick(s) : cat.byRarity.S[0]; }
+  const m = withArt(cat.byRarity.M);
+  return m.length ? pick(m) : cat.byRarity.M[0];
+}
+
 export function packHTML(type, cat, { faction, event } = {}) {
   const def = BOOSTERS[type];
   let a = '#9F1834', b = '#683BBA', label = def.name.replace('Booster ', '');
@@ -27,7 +38,16 @@ export function packHTML(type, cat, { faction, event } = {}) {
   if (type === 'event' && event) { a = cat.faction[event.factions[0]].colors.secondary; b = cat.faction[event.factions[1]].colors.secondary; label = event.name; }
   if (type === 'premium') { a = '#8A6526'; b = '#F1DB9E'; }
   const sig = type === 'faction' && faction ? sigil(faction) : EMBLEM;
-  return `<div class="pack pack-${type}" style="--pa:${a};--pb:${b}"><div class="pack-crimp"></div><div class="pack-face"><span class="pack-sig">${sig}</span><span class="pack-brand">ABYSSAL</span><span class="pack-name">${esc(label)}</span><span class="pack-count">5 cartes</span></div><div class="pack-crimp bottom"></div></div>`;
+  const art = packCard(type, cat, faction, event);
+  const tag = type === 'premium' ? 'Rare garantie' : type === 'event' ? 'Événement' : '5 cartes';
+  return `<div class="pack pack-${type}" style="--pa:${a};--pb:${b}">
+    <div class="pk-metal"></div>
+    <div class="pk-window"><img alt="" src="${artUrl(art)}"></div>
+    <div class="pk-brand"><span class="pk-sig">${sig}</span><b>ABYSSAL</b></div>
+    <div class="pk-label"><span class="pk-name">${esc(label)}</span><span class="pk-tag">${tag}</span></div>
+    <div class="pk-tearline"></div>
+    <div class="pk-foil"></div>
+  </div>`;
 }
 
 export function showOdds(app, type) {

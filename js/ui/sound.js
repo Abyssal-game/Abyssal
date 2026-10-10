@@ -61,6 +61,8 @@ export const sfx = {
   coin() { tone(988, { type: 'square', dur: 0.08, gain: 0.06 }); tone(1319, { type: 'square', dur: 0.14, gain: 0.06, delay: 0.07 }); },
   tear() { noise({ dur: 0.45, gain: 0.35, freq: 900, sweep: 3000, q: 0.6 }); tone(80, { type: 'sine', dur: 0.5, gain: 0.25, slide: -30 }); },
   flip() { noise({ dur: 0.16, gain: 0.18, freq: 2400, q: 1.2 }); },
+  rip(p = 0) { noise({ dur: 0.07, gain: 0.16, freq: 1400 + p * 2600, q: 1.4 }); },
+  swipe() { noise({ dur: 0.22, gain: 0.12, freq: 700, sweep: 2600, q: 0.7 }); },
   reveal(r) {
     const notes = CHORDS[r] || CHORDS.C;
     const big = r === 'M' || r === 'S';
