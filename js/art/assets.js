@@ -14,7 +14,7 @@ export async function loadArtManifest(base = './') {
       available = new Set(m.available || []);
       // Dos de carte illustré (facultatif) : assets/backs/back.webp
       if (m.cardBack && typeof document !== 'undefined') {
-        document.documentElement.style.setProperty('--card-back', `url("${m.cardBack}")`);
+        document.documentElement.style.setProperty('--card-back', `url("${new URL(m.cardBack, document.baseURI).href}")`);
         document.documentElement.classList.add('has-back');
       }
     }

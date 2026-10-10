@@ -199,5 +199,5 @@
 .is-mystery.real .tcg-art img { filter: grayscale(1) brightness(.3) contrast(1.4) blur(2.5px); }
 
 /* Dos de carte illustré */
-.has-back .tcg-back { background: var(--card-back) center / cover no-repeat; border: 0; box-shadow: 0 8px 20px rgba(0, 0, 0, .6); }
+.has-back .tcg-back { background: var(--card-back) center / 100% 100% no-repeat; border: 0; box-shadow: 0 8px 20px rgba(0, 0, 0, .6); }
 .has-back .tcg-back > *, .has-back .tcg-back::after { display: none; }
