@@ -48,6 +48,7 @@ export default function account(app, root) {
       <section class="panel stack">
         <h2>Pseudo</h2>
         <p class="small muted">C’est le nom que les autres joueurs voient dans les classements.</p>
+        ${p?.badge ? `<p class="small">Ton badge : ${cloud.badgeHTML(p.badge)}</p>` : ''}
         <form class="row gap acc-pseudo" id="pseudo"><input class="input plain" name="pseudo" maxlength="16" minlength="3" placeholder="Ton pseudo" value="${esc(p?.pseudo || '')}" required><button class="btn primary" type="submit">OK</button></form>
         ${p?.pseudo ? '' : '<p class="small acc-warn">Choisis un pseudo pour apparaître au classement de la Descente.</p>'}
       </section>

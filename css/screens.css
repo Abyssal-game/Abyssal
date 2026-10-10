@@ -697,3 +697,6 @@ button.tile { font: inherit; text-align: left; cursor: pointer; }
 .lb-name { min-width: 0; display: flex; flex-direction: column; line-height: 1.2; }
 .lb-name b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lb-floor { font: 700 1rem/1 var(--f-display); color: var(--gold-hi); white-space: nowrap; }
+
+.pbadge { display: inline-block; margin-left: 6px; padding: 2px 7px; border-radius: 99px; font: 800 .6rem/1.3 var(--f-ui); letter-spacing: .06em; text-transform: uppercase; vertical-align: 2px; }
+.b-createur { color: #1A1206; background: linear-gradient(110deg, #FFF6D6, #E8C987 40%, #C8A45D 70%, #FFF0C2); box-shadow: 0 0 10px rgba(240, 200, 100, .55); }

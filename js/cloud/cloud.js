@@ -128,5 +128,12 @@ export async function submitScore(day, floor, cursed) {
   await authed('/rest/v1/rpc/submit_score', { method: 'POST', body: { p_day: day, p_floor: floor, p_cursed: !!cursed } });
 }
 export async function leaderboard(day, limit = 20) {
-  return authed(`/rest/v1/descent_scores?day=eq.${day}&select=floor,cursed,user_id,profiles(pseudo,avatar,title)&order=floor.desc,updated_at.asc&limit=${limit}`);
+  return authed(`/rest/v1/descent_scores?day=eq.${day}&select=floor,cursed,user_id,profiles(pseudo,avatar,title,badge)&order=floor.desc,updated_at.asc&limit=${limit}`);
+}
+
+// Badges attribués par le serveur
+export const BADGES = { createur: { name: 'Créateur', cls: 'b-createur' } };
+export function badgeHTML(key) {
+  const b = BADGES[key];
+  return b ? `<span class="pbadge ${b.cls}">${b.name}</span>` : '';
 }
