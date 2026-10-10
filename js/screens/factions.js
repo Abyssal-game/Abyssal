@@ -16,7 +16,7 @@ export default function factions(app, root, params) {
       const p = g.factionProgress(f.key);
       const feat = cat.get(f.featured);
       return `<a class="fac-card" href="#/faction/${f.key}" style="--fc:${f.colors.secondary};--fp:${f.colors.primary}">
-        <img alt="" loading="lazy" src="${artUrl(feat, { mystery: !g.owns(feat.id), lite: true })}">
+        <img alt="" loading="lazy" class="${g.owns(feat.id) ? '' : 'veiled'}" src="${artUrl(feat, { mystery: !g.owns(feat.id), lite: true })}">
         <span class="fac-veil"></span>
         <span class="fac-text">
           <span class="fac-sig">${sigil(f.key)}</span>
@@ -39,7 +39,7 @@ function factionPage(app, root, key) {
   root.innerHTML = `
     <a class="back-link" href="#/factions">${icon('back')}Factions</a>
     <section class="fac-hero" style="--fc:${f.colors.secondary};--fp:${f.colors.primary}">
-      <img alt="" src="${artUrl(feat, { mystery: !g.owns(feat.id) })}">
+      <img alt="" class="${g.owns(feat.id) ? '' : 'veiled'}" src="${artUrl(feat, { mystery: !g.owns(feat.id) })}">
       <div class="fac-hero-veil"></div>
       <div class="fac-hero-text"><span class="fac-sig big">${sigil(key)}</span><h1>${esc(f.name)}</h1><p class="lore">${esc(f.realm)} · « ${esc(f.motto)} »</p></div>
     </section>

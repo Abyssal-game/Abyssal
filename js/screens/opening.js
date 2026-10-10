@@ -56,57 +56,75 @@ export function openPack(app, type, { faction, onDone } = {}) {
   }
 
   // Booster : déchirer en glissant le doigt sur la ligne, ou toucher pour l'ouvrir.
-  const zigzag = (top) => {
+  // La bande du haut est découpée en lanières qui se soulèvent une à une sous le doigt,
+  // le long d'une ligne de déchirure irrégulière (différente à chaque booster).
+  const SLICES = 12, EDGE = 48;
+  const ragged = Array.from({ length: EDGE + 1 }, (_, k) => 9.4 + Math.random() * 1.9 + (k % 3 === 0 ? 0.5 : 0));
+  const edgeY = (x) => ragged[Math.round(x * EDGE)];
+  const pt = (x) => `${(x * 100).toFixed(2)}% ${edgeY(x).toFixed(2)}%`;
+  const sliceClip = (a, b) => {
     const pts = [];
-    for (let k = 0; k <= 16; k++) pts.push(`${(k / 16) * 100}% ${k % 2 ? 9.4 : 11.6}%`);
-    return top ? `polygon(0 0, 100% 0, ${pts.reverse().join(', ')})` : `polygon(${pts.join(', ')}, 100% 100%, 0 100%)`;
+    for (let k = Math.round(b * EDGE); k >= Math.round(a * EDGE); k--) pts.push(pt(k / EDGE));
+    return `polygon(${(a * 100).toFixed(2)}% 0, ${(b * 100).toFixed(2)}% 0, ${pts.join(', ')})`;
+  };
+  const bodyClip = () => `polygon(${ragged.map((_, k) => pt(k / EDGE)).join(', ')}, 100% 100%, 0 100%)`;
+  const edgePath = (dir) => {
+    const xs = ragged.map((y, k) => [(k / EDGE) * 100, y]);
+    if (dir < 0) xs.reverse();
+    return 'M' + xs.map(([x, y]) => `${x.toFixed(2)} ${y.toFixed(2)}`).join('L');
   };
 
   function showPack() {
     const pk = packHTML(type, cat, { faction, event: ev });
+    const slices = Array.from({ length: SLICES }, (_, i) => `<div class="pk-slice" style="clip-path:${sliceClip(i / SLICES, (i + 1) / SLICES)};transform-origin:${(((i + 0.5) / SLICES) * 100).toFixed(1)}% 10.5%">${pk}</div>`).join('');
     stage.innerHTML = `<div class="op-pack" role="button" tabindex="0" aria-label="Ouvrir le booster : glisse le doigt le long de la ligne pointillée, ou touche-le">
-      <div class="pk-piece pk-body" style="clip-path:${zigzag(false)}">${pk}</div>
-      <div class="pk-piece pk-top" style="clip-path:${zigzag(true)}">${pk}</div>
-      <div class="pk-seam"><i></i></div><div class="pk-burst"></div>
+      <div class="pk-inside"><div class="pk-cards"><div class="tcg-back">${EMBLEM}</div></div></div>
+      <div class="pk-piece pk-body" style="clip-path:${bodyClip()}">${pk}</div>
+      <div class="pk-strip">${slices}</div>
+      <svg class="pk-edge" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="${edgePath(1)}" pathLength="1"/></svg>
+      <div class="pk-burst"></div>
     </div>`;
     hint.innerHTML = `${icon('sparkle')} Glisse le doigt le long de la ligne pour déchirer, ou touche le booster.`;
     const pack = stage.querySelector('.op-pack');
-    const top = pack.querySelector('.pk-top');
-    const seam = pack.querySelector('.pk-seam');
+    const sl = [...pack.querySelectorAll('.pk-slice')];
+    const edge = pack.querySelector('.pk-edge path');
     let start = null, p = 0, dir = 1, lastTick = 0, done = false;
     const setP = (v) => {
       p = Math.max(0, Math.min(1, v));
+      sl.forEach((el2, i) => {
+        const k = dir > 0 ? i : SLICES - 1 - i;
+        const t = Math.max(0, Math.min(1, p * SLICES * 1.25 - k));
+        el2.style.transform = t ? `translateY(${(-t * 2.6).toFixed(2)}%) rotate(${(-dir * t * (4 + (k % 3))).toFixed(2)}deg)` : '';
+        el2.style.filter = t ? `brightness(${(1 + t * 0.25).toFixed(2)}) drop-shadow(0 ${(t * 4).toFixed(1)}px ${(t * 5).toFixed(1)}px rgba(0,0,0,.6))` : '';
+      });
+      edge.style.strokeDashoffset = String(1 - p);
       pack.style.setProperty('--p', p);
-      seam.classList.toggle('rtl', dir < 0);
-      top.style.transformOrigin = dir > 0 ? '100% 10%' : '0 10%';
-      top.style.transform = `translateY(${-p * 3}%) rotate(${-dir * p * 5}deg)`;
-      if (p - lastTick > 0.07) { lastTick = p; app.sfx.rip(p); }
+      if (p - lastTick > 0.06) { lastTick = p; app.sfx.rip(p); }
     };
+    const setDir = (d) => { dir = d; edge.setAttribute('d', edgePath(d)); pack.style.setProperty('--dir', d); };
     const finish = () => { if (!done) { done = true; tear(dir); } };
-    // Ouverture automatique (toucher) : la déchirure se dessine d'elle-même
-    const autoTear = () => {
-      if (done || busy) return;
+    const animateTo = (ms) => {
       busy = true;
-      if (reduced) { busy = false; return finish(); }
-      const t0 = performance.now();
+      const from = p, t0 = performance.now();
       const step = (t) => {
-        setP((t - t0) / 420);
-        if (p < 1) requestAnimationFrame(step); else { busy = false; finish(); }
+        const k = Math.min(1, (t - t0) / ms);
+        setP(from + (1 - from) * (k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2));
+        if (k < 1) requestAnimationFrame(step); else { busy = false; finish(); }
       };
       requestAnimationFrame(step);
     };
     pack.addEventListener('pointerdown', (e) => {
       if (done || busy) return;
       const r = pack.getBoundingClientRect();
-      start = { x: e.clientX, y: e.clientY, w: r.width, moved: false };
+      start = { x: e.clientX, w: r.width, moved: false };
       pack.setPointerCapture(e.pointerId);
     });
     pack.addEventListener('pointermove', (e) => {
       if (!start || done) return;
       const dx = e.clientX - start.x;
       if (!start.moved && Math.abs(dx) < 8) return;
-      if (!start.moved) { start.moved = true; dir = dx > 0 ? 1 : -1; pack.classList.add('dragging'); }
-      setP(Math.max(p, (dx * dir) / (start.w * 0.75)));
+      if (!start.moved) { start.moved = true; setDir(dx > 0 ? 1 : -1); pack.classList.add('dragging'); }
+      setP(Math.max(p, (dx * dir) / (start.w * 0.8)));
       if (p >= 1) { start = null; pack.classList.remove('dragging'); finish(); }
     });
     const up = () => {
@@ -114,13 +132,13 @@ export function openPack(app, type, { faction, onDone } = {}) {
       const moved = start.moved;
       start = null;
       pack.classList.remove('dragging');
-      if (!moved) return autoTear();
-      if (p > 0.6) { const from = p; const t0 = performance.now(); const step = (t) => { setP(from + (t - t0) / 200); if (p < 1) requestAnimationFrame(step); else finish(); }; requestAnimationFrame(step); }
-      else { pack.classList.add('snap'); setP(0); lastTick = 0; setTimeout(() => pack.classList.remove('snap'), 260); }
+      if (!moved) { setDir(1); return reduced ? finish() : animateTo(650); }
+      if (p > 0.55) animateTo(220);
+      else { pack.classList.add('snap'); setP(0); lastTick = 0; setTimeout(() => pack.classList.remove('snap'), 300); }
     };
     pack.addEventListener('pointerup', up);
     pack.addEventListener('pointercancel', up);
-    pack.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); autoTear(); } });
+    pack.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && !done && !busy) { e.preventDefault(); setDir(1); animateTo(650); } });
   }
 
   async function tear(dir = 1) {
@@ -130,10 +148,12 @@ export function openPack(app, type, { faction, onDone } = {}) {
     const pack = stage.querySelector('.op-pack');
     pack.style.setProperty('--dir', dir);
     pack.classList.add('torn');
-    await wait(260);
-    el.classList.add('flash');
+    await wait(380);
     pack.classList.add('open');
-    await wait(620);
+    await wait(560);
+    el.classList.add('flash');
+    pack.classList.add('out');
+    await wait(420);
     el.classList.remove('flash');
     busy = false;
     if (phase === 'summary') return;

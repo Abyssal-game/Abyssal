@@ -9,7 +9,15 @@ const cache = new Map();
 export async function loadArtManifest(base = './') {
   try {
     const r = await fetch(base + 'assets/art/manifest.json', { cache: 'no-cache' });
-    if (r.ok) available = new Set((await r.json()).available || []);
+    if (r.ok) {
+      const m = await r.json();
+      available = new Set(m.available || []);
+      // Dos de carte illustré (facultatif) : assets/backs/back.webp
+      if (m.cardBack && typeof document !== 'undefined') {
+        document.documentElement.style.setProperty('--card-back', `url("${m.cardBack}")`);
+        document.documentElement.classList.add('has-back');
+      }
+    }
   } catch (e) {
     available = new Set();
   }

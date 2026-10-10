@@ -25,13 +25,13 @@ export default function home(app, root) {
 
   root.innerHTML = `
     <section class="hero" style="--fc:${fac.colors.secondary}">
-      <div class="hero-art"><img alt="" src="${artUrl(hero, { mystery: !heroOwned && !hasRealArt(hero.id) })}"></div>
+      <div class="hero-art"><img alt="" class="${heroOwned ? '' : 'veiled'}" src="${artUrl(hero, { mystery: !heroOwned })}"></div>
       <div class="hero-veil"></div>
       <div class="hero-content">
         <div class="logo">${EMBLEM}<h1 class="wordmark">ABYSSAL</h1><p class="tagline">Le Bestiaire interdit</p></div>
         <button class="hero-caption" data-act="hero" aria-label="Voir la créature du jour">
-          <span class="small muted">${heroOwned ? 'Créature du jour' : `${hero.rarity === 'S' ? 'Secrète' : 'Mythique'} à trouver dans les boosters`}</span>
-          <b>${heroOwned || hasRealArt(hero.id) ? esc(hero.name) : '???'}</b>
+          <span class="small muted">${heroOwned ? 'Créature du jour' : `Une ${hero.rarity === 'S' ? 'secrète' : 'mythique'} se cache dans les boosters`}</span>
+          <b>${heroOwned ? esc(hero.name) : '???'}</b>
           <span class="small" style="color:${fac.colors.secondary}">${sigil(hero.faction)} ${esc(fac.name)}</span>
         </button>
       </div>

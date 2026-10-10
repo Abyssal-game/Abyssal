@@ -1,5 +1,5 @@
 {
-  "comment": "Liste des illustrations définitives présentes dans ce dossier (identifiants de cartes). Exemple : [\"INF-052\", \"INF-052-alt\"]. Fichiers attendus : <ID>.webp, format 600 × 840.",
+  "comment": "Liste des illustrations définitives présentes dans ce dossier (identifiants de cartes). Exemple : [\"INF-052\", \"INF-052-alt\"]. Fichiers attendus : <ID>.webp, format 600 × 840. cardBack : chemin du dos de carte illustré (ex. \"assets/backs/back.webp\"), ou null pour le dos par défaut.",
   "available": [
     "ABY-045",
     "ABY-046",
@@ -27,5 +27,6 @@
     "SAU-048",
     "SAU-049",
     "SAU-050"
-  ]
+  ],
+  "cardBack": null
 }

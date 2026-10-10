@@ -216,3 +216,6 @@ textarea.input { padding: 12px; min-height: 120px; font: .8rem/1.4 ui-monospace,
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+
+/* Illustration d'une carte non obtenue : on devine une forme, rien de plus */
+img.veiled { filter: grayscale(1) brightness(.28) contrast(1.4) blur(3px); transform: scale(1.04); }

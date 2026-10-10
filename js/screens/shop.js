@@ -62,9 +62,9 @@ export default function shop(app, root) {
   function treasures() {
     const list = cat.cards.filter((c) => (c.rarity === 'S' || c.rarity === 'M') && hasRealArt(c.id)).sort((a, b) => (b.rarity === 'S') - (a.rarity === 'S'));
     if (!list.length) return '';
-    return `<h2 class="section-title">Les trésors du Bestiaire</h2>
-      <div class="treasures">${list.map((c) => `<figure class="treasure r-${c.rarity} ${g.owns(c.id) ? 'owned' : ''}" style="--rc:${RARITY[c.rarity].color}"><img alt="${esc(c.name)}" loading="lazy" src="${artUrl(c)}"><figcaption><b>${esc(c.name)}</b><span>${RARITY[c.rarity].name}${g.owns(c.id) ? ' · possédée' : ''}</span></figcaption></figure>`).join('')}</div>
-      <p class="small muted">Elles se cachent dans les boosters. Les secrètes sortent environ une fois toutes les 330 cartes.</p>`;
+    return `<h2 class="section-title">Les trésors cachés</h2>
+      <div class="treasures">${list.map((c) => { const own = g.owns(c.id); return `<figure class="treasure r-${c.rarity} ${own ? 'owned' : ''}" style="--rc:${RARITY[c.rarity].color}"><img alt="" loading="lazy" class="${own ? '' : 'veiled'}" src="${artUrl(c, { mystery: !own })}"><figcaption><b>${own ? esc(c.name) : '???'}</b><span>${RARITY[c.rarity].name}${own ? ' · possédée' : ''}</span></figcaption></figure>`; }).join('')}</div>
+      <p class="small muted">Leur vrai visage ne se révèle qu’à celui qui les trouve. Les secrètes sortent environ une fois toutes les 330 cartes.</p>`;
   }
 
   function freeLine() {
@@ -74,6 +74,16 @@ export default function shop(app, root) {
   }
 
   function render() {
+    // garde la position de défilement (page et rangée des factions) pendant le rafraîchissement
+    const keepX = root.querySelector('.fac-pick')?.scrollLeft || 0;
+    const keepY = window.scrollY;
+    draw();
+    const fp = root.querySelector('.fac-pick');
+    if (fp) fp.scrollLeft = keepX;
+    window.scrollTo(0, keepY);
+  }
+
+  function draw() {
     const s = g.s;
     const card = (type, extra = '') => {
       const def = BOOSTERS[type];
