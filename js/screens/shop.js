@@ -20,18 +20,17 @@ export function payLabel(g, type, again = false) {
   return `${again ? 'Encore un' : 'Acheter'} <span class="price">${icon('crystal')}${fmt(BOOSTERS[type].price)}</span>`;
 }
 
+// Visuels d'emballage : assets/packs/<clé>.webp (booster, faction ou événement).
 export function packHTML(type, cat, { faction, event } = {}) {
   const def = BOOSTERS[type];
-  let a = '#9F1834', b = '#683BBA', label = def.name.replace('Booster ', '');
-  if (type === 'faction' && faction) { a = cat.faction[faction].colors.primary; b = cat.faction[faction].colors.secondary; label = cat.faction[faction].name; }
-  if (type === 'event' && event) { a = cat.faction[event.factions[0]].colors.secondary; b = cat.faction[event.factions[1]].colors.secondary; label = event.name; }
-  if (type === 'premium') { a = '#8A6526'; b = '#F1DB9E'; }
-  const sig = type === 'faction' && faction ? sigil(faction) : EMBLEM;
-  const tag = type === 'premium' ? 'Rare garantie' : type === 'event' ? 'Événement' : '5 cartes';
-  return `<div class="pack pack-${type}" style="--pa:${a};--pb:${b}">
-    <div class="pk-metal"></div>
-    <div class="pk-emblem">${sig}</div>
-    <div class="pk-brand"><span class="pk-sig">${sig}</span><b>ABYSSAL</b></div>
+  let label = def.name.replace('Booster ', '');
+  let key = type;
+  if (type === 'faction' && faction) { label = cat.faction[faction].name; key = faction; }
+  if (type === 'event' && event) label = event.name;
+  const tag = type === 'premium' ? 'Rare garantie' : '5 cartes';
+  return `<div class="pack pack-${type}">
+    <img class="pk-img" alt="" src="assets/packs/${key}.webp">
+    <div class="pk-logo">ABYSSAL</div>
     <div class="pk-label"><span class="pk-name">${esc(label)}</span><span class="pk-tag">${tag}</span></div>
     <div class="pk-tearline"></div>
     <div class="pk-foil"></div>

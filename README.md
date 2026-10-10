@@ -67,6 +67,10 @@ Le champ `art` décrit l’illustration provisoire : `form` (`hum`, `beast`, `dr
 
 Une image déclarée mais introuvable est automatiquement remplacée par l’illustration provisoire : pas de carte vide ni d’image cassée. Les effets de rareté et de variante (cadres, holographie, chromatique…) s’appliquent aussi aux vraies images.
 
+## Remplacer les visuels de boosters
+
+`python3 tools/add-pack.py <clé> <image>` découpe le paquet sur son fond uni et l’enregistre dans `assets/packs/<clé>.webp` (clés : `standard`, `premium`, `event`, et une par faction). Le logo, le nom et la déchirure sont ajoutés par le jeu : l’image ne doit contenir aucun texte.
+
 ## Modifier les taux de rareté et l’économie
 
 Tout est centralisé dans `js/config.js` :

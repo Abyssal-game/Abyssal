@@ -58,7 +58,7 @@ export function openPack(app, type, { faction, onDone } = {}) {
   // Booster : déchirer en glissant le doigt sur la ligne, ou toucher pour l'ouvrir.
   const zigzag = (top) => {
     const pts = [];
-    for (let k = 0; k <= 16; k++) pts.push(`${(k / 16) * 100}% ${k % 2 ? 11.2 : 13.8}%`);
+    for (let k = 0; k <= 16; k++) pts.push(`${(k / 16) * 100}% ${k % 2 ? 9.4 : 11.6}%`);
     return top ? `polygon(0 0, 100% 0, ${pts.reverse().join(', ')})` : `polygon(${pts.join(', ')}, 100% 100%, 0 100%)`;
   };
 
@@ -78,7 +78,7 @@ export function openPack(app, type, { faction, onDone } = {}) {
       p = Math.max(0, Math.min(1, v));
       pack.style.setProperty('--p', p);
       seam.classList.toggle('rtl', dir < 0);
-      top.style.transformOrigin = dir > 0 ? '100% 12%' : '0 12%';
+      top.style.transformOrigin = dir > 0 ? '100% 10%' : '0 10%';
       top.style.transform = `translateY(${-p * 3}%) rotate(${-dir * p * 5}deg)`;
       if (p - lastTick > 0.07) { lastTick = p; app.sfx.rip(p); }
     };
