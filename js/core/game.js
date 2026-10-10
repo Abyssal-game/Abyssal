@@ -536,6 +536,7 @@ export class Game {
       } else d.wounds[m.id] = now + DESCENT.woundHours * 3600000;
     }
     const summary = { wiped, floor: run.cleared, loot, fallen, lostCards, levelUps, cursed: run.cursed };
+    this.emit('descentEnd', summary);
     d.last = summary;
     d.run = null;
     this.s.xp += run.cleared * 8;

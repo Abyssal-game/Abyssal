@@ -6,6 +6,9 @@ import { artUrl } from '../art/assets.js';
 import { icon } from '../ui/icons.js';
 import { esc, fmt, toast, openSheet, confirmBox, bindActions } from '../ui/dom.js';
 import { bagHTML, bindBag } from './items.js';
+import * as cloud from '../cloud/cloud.js';
+import { sync } from '../cloud/sync.js';
+import { EMBLEM } from '../ui/icons.js';
 
 const ROOM_ICON = { fight: 'swords', elite: 'skull', altar: 'star', rest: 'heart', treasure: 'crystal', boss: 'crown' };
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -47,6 +50,7 @@ export default function descent(app, root) {
         <button class="switch" role="switch" aria-checked="${ui.cursed}" data-act="curse" aria-label="Descente maudite"><i></i></button></div>
       <button class="btn ${ui.cursed ? 'danger' : 'primary'} block big-cta" data-act="start" ${torches && ready >= 3 ? '' : 'disabled'}>${icon('flame')}${torches ? 'Allumer une torche et descendre' : 'Plus de torche : reviens demain'}</button>
       ${ready < 3 ? `<p class="small muted center">Il faut au moins 3 cartes en état de combattre.</p>` : ''}
+      <section class="panel lb" id="lb"><h3>${icon('trophy')} Classement mondial du jour</h3><div class="lb-body small muted">Chargement…</div></section>
       <details class="panel dc-rules"><summary>${icon('info')} Comment ça marche</summary>
         <ul class="small">
           <li>Chaque jour : ${DESCENT.torches} torches, donc ${DESCENT.torches} expéditions. Le donjon est le même pour tout le monde ce jour-là.</li>
@@ -57,6 +61,26 @@ export default function descent(app, root) {
           <li>Les cartes gagnent de l’expérience (niveau 10 maximum, +6 % par niveau). Les variantes donnent aussi de la force : holographique +5 %, chromatique +8 %, or +12 %, cosmique +16 %.</li>
         </ul></details>`;
     lazyArt(root);
+    loadBoard();
+  }
+
+  async function loadBoard() {
+    const box = root.querySelector('#lb .lb-body');
+    if (!box) return;
+    if (!cloud.isLoggedIn()) { box.innerHTML = 'Connecte-toi pour comparer ton étage avec les joueurs du monde entier. <a href="#/compte">Se connecter</a>'; return; }
+    try {
+      const day = g.descent().day;
+      const rows = await cloud.leaderboard(day, 30);
+      if (!root.contains(box)) return;
+      const me = cloud.currentUser()?.id;
+      const mine = g.descent().bestToday;
+      box.classList.remove('muted');
+      box.innerHTML = (rows.length ? rows.map((r, i) => {
+        const av = r.profiles?.avatar && cat.get(r.profiles.avatar);
+        return `<div class="lb-row ${r.user_id === me ? 'me' : ''}"><span class="lb-rank">${i + 1}</span><span class="lb-av">${av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM}</span><span class="lb-name"><b>${esc(r.profiles?.pseudo || '?')}</b><span class="small muted">${esc(r.profiles?.title || '')}</span></span><span class="lb-floor">${r.cursed ? `${icon('skull')} ` : ''}Étage ${r.floor}</span></div>`;
+      }).join('') : '<p class="small muted">Personne n’est encore descendu aujourd’hui. À toi d’ouvrir la voie !</p>')
+        + (!sync.profile?.pseudo ? '<p class="small acc-warn"><a href="#/compte">Choisis un pseudo</a> pour apparaître au classement.</p>' : !rows.some((r) => r.user_id === me) && mine ? `<p class="small muted">Ton meilleur étage aujourd’hui : ${mine}.</p>` : '');
+    } catch (e) { if (root.contains(box)) box.textContent = e.message; }
   }
 
   function summaryHTML(s) {

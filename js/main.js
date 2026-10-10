@@ -18,17 +18,19 @@ import achievementsScreen from './screens/achievements.js';
 import profileScreen from './screens/profile.js';
 import settingsScreen from './screens/settings.js';
 import descentScreen from './screens/descent.js';
+import accountScreen from './screens/account.js';
+import { startSync } from './cloud/sync.js';
 
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,
   factions: factionsScreen, faction: factionsScreen, succes: achievementsScreen, profil: profileScreen,
-  parametres: settingsScreen, descente: descentScreen,
+  parametres: settingsScreen, descente: descentScreen, compte: accountScreen,
 };
 const TABS = [
   ['antre', 'home', 'Antre'], ['collection', 'cards', 'Collection'], ['boutique', 'booster', 'Boosters'],
   ['descente', 'swords', 'Descente'], ['profil', 'user', 'Profil'],
 ];
-const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', bestiaire: 'antre', descente: 'descente', factions: 'antre', faction: 'antre', succes: 'profil', profil: 'profil', parametres: 'profil' };
+const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', bestiaire: 'antre', descente: 'descente', factions: 'antre', faction: 'antre', succes: 'profil', profil: 'profil', parametres: 'profil', compte: 'profil' };
 
 function storageOrMemory() {
   try {
@@ -199,6 +201,7 @@ async function boot() {
     app.applySettings = applySettings;
     if (new URLSearchParams(location.search).has('dev')) app.game.s.settings.dev = true;
     applySettings();
+    startSync(app);
     lastShards = app.game.s.shards;
     window.addEventListener('hashchange', render);
     render();

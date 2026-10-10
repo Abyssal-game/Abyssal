@@ -49,7 +49,7 @@ export default function profile(app, root) {
           <p class="small muted">${av ? `Avatar : ${esc(av.name)}` : 'Choisis un avatar depuis la fiche d’une carte possédée.'}</p>
         </div>
       </section>
-      <div class="row gap wrap"><a class="btn small" href="#/succes">${icon('trophy')}Succès</a><a class="btn small" href="#/parametres">${icon('gear')}Réglages et sauvegarde</a></div>
+      <div class="row gap wrap"><a class="btn small" href="#/compte">${icon('user')}Compte en ligne</a><a class="btn small" href="#/succes">${icon('trophy')}Succès</a><a class="btn small" href="#/parametres">${icon('gear')}Réglages et sauvegarde</a></div>
 
       <h2 class="section-title">Vitrine</h2>
       ${show.length ? `<div class="showcase" id="showcase">${show.map((c) => { const e = g.entry(c.id); const v = ['special', 'galaxy', 'gold', 'ancestral', 'corrupt', 'chroma', 'holo', 'alt'].find((x) => e.v[x]) || 'normal'; return cardHTML(c, { variant: v }); }).join('')}</div><p class="small muted">${s.showcase.length ? 'Tes cartes mises en vitrine.' : 'Tes cartes les plus prestigieuses. Mets-en d’autres en vitrine depuis leur fiche.'}</p>` : '<p class="muted">Ta vitrine est vide : ouvre ton premier booster.</p>'}
