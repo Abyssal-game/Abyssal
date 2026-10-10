@@ -74,7 +74,17 @@ export async function setPseudo(pseudo) {
   const p = pseudo.trim();
   await cloud.saveProfile({ pseudo: p, ...profilePayload() });
   sync.profile = { ...(sync.profile || {}), pseudo: p };
-  emit();
+  await refreshProfile();
+}
+
+// Relit le profil sur le serveur (pseudo, badge…) : un badge attribué depuis Supabase apparaît sans relancer l'app.
+let lastRefresh = 0;
+export async function refreshProfile(force = true) {
+  if (!cloud.isLoggedIn()) return null;
+  if (!force && Date.now() - lastRefresh < 15000) return sync.profile;
+  lastRefresh = Date.now();
+  try { sync.profile = await cloud.getProfile(); emit(); } catch (e) { /* réseau : on garde l'ancien */ }
+  return sync.profile;
 }
 
 export function startSync(theApp) {

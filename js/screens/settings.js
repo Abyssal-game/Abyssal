@@ -5,7 +5,7 @@ import { exportCode, importCode } from '../core/save.js';
 import { drawBooster } from '../core/boosters.js';
 import { RARITIES, RARITY_ORDER, BOOSTERS } from '../config.js';
 import { sfx } from '../ui/sound.js';
-import { sync } from '../cloud/sync.js';
+import { sync, onSync, refreshProfile } from '../cloud/sync.js';
 import { openCreator } from './creator.js';
 
 export default function settings(app, root) {
@@ -140,6 +140,11 @@ export default function settings(app, root) {
     },
   });
   render();
+  // le badge peut arriver du serveur après l'affichage
+  const before = sync.profile?.badge;
+  const off = onSync(() => { if (sync.profile?.badge !== before) render(); });
+  refreshProfile(false);
+  return () => off();
 }
 
 function simulate(app) {

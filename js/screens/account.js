@@ -1,6 +1,6 @@
 // Compte : connexion, pseudo public, sauvegarde en ligne, déconnexion, suppression du compte.
 import * as cloud from '../cloud/cloud.js';
-import { sync, onSync, afterLogin, pushNow, restoreFromCloud, setPseudo } from '../cloud/sync.js';
+import { sync, onSync, afterLogin, pushNow, restoreFromCloud, setPseudo, refreshProfile } from '../cloud/sync.js';
 import { icon } from '../ui/icons.js';
 import { esc, toast, confirmBox, bindActions } from '../ui/dom.js';
 
@@ -86,5 +86,6 @@ export default function account(app, root) {
   });
   const off = onSync(() => { if (!busy) render(); });
   render();
+  refreshProfile();
   return () => off();
 }
