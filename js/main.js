@@ -127,7 +127,6 @@ function render() {
   if (!same) view.classList.add('view-in');
   view.innerHTML = '';
   app.cleanup = screen(app, view, app.params) || null;
-  view.focus({ preventScroll: true });
   window.scrollTo(0, keepY);
   scrollKey = key;
   // les images différées peuvent encore ajuster la hauteur : on recolle une fois la page posée
@@ -204,7 +203,6 @@ async function boot() {
     app.game.on('error', (m) => toast(esc(m), { kind: 'error', icon: 'info', ms: 6000 }));
     app.flushProgress = () => { const ev = app.pendingProgress || []; app.pendingProgress = null; if (ev.length) onProgress(ev); };
     app.applySettings = applySettings;
-    if (new URLSearchParams(location.search).has('dev')) app.game.s.settings.dev = true;
     applySettings();
     startSync(app);
     lastShards = app.game.s.shards;

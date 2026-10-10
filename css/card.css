@@ -248,3 +248,10 @@
 /* ——— Fluidité : dans les grilles, effets figés (pas de repeinture continue) ——— */
 .tcg-mini .tcg-frame, .tcg-mini .tcg-shine, .tcg-mini .tcg-art::after { animation: none !important; }
 .tcg-mini.is-mystery.real .tcg-art img { filter: grayscale(1) brightness(.24) contrast(1.4); }
+
+/* Fluidité des grilles : les cartes hors écran ne sont ni mises en page ni peintes */
+.grid-cards > .tcg, .grid-cards > .dc-pk, .grid-cards > .pick-c { content-visibility: auto; contain-intrinsic-size: auto 150px; }
+.tcg-mini { contain: layout paint style; }
+.tcg-mini .tcg-glare, .tcg-mini .tcg-shine { mix-blend-mode: normal; }
+.tcg-mini .tcg-art::after { display: none; }
+.tcg-mini.v-holo .tcg-shine, .tcg-mini.v-chroma .tcg-shine, .tcg-mini.v-galaxy .tcg-shine, .tcg-mini.v-gold .tcg-shine { opacity: .35; }

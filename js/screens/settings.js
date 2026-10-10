@@ -10,7 +10,6 @@ import { openCreator } from './creator.js';
 
 export default function settings(app, root) {
   const g = app.game;
-  let taps = 0;
 
   function toggle(key, label, desc) {
     const on = !!g.s.settings[key];
@@ -46,32 +45,15 @@ export default function settings(app, root) {
         <h2>Zone sensible</h2>
         <button class="btn danger small" data-act="reset">${icon('trash')}Effacer toute la progression</button>
       </section>
-      ${sync.profile?.badge === 'createur' || s.dev ? `<section class="panel stack cr-entry"><h2>${icon('crown')} Mode Créateur</h2>
+      ${sync.profile?.badge === 'createur' ? `<section class="panel stack cr-entry"><h2>${icon('crown')} Mode Créateur</h2>
         <p class="small muted">Réservé au badge Créateur : ressources, cartes, variantes, boosters imposés, rituels et Descente à volonté.</p>
         <button class="btn gold block" data-act="creator">${s.dev ? 'Ouvrir les pouvoirs' : 'Activer le Mode Créateur'}</button></section>` : ''}
       <section class="panel stack about">
         <h2>À propos</h2>
         <p class="small">ABYSSAL — Le Bestiaire interdit. Créé par <b>Alexis Seguin</b>.</p>
-        <p class="small muted" data-act="version">Version ${esc(app.version)} · ${app.catalog.cards.length} cartes</p>
+        <p class="small muted">Version ${esc(app.version)} · ${app.catalog.cards.length} cartes</p>
       </section>`;
     root.querySelector('#vol')?.addEventListener('change', (e) => { g.setSetting('volume', Number(e.target.value)); app.applySettings(); sfx.tap(); });
-  }
-
-  function devPanel() {
-    return `<section class="panel stack dev">
-      <h2>${icon('code')} Outils de développement</h2>
-      <p class="small muted">Pour tester l’économie et les tirages. Ces actions modifient réellement la sauvegarde.</p>
-      <div class="row gap wrap">
-        <button class="btn small" data-act="dev" data-x="shards">+1 000 éclats</button>
-        <button class="btn small" data-act="dev" data-x="ash">+1 000 cendres</button>
-        <button class="btn small" data-act="dev" data-x="tickets">+5 tickets de chaque</button>
-        <button class="btn small" data-act="dev" data-x="pity">Garanties à zéro</button>
-        <button class="btn small" data-act="dev" data-x="pityhr">Garantie HR au prochain</button>
-        <button class="btn small" data-act="dev" data-x="sim">Simuler 10 000 boosters</button>
-        <button class="btn small" data-act="dev" data-x="all">Tout débloquer</button>
-        <button class="btn small" data-act="dev" data-x="off">Désactiver ce mode</button>
-      </div>
-    </section>`;
   }
 
   bindActions(root, {
@@ -123,9 +105,6 @@ export default function settings(app, root) {
       app.go('');
     },
     creator() { if (!g.s.settings.dev) g.setSetting('dev', true); render(); openCreator(app); },
-    version() {
-      if (++taps >= 7) { taps = 0; g.setSetting('dev', !g.s.settings.dev); toast(g.s.settings.dev ? 'Mode développeur activé.' : 'Mode développeur désactivé.', { icon: 'code' }); render(); }
-    },
     dev(el) {
       const x = el.dataset.x;
       if (x === 'shards') g.devGrant({ shards: 1000 });

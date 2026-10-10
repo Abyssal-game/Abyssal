@@ -83,7 +83,11 @@ export async function refreshProfile(force = true) {
   if (!cloud.isLoggedIn()) return null;
   if (!force && Date.now() - lastRefresh < 15000) return sync.profile;
   lastRefresh = Date.now();
-  try { sync.profile = await cloud.getProfile(); emit(); } catch (e) { /* réseau : on garde l'ancien */ }
+  try {
+    sync.profile = await cloud.getProfile();
+    if (app && app.game.s.settings.dev && sync.profile && sync.profile.badge !== 'createur') app.game.setSetting('dev', false);
+    emit();
+  } catch (e) { /* réseau : on garde l'ancien */ }
   return sync.profile;
 }
 
