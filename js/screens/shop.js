@@ -3,6 +3,8 @@ import { BOOSTERS, RARITIES, PITY, FACTION_ORDER, ECONOMY } from '../config.js';
 import { boosterOdds } from '../core/boosters.js';
 import { icon, sigil, EMBLEM } from '../ui/icons.js';
 import { esc, fmt, openSheet, bindActions, toast } from '../ui/dom.js';
+import { artUrl, hasRealArt } from '../art/assets.js';
+import { RARITY } from '../config.js';
 import { openPack } from './opening.js';
 
 export function waitText(ms) {
@@ -49,6 +51,15 @@ export default function shop(app, root) {
   const st = (app.state.shop ||= { faction: 'infernal' });
   const ev = g.event();
 
+  // Vitrine : les cartes les plus rares déjà illustrées, visibles par tous.
+  function treasures() {
+    const list = cat.cards.filter((c) => (c.rarity === 'S' || c.rarity === 'M') && hasRealArt(c.id)).sort((a, b) => (b.rarity === 'S') - (a.rarity === 'S'));
+    if (!list.length) return '';
+    return `<h2 class="section-title">Les trésors du Bestiaire</h2>
+      <div class="treasures">${list.map((c) => `<figure class="treasure r-${c.rarity} ${g.owns(c.id) ? 'owned' : ''}" style="--rc:${RARITY[c.rarity].color}"><img alt="${esc(c.name)}" loading="lazy" src="${artUrl(c)}"><figcaption><b>${esc(c.name)}</b><span>${RARITY[c.rarity].name}${g.owns(c.id) ? ' · possédée' : ''}</span></figcaption></figure>`).join('')}</div>
+      <p class="small muted">Elles se cachent dans les boosters. Les secrètes sortent environ une fois toutes les 330 cartes.</p>`;
+  }
+
   function freeLine() {
     const f = g.freePack();
     if (!f.nextAt) return `<p class="small free-line">${icon('sparkle')} Boosters gratuits au maximum (${f.stock}). Ouvre-les !</p>`;
@@ -83,6 +94,7 @@ export default function shop(app, root) {
         <h1>Boosters</h1>
         <p class="muted">Tout s’achète avec les éclats gagnés en jouant. Aucun achat en argent réel.</p>
       </header>
+      ${treasures()}
       <div class="panel pity">
         <div><span class="small muted">Garantie Hyper rare</span><b>${g.s.pity.sinceHR} / ${PITY.hr - 1}</b><span class="progress"><i style="width:${(g.s.pity.sinceHR / (PITY.hr - 1)) * 100}%;--bar:#C266FF"></i></span></div>
         <div><span class="small muted">Garantie Mythique</span><b>${g.s.pity.sinceM} / ${PITY.m - 1}</b><span class="progress"><i style="width:${(g.s.pity.sinceM / (PITY.m - 1)) * 100}%;--bar:#F0C75E"></i></span></div>

@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v5';
+const VERSION = 'abyssal-v6';
 const CORE = [
   './', 'index.html', 'manifest.webmanifest',
   'css/base.css', 'css/card.css', 'css/screens.css',
@@ -43,6 +43,11 @@ self.addEventListener('fetch', (e) => {
     return;
   }
   if (url.origin !== location.origin) return;
+  // Liste des illustrations : toujours le réseau d'abord, pour voir les nouvelles images sans attendre
+  if (url.pathname.endsWith('/assets/art/manifest.json')) {
+    e.respondWith(fetch(req).then((res) => { if (res.ok) caches.open(VERSION).then((c) => c.put(req, res.clone())); return res; }).catch(() => caches.match(req, { ignoreSearch: true })));
+    return;
+  }
   // Illustrations définitives : réseau, puis cache
   if (url.pathname.includes('/assets/art/') && !url.pathname.endsWith('manifest.json')) {
     e.respondWith(caches.open(VERSION + '-art').then(async (c) => {

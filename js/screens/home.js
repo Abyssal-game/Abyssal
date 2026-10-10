@@ -1,6 +1,6 @@
 // Accueil : logo, créature emblématique, accès rapides, progression, découvertes.
 import { cardHTML, lazyArt } from '../ui/card.js';
-import { artUrl } from '../art/assets.js';
+import { artUrl, hasRealArt } from '../art/assets.js';
 import { icon, EMBLEM, sigil } from '../ui/icons.js';
 import { esc, fmt, toast, bindActions, pct } from '../ui/dom.js';
 import { FACTION_ORDER } from '../config.js';
@@ -13,7 +13,8 @@ export default function home(app, root) {
   // Créature du jour : une mythique possédée, sinon la silhouette d'une mythique
   const mythics = cat.cards.filter((c) => c.rarity === 'M');
   const ownedM = mythics.filter((c) => g.owns(c.id));
-  const pool = ownedM.length ? ownedM : mythics;
+  const withArt = cat.cards.filter((c) => (c.rarity === 'M' || c.rarity === 'S') && hasRealArt(c.id));
+  const pool = withArt.length ? withArt : ownedM.length ? ownedM : mythics;
   const hero = pool[Math.floor(seeded('jour:' + today())() * pool.length)];
   const heroOwned = g.owns(hero.id);
   const fac = cat.faction[hero.faction];
@@ -24,13 +25,13 @@ export default function home(app, root) {
 
   root.innerHTML = `
     <section class="hero" style="--fc:${fac.colors.secondary}">
-      <div class="hero-art"><img alt="" src="${artUrl(hero, { mystery: !heroOwned })}"></div>
+      <div class="hero-art"><img alt="" src="${artUrl(hero, { mystery: !heroOwned && !hasRealArt(hero.id) })}"></div>
       <div class="hero-veil"></div>
       <div class="hero-content">
         <div class="logo">${EMBLEM}<h1 class="wordmark">ABYSSAL</h1><p class="tagline">Le Bestiaire interdit</p></div>
         <button class="hero-caption" data-act="hero" aria-label="Voir la créature du jour">
-          <span class="small muted">${heroOwned ? 'Créature du jour' : 'Une mythique t’attend'}</span>
-          <b>${heroOwned ? esc(hero.name) : '???'}</b>
+          <span class="small muted">${heroOwned ? 'Créature du jour' : `${hero.rarity === 'S' ? 'Secrète' : 'Mythique'} à trouver dans les boosters`}</span>
+          <b>${heroOwned || hasRealArt(hero.id) ? esc(hero.name) : '???'}</b>
           <span class="small" style="color:${fac.colors.secondary}">${sigil(hero.faction)} ${esc(fac.name)}</span>
         </button>
       </div>
@@ -73,7 +74,7 @@ export default function home(app, root) {
   `;
   lazyArt(root);
   bindActions(root, {
-    hero() { app.openCard(hero.id); },
+    hero() { heroOwned ? app.openCard(hero.id) : app.go('boutique'); },
     daily() {
       try {
         const r = g.claimDaily();
