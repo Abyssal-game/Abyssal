@@ -155,7 +155,7 @@ export const LUCK_POINTS = { C: 1, PC: 2, R: 6, HR: 20, M: 80, S: 200, variant: 
 export const ITEMS = {
   baume:     { name: 'Baume de soin',          price: 80,  icon: 'heart',   desc: 'Soigne immédiatement une carte blessée dans la Descente.' },
   elixir:    { name: 'Élixir des profondeurs', price: 260, icon: 'flame',   desc: 'Soigne d’un coup toutes tes cartes blessées.' },
-  torche:    { name: 'Torche bénie',           price: 220, icon: 'flame',   desc: 'Une expédition de plus dans la Descente aujourd’hui.', limit: 2 },
+  torche:    { name: 'Torche bénie',           price: 220, icon: 'flame',   desc: 'Rallume une torche déjà utilisée : une expédition de plus aujourd’hui.', limit: 2 },
   encens:    { name: 'Encens de ferveur',      price: 150, icon: 'sparkle', desc: '+15 % de chance de réussite à ton prochain rituel d’élévation.' },
   parchemin: { name: 'Parchemin d’expérience', price: 120, icon: 'scroll',  desc: '+60 XP de combat à la carte de ton choix.' },
 };

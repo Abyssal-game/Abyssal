@@ -74,6 +74,13 @@ export function migrate(raw) {
   s.stats = { ...d.stats, ...s.stats };
   s.tickets = { ...d.tickets, ...s.tickets };
   s.pity = { ...d.pity, ...s.pity };
+  // objets imbriqués ajoutés au fil des versions : complétés sans écraser l'existant
+  s.stats.pulls = { ...d.stats.pulls, ...(s.stats.pulls || {}) };
+  for (const k of ['descent', 'missions', 'freePack', 'daily', 'itemBuys']) s[k] = { ...d[k], ...(s[k] && typeof s[k] === 'object' ? s[k] : {}) };
+  for (const k of ['wounds', 'xp']) if (!s.descent[k] || typeof s.descent[k] !== 'object') s.descent[k] = {};
+  if (!Array.isArray(s.descent.team)) s.descent.team = [];
+  for (const k of ['items', 'fervor', 'collection', 'deciphered', 'achievements', 'setsDone', 'factionsDone']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
+  for (const k of ['best', 'recent', 'history', 'showcase', 'titles', 'frames']) if (!Array.isArray(s[k])) s[k] = d[k];
   return s;
 }
 

@@ -354,6 +354,7 @@ export class Game {
     const to = this.ritualTarget(id, from);
     if (!to) throw new Error('Cette carte ne peut plus être élevée.');
     for (const [r, n] of Object.entries(offer)) if (n > this.ritualSpare(r, id)) throw new Error('Pas assez de doublons pour cette offrande.');
+    if (forbidden && this.s.descent.run?.team.some((m) => m.id === id)) throw new Error('Cette carte est en pleine expédition : termine d’abord la Descente.');
     const chance = this.ritualChance(id, from, offer, forbidden);
     if (!chance) throw new Error('Choisis au moins une offrande.');
     const used = Object.entries(offer).flatMap(([r, n]) => (n ? this.takeSpares(r, n, id) : []));
@@ -377,6 +378,7 @@ export class Game {
           delete this.s.collection[id];
           if (this.s.avatar === id) this.s.avatar = null;
           this.s.showcase = this.s.showcase.filter((x) => x !== id);
+          this.s.descent.team = this.s.descent.team.filter((x) => x !== id);
         }
       }
     }
@@ -490,8 +492,10 @@ export class Game {
       else m.xp += DESCENT.xpPerFight * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1);
     });
     run.battle = null;
-    const out = { room, won };
-    if (won) {
+    // victoire « par des Restes » : si toute l'équipe est tombée, l'expédition s'arrête quand même
+    const wiped = run.team.every((m) => m.fallen);
+    const out = { room, won: won && !wiped };
+    if (won && !wiped) {
       out.loot = this.addLoot(roomLoot(run.floor, room, this.rng));
       run.phase = 'cleared';
       run.cleared = run.floor;
@@ -529,14 +533,15 @@ export class Game {
     this.persist();
   }
   recordDepth(floor) {
-    const d = this.s.descent;
-    d.bestToday = Math.max(d.bestToday, floor);
+    const d = this.descent(), run = d.run;
     d.best = Math.max(d.best, floor);
-    this.track('depth', floor);
+    // une expédition commencée la veille ne compte pas pour le record ni les missions du jour
+    if (!run || run.day === d.day) { d.bestToday = Math.max(d.bestToday, floor); this.track('depth', floor); }
   }
   nextFloor() {
     const run = this.s.descent.run;
     if (!run || run.phase !== 'cleared') throw new Error('Termine d’abord cet étage.');
+    if (run.team.every((m) => m.fallen)) throw new Error('Toute ton équipe est tombée : remonte à la surface.');
     run.floor++;
     run.phase = 'doors';
     this.persist();
@@ -575,7 +580,7 @@ export class Game {
         }
       } else d.wounds[m.id] = now + DESCENT.woundHours * 3600000;
     }
-    const summary = { wiped, floor: run.cleared, loot, fallen, lostCards, levelUps, cursed: run.cursed };
+    const summary = { wiped, floor: run.cleared, day: run.day, loot, fallen, lostCards, levelUps, cursed: run.cursed };
     this.emit('descentEnd', summary);
     d.last = summary;
     d.run = null;
@@ -606,7 +611,7 @@ export class Game {
     const d = this.descent();
     if (k === 'baume') { if (!this.isWounded(target)) throw new Error('Cette carte n’est pas blessée.'); delete d.wounds[target]; }
     else if (k === 'elixir') { const n = Object.keys(d.wounds).filter((id) => this.isWounded(id)).length; if (!n) throw new Error('Aucune carte blessée.'); d.wounds = {}; }
-    else if (k === 'torche') d.used--;
+    else if (k === 'torche') { if (d.used <= 0) throw new Error('Toutes tes torches du jour sont déjà disponibles.'); d.used--; }
     else if (k === 'encens') { if (this.s.ritualBoost) throw new Error('Un encens brûle déjà pour ton prochain rituel.'); this.s.ritualBoost = 15; }
     else if (k === 'parchemin') { if (!this.owns(target)) throw new Error('Choisis une carte que tu possèdes.'); d.xp[target] = (d.xp[target] || 0) + 60; }
     else throw new Error('Objet inconnu.');

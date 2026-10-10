@@ -1,6 +1,6 @@
 // Compte : connexion, pseudo public, sauvegarde en ligne, déconnexion, suppression du compte.
 import * as cloud from '../cloud/cloud.js';
-import { sync, onSync, afterLogin, pushNow, restoreFromCloud, setPseudo, refreshProfile } from '../cloud/sync.js';
+import { sync, onSync, afterLogin, pushNow, restoreFromCloud, setPseudo, refreshProfile, resumeSync } from '../cloud/sync.js';
 import { icon } from '../ui/icons.js';
 import { esc, toast, confirmBox, bindActions } from '../ui/dom.js';
 
@@ -42,7 +42,7 @@ export default function account(app, root) {
       return;
     }
     const p = sync.profile;
-    const st = { ok: `${icon('check')} Sauvegardée en ligne ${ago(sync.lastPush)}`, saving: 'Sauvegarde en cours…', error: `${icon('info')} ${esc(sync.error || 'Erreur')}`, paused: 'Synchronisation en pause', off: '' }[sync.status] || '';
+    const st = { ok: `${icon('check')} Sauvegardée en ligne ${ago(sync.lastPush)}`, saving: 'Sauvegarde en cours…', error: `${icon('info')} ${esc(sync.error || 'Erreur')}`, paused: 'Synchronisation en pause : choisis quelle partie garder.', off: '' }[sync.status] || '';
     root.innerHTML = `
       <header class="screen-head"><h1>Compte</h1><p class="muted">${esc(u.email || '')}</p></header>
       <section class="panel stack">
@@ -57,7 +57,7 @@ export default function account(app, root) {
         <h2>Sauvegarde en ligne</h2>
         <p class="small acc-sync ${sync.status}">${st}</p>
         <p class="small muted">Ta partie est envoyée automatiquement quelques secondes après chaque action, et quand tu quittes l’app.</p>
-        <div class="row gap wrap"><button class="btn small" data-act="push">${icon('upload')}Sauvegarder maintenant</button><button class="btn small" data-act="pull">${icon('download')}Récupérer la partie en ligne</button></div>
+        ${sync.status === 'paused' ? `<button class="btn primary small" data-act="resume">${icon('refresh')}Reprendre la synchronisation</button>` : ''}<div class="row gap wrap"><button class="btn small" data-act="push">${icon('upload')}Sauvegarder maintenant</button><button class="btn small" data-act="pull">${icon('download')}Récupérer la partie en ligne</button></div>
       </section>
       <section class="panel stack">
         <button class="btn block" data-act="logout">Se déconnecter</button>
@@ -71,7 +71,8 @@ export default function account(app, root) {
     });
   }
   bindActions(root, {
-    async push() { await pushNow(); toast(sync.status === 'ok' ? 'Partie sauvegardée en ligne.' : esc(sync.error || 'Échec de la sauvegarde.'), { kind: sync.status === 'ok' ? 'success' : 'error', icon: 'upload' }); render(); },
+    async resume() { try { await resumeSync(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } render(); },
+    async push() { if (sync.status === 'paused') { toast('Choisis d’abord quelle partie garder (Reprendre la synchronisation).', { icon: 'info' }); return; } await pushNow(); toast(sync.status === 'ok' ? 'Partie sauvegardée en ligne.' : esc(sync.error || 'Échec de la sauvegarde.'), { kind: sync.status === 'ok' ? 'success' : 'error', icon: 'upload' }); render(); },
     async pull() {
       if (!(await confirmBox('Remplacer la partie de cet appareil par la partie en ligne ?', { ok: 'Remplacer' }))) return;
       try { await restoreFromCloud(); toast('Partie en ligne chargée.', { kind: 'success', icon: 'download' }); } catch (err) { toast(esc(err.message), { kind: 'error' }); }

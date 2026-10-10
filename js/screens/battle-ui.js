@@ -205,6 +205,7 @@ export function runBattle(app, root, { title, onEnd }) {
       if (st.pending !== u.uid) {
         const b = beginTurn(st);
         if (b.ev.length) await play(b.ev);
+        if (!alive) return;
         if (b.skip) { g.persist(); continue; }
         u = current(st);
         st.pending = u.uid;

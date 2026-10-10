@@ -149,8 +149,10 @@ test('boutique d’objets : achat, limite, soin, torche, encens', () => {
   assert.throws(() => g.useItem('baume', id));
   g.buyItem('torche'); g.buyItem('torche');
   assert.throws(() => g.buyItem('torche'));
+  assert.throws(() => g.useItem('torche')); // toutes les torches sont encore là
+  g.s.descent.used = 2;
   g.useItem('torche');
-  assert.equal(g.torchesLeft(), 4);
+  assert.equal(g.torchesLeft(), 2);
   const t = catalog.byRarity.R[0].id;
   g.addCard(t);
   catalog.byRarity.C.slice(1, 3).forEach((c) => { g.addCard(c.id); g.addCard(c.id); });
@@ -195,4 +197,30 @@ test('combat au tour par tour : frise, parade parfaite, compétences, fin de com
     const r = g.autoResolve({ strike: 'good', parry: 'good' });
     assert.ok(r.won || r.lost);
   }
+});
+
+test('correctifs : migration des objets imbriqués, victoire par des Restes, expédition de la veille', async () => {
+  const { migrate, defaultSave } = await import('../js/core/save.js');
+  const old = defaultSave(); old.descent = { day: null }; delete old.stats.pulls; old.missions = null;
+  const m = migrate(old);
+  assert.deepEqual(m.descent.wounds, {});
+  assert.equal(m.stats.pulls.C, 0);
+  assert.ok(Array.isArray(m.missions.list));
+  // expédition qui passe minuit : ne compte pas pour le record du nouveau jour
+  let now = new Date(2026, 9, 10, 23, 50);
+  const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('mid'), clock: () => now });
+  const ids = catalog.byRarity.R.slice(0, 6).map((c) => c.id);
+  ids.forEach((id) => g.addCard(id)); g.setTeam(ids); g.startRun();
+  now = new Date(2026, 9, 11, 0, 10);
+  g.descent();
+  g.recordDepth(5);
+  assert.equal(g.s.descent.bestToday, 0);
+  assert.equal(g.s.descent.best, 5);
+  // toute l'équipe tombée : pas de victoire même si un Reste reste debout
+  g.s.descent.run.phase = 'battle'; g.s.descent.run.room = 'fight';
+  g.s.descent.run.battle = { over: 'won', units: {} };
+  g.s.descent.run.team.forEach((t) => { t.fallen = true; t.hp = 0; });
+  const r = g.finishBattle();
+  assert.ok(r.lost);
+  assert.equal(r.summary.day, '2026-10-10');
 });

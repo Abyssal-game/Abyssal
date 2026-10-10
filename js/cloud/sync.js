@@ -1,8 +1,7 @@
 // Synchronisation : la sauvegarde part en ligne quelques secondes après chaque changement,
 // le profil public suit, et les scores de la Descente sont envoyés au classement.
 import * as cloud from './cloud.js';
-import { migrate } from '../core/save.js';
-import { today } from '../core/save.js';
+import { migrate, today } from '../core/save.js';
 import { openSheet, esc, toast } from '../ui/dom.js';
 
 export const sync = { status: 'off', lastPush: 0, error: null, profile: null };
@@ -16,12 +15,20 @@ function profilePayload() {
   return { avatar: s.avatar, title: s.title, level: g.levelInfo().level, owned: g.uniqueCount() };
 }
 
+// Date (côté serveur) de la dernière sauvegarde en ligne connue de cet appareil.
+const SYNCED_KEY = 'abyssal.syncedAt', PAUSED_KEY = 'abyssal.syncPaused';
+const lsGet = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+const lsSet = (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) { /* rien */ } };
+let choosing = false; // tant qu'on compare les deux parties, rien ne part en ligne
+
 export async function pushNow() {
   if (!cloud.isLoggedIn() || !app) return;
+  if (choosing || sync.status === 'paused') return;
   if (busy) { pending = true; return; }
   busy = true; sync.status = 'saving'; emit();
   try {
     sync.lastPush = await cloud.pushSave(app.game.s);
+    lsSet(SYNCED_KEY, String(sync.lastPush));
     if (sync.profile?.pseudo) await cloud.saveProfile({ pseudo: sync.profile.pseudo, ...profilePayload() });
     sync.status = 'ok'; sync.error = null;
   } catch (e) { sync.status = 'error'; sync.error = e.message; }
@@ -31,42 +38,69 @@ export async function pushNow() {
 function schedule() { clearTimeout(timer); timer = setTimeout(pushNow, 4000); }
 
 // Remplace la partie de cet appareil par une sauvegarde venue du serveur.
-function adopt(data) {
-  const s = migrate(data);
+function adopt(remote) {
+  const s = migrate(remote.data); // lève une erreur si la sauvegarde en ligne est illisible
   app.game.s = s;
   app.game.persist();
   app.applySettings?.();
   app.refresh();
+  sync.lastPush = Date.now();
+  lsSet(SYNCED_KEY, String(Math.max(Date.now(), new Date(remote.updated_at).getTime() || 0)));
 }
 const fresh = (s) => !s.stats.boosters && !Object.keys(s.collection).length;
 const describe = (s, when) => `${Object.keys(s.collection || {}).length} créatures · ${s.stats?.boosters || 0} boosters ouverts${when ? ` · ${new Date(when).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}` : ''}`;
 
-// Après connexion : choisir quelle partie garder si les deux existent.
-export async function afterLogin() {
-  sync.status = 'saving'; emit();
-  const remote = await cloud.pullSave();
-  try { sync.profile = await cloud.getProfile(); } catch (e) { sync.profile = null; }
-  const local = app.game.s;
-  if (!remote) { await pushNow(); return 'pushed'; }
-  if (fresh(local)) { adopt(remote.data); sync.status = 'ok'; sync.lastPush = Date.now(); emit(); return 'pulled'; }
-  const choice = await new Promise((resolve) => {
+function askChoice(remote, local, intro) {
+  return new Promise((resolve) => {
     const sh = openSheet(`<h2>Deux parties trouvées</h2>
-      <p class="small muted">Laquelle veux-tu garder ? L’autre sera remplacée.</p>
+      <p class="small muted">${intro} Laquelle veux-tu garder ? L’autre sera remplacée.</p>
       <button class="btn block sync-pick" data-c="remote"><b>Partie en ligne</b><span class="small muted">${esc(describe(remote.data, remote.updated_at))}</span></button>
       <button class="btn block sync-pick" data-c="local"><b>Partie de cet appareil</b><span class="small muted">${esc(describe(local, local.updatedAt))}</span></button>`, { cls: 'sheet-small', label: 'Choisir la partie', onClose: () => resolve(null) });
     sh.body.addEventListener('click', (e) => { const b = e.target.closest('[data-c]'); if (b) { const c = b.dataset.c; resolve(c); sh.close(); } });
   });
-  if (choice === 'remote') { adopt(remote.data); sync.status = 'ok'; sync.lastPush = Date.now(); emit(); return 'pulled'; }
-  if (choice === 'local') { await pushNow(); return 'pushed'; }
-  sync.status = 'paused'; emit();
-  return 'cancelled';
 }
+
+// Compare la partie de l'appareil et la partie en ligne, puis applique le choix.
+async function reconcile({ intro, auto }) {
+  choosing = true; sync.status = 'saving'; emit();
+  try {
+    const remote = await cloud.pullSave();
+    const local = app.game.s;
+    if (!remote) { choosing = false; lsSet(PAUSED_KEY, null); sync.status = 'ok'; await pushNow(); return 'pushed'; }
+    const synced = Number(lsGet(SYNCED_KEY) || 0);
+    const remoteT = new Date(remote.updated_at).getTime() || 0;
+    const localChanged = (local.updatedAt || 0) > synced + 2000;
+    const remoteChanged = remoteT > synced + 2000;
+    let choice;
+    if (fresh(local)) choice = 'remote';
+    else if (auto && !remoteChanged) choice = 'local';            // rien de neuf en ligne
+    else if (auto && !localChanged) choice = 'remote';            // l'appareil n'a pas bougé depuis : on prend la plus récente
+    else choice = await askChoice(remote, local, intro);
+    choosing = false;
+    if (choice === 'remote') { adopt(remote); lsSet(PAUSED_KEY, null); sync.status = 'ok'; emit(); return 'pulled'; }
+    if (choice === 'local') { lsSet(PAUSED_KEY, null); sync.status = 'ok'; await pushNow(); return 'pushed'; }
+    lsSet(PAUSED_KEY, '1'); sync.status = 'paused'; emit();
+    return 'cancelled';
+  } catch (e) {
+    choosing = false; sync.status = 'error'; sync.error = e.message; emit();
+    throw e;
+  }
+}
+
+// Après connexion : choisir quelle partie garder si les deux existent.
+export async function afterLogin() {
+  try { sync.profile = await cloud.getProfile(); } catch (e) { sync.profile = null; }
+  lsSet(SYNCED_KEY, null);
+  return reconcile({ intro: 'Ce compte a déjà une partie en ligne.', auto: false });
+}
+// Reprise de la synchronisation (bouton « Reprendre » quand elle est en pause).
+export function resumeSync() { return reconcile({ intro: 'La synchronisation était en pause.', auto: false }); }
 
 export async function restoreFromCloud() {
   const remote = await cloud.pullSave();
   if (!remote) throw new Error('Aucune sauvegarde en ligne pour ce compte.');
-  adopt(remote.data);
-  sync.lastPush = Date.now();
+  adopt(remote);
+  lsSet(PAUSED_KEY, null); sync.status = 'ok';
   emit();
 }
 
@@ -94,15 +128,18 @@ export async function refreshProfile(force = true) {
 export function startSync(theApp) {
   app = theApp;
   app.game.on('change', () => { if (cloud.isLoggedIn() && sync.status !== 'paused') schedule(); });
-  app.game.on('descentEnd', () => {
+  app.game.on('descentEnd', (sum) => {
     if (!cloud.isLoggedIn() || !sync.profile?.pseudo) return;
     if (app.game.s.settings.dev) return; // pas de score au classement en Mode Créateur
-    const d = app.game.s.descent;
-    cloud.submitScore(d.day || today(), d.bestToday, !!d.cursed).catch(() => {});
+    if (!sum.floor) return;
+    // chaque expédition envoie son propre score, pour le jour de son donjon (le serveur garde le meilleur)
+    cloud.submitScore(sum.day || today(), sum.floor, !!sum.cursed).catch(() => {});
   });
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && cloud.isLoggedIn()) { clearTimeout(timer); pushNow(); } });
   if (cloud.isLoggedIn()) {
-    sync.status = 'ok';
     cloud.getProfile().then((p) => { sync.profile = p; emit(); }).catch(() => {});
+    if (lsGet(PAUSED_KEY)) { sync.status = 'paused'; emit(); }
+    // au démarrage : si la partie en ligne a avancé ailleurs (autre appareil), on la récupère ou on demande
+    else reconcile({ intro: 'Ta partie a avancé sur un autre appareil.', auto: true }).catch(() => {});
   }
 }
