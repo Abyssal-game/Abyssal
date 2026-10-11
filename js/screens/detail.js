@@ -1,5 +1,7 @@
 // Vue détaillée d'une carte (fenêtre plein écran) : grand format, variantes,
 // lore, capacités, lignée, ensembles, actions.
+import { pactLinesHTML, pactTitle } from '../ui/pact.js';
+import { HEROES } from '../core/heroes.js';
 import { RARITY, VARIANTS, ECONOMY, VARIANT_RATES } from '../config.js';
 import { openRitual } from './ritual.js';
 import { cardHTML, enableTilt, gyroAvailable, gyroOn, setGyro } from '../ui/card.js';
@@ -81,6 +83,10 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
             <div><dt>Collection</dt><dd>${card.id}</dd></div>
           </dl>
         </div>
+        <div class="panel pact-card"><b>${icon('sparkle')} Dans l’Aventure</b>
+          <p class="small"><b>${esc(pactTitle(card))}</b>${g.pactHolder(current) ? ` · lié à ${esc(HEROES[g.pactHolder(current)].name.split(' ')[0])}` : ''}</p>${pactLinesHTML(card, { all: true })}
+          <p class="small dc-good">${icon('book')} Connaissance : tes héros infligent +${Math.round(g.knowledge(current) * 100)} % de dégâts à cette créature.</p>
+          <p class="small muted">Lie cette carte à un héros depuis sa fiche (Aventure, puis Héros).</p></div>
         <h3 class="section-title">Description</h3>
         <p class="lore big">« ${esc(card.lore)} »</p>
         <h3 class="section-title">Rareté</h3>
@@ -102,6 +108,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
           </dl>
         </div>
         <p class="lore">Cette page du Bestiaire est encore scellée. Trouve la carte dans un booster${craft ? ', ou invoque-la avec des cendres' : ''}.</p>
+        <p class="small">${icon('sparkle')} Une fois obtenue : <b>${esc(pactTitle(card))}</b> pour un héros, et +10 % de dégâts contre cette créature.</p>
         <p class="small">${odds(card)}</p>
         <p class="small muted">Les noms d’une faction se révèlent quand tu en possèdes la moitié. Tu peux aussi déchiffrer un nom pour ${ECONOMY.decipherAsh} cendres.</p>
         <div class="row gap wrap">

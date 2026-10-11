@@ -1,5 +1,6 @@
 // Héros jouables, invocations et ennemis (créatures du Bestiaire) : données et création des unités.
 import { RARITY_ORDER } from '../config.js';
+import { applyPact } from './pacts.js';
 
 // ——— Progression ———————————————————————————————————————————————————————
 export const MAX_LEVEL = 30;
@@ -123,15 +124,15 @@ export const INVOCATIONS = {
 };
 export const INVOCATION_ORDER = ['phenix', 'bahamut', 'fenrir'];
 export const GAUGE = { action: 10, hurt: 6, perfect: 8 };
-const VARIANT_POWER = { normal: 0, alt: 0.03, holo: 0.05, corrupt: 0.06, chroma: 0.08, ancestral: 0.1, gold: 0.12, galaxy: 0.16, special: 0.16 };
-export const invocationPower = (level, variant = 'normal') => (1 + 0.1 * (level - 1)) * (1 + (VARIANT_POWER[variant] || 0));
+// Les variantes de carte restent cosmétiques : seule le niveau renforce une invocation.
+export const invocationPower = (level) => 1 + 0.1 * (level - 1);
 
 // ——— Unités ————————————————————————————————————————————————————————————
 let seq = 0;
 const blank = () => ({ stealth: 0, inspired: 0, weak: 0, bear: 0, regen: 0, stun: 0, burn: 0, frozen: 0, mark: 0, exposed: 0, taunt: 0, protectedBy: null, protecting: 0, defend: false, shield: 0, armorUp: 0, enraged: false, charging: false, poison: 0 });
 
 // gear : bonus de l'équipement (voir gearBonus dans gear.js)
-export function makeHero(key, { level = 1, wounded = false, blessings = [], gear = null } = {}) {
+export function makeHero(key, { level = 1, wounded = false, blessings = [], gear = null, pact = null } = {}) {
   const h = HEROES[key];
   const k = growth(level) * (wounded ? 0.8 : 1);
   const u = {
@@ -160,6 +161,7 @@ export function makeHero(key, { level = 1, wounded = false, blessings = [], gear
     u.gaugeBonus = (fx.gauge ? 4 : 0) + 2 * (fx.a_lien || 0);
     u.energy = Math.min(3, u.energy + (fx.a_elan || 0));
   }
+  applyPact(u, pact);
   if (blessings.includes('blades')) u.atk += 3;
   if (blessings.includes('haste')) u.spd += 2;
   if (blessings.includes('vigor')) u.maxHp = Math.round(u.maxHp * 1.2);

@@ -161,8 +161,8 @@ export function salvageValue(it) {
 export const CHESTS = {
   bois:    { name: 'Coffre de bois',  color: '#B07A45', items: 1, odds: { C: 76, R: 21, E: 3, L: 0 }, desc: 'Un objet, souvent commun.' },
   fer:     { name: 'Coffre de fer',   color: '#A9B6C9', items: 2, odds: { C: 44, R: 40, E: 13.5, L: 2.5 }, desc: 'Deux objets, rare ou mieux fréquent.' },
-  or:      { name: 'Coffre d’or',     color: '#F2C14E', items: 3, choice: true, key: 'or', odds: { C: 0, R: 52, E: 38, L: 10 }, desc: 'Trois objets rares ou mieux : tu en gardes un.' },
-  abyssal: { name: 'Coffre abyssal',  color: '#B04BFF', items: 3, choice: true, key: 'abyssal', odds: { C: 0, R: 0, E: 70, L: 30 }, desc: 'Trois objets épiques ou légendaires : tu en gardes un.' },
+  or:      { name: 'Coffre d’or',     color: '#F2C14E', items: 3, choice: true, odds: { C: 0, R: 52, E: 38, L: 10 }, desc: 'Trois objets rares ou mieux : tu en gardes un.' },
+  abyssal: { name: 'Coffre abyssal',  color: '#B04BFF', items: 3, choice: true, odds: { C: 0, R: 0, E: 70, L: 30 }, desc: 'Trois objets épiques ou légendaires : tu en gardes un.' },
 };
 export const CHEST_ORDER = ['bois', 'fer', 'or', 'abyssal'];
 export const KEYS = {

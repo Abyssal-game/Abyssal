@@ -5,6 +5,7 @@ import { drawBooster, cryptoRandom, currentEvent, boosterOdds } from './boosters
 import { loadSave, writeSave, defaultSave, today } from './save.js';
 import { createBattle, autoBattle } from './battle.js';
 import { DESCENT, floorDoors, floorEnemies, roomLoot, blessingChoices } from './descent.js';
+import { pactOf, PACT_UNLOCK } from './pacts.js';
 import { BASES, SLOT_ORDER, CHESTS, GEAR_RARITY, canUse, gearBonus, itemScore, rollChest, forgeCost, salvageValue, LEG_PITY } from './gear.js';
 import { HEROES, HERO_ORDER, INVOCATIONS, makeHero, levelOf, invocationPower, enemyLevel, huntStage, HUNT_STAGES, totalXpFor } from './heroes.js';
 
@@ -33,6 +34,7 @@ export class Game {
     const { save, source } = loadSave(storage);
     this.s = save;
     this.loadedFrom = source;
+    try { this.convertOldKeys(); } catch (e) { /* rien */ }
   }
 
   // Événements -------------------------------------------------------------
@@ -110,7 +112,8 @@ export class Game {
 
   canBuy(type) {
     const def = BOOSTERS[type];
-    return (this.s.tickets[type] || 0) > 0 || (type === 'standard' && this.freePack().stock > 0) || this.s.shards >= def.price;
+    // le booster premium ne s'achète plus : il se gagne (gardiens de la Descente)
+    return (this.s.tickets[type] || 0) > 0 || (type === 'standard' && this.freePack().stock > 0) || (!def.rewardOnly && this.s.shards >= def.price);
   }
 
   openBooster(type, { faction } = {}) {
@@ -432,7 +435,26 @@ export class Game {
     this.persist();
     return list;
   }
-  heroUnit(key, blessings = []) { return makeHero(key, { level: this.heroLevel(key), wounded: this.heroWounded(key), blessings, gear: this.gearOf(key) }); }
+  heroUnit(key, blessings = []) { return makeHero(key, { level: this.heroLevel(key), wounded: this.heroWounded(key), blessings, gear: this.gearOf(key), pact: this.pactFor(key) }); }
+
+  // Pactes : une carte possédée liée à un héros (une carte par héros, un héros par carte)
+  pactsOpen() { return (this.s.descent.best || 0) >= PACT_UNLOCK; }
+  pactCard(hero) { const id = this.s.pacts?.[hero]; return id && this.owns(id) ? this.catalog.get(id) : null; }
+  pactFor(hero) { return this.pactsOpen() ? pactOf(this.pactCard(hero)) : null; }
+  pactHolder(id) { return Object.keys(this.s.pacts || {}).find((h) => this.s.pacts[h] === id) || null; }
+  setPact(hero, id) {
+    if (this.s.descent.run) throw new Error('Termine d’abord ton expédition pour changer de pacte.');
+    if (!this.pactsOpen()) throw new Error(`Les pactes se débloquent en atteignant l’étage ${PACT_UNLOCK} de la Descente.`);
+    if (!this.s.heroes[hero]) throw new Error('Héros inconnu.');
+    if (id && !this.owns(id)) throw new Error('Tu ne possèdes pas cette carte.');
+    this.s.pacts ||= {};
+    const other = id && this.pactHolder(id);
+    if (other) delete this.s.pacts[other];
+    if (id) this.s.pacts[hero] = id; else delete this.s.pacts[hero];
+    this.persist();
+  }
+  // Connaissance d'un ennemi : posséder sa carte (+10 %) et le maîtriser à la chasse (+10 %), plafonné à +20 %.
+  knowledge(id) { return Math.min(0.2, (this.owns(id) ? 0.1 : 0) + (this.huntKills(id) >= HUNT_STAGES[2].k ? 0.1 : 0)); }
 
   // L'Arsenal : équipement des héros, coffres, clés, forge ----------------------
   arsenal() {
@@ -456,7 +478,13 @@ export class Game {
   addChests(chests = {}, keys = {}) {
     const a = this.arsenal();
     for (const [k, n] of Object.entries(chests)) if (CHESTS[k]) a.chests[k] = (a.chests[k] || 0) + n;
-    for (const [k, n] of Object.entries(keys)) a.keys[k] = (a.keys[k] || 0) + n;
+    // les clés n'existent plus : celles qui arrivent encore sont changées en éclats
+    for (const [k, n] of Object.entries(keys || {})) this.s.shards += n * (k === 'abyssal' ? 400 : 150);
+  }
+  convertOldKeys() {
+    const a = this.arsenal(), n = Object.entries(a.keys || {}).filter(([, v]) => v > 0);
+    if (!n.length) return;
+    this.addChests({}, a.keys); a.keys = {}; this.persist();
   }
   noRunLock() { if (this.s.descent.run) throw new Error('Termine d’abord ton expédition pour changer l’équipement.'); }
   equip(id, hero) {
@@ -501,9 +529,7 @@ export class Game {
     if (!c) throw new Error('Coffre inconnu.');
     if (a.pending) throw new Error('Choisis d’abord ton objet dans le coffre déjà ouvert.');
     if (!this.chestCount(type)) throw new Error('Tu n’as pas ce coffre.');
-    if (c.key && !this.keyCount(c.key)) throw new Error(`Il te faut une ${c.key === 'or' ? 'clé d’or' : 'clé abyssale'}.`);
     a.chests[type]--;
-    if (c.key) a.keys[c.key]--;
     const pity = type === 'bois' ? 0 : a.pity || 0;
     const { items, gotL } = rollChest(this.rng, type, this.chestCtx(), pity);
     if (type !== 'bois') a.pity = gotL ? 0 : pity + 1;
@@ -633,8 +659,8 @@ export class Game {
       // Le combat se joue au tour par tour : son état est gardé dans l'expédition (reprise exacte).
       const enemies = floorEnemies(this.catalog, run.day, run.floor, room);
       const mastery = {};
-      enemies.forEach((e) => { if (this.huntKills(e.id) >= HUNT_STAGES[2].k) mastery[e.id] = true; });
-      const power = invocationPower(this.invocationLevel(run.inv), this.invocationVariant(run.inv));
+      enemies.forEach((e) => { const k = this.knowledge(e.id); if (k) mastery[e.id] = k; });
+      const power = invocationPower(this.invocationLevel(run.inv));
       run.battle = createBattle(this.runUnits(), enemies, Math.floor(this.rng() * 2 ** 31), { gauge: run.gauge, invocation: { key: run.inv, power }, mastery });
       run.room = room;
       run.phase = 'battle';
@@ -724,7 +750,9 @@ export class Game {
   }
   recordDepth(floor) {
     const d = this.descent(), run = d.run;
+    const before = d.best;
     d.best = Math.max(d.best, floor);
+    if (before < PACT_UNLOCK && d.best >= PACT_UNLOCK) this.s.pactNews = true;
     this.unlockHeroes();
     // une expédition commencée la veille ne compte pas pour le record ni les missions du jour
     if (!run || run.day === d.day) { d.bestToday = Math.max(d.bestToday, floor); this.track('depth', floor); }
@@ -916,7 +944,7 @@ export class Game {
     this.persist();
   }
   devMaxLevels() { HERO_ORDER.forEach((k) => { this.hero(k).xp = Math.max(this.hero(k).xp, totalXpFor(20)); }); Object.keys(INVOCATIONS).forEach((k) => { this.s.invXp[k] = Math.max(this.s.invXp[k] || 0, totalXpFor(20)); }); this.persist(); }
-  devArsenal() { this.addChests({ bois: 5, fer: 5, or: 3, abyssal: 3 }, { or: 3, abyssal: 3 }); this.arsenal().fer = (this.arsenal().fer || 0) + 200; this.persist(); }
+  devArsenal() { this.addChests({ bois: 5, fer: 5, or: 3, abyssal: 3 }); this.arsenal().fer = (this.arsenal().fer || 0) + 200; this.persist(); }
   devHealAll() { HERO_ORDER.forEach((k) => { if (this.s.heroes[k]) this.s.heroes[k].wound = 0; }); this.persist(); }
   devTorches() { this.descent().used = 0; this.persist(); }
   devFreePacks() { this.s.freePack = { stock: FREE_PACK.max, since: Date.now() }; this.persist(); }

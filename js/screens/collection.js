@@ -20,7 +20,6 @@ export default function collection(app, root, params) {
     </header>
     <div class="col-head-row">
       <div class="seg" role="group" aria-label="Mode d’affichage">${[['grid', 'Grille'], ['album', 'Classeur']].map(([k, l]) => `<button class="seg-b" data-act="view" data-v="${k}" aria-pressed="${(st.view || 'grid') === k}">${l}</button>`).join('')}</div>
-      <button class="btn small" data-act="fusion">${icon('sparkle')}Fusion</button>
     </div>
     <div id="col-main">
     <div class="col-tools">

@@ -101,8 +101,14 @@ function hurt(st, src, tgt, amount, ev, kind = 'hit', extra = {}) {
     if (tgt.st.defend) d = Math.ceil(d / 2);
   }
   d = Math.min(d, tgt.hp);
+  // pacte céleste : survit une fois au coup fatal
+  const saved = tgt.lastStand && d >= tgt.hp && tgt.hp > 1;
+  if (saved) { d = tgt.hp - 1; tgt.lastStand = false; }
   tgt.hp -= d;
   ev.push({ t: kind, a: src?.uid || null, u: tgt.uid, d, hp: tgt.hp, ...extra });
+  if (saved) { ev.push({ t: 'status', u: tgt.uid, s: 'Sauvé !' }); heal(st, tgt, tgt.maxHp * 0.3, ev); }
+  // pacte abyssal : renvoie une partie des dégâts
+  if (tgt.thorns && src && src.side !== tgt.side && src.hp > 0 && kind === 'hit' && d > 0) hurt(st, null, src, d * tgt.thorns, ev, 'dot');
   if (tgt.side === 'ally') {
     gain(st, GAUGE.hurt);
     if (tgt.id === 'brenna') tgt.res = Math.min(100, (tgt.res || 0) + 18);
@@ -111,7 +117,11 @@ function hurt(st, src, tgt, amount, ev, kind = 'hit', extra = {}) {
     ev.push({ t: 'die', u: tgt.uid });
     if (tgt.side === 'enemy') {
       st.kills.push(tgt.id);
-      front(st, 'ally').forEach((h) => { if (h.id === 'ossian') h.res = Math.min(100, (h.res || 0) + 20); });
+      front(st, 'ally').forEach((h) => {
+        if (h.id === 'ossian') h.res = Math.min(100, (h.res || 0) + 20);
+        if (h.killEnergy) { h.energy = Math.min(MAX_ENERGY, h.energy + 1); heal(st, h, h.maxHp * 0.1, ev); }
+        if (h.killHealTeam) front(st, 'ally').forEach((x) => heal(st, x, x.maxHp * h.killHealTeam, ev));
+      });
     }
     if (tgt.st.protecting) front(st, 'ally').forEach((h) => { if (h.st.protectedBy === tgt.uid) h.st.protectedBy = null; });
     // un ennemi de réserve entre en ligne et annonce son intention
@@ -127,7 +137,7 @@ function check(st) {
   else if (!alive(st, 'ally').length) st.over = 'lost';
 }
 // Multiplicateur subi par une cible (marque, exposition, maîtrise du Bestiaire)
-const taken = (st, t) => 1 + (t.st.mark ? 0.3 : 0) + (t.st.exposed ? 0.3 : 0) + (t.side === 'enemy' && st.mastery[t.id] ? 0.1 : 0);
+const taken = (st, t) => 1 + (t.st.mark ? 0.3 : 0) + (t.st.exposed ? 0.3 : 0) + (t.side === 'enemy' ? (st.mastery[t.id] === true ? 0.1 : st.mastery[t.id] || 0) : 0);
 const defOf = (u) => u.def * (u.st.armorUp ? 1.5 : 1) * (u.st.bear ? 1.5 : 1);
 const dmg = (st, base, t, mult = 1) => Math.max(1, base * mult * taken(st, t) - defOf(t) * 0.4);
 
@@ -140,6 +150,7 @@ export function beginTurn(st) {
   u.st.defend = false;
   for (const k of ['mark', 'exposed', 'taunt', 'armorUp', 'inspired', 'weak', 'bear']) if (u.st[k]) u.st[k]--;
   if (u.st.regen) { u.st.regen--; heal(st, u, u.maxHp * 0.06, ev); }
+  if (u.regenTurn && u.hp > 0) heal(st, u, u.maxHp * u.regenTurn, ev);
   if (u.st.protecting) { u.st.protecting--; if (!u.st.protecting) front(st, 'ally').forEach((h) => { if (h.st.protectedBy === u.uid) h.st.protectedBy = null; }); }
   if (u.st.burn) { u.st.burn--; hurt(st, null, u, Math.max(3, u.maxHp * 0.06), ev, 'dot', { burn: true }); }
   if (u.hp > 0 && u.st.poison) { u.st.poison--; hurt(st, null, u, Math.max(3, u.maxHp * 0.06), ev, 'dot', { poison: true }); }
@@ -176,22 +187,26 @@ export function act(st, a) {
   if (u.kind === 'enemy') enemyAct(st, u, a, ev);
   else {
     const s = STRIKE[a.strike] || 1;
-    if (a.strike === 'perfect') gain(st, GAUGE.perfect);
+    if (a.strike === 'perfect') { gain(st, GAUGE.perfect); if (u.perfectEnergy) u.energy = Math.min(MAX_ENERGY, u.energy + 1); }
     const t = a.target ? st.units[a.target] : null;
     const base = Math.max(u.atk, u.mag * 0.7);
     const stealth = !!u.st.stealth;
-    const boost = (tgt) => (u.st.inspired ? 1.25 : 1) * (u.st.bear ? 1.3 : 1) * (stealth ? 2 : 1) * (u.id === 'kael' && tgt.hp < tgt.maxHp / 2 ? 1.35 : 1);
+    const boost = (tgt) => (u.st.inspired ? 1.25 : 1) * (u.st.bear ? 1.3 : 1) * (stealth ? 2 : 1) * (u.id === 'kael' && tgt.hp < tgt.maxHp / 2 ? 1.35 : 1)
+      * (1 + (u.pactDmg || 0) + (u.burnBonus && tgt.st.burn ? u.burnBonus : 0) + (u.eliteBonus && (tgt.elite || tgt.boss) ? u.eliteBonus : 0));
     const hit = (tgt, amount, extra = {}) => {
       if (!tgt || tgt.hp <= 0) return 0;
-      const d = hurt(st, u, tgt, amount * boost(tgt), ev, 'hit', stealth ? { ...extra, crit: true } : extra);
+      const pierce = u.pierce ? defOf(tgt) * 0.4 * u.pierce : 0; // pacte primordial : ignore une partie de la défense
+      const d = hurt(st, u, tgt, (amount + pierce) * boost(tgt), ev, 'hit', stealth ? { ...extra, crit: true } : extra);
       if (u.lifesteal && d) heal(st, u, d * u.lifesteal, ev);
+      if (d && tgt.hp > 0 && u.burnChance && rand(st) < u.burnChance) { tgt.st.burn = Math.max(tgt.st.burn, 2); ev.push({ t: 'status', u: tgt.uid, s: 'Brûlure' }); }
+      if (d && tgt.hp > 0 && u.poisonChance && rand(st) < u.poisonChance) { tgt.st.poison = Math.max(tgt.st.poison, 2); ev.push({ t: 'status', u: tgt.uid, s: 'Poison' }); }
       return d;
     };
     if (a.action === 'attack') {
       const target = t && t.hp > 0 ? t : front(st, 'enemy')[0];
       const wasMarked = target?.st.mark;
       hit(target, dmg(st, base, target, s), { crit: a.strike === 'perfect' });
-      if (u.fury && target && target.hp > 0 && rand(st) < 0.25) hit(target, dmg(st, base, target, 0.8));
+      if (target && target.hp > 0 && rand(st) < (u.fury ? 0.25 : 0) + (u.furyChance || 0)) hit(target, dmg(st, base, target, 0.8));
       if (u.id === 'brenna') u.res = Math.min(100, (u.res || 0) + 12);
       if (u.id === 'sylea' && wasMarked) u.energy = Math.min(MAX_ENERGY, u.energy + 1);
     } else if (a.action === 'defend') {
@@ -291,6 +306,7 @@ function enemyAct(st, e, a, ev) {
     if (extra.parryable && a.parry === 'perfect') {
       ev.push({ t: 'parry', u: t.uid, a: e.uid });
       gain(st, GAUGE.perfect);
+      if (t.perfectEnergy) t.energy = Math.min(MAX_ENERGY, t.energy + 1);
       return hurt(st, t, e, dmg(st, Math.max(t.atk, t.mag * 0.7), e, 0.8), ev, 'hit', { counter: true }) && 0;
     }
     const m = mult * (extra.parryable && a.parry === 'good' ? 0.5 : 1);

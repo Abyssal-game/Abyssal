@@ -106,7 +106,7 @@ export async function openChestFlow(app, type, { after } = {}) {
   }
   function endButtons() {
     const end = box.querySelector('.cho-end');
-    const more = g.chestCount(type) && (!c.key || g.keyCount(c.key));
+    const more = g.chestCount(type);
     end.innerHTML = `<button class="btn" data-c="close">Fermer</button>${more ? `<button class="btn primary" data-c="again">${icon('lock')}Encore un (${g.chestCount(type)})</button>` : ''}`;
     end.hidden = false;
   }
@@ -146,16 +146,15 @@ export default function arsenal(app, root) {
     const junk = Object.entries(a.items).filter(([id, it]) => it.r === 'C' && !g.wearer(id)).length;
     root.innerHTML = `
       <header class="screen-head"><h1>Arsenal</h1><p class="muted">Armes, armures, reliques et sorts de tes héros. Les coffres se gagnent dans la Descente.</p></header>
-      <section class="panel ars-res"><span>${keyHTML('or', g.keyCount('or'))}<small>Clés d’or</small></span><span>${keyHTML('abyssal', g.keyCount('abyssal'))}<small>Clés abyssales</small></span><span class="ars-fer">${icon('flame')}<b>${fmt(a.fer || 0)}</b><small>Fer runique</small></span></section>
       <h2 class="section-title">Coffres</h2>
       <div class="ch-grid">${CHEST_ORDER.map((t) => {
-        const c = CHESTS[t], n = g.chestCount(t), locked = c.key && !g.keyCount(c.key);
+        const c = CHESTS[t], n = g.chestCount(t);
         return `<button class="ch-c ${n ? '' : 'none'}" data-chest="${t}" style="--cc:${c.color}" ${n ? '' : 'disabled'}>
           <span class="ch-art">${chestSVG(t)}</span>${n ? `<span class="ch-n">${n}</span>` : ''}
-          <b>${esc(c.name)}</b><span class="small">${n ? (locked ? `${icon('lock')} ${esc(KEYS[c.key].name)} requise` : 'Toucher pour ouvrir') : esc(c.desc)}</span></button>`;
+          <b>${esc(c.name)}</b><span class="small">${n ? 'Toucher pour ouvrir' : esc(c.desc)}</span></button>`;
       }).join('')}</div>
       <p class="small muted">Garantie : un objet <b style="color:${GEAR_RARITY.L.color}">légendaire</b> au plus tard tous les ${LEG_PITY} coffres de fer, d’or ou abyssaux (encore ${Math.max(1, LEG_PITY - (a.pity || 0))}). <button class="linkish" data-a="odds">Probabilités</button></p>
-      <h2 class="section-title">Équipement <span class="small muted">${count} objet${count > 1 ? 's' : ''}</span></h2>
+      <h2 class="section-title">Équipement <span class="small muted">${count} objet${count > 1 ? 's' : ''} · ${icon('flame')} ${fmt(a.fer || 0)} fer runique</span></h2>
       <div class="seg wide ars-slots" role="tablist">${SLOT_ORDER.map((s) => `<button role="tab" class="seg-b" aria-selected="${ui.slot === s}" aria-pressed="${ui.slot === s}" data-slot="${s}">${SLOTS[s].plural}</button>`).join('')}</div>
       <div class="chips ars-heroes"><button class="chip" aria-pressed="${ui.hero === 'all'}" data-hf="all">Tous</button>${HERO_ORDER.filter((h) => g.s.heroes[h]).map((h) => `<button class="chip" aria-pressed="${ui.hero === h}" data-hf="${h}" style="--chip:${HEROES[h].color}">${esc(HEROES[h].name.split(' ')[0])}</button>`).join('')}</div>
       ${items.length ? `<div class="gi-grid">${items.map(([id, it]) => itemTileHTML(it, { id, wearer: g.wearer(id) })).join('')}</div>`
@@ -175,7 +174,7 @@ export default function arsenal(app, root) {
       <div class="table-wrap"><table class="odds"><thead><tr><th></th>${GEAR_ORDER.map((r) => `<th scope="col" style="color:${GEAR_RARITY[r].color}">${GEAR_RARITY[r].name}</th>`).join('')}<th>Objets</th></tr></thead><tbody>${rows}</tbody></table></div>
       <ul class="small"><li>Coffre de fer : au moins un objet rare ou mieux.</li><li>Après ${LEG_PITY - 1} coffres (fer, or, abyssal) sans légendaire, le suivant en contient un.</li><li>Les épiques ont une propriété bonus ; les légendaires sont uniques, avec un effet propre en plus.</li></ul>
       <h3>Où trouver les coffres</h3>
-      <ul class="small"><li>Salles au trésor et élites de la Descente : bois, puis fer dès l’étage 6.</li><li>Gardiens : coffre d’or, puis abyssal dès l’étage 15. Clé d’or dès l’étage 10, clé abyssale dès l’étage 20.</li><li>Bonus des missions du jour : une clé d’or. Boutique : coffre de fer et clés.</li><li>Attention : les coffres trouvés pendant une expédition sont perdus si toute l’équipe tombe.</li></ul>`, { label: 'Probabilités des coffres' });
+      <ul class="small"><li>Salles au trésor et élites de la Descente : bois, puis fer dès l’étage 6.</li><li>Gardiens : coffre d’or, puis abyssal dès l’étage 15.</li><li>Bonus des missions du jour et Marchand : coffre de fer.</li><li>Attention : les coffres trouvés pendant une expédition sont perdus si toute l’équipe tombe.</li></ul>`, { label: 'Probabilités des coffres' });
   }
   root.addEventListener('click', async (e) => {
     const pk = e.target.closest('[data-pick]');

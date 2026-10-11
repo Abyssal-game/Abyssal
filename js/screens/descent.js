@@ -11,7 +11,7 @@ import { bagHTML, bindBag } from './items.js';
 import { runBattle } from './battle-ui.js';
 import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
-import { EMBLEM } from '../ui/icons.js';
+import { EMBLEM, sigil } from '../ui/icons.js';
 import { CHESTS, KEYS } from '../core/gear.js';
 
 // Coffres et clés d'un butin, en texte
@@ -35,16 +35,18 @@ export default function descent(app, root) {
     const last = ui.outcome;
     const danger = g.floorDanger(1);
     const news = g.takeHeroNews();
+    const pactNews = g.s.pactNews; if (pactNews) { g.s.pactNews = false; g.persist(); }
     const inv = INVOCATIONS[g.s.invocation] || INVOCATIONS.phenix;
     const ready = torches && party.length === DESCENT.teamSize;
     root.innerHTML = `
       <header class="screen-head dc-head"><h1>La Descente</h1><p class="muted">${d.best ? `Ton record : étage ${d.best}${d.bestToday ? ` · aujourd’hui : ${d.bestToday}` : ''}` : 'Chaque jour, l’Abysse change de visage.'}</p></header>
       ${last ? summaryHTML(last) : ''}
+      ${pactNews ? `<section class="panel ornate dc-news"><div class="dc-new-h"><span class="dc-new-ic">${icon('sparkle')}</span><span><b>Les pactes sont débloqués !</b><span class="small">Chaque héros peut maintenant se lier à une de tes cartes : sa faction donne l’effet, sa rareté le renforce.</span><span class="small muted">Aventure, puis Héros : touche un héros, puis « Pacte ».</span></span></div></section>` : ''}
       ${news.length ? `<section class="panel ornate dc-news">${news.map((k) => `<div class="dc-new-h" style="--hc:${HEROES[k].color}"><img alt="" src="${heroArtUrl(k)}"><span><b>${esc(HEROES[k].name)} rejoint ton équipe !</b><span class="small">${esc(HEROES[k].cls)} · ${esc(HEROES[k].role)}</span></span></div>`).join('')}<p class="small muted">Touche « Modifier » pour l’emmener avec toi.</p></section>` : ''}
       <section class="panel dc-go">
         <div class="dc-go-top"><span class="dc-torches">${Array.from({ length: DESCENT.torches }, (_, i) => `<i class="${i < torches ? 'on' : ''}">${icon('flame')}</i>`).join('')}</span><span class="small muted">${torches ? `${torches} expédition${torches > 1 ? 's' : ''} possible${torches > 1 ? 's' : ''} aujourd’hui` : 'Plus de torche : reviens demain'}</span></div>
         <div class="dc-team">
-          ${party.map((k) => `<span class="dc-tm" style="--hc:${HEROES[k].color}"><img alt="" src="${heroArtUrl(k)}"><b>${esc(HEROES[k].name.split(' ')[0])}</b><small>Niv. ${g.heroLevel(k)}${g.heroWounded(k) ? ' · blessé' : ''}</small></span>`).join('')}
+          ${party.map((k) => `<span class="dc-tm" style="--hc:${HEROES[k].color}"><img alt="" src="${heroArtUrl(k)}">${g.pactFor(k) ? `<span class="dc-pact">${sigil(g.pactCard(k).faction)}</span>` : ''}<b>${esc(HEROES[k].name.split(' ')[0])}</b><small>Niv. ${g.heroLevel(k)}${g.heroWounded(k) ? ' · blessé' : ''}</small></span>`).join('')}
           ${Array.from({ length: DESCENT.teamSize - party.length }, () => '<span class="dc-tm empty"><i>+</i><small>Héros</small></span>').join('')}
           <span class="dc-tm inv" style="--hc:${inv.color}"><span class="ic-art" data-card="${inv.card}"></span><b>${esc(inv.name)}</b><small>Invocation</small></span>
         </div>

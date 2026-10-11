@@ -42,10 +42,11 @@ export function defaultSave(now = Date.now()) {
     party: ['brenna', 'aldric', 'morgane'],
     invocation: 'phenix',
     invXp: {},            // invocation -> expérience
+    pacts: {},            // héros -> carte liée en pacte
     hunt: {},             // Bestiaire de chasse : id de créature -> nombre de victoires
     // Arsenal : objets (id -> { b: modèle, r: rareté, f: forge, a: propriété }), équipement par héros,
     // coffres et clés (un cadeau de départ pour découvrir), fer runique, garantie de légendaire.
-    arsenal: { items: {}, eq: {}, chests: { bois: 2, fer: 1, or: 1, abyssal: 0 }, keys: { or: 1, abyssal: 0 }, fer: 0, pity: 0, seq: 0, opened: 0, pending: null },
+    arsenal: { items: {}, eq: {}, chests: { bois: 2, fer: 1, or: 1, abyssal: 0 }, keys: {}, fer: 0, pity: 0, seq: 0, opened: 0, pending: null },
     descent: { day: null, used: 0, bestToday: 0, best: 0, runs: 0, team: [], run: null, wounds: {}, xp: {}, cursed: false },
     history: [],          // dernières ouvertures
     recent: [],           // dernières découvertes (ids)
@@ -89,7 +90,7 @@ export function migrate(raw) {
   if (!Array.isArray(s.descent.team)) s.descent.team = [];
   s.heroes = { ...d.heroes, ...(s.heroes && typeof s.heroes === 'object' ? s.heroes : {}) };
   if (!Array.isArray(s.party) || !s.party.length) s.party = d.party;
-  for (const k of ['items', 'fervor', 'collection', 'deciphered', 'achievements', 'setsDone', 'factionsDone', 'invXp', 'hunt']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
+  for (const k of ['items', 'fervor', 'collection', 'deciphered', 'achievements', 'setsDone', 'factionsDone', 'invXp', 'hunt', 'pacts']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
   for (const k of ['best', 'recent', 'history', 'showcase', 'titles', 'frames']) if (!Array.isArray(s[k])) s[k] = d[k];
   return s;
 }

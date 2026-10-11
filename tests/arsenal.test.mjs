@@ -22,10 +22,9 @@ test('arsenal : modèles cohérents (sorts connus, emplacements, héros)', () =>
   assert.ok(itemStats({ b: 'hache', r: 'L', f: 10 }).atk > itemStats({ b: 'hache', r: 'E', f: 0 }).atk);
 });
 
-test('coffres : cadeau de départ, clé requise, choix, fer runique, garantie légendaire', () => {
+test('coffres : cadeau de départ, sans clé, choix, fer runique, garantie légendaire', () => {
   const g = newGame();
   assert.equal(g.chestCount('bois'), 2);
-  assert.equal(g.keyCount('or'), 1);
   const r1 = g.openChest('bois');
   assert.equal(r1.items.length, 1);
   assert.equal(Object.keys(g.arsenal().items).length, 1);
@@ -40,9 +39,9 @@ test('coffres : cadeau de départ, clé requise, choix, fer runique, garantie l�
   g.chooseChestItem(1);
   assert.equal(g.arsenal().pending, null);
   assert.ok(g.arsenal().fer > fer, 'les objets non gardés deviennent du fer runique');
-  assert.equal(g.keyCount('or'), 0);
   g.addChests({ or: 1 });
-  assert.throws(() => g.openChest('or'), /clé d’or/);
+  assert.ok(g.openChest('or').choice, 'plus besoin de clé');
+  g.chooseChestItem(0);
   // garantie
   const rng = rngFrom('p');
   const ctx = { heroes: ['brenna', 'aldric', 'sylea', 'morgane'], party: ['brenna'], eqScore: () => 0 };
@@ -103,30 +102,32 @@ test('sorts et effets en combat', () => {
 test('descente : coffres au butin, perdus si l’équipe tombe ; migration ajoute l’Arsenal', () => {
   const g = newGame('l');
   g.startRun();
-  g.addLoot({ shards: 10, chests: { or: 1 }, keys: { or: 1 } });
+  g.addLoot({ shards: 10, chests: { or: 1 } });
   const s = g.endRun(false);
   assert.equal(s.loot.chests.or, 1);
   assert.equal(g.chestCount('or'), 2);
-  assert.equal(g.keyCount('or'), 2);
   g.startRun();
-  g.addLoot({ chests: { fer: 2 }, keys: { or: 1 } });
+  g.addLoot({ chests: { fer: 2 } });
   g.s.descent.run.team.forEach((m) => { m.fallen = true; });
   g.endRun(true);
   assert.equal(g.chestCount('fer'), 1, 'coffres perdus');
-  assert.equal(g.keyCount('or'), 3, 'clés gardées hors descente maudite');
+  // anciennes clés converties en éclats
+  const sh = g.s.shards; g.arsenal().keys = { or: 2 }; g.convertOldKeys();
+  assert.equal(g.s.shards, sh + 300);
   const old = migrate({ version: 2, createdAt: 1, shards: 5 });
   assert.equal(old.arsenal.chests.bois, 2);
   assert.ok(old.arsenal.items && old.arsenal.eq);
 });
 
-test('boutique : coffre de fer et clés vont dans l’Arsenal', () => {
+test('boutique : coffre de fer dans l’Arsenal, premium non achetable', () => {
   const g = newGame('b');
   g.s.shards = 5000;
   g.buyItem('coffreFer');
   assert.equal(g.chestCount('fer'), 2);
   assert.equal(g.itemCount('coffreFer'), 0);
-  g.buyItem('cleOr');
-  assert.throws(() => g.buyItem('cleOr'), /Limite/);
+  assert.equal(g.canBuy('premium'), false);
+  g.s.tickets.premium = 1;
+  assert.equal(g.canBuy('premium'), true);
 });
 
 test('nouvelles classes : arrivée par la profondeur, mécaniques en combat', () => {
@@ -159,3 +160,36 @@ test('nouvelles classes : arrivée par la profondeur, mécaniques en combat', ()
 });
 import { makeHero } from '../js/core/heroes.js';
 function H(k) { return makeHero(k, { level: 3 }); }
+
+test('pactes : débloqués à l’étage 2, effets par faction et rareté, connaissance plafonnée', async () => {
+  const { pactOf, PACT_UNLOCK } = await import('../js/core/pacts.js');
+  const g = newGame('p');
+  const inf = catalog.cards.find((c) => c.faction === 'infernal' && c.rarity === 'C');
+  const myth = catalog.cards.find((c) => c.faction === 'celeste' && c.rarity === 'M');
+  g.addCard(inf.id); g.addCard(myth.id);
+  assert.throws(() => g.setPact('brenna', inf.id), /étage/);
+  g.s.descent.best = PACT_UNLOCK;
+  g.setPact('brenna', inf.id);
+  assert.equal(pactOf(inf).tier, 1);
+  assert.equal(pactOf(myth).tier, 3);
+  assert.equal(g.heroUnit('brenna').pactDmg, 0.1);
+  g.setPact('aldric', inf.id);
+  assert.equal(g.pactHolder(inf.id), 'aldric', 'une carte ne lie qu’un héros');
+  assert.equal(g.s.pacts.brenna, undefined);
+  g.setPact('brenna', myth.id);
+  const u = g.heroUnit('brenna');
+  assert.ok(u.lastStand && u.regenTurn, 'mythique céleste : régénération et survie');
+  // survie au coup fatal
+  const st = createBattle([u], [makeEnemy(inf, { level: 30, boss: true })], 3);
+  const hero = Object.values(st.units).find((x) => x.kind === 'hero');
+  const boss = Object.values(st.units).find((x) => x.kind === 'enemy');
+  boss.intent = { k: 'heavy', t: hero.uid };
+  act(st, { actor: boss.uid, action: 'enemy' });
+  assert.ok(hero.hp > 0, 'sauvé une fois');
+  // connaissance : carte possédée +10 %, plafond 20 %
+  assert.equal(g.knowledge(inf.id), 0.1);
+  g.s.hunt[inf.id] = 99;
+  assert.equal(g.knowledge(inf.id), 0.2);
+  g.s.descent.run = { v: 2 };
+  assert.throws(() => g.setPact('brenna', null), /expédition/);
+});

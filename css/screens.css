@@ -1095,7 +1095,7 @@ body.battle-mode .tb { min-height: calc(100dvh - var(--safe-t) - var(--safe-b) -
 .dc-go-top .dc-torches { margin: 0; }
 .dc-team { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .dc-tm { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; text-align: center; }
-.dc-tm img, .dc-tm .ic-art, .dc-tm i { width: 100%; aspect-ratio: 3 / 4; border-radius: 12px; object-fit: cover; object-position: 50% 15%; border: 2px solid var(--hc, var(--line)); box-shadow: 0 0 12px color-mix(in srgb, var(--hc, transparent) 35%, transparent); overflow: hidden; display: block; }
+.dc-tm > img, .dc-tm > .ic-art, .dc-tm > i { width: 100%; aspect-ratio: 3 / 4; border-radius: 12px; object-fit: cover; object-position: 50% 15%; border: 2px solid var(--hc, var(--line)); box-shadow: 0 0 12px color-mix(in srgb, var(--hc, transparent) 35%, transparent); overflow: hidden; display: block; }
 .dc-tm .ic-art img { width: 100%; height: 100%; object-fit: cover; border: 0; border-radius: 0; box-shadow: none; }
 .dc-tm b { font: 700 .74rem/1.1 var(--f-display); letter-spacing: .02em; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dc-tm small { font-size: .64rem; color: var(--mute); }
@@ -1243,3 +1243,34 @@ body.battle-mode .tb {
 .tb-top { padding: 2px 2px 0; }
 @media (prefers-reduced-motion: reduce) { .tb-u, .tb-u::after { animation: none !important; } }
 html.reduce-motion .tb-u, html.reduce-motion .tb-u::after { animation: none !important; }
+.tb-know { color: #8FE3A8; font-weight: 700; display: inline-flex; align-items: center; gap: 2px; }
+.tb-know .ic { width: 10px; height: 10px; }
+/* ——— Pactes ——————————————————————————————————————————————— */
+.pact-lines { margin: 4px 0 0; padding-left: 16px; font-size: .74rem; line-height: 1.35; color: var(--ink); }
+.pact-lines li.off { color: var(--mute); opacity: .7; }
+.pact-lines li.off span { font-size: .66rem; }
+.pact-slot, .pact-row { display: flex; gap: 10px; align-items: flex-start; width: 100%; padding: 10px; border-radius: 12px; text-align: left; color: var(--ink); font: inherit; background: rgba(14, 16, 24, .9); border: 1px solid color-mix(in srgb, var(--rc, var(--line)) 55%, transparent); }
+.pact-slot.empty { align-items: center; border-style: dashed; border-color: var(--line); }
+.pact-slot > span:last-child, .pact-t { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.pact-slot b, .pact-t b { font: 700 .86rem/1.2 var(--f-display); }
+.pact-slot small, .pact-t small { font-size: .7rem; }
+.pact-slot small .sigil, .pact-row small .sigil { width: 14px; height: 14px; vertical-align: -3px; }
+.pact-thumb { width: 52px; aspect-ratio: 5 / 7; flex: none; border-radius: 8px; overflow: hidden; display: grid; place-items: center; background: rgba(0, 0, 0, .4); border: 1px solid var(--line); color: var(--mute); font: 300 1.5rem/1 var(--f-ui); }
+.pact-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.pact-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.pact-row.on { box-shadow: inset 0 0 0 1px var(--gold-hi); }
+.pact-row > .ic { color: var(--gold-hi); flex: none; }
+.pact-row { content-visibility: auto; contain-intrinsic-size: auto 90px; }
+.pact-fx { padding: 10px 12px; margin: 8px 0; }
+.pact-lock { display: flex; gap: 6px; align-items: center; }
+.pact-slot[disabled] { opacity: .6; }
+.dc-tm { position: relative; }
+.dc-pact { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: rgba(0, 0, 0, .75); border: 1px solid var(--gold); }
+.dc-pact .sigil { width: 18px !important; height: 18px !important; border: 0 !important; box-shadow: none !important; aspect-ratio: 1 !important; }
+.pact-card { padding: 12px 14px; margin-top: 12px; }
+.pact-card > b { color: var(--gold-hi); display: inline-flex; gap: 6px; align-items: center; }
+.pact-card p { margin: 6px 0 0; }
+.op-gain { color: #9FE3B4; font-size: .78rem; }
+.op-gain .ic { width: 13px; height: 13px; vertical-align: -2px; }
+.dc-new-ic { width: 48px; height: 48px; flex: none; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb, var(--gold) 18%, transparent); color: var(--gold-hi); }
+.dc-new-ic .ic { width: 26px; height: 26px; }

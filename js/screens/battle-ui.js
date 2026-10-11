@@ -66,7 +66,7 @@ export function runBattle(app, root, { title, onEnd }) {
       <span class="tb-art"><img alt="" src="${artUrl(cat.get(u.id))}"></span>
       ${intentHTML(u)}
       ${statusHTML(u)}
-      <span class="tb-foot"><span class="tb-nm">${esc(u.name)}</span><span class="tb-sub">${u.boss ? 'Gardien · ' : u.elite ? 'Élite · ' : ''}Niv. ${u.level}</span>
+      <span class="tb-foot"><span class="tb-nm">${esc(u.name)}</span><span class="tb-sub">${u.boss ? 'Gardien · ' : u.elite ? 'Élite · ' : ''}Niv. ${u.level}${st.mastery?.[u.id] ? ` · <b class="tb-know">${icon('book')}+${Math.round((st.mastery[u.id] === true ? 0.1 : st.mastery[u.id]) * 100)} %</b>` : ''}</span>
         <span class="tb-hp"><span class="hpbar"><i style="width:${Math.max(0, u.hp / u.maxHp) * 100}%"></i></span><b>${Math.max(0, u.hp)}</b></span></span>
     </button>`;
   const heroTile = (u, active) => {
@@ -185,12 +185,13 @@ export function runBattle(app, root, { title, onEnd }) {
   // Fiche d'un ennemi (sa carte, son niveau, son comportement)
   function enemyInfo(u) {
     const c = cat.get(u.id), kills = g.huntKills(u.id), stage = huntStage(kills);
-    const known = stage >= 1;
+    const owned = g.owns(u.id), known = stage >= 1 || owned, bonus = Math.round(g.knowledge(u.id) * 100);
     openSheet(`<div class="tb-info">
       <div class="tb-info-card">${cardHTML(c, { size: 'full', mystery: !g.owns(c.id) && stage < 0, nameKnown: true })}</div>
       <h3>${esc(u.name)} · niveau ${u.level}${u.boss ? ' · gardien' : u.elite ? ' · élite' : ''}</h3>
       <dl class="facts"><div><dt>PV</dt><dd>${Math.max(0, u.hp)} / ${u.maxHp}</dd></div><div><dt>Attaque</dt><dd>${u.atk}</dd></div><div><dt>Défense</dt><dd>${u.def}</dd></div><div><dt>Vitesse</dt><dd>${u.spd}</dd></div></dl>
-      <p class="small"><b>${esc(FAMILIES[u.family].name)}</b>${known ? ` : ${esc(FAMILIES[u.family].desc)}` : ' : comportement inconnu. Vaincs-la 5 fois pour l’étudier.'}</p>
+      <p class="small"><b>${esc(FAMILIES[u.family].name)}</b>${known ? ` : ${esc(FAMILIES[u.family].desc)}` : ' : comportement inconnu. Obtiens sa carte, ou vaincs-la 5 fois, pour l’étudier.'}</p>
+      <p class="small ${bonus ? 'dc-good' : 'muted'}">${icon('book')} ${bonus ? `Tu la connais : tes héros lui infligent +${bonus} % de dégâts.` : 'Possède sa carte pour connaître son point faible (+10 % de dégâts).'}</p>
       <p class="small muted">Bestiaire de chasse : ${stage < 0 ? 'jamais vaincue' : `${esc(HUNT_STAGES[stage].name)} (${kills} victoire${kills > 1 ? 's' : ''})`}.</p>
     </div>`, { label: u.name });
   }

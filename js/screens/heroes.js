@@ -7,6 +7,7 @@ import { icon } from '../ui/icons.js';
 import { esc, fmt, openSheet, toast } from '../ui/dom.js';
 import { BASES, SLOTS, SLOT_ORDER, GEAR_RARITY, canUse, itemScore } from '../core/gear.js';
 import { gearIcon, statLine, effectLines, itemName } from '../ui/gear.js';
+import { pactBlockHTML, openPactPicker } from '../ui/pact.js';
 
 export function fillInvocationArt(app, root) {
   root.querySelectorAll('.ic-art[data-card]').forEach((el) => {
@@ -50,6 +51,8 @@ export function openHero(app, key) {
     <div class="hs-lv"><b>Niveau ${info.level}</b><span class="xpbar"><i style="width:${info.need ? (info.into / info.need) * 100 : 100}%"></i></span><span class="small muted">${info.need ? `${fmt(info.into)} / ${fmt(info.need)} XP` : 'Niveau maximum'}</span></div>
     ${g.heroWounded(key) ? `<p class="small dc-bad">${icon('heart')} Blessé encore ${Math.ceil(g.woundLeft(key) / 3600000)} h : statistiques réduites de 20 %. Un baume de soin le remet sur pied.</p>` : ''}
     <dl class="facts hs-stats">${stat('PV', u.maxHp, gb.hp)}${stat('Attaque', u.atk, gb.atk)}${stat('Magie', u.mag, gb.mag)}${stat('Défense', u.def, gb.def)}${stat('Vitesse', u.spd, gb.spd)}</dl>
+    <h3 class="section-title">Pacte</h3>
+    ${pactBlockHTML(g, key)}
     <h3 class="section-title">Équipement <button class="linkish" data-hs="auto" ${run ? 'disabled' : ''}>Équiper le meilleur</button></h3>
     <div class="hs-eq">${SLOT_ORDER.map((sl) => { const it = eq[sl] && g.gearItem(eq[sl]); return it
       ? `<button class="hs-slot full" data-hs="slot" data-sl="${sl}" style="--gc:${GEAR_RARITY[it.r].color}" ${run ? 'disabled' : ''}><span class="gi-ic">${gearIcon(BASES[it.b].type)}</span><span><b>${esc(itemName(it))}</b><small>${esc(SLOTS[sl].name)}</small></span></button>`
@@ -66,19 +69,20 @@ export function openHero(app, key) {
     if (!b || b.disabled) return;
     if (b.dataset.hs === 'auto') { try { g.autoEquip(key); app.sfx.tap(); toast('Meilleur équipement en place.', { icon: 'check' }); } catch (err) { toast(esc(err.message), { kind: 'error' }); } draw(); }
     if (b.dataset.hs === 'slot') pickGear(app, key, b.dataset.sl, draw);
+    if (b.dataset.hs === 'pact') openPactPicker(app, key, draw);
   });
   draw();
 }
 
 export function openInvocation(app, key) {
   const g = app.game, inv = INVOCATIONS[key], c = app.catalog.get(inv.card);
-  const lv = g.invocationLevel(key), v = g.invocationVariant(key);
-  const p = Math.round((invocationPower(lv, v) - 1) * 100);
+  const lv = g.invocationLevel(key);
+  const p = Math.round((invocationPower(lv) - 1) * 100);
   openSheet(`<div class="hero-sheet" style="--hc:${inv.color}">
     <div class="hs-top"><img alt="" src="${artUrl(c)}"><div class="hs-name"><h2>${esc(inv.name)}</h2><p>Invocation</p><p class="small muted">Niveau ${lv}${p ? ` · puissance +${p} %` : ''}</p></div></div>
     <p>${esc(inv.desc)}</p>
     <p class="small muted">La jauge d’invocation se remplit à chaque action de tes héros, quand ils sont frappés, et davantage avec les frappes et parades parfaites. Une fois pleine, n’importe quel héros peut invoquer à son tour.</p>
-    <p class="small muted">Elle gagne de l’expérience à chaque expédition, et beaucoup plus quand tu l’invoques. Posséder sa carte dans une version rare la renforce : ${v !== 'normal' ? `ta version ${esc(VARIANTS[v].name.toLowerCase())} donne un bonus.` : 'holographique +5 %, or +12 %, cosmique +16 %…'}</p>
+    <p class="small muted">Elle gagne de l’expérience à chaque expédition, et beaucoup plus quand tu l’invoques : chaque niveau la renforce de 10 %.</p>
   </div>`, { label: inv.name });
 }
 

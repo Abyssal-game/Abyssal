@@ -7,7 +7,7 @@ import { esc, fmt, toast, openSheet } from '../ui/dom.js';
 
 export function itemsShopHTML(g) {
   return `<h2 class="section-title" id="objets">Objets</h2>
-    <div class="items">${Object.entries(ITEMS).map(([k, it]) => {
+    <div class="items">${Object.entries(ITEMS).filter(([, it]) => !it.hidden).map(([k, it]) => {
       const lim = it.limit ? it.limit - g.boughtToday(k) : null;
       const can = g.s.shards >= it.price && (lim === null || lim > 0);
       return `<article class="panel item">

@@ -74,7 +74,7 @@ export function roomLoot(floor, room, rng) {
   if (room === 'treasure') return { shards: base, ash: rng() < 0.5 ? 8 + floor : 0, chests: { [small]: 1 } };
   if (room === 'boss') {
     return { shards: base * 3, ash: 20 + floor * 3, tickets: { [floor >= 15 ? 'premium' : 'standard']: 1 },
-      chests: { [floor >= 15 ? 'abyssal' : 'or']: 1 }, keys: floor >= 20 ? { abyssal: 1 } : floor >= 10 ? { or: 1 } : {} };
+      chests: { [floor >= 15 ? 'abyssal' : 'or']: 1 } };
   }
   return { shards: 0, ash: 0 };
 }

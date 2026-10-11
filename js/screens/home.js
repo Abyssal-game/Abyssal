@@ -29,7 +29,7 @@ export default function home(app, root) {
       const done = x.p >= x.n;
       rows.push(`<div class="td-row ${x.claimed ? 'done' : ''}"><span class="td-ic">${x.claimed ? icon('check') : icon('star')}</span><span class="td-t"><b>${esc(x.text)}</b>${x.claimed ? '' : `<span class="progress"><i style="width:${(x.p / x.n) * 100}%"></i></span>`}</span>${x.claimed ? '<span class="small muted">Fait</span>' : done ? `<button class="btn small gold" data-act="mission" data-i="${i}">+${x.shards}</button>` : `<span class="td-n small muted">${x.p}/${x.n}</span>`}</div>`);
     });
-    if (allClaimed && !m.bonus) rows.push(`<div class="td-row"><span class="td-ic gold">${icon('ticket')}</span><span class="td-t"><b>Bonus des 3 missions</b><span class="small muted">Un booster et une clé d’or</span></span><button class="btn small primary" data-act="mbonus">Récupérer</button></div>`);
+    if (allClaimed && !m.bonus) rows.push(`<div class="td-row"><span class="td-ic gold">${icon('ticket')}</span><span class="td-t"><b>Bonus des 3 missions</b><span class="small muted">Un booster et un coffre de fer</span></span><button class="btn small primary" data-act="mbonus">Récupérer</button></div>`);
     if (chests) rows.push(`<a class="td-row" href="#/arsenal"><span class="td-ic gold">${icon('lock')}</span><span class="td-t"><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Dans l’Arsenal</span></span>${icon('next')}</a>`);
     return `<section class="panel today"><h2>Aujourd’hui</h2>${rows.join('')}</section>`;
   }
@@ -57,7 +57,7 @@ export default function home(app, root) {
       catch (e) { toast(esc(e.message), { kind: 'error' }); }
     },
     mbonus() {
-      try { g.claimMission('bonus'); app.sfx.achievement(); toast('Bonus des missions : <b>1 booster standard</b> et <b>1 clé d’or</b> !', { kind: 'epic', icon: 'ticket' }); app.refresh(); }
+      try { g.claimMission('bonus'); app.sfx.achievement(); toast('Bonus des missions : <b>1 booster standard</b> et <b>1 coffre de fer</b> !', { kind: 'epic', icon: 'ticket' }); app.refresh(); }
       catch (e) { toast(esc(e.message), { kind: 'error' }); }
     },
     daily() {

@@ -26,7 +26,7 @@ export function openCreator(app) {
         <div class="row gap wrap">${B('snap', `${icon('download')}Copier ma partie actuelle`)}${snap ? B('restore', `${icon('upload')}Revenir à la copie`, 'gold') : ''}</div></section>
 
       <section class="cr-sec"><h3>Ressources</h3><div class="row gap wrap">
-        ${B('shards', '+10 000 éclats')}${B('ash', '+10 000 cendres')}${B('tickets', '+10 boosters de chaque')}${B('items', '+5 de chaque objet')}${B('arsenal', 'Coffres, clés et 200 fer')}${B('free', 'Recharger les boosters gratuits')}
+        ${B('shards', '+10 000 éclats')}${B('ash', '+10 000 cendres')}${B('tickets', '+10 boosters de chaque')}${B('items', '+5 de chaque objet')}${B('arsenal', 'Coffres et 200 fer')}${B('free', 'Recharger les boosters gratuits')}
       </div></section>
 
       <section class="cr-sec"><h3>Cartes</h3><div class="row gap wrap">
