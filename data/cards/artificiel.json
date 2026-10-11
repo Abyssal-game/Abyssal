@@ -34,9 +34,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -79,9 +76,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -127,9 +121,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -173,9 +164,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -217,9 +205,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -260,9 +245,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -304,9 +286,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -349,9 +328,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -392,9 +368,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -433,9 +406,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -480,9 +450,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -525,9 +492,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -568,9 +532,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -612,9 +573,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -655,9 +613,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -701,9 +656,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -756,9 +708,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -800,9 +749,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -846,9 +792,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -891,9 +834,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -936,9 +876,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -980,9 +917,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -1027,9 +961,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -1070,9 +1001,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -1116,9 +1044,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -1162,9 +1087,6 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy"
   ],
   "art": {
@@ -1210,11 +1132,7 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy",
-   "ancestral",
    "gold"
   ],
   "art": {
@@ -1262,11 +1180,7 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy",
-   "ancestral",
    "gold"
   ],
   "art": {
@@ -1314,11 +1228,7 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy",
-   "ancestral",
    "gold"
   ],
   "art": {
@@ -1367,11 +1277,7 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy",
-   "ancestral",
    "gold"
   ],
   "art": {
@@ -1422,11 +1328,7 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy",
-   "ancestral",
    "gold"
   ],
   "art": {
@@ -1472,11 +1374,7 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy",
-   "ancestral",
    "gold"
   ],
   "art": {
@@ -1522,11 +1420,7 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy",
-   "ancestral",
    "gold"
   ],
   "art": {
@@ -1571,11 +1465,7 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy",
-   "ancestral",
    "gold"
   ],
   "art": {
@@ -1625,11 +1515,7 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy",
-   "ancestral",
    "gold"
   ],
   "art": {
@@ -1677,11 +1563,7 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy",
-   "ancestral",
    "gold"
   ],
   "art": {
@@ -1728,11 +1610,7 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy",
-   "ancestral",
    "gold"
   ],
   "art": {
@@ -1777,11 +1655,7 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy",
-   "ancestral",
    "gold"
   ],
   "art": {
@@ -1827,11 +1701,7 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy",
-   "ancestral",
    "gold"
   ],
   "art": {
@@ -1882,11 +1752,7 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy",
-   "ancestral",
    "gold"
   ],
   "art": {
@@ -1934,11 +1800,7 @@
   "variants": [
    "normal",
    "holo",
-   "chroma",
-   "corrupt",
-   "alt",
    "galaxy",
-   "ancestral",
    "gold"
   ],
   "art": {

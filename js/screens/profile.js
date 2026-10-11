@@ -8,7 +8,7 @@ import { RARITIES, FRAMES, BOOSTERS, FACTION_ORDER, VARIANTS, RARITY, RARITY_ORD
 export default function profile(app, root) {
   const g = app.game, cat = app.catalog;
 
-  const VORDER = ['special', 'galaxy', 'gold', 'ancestral', 'corrupt', 'chroma', 'holo', 'alt'];
+  const VORDER = ['special', 'galaxy', 'gold', 'holo'];
   function luckHTML() {
     const s = g.s, st = s.stats;
     if (!st.boosters) return '';
@@ -51,7 +51,7 @@ export default function profile(app, root) {
       </section>
 
       <h2 class="section-title">Vitrine</h2>
-      ${show.length ? `<div class="showcase" id="showcase">${show.map((c) => { const e = g.entry(c.id); const v = ['special', 'galaxy', 'gold', 'ancestral', 'corrupt', 'chroma', 'holo', 'alt'].find((x) => e.v[x]) || 'normal'; return cardHTML(c, { variant: v }); }).join('')}</div><p class="small muted">${s.showcase.length ? 'Tes cartes mises en vitrine.' : 'Tes cartes les plus prestigieuses. Mets-en d’autres en vitrine depuis leur fiche.'}</p>` : '<p class="muted">Ta vitrine est vide : ouvre ton premier booster.</p>'}
+      ${show.length ? `<div class="showcase" id="showcase">${show.map((c) => { const e = g.entry(c.id); const v = ['special', 'galaxy', 'gold', 'holo'].find((x) => e.v[x]) || 'normal'; return cardHTML(c, { variant: v }); }).join('')}</div><p class="small muted">${s.showcase.length ? 'Tes cartes mises en vitrine.' : 'Tes cartes les plus prestigieuses. Mets-en d’autres en vitrine depuis leur fiche.'}</p>` : '<p class="muted">Ta vitrine est vide : ouvre ton premier booster.</p>'}
 
       <div class="stats-grid pf-3">
         <div class="panel stat"><b>${owned}</b><span>créatures sur ${total}</span></div>

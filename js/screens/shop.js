@@ -49,7 +49,7 @@ export function showOdds(app, type) {
     <h3>Garanties</h3>
     <ul class="small"><li>Après ${PITY.hr - 1} boosters d’affilée sans Hyper rare ou mieux, la dernière carte du suivant est <b>au moins Hyper rare</b>.</li><li>Après ${PITY.m - 1} boosters d’affilée sans Mythique ou mieux, la dernière carte du suivant est <b>au moins Mythique</b>.</li><li>Les compteurs sont communs à tous les boosters et repartent à zéro dès que la rareté est obtenue.</li></ul>
     <h3>Variantes</h3>
-    <p class="small">Chaque carte peut sortir en variante cosmétique (holographique, chromatique, corrompue, illustration alternative, ancestrale pour les Rares et mieux). Une variante est purement visuelle.${def.variantMult > 1 ? ` Ce booster multiplie leurs chances par ${String(def.variantMult).replace('.', ',')}.` : ''}</p>
+    <p class="small">Chaque carte peut sortir en variante cosmétique : holographique, feuille d’or (plus rare) ou cosmique (très rare). Une variante est purement visuelle.${def.variantMult > 1 ? ` Ce booster multiplie leurs chances par ${String(def.variantMult).replace('.', ',')}.` : ''}</p>
     <h3>Doublons</h3>
     <p class="small">Un doublon exact rapporte des cendres (${RARITIES.map((r) => `${r.short} ${ECONOMY.duplicateAsh[r.key]}`).join(', ')}). Les cendres servent à invoquer une carte manquante.</p>`, { label: 'Probabilités' });
 }

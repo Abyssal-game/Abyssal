@@ -138,3 +138,14 @@ test('duel de cartes — riposte, Garde, Assaut, réserve, ultime', async () => 
   assert.ok(['won', 'lost'].includes(st2.over));
   assert.ok(st2.round < 20);
 });
+
+test('variantes retirées : les exemplaires deviennent holographiques ou or', () => {
+  const st = new MemoryStorage();
+  const g = newGame('v', st);
+  g.addCard('PRI-031');
+  const raw = JSON.parse(JSON.stringify(g.s));
+  raw.collection['PRI-031'].v = { normal: 1, chroma: 2, alt: 1, ancestral: 1 };
+  st.setItem(SAVE_KEY, JSON.stringify(raw));
+  const h = newGame('v2', st);
+  assert.deepEqual(h.s.collection['PRI-031'].v, { normal: 1, holo: 3, gold: 1 });
+});

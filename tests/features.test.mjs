@@ -93,6 +93,6 @@ test('rituel : chance calculée, réussite transforme la carte, échec augmente 
   const r3 = never.ritual(target.id, 'normal', { C: 2 }, true);
   assert.ok(r3.lost);
   assert.ok(!never.owns(target.id));
-  // les C et PC n'ont pas de feuille d'or : chroma -> cosmique
-  assert.equal(never.ritualTarget(commons[0].id, 'chroma'), 'galaxy');
+  // les C et PC n'ont pas de feuille d'or : holographique -> cosmique
+  assert.equal(never.ritualTarget(commons[0].id, 'holo'), 'galaxy');
 });

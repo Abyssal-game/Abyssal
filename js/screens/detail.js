@@ -37,7 +37,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
   function ritualFrom() {
     const e = g.entry(current);
     if (!e) return null;
-    for (const v of [shownVariant, 'normal', 'holo', 'chroma', 'gold']) if (e.v[v] > 0 && g.ritualTarget(current, v)) return v;
+    for (const v of [shownVariant, 'normal', 'holo', 'gold']) if (e.v[v] > 0 && g.ritualTarget(current, v)) return v;
     return null;
   }
   function draw() {

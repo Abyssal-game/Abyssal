@@ -1,6 +1,6 @@
 // Sauvegarde locale versionnée (localStorage), migration, export / import.
 // La sauvegarde reste sur l'appareil : elle n'est synchronisée nulle part.
-import { ECONOMY, SAVE_VERSION, SAVE_KEY, SAVE_BACKUP_KEY, EXPORT_PREFIX } from '../config.js';
+import { ECONOMY, OLD_VARIANTS, SAVE_VERSION, SAVE_KEY, SAVE_BACKUP_KEY, EXPORT_PREFIX } from '../config.js';
 
 export function today(date = new Date()) {
   const p = (n) => String(n).padStart(2, '0');
@@ -86,6 +86,13 @@ export function migrate(raw) {
   if (!Array.isArray(s.team)) s.team = [];
   for (const k of ['items', 'fervor', 'collection', 'deciphered', 'achievements', 'setsDone', 'factionsDone', 'hunt']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
   for (const k of ['best', 'recent', 'history', 'showcase', 'titles', 'frames']) if (!Array.isArray(s[k])) s[k] = d[k];
+  // Variantes retirées : les exemplaires deviennent holographiques ou or (rien n'est perdu)
+  for (const e of Object.values(s.collection)) {
+    if (!e || !e.v) continue;
+    for (const [o, to] of Object.entries(OLD_VARIANTS)) if (e.v[o]) { e.v[to] = (e.v[to] || 0) + e.v[o]; delete e.v[o]; }
+  }
+  for (const k of Object.keys(s.fervor)) if (OLD_VARIANTS[k.split(':')[1]]) delete s.fervor[k];
+  for (const h of [...s.history, ...s.best]) for (const c of h?.cards || []) if (OLD_VARIANTS[c.v]) c.v = OLD_VARIANTS[c.v];
   return s;
 }
 

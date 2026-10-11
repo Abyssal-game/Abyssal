@@ -53,12 +53,14 @@ export const BOOSTERS = {
 // Probabilité (%) qu'une carte tirée soit une variante cosmétique (multipliée par variantMult).
 // Chance (en %) qu'une carte tirée sorte dans chaque variante. Volontairement rare :
 // le Rituel d'élévation est l'autre moyen de les obtenir.
-export const VARIANT_RATES = { holo: 2.5, chroma: 1, corrupt: 0.8, alt: 0.8, ancestral: 0.5, gold: 0.25, galaxy: 0.12 };
+export const VARIANT_RATES = { holo: 4, gold: 0.6, galaxy: 0.2 };
+// Anciennes variantes retirées : les exemplaires possédés deviennent la variante indiquée.
+export const OLD_VARIANTS = { chroma: 'holo', corrupt: 'holo', alt: 'holo', ancestral: 'gold' };
 
 // Rituel d'élévation : une carte monte d'un cran sur l'échelle en sacrifiant des doublons.
 export const RITUAL = {
-  ladder: ['normal', 'holo', 'chroma', 'gold', 'galaxy'],
-  perPoint: { holo: 4, chroma: 2.5, gold: 1.5, galaxy: 0.8 },   // % de réussite par point d'offrande
+  ladder: ['normal', 'holo', 'gold', 'galaxy'],
+  perPoint: { holo: 4, gold: 2, galaxy: 0.8 },   // % de réussite par point d'offrande
   points: { C: 1, PC: 2, R: 5, HR: 12, M: 30, S: 60 },          // valeur d'une offrande
   rarityMult: { C: 1.25, PC: 1.1, R: 1, HR: 0.8, M: 0.6, S: 0.5 }, // plus la carte est rare, plus c'est dur
   fervor: 12,         // % gagnés à chaque échec : la réussite finit toujours par arriver
@@ -68,10 +70,6 @@ export const RITUAL = {
 export const VARIANTS = {
   normal:    { name: 'Normale',                  short: 'Normale' },
   holo:      { name: 'Holographique',            short: 'Holo' },
-  chroma:    { name: 'Chromatique',              short: 'Chroma' },
-  corrupt:   { name: 'Corrompue',                short: 'Corrompue' },
-  alt:       { name: 'Illustration alternative', short: 'Alternative' },
-  ancestral: { name: 'Ancestrale',               short: 'Ancestrale' },
   gold:      { name: 'Feuille d’or',             short: 'Or' },
   galaxy:    { name: 'Cosmique',                 short: 'Cosmique' },
   special:   { name: 'Édition des Sceaux',       short: 'Édition' },

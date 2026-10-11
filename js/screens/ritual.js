@@ -1,4 +1,4 @@
-// Rituel d'élévation : une carte monte d'un cran (holographique, chromatique, or, cosmique)
+// Rituel d'élévation : une carte monte d'un cran (holographique, or, cosmique)
 // en sacrifiant des doublons. Chance affichée, ferveur en cas d'échec, rituel interdit risqué.
 import { RARITY, RARITIES, VARIANTS, RITUAL } from '../config.js';
 import { cardHTML } from '../ui/card.js';

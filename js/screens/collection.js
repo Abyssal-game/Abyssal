@@ -68,7 +68,7 @@ export default function collection(app, root, params) {
   }
 
   function bestVariant(e) {
-    for (const v of ['special', 'galaxy', 'gold', 'ancestral', 'corrupt', 'chroma', 'holo', 'alt']) if (e.v[v]) return v;
+    for (const v of ['special', 'galaxy', 'gold', 'holo']) if (e.v[v]) return v;
     return 'normal';
   }
 
