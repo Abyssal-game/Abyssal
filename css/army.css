@@ -274,3 +274,20 @@ img.emblem { object-fit: contain; }
 .sheet.welcome .wl { padding-top: 18px; }
 .sheet.welcome .wl-ic { margin-left: auto; margin-right: auto; }
 .sheet.welcome .wl-btns .btn { white-space: nowrap; font-size: .9rem; padding-left: 10px; padding-right: 10px; }
+
+/* Accueil : tuiles illustrées Boosters et Aventure */
+.home-acts .ha { min-height: 178px; justify-content: flex-end; overflow: hidden; isolation: isolate; padding: 12px; }
+.ha-art { position: absolute; inset: 0; z-index: -1; background: center / cover no-repeat; transition: transform .4s; }
+.ha-pack .ha-art { background-image: linear-gradient(180deg, rgba(20, 4, 10, 0) 30%, rgba(40, 6, 16, .9) 78%), url(../assets/ui/tile-boosters.webp); }
+.ha-dive .ha-art { background-image: linear-gradient(180deg, rgba(10, 6, 24, 0) 30%, rgba(16, 10, 34, .92) 78%), url(../assets/ui/tile-adventure.webp); }
+.home-acts .ha .ic { position: absolute; top: 10px; left: 10px; width: 26px; height: 26px; padding: 6px; box-sizing: content-box; border-radius: 50%; background: rgba(0, 0, 0, .55); }
+.home-acts .ha b { font-size: 1.05rem; text-shadow: 0 2px 6px #000; }
+.home-acts .ha span:not(.ha-art):not(.cta-badge) { text-shadow: 0 1px 4px #000; }
+.home-acts .ha:active .ha-art { transform: scale(1.05); }
+/* Accueil : bandeau illustré de « Aujourd'hui » */
+.today { padding-top: 0; overflow: hidden; }
+.today-head { margin: 0 -14px 4px; padding: 26px 16px 18px; background: linear-gradient(90deg, rgba(12, 10, 18, .2), rgba(12, 10, 18, 0) 60%), url(../assets/ui/today.webp) right center / cover no-repeat; border-bottom: 1px solid var(--line-soft); }
+.today-head h2 { margin: 0 !important; font-size: 1.1rem !important; text-shadow: 0 2px 6px #000; }
+.td-row { padding: 12px 0; }
+/* Tutoriel : grande illustration */
+.wl-art { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 14px; margin: 4px 0 14px; border: 1px solid var(--line); box-shadow: 0 8px 22px rgba(0, 0, 0, .6); }

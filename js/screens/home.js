@@ -32,7 +32,7 @@ export default function home(app, root) {
     });
     if (allClaimed && !m.bonus) rows.push(`<div class="td-row"><span class="td-ic gold">${icon('ticket')}</span><span class="td-t"><b>Bonus des 3 missions</b><span class="small muted">Un booster et un coffre de fer</span></span><button class="btn small primary" data-act="mbonus">Récupérer</button></div>`);
     if (chests) rows.push(`<a class="td-row" href="#/coffres"><span class="td-ic gold">${icon('lock')}</span><span class="td-t"><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Pleins de boosters</span></span>${icon('next')}</a>`);
-    return `<section class="panel today"><h2>Aujourd’hui</h2>${rows.join('')}</section>`;
+    return `<section class="panel today"><div class="today-head"><h2>Aujourd’hui</h2></div>${rows.join('')}</section>`;
   }
 
   root.innerHTML = `
@@ -41,8 +41,8 @@ export default function home(app, root) {
     </section>
 
     <div class="home-acts">
-      <a class="ha ha-pack" href="#/boutique">${icon('booster')}<b>Boosters</b><span>${freeCount ? `${freeCount} offert${freeCount > 1 ? 's' : ''}` : 'Tente ta chance'}</span>${freeCount ? `<span class="cta-badge">${freeCount}</span>` : ''}</a>
-      <a class="ha ha-dive" href="#/descente">${icon('swords')}<b>Aventure</b><span>${g.descent().run ? `En cours · étage ${g.descent().run.floor}` : g.torchesLeft() ? `${g.torchesLeft()} torche${g.torchesLeft() > 1 ? 's' : ''} aujourd’hui` : 'Reviens demain'}</span></a>
+      <a class="ha ha-pack" href="#/boutique"><span class="ha-art"></span>${icon('booster')}<b>Boosters</b><span>${freeCount ? `${freeCount} offert${freeCount > 1 ? 's' : ''}` : 'Tente ta chance'}</span>${freeCount ? `<span class="cta-badge">${freeCount}</span>` : ''}</a>
+      <a class="ha ha-dive" href="#/descente"><span class="ha-art"></span>${icon('swords')}<b>Aventure</b><span>${g.descent().run ? `En cours · étage ${g.descent().run.floor}` : g.torchesLeft() ? `${g.torchesLeft()} torche${g.torchesLeft() > 1 ? 's' : ''} aujourd’hui` : 'Reviens demain'}</span></a>
     </div>
 
     ${todayHTML()}
