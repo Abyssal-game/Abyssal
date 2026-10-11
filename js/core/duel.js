@@ -93,7 +93,7 @@ export function attack(st, aUid, tUid, { dodged = false } = {}) {
   a.attacked = true;
   ev.push({ t: 'attack', a: a.uid, u: t.uid });
   let hit = 0;
-  if (dodged) ev.push({ t: 'dodge', u: t.uid });
+  if (dodged) { t.dodges = (t.dodges || 0) + 1; ev.push({ t: 'dodge', u: t.uid }); }
   else hit = damage(st, t, atkOf(st, a, t), ev, a.uid);
   if (hit && t.hp > 0) {
     if (a.kw === 'venin') { t.poison = Math.min(6, t.poison + 2); ev.push({ t: 'status', u: t.uid, s: 'Venin' }); }
@@ -202,11 +202,12 @@ export function swap(st, outUid, inUid) {
 }
 
 // Difficulté d'une esquive : durée (ms) de la fenêtre à viser, plus courte face à un ennemi
-// de plus haut niveau que la carte visée (et face aux élites et gardiens).
+// de plus haut niveau que la carte visée, face aux élites et gardiens, et à chaque esquive
+// déjà réussie par cette carte pendant le combat (elle s'essouffle).
 export function dodgeWindow(st, a, t) {
   const e = st.units[a], u = st.units[t];
-  const w = 330 + 40 * ((u?.level || 1) - (e?.level || 1)) - (e?.boss ? 70 : e?.elite ? 35 : 0);
-  return Math.max(110, Math.min(520, Math.round(w)));
+  const w = (140 + 25 * ((u?.level || 1) - (e?.level || 1)) - (e?.boss ? 40 : e?.elite ? 20 : 0)) * 0.8 ** (u?.dodges || 0);
+  return Math.max(45, Math.min(260, Math.round(w)));
 }
 
 // IA ennemie : achève ce qu'elle peut tuer, sinon frappe la carte la plus dangereuse.

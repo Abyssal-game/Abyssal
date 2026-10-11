@@ -154,25 +154,37 @@ export function runDuel(app, root, { title, onEnd }) {
   let dodgeTap = null;
   function dodgeQTE(a, t) {
     return new Promise((resolve) => {
-      const win = dodgeWindow(st, a, t), D = ui.fast ? 900 : 1150;
-      const z0 = 0.45 + Math.random() * 0.3, zw = win / D;
+      // Le curseur accélère (difficile de prévoir son passage) ; face à une élite ou un gardien,
+      // la zone dorée se déplace aussi.
+      const u = st.units[a], moving = u?.boss || u?.elite;
+      const win = dodgeWindow(st, a, t), D = 900;
+      const ease = (x) => x ** 1.7;                  // position du curseur selon le temps (0 → 1)
+      const zw = Math.max(0.035, ease(Math.min(1, 0.75 + win / D)) - ease(0.75)); // largeur de la zone, ramenée à la vitesse du curseur vers la fin
+      let z0 = 0.35 + Math.random() * (0.6 - zw);
       const aEl = el(a), tEl = el(t);
       aEl?.classList.add('aim'); tEl?.classList.add('aimed');
       const bar = document.createElement('div');
       bar.className = 'dv-dodge';
-      bar.innerHTML = `<span class="dv-dodge-t">Esquive ! <small>touche au bon moment</small></span><span class="dv-dodge-bar"><i class="z" style="left:${z0 * 100}%;width:${zw * 100}%"></i><i class="c"></i></span>`;
+      bar.innerHTML = `<span class="dv-dodge-t">Esquive ! <small>touche quand le curseur est dans l’or</small></span><span class="dv-dodge-bar"><i class="z" style="left:${z0 * 100}%;width:${zw * 100}%"></i><i class="c"></i></span>`;
       $('.dv-mid').appendChild(bar); $('.dv-mid').classList.add('qte');
-      const cur = bar.querySelector('.c'), t0 = performance.now();
-      let done = false, raf = 0;
+      const cur = bar.querySelector('.c'), zEl = bar.querySelector('.z');
+      let t0 = 0, done = false, raf = 0;
+      const zoneAt = (x) => (moving ? Math.min(0.97 - zw, Math.max(0.3, z0 + Math.sin(x * 9) * 0.12)) : z0);
       const end = (ok) => {
         if (done) return; done = true; cancelAnimationFrame(raf); dodgeTap = null;
         bar.classList.add(ok ? 'ok' : 'ko');
         setTimeout(() => { bar.remove(); $('.dv-mid')?.classList.remove('qte'); aEl?.classList.remove('aim'); tEl?.classList.remove('aimed'); resolve(ok); }, ok ? 260 : 160);
       };
-      const step = () => { const x = (performance.now() - t0) / D; cur.style.left = `${Math.min(1, x) * 100}%`; if (x >= 1) end(false); else raf = requestAnimationFrame(step); };
-      dodgeTap = () => { const x = (performance.now() - t0) / D; end(x >= z0 && x <= z0 + zw); };
-      // petit délai : le temps de voir qui attaque qui
-      setTimeout(() => { if (!done && alive_) raf = requestAnimationFrame(step); }, T(250));
+      const step = () => {
+        const x = (performance.now() - t0) / D, pos = ease(Math.min(1, x));
+        cur.style.left = `${pos * 100}%`;
+        if (moving) zEl.style.left = `${zoneAt(x) * 100}%`;
+        if (x >= 1) end(false); else raf = requestAnimationFrame(step);
+      };
+      // toucher avant le départ du curseur = esquive ratée
+      dodgeTap = () => { if (!t0) return end(false); const x = (performance.now() - t0) / D, pos = ease(Math.min(1, x)), zz = zoneAt(x); end(pos >= zz && pos <= zz + zw); };
+      // départ après un délai variable : impossible de toucher en rythme
+      setTimeout(() => { if (!done && alive_) { t0 = performance.now(); raf = requestAnimationFrame(step); } }, (reduced ? 250 : 300) + Math.random() * 450);
     });
   }
   async function enemyTurn() {
@@ -262,7 +274,7 @@ export function runDuel(app, root, { title, onEnd }) {
       <li>Touche une de tes cartes, puis l’ennemi à frapper. La cible <b>riposte</b> avec son attaque.</li>
       <li>Chaque carte attaque une fois par tour. Ensuite, touche <b>Fin du tour</b> : les créatures corrompues attaquent.</li>
       <li>${icon('skull')} Le badge rouge sur une de tes cartes annonce les dégâts qu’elle va prendre : abats l’attaquant avant, ou mets-la à l’abri.</li>
-      <li><b>Esquive</b> : quand un ennemi attaque, touche l’écran quand le curseur passe dans la zone dorée. Réussie, ta carte ne prend rien et riposte quand même. Plus l’ennemi a un niveau élevé par rapport à ta carte, plus la zone est étroite.</li>
+      <li><b>Esquive</b> : quand un ennemi attaque, touche l’écran quand le curseur passe dans la zone dorée. Réussie, ta carte ne prend rien et riposte quand même. Le curseur part à un moment imprévisible et accélère. La zone est plus étroite face à un ennemi de plus haut niveau que ta carte, et chaque esquive réussie par une même carte rend la suivante plus dure. Face aux élites et aux gardiens, la zone bouge. Toucher trop tôt fait rater l’esquive.</li>
       <li><b>Réserve</b> : une fois par tour, touche une de tes cartes puis la Réserve pour l’échanger. La carte qui entre n’attaque pas ce tour-ci.</li>
       <li>Si une carte tombe, ta réserve prend sa place.</li>
       <li>Chaque attaque charge le <b>pouvoir du Gardien</b> : à ${GAUGE_MAX}, touche-le pour le lancer.</li></ul>
