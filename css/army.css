@@ -317,3 +317,29 @@ img.emblem { object-fit: contain; }
 .dc-banner .small { color: #D9D3C4; text-shadow: 0 1px 4px #000; }
 .dc-fold.bn-ranking > summary { min-height: 64px; display: flex; align-items: center; background: linear-gradient(90deg, rgba(10, 11, 16, .9) 35%, rgba(10, 11, 16, .2) 80%), var(--bn) right center / cover no-repeat; padding: 12px 16px; border-radius: inherit; }
 .dc-fold.bn-ranking[open] > summary { margin-bottom: 10px; border-radius: 16px 16px 0 0; }
+
+/* Accueil : tuiles sans petites icônes ; missions avec médaillons colorés */
+.home-acts .ha > .ic { display: none; }
+.td-ic.mi { width: 40px; height: 40px; flex: none; border-radius: 12px; display: grid; place-items: center; color: var(--mc); background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--mc) 32%, transparent), rgba(10, 11, 16, .9) 75%); border: 1px solid color-mix(in srgb, var(--mc) 55%, transparent); box-shadow: 0 0 12px color-mix(in srgb, var(--mc) 25%, transparent), inset 0 1px 0 rgba(255, 255, 255, .12); }
+.td-ic.mi .ic, .td-ic.mi .sigil, .td-ic.mi svg { width: 22px; height: 22px; }
+.td-row.done .td-ic.mi { --mc: #7FE0A0; }
+/* Ouverture des boosters : le texte sous la carte passe devant la pile */
+.op-label { position: relative; z-index: 40; text-shadow: 0 1px 4px #000; }
+/* Résumé : 2 cartes en haut, 3 en dessous */
+.op-grid { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; gap: 10px 8px; }
+.op-grid .op-cell { grid-column: span 2; }
+.op-grid .op-cell:nth-child(1) { grid-column: 2 / span 2; }
+.op-grid .op-cell:nth-child(2) { grid-column: 4 / span 2; }
+.op-grid .op-cell:only-child { grid-column: 3 / span 2; }
+/* Choix de faction : la dernière ligne centrée */
+.chips.fac-grid { display: flex !important; flex-wrap: wrap; justify-content: center; }
+.chips.fac-grid .chip { flex: 0 0 calc((100% - 18px) / 4); }
+/* Aventure : « Comment ça marche » en étapes illustrées */
+.how-steps { list-style: none; margin: 0 0 8px; padding: 0 14px; display: grid; gap: 10px; }
+.how-steps li { display: flex; gap: 12px; align-items: flex-start; padding: 10px; border-radius: 14px; background: linear-gradient(90deg, color-mix(in srgb, var(--hc) 12%, transparent), transparent 70%); border: 1px solid color-mix(in srgb, var(--hc) 30%, transparent); }
+.how-steps li > span:last-child { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.how-steps b { font: 700 .95rem/1.2 var(--f-display); color: var(--hc); letter-spacing: .03em; }
+.how-steps .small { color: #D9D3C4; }
+.how-ic { position: relative; flex: none; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; color: var(--hc); background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--hc) 30%, transparent), rgba(10, 11, 16, .95) 75%); border: 1px solid color-mix(in srgb, var(--hc) 60%, transparent); }
+.how-ic .ic { width: 22px; height: 22px; }
+.how-ic em { position: absolute; right: -4px; bottom: -4px; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font: 800 .65rem/1 var(--f-ui); font-style: normal; color: #1A1206; background: var(--hc); }

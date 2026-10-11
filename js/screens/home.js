@@ -10,6 +10,9 @@ import { openFusion } from './fusion.js';
 import { FUSION } from '../config.js';
 import { setScene } from '../ui/scene.js';
 
+// Icône et couleur de chaque type de mission du jour
+const MISSION_LOOK = { booster: ['booster', '#E0485E'], new: ['book', '#B48CFF'], rare: ['crystal', '#6FB4FF'], variant: ['sparkle', '#FF8AD8'], ritual: ['flame', '#FF9A3A'], depth: ['swords', '#9C7BFF'], win: ['crown', '#F2C14E'], daily: ['crystal', '#7FD3FF'], chest: ['lock', '#E8C35A'] };
+
 export default function home(app, root) {
   const g = app.game, cat = app.catalog, s = g.s;
   const total = g.total(), owned = g.uniqueCount();
@@ -25,13 +28,13 @@ export default function home(app, root) {
     const m = g.missions();
     const allClaimed = m.list.every((x) => x.claimed);
     const rows = [];
-    if (g.canDailyClaim()) rows.push(`<div class="td-row"><span class="td-ic gold">${icon('crystal')}</span><span class="td-t"><b>Offrande du jour</b><span class="small muted">${daily.streak > 1 ? `Série de ${daily.streak} jours` : 'À récupérer chaque jour'}</span></span><button class="btn small gold" data-act="daily">+${daily.amount}</button></div>`);
+    if (g.canDailyClaim()) rows.push(`<div class="td-row"><span class="td-ic mi" style="--mc:#7FD3FF">${icon('crystal')}</span><span class="td-t"><b>Offrande du jour</b><span class="small muted">${daily.streak > 1 ? `Série de ${daily.streak} jours` : 'À récupérer chaque jour'}</span></span><button class="btn small gold" data-act="daily">+${daily.amount}</button></div>`);
     m.list.forEach((x, i) => {
       const done = x.p >= x.n;
-      rows.push(`<div class="td-row ${x.claimed ? 'done' : ''}"><span class="td-ic">${x.claimed ? icon('check') : icon('star')}</span><span class="td-t"><b>${esc(x.text)}</b>${x.claimed ? '' : `<span class="progress"><i style="width:${(x.p / x.n) * 100}%"></i></span>`}</span>${x.claimed ? '<span class="small muted">Fait</span>' : done ? `<button class="btn small gold" data-act="mission" data-i="${i}">+${x.shards}</button>` : `<span class="td-n small muted">${x.p}/${x.n}</span>`}</div>`);
+      rows.push(`<div class="td-row ${x.claimed ? 'done' : ''}"><span class="td-ic mi" style="--mc:${x.faction ? cat.faction[x.faction].colors.secondary : MISSION_LOOK[x.kind]?.[1] || '#C8A45D'}">${x.claimed ? icon('check') : x.faction ? sigil(x.faction) : icon(MISSION_LOOK[x.kind]?.[0] || 'star')}</span><span class="td-t"><b>${esc(x.text)}</b>${x.claimed ? '' : `<span class="progress"><i style="width:${(x.p / x.n) * 100}%"></i></span>`}</span>${x.claimed ? '<span class="small muted">Fait</span>' : done ? `<button class="btn small gold" data-act="mission" data-i="${i}">+${x.shards}</button>` : `<span class="td-n small muted">${x.p}/${x.n}</span>`}</div>`);
     });
-    if (allClaimed && !m.bonus) rows.push(`<div class="td-row"><span class="td-ic gold">${icon('ticket')}</span><span class="td-t"><b>Bonus des 3 missions</b><span class="small muted">Un booster et un coffre de fer</span></span><button class="btn small primary" data-act="mbonus">Récupérer</button></div>`);
-    if (chests) rows.push(`<a class="td-row" href="#/coffres"><span class="td-ic gold">${icon('lock')}</span><span class="td-t"><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Pleins de boosters</span></span>${icon('next')}</a>`);
+    if (allClaimed && !m.bonus) rows.push(`<div class="td-row"><span class="td-ic mi" style="--mc:#F2C14E">${icon('ticket')}</span><span class="td-t"><b>Bonus des 3 missions</b><span class="small muted">Un booster et un coffre de fer</span></span><button class="btn small primary" data-act="mbonus">Récupérer</button></div>`);
+    if (chests) rows.push(`<a class="td-row" href="#/coffres"><span class="td-ic mi" style="--mc:#E8C35A">${icon('lock')}</span><span class="td-t"><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Pleins de boosters</span></span>${icon('next')}</a>`);
     return `<section class="panel today"><div class="today-head"><h2>Aujourd’hui</h2></div>${rows.join('')}</section>`;
   }
 
@@ -41,8 +44,8 @@ export default function home(app, root) {
     </section>
 
     <div class="home-acts">
-      <a class="ha ha-pack" href="#/boutique"><span class="ha-art"></span>${icon('booster')}<b>Boosters</b><span>${freeCount ? `${freeCount} offert${freeCount > 1 ? 's' : ''}` : 'Tente ta chance'}</span>${freeCount ? `<span class="cta-badge">${freeCount}</span>` : ''}</a>
-      <a class="ha ha-dive" href="#/descente"><span class="ha-art"></span>${icon('swords')}<b>Aventure</b><span>${g.descent().run ? `En cours · étage ${g.descent().run.floor}` : g.torchesLeft() ? `${g.torchesLeft()} torche${g.torchesLeft() > 1 ? 's' : ''} aujourd’hui` : 'Reviens demain'}</span></a>
+      <a class="ha ha-pack" href="#/boutique"><span class="ha-art"></span><b>Boosters</b><span>${freeCount ? `${freeCount} offert${freeCount > 1 ? 's' : ''}` : 'Tente ta chance'}</span>${freeCount ? `<span class="cta-badge">${freeCount}</span>` : ''}</a>
+      <a class="ha ha-dive" href="#/descente"><span class="ha-art"></span><b>Aventure</b><span>${g.descent().run ? `En cours · étage ${g.descent().run.floor}` : g.torchesLeft() ? `${g.torchesLeft()} torche${g.torchesLeft() > 1 ? 's' : ''} aujourd’hui` : 'Reviens demain'}</span></a>
     </div>
 
     ${todayHTML()}

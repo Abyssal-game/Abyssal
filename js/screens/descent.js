@@ -15,6 +15,7 @@ import { sync } from '../cloud/sync.js';
 
 // Illustrations des portes et des bonus
 const DOOR_ART = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss', rest: 'rest', altar: 'altar', treasure: 'treasure' };
+const HOW = [['user', '#7FA8D8', 'Ton équipe', '5 de tes cartes : 3 au combat, 2 en réserve. Chaque doublon les fait monter de niveau.'], ['swords', '#E0485E', 'Le duel', 'Touche ta carte, puis l’ennemi. La cible riposte. Ensuite, « Fin du tour ».'], ['eye', '#9FE0FF', 'Esquive et réserve', 'Pendant le tour ennemi, touche au bon moment pour esquiver. Une fois par tour, échange une carte avec la réserve.'], ['book', '#B48CFF', 'Connaître l’ennemi', 'Posséder la carte d’une créature corrompue donne +1 dégât contre elle.'], ['star', '#F2C14E', 'Chaque étage', 'Combat simple ou élite, puis un bonus au choix : source, autel ou trésor. Gardien tous les 5 étages.'], ['lock', '#E8C35A', 'Le coffre', 'Remonte quand tu veux : plus tu descends, plus le coffre est beau [bois, fer, or, abyssal].']];
 const ROOM_ICON = { fight: 'swords', elite: 'skull', altar: 'star', rest: 'heart', treasure: 'crystal', boss: 'crown' };
 
 export default function descent(app, root) {
@@ -46,14 +47,9 @@ export default function descent(app, root) {
       </section>
       ${Object.values(g.s.items).some((n) => n > 0) ? bagHTML(g) : ''}
       <details class="panel dc-fold bn-ranking" id="lb"><summary>${icon('trophy')} Classement du jour</summary><div class="lb-body small muted">Chargement…</div></details>
-      <details class="panel dc-fold"><summary>${icon('info')} Comment ça marche</summary><ul class="small">
-        <li>Tes cartes sont des créatures liées à ton livre : elles combattent pour toi. 3 au combat, 2 en réserve.</li>
-        <li>Au combat, touche une de tes cartes puis l’ennemi à attaquer. La cible riposte. Chaque carte attaque une fois par tour, puis « Fin du tour ».</li>
-        <li>Les créatures de l’Abysse sont des versions <b>corrompues</b>. Posséder la carte d’une créature donne +1 dégât contre elle.</li>
-        <li>${DESCENT.torches} expéditions avec coffre par jour, puis tu peux rejouer sans coffre. Tous les 5 étages, un gardien garde un coffre.</li>
-        <li>Chaque étage se gagne au combat (simple, ou élite plus dangereuse et mieux payée). Après chaque victoire, choisis un bonus : source (soin), autel (bénédiction) ou trésor (éclats).</li>
-        <li>Pendant le tour ennemi, touche l’écran au bon moment pour <b>esquiver</b>. Une fois par tour, tu peux <b>échanger</b> une carte avec ta réserve.</li>
-        <li>Remonte quand tu veux : la profondeur atteinte décide du coffre (1–4 bois, 5–9 fer, 10–14 or, 15+ abyssal).</li></ul></details>`;
+      <details class="panel dc-fold dc-how"><summary>${icon('info')} Comment ça marche</summary>
+        <ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${icon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol>
+        <p class="small muted center">${DESCENT.torches} expéditions avec coffre par jour, puis tu peux rejouer sans coffre.</p></details>`;
     root.querySelector('#lb').addEventListener('toggle', (e) => { if (e.target.open) loadBoard(); }, { once: true });
   }
 

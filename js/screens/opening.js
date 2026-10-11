@@ -118,15 +118,16 @@ export function openPack(app, type, { faction, onDone } = {}) {
     pack.addEventListener('pointerdown', (e) => {
       if (done || busy) return;
       const r = pack.getBoundingClientRect();
-      start = { x: e.clientX, w: r.width, moved: false };
+      start = { x: e.clientX, y: e.clientY, w: r.width, moved: false };
       pack.setPointerCapture(e.pointerId);
     });
     pack.addEventListener('pointermove', (e) => {
       if (!start || done) return;
-      const dx = e.clientX - start.x;
-      if (!start.moved && Math.abs(dx) < 8) return;
-      if (!start.moved) { start.moved = true; setDir(dx > 0 ? 1 : -1); pack.classList.add('dragging'); }
-      setP(Math.max(p, (dx * dir) / (start.w * 0.8)));
+      // déchirure tolérante : le geste peut être horizontal ou en biais, n'importe où sur le paquet
+      const dx = e.clientX - start.x, dy = e.clientY - start.y, d = Math.abs(dx) >= Math.abs(dy) * 0.6 ? dx : (dx || 1) / Math.abs(dx || 1) * Math.hypot(dx, dy);
+      if (!start.moved && Math.hypot(dx, dy) < 6) return;
+      if (!start.moved) { start.moved = true; setDir(d >= 0 ? 1 : -1); pack.classList.add('dragging'); }
+      setP(Math.max(p, Math.abs(d) / (start.w * 0.5)));
       if (p >= 1) { start = null; pack.classList.remove('dragging'); finish(); }
     });
     const up = () => {
@@ -135,7 +136,7 @@ export function openPack(app, type, { faction, onDone } = {}) {
       start = null;
       pack.classList.remove('dragging');
       if (!moved) { setDir(1); return reduced ? finish() : animateTo(650); }
-      if (p > 0.55) animateTo(220);
+      if (p > 0.25) animateTo(240);
       else { pack.classList.add('snap'); setP(0); lastTick = 0; setTimeout(() => pack.classList.remove('snap'), 300); }
     };
     pack.addEventListener('pointerup', up);
