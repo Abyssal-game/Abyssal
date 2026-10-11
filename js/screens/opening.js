@@ -104,7 +104,7 @@ export function openPack(app, type, { faction, onDone } = {}) {
       if (p - lastTick > 0.06) { lastTick = p; app.sfx.rip(p); }
     };
     const setDir = (d) => { dir = d; edge.setAttribute('d', edgePath(d)); pack.style.setProperty('--dir', d); };
-    const finish = () => { if (!done) { done = true; tear(dir); } };
+    const finish = () => { if (!done) { done = true; stage.style.touchAction = ''; tear(dir); } };
     const animateTo = (ms) => {
       busy = true;
       const from = p, t0 = performance.now();
@@ -115,32 +115,43 @@ export function openPack(app, type, { faction, onDone } = {}) {
       };
       requestAnimationFrame(step);
     };
-    pack.addEventListener('pointerdown', (e) => {
-      if (done || busy) return;
-      const r = pack.getBoundingClientRect();
-      start = { x: e.clientX, y: e.clientY, w: r.width, moved: false };
-      pack.setPointerCapture(e.pointerId);
-    });
-    pack.addEventListener('pointermove', (e) => {
-      if (!start || done) return;
-      // déchirure tolérante : le geste peut être horizontal ou en biais, n'importe où sur le paquet
-      const dx = e.clientX - start.x, dy = e.clientY - start.y, d = Math.abs(dx) >= Math.abs(dy) * 0.6 ? dx : (dx || 1) / Math.abs(dx || 1) * Math.hypot(dx, dy);
-      if (!start.moved && Math.hypot(dx, dy) < 6) return;
-      if (!start.moved) { start.moved = true; setDir(d >= 0 ? 1 : -1); pack.classList.add('dragging'); }
-      setP(Math.max(p, Math.abs(d) / (start.w * 0.5)));
-      if (p >= 1) { start = null; pack.classList.remove('dragging'); finish(); }
-    });
-    const up = () => {
-      if (!start || done) return;
+    // Déchirure très tolérante : le doigt peut partir de n'importe où sur l'écran, dans n'importe
+    // quelle direction. Dès ~20 px de glissé, le booster finit de se déchirer tout seul ;
+    // il ne revient jamais en arrière. Un simple toucher l'ouvre aussi.
+    const zone = stage;
+    const pt = (e) => (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]) || e;
+    const begin = (e) => {
+      if (done || busy || start) return;
+      const q = pt(e), r = pack.getBoundingClientRect();
+      start = { x: q.clientX, y: q.clientY, w: r.width, moved: false };
+    };
+    const drag = (e) => {
+      if (!start || done || busy) return;
+      const q = pt(e), dx = q.clientX - start.x, dy = q.clientY - start.y, dist = Math.hypot(dx, dy);
+      if (e.cancelable) e.preventDefault();
+      if (!start.moved && dist < 8) return;
+      if (!start.moved) { start.moved = true; setDir(dx >= 0 ? 1 : -1); pack.classList.add('dragging'); }
+      setP(Math.max(p, dist / (start.w * 0.6)));
+      if (dist > 20) { start = null; pack.classList.remove('dragging'); reduced ? finish() : animateTo(300); }
+    };
+    const end = () => {
+      if (!start || done || busy) return;
       const moved = start.moved;
       start = null;
       pack.classList.remove('dragging');
-      if (!moved) { setDir(1); return reduced ? finish() : animateTo(650); }
-      if (p > 0.25) animateTo(240);
-      else { pack.classList.add('snap'); setP(0); lastTick = 0; setTimeout(() => pack.classList.remove('snap'), 300); }
+      if (!moved) setDir(1);
+      reduced ? finish() : animateTo(moved ? 260 : 600);
     };
-    pack.addEventListener('pointerup', up);
-    pack.addEventListener('pointercancel', up);
+    zone.style.touchAction = 'none';
+    zone.addEventListener('pointerdown', begin);
+    zone.addEventListener('pointermove', drag);
+    zone.addEventListener('pointerup', end);
+    zone.addEventListener('pointercancel', end);
+    // secours pour Safari : les événements tactiles, au cas où les « pointer » sont interrompus
+    zone.addEventListener('touchstart', begin, { passive: true });
+    zone.addEventListener('touchmove', drag, { passive: false });
+    zone.addEventListener('touchend', end);
+    zone.addEventListener('touchcancel', end);
     pack.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && !done && !busy) { e.preventDefault(); setDir(1); animateTo(650); } });
   }
 
