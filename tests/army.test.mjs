@@ -167,3 +167,13 @@ test('gardiens, créature de la semaine et 7e jour d’offrande', async () => {
   const r = g.claimDaily();
   assert.equal(r.streak, 7); assert.equal(r.chest, 'fer');
 });
+
+test('équipe : on peut tout retirer ; la Descente est seulement bloquée sous 3 créatures', () => {
+  const g = newGame('t');
+  g.team();
+  g.setTeam([]);
+  assert.deepEqual(g.team(), [], 'pas de remplissage automatique après un choix du joueur');
+  assert.throws(() => g.startRun(), /au moins 3/);
+  g.setTeam(STARTER.slice(0, 3));
+  assert.ok(g.startRun());
+});

@@ -37,7 +37,6 @@ export function toggleTeam(app, id) {
   try {
     const t = g.team().slice();
     if (t.includes(id)) {
-      if (t.length <= TEAM.active) throw new Error(`Il faut au moins ${TEAM.active} créatures dans ton équipe.`);
       g.setTeam(t.filter((x) => x !== id));
     } else {
       if (t.length >= TEAM.active + TEAM.reserve) throw new Error('Ton équipe est complète : retire d’abord une créature.');
@@ -84,6 +83,8 @@ export function teamScreen(app, root) {
       <section class="panel v2-team">
         <div class="v2-budget"><span>Budget</span><span class="progress"><i style="width:${Math.min(100, (cost / BUDGET) * 100)}%;--bar:${cost > BUDGET ? '#FF5468' : 'var(--gold)'}"></i></span><b>${cost} / ${BUDGET}</b></div>
         <p class="small muted">Coût : Commune 1, Peu commune 2, Rare 3, Hyper rare 4, Mythique 5, Secrète 6.</p>
+        ${team.length < TEAM.active ? `<p class="small v2-warn">${icon('info')} Il faut au moins ${TEAM.active} créatures pour partir dans la Descente (encore ${TEAM.active - team.length}).</p>` : ''}
+        ${team.length && !run ? `<button class="linkish small" data-act="clear">Vider l’équipe</button>` : ''}
         <h3 class="section-title">Au combat</h3><div class="v2-slots">${[0, 1, 2].map(slot).join('')}</div>
         <h3 class="section-title">En réserve</h3><div class="v2-slots res">${[3, 4].map(slot).join('')}</div>
         <div class="panel v2-skill ult" style="--uc:${ult.color}"><b>${icon('sparkle')} Pouvoir : ${esc(ult.name)}</b><p class="small">${esc(ult.desc)}</p><p class="small muted">${ult.card ? `Porté par ${esc(cat.get(ult.card).name)}.` : 'Ajoute une Mythique ou une Secrète pour un pouvoir plus puissant.'}</p></div>
@@ -93,7 +94,10 @@ export function teamScreen(app, root) {
     lazyArt(root);
   };
   root.addEventListener('click', (e) => { const t = e.target.closest('.tcg'); if (t) openCreature(app, t.dataset.id, { onChange: draw }); });
-  bindActions(root, { sort() { ui.sort = ui.sort === 'cost' ? 'power' : 'cost'; draw(); } });
+  bindActions(root, {
+    sort() { ui.sort = ui.sort === 'cost' ? 'power' : 'cost'; draw(); },
+    clear() { try { g.setTeam([]); app.sfx.tap(); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
+  });
   draw();
   coach(app, 'army-team', 'Ton équipe : <b>3 créatures au combat</b> et <b>2 en réserve</b>. Chaque carte a une <b>capacité</b> (icône en haut à gauche), son <b>attaque</b> et ses <b>PV</b>, et un <b>coût</b> (en haut à droite) : le total ne doit pas dépasser 15. Chaque doublon fait <b>monter de niveau</b> la créature.', { title: 'Compose ton équipe' });
   app.refreshView = draw;

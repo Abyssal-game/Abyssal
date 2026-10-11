@@ -405,7 +405,8 @@ export class Game {
   team() {
     let t = (this.s.team || []).filter((id) => this.owns(id));
     if (this.teamCost(t) > BUDGET) t = [];
-    if (t.length < TEAM.active) {
+    // remplissage automatique seulement tant que le joueur n'a jamais composé son équipe lui-même
+    if (t.length < TEAM.active && !this.s.teamSet) {
       if (this.uniqueCount() < TEAM.active) {
         STARTER.forEach((id) => { if (!this.owns(id)) { this.addCard(id, 'normal', 'reward'); this.s.collection[id].isNew = false; } });
         t = STARTER.slice(); // rôles complémentaires, dans le bon ordre
@@ -431,6 +432,7 @@ export class Game {
     if (this.teamCost(list) > BUDGET) throw new Error(`Ton équipe dépasse le budget de ${BUDGET} points.`);
     if (this.s.descent.run) throw new Error('Termine d’abord ton expédition.');
     this.s.team = list;
+    this.s.teamSet = true;
     this.persist();
     return list;
   }

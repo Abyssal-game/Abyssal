@@ -430,3 +430,4 @@ img.emblem { object-fit: contain; }
 .tab[aria-current="page"]::before { top: 8px; width: 46px; height: 46px; border-radius: 50%; background: radial-gradient(circle, rgba(242, 193, 78, .22), transparent 70%); box-shadow: none; z-index: -1; }
 .tab[aria-current="page"] .ic { transform: translateY(-2px) scale(1.08); filter: drop-shadow(0 0 6px rgba(242, 193, 78, .6)); }
 .tab-main .orb { background: radial-gradient(circle at 50% 30%, #E0485E, #8E1630 55%, #3A0610) !important; border: 2px solid #F2D58A !important; box-shadow: 0 0 0 4px rgba(10, 8, 16, .95), 0 0 0 5px rgba(242, 213, 138, .35), 0 0 24px rgba(224, 72, 94, .6) !important; }
+.v2-warn { color: #FFB3BF; display: flex; gap: 6px; align-items: center; justify-content: center; } .v2-warn .ic { width: 15px; height: 15px; flex: none; }

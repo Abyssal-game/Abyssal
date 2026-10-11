@@ -44,6 +44,7 @@ export default function descent(app, root) {
         ${teamStrip(team)}
         <p class="small muted center">Pouvoir : <b>${esc(g.ultimate(team).name)}</b> · budget ${g.teamCost(team)} / ${BUDGET}</p>
         <a class="btn small ghost block" href="#/equipe">${icon('user')}Modifier l’équipe</a>
+        ${team.length < TEAM.active ? `<p class="small v2-warn center">${icon('info')} Ajoute au moins ${TEAM.active} créatures à ton équipe pour descendre.</p>` : ''}
         <button class="btn ${ui.cursed && torches ? 'danger' : 'primary'} block big-cta" data-act="start" ${team.length >= TEAM.active ? '' : 'disabled'}>${icon('flame')}${torches ? 'Descendre' : 'Descendre (sans coffre)'}</button>
         ${torches ? `<div class="dc-curse-row ${ui.cursed ? 'on' : ''}"><span><b>${icon('skull')} Descente maudite</b><span class="small muted">coffre d’une qualité au-dessus, mais rien si l’équipe tombe</span></span><button class="switch" role="switch" aria-checked="${ui.cursed}" data-act="curse" aria-label="Descente maudite"><i></i></button></div>` : ''}
       </section>
