@@ -19,6 +19,14 @@ export const KEYWORDS = {
   cri:       { name: 'Cri',       icon: 'sparkle', desc: 'Au début de son tour, ses alliés gagnent +1 en attaque.' },
   deferlante: { name: 'Déferlante', icon: 'flame', desc: 'Son attaque touche aussi les voisins de la cible (moitié des dégâts).' },
 };
+// Pouvoirs des gardiens (un tous les 5 étages, dans cet ordre, puis on recommence)
+export const BOSS_POWERS = {
+  carapace: { name: 'Carapace', desc: 'Un tour sur deux, le gardien se couvre d’un bouclier qui bloque un coup.' },
+  givre:    { name: 'Souffle de givre', desc: 'Un tour sur deux, le gardien gèle ta créature la plus forte.' },
+  fureur:   { name: 'Fureur croissante', desc: 'À chaque tour, le gardien gagne +1 en attaque.' },
+  devoreur: { name: 'Dévoreur', desc: 'À chaque tour, le gardien récupère 15 % de ses PV.' },
+};
+export const bossPowerOf = (floor) => ['carapace', 'givre', 'fureur', 'devoreur'][(Math.max(1, Math.floor(floor / 5)) - 1) % 4];
 const KW_BY_ROLE = { protecteur: 'garde', degats: 'assaut', soin: 'soin', poison: 'venin', controle: 'gel', soutien: 'cri', zone: 'deferlante' };
 // Gabarit par rôle à la rareté Commune, niveau 1
 const BASE = { protecteur: [2, 11], degats: [4, 6], soin: [1, 7], poison: [2, 7], controle: [2, 7], soutien: [2, 8], zone: [2, 6] };
@@ -39,8 +47,8 @@ export function duelUnit(card, { side = 'ally', level = 1, scale = null, boss = 
 }
 
 // ——— État ———
-export function createDuel(allies, enemies, { gauge = 0, ult = 'sceau', power = 1, known = {}, ruleMult = 1 } = {}) {
-  const st = { units: {}, order: { ally: [], enemy: [] }, turn: 'ally', round: 1, gauge: Math.min(GAUGE_MAX, gauge), ult, power, known, ruleMult, over: null, kills: [], swapped: false, queue: [] };
+export function createDuel(allies, enemies, { gauge = 0, ult = 'sceau', power = 1, known = {}, ruleMult = 1, bossPower = null } = {}) {
+  const st = { units: {}, order: { ally: [], enemy: [] }, turn: 'ally', round: 1, gauge: Math.min(GAUGE_MAX, gauge), ult, power, known, ruleMult, over: null, kills: [], swapped: false, queue: [], bossPower };
   for (const u of [...allies, ...enemies]) { st.units[u.uid] = { ...u }; st.order[u.side].push(u.uid); }
   ['ally', 'enemy'].forEach((side) => front(st, side).forEach((u) => { u.inPlay = true; }));
   startTurn(st, 'ally', []);
@@ -110,6 +118,20 @@ export function attack(st, aUid, tUid, { dodged = false } = {}) {
   return ev;
 }
 
+// ——— Pouvoir du gardien, au début de son tour ———
+function bossAct(st, ev) {
+  const b = front(st, 'enemy').find((u) => u.boss && u.hp > 0);
+  if (!b) return;
+  const even = st.round % 2 === 1; // tours 1, 3, 5…
+  const p = st.bossPower;
+  if (p === 'carapace' && even) { b.shield = 1; ev.push({ t: 'boss', u: b.uid, s: 'Carapace !' }); }
+  else if (p === 'givre' && even) {
+    const t = front(st, 'ally').filter((u) => u.hp > 0).sort((x, y) => y.atk - x.atk)[0];
+    if (t) { t.frozen = 1; ev.push({ t: 'boss', u: b.uid, s: 'Souffle de givre' }); ev.push({ t: 'status', u: t.uid, s: 'Gelé' }); }
+  } else if (p === 'fureur') { b.atk += 1; ev.push({ t: 'boss', u: b.uid, s: `Fureur : ${b.atk} ATQ` }); }
+  else if (p === 'devoreur' && b.hp < b.maxHp) { heal(b, b.maxHp * 0.15, ev); ev.push({ t: 'boss', u: b.uid, s: 'Dévore…' }); }
+}
+
 // ——— Début et fin de tour ———
 function startTurn(st, side, ev) {
   st.turn = side;
@@ -119,6 +141,7 @@ function startTurn(st, side, ev) {
     if (u.frozen) { u.frozen--; if (u.frozen === 0) u.attacked = true; } // gelé : passe ce tour
     if (u.poison) { damage(st, u, 2, ev); u.poison = Math.max(0, u.poison - 2); }
   }
+  if (side === 'enemy' && st.bossPower) bossAct(st, ev);
   const criers = front(st, side).filter((u) => u.kw === 'cri' && u.hp > 0);
   if (criers.length) { front(st, side).forEach((u) => { u.boost += criers.length; }); ev.push({ t: 'status', u: criers[0].uid, s: `Cri : +${criers.length} ATQ` }); }
   check(st, ev);

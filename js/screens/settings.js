@@ -24,7 +24,7 @@ export default function settings(app, root) {
   function render() {
     const s = g.s.settings;
     root.innerHTML = `
-      <header class="screen-head"><h1>Réglages</h1></header>
+      <header class="screen-head ui-hero bn-settings"><h1>Réglages</h1><p class="muted">Son, animations, sauvegarde et compte.</p></header>
       <section class="panel stack">
         <h2>Son et animations</h2>
         ${toggle('sound', 'Effets sonores', 'Sons synthétisés : ouverture, révélation, succès.')}

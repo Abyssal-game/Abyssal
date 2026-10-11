@@ -149,3 +149,21 @@ test('variantes retirées : les exemplaires deviennent holographiques ou or', ()
   const h = newGame('v2', st);
   assert.deepEqual(h.s.collection['PRI-031'].v, { normal: 1, holo: 3, gold: 1 });
 });
+
+test('gardiens, créature de la semaine et 7e jour d’offrande', async () => {
+  const D = await import('../js/core/duel.js');
+  assert.equal(D.bossPowerOf(5), 'carapace'); assert.equal(D.bossPowerOf(10), 'givre'); assert.equal(D.bossPowerOf(25), 'carapace');
+  const card = (id) => catalog.get(id);
+  const st = D.createDuel(STARTER.map((id) => D.duelUnit(card(id))), [D.duelUnit(card('ABY-030'), { side: 'enemy', boss: true })], { bossPower: 'fureur' });
+  const boss = Object.values(st.units).find((u) => u.boss), atk0 = boss.atk;
+  D.endTurn(st);
+  assert.ok(boss.hp <= 0 || boss.atk > atk0, 'la fureur augmente l’attaque');
+  const g = newGame('w');
+  const w = g.weekly();
+  assert.ok(catalog.get(w.id) && !w.done);
+  g.s.daily = { last: null, streak: 0 };
+  for (let i = 0; i < 6; i++) g.s.daily = { last: null, streak: i }; // série de 6 jours
+  g.s.daily = { last: '2026-10-11', streak: 6 };
+  const r = g.claimDaily();
+  assert.equal(r.streak, 7); assert.equal(r.chest, 'fer');
+});

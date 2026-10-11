@@ -83,7 +83,7 @@ export default function bestiary(app, root) {
 
   function render() {
     root.innerHTML = `
-      <header class="screen-head"><h1>Bestiaire</h1><p class="muted">Le livre interdit, page après page.</p></header>
+      <header class="screen-head ui-hero bn-bestiary"><h1>Bestiaire</h1><p class="muted">Le livre interdit, page après page.</p></header>
       <div class="seg wide" role="tablist">${[['creatures', 'Créatures'], ['chasse', 'Chasse'], ['chroniques', 'Royaumes et histoire']].map(([k, l]) => `<button class="seg-b" role="tab" data-act="tab" data-v="${k}" aria-selected="${st.tab === k}" aria-pressed="${st.tab === k}">${l}</button>`).join('')}</div>
       <div class="stack best-body">${st.tab === 'chroniques' ? chronicles() : st.tab === 'chasse' ? hunt() : creatures()}</div>`;
     const q = root.querySelector('#best-q');

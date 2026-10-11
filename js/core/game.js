@@ -1,10 +1,10 @@
 // État du joueur et règles de progression. Toute modification passe par ici
 // et est enregistrée immédiatement : une carte affichée est une carte sauvegardée.
 import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, FUSION, LUCK_POINTS, RITUAL, ITEMS } from '../config.js';
-import { drawBooster, cryptoRandom, currentEvent, boosterOdds } from './boosters.js';
+import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
 import { DESCENT, CHESTS, floorDoors, floorEnemies, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, huntStage, HUNT_STAGES } from './descent.js';
-import { createDuel, autoDuel, duelUnit, GAUGE_MAX } from './duel.js';
+import { createDuel, autoDuel, duelUnit, GAUGE_MAX, bossPowerOf } from './duel.js';
 import { STARTER, COST, BUDGET, TEAM, ULTS, levelFromDups, canUlt, ultOf } from './army.js';
 
 const RI = (r) => RARITY_ORDER.indexOf(r);
@@ -220,11 +220,14 @@ export class Game {
     const { streak, amount } = this.dailyAmount();
     this.s.daily = { last: today(this.clock()), streak };
     this.s.shards += amount;
+    // 7e jour d'affilée : un coffre de fer en plus (et ainsi de suite tous les 7 jours)
+    const chest = streak % 7 === 0 ? 'fer' : null;
+    if (chest) this.addChests({ [chest]: 1 });
     this.s.stats.daily++;
     this.track('daily', 1);
     const progress = this.checkProgress();
     this.persist();
-    return { amount, streak, progress };
+    return { amount, streak, chest, progress };
   }
 
   craftCost(id) { return ECONOMY.craftAsh[this.catalog.get(id).rarity]; }
@@ -453,6 +456,17 @@ export class Game {
     return packs;
   }
 
+  // Créature de la semaine : la même pour tout le monde, elle apparaît comme élite (étage 3 et plus).
+  // La vaincre donne sa carte, une fois par semaine.
+  weekly() {
+    const w = weekIndex(this.clock());
+    const pool = this.catalog.cards.filter((c) => c.rarity === 'R' || c.rarity === 'HR');
+    let h = 2166136261 ^ w; h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0;
+    const card = pool[h % pool.length];
+    const done = this.s.weekly?.week === w && this.s.weekly.done;
+    return { week: w, id: card.id, done };
+  }
+
   // La Descente -------------------------------------------------------------
   descent() {
     const d = this.s.descent;
@@ -511,7 +525,10 @@ export class Game {
       // les créatures du Bestiaire, corrompues ; l'état du duel est gardé dans l'expédition (reprise exacte)
       const sc = enemyScale(run.floor);
       const lvl = enemyLevel(run.floor, room);
-      const enemies = floorEnemies(this.catalog, run.day, run.floor, room).map((e) => duelUnit(this.catalog.get(e.id), { side: 'enemy', scale: sc, level: e.boss || e.elite ? lvl : enemyLevel(run.floor, 'fight'), boss: e.boss, elite: e.elite }));
+      const wk = this.weekly();
+      const list = floorEnemies(this.catalog, run.day, run.floor, room);
+      if (room === 'elite' && run.floor >= 3 && !wk.done) list.forEach((e) => { if (e.elite) e.id = wk.id; });
+      const enemies = list.map((e) => duelUnit(this.catalog.get(e.id), { side: 'enemy', scale: sc, level: e.boss || e.elite ? lvl : enemyLevel(run.floor, 'fight'), boss: e.boss, elite: e.elite }));
       for (const e of enemies) {
         const f = this.catalog.get(e.id)?.faction;
         if (rule.key === 'furie' && f === rule.faction) e.atk = Math.round(e.atk * 1.25 + 0.4);
@@ -519,7 +536,7 @@ export class Game {
       }
       const known = {};
       enemies.forEach((e) => { if (this.knows(e.id)) known[e.id] = true; });
-      run.battle = createDuel(this.runUnits(), enemies, { gauge: run.gauge, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1 });
+      run.battle = createDuel(this.runUnits(), enemies, { gauge: run.gauge, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, bossPower: room === 'boss' ? bossPowerOf(run.floor) : null });
       run.room = room; run.phase = 'battle'; out.battle = true;
     }
     if (run.phase === 'cleared') this.clearFloor();
@@ -583,6 +600,11 @@ export class Game {
     run.battle = null;
     const won = st.over === 'won' && run.team.some((m) => !m.fallen);
     const out = { room, won, discovered };
+    const wk = this.weekly();
+    if (won && !wk.done && st.kills.includes(wk.id)) {
+      this.s.weekly = { week: wk.week, done: true };
+      out.weekly = { id: wk.id, ...this.addCard(wk.id, 'normal', 'booster') };
+    }
     if (won) {
       const hunt = room === 'elite' && this.rule(run.day).key === 'chasse';
       out.shards = this.gainShards((8 + 3 * run.floor) * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1) * (hunt ? 2 : 1));

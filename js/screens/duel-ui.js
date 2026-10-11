@@ -8,7 +8,7 @@ import { icon, EMBLEM } from '../ui/icons.js';
 import { esc, openSheet, toast } from '../ui/dom.js';
 import { coach } from '../ui/coach.js';
 import { cardHTML } from '../ui/card.js';
-import { KEYWORDS, GAUGE_MAX, front, reserve, targetsFor, canAct, attack, beginEnemyTurn, nextStrike, strike, endEnemyTurn, dodgeWindow, threats, canSwap, swap, useUlt, ultReady, autoAttacks } from '../core/duel.js';
+import { KEYWORDS, BOSS_POWERS, GAUGE_MAX, front, reserve, targetsFor, canAct, attack, beginEnemyTurn, nextStrike, strike, endEnemyTurn, dodgeWindow, threats, canSwap, swap, useUlt, ultReady, autoAttacks } from '../core/duel.js';
 import { ULTS } from '../core/army.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -54,7 +54,7 @@ export function runDuel(app, root, { title, onEnd }) {
     return `<button class="dv-c ${u.side} ${u.side === 'enemy' ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${acts && u.side === 'ally' ? 'ready' : ''} ${u.attacked && u.side === st.turn ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''}" data-uid="${u.uid}" style="--rc:${RARITY[u.rarity].color}">
       <span class="dv-art"><img alt="" src="${artUrl(c)}"></span>
       <span class="dv-kw" title="${esc(kw.name)}">${icon(kw.icon)}<em>${esc(kw.name)}</em></span>
-      ${u.boss ? '<span class="dv-boss">Gardien</span>' : u.elite ? '<span class="dv-boss elite">Élite</span>' : ''}
+      ${u.boss && st.bossPower ? `<span class="dv-bpow">${esc(BOSS_POWERS[st.bossPower].name)}</span>` : ''}${u.boss ? '<span class="dv-boss">Gardien</span>' : u.elite ? '<span class="dv-boss elite">Élite</span>' : ''}
       <span class="dv-nm">${esc(c.name)}</span>
       <span class="dv-atk">${icon('swords')}<b>${u.atk + (u.boost || 0)}</b></span>
       <span class="dv-hp ${u.hp < u.maxHp ? 'hurt' : ''}">${icon('heart')}<b>${Math.max(0, u.hp)}</b></span>
@@ -71,6 +71,19 @@ export function runDuel(app, root, { title, onEnd }) {
     const on = canSwap(st) && sel && st.units[sel]?.side === 'ally';
     return `<button class="dv-resv ${on ? 'on' : ''} ${canSwap(st) ? '' : 'used'}" data-d="swap" aria-label="Échanger avec la réserve">${r.map((u) => `<img alt="" src="${artUrl(cat.get(u.id), { lite: true })}">`).join('')}<small>${icon('back')}Réserve</small></button>`;
   };
+  // Tutoriel jouable du premier combat : une main dorée montre quoi toucher
+  let guide = !g.s.tips?.['duel-guide'];
+  function guideStep() {
+    root.querySelectorAll('.guide').forEach((x) => x.classList.remove('guide'));
+    if (!guide || busy || st.turn !== 'ally' || st.over) return;
+    const ready = front(st, 'ally').filter((u) => canAct(st, u));
+    let t = null, txt = '';
+    if (sel && canAct(st, st.units[sel])) { t = root.querySelector(`[data-uid="${targetsFor(st, 'ally')[0]}"]`); txt = 'Touche cet ennemi pour l’attaquer'; }
+    else if (ready.length) { t = root.querySelector(`[data-uid="${ready[0].uid}"]`); txt = 'Touche ta créature'; }
+    else { t = root.querySelector('.dv-end'); txt = 'Toutes tes créatures ont attaqué : touche « Fin du tour »'; }
+    if (t) { t.classList.add('guide'); say(`<b class="dc-good">${txt}</b>`); }
+  }
+  function endGuide() { if (!guide) return; guide = false; g.s.tips = { ...(g.s.tips || {}), 'duel-guide': Date.now(), 'v2-duel': Date.now() }; g.persist(); }
   function draw() {
     if (!alive_) return;
     th = threats(st);
@@ -91,6 +104,7 @@ export function runDuel(app, root, { title, onEnd }) {
       say(su ? (canAct(st, su) ? `Touche l’ennemi à attaquer${canSwap(st) ? ', ou la <b>Réserve</b> pour l’échanger' : ''}` : canSwap(st) ? 'Touche la <b>Réserve</b> pour l’échanger' : 'Elle a déjà joué ce tour')
         : left ? 'Touche une de tes cartes pour attaquer' : 'Touche <b>Fin du tour</b>');
     }
+    guideStep();
   }
   const el = (uid) => root.querySelector(`[data-uid="${uid}"]`);
   const shake = (big) => { if (reduced) return; const d = root.querySelector('.dv'); d.classList.remove('shake', 'big'); void d.offsetWidth; d.classList.add('shake'); d.classList.toggle('big', !!big); };
@@ -132,14 +146,15 @@ export function runDuel(app, root, { title, onEnd }) {
         const t = el(e.u);
         if (t) { t.classList.remove('hit'); void t.offsetWidth; t.classList.add('hit'); const hp = t.querySelector('.dv-hp b'); if (hp) hp.textContent = Math.max(0, e.hp); t.querySelector('.dv-hp')?.classList.add('hurt'); }
         fxAt(e.u, e.d >= 6 ? 'impact' : 'slash', { big: e.d >= 6 });
-        float(e.u, `-${e.d}`, e.d >= 6 ? 'dmg big' : 'dmg'); app.sfx.hit(); sparks(e.u); if (e.d >= 6 || e.hp <= 0) shake(e.d >= 9);
+        float(e.u, `-${e.d}`, e.d >= 6 ? 'dmg big' : 'dmg'); (e.d >= 6 ? app.sfx.smash : app.sfx.slash)(); sparks(e.u); if (e.d >= 6 || e.hp <= 0) shake(e.d >= 9);
         await wait(T(260));
-      } else if (e.t === 'heal') { fxAt(e.u, 'heal'); float(e.u, `+${e.d}`, 'heal'); const t = el(e.u); const hp = t?.querySelector('.dv-hp b'); if (hp) hp.textContent = st.units[e.u].hp; await wait(T(220)); }
-      else if (e.t === 'block') { float(e.u, 'Bloqué', 'info'); sparks(e.u, 'blue'); await wait(T(260)); }
-      else if (e.t === 'dodge') { fxAt(e.u, 'dodge', { big: true }); const t = el(e.u); if (t) { t.classList.remove('dodge'); void t.offsetWidth; t.classList.add('dodge'); } float(e.u, 'Esquive !', 'dodge'); app.sfx.swipe?.(); await wait(T(320)); }
-      else if (e.t === 'swap') { draw(); el(e.u)?.classList.add('enter'); float(e.u, 'Entre en jeu', 'info'); await wait(T(360)); }
-      else if (e.t === 'status') { if (e.s === 'Venin') fxAt(e.u, 'venom'); else if (e.s === 'Gelé') fxAt(e.u, 'frost'); float(e.u, e.s, 'info'); await wait(T(240)); }
-      else if (e.t === 'die') { fxAt(e.u, 'death', { big: true }); sparks(e.u, 'big'); el(e.u)?.classList.add('dying'); await wait(T(460)); draw(); }
+      } else if (e.t === 'heal') { app.sfx.heal(); fxAt(e.u, 'heal'); float(e.u, `+${e.d}`, 'heal'); const t = el(e.u); const hp = t?.querySelector('.dv-hp b'); if (hp) hp.textContent = st.units[e.u].hp; await wait(T(220)); }
+      else if (e.t === 'block') { app.sfx.block(); float(e.u, 'Bloqué', 'info'); sparks(e.u, 'blue'); await wait(T(260)); }
+      else if (e.t === 'dodge') { app.sfx.dodge(); fxAt(e.u, 'dodge', { big: true }); const t = el(e.u); if (t) { t.classList.remove('dodge'); void t.offsetWidth; t.classList.add('dodge'); } float(e.u, 'Esquive !', 'dodge'); await wait(T(320)); }
+      else if (e.t === 'boss') { app.sfx.boss(); const t = el(e.u); if (t) { t.classList.remove('roar'); void t.offsetWidth; t.classList.add('roar'); } float(e.u, e.s, 'boss'); shake(true); await wait(T(700)); }
+      else if (e.t === 'swap') { app.sfx.enter(); draw(); el(e.u)?.classList.add('enter'); float(e.u, 'Entre en jeu', 'info'); await wait(T(360)); }
+      else if (e.t === 'status') { if (e.s === 'Venin') { app.sfx.poison(); fxAt(e.u, 'venom'); } else if (e.s === 'Gelé') { app.sfx.freeze(); fxAt(e.u, 'frost'); } float(e.u, e.s, 'info'); await wait(T(240)); }
+      else if (e.t === 'die') { app.sfx.death(); fxAt(e.u, 'death', { big: true }); sparks(e.u, 'big'); el(e.u)?.classList.add('dying'); await wait(T(460)); draw(); }
       else if (e.t === 'enter') { draw(); el(e.u)?.classList.add('enter'); await wait(T(380)); }
       else if (e.t === 'revive') { draw(); float(e.u, 'Relevée !', 'heal'); await wait(T(300)); }
       else if (e.t === 'phase') { draw(); say(e.side === 'enemy' ? '<b class="dc-bad">Tour des créatures corrompues</b>' : 'À toi !'); await wait(T(e.side === 'enemy' ? 420 : 200)); }
@@ -155,7 +170,7 @@ export function runDuel(app, root, { title, onEnd }) {
     root.querySelector('.dv').appendChild(fx);
     root.querySelector('.dv').style.setProperty('--uc', ult.color);
     root.querySelector('.dv').classList.add('ultflash'); fxAt(null, 'seal', { center: true }); setTimeout(() => root.querySelector('.dv')?.classList.remove('ultflash'), 900);
-    app.sfx.reveal('M');
+    app.sfx.ult();
     await wait(reduced ? 300 : 1300);
     fx.classList.add('out'); setTimeout(() => fx.remove(), 400);
   }
@@ -164,6 +179,7 @@ export function runDuel(app, root, { title, onEnd }) {
     if (!st.over || !alive_) return;
     busy = true; draw();
     say(st.over === 'won' ? '<b class="dc-good">Victoire !</b>' : '<b class="dc-bad">Défaite…</b>');
+    (st.over === 'won' ? app.sfx.victory : app.sfx.defeat)();
     await wait(T(800));
     if (alive_) { alive_ = false; ctl.abort(); document.body.classList.remove('battle-mode'); onEnd(); }
   }
@@ -190,7 +206,7 @@ export function runDuel(app, root, { title, onEnd }) {
       const zoneAt = (x) => (moving ? Math.min(0.97 - zw, Math.max(0.3, z0 + Math.sin(x * 9) * 0.12)) : z0);
       const end = (ok) => {
         if (done) return; done = true; cancelAnimationFrame(raf); dodgeTap = null;
-        bar.classList.add(ok ? 'ok' : 'ko');
+        bar.classList.add(ok ? 'ok' : 'ko'); if (!ok) app.sfx.miss();
         setTimeout(() => { bar.remove(); $('.dv-mid')?.classList.remove('qte'); aEl?.classList.remove('aim'); tEl?.classList.remove('aimed'); resolve(ok); }, ok ? 260 : 160);
       };
       const step = () => {
@@ -221,7 +237,9 @@ export function runDuel(app, root, { title, onEnd }) {
     busy = true; sel = null; draw();
     const ev = beginEnemyTurn(st); g.persist();
     await play(ev);
+    const firstGuide = guide;
     await enemyTurn();
+    if (firstGuide) { endGuide(); coach(app, 'v2-dodge', 'Bien joué ! Pendant le tour ennemi, touche l’écran quand le curseur passe dans la <b>zone dorée</b> pour <b>esquiver</b>. Le badge rouge sur tes cartes annonce les coups à venir, et une fois par tour tu peux <b>échanger</b> une carte avec ta réserve.', { title: 'Esquive et stratégie' }); }
     busy = false; draw();
     if (st.over) return finish();
   }
@@ -284,6 +302,7 @@ export function runDuel(app, root, { title, onEnd }) {
       <h3>${esc(c.name)}${u.side === 'enemy' ? ' corrompu' : ''}</h3>
       <dl class="facts"><div><dt>Attaque</dt><dd>${u.atk}</dd></div><div><dt>PV</dt><dd>${Math.max(0, u.hp)} / ${u.maxHp}</dd></div><div><dt>Niveau</dt><dd>${u.level || 1}</dd></div></dl>
       <p class="small"><b>${icon(kw.icon)} ${esc(kw.name)}</b> : ${esc(kw.desc)}</p>
+      ${u.boss && st.bossPower ? `<p class="small dc-bad"><b>${esc(BOSS_POWERS[st.bossPower].name)}</b> : ${esc(BOSS_POWERS[st.bossPower].desc)}</p>` : ''}
       ${u.side === 'enemy' && g.owns(u.id) ? `<p class="small dc-good">${icon('book')} Tu possèdes sa carte : tes créatures lui font +1 dégât.</p>` : ''}</div>`, { label: c.name });
   }
   function help() {
@@ -302,6 +321,6 @@ export function runDuel(app, root, { title, onEnd }) {
   draw();
   // combat repris pendant le tour ennemi (application fermée en plein tour)
   if (st.turn === 'enemy' && !st.over) { busy = true; draw(); enemyTurn().then(() => { busy = false; draw(); if (st.over) finish(); }); }
-  coach(app, 'v2-duel', 'Chaque carte a son <b>attaque</b> (épée) et ses <b>PV</b> (cœur). Touche une de tes cartes, puis l’ennemi à frapper : il <b>riposte</b>. Quand toutes tes cartes ont attaqué, touche <b>Fin du tour</b>.<br><br>Chaque carte a une <b>capacité</b> qui agit toute seule (Garde, Soin, Venin…). Touche une carte qui a déjà joué pour lire sa capacité.', { title: 'Le duel de cartes' }).then(() => coach(app, 'v2-dodge', 'Nouveau : les créatures corrompues <b>annoncent leur cible</b> (badge rouge sur ta carte). Pendant leur tour, touche l’écran quand le curseur passe dans la <b>zone dorée</b> pour <b>esquiver</b>. Une fois par tour, tu peux aussi <b>échanger</b> une carte avec ta réserve.', { title: 'Esquive et stratégie' }));
+  if (!guide) coach(app, 'v2-duel', 'Chaque carte a son <b>attaque</b> (épée) et ses <b>PV</b> (cœur). Touche une de tes cartes, puis l’ennemi à frapper : il <b>riposte</b>. Quand toutes tes cartes ont attaqué, touche <b>Fin du tour</b>.<br><br>Chaque carte a une <b>capacité</b> qui agit toute seule (Garde, Soin, Venin…). Touche une carte qui a déjà joué pour lire sa capacité.', { title: 'Le duel de cartes' }).then(() => coach(app, 'v2-dodge', 'Nouveau : les créatures corrompues <b>annoncent leur cible</b> (badge rouge sur ta carte). Pendant leur tour, touche l’écran quand le curseur passe dans la <b>zone dorée</b> pour <b>esquiver</b>. Une fois par tour, tu peux aussi <b>échanger</b> une carte avec ta réserve.', { title: 'Esquive et stratégie' }));
   return { stop() { alive_ = false; ctl.abort(); document.body.classList.remove('battle-mode'); } };
 }

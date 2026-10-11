@@ -47,7 +47,7 @@ export default function achievements(app, root, params) {
   function render() {
     const doneA = Object.keys(g.s.achievements).length, doneS = Object.keys(g.s.setsDone).length;
     root.innerHTML = `
-      <header class="screen-head"><h1>Succès</h1><p class="muted">${doneA} / ${cat.achievements.length} succès · ${doneS} / ${cat.sets.length} ensembles complétés</p></header>
+      <header class="screen-head ui-hero bn-trophies"><h1>Succès</h1><p class="muted">${doneA} / ${cat.achievements.length} succès · ${doneS} / ${cat.sets.length} ensembles complétés</p></header>
       <div class="seg wide" role="tablist">${[['succes', 'Succès'], ['ensembles', 'Ensembles']].map(([k, l]) => `<button class="seg-b" role="tab" data-act="tab" data-v="${k}" aria-selected="${st.tab === k}" aria-pressed="${st.tab === k}">${l}</button>`).join('')}</div>
       <div class="stack">${st.tab === 'succes' ? succes() : ensembles()}</div>`;
     lazyArt(root);
