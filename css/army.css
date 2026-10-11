@@ -229,3 +229,15 @@ body.battle-mode .dv { height: calc(100dvh - var(--safe-t) - var(--safe-b) - 14p
 .dv-resw .dv-resv small { flex-basis: 100%; justify-content: center; }
 .dv-mid.qte > .dv-msg, .dv-mid.qte > .dv-resw { visibility: hidden; }
 .dv-dodge { background: #08090E; }
+
+/* Décor illustré du combat (assombri pour garder les cartes lisibles) */
+body.battle-mode .dv.has-bg { background: linear-gradient(180deg, rgba(6, 6, 12, .25), rgba(6, 6, 12, .55) 45%, rgba(6, 6, 12, .35)), var(--bgimg) center / cover no-repeat, #08070C; }
+/* Effets illustrés : le fond noir disparaît grâce au mode « écran » */
+.dv-fx { position: absolute; z-index: 25; pointer-events: none; transform: translate(-50%, -50%) scale(.6); mix-blend-mode: screen; opacity: 0; animation: dvFx .7s ease-out forwards; }
+@keyframes dvFx { 15% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 60% { opacity: .9; } to { opacity: 0; transform: translate(-50%, -50%) scale(1.15); } }
+.dv-fx.fx-slash { animation-duration: .45s; }
+.dv-fx.fx-heal, .dv-fx.fx-death { animation: dvFxUp .75s ease-out forwards; }
+@keyframes dvFxUp { 20% { opacity: 1; transform: translate(-50%, -50%) scale(1); } to { opacity: 0; transform: translate(-50%, -62%) scale(1.05); } }
+.dv-fx.center { z-index: 31; animation: dvSeal 1.35s ease-out forwards; }
+@keyframes dvSeal { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.3) rotate(-40deg); } 30% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0); } 75% { opacity: .9; } to { opacity: 0; transform: translate(-50%, -50%) scale(1.25) rotate(25deg); } }
+@media (prefers-reduced-motion: reduce) { .dv-fx { display: none; } }

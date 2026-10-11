@@ -12,6 +12,10 @@ import { KEYWORDS, GAUGE_MAX, front, reserve, targetsFor, canAct, attack, beginE
 import { ULTS } from '../core/army.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+// Décor selon la profondeur (salle du Gardien à part) et effets illustrés (fond noir fondu en mode « écran »)
+const bgOf = (run) => `assets/battle/bg-${run.room === 'boss' ? 'boss' : run.floor >= 15 ? 4 : run.floor >= 10 ? 3 : run.floor >= 5 ? 2 : 1}.webp`;
+const FX = ['slash', 'impact', 'dodge', 'heal', 'venom', 'frost', 'seal', 'death'];
+const fxUrl = (n) => `assets/fx/${n}.webp`;
 
 export function runDuel(app, root, { title, onEnd }) {
   const g = app.game, cat = app.catalog, run = g.descent().run, st = run.battle;
@@ -23,7 +27,8 @@ export function runDuel(app, root, { title, onEnd }) {
   const ult = ULTS[st.ult];
   document.body.classList.add('battle-mode');
 
-  root.innerHTML = `<div class="dv ${run.room}">
+  FX.forEach((n) => { new Image().src = fxUrl(n); });
+  root.innerHTML = `<div class="dv ${run.room} has-bg" style="--bgimg:url(${new URL(bgOf(run), document.baseURI).href})">
     <div class="dv-top"><b>${esc(title)}</b><span class="row gap">
       <button class="btn small ghost" data-d="help" aria-label="Règles">?</button>
       <button class="btn small ghost ${ui.fast ? 'on' : ''}" data-d="fast">×2</button>
@@ -96,6 +101,18 @@ export function runDuel(app, root, { title, onEnd }) {
     b.innerHTML = Array.from({ length: 10 }, (_, i) => `<i style="--a:${i * 36 + Math.round(Math.random() * 20)}deg;--r:${30 + Math.round(Math.random() * 26)}px"></i>`).join('');
     t.appendChild(b); setTimeout(() => b.remove(), 650);
   };
+  // Effet illustré posé sur une carte (ou au centre de l'écran)
+  const fxAt = (uid, name, { big = false, center = false } = {}) => {
+    if (reduced) return;
+    const box = root.querySelector('.dv'); if (!box) return;
+    const b = box.getBoundingClientRect();
+    let x = b.width / 2, y = b.height / 2, size = b.width * 0.9;
+    if (!center) { const t = el(uid); if (!t) return; const r = t.getBoundingClientRect(); x = r.left - b.left + r.width / 2; y = r.top - b.top + r.height / 2; size = r.width * (big ? 1.9 : 1.45); }
+    const im = document.createElement('img');
+    im.className = `dv-fx fx-${name}${center ? ' center' : ''}`; im.alt = ''; im.src = fxUrl(name);
+    im.style.cssText = `left:${x}px;top:${y}px;width:${size}px;height:${size}px`;
+    box.appendChild(im); setTimeout(() => im.remove(), center ? 1400 : 750);
+  };
   const float = (uid, txt, cls) => { const t = el(uid); if (!t) return; const f = document.createElement('span'); f.className = `dv-float ${cls}`; f.textContent = txt; t.appendChild(f); setTimeout(() => f.remove(), 900); };
 
   // ——— Lecture des événements (animations) ———
@@ -114,14 +131,15 @@ export function runDuel(app, root, { title, onEnd }) {
       } else if (e.t === 'dmg') {
         const t = el(e.u);
         if (t) { t.classList.remove('hit'); void t.offsetWidth; t.classList.add('hit'); const hp = t.querySelector('.dv-hp b'); if (hp) hp.textContent = Math.max(0, e.hp); t.querySelector('.dv-hp')?.classList.add('hurt'); }
+        fxAt(e.u, e.d >= 6 ? 'impact' : 'slash', { big: e.d >= 6 });
         float(e.u, `-${e.d}`, e.d >= 6 ? 'dmg big' : 'dmg'); app.sfx.hit(); sparks(e.u); if (e.d >= 6 || e.hp <= 0) shake(e.d >= 9);
         await wait(T(260));
-      } else if (e.t === 'heal') { float(e.u, `+${e.d}`, 'heal'); const t = el(e.u); const hp = t?.querySelector('.dv-hp b'); if (hp) hp.textContent = st.units[e.u].hp; await wait(T(220)); }
+      } else if (e.t === 'heal') { fxAt(e.u, 'heal'); float(e.u, `+${e.d}`, 'heal'); const t = el(e.u); const hp = t?.querySelector('.dv-hp b'); if (hp) hp.textContent = st.units[e.u].hp; await wait(T(220)); }
       else if (e.t === 'block') { float(e.u, 'Bloqué', 'info'); sparks(e.u, 'blue'); await wait(T(260)); }
-      else if (e.t === 'dodge') { const t = el(e.u); if (t) { t.classList.remove('dodge'); void t.offsetWidth; t.classList.add('dodge'); } float(e.u, 'Esquive !', 'dodge'); app.sfx.swipe?.(); await wait(T(320)); }
+      else if (e.t === 'dodge') { fxAt(e.u, 'dodge', { big: true }); const t = el(e.u); if (t) { t.classList.remove('dodge'); void t.offsetWidth; t.classList.add('dodge'); } float(e.u, 'Esquive !', 'dodge'); app.sfx.swipe?.(); await wait(T(320)); }
       else if (e.t === 'swap') { draw(); el(e.u)?.classList.add('enter'); float(e.u, 'Entre en jeu', 'info'); await wait(T(360)); }
-      else if (e.t === 'status') { float(e.u, e.s, 'info'); await wait(T(240)); }
-      else if (e.t === 'die') { sparks(e.u, 'big'); el(e.u)?.classList.add('dying'); await wait(T(460)); draw(); }
+      else if (e.t === 'status') { if (e.s === 'Venin') fxAt(e.u, 'venom'); else if (e.s === 'Gelé') fxAt(e.u, 'frost'); float(e.u, e.s, 'info'); await wait(T(240)); }
+      else if (e.t === 'die') { fxAt(e.u, 'death', { big: true }); sparks(e.u, 'big'); el(e.u)?.classList.add('dying'); await wait(T(460)); draw(); }
       else if (e.t === 'enter') { draw(); el(e.u)?.classList.add('enter'); await wait(T(380)); }
       else if (e.t === 'revive') { draw(); float(e.u, 'Relevée !', 'heal'); await wait(T(300)); }
       else if (e.t === 'phase') { draw(); say(e.side === 'enemy' ? '<b class="dc-bad">Tour des créatures corrompues</b>' : 'À toi !'); await wait(T(e.side === 'enemy' ? 420 : 200)); }
@@ -136,7 +154,7 @@ export function runDuel(app, root, { title, onEnd }) {
     fx.innerHTML = `${c ? `<img alt="" src="${artUrl(c)}">` : `<span class="tb-sceau">${EMBLEM}</span>`}<b>${esc(ult.name)}</b>`;
     root.querySelector('.dv').appendChild(fx);
     root.querySelector('.dv').style.setProperty('--uc', ult.color);
-    root.querySelector('.dv').classList.add('ultflash'); setTimeout(() => root.querySelector('.dv')?.classList.remove('ultflash'), 900);
+    root.querySelector('.dv').classList.add('ultflash'); fxAt(null, 'seal', { center: true }); setTimeout(() => root.querySelector('.dv')?.classList.remove('ultflash'), 900);
     app.sfx.reveal('M');
     await wait(reduced ? 300 : 1300);
     fx.classList.add('out'); setTimeout(() => fx.remove(), 400);
