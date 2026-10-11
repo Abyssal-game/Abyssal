@@ -396,3 +396,37 @@ img.emblem { object-fit: contain; }
 /* Menu Plus : icônes peintes */
 .mn-ic.pic { background: none !important; border: 0 !important; }
 .mn-ic.pic .picon { width: 40px; height: 40px; }
+
+/* ——— Fiche d'une carte : résumé, actions, onglets ———————————————————————— */
+.dt-sum { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 0 0 12px; }
+.dt-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 99px; font: 700 .76rem/1 var(--f-ui); color: var(--c, var(--ink)); background: color-mix(in srgb, var(--c, #888) 14%, rgba(10, 11, 16, .9)); border: 1px solid color-mix(in srgb, var(--c, #888) 45%, transparent); }
+.dt-chip .sigil, .dt-chip svg { width: 15px; height: 15px; }
+.dt-chip.gold { --c: #F2C14E; }
+.dt-team { margin-bottom: 10px; }
+.dt-acts { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
+.dt-act { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px 8px; border-radius: 14px; background: rgba(18, 20, 30, .9); border: 1px solid var(--line); color: var(--ink); font: 600 .72rem/1.1 var(--f-ui); }
+.dt-act .picon { width: 34px; height: 34px; }
+.dt-act.on { border-color: var(--gold-hi); color: var(--gold-hi); box-shadow: 0 0 14px rgba(241, 219, 158, .35); }
+.dt-act:active { transform: scale(.95); }
+.dt-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: -1px; position: relative; z-index: 1; }
+.dt-tab { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 4px; border-radius: 14px 14px 0 0; background: rgba(12, 13, 20, .7); border: 1px solid var(--line-soft); border-bottom: 0; color: var(--mute); font: 700 .8rem/1 var(--f-ui); }
+.dt-tab .picon { width: 26px; height: 26px; opacity: .6; }
+.dt-tab[aria-selected="true"] { background: linear-gradient(180deg, rgba(36, 32, 52, .98), rgba(24, 28, 40, .94)); color: var(--gold-hi); border-color: var(--line); }
+.dt-tab[aria-selected="true"] .picon { opacity: 1; }
+.dt-pane { border-top-left-radius: 0; border-top-right-radius: 0; }
+.dt-pane .lore.big { margin-top: 0; }
+.dt-facts { margin-top: 12px; }
+.tilt-hint { display: flex; justify-content: center; align-items: center; gap: 6px; }
+.tilt-hint .ic { width: 14px; height: 14px; }
+.detail-card .tcg.tilting { cursor: grabbing; }
+
+/* ——— Barre du bas : plaque sombre gravée d'or, onglet actif en médaillon ———— */
+#tabbar { background: linear-gradient(180deg, rgba(20, 16, 30, .97), rgba(6, 6, 10, .99)) !important; border-top: 0 !important; box-shadow: 0 -12px 30px rgba(0, 0, 0, .6) !important; }
+#tabbar::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, transparent, #8A6526 15%, #F2D58A 50%, #8A6526 85%, transparent); box-shadow: 0 0 10px rgba(242, 213, 138, .35); }
+#tabbar::after { content: ''; position: absolute; left: 10px; right: 10px; top: 5px; height: 1px; background: linear-gradient(90deg, transparent, rgba(242, 213, 138, .18), transparent); pointer-events: none; }
+.tab { color: #8E89A3; transition: color .2s; }
+.tab .ic { transition: transform .2s; }
+.tab[aria-current="page"] { color: var(--gold-hi); text-shadow: 0 0 8px rgba(241, 219, 158, .5); }
+.tab[aria-current="page"]::before { top: 8px; width: 46px; height: 46px; border-radius: 50%; background: radial-gradient(circle, rgba(242, 193, 78, .22), transparent 70%); box-shadow: none; z-index: -1; }
+.tab[aria-current="page"] .ic { transform: translateY(-2px) scale(1.08); filter: drop-shadow(0 0 6px rgba(242, 193, 78, .6)); }
+.tab-main .orb { background: radial-gradient(circle at 50% 30%, #E0485E, #8E1630 55%, #3A0610) !important; border: 2px solid #F2D58A !important; box-shadow: 0 0 0 4px rgba(10, 8, 16, .95), 0 0 0 5px rgba(242, 213, 138, .35), 0 0 24px rgba(224, 72, 94, .6) !important; }

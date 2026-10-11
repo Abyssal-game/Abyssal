@@ -72,85 +72,56 @@ export function lazyArt(root) {
   imgs.forEach((i) => io.observe(i));
 }
 
-// Inclinaison 3D de la carte entière (cadre compris) : au doigt, à la souris,
-// ou avec le gyroscope du téléphone. Mouvement amorti, retour en douceur.
-let gyro = { on: false, beta: null, gamma: null };
-function onOrient(e) { if (e.beta != null) { gyro.beta = e.beta; gyro.gamma = e.gamma; } }
-export function gyroAvailable() { return typeof window !== 'undefined' && 'DeviceOrientationEvent' in window && matchMedia('(pointer: coarse)').matches; }
-export function gyroOn() { return gyro.on; }
-export async function setGyro(on) {
-  if (on) {
-    try {
-      const D = window.DeviceOrientationEvent;
-      if (D && typeof D.requestPermission === 'function' && (await D.requestPermission()) !== 'granted') return false;
-    } catch (e) { return false; }
-    window.addEventListener('deviceorientation', onOrient);
-    gyro.on = true;
-  } else {
-    window.removeEventListener('deviceorientation', onOrient);
-    gyro = { on: false, beta: null, gamma: null };
-  }
-  return gyro.on;
-}
-
+// Inclinaison 3D de la carte entière (cadre compris), au doigt ou à la souris.
 export function enableTilt(el, { reduced = false } = {}) {
   const card = el.classList.contains('tcg') ? el : el.querySelector('.tcg');
   if (!card) return () => {};
-  const MAX = 24;
+  // Rotation au doigt : on fait tourner la carte comme un objet tenu en main.
+  // Le glissé est relatif (pas de saut au premier toucher) ; au lâcher, la carte revient doucement.
+  const MAX = 32;
   let cur = { x: 0, y: 0 }, tgt = { x: 0, y: 0 };
   let touching = false, raf = 0, alive = true, start = null, moved = false, t0 = performance.now();
-  let base = null; // orientation de référence du téléphone
   const apply = () => {
-    card.style.transform = reduced ? '' : `perspective(800px) rotateX(${cur.x.toFixed(2)}deg) rotateY(${cur.y.toFixed(2)}deg)`;
-    // le reflet suit l'angle : comme une vraie carte sous une lampe
+    card.style.transform = reduced ? '' : `perspective(900px) rotateX(${cur.x.toFixed(2)}deg) rotateY(${cur.y.toFixed(2)}deg) scale(${touching ? 1.03 : 1})`;
     card.style.setProperty('--mx', `${(50 + (cur.y / MAX) * 50).toFixed(1)}%`);
     card.style.setProperty('--my', `${(50 - (cur.x / MAX) * 50).toFixed(1)}%`);
     card.style.setProperty('--tilt', (Math.min(1, Math.hypot(cur.x, cur.y) / MAX)).toFixed(3));
+    card.style.boxShadow = `${(-cur.y * 0.6).toFixed(1)}px ${(14 + cur.x * 0.5).toFixed(1)}px 34px rgba(0, 0, 0, .65)`;
   };
   const loop = (now) => {
     if (!alive) return;
     if (!touching) {
-      if (gyro.on && gyro.beta != null) {
-        if (!base) base = { b: gyro.beta, g: gyro.gamma };
-        base.b += (gyro.beta - base.b) * 0.004; base.g += (gyro.gamma - base.g) * 0.004; // se recentre lentement
-        tgt.x = Math.max(-MAX, Math.min(MAX, -(gyro.beta - base.b) * 0.9));
-        tgt.y = Math.max(-MAX, Math.min(MAX, (gyro.gamma - base.g) * 0.9));
-      } else if (!reduced) {
-        const t = (now - t0) / 1000; // léger balancement au repos pour faire vivre les reflets
-        tgt.x = Math.sin(t * 0.9) * 3.5; tgt.y = Math.cos(t * 0.7) * 5;
-      } else { tgt.x = 0; tgt.y = 0; }
+      if (!reduced) { const t = (now - t0) / 1000; tgt.x = Math.sin(t * 0.9) * 3; tgt.y = Math.cos(t * 0.7) * 4.5; } // léger balancement
+      else { tgt.x = 0; tgt.y = 0; }
     }
-    const k = touching ? 0.35 : 0.08;
+    const k = touching ? 0.45 : 0.07;
     cur.x += (tgt.x - cur.x) * k; cur.y += (tgt.y - cur.y) * k;
     apply();
     raf = requestAnimationFrame(loop);
   };
-  const fromPoint = (e) => {
-    const r = card.getBoundingClientRect();
-    const px = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), py = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
-    tgt.y = (px - 0.5) * 2 * MAX; tgt.x = (0.5 - py) * 2 * MAX;
-  };
+  const clamp = (v) => Math.max(-MAX, Math.min(MAX, v));
   const down = (e) => {
-    touching = true; moved = false; start = { x: e.clientX, y: e.clientY };
+    touching = true; moved = false;
+    start = { x: e.clientX, y: e.clientY, rx: cur.x, ry: cur.y, w: card.getBoundingClientRect().width };
     card.classList.add('tilting');
     try { card.setPointerCapture(e.pointerId); } catch (err) { /* rien */ }
-    fromPoint(e);
   };
   const move = (e) => {
-    if (e.pointerType === 'mouse' && !touching) { fromPoint(e); card.classList.add('tilting'); return; }
-    if (!touching) return;
-    if (start && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 8) moved = true;
-    fromPoint(e);
+    if (!touching || !start) return;
+    const dx = e.clientX - start.x, dy = e.clientY - start.y;
+    if (Math.hypot(dx, dy) > 6) moved = true;
+    const k = (MAX * 2.2) / start.w; // traverser la carte = une bonne rotation
+    tgt.y = clamp(start.ry + dx * k); tgt.x = clamp(start.rx - dy * k);
+    e.preventDefault();
   };
-  const up = () => { touching = false; card.classList.remove('tilting'); tgt.x = 0; tgt.y = 0; t0 = performance.now(); };
-  const leave = (e) => { if (e.pointerType === 'mouse') up(); };
-  // un glissé ne doit pas compter comme un toucher (bascule de l'illustration)
+  const up = () => { if (!touching) return; touching = false; start = null; card.classList.remove('tilting'); tgt.x = 0; tgt.y = 0; t0 = performance.now(); };
   const click = (e) => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } };
   card.addEventListener('pointerdown', down);
-  card.addEventListener('pointermove', move);
+  card.addEventListener('pointermove', move, { passive: false });
   card.addEventListener('pointerup', up);
   card.addEventListener('pointercancel', up);
-  card.addEventListener('pointerleave', leave);
+  card.addEventListener('lostpointercapture', up);
+  card.addEventListener('touchmove', (e) => { if (touching) e.preventDefault(); }, { passive: false }); // la page ne défile pas pendant la rotation
   card.addEventListener('click', click, true);
   card.addEventListener('dragstart', (e) => e.preventDefault());
   card.classList.add('tiltable');

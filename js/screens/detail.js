@@ -3,10 +3,10 @@
 import { combatHTML, toggleTeam } from './army.js';
 import { RARITY, VARIANTS, ECONOMY, VARIANT_RATES } from '../config.js';
 import { openRitual } from './ritual.js';
-import { cardHTML, enableTilt, gyroAvailable, gyroOn, setGyro } from '../ui/card.js';
+import { cardHTML, enableTilt } from '../ui/card.js';
 import { boosterOdds } from '../core/boosters.js';
 import { openSheet, esc, toast, confirmBox, fmt, bindActions } from '../ui/dom.js';
-import { icon, sigil } from '../ui/icons.js';
+import { icon, sigil, picon } from '../ui/icons.js';
 
 // Chance réelle d'obtenir cette carte précise dans un booster standard.
 function oddsFor(cat, card) {
@@ -23,6 +23,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
   let current = id;
   let shownVariant = variant;
   let stopTilt = () => {};
+  let dtab = 'combat';
   const sheet = openSheet('', { full: true, cls: 'detail-sheet', label: 'Carte', onClose: () => { stopTilt(); app.refreshView && app.refreshView(); } });
 
   const odds = (card) => `Une chance sur <b>${oddsFor(cat, card).toLocaleString('fr-FR')}</b> de la trouver dans un booster standard (sans compter les garanties).`;
@@ -65,34 +66,34 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
       const sets = card.sets.map((k) => cat.set[k]).filter(Boolean);
       const isAvatar = g.s.avatar === current;
       const inShow = g.s.showcase.includes(current);
+      const inTeam = g.s.team.includes(current), li = g.cardLevelInfo(current);
+      const rit = ritualFrom();
+      const tabs = [['combat', 'swords', 'Combat'], ['story', 'book', 'Histoire'], ['rarity', 'crystal', 'Rareté']];
+      const TAB = {
+        combat: `${combatHTML(g, card)}`,
+        story: `<p class="lore big">« ${esc(card.lore)} »</p>
+          <dl class="facts dt-facts"><div><dt>Catégorie</dt><dd>${esc(card.category)}</dd></div><div><dt>Faction</dt><dd><span class="fac-dot" style="color:${fac.colors.secondary}">${sigil(card.faction)}</span>${esc(fac.name)}</dd></div><div><dt>Découverte le</dt><dd>${dateFr(e.first)}</dd></div><div><dt>Numéro</dt><dd>${card.id}</dd></div></dl>
+          ${line ? `<h3 class="section-title">${esc(line.name)}</h3><div class="strip">${line.cards.map((c) => cardHTML(c, { mystery: !g.owns(c.id), nameKnown: g.nameKnown(c.id) })).join('')}</div><p class="small muted">Stade ${card.evolution.stage} sur ${card.evolution.stages}.</p>` : ''}
+          ${sets.length ? `<h3 class="section-title">Ensembles</h3><div class="stack">${sets.map((s) => { const p = g.setProgress(s.key); return `<a class="set-link panel" href="#/succes/ensembles"><b>${esc(s.name)}</b><span class="small muted">${p.owned} / ${p.total}${p.done ? ' · complété' : ''}</span><span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span></a>`; }).join('')}</div>` : ''}`,
+        rarity: `<p>${odds(card)}</p><p class="small muted">Chance de la trouver dans une version spéciale, par booster standard :</p><div class="var-odds">${variantOdds(card)}</div>
+          ${rit ? `<div class="panel ri-cta"><div><b>${icon('sparkle')} Rituel d’élévation</b><p class="small muted">Sacrifie des doublons pour la faire passer en ${esc(VARIANTS[g.ritualTarget(current, rit)].name.toLowerCase())}.</p></div><button class="btn primary small" data-act="ritual">Élever</button></div>` : ''}`,
+      };
       body = `
-        <div class="detail-actions row gap wrap">
-          <button class="btn small ${isAvatar ? 'gold' : ''}" data-act="avatar">${icon('user')}${isAvatar ? 'Avatar actuel' : 'Choisir comme avatar'}</button>
-          <button class="btn small" data-act="artonly">${icon('eye')}Voir l’illustration</button>
-          ${gyroAvailable() ? `<button class="btn small ${gyroOn() ? 'gold' : ''}" data-act="gyro">${icon('sparkle')}${gyroOn() ? 'Mouvement activé' : 'Bouger avec le téléphone'}</button>` : ''}
-          <button class="btn small ${inShow ? 'gold' : ''}" data-act="showcase">${icon('pin')}${inShow ? 'En vitrine' : 'Mettre en vitrine'}</button>
+        <div class="dt-sum">
+          <span class="dt-chip" style="--c:${r.color}">${r.name}</span>
+          <span class="dt-chip" style="--c:${fac.colors.secondary}">${sigil(card.faction)}${esc(fac.name)}</span>
+          <span class="dt-chip">×${e.n} exemplaire${e.n > 1 ? 's' : ''}</span>
+          <span class="dt-chip gold">Niv. ${li.level}</span>
         </div>
-        <div class="panel detail-facts">
-          <dl class="facts">
-            <div><dt>Faction</dt><dd><span class="fac-dot" style="color:${fac.colors.secondary}">${sigil(card.faction)}</span>${esc(fac.name)}</dd></div>
-            <div><dt>Rareté</dt><dd style="color:${r.color}">${r.name}</dd></div>
-            <div><dt>Catégorie</dt><dd>${esc(card.category)}</dd></div>
-            <div><dt>Exemplaires</dt><dd>${e.n}</dd></div>
-            <div><dt>Découverte</dt><dd>${dateFr(e.first)}</dd></div>
-            <div><dt>Collection</dt><dd>${card.id}</dd></div>
-          </dl>
+        <button class="btn ${inTeam ? 'ghost' : 'primary'} block dt-team" data-act="team">${icon('swords')}${inTeam ? 'Dans ton équipe · retirer' : 'Ajouter à mon équipe'}</button>
+        <div class="dt-acts">
+          <button class="dt-act ${isAvatar ? 'on' : ''}" data-act="avatar">${picon('seal')}<span>${isAvatar ? 'Mon avatar' : 'Avatar'}</span></button>
+          <button class="dt-act ${inShow ? 'on' : ''}" data-act="showcase">${picon('crown')}<span>${inShow ? 'En vitrine' : 'Vitrine'}</span></button>
+          <button class="dt-act" data-act="artonly">${picon('holo')}<span>Illustration</span></button>
+          ${rit ? `<button class="dt-act" data-act="ritual">${picon('ritual')}<span>Élever</span></button>` : ''}
         </div>
-        <div class="panel pact-card"><b>${icon('swords')} Au combat</b>${combatHTML(g, card)}
-          <button class="btn small ${g.s.team.includes(current) ? 'ghost' : 'primary'} block" data-act="team">${g.s.team.includes(current) ? 'Retirer de l’équipe' : 'Ajouter à l’équipe'}</button></div>
-        <h3 class="section-title">Description</h3>
-        <p class="lore big">« ${esc(card.lore)} »</p>
-        <h3 class="section-title">Rareté</h3>
-        <p>${odds(card)}</p>
-        <p class="small muted">Chance de la trouver dans une version spéciale, par booster standard :</p>
-        <div class="var-odds">${variantOdds(card)}</div>
-        ${ritualFrom() ? `<div class="panel ri-cta"><div><b>${icon('sparkle')} Rituel d’élévation</b><p class="small muted">Sacrifie des doublons pour la faire passer en ${esc(VARIANTS[g.ritualTarget(current, ritualFrom())].name.toLowerCase())}.</p></div><button class="btn primary small" data-act="ritual">Élever</button></div>` : ''}
-        ${line ? `<h3 class="section-title">${esc(line.name)}</h3><div class="strip">${line.cards.map((c) => cardHTML(c, { mystery: !g.owns(c.id), nameKnown: g.nameKnown(c.id) })).join('')}</div><p class="small muted">Stade ${card.evolution.stage} sur ${card.evolution.stages}. Les stades sont des cartes distinctes à collectionner.</p>` : ''}
-        ${sets.length ? `<h3 class="section-title">Ensembles</h3><div class="stack">${sets.map((s) => { const p = g.setProgress(s.key); return `<a class="set-link panel" href="#/succes/ensembles"><b>${esc(s.name)}</b><span class="small muted">${p.owned} / ${p.total}${p.done ? ' · complété' : ''}</span><span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span></a>`; }).join('')}</div>` : ''}`;
+        <div class="dt-tabs" role="tablist">${tabs.map(([k, ic, l]) => `<button class="dt-tab" role="tab" data-act="tab" data-v="${k}" aria-selected="${dtab === k}">${picon(ic)}<span>${l}</span></button>`).join('')}</div>
+        <div class="panel dt-pane">${TAB[dtab]}</div>`;
     } else {
       const craft = ECONOMY.craftAsh[card.rarity];
       body = `
@@ -117,7 +118,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     sheet.setContent(`<div class="detail">
       ${nav}
       <div class="detail-card">${cardHTML(card, { size: 'full', variant: shownVariant, mystery: !owned, nameKnown: known })}</div>
-      ${owned ? '<p class="tilt-hint small muted">Fais glisser ton doigt sur la carte pour l’incliner.</p>' : ''}
+      ${owned ? `<p class="tilt-hint small muted">${icon('refresh')} Fais glisser ton doigt sur la carte pour la faire pivoter.</p>` : ''}
       ${variantsRow}
       <div class="detail-info">${body}</div>
     </div>`);
@@ -132,16 +133,11 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     showcase() { g.toggleShowcase(current); draw(); },
     team() { if (toggleTeam(app, current)) draw(); },
     ritual() { openRitual(app, current, ritualFrom(), { onClose: () => { shownVariant = null; draw(); } }); },
-    async gyro() {
-      const want = !gyroOn();
-      const on = await setGyro(want);
-      if (want && !on) toast('Le mouvement n’est pas disponible : autorise l’accès aux capteurs de mouvement.', { icon: 'info' });
-      draw();
-    },
+    tab(el) { dtab = el.dataset.v; draw(); },
     artonly(el) {
       const c = sheet.body.querySelector('.detail-card .tcg');
       const on = c.classList.toggle('art-only');
-      el.lastChild.textContent = on ? 'Afficher le texte' : 'Voir l’illustration';
+      el.querySelector('span').textContent = on ? 'Texte' : 'Illustration';
       if (on) sheet.el.scrollTo({ top: 0, behavior: 'smooth' });
     },
     async craft() {
@@ -155,9 +151,6 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
       try { g.decipher(current); toast(`Nom déchiffré : <b>${esc(cat.get(current).name)}</b>`, { icon: 'eye' }); draw(); }
       catch (err) { toast(esc(err.message), { kind: 'error' }); }
     },
-  });
-  sheet.body.addEventListener('click', (ev) => {
-    if (ev.target.closest('.detail-card .tcg') && g.owns(current)) sheet.body.querySelector('[data-act="artonly"]')?.click();
   });
   // Ouvre une carte de la lignée
   sheet.body.addEventListener('click', (ev) => {
