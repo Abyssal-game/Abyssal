@@ -10,27 +10,34 @@ const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 export default function bestiary(app, root) {
   const g = app.game, cat = app.catalog, lore = cat.lore;
-  const st = (app.state.best ||= { tab: 'chroniques', faction: 'infernal', q: '' });
+  const st = (app.state.best ||= { tab: 'creatures', faction: 'infernal', q: '' });
 
   function chronicles() {
     const n = g.uniqueCount();
     const unlocked = (at) => (at === 'all' ? n >= g.total() : n >= at);
+    const open = lore.chronicles.filter((c) => unlocked(c.at));
+    const sealed = lore.chronicles.filter((c) => !unlocked(c.at));
+    const nextAt = sealed.find((c) => c.at !== 'all')?.at;
+    const myst = lore.mysteries.filter((m) => g.s.setsDone[m.set]);
     return `
-      <article class="panel ornate genesis"><span class="gen-emblem">${EMBLEM}</span><h2>${esc(lore.genesis.title)}</h2>${lore.genesis.text.map((p) => `<p class="lore">${esc(p)}</p>`).join('')}</article>
-      <h2 class="section-title">Chroniques du Néant</h2>
-      <div class="chron">${lore.chronicles.map((c) => unlocked(c.at)
-        ? `<article class="panel chron-item"><h3>${esc(c.title)}</h3><p class="lore">${esc(c.text)}</p></article>`
-        : `<article class="panel chron-item locked">${icon('lock')}<div><h3>${esc(c.title.split('.')[0])}. Page scellée</h3><p class="small muted">Se révèle à ${c.at === 'all' ? 'la complétion du bestiaire' : `${c.at} créatures découvertes`} (tu en as ${n}).</p></div></article>`).join('')}</div>
       <h2 class="section-title">Les sept royaumes</h2>
       <div class="realms">${cat.factions.map((f) => `<a class="panel realm" href="#/faction/${f.key}" style="--fc:${f.colors.secondary}"><span class="realm-sig">${sigil(f.key)}</span><div><h3>${esc(f.realm)}</h3><p class="small muted">${esc(f.motto)}</p></div></a>`).join('')}</div>
-      <h2 class="section-title">Conflits</h2>
-      ${lore.conflicts.map((c) => `<article class="panel conflict"><h3>${esc(c.title)}</h3><p class="small">${c.sides.map((s) => `<span style="color:${cat.faction[s].colors.secondary}">${sigil(s)} ${esc(cat.faction[s].name)}</span>`).join(' contre ')}</p><p class="lore">${esc(c.text)}</p></article>`).join('')}
-      <h2 class="section-title">Figures du Bestiaire</h2>
-      ${lore.figures.map((f) => `<article class="panel figure"><h3>${esc(f.name)}</h3><p class="lore">${esc(f.text)}</p></article>`).join('')}
-      <h2 class="section-title">Mystères</h2>
-      ${lore.mysteries.map((m) => g.s.setsDone[m.set]
-        ? `<article class="panel mystery"><h3>${esc(m.title)}</h3><p class="lore">${esc(m.text)}</p></article>`
-        : `<article class="panel mystery locked">${icon('lock')}<div><h3>Mystère scellé</h3><p class="small muted">Complète l’ensemble « ${esc(cat.set[m.set].name)} » pour le lire.</p></div></article>`).join('')}`;
+      <h2 class="section-title">Le Livre interdit</h2>
+      <details class="panel dc-fold"><summary>${icon('book')} ${esc(lore.genesis.title)}</summary><div>${lore.genesis.text.map((p) => `<p class="lore">${esc(p)}</p>`).join('')}</div></details>
+      <details class="panel dc-fold"><summary>${icon('scroll')} Chroniques du Néant <span class="small muted">${open.length} / ${lore.chronicles.length}</span></summary><div>
+        ${open.map((c) => `<h3>${esc(c.title)}</h3><p class="lore">${esc(c.text)}</p>`).join('')}
+        ${sealed.length ? `<p class="small muted">${icon('lock')} ${sealed.length} page${sealed.length > 1 ? 's' : ''} encore scellée${sealed.length > 1 ? 's' : ''}.${nextAt ? ` La prochaine s’ouvre à ${nextAt} créatures découvertes (tu en as ${n}).` : ''}</p>` : ''}
+      </div></details>
+      <details class="panel dc-fold"><summary>${icon('swords')} Conflits</summary><div>
+        ${lore.conflicts.map((c) => `<h3>${esc(c.title)}</h3><p class="small">${c.sides.map((s) => `<span style="color:${cat.faction[s].colors.secondary}">${esc(cat.faction[s].name)}</span>`).join(' contre ')}</p><p class="lore">${esc(c.text)}</p>`).join('')}
+      </div></details>
+      <details class="panel dc-fold"><summary>${icon('user')} Figures du Bestiaire</summary><div>
+        ${lore.figures.map((f) => `<h3>${esc(f.name)}</h3><p class="lore">${esc(f.text)}</p>`).join('')}
+      </div></details>
+      <details class="panel dc-fold"><summary>${icon('eye')} Mystères <span class="small muted">${myst.length} / ${lore.mysteries.length}</span></summary><div>
+        ${myst.map((m) => `<h3>${esc(m.title)}</h3><p class="lore">${esc(m.text)}</p>`).join('')}
+        ${myst.length < lore.mysteries.length ? `<p class="small muted">${icon('lock')} Chaque ensemble de cartes complété révèle un mystère.</p>` : ''}
+      </div></details>`;
   }
 
   function creatures() {
@@ -38,13 +45,16 @@ export default function bestiary(app, root) {
     const list = cat.byFaction[st.faction].filter((c) => !q || (g.nameKnown(c.id) && norm(c.name + ' ' + c.category).includes(q)));
     const fp = g.factionProgress(st.faction);
     const groups = {};
-    list.forEach((c) => (groups[g.owns(c.id) ? c.category : 'Pages scellées'] ||= []).push(c));
+    // les pages encore scellées ne sont pas listées une par une : un simple compteur suffit
+    const sealedN = list.filter((c) => !g.owns(c.id) && !g.nameKnown(c.id)).length;
+    list.filter((c) => g.owns(c.id) || g.nameKnown(c.id)).forEach((c) => (groups[g.owns(c.id) ? c.category : 'Pages scellées'] ||= []).push(c));
     const keys = Object.keys(groups).sort((a, b) => (a === 'Pages scellées') - (b === 'Pages scellées') || a.localeCompare(b, 'fr'));
     return `
       <div class="chips" role="group" aria-label="Faction">${FACTION_ORDER.map((f) => `<button class="chip" data-act="fac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}">${sigil(f)}${esc(cat.faction[f].name)}</button>`).join('')}</div>
       <label class="input-wrap"><span class="sr">Rechercher dans le bestiaire</span>${icon('search')}<input class="input" id="best-q" type="search" placeholder="Rechercher une créature connue…" value="${esc(st.q)}"></label>
       <p class="small muted">${fp.owned} entrées sur ${fp.total} dans ${esc(cat.faction[st.faction].realm)}.</p>
-      ${keys.map((k) => `<h3 class="section-title">${esc(k)}</h3><div class="codex">${groups[k].map((c) => entry(c)).join('')}</div>`).join('') || '<p class="muted">Aucune créature connue ne correspond.</p>'}`;
+      ${keys.map((k) => `<h3 class="section-title">${esc(k)}</h3><div class="codex">${groups[k].map((c) => entry(c)).join('')}</div>`).join('') || '<p class="muted">Aucune créature connue ne correspond.</p>'}
+      ${sealedN && !q ? `<p class="small muted center sealed-n">${icon('lock')} ${sealedN} page${sealedN > 1 ? 's' : ''} encore scellée${sealedN > 1 ? 's' : ''} dans ce royaume. Ouvre des boosters pour les révéler.</p>` : ''}`;
   }
 
   // Bestiaire de chasse : les créatures vaincues dans la Descente
@@ -52,13 +62,11 @@ export default function bestiary(app, root) {
     const fp = cat.byFaction[st.faction];
     const seen = fp.filter((c) => g.huntKills(c.id) > 0).length;
     return `
-      <p class="small muted">Chaque créature vaincue dans la Descente s’inscrit ici. ${HUNT_STAGES.map((s) => `<b>${esc(s.name)}</b> (${s.k} victoire${s.k > 1 ? 's' : ''}) : ${esc(s.desc.toLowerCase())}`).join(' · ')}</p>
-      <p class="small"><b>${g.huntCount()}</b> créatures chassées au total.</p>
+      <p class="small muted">Chaque créature vaincue dans la Descente s’inscrit ici (${g.huntCount()} au total). À ${HUNT_STAGES[2].k} victoires, tu la maîtrises : +10 % de dégâts contre elle.</p>
       <div class="chips" role="group" aria-label="Faction">${FACTION_ORDER.map((f) => `<button class="chip" data-act="fac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}">${sigil(f)}${esc(cat.faction[f].name)}</button>`).join('')}</div>
       <p class="small muted">${seen} / ${fp.length} créatures de ${esc(cat.faction[st.faction].realm)} chassées.</p>
-      <div class="codex">${fp.map((c) => {
+      <div class="codex">${fp.filter((c) => g.huntKills(c.id) > 0).map((c) => {
         const k = g.huntKills(c.id), stg = huntStage(k), r = RARITY[c.rarity];
-        if (stg < 0) return `<div class="codex-row sealed"><span class="codex-thumb"><img alt="" loading="lazy" src="${artUrl(c, { mystery: true })}"></span><span class="codex-text"><b>Jamais affrontée</b><span class="small muted">${c.id} · <span style="color:${r.color}">${r.name}</span></span></span>${icon('lock')}</div>`;
         const fam = FAMILIES[familyOf(c)];
         return `<button class="codex-row hunt-row" data-id="${c.id}"><span class="codex-thumb"><img alt="" loading="lazy" src="${artUrl(c, { lite: true, mystery: !g.owns(c.id) && false })}"></span><span class="codex-text"><b>${esc(c.name)}</b><span class="small"><span class="hunt-stage s${stg}">${esc(HUNT_STAGES[stg].name)}</span> · ${k} victoire${k > 1 ? 's' : ''}</span><span class="small muted">${stg >= 1 ? `${esc(fam.name)} : ${esc(fam.desc)}` : `Encore ${HUNT_STAGES[1].k - k} victoire${HUNT_STAGES[1].k - k > 1 ? 's' : ''} pour l’étudier.`}</span></span></button>`;
       }).join('')}</div>`;
@@ -76,7 +84,7 @@ export default function bestiary(app, root) {
   function render() {
     root.innerHTML = `
       <header class="screen-head"><h1>Bestiaire</h1><p class="muted">Le livre interdit, page après page.</p></header>
-      <div class="seg wide" role="tablist">${[['chroniques', 'Chroniques'], ['creatures', 'Créatures'], ['chasse', 'Chasse']].map(([k, l]) => `<button class="seg-b" role="tab" data-act="tab" data-v="${k}" aria-selected="${st.tab === k}" aria-pressed="${st.tab === k}">${l}</button>`).join('')}</div>
+      <div class="seg wide" role="tablist">${[['creatures', 'Créatures'], ['chasse', 'Chasse'], ['chroniques', 'Royaumes et histoire']].map(([k, l]) => `<button class="seg-b" role="tab" data-act="tab" data-v="${k}" aria-selected="${st.tab === k}" aria-pressed="${st.tab === k}">${l}</button>`).join('')}</div>
       <div class="stack best-body">${st.tab === 'chroniques' ? chronicles() : st.tab === 'chasse' ? hunt() : creatures()}</div>`;
     const q = root.querySelector('#best-q');
     if (q) q.addEventListener('input', (e) => { st.q = e.target.value; const pos = e.target.selectionStart; render(); const n = root.querySelector('#best-q'); n.focus(); n.setSelectionRange(pos, pos); });

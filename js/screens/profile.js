@@ -21,8 +21,8 @@ export default function profile(app, root) {
     const verdict = ratio === null ? 'Ouvre encore quelques boosters pour mesurer ta chance.'
       : ratio >= 1.5 ? 'Les sceaux te sourient : une chance insolente.' : ratio >= 1.1 ? 'Plus chanceux que la moyenne.' : ratio >= 0.9 ? 'Pile dans la moyenne.' : ratio >= 0.6 ? 'Un peu en dessous de la moyenne… pour l’instant.' : 'Le Néant te met à l’épreuve. Ça va tourner.';
     const p = st.pulls || {};
-    return `<h2 class="section-title">Ta chance</h2>
-      <div class="panel">
+    return `<details class="panel dc-fold"><summary>${icon('sparkle')} Ta chance</summary><div>
+      <div>
         <div class="luck">
           <div class="ring" style="--p:${ratio === null ? 0 : Math.min(100, ratio * 50)};--c:${ratio !== null && ratio >= 1 ? 'var(--gold)' : '#8FA3C8'}"><span>${ratio === null ? '—' : Math.round(ratio * 100) + '%'}</span></div>
           <div><b>${ratio === null ? 'Chance à mesurer' : `${Math.round(ratio * 100)} % de la moyenne`}</b><p class="small muted">${verdict}</p><p class="small muted">Hyper rares ou mieux obtenues : ${st.gotHR} (moyenne attendue : ${st.expHR.toFixed(1).replace('.', ',')}).</p></div>
@@ -31,7 +31,7 @@ export default function profile(app, root) {
         <p class="small muted">Cartes tirées dans les boosters depuis la mise à jour.</p>
       </div>
       ${rarest ? `<div class="panel rarest"><div>${cardHTML(rarest, { variant: rv })}</div><div><span class="small muted">Ta carte la plus rare</span><h3>${esc(rarest.name)}</h3><p class="small"><b style="color:${RARITY[rarest.rarity].color}">${RARITY[rarest.rarity].name}</b>${rv !== 'normal' ? ` · ${esc(VARIANTS[rv].name)}` : ''}</p><p class="small muted">Trouvée le ${new Date(g.entry(rarest.id).first).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}.</p></div></div>` : ''}
-      ${s.best.length ? `<h3 class="section-title">Tes plus belles ouvertures</h3><div class="stack">${s.best.map((b, i) => `<div class="panel hist best-op"><span class="best-rank">${i + 1}</span><div><div class="row between small"><b>${esc(BOOSTERS[b.type]?.name || b.type)}</b><span class="muted">${new Date(b.t).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} · ${b.score} pts</span></div><div class="hist-cards">${b.cards.map((c) => { const card = cat.get(c.id); return card ? `<button class="hist-c" data-id="${c.id}" style="--rc:${RARITY[card.rarity].color}" title="${esc(card.name)}"><img alt="${esc(card.name)}" loading="lazy" src="${artUrl(card, { lite: true })}">${c.v !== 'normal' ? `<em>${esc(VARIANTS[c.v].short)}</em>` : ''}</button>` : ''; }).join('')}</div></div></div>`).join('')}</div>` : ''}`;
+      ${s.best.length ? `<h3>Tes plus belles ouvertures</h3><div class="stack">${s.best.map((b, i) => `<div class="panel hist best-op"><span class="best-rank">${i + 1}</span><div><div class="row between small"><b>${esc(BOOSTERS[b.type]?.name || b.type)}</b><span class="muted">${new Date(b.t).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} · ${b.score} pts</span></div><div class="hist-cards">${b.cards.map((c) => { const card = cat.get(c.id); return card ? `<button class="hist-c" data-id="${c.id}" style="--rc:${RARITY[card.rarity].color}" title="${esc(card.name)}"><img alt="${esc(card.name)}" loading="lazy" src="${artUrl(card, { lite: true })}">${c.v !== 'normal' ? `<em>${esc(VARIANTS[c.v].short)}</em>` : ''}</button>` : ''; }).join('')}</div></div></div>`).join('')}</div>` : ''}</div></details>`;
   }
 
   function render() {
@@ -53,35 +53,35 @@ export default function profile(app, root) {
       <h2 class="section-title">Vitrine</h2>
       ${show.length ? `<div class="showcase" id="showcase">${show.map((c) => { const e = g.entry(c.id); const v = ['special', 'galaxy', 'gold', 'ancestral', 'corrupt', 'chroma', 'holo', 'alt'].find((x) => e.v[x]) || 'normal'; return cardHTML(c, { variant: v }); }).join('')}</div><p class="small muted">${s.showcase.length ? 'Tes cartes mises en vitrine.' : 'Tes cartes les plus prestigieuses. Mets-en d’autres en vitrine depuis leur fiche.'}</p>` : '<p class="muted">Ta vitrine est vide : ouvre ton premier booster.</p>'}
 
+      <div class="stats-grid pf-3">
+        <div class="panel stat"><b>${owned}</b><span>créatures sur ${total}</span></div>
+        <div class="panel stat"><b>${fmt(s.stats.boosters)}</b><span>boosters ouverts</span></div>
+        <div class="panel stat"><b>${g.descent().best || 0}</b><span>étage record</span></div>
+      </div>
+
+      <details class="panel dc-fold"><summary>${icon('trophy')} Titres et cadres</summary><div>
+        <div class="chips">${s.titles.map((t) => `<button class="chip" data-act="title" data-v="${esc(t)}" aria-pressed="${t === s.title}">${esc(t)}</button>`).join('')}</div>
+        <div class="frames">${Object.entries(FRAMES).map(([k, name]) => { const has = s.frames.includes(k); return `<button class="frame-pick" data-act="frame" data-v="${k}" ${has ? '' : 'disabled'} aria-pressed="${s.frame === k}"><span class="avatar-mini pf pf-${k}">${has ? '' : icon('lock')}</span><span class="small">${esc(name)}</span></button>`; }).join('')}</div>
+      </div></details>
+
       ${luckHTML()}
 
-      <h2 class="section-title">Statistiques</h2>
-      <div class="stats-grid">
-        <div class="panel stat"><b>${owned}</b><span>créatures sur ${total}</span></div>
-        <div class="panel stat"><b>${pct(owned / total, 1)}</b><span>du bestiaire</span></div>
-        <div class="panel stat"><b>${fmt(s.stats.cards)}</b><span>cartes obtenues</span></div>
-        <div class="panel stat"><b>${fmt(s.stats.boosters)}</b><span>boosters ouverts</span></div>
-        <div class="panel stat"><b>${g.rarityCount('M')}</b><span>mythiques</span></div>
-        <div class="panel stat"><b>${g.rarityCount('S')}</b><span>secrètes</span></div>
-        <div class="panel stat"><b>${g.variantCount()}</b><span>variantes</span></div>
-        <div class="panel stat"><b>${fmt(s.stats.ashEarned)}</b><span>cendres gagnées</span></div>
-      </div>
-      <div class="panel">
+      <details class="panel dc-fold"><summary>${icon('book')} Statistiques détaillées</summary><div>
+        <div class="stats-grid">
+          <div class="panel stat"><b>${fmt(s.stats.cards)}</b><span>cartes obtenues</span></div>
+          <div class="panel stat"><b>${g.variantCount()}</b><span>variantes</span></div>
+          <div class="panel stat"><b>${g.rarityCount('M')}</b><span>mythiques</span></div>
+          <div class="panel stat"><b>${g.rarityCount('S')}</b><span>secrètes</span></div>
+        </div>
         <h3>Par rareté</h3>
         <div class="rar-bars">${RARITIES.map((r) => `<div><span style="color:${r.color}">${r.name}</span><b>${g.rarityCount(r.key)} / ${cat.byRarity[r.key].length}</b></div>`).join('')}</div>
         <h3>Par faction</h3>
         ${FACTION_ORDER.map((f) => { const p = g.factionProgress(f); return `<div class="fac-row"><span style="color:${cat.faction[f].colors.secondary}">${sigil(f)}</span><span>${esc(cat.faction[f].name)}</span><span class="progress"><i style="width:${p.ratio * 100}%;--bar:${cat.faction[f].colors.secondary}"></i></span><b>${p.owned}/${p.total}</b></div>`; }).join('')}
         <h3>Ensembles</h3>
         ${cat.sets.map((st) => { const p = g.setProgress(st.key); return `<div class="fac-row"><span>${p.done ? icon('star') : ''}</span><span>${esc(st.name)}</span><span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span><b>${p.owned}/${p.total}</b></div>`; }).join('')}
-      </div>
+      </div></details>
 
-      <h2 class="section-title">Titres</h2>
-      <div class="chips">${s.titles.map((t) => `<button class="chip" data-act="title" data-v="${esc(t)}" aria-pressed="${t === s.title}">${esc(t)}</button>`).join('')}</div>
-      <h2 class="section-title">Cadres de profil</h2>
-      <div class="frames">${Object.entries(FRAMES).map(([k, name]) => { const has = s.frames.includes(k); return `<button class="frame-pick" data-act="frame" data-v="${k}" ${has ? '' : 'disabled'} aria-pressed="${s.frame === k}"><span class="avatar-mini pf pf-${k}">${has ? '' : icon('lock')}</span><span class="small">${esc(name)}</span></button>`; }).join('')}</div>
-
-      <h2 class="section-title">Dernières ouvertures</h2>
-      ${s.history.length ? `<div class="history">${s.history.slice(0, 10).map((h) => `<div class="panel hist"><div class="row between small"><b>${esc(BOOSTERS[h.type]?.name || h.type)}${h.faction ? ` · ${esc(cat.faction[h.faction].name)}` : ''}</b><span class="muted">${new Date(h.t).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}</span></div><div class="hist-cards">${h.cards.map((c) => { const card = cat.get(c.id); return card ? `<button class="hist-c" data-id="${c.id}" style="--rc:${RARITIES.find((r) => r.key === card.rarity).color}" title="${esc(card.name)}"><img alt="${esc(card.name)}" loading="lazy" src="${artUrl(card, { lite: true })}">${c.n ? '<i>N</i>' : ''}${c.v !== 'normal' ? `<em>${esc(VARIANTS[c.v].short)}</em>` : ''}</button>` : ''; }).join('')}</div></div>`).join('')}</div>` : '<p class="muted">Aucune ouverture pour l’instant.</p>'}
+      ${s.history.length ? `<details class="panel dc-fold"><summary>${icon('booster')} Dernières ouvertures</summary><div class="history">${s.history.slice(0, 10).map((h) => `<div class="panel hist"><div class="row between small"><b>${esc(BOOSTERS[h.type]?.name || h.type)}${h.faction ? ` · ${esc(cat.faction[h.faction].name)}` : ''}</b><span class="muted">${new Date(h.t).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}</span></div><div class="hist-cards">${h.cards.map((c) => { const card = cat.get(c.id); return card ? `<button class="hist-c" data-id="${c.id}" style="--rc:${RARITIES.find((r) => r.key === card.rarity).color}" title="${esc(card.name)}"><img alt="${esc(card.name)}" loading="lazy" src="${artUrl(card, { lite: true })}">${c.n ? '<i>N</i>' : ''}${c.v !== 'normal' ? `<em>${esc(VARIANTS[c.v].short)}</em>` : ''}</button>` : ''; }).join('')}</div></div>`).join('')}</div></details>` : ''}
     `;
     lazyArt(root);
   }

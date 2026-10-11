@@ -22,21 +22,22 @@ import accountScreen from './screens/account.js';
 import menuScreen from './screens/menu.js';
 import heroesScreen from './screens/heroes.js';
 import arsenalScreen from './screens/arsenal.js';
+import merchantScreen from './screens/merchant.js';
 import { startSync } from './cloud/sync.js';
 import { showWelcome } from './screens/welcome.js';
 
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,
   factions: factionsScreen, faction: factionsScreen, succes: achievementsScreen, profil: profileScreen,
-  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen, heros: heroesScreen, arsenal: arsenalScreen,
+  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen, heros: heroesScreen, arsenal: arsenalScreen, marchand: merchantScreen,
 };
 const TABS = [
-  ['antre', 'home', 'Antre'], ['collection', 'cards', 'Collection'], ['boutique', 'booster', 'Boosters'],
-  ['descente', 'swords', 'Descente'], ['menu', 'menu', 'Menu'],
+  ['antre', 'home', 'Accueil'], ['collection', 'cards', 'Collection'], ['boutique', 'booster', 'Boosters'],
+  ['descente', 'swords', 'Aventure'], ['menu', 'menu', 'Plus'],
 ];
-const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente', arsenal: 'descente' };
+const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente', arsenal: 'descente', marchand: 'descente' };
 // Page parente des sous-pages (bouton retour en haut)
-const PARENT = { bestiaire: 'menu', factions: 'menu', faction: 'factions', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente', arsenal: 'descente' };
+const PARENT = { bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente', arsenal: 'descente', marchand: 'descente' };
 
 function storageOrMemory() {
   try {

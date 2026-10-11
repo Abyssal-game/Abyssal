@@ -101,22 +101,14 @@ export default function shop(app, root, params = []) {
     root.innerHTML = `
       <header class="screen-head">
         <h1>Boosters</h1>
-        <p class="muted">Choisis ton booster et tente ta chance.</p>
       </header>
-      <nav class="seg shop-seg" aria-label="Rayons"><a class="seg-b" href="#/boutique" aria-pressed="${params[0] !== 'objets'}">Boosters</a><a class="seg-b" href="#/boutique/objets" aria-pressed="${params[0] === 'objets'}">Objets</a></nav>
-      <div class="panel pity">
-        <div><span class="small muted">Garantie Hyper rare</span><b>${g.s.pity.sinceHR} / ${PITY.hr - 1}</b><span class="progress"><i style="width:${(g.s.pity.sinceHR / (PITY.hr - 1)) * 100}%;--bar:#C266FF"></i></span></div>
-        <div><span class="small muted">Garantie Mythique</span><b>${g.s.pity.sinceM} / ${PITY.m - 1}</b><span class="progress"><i style="width:${(g.s.pity.sinceM / (PITY.m - 1)) * 100}%;--bar:#F0C75E"></i></span></div>
-        <p class="small muted">Boosters ouverts d’affilée sans cette rareté. Au maximum, la garantie s’applique au booster suivant.</p>
-      </div>
+      <p class="small muted pity-line">${icon('sparkle')} Hyper rare garantie dans ${PITY.hr - g.s.pity.sinceHR} booster${PITY.hr - g.s.pity.sinceHR > 1 ? 's' : ''} au plus · Mythique dans ${PITY.m - g.s.pity.sinceM}</p>
       <div class="products">
         ${card('standard')}
         ${card('faction', `<div class="chips fac-pick" role="radiogroup" aria-label="Faction du booster">${FACTION_ORDER.map((f) => `<button class="chip" role="radio" data-act="pickfac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}" aria-checked="${st.faction === f}">${sigil(f)}${esc(cat.faction[f].name)}</button>`).join('')}</div>`)}
         ${card('event', `<p class="event-line"><b>${esc(ev.name)}</b> · ${ev.factions.map((f) => esc(cat.faction[f].name)).join(' et ')}<br><span class="small muted">${esc(ev.desc)} Encore ${ev.daysLeft} jour${ev.daysLeft > 1 ? 's' : ''}.</span></p>`)}
         ${card('premium')}
       </div>
-      ${itemsShopHTML(g)}
-      <p class="small muted center">Gagne des éclats avec les découvertes, l’offrande du jour, les succès, les ensembles, les niveaux et les boosters gratuits.</p>
     `;
   }
   render();
@@ -128,8 +120,6 @@ export default function shop(app, root, params = []) {
       openPack(app, type, { faction: type === 'faction' ? st.faction : undefined, onDone: () => render() });
     },
   });
-  bindItemShop(app, root, render);
-  if (params[0] === 'objets') requestAnimationFrame(() => root.querySelector('#objets')?.scrollIntoView({ block: 'start' }));
   app.refreshView = render;
   const timer = setInterval(() => { if (!document.querySelector('.opening')) render(); }, 60000);
   return () => { app.refreshView = null; clearInterval(timer); };

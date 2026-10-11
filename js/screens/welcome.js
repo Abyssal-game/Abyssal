@@ -1,13 +1,12 @@
-// Guide de bienvenue : 4 pages, montré une seule fois (rejouable depuis les Réglages).
+// Guide de bienvenue : quelques pages, montré une seule fois (rejouable depuis les Réglages).
 import { icon, EMBLEM } from '../ui/icons.js';
 import { openSheet } from '../ui/dom.js';
 
 const PAGES = [
   { ic: null, t: 'Bienvenue dans l’Abysse', p: 'Le Bestiaire interdit a été déchiré. Ses 335 créatures se cachent dans des boosters scellés. À toi de les retrouver.' },
-  { ic: 'booster', t: 'Ouvre des boosters', p: 'Déchire le paquet du doigt, puis retourne les cartes. Les plus rares tremblent avant d’apparaître… Des boosters offerts se rechargent toutes les 6 heures.' },
-  { ic: 'swords', t: 'Descends dans l’Abysse', p: 'Chaque jour, 3 torches pour explorer un donjon avec ton équipe de 6 cartes. Combats au tour par tour : touche au bon moment pour frapper fort ou parer.' },
-  { ic: 'sparkle', t: 'Rends tes cartes légendaires', p: 'Fusionne tes doublons, élève tes cartes en holographique, or ou cosmique grâce au Rituel, et accomplis les missions du jour.' },
-  { ic: 'menu', t: 'Tout est dans le Menu', p: 'Profil, succès, objets, bestiaire, compte en ligne et réglages : l’onglet Menu, en bas à droite, rassemble tout le reste.' },
+  { ic: 'booster', t: 'Ouvre des boosters', p: 'Le gros bouton du milieu. Déchire le paquet du doigt, puis retourne les cartes. Des boosters offerts se rechargent toutes les 6 heures.' },
+  { ic: 'swords', t: 'Pars à l’aventure', p: 'Dans l’onglet Aventure : 3 expéditions par jour avec tes 3 héros, des combats au tour par tour, et des coffres pour les équiper.' },
+  { ic: 'home', t: 'Reviens chaque jour', p: 'L’Accueil rassemble ce qui t’attend aujourd’hui : l’offrande, les missions et les coffres à ouvrir. Le reste est dans l’onglet Plus.' },
 ];
 
 export function showWelcome(app, { force = false } = {}) {

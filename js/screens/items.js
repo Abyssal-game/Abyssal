@@ -31,7 +31,7 @@ export function bindItemShop(app, root, after) {
 // Sac : objets possédés et leur utilisation
 export function bagHTML(g) {
   const owned = Object.keys(ITEMS).filter((k) => g.itemCount(k));
-  return `<section class="panel bag"><div class="row between"><h3>${icon('booster')} Ton sac</h3><a class="small" href="#/boutique">Acheter des objets</a></div>
+  return `<section class="panel bag"><h3>${icon('booster')} Ton sac</h3>
     ${owned.length ? `<div class="bag-list">${owned.map((k) => `<button class="bag-it" data-item-use="${k}" title="${esc(ITEMS[k].desc)}"><span class="item-ic sm">${icon(ITEMS[k].icon)}</span><span>${esc(ITEMS[k].name)}</span><b>×${g.itemCount(k)}</b></button>`).join('')}</div>`
       : '<p class="small muted">Vide. Les baumes soignent tes héros blessés, les torches bénies offrent une expédition de plus.</p>'}
   </section>`;

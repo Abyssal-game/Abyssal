@@ -8,20 +8,27 @@ export default function achievements(app, root, params) {
   const st = (app.state.ach ||= { tab: 'succes' });
   if (params[0] === 'ensembles') st.tab = 'ensembles';
 
+  // Les succès les plus proches d'abord ; le reste et les succès débloqués sont repliés.
   function succes() {
-    const list = cat.achievements.slice().sort((a, b) => !!g.s.achievements[a.key] - !!g.s.achievements[b.key]);
-    return `<div class="ach-list">${list.map((a) => {
+    const row = (a) => {
       const done = g.s.achievements[a.key];
       const cur = Math.min(g.achievementValue(a), g.achievementTarget(a));
       const tgt = g.achievementTarget(a);
       return `<article class="panel ach ${done ? 'done' : ''}">
-        <span class="ach-ic">${icon(done ? 'trophy' : 'lock')}</span>
+        <span class="ach-ic">${icon(done ? 'trophy' : 'star')}</span>
         <div class="ach-body"><h3>${esc(a.name)}</h3><p class="small muted">${esc(a.desc)}</p>
-          ${done ? `<p class="small ok">Débloqué le ${new Date(done).toLocaleDateString('fr-FR')}</p>` : `<span class="progress"><i style="width:${(cur / tgt) * 100}%"></i></span><span class="small muted">${cur} / ${tgt}</span>`}
+          ${done ? '' : `<span class="progress"><i style="width:${(cur / tgt) * 100}%"></i></span>`}
+          <span class="small muted">${done ? `Débloqué le ${new Date(done).toLocaleDateString('fr-FR')}` : `${cur} / ${tgt}`} · ${app.rewardText(a.reward)}</span>
         </div>
-        <span class="ach-reward small">${app.rewardText(a.reward)}</span>
       </article>`;
-    }).join('')}</div>`;
+    };
+    const ratio = (a) => Math.min(g.achievementValue(a), g.achievementTarget(a)) / g.achievementTarget(a);
+    const todo = cat.achievements.filter((a) => !g.s.achievements[a.key]).sort((x, y) => ratio(y) - ratio(x));
+    const done = cat.achievements.filter((a) => g.s.achievements[a.key]);
+    return `<h2 class="section-title">Les plus proches</h2>
+      <div class="ach-list">${todo.slice(0, 5).map(row).join('') || '<p class="muted">Tous les succès sont débloqués. Bravo !</p>'}</div>
+      ${todo.length > 5 ? `<details class="panel dc-fold"><summary>${icon('star')} Les ${todo.length - 5} autres succès</summary><div class="ach-list">${todo.slice(5).map(row).join('')}</div></details>` : ''}
+      ${done.length ? `<details class="panel dc-fold"><summary>${icon('trophy')} Débloqués <span class="small muted">${done.length}</span></summary><div class="ach-list">${done.map(row).join('')}</div></details>` : ''}`;
   }
 
   function ensembles() {

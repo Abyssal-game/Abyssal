@@ -35,40 +35,73 @@ export default function descent(app, root) {
     const last = ui.outcome;
     const danger = g.floorDanger(1);
     const news = g.takeHeroNews();
+    const inv = INVOCATIONS[g.s.invocation] || INVOCATIONS.phenix;
+    const ready = torches && party.length === DESCENT.teamSize;
     root.innerHTML = `
-      <header class="screen-head dc-head"><h1>La Descente</h1><p class="muted">Chaque jour, l’Abysse change de visage. Jusqu’où oseras-tu descendre ?</p></header>
+      <header class="screen-head dc-head"><h1>La Descente</h1><p class="muted">${d.best ? `Ton record : étage ${d.best}${d.bestToday ? ` · aujourd’hui : ${d.bestToday}` : ''}` : 'Chaque jour, l’Abysse change de visage.'}</p></header>
       ${last ? summaryHTML(last) : ''}
-      ${news.length ? `<section class="panel ornate dc-news">${news.map((k) => `<div class="dc-new-h" style="--hc:${HEROES[k].color}"><img alt="" src="${heroArtUrl(k)}"><span><b>${esc(HEROES[k].name)} rejoint ton Antre !</b><span class="small">${esc(HEROES[k].cls)} · ${esc(HEROES[k].role)}</span><span class="small muted">${esc(HEROES[k].passive)}</span></span></div>`).join('')}<p class="small muted">Touche son portrait plus bas pour l’ajouter à ton équipe.</p></section>` : ''}
-      <section class="panel dc-stats">
-        <div><span class="dc-torches">${Array.from({ length: DESCENT.torches }, (_, i) => `<i class="${i < torches ? 'on' : ''}">${icon('flame')}</i>`).join('')}</span><span class="small muted">Torches du jour</span></div>
-        <div><b>${d.bestToday ? `Étage ${d.bestToday}` : '—'}</b><span class="small muted">Record du jour</span></div>
-        <div><b>${d.best ? `Étage ${d.best}` : '—'}</b><span class="small muted">Record absolu</span></div>
+      ${news.length ? `<section class="panel ornate dc-news">${news.map((k) => `<div class="dc-new-h" style="--hc:${HEROES[k].color}"><img alt="" src="${heroArtUrl(k)}"><span><b>${esc(HEROES[k].name)} rejoint ton équipe !</b><span class="small">${esc(HEROES[k].cls)} · ${esc(HEROES[k].role)}</span></span></div>`).join('')}<p class="small muted">Touche « Modifier » pour l’emmener avec toi.</p></section>` : ''}
+      <section class="panel dc-go">
+        <div class="dc-go-top"><span class="dc-torches">${Array.from({ length: DESCENT.torches }, (_, i) => `<i class="${i < torches ? 'on' : ''}">${icon('flame')}</i>`).join('')}</span><span class="small muted">${torches ? `${torches} expédition${torches > 1 ? 's' : ''} possible${torches > 1 ? 's' : ''} aujourd’hui` : 'Plus de torche : reviens demain'}</span></div>
+        <div class="dc-team">
+          ${party.map((k) => `<span class="dc-tm" style="--hc:${HEROES[k].color}"><img alt="" src="${heroArtUrl(k)}"><b>${esc(HEROES[k].name.split(' ')[0])}</b><small>Niv. ${g.heroLevel(k)}${g.heroWounded(k) ? ' · blessé' : ''}</small></span>`).join('')}
+          ${Array.from({ length: DESCENT.teamSize - party.length }, () => '<span class="dc-tm empty"><i>+</i><small>Héros</small></span>').join('')}
+          <span class="dc-tm inv" style="--hc:${inv.color}"><span class="ic-art" data-card="${inv.card}"></span><b>${esc(inv.name)}</b><small>Invocation</small></span>
+        </div>
+        <button class="btn small ghost block" data-act="team">${icon('user')}Modifier l’équipe</button>
+        <button class="btn ${ui.cursed ? 'danger' : 'primary'} block big-cta" data-act="start" ${ready ? '' : 'disabled'}>${icon('flame')}${torches ? 'Descendre' : 'Reviens demain'}</button>
+        <div class="dc-curse-row ${ui.cursed ? 'on' : ''}"><span><b>${icon('skull')} Descente maudite</b><span class="small muted">butin doublé, mais tout est perdu si l’équipe tombe</span></span>
+          <button class="switch" role="switch" aria-checked="${ui.cursed}" data-act="curse" aria-label="Descente maudite"><i></i></button></div>
+        <p class="small muted center">${party.length < DESCENT.teamSize ? `Choisis ${DESCENT.teamSize} héros.` : `Premier étage : créatures niveau ${danger.level}`}</p>
       </section>
-      ${chestsWaiting() ? `<a class="panel dc-chests" href="#/arsenal"><span class="dc-ch-ic">${icon('lock')}</span><span class="dc-ch-t"><b>${chestsWaiting()} coffre${chestsWaiting() > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Équipe tes héros dans l’Arsenal</span></span>${icon('next')}</a>` : ''}
-      <h2 class="section-title">Ton équipe <span class="more"><a href="#/arsenal">Arsenal</a> · <a href="#/heros">Fiches</a></span></h2>
-      <div class="hc-grid dc-party">${HERO_ORDER.filter((k) => g.s.heroes[k]).map((k) => heroCardHTML(g, k, { selected: party.includes(k), order: party.indexOf(k) + 1, act: 'pick' })).join('')}</div>
-      <p class="small muted">Touche un héros pour l’ajouter ou le retirer de l’équipe (${party.length} / ${DESCENT.teamSize}). Appui long : sa fiche.</p>
-      <h2 class="section-title">Invocation</h2>
-      <div class="ic-grid">${INVOCATION_ORDER.map((k) => invocationCardHTML(g, k, { selected: g.s.invocation === k })).join('')}</div>
-      ${bagHTML(g)}
-      <div class="ri-forbid dc-curse ${ui.cursed ? 'on' : ''}"><div><b>${icon('skull')} Descente maudite</b><p class="small">Butin <b>doublé</b>. Mais si toute l’équipe tombe, <b>tout le butin</b> de l’expédition est perdu.</p></div>
-        <button class="switch" role="switch" aria-checked="${ui.cursed}" data-act="curse" aria-label="Descente maudite"><i></i></button></div>
-      <button class="btn ${ui.cursed ? 'danger' : 'primary'} block big-cta" data-act="start" ${torches && party.length === DESCENT.teamSize ? '' : 'disabled'}>${icon('flame')}${torches ? 'Allumer une torche et descendre' : 'Plus de torche : reviens demain'}</button>
-      ${party.length < DESCENT.teamSize ? `<p class="small muted center">Choisis ${DESCENT.teamSize} héros.</p>` : `<p class="small muted center">Premier étage : créatures niveau ${danger.level} · ton équipe niveau ${danger.heroLevel}</p>`}
-      <section class="panel lb" id="lb"><h3>${icon('trophy')} Classement mondial du jour</h3><div class="lb-body small muted">Chargement…</div></section>
-      <details class="panel dc-rules"><summary>${icon('info')} Comment ça marche</summary>
+      <div class="dc-tiles">
+        <a class="dc-tile" href="#/heros">${icon('swords')}<b>Héros</b></a>
+        <a class="dc-tile" href="#/arsenal">${icon('shield')}<b>Arsenal</b>${chestsWaiting() ? `<span class="badge">${chestsWaiting()}</span>` : ''}</a>
+        <a class="dc-tile" href="#/marchand">${icon('heart')}<b>Marchand</b></a>
+      </div>
+      <details class="panel dc-fold" id="lb"><summary>${icon('trophy')} Classement du jour</summary><div class="lb-body small muted">Chargement…</div></details>
+      <details class="panel dc-fold"><summary>${icon('info')} Comment ça marche</summary>
         <ul class="small">
-          <li>Chaque jour : ${DESCENT.torches} torches, donc ${DESCENT.torches} expéditions. Le donjon est le même pour tout le monde ce jour-là.</li>
-          <li>Tes <b>3 héros</b> affrontent les créatures du Bestiaire. Plus tu descends, plus leur <b>niveau</b> monte : fais progresser tes héros à chaque expédition.</li>
-          <li>Les ennemis <b>annoncent</b> leur prochaine action au-dessus de leur tête. Quand l’un d’eux <b>prépare</b> une attaque, interromps-le (Lance de givre), protège la cible (Égide), ou <b>pare</b> au bon moment quand le cercle rouge se resserre.</li>
-          <li>Chaque classe a son style : la rage de Brenna, la protection d’Aldric, la marque de Syléa, les éléments de Morgane (feu sur glace ou glace sur feu = Brisure). D’autres héros te rejoignent en descendant : Kaël (étage 3), Thalia (6), Lucien (9) et Ossian (12).</li>
-          <li>La <b>jauge d’invocation</b> se remplit pendant les combats. Pleine, elle permet d’appeler ton invocation : Phénix, Bahamut, Fenrir.</li>
-          <li>Les salles au trésor, les élites et les gardiens cachent des <b>coffres</b> : armes, armures, reliques et sorts pour tes héros, à ouvrir dans l’Arsenal.</li>
-          <li>Après chaque étage : <b>remonter</b> avec le butin, ou <b>descendre</b>. Si toute l’équipe tombe, la moitié des éclats et des cendres est perdue, ainsi que les boosters et coffres trouvés. Un héros tombé est affaibli ${DESCENT.woundHours} h.</li>
-          <li>Chaque créature vaincue rejoint ton <b>Bestiaire de chasse</b> ; à force de la vaincre, tu l’étudies puis la maîtrises (+10 % de dégâts contre elle).</li>
+          <li>${DESCENT.torches} expéditions par jour. Le donjon est le même pour tout le monde ce jour-là.</li>
+          <li>Tes <b>3 héros</b> affrontent les créatures du Bestiaire, de plus en plus fortes en profondeur. Ils gagnent des niveaux à chaque expédition.</li>
+          <li>Les ennemis <b>annoncent</b> leur prochaine action. Quand l’un d’eux prépare un gros coup, interromps-le, protège la cible ou <b>pare</b> au bon moment.</li>
+          <li>La <b>jauge d’invocation</b> se remplit en combat : pleine, elle appelle ton invocation.</li>
+          <li>Les salles au trésor, les élites et les gardiens donnent des <b>coffres</b> pour équiper tes héros (Arsenal).</li>
+          <li>Après chaque étage : <b>remonter</b> avec le butin, ou <b>descendre</b>. Si l’équipe tombe, tu perds la moitié des éclats et les coffres trouvés.</li>
+          <li>De nouveaux héros te rejoignent en descendant : Kaël (étage 3), Thalia (6), Lucien (9), Ossian (12).</li>
         </ul></details>`;
     fillInvocationArt(app, root);
-    loadBoard();
+    root.querySelector('#lb').addEventListener('toggle', (e) => { if (e.target.open) loadBoard(); }, { once: true });
+  }
+
+  // Composition de l'équipe et choix de l'invocation, dans une fenêtre
+  function teamSheet() {
+    const sh = openSheet('', { label: 'Équipe', onClose: () => render() });
+    const draw = () => {
+      const party = g.s.party.filter((k) => g.s.heroes[k]);
+      sh.setContent(`<h2>Ton équipe <span class="small muted">${party.length} / ${DESCENT.teamSize}</span></h2>
+        <p class="small muted">Touche un héros pour l’ajouter ou le retirer.</p>
+        <div class="hc-grid dc-party">${HERO_ORDER.filter((k) => g.s.heroes[k]).map((k) => heroCardHTML(g, k, { selected: party.includes(k), order: party.indexOf(k) + 1 })).join('')}</div>
+        <h3 class="section-title">Invocation</h3>
+        <div class="ic-grid">${INVOCATION_ORDER.map((k) => invocationCardHTML(g, k, { selected: g.s.invocation === k })).join('')}</div>
+        <button class="btn primary block" data-close>Valider</button>`);
+      fillInvocationArt(app, sh.body);
+    };
+    sh.body.addEventListener('click', (e) => {
+      const h = e.target.closest('[data-hero]');
+      if (h) {
+        const k = h.dataset.hero;
+        let party = g.s.party.filter((x) => g.s.heroes[x]);
+        if (party.includes(k)) party = party.filter((x) => x !== k);
+        else if (party.length < DESCENT.teamSize) party = [...party, k];
+        else party = [...party.slice(1), k];
+        g.setParty(party); app.sfx.tap(); return draw();
+      }
+      const i = e.target.closest('.ic-c[data-inv]');
+      if (i && g.invocationUnlocked(i.dataset.inv)) { g.setInvocation(i.dataset.inv); app.sfx.tap(); return draw(); }
+      if (e.target.closest('[data-close]')) sh.close();
+    });
+    draw();
   }
 
   async function loadBoard() {
@@ -215,14 +248,7 @@ export default function descent(app, root) {
   }
 
   bindActions(root, {
-    pick(el) {
-      const k = el.dataset.hero;
-      let party = g.s.party.filter((x) => g.s.heroes[x]);
-      if (party.includes(k)) party = party.filter((x) => x !== k);
-      else if (party.length < DESCENT.teamSize) party = [...party, k];
-      else party = [...party.slice(1), k];
-      g.setParty(party); app.sfx.tap(); render();
-    },
+    team() { teamSheet(); },
     curse() { ui.cursed = !ui.cursed; render(); },
     async start() {
       if (ui.cursed && !(await confirmBox('Descente maudite : si toute l’équipe tombe, <b>tout le butin</b> est perdu. Tu es sûr ?', { ok: 'Je descends', danger: true }))) return;
@@ -244,21 +270,6 @@ export default function descent(app, root) {
     share() { share(); },
     dismiss() { ui.outcome = null; render(); },
   });
-  bindBag(app, root, () => { if (!g.descent().run) render(); });
-  // Invocation choisie ; appui long sur un héros ou une invocation : sa fiche
-  let pressT = 0, longDone = false;
-  root.addEventListener('pointerdown', (e) => {
-    const t = e.target.closest('.dc-party [data-hero], .ic-c[data-inv]');
-    if (!t) return;
-    longDone = false;
-    pressT = setTimeout(() => { longDone = true; t.dataset.hero ? openHero(app, t.dataset.hero) : openInvocation(app, t.dataset.inv); }, 480);
-  });
-  ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) => root.addEventListener(ev, () => clearTimeout(pressT)));
-  root.addEventListener('click', (e) => {
-    if (longDone) { e.stopPropagation(); e.preventDefault(); longDone = false; return; }
-    const i = e.target.closest('.ic-c[data-inv]');
-    if (i && !g.descent().run) { if (g.invocationUnlocked(i.dataset.inv)) { g.setInvocation(i.dataset.inv); app.sfx.tap(); render(); } }
-  }, true);
   render();
   app.refreshView = () => { if (!playing) render(); };
   return () => { app.refreshView = null; skip = true; if (battle) { battle.stop(); battle = null; } };
