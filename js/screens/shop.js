@@ -82,9 +82,9 @@ export default function shop(app, root, params = []) {
       const tickets = s.tickets[type] || 0;
       const can = g.canBuy(type);
       return `<article class="panel product" data-type="${type}">
+        <div class="product-banner bn-${type}"><h2>${esc(def.name)}</h2></div>
         <div class="product-pack">${packHTML(type, cat, { faction: st.faction, event: ev })}</div>
         <div class="product-info">
-          <h2>${esc(def.name)}</h2>
           <p class="small muted">${esc(def.desc)}</p>
           ${extra}
           <div class="row gap wrap">

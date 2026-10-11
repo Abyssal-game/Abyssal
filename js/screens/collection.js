@@ -14,9 +14,10 @@ export default function collection(app, root, params) {
   const total = g.total();
 
   root.innerHTML = `
-    <header class="screen-head">
+    <header class="screen-head ui-hero bn-collection">
       <h1>Collection</h1>
       <p class="muted" id="col-summary"></p>
+      <span class="progress ui-prog"><i id="col-prog"></i></span>
     </header>
     <div class="col-head-row">
       <div class="seg" role="group" aria-label="Mode d’affichage">${[['grid', 'Grille'], ['album', 'Classeur']].map(([k, l]) => `<button class="seg-b" data-act="view" data-v="${k}" aria-pressed="${(st.view || 'grid') === k}">${l}</button>`).join('')}</div>
@@ -85,6 +86,7 @@ export default function collection(app, root, params) {
     root.querySelector('#col-empty').hidden = list.length > 0;
     const owned = g.uniqueCount();
     root.querySelector('#col-summary').textContent = `${owned} créatures découvertes sur ${total} (${pct(owned / total)}) · ${g.newCount()} nouvelle${g.newCount() > 1 ? 's' : ''}`;
+    root.querySelector('#col-prog').style.width = `${(owned / total) * 100}%`;
     root.querySelector('#col-count').textContent = `${list.length} carte${list.length > 1 ? 's' : ''} affichée${list.length > 1 ? 's' : ''}`;
     root.querySelector('#col-seen').hidden = g.newCount() === 0;
   }
@@ -109,6 +111,7 @@ export default function collection(app, root, params) {
     lazyArt(box);
     const owned = g.uniqueCount();
     root.querySelector('#col-summary').textContent = `${owned} créatures découvertes sur ${total} (${pct(owned / total)})`;
+    root.querySelector('#col-prog').style.width = `${(owned / total) * 100}%`;
     ids = cards.map((c) => c.id);
     const al = box.querySelector('.album');
     const dots = [...box.querySelectorAll('.album-dots i')];

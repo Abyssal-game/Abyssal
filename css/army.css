@@ -291,3 +291,29 @@ img.emblem { object-fit: contain; }
 .td-row { padding: 12px 0; }
 /* Tutoriel : grande illustration */
 .wl-art { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 14px; margin: 4px 0 14px; border: 1px solid var(--line); box-shadow: 0 8px 22px rgba(0, 0, 0, .6); }
+
+/* ——— Bandeaux illustrés (assets/ui/bn-*.webp) ——————————————————————— */
+.bn-collection { --bn: url(../assets/ui/bn-collection.webp); } .bn-standard { --bn: url(../assets/ui/bn-standard.webp); }
+.bn-faction { --bn: url(../assets/ui/bn-faction.webp); } .bn-event { --bn: url(../assets/ui/bn-event.webp); }
+.bn-premium { --bn: url(../assets/ui/bn-premium.webp); } .bn-rule { --bn: url(../assets/ui/bn-rule.webp); }
+.bn-expedition { --bn: url(../assets/ui/bn-expedition.webp); } .bn-ranking { --bn: url(../assets/ui/bn-ranking.webp); }
+/* Collection : en-tête illustré avec la progression */
+.ui-hero { position: relative; overflow: hidden; border-radius: 18px; padding: 20px 16px 16px; border: 1px solid var(--line); background: linear-gradient(90deg, rgba(8, 9, 13, .7) 30%, rgba(8, 9, 13, 0) 75%), var(--bn) right center / cover no-repeat, #0B0C12; margin-bottom: 12px; }
+.ui-hero h1 { margin: 0 0 4px; text-shadow: 0 2px 8px #000; }
+.ui-hero p { margin: 0 0 10px; max-width: 62%; color: #D9D3C4 !important; text-shadow: 0 1px 4px #000; }
+.ui-prog { display: block; max-width: 60%; height: 8px; }
+.col-tools .seg.wide { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: visible; }
+.col-tools .seg.wide .seg-b { padding-left: 2px; padding-right: 2px; font-size: .78rem; min-width: 0; white-space: nowrap; }
+/* Boosters : chaque offre s'ouvre sur son bandeau */
+.product { overflow: hidden; padding-top: 0; }
+.product-banner { grid-column: 1 / -1; margin: 0 -16px 2px; min-height: 96px; display: flex; align-items: flex-end; padding: 0 16px 12px; background: linear-gradient(180deg, rgba(8, 9, 13, 0) 40%, rgba(8, 9, 13, .85)), linear-gradient(90deg, rgba(8, 9, 13, .55), rgba(8, 9, 13, 0) 60%), var(--bn) right center / cover no-repeat; border-bottom: 1px solid var(--line-soft); }
+.product-banner h2 { margin: 0 !important; font-size: 1.25rem; text-shadow: 0 2px 8px #000; }
+.product .product-pack { margin-top: 4px; }
+/* Aventure : règle du jour, expédition, classement */
+.dc-rule.bn-rule { background: linear-gradient(90deg, rgba(10, 11, 16, .92) 35%, rgba(10, 11, 16, .25) 80%), var(--bn) right center / cover no-repeat, #0B0C12; }
+.dc-go { overflow: hidden; padding-top: 0; }
+.dc-banner { margin: 0 -14px -2px; min-height: 92px; padding: 14px 16px; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; background: linear-gradient(90deg, rgba(8, 9, 13, .8) 25%, rgba(8, 9, 13, 0) 70%), linear-gradient(180deg, transparent 50%, rgba(8, 9, 13, .7)), var(--bn) right center / cover no-repeat; border-bottom: 1px solid var(--line-soft); }
+.dc-banner b { font: 700 1.25rem/1.1 var(--f-display); letter-spacing: .05em; color: var(--gold-hi); text-shadow: 0 2px 8px #000; }
+.dc-banner .small { color: #D9D3C4; text-shadow: 0 1px 4px #000; }
+.dc-fold.bn-ranking > summary { min-height: 64px; display: flex; align-items: center; background: linear-gradient(90deg, rgba(10, 11, 16, .9) 35%, rgba(10, 11, 16, .2) 80%), var(--bn) right center / cover no-repeat; padding: 12px 16px; border-radius: inherit; }
+.dc-fold.bn-ranking[open] > summary { margin-bottom: 10px; border-radius: 16px 16px 0 0; }

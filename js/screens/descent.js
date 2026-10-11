@@ -23,7 +23,7 @@ export default function descent(app, root) {
   let battle = null, playing = false;
 
   const teamStrip = (ids, run) => `<div class="v2-strip">${ids.map((id, i) => { const c = cat.get(id); const m = run?.team.find((x) => x.id === id); return `<span class="v2-mini ${i >= TEAM.active ? 'res' : ''} ${m?.fallen ? 'fallen' : ''}" style="--rc:${RARITY[c.rarity].color}"><img alt="" src="${artUrl(c, { lite: true })}">${m ? `<span class="hpbar"><i style="width:${(m.hp / m.maxHp) * 100}%"></i></span>` : `<small>${i < TEAM.active ? `Niv. ${g.cardLevel(id)}` : 'Rés.'}</small>`}</span>`; }).join('')}</div>`;
-  const ruleHTML = (r) => `<section class="panel dc-rule" style="--rf:${r.faction ? cat.faction[r.faction].colors.secondary : 'var(--gold)'}"><span class="dc-rule-ic">${r.faction ? sigil(r.faction) : icon('star')}</span><span><span class="small muted">Règle du jour</span><b>${esc(r.name)}</b><span class="small">${esc(r.desc)}</span></span></section>`;
+  const ruleHTML = (r) => `<section class="panel dc-rule bn-rule" style="--rf:${r.faction ? cat.faction[r.faction].colors.secondary : 'var(--gold)'}"><span class="dc-rule-ic">${r.faction ? sigil(r.faction) : icon('star')}</span><span><span class="small muted">Règle du jour</span><b>${esc(r.name)}</b><span class="small">${esc(r.desc)}</span></span></section>`;
   const chestChip = (c) => (c ? `<span class="v2-chest-chip" style="--cc:${CHESTS[c].color}">${icon('lock')} ${esc(CHESTS[c].name)}</span>` : '<span class="v2-chest-chip none">aucun coffre</span>');
 
   // ——— Accueil de l'Aventure ———————————————————————————————————————————
@@ -36,6 +36,7 @@ export default function descent(app, root) {
       ${chests ? `<a class="panel dc-chests" href="#/coffres"><span class="dc-new-ic">${icon('lock')}</span><span><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Pleins de boosters</span></span>${icon('next')}</a>` : ''}
       ${ruleHTML(g.rule())}
       <section class="panel dc-go">
+        <div class="dc-banner bn-expedition"><b>Expédition</b><span class="small">${d.best ? `Record : étage ${d.best}` : 'Ta première descente t’attend'}</span></div>
         <div class="dc-go-top"><span class="dc-torches">${Array.from({ length: DESCENT.torches }, (_, i) => `<i class="${i < torches ? 'on' : ''}">${icon('flame')}</i>`).join('')}</span><span class="small muted">${torches ? `${torches} expédition${torches > 1 ? 's' : ''} avec coffre aujourd’hui` : 'Expéditions du jour faites : tu peux rejouer, sans coffre'}</span></div>
         ${teamStrip(team)}
         <p class="small muted center">Pouvoir : <b>${esc(g.ultimate(team).name)}</b> · budget ${g.teamCost(team)} / ${BUDGET}</p>
@@ -44,7 +45,7 @@ export default function descent(app, root) {
         ${torches ? `<div class="dc-curse-row ${ui.cursed ? 'on' : ''}"><span><b>${icon('skull')} Descente maudite</b><span class="small muted">coffre d’une qualité au-dessus, mais rien si l’équipe tombe</span></span><button class="switch" role="switch" aria-checked="${ui.cursed}" data-act="curse" aria-label="Descente maudite"><i></i></button></div>` : ''}
       </section>
       ${Object.values(g.s.items).some((n) => n > 0) ? bagHTML(g) : ''}
-      <details class="panel dc-fold" id="lb"><summary>${icon('trophy')} Classement du jour</summary><div class="lb-body small muted">Chargement…</div></details>
+      <details class="panel dc-fold bn-ranking" id="lb"><summary>${icon('trophy')} Classement du jour</summary><div class="lb-body small muted">Chargement…</div></details>
       <details class="panel dc-fold"><summary>${icon('info')} Comment ça marche</summary><ul class="small">
         <li>Tes cartes sont des créatures liées à ton livre : elles combattent pour toi. 3 au combat, 2 en réserve.</li>
         <li>Au combat, touche une de tes cartes puis l’ennemi à attaquer. La cible riposte. Chaque carte attaque une fois par tour, puis « Fin du tour ».</li>
