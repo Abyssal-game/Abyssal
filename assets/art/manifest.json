@@ -130,6 +130,9 @@
     "abyssal"
   ],
   "factions": [
+    "infernal",
+    "abyssal",
+    "celeste",
     "sauvage",
     "necrotique",
     "primordial",
