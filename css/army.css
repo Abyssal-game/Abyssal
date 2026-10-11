@@ -389,10 +389,9 @@ img.emblem { object-fit: contain; }
 .dc-week.done { border-color: rgba(127, 224, 160, .5); background: linear-gradient(90deg, rgba(30, 90, 60, .3), rgba(12, 14, 20, .94) 70%); }
 .dc-week.done b { color: #9FEFC0; }
 /* En-têtes illustrés : Succès, Bestiaire, Réglages (images provisoires) */
-.bn-trophies { --bn: url(../assets/ui/bn-ranking.webp); }
-.bn-bestiary { --bn: url(../assets/scenes/bestiary.webp); }
-.bn-settings { --bn: url(../assets/scenes/menu.webp); }
-.bn-bestiary.ui-hero, .bn-settings.ui-hero { background-position: right center, center 70% !important; }
+.bn-trophies { --bn: url(../assets/ui/bn-trophies.webp); }
+.bn-bestiary { --bn: url(../assets/ui/bn-bestiary.webp); }
+.bn-settings { --bn: url(../assets/ui/bn-settings.webp); }
 /* Menu Plus : icônes peintes */
 .mn-ic.pic { background: none !important; border: 0 !important; }
 .mn-ic.pic .picon { width: 40px; height: 40px; }
@@ -431,3 +430,10 @@ img.emblem { object-fit: contain; }
 .tab[aria-current="page"] .ic { transform: translateY(-2px) scale(1.08); filter: drop-shadow(0 0 6px rgba(242, 193, 78, .6)); }
 .tab-main .orb { background: radial-gradient(circle at 50% 30%, #E0485E, #8E1630 55%, #3A0610) !important; border: 2px solid #F2D58A !important; box-shadow: 0 0 0 4px rgba(10, 8, 16, .95), 0 0 0 5px rgba(242, 213, 138, .35), 0 0 24px rgba(224, 72, 94, .6) !important; }
 .v2-warn { color: #FFB3BF; display: flex; gap: 6px; align-items: center; justify-content: center; } .v2-warn .ic { width: 15px; height: 15px; flex: none; }
+
+/* Bandeaux : profil, créature de la semaine, série de jours */
+.profile-head.bn-profile { background: linear-gradient(90deg, rgba(12, 10, 20, .9) 35%, rgba(12, 10, 20, .2) 85%), url(../assets/ui/bn-profile.webp) right center / cover no-repeat, #0B0C12 !important; }
+.dc-week { background: linear-gradient(90deg, rgba(40, 10, 16, .92) 40%, rgba(20, 10, 12, .3) 90%), url(../assets/ui/bn-weekly.webp) right center / cover no-repeat, #0B0C12 !important; }
+.dc-week.done { background: linear-gradient(90deg, rgba(12, 30, 20, .92) 40%, rgba(10, 20, 14, .35) 90%), url(../assets/ui/bn-weekly.webp) right center / cover no-repeat, #0B0C12 !important; }
+.dc-week-lbl { display: inline-flex; align-items: center; gap: 4px; } .dc-week-lbl .picon { width: 20px; height: 20px; }
+.td-daily { margin: 0 -14px; padding-left: 14px; padding-right: 14px; background: linear-gradient(90deg, rgba(12, 10, 18, .94) 45%, rgba(12, 10, 18, .4)), url(../assets/ui/bn-streak.webp) right center / cover no-repeat; }

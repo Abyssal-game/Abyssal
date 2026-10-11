@@ -40,7 +40,7 @@ export default function profile(app, root) {
     const av = s.avatar && cat.get(s.avatar);
     const show = (s.showcase.length ? s.showcase.map((id) => cat.get(id)) : g.bestCards(3)).filter(Boolean);
     root.innerHTML = `
-      <section class="panel ornate profile-head">
+      <section class="panel ornate profile-head bn-profile">
         <div class="avatar-big pf pf-${s.frame}">${av ? `<img alt="" src="${artUrl(av)}">` : EMBLEM}</div>
         <div class="ph-text">
           <h1>${esc(s.title)}</h1>
