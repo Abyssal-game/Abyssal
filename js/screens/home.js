@@ -37,9 +37,7 @@ export default function home(app, root) {
 
   root.innerHTML = `
     <section class="home-brand">
-      <span class="hb-emblem">${EMBLEM}</span>
-      <h1 class="wordmark">ABYSSAL</h1>
-      <p class="tagline"><i></i>Le Bestiaire interdit<i></i></p>
+      <h1 class="hb-title"><img src="assets/brand/title.webp" alt="ABYSSAL — Le Bestiaire interdit"></h1>
     </section>
 
     <div class="home-acts">

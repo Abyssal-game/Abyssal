@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v68';
+const VERSION = 'abyssal-v70';
 const CORE = [
   './', 'index.html', 'manifest.webmanifest',
   'css/base.css', 'css/card.css', 'css/screens.css', 'css/army.css',
@@ -18,7 +18,7 @@ const CORE = [
   'data/cards/necrotique.json', 'data/cards/primordial.json', 'data/cards/artificiel.json',
   'assets/art/manifest.json',
   ...['standard', 'premium', 'event', 'infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel'].map((k) => `assets/packs/${k}.webp`),
-  'assets/backs/back.webp',
+  'assets/backs/back.webp', 'assets/brand/emblem.webp', 'assets/brand/title.webp', 'assets/brand/loading.webp',
   ...['bg-1', 'bg-2', 'bg-3', 'bg-4', 'bg-boss'].map((k) => `assets/battle/${k}.webp`),
   ...['home', 'descent', 'shop', 'collection', 'team', 'chests', 'bestiary', 'trophies', 'profile', 'menu', 'factions', 'door-fight', 'door-elite', 'door-boss', 'rest', 'altar', 'treasure'].map((k) => `assets/scenes/${k}.webp`),
   ...['holo', 'gold-leaf', 'gold-frame', 'cosmic', 'cosmic-frame', 'seal-frame'].map((k) => `assets/variants/${k}.webp`),
