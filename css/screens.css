@@ -1299,3 +1299,4 @@ html.reduce-motion .tb-u, html.reduce-motion .tb-u::after { animation: none !imp
 .dc-rule-line .ic { width: 13px; height: 13px; vertical-align: -2px; color: var(--gold); }
 .pf-abysse { border-color: #3FA9C9; box-shadow: 0 0 0 2px #04121A, 0 0 18px rgba(63, 169, 201, .8), inset 0 0 10px rgba(63, 169, 201, .5); }
 .pf-chasseur { border-color: #8FCB5A; border-style: double; border-width: 5px; box-shadow: 0 0 12px rgba(143, 203, 90, .55); }
+.mn-proto { border-bottom: 1px solid var(--line-soft); background: linear-gradient(100deg, rgba(200, 164, 93, .14), transparent 70%); }

@@ -17,6 +17,7 @@ export default function menu(app, root) {
   const A = (act, ic, title, sub) => `<button class="mn-t" data-mn="${act}"><span class="mn-ic">${icon(ic)}</span><span class="mn-tx"><b>${title}</b><span>${sub}</span></span>${icon('next')}</button>`;
   root.innerHTML = `
     <nav class="mn-list">
+      <a class="mn-t mn-proto" href="v2/"><span class="mn-ic">${icon('sparkle')}</span><span class="mn-tx"><b>Essayer le prototype</b><span>La nouvelle version : tes cartes combattent</span></span>${icon('next')}</a>
       ${T('#/profil', 'user', 'Profil', 'Vitrine, titres, statistiques')}
       ${T('#/succes', 'trophy', 'Succès', `${achDone} / ${cat.achievements.length} débloqués`)}
       ${T('#/bestiaire', 'book', 'Bestiaire', 'Les créatures, les royaumes, l’histoire')}

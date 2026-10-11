@@ -33,8 +33,8 @@ export function createBattle(heroes, enemies, seed = 1, { gauge = 0, invocation 
 }
 
 export const alive = (st, side) => st.order[side].map((id) => st.units[id]).filter((u) => u.hp > 0);
-export const front = (st, side) => (side === 'ally' ? alive(st, side) : alive(st, side).slice(0, FRONT));
-export const bench = (st, side) => (side === 'ally' ? [] : alive(st, side).slice(FRONT));
+export const front = (st, side) => alive(st, side).slice(0, FRONT);
+export const bench = (st, side) => alive(st, side).slice(FRONT);
 export function current(st) {
   if (st.over) return null;
   return [...front(st, 'ally'), ...front(st, 'enemy')].sort((a, b) => a.ct - b.ct)[0] || null;
@@ -84,11 +84,11 @@ function gain(st, n) { st.gauge = Math.min(100, (st.gauge || 0) + n); }
 function hurt(st, src, tgt, amount, ev, kind = 'hit', extra = {}) {
   if (tgt.hp <= 0) return 0;
   // Égide du paladin : il reçoit le coup à la place de l'allié protégé
-  if (tgt.side === 'ally' && tgt.st.protectedBy && kind !== 'dot') {
+  if (tgt.side === 'ally' && tgt.st.protectedBy && kind !== 'dot' && !extra.covered) {
     const p = st.units[tgt.st.protectedBy];
-    if (p && p.hp > 0 && p.st.protecting) {
+    if (p && p.hp > 0 && p.st.protecting && front(st, 'ally').includes(p)) {
       ev.push({ t: 'cover', u: p.uid, v: tgt.uid });
-      const d = hurt(st, src, p, amount * 0.7, ev, kind, extra);
+      const d = hurt(st, src, p, amount * 0.7, ev, kind, { ...extra, covered: true });
       p.res = Math.min(100, (p.res || 0) + d * 2);
       return d;
     }
@@ -124,8 +124,9 @@ function hurt(st, src, tgt, amount, ev, kind = 'hit', extra = {}) {
       });
     }
     if (tgt.st.protecting) front(st, 'ally').forEach((h) => { if (h.st.protectedBy === tgt.uid) h.st.protectedBy = null; });
-    // un ennemi de réserve entre en ligne et annonce son intention
+    // un ennemi de réserve entre en ligne et annonce son intention ; une créature de réserve prend la relève
     front(st, 'enemy').forEach((e) => { if (!e.intent) setIntent(st, e); if (e.ct < st.now) e.ct = st.now + tick(e) * 0.5; });
+    front(st, 'ally').forEach((h) => { if (h.ct < st.now) { h.ct = st.now + tick(h) * 0.5; if (!h.entered) { h.entered = true; ev.push({ t: 'status', u: h.uid, s: 'Entre en jeu' }); } } });
   } else if (tgt.side === 'enemy' && !tgt.st.enraged && (tgt.family === 'enrage' || tgt.boss) && tgt.hp < tgt.maxHp / 2) {
     tgt.st.enraged = true;
     ev.push({ t: 'status', u: tgt.uid, s: 'Enragé !' });
@@ -218,6 +219,15 @@ export function act(st, a) {
       if (t && a.heal) heal(st, t, t.maxHp * a.heal, ev);
       if (a.healAll) front(st, 'ally').forEach((f) => heal(st, f, f.maxHp * a.healAll, ev));
       ev.push({ t: 'item', u: u.uid, item: a.item });
+    } else if (a.action === 'swap') {
+      // remplacement tactique : une créature de réserve prend la place de celle qui joue (une fois par combat)
+      const r = st.units[a.target];
+      const oi = st.order.ally.indexOf(u.uid), ri = st.order.ally.indexOf(a.target);
+      if (!r || r.hp <= 0 || st.swapped || ri < 0 || !bench(st, 'ally').includes(r)) return act(st, { ...a, action: 'defend' });
+      st.order.ally[oi] = r.uid; st.order.ally[ri] = u.uid;
+      st.swapped = true;
+      r.ct = st.now + tick(r) * 0.4; r.entered = true;
+      ev.push({ t: 'swap', u: u.uid, v: r.uid });
     } else if (a.action === 'invoke') {
       if (!canInvoke(st)) return act(st, { ...a, action: 'attack' });
       invoke(st, u, ev);
@@ -252,6 +262,22 @@ export function act(st, a) {
           }
           break;
         }
+        // Compétences des créatures (prototype v2)
+        case 'c_garde': { const w = front(st, 'ally').filter((h) => h.uid !== u.uid).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0]; u.st.armorUp = 2; if (w) { w.st.protectedBy = u.uid; u.st.protecting = 2; ev.push({ t: 'status', u: w.uid, s: 'Protégé' }); } else ev.push({ t: 'status', u: u.uid, s: 'Garde' }); break; }
+        case 'c_frappe': { const tt = t && t.hp > 0 ? t : foes[0]; hit(tt, dmg(st, Math.max(u.atk, u.mag), tt, 1.8 * s), { crit: a.strike === 'perfect' }); break; }
+        case 'c_soin': { const tt = t && t.hp > 0 ? t : front(st, 'ally').sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0]; heal(st, tt, tt.maxHp * 0.25 + u.mag, ev); break; }
+        case 'c_venin': { const tt = t && t.hp > 0 ? t : foes[0]; hit(tt, dmg(st, Math.max(u.atk, u.mag), tt, 0.7 * s), { crit: a.strike === 'perfect' }); if (tt && tt.hp > 0) { tt.st.poison = 3; ev.push({ t: 'status', u: tt.uid, s: 'Poison' }); } break; }
+        case 'c_entrave': {
+          const tt = t && t.hp > 0 ? t : foes[0];
+          hit(tt, dmg(st, Math.max(u.atk, u.mag), tt, 0.6 * s), { crit: a.strike === 'perfect' });
+          if (tt && tt.hp > 0) {
+            if (tt.st.charging) { tt.st.charging = false; tt.turns++; setIntent(st, tt); ev.push({ t: 'interrupt', u: tt.uid }); }
+            if (!tt.boss) { tt.st.stun = 1; ev.push({ t: 'status', u: tt.uid, s: 'Étourdi' }); }
+          }
+          break;
+        }
+        case 'c_cri': front(st, 'ally').forEach((h) => { h.st.inspired = 2; }); gain(st, 10); ev.push({ t: 'status', u: u.uid, s: 'Ralliement !' }); break;
+        case 'c_vague': foes.forEach((f) => hit(f, dmg(st, u.mag, f, 0.8))); break;
         // Sorts de l'Arsenal (u.sp : puissance selon la rareté)
         case 'seisme': foes.forEach((f) => { if (hit(f, dmg(st, u.atk, f, 0.8 * (u.sp || 1)))) u.res = Math.min(100, (u.res || 0) + 10); }); break;
         case 'rempart': front(st, 'ally').forEach((h) => { h.st.shield = 1; }); ev.push({ t: 'status', u: u.uid, s: 'Rempart !' }); break;
@@ -339,13 +365,17 @@ function invoke(st, u, ev) {
   st.gauge = 0;
   st.invUses = (st.invUses || 0) + 1;
   ev.push({ t: 'summon', u: u.uid, inv: inv.key });
-  if (inv.key === 'phenix') {
+  if (inv.key === 'sceau') {
+    front(st, 'ally').forEach((h) => { heal(st, h, h.maxHp * 0.2 * p, ev); h.st.shield = 1; });
+  } else if (inv.key === 'aegis') {
+    front(st, 'ally').forEach((h) => { h.st.shield = 1; h.energy = Math.min(MAX_ENERGY, h.energy + 2); ev.push({ t: 'status', u: h.uid, s: 'Égide' }); });
+  } else if (inv.key === 'phenix' || inv.key === 'revive') {
     const fallen = st.order.ally.map((id) => st.units[id]).filter((h) => h.hp <= 0);
     if (fallen.length) fallen.forEach((h) => { h.hp = Math.round(h.maxHp * 0.4 * p); h.ct = st.now + tick(h) * 0.5; ev.push({ t: 'revive', u: h.uid, hp: h.hp }); });
     else front(st, 'ally').forEach((h) => { heal(st, h, h.maxHp * 0.35 * p, ev); h.st.poison = 0; h.st.burn = 0; });
-  } else if (inv.key === 'bahamut') {
+  } else if (inv.key === 'bahamut' || inv.key === 'nova') {
     front(st, 'enemy').forEach((e) => { hurt(st, null, e, (30 + 7 * lvl) * p * taken(st, e), ev, 'hit', { big: true }); if (e.hp > 0) { e.st.exposed = 2; } });
-  } else if (inv.key === 'fenrir') {
+  } else if (inv.key === 'fenrir' || inv.key === 'smite') {
     const t = front(st, 'enemy').sort((x, y) => y.hp - x.hp)[0];
     if (t) { hurt(st, null, t, (70 + 14 * lvl) * p * taken(st, t), ev, 'hit', { big: true }); if (t.hp <= 0) st.gauge = 50; }
   }
@@ -358,11 +388,23 @@ export function plan(st, u) {
   if (canInvoke(st)) {
     const anyFallen = st.order.ally.some((id) => st.units[id].hp <= 0);
     const lowTeam = allies.reduce((a, h) => a + h.hp / h.maxHp, 0) / allies.length < 0.55;
-    if (st.inv.key !== 'phenix' || anyFallen || lowTeam) return A('invoke');
+    if (!['phenix', 'revive', 'sceau'].includes(st.inv.key) || anyFallen || lowTeam) return A('invoke');
   }
   const prey = () => (foes.find((f) => f.st.mark) || foes.slice().sort((x, y) => x.hp - y.hp)[0])?.uid;
   const charging = foes.find((f) => f.st.charging);
   const has = (k) => u.skills.includes(k) && u.energy >= SKILLS[k].cost;
+  if (u.creature) {
+    const hurtAlly = allies.filter((h) => h.hp < h.maxHp * 0.55).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
+    if (has('c_entrave') && charging) return A('skill', { skill: 'c_entrave', target: charging.uid });
+    if (has('c_soin') && hurtAlly) return A('skill', { skill: 'c_soin', target: hurtAlly.uid });
+    if (has('c_garde') && (charging || hurtAlly) && !u.st.protecting) return A('skill', { skill: 'c_garde' });
+    if (has('c_cri') && !allies.some((h) => h.st.inspired)) return A('skill', { skill: 'c_cri' });
+    if (has('c_vague') && foes.length >= 2) return A('skill', { skill: 'c_vague' });
+    const tough = foes.slice().sort((x, y) => y.hp - x.hp)[0];
+    if (has('c_venin') && tough && !tough.st.poison) return A('skill', { skill: 'c_venin', target: tough.uid });
+    if (has('c_frappe') && u.energy >= 2) return A('skill', { skill: 'c_frappe', target: prey() });
+    return A('attack', { target: prey() });
+  }
   // Sorts de l'Arsenal
   if (has('meteore') && foes.length >= 2) return A('skill', { skill: 'meteore' });
   if (has('blizzard') && foes.length >= 2 && (foes.some((f) => f.st.burn) || foes.length >= 3)) return A('skill', { skill: 'blizzard' });

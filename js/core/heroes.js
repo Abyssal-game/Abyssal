@@ -95,6 +95,14 @@ export const SKILLS = {
   dissonance: { name: 'Dissonance', cost: 1, target: 'enemies', desc: 'Magie ×0,5 sur toute la ligne ; les ennemis frappent 25 % moins fort 2 tours.' },
   drain:    { name: 'Drain de vie', cost: 1, target: 'enemy', desc: 'Magie ×1,2 ; se soigne de la moitié des dégâts.' },
   macabre:  { name: 'Danse macabre', cost: 2, target: 'enemies', desc: 'Les morts frappent toute la ligne : ×0,5, +25 % par âme (consomme les âmes).' },
+  // Compétences des créatures (prototype v2) : une par rôle
+  c_garde:   { name: 'Garde', cost: 1, target: 'self', desc: 'Protège l’allié le plus blessé 2 tours (reçoit ses coups à 70 %) et durcit sa défense.' },
+  c_frappe:  { name: 'Coup puissant', cost: 1, target: 'enemy', desc: 'Frappe une cible à ×1,8.' },
+  c_soin:    { name: 'Soin', cost: 1, target: 'ally', desc: 'Soigne un allié de 25 % de ses PV, plus la magie.' },
+  c_venin:   { name: 'Venin', cost: 1, target: 'enemy', desc: 'Frappe à ×0,7 et empoisonne 3 tours (6 % des PV par tour).' },
+  c_entrave: { name: 'Entrave', cost: 2, target: 'enemy', desc: 'Frappe à ×0,6, étourdit 1 tour et interrompt un gros coup en préparation.' },
+  c_cri:     { name: 'Cri de ralliement', cost: 1, target: 'self', desc: 'L’équipe inflige +25 % de dégâts 2 tours ; +10 à la jauge.' },
+  c_vague:   { name: 'Déferlante', cost: 2, target: 'enemies', desc: 'Frappe toute la ligne ennemie (magie ×0,8).' },
   // Sorts de l'Arsenal (ajoutés par l'emplacement « Sort »)
   seisme:   { name: 'Séisme', cost: 2, target: 'enemies', spell: true, desc: 'Frappe toute la ligne (×0,8) ; +10 rage par cible.' },
   rempart:  { name: 'Rempart runique', cost: 2, target: 'self', spell: true, desc: 'Chaque héros reçoit un bouclier qui annule le prochain coup.' },

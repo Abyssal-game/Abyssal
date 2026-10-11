@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v52';
+const VERSION = 'abyssal-v54';
 const CORE = [
   './', 'index.html', 'manifest.webmanifest',
   'css/base.css', 'css/card.css', 'css/screens.css',
@@ -59,6 +59,11 @@ self.addEventListener('fetch', (e) => {
       if (res.ok) c.put(req, res.clone());
       return res;
     }));
+    return;
+  }
+  // Prototype v2 : toujours le réseau d'abord (il change souvent), le cache en secours hors ligne
+  if (url.pathname.includes('/v2/')) {
+    e.respondWith(fetch(req).then((res) => { if (res.ok) caches.open(VERSION).then((c) => c.put(req, res.clone())); return res; }).catch(() => caches.match(req, { ignoreSearch: true })));
     return;
   }
   // Application : cache d'abord (version figée), réseau en secours

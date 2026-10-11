@@ -18,6 +18,10 @@ Application d’ouverture de boosters et de collection de cartes dark fantasy, j
 - **Les illustrations sont provisoires.** Elles sont générées par le jeu (silhouettes en contre-jour, décors propres à chaque faction) à partir de la fiche de chaque carte. Elles se remplacent une par une par de vraies images, sans toucher au code (voir plus bas).
 - **La sauvegarde est locale** (localStorage de l’appareil). Elle n’est synchronisée nulle part ; l’export/import de sauvegarde sert à la conserver ou à la transférer.
 
+## Prototype v2 (dossier `v2/`)
+
+Nouvelle direction en test, à l’adresse `…/v2/` : les cartes sont des créatures qui combattent (3 au combat, 2 en réserve, budget de 15 points selon la rareté), les doublons les font monter de niveau, la Descente rapporte des coffres pleins de boosters. 25 créatures représentatives (`v2/js/units.js`), sauvegarde séparée (`abyssal.v2`), tests dans `tests/v2.test.mjs`. La page réutilise les données, illustrations, styles et le moteur de combat de la version actuelle (`<base href="../">`).
+
 ## Boucle de jeu
 
 - **La Descente** (`js/core/descent.js`, `js/core/battle.js`, `js/core/heroes.js`, écrans `js/screens/descent.js` et `js/screens/battle-ui.js`) : expédition quotidienne (3 torches par jour) avec une équipe de **3 héros** qui gagnent des niveaux : Brenna, Aldric, Syléa et Morgane au départ, puis Kaël (étage 3), Thalia (6), Lucien (9) et Ossian (12). Les ennemis sont les créatures du Bestiaire, de plus en plus fortes en profondeur ; elles annoncent leur prochaine action (attaques préparées à interrompre ou à parer). Une **invocation** (Phénix, Bahamut, Fenrir) se déclenche quand sa jauge est pleine. Les créatures vaincues remplissent le **Bestiaire de chasse**. Portraits définitifs des héros : `assets/heroes/<clé>.webp`, déclarés dans la liste `heroes` de `assets/art/manifest.json`.
