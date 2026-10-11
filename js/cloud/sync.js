@@ -40,8 +40,7 @@ function schedule() { clearTimeout(timer); timer = setTimeout(pushNow, 4000); }
 // Remplace la partie de cet appareil par une sauvegarde venue du serveur.
 function adopt(remote) {
   const s = migrate(remote.data); // lève une erreur si la sauvegarde en ligne est illisible
-  app.game.s = s;
-  app.game.persist();
+  app.game.replaceSave(s); // convertit au passage une partie de l'ancien système (héros)
   app.applySettings?.();
   app.refresh();
   sync.lastPush = Date.now();

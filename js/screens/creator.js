@@ -26,11 +26,11 @@ export function openCreator(app) {
         <div class="row gap wrap">${B('snap', `${icon('download')}Copier ma partie actuelle`)}${snap ? B('restore', `${icon('upload')}Revenir à la copie`, 'gold') : ''}</div></section>
 
       <section class="cr-sec"><h3>Ressources</h3><div class="row gap wrap">
-        ${B('shards', '+10 000 éclats')}${B('ash', '+10 000 cendres')}${B('tickets', '+10 boosters de chaque')}${B('items', '+5 de chaque objet')}${B('arsenal', 'Coffres et 200 fer')}${B('free', 'Recharger les boosters gratuits')}
+        ${B('shards', '+10 000 éclats')}${B('ash', '+10 000 cendres')}${B('tickets', '+10 boosters de chaque')}${B('items', '+5 de chaque objet')}${B('chests', 'Des coffres de chaque')}${B('free', 'Recharger les boosters gratuits')}
       </div></section>
 
       <section class="cr-sec"><h3>Cartes</h3><div class="row gap wrap">
-        ${B('all', 'Toutes les cartes')}${B('variants', 'Toutes les variantes')}${B('dups', 'Doublons pour tester')}${B('levels', 'Héros et invocations niveau 20')}
+        ${B('all', 'Toutes les cartes')}${B('variants', 'Toutes les variantes')}${B('dups', 'Doublons pour tester')}
       </div>
         <form class="cr-give" id="give">
           <input class="input plain" name="q" list="cr-cards" placeholder="Nom d’une carte…" autocomplete="off">
@@ -47,7 +47,7 @@ export function openCreator(app) {
 
       <section class="cr-sec"><h3>Rituel et Descente</h3>
         <div class="set-row"><div><b>Rituels toujours réussis</b></div><button class="switch" role="switch" aria-checked="${!!g.s.devRitual}" data-x="ritual"><i></i></button></div>
-        <div class="row gap wrap">${B('torches', 'Rendre les torches')}${B('heal', 'Soigner tous les héros')}${B('missions', 'Accomplir les missions')}</div>
+        <div class="row gap wrap">${B('torches', 'Rendre les torches')}${B('missions', 'Accomplir les missions')}</div>
         <form class="cr-give" id="floor"><input class="input plain" name="n" type="number" min="1" max="200" placeholder="Étage" ${d.run ? '' : 'disabled'}><button class="btn small" type="submit" ${d.run ? '' : 'disabled'}>Aller à l’étage</button></form>
         <p class="small muted">${d.run ? `Expédition en cours : étage ${d.run.floor}.` : 'Lance une Descente pour pouvoir sauter d’étage.'}</p>
       </section>
@@ -73,15 +73,13 @@ export function openCreator(app) {
       if (x === 'ash') g.devGrant({ ash: 10000 });
       if (x === 'tickets') g.devGrant({ tickets: Object.fromEntries(Object.keys(BOOSTERS).map((k) => [k, 10])) });
       if (x === 'items') g.devItems(5);
-      if (x === 'arsenal') g.devArsenal();
+      if (x === 'chests') g.devChests();
       if (x === 'free') g.devFreePacks();
       if (x === 'all') g.devUnlockAll();
       if (x === 'variants') g.devAllVariants();
       if (x === 'dups') g.devDuplicates(10);
-      if (x === 'levels') g.devMaxLevels();
       if (x === 'ritual') { g.s.devRitual = !g.s.devRitual; g.persist(); }
       if (x === 'torches') g.devTorches();
-      if (x === 'heal') g.devHealAll();
       if (x === 'missions') g.devMissions();
       if (x === 'off') { g.setSetting('dev', false); sheet.close(); toast('Mode Créateur désactivé.', { icon: 'crown' }); return; }
       if (!['snap', 'restore', 'ritual'].includes(x)) toast('C’est fait.', { kind: 'success', icon: 'crown' });

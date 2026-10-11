@@ -1,13 +1,13 @@
 // ABYSSAL v2 : écran du duel de cartes.
 // Grandes cartes avec ATTAQUE et PV ; toucher une de tes cartes, puis l'ennemi à frapper.
-import { RARITY } from '../../js/config.js';
-import { artUrl } from '../../js/art/assets.js';
-import { icon, EMBLEM } from '../../js/ui/icons.js';
-import { esc, openSheet, toast } from '../../js/ui/dom.js';
-import { coach } from '../../js/ui/coach.js';
-import { cardHTML } from '../../js/ui/card.js';
-import { KEYWORDS, GAUGE_MAX, front, reserve, alive, targetsFor, canAct, attack, endTurn, useUlt, ultReady, autoTurn } from './duel.js';
-import { ULTS } from './units.js';
+import { RARITY } from '../config.js';
+import { artUrl } from '../art/assets.js';
+import { icon, EMBLEM } from '../ui/icons.js';
+import { esc, openSheet, toast } from '../ui/dom.js';
+import { coach } from '../ui/coach.js';
+import { cardHTML } from '../ui/card.js';
+import { KEYWORDS, GAUGE_MAX, front, reserve, alive, targetsFor, canAct, attack, endTurn, useUlt, ultReady, autoTurn } from '../core/duel.js';
+import { ULTS } from '../core/army.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 

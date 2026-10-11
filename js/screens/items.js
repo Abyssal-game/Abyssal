@@ -1,9 +1,7 @@
-// Objets : rayon de la boutique et sac du joueur (utilisation, choix d'une carte cible).
+// Objets : rayon de la boutique et sac du joueur.
 import { ITEMS } from '../config.js';
-import { HERO_ORDER } from '../core/heroes.js';
-import { heroCardHTML } from '../ui/hero.js';
 import { icon } from '../ui/icons.js';
-import { esc, fmt, toast, openSheet } from '../ui/dom.js';
+import { esc, fmt, toast } from '../ui/dom.js';
 
 export function itemsShopHTML(g) {
   return `<h2 class="section-title" id="objets">Objets</h2>
@@ -23,7 +21,7 @@ export function bindItemShop(app, root, after) {
   root.addEventListener('click', (e) => {
     const b = e.target.closest('[data-item-buy]');
     if (!b || b.disabled) return;
-    try { app.game.buyItem(b.dataset.itemBuy); app.sfx.coin(); toast(`<b>${esc(ITEMS[b.dataset.itemBuy].name)}</b> rejoint ${ITEMS[b.dataset.itemBuy].arsenal ? 'ton Arsenal' : 'ton sac'}.`, { kind: 'success', icon: ITEMS[b.dataset.itemBuy].icon }); after(); }
+    try { app.game.buyItem(b.dataset.itemBuy); app.sfx.coin(); toast(`<b>${esc(ITEMS[b.dataset.itemBuy].name)}</b> rejoint ${ITEMS[b.dataset.itemBuy].chests ? 'tes coffres' : 'ton sac'}.`, { kind: 'success', icon: ITEMS[b.dataset.itemBuy].icon }); after(); }
     catch (err) { app.sfx.error(); toast(esc(err.message), { kind: 'error' }); }
   });
 }
@@ -33,7 +31,7 @@ export function bagHTML(g) {
   const owned = Object.keys(ITEMS).filter((k) => g.itemCount(k));
   return `<section class="panel bag"><h3>${icon('booster')} Ton sac</h3>
     ${owned.length ? `<div class="bag-list">${owned.map((k) => `<button class="bag-it" data-item-use="${k}" title="${esc(ITEMS[k].desc)}"><span class="item-ic sm">${icon(ITEMS[k].icon)}</span><span>${esc(ITEMS[k].name)}</span><b>×${g.itemCount(k)}</b></button>`).join('')}</div>`
-      : '<p class="small muted">Vide. Les baumes soignent tes héros blessés, les torches bénies offrent une expédition de plus.</p>'}
+      : '<p class="small muted">Vide. Les torches bénies offrent une expédition de plus.</p>'}
   </section>`;
 }
 
@@ -43,17 +41,10 @@ export function bindBag(app, root, after) {
     try { g.useItem(k, target); app.sfx.discover(); toast(`Objet utilisé : ${esc(ITEMS[k].name)}.`, { kind: 'success', icon: ITEMS[k].icon }); after(); }
     catch (err) { app.sfx.error(); toast(esc(err.message), { kind: 'error' }); }
   };
-  const pickHero = (k, keys, title) => {
-    if (!keys.length) { toast(k === 'baume' ? 'Aucun héros blessé.' : 'Aucun héros disponible.', { icon: 'info' }); return; }
-    const sh = openSheet(`<h2>${esc(title)}</h2><div class="hc-grid">${keys.map((h) => heroCardHTML(g, h)).join('')}</div>`, { label: title });
-    sh.body.addEventListener('click', (e) => { const t = e.target.closest('[data-hero]'); if (t) { sh.close(); use(k, t.dataset.hero); } });
-  };
   root.addEventListener('click', (e) => {
     const b = e.target.closest('[data-item-use]');
     if (!b) return;
     const k = b.dataset.itemUse;
-    if (k === 'baume') pickHero(k, HERO_ORDER.filter((h) => g.s.heroes[h] && g.heroWounded(h)), 'Soigner quel héros ?');
-    else if (k === 'parchemin') pickHero(k, HERO_ORDER.filter((h) => g.s.heroes[h]), 'Donner l’expérience à quel héros ?');
-    else use(k);
+    use(k);
   });
 }

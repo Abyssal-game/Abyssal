@@ -1,17 +1,18 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v56';
+const VERSION = 'abyssal-v57';
 const CORE = [
   './', 'index.html', 'manifest.webmanifest',
-  'css/base.css', 'css/card.css', 'css/screens.css',
+  'css/base.css', 'css/card.css', 'css/screens.css', 'css/army.css',
   'js/main.js', 'js/config.js',
   'js/core/catalog.js', 'js/core/game.js', 'js/core/save.js', 'js/core/boosters.js',
   'js/art/geometry.js', 'js/art/scenes.js', 'js/art/creatures.js', 'js/art/procedural.js', 'js/art/assets.js',
   'js/ui/dom.js', 'js/ui/icons.js', 'js/ui/card.js', 'js/ui/sound.js',
   'js/screens/home.js', 'js/screens/collection.js', 'js/screens/shop.js', 'js/screens/opening.js', 'js/screens/detail.js',
   'js/screens/bestiary.js', 'js/screens/factions.js', 'js/screens/achievements.js', 'js/screens/profile.js',
-  'js/screens/settings.js', 'js/screens/fusion.js', 'js/screens/ritual.js', 'js/screens/descent.js', 'js/screens/items.js', 'js/screens/account.js', 'js/screens/creator.js', 'js/screens/battle-ui.js', 'js/screens/menu.js', 'js/screens/welcome.js', 'js/screens/heroes.js', 'js/core/heroes.js', 'js/ui/hero.js', 'js/core/battle.js', 'js/cloud/cloud.js', 'js/cloud/sync.js', 'js/core/descent.js', 'js/core/pacts.js', 'js/ui/pact.js', 'js/ui/coach.js', 'js/core/gear.js', 'js/ui/gear.js', 'js/screens/arsenal.js', 'js/screens/merchant.js',
+  'js/screens/settings.js', 'js/screens/fusion.js', 'js/screens/ritual.js', 'js/screens/descent.js', 'js/screens/items.js', 'js/screens/account.js', 'js/screens/creator.js', 'js/screens/menu.js', 'js/screens/welcome.js', 'js/cloud/cloud.js', 'js/cloud/sync.js', 'js/core/descent.js', 'js/ui/coach.js',
+  'js/core/army.js', 'js/core/duel.js', 'js/screens/army.js', 'js/screens/duel-ui.js', 'js/ui/chest.js',
   'data/factions.json', 'data/sets.json', 'data/abilities.json', 'data/achievements.json', 'data/lore.json',
   'data/cards/infernal.json', 'data/cards/abyssal.json', 'data/cards/celeste.json', 'data/cards/sauvage.json',
   'data/cards/necrotique.json', 'data/cards/primordial.json', 'data/cards/artificiel.json',

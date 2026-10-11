@@ -33,5 +33,5 @@
  { "key": "hunt_100", "name": "Grand veneur", "desc": "Vaincs 100 espèces de créatures différentes.", "cond": {"type": "hunted", "n": 100}, "reward": {"shards": 400, "title": "Grand veneur"} },
  { "key": "master_5", "name": "Savoir ancien", "desc": "Maîtrise 5 créatures (15 victoires contre chacune).", "cond": {"type": "mastered", "n": 5}, "reward": {"shards": 200, "frame": "chasseur"} },
  { "key": "trophy_1", "name": "Premier trophée", "desc": "Vaincs 40 fois la même créature.", "cond": {"type": "trophies", "n": 1}, "reward": {"shards": 150, "title": "Chasseur de trophées"} },
- { "key": "pact_3", "name": "Lié par le sang", "desc": "Scelle un pacte légendaire (carte Mythique ou Secrète).", "cond": {"type": "pactLeg", "n": 1}, "reward": {"shards": 150} }
+ { "key": "pact_3", "name": "Lié par le sang", "desc": "Fais monter une créature au niveau 5 grâce à ses doublons.", "cond": {"type": "cardLevel", "n": 5}, "reward": {"shards": 150} }
 ]

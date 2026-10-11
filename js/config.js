@@ -83,7 +83,6 @@ export const EVENTS = [
   { key: 'maree',   name: 'La Marée noire',            factions: ['abyssal', 'primordial'],  desc: 'Les Fosses remontent, et avec elles ce qui dormait avant le temps.' },
   { key: 'chute',   name: 'L’Écho de la Chute',        factions: ['celeste', 'infernal'],    desc: 'Les anges et les déchus se souviennent ensemble de la grande guerre.' },
   { key: 'chasse',  name: 'La Grande Chasse',          factions: ['sauvage', 'necrotique'],  desc: 'Les bêtes courent, et les morts courent avec elles.' },
-  { key: 'forge',   name: 'Le Réveil de la Forge',     factions: ['artificiel', 'primordial'], desc: 'La Forge Sans Maître rallume les feux du monde.' },
   { key: 'silence', name: 'Le Silence des profondeurs', factions: ['abyssal', 'artificiel'], desc: 'Des machines englouties se remettent en marche sous la mer.' },
   { key: 'aube',    name: 'L’Aube sauvage',            factions: ['celeste', 'sauvage'],     desc: 'Une lumière étrange se lève sur la Forêt Première.' },
 ];
@@ -143,8 +142,7 @@ export const MISSIONS = [
   { key: 'depth4',   kind: 'depth',    n: 4, shards: 70, text: 'Atteins l’étage 4 de la Descente' },
   { key: 'wins',     kind: 'win',      n: 5, shards: 60, text: 'Remporte 5 combats dans la Descente' },
   { key: 'offering', kind: 'daily',    n: 1, shards: 30, text: 'Récupère l’offrande du jour' },
-  { key: 'chest2',   kind: 'chest',    n: 2, shards: 50, text: 'Ouvre 2 coffres de l’Arsenal' },
-  { key: 'forge',    kind: 'forge',    n: 1, shards: 50, text: 'Forge un objet' },
+  { key: 'chest2',   kind: 'chest',    n: 2, shards: 50, text: 'Ouvre 2 coffres' },
 ];
 export const MISSION_BONUS = { tickets: { standard: 1 }, chests: { fer: 1 } }; // les 3 missions du jour accomplies
 
@@ -156,11 +154,8 @@ export const LUCK_POINTS = { C: 1, PC: 2, R: 6, HR: 20, M: 80, S: 200, variant: 
 
 // Boutique d'objets (payés en éclats). limit : achats maximum par jour.
 export const ITEMS = {
-  baume:     { name: 'Baume de soin',          price: 80,  icon: 'heart',   desc: 'Soigne immédiatement un héros blessé.' },
-  elixir:    { name: 'Élixir des profondeurs', price: 260, icon: 'flame',   desc: 'Soigne d’un coup tous tes héros blessés.', hidden: true },
   torche:    { name: 'Torche bénie',           price: 220, icon: 'flame',   desc: 'Rallume une torche déjà utilisée : une expédition de plus aujourd’hui.', limit: 2 },
   encens:    { name: 'Encens de ferveur',      price: 150, icon: 'sparkle', desc: '+15 % de chance de réussite à ton prochain rituel d’élévation.', hidden: true },
-  parchemin: { name: 'Parchemin d’expérience', price: 120, icon: 'scroll',  desc: '+80 XP au héros de ton choix.' },
-  // Rayon de l'Arsenal : vont directement dans l'Arsenal (pas dans le sac)
-  coffreFer: { name: 'Coffre de fer',  price: 240, icon: 'lock', desc: 'Deux objets pour tes héros. Rare ou mieux garanti.', limit: 2, arsenal: { chests: { fer: 1 } } },
+  // Coffre : rejoint tes coffres (2 boosters à l'intérieur)
+  coffreFer: { name: 'Coffre de fer',  price: 180, icon: 'lock', desc: 'Un coffre qui contient 2 boosters standard.', limit: 2, chests: { fer: 1 } },
 };

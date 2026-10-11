@@ -17,7 +17,7 @@ export default function home(app, root) {
   const recent = s.recent.map((id) => cat.get(id)).filter(Boolean).slice(0, 10);
   const freeCount = Object.values(s.tickets).reduce((a, b) => a + b, 0) + g.freePack().stock;
 
-  const chests = Object.values(g.arsenal().chests).reduce((a, n) => a + n, 0);
+  const chests = g.chestCount();
 
   // « Aujourd'hui » : tout ce qui se récupère ou s'accomplit dans la journée, au même endroit.
   function todayHTML() {
@@ -30,7 +30,7 @@ export default function home(app, root) {
       rows.push(`<div class="td-row ${x.claimed ? 'done' : ''}"><span class="td-ic">${x.claimed ? icon('check') : icon('star')}</span><span class="td-t"><b>${esc(x.text)}</b>${x.claimed ? '' : `<span class="progress"><i style="width:${(x.p / x.n) * 100}%"></i></span>`}</span>${x.claimed ? '<span class="small muted">Fait</span>' : done ? `<button class="btn small gold" data-act="mission" data-i="${i}">+${x.shards}</button>` : `<span class="td-n small muted">${x.p}/${x.n}</span>`}</div>`);
     });
     if (allClaimed && !m.bonus) rows.push(`<div class="td-row"><span class="td-ic gold">${icon('ticket')}</span><span class="td-t"><b>Bonus des 3 missions</b><span class="small muted">Un booster et un coffre de fer</span></span><button class="btn small primary" data-act="mbonus">Récupérer</button></div>`);
-    if (chests) rows.push(`<a class="td-row" href="#/arsenal"><span class="td-ic gold">${icon('lock')}</span><span class="td-t"><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Dans l’Arsenal</span></span>${icon('next')}</a>`);
+    if (chests) rows.push(`<a class="td-row" href="#/coffres"><span class="td-ic gold">${icon('lock')}</span><span class="td-t"><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Pleins de boosters</span></span>${icon('next')}</a>`);
     return `<section class="panel today"><h2>Aujourd’hui</h2>${rows.join('')}</section>`;
   }
 

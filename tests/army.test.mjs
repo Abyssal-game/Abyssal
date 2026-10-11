@@ -1,36 +1,41 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { loadCatalog, MemoryStorage, rngFrom } from './helpers.mjs';
-import { Game2, chestForDepth } from '../v2/js/game.js';
-import { POOL, STARTER, roleOf, levelFromDups, MAX_LEVEL, BUDGET } from '../v2/js/units.js';
-import { duelUnit } from '../v2/js/duel.js';
+import { Game } from '../js/core/game.js';
+import { STARTER, roleOf, levelFromDups, MAX_LEVEL, BUDGET } from '../js/core/army.js';
+import { chestForDepth } from '../js/core/descent.js';
+import { duelUnit } from '../js/core/duel.js';
+import { SAVE_KEY } from '../js/config.js';
 
 const catalog = loadCatalog();
 const day = new Date(2026, 9, 12, 12);
-const newGame = (seed = 'v') => new Game2(catalog, new MemoryStorage(), { rng: rngFrom(seed), clock: () => day });
+const newGame = (seed = 'a', storage = new MemoryStorage()) => new Game(catalog, storage, { rng: rngFrom(seed), clock: () => day });
 
-test('v2 : le prototype démarre avec 5 créatures et une équipe valide', () => {
+test('équipe : 5 Communes offertes à qui n’a pas 3 créatures, sinon les meilleures cartes sous le budget', () => {
   const g = newGame();
-  assert.equal(POOL.filter((id) => catalog.get(id)).length, POOL.length, 'toutes les cartes du prototype existent');
-  assert.deepEqual(g.s.team, STARTER);
-  assert.ok(g.teamCost() <= BUDGET);
+  assert.deepEqual(g.team(), STARTER);
   assert.equal(new Set(STARTER.map((id) => roleOf(catalog.get(id)))).size, 5, 'cinq rôles différents au départ');
+  const h = newGame('b');
+  catalog.cards.slice(0, 40).forEach((c) => h.addCard(c.id));
+  const t = h.team();
+  assert.equal(t.length, 5);
+  assert.ok(h.teamCost(t) <= BUDGET);
+  assert.ok(t.every((id) => h.owns(id)));
 });
 
-test('v2 : doublons → niveaux, puis cendres au niveau maximum', () => {
+test('niveaux : chaque doublon renforce la créature', () => {
   const g = newGame('d');
   const id = STARTER[0];
-  assert.equal(g.level(id), 1);
+  assert.equal(g.addCard(id).levelUp, 0, 'nouvelle carte');
+  assert.equal(g.cardLevel(id), 1);
   assert.equal(g.addCard(id).levelUp, 2);
   assert.equal(levelFromDups(100).level, MAX_LEVEL);
-  g.s.cards[id].n = 200;
-  assert.ok(g.addCard(id).ash > 0);
   assert.ok(duelUnit(catalog.get(id), { level: 10 }).maxHp > duelUnit(catalog.get(id), { level: 1 }).maxHp);
 });
 
-test('v2 : budget d’équipe et pouvoir ultime', () => {
-  const g = newGame('b');
-  ['ART-039', 'NEC-044', 'ABY-043'].forEach((id) => g.addCard(id));
+test('budget d’équipe et pouvoir ultime', () => {
+  const g = newGame('u');
+  ['ART-039', 'NEC-044', 'ABY-043', ...STARTER].forEach((id) => g.addCard(id));
   assert.throws(() => g.setTeam(['ART-039', 'NEC-044', 'ABY-043', 'NEC-001', 'INF-001']), /budget/);
   g.setTeam(['ART-039', 'NEC-001', 'INF-001', 'CEL-001', 'SAU-014']);
   assert.equal(g.ultimate().key, 'aegis');
@@ -38,20 +43,7 @@ test('v2 : budget d’équipe et pouvoir ultime', () => {
   assert.equal(g.ultimate().key, 'sceau');
 });
 
-test('v2 : boosters gratuits et payants, garantie Hyper rare', () => {
-  const g = newGame('p');
-  assert.equal(g.freePack().stock, 2);
-  g.buyPack(); g.buyPack();
-  assert.equal(g.freePack().stock, 0);
-  const shards = g.s.shards;
-  assert.equal(g.buyPack().length, 5);
-  assert.equal(g.s.shards, shards - 100);
-  g.s.pity.sinceHR = 9;
-  const cards = g.drawPack('standard');
-  assert.ok(cards.some((c) => ['HR', 'M', 'S'].includes(catalog.get(c.id).rarity)));
-});
-
-test('v2 : une expédition complète rapporte un coffre selon la profondeur, qui contient des boosters', () => {
+test('aventure : une expédition rapporte un coffre selon la profondeur ; le coffre donne des boosters', () => {
   assert.equal(chestForDepth(3), 'bois'); assert.equal(chestForDepth(7), 'fer'); assert.equal(chestForDepth(12), 'or'); assert.equal(chestForDepth(16), 'abyssal');
   const g = newGame('r');
   g.startRun();
@@ -65,18 +57,51 @@ test('v2 : une expédition complète rapporte un coffre selon la profondeur, qui
   }
   const last = g.s.descent.last;
   assert.ok(last.floor >= 1);
-  const n = g.chestCount();
-  assert.ok(n >= 1, 'au moins un coffre');
+  assert.ok(g.chestCount() >= 1, 'au moins un coffre');
+  assert.ok(Object.keys(g.s.hunt).length > 0, 'les créatures vaincues entrent au Bestiaire de chasse');
   const type = Object.keys(g.s.chests).find((k) => g.s.chests[k] > 0);
-  const before = Object.keys(g.s.cards).length + Object.values(g.s.cards).reduce((a, e) => a + e.n, 0);
+  const tickets = { ...g.s.tickets };
   const packs = g.openChest(type);
-  assert.ok(packs.length >= 1 && packs.every((p) => p.cards.length === 5));
-  const after = Object.keys(g.s.cards).length + Object.values(g.s.cards).reduce((a, e) => a + e.n, 0);
-  assert.ok(after > before);
+  assert.ok(packs.length >= 1);
+  packs.forEach((k) => assert.ok(g.s.tickets[k] > (tickets[k] || 0)));
+  const res = g.openBooster(packs[0]);
+  assert.equal(res.opening.paidWith, 'ticket');
+  // après les 3 torches : on peut rejouer, sans coffre
+  g.s.descent.used = 3;
+  const run = g.startRun();
+  assert.equal(run.free, true);
+  g.endRun(false);
 });
 
-test('v2 : duel de cartes — riposte, Garde, Assaut, réserve, ultime', async () => {
-  const D = await import('../v2/js/duel.js');
+test('passage au nouveau système : héros et équipement deviennent des éclats, les coffres sont gardés', () => {
+  const st = new MemoryStorage();
+  const old = newGame('m', st);
+  old.addCard('ABY-001'); old.addCard('PRI-001'); old.addCard('CEL-001');
+  const raw = JSON.parse(JSON.stringify(old.s));
+  delete raw.army; delete raw.team; delete raw.chests;
+  raw.heroes = { brenna: { xp: 500, wound: 0 }, aldric: { xp: 0, wound: 0 } };
+  raw.party = ['brenna', 'aldric']; raw.pacts = { brenna: 'ABY-001' }; raw.invXp = { phenix: 30 };
+  raw.arsenal = { items: { g1: { b: 'x', r: 'E', f: 1 } }, eq: {}, chests: { bois: 1, or: 2 }, keys: {}, fer: 40, pending: null };
+  raw.items = { baume: 2, torche: 1 };
+  raw.descent = { ...raw.descent, run: { v: 2, day: '2026-10-12', loot: { shards: 30, ash: 5, tickets: {}, chests: { fer: 1 } } }, used: 1 };
+  st.setItem(SAVE_KEY, JSON.stringify(raw));
+  const g = newGame('m2', st);
+  assert.equal(g.s.army, 1);
+  for (const k of ['heroes', 'party', 'pacts', 'arsenal', 'invXp']) assert.equal(g.s[k], undefined, k);
+  assert.deepEqual({ bois: g.s.chests.bois, or: g.s.chests.or, fer: g.s.chests.fer }, { bois: 1, or: 2, fer: 1 });
+  assert.equal(g.s.items.baume, undefined);
+  assert.equal(g.s.items.torche, 1);
+  assert.equal(g.s.descent.run, null);
+  assert.equal(g.s.descent.used, 0, 'torche rendue');
+  assert.ok(g.s.armyNews.shards > 30 + 160);
+  assert.ok(g.s.shards >= raw.shards + g.s.armyNews.shards);
+  // une seule fois
+  const again = newGame('m3', st);
+  assert.equal(again.s.shards, g.s.shards);
+});
+
+test('duel de cartes — riposte, Garde, Assaut, réserve, ultime', async () => {
+  const D = await import('../js/core/duel.js');
   const card = (id) => catalog.get(id);
   // Garde : doit être attaquée en premier
   const allies = STARTER.map((id) => D.duelUnit(card(id)));

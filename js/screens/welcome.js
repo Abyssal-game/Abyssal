@@ -5,7 +5,7 @@ import { openSheet } from '../ui/dom.js';
 const PAGES = [
   { ic: null, t: 'Bienvenue dans l’Abysse', p: 'Le Bestiaire interdit a été déchiré. Ses 335 créatures se cachent dans des boosters scellés. À toi de les retrouver.' },
   { ic: 'booster', t: 'Ouvre des boosters', p: 'Le gros bouton du milieu. Déchire le paquet du doigt, puis retourne les cartes. Des boosters offerts se rechargent toutes les 6 heures.' },
-  { ic: 'swords', t: 'Pars à l’aventure', p: 'Dans l’onglet Aventure : 3 expéditions par jour avec tes 3 héros, des combats au tour par tour, et des coffres pour les équiper.' },
+  { ic: 'swords', t: 'Pars à l’aventure', p: 'Tes cartes combattent pour toi ! Dans l’onglet Aventure, ton équipe de 5 créatures descend dans l’Abysse et rapporte des coffres pleins de boosters.' },
   { ic: 'home', t: 'Reviens chaque jour', p: 'L’Accueil rassemble ce qui t’attend aujourd’hui : l’offrande, les missions et les coffres à ouvrir. Le reste est dans l’onglet Plus.' },
 ];
 

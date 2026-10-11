@@ -20,24 +20,22 @@ import settingsScreen from './screens/settings.js';
 import descentScreen from './screens/descent.js';
 import accountScreen from './screens/account.js';
 import menuScreen from './screens/menu.js';
-import heroesScreen from './screens/heroes.js';
-import arsenalScreen from './screens/arsenal.js';
-import merchantScreen from './screens/merchant.js';
+import { teamScreen, chestsScreen } from './screens/army.js';
 import { startSync } from './cloud/sync.js';
 import { showWelcome } from './screens/welcome.js';
 
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,
   factions: factionsScreen, faction: factionsScreen, succes: achievementsScreen, profil: profileScreen,
-  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen, heros: heroesScreen, arsenal: arsenalScreen, marchand: merchantScreen,
+  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen,
 };
 const TABS = [
   ['antre', 'home', 'Accueil'], ['collection', 'cards', 'Collection'], ['boutique', 'booster', 'Boosters'],
   ['descente', 'swords', 'Aventure'], ['menu', 'menu', 'Plus'],
 ];
-const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente', arsenal: 'descente', marchand: 'descente' };
+const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', equipe: 'descente', coffres: 'descente', heros: 'descente', arsenal: 'descente', marchand: 'descente' };
 // Page parente des sous-pages (bouton retour en haut)
-const PARENT = { bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente', arsenal: 'descente', marchand: 'descente' };
+const PARENT = { bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', equipe: 'descente', coffres: 'descente', heros: 'descente', arsenal: 'descente', marchand: 'descente' };
 
 function storageOrMemory() {
   try {
@@ -59,6 +57,7 @@ const app = {
   sfx,
   hasRealArt,
   refresh() { render(); },
+  chrome() { renderChrome(); },
 };
 window.__abyssal = app; // accès pour les tests automatisés
 
@@ -88,7 +87,7 @@ function renderChrome() {
   const ticketCount = Object.values(s.tickets).reduce((a, b) => a + b, 0) + g.freePack().stock;
   document.getElementById('tabbar').innerHTML = TABS.map(([key, ic, label]) => {
     const cur = key === tab ? ' aria-current="page"' : '';
-    const badge = key === 'collection' && nNew ? `<span class="badge">${nNew > 99 ? '99+' : nNew}</span>` : key === 'boutique' && ticketCount ? `<span class="badge">${ticketCount}</span>` : key === 'antre' && (g.canDailyClaim() || g.missionsToClaim()) ? '<span class="badge">!</span>' : key === 'descente' && g.torchesLeft() ? `<span class="badge">${g.torchesLeft()}</span>` : '';
+    const badge = key === 'collection' && nNew ? `<span class="badge">${nNew > 99 ? '99+' : nNew}</span>` : key === 'boutique' && ticketCount ? `<span class="badge">${ticketCount}</span>` : key === 'antre' && (g.canDailyClaim() || g.missionsToClaim()) ? '<span class="badge">!</span>' : key === 'descente' && (g.chestCount() || g.torchesLeft()) ? `<span class="badge">${g.chestCount() || g.torchesLeft()}</span>` : '';
     if (key === 'boutique') return `<a class="tab tab-main" href="#/boutique"${cur}><span class="orb">${icon(ic)}</span>${label}${badge}</a>`;
     return `<a class="tab" href="#/${key}"${cur}>${icon(ic)}${label}${badge}</a>`;
   }).join('');

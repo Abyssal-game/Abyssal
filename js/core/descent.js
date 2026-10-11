@@ -1,25 +1,81 @@
-// La Descente : expédition quotidienne dans l'Abysse avec une équipe de héros.
-// Données des étages : portes, ennemis (créatures du Bestiaire avec niveaux), butin, bénédictions.
-import { makeEnemy, enemyLevel, enemyPool, bossPool } from './heroes.js';
+// La Descente : expédition quotidienne dans l'Abysse avec une équipe de cartes.
+// Données des étages : portes, créatures corrompues, coffres, bénédictions, règle du jour.
+import { RARITY_ORDER } from '../config.js';
 
 export const DESCENT = {
-  teamSize: 3,
-  torches: 3,            // expéditions par jour
+  torches: 3,            // expéditions avec coffre par jour
   bossEvery: 5,
-  woundHours: 6,         // un héros tombé est affaibli (-20 %) pendant ce temps
-  cursedLoot: 2,         // descente maudite : butin doublé, mais tout est perdu si l'équipe tombe
 };
 
+// Bénédictions de l'autel (pour toute l'expédition)
 export const BLESSINGS = {
-  blades:  { name: 'Lames affûtées',   desc: '+3 ATQ pour toute l’équipe.' },
-  scales:  { name: 'Peau d’écailles',  desc: 'Chaque dégât subi est réduit de 2.' },
-  thirst:  { name: 'Soif de sang',     desc: 'Les héros se soignent de 30 % des dégâts infligés.' },
-  vigor:   { name: 'Vigueur',          desc: '+20 % de PV max, et soin complet de l’équipe.' },
-  haste:   { name: 'Pas du vent',      desc: '+2 VIT pour toute l’équipe.' },
-  greed:   { name: 'Avidité',          desc: 'Le butin des prochains combats augmente de 30 %.' },
-  ward:    { name: 'Sceau protecteur', desc: 'Chaque héros annule le premier coup de chaque combat.' },
-  fury:    { name: 'Rage du Néant',    desc: 'Les attaques ont 25 % de chances de frapper une seconde fois.' },
+  blades: { name: 'Lames affûtées', desc: '+1 en attaque pour toutes tes créatures.' },
+  vigor:  { name: 'Vigueur', desc: '+20 % de PV maximum et soin complet.' },
+  ward:   { name: 'Sceau protecteur', desc: 'Chaque créature commence chaque combat avec un bouclier.' },
+  greed:  { name: 'Avidité', desc: '+30 % d’éclats pour le reste de l’expédition.' },
 };
+
+// Coffres : la profondeur atteinte décide du coffre ; il contient des boosters.
+export const CHESTS = {
+  bois:    { name: 'Coffre de bois',  color: '#B07A45', packs: ['standard'], desc: '1 booster' },
+  fer:     { name: 'Coffre de fer',   color: '#A9B6C9', packs: ['standard', 'standard'], desc: '2 boosters' },
+  or:      { name: 'Coffre d’or',     color: '#F2C14E', packs: ['standard', 'premium'], desc: '2 boosters, dont 1 premium' },
+  abyssal: { name: 'Coffre abyssal',  color: '#B04BFF', packs: ['premium', 'premium'], desc: '2 boosters premium' },
+};
+export const CHEST_ORDER = ['bois', 'fer', 'or', 'abyssal'];
+export const chestForDepth = (floor) => (floor >= 15 ? 'abyssal' : floor >= 10 ? 'or' : floor >= 5 ? 'fer' : floor >= 1 ? 'bois' : null);
+export const shiftChest = (c, n) => { const i = c ? CHEST_ORDER.indexOf(c) + n : n - 1; return i < 0 ? null : CHEST_ORDER[Math.min(CHEST_ORDER.length - 1, i)]; };
+
+// Force des créatures corrompues selon la profondeur
+export const enemyScale = (floor) => 1 + 0.11 * (floor - 1);
+
+// Familles de comportement des créatures (page du Bestiaire)
+export const FAMILIES = {
+  brute:      { name: 'Brute', desc: 'Frappe fort, sans finesse.' },
+  gardien:    { name: 'Gardien', desc: 'Protège ses alliés : il faut l’abattre en premier.' },
+  lanceur:    { name: 'Lanceur de sorts', desc: 'Ses attaques touchent aussi ses voisins.' },
+  venimeux:   { name: 'Venimeux', desc: 'Empoisonne ses proies.' },
+  guerisseur: { name: 'Guérisseur', desc: 'Soigne ses alliés blessés : abats-le vite.' },
+  enrage:     { name: 'Enragé', desc: 'Frappe sans relâche.' },
+  traqueur:   { name: 'Traqueur', desc: 'S’acharne sur la proie la plus faible.' },
+  controleur: { name: 'Contrôleur', desc: 'Gèle ses adversaires.' },
+  essaim:     { name: 'Essaim', desc: 'Nombreux et fragiles.' },
+};
+export function familyOf(card) {
+  const a = new Set((card.abilities || []).map((x) => x.key));
+  if (/essaim|insecte/i.test(card.category)) return 'essaim';
+  if (a.has('bless') || a.has('regen')) return 'guerisseur';
+  if (a.has('guard') || a.has('armor') || a.has('aegis')) return 'gardien';
+  if (a.has('venom')) return 'venimeux';
+  if (a.has('drown') || a.has('fear')) return 'controleur';
+  if (a.has('frenzy') || a.has('devour')) return 'enrage';
+  if (a.has('curse') || a.has('cataclysm') || a.has('strike')) return 'lanceur';
+  if (a.has('elusive') || a.has('first')) return 'traqueur';
+  return 'brute';
+}
+
+// Étapes du Bestiaire de chasse
+export const HUNT_STAGES = [
+  { k: 1, name: 'Découverte', desc: 'Nom et illustration révélés.' },
+  { k: 5, name: 'Étude', desc: 'Comportement connu.' },
+  { k: 15, name: 'Maîtrise', desc: 'Tes créatures lui font +1 dégât, même sans posséder sa carte.' },
+  { k: 40, name: 'Trophée', desc: 'Titre de chasseur et récompense.' },
+];
+export function huntStage(kills = 0) {
+  let i = -1;
+  HUNT_STAGES.forEach((s, j) => { if (kills >= s.k) i = j; });
+  return i; // -1 : jamais vaincue
+}
+
+// Rareté maximale des ennemis selon la profondeur (les mythiques arrivent tard).
+function enemyPool(catalog, floor) {
+  const maxR = Math.min(3, 1 + Math.floor((floor - 1) / 4));
+  return catalog.cards.filter((c) => RARITY_ORDER.indexOf(c.rarity) <= maxR);
+}
+function bossPool(catalog, floor) {
+  const min = floor >= 20 ? 4 : 3;
+  return catalog.cards.filter((c) => RARITY_ORDER.indexOf(c.rarity) >= min);
+}
 
 // Générateur déterministe à partir d'une chaîne (même donjon pour tout le monde le même jour).
 export function rngOf(str) {
@@ -34,11 +90,11 @@ const pick = (rng, list) => list[Math.floor(rng() * list.length)];
 const ROOM_TYPES = ['fight', 'fight', 'elite', 'altar', 'rest', 'treasure'];
 export const ROOMS = {
   fight:    { name: 'Combat',         desc: 'Des créatures barrent le passage.' },
-  elite:    { name: 'Élite',          desc: 'Un adversaire redoutable. Butin doublé.' },
+  elite:    { name: 'Élite',          desc: 'Un adversaire redoutable. Éclats doublés.' },
   altar:    { name: 'Autel ancien',   desc: 'Choisis une bénédiction pour toute l’expédition.' },
   rest:     { name: 'Source sacrée',  desc: 'Ton équipe récupère 40 % de ses PV.' },
-  treasure: { name: 'Trésor oublié',  desc: 'Un coffre, sans gardien… en apparence.' },
-  boss:     { name: 'Gardien',        desc: 'Le gardien de l’étage. Victoire : coffre et booster.' },
+  treasure: { name: 'Trésor oublié',  desc: 'Des éclats, sans gardien… en apparence.' },
+  boss:     { name: 'Gardien',        desc: 'Le gardien de l’étage. Victoire : un coffre.' },
 };
 
 // Deux portes proposées à chaque étage (les étages multiples de 5 sont des gardiens).
@@ -54,29 +110,13 @@ export function floorDoors(day, floor) {
 // Ennemis d'un étage : plus nombreux, plus rares et plus forts en profondeur.
 export function floorEnemies(catalog, day, floor, room) {
   const rng = rngOf(`enemies:${day}:${floor}:${room}`);
-  const level = enemyLevel(floor, room);
   const pool = enemyPool(catalog, floor);
   const out = [];
-  if (room === 'boss') out.push(makeEnemy(pick(rng, bossPool(catalog, floor)), { level, boss: true }));
-  if (room === 'elite') out.push(makeEnemy(pick(rng, pool.filter((c) => c.rarity !== 'C')), { level, elite: true }));
+  if (room === 'boss') out.push({ id: pick(rng, bossPool(catalog, floor)).id, boss: true });
+  if (room === 'elite') out.push({ id: pick(rng, pool.filter((c) => c.rarity !== 'C')).id, elite: true });
   const n = room === 'boss' ? (floor >= 10 ? 2 : 1) : room === 'elite' ? 1 + (floor >= 6 ? 1 : 0) : 2 + (floor >= 3 ? 1 : 0) + (floor >= 9 ? 1 : 0);
-  for (let i = 0; i < n; i++) out.push(makeEnemy(pick(rng, pool), { level: Math.max(1, level - (room === 'fight' ? 0 : 1)) }));
+  for (let i = 0; i < n; i++) out.push({ id: pick(rng, pool).id });
   return out;
-}
-
-// Butin d'une salle (avant le multiplicateur d'avidité ou de malédiction)
-// Coffres : bois en surface, fer plus bas ; les gardiens gardent les coffres d'or puis abyssaux.
-export function roomLoot(floor, room, rng) {
-  const base = 12 + floor * 5;
-  const small = floor >= 6 ? 'fer' : 'bois';
-  if (room === 'fight') return { shards: base, ash: rng() < 0.4 ? 5 + floor : 0, chests: rng() < 0.12 ? { bois: 1 } : {} };
-  if (room === 'elite') return { shards: base * 2, ash: 10 + floor * 2, chests: rng() < 0.5 ? { [small]: 1 } : {} };
-  if (room === 'treasure') return { shards: base, ash: rng() < 0.5 ? 8 + floor : 0, chests: { [small]: 1 } };
-  if (room === 'boss') {
-    return { shards: base * 3, ash: 20 + floor * 3, tickets: { [floor >= 15 ? 'premium' : 'standard']: 1 },
-      chests: { [floor >= 15 ? 'abyssal' : 'or']: 1 } };
-  }
-  return { shards: 0, ash: 0 };
 }
 
 export function blessingChoices(day, floor, owned = []) {
@@ -89,15 +129,15 @@ export function blessingChoices(day, floor, owned = []) {
 
 // ——— Règle du jour ————————————————————————————————————————————————————
 // Une règle différente chaque jour, la même pour tout le monde. {faction} est remplacé
-// par une faction tirée le même jour (règles liées aux pactes et à la connaissance).
+// par une faction tirée le même jour.
 export const DAILY_RULES = {
   furie:    { name: 'Furie · {faction}',   desc: 'Les créatures de la faction {faction} frappent 25 % plus fort.', faction: true },
   sommeil:  { name: 'Sommeil · {faction}', desc: 'Les créatures de la faction {faction} ont 25 % de PV en moins.', faction: true },
   sources:  { name: 'Sources bénies',      desc: 'Les sources sacrées soignent 80 % des PV au lieu de 40 %.' },
   ruee:     { name: 'Ruée vers les éclats', desc: 'Les éclats trouvés sont augmentés de 50 %.' },
-  lune:     { name: 'Nuit des invocations', desc: 'La jauge d’invocation commence l’expédition à moitié pleine.' },
+  lune:     { name: 'Nuit du pouvoir', desc: 'La jauge du pouvoir commence chaque expédition à moitié pleine.' },
   chasse:   { name: 'Chasse aux élites',   desc: 'Chaque élite vaincue rapporte un coffre et deux fois plus d’éclats.' },
-  instable: { name: 'Abysse instable',     desc: 'Tout le monde frappe 25 % plus fort : héros comme créatures.' },
+  instable: { name: 'Abysse instable',     desc: 'Tout le monde frappe 25 % plus fort : tes créatures comme les corrompues.' },
 };
 const RULE_KEYS = Object.keys(DAILY_RULES);
 const RULE_FACTIONS = ['infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel'];

@@ -1,8 +1,6 @@
 // Ouverture de booster : sceau à briser, révélation carte par carte ou d'un coup,
 // effets selon la rareté, récapitulatif. Les cartes sont déjà enregistrées
 // dans la sauvegarde avant la première animation.
-import { pactTitle } from '../ui/pact.js';
-import { PACT_FX } from '../core/pacts.js';
 import { BOOSTERS, RARITY, VARIANTS } from '../config.js';
 import { cardHTML } from '../ui/card.js';
 import { icon, EMBLEM } from '../ui/icons.js';
@@ -51,9 +49,9 @@ export function openPack(app, type, { faction, onDone } = {}) {
     const r = RARITY[c.rarity];
     let s = `<b style="color:${r.color}">${r.name}</b>`;
     if (c.variant !== 'normal') s += ` · <span class="vtag">${VARIANTS[c.variant].name}</span>`;
-    if (c.isNewCard) s += ` · <span class="newtag">Nouvelle découverte</span><br><span class="op-gain">${icon('sparkle')} ${esc(pactTitle(cat.get(c.id)))} · ${icon('book')} +10 % de dégâts contre elle</span>`;
-    else if (c.isNewVariant) s += ' · <span class="newtag">Nouvelle variante</span>';
-    else s += ` · doublon <span class="muted">+${c.ash} cendres</span>`;
+    if (c.isNewCard) s += ` · <span class="newtag">Nouvelle découverte</span><br><span class="op-gain">${icon('swords')} Elle peut rejoindre ton équipe</span>`;
+    else if (c.isNewVariant) s += ` · <span class="newtag">Nouvelle variante</span>${c.levelUp ? `<br><span class="op-gain">${icon('star')} Niveau ${c.levelUp} !</span>` : ''}`;
+    else s += ` · doublon <span class="muted">+${c.ash} cendres</span>${c.levelUp ? `<br><span class="op-gain">${icon('star')} Niveau ${c.levelUp} !</span>` : ''}`;
     return s;
   }
 
@@ -320,8 +318,8 @@ export function openPack(app, type, { faction, onDone } = {}) {
     stage.innerHTML = `<div class="op-summary">
       <h2>${newCount ? `${newCount} nouvelle${newCount > 1 ? 's' : ''} créature${newCount > 1 ? 's' : ''}` : 'Booster ouvert'}</h2>
       ${opening.guaranteed ? `<p class="small guarantee">${icon('star')} Garantie appliquée : ${opening.guaranteed === 'm' ? 'Mythique ou mieux' : 'Hyper rare ou mieux'}.</p>` : ''}
-      <div class="op-grid">${opening.cards.map((c, i) => `<div class="op-cell" style="--i:${i}">${cardHTML(cat.get(c.id), { variant: c.variant, isNew: c.isNewCard || c.isNewVariant, lazy: false })}<span class="op-tag">${c.isNewCard ? `Nouvelle · ${esc(PACT_FX[cat.get(c.id).faction].name)}` : c.isNewVariant ? VARIANTS[c.variant].short : `+${c.ash} cendres`}</span></div>`).join('')}</div>
-      ${newCount ? `<p class="small op-gain center">${icon('sparkle')} ${newCount > 1 ? 'Chaque nouvelle créature' : 'La nouvelle créature'} peut sceller un pacte avec un héros, et tes héros lui infligent désormais +10 % de dégâts.</p>` : ''}
+      <div class="op-grid">${opening.cards.map((c, i) => `<div class="op-cell" style="--i:${i}">${cardHTML(cat.get(c.id), { variant: c.variant, isNew: c.isNewCard || c.isNewVariant, lazy: false })}<span class="op-tag">${c.isNewCard ? 'Nouvelle recrue' : c.levelUp ? `Niveau ${c.levelUp} !` : c.isNewVariant ? VARIANTS[c.variant].short : `+${c.ash} cendres`}</span></div>`).join('')}</div>
+      ${newCount || opening.cards.some((c) => c.levelUp) ? `<p class="small op-gain center">${icon('swords')} ${newCount ? `${newCount > 1 ? 'Les nouvelles créatures peuvent' : 'La nouvelle créature peut'} rejoindre ton équipe. ` : ''}Chaque doublon fait monter une créature de niveau.</p>` : ''}
       <ul class="op-rewards">
         ${r.shards ? `<li>${icon('crystal')}<span>Récompenses de découverte</span><b>+${fmt(r.shards)} éclats</b></li>` : ''}
         ${r.ash ? `<li>${icon('ash')}<span>Doublons convertis</span><b>+${fmt(r.ash)} cendres</b></li>` : ''}

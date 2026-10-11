@@ -1,8 +1,8 @@
-// ABYSSAL v2 : duel de cartes. Moteur pur (état JSON, reprise exacte).
+// ABYSSAL : duel de cartes. Moteur pur (état JSON, reprise exacte).
 // Chaque carte a une ATTAQUE, des PV et une capacité liée à son rôle.
 // Ton tour : chaque carte au combat attaque une fois (la cible riposte), puis « Fin du tour »
 // et les créatures corrompues attaquent. 3 cartes au combat par camp ; la réserve prend la relève.
-import { roleOf } from './units.js';
+import { roleOf } from './army.js';
 
 export const FRONT = 3;
 export const GAUGE_MAX = 5;

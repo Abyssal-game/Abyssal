@@ -3,13 +3,12 @@
 import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, FUSION, LUCK_POINTS, RITUAL, ITEMS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
-import { createBattle, autoBattle } from './battle.js';
-import { DESCENT, floorDoors, floorEnemies, roomLoot, blessingChoices, dailyRule } from './descent.js';
-import { pactOf, PACT_UNLOCK } from './pacts.js';
-import { BASES, SLOT_ORDER, CHESTS, GEAR_RARITY, canUse, gearBonus, itemScore, rollChest, forgeCost, salvageValue, LEG_PITY } from './gear.js';
-import { HEROES, HERO_ORDER, INVOCATIONS, makeHero, levelOf, invocationPower, enemyLevel, huntStage, HUNT_STAGES, totalXpFor } from './heroes.js';
+import { DESCENT, CHESTS, floorDoors, floorEnemies, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, huntStage, HUNT_STAGES } from './descent.js';
+import { createDuel, autoDuel, duelUnit, GAUGE_MAX } from './duel.js';
+import { STARTER, COST, BUDGET, TEAM, ULTS, levelFromDups, canUlt, ultOf } from './army.js';
 
 const RI = (r) => RARITY_ORDER.indexOf(r);
+const ITEM_REFUND = { baume: 80, elixir: 260, parchemin: 120 };
 
 // Petit générateur déterministe (même missions pour une même journée).
 function seededRng(str) {
@@ -34,7 +33,7 @@ export class Game {
     const { save, source } = loadSave(storage);
     this.s = save;
     this.loadedFrom = source;
-    try { this.convertOldKeys(); } catch (e) { /* rien */ }
+    try { this.convertHeroes(); } catch (e) { /* rien */ }
   }
 
   // Événements -------------------------------------------------------------
@@ -195,6 +194,9 @@ export class Game {
       out.xp = XP.duplicate * 2;
       e.isNew = true;
     }
+    // niveau de la créature : chaque exemplaire en plus la renforce
+    out.level = levelFromDups(e.n - 1).level;
+    out.levelUp = !isNewCard && levelFromDups(e.n - 2).level < out.level ? out.level : 0;
     if (source !== 'reward') {
       this.s.shards += out.shards;
       this.s.ash += out.ash;
@@ -390,345 +392,196 @@ export class Game {
     return { success, chance, to, used, lost, progress };
   }
 
+  // L'équipe : les cartes combattent ---------------------------------------
+  // Niveau d'une carte : chaque exemplaire en plus (doublon) la fait progresser.
+  cardLevelInfo(id) { const e = this.entry(id); return levelFromDups(e ? e.n - 1 : 0); }
+  cardLevel(id) { return this.cardLevelInfo(id).level; }
+  teamCost(ids = this.s.team) { return ids.reduce((a, id) => a + (COST[this.catalog.get(id)?.rarity] || 0), 0); }
+  // Équipe valable : cartes possédées, budget respecté. Complétée automatiquement si besoin
+  // (et 5 Communes offertes à qui n'a pas encore 3 créatures).
+  team() {
+    let t = (this.s.team || []).filter((id) => this.owns(id));
+    if (this.teamCost(t) > BUDGET) t = [];
+    if (t.length < TEAM.active) {
+      if (this.uniqueCount() < TEAM.active) {
+        STARTER.forEach((id) => { if (!this.owns(id)) { this.addCard(id, 'normal', 'reward'); this.s.collection[id].isNew = false; } });
+        t = STARTER.slice(); // rôles complémentaires, dans le bon ordre
+      } else t = this.autoTeam(t);
+    }
+    if (t.join() !== (this.s.team || []).join()) { this.s.team = t; this.persist(); }
+    return t;
+  }
+  // Complète l'équipe avec les meilleures cartes possédées, sans dépasser le budget
+  autoTeam(keep = []) {
+    const t = keep.slice(), size = TEAM.active + TEAM.reserve;
+    const cards = Object.keys(this.s.collection).map((id) => this.catalog.get(id)).filter((c) => c && !t.includes(c.id))
+      .sort((a, b) => RI(b.rarity) - RI(a.rarity) || this.cardLevel(b.id) - this.cardLevel(a.id) || b.power - a.power);
+    for (const c of cards) {
+      if (t.length >= size) break;
+      const left = size - t.length - 1; // place gardée pour compléter avec des Communes
+      if (this.teamCost(t) + COST[c.rarity] + left <= BUDGET) t.push(c.id);
+    }
+    return t;
+  }
+  setTeam(ids) {
+    const list = [...new Set(ids)].filter((id) => this.owns(id)).slice(0, TEAM.active + TEAM.reserve);
+    if (this.teamCost(list) > BUDGET) throw new Error(`Ton équipe dépasse le budget de ${BUDGET} points.`);
+    if (this.s.descent.run) throw new Error('Termine d’abord ton expédition.');
+    this.s.team = list;
+    this.persist();
+    return list;
+  }
+  // La carte qui porte le pouvoir ultime : la Mythique ou Secrète la plus rare de l'équipe
+  ultCard(ids = this.s.team) {
+    return ids.map((id) => this.catalog.get(id)).filter(canUlt).sort((a, b) => RI(b.rarity) - RI(a.rarity))[0] || null;
+  }
+  ultimate(ids = this.s.team) { const c = this.ultCard(ids); const key = ultOf(c); return { key, ...ULTS[key], card: c?.id || null, power: 1 + 0.08 * ((c ? this.cardLevel(c.id) : 1) - 1) }; }
+
+  // Coffres : chaque coffre contient des boosters (ajoutés aux boosters à ouvrir)
+  chestCount() { return Object.values(this.s.chests).reduce((a, n) => a + n, 0); }
+  addChests(chests = {}) { for (const [k, n] of Object.entries(chests || {})) if (CHESTS[k]) this.s.chests[k] = (this.s.chests[k] || 0) + n; }
+  openChest(type) {
+    if (!CHESTS[type]) throw new Error('Coffre inconnu.');
+    if (!(this.s.chests[type] > 0)) throw new Error('Tu n’as pas ce coffre.');
+    this.s.chests[type]--;
+    const packs = CHESTS[type].packs.slice();
+    packs.forEach((k) => { this.s.tickets[k] = (this.s.tickets[k] || 0) + 1; });
+    this.s.stats.chests = (this.s.stats.chests || 0) + 1;
+    this.track('chest', 1);
+    this.checkProgress();
+    this.persist();
+    return packs;
+  }
+
   // La Descente -------------------------------------------------------------
   descent() {
     const d = this.s.descent;
     const day = today(this.clock());
     if (d.day !== day) { d.day = day; d.used = 0; d.bestToday = 0; }
-    if ((d.best || 0) >= 3 && HERO_ORDER.some((k) => !this.s.heroes[k] && HEROES[k].unlock <= d.best)) this.unlockHeroes();
-    // expédition de l'ancien système (cartes au combat) : on la clôt en rendant tout le butin
-    if (d.run && d.run.v !== 2) {
-      const l = d.run.loot || {};
-      this.s.shards += l.shards || 0; this.s.ash += l.ash || 0;
-      for (const [t, n] of Object.entries(l.tickets || {})) this.s.tickets[t] = (this.s.tickets[t] || 0) + n;
-      d.run = null;
-    }
     return d;
   }
   // Règle du jour (celle de l'expédition en cours si elle a commencé la veille)
   rule(day = this.descent().run?.day || this.descent().day) { return dailyRule(day, Object.fromEntries(Object.entries(this.catalog.faction).map(([k, f]) => [k, f.name]))); }
   torchesLeft() { return Math.max(0, DESCENT.torches - this.descent().used); }
-
-  // Héros
-  hero(key) { return (this.s.heroes[key] ||= { xp: 0, wound: 0 }); }
-  heroLevel(key) { return levelOf(this.hero(key).xp).level; }
-  heroInfo(key) { return levelOf(this.hero(key).xp); }
-  heroWounded(key) { return (this.hero(key).wound || 0) > this.clock().getTime(); }
-  woundLeft(key) { return Math.max(0, (this.hero(key).wound || 0) - this.clock().getTime()); }
-  ownedHeroes() { return HERO_ORDER.filter((k) => this.s.heroes[k]); }
-  // Nouveaux héros : ils rejoignent l'Antre quand le record de profondeur atteint leur étage.
-  // Ils arrivent avec un niveau proche de celui de l'équipe, pour être jouables tout de suite.
-  unlockHeroes() {
-    const best = this.s.descent.best || 0, got = [];
-    for (const k of HERO_ORDER) {
-      const need = HEROES[k].unlock;
-      if (this.s.heroes[k] || !need || best < need) continue;
-      const lv = Math.max(1, Math.round(this.s.party.reduce((a, h) => a + this.heroLevel(h), 0) / Math.max(1, this.s.party.length)) - 1);
-      this.s.heroes[k] = { xp: totalXpFor(lv), wound: 0 };
-      got.push(k);
-    }
-    if (got.length) this.s.heroNews = [...(this.s.heroNews || []), ...got];
-    return got;
-  }
-  takeHeroNews() { const n = this.s.heroNews || []; if (n.length) { this.s.heroNews = []; this.persist(); } return n; }
-  setParty(keys) {
-    const list = [...new Set(keys)].filter((k) => this.s.heroes[k]).slice(0, DESCENT.teamSize);
-    this.s.party = list;
-    this.persist();
-    return list;
-  }
-  heroUnit(key, blessings = []) { return makeHero(key, { level: this.heroLevel(key), wounded: this.heroWounded(key), blessings, gear: this.gearOf(key), pact: this.pactFor(key) }); }
-
-  // Pactes : une carte possédée liée à un héros (une carte par héros, un héros par carte)
-  pactsOpen() { return (this.s.descent.best || 0) >= PACT_UNLOCK; }
-  pactCard(hero) { const id = this.s.pacts?.[hero]; return id && this.owns(id) ? this.catalog.get(id) : null; }
-  pactFor(hero) { return this.pactsOpen() ? pactOf(this.pactCard(hero)) : null; }
-  pactHolder(id) { return Object.keys(this.s.pacts || {}).find((h) => this.s.pacts[h] === id) || null; }
-  setPact(hero, id) {
-    if (this.s.descent.run) throw new Error('Termine d’abord ton expédition pour changer de pacte.');
-    if (!this.pactsOpen()) throw new Error(`Les pactes se débloquent en atteignant l’étage ${PACT_UNLOCK} de la Descente.`);
-    if (!this.s.heroes[hero]) throw new Error('Héros inconnu.');
-    if (id && !this.owns(id)) throw new Error('Tu ne possèdes pas cette carte.');
-    this.s.pacts ||= {};
-    const other = id && this.pactHolder(id);
-    if (other) delete this.s.pacts[other];
-    if (id) this.s.pacts[hero] = id; else delete this.s.pacts[hero];
-    this.checkProgress();
-    this.persist();
-  }
-  // Connaissance d'un ennemi : posséder sa carte (+10 %) et le maîtriser à la chasse (+10 %), plafonné à +20 %.
-  knowledge(id) { return Math.min(0.2, (this.owns(id) ? 0.1 : 0) + (this.huntKills(id) >= HUNT_STAGES[2].k ? 0.1 : 0)); }
-
-  // L'Arsenal : équipement des héros, coffres, clés, forge ----------------------
-  arsenal() {
-    const a = this.s.arsenal;
-    for (const k of ['items', 'eq', 'chests', 'keys']) if (!a[k] || typeof a[k] !== 'object') a[k] = {};
-    return a;
-  }
-  gearItem(id) { return this.arsenal().items[id] || null; }
-  equipped(hero) { return (this.arsenal().eq[hero] ||= {}); }
-  equippedItems(hero) { const e = this.equipped(hero); return SLOT_ORDER.map((sl) => e[sl] && this.gearItem(e[sl])).filter(Boolean); }
-  gearOf(hero) { return gearBonus(this.equippedItems(hero)); }
-  wearer(id) {
-    for (const [h, e] of Object.entries(this.arsenal().eq)) for (const sl of SLOT_ORDER) if (e[sl] === id) return h;
-    return null;
-  }
-  // Puissance indicative d'un héros (niveau + équipement)
-  heroPower(hero) { return this.heroLevel(hero) * 10 + this.equippedItems(hero).reduce((a, it) => a + itemScore(it), 0); }
-  chestCount(type) { return this.arsenal().chests[type] || 0; }
-  keyCount(k) { return this.arsenal().keys[k] || 0; }
-  newGearCount() { return Object.values(this.arsenal().items).filter((it) => it.isNew).length; }
-  addChests(chests = {}, keys = {}) {
-    const a = this.arsenal();
-    for (const [k, n] of Object.entries(chests)) if (CHESTS[k]) a.chests[k] = (a.chests[k] || 0) + n;
-    // les clés n'existent plus : celles qui arrivent encore sont changées en éclats
-    for (const [k, n] of Object.entries(keys || {})) this.s.shards += n * (k === 'abyssal' ? 400 : 150);
-  }
-  convertOldKeys() {
-    const a = this.arsenal(), n = Object.entries(a.keys || {}).filter(([, v]) => v > 0);
-    if (!n.length) return;
-    this.addChests({}, a.keys); a.keys = {}; this.persist();
-  }
-  noRunLock() { if (this.s.descent.run) throw new Error('Termine d’abord ton expédition pour changer l’équipement.'); }
-  equip(id, hero) {
-    this.noRunLock();
-    const it = this.gearItem(id);
-    if (!it) throw new Error('Objet introuvable.');
-    if (!this.s.heroes[hero] || !canUse(it.b, hero)) throw new Error('Ce héros ne peut pas utiliser cet objet.');
-    const prev = this.wearer(id);
-    const slot = BASES[it.b].slot;
-    if (prev) delete this.equipped(prev)[slot];
-    this.equipped(hero)[slot] = id;
-    it.isNew = false;
-    this.persist();
-  }
-  unequip(hero, slot) { this.noRunLock(); delete this.equipped(hero)[slot]; this.persist(); }
-  // Équipe automatiquement le meilleur objet de chaque emplacement
-  autoEquip(hero) {
-    this.noRunLock();
-    for (const slot of SLOT_ORDER) {
-      const cur = this.equipped(hero)[slot];
-      const best = Object.entries(this.arsenal().items)
-        .filter(([id, it]) => BASES[it.b].slot === slot && canUse(it.b, hero) && (!this.wearer(id) || id === cur))
-        .sort((x, y) => itemScore(y[1]) - itemScore(x[1]))[0];
-      if (best) this.equipped(hero)[slot] = best[0];
-    }
-    this.persist();
-  }
-  pushItem(it) {
-    const a = this.arsenal();
-    a.seq = (a.seq || 0) + 1;
-    const id = `g${a.seq}`;
-    a.items[id] = { ...it, at: this.clock().getTime(), isNew: true };
-    return id;
-  }
-  chestCtx() {
-    const heroes = this.ownedHeroes();
-    const eqScore = (h, slot) => { const id = this.equipped(h)[slot]; return id && this.gearItem(id) ? itemScore(this.gearItem(id)) : 0; };
-    return { heroes, party: this.s.party, eqScore };
-  }
-  openChest(type) {
-    const c = CHESTS[type], a = this.arsenal();
-    if (!c) throw new Error('Coffre inconnu.');
-    if (a.pending) throw new Error('Choisis d’abord ton objet dans le coffre déjà ouvert.');
-    if (!this.chestCount(type)) throw new Error('Tu n’as pas ce coffre.');
-    a.chests[type]--;
-    const pity = type === 'bois' ? 0 : a.pity || 0;
-    const { items, gotL } = rollChest(this.rng, type, this.chestCtx(), pity);
-    if (type !== 'bois') a.pity = gotL ? 0 : pity + 1;
-    a.opened = (a.opened || 0) + 1;
-    this.track('chest', 1);
-    let out;
-    if (c.choice) { a.pending = { type, items }; out = { type, choice: true, items }; }
-    else { const ids = items.map((it) => this.pushItem(it)); out = { type, items, ids }; }
-    this.checkProgress();
-    this.persist();
-    return out;
-  }
-  // Coffre à choix : l'objet gardé rejoint l'Arsenal, les autres sont fondus en fer runique.
-  chooseChestItem(i) {
-    const a = this.arsenal(), p = a.pending;
-    if (!p || !p.items[i]) throw new Error('Aucun objet à choisir.');
-    const id = this.pushItem(p.items[i]);
-    const fer = p.items.reduce((s, it, j) => s + (j === i ? 0 : GEAR_RARITY[it.r].fer), 0);
-    a.fer = (a.fer || 0) + fer;
-    a.pending = null;
-    this.persist();
-    return { id, fer };
-  }
-  forge(id) {
-    const it = this.gearItem(id), a = this.arsenal();
-    if (!it) throw new Error('Objet introuvable.');
-    if (it.f >= GEAR_RARITY[it.r].forge) throw new Error('Rang de forge maximum atteint.');
-    if (this.wearer(id)) this.noRunLock();
-    const cost = forgeCost(it);
-    if ((a.fer || 0) < cost.fer) throw new Error('Pas assez de fer runique.');
-    if (this.s.shards < cost.shards) throw new Error('Pas assez d’éclats.');
-    a.fer -= cost.fer;
-    this.s.shards -= cost.shards;
-    this.s.stats.shardsSpent += cost.shards;
-    it.f++;
-    this.track('forge', 1);
-    this.persist();
-    return it.f;
-  }
-  salvage(ids) {
-    const a = this.arsenal();
-    let fer = 0, n = 0;
-    for (const id of [].concat(ids)) {
-      const it = this.gearItem(id);
-      if (!it || this.wearer(id)) continue;
-      fer += salvageValue(it);
-      delete a.items[id];
-      n++;
-    }
-    a.fer = (a.fer || 0) + fer;
-    this.persist();
-    return { fer, n };
-  }
-  markGearSeen() { Object.values(this.arsenal().items).forEach((it) => { it.isNew = false; }); this.persist(); }
-
-  // Invocations
-  invocationUnlocked(key) {
-    const u = INVOCATIONS[key]?.unlock;
-    if (!u) return false;
-    return !!(u.start || (u.card && this.owns(u.card)) || (u.depth && this.s.descent.best >= u.depth));
-  }
-  invocationLevel(key) { return levelOf(this.s.invXp[key] || 0).level; }
-  invocationVariant(key) {
-    const e = this.entry(INVOCATIONS[key].card);
-    if (!e) return 'normal';
-    return ['galaxy', 'special', 'gold', 'ancestral', 'chroma', 'corrupt', 'holo', 'alt'].find((v) => e.v[v] > 0) || 'normal';
-  }
-  setInvocation(key) { if (this.invocationUnlocked(key)) { this.s.invocation = key; this.persist(); } }
-
-  // Bestiaire de chasse
+  // Bonus contre une créature : posséder sa carte ou la maîtriser à la chasse
+  knows(id) { return this.owns(id) || this.huntKills(id) >= HUNT_STAGES[2].k; }
   huntKills(id) { return this.s.hunt[id] || 0; }
   huntCount() { return Object.keys(this.s.hunt).length; }
 
   startRun({ cursed = false } = {}) {
     const d = this.descent();
     if (d.run) throw new Error('Une expédition est déjà en cours.');
-    if (this.torchesLeft() <= 0) throw new Error('Plus de torche aujourd’hui : reviens demain.');
-    const party = this.s.party.filter((k) => this.s.heroes[k]);
-    if (party.length < DESCENT.teamSize) throw new Error(`Choisis ${DESCENT.teamSize} héros pour ton équipe.`);
-    d.used++;
-    d.runs++;
-    d.cursed = cursed;
-    const inv = this.invocationUnlocked(this.s.invocation) ? this.s.invocation : 'phenix';
+    const team = this.team();
+    if (team.length < TEAM.active) throw new Error(`Il faut au moins ${TEAM.active} créatures dans ton équipe.`);
+    const free = this.torchesLeft() <= 0; // après les torches du jour : on peut rejouer, sans coffre
+    if (!free) d.used++;
+    d.runs = (d.runs || 0) + 1;
+    const ult = this.ultimate(team);
     d.run = {
-      v: 2, day: d.day, floor: 1, cleared: 0, cursed, phase: 'doors', blessings: [], altar: null, gauge: this.rule(d.day).key === 'lune' ? 50 : 0, inv, invXp: 0,
-      team: party.map((k) => { const u = this.heroUnit(k); return { id: k, hp: u.maxHp, maxHp: u.maxHp, fallen: false, xp: 0 }; }),
-      loot: { shards: 0, ash: 0, tickets: {}, chests: {}, keys: {} }, kills: {},
+      v: 3, day: d.day, floor: 1, cleared: 0, phase: 'doors', cursed: cursed && !free, free, blessings: [], altar: null,
+      gauge: this.rule(d.day).key === 'lune' ? Math.ceil(GAUGE_MAX / 2) : 0, ult: { key: ult.key, power: ult.power, card: ult.card },
+      team: team.map((id) => { const u = duelUnit(this.catalog.get(id), { level: this.cardLevel(id) }); return { id, hp: u.maxHp, maxHp: u.maxHp, fallen: false }; }),
+      shards: 0, chests: [], kills: {},
     };
     this.persist();
     return d.run;
   }
   runUnits() {
-    const run = this.s.descent.run;
-    return run.team.filter((m) => !m.fallen && m.hp > 0).map((m) => {
-      const u = this.heroUnit(m.id, run.blessings);
+    const run = this.s.descent.run, b = run.blessings;
+    return run.team.filter((m) => !m.fallen).map((m) => {
+      const u = duelUnit(this.catalog.get(m.id), { level: this.cardLevel(m.id) });
+      if (b.includes('blades')) u.atk += 1;
+      if (b.includes('ward')) u.shield = 1;
       return { ...u, maxHp: m.maxHp, hp: Math.min(m.hp, m.maxHp) };
     });
   }
-  // Danger estimé d'un étage (comparaison des niveaux)
-  floorDanger(floor) {
-    const run = this.s.descent.run;
-    const team = run ? run.team.filter((m) => !m.fallen) : this.s.party.map((k) => ({ id: k }));
-    const lv = team.reduce((a, m) => a + this.heroLevel(m.id), 0) / Math.max(1, team.length);
-    const gap = enemyLevel(floor, 'fight') - lv;
-    const hp = run ? run.team.reduce((a, m) => a + (m.fallen ? 0 : m.hp), 0) / run.team.reduce((a, m) => a + m.maxHp, 0) : 1;
-    const score = gap + (1 - hp) * 6;
-    return { level: enemyLevel(floor, 'fight'), heroLevel: Math.round(lv), label: score <= -2 ? 'Facile' : score <= 2 ? 'Équilibré' : score <= 5 ? 'Dangereux' : 'Mortel', score };
-  }
   doors() { const run = this.s.descent.run; return run ? floorDoors(run.day, run.floor) : []; }
-  addLoot(l) {
-    const run = this.s.descent.run;
-    const k = (run.blessings.includes('greed') ? 1.3 : 1) * (run.cursed ? DESCENT.cursedLoot : 1);
-    const rush = this.rule(run.day).key === 'ruee' ? 1.5 : 1;
-    const got = { shards: Math.round((l.shards || 0) * k * rush), ash: Math.round((l.ash || 0) * k), tickets: l.tickets || {}, chests: l.chests || {}, keys: l.keys || {} };
-    run.loot.shards += got.shards; run.loot.ash += got.ash;
-    for (const [t, n] of Object.entries(got.tickets)) run.loot.tickets[t] = (run.loot.tickets[t] || 0) + n;
-    run.loot.chests ||= {}; run.loot.keys ||= {};
-    for (const [t, n] of Object.entries(got.chests)) run.loot.chests[t] = (run.loot.chests[t] || 0) + n;
-    for (const [t, n] of Object.entries(got.keys)) run.loot.keys[t] = (run.loot.keys[t] || 0) + n;
-    return got;
+  // Coffre rapporté si l'on remonte maintenant
+  chestNow(run = this.s.descent.run) {
+    if (!run || run.free) return null;
+    return shiftChest(chestForDepth(run.cleared), run.cursed ? 1 : 0);
   }
   chooseDoor(room) {
     const run = this.s.descent.run;
     if (!run || run.phase !== 'doors') throw new Error('Aucune porte à choisir.');
     if (!this.doors().includes(room)) throw new Error('Porte inconnue.');
+    const rule = this.rule(run.day);
     const out = { room };
     if (room === 'fight' || room === 'elite' || room === 'boss') {
-      // Le combat se joue au tour par tour : son état est gardé dans l'expédition (reprise exacte).
-      const enemies = floorEnemies(this.catalog, run.day, run.floor, room);
-      const rule = this.rule(run.day);
+      // les créatures du Bestiaire, corrompues ; l'état du duel est gardé dans l'expédition (reprise exacte)
+      const sc = enemyScale(run.floor);
+      const enemies = floorEnemies(this.catalog, run.day, run.floor, room).map((e) => duelUnit(this.catalog.get(e.id), { side: 'enemy', scale: sc, boss: e.boss, elite: e.elite }));
       for (const e of enemies) {
         const f = this.catalog.get(e.id)?.faction;
-        if (rule.key === 'furie' && f === rule.faction) e.atk = Math.round(e.atk * 1.25);
-        if (rule.key === 'sommeil' && f === rule.faction) { e.maxHp = Math.round(e.maxHp * 0.75); e.hp = e.maxHp; }
+        if (rule.key === 'furie' && f === rule.faction) e.atk = Math.round(e.atk * 1.25 + 0.4);
+        if (rule.key === 'sommeil' && f === rule.faction) { e.maxHp = Math.max(1, Math.round(e.maxHp * 0.75)); e.hp = e.maxHp; }
       }
-      const mastery = {};
-      enemies.forEach((e) => { const k = this.knowledge(e.id); if (k) mastery[e.id] = k; });
-      const power = invocationPower(this.invocationLevel(run.inv));
-      run.battle = createBattle(this.runUnits(), enemies, Math.floor(this.rng() * 2 ** 31), { gauge: run.gauge, invocation: { key: run.inv, power }, mastery, dmgMult: rule.key === 'instable' ? 1.25 : 1 });
-      run.room = room;
-      run.phase = 'battle';
-      out.battle = true;
-      this.persist();
-      return out;
+      const known = {};
+      enemies.forEach((e) => { if (this.knows(e.id)) known[e.id] = true; });
+      run.battle = createDuel(this.runUnits(), enemies, { gauge: run.gauge, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1 });
+      run.room = room; run.phase = 'battle'; out.battle = true;
     } else if (room === 'rest') {
-      const heal = this.rule(run.day).key === 'sources' ? 0.8 : 0.4;
-      run.team.forEach((m) => { if (!m.fallen) m.hp = Math.min(m.maxHp, m.hp + Math.ceil(m.maxHp * heal)); });
+      const k = rule.key === 'sources' ? 0.8 : 0.4;
+      run.team.forEach((m) => { if (!m.fallen) m.hp = Math.min(m.maxHp, m.hp + Math.ceil(m.maxHp * k)); });
       run.phase = 'cleared';
     } else if (room === 'treasure') {
-      out.loot = this.addLoot(roomLoot(run.floor, room, this.rng));
+      out.shards = this.gainShards(15 + run.floor * 6);
       run.phase = 'cleared';
     } else if (room === 'altar') {
       run.altar = blessingChoices(run.day, run.floor, run.blessings);
       if (run.altar.length) { run.phase = 'altar'; out.altar = run.altar; }
       else { run.altar = null; run.team.forEach((m) => { if (!m.fallen) m.hp = m.maxHp; }); run.phase = 'cleared'; out.healed = true; }
     }
-    if (run.phase === 'cleared') { run.cleared = run.floor; this.recordDepth(run.floor); }
+    if (run.phase === 'cleared') this.clearFloor();
     this.persist();
     return out;
   }
-  // Fin du combat : PV, chutes, expérience, Bestiaire de chasse, butin ou défaite.
+  gainShards(n) {
+    const run = this.s.descent.run;
+    const k = (run.blessings.includes('greed') ? 1.3 : 1) * (this.rule(run.day).key === 'ruee' ? 1.5 : 1) * (run.free ? 0.5 : 1);
+    const got = Math.round(n * k);
+    run.shards += got;
+    return got;
+  }
+  clearFloor() {
+    const run = this.s.descent.run;
+    run.cleared = run.floor;
+    this.recordDepth(run.floor);
+  }
+  // Fin du combat : PV, chutes, Bestiaire de chasse, éclats et coffres, ou défaite.
   finishBattle() {
     const run = this.s.descent.run;
     if (!run || run.phase !== 'battle' || !run.battle?.over) throw new Error('Aucun combat terminé.');
-    const st = run.battle, room = run.room, won = st.over === 'won';
-    const heroes = Object.values(st.units).filter((u) => u.kind === 'hero');
-    const xp = Math.round((12 + 4 * run.floor) * (room === 'boss' ? 2.5 : room === 'elite' ? 1.5 : 1));
+    const st = run.battle, room = run.room;
+    const units = Object.values(st.units).filter((u) => u.side === 'ally');
     run.team.forEach((m) => {
-      const u = heroes.find((h) => h.id === m.id);
+      const u = units.find((x) => x.id === m.id);
       if (!u) return;
       m.hp = Math.max(0, Math.min(m.maxHp, u.hp));
       if (m.hp <= 0) m.fallen = true;
-      m.xp += m.fallen ? Math.round(xp / 2) : xp;
     });
     run.gauge = st.gauge || 0;
-    run.invXp += 6 + 15 * (st.invUses || 0);
-    // Bestiaire de chasse
     const discovered = [];
     for (const id of st.kills) {
       if (!this.s.hunt[id]) discovered.push(id);
       const before = huntStage(this.s.hunt[id] || 0);
       this.s.hunt[id] = (this.s.hunt[id] || 0) + 1;
       run.kills[id] = (run.kills[id] || 0) + 1;
-      const after = huntStage(this.s.hunt[id]);
-      if (after === 3 && before < 3) { this.s.shards += 100; }
+      if (huntStage(this.s.hunt[id]) === 3 && before < 3) this.s.shards += 100;
     }
     run.battle = null;
-    const wiped = run.team.every((m) => m.fallen);
-    const out = { room, won: won && !wiped, xp, discovered };
-    if (won && !wiped) {
-      const l = roomLoot(run.floor, room, this.rng);
-      if (room === 'elite' && this.rule(run.day).key === 'chasse') { l.shards *= 2; l.chests = { ...(l.chests || {}), [run.floor >= 6 ? 'fer' : 'bois']: 1 }; }
-      out.loot = this.addLoot(l);
+    const won = st.over === 'won' && run.team.some((m) => !m.fallen);
+    const out = { room, won, discovered };
+    if (won) {
+      const hunt = room === 'elite' && this.rule(run.day).key === 'chasse';
+      out.shards = this.gainShards((8 + 3 * run.floor) * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1) * (hunt ? 2 : 1));
+      // les gardiens donnent un coffre tout de suite ; règle « Chasse aux élites » : les élites aussi
+      if (!run.free && (room === 'boss' || hunt)) {
+        const c = room === 'boss' ? chestForDepth(run.floor) : 'bois';
+        run.chests.push(c); out.chest = c;
+      }
       run.phase = 'cleared';
-      run.cleared = run.floor;
-      this.recordDepth(run.floor);
+      this.clearFloor();
       this.track('win', 1);
       this.checkProgress();
       this.persist();
@@ -738,19 +591,8 @@ export class Game {
     }
     return out;
   }
-  // Objet utilisé en plein combat (baume : 50 % des PV d'un héros ; élixir : 40 % à toute l'équipe).
-  battleItem(k) {
-    if (!['baume', 'elixir'].includes(k)) throw new Error('Objet inutilisable en combat.');
-    if (!this.itemCount(k)) throw new Error('Tu n’as pas cet objet.');
-    this.s.items[k]--;
-    return k === 'baume' ? { heal: 0.5 } : { healAll: 0.4 };
-  }
-  // Résolution automatique d'un combat en cours (simulations, mode rapide).
-  autoResolve(timing = {}) {
-    const run = this.s.descent.run;
-    autoBattle(run.battle, timing);
-    return this.finishBattle();
-  }
+  // Résolution automatique d'un combat en cours (simulations)
+  autoResolve() { autoDuel(this.s.descent.run.battle); return this.finishBattle(); }
   chooseBlessing(key) {
     const run = this.s.descent.run;
     if (!run || run.phase !== 'altar' || !run.altar.includes(key)) throw new Error('Bénédiction indisponible.');
@@ -758,16 +600,12 @@ export class Game {
     if (key === 'vigor') run.team.forEach((m) => { if (!m.fallen) { m.maxHp = Math.round(m.maxHp * 1.2); m.hp = m.maxHp; } });
     run.altar = null;
     run.phase = 'cleared';
-    run.cleared = run.floor;
-    this.recordDepth(run.floor);
+    this.clearFloor();
     this.persist();
   }
   recordDepth(floor) {
     const d = this.descent(), run = d.run;
-    const before = d.best;
     d.best = Math.max(d.best, floor);
-    if (before < PACT_UNLOCK && d.best >= PACT_UNLOCK) this.s.pactNews = true;
-    this.unlockHeroes();
     // une expédition commencée la veille ne compte pas pour le record ni les missions du jour
     if (!run || run.day === d.day) { d.bestToday = Math.max(d.bestToday, floor); this.track('depth', floor); }
   }
@@ -780,37 +618,22 @@ export class Game {
     this.persist();
     return run.floor;
   }
-  // Fin d'expédition : butin (moitié perdue en cas de défaite, tout en descente maudite),
-  // expérience des héros et de l'invocation, héros tombés affaiblis quelques heures.
+  // Fin d'expédition : coffre selon la profondeur (une qualité de moins si l'équipe tombe ;
+  // en descente maudite, une de plus, mais rien si l'équipe tombe). Éclats : moitié perdue si l'équipe tombe.
   endRun(wiped = false) {
     const d = this.s.descent, run = d.run;
     if (!run) throw new Error('Aucune expédition en cours.');
-    const loot = { ...run.loot, tickets: { ...run.loot.tickets }, chests: { ...(run.loot.chests || {}) }, keys: { ...(run.loot.keys || {}) } };
-    if (wiped) {
-      const k = run.cursed ? 0 : 0.5;
-      loot.shards = Math.floor(loot.shards * k); loot.ash = Math.floor(loot.ash * k); loot.tickets = {};
-      // les coffres sont perdus avec l'équipe ; les clés aussi en descente maudite
-      loot.chests = {};
-      if (run.cursed) loot.keys = {};
+    let chest = null;
+    if (!run.free) {
+      chest = shiftChest(chestForDepth(run.cleared), (run.cursed ? 1 : 0) - (wiped ? 1 : 0));
+      if (wiped && run.cursed) chest = null;
     }
-    this.addChests(loot.chests, loot.keys);
-    this.s.shards += loot.shards;
-    this.s.ash += loot.ash;
-    for (const [t, n] of Object.entries(loot.tickets)) this.s.tickets[t] = (this.s.tickets[t] || 0) + n;
-    const now = this.clock().getTime();
-    const fallen = [], levelUps = [];
-    for (const m of run.team) {
-      const h = this.hero(m.id);
-      const before = levelOf(h.xp).level;
-      h.xp += m.xp;
-      const after = levelOf(h.xp).level;
-      if (after > before) levelUps.push({ id: m.id, level: after });
-      if (m.fallen) { fallen.push(m.id); h.wound = now + DESCENT.woundHours * 3600000; }
-    }
-    const invBefore = this.invocationLevel(run.inv);
-    this.s.invXp[run.inv] = (this.s.invXp[run.inv] || 0) + run.invXp;
-    const invUp = this.invocationLevel(run.inv) > invBefore ? { key: run.inv, level: this.invocationLevel(run.inv) } : null;
-    const summary = { wiped, floor: run.cleared, day: run.day, loot, fallen, levelUps, invUp, kills: run.kills, cursed: run.cursed, lostCards: [] };
+    let shards = run.shards;
+    if (wiped) shards = run.cursed ? 0 : Math.floor(shards / 2);
+    const chests = [...(wiped && run.cursed ? [] : run.chests), ...(chest ? [chest] : [])];
+    chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });
+    this.s.shards += shards;
+    const summary = { wiped, floor: run.cleared, day: run.day, chests, shards, kills: run.kills, free: run.free, cursed: run.cursed };
     this.emit('descentEnd', summary);
     d.last = summary;
     d.run = null;
@@ -818,6 +641,44 @@ export class Game {
     this.checkProgress();
     this.persist();
     return summary;
+  }
+
+  // Passage au nouveau système (une fois) : les héros, l'équipement et les pactes disparaissent.
+  // Les coffres de l'Arsenal sont gardés (ils contiennent désormais des boosters) ; le reste devient des éclats.
+  convertHeroes() {
+    const s = this.s;
+    if (s.army === 1) return;
+    let shards = 0;
+    const a = s.arsenal;
+    if (a && typeof a === 'object') {
+      this.addChests(a.chests || {});
+      if (a.pending?.type) this.addChests({ [a.pending.type]: 1 });
+      const val = { C: 10, R: 25, E: 60, L: 150 };
+      shards += Object.values(a.items || {}).reduce((t, it) => t + (val[it?.r] || 10) * (1 + (it?.f || 0)), 0);
+      shards += Math.round((a.fer || 0) / 2);
+      for (const [k, n] of Object.entries(a.keys || {})) shards += (n || 0) * (k === 'abyssal' ? 400 : 150);
+    }
+    if (s.heroes && typeof s.heroes === 'object') {
+      const lv = (xp) => { let l = 1, t = xp || 0; while (t >= 40 + 25 * (l - 1)) { t -= 40 + 25 * (l - 1); l++; } return l; };
+      shards += Object.values(s.heroes).reduce((t, h) => t + 15 * (lv(h?.xp) - 1), 0);
+    }
+    for (const k of ['baume', 'elixir', 'parchemin']) if (s.items?.[k]) { shards += s.items[k] * ITEM_REFUND[k]; delete s.items[k]; }
+    // expédition de l'ancien système : close, butin rendu et torche rendue
+    const d = s.descent;
+    if (d?.run && d.run.v !== 3) {
+      const l = d.run.loot || {};
+      shards += l.shards || 0; s.ash += l.ash || 0;
+      for (const [t, n] of Object.entries(l.tickets || {})) s.tickets[t] = (s.tickets[t] || 0) + n;
+      this.addChests(l.chests || {});
+      if (d.used > 0) d.used--;
+      d.run = null;
+    }
+    for (const k of ['heroes', 'party', 'invocation', 'invXp', 'pacts', 'arsenal', 'heroNews', 'pactNews']) delete s[k];
+    if (d) { delete d.team; delete d.wounds; delete d.xp; delete d.cursed; }
+    s.shards += shards;
+    s.army = 1;
+    if (Object.keys(s.collection).length) s.armyNews = { shards };
+    this.persist();
   }
 
   // Boutique d'objets --------------------------------------------------------
@@ -830,7 +691,7 @@ export class Game {
     if (this.s.shards < it.price) throw new Error('Pas assez d’éclats.');
     this.s.shards -= it.price;
     this.s.stats.shardsSpent += it.price;
-    if (it.arsenal) this.addChests(it.arsenal.chests, it.arsenal.keys);
+    if (it.chests) this.addChests(it.chests);
     else this.s.items[k] = this.itemCount(k) + 1;
     const day = today(this.clock());
     if (this.s.itemBuys.day !== day) this.s.itemBuys = { day };
@@ -840,11 +701,8 @@ export class Game {
   useItem(k, target = null) {
     if (!this.itemCount(k)) throw new Error('Tu n’as pas cet objet.');
     const d = this.descent();
-    if (k === 'baume') { if (!this.s.heroes[target] || !this.heroWounded(target)) throw new Error('Ce héros n’est pas blessé.'); this.hero(target).wound = 0; }
-    else if (k === 'elixir') { const hurt = this.ownedHeroes().filter((h) => this.heroWounded(h)); if (!hurt.length) throw new Error('Aucun héros blessé.'); hurt.forEach((h) => { this.hero(h).wound = 0; }); }
-    else if (k === 'torche') { if (d.used <= 0) throw new Error('Toutes tes torches du jour sont déjà disponibles.'); d.used--; }
+    if (k === 'torche') { if (d.used <= 0) throw new Error('Toutes tes torches du jour sont déjà disponibles.'); d.used--; }
     else if (k === 'encens') { if (this.s.ritualBoost) throw new Error('Un encens brûle déjà pour ton prochain rituel.'); this.s.ritualBoost = 15; }
-    else if (k === 'parchemin') { if (!this.s.heroes[target]) throw new Error('Choisis un héros.'); this.hero(target).xp += 80; }
     else throw new Error('Objet inconnu.');
     this.s.items[k]--;
     this.persist();
@@ -870,7 +728,7 @@ export class Game {
     if (reward.title && !this.s.titles.includes(reward.title)) this.s.titles.push(reward.title);
     if (reward.frame && !this.s.frames.includes(reward.frame)) this.s.frames.push(reward.frame);
     if (reward.special) this.addCard(reward.special, 'special', 'reward');
-    if (reward.chests || reward.keys) this.addChests(reward.chests, reward.keys);
+    if (reward.chests) this.addChests(reward.chests);
   }
 
   achievementValue(a) {
@@ -889,7 +747,7 @@ export class Game {
       case 'hunted': return this.huntCount();
       case 'mastered': return Object.values(this.s.hunt).filter((k) => k >= HUNT_STAGES[2].k).length;
       case 'trophies': return Object.values(this.s.hunt).filter((k) => k >= HUNT_STAGES[3].k).length;
-      case 'pactLeg': return Object.keys(this.s.pacts || {}).some((h) => this.pactFor(h)?.tier === 3) ? 1 : 0;
+      case 'cardLevel': return Math.max(0, ...Object.keys(this.s.collection).map((id) => this.cardLevel(id)));
       default: return 0;
     }
   }
@@ -962,9 +820,7 @@ export class Game {
     ['C', 'PC', 'R', 'HR', 'M'].forEach((r) => this.catalog.byRarity[r].slice(0, n).forEach((c) => { for (let i = 0; i < 2; i++) this.addCard(c.id, 'normal', 'reward'); }));
     this.persist();
   }
-  devMaxLevels() { HERO_ORDER.forEach((k) => { this.hero(k).xp = Math.max(this.hero(k).xp, totalXpFor(20)); }); Object.keys(INVOCATIONS).forEach((k) => { this.s.invXp[k] = Math.max(this.s.invXp[k] || 0, totalXpFor(20)); }); this.persist(); }
-  devArsenal() { this.addChests({ bois: 5, fer: 5, or: 3, abyssal: 3 }); this.arsenal().fer = (this.arsenal().fer || 0) + 200; this.persist(); }
-  devHealAll() { HERO_ORDER.forEach((k) => { if (this.s.heroes[k]) this.s.heroes[k].wound = 0; }); this.persist(); }
+  devChests() { this.addChests({ bois: 5, fer: 5, or: 3, abyssal: 3 }); this.persist(); }
   devTorches() { this.descent().used = 0; this.persist(); }
   devFreePacks() { this.s.freePack = { stock: FREE_PACK.max, since: Date.now() }; this.persist(); }
   devMissions() { this.missions().list.forEach((x) => { x.p = x.n; }); this.persist(); }
@@ -982,7 +838,7 @@ export class Game {
     this.s.settings = { ...this.s.settings, ...settings };
     this.persist();
   }
-  replaceSave(save) { this.s = save; this.persist(); }
+  replaceSave(save) { this.s = save; try { this.convertHeroes(); } catch (e) { /* rien */ } this.persist(); }
   bestCards(n = 3) {
     return Object.keys(this.s.collection)
       .map((id) => this.catalog.get(id))

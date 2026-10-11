@@ -1,112 +1,61 @@
-// La Descente : équipe, expédition étage par étage, combats animés, butin.
-import { DESCENT, ROOMS, BLESSINGS } from '../core/descent.js';
-import { HEROES, HERO_ORDER, INVOCATIONS, INVOCATION_ORDER } from '../core/heroes.js';
-import { heroCardHTML, heroArtUrl, invocationCardHTML } from '../ui/hero.js';
-import { openHero, openInvocation, fillInvocationArt } from './heroes.js';
-import { lazyArt } from '../ui/card.js';
+// L'Aventure (la Descente) : ton équipe de cartes descend dans l'Abysse, étage par étage,
+// affronte les créatures corrompues en duel et rapporte un coffre plein de boosters.
+import { RARITY } from '../config.js';
+import { DESCENT, ROOMS, BLESSINGS, CHESTS, chestForDepth } from '../core/descent.js';
+import { TEAM, BUDGET } from '../core/army.js';
 import { artUrl } from '../art/assets.js';
-import { icon } from '../ui/icons.js';
-import { esc, fmt, toast, openSheet, confirmBox, bindActions } from '../ui/dom.js';
+import { icon, EMBLEM, sigil } from '../ui/icons.js';
+import { esc, fmt, toast, confirmBox, bindActions } from '../ui/dom.js';
+import { coach } from '../ui/coach.js';
 import { bagHTML, bindBag } from './items.js';
-import { runBattle } from './battle-ui.js';
+import { runDuel } from './duel-ui.js';
 import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
-import { EMBLEM, sigil } from '../ui/icons.js';
-import { coach } from '../ui/coach.js';
-import { CHESTS, KEYS } from '../core/gear.js';
-
-// Coffres et clés d'un butin, en texte
-const chestText = (l = {}, plus = '') => [...Object.entries(l.chests || {}).filter(([, n]) => n).map(([t, n]) => `${plus}${n} ${CHESTS[t].name.toLowerCase()}`), ...Object.entries(l.keys || {}).filter(([, n]) => n).map(([t, n]) => `${plus}${n} ${KEYS[t].name.toLowerCase()}`)];
-const chestN = (l = {}) => Object.values(l.chests || {}).reduce((a, b) => a + b, 0);
 
 const ROOM_ICON = { fight: 'swords', elite: 'skull', altar: 'star', rest: 'heart', treasure: 'crystal', boss: 'crown' };
-const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export default function descent(app, root) {
   const g = app.game, cat = app.catalog;
-  const ui = (app.state.descent ||= { cursed: false, speed: 1, outcome: null });
-  let playing = false, skip = false;
+  const ui = (app.state.descent ||= { cursed: false, outcome: null });
+  let battle = null, playing = false;
 
+  const teamStrip = (ids, run) => `<div class="v2-strip">${ids.map((id, i) => { const c = cat.get(id); const m = run?.team.find((x) => x.id === id); return `<span class="v2-mini ${i >= TEAM.active ? 'res' : ''} ${m?.fallen ? 'fallen' : ''}" style="--rc:${RARITY[c.rarity].color}"><img alt="" src="${artUrl(c, { lite: true })}">${m ? `<span class="hpbar"><i style="width:${(m.hp / m.maxHp) * 100}%"></i></span>` : `<small>${i < TEAM.active ? `Niv. ${g.cardLevel(id)}` : 'Rés.'}</small>`}</span>`; }).join('')}</div>`;
   const ruleHTML = (r) => `<section class="panel dc-rule" style="--rf:${r.faction ? cat.faction[r.faction].colors.secondary : 'var(--gold)'}"><span class="dc-rule-ic">${r.faction ? sigil(r.faction) : icon('star')}</span><span><span class="small muted">Règle du jour</span><b>${esc(r.name)}</b><span class="small">${esc(r.desc)}</span></span></section>`;
-  const chestsWaiting = () => Object.values(g.arsenal().chests).reduce((a, n) => a + n, 0);
-  // ——— Accueil de la Descente ——————————————————————————————————————————
+  const chestChip = (c) => (c ? `<span class="v2-chest-chip" style="--cc:${CHESTS[c].color}">${icon('lock')} ${esc(CHESTS[c].name)}</span>` : '<span class="v2-chest-chip none">aucun coffre</span>');
+
+  // ——— Accueil de l'Aventure ———————————————————————————————————————————
   function lobby() {
-    const d = g.descent();
-    const party = g.s.party.filter((k) => g.s.heroes[k]);
-    const torches = g.torchesLeft();
-    const last = ui.outcome;
-    const danger = g.floorDanger(1);
-    const news = g.takeHeroNews();
-    const pactNews = g.s.pactNews; if (pactNews) { g.s.pactNews = false; g.persist(); }
-    const inv = INVOCATIONS[g.s.invocation] || INVOCATIONS.phenix;
-    const ready = torches && party.length === DESCENT.teamSize;
-    root.innerHTML = `
-      <header class="screen-head dc-head"><h1>La Descente</h1><p class="muted">${d.best ? `Ton record : étage ${d.best}${d.bestToday ? ` · aujourd’hui : ${d.bestToday}` : ''}` : 'Chaque jour, l’Abysse change de visage.'}</p></header>
+    const d = g.descent(), torches = g.torchesLeft(), last = ui.outcome, team = g.team(), chests = g.chestCount();
+    const news = g.s.armyNews;
+    root.innerHTML = `<header class="screen-head dc-head"><h1>La Descente</h1><p class="muted">${d.best ? `Ton record : étage ${d.best}${d.bestToday ? ` · aujourd’hui : ${d.bestToday}` : ''}` : 'Descends, survis, rapporte un coffre.'}</p></header>
+      ${news ? `<section class="panel ornate dc-news"><div class="dc-new-h"><span class="dc-new-ic">${icon('sparkle')}</span><span><b>Tes cartes combattent !</b><span class="small">Les héros ont quitté l’Abysse : ce sont maintenant tes créatures qui descendent. Chaque doublon fait monter une carte de niveau.</span>${news.shards ? `<span class="small">Ton ancien équipement et l’expérience de tes héros ont été changés en <b>${fmt(news.shards)} éclats</b>. Tes coffres sont gardés : ils contiennent maintenant des boosters.</span>` : ''}</span></div><button class="btn small ghost" data-act="news">OK</button></section>` : ''}
       ${last ? summaryHTML(last) : ''}
-      ${pactNews ? `<section class="panel ornate dc-news"><div class="dc-new-h"><span class="dc-new-ic">${icon('sparkle')}</span><span><b>Les pactes sont débloqués !</b><span class="small">Chaque héros peut maintenant se lier à une de tes cartes : sa faction donne l’effet, sa rareté le renforce.</span><span class="small muted">Aventure, puis Héros : touche un héros, puis « Pacte ».</span></span></div></section>` : ''}
-      ${news.length ? `<section class="panel ornate dc-news">${news.map((k) => `<div class="dc-new-h" style="--hc:${HEROES[k].color}"><img alt="" src="${heroArtUrl(k)}"><span><b>${esc(HEROES[k].name)} rejoint ton équipe !</b><span class="small">${esc(HEROES[k].cls)} · ${esc(HEROES[k].role)}</span></span></div>`).join('')}<p class="small muted">Touche « Modifier » pour l’emmener avec toi.</p></section>` : ''}
+      ${chests ? `<a class="panel dc-chests" href="#/coffres"><span class="dc-new-ic">${icon('lock')}</span><span><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Pleins de boosters</span></span>${icon('next')}</a>` : ''}
       ${ruleHTML(g.rule())}
       <section class="panel dc-go">
-        <div class="dc-go-top"><span class="dc-torches">${Array.from({ length: DESCENT.torches }, (_, i) => `<i class="${i < torches ? 'on' : ''}">${icon('flame')}</i>`).join('')}</span><span class="small muted">${torches ? `${torches} expédition${torches > 1 ? 's' : ''} possible${torches > 1 ? 's' : ''} aujourd’hui` : 'Plus de torche : reviens demain'}</span></div>
-        <div class="dc-team">
-          ${party.map((k) => `<span class="dc-tm" style="--hc:${HEROES[k].color}"><img alt="" src="${heroArtUrl(k)}">${g.pactFor(k) ? `<span class="dc-pact">${sigil(g.pactCard(k).faction)}</span>` : ''}<b>${esc(HEROES[k].name.split(' ')[0])}</b><small>Niv. ${g.heroLevel(k)}${g.heroWounded(k) ? ' · blessé' : ''}</small></span>`).join('')}
-          ${Array.from({ length: DESCENT.teamSize - party.length }, () => '<span class="dc-tm empty"><i>+</i><small>Héros</small></span>').join('')}
-          <span class="dc-tm inv" style="--hc:${inv.color}"><span class="ic-art" data-card="${inv.card}"></span><b>${esc(inv.name)}</b><small>Invocation</small></span>
-        </div>
-        <button class="btn small ghost block" data-act="team">${icon('user')}Modifier l’équipe</button>
-        <button class="btn ${ui.cursed ? 'danger' : 'primary'} block big-cta" data-act="start" ${ready ? '' : 'disabled'}>${icon('flame')}${torches ? 'Descendre' : 'Reviens demain'}</button>
-        <div class="dc-curse-row ${ui.cursed ? 'on' : ''}"><span><b>${icon('skull')} Descente maudite</b><span class="small muted">butin doublé, mais tout est perdu si l’équipe tombe</span></span>
-          <button class="switch" role="switch" aria-checked="${ui.cursed}" data-act="curse" aria-label="Descente maudite"><i></i></button></div>
-        <p class="small muted center">${party.length < DESCENT.teamSize ? `Choisis ${DESCENT.teamSize} héros.` : `Premier étage : créatures niveau ${danger.level}`}</p>
+        <div class="dc-go-top"><span class="dc-torches">${Array.from({ length: DESCENT.torches }, (_, i) => `<i class="${i < torches ? 'on' : ''}">${icon('flame')}</i>`).join('')}</span><span class="small muted">${torches ? `${torches} expédition${torches > 1 ? 's' : ''} avec coffre aujourd’hui` : 'Expéditions du jour faites : tu peux rejouer, sans coffre'}</span></div>
+        ${teamStrip(team)}
+        <p class="small muted center">Pouvoir : <b>${esc(g.ultimate(team).name)}</b> · budget ${g.teamCost(team)} / ${BUDGET}</p>
+        <a class="btn small ghost block" href="#/equipe">${icon('user')}Modifier l’équipe</a>
+        <button class="btn ${ui.cursed && torches ? 'danger' : 'primary'} block big-cta" data-act="start" ${team.length >= TEAM.active ? '' : 'disabled'}>${icon('flame')}${torches ? 'Descendre' : 'Descendre (sans coffre)'}</button>
+        ${torches ? `<div class="dc-curse-row ${ui.cursed ? 'on' : ''}"><span><b>${icon('skull')} Descente maudite</b><span class="small muted">coffre d’une qualité au-dessus, mais rien si l’équipe tombe</span></span><button class="switch" role="switch" aria-checked="${ui.cursed}" data-act="curse" aria-label="Descente maudite"><i></i></button></div>` : ''}
       </section>
-      <div class="dc-tiles">
-        <a class="dc-tile" href="#/heros">${icon('swords')}<b>Héros</b></a>
-        <a class="dc-tile" href="#/arsenal">${icon('shield')}<b>Arsenal</b>${chestsWaiting() ? `<span class="badge">${chestsWaiting()}</span>` : ''}</a>
-        <a class="dc-tile" href="#/marchand">${icon('heart')}<b>Marchand</b></a>
-      </div>
+      ${Object.values(g.s.items).some((n) => n > 0) ? bagHTML(g) : ''}
       <details class="panel dc-fold" id="lb"><summary>${icon('trophy')} Classement du jour</summary><div class="lb-body small muted">Chargement…</div></details>
-      <details class="panel dc-fold"><summary>${icon('info')} Comment ça marche</summary>
-        <ul class="small">
-          <li>${DESCENT.torches} expéditions par jour. Le donjon est le même pour tout le monde ce jour-là.</li>
-          <li>Tes <b>3 héros</b> affrontent les créatures du Bestiaire, de plus en plus fortes en profondeur. Ils gagnent des niveaux à chaque expédition.</li>
-          <li>Les ennemis <b>annoncent</b> leur prochaine action. Quand l’un d’eux prépare un gros coup, interromps-le, protège la cible ou <b>pare</b> au bon moment.</li>
-          <li>La <b>jauge d’invocation</b> se remplit en combat : pleine, elle appelle ton invocation.</li>
-          <li>Les salles au trésor, les élites et les gardiens donnent des <b>coffres</b> pour équiper tes héros (Arsenal).</li>
-          <li>Après chaque étage : <b>remonter</b> avec le butin, ou <b>descendre</b>. Si l’équipe tombe, tu perds la moitié des éclats et les coffres trouvés.</li>
-          <li>De nouveaux héros te rejoignent en descendant : Kaël (étage 3), Thalia (6), Lucien (9), Ossian (12).</li>
-        </ul></details>`;
-    fillInvocationArt(app, root);
+      <details class="panel dc-fold"><summary>${icon('info')} Comment ça marche</summary><ul class="small">
+        <li>Tes cartes sont des créatures liées à ton livre : elles combattent pour toi. 3 au combat, 2 en réserve.</li>
+        <li>Au combat, touche une de tes cartes puis l’ennemi à attaquer. La cible riposte. Chaque carte attaque une fois par tour, puis « Fin du tour ».</li>
+        <li>Les créatures de l’Abysse sont des versions <b>corrompues</b>. Posséder la carte d’une créature donne +1 dégât contre elle.</li>
+        <li>${DESCENT.torches} expéditions avec coffre par jour, puis tu peux rejouer sans coffre. Tous les 5 étages, un gardien garde un coffre.</li>
+        <li>Remonte quand tu veux : la profondeur atteinte décide du coffre (1–4 bois, 5–9 fer, 10–14 or, 15+ abyssal).</li></ul></details>`;
     root.querySelector('#lb').addEventListener('toggle', (e) => { if (e.target.open) loadBoard(); }, { once: true });
   }
 
-  // Composition de l'équipe et choix de l'invocation, dans une fenêtre
-  function teamSheet() {
-    const sh = openSheet('', { label: 'Équipe', onClose: () => render() });
-    const draw = () => {
-      const party = g.s.party.filter((k) => g.s.heroes[k]);
-      sh.setContent(`<h2>Ton équipe <span class="small muted">${party.length} / ${DESCENT.teamSize}</span></h2>
-        <p class="small muted">Touche un héros pour l’ajouter ou le retirer.</p>
-        <div class="hc-grid dc-party">${HERO_ORDER.filter((k) => g.s.heroes[k]).map((k) => heroCardHTML(g, k, { selected: party.includes(k), order: party.indexOf(k) + 1 })).join('')}</div>
-        <h3 class="section-title">Invocation</h3>
-        <div class="ic-grid">${INVOCATION_ORDER.map((k) => invocationCardHTML(g, k, { selected: g.s.invocation === k })).join('')}</div>
-        <button class="btn primary block" data-close>Valider</button>`);
-      fillInvocationArt(app, sh.body);
-    };
-    sh.body.addEventListener('click', (e) => {
-      const h = e.target.closest('[data-hero]');
-      if (h) {
-        const k = h.dataset.hero;
-        let party = g.s.party.filter((x) => g.s.heroes[x]);
-        if (party.includes(k)) party = party.filter((x) => x !== k);
-        else if (party.length < DESCENT.teamSize) party = [...party, k];
-        else party = [...party.slice(1), k];
-        g.setParty(party); app.sfx.tap(); return draw();
-      }
-      const i = e.target.closest('.ic-c[data-inv]');
-      if (i && g.invocationUnlocked(i.dataset.inv)) { g.setInvocation(i.dataset.inv); app.sfx.tap(); return draw(); }
-      if (e.target.closest('[data-close]')) sh.close();
-    });
-    draw();
+  function summaryHTML(s) {
+    return `<section class="panel ornate dc-sum ${s.wiped ? 'lost' : 'won'}"><h2>${s.wiped ? 'L’équipe est tombée' : 'Retour à la surface'}</h2><p class="dc-depth">Étage <b>${s.floor}</b></p>
+      <p class="small">${s.chests.length ? s.chests.map((c) => chestChip(c)).join(' ') : 'Aucun coffre cette fois.'} ${s.shards ? `· ${icon('crystal')} ${fmt(s.shards)} éclats` : ''}</p>
+      ${s.chests.length ? `<a class="btn gold block" href="#/coffres">${icon('lock')}Ouvrir mes coffres</a>` : ''}
+      <div class="row gap"><button class="btn small ghost" data-act="share">${icon('copy')}Partager</button><button class="btn small ghost" data-act="dismiss">OK</button></div></section>`;
   }
 
   async function loadBoard() {
@@ -128,65 +77,47 @@ export default function descent(app, root) {
     } catch (e) { if (root.contains(box)) box.textContent = e.message; }
   }
 
-  function summaryHTML(s) {
-    const lootLine = [s.loot.shards ? `${icon('crystal')} ${fmt(s.loot.shards)} éclats` : '', s.loot.ash ? `${icon('ash')} ${fmt(s.loot.ash)} cendres` : '', ...Object.entries(s.loot.tickets || {}).map(([t, n]) => `${icon('ticket')} ${n} booster${n > 1 ? 's' : ''} ${t === 'premium' ? 'premium' : 'standard'}`), ...chestText(s.loot).map((x) => `${icon('lock')} ${x}`)].filter(Boolean).join(' · ');
-    const kills = Object.entries(s.kills || {});
-    return `<section class="panel ornate dc-sum ${s.wiped ? 'lost' : 'won'}">
-      <h2>${s.wiped ? 'L’équipe est tombée' : 'Retour à la surface'}</h2>
-      <p class="dc-depth">Étage <b>${s.floor}</b></p>
-      <p class="small">${lootLine || 'Aucun butin.'}${s.wiped ? ` <span class="muted">(${s.cursed ? 'tout a été perdu' : 'la moitié a été perdue'})</span>` : ''}</p>
-      ${s.levelUps?.length ? `<p class="small dc-good">${icon('sparkle')} ${s.levelUps.map((l) => `${esc(HEROES[l.id]?.name || l.id)} passe niveau ${l.level}`).join(', ')}</p>` : ''}
-      ${s.invUp ? `<p class="small dc-good">${icon('sparkle')} ${esc(INVOCATIONS[s.invUp.key].name)} passe niveau ${s.invUp.level}</p>` : ''}
-      ${kills.length ? `<p class="small muted">${icon('book')} Créatures vaincues : ${kills.reduce((a, [, n]) => a + n, 0)} (${kills.length} espèce${kills.length > 1 ? 's' : ''})</p>` : ''}
-      ${s.fallen?.length ? `<p class="small muted">${icon('heart')} Affaiblis ${DESCENT.woundHours} h : ${s.fallen.map((k) => esc(HEROES[k]?.name || k)).join(', ')}</p>` : ''}
-      ${chestN(s.loot) ? `<a class="btn small gold" href="#/arsenal">${icon('lock')}Ouvrir mes coffres</a>` : ''}
-      <div class="row gap wrap"><button class="btn small" data-act="share">${icon('upload')}Partager mon score</button><button class="btn small ghost" data-act="dismiss">OK</button></div>
-    </section>`;
-  }
-
-  // ——— Expédition en cours ————————————————————————————————————————————
-  function teamStrip(run) {
-    return `<div class="dc-strip hero-strip">${run.team.map((m) => `<div class="dc-mini ${m.fallen ? 'fallen' : ''}" style="--rc:${HEROES[m.id].color}"><img alt="" src="${heroArtUrl(m.id)}"><span class="hpbar"><i style="width:${(m.hp / m.maxHp) * 100}%"></i></span></div>`).join('')}
-      <div class="dc-gauge" title="Jauge d’invocation"><span>${esc(INVOCATIONS[run.inv].name)}</span><span class="progress"><i style="width:${run.gauge || 0}%;--bar:${INVOCATIONS[run.inv].color}"></i></span><span class="small muted">${Math.floor(run.gauge || 0)} %</span></div></div>`;
-  }
-  function runHead(run) {
-    return `<header class="dc-run-head">
-      <div><span class="small muted">${run.cursed ? `<span class="dc-bad">${icon('skull')} Maudite</span> · ` : ''}La Descente</span><h1>Étage ${run.floor}</h1></div>
-      <div class="dc-loot"><span>${icon('crystal')}${fmt(run.loot.shards)}</span><span>${icon('ash')}${fmt(run.loot.ash)}</span>${Object.values(run.loot.tickets).reduce((a, b) => a + b, 0) ? `<span>${icon('ticket')}${Object.values(run.loot.tickets).reduce((a, b) => a + b, 0)}</span>` : ''}${chestN(run.loot) ? `<span>${icon('lock')}${chestN(run.loot)}</span>` : ''}</div>
-    </header>
-    ${teamStrip(run)}
-    <p class="dc-rule-line small">${icon('star')} <b>${esc(g.rule(run.day).name)}</b> · ${esc(g.rule(run.day).desc)}</p>
-    ${run.blessings.length ? `<div class="chips dc-bless">${run.blessings.map((k) => `<span class="chip" title="${esc(BLESSINGS[k].desc)}">${icon('star')}${esc(BLESSINGS[k].name)}</span>`).join('')}</div>` : ''}`;
-  }
+  // ——— Expédition ———————————————————————————————————————————————————
+  const runHead = (run) => `<header class="dc-run-head"><div><span class="small muted">${run.free ? 'Descente libre (sans coffre)' : run.cursed ? `<span class="dc-bad">${icon('skull')} Maudite</span>` : 'La Descente'}</span><h1>Étage ${run.floor}</h1></div><div class="dc-loot"><span>${icon('crystal')}${fmt(run.shards)}</span>${run.chests.length ? `<span>${icon('lock')}${run.chests.length}</span>` : ''}</div></header>
+    ${teamStrip(run.team.map((m) => m.id), run)}
+    <p class="dc-rule-line small">${icon('star')} <b>${esc(g.rule(run.day).name)}</b> · ${esc(g.rule(run.day).desc)}</p>`;
   function doorsView(run) {
     const doors = g.doors();
-    root.innerHTML = `${runHead(run)}
-      <p class="dc-prompt">${doors.length > 1 ? 'Deux passages s’ouvrent devant toi.' : 'Un gardien barre la route.'}</p>
+    root.innerHTML = `${runHead(run)}<p class="dc-prompt">${doors.length > 1 ? 'Deux passages s’ouvrent devant toi.' : 'Un gardien barre la route.'}</p>
       <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r}" data-act="door" data-r="${r}"><span class="dc-door-ic">${icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${ROOMS[r].desc}</span></button>`).join('')}</div>
-      ${run.cleared ? `<button class="btn ghost block" data-act="leave">${icon('back')}Remonter avec le butin</button>` : ''}`;
-    coach(app, 'd-doors', 'Chaque étage propose <b>deux portes</b>. Un combat rapporte du butin et de l’expérience ; une source soigne ton équipe ; un autel donne une bénédiction pour toute l’expédition. Tous les 5 étages, un <b>gardien</b> garde un coffre.', { title: 'La Descente' });
+      ${run.cleared ? `<button class="btn ghost block" data-act="leave">${icon('back')}Remonter</button>` : ''}`;
   }
   function clearedView(run, extra = '') {
-    const nextBoss = (run.floor + 1) % DESCENT.bossEvery === 0;
-    const dz = g.floorDanger(run.floor + 1);
-    const lose = run.cursed ? run.loot.shards : Math.ceil(run.loot.shards / 2);
-    const tk = Object.values(run.loot.tickets).reduce((a, b) => a + b, 0);
-    root.innerHTML = `${runHead(run)}
-      ${extra}
-      <section class="panel dc-risk">
-        <div><span class="small muted">Étage ${run.floor + 1}${nextBoss ? ' · gardien' : ''}</span><b class="dz dz-${dz.label.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()}">${dz.label}</b><span class="small muted">Créatures niv. ${dz.level}${nextBoss ? '+' : ''}<br>Ton équipe niv. ${dz.heroLevel}</span></div>
-        <div><span class="small muted">Si l’équipe tombe</span><b class="dc-bad">−${fmt(lose)} éclats</b><span class="small muted">${tk ? `et ${tk} booster${tk > 1 ? 's' : ''} ` : ''}${chestN(run.loot) ? `${tk ? '+' : 'et'} ${chestN(run.loot)} coffre${chestN(run.loot) > 1 ? 's' : ''} ` : ''}${run.cursed ? '(tout le butin)' : '(la moitié des éclats)'}</span></div>
-      </section>
-      <div class="dc-choice">
-        <button class="btn primary block big-cta" data-act="next">${icon('next')}Descendre à l’étage ${run.floor + 1}${nextBoss ? ' (gardien)' : ''}</button>
-        <button class="btn block" data-act="leave">${icon('back')}Remonter avec le butin</button>
-      </div>`;
-    coach(app, 'd-cleared', 'Étage terminé ! Tu peux <b>descendre</b> (plus de butin, mais des créatures plus fortes) ou <b>remonter</b> pour garder tout ce que tu as trouvé. Si toute l’équipe tombe, tu perds la moitié des éclats et les coffres trouvés.', { title: 'Continuer ou remonter ?' });
+    const now = g.chestNow(run), next = run.free ? null : chestForDepth(run.floor + 1);
+    const alive = run.team.some((m) => !m.fallen);
+    root.innerHTML = `${runHead(run)}${extra}
+      <section class="panel dc-risk"><div><span class="small muted">Si tu remontes</span>${chestChip(now)}<span class="small muted">${icon('crystal')} ${fmt(run.shards)} éclats</span></div>
+        <div><span class="small muted">Étage ${run.floor + 1}${(run.floor + 1) % DESCENT.bossEvery === 0 ? ' · gardien' : ''}</span>${run.free ? '<span class="small">Descente libre</span>' : `<span class="small">${next !== chestForDepth(run.floor) ? `Coffre amélioré : ${esc(CHESTS[next].name)}` : 'Même coffre'}</span>`}<span class="small muted">Si l’équipe tombe : ${run.cursed ? 'tout est perdu' : 'coffre d’une qualité en dessous'}</span></div></section>
+      <div class="dc-choice">${alive ? `<button class="btn primary block big-cta" data-act="next">${icon('next')}Descendre à l’étage ${run.floor + 1}</button>` : ''}<button class="btn block" data-act="leave">${icon('back')}Remonter avec le coffre</button></div>`;
   }
   function altarView(run) {
-    root.innerHTML = `${runHead(run)}
-      <p class="dc-prompt">L’autel murmure. Choisis une bénédiction pour le reste de l’expédition.</p>
+    root.innerHTML = `${runHead(run)}<p class="dc-prompt">L’autel murmure. Choisis une bénédiction.</p>
       <div class="dc-altar">${run.altar.map((k) => `<button class="dc-bl" data-act="bless" data-k="${k}"><span>${icon('star')}</span><b>${esc(BLESSINGS[k].name)}</b><span class="small">${esc(BLESSINGS[k].desc)}</span></button>`).join('')}</div>`;
+  }
+  function battleView(run) {
+    if (battle) return;
+    playing = true;
+    const title = `Étage ${run.floor}${run.room === 'boss' ? ' · Gardien' : run.room === 'elite' ? ' · Élite' : ''}`;
+    battle = runDuel(app, root, { title, onEnd: () => {
+      battle = null; playing = false;
+      app.pendingProgress = [];
+      let out;
+      try { out = g.finishBattle(); } catch (e) { app.flushProgress(); toast(esc(e.message), { kind: 'error' }); return render(); }
+      app.chrome();
+      if (out.lost) { app.sfx.error(); ui.outcome = out.summary; render(); }
+      else {
+        app.sfx.reveal(out.room === 'boss' ? 'M' : 'R');
+        const disc = out.discovered.map((id) => cat.get(id)?.name).filter(Boolean);
+        clearedView(g.descent().run, `<p class="dc-event dc-win">${icon('swords')} <b>Victoire !</b> +${fmt(out.shards)} éclats${out.chest ? ` · <b>${esc(CHESTS[out.chest].name)}</b> gagné !` : ''}${disc.length ? `<br><span class="small">${icon('book')} Première rencontre : ${disc.map(esc).join(', ')}</span>` : ''}</p>`);
+      }
+      window.scrollTo(0, 0);
+      app.flushProgress();
+    } });
   }
   function render() {
     const run = g.descent().run;
@@ -197,56 +128,6 @@ export default function descent(app, root) {
     return clearedView(run);
   }
 
-  // ——— Combat au tour par tour ————————————————————————————————————————
-  let battle = null;
-  function battleView(run) {
-    if (battle) return;
-    playing = true;
-    const room = run.room;
-    const title = `Étage ${run.floor}${room === 'boss' ? ' · Gardien' : room === 'elite' ? ' · Élite' : ''}`;
-    battle = runBattle(app, root, { title, onEnd: () => {
-      battle = null; playing = false;
-      let out;
-      try { app.pendingProgress = []; out = g.finishBattle(); } catch (e) { app.pendingProgress = null; toast(esc(e.message), { kind: 'error' }); return render(); }
-      if (out.lost) {
-        app.sfx.error();
-        ui.outcome = out.summary;
-        render();
-      } else {
-        app.sfx.reveal(room === 'boss' ? 'M' : 'R');
-        const disc = (out.discovered || []).map((id) => cat.get(id)?.name).filter(Boolean);
-        clearedView(g.descent().run, `<p class="dc-event dc-win">${icon('swords')} <b>Victoire !</b> ${lootText(out.loot)} · +${out.xp} XP${disc.length ? `<br><span class="small">${icon('book')} Nouveau au Bestiaire de chasse : ${disc.map(esc).join(', ')}</span>` : ''}</p>`);
-      }
-      window.scrollTo(0, 0);
-      app.flushProgress();
-    } });
-  }
-
-  // ——— Actions ————————————————————————————————————————————————————————
-  async function door(room) {
-    if (playing) return;
-    const run = g.descent().run;
-    let out;
-    try { app.pendingProgress = []; out = g.chooseDoor(room); }
-    catch (e) { app.pendingProgress = null; toast(esc(e.message), { kind: 'error' }); return; }
-    if (out.battle) {
-      app.pendingProgress = null;
-      window.scrollTo(0, 0);
-      battleView(g.descent().run);
-      return;
-    } else if (out.altar) {
-      render();
-    } else {
-      const msg = room === 'rest' ? `<p class="dc-event">${icon('heart')} L’eau de la source referme les blessures de ton équipe.</p>`
-        : room === 'treasure' ? `<p class="dc-event">${icon('crystal')} Le coffre s’ouvre : ${lootText(out.loot)}</p>`
-        : out.healed ? `<p class="dc-event">${icon('star')} L’autel est muet, mais sa lumière soigne ton équipe.</p>` : '';
-      app.sfx.coin();
-      clearedView(g.descent().run, msg);
-    }
-    app.flushProgress();
-  }
-  const lootText = (l = {}) => [l.shards ? `+${fmt(l.shards)} éclats` : '', l.ash ? `+${fmt(l.ash)} cendres` : '', ...Object.entries(l.tickets || {}).map(([t, n]) => `+${n} booster ${t === 'premium' ? 'premium' : 'standard'}`), ...chestText(l, '+')].filter(Boolean).join(', ') || 'Rien cette fois.';
-
   function share() {
     const s = ui.outcome || {};
     const d = g.descent();
@@ -256,29 +137,38 @@ export default function descent(app, root) {
   }
 
   bindActions(root, {
-    team() { teamSheet(); },
     curse() { ui.cursed = !ui.cursed; render(); },
+    news() { delete g.s.armyNews; g.persist(); render(); },
     async start() {
-      if (ui.cursed && !(await confirmBox('Descente maudite : si toute l’équipe tombe, <b>tout le butin</b> est perdu. Tu es sûr ?', { ok: 'Je descends', danger: true }))) return;
-      try { g.startRun({ cursed: ui.cursed }); ui.outcome = null; app.sfx.tear(); render(); window.scrollTo(0, 0); }
-      catch (e) { toast(esc(e.message), { kind: 'error' }); }
+      if (ui.cursed && g.torchesLeft() && !(await confirmBox('Descente maudite : si toute l’équipe tombe, <b>tu ne rapportes rien</b>. Tu es sûr ?', { ok: 'Je descends', danger: true }))) return;
+      try {
+        g.startRun({ cursed: ui.cursed }); ui.outcome = null; app.sfx.tear(); app.chrome(); render(); window.scrollTo(0, 0);
+        coach(app, 'army-doors', 'Choisis une porte à chaque étage. Plus tu descends, plus le <b>coffre</b> que tu rapporteras est beau. Tu peux <b>remonter</b> après chaque étage pour garder ton coffre.', { title: 'La Descente' });
+      } catch (e) { toast(esc(e.message), { kind: 'error' }); }
     },
-    door(el) { door(el.dataset.r); },
+    door(el) {
+      if (playing) return;
+      let out;
+      try { out = g.chooseDoor(el.dataset.r); } catch (e) { toast(esc(e.message), { kind: 'error' }); return; }
+      if (out.battle) { window.scrollTo(0, 0); return battleView(g.descent().run); }
+      if (out.altar) return render();
+      app.sfx.coin();
+      clearedView(g.descent().run, el.dataset.r === 'rest' ? `<p class="dc-event">${icon('heart')} L’eau de la source soigne tes créatures.</p>` : el.dataset.r === 'treasure' ? `<p class="dc-event">${icon('crystal')} +${fmt(out.shards)} éclats</p>` : out.healed ? `<p class="dc-event">${icon('star')} L’autel est muet, mais sa lumière soigne ton équipe.</p>` : '');
+    },
     bless(el) { try { g.chooseBlessing(el.dataset.k); app.sfx.discover(); clearedView(g.descent().run, `<p class="dc-event">${icon('star')} ${esc(BLESSINGS[el.dataset.k].name)} : ${esc(BLESSINGS[el.dataset.k].desc)}</p>`); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     next() { try { g.nextFloor(); app.sfx.swipe(); render(); window.scrollTo(0, 0); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     async leave() {
-      if (!(await confirmBox('Remonter maintenant avec tout le butin ?', { ok: 'Remonter' }))) return;
+      if (!(await confirmBox('Remonter maintenant avec ton coffre ?', { ok: 'Remonter' }))) return;
       app.pendingProgress = [];
       ui.outcome = g.endRun(false);
-      app.sfx.coin();
-      render(); window.scrollTo(0, 0);
+      app.sfx.coin(); app.chrome(); render(); window.scrollTo(0, 0);
       app.flushProgress();
     },
-    after() { render(); window.scrollTo(0, 0); },
     share() { share(); },
     dismiss() { ui.outcome = null; render(); },
   });
+  bindBag(app, root, () => render());
   render();
   app.refreshView = () => { if (!playing) render(); };
-  return () => { app.refreshView = null; skip = true; if (battle) { battle.stop(); battle = null; } };
+  return () => { app.refreshView = null; if (battle) { battle.stop(); battle = null; } };
 }
