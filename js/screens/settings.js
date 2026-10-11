@@ -1,4 +1,5 @@
 // Réglages : son, animations, accessibilité, sauvegarde, outils de développement.
+import { resetTips } from '../ui/coach.js';
 import { icon } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, openSheet, bindActions } from '../ui/dom.js';
 import { exportCode, importCode } from '../core/save.js';
@@ -52,7 +53,7 @@ export default function settings(app, root) {
       <section class="panel stack about">
         <h2>À propos</h2>
         <p class="small">ABYSSAL — Le Bestiaire interdit. Créé par <b>Alexis Seguin</b>.</p>
-        <button class="btn small" data-act="guide">${icon('info')}Revoir le guide de bienvenue</button>
+        <button class="btn small" data-act="guide">${icon('info')}Revoir le guide et les bulles d’aide</button>
         <p class="small muted">Version ${esc(app.version)} · ${app.catalog.cards.length} cartes</p>
       </section>`;
     root.querySelector('#vol')?.addEventListener('change', (e) => { g.setSetting('volume', Number(e.target.value)); app.applySettings(); sfx.tap(); });
@@ -106,7 +107,7 @@ export default function settings(app, root) {
       toast('Progression effacée.', { icon: 'trash' });
       app.go('');
     },
-    guide() { showWelcome(app, { force: true }); },
+    guide() { resetTips(app); showWelcome(app, { force: true }); },
     creator() { if (!g.s.settings.dev) g.setSetting('dev', true); render(); openCreator(app); },
     dev(el) {
       const x = el.dataset.x;

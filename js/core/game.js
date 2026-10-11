@@ -636,7 +636,7 @@ export class Game {
     const gap = enemyLevel(floor, 'fight') - lv;
     const hp = run ? run.team.reduce((a, m) => a + (m.fallen ? 0 : m.hp), 0) / run.team.reduce((a, m) => a + m.maxHp, 0) : 1;
     const score = gap + (1 - hp) * 6;
-    return { level: enemyLevel(floor, 'fight'), heroLevel: Math.round(lv), label: score <= -2 ? 'Facile' : score <= 1 ? 'Équilibré' : score <= 4 ? 'Dangereux' : 'Mortel', score };
+    return { level: enemyLevel(floor, 'fight'), heroLevel: Math.round(lv), label: score <= -2 ? 'Facile' : score <= 2 ? 'Équilibré' : score <= 5 ? 'Dangereux' : 'Mortel', score };
   }
   doors() { const run = this.s.descent.run; return run ? floorDoors(run.day, run.floor) : []; }
   addLoot(l) {

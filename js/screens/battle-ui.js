@@ -6,6 +6,7 @@ import { SKILLS, MAX_ENERGY, beginTurn, current, timeline, front, alive, targets
 import { artUrl } from '../art/assets.js';
 import { heroArtUrl } from '../ui/hero.js';
 import { cardHTML } from '../ui/card.js';
+import { coach } from '../ui/coach.js';
 import { icon } from '../ui/icons.js';
 import { esc, toast, openSheet } from '../ui/dom.js';
 
@@ -129,7 +130,9 @@ export function runBattle(app, root, { title, onEnd }) {
       switch (e.t) {
         case 'skill': say(`<b>${esc(u.name.split(' ')[0])}</b> · ${esc(e.name)}`); app.sfx.summon(); await wait(step(360)); break;
         case 'intent': { const [, label] = INTENT[e.k] || INTENT.attack; if (e.k !== 'charge') say(`<b class="dc-bad">${esc(u.name)}</b> · ${esc(label)}`); await wait(step(e.k === 'charge' ? 50 : 250)); break; }
-        case 'charge': say(`<b class="dc-bad">${esc(u.name)}</b> prépare une attaque dévastatrice !`); draw(); bump(e.u, 'charge-pulse'); await wait(step(700)); break;
+        case 'charge': say(`<b class="dc-bad">${esc(u.name)}</b> prépare une attaque dévastatrice !`); draw(); bump(e.u, 'charge-pulse'); await wait(step(700));
+          if (!ui.auto) await coach(app, 'b-charge', 'Cet ennemi <b>prépare un gros coup</b> pour son prochain tour. Trois réponses : l’<b>interrompre</b> (Lance de givre de Morgane), <b>protéger</b> sa cible (Égide d’Aldric), ou le <b>parer</b> : touche l’écran quand le cercle rouge se resserre sur ton héros.', { title: 'Attaque préparée' });
+          break;
         case 'interrupt': draw(); float(e.u, 'INTERROMPU !', 'crit'); app.sfx.coin(); await wait(step(600)); break;
         case 'heal': draw(); float(e.u, `+${e.d}`, 'heal'); await wait(step(280)); break;
         case 'parry': draw(); bump(e.u, 'parry'); float(e.u, 'PARADE !', 'crit'); app.sfx.coin(); await wait(step(450)); break;
@@ -206,7 +209,7 @@ export function runBattle(app, root, { title, onEnd }) {
         targeting = null;
         root.querySelectorAll('.tb-u.target').forEach((x) => x.classList.remove('target'));
         const items = ['baume', 'elixir'].filter((k) => g.itemCount(k));
-        cmdEl.innerHTML = `<p class="tb-who">Au tour de <b style="color:${h.color}">${esc(h.name)}</b></p>
+        cmdEl.innerHTML = `
           <div class="tb-acts">
             ${canInvoke(st) ? `<button class="tb-a inv" data-c="invoke" style="--ic:${invDef.color}">${icon('sparkle')}<b>Invoquer ${esc(invDef.name)}</b></button>` : ''}
             <button class="tb-a main" data-c="attack">${icon('swords')}<b>Attaque</b></button>
@@ -284,9 +287,12 @@ export function runBattle(app, root, { title, onEnd }) {
         await wait(step(320));
       } else {
         say(`À toi de jouer : <b>${esc(HEROES[u.id].name.split(' ')[0])}</b>`);
+        await coach(app, 'b-turn', 'C’est le tour de <b>' + esc(HEROES[u.id].name.split(' ')[0]) + '</b> (sa carte est soulevée). Touche <b>Attaque</b>, puis l’ennemi à frapper.<br><br>Au-dessus de chaque ennemi s’affiche <b>ce qu’il fera</b> à son tour, et sur qui. Les <b>◆</b> sous tes héros sont leur énergie : les compétences en coûtent, et on en regagne un à chaque tour.', { title: 'Ton premier combat' });
+        if (canInvoke(st)) await coach(app, 'b-gauge', `La jauge est pleine : touche <b>Invoquer ${esc(invDef?.name || '')}</b> pour appeler ton invocation. Elle se remplit quand tes héros agissent ou sont frappés.`, { title: 'Invocation prête' });
         a = await choose(u);
         if (!alive_) return;
         if (!a) a = plan(st, u);
+        if (!ui.auto && ui.rhythm && singleStrike(a)) await coach(app, 'b-strike', 'Un cercle doré va se resserrer sur la cible. <b>Touche l’écran</b> quand il touche la carte : frappe <b>parfaite</b>, dégâts augmentés. Tu peux couper ce bonus avec le bouton ✦ en haut.', { title: 'Frappe en rythme' });
         if (!ui.auto && ui.rhythm && singleStrike(a)) a.strike = await rhythm(a.target || front(st, 'enemy')[0]?.uid, 'Frappe !', 'strike');
       }
       if (!alive_) return;

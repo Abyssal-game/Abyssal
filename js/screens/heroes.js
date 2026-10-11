@@ -1,4 +1,5 @@
 // Héros : liste, fiche détaillée (statistiques, compétences, progression) et invocations.
+import { coach } from '../ui/coach.js';
 import { HEROES, HERO_ORDER, SKILLS, INVOCATIONS, INVOCATION_ORDER, makeHero, invocationPower } from '../core/heroes.js';
 import { VARIANTS } from '../config.js';
 import { heroCardHTML, heroArtUrl, invocationCardHTML } from '../ui/hero.js';
@@ -64,6 +65,7 @@ export function openHero(app, key) {
     <p class="lore small">« ${esc(h.lore)} »</p>
   </div>`);
   }
+  if (g.pactsOpen()) coach(app, 'h-pact', 'Chaque héros peut sceller un <b>pacte</b> avec une de tes cartes. La <b>faction</b> de la carte donne l’effet (Brasier, Grâce…), sa <b>rareté</b> le renforce. Ouvre des boosters pour avoir plus de choix !', { title: 'Les pactes' });
   sheet.body.addEventListener('click', (e) => {
     const b = e.target.closest('[data-hs]');
     if (!b || b.disabled) return;

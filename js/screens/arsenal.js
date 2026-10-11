@@ -1,4 +1,5 @@
 // L'Arsenal : coffres et clés, ouverture animée, inventaire, fiche d'objet (équiper, forger, démanteler).
+import { coach } from '../ui/coach.js';
 import { BASES, SLOTS, SLOT_ORDER, GEAR_RARITY, GEAR_ORDER, CHESTS, CHEST_ORDER, KEYS, LEG_PITY, canUse, itemScore, forgeCost, salvageValue } from '../core/gear.js';
 import { HEROES, HERO_ORDER } from '../core/heroes.js';
 import { itemTileHTML, gearIcon, statLine, effectLines, itemName, whoCanUse, chestSVG, keyHTML } from '../ui/gear.js';
@@ -196,6 +197,7 @@ export default function arsenal(app, root) {
     }
   });
   render();
+  coach(app, 'a-arsenal', 'Ici, tu ouvres les <b>coffres</b> trouvés dans la Descente. Ils contiennent des armes, armures, reliques et sorts pour tes héros. Touche un objet pour l’équiper, ou va dans la fiche d’un héros et touche « Équiper le meilleur ».', { title: 'L’Arsenal' });
   app.refreshView = render;
   return () => { app.refreshView = null; };
 }

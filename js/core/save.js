@@ -43,6 +43,7 @@ export function defaultSave(now = Date.now()) {
     invocation: 'phenix',
     invXp: {},            // invocation -> expérience
     pacts: {},            // héros -> carte liée en pacte
+    tips: {},             // bulles d'aide déjà vues
     hunt: {},             // Bestiaire de chasse : id de créature -> nombre de victoires
     // Arsenal : objets (id -> { b: modèle, r: rareté, f: forge, a: propriété }), équipement par héros,
     // coffres et clés (un cadeau de départ pour découvrir), fer runique, garantie de légendaire.

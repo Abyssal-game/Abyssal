@@ -12,6 +12,7 @@ import { runBattle } from './battle-ui.js';
 import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
 import { EMBLEM, sigil } from '../ui/icons.js';
+import { coach } from '../ui/coach.js';
 import { CHESTS, KEYS } from '../core/gear.js';
 
 // Coffres et clés d'un butin, en texte
@@ -144,7 +145,7 @@ export default function descent(app, root) {
   // ——— Expédition en cours ————————————————————————————————————————————
   function teamStrip(run) {
     return `<div class="dc-strip hero-strip">${run.team.map((m) => `<div class="dc-mini ${m.fallen ? 'fallen' : ''}" style="--rc:${HEROES[m.id].color}"><img alt="" src="${heroArtUrl(m.id)}"><span class="hpbar"><i style="width:${(m.hp / m.maxHp) * 100}%"></i></span></div>`).join('')}
-      <div class="dc-gauge" title="Jauge d’invocation"><span>${esc(INVOCATIONS[run.inv].name)}</span><span class="progress"><i style="width:${run.gauge || 0}%;--bar:${INVOCATIONS[run.inv].color}"></i></span></div></div>`;
+      <div class="dc-gauge" title="Jauge d’invocation"><span>${esc(INVOCATIONS[run.inv].name)}</span><span class="progress"><i style="width:${run.gauge || 0}%;--bar:${INVOCATIONS[run.inv].color}"></i></span><span class="small muted">${Math.floor(run.gauge || 0)} %</span></div></div>`;
   }
   function runHead(run) {
     return `<header class="dc-run-head">
@@ -160,6 +161,7 @@ export default function descent(app, root) {
       <p class="dc-prompt">${doors.length > 1 ? 'Deux passages s’ouvrent devant toi.' : 'Un gardien barre la route.'}</p>
       <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r}" data-act="door" data-r="${r}"><span class="dc-door-ic">${icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${ROOMS[r].desc}</span></button>`).join('')}</div>
       ${run.cleared ? `<button class="btn ghost block" data-act="leave">${icon('back')}Remonter avec le butin</button>` : ''}`;
+    coach(app, 'd-doors', 'Chaque étage propose <b>deux portes</b>. Un combat rapporte du butin et de l’expérience ; une source soigne ton équipe ; un autel donne une bénédiction pour toute l’expédition. Tous les 5 étages, un <b>gardien</b> garde un coffre.', { title: 'La Descente' });
   }
   function clearedView(run, extra = '') {
     const nextBoss = (run.floor + 1) % DESCENT.bossEvery === 0;
@@ -169,13 +171,14 @@ export default function descent(app, root) {
     root.innerHTML = `${runHead(run)}
       ${extra}
       <section class="panel dc-risk">
-        <div><span class="small muted">Étage ${run.floor + 1}${nextBoss ? ' · gardien' : ''}</span><b class="dz dz-${dz.label.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()}">${dz.label}</b><span class="small muted">créatures niv. ${dz.level}${nextBoss ? '+' : ''} · tes héros niv. ${dz.heroLevel}</span></div>
+        <div><span class="small muted">Étage ${run.floor + 1}${nextBoss ? ' · gardien' : ''}</span><b class="dz dz-${dz.label.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()}">${dz.label}</b><span class="small muted">Créatures niv. ${dz.level}${nextBoss ? '+' : ''}<br>Ton équipe niv. ${dz.heroLevel}</span></div>
         <div><span class="small muted">Si l’équipe tombe</span><b class="dc-bad">−${fmt(lose)} éclats</b><span class="small muted">${tk ? `et ${tk} booster${tk > 1 ? 's' : ''} ` : ''}${chestN(run.loot) ? `${tk ? '+' : 'et'} ${chestN(run.loot)} coffre${chestN(run.loot) > 1 ? 's' : ''} ` : ''}${run.cursed ? '(tout le butin)' : '(la moitié des éclats)'}</span></div>
       </section>
       <div class="dc-choice">
         <button class="btn primary block big-cta" data-act="next">${icon('next')}Descendre à l’étage ${run.floor + 1}${nextBoss ? ' (gardien)' : ''}</button>
         <button class="btn block" data-act="leave">${icon('back')}Remonter avec le butin</button>
       </div>`;
+    coach(app, 'd-cleared', 'Étage terminé ! Tu peux <b>descendre</b> (plus de butin, mais des créatures plus fortes) ou <b>remonter</b> pour garder tout ce que tu as trouvé. Si toute l’équipe tombe, tu perds la moitié des éclats et les coffres trouvés.', { title: 'Continuer ou remonter ?' });
   }
   function altarView(run) {
     root.innerHTML = `${runHead(run)}
