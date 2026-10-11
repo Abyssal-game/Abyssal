@@ -4,7 +4,9 @@ import { VARIANTS } from '../config.js';
 import { heroCardHTML, heroArtUrl, invocationCardHTML } from '../ui/hero.js';
 import { artUrl } from '../art/assets.js';
 import { icon } from '../ui/icons.js';
-import { esc, fmt, openSheet } from '../ui/dom.js';
+import { esc, fmt, openSheet, toast } from '../ui/dom.js';
+import { BASES, SLOTS, SLOT_ORDER, GEAR_RARITY, canUse, itemScore } from '../core/gear.js';
+import { gearIcon, statLine, effectLines, itemName } from '../ui/gear.js';
 
 export function fillInvocationArt(app, root) {
   root.querySelectorAll('.ic-art[data-card]').forEach((el) => {
@@ -14,20 +16,58 @@ export function fillInvocationArt(app, root) {
   });
 }
 
+// Choix d'un objet pour un emplacement
+function pickGear(app, hero, slot, done) {
+  const g = app.game;
+  const list = Object.entries(g.arsenal().items)
+    .filter(([, it]) => BASES[it.b]?.slot === slot && canUse(it.b, hero))
+    .sort((x, y) => itemScore(y[1]) - itemScore(x[1]));
+  const cur = g.equipped(hero)[slot];
+  const sh = openSheet(`<h2>${esc(SLOTS[slot].name)} · ${esc(HEROES[hero].name.split(' ')[0])}</h2>
+    ${list.length ? `<div class="gp-list">${list.map(([id, it]) => { const w = g.wearer(id); return `<button class="gp-row ${id === cur ? 'on' : ''}" data-id="${id}" style="--gc:${GEAR_RARITY[it.r].color}"><span class="gi-ic">${gearIcon(BASES[it.b].type)}</span><span class="gp-t"><b>${esc(itemName(it))}</b><span class="small">${esc(GEAR_RARITY[it.r].name)}${statLine(it) ? ` · ${statLine(it)}` : ''}</span>${effectLines(it).map((l) => `<span class="small gs-fx">${l}</span>`).join('')}${w && w !== hero ? `<span class="small muted">Porté par ${esc(HEROES[w].name.split(' ')[0])} : il lui sera retiré</span>` : ''}</span>${id === cur ? icon('check') : ''}</button>`; }).join('')}</div>`
+      : `<p class="small muted">Aucun objet de ce type pour ${esc(HEROES[hero].name.split(' ')[0])}. Ouvre des coffres dans l’<a href="#/arsenal">Arsenal</a>.</p>`}
+    ${cur ? '<button class="btn ghost block" data-id="none">Retirer l’objet</button>' : ''}`, { label: SLOTS[slot].name });
+  sh.body.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-id]');
+    if (!b) return;
+    try { if (b.dataset.id === 'none') g.unequip(hero, slot); else g.equip(b.dataset.id, hero); app.sfx.tap(); sh.close(); done(); }
+    catch (err) { app.sfx.error(); toast(esc(err.message), { kind: 'error' }); }
+  });
+}
+
 export function openHero(app, key) {
-  const g = app.game, h = HEROES[key], info = g.heroInfo(key);
-  const u = makeHero(key, { level: info.level, wounded: g.heroWounded(key) });
-  const stat = (l, v) => `<div><dt>${l}</dt><dd>${v}</dd></div>`;
-  openSheet(`<div class="hero-sheet" style="--hc:${h.color}">
+  const g = app.game, h = HEROES[key];
+  const sheet = openSheet('', { label: h.name, onClose: () => { app.refreshView && app.refreshView(); } });
+  const stat = (l, v, b) => `<div><dt>${l}</dt><dd>${v}${b ? `<small class="hs-gb">+${b}</small>` : ''}</dd></div>`;
+  function draw() {
+  const info = g.heroInfo(key);
+  const u = g.heroUnit(key);
+  const gb = g.gearOf(key).stats;
+  const eq = g.equipped(key);
+  const run = !!g.s.descent.run;
+  sheet.setContent(`<div class="hero-sheet" style="--hc:${h.color}">
     <div class="hs-top"><img alt="" src="${heroArtUrl(key)}"><div class="hs-name"><h2>${esc(h.name)}</h2><p>${esc(h.cls)} · ${esc(h.race)}</p><p class="small muted">${esc(h.role)}</p></div></div>
     <div class="hs-lv"><b>Niveau ${info.level}</b><span class="xpbar"><i style="width:${info.need ? (info.into / info.need) * 100 : 100}%"></i></span><span class="small muted">${info.need ? `${fmt(info.into)} / ${fmt(info.need)} XP` : 'Niveau maximum'}</span></div>
     ${g.heroWounded(key) ? `<p class="small dc-bad">${icon('heart')} Blessé encore ${Math.ceil(g.woundLeft(key) / 3600000)} h : statistiques réduites de 20 %. Un baume de soin le remet sur pied.</p>` : ''}
-    <dl class="facts hs-stats">${stat('PV', u.maxHp)}${stat('Attaque', u.atk)}${stat('Magie', u.mag)}${stat('Défense', u.def)}${stat('Vitesse', u.spd)}</dl>
+    <dl class="facts hs-stats">${stat('PV', u.maxHp, gb.hp)}${stat('Attaque', u.atk, gb.atk)}${stat('Magie', u.mag, gb.mag)}${stat('Défense', u.def, gb.def)}${stat('Vitesse', u.spd, gb.spd)}</dl>
+    <h3 class="section-title">Équipement <button class="linkish" data-hs="auto" ${run ? 'disabled' : ''}>Équiper le meilleur</button></h3>
+    <div class="hs-eq">${SLOT_ORDER.map((sl) => { const it = eq[sl] && g.gearItem(eq[sl]); return it
+      ? `<button class="hs-slot full" data-hs="slot" data-sl="${sl}" style="--gc:${GEAR_RARITY[it.r].color}" ${run ? 'disabled' : ''}><span class="gi-ic">${gearIcon(BASES[it.b].type)}</span><span><b>${esc(itemName(it))}</b><small>${esc(SLOTS[sl].name)}</small></span></button>`
+      : `<button class="hs-slot" data-hs="slot" data-sl="${sl}" ${run ? 'disabled' : ''}><span class="gi-ic empty">+</span><span><b>${esc(SLOTS[sl].name)}</b><small>Vide</small></span></button>`; }).join('')}</div>
+    ${run ? '<p class="small muted">Expédition en cours : l’équipement se change à la surface.</p>' : ''}
     <h3 class="section-title">Talent</h3><p class="small">${esc(h.passive)}</p>
     <h3 class="section-title">Compétences</h3>
-    ${h.skills.map((k) => `<div class="hs-sk"><b>${esc(SKILLS[k].name)}</b><span class="tb-cost">${'◆'.repeat(SKILLS[k].cost)}</span><p class="small muted">${esc(SKILLS[k].desc)}</p></div>`).join('')}
+    ${u.skills.map((k) => `<div class="hs-sk"><b>${esc(SKILLS[k].name)}</b><span class="tb-cost">${'◆'.repeat(SKILLS[k].cost)}</span>${SKILLS[k].spell ? '<span class="hs-spell">Sort</span>' : ''}<p class="small muted">${esc(SKILLS[k].desc)}</p></div>`).join('')}
     <p class="lore small">« ${esc(h.lore)} »</p>
-  </div>`, { label: h.name });
+  </div>`);
+  }
+  sheet.body.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-hs]');
+    if (!b || b.disabled) return;
+    if (b.dataset.hs === 'auto') { try { g.autoEquip(key); app.sfx.tap(); toast('Meilleur équipement en place.', { icon: 'check' }); } catch (err) { toast(esc(err.message), { kind: 'error' }); } draw(); }
+    if (b.dataset.hs === 'slot') pickGear(app, key, b.dataset.sl, draw);
+  });
+  draw();
 }
 
 export function openInvocation(app, key) {
@@ -51,7 +91,7 @@ export default function heroes(app, root) {
       <p class="small muted">Touche un héros pour voir sa fiche. Ton équipe de 3 se compose dans la Descente.</p>
       <h2 class="section-title">Invocations</h2>
       <div class="ic-grid">${INVOCATION_ORDER.map((k) => invocationCardHTML(g, k, { selected: g.s.invocation === k })).join('')}</div>
-      <a class="btn block" href="#/descente">${icon('swords')}Aller à la Descente</a>`;
+      <div class="row gap"><a class="btn block" href="#/arsenal">${icon('shield')}Arsenal</a><a class="btn block" href="#/descente">${icon('swords')}Descente</a></div>`;
     fillInvocationArt(app, root);
   }
   root.addEventListener('click', (e) => {

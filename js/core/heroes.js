@@ -56,6 +56,15 @@ export const SKILLS = {
   volee:   { name: 'Volée de flèches', cost: 2, target: 'enemies', desc: 'Touche toute la ligne (×1,7 sur les cibles marquées).' },
   feu:     { name: 'Trait de feu', cost: 1, target: 'enemy', desc: 'Dégâts magiques ×1,5 et Brûlure 3 tours.' },
   givre:   { name: 'Lance de givre', cost: 1, target: 'enemy', desc: 'Dégâts ×1,1, Gel 2 tours et interrompt une attaque en préparation.' },
+  // Sorts de l'Arsenal (ajoutés par l'emplacement « Sort »)
+  seisme:   { name: 'Séisme', cost: 2, target: 'enemies', spell: true, desc: 'Frappe toute la ligne (×0,8) ; +10 rage par cible.' },
+  rempart:  { name: 'Rempart runique', cost: 2, target: 'self', spell: true, desc: 'Chaque héros reçoit un bouclier qui annule le prochain coup.' },
+  jugement: { name: 'Jugement', cost: 1, target: 'enemy', spell: true, desc: 'Dégâts sacrés (magie ×1,3) ; la cible est exposée 2 tours.' },
+  priere:   { name: 'Prière des Veilleurs', cost: 2, target: 'self', spell: true, desc: 'Soigne toute l’équipe de 15 % des PV.' },
+  gorge:    { name: 'Tir à la gorge', cost: 1, target: 'enemy', spell: true, desc: 'Dégâts ×0,8 ; interrompt une attaque en préparation.' },
+  percant:  { name: 'Tir perçant', cost: 2, target: 'enemy', spell: true, desc: 'Dégâts ×2, ignore la défense.' },
+  meteore:  { name: 'Pluie de météores', cost: 3, target: 'enemies', spell: true, desc: 'Magie ×1,2 sur toute la ligne et Brûlure 2 tours.' },
+  blizzard: { name: 'Blizzard', cost: 2, target: 'enemies', spell: true, desc: 'Magie ×0,6 sur toute la ligne et Gel 1 tour.' },
 };
 
 // ——— Invocations ——————————————————————————————————————————————————————
@@ -75,7 +84,8 @@ export const invocationPower = (level, variant = 'normal') => (1 + 0.1 * (level 
 let seq = 0;
 const blank = () => ({ stun: 0, burn: 0, frozen: 0, mark: 0, exposed: 0, taunt: 0, protectedBy: null, protecting: 0, defend: false, shield: 0, armorUp: 0, enraged: false, charging: false, poison: 0 });
 
-export function makeHero(key, { level = 1, wounded = false, blessings = [] } = {}) {
+// gear : bonus de l'équipement (voir gearBonus dans gear.js)
+export function makeHero(key, { level = 1, wounded = false, blessings = [], gear = null } = {}) {
   const h = HEROES[key];
   const k = growth(level) * (wounded ? 0.8 : 1);
   const u = {
@@ -83,11 +93,28 @@ export function makeHero(key, { level = 1, wounded = false, blessings = [] } = {
     maxHp: Math.round(h.base.hp * k), atk: Math.round(h.base.atk * k), mag: Math.round(h.base.mag * k), def: Math.round(h.base.def * k), spd: h.base.spd,
     energy: 1, res: 0, skills: h.skills.slice(), st: blank(), wounded, ct: 0,
   };
+  if (gear) {
+    const w = wounded ? 0.8 : 1;
+    for (const k of ['hp', 'atk', 'mag', 'def']) u[k === 'hp' ? 'maxHp' : k] += Math.round((gear.stats[k] || 0) * w);
+    u.spd += gear.stats.spd || 0;
+    const fx = gear.fx;
+    if (gear.spell) { u.skills.push(gear.spell.key); u.sp = gear.spell.pow; }
+    if (fx.rage) u.res = 50;
+    if (fx.heal) u.healBoost = 0.3;
+    if (fx.volley) u.volley = 2.4;
+    if (fx.shatter) u.shatter = 3;
+    if (fx.ward) u.ward = true;
+    if (fx.energy) u.energy = 3;
+    u.dodge = (fx.dodge ? 0.15 : 0) + 0.1 * (fx.a_esquive || 0);
+    u.lifesteal = (fx.vamp ? 0.15 : 0) + 0.08 * (fx.a_vamp || 0);
+    u.gaugeBonus = (fx.gauge ? 4 : 0) + 2 * (fx.a_lien || 0);
+    u.energy = Math.min(3, u.energy + (fx.a_elan || 0));
+  }
   if (blessings.includes('blades')) u.atk += 3;
   if (blessings.includes('haste')) u.spd += 2;
   if (blessings.includes('vigor')) u.maxHp = Math.round(u.maxHp * 1.2);
   if (blessings.includes('scales')) u.armor = 2;
-  if (blessings.includes('thirst')) u.lifesteal = 0.3;
+  if (blessings.includes('thirst')) u.lifesteal = (u.lifesteal || 0) + 0.3;
   if (blessings.includes('fury')) u.fury = true;
   if (blessings.includes('ward')) u.ward = true;
   u.hp = u.maxHp;

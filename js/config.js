@@ -142,8 +142,10 @@ export const MISSIONS = [
   { key: 'depth4',   kind: 'depth',    n: 4, shards: 70, text: 'Atteins l’étage 4 de la Descente' },
   { key: 'wins',     kind: 'win',      n: 5, shards: 60, text: 'Remporte 5 combats dans la Descente' },
   { key: 'offering', kind: 'daily',    n: 1, shards: 30, text: 'Récupère l’offrande du jour' },
+  { key: 'chest2',   kind: 'chest',    n: 2, shards: 50, text: 'Ouvre 2 coffres de l’Arsenal' },
+  { key: 'forge',    kind: 'forge',    n: 1, shards: 50, text: 'Forge un objet' },
 ];
-export const MISSION_BONUS = { tickets: { standard: 1 } }; // les 3 missions du jour accomplies
+export const MISSION_BONUS = { tickets: { standard: 1 }, keys: { or: 1 } }; // les 3 missions du jour accomplies
 
 // Fusion : 5 doublons d'une rareté donnent 1 carte de la rareté au-dessus.
 export const FUSION = { cost: 5, next: { C: 'PC', PC: 'R', R: 'HR', HR: 'M' }, unownedWeight: 3 };
@@ -158,4 +160,8 @@ export const ITEMS = {
   torche:    { name: 'Torche bénie',           price: 220, icon: 'flame',   desc: 'Rallume une torche déjà utilisée : une expédition de plus aujourd’hui.', limit: 2 },
   encens:    { name: 'Encens de ferveur',      price: 150, icon: 'sparkle', desc: '+15 % de chance de réussite à ton prochain rituel d’élévation.' },
   parchemin: { name: 'Parchemin d’expérience', price: 120, icon: 'scroll',  desc: '+80 XP au héros de ton choix.' },
+  // Rayon de l'Arsenal : vont directement dans l'Arsenal (pas dans le sac)
+  coffreFer: { name: 'Coffre de fer',  price: 240, icon: 'lock', desc: 'Deux objets pour tes héros. Rare ou mieux garanti.', limit: 2, arsenal: { chests: { fer: 1 } } },
+  cleOr:     { name: 'Clé d’or',       price: 380, icon: 'lock', desc: 'Ouvre un coffre d’or (gardiens de la Descente).', limit: 1, arsenal: { keys: { or: 1 } } },
+  cleAbysse: { name: 'Clé abyssale',   price: 900, icon: 'lock', desc: 'Ouvre un coffre abyssal (gardiens à partir de l’étage 15).', limit: 1, arsenal: { keys: { abyssal: 1 } } },
 };

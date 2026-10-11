@@ -93,6 +93,7 @@ function hurt(st, src, tgt, amount, ev, kind = 'hit', extra = {}) {
   }
   let d = Math.max(1, Math.round(amount));
   if (kind !== 'dot') {
+    if (tgt.dodge && src && rand(st) < tgt.dodge) { ev.push({ t: 'dodge', u: tgt.uid }); return 0; }
     if (tgt.st.shield) { tgt.st.shield = 0; ev.push({ t: 'block', u: tgt.uid }); return 0; }
     d = Math.max(1, d - (tgt.armor || 0));
     if (tgt.st.defend) d = Math.ceil(d / 2);
@@ -207,20 +208,20 @@ export function act(st, a) {
         case 'fendoir': { const tt = t && t.hp > 0 ? t : foes[0]; hit(tt, dmg(st, u.atk, tt, (1.2 + (u.res || 0) / 100) * s), { crit: a.strike === 'perfect' }); u.res = 0; break; }
         case 'defi': u.st.taunt = 2; u.st.armorUp = 2; u.res = Math.min(100, (u.res || 0) + 25); ev.push({ t: 'status', u: u.uid, s: 'Défi !' }); break;
         case 'egide': if (t && t.uid !== u.uid) { t.st.protectedBy = u.uid; u.st.protecting = 2; ev.push({ t: 'status', u: t.uid, s: 'Protégé' }); } else { u.st.armorUp = 2; ev.push({ t: 'status', u: u.uid, s: 'Garde' }); } break;
-        case 'lumiere': { const tt = t || u; heal(st, tt, tt.maxHp * 0.25 + (u.res || 0) * 0.6 + u.mag, ev); u.res = 0; break; }
+        case 'lumiere': { const tt = t || u; heal(st, tt, (tt.maxHp * 0.25 + (u.res || 0) * 0.6 + u.mag) * (1 + (u.healBoost || 0)), ev); u.res = 0; break; }
         case 'marque': if (t) { t.st.mark = 3; ev.push({ t: 'status', u: t.uid, s: 'Marqué' }); hit(t, dmg(st, u.atk, t, 0.6 * s)); } break;
-        case 'volee': foes.forEach((f) => hit(f, dmg(st, u.atk, f, (f.st.mark ? 1.7 : 0.8)))); break;
+        case 'volee': foes.forEach((f) => hit(f, dmg(st, u.atk, f, (f.st.mark ? u.volley || 1.7 : 0.8)))); break;
         case 'feu': {
           const tt = t && t.hp > 0 ? t : foes[0];
           const shatter = tt?.st.frozen;
-          hit(tt, dmg(st, u.mag, tt, 1.5 * s * (shatter ? 2 : 1)), { crit: a.strike === 'perfect', shatter });
+          hit(tt, dmg(st, u.mag, tt, 1.5 * s * (shatter ? u.shatter || 2 : 1)), { crit: a.strike === 'perfect', shatter });
           if (tt && tt.hp > 0) { if (shatter) tt.st.frozen = 0; else { tt.st.burn = 3; ev.push({ t: 'status', u: tt.uid, s: 'Brûlure' }); } }
           break;
         }
         case 'givre': {
           const tt = t && t.hp > 0 ? t : foes[0];
           const shatter = tt?.st.burn;
-          hit(tt, dmg(st, u.mag, tt, 1.1 * s * (shatter ? 2 : 1)), { crit: a.strike === 'perfect', shatter });
+          hit(tt, dmg(st, u.mag, tt, 1.1 * s * (shatter ? u.shatter || 2 : 1)), { crit: a.strike === 'perfect', shatter });
           if (tt && tt.hp > 0) {
             if (shatter) tt.st.burn = 0; else tt.st.frozen = 2;
             if (tt.st.charging) { tt.st.charging = false; tt.turns++; setIntent(st, tt); ev.push({ t: 'interrupt', u: tt.uid }); }
@@ -228,10 +229,24 @@ export function act(st, a) {
           }
           break;
         }
+        // Sorts de l'Arsenal (u.sp : puissance selon la rareté)
+        case 'seisme': foes.forEach((f) => { if (hit(f, dmg(st, u.atk, f, 0.8 * (u.sp || 1)))) u.res = Math.min(100, (u.res || 0) + 10); }); break;
+        case 'rempart': front(st, 'ally').forEach((h) => { h.st.shield = 1; }); ev.push({ t: 'status', u: u.uid, s: 'Rempart !' }); break;
+        case 'jugement': { const tt = t && t.hp > 0 ? t : foes[0]; hit(tt, dmg(st, u.mag, tt, 1.3 * s * (u.sp || 1)), { crit: a.strike === 'perfect' }); if (tt && tt.hp > 0) { tt.st.exposed = 2; ev.push({ t: 'status', u: tt.uid, s: 'Exposé' }); } break; }
+        case 'priere': front(st, 'ally').forEach((h) => heal(st, h, h.maxHp * 0.15 * (u.sp || 1) * (1 + (u.healBoost || 0)), ev)); break;
+        case 'gorge': {
+          const tt = t && t.hp > 0 ? t : foes[0];
+          hit(tt, dmg(st, u.atk, tt, 0.8 * s * (u.sp || 1)), { crit: a.strike === 'perfect' });
+          if (tt && tt.hp > 0 && tt.st.charging) { tt.st.charging = false; tt.turns++; setIntent(st, tt); ev.push({ t: 'interrupt', u: tt.uid }); }
+          break;
+        }
+        case 'percant': { const tt = t && t.hp > 0 ? t : foes[0]; if (tt) hit(tt, Math.max(1, u.atk * 2 * s * (u.sp || 1) * taken(st, tt)), { crit: a.strike === 'perfect' }); break; }
+        case 'meteore': foes.forEach((f) => { hit(f, dmg(st, u.mag, f, 1.2 * (u.sp || 1))); if (f.hp > 0) f.st.burn = Math.max(f.st.burn, 2); }); break;
+        case 'blizzard': foes.forEach((f) => { const sh = f.st.burn; hit(f, dmg(st, u.mag, f, 0.6 * (u.sp || 1) * (sh ? u.shatter || 2 : 1)), { shatter: !!sh }); if (f.hp > 0) { if (sh) f.st.burn = 0; else f.st.frozen = Math.max(f.st.frozen, 1); } }); break;
         default: break;
       }
     }
-    if (a.action !== 'invoke') gain(st, GAUGE.action);
+    if (a.action !== 'invoke') gain(st, GAUGE.action + (u.gaugeBonus || 0));
   }
   u.ct = Math.max(u.ct, st.now) + tick(u) * speed;
   check(st);
@@ -306,6 +321,15 @@ export function plan(st, u) {
   const prey = () => (foes.find((f) => f.st.mark) || foes.slice().sort((x, y) => x.hp - y.hp)[0])?.uid;
   const charging = foes.find((f) => f.st.charging);
   const has = (k) => u.skills.includes(k) && u.energy >= SKILLS[k].cost;
+  // Sorts de l'Arsenal
+  if (has('meteore') && foes.length >= 2) return A('skill', { skill: 'meteore' });
+  if (has('blizzard') && foes.length >= 2 && (foes.some((f) => f.st.burn) || foes.length >= 3)) return A('skill', { skill: 'blizzard' });
+  if (has('seisme') && foes.length >= 3) return A('skill', { skill: 'seisme' });
+  if (has('gorge') && charging) return A('skill', { skill: 'gorge', target: charging.uid });
+  if (has('rempart') && charging && allies.length >= 2) return A('skill', { skill: 'rempart' });
+  if (has('priere') && allies.filter((h) => h.hp < h.maxHp * 0.65).length >= 2) return A('skill', { skill: 'priere' });
+  if (has('jugement') && u.energy >= 2) return A('skill', { skill: 'jugement', target: foes.slice().sort((x, y) => y.hp - x.hp)[0]?.uid });
+  if (has('percant') && u.energy >= 3) return A('skill', { skill: 'percant', target: prey() });
   if (u.id === 'aldric') {
     const low = allies.filter((h) => h.hp < h.maxHp * 0.45).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
     if (low && has('lumiere')) return A('skill', { skill: 'lumiere', target: low.uid });

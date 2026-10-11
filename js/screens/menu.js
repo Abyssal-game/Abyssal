@@ -13,6 +13,7 @@ export default function menu(app, root) {
   const spare = ['C', 'PC', 'R', 'HR'].reduce((a, r) => a + g.spareCount(r), 0);
   const achDone = Object.keys(s.achievements).length;
   const creator = sync.profile?.badge === 'createur';
+  const chests = Object.values(g.arsenal().chests).reduce((a, n) => a + n, 0);
   const T = (href, ic, title, sub, extra = '') => `<a class="mn-t" href="${href}"${extra}><span class="mn-ic">${icon(ic)}</span><span class="mn-tx"><b>${title}</b><span>${sub}</span></span>${icon('next')}</a>`;
   const A = (act, ic, title, sub) => `<button class="mn-t" data-mn="${act}"><span class="mn-ic">${icon(ic)}</span><span class="mn-tx"><b>${title}</b><span>${sub}</span></span>${icon('next')}</button>`;
   root.innerHTML = `
@@ -25,6 +26,7 @@ export default function menu(app, root) {
     <h2 class="section-title">Mon aventure</h2>
     <nav class="mn-list">
       ${T('#/heros', 'swords', 'Héros et invocations', 'Niveaux, compétences, fiches')}
+      ${T('#/arsenal', 'shield', 'Arsenal', chests ? `${chests} coffre${chests > 1 ? 's' : ''} à ouvrir` : 'Armes, armures, reliques, sorts')}
       ${T('#/profil', 'user', 'Profil', 'Vitrine, chance, statistiques, titres')}
       ${T('#/succes', 'trophy', 'Succès et ensembles', `${achDone} / ${cat.achievements.length} succès`)}
       ${A('fusion', 'sparkle', 'Fusion des doublons', `${spare} doublon${spare > 1 ? 's' : ''} disponible${spare > 1 ? 's' : ''}`)}

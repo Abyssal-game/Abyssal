@@ -40,7 +40,7 @@ export default function home(app, root) {
           <span><span class="progress"><i style="width:${(x.p / x.n) * 100}%"></i></span><span class="mi-n">${x.p} / ${x.n}</span></span>
         </div>`;
       }).join('')}
-      ${m.bonus ? '' : `<div class="mi-bonus"><span class="small">${allClaimed ? 'Les trois missions sont accomplies !' : 'Accomplis les trois missions pour gagner un <b>booster standard</b>.'}</span>${allClaimed ? `<button class="btn small primary" data-act="mbonus">${icon('ticket')}Récupérer</button>` : ''}</div>`}
+      ${m.bonus ? '' : `<div class="mi-bonus"><span class="small">${allClaimed ? 'Les trois missions sont accomplies !' : 'Accomplis les trois missions pour gagner un <b>booster standard</b> et une <b>clé d’or</b>.'}</span>${allClaimed ? `<button class="btn small primary" data-act="mbonus">${icon('ticket')}Récupérer</button>` : ''}</div>`}
     </section>`;
   }
 
@@ -99,7 +99,7 @@ export default function home(app, root) {
       catch (e) { toast(esc(e.message), { kind: 'error' }); }
     },
     mbonus() {
-      try { g.claimMission('bonus'); app.sfx.achievement(); toast('Bonus des missions : <b>1 booster standard</b> offert !', { kind: 'epic', icon: 'ticket' }); app.refresh(); }
+      try { g.claimMission('bonus'); app.sfx.achievement(); toast('Bonus des missions : <b>1 booster standard</b> et <b>1 clé d’or</b> !', { kind: 'epic', icon: 'ticket' }); app.refresh(); }
       catch (e) { toast(esc(e.message), { kind: 'error' }); }
     },
     daily() {

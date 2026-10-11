@@ -65,12 +65,17 @@ export function floorEnemies(catalog, day, floor, room) {
 }
 
 // Butin d'une salle (avant le multiplicateur d'avidité ou de malédiction)
+// Coffres : bois en surface, fer plus bas ; les gardiens gardent les coffres d'or puis abyssaux.
 export function roomLoot(floor, room, rng) {
   const base = 12 + floor * 5;
-  if (room === 'fight') return { shards: base, ash: rng() < 0.4 ? 5 + floor : 0 };
-  if (room === 'elite') return { shards: base * 2, ash: 10 + floor * 2 };
-  if (room === 'treasure') return { shards: Math.round(base * 1.5), ash: rng() < 0.5 ? 8 + floor : 0 };
-  if (room === 'boss') return { shards: base * 3, ash: 20 + floor * 3, tickets: { [floor >= 15 ? 'premium' : 'standard']: 1 } };
+  const small = floor >= 6 ? 'fer' : 'bois';
+  if (room === 'fight') return { shards: base, ash: rng() < 0.4 ? 5 + floor : 0, chests: rng() < 0.12 ? { bois: 1 } : {} };
+  if (room === 'elite') return { shards: base * 2, ash: 10 + floor * 2, chests: rng() < 0.5 ? { [small]: 1 } : {} };
+  if (room === 'treasure') return { shards: base, ash: rng() < 0.5 ? 8 + floor : 0, chests: { [small]: 1 } };
+  if (room === 'boss') {
+    return { shards: base * 3, ash: 20 + floor * 3, tickets: { [floor >= 15 ? 'premium' : 'standard']: 1 },
+      chests: { [floor >= 15 ? 'abyssal' : 'or']: 1 }, keys: floor >= 20 ? { abyssal: 1 } : floor >= 10 ? { or: 1 } : {} };
+  }
   return { shards: 0, ash: 0 };
 }
 

@@ -43,6 +43,9 @@ export function defaultSave(now = Date.now()) {
     invocation: 'phenix',
     invXp: {},            // invocation -> expérience
     hunt: {},             // Bestiaire de chasse : id de créature -> nombre de victoires
+    // Arsenal : objets (id -> { b: modèle, r: rareté, f: forge, a: propriété }), équipement par héros,
+    // coffres et clés (un cadeau de départ pour découvrir), fer runique, garantie de légendaire.
+    arsenal: { items: {}, eq: {}, chests: { bois: 2, fer: 1, or: 1, abyssal: 0 }, keys: { or: 1, abyssal: 0 }, fer: 0, pity: 0, seq: 0, opened: 0, pending: null },
     descent: { day: null, used: 0, bestToday: 0, best: 0, runs: 0, team: [], run: null, wounds: {}, xp: {}, cursed: false },
     history: [],          // dernières ouvertures
     recent: [],           // dernières découvertes (ids)
@@ -81,7 +84,7 @@ export function migrate(raw) {
   s.pity = { ...d.pity, ...s.pity };
   // objets imbriqués ajoutés au fil des versions : complétés sans écraser l'existant
   s.stats.pulls = { ...d.stats.pulls, ...(s.stats.pulls || {}) };
-  for (const k of ['descent', 'missions', 'freePack', 'daily', 'itemBuys']) s[k] = { ...d[k], ...(s[k] && typeof s[k] === 'object' ? s[k] : {}) };
+  for (const k of ['descent', 'missions', 'freePack', 'daily', 'itemBuys', 'arsenal']) s[k] = { ...d[k], ...(s[k] && typeof s[k] === 'object' ? s[k] : {}) };
   for (const k of ['wounds', 'xp']) if (!s.descent[k] || typeof s.descent[k] !== 'object') s.descent[k] = {};
   if (!Array.isArray(s.descent.team)) s.descent.team = [];
   s.heroes = { ...d.heroes, ...(s.heroes && typeof s.heroes === 'object' ? s.heroes : {}) };

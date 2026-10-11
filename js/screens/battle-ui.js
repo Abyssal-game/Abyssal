@@ -134,6 +134,7 @@ export function runBattle(app, root, { title, onEnd }) {
         case 'parry': draw(); bump(e.u, 'parry'); float(e.u, 'PARADE !', 'crit'); app.sfx.coin(); await wait(step(450)); break;
         case 'cover': draw(); float(e.v, 'Protégé', 'spell'); await wait(step(200)); break;
         case 'block': draw(); float(e.u, 'Bloqué', 'spell'); await wait(step(300)); break;
+        case 'dodge': draw(); float(e.u, 'Esquive', 'spell'); await wait(step(300)); break;
         case 'status': draw(); float(e.u, e.s, 'spell'); await wait(step(300)); break;
         case 'stunned': say(`<b>${esc(u.name)}</b> est étourdi.`); draw(); float(e.u, 'Étourdi', 'spell'); await wait(step(500)); break;
         case 'defend': draw(); float(e.u, 'Défense', 'spell'); await wait(step(280)); break;

@@ -23,7 +23,7 @@ export function bindItemShop(app, root, after) {
   root.addEventListener('click', (e) => {
     const b = e.target.closest('[data-item-buy]');
     if (!b || b.disabled) return;
-    try { app.game.buyItem(b.dataset.itemBuy); app.sfx.coin(); toast(`<b>${esc(ITEMS[b.dataset.itemBuy].name)}</b> rejoint ton sac.`, { kind: 'success', icon: ITEMS[b.dataset.itemBuy].icon }); after(); }
+    try { app.game.buyItem(b.dataset.itemBuy); app.sfx.coin(); toast(`<b>${esc(ITEMS[b.dataset.itemBuy].name)}</b> rejoint ${ITEMS[b.dataset.itemBuy].arsenal ? 'ton Arsenal' : 'ton sac'}.`, { kind: 'success', icon: ITEMS[b.dataset.itemBuy].icon }); after(); }
     catch (err) { app.sfx.error(); toast(esc(err.message), { kind: 'error' }); }
   });
 }
@@ -33,7 +33,7 @@ export function bagHTML(g) {
   const owned = Object.keys(ITEMS).filter((k) => g.itemCount(k));
   return `<section class="panel bag"><div class="row between"><h3>${icon('booster')} Ton sac</h3><a class="small" href="#/boutique">Acheter des objets</a></div>
     ${owned.length ? `<div class="bag-list">${owned.map((k) => `<button class="bag-it" data-item-use="${k}" title="${esc(ITEMS[k].desc)}"><span class="item-ic sm">${icon(ITEMS[k].icon)}</span><span>${esc(ITEMS[k].name)}</span><b>×${g.itemCount(k)}</b></button>`).join('')}</div>`
-      : '<p class="small muted">Vide. Les baumes soignent tes cartes blessées, les torches bénies offrent une expédition de plus.</p>'}
+      : '<p class="small muted">Vide. Les baumes soignent tes héros blessés, les torches bénies offrent une expédition de plus.</p>'}
   </section>`;
 }
 
