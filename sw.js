@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v62';
+const VERSION = 'abyssal-v63';
 const CORE = [
   './', 'index.html', 'manifest.webmanifest',
   'css/base.css', 'css/card.css', 'css/screens.css', 'css/army.css',
@@ -12,7 +12,7 @@ const CORE = [
   'js/screens/home.js', 'js/screens/collection.js', 'js/screens/shop.js', 'js/screens/opening.js', 'js/screens/detail.js',
   'js/screens/bestiary.js', 'js/screens/factions.js', 'js/screens/achievements.js', 'js/screens/profile.js',
   'js/screens/settings.js', 'js/screens/fusion.js', 'js/screens/ritual.js', 'js/screens/descent.js', 'js/screens/items.js', 'js/screens/account.js', 'js/screens/creator.js', 'js/screens/menu.js', 'js/screens/welcome.js', 'js/cloud/cloud.js', 'js/cloud/sync.js', 'js/core/descent.js', 'js/ui/coach.js',
-  'js/core/army.js', 'js/core/duel.js', 'js/screens/army.js', 'js/screens/duel-ui.js', 'js/ui/chest.js',
+  'js/core/army.js', 'js/core/duel.js', 'js/screens/army.js', 'js/screens/duel-ui.js', 'js/ui/chest.js', 'js/ui/scene.js',
   'data/factions.json', 'data/sets.json', 'data/abilities.json', 'data/achievements.json', 'data/lore.json',
   'data/cards/infernal.json', 'data/cards/abyssal.json', 'data/cards/celeste.json', 'data/cards/sauvage.json',
   'data/cards/necrotique.json', 'data/cards/primordial.json', 'data/cards/artificiel.json',
@@ -20,6 +20,7 @@ const CORE = [
   ...['standard', 'premium', 'event', 'infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel'].map((k) => `assets/packs/${k}.webp`),
   'assets/backs/back.webp',
   ...['bg-1', 'bg-2', 'bg-3', 'bg-4', 'bg-boss'].map((k) => `assets/battle/${k}.webp`),
+  ...['home', 'descent', 'door-fight', 'door-boss', 'rest', 'altar', 'treasure'].map((k) => `assets/scenes/${k}.webp`),
   ...['slash', 'impact', 'dodge', 'heal', 'venom', 'frost', 'seal', 'death'].map((k) => `assets/fx/${k}.webp`),
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/favicon.png',
 ];

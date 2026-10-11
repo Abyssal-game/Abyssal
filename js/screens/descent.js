@@ -9,9 +9,12 @@ import { esc, fmt, toast, confirmBox, bindActions } from '../ui/dom.js';
 import { coach } from '../ui/coach.js';
 import { bagHTML, bindBag } from './items.js';
 import { runDuel } from './duel-ui.js';
+import { setScene, sceneUrl } from '../ui/scene.js';
 import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
 
+// Illustrations des portes et des bonus (l'élite reprend la porte de combat, teintée)
+const DOOR_ART = { fight: 'door-fight', elite: 'door-fight', boss: 'door-boss', rest: 'rest', altar: 'altar', treasure: 'treasure' };
 const ROOM_ICON = { fight: 'swords', elite: 'skull', altar: 'star', rest: 'heart', treasure: 'crystal', boss: 'crown' };
 
 export default function descent(app, root) {
@@ -86,7 +89,7 @@ export default function descent(app, root) {
   function doorsView(run) {
     const doors = g.doors();
     root.innerHTML = `${runHead(run)}<p class="dc-prompt">${doors.includes('boss') ? 'Un gardien barre la route.' : doors.length > 1 ? 'Deux passages. Le plus dangereux rapporte plus.' : 'Des créatures barrent le passage.'}</p>
-      <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r}" data-act="door" data-r="${r}"><span class="dc-door-ic">${icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${ROOMS[r].desc}</span></button>`).join('')}</div>
+      <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r} has-art" data-act="door" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic">${icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${ROOMS[r].desc}</span></button>`).join('')}</div>
       ${run.cleared ? `<button class="btn ghost block" data-act="leave">${icon('back')}Remonter</button>` : ''}`;
   }
   function clearedView(run, extra = '') {
@@ -100,7 +103,7 @@ export default function descent(app, root) {
   // Bonus choisi après une victoire
   function rewardView(run, extra = '') {
     root.innerHTML = `${runHead(run)}${extra}<p class="dc-prompt">Choisis ton bonus.</p>
-      <div class="dc-doors ${run.rewards.length > 2 ? 'three' : ''}">${run.rewards.map((r) => `<button class="dc-door r-${r}" data-act="reward" data-r="${r}"><span class="dc-door-ic">${icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'treasure' ? `+${fmt(Math.round((15 + run.floor * 6) * (run.free ? 0.5 : 1)))} éclats environ` : ROOMS[r].desc}</span></button>`).join('')}</div>`;
+      <div class="dc-doors ${run.rewards.length > 2 ? 'three' : ''}">${run.rewards.map((r) => `<button class="dc-door r-${r} has-art" data-act="reward" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic">${icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'treasure' ? `+${fmt(Math.round((15 + run.floor * 6) * (run.free ? 0.5 : 1)))} éclats environ` : ROOMS[r].desc}</span></button>`).join('')}</div>`;
   }
   function altarView(run) {
     root.innerHTML = `${runHead(run)}<p class="dc-prompt">L’autel murmure. Choisis une bénédiction.</p>
@@ -128,6 +131,7 @@ export default function descent(app, root) {
   }
   function render() {
     const run = g.descent().run;
+    setScene(run?.phase === 'battle' ? null : 'descent');
     if (!run) return lobby();
     if (run.phase === 'doors') return doorsView(run);
     if (run.phase === 'altar') return altarView(run);

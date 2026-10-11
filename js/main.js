@@ -23,6 +23,7 @@ import menuScreen from './screens/menu.js';
 import { teamScreen, chestsScreen } from './screens/army.js';
 import { startSync } from './cloud/sync.js';
 import { showWelcome } from './screens/welcome.js';
+import { setScene } from './ui/scene.js';
 
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,
@@ -121,6 +122,7 @@ function render() {
   app.route = ROUTES[route] ? route : '';
   app.params = params.map(decodeURIComponent);
   renderChrome();
+  setScene(null);
   // Nouvel élément à chaque affichage : les écouteurs de l'écran précédent disparaissent avec lui
   // (sinon ils s'accumulent et un toucher déclenche l'action plusieurs fois).
   const old = document.getElementById('view');

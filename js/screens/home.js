@@ -8,6 +8,7 @@ import { seeded } from '../art/geometry.js';
 import { today } from '../core/save.js';
 import { openFusion } from './fusion.js';
 import { FUSION } from '../config.js';
+import { setScene } from '../ui/scene.js';
 
 export default function home(app, root) {
   const g = app.game, cat = app.catalog, s = g.s;
@@ -50,6 +51,7 @@ export default function home(app, root) {
     <p class="home-col small muted center"><a href="#/collection">${owned} / ${total} créatures découvertes</a></p>
   `;
   lazyArt(root);
+  setScene('home');
   bindActions(root, {
     fusion() { openFusion(app); },
     mission(el) {

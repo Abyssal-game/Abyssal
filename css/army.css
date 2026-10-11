@@ -241,3 +241,19 @@ body.battle-mode .dv.has-bg { background: linear-gradient(180deg, rgba(6, 6, 12,
 .dv-fx.center { z-index: 31; animation: dvSeal 1.35s ease-out forwards; }
 @keyframes dvSeal { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.3) rotate(-40deg); } 30% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0); } 75% { opacity: .9; } to { opacity: 0; transform: translate(-50%, -50%) scale(1.25) rotate(25deg); } }
 @media (prefers-reduced-motion: reduce) { .dv-fx { display: none; } }
+
+/* Fond illustré de l'Accueil et de la Descente (assombri pour la lisibilité) */
+body.scene::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(180deg, rgba(8, 9, 13, .55), rgba(8, 9, 13, .78) 40%, rgba(8, 9, 13, .9)), var(--scene) center top / cover no-repeat; }
+body.battle-mode.scene::before { display: none; }
+/* Portes et bonus illustrés */
+.dc-door.has-art { position: relative; overflow: hidden; justify-content: flex-end; min-height: 230px; padding: 14px 10px 16px; background: #08090D; isolation: isolate; }
+.dc-door.has-art .dc-door-art { position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(8, 9, 13, 0) 30%, rgba(8, 9, 13, .78) 62%, rgba(8, 9, 13, .96)), var(--art) center 30% / cover no-repeat; transition: transform .3s; }
+.dc-door.has-art .dc-door-ic { width: 40px; height: 40px; }
+.dc-door.has-art .dc-door-ic .ic { width: 20px; height: 20px; }
+.dc-door.has-art .small { color: #D9D3C4; text-shadow: 0 1px 3px #000; }
+.dc-door.has-art b { text-shadow: 0 2px 6px #000; }
+.dc-door.r-elite.has-art .dc-door-art { background: linear-gradient(180deg, rgba(8, 9, 13, 0) 30%, rgba(8, 9, 13, .78) 62%, rgba(8, 9, 13, .96)), linear-gradient(rgba(150, 70, 235, .75), rgba(150, 70, 235, .75)), var(--art) center 30% / cover no-repeat; background-blend-mode: normal, color, normal; }
+@media (max-width: 380px) { .dc-door.has-art { min-height: 180px; } .dc-door.r-boss.has-art { min-height: 220px; } }
+.dc-door.r-elite.has-art { border-color: rgba(194, 102, 255, .6); box-shadow: inset 0 0 30px rgba(0, 0, 0, .7), 0 0 18px rgba(194, 102, 255, .25); }
+.dc-door.r-boss.has-art { min-height: 280px; }
+.dc-door.has-art:active .dc-door-art { transform: scale(1.04); }
