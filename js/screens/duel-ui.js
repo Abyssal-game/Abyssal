@@ -1,12 +1,14 @@
-// ABYSSAL v2 : écran du duel de cartes.
+// ABYSSAL : écran du duel de cartes.
 // Grandes cartes avec ATTAQUE et PV ; toucher une de tes cartes, puis l'ennemi à frapper.
+// Tour ennemi coup par coup : une barre d'esquive à toucher au bon moment. Cibles annoncées,
+// échange avec la réserve, effets (étincelles, secousses, esquives).
 import { RARITY } from '../config.js';
 import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM } from '../ui/icons.js';
 import { esc, openSheet, toast } from '../ui/dom.js';
 import { coach } from '../ui/coach.js';
 import { cardHTML } from '../ui/card.js';
-import { KEYWORDS, GAUGE_MAX, front, reserve, alive, targetsFor, canAct, attack, endTurn, useUlt, ultReady, autoTurn } from '../core/duel.js';
+import { KEYWORDS, GAUGE_MAX, front, reserve, targetsFor, canAct, attack, beginEnemyTurn, nextStrike, strike, endEnemyTurn, dodgeWindow, threats, canSwap, swap, useUlt, ultReady, autoAttacks } from '../core/duel.js';
 import { ULTS } from '../core/army.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -27,7 +29,7 @@ export function runDuel(app, root, { title, onEnd }) {
       <button class="btn small ghost ${ui.fast ? 'on' : ''}" data-d="fast">×2</button>
       <button class="btn small ghost" data-d="quit" aria-label="Pause">${icon('close')}</button></span></div>
     <div class="dv-row enemy"></div>
-    <div class="dv-mid"><span class="dv-msg"></span></div>
+    <div class="dv-mid"><span class="dv-msg"></span><span class="dv-resw"></span></div>
     <div class="dv-row ally"></div>
     <div class="dv-bar">
       <button class="dv-ult" data-d="ult" style="--uc:${ult.color}"><span class="dv-ult-ring"><i></i></span><span class="dv-ult-t"><b>${esc(ult.name)}</b><small></small></span></button>
@@ -40,6 +42,7 @@ export function runDuel(app, root, { title, onEnd }) {
   const say = (h) => { msgEl.innerHTML = h; };
 
   // ——— Carte de duel ———
+  let th = {};
   const cardEl = (u) => {
     const c = cat.get(u.id), kw = KEYWORDS[u.kw], acts = canAct(st, u);
     const dead = u.hp <= 0;
@@ -50,14 +53,25 @@ export function runDuel(app, root, { title, onEnd }) {
       <span class="dv-nm">${esc(c.name)}</span>
       <span class="dv-atk">${icon('swords')}<b>${u.atk + (u.boost || 0)}</b></span>
       <span class="dv-hp ${u.hp < u.maxHp ? 'hurt' : ''}">${icon('heart')}<b>${Math.max(0, u.hp)}</b></span>
+      ${u.side === 'ally' && th[u.uid] ? `<span class="dv-threat" title="Dégâts annoncés">${icon('skull')}-${th[u.uid]}</span>` : ''}
+      ${u.side === 'enemy' ? `<span class="dv-lv">Niv. ${u.level || 1}</span>` : ''}
       <span class="dv-st">${u.shield ? `<i class="sh">${icon('shield')}</i>` : ''}${u.poison ? `<i class="po">${icon('skull')}${u.poison}</i>` : ''}${u.frozen ? '<i class="fr">Gelé</i>' : ''}${u.boost ? `<i class="bo">+${u.boost}</i>` : ''}</span>
     </button>`;
   };
-  const resHTML = (side) => { const r = reserve(st, side); return r.length ? `<span class="dv-res" title="Réserve">+${r.length}</span>` : ''; };
+  // Réserve : miniatures ; côté joueur, bouton d'échange (une fois par tour)
+  const resHTML = (side) => {
+    const r = reserve(st, side);
+    if (!r.length) return '';
+    if (side === 'enemy') return `<span class="dv-res" title="Réserve">+${r.length}</span>`;
+    const on = canSwap(st) && sel && st.units[sel]?.side === 'ally';
+    return `<button class="dv-resv ${on ? 'on' : ''} ${canSwap(st) ? '' : 'used'}" data-d="swap" aria-label="Échanger avec la réserve">${r.map((u) => `<img alt="" src="${artUrl(cat.get(u.id), { lite: true })}">`).join('')}<small>${icon('back')}Réserve</small></button>`;
+  };
   function draw() {
     if (!alive_) return;
+    th = threats(st);
     enEl.innerHTML = front(st, 'enemy').map(cardEl).join('') + resHTML('enemy');
-    alEl.innerHTML = front(st, 'ally').map(cardEl).join('') + resHTML('ally');
+    alEl.innerHTML = front(st, 'ally').map(cardEl).join('');
+    $('.dv-resw').innerHTML = resHTML('ally');
     const ready = ultReady(st);
     const ring = $('.dv-ult-ring i');
     ring.style.setProperty('--p', `${(st.gauge / GAUGE_MAX) * 100}`);
@@ -67,9 +81,21 @@ export function runDuel(app, root, { title, onEnd }) {
     $('.dv-end').classList.toggle('pulse', st.turn === 'ally' && !left && !busy);
     root.querySelectorAll('.dv-bar button').forEach((b) => { b.disabled = busy || st.turn !== 'ally' || !!st.over; });
     if (sel) targetsFor(st, 'ally').forEach((id) => root.querySelector(`[data-uid="${id}"]`)?.classList.add('target'));
-    if (!busy && st.turn === 'ally' && !st.over) say(sel ? 'Touche l’ennemi à attaquer' : left ? 'Touche une de tes cartes pour attaquer' : 'Touche <b>Fin du tour</b>');
+    if (!busy && st.turn === 'ally' && !st.over) {
+      const su = sel && st.units[sel];
+      say(su ? (canAct(st, su) ? `Touche l’ennemi à attaquer${canSwap(st) ? ', ou la <b>Réserve</b> pour l’échanger' : ''}` : canSwap(st) ? 'Touche la <b>Réserve</b> pour l’échanger' : 'Elle a déjà joué ce tour')
+        : left ? 'Touche une de tes cartes pour attaquer' : 'Touche <b>Fin du tour</b>');
+    }
   }
   const el = (uid) => root.querySelector(`[data-uid="${uid}"]`);
+  const shake = (big) => { if (reduced) return; const d = root.querySelector('.dv'); d.classList.remove('shake', 'big'); void d.offsetWidth; d.classList.add('shake'); d.classList.toggle('big', !!big); };
+  const sparks = (uid, cls = '') => {
+    if (reduced) return;
+    const t = el(uid); if (!t) return;
+    const b = document.createElement('span'); b.className = `dv-burst ${cls}`;
+    b.innerHTML = Array.from({ length: 10 }, (_, i) => `<i style="--a:${i * 36 + Math.round(Math.random() * 20)}deg;--r:${30 + Math.round(Math.random() * 26)}px"></i>`).join('');
+    t.appendChild(b); setTimeout(() => b.remove(), 650);
+  };
   const float = (uid, txt, cls) => { const t = el(uid); if (!t) return; const f = document.createElement('span'); f.className = `dv-float ${cls}`; f.textContent = txt; t.appendChild(f); setTimeout(() => f.remove(), 900); };
 
   // ——— Lecture des événements (animations) ———
@@ -88,12 +114,14 @@ export function runDuel(app, root, { title, onEnd }) {
       } else if (e.t === 'dmg') {
         const t = el(e.u);
         if (t) { t.classList.remove('hit'); void t.offsetWidth; t.classList.add('hit'); const hp = t.querySelector('.dv-hp b'); if (hp) hp.textContent = Math.max(0, e.hp); t.querySelector('.dv-hp')?.classList.add('hurt'); }
-        float(e.u, `-${e.d}`, 'dmg'); app.sfx.hit();
+        float(e.u, `-${e.d}`, e.d >= 6 ? 'dmg big' : 'dmg'); app.sfx.hit(); sparks(e.u); if (e.d >= 6 || e.hp <= 0) shake(e.d >= 9);
         await wait(T(260));
       } else if (e.t === 'heal') { float(e.u, `+${e.d}`, 'heal'); const t = el(e.u); const hp = t?.querySelector('.dv-hp b'); if (hp) hp.textContent = st.units[e.u].hp; await wait(T(220)); }
-      else if (e.t === 'block') { float(e.u, 'Bloqué', 'info'); await wait(T(260)); }
+      else if (e.t === 'block') { float(e.u, 'Bloqué', 'info'); sparks(e.u, 'blue'); await wait(T(260)); }
+      else if (e.t === 'dodge') { const t = el(e.u); if (t) { t.classList.remove('dodge'); void t.offsetWidth; t.classList.add('dodge'); } float(e.u, 'Esquive !', 'dodge'); app.sfx.swipe?.(); await wait(T(320)); }
+      else if (e.t === 'swap') { draw(); el(e.u)?.classList.add('enter'); float(e.u, 'Entre en jeu', 'info'); await wait(T(360)); }
       else if (e.t === 'status') { float(e.u, e.s, 'info'); await wait(T(240)); }
-      else if (e.t === 'die') { el(e.u)?.classList.add('dying'); await wait(T(420)); draw(); }
+      else if (e.t === 'die') { sparks(e.u, 'big'); el(e.u)?.classList.add('dying'); await wait(T(460)); draw(); }
       else if (e.t === 'enter') { draw(); el(e.u)?.classList.add('enter'); await wait(T(380)); }
       else if (e.t === 'revive') { draw(); float(e.u, 'Relevée !', 'heal'); await wait(T(300)); }
       else if (e.t === 'phase') { draw(); say(e.side === 'enemy' ? '<b class="dc-bad">Tour des créatures corrompues</b>' : 'À toi !'); await wait(T(e.side === 'enemy' ? 420 : 200)); }
@@ -107,6 +135,8 @@ export function runDuel(app, root, { title, onEnd }) {
     fx.className = 'tb-summon'; fx.style.setProperty('--ic', ult.color);
     fx.innerHTML = `${c ? `<img alt="" src="${artUrl(c)}">` : `<span class="tb-sceau">${EMBLEM}</span>`}<b>${esc(ult.name)}</b>`;
     root.querySelector('.dv').appendChild(fx);
+    root.querySelector('.dv').style.setProperty('--uc', ult.color);
+    root.querySelector('.dv').classList.add('ultflash'); setTimeout(() => root.querySelector('.dv')?.classList.remove('ultflash'), 900);
     app.sfx.reveal('M');
     await wait(reduced ? 300 : 1300);
     fx.classList.add('out'); setTimeout(() => fx.remove(), 400);
@@ -119,16 +149,56 @@ export function runDuel(app, root, { title, onEnd }) {
     await wait(T(800));
     if (alive_) { alive_ = false; ctl.abort(); document.body.classList.remove('battle-mode'); onEnd(); }
   }
+  // Tour ennemi : chaque attaque s'annonce, une barre d'esquive apparaît ; touche quand le
+  // curseur passe dans la zone dorée (plus étroite face à un ennemi plus fort).
+  let dodgeTap = null;
+  function dodgeQTE(a, t) {
+    return new Promise((resolve) => {
+      const win = dodgeWindow(st, a, t), D = ui.fast ? 900 : 1150;
+      const z0 = 0.45 + Math.random() * 0.3, zw = win / D;
+      const aEl = el(a), tEl = el(t);
+      aEl?.classList.add('aim'); tEl?.classList.add('aimed');
+      const bar = document.createElement('div');
+      bar.className = 'dv-dodge';
+      bar.innerHTML = `<span class="dv-dodge-t">Esquive ! <small>touche au bon moment</small></span><span class="dv-dodge-bar"><i class="z" style="left:${z0 * 100}%;width:${zw * 100}%"></i><i class="c"></i></span>`;
+      $('.dv-mid').appendChild(bar); $('.dv-mid').classList.add('qte');
+      const cur = bar.querySelector('.c'), t0 = performance.now();
+      let done = false, raf = 0;
+      const end = (ok) => {
+        if (done) return; done = true; cancelAnimationFrame(raf); dodgeTap = null;
+        bar.classList.add(ok ? 'ok' : 'ko');
+        setTimeout(() => { bar.remove(); $('.dv-mid')?.classList.remove('qte'); aEl?.classList.remove('aim'); tEl?.classList.remove('aimed'); resolve(ok); }, ok ? 260 : 160);
+      };
+      const step = () => { const x = (performance.now() - t0) / D; cur.style.left = `${Math.min(1, x) * 100}%`; if (x >= 1) end(false); else raf = requestAnimationFrame(step); };
+      dodgeTap = () => { const x = (performance.now() - t0) / D; end(x >= z0 && x <= z0 + zw); };
+      // petit délai : le temps de voir qui attaque qui
+      setTimeout(() => { if (!done && alive_) raf = requestAnimationFrame(step); }, T(250));
+    });
+  }
+  async function enemyTurn() {
+    for (let s = nextStrike(st); s && alive_; s = nextStrike(st)) {
+      const ok = await dodgeQTE(s.a, s.t);
+      if (!alive_) return;
+      const ev = strike(st, s.a, s.t, { dodged: ok }); g.persist();
+      await play(ev);
+    }
+    if (!alive_) return;
+    const ev = endEnemyTurn(st); g.persist();
+    await play(ev);
+  }
   async function doEnd() {
     if (busy || st.turn !== 'ally' || st.over) return;
     busy = true; sel = null; draw();
-    const ev = endTurn(st); g.persist();
+    const ev = beginEnemyTurn(st); g.persist();
     await play(ev);
+    await enemyTurn();
     busy = false; draw();
     if (st.over) return finish();
   }
 
   // ——— Touchers ———
+  // l'esquive se déclenche au toucher, n'importe où sur l'écran du combat
+  root.addEventListener('pointerdown', (e) => { if (dodgeTap && !e.target.closest('[data-d="quit"],[data-d="help"],[data-d="fast"]')) { e.preventDefault(); dodgeTap(); } }, { signal: ctl.signal });
   root.addEventListener('click', async (e) => {
     if (!alive_) return;
     const b = e.target.closest('[data-d]');
@@ -139,20 +209,23 @@ export function runDuel(app, root, { title, onEnd }) {
       if (k === 'help') return help();
       if (busy) return;
       if (k === 'end') return doEnd();
+      if (k === 'swap') return doSwap();
       if (k === 'ult' && ultReady(st)) { busy = true; sel = null; const ev = useUlt(st); g.persist(); await play(ev); busy = false; draw(); if (st.over) finish(); return; }
-      if (k === 'auto') { busy = true; sel = null; draw(); const ev = autoTurn(st); g.persist(); await play(ev); busy = false; draw(); if (st.over) finish(); return; }
+      if (k === 'auto') { busy = true; sel = null; draw(); const ev = autoAttacks(st); g.persist(); await play(ev); busy = false; draw(); if (st.over) return finish(); return doEnd(); }
       return;
     }
     const c = e.target.closest('.dv-c');
     if (!c || busy || st.over) return;
     const u = st.units[c.dataset.uid];
     if (u.side === 'ally') {
-      if (canAct(st, u)) { sel = sel === u.uid ? null : u.uid; app.sfx.tap(); draw(); }
-      else { info(u); }
+      // toucher une carte la sélectionne (attaque ou échange) ; la toucher encore ouvre sa fiche
+      if (sel === u.uid) { sel = null; draw(); info(u); return; }
+      if (canAct(st, u) || canSwap(st)) { sel = u.uid; app.sfx.tap(); draw(); }
+      else info(u);
       return;
     }
     // ennemi
-    if (sel && targetsFor(st, 'ally').includes(u.uid)) {
+    if (sel && canAct(st, st.units[sel]) && targetsFor(st, 'ally').includes(u.uid)) {
       const a = sel; sel = null; busy = true; draw();
       const ev = attack(st, a, u.uid); g.persist();
       await play(ev);
@@ -160,15 +233,26 @@ export function runDuel(app, root, { title, onEnd }) {
       if (st.over) return finish();
       return;
     }
-    if (sel && !targetsFor(st, 'ally').includes(u.uid)) { toast('Une créature avec <b>Garde</b> protège les autres : attaque-la d’abord.', { icon: 'shield' }); return; }
+    if (sel && canAct(st, st.units[sel]) && !targetsFor(st, 'ally').includes(u.uid)) { toast('Une créature avec <b>Garde</b> protège les autres : attaque-la d’abord.', { icon: 'shield' }); return; }
     info(u);
   }, { signal: ctl.signal });
 
+  async function doSwap() {
+    if (!canSwap(st)) { toast('Un seul échange par tour.', { icon: 'info' }); return; }
+    const su = sel && st.units[sel];
+    if (!su || su.side !== 'ally') { toast('Touche d’abord la carte à remplacer, puis la Réserve.', { icon: 'info' }); return; }
+    const r = reserve(st, 'ally');
+    const go = async (inUid) => { sel = null; busy = true; const ev = swap(st, su.uid, inUid); g.persist(); await play(ev); busy = false; draw(); };
+    if (r.length === 1) return go(r[0].uid);
+    const sh = openSheet(`<h2>Qui entre en jeu ?</h2><p class="small muted">À la place de <b>${esc(cat.get(su.id).name)}</b>. La carte qui entre ne peut pas attaquer ce tour-ci.</p>
+      <div class="dv-pick">${r.map((x) => `<button class="dv-pick-c" data-in="${x.uid}"><img alt="" src="${artUrl(cat.get(x.id), { lite: true })}"><b>${esc(cat.get(x.id).name)}</b><span>${icon('swords')}${x.atk} · ${icon('heart')}${x.hp}/${x.maxHp}</span></button>`).join('')}</div>`, { label: 'Échange' });
+    sh.body.addEventListener('click', (ev) => { const p = ev.target.closest('[data-in]'); if (p) { sh.close(); go(p.dataset.in); } });
+  }
   function info(u) {
     const c = cat.get(u.id), kw = KEYWORDS[u.kw];
     openSheet(`<div class="tb-info"><div class="tb-info-card ${u.side === 'enemy' ? 'corrupt' : ''}">${cardHTML(c, { size: 'full', nameKnown: true })}</div>
       <h3>${esc(c.name)}${u.side === 'enemy' ? ' corrompu' : ''}</h3>
-      <dl class="facts"><div><dt>Attaque</dt><dd>${u.atk}</dd></div><div><dt>PV</dt><dd>${Math.max(0, u.hp)} / ${u.maxHp}</dd></div></dl>
+      <dl class="facts"><div><dt>Attaque</dt><dd>${u.atk}</dd></div><div><dt>PV</dt><dd>${Math.max(0, u.hp)} / ${u.maxHp}</dd></div><div><dt>Niveau</dt><dd>${u.level || 1}</dd></div></dl>
       <p class="small"><b>${icon(kw.icon)} ${esc(kw.name)}</b> : ${esc(kw.desc)}</p>
       ${u.side === 'enemy' && g.owns(u.id) ? `<p class="small dc-good">${icon('book')} Tu possèdes sa carte : tes créatures lui font +1 dégât.</p>` : ''}</div>`, { label: c.name });
   }
@@ -177,12 +261,17 @@ export function runDuel(app, root, { title, onEnd }) {
       <li>Chaque carte a une <b>attaque</b> ${icon('swords')} et des <b>PV</b> ${icon('heart')}.</li>
       <li>Touche une de tes cartes, puis l’ennemi à frapper. La cible <b>riposte</b> avec son attaque.</li>
       <li>Chaque carte attaque une fois par tour. Ensuite, touche <b>Fin du tour</b> : les créatures corrompues attaquent.</li>
-      <li>Si une carte tombe, ta <b>réserve</b> prend sa place.</li>
+      <li>${icon('skull')} Le badge rouge sur une de tes cartes annonce les dégâts qu’elle va prendre : abats l’attaquant avant, ou mets-la à l’abri.</li>
+      <li><b>Esquive</b> : quand un ennemi attaque, touche l’écran quand le curseur passe dans la zone dorée. Réussie, ta carte ne prend rien et riposte quand même. Plus l’ennemi a un niveau élevé par rapport à ta carte, plus la zone est étroite.</li>
+      <li><b>Réserve</b> : une fois par tour, touche une de tes cartes puis la Réserve pour l’échanger. La carte qui entre n’attaque pas ce tour-ci.</li>
+      <li>Si une carte tombe, ta réserve prend sa place.</li>
       <li>Chaque attaque charge le <b>pouvoir du Gardien</b> : à ${GAUGE_MAX}, touche-le pour le lancer.</li></ul>
       <h3>Les capacités</h3>${Object.values(KEYWORDS).map((k) => `<p class="small">${icon(k.icon)} <b>${esc(k.name)}</b> : ${esc(k.desc)}</p>`).join('')}`, { label: 'Règles du duel' });
   }
 
   draw();
-  coach(app, 'v2-duel', 'Chaque carte a son <b>attaque</b> (épée) et ses <b>PV</b> (cœur). Touche une de tes cartes, puis l’ennemi à frapper : il <b>riposte</b>. Quand toutes tes cartes ont attaqué, touche <b>Fin du tour</b>.<br><br>Chaque carte a une <b>capacité</b> qui agit toute seule (Garde, Soin, Venin…). Touche une carte qui a déjà joué pour lire sa capacité.', { title: 'Le duel de cartes' });
+  // combat repris pendant le tour ennemi (application fermée en plein tour)
+  if (st.turn === 'enemy' && !st.over) { busy = true; draw(); enemyTurn().then(() => { busy = false; draw(); if (st.over) finish(); }); }
+  coach(app, 'v2-duel', 'Chaque carte a son <b>attaque</b> (épée) et ses <b>PV</b> (cœur). Touche une de tes cartes, puis l’ennemi à frapper : il <b>riposte</b>. Quand toutes tes cartes ont attaqué, touche <b>Fin du tour</b>.<br><br>Chaque carte a une <b>capacité</b> qui agit toute seule (Garde, Soin, Venin…). Touche une carte qui a déjà joué pour lire sa capacité.', { title: 'Le duel de cartes' }).then(() => coach(app, 'v2-dodge', 'Nouveau : les créatures corrompues <b>annoncent leur cible</b> (badge rouge sur ta carte). Pendant leur tour, touche l’écran quand le curseur passe dans la <b>zone dorée</b> pour <b>esquiver</b>. Une fois par tour, tu peux aussi <b>échanger</b> une carte avec ta réserve.', { title: 'Esquive et stratégie' }));
   return { stop() { alive_ = false; ctl.abort(); document.body.classList.remove('battle-mode'); } };
 }

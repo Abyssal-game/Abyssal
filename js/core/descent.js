@@ -27,7 +27,7 @@ export const chestForDepth = (floor) => (floor >= 15 ? 'abyssal' : floor >= 10 ?
 export const shiftChest = (c, n) => { const i = c ? CHEST_ORDER.indexOf(c) + n : n - 1; return i < 0 ? null : CHEST_ORDER[Math.min(CHEST_ORDER.length - 1, i)]; };
 
 // Force des créatures corrompues selon la profondeur
-export const enemyScale = (floor) => 1 + 0.11 * (floor - 1);
+export const enemyScale = (floor) => 1 + 0.09 * (floor - 1);
 
 // Familles de comportement des créatures (page du Bestiaire)
 export const FAMILIES = {
@@ -87,25 +87,33 @@ const pick = (rng, list) => list[Math.floor(rng() * list.length)];
 
 
 // ——— Étages ———————————————————————————————————————————————————————
-const ROOM_TYPES = ['fight', 'fight', 'elite', 'altar', 'rest', 'treasure'];
 export const ROOMS = {
-  fight:    { name: 'Combat',         desc: 'Des créatures barrent le passage.' },
-  elite:    { name: 'Élite',          desc: 'Un adversaire redoutable. Éclats doublés.' },
+  fight:    { name: 'Combat',         desc: 'Des créatures barrent le passage. Victoire : un bonus au choix.' },
+  elite:    { name: 'Élite',          desc: 'Plus dangereux : éclats doublés et 3 bonus au choix.' },
   altar:    { name: 'Autel ancien',   desc: 'Choisis une bénédiction pour toute l’expédition.' },
-  rest:     { name: 'Source sacrée',  desc: 'Ton équipe récupère 40 % de ses PV.' },
-  treasure: { name: 'Trésor oublié',  desc: 'Des éclats, sans gardien… en apparence.' },
+  rest:     { name: 'Source sacrée',  desc: 'Tes créatures récupèrent 40 % de leurs PV.' },
+  treasure: { name: 'Trésor oublié',  desc: 'Une poignée d’éclats.' },
   boss:     { name: 'Gardien',        desc: 'Le gardien de l’étage. Victoire : un coffre.' },
 };
 
-// Deux portes proposées à chaque étage (les étages multiples de 5 sont des gardiens).
+// Chaque étage se gagne au combat : combat simple ou élite (plus dur, mieux payé).
+// Tous les 5 étages, un gardien. Le premier étage est un combat simple.
 export function floorDoors(day, floor) {
   if (floor % DESCENT.bossEvery === 0) return ['boss'];
-  const rng = rngOf(`doors:${day}:${floor}`);
-  const a = pick(rng, ROOM_TYPES);
-  let b = pick(rng, ROOM_TYPES);
-  for (let i = 0; i < 6 && b === a; i++) b = pick(rng, ROOM_TYPES);
-  return floor === 1 ? ['fight', b === 'fight' ? 'rest' : b] : [a, b];
+  return floor === 1 ? ['fight'] : ['fight', 'elite'];
 }
+// Après une victoire : un bonus au choix (2 propositions, 3 après une élite)
+export const REWARD_ROOMS = ['rest', 'altar', 'treasure'];
+export function floorRewards(day, floor, room, owned = []) {
+  const rng = rngOf(`rewards:${day}:${floor}`);
+  const keys = REWARD_ROOMS.filter((k) => k !== 'altar' || Object.keys(BLESSINGS).some((b) => !owned.includes(b)));
+  if (room === 'elite') return keys;
+  const out = [];
+  while (out.length < 2 && keys.length) out.push(keys.splice(Math.floor(rng() * keys.length), 1)[0]);
+  return out;
+}
+// Niveau des créatures corrompues (il rend l'esquive plus difficile)
+export const enemyLevel = (floor, room) => Math.max(1, Math.round(1 + (floor - 1) * 0.55)) + (room === 'elite' ? 1 : room === 'boss' ? 2 : 0);
 
 // Ennemis d'un étage : plus nombreux, plus rares et plus forts en profondeur.
 export function floorEnemies(catalog, day, floor, room) {

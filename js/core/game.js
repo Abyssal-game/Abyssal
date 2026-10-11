@@ -3,7 +3,7 @@
 import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, FUSION, LUCK_POINTS, RITUAL, ITEMS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
-import { DESCENT, CHESTS, floorDoors, floorEnemies, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, huntStage, HUNT_STAGES } from './descent.js';
+import { DESCENT, CHESTS, floorDoors, floorEnemies, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, huntStage, HUNT_STAGES } from './descent.js';
 import { createDuel, autoDuel, duelUnit, GAUGE_MAX } from './duel.js';
 import { STARTER, COST, BUDGET, TEAM, ULTS, levelFromDups, canUlt, ultOf } from './army.js';
 
@@ -510,7 +510,8 @@ export class Game {
     if (room === 'fight' || room === 'elite' || room === 'boss') {
       // les créatures du Bestiaire, corrompues ; l'état du duel est gardé dans l'expédition (reprise exacte)
       const sc = enemyScale(run.floor);
-      const enemies = floorEnemies(this.catalog, run.day, run.floor, room).map((e) => duelUnit(this.catalog.get(e.id), { side: 'enemy', scale: sc, boss: e.boss, elite: e.elite }));
+      const lvl = enemyLevel(run.floor, room);
+      const enemies = floorEnemies(this.catalog, run.day, run.floor, room).map((e) => duelUnit(this.catalog.get(e.id), { side: 'enemy', scale: sc, level: e.boss || e.elite ? lvl : enemyLevel(run.floor, 'fight'), boss: e.boss, elite: e.elite }));
       for (const e of enemies) {
         const f = this.catalog.get(e.id)?.faction;
         if (rule.key === 'furie' && f === rule.faction) e.atk = Math.round(e.atk * 1.25 + 0.4);
@@ -520,19 +521,29 @@ export class Game {
       enemies.forEach((e) => { if (this.knows(e.id)) known[e.id] = true; });
       run.battle = createDuel(this.runUnits(), enemies, { gauge: run.gauge, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1 });
       run.room = room; run.phase = 'battle'; out.battle = true;
-    } else if (room === 'rest') {
+    }
+    if (run.phase === 'cleared') this.clearFloor();
+    this.persist();
+    return out;
+  }
+  // Bonus choisi après une victoire : source (soin), autel (bénédiction) ou trésor (éclats)
+  chooseReward(room) {
+    const run = this.s.descent.run;
+    if (!run || run.phase !== 'reward' || !(run.rewards || []).includes(room)) throw new Error('Bonus indisponible.');
+    const rule = this.rule(run.day);
+    const out = { room };
+    run.rewards = null;
+    run.phase = 'cleared';
+    if (room === 'rest') {
       const k = rule.key === 'sources' ? 0.8 : 0.4;
       run.team.forEach((m) => { if (!m.fallen) m.hp = Math.min(m.maxHp, m.hp + Math.ceil(m.maxHp * k)); });
-      run.phase = 'cleared';
     } else if (room === 'treasure') {
       out.shards = this.gainShards(15 + run.floor * 6);
-      run.phase = 'cleared';
     } else if (room === 'altar') {
       run.altar = blessingChoices(run.day, run.floor, run.blessings);
       if (run.altar.length) { run.phase = 'altar'; out.altar = run.altar; }
-      else { run.altar = null; run.team.forEach((m) => { if (!m.fallen) m.hp = m.maxHp; }); run.phase = 'cleared'; out.healed = true; }
+      else { run.altar = null; run.team.forEach((m) => { if (!m.fallen) m.hp = m.maxHp; }); out.healed = true; }
     }
-    if (run.phase === 'cleared') this.clearFloor();
     this.persist();
     return out;
   }
@@ -580,7 +591,9 @@ export class Game {
         const c = room === 'boss' ? chestForDepth(run.floor) : 'bois';
         run.chests.push(c); out.chest = c;
       }
-      run.phase = 'cleared';
+      run.phase = 'reward';
+      run.rewards = floorRewards(run.day, run.floor, room, run.blessings);
+      out.rewards = run.rewards;
       this.clearFloor();
       this.track('win', 1);
       this.checkProgress();

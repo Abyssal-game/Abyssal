@@ -164,3 +164,68 @@ body.battle-mode .dv { height: calc(100dvh - var(--safe-t) - var(--safe-b) - 14p
 .dc-chests { display: flex; align-items: center; gap: 12px; padding: 12px 14px; color: inherit; text-decoration: none; }
 .dc-chests > span:nth-child(2) { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .army-combat { display: grid; gap: 10px; margin-top: 6px; }
+
+/* Choix de faction en grille (plus de rangée qui défile et se coupe au bord de l'écran) */
+.chips.fac-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; overflow: visible; padding: 2px 0 4px; }
+.chips.fac-grid .chip { flex-direction: column; justify-content: center; gap: 3px; min-width: 0; min-height: 58px; padding: 6px 2px; border-radius: 12px; white-space: normal; text-align: center; line-height: 1.1; }
+.chips.fac-grid .chip .fg-n { font-size: .72rem; max-width: 100%; overflow-wrap: anywhere; }
+.chips.fac-grid .chip .fg-c { font-size: .66rem; }
+.chips.fac-grid .chip svg, .chips.fac-grid .chip img { flex: none; }
+.product-below { grid-column: 1 / -1; min-width: 0; }
+@media (max-width: 360px) { .chips.fac-grid .chip .fg-n { font-size: .64rem; } }
+
+/* ——— Duel : stratégie et effets ——————————————————————————————————————— */
+/* Dégâts annoncés sur une de tes cartes, niveau des ennemis */
+.dv-threat { position: absolute; z-index: 5; top: -9px; left: 50%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 2px; padding: 3px 7px; border-radius: 99px; background: linear-gradient(#C42142, #7A0F24); border: 1px solid #FF8A9B; color: #fff; font: 900 .72rem/1 var(--f-ui); box-shadow: 0 0 12px rgba(255, 60, 90, .6); white-space: nowrap; animation: dvThreat 1.4s ease-in-out infinite; }
+.dv-threat .ic { width: 11px; height: 11px; }
+@keyframes dvThreat { 50% { box-shadow: 0 0 20px rgba(255, 60, 90, .95); } }
+.dv-lv { position: absolute; z-index: 3; top: 30px; right: 5px; font: 800 .56rem/1 var(--f-ui); padding: 3px 5px; border-radius: 6px; background: rgba(0, 0, 0, .78); color: #FFB3BF; border: 1px solid rgba(255, 120, 140, .35); }
+.dv-c.boss .dv-lv, .dv-c.elite .dv-lv { top: 24px; }
+/* Réserve du joueur : miniatures, bouton d'échange */
+.dv-resv { position: absolute; right: 0; bottom: -2px; z-index: 6; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px; border-radius: 10px; background: rgba(10, 12, 20, .9); border: 1px dashed var(--line); color: var(--mute); font: 700 .55rem/1 var(--f-ui); }
+.dv-resv img { width: 26px; height: 34px; object-fit: cover; border-radius: 4px; border: 1px solid rgba(255, 255, 255, .25); }
+.dv-resv small { display: inline-flex; align-items: center; gap: 1px; } .dv-resv small .ic { width: 10px; height: 10px; transform: scaleX(-1); }
+.dv-resv.on { border: 1px solid var(--gold-hi); color: var(--gold-hi); box-shadow: 0 0 16px rgba(241, 219, 158, .6); animation: dvPulse 1.1s ease-in-out infinite; }
+.dv-resv.used { opacity: .5; }
+.dv-pick { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dv-pick-c { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px; border-radius: 12px; background: var(--panel, rgba(255, 255, 255, .04)); border: 1px solid var(--line); color: var(--ink); font: inherit; }
+.dv-pick-c img { width: 72px; height: 96px; object-fit: cover; border-radius: 8px; }
+.dv-pick-c span { display: inline-flex; gap: 4px; align-items: center; font-size: .8rem; color: var(--mute); } .dv-pick-c .ic { width: 12px; height: 12px; }
+/* Esquive */
+.dv-mid { position: relative; }
+.dv-dodge { position: absolute; inset: 50% 0 auto; transform: translateY(-50%); z-index: 20; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 16px; background: rgba(8, 9, 14, .92); border: 1px solid rgba(241, 219, 158, .45); box-shadow: 0 0 30px rgba(0, 0, 0, .8); animation: dvIn .15s ease-out; }
+@keyframes dvIn { from { opacity: 0; transform: translateY(-50%) scale(.92); } }
+.dv-dodge-t { font: 700 1rem/1 var(--f-display); color: var(--gold-hi); text-transform: uppercase; letter-spacing: .06em; }
+.dv-dodge-t small { display: block; margin-top: 3px; font: 500 .7rem/1 var(--f-ui); color: var(--mute); text-transform: none; letter-spacing: 0; text-align: center; }
+.dv-dodge-bar { position: relative; width: 100%; height: 18px; border-radius: 99px; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .15); overflow: hidden; }
+.dv-dodge-bar .z { position: absolute; top: 0; bottom: 0; background: linear-gradient(90deg, #A8741E, #F2C14E, #A8741E); box-shadow: 0 0 12px rgba(242, 193, 78, .8); }
+.dv-dodge-bar .c { position: absolute; top: -2px; bottom: -2px; left: 0; width: 4px; margin-left: -2px; border-radius: 2px; background: #fff; box-shadow: 0 0 10px #fff; }
+.dv-dodge.ok { border-color: #7FE0A0; } .dv-dodge.ok .dv-dodge-t { color: #7FE0A0; }
+.dv-dodge.ko { border-color: #FF6B7F; } .dv-dodge.ko .dv-dodge-t { color: #FF6B7F; }
+.dv-c.aim { z-index: 6; box-shadow: 0 0 0 3px #FF6B7F, 0 0 28px rgba(255, 80, 100, .9); transform: translateY(8px) scale(1.06); }
+.dv-c.aimed { z-index: 6; box-shadow: 0 0 0 3px var(--gold-hi), 0 0 24px rgba(241, 219, 158, .8); }
+.dv-c.dodge { animation: dvDodge .42s ease-out; }
+@keyframes dvDodge { 30% { transform: translateX(-34px) rotate(-8deg); filter: blur(1px) brightness(1.4); opacity: .75; } 70% { transform: translateX(10px) rotate(2deg); } }
+.dv-float.dodge { color: #9FE0FF; font-size: 1.15rem; text-transform: uppercase; letter-spacing: .05em; }
+.dv-float.dmg.big { font-size: 2.1rem; color: #FF3D5E; }
+/* Étincelles d'impact */
+.dv-burst { position: absolute; left: 50%; top: 45%; width: 0; height: 0; z-index: 8; pointer-events: none; }
+.dv-burst i { position: absolute; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: #FFE6A0; box-shadow: 0 0 8px #FFB347, 0 0 2px #fff; animation: dvSpark .55s ease-out forwards; transform: rotate(var(--a)) translateX(0); }
+.dv-burst.blue i { background: #CFE6FF; box-shadow: 0 0 8px #6FB4FF; }
+.dv-burst.big i { width: 9px; height: 9px; background: #FF8A6A; box-shadow: 0 0 12px #FF3D5E; }
+@keyframes dvSpark { to { transform: rotate(var(--a)) translateX(var(--r)); opacity: 0; } }
+/* Secousse de l'écran et éclair du pouvoir */
+.dv.shake { animation: dvShake .3s ease; } .dv.shake.big { animation: dvShake .45s ease; }
+@keyframes dvShake { 20% { transform: translate(-5px, 2px); } 40% { transform: translate(5px, -2px); } 60% { transform: translate(-3px, 1px); } 80% { transform: translate(2px, 0); } }
+.dv.ultflash::after { content: ''; position: absolute; inset: 0; z-index: 30; pointer-events: none; background: radial-gradient(circle, color-mix(in srgb, var(--uc, #F2C14E) 55%, transparent), transparent 70%); animation: dvFlash .9s ease-out forwards; }
+@keyframes dvFlash { from { opacity: 1; } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .dv-threat, .dv-resv.on { animation: none; } .dv-c.dodge { animation: none; } }
+.dv { position: relative; }
+/* Réserve rangée à droite du message, hors des cartes */
+.dv-mid { display: flex; align-items: center; gap: 8px; }
+.dv-mid .dv-msg { flex: 1; min-width: 0; }
+.dv-resw:empty { display: none; }
+.dv-resw .dv-resv { position: static; flex-direction: row; flex-wrap: wrap; justify-content: center; max-width: 96px; }
+.dv-resw .dv-resv small { flex-basis: 100%; justify-content: center; }
+.dv-mid.qte > .dv-msg, .dv-mid.qte > .dv-resw { visibility: hidden; }
+.dv-dodge { background: #08090E; }

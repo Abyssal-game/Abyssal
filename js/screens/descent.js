@@ -47,6 +47,8 @@ export default function descent(app, root) {
         <li>Au combat, touche une de tes cartes puis l’ennemi à attaquer. La cible riposte. Chaque carte attaque une fois par tour, puis « Fin du tour ».</li>
         <li>Les créatures de l’Abysse sont des versions <b>corrompues</b>. Posséder la carte d’une créature donne +1 dégât contre elle.</li>
         <li>${DESCENT.torches} expéditions avec coffre par jour, puis tu peux rejouer sans coffre. Tous les 5 étages, un gardien garde un coffre.</li>
+        <li>Chaque étage se gagne au combat (simple, ou élite plus dangereuse et mieux payée). Après chaque victoire, choisis un bonus : source (soin), autel (bénédiction) ou trésor (éclats).</li>
+        <li>Pendant le tour ennemi, touche l’écran au bon moment pour <b>esquiver</b>. Une fois par tour, tu peux <b>échanger</b> une carte avec ta réserve.</li>
         <li>Remonte quand tu veux : la profondeur atteinte décide du coffre (1–4 bois, 5–9 fer, 10–14 or, 15+ abyssal).</li></ul></details>`;
     root.querySelector('#lb').addEventListener('toggle', (e) => { if (e.target.open) loadBoard(); }, { once: true });
   }
@@ -83,7 +85,7 @@ export default function descent(app, root) {
     <p class="dc-rule-line small">${icon('star')} <b>${esc(g.rule(run.day).name)}</b> · ${esc(g.rule(run.day).desc)}</p>`;
   function doorsView(run) {
     const doors = g.doors();
-    root.innerHTML = `${runHead(run)}<p class="dc-prompt">${doors.length > 1 ? 'Deux passages s’ouvrent devant toi.' : 'Un gardien barre la route.'}</p>
+    root.innerHTML = `${runHead(run)}<p class="dc-prompt">${doors.includes('boss') ? 'Un gardien barre la route.' : doors.length > 1 ? 'Deux passages. Le plus dangereux rapporte plus.' : 'Des créatures barrent le passage.'}</p>
       <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r}" data-act="door" data-r="${r}"><span class="dc-door-ic">${icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${ROOMS[r].desc}</span></button>`).join('')}</div>
       ${run.cleared ? `<button class="btn ghost block" data-act="leave">${icon('back')}Remonter</button>` : ''}`;
   }
@@ -94,6 +96,11 @@ export default function descent(app, root) {
       <section class="panel dc-risk"><div><span class="small muted">Si tu remontes</span>${chestChip(now)}<span class="small muted">${icon('crystal')} ${fmt(run.shards)} éclats</span></div>
         <div><span class="small muted">Étage ${run.floor + 1}${(run.floor + 1) % DESCENT.bossEvery === 0 ? ' · gardien' : ''}</span>${run.free ? '<span class="small">Descente libre</span>' : `<span class="small">${next !== chestForDepth(run.floor) ? `Coffre amélioré : ${esc(CHESTS[next].name)}` : 'Même coffre'}</span>`}<span class="small muted">Si l’équipe tombe : ${run.cursed ? 'tout est perdu' : 'coffre d’une qualité en dessous'}</span></div></section>
       <div class="dc-choice">${alive ? `<button class="btn primary block big-cta" data-act="next">${icon('next')}Descendre à l’étage ${run.floor + 1}</button>` : ''}<button class="btn block" data-act="leave">${icon('back')}Remonter avec le coffre</button></div>`;
+  }
+  // Bonus choisi après une victoire
+  function rewardView(run, extra = '') {
+    root.innerHTML = `${runHead(run)}${extra}<p class="dc-prompt">Choisis ton bonus.</p>
+      <div class="dc-doors ${run.rewards.length > 2 ? 'three' : ''}">${run.rewards.map((r) => `<button class="dc-door r-${r}" data-act="reward" data-r="${r}"><span class="dc-door-ic">${icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'treasure' ? `+${fmt(Math.round((15 + run.floor * 6) * (run.free ? 0.5 : 1)))} éclats environ` : ROOMS[r].desc}</span></button>`).join('')}</div>`;
   }
   function altarView(run) {
     root.innerHTML = `${runHead(run)}<p class="dc-prompt">L’autel murmure. Choisis une bénédiction.</p>
@@ -113,7 +120,7 @@ export default function descent(app, root) {
       else {
         app.sfx.reveal(out.room === 'boss' ? 'M' : 'R');
         const disc = out.discovered.map((id) => cat.get(id)?.name).filter(Boolean);
-        clearedView(g.descent().run, `<p class="dc-event dc-win">${icon('swords')} <b>Victoire !</b> +${fmt(out.shards)} éclats${out.chest ? ` · <b>${esc(CHESTS[out.chest].name)}</b> gagné !` : ''}${disc.length ? `<br><span class="small">${icon('book')} Première rencontre : ${disc.map(esc).join(', ')}</span>` : ''}</p>`);
+        rewardView(g.descent().run, `<p class="dc-event dc-win">${icon('swords')} <b>Victoire !</b> +${fmt(out.shards)} éclats${out.chest ? ` · <b>${esc(CHESTS[out.chest].name)}</b> gagné !` : ''}${disc.length ? `<br><span class="small">${icon('book')} Première rencontre : ${disc.map(esc).join(', ')}</span>` : ''}</p>`);
       }
       window.scrollTo(0, 0);
       app.flushProgress();
@@ -124,6 +131,7 @@ export default function descent(app, root) {
     if (!run) return lobby();
     if (run.phase === 'doors') return doorsView(run);
     if (run.phase === 'altar') return altarView(run);
+    if (run.phase === 'reward') return rewardView(run);
     if (run.phase === 'battle') return battleView(run);
     return clearedView(run);
   }
@@ -151,6 +159,11 @@ export default function descent(app, root) {
       let out;
       try { out = g.chooseDoor(el.dataset.r); } catch (e) { toast(esc(e.message), { kind: 'error' }); return; }
       if (out.battle) { window.scrollTo(0, 0); return battleView(g.descent().run); }
+      render();
+    },
+    reward(el) {
+      let out;
+      try { out = g.chooseReward(el.dataset.r); } catch (e) { toast(esc(e.message), { kind: 'error' }); return; }
       if (out.altar) return render();
       app.sfx.coin();
       clearedView(g.descent().run, el.dataset.r === 'rest' ? `<p class="dc-event">${icon('heart')} L’eau de la source soigne tes créatures.</p>` : el.dataset.r === 'treasure' ? `<p class="dc-event">${icon('crystal')} +${fmt(out.shards)} éclats</p>` : out.healed ? `<p class="dc-event">${icon('star')} L’autel est muet, mais sa lumière soigne ton équipe.</p>` : '');

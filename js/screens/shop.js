@@ -77,7 +77,7 @@ export default function shop(app, root, params = []) {
 
   function draw() {
     const s = g.s;
-    const card = (type, extra = '') => {
+    const card = (type, extra = '', below = '') => {
       const def = BOOSTERS[type];
       const tickets = s.tickets[type] || 0;
       const can = g.canBuy(type);
@@ -96,6 +96,7 @@ export default function shop(app, root, params = []) {
           ${!can ? `<p class="small muted">Il te manque ${fmt(def.price - s.shards)} éclats.</p>` : ''}
           ${type === 'standard' ? freeLine() : ''}
         </div>
+        ${below ? `<div class="product-below">${below}</div>` : ''}
       </article>`;
     };
     root.innerHTML = `
@@ -105,7 +106,7 @@ export default function shop(app, root, params = []) {
       <p class="small muted pity-line">${icon('sparkle')} Hyper rare garantie dans ${PITY.hr - g.s.pity.sinceHR} booster${PITY.hr - g.s.pity.sinceHR > 1 ? 's' : ''} au plus · Mythique dans ${PITY.m - g.s.pity.sinceM}</p>
       <div class="products">
         ${card('standard')}
-        ${card('faction', `<div class="chips fac-pick" role="radiogroup" aria-label="Faction du booster">${FACTION_ORDER.map((f) => `<button class="chip" role="radio" data-act="pickfac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}" aria-checked="${st.faction === f}">${sigil(f)}${esc(cat.faction[f].name)}</button>`).join('')}</div>`)}
+        ${card('faction', '', `<div class="chips fac-pick fac-grid" role="radiogroup" aria-label="Faction du booster">${FACTION_ORDER.map((f) => `<button class="chip" role="radio" data-act="pickfac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}" aria-checked="${st.faction === f}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>`)}
         ${card('event', `<p class="event-line"><b>${esc(ev.name)}</b> · ${ev.factions.map((f) => esc(cat.faction[f].name)).join(' et ')}<br><span class="small muted">${esc(ev.desc)} Encore ${ev.daysLeft} jour${ev.daysLeft > 1 ? 's' : ''}.</span></p>`)}
         ${g.s.tickets.premium ? card('premium') : ''}
       </div>

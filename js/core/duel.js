@@ -2,6 +2,8 @@
 // Chaque carte a une ATTAQUE, des PV et une capacité liée à son rôle.
 // Ton tour : chaque carte au combat attaque une fois (la cible riposte), puis « Fin du tour »
 // et les créatures corrompues attaquent. 3 cartes au combat par camp ; la réserve prend la relève.
+// Stratégie : les ennemis annoncent leur cible (intention), une fois par tour on peut échanger
+// une carte avec la réserve, et chaque attaque ennemie peut être esquivée (plus dur face à plus fort).
 import { roleOf } from './army.js';
 
 export const FRONT = 3;
@@ -32,16 +34,17 @@ export function duelUnit(card, { side = 'ally', level = 1, scale = null, boss = 
   const hp = Math.max(1, Math.round(h * k * (boss ? 2.6 : elite ? 1.5 : 1)));
   return {
     uid: `${side[0]}${++seq}`, id: card.id, name: card.name, side, rarity: card.rarity, role, kw: KW_BY_ROLE[role],
-    atk, hp, maxHp: hp, level, boss, elite, poison: 0, frozen: 0, boost: 0, shield: 0, attacked: false,
+    atk, hp, maxHp: hp, level, boss, elite, poison: 0, frozen: 0, boost: 0, shield: 0, attacked: false, intent: null,
   };
 }
 
 // ——— État ———
 export function createDuel(allies, enemies, { gauge = 0, ult = 'sceau', power = 1, known = {}, ruleMult = 1 } = {}) {
-  const st = { units: {}, order: { ally: [], enemy: [] }, turn: 'ally', round: 1, gauge: Math.min(GAUGE_MAX, gauge), ult, power, known, ruleMult, over: null, kills: [] };
+  const st = { units: {}, order: { ally: [], enemy: [] }, turn: 'ally', round: 1, gauge: Math.min(GAUGE_MAX, gauge), ult, power, known, ruleMult, over: null, kills: [], swapped: false, queue: [] };
   for (const u of [...allies, ...enemies]) { st.units[u.uid] = { ...u }; st.order[u.side].push(u.uid); }
   ['ally', 'enemy'].forEach((side) => front(st, side).forEach((u) => { u.inPlay = true; }));
   startTurn(st, 'ally', []);
+  planIntents(st);
   return st;
 }
 export const alive = (st, side) => st.order[side].map((id) => st.units[id]).filter((u) => u.hp > 0);
@@ -84,12 +87,14 @@ function check(st, ev) {
 }
 
 // ——— Attaque d'une carte ———
-export function attack(st, aUid, tUid) {
+export function attack(st, aUid, tUid, { dodged = false } = {}) {
   const a = st.units[aUid], t = st.units[tUid], ev = [];
   if (!a || !t || !canAct(st, a) || !targetsFor(st, a.side).includes(tUid)) return ev;
   a.attacked = true;
   ev.push({ t: 'attack', a: a.uid, u: t.uid });
-  const hit = damage(st, t, atkOf(st, a, t), ev, a.uid);
+  let hit = 0;
+  if (dodged) ev.push({ t: 'dodge', u: t.uid });
+  else hit = damage(st, t, atkOf(st, a, t), ev, a.uid);
   if (hit && t.hp > 0) {
     if (a.kw === 'venin') { t.poison = Math.min(6, t.poison + 2); ev.push({ t: 'status', u: t.uid, s: 'Venin' }); }
     if (a.kw === 'gel') { t.frozen = 1; ev.push({ t: 'status', u: t.uid, s: 'Gelé' }); }
@@ -108,6 +113,7 @@ export function attack(st, aUid, tUid) {
 // ——— Début et fin de tour ———
 function startTurn(st, side, ev) {
   st.turn = side;
+  if (side === 'ally') st.swapped = false;
   for (const u of alive(st, side)) { u.attacked = false; u.boost = 0; }
   for (const u of front(st, side)) {
     if (u.frozen) { u.frozen--; if (u.frozen === 0) u.attacked = true; } // gelé : passe ce tour
@@ -123,22 +129,86 @@ function endOf(st, side, ev) {
     if (w) heal(w, Math.max(2, Math.round(u.atk * 1.5 + 1)), ev);
   }
 }
-// Fin du tour du joueur : soins, tour ennemi complet (IA), puis début du tour suivant du joueur.
-export function endTurn(st) {
+// Fin du tour du joueur. Le tour ennemi se joue coup par coup (beginEnemyTurn, nextStrike, strike,
+// endEnemyTurn) pour laisser le joueur esquiver ; endTurn le joue d'un bloc (simulations).
+export function beginEnemyTurn(st) {
   const ev = [];
   if (st.over || st.turn !== 'ally') return ev;
   endOf(st, 'ally', ev);
   startTurn(st, 'enemy', ev);
   ev.push({ t: 'phase', side: 'enemy' });
-  for (const e of front(st, 'enemy')) {
-    if (st.over) break;
-    if (!canAct(st, e)) continue;
-    const tg = enemyTarget(st, e);
-    if (tg) ev.push(...attack(st, e.uid, tg));
-  }
-  if (!st.over) { endOf(st, 'enemy', ev); st.round++; startTurn(st, 'ally', ev); ev.push({ t: 'phase', side: 'ally' }); }
+  st.queue = front(st, 'enemy').map((u) => u.uid);
   return ev;
 }
+// Prochain coup ennemi : { a: attaquant, t: cible } (l'intention annoncée si elle tient encore), ou null
+export function nextStrike(st) {
+  while (!st.over && st.turn === 'enemy' && st.queue.length) {
+    const e = st.units[st.queue[0]];
+    if (!e || !canAct(st, e)) { st.queue.shift(); continue; }
+    const ts = targetsFor(st, 'enemy');
+    const t = e.intent && ts.includes(e.intent) ? e.intent : enemyTarget(st, e);
+    if (!t) { st.queue.shift(); continue; }
+    return { a: e.uid, t };
+  }
+  return null;
+}
+export function strike(st, a, t, { dodged = false } = {}) {
+  if (st.queue[0] === a) st.queue.shift();
+  return attack(st, a, t, { dodged });
+}
+export function endEnemyTurn(st) {
+  const ev = [];
+  st.queue = [];
+  if (!st.over && st.turn === 'enemy') { endOf(st, 'enemy', ev); st.round++; startTurn(st, 'ally', ev); planIntents(st); ev.push({ t: 'phase', side: 'ally' }); }
+  return ev;
+}
+export function endTurn(st, dodge = () => false) {
+  const ev = beginEnemyTurn(st);
+  for (let s = nextStrike(st); s; s = nextStrike(st)) ev.push(...strike(st, s.a, s.t, { dodged: dodge(st, s) }));
+  ev.push(...endEnemyTurn(st));
+  return ev;
+}
+// Intentions : au début de ton tour, chaque ennemi annonce qui il va frapper.
+function planIntents(st) {
+  for (const e of alive(st, 'enemy')) e.intent = front(st, 'enemy').includes(e) && !e.frozen ? enemyTarget(st, e) : null;
+}
+// Dégâts annoncés sur chacune de tes cartes (pour l'affichage)
+export function threats(st) {
+  const out = {};
+  if (st.turn !== 'ally') return out;
+  const ts = targetsFor(st, 'enemy');
+  for (const e of front(st, 'enemy')) {
+    if (e.frozen) continue;
+    const t = e.intent && ts.includes(e.intent) ? e.intent : enemyTarget(st, e);
+    if (t) out[t] = (out[t] || 0) + atkOf(st, e, st.units[t]);
+  }
+  return out;
+}
+
+// Échange : une fois par tour, une carte au combat laisse sa place à une carte de la réserve.
+// La carte qui entre ne peut pas attaquer ce tour-ci.
+export const canSwap = (st) => st.turn === 'ally' && !st.over && !st.swapped && reserve(st, 'ally').length > 0;
+export function swap(st, outUid, inUid) {
+  const ev = [];
+  const o = st.order.ally, i = o.indexOf(outUid), j = o.indexOf(inUid);
+  const f = front(st, 'ally'), r = reserve(st, 'ally');
+  if (!canSwap(st) || !f.some((u) => u.uid === outUid) || !r.some((u) => u.uid === inUid)) return ev;
+  [o[i], o[j]] = [o[j], o[i]];
+  const a = st.units[inUid], b = st.units[outUid];
+  a.inPlay = true; a.attacked = true; b.inPlay = false;
+  st.swapped = true;
+  ev.push({ t: 'swap', u: inUid, out: outUid });
+  return ev;
+}
+
+// Difficulté d'une esquive : durée (ms) de la fenêtre à viser, plus courte face à un ennemi
+// de plus haut niveau que la carte visée (et face aux élites et gardiens).
+export function dodgeWindow(st, a, t) {
+  const e = st.units[a], u = st.units[t];
+  const w = 330 + 40 * ((u?.level || 1) - (e?.level || 1)) - (e?.boss ? 70 : e?.elite ? 35 : 0);
+  return Math.max(110, Math.min(520, Math.round(w)));
+}
+
 // IA ennemie : achève ce qu'elle peut tuer, sinon frappe la carte la plus dangereuse.
 function enemyTarget(st, e) {
   const ts = targetsFor(st, 'enemy').map((id) => st.units[id]);
@@ -167,7 +237,8 @@ export function useUlt(st) {
 }
 
 // ——— Jeu automatique (bouton Auto, simulations) ———
-export function autoTurn(st) {
+// Joue les attaques de ton tour (sans finir le tour)
+export function autoAttacks(st) {
   const ev = [];
   if (ultReady(st) && (st.ult !== 'sceau' && st.ult !== 'revive' || front(st, 'ally').some((u) => u.hp < u.maxHp / 2) || st.order.ally.some((id) => st.units[id].hp <= 0))) ev.push(...useUlt(st));
   for (let guard = 0; guard < 10 && !st.over; guard++) {
@@ -178,11 +249,16 @@ export function autoTurn(st) {
     const safe = ts.filter((t) => a.kw === 'assaut' || t.atk < a.hp).sort((x, y) => x.hp - y.hp)[0];
     ev.push(...attack(st, a.uid, (kill || safe || ts.sort((x, y) => x.hp - y.hp)[0]).uid));
   }
-  if (!st.over) ev.push(...endTurn(st));
   return ev;
 }
-export function autoDuel(st, max = 60) {
-  for (let i = 0; i < max && !st.over; i++) autoTurn(st);
+// dodge(st, coup) : décide si une attaque ennemie est esquivée (simulations)
+export function autoTurn(st, dodge) {
+  const ev = autoAttacks(st);
+  if (!st.over) ev.push(...endTurn(st, dodge));
+  return ev;
+}
+export function autoDuel(st, max = 60, dodge) {
+  for (let i = 0; i < max && !st.over; i++) autoTurn(st, dodge);
   if (!st.over) st.over = 'lost';
   return st;
 }

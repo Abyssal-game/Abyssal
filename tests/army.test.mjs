@@ -51,6 +51,7 @@ test('aventure : une expédition rapporte un coffre selon la profondeur ; le cof
   for (let k = 0; k < 300 && g.s.descent.run; k++) {
     const r = g.s.descent.run;
     if (r.phase === 'doors') { const o = g.chooseDoor(g.doors()[0]); if (o.battle) g.autoResolve(); }
+    else if (r.phase === 'reward') g.chooseReward(r.rewards[0]);
     else if (r.phase === 'altar') g.chooseBlessing(r.altar[0]);
     else if (r.cleared >= 3) g.endRun(false);
     else g.nextFloor();
