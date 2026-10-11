@@ -35,6 +35,8 @@ const TABS = [
   ['descente', 'swords', 'Aventure'], ['menu', 'menu', 'Plus'],
 ];
 const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', equipe: 'descente', coffres: 'descente', heros: 'descente', arsenal: 'descente', marchand: 'descente' };
+// Fond illustré de chaque page (l'Accueil et la Descente posent le leur)
+const ROUTE_SCENE = { boutique: 'shop', collection: 'collection', equipe: 'team', coffres: 'chests', bestiaire: 'bestiary', succes: 'trophies', profil: 'profile', menu: 'menu', parametres: 'menu', compte: 'menu', factions: 'factions', faction: 'factions' };
 // Page parente des sous-pages (bouton retour en haut)
 const PARENT = { bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', equipe: 'descente', coffres: 'descente', heros: 'descente', arsenal: 'descente', marchand: 'descente' };
 
@@ -122,7 +124,7 @@ function render() {
   app.route = ROUTES[route] ? route : '';
   app.params = params.map(decodeURIComponent);
   renderChrome();
-  setScene(null);
+  setScene(ROUTE_SCENE[app.route] || null);
   // Nouvel élément à chaque affichage : les écouteurs de l'écran précédent disparaissent avec lui
   // (sinon ils s'accumulent et un toucher déclenche l'action plusieurs fois).
   const old = document.getElementById('view');
