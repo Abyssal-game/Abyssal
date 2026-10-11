@@ -19,8 +19,8 @@ const tick = (u) => (100 / Math.max(1, u.spd)) * (u.st.frozen ? 1.5 : 1);
 const other = (side) => (side === 'ally' ? 'enemy' : 'ally');
 
 // ——— Création ———
-export function createBattle(heroes, enemies, seed = 1, { gauge = 0, invocation = null, mastery = {} } = {}) {
-  const st = { seed: seed | 0, now: 0, over: null, units: {}, order: { ally: [], enemy: [] }, gauge, inv: invocation, mastery, log: [], kills: [] };
+export function createBattle(heroes, enemies, seed = 1, { gauge = 0, invocation = null, mastery = {}, dmgMult = 1 } = {}) {
+  const st = { seed: seed | 0, now: 0, over: null, units: {}, order: { ally: [], enemy: [] }, gauge, inv: invocation, mastery, dmgMult, log: [], kills: [] };
   for (const u of [...heroes, ...enemies]) {
     const x = JSON.parse(JSON.stringify(u));
     x.ct = tick(x) * (0.3 + rand(st) * 0.6);
@@ -93,7 +93,7 @@ function hurt(st, src, tgt, amount, ev, kind = 'hit', extra = {}) {
       return d;
     }
   }
-  let d = Math.max(1, Math.round(amount));
+  let d = Math.max(1, Math.round(amount * (kind === 'hit' && src ? st.dmgMult || 1 : 1)));
   if (kind !== 'dot') {
     if (tgt.dodge && src && rand(st) < tgt.dodge) { ev.push({ t: 'dodge', u: tgt.uid }); return 0; }
     if (tgt.st.shield) { tgt.st.shield = 0; ev.push({ t: 'block', u: tgt.uid }); return 0; }

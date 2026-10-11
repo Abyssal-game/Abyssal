@@ -193,3 +193,38 @@ test('pactes : débloqués à l’étage 2, effets par faction et rareté, conna
   g.s.descent.run = { v: 2 };
   assert.throws(() => g.setPact('brenna', null), /expédition/);
 });
+
+test('règle du jour : stable, variée, appliquée aux combats et au butin', async () => {
+  const { dailyRule, DAILY_RULES } = await import('../js/core/descent.js');
+  assert.deepEqual(dailyRule('2026-10-10'), dailyRule('2026-10-10'));
+  const seen = new Set();
+  for (let d = 1; d <= 60; d++) seen.add(dailyRule(`2026-11-${String(d).padStart(2, '0')}`).key);
+  assert.ok(seen.size >= 5, 'plusieurs règles sur deux mois');
+  for (const k of Object.keys(DAILY_RULES)) assert.ok(DAILY_RULES[k].name && DAILY_RULES[k].desc);
+  // trouve un jour « Nuit des invocations » et un jour « Sources bénies »
+  const find = (key) => { for (let i = 0; i < 400; i++) { const d = new Date(2026, 0, 1 + i); const s = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; if (dailyRule(s).key === key) return d; } };
+  const lune = find('lune');
+  const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('r'), clock: () => new Date(lune.getFullYear(), lune.getMonth(), lune.getDate(), 12) });
+  g.startRun();
+  assert.equal(g.s.descent.run.gauge, 50);
+  assert.equal(g.rule().key, 'lune');
+  const inst = find('instable');
+  const g2 = new Game(catalog, new MemoryStorage(), { rng: rngFrom('i'), clock: () => new Date(inst.getFullYear(), inst.getMonth(), inst.getDate(), 12) });
+  g2.startRun();
+  g2.chooseDoor('fight');
+  assert.equal(g2.s.descent.run.battle.dmgMult, 1.25);
+});
+
+test('prestige : succès de profondeur et de chasse, avec coffres, titres et cadres', () => {
+  const g = newGame('z');
+  g.startRun();
+  g.recordDepth(15);
+  g.checkProgress();
+  for (const k of ['depth_5', 'depth_10', 'depth_15']) assert.ok(g.s.achievements[k], k);
+  assert.ok(g.s.titles.includes('Plongeur des Abysses'));
+  assert.ok(g.s.frames.includes('abysse'));
+  assert.ok(g.chestCount('abyssal') >= 1);
+  for (let i = 0; i < 5; i++) g.s.hunt[catalog.cards[i].id] = 15;
+  g.checkProgress();
+  assert.ok(g.s.achievements.master_5 && g.s.frames.includes('chasseur'));
+});

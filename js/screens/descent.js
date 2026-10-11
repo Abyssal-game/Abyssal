@@ -27,6 +27,7 @@ export default function descent(app, root) {
   const ui = (app.state.descent ||= { cursed: false, speed: 1, outcome: null });
   let playing = false, skip = false;
 
+  const ruleHTML = (r) => `<section class="panel dc-rule" style="--rf:${r.faction ? cat.faction[r.faction].colors.secondary : 'var(--gold)'}"><span class="dc-rule-ic">${r.faction ? sigil(r.faction) : icon('star')}</span><span><span class="small muted">Règle du jour</span><b>${esc(r.name)}</b><span class="small">${esc(r.desc)}</span></span></section>`;
   const chestsWaiting = () => Object.values(g.arsenal().chests).reduce((a, n) => a + n, 0);
   // ——— Accueil de la Descente ——————————————————————————————————————————
   function lobby() {
@@ -44,6 +45,7 @@ export default function descent(app, root) {
       ${last ? summaryHTML(last) : ''}
       ${pactNews ? `<section class="panel ornate dc-news"><div class="dc-new-h"><span class="dc-new-ic">${icon('sparkle')}</span><span><b>Les pactes sont débloqués !</b><span class="small">Chaque héros peut maintenant se lier à une de tes cartes : sa faction donne l’effet, sa rareté le renforce.</span><span class="small muted">Aventure, puis Héros : touche un héros, puis « Pacte ».</span></span></div></section>` : ''}
       ${news.length ? `<section class="panel ornate dc-news">${news.map((k) => `<div class="dc-new-h" style="--hc:${HEROES[k].color}"><img alt="" src="${heroArtUrl(k)}"><span><b>${esc(HEROES[k].name)} rejoint ton équipe !</b><span class="small">${esc(HEROES[k].cls)} · ${esc(HEROES[k].role)}</span></span></div>`).join('')}<p class="small muted">Touche « Modifier » pour l’emmener avec toi.</p></section>` : ''}
+      ${ruleHTML(g.rule())}
       <section class="panel dc-go">
         <div class="dc-go-top"><span class="dc-torches">${Array.from({ length: DESCENT.torches }, (_, i) => `<i class="${i < torches ? 'on' : ''}">${icon('flame')}</i>`).join('')}</span><span class="small muted">${torches ? `${torches} expédition${torches > 1 ? 's' : ''} possible${torches > 1 ? 's' : ''} aujourd’hui` : 'Plus de torche : reviens demain'}</span></div>
         <div class="dc-team">
@@ -153,6 +155,7 @@ export default function descent(app, root) {
       <div class="dc-loot"><span>${icon('crystal')}${fmt(run.loot.shards)}</span><span>${icon('ash')}${fmt(run.loot.ash)}</span>${Object.values(run.loot.tickets).reduce((a, b) => a + b, 0) ? `<span>${icon('ticket')}${Object.values(run.loot.tickets).reduce((a, b) => a + b, 0)}</span>` : ''}${chestN(run.loot) ? `<span>${icon('lock')}${chestN(run.loot)}</span>` : ''}</div>
     </header>
     ${teamStrip(run)}
+    <p class="dc-rule-line small">${icon('star')} <b>${esc(g.rule(run.day).name)}</b> · ${esc(g.rule(run.day).desc)}</p>
     ${run.blessings.length ? `<div class="chips dc-bless">${run.blessings.map((k) => `<span class="chip" title="${esc(BLESSINGS[k].desc)}">${icon('star')}${esc(BLESSINGS[k].name)}</span>`).join('')}</div>` : ''}`;
   }
   function doorsView(run) {

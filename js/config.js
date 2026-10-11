@@ -116,6 +116,7 @@ export const FRAMES = {
   base: 'Cadre de fer', or: 'Cadre d’or', prisme: 'Cadre prismatique', titan: 'Cadre des Titans', neant: 'Cadre du Néant',
   infernal: 'Cadre infernal', abyssal: 'Cadre abyssal', celeste: 'Cadre céleste', sauvage: 'Cadre sauvage',
   necrotique: 'Cadre nécrotique', primordial: 'Cadre primordial', artificiel: 'Cadre artificiel',
+  abysse: 'Cadre des Profondeurs', chasseur: 'Cadre du Chasseur',
 };
 
 // Booster standard gratuit qui se recharge avec le temps (aucune obligation de revenir).

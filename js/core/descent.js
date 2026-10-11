@@ -86,3 +86,26 @@ export function blessingChoices(day, floor, owned = []) {
   while (out.length < 3 && keys.length) out.push(keys.splice(Math.floor(rng() * keys.length), 1)[0]);
   return out;
 }
+
+// ——— Règle du jour ————————————————————————————————————————————————————
+// Une règle différente chaque jour, la même pour tout le monde. {faction} est remplacé
+// par une faction tirée le même jour (règles liées aux pactes et à la connaissance).
+export const DAILY_RULES = {
+  furie:    { name: 'Furie · {faction}',   desc: 'Les créatures de la faction {faction} frappent 25 % plus fort.', faction: true },
+  sommeil:  { name: 'Sommeil · {faction}', desc: 'Les créatures de la faction {faction} ont 25 % de PV en moins.', faction: true },
+  sources:  { name: 'Sources bénies',      desc: 'Les sources sacrées soignent 80 % des PV au lieu de 40 %.' },
+  ruee:     { name: 'Ruée vers les éclats', desc: 'Les éclats trouvés sont augmentés de 50 %.' },
+  lune:     { name: 'Nuit des invocations', desc: 'La jauge d’invocation commence l’expédition à moitié pleine.' },
+  chasse:   { name: 'Chasse aux élites',   desc: 'Chaque élite vaincue rapporte un coffre et deux fois plus d’éclats.' },
+  instable: { name: 'Abysse instable',     desc: 'Tout le monde frappe 25 % plus fort : héros comme créatures.' },
+};
+const RULE_KEYS = Object.keys(DAILY_RULES);
+const RULE_FACTIONS = ['infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel'];
+export function dailyRule(day, factionNames = {}) {
+  const rng = rngOf(`rule:${day}`);
+  const key = RULE_KEYS[Math.floor(rng() * RULE_KEYS.length)];
+  const faction = DAILY_RULES[key].faction ? RULE_FACTIONS[Math.floor(rng() * RULE_FACTIONS.length)] : null;
+  const fname = faction ? (factionNames[faction] || faction) : '';
+  const fill = (t) => t.replace('{faction}', fname);
+  return { key, faction, name: fill(DAILY_RULES[key].name), desc: fill(DAILY_RULES[key].desc) };
+}

@@ -145,6 +145,8 @@ function rewardText(r = {}) {
   if (r.title) parts.push(`titre « ${esc(r.title)} »`);
   if (r.frame) parts.push('un cadre de profil');
   if (r.special) parts.push('une Édition des Sceaux');
+  const ch = { bois: 'coffre de bois', fer: 'coffre de fer', or: 'coffre d’or', abyssal: 'coffre abyssal' };
+  for (const [k, n] of Object.entries(r.chests || {})) parts.push(`${n} ${ch[k] || 'coffre'}`);
   return parts.join(', ');
 }
 app.rewardText = rewardText;

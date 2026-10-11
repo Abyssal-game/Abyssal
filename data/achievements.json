@@ -24,5 +24,14 @@
  { "key": "craft_1",       "name": "Rituel d’invocation",     "desc": "Invoque une carte avec des cendres.",              "cond": { "type": "crafted", "n": 1 },           "reward": { "shards": 50 } },
  { "key": "daily_7",       "name": "Fidèle des sceaux",       "desc": "Récupère 7 offrandes quotidiennes.",               "cond": { "type": "daily", "n": 7 },             "reward": { "shards": 150 } },
  { "key": "unique_150",    "name": "Cent cinquante noms",     "desc": "Découvre 150 cartes différentes.",                 "cond": { "type": "unique", "n": 150 },          "reward": { "shards": 300, "tickets": { "standard": 2 } } },
- { "key": "boosters_300",  "name": "Gardien des Sceaux",      "desc": "Ouvre 300 boosters.",                              "cond": { "type": "boosters", "n": 300 },        "reward": { "shards": 1000, "title": "Gardien des Sceaux", "frame": "or" } }
+ { "key": "boosters_300",  "name": "Gardien des Sceaux",      "desc": "Ouvre 300 boosters.",                              "cond": { "type": "boosters", "n": 300 },        "reward": { "shards": 1000, "title": "Gardien des Sceaux", "frame": "or" } },
+ { "key": "depth_5", "name": "Premier gardien", "desc": "Atteins l’étage 5 de la Descente.", "cond": {"type": "depth", "n": 5}, "reward": {"shards": 100} },
+ { "key": "depth_10", "name": "Sous la surface", "desc": "Atteins l’étage 10 de la Descente.", "cond": {"type": "depth", "n": 10}, "reward": {"shards": 200, "chests": {"or": 1}, "title": "Plongeur des Abysses"} },
+ { "key": "depth_15", "name": "Là où la lumière meurt", "desc": "Atteins l’étage 15 de la Descente.", "cond": {"type": "depth", "n": 15}, "reward": {"shards": 300, "chests": {"abyssal": 1}, "frame": "abysse"} },
+ { "key": "depth_20", "name": "Le cœur de l’Abysse", "desc": "Atteins l’étage 20 de la Descente.", "cond": {"type": "depth", "n": 20}, "reward": {"shards": 500, "title": "Celui qui a vu le fond"} },
+ { "key": "hunt_25", "name": "Traqueur", "desc": "Vaincs 25 espèces de créatures différentes.", "cond": {"type": "hunted", "n": 25}, "reward": {"shards": 120} },
+ { "key": "hunt_100", "name": "Grand veneur", "desc": "Vaincs 100 espèces de créatures différentes.", "cond": {"type": "hunted", "n": 100}, "reward": {"shards": 400, "title": "Grand veneur"} },
+ { "key": "master_5", "name": "Savoir ancien", "desc": "Maîtrise 5 créatures (15 victoires contre chacune).", "cond": {"type": "mastered", "n": 5}, "reward": {"shards": 200, "frame": "chasseur"} },
+ { "key": "trophy_1", "name": "Premier trophée", "desc": "Vaincs 40 fois la même créature.", "cond": {"type": "trophies", "n": 1}, "reward": {"shards": 150, "title": "Chasseur de trophées"} },
+ { "key": "pact_3", "name": "Lié par le sang", "desc": "Scelle un pacte légendaire (carte Mythique ou Secrète).", "cond": {"type": "pactLeg", "n": 1}, "reward": {"shards": 150} }
 ]

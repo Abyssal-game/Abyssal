@@ -4,7 +4,7 @@ import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_O
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
 import { createBattle, autoBattle } from './battle.js';
-import { DESCENT, floorDoors, floorEnemies, roomLoot, blessingChoices } from './descent.js';
+import { DESCENT, floorDoors, floorEnemies, roomLoot, blessingChoices, dailyRule } from './descent.js';
 import { pactOf, PACT_UNLOCK } from './pacts.js';
 import { BASES, SLOT_ORDER, CHESTS, GEAR_RARITY, canUse, gearBonus, itemScore, rollChest, forgeCost, salvageValue, LEG_PITY } from './gear.js';
 import { HEROES, HERO_ORDER, INVOCATIONS, makeHero, levelOf, invocationPower, enemyLevel, huntStage, HUNT_STAGES, totalXpFor } from './heroes.js';
@@ -405,6 +405,8 @@ export class Game {
     }
     return d;
   }
+  // Règle du jour (celle de l'expédition en cours si elle a commencé la veille)
+  rule(day = this.descent().run?.day || this.descent().day) { return dailyRule(day, Object.fromEntries(Object.entries(this.catalog.faction).map(([k, f]) => [k, f.name]))); }
   torchesLeft() { return Math.max(0, DESCENT.torches - this.descent().used); }
 
   // Héros
@@ -451,6 +453,7 @@ export class Game {
     const other = id && this.pactHolder(id);
     if (other) delete this.s.pacts[other];
     if (id) this.s.pacts[hero] = id; else delete this.s.pacts[hero];
+    this.checkProgress();
     this.persist();
   }
   // Connaissance d'un ennemi : posséder sa carte (+10 %) et le maîtriser à la chasse (+10 %), plafonné à +20 %.
@@ -614,7 +617,7 @@ export class Game {
     d.cursed = cursed;
     const inv = this.invocationUnlocked(this.s.invocation) ? this.s.invocation : 'phenix';
     d.run = {
-      v: 2, day: d.day, floor: 1, cleared: 0, cursed, phase: 'doors', blessings: [], altar: null, gauge: 0, inv, invXp: 0,
+      v: 2, day: d.day, floor: 1, cleared: 0, cursed, phase: 'doors', blessings: [], altar: null, gauge: this.rule(d.day).key === 'lune' ? 50 : 0, inv, invXp: 0,
       team: party.map((k) => { const u = this.heroUnit(k); return { id: k, hp: u.maxHp, maxHp: u.maxHp, fallen: false, xp: 0 }; }),
       loot: { shards: 0, ash: 0, tickets: {}, chests: {}, keys: {} }, kills: {},
     };
@@ -642,7 +645,8 @@ export class Game {
   addLoot(l) {
     const run = this.s.descent.run;
     const k = (run.blessings.includes('greed') ? 1.3 : 1) * (run.cursed ? DESCENT.cursedLoot : 1);
-    const got = { shards: Math.round((l.shards || 0) * k), ash: Math.round((l.ash || 0) * k), tickets: l.tickets || {}, chests: l.chests || {}, keys: l.keys || {} };
+    const rush = this.rule(run.day).key === 'ruee' ? 1.5 : 1;
+    const got = { shards: Math.round((l.shards || 0) * k * rush), ash: Math.round((l.ash || 0) * k), tickets: l.tickets || {}, chests: l.chests || {}, keys: l.keys || {} };
     run.loot.shards += got.shards; run.loot.ash += got.ash;
     for (const [t, n] of Object.entries(got.tickets)) run.loot.tickets[t] = (run.loot.tickets[t] || 0) + n;
     run.loot.chests ||= {}; run.loot.keys ||= {};
@@ -658,17 +662,24 @@ export class Game {
     if (room === 'fight' || room === 'elite' || room === 'boss') {
       // Le combat se joue au tour par tour : son état est gardé dans l'expédition (reprise exacte).
       const enemies = floorEnemies(this.catalog, run.day, run.floor, room);
+      const rule = this.rule(run.day);
+      for (const e of enemies) {
+        const f = this.catalog.get(e.id)?.faction;
+        if (rule.key === 'furie' && f === rule.faction) e.atk = Math.round(e.atk * 1.25);
+        if (rule.key === 'sommeil' && f === rule.faction) { e.maxHp = Math.round(e.maxHp * 0.75); e.hp = e.maxHp; }
+      }
       const mastery = {};
       enemies.forEach((e) => { const k = this.knowledge(e.id); if (k) mastery[e.id] = k; });
       const power = invocationPower(this.invocationLevel(run.inv));
-      run.battle = createBattle(this.runUnits(), enemies, Math.floor(this.rng() * 2 ** 31), { gauge: run.gauge, invocation: { key: run.inv, power }, mastery });
+      run.battle = createBattle(this.runUnits(), enemies, Math.floor(this.rng() * 2 ** 31), { gauge: run.gauge, invocation: { key: run.inv, power }, mastery, dmgMult: rule.key === 'instable' ? 1.25 : 1 });
       run.room = room;
       run.phase = 'battle';
       out.battle = true;
       this.persist();
       return out;
     } else if (room === 'rest') {
-      run.team.forEach((m) => { if (!m.fallen) m.hp = Math.min(m.maxHp, m.hp + Math.ceil(m.maxHp * 0.4)); });
+      const heal = this.rule(run.day).key === 'sources' ? 0.8 : 0.4;
+      run.team.forEach((m) => { if (!m.fallen) m.hp = Math.min(m.maxHp, m.hp + Math.ceil(m.maxHp * heal)); });
       run.phase = 'cleared';
     } else if (room === 'treasure') {
       out.loot = this.addLoot(roomLoot(run.floor, room, this.rng));
@@ -712,11 +723,14 @@ export class Game {
     const wiped = run.team.every((m) => m.fallen);
     const out = { room, won: won && !wiped, xp, discovered };
     if (won && !wiped) {
-      out.loot = this.addLoot(roomLoot(run.floor, room, this.rng));
+      const l = roomLoot(run.floor, room, this.rng);
+      if (room === 'elite' && this.rule(run.day).key === 'chasse') { l.shards *= 2; l.chests = { ...(l.chests || {}), [run.floor >= 6 ? 'fer' : 'bois']: 1 }; }
+      out.loot = this.addLoot(l);
       run.phase = 'cleared';
       run.cleared = run.floor;
       this.recordDepth(run.floor);
       this.track('win', 1);
+      this.checkProgress();
       this.persist();
     } else {
       out.lost = true;
@@ -871,6 +885,11 @@ export class Game {
       case 'variants': return this.variantCount();
       case 'crafted': return this.s.stats.crafted;
       case 'daily': return this.s.stats.daily;
+      case 'depth': return this.s.descent.best || 0;
+      case 'hunted': return this.huntCount();
+      case 'mastered': return Object.values(this.s.hunt).filter((k) => k >= HUNT_STAGES[2].k).length;
+      case 'trophies': return Object.values(this.s.hunt).filter((k) => k >= HUNT_STAGES[3].k).length;
+      case 'pactLeg': return Object.keys(this.s.pacts || {}).some((h) => this.pactFor(h)?.tier === 3) ? 1 : 0;
       default: return 0;
     }
   }
