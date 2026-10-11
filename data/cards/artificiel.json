@@ -909,11 +909,11 @@
  {
   "id": "ART-021",
   "number": 21,
-  "name": "Tête d’Airain",
-  "title": "Elle a tout prédit",
+  "name": "Moine d’Airain",
+  "title": "Le temps est",
   "faction": "artificiel",
   "rarity": "PC",
-  "category": "Objet alchimique",
+  "category": "Automate",
   "power": 3,
   "role": "M",
   "stats": {
@@ -929,8 +929,8 @@
     "key": "omen"
    }
   ],
-  "visual": "Tête de bronze sur un socle, bouche entrouverte, yeux qui s’allument lorsqu’elle va parler.",
-  "lore": "Les légendes médiévales l’attribuent à de savants moines. Elle dit : « Le temps est. Le temps fut. Le temps est passé. »",
+  "visual": "Automate de bronze en robe de moine, tête d’airain au visage figé et bouche articulée ouverte, rouages visibles au cou, sablier dans les mains.",
+  "lore": "Les moines qui le construisirent attendirent qu’il parle. Il dit : « Le temps est. Le temps était. Le temps n’est plus. »",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -942,12 +942,13 @@
    "galaxy"
   ],
   "art": {
-   "form": "object",
-   "kind": "head",
+   "form": "golem",
+   "shape": "tall",
+   "head": "mask",
    "scene": "forge"
   },
   "image": "assets/art/ART-021.webp",
-  "artPrompt": "Tête d’Airain — Tête de bronze sur un socle, bouche entrouverte, yeux qui s’allument lorsqu’elle va parler. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+  "artPrompt": "Moine d’Airain — Automate de bronze en robe de moine, tête d’airain au visage figé et bouche articulée ouverte, rouages visibles au cou, sablier dans les mains. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "ART-022",
@@ -1900,11 +1901,11 @@
  {
   "id": "ART-041",
   "number": 41,
-  "name": "L’Horloge de la Fin",
+  "name": "Le Dragon d’Horlogerie",
   "title": "Minuit moins une",
   "faction": "artificiel",
   "rarity": "S",
-  "category": "Construction cosmique",
+  "category": "Automate",
   "power": 10,
   "role": "M",
   "stats": {
@@ -1924,8 +1925,8 @@
     "value": 3
    }
   ],
-  "visual": "Horloge colossale d’or dont les aiguilles approchent de minuit, mécanisme ouvert sur le Néant.",
-  "lore": "Elle a été remontée le jour où le premier sceau s’est brisé. Elle n’a jamais retardé.",
+  "visual": "Dragon colossal fait de rouages d’or et de laiton, cœur d’horloge visible dans la poitrine ouverte sur le Néant, ailes de lames articulées.",
+  "lore": "On le remonta le jour où le premier sceau se brisa. Quand son cœur sonnera minuit, il prendra son envol.",
   "evolution": null,
   "sets": [
    "neant"
@@ -1941,11 +1942,13 @@
    "gold"
   ],
   "art": {
-   "form": "golem",
-   "shape": "clock",
-   "scale": 1.1
+   "form": "dragon",
+   "legs": 4,
+   "wings": "bat",
+   "scale": 1.1,
+   "scene": "forge"
   },
   "image": "assets/art/ART-041.webp",
-  "artPrompt": "L’Horloge de la Fin — Horloge colossale d’or dont les aiguilles approchent de minuit, mécanisme ouvert sur le Néant. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+  "artPrompt": "Le Dragon d’Horlogerie — Dragon colossal fait de rouages d’or et de laiton, cœur d’horloge visible dans la poitrine ouverte sur le Néant, ailes de lames articulées. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

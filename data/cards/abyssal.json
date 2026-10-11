@@ -1240,11 +1240,11 @@
  {
   "id": "ABY-029",
   "number": 29,
-  "name": "Marée de Sang",
+  "name": "Serpent de la Marée Rouge",
   "title": "Première Plaie",
   "faction": "abyssal",
   "rarity": "PC",
-  "category": "Fléau",
+  "category": "Créature marine",
   "power": 4,
   "role": "U",
   "stats": {
@@ -1264,8 +1264,8 @@
     "value": 1
    }
   ],
-  "visual": "Méduse colossale d’un rouge profond qui teinte la mer sur des lieues, filaments couleur de veines.",
-  "lore": "Quand les sceaux cédèrent, les eaux devinrent sang. Cela, au moins, les vieux livres l’avaient prévu.",
+  "visual": "Serpent de mer écarlate jaillissant d’une mer changée en sang, crinière d’algues rouges, gueule ouverte qui déverse le sang sur le rivage.",
+  "lore": "Quand les sceaux cédèrent, les eaux devinrent sang. Cela, au moins, les vieux livres l’avaient prévu. Pas lui.",
   "evolution": null,
   "sets": [
    "plaies"
@@ -1279,13 +1279,12 @@
    "galaxy"
   ],
   "art": {
-   "form": "tentacle",
-   "core": "bell",
-   "count": 12,
-   "tint": "#e0303c"
+   "form": "serpent",
+   "tint": "#e0303c",
+   "scene": "ocean"
   },
   "image": "assets/art/ABY-029.webp",
-  "artPrompt": "Marée de Sang — Méduse colossale d’un rouge profond qui teinte la mer sur des lieues, filaments couleur de veines. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+  "artPrompt": "Serpent de la Marée Rouge — Serpent de mer écarlate jaillissant d’une mer changée en sang, crinière d’algues rouges, gueule ouverte qui déverse le sang sur le rivage. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "ABY-030",
@@ -2207,7 +2206,7 @@
   "title": "Ne pas réveiller",
   "faction": "abyssal",
   "rarity": "S",
-  "category": "Entité du Néant",
+  "category": "Entité abyssale",
   "power": 10,
   "role": "M",
   "stats": {
@@ -2230,7 +2229,7 @@
     "value": 2
    }
   ],
-  "visual": "Un œil unique, vaste comme une mer, entrouvert au fond du monde, cerné de racines de chair.",
+  "visual": "Titan endormi à tête de pieuvre, grandes ailes membraneuses repliées, recroquevillé au fond de la fosse, un seul œil immense entrouvert, tentacules en éventail.",
   "lore": "Il dort depuis avant le temps. Chaque carte de ce bestiaire est peut-être l’un de ses rêves.",
   "evolution": null,
   "sets": [
@@ -2247,11 +2246,13 @@
    "gold"
   ],
   "art": {
-   "form": "orb",
-   "type": "eye",
+   "form": "tentacle",
+   "core": "mantle",
+   "count": 12,
+   "scale": 1.15,
    "scene": "abyss"
   },
   "image": "assets/art/ABY-048.webp",
-  "artPrompt": "Le Rêveur Sous la Fosse — Un œil unique, vaste comme une mer, entrouvert au fond du monde, cerné de racines de chair. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+  "artPrompt": "Le Rêveur Sous la Fosse — Titan endormi à tête de pieuvre, grandes ailes membraneuses repliées, recroquevillé au fond de la fosse, un seul œil immense entrouvert, tentacules en éventail. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

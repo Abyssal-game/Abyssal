@@ -1180,11 +1180,11 @@
  {
   "id": "NEC-027",
   "number": 27,
-  "name": "Ténèbres Palpables",
+  "name": "Rôdeur des Ténèbres",
   "title": "Neuvième Plaie",
   "faction": "necrotique",
   "rarity": "PC",
-  "category": "Fléau",
+  "category": "Spectre",
   "power": 4,
   "role": "M",
   "stats": {
@@ -1204,8 +1204,8 @@
     "value": 1
    }
   ],
-  "visual": "Obscurité si épaisse qu’on peut la toucher, constellée d’yeux qui ne cillent pas.",
-  "lore": "Trois jours de ténèbres. Personne ne put voir son prochain. Elle, voyait tout le monde.",
+  "visual": "Silhouette spectrale faite de ténèbres épaisses, longs bras griffus, deux yeux pâles, qui avale la lumière des bougies autour d’elle.",
+  "lore": "Trois jours de ténèbres. Personne ne put voir son prochain. Lui voyait tout le monde.",
   "evolution": null,
   "sets": [
    "plaies"
@@ -1219,12 +1219,13 @@
    "galaxy"
   ],
   "art": {
-   "form": "orb",
-   "type": "void",
+   "form": "spectre",
+   "head": "void",
+   "arms": "up",
    "scene": "crypt"
   },
   "image": "assets/art/NEC-027.webp",
-  "artPrompt": "Ténèbres Palpables — Obscurité si épaisse qu’on peut la toucher, constellée d’yeux qui ne cillent pas. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+  "artPrompt": "Rôdeur des Ténèbres — Silhouette spectrale faite de ténèbres épaisses, longs bras griffus, deux yeux pâles, qui avale la lumière des bougies autour d’elle. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-028",
@@ -2045,11 +2046,11 @@
  {
   "id": "NEC-044",
   "number": 44,
-  "name": "La Dernière Veillée",
-  "title": "Quand tout s’éteint",
+  "name": "Baron Samedi",
+  "title": "Le maître des cimetières",
   "faction": "necrotique",
   "rarity": "S",
-  "category": "Entité",
+  "category": "Esprit des morts",
   "power": 10,
   "role": "U",
   "stats": {
@@ -2072,8 +2073,8 @@
     "key": "omen"
    }
   ],
-  "visual": "Une lanterne dorée posée sur une tombe sans nom, dont la flamme dessine tous les visages des morts.",
-  "lore": "Quelqu’un veille sur les morts que tout le monde a oubliés. Cette carte prouve qu’elle existe.",
+  "visual": "Grand squelette élégant en queue-de-pie noire et chapeau haut-de-forme, visage peint en crâne blanc, cigare fumant, canne à pommeau de crâne, au milieu des croix d’un cimetière.",
+  "lore": "Personne n’entre dans la tombe sans sa permission. Il rit, il boit, et il décide qui reste couché.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2087,11 +2088,13 @@
    "gold"
   ],
   "art": {
-   "form": "object",
-   "kind": "lantern",
+   "form": "hum",
+   "head": "skull",
+   "body": "cloak",
+   "arms": "staff",
    "scene": "crypt"
   },
   "image": "assets/art/NEC-044.webp",
-  "artPrompt": "La Dernière Veillée — Une lanterne dorée posée sur une tombe sans nom, dont la flamme dessine tous les visages des morts. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+  "artPrompt": "Baron Samedi — Grand squelette élégant en queue-de-pie noire et chapeau haut-de-forme, visage peint en crâne blanc, cigare fumant, canne à pommeau de crâne, au milieu des croix d’un cimetière. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

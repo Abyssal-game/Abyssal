@@ -1270,11 +1270,11 @@
  {
   "id": "SAU-029",
   "number": 29,
-  "name": "La Famine Grise",
+  "name": "Le Roi des Rats",
   "title": "Troisième Plaie",
   "faction": "sauvage",
   "rarity": "PC",
-  "category": "Fléau",
+  "category": "Bête",
   "power": 4,
   "role": "B",
   "stats": {
@@ -1290,8 +1290,8 @@
     "key": "devour"
    }
   ],
-  "visual": "Marée de rats gris qui recouvre les champs comme une moisissure, ne laissant derrière elle que des tiges nues.",
-  "lore": "Les greniers se vidèrent en une nuit. Les rats, eux, ne grossirent pas d’un gramme.",
+  "visual": "Masse grouillante de rats gris aux queues nouées en un seul nœud, couronne de paille sur le rat du centre, yeux rouges dans l’ombre d’un grenier vide.",
+  "lore": "Les greniers se vidèrent en une nuit. Ses sujets, eux, ne grossirent pas d’un gramme : tout fut pour le roi.",
   "evolution": null,
   "sets": [
    "plaies"
@@ -1310,7 +1310,7 @@
    "count": 48
   },
   "image": "assets/art/SAU-029.webp",
-  "artPrompt": "La Famine Grise — Marée de rats gris qui recouvre les champs comme une moisissure, ne laissant derrière elle que des tiges nues. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+  "artPrompt": "Le Roi des Rats — Masse grouillante de rats gris aux queues nouées en un seul nœud, couronne de paille sur le rat du centre, yeux rouges dans l’ombre d’un grenier vide. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "SAU-030",

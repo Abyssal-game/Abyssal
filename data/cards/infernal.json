@@ -461,11 +461,11 @@
  {
   "id": "INF-011",
   "number": 11,
-  "name": "Lanterne Hurlante",
+  "name": "Porte-Lanterne Hurlant",
   "title": "Guide des égarés",
   "faction": "infernal",
   "rarity": "C",
-  "category": "Objet maudit",
+  "category": "Démon",
   "power": 2,
   "role": "M",
   "stats": {
@@ -482,8 +482,8 @@
     "value": 1
    }
   ],
-  "visual": "Lanterne de papier huilé dont l’âme captive hurle par une bouche déchirée, langue pendante.",
-  "lore": "Les voyageurs la suivent pour sortir des enfers. Elle les y ramène.",
+  "visual": "Petit démon voûté et décharné qui tend une lanterne de papier huilé où une âme captive hurle, sourire trop large.",
+  "lore": "Les voyageurs le suivent pour sortir des enfers. Il les y ramène.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -495,11 +495,14 @@
    "galaxy"
   ],
   "art": {
-   "form": "object",
-   "kind": "lantern"
+   "form": "hum",
+   "head": "beast",
+   "body": "lean",
+   "horns": "short",
+   "arms": "reach"
   },
   "image": "assets/art/INF-011.webp",
-  "artPrompt": "Lanterne Hurlante — Lanterne de papier huilé dont l’âme captive hurle par une bouche déchirée, langue pendante. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+  "artPrompt": "Porte-Lanterne Hurlant — Petit démon voûté et décharné qui tend une lanterne de papier huilé où une âme captive hurle, sourire trop large. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-012",
@@ -1377,11 +1380,11 @@
  {
   "id": "INF-031",
   "number": 31,
-  "name": "Vierge de Fer",
-  "title": "Étreinte éternelle",
+  "name": "Geôlière de Fer",
+  "title": "Celle qui enlace",
   "faction": "infernal",
   "rarity": "PC",
-  "category": "Construction maudite",
+  "category": "Démone",
   "power": 4,
   "role": "T",
   "stats": {
@@ -1398,7 +1401,7 @@
     "value": 1
    }
   ],
-  "visual": "Sarcophage de fer à visage de femme, hérissé de pointes intérieures, qui marche sur des jambes articulées.",
+  "visual": "Démone grande et raide, corps à demi fondu dans une armure de vierge de fer ouverte hérissée de pointes, chaînes tombant de ses bras.",
   "lore": "Elle n’a jamais lâché ce qu’elle a enlacé.",
   "evolution": null,
   "sets": [],
@@ -1411,12 +1414,14 @@
    "galaxy"
   ],
   "art": {
-   "form": "golem",
-   "shape": "tall",
-   "head": "mask"
+   "form": "hum",
+   "head": "face",
+   "body": "armor",
+   "horns": "short",
+   "arms": "spread"
   },
   "image": "assets/art/INF-031.webp",
-  "artPrompt": "Vierge de Fer — Sarcophage de fer à visage de femme, hérissé de pointes intérieures, qui marche sur des jambes articulées. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+  "artPrompt": "Geôlière de Fer — Démone grande et raide, corps à demi fondu dans une armure de vierge de fer ouverte hérissée de pointes, chaînes tombant de ses bras. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "INF-032",

@@ -138,11 +138,11 @@
  {
   "id": "CEL-004",
   "number": 4,
-  "name": "Cloche de l’Aube",
-  "title": "Elle sonne seule",
+  "name": "Sonneur de l’Aube",
+  "title": "Le premier réveillé",
   "faction": "celeste",
   "rarity": "C",
-  "category": "Objet sacré",
+  "category": "Ange",
   "power": 2,
   "role": "T",
   "stats": {
@@ -158,8 +158,8 @@
     "key": "guard"
    }
   ],
-  "visual": "Cloche de bronze patiné suspendue dans le vide, gravée de prières, battant en forme d’œil.",
-  "lore": "Elle sonne quand un sceau se fissure. Elle sonne beaucoup, ces temps-ci.",
+  "visual": "Jeune ange aux ailes blanches suspendu à la corde d’une grande cloche de bronze, tête levée vers l’aurore.",
+  "lore": "Il sonne quand un sceau se fissure. Il sonne beaucoup, ces temps-ci.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -171,12 +171,16 @@
    "galaxy"
   ],
   "art": {
-   "form": "object",
-   "kind": "bell",
+   "form": "hum",
+   "head": "face",
+   "body": "robe",
+   "wings": "feather",
+   "arms": "up",
+   "halo": "ring",
    "scene": "heaven"
   },
   "image": "assets/art/CEL-004.webp",
-  "artPrompt": "Cloche de l’Aube — Cloche de bronze patiné suspendue dans le vide, gravée de prières, battant en forme d’œil. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+  "artPrompt": "Sonneur de l’Aube — Jeune ange aux ailes blanches suspendu à la corde d’une grande cloche de bronze, tête levée vers l’aurore. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "CEL-005",
@@ -495,11 +499,11 @@
  {
   "id": "CEL-012",
   "number": 12,
-  "name": "Psautier Vivant",
-  "title": "Il se lit seul",
+  "name": "Lectrice Aveugle",
+  "title": "Celle qui récite",
   "faction": "celeste",
   "rarity": "C",
-  "category": "Objet sacré",
+  "category": "Ange",
   "power": 2,
   "role": "M",
   "stats": {
@@ -515,8 +519,8 @@
     "key": "omen"
    }
   ],
-  "visual": "Livre de prières ouvert dont les pages s’envolent comme des oiseaux, œil d’or au centre de la reliure.",
-  "lore": "Chaque psaume lu à voix haute l’affame un peu moins.",
+  "visual": "Ange aux yeux bandés d’or qui récite un psautier ouvert flottant devant elle, lettres de lumière qui s’échappent des pages.",
+  "lore": "Chaque psaume qu’elle récite à voix haute affame un peu moins les ténèbres.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -528,12 +532,16 @@
    "galaxy"
   ],
   "art": {
-   "form": "object",
-   "kind": "book",
+   "form": "hum",
+   "head": "face",
+   "body": "robe",
+   "wings": "feather",
+   "arms": "pray",
+   "halo": "ring",
    "scene": "heaven"
   },
   "image": "assets/art/CEL-012.webp",
-  "artPrompt": "Psautier Vivant — Livre de prières ouvert dont les pages s’envolent comme des oiseaux, œil d’or au centre de la reliure. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+  "artPrompt": "Lectrice Aveugle — Ange aux yeux bandés d’or qui récite un psautier ouvert flottant devant elle, lettres de lumière qui s’échappent des pages. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "CEL-013",
@@ -2123,11 +2131,11 @@
  {
   "id": "CEL-045",
   "number": 45,
-  "name": "L’Aube Avant la Lumière",
-  "title": "Premier jour",
+  "name": "Métatron, la Voix du Trône",
+  "title": "Le scribe de Dieu",
   "faction": "celeste",
   "rarity": "S",
-  "category": "Entité céleste",
+  "category": "Archange",
   "power": 10,
   "role": "U",
   "stats": {
@@ -2147,8 +2155,8 @@
     "key": "aegis"
    }
   ],
-  "visual": "Un soleil naissant, encore enveloppé de ténèbres, dont la première lueur dessine un visage.",
-  "lore": "Avant le premier rayon, il y eut une intention. Cette carte en est le souvenir.",
+  "visual": "Archange immense aux trente-six ailes de lumière dorée, visage serein, tenant un livre de feu ouvert, entouré d’anneaux d’yeux célestes.",
+  "lore": "Il écrit tout ce qui a été et tout ce qui sera. Les pages qu’il a déchirées sont devenues ce bestiaire.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2162,11 +2170,15 @@
    "gold"
   ],
   "art": {
-   "form": "orb",
-   "type": "sun",
+   "form": "hum",
+   "head": "face",
+   "body": "robe",
+   "wings": "six",
+   "arms": "spread",
+   "halo": "ring",
    "scene": "heaven"
   },
   "image": "assets/art/CEL-045.webp",
-  "artPrompt": "L’Aube Avant la Lumière — Un soleil naissant, encore enveloppé de ténèbres, dont la première lueur dessine un visage. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+  "artPrompt": "Métatron, la Voix du Trône — Archange immense aux trente-six ailes de lumière dorée, visage serein, tenant un livre de feu ouvert, entouré d’anneaux d’yeux célestes. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

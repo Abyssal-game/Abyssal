@@ -2583,11 +2583,11 @@
  {
   "id": "PRI-053",
   "number": 53,
-  "name": "Le Premier Souffle",
-  "title": "Ce qui s’éveilla",
+  "name": "Ouroboros, le Serpent Sans Fin",
+  "title": "Le commencement est la fin",
   "faction": "primordial",
   "rarity": "S",
-  "category": "Entité du Néant",
+  "category": "Dragon primordial",
   "power": 10,
   "role": "M",
   "stats": {
@@ -2611,8 +2611,8 @@
     "value": 2
    }
   ],
-  "visual": "Un portail d’or dans le Néant, d’où s’échappe le premier souffle du monde, chargé de sept couleurs.",
-  "lore": "Avant le temps, il n’existait que le Néant. Puis quelque chose s’éveilla. Le voici.",
+  "visual": "Serpent cosmique colossal enroulé en cercle parfait, mordant sa propre queue, écailles faites de galaxies et de flammes originelles.",
+  "lore": "Avant le temps, il n’y avait que lui. Il se dévore depuis toujours, et c’est de cette faim que le monde est né.",
   "evolution": null,
   "sets": [
    "neant"
@@ -2628,11 +2628,11 @@
    "gold"
   ],
   "art": {
-   "form": "orb",
-   "type": "portal",
+   "form": "serpent",
+   "scale": 1.1,
    "scene": "void"
   },
   "image": "assets/art/PRI-053.webp",
-  "artPrompt": "Le Premier Souffle — Un portail d’or dans le Néant, d’où s’échappe le premier souffle du monde, chargé de sept couleurs. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+  "artPrompt": "Ouroboros, le Serpent Sans Fin — Serpent cosmique colossal enroulé en cercle parfait, mordant sa propre queue, écailles faites de galaxies et de flammes originelles. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]
