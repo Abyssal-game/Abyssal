@@ -117,6 +117,22 @@
     "brenna",
     "aldric",
     "sylea",
-    "morgane"
+    "morgane",
+    "kael",
+    "ossian",
+    "thalia",
+    "lucien"
+  ],
+  "chests": [
+    "bois",
+    "fer",
+    "or",
+    "abyssal"
+  ],
+  "factions": [
+    "sauvage",
+    "necrotique",
+    "primordial",
+    "artificiel"
   ]
 }

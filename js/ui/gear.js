@@ -2,6 +2,7 @@
 import { BASES, GEAR_RARITY, SLOTS, EFFECTS, AFFIXES, CHESTS, KEYS, itemStats, spellPower } from '../core/gear.js';
 import { HEROES, SKILLS } from '../core/heroes.js';
 import { esc } from './dom.js';
+import { hasChestArt } from '../art/assets.js';
 
 const P = {
   axe: '<path d="M14 42 34 14"/><path d="M28 10c6-2 12 2 12 9-5 0-8-1-10-4"/><path d="M28 10c-2 5-1 10 3 12 2-3 3-6 3-9"/><path d="M12 39l5 5"/>',
@@ -20,6 +21,9 @@ const P = {
   amulet: '<path d="M10 8c2 10 8 14 14 14s12-4 14-14"/><path d="M24 22l9 9-9 10-9-10z"/><path d="M24 27v8"/>',
   feather: '<path d="M14 40C14 22 22 10 38 8c0 16-10 26-24 28"/><path d="M14 40 32 16"/><path d="M20 30l6 0M24 24l6 0"/>',
   eye: '<path d="M6 24c6-9 12-12 18-12s12 3 18 12c-6 9-12 12-18 12S12 33 6 24z"/><circle cx="24" cy="24" r="6"/><path d="M24 18v12"/>',
+  lute: '<ellipse cx="20" cy="30" rx="10" ry="11"/><circle cx="20" cy="30" r="3"/><path d="M26 22 38 8"/><path d="M35 6l5 5"/>',
+  scythe: '<path d="M14 42 32 8"/><path d="M30 10c-8-4-18-2-22 6 7-2 14-1 20 2"/><path d="M12 40l4 3"/>',
+  skull: '<path d="M14 22a10 10 0 1 1 20 0v5l-3 2v5H17v-5l-3-2z"/><circle cx="20" cy="22" r="2.5"/><circle cx="28" cy="22" r="2.5"/><path d="M22 34v-3M26 34v-3M24 34v10"/>',
   tome: '<path d="M10 10h12c2 0 2 2 2 2v28s0-2-2-2H10z"/><path d="M38 10H26c-2 0-2 2-2 2v28s0-2 2-2h12z"/><path d="M31 18l-2 4h4l-2 4"/>',
 };
 export function gearIcon(type) {
@@ -57,7 +61,8 @@ export function itemTileHTML(it, { id = '', wearer = null, attrs = '', big = fal
 }
 
 // Coffre dessiné (couvercle séparé pour l'animation d'ouverture)
-export function chestSVG(type) {
+export function chestSVG(type, { open = false } = {}) {
+  if (hasChestArt(type)) return `<img class="ch-img" alt="" src="assets/chests/${type}${open ? '-open' : ''}.webp">`;
   const c = CHESTS[type].color;
   const gem = type === 'abyssal' ? '<path d="M60 64l7 8-7 9-7-9z" fill="#E9B8FF"/>' : type === 'or' ? '<circle cx="60" cy="72" r="6" fill="#FFF0B8"/>' : '<rect x="55" y="66" width="10" height="12" rx="2" fill="#2A1A10"/>';
   const band = type === 'bois' ? '#6E4A2A' : type === 'fer' ? '#5C6676' : type === 'or' ? '#B8862C' : '#5B1F8A';

@@ -1049,3 +1049,19 @@ body.battle-mode .tb { min-height: calc(100dvh - var(--safe-t) - var(--safe-b) -
 .dc-ch-t { display: flex; flex-direction: column; flex: 1; }
 .dc-chests > .ic:last-child { color: var(--mute); }
 .section-title .more a { color: inherit; }
+/* Coffres illustrés */
+.ch-img { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; -webkit-mask: radial-gradient(closest-side, #000 72%, transparent); mask: radial-gradient(closest-side, #000 72%, transparent); }
+.cho-chest .ch-img { position: relative; z-index: 1; }
+.cho-chest.open .ch-img { animation: chPop .5s cubic-bezier(.2, 1.6, .4, 1); }
+@keyframes chPop { from { transform: scale(.9); filter: brightness(2.2); } }
+.sigil-img { object-fit: contain; vertical-align: -.25em; }
+/* Héros à rejoindre, arrivée d'un nouveau héros */
+.hc.locked { filter: grayscale(.75) brightness(.6); pointer-events: none; }
+.hc-lock { position: absolute; top: 8px; left: 8px; z-index: 2; display: inline-flex; align-items: center; gap: 4px; font: 700 .72rem/1 var(--f-ui); color: #fff; background: rgba(0, 0, 0, .75); padding: 5px 8px; border-radius: 99px; }
+.hc-lock .ic { width: 13px; height: 13px; }
+.hc-t .small { font-size: .7rem; color: var(--mute); }
+.dc-news { display: flex; flex-direction: column; gap: 10px; }
+.dc-new-h { display: flex; gap: 12px; align-items: center; }
+.dc-new-h img { width: 64px; height: 84px; object-fit: cover; object-position: 50% 15%; border-radius: 10px; border: 2px solid var(--hc); box-shadow: 0 0 16px color-mix(in srgb, var(--hc) 50%, transparent); flex: none; }
+.dc-new-h > span { display: flex; flex-direction: column; gap: 3px; }
+.dc-new-h b { color: var(--hc); font-family: var(--f-display); }

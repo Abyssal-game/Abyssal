@@ -1,7 +1,7 @@
 // Écran de combat : héros (bas) contre créatures (haut). Frise d'initiative, intentions
 // ennemies affichées, compétences de classe, jauge d'invocation, parade et frappe en rythme.
 import { RARITY } from '../config.js';
-import { HEROES, INVOCATIONS, FAMILIES, huntStage, HUNT_STAGES } from '../core/heroes.js';
+import { HEROES, INVOCATIONS, FAMILIES, huntStage, HUNT_STAGES, RES_NAMES } from '../core/heroes.js';
 import { SKILLS, MAX_ENERGY, beginTurn, current, timeline, front, alive, targets, act, plan, canInvoke, intentPreview } from '../core/battle.js';
 import { artUrl } from '../art/assets.js';
 import { heroArtUrl } from '../ui/hero.js';
@@ -10,7 +10,7 @@ import { icon } from '../ui/icons.js';
 import { esc, toast, openSheet } from '../ui/dom.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-const STATUS = [['stun', 'Étourdi'], ['poison', 'Poison'], ['burn', 'Brûlure'], ['frozen', 'Gelé'], ['mark', 'Marqué'], ['exposed', 'Exposé'], ['shield', 'Bouclier'], ['taunt', 'Défi'], ['armorUp', 'Garde'], ['defend', 'Défense'], ['enraged', 'Enragé']];
+const STATUS = [['stealth', 'Ombre'], ['bear', 'Ours'], ['inspired', 'Inspiré'], ['weak', 'Affaibli'], ['regen', 'Régén.'], ['stun', 'Étourdi'], ['poison', 'Poison'], ['burn', 'Brûlure'], ['frozen', 'Gelé'], ['mark', 'Marqué'], ['exposed', 'Exposé'], ['shield', 'Bouclier'], ['taunt', 'Défi'], ['armorUp', 'Garde'], ['defend', 'Défense'], ['enraged', 'Enragé']];
 const INTENT = {
   attack: ['swords', 'Attaque'], hunt: ['swords', 'Traque'], double: ['swords', 'Double attaque'], poison: ['skull', 'Morsure venimeuse'],
   aoe: ['flame', 'Frappe toute l’équipe'], guard: ['shield', 'Bouclier'], heal: ['heart', 'Soin'], charge: ['sparkle', 'Prépare une attaque…'],
@@ -75,7 +75,7 @@ export function runBattle(app, root, { title, onEnd }) {
       <span class="tb-art"><img alt="" src="${heroArtUrl(u.id)}"></span>
       <span class="tb-nm">${esc(h.name.split(' ')[0])} <small>Niv. ${u.level}</small></span>
       <span class="tb-hp"><span class="hpbar"><i style="width:${Math.max(0, u.hp / u.maxHp) * 100}%"></i></span><b>${Math.max(0, u.hp)}</b></span>
-      <span class="tb-en">${Array.from({ length: MAX_ENERGY }, (_, i) => `<i class="${i < u.energy ? 'on' : ''}"></i>`).join('')}${h.res ? `<span class="tb-res" title="${h.res === 'rage' ? 'Rage' : 'Ferveur'}"><i style="width:${u.res || 0}%"></i></span>` : ''}</span>
+      <span class="tb-en">${Array.from({ length: MAX_ENERGY }, (_, i) => `<i class="${i < u.energy ? 'on' : ''}"></i>`).join('')}${h.res ? `<span class="tb-res" title="${RES_NAMES[h.res] || ''}"><i style="width:${u.res || 0}%"></i></span>` : ''}</span>
       ${statusHTML(u)}${u.st.protectedBy ? '<span class="tb-prot">' + icon('shield') + '</span>' : ''}
     </button>`;
   };

@@ -6,7 +6,7 @@ import { loadSave, writeSave, defaultSave, today } from './save.js';
 import { createBattle, autoBattle } from './battle.js';
 import { DESCENT, floorDoors, floorEnemies, roomLoot, blessingChoices } from './descent.js';
 import { BASES, SLOT_ORDER, CHESTS, GEAR_RARITY, canUse, gearBonus, itemScore, rollChest, forgeCost, salvageValue, LEG_PITY } from './gear.js';
-import { HERO_ORDER, INVOCATIONS, makeHero, levelOf, invocationPower, enemyLevel, huntStage, HUNT_STAGES, totalXpFor } from './heroes.js';
+import { HEROES, HERO_ORDER, INVOCATIONS, makeHero, levelOf, invocationPower, enemyLevel, huntStage, HUNT_STAGES, totalXpFor } from './heroes.js';
 
 const RI = (r) => RARITY_ORDER.indexOf(r);
 
@@ -392,6 +392,7 @@ export class Game {
     const d = this.s.descent;
     const day = today(this.clock());
     if (d.day !== day) { d.day = day; d.used = 0; d.bestToday = 0; }
+    if ((d.best || 0) >= 3 && HERO_ORDER.some((k) => !this.s.heroes[k] && HEROES[k].unlock <= d.best)) this.unlockHeroes();
     // expédition de l'ancien système (cartes au combat) : on la clôt en rendant tout le butin
     if (d.run && d.run.v !== 2) {
       const l = d.run.loot || {};
@@ -410,6 +411,21 @@ export class Game {
   heroWounded(key) { return (this.hero(key).wound || 0) > this.clock().getTime(); }
   woundLeft(key) { return Math.max(0, (this.hero(key).wound || 0) - this.clock().getTime()); }
   ownedHeroes() { return HERO_ORDER.filter((k) => this.s.heroes[k]); }
+  // Nouveaux héros : ils rejoignent l'Antre quand le record de profondeur atteint leur étage.
+  // Ils arrivent avec un niveau proche de celui de l'équipe, pour être jouables tout de suite.
+  unlockHeroes() {
+    const best = this.s.descent.best || 0, got = [];
+    for (const k of HERO_ORDER) {
+      const need = HEROES[k].unlock;
+      if (this.s.heroes[k] || !need || best < need) continue;
+      const lv = Math.max(1, Math.round(this.s.party.reduce((a, h) => a + this.heroLevel(h), 0) / Math.max(1, this.s.party.length)) - 1);
+      this.s.heroes[k] = { xp: totalXpFor(lv), wound: 0 };
+      got.push(k);
+    }
+    if (got.length) this.s.heroNews = [...(this.s.heroNews || []), ...got];
+    return got;
+  }
+  takeHeroNews() { const n = this.s.heroNews || []; if (n.length) { this.s.heroNews = []; this.persist(); } return n; }
   setParty(keys) {
     const list = [...new Set(keys)].filter((k) => this.s.heroes[k]).slice(0, DESCENT.teamSize);
     this.s.party = list;
@@ -709,6 +725,7 @@ export class Game {
   recordDepth(floor) {
     const d = this.descent(), run = d.run;
     d.best = Math.max(d.best, floor);
+    this.unlockHeroes();
     // une expédition commencée la veille ne compte pas pour le record ni les missions du jour
     if (!run || run.day === d.day) { d.bestToday = Math.max(d.bestToday, floor); this.track('depth', floor); }
   }

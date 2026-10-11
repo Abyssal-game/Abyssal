@@ -75,6 +75,7 @@ export async function openChestFlow(app, type, { after } = {}) {
     </div>`, { cls: 'chest-sheet', label: c.name, onClose: () => { if (g.arsenal().pending) { /* le choix reste en attente : il sera proposé à nouveau */ } after && after(); app.flushProgress(); } });
   const box = sheet.body.querySelector('.cho');
   const chest = box.querySelector('.cho-chest');
+  if (chest.querySelector('.ch-img')) new Image().src = `assets/chests/${type}-open.webp`; // préchargement
   let opened = false;
   const open = async () => {
     if (opened) return; opened = true;
@@ -84,6 +85,8 @@ export async function openChestFlow(app, type, { after } = {}) {
     await wait(reduced ? 50 : 900);
     chest.classList.remove('shake');
     chest.classList.add('open', `r-${GEAR_ORDER[best]}`);
+    const img = chest.querySelector('.ch-img');
+    if (img) img.src = `assets/chests/${type}-open.webp`;
     try { navigator.vibrate?.(best >= 2 ? [30, 50, 80] : 30); } catch (e) { /* rien */ }
     app.sfx.reveal(best === 3 ? 'M' : best === 2 ? 'HR' : 'R');
     await wait(reduced ? 50 : 450);

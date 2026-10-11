@@ -34,9 +34,11 @@ export default function descent(app, root) {
     const torches = g.torchesLeft();
     const last = ui.outcome;
     const danger = g.floorDanger(1);
+    const news = g.takeHeroNews();
     root.innerHTML = `
       <header class="screen-head dc-head"><h1>La Descente</h1><p class="muted">Chaque jour, l’Abysse change de visage. Jusqu’où oseras-tu descendre ?</p></header>
       ${last ? summaryHTML(last) : ''}
+      ${news.length ? `<section class="panel ornate dc-news">${news.map((k) => `<div class="dc-new-h" style="--hc:${HEROES[k].color}"><img alt="" src="${heroArtUrl(k)}"><span><b>${esc(HEROES[k].name)} rejoint ton Antre !</b><span class="small">${esc(HEROES[k].cls)} · ${esc(HEROES[k].role)}</span><span class="small muted">${esc(HEROES[k].passive)}</span></span></div>`).join('')}<p class="small muted">Touche son portrait plus bas pour l’ajouter à ton équipe.</p></section>` : ''}
       <section class="panel dc-stats">
         <div><span class="dc-torches">${Array.from({ length: DESCENT.torches }, (_, i) => `<i class="${i < torches ? 'on' : ''}">${icon('flame')}</i>`).join('')}</span><span class="small muted">Torches du jour</span></div>
         <div><b>${d.bestToday ? `Étage ${d.bestToday}` : '—'}</b><span class="small muted">Record du jour</span></div>
@@ -59,7 +61,7 @@ export default function descent(app, root) {
           <li>Chaque jour : ${DESCENT.torches} torches, donc ${DESCENT.torches} expéditions. Le donjon est le même pour tout le monde ce jour-là.</li>
           <li>Tes <b>3 héros</b> affrontent les créatures du Bestiaire. Plus tu descends, plus leur <b>niveau</b> monte : fais progresser tes héros à chaque expédition.</li>
           <li>Les ennemis <b>annoncent</b> leur prochaine action au-dessus de leur tête. Quand l’un d’eux <b>prépare</b> une attaque, interromps-le (Lance de givre), protège la cible (Égide), ou <b>pare</b> au bon moment quand le cercle rouge se resserre.</li>
-          <li>Chaque classe a son style : la rage de Brenna, la protection d’Aldric, la marque de Syléa, les éléments de Morgane (feu sur glace ou glace sur feu = Brisure).</li>
+          <li>Chaque classe a son style : la rage de Brenna, la protection d’Aldric, la marque de Syléa, les éléments de Morgane (feu sur glace ou glace sur feu = Brisure). D’autres héros te rejoignent en descendant : Kaël (étage 3), Thalia (6), Lucien (9) et Ossian (12).</li>
           <li>La <b>jauge d’invocation</b> se remplit pendant les combats. Pleine, elle permet d’appeler ton invocation : Phénix, Bahamut, Fenrir.</li>
           <li>Les salles au trésor, les élites et les gardiens cachent des <b>coffres</b> : armes, armures, reliques et sorts pour tes héros, à ouvrir dans l’Arsenal.</li>
           <li>Après chaque étage : <b>remonter</b> avec le butin, ou <b>descendre</b>. Si toute l’équipe tombe, la moitié des éclats et des cendres est perdue, ainsi que les boosters et coffres trouvés. Un héros tombé est affaibli ${DESCENT.woundHours} h.</li>

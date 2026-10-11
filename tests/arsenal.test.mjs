@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { loadCatalog, MemoryStorage, rngFrom } from './helpers.mjs';
 import { Game } from '../js/core/game.js';
 import { BASES, CHESTS, LEG_PITY, rollChest, itemStats, canUse } from '../js/core/gear.js';
-import { SKILLS, makeEnemy } from '../js/core/heroes.js';
+import { SKILLS, makeEnemy, HERO_ORDER, HEROES } from '../js/core/heroes.js';
 import { createBattle, act, beginTurn, current } from '../js/core/battle.js';
 import { migrate } from '../js/core/save.js';
 
@@ -15,7 +15,7 @@ test('arsenal : modèles cohérents (sorts connus, emplacements, héros)', () =>
   for (const [k, b] of Object.entries(BASES)) {
     assert.ok(['arme', 'armure', 'relique', 'sort'].includes(b.slot), k);
     if (b.spell) assert.ok(SKILLS[b.spell]?.spell, k);
-    (b.for || []).forEach((h) => assert.ok(['brenna', 'aldric', 'sylea', 'morgane'].includes(h), k));
+    (b.for || []).forEach((h) => assert.ok(HERO_ORDER.includes(h), k));
   }
   assert.ok(canUse('hache', 'brenna') && !canUse('hache', 'morgane') && canUse('talisman', 'morgane'));
   assert.deepEqual(itemStats({ b: 'hache', r: 'C', f: 0 }), { atk: 3 });
@@ -128,3 +128,34 @@ test('boutique : coffre de fer et clés vont dans l’Arsenal', () => {
   g.buyItem('cleOr');
   assert.throws(() => g.buyItem('cleOr'), /Limite/);
 });
+
+test('nouvelles classes : arrivée par la profondeur, mécaniques en combat', () => {
+  const g = newGame('n');
+  assert.ok(!g.s.heroes.kael);
+  g.startRun();
+  g.recordDepth(6);
+  assert.ok(g.s.heroes.kael && g.s.heroes.thalia && !g.s.heroes.lucien);
+  assert.deepEqual(g.takeHeroNews(), ['kael', 'thalia']);
+  assert.deepEqual(g.takeHeroNews(), []);
+  // chaque classe a ses compétences, ses armes et ses sorts
+  for (const k of HERO_ORDER) {
+    HEROES[k].skills.forEach((sk) => assert.ok(SKILLS[sk], sk));
+    assert.ok(Object.values(BASES).some((b) => b.slot === 'arme' && b.for?.includes(k)), k);
+    assert.equal(Object.values(BASES).filter((b) => b.slot === 'sort' && b.for?.includes(k)).length, 2, k);
+    assert.ok(Object.values(BASES).some((b) => b.slot === 'armure' && b.for?.includes(k)), k);
+  }
+  // l'assassin caché n'est jamais visé
+  const enemies = catalog.cards.filter((c) => c.rarity === 'C').slice(0, 2).map((c) => makeEnemy(c, { level: 1 }));
+  const heroes = ['kael', 'thalia', 'ossian'].map((k) => H(k));
+  const st = createBattle(heroes, enemies, 11);
+  const kael = Object.values(st.units).find((u) => u.id === 'kael');
+  kael.st.stealth = 2;
+  for (let i = 0; i < 30 && !st.over; i++) {
+    beginTurn(st); const u = current(st); if (!u) break;
+    if (u.kind === 'enemy') { const ev = act(st, { actor: u.uid, action: 'enemy' }); ev.filter((e) => e.t === 'hit' && !e.aoe).forEach((e) => assert.notEqual(e.u, kael.uid)); }
+    else act(st, { actor: u.uid, action: 'defend' });
+    kael.st.stealth = 2;
+  }
+});
+import { makeHero } from '../js/core/heroes.js';
+function H(k) { return makeHero(k, { level: 3 }); }

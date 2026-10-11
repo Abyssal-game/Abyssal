@@ -20,8 +20,8 @@ export const GEAR_RARITY = {
 export const GEAR_ORDER = ['C', 'R', 'E', 'L'];
 
 // Poids d'armure par héros
-const WEIGHT = { brenna: 'lourde', aldric: 'lourde', sylea: 'legere', morgane: 'etoffe' };
-const HEAVY = ['brenna', 'aldric'], LIGHT = ['sylea'], CLOTH = ['morgane'];
+const WEIGHT = { brenna: 'lourde', aldric: 'lourde', sylea: 'legere', morgane: 'etoffe', kael: 'legere', thalia: 'legere', lucien: 'legere', ossian: 'etoffe' };
+const HEAVY = ['brenna', 'aldric'], LIGHT = ['sylea', 'kael', 'thalia', 'lucien'], CLOTH = ['morgane', 'ossian'];
 
 // Modèles d'objets. for : héros qui peuvent l'utiliser (absent = tous).
 // stats à la rareté Commune (la vitesse ne grandit pas avec la rareté).
@@ -40,6 +40,18 @@ export const BASES = {
   aube:     { slot: 'arme', name: 'Aube-Jurée',         type: 'sword',  for: ['aldric'], stats: { atk: 2, mag: 2 }, leg: true, fx: 'heal' },
   murmure:  { slot: 'arme', name: 'Murmure-Sylvestre',  type: 'bow',    for: ['sylea'],  stats: { atk: 3.5 }, leg: true, fx: 'volley' },
   eclipse:  { slot: 'arme', name: 'Cœur d’Éclipse',     type: 'orb',    for: ['morgane'], stats: { mag: 3.5 }, leg: true, fx: 'shatter' },
+  kriss:    { slot: 'arme', name: 'Kriss d’ombre',      type: 'dagger', for: ['kael'],   stats: { atk: 3 } },
+  griffes:  { slot: 'arme', name: 'Griffes de chat-noir', type: 'dagger', for: ['kael'],  stats: { atk: 2, hp: 3 }, spd: 1 },
+  chene:    { slot: 'arme', name: 'Bâton de chêne',     type: 'staff',  for: ['thalia'], stats: { atk: 1, mag: 2, hp: 4 } },
+  serpe:    { slot: 'arme', name: 'Serpe de gui',       type: 'dagger', for: ['thalia'], stats: { atk: 2, mag: 1 } },
+  luth:     { slot: 'arme', name: 'Luth enchanté',      type: 'lute',   for: ['lucien'], stats: { mag: 3 } },
+  rapiere:  { slot: 'arme', name: 'Rapière de duel',    type: 'sword',  for: ['lucien'], stats: { atk: 2, mag: 1 }, spd: 1 },
+  faux:     { slot: 'arme', name: 'Faux d’os',          type: 'scythe', for: ['ossian'], stats: { mag: 3 } },
+  crane:    { slot: 'arme', name: 'Crâne-reliquaire',   type: 'skull',  for: ['ossian'], stats: { mag: 2, hp: 5 } },
+  crepuscule: { slot: 'arme', name: 'Lame du Crépuscule', type: 'dagger', for: ['kael'], stats: { atk: 3.5 }, leg: true, fx: 'execute' },
+  racine:   { slot: 'arme', name: 'Racine-Mère',        type: 'staff',  for: ['thalia'], stats: { atk: 1.5, mag: 2 }, leg: true, fx: 'bearStart' },
+  lyre:     { slot: 'arme', name: 'Lyre d’Orphée',      type: 'lute',   for: ['lucien'], stats: { mag: 3.5 }, leg: true, fx: 'song' },
+  sceptre:  { slot: 'arme', name: 'Sceptre des Morts',  type: 'skull',  for: ['ossian'], stats: { mag: 3.5 }, leg: true, fx: 'souls' },
   // Armures
   cuirasse: { slot: 'armure', name: 'Cuirasse de fer',     type: 'plate', for: HEAVY, stats: { hp: 12, def: 1 } },
   harnois:  { slot: 'armure', name: 'Harnois des Sceaux',  type: 'plate', for: HEAVY, stats: { hp: 8, def: 2 } },
@@ -50,6 +62,14 @@ export const BASES = {
   egide:    { slot: 'armure', name: 'Égide des Anciens',   type: 'plate', for: HEAVY, stats: { hp: 12, def: 2 }, leg: true, fx: 'ward' },
   voile:    { slot: 'armure', name: 'Voile de Nuit',       type: 'leather', for: LIGHT, stats: { hp: 10, def: 1 }, leg: true, fx: 'dodge' },
   astres:   { slot: 'armure', name: 'Manteau des Astres',  type: 'robe', for: CLOTH, stats: { hp: 9, mag: 1 }, leg: true, fx: 'energy' },
+  venin:    { slot: 'sort', name: 'Lame empoisonnée',  type: 'tome', for: ['kael'],   spell: 'venin' },
+  eventail: { slot: 'sort', name: 'Éventail de lames', type: 'tome', for: ['kael'],   spell: 'eventail' },
+  ronces:   { slot: 'sort', name: 'Ronces',            type: 'tome', for: ['thalia'], spell: 'ronces' },
+  renouveau: { slot: 'sort', name: 'Renouveau',        type: 'tome', for: ['thalia'], spell: 'renouveau' },
+  berceuse: { slot: 'sort', name: 'Berceuse',          type: 'tome', for: ['lucien'], spell: 'berceuse' },
+  ballade:  { slot: 'sort', name: 'Ballade héroïque',  type: 'tome', for: ['lucien'], spell: 'ballade' },
+  malediction: { slot: 'sort', name: 'Malédiction',    type: 'tome', for: ['ossian'], spell: 'malediction' },
+  pacte:    { slot: 'sort', name: 'Pacte de sang',     type: 'tome', for: ['ossian'], spell: 'pacte' },
   // Reliques (tous les héros)
   talisman: { slot: 'relique', name: 'Talisman d’os',     type: 'talisman', stats: { hp: 10 } },
   anneau:   { slot: 'relique', name: 'Anneau de sang',    type: 'ring', stats: { atk: 1, mag: 1 } },
@@ -79,6 +99,10 @@ export const EFFECTS = {
   energy:  'Commence chaque combat avec toute son énergie.',
   gauge:   'Chaque action remplit la jauge d’invocation de 4 points de plus.',
   vamp:    'Vol de vie : se soigne de 15 % des dégâts infligés.',
+  execute: 'Exécution frappe à ×3,5 (au lieu de ×2,6) les cibles affaiblies.',
+  bearStart: 'Commence chaque combat en forme d’ours.',
+  song:    'Les chants durent 3 tours au lieu de 2.',
+  souls:   'Commence chaque combat avec 3 âmes.',
 };
 // Propriétés bonus (une sur les épiques, une en plus de l'effet sur les légendaires)
 export const AFFIXES = {

@@ -89,6 +89,9 @@ export default function heroes(app, root) {
       <header class="screen-head"><h1>Héros</h1><p class="muted">Ceux qui descendent dans l’Abysse. Ils gagnent en niveau à chaque expédition.</p></header>
       <div class="hc-grid">${HERO_ORDER.filter((k) => g.s.heroes[k]).map((k) => heroCardHTML(g, k, { selected: g.s.party.includes(k), order: g.s.party.indexOf(k) + 1 })).join('')}</div>
       <p class="small muted">Touche un héros pour voir sa fiche. Ton équipe de 3 se compose dans la Descente.</p>
+      ${HERO_ORDER.some((k) => !g.s.heroes[k]) ? `<h2 class="section-title">À rejoindre</h2>
+      <div class="hc-grid">${HERO_ORDER.filter((k) => !g.s.heroes[k]).map((k) => `<div class="hc locked" style="--hc:${HEROES[k].color}"><span class="hc-art"><img alt="" src="${heroArtUrl(k)}"></span><span class="hc-lock">${icon('lock')} Étage ${HEROES[k].unlock}</span><span class="hc-t"><b>${esc(HEROES[k].name)}</b><span>${esc(HEROES[k].cls)} · ${esc(HEROES[k].race)}</span><span class="small">${esc(HEROES[k].role)}</span></span></div>`).join('')}</div>
+      <p class="small muted">Atteins l’étage indiqué dans la Descente pour qu’ils rejoignent ton Antre.</p>` : ''}
       <h2 class="section-title">Invocations</h2>
       <div class="ic-grid">${INVOCATION_ORDER.map((k) => invocationCardHTML(g, k, { selected: g.s.invocation === k })).join('')}</div>
       <div class="row gap"><a class="btn block" href="#/arsenal">${icon('shield')}Arsenal</a><a class="btn block" href="#/descente">${icon('swords')}Descente</a></div>`;

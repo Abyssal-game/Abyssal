@@ -44,8 +44,38 @@ export const HEROES = {
     skills: ['feu', 'givre'],
     lore: 'Née pendant une éclipse, elle entend le feu et la glace se disputer dans ses veines.',
   },
+  kael: {
+    name: 'Kaël Lame-Cendre', cls: 'Assassin', race: 'Humain', role: 'Se cache et exécute', color: '#E0533A', icon: 'swords',
+    base: { hp: 68, atk: 12, mag: 3, def: 3, spd: 8 }, res: null, unlock: 3,
+    passive: 'Coup dans le dos : +35 % de dégâts contre les ennemis sous la moitié de leurs PV.',
+    skills: ['ombre', 'execution'],
+    lore: 'On dit qu’il a appris son métier dans les cendres d’une ville que personne n’a revue. Il ne dément pas.',
+  },
+  thalia: {
+    name: 'Thalia Cœur-de-Chêne', cls: 'Druidesse', race: 'Demi-sylvestre', role: 'Change de forme et soigne', color: '#7CC24A', icon: 'heart',
+    base: { hp: 90, atk: 10, mag: 10, def: 5, spd: 5 }, res: null, unlock: 6,
+    passive: 'Forme d’ours : défense ×1,5 et dégâts +30 % tant que dure la transformation.',
+    skills: ['ours', 'seve'],
+    lore: 'La forêt sacrée l’a vue naître d’un gland tombé un soir d’orage. Elle se bat pour que la forêt survive à l’Abysse.',
+  },
+  lucien: {
+    name: 'Lucien Chante-Brume', cls: 'Barde', race: 'Demi-elfe', role: 'Renforce l’équipe, affaiblit l’ennemi', color: '#C8649B', icon: 'sparkle',
+    base: { hp: 74, atk: 7, mag: 11, def: 3, spd: 7 }, res: null, unlock: 9,
+    passive: 'Inspiration : chacun de ses chants remplit aussi la jauge d’invocation de 10 points.',
+    skills: ['hymne', 'dissonance'],
+    lore: 'Il prétend avoir chanté pour une reine des fées. La reine, elle, prétend ne pas s’en souvenir.',
+  },
+  ossian: {
+    name: 'Ossian le Pâle', cls: 'Nécromancien', race: 'Humain', role: 'Moissonne les âmes', color: '#5FD3A0', icon: 'skull',
+    base: { hp: 66, atk: 4, mag: 14, def: 2, spd: 5 }, res: 'ames', unlock: 12,
+    passive: 'Moisson : chaque ennemi vaincu lui donne une âme (5 au maximum), que Danse macabre libère.',
+    skills: ['drain', 'macabre'],
+    lore: 'Il parle aux morts depuis l’enfance. Les vivants, eux, ont cessé de lui répondre.',
+  },
 };
-export const HERO_ORDER = ['brenna', 'aldric', 'sylea', 'morgane'];
+export const HERO_ORDER = ['brenna', 'aldric', 'sylea', 'morgane', 'kael', 'thalia', 'lucien', 'ossian'];
+// Ressources affichées sous le portrait en combat
+export const RES_NAMES = { rage: 'Rage', ferveur: 'Ferveur', ames: 'Âmes' };
 
 export const SKILLS = {
   fendoir: { name: 'Fendoir', cost: 1, target: 'enemy', desc: 'Frappe à 120 %, plus 1 % par point de rage (consomme la rage).' },
@@ -56,6 +86,14 @@ export const SKILLS = {
   volee:   { name: 'Volée de flèches', cost: 2, target: 'enemies', desc: 'Touche toute la ligne (×1,7 sur les cibles marquées).' },
   feu:     { name: 'Trait de feu', cost: 1, target: 'enemy', desc: 'Dégâts magiques ×1,5 et Brûlure 3 tours.' },
   givre:   { name: 'Lance de givre', cost: 1, target: 'enemy', desc: 'Dégâts ×1,1, Gel 2 tours et interrompt une attaque en préparation.' },
+  ombre:    { name: 'Voile d’ombre', cost: 1, target: 'self', desc: 'Disparaît : ne peut plus être ciblé, et sa prochaine attaque fait double dégâts.' },
+  execution: { name: 'Exécution', cost: 2, target: 'enemy', desc: 'Frappe à ×1,5 ; à ×2,6 si la cible a moins de 30 % de ses PV.' },
+  ours:     { name: 'Forme d’ours', cost: 1, target: 'self', desc: 'Se transforme 3 tours : défense ×1,5, dégâts +30 %, attire les coups.' },
+  seve:     { name: 'Sève de vie', cost: 1, target: 'ally', desc: 'Soigne 20 % des PV, puis régénère 6 % par tour pendant 3 tours.' },
+  hymne:    { name: 'Hymne de bravoure', cost: 1, target: 'self', desc: 'Toute l’équipe inflige +25 % de dégâts pendant 2 tours.' },
+  dissonance: { name: 'Dissonance', cost: 1, target: 'enemies', desc: 'Magie ×0,5 sur toute la ligne ; les ennemis frappent 25 % moins fort 2 tours.' },
+  drain:    { name: 'Drain de vie', cost: 1, target: 'enemy', desc: 'Magie ×1,2 ; se soigne de la moitié des dégâts.' },
+  macabre:  { name: 'Danse macabre', cost: 2, target: 'enemies', desc: 'Les morts frappent toute la ligne : ×0,5, +25 % par âme (consomme les âmes).' },
   // Sorts de l'Arsenal (ajoutés par l'emplacement « Sort »)
   seisme:   { name: 'Séisme', cost: 2, target: 'enemies', spell: true, desc: 'Frappe toute la ligne (×0,8) ; +10 rage par cible.' },
   rempart:  { name: 'Rempart runique', cost: 2, target: 'self', spell: true, desc: 'Chaque héros reçoit un bouclier qui annule le prochain coup.' },
@@ -65,6 +103,14 @@ export const SKILLS = {
   percant:  { name: 'Tir perçant', cost: 2, target: 'enemy', spell: true, desc: 'Dégâts ×2, ignore la défense.' },
   meteore:  { name: 'Pluie de météores', cost: 3, target: 'enemies', spell: true, desc: 'Magie ×1,2 sur toute la ligne et Brûlure 2 tours.' },
   blizzard: { name: 'Blizzard', cost: 2, target: 'enemies', spell: true, desc: 'Magie ×0,6 sur toute la ligne et Gel 1 tour.' },
+  venin:    { name: 'Lame empoisonnée', cost: 1, target: 'enemy', spell: true, desc: 'Dégâts ×0,8 et Poison 3 tours.' },
+  eventail: { name: 'Éventail de lames', cost: 2, target: 'enemies', spell: true, desc: 'Frappe toute la ligne (×0,7).' },
+  ronces:   { name: 'Ronces', cost: 2, target: 'enemies', spell: true, desc: 'Magie ×0,6 sur toute la ligne et Poison 2 tours.' },
+  renouveau: { name: 'Renouveau', cost: 2, target: 'self', spell: true, desc: 'Toute l’équipe régénère 6 % des PV par tour pendant 3 tours.' },
+  berceuse: { name: 'Berceuse', cost: 2, target: 'enemy', spell: true, desc: 'Endort la cible 1 tour et interrompt une attaque en préparation.' },
+  ballade:  { name: 'Ballade héroïque', cost: 2, target: 'self', spell: true, desc: '+1 énergie pour chaque allié.' },
+  malediction: { name: 'Malédiction', cost: 1, target: 'enemy', spell: true, desc: 'La cible est exposée 3 tours et frappe 25 % moins fort.' },
+  pacte:    { name: 'Pacte de sang', cost: 0, target: 'self', spell: true, desc: 'Sacrifie 15 % de ses PV pour gagner 2 énergie.' },
 };
 
 // ——— Invocations ——————————————————————————————————————————————————————
@@ -82,7 +128,7 @@ export const invocationPower = (level, variant = 'normal') => (1 + 0.1 * (level 
 
 // ——— Unités ————————————————————————————————————————————————————————————
 let seq = 0;
-const blank = () => ({ stun: 0, burn: 0, frozen: 0, mark: 0, exposed: 0, taunt: 0, protectedBy: null, protecting: 0, defend: false, shield: 0, armorUp: 0, enraged: false, charging: false, poison: 0 });
+const blank = () => ({ stealth: 0, inspired: 0, weak: 0, bear: 0, regen: 0, stun: 0, burn: 0, frozen: 0, mark: 0, exposed: 0, taunt: 0, protectedBy: null, protecting: 0, defend: false, shield: 0, armorUp: 0, enraged: false, charging: false, poison: 0 });
 
 // gear : bonus de l'équipement (voir gearBonus dans gear.js)
 export function makeHero(key, { level = 1, wounded = false, blessings = [], gear = null } = {}) {
@@ -105,6 +151,10 @@ export function makeHero(key, { level = 1, wounded = false, blessings = [], gear
     if (fx.shatter) u.shatter = 3;
     if (fx.ward) u.ward = true;
     if (fx.energy) u.energy = 3;
+    if (fx.execute) u.execMult = 3.5;
+    if (fx.souls) u.res = 60;
+    if (fx.bearStart) u.st.bear = 3;
+    if (fx.song) u.songTurns = 3;
     u.dodge = (fx.dodge ? 0.15 : 0) + 0.1 * (fx.a_esquive || 0);
     u.lifesteal = (fx.vamp ? 0.15 : 0) + 0.08 * (fx.a_vamp || 0);
     u.gaugeBonus = (fx.gauge ? 4 : 0) + 2 * (fx.a_lien || 0);

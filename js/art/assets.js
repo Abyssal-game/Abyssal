@@ -5,6 +5,8 @@ import { renderArt, renderMystery } from './procedural.js';
 
 let available = new Set();
 let heroArt = new Set();
+let chestArt = new Set();
+let factionArt = new Set();
 const cache = new Map();
 
 export async function loadArtManifest(base = './') {
@@ -14,6 +16,8 @@ export async function loadArtManifest(base = './') {
       const m = await r.json();
       available = new Set(m.available || []);
       heroArt = new Set(m.heroes || []);
+      chestArt = new Set(m.chests || []);
+      factionArt = new Set(m.factions || []);
       // Dos de carte illustré (facultatif) : assets/backs/back.webp
       if (m.cardBack && typeof document !== 'undefined') {
         document.documentElement.style.setProperty('--card-back', `url("${new URL(m.cardBack, document.baseURI).href}")`);
@@ -27,6 +31,11 @@ export async function loadArtManifest(base = './') {
 
 export function hasRealArt(id, alt = false) { return available.has(alt ? `${id}-alt` : id); }
 export function hasHeroArt(key) { return heroArt.has(key); }
+// Coffres illustrés : assets/chests/<clé>.webp et <clé>-open.webp
+export function hasChestArt(key) { return chestArt.has(key); }
+// Symboles de factions illustrés : assets/factions/<clé>.webp, utilisés seulement quand les 7 sont là
+// (pour garder un style homogène).
+export function factionArtReady(keys) { return keys.every((k) => factionArt.has(k)); }
 
 // Les URL ne sont jamais révoquées : une image déjà affichée peut être
 // redécodée par le navigateur à tout moment (défilement, mise en cache).

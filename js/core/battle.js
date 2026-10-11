@@ -48,9 +48,11 @@ export function timeline(st, n = 8) {
 
 // ——— Intentions ennemies (affichées au joueur avant qu'elles ne frappent) ———
 const pickHero = (st, how = 'random') => {
-  const hs = front(st, 'ally');
+  let hs = front(st, 'ally');
   if (!hs.length) return null;
-  const taunt = hs.filter((h) => h.st.taunt);
+  // un héros caché dans l'ombre ne peut pas être visé (sauf s'il est seul)
+  if (hs.some((h) => !h.st.stealth)) hs = hs.filter((h) => !h.st.stealth);
+  const taunt = hs.filter((h) => h.st.taunt || h.st.bear);
   if (taunt.length) return taunt[0].uid;
   if (how === 'weak') return hs.slice().sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0].uid;
   return hs[Math.floor(rand(st) * hs.length)].uid;
@@ -67,7 +69,7 @@ export function setIntent(st, e) {
 export function intentPreview(st, e) {
   const i = e.intent;
   if (!i) return null;
-  const a = e.atk * (e.st.enraged ? 1.4 : 1);
+  const a = e.atk * (e.st.enraged ? 1.4 : 1) * (e.st.weak ? 0.75 : 1);
   const m = { attack: 1, hunt: 1.35, double: 1.2, poison: 0.7, heavy: 2.2, stunheavy: 1.4, aoe: 0.6 }[i.k];
   return { ...i, dmg: m ? Math.round(a * m) : 0 };
 }
@@ -107,7 +109,10 @@ function hurt(st, src, tgt, amount, ev, kind = 'hit', extra = {}) {
   }
   if (tgt.hp <= 0) {
     ev.push({ t: 'die', u: tgt.uid });
-    if (tgt.side === 'enemy') st.kills.push(tgt.id);
+    if (tgt.side === 'enemy') {
+      st.kills.push(tgt.id);
+      front(st, 'ally').forEach((h) => { if (h.id === 'ossian') h.res = Math.min(100, (h.res || 0) + 20); });
+    }
     if (tgt.st.protecting) front(st, 'ally').forEach((h) => { if (h.st.protectedBy === tgt.uid) h.st.protectedBy = null; });
     // un ennemi de réserve entre en ligne et annonce son intention
     front(st, 'enemy').forEach((e) => { if (!e.intent) setIntent(st, e); if (e.ct < st.now) e.ct = st.now + tick(e) * 0.5; });
@@ -123,7 +128,7 @@ function check(st) {
 }
 // Multiplicateur subi par une cible (marque, exposition, maîtrise du Bestiaire)
 const taken = (st, t) => 1 + (t.st.mark ? 0.3 : 0) + (t.st.exposed ? 0.3 : 0) + (t.side === 'enemy' && st.mastery[t.id] ? 0.1 : 0);
-const defOf = (u) => u.def * (u.st.armorUp ? 1.5 : 1);
+const defOf = (u) => u.def * (u.st.armorUp ? 1.5 : 1) * (u.st.bear ? 1.5 : 1);
 const dmg = (st, base, t, mult = 1) => Math.max(1, base * mult * taken(st, t) - defOf(t) * 0.4);
 
 // ——— Début de tour ———
@@ -133,7 +138,8 @@ export function beginTurn(st) {
   const ev = [];
   st.now = u.ct;
   u.st.defend = false;
-  for (const k of ['mark', 'exposed', 'taunt', 'armorUp']) if (u.st[k]) u.st[k]--;
+  for (const k of ['mark', 'exposed', 'taunt', 'armorUp', 'inspired', 'weak', 'bear']) if (u.st[k]) u.st[k]--;
+  if (u.st.regen) { u.st.regen--; heal(st, u, u.maxHp * 0.06, ev); }
   if (u.st.protecting) { u.st.protecting--; if (!u.st.protecting) front(st, 'ally').forEach((h) => { if (h.st.protectedBy === u.uid) h.st.protectedBy = null; }); }
   if (u.st.burn) { u.st.burn--; hurt(st, null, u, Math.max(3, u.maxHp * 0.06), ev, 'dot', { burn: true }); }
   if (u.hp > 0 && u.st.poison) { u.st.poison--; hurt(st, null, u, Math.max(3, u.maxHp * 0.06), ev, 'dot', { poison: true }); }
@@ -173,9 +179,11 @@ export function act(st, a) {
     if (a.strike === 'perfect') gain(st, GAUGE.perfect);
     const t = a.target ? st.units[a.target] : null;
     const base = Math.max(u.atk, u.mag * 0.7);
+    const stealth = !!u.st.stealth;
+    const boost = (tgt) => (u.st.inspired ? 1.25 : 1) * (u.st.bear ? 1.3 : 1) * (stealth ? 2 : 1) * (u.id === 'kael' && tgt.hp < tgt.maxHp / 2 ? 1.35 : 1);
     const hit = (tgt, amount, extra = {}) => {
       if (!tgt || tgt.hp <= 0) return 0;
-      const d = hurt(st, u, tgt, amount, ev, 'hit', extra);
+      const d = hurt(st, u, tgt, amount * boost(tgt), ev, 'hit', stealth ? { ...extra, crit: true } : extra);
       if (u.lifesteal && d) heal(st, u, d * u.lifesteal, ev);
       return d;
     };
@@ -241,11 +249,29 @@ export function act(st, a) {
           break;
         }
         case 'percant': { const tt = t && t.hp > 0 ? t : foes[0]; if (tt) hit(tt, Math.max(1, u.atk * 2 * s * (u.sp || 1) * taken(st, tt)), { crit: a.strike === 'perfect' }); break; }
+        // Nouvelles classes
+        case 'ombre': u.st.stealth = 2; front(st, 'enemy').forEach((e) => { if (e.intent?.t === u.uid) e.intent.t = pickHero(st); }); ev.push({ t: 'status', u: u.uid, s: 'Dans l’ombre' }); break;
+        case 'execution': { const tt = t && t.hp > 0 ? t : foes[0]; if (tt) hit(tt, dmg(st, u.atk, tt, (tt.hp < tt.maxHp * 0.3 ? u.execMult || 2.6 : 1.5) * s), { crit: a.strike === 'perfect' }); break; }
+        case 'ours': u.st.bear = 3; ev.push({ t: 'status', u: u.uid, s: 'Forme d’ours' }); break;
+        case 'seve': { const tt = t || u; heal(st, tt, tt.maxHp * 0.2 + u.mag * 0.5, ev); tt.st.regen = 3; ev.push({ t: 'status', u: tt.uid, s: 'Régénération' }); break; }
+        case 'hymne': front(st, 'ally').forEach((h) => { h.st.inspired = u.songTurns || 2; }); gain(st, 10); ev.push({ t: 'status', u: u.uid, s: 'Hymne !' }); break;
+        case 'dissonance': foes.forEach((f) => { hit(f, dmg(st, u.mag, f, 0.5)); if (f.hp > 0) f.st.weak = u.songTurns || 2; }); gain(st, 10); break;
+        case 'drain': { const tt = t && t.hp > 0 ? t : foes[0]; const d = hit(tt, dmg(st, u.mag, tt, 1.2 * s), { crit: a.strike === 'perfect' }); if (d) heal(st, u, d * 0.5, ev); break; }
+        case 'macabre': { const souls = Math.floor((u.res || 0) / 20); foes.forEach((f) => hit(f, dmg(st, u.mag, f, 0.5 + 0.25 * souls))); u.res = 0; break; }
+        case 'venin': { const tt = t && t.hp > 0 ? t : foes[0]; hit(tt, dmg(st, u.atk, tt, 0.8 * s * (u.sp || 1))); if (tt && tt.hp > 0) { tt.st.poison = 3; ev.push({ t: 'status', u: tt.uid, s: 'Poison' }); } break; }
+        case 'eventail': foes.forEach((f) => hit(f, dmg(st, u.atk, f, 0.7 * (u.sp || 1)))); break;
+        case 'ronces': foes.forEach((f) => { hit(f, dmg(st, u.mag, f, 0.6 * (u.sp || 1))); if (f.hp > 0) f.st.poison = Math.max(f.st.poison, 2); }); break;
+        case 'renouveau': front(st, 'ally').forEach((h) => { h.st.regen = 3; heal(st, h, h.maxHp * 0.06 * (u.sp || 1), ev); }); ev.push({ t: 'status', u: u.uid, s: 'Renouveau' }); break;
+        case 'berceuse': { const tt = t && t.hp > 0 ? t : foes[0]; if (tt) { if (tt.st.charging) { tt.st.charging = false; tt.turns++; setIntent(st, tt); ev.push({ t: 'interrupt', u: tt.uid }); } tt.st.stun = 1; ev.push({ t: 'status', u: tt.uid, s: 'Endormi' }); } break; }
+        case 'ballade': front(st, 'ally').forEach((h) => { h.energy = Math.min(MAX_ENERGY, h.energy + 1); }); gain(st, 10); ev.push({ t: 'status', u: u.uid, s: 'Ballade !' }); break;
+        case 'malediction': { const tt = t && t.hp > 0 ? t : foes[0]; if (tt) { tt.st.exposed = 3; tt.st.weak = 2; ev.push({ t: 'status', u: tt.uid, s: 'Maudit' }); } break; }
+        case 'pacte': { const c = Math.min(u.hp - 1, Math.round(u.maxHp * 0.15)); u.hp -= c; ev.push({ t: 'dot', a: null, u: u.uid, d: c, hp: u.hp }); u.energy = Math.min(MAX_ENERGY, u.energy + 2); break; }
         case 'meteore': foes.forEach((f) => { hit(f, dmg(st, u.mag, f, 1.2 * (u.sp || 1))); if (f.hp > 0) f.st.burn = Math.max(f.st.burn, 2); }); break;
         case 'blizzard': foes.forEach((f) => { const sh = f.st.burn; hit(f, dmg(st, u.mag, f, 0.6 * (u.sp || 1) * (sh ? u.shatter || 2 : 1)), { shatter: !!sh }); if (f.hp > 0) { if (sh) f.st.burn = 0; else f.st.frozen = Math.max(f.st.frozen, 1); } }); break;
         default: break;
       }
     }
+    if (stealth && !(a.action === 'skill' && a.skill === 'ombre')) u.st.stealth = 0;
     if (a.action !== 'invoke') gain(st, GAUGE.action + (u.gaugeBonus || 0));
   }
   u.ct = Math.max(u.ct, st.now) + tick(u) * speed;
@@ -256,9 +282,9 @@ export function act(st, a) {
 
 function enemyAct(st, e, a, ev) {
   const intent = e.intent || { k: 'attack', t: pickHero(st) };
-  const atk = e.atk * (e.st.enraged ? 1.4 : 1);
-  // cible annoncée ; si elle est tombée, une autre
-  const tgtOf = () => { const t = intent.t && st.units[intent.t]; const taunt = front(st, 'ally').find((h) => h.st.taunt); return taunt || (t && t.hp > 0 ? t : st.units[pickHero(st)]); };
+  const atk = e.atk * (e.st.enraged ? 1.4 : 1) * (e.st.weak ? 0.75 : 1);
+  // cible annoncée ; si elle est tombée ou cachée dans l'ombre, une autre
+  const tgtOf = () => { const t = intent.t && st.units[intent.t]; const taunt = front(st, 'ally').find((h) => h.st.taunt || h.st.bear); return taunt || (t && t.hp > 0 && !t.st.stealth ? t : st.units[pickHero(st)]); };
   const strikeHero = (mult, extra = {}) => {
     const t = tgtOf();
     if (!t) return 0;
@@ -330,6 +356,32 @@ export function plan(st, u) {
   if (has('priere') && allies.filter((h) => h.hp < h.maxHp * 0.65).length >= 2) return A('skill', { skill: 'priere' });
   if (has('jugement') && u.energy >= 2) return A('skill', { skill: 'jugement', target: foes.slice().sort((x, y) => y.hp - x.hp)[0]?.uid });
   if (has('percant') && u.energy >= 3) return A('skill', { skill: 'percant', target: prey() });
+  if (u.id === 'kael') {
+    const weak = foes.filter((f) => f.hp < f.maxHp * 0.3).sort((x, y) => x.hp - y.hp)[0];
+    if (weak && has('execution')) return A('skill', { skill: 'execution', target: weak.uid });
+    if (!u.st.stealth && has('ombre') && u.energy >= 2) return A('skill', { skill: 'ombre' });
+  }
+  if (u.id === 'thalia') {
+    const low = allies.filter((h) => h.hp < h.maxHp * 0.55 && !h.st.regen).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
+    if (low && has('seve')) return A('skill', { skill: 'seve', target: low.uid });
+    if (!u.st.bear && has('ours') && (charging || u.hp > u.maxHp * 0.6)) return A('skill', { skill: 'ours' });
+  }
+  if (u.id === 'lucien') {
+    if (!allies.some((h) => h.st.inspired) && has('hymne')) return A('skill', { skill: 'hymne' });
+    if (foes.length >= 2 && !foes.some((f) => f.st.weak) && has('dissonance')) return A('skill', { skill: 'dissonance' });
+  }
+  if (u.id === 'ossian') {
+    if ((u.res || 0) >= 60 && has('macabre') && foes.length >= 2) return A('skill', { skill: 'macabre' });
+    if (has('drain')) return A('skill', { skill: 'drain', target: prey() });
+  }
+  if (has('berceuse') && charging) return A('skill', { skill: 'berceuse', target: charging.uid });
+  if (has('ballade') && allies.filter((h) => h.energy < 2).length >= 2) return A('skill', { skill: 'ballade' });
+  if (has('renouveau') && allies.filter((h) => h.hp < h.maxHp * 0.7).length >= 2) return A('skill', { skill: 'renouveau' });
+  if (has('ronces') && foes.length >= 2) return A('skill', { skill: 'ronces' });
+  if (has('eventail') && foes.length >= 3) return A('skill', { skill: 'eventail' });
+  if (has('venin') && prey() && !st.units[prey()].st.poison) return A('skill', { skill: 'venin', target: prey() });
+  if (has('malediction') && u.energy >= 2) return A('skill', { skill: 'malediction', target: foes.slice().sort((x, y) => y.hp - x.hp)[0]?.uid });
+  if (has('pacte') && u.energy <= 1 && u.hp > u.maxHp * 0.6) return A('skill', { skill: 'pacte' });
   if (u.id === 'aldric') {
     const low = allies.filter((h) => h.hp < h.maxHp * 0.45).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
     if (low && has('lumiere')) return A('skill', { skill: 'lumiere', target: low.uid });
