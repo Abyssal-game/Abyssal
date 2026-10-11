@@ -1,4 +1,4 @@
-// Accueil : logo, créature du jour, deux accès principaux et ce qui est à faire aujourd'hui.
+// Accueil : logo, deux accès principaux et ce qui est à faire aujourd'hui.
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { artUrl, hasRealArt } from '../art/assets.js';
 import { icon, EMBLEM, sigil } from '../ui/icons.js';
@@ -12,14 +12,6 @@ import { FUSION } from '../config.js';
 export default function home(app, root) {
   const g = app.game, cat = app.catalog, s = g.s;
   const total = g.total(), owned = g.uniqueCount();
-  // Créature du jour : la plus belle carte illustrée que le joueur possède déjà (rien n'est dévoilé).
-  const ownedArt = cat.cards.filter((c) => g.owns(c.id) && hasRealArt(c.id));
-  const best = ['S', 'M', 'HR', 'R'].map((r) => ownedArt.filter((c) => c.rarity === r)).find((l) => l.length);
-  const mythics = cat.cards.filter((c) => c.rarity === 'M');
-  const pool = best || (ownedArt.length ? ownedArt : mythics);
-  const hero = pool[Math.floor(seeded('jour:' + today())() * pool.length)];
-  const heroOwned = g.owns(hero.id);
-  const fac = cat.faction[hero.faction];
   const ev = g.event();
   const daily = g.dailyAmount();
   const recent = s.recent.map((id) => cat.get(id)).filter(Boolean).slice(0, 10);
@@ -43,16 +35,10 @@ export default function home(app, root) {
   }
 
   root.innerHTML = `
-    <section class="hero ${heroOwned ? '' : 'hero-empty'}" style="--fc:${fac.colors.secondary}">
-      ${heroOwned ? `<div class="hero-art"><img alt="" src="${artUrl(hero)}"></div>` : ''}
-      <div class="hero-veil"></div>
-      <div class="hero-content">
-        <div class="logo">${EMBLEM}<h1 class="wordmark">ABYSSAL</h1><p class="tagline"><i></i>Le Bestiaire interdit<i></i></p></div>
-        ${heroOwned ? `<button class="hero-caption" data-act="hero" aria-label="Voir la créature du jour">
-          <span class="small muted">Créature du jour</span>
-          <b>${esc(hero.name)}</b>
-        </button>` : '<span></span>'}
-      </div>
+    <section class="home-brand">
+      <span class="hb-emblem">${EMBLEM}</span>
+      <h1 class="wordmark">ABYSSAL</h1>
+      <p class="tagline"><i></i>Le Bestiaire interdit<i></i></p>
     </section>
 
     <div class="home-acts">
@@ -65,7 +51,6 @@ export default function home(app, root) {
   `;
   lazyArt(root);
   bindActions(root, {
-    hero() { app.openCard(hero.id); },
     fusion() { openFusion(app); },
     mission(el) {
       try { const r = g.claimMission(Number(el.dataset.i)); app.sfx.coin(); toast(`Mission accomplie : <b>+${r.shards} éclats</b>`, { kind: 'success', icon: 'crystal' }); app.refresh(); }
