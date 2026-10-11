@@ -343,3 +343,13 @@ img.emblem { object-fit: contain; }
 .how-ic { position: relative; flex: none; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; color: var(--hc); background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--hc) 30%, transparent), rgba(10, 11, 16, .95) 75%); border: 1px solid color-mix(in srgb, var(--hc) 60%, transparent); }
 .how-ic .ic { width: 22px; height: 22px; }
 .how-ic em { position: absolute; right: -4px; bottom: -4px; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font: 800 .65rem/1 var(--f-ui); font-style: normal; color: #1A1206; background: var(--hc); }
+
+/* Ouverture des boosters : autel rituel illustré (version éclatante pour les cartes rares) */
+.opening .op-bg { background: linear-gradient(180deg, rgba(6, 5, 10, .25), rgba(6, 5, 10, .55)), url(../assets/ui/open-bg.webp) center 60% / cover no-repeat, #08070C !important; }
+.opening.epic .op-bg { background: linear-gradient(180deg, rgba(6, 5, 10, .15), rgba(6, 5, 10, .45)), url(../assets/ui/open-epic.webp) center 60% / cover no-repeat, #08070C !important; }
+.opening .op-rays { opacity: .18 !important; }
+/* Retour d'expédition : bandeau de victoire ou de défaite */
+.dc-sum { background: linear-gradient(90deg, rgba(10, 11, 16, .92) 30%, rgba(10, 11, 16, .3) 80%), var(--bn) right center / cover no-repeat, #0B0C12 !important; }
+.dc-sum.won { --bn: url(../assets/ui/bn-victory.webp); }
+.dc-sum.lost { --bn: url(../assets/ui/bn-defeat.webp); }
+.dc-sum { text-align: left !important; } .dc-sum .row { justify-content: flex-start !important; } .dc-sum > * { max-width: 72%; } .dc-sum .btn.block { max-width: 72%; }
