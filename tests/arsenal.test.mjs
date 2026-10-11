@@ -59,7 +59,7 @@ test('équipement : équiper, statistiques, sort ajouté, forge, démantèlement
   assert.throws(() => g.equip(id, 'morgane'), /ne peut pas/);
   g.equip(id, 'brenna');
   assert.equal(g.wearer(id), 'brenna');
-  assert.equal(g.heroUnit('brenna').atk, before + 5);
+  assert.equal(g.heroUnit('brenna').atk, before + itemStats(g.gearItem(id)).atk);
   const sp = g.pushItem({ b: 'seisme', r: 'E', f: 0, a: null });
   g.equip(sp, 'brenna');
   assert.ok(g.heroUnit('brenna').skills.includes('seisme'));
