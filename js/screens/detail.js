@@ -68,7 +68,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
       const inShow = g.s.showcase.includes(current);
       const inTeam = g.s.team.includes(current), li = g.cardLevelInfo(current);
       const rit = ritualFrom();
-      const tabs = [['combat', 'swords', 'Combat'], ['story', 'book', 'Histoire'], ['rarity', 'crystal', 'Rareté']];
+      const tabs = [['combat', 'team', 'Combat'], ['story', 'history', 'Histoire'], ['rarity', 'crystal', 'Rareté']];
       const TAB = {
         combat: `${combatHTML(g, card)}`,
         story: `<p class="lore big">« ${esc(card.lore)} »</p>
@@ -85,11 +85,11 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
           <span class="dt-chip">×${e.n} exemplaire${e.n > 1 ? 's' : ''}</span>
           <span class="dt-chip gold">Niv. ${li.level}</span>
         </div>
-        <button class="btn ${inTeam ? 'ghost' : 'primary'} block dt-team" data-act="team">${icon('swords')}${inTeam ? 'Dans ton équipe · retirer' : 'Ajouter à mon équipe'}</button>
+        <button class="btn ${inTeam ? 'ghost' : 'primary'} block dt-team" data-act="team">${picon('team')}${inTeam ? 'Dans ton équipe · retirer' : 'Ajouter à mon équipe'}</button>
         <div class="dt-acts">
-          <button class="dt-act ${isAvatar ? 'on' : ''}" data-act="avatar">${picon('seal')}<span>${isAvatar ? 'Mon avatar' : 'Avatar'}</span></button>
-          <button class="dt-act ${inShow ? 'on' : ''}" data-act="showcase">${picon('crown')}<span>${inShow ? 'En vitrine' : 'Vitrine'}</span></button>
-          <button class="dt-act" data-act="artonly">${picon('holo')}<span>Illustration</span></button>
+          <button class="dt-act ${isAvatar ? 'on' : ''}" data-act="avatar">${picon('avatar')}<span>${isAvatar ? 'Mon avatar' : 'Avatar'}</span></button>
+          <button class="dt-act ${inShow ? 'on' : ''}" data-act="showcase">${picon('showcase')}<span>${inShow ? 'En vitrine' : 'Vitrine'}</span></button>
+          <button class="dt-act" data-act="artonly">${picon('illus')}<span>Illustration</span></button>
           ${rit ? `<button class="dt-act" data-act="ritual">${picon('ritual')}<span>Élever</span></button>` : ''}
         </div>
         <div class="dt-tabs" role="tablist">${tabs.map(([k, ic, l]) => `<button class="dt-tab" role="tab" data-act="tab" data-v="${k}" aria-selected="${dtab === k}">${picon(ic)}<span>${l}</span></button>`).join('')}</div>

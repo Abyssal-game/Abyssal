@@ -31,9 +31,11 @@ const ROUTES = {
   parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen,
 };
 const TABS = [
-  ['antre', 'home', 'Accueil'], ['collection', 'cards', 'Collection'], ['boutique', 'booster', 'Boosters'],
-  ['descente', 'swords', 'Aventure'], ['menu', 'menu', 'Plus'],
+  ['antre', 'tab-home', 'Accueil'], ['collection', 'tab-collection', 'Collection'], ['boutique', 'tab-boosters', 'Boosters'],
+  ['descente', 'tab-adventure', 'Aventure'], ['menu', 'tab-more', 'Plus'],
 ];
+// icônes peintes de la barre du bas (assets/icons)
+const tabIcon = (k) => `<img class="tab-pic" alt="" src="assets/icons/${k}.webp">`;
 const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', equipe: 'descente', coffres: 'descente', heros: 'descente', arsenal: 'descente', marchand: 'descente' };
 // Fond illustré de chaque page (l'Accueil et la Descente posent le leur)
 const ROUTE_SCENE = { boutique: 'shop', collection: 'collection', equipe: 'team', coffres: 'chests', bestiaire: 'bestiary', succes: 'trophies', profil: 'profile', menu: 'menu', parametres: 'menu', compte: 'menu', factions: 'factions', faction: 'factions' };
@@ -91,8 +93,8 @@ function renderChrome() {
   document.getElementById('tabbar').innerHTML = TABS.map(([key, ic, label]) => {
     const cur = key === tab ? ' aria-current="page"' : '';
     const badge = key === 'collection' && nNew ? `<span class="badge">${nNew > 99 ? '99+' : nNew}</span>` : key === 'boutique' && ticketCount ? `<span class="badge">${ticketCount}</span>` : key === 'antre' && (g.canDailyClaim() || g.missionsToClaim()) ? '<span class="badge">!</span>' : key === 'descente' && (g.chestCount() || g.torchesLeft()) ? `<span class="badge">${g.chestCount() || g.torchesLeft()}</span>` : '';
-    if (key === 'boutique') return `<a class="tab tab-main" href="#/boutique"${cur}><span class="orb">${icon(ic)}</span>${label}${badge}</a>`;
-    return `<a class="tab" href="#/${key}"${cur}>${icon(ic)}${label}${badge}</a>`;
+    if (key === 'boutique') return `<a class="tab tab-main" href="#/boutique"${cur}><span class="orb">${tabIcon(ic)}</span>${label}${badge}</a>`;
+    return `<a class="tab" href="#/${key}"${cur}>${tabIcon(ic)}${label}${badge}</a>`;
   }).join('');
 }
 

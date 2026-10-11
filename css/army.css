@@ -437,3 +437,11 @@ img.emblem { object-fit: contain; }
 .dc-week.done { background: linear-gradient(90deg, rgba(12, 30, 20, .92) 40%, rgba(10, 20, 14, .35) 90%), url(../assets/ui/bn-weekly.webp) right center / cover no-repeat, #0B0C12 !important; }
 .dc-week-lbl { display: inline-flex; align-items: center; gap: 4px; } .dc-week-lbl .picon { width: 20px; height: 20px; }
 .td-daily { margin: 0 -14px; padding-left: 14px; padding-right: 14px; background: linear-gradient(90deg, rgba(12, 10, 18, .94) 45%, rgba(12, 10, 18, .4)), url(../assets/ui/bn-streak.webp) right center / cover no-repeat; }
+
+/* Barre du bas : icônes peintes, éteintes au repos, allumées sur l'onglet actif */
+.tab .tab-pic { width: 34px; height: 34px; object-fit: contain; filter: saturate(.45) brightness(.75); transition: transform .2s, filter .2s; }
+.tab[aria-current="page"] .tab-pic { filter: drop-shadow(0 0 7px rgba(242, 193, 78, .7)); transform: translateY(-2px) scale(1.12); }
+.tab { gap: 1px; }
+.tab-main .orb .tab-pic { width: 40px; height: 40px; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .6)); transform: none; }
+.tab-main[aria-current="page"] .orb .tab-pic { transform: scale(1.06); }
+.dt-team .picon { width: 26px; height: 26px; margin-right: 4px; }
