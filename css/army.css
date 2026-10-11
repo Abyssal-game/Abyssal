@@ -266,3 +266,11 @@ body.battle-mode.scene::before { display: none; }
 .hb-title { margin: 6px 0 0; }
 .hb-title img { width: min(88vw, 420px); height: auto; display: block; margin: 0 auto; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .9)); }
 img.emblem { object-fit: contain; }
+
+/* Tutoriel : fenêtre centrée, entièrement visible (bord bas de l'iPhone compris), contenu centré */
+.sheet-wrap:has(.sheet.welcome) { align-items: center; padding: calc(var(--safe-t) + 12px) 12px calc(var(--safe-b) + 12px); }
+.sheet.welcome { border-radius: 22px; border-bottom: 1px solid var(--line); max-height: 100%; padding: 22px 18px 20px; }
+.sheet.welcome .sheet-close { position: absolute; top: 10px; right: 10px; float: none; margin: 0; }
+.sheet.welcome .wl { padding-top: 18px; }
+.sheet.welcome .wl-ic { margin-left: auto; margin-right: auto; }
+.sheet.welcome .wl-btns .btn { white-space: nowrap; font-size: .9rem; padding-left: 10px; padding-right: 10px; }
