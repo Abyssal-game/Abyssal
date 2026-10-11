@@ -195,7 +195,7 @@ export default function descent(app, root) {
     if (battle) return;
     playing = true;
     const room = run.room;
-    const title = `${room === 'boss' ? 'Gardien de l’étage' : room === 'elite' ? 'Combat d’élite' : 'Combat'} · étage ${run.floor}`;
+    const title = `Étage ${run.floor}${room === 'boss' ? ' · Gardien' : room === 'elite' ? ' · Élite' : ''}`;
     battle = runBattle(app, root, { title, onEnd: () => {
       battle = null; playing = false;
       let out;

@@ -61,28 +61,29 @@ export function runBattle(app, root, { title, onEnd }) {
     const danger = ['heavy', 'stunheavy'].includes(p.k);
     return `<span class="tb-int ${danger ? 'danger' : ''} ${p.k === 'charge' ? 'charging' : ''}">${icon(ic)}<b>${p.dmg ? p.dmg : ''}</b><em>${esc(label)}${t && t.hp > 0 && p.k !== 'aoe' ? ` · ${esc(t.name.split(' ')[0])}` : ''}</em></span>`;
   };
+  // Tuiles en forme de carte : illustration pleine, nom et PV posés en bas
   const enemyTile = (u, active) => `<button class="tb-u enemy ${active ? 'active' : ''} ${u.boss ? 'boss' : ''} ${u.st.charging ? 'charging' : ''}" data-uid="${u.uid}" style="--rc:${RARITY[u.rarity]?.color || '#888'}">
+      <span class="tb-art"><img alt="" src="${artUrl(cat.get(u.id))}"></span>
       ${intentHTML(u)}
-      <span class="tb-art"><img alt="" src="${artUrl(cat.get(u.id), { lite: true })}"></span>
-      <span class="tb-lv">${u.boss ? 'Gardien · ' : u.elite ? 'Élite · ' : ''}Niv. ${u.level}</span>
-      <span class="tb-nm">${esc(u.name)}</span>
-      <span class="tb-hp"><span class="hpbar"><i style="width:${Math.max(0, u.hp / u.maxHp) * 100}%"></i></span><b>${Math.max(0, u.hp)}</b></span>
       ${statusHTML(u)}
+      <span class="tb-foot"><span class="tb-nm">${esc(u.name)}</span><span class="tb-sub">${u.boss ? 'Gardien · ' : u.elite ? 'Élite · ' : ''}Niv. ${u.level}</span>
+        <span class="tb-hp"><span class="hpbar"><i style="width:${Math.max(0, u.hp / u.maxHp) * 100}%"></i></span><b>${Math.max(0, u.hp)}</b></span></span>
     </button>`;
   const heroTile = (u, active) => {
     const h = HEROES[u.id];
     return `<button class="tb-u heroic ${active ? 'active' : ''} ${u.hp <= 0 ? 'dead' : ''}" data-uid="${u.uid}" style="--rc:${h.color}">
       <span class="tb-art"><img alt="" src="${heroArtUrl(u.id)}"></span>
-      <span class="tb-nm">${esc(h.name.split(' ')[0])} <small>Niv. ${u.level}</small></span>
-      <span class="tb-hp"><span class="hpbar"><i style="width:${Math.max(0, u.hp / u.maxHp) * 100}%"></i></span><b>${Math.max(0, u.hp)}</b></span>
-      <span class="tb-en">${Array.from({ length: MAX_ENERGY }, (_, i) => `<i class="${i < u.energy ? 'on' : ''}"></i>`).join('')}${h.res ? `<span class="tb-res" title="${RES_NAMES[h.res] || ''}"><i style="width:${u.res || 0}%"></i></span>` : ''}</span>
       ${statusHTML(u)}${u.st.protectedBy ? '<span class="tb-prot">' + icon('shield') + '</span>' : ''}
+      <span class="tb-foot"><span class="tb-nm">${esc(h.name.split(' ')[0])} <small>Niv. ${u.level}</small></span>
+        <span class="tb-hp"><span class="hpbar"><i style="width:${Math.max(0, u.hp / u.maxHp) * 100}%"></i></span><b>${Math.max(0, u.hp)}</b></span>
+        <span class="tb-en">${Array.from({ length: MAX_ENERGY }, (_, i) => `<i class="${i < u.energy ? 'on' : ''}"></i>`).join('')}${h.res ? `<span class="tb-res" title="${RES_NAMES[h.res] || ''}"><i style="width:${u.res || 0}%"></i></span>` : ''}</span></span>
     </button>`;
   };
   function draw() {
     if (!alive_) return;
     const cur = current(st);
     const en = front(st, 'enemy'), reserve = alive(st, 'enemy').length - en.length;
+    enEl.dataset.n = en.length;
     enEl.innerHTML = en.map((u) => enemyTile(u, cur && cur.uid === u.uid)).join('') + (reserve > 0 ? `<span class="tb-bench">+${reserve}</span>` : '');
     alEl.innerHTML = st.order.ally.map((id) => heroTile(st.units[id], cur && cur.uid === id)).join('');
     lineEl.innerHTML = timeline(st, 8).map((id, i) => { const u = st.units[id]; return `<span class="tb-t ${u.side} ${i === 0 ? 'now' : ''}"><img alt="" src="${u.kind === 'hero' ? heroArtUrl(u.id) : artUrl(cat.get(u.id), { lite: true })}"></span>`; }).join('');
