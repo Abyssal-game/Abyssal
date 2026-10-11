@@ -13,8 +13,8 @@ import { setScene, sceneUrl } from '../ui/scene.js';
 import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
 
-// Illustrations des portes et des bonus (l'élite reprend la porte de combat, teintée)
-const DOOR_ART = { fight: 'door-fight', elite: 'door-fight', boss: 'door-boss', rest: 'rest', altar: 'altar', treasure: 'treasure' };
+// Illustrations des portes et des bonus
+const DOOR_ART = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss', rest: 'rest', altar: 'altar', treasure: 'treasure' };
 const ROOM_ICON = { fight: 'swords', elite: 'skull', altar: 'star', rest: 'heart', treasure: 'crystal', boss: 'crown' };
 
 export default function descent(app, root) {

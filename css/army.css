@@ -252,7 +252,6 @@ body.battle-mode.scene::before { display: none; }
 .dc-door.has-art .dc-door-ic .ic { width: 20px; height: 20px; }
 .dc-door.has-art .small { color: #D9D3C4; text-shadow: 0 1px 3px #000; }
 .dc-door.has-art b { text-shadow: 0 2px 6px #000; }
-.dc-door.r-elite.has-art .dc-door-art { background: linear-gradient(180deg, rgba(8, 9, 13, 0) 30%, rgba(8, 9, 13, .78) 62%, rgba(8, 9, 13, .96)), linear-gradient(rgba(150, 70, 235, .75), rgba(150, 70, 235, .75)), var(--art) center 30% / cover no-repeat; background-blend-mode: normal, color, normal; }
 @media (max-width: 380px) { .dc-door.has-art { min-height: 180px; } .dc-door.r-boss.has-art { min-height: 220px; } }
 .dc-door.r-elite.has-art { border-color: rgba(194, 102, 255, .6); box-shadow: inset 0 0 30px rgba(0, 0, 0, .7), 0 0 18px rgba(194, 102, 255, .25); }
 .dc-door.r-boss.has-art { min-height: 280px; }
