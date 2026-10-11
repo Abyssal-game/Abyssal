@@ -3,7 +3,7 @@
 // Sauvegarde séparée (abyssal.v2) : la version actuelle du jeu n'est jamais touchée.
 import { TABLES, PITY, RARITY_ORDER } from '../../js/config.js';
 import { rollRarity, rollVariant, cryptoRandom } from '../../js/core/boosters.js';
-import { createDuel, autoDuel, duelUnit } from './duel.js';
+import { createDuel, autoDuel, duelUnit, GAUGE_MAX } from './duel.js';
 import { DESCENT, floorDoors, floorEnemies, blessingChoices, dailyRule } from '../../js/core/descent.js';
 
 // Bénédictions de l'autel adaptées au duel de cartes
@@ -60,6 +60,9 @@ export class Game2 {
     let s = null;
     try { const t = storage.getItem(SAVE_KEY); if (t) s = JSON.parse(t); } catch (e) { s = null; }
     this.s = s && s.v ? { ...defaults(this.clock().getTime()), ...s } : this.newSave();
+    // Expédition commencée avec l'ancien combat : elle est annulée et sa torche rendue.
+    const r = this.s.descent?.run;
+    if (r && r.duel !== 1) { if (!r.free && this.s.descent.used > 0) this.s.descent.used--; this.s.descent.run = null; this.persist(); }
   }
   newSave() {
     const s = defaults(this.clock().getTime());
@@ -169,8 +172,8 @@ export class Game2 {
     this.s.stats.runs++;
     const ult = this.ultimate(team);
     d.run = {
-      day: d.day, floor: 1, cleared: 0, phase: 'doors', cursed: cursed && !free, free, blessings: [], altar: null,
-      gauge: this.rule(d.day).key === 'lune' ? 50 : 0, ult: { key: ult.key, power: ult.power, card: ult.card },
+      duel: 1, day: d.day, floor: 1, cleared: 0, phase: 'doors', cursed: cursed && !free, free, blessings: [], altar: null,
+      gauge: this.rule(d.day).key === 'lune' ? Math.ceil(GAUGE_MAX / 2) : 0, ult: { key: ult.key, power: ult.power, card: ult.card },
       team: team.map((id) => { const u = duelUnit(this.catalog.get(id), { level: this.level(id) }); return { id, hp: u.maxHp, maxHp: u.maxHp, fallen: false }; }),
       shards: 0, chests: [], newSeen: [],
     };
