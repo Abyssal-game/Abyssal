@@ -67,3 +67,6 @@ export const EMBLEM = '<img class="emblem" src="assets/brand/emblem.webp" alt=""
 
 export const icon = (name) => ICONS[name] || '';
 export const sigil = (faction) => (factionArtReady(Object.keys(SIGILS)) && SIGILS[faction] ? `<img class="sigil sigil-img" alt="" src="assets/factions/${faction}.webp">` : SIGILS[faction] || '');
+
+// Icônes peintes (assets/icons) : défis du jour, étapes de l'Aventure
+export const picon = (name) => `<img class="picon" alt="" src="assets/icons/${name}.webp">`;

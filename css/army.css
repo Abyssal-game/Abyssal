@@ -353,3 +353,7 @@ img.emblem { object-fit: contain; }
 .dc-sum.won { --bn: url(../assets/ui/bn-victory.webp); }
 .dc-sum.lost { --bn: url(../assets/ui/bn-defeat.webp); }
 .dc-sum { text-align: left !important; } .dc-sum .row { justify-content: flex-start !important; } .dc-sum > * { max-width: 72%; } .dc-sum .btn.block { max-width: 72%; }
+/* Icônes peintes */
+.picon { display: block; width: 100%; height: 100%; object-fit: contain; }
+.td-ic.mi .picon { width: 34px; height: 34px; }
+.how-ic .picon { width: 36px; height: 36px; }

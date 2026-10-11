@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v75';
+const VERSION = 'abyssal-v76';
 const CORE = [
   './', 'index.html', 'manifest.webmanifest',
   'css/base.css', 'css/card.css', 'css/screens.css', 'css/army.css',
@@ -23,6 +23,7 @@ const CORE = [
   ...['home', 'descent', 'shop', 'collection', 'team', 'chests', 'bestiary', 'trophies', 'profile', 'menu', 'factions', 'door-fight', 'door-elite', 'door-boss', 'rest', 'altar', 'treasure'].map((k) => `assets/scenes/${k}.webp`),
   ...['holo', 'gold-leaf', 'gold-frame', 'cosmic', 'cosmic-frame', 'seal-frame'].map((k) => `assets/variants/${k}.webp`),
   ...['tuto-1', 'tuto-2', 'tuto-3', 'tuto-4', 'tile-boosters', 'tile-adventure', 'today', 'bn-collection', 'bn-standard', 'bn-faction', 'bn-event', 'bn-premium', 'bn-rule', 'bn-expedition', 'bn-ranking', 'open-bg', 'open-epic', 'bn-victory', 'bn-defeat'].map((k) => `assets/ui/${k}.webp`),
+  ...['booster', 'book', 'crystal', 'holo', 'ritual', 'depth', 'crown', 'chest', 'cards', 'swords', 'dodge', 'seal'].map((k) => `assets/icons/${k}.webp`),
   ...['slash', 'impact', 'dodge', 'heal', 'venom', 'frost', 'seal', 'death'].map((k) => `assets/fx/${k}.webp`),
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/favicon.png',
 ];
