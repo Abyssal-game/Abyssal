@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v66';
+const VERSION = 'abyssal-v67';
 const CORE = [
   './', 'index.html', 'manifest.webmanifest',
   'css/base.css', 'css/card.css', 'css/screens.css', 'css/army.css',
@@ -21,6 +21,7 @@ const CORE = [
   'assets/backs/back.webp',
   ...['bg-1', 'bg-2', 'bg-3', 'bg-4', 'bg-boss'].map((k) => `assets/battle/${k}.webp`),
   ...['home', 'descent', 'door-fight', 'door-elite', 'door-boss', 'rest', 'altar', 'treasure'].map((k) => `assets/scenes/${k}.webp`),
+  ...['holo', 'gold-leaf', 'gold-frame', 'cosmic', 'cosmic-frame', 'seal-frame'].map((k) => `assets/variants/${k}.webp`),
   ...['slash', 'impact', 'dodge', 'heal', 'venom', 'frost', 'seal', 'death'].map((k) => `assets/fx/${k}.webp`),
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/favicon.png',
 ];

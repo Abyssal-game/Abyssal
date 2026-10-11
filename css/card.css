@@ -255,3 +255,19 @@
 .tcg-mini .tcg-glare, .tcg-mini .tcg-shine { mix-blend-mode: normal; }
 .tcg-mini .tcg-art::after { display: none; }
 .tcg-mini.v-holo .tcg-shine, .tcg-mini.v-chroma .tcg-shine, .tcg-mini.v-galaxy .tcg-shine, .tcg-mini.v-gold .tcg-shine { opacity: .35; }
+
+/* ——— Variantes illustrées (textures et cadres dans assets/variants) ——————————— */
+/* Holographique : feuille arc-en-ciel qui glisse avec l'inclinaison */
+.v-holo .tcg-shine { background: url(../assets/variants/holo.webp) 0 0 / 140% 140% repeat; background-position: var(--mx) var(--my); mix-blend-mode: hard-light; opacity: .38; animation: vHolo 10s linear infinite; }
+.tiltable.v-holo .tcg-shine { opacity: calc(.32 + var(--tilt, 0) * .35); }
+@keyframes vHolo { to { background-position: calc(var(--mx) + 140%) calc(var(--my) + 140%); } }
+/* Feuille d'or : paillettes d'or, cadre doré ciselé */
+.v-gold .tcg-shine { background: url(../assets/variants/gold-leaf.webp) center / 120% 120% repeat; background-position: var(--mx) var(--my); mix-blend-mode: screen; opacity: .75; animation: none; }
+/* Cosmique : nébuleuse étoilée, cadre d'énergie */
+.v-galaxy .tcg-shine { background: url(../assets/variants/cosmic.webp) center / 150% 150% repeat; background-position: var(--mx) var(--my); mix-blend-mode: screen; opacity: .5; animation: vHolo 18s linear infinite; }
+.tcg-vframe { position: absolute; inset: 0; z-index: 4; pointer-events: none; border-radius: inherit; background: center / 100% 100% no-repeat; }
+.v-gold .tcg-vframe { background-image: url(../assets/variants/gold-frame.webp); }
+.v-galaxy .tcg-vframe { background-image: url(../assets/variants/cosmic-frame.webp); animation: vPulse 4s ease-in-out infinite; }
+.v-special .tcg-vframe { background-image: url(../assets/variants/seal-frame.webp); }
+@keyframes vPulse { 50% { filter: brightness(1.35); } }
+@media (prefers-reduced-motion: reduce) { .v-holo .tcg-shine, .v-galaxy .tcg-shine, .v-galaxy .tcg-vframe { animation: none; } }

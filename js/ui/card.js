@@ -25,6 +25,8 @@ export function cardHTML(card, opts = {}) {
     ? `<img alt="" decoding="async" data-lazy="${lite ? 1 : 0}${mystery ? 1 : 0}" data-card="${card.id}" data-variant="${variant}">`
     : `<img alt="" decoding="async" src="${artUrl(card, { variant, lite, mystery })}" data-card="${card.id}" data-variant="${variant}">`;
   const name = mystery ? (nameKnown ? esc(card.name) : 'Inconnue') : esc(card.name);
+  // Cadre illustré des variantes Or, Cosmique et Édition des Sceaux (posé au-dessus de la carte)
+  const vframe = !mystery && ['gold', 'galaxy', 'special'].includes(variant) ? '<div class="tcg-vframe"></div>' : '';
   const label = mystery ? `Carte non découverte ${card.id}${nameKnown ? ', ' + card.name : ''}` : `${card.name}, ${r.name}${variant !== 'normal' ? ', ' + VARIANTS[variant].name : ''}`;
 
   if (size === 'mini') {
@@ -33,7 +35,7 @@ export function cardHTML(card, opts = {}) {
       ${mystery ? `<div class="tcg-lock">${icon('lock')}</div>` : variant !== 'normal' ? `<span class="tcg-vbadge">${VARIANTS[variant].short}</span>` : ''}
       <span class="tcg-sig">${sigil(card.faction)}</span>
       <div class="tcg-plate"><span class="tcg-gem">${r.short}</span><span class="tcg-nm">${name}</span></div>
-      ${count > 1 ? `<span class="tcg-count">×${count}</span>` : ''}${isNew ? '<span class="tcg-new">Nouveau</span>' : ''}${tag}
+      ${vframe}${count > 1 ? `<span class="tcg-count">×${count}</span>` : ''}${isNew ? '<span class="tcg-new">Nouveau</span>' : ''}${tag}
     </div>`;
   }
   // Grand format : l'illustration d'abord, un bandeau de nom et un court texte.
@@ -48,7 +50,7 @@ export function cardHTML(card, opts = {}) {
     <div class="tcg-body">
       ${mystery ? '<p class="tcg-hidden">Page scellée du Bestiaire</p>' : `<div class="tcg-type">${esc(card.category)} · ${esc(fac?.name || '')}</div><p class="tcg-lore">« ${esc(card.lore)} »</p>`}
       <div class="tcg-foot"><span class="tcg-gem">${r.short}</span><span>${card.id} · ${card.number}/${total}</span><span>${!mystery && variant !== 'normal' ? esc(VARIANTS[variant].name) : r.name}</span></div>
-    </div>
+    </div>${vframe}
   </div>`;
 }
 
