@@ -1,8 +1,7 @@
 // ABYSSAL v2 (prototype) : écrans Descente, Équipe, Boosters, Collection, Coffres,
 // fiche d'une créature et révélation des cartes (boosters et coffres).
 import { RARITY, VARIANTS } from '../../js/config.js';
-import { SKILLS } from '../../js/core/heroes.js';
-import { ROOMS, BLESSINGS, DESCENT } from '../../js/core/descent.js';
+import { ROOMS, DESCENT } from '../../js/core/descent.js';
 import { cardHTML } from '../../js/ui/card.js';
 import { artUrl } from '../../js/art/assets.js';
 import { icon, sigil } from '../../js/ui/icons.js';
@@ -10,14 +9,16 @@ import { esc, fmt, toast, openSheet, confirmBox, bindActions } from '../../js/ui
 import { chestSVG } from '../../js/ui/gear.js';
 import { packHTML } from '../../js/screens/shop.js';
 import { coach } from '../../js/ui/coach.js';
-import { ROLES, COST, BUDGET, TEAM, MAX_LEVEL, ULTS, roleOf, canUlt, ultOf, makeCreature } from './units.js';
+import { ROLES, COST, BUDGET, TEAM, MAX_LEVEL, ULTS, roleOf, canUlt, ultOf } from './units.js';
+import { KEYWORDS, keywordOf, duelUnit } from './duel.js';
 import { CHESTS, CHEST_ORDER, PRICE, chestForDepth } from './game.js';
-import { runBattle } from './battle-ui.js';
+import { runDuel } from './duel-ui.js';
+import { BLESS2 } from './game.js';
 
 const ROOM_ICON = { fight: 'swords', elite: 'skull', altar: 'star', rest: 'heart', treasure: 'crystal', boss: 'crown' };
 
 // Petite étiquette de rôle / niveau / coût posée sur une carte
-const badges = (g, c) => `<span class="v2-badges"><span class="v2-role" style="--ro:${ROLES[roleOf(c)].color}">${icon(ROLES[roleOf(c)].icon)}</span>${g.owns(c.id) ? `<span class="v2-lv">Niv. ${g.level(c.id)}</span>` : ''}<span class="v2-cost">${COST[c.rarity]}</span></span>`;
+const badges = (g, c) => { const u = duelUnit(c, { level: g.owns(c.id) ? g.level(c.id) : 1 }); const kw = KEYWORDS[keywordOf(c)]; return `<span class="v2-badges"><span class="v2-role" style="--ro:${ROLES[roleOf(c)].color}" title="${esc(kw.name)}">${icon(kw.icon)}</span>${g.owns(c.id) ? `<span class="v2-lv">Niv. ${g.level(c.id)}</span>` : ''}<span class="v2-cost">${COST[c.rarity]}</span><span class="v2-ah"><i>${icon('swords')}${u.atk}</i><i>${icon('heart')}${u.maxHp}</i></span></span>`; };
 const cardWithBadges = (g, c, opts = {}) => cardHTML(c, { ...opts, tag: badges(g, c) });
 
 // ——— Fiche d'une créature ————————————————————————————————————————————
@@ -25,18 +26,17 @@ export function openCreature(app, id, { onChange } = {}) {
   const g = app.game, c = app.catalog.get(id);
   const sh = openSheet('', { label: c.name, onClose: () => onChange && onChange() });
   const draw = () => {
-    const owned = g.owns(id), role = ROLES[roleOf(c)], sk = SKILLS[role.skill];
-    const li = g.levelInfo(id), u = makeCreature(c, { level: li.level });
+    const owned = g.owns(id), role = ROLES[roleOf(c)], kw = KEYWORDS[keywordOf(c)];
+    const li = g.levelInfo(id), u = duelUnit(c, { level: li.level }), nx = li.level < MAX_LEVEL ? duelUnit(c, { level: li.level + 1 }) : null;
     const inTeam = g.s.team.includes(id);
     const ult = canUlt(c) ? ULTS[ultOf(c)] : null;
     sh.setContent(`<div class="v2-detail">
       <div class="v2-detail-card">${cardHTML(c, { size: 'full', mystery: !owned, nameKnown: true })}</div>
       <div class="v2-detail-h"><span class="v2-role big" style="--ro:${role.color}">${icon(role.icon)}</span><div><h2>${esc(c.name)}</h2><p class="small" style="color:${RARITY[c.rarity].color}">${RARITY[c.rarity].name} · ${esc(role.name)} · coût ${COST[c.rarity]}</p></div></div>
-      <p class="small muted">${esc(role.desc)}</p>
-      <div class="panel v2-skill"><b>${esc(sk.name)}</b> <span class="tb-cost">${'◆'.repeat(sk.cost)}</span><p class="small">${esc(sk.desc)}</p></div>
+      <div class="v2-big-stats"><span class="dv-atk">${icon('swords')}<b>${u.atk}</b><small>Attaque</small></span><span class="dv-hp">${icon('heart')}<b>${u.maxHp}</b><small>PV</small></span></div>
+      <div class="panel v2-skill"><b>${icon(kw.icon)} ${esc(kw.name)}</b><p class="small">${esc(kw.desc)}</p></div>
       ${ult ? `<div class="panel v2-skill ult" style="--uc:${ult.color}"><b>${icon('sparkle')} Pouvoir ultime : ${esc(ult.name)}</b><p class="small">${esc(ult.desc)}</p><p class="small muted">Une seule créature de l’équipe porte l’ultime : la Mythique ou Secrète la plus rare.</p></div>` : ''}
-      ${owned ? `<dl class="facts v2-stats"><div><dt>PV</dt><dd>${u.maxHp}</dd></div><div><dt>Attaque</dt><dd>${u.atk}</dd></div><div><dt>Magie</dt><dd>${u.mag}</dd></div><div><dt>Défense</dt><dd>${u.def}</dd></div><div><dt>Vitesse</dt><dd>${u.spd}</dd></div></dl>
-        <div class="v2-lvl"><b>Niveau ${li.level}</b><span class="xpbar"><i style="width:${li.need ? (li.into / li.need) * 100 : 100}%"></i></span><span class="small muted">${li.need ? `${li.into} / ${li.need} doublon${li.need > 1 ? 's' : ''} pour le niveau ${li.level + 1}` : 'Niveau maximum : les doublons donnent des cendres'}</span></div>
+      ${owned ? `<div class="v2-lvl"><b>Niveau ${li.level}</b><span class="xpbar"><i style="width:${li.need ? (li.into / li.need) * 100 : 100}%"></i></span><span class="small muted">${li.need ? `${li.into} / ${li.need} doublon${li.need > 1 ? 's' : ''} pour le niveau ${li.level + 1}${nx && (nx.atk > u.atk || nx.maxHp > u.maxHp) ? ` (${nx.atk > u.atk ? `+${nx.atk - u.atk} ATQ ` : ''}${nx.maxHp > u.maxHp ? `+${nx.maxHp - u.maxHp} PV` : ''})` : ''}` : 'Niveau maximum : les doublons donnent des cendres'}</span></div>
         <button class="btn ${inTeam ? 'ghost' : 'primary'} block" data-v="team">${inTeam ? 'Retirer de l’équipe' : 'Ajouter à l’équipe'}</button>`
       : '<p class="small muted center">Pas encore dans ta collection : trouve-la dans un booster.</p>'}
     </div>`);
@@ -189,7 +189,7 @@ export function teamScreen(app, root) {
   };
   root.addEventListener('click', (e) => { const t = e.target.closest('.tcg'); if (t) openCreature(app, t.dataset.id, { onChange: draw }); });
   draw();
-  coach(app, 'v2-team', 'Ton équipe : <b>3 créatures au combat</b> et <b>2 en réserve</b>. Chaque carte a un <b>rôle</b> (icône en haut à gauche) et un <b>coût</b> (en haut à droite) : le total ne doit pas dépasser 15. Une équipe variée (un Protecteur, un Soigneur, des Attaquants…) va plus loin qu’une équipe de cartes rares.', { title: 'Compose ton équipe' });
+  coach(app, 'v2-team', 'Ton équipe : <b>3 créatures au combat</b> et <b>2 en réserve</b>. Chaque carte a une <b>capacité</b> (icône en haut à gauche), son <b>attaque</b> et ses <b>PV</b>, et un <b>coût</b> (en haut à droite) : le total ne doit pas dépasser 15. Une équipe variée (un Protecteur, un Soigneur, des Attaquants…) va plus loin qu’une équipe de cartes rares.', { title: 'Compose ton équipe' });
   return draw;
 }
 
@@ -243,13 +243,13 @@ export function descentScreen(app, root) {
   }
   function altarView(run) {
     root.innerHTML = `${runHead(run)}<p class="dc-prompt">L’autel murmure. Choisis une bénédiction.</p>
-      <div class="dc-altar">${run.altar.map((k) => `<button class="dc-bl" data-act="bless" data-k="${k}"><span>${icon('star')}</span><b>${esc(BLESSINGS[k].name)}</b><span class="small">${esc(BLESSINGS[k].desc).replace('héros', 'créatures')}</span></button>`).join('')}</div>`;
+      <div class="dc-altar">${run.altar.map((k) => `<button class="dc-bl" data-act="bless" data-k="${k}"><span>${icon('star')}</span><b>${esc(BLESS2[k].name)}</b><span class="small">${esc(BLESS2[k].desc)}</span></button>`).join('')}</div>`;
   }
   function battleView(run) {
     if (battle) return;
     playing = true;
     const title = `Étage ${run.floor}${run.room === 'boss' ? ' · Gardien' : run.room === 'elite' ? ' · Élite' : ''}`;
-    battle = runBattle(app, root, { title, onEnd: () => {
+    battle = runDuel(app, root, { title, onEnd: () => {
       battle = null; playing = false;
       let out;
       try { out = g.finishBattle(); } catch (e) { toast(esc(e.message), { kind: 'error' }); return render(); }

@@ -92,3 +92,87 @@
 .tb-sceau .emblem { width: min(50vw, 200px); height: auto; filter: drop-shadow(0 0 30px var(--ic)); }
 .tb-u .tb-foot .tb-nm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 @media (prefers-reduced-motion: reduce) { .v2-flip.turn .v2-flip-in, .v2-back { animation: none !important; } }
+
+/* ——— Duel de cartes ——————————————————————————————————————————————— */
+body.battle-mode .dv { height: calc(100dvh - var(--safe-t) - var(--safe-b) - 14px); display: flex; flex-direction: column; gap: 6px; overflow: hidden;
+  background: radial-gradient(90% 40% at 50% 20%, rgba(120, 20, 60, .3), transparent 70%), radial-gradient(90% 40% at 50% 75%, rgba(70, 50, 150, .28), transparent 70%), #08070C; border-radius: 18px; padding: 6px 6px 8px; }
+.dv-top { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.dv-top > b { font: 700 .95rem/1 var(--f-display); letter-spacing: .06em; color: var(--gold-hi); }
+.dv-top .btn.small { min-height: 34px; padding: 0 11px; }
+.dv-top .btn.on { background: var(--gold); color: #1A1206; }
+.dv-row { position: relative; flex: 1 1 0; min-height: 0; display: flex; align-items: center; justify-content: center; gap: 8px; perspective: 800px; }
+.dv-mid { flex: none; min-height: 1.6em; text-align: center; }
+.dv-msg { font: 600 .9rem/1.3 var(--f-display); letter-spacing: .03em; color: var(--ink); padding: 3px 14px; border-radius: 99px; background: linear-gradient(90deg, transparent, rgba(0, 0, 0, .6), transparent); }
+.dv-c { position: relative; flex: 0 0 auto; width: calc((100% - 24px) / 3); max-width: 150px; max-height: 100%; aspect-ratio: 5 / 7; padding: 0; border-radius: 12px; overflow: visible; color: var(--ink); font: inherit;
+  background: #06070A; border: 2px solid var(--rc); transform: rotateX(var(--tilt, 8deg)); transform-origin: 50% 100%;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .15), 0 5px 0 color-mix(in srgb, var(--rc) 45%, #000), 0 12px 20px rgba(0, 0, 0, .7); transition: transform .2s, box-shadow .2s, opacity .3s, filter .3s; }
+.dv-row.ally .dv-c { --tilt: 6deg; }
+.dv-art { position: absolute; inset: 0; border-radius: 10px; overflow: hidden; }
+.dv-art img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; }
+.dv-art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0, 0, 0, .35), transparent 25%, transparent 55%, rgba(4, 4, 8, .92)); }
+.dv-c.corrupt .dv-art img { filter: saturate(.55) brightness(.78) hue-rotate(-18deg) contrast(1.1); }
+.dv-c.corrupt .dv-art::before { content: ''; position: absolute; inset: 0; z-index: 1; background: radial-gradient(120% 90% at 50% 110%, rgba(110, 20, 140, .6), transparent 60%); mix-blend-mode: multiply; }
+.dv-c.corrupt { border-color: color-mix(in srgb, var(--rc) 45%, #7A1A9A); }
+.dv-nm { position: absolute; z-index: 2; left: 6px; right: 6px; bottom: 30px; text-align: center; font: 700 .66rem/1.1 var(--f-display); letter-spacing: .02em; color: #fff; text-shadow: 0 1px 3px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dv-kw { position: absolute; z-index: 3; top: 5px; left: 5px; display: inline-flex; align-items: center; gap: 3px; padding: 3px 6px 3px 4px; border-radius: 99px; background: rgba(0, 0, 0, .78); border: 1px solid rgba(255, 255, 255, .2); font: 700 .58rem/1 var(--f-ui); color: #F2E6C8; }
+.dv-kw .ic { width: 12px; height: 12px; color: var(--gold-hi); }
+.dv-kw em { font-style: normal; }
+.dv-boss { position: absolute; z-index: 3; top: 5px; right: 5px; font: 800 .56rem/1 var(--f-ui); text-transform: uppercase; letter-spacing: .06em; padding: 3px 6px; border-radius: 6px; background: #8E1630; color: #fff; }
+.dv-boss.elite { background: #5A2A8A; }
+/* Badges ATTAQUE et PV, comme sur une vraie carte */
+.dv-atk, .dv-hp { position: absolute; z-index: 4; bottom: -8px; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; font: 900 1.05rem/1 var(--f-display); color: #fff; text-shadow: 0 1px 2px #000; box-shadow: 0 3px 8px rgba(0, 0, 0, .7), inset 0 2px 0 rgba(255, 255, 255, .3); }
+.dv-atk { left: -6px; background: radial-gradient(circle at 35% 30%, #F2C14E, #A8741E 70%); border: 2px solid #FFE6A0; }
+.dv-hp { right: -6px; background: radial-gradient(circle at 35% 30%, #E0485E, #8E1630 70%); border: 2px solid #FF9AAA; }
+.dv-atk .ic, .dv-hp .ic { position: absolute; width: 38px; height: 38px; opacity: .22; }
+.dv-atk b, .dv-hp b { position: relative; }
+.dv-hp.hurt b { color: #FFD0D6; }
+.dv-st { position: absolute; z-index: 4; top: 30px; left: 5px; display: flex; flex-direction: column; gap: 3px; }
+.dv-st i { font: 800 .58rem/1 var(--f-ui); font-style: normal; display: inline-flex; align-items: center; gap: 2px; padding: 3px 5px; border-radius: 6px; background: rgba(0, 0, 0, .8); color: #fff; }
+.dv-st i .ic { width: 11px; height: 11px; }
+.dv-st .po { color: #B6E35A; } .dv-st .fr { color: #9FE0FF; } .dv-st .bo { color: var(--gold-hi); } .dv-st .sh { color: #9FC3FF; }
+/* États */
+.dv-c.ready { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .2), 0 0 0 2px #7FE0A0, 0 0 18px rgba(127, 224, 160, .55), 0 5px 0 color-mix(in srgb, var(--rc) 45%, #000), 0 12px 20px rgba(0, 0, 0, .7); }
+.dv-c.sel { --tilt: 0deg; transform: translateY(-10px) scale(1.06); box-shadow: 0 0 0 3px var(--gold-hi), 0 0 26px rgba(241, 219, 158, .8), 0 16px 26px rgba(0, 0, 0, .8); z-index: 3; }
+.dv-c.spent { filter: brightness(.6) saturate(.7); }
+.dv-c.target { animation: dvTarget .8s ease-in-out infinite; cursor: crosshair; }
+@keyframes dvTarget { 50% { box-shadow: 0 0 0 3px #FF6B7F, 0 0 26px rgba(255, 80, 100, .8), 0 12px 20px rgba(0, 0, 0, .7); } }
+.dv-c.lunge { animation: dvLunge .3s ease; z-index: 5; }
+.dv-c.lunge.small { animation-duration: .22s; }
+@keyframes dvLunge { 45% { transform: translate(var(--dx), var(--dy)) scale(1.08); } }
+.dv-c.hit { animation: dvHit .32s ease; }
+@keyframes dvHit { 20% { transform: rotateX(var(--tilt, 8deg)) translateX(-6px) rotate(-2deg); filter: brightness(2.4) saturate(0); } 55% { transform: rotateX(var(--tilt, 8deg)) translateX(5px) rotate(1.5deg); } }
+.dv-c.dying { transition: transform .4s, opacity .4s; transform: scale(.7) rotate(-6deg); opacity: 0; }
+.dv-c.enter { animation: dvEnter .4s cubic-bezier(.2, 1.4, .4, 1); }
+@keyframes dvEnter { from { transform: translateY(40px) scale(.7); opacity: 0; } }
+.dv-c.boss { width: calc((100% - 24px) / 2.4); max-width: 175px; border-width: 3px; }
+.dv-res { position: absolute; right: 2px; bottom: 6px; min-width: 30px; height: 30px; padding: 0 6px; border-radius: 9px; display: grid; place-items: center; font: 800 .8rem/1 var(--f-ui); color: var(--ink); background: rgba(255, 255, 255, .08); border: 1px dashed var(--line); }
+.dv-float { position: absolute; z-index: 9; left: 50%; top: 35%; transform: translateX(-50%); font: 900 1.6rem/1 var(--f-display); pointer-events: none; text-shadow: 0 2px 4px #000, 0 0 10px rgba(0, 0, 0, .8); animation: dvFloat .9s ease-out forwards; white-space: nowrap; }
+.dv-float.dmg { color: #FF6B7F; } .dv-float.heal { color: #7FE0A0; } .dv-float.info { color: #F2E6C8; font-size: .95rem; }
+@keyframes dvFloat { from { opacity: 0; transform: translate(-50%, 10px) scale(.6); } 20% { opacity: 1; transform: translate(-50%, 0) scale(1.15); } to { opacity: 0; transform: translate(-50%, -34px) scale(1); } }
+/* Barre du bas : pouvoir du Gardien, Auto, Fin du tour */
+.dv-bar { flex: none; display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; padding-top: 6px; }
+.dv-ult { display: flex; align-items: center; gap: 8px; padding: 6px 10px 6px 6px; border-radius: 14px; text-align: left; color: var(--ink); font: inherit; background: rgba(14, 16, 24, .9); border: 1px solid color-mix(in srgb, var(--uc) 45%, transparent); min-width: 0; }
+.dv-ult-ring { width: 38px; height: 38px; flex: none; border-radius: 50%; position: relative; background: conic-gradient(var(--uc) calc(var(--p, 0) * 1%), rgba(255, 255, 255, .08) 0); }
+.dv-ult-ring i { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(var(--uc) calc(var(--p, 0) * 1%), rgba(255, 255, 255, .08) 0); -webkit-mask: radial-gradient(closest-side, transparent 64%, #000 66%); mask: radial-gradient(closest-side, transparent 64%, #000 66%); }
+.dv-ult-ring { background: radial-gradient(circle, color-mix(in srgb, var(--uc) 30%, transparent), transparent 70%); }
+.dv-ult-t { display: flex; flex-direction: column; min-width: 0; }
+.dv-ult-t b { font: 700 .76rem/1.15 var(--f-display); color: var(--uc); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dv-ult-t small { font-size: .66rem; color: var(--mute); }
+.dv-ult.ready { box-shadow: 0 0 18px color-mix(in srgb, var(--uc) 70%, transparent); animation: gaugeGlow 1.2s ease-in-out infinite; }
+.dv-ult.ready small { color: var(--uc); }
+.dv-end { min-height: 48px; padding: 0 16px; }
+.dv-end.pulse { animation: dvPulse 1.1s ease-in-out infinite; }
+@keyframes dvPulse { 50% { box-shadow: 0 0 0 3px var(--gold-hi), 0 0 22px rgba(241, 219, 158, .7); } }
+.dv-bar button[disabled] { opacity: .45; }
+@media (max-height: 620px) { .dv-atk, .dv-hp { width: 32px; height: 32px; font-size: .9rem; } .dv-nm { bottom: 25px; font-size: .6rem; } .dv-kw em { display: none; } }
+@media (prefers-reduced-motion: reduce) { .dv-c.target, .dv-end.pulse, .dv-ult.ready { animation: none; } }
+@media (max-width: 360px) { .dv-bar { gap: 6px; } .dv-ult { padding-right: 6px; gap: 5px; } .dv-end { padding: 0 8px; font-size: .85rem; } .dv-bar button[data-d="auto"] { padding: 0 10px; } .dv-ult-ring { width: 26px; height: 26px; } .dv-ult-t b { display: none; } .dv-ult-t::before { content: "Pouvoir"; font: 700 .64rem/1.15 var(--f-display); color: var(--uc); } .dv-ult-t small { font-size: .6rem; } }
+/* Stats sur les cartes de la collection / équipe */
+.v2-ah { position: absolute; left: 4px; right: 4px; bottom: 26%; display: flex; justify-content: space-between; }
+.v2-ah i { display: inline-flex; align-items: center; gap: 2px; font: 800 .66rem/1 var(--f-ui); font-style: normal; padding: 3px 5px; border-radius: 6px; background: rgba(0, 0, 0, .8); color: #fff; }
+.v2-ah i:first-child { color: #FFE08A; } .v2-ah i:last-child { color: #FF9AAA; }
+.v2-ah .ic { width: 10px; height: 10px; }
+.v2-big-stats { display: flex; justify-content: center; gap: 28px; margin: 14px 0 6px; }
+.v2-big-stats > span { position: relative; left: auto; right: auto; bottom: auto; width: 64px; height: 64px; font-size: 1.6rem; flex-direction: column; }
+.v2-big-stats small { position: absolute; bottom: -18px; font: 600 .66rem/1 var(--f-ui); color: var(--mute); text-shadow: none; }
+.v2-big-stats .ic { width: 64px; height: 64px; }

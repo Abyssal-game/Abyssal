@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { loadCatalog, MemoryStorage, rngFrom } from './helpers.mjs';
 import { Game2, chestForDepth } from '../v2/js/game.js';
-import { POOL, STARTER, roleOf, levelFromDups, MAX_LEVEL, BUDGET, makeCreature } from '../v2/js/units.js';
+import { POOL, STARTER, roleOf, levelFromDups, MAX_LEVEL, BUDGET } from '../v2/js/units.js';
+import { duelUnit } from '../v2/js/duel.js';
 
 const catalog = loadCatalog();
 const day = new Date(2026, 9, 12, 12);
@@ -24,7 +25,7 @@ test('v2 : doublons → niveaux, puis cendres au niveau maximum', () => {
   assert.equal(levelFromDups(100).level, MAX_LEVEL);
   g.s.cards[id].n = 200;
   assert.ok(g.addCard(id).ash > 0);
-  assert.ok(makeCreature(catalog.get(id), { level: 10 }).maxHp > makeCreature(catalog.get(id), { level: 1 }).maxHp);
+  assert.ok(duelUnit(catalog.get(id), { level: 10 }).maxHp > duelUnit(catalog.get(id), { level: 1 }).maxHp);
 });
 
 test('v2 : budget d’équipe et pouvoir ultime', () => {
@@ -74,22 +75,40 @@ test('v2 : une expédition complète rapporte un coffre selon la profondeur, qui
   assert.ok(after > before);
 });
 
-test('v2 : combat avec réserve (relève et remplacement tactique)', async () => {
-  const { createBattle, act, beginTurn, current, front, bench } = await import('../js/core/battle.js');
-  const { makeEnemy } = await import('../js/core/heroes.js');
-  const g = newGame('s');
-  const team = STARTER.map((id) => makeCreature(catalog.get(id)));
-  const st = createBattle(team, [makeEnemy(catalog.cards[0], { level: 1 })], 5);
-  assert.equal(front(st, 'ally').length, 3);
-  assert.equal(bench(st, 'ally').length, 2);
-  while (current(st).side !== 'ally') { beginTurn(st); const u = current(st); act(st, { actor: u.uid, action: 'enemy' }); }
-  beginTurn(st);
-  const u = current(st), r = bench(st, 'ally')[0];
-  act(st, { actor: u.uid, action: 'swap', target: r.uid });
-  assert.ok(front(st, 'ally').includes(r), 'la réserve entre');
-  assert.ok(bench(st, 'ally').includes(u), 'la créature sort');
-  // une créature tombée est remplacée par la réserve
-  front(st, 'ally')[0].hp = 0;
-  assert.equal(front(st, 'ally').length, 3);
-  assert.ok(g);
+test('v2 : duel de cartes — riposte, Garde, Assaut, réserve, ultime', async () => {
+  const D = await import('../v2/js/duel.js');
+  const card = (id) => catalog.get(id);
+  // Garde : doit être attaquée en premier
+  const allies = STARTER.map((id) => D.duelUnit(card(id)));
+  const foes = ['NEC-001', 'INF-001'].map((id) => D.duelUnit(card(id), { side: 'enemy' }));
+  const st = D.createDuel(allies, foes, { ult: 'nova' });
+  const guard = Object.values(st.units).find((u) => u.side === 'enemy' && u.kw === 'garde');
+  assert.deepEqual(D.targetsFor(st, 'ally'), [guard.uid]);
+  // riposte : l'attaquant (sans Assaut) prend des dégâts
+  const atk = D.front(st, 'ally').find((u) => u.kw !== 'assaut' && u.atk > 0);
+  const hp0 = atk.hp, ghp = guard.hp;
+  D.attack(st, atk.uid, guard.uid);
+  assert.ok(guard.hp < ghp && atk.hp < hp0, 'dégâts et riposte');
+  assert.equal(D.canAct(st, atk), false, 'une attaque par tour');
+  // Assaut : pas de riposte
+  const as = D.front(st, 'ally').find((u) => u.kw === 'assaut');
+  const ahp = as.hp; D.attack(st, as.uid, guard.uid);
+  assert.equal(as.hp, ahp);
+  // fin du tour : les ennemis jouent, puis c'est de nouveau à nous
+  D.endTurn(st);
+  assert.equal(st.turn, 'ally');
+  // réserve : une carte tombée est remplacée
+  assert.equal(D.reserve(st, 'ally').length + D.front(st, 'ally').length, D.alive(st, 'ally').length);
+  D.front(st, 'ally')[0].hp = 0;
+  assert.equal(D.front(st, 'ally').length, Math.min(3, D.alive(st, 'ally').length));
+  // ultime quand la jauge est pleine
+  st.gauge = D.GAUGE_MAX;
+  assert.ok(D.ultReady(st));
+  const ev = D.useUlt(st);
+  assert.ok(ev.some((e) => e.t === 'ult') && st.gauge === 0);
+  // un duel automatique se termine
+  const st2 = D.createDuel(STARTER.map((id) => D.duelUnit(card(id))), ['ABY-001', 'PRI-001', 'CEL-001'].map((id) => D.duelUnit(card(id), { side: 'enemy' })));
+  D.autoDuel(st2);
+  assert.ok(['won', 'lost'].includes(st2.over));
+  assert.ok(st2.round < 20);
 });

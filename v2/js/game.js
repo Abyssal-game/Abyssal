@@ -3,10 +3,20 @@
 // Sauvegarde séparée (abyssal.v2) : la version actuelle du jeu n'est jamais touchée.
 import { TABLES, PITY, RARITY_ORDER } from '../../js/config.js';
 import { rollRarity, rollVariant, cryptoRandom } from '../../js/core/boosters.js';
-import { createBattle, autoBattle } from '../../js/core/battle.js';
+import { createDuel, autoDuel, duelUnit } from './duel.js';
 import { DESCENT, floorDoors, floorEnemies, blessingChoices, dailyRule } from '../../js/core/descent.js';
+
+// Bénédictions de l'autel adaptées au duel de cartes
+export const BLESS2 = {
+  blades: { name: 'Lames affûtées', desc: '+1 en attaque pour toutes tes créatures.' },
+  vigor:  { name: 'Vigueur', desc: '+20 % de PV maximum et soin complet.' },
+  ward:   { name: 'Sceau protecteur', desc: 'Chaque créature commence chaque combat avec un bouclier.' },
+  greed:  { name: 'Avidité', desc: '+30 % d’éclats pour le reste de l’expédition.' },
+};
+// Force des créatures corrompues selon la profondeur
+export const enemyScale = (floor) => 1 + 0.11 * (floor - 1);
 import { today } from '../../js/core/save.js';
-import { POOL, STARTER, COST, BUDGET, TEAM, MAX_LEVEL, levelFromDups, makeCreature, roleOf, canUlt, ultOf, ULTS } from './units.js';
+import { POOL, STARTER, COST, BUDGET, TEAM, MAX_LEVEL, levelFromDups, roleOf, canUlt, ultOf, ULTS } from './units.js';
 
 export const SAVE_KEY = 'abyssal.v2';
 export const PRICE = { standard: 100 };
@@ -161,7 +171,7 @@ export class Game2 {
     d.run = {
       day: d.day, floor: 1, cleared: 0, phase: 'doors', cursed: cursed && !free, free, blessings: [], altar: null,
       gauge: this.rule(d.day).key === 'lune' ? 50 : 0, ult: { key: ult.key, power: ult.power, card: ult.card },
-      team: team.map((id) => { const u = makeCreature(this.catalog.get(id), { level: this.level(id) }); return { id, hp: u.maxHp, maxHp: u.maxHp, fallen: false }; }),
+      team: team.map((id) => { const u = duelUnit(this.catalog.get(id), { level: this.level(id) }); return { id, hp: u.maxHp, maxHp: u.maxHp, fallen: false }; }),
       shards: 0, chests: [], newSeen: [],
     };
     this.persist();
@@ -169,8 +179,11 @@ export class Game2 {
   }
   runUnits() {
     const run = this.s.descent.run;
+    const b = run.blessings;
     return run.team.filter((m) => !m.fallen).map((m) => {
-      const u = makeCreature(this.catalog.get(m.id), { level: this.level(m.id), blessings: run.blessings });
+      const u = duelUnit(this.catalog.get(m.id), { level: this.level(m.id) });
+      if (b.includes('blades')) u.atk += 1;
+      if (b.includes('ward')) u.shield = 1;
       return { ...u, maxHp: m.maxHp, hp: Math.min(m.hp, m.maxHp) };
     });
   }
@@ -186,15 +199,18 @@ export class Game2 {
     const rule = this.rule(run.day);
     const out = { room };
     if (room === 'fight' || room === 'elite' || room === 'boss') {
-      const enemies = floorEnemies(this.enemies, run.day, run.floor, room);
+      // les mêmes créatures que la version actuelle, transformées en cartes de duel corrompues
+      const sc = enemyScale(run.floor);
+      const enemies = floorEnemies(this.enemies, run.day, run.floor, room).map((e) => duelUnit(this.catalog.get(e.id), { side: 'enemy', scale: sc, boss: e.boss, elite: e.elite }));
       for (const e of enemies) {
         const f = this.catalog.get(e.id)?.faction;
-        if (rule.key === 'furie' && f === rule.faction) e.atk = Math.round(e.atk * 1.25);
-        if (rule.key === 'sommeil' && f === rule.faction) { e.maxHp = Math.round(e.maxHp * 0.75); e.hp = e.maxHp; }
+        if (rule.key === 'furie' && f === rule.faction) e.atk = Math.round(e.atk * 1.25 + 0.4);
+        if (rule.key === 'sommeil' && f === rule.faction) { e.maxHp = Math.max(1, Math.round(e.maxHp * 0.75)); e.hp = e.maxHp; }
       }
-      const mastery = {};
-      enemies.forEach((e) => { if (this.owns(e.id)) mastery[e.id] = 0.1; });
-      run.battle = createBattle(this.runUnits(), enemies, Math.floor(this.rng() * 2 ** 31), { gauge: run.gauge, invocation: { key: run.ult.key, power: run.ult.power }, mastery, dmgMult: rule.key === 'instable' ? 1.25 : 1 });
+      const known = {};
+      enemies.forEach((e) => { if (this.owns(e.id)) known[e.id] = true; });
+      const allies = this.runUnits();
+      run.battle = createDuel(allies, enemies, { gauge: run.gauge, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1 });
       run.room = room; run.phase = 'battle'; out.battle = true;
     } else if (room === 'rest') {
       const k = rule.key === 'sources' ? 0.8 : 0.4;
@@ -204,7 +220,7 @@ export class Game2 {
       out.shards = this.gainShards(15 + run.floor * 6);
       run.phase = 'cleared';
     } else if (room === 'altar') {
-      run.altar = blessingChoices(run.day, run.floor, run.blessings);
+      run.altar = blessingChoices(run.day, run.floor, run.blessings).filter((k) => BLESS2[k]).concat(Object.keys(BLESS2).filter((k) => !run.blessings.includes(k))).filter((k, i, a) => a.indexOf(k) === i).slice(0, 3);
       if (run.altar.length) { run.phase = 'altar'; out.altar = run.altar; }
       else { run.altar = null; run.phase = 'cleared'; }
     }
@@ -259,7 +275,7 @@ export class Game2 {
     }
     return out;
   }
-  autoResolve(timing = {}) { autoBattle(this.s.descent.run.battle, timing); return this.finishBattle(); }
+  autoResolve() { autoDuel(this.s.descent.run.battle); return this.finishBattle(); }
   chooseBlessing(key) {
     const run = this.s.descent.run;
     if (!run || run.phase !== 'altar' || !run.altar.includes(key)) throw new Error('Bénédiction indisponible.');
