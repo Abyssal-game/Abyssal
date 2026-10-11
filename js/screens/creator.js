@@ -30,7 +30,7 @@ export function openCreator(app) {
       </div></section>
 
       <section class="cr-sec"><h3>Cartes</h3><div class="row gap wrap">
-        ${B('all', 'Toutes les cartes')}${B('variants', 'Toutes les variantes')}${B('dups', 'Doublons pour tester')}${B('levels', 'Niveau 10 partout')}
+        ${B('all', 'Toutes les cartes')}${B('variants', 'Toutes les variantes')}${B('dups', 'Doublons pour tester')}${B('levels', 'Héros et invocations niveau 20')}
       </div>
         <form class="cr-give" id="give">
           <input class="input plain" name="q" list="cr-cards" placeholder="Nom d’une carte…" autocomplete="off">
@@ -47,7 +47,7 @@ export function openCreator(app) {
 
       <section class="cr-sec"><h3>Rituel et Descente</h3>
         <div class="set-row"><div><b>Rituels toujours réussis</b></div><button class="switch" role="switch" aria-checked="${!!g.s.devRitual}" data-x="ritual"><i></i></button></div>
-        <div class="row gap wrap">${B('torches', 'Rendre les torches')}${B('heal', 'Soigner toutes les cartes')}${B('missions', 'Accomplir les missions')}</div>
+        <div class="row gap wrap">${B('torches', 'Rendre les torches')}${B('heal', 'Soigner tous les héros')}${B('missions', 'Accomplir les missions')}</div>
         <form class="cr-give" id="floor"><input class="input plain" name="n" type="number" min="1" max="200" placeholder="Étage" ${d.run ? '' : 'disabled'}><button class="btn small" type="submit" ${d.run ? '' : 'disabled'}>Aller à l’étage</button></form>
         <p class="small muted">${d.run ? `Expédition en cours : étage ${d.run.floor}.` : 'Lance une Descente pour pouvoir sauter d’étage.'}</p>
       </section>

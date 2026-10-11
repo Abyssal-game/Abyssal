@@ -4,6 +4,7 @@ import { artUrl } from '../art/assets.js';
 import { icon, sigil, EMBLEM } from '../ui/icons.js';
 import { esc, bindActions } from '../ui/dom.js';
 import { FACTION_ORDER, RARITY } from '../config.js';
+import { FAMILIES, HUNT_STAGES, huntStage, familyOf } from '../core/heroes.js';
 
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
@@ -46,6 +47,23 @@ export default function bestiary(app, root) {
       ${keys.map((k) => `<h3 class="section-title">${esc(k)}</h3><div class="codex">${groups[k].map((c) => entry(c)).join('')}</div>`).join('') || '<p class="muted">Aucune créature connue ne correspond.</p>'}`;
   }
 
+  // Bestiaire de chasse : les créatures vaincues dans la Descente
+  function hunt() {
+    const fp = cat.byFaction[st.faction];
+    const seen = fp.filter((c) => g.huntKills(c.id) > 0).length;
+    return `
+      <p class="small muted">Chaque créature vaincue dans la Descente s’inscrit ici. ${HUNT_STAGES.map((s) => `<b>${esc(s.name)}</b> (${s.k} victoire${s.k > 1 ? 's' : ''}) : ${esc(s.desc.toLowerCase())}`).join(' · ')}</p>
+      <p class="small"><b>${g.huntCount()}</b> créatures chassées au total.</p>
+      <div class="chips" role="group" aria-label="Faction">${FACTION_ORDER.map((f) => `<button class="chip" data-act="fac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}">${sigil(f)}${esc(cat.faction[f].name)}</button>`).join('')}</div>
+      <p class="small muted">${seen} / ${fp.length} créatures de ${esc(cat.faction[st.faction].realm)} chassées.</p>
+      <div class="codex">${fp.map((c) => {
+        const k = g.huntKills(c.id), stg = huntStage(k), r = RARITY[c.rarity];
+        if (stg < 0) return `<div class="codex-row sealed"><span class="codex-thumb"><img alt="" loading="lazy" src="${artUrl(c, { mystery: true })}"></span><span class="codex-text"><b>Jamais affrontée</b><span class="small muted">${c.id} · <span style="color:${r.color}">${r.name}</span></span></span>${icon('lock')}</div>`;
+        const fam = FAMILIES[familyOf(c)];
+        return `<button class="codex-row hunt-row" data-id="${c.id}"><span class="codex-thumb"><img alt="" loading="lazy" src="${artUrl(c, { lite: true, mystery: !g.owns(c.id) && false })}"></span><span class="codex-text"><b>${esc(c.name)}</b><span class="small"><span class="hunt-stage s${stg}">${esc(HUNT_STAGES[stg].name)}</span> · ${k} victoire${k > 1 ? 's' : ''}</span><span class="small muted">${stg >= 1 ? `${esc(fam.name)} : ${esc(fam.desc)}` : `Encore ${HUNT_STAGES[1].k - k} victoire${HUNT_STAGES[1].k - k > 1 ? 's' : ''} pour l’étudier.`}</span></span></button>`;
+      }).join('')}</div>`;
+  }
+
   function entry(c) {
     const owned = g.owns(c.id);
     const r = RARITY[c.rarity];
@@ -58,8 +76,8 @@ export default function bestiary(app, root) {
   function render() {
     root.innerHTML = `
       <header class="screen-head"><h1>Bestiaire</h1><p class="muted">Le livre interdit, page après page.</p></header>
-      <div class="seg wide" role="tablist">${[['chroniques', 'Chroniques'], ['creatures', 'Créatures']].map(([k, l]) => `<button class="seg-b" role="tab" data-act="tab" data-v="${k}" aria-selected="${st.tab === k}" aria-pressed="${st.tab === k}">${l}</button>`).join('')}</div>
-      <div class="stack best-body">${st.tab === 'chroniques' ? chronicles() : creatures()}</div>`;
+      <div class="seg wide" role="tablist">${[['chroniques', 'Chroniques'], ['creatures', 'Créatures'], ['chasse', 'Chasse']].map(([k, l]) => `<button class="seg-b" role="tab" data-act="tab" data-v="${k}" aria-selected="${st.tab === k}" aria-pressed="${st.tab === k}">${l}</button>`).join('')}</div>
+      <div class="stack best-body">${st.tab === 'chroniques' ? chronicles() : st.tab === 'chasse' ? hunt() : creatures()}</div>`;
     const q = root.querySelector('#best-q');
     if (q) q.addEventListener('input', (e) => { st.q = e.target.value; const pos = e.target.selectionStart; render(); const n = root.querySelector('#best-q'); n.focus(); n.setSelectionRange(pos, pos); });
   }

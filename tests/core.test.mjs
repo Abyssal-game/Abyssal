@@ -223,6 +223,6 @@ test('booster gratuit : se recharge avec le temps, plafonné', () => {
   assert.equal(opening.paidWith, 'free');
   assert.equal(g.freePack().stock, 0);
   now = new Date(2026, 9, 13, 8);
-  assert.equal(g.freePack().stock, 2, 'plafonné au maximum');
+  assert.equal(g.freePack().stock, 3, 'plafonné au maximum');
   assert.equal(g.freePack().nextAt, null);
 });

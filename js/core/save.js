@@ -38,6 +38,11 @@ export function defaultSave(now = Date.now()) {
     items: {},            // objets possédés : clé -> nombre
     itemBuys: { day: null },
     ritualBoost: 0,       // bonus d'encens pour le prochain rituel
+    heroes: { brenna: { xp: 0, wound: 0 }, aldric: { xp: 0, wound: 0 }, sylea: { xp: 0, wound: 0 }, morgane: { xp: 0, wound: 0 } },
+    party: ['brenna', 'aldric', 'morgane'],
+    invocation: 'phenix',
+    invXp: {},            // invocation -> expérience
+    hunt: {},             // Bestiaire de chasse : id de créature -> nombre de victoires
     descent: { day: null, used: 0, bestToday: 0, best: 0, runs: 0, team: [], run: null, wounds: {}, xp: {}, cursed: false },
     history: [],          // dernières ouvertures
     recent: [],           // dernières découvertes (ids)
@@ -79,7 +84,9 @@ export function migrate(raw) {
   for (const k of ['descent', 'missions', 'freePack', 'daily', 'itemBuys']) s[k] = { ...d[k], ...(s[k] && typeof s[k] === 'object' ? s[k] : {}) };
   for (const k of ['wounds', 'xp']) if (!s.descent[k] || typeof s.descent[k] !== 'object') s.descent[k] = {};
   if (!Array.isArray(s.descent.team)) s.descent.team = [];
-  for (const k of ['items', 'fervor', 'collection', 'deciphered', 'achievements', 'setsDone', 'factionsDone']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
+  s.heroes = { ...d.heroes, ...(s.heroes && typeof s.heroes === 'object' ? s.heroes : {}) };
+  if (!Array.isArray(s.party) || !s.party.length) s.party = d.party;
+  for (const k of ['items', 'fervor', 'collection', 'deciphered', 'achievements', 'setsDone', 'factionsDone', 'invXp', 'hunt']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
   for (const k of ['best', 'recent', 'history', 'showcase', 'titles', 'frames']) if (!Array.isArray(s[k])) s[k] = d[k];
   return s;
 }

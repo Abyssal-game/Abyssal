@@ -4,7 +4,8 @@ import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_O
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
 import { createBattle, autoBattle } from './battle.js';
-import { DESCENT, makeUnit, fight, floorDoors, floorEnemies, roomLoot, blessingChoices, factionBonus, cardLevel } from './descent.js';
+import { DESCENT, floorDoors, floorEnemies, roomLoot, blessingChoices } from './descent.js';
+import { HERO_ORDER, INVOCATIONS, makeHero, levelOf, invocationPower, enemyLevel, huntStage, HUNT_STAGES, totalXpFor } from './heroes.js';
 
 const RI = (r) => RARITY_ORDER.indexOf(r);
 
@@ -354,7 +355,6 @@ export class Game {
     const to = this.ritualTarget(id, from);
     if (!to) throw new Error('Cette carte ne peut plus être élevée.');
     for (const [r, n] of Object.entries(offer)) if (n > this.ritualSpare(r, id)) throw new Error('Pas assez de doublons pour cette offrande.');
-    if (forbidden && this.s.descent.run?.team.some((m) => m.id === id)) throw new Error('Cette carte est en pleine expédition : termine d’abord la Descente.');
     const chance = this.ritualChance(id, from, offer, forbidden);
     if (!chance) throw new Error('Choisis au moins une offrande.');
     const used = Object.entries(offer).flatMap(([r, n]) => (n ? this.takeSpares(r, n, id) : []));
@@ -378,7 +378,6 @@ export class Game {
           delete this.s.collection[id];
           if (this.s.avatar === id) this.s.avatar = null;
           this.s.showcase = this.s.showcase.filter((x) => x !== id);
-          this.s.descent.team = this.s.descent.team.filter((x) => x !== id);
         }
       }
     }
@@ -392,51 +391,84 @@ export class Game {
     const d = this.s.descent;
     const day = today(this.clock());
     if (d.day !== day) { d.day = day; d.used = 0; d.bestToday = 0; }
+    // expédition de l'ancien système (cartes au combat) : on la clôt en rendant tout le butin
+    if (d.run && d.run.v !== 2) {
+      const l = d.run.loot || {};
+      this.s.shards += l.shards || 0; this.s.ash += l.ash || 0;
+      for (const [t, n] of Object.entries(l.tickets || {})) this.s.tickets[t] = (this.s.tickets[t] || 0) + n;
+      d.run = null;
+    }
     return d;
   }
   torchesLeft() { return Math.max(0, DESCENT.torches - this.descent().used); }
-  isWounded(id) { return (this.s.descent.wounds[id] || 0) > this.clock().getTime(); }
-  woundLeft(id) { return Math.max(0, (this.s.descent.wounds[id] || 0) - this.clock().getTime()); }
-  cardLevel(id) { return cardLevel(this.s.descent.xp[id] || 0); }
-  // La variante possédée qui donne le plus de puissance
-  bestCombatVariant(id) {
-    const e = this.entry(id);
-    if (!e) return 'normal';
-    return Object.keys(e.v).filter((v) => e.v[v] > 0).sort((a, b) => (DESCENT.variantBonus[b] || 0) - (DESCENT.variantBonus[a] || 0))[0] || 'normal';
-  }
-  teamUnits(ids, blessings = []) {
-    const cards = ids.map((id) => this.catalog.get(id)).filter(Boolean);
-    const fb = factionBonus(cards);
-    return cards.map((c) => makeUnit(c, { level: this.cardLevel(c.id), variant: this.bestCombatVariant(c.id), bonus: c.faction === fb.faction ? fb.bonus : 0, blessings }));
-  }
-  setTeam(ids) {
-    const list = [...new Set(ids)].filter((id) => this.owns(id)).slice(0, DESCENT.teamSize);
-    this.descent().team = list;
+
+  // Héros
+  hero(key) { return (this.s.heroes[key] ||= { xp: 0, wound: 0 }); }
+  heroLevel(key) { return levelOf(this.hero(key).xp).level; }
+  heroInfo(key) { return levelOf(this.hero(key).xp); }
+  heroWounded(key) { return (this.hero(key).wound || 0) > this.clock().getTime(); }
+  woundLeft(key) { return Math.max(0, (this.hero(key).wound || 0) - this.clock().getTime()); }
+  ownedHeroes() { return HERO_ORDER.filter((k) => this.s.heroes[k]); }
+  setParty(keys) {
+    const list = [...new Set(keys)].filter((k) => this.s.heroes[k]).slice(0, DESCENT.teamSize);
+    this.s.party = list;
     this.persist();
     return list;
   }
+  heroUnit(key, blessings = []) { return makeHero(key, { level: this.heroLevel(key), wounded: this.heroWounded(key), blessings }); }
+
+  // Invocations
+  invocationUnlocked(key) {
+    const u = INVOCATIONS[key]?.unlock;
+    if (!u) return false;
+    return !!(u.start || (u.card && this.owns(u.card)) || (u.depth && this.s.descent.best >= u.depth));
+  }
+  invocationLevel(key) { return levelOf(this.s.invXp[key] || 0).level; }
+  invocationVariant(key) {
+    const e = this.entry(INVOCATIONS[key].card);
+    if (!e) return 'normal';
+    return ['galaxy', 'special', 'gold', 'ancestral', 'chroma', 'corrupt', 'holo', 'alt'].find((v) => e.v[v] > 0) || 'normal';
+  }
+  setInvocation(key) { if (this.invocationUnlocked(key)) { this.s.invocation = key; this.persist(); } }
+
+  // Bestiaire de chasse
+  huntKills(id) { return this.s.hunt[id] || 0; }
+  huntCount() { return Object.keys(this.s.hunt).length; }
+
   startRun({ cursed = false } = {}) {
     const d = this.descent();
     if (d.run) throw new Error('Une expédition est déjà en cours.');
     if (this.torchesLeft() <= 0) throw new Error('Plus de torche aujourd’hui : reviens demain.');
-    const team = d.team.filter((id) => this.owns(id) && !this.isWounded(id));
-    if (team.length < 3) throw new Error('Il faut au moins 3 cartes en état de combattre dans ton équipe.');
-    const units = this.teamUnits(team);
+    const party = this.s.party.filter((k) => this.s.heroes[k]);
+    if (party.length < DESCENT.teamSize) throw new Error(`Choisis ${DESCENT.teamSize} héros pour ton équipe.`);
     d.used++;
     d.runs++;
     d.cursed = cursed;
+    const inv = this.invocationUnlocked(this.s.invocation) ? this.s.invocation : 'phenix';
     d.run = {
-      day: d.day, floor: 1, cleared: 0, cursed, phase: 'doors', blessings: [], altar: null,
-      team: units.map((u) => ({ id: u.id, variant: u.variant, hp: u.maxHp, maxHp: u.maxHp, fallen: false, xp: 0 })),
-      loot: { shards: 0, ash: 0, tickets: {} },
+      v: 2, day: d.day, floor: 1, cleared: 0, cursed, phase: 'doors', blessings: [], altar: null, gauge: 0, inv, invXp: 0,
+      team: party.map((k) => { const u = this.heroUnit(k); return { id: k, hp: u.maxHp, maxHp: u.maxHp, fallen: false, xp: 0 }; }),
+      loot: { shards: 0, ash: 0, tickets: {} }, kills: {},
     };
     this.persist();
     return d.run;
   }
   runUnits() {
     const run = this.s.descent.run;
-    const units = this.teamUnits(run.team.map((m) => m.id), run.blessings);
-    return units.map((u, i) => ({ ...u, maxHp: run.team[i].maxHp, hp: run.team[i].hp, fallen: run.team[i].fallen })).filter((u) => !u.fallen && u.hp > 0);
+    return run.team.filter((m) => !m.fallen && m.hp > 0).map((m) => {
+      const u = this.heroUnit(m.id, run.blessings);
+      return { ...u, maxHp: m.maxHp, hp: Math.min(m.hp, m.maxHp) };
+    });
+  }
+  // Danger estimé d'un étage (comparaison des niveaux)
+  floorDanger(floor) {
+    const run = this.s.descent.run;
+    const team = run ? run.team.filter((m) => !m.fallen) : this.s.party.map((k) => ({ id: k }));
+    const lv = team.reduce((a, m) => a + this.heroLevel(m.id), 0) / Math.max(1, team.length);
+    const gap = enemyLevel(floor, 'fight') - lv;
+    const hp = run ? run.team.reduce((a, m) => a + (m.fallen ? 0 : m.hp), 0) / run.team.reduce((a, m) => a + m.maxHp, 0) : 1;
+    const score = gap + (1 - hp) * 6;
+    return { level: enemyLevel(floor, 'fight'), heroLevel: Math.round(lv), label: score <= -2 ? 'Facile' : score <= 1 ? 'Équilibré' : score <= 4 ? 'Dangereux' : 'Mortel', score };
   }
   doors() { const run = this.s.descent.run; return run ? floorDoors(run.day, run.floor) : []; }
   addLoot(l) {
@@ -454,9 +486,11 @@ export class Game {
     const out = { room };
     if (room === 'fight' || room === 'elite' || room === 'boss') {
       // Le combat se joue au tour par tour : son état est gardé dans l'expédition (reprise exacte).
-      const allies = this.runUnits();
       const enemies = floorEnemies(this.catalog, run.day, run.floor, room);
-      run.battle = createBattle(allies, enemies, Math.floor(this.rng() * 2 ** 31));
+      const mastery = {};
+      enemies.forEach((e) => { if (this.huntKills(e.id) >= HUNT_STAGES[2].k) mastery[e.id] = true; });
+      const power = invocationPower(this.invocationLevel(run.inv), this.invocationVariant(run.inv));
+      run.battle = createBattle(this.runUnits(), enemies, Math.floor(this.rng() * 2 ** 31), { gauge: run.gauge, invocation: { key: run.inv, power }, mastery });
       run.room = room;
       run.phase = 'battle';
       out.battle = true;
@@ -477,24 +511,35 @@ export class Game {
     this.persist();
     return out;
   }
-  // Fin du combat : PV et chutes reportés sur l'équipe, butin ou défaite.
+  // Fin du combat : PV, chutes, expérience, Bestiaire de chasse, butin ou défaite.
   finishBattle() {
     const run = this.s.descent.run;
     if (!run || run.phase !== 'battle' || !run.battle?.over) throw new Error('Aucun combat terminé.');
     const st = run.battle, room = run.room, won = st.over === 'won';
-    const byId = {};
-    Object.values(st.units).filter((u) => u.side === 'ally' && !u.remnant).forEach((u) => { byId[u.id] = u; });
+    const heroes = Object.values(st.units).filter((u) => u.kind === 'hero');
+    const xp = Math.round((12 + 4 * run.floor) * (room === 'boss' ? 2.5 : room === 'elite' ? 1.5 : 1));
     run.team.forEach((m) => {
-      const u = byId[m.id];
+      const u = heroes.find((h) => h.id === m.id);
       if (!u) return;
       m.hp = Math.max(0, Math.min(m.maxHp, u.hp));
       if (m.hp <= 0) m.fallen = true;
-      else m.xp += DESCENT.xpPerFight * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1);
+      m.xp += m.fallen ? Math.round(xp / 2) : xp;
     });
+    run.gauge = st.gauge || 0;
+    run.invXp += 6 + 15 * (st.invUses || 0);
+    // Bestiaire de chasse
+    const discovered = [];
+    for (const id of st.kills) {
+      if (!this.s.hunt[id]) discovered.push(id);
+      const before = huntStage(this.s.hunt[id] || 0);
+      this.s.hunt[id] = (this.s.hunt[id] || 0) + 1;
+      run.kills[id] = (run.kills[id] || 0) + 1;
+      const after = huntStage(this.s.hunt[id]);
+      if (after === 3 && before < 3) { this.s.shards += 100; }
+    }
     run.battle = null;
-    // victoire « par des Restes » : si toute l'équipe est tombée, l'expédition s'arrête quand même
     const wiped = run.team.every((m) => m.fallen);
-    const out = { room, won: won && !wiped };
+    const out = { room, won: won && !wiped, xp, discovered };
     if (won && !wiped) {
       out.loot = this.addLoot(roomLoot(run.floor, room, this.rng));
       run.phase = 'cleared';
@@ -508,7 +553,7 @@ export class Game {
     }
     return out;
   }
-  // Objet utilisé en plein combat (baume : 50 % des PV d'une carte ; élixir : 40 % à la première ligne).
+  // Objet utilisé en plein combat (baume : 50 % des PV d'un héros ; élixir : 40 % à toute l'équipe).
   battleItem(k) {
     if (!['baume', 'elixir'].includes(k)) throw new Error('Objet inutilisable en combat.');
     if (!this.itemCount(k)) throw new Error('Tu n’as pas cet objet.');
@@ -547,40 +592,33 @@ export class Game {
     this.persist();
     return run.floor;
   }
-  // Fin d'expédition : butin (moitié perdue en cas de défaite), blessures ou pertes des cartes tombées.
+  // Fin d'expédition : butin (moitié perdue en cas de défaite, tout en descente maudite),
+  // expérience des héros et de l'invocation, héros tombés affaiblis quelques heures.
   endRun(wiped = false) {
     const d = this.s.descent, run = d.run;
     if (!run) throw new Error('Aucune expédition en cours.');
     const loot = { ...run.loot, tickets: { ...run.loot.tickets } };
-    if (wiped) { loot.shards = Math.floor(loot.shards / 2); loot.ash = Math.floor(loot.ash / 2); loot.tickets = {}; }
+    if (wiped) {
+      const k = run.cursed ? 0 : 0.5;
+      loot.shards = Math.floor(loot.shards * k); loot.ash = Math.floor(loot.ash * k); loot.tickets = {};
+    }
     this.s.shards += loot.shards;
     this.s.ash += loot.ash;
     for (const [t, n] of Object.entries(loot.tickets)) this.s.tickets[t] = (this.s.tickets[t] || 0) + n;
     const now = this.clock().getTime();
-    const fallen = [], lostCards = [], levelUps = [];
+    const fallen = [], levelUps = [];
     for (const m of run.team) {
-      if (m.xp) {
-        const before = this.cardLevel(m.id);
-        d.xp[m.id] = (d.xp[m.id] || 0) + m.xp;
-        if (this.cardLevel(m.id) > before) levelUps.push({ id: m.id, level: this.cardLevel(m.id) });
-      }
-      if (!m.fallen) continue;
-      fallen.push(m.id);
-      if (run.cursed) {
-        const e = this.s.collection[m.id];
-        if (!e) continue;
-        const v = e.v[m.variant] > 0 ? m.variant : Object.keys(e.v).find((k) => e.v[k] > 0);
-        e.v[v]--; e.n--;
-        lostCards.push({ id: m.id, variant: v, gone: e.n <= 0 });
-        if (e.n <= 0) {
-          delete this.s.collection[m.id];
-          if (this.s.avatar === m.id) this.s.avatar = null;
-          this.s.showcase = this.s.showcase.filter((x) => x !== m.id);
-          d.team = d.team.filter((x) => x !== m.id);
-        }
-      } else d.wounds[m.id] = now + DESCENT.woundHours * 3600000;
+      const h = this.hero(m.id);
+      const before = levelOf(h.xp).level;
+      h.xp += m.xp;
+      const after = levelOf(h.xp).level;
+      if (after > before) levelUps.push({ id: m.id, level: after });
+      if (m.fallen) { fallen.push(m.id); h.wound = now + DESCENT.woundHours * 3600000; }
     }
-    const summary = { wiped, floor: run.cleared, day: run.day, loot, fallen, lostCards, levelUps, cursed: run.cursed };
+    const invBefore = this.invocationLevel(run.inv);
+    this.s.invXp[run.inv] = (this.s.invXp[run.inv] || 0) + run.invXp;
+    const invUp = this.invocationLevel(run.inv) > invBefore ? { key: run.inv, level: this.invocationLevel(run.inv) } : null;
+    const summary = { wiped, floor: run.cleared, day: run.day, loot, fallen, levelUps, invUp, kills: run.kills, cursed: run.cursed, lostCards: [] };
     this.emit('descentEnd', summary);
     d.last = summary;
     d.run = null;
@@ -609,11 +647,11 @@ export class Game {
   useItem(k, target = null) {
     if (!this.itemCount(k)) throw new Error('Tu n’as pas cet objet.');
     const d = this.descent();
-    if (k === 'baume') { if (!this.isWounded(target)) throw new Error('Cette carte n’est pas blessée.'); delete d.wounds[target]; }
-    else if (k === 'elixir') { const n = Object.keys(d.wounds).filter((id) => this.isWounded(id)).length; if (!n) throw new Error('Aucune carte blessée.'); d.wounds = {}; }
+    if (k === 'baume') { if (!this.s.heroes[target] || !this.heroWounded(target)) throw new Error('Ce héros n’est pas blessé.'); this.hero(target).wound = 0; }
+    else if (k === 'elixir') { const hurt = this.ownedHeroes().filter((h) => this.heroWounded(h)); if (!hurt.length) throw new Error('Aucun héros blessé.'); hurt.forEach((h) => { this.hero(h).wound = 0; }); }
     else if (k === 'torche') { if (d.used <= 0) throw new Error('Toutes tes torches du jour sont déjà disponibles.'); d.used--; }
     else if (k === 'encens') { if (this.s.ritualBoost) throw new Error('Un encens brûle déjà pour ton prochain rituel.'); this.s.ritualBoost = 15; }
-    else if (k === 'parchemin') { if (!this.owns(target)) throw new Error('Choisis une carte que tu possèdes.'); d.xp[target] = (d.xp[target] || 0) + 60; }
+    else if (k === 'parchemin') { if (!this.s.heroes[target]) throw new Error('Choisis un héros.'); this.hero(target).xp += 80; }
     else throw new Error('Objet inconnu.');
     this.s.items[k]--;
     this.persist();
@@ -725,8 +763,8 @@ export class Game {
     ['C', 'PC', 'R', 'HR', 'M'].forEach((r) => this.catalog.byRarity[r].slice(0, n).forEach((c) => { for (let i = 0; i < 2; i++) this.addCard(c.id, 'normal', 'reward'); }));
     this.persist();
   }
-  devMaxLevels() { Object.keys(this.s.collection).forEach((id) => { this.s.descent.xp[id] = 20 * 81; }); this.persist(); }
-  devHealAll() { this.s.descent.wounds = {}; this.persist(); }
+  devMaxLevels() { HERO_ORDER.forEach((k) => { this.hero(k).xp = Math.max(this.hero(k).xp, totalXpFor(20)); }); Object.keys(INVOCATIONS).forEach((k) => { this.s.invXp[k] = Math.max(this.s.invXp[k] || 0, totalXpFor(20)); }); this.persist(); }
+  devHealAll() { HERO_ORDER.forEach((k) => { if (this.s.heroes[k]) this.s.heroes[k].wound = 0; }); this.persist(); }
   devTorches() { this.descent().used = 0; this.persist(); }
   devFreePacks() { this.s.freePack = { stock: FREE_PACK.max, since: Date.now() }; this.persist(); }
   devMissions() { this.missions().list.forEach((x) => { x.p = x.n; }); this.persist(); }

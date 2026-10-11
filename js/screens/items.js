@@ -1,6 +1,7 @@
 // Objets : rayon de la boutique et sac du joueur (utilisation, choix d'une carte cible).
 import { ITEMS } from '../config.js';
-import { cardHTML, lazyArt } from '../ui/card.js';
+import { HERO_ORDER } from '../core/heroes.js';
+import { heroCardHTML } from '../ui/hero.js';
 import { icon } from '../ui/icons.js';
 import { esc, fmt, toast, openSheet } from '../ui/dom.js';
 
@@ -37,23 +38,22 @@ export function bagHTML(g) {
 }
 
 export function bindBag(app, root, after) {
-  const g = app.game, cat = app.catalog;
+  const g = app.game;
   const use = (k, target) => {
     try { g.useItem(k, target); app.sfx.discover(); toast(`Objet utilisé : ${esc(ITEMS[k].name)}.`, { kind: 'success', icon: ITEMS[k].icon }); after(); }
     catch (err) { app.sfx.error(); toast(esc(err.message), { kind: 'error' }); }
   };
-  const pickCard = (k, ids, title) => {
-    if (!ids.length) { toast(k === 'baume' ? 'Aucune carte blessée.' : 'Aucune carte disponible.', { icon: 'info' }); return; }
-    const s = openSheet(`<h2>${esc(title)}</h2><div class="grid-cards">${ids.map((id) => `<div class="pick-c" data-id="${id}">${cardHTML(cat.get(id), { lazy: true, variant: g.bestCombatVariant(id) })}<span class="dc-lv">Niv. ${g.cardLevel(id)}</span></div>`).join('')}</div>`, { label: title });
-    lazyArt(s.body);
-    s.body.addEventListener('click', (e) => { const t = e.target.closest('.pick-c'); if (t) { s.close(); use(k, t.dataset.id); } });
+  const pickHero = (k, keys, title) => {
+    if (!keys.length) { toast(k === 'baume' ? 'Aucun héros blessé.' : 'Aucun héros disponible.', { icon: 'info' }); return; }
+    const sh = openSheet(`<h2>${esc(title)}</h2><div class="hc-grid">${keys.map((h) => heroCardHTML(g, h)).join('')}</div>`, { label: title });
+    sh.body.addEventListener('click', (e) => { const t = e.target.closest('[data-hero]'); if (t) { sh.close(); use(k, t.dataset.hero); } });
   };
   root.addEventListener('click', (e) => {
     const b = e.target.closest('[data-item-use]');
     if (!b) return;
     const k = b.dataset.itemUse;
-    if (k === 'baume') pickCard(k, Object.keys(g.s.descent.wounds).filter((id) => g.isWounded(id) && g.owns(id)), 'Soigner quelle carte ?');
-    else if (k === 'parchemin') pickCard(k, [...new Set([...g.s.descent.team, ...Object.keys(g.s.collection)])].filter((id) => g.owns(id)).slice(0, 60), 'Donner l’expérience à quelle carte ?');
+    if (k === 'baume') pickHero(k, HERO_ORDER.filter((h) => g.s.heroes[h] && g.heroWounded(h)), 'Soigner quel héros ?');
+    else if (k === 'parchemin') pickHero(k, HERO_ORDER.filter((h) => g.s.heroes[h]), 'Donner l’expérience à quel héros ?');
     else use(k);
   });
 }

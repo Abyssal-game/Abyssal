@@ -1,11 +1,13 @@
-// Combat au tour par tour (façon Final Fantasy X / Clair Obscur) : frise d'initiative,
-// énergie, compétences tirées des capacités des cartes, parade et frappe en rythme.
+// Combat au tour par tour : 3 héros contre les créatures de l'Abysse.
+// Frise d'initiative, énergie, mécaniques de classe, intentions ennemies annoncées
+// (dont les attaques préparées, à interrompre ou à parer) et jauge d'invocation.
 // Moteur pur : l'état est un objet JSON (sauvegardé à chaque action, reprise exacte).
+import { SKILLS, FAMILIES, GAUGE } from './heroes.js';
 
+export { SKILLS };
 export const FRONT = 3;
 export const MAX_ENERGY = 3;
 
-// ——— Hasard reproductible stocké dans l'état ———
 function rand(st) {
   st.seed = (st.seed + 0x6D2B79F5) | 0;
   let t = st.seed;
@@ -13,92 +15,129 @@ function rand(st) {
   t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 }
-
-// ——— Compétences : une par capacité de la carte (ou un coup puissant par défaut) ———
-export const SKILLS = {
-  power:     { name: 'Coup puissant',      cost: 1, target: 'enemy',   desc: 'Frappe à 160 %.' },
-  strike:    { name: 'Éruption',           cost: 1, target: 'enemy',   desc: 'Un jet de flammes qui ignore la défense.' },
-  curse:     { name: 'Malédiction',        cost: 2, target: 'enemies', desc: 'Blesse tous les ennemis en première ligne.' },
-  cataclysm: { name: 'Cataclysme',         cost: 3, target: 'enemies', desc: 'Dévaste toute la ligne ennemie.' },
-  bless:     { name: 'Bénédiction',        cost: 2, target: 'allies',  desc: 'Soigne toute la première ligne.' },
-  drain:     { name: 'Morsure vampirique', cost: 1, target: 'enemy',   desc: 'Frappe et récupère les PV infligés.' },
-  venom:     { name: 'Crocs venimeux',     cost: 1, target: 'enemy',   desc: 'Frappe et empoisonne 3 tours.' },
-  drown:     { name: 'Engloutir',          cost: 2, target: 'enemy',   desc: 'Étourdit la cible pendant son prochain tour.' },
-  command:   { name: 'Cri de guerre',      cost: 2, target: 'allies',  desc: '+30 % d’attaque pour la première ligne.' },
-  guard:     { name: 'Provocation',        cost: 1, target: 'self',    desc: 'Attire les coups et réduit les dégâts subis de moitié.' },
-  aegis:     { name: 'Égide',              cost: 1, target: 'ally',    desc: 'Un bouclier qui annule le prochain coup.' },
-  regen:     { name: 'Régénération',       cost: 1, target: 'self',    desc: 'Récupère 35 % de ses PV.' },
-  frenzy:    { name: 'Frénésie',           cost: 2, target: 'enemy',   desc: 'Deux coups d’affilée.' },
-  first:     { name: 'Coup éclair',        cost: 1, target: 'enemy',   desc: 'Frappe et rejoue très vite.' },
-  devour:    { name: 'Dévorer',            cost: 2, target: 'enemy',   desc: 'Frappe à 150 % ; si la cible meurt, gagne en force.' },
-  fear:      { name: 'Effroi',             cost: 2, target: 'enemies', desc: 'Les ennemis perdent 25 % d’attaque.' },
-  elusive:   { name: 'Disparition',        cost: 1, target: 'self',    desc: 'Insaisissable jusqu’à son prochain tour.' },
-  armor:     { name: 'Carapace',           cost: 1, target: 'self',    desc: 'Défense doublée pendant 2 tours.' },
-  omen:      { name: 'Présage',            cost: 1, target: 'allies',  desc: '+1 énergie à toute la première ligne.' },
-  charge:    { name: 'Charge',             cost: 1, target: 'enemy',   desc: 'Frappe à 140 % et rejoue vite.' },
-  relic:     { name: 'Reliquat',           cost: 1, target: 'enemy',   desc: 'Frappe ; à sa mort, laissera un Reste.' },
-  death:     { name: 'Souffle mortel',     cost: 2, target: 'enemy',   desc: 'Frappe à 180 %.' },
-};
-export function skillsOf(u) {
-  const keys = Object.keys(u.abil || {}).filter((k) => SKILLS[k]);
-  return (keys.length ? keys : ['power']).slice(0, 2);
-}
+const tick = (u) => (100 / Math.max(1, u.spd)) * (u.st.frozen ? 1.5 : 1);
+const other = (side) => (side === 'ally' ? 'enemy' : 'ally');
 
 // ——— Création ———
-const tick = (u) => 100 / Math.max(1, u.spd);
-export function createBattle(allies, enemies, seed = 1) {
-  const st = { seed: seed | 0, now: 0, over: null, round: 0, units: {}, order: { ally: [], enemy: [] }, log: [] };
-  for (const u of [...allies, ...enemies]) {
-    const x = {
-      uid: u.uid, id: u.id, name: u.name, rarity: u.rarity, faction: u.faction, side: u.side, remnant: !!u.remnant,
-      atk: u.atk, def: u.def, spd: u.spd, maxHp: u.maxHp, hp: u.hp, abil: { ...u.abil }, energy: 1, fury: !!u.fury,
-      st: { stun: 0, poison: 0, shield: u.abil.aegis ? 1 : 0, guard: 0, defend: false, hidden: u.abil.elusive ? 1 : 0, armorT: 0, atkUp: 0, fear: 0 },
-      ct: 0,
-    };
-    x.ct = tick(x) * (0.35 + rand(st) * 0.5) * (u.abil.first || u.abil.charge ? 0.3 : 1);
+export function createBattle(heroes, enemies, seed = 1, { gauge = 0, invocation = null, mastery = {} } = {}) {
+  const st = { seed: seed | 0, now: 0, over: null, units: {}, order: { ally: [], enemy: [] }, gauge, inv: invocation, mastery, log: [], kills: [] };
+  for (const u of [...heroes, ...enemies]) {
+    const x = JSON.parse(JSON.stringify(u));
+    x.ct = tick(x) * (0.3 + rand(st) * 0.6);
+    if (x.ward) x.st.shield = 1;
     st.units[x.uid] = x;
     st.order[x.side].push(x.uid);
   }
+  front(st, 'enemy').forEach((e) => setIntent(st, e));
   return st;
 }
 
 export const alive = (st, side) => st.order[side].map((id) => st.units[id]).filter((u) => u.hp > 0);
-export const front = (st, side) => alive(st, side).slice(0, FRONT);
-export const bench = (st, side) => alive(st, side).slice(FRONT);
-const other = (side) => (side === 'ally' ? 'enemy' : 'ally');
-
-// Prochain à jouer : le plus petit compteur parmi les premières lignes.
+export const front = (st, side) => (side === 'ally' ? alive(st, side) : alive(st, side).slice(0, FRONT));
+export const bench = (st, side) => (side === 'ally' ? [] : alive(st, side).slice(FRONT));
 export function current(st) {
   if (st.over) return null;
-  const list = [...front(st, 'ally'), ...front(st, 'enemy')];
-  return list.sort((a, b) => a.ct - b.ct)[0] || null;
+  return [...front(st, 'ally'), ...front(st, 'enemy')].sort((a, b) => a.ct - b.ct)[0] || null;
 }
-// Frise : les prochains tours (prévision à état constant).
 export function timeline(st, n = 8) {
   const list = [...front(st, 'ally'), ...front(st, 'enemy')].map((u) => ({ uid: u.uid, ct: u.ct, t: tick(u) }));
   const out = [];
-  for (let i = 0; i < n && list.length; i++) {
-    list.sort((a, b) => a.ct - b.ct);
-    out.push(list[0].uid);
-    list[0].ct += list[0].t;
-  }
+  for (let i = 0; i < n && list.length; i++) { list.sort((a, b) => a.ct - b.ct); out.push(list[0].uid); list[0].ct += list[0].t; }
   return out;
 }
 
-// Début de tour : poison, régénération, énergie, étourdissement. Renvoie les événements et
-// indique si l'unité perd son tour.
+// ——— Intentions ennemies (affichées au joueur avant qu'elles ne frappent) ———
+const pickHero = (st, how = 'random') => {
+  const hs = front(st, 'ally');
+  if (!hs.length) return null;
+  const taunt = hs.filter((h) => h.st.taunt);
+  if (taunt.length) return taunt[0].uid;
+  if (how === 'weak') return hs.slice().sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0].uid;
+  return hs[Math.floor(rand(st) * hs.length)].uid;
+};
+export function setIntent(st, e) {
+  if (e.hp <= 0) return;
+  if (e.st.charging) { e.intent = { k: e.family === 'controleur' && !e.boss ? 'stunheavy' : 'heavy', t: e.intent?.t || pickHero(st) }; return; }
+  const pattern = e.boss ? ['attack', 'charge', 'aoe', 'attack'] : FAMILIES[e.family].pattern;
+  let k = pattern[e.turns % pattern.length];
+  if (k === 'heal' && !front(st, 'enemy').some((x) => x.hp < x.maxHp * 0.7)) k = 'attack';
+  e.intent = { k, t: ['attack', 'hunt', 'poison', 'charge', 'double'].includes(k) ? pickHero(st, k === 'hunt' ? 'weak' : 'random') : null };
+}
+// Estimation affichée (dégâts prévus) pour l'intention d'un ennemi
+export function intentPreview(st, e) {
+  const i = e.intent;
+  if (!i) return null;
+  const a = e.atk * (e.st.enraged ? 1.4 : 1);
+  const m = { attack: 1, hunt: 1.35, double: 1.2, poison: 0.7, heavy: 2.2, stunheavy: 1.4, aoe: 0.6 }[i.k];
+  return { ...i, dmg: m ? Math.round(a * m) : 0 };
+}
+
+// ——— Effets ———
+function heal(st, u, n, ev) {
+  if (u.hp <= 0) return;
+  const h = Math.min(Math.round(n), u.maxHp - u.hp);
+  if (h > 0) { u.hp += h; ev.push({ t: 'heal', u: u.uid, d: h, hp: u.hp }); }
+}
+function gain(st, n) { st.gauge = Math.min(100, (st.gauge || 0) + n); }
+function hurt(st, src, tgt, amount, ev, kind = 'hit', extra = {}) {
+  if (tgt.hp <= 0) return 0;
+  // Égide du paladin : il reçoit le coup à la place de l'allié protégé
+  if (tgt.side === 'ally' && tgt.st.protectedBy && kind !== 'dot') {
+    const p = st.units[tgt.st.protectedBy];
+    if (p && p.hp > 0 && p.st.protecting) {
+      ev.push({ t: 'cover', u: p.uid, v: tgt.uid });
+      const d = hurt(st, src, p, amount * 0.7, ev, kind, extra);
+      p.res = Math.min(100, (p.res || 0) + d * 2);
+      return d;
+    }
+  }
+  let d = Math.max(1, Math.round(amount));
+  if (kind !== 'dot') {
+    if (tgt.st.shield) { tgt.st.shield = 0; ev.push({ t: 'block', u: tgt.uid }); return 0; }
+    d = Math.max(1, d - (tgt.armor || 0));
+    if (tgt.st.defend) d = Math.ceil(d / 2);
+  }
+  d = Math.min(d, tgt.hp);
+  tgt.hp -= d;
+  ev.push({ t: kind, a: src?.uid || null, u: tgt.uid, d, hp: tgt.hp, ...extra });
+  if (tgt.side === 'ally') {
+    gain(st, GAUGE.hurt);
+    if (tgt.id === 'brenna') tgt.res = Math.min(100, (tgt.res || 0) + 18);
+  }
+  if (tgt.hp <= 0) {
+    ev.push({ t: 'die', u: tgt.uid });
+    if (tgt.side === 'enemy') st.kills.push(tgt.id);
+    if (tgt.st.protecting) front(st, 'ally').forEach((h) => { if (h.st.protectedBy === tgt.uid) h.st.protectedBy = null; });
+    // un ennemi de réserve entre en ligne et annonce son intention
+    front(st, 'enemy').forEach((e) => { if (!e.intent) setIntent(st, e); if (e.ct < st.now) e.ct = st.now + tick(e) * 0.5; });
+  } else if (tgt.side === 'enemy' && !tgt.st.enraged && (tgt.family === 'enrage' || tgt.boss) && tgt.hp < tgt.maxHp / 2) {
+    tgt.st.enraged = true;
+    ev.push({ t: 'status', u: tgt.uid, s: 'Enragé !' });
+  }
+  return d;
+}
+function check(st) {
+  if (!alive(st, 'enemy').length) st.over = 'won';
+  else if (!alive(st, 'ally').length) st.over = 'lost';
+}
+// Multiplicateur subi par une cible (marque, exposition, maîtrise du Bestiaire)
+const taken = (st, t) => 1 + (t.st.mark ? 0.3 : 0) + (t.st.exposed ? 0.3 : 0) + (t.side === 'enemy' && st.mastery[t.id] ? 0.1 : 0);
+const defOf = (u) => u.def * (u.st.armorUp ? 1.5 : 1);
+const dmg = (st, base, t, mult = 1) => Math.max(1, base * mult * taken(st, t) - defOf(t) * 0.4);
+
+// ——— Début de tour ———
 export function beginTurn(st) {
   const u = current(st);
   if (!u) return { ev: [], skip: true };
   const ev = [];
   st.now = u.ct;
   u.st.defend = false;
-  if (u.st.hidden) u.st.hidden--;
-  if (u.st.guard) u.st.guard--;
-  if (u.st.armorT) u.st.armorT--;
-  if (u.st.poison) { u.st.poison--; hurt(st, null, u, Math.max(1, Math.round(u.maxHp * 0.06)), ev, 'poison'); }
-  if (u.hp > 0 && u.abil.regen) heal(u, u.abil.regen + 1, ev);
-  if (u.hp > 0) { u.energy = Math.min(MAX_ENERGY, u.energy + 1); }
+  for (const k of ['mark', 'exposed', 'taunt', 'armorUp']) if (u.st[k]) u.st[k]--;
+  if (u.st.protecting) { u.st.protecting--; if (!u.st.protecting) front(st, 'ally').forEach((h) => { if (h.st.protectedBy === u.uid) h.st.protectedBy = null; }); }
+  if (u.st.burn) { u.st.burn--; hurt(st, null, u, Math.max(3, u.maxHp * 0.06), ev, 'dot', { burn: true }); }
+  if (u.hp > 0 && u.st.poison) { u.st.poison--; hurt(st, null, u, Math.max(3, u.maxHp * 0.06), ev, 'dot', { poison: true }); }
+  if (u.hp > 0 && u.st.frozen) u.st.frozen--;
+  if (u.hp > 0 && u.kind === 'hero') u.energy = Math.min(MAX_ENERGY, u.energy + 1);
   if (u.hp > 0 && u.st.stun) {
     u.st.stun--;
     ev.push({ t: 'stunned', u: u.uid });
@@ -110,179 +149,194 @@ export function beginTurn(st) {
   return { ev, skip: u.hp <= 0 || !!st.over };
 }
 
-// ——— Effets ———
-function heal(u, n, ev) {
-  if (u.hp <= 0) return;
-  const h = Math.min(Math.round(n), u.maxHp - u.hp);
-  if (h > 0) { u.hp += h; ev.push({ t: 'heal', u: u.uid, d: h, hp: u.hp }); }
-}
-function hurt(st, src, tgt, amount, ev, kind = 'hit', extra = {}) {
-  if (tgt.hp <= 0) return 0;
-  let d = Math.max(1, Math.round(amount));
-  if (kind === 'hit' || kind === 'skill') {
-    if (tgt.st.shield) { tgt.st.shield = 0; ev.push({ t: 'block', u: tgt.uid }); return 0; }
-    d = Math.max(1, d - (tgt.abil.armor || 0));
-    if (tgt.st.defend) d = Math.ceil(d / 2);
-    if (tgt.st.guard) d = Math.ceil(d * 0.6);
-  }
-  d = Math.min(d, tgt.hp);
-  tgt.hp -= d;
-  ev.push({ t: kind, a: src?.uid || null, u: tgt.uid, d, hp: tgt.hp, ...extra });
-  if (tgt.hp <= 0) die(st, tgt, src, ev);
-  return d;
-}
-function die(st, u, killer, ev) {
-  ev.push({ t: 'die', u: u.uid });
-  if (u.abil.death) front(st, other(u.side)).forEach((f) => hurt(st, u, f, u.abil.death * 2, ev, 'burst'));
-  if (u.abil.relic && !u.remnant) {
-    const r = { uid: `${u.uid}r`, id: u.id, name: 'Reste', rarity: 'C', faction: u.faction, side: u.side, remnant: true, atk: 2, def: 0, spd: 2, maxHp: 8, hp: 8, abil: {}, energy: 0, st: { stun: 0, poison: 0, shield: 0, guard: 0, defend: false, hidden: 0, armorT: 0, atkUp: 0, fear: 0 }, ct: st.now + 50 };
-    st.units[r.uid] = r;
-    const list = st.order[u.side];
-    list.splice(list.indexOf(u.uid) + 1, 0, r.uid);
-    ev.push({ t: 'summon', u: r.uid });
-  }
-  if (killer && killer.hp > 0 && killer.abil.devour) { killer.atk += 1; killer.maxHp += 3; killer.hp += 3; ev.push({ t: 'grow', u: killer.uid }); }
-  // un remplaçant entre en première ligne : il joue un peu après
-  for (const side of ['ally', 'enemy']) front(st, side).forEach((f) => { if (f.ct < st.now) f.ct = st.now + tick(f) * 0.5; });
-}
-function check(st) {
-  if (!alive(st, 'enemy').length) st.over = 'won';
-  else if (!alive(st, 'ally').length) st.over = 'lost';
-}
-const atkOf = (u) => u.atk * (1 + (u.st.atkUp ? 0.3 : 0)) * (u.st.fear ? 0.75 : 1);
-const defOf = (u) => u.def * (u.st.armorT ? 2 : 1);
-const dmg = (a, t, mult = 1, ignoreDef = false) => Math.max(1, atkOf(a) * mult - (ignoreDef ? 0 : defOf(t) * 0.35));
-
-// Cibles valides pour une action
+// ——— Cibles ———
 export function targets(st, actor, kind) {
-  const foes = front(st, other(actor.side));
-  if (kind === 'enemy') {
-    const taunt = foes.filter((f) => f.st.guard);
-    const visible = (taunt.length ? taunt : foes).filter((f) => !f.st.hidden);
-    return (visible.length ? visible : foes).map((f) => f.uid);
-  }
-  if (kind === 'ally') return front(st, actor.side).map((f) => f.uid);
-  if (kind === 'swap') return bench(st, actor.side).map((f) => f.uid);
+  if (kind === 'enemy') return front(st, 'enemy').map((f) => f.uid);
+  if (kind === 'ally') return front(st, 'ally').map((f) => f.uid);
   return [];
 }
+export function canInvoke(st) { return !!st.inv && (st.gauge || 0) >= 100; }
 
 // ——— Action ———
-// act : { actor, action: 'attack'|'defend'|'skill'|'item'|'swap', skill, target, item,
-//         strike: 'perfect'|'good'|'miss' (frappe en rythme de l'attaquant),
-//         parry:  'perfect'|'good'|'miss' (parade du défenseur) }
-const STRIKE = { perfect: 1.35, good: 1.1, miss: 1 };
+// a : { actor, action: 'attack'|'skill'|'defend'|'item'|'invoke'|'enemy', skill, target,
+//       strike: 'perfect'|'good'|'miss' (frappe en rythme), parry: idem (parade du héros visé) }
+const STRIKE = { perfect: 1.3, good: 1.1, miss: 1 };
 export function act(st, a) {
   const u = st.units[a.actor];
   const ev = [];
   if (!u || u.hp <= 0 || st.over) return ev;
-  const tgt = a.target ? st.units[a.target] : null;
-  const sMult = STRIKE[a.strike] || 1;
-  // la parade ne concerne qu'une attaque visant un seul allié
-  const parried = (t) => (t && t.side === 'ally' && u.side === 'enemy' ? a.parry : null);
-  const single = (t, mult, opts = {}) => {
-    if (!t || t.hp <= 0) return 0;
-    const p = parried(t);
-    if (p === 'perfect') {
-      ev.push({ t: 'parry', u: t.uid, a: u.uid });
-      hurt(st, t, u, dmg(t, u, 0.6), ev, 'hit', { counter: true });
-      return 0;
-    }
-    const m = mult * sMult * (p === 'good' ? 0.5 : 1);
-    return hurt(st, u, t, dmg(u, t, m, opts.ignoreDef), ev, opts.kind || 'hit', { crit: a.strike === 'perfect', dodge: p === 'good' });
-  };
   let speed = 1;
-  if (a.action === 'attack') {
-    if (tgt) single(tgt, 1);
-    if (u.fury && tgt && tgt.hp > 0 && rand(st) < 0.2) single(tgt, 1);
-  } else if (a.action === 'defend') {
-    u.st.defend = true;
-    u.energy = Math.min(MAX_ENERGY, u.energy + 1);
-    ev.push({ t: 'defend', u: u.uid });
-    speed = 0.7;
-  } else if (a.action === 'swap') {
-    if (tgt && tgt.side === u.side) {
-      const list = st.order[u.side];
-      const i = list.indexOf(u.uid), j = list.indexOf(tgt.uid);
-      [list[i], list[j]] = [list[j], list[i]];
-      tgt.ct = st.now + tick(tgt) * 0.4;
-      ev.push({ t: 'swap', u: u.uid, v: tgt.uid });
+  if (u.kind === 'enemy') enemyAct(st, u, a, ev);
+  else {
+    const s = STRIKE[a.strike] || 1;
+    if (a.strike === 'perfect') gain(st, GAUGE.perfect);
+    const t = a.target ? st.units[a.target] : null;
+    const base = Math.max(u.atk, u.mag * 0.7);
+    const hit = (tgt, amount, extra = {}) => {
+      if (!tgt || tgt.hp <= 0) return 0;
+      const d = hurt(st, u, tgt, amount, ev, 'hit', extra);
+      if (u.lifesteal && d) heal(st, u, d * u.lifesteal, ev);
+      return d;
+    };
+    if (a.action === 'attack') {
+      const target = t && t.hp > 0 ? t : front(st, 'enemy')[0];
+      const wasMarked = target?.st.mark;
+      hit(target, dmg(st, base, target, s), { crit: a.strike === 'perfect' });
+      if (u.fury && target && target.hp > 0 && rand(st) < 0.25) hit(target, dmg(st, base, target, 0.8));
+      if (u.id === 'brenna') u.res = Math.min(100, (u.res || 0) + 12);
+      if (u.id === 'sylea' && wasMarked) u.energy = Math.min(MAX_ENERGY, u.energy + 1);
+    } else if (a.action === 'defend') {
+      u.st.defend = true;
+      u.energy = Math.min(MAX_ENERGY, u.energy + 1);
+      ev.push({ t: 'defend', u: u.uid });
+      speed = 0.7;
+    } else if (a.action === 'item') {
+      if (t && a.heal) heal(st, t, t.maxHp * a.heal, ev);
+      if (a.healAll) front(st, 'ally').forEach((f) => heal(st, f, f.maxHp * a.healAll, ev));
+      ev.push({ t: 'item', u: u.uid, item: a.item });
+    } else if (a.action === 'invoke') {
+      if (!canInvoke(st)) return act(st, { ...a, action: 'attack' });
+      invoke(st, u, ev);
+    } else if (a.action === 'skill') {
+      const sk = SKILLS[a.skill];
+      if (!sk || u.energy < sk.cost || !u.skills.includes(a.skill)) return act(st, { ...a, action: 'attack' });
+      u.energy -= sk.cost;
+      ev.push({ t: 'skill', u: u.uid, name: sk.name, key: a.skill });
+      const foes = front(st, 'enemy');
+      switch (a.skill) {
+        case 'fendoir': { const tt = t && t.hp > 0 ? t : foes[0]; hit(tt, dmg(st, u.atk, tt, (1.2 + (u.res || 0) / 100) * s), { crit: a.strike === 'perfect' }); u.res = 0; break; }
+        case 'defi': u.st.taunt = 2; u.st.armorUp = 2; u.res = Math.min(100, (u.res || 0) + 25); ev.push({ t: 'status', u: u.uid, s: 'Défi !' }); break;
+        case 'egide': if (t && t.uid !== u.uid) { t.st.protectedBy = u.uid; u.st.protecting = 2; ev.push({ t: 'status', u: t.uid, s: 'Protégé' }); } else { u.st.armorUp = 2; ev.push({ t: 'status', u: u.uid, s: 'Garde' }); } break;
+        case 'lumiere': { const tt = t || u; heal(st, tt, tt.maxHp * 0.25 + (u.res || 0) * 0.6 + u.mag, ev); u.res = 0; break; }
+        case 'marque': if (t) { t.st.mark = 3; ev.push({ t: 'status', u: t.uid, s: 'Marqué' }); hit(t, dmg(st, u.atk, t, 0.6 * s)); } break;
+        case 'volee': foes.forEach((f) => hit(f, dmg(st, u.atk, f, (f.st.mark ? 1.7 : 0.8)))); break;
+        case 'feu': {
+          const tt = t && t.hp > 0 ? t : foes[0];
+          const shatter = tt?.st.frozen;
+          hit(tt, dmg(st, u.mag, tt, 1.5 * s * (shatter ? 2 : 1)), { crit: a.strike === 'perfect', shatter });
+          if (tt && tt.hp > 0) { if (shatter) tt.st.frozen = 0; else { tt.st.burn = 3; ev.push({ t: 'status', u: tt.uid, s: 'Brûlure' }); } }
+          break;
+        }
+        case 'givre': {
+          const tt = t && t.hp > 0 ? t : foes[0];
+          const shatter = tt?.st.burn;
+          hit(tt, dmg(st, u.mag, tt, 1.1 * s * (shatter ? 2 : 1)), { crit: a.strike === 'perfect', shatter });
+          if (tt && tt.hp > 0) {
+            if (shatter) tt.st.burn = 0; else tt.st.frozen = 2;
+            if (tt.st.charging) { tt.st.charging = false; tt.turns++; setIntent(st, tt); ev.push({ t: 'interrupt', u: tt.uid }); }
+            else if (!shatter) ev.push({ t: 'status', u: tt.uid, s: 'Gelé' });
+          }
+          break;
+        }
+        default: break;
+      }
     }
-  } else if (a.action === 'item') {
-    if (tgt && a.heal) heal(tgt, tgt.maxHp * a.heal, ev);
-    if (a.healAll) front(st, u.side).forEach((f) => heal(f, f.maxHp * a.healAll, ev));
-    ev.push({ t: 'item', u: u.uid, item: a.item });
-  } else if (a.action === 'skill') {
-    const k = a.skill, sk = SKILLS[k];
-    if (!sk || u.energy < sk.cost) return act(st, { ...a, action: 'attack' });
-    u.energy -= sk.cost;
-    ev.push({ t: 'skill', u: u.uid, name: sk.name, key: k });
-    const foes = front(st, other(u.side));
-    const mag = 1 + (u.abil[k] || 1) * 0.15;
-    switch (k) {
-      case 'power': single(tgt, 1.6); break;
-      case 'strike': single(tgt, 1.3 * mag, { ignoreDef: true, kind: 'skill' }); break;
-      case 'curse': foes.forEach((f) => hurt(st, u, f, dmg(u, f, 0.7 * mag * sMult), ev, 'skill')); break;
-      case 'cataclysm': foes.forEach((f) => hurt(st, u, f, dmg(u, f, 1.1 * mag * sMult), ev, 'skill')); break;
-      case 'bless': front(st, u.side).forEach((f) => heal(f, f.maxHp * 0.25 * mag, ev)); break;
-      case 'drain': { const d = single(tgt, 1.1); if (d) heal(u, d, ev); break; }
-      case 'venom': { single(tgt, 0.9); if (tgt && tgt.hp > 0) { tgt.st.poison = 3; ev.push({ t: 'status', u: tgt.uid, s: 'Poison' }); } break; }
-      case 'drown': { single(tgt, 0.6); if (tgt && tgt.hp > 0) { tgt.st.stun = 1; ev.push({ t: 'status', u: tgt.uid, s: 'Étourdi' }); } break; }
-      case 'command': front(st, u.side).forEach((f) => { f.st.atkUp = 1; ev.push({ t: 'status', u: f.uid, s: 'ATQ +30 %' }); }); break;
-      case 'guard': u.st.guard = 2; ev.push({ t: 'status', u: u.uid, s: 'Provocation' }); break;
-      case 'aegis': if (tgt) { tgt.st.shield = 1; ev.push({ t: 'status', u: tgt.uid, s: 'Égide' }); } break;
-      case 'regen': heal(u, u.maxHp * 0.35, ev); break;
-      case 'frenzy': single(tgt, 0.9); if (tgt && tgt.hp > 0) single(tgt, 0.9); break;
-      case 'first': single(tgt, 1.1); speed = 0.45; break;
-      case 'devour': single(tgt, 1.5); break;
-      case 'fear': foes.forEach((f) => { f.st.fear = 1; ev.push({ t: 'status', u: f.uid, s: 'Effroi' }); }); break;
-      case 'elusive': u.st.hidden = 1; ev.push({ t: 'status', u: u.uid, s: 'Insaisissable' }); break;
-      case 'armor': u.st.armorT = 2; ev.push({ t: 'status', u: u.uid, s: 'Carapace' }); break;
-      case 'omen': front(st, u.side).forEach((f) => { f.energy = Math.min(MAX_ENERGY, f.energy + 1); }); ev.push({ t: 'status', u: u.uid, s: '+1 énergie' }); break;
-      case 'charge': single(tgt, 1.4); speed = 0.6; break;
-      case 'relic': single(tgt, 1.2); break;
-      case 'death': single(tgt, 1.8); break;
-      default: single(tgt, 1);
-    }
+    if (a.action !== 'invoke') gain(st, GAUGE.action);
   }
   u.ct = Math.max(u.ct, st.now) + tick(u) * speed;
-  st.round++;
   check(st);
   st.log = [...st.log, ...ev].slice(-30);
   return ev;
 }
 
-// ——— Intelligence artificielle (ennemis, et alliés en mode automatique) ———
-export function plan(st, u) {
-  const foes = front(st, other(u.side)), friends = front(st, u.side);
-  const opts = skillsOf(u).filter((k) => u.energy >= SKILLS[k].cost);
-  const pickFoe = () => {
-    const ids = targets(st, u, 'enemy');
-    const list = ids.map((id) => st.units[id]);
-    return (rand(st) < 0.55 ? list.sort((x, y) => x.hp - y.hp)[0] : list[Math.floor(rand(st) * list.length)])?.uid;
+function enemyAct(st, e, a, ev) {
+  const intent = e.intent || { k: 'attack', t: pickHero(st) };
+  const atk = e.atk * (e.st.enraged ? 1.4 : 1);
+  // cible annoncée ; si elle est tombée, une autre
+  const tgtOf = () => { const t = intent.t && st.units[intent.t]; const taunt = front(st, 'ally').find((h) => h.st.taunt); return taunt || (t && t.hp > 0 ? t : st.units[pickHero(st)]); };
+  const strikeHero = (mult, extra = {}) => {
+    const t = tgtOf();
+    if (!t) return 0;
+    if (extra.parryable && a.parry === 'perfect') {
+      ev.push({ t: 'parry', u: t.uid, a: e.uid });
+      gain(st, GAUGE.perfect);
+      return hurt(st, t, e, dmg(st, Math.max(t.atk, t.mag * 0.7), e, 0.8), ev, 'hit', { counter: true }) && 0;
+    }
+    const m = mult * (extra.parryable && a.parry === 'good' ? 0.5 : 1);
+    return hurt(st, e, t, dmg(st, atk, t, m), ev, 'hit', { dodge: extra.parryable && a.parry === 'good', heavy: !!extra.parryable });
   };
-  const hurtAlly = friends.filter((f) => f.hp < f.maxHp * 0.5).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
-  if (hurtAlly && opts.includes('bless')) return { actor: u.uid, action: 'skill', skill: 'bless' };
-  if (u.hp < u.maxHp * 0.4 && opts.includes('regen')) return { actor: u.uid, action: 'skill', skill: 'regen' };
-  if (hurtAlly && opts.includes('aegis') && !hurtAlly.st.shield) return { actor: u.uid, action: 'skill', skill: 'aegis', target: hurtAlly.uid };
-  const attackSkills = opts.filter((k) => ['enemy', 'enemies'].includes(SKILLS[k].target));
-  if (attackSkills.length && rand(st) < 0.65) {
-    const k = attackSkills[Math.floor(rand(st) * attackSkills.length)];
-    return { actor: u.uid, action: 'skill', skill: k, target: SKILLS[k].target === 'enemy' ? pickFoe() : null };
+  ev.push({ t: 'intent', u: e.uid, k: intent.k });
+  switch (intent.k) {
+    case 'attack': strikeHero(1); break;
+    case 'hunt': strikeHero(1.35); break;
+    case 'double': strikeHero(0.6); if (!st.over) strikeHero(0.6); break;
+    case 'poison': { const t = tgtOf(); strikeHero(0.7); if (t && t.hp > 0) { t.st.poison = 3; ev.push({ t: 'status', u: t.uid, s: 'Poison' }); } break; }
+    case 'aoe': front(st, 'ally').forEach((h) => hurt(st, e, h, dmg(st, Math.max(atk, e.mag), h, 0.6), ev, 'hit', { aoe: true })); break;
+    case 'guard': front(st, 'enemy').forEach((x) => { x.st.shield = 1; }); ev.push({ t: 'status', u: e.uid, s: 'Bouclier' }); break;
+    case 'heal': { const w = front(st, 'enemy').sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0]; if (w) heal(st, w, w.maxHp * 0.25, ev); break; }
+    case 'charge': e.st.charging = true; ev.push({ t: 'charge', u: e.uid }); break;
+    case 'heavy': e.st.charging = false; strikeHero(2.2, { parryable: true }); break;
+    case 'stunheavy': { e.st.charging = false; const t = tgtOf(); const d = strikeHero(1.4, { parryable: true }); if (t && d && t.hp > 0) { t.st.stun = 1; ev.push({ t: 'status', u: t.uid, s: 'Étourdi' }); } break; }
+    default: strikeHero(1);
   }
-  const support = opts.filter((k) => ['self', 'allies'].includes(SKILLS[k].target) && k !== 'bless' && k !== 'regen');
-  if (support.length && rand(st) < 0.3) return { actor: u.uid, action: 'skill', skill: support[0] };
-  if (!foes.length) return { actor: u.uid, action: 'defend' };
-  return { actor: u.uid, action: 'attack', target: pickFoe() };
+  if (intent.k !== 'charge') e.turns++;
+  if (intent.k === 'charge') { e.intent = { k: e.family === 'controleur' && !e.boss ? 'stunheavy' : 'heavy', t: intent.t }; return; }
+  setIntent(st, e);
 }
 
-// Joue automatiquement jusqu'à la fin (simulations et tests). timing : réussite des actions en rythme.
-export function autoBattle(st, { strike = 'miss', parry = 'miss', max = 400 } = {}) {
+// ——— Invocations ———
+function invoke(st, u, ev) {
+  const inv = st.inv, p = inv.power;
+  const team = st.order.ally.map((id) => st.units[id]);
+  const lvl = team.reduce((a, h) => a + h.level, 0) / Math.max(1, team.length);
+  st.gauge = 0;
+  st.invUses = (st.invUses || 0) + 1;
+  ev.push({ t: 'summon', u: u.uid, inv: inv.key });
+  if (inv.key === 'phenix') {
+    const fallen = st.order.ally.map((id) => st.units[id]).filter((h) => h.hp <= 0);
+    if (fallen.length) fallen.forEach((h) => { h.hp = Math.round(h.maxHp * 0.4 * p); h.ct = st.now + tick(h) * 0.5; ev.push({ t: 'revive', u: h.uid, hp: h.hp }); });
+    else front(st, 'ally').forEach((h) => { heal(st, h, h.maxHp * 0.35 * p, ev); h.st.poison = 0; h.st.burn = 0; });
+  } else if (inv.key === 'bahamut') {
+    front(st, 'enemy').forEach((e) => { hurt(st, null, e, (30 + 7 * lvl) * p * taken(st, e), ev, 'hit', { big: true }); if (e.hp > 0) { e.st.exposed = 2; } });
+  } else if (inv.key === 'fenrir') {
+    const t = front(st, 'enemy').sort((x, y) => y.hp - x.hp)[0];
+    if (t) { hurt(st, null, t, (70 + 14 * lvl) * p * taken(st, t), ev, 'hit', { big: true }); if (t.hp <= 0) st.gauge = 50; }
+  }
+}
+
+// ——— Intelligence artificielle des héros (mode auto, simulations) ———
+export function plan(st, u) {
+  const foes = front(st, 'enemy'), allies = front(st, 'ally');
+  const A = (action, extra = {}) => ({ actor: u.uid, action, ...extra });
+  if (canInvoke(st)) {
+    const anyFallen = st.order.ally.some((id) => st.units[id].hp <= 0);
+    const lowTeam = allies.reduce((a, h) => a + h.hp / h.maxHp, 0) / allies.length < 0.55;
+    if (st.inv.key !== 'phenix' || anyFallen || lowTeam) return A('invoke');
+  }
+  const prey = () => (foes.find((f) => f.st.mark) || foes.slice().sort((x, y) => x.hp - y.hp)[0])?.uid;
+  const charging = foes.find((f) => f.st.charging);
+  const has = (k) => u.skills.includes(k) && u.energy >= SKILLS[k].cost;
+  if (u.id === 'aldric') {
+    const low = allies.filter((h) => h.hp < h.maxHp * 0.45).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
+    if (low && has('lumiere')) return A('skill', { skill: 'lumiere', target: low.uid });
+    const threatened = charging && st.units[charging.intent?.t];
+    if (threatened && threatened.uid !== u.uid && !threatened.st.protectedBy && has('egide')) return A('skill', { skill: 'egide', target: threatened.uid });
+  }
+  if (u.id === 'morgane') {
+    if (charging && has('givre')) return A('skill', { skill: 'givre', target: charging.uid });
+    const frozen = foes.find((f) => f.st.frozen), burning = foes.find((f) => f.st.burn);
+    if (frozen && has('feu')) return A('skill', { skill: 'feu', target: frozen.uid });
+    if (burning && has('givre')) return A('skill', { skill: 'givre', target: burning.uid });
+    if (has('feu')) return A('skill', { skill: 'feu', target: foes.slice().sort((x, y) => y.hp - x.hp)[0]?.uid });
+  }
+  if (u.id === 'sylea') {
+    if (!foes.some((f) => f.st.mark) && has('marque')) return A('skill', { skill: 'marque', target: foes.slice().sort((x, y) => y.hp - x.hp)[0]?.uid });
+    if (foes.length >= 2 && has('volee')) return A('skill', { skill: 'volee' });
+  }
+  if (u.id === 'brenna') {
+    if ((u.res || 0) >= 60 && has('fendoir')) return A('skill', { skill: 'fendoir', target: prey() });
+    if (charging && !u.st.taunt && has('defi') && u.hp > u.maxHp * 0.5) return A('skill', { skill: 'defi' });
+  }
+  return A('attack', { target: prey() });
+}
+
+export function autoBattle(st, { strike = 'miss', parry = 'miss', max = 600 } = {}) {
   for (let i = 0; i < max && !st.over; i++) {
     const b = beginTurn(st);
     if (b.skip || st.over) continue;
     const u = current(st);
-    const p = plan(st, u);
-    act(st, { ...p, strike: u.side === 'ally' ? strike : null, parry: u.side === 'enemy' ? parry : null });
+    const a = u.kind === 'enemy' ? { actor: u.uid, action: 'enemy', parry } : { ...plan(st, u), strike };
+    act(st, a);
   }
   if (!st.over) st.over = 'lost';
   return st;

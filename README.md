@@ -20,7 +20,7 @@ Application d’ouverture de boosters et de collection de cartes dark fantasy, j
 
 ## Boucle de jeu
 
-- **La Descente** (`js/core/descent.js`, écran `js/screens/descent.js`) : expédition quotidienne (3 torches par jour) avec une équipe de 6 cartes. Combats automatiques, portes à choisir, autels, gardiens tous les 5 étages, butin à ramener. Les cartes tombées se reposent 24 h ; en descente maudite (butin doublé), elles sont perdues. Les cartes gagnent des niveaux ; variantes et niveaux augmentent leurs statistiques.
+- **La Descente** (`js/core/descent.js`, `js/core/battle.js`, `js/core/heroes.js`, écrans `js/screens/descent.js` et `js/screens/battle-ui.js`) : expédition quotidienne (3 torches par jour) avec une équipe de **3 héros** (Brenna, Aldric, Syléa, Morgane) qui gagnent des niveaux. Les ennemis sont les créatures du Bestiaire, de plus en plus fortes en profondeur ; elles annoncent leur prochaine action (attaques préparées à interrompre ou à parer). Une **invocation** (Phénix, Bahamut, Fenrir) se déclenche quand sa jauge est pleine. Les créatures vaincues remplissent le **Bestiaire de chasse**. Portraits définitifs des héros : `assets/heroes/<clé>.webp`, déclarés dans la liste `heroes` de `assets/art/manifest.json`.
 - **Rituel d’élévation** (`js/screens/ritual.js`) : sacrifier des doublons pour faire monter une carte d’un cran (normale → holographique → chromatique → or → cosmique), avec chance affichée, ferveur après un échec et rituel interdit risqué. Réglages dans `RITUAL` (`js/config.js`).
 - **Fusion** des doublons, **missions du jour**, **classeur** par faction et **statistiques de chance** dans le profil.
 

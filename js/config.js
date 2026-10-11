@@ -60,7 +60,7 @@ export const RITUAL = {
   perPoint: { holo: 4, chroma: 2.5, gold: 1.5, galaxy: 0.8 },   // % de réussite par point d'offrande
   points: { C: 1, PC: 2, R: 5, HR: 12, M: 30, S: 60 },          // valeur d'une offrande
   rarityMult: { C: 1.25, PC: 1.1, R: 1, HR: 0.8, M: 0.6, S: 0.5 }, // plus la carte est rare, plus c'est dur
-  fervor: 8,          // % gagnés à chaque échec (jusqu'à la réussite)
+  fervor: 12,         // % gagnés à chaque échec : la réussite finit toujours par arriver
   cap: 90, forbiddenMult: 2, forbiddenCap: 97,
 };
 
@@ -118,7 +118,7 @@ export const FRAMES = {
 };
 
 // Booster standard gratuit qui se recharge avec le temps (aucune obligation de revenir).
-export const FREE_PACK = { everyHours: 6, max: 2 };
+export const FREE_PACK = { everyHours: 6, max: 3 };
 
 export const FACTION_ORDER = ['infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel'];
 
@@ -153,9 +153,9 @@ export const LUCK_POINTS = { C: 1, PC: 2, R: 6, HR: 20, M: 80, S: 200, variant: 
 
 // Boutique d'objets (payés en éclats). limit : achats maximum par jour.
 export const ITEMS = {
-  baume:     { name: 'Baume de soin',          price: 80,  icon: 'heart',   desc: 'Soigne immédiatement une carte blessée dans la Descente.' },
-  elixir:    { name: 'Élixir des profondeurs', price: 260, icon: 'flame',   desc: 'Soigne d’un coup toutes tes cartes blessées.' },
+  baume:     { name: 'Baume de soin',          price: 80,  icon: 'heart',   desc: 'Soigne immédiatement un héros blessé.' },
+  elixir:    { name: 'Élixir des profondeurs', price: 260, icon: 'flame',   desc: 'Soigne d’un coup tous tes héros blessés.' },
   torche:    { name: 'Torche bénie',           price: 220, icon: 'flame',   desc: 'Rallume une torche déjà utilisée : une expédition de plus aujourd’hui.', limit: 2 },
   encens:    { name: 'Encens de ferveur',      price: 150, icon: 'sparkle', desc: '+15 % de chance de réussite à ton prochain rituel d’élévation.' },
-  parchemin: { name: 'Parchemin d’expérience', price: 120, icon: 'scroll',  desc: '+60 XP de combat à la carte de ton choix.' },
+  parchemin: { name: 'Parchemin d’expérience', price: 120, icon: 'scroll',  desc: '+80 XP au héros de ton choix.' },
 };

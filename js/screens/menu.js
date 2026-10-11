@@ -24,6 +24,7 @@ export default function menu(app, root) {
     </a>
     <h2 class="section-title">Mon aventure</h2>
     <nav class="mn-list">
+      ${T('#/heros', 'swords', 'Héros et invocations', 'Niveaux, compétences, fiches')}
       ${T('#/profil', 'user', 'Profil', 'Vitrine, chance, statistiques, titres')}
       ${T('#/succes', 'trophy', 'Succès et ensembles', `${achDone} / ${cat.achievements.length} succès`)}
       ${A('fusion', 'sparkle', 'Fusion des doublons', `${spare} doublon${spare > 1 ? 's' : ''} disponible${spare > 1 ? 's' : ''}`)}

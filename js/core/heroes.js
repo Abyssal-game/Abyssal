@@ -1,0 +1,160 @@
+// Héros jouables, invocations et ennemis (créatures du Bestiaire) : données et création des unités.
+import { RARITY_ORDER } from '../config.js';
+
+// ——— Progression ———————————————————————————————————————————————————————
+export const MAX_LEVEL = 30;
+export const xpToNext = (lvl) => 40 + 25 * (lvl - 1);
+export function levelOf(xp = 0) {
+  let lvl = 1, rest = xp;
+  while (lvl < MAX_LEVEL && rest >= xpToNext(lvl)) { rest -= xpToNext(lvl); lvl++; }
+  return { level: lvl, into: rest, need: lvl >= MAX_LEVEL ? 0 : xpToNext(lvl) };
+}
+export const totalXpFor = (lvl) => { let t = 0; for (let l = 1; l < lvl; l++) t += xpToNext(l); return t; };
+const growth = (lvl) => 1 + 0.09 * (lvl - 1);
+const egrowth = (lvl) => 1 + 0.15 * (lvl - 1) + 0.002 * (lvl - 1) ** 2; // les ennemis montent plus vite : il faut faire progresser ses héros
+
+// ——— Héros ————————————————————————————————————————————————————————————
+// res : ressource propre à la classe (affichée sous le portrait).
+export const HEROES = {
+  brenna: {
+    name: 'Brenna Forge-Rune', cls: 'Guerrière', race: 'Naine', role: 'Encaisse et frappe fort', color: '#E07A3A', icon: 'axe',
+    base: { hp: 96, atk: 12, mag: 3, def: 6, spd: 5 }, res: 'rage',
+    passive: 'Rage : chaque coup donné (+12) ou reçu (+18) remplit sa rage, que Fendoir libère.',
+    skills: ['fendoir', 'defi'],
+    lore: 'Dernière gardienne de la Forge des Runes. Elle n’a jamais reculé, pas même devant le Néant.',
+  },
+  aldric: {
+    name: 'Aldric de Vaux', cls: 'Paladin', race: 'Humain', role: 'Protège et soigne', color: '#E8C35A', icon: 'shield',
+    base: { hp: 104, atk: 9, mag: 8, def: 8, spd: 4 }, res: 'ferveur',
+    passive: 'Ferveur : les coups qu’il encaisse en protégeant un allié remplissent sa ferveur, qui renforce ses soins.',
+    skills: ['egide', 'lumiere'],
+    lore: 'Chevalier d’un ordre éteint, il garde encore le serment de protéger ceux qui marchent derrière lui.',
+  },
+  sylea: {
+    name: 'Syléa Feuille-d’Ombre', cls: 'Rôdeuse', race: 'Elfe', role: 'Marque et achève', color: '#5FC98A', icon: 'bow',
+    base: { hp: 72, atk: 13, mag: 5, def: 3, spd: 8 }, res: null,
+    passive: 'Chasseuse : attaquer une cible marquée lui rend 1 énergie.',
+    skills: ['marque', 'volee'],
+    lore: 'Elle a suivi la piste d’une bête jusqu’au bord de l’Abysse, et n’a jamais voulu faire demi-tour.',
+  },
+  morgane: {
+    name: 'Morgane l’Éclipsée', cls: 'Mage', race: 'Humaine', role: 'Dégâts magiques et interruption', color: '#9C7BFF', icon: 'flame',
+    base: { hp: 64, atk: 5, mag: 15, def: 2, spd: 6 }, res: null,
+    passive: 'Éléments : le feu sur une cible gelée, ou le givre sur une cible en feu, provoque une Brisure (dégâts doublés).',
+    skills: ['feu', 'givre'],
+    lore: 'Née pendant une éclipse, elle entend le feu et la glace se disputer dans ses veines.',
+  },
+};
+export const HERO_ORDER = ['brenna', 'aldric', 'sylea', 'morgane'];
+
+export const SKILLS = {
+  fendoir: { name: 'Fendoir', cost: 1, target: 'enemy', desc: 'Frappe à 120 %, plus 1 % par point de rage (consomme la rage).' },
+  defi:    { name: 'Cri de défi', cost: 1, target: 'self', desc: 'Attire les attaques 2 tours, défense ×1,5, +25 rage.' },
+  egide:   { name: 'Égide', cost: 1, target: 'ally', desc: 'Protège un allié 2 tours : Aldric reçoit ses coups (à 70 %).' },
+  lumiere: { name: 'Lumière sacrée', cost: 2, target: 'ally', desc: 'Soigne 25 % des PV, plus la ferveur accumulée.' },
+  marque:  { name: 'Marque du chasseur', cost: 1, target: 'enemy', desc: 'Marque une cible 3 tours : elle subit +30 % de dégâts.' },
+  volee:   { name: 'Volée de flèches', cost: 2, target: 'enemies', desc: 'Touche toute la ligne (×1,7 sur les cibles marquées).' },
+  feu:     { name: 'Trait de feu', cost: 1, target: 'enemy', desc: 'Dégâts magiques ×1,5 et Brûlure 3 tours.' },
+  givre:   { name: 'Lance de givre', cost: 1, target: 'enemy', desc: 'Dégâts ×1,1, Gel 2 tours et interrompt une attaque en préparation.' },
+};
+
+// ——— Invocations ——————————————————————————————————————————————————————
+// card : la créature du Bestiaire invoquée (son illustration est réutilisée).
+// unlock : ce qui la débloque (posséder la carte, ou atteindre une profondeur).
+export const INVOCATIONS = {
+  phenix:  { name: 'Phénix', card: 'CEL-031', color: '#FF9A3A', unlock: { start: true }, desc: 'Relève les héros tombés (40 % des PV) ; si personne n’est tombé, soigne toute l’équipe.' },
+  bahamut: { name: 'Bahamut', card: 'ABY-043', color: '#7FD3FF', unlock: { card: 'ABY-043', depth: 10 }, desc: 'Mégaflare : frappe tous les ennemis et les expose (+30 % de dégâts subis, 2 tours).' },
+  fenrir:  { name: 'Fenrir', card: 'SAU-049', color: '#C9D1DE', unlock: { card: 'SAU-049', depth: 15 }, desc: 'Croc du Ragnarök : énorme morsure ; si la proie meurt, la jauge revient à moitié.' },
+};
+export const INVOCATION_ORDER = ['phenix', 'bahamut', 'fenrir'];
+export const GAUGE = { action: 10, hurt: 6, perfect: 8 };
+const VARIANT_POWER = { normal: 0, alt: 0.03, holo: 0.05, corrupt: 0.06, chroma: 0.08, ancestral: 0.1, gold: 0.12, galaxy: 0.16, special: 0.16 };
+export const invocationPower = (level, variant = 'normal') => (1 + 0.1 * (level - 1)) * (1 + (VARIANT_POWER[variant] || 0));
+
+// ——— Unités ————————————————————————————————————————————————————————————
+let seq = 0;
+const blank = () => ({ stun: 0, burn: 0, frozen: 0, mark: 0, exposed: 0, taunt: 0, protectedBy: null, protecting: 0, defend: false, shield: 0, armorUp: 0, enraged: false, charging: false, poison: 0 });
+
+export function makeHero(key, { level = 1, wounded = false, blessings = [] } = {}) {
+  const h = HEROES[key];
+  const k = growth(level) * (wounded ? 0.8 : 1);
+  const u = {
+    uid: `h${++seq}`, kind: 'hero', side: 'ally', id: key, name: h.name, cls: h.cls, level,
+    maxHp: Math.round(h.base.hp * k), atk: Math.round(h.base.atk * k), mag: Math.round(h.base.mag * k), def: Math.round(h.base.def * k), spd: h.base.spd,
+    energy: 1, res: 0, skills: h.skills.slice(), st: blank(), wounded, ct: 0,
+  };
+  if (blessings.includes('blades')) u.atk += 3;
+  if (blessings.includes('haste')) u.spd += 2;
+  if (blessings.includes('vigor')) u.maxHp = Math.round(u.maxHp * 1.2);
+  if (blessings.includes('scales')) u.armor = 2;
+  if (blessings.includes('thirst')) u.lifesteal = 0.3;
+  if (blessings.includes('fury')) u.fury = true;
+  if (blessings.includes('ward')) u.ward = true;
+  u.hp = u.maxHp;
+  return u;
+}
+
+// Familles de comportement des créatures : déduites de leurs capacités et de leur catégorie.
+export const FAMILIES = {
+  brute:      { name: 'Brute', desc: 'Prépare des coups dévastateurs : interromps-la ou pare au bon moment.', pattern: ['attack', 'attack', 'charge'] },
+  gardien:    { name: 'Gardien', desc: 'Protège ses alliés derrière un bouclier.', pattern: ['attack', 'guard', 'attack'] },
+  lanceur:    { name: 'Lanceur de sorts', desc: 'Frappe toute ton équipe un tour sur deux.', pattern: ['attack', 'aoe'] },
+  venimeux:   { name: 'Venimeux', desc: 'Empoisonne ses proies.', pattern: ['poison', 'attack'] },
+  guerisseur: { name: 'Guérisseur', desc: 'Soigne ses alliés blessés : abats-le en premier.', pattern: ['attack', 'heal'] },
+  enrage:     { name: 'Enragé', desc: 'Devient furieux sous la moitié de ses PV.', pattern: ['attack'] },
+  traqueur:   { name: 'Traqueur', desc: 'S’acharne sur le héros le plus faible.', pattern: ['hunt', 'attack'] },
+  controleur: { name: 'Contrôleur', desc: 'Prépare des attaques qui étourdissent.', pattern: ['attack', 'charge'] },
+  essaim:     { name: 'Essaim', desc: 'Frappe deux fois, mais fragile.', pattern: ['double'] },
+};
+export function familyOf(card) {
+  const a = new Set((card.abilities || []).map((x) => x.key));
+  if (/essaim|insecte/i.test(card.category)) return 'essaim';
+  if (a.has('bless') || a.has('regen')) return 'guerisseur';
+  if (a.has('guard') || a.has('armor') || a.has('aegis')) return 'gardien';
+  if (a.has('venom')) return 'venimeux';
+  if (a.has('drown') || a.has('fear')) return 'controleur';
+  if (a.has('frenzy') || a.has('devour')) return 'enrage';
+  if (a.has('curse') || a.has('cataclysm') || a.has('strike')) return 'lanceur';
+  if (a.has('elusive') || a.has('first')) return 'traqueur';
+  return 'brute';
+}
+
+export const enemyLevel = (floor, room) => Math.max(1, Math.round(floor * 1.1) + (room === 'elite' ? 2 : room === 'boss' ? 3 : 0));
+
+export function makeEnemy(card, { level = 1, boss = false, elite = false } = {}) {
+  const s = card.stats;
+  const k = egrowth(level) * (boss ? 2.6 : elite ? 1.35 : 1);
+  const fam = familyOf(card);
+  const u = {
+    uid: `e${++seq}`, kind: 'enemy', side: 'enemy', id: card.id, name: card.name, rarity: card.rarity, level, family: fam, boss, elite,
+    maxHp: Math.round((s.hp * 4.2 + 22) * k * (fam === 'essaim' ? 0.7 : 1)),
+    atk: Math.round((s.atk * 1.2 + 5) * egrowth(level) * (boss ? 1.25 : elite ? 1.1 : 1)),
+    mag: Math.round((s.mag * 1.2 + 3) * egrowth(level)),
+    def: Math.round(s.def * 1.1 * egrowth(level)), spd: s.spd, energy: 0, res: 0, st: blank(), ct: 0, turns: 0,
+  };
+  u.hp = u.maxHp;
+  return u;
+}
+
+// Rareté maximale des ennemis selon la profondeur (les mythiques arrivent tard).
+export function enemyPool(catalog, floor) {
+  const maxR = Math.min(3, 1 + Math.floor((floor - 1) / 4));
+  return catalog.cards.filter((c) => RARITY_ORDER.indexOf(c.rarity) <= maxR && !Object.values(INVOCATIONS).some((i) => i.card === c.id));
+}
+export function bossPool(catalog, floor) {
+  const min = floor >= 20 ? 4 : 3;
+  return catalog.cards.filter((c) => RARITY_ORDER.indexOf(c.rarity) >= min && !Object.values(INVOCATIONS).some((i) => i.card === c.id));
+}
+
+// Étapes du Bestiaire de chasse
+export const HUNT_STAGES = [
+  { k: 1, name: 'Découverte', desc: 'Nom et illustration révélés.' },
+  { k: 5, name: 'Étude', desc: 'Comportement et statistiques connus.' },
+  { k: 15, name: 'Maîtrise', desc: '+10 % de dégâts contre cette créature.' },
+  { k: 40, name: 'Trophée', desc: 'Titre de chasseur et récompense.' },
+];
+export function huntStage(kills = 0) {
+  let i = -1;
+  HUNT_STAGES.forEach((s, j) => { if (kills >= s.k) i = j; });
+  return i; // -1 : jamais vaincue
+}

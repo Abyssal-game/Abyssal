@@ -36,12 +36,10 @@ export function openRitual(app, id, from, { onClose } = {}) {
         <div class="ri-c ri-to">${cardHTML(card, { variant: to })}<span class="small"><b>${esc(VARIANTS[to].name)}</b></span></div>
       </div>
       <div class="ri-chance ${forbidden ? 'forbidden' : ''}"><div class="ring" style="--p:${chance};--c:${forbidden ? '#FF3A5A' : 'var(--gold)'}"><span>${String(chance).replace('.', ',')}%</span></div>
-        <div><b>Chance de réussite</b><p class="small muted">${fervor ? `Ferveur : +${fervor * RITUAL.fervor} % grâce à ${fervor} échec${fervor > 1 ? 's' : ''} précédent${fervor > 1 ? 's' : ''}.` : 'Chaque échec ajoute de la ferveur : la tentative suivante sera plus facile.'}</p></div></div>
+        <div><b>Chance de réussite</b><p class="small muted">${fervor ? `Ferveur : +${fervor * RITUAL.fervor} % grâce à ${fervor} échec${fervor > 1 ? 's' : ''} précédent${fervor > 1 ? 's' : ''}.` : 'Chaque échec ajoute de la ferveur (+12 %) : le rituel finit toujours par réussir.'}</p></div></div>
       ${g.s.ritualBoost ? `<p class="small ri-boost">${icon('sparkle')} Un encens de ferveur brûle : +${g.s.ritualBoost} % pour ce rituel.</p>` : g.itemCount('encens') ? `<button class="btn small" data-ri="encens">${icon('sparkle')}Brûler un encens (+15 %) · ${g.itemCount('encens')} en stock</button>` : ''}
       <h3 class="section-title">Offrandes</h3>
       ${rows || '<p class="small muted">Tu n’as aucun doublon à offrir. Ouvre des boosters pour en obtenir.</p>'}
-      <div class="ri-forbid ${forbidden ? 'on' : ''}"><div><b>Rituel interdit</b><p class="small">Chance doublée. Mais si le rituel échoue, <b>cet exemplaire de ${esc(card.name)} est consumé</b>.</p></div>
-        <button class="switch" role="switch" aria-checked="${forbidden}" data-ri="forbid" aria-label="Rituel interdit"><i></i></button></div>
       <p class="small muted">Les offrandes sont détruites, que le rituel réussisse ou non. Ton premier exemplaire de chaque carte n’est jamais offert.</p>
       <button class="btn ${forbidden ? 'danger' : 'primary'} block" data-ri="go" ${chance ? '' : 'disabled'}>${icon('sparkle')}Lancer le rituel</button>
     </div>`);

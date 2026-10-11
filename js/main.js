@@ -20,21 +20,22 @@ import settingsScreen from './screens/settings.js';
 import descentScreen from './screens/descent.js';
 import accountScreen from './screens/account.js';
 import menuScreen from './screens/menu.js';
+import heroesScreen from './screens/heroes.js';
 import { startSync } from './cloud/sync.js';
 import { showWelcome } from './screens/welcome.js';
 
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,
   factions: factionsScreen, faction: factionsScreen, succes: achievementsScreen, profil: profileScreen,
-  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen,
+  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen, heros: heroesScreen,
 };
 const TABS = [
   ['antre', 'home', 'Antre'], ['collection', 'cards', 'Collection'], ['boutique', 'booster', 'Boosters'],
   ['descente', 'swords', 'Descente'], ['menu', 'menu', 'Menu'],
 ];
-const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu' };
+const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente' };
 // Page parente des sous-pages (bouton retour en haut)
-const PARENT = { bestiaire: 'menu', factions: 'menu', faction: 'factions', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu' };
+const PARENT = { bestiaire: 'menu', factions: 'menu', faction: 'factions', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente' };
 
 function storageOrMemory() {
   try {
