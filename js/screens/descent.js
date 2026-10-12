@@ -3,7 +3,9 @@
 import { RARITY } from '../config.js';
 import { DESCENT, ROOMS, BLESSINGS, CHESTS, chestForDepth } from '../core/descent.js';
 import { TEAM, BUDGET } from '../core/army.js';
-import { BOSS_POWERS, bossPowerOf } from '../core/duel.js';
+import { BOSSES, bossOf } from '../core/bosses.js';
+import { PACTS } from '../core/pacts.js';
+import { RELATION } from '../core/relations.js';
 import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM, sigil, picon, crestHTML } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, bindActions } from '../ui/dom.js';
@@ -104,7 +106,7 @@ export default function descent(app, root) {
   function doorsView(run) {
     const doors = g.doors();
     root.innerHTML = `${runHead(run)}<p class="dc-prompt">${doors.includes('boss') ? 'Un gardien barre la route.' : doors.length > 1 ? 'Deux passages. Le plus dangereux rapporte plus.' : 'Des créatures barrent le passage.'}</p>
-      <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r} has-art" data-act="door" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic ${DOOR_PIC[r] ? 'pic' : ''}">${DOOR_PIC[r] ? picon(DOOR_PIC[r]) : icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'boss' ? `<b class="dc-bad">${esc(BOSS_POWERS[bossPowerOf(run.floor)].name)}</b> : ${esc(BOSS_POWERS[bossPowerOf(run.floor)].desc)} <b class="dc-good">Point faible : ${esc(BOSS_POWERS[bossPowerOf(run.floor)].counter)}</b>` : r === 'elite' && run.floor >= WEEKLY_FLOOR && !g.weekly().done ? `${ROOMS[r].desc} <b class="dc-good">La créature de la semaine t’y attend !</b>` : ROOMS[r].desc}</span></button>`).join('')}</div>
+      <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r} has-art" data-act="door" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic ${DOOR_PIC[r] ? 'pic' : ''}">${DOOR_PIC[r] ? picon(DOOR_PIC[r]) : icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'boss' ? `<b class="dc-bad">${esc(BOSSES[bossOf(run.floor)].name)}</b> : ${esc(BOSSES[bossOf(run.floor)].mechanic)}${g.s.bossesBeaten[bossOf(run.floor)] ? ` <b class="dc-good">Contre : ${esc(BOSSES[bossOf(run.floor)].counter)}</b>` : ''}` : r === 'elite' && run.floor >= WEEKLY_FLOOR && !g.weekly().done ? `${ROOMS[r].desc} <b class="dc-good">La créature de la semaine t’y attend !</b>` : ROOMS[r].desc}</span></button>`).join('')}</div>
       ${run.cleared ? `<button class="btn ghost block" data-act="leave">${icon('back')}Remonter</button>` : ''}`;
   }
   function clearedView(run, extra = '') {
@@ -129,6 +131,8 @@ export default function descent(app, root) {
         ${w ? `<div class="vx-loot"><span class="vx-chip">${icon('crystal')}+${fmt(w.shards)}</span>${w.chest ? `<span class="vx-chip gold" style="--cc:${CHESTS[w.chest].color}">${icon('p:chest')}${esc(CHESTS[w.chest].name)}</span>` : ''}${feats.length ? `<span class="vx-chip feat">${icon('p:feats')}${feats.join(' · ')}</span>` : ''}</div>` : ''}
         ${w?.recruit ? `<p class="vx-week">${icon('crown')} Le gardien vaincu, <b>${esc(cat.get(w.recruit).name)}</b>, rejoint ta collection !</p>` : ''}
         ${w?.weekly ? `<p class="vx-week">${icon('sparkle')} <b>${esc(cat.get(w.weekly).name)}</b> rejoint ta collection !</p>` : ''}
+        ${w?.boss ? bossRecap(w.boss) : ''}
+        ${w?.relNew?.length ? `<p class="vx-week">${icon('p:combo')} Relation découverte : <b>${w.relNew.map((k) => esc(RELATION[k]?.name || k)).join(', ')}</b>. Retrouve-la dans le Bestiaire.</p>` : ''}
         ${w?.disc?.length ? `<div class="vx-disc"><span class="small muted">${picon('discover')}Nouvelles rencontres</span>${w.disc.slice(0, 5).map((id) => `<img alt="${esc(cat.get(id).name)}" title="${esc(cat.get(id).name)}" src="${artUrl(cat.get(id), { lite: true })}">`).join('')}</div>` : ''}
       </div>
       <div class="vx-team"><span class="small muted">Ton équipe · ${pct} % des PV</span>${teamStrip(run.team.map((m) => m.id), run)}</div>
@@ -157,12 +161,54 @@ export default function descent(app, root) {
       else {
         app.sfx.reveal(out.room === 'boss' ? 'M' : 'R');
         const r = g.descent().run;
-        ui.win = { floor: r.floor, room: out.room, shards: out.shards, chest: out.chest || null, disc: out.discovered.filter((id) => cat.get(id)), weekly: out.weekly?.id || null, recruit: out.recruit?.id || null, stats };
+        ui.win = { floor: r.floor, room: out.room, shards: out.shards, chest: out.chest || null, disc: out.discovered.filter((id) => cat.get(id)), weekly: out.weekly?.id || null, recruit: out.recruit?.id || null, stats, boss: out.boss || null, relNew: out.relNew || [] };
         rewardView(r);
       }
       window.scrollTo(0, 0);
       app.flushProgress();
     } });
+  }
+  // Pactes de l'Abîme : trois propositions facultatives avant un combat d'élite ou de gardien
+  function pactView(run) {
+    const boss = run.pendingRoom === 'boss' ? BOSSES[bossOf(run.floor)] : null;
+    root.innerHTML = `${runHead(run)}
+      <section class="pk-head"><img alt="" src="assets/icons/seal.webp"><div><h2>Pactes de l’Abîme</h2><p class="small">${boss ? `${esc(boss.name)} t’attend.` : 'Une élite redoutable t’attend.'} Une voix te propose un marché. Chaque pacte dure ce seul combat : un vrai avantage, et un vrai prix.</p></div></section>
+      <div class="pk-list">${(run.pactOffer || []).map((k) => { const p = PACTS[k]; return `<button class="pk-c ${ui.pact === k ? 'on' : ''}" data-act="pactpick" data-k="${k}" style="--pk:${p.color}" aria-pressed="${ui.pact === k}">
+        <b>${esc(p.name)}</b><span class="pk-gain"><i>Gain</i>${esc(p.gain)}</span><span class="pk-cost"><i>Prix</i>${esc(p.cost)}</span></button>`; }).join('')}</div>
+      <div class="pk-actions">${ui.pact && (run.pactOffer || []).includes(ui.pact) ? `<button class="btn primary block big-cta dc-plq dc-plq-red" data-act="pactgo">Signer le ${esc(PACTS[ui.pact].name)}</button>` : '<p class="small muted center">Touche un pacte pour le choisir.</p>'}
+        <button class="btn block dc-plq dc-plq-dark" data-act="pactno">Refuser et combattre sans pacte</button></div>`;
+  }
+  // Récapitulatif après un gardien : mécaniques rencontrées, interruptions, faiblesses, récit débloqué
+  function bossRecap(b) {
+    const B = BOSSES[b.key];
+    return `<div class="bx-recap"><b>${esc(B.name)} vaincu</b>
+      <ul>${b.log.map((m) => `<li>${esc(m)}</li>`).join('')}
+      <li>Interruptions réussies : <b>${b.interrupts}</b>${b.key === 'devoreur' ? ` · festins du Dévoreur : <b>${b.feasts}</b>` : ''}</li></ul>
+      ${b.first ? `<p class="small">${icon('p:genesis')} Nouveau récit dans le Bestiaire : <i>${esc(B.name)}</i>.</p>` : ''}</div>`;
+  }
+  function startPact(key) {
+    let out;
+    try { out = g.choosePact(key); } catch (e) { toast(esc(e.message), { kind: 'error' }); return; }
+    ui.pact = null;
+    if (key) app.sfx.discover();
+    if (out.battle) enterBattle();
+  }
+  // Entrée en combat ; un gardien a droit à une courte présentation (touche pour passer)
+  function enterBattle() {
+    window.scrollTo(0, 0);
+    const run = g.descent().run;
+    const key = run.battle?.bossKey;
+    if (!key || app.reduced()) return battleView(run);
+    const b = BOSSES[key], seen = g.s.bossesBeaten[key];
+    const el = document.createElement('div');
+    el.className = 'bx-intro';
+    el.innerHTML = `<div class="bx-in"><span class="bx-k">Étage ${run.floor} · Gardien</span><h1>${esc(b.name)}</h1><p class="bx-t">${esc(b.title)}</p><p class="bx-p">${esc(b.intro)}</p><p class="bx-m"><b>Sa mécanique</b> ${esc(b.mechanic)}</p>${seen ? `<p class="bx-m good"><b>Pour le contrer</b> ${esc(b.counter)}</p>` : ''}<span class="bx-tap">Touche pour combattre</span></div>`;
+    document.body.appendChild(el);
+    app.sfx.boss?.();
+    let done = false;
+    const go = () => { if (done) return; done = true; el.classList.add('out'); setTimeout(() => el.remove(), 300); battleView(g.descent().run); };
+    el.addEventListener('click', go);
+    setTimeout(go, 9000);
   }
   function render() {
     const run = g.descent().run;
@@ -172,6 +218,7 @@ export default function descent(app, root) {
     if (run.phase === 'altar') return altarView(run);
     if (run.phase === 'reward') return rewardView(run);
     if (run.phase === 'battle') return battleView(run);
+    if (run.phase === 'pact') return pactView(run);
     return clearedView(run);
   }
 
@@ -198,9 +245,13 @@ export default function descent(app, root) {
       if (playing) return;
       let out;
       try { out = g.chooseDoor(el.dataset.r); } catch (e) { toast(esc(e.message), { kind: 'error' }); return; }
-      if (out.battle) { window.scrollTo(0, 0); return battleView(g.descent().run); }
+      if (out.pact) { ui.pact = null; app.sfx.boss?.(); window.scrollTo(0, 0); tuto(app, 'pacts'); return render(); }
+      if (out.battle) return enterBattle();
       render();
     },
+    pactpick(el) { ui.pact = el.dataset.k; app.sfx.tap(); render(); },
+    pactgo() { startPact(ui.pact); },
+    pactno() { startPact(null); },
     reward(el) {
       let out;
       try { out = g.chooseReward(el.dataset.r); } catch (e) { toast(esc(e.message), { kind: 'error' }); return; }

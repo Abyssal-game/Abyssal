@@ -15,6 +15,9 @@ import {
   beginEnemyTurn, nextEnemy, enemyAct, endEnemyTurn, takeSkips, defenseWindow, threats, intentInfo, useUlt, ultReady, autoActs,
 } from '../core/duel.js';
 import { KITS, AI_FAMILIES, DICE_TIERS, WEAK_TO } from '../core/skills.js';
+import { BOSSES, LAWS, ASPECTS } from '../core/bosses.js';
+import { PACTS } from '../core/pacts.js';
+import { RELICS } from '../core/relics.js';
 import { ULTS } from '../core/army.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -33,7 +36,9 @@ const FX = ['slash', 'impact', 'dodge', 'heal', 'venom', 'frost', 'seal', 'death
 const fxUrl = (n) => `assets/fx/${n}.webp`;
 const DANGER = ['', '', 'Danger', 'Mortel'];
 // Icône peinte d'une intention ennemie
-const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${k}.webp">`;
+// les intentions des gardiens réutilisent les icônes peintes les plus proches
+const IN_PIC = { gorge: 'heavy', gather: 'channel', blizzard: 'frost', mimic: 'channel', copy: 'heavy', decree: 'rally', shift: 'charge' };
+const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${IN_PIC[k] || k}.webp">`;
 
 export function runDuel(app, root, { title, onEnd }) {
   const g = app.game, cat = app.catalog, run = g.descent().run, st = run.battle;
@@ -53,6 +58,7 @@ export function runDuel(app, root, { title, onEnd }) {
       <button class="btn small ghost" data-d="help" aria-label="Règles du combat">?</button>
       <button class="btn small ghost ${ui.fast ? 'on' : ''}" data-d="fast" aria-label="Animations accélérées">×2</button>
       <button class="btn small ghost" data-d="quit" aria-label="Pause">${icon('close')}</button></span></div>
+    <div class="cb-rules"></div>
     <div class="dv-row enemy"></div>
     <div class="dv-mid"><span class="dv-msg" aria-live="polite"></span><span class="dv-resw"></span></div>
     <div class="cb-acts" hidden></div>
@@ -91,8 +97,9 @@ export function runDuel(app, root, { title, onEnd }) {
   const intentChip = (u) => {
     const i = intentInfo(st, u);
     if (!i || st.turn !== 'ally') return '';
-    const named = ['charge', 'channel', 'shield', 'heal', 'rally', 'frost'].includes(i.kind);
-    const label = named ? esc(i.def.name) : `${i.dmg}${i.kind === 'blast' ? ' ×3' : ''}`;
+    const named = ['charge', 'channel', 'shield', 'heal', 'rally', 'frost', 'gather', 'mimic', 'decree', 'shift'].includes(i.kind);
+    const label = i.kind === 'mimic' ? `Copie : ${esc(i.copyName)}` : i.kind === 'decree' ? esc(LAWS[i.law]?.name || 'Décret') : i.kind === 'shift' ? esc(ASPECTS[i.aspect]?.name || 'Bascule')
+      : named ? esc(i.def.name) : i.kind === 'copy' ? `${esc(i.copyName)}${i.dmg ? ` ${i.dmg}` : ''}` : `${i.dmg}${i.aoe ? ' ×3' : ''}`;
     return `<span class="cb-int d${i.danger} k-${i.kind}" title="${esc(i.def.name)} : ${esc(i.def.desc)}">${intentIcon(i.kind)}<b>${label}</b>${i.danger >= 2 ? `<em>${DANGER[i.danger]}</em>` : ''}</span>`;
   };
   const cardEl = (u) => {
@@ -173,6 +180,11 @@ export function runDuel(app, root, { title, onEnd }) {
       }
     }
     enEl.innerHTML = front(st, 'enemy').map(cardEl).join('') + resHTML('enemy');
+    const rules = [st.pact && PACTS[st.pact] ? `<span class="cb-law" style="--pk:${PACTS[st.pact].color}" data-d="rule" data-k="pact">${icon('p:seal')}<b>${esc(PACTS[st.pact].name)}</b></span>` : '',
+      st.law ? `<span class="cb-law" data-d="rule" data-k="law"><b>${esc(LAWS[st.law].name)}</b></span>` : '',
+      st.aspect ? `<span class="cb-law" data-d="rule" data-k="aspect"><b>${esc(ASPECTS[st.aspect].name)}</b></span>` : '',
+      (st.relics || []).length ? `<span class="cb-law" data-d="rule" data-k="relics">${icon('p:crown')}<b>${st.relics.length} relique${st.relics.length > 1 ? 's' : ''}</b></span>` : ''].join('');
+    const rulesEl = $('.cb-rules'); if (rulesEl) { rulesEl.innerHTML = rules; rulesEl.hidden = !rules; }
     alEl.innerHTML = front(st, 'ally').map(cardEl).join('');
     $('.dv-resw').innerHTML = resHTML('ally');
     const showActs = !!sel && st.turn === 'ally' && !busy && !st.over;
@@ -308,6 +320,7 @@ export function runDuel(app, root, { title, onEnd }) {
         case 'revive': draw(); float(e.u, 'Relevée !', 'heal'); await wait(T(280)); break;
         case 'phase': draw(); say(e.side === 'enemy' ? '<b class="dc-bad">Tour des créatures corrompues</b>' : 'À toi !'); await wait(T(e.side === 'enemy' ? 380 : 160)); break;
         case 'ult': await ultFx(); break;
+        case 'law': draw(); banner(e.law ? esc(LAWS[e.law].name) : esc(ASPECTS[e.aspect].name), 'skill', 1100); await wait(T(700)); break;
         default: break;
       }
     }
@@ -511,6 +524,15 @@ export function runDuel(app, root, { title, onEnd }) {
     sh.body.addEventListener('click', (ev) => { const p = ev.target.closest('[data-in]'); if (p) { sh.close(); const u = sel; mode = null; exec(() => act(st, u, 'swap', p.dataset.in)); } });
   }
 
+  // Règles en vigueur : pacte, loi de l'Architecte, aspect de l'Éclipse, reliques
+  function ruleSheet(k) {
+    let h = '';
+    if (k === 'pact' && PACTS[st.pact]) h = `<h2>${esc(PACTS[st.pact].name)}</h2><p><b class="dc-good">Gain</b> : ${esc(PACTS[st.pact].gain)}</p><p><b class="dc-bad">Prix</b> : ${esc(PACTS[st.pact].cost)}</p>`;
+    else if (k === 'law' && LAWS[st.law]) h = `<h2>${esc(LAWS[st.law].name)}</h2><p>${esc(LAWS[st.law].desc)}</p><p class="small muted">L’Architecte change de Loi tous les deux tours ; la prochaine est annoncée sur sa carte.</p>`;
+    else if (k === 'aspect' && ASPECTS[st.aspect]) { const A = ASPECTS[st.aspect]; h = `<h2>${esc(A.name)}</h2><p>Faible face à <b>${A.weak.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}</b> (+60 %), résiste à <b>${A.resist.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}</b> (−50 %).</p>`; }
+    else if (k === 'relics') h = `<h2>Tes reliques</h2>${(st.relics || []).map((r) => `<p class="small"><b>${esc(RELICS[r].name)}</b> : ${esc(RELICS[r].gain)} <span class="dc-bad">${esc(RELICS[r].cost)}</span></p>`).join('')}`;
+    if (h) openSheet(`<div class="cb-rulesheet">${h}</div>`, { label: 'Règle en vigueur' });
+  }
   // ——— Touchers ———
   root.addEventListener('pointerdown', (e) => { if (defTap && !e.target.closest('[data-d="quit"],[data-d="help"],[data-d="fast"]')) { e.preventDefault(); defTap(); } }, { signal: ctl.signal });
   root.addEventListener('click', async (e) => {
@@ -521,6 +543,7 @@ export function runDuel(app, root, { title, onEnd }) {
       if (k === 'quit') { toast('Combat en pause : il t’attend dans la Descente.', { icon: 'swords' }); app.go(''); return; }
       if (k === 'fast') { ui.fast = !ui.fast; b.classList.toggle('on', ui.fast); return; }
       if (k === 'help') return help();
+      if (k === 'rule') return ruleSheet(b.dataset.k);
       if (busy) return;
       if (k === 'desel') { sel = null; mode = null; confirm = null; draw(); return; }
       if (k === 'cancel') { mode = null; confirm = null; draw(); return; }
@@ -592,9 +615,10 @@ export function runDuel(app, root, { title, onEnd }) {
     openSheet(`<div class="tb-info"><div class="tb-info-card ${u.side === 'enemy' ? 'corrupt' : ''}">${cardHTML(c, { size: 'full', nameKnown: true })}</div>
       <h3>${esc(c.name)}${u.side === 'enemy' ? ' corrompu' : ''}</h3>
       <dl class="facts"><div><dt>Attaque</dt><dd>${u.atk + (u.boost || 0)}</dd></div><div><dt>PV</dt><dd>${Math.max(0, u.hp)} / ${u.maxHp}</dd></div><div><dt>Niveau</dt><dd>${u.level || 1}</dd></div>${u.brkMax ? `<div><dt>Brisure</dt><dd>${u.broken ? 'Brisé' : `${u.brk} / ${u.brkMax}`}</dd></div>` : ''}</dl>
-      ${i ? `<p class="small cb-iline"><b>${intentIcon(i.kind)} Intention : ${esc(i.def.name)}</b>${i.dmg ? ` · ${i.dmg} dégâts${i.kind === 'blast' ? ' à chacune' : ''}` : ''}${tgtName ? ` sur ${esc(tgtName)}` : ''}. ${esc(i.def.desc)}${i.qte && defMode !== 'off' ? ' <b>Défense active possible.</b>' : ''}</p>` : ''}
+      ${i ? `<p class="small cb-iline"><b>${intentIcon(i.kind)} Intention : ${esc(i.kind === 'mimic' ? `Copie de « ${i.copyName} »` : i.kind === 'copy' ? `${i.copyName} (copiée)` : i.kind === 'decree' ? LAWS[i.law]?.name || i.def.name : i.kind === 'shift' ? ASPECTS[i.aspect]?.name || i.def.name : i.def.name)}</b>${i.kind === 'decree' && LAWS[i.law] ? ` : ${esc(LAWS[i.law].desc)}` : ''}${i.dmg ? ` · ${i.dmg} dégâts${i.kind === 'blast' ? ' à chacune' : ''}` : ''}${tgtName ? ` sur ${esc(tgtName)}` : ''}. ${esc(i.def.desc)}${i.qte && defMode !== 'off' ? ' <b>Défense active possible.</b>' : ''}</p>` : ''}
       ${fam ? `<p class="small"><b>${esc(fam.name)}</b> : ${esc(fam.desc)} <span class="dc-good">${esc(fam.counter)}</span></p>` : ''}
-      ${u.boss && st.bossPower ? `<p class="small dc-bad"><b>${esc(BOSS_POWERS[st.bossPower].name)}</b> : ${esc(BOSS_POWERS[st.bossPower].desc)} Sous la moitié de ses PV, il entre en phase 2.</p><p class="small dc-good"><b>Point faible</b> : ${esc(BOSS_POWERS[st.bossPower].counter)}</p>` : ''}
+      ${u.boss && st.bossKey ? `<p class="small dc-bad"><b>${esc(BOSSES[st.bossKey].name)}</b> : ${esc(BOSSES[st.bossKey].mechanic)} Sous la moitié de ses PV, il entre en phase 2 et accélère.</p>${g.s.bossesBeaten[st.bossKey] ? `<p class="small dc-good"><b>Pour le contrer</b> : ${esc(BOSSES[st.bossKey].counter)}</p>` : ''}${u.aspect ? `<p class="small"><b>${esc(ASPECTS[u.aspect].name)}</b> : faible face à ${ASPECTS[u.aspect].weak.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}, résiste à ${ASPECTS[u.aspect].resist.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}.</p>` : ''}` : ''}
+      ${u.boss && st.bossPower && !st.bossKey ? `<p class="small dc-bad"><b>${esc(BOSS_POWERS[st.bossPower].name)}</b> : ${esc(BOSS_POWERS[st.bossPower].desc)} Sous la moitié de ses PV, il entre en phase 2.</p><p class="small dc-good"><b>Point faible</b> : ${esc(BOSS_POWERS[st.bossPower].counter)}</p>` : ''}
       ${u.side === 'enemy' ? `<p class="small">${weakF ? `<b>Faiblesse</b> : ${sigil(weakF)} ${esc(cat.faction[weakF]?.name || weakF)} (+50 % de dégâts)` : '<b>Faiblesse</b> : inconnue. Frappe-la avec la bonne faction, ou marque-la, pour la découvrir.'}</p>` : `
       <p class="small"><b>${actIcon('attack')} ${esc(kit.basic.name)}</b> (1 action) : ${esc(kit.basic.desc)}</p>
       <p class="small"><b>${actIcon(kit.skill.key, kit.skill.icon)} ${esc(kit.skill.name)}</b> (${kit.skill.ap} action${kit.skill.ap > 1 ? 's' : ''}, ${kit.skill.fervor} Ferveur) : ${esc(kit.skill.desc)}</p>
@@ -629,7 +653,7 @@ export function runDuel(app, root, { title, onEnd }) {
       <h3>Les rôles</h3>${Object.values(KITS).map((k) => `<p class="small">${roleIcon(k.kw)} <b>${esc(k.name)}</b> · <b>${esc(k.skill.name)}</b> (${k.skill.ap} act., ${k.skill.fervor} Ferveur) : ${esc(k.skill.desc)} <i>${esc(k.passive.name)} : ${esc(k.passive.desc)}</i></p>`).join('')}
       <h3>Les combinaisons</h3>${SYNERGIES.map((x) => `<p class="small"><b class="dv-syn-n">${esc(x.name)}</b> : ${esc(x.desc)}</p>`).join('')}
       <h3>Les ennemis</h3>${Object.values(AI_FAMILIES).map((f) => `<p class="small"><b>${esc(f.name)}</b> : ${esc(f.desc)} <span class="dc-good">${esc(f.counter)}</span></p>`).join('')}
-      <h3>Les gardiens</h3>${Object.values(BOSS_POWERS).map((x) => `<p class="small"><b>${esc(x.name)}</b> : ${esc(x.desc)} <span class="dc-good">${esc(x.counter)}</span></p>`).join('')}
+      <h3>Les gardiens</h3>${Object.entries(BOSSES).map(([k, x]) => `<p class="small"><b>${esc(x.name)}</b> : ${esc(x.mechanic)}${g.s.bossesBeaten[k] ? ` <span class="dc-good">${esc(x.counter)}</span>` : ''}</p>`).join('')}
       <p class="small muted">Sous la moitié de leurs PV, les gardiens entrent en phase 2 : plus forts, ils alternent coups chargés et déflagrations, et visent tes Soigneurs.</p>`, { label: 'Règles du combat' });
   }
 

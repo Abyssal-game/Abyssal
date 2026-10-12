@@ -5,6 +5,9 @@ import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from 
 import { loadSave, writeSave, defaultSave, today } from './save.js';
 import { DESCENT, CHESTS, floorDoors, floorEnemies, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, huntStage, HUNT_STAGES } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel } from './duel.js';
+import { bossOf, BOSSES } from './bosses.js';
+import { pactChoices, PACTS } from './pacts.js';
+import { FORMS, formUnlocked } from './forms.js';
 import { FERVOR_START, FERVOR_MAX } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
 export const WEEKLY_FLOOR = 8;
@@ -451,16 +454,30 @@ export class Game {
     d.run = {
       v: 3, day: d.day, floor: 1, cleared: 0, phase: 'doors', cursed: cursed && !free, free, blessings: [], altar: null,
       gauge: this.rule(d.day).key === 'lune' ? FERVOR_MAX - 2 : FERVOR_START, ult: { key: ult.key, power: ult.power, card: ult.card },
-      team: team.map((id) => { const u = duelUnit(this.catalog.get(id), { level: this.cardLevel(id) }); return { id, hp: u.maxHp, maxHp: u.maxHp, fallen: false }; }),
+      team: team.map((id) => { const u = duelUnit(this.catalog.get(id), { level: this.cardLevel(id), form: this.formOf(id) }); return { id, hp: u.maxHp, maxHp: u.maxHp, fallen: false, form: this.formOf(id) }; }),
       shards: 0, chests: [], kills: {},
     };
     this.persist();
     return d.run;
   }
+  // Forme choisie pour une carte (corrompue si débloquée et sélectionnée)
+  formOf(id) { return this.s.forms?.[id] === 'corrompue' && formUnlocked(this, id) ? 'corrompue' : null; }
+  setForm(id, form) {
+    if (form === 'corrompue' && !formUnlocked(this, id)) throw new Error('Cette forme n’est pas encore éveillée.');
+    if (this.s.descent.run) throw new Error('Termine d’abord ton expédition.');
+    if (form === 'corrompue') this.s.forms[id] = 'corrompue'; else delete this.s.forms[id];
+    this.persist();
+  }
+  // Relations rencontrées pendant un combat : elles entrent dans le Bestiaire
+  learnRelations(st) {
+    const out = [];
+    for (const k of Object.keys(st?.relSeen || {})) if (!this.s.relations[k]) { this.s.relations[k] = Date.now(); out.push(k); }
+    return out;
+  }
   runUnits() {
     const run = this.s.descent.run, b = run.blessings;
     return run.team.filter((m) => !m.fallen).map((m) => {
-      const u = duelUnit(this.catalog.get(m.id), { level: this.cardLevel(m.id) });
+      const u = duelUnit(this.catalog.get(m.id), { level: this.cardLevel(m.id), form: m.form || null });
       if (b.includes('blades')) u.atk += 1;
       if (b.includes('ward')) u.shield = 1;
       return { ...u, maxHp: m.maxHp, hp: Math.min(m.hp, m.maxHp) };
@@ -478,6 +495,27 @@ export class Game {
     if (!this.doors().includes(room)) throw new Error('Porte inconnue.');
     const rule = this.rule(run.day);
     const out = { room };
+    // Élite ou gardien : un Pacte de l'Abîme est proposé avant le combat (facultatif)
+    if ((room === 'elite' || room === 'boss') && !run.free) {
+      run.pactOffer = pactChoices(`${run.day}:${run.floor}:${room}`); run.pendingRoom = room; run.phase = 'pact';
+      this.persist();
+      return { room, pact: run.pactOffer };
+    }
+    return this.startBattle(room, out);
+  }
+  // Pacte accepté (clé) ou refusé (null), puis le combat commence
+  choosePact(key) {
+    const run = this.s.descent.run;
+    if (!run || run.phase !== 'pact') throw new Error('Aucun pacte à choisir.');
+    if (key && !(run.pactOffer || []).includes(key)) throw new Error('Pacte inconnu.');
+    const room = run.pendingRoom;
+    run.pact = key || null; run.pactOffer = null; run.pendingRoom = null;
+    if (key) this.s.stats.pacts = (this.s.stats.pacts || 0) + 1;
+    return this.startBattle(room, { room, pact: key });
+  }
+  startBattle(room, out = { room }) {
+    const run = this.s.descent.run;
+    const rule = this.rule(run.day);
     if (room === 'fight' || room === 'elite' || room === 'boss') {
       // les créatures du Bestiaire, corrompues ; l'état du duel est gardé dans l'expédition (reprise exacte)
       const sc = enemyScale(run.floor);
@@ -496,7 +534,7 @@ export class Game {
       }
       const known = {};
       enemies.forEach((e) => { if (this.knows(e.id)) known[e.id] = true; });
-      run.battle = createDuel(this.runUnits(), enemies, { fervor: run.gauge || 0, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, bossPower: room === 'boss' ? bossPowerOf(run.floor) : null, blessings: run.blessings, discovered: this.s.weakSeen || {}, seed: this.rng ? Math.floor(this.rng() * 2 ** 31) : null });
+      run.battle = createDuel(this.runUnits(), enemies, { fervor: run.gauge || 0, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, boss: room === 'boss' ? bossOf(run.floor) : null, pact: room === 'fight' ? null : run.pact || null, blessings: run.blessings, discovered: this.s.weakSeen || {}, seed: this.rng ? Math.floor(this.rng() * 2 ** 31) : null });
       run.room = room; run.phase = 'battle'; out.battle = true;
     }
     if (run.phase === 'cleared') this.clearFloor();
@@ -550,6 +588,10 @@ export class Game {
       if (m.hp <= 0) m.fallen = true;
     });
     run.gauge = st.fervor ?? st.gauge ?? 0; // la Ferveur se garde d'un combat à l'autre
+    const relNew = this.learnRelations(st);
+    const bossKey = st.bossKey;
+    const pactUsed = st.pact || null;
+    run.pact = null;
     this.s.weakSeen = { ...(this.s.weakSeen || {}), ...(st.discovered || {}) };
     const discovered = [];
     for (const id of st.kills) {
@@ -561,7 +603,12 @@ export class Game {
     }
     run.battle = null;
     const won = st.over === 'won' && run.team.some((m) => !m.fallen);
-    const out = { room, won, discovered };
+    const out = { room, won, discovered, relNew, pact: pactUsed };
+    if (bossKey) {
+      out.boss = { key: bossKey, log: (st.bossLog || []).slice(), interrupts: st.stats?.interrupts || 0, feasts: st.stats?.feasts || 0, weak: Object.keys(st.discovered || {}), first: won && !this.s.bossesBeaten[bossKey] };
+      if (won) { this.s.bossesBeaten[bossKey] = this.s.bossesBeaten[bossKey] || Date.now(); }
+    }
+    if (!won && pactUsed === 'gardien') run.shards = 0; // le prix du Pacte du Gardien
     const wk = this.weekly();
     if (won && !wk.done && st.kills.includes(wk.id)) {
       this.s.weekly = { week: wk.week, done: true };

@@ -128,6 +128,13 @@ export const INTENTS = {
   rally:   { name: 'Renfort',        icon: 'sparkle', desc: 'Les autres ennemis gagnent +2 en attaque pour ce tour.' },
   poison:  { name: 'Empoisonnement', icon: 'skull',   desc: 'Frappe et empoisonne la cible (+3 poison).' },
   frost:   { name: 'Sort de gel',    icon: 'eye',     desc: 'Gèle la cible : elle ne pourra pas agir à ton prochain tour.' },
+  gorge:    { name: 'Dévorer',        icon: 'skull',   desc: 'Arrache des PV à la cible (plus d’une fois et demie sa force) et s’en nourrit. Chaque festin réussi lui donne +1 ATQ (+2 en phase 2). Gel ou Brisure l’interrompent.' },
+  gather:   { name: 'Le froid monte', icon: 'sparkle', desc: 'N’attaque pas ce tour-ci : Tempête de givre au tour suivant. Gel ou Brisure l’interrompent.' },
+  blizzard: { name: 'Tempête de givre', icon: 'flame', desc: 'Frappe toute ton équipe et gèle ta créature la plus forte (deux en phase 2).' },
+  mimic:    { name: 'Copie',          icon: 'eye',     desc: 'Observe ton équipe : au tour suivant, il retourne contre toi la compétence annoncée. Gel ou Brisure l’interrompent.' },
+  copy:     { name: 'Imitation',      icon: 'skull',   desc: 'Utilise contre toi la compétence copiée.' },
+  decree:   { name: 'Décret',         icon: 'sparkle', desc: 'Impose une nouvelle Loi qui change les règles du combat à partir de ton prochain tour.' },
+  shift:    { name: 'Bascule',        icon: 'sparkle', desc: 'Change d’aspect : ses faiblesses et résistances s’inversent à partir de ton prochain tour.' },
 };
 
 // Pouvoirs des gardiens. weak : la capacité qui les contre. Phase 2 sous 50 % des PV.

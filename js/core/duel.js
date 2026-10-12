@@ -12,8 +12,11 @@ import {
   AP_MAX, FERVOR_MAX, ACTS_PER_UNIT, ULT_COST, KITS, COMMON_ACTS, WEAK_TO, WEAK_MULT, RESIST_MULT,
   aiFamily, INTENTS, BOSS_POWERS, bossPowerOf, diceChance, KEYWORDS, keywordOf, SYNERGIES,
 } from './skills.js';
+import { BOSSES, LAWS, ASPECTS } from './bosses.js';
+import { familyOf, relationMult, activeLegends } from './relations.js';
+import { FORMS } from './forms.js';
 
-export { KEYWORDS, keywordOf, INTENTS, BOSS_POWERS, bossPowerOf, SYNERGIES, FERVOR_MAX, AP_MAX };
+export { KEYWORDS, keywordOf, INTENTS, BOSS_POWERS, bossPowerOf, SYNERGIES, FERVOR_MAX, AP_MAX, BOSSES, LAWS, ASPECTS };
 export const FRONT = 3;
 export const GAUGE_MAX = FERVOR_MAX; // compatibilité : l'ancienne jauge du pouvoir est devenue la Ferveur
 export const PACK_BONUS = 1;         // Instinct de meute : les Communes frappent plus fort élites et gardiens
@@ -23,12 +26,15 @@ const FAM_BY_ROLE = { protecteur: 'protecteur', soin: 'soutien', poison: 'parasi
 // Gabarit par rôle à la rareté Commune, niveau 1 : [attaque, PV]
 const BASE = { protecteur: [2, 12], degats: [4, 7], soin: [2, 8], poison: [2, 8], controle: [2, 8], soutien: [2, 9], zone: [2, 7] };
 const RARITY_MULT = { C: 1, PC: 1.15, R: 1.3, HR: 1.45, M: 1.6, S: 1.75 };
-const SINGLE = ['hit', 'heavy', 'poison', 'frost'];
+const SINGLE = ['hit', 'heavy', 'poison', 'frost', 'gorge'];
+// Intentions spéciales des gardiens (comptent comme « actions spéciales » pour le Pacte du Reflet)
+const SPECIAL = ['heavy', 'blast', 'shield', 'heal', 'rally', 'charge', 'channel', 'gorge', 'gather', 'blizzard', 'mimic', 'copy', 'decree', 'shift'];
 
 let seq = 0;
 // Une carte de combat. scale : force (niveau pour les alliés, profondeur pour les ennemis).
-export function duelUnit(card, { side = 'ally', level = 1, scale = null, boss = false, elite = false } = {}) {
+export function duelUnit(card, { side = 'ally', level = 1, scale = null, boss = false, elite = false, form = null } = {}) {
   const role = roleOf(card), [a, h] = BASE[role];
+  const fm = side === 'ally' && form ? FORMS[card.id] : null;
   const k = RARITY_MULT[card.rarity] * (scale ?? (1 + 0.08 * (level - 1)));
   const atk = Math.max(1, Math.round(a * k * (boss ? 1.25 : 1) * (side === 'enemy' ? 1.2 : 1)));
   const hp = Math.max(1, Math.round(h * k * (boss ? 3 : elite ? 1.6 : 1)));
@@ -37,7 +43,8 @@ export function duelUnit(card, { side = 'ally', level = 1, scale = null, boss = 
     uid: `${side[0]}${++seq}`, id: card.id, name: card.name, side, rarity: card.rarity, faction: card.faction, role, kw: KW_BY_ROLE[role],
     fam: side === 'enemy' ? aiFamily(card, { boss }) : null,
     atk, hp, maxHp: hp, level, boss, elite, poison: 0, frozen: 0, frostCD: 0, boost: 0, shield: 0, acts: 0, intent: null,
-    brk: brkMax, brkMax, broken: false, mark: 0,
+    brk: brkMax, brkMax, broken: false, mark: 0, family: familyOf(card),
+    ...(fm ? { form: fm.passive, name: fm.name, atk: Math.max(1, atk + fm.atk), hp: Math.max(1, Math.round(hp * fm.hp)), maxHp: Math.max(1, Math.round(hp * fm.hp)) } : {}),
   };
 }
 
@@ -52,19 +59,48 @@ export function rand(st) {
 const d20 = (st) => 1 + Math.floor(rand(st) * 20);
 
 // ——— État ———
-export function createDuel(allies, enemies, { gauge = 0, fervor = gauge, ult = 'sceau', power = 1, known = {}, ruleMult = 1, bossPower = null, blessings = [], seed = null, discovered = {} } = {}) {
+export function createDuel(allies, enemies, { gauge = 0, fervor = gauge, ult = 'sceau', power = 1, known = {}, ruleMult = 1, bossPower = null, boss = null, pact = null, relics = [], blessings = [], seed = null, discovered = {} } = {}) {
   const st = {
     ver: 2, units: {}, order: { ally: [], enemy: [] }, turn: 'ally', round: 1, ap: AP_MAX,
     fervor: Math.min(FERVOR_MAX, fervor + (blessings.includes('ferveur') ? 1 : 0)), gauge: 0,
     ult, power, known, ruleMult, bossPower, blessings, over: null, kills: [], swapped: false,
     freeSwap: blessings.includes('relais'), sursis: blessings.includes('sursis'), queue: [], skipEv: [], discovered: { ...discovered },
-    seed: seed ?? Math.floor(Math.random() * 2 ** 31), stats: { parries: 0, dodges: 0, breaks: 0, crits: 0, fumbles: 0 },
+    seed: seed ?? Math.floor(Math.random() * 2 ** 31), stats: { parries: 0, dodges: 0, breaks: 0, crits: 0, fumbles: 0, interrupts: 0, feasts: 0 },
+    bossKey: boss && BOSSES[boss] ? boss : null, law: null, aspect: null, pact: pact || null, relics: relics.slice(), relSeen: {}, bossLog: [], legends: [],
   };
   for (const u of [...allies, ...enemies]) { st.units[u.uid] = { ...u }; st.order[u.side].push(u.uid); }
+  setupExtras(st);
   ['ally', 'enemy'].forEach((side) => front(st, side).forEach((u) => { u.inPlay = true; }));
   st.gauge = st.fervor;
   startAllyTurn(st, []);
   return st;
+}
+// Gardien, pacte, reliques, légendes et formes : préparation au début du combat
+function setupExtras(st) {
+  const allies = st.order.ally.map((id) => st.units[id]);
+  const scaleHp = (u, k) => { u.maxHp = Math.max(1, Math.round(u.maxHp * k)); u.hp = Math.min(u.maxHp, Math.max(1, Math.round(u.hp * k))); };
+  if (st.bossKey === 'eclipse') { st.aspect = 'soleil'; st.order.enemy.forEach((id) => { if (st.units[id].boss) st.units[id].aspect = 'soleil'; }); }
+  // Légendes : plusieurs créatures d'un même mythe dans l'équipe
+  st.legends = activeLegends(allies.map((u) => u.id));
+  for (const L of st.legends) {
+    st.relSeen[L.key] = true;
+    allies.filter((u) => L.members.includes(u.id)).forEach((u) => { u.atk += L.members.length >= 3 ? 2 : 1; scaleHp(u, 1.1); u.legend = L.key; });
+  }
+  // Formes corrompues
+  allies.forEach((u) => { if (u.form === 'rebirth') { u.hp = Math.max(1, Math.round(u.maxHp * 0.7)); u.reborn = false; } });
+  // Pactes
+  if (st.pact === 'reflet') st.fervor = Math.max(0, st.fervor - 2);
+  if (st.pact === 'cendre') { st.fervor = FERVOR_MAX; allies.forEach((u) => { u.healMult = 0.5; }); }
+  if (st.pact === 'ombre') allies.forEach((u) => scaleHp(u, 0.8));
+  if (st.pact === 'gardien') st.guardianPact = true;
+  // Reliques (Chasse aux Reliques)
+  const R_ = st.relics || [];
+  if (R_.includes('coeur')) allies.forEach((u) => scaleHp(u, 1.35));
+  if (R_.includes('sablier')) allies.forEach((u) => scaleHp(u, 0.9));
+  if (R_.includes('dent')) st.fervor = Math.max(0, st.fervor - 1);
+  if (R_.includes('oeil')) st.order.enemy.forEach((id) => { const f = st.units[id].faction; if (f) st.discovered[f] = true; });
+  st.miroir = R_.includes('miroir');
+  st.gauge = st.fervor;
 }
 // Ancienne sauvegarde (combat en cours avant la refonte) : on complète l'état et on reprend au tour du joueur.
 export function upgradeDuel(st) {
@@ -90,6 +126,7 @@ const inFront = (st, u) => !!u && u.hp > 0 && front(st, u.side).includes(u);
 
 // Multiplicateur de faction : faiblesse ×1,5 ; même faction ×0,75
 export function factionMult(a, t) {
+  if (t?.aspect && a?.faction && ASPECTS[t.aspect]) return ASPECTS[t.aspect].weak.includes(a.faction) ? 1.6 : ASPECTS[t.aspect].resist.includes(a.faction) ? 0.5 : 1;
   if (!a?.faction || !t?.faction) return 1;
   if (WEAK_TO[t.faction] === a.faction) return WEAK_MULT;
   if (a.faction === t.faction) return RESIST_MULT;
@@ -111,7 +148,26 @@ export function dmgOf(st, a, t, mult = 1, { basic = false } = {}) {
   if (a.slow) n *= 0.5;
   if (t.defend) n *= 0.5;
   if (t.exposed) n *= 1.25;
+  n *= relationMult(a, t).m;
+  const R_ = st.relics || [];
+  if (a.side === 'ally') {
+    if (st.pact === 'sang') n *= 1.3;
+    if (st.pact === 'ombre' && !st.ombreUsed) n *= 1.5;
+    if (R_.includes('dent') && (t.boss || t.elite)) n *= 1.3;
+    if (a.form === 'frenzy' && st.order.ally.some((id) => st.units[id].hp <= 0)) n *= 1.5;
+    if (R_.includes('couronne')) n += Math.min(3, Math.floor(teamLoss(st) / 0.25)) * mult;
+  } else {
+    if (st.law === 'hate') n *= 1.3;
+    if (R_.includes('oeil')) n *= 1.15;
+  }
+  if (t.boss && st.law === 'fer' && !t.broken) n *= 0.6;
   return mult > 0 ? Math.max(1, Math.round(n)) : 0;
+}
+// Part des PV perdus par toute l'équipe (0 à 1), pour la Couronne des Cendres
+function teamLoss(st) {
+  const all = st.order.ally.map((id) => st.units[id]);
+  const max = all.reduce((x, u) => x + u.maxHp, 0) || 1;
+  return 1 - all.reduce((x, u) => x + Math.max(0, u.hp), 0) / max;
 }
 
 // ——— Effets élémentaires ———
@@ -123,15 +179,32 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   if (u.side === 'ally' && d >= u.hp && st.sursis) { st.sursis = false; d = u.hp - 1; u.shield = 1; ev.push({ t: 'status', u: u.uid, s: 'Sursis !', syn: true }); }
   u.hp -= d;
   if (d > 0) ev.push({ t: 'dmg', u: u.uid, d, hp: u.hp, src });
+  const a = src && st.units[src];
+  // Relations (prédation, rivalité) : annoncées la première fois qu'elles jouent
+  const rel = a ? relationMult(a, u).rel : null;
+  if (rel && d > 0 && !(st.relSeen ||= {})[rel]) { st.relSeen[rel] = true; ev.push({ t: 'status', u: u.uid, s: rel.startsWith('r-') ? 'Rivaux !' : 'Proie !', syn: true, rel }); }
+  // Loi de l'écho : frapper l'Architecte blesse en retour
+  if (u.boss && st.law === 'echo' && a && a.side === 'ally' && d > 0 && a.hp > 0) { ev.push({ t: 'status', u: a.uid, s: 'Écho', k: 'bad' }); hurt(st, a, 2, ev); }
   if (u.hp <= 0) {
+    if (u.side === 'ally' && u.form === 'rebirth' && !u.reborn) {
+      u.reborn = true; u.hp = Math.max(1, Math.round(u.maxHp * 0.3)); u.poison = 0;
+      ev.push({ t: 'revive', u: u.uid }); ev.push({ t: 'status', u: u.uid, s: 'Renaissance noire', syn: true });
+      return d;
+    }
+    if (u.side === 'ally' && st.guardianPact) {
+      st.guardianPact = false; u.hp = Math.max(1, Math.round(u.maxHp * 0.35)); u.poison = 0;
+      ev.push({ t: 'revive', u: u.uid }); ev.push({ t: 'status', u: u.uid, s: 'Pacte du Gardien', syn: true });
+      return d;
+    }
     ev.push({ t: 'die', u: u.uid });
     if (u.side === 'enemy') st.kills.push(u.id);
+    if (u.side === 'ally') alive(st, 'ally').filter((x) => x.form === 'vengeance').forEach((x) => { x.atk += 2; ev.push({ t: 'status', u: x.uid, s: 'Vengeance : +2 ATQ', syn: true }); });
   }
   return d;
 }
 function heal(u, n, ev) {
   if (u.hp <= 0) return 0;
-  const h = Math.min(u.maxHp - u.hp, Math.round(n));
+  const h = Math.min(u.maxHp - u.hp, Math.round(n * (u.healMult || 1)));
   if (h > 0) { u.hp += h; ev.push({ t: 'heal', u: u.uid, d: h }); }
   return h;
 }
@@ -153,8 +226,14 @@ function freeze(st, t, ev) {
   t.frozen = 1;
   if (t.boss || t.elite) t.frostCD = 2;
   ev.push({ t: 'status', u: t.uid, s: 'Gelé', k: 'frost' });
+  interruptBoss(st, t);
   if (t.charged) { t.charged = null; ev.push({ t: 'status', u: t.uid, s: 'Charge interrompue', syn: true }); }
   if (t.intent) t.intent = { ...t.intent, cancelled: true };
+}
+// Un gardien interrompu pendant une action spéciale : compté pour le récapitulatif
+function interruptBoss(st, t) {
+  if (!t.boss || !st.bossKey) return;
+  if (t.charged || (t.intent && SPECIAL.includes(t.intent.kind) && !t.intent.cancelled)) { st.stats.interrupts = (st.stats.interrupts || 0) + 1; logBoss(st, 'Interruption'); }
 }
 // Brisure (élites et gardiens) : à zéro, l'ennemi perd sa prochaine action et devient vulnérable
 // jusqu'à la fin de ton prochain tour. Il se relève ensuite avec une jauge plus solide (+40 %).
@@ -165,6 +244,7 @@ export function breakHit(st, t, n, ev, src = null) {
   ev.push({ t: 'brk', u: t.uid, brk: t.brk, max: t.brkMax });
   if (t.brk > 0) return;
   t.broken = true; t.brokenSkip = true; t.brokenEnd = st.round + 1;
+  interruptBoss(st, t);
   if (t.charged) { t.charged = null; ev.push({ t: 'status', u: t.uid, s: 'Charge interrompue', syn: true }); }
   if (t.intent) t.intent = { ...t.intent, cancelled: true };
   st.stats.breaks++;
@@ -201,14 +281,15 @@ export function actionsFor(st, uid) {
   const kit = KITS[u.role];
   const base = (key, def) => {
     const ap = key === 'swap' && st.freeSwap ? 0 : def.ap;
+    const fervor = def.fervor + (st.law === 'silence' && !['attack', 'defend', 'swap'].includes(key) ? 1 : 0);
     let why = '';
     if (st.turn !== 'ally' || st.over) why = 'Ce n’est pas ton tour.';
     else if (!inFront(st, u)) why = 'Elle n’est pas au combat.';
     else if (u.stunned && key !== 'swap') why = 'Gelée : elle passe ce tour.';
     else if (key !== 'swap' && u.acts >= ACTS_PER_UNIT) why = `Elle a déjà agi ${ACTS_PER_UNIT} fois ce tour.`;
     else if (st.ap < ap) why = 'Plus assez de points d’action.';
-    else if (st.fervor < def.fervor) why = `Il faut ${def.fervor} Ferveur.`;
-    return { key, name: def.name, icon: def.icon, ap, fervor: def.fervor, target: def.target, desc: def.desc, dice: !!def.dice, ok: !why, why };
+    else if (st.fervor < fervor) why = `Il faut ${fervor} Ferveur.`;
+    return { key, name: def.name, icon: def.icon, ap, fervor, target: def.target, desc: def.desc, dice: !!def.dice, ok: !why, why };
   };
   const out = [base('attack', { ...COMMON_ACTS.attack, name: kit.basic.name, desc: `${kit.basic.desc} +1 Ferveur.` }), base(kit.skill.key, kit.skill), base('defend', COMMON_ACTS.defend), base('swap', COMMON_ACTS.swap)];
   const sw = out[3], d = out[2];
@@ -328,6 +409,7 @@ export function act(st, uid, key, tUid = null) {
     if (tier === 'crit' || tier === 'success') { freeze(st, t, ev); if (tier === 'crit') breakHit(st, t, 3, ev, u); }
     else if (tier === 'partial') { t.slow = true; ev.push({ t: 'status', u: tUid, s: 'Ralentie', k: 'frost' }); }
   }
+  if (['attack', 'estoc', 'raz'].includes(key)) st.ombreUsed = true;
   check(st, ev);
   return ev;
 }
@@ -342,7 +424,7 @@ function basicAttack(st, u, t, ev) {
   const d = hurt(st, t, dmgOf(st, u, t, 1, { basic: true }), ev, u.uid, { pierce: u.role === 'poison' });
   if (d && t.hp > 0) {
     if (u.role === 'poison') addPoison(st, t, 2, ev, u);
-    breakHit(st, t, 1 + (u.role === 'protecteur' ? 1 : 0) + (u.role === 'controle' && frozen ? 2 : 0) + (isWeak(u, t) ? 1 : 0), ev, u);
+    breakHit(st, t, 1 + (u.role === 'protecteur' ? 1 : 0) + (u.role === 'controle' && frozen ? 2 : 0) + (isWeak(u, t) ? 1 : 0) + (u.form === 'shatter' ? 1 : 0), ev, u);
     if (u.role === 'degats' && t.boss) t.wound = 1;
   }
   if (u.role === 'zone') {
@@ -350,6 +432,7 @@ function basicAttack(st, u, t, ev) {
     if (full && (row[i - 1] || row[i + 1])) ev.push({ t: 'status', u: u.uid, s: 'Raz-de-marée !', syn: true });
     [row[i - 1], row[i + 1]].filter(Boolean).forEach((n) => hurt(st, n, full ? dmgOf(st, u, n) : Math.ceil(dmgOf(st, u, n) / 2), ev, u.uid));
   }
+  if ((st.relics || []).includes('coeur')) { st.coeurTick = !st.coeurTick; if (st.coeurTick) return; }
   gainFervor(st, 1, ev);
 }
 function doSwap(st, out, inn, ev) {
@@ -387,11 +470,15 @@ export function useUlt(st) {
 // ——— Tours ———
 function startAllyTurn(st, ev) {
   st.turn = 'ally';
-  st.ap = AP_MAX; st.swapped = false;
+  const R_ = st.relics || [];
+  st.ap = AP_MAX + (st.law === 'hate' ? 1 : 0) + (st.round === 1 ? (R_.includes('sablier') ? 1 : 0) - (R_.includes('miroir') ? 1 : 0) : 0);
+  st.swapped = false; st.ombreUsed = false;
   for (const u of alive(st, 'ally')) { u.acts = 0; u.boost = 0; u.defend = false; u.guardBy = null; u.rempart = null; u.exposed = false; u.stunned = false; }
   for (const u of front(st, 'ally')) {
     if (u.frozen) { u.frozen = 0; u.stunned = true; ev.push({ t: 'status', u: u.uid, s: 'Gelée : passe son tour', k: 'frost' }); }
     tickPoison(st, u, ev);
+    // Pacte du Sang : le prix se paie à chaque tour (jamais mortel)
+    if (st.pact === 'sang' && st.round > 1 && u.hp > 1) { const d = Math.min(u.hp - 1, Math.max(1, Math.round(u.maxHp * 0.06))); u.hp -= d; ev.push({ t: 'dmg', u: u.uid, d, hp: u.hp }); ev.push({ t: 'status', u: u.uid, s: 'Prix du sang', k: 'bad' }); }
   }
   const criers = front(st, 'ally').filter((u) => u.kw === 'cri' && u.hp > 0);
   if (criers.length) { front(st, 'ally').forEach((u) => { u.boost += criers.length; }); ev.push({ t: 'status', u: criers[0].uid, s: `Cri : +${criers.length} ATQ` }); }
@@ -419,12 +506,22 @@ export function beginEnemyTurn(st) {
   for (const u of alive(st, 'enemy')) u.boost = 0;
   for (const u of front(st, 'enemy')) tickPoison(st, u, ev);
   check(st, ev);
-  if (!st.over && st.bossPower) bossPower(st, ev);
+  if (!st.over && st.bossKey) bossPhase(st, ev);
+  else if (!st.over && st.bossPower) bossPower(st, ev);
   ev.push({ t: 'phase', side: 'enemy' });
   st.queue = front(st, 'enemy').map((u) => u.uid);
   st.skipEv = [];
   return ev;
 }
+// Gardiens à mécaniques : phase 2 sous la moitié de leurs PV (plus agressifs, motif accéléré)
+function bossPhase(st, ev) {
+  const b = front(st, 'enemy').find((u) => u.boss && u.hp > 0);
+  if (!b || b.phase2 || b.hp > b.maxHp / 2) return;
+  b.phase2 = true; b.atk = Math.round(b.atk * 1.2 + 0.5);
+  ev.push({ t: 'phase2', u: b.uid, s: `${BOSSES[st.bossKey].name} : phase 2 !` });
+  logBoss(st, 'Phase 2');
+}
+const logBoss = (st, m) => { const l = (st.bossLog ||= []); if (!l.includes(m)) l.push(m); };
 // Pouvoir du gardien, au début de son tour. Phase 2 sous la moitié de ses PV.
 function bossPower(st, ev) {
   const b = front(st, 'enemy').find((u) => u.boss && u.hp > 0);
@@ -471,7 +568,7 @@ export function takeSkips(st) { const e = st.skipEv || []; st.skipEv = []; retur
 // La cible annoncée tient-elle encore ? Sinon l'ennemi en choisit une autre selon sa famille.
 function refreshIntent(st, e) {
   const it = e.intent;
-  if (SINGLE.includes(it.kind)) {
+  if (SINGLE.includes(it.kind) || (it.kind === 'copy' && it.t)) {
     const ts = targetsFor(st, 'enemy', e);
     if (!ts.includes(it.t)) it.t = pickTarget(st, e);
     if (!it.t) return null;
@@ -488,6 +585,9 @@ export function enemyAct(st, aUid, defense = 'none') {
   const it = e.intent, kind = it.kind;
   e.intent = null;
   ev.push({ t: 'eact', a: aUid, kind, tgt: it.t });
+  let dealt = 0;
+  const big = ['heavy', 'blast', 'gorge', 'blizzard', 'copy'].includes(kind);
+  const evStart = ev.length;
   const strike = (t, mult) => {
     if (!t || t.hp <= 0) return null;
     // Rempart : le protecteur prend le coup à la place, avec 40 % de dégâts en moins
@@ -513,6 +613,51 @@ export function enemyAct(st, aUid, defense = 'none') {
   else if (kind === 'shield') { const t = st.units[it.t]; if (t && t.hp > 0) { t.shield = 1; ev.push({ t: 'status', u: t.uid, s: 'Bouclier', k: 'guard' }); } }
   else if (kind === 'heal') { const t = st.units[it.t]; if (t) heal(t, t.maxHp * 0.25, ev); }
   else if (kind === 'rally') { front(st, 'enemy').forEach((x) => { if (x !== e) x.boost += 2; }); ev.push({ t: 'status', u: aUid, s: 'Renfort : +2 ATQ', k: 'charge' }); }
+  else if (kind === 'gorge') {
+    // Le Dévoreur : morsure qui le nourrit ; chaque festin réussi le rend plus fort
+    logBoss(st, 'Dévorer');
+    const t = strike(st.units[it.t], 1.6);
+    const d = ev.slice(evStart).filter((x) => x.t === 'dmg' && st.units[x.u]?.side === 'ally').reduce((n, x) => n + x.d, 0);
+    if (t && d > 0) { heal(e, d, ev); e.atk += e.phase2 ? 2 : 1; st.stats.feasts = (st.stats.feasts || 0) + 1; ev.push({ t: 'boss', u: aUid, s: `Festin : ${e.atk} ATQ` }); }
+  } else if (kind === 'gather') { e.charged = 'blizzard'; logBoss(st, 'Tempête de givre'); ev.push({ t: 'status', u: aUid, s: 'Le froid monte…', k: 'charge' }); }
+  else if (kind === 'blizzard') {
+    e.charged = null;
+    ev.push({ t: 'aoe', u: aUid, side: 'enemy' });
+    if (defense !== 'none') defended(st, e, null, ev, defense, 'blast');
+    else {
+      front(st, 'ally').forEach((x) => hurt(st, x, dmgOf(st, e, x, 0.9), ev, aUid));
+      front(st, 'ally').filter((x) => x.hp > 0 && !x.frozen).sort((x, y) => y.atk - x.atk).slice(0, e.phase2 ? 2 : 1).forEach((x) => { x.frozen = 1; ev.push({ t: 'status', u: x.uid, s: 'Gelée', k: 'frost' }); });
+    }
+  } else if (kind === 'mimic') {
+    e.charged = 'copy'; e.copyKey = it.copy; e.copyName = it.copyName; logBoss(st, 'Copie');
+    ev.push({ t: 'boss', u: aUid, s: `Copie : ${it.copyName}` });
+  } else if (kind === 'copy') {
+    e.charged = null; const k = it.copy;
+    ev.push({ t: 'boss', u: aUid, s: `${it.copyName} !` });
+    if (k === 'estoc') { const t = strike(st.units[it.t], 2); if (t && t.hp > 0) breakHit(st, t, 0, ev); }
+    else if (k === 'entrave') { const t = strike(st.units[it.t], 0.6); if (t && t.hp > 0 && defense === 'none') { t.frozen = 1; ev.push({ t: 'status', u: t.uid, s: 'Gelée', k: 'frost' }); } }
+    else if (k === 'marque') strike(st.units[it.t], 1.5);
+    else if (k === 'rempart') front(st, 'enemy').forEach((x) => { x.shield = 1; ev.push({ t: 'status', u: x.uid, s: 'Bouclier', k: 'guard' }); });
+    else if (k === 'priere') heal(e, e.maxHp * 0.25, ev);
+    else if (k === 'contagion') { if (defense !== 'none') defended(st, e, null, ev, defense, 'blast'); else front(st, 'ally').forEach((x) => addPoison(st, x, 3, ev, e)); }
+    else { ev.push({ t: 'aoe', u: aUid, side: 'enemy' }); if (defense !== 'none') defended(st, e, null, ev, defense, 'blast'); else front(st, 'ally').forEach((x) => hurt(st, x, dmgOf(st, e, x, 0.7), ev, aUid)); }
+  } else if (kind === 'decree') {
+    st.law = it.law; logBoss(st, LAWS[it.law].name);
+    ev.push({ t: 'boss', u: aUid, s: LAWS[it.law].name }); ev.push({ t: 'law', law: it.law });
+  } else if (kind === 'shift') {
+    e.aspect = it.aspect; st.aspect = it.aspect; logBoss(st, ASPECTS[it.aspect].name);
+    ev.push({ t: 'boss', u: aUid, s: ASPECTS[it.aspect].name }); ev.push({ t: 'law', aspect: it.aspect });
+  }
+  // Miroir de l'Abîme : la première grosse attaque du combat se retourne en partie contre l'ennemi
+  if (big && st.miroir && e.hp > 0) {
+    dealt = ev.slice(evStart).filter((x) => x.t === 'dmg' && st.units[x.u]?.side === 'ally').reduce((n, x) => n + x.d, 0);
+    if (dealt > 0) { st.miroir = false; ev.push({ t: 'status', u: aUid, s: 'Miroir de l’Abîme', syn: true }); hurt(st, e, Math.ceil(dealt / 2), ev); }
+  }
+  // Pacte du Reflet : chaque action spéciale ennemie te renvoie son écho
+  if (st.pact === 'reflet' && SPECIAL.includes(kind)) {
+    gainFervor(st, 1, ev, 'Écho');
+    if (['shield', 'heal'].includes(kind)) { const w = front(st, 'ally').slice().sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0]; if (w) { w.shield = 1; ev.push({ t: 'status', u: w.uid, s: 'Écho : bouclier', k: 'guard' }); } }
+  }
   e.slow = false;
   check(st, ev);
   return ev;
@@ -538,7 +683,7 @@ export function endEnemyTurn(st) {
   st.queue = [];
   if (st.over || st.turn !== 'enemy') return ev;
   // Dégel : face au Souffle de givre, tes Soigneurs libèrent les créatures gelées
-  if (st.bossPower === 'givre' && front(st, 'ally').some((x) => x.kw === 'soin')) {
+  if ((st.bossPower === 'givre' || st.bossKey === 'matriarche') && front(st, 'ally').some((x) => x.kw === 'soin')) {
     front(st, 'ally').filter((x) => x.frozen).forEach((x) => { x.frozen = 0; ev.push({ t: 'status', u: x.uid, s: 'Dégel', syn: true }); });
   }
   // Repos : les créatures en réserve récupèrent 10 % de leurs PV (le poison reste)
@@ -574,12 +719,23 @@ function planIntents(st) {
     if (SINGLE.includes(kind)) t = pickTarget(st, e);
     if (kind === 'shield') t = front(st, 'enemy').filter((x) => !x.shield).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0]?.uid || e.uid;
     if (kind === 'heal') t = front(st, 'enemy').slice().sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0]?.uid;
-    e.intent = { kind, t, qte: qteFor(e, kind) };
+    const extra = {};
+    if (kind === 'gorge') t = targetsFor(st, 'enemy', e).map((id) => st.units[id]).sort((x, y) => y.hp - x.hp)[0]?.uid || null;
+    if (kind === 'mimic') {
+      // copie la compétence de ta créature la plus forte au combat
+      const src = front(st, 'ally').slice().sort((x, y) => (y.atk + (y.boost || 0)) - (x.atk + (x.boost || 0)))[0];
+      extra.copy = src ? KITS[src.role].skill.key : 'estoc'; extra.copyName = src ? KITS[src.role].skill.name : 'Coup d’estoc';
+    }
+    if (kind === 'copy') { extra.copy = e.copyKey; extra.copyName = e.copyName; t = ['estoc', 'entrave', 'marque'].includes(e.copyKey) ? pickTarget(st, e) : null; }
+    if (kind === 'decree') { const ks = Object.keys(LAWS).filter((k) => k !== st.law); extra.law = ks[Math.floor(rand(st) * ks.length)]; }
+    if (kind === 'shift') extra.aspect = e.aspect === 'soleil' ? 'lune' : 'soleil';
+    e.intent = { kind, t, qte: qteFor(e, kind) || (kind === 'copy' && ['estoc', 'entrave', 'raz', 'contagion'].includes(extra.copy)), ...extra };
   }
 }
-const qteFor = (e, kind) => ['heavy', 'blast', 'frost'].includes(kind) || ((e.boss || e.elite) && ['hit', 'poison'].includes(kind));
+const qteFor = (e, kind) => ['heavy', 'blast', 'frost', 'gorge', 'blizzard'].includes(kind) || ((e.boss || e.elite) && ['hit', 'poison'].includes(kind));
 function intentKind(st, e) {
   if (e.charged) return e.charged;
+  if (e.boss && st.bossKey) return BOSSES[st.bossKey].pattern(e.phase2 ? 2 : 1, st.round);
   const r = rand(st);
   const others = front(st, 'enemy').length > 1;
   switch (e.fam) {
@@ -605,12 +761,16 @@ export function intentInfo(st, e) {
   const g = t?.guardBy && st.units[t.guardBy];
   const eff = g && inFront(st, g) ? g : t;
   let dmg = 0;
-  const m = { hit: 1, heavy: e.boss ? 2.5 : 2.2, poison: 0.6, frost: 0.5 }[it.kind];
+  const copyM = it.kind === 'copy' ? { estoc: 2, entrave: 0.6, marque: 1.5 }[it.copy] : null;
+  const m = copyM || { hit: 1, heavy: e.boss ? 2.5 : 2.2, poison: 0.6, frost: 0.5, gorge: 1.6 }[it.kind];
   if (m && eff) dmg = dmgOf(st, e, eff, m * (eff !== t ? 0.6 : 1));
   if (it.kind === 'blast') dmg = Math.max(0, ...front(st, 'ally').map((x) => dmgOf(st, e, x, e.boss ? 1 : 0.8)));
-  const lethal = !!eff && SINGLE.includes(it.kind) && dmg >= eff.hp;
-  const danger = it.kind === 'heavy' || it.kind === 'blast' || lethal ? 3 : ['frost', 'charge', 'channel'].includes(it.kind) || (e.boss && it.kind === 'hit') ? 2 : dmg ? 1 : 0;
-  return { ...it, def: INTENTS[it.kind], dmg, target: SINGLE.includes(it.kind) ? eff?.uid || null : it.t, lethal, danger };
+  if (it.kind === 'blizzard') dmg = Math.max(0, ...front(st, 'ally').map((x) => dmgOf(st, e, x, 0.9)));
+  if (it.kind === 'copy' && it.copy === 'raz') dmg = Math.max(0, ...front(st, 'ally').map((x) => dmgOf(st, e, x, 0.7)));
+  const single = SINGLE.includes(it.kind) || !!(it.kind === 'copy' && it.t);
+  const lethal = !!eff && single && dmg >= eff.hp;
+  const danger = ['heavy', 'blast', 'gorge', 'blizzard', 'copy'].includes(it.kind) || lethal ? 3 : ['frost', 'charge', 'channel', 'gather', 'mimic', 'decree', 'shift'].includes(it.kind) || (e.boss && it.kind === 'hit') ? 2 : dmg ? 1 : 0;
+  return { ...it, def: INTENTS[it.kind], dmg, target: single ? eff?.uid || null : it.t, lethal, danger, aoe: ['blast', 'blizzard'].includes(it.kind) || (it.kind === 'copy' && it.copy === 'raz') };
 }
 // Dégâts annoncés sur chacune de tes cartes (badges rouges)
 export function threats(st) {
@@ -619,7 +779,7 @@ export function threats(st) {
   for (const e of front(st, 'enemy')) {
     const i = intentInfo(st, e);
     if (!i || !i.dmg) continue;
-    if (i.kind === 'blast') front(st, 'ally').forEach((x) => { out[x.uid] = (out[x.uid] || 0) + dmgOf(st, e, x, e.boss ? 1 : 0.8); });
+    if (i.aoe) { const mm = i.kind === 'blast' ? (e.boss ? 1 : 0.8) : i.kind === 'blizzard' ? 0.9 : 0.7; front(st, 'ally').forEach((x) => { out[x.uid] = (out[x.uid] || 0) + dmgOf(st, e, x, mm); }); }
     else if (i.target) out[i.target] = (out[i.target] || 0) + i.dmg;
   }
   return out;
