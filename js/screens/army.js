@@ -83,7 +83,7 @@ export function teamScreen(app, root) {
   const ui = (app.state.team ||= { sort: 'power' });
   const draw = () => {
     const team = g.team(), cost = g.teamCost(team), ult = g.ultimate(team), run = g.descent().run;
-    const slot = (i) => { const c = team[i] && cat.get(team[i]); return c ? `<div class="v2-slot full">${armyCard(g, c)}</div>` : `<div class="v2-slot"><span>+</span><small>${i < TEAM.active ? 'Combat' : 'Réserve'}</small></div>`; };
+    const slot = (i) => { const c = team[i] && cat.get(team[i]); return c ? `<div class="v2-slot full">${armyCard(g, c)}${run ? '' : `<span class="tm-ctl"><button class="tm-b" data-act="move" data-id="${c.id}" aria-label="${i < TEAM.active ? 'Mettre en réserve' : 'Envoyer au combat'}">${i < TEAM.active ? '▼' : '▲'}</button><button class="tm-b x" data-act="drop" data-id="${c.id}" aria-label="Retirer de l’équipe">✕</button></span>`}</div>` : `<div class="v2-slot"><span>+</span><small>${i < TEAM.active ? 'Combat' : 'Réserve'}</small></div>`; };
     const owned = Object.keys(g.s.collection).map((id) => cat.get(id)).filter(Boolean);
     const RI = (r) => ['C', 'PC', 'R', 'HR', 'M', 'S'].indexOf(r);
     owned.sort(ui.sort === 'cost' ? (a, b) => COST[a.rarity] - COST[b.rarity] || g.cardLevel(b.id) - g.cardLevel(a.id) : (a, b) => g.cardLevel(b.id) - g.cardLevel(a.id) || RI(b.rarity) - RI(a.rarity));
@@ -93,18 +93,30 @@ export function teamScreen(app, root) {
         <div class="v2-budget"><span>Budget</span><span class="progress"><i style="width:${Math.min(100, (cost / BUDGET) * 100)}%;--bar:${cost > BUDGET ? '#FF5468' : 'var(--gold)'}"></i></span><b>${cost} / ${BUDGET}</b></div>
         <p class="small muted">Coût : Commune 1, Peu commune 2, Rare 3, Hyper rare 4, Mythique 5, Secrète 6.</p>
         ${team.length < TEAM.active ? `<p class="small v2-warn">${icon('info')} Il faut au moins ${TEAM.active} créatures pour partir dans la Descente (encore ${TEAM.active - team.length}).</p>` : ''}
-        ${team.length && !run ? `<button class="linkish small" data-act="clear">Vider l’équipe</button>` : ''}
+        ${run ? '' : `<div class="tm-tools"><button class="btn small primary" data-act="auto">${icon('sparkle')}Équipe automatique</button>${team.length ? '<button class="btn small ghost" data-act="clear">Vider</button>' : ''}</div><p class="small muted tm-help">Touche <b>+</b> sous une créature pour l’ajouter, <b>▲▼</b> pour la passer du combat à la réserve, <b>✕</b> pour la retirer.</p>`}
         <h3 class="section-title">Au combat</h3><div class="v2-slots">${[0, 1, 2].map(slot).join('')}</div>
         <h3 class="section-title">En réserve</h3><div class="v2-slots res">${[3, 4].map(slot).join('')}</div>
         <div class="panel v2-skill ult" style="--uc:${ult.color}"><b>${icon('p:power')} Pouvoir : ${esc(ult.name)}</b><p class="small">${esc(ult.desc)}</p><p class="small muted">${ult.card ? `Porté par ${esc(cat.get(ult.card).name)}.` : 'Ajoute une Mythique ou une Secrète pour un pouvoir plus puissant.'}</p></div>
       </section>
       <h2 class="section-title">Ta collection <span class="more small"><button class="linkish" data-act="sort">${ui.sort === 'cost' ? 'Trier par niveau' : 'Trier par coût'}</button></span></h2>
-      <div class="grid-cards v2-grid">${owned.map((c) => `<div class="v2-pick ${team.includes(c.id) ? 'in' : ''}">${armyCard(g, c)}</div>`).join('')}</div>`;
+      <div class="grid-cards v2-grid">${owned.map((c) => `<div class="v2-pick ${team.includes(c.id) ? 'in' : ''}">${armyCard(g, c)}${run ? '' : `<button class="tm-add ${team.includes(c.id) ? 'in' : ''}" data-act="quick" data-id="${c.id}">${team.includes(c.id) ? '✓ Dans l’équipe' : `+ Ajouter · ${COST[c.rarity]}`}</button>`}</div>`).join('')}</div>`;
     lazyArt(root);
   };
-  root.addEventListener('click', (e) => { const t = e.target.closest('.tcg'); if (t) openCreature(app, t.dataset.id, { onChange: draw }); });
+  root.addEventListener('click', (e) => { if (e.target.closest('[data-act]')) return; const t = e.target.closest('.tcg'); if (t) openCreature(app, t.dataset.id, { onChange: draw }); });
   bindActions(root, {
     sort() { ui.sort = ui.sort === 'cost' ? 'power' : 'cost'; draw(); },
+    quick(el) { if (toggleTeam(app, el.dataset.id)) draw(); },
+    drop(el) { if (toggleTeam(app, el.dataset.id)) draw(); },
+    move(el) {
+      const t = g.team().slice(), i = t.indexOf(el.dataset.id);
+      if (i < 0) return;
+      // du combat vers la réserve : échange avec la 1re créature en réserve ; de la réserve vers le combat : avec la dernière au combat
+      const j = i < TEAM.active ? (t.length > TEAM.active ? TEAM.active : -1) : TEAM.active - 1;
+      if (j < 0) { toast('Ajoute d’abord une créature en réserve pour faire l’échange.', { kind: 'error' }); return; }
+      [t[i], t[j]] = [t[j], t[i]];
+      try { g.setTeam(t); app.sfx.tap(); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); }
+    },
+    auto() { try { g.setTeam(g.autoTeam([])); app.sfx.discover(); toast('Équipe composée : les plus fortes créatures qui tiennent dans le budget.', { icon: 'sparkle' }); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     clear() { try { g.setTeam([]); app.sfx.tap(); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
   });
   draw();

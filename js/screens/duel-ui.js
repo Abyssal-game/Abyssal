@@ -86,7 +86,7 @@ export function runDuel(app, root, { title, onEnd }) {
     u.defend ? st_('defend', 'Défense : -50 % de dégâts') : '',
     u.guardBy ? st_('guard', 'Protégé par un Rempart') : '',
     u.exposed ? st_('exposed', 'Exposée : +25 % de dégâts subis') : '',
-    u.boost ? `<i class="bo">+${u.boost}</i>` : '',
+    u.boost ? `<i class="bo" title="Attaque renforcée pour ce tour">+${u.boost} ATQ</i>` : '',
   ].join('');
   const intentChip = (u) => {
     const i = intentInfo(st, u);

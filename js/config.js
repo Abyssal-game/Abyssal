@@ -33,20 +33,20 @@ export const PITY = {
 
 export const BOOSTERS = {
   standard: {
-    name: 'Booster standard', price: 100, slots: ['base', 'base', 'base', 'base', 'pcPlus'], pool: 'all', variantMult: 1,
+    name: 'Booster standard', price: 200, slots: ['base', 'base', 'base', 'base', 'pcPlus'], pool: 'all', variantMult: 1,
     desc: '5 cartes de toutes les factions. Le 5e emplacement est au moins Peu commune.',
   },
   faction: {
-    name: 'Booster de faction', price: 150, slots: ['base', 'base', 'base', 'base', 'pcPlus'], pool: 'faction', variantMult: 1,
+    name: 'Booster de faction', price: 300, slots: ['base', 'base', 'base', 'base', 'pcPlus'], pool: 'faction', variantMult: 1,
     desc: '5 cartes d’une seule faction, au choix. Le 5e emplacement est au moins Peu commune.',
   },
   event: {
-    name: 'Booster événement', price: 180, slots: ['event', 'event', 'event', 'event', 'pcPlus'], pool: 'event', variantMult: 1.5,
+    name: 'Booster événement', price: 360, slots: ['event', 'event', 'event', 'event', 'pcPlus'], pool: 'event', variantMult: 1.5,
     desc: '5 cartes des deux factions de l’événement de la semaine, avec des chances accrues de Rare et mieux.',
   },
   premium: {
     rewardOnly: true, // ne s'achète pas : récompense des gardiens et des niveaux
-    name: 'Booster premium', price: 400, slots: ['base', 'base', 'pcPlus', 'pcPlus', 'rPlus'], pool: 'all', variantMult: 2,
+    name: 'Booster premium', price: 750, slots: ['base', 'base', 'pcPlus', 'pcPlus', 'rPlus'], pool: 'all', variantMult: 2,
     desc: '5 cartes : deux emplacements Peu commune ou mieux, le dernier Rare ou mieux. Variantes deux fois plus fréquentes.',
   },
 };
@@ -87,7 +87,7 @@ export const EVENTS = [
 
 export const ECONOMY = {
   start: { shards: 0, ash: 0, tickets: { standard: 2 } },
-  discoveryShards: { C: 5, PC: 10, R: 25, HR: 50, M: 100, S: 200 },
+  discoveryShards: { C: 2, PC: 5, R: 12, HR: 25, M: 50, S: 100 },
   duplicateAsh: { C: 2, PC: 5, R: 15, HR: 40, M: 100, S: 250 },
   craftAsh: { C: 40, PC: 100, R: 250, HR: 600, M: 1600 }, // les secrètes ne s'invoquent pas
   decipherAsh: 15,

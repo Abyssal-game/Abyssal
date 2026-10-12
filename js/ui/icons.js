@@ -48,7 +48,6 @@ export const ICONS = {
   hourglass: I('<path d="M6.5 3.5h11M6.5 20.5h11M7.5 3.5c0 5 9 5.5 9 8.5s-9 3.5-9 8.5M16.5 3.5c0 5-9 5.5-9 8.5s9 3.5 9 8.5"/>'),
 };
 
-import { factionArtReady } from '../art/assets.js';
 
 // Sceaux des factions (traits fins, couleur via currentColor).
 const S = (body) => `<svg class="sigil" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
@@ -73,7 +72,8 @@ export const icon = (name) => {
   const pic = name.startsWith('p:') ? name.slice(2) : CUR_PIC[name];
   return pic ? `<img class="ic ic-cur" alt="" src="assets/icons/${pic}.webp">` : ICONS[name] || '';
 };
-export const sigil = (faction) => (factionArtReady(Object.keys(SIGILS)) && SIGILS[faction] ? `<img class="sigil sigil-img" alt="" src="assets/factions/${faction}.webp">` : SIGILS[faction] || '');
+// Emblème peint de la faction, toujours (le dessin au trait ne sert plus qu'en secours si l'image échoue)
+export const sigil = (faction) => (SIGILS[faction] ? `<img class="sigil sigil-img" alt="" src="assets/factions/${faction}.webp">` : '');
 
 // Icônes peintes (assets/icons) : défis du jour, étapes de l'Aventure
 export const picon = (name) => `<img class="picon" alt="" src="assets/icons/${name}.webp">`;

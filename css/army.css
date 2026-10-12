@@ -1118,3 +1118,49 @@ body.battle-mode::after { display: none; }
 .wallet .pill span { color: #FFFFFF; font-weight: 800; }
 /* Joueurs en ligne : même repère que la barre d'onglets (vraie hauteur de l'écran), juste au-dessus d'elle */
 body > .online-pill { bottom: auto !important; top: calc(var(--app-h, 100dvh) - var(--tab-h) - var(--safe-b) - 52px) !important; }
+
+/* ===== Retours iPhone (3) ===== */
+/* Cartes non découvertes : on ne devine plus la créature, même sur les Mythiques très lumineuses */
+.is-mystery.real .tcg-art img, .tcg-mini.is-mystery.real .tcg-art img { filter: grayscale(1) brightness(.1) contrast(1.8) blur(5px) !important; }
+img.veiled { filter: grayscale(1) brightness(.1) contrast(1.8) blur(6px) !important; }
+/* Bouton fermer : il ne pousse plus le contenu sur le côté (contenu bien centré) */
+.sheet-wrap:not(.sheet-full) .sheet-close { position: absolute !important; float: none !important; top: 12px; right: 12px; margin: 0 !important; }
+.sheet-wrap.sheet-full .sheet-close { position: fixed !important; float: none !important; top: calc(var(--safe-t) + 10px); right: 12px; margin: 0 !important; z-index: 6; }
+.wal-sheet { padding-top: 6px; }
+.wal-big { display: block; margin: 0 auto; }
+.wal-big img.ic { width: 76px !important; height: 76px !important; transform: none !important; display: block; margin: 0 auto; }
+.wal-sheet p { max-width: 30em; }
+.detail { max-width: 460px; margin: 0 auto; text-align: center; }
+.detail .detail-info { text-align: left; }
+.detail .detail-info > .lore, .detail .detail-info > p.small.muted.center { text-align: center; }
+/* Ennemis : le badge Élite/Gardien ne chevauche plus le caractère ; badges plus élégants */
+.dv-c .dv-boss { top: auto !important; right: auto !important; left: 50% !important; bottom: 46px !important; transform: translateX(-50%); white-space: nowrap; }
+.dv-boss.elite { background: linear-gradient(#3B2A10, #1A1208) !important; border: 1px solid rgba(242, 193, 78, .7) !important; color: #F7DE9A !important; }
+.dv-kw.fam { background: rgba(12, 8, 18, .9) !important; border: 1px solid rgba(232, 195, 90, .5) !important; }
+.dv-kw.fam em { color: #F3E3B8 !important; }
+.dv-c.has-brk .dv-boss { bottom: 56px !important; }
+/* Stèles : nom gravé dans le marbre, toujours dans le cadre */
+.dc-altar .dc-bl { padding: 36% 26% 0 20% !important; }
+.dc-altar .dc-bl b { font-family: var(--f-display) !important; font-weight: 700 !important; font-size: 12cqw !important; line-height: 1.2 !important; letter-spacing: .02em !important; text-transform: uppercase; color: #4A2E0A !important; text-shadow: 0 1px 0 rgba(255, 250, 235, .75), 0 -1px 0 rgba(60, 35, 5, .25); text-align: center; width: 100%; overflow: hidden; }
+.dc-altar .dc-bl > span:first-child .picon { width: 36cqw !important; height: 36cqw !important; max-width: 34px; max-height: 34px; }
+/* Équipe : composition rapide */
+.tm-tools { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0 4px; }
+.tm-help { margin: 0 0 6px; }
+.v2-slot.full { position: relative; }
+.tm-ctl { position: absolute; z-index: 6; left: 0; right: 0; bottom: -10px; display: flex; justify-content: center; gap: 6px; }
+.tm-b { width: 34px; height: 30px; border-radius: 10px; border: 1px solid rgba(232, 195, 90, .6); background: rgba(14, 10, 20, .95); color: var(--gold-hi); font: 800 .8rem/1 var(--f-ui); box-shadow: 0 3px 8px rgba(0, 0, 0, .6); }
+.tm-b.x { color: #FF9AA8; border-color: rgba(255, 110, 130, .55); }
+.v2-slots { margin-bottom: 14px; }
+.v2-pick { display: flex; flex-direction: column; gap: 4px; }
+.tm-add { width: 100%; min-height: 32px; border-radius: 10px; border: 1px solid rgba(232, 195, 90, .5); background: linear-gradient(#3A2A12, #1A1208); color: #F7DE9A; font: 800 .7rem/1 var(--f-ui); }
+.tm-add.in { background: rgba(60, 140, 80, .25); border-color: rgba(120, 210, 140, .55); color: #A8EBB8; }
+/* Présentation d'une faction : paysage de son royaume (assets/realms), sinon un fond à ses couleurs */
+.fac-hero { background: radial-gradient(120% 90% at 70% 20%, color-mix(in srgb, var(--fc) 35%, transparent), transparent 60%), linear-gradient(160deg, color-mix(in srgb, var(--fp) 70%, #000), #07080C); }
+.fac-hero .fac-realm { object-position: 50% 40% !important; }
+.fac-hero .fac-sig.big .sigil-img { width: 64px; height: 64px; }
+.dc-altar .dc-bl b { font-size: 17cqw !important; }
+.tm-ctl { bottom: -18px !important; }
+.v2-slots { margin-bottom: 24px !important; }
+.dc-altar .dc-bl b { font-size: 14.5cqw !important; }
+.dc-altar .dc-bl { padding: 34% 18% 0 18% !important; } .dc-altar .dc-bl b { font-size: 15cqw !important; }
+.dc-altar .dc-bl b { font-size: 12.5cqw !important; }

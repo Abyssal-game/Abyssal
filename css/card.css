@@ -271,3 +271,4 @@
 .v-special .tcg-vframe { background-image: url(../assets/variants/seal-frame.webp); }
 @keyframes vPulse { 50% { filter: brightness(1.35); } }
 @media (prefers-reduced-motion: reduce) { .v-holo .tcg-shine, .v-galaxy .tcg-shine, .v-galaxy .tcg-vframe { animation: none; } }
+.tcg-art img { display: block; }

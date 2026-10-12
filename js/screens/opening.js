@@ -6,7 +6,7 @@ import { cardHTML } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM, roleIcon, picon } from '../ui/icons.js';
 import { esc, fmt, toast } from '../ui/dom.js';
-import { packHTML, payLabel, pityHTML } from './shop.js';
+import { packHTML, payLabel } from './shop.js';
 import { roleOf, ROLES } from '../core/army.js';
 import { keywordOf, KEYWORDS } from '../core/duel.js';
 
@@ -356,7 +356,6 @@ export function openPack(app, type, { faction, onDone } = {}) {
         ${r.ash ? `<span>${icon('ash')}<b>+${fmt(r.ash)}</b><small>cendres</small></span>` : ''}
         <span>${picon('xp')}<b>+${fmt(r.xp)}</b><small>XP</small></span>
       </div>
-      ${pityHTML(g)}
       <p class="small muted center op-sum-hint">Touche une carte pour l’examiner.</p>
     </div>`;
     el.insertAdjacentHTML('beforeend', `<div class="op-actions op-actions-fixed">
