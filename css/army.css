@@ -1116,3 +1116,5 @@ body.battle-mode::after { display: none; }
 .top-meta b { color: #F3E3B8; font-weight: 700; text-shadow: none; -webkit-font-smoothing: antialiased; }
 .wallet .pill { background: #12141C !important; border-color: rgba(232, 195, 90, .3) !important; }
 .wallet .pill span { color: #FFFFFF; font-weight: 800; }
+/* Joueurs en ligne : même repère que la barre d'onglets (vraie hauteur de l'écran), juste au-dessus d'elle */
+body > .online-pill { bottom: auto !important; top: calc(var(--app-h, 100dvh) - var(--tab-h) - var(--safe-b) - 52px) !important; }
