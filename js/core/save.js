@@ -57,7 +57,7 @@ export function defaultSave(now = Date.now()) {
     lore: {},             // fragment de récit -> date de déblocage
     sceaux: { wins: 0, losses: 0, draws: 0, beaten: {}, day: null, paidToday: 0, streak: 0, best: 0, history: [] },
     relics: { best: 0, runs: 0, wins: 0, run: null, last: null, day: null, paidToday: 0 },
-    war: { week: null, side: null, points: 0, used: {}, claimed: {}, history: [] },
+    war: { week: null, side: null, points: 0, used: {}, claimed: {}, history: [], report: null },
   };
 }
 

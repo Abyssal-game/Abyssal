@@ -10,6 +10,7 @@ import { pactChoices, PACTS } from './pacts.js';
 import { FORMS, formUnlocked } from './forms.js';
 import * as SC from './sceaux.js';
 import * as HT from './hunt.js';
+import * as WR from './war.js';
 import { FERVOR_START, FERVOR_MAX } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
 export const WEEKLY_FLOOR = 8;
@@ -519,6 +520,7 @@ export class Game {
     const out = { result: st.over, shards: 0, first: false, title: null, daily: st.daily, capped: false };
     if (st.over === 'won') {
       sc.wins++; sc.streak++; sc.best = Math.max(sc.best, sc.streak);
+      out.war = this.warAdd('sceaux');
       if (!sc.beaten[R.key]) { sc.beaten[R.key] = Date.now(); out.first = true; out.shards += SC.SCEAUX_REWARD.firstWin; }
       if (st.daily && sc.dailyDone !== day) { sc.dailyDone = day; out.shards += SC.SCEAUX_REWARD.daily; }
       if (sc.paidToday < SC.SCEAUX_REWARD.dailyPaid) { sc.paidToday++; out.shards += R.reward; } else out.capped = true;
@@ -662,6 +664,7 @@ export class Game {
     if (st.bossKey && won) this.s.bossesBeaten[st.bossKey] = this.s.bossesBeaten[st.bossKey] || Date.now();
     if (!won) { out.summary = this.relicEnd({ wiped: true }); return out; }
     this.track('win', 1);
+    out.war = this.warAdd(room === 'boss' ? 'relicBoss' : 'relic', run.team.filter((m) => !m.fallen).map((m) => m.id));
     out.shards = this.relicLoot(HT.combatLoot(run.step, room));
     if (run.relics.includes('lanterne')) { run.team.forEach((m) => { if (!m.fallen) m.hp = Math.min(m.maxHp, m.hp + Math.ceil(m.maxHp * 0.15)); }); out.lantern = true; }
     run.log.push(`${HT.ROOMS[room].name} gagné (+${out.shards} éclats)`);
@@ -769,6 +772,60 @@ export class Game {
     this.checkProgress();
     this.persist();
     return out;
+  }
+  // ——— Guerre des Factions (hebdomadaire, en solo contre l'Abîme) ———
+  war() {
+    const w = this.s.war, week = weekIndex(this.clock());
+    if (w.week !== week) {
+      if (w.week != null && w.side) {
+        // semaine terminée : les paliers atteints et non réclamés sont versés automatiquement
+        const paid = [];
+        for (const i of WR.tiersReached(w.points)) if (!w.claimed[i]) { this.warGrant(i); paid.push(i); }
+        w.history.unshift({ week: w.week, side: w.side, points: w.points, tiers: WR.tiersReached(w.points).length });
+        w.history = w.history.slice(0, 12);
+        w.report = { side: w.side, points: w.points, tiers: WR.tiersReached(w.points).length, paid: paid.reduce((a, i) => a + WR.WAR.tiers[i].shards, 0) };
+      }
+      Object.assign(w, { week, side: null, points: 0, used: {}, claimed: {} });
+      this.persist();
+    }
+    return w;
+  }
+  warJoin(f) {
+    const w = this.war();
+    if (w.side) throw new Error('Ton serment est déjà prêté pour cette semaine.');
+    if (!FACTION_ORDER.includes(f)) throw new Error('Royaume inconnu.');
+    w.side = f; this.persist();
+    return w;
+  }
+  // Victoire comptée pour la Guerre ; ids : créatures au combat (pour le bonus de serment)
+  warAdd(kind, ids = null) {
+    const w = this.war();
+    if (!w.side || !WR.WAR.sources[kind]) return 0;
+    const day = today(this.clock()), key = `${kind}:${day}`;
+    for (const k of Object.keys(w.used)) if (!k.endsWith(day)) delete w.used[k];
+    const oath = !!ids && ids.slice(0, 3).filter((id) => this.catalog.get(id)?.faction === w.side).length >= 2;
+    const pts = WR.warPoints(kind, w.used[key] || 0, oath);
+    w.used[key] = (w.used[key] || 0) + 1;
+    w.points += pts;
+    this.persist();
+    return pts;
+  }
+  warGrant(i) {
+    const w = this.s.war, t = WR.WAR.tiers[i];
+    w.claimed[i] = true;
+    this.s.shards += t.shards;
+    if (t.frame && !this.s.frames.includes(t.frame)) this.s.frames.push(t.frame);
+    if (t.title && !this.s.titles.includes(t.title)) this.s.titles.push(t.title);
+    return t;
+  }
+  warClaim(i) {
+    const w = this.war();
+    if (!WR.tiersReached(w.points).includes(i)) throw new Error('Palier pas encore atteint.');
+    if (w.claimed[i]) throw new Error('Récompense déjà reçue.');
+    const t = this.warGrant(i);
+    this.checkProgress();
+    this.persist();
+    return t;
   }
   // Forme choisie pour une carte (corrompue si débloquée et sélectionnée)
   formOf(id) { return this.s.forms?.[id] === 'corrompue' && formUnlocked(this, id) ? 'corrompue' : null; }
@@ -930,6 +987,7 @@ export class Game {
       if (b && this.rng() < BOSS_RECRUIT) out.recruit = { id: b.id, ...this.addCard(b.id, 'normal', 'booster') };
     }
     if (won) {
+      out.war = this.warAdd(room, run.team.filter((m) => !m.fallen).map((m) => m.id));
       const hunt = room === 'elite' && this.rule(run.day).key === 'chasse';
       out.shards = this.gainShards((8 + 3 * run.floor) * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1) * (hunt ? 2 : 1));
       // les gardiens donnent un coffre tout de suite ; règle « Chasse aux élites » : les élites aussi

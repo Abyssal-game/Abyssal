@@ -98,6 +98,7 @@ export default function sceauxScreen(app, root) {
       <p class="sc-final"><b>${f.p}</b> contre <b>${f.o}</b></p>
       <p class="sc-say"><img alt="" src="${artUrl(cat.get(R.portrait), { lite: true })}"><span>« ${esc(st.over === 'won' ? R.win : st.over === 'lost' ? R.lose : 'Partie nulle. On recommence ?')} »</span></p>
       ${out.shards ? `<p class="sc-gain">${icon('crystal')} <b>+${fmt(out.shards)}</b> éclats${out.first ? ' (première victoire)' : ''}</p>` : ''}
+      ${out.war ? `<p class="sc-gain">${icon('p:conflicts')} <b>+${out.war}</b> points de guerre</p>` : ''}
       ${out.capped ? '<p class="small muted">Plus de victoires payées aujourd’hui : tu joues pour la gloire.</p>' : ''}
       ${out.title ? `<p class="sc-gain">${icon('p:titles')} Nouveau titre : <b>${esc(out.title)}</b></p>` : ''}
       ${out.frame ? `<p class="sc-gain">${icon('p:titles')} Nouveau cadre de profil : <b>Cadre des Sceaux</b></p>` : ''}

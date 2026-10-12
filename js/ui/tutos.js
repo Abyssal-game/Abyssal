@@ -14,6 +14,7 @@ export const TUTOS = [
   { key: 'sceaux', group: 'Aventure', title: 'Duels des Sceaux', html: 'Un jeu de cartes à part, sans PV ni attaque : chaque carte a <b>quatre valeurs</b>, une par côté. Bats les adversaires dans l’ordre pour débloquer les suivants, et relève le <b>défi du jour</b>. Compose ta main de 5 cartes avec <b>Composer ma main</b>.' },
   { key: 'sceaux-board', group: 'Aventure', title: 'Le plateau des Sceaux', html: 'Touche une de tes cartes, puis une <b>case libre</b>. Si ta valeur est <b>plus grande</b> que celle d’en face d’une carte adverse voisine, tu la <b>captures</b>. Après 9 poses, celui qui a le plus de cartes à sa couleur gagne.' },
   { key: 'reliques', group: 'Aventure', title: 'Chasse aux Reliques', html: 'Une chasse de <b>9 salles</b>. Avant chaque salle, choisis entre deux chemins. Les <b>reliques</b> (4 au plus) ont toutes un gain et un prix.<br><br>Ton butin est <b>en jeu</b> tant qu’il n’est pas <b>à l’abri</b> : si l’équipe tombe, il est perdu. Les seuils, le Passeur et une <b>sortie</b> entre deux salles le protègent.' },
+  { key: 'guerre', group: 'Aventure', title: 'Guerre des Factions', html: 'Chaque semaine, prête serment à un <b>royaume</b>. Tes victoires (Descente, Sceaux, Chasse) lui rapportent des <b>points</b> ; les paliers donnent des éclats, un titre et un cadre. Tu joues <b>en solo contre l’Abîme</b> : pas d’autres joueurs, pas de faux classement.' },
 ];
 const BY_KEY = Object.fromEntries(TUTOS.map((t) => [t.key, t]));
 // Affiche la bulle si elle n'a pas encore été vue (force : la remontrer quand même)

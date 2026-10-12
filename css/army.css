@@ -1440,3 +1440,40 @@ img.veiled { filter: grayscale(1) brightness(.1) contrast(1.8) blur(6px) !import
 .fm-badge { position: absolute; left: 50%; bottom: -12px; transform: translateX(-50%); z-index: 3; padding: 5px 14px; border-radius: 99px; white-space: nowrap; background: linear-gradient(180deg, #6A2FC0, #2E0E5A); border: 1px solid #C9A0FF; color: #F1E4FF; font: 700 .85rem/1.2 var(--f-display); box-shadow: 0 4px 14px rgba(0, 0, 0, .6); }
 .fm-tag { position: absolute; top: 34%; left: 50%; transform: translateX(-50%) rotate(-8deg); z-index: 4; padding: 2px 8px; border-radius: 6px; background: rgba(60, 20, 110, .92); border: 1px solid #C9A0FF; color: #F1E4FF; font: 800 .62rem/1.3 var(--f-ui); text-transform: uppercase; letter-spacing: .06em; pointer-events: none; }
 .detail-card.fm-on::after { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none; border-radius: 18px; background: radial-gradient(circle at 50% 40%, transparent 35%, rgba(90, 30, 160, .45) 100%); box-shadow: inset 0 0 40px rgba(138, 79, 216, .55); }
+
+/* ——— Guerre des Factions ———————————————————————————————————————————————— */
+.wr-report { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; border-color: rgba(232, 195, 90, .45) !important; }
+.wr-report .btn { align-self: flex-end; }
+.wr-side { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; border-color: color-mix(in srgb, var(--fc) 60%, transparent) !important; background: radial-gradient(120% 100% at 0% 50%, color-mix(in srgb, var(--fc) 28%, transparent), rgba(12, 13, 20, .94) 70%) !important; }
+.wr-side > span:last-child { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.wr-side b { font: 700 1.2rem/1.15 var(--f-display); color: var(--fc); }
+.wr-sig { flex: none; width: 58px; height: 58px; display: grid; place-items: center; }
+.wr-sig .sigil-img, .wr-sig img, .wr-sig svg { width: 100% !important; height: 100% !important; }
+.wr-sig.sm { width: 36px; height: 36px; }
+.wr-front { margin-bottom: 10px; }
+.wr-pts { display: flex; align-items: baseline; gap: 8px; }
+.wr-pts b { font: 900 2rem/1 var(--f-display); color: var(--gold-hi); }
+.wr-bar { position: relative; height: 12px; margin: 12px 4px 14px; border-radius: 6px; background: rgba(255, 255, 255, .08); }
+.wr-bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 6px; background: linear-gradient(90deg, color-mix(in srgb, var(--fc) 50%, #000), var(--fc)); box-shadow: 0 0 10px color-mix(in srgb, var(--fc) 60%, transparent); }
+.wr-bar em { position: absolute; top: -4px; width: 4px; height: 20px; margin-left: -2px; border-radius: 2px; background: rgba(255, 255, 255, .25); }
+.wr-bar em.ok { background: var(--gold-hi); box-shadow: 0 0 6px var(--gold-hi); }
+.wr-tiers { display: grid; gap: 8px; }
+.wr-tier { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255, 255, 255, .03); }
+.wr-tier > span:first-child { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.wr-tier .ic { width: 15px; height: 15px; vertical-align: -2px; }
+.wr-tier.ok { border-color: rgba(232, 195, 90, .55); } .wr-tier.got { opacity: .7; }
+.wr-got { color: #7FE0A0; }
+.wr-pick h2, .wr-how h2 { margin: 0 0 6px; font-size: 1.15rem; }
+.wr-facs { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; margin-top: 10px; }
+.wr-fac { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border-radius: 14px; border: 1px solid color-mix(in srgb, var(--fc) 50%, transparent); background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--fc) 22%, transparent), rgba(12, 13, 20, .94) 75%); color: inherit; font: inherit; cursor: pointer; min-height: 110px; }
+.wr-fac b { font: 700 .95rem/1.1 var(--f-display); color: var(--fc); }
+.wr-fac .wr-sig { width: 46px; height: 46px; }
+.wr-how { margin: 10px 0; }
+.wr-how ul { list-style: none; padding: 0; margin: 0 0 8px; display: grid; gap: 6px; }
+.wr-how li { display: grid; grid-template-columns: 1fr auto; gap: 0 10px; font-size: .9rem; }
+.wr-how li b { color: var(--gold-hi); grid-row: span 2; align-self: center; font: 800 1.05rem/1 var(--f-ui); }
+.wr-honest { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 4px 8px 14px; }
+.wr-honest .picon { width: 22px; height: 22px; flex: none; }
+.wr-hist { display: flex; align-items: center; gap: 10px; padding: 10px 12px !important; }
+.wr-hist > span:last-child { display: flex; flex-direction: column; } .wr-hist b { color: var(--fc); }
+.om-ic .sigil-img { width: 38px; height: 38px; }

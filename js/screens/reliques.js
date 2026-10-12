@@ -104,7 +104,7 @@ export default function reliquesScreen(app, root) {
       else {
         app.sfx.reveal(out.room === 'boss' ? 'M' : 'R');
         if (out.next?.won) ui.last = out.next;
-        else toast(`Victoire : <b>+${fmt(out.shards)}</b> éclats en jeu${out.lantern ? ' · la Lanterne soigne ton équipe' : ''}`, { icon: 'crystal' });
+        else toast(`Victoire : <b>+${fmt(out.shards)}</b> éclats en jeu${out.lantern ? ' · la Lanterne soigne ton équipe' : ''}${out.war ? `<br>+${out.war} points de guerre` : ''}`, { icon: 'crystal' });
       }
       ui.pick = null; ui.drop = null;
       window.scrollTo(0, 0);
