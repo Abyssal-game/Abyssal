@@ -7,6 +7,8 @@ import { cardHTML, enableTilt } from '../ui/card.js';
 import { boosterOdds } from '../core/boosters.js';
 import { openSheet, esc, toast, confirmBox, fmt, bindActions } from '../ui/dom.js';
 import { icon, sigil, picon } from '../ui/icons.js';
+import { FORMS, formUnlocked } from '../core/forms.js';
+import { relationsOf } from '../core/relations.js';
 
 // Chance réelle d'obtenir cette carte précise dans un booster standard.
 function oddsFor(cat, card) {
@@ -41,6 +43,23 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     for (const v of [shownVariant, 'normal', 'holo', 'gold']) if (e.v[v] > 0 && g.ritualTarget(current, v)) return v;
     return null;
   }
+  // Forme corrompue : présentation, condition d'éveil et choix de la forme emmenée au combat
+  function formHTML(card) {
+    const f = FORMS[card.id];
+    if (!f) return '';
+    const open = formUnlocked(g, card.id), on = g.formOf(card.id) === 'corrompue';
+    return `<div class="fm-panel ${on ? 'on' : ''} ${open ? '' : 'locked'}"><span class="fm-k">${icon(open ? 'sparkle' : 'lock')} Forme corrompue</span>
+      <b>${open ? esc(f.name) : 'Forme endormie'}</b><span class="small fm-t">${open ? esc(f.title) : `Pour l’éveiller : ${esc(f.condText.charAt(0).toLowerCase() + f.condText.slice(1))}.`}</span>
+      ${open ? `<p class="small"><b>${esc(f.passiveName)}.</b> ${esc(f.passiveDesc)}</p><p class="lore small">« ${esc(f.lore)} »</p>
+      <div class="seg fm-seg" role="group" aria-label="Forme au combat"><button class="seg-b" data-act="form" data-v="" aria-pressed="${!on}">Originelle</button><button class="seg-b" data-act="form" data-v="corrompue" aria-pressed="${on}">Corrompue</button></div>` : ''}</div>`;
+  }
+  // Relations de la créature : découvertes en combat, sinon seulement annoncées
+  function relHTML(card) {
+    const rs = relationsOf(card);
+    if (!rs.length) return '';
+    const T = { proie: 'Prédation', rival: 'Rivalité', legende: 'Légende' };
+    return `<h3 class="section-title">Relations</h3><div class="stack">${rs.map((r) => (g.s.relations[r.key] ? `<div class="lr-e rel t-${r.type}"><span class="lr-type">${T[r.type]}</span><b>${esc(r.name)}</b><span class="small">${esc(r.desc)}</span></div>` : `<div class="lr-e locked"><b>${icon('lock')} ${T[r.type]} inconnue</b><span class="small muted">${r.type === 'legende' ? 'Réunis-la avec les créatures de son mythe et combats.' : 'Elle se révèle en combat.'}</span></div>`)).join('')}</div>`;
+  }
   function draw() {
     stopTilt();
     const card = cat.get(current);
@@ -70,9 +89,10 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
       const rit = ritualFrom();
       const tabs = [['combat', 'team', 'Combat'], ['story', 'history', 'Histoire'], ['rarity', 'crystal', 'Rareté']];
       const TAB = {
-        combat: `${combatHTML(g, card)}`,
+        combat: `${formHTML(card)}${combatHTML(g, card)}`,
         story: `<p class="lore big">« ${esc(card.lore)} »</p>
           <dl class="facts dt-facts"><div><dt>Catégorie</dt><dd>${esc(card.category)}</dd></div><div><dt>Faction</dt><dd><span class="fac-dot" style="color:${fac.colors.secondary}">${sigil(card.faction)}</span>${esc(fac.name)}</dd></div><div><dt>Découverte le</dt><dd>${dateFr(e.first)}</dd></div><div><dt>Numéro</dt><dd>${card.id}</dd></div></dl>
+          ${relHTML(card)}
           ${line ? `<h3 class="section-title">${esc(line.name)}</h3><div class="strip">${line.cards.map((c) => cardHTML(c, { mystery: !g.owns(c.id), nameKnown: g.nameKnown(c.id) })).join('')}</div><p class="small muted">Stade ${card.evolution.stage} sur ${card.evolution.stages}.</p>` : ''}
           ${sets.length ? `<h3 class="section-title">Ensembles</h3><div class="stack">${sets.map((s) => { const p = g.setProgress(s.key); return `<a class="set-link panel" href="#/succes/ensembles"><b>${esc(s.name)}</b><span class="small muted">${p.owned} / ${p.total}${p.done ? ' · complété' : ''}</span><span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span></a>`; }).join('')}</div>` : ''}`,
         rarity: `<p>${odds(card)}</p><p class="small muted">Chance de la trouver dans une version spéciale, par booster standard :</p><div class="var-odds">${variantOdds(card)}</div>
@@ -109,7 +129,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     }
     sheet.setContent(`<div class="detail ${owned ? '' : 'is-sealed'}">
       ${nav}
-      <div class="detail-card">${cardHTML(card, { size: 'full', variant: shownVariant, mystery: !owned, nameKnown: known })}</div>
+      <div class="detail-card ${owned && g.formOf(current) ? 'fm-on' : ''}">${cardHTML(card, { size: 'full', variant: shownVariant, mystery: !owned, nameKnown: known })}${owned && g.formOf(current) ? `<span class="fm-badge">${esc(FORMS[current].name)}</span>` : ''}</div>
       ${owned ? `<p class="tilt-hint small muted">${icon('refresh')} Fais glisser ton doigt sur la carte pour la faire pivoter.</p>` : ''}
       ${variantsRow}
       <div class="detail-info">${body}</div>
@@ -126,6 +146,10 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     team() { if (toggleTeam(app, current)) draw(); },
     ritual() { openRitual(app, current, ritualFrom(), { onClose: () => { shownVariant = null; draw(); } }); },
     tab(el) { dtab = el.dataset.v; draw(); },
+    form(el) {
+      try { g.setForm(current, el.dataset.v || null); app.sfx.discover?.(); toast(el.dataset.v ? `<b>${esc(FORMS[current].name)}</b> combattra sous sa forme corrompue.` : 'Elle combattra sous sa forme originelle.', { icon: 'sparkle' }); draw(); }
+      catch (err) { toast(esc(err.message), { kind: 'error' }); }
+    },
     artonly(el) {
       const c = sheet.body.querySelector('.detail-card .tcg');
       const on = c.classList.toggle('art-only');

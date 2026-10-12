@@ -5,6 +5,7 @@ import { icon, sigil, EMBLEM, picon } from '../ui/icons.js';
 import { esc, bindActions } from '../ui/dom.js';
 import { FACTION_ORDER, RARITY } from '../config.js';
 import { FAMILIES, HUNT_STAGES, huntStage, familyOf } from '../core/descent.js';
+import { loreEntries, markLoreRead, unreadLore } from '../core/lore.js';
 
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
@@ -72,6 +73,27 @@ export default function bestiary(app, root) {
       }).join('')}</div>`;
   }
 
+  // Récits : gardiens, formes corrompues, relations et fragments des royaumes
+  function recits() {
+    const all = loreEntries(g, cat), open = all.filter((e) => e.unlocked);
+    const fresh = new Set(all.filter((e) => e.unlocked && !g.s.lore[e.key]).map((e) => e.key));
+    const nb = (e) => (fresh.has(e.key) ? '<span class="lr-new">Nouveau</span>' : '');
+    const lock = (e) => `<div class="lr-e locked"><b>${icon('lock')} ${e.kind === 'boss' || e.kind === 'form' ? 'Récit scellé' : esc(e.title)}</b><span class="small muted">${esc(e.hint)}</span></div>`;
+    const of = (k) => all.filter((e) => e.kind === k);
+    const html = `<p class="small muted">${open.length} récit${open.length > 1 ? 's' : ''} sur ${all.length}. Ils s’ouvrent en jouant : gardiens vaincus, formes éveillées, relations rencontrées, royaumes complétés.</p>
+      <h2 class="section-title">Les gardiens de l’Abîme</h2>
+      <div class="stack">${of('boss').map((e) => (e.unlocked ? `<div class="lr-e boss">${nb(e)}<b>${esc(e.title)}</b><span class="small lr-sub">${esc(e.sub)}</span><p class="lore">${esc(e.text)}</p><p class="small"><b>Sa mécanique.</b> ${esc(e.mechanic)}</p><p class="small"><b>Pour le contrer.</b> ${esc(e.counter)}</p></div>` : lock(e))).join('')}</div>
+      <h2 class="section-title">Formes corrompues</h2>
+      <div class="stack">${of('form').map((e) => { const c = cat.get(e.id); return e.unlocked ? `<button class="lr-e form" data-act="card" data-id="${e.id}">${nb(e)}<span class="lr-th"><img alt="" src="${artUrl(c, { lite: true })}"></span><span><b>${esc(e.title)}</b><span class="small lr-sub">${esc(c.name)} · ${esc(e.sub)}</span><p class="lore small">${esc(e.text)}</p></span></button>` : lock(e); }).join('')}</div>
+      <h2 class="section-title">Relations entre créatures</h2>
+      <div class="stack">${of('rel').map((e) => (e.unlocked ? `<div class="lr-e rel t-${e.rel.type}">${nb(e)}<span class="lr-type">${e.rel.type === 'proie' ? 'Prédation' : e.rel.type === 'rival' ? 'Rivalité' : 'Légende'}</span><b>${esc(e.title)}</b><span class="small">${esc(e.text)}</span></div>` : `<div class="lr-e locked"><b>${icon('lock')} ${e.rel.type === 'proie' ? 'Prédation' : e.rel.type === 'rival' ? 'Rivalité' : 'Légende'} inconnue</b><span class="small muted">${esc(e.hint)}</span></div>`)).join('')}</div>
+      <h2 class="section-title">Fragments des royaumes</h2>
+      ${FACTION_ORDER.map((f) => { const fr = of('frag').filter((e) => e.faction === f), n = fr.filter((e) => e.unlocked).length; return `<details class="panel dc-fold lr-fac" style="--fc:${cat.faction[f].colors.secondary}"><summary>${sigil(f)} ${esc(cat.faction[f].realm)} <span class="small muted">${n} / ${fr.length}</span>${fr.some((e) => fresh.has(e.key)) ? '<span class="lr-new">Nouveau</span>' : ''}</summary><div>${fr.map((e) => (e.unlocked ? `<h3>${esc(e.title)}</h3><p class="lore">${esc(e.text)}</p>` : `<p class="small muted">${icon('lock')} ${esc(e.hint)}</p>`)).join('')}</div></details>`; }).join('')}`;
+    // les récits affichés une fois ne sont plus « nouveaux »
+    setTimeout(() => markLoreRead(g, [...fresh]), 0);
+    return html;
+  }
+
   function entry(c) {
     const owned = g.owns(c.id);
     const r = RARITY[c.rarity];
@@ -84,16 +106,19 @@ export default function bestiary(app, root) {
   function render() {
     root.innerHTML = `
       <header class="screen-head ui-hero bn-bestiary"><h1>Bestiaire</h1><p class="muted">Le livre interdit, page après page.</p></header>
-      <div class="seg wide" role="tablist">${[['creatures', 'Créatures'], ['chasse', 'Chasse'], ['chroniques', 'Royaumes et histoire']].map(([k, l]) => `<button class="seg-b" role="tab" data-act="tab" data-v="${k}" aria-selected="${st.tab === k}" aria-pressed="${st.tab === k}">${l}</button>`).join('')}</div>
-      <div class="stack best-body">${st.tab === 'chroniques' ? chronicles() : st.tab === 'chasse' ? hunt() : creatures()}</div>`;
+      <div class="seg wide" role="tablist">${[['creatures', 'Créatures'], ['recits', 'Récits'], ['chasse', 'Chasse'], ['chroniques', 'Royaumes']].map(([k, l]) => `<button class="seg-b" role="tab" data-act="tab" data-v="${k}" aria-selected="${st.tab === k}" aria-pressed="${st.tab === k}">${l}${k === 'recits' && st.tab !== 'recits' && unreadLore(g, cat).length ? '<i class="lr-dot"></i>' : ''}</button>`).join('')}</div>
+      <div class="stack best-body">${st.tab === 'chroniques' ? chronicles() : st.tab === 'chasse' ? hunt() : st.tab === 'recits' ? recits() : creatures()}</div>`;
     const q = root.querySelector('#best-q');
     if (q) q.addEventListener('input', (e) => { st.q = e.target.value; const pos = e.target.selectionStart; render(); const n = root.querySelector('#best-q'); n.focus(); n.setSelectionRange(pos, pos); });
   }
   bindActions(root, {
     tab(el) { st.tab = el.dataset.v; render(); },
     fac(el) { st.faction = el.dataset.v; render(); },
+    card() {},
   });
   root.addEventListener('click', (e) => {
+    const lf = e.target.closest('.lr-e.form');
+    if (lf) return app.openCard(lf.dataset.id);
     const row = e.target.closest('.codex-row');
     if (row) app.openCard(row.dataset.id, { list: [...root.querySelectorAll('.codex-row')].map((r) => r.dataset.id) });
   });

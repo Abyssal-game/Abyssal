@@ -80,7 +80,7 @@ export default function collection(app, root, params) {
     const grid = root.querySelector('#col-grid');
     grid.innerHTML = list.map((c) => {
       const e = g.entry(c.id);
-      return e ? cardHTML(c, { lazy: true, count: e.n, isNew: e.isNew, variant: bestVariant(e) })
+      return e ? cardHTML(c, { lazy: true, count: e.n, isNew: e.isNew, variant: bestVariant(e), tag: g.formOf(c.id) ? '<span class="fm-tag">Corrompue</span>' : '' })
         : cardHTML(c, { lazy: true, mystery: true, nameKnown: g.nameKnown(c.id) });
     }).join('');
     lazyArt(grid);

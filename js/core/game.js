@@ -389,7 +389,7 @@ export class Game {
   setTeam(ids) {
     const list = [...new Set(ids)].filter((id) => this.owns(id)).slice(0, TEAM.active + TEAM.reserve);
     if (this.teamCost(list) > BUDGET) throw new Error(`Ton équipe dépasse le budget de ${BUDGET} points.`);
-    if (this.s.descent.run) throw new Error('Termine d’abord ton expédition.');
+    if (this.s.descent.run || this.s.relics.run) throw new Error('Termine d’abord ton expédition ou ta chasse en cours.');
     this.s.team = list;
     this.s.teamSet = true;
     this.persist();
@@ -774,7 +774,7 @@ export class Game {
   formOf(id) { return this.s.forms?.[id] === 'corrompue' && formUnlocked(this, id) ? 'corrompue' : null; }
   setForm(id, form) {
     if (form === 'corrompue' && !formUnlocked(this, id)) throw new Error('Cette forme n’est pas encore éveillée.');
-    if (this.s.descent.run) throw new Error('Termine d’abord ton expédition.');
+    if (this.s.descent.run || this.s.relics.run) throw new Error('Termine d’abord ton expédition ou ta chasse en cours.');
     if (form === 'corrompue') this.s.forms[id] = 'corrompue'; else delete this.s.forms[id];
     this.persist();
   }

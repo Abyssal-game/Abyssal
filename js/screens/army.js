@@ -15,15 +15,16 @@ import { openChestScene } from './chest-open.js';
 
 // Étiquettes posées sur une carte : capacité, niveau, coût, attaque et PV
 export const armyBadges = (g, c) => {
-  const u = duelUnit(c, { level: g.owns(c.id) ? g.cardLevel(c.id) : 1 }), kw = KEYWORDS[keywordOf(c)];
-  return `<span class="v2-badges"><span class="v2-role" style="--ro:${ROLES[roleOf(c)].color}" title="${esc(kw.name)}">${roleIcon(keywordOf(c))}</span>${g.owns(c.id) ? `<span class="v2-lv">Niv. ${g.cardLevel(c.id)}</span>` : ''}<span class="v2-cost">${COST[c.rarity]}</span><span class="v2-ah"><i>${icon('swords')}${u.atk}</i><i>${icon('heart')}${u.maxHp}</i></span></span>`;
+  const fm = g.owns(c.id) ? g.formOf(c.id) : null;
+  const u = duelUnit(c, { level: g.owns(c.id) ? g.cardLevel(c.id) : 1, form: fm }), kw = KEYWORDS[keywordOf(c)];
+  return `${fm ? '<span class="fm-tag">Corrompue</span>' : ''}<span class="v2-badges"><span class="v2-role" style="--ro:${ROLES[roleOf(c)].color}" title="${esc(kw.name)}">${roleIcon(keywordOf(c))}</span>${g.owns(c.id) ? `<span class="v2-lv">Niv. ${g.cardLevel(c.id)}</span>` : ''}<span class="v2-cost">${COST[c.rarity]}</span><span class="v2-ah"><i>${icon('swords')}${u.atk}</i><i>${icon('heart')}${u.maxHp}</i></span></span>`;
 };
 export const armyCard = (g, c, opts = {}) => cardHTML(c, { ...opts, tag: armyBadges(g, c) });
 
 // Bloc « Au combat » d'une carte : attaque, PV, capacité, pouvoir, niveau
 export function combatHTML(g, c) {
   const owned = g.owns(c.id), kit = kitOf(c), role = ROLES[roleOf(c)], syn = synergiesFor(roleOf(c));
-  const li = g.cardLevelInfo(c.id), u = duelUnit(c, { level: li.level }), nx = li.level < MAX_LEVEL ? duelUnit(c, { level: li.level + 1 }) : null;
+  const li = g.cardLevelInfo(c.id), fm = owned ? g.formOf(c.id) : null, u = duelUnit(c, { level: li.level, form: fm }), nx = li.level < MAX_LEVEL ? duelUnit(c, { level: li.level + 1, form: fm }) : null;
   const ult = canUlt(c) ? ULTS[ultOf(c)] : null;
   return `<div class="army-combat">
     <p class="small muted">${esc(role.name)} · coût d’équipe ${COST[c.rarity]}</p>
