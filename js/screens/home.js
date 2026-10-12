@@ -57,7 +57,10 @@ export default function home(app, root) {
     <div class="online-pill" role="status" aria-live="polite"><img class="on-ic" alt="" src="assets/icons/online.webp"><span class="on-dot"></span><span class="on-t">Connexion…</span></div>
   `;
   // Joueurs connectés en ce moment (mis à jour en direct)
+  // posée directement sur la page (et non dans l'écran animé), pour rester collée au-dessus des onglets
+  document.querySelectorAll('body > .online-pill').forEach((x) => x.remove());
   const pill = root.querySelector('.online-pill');
+  document.body.appendChild(pill);
   const offP = onPresence((p) => {
     pill.classList.toggle('live', p.status === 'on');
     pill.querySelector('.on-t').innerHTML = p.status === 'on' ? `<b>${fmt(p.count)}</b> joueur${p.count > 1 ? 's' : ''} en ligne` : p.status === 'connecting' ? 'Connexion…' : 'Hors ligne';
@@ -83,5 +86,5 @@ export default function home(app, root) {
     },
   });
   app.refreshView = () => app.refresh();
-  return () => { app.refreshView = null; offP(); };
+  return () => { app.refreshView = null; offP(); pill.remove(); };
 }

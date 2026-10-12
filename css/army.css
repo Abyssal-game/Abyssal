@@ -924,7 +924,6 @@ img.ic.ic-cur { object-fit: contain; transform: scale(1.18); filter: drop-shadow
 /* ===== Retours iPhone (1) : vraie hauteur d'écran, fenêtres centrées ou plein écran ===== */
 .sheet-wrap, .opening, .coach, .boot { bottom: auto !important; height: var(--app-h, 100dvh) !important; }
 #tabbar { bottom: auto !important; top: calc(var(--app-h, 100dvh) - var(--tab-h) - var(--safe-b)); }
-.online-pill { bottom: auto !important; top: calc(var(--app-h, 100dvh) - var(--tab-h) - var(--safe-b) - 48px); }
 #view { min-height: var(--app-h, 100vh); }
 body.battle-mode .dv { height: calc(var(--app-h, 100dvh) - var(--safe-t) - var(--safe-b) - 14px) !important; }
 body.battle-mode .tb { height: calc(var(--app-h, 100dvh) - var(--safe-t) - var(--safe-b) - 14px) !important; }
