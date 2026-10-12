@@ -8,7 +8,7 @@ import { icon, EMBLEM } from '../ui/icons.js';
 import { esc, openSheet, toast } from '../ui/dom.js';
 import { coach } from '../ui/coach.js';
 import { cardHTML } from '../ui/card.js';
-import { KEYWORDS, BOSS_POWERS, GAUGE_MAX, front, reserve, targetsFor, canAct, attack, beginEnemyTurn, nextStrike, strike, endEnemyTurn, dodgeWindow, threats, canSwap, swap, useUlt, ultReady, autoAttacks } from '../core/duel.js';
+import { KEYWORDS, BOSS_POWERS, INTENTS, SYNERGIES, PACK_BONUS, GAUGE_MAX, front, reserve, targetsFor, canAct, attack, beginEnemyTurn, nextStrike, strike, endEnemyTurn, dodgeWindow, threats, canSwap, swap, useUlt, ultReady, autoAttacks } from '../core/duel.js';
 import { ULTS } from '../core/army.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -60,6 +60,7 @@ export function runDuel(app, root, { title, onEnd }) {
       <span class="dv-hp ${u.hp < u.maxHp ? 'hurt' : ''}">${icon('heart')}<b>${Math.max(0, u.hp)}</b></span>
       ${u.side === 'ally' && th[u.uid] ? `<span class="dv-threat" title="Dégâts annoncés">${icon('skull')}-${th[u.uid]}</span>` : ''}
       ${u.side === 'enemy' ? `<span class="dv-lv">Niv. ${u.level || 1}</span>` : ''}
+      ${u.side === 'enemy' && u.kind && st.turn === 'ally' && !u.frozen ? `<span class="dv-int k-${u.kind}" title="${esc(INTENTS[u.kind].desc)}">${icon(INTENTS[u.kind].icon)}${esc(INTENTS[u.kind].name)}</span>` : ''}
       <span class="dv-st">${u.shield ? `<i class="sh">${icon('shield')}</i>` : ''}${u.poison ? `<i class="po">${icon('skull')}${u.poison}</i>` : ''}${u.frozen ? '<i class="fr">Gelé</i>' : ''}${u.boost ? `<i class="bo">+${u.boost}</i>` : ''}</span>
     </button>`;
   };
@@ -150,10 +151,14 @@ export function runDuel(app, root, { title, onEnd }) {
         await wait(T(260));
       } else if (e.t === 'heal') { app.sfx.heal(); fxAt(e.u, 'heal'); float(e.u, `+${e.d}`, 'heal'); const t = el(e.u); const hp = t?.querySelector('.dv-hp b'); if (hp) hp.textContent = st.units[e.u].hp; await wait(T(220)); }
       else if (e.t === 'block') { app.sfx.block(); float(e.u, 'Bloqué', 'info'); sparks(e.u, 'blue'); await wait(T(260)); }
-      else if (e.t === 'dodge') { app.sfx.dodge(); fxAt(e.u, 'dodge', { big: true }); const t = el(e.u); if (t) { t.classList.remove('dodge'); void t.offsetWidth; t.classList.add('dodge'); } float(e.u, 'Esquive !', 'dodge'); await wait(T(320)); }
+      else if (e.t === 'dodge') { app.sfx.dodge(); fxAt(e.u, 'dodge', { big: true }); const t = el(e.u); if (t) { t.classList.remove('dodge'); void t.offsetWidth; t.classList.add('dodge'); } float(e.u, st.units[e.u]?.side === 'ally' ? 'Esquive ! +1 jauge' : 'Esquive !', 'dodge'); draw(); await wait(T(320)); }
       else if (e.t === 'boss') { app.sfx.boss(); const t = el(e.u); if (t) { t.classList.remove('roar'); void t.offsetWidth; t.classList.add('roar'); } float(e.u, e.s, 'boss'); shake(true); await wait(T(700)); }
       else if (e.t === 'swap') { app.sfx.enter(); draw(); el(e.u)?.classList.add('enter'); float(e.u, 'Entre en jeu', 'info'); await wait(T(360)); }
-      else if (e.t === 'status') { if (e.s === 'Venin') { app.sfx.poison(); fxAt(e.u, 'venom'); } else if (e.s === 'Gelé') { app.sfx.freeze(); fxAt(e.u, 'frost'); } float(e.u, e.s, 'info'); await wait(T(240)); }
+      else if (e.t === 'status') {
+        if (/venin/i.test(e.s)) { app.sfx.poison(); fxAt(e.u, 'venom', { big: !!e.syn }); } else if (e.s === 'Gelé') { app.sfx.freeze(); fxAt(e.u, 'frost'); } else if (e.syn) app.sfx.ult();
+        float(e.u, e.s, e.syn ? 'syn' : 'info'); if (e.s === 'Se charge…') { draw(); el(e.u)?.classList.add('charging'); }
+        await wait(T(e.syn ? 520 : 240));
+      }
       else if (e.t === 'die') { app.sfx.death(); fxAt(e.u, 'death', { big: true }); sparks(e.u, 'big'); el(e.u)?.classList.add('dying'); await wait(T(460)); draw(); }
       else if (e.t === 'enter') { draw(); el(e.u)?.classList.add('enter'); await wait(T(380)); }
       else if (e.t === 'revive') { draw(); float(e.u, 'Relevée !', 'heal'); await wait(T(300)); }
@@ -190,7 +195,7 @@ export function runDuel(app, root, { title, onEnd }) {
     return new Promise((resolve) => {
       // Le curseur accélère (difficile de prévoir son passage) ; face à une élite ou un gardien,
       // la zone dorée se déplace aussi.
-      const u = st.units[a], moving = u?.boss || u?.elite;
+      const u = st.units[a], moving = u?.boss || u?.elite, kind = u?.kind || 'hit';
       const win = dodgeWindow(st, a, t), D = 900;
       const ease = (x) => x ** 1.7;                  // position du curseur selon le temps (0 → 1)
       const zw = Math.max(0.035, ease(Math.min(1, 0.75 + win / D)) - ease(0.75)); // largeur de la zone, ramenée à la vitesse du curseur vers la fin
@@ -199,7 +204,7 @@ export function runDuel(app, root, { title, onEnd }) {
       aEl?.classList.add('aim'); tEl?.classList.add('aimed');
       const bar = document.createElement('div');
       bar.className = 'dv-dodge';
-      bar.innerHTML = `<span class="dv-dodge-t">Esquive ! <small>touche quand le curseur est dans l’or</small></span><span class="dv-dodge-bar"><i class="z" style="left:${z0 * 100}%;width:${zw * 100}%"></i><i class="c"></i></span>`;
+      bar.innerHTML = `<span class="dv-dodge-t">${kind === 'zone' ? 'Attaque de zone ! ' : kind === 'heavy' ? 'Coup chargé ! ' : ''}Esquive ! <small>touche quand le curseur est dans l’or</small></span><span class="dv-dodge-bar"><i class="z" style="left:${z0 * 100}%;width:${zw * 100}%"></i><i class="c"></i></span>`;
       $('.dv-mid').appendChild(bar); $('.dv-mid').classList.add('qte');
       const cur = bar.querySelector('.c'), zEl = bar.querySelector('.z');
       let t0 = 0, done = false, raf = 0;
@@ -223,7 +228,7 @@ export function runDuel(app, root, { title, onEnd }) {
   }
   async function enemyTurn() {
     for (let s = nextStrike(st); s && alive_; s = nextStrike(st)) {
-      const ok = await dodgeQTE(s.a, s.t);
+      const ok = s.kind === 'charge' ? false : await dodgeQTE(s.a, s.t);
       if (!alive_) return;
       const ev = strike(st, s.a, s.t, { dodged: ok }); g.persist();
       await play(ev);
@@ -302,7 +307,9 @@ export function runDuel(app, root, { title, onEnd }) {
       <h3>${esc(c.name)}${u.side === 'enemy' ? ' corrompu' : ''}</h3>
       <dl class="facts"><div><dt>Attaque</dt><dd>${u.atk}</dd></div><div><dt>PV</dt><dd>${Math.max(0, u.hp)} / ${u.maxHp}</dd></div><div><dt>Niveau</dt><dd>${u.level || 1}</dd></div></dl>
       <p class="small"><b>${icon(kw.icon)} ${esc(kw.name)}</b> : ${esc(kw.desc)}</p>
-      ${u.boss && st.bossPower ? `<p class="small dc-bad"><b>${esc(BOSS_POWERS[st.bossPower].name)}</b> : ${esc(BOSS_POWERS[st.bossPower].desc)}</p>` : ''}
+      ${u.side === 'enemy' && u.kind && !u.frozen ? `<p class="small"><b>Intention : ${esc(INTENTS[u.kind].name)}</b>. ${esc(INTENTS[u.kind].desc)}</p>` : ''}
+      ${u.boss && st.bossPower ? `<p class="small dc-bad"><b>${esc(BOSS_POWERS[st.bossPower].name)}</b> : ${esc(BOSS_POWERS[st.bossPower].desc)}</p><p class="small dc-good"><b>Point faible</b> : ${esc(BOSS_POWERS[st.bossPower].counter)}</p>` : ''}
+      ${u.side === 'ally' && u.rarity === 'C' ? `<p class="small dc-good">${icon('star')} Instinct de meute : +${PACK_BONUS} dégât aux élites et aux gardiens.</p>` : ''}
       ${u.side === 'enemy' && g.owns(u.id) ? `<p class="small dc-good">${icon('book')} Tu possèdes sa carte : tes créatures lui font +1 dégât.</p>` : ''}</div>`, { label: c.name });
   }
   function help() {
@@ -311,11 +318,15 @@ export function runDuel(app, root, { title, onEnd }) {
       <li>Touche une de tes cartes, puis l’ennemi à frapper. La cible <b>riposte</b> avec son attaque.</li>
       <li>Chaque carte attaque une fois par tour. Ensuite, touche <b>Fin du tour</b> : les créatures corrompues attaquent.</li>
       <li>${icon('skull')} Le badge rouge sur une de tes cartes annonce les dégâts qu’elle va prendre : abats l’attaquant avant, ou mets-la à l’abri.</li>
-      <li><b>Esquive</b> : quand un ennemi attaque, touche l’écran quand le curseur passe dans la zone dorée. Réussie, ta carte ne prend rien et riposte quand même. Le curseur part à un moment imprévisible et accélère. La zone est plus étroite face à un ennemi de plus haut niveau que ta carte, et chaque esquive réussie par une même carte rend la suivante plus dure. Face aux élites et aux gardiens, la zone bouge. Toucher trop tôt fait rater l’esquive.</li>
+      <li><b>Esquive</b> : quand un ennemi attaque, touche l’écran quand le curseur passe dans la zone dorée. Réussie, ta carte ne prend rien, riposte quand même, et la jauge du pouvoir gagne +1. Le curseur part à un moment imprévisible et accélère. La zone est plus étroite face à un ennemi de plus haut niveau que ta carte et face à un coup chargé. Face aux élites et aux gardiens, la zone bouge. Toucher trop tôt fait rater l’esquive.</li>
+      <li><b>Intentions</b> : au-dessus de chaque ennemi, ce qu’il prépare. ${Object.values(INTENTS).map((k) => `<b>${esc(k.name)}</b> : ${esc(k.desc)}`).join(' ')}</li>
+      <li><b>Instinct de meute</b> : tes cartes Communes font +${PACK_BONUS} dégât aux élites et aux gardiens.</li>
       <li><b>Réserve</b> : une fois par tour, touche une de tes cartes puis la Réserve pour l’échanger. La carte qui entre n’attaque pas ce tour-ci.</li>
       <li>Si une carte tombe, ta réserve prend sa place.</li>
       <li>Chaque attaque charge le <b>pouvoir du Gardien</b> : à ${GAUGE_MAX}, touche-le pour le lancer.</li></ul>
-      <h3>Les capacités</h3>${Object.values(KEYWORDS).map((k) => `<p class="small">${icon(k.icon)} <b>${esc(k.name)}</b> : ${esc(k.desc)}</p>`).join('')}`, { label: 'Règles du duel' });
+      <h3>Les capacités</h3>${Object.values(KEYWORDS).map((k) => `<p class="small">${icon(k.icon)} <b>${esc(k.name)}</b> : ${esc(k.desc)}</p>`).join('')}
+      <h3>Les combinaisons</h3>${SYNERGIES.map((x) => `<p class="small"><b class="dv-syn-n">${esc(x.name)}</b> : ${esc(x.desc)}</p>`).join('')}
+      <h3>Les points faibles des gardiens</h3>${Object.values(BOSS_POWERS).map((x) => `<p class="small"><b>${esc(x.name)}</b> : ${esc(x.counter)}</p>`).join('')}`, { label: 'Règles du duel' });
   }
 
   draw();

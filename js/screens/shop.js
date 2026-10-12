@@ -22,6 +22,15 @@ export function payLabel(g, type, again = false) {
 }
 
 // Visuels d'emballage : assets/packs/<clé>.webp (booster, faction ou événement).
+// Compteurs de garanties : combien de boosters avant la prochaine Hyper rare / Mythique assurée
+export function pityHTML(g) {
+  const row = (r, n, max, label) => {
+    const left = max - n;
+    return `<div class="pt-row"><span class="pt-gem" style="--rc:${RARITY[r].color}">${RARITY[r].short}</span><span class="pt-t"><b>${label}</b><small>${left <= 1 ? 'garantie au prochain booster !' : `garantie dans ${left} boosters au plus`}</small></span><span class="pt-bar"><i style="width:${Math.min(100, (n / (max - 1)) * 100)}%;--rc:${RARITY[r].color}"></i></span></div>`;
+  };
+  return `<div class="pity-box" aria-label="Garanties">${row('HR', g.s.pity.sinceHR, PITY.hr, 'Hyper rare')}${row('M', g.s.pity.sinceM, PITY.m, 'Mythique')}</div>`;
+}
+
 export function packHTML(type, cat, { faction, event } = {}) {
   const def = BOOSTERS[type];
   let label = def.name.replace('Booster ', '');
@@ -103,7 +112,7 @@ export default function shop(app, root, params = []) {
       <header class="screen-head">
         <h1>Boosters</h1>
       </header>
-      <p class="small muted pity-line">${icon('sparkle')} Hyper rare garantie dans ${PITY.hr - g.s.pity.sinceHR} booster${PITY.hr - g.s.pity.sinceHR > 1 ? 's' : ''} au plus · Mythique dans ${PITY.m - g.s.pity.sinceM}</p>
+      ${pityHTML(g)}
       <div class="products">
         ${card('standard')}
         ${card('faction', '', `<div class="chips fac-pick fac-grid" role="radiogroup" aria-label="Faction du booster">${FACTION_ORDER.map((f) => `<button class="chip" role="radio" data-act="pickfac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}" aria-checked="${st.faction === f}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>`)}

@@ -25,8 +25,8 @@ Application d’ouverture de boosters et de collection de cartes dark fantasy, j
 - **La Descente** (`js/core/descent.js`, écran `js/screens/descent.js`) : 3 expéditions avec coffre par jour (puis sans coffre), deux portes par étage, gardien tous les 5 étages. Les ennemis sont les créatures du Bestiaire, corrompues, plus fortes en profondeur ; posséder la carte d’une créature (ou la maîtriser à la chasse) donne +1 dégât contre elle. La profondeur atteinte donne le coffre (bois, fer, or, abyssal) ; chaque coffre contient des boosters (`CHESTS`). Coffres illustrés : `assets/chests/<clé>.webp` et `<clé>-open.webp` (liste `chests` du manifeste). Symboles de factions illustrés : `assets/factions/<clé>.webp` (liste `factions`).
 - Les anciens héros, l’Arsenal et les pactes ont été retirés : à la première ouverture, `convertHeroes()` (dans `js/core/game.js`) change l’expérience et l’équipement en éclats et garde les coffres.
 - **Règle du jour** (`dailyRule` dans `js/core/descent.js`) : une règle différente chaque jour pour la Descente (furie ou sommeil d’une faction, sources bénies, ruée vers les éclats, nuit du pouvoir, chasse aux élites, Abysse instable). **Bulles d’aide** (`js/ui/coach.js`) : montrées une fois, réactivables dans les Réglages.
-- **Rituel d’élévation** (`js/screens/ritual.js`) : sacrifier des doublons pour faire monter une carte d’un cran (normale → holographique → chromatique → or → cosmique), avec chance affichée, ferveur après un échec et rituel interdit risqué. Réglages dans `RITUAL` (`js/config.js`).
-- **Fusion** des doublons, **missions du jour**, **classeur** par faction et **statistiques de chance** dans le profil.
+- **Rituel d’élévation** (`js/screens/ritual.js`) : faire monter une carte d’un cran (normale → holographique → or → cosmique) contre des cendres. Il réussit toujours et ne touche pas aux doublons (qui donnent les niveaux). Réglages dans `RITUAL` (`js/config.js`).
+- **Missions du jour**, **classeur** par faction et **statistiques de chance** dans le profil.
 
 ## Lancer le jeu
 

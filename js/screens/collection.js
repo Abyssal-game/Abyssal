@@ -3,7 +3,6 @@ import { cardHTML, lazyArt } from '../ui/card.js';
 import { icon, sigil } from '../ui/icons.js';
 import { esc, bindActions, pct } from '../ui/dom.js';
 import { RARITIES, FACTION_ORDER, RARITY_ORDER, RARITY } from '../config.js';
-import { openFusion } from './fusion.js';
 
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
@@ -146,7 +145,6 @@ export default function collection(app, root, params) {
     seen() { g.markAllSeen(); drawGrid(); },
     view(el) { st.view = el.dataset.v; drawView(); },
     afac(el) { st.albumFac = el.dataset.v; st.albumPage = 0; drawAlbum(); },
-    fusion() { openFusion(app); },
   });
   let tq;
   root.querySelector('#col-q').addEventListener('input', (e) => { clearTimeout(tq); tq = setTimeout(() => { st.q = e.target.value; drawGrid(); }, 140); });

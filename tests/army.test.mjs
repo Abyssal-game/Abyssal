@@ -177,3 +177,72 @@ test('équipe : on peut tout retirer ; la Descente est seulement bloquée sous 3
   g.setTeam(STARTER.slice(0, 3));
   assert.ok(g.startRun());
 });
+
+test('duel — intentions typées, combinaisons, esquive récompensée, points faibles des gardiens', async () => {
+  const D = await import('../js/core/duel.js');
+  const card = (id) => catalog.get(id);
+  const U = (id, o = {}) => D.duelUnit(card(id), o);
+  // Esquive réussie : jauge +1, la fenêtre ne rétrécit plus
+  let st = D.createDuel([U('INF-001'), U('INF-002')], [U('INF-004', { side: 'enemy' })]);
+  const [a1] = st.order.ally, [e1] = st.order.enemy;
+  const w0 = D.dodgeWindow(st, e1, a1);
+  D.beginEnemyTurn(st);
+  st.units[e1].kind = 'hit';
+  const g0 = st.gauge;
+  D.strike(st, e1, a1, { dodged: true });
+  assert.equal(st.gauge, g0 + 1);
+  assert.equal(D.dodgeWindow(st, e1, a1), w0);
+  // Zone : toute la ligne prend 60 %
+  st = D.createDuel([U('INF-001'), U('INF-002'), U('INF-004')], [U('INF-008', { side: 'enemy' })]);
+  const z = st.units[st.order.enemy[0]];
+  D.beginEnemyTurn(st); z.kind = 'zone';
+  const hp = st.order.ally.map((id) => st.units[id].hp);
+  D.strike(st, z.uid, st.order.ally[0]);
+  st.order.ally.forEach((id, i) => assert.equal(st.units[id].hp, hp[i] - Math.ceil(z.atk * 0.6)));
+  // Charge puis coup chargé (double), et le Gel interrompt la charge
+  st = D.createDuel([U('INF-009'), U('INF-011')], [U('INF-001', { side: 'enemy' })]);
+  const c = st.units[st.order.enemy[0]], tank = st.units[st.order.ally[0]], ice = st.units[st.order.ally[1]];
+  D.beginEnemyTurn(st); c.kind = 'charge';
+  const before = tank.hp;
+  D.strike(st, c.uid, tank.uid);
+  assert.equal(tank.hp, before);
+  assert.ok(c.charged);
+  D.endEnemyTurn(st);
+  assert.equal(c.kind, 'heavy');
+  assert.equal(D.threats(st)[c.intent], c.atk * 2);
+  D.attack(st, ice.uid, c.uid);
+  assert.ok(!c.charged && c.frozen);
+  // Venin traverse le bouclier ; Givre-venin sur une cible gelée
+  st = D.createDuel([U('INF-006'), U('INF-011')], [U('INF-009', { side: 'enemy' })]);
+  const v = st.units[st.order.ally[0]], g2 = st.units[st.order.ally[1]], foe = st.units[st.order.enemy[0]];
+  foe.shield = 1;
+  D.attack(st, g2.uid, foe.uid);       // le bouclier bloque le Gel
+  assert.ok(!foe.frozen);
+  st.units[foe.uid].shield = 1; foe.frozen = 1;
+  const hp2 = foe.hp;
+  D.attack(st, v.uid, foe.uid);        // Venin : perce le bouclier, poison doublé sur cible gelée
+  assert.ok(foe.hp < hp2);
+  assert.equal(foe.poison, 4);
+  // Assaut : pas de riposte de la cible, et pas de riposte de l'attaquant jusqu'à son tour
+  st = D.createDuel([U('INF-001')], [U('INF-002', { side: 'enemy' }), U('INF-004', { side: 'enemy' })]);
+  const as = st.units[st.order.ally[0]], [f1, f2] = st.order.enemy.map((id) => st.units[id]);
+  D.attack(st, as.uid, f1.uid);
+  assert.ok(as.exposed);
+  D.beginEnemyTurn(st); f2.kind = 'hit';
+  const fhp = f2.hp;
+  D.strike(st, f2.uid, as.uid);
+  assert.equal(f2.hp, fhp);
+  // Gardien : Gel résisté un tour sur deux, fureur stoppée quand il est gelé ; Communes +1 contre lui
+  st = D.createDuel([U('INF-011'), U('INF-001')], [U('ABY-030', { side: 'enemy', boss: true })], { bossPower: 'fureur' });
+  const boss = st.units[st.order.enemy[0]], gel = st.units[st.order.ally[0]], com = st.units[st.order.ally[1]];
+  const bhp = boss.hp;
+  D.attack(st, com.uid, boss.uid);
+  assert.equal(bhp - boss.hp, com.atk + D.PACK_BONUS);
+  D.attack(st, gel.uid, boss.uid);
+  assert.ok(boss.frozen);
+  const atk = boss.atk;
+  D.endTurn(st, () => false);
+  assert.equal(boss.atk, atk);           // gelé : pas de fureur
+  D.attack(st, gel.uid, boss.uid);
+  assert.ok(!boss.frozen);               // résiste au gel suivant
+});

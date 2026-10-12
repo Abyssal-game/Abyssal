@@ -46,7 +46,6 @@ export function openCreator(app) {
       </section>
 
       <section class="cr-sec"><h3>Rituel et Descente</h3>
-        <div class="set-row"><div><b>Rituels toujours réussis</b></div><button class="switch" role="switch" aria-checked="${!!g.s.devRitual}" data-x="ritual"><i></i></button></div>
         <div class="row gap wrap">${B('torches', 'Rendre les torches')}${B('missions', 'Accomplir les missions')}</div>
         <form class="cr-give" id="floor"><input class="input plain" name="n" type="number" min="1" max="200" placeholder="Étage" ${d.run ? '' : 'disabled'}><button class="btn small" type="submit" ${d.run ? '' : 'disabled'}>Aller à l’étage</button></form>
         <p class="small muted">${d.run ? `Expédition en cours : étage ${d.run.floor}.` : 'Lance une Descente pour pouvoir sauter d’étage.'}</p>
@@ -78,11 +77,10 @@ export function openCreator(app) {
       if (x === 'all') g.devUnlockAll();
       if (x === 'variants') g.devAllVariants();
       if (x === 'dups') g.devDuplicates(10);
-      if (x === 'ritual') { g.s.devRitual = !g.s.devRitual; g.persist(); }
       if (x === 'torches') g.devTorches();
       if (x === 'missions') g.devMissions();
       if (x === 'off') { g.setSetting('dev', false); sheet.close(); toast('Mode Créateur désactivé.', { icon: 'crown' }); return; }
-      if (!['snap', 'restore', 'ritual'].includes(x)) toast('C’est fait.', { kind: 'success', icon: 'crown' });
+      if (!['snap', 'restore'].includes(x)) toast('C’est fait.', { kind: 'success', icon: 'crown' });
     } catch (err) { toast(esc(err.message), { kind: 'error' }); }
     draw();
   });

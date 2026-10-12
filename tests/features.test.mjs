@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { loadCatalog, MemoryStorage, rngFrom } from './helpers.mjs';
 import { Game } from '../js/core/game.js';
-import { FUSION } from '../js/config.js';
+import { RITUAL } from '../js/config.js';
 
 const catalog = loadCatalog();
 const newGame = (seed = 'f', day = new Date(2026, 9, 10, 12)) => new Game(catalog, new MemoryStorage(), { rng: rngFrom(seed), clock: () => day });
@@ -41,20 +41,6 @@ test('missions : progression, récompense et bonus', () => {
   assert.throws(() => g.claimMission('bonus'));
 });
 
-test('fusion : 5 doublons communs donnent une peu commune, la première copie est gardée', () => {
-  const g = newGame('fusion');
-  const commons = catalog.byRarity.C.slice(0, 3);
-  commons.forEach((c) => { for (let i = 0; i < 3; i++) g.addCard(c.id); }); // 2 doublons chacune = 6
-  assert.equal(g.spareCount('C'), 6);
-  const r = g.fuse('C');
-  assert.equal(catalog.get(r.id).rarity, 'PC');
-  assert.equal(r.used.length, FUSION.cost);
-  assert.equal(g.spareCount('C'), 1);
-  commons.forEach((c) => assert.ok(g.entry(c.id).v.normal >= 1));
-  assert.throws(() => g.fuse('C'));
-  assert.throws(() => g.fuse('M'));
-});
-
 test('chance : statistiques et plus belles ouvertures', () => {
   const g = newGame('luck');
   g.s.shards = 100000;
@@ -66,33 +52,26 @@ test('chance : statistiques et plus belles ouvertures', () => {
   for (let i = 1; i < 5; i++) assert.ok(g.s.best[i - 1].score >= g.s.best[i].score);
 });
 
-test('rituel : chance calculée, réussite transforme la carte, échec augmente la ferveur', () => {
-  const always = new Game(catalog, new MemoryStorage(), { rng: () => 0, clock: () => new Date(2026, 9, 10) });
+test('rituel : toujours réussi, payé en cendres, les doublons sont gardés', () => {
+  const g = new Game(catalog, new MemoryStorage(), { rng: () => 0.999, clock: () => new Date(2026, 9, 10) });
   const target = catalog.byRarity.R[0];
-  always.addCard(target.id);
-  const commons = catalog.byRarity.C.slice(0, 4);
-  commons.forEach((c) => { for (let i = 0; i < 4; i++) always.addCard(c.id); }); // 12 doublons C
-  assert.equal(always.ritualTarget(target.id, 'normal'), 'holo');
-  assert.equal(always.ritualChance(target.id, 'normal', {}), 0);
-  assert.equal(always.ritualChance(target.id, 'normal', { C: 5 }), 20);
-  const r = always.ritual(target.id, 'normal', { C: 5 });
+  for (let i = 0; i < 3; i++) g.addCard(target.id);
+  const lvl = g.cardLevel(target.id);
+  assert.equal(g.ritualTarget(target.id, 'normal'), 'holo');
+  const cost = g.ritualCost(target.id, 'normal');
+  assert.equal(cost, RITUAL.cost.holo);
+  g.s.ash = cost - 1;
+  assert.throws(() => g.ritual(target.id, 'normal'));
+  g.s.ash = cost + 5;
+  const r = g.ritual(target.id, 'normal');
   assert.ok(r.success);
-  assert.equal(always.entry(target.id).v.holo, 1);
-  assert.equal(always.entry(target.id).v.normal, 0);
-  assert.equal(always.spareCount('C'), 7);
-
-  const never = new Game(catalog, new MemoryStorage(), { rng: () => 0.999, clock: () => new Date(2026, 9, 10) });
-  never.addCard(target.id);
-  commons.forEach((c) => { for (let i = 0; i < 4; i++) never.addCard(c.id); });
-  const r2 = never.ritual(target.id, 'normal', { C: 2 });
-  assert.ok(!r2.success);
-  assert.equal(never.s.fervor[`${target.id}:holo`], 1);
-  assert.ok(never.owns(target.id));
-  assert.equal(never.ritualChance(target.id, 'normal', { C: 2 }), 20);
-  // rituel interdit raté : la carte est consumée
-  const r3 = never.ritual(target.id, 'normal', { C: 2 }, true);
-  assert.ok(r3.lost);
-  assert.ok(!never.owns(target.id));
+  assert.equal(g.s.ash, 5);
+  assert.equal(g.entry(target.id).v.holo, 1);
+  assert.equal(g.entry(target.id).v.normal, 2);
+  assert.equal(g.cardLevel(target.id), lvl);
+  // ancienne ferveur : réduction du coût
+  g.s.fervor[`${target.id}:gold`] = 2;
+  assert.equal(g.ritualCost(target.id, 'holo'), Math.round(RITUAL.cost.gold * 0.8 / 5) * 5);
   // les C et PC n'ont pas de feuille d'or : holographique -> cosmique
-  assert.equal(never.ritualTarget(commons[0].id, 'holo'), 'galaxy');
+  assert.equal(g.ritualTarget(catalog.byRarity.C[0].id, 'holo'), 'galaxy');
 });

@@ -12,20 +12,37 @@ export const GAUGE_MAX = 5;
 // Capacités (une par rôle)
 export const KEYWORDS = {
   garde:     { name: 'Garde',     icon: 'shield',  desc: 'Les ennemis doivent l’attaquer en premier.' },
-  assaut:    { name: 'Assaut',    icon: 'swords',  desc: 'Quand elle attaque, la cible ne riposte pas.' },
+  assaut:    { name: 'Assaut',    icon: 'swords',  desc: 'Quand elle attaque, la cible ne riposte pas. En contrepartie, elle ne riposte pas non plus jusqu’à son prochain tour.' },
   soin:      { name: 'Soin',      icon: 'heart',   desc: 'À la fin de son tour, soigne l’allié le plus blessé.' },
-  venin:     { name: 'Venin',     icon: 'skull',   desc: 'Empoisonne ce qu’elle touche : 2 PV perdus à chaque tour.' },
-  gel:       { name: 'Gel',       icon: 'eye',     desc: 'Ce qu’elle touche ne peut pas attaquer au tour suivant.' },
+  venin:     { name: 'Venin',     icon: 'skull',   desc: 'Empoisonne ce qu’elle touche : 2 PV perdus à chaque tour. Son coup traverse les boucliers.' },
+  gel:       { name: 'Gel',       icon: 'eye',     desc: 'Ce qu’elle touche ne peut pas attaquer au tour suivant, et perd sa charge. Un gardien gelé résiste au gel suivant.' },
   cri:       { name: 'Cri',       icon: 'sparkle', desc: 'Au début de son tour, ses alliés gagnent +1 en attaque.' },
   deferlante: { name: 'Déferlante', icon: 'flame', desc: 'Son attaque touche aussi les voisins de la cible (moitié des dégâts).' },
 };
-// Pouvoirs des gardiens (un tous les 5 étages, dans cet ordre, puis on recommence)
-export const BOSS_POWERS = {
-  carapace: { name: 'Carapace', desc: 'Un tour sur deux, le gardien se couvre d’un bouclier qui bloque un coup.' },
-  givre:    { name: 'Souffle de givre', desc: 'Un tour sur deux, le gardien gèle ta créature la plus forte.' },
-  fureur:   { name: 'Fureur croissante', desc: 'À chaque tour, le gardien gagne +1 en attaque.' },
-  devoreur: { name: 'Dévoreur', desc: 'À chaque tour, le gardien récupère 15 % de ses PV.' },
+// Synergies entre capacités (affichées dans les règles et au moment où elles jouent)
+export const SYNERGIES = [
+  { a: 'gel', b: 'venin', name: 'Givre-venin', desc: 'Le Venin sur une cible gelée l’empoisonne deux fois plus.' },
+  { a: 'cri', b: 'deferlante', name: 'Raz-de-marée', desc: 'Renforcée par un Cri, la Déferlante frappe les voisins à pleine puissance.' },
+  { a: 'venin', b: null, name: 'Perce-bouclier', desc: 'Le Venin traverse les boucliers (et la Carapace des gardiens).' },
+  { a: 'gel', b: null, name: 'Interruption', desc: 'Geler un ennemi qui se charge annule son coup chargé.' },
+];
+// Intentions ennemies : ce que chaque ennemi prépare (annoncé au début de ton tour)
+export const INTENTS = {
+  hit:    { name: 'Coup',        icon: 'swords', desc: 'Frappe la cible annoncée.' },
+  zone:   { name: 'Zone',        icon: 'flame',  desc: 'Frappe toutes tes cartes au combat (60 % de son attaque), sans riposte.' },
+  charge: { name: 'Se charge',   icon: 'sparkle', desc: 'N’attaque pas ce tour-ci, mais frappera deux fois plus fort au suivant. Gèle-le pour l’interrompre.' },
+  heavy:  { name: 'Coup chargé', icon: 'skull',  desc: 'Frappe la cible annoncée avec deux fois son attaque.' },
 };
+// Pouvoirs des gardiens (un tous les 5 étages, dans cet ordre, puis on recommence)
+// weak : la capacité qui le contre (point faible affiché avant et pendant le combat)
+export const BOSS_POWERS = {
+  carapace: { name: 'Carapace', desc: 'Un tour sur deux, le gardien se couvre d’un bouclier qui bloque un coup.', weak: 'venin', counter: 'Le Venin traverse sa carapace.' },
+  givre:    { name: 'Souffle de givre', desc: 'Un tour sur deux, le gardien gèle ta créature la plus forte.', weak: 'soin', counter: 'Tes Soigneurs dégèlent tes créatures à la fin de son tour.' },
+  fureur:   { name: 'Fureur croissante', desc: 'À chaque tour, le gardien gagne +1 en attaque.', weak: 'gel', counter: 'Gelé, il ne gagne pas de fureur.' },
+  devoreur: { name: 'Dévoreur', desc: 'À chaque tour, le gardien récupère 15 % de ses PV.', weak: 'assaut', counter: 'Un coup d’Assaut l’empêche de se soigner au tour suivant.' },
+};
+// Instinct de meute : les Communes frappent plus fort les élites et les gardiens
+export const PACK_BONUS = 1;
 export const bossPowerOf = (floor) => ['carapace', 'givre', 'fureur', 'devoreur'][(Math.max(1, Math.floor(floor / 5)) - 1) % 4];
 const KW_BY_ROLE = { protecteur: 'garde', degats: 'assaut', soin: 'soin', poison: 'venin', controle: 'gel', soutien: 'cri', zone: 'deferlante' };
 // Gabarit par rôle à la rareté Commune, niveau 1
@@ -42,7 +59,7 @@ export function duelUnit(card, { side = 'ally', level = 1, scale = null, boss = 
   const hp = Math.max(1, Math.round(h * k * (boss ? 2.6 : elite ? 1.5 : 1)));
   return {
     uid: `${side[0]}${++seq}`, id: card.id, name: card.name, side, rarity: card.rarity, role, kw: KW_BY_ROLE[role],
-    atk, hp, maxHp: hp, level, boss, elite, poison: 0, frozen: 0, boost: 0, shield: 0, attacked: false, intent: null,
+    atk, hp, maxHp: hp, level, boss, elite, poison: 0, frozen: 0, boost: 0, shield: 0, attacked: false, intent: null, kind: null,
   };
 }
 
@@ -59,7 +76,9 @@ export const alive = (st, side) => st.order[side].map((id) => st.units[id]).filt
 export const front = (st, side) => alive(st, side).slice(0, FRONT);
 export const reserve = (st, side) => alive(st, side).slice(FRONT);
 const other = (side) => (side === 'ally' ? 'enemy' : 'ally');
-const atkOf = (st, u, t) => Math.max(0, u.atk + u.boost + (u.side === 'ally' && t && st.known[t.id] ? 1 : 0)) * (st.ruleMult || 1);
+const atkOf = (st, u, t) => Math.max(0, u.atk + u.boost + (u.side === 'ally' && t && st.known[t.id] ? 1 : 0) + (u.side === 'ally' && u.rarity === 'C' && t && (t.boss || t.elite) ? PACK_BONUS : 0)) * (st.ruleMult || 1);
+// Petit hasard reproductible (même combat repris = mêmes intentions)
+const roll = (str) => { let h = 2166136261; for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 16777619); return ((h >>> 0) % 1000) / 1000; };
 
 // Cibles autorisées : la Garde d'abord
 export function targetsFor(st, side) {
@@ -70,8 +89,9 @@ export function targetsFor(st, side) {
 export const canAct = (st, u) => st.turn === u.side && !st.over && u.hp > 0 && !u.attacked && !u.frozen && front(st, u.side).includes(u);
 
 // ——— Dégâts ———
-function damage(st, u, n, ev, src = null) {
+function damage(st, u, n, ev, src = null, pierce = false) {
   if (u.hp <= 0 || n <= 0) return 0;
+  if (u.shield && pierce) { u.shield = 0; ev.push({ t: 'status', u: u.uid, s: 'Perce-bouclier' }); }
   if (u.shield) { u.shield = 0; ev.push({ t: 'block', u: u.uid }); return 0; }
   const d = Math.min(u.hp, Math.round(n));
   u.hp -= d;
@@ -95,24 +115,48 @@ function check(st, ev) {
 }
 
 // ——— Attaque d'une carte ———
-export function attack(st, aUid, tUid, { dodged = false } = {}) {
+// kind : intention d'un ennemi ('zone' : toute la ligne à 60 %, 'heavy' : double dégâts)
+export function attack(st, aUid, tUid, { dodged = false, kind = 'hit' } = {}) {
   const a = st.units[aUid], t = st.units[tUid], ev = [];
   if (!a || !t || !canAct(st, a) || !targetsFor(st, a.side).includes(tUid)) return ev;
   a.attacked = true;
-  ev.push({ t: 'attack', a: a.uid, u: t.uid });
+  if (a.kw === 'assaut') a.exposed = true; // ne ripostera pas avant son prochain tour
+  ev.push({ t: 'attack', a: a.uid, u: t.uid, kind });
+  if (kind === 'zone') {
+    if (dodged) { ev.push({ t: 'dodge', u: t.uid }); if (t.side === 'ally') st.gauge = Math.min(GAUGE_MAX, st.gauge + 1); }
+    else front(st, t.side).forEach((x) => damage(st, x, Math.ceil(atkOf(st, a, x) * 0.6), ev, a.uid));
+    check(st, ev);
+    return ev;
+  }
   let hit = 0;
-  if (dodged) { t.dodges = (t.dodges || 0) + 1; ev.push({ t: 'dodge', u: t.uid }); }
-  else hit = damage(st, t, atkOf(st, a, t), ev, a.uid);
+  // une esquive réussie remplit la jauge du pouvoir
+  if (dodged) { t.dodges = (t.dodges || 0) + 1; ev.push({ t: 'dodge', u: t.uid }); if (t.side === 'ally') st.gauge = Math.min(GAUGE_MAX, st.gauge + 1); }
+  else hit = damage(st, t, atkOf(st, a, t) * (kind === 'heavy' ? 2 : 1), ev, a.uid, a.kw === 'venin');
   if (hit && t.hp > 0) {
-    if (a.kw === 'venin') { t.poison = Math.min(6, t.poison + 2); ev.push({ t: 'status', u: t.uid, s: 'Venin' }); }
-    if (a.kw === 'gel') { t.frozen = 1; ev.push({ t: 'status', u: t.uid, s: 'Gelé' }); }
+    if (a.kw === 'venin') {
+      const combo = t.frozen > 0;
+      t.poison = Math.min(combo ? 10 : 6, t.poison + (combo ? 4 : 2));
+      ev.push({ t: 'status', u: t.uid, s: combo ? 'Givre-venin !' : 'Venin', syn: combo });
+    }
+    if (a.kw === 'gel') {
+      if (t.boss && t.frostCD > 0) ev.push({ t: 'status', u: t.uid, s: 'Résiste au gel' });
+      else {
+        t.frozen = 1;
+        if (t.boss) t.frostCD = 2;
+        ev.push({ t: 'status', u: t.uid, s: 'Gelé' });
+        if (t.charged) { t.charged = false; t.kind = null; ev.push({ t: 'status', u: t.uid, s: 'Charge interrompue', syn: true }); }
+      }
+    }
+    if (a.kw === 'assaut' && t.boss) t.wound = 1;
   }
   if (a.kw === 'deferlante') {
     const row = front(st, t.side), i = row.findIndex((x) => x.uid === t.uid);
-    [row[i - 1], row[i + 1]].filter(Boolean).forEach((n) => damage(st, n, Math.ceil(atkOf(st, a, n) / 2), ev, a.uid));
+    const full = a.boost > 0; // Raz-de-marée : renforcée par un Cri
+    if (full && (row[i - 1] || row[i + 1])) ev.push({ t: 'status', u: a.uid, s: 'Raz-de-marée !', syn: true });
+    [row[i - 1], row[i + 1]].filter(Boolean).forEach((n) => damage(st, n, full ? atkOf(st, a, n) : Math.ceil(atkOf(st, a, n) / 2), ev, a.uid));
   }
-  // riposte (sauf Assaut)
-  if (t.hp > 0 && a.kw !== 'assaut' && atkOf(st, t, a) > 0) { ev.push({ t: 'riposte', a: t.uid, u: a.uid }); damage(st, a, atkOf(st, t, a), ev, t.uid); }
+  // riposte (sauf contre Assaut, et pas pour une carte d'Assaut qui vient d'attaquer)
+  if (t.hp > 0 && a.kw !== 'assaut' && !t.exposed && atkOf(st, t, a) > 0) { ev.push({ t: 'riposte', a: t.uid, u: a.uid }); damage(st, a, atkOf(st, t, a), ev, t.uid); }
   if (a.side === 'ally') st.gauge = Math.min(GAUGE_MAX, st.gauge + 1);
   check(st, ev);
   return ev;
@@ -122,21 +166,29 @@ export function attack(st, aUid, tUid, { dodged = false } = {}) {
 function bossAct(st, ev) {
   const b = front(st, 'enemy').find((u) => u.boss && u.hp > 0);
   if (!b) return;
+  const frozen = b.attacked; // gelé ce tour-ci
+  if (b.frostCD) b.frostCD--;
+  const wound = b.wound; b.wound = 0;
   const even = st.round % 2 === 1; // tours 1, 3, 5…
   const p = st.bossPower;
   if (p === 'carapace' && even) { b.shield = 1; ev.push({ t: 'boss', u: b.uid, s: 'Carapace !' }); }
   else if (p === 'givre' && even) {
     const t = front(st, 'ally').filter((u) => u.hp > 0).sort((x, y) => y.atk - x.atk)[0];
     if (t) { t.frozen = 1; ev.push({ t: 'boss', u: b.uid, s: 'Souffle de givre' }); ev.push({ t: 'status', u: t.uid, s: 'Gelé' }); }
-  } else if (p === 'fureur') { b.atk += 1; ev.push({ t: 'boss', u: b.uid, s: `Fureur : ${b.atk} ATQ` }); }
-  else if (p === 'devoreur' && b.hp < b.maxHp) { heal(b, b.maxHp * 0.15, ev); ev.push({ t: 'boss', u: b.uid, s: 'Dévore…' }); }
+  } else if (p === 'fureur') {
+    if (frozen) ev.push({ t: 'status', u: b.uid, s: 'Fureur gelée', syn: true });
+    else { b.atk += 1; ev.push({ t: 'boss', u: b.uid, s: `Fureur : ${b.atk} ATQ` }); }
+  } else if (p === 'devoreur' && b.hp < b.maxHp) {
+    if (wound) ev.push({ t: 'status', u: b.uid, s: 'Plaie ouverte : pas de soin', syn: true });
+    else { heal(b, b.maxHp * 0.15, ev); ev.push({ t: 'boss', u: b.uid, s: 'Dévore…' }); }
+  }
 }
 
 // ——— Début et fin de tour ———
 function startTurn(st, side, ev) {
   st.turn = side;
   if (side === 'ally') st.swapped = false;
-  for (const u of alive(st, side)) { u.attacked = false; u.boost = 0; }
+  for (const u of alive(st, side)) { u.attacked = false; u.boost = 0; u.exposed = false; }
   for (const u of front(st, side)) {
     if (u.frozen) { u.frozen--; if (u.frozen === 0) u.attacked = true; } // gelé : passe ce tour
     if (u.poison) { damage(st, u, 2, ev); u.poison = Math.max(0, u.poison - 2); }
@@ -150,6 +202,10 @@ function endOf(st, side, ev) {
   for (const u of front(st, side).filter((x) => x.kw === 'soin' && x.hp > 0)) {
     const w = alive(st, side).filter((x) => x.hp < x.maxHp).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
     if (w) heal(w, Math.max(2, Math.round(u.atk * 1.5 + 1)), ev);
+  }
+  // Dégel : à la fin du tour adverse, tes Soigneurs libèrent les créatures gelées par un gardien
+  if (side === 'enemy' && st.bossPower === 'givre' && front(st, 'ally').some((x) => x.kw === 'soin' && x.hp > 0)) {
+    front(st, 'ally').filter((x) => x.frozen && x.hp > 0).forEach((x) => { x.frozen = 0; ev.push({ t: 'status', u: x.uid, s: 'Dégel', syn: true }); });
   }
 }
 // Fin du tour du joueur. Le tour ennemi se joue coup par coup (beginEnemyTurn, nextStrike, strike,
@@ -171,13 +227,20 @@ export function nextStrike(st) {
     const ts = targetsFor(st, 'enemy');
     const t = e.intent && ts.includes(e.intent) ? e.intent : enemyTarget(st, e);
     if (!t) { st.queue.shift(); continue; }
-    return { a: e.uid, t };
+    return { a: e.uid, t, kind: e.kind || 'hit' };
   }
   return null;
 }
 export function strike(st, a, t, { dodged = false } = {}) {
   if (st.queue[0] === a) st.queue.shift();
-  return attack(st, a, t, { dodged });
+  const e = st.units[a], kind = e?.kind || 'hit';
+  if (kind === 'charge') {
+    // se charge : pas d'attaque ce tour-ci, coup double au suivant
+    e.attacked = true; e.charged = true;
+    return [{ t: 'status', u: a, s: 'Se charge…' }];
+  }
+  if (kind === 'heavy') e.charged = false;
+  return attack(st, a, t, { dodged, kind });
 }
 export function endEnemyTurn(st) {
   const ev = [];
@@ -187,13 +250,25 @@ export function endEnemyTurn(st) {
 }
 export function endTurn(st, dodge = () => false) {
   const ev = beginEnemyTurn(st);
-  for (let s = nextStrike(st); s; s = nextStrike(st)) ev.push(...strike(st, s.a, s.t, { dodged: dodge(st, s) }));
+  for (let s = nextStrike(st); s; s = nextStrike(st)) ev.push(...strike(st, s.a, s.t, { dodged: s.kind !== 'charge' && dodge(st, s) }));
   ev.push(...endEnemyTurn(st));
   return ev;
 }
 // Intentions : au début de ton tour, chaque ennemi annonce qui il va frapper.
+// Chaque ennemi annonce aussi le type de son attaque : coup simple, zone (Fléaux), charge.
 function planIntents(st) {
-  for (const e of alive(st, 'enemy')) e.intent = front(st, 'enemy').includes(e) && !e.frozen ? enemyTarget(st, e) : null;
+  for (const e of alive(st, 'enemy')) {
+    const on = front(st, 'enemy').includes(e) && !e.frozen;
+    e.intent = on ? enemyTarget(st, e) : null;
+    e.kind = on ? intentKind(st, e) : null;
+  }
+}
+function intentKind(st, e) {
+  if (e.charged) return 'heavy';
+  const r = roll(`${e.uid}:${st.round}`);
+  if (e.kw === 'deferlante' && r < 0.5) return 'zone';
+  if (st.round >= 2 && r > (e.boss ? 0.62 : e.elite ? 0.72 : 0.85)) return 'charge';
+  return 'hit';
 }
 // Dégâts annoncés sur chacune de tes cartes (pour l'affichage)
 export function threats(st) {
@@ -202,8 +277,10 @@ export function threats(st) {
   const ts = targetsFor(st, 'enemy');
   for (const e of front(st, 'enemy')) {
     if (e.frozen) continue;
+    if (e.kind === 'charge') continue;
+    if (e.kind === 'zone') { front(st, 'ally').forEach((x) => { out[x.uid] = (out[x.uid] || 0) + Math.ceil(atkOf(st, e, x) * 0.6); }); continue; }
     const t = e.intent && ts.includes(e.intent) ? e.intent : enemyTarget(st, e);
-    if (t) out[t] = (out[t] || 0) + atkOf(st, e, st.units[t]);
+    if (t) out[t] = (out[t] || 0) + atkOf(st, e, st.units[t]) * (e.kind === 'heavy' ? 2 : 1);
   }
   return out;
 }
@@ -225,11 +302,10 @@ export function swap(st, outUid, inUid) {
 }
 
 // Difficulté d'une esquive : durée (ms) de la fenêtre à viser, plus courte face à un ennemi
-// de plus haut niveau que la carte visée, face aux élites et gardiens, et à chaque esquive
-// déjà réussie par cette carte pendant le combat (elle s'essouffle).
+// de plus haut niveau que la carte visée, face aux élites et gardiens, et face à un coup chargé.
 export function dodgeWindow(st, a, t) {
   const e = st.units[a], u = st.units[t];
-  const w = (140 + 25 * ((u?.level || 1) - (e?.level || 1)) - (e?.boss ? 40 : e?.elite ? 20 : 0)) * 0.8 ** (u?.dodges || 0);
+  const w = (140 + 25 * ((u?.level || 1) - (e?.level || 1)) - (e?.boss ? 40 : e?.elite ? 20 : 0)) * (e?.kind === 'heavy' ? 0.8 : 1);
   return Math.max(45, Math.min(260, Math.round(w)));
 }
 

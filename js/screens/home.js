@@ -6,8 +6,6 @@ import { esc, fmt, toast, bindActions, pct } from '../ui/dom.js';
 import { FACTION_ORDER } from '../config.js';
 import { seeded } from '../art/geometry.js';
 import { today } from '../core/save.js';
-import { openFusion } from './fusion.js';
-import { FUSION } from '../config.js';
 import { setScene } from '../ui/scene.js';
 
 // Icône et couleur de chaque type de mission du jour
@@ -59,7 +57,6 @@ export default function home(app, root) {
   lazyArt(root);
   setScene('home');
   bindActions(root, {
-    fusion() { openFusion(app); },
     mission(el) {
       try { const r = g.claimMission(Number(el.dataset.i)); app.sfx.coin(); toast(`Mission accomplie : <b>+${r.shards} éclats</b>`, { kind: 'success', icon: 'crystal' }); app.refresh(); }
       catch (e) { toast(esc(e.message), { kind: 'error' }); }

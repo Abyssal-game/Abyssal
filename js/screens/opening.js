@@ -5,7 +5,9 @@ import { BOOSTERS, RARITY, VARIANTS } from '../config.js';
 import { cardHTML } from '../ui/card.js';
 import { icon, EMBLEM } from '../ui/icons.js';
 import { esc, fmt, toast } from '../ui/dom.js';
-import { packHTML, payLabel } from './shop.js';
+import { packHTML, payLabel, pityHTML } from './shop.js';
+import { roleOf, ROLES } from '../core/army.js';
+import { keywordOf, KEYWORDS } from '../core/duel.js';
 
 const RI = (r) => ['C', 'PC', 'R', 'HR', 'M', 'S'].indexOf(r);
 
@@ -52,6 +54,9 @@ export function openPack(app, type, { faction, onDone } = {}) {
     if (c.isNewCard) s += ` · <span class="newtag">Nouvelle découverte</span><br><span class="op-gain">${icon('swords')} Elle peut rejoindre ton équipe</span>`;
     else if (c.isNewVariant) s += ` · <span class="newtag">Nouvelle variante</span>${c.levelUp ? `<br><span class="op-gain">${icon('star')} Niveau ${c.levelUp} !</span>` : ''}`;
     else s += ` · doublon <span class="muted">+${c.ash} cendres</span>${c.levelUp ? `<br><span class="op-gain">${icon('star')} Niveau ${c.levelUp} !</span>` : ''}`;
+    // rôle et capacité en combat
+    const card = cat.get(c.id), role = ROLES[roleOf(card)], kw = KEYWORDS[keywordOf(card)];
+    s += `<br><span class="op-role" style="--rlc:${role.color}" title="${esc(kw.desc)}">${icon(role.icon)}<b>${esc(role.name)}</b> <em>· ${esc(kw.name)} : ${esc(kw.desc)}</em></span>`;
     return s;
   }
 
@@ -180,11 +185,12 @@ export function openPack(app, type, { faction, onDone } = {}) {
     const c = opening.cards[index];
     const glow = RI(c.rarity) >= 2 ? `glow-${c.rarity}` : '';
     const left = opening.cards.length - index - 1;
+    const last = !left && opening.cards.length > 1; // dernière carte : sa lueur trahit sa rareté
     stage.innerHTML = `<div class="op-pile ${first ? 'rise' : ''}">
       ${Array.from({ length: Math.min(left, 4) }, (_, k) => `<div class="op-under" style="--k:${k + 1}"><div class="tcg-back">${EMBLEM}</div></div>`).join('')}
-      <div class="op-card ${glow}" role="button" tabindex="0" aria-label="Retourner la carte ${index + 1} sur ${opening.cards.length}"><div class="op-flip"><div class="tcg-back">${EMBLEM}</div></div></div>
+      <div class="op-card ${glow} ${last ? 'op-last' : ''}" style="--lc:${RARITY[c.rarity].color}" role="button" tabindex="0" aria-label="Retourner la carte ${index + 1} sur ${opening.cards.length}"><div class="op-flip"><div class="tcg-back">${EMBLEM}</div></div></div>
     </div><p class="op-label"></p>`;
-    hint.textContent = RI(c.rarity) >= 4 ? 'Quelque chose d’immense attend derrière ce sceau…' : RI(c.rarity) >= 3 ? 'Cette carte vibre sous tes doigts.' : 'Touche la carte pour la retourner.';
+    hint.textContent = RI(c.rarity) >= 4 ? 'Quelque chose d’immense attend derrière ce sceau…' : RI(c.rarity) >= 3 ? 'Cette carte vibre sous tes doigts.' : last ? 'Dernière carte… sa lueur trahit sa rareté.' : 'Touche la carte pour la retourner.';
     bindCard(stage.querySelector('.op-card'));
   }
 
@@ -234,6 +240,14 @@ export function openPack(app, type, { faction, onDone } = {}) {
     const btn = stage.querySelector('.op-card');
     const inner = btn.querySelector('.op-flip');
     const lvl = RI(c.rarity);
+    if (lvl < 3 && !reduced && btn.classList.contains('op-last')) {
+      // dernière carte : un court instant de suspense
+      btn.classList.add('charging');
+      app.sfx.rumble(0.35);
+      await wait(480);
+      btn.classList.remove('charging');
+      if (phase === 'summary') { busy = false; return; }
+    }
     if (lvl >= 3 && !reduced) {
       // Montée en tension : la carte tremble, la lumière monte, l'écran s'assombrit.
       const big = lvl >= 4;
@@ -332,6 +346,7 @@ export function openPack(app, type, { faction, onDone } = {}) {
       ${opening.guaranteed ? `<p class="small guarantee">${icon('star')} Garantie appliquée : ${opening.guaranteed === 'm' ? 'Mythique ou mieux' : 'Hyper rare ou mieux'}.</p>` : ''}
       <div class="op-grid">${opening.cards.map((c, i) => `<div class="op-cell" style="--i:${i}">${cardHTML(cat.get(c.id), { variant: c.variant, isNew: c.isNewCard || c.isNewVariant, lazy: false })}<span class="op-tag">${c.isNewCard ? 'Nouvelle recrue' : c.levelUp ? `Niveau ${c.levelUp} !` : c.isNewVariant ? VARIANTS[c.variant].short : `+${c.ash} cendres`}</span></div>`).join('')}</div>
       ${newCount || opening.cards.some((c) => c.levelUp) ? `<p class="small op-gain center">${icon('swords')} ${newCount ? `${newCount > 1 ? 'Les nouvelles créatures peuvent' : 'La nouvelle créature peut'} rejoindre ton équipe. ` : ''}Chaque doublon fait monter une créature de niveau.</p>` : ''}
+      ${pityHTML(g)}
       <ul class="op-rewards">
         ${r.shards ? `<li>${icon('crystal')}<span>Récompenses de découverte</span><b>+${fmt(r.shards)} éclats</b></li>` : ''}
         ${r.ash ? `<li>${icon('ash')}<span>Doublons convertis</span><b>+${fmt(r.ash)} cendres</b></li>` : ''}

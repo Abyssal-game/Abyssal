@@ -4,13 +4,11 @@ import { artUrl } from '../art/assets.js';
 import { esc, fmt } from '../ui/dom.js';
 import { sync } from '../cloud/sync.js';
 import { isLoggedIn } from '../cloud/cloud.js';
-import { openFusion } from './fusion.js';
 import { openCreator } from './creator.js';
 
 export default function menu(app, root) {
   const g = app.game, cat = app.catalog, s = g.s, lv = g.levelInfo();
   const av = s.avatar && cat.get(s.avatar);
-  const spare = ['C', 'PC', 'R', 'HR'].reduce((a, r) => a + g.spareCount(r), 0);
   const achDone = Object.keys(s.achievements).length;
   const creator = sync.profile?.badge === 'createur';
   const T = (href, ic, title, sub, extra = '') => `<a class="mn-t" href="${href}"${extra}><span class="mn-ic ${ic.startsWith('p:') ? 'pic' : ''}">${ic.startsWith('p:') ? picon(ic.slice(2)) : icon(ic)}</span><span class="mn-tx"><b>${title}</b><span>${sub}</span></span>${icon('next')}</a>`;
@@ -30,7 +28,6 @@ export default function menu(app, root) {
   root.addEventListener('click', (e) => {
     const b = e.target.closest('[data-mn]');
     if (!b) return;
-    if (b.dataset.mn === 'fusion') openFusion(app);
     if (b.dataset.mn === 'creator') { if (!g.s.settings.dev) g.setSetting('dev', true); openCreator(app); }
   });
   app.refreshView = () => app.refresh();
