@@ -5,7 +5,7 @@
 // active (esquive dans l'or, parade parfaite sur le trait blanc, au dernier instant). Toute la logique est dans core/duel.js.
 import { RARITY } from '../config.js';
 import { artUrl } from '../art/assets.js';
-import { icon, EMBLEM, sigil, roleIcon, actIcon } from '../ui/icons.js';
+import { icon, EMBLEM, sigil, roleIcon, actIcon, crestHTML } from '../ui/icons.js';
 import { esc, openSheet, toast } from '../ui/dom.js';
 import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
@@ -339,7 +339,8 @@ export function runDuel(app, root, { title, onEnd }) {
     busy = true; sel = null; mode = null; confirm = null; draw();
     say(st.over === 'won' ? '<b class="dc-good">Victoire !</b>' : '<b class="dc-bad">Défaite…</b>');
     (st.over === 'won' ? app.sfx.victory : app.sfx.defeat)();
-    await wait(T(800));
+    $('.dv').insertAdjacentHTML('beforeend', `<div class="cb-end">${crestHTML(st.over === 'won', st.over === 'won' ? 'Victoire' : 'Défaite')}</div>`);
+    await wait(T(1300));
     if (alive_) { alive_ = false; ctl.abort(); document.body.classList.remove('battle-mode'); onEnd(); }
   }
 

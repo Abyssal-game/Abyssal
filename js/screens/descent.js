@@ -5,7 +5,7 @@ import { DESCENT, ROOMS, BLESSINGS, CHESTS, chestForDepth } from '../core/descen
 import { TEAM, BUDGET } from '../core/army.js';
 import { BOSS_POWERS, bossPowerOf } from '../core/duel.js';
 import { artUrl } from '../art/assets.js';
-import { icon, EMBLEM, sigil, picon } from '../ui/icons.js';
+import { icon, EMBLEM, sigil, picon, crestHTML } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, bindActions } from '../ui/dom.js';
 import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
@@ -66,7 +66,7 @@ export default function descent(app, root) {
       <span><span class="small muted dc-week-lbl">${picon('hunt')}Créature de la semaine</span><b>${esc(c.name)}</b><span class="small">${w.done ? `${icon('check')} Vaincue : sa carte est à toi ! Nouvelle créature lundi.` : 'Elle rôde dans l’Abysse, comme <b>élite redoutable</b> à partir de l’étage 8. Vaincs-la pour gagner sa carte.'}</span></span></section>`;
   }
   function summaryHTML(s) {
-    return `<section class="panel ornate dc-sum ${s.wiped ? 'lost' : 'won'}"><h2>${s.wiped ? 'L’équipe est tombée' : 'Retour à la surface'}</h2><p class="dc-depth">Étage <b>${s.floor}</b></p>
+    return `<section class="panel ornate dc-sum ${s.wiped ? 'lost' : 'won'}">${crestHTML(!s.wiped, s.floor, 'Étage', 'dc-crest')}<h2>${s.wiped ? 'L’équipe est tombée' : 'Retour à la surface'}</h2>
       <p class="small">${s.chests.length ? s.chests.map((c) => chestChip(c)).join(' ') : 'Aucun coffre cette fois.'} ${s.shards ? `· ${icon('crystal')} ${fmt(s.shards)} éclats` : ''}</p>
       ${s.chests.length ? `<a class="btn gold block" href="#/coffres">${icon('lock')}Ouvrir mes coffres</a>` : ''}
       <div class="row gap"><button class="btn small ghost" data-act="share">${icon('copy')}Partager</button><button class="btn small ghost" data-act="dismiss">OK</button></div></section>`;
@@ -117,11 +117,11 @@ export default function descent(app, root) {
     const effect = (r) => (r === 'rest' ? `Soigne ${heal} % des PV de chaque créature` : r === 'altar' ? 'Une bénédiction au choix pour toute l’expédition' : `Environ +${fmt(Math.round((15 + run.floor * 6) * (run.free ? 0.5 : 1)))} éclats`);
     const feats = w?.stats ? [w.stats.parries && `${w.stats.parries} parade${w.stats.parries > 1 ? 's' : ''}`, w.stats.breaks && `${w.stats.breaks} Brisure${w.stats.breaks > 1 ? 's' : ''}`, w.stats.crits && `${w.stats.crits} critique${w.stats.crits > 1 ? 's' : ''}`].filter(Boolean) : [];
     root.innerHTML = `<section class="vx ${w?.room || ''}">
-      <div class="vx-hero"><span class="vx-k">Étage ${run.floor}${w?.room === 'boss' ? ' · Gardien vaincu' : w?.room === 'elite' ? ' · Élite' : ''}</span><h1>Victoire</h1>
+      <div class="vx-hero">${crestHTML(true, run.floor, 'Étage', 'vx-crest')}<h1>Victoire</h1><span class="vx-k">${w?.room === 'boss' ? 'Gardien vaincu' : w?.room === 'elite' ? 'Élite vaincue' : `Étage ${run.floor} franchi`}</span>
         ${w ? `<div class="vx-loot"><span class="vx-chip">${icon('crystal')}+${fmt(w.shards)}</span>${w.chest ? `<span class="vx-chip gold" style="--cc:${CHESTS[w.chest].color}">${icon('lock')}${esc(CHESTS[w.chest].name)}</span>` : ''}${feats.length ? `<span class="vx-chip feat">${icon('sparkle')}${feats.join(' · ')}</span>` : ''}</div>` : ''}
         ${w?.recruit ? `<p class="vx-week">${icon('crown')} Le gardien vaincu, <b>${esc(cat.get(w.recruit).name)}</b>, rejoint ta collection !</p>` : ''}
         ${w?.weekly ? `<p class="vx-week">${icon('sparkle')} <b>${esc(cat.get(w.weekly).name)}</b> rejoint ta collection !</p>` : ''}
-        ${w?.disc?.length ? `<div class="vx-disc"><span class="small muted">Nouvelles rencontres</span>${w.disc.slice(0, 5).map((id) => `<img alt="${esc(cat.get(id).name)}" title="${esc(cat.get(id).name)}" src="${artUrl(cat.get(id), { lite: true })}">`).join('')}</div>` : ''}
+        ${w?.disc?.length ? `<div class="vx-disc"><span class="small muted">${picon('discover')}Nouvelles rencontres</span>${w.disc.slice(0, 5).map((id) => `<img alt="${esc(cat.get(id).name)}" title="${esc(cat.get(id).name)}" src="${artUrl(cat.get(id), { lite: true })}">`).join('')}</div>` : ''}
       </div>
       <div class="vx-team"><span class="small muted">Ton équipe · ${pct} % des PV</span>${teamStrip(run.team.map((m) => m.id), run)}</div>
       <h2 class="vx-h">Choisis ton bonus</h2>

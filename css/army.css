@@ -871,3 +871,42 @@ img.emblem { object-fit: contain; }
 .dv-row.enemy .guide::before { top: -30px; bottom: auto; }
 @keyframes guideHand { 50% { transform: translate(-6px, 6px); } }
 @media (prefers-reduced-motion: reduce) { .guide::before { animation: none; } }
+
+/* ===== Lot 4 : victoire, défaite, niveaux, succès, raretés ===== */
+.crest { position: relative; margin: 0 auto; aspect-ratio: 952 / 576; background: url(../assets/ui/crest-victory.webp) center / contain no-repeat; container-type: inline-size; }
+.crest.lost { aspect-ratio: 912 / 559; background-image: url(../assets/ui/crest-defeat.webp); }
+.crest > span { position: absolute; left: 52.7%; top: 56%; width: 36%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; text-align: center; line-height: 1; }
+.crest.lost > span { left: 46.8%; top: 47%; width: 30%; }
+.crest b { font: 900 17cqw/1 var(--f-display); color: #FFE9B0; text-shadow: 0 2px 0 #3a2508, 0 0 12px rgba(255, 200, 90, .55); }
+.crest.lost b { color: #E9D6D2; text-shadow: 0 2px 0 #1a0606, 0 0 12px rgba(255, 70, 50, .5); }
+.crest small { margin-top: 1cqw; font: 700 4.4cqw/1 var(--f-ui); letter-spacing: .14em; text-transform: uppercase; color: #E7D8B4; }
+.crest.lost small { color: #CDB5B0; }
+.vx-crest { width: min(62%, 240px); margin-top: -6px; }
+.vx-hero h1 { margin-top: 0; }
+.vx-hero .vx-k { margin: -4px 0 10px; }
+.vx-disc .picon { display: inline-block; width: 22px; height: 22px; vertical-align: -6px; margin-right: 4px; }
+.dc-sum { position: relative; background: linear-gradient(90deg, rgba(10, 11, 16, .95) 45%, rgba(10, 11, 16, .55)), #0B0C12 !important; min-height: 150px; }
+.dc-sum > *:not(.dc-crest) { max-width: 60% !important; }
+.dc-sum .btn.block { max-width: 60% !important; }
+.dc-crest { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 40%; margin: 0; }
+.cb-end { position: absolute; inset: 0; z-index: 40; display: grid; place-items: center; background: radial-gradient(closest-side, rgba(0, 0, 0, .55), transparent); pointer-events: none; animation: cbEndIn .45s cubic-bezier(.2, 1.4, .4, 1) both; }
+.cb-end .crest { width: min(92%, 420px); }
+.cb-end .crest b { font-size: 6.6cqw; letter-spacing: .02em; }
+@keyframes cbEndIn { from { opacity: 0; transform: scale(.7); } }
+@media (prefers-reduced-motion: reduce) { .cb-end { animation: none; } }
+.toast-level, .toast-ach { border: 0 !important; border-radius: 0; box-shadow: none !important; background: url(../assets/ui/bn-level.webp) center / 100% 100% no-repeat !important; min-height: 74px; padding: 16px 19% 12px !important; justify-content: center; text-align: center; color: #F7EEFF; text-shadow: 0 1px 2px #000; filter: drop-shadow(0 8px 16px rgba(0, 0, 0, .7)); }
+.toast-level > div { display: flex; align-items: center; gap: 8px; text-align: left; }
+.toast-level .toast-xp { width: 30px; height: 30px; flex: none; }
+.toast-level b { color: #FFE39A; }
+.toast-level .small { color: #E4D6F5; }
+.toast-ach { background-image: url(../assets/ui/bn-achieve.webp) !important; min-height: 66px; padding: 12px 8% 10px 21% !important; text-align: left; justify-content: flex-start; }
+.toast-ach .small { color: #D9CFC0 !important; }
+.tcg .tcg-gem { min-width: 0; width: 14cqw; height: 14cqw; padding: 0; border-radius: 0; background: center / contain no-repeat; box-shadow: none; color: #fff; font-size: 5cqw; letter-spacing: -.02em; text-shadow: 0 0 2px #000, 0 1px 2px #000, 0 0 5px rgba(0, 0, 0, .9); }
+.tcg-foot .tcg-gem { width: 10cqw; height: 10cqw; min-width: 0; font-size: 3.8cqw; }
+.tcg.r-C .tcg-gem { background-image: url(../assets/ui/rar-C.webp); }
+.tcg.r-PC .tcg-gem { background-image: url(../assets/ui/rar-PC.webp); }
+.tcg.r-R .tcg-gem { background-image: url(../assets/ui/rar-R.webp); }
+.tcg.r-HR .tcg-gem { background-image: url(../assets/ui/rar-HR.webp); filter: drop-shadow(0 0 2cqw rgba(170, 90, 255, .6)); }
+.tcg.r-M .tcg-gem { background-image: url(../assets/ui/rar-M.webp); filter: drop-shadow(0 0 2cqw rgba(255, 170, 50, .7)); }
+.tcg.r-S .tcg-gem { background-image: url(../assets/ui/rar-S.webp); filter: drop-shadow(0 0 2cqw rgba(160, 220, 255, .7)); }
+@media (max-width: 380px) { .dc-crest { width: 34%; } .dc-sum > *:not(.dc-crest), .dc-sum .btn.block { max-width: 64% !important; } }

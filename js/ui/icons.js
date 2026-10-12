@@ -75,4 +75,6 @@ export const picon = (name) => `<img class="picon" alt="" src="assets/icons/${na
 // Icônes peintes des actions de combat (attaque, défense, relève et les 7 compétences)
 const ACT_PICS = new Set(['attack', 'defend', 'swap', 'rempart', 'estoc', 'priere', 'contagion', 'entrave', 'marque', 'raz']);
 export const actIcon = (key, fallback) => (ACT_PICS.has(key) ? `<img class="aicon" alt="" src="assets/icons/act-${key}.webp">` : icon(fallback));
+// Blason peint de victoire ou de défaite, avec un texte au centre de la plaque
+export const crestHTML = (won, big, small = '', cls = '') => `<div class="crest ${won ? 'won' : 'lost'} ${cls}" role="img" aria-label="${won ? 'Victoire' : 'Défaite'}"><span><b>${big}</b>${small ? `<small>${small}</small>` : ''}</span></div>`;
 export const roleIcon = (kw) => `<img class="ricon" alt="" src="assets/icons/role-${kw}.webp">`;

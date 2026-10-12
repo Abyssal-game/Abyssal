@@ -181,10 +181,10 @@ function onProgress(events) {
     return;
   }
   events.forEach((e, i) => setTimeout(() => {
-    if (e.kind === 'achievement') toast(`Succès débloqué : <b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'epic', icon: 'trophy', ms: 4200 });
+    if (e.kind === 'achievement') toast(`Succès débloqué : <b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'ach', ms: 4200 });
     if (e.kind === 'set') toast(`Ensemble complété : <b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'epic', icon: 'star', ms: 5000 });
     if (e.kind === 'faction') toast(`Faction complétée : <b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'epic', icon: 'shield', ms: 5000 });
-    if (e.kind === 'level') toast(`Niveau <b>${e.level}</b> atteint !<br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'success', icon: 'sparkle', ms: 3800 });
+    if (e.kind === 'level') toast(`<img class="picon toast-xp" alt="" src="assets/icons/xp.webp"><span>Niveau <b>${e.level}</b> atteint !<br><span class="small">${rewardText(e.reward)}</span></span>`, { kind: 'level', ms: 3800 });
     sfx.achievement();
   }, (app.holdToasts ? 0 : 300) + i * 650));
 }
