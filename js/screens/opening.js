@@ -3,7 +3,7 @@
 // dans la sauvegarde avant la première animation.
 import { BOOSTERS, RARITY, VARIANTS } from '../config.js';
 import { cardHTML } from '../ui/card.js';
-import { icon, EMBLEM } from '../ui/icons.js';
+import { icon, EMBLEM, roleIcon } from '../ui/icons.js';
 import { esc, fmt, toast } from '../ui/dom.js';
 import { packHTML, payLabel, pityHTML } from './shop.js';
 import { roleOf, ROLES } from '../core/army.js';
@@ -56,7 +56,7 @@ export function openPack(app, type, { faction, onDone } = {}) {
     else s += ` · doublon <span class="muted">+${c.ash} cendres</span>${c.levelUp ? `<br><span class="op-gain">${icon('star')} Niveau ${c.levelUp} !</span>` : ''}`;
     // rôle et capacité en combat
     const card = cat.get(c.id), role = ROLES[roleOf(card)], kw = KEYWORDS[keywordOf(card)];
-    s += `<br><span class="op-role" style="--rlc:${role.color}" title="${esc(kw.desc)}">${icon(role.icon)}<b>${esc(role.name)}</b> <em>· ${esc(kw.name)} : ${esc(kw.desc)}</em></span>`;
+    s += `<br><span class="op-role" style="--rlc:${role.color}" title="${esc(kw.desc)}">${roleIcon(keywordOf(card))}<b>${esc(role.name)}</b> <em>· ${esc(kw.name)} : ${esc(kw.desc)}</em></span>`;
     return s;
   }
 

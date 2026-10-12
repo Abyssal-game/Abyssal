@@ -70,3 +70,6 @@ export const sigil = (faction) => (factionArtReady(Object.keys(SIGILS)) && SIGIL
 
 // Icônes peintes (assets/icons) : défis du jour, étapes de l'Aventure
 export const picon = (name) => `<img class="picon" alt="" src="assets/icons/${name}.webp">`;
+
+// Emblème peint d'un rôle de combat (garde, assaut, soin, venin, gel, cri, deferlante)
+export const roleIcon = (kw) => `<img class="ricon" alt="" src="assets/icons/role-${kw}.webp">`;

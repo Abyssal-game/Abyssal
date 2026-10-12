@@ -1,7 +1,7 @@
 // L'équipe de cartes : fiche de combat d'une créature, écran Équipe et écran Coffres.
 import { RARITY } from '../config.js';
 import { cardHTML, lazyArt } from '../ui/card.js';
-import { icon } from '../ui/icons.js';
+import { icon, roleIcon } from '../ui/icons.js';
 import { esc, toast, openSheet, bindActions } from '../ui/dom.js';
 import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
@@ -16,7 +16,7 @@ import { openChestScene } from './chest-open.js';
 // Étiquettes posées sur une carte : capacité, niveau, coût, attaque et PV
 export const armyBadges = (g, c) => {
   const u = duelUnit(c, { level: g.owns(c.id) ? g.cardLevel(c.id) : 1 }), kw = KEYWORDS[keywordOf(c)];
-  return `<span class="v2-badges"><span class="v2-role" style="--ro:${ROLES[roleOf(c)].color}" title="${esc(kw.name)}">${icon(kw.icon)}</span>${g.owns(c.id) ? `<span class="v2-lv">Niv. ${g.cardLevel(c.id)}</span>` : ''}<span class="v2-cost">${COST[c.rarity]}</span><span class="v2-ah"><i>${icon('swords')}${u.atk}</i><i>${icon('heart')}${u.maxHp}</i></span></span>`;
+  return `<span class="v2-badges"><span class="v2-role" style="--ro:${ROLES[roleOf(c)].color}" title="${esc(kw.name)}">${roleIcon(keywordOf(c))}</span>${g.owns(c.id) ? `<span class="v2-lv">Niv. ${g.cardLevel(c.id)}</span>` : ''}<span class="v2-cost">${COST[c.rarity]}</span><span class="v2-ah"><i>${icon('swords')}${u.atk}</i><i>${icon('heart')}${u.maxHp}</i></span></span>`;
 };
 export const armyCard = (g, c, opts = {}) => cardHTML(c, { ...opts, tag: armyBadges(g, c) });
 
@@ -31,7 +31,7 @@ export function combatHTML(g, c) {
     <div class="panel v2-skill cb-kit">
       <p class="small"><b>${icon('swords')} ${esc(kit.basic.name)}</b> <span class="cb-k">1 action</span><br>${esc(kit.basic.desc)} +1 Ferveur.</p>
       <p class="small"><b class="gold">${icon(kit.skill.icon)} ${esc(kit.skill.name)}</b> <span class="cb-k">${kit.skill.ap} action${kit.skill.ap > 1 ? 's' : ''} · ${kit.skill.fervor} Ferveur${kit.skill.dice ? ' · D20' : ''}</span><br>${esc(kit.skill.desc)}</p>
-      <p class="small"><b>${icon(kit.icon)} ${esc(kit.passive.name)}</b> <span class="cb-k">passif</span><br>${esc(kit.passive.desc)}</p>
+      <p class="small"><b>${roleIcon(kit.kw)} ${esc(kit.passive.name)}</b> <span class="cb-k">passif</span><br>${esc(kit.passive.desc)}</p>
       ${c.rarity === 'C' ? `<p class="small dc-good">${icon('star')} Instinct de meute : +1 dégât aux élites et aux gardiens.</p>` : ''}
     </div>
     ${syn.length ? `<div class="panel v2-skill"><b>${icon('sparkle')} Combinaisons</b>${syn.map((x) => `<p class="small"><b>${esc(x.name)}</b> : ${esc(x.desc)}</p>`).join('')}</div>` : ''}

@@ -5,7 +5,7 @@
 // active (esquive dans l'or, parade parfaite au cœur blanc). Toute la logique est dans core/duel.js.
 import { RARITY } from '../config.js';
 import { artUrl } from '../art/assets.js';
-import { icon, EMBLEM, sigil } from '../ui/icons.js';
+import { icon, EMBLEM, sigil, roleIcon } from '../ui/icons.js';
 import { esc, openSheet, toast } from '../ui/dom.js';
 import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
@@ -88,7 +88,7 @@ export function runDuel(app, root, { title, onEnd }) {
     const tgt = tgtInfo[u.uid];
     return `<button class="dv-c ${u.side} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.broken ? 'broken' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(c.name)}, ${Math.max(0, u.hp)} PV">
       <span class="dv-art"><img alt="" src="${artUrl(c)}"></span>
-      <span class="dv-kw" title="${esc(kit.name)}">${icon(kit.icon)}<em>${esc(kit.name)}</em></span>
+      <span class="dv-kw" title="${esc(kit.name)}">${roleIcon(kit.kw)}<em>${esc(kit.name)}</em></span>
       ${u.boss ? `<span class="dv-boss">${u.phase2 ? 'Furie' : 'Gardien'}</span>` : u.elite ? '<span class="dv-boss elite">Élite</span>' : ''}
       <span class="dv-nm">${esc(c.name)}</span>
       ${u.brkMax ? `<span class="cb-brk ${u.broken ? 'is-broken' : ''}" title="Brisure">${u.broken ? '<b>BRISÉ</b>' : `<i style="width:${(u.brk / u.brkMax) * 100}%"></i>`}</span>` : ''}
@@ -541,7 +541,7 @@ export function runDuel(app, root, { title, onEnd }) {
       <li><b>Brisure</b> (élites, gardiens) : vide, l’ennemi perd son action, subit +50 % de dégâts et +5 aux jets contre lui jusqu’à la fin de ton tour suivant.</li>
       <li><b>Faiblesses</b> : chaque faction en craint une autre (+50 % de dégâts) ; contre sa propre faction : -25 %. ★ sur une cible = faiblesse exploitée.</li>
       <li><b>Instinct de meute</b> : tes Communes font +${PACK_BONUS} dégât aux élites et aux gardiens.</li></ul>
-      <h3>Les rôles</h3>${Object.values(KITS).map((k) => `<p class="small">${icon(k.icon)} <b>${esc(k.name)}</b> · <b>${esc(k.skill.name)}</b> (${k.skill.ap} act., ${k.skill.fervor} Ferveur) : ${esc(k.skill.desc)} <i>${esc(k.passive.name)} : ${esc(k.passive.desc)}</i></p>`).join('')}
+      <h3>Les rôles</h3>${Object.values(KITS).map((k) => `<p class="small">${roleIcon(k.kw)} <b>${esc(k.name)}</b> · <b>${esc(k.skill.name)}</b> (${k.skill.ap} act., ${k.skill.fervor} Ferveur) : ${esc(k.skill.desc)} <i>${esc(k.passive.name)} : ${esc(k.passive.desc)}</i></p>`).join('')}
       <h3>Les combinaisons</h3>${SYNERGIES.map((x) => `<p class="small"><b class="dv-syn-n">${esc(x.name)}</b> : ${esc(x.desc)}</p>`).join('')}
       <h3>Les ennemis</h3>${Object.values(AI_FAMILIES).map((f) => `<p class="small"><b>${esc(f.name)}</b> : ${esc(f.desc)} <span class="dc-good">${esc(f.counter)}</span></p>`).join('')}
       <h3>Les gardiens</h3>${Object.values(BOSS_POWERS).map((x) => `<p class="small"><b>${esc(x.name)}</b> : ${esc(x.desc)} <span class="dc-good">${esc(x.counter)}</span></p>`).join('')}
