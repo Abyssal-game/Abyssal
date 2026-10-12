@@ -910,3 +910,7 @@ img.emblem { object-fit: contain; }
 .tcg.r-M .tcg-gem { background-image: url(../assets/ui/rar-M.webp); filter: drop-shadow(0 0 2cqw rgba(255, 170, 50, .7)); }
 .tcg.r-S .tcg-gem { background-image: url(../assets/ui/rar-S.webp); filter: drop-shadow(0 0 2cqw rgba(160, 220, 255, .7)); }
 @media (max-width: 380px) { .dc-crest { width: 34%; } .dc-sum > *:not(.dc-crest), .dc-sum .btn.block { max-width: 64% !important; } }
+
+/* ===== Lot 5 : menus et monnaies peints ===== */
+img.ic.ic-cur { object-fit: contain; transform: scale(1.18); filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .7)); }
+.dc-fold > summary > .picon { display: inline-block; width: 32px; height: 32px; flex: none; }

@@ -1,7 +1,7 @@
 // Bestiaire : encyclopédie des créatures connues et chroniques débloquées
 // au fil des découvertes.
 import { artUrl } from '../art/assets.js';
-import { icon, sigil, EMBLEM } from '../ui/icons.js';
+import { icon, sigil, EMBLEM, picon } from '../ui/icons.js';
 import { esc, bindActions } from '../ui/dom.js';
 import { FACTION_ORDER, RARITY } from '../config.js';
 import { FAMILIES, HUNT_STAGES, huntStage, familyOf } from '../core/descent.js';
@@ -23,18 +23,18 @@ export default function bestiary(app, root) {
       <h2 class="section-title">Les sept royaumes</h2>
       <div class="realms">${cat.factions.map((f) => `<a class="panel realm" href="#/faction/${f.key}" style="--fc:${f.colors.secondary}"><span class="realm-sig">${sigil(f.key)}</span><div><h3>${esc(f.realm)}</h3><p class="small muted">${esc(f.motto)}</p></div></a>`).join('')}</div>
       <h2 class="section-title">Le Livre interdit</h2>
-      <details class="panel dc-fold"><summary>${icon('book')} ${esc(lore.genesis.title)}</summary><div>${lore.genesis.text.map((p) => `<p class="lore">${esc(p)}</p>`).join('')}</div></details>
-      <details class="panel dc-fold"><summary>${icon('scroll')} Chroniques du Néant <span class="small muted">${open.length} / ${lore.chronicles.length}</span></summary><div>
+      <details class="panel dc-fold"><summary>${picon('genesis')} ${esc(lore.genesis.title)}</summary><div>${lore.genesis.text.map((p) => `<p class="lore">${esc(p)}</p>`).join('')}</div></details>
+      <details class="panel dc-fold"><summary>${picon('chronicles')} Chroniques du Néant <span class="small muted">${open.length} / ${lore.chronicles.length}</span></summary><div>
         ${open.map((c) => `<h3>${esc(c.title)}</h3><p class="lore">${esc(c.text)}</p>`).join('')}
         ${sealed.length ? `<p class="small muted">${icon('lock')} ${sealed.length} page${sealed.length > 1 ? 's' : ''} encore scellée${sealed.length > 1 ? 's' : ''}.${nextAt ? ` La prochaine s’ouvre à ${nextAt} créatures découvertes (tu en as ${n}).` : ''}</p>` : ''}
       </div></details>
-      <details class="panel dc-fold"><summary>${icon('swords')} Conflits</summary><div>
+      <details class="panel dc-fold"><summary>${picon('conflicts')} Conflits</summary><div>
         ${lore.conflicts.map((c) => `<h3>${esc(c.title)}</h3><p class="small">${c.sides.map((s) => `<span style="color:${cat.faction[s].colors.secondary}">${esc(cat.faction[s].name)}</span>`).join(' contre ')}</p><p class="lore">${esc(c.text)}</p>`).join('')}
       </div></details>
-      <details class="panel dc-fold"><summary>${icon('user')} Figures du Bestiaire</summary><div>
+      <details class="panel dc-fold"><summary>${picon('figures')} Figures du Bestiaire</summary><div>
         ${lore.figures.map((f) => `<h3>${esc(f.name)}</h3><p class="lore">${esc(f.text)}</p>`).join('')}
       </div></details>
-      <details class="panel dc-fold"><summary>${icon('eye')} Mystères <span class="small muted">${myst.length} / ${lore.mysteries.length}</span></summary><div>
+      <details class="panel dc-fold"><summary>${picon('mysteries')} Mystères <span class="small muted">${myst.length} / ${lore.mysteries.length}</span></summary><div>
         ${myst.map((m) => `<h3>${esc(m.title)}</h3><p class="lore">${esc(m.text)}</p>`).join('')}
         ${myst.length < lore.mysteries.length ? `<p class="small muted">${icon('lock')} Chaque ensemble de cartes complété révèle un mystère.</p>` : ''}
       </div></details>`;

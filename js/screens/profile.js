@@ -1,7 +1,7 @@
 // Profil : titre, cadre, niveau, statistiques, vitrine, historique.
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
-import { icon, sigil, EMBLEM } from '../ui/icons.js';
+import { icon, sigil, EMBLEM, picon } from '../ui/icons.js';
 import { esc, fmt, pct, bindActions } from '../ui/dom.js';
 import { RARITIES, FRAMES, BOOSTERS, FACTION_ORDER, VARIANTS, RARITY, RARITY_ORDER } from '../config.js';
 
@@ -21,7 +21,7 @@ export default function profile(app, root) {
     const verdict = ratio === null ? 'Ouvre encore quelques boosters pour mesurer ta chance.'
       : ratio >= 1.5 ? 'Les sceaux te sourient : une chance insolente.' : ratio >= 1.1 ? 'Plus chanceux que la moyenne.' : ratio >= 0.9 ? 'Pile dans la moyenne.' : ratio >= 0.6 ? 'Un peu en dessous de la moyenne… pour l’instant.' : 'Le Néant te met à l’épreuve. Ça va tourner.';
     const p = st.pulls || {};
-    return `<details class="panel dc-fold"><summary>${icon('sparkle')} Ta chance</summary><div>
+    return `<details class="panel dc-fold"><summary>${picon('luck')} Ta chance</summary><div>
       <div>
         <div class="luck">
           <div class="ring" style="--p:${ratio === null ? 0 : Math.min(100, ratio * 50)};--c:${ratio !== null && ratio >= 1 ? 'var(--gold)' : '#8FA3C8'}"><span>${ratio === null ? '—' : Math.round(ratio * 100) + '%'}</span></div>
@@ -59,14 +59,14 @@ export default function profile(app, root) {
         <div class="panel stat"><b>${g.descent().best || 0}</b><span>étage record</span></div>
       </div>
 
-      <details class="panel dc-fold"><summary>${icon('trophy')} Titres et cadres</summary><div>
+      <details class="panel dc-fold"><summary>${picon('titles')} Titres et cadres</summary><div>
         <div class="chips">${s.titles.map((t) => `<button class="chip" data-act="title" data-v="${esc(t)}" aria-pressed="${t === s.title}">${esc(t)}</button>`).join('')}</div>
         <div class="frames">${Object.entries(FRAMES).map(([k, name]) => { const has = s.frames.includes(k); return `<button class="frame-pick" data-act="frame" data-v="${k}" ${has ? '' : 'disabled'} aria-pressed="${s.frame === k}"><span class="avatar-mini pf pf-${k}">${has ? '' : icon('lock')}</span><span class="small">${esc(name)}</span></button>`; }).join('')}</div>
       </div></details>
 
       ${luckHTML()}
 
-      <details class="panel dc-fold"><summary>${icon('book')} Statistiques détaillées</summary><div>
+      <details class="panel dc-fold"><summary>${picon('stats')} Statistiques détaillées</summary><div>
         <div class="stats-grid">
           <div class="panel stat"><b>${fmt(s.stats.cards)}</b><span>cartes obtenues</span></div>
           <div class="panel stat"><b>${g.variantCount()}</b><span>variantes</span></div>
@@ -81,7 +81,7 @@ export default function profile(app, root) {
         ${cat.sets.map((st) => { const p = g.setProgress(st.key); return `<div class="fac-row"><span>${p.done ? icon('star') : ''}</span><span>${esc(st.name)}</span><span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span><b>${p.owned}/${p.total}</b></div>`; }).join('')}
       </div></details>
 
-      ${s.history.length ? `<details class="panel dc-fold"><summary>${icon('booster')} Dernières ouvertures</summary><div class="history">${s.history.slice(0, 10).map((h) => `<div class="panel hist"><div class="row between small"><b>${esc(BOOSTERS[h.type]?.name || h.type)}${h.faction ? ` · ${esc(cat.faction[h.faction].name)}` : ''}</b><span class="muted">${new Date(h.t).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}</span></div><div class="hist-cards">${h.cards.map((c) => { const card = cat.get(c.id); return card ? `<button class="hist-c" data-id="${c.id}" style="--rc:${RARITIES.find((r) => r.key === card.rarity).color}" title="${esc(card.name)}"><img alt="${esc(card.name)}" loading="lazy" src="${artUrl(card, { lite: true })}">${c.n ? '<i>N</i>' : ''}${c.v !== 'normal' ? `<em>${esc(VARIANTS[c.v].short)}</em>` : ''}</button>` : ''; }).join('')}</div></div>`).join('')}</div></details>` : ''}
+      ${s.history.length ? `<details class="panel dc-fold"><summary>${picon('openings')} Dernières ouvertures</summary><div class="history">${s.history.slice(0, 10).map((h) => `<div class="panel hist"><div class="row between small"><b>${esc(BOOSTERS[h.type]?.name || h.type)}${h.faction ? ` · ${esc(cat.faction[h.faction].name)}` : ''}</b><span class="muted">${new Date(h.t).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}</span></div><div class="hist-cards">${h.cards.map((c) => { const card = cat.get(c.id); return card ? `<button class="hist-c" data-id="${c.id}" style="--rc:${RARITIES.find((r) => r.key === card.rarity).color}" title="${esc(card.name)}"><img alt="${esc(card.name)}" loading="lazy" src="${artUrl(card, { lite: true })}">${c.n ? '<i>N</i>' : ''}${c.v !== 'normal' ? `<em>${esc(VARIANTS[c.v].short)}</em>` : ''}</button>` : ''; }).join('')}</div></div>`).join('')}</div></details>` : ''}
     `;
     lazyArt(root);
   }

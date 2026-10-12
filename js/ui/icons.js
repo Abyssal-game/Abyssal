@@ -65,7 +65,9 @@ export const SIGILS = {
 // Emblème du jeu : le sceau illustré (œil reptilien, étoile, couronne d'épines dorées).
 export const EMBLEM = '<img class="emblem" src="assets/brand/emblem.webp" alt="" aria-hidden="true">';
 
-export const icon = (name) => ICONS[name] || '';
+// Les monnaies (éclats, cendres) sont peintes ; les autres icônes restent en traits
+const CUR_PIC = { crystal: 'cur-shard', ash: 'cur-ash' };
+export const icon = (name) => (CUR_PIC[name] ? `<img class="ic ic-cur" alt="" src="assets/icons/${CUR_PIC[name]}.webp">` : ICONS[name] || '');
 export const sigil = (faction) => (factionArtReady(Object.keys(SIGILS)) && SIGILS[faction] ? `<img class="sigil sigil-img" alt="" src="assets/factions/${faction}.webp">` : SIGILS[faction] || '');
 
 // Icônes peintes (assets/icons) : défis du jour, étapes de l'Aventure
