@@ -17,7 +17,7 @@ export function waitText(ms) {
 export function payLabel(g, type, again = false) {
   const t = g.s.tickets[type] || 0;
   if (t > 0) return `${icon('ticket')}${again ? 'Encore un' : 'Ouvrir'} · ticket (${t})`;
-  if (type === 'standard') { const f = g.freePack(); if (f.stock > 0) return `${icon('p:booster')}${again ? 'Encore un' : 'Ouvrir'} · gratuit (${f.stock})`; }
+  if (type === 'standard') { const f = g.freePack(); if (f.stock > 0) return `${icon('p:free-pack')}${again ? 'Encore un' : 'Ouvrir'} · gratuit (${f.stock})`; }
   return `${again ? 'Encore un' : 'Acheter'} <span class="price">${icon('crystal')}${fmt(BOOSTERS[type].price)}</span>`;
 }
 
@@ -70,7 +70,7 @@ export default function shop(app, root, params = []) {
 
   function freeLine() {
     const f = g.freePack();
-    if (!f.nextAt) return `<p class="free-line full">${icon('p:booster')}<span><b>${f.stock} boosters gratuits</b><small>Réserve pleine : ouvre-les !</small></span></p>`;
+    if (!f.nextAt) return `<p class="free-line full">${icon('p:free-pack')}<span><b>${f.stock} boosters gratuits</b><small>Réserve pleine : ouvre-les !</small></span></p>`;
     return `<p class="free-line">${icon('hourglass')}<span>Prochain booster gratuit dans <b>${waitText(f.nextAt - Date.now())}</b><small>${f.stock ? `${f.stock} en réserve` : 'Aucun en réserve'}</small></span></p>`;
   }
 

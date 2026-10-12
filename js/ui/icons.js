@@ -68,7 +68,7 @@ export const EMBLEM = '<img class="emblem" src="assets/brand/emblem.webp" alt=""
 // Les monnaies (éclats, cendres) sont peintes ; les autres icônes restent en traits
 // Les petits dessins au trait les plus visibles sont remplacés par des icônes peintes ;
 // icon('p:nom') donne directement l'icône peinte assets/icons/nom.webp.
-const CUR_PIC = { crystal: 'cur-shard', ash: 'cur-ash', sparkle: 'xp', star: 'xp', lock: 'mysteries', skull: 'danger' };
+const CUR_PIC = { crystal: 'cur-shard', ash: 'cur-ash', sparkle: 'xp', star: 'xp', lock: 'mysteries', skull: 'danger', ticket: 'ticket', hourglass: 'hourglass' };
 export const icon = (name) => {
   const pic = name.startsWith('p:') ? name.slice(2) : CUR_PIC[name];
   return pic ? `<img class="ic ic-cur" alt="" src="assets/icons/${pic}.webp">` : ICONS[name] || '';
