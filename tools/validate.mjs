@@ -11,8 +11,12 @@ const errors = [], warnings = [];
 const ids = new Set(), names = new Set();
 for (const f of FACTION_ORDER) {
   const prefix = cat.faction[f].prefix;
-  cat.byFaction[f].forEach((c, i) => {
-    if (c.id !== `${prefix}-${String(i + 1).padStart(3, '0')}`) warnings.push(`${c.id} : numéro hors séquence (position ${i + 1})`);
+  // Les numéros doivent croître ; un trou est permis (carte retirée : on ne renumérote jamais, les sauvegardes en dépendent)
+  let last = 0;
+  cat.byFaction[f].forEach((c) => {
+    const n = Number(c.id.slice(prefix.length + 1));
+    if (!c.id.startsWith(`${prefix}-`) || !(n > last)) warnings.push(`${c.id} : numéro hors séquence (après ${last})`);
+    last = n;
   });
 }
 for (const c of cat.cards) {

@@ -31,6 +31,9 @@ export function levelFromXp(xp) {
   return { level, into: rest, need: XP.toNext(level) };
 }
 
+// Cartes retirées (identifiant → rareté, pour rembourser les exemplaires possédés)
+const REMOVED_CARDS = { 'ABY-050': 'HR', 'CEL-046': 'HR' };
+
 export class Game {
   constructor(catalog, storage, { rng = cryptoRandom, clock = () => new Date() } = {}) {
     this.catalog = catalog;
@@ -43,6 +46,7 @@ export class Game {
     this.loadedFrom = source;
     try { this.convertHeroes(); } catch (e) { /* rien */ }
     try { this.fixVariants(); } catch (e) { /* rien */ }
+    try { this.dropRemoved(); } catch (e) { /* rien */ }
   }
 
   // Événements -------------------------------------------------------------
@@ -824,6 +828,28 @@ export class Game {
   // Les coffres de l'Arsenal sont gardés (ils contiennent désormais des boosters) ; le reste devient des éclats.
   // Une carte qui change de rareté peut perdre une variante (pas d'or pour les Communes et Peu communes) :
   // les exemplaires concernés deviennent holographiques, rien n'est perdu.
+  // Cartes retirées du jeu : chaque exemplaire possédé est remboursé en cendres, et la carte disparaît des équipes et des parties en cours
+  dropRemoved() {
+    const s = this.s, gone = Object.keys(REMOVED_CARDS).filter((id) => !this.catalog.get(id));
+    if (!gone.length || !gone.some((id) => JSON.stringify(s).includes(`"${id}"`))) return;
+    const has = (o) => o && gone.some((id) => JSON.stringify(o).includes(`"${id}"`));
+    for (const id of gone) {
+      const e = s.collection[id];
+      if (e) { const n = Object.values(e.v || {}).reduce((a, k) => a + (k || 0), 0) || 1; s.ash += n * (ECONOMY.craftAsh[REMOVED_CARDS[id]] || 0); delete s.collection[id]; }
+      if (s.deciphered) delete s.deciphered[id];
+    }
+    const keep = (id) => !gone.includes(id);
+    if (Array.isArray(s.team)) s.team = s.team.filter(keep);
+    if (Array.isArray(s.teamPresets)) s.teamPresets.forEach((p) => { if (Array.isArray(p.team)) p.team = p.team.filter(keep); if (Array.isArray(p.ids)) p.ids = p.ids.filter(keep); });
+    if (s.sceaux) { if (Array.isArray(s.sceaux.hand)) s.sceaux.hand = s.sceaux.hand.filter(keep); if (has(s.sceaux.cur)) s.sceaux.cur = null; }
+    const run = s.descent?.run;
+    if (run) {
+      if (has(run.battle)) { run.battle = null; run.phase = 'doors'; }
+      if (Array.isArray(run.team)) run.team = run.team.filter((m) => keep(m.id));
+      if (!run.team?.length) s.descent.run = null;
+    }
+    this.persist();
+  }
   fixVariants() {
     let changed = false;
     for (const [id, e] of Object.entries(this.s.collection)) {

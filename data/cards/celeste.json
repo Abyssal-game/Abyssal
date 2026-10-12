@@ -2030,56 +2030,6 @@
   "artPrompt": "Métatron, la Voix du Trône — Archange immense aux trente-six ailes de lumière dorée, visage serein, tenant un livre de feu ouvert, entouré d’anneaux d’yeux célestes. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
-  "id": "CEL-046",
-  "number": 46,
-  "name": "Ziz",
-  "title": "Le roi des oiseaux",
-  "faction": "celeste",
-  "rarity": "HR",
-  "category": "Créature céleste",
-  "power": 8,
-  "role": "B",
-  "stats": {
-   "atk": 12,
-   "def": 4,
-   "spd": 6,
-   "mag": 4,
-   "hp": 17,
-   "cost": 7
-  },
-  "abilities": [
-   {
-    "key": "first"
-   },
-   {
-    "key": "cataclysm",
-    "value": 1
-   }
-  ],
-  "visual": "Oiseau si grand que ses ailes cachent le soleil, les pieds posés sur terre et la tête dans les nuées.",
-  "lore": "Un œuf de Ziz, tombé un jour, a noyé soixante villes. Ses ailes gardent le monde des tempêtes du sud.",
-  "evolution": null,
-  "sets": [],
-  "variants": [
-   "normal",
-   "holo",
-   "galaxy",
-   "gold"
-  ],
-  "art": {
-   "form": "hum",
-   "head": "void",
-   "wings": "six",
-   "body": "robe",
-   "arms": "spread",
-   "halo": "spike",
-   "tint": "#ff4a4a",
-   "scene": "sky"
-  },
-  "image": "assets/art/CEL-046.webp",
-  "artPrompt": "Ziz — Oiseau si grand que ses ailes cachent le soleil, les pieds posés sur terre et la tête dans les nuées. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
- },
- {
   "id": "CEL-047",
   "number": 47,
   "name": "Garuda",
