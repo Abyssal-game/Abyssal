@@ -52,7 +52,7 @@ export function runDuel(app, root, { title, onEnd }) {
       <button class="cb-res" data-d="ult" style="--uc:${ult.color}" aria-label="Actions, Ferveur et pouvoir d’équipe">
         <span class="cb-ap"><small>Actions</small><span class="cb-pips"></span></span>
         <span class="cb-fv"><small>Ferveur</small><span class="cb-gems"></span></span>
-        <span class="cb-ult"><b>${esc(ult.name)}</b><small></small></span>
+        <span class="cb-ult"><img class="cb-pw" alt="" src="assets/icons/power.webp"><b>${esc(ult.name)}</b><small></small></span>
       </button>
       <button class="btn small ghost dv-auto" data-d="auto">Auto</button>
       <button class="btn primary dv-end" data-d="end">Fin du tour</button>
@@ -94,12 +94,12 @@ export function runDuel(app, root, { title, onEnd }) {
     return `<button class="dv-c ${u.side} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.broken ? 'broken' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(c.name)}, ${Math.max(0, u.hp)} PV">
       <span class="dv-art"><img alt="" src="${artUrl(c)}"></span>
       <span class="dv-kw" title="${esc(kit.name)}">${roleIcon(kit.kw)}<em>${esc(kit.name)}</em></span>
-      ${u.boss ? `<span class="dv-boss">${u.phase2 ? 'Furie' : 'Gardien'}</span>` : u.elite ? '<span class="dv-boss elite">Élite</span>' : ''}
+      ${u.boss ? `<span class="dv-boss"><img alt="" src="assets/icons/crest-boss.webp">${u.phase2 ? 'Furie' : 'Gardien'}</span>` : u.elite ? '<span class="dv-boss elite"><img alt="" src="assets/icons/crest-elite.webp">Élite</span>' : ''}
       <span class="dv-nm">${esc(c.name)}</span>
       ${u.brkMax ? `<span class="cb-brk ${u.broken ? 'is-broken' : ''}" title="Brisure">${u.broken ? '<img alt="" src="assets/icons/st-broken.webp"><b>BRISÉ</b>' : `<i style="width:${(u.brk / u.brkMax) * 100}%"></i>`}</span>` : ''}
       <span class="dv-atk">${icon('swords')}<b>${u.atk + (u.boost || 0)}</b></span>
       <span class="dv-hp ${u.hp < u.maxHp ? 'hurt' : ''}">${icon('heart')}<b>${Math.max(0, u.hp)}</b></span>
-      ${!enemy && th[u.uid] ? `<span class="dv-threat" title="Dégâts annoncés">${icon('skull')}-${th[u.uid]}</span>` : ''}
+      ${!enemy && th[u.uid] ? `<span class="dv-threat" title="Dégâts annoncés"><img alt="" src="assets/icons/danger.webp">-${th[u.uid]}</span>` : ''}
       ${enemy ? intentChip(u) : ''}
       ${tgt ? `<span class="cb-tgt">${tgt}</span>` : ''}
       <span class="dv-st">${statusHTML(u)}</span>

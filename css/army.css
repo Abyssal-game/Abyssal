@@ -747,3 +747,20 @@ img.emblem { object-fit: contain; }
 .cb-banner .iicon { width: 34px; height: 34px; margin: -8px 0; }
 .cb-iline .iicon { width: 18px; height: 18px; vertical-align: -4px; }
 .dv-dodge-t .iicon { width: 26px; height: 26px; vertical-align: -7px; margin-right: 2px; }
+
+/* ——— Gemmes d'actions et de Ferveur, emblèmes ——— */
+.cb-pips i, .cb-gems i { border: 0 !important; border-radius: 0 !important; box-shadow: none !important; transform: none !important; background: center / contain no-repeat !important; }
+.cb-pips i { width: 16px !important; height: 16px !important; background-image: url(../assets/icons/gem-ap0.webp) !important; }
+.cb-pips i.on { background-image: url(../assets/icons/gem-ap.webp) !important; filter: drop-shadow(0 0 4px rgba(80, 230, 140, .7)); }
+.cb-gems i { width: 13px !important; height: 17px !important; background-image: url(../assets/icons/gem-fv0.webp) !important; }
+.cb-gems i.on { background-image: url(../assets/icons/gem-fv.webp) !important; filter: drop-shadow(0 0 4px rgba(170, 100, 255, .8)); }
+.cb-pips, .cb-gems { gap: 2px !important; }
+@media (max-width: 360px) { .cb-pips i { width: 13px !important; height: 13px !important; } .cb-gems i { width: 10px !important; height: 13px !important; } }
+.dv-boss { display: inline-flex !important; align-items: center; gap: 3px; padding-left: 3px !important; }
+.dv-boss img { width: 18px; height: 18px; margin: -5px 0; filter: drop-shadow(0 1px 2px #000); }
+.dv-threat img { width: 18px; height: 18px; margin: -5px 1px -5px -4px; }
+.cb-ult .cb-pw { width: 20px; height: 20px; margin: -4px 0; flex: none; filter: drop-shadow(0 0 4px rgba(242, 193, 78, .6)); }
+.cb-ult { align-items: center !important; }
+.cb-res.ready .cb-pw { animation: pwSpin 3s linear infinite; }
+@keyframes pwSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .cb-res.ready .cb-pw { animation: none; } }
