@@ -1156,7 +1156,7 @@ img.veiled { filter: grayscale(1) brightness(.1) contrast(1.8) blur(6px) !import
 .tm-add.in { background: rgba(60, 140, 80, .25); border-color: rgba(120, 210, 140, .55); color: #A8EBB8; }
 /* Présentation d'une faction : paysage de son royaume (assets/realms), sinon un fond à ses couleurs */
 .fac-hero { background: radial-gradient(120% 90% at 70% 20%, color-mix(in srgb, var(--fc) 35%, transparent), transparent 60%), linear-gradient(160deg, color-mix(in srgb, var(--fp) 70%, #000), #07080C); }
-.fac-hero .fac-realm { object-position: 50% 40% !important; }
+.fac-hero .fac-realm { object-position: 50% 50% !important; }
 .fac-hero .fac-sig.big .sigil-img { width: 64px; height: 64px; }
 .dc-altar .dc-bl b { font-size: 17cqw !important; }
 .tm-ctl { bottom: -18px !important; }
