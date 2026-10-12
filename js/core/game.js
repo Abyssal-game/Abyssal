@@ -38,6 +38,7 @@ export class Game {
     this.s = save;
     this.loadedFrom = source;
     try { this.convertHeroes(); } catch (e) { /* rien */ }
+    try { this.fixVariants(); } catch (e) { /* rien */ }
   }
 
   // Événements -------------------------------------------------------------
@@ -356,7 +357,8 @@ export class Game {
   // (et 5 Communes offertes à qui n'a pas encore 3 créatures).
   team() {
     let t = (this.s.team || []).filter((id) => this.owns(id));
-    if (this.teamCost(t) > BUDGET) t = [];
+    // budget dépassé (par exemple après un changement de rareté) : on retire les dernières cartes
+    while (t.length && this.teamCost(t) > BUDGET) t = t.slice(0, -1);
     // remplissage automatique seulement tant que le joueur n'a jamais composé son équipe lui-même
     if (t.length < TEAM.active && !this.s.teamSet) {
       if (this.uniqueCount() < TEAM.active) {
@@ -652,6 +654,21 @@ export class Game {
 
   // Passage au nouveau système (une fois) : les héros, l'équipement et les pactes disparaissent.
   // Les coffres de l'Arsenal sont gardés (ils contiennent désormais des boosters) ; le reste devient des éclats.
+  // Une carte qui change de rareté peut perdre une variante (pas d'or pour les Communes et Peu communes) :
+  // les exemplaires concernés deviennent holographiques, rien n'est perdu.
+  fixVariants() {
+    let changed = false;
+    for (const [id, e] of Object.entries(this.s.collection)) {
+      const card = this.catalog.get(id);
+      if (!card) continue;
+      for (const v of Object.keys(e.v)) {
+        if (!e.v[v] || card.variants.includes(v) || v === 'special') continue;
+        const to = card.variants.includes('holo') ? 'holo' : 'normal';
+        e.v[to] = (e.v[to] || 0) + e.v[v]; delete e.v[v]; changed = true;
+      }
+    }
+    if (changed) this.persist();
+  }
   convertHeroes() {
     const s = this.s;
     if (s.army === 1) return;
@@ -845,7 +862,7 @@ export class Game {
     this.s.settings = { ...this.s.settings, ...settings };
     this.persist();
   }
-  replaceSave(save) { this.s = save; try { this.convertHeroes(); } catch (e) { /* rien */ } this.persist(); }
+  replaceSave(save) { this.s = save; try { this.convertHeroes(); this.fixVariants(); } catch (e) { /* rien */ } this.persist(); }
   bestCards(n = 3) {
     return Object.keys(this.s.collection)
       .map((id) => this.catalog.get(id))

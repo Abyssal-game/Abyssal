@@ -139,3 +139,16 @@ test('équipe : on peut tout retirer ; la Descente est seulement bloquée sous 3
   g.setTeam(STARTER.slice(0, 3));
   assert.ok(g.startRun());
 });
+
+test('changement de rareté : une variante devenue impossible passe en holographique, rien n’est perdu', () => {
+  const g = newGame('fix');
+  const c = catalog.get('INF-048'); // passée de Hyper rare à Rare
+  g.addCard(c.id);
+  g.s.collection[c.id].v.special = 0;
+  const pc = catalog.byRarity.PC[0];
+  g.addCard(pc.id);
+  g.s.collection[pc.id].v.gold = 2; // l'or n'existe pas pour les Peu communes
+  g.fixVariants();
+  assert.equal(g.s.collection[pc.id].v.gold, undefined);
+  assert.equal(g.s.collection[pc.id].v.holo, 2);
+});
