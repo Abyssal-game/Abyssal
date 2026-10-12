@@ -213,14 +213,11 @@ export default function sceauxScreen(app, root) {
     tuto(app, 'sceaux-board');
     aiTurn();
   }
+  // Règles en cours de partie : la même présentation que le volet « Comment ça marche »
   function rules() {
     openSheet(`<div class="sc-rules"><h2>Règles des Sceaux</h2>
-      <ul class="small"><li>Chaque joueur a <b>5 cartes</b>. Chaque carte a quatre valeurs : <b>haut, droite, bas, gauche</b> (de 1 à 10 ; 10 s’écrit A).</li>
-      <li>À tour de rôle, on pose une carte sur une <b>case libre</b> du plateau de 3 × 3.</li>
-      <li>Si une valeur de ta carte est <b>plus grande</b> que la valeur d’en face d’une carte adverse voisine, tu la <b>captures</b> : elle passe de ta couleur. À valeur égale, rien ne se passe.</li>
-      <li>Après les 9 poses, on compte les cartes de chaque couleur sur le plateau, plus la carte restée en main. Le plus grand total gagne ; <b>5 contre 5</b>, c’est une égalité.</li>
-      <li>Toutes les cartes ont le même total de valeurs (20) : une Mythique a des pointes plus fortes, mais aussi des côtés plus faibles. Une Commune bien placée peut la capturer.</li></ul>
-      <h3>Règles spéciales</h3>${Object.values(SC.RULES).map((r) => `<p class="small"><b>${esc(r.name)}</b> : ${esc(r.desc)}</p>`).join('')}
+      <ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol>
+      ${Object.values(SC.RULES).filter((r) => r.name !== 'Classique').map((r) => `<p class="small"><b>${esc(r.name)}</b> : ${esc(r.desc)}</p>`).join('')}
       <p class="small muted">Victoires payées : ${SC.SCEAUX_REWARD.dailyPaid} par jour. Première victoire contre un adversaire : +${SC.SCEAUX_REWARD.firstWin} éclats. Défi du jour : +${SC.SCEAUX_REWARD.daily}.</p></div>`, { label: 'Règles des Sceaux' });
   }
   function handSheet() {
