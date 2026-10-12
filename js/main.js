@@ -83,8 +83,8 @@ const WALLET = {
 // au CSS (--app-h) pour que les pages plein écran et la barre d'onglets aillent jusqu'en bas.
 function fitHeight() {
   const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
-  const gap = screen.height - innerHeight;
-  const h = standalone && innerHeight > innerWidth && gap > 0 && gap < 100 ? screen.height : innerHeight;
+  // installée sur l'écran d'accueil, en portrait, le jeu occupe tout l'écran : on prend sa hauteur réelle
+  const h = standalone && innerHeight > innerWidth ? Math.max(screen.height, innerHeight) : innerHeight;
   document.documentElement.style.setProperty('--app-h', `${h}px`);
 }
 fitHeight();
