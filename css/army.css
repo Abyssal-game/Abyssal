@@ -811,3 +811,47 @@ img.emblem { object-fit: contain; }
 .ri-hub-cost { display: inline-flex; align-items: center; gap: 3px; font: 800 .75rem/1 var(--f-ui); color: var(--gold-hi); }
 .ri-hub-cost .ic { width: 13px; height: 13px; }
 .ritual-sheet.sheet, .sheet-full .ritual-sheet { max-width: 640px; }
+
+/* ===== Lot 2 : Descente peinte ===== */
+.dc-plq { border-style: solid !important; border-width: 1px !important; border-color: transparent !important; background: transparent !important; box-shadow: none !important; min-height: 54px; padding: 0 34px !important; color: #FFF3DA !important; text-shadow: 0 1px 2px #000, 0 0 10px rgba(0, 0, 0, .8); font-family: var(--f-display); letter-spacing: .02em; }
+.dc-plq-red { border-image: url(../assets/ui/btn-red.webp) 0 104 fill / 0 26px stretch !important; }
+.dc-plq-red.danger { filter: saturate(1.35) brightness(1.08); }
+.dc-plq-dark { border-image: url(../assets/ui/btn-dark.webp) 0 104 fill / 0 21px stretch !important; min-height: 44px; color: #E6DCC6 !important; }
+.dc-plq:disabled { filter: grayscale(.8) brightness(.7); }
+.dc-plq:not(:disabled):active { transform: scale(.98); }
+.dc-curse-row { position: relative; overflow: hidden; min-height: 72px; background: #120b14 url(../assets/ui/bn-cursed.webp) right center / cover no-repeat !important; border-color: rgba(180, 32, 63, .45) !important; }
+.dc-curse-row::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10, 6, 12, .92) 0%, rgba(10, 6, 12, .75) 50%, rgba(10, 6, 12, .1) 100%); pointer-events: none; }
+.dc-curse-row > * { position: relative; }
+.dc-curse-row > span { max-width: 68%; }
+.dc-curse-row .small.muted { color: #D8C9CF !important; }
+.dc-curse-row.on { box-shadow: 0 0 18px rgba(200, 30, 60, .45), inset 0 0 0 1px rgba(255, 80, 110, .5); }
+.dc-curse-row.on::before { background: linear-gradient(90deg, rgba(40, 6, 14, .9) 0%, rgba(40, 6, 14, .6) 50%, rgba(40, 6, 14, 0) 100%); }
+.dc-rule-ic .picon { width: 42px !important; height: 42px !important; object-fit: contain; filter: drop-shadow(0 0 6px rgba(160, 90, 255, .5)); }
+.dc-rule-ic:has(.picon) { background: none; }
+.dc-rule-line .picon { display: inline-block; width: 18px; height: 18px; vertical-align: -4px; margin-right: 2px; }
+.dc-torches { align-items: flex-end; gap: 2px; }
+.dc-torches i { display: grid; place-items: end center; width: 18px; height: 36px; }
+.dc-torches i .picon { width: auto; height: 34px; max-width: none; object-fit: contain; }
+.dc-torches i.on { filter: drop-shadow(0 0 6px rgba(255, 140, 50, .55)); }
+.dc-torches i:not(.on) .picon { opacity: .75; height: 30px; }
+.dc-door-ic.pic { background: none !important; border: 0 !important; border-radius: 0; }
+.dc-door .dc-door-ic.pic, .dc-door.has-art .dc-door-ic.pic { width: 54px; height: 54px; }
+.dc-door-ic.pic .picon { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .8)); }
+.dc-stair { display: flex; align-items: center; gap: 12px; width: 100%; padding: 8px 14px 8px 8px; text-align: left; border-radius: 14px; color: var(--ink); border: 1px solid var(--line); background: linear-gradient(100deg, rgba(20, 16, 30, .96), rgba(12, 10, 18, .96)); }
+.dc-stair .picon { width: 64px; height: 64px; flex: none; object-fit: contain; border-radius: 10px; }
+.dc-stair > span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.dc-stair b { font-family: var(--f-display); font-size: 1.05rem; }
+.dc-stair .small { color: var(--mute); }
+.dc-stair.down { border-color: rgba(150, 90, 255, .55); background: linear-gradient(100deg, rgba(60, 30, 110, .55), rgba(14, 10, 24, .96) 70%); box-shadow: 0 0 18px rgba(120, 70, 255, .25); }
+.dc-stair.down b { color: #E6D9FF; }
+.dc-stair.up { border-color: rgba(242, 193, 78, .4); background: linear-gradient(100deg, rgba(110, 80, 20, .4), rgba(14, 12, 18, .96) 70%); }
+.dc-stair.up b { color: var(--gold-hi); }
+.dc-stair:active { transform: scale(.985); }
+.dc-altar .dc-bl { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; aspect-ratio: 420 / 626; padding: 26% 16% 14%; border: 0; border-radius: 0; background: url(../assets/ui/bless-frame.webp) center / 100% 100% no-repeat; color: #2B1E10; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .6)); }
+.dc-altar .dc-bl > span:first-child .picon { width: 34px; height: 34px; }
+.dc-altar .dc-bl b { color: #3A2408; font-size: .98rem; line-height: 1.15; }
+.dc-altar .dc-bl .small { color: #4A3A26 !important; font-size: .78rem; line-height: 1.25; }
+.dc-altar .dc-bl:active { transform: scale(.97); }
+.dc-altar:has(.dc-bl) { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 2px 12px; margin: 0 -2px; scrollbar-width: none; }
+.dc-altar::-webkit-scrollbar { display: none; }
+.dc-altar .dc-bl { flex: 0 0 min(58%, 210px); scroll-snap-align: center; }
