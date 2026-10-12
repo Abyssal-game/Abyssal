@@ -63,15 +63,18 @@ export function runDuel(app, root, { title, onEnd }) {
 
   // ——— Carte de combat ———
   let th = {}, tgtInfo = {};
+  // États : icônes peintes (le chiffre du poison et du bonus d'attaque en pastille)
+  const st_ = (k, title, val = '') => `<i class="sti" title="${title}"><img alt="${title}" src="assets/icons/st-${k}.webp">${val !== '' ? `<b>${val}</b>` : ''}</i>`;
   const statusHTML = (u) => [
-    u.shield ? `<i class="sh" title="Bouclier : bloque un coup">${icon('shield')}</i>` : '',
-    u.poison ? `<i class="po" title="Poison">${icon('skull')}${u.poison}</i>` : '',
-    u.frozen || u.stunned ? '<i class="fr" title="Gelé : passe son tour">Gel</i>' : '',
-    u.slow ? '<i class="fr" title="Ralenti : prochaine attaque -50 %">Lent</i>' : '',
-    u.mark ? '<i class="mk" title="Marqué : +30 % de dégâts, +3 aux jets">Marque</i>' : '',
-    u.defend ? `<i class="df" title="Défense : -50 % de dégâts">${icon('shield')}-50%</i>` : '',
-    u.guardBy ? '<i class="gd" title="Protégé par un Rempart">Rempart</i>' : '',
-    u.exposed ? '<i class="ex" title="Exposée : +25 % de dégâts subis">Exposée</i>' : '',
+    u.broken ? st_('broken', 'Brisé : +50 % de dégâts subis, +5 aux jets') : '',
+    u.shield ? st_('shield', 'Bouclier : bloque un coup') : '',
+    u.poison ? st_('poison', `Poison : ${u.poison} dégâts au début de son tour`, u.poison) : '',
+    u.frozen || u.stunned ? st_('frost', 'Gelé : passe son tour') : '',
+    u.slow ? st_('slow', 'Ralenti : prochaine attaque -50 %') : '',
+    u.mark ? st_('mark', 'Marqué : +30 % de dégâts, +3 aux jets') : '',
+    u.defend ? st_('defend', 'Défense : -50 % de dégâts') : '',
+    u.guardBy ? st_('guard', 'Protégé par un Rempart') : '',
+    u.exposed ? st_('exposed', 'Exposée : +25 % de dégâts subis') : '',
     u.boost ? `<i class="bo">+${u.boost}</i>` : '',
   ].join('');
   const intentChip = (u) => {
@@ -91,7 +94,7 @@ export function runDuel(app, root, { title, onEnd }) {
       <span class="dv-kw" title="${esc(kit.name)}">${roleIcon(kit.kw)}<em>${esc(kit.name)}</em></span>
       ${u.boss ? `<span class="dv-boss">${u.phase2 ? 'Furie' : 'Gardien'}</span>` : u.elite ? '<span class="dv-boss elite">Élite</span>' : ''}
       <span class="dv-nm">${esc(c.name)}</span>
-      ${u.brkMax ? `<span class="cb-brk ${u.broken ? 'is-broken' : ''}" title="Brisure">${u.broken ? '<b>BRISÉ</b>' : `<i style="width:${(u.brk / u.brkMax) * 100}%"></i>`}</span>` : ''}
+      ${u.brkMax ? `<span class="cb-brk ${u.broken ? 'is-broken' : ''}" title="Brisure">${u.broken ? '<img alt="" src="assets/icons/st-broken.webp"><b>BRISÉ</b>' : `<i style="width:${(u.brk / u.brkMax) * 100}%"></i>`}</span>` : ''}
       <span class="dv-atk">${icon('swords')}<b>${u.atk + (u.boost || 0)}</b></span>
       <span class="dv-hp ${u.hp < u.maxHp ? 'hurt' : ''}">${icon('heart')}<b>${Math.max(0, u.hp)}</b></span>
       ${!enemy && th[u.uid] ? `<span class="dv-threat" title="Dégâts annoncés">${icon('skull')}-${th[u.uid]}</span>` : ''}
