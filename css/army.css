@@ -1164,3 +1164,10 @@ img.veiled { filter: grayscale(1) brightness(.1) contrast(1.8) blur(6px) !import
 .dc-altar .dc-bl b { font-size: 14.5cqw !important; }
 .dc-altar .dc-bl { padding: 34% 18% 0 18% !important; } .dc-altar .dc-bl b { font-size: 15cqw !important; }
 .dc-altar .dc-bl b { font-size: 12.5cqw !important; }
+/* Rituel : même en-tête illustré que Succès, Bestiaire et Réglages */
+.bn-ritual { --bn: url(../assets/ui/bn-ritual.webp); }
+.ri-hub-hero { margin: 0 0 6px; text-align: left; padding-right: 54px; }
+.ri-hub-hero .ri-hub-ash { display: inline-flex; flex-direction: row; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 99px; background: rgba(0, 0, 0, .55); border: 1px solid rgba(232, 195, 90, .35); font: 600 .8rem/1 var(--f-ui); color: var(--mute); }
+.ri-hub-hero .ri-hub-ash b { font: 900 1rem/1 var(--f-display); color: var(--gold-hi); }
+.ri-hub-hero .ri-hub-ash .ic { width: 22px !important; height: 22px !important; }
+.ri-hub-hero h1 { font-size: 1.5rem; } .ri-hub-hero p { max-width: 58%; }

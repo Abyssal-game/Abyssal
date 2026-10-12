@@ -94,12 +94,8 @@ export function openRitualHub(app) {
     list.sort((a, b) => (a.cost <= g.s.ash) - (b.cost <= g.s.ash) || a.cost - b.cost).reverse();
     const ready = list.filter((x) => x.cost <= g.s.ash).length;
     sheet.setContent(`<div class="ri-hub-in">
-      <header class="ri-hub-head">
-        <img class="ri-hub-emb" alt="" src="assets/icons/ritual.webp">
-        <h2>Rituel d’élévation</h2>
-        <p class="ri-hub-sub">Brûle des cendres pour faire passer une créature en <b>holographique</b>, puis en <b>or</b>, puis en <b>cosmique</b>. Le rituel réussit toujours.</p>
-        <div class="ri-hub-ash"><span>${icon('ash')}<b>${fmt(g.s.ash)}</b> cendres</span><small>${list.length ? (ready ? `${ready} rituel${ready > 1 ? 's' : ''} possible${ready > 1 ? 's' : ''} maintenant` : 'Pas encore assez pour un rituel') : ''}</small></div>
-      </header>
+      <header class="screen-head ui-hero bn-ritual ri-hub-hero"><h1>Rituel d’élévation</h1><p class="muted">Holographique, or, puis cosmique. Le rituel réussit toujours.</p>
+        <span class="ri-hub-ash">${icon('ash')}<b>${fmt(g.s.ash)}</b> cendres${list.length ? ` · ${ready ? `${ready} créature${ready > 1 ? 's' : ''} à ta portée` : 'pas encore assez'}` : ''}</span></header>
       ${list.length ? `<div class="ri-hub-grid">${list.map(({ c, from, to, cost }) => `<button class="ri-hub-c ${cost <= g.s.ash ? 'ok' : ''}" data-id="${c.id}" data-from="${from}" style="--rc:${RARITY[c.rarity].color}">
         <span class="ri-hub-art"><img alt="" src="${artUrl(c, { lite: true })}"></span><b>${esc(c.name)}</b><span class="ri-hub-step">${esc(VARIANTS[from].short)} <i>→</i> <em>${esc(VARIANTS[to].short)}</em></span><span class="ri-hub-cost">${icon('ash')} ${fmt(cost)}</span></button>`).join('')}</div>` : '<p class="muted center">Aucune carte à élever pour l’instant.</p>'}
       <p class="small muted center ri-hub-foot">Les cendres viennent des doublons trouvés dans les boosters.</p>
