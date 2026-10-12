@@ -275,6 +275,8 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
         document.getElementById('toasts').lastElementChild?.addEventListener('click', () => w.postMessage('skipWaiting'));
       };
       if (reg.waiting && navigator.serviceWorker.controller) notify(reg.waiting);
+      // au retour dans l'app (iPhone : elle reste souvent ouverte en arrière-plan), on cherche une mise à jour
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update().catch(() => {}); });
       reg.addEventListener('updatefound', () => {
         const w = reg.installing;
         w && w.addEventListener('statechange', () => { if (w.state === 'installed' && navigator.serviceWorker.controller) notify(w); });
