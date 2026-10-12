@@ -20,7 +20,7 @@ export default function collection(app, root, params) {
       <span class="progress ui-prog"><i id="col-prog"></i></span>
     </header>
     <div class="col-head-row">
-      <button class="btn small gold col-ritual" data-act="ritual">${icon('sparkle')}Rituel</button>
+      <button class="btn small gold col-ritual" data-act="ritual">${icon('p:ritual')}Rituel</button>
       <div class="seg" role="group" aria-label="Mode d’affichage">${[['grid', 'Grille'], ['album', 'Classeur']].map(([k, l]) => `<button class="seg-b" data-act="view" data-v="${k}" aria-pressed="${(st.view || 'grid') === k}">${l}</button>`).join('')}</div>
     </div>
     <div id="col-main">
@@ -105,7 +105,7 @@ export default function collection(app, root, params) {
         <div class="album-ph"><span>${sigil(f)} ${esc(fac.name)}</span><span>Page ${i + 1} / ${pages.length}</span></div>
         <div class="album-grid">${pg.map((c) => { const e = g.entry(c.id); return e
           ? `<div class="slot">${cardHTML(c, { lazy: true, isNew: e.isNew, variant: bestVariant(e) })}</div>`
-          : `<div class="slot slot-empty" role="button" tabindex="0" data-id="${c.id}" aria-label="Emplacement ${c.number} vide, ${RARITY[c.rarity].name}"><span class="slot-num">${c.number}</span><span class="fu-gem" style="--rc:${RARITY[c.rarity].color}">${RARITY[c.rarity].short}</span></div>`; }).join('')}</div>
+          : `<div class="slot slot-empty" role="button" tabindex="0" data-id="${c.id}" aria-label="Emplacement ${c.number} vide, ${RARITY[c.rarity].name}"><span class="slot-num">${c.number}</span><span class="fu-gem rgem" data-r="${c.rarity}" style="--rc:${RARITY[c.rarity].color}">${RARITY[c.rarity].short}</span></div>`; }).join('')}</div>
       </section>`).join('')}</div>
       <div class="album-dots">${pages.map((_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</div>
       <p class="small muted center">Glisse pour tourner les pages. ${g.factionProgress(f).owned} / ${cards.length} emplacements remplis.</p>`;

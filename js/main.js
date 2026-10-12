@@ -78,6 +78,19 @@ const WALLET = {
   shards: ['Éclats', 'La monnaie principale. Ils servent à acheter des boosters dans la Boutique.', 'Tu en gagnes avec l’offrande du jour, les missions, les succès, les nouvelles créatures découvertes et surtout dans la Descente (combats, trésors, gardiens).', 'boutique', 'Aller aux Boosters'],
   ash: ['Cendres', 'Ce qui reste de tes doublons. Elles servent au Rituel d’élévation (holographique, or, cosmique), à invoquer une carte manquante et à déchiffrer les noms inconnus.', 'Tu en gagnes à chaque doublon obtenu dans un booster : plus la carte est rare, plus elle en donne.', 'collection', 'Aller à la Collection'],
 };
+// iPhone, app posée sur l'écran d'accueil : la hauteur annoncée par le navigateur peut être plus
+// courte que l'écran réel (une bande noire reste en bas). On mesure la vraie hauteur et on la donne
+// au CSS (--app-h) pour que les pages plein écran et la barre d'onglets aillent jusqu'en bas.
+function fitHeight() {
+  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  const gap = screen.height - innerHeight;
+  const h = standalone && innerHeight > innerWidth && gap > 0 && gap < 100 ? screen.height : innerHeight;
+  document.documentElement.style.setProperty('--app-h', `${h}px`);
+}
+fitHeight();
+addEventListener('resize', fitHeight);
+addEventListener('orientationchange', () => setTimeout(fitHeight, 300));
+
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-wallet]');
   if (!b) return;

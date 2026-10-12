@@ -16,10 +16,10 @@ export function openRitual(app, id, from, { onClose } = {}) {
     const e = g.entry(id);
     if (!e || !(e.v[from] > 0)) { sheet.setContent('<p class="muted center">Cette carte n’est plus disponible pour le rituel.</p>'); return; }
     const to = g.ritualTarget(id, from);
-    if (!to) { sheet.setContent(`<div class="ritual"><h2>${icon('sparkle')} Rituel d’élévation</h2><p>${esc(card.name)} a atteint le sommet : <b>${esc(VARIANTS[from].name)}</b>.</p></div>`); return; }
+    if (!to) { sheet.setContent(`<div class="ritual"><h2>${icon('p:ritual')} Rituel d’élévation</h2><p>${esc(card.name)} a atteint le sommet : <b>${esc(VARIANTS[from].name)}</b>.</p></div>`); return; }
     const cost = g.ritualCost(id, from), have = g.s.ash, ok = have >= cost;
     sheet.setContent(`<div class="ritual">
-      <h2>${icon('sparkle')} Rituel d’élévation</h2>
+      <h2>${icon('p:ritual')} Rituel d’élévation</h2>
       <div class="ri-cards">
         <div class="ri-c">${cardHTML(card, { variant: from })}<span class="small muted">${esc(VARIANTS[from].name)}</span></div>
         <span class="ri-arrow">${icon('next')}</span>
@@ -30,9 +30,9 @@ export function openRitual(app, id, from, { onClose } = {}) {
         <span class="small muted">Tu en as ${fmt(have)}${ok ? '' : ` : il en manque ${fmt(cost - have)}`}</span>
         <i style="--p:${Math.min(100, (have / cost) * 100)}%"></i>
       </div>
-      ${g.s.ritualBoost ? `<p class="small ri-boost">${icon('sparkle')} Un encens brûle : -${g.s.ritualBoost} % sur ce rituel.</p>` : g.itemCount('encens') ? `<button class="btn small" data-ri="encens">${icon('sparkle')}Brûler un encens (-15 %) · ${g.itemCount('encens')} en stock</button>` : ''}
+      ${g.s.ritualBoost ? `<p class="small ri-boost">${icon('p:ritual')} Un encens brûle : -${g.s.ritualBoost} % sur ce rituel.</p>` : g.itemCount('encens') ? `<button class="btn small" data-ri="encens">${icon('p:ritual')}Brûler un encens (-15 %) · ${g.itemCount('encens')} en stock</button>` : ''}
       <p class="small muted">Le rituel réussit toujours. Tes doublons ne sont pas touchés : ils gardent le niveau de tes créatures. Les cendres viennent des doublons trouvés dans les boosters.</p>
-      <button class="btn primary block" data-ri="go" ${ok ? '' : 'disabled'}>${icon('sparkle')}Lancer le rituel</button>
+      <button class="btn primary block" data-ri="go" ${ok ? '' : 'disabled'}>${icon('p:ritual')}Lancer le rituel</button>
     </div>`);
   }
 
@@ -59,7 +59,7 @@ export function openRitual(app, id, from, { onClose } = {}) {
     app.sfx.reveal(['M', 'S'].includes(card.rarity) ? card.rarity : 'HR');
     msg.innerHTML = `<b class="ri-ok">Le rituel a réussi !</b><br>${esc(card.name)} devient <b>${esc(VARIANTS[to].name)}</b>.`;
     const end = sheet.body.querySelector('.ri-end');
-    end.innerHTML = `<button class="btn" data-ri="close">Fermer</button>${g.ritualTarget(id, to) ? `<button class="btn primary" data-ri="next">${icon('sparkle')}Continuer l’élévation</button>` : ''}`;
+    end.innerHTML = `<button class="btn" data-ri="close">Fermer</button>${g.ritualTarget(id, to) ? `<button class="btn primary" data-ri="next">${icon('p:ritual')}Continuer l’élévation</button>` : ''}`;
     end.hidden = false;
     app.flushProgress();
     from = to;
@@ -92,11 +92,17 @@ export function openRitualHub(app) {
       if (from) list.push({ c, from, to: g.ritualTarget(c.id, from), cost: g.ritualCost(c.id, from) });
     }
     list.sort((a, b) => (a.cost <= g.s.ash) - (b.cost <= g.s.ash) || a.cost - b.cost).reverse();
+    const ready = list.filter((x) => x.cost <= g.s.ash).length;
     sheet.setContent(`<div class="ri-hub-in">
-      <header class="ri-hub-head"><h2>${icon('sparkle')} Rituel d’élévation</h2>
-        <p class="small muted">Fais passer une carte en holographique, en or puis en cosmique. Le rituel réussit toujours et se paie en cendres (${icon('ash')} <b>${fmt(g.s.ash)}</b>).</p></header>
+      <header class="ri-hub-head">
+        <img class="ri-hub-emb" alt="" src="assets/icons/ritual.webp">
+        <h2>Rituel d’élévation</h2>
+        <p class="ri-hub-sub">Brûle des cendres pour faire passer une créature en <b>holographique</b>, puis en <b>or</b>, puis en <b>cosmique</b>. Le rituel réussit toujours.</p>
+        <div class="ri-hub-ash"><span>${icon('ash')}<b>${fmt(g.s.ash)}</b> cendres</span><small>${list.length ? (ready ? `${ready} rituel${ready > 1 ? 's' : ''} possible${ready > 1 ? 's' : ''} maintenant` : 'Pas encore assez pour un rituel') : ''}</small></div>
+      </header>
       ${list.length ? `<div class="ri-hub-grid">${list.map(({ c, from, to, cost }) => `<button class="ri-hub-c ${cost <= g.s.ash ? 'ok' : ''}" data-id="${c.id}" data-from="${from}" style="--rc:${RARITY[c.rarity].color}">
-        <img alt="" src="${artUrl(c, { lite: true })}"><b>${esc(c.name)}</b><span class="small">${esc(VARIANTS[from].short)} → <b>${esc(VARIANTS[to].short)}</b></span><span class="ri-hub-cost">${icon('ash')} ${fmt(cost)}</span></button>`).join('')}</div>` : '<p class="muted center">Aucune carte à élever pour l’instant.</p>'}
+        <span class="ri-hub-art"><img alt="" src="${artUrl(c, { lite: true })}"></span><b>${esc(c.name)}</b><span class="ri-hub-step">${esc(VARIANTS[from].short)} <i>→</i> <em>${esc(VARIANTS[to].short)}</em></span><span class="ri-hub-cost">${icon('ash')} ${fmt(cost)}</span></button>`).join('')}</div>` : '<p class="muted center">Aucune carte à élever pour l’instant.</p>'}
+      <p class="small muted center ri-hub-foot">Les cendres viennent des doublons trouvés dans les boosters.</p>
     </div>`);
   }
   sheet.body.addEventListener('click', (e) => {

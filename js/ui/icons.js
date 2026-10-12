@@ -66,8 +66,13 @@ export const SIGILS = {
 export const EMBLEM = '<img class="emblem" src="assets/brand/emblem.webp" alt="" aria-hidden="true">';
 
 // Les monnaies (éclats, cendres) sont peintes ; les autres icônes restent en traits
-const CUR_PIC = { crystal: 'cur-shard', ash: 'cur-ash' };
-export const icon = (name) => (CUR_PIC[name] ? `<img class="ic ic-cur" alt="" src="assets/icons/${CUR_PIC[name]}.webp">` : ICONS[name] || '');
+// Les petits dessins au trait les plus visibles sont remplacés par des icônes peintes ;
+// icon('p:nom') donne directement l'icône peinte assets/icons/nom.webp.
+const CUR_PIC = { crystal: 'cur-shard', ash: 'cur-ash', sparkle: 'xp', star: 'xp', lock: 'mysteries', skull: 'danger' };
+export const icon = (name) => {
+  const pic = name.startsWith('p:') ? name.slice(2) : CUR_PIC[name];
+  return pic ? `<img class="ic ic-cur" alt="" src="assets/icons/${pic}.webp">` : ICONS[name] || '';
+};
 export const sigil = (faction) => (factionArtReady(Object.keys(SIGILS)) && SIGILS[faction] ? `<img class="sigil sigil-img" alt="" src="assets/factions/${faction}.webp">` : SIGILS[faction] || '');
 
 // Icônes peintes (assets/icons) : défis du jour, étapes de l'Aventure

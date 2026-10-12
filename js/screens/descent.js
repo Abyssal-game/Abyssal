@@ -10,6 +10,7 @@ import { esc, fmt, toast, confirmBox, bindActions } from '../ui/dom.js';
 import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
 import { bagHTML, bindBag } from './items.js';
+import { chestSVG } from '../ui/chest.js';
 import { runDuel } from './duel-ui.js';
 import { WEEKLY_FLOOR } from '../core/game.js';
 import { setScene, sceneUrl } from '../ui/scene.js';
@@ -29,7 +30,7 @@ export default function descent(app, root) {
 
   const teamStrip = (ids, run) => `<div class="v2-strip">${ids.map((id, i) => { const c = cat.get(id); const m = run?.team.find((x) => x.id === id); return `<span class="v2-mini ${i >= TEAM.active ? 'res' : ''} ${m?.fallen ? 'fallen' : ''}" style="--rc:${RARITY[c.rarity].color}"><img alt="" src="${artUrl(c, { lite: true })}">${m ? `<span class="hpbar"><i style="width:${(m.hp / m.maxHp) * 100}%"></i></span>` : `<small>${i < TEAM.active ? `Niv. ${g.cardLevel(id)}` : 'Rés.'}</small>`}</span>`; }).join('')}</div>`;
   const ruleHTML = (r) => `<section class="panel dc-rule bn-rule" style="--rf:${r.faction ? cat.faction[r.faction].colors.secondary : 'var(--gold)'}"><span class="dc-rule-ic">${r.faction ? sigil(r.faction) : picon('rule')}</span><span><span class="small muted">Règle du jour</span><b>${esc(r.name)}</b><span class="small">${esc(r.desc)}</span></span></section>`;
-  const chestChip = (c) => (c ? `<span class="v2-chest-chip" style="--cc:${CHESTS[c].color}">${icon('lock')} ${esc(CHESTS[c].name)}</span>` : '<span class="v2-chest-chip none">aucun coffre</span>');
+  const chestChip = (c) => (c ? `<span class="v2-chest-chip" style="--cc:${CHESTS[c].color}">${icon('p:chest')} ${esc(CHESTS[c].name)}</span>` : '<span class="v2-chest-chip none">aucun coffre</span>');
 
   // ——— Accueil de l'Aventure ———————————————————————————————————————————
   function lobby() {
@@ -38,7 +39,7 @@ export default function descent(app, root) {
     root.innerHTML = `<header class="screen-head dc-head"><h1>La Descente</h1><p class="muted">${d.best ? `Ton record : étage ${d.best}${d.bestToday ? ` · aujourd’hui : ${d.bestToday}` : ''}` : 'Descends, survis, rapporte un coffre.'}</p></header>
       ${news ? `<section class="panel ornate dc-news"><div class="dc-new-h"><span class="dc-new-ic">${icon('sparkle')}</span><span><b>Tes cartes combattent !</b><span class="small">Les héros ont quitté l’Abysse : ce sont maintenant tes créatures qui descendent. Chaque doublon fait monter une carte de niveau.</span>${news.shards ? `<span class="small">Ton ancien équipement et l’expérience de tes héros ont été changés en <b>${fmt(news.shards)} éclats</b>. Tes coffres sont gardés : ils contiennent maintenant des boosters.</span>` : ''}</span></div><button class="btn small ghost" data-act="news">OK</button></section>` : ''}
       ${last ? summaryHTML(last) : ''}
-      ${chests ? `<a class="panel dc-chests" href="#/coffres"><span class="dc-new-ic">${icon('lock')}</span><span><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Pleins de boosters</span></span>${icon('next')}</a>` : ''}
+      ${chests ? `<a class="panel dc-chests" href="#/coffres"><span class="dc-new-ic">${icon('p:chest')}</span><span><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Pleins de boosters</span></span>${icon('next')}</a>` : ''}
       ${ruleHTML(g.rule())}
       ${weeklyHTML()}
       <section class="panel dc-go">
@@ -46,14 +47,14 @@ export default function descent(app, root) {
         <div class="dc-go-top"><span class="dc-torches">${Array.from({ length: DESCENT.torches }, (_, i) => `<i class="${i < torches ? 'on' : ''}">${picon(i < torches ? 'torch-on' : 'torch-off')}</i>`).join('')}</span><span class="small muted">${torches ? `${torches} expédition${torches > 1 ? 's' : ''} avec coffre aujourd’hui` : 'Expéditions du jour faites : tu peux rejouer, sans coffre'}</span></div>
         ${teamStrip(team)}
         <p class="small muted center">Pouvoir : <b>${esc(g.ultimate(team).name)}</b> · budget ${g.teamCost(team)} / ${BUDGET}</p>
-        <a class="btn small ghost block dc-plq dc-plq-dark" href="#/equipe">${icon('user')}Modifier l’équipe</a>
+        <a class="btn small ghost block dc-plq dc-plq-dark" href="#/equipe">${icon('p:team')}Modifier l’équipe</a>
         ${team.length < TEAM.active ? `<p class="small v2-warn center">${icon('info')} Ajoute au moins ${TEAM.active} créatures à ton équipe pour descendre.</p>` : ''}
-        <button class="btn ${ui.cursed && torches ? 'danger' : 'primary'} block big-cta dc-plq dc-plq-red" data-act="start" ${team.length >= TEAM.active ? '' : 'disabled'}>${icon('flame')}${torches ? 'Descendre' : 'Descendre (sans coffre)'}</button>
+        <button class="btn ${ui.cursed && torches ? 'danger' : 'primary'} block big-cta dc-plq dc-plq-red" data-act="start" ${team.length >= TEAM.active ? '' : 'disabled'}>${icon('p:depth')}${torches ? 'Descendre' : 'Descendre (sans coffre)'}</button>
         ${torches ? `<div class="dc-curse-row ${ui.cursed ? 'on' : ''}"><span><b>${icon('skull')} Descente maudite</b><span class="small muted">coffre d’une qualité au-dessus, mais rien si l’équipe tombe</span></span><button class="switch" role="switch" aria-checked="${ui.cursed}" data-act="curse" aria-label="Descente maudite"><i></i></button></div>` : ''}
       </section>
       ${Object.values(g.s.items).some((n) => n > 0) ? bagHTML(g) : ''}
-      <details class="panel dc-fold bn-ranking" id="lb"><summary>${icon('trophy')} Classement du jour</summary><div class="lb-body small muted">Chargement…</div></details>
-      <details class="panel dc-fold dc-how"><summary>${icon('info')} Comment ça marche</summary>
+      <details class="panel dc-fold bn-ranking" id="lb"><summary><span class="dc-sum-t">Classement du jour</span></summary><div class="lb-body small muted">Chargement…</div></details>
+      <details class="panel dc-fold dc-how"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/book.webp"><span class="dc-sum-t">Comment ça marche</span></summary>
         <ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol>
         <p class="small muted center">${DESCENT.torches} expéditions avec coffre par jour, puis tu peux rejouer sans coffre.</p></details>`;
     root.querySelector('#lb').addEventListener('toggle', (e) => { if (e.target.open) loadBoard(); }, { once: true });
@@ -68,7 +69,7 @@ export default function descent(app, root) {
   function summaryHTML(s) {
     return `<section class="panel ornate dc-sum ${s.wiped ? 'lost' : 'won'}">${crestHTML(!s.wiped, s.floor, 'Étage', 'dc-crest')}<h2>${s.wiped ? 'L’équipe est tombée' : 'Retour à la surface'}</h2>
       <p class="small">${s.chests.length ? s.chests.map((c) => chestChip(c)).join(' ') : 'Aucun coffre cette fois.'} ${s.shards ? `· ${icon('crystal')} ${fmt(s.shards)} éclats` : ''}</p>
-      ${s.chests.length ? `<a class="btn gold block" href="#/coffres">${icon('lock')}Ouvrir mes coffres</a>` : ''}
+      ${s.chests.length ? `<a class="btn gold block" href="#/coffres">${icon('p:chest')}Ouvrir mes coffres</a>` : ''}
       <div class="row gap"><button class="btn small ghost" data-act="share">${icon('copy')}Partager</button><button class="btn small ghost" data-act="dismiss">OK</button></div></section>`;
   }
 
@@ -92,7 +93,7 @@ export default function descent(app, root) {
   }
 
   // ——— Expédition ———————————————————————————————————————————————————
-  const runHead = (run) => `<header class="dc-run-head"><div><span class="small muted">${run.free ? 'Descente libre (sans coffre)' : run.cursed ? `<span class="dc-bad">${icon('skull')} Maudite</span>` : 'La Descente'}</span><h1>Étage ${run.floor}</h1></div><div class="dc-loot"><span>${icon('crystal')}${fmt(run.shards)}</span>${run.chests.length ? `<span>${icon('lock')}${run.chests.length}</span>` : ''}</div></header>
+  const runHead = (run) => `<header class="dc-run-head"><div><span class="small muted">${run.free ? 'Descente libre (sans coffre)' : run.cursed ? `<span class="dc-bad">${icon('skull')} Maudite</span>` : 'La Descente'}</span><h1>Étage ${run.floor}</h1></div><div class="dc-loot"><span>${icon('crystal')}${fmt(run.shards)}</span>${run.chests.length ? `<span>${icon('p:chest')}${run.chests.length}</span>` : ''}</div></header>
     ${teamStrip(run.team.map((m) => m.id), run)}
     <p class="dc-rule-line small">${picon('rule')} <b>${esc(g.rule(run.day).name)}</b> · ${esc(g.rule(run.day).desc)}</p>`;
   function doorsView(run) {
@@ -105,8 +106,10 @@ export default function descent(app, root) {
     const now = g.chestNow(run), next = run.free ? null : chestForDepth(run.floor + 1);
     const alive = run.team.some((m) => !m.fallen);
     root.innerHTML = `${runHead(run)}${extra}
-      <section class="panel dc-risk"><div><span class="small muted">Si tu remontes</span>${chestChip(now)}<span class="small muted">${icon('crystal')} ${fmt(run.shards)} éclats</span></div>
-        <div><span class="small muted">Étage ${run.floor + 1}${(run.floor + 1) % DESCENT.bossEvery === 0 ? ' · gardien' : ''}</span>${run.free ? '<span class="small">Descente libre</span>' : `<span class="small">${next !== chestForDepth(run.floor) ? `Coffre amélioré : ${esc(CHESTS[next].name)}` : 'Même coffre'}</span>`}<span class="small muted">Si l’équipe tombe : ${run.cursed ? 'tout est perdu' : 'coffre d’une qualité en dessous'}</span></div></section>
+      <section class="dc-risk2">
+        <div class="dr-up"><span class="dr-k">Si tu remontes</span>${now ? `<span class="dr-chest">${chestSVG(now)}</span><b style="color:${CHESTS[now].color}">${esc(CHESTS[now].name)}</b><span class="dr-sub">${esc(CHESTS[now].desc)}</span>` : '<span class="dr-sub">Pas de coffre (descente libre)</span>'}<span class="dr-shards">${icon('crystal')}<b>${fmt(run.shards)}</b> éclats</span></div>
+        <div class="dr-down"><span class="dr-k">Étage ${run.floor + 1}${(run.floor + 1) % DESCENT.bossEvery === 0 ? ' · gardien' : ''}</span><img class="dr-stair" alt="" src="assets/icons/stairs-down.webp">${run.free ? '<b>Descente libre</b>' : next !== chestForDepth(run.floor) ? `<b class="dc-good">Coffre amélioré</b><span class="dr-sub">${esc(CHESTS[next].name)}</span>` : '<b>Même coffre</b><span class="dr-sub">Il s’améliore aux étages 5, 10 et 15</span>'}<span class="dr-risk">${icon('skull')}${run.cursed ? 'Si l’équipe tombe : tout est perdu' : 'Si l’équipe tombe : coffre d’une qualité en dessous'}</span></div>
+      </section>
       <div class="dc-choice">${alive ? `<button class="dc-stair down" data-act="next">${picon('stairs-down')}<span><b>Descendre à l’étage ${run.floor + 1}</b><span class="small">${run.free ? 'Plus profond, plus dangereux' : next !== chestForDepth(run.floor) ? `Plus dangereux, mais ${esc(CHESTS[next].name.toLowerCase())} à la clé` : 'Plus profond, plus dangereux'}</span></span></button>` : ''}<button class="dc-stair up" data-act="leave">${picon('stairs-up')}<span><b>Remonter avec le coffre</b><span class="small">${run.free ? 'Fin de la descente libre' : 'Tu gardes le coffre et tes éclats'}</span></span></button></div>`;
   }
   // Fin de combat : la victoire et son butin, l'état de l'équipe, puis un seul choix (le bonus)
@@ -118,7 +121,7 @@ export default function descent(app, root) {
     const feats = w?.stats ? [w.stats.parries && `${w.stats.parries} parade${w.stats.parries > 1 ? 's' : ''}`, w.stats.breaks && `${w.stats.breaks} Brisure${w.stats.breaks > 1 ? 's' : ''}`, w.stats.crits && `${w.stats.crits} critique${w.stats.crits > 1 ? 's' : ''}`].filter(Boolean) : [];
     root.innerHTML = `<section class="vx ${w?.room || ''}">
       <div class="vx-hero">${crestHTML(true, run.floor, 'Étage', 'vx-crest')}<h1>Victoire</h1><span class="vx-k">${w?.room === 'boss' ? 'Gardien vaincu' : w?.room === 'elite' ? 'Élite vaincue' : `Étage ${run.floor} franchi`}</span>
-        ${w ? `<div class="vx-loot"><span class="vx-chip">${icon('crystal')}+${fmt(w.shards)}</span>${w.chest ? `<span class="vx-chip gold" style="--cc:${CHESTS[w.chest].color}">${icon('lock')}${esc(CHESTS[w.chest].name)}</span>` : ''}${feats.length ? `<span class="vx-chip feat">${icon('sparkle')}${feats.join(' · ')}</span>` : ''}</div>` : ''}
+        ${w ? `<div class="vx-loot"><span class="vx-chip">${icon('crystal')}+${fmt(w.shards)}</span>${w.chest ? `<span class="vx-chip gold" style="--cc:${CHESTS[w.chest].color}">${icon('p:chest')}${esc(CHESTS[w.chest].name)}</span>` : ''}${feats.length ? `<span class="vx-chip feat">${icon('sparkle')}${feats.join(' · ')}</span>` : ''}</div>` : ''}
         ${w?.recruit ? `<p class="vx-week">${icon('crown')} Le gardien vaincu, <b>${esc(cat.get(w.recruit).name)}</b>, rejoint ta collection !</p>` : ''}
         ${w?.weekly ? `<p class="vx-week">${icon('sparkle')} <b>${esc(cat.get(w.weekly).name)}</b> rejoint ta collection !</p>` : ''}
         ${w?.disc?.length ? `<div class="vx-disc"><span class="small muted">${picon('discover')}Nouvelles rencontres</span>${w.disc.slice(0, 5).map((id) => `<img alt="${esc(cat.get(id).name)}" title="${esc(cat.get(id).name)}" src="${artUrl(cat.get(id), { lite: true })}">`).join('')}</div>` : ''}
@@ -130,7 +133,8 @@ export default function descent(app, root) {
   }
   function altarView(run) {
     root.innerHTML = `${runHead(run)}<p class="dc-prompt">L’autel murmure. Choisis une bénédiction.</p>
-      <div class="dc-altar">${run.altar.map((k) => `<button class="dc-bl" data-act="bless" data-k="${k}"><span>${picon('rule')}</span><b>${esc(BLESSINGS[k].name)}</b><span class="small">${esc(BLESSINGS[k].desc)}</span></button>`).join('')}</div>
+      <div class="dc-altar">${run.altar.map((k) => `<button class="dc-bl ${ui.bless === k ? 'on' : ''}" data-act="blesspick" data-k="${k}" aria-pressed="${ui.bless === k}"><span>${picon('rule')}</span><b>${esc(BLESSINGS[k].name)}</b></button>`).join('')}</div>
+      ${run.altar.includes(ui.bless) ? `<div class="panel dc-bl-pick"><b>${esc(BLESSINGS[ui.bless].name)}</b><p>${esc(BLESSINGS[ui.bless].desc)}</p><button class="btn primary block" data-act="bless" data-k="${ui.bless}">Recevoir cette bénédiction</button></div>` : '<p class="small muted center dc-bl-hint">Touche une stèle pour lire sa bénédiction.</p>'}
       ${run.rewardsBak ? `<button class="btn ghost block" data-act="unaltar">${icon('back')}Revenir aux bonus</button>` : ''}`;
   }
   function battleView(run) {
@@ -200,7 +204,8 @@ export default function descent(app, root) {
       app.sfx.coin();
       clearedView(g.descent().run, el.dataset.r === 'rest' ? `<p class="dc-event">${icon('heart')} L’eau de la source soigne tes créatures.</p>` : el.dataset.r === 'treasure' ? `<p class="dc-event">${icon('crystal')} +${fmt(out.shards)} éclats</p>` : out.healed ? `<p class="dc-event">${icon('star')} L’autel est muet, mais sa lumière soigne ton équipe.</p>` : '');
     },
-    bless(el) { try { g.chooseBlessing(el.dataset.k); app.sfx.discover(); clearedView(g.descent().run, `<p class="dc-event">${icon('star')} ${esc(BLESSINGS[el.dataset.k].name)} : ${esc(BLESSINGS[el.dataset.k].desc)}</p>`); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
+    blesspick(el) { ui.bless = el.dataset.k; app.sfx.tap(); altarView(g.descent().run); },
+    bless(el) { ui.bless = null;  try { g.chooseBlessing(el.dataset.k); app.sfx.discover(); clearedView(g.descent().run, `<p class="dc-event">${icon('p:rule')} ${esc(BLESSINGS[el.dataset.k].name)} : ${esc(BLESSINGS[el.dataset.k].desc)}</p>`); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     unaltar() { try { g.cancelAltar(); app.sfx.tap(); render(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     next() { try { g.nextFloor(); app.sfx.swipe(); render(); window.scrollTo(0, 0); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     async leave() {

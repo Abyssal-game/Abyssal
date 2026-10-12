@@ -876,7 +876,7 @@ img.emblem { object-fit: contain; }
 .crest { position: relative; margin: 0 auto; aspect-ratio: 952 / 576; background: url(../assets/ui/crest-victory.webp) center / contain no-repeat; container-type: inline-size; }
 .crest.lost { aspect-ratio: 909 / 560; background-image: url(../assets/ui/crest-defeat.webp); }
 .crest > span { position: absolute; left: 52.7%; top: 56%; width: 36%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; text-align: center; line-height: 1; }
-.crest.lost > span { left: 46.8%; top: 47%; width: 30%; }
+.crest.lost > span { left: 45%; top: 42%; width: 30%; }
 .crest b { font: 900 17cqw/1 var(--f-display); color: #FFE9B0; text-shadow: 0 2px 0 #3a2508, 0 0 12px rgba(255, 200, 90, .55); }
 .crest.lost b { color: #E9D6D2; text-shadow: 0 2px 0 #1a0606, 0 0 12px rgba(255, 70, 50, .5); }
 .crest small { margin-top: 1cqw; font: 700 4.4cqw/1 var(--f-ui); letter-spacing: .14em; text-transform: uppercase; color: #E7D8B4; }
@@ -920,3 +920,157 @@ img.ic.ic-cur { object-fit: contain; transform: scale(1.18); filter: drop-shadow
 .v2-slots.res .v2-slot:not(.full) { background-image: url(../assets/ui/slot-silver.webp); color: #A9D4F2; text-shadow: 0 0 10px rgba(120, 190, 255, .8); }
 .v2-slot:not(.full) > span { font-size: 2.2rem; }
 .v2-slot:not(.full) small { font: 700 .66rem/1 var(--f-ui); letter-spacing: .12em; text-transform: uppercase; }
+
+/* ===== Retours iPhone (1) : vraie hauteur d'écran, fenêtres centrées ou plein écran ===== */
+.sheet-wrap, .opening, .coach, .boot { bottom: auto !important; height: var(--app-h, 100dvh) !important; }
+#tabbar { bottom: auto !important; top: calc(var(--app-h, 100dvh) - var(--tab-h) - var(--safe-b)); }
+.online-pill { bottom: auto !important; top: calc(var(--app-h, 100dvh) - var(--tab-h) - var(--safe-b) - 48px); }
+#view { min-height: var(--app-h, 100vh); }
+body.battle-mode .dv { height: calc(var(--app-h, 100dvh) - var(--safe-t) - var(--safe-b) - 14px) !important; }
+body.battle-mode .tb { height: calc(var(--app-h, 100dvh) - var(--safe-t) - var(--safe-b) - 14px) !important; }
+/* Les petites fenêtres s'ouvrent au milieu de l'écran, en carte */
+.sheet-wrap { align-items: center !important; padding: calc(var(--safe-t) + 12px) 12px calc(var(--safe-b) + 12px); }
+.sheet-wrap .sheet { max-height: 100%; border-radius: 22px; border-bottom: 1px solid var(--line); padding-bottom: 22px; transform: translateY(26px) scale(.97); opacity: 0; transition: transform .28s cubic-bezier(.2, .9, .3, 1.1), opacity .2s; box-shadow: 0 20px 60px rgba(0, 0, 0, .75), 0 0 0 1px rgba(232, 195, 90, .12); }
+.sheet-wrap.in .sheet { transform: none; opacity: 1; }
+/* Les grandes fenêtres prennent tout l'écran, du haut jusqu'en bas */
+.sheet-wrap.sheet-full { padding: 0; }
+.sheet-wrap.sheet-full .sheet { width: 100%; max-width: none !important; height: 100% !important; max-height: 100%; border-radius: 0; border: 0; padding: calc(var(--safe-t) + 14px) var(--gutter) calc(var(--safe-b) + 20px); }
+.sheet-wrap.sheet-full .sheet-close { margin-top: 0; }
+@media (prefers-reduced-motion: reduce) { .sheet-wrap .sheet { transition: opacity .15s; transform: none; } }
+/* En-tête net : fond plein jusqu'au bord, fin liseré doré (plus de fondu qui laisse voir la page à travers) */
+#topbar { background: linear-gradient(180deg, #06070B, #0B0C12) !important; border-bottom: 1px solid rgba(232, 195, 90, .2); box-shadow: 0 8px 18px rgba(0, 0, 0, .55); }
+/* Pierres de rareté peintes partout (garanties, emplacements vides de la collection) */
+.rgem { background: center / contain no-repeat !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; color: #fff !important; text-shadow: 0 0 2px #000, 0 1px 2px #000, 0 0 6px rgba(0, 0, 0, .9); font-weight: 900; letter-spacing: -.02em; }
+.pt-gem.rgem { width: 40px; height: 40px; min-width: 40px; font-size: .78rem; }
+.rgem[data-r="C"] { background-image: url(../assets/ui/rar-C.webp) !important; }
+.rgem[data-r="PC"] { background-image: url(../assets/ui/rar-PC.webp) !important; }
+.rgem[data-r="R"] { background-image: url(../assets/ui/rar-R.webp) !important; }
+.rgem[data-r="HR"] { background-image: url(../assets/ui/rar-HR.webp) !important; filter: drop-shadow(0 0 6px rgba(170, 90, 255, .55)); }
+.rgem[data-r="M"] { background-image: url(../assets/ui/rar-M.webp) !important; filter: drop-shadow(0 0 6px rgba(255, 170, 50, .6)); }
+.rgem[data-r="S"] { background-image: url(../assets/ui/rar-S.webp) !important; filter: drop-shadow(0 0 6px rgba(160, 220, 255, .6)); }
+.op-rewards li > .picon { display: inline-block; width: 26px; height: 26px; flex: none; }
+/* Fiche d'une carte scellée : tout tient sur l'écran, sans défiler */
+.detail.is-sealed { display: flex; flex-direction: column; gap: 10px; }
+.detail.is-sealed .detail-card { width: min(100%, 300px, calc((var(--app-h, 100dvh) - var(--safe-t) - var(--safe-b) - 330px) * .714)); margin: 0 auto; }
+.detail.is-sealed .detail-info { display: flex; flex-direction: column; gap: 10px; }
+.dt-sealed { padding: 12px 14px !important; display: flex; flex-direction: column; gap: 6px; }
+.dt-sealed .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0; }
+.dt-sealed p { margin: 0; }
+.detail.is-sealed [data-act="craft"] small { opacity: .75; font: 600 .72rem/1 var(--f-ui); text-transform: none; letter-spacing: 0; margin-left: 4px; }
+/* Rituel d'élévation : page soignée */
+.ri-hub-head { position: relative; text-align: center; padding: 6px 4px 14px; margin-bottom: 4px; border-bottom: 1px solid rgba(232, 195, 90, .25); }
+.ri-hub-emb { display: block; width: 84px; height: 84px; margin: 0 auto 2px; object-fit: contain; filter: drop-shadow(0 0 18px rgba(255, 120, 200, .35)); }
+.ri-hub-head h2 { display: block !important; margin: 0 0 6px !important; font: 900 1.55rem/1.1 var(--f-display); letter-spacing: .04em; background: linear-gradient(180deg, #FFF6DA, #E8C987 55%, #9A7434); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.ri-hub-sub { margin: 0 auto 10px; max-width: 34em; font-size: .86rem; line-height: 1.4; color: var(--mute); }
+.ri-hub-sub b { color: var(--ink); }
+.ri-hub-ash { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 18px; border-radius: 14px; background: rgba(0, 0, 0, .35); border: 1px solid rgba(232, 195, 90, .3); }
+.ri-hub-ash > span { display: inline-flex; align-items: center; gap: 6px; font: 600 .9rem/1 var(--f-ui); color: var(--mute); }
+.ri-hub-ash > span b { font: 900 1.2rem/1 var(--f-display); color: var(--gold-hi); }
+.ri-hub-ash .ic { width: 24px; height: 24px; }
+.ri-hub-ash small { font-size: .72rem; color: var(--mute); }
+.ri-hub-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 10px !important; margin-top: 14px !important; }
+.ri-hub-c { opacity: .75 !important; padding: 8px 6px 10px !important; background: linear-gradient(180deg, rgba(30, 24, 44, .9), rgba(12, 10, 18, .95)) !important; }
+.ri-hub-c.ok { opacity: 1 !important; }
+.ri-hub-art { display: block; width: 100%; aspect-ratio: 5 / 7; border-radius: 10px; overflow: hidden; border: 1px solid color-mix(in srgb, var(--rc) 60%, transparent); }
+.ri-hub-art img { width: 100% !important; height: 100% !important; object-fit: cover; border-radius: 0 !important; display: block; }
+.ri-hub-c b { font: 700 .76rem/1.15 var(--f-display) !important; margin-top: 2px; }
+.ri-hub-step { font: 600 .7rem/1 var(--f-ui); color: var(--mute); }
+.ri-hub-step i { font-style: normal; color: var(--gold); }
+.ri-hub-step em { font-style: normal; font-weight: 800; color: #E7D8FF; }
+.ri-hub-cost .ic { width: 16px !important; height: 16px !important; }
+.ri-hub-foot { margin-top: 14px; }
+/* Récapitulatif de booster : tout sur un écran, boutons fixés en bas */
+.opening.is-summary .op-stage { overflow: hidden; padding-bottom: calc(var(--safe-b) + 84px); justify-content: flex-start; }
+.op-summary { display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; }
+.op-sum-title { margin: 0; display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; font: 900 1.3rem/1.1 var(--f-display) !important; letter-spacing: .06em; text-transform: uppercase; }
+.op-sum-title span { background: linear-gradient(180deg, #FFF6DA, #E8C987 55%, #9A7434); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .9)); }
+.op-sum-title::before, .op-sum-title::after { content: ''; flex: 1; max-width: 60px; height: 2px; background: linear-gradient(90deg, transparent, var(--gold)); }
+.op-sum-title::after { transform: scaleX(-1); }
+.opening.is-summary .op-grid { width: min(100%, calc((var(--app-h, 100dvh) - var(--safe-t) - var(--safe-b) - 400px) * 1.5)); margin: 0 auto !important; gap: 6px 6px !important; }
+.opening.is-summary .op-tag { font-size: .66rem; }
+.op-loot { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.op-loot span { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 99px; background: rgba(10, 8, 18, .8); border: 1px solid rgba(232, 195, 90, .35); }
+.op-loot .ic, .op-loot .picon { width: 22px; height: 22px; display: inline-block; }
+.op-loot b { font: 900 1rem/1 var(--f-display); color: var(--gold-hi); }
+.op-loot small { font-size: .72rem; color: var(--mute); }
+.op-summary .pity-box { width: 100%; max-width: 460px; margin: 0 !important; padding: 8px 10px !important; gap: 6px !important; }
+.op-summary .pt-gem.rgem { width: 32px; height: 32px; min-width: 32px; font-size: .66rem; }
+.op-sum-hint { margin: 0; }
+.op-actions-fixed { position: absolute !important; z-index: 5 !important; left: 0; right: 0; bottom: 0; margin: 0 !important; padding: 18px var(--gutter) calc(var(--safe-b) + 14px) !important; background: linear-gradient(180deg, transparent, rgba(6, 5, 10, .95) 35%) !important; }
+.opening:not(.is-summary) .op-actions-fixed { display: none; }
+/* Classement du jour et « Comment ça marche » : un seul bandeau, sans case dans la case */
+.dc-fold.bn-ranking, .dc-fold.dc-how { padding: 0 !important; overflow: hidden; }
+.dc-fold.bn-ranking > summary { border-radius: 0 !important; min-height: 72px; padding: 14px 18px !important; margin: 0 !important; }
+.dc-fold.bn-ranking > .lb-body { padding: 12px 16px 14px; }
+.dc-fold.dc-how > summary { min-height: 64px; padding: 10px 18px !important; background: linear-gradient(90deg, rgba(40, 30, 14, .55), rgba(10, 11, 16, 0) 70%); }
+.dc-fold.dc-how[open] > summary { border-bottom: 1px solid rgba(232, 195, 90, .2); margin-bottom: 10px; }
+.dc-fold.dc-how > :not(summary) { margin-left: 4px; margin-right: 4px; }
+.dc-fold.dc-how > p { padding: 0 14px 12px; }
+.dc-sum-ic { width: 40px !important; height: 40px !important; display: inline-block !important; flex: none; }
+.dc-sum-t { font: 700 1.05rem/1.2 var(--f-display); letter-spacing: .04em; color: #F3E7C8; text-shadow: 0 1px 3px #000; }
+/* Badge d'intention : l'icône est posée dans une pastille, le nom ne déborde plus */
+.cb-int { max-width: calc(100% + 6px); gap: 4px !important; padding: 3px 8px 3px 3px !important; }
+.cb-int .iicon { width: 22px !important; height: 22px !important; margin: 0 !important; flex: none; border-radius: 50%; background: radial-gradient(circle, rgba(255, 255, 255, .22), rgba(0, 0, 0, .45) 70%); padding: 1px; }
+.cb-int b { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: .64rem; letter-spacing: 0; }
+.crest > span { top: 54% !important; left: 52.5% !important; width: 30% !important; }
+.crest.lost > span { left: 45% !important; top: 40% !important; }
+.crest b { font-size: 15cqw; }
+.crest small { font-size: 3.6cqw; margin-top: .5cqw; }
+/* « Étage N franchi » sur une petite plaque de pierre gravée */
+.vx-hero .vx-k { display: inline-flex !important; align-items: center; justify-content: center; min-height: 34px; margin: 0 auto 12px !important; padding: 2px 34px 0; border-style: solid; border-width: 1px; border-color: transparent; border-image: url(../assets/ui/plate-title.webp) 0 150 fill / 0 26px stretch; font: 700 .8rem/1 var(--f-display) !important; letter-spacing: .12em !important; color: #F3E3B8 !important; text-shadow: 0 1px 2px #000; }
+/* Autel : les trois stèles côte à côte, le texte centré dans le marbre ; l'effet s'affiche dessous */
+.dc-altar:has(.dc-bl) { display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 8px; overflow: visible; padding: 4px 0 8px; margin: 0; }
+.dc-altar .dc-bl { flex: none !important; width: 100%; aspect-ratio: 420 / 626; padding: 34% 27% 0 21% !important; justify-content: flex-start; gap: 6px; transition: transform .15s, filter .15s; }
+.dc-altar .dc-bl > span:first-child .picon { width: 30px !important; height: 30px !important; }
+.dc-altar .dc-bl b { font: 800 .74rem/1.15 var(--f-display) !important; letter-spacing: .01em; color: #3A2408 !important; overflow-wrap: anywhere; hyphens: auto; }
+.dc-altar .dc-bl.on { transform: translateY(-4px) scale(1.04); filter: drop-shadow(0 0 14px rgba(255, 215, 120, .85)) drop-shadow(0 6px 14px rgba(0, 0, 0, .6)); }
+.dc-altar:has(.dc-bl.on) .dc-bl:not(.on) { filter: brightness(.6) drop-shadow(0 6px 14px rgba(0, 0, 0, .6)); }
+.dc-bl-pick { text-align: center; padding: 14px !important; border-color: rgba(232, 195, 90, .45) !important; animation: dvIn .2s ease-out; }
+.dc-bl-pick b { font: 800 1.1rem/1.2 var(--f-display); color: var(--gold-hi); }
+.dc-bl-pick p { margin: 6px 0 12px; }
+.dc-bl-hint { margin: 4px 0 10px; }
+/* « Si tu remontes » : deux colonnes illustrées */
+.dc-risk2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.dc-risk2 > div { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; padding: 12px 10px 14px; border-radius: 16px; border: 1px solid rgba(232, 195, 90, .35); }
+.dr-up { background: radial-gradient(120% 80% at 50% 25%, rgba(242, 193, 78, .18), transparent 65%), linear-gradient(180deg, rgba(24, 18, 10, .95), rgba(10, 8, 12, .95)); }
+.dr-down { border-color: rgba(150, 90, 255, .45) !important; background: radial-gradient(120% 80% at 50% 25%, rgba(130, 70, 255, .2), transparent 65%), linear-gradient(180deg, rgba(18, 12, 30, .95), rgba(8, 6, 14, .95)); }
+.dr-k { font: 700 .66rem/1 var(--f-ui); letter-spacing: .14em; text-transform: uppercase; color: var(--mute); }
+.dr-chest { display: block; width: 74px; height: 64px; margin: 2px 0; }
+.dr-chest img, .dr-chest svg { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .7)); }
+.dr-stair { width: 64px; height: 64px; object-fit: contain; margin: 2px 0; }
+.dc-risk2 b { font: 800 .98rem/1.15 var(--f-display); }
+.dr-sub { font-size: .72rem; color: var(--mute); line-height: 1.25; }
+.dr-shards { display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; padding: 4px 10px; border-radius: 99px; background: rgba(0, 0, 0, .4); font-size: .76rem; color: var(--mute); }
+.dr-shards .ic { width: 18px; height: 18px; } .dr-shards b { font-size: .9rem; color: #9FD8FF; }
+.dr-risk { display: flex; align-items: center; gap: 5px; margin-top: 4px; font-size: .7rem; line-height: 1.25; color: #F0A8B4; text-align: left; }
+.dr-risk .ic { width: 20px; height: 20px; flex: none; }
+/* Boutons sur plaques peintes (boutique, booster, coffre) */
+.dc-plq .ic, .dc-plq img.ic { width: 22px; height: 22px; }
+.dc-plq.small, .op-all { min-height: 40px !important; padding: 0 22px !important; font-size: .74rem !important; border-image-width: 0 16px !important; }
+.op-actions-fixed .dc-plq { flex: 1 1 0; max-width: 260px; }
+.shop-buy { min-width: 200px; }
+.free-line { display: flex !important; align-items: center; gap: 10px; margin: 10px 0 0; padding: 8px 14px 8px 8px; border-radius: 14px; background: linear-gradient(90deg, rgba(60, 40, 12, .55), rgba(12, 10, 18, .6)); border: 1px solid rgba(232, 195, 90, .3); color: #F0E3C4; }
+.free-line > .ic, .free-line > img.ic { width: 34px !important; height: 34px !important; flex: none; color: var(--gold-hi); }
+.free-line span { display: flex; flex-direction: column; gap: 2px; font-size: .84rem; }
+.free-line b { color: var(--gold-hi); }
+.free-line small { font-size: .72rem; color: var(--mute); }
+/* Coffre : « N boosters ! » en grand titre doré */
+.chx-count { display: block; font: 900 1.6rem/1.1 var(--f-display); letter-spacing: .05em; text-transform: uppercase; background: linear-gradient(180deg, #FFF6DA, #E8C987 55%, #9A7434); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 2px 8px rgba(0, 0, 0, .9)); }
+.chx .op-top { padding-top: calc(var(--safe-t) + 10px); }
+.chx-actions { padding-bottom: calc(var(--safe-b) + 14px); }
+/* Message d'événement de la Descente (bénédiction reçue, source, trésor) */
+.dc-event { display: flex; align-items: center; justify-content: center; gap: 10px; text-align: left !important; padding: 12px 16px !important; border-radius: 16px !important; background: linear-gradient(90deg, rgba(70, 50, 14, .55), rgba(14, 12, 20, .9)) !important; border: 1px solid rgba(232, 195, 90, .45) !important; font-size: .9rem; color: #F3E7C8; }
+.dc-event .ic, .dc-event img.ic { width: 34px !important; height: 34px !important; flex: none; vertical-align: middle !important; }
+/* Icônes peintes dans les textes et boutons : taille lisible */
+img.ic.ic-cur { display: inline-block; vertical-align: -0.3em; }
+.v2-skill b img.ic, .panel b > img.ic { width: 24px; height: 24px; }
+.vx-chip { padding: 5px 12px 5px 6px !important; gap: 6px !important; }
+.vx-chip .ic, .vx-chip img.ic { width: 24px !important; height: 24px !important; }
+.dc-altar .dc-bl { padding-left: 19% !important; padding-right: 25% !important; container-type: inline-size; }
+.dc-altar .dc-bl b { overflow-wrap: normal !important; word-break: normal !important; hyphens: none !important; font-size: min(.74rem, 11cqw) !important; letter-spacing: 0 !important; }
+.dc-altar .dc-bl b { font-size: min(.74rem, 19cqw) !important; }
+@media (max-width: 380px) { .dc-plq { font-size: .78rem !important; padding: 0 26px !important; letter-spacing: .01em; } .op-actions-fixed .dc-plq { min-height: 48px; } }
+@media (max-height: 700px) { .op-summary .pity-box, .op-sum-hint { display: none; } .opening.is-summary .op-grid { width: min(100%, calc((var(--app-h, 100dvh) - var(--safe-t) - var(--safe-b) - 300px) * 1.5)); } }
+.op-actions-fixed { flex-wrap: nowrap !important; }
+.op-actions-fixed .dc-plq { flex: 1 1 0 !important; min-width: 0; white-space: nowrap; padding: 0 18px !important; }
+.op-actions-fixed .op-btn-close { flex: 0 1 34% !important; }

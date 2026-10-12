@@ -66,8 +66,8 @@ export function openChestScene(app, type, { onDone } = {}) {
       await wait(520);
     }
     const n = packs.length, prem = packs.filter((k) => k === 'premium').length;
-    msg.innerHTML = `<b>${n} booster${n > 1 ? 's' : ''}${prem ? ` dont ${prem === n ? (n > 1 ? 'tous premium' : 'premium') : `${prem} premium`}` : ''} !</b>`;
-    acts.innerHTML = `<button class="btn gold block big-cta" data-x="go">${icon('booster')}Ouvrir ${n > 1 ? 'les boosters' : 'le booster'}</button><button class="btn ghost block" data-x="later">Plus tard (dans Boosters)</button>`;
+    msg.innerHTML = `<b class="chx-count">${n} booster${n > 1 ? 's' : ''}${prem ? ` dont ${prem === n ? (n > 1 ? 'tous premium' : 'premium') : `${prem} premium`}` : ''} !</b>`;
+    acts.innerHTML = `<button class="btn primary block big-cta dc-plq dc-plq-red" data-x="go">${icon('p:booster')}Ouvrir ${n > 1 ? 'les boosters' : 'le booster'}</button><button class="btn block dc-plq dc-plq-dark" data-x="later">Plus tard (dans Boosters)</button>`;
     acts.hidden = false;
     busy = false;
   }

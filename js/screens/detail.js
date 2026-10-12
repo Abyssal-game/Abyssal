@@ -76,7 +76,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
           ${line ? `<h3 class="section-title">${esc(line.name)}</h3><div class="strip">${line.cards.map((c) => cardHTML(c, { mystery: !g.owns(c.id), nameKnown: g.nameKnown(c.id) })).join('')}</div><p class="small muted">Stade ${card.evolution.stage} sur ${card.evolution.stages}.</p>` : ''}
           ${sets.length ? `<h3 class="section-title">Ensembles</h3><div class="stack">${sets.map((s) => { const p = g.setProgress(s.key); return `<a class="set-link panel" href="#/succes/ensembles"><b>${esc(s.name)}</b><span class="small muted">${p.owned} / ${p.total}${p.done ? ' · complété' : ''}</span><span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span></a>`; }).join('')}</div>` : ''}`,
         rarity: `<p>${odds(card)}</p><p class="small muted">Chance de la trouver dans une version spéciale, par booster standard :</p><div class="var-odds">${variantOdds(card)}</div>
-          ${rit ? `<div class="panel ri-cta"><div><b>${icon('sparkle')} Rituel d’élévation</b><p class="small muted">Fais-la passer en ${esc(VARIANTS[g.ritualTarget(current, rit)].name.toLowerCase())} pour ${g.ritualCost(current, rit)} cendres. Réussite garantie.</p></div><button class="btn primary small" data-act="ritual">Élever</button></div>` : ''}`,
+          ${rit ? `<div class="panel ri-cta"><div><b>${icon('p:ritual')} Rituel d’élévation</b><p class="small muted">Fais-la passer en ${esc(VARIANTS[g.ritualTarget(current, rit)].name.toLowerCase())} pour ${g.ritualCost(current, rit)} cendres. Réussite garantie.</p></div><button class="btn primary small" data-act="ritual">Élever</button></div>` : ''}`,
       };
       body = `
         <div class="dt-sum">
@@ -97,25 +97,17 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     } else {
       const craft = ECONOMY.craftAsh[card.rarity];
       body = `
-        <div class="panel detail-facts">
+        <div class="panel detail-facts dt-sealed">
           <dl class="facts">
             <div><dt>Faction</dt><dd><span class="fac-dot" style="color:${fac.colors.secondary}">${sigil(card.faction)}</span>${esc(fac.name)}</dd></div>
             <div><dt>Rareté</dt><dd style="color:${r.color}">${r.name}</dd></div>
-            <div><dt>Nom</dt><dd>${known ? esc(card.name) : 'Inconnu'}</dd></div>
-            <div><dt>Collection</dt><dd>${card.id}</dd></div>
           </dl>
+          <p class="small">Page encore scellée : trouve la carte dans un booster${craft ? ' ou invoque-la avec des cendres' : ''}. ${odds(card)}</p>
+          <p class="small muted">Son nom se révèle quand tu possèdes la moitié de sa faction.</p>
         </div>
-        <p class="lore">Cette page du Bestiaire est encore scellée. Trouve la carte dans un booster${craft ? ', ou invoque-la avec des cendres' : ''}.</p>
-        <p class="small">${icon('swords')} Une fois obtenue, elle peut combattre dans ton équipe, et tes créatures lui font +1 dégât dans l’Abysse.</p>
-        <p class="small">${odds(card)}</p>
-        <p class="small muted">Les noms d’une faction se révèlent quand tu en possèdes la moitié. Tu peux aussi déchiffrer un nom pour ${ECONOMY.decipherAsh} cendres.</p>
-        <div class="row gap wrap">
-          ${craft ? `<button class="btn primary" data-act="craft" ${g.s.ash < craft ? 'disabled' : ''}>${icon('ash')}Invoquer · ${fmt(craft)} cendres</button>` : '<p class="small muted">Les cartes secrètes ne peuvent pas être invoquées : seul le hasard les révèle.</p>'}
-          ${known ? '' : `<button class="btn" data-act="decipher" ${g.s.ash < ECONOMY.decipherAsh ? 'disabled' : ''}>${icon('eye')}Déchiffrer le nom · ${ECONOMY.decipherAsh}</button>`}
-        </div>
-        <p class="small muted">Tu possèdes ${fmt(g.s.ash)} cendres. Les doublons obtenus dans les boosters en rapportent.</p>`;
+        ${craft ? `<button class="btn primary block" data-act="craft" ${g.s.ash < craft ? 'disabled' : ''}>${icon('ash')}Invoquer · ${fmt(craft)} cendres <small>(tu en as ${fmt(g.s.ash)})</small></button>` : '<p class="small muted center">Les cartes secrètes ne peuvent pas être invoquées : seul le hasard les révèle.</p>'}`;
     }
-    sheet.setContent(`<div class="detail">
+    sheet.setContent(`<div class="detail ${owned ? '' : 'is-sealed'}">
       ${nav}
       <div class="detail-card">${cardHTML(card, { size: 'full', variant: shownVariant, mystery: !owned, nameKnown: known })}</div>
       ${owned ? `<p class="tilt-hint small muted">${icon('refresh')} Fais glisser ton doigt sur la carte pour la faire pivoter.</p>` : ''}

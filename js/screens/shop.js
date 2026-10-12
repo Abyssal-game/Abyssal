@@ -17,7 +17,7 @@ export function waitText(ms) {
 export function payLabel(g, type, again = false) {
   const t = g.s.tickets[type] || 0;
   if (t > 0) return `${icon('ticket')}${again ? 'Encore un' : 'Ouvrir'} · ticket (${t})`;
-  if (type === 'standard') { const f = g.freePack(); if (f.stock > 0) return `${icon('sparkle')}${again ? 'Encore un' : 'Ouvrir'} · gratuit (${f.stock})`; }
+  if (type === 'standard') { const f = g.freePack(); if (f.stock > 0) return `${icon('p:booster')}${again ? 'Encore un' : 'Ouvrir'} · gratuit (${f.stock})`; }
   return `${again ? 'Encore un' : 'Acheter'} <span class="price">${icon('crystal')}${fmt(BOOSTERS[type].price)}</span>`;
 }
 
@@ -26,7 +26,7 @@ export function payLabel(g, type, again = false) {
 export function pityHTML(g) {
   const row = (r, n, max, label) => {
     const left = max - n;
-    return `<div class="pt-row"><span class="pt-gem" style="--rc:${RARITY[r].color}">${RARITY[r].short}</span><span class="pt-t"><b>${label}</b><small>${left <= 1 ? 'garantie au prochain booster !' : `garantie dans ${left} boosters au plus`}</small></span><span class="pt-bar"><i style="width:${Math.min(100, (n / (max - 1)) * 100)}%;--rc:${RARITY[r].color}"></i></span></div>`;
+    return `<div class="pt-row"><span class="pt-gem rgem" data-r="${r}" style="--rc:${RARITY[r].color}">${RARITY[r].short}</span><span class="pt-t"><b>${label}</b><small>${left <= 1 ? 'garantie au prochain booster !' : `garantie dans ${left} boosters au plus`}</small></span><span class="pt-bar"><i style="width:${Math.min(100, (n / (max - 1)) * 100)}%;--rc:${RARITY[r].color}"></i></span></div>`;
   };
   return `<div class="pity-box" aria-label="Garanties">${row('HR', g.s.pity.sinceHR, PITY.hr, 'Hyper rare')}${row('M', g.s.pity.sinceM, PITY.m, 'Mythique')}</div>`;
 }
@@ -70,8 +70,8 @@ export default function shop(app, root, params = []) {
 
   function freeLine() {
     const f = g.freePack();
-    if (!f.nextAt) return `<p class="small free-line">${icon('sparkle')} Boosters gratuits au maximum (${f.stock}). Ouvre-les !</p>`;
-    return `<p class="small free-line">${icon('hourglass')} Prochain booster gratuit dans ${waitText(f.nextAt - Date.now())} (${f.stock} en réserve).</p>`;
+    if (!f.nextAt) return `<p class="free-line full">${icon('p:booster')}<span><b>${f.stock} boosters gratuits</b><small>Réserve pleine : ouvre-les !</small></span></p>`;
+    return `<p class="free-line">${icon('hourglass')}<span>Prochain booster gratuit dans <b>${waitText(f.nextAt - Date.now())}</b><small>${f.stock ? `${f.stock} en réserve` : 'Aucun en réserve'}</small></span></p>`;
   }
 
   function render() {
@@ -97,7 +97,7 @@ export default function shop(app, root, params = []) {
           <p class="small muted">${esc(def.desc)}</p>
           ${extra}
           <div class="row gap wrap">
-            <button class="btn ${can ? 'primary' : ''}" data-act="buy" data-type="${type}" ${can ? '' : 'disabled'}>
+            <button class="btn ${can ? 'primary dc-plq dc-plq-red' : 'dc-plq dc-plq-dark'} shop-buy" data-act="buy" data-type="${type}" ${can ? '' : 'disabled'}>
               ${payLabel(g, type)}
             </button>
             <button class="btn ghost small" data-act="odds" data-type="${type}">${icon('info')}Probabilités</button>

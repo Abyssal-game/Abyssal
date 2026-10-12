@@ -4,7 +4,7 @@
 import { BOOSTERS, RARITY, VARIANTS } from '../config.js';
 import { cardHTML } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
-import { icon, EMBLEM, roleIcon } from '../ui/icons.js';
+import { icon, EMBLEM, roleIcon, picon } from '../ui/icons.js';
 import { esc, fmt, toast } from '../ui/dom.js';
 import { packHTML, payLabel, pityHTML } from './shop.js';
 import { roleOf, ROLES } from '../core/army.js';
@@ -39,7 +39,7 @@ export function openPack(app, type, { faction, onDone } = {}) {
   el.setAttribute('aria-modal', 'true');
   el.setAttribute('aria-label', `Ouverture : ${def.name}`);
   el.innerHTML = `<div class="op-bg"></div><div class="op-rays"></div>
-    <header class="op-top"><span class="op-title">${esc(def.name)}</span><button class="btn small ghost" data-op="all">${icon('skip')}Tout révéler</button></header>
+    <header class="op-top"><span class="op-title">${esc(def.name)}</span><button class="btn small dc-plq dc-plq-dark op-all" data-op="all">${icon('skip')}Tout révéler</button></header>
     <div class="op-stage" aria-live="polite"></div>
     <footer class="op-bottom"><div class="op-dots">${opening.cards.map(() => '<i></i>').join('')}</div><p class="op-hint small muted"></p></footer>`;
   document.body.appendChild(el);
@@ -348,22 +348,21 @@ export function openPack(app, type, { faction, onDone } = {}) {
     dots.forEach((d, i) => { d.style.background = RARITY[opening.cards[i].rarity].color; d.classList.add('on'); });
     const canAgain = g.canBuy(type);
     stage.innerHTML = `<div class="op-summary">
-      <h2>${newCount ? `${newCount} nouvelle${newCount > 1 ? 's' : ''} créature${newCount > 1 ? 's' : ''}` : 'Booster ouvert'}</h2>
+      <h2 class="op-sum-title"><span>${newCount ? `${newCount} nouvelle${newCount > 1 ? 's' : ''} créature${newCount > 1 ? 's' : ''}` : 'Booster ouvert'}</span></h2>
       ${opening.guaranteed ? `<p class="small guarantee">${icon('star')} Garantie appliquée : ${opening.guaranteed === 'm' ? 'Mythique ou mieux' : 'Hyper rare ou mieux'}.</p>` : ''}
       <div class="op-grid">${opening.cards.map((c, i) => `<div class="op-cell" style="--i:${i}">${cardHTML(cat.get(c.id), { variant: c.variant, isNew: c.isNewCard || c.isNewVariant, lazy: false })}<span class="op-tag">${c.isNewCard ? 'Nouvelle recrue' : c.levelUp ? `Niveau ${c.levelUp} !` : c.isNewVariant ? VARIANTS[c.variant].short : `+${c.ash} cendres`}</span></div>`).join('')}</div>
-      ${newCount || opening.cards.some((c) => c.levelUp) ? `<p class="small op-gain center">${icon('swords')} ${newCount ? `${newCount > 1 ? 'Les nouvelles créatures peuvent' : 'La nouvelle créature peut'} rejoindre ton équipe. ` : ''}Chaque doublon fait monter une créature de niveau.</p>` : ''}
-      ${pityHTML(g)}
-      <ul class="op-rewards">
-        ${r.shards ? `<li>${icon('crystal')}<span>Récompenses de découverte</span><b>+${fmt(r.shards)} éclats</b></li>` : ''}
-        ${r.ash ? `<li>${icon('ash')}<span>Doublons convertis</span><b>+${fmt(r.ash)} cendres</b></li>` : ''}
-        <li>${icon('sparkle')}<span>Expérience</span><b>+${fmt(r.xp)} XP</b></li>
-      </ul>
-      <p class="small muted center">Toutes ces cartes sont déjà dans ta collection. Touche une carte pour l’examiner.</p>
-      <div class="op-actions">
-        <button class="btn" data-op="close">Fermer</button>
-        ${canAgain ? `<button class="btn primary" data-op="again">${payLabel(g, type, true)}</button>` : ''}
+      <div class="op-loot">
+        ${r.shards ? `<span>${icon('crystal')}<b>+${fmt(r.shards)}</b><small>éclats</small></span>` : ''}
+        ${r.ash ? `<span>${icon('ash')}<b>+${fmt(r.ash)}</b><small>cendres</small></span>` : ''}
+        <span>${picon('xp')}<b>+${fmt(r.xp)}</b><small>XP</small></span>
       </div>
+      ${pityHTML(g)}
+      <p class="small muted center op-sum-hint">Touche une carte pour l’examiner.</p>
     </div>`;
+    el.insertAdjacentHTML('beforeend', `<div class="op-actions op-actions-fixed">
+        <button class="btn dc-plq dc-plq-dark op-btn-close" data-op="close">Fermer</button>
+        ${canAgain ? `<button class="btn primary dc-plq dc-plq-red op-btn-again" data-op="again">${payLabel(g, type, true)}</button>` : ''}
+      </div>`);
     hint.textContent = '';
     stage.querySelector('.op-grid').addEventListener('click', (e) => {
       const t = e.target.closest('.tcg');
