@@ -689,3 +689,9 @@ img.emblem { object-fit: contain; }
 .chx-pack { width: min(34vw, 18vh, 150px); }
 .chx-chest.open { width: min(56vw, 26vh, 280px); }
 @media (max-height: 620px) { .chx-stage { gap: 8px; } .chx-actions .btn { min-height: 44px; } .chx-msg { font-size: .9rem; } }
+/* Gardiens et élites : le nom passe au-dessus de la jauge de Brisure ; étiquettes sous l'intention */
+.dv-c.has-brk .dv-nm { bottom: 38px; }
+.dv-c.has-brk .cb-brk { bottom: 28px; }
+.dv-c.has-int .dv-boss { top: 20px; }
+.dv-c.has-int .dv-kw { top: 20px; }
+.dv-c.has-int.boss .dv-lv, .dv-c.has-int.elite .dv-lv { top: 42px; }
