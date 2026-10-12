@@ -1550,3 +1550,4 @@ body.sc-lost .sc-scene, body.sc-lost .sc-game { filter: grayscale(.85) brightnes
 .sc-dlg-por { flex: none; width: 64px; height: 64px; border-radius: 50%; padding: 2px; background: conic-gradient(#8C6A2E, #E8C987, #8C6A2E, #E8C987, #8C6A2E); box-shadow: 0 3px 8px rgba(0, 0, 0, .7); }
 .sc-dlg-por img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
 .sc-por img, .sc-med img, .sc-say img { object-position: 50% 35%; }
+.dc-fold.dc-how > p.sc-rl { margin: 0; padding-bottom: 6px; }

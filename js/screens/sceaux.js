@@ -2,12 +2,19 @@
 import * as SC from '../core/sceaux.js';
 import { STARTER } from '../core/army.js';
 import { artUrl } from '../art/assets.js';
-import { icon, sigil, crestHTML } from '../ui/icons.js';
+import { icon, sigil, picon, crestHTML } from '../ui/icons.js';
 import { openSheet, esc, fmt, toast } from '../ui/dom.js';
 import { setScene } from '../ui/scene.js';
 import { tuto } from '../ui/tutos.js';
 
 const V = SC.showVal;
+// « Comment ça marche » : même présentation que la Descente (icône, couleur, numéro)
+const HOW = [['cards', '#7FA8D8', 'Ta main', '5 cartes. Chacune a quatre valeurs, une par côté (de 1 à 10 ; 10 s’écrit A).'],
+  ['seal', '#E8C35A', 'Le plateau', 'À tour de rôle, chacun pose une carte sur une case libre du plateau de 3 × 3.'],
+  ['swords', '#E0485E', 'Capturer', 'Si ta valeur est plus grande que celle d’en face d’une carte adverse voisine, tu la captures. À égalité, rien ne se passe.'],
+  ['crown', '#F2C14E', 'La victoire', 'Après les 9 poses, on compte les cartes de chaque couleur, plus celle restée en main. 5 contre 5 : égalité.'],
+  ['rule', '#B48CFF', 'Règles spéciales', 'Certains adversaires jouent avec une règle en plus : cases sacrées, plateau instable ou fraternité.'],
+  ['hourglass', '#9FE0FF', 'Adversaires et défi', 'Bats chaque adversaire pour débloquer le suivant. Un défi du jour t’attend aussi.']];
 // Salle de chaque adversaire (assets/sceaux) : le plateau reste le même, le décor change
 const THEME = { initie: 'salle', collectionneur: 'salle-artificiel', stratege: 'salle-celeste', maitre: 'salle-necrotique', echo: 'salle-abyssal' };
 const themeOf = (r) => THEME[r] || 'salle';
@@ -38,7 +45,7 @@ export default function sceauxScreen(app, root) {
     const R = SC.RIVAL[d.rival];
     root.innerHTML = `<header class="screen-head ui-hero bn-sceaux"><h1>Duels des Sceaux</h1><p class="muted">Pose tes cartes sur le plateau et capture celles de l’adversaire.</p>
         <span class="sc-rec">${sc.wins} victoire${sc.wins > 1 ? 's' : ''} · ${sc.losses} défaite${sc.losses > 1 ? 's' : ''} · ${sc.draws} égalité${sc.draws > 1 ? 's' : ''}</span></header>
-      <div class="row gap wrap sc-top"><button class="btn small" data-sc="rules">${icon('p:help')}Règles</button><button class="btn small" data-sc="hand">${icon('p:cards')}Composer ma main</button></div>
+      <div class="row gap wrap sc-top"><button class="btn small" data-sc="hand">${icon('p:cards')}Composer ma main</button></div>
       <section class="panel sc-hand"><span class="small muted">Ta main</span><div class="sc-row">${hand.map((id) => scCard(cat, id, { owner: 'p' })).join('')}</div>
         ${hand.some((id) => !g.owns(id)) ? '<p class="small muted">Les cartes de départ qui te manquent sont prêtées pour la partie.</p>' : ''}</section>
       <button class="panel sc-daily ${dailyDone ? 'done' : ''}" data-sc="daily" ${dailyDone ? 'disabled' : ''}>
@@ -50,7 +57,11 @@ export default function sceauxScreen(app, root) {
         <span class="sc-ri"><b>${esc(r.name)}</b><span class="small">${esc(r.title)} · ${'★'.repeat(r.level)}${'☆'.repeat(4 - r.level)}</span>
         <span class="small muted">${open ? `Règle « ${esc(SC.RULES[r.rule].name)} » · +${r.reward} éclats${won ? '' : ` · 1re victoire +${SC.SCEAUX_REWARD.firstWin}`}` : `Bats ${esc(SC.RIVALS[i - 1].name)} pour l’affronter`}</span></span>
         ${won ? `<span class="sc-won">${icon('check')}</span>` : open ? icon('next') : icon('p:mysteries')}</button>`; }).join('')}</div>
-      <p class="small muted center">Récompenses : ${SC.SCEAUX_REWARD.dailyPaid} victoires payées par jour (${Math.max(0, SC.SCEAUX_REWARD.dailyPaid - (sc.day === todayKey() ? sc.paidToday : 0))} restantes aujourd’hui). Au-delà, tu peux jouer pour le plaisir.</p>`;
+      <p class="small muted center">Récompenses : ${SC.SCEAUX_REWARD.dailyPaid} victoires payées par jour (${Math.max(0, SC.SCEAUX_REWARD.dailyPaid - (sc.day === todayKey() ? sc.paidToday : 0))} restantes aujourd’hui). Au-delà, tu peux jouer pour le plaisir.</p>
+      <details class="panel dc-fold dc-how"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/help.webp"><span class="dc-sum-t">Comment ça marche</span></summary>
+        <ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol>
+        ${Object.values(SC.RULES).filter((r) => r.name !== 'Classique').map((r) => `<p class="small sc-rl"><b>${esc(r.name)}</b> : ${esc(r.desc)}</p>`).join('')}
+        <p class="small muted center">Toutes les cartes ont le même total de valeurs (20) : une Commune bien placée peut capturer une Mythique.</p></details>`;
     tuto(app, 'sceaux');
   }
   const todayKey = () => { const d = g.clock(), p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; };
