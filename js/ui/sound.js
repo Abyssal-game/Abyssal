@@ -90,5 +90,12 @@ export const sfx = {
   ult() { [262, 330, 392, 523, 659].forEach((f, i) => tone(f, { type: 'triangle', dur: 0.6, gain: 0.08, delay: i * 0.07 })); noise({ dur: 0.8, gain: 0.1, freq: 3000, sweep: 800, q: 0.5 }); },
   victory() { [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, { type: 'triangle', dur: 0.4, gain: 0.1, delay: i * 0.1 })); },
   defeat() { [392, 330, 262, 196].forEach((f, i) => tone(f, { type: 'sawtooth', dur: 0.45, gain: 0.07, delay: i * 0.16 })); },
+  // Combat tactique : dé, critique, échec, parade, Brisure, compétence
+  dice() { for (let i = 0; i < 6; i++) noise({ dur: 0.04, gain: 0.12, freq: 1800 + i * 200, q: 2, delay: i * 0.07 }); },
+  crit() { [784, 988, 1319, 1568].forEach((f, i) => tone(f, { type: 'triangle', dur: 0.35, gain: 0.09, delay: i * 0.06 })); },
+  fumble() { tone(220, { type: 'square', dur: 0.3, gain: 0.07, slide: -120 }); tone(110, { type: 'sawtooth', dur: 0.35, gain: 0.06, delay: 0.1, slide: -40 }); },
+  parry() { tone(1760, { type: 'square', dur: 0.08, gain: 0.07 }); tone(2640, { type: 'triangle', dur: 0.35, gain: 0.07, delay: 0.02 }); noise({ dur: 0.18, gain: 0.18, freq: 4200, q: 1.5 }); },
+  shatter() { noise({ dur: 0.6, gain: 0.3, freq: 3600, sweep: 900, q: 0.6 }); [1568, 1175, 880].forEach((f, i) => tone(f, { type: 'triangle', dur: 0.3, gain: 0.07, delay: i * 0.05 })); tone(60, { type: 'sawtooth', dur: 0.5, gain: 0.16, slide: -20 }); },
+  skill() { tone(440, { type: 'triangle', dur: 0.18, gain: 0.08, slide: 440 }); noise({ dur: 0.25, gain: 0.08, freq: 2000, sweep: 5000, q: 0.8 }); },
   summon() { tone(220, { type: 'triangle', dur: 0.4, gain: 0.12, slide: 220 }); },
 };

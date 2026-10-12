@@ -1,0 +1,165 @@
+// ABYSSAL : données du combat tactique (aucune logique d'affichage).
+// Chaque rôle a un kit réutilisable : attaque de base, compétence signature, passif.
+// Les 335 créatures héritent du kit de leur rôle ; rareté et niveau changent les chiffres.
+import { roleOf } from './army.js';
+
+// ——— Ressources du joueur ———————————————————————————————————————————
+export const AP_MAX = 3;          // points d'action d'équipe par tour
+export const FERVOR_MAX = 6;      // Ferveur : jauge commune, gardée d'un combat à l'autre
+export const FERVOR_START = 2;    // au début d'une expédition
+export const ACTS_PER_UNIT = 2;   // une créature agit au plus 2 fois par tour
+export const ULT_COST = { ap: 1, fervor: FERVOR_MAX }; // le pouvoir d'équipe vide la Ferveur
+
+// ——— Kits par rôle ——————————————————————————————————————————————————
+// kw : nom de la capacité (compatibilité) ; basic : attaque de base ; skill : compétence signature ;
+// passive : passif ou réaction. target : 'enemy' | 'ally' | 'none'. dice : jet de D20 (dc : difficulté).
+export const KITS = {
+  protecteur: {
+    kw: 'garde', name: 'Garde', icon: 'shield',
+    basic: { name: 'Coup de bouclier', desc: 'Dégâts normaux, +1 Brisure en plus.' },
+    skill: { key: 'rempart', name: 'Rempart', icon: 'shield', ap: 1, fervor: 1, target: 'ally', desc: 'Jusqu’à ton prochain tour, protège un allié : les coups qui le visent la frappent à sa place, et elle en prend 40 % de moins.' },
+    passive: { name: 'Riposte', desc: 'Les ennemis doivent la viser en premier (sauf les assassins). Après une parade parfaite, elle contre-attaque.' },
+  },
+  degats: {
+    kw: 'assaut', name: 'Assaut', icon: 'swords',
+    basic: { name: 'Frappe', desc: 'Dégâts normaux.' },
+    skill: { key: 'estoc', name: 'Coup d’estoc', icon: 'swords', ap: 2, fervor: 2, target: 'enemy', dice: { dc: 10 }, desc: 'Jet de D20. Réussite : dégâts ×2 et +3 Brisure. Critique : ×3 et +4 Brisure. Partielle : ×1,2. Échec critique : moitié des dégâts, et elle est exposée (+25 % de dégâts subis).' },
+    passive: { name: 'Exécution', desc: '+50 % de dégâts sur une cible brisée ou sous 30 % de ses PV. Contre-attaque après une parade parfaite.' },
+  },
+  soin: {
+    kw: 'soin', name: 'Soin', icon: 'heart',
+    basic: { name: 'Frappe', desc: 'Dégâts normaux.' },
+    skill: { key: 'priere', name: 'Prière', icon: 'heart', ap: 1, fervor: 2, target: 'ally', desc: 'Soigne un allié de 40 % de ses PV maximum et le libère du poison et du gel.' },
+    passive: { name: 'Souffle de vie', desc: 'À la fin de ton tour, soigne un peu l’allié le plus blessé.' },
+  },
+  poison: {
+    kw: 'venin', name: 'Venin', icon: 'skull',
+    basic: { name: 'Morsure', desc: 'Dégâts normaux et +2 poison. Traverse les boucliers.' },
+    skill: { key: 'contagion', name: 'Contagion', icon: 'skull', ap: 1, fervor: 2, target: 'enemy', dice: { dc: 9 }, desc: 'Jet de D20. Réussite : le poison de la cible double et se propage à ses voisins. Critique : à tous les ennemis. Partielle : double seulement sur la cible. Une cible saine reçoit d’abord 3 poison.' },
+    passive: { name: 'Givre-venin', desc: 'Sur une cible gelée, le poison appliqué est doublé.' },
+  },
+  controle: {
+    kw: 'gel', name: 'Gel', icon: 'eye',
+    basic: { name: 'Morsure du froid', desc: 'Dégâts normaux, +2 Brisure sur une cible gelée.' },
+    skill: { key: 'entrave', name: 'Entrave glaciale', icon: 'eye', ap: 1, fervor: 2, target: 'enemy', dice: { dc: 10 }, desc: 'Jet de D20. Réussite : la cible est gelée et perd sa prochaine action (sa charge est annulée). Critique : gelée et +3 Brisure. Partielle : ralentie, sa prochaine attaque fait moitié moins mal.' },
+    passive: { name: 'Bris de glace', desc: 'Tes coups sur une cible gelée font +2 Brisure.' },
+  },
+  soutien: {
+    kw: 'cri', name: 'Cri', icon: 'sparkle',
+    basic: { name: 'Frappe', desc: 'Dégâts normaux.' },
+    skill: { key: 'marque', name: 'Marque du chasseur', icon: 'sparkle', ap: 1, fervor: 1, target: 'enemy', desc: 'Marque un ennemi pendant 2 tours : +30 % de dégâts subis, +3 à tous tes jets de dés contre lui, et sa faiblesse est révélée.' },
+    passive: { name: 'Cri de guerre', desc: 'Au début de ton tour, tes créatures au combat gagnent +1 en attaque.' },
+  },
+  zone: {
+    kw: 'deferlante', name: 'Déferlante', icon: 'flame',
+    basic: { name: 'Vague', desc: 'Touche aussi les voisins de la cible (moitié des dégâts).' },
+    skill: { key: 'raz', name: 'Raz-de-marée', icon: 'flame', ap: 2, fervor: 3, target: 'none', desc: 'Frappe tous les ennemis au combat (70 % de son attaque) et +1 Brisure à chacun.' },
+    passive: { name: 'Marée montante', desc: 'Renforcée par un Cri, sa Vague frappe les voisins à pleine puissance.' },
+  },
+};
+export const kitOf = (card) => KITS[roleOf(card)];
+// Compatibilité : nom court de la capacité (Garde, Assaut…) affiché partout dans le jeu
+export const KEYWORDS = Object.fromEntries(Object.values(KITS).map((k) => [k.kw, { name: k.name, icon: k.icon, desc: `${k.passive.desc} Compétence : ${k.skill.name}.` }]));
+export const keywordOf = (card) => kitOf(card).kw;
+
+// Actions communes à toutes les créatures
+export const COMMON_ACTS = {
+  attack: { name: 'Attaque', icon: 'swords', ap: 1, fervor: 0, target: 'enemy', desc: 'Dégâts fiables. +1 Ferveur.' },
+  defend: { name: 'Défense', icon: 'shield', ap: 1, fervor: 0, target: 'none', desc: 'Jusqu’à ton prochain tour, elle subit 50 % de dégâts en moins.' },
+  swap:   { name: 'Permuter', icon: 'back', ap: 1, fervor: 0, target: 'reserve', desc: 'Une créature de la réserve prend sa place (une fois par tour). PV et états sont conservés.' },
+};
+
+// ——— Jets de dés (D20) ——————————————————————————————————————————————
+// 1 naturel : échec critique · total < DD : réussite partielle · total ≥ DD : réussite · 20 naturel : critique.
+export const DICE_TIERS = {
+  fumble:  { name: 'Échec critique', color: '#FF4D6A' },
+  partial: { name: 'Réussite partielle', color: '#F2A54E' },
+  success: { name: 'Réussite', color: '#7FE0A0' },
+  crit:    { name: 'Réussite critique', color: '#F2C14E' },
+};
+export function diceChance(dc, mod) {
+  let ok = 1; // le 20 naturel réussit toujours
+  for (let r = 2; r <= 19; r++) if (r + mod >= dc) ok++;
+  return Math.round((ok / 20) * 100);
+}
+
+// ——— Faiblesses : chaque faction craint une autre faction ——————————————
+// (affichées une fois découvertes : en l'exploitant, ou grâce à la Marque)
+export const WEAK_TO = {
+  sauvage: 'infernal',     // le feu dévore la forêt
+  infernal: 'abyssal',     // l'eau noire éteint les braises
+  abyssal: 'artificiel',   // la foudre des machines traverse les eaux
+  artificiel: 'primordial', // les forces premières rouillent le métal
+  primordial: 'sauvage',   // la vie dompte le chaos
+  celeste: 'necrotique',   // la mort ternit la lumière
+  necrotique: 'celeste',   // la lumière brûle les morts
+};
+export const WEAK_MULT = 1.5, RESIST_MULT = 0.75; // une créature résiste à sa propre faction
+
+// ——— Familles de comportement des ennemis ————————————————————————————
+export const AI_FAMILIES = {
+  predateur:  { name: 'Prédateur', desc: 'Attaque la créature la plus blessée.', counter: 'Soigne ou protège ta créature blessée, ou mets-la en réserve.' },
+  assassin:   { name: 'Assassin', desc: 'Ignore la Garde et vise la créature la plus fragile.', counter: 'Protège ta créature fragile avec un Rempart ou une Défense.' },
+  berserker:  { name: 'Berserker', desc: 'Frappe plus fort quand il perd des PV (+50 % sous la moitié).', counter: 'Achève-le d’un coup, ou gèle-le.' },
+  protecteur: { name: 'Protecteur', desc: 'Couvre d’un bouclier l’allié le plus menacé, sinon frappe.', counter: 'Le Venin traverse ses boucliers.' },
+  mage:       { name: 'Mage', desc: 'Concentre son énergie, puis frappe toute ton équipe.', counter: 'Gèle-le pendant sa concentration, ou prépare une parade.' },
+  parasite:   { name: 'Parasite', desc: 'Empoisonne ta créature la plus dangereuse.', counter: 'La Prière purge le poison.' },
+  controleur: { name: 'Contrôleur', desc: 'Gèle régulièrement ta créature la plus forte.', counter: 'Esquive son sort, ou garde un Soigneur pour la libérer.' },
+  soutien:    { name: 'Soutien', desc: 'Soigne ou renforce les autres ennemis.', counter: 'Abats-le en premier.' },
+  gardien:    { name: 'Gardien', desc: 'Prépare des attaques dévastatrices annoncées.', counter: 'Brise sa garde ou interromps sa charge.' },
+};
+export function aiFamily(card, { boss = false, uid = '' } = {}) {
+  if (boss) return 'gardien';
+  const r = roleOf(card);
+  if (r === 'degats') { let h = 0; for (const ch of card.id) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return ['predateur', 'assassin', 'berserker'][h % 3]; }
+  return { protecteur: 'protecteur', soin: 'soutien', poison: 'parasite', controle: 'controleur', soutien: 'soutien', zone: 'mage' }[r] || 'predateur';
+}
+
+// Intentions ennemies (annoncées au début de ton tour)
+// qte : déclenche la défense active ; danger : 1 à 3.
+export const INTENTS = {
+  hit:     { name: 'Attaque',        icon: 'swords',  desc: 'Frappe la cible annoncée.' },
+  heavy:   { name: 'Coup chargé',    icon: 'skull',   desc: 'Frappe la cible annoncée avec plus de deux fois sa force.' },
+  charge:  { name: 'Se charge',      icon: 'sparkle', desc: 'N’attaque pas ce tour-ci : coup chargé au tour suivant. Gèle-le ou brise-le pour l’interrompre.' },
+  channel: { name: 'Concentration',  icon: 'sparkle', desc: 'Prépare une attaque sur toute ton équipe pour le tour suivant.' },
+  blast:   { name: 'Déflagration',   icon: 'flame',   desc: 'Frappe toutes tes créatures au combat.' },
+  shield:  { name: 'Protection',     icon: 'shield',  desc: 'Donne un bouclier à un allié (bloque un coup).' },
+  heal:    { name: 'Soin',           icon: 'heart',   desc: 'Soigne l’ennemi le plus blessé.' },
+  rally:   { name: 'Renfort',        icon: 'sparkle', desc: 'Les autres ennemis gagnent +2 en attaque pour ce tour.' },
+  poison:  { name: 'Empoisonnement', icon: 'skull',   desc: 'Frappe et empoisonne la cible (+3 poison).' },
+  frost:   { name: 'Sort de gel',    icon: 'eye',     desc: 'Gèle la cible : elle ne pourra pas agir à ton prochain tour.' },
+};
+
+// Pouvoirs des gardiens. weak : la capacité qui les contre. Phase 2 sous 50 % des PV.
+export const BOSS_POWERS = {
+  carapace: { name: 'Carapace', desc: 'Un tour sur deux, se couvre d’un bouclier qui bloque un coup (à chaque tour en phase 2).', weak: 'venin', counter: 'Le Venin traverse sa carapace.' },
+  givre:    { name: 'Souffle de givre', desc: 'Un tour sur deux, gèle ta créature la plus forte (à chaque tour en phase 2).', weak: 'soin', counter: 'Tes Soigneurs dégèlent tes créatures, et la Prière aussi.' },
+  fureur:   { name: 'Fureur croissante', desc: 'Gagne +1 en attaque à chaque tour (+2 en phase 2).', weak: 'gel', counter: 'Gelé ou brisé, il ne gagne pas de fureur.' },
+  devoreur: { name: 'Dévoreur', desc: 'Récupère 15 % de ses PV à chaque tour (20 % en phase 2).', weak: 'assaut', counter: 'Un coup d’Assaut l’empêche de se soigner au tour suivant.' },
+};
+export const bossPowerOf = (floor) => ['carapace', 'givre', 'fureur', 'devoreur'][(Math.max(1, Math.floor(floor / 5)) - 1) % 4];
+
+// ——— Combinaisons (affichées dans les règles et les fiches) ————————————
+export const SYNERGIES = [
+  { roles: ['soutien', 'degats'], name: 'Chasse', desc: 'Marque puis Coup d’estoc : +3 au jet et +30 % de dégâts.' },
+  { roles: ['controle', 'degats'], name: 'Bris de glace', desc: 'Un Coup d’estoc sur une cible gelée : +3 au jet et +2 Brisure.' },
+  { roles: ['controle', 'poison'], name: 'Givre-venin', desc: 'Le poison appliqué sur une cible gelée est doublé.' },
+  { roles: ['poison', 'poison'], name: 'Épidémie', desc: 'Accumule le poison, puis Contagion pour le propager.' },
+  { roles: ['protecteur', 'soin'], name: 'Bastion', desc: 'Rempart sur l’allié menacé, puis Prière : il tient le choc.' },
+  { roles: ['soutien', 'zone'], name: 'Raz-de-marée', desc: 'Renforcée par un Cri, la Vague frappe les voisins à pleine puissance.' },
+  { roles: ['degats', null], name: 'Curée', desc: 'Une cible brisée subit +50 % de dégâts, et l’Assaut l’exécute (+50 % encore).' },
+  { roles: ['protecteur', null], name: 'Parade et riposte', desc: 'Parade parfaite : aucun dégât, +2 Ferveur, Brisure de l’attaquant, et contre-attaque des Gardes et des Assauts.' },
+];
+export const synergiesFor = (role) => SYNERGIES.filter((s) => s.roles.includes(role) || s.roles[1] === null);
+
+// ——— Bénédictions de combat (autel de la Descente) —————————————————————
+export const COMBAT_BLESSINGS = {
+  parade:  { name: 'Lame-miroir', desc: 'Chaque parade parfaite donne +1 Ferveur de plus et +1 Brisure.' },
+  brise:   { name: 'Marteau du Sceau', desc: 'Toutes tes attaques font +1 Brisure.' },
+  venin:   { name: 'Fiole noire', desc: 'Le poison que tu appliques est augmenté de 1, et Contagion gagne +3 au jet.' },
+  relais:  { name: 'Relais d’ombre', desc: 'Ta première permutation de chaque combat ne coûte aucune action.' },
+  curee:   { name: 'Curée', desc: 'Tes attaques de base font +50 % de dégâts aux ennemis brisés.' },
+  sursis:  { name: 'Sursis', desc: 'Une fois par combat, une créature qui devrait tomber survit à 1 PV avec un bouclier.' },
+  des:     { name: 'Faveur du destin', desc: '+2 à tous tes jets de dés.' },
+  ferveur: { name: 'Braise sacrée', desc: 'Chaque combat commence avec +1 Ferveur.' },
+};

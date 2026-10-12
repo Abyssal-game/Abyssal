@@ -33,6 +33,11 @@ export default function settings(app, root) {
         ${toggle('fastOpen', 'Ouverture rapide des boosters', 'Affiche directement le récapitulatif, sans révéler les cartes une par une.')}
       </section>
       <section class="panel stack">
+        <h2>Combat</h2>
+        ${seg('defense', 'Défense active (esquive et parade au bon moment)', [['on', 'Normale'], ['easy', 'Facile'], ['off', 'Désactivée']])}
+        <p class="small muted">Désactivée : plus de barre de timing pendant le tour ennemi ; tu te protèges avec la Défense, le Rempart et la Prière.</p>
+      </section>
+      <section class="panel stack">
         <h2>Sauvegarde</h2>
         <p class="small">Ta progression est enregistrée <b>uniquement sur cet appareil</b>, dans ce navigateur, après chaque action. Elle n’est synchronisée nulle part. Pour la conserver ou la transférer, exporte-la régulièrement.</p>
         ${app.persistent ? '' : '<p class="small err">Le stockage local est indisponible : la progression sera perdue à la fermeture.</p>'}

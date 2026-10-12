@@ -7,7 +7,8 @@ import { coach } from '../ui/coach.js';
 import { chestSVG } from '../ui/chest.js';
 import { CHESTS, CHEST_ORDER } from '../core/descent.js';
 import { ROLES, COST, BUDGET, TEAM, MAX_LEVEL, ULTS, roleOf, canUlt, ultOf } from '../core/army.js';
-import { KEYWORDS, keywordOf, duelUnit } from '../core/duel.js';
+import { duelUnit } from '../core/duel.js';
+import { kitOf, synergiesFor, KEYWORDS, keywordOf } from '../core/skills.js';
 import { openPack } from './opening.js';
 
 // Étiquettes posées sur une carte : capacité, niveau, coût, attaque et PV
@@ -19,13 +20,19 @@ export const armyCard = (g, c, opts = {}) => cardHTML(c, { ...opts, tag: armyBad
 
 // Bloc « Au combat » d'une carte : attaque, PV, capacité, pouvoir, niveau
 export function combatHTML(g, c) {
-  const owned = g.owns(c.id), kw = KEYWORDS[keywordOf(c)], role = ROLES[roleOf(c)];
+  const owned = g.owns(c.id), kit = kitOf(c), role = ROLES[roleOf(c)], syn = synergiesFor(roleOf(c));
   const li = g.cardLevelInfo(c.id), u = duelUnit(c, { level: li.level }), nx = li.level < MAX_LEVEL ? duelUnit(c, { level: li.level + 1 }) : null;
   const ult = canUlt(c) ? ULTS[ultOf(c)] : null;
   return `<div class="army-combat">
     <p class="small muted">${esc(role.name)} · coût d’équipe ${COST[c.rarity]}</p>
     <div class="v2-big-stats"><span class="dv-atk">${icon('swords')}<b>${u.atk}</b><small>Attaque</small></span><span class="dv-hp">${icon('heart')}<b>${u.maxHp}</b><small>PV</small></span></div>
-    <div class="panel v2-skill"><b>${icon(kw.icon)} ${esc(kw.name)}</b><p class="small">${esc(kw.desc)}</p></div>
+    <div class="panel v2-skill cb-kit">
+      <p class="small"><b>${icon('swords')} ${esc(kit.basic.name)}</b> <span class="cb-k">1 action</span><br>${esc(kit.basic.desc)} +1 Ferveur.</p>
+      <p class="small"><b class="gold">${icon(kit.skill.icon)} ${esc(kit.skill.name)}</b> <span class="cb-k">${kit.skill.ap} action${kit.skill.ap > 1 ? 's' : ''} · ${kit.skill.fervor} Ferveur${kit.skill.dice ? ' · D20' : ''}</span><br>${esc(kit.skill.desc)}</p>
+      <p class="small"><b>${icon(kit.icon)} ${esc(kit.passive.name)}</b> <span class="cb-k">passif</span><br>${esc(kit.passive.desc)}</p>
+      ${c.rarity === 'C' ? `<p class="small dc-good">${icon('star')} Instinct de meute : +1 dégât aux élites et aux gardiens.</p>` : ''}
+    </div>
+    ${syn.length ? `<div class="panel v2-skill"><b>${icon('sparkle')} Combinaisons</b>${syn.map((x) => `<p class="small"><b>${esc(x.name)}</b> : ${esc(x.desc)}</p>`).join('')}</div>` : ''}
     ${ult ? `<div class="panel v2-skill ult" style="--uc:${ult.color}"><b>${icon('sparkle')} Pouvoir : ${esc(ult.name)}</b><p class="small">${esc(ult.desc)}</p><p class="small muted">Dans l’équipe, la Mythique ou Secrète la plus rare remplace le Sceau du Gardien par son pouvoir.</p></div>` : ''}
     ${owned ? `<div class="v2-lvl"><b>Niveau ${li.level}</b><span class="xpbar"><i style="width:${li.need ? (li.into / li.need) * 100 : 100}%"></i></span><span class="small muted">${li.need ? `${li.into} / ${li.need} doublon${li.need > 1 ? 's' : ''} pour le niveau ${li.level + 1}${nx && (nx.atk > u.atk || nx.maxHp > u.maxHp) ? ` (${nx.atk > u.atk ? `+${nx.atk - u.atk} ATQ ` : ''}${nx.maxHp > u.maxHp ? `+${nx.maxHp - u.maxHp} PV` : ''})` : ''}` : 'Niveau maximum'}</span></div>` : ''}
   </div>`;

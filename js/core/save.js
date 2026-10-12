@@ -47,7 +47,7 @@ export function defaultSave(now = Date.now()) {
     descent: { day: null, used: 0, bestToday: 0, best: 0, runs: 0, run: null },
     history: [],          // dernières ouvertures
     recent: [],           // dernières découvertes (ids)
-    settings: { sound: true, volume: 0.7, motion: 'auto', quality: 'auto', fastOpen: false, textSize: 'normal', contrast: false, dev: false },
+    settings: { sound: true, volume: 0.7, motion: 'auto', quality: 'auto', fastOpen: false, defense: 'on', textSize: 'normal', contrast: false, dev: false },
     seenIntro: false,
   };
 }

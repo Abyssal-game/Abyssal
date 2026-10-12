@@ -1,6 +1,7 @@
 // La Descente : expédition quotidienne dans l'Abysse avec une équipe de cartes.
 // Données des étages : portes, créatures corrompues, coffres, bénédictions, règle du jour.
 import { RARITY_ORDER } from '../config.js';
+import { COMBAT_BLESSINGS } from './skills.js';
 
 export const DESCENT = {
   torches: 3,            // expéditions avec coffre par jour
@@ -13,6 +14,7 @@ export const BLESSINGS = {
   vigor:  { name: 'Vigueur', desc: '+20 % de PV maximum et soin complet.' },
   ward:   { name: 'Sceau protecteur', desc: 'Chaque créature commence chaque combat avec un bouclier.' },
   greed:  { name: 'Avidité', desc: '+30 % d’éclats pour le reste de l’expédition.' },
+  ...COMBAT_BLESSINGS, // bénédictions qui changent la façon de combattre
 };
 
 // Coffres : la profondeur atteinte décide du coffre ; il contient des boosters.
@@ -112,7 +114,7 @@ export function floorRewards(day, floor, room, owned = []) {
   while (out.length < 2 && keys.length) out.push(keys.splice(Math.floor(rng() * keys.length), 1)[0]);
   return out;
 }
-// Niveau des créatures corrompues (il rend l'esquive plus difficile)
+// Niveau des créatures corrompues (il rend la défense active plus difficile)
 export const enemyLevel = (floor, room) => Math.max(1, Math.round(1 + (floor - 1) * 0.55)) + (room === 'elite' ? 1 : room === 'boss' ? 2 : 0);
 
 // Ennemis d'un étage : plus nombreux, plus rares et plus forts en profondeur.
@@ -143,7 +145,7 @@ export const DAILY_RULES = {
   sommeil:  { name: 'Sommeil · {faction}', desc: 'Les créatures de la faction {faction} ont 25 % de PV en moins.', faction: true },
   sources:  { name: 'Sources bénies',      desc: 'Les sources sacrées soignent 80 % des PV au lieu de 40 %.' },
   ruee:     { name: 'Ruée vers les éclats', desc: 'Les éclats trouvés sont augmentés de 50 %.' },
-  lune:     { name: 'Nuit du pouvoir', desc: 'La jauge du pouvoir commence chaque expédition à moitié pleine.' },
+  lune:     { name: 'Nuit du pouvoir', desc: 'La Ferveur commence l’expédition à 4 au lieu de 2.' },
   chasse:   { name: 'Chasse aux élites',   desc: 'Chaque élite vaincue rapporte un coffre et deux fois plus d’éclats.' },
   instable: { name: 'Abysse instable',     desc: 'Tout le monde frappe 25 % plus fort : tes créatures comme les corrompues.' },
 };

@@ -4,7 +4,8 @@ import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_O
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
 import { DESCENT, CHESTS, floorDoors, floorEnemies, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, huntStage, HUNT_STAGES } from './descent.js';
-import { createDuel, autoDuel, duelUnit, GAUGE_MAX, bossPowerOf } from './duel.js';
+import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel } from './duel.js';
+import { FERVOR_START, FERVOR_MAX } from './skills.js';
 import { STARTER, COST, BUDGET, TEAM, ULTS, levelFromDups, canUlt, ultOf } from './army.js';
 
 const RI = (r) => RARITY_ORDER.indexOf(r);
@@ -422,6 +423,7 @@ export class Game {
     const d = this.s.descent;
     const day = today(this.clock());
     if (d.day !== day) { d.day = day; d.used = 0; d.bestToday = 0; }
+    if (d.run?.battle && d.run.battle.ver !== 2) upgradeDuel(d.run.battle); // combat en cours d'avant la refonte
     return d;
   }
   // Règle du jour (celle de l'expédition en cours si elle a commencé la veille)
@@ -443,7 +445,7 @@ export class Game {
     const ult = this.ultimate(team);
     d.run = {
       v: 3, day: d.day, floor: 1, cleared: 0, phase: 'doors', cursed: cursed && !free, free, blessings: [], altar: null,
-      gauge: this.rule(d.day).key === 'lune' ? Math.ceil(GAUGE_MAX / 2) : 0, ult: { key: ult.key, power: ult.power, card: ult.card },
+      gauge: this.rule(d.day).key === 'lune' ? FERVOR_MAX - 2 : FERVOR_START, ult: { key: ult.key, power: ult.power, card: ult.card },
       team: team.map((id) => { const u = duelUnit(this.catalog.get(id), { level: this.cardLevel(id) }); return { id, hp: u.maxHp, maxHp: u.maxHp, fallen: false }; }),
       shards: 0, chests: [], kills: {},
     };
@@ -486,7 +488,7 @@ export class Game {
       }
       const known = {};
       enemies.forEach((e) => { if (this.knows(e.id)) known[e.id] = true; });
-      run.battle = createDuel(this.runUnits(), enemies, { gauge: run.gauge, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, bossPower: room === 'boss' ? bossPowerOf(run.floor) : null });
+      run.battle = createDuel(this.runUnits(), enemies, { fervor: run.gauge || 0, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, bossPower: room === 'boss' ? bossPowerOf(run.floor) : null, blessings: run.blessings, discovered: this.s.weakSeen || {}, seed: this.rng ? Math.floor(this.rng() * 2 ** 31) : null });
       run.room = room; run.phase = 'battle'; out.battle = true;
     }
     if (run.phase === 'cleared') this.clearFloor();
@@ -538,7 +540,8 @@ export class Game {
       m.hp = Math.max(0, Math.min(m.maxHp, u.hp));
       if (m.hp <= 0) m.fallen = true;
     });
-    run.gauge = st.gauge || 0;
+    run.gauge = st.fervor ?? st.gauge ?? 0; // la Ferveur se garde d'un combat à l'autre
+    this.s.weakSeen = { ...(this.s.weakSeen || {}), ...(st.discovered || {}) };
     const discovered = [];
     for (const id of st.kills) {
       if (!this.s.hunt[id]) discovered.push(id);
