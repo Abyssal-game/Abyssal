@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v99';
+const VERSION = 'abyssal-v100';
 const CORE = [
   './', 'index.html', 'manifest.webmanifest',
   'css/base.css', 'css/card.css', 'css/screens.css', 'css/army.css',
@@ -19,7 +19,7 @@ const CORE = [
   'assets/art/manifest.json',
   ...['standard', 'premium', 'event', 'infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel'].map((k) => `assets/packs/${k}.webp`),
   'assets/backs/back.webp', 'assets/brand/emblem.webp', 'assets/brand/title.webp', 'assets/brand/loading.webp', 'assets/brand/seal-big.webp',
-  ...['bg-1', 'bg-2', 'bg-3', 'bg-4', 'bg-boss'].map((k) => `assets/battle/${k}.webp`),
+  ...['bg-1', 'bg-2', 'bg-3', 'bg-4', 'bg-boss', 'f-1', 'f-2', 'f-3', 'f-4', 'f-5', 'f-6', 'f-7', 'f-8', 'f-9', 'f-10', 'f-11', 'f-12'].map((k) => `assets/battle/${k}.webp`),
   ...['home', 'descent', 'shop', 'collection', 'team', 'chests', 'bestiary', 'trophies', 'profile', 'menu', 'factions', 'door-fight', 'door-elite', 'door-boss', 'rest', 'altar', 'treasure'].map((k) => `assets/scenes/${k}.webp`),
   ...['holo', 'gold-leaf', 'gold-frame', 'cosmic', 'cosmic-frame', 'seal-frame'].map((k) => `assets/variants/${k}.webp`),
   ...['tuto-1', 'tuto-2', 'tuto-3', 'tuto-4', 'tile-boosters', 'tile-adventure', 'today', 'bn-collection', 'bn-standard', 'bn-faction', 'bn-event', 'bn-premium', 'bn-rule', 'bn-expedition', 'bn-ranking', 'open-bg', 'open-epic', 'chest-bg', 'bn-victory', 'bn-defeat', 'bn-trophies', 'bn-bestiary', 'bn-settings', 'bn-profile', 'bn-weekly', 'bn-streak', 'bn-cursed', 'btn-red', 'btn-dark', 'bless-frame', 'plate-title', 'ribbon', 'crest-victory', 'crest-defeat', 'bn-level', 'bn-achieve', 'rar-C', 'rar-PC', 'rar-R', 'rar-HR', 'rar-M', 'rar-S', 'slot-gold', 'slot-silver'].map((k) => `assets/ui/${k}.webp`),
