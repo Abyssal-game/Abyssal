@@ -54,7 +54,7 @@ export default function home(app, root) {
 
     ${todayHTML()}
     <p class="home-col small muted center"><a href="#/collection">${owned} / ${total} créatures découvertes</a></p>
-    <div class="online-pill" role="status" aria-live="polite"><span class="on-dot"></span><span class="on-t">Connexion…</span></div>
+    <div class="online-pill" role="status" aria-live="polite"><img class="on-ic" alt="" src="assets/icons/online.webp"><span class="on-dot"></span><span class="on-t">Connexion…</span></div>
   `;
   // Joueurs connectés en ce moment (mis à jour en direct)
   const pill = root.querySelector('.online-pill');

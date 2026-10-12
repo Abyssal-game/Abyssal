@@ -20,7 +20,7 @@ import { ULTS } from '../core/army.js';
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 // Décor selon la profondeur (salle du Gardien à part) et effets illustrés (fond noir fondu en mode « écran »)
 const bgOf = (run) => `assets/battle/bg-${run.room === 'boss' ? 'boss' : run.floor >= 15 ? 4 : run.floor >= 10 ? 3 : run.floor >= 5 ? 2 : 1}.webp`;
-const FX = ['slash', 'impact', 'dodge', 'heal', 'venom', 'frost', 'seal', 'death'];
+const FX = ['slash', 'impact', 'dodge', 'heal', 'venom', 'frost', 'seal', 'death', 'd20', 'd20-crit', 'd20-fumble'];
 const fxUrl = (n) => `assets/fx/${n}.webp`;
 const DANGER = ['', '!', '!!', '!!!'];
 
@@ -217,7 +217,7 @@ export function runDuel(app, root, { title, onEnd }) {
     const tier = DICE_TIERS[e.tier];
     const box = document.createElement('div');
     box.className = `cb-dice t-${e.tier}`;
-    box.innerHTML = `<div class="cb-d20"><svg viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,4 92,28 92,72 50,96 8,72 8,28" /><path d="M50 4 30 40h40zM30 40 8 72M70 40l22 32M30 40l20 40 20-40M50 80v16M50 80 8 72M50 80l42-8" /></svg><b>?</b></div>
+    box.innerHTML = `<div class="cb-d20"><img class="cb-die" alt="" src="assets/fx/d20.webp"><b>?</b></div>
       <p class="cb-dline"></p><p class="cb-dtier"></p>`;
     $('.dv').appendChild(box);
     const num = box.querySelector('b');
@@ -227,6 +227,7 @@ export function runDuel(app, root, { title, onEnd }) {
     const spin = T(650), t0 = performance.now();
     while (!skip && performance.now() - t0 < spin && alive_) { num.textContent = 1 + Math.floor(Math.random() * 20); await wait(55); }
     num.textContent = e.r;
+    if (e.tier === 'crit' || e.tier === 'fumble') box.querySelector('.cb-die').src = `assets/fx/d20-${e.tier === 'crit' ? 'crit' : 'fumble'}.webp`;
     box.classList.add('done');
     box.querySelector('.cb-dline').innerHTML = `${e.r}${e.mods.map(([n, v]) => ` <span>+${v} ${esc(n)}</span>`).join('')} = <b>${e.total}</b> · DD ${e.dc}`;
     box.querySelector('.cb-dtier').innerHTML = `<b style="color:${tier.color}">${tier.name}</b>`;

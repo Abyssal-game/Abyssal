@@ -695,3 +695,16 @@ img.emblem { object-fit: contain; }
 .dv-c.has-int .dv-boss { top: 20px; }
 .dv-c.has-int .dv-kw { top: 20px; }
 .dv-c.has-int.boss .dv-lv, .dv-c.has-int.elite .dv-lv { top: 42px; }
+/* Décor du coffre, dé illustré, icône des joueurs en ligne */
+.chx .chx-bg { background: linear-gradient(180deg, rgba(6, 5, 10, .1), rgba(6, 5, 10, .35)), url(../assets/ui/chest-bg.webp) center bottom / cover no-repeat, #08070C !important; }
+.chx-stage { justify-content: flex-end; padding-bottom: calc(9vh + env(safe-area-inset-bottom)); }
+.cb-d20 { width: 150px; height: 150px; }
+.cb-die { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 18px rgba(169, 112, 255, .55)); }
+.cb-d20 b { margin-top: 10px; font-size: 2.1rem; text-shadow: 0 2px 6px #000, 0 0 12px rgba(0, 0, 0, .8); }
+.cb-dice.t-crit .cb-die { filter: drop-shadow(0 0 30px #F2C14E); transform: scale(1.12); transition: transform .3s; }
+.cb-dice.t-fumble .cb-die { filter: drop-shadow(0 0 22px #FF4D6A); }
+.cb-dice.t-crit .cb-d20 b { color: #3A2400; text-shadow: 0 0 10px #fff; }
+.on-ic { width: 26px; height: 26px; margin: -4px 0 -4px -4px; filter: grayscale(1) brightness(.7); }
+.online-pill.live .on-ic { filter: drop-shadow(0 0 6px rgba(75, 224, 138, .7)); }
+.chx.opening.epic .chx-bg, .chx.opening .chx-bg { background: radial-gradient(circle at 50% 70%, color-mix(in srgb, var(--cc) 35%, transparent), transparent 50%), linear-gradient(180deg, rgba(6, 5, 10, .1), rgba(6, 5, 10, .35)), url(../assets/ui/chest-bg.webp) center bottom / cover no-repeat, #08070C !important; }
+.chx.opening.epic .op-rays { opacity: .14 !important; }

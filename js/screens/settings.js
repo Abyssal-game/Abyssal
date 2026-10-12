@@ -24,8 +24,7 @@ export default function settings(app, root) {
 
   const ui = (app.state.settings ||= { tab: 'jeu' });
   const TABS = [['jeu', 'Jeu', 'set-game', 'dodge'], ['tutos', 'Tutoriels', 'set-tutos', 'book'], ['save', 'Sauvegarde', 'set-save', 'seal'], ['about', 'À propos', 'set-about', 'crown']];
-  // icônes peintes (en attendant les icônes dédiées set-game, set-tutos, set-save, set-about)
-  const tabIcon = (k, fb) => `<img class="picon" alt="" src="assets/icons/${fb}.webp">`;
+  const tabIcon = (k) => `<img class="picon" alt="" src="assets/icons/${k}.webp">`;
 
   function tabJeu(s) {
     return `<section class="panel stack">
