@@ -2451,5 +2451,456 @@
   },
   "image": "assets/art/INF-054.webp",
   "artPrompt": "Lucifer, l’Étoile du Matin — L’ange originel dans sa gloire première : six ailes immaculées, auréole d’aube, visage encore sans ombre. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "INF-055",
+  "number": 55,
+  "name": "Béhémoth",
+  "title": "La bête que nul ne dompte",
+  "faction": "infernal",
+  "rarity": "HR",
+  "category": "Bête infernale",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 7,
+   "spd": 4,
+   "mag": 3,
+   "hp": 25,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "aegis"
+   }
+  ],
+  "visual": "Colosse à la peau de roche noire, cornes recourbées comme des arches, chaque pas fendant le sol de lave.",
+  "lore": "Le livre de Job dit que rien sur terre ne l’égale. Il broute les montagnes de cendre et attend le dernier festin.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "fish",
+   "whale": true,
+   "fins": true,
+   "scale": 1.2,
+   "scene": "cosmos"
+  },
+  "image": "assets/art/INF-055.webp",
+  "artPrompt": "Béhémoth — Colosse à la peau de roche noire, cornes recourbées comme des arches, chaque pas fendant le sol de lave. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "INF-056",
+  "number": 56,
+  "name": "Erlik Khan",
+  "title": "Seigneur du monde d’en bas",
+  "faction": "infernal",
+  "rarity": "R",
+  "category": "Démon",
+  "power": 6,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 3,
+   "spd": 5,
+   "mag": 8,
+   "hp": 11,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "curse",
+    "value": 2
+   }
+  ],
+  "visual": "Vieux roi aux sourcils de braise et à la barbe noire, vêtu de fourrures, tenant un sceptre surmonté d’un crâne de taureau.",
+  "lore": "Dans les steppes de Sibérie, il juge les morts et garde leurs âmes au fond de neuf rivières souterraines.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "wings": "tatter",
+   "body": "robe",
+   "halo": "spike",
+   "arms": "staff",
+   "scene": null
+  },
+  "image": "assets/art/INF-056.webp",
+  "artPrompt": "Erlik Khan — Vieux roi aux sourcils de braise et à la barbe noire, vêtu de fourrures, tenant un sceptre surmonté d’un crâne de taureau. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "INF-057",
+  "number": 57,
+  "name": "Balor",
+  "title": "L’Œil qui détruit",
+  "faction": "infernal",
+  "rarity": "R",
+  "category": "Démon",
+  "power": 6,
+  "role": "S",
+  "stats": {
+   "atk": 9,
+   "def": 2,
+   "spd": 7,
+   "mag": 3,
+   "hp": 11,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 2
+   }
+  ],
+  "visual": "Géant borgne dont l’unique paupière, soulevée par quatre serviteurs, libère un regard de feu qui calcine tout.",
+  "lore": "Le roi des Fomoires d’Irlande ne regarde jamais en face. Quand son œil s’ouvre, des armées entières tombent en poussière.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "wings": "feather",
+   "tail": true,
+   "legs": "goat",
+   "claws": true,
+   "arms": "up",
+   "scene": "temple"
+  },
+  "image": "assets/art/INF-057.webp",
+  "artPrompt": "Balor — Géant borgne dont l’unique paupière, soulevée par quatre serviteurs, libère un regard de feu qui calcine tout. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "INF-058",
+  "number": 58,
+  "name": "Camazotz",
+  "title": "Chauve-souris de la mort",
+  "faction": "infernal",
+  "rarity": "R",
+  "category": "Démon",
+  "power": 5,
+  "role": "M",
+  "stats": {
+   "atk": 4,
+   "def": 1,
+   "spd": 4,
+   "mag": 6,
+   "hp": 9,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "drain"
+   }
+  ],
+  "visual": "Chauve-souris géante à corps d’homme, ailes membraneuses déchirées, crocs et lame d’obsidienne, dans une grotte maya.",
+  "lore": "Dans le Popol Vuh, il arrache les têtes de ceux qui s’endorment dans la Maison des Chauves-souris.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "horns": "short",
+   "body": "cloak",
+   "arms": "staff",
+   "scene": null
+  },
+  "image": "assets/art/INF-058.webp",
+  "artPrompt": "Camazotz — Chauve-souris géante à corps d’homme, ailes membraneuses déchirées, crocs et lame d’obsidienne, dans une grotte maya. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "INF-059",
+  "number": 59,
+  "name": "Aqrabuamelu",
+  "title": "Homme-scorpion des montagnes",
+  "faction": "infernal",
+  "rarity": "PC",
+  "category": "Démon mésopotamien",
+  "power": 3,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 3,
+   "spd": 2,
+   "mag": 1,
+   "hp": 12,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Guerrier au torse humain sur un corps de scorpion géant, dard levé, gardant une porte dans la montagne.",
+  "lore": "Ils gardent la porte du soleil au mont Mashu. Leur regard, dit l’épopée de Gilgamesh, donne la mort.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "body": "armor",
+   "arms": "sword",
+   "scene": null
+  },
+  "image": "assets/art/INF-059.webp",
+  "artPrompt": "Aqrabuamelu — Guerrier au torse humain sur un corps de scorpion géant, dard levé, gardant une porte dans la montagne. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "INF-060",
+  "number": 60,
+  "name": "Empousa",
+  "title": "Aux jambes d’airain",
+  "faction": "infernal",
+  "rarity": "PC",
+  "category": "Démone",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 2,
+   "spd": 4,
+   "mag": 4,
+   "hp": 9,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   }
+  ],
+  "visual": "Démone gracieuse aux cheveux de flammes, une jambe de bronze et une jambe d’âne, sourire trop large.",
+  "lore": "Servante d’Hécate, elle séduit les voyageurs la nuit et boit leur sang avant l’aube.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "horns": "curl",
+   "wings": "bat",
+   "body": "gown",
+   "arms": "reach",
+   "hair": true,
+   "scene": null
+  },
+  "image": "assets/art/INF-060.webp",
+  "artPrompt": "Empousa — Démone gracieuse aux cheveux de flammes, une jambe de bronze et une jambe d’âne, sourire trop large. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "INF-061",
+  "number": 61,
+  "name": "Lamie",
+  "title": "Reine dévoreuse",
+  "faction": "infernal",
+  "rarity": "R",
+  "category": "Démone",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 6,
+   "def": 5,
+   "spd": 3,
+   "mag": 3,
+   "hp": 19,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   }
+  ],
+  "visual": "Femme au buste royal et au corps de serpent, couronne ternie, yeux qu’elle peut ôter et poser à côté d’elle.",
+  "lore": "Reine de Libye maudite par Héra, elle ne dort jamais : elle retire ses yeux pour oublier.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "crown",
+   "body": "bulky",
+   "arms": "down",
+   "core": true,
+   "scene": null
+  },
+  "image": "assets/art/INF-061.webp",
+  "artPrompt": "Lamie — Femme au buste royal et au corps de serpent, couronne ternie, yeux qu’elle peut ôter et poser à côté d’elle. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "INF-062",
+  "number": 62,
+  "name": "Taotie",
+  "title": "La faim sans fin",
+  "faction": "infernal",
+  "rarity": "R",
+  "category": "Bête infernale",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 3,
+   "spd": 6,
+   "mag": 2,
+   "hp": 15,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Masque de bête aux cornes recourbées et à la gueule immense, sans corps, flottant au-dessus de vases de bronze.",
+  "lore": "Il a dévoré son propre corps. Il ne reste que la tête, et la faim.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "horns": "long",
+   "body": "armor",
+   "wings": "tatter",
+   "arms": "sword",
+   "scene": null
+  },
+  "image": "assets/art/INF-062.webp",
+  "artPrompt": "Taotie — Masque de bête aux cornes recourbées et à la gueule immense, sans corps, flottant au-dessus de vases de bronze. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "INF-063",
+  "number": 63,
+  "name": "Ushi-oni",
+  "title": "Le démon-taureau des rivages",
+  "faction": "infernal",
+  "rarity": "PC",
+  "category": "Oni",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 4,
+   "def": 2,
+   "spd": 4,
+   "mag": 4,
+   "hp": 10,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Démon à tête de taureau et au corps d’araignée géante, crocs de fer, surgissant des vagues sur une plage.",
+  "lore": "Il attend les pêcheurs au bord de la mer, la nuit. Son souffle seul empoisonne les filets.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "horns": "long",
+   "wings": "tatter",
+   "body": "lean",
+   "arms": "spread",
+   "scene": null
+  },
+  "image": "assets/art/INF-063.webp",
+  "artPrompt": "Ushi-oni — Démon à tête de taureau et au corps d’araignée géante, crocs de fer, surgissant des vagues sur une plage. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "INF-064",
+  "number": 64,
+  "name": "Le Roi des Ombres",
+  "title": "Celui qui règne sans lumière",
+  "faction": "infernal",
+  "rarity": "R",
+  "category": "Démon",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 6,
+   "def": 5,
+   "spd": 3,
+   "mag": 2,
+   "hp": 20,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Roi fait d’ombre vivante, couronne de flammes noires, cape qui dévore la lumière autour de lui.",
+  "lore": "Il n’a jamais vu son propre visage. Partout où il marche, les flammes s’éteignent pour lui faire place.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "insect",
+   "type": "spider",
+   "face": true,
+   "scene": null
+  },
+  "image": "assets/art/INF-064.webp",
+  "artPrompt": "Le Roi des Ombres — Roi fait d’ombre vivante, couronne de flammes noires, cape qui dévore la lumière autour de lui. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

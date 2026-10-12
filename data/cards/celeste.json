@@ -2028,5 +2028,388 @@
   },
   "image": "assets/art/CEL-045.webp",
   "artPrompt": "Métatron, la Voix du Trône — Archange immense aux trente-six ailes de lumière dorée, visage serein, tenant un livre de feu ouvert, entouré d’anneaux d’yeux célestes. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-046",
+  "number": 46,
+  "name": "Ziz",
+  "title": "Le roi des oiseaux",
+  "faction": "celeste",
+  "rarity": "HR",
+  "category": "Créature céleste",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 6,
+   "mag": 4,
+   "hp": 17,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "first"
+   },
+   {
+    "key": "cataclysm",
+    "value": 1
+   }
+  ],
+  "visual": "Oiseau si grand que ses ailes cachent le soleil, les pieds posés sur terre et la tête dans les nuées.",
+  "lore": "Un œuf de Ziz, tombé un jour, a noyé soixante villes. Ses ailes gardent le monde des tempêtes du sud.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "void",
+   "wings": "six",
+   "body": "robe",
+   "arms": "spread",
+   "halo": "spike",
+   "tint": "#ff4a4a",
+   "scene": "sky"
+  },
+  "image": "assets/art/CEL-046.webp",
+  "artPrompt": "Ziz — Oiseau si grand que ses ailes cachent le soleil, les pieds posés sur terre et la tête dans les nuées. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-047",
+  "number": 47,
+  "name": "Garuda",
+  "title": "Monture des dieux",
+  "faction": "celeste",
+  "rarity": "HR",
+  "category": "Créature céleste",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 7,
+   "mag": 3,
+   "hp": 19,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Homme-aigle aux ailes d’or et au bec acéré, armure de joyaux, un serpent saisi dans ses serres.",
+  "lore": "Ennemi juré des nagas, il porte Vishnu sur son dos. Rien de ce qui rampe ne lui échappe.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "ram",
+   "wings": "bat",
+   "body": "bulky",
+   "arms": "spread",
+   "tail": true,
+   "claws": true,
+   "legs": "goat",
+   "scene": "sky"
+  },
+  "image": "assets/art/CEL-047.webp",
+  "artPrompt": "Garuda — Homme-aigle aux ailes d’or et au bec acéré, armure de joyaux, un serpent saisi dans ses serres. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-048",
+  "number": 48,
+  "name": "Bennu",
+  "title": "L’oiseau qui renaît du soleil",
+  "faction": "celeste",
+  "rarity": "R",
+  "category": "Créature égyptienne",
+  "power": 6,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 2,
+   "spd": 6,
+   "mag": 9,
+   "hp": 12,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 2
+   },
+   {
+    "key": "strike",
+    "value": 2
+   }
+  ],
+  "visual": "Héron d’or et de pourpre aux longues plumes de crête, perché sur une pierre dressée au lever du soleil.",
+  "lore": "Les Égyptiens disaient qu’il avait chanté le premier son du monde. Il renaît chaque matin avec Râ.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "void",
+   "wings": "six",
+   "body": "robe",
+   "arms": "pray",
+   "halo": "ring",
+   "scene": null
+  },
+  "image": "assets/art/CEL-048.webp",
+  "artPrompt": "Bennu — Héron d’or et de pourpre aux longues plumes de crête, perché sur une pierre dressée au lever du soleil. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-049",
+  "number": 49,
+  "name": "Anzû",
+  "title": "Le voleur des tablettes",
+  "faction": "celeste",
+  "rarity": "R",
+  "category": "Créature céleste",
+  "power": 6,
+  "role": "S",
+  "stats": {
+   "atk": 8,
+   "def": 3,
+   "spd": 8,
+   "mag": 3,
+   "hp": 10,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "first"
+   },
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Aigle géant à tête de lion, ailes de tempête, tenant dans ses serres une tablette d’argile lumineuse.",
+  "lore": "Il vola les Tablettes des Destins aux dieux de Sumer. Pendant un temps, il fut maître de tout.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "horse",
+   "rider": true,
+   "hooves": true,
+   "mane": true,
+   "scene": "heaven"
+  },
+  "image": "assets/art/CEL-049.webp",
+  "artPrompt": "Anzû — Aigle géant à tête de lion, ailes de tempête, tenant dans ses serres une tablette d’argile lumineuse. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-050",
+  "number": 50,
+  "name": "Caladrius",
+  "title": "Oiseau des chevets",
+  "faction": "celeste",
+  "rarity": "PC",
+  "category": "Créature céleste",
+  "power": 3,
+  "role": "U",
+  "stats": {
+   "atk": 2,
+   "def": 2,
+   "spd": 4,
+   "mag": 5,
+   "hp": 11,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 2
+   }
+  ],
+  "visual": "Oiseau d’un blanc parfait aux yeux d’or, posé sur le lit d’un malade, absorbant une brume sombre.",
+  "lore": "S’il regarde le malade, celui-ci guérit : il prend la maladie et l’emporte vers le soleil.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "eagle",
+   "scene": "sky"
+  },
+  "image": "assets/art/CEL-050.webp",
+  "artPrompt": "Caladrius — Oiseau d’un blanc parfait aux yeux d’or, posé sur le lit d’un malade, absorbant une brume sombre. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-051",
+  "number": 51,
+  "name": "Bai Ze",
+  "title": "Celui qui connaît tous les monstres",
+  "faction": "celeste",
+  "rarity": "R",
+  "category": "Créature céleste",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 8,
+   "def": 2,
+   "spd": 5,
+   "mag": 3,
+   "hp": 13,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "first"
+   },
+   {
+    "key": "command",
+    "value": 1
+   }
+  ],
+  "visual": "Bête blanche à corps de lion, barbe de sage et six yeux, cornes délicates, entourée de rouleaux flottants.",
+  "lore": "Il dicta à l’Empereur Jaune la liste de tous les monstres du monde. Ce livre-ci lui doit beaucoup.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "wings": "feather",
+   "body": "armor",
+   "arms": "sword",
+   "halo": "ring",
+   "scene": null
+  },
+  "image": "assets/art/CEL-051.webp",
+  "artPrompt": "Bai Ze — Bête blanche à corps de lion, barbe de sage et six yeux, cornes délicates, entourée de rouleaux flottants. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-052",
+  "number": 52,
+  "name": "Buraq",
+  "title": "La monture d’un seul voyage",
+  "faction": "celeste",
+  "rarity": "R",
+  "category": "Créature céleste",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 8,
+   "def": 2,
+   "spd": 5,
+   "mag": 3,
+   "hp": 13,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "first"
+   },
+   {
+    "key": "command",
+    "value": 1
+   }
+  ],
+  "visual": "Coursier blanc ailé, plus grand qu’un âne et plus petit qu’un mulet, galopant sur un chemin de lumière.",
+  "lore": "Chacun de ses pas se pose aussi loin que son regard porte.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "wings": "feather",
+   "body": "armor",
+   "arms": "sword",
+   "halo": "ring",
+   "scene": null
+  },
+  "image": "assets/art/CEL-052.webp",
+  "artPrompt": "Buraq — Coursier blanc ailé, plus grand qu’un âne et plus petit qu’un mulet, galopant sur un chemin de lumière. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-053",
+  "number": 53,
+  "name": "Le Roi des Sceaux",
+  "title": "Celui qui ferma l’Abîme",
+  "faction": "celeste",
+  "rarity": "M",
+  "category": "Construction sacrée",
+  "power": 9,
+  "role": "M",
+  "stats": {
+   "atk": 7,
+   "def": 4,
+   "spd": 6,
+   "mag": 10,
+   "hp": 16,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   },
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Roi d’ivoire et de laiton sans visage, couronne en forme d’astrolabe, sept sceaux lumineux tournant autour de lui.",
+  "lore": "Il a gravé le premier Sceau, puis le dernier. Depuis, il veille à ce que personne ne les brise.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "gown",
+   "arms": "up",
+   "hair": true,
+   "horns": "crown",
+   "halo": "ring",
+   "scene": "temple"
+  },
+  "image": "assets/art/CEL-053.webp",
+  "artPrompt": "Le Roi des Sceaux — Roi d’ivoire et de laiton sans visage, couronne en forme d’astrolabe, sept sceaux lumineux tournant autour de lui. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

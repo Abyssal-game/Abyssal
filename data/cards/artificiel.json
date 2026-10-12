@@ -1812,5 +1812,95 @@
   },
   "image": "assets/art/ART-041.webp",
   "artPrompt": "Le Dragon d’Horlogerie — Dragon colossal fait de rouages d’or et de laiton, cœur d’horloge visible dans la poitrine ouverte sur le Néant, ailes de lames articulées. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-042",
+  "number": 42,
+  "name": "L’Architecte du Vide",
+  "title": "Il dessine ce qui n’existe pas encore",
+  "faction": "artificiel",
+  "rarity": "R",
+  "category": "Divinité artificielle",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 2,
+   "spd": 5,
+   "mag": 2,
+   "hp": 15,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "command",
+    "value": 1
+   }
+  ],
+  "visual": "Automate élancé aux bras multiples tenant compas et équerres, traçant des plans lumineux dans le néant.",
+  "lore": "Il a dessiné la Forge, puis la Forge l’a oublié. Il dessine encore, pour un monde qu’on n’a pas bâti.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "goat",
+   "wings": "feather",
+   "body": "armor",
+   "arms": "sword",
+   "scene": "ruins"
+  },
+  "image": "assets/art/ART-042.webp",
+  "artPrompt": "L’Architecte du Vide — Automate élancé aux bras multiples tenant compas et équerres, traçant des plans lumineux dans le néant. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-043",
+  "number": 43,
+  "name": "Le Gardien du Temps",
+  "title": "Le dernier horloger",
+  "faction": "artificiel",
+  "rarity": "R",
+  "category": "Automate cosmique",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 2,
+   "spd": 5,
+   "mag": 2,
+   "hp": 15,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "command",
+    "value": 1
+   }
+  ],
+  "visual": "Automate d’airain dont le torse est une horloge ouverte, rouages et sabliers tournant en orbite autour de lui.",
+  "lore": "Il remonte le monde chaque nuit. Le jour où il oubliera, tout s’arrêtera exactement là.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "goat",
+   "wings": "feather",
+   "body": "armor",
+   "arms": "sword",
+   "scene": "ruins"
+  },
+  "image": "assets/art/ART-043.webp",
+  "artPrompt": "Le Gardien du Temps — Automate d’airain dont le torse est une horloge ouverte, rouages et sabliers tournant en orbite autour de lui. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

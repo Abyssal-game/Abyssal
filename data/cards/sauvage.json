@@ -2218,5 +2218,530 @@
   },
   "image": "assets/art/SAU-050.webp",
   "artPrompt": "Le Premier Prédateur — Le premier fauve, gravé dans l’or : crinière de rayons, griffes de lumière, regard qui a vu naître la peur. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-051",
+  "number": 51,
+  "name": "Orthros",
+  "title": "Le chien à deux têtes",
+  "faction": "sauvage",
+  "rarity": "R",
+  "category": "Bête",
+  "power": 6,
+  "role": "S",
+  "stats": {
+   "atk": 7,
+   "def": 2,
+   "spd": 10,
+   "mag": 3,
+   "hp": 11,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Grand chien noir à deux têtes, crinière de serpents, crocs luisants, gardant un troupeau de bœufs rouges.",
+  "lore": "Frère de Cerbère, il gardait le troupeau de Géryon. Héraclès l’abattit d’un seul coup de massue.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "bird",
+   "wings": "feather",
+   "tail": "lion",
+   "size": "big",
+   "scene": null
+  },
+  "image": "assets/art/SAU-051.webp",
+  "artPrompt": "Orthros — Grand chien noir à deux têtes, crinière de serpents, crocs luisants, gardant un troupeau de bœufs rouges. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-052",
+  "number": 52,
+  "name": "Cockatrice",
+  "title": "Née d’un œuf de coq",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Chimère",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 6,
+   "def": 1,
+   "spd": 9,
+   "mag": 1,
+   "hp": 8,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Coq monstrueux à queue de serpent et ailes de dragon, crête rouge, regard qui pétrifie les fleurs autour de lui.",
+  "lore": "Née d’un œuf pondu par un coq et couvé par un crapaud. Son regard change la vie en pierre.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "horse",
+   "hooves": true,
+   "mane": true,
+   "tail": "bushy",
+   "scene": "swamp"
+  },
+  "image": "assets/art/SAU-052.webp",
+  "artPrompt": "Cockatrice — Coq monstrueux à queue de serpent et ailes de dragon, crête rouge, regard qui pétrifie les fleurs autour de lui. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-053",
+  "number": 53,
+  "name": "Satyre",
+  "title": "Joueur de flûte des bois",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Créature mythologique",
+  "power": 2,
+  "role": "M",
+  "stats": {
+   "atk": 1,
+   "def": 1,
+   "spd": 5,
+   "mag": 2,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Homme-bouc aux cornes courtes, flûte de Pan aux lèvres, dansant dans une clairière.",
+  "lore": "Il joue pour les nymphes, les ivrognes et les égarés. Ceux qui dansent trop longtemps oublient de rentrer.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "owl",
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-053.webp",
+  "artPrompt": "Satyre — Homme-bouc aux cornes courtes, flûte de Pan aux lèvres, dansant dans une clairière. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-054",
+  "number": 54,
+  "name": "Sanglier de Calydon",
+  "title": "La colère d’Artémis",
+  "faction": "sauvage",
+  "rarity": "R",
+  "category": "Bête",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 5,
+   "spd": 4,
+   "mag": 2,
+   "hp": 20,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "armor",
+    "value": 2
+   }
+  ],
+  "visual": "Sanglier gigantesque aux soies dressées comme des lances, défenses d’ivoire jauni, labourant les champs.",
+  "lore": "Envoyé par Artémis pour punir un roi oublieux. Il fallut tous les héros de Grèce pour l’abattre.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lion",
+   "mane": true,
+   "tail": "lion",
+   "size": "big",
+   "scene": "mountain"
+  },
+  "image": "assets/art/SAU-054.webp",
+  "artPrompt": "Sanglier de Calydon — Sanglier gigantesque aux soies dressées comme des lances, défenses d’ivoire jauni, labourant les champs. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-055",
+  "number": 55,
+  "name": "Grootslang",
+  "title": "Le grand serpent des grottes",
+  "faction": "sauvage",
+  "rarity": "R",
+  "category": "Chimère",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 8,
+   "def": 2,
+   "spd": 7,
+   "mag": 2,
+   "hp": 13,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Créature à corps de serpent et à tête d’éléphant, défenses incrustées de diamants bruts, dans une grotte profonde.",
+  "lore": "Les dieux firent une erreur en le créant si fort. Il garde un lac de diamants au fond de l’Afrique australe.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "bull",
+   "body": "bulky",
+   "legs": "goat",
+   "arms": "staff",
+   "scene": "ruins"
+  },
+  "image": "assets/art/SAU-055.webp",
+  "artPrompt": "Grootslang — Créature à corps de serpent et à tête d’éléphant, défenses incrustées de diamants bruts, dans une grotte profonde. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-056",
+  "number": 56,
+  "name": "Karkadann",
+  "title": "La licorne féroce",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Bête",
+  "power": 3,
+  "role": "S",
+  "stats": {
+   "atk": 4,
+   "def": 1,
+   "spd": 8,
+   "mag": 1,
+   "hp": 7,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Bête massive au corps de rhinocéros et à la corne unique, longue et noire, chargeant à travers les herbes hautes.",
+  "lore": "Les licornes de Perse ne sont pas douces. Seule une colombe peut se poser sur sa corne sans mourir.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "bird",
+   "wings": "feather",
+   "hooves": true,
+   "tail": "bushy",
+   "scene": "swamp"
+  },
+  "image": "assets/art/SAU-056.webp",
+  "artPrompt": "Karkadann — Bête massive au corps de rhinocéros et à la corne unique, longue et noire, chargeant à travers les herbes hautes. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-057",
+  "number": 57,
+  "name": "Adlet",
+  "title": "Chiens-hommes de la toundra",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Lycanthrope",
+  "power": 5,
+  "role": "B",
+  "stats": {
+   "atk": 8,
+   "def": 1,
+   "spd": 7,
+   "mag": 3,
+   "hp": 12,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Créature au torse humain et aux pattes de chien, fourrure grise couverte de givre, sous une aurore boréale.",
+  "lore": "Les Inuits racontent qu’ils sont nés d’une femme et d’un chien. Ils chassent en meute sur la glace.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "claws": true,
+   "body": "bulky",
+   "legs": "goat",
+   "arms": "reach",
+   "tail": true,
+   "scene": "swamp"
+  },
+  "image": "assets/art/SAU-057.webp",
+  "artPrompt": "Adlet — Créature au torse humain et aux pattes de chien, fourrure grise couverte de givre, sous une aurore boréale. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-058",
+  "number": 58,
+  "name": "Camahueto",
+  "title": "Le veau-licorne des rivières",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Bête",
+  "power": 2,
+  "role": "S",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 7,
+   "mag": 1,
+   "hp": 4,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Jeune taureau à une seule corne dorée, bondissant d’une rivière vers la mer en arrachant les rives.",
+  "lore": "Au Chili, sa corne arrache la terre des rivières jusqu’à la mer. Les chamans la râpent pour guérir.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "dog",
+   "tail": "bushy",
+   "scene": null
+  },
+  "image": "assets/art/SAU-058.webp",
+  "artPrompt": "Camahueto — Jeune taureau à une seule corne dorée, bondissant d’une rivière vers la mer en arrachant les rives. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-059",
+  "number": 59,
+  "name": "Tikbalang",
+  "title": "Celui qui égare les voyageurs",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Créature mythologique",
+  "power": 4,
+  "role": "B",
+  "stats": {
+   "atk": 6,
+   "def": 1,
+   "spd": 6,
+   "mag": 2,
+   "hp": 10,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Créature longiligne à tête et sabots de cheval, membres démesurés, assise dans un grand arbre.",
+  "lore": "Aux Philippines, il fait tourner les voyageurs en rond. Il faut retourner sa chemise pour lui échapper.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lion",
+   "mane": true,
+   "horns": "short",
+   "size": "big",
+   "tail": "lion",
+   "scene": "swamp"
+  },
+  "image": "assets/art/SAU-059.webp",
+  "artPrompt": "Tikbalang — Créature longiligne à tête et sabots de cheval, membres démesurés, assise dans un grand arbre. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-060",
+  "number": 60,
+  "name": "Gorgone",
+  "title": "Le regard qui pétrifie",
+  "faction": "sauvage",
+  "rarity": "HR",
+  "category": "Créature mythologique",
+  "power": 7,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 3,
+   "spd": 7,
+   "mag": 8,
+   "hp": 14,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Femme aux cheveux de serpents vivants, yeux d’or fermés, entourée de statues de guerriers pétrifiés.",
+  "lore": "Méduse fut belle avant d’être maudite. Depuis, tout ce qui croise son regard devient pierre.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "human",
+   "wings": "feather",
+   "tail": "lion",
+   "size": "big",
+   "scene": "swamp"
+  },
+  "image": "assets/art/SAU-060.webp",
+  "artPrompt": "Gorgone — Femme aux cheveux de serpents vivants, yeux d’or fermés, entourée de statues de guerriers pétrifiés. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-061",
+  "number": 61,
+  "name": "Ōmukade",
+  "title": "Le mille-pattes du mont Mikami",
+  "faction": "sauvage",
+  "rarity": "R",
+  "category": "Insecte",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 3,
+   "spd": 7,
+   "mag": 2,
+   "hp": 14,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Mille-pattes gigantesque enroulé sept fois autour d’une montagne, carapace rouge et pattes comme des torches.",
+  "lore": "Seule une flèche trempée dans la salive humaine put le transpercer. Ses pas éclairaient la forêt comme mille lanternes.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "human",
+   "mane": true,
+   "tail": "scorpion",
+   "size": "big",
+   "scene": null
+  },
+  "image": "assets/art/SAU-061.webp",
+  "artPrompt": "Ōmukade — Mille-pattes gigantesque enroulé sept fois autour d’une montagne, carapace rouge et pattes comme des torches. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-062",
+  "number": 62,
+  "name": "Tsuchigumo",
+  "title": "L’araignée de terre",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Insecte",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 6,
+   "mag": 5,
+   "hp": 9,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   },
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Araignée géante à tête de tigre, toile tendue entre des cèdres, dans une forêt brumeuse du Japon.",
+  "lore": "Les anciens appelaient ainsi ceux qui refusaient l’empereur. Peu à peu, le nom leur a fait pousser des pattes.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy"
+  ],
+  "art": {
+   "form": "insect",
+   "type": "spider",
+   "face": true,
+   "scene": "swamp"
+  },
+  "image": "assets/art/SAU-062.webp",
+  "artPrompt": "Tsuchigumo — Araignée géante à tête de tigre, toile tendue entre des cèdres, dans une forêt brumeuse du Japon. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

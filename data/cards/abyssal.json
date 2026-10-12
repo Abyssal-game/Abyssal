@@ -2091,5 +2091,186 @@
   },
   "image": "assets/art/ABY-048.webp",
   "artPrompt": "Le Rêveur Sous la Fosse — Titan endormi à tête de pieuvre, grandes ailes membraneuses repliées, recroquevillé au fond de la fosse, un seul œil immense entrouvert, tentacules en éventail. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-049",
+  "number": 49,
+  "name": "Cthulhu",
+  "title": "Celui qui rêve sous la mer",
+  "faction": "abyssal",
+  "rarity": "M",
+  "category": "Entité abyssale",
+  "power": 9,
+  "role": "M",
+  "stats": {
+   "atk": 6,
+   "def": 4,
+   "spd": 6,
+   "mag": 10,
+   "hp": 18,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "drown"
+   },
+   {
+    "key": "command",
+    "value": 2
+   }
+  ],
+  "visual": "Colosse ailé à tête de pieuvre et aux griffes immenses, endormi dans une cité engloutie aux angles impossibles.",
+  "lore": "Dans sa demeure de R’lyeh, il rêve. Quand il se retourne dans son sommeil, les poètes deviennent fous.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "tentacle",
+   "core": "head",
+   "count": 11,
+   "crown": true,
+   "eyes": 5,
+   "scale": 1.05,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-049.webp",
+  "artPrompt": "Cthulhu — Colosse ailé à tête de pieuvre et aux griffes immenses, endormi dans une cité engloutie aux angles impossibles. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-050",
+  "number": 50,
+  "name": "Le Colosse des Abysses",
+  "title": "Montagne qui marche au fond des mers",
+  "faction": "abyssal",
+  "rarity": "HR",
+  "category": "Entité abyssale",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 7,
+   "spd": 4,
+   "mag": 3,
+   "hp": 25,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "aegis"
+   }
+  ],
+  "visual": "Géant de corail et de basalte couvert d’épaves, un phare éteint planté dans l’épaule, avançant au fond de l’océan.",
+  "lore": "On l’a pris pour une île. Trois royaumes y ont bâti des ports avant qu’il ne se lève.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "fish",
+   "whale": true,
+   "fins": true,
+   "scale": 1.2,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-050.webp",
+  "artPrompt": "Le Colosse des Abysses — Géant de corail et de basalte couvert d’épaves, un phare éteint planté dans l’épaule, avançant au fond de l’océan. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-051",
+  "number": 51,
+  "name": "Le Serpent du Néant",
+  "title": "Il nage entre les mondes",
+  "faction": "abyssal",
+  "rarity": "R",
+  "category": "Serpent primordial",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 9,
+   "def": 2,
+   "spd": 4,
+   "mag": 2,
+   "hp": 16,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Serpent sans fin aux écailles noires comme le vide, constellé d’étoiles mortes, dont la tête sort d’une faille dans l’eau.",
+  "lore": "Il n’a ni début ni fin connus. Là où il passe, l’eau devient si noire qu’elle oublie la lumière.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "horse",
+   "hooves": true,
+   "rider": true,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-051.webp",
+  "artPrompt": "Le Serpent du Néant — Serpent sans fin aux écailles noires comme le vide, constellé d’étoiles mortes, dont la tête sort d’une faille dans l’eau. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-052",
+  "number": 52,
+  "name": "Vritra",
+  "title": "Le Retenteur des eaux",
+  "faction": "abyssal",
+  "rarity": "HR",
+  "category": "Dragon",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 3,
+   "spd": 6,
+   "mag": 2,
+   "hp": 19,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Dragon-serpent immense enroulé autour d’une montagne, retenant derrière lui des fleuves entiers prisonniers.",
+  "lore": "Dans les Védas, il avait avalé toutes les eaux du monde. Il a fallu la foudre d’Indra pour qu’il les rende.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "fish",
+   "fins": true,
+   "spikes": true,
+   "scale": 1.15,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-052.webp",
+  "artPrompt": "Vritra — Dragon-serpent immense enroulé autour d’une montagne, retenant derrière lui des fleuves entiers prisonniers. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

@@ -1,6 +1,6 @@
 // ABYSSAL : données du combat tactique (aucune logique d'affichage).
 // Chaque rôle a un kit réutilisable : attaque de base, compétence signature, passif.
-// Les 335 créatures héritent du kit de leur rôle ; rareté et niveau changent les chiffres.
+// Les créatures héritent du kit de leur rôle ; rareté et niveau changent les chiffres.
 import { roleOf } from './army.js';
 
 // ——— Ressources du joueur ———————————————————————————————————————————

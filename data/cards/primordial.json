@@ -2446,5 +2446,622 @@
   },
   "image": "assets/art/PRI-053.webp",
   "artPrompt": "Ouroboros, le Serpent Sans Fin — Serpent cosmique colossal enroulé en cercle parfait, mordant sa propre queue, écailles faites de galaxies et de flammes originelles. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "PRI-054",
+  "number": 54,
+  "name": "Zilant",
+  "title": "Le dragon de Kazan",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Dragon",
+  "power": 7,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 3,
+   "spd": 6,
+   "mag": 2,
+   "hp": 18,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 2
+   },
+   {
+    "key": "cataclysm",
+    "value": 1
+   }
+  ],
+  "visual": "Dragon ailé à deux pattes et longue queue enroulée, écailles noires et crête rouge, sur une colline couronnée.",
+  "lore": "Il gardait la colline où l’on bâtit Kazan. On l’a mis sur les armoiries de la ville, pour qu’il garde encore.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "dragon",
+   "legs": 4,
+   "fire": true,
+   "scene": "volcano"
+  },
+  "image": "assets/art/PRI-054.webp",
+  "artPrompt": "Zilant — Dragon ailé à deux pattes et longue queue enroulée, écailles noires et crête rouge, sur une colline couronnée. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "PRI-055",
+  "number": 55,
+  "name": "Aži Dahāka",
+  "title": "Le dragon aux trois têtes",
+  "faction": "primordial",
+  "rarity": "M",
+  "category": "Dragon primordial",
+  "power": 10,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 7,
+   "mag": 4,
+   "hp": 24,
+   "cost": 10
+  },
+  "abilities": [
+   {
+    "key": "cataclysm",
+    "value": 3
+   }
+  ],
+  "visual": "Dragon titanesque à trois têtes et six yeux, corps couvert de lézards et de scorpions, sous un ciel de cendres.",
+  "lore": "Le mal de la Perse ancienne. Enchaîné sous le mont Damavand, il se libérera à la fin des temps.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "dragon",
+   "heads": 5,
+   "legs": 4,
+   "fire": true,
+   "scene": "cosmos"
+  },
+  "image": "assets/art/PRI-055.webp",
+  "artPrompt": "Aži Dahāka — Dragon titanesque à trois têtes et six yeux, corps couvert de lézards et de scorpions, sous un ciel de cendres. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "PRI-056",
+  "number": 56,
+  "name": "Yog-Sothoth",
+  "title": "La porte et la clé",
+  "faction": "primordial",
+  "rarity": "HR",
+  "category": "Entité du Néant",
+  "power": 9,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 7,
+   "mag": 4,
+   "hp": 22,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "cataclysm",
+    "value": 1
+   },
+   {
+    "key": "command",
+    "value": 1
+   }
+  ],
+  "visual": "Amas de sphères irisées flottant dans le vide, certaines s’ouvrant comme des yeux, d’autres sur des paysages lointains.",
+  "lore": "Il est la porte, la clé et le gardien de la porte. Passé, présent et futur sont un en lui.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "void",
+   "wings": "flame",
+   "body": "bulky",
+   "arms": "spread",
+   "scale": 1.18,
+   "scene": "ruins"
+  },
+  "image": "assets/art/PRI-056.webp",
+  "artPrompt": "Yog-Sothoth — Amas de sphères irisées flottant dans le vide, certaines s’ouvrant comme des yeux, d’autres sur des paysages lointains. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "PRI-057",
+  "number": 57,
+  "name": "Nyarlathotep",
+  "title": "Le chaos rampant",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Entité du Néant",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 4,
+   "def": 4,
+   "spd": 3,
+   "mag": 2,
+   "hp": 22,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Homme grand et élégant à la peau sombre comme le vide, sourire trop large, mille visages esquissés dans son ombre.",
+  "lore": "Le messager des dieux extérieurs a mille formes. La plus dangereuse est celle qui vous sourit.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "robe",
+   "arms": "down",
+   "scale": 1.25,
+   "dy": 30,
+   "scene": "volcano"
+  },
+  "image": "assets/art/PRI-057.webp",
+  "artPrompt": "Nyarlathotep — Homme grand et élégant à la peau sombre comme le vide, sourire trop large, mille visages esquissés dans son ombre. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "PRI-058",
+  "number": 58,
+  "name": "Azathoth",
+  "title": "Le sultan des démons",
+  "faction": "primordial",
+  "rarity": "M",
+  "category": "Entité du Néant",
+  "power": 10,
+  "role": "M",
+  "stats": {
+   "atk": 9,
+   "def": 3,
+   "spd": 7,
+   "mag": 10,
+   "hp": 19,
+   "cost": 10
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   },
+   {
+    "key": "cataclysm",
+    "value": 2
+   }
+  ],
+  "visual": "Masse informe de lumière et de chaos bouillonnant au centre de tout, entourée de flûtistes sans visage.",
+  "lore": "Au cœur de l’univers, il dort, aveugle et idiot. Si la musique s’arrête, il se réveillera.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "cloak",
+   "arms": "scythe",
+   "horns": "short",
+   "scale": 1.18,
+   "scene": "cosmos"
+  },
+  "image": "assets/art/PRI-058.webp",
+  "artPrompt": "Azathoth — Masse informe de lumière et de chaos bouillonnant au centre de tout, entourée de flûtistes sans visage. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "PRI-059",
+  "number": 59,
+  "name": "Cipactli",
+  "title": "Le monstre de la mer première",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Bête primordiale",
+  "power": 7,
+  "role": "T",
+  "stats": {
+   "atk": 6,
+   "def": 5,
+   "spd": 3,
+   "mag": 4,
+   "hp": 23,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Crocodile-poisson colossal aux mille gueules, une à chaque articulation, flottant dans une mer originelle.",
+  "lore": "Les dieux aztèques l’ont déchiré pour faire la terre. Son dos est le sol que tu foules.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "bulky",
+   "arms": "up",
+   "globe": true,
+   "scale": 1.15,
+   "scene": "volcano"
+  },
+  "image": "assets/art/PRI-059.webp",
+  "artPrompt": "Cipactli — Crocodile-poisson colossal aux mille gueules, une à chaque articulation, flottant dans une mer originelle. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "PRI-060",
+  "number": 60,
+  "name": "Tlaltecuhtli",
+  "title": "La terre qui dévore",
+  "faction": "primordial",
+  "rarity": "HR",
+  "category": "Divinité aztèque",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 6,
+   "spd": 4,
+   "mag": 4,
+   "hp": 26,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "drown"
+   },
+   {
+    "key": "cataclysm",
+    "value": 1
+   }
+  ],
+  "visual": "Déesse accroupie aux genoux et aux coudes ouverts en gueules, mâchoires béantes tournées vers le ciel.",
+  "lore": "Elle réclame le sang des hommes, parce que les dieux l’ont déchirée pour en faire le monde.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "tentacle",
+   "core": "mantle",
+   "count": 10,
+   "scale": 1.1,
+   "scene": "ruins"
+  },
+  "image": "assets/art/PRI-060.webp",
+  "artPrompt": "Tlaltecuhtli — Déesse accroupie aux genoux et aux coudes ouverts en gueules, mâchoires béantes tournées vers le ciel. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "PRI-061",
+  "number": 61,
+  "name": "Échidna",
+  "title": "La Mère des Monstres",
+  "faction": "primordial",
+  "rarity": "HR",
+  "category": "Créature mythologique",
+  "power": 9,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 7,
+   "mag": 4,
+   "hp": 22,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "cataclysm",
+    "value": 1
+   },
+   {
+    "key": "command",
+    "value": 1
+   }
+  ],
+  "visual": "Femme magnifique au corps de serpent enroulé dans une grotte, entourée d’œufs et de petits monstres.",
+  "lore": "Cerbère, l’Hydre, la Chimère, Orthros : tous l’appellent maman.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "void",
+   "wings": "flame",
+   "body": "bulky",
+   "arms": "spread",
+   "scale": 1.18,
+   "scene": "ruins"
+  },
+  "image": "assets/art/PRI-061.webp",
+  "artPrompt": "Échidna — Femme magnifique au corps de serpent enroulé dans une grotte, entourée d’œufs et de petits monstres. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "PRI-062",
+  "number": 62,
+  "name": "Humbaba",
+  "title": "Gardien de la Forêt des Cèdres",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Géant",
+  "power": 6,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 2,
+   "spd": 4,
+   "mag": 7,
+   "hp": 13,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 2
+   },
+   {
+    "key": "aegis"
+   }
+  ],
+  "visual": "Géant au visage de lion fait d’entrailles enroulées, sept auras rayonnantes, gardant des cèdres immenses.",
+  "lore": "Gilgamesh l’a tué pour couper ses arbres. La forêt, depuis, n’a jamais repoussé.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "mask",
+   "body": "robe",
+   "arms": "spread",
+   "halo": "ring",
+   "scale": 1.12,
+   "scene": "volcano"
+  },
+  "image": "assets/art/PRI-062.webp",
+  "artPrompt": "Humbaba — Géant au visage de lion fait d’entrailles enroulées, sept auras rayonnantes, gardant des cèdres immenses. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "PRI-063",
+  "number": 63,
+  "name": "Hécatonchire",
+  "title": "Cent bras, cinquante têtes",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Titan",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 9,
+   "def": 3,
+   "spd": 4,
+   "mag": 3,
+   "hp": 16,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Géant monstrueux aux cent bras et aux cinquante têtes, lançant des rochers vers le ciel.",
+  "lore": "Ils lancèrent trois cents rochers à la fois contre les Titans. La guerre fut gagnée en un jour.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "dragon",
+   "legs": 2,
+   "wings": "tatter",
+   "scene": "volcano"
+  },
+  "image": "assets/art/PRI-063.webp",
+  "artPrompt": "Hécatonchire — Géant monstrueux aux cent bras et aux cinquante têtes, lançant des rochers vers le ciel. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "PRI-064",
+  "number": 64,
+  "name": "Le Dévoreur de Mondes",
+  "title": "La dernière faim",
+  "faction": "primordial",
+  "rarity": "HR",
+  "category": "Entité du Néant",
+  "power": 9,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 3,
+   "spd": 7,
+   "mag": 4,
+   "hp": 23,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "cataclysm",
+    "value": 2
+   }
+  ],
+  "visual": "Gueule cosmique ouverte sur le vide, aux dents faites de lunes brisées, avalant une planète en flammes.",
+  "lore": "Il a mangé des mondes avant le nôtre. Il a gardé le meilleur pour la fin.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "wings": "bat",
+   "body": "bulky",
+   "arms": "spread",
+   "tail": true,
+   "horns": "many",
+   "scale": 1.15,
+   "scene": "ruins"
+  },
+  "image": "assets/art/PRI-064.webp",
+  "artPrompt": "Le Dévoreur de Mondes — Gueule cosmique ouverte sur le vide, aux dents faites de lunes brisées, avalant une planète en flammes. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "PRI-065",
+  "number": 65,
+  "name": "Le Titan sans Visage",
+  "title": "Il a oublié qui il était",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Titan",
+  "power": 7,
+  "role": "T",
+  "stats": {
+   "atk": 6,
+   "def": 5,
+   "spd": 4,
+   "mag": 3,
+   "hp": 23,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Titan de pierre à la tête lisse et sans traits, mains posées sur une épée plantée dans la montagne.",
+  "lore": "Les dieux ont effacé son nom et son visage. Il garde pourtant toujours la même porte.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "horns": "bull",
+   "body": "bulky",
+   "tail": true,
+   "hair": true,
+   "arms": "spread",
+   "scale": 1.12,
+   "scene": "volcano"
+  },
+  "image": "assets/art/PRI-065.webp",
+  "artPrompt": "Le Titan sans Visage — Titan de pierre à la tête lisse et sans traits, mains posées sur une épée plantée dans la montagne. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "PRI-066",
+  "number": 66,
+  "name": "Le Cœur du Chaos",
+  "title": "Il bat avant toute chose",
+  "faction": "primordial",
+  "rarity": "R",
+  "category": "Entité du Néant",
+  "power": 7,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 3,
+   "spd": 6,
+   "mag": 2,
+   "hp": 18,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 2
+   },
+   {
+    "key": "cataclysm",
+    "value": 1
+   }
+  ],
+  "visual": "Cœur titanesque fait de magma et d’étoiles, battant au centre d’une nébuleuse, veines de feu qui s’étendent.",
+  "lore": "Avant la lumière, il battait déjà. À chaque battement, un monde naît ou meurt.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "dragon",
+   "legs": 4,
+   "fire": true,
+   "scene": "volcano"
+  },
+  "image": "assets/art/PRI-066.webp",
+  "artPrompt": "Le Cœur du Chaos — Cœur titanesque fait de magma et d’étoiles, battant au centre d’une nébuleuse, veines de feu qui s’étendent. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]
