@@ -34,11 +34,7 @@ export default function settings(app, root) {
         ${seg('motion', 'Animations', [['auto', 'Selon l’appareil'], ['reduced', 'Réduites'], ['full', 'Complètes']])}
         ${toggle('fastOpen', 'Ouverture rapide des boosters', 'Affiche directement le récapitulatif, sans révéler les cartes une par une.')}
       </section>
-      <section class="panel stack">
-        <h2>Combat</h2>
-        ${seg('defense', 'Défense active (esquive et parade au bon moment)', [['on', 'Normale'], ['easy', 'Facile'], ['off', 'Désactivée']])}
-        <p class="small muted">Désactivée : plus de barre de timing pendant le tour ennemi ; tu te protèges avec la Défense, le Rempart et la Prière.</p>
-      </section>`;
+`;
   }
   function tabTutos() {
     const seen = g.s.tips || {};
@@ -74,7 +70,7 @@ export default function settings(app, root) {
         <button class="btn gold block" data-act="creator">${s.dev ? 'Ouvrir les pouvoirs' : 'Activer le Mode Créateur'}</button></section>` : ''}
       <section class="panel stack about">
         <h2>À propos</h2>
-        <p class="small">ABYSSAL — Le Bestiaire interdit. Créé par <b>Alexis Seguin</b>.</p>
+        <p class="small">ABYSSAL — Le Bestiaire interdit.</p>
         <p class="small muted">Version ${esc(app.version)} · ${app.catalog.cards.length} cartes</p>
       </section>`;
   }

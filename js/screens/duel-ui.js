@@ -2,7 +2,7 @@
 // Toucher une de tes créatures ouvre ses actions (Attaque, compétence, Défense, Permuter) ; on choisit
 // ensuite la cible. Les compétences à risque montrent leurs chances et modificateurs avant le jet de D20.
 // Tour ennemi : chaque ennemi exécute son intention ; les attaques dangereuses ouvrent la défense
-// active (esquive dans l'or, parade parfaite au cœur blanc). Toute la logique est dans core/duel.js.
+// active (esquive dans l'or, parade parfaite sur le trait blanc, au dernier instant). Toute la logique est dans core/duel.js.
 import { RARITY } from '../config.js';
 import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM, sigil, roleIcon } from '../ui/icons.js';
@@ -19,7 +19,16 @@ import { ULTS } from '../core/army.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 // Décor selon la profondeur (salle du Gardien à part) et effets illustrés (fond noir fondu en mode « écran »)
-const bgOf = (run) => `assets/battle/bg-${run.room === 'boss' ? 'boss' : run.floor >= 15 ? 4 : run.floor >= 10 ? 3 : run.floor >= 5 ? 2 : 1}.webp`;
+const bgOld = (run) => `assets/battle/bg-${run.room === 'boss' ? 'boss' : run.floor >= 15 ? 4 : run.floor >= 10 ? 3 : run.floor >= 5 ? 2 : 1}.webp`;
+// Décor propre à l'étage : un décor tous les 2 étages (f-1 à f-16), un décor unique par gardien (g-1 à g-8).
+// Si l'image n'existe pas encore, l'ancien décor (posé dessous) reste visible.
+export function floorBg(floor, room) {
+  if (room === 'boss' || floor % 5 === 0) return `assets/battle/g-${Math.min(8, Math.max(1, Math.round(floor / 5)))}.webp`;
+  const n = floor - Math.floor(floor / 5); // rang parmi les étages sans gardien
+  return `assets/battle/f-${Math.min(16, Math.ceil(n / 2))}.webp`;
+}
+const abs = (u) => new URL(u, document.baseURI).href;
+const bgOf = (run) => `url(${abs(floorBg(run.floor, run.room))}), url(${abs(bgOld(run))})`;
 const FX = ['slash', 'impact', 'dodge', 'heal', 'venom', 'frost', 'seal', 'death', 'd20', 'd20-crit', 'd20-fumble'];
 const fxUrl = (n) => `assets/fx/${n}.webp`;
 const DANGER = ['', '!', '!!', '!!!'];
@@ -31,7 +40,7 @@ export function runDuel(app, root, { title, onEnd }) {
   const ui = (app.state.duel ||= { fast: false });
   const reduced = app.reduced();
   const T = (ms) => (reduced ? Math.min(ms, 80) : ui.fast ? ms * 0.45 : ms);
-  const defMode = g.s.settings.defense || 'on'; // 'on' | 'easy' | 'off'
+  const defMode = 'on'; // la défense active est la même pour tout le monde
   let alive_ = true, busy = false, sel = null, mode = null; // mode : action en attente de cible
   let confirm = null; // { key, t } : compétence à risque en attente de confirmation
   const ctl = new AbortController();
@@ -39,7 +48,7 @@ export function runDuel(app, root, { title, onEnd }) {
   document.body.classList.add('battle-mode');
 
   FX.forEach((n) => { new Image().src = fxUrl(n); });
-  root.innerHTML = `<div class="dv cb ${run.room} has-bg" style="--bgimg:url(${new URL(bgOf(run), document.baseURI).href})">
+  root.innerHTML = `<div class="dv cb ${run.room} has-bg" style="--bgimg:${bgOf(run)}">
     <div class="dv-top"><b>${esc(title)}</b><span class="row gap">
       <button class="btn small ghost" data-d="help" aria-label="Règles du combat">?</button>
       <button class="btn small ghost ${ui.fast ? 'on' : ''}" data-d="fast" aria-label="Animations accélérées">×2</button>
@@ -133,7 +142,7 @@ export function runDuel(app, root, { title, onEnd }) {
       <ul><li>Difficulté (DD) : <b>${r.dc}</b></li>${r.mods.length ? r.mods.map(([n, v]) => `<li class="mod">${esc(n)} <b>+${v}</b></li>`).join('') : '<li class="muted">Aucun bonus : marque, gel, Brisure ou faiblesse aident.</li>'}
       <li class="muted">1 : échec critique · 20 : critique</li></ul></div>
       <p class="small muted">${esc(KITS[u.role].skill.desc)}</p>
-      <div class="row gap"><button class="btn ghost" data-d="cancel">Annuler</button><button class="btn primary" data-d="go">${icon('sparkle')}Lancer le dé</button></div>
+      <div class="row gap"><button class="btn ghost" data-d="cancel">Annuler</button><button class="btn primary cb-roll" data-d="go"><img class="btn-die" alt="" src="assets/fx/d20.webp">Lancer le dé</button></div>
     </div>`;
   }
 
@@ -335,7 +344,7 @@ export function runDuel(app, root, { title, onEnd }) {
   }
 
   // ——— Défense active ———
-  // Un curseur traverse la barre en accélérant. Toucher dans l'or : esquive. Au cœur blanc : parade parfaite.
+  // Un curseur traverse la barre en accélérant. Toucher dans l'or : esquive. Sur le trait blanc, au tout dernier instant : parade parfaite.
   let defTap = null;
   function defenseQTE(s) {
     return new Promise((resolve) => {
@@ -350,11 +359,11 @@ export function runDuel(app, root, { title, onEnd }) {
       const def = INTENTS[s.kind];
       const bar = document.createElement('div');
       bar.className = 'dv-dodge cb-def';
-      bar.innerHTML = `<span class="dv-dodge-t">${intentIcon(s.kind)} ${esc(def.name)} ! <small>Touche dans l’or pour esquiver, au cœur blanc pour parer</small></span><span class="dv-dodge-bar"><i class="z"><i class="p"></i></i><i class="c"></i></span>`;
+      bar.innerHTML = `<span class="dv-dodge-t">${intentIcon(s.kind)} ${esc(def.name)} ! <small>Or : esquive · trait blanc, au dernier instant : parade</small></span><span class="dv-dodge-bar"><i class="z"><i class="p"></i></i><i class="c"></i></span>`;
       $('.dv-mid').appendChild(bar); $('.dv-mid').classList.add('qte');
       const cur = bar.querySelector('.c'), zEl = bar.querySelector('.z'), pEl = bar.querySelector('.p');
       zEl.style.cssText = `left:${z0 * 100}%;width:${zw * 100}%`;
-      pEl.style.cssText = `left:${((zw - pw) / 2 / zw) * 100}%;width:${(pw / zw) * 100}%`;
+      pEl.style.cssText = `left:${((zw - pw) / zw) * 100}%;width:${(pw / zw) * 100}%`;
       let t0 = 0, done = false, raf = 0;
       const zoneAt = (x) => (moving ? Math.min(0.97 - zw, Math.max(0.3, z0 + Math.sin(x * 9) * 0.1)) : z0);
       const end = (res) => {
@@ -373,7 +382,7 @@ export function runDuel(app, root, { title, onEnd }) {
       defTap = () => {
         if (!t0) return end('none'); // trop tôt
         const x = (performance.now() - t0) / D, pos = ease(Math.min(1, x)), zz = zoneAt(x);
-        const pz = zz + (zw - pw) / 2;
+        const pz = zz + zw - pw; // la parade : le tout dernier instant de la zone, juste avant l'impact
         end(pos >= pz && pos <= pz + pw ? 'parry' : pos >= zz && pos <= zz + zw ? 'dodge' : 'none');
       };
       setTimeout(() => { if (!done && alive_) { t0 = performance.now(); raf = requestAnimationFrame(step); } }, (reduced ? 250 : 300) + Math.random() * 450);
@@ -478,9 +487,7 @@ export function runDuel(app, root, { title, onEnd }) {
       if (k === 'go' && confirm) { const { key, t } = confirm; confirm = null; const u = sel; return exec(() => act(st, u, key, t)); }
       if (k === 'end') return doEnd();
       if (k === 'ult') {
-        if (ultReady(st)) { sel = null; mode = null; confirm = null; return exec(() => useUlt(st)); }
-        toast(`<b>${esc(ult.name)}</b> : ${esc(ult.desc)}<br>Il faut ${FERVOR_MAX} Ferveur et 1 action.`, { icon: 'sparkle' });
-        return;
+        return ultSheet();
       }
       if (k === 'auto') { sel = null; mode = null; confirm = null; busy = true; draw(); const ev = autoActs(st); g.persist(); await play(ev); busy = false; draw(); if (st.over) return finish(); return doEnd(); }
       return;
@@ -501,6 +508,39 @@ export function runDuel(app, root, { title, onEnd }) {
     if (sel && actionsFor(st, sel)[0].ok && actionTargets(st, sel, 'attack').includes(u.uid)) { const a = sel; return exec(() => act(st, a, 'attack', u.uid)); }
     info(u);
   }, { signal: ctl.signal });
+
+  // ——— Pouvoir d'équipe : explication avant, récapitulatif après ———
+  const ULT_HOW = {
+    sceau: 'Chacune de tes créatures au combat récupère 30 % de ses PV et reçoit un bouclier qui bloque complètement le prochain coup.',
+    revive: 'Tes créatures tombées reviennent au combat avec la moitié de leurs PV. Si aucune n’est tombée, tes créatures au combat récupèrent 40 % de leurs PV.',
+    nova: 'Chaque ennemi au combat subit des dégâts (plus forts à chaque tour qui passe) et sa jauge de Brisure baisse.',
+    smite: 'L’ennemi qui a le plus de PV subit un coup énorme (plus fort à chaque tour) et sa jauge de Brisure baisse fortement.',
+    aegis: 'Tes créatures au combat reçoivent un bouclier, sont libérées du gel, et ton équipe gagne 2 actions de plus ce tour-ci.',
+  };
+  function ultSheet() {
+    const ready = ultReady(st), c = run.ult.card ? cat.get(run.ult.card) : null;
+    const sh = openSheet(`<div class="cb-ultsheet" style="--uc:${ult.color}">
+      <div class="cb-ult-hero">${c ? `<img alt="" src="${artUrl(c)}">` : '<img alt="" src="assets/icons/power.webp">'}</div>
+      <h2>${esc(ult.name)}</h2>
+      <p class="small muted">Pouvoir d’équipe${c ? ` de ${esc(c.name)}` : ''} · coûte <b>1 action</b> et <b>toute la Ferveur (${FERVOR_MAX})</b></p>
+      <p>${esc(ULT_HOW[st.ult] || ult.desc)}</p>
+      ${ready ? `<button class="btn gold block big-cta" data-u="go">Lancer ${esc(ult.name)}</button>` : `<p class="small cb-ult-need">${st.fervor < FERVOR_MAX ? `Encore ${FERVOR_MAX - st.fervor} Ferveur à gagner : attaque, exploite les faiblesses, esquive, pare et brise les ennemis.` : 'Il te faut encore 1 action ce tour-ci.'}</p>`}
+    </div>`, { label: ult.name });
+    sh.body.addEventListener('click', (e) => { if (e.target.closest('[data-u="go"]')) { sh.close(); castUlt(); } });
+  }
+  async function castUlt() {
+    if (!ultReady(st)) return;
+    sel = null; mode = null; confirm = null; busy = true; draw();
+    const ev = useUlt(st); g.persist();
+    await play(ev);
+    const healed = ev.filter((x) => x.t === 'heal').reduce((a, x) => a + x.d, 0);
+    const dmg = ev.filter((x) => x.t === 'dmg').reduce((a, x) => a + x.d, 0);
+    const revived = ev.filter((x) => x.t === 'revive').length;
+    const parts = [revived && `${revived} créature${revived > 1 ? 's' : ''} relevée${revived > 1 ? 's' : ''}`, healed && `+${healed} PV rendus`, dmg && `${dmg} dégâts infligés`, ['sceau', 'aegis'].includes(st.ult) && 'boucliers sur tes créatures', st.ult === 'aegis' && '+2 actions'].filter(Boolean);
+    toast(`<b>${esc(ult.name)}</b> : ${parts.join(' · ') || 'aucun effet'}`, { icon: 'sparkle', kind: 'success' });
+    busy = false; draw();
+    if (st.over) finish();
+  }
 
   // ——— Fiches ———
   function info(u) {
@@ -541,7 +581,7 @@ export function runDuel(app, root, { title, onEnd }) {
       <li><b>Attaque</b> (1 action) : dégâts fiables, +1 Ferveur. <b>Défense</b> (1 action) : -50 % de dégâts jusqu’à ton prochain tour. <b>Permuter</b> (1 action, une fois par tour) : une créature de la réserve prend la place ; PV et états sont gardés, et la réserve récupère 10 % de PV par tour.</li>
       <li><b>Ferveur</b> (${FERVOR_MAX} au plus, gardée d’un combat à l’autre) : attaques, faiblesses, esquives (+1), parades parfaites (+2) et Brisures (+2) la remplissent. Les compétences la dépensent ; pleine, elle lance le <b>pouvoir d’équipe</b> (${esc(ult.name)} : ${esc(ult.desc)}).</li>
       <li><b>Intentions</b> : au-dessus de chaque ennemi, ce qu’il fera et les dégâts prévus ; « ! » = danger. Le badge rouge sur tes cartes annonce les dégâts qu’elles vont prendre.</li>
-      <li><b>Défense active</b> (coups chargés, attaques de zone, sorts, élites et gardiens) : touche dans l’or pour esquiver (+1 Ferveur), au cœur blanc pour parer (aucun dégât, +2 Ferveur, Brisure, contre-attaque des Gardes et des Assauts). Réglable dans les Réglages.</li>
+      <li><b>Défense active</b> (coups chargés, attaques de zone, sorts, élites et gardiens) : touche dans l’or pour esquiver (+1 Ferveur), sur le trait blanc, au tout dernier instant, pour parer (aucun dégât, +2 Ferveur, Brisure, contre-attaque des Gardes et des Assauts).</li>
       <li><b>Dés</b> : Coup d’estoc, Contagion et Entrave lancent un D20 contre une difficulté (DD). 1 : échec critique ; sous le DD : réussite partielle ; DD atteint : réussite ; 20 : critique. Marque, gel, Brisure et faiblesse donnent des bonus.</li>
       <li><b>Brisure</b> (élites, gardiens) : vide, l’ennemi perd son action, subit +50 % de dégâts et +5 aux jets contre lui jusqu’à la fin de ton tour suivant.</li>
       <li><b>Faiblesses</b> : chaque faction en craint une autre (+50 % de dégâts) ; contre sa propre faction : -25 %. ★ sur une cible = faiblesse exploitée.</li>

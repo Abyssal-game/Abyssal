@@ -625,7 +625,7 @@ export function threats(st) {
   return out;
 }
 
-// Défense active : durée (ms) de la zone d'esquive ; la parade parfaite en est le cœur (35 %)
+// Défense active : durée (ms) de la zone d'esquive ; la parade parfaite en est le dernier instant
 export function defenseWindow(st, aUid, tUid) {
   const e = st.units[aUid], u = st.units[tUid] || front(st, 'ally')[0];
   const kind = e?.intent?.kind || 'hit';
@@ -633,7 +633,8 @@ export function defenseWindow(st, aUid, tUid) {
   w += 15 * ((u?.level || 1) - (e?.level || 1));
   if (e?.boss) w -= 30; else if (e?.elite) w -= 15;
   w = Math.max(110, Math.min(320, Math.round(w)));
-  return { dodge: w, parry: Math.max(45, Math.round(w * 0.35)) };
+  // parade : fenêtre étroite (environ 1/5 de l'esquive), au tout dernier instant avant l'impact
+  return { dodge: w, parry: Math.max(32, Math.round(w * 0.2)) };
 }
 
 // ——— Pilote automatique (bouton Auto et simulations) ———

@@ -6,6 +6,9 @@ import { loadSave, writeSave, defaultSave, today } from './save.js';
 import { DESCENT, CHESTS, floorDoors, floorEnemies, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, huntStage, HUNT_STAGES } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel } from './duel.js';
 import { FERVOR_START, FERVOR_MAX } from './skills.js';
+// Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
+export const WEEKLY_FLOOR = 8;
+export const BOSS_RECRUIT = 0.25;
 import { STARTER, COST, BUDGET, TEAM, ULTS, levelFromDups, canUlt, ultOf } from './army.js';
 
 const RI = (r) => RARITY_ORDER.indexOf(r);
@@ -407,7 +410,7 @@ export class Game {
     return packs;
   }
 
-  // Créature de la semaine : la même pour tout le monde, elle apparaît comme élite (étage 3 et plus).
+  // Créature de la semaine : la même pour tout le monde, elle apparaît comme élite redoutable (étage 8 et plus).
   // La vaincre donne sa carte, une fois par semaine.
   weekly() {
     const w = weekIndex(this.clock());
@@ -479,9 +482,12 @@ export class Game {
       const lvl = enemyLevel(run.floor, room);
       const wk = this.weekly();
       const list = floorEnemies(this.catalog, run.day, run.floor, room);
-      if (room === 'elite' && run.floor >= 3 && !wk.done) list.forEach((e) => { if (e.elite) e.id = wk.id; });
+      const hunt = room === 'elite' && run.floor >= WEEKLY_FLOOR && !wk.done;
+      if (hunt) list.forEach((e) => { if (e.elite) e.id = wk.id; });
       const enemies = list.map((e) => duelUnit(this.catalog.get(e.id), { side: 'enemy', scale: sc, level: e.boss || e.elite ? lvl : enemyLevel(run.floor, 'fight'), boss: e.boss, elite: e.elite }));
       for (const e of enemies) {
+        // la créature de la semaine est une proie redoutable : plus solide et plus forte qu'une élite
+        if (hunt && e.elite && e.id === wk.id) { e.maxHp = Math.round(e.maxHp * 1.7); e.hp = e.maxHp; e.atk = Math.round(e.atk * 1.25 + 0.5); e.brkMax = 9; e.brk = 9; e.weekly = true; }
         const f = this.catalog.get(e.id)?.faction;
         if (rule.key === 'furie' && f === rule.faction) e.atk = Math.round(e.atk * 1.25 + 0.4);
         if (rule.key === 'sommeil' && f === rule.faction) { e.maxHp = Math.max(1, Math.round(e.maxHp * 0.75)); e.hp = e.maxHp; }
@@ -501,10 +507,11 @@ export class Game {
     if (!run || run.phase !== 'reward' || !(run.rewards || []).includes(room)) throw new Error('Bonus indisponible.');
     const rule = this.rule(run.day);
     const out = { room };
+    run.rewardsBak = run.rewards; // pour revenir en arrière depuis l'autel
     run.rewards = null;
     run.phase = 'cleared';
     if (room === 'rest') {
-      const k = rule.key === 'sources' ? 0.8 : 0.4;
+      const k = rule.key === 'sources' ? 0.6 : 0.3;
       run.team.forEach((m) => { if (!m.fallen) m.hp = Math.min(m.maxHp, m.hp + Math.ceil(m.maxHp * k)); });
     } else if (room === 'treasure') {
       out.shards = this.gainShards(15 + run.floor * 6);
@@ -558,6 +565,11 @@ export class Game {
       this.s.weekly = { week: wk.week, done: true };
       out.weekly = { id: wk.id, ...this.addCard(wk.id, 'normal', 'booster') };
     }
+    // gardien vaincu : une chance sur quatre qu'il rejoigne ta collection (la vraie voie vers les grandes créatures)
+    if (won && room === 'boss' && !run.free) {
+      const b = Object.values(st.units).find((u) => u.boss);
+      if (b && this.rng() < BOSS_RECRUIT) out.recruit = { id: b.id, ...this.addCard(b.id, 'normal', 'booster') };
+    }
     if (won) {
       const hunt = room === 'elite' && this.rule(run.day).key === 'chasse';
       out.shards = this.gainShards((8 + 3 * run.floor) * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1) * (hunt ? 2 : 1));
@@ -581,6 +593,13 @@ export class Game {
   }
   // Résolution automatique d'un combat en cours (simulations)
   autoResolve() { autoDuel(this.s.descent.run.battle); return this.finishBattle(); }
+  // Retour depuis l'autel : on peut encore choisir un autre bonus (source ou trésor)
+  cancelAltar() {
+    const run = this.s.descent.run;
+    if (!run || run.phase !== 'altar' || !run.rewardsBak) throw new Error('Impossible de revenir en arrière.');
+    run.altar = null; run.phase = 'reward'; run.rewards = run.rewardsBak; run.rewardsBak = null;
+    this.persist();
+  }
   chooseBlessing(key) {
     const run = this.s.descent.run;
     if (!run || run.phase !== 'altar' || !run.altar.includes(key)) throw new Error('Bénédiction indisponible.');

@@ -80,7 +80,7 @@ test('garantie HR au 10e booster sans HR, garantie M au 40e', () => {
 test('probabilités affichées cohérentes', () => {
   const o = boosterOdds('standard');
   o.slots.forEach((s) => assert.ok(Math.abs(Object.values(s.odds).reduce((a, b) => a + b, 0) - 100) < 1e-9));
-  assert.ok(o.atLeastHR > 15 && o.atLeastHR < 40);
+  assert.ok(o.atLeastHR > 3 && o.atLeastHR < 15);
 });
 
 test('rotation hebdomadaire des événements', () => {
@@ -93,6 +93,7 @@ test('ouverture : monnaie débitée, cartes enregistrées, doublons en cendres',
   const g = new Game(catalog, store, { rng: rngFrom('game') });
   g.s.tickets.standard = 0;
   g.s.freePack.stock = 0;
+  g.s.shards = 500;
   const before = g.s.shards;
   const { opening, progress } = g.openBooster('standard');
   const bonus = progress.reduce((t, e) => t + (e.reward?.shards || 0), 0);
@@ -217,12 +218,12 @@ test('booster gratuit : se recharge avec le temps, plafonné', () => {
   g.s.freePack = { stock: 0, since: now.getTime() };
   g.s.tickets.standard = 0; g.s.shards = 0;
   assert.equal(g.canBuy('standard'), false);
-  now = new Date(2026, 9, 10, 14, 1);
+  now = new Date(2026, 9, 10, 16, 1);
   assert.equal(g.freePack().stock, 1);
   const { opening } = g.openBooster('standard');
   assert.equal(opening.paidWith, 'free');
   assert.equal(g.freePack().stock, 0);
   now = new Date(2026, 9, 13, 8);
-  assert.equal(g.freePack().stock, 3, 'plafonné au maximum');
+  assert.equal(g.freePack().stock, 2, 'plafonné au maximum');
   assert.equal(g.freePack().nextAt, null);
 });

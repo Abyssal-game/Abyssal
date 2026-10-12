@@ -11,6 +11,7 @@ import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
 import { bagHTML, bindBag } from './items.js';
 import { runDuel } from './duel-ui.js';
+import { WEEKLY_FLOOR } from '../core/game.js';
 import { setScene, sceneUrl } from '../ui/scene.js';
 import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
@@ -61,7 +62,7 @@ export default function descent(app, root) {
   function weeklyHTML() {
     const w = g.weekly(), c = cat.get(w.id);
     return `<section class="panel dc-week ${w.done ? 'done' : ''}" data-act="weekcard" data-id="${c.id}"><span class="dc-week-art" style="--rc:${RARITY[c.rarity].color}"><img alt="" src="${artUrl(c, { lite: true })}"></span>
-      <span><span class="small muted dc-week-lbl">${picon('hunt')}Créature de la semaine</span><b>${esc(c.name)}</b><span class="small">${w.done ? `${icon('check')} Vaincue : sa carte est à toi ! Nouvelle créature lundi.` : 'Elle rôde dans l’Abysse, comme <b>élite</b> à partir de l’étage 3. Vaincs-la pour gagner sa carte.'}</span></span></section>`;
+      <span><span class="small muted dc-week-lbl">${picon('hunt')}Créature de la semaine</span><b>${esc(c.name)}</b><span class="small">${w.done ? `${icon('check')} Vaincue : sa carte est à toi ! Nouvelle créature lundi.` : 'Elle rôde dans l’Abysse, comme <b>élite redoutable</b> à partir de l’étage 8. Vaincs-la pour gagner sa carte.'}</span></span></section>`;
   }
   function summaryHTML(s) {
     return `<section class="panel ornate dc-sum ${s.wiped ? 'lost' : 'won'}"><h2>${s.wiped ? 'L’équipe est tombée' : 'Retour à la surface'}</h2><p class="dc-depth">Étage <b>${s.floor}</b></p>
@@ -96,7 +97,7 @@ export default function descent(app, root) {
   function doorsView(run) {
     const doors = g.doors();
     root.innerHTML = `${runHead(run)}<p class="dc-prompt">${doors.includes('boss') ? 'Un gardien barre la route.' : doors.length > 1 ? 'Deux passages. Le plus dangereux rapporte plus.' : 'Des créatures barrent le passage.'}</p>
-      <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r} has-art" data-act="door" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic">${icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'boss' ? `<b class="dc-bad">${esc(BOSS_POWERS[bossPowerOf(run.floor)].name)}</b> : ${esc(BOSS_POWERS[bossPowerOf(run.floor)].desc)} <b class="dc-good">Point faible : ${esc(BOSS_POWERS[bossPowerOf(run.floor)].counter)}</b>` : r === 'elite' && run.floor >= 3 && !g.weekly().done ? `${ROOMS[r].desc} <b class="dc-good">La créature de la semaine t’y attend !</b>` : ROOMS[r].desc}</span></button>`).join('')}</div>
+      <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r} has-art" data-act="door" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic">${icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'boss' ? `<b class="dc-bad">${esc(BOSS_POWERS[bossPowerOf(run.floor)].name)}</b> : ${esc(BOSS_POWERS[bossPowerOf(run.floor)].desc)} <b class="dc-good">Point faible : ${esc(BOSS_POWERS[bossPowerOf(run.floor)].counter)}</b>` : r === 'elite' && run.floor >= WEEKLY_FLOOR && !g.weekly().done ? `${ROOMS[r].desc} <b class="dc-good">La créature de la semaine t’y attend !</b>` : ROOMS[r].desc}</span></button>`).join('')}</div>
       ${run.cleared ? `<button class="btn ghost block" data-act="leave">${icon('back')}Remonter</button>` : ''}`;
   }
   function clearedView(run, extra = '') {
@@ -117,6 +118,7 @@ export default function descent(app, root) {
     root.innerHTML = `<section class="vx ${w?.room || ''}">
       <div class="vx-hero"><span class="vx-k">Étage ${run.floor}${w?.room === 'boss' ? ' · Gardien vaincu' : w?.room === 'elite' ? ' · Élite' : ''}</span><h1>Victoire</h1>
         ${w ? `<div class="vx-loot"><span class="vx-chip">${icon('crystal')}+${fmt(w.shards)}</span>${w.chest ? `<span class="vx-chip gold" style="--cc:${CHESTS[w.chest].color}">${icon('lock')}${esc(CHESTS[w.chest].name)}</span>` : ''}${feats.length ? `<span class="vx-chip feat">${icon('sparkle')}${feats.join(' · ')}</span>` : ''}</div>` : ''}
+        ${w?.recruit ? `<p class="vx-week">${icon('crown')} Le gardien vaincu, <b>${esc(cat.get(w.recruit).name)}</b>, rejoint ta collection !</p>` : ''}
         ${w?.weekly ? `<p class="vx-week">${icon('sparkle')} <b>${esc(cat.get(w.weekly).name)}</b> rejoint ta collection !</p>` : ''}
         ${w?.disc?.length ? `<div class="vx-disc"><span class="small muted">Nouvelles rencontres</span>${w.disc.slice(0, 5).map((id) => `<img alt="${esc(cat.get(id).name)}" title="${esc(cat.get(id).name)}" src="${artUrl(cat.get(id), { lite: true })}">`).join('')}</div>` : ''}
       </div>
@@ -127,7 +129,8 @@ export default function descent(app, root) {
   }
   function altarView(run) {
     root.innerHTML = `${runHead(run)}<p class="dc-prompt">L’autel murmure. Choisis une bénédiction.</p>
-      <div class="dc-altar">${run.altar.map((k) => `<button class="dc-bl" data-act="bless" data-k="${k}"><span>${icon('star')}</span><b>${esc(BLESSINGS[k].name)}</b><span class="small">${esc(BLESSINGS[k].desc)}</span></button>`).join('')}</div>`;
+      <div class="dc-altar">${run.altar.map((k) => `<button class="dc-bl" data-act="bless" data-k="${k}"><span>${icon('star')}</span><b>${esc(BLESSINGS[k].name)}</b><span class="small">${esc(BLESSINGS[k].desc)}</span></button>`).join('')}</div>
+      ${run.rewardsBak ? `<button class="btn ghost block" data-act="unaltar">${icon('back')}Revenir aux bonus</button>` : ''}`;
   }
   function battleView(run) {
     if (battle) return;
@@ -144,7 +147,7 @@ export default function descent(app, root) {
       else {
         app.sfx.reveal(out.room === 'boss' ? 'M' : 'R');
         const r = g.descent().run;
-        ui.win = { floor: r.floor, room: out.room, shards: out.shards, chest: out.chest || null, disc: out.discovered.filter((id) => cat.get(id)), weekly: out.weekly?.id || null, stats };
+        ui.win = { floor: r.floor, room: out.room, shards: out.shards, chest: out.chest || null, disc: out.discovered.filter((id) => cat.get(id)), weekly: out.weekly?.id || null, recruit: out.recruit?.id || null, stats };
         rewardView(r);
       }
       window.scrollTo(0, 0);
@@ -197,6 +200,7 @@ export default function descent(app, root) {
       clearedView(g.descent().run, el.dataset.r === 'rest' ? `<p class="dc-event">${icon('heart')} L’eau de la source soigne tes créatures.</p>` : el.dataset.r === 'treasure' ? `<p class="dc-event">${icon('crystal')} +${fmt(out.shards)} éclats</p>` : out.healed ? `<p class="dc-event">${icon('star')} L’autel est muet, mais sa lumière soigne ton équipe.</p>` : '');
     },
     bless(el) { try { g.chooseBlessing(el.dataset.k); app.sfx.discover(); clearedView(g.descent().run, `<p class="dc-event">${icon('star')} ${esc(BLESSINGS[el.dataset.k].name)} : ${esc(BLESSINGS[el.dataset.k].desc)}</p>`); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
+    unaltar() { try { g.cancelAltar(); app.sfx.tap(); render(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     next() { try { g.nextFloor(); app.sfx.swipe(); render(); window.scrollTo(0, 0); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     async leave() {
       if (!(await confirmBox('Remonter maintenant avec ton coffre ?', { ok: 'Remonter' }))) return;

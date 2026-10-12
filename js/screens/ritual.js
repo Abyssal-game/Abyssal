@@ -1,6 +1,7 @@
 // Rituel d'élévation : une carte monte d'un cran (holographique, or, cosmique)
 // contre des cendres. Il réussit toujours, et les doublons (niveaux) ne sont jamais touchés.
-import { VARIANTS } from '../config.js';
+import { VARIANTS, RARITY } from '../config.js';
+import { artUrl } from '../art/assets.js';
 import { cardHTML } from '../ui/card.js';
 import { icon } from '../ui/icons.js';
 import { openSheet, esc, toast, fmt } from '../ui/dom.js';
@@ -9,7 +10,7 @@ export function openRitual(app, id, from, { onClose } = {}) {
   const g = app.game, cat = app.catalog;
   const card = cat.get(id);
   let busy = false;
-  const sheet = openSheet('', { cls: 'ritual-sheet', label: 'Rituel d’élévation', onClose: () => { onClose && onClose(); app.refreshView && app.refreshView(); } });
+  const sheet = openSheet('', { cls: 'ritual-sheet', full: true, label: 'Rituel d’élévation', onClose: () => { onClose && onClose(); app.refreshView && app.refreshView(); } });
 
   function draw() {
     const e = g.entry(id);
@@ -73,6 +74,34 @@ export function openRitual(app, id, from, { onClose } = {}) {
     if (a === 'go') go();
     if (a === 'next') draw();
     if (a === 'close') sheet.close();
+  });
+  draw();
+  return sheet;
+}
+
+// Autel du rituel : toutes les cartes que tu peux élever, en pleine page
+export function openRitualHub(app) {
+  const g = app.game, cat = app.catalog;
+  const sheet = openSheet('', { cls: 'ritual-sheet ri-hub', full: true, label: 'Rituel d’élévation' });
+  function draw() {
+    const list = [];
+    for (const c of cat.cards) {
+      const e = g.entry(c.id);
+      if (!e) continue;
+      const from = ['normal', 'holo', 'gold'].find((v) => e.v[v] > 0 && g.ritualTarget(c.id, v));
+      if (from) list.push({ c, from, to: g.ritualTarget(c.id, from), cost: g.ritualCost(c.id, from) });
+    }
+    list.sort((a, b) => (a.cost <= g.s.ash) - (b.cost <= g.s.ash) || a.cost - b.cost).reverse();
+    sheet.setContent(`<div class="ri-hub-in">
+      <header class="ri-hub-head"><h2>${icon('sparkle')} Rituel d’élévation</h2>
+        <p class="small muted">Fais passer une carte en holographique, en or puis en cosmique. Le rituel réussit toujours et se paie en cendres (${icon('ash')} <b>${fmt(g.s.ash)}</b>).</p></header>
+      ${list.length ? `<div class="ri-hub-grid">${list.map(({ c, from, to, cost }) => `<button class="ri-hub-c ${cost <= g.s.ash ? 'ok' : ''}" data-id="${c.id}" data-from="${from}" style="--rc:${RARITY[c.rarity].color}">
+        <img alt="" src="${artUrl(c, { lite: true })}"><b>${esc(c.name)}</b><span class="small">${esc(VARIANTS[from].short)} → <b>${esc(VARIANTS[to].short)}</b></span><span class="ri-hub-cost">${icon('ash')} ${fmt(cost)}</span></button>`).join('')}</div>` : '<p class="muted center">Aucune carte à élever pour l’instant.</p>'}
+    </div>`);
+  }
+  sheet.body.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-id]');
+    if (b) openRitual(app, b.dataset.id, b.dataset.from, { onClose: draw });
   });
   draw();
   return sheet;

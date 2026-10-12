@@ -231,7 +231,7 @@ body.battle-mode .dv { height: calc(100dvh - var(--safe-t) - var(--safe-b) - 14p
 .dv-dodge { background: #08090E; }
 
 /* Décor illustré du combat (assombri pour garder les cartes lisibles) */
-body.battle-mode .dv.has-bg { background: linear-gradient(180deg, rgba(6, 6, 12, .25), rgba(6, 6, 12, .55) 45%, rgba(6, 6, 12, .35)), var(--bgimg) center / cover no-repeat, #08070C; }
+body.battle-mode .dv.has-bg { background: linear-gradient(180deg, rgba(6, 6, 12, .25), rgba(6, 6, 12, .55) 45%, rgba(6, 6, 12, .35)), var(--bgimg), #08070C; background-position: center; background-size: cover; background-repeat: no-repeat; }
 /* Effets illustrés : le fond noir disparaît grâce au mode « écran » */
 .dv-fx { position: absolute; z-index: 25; pointer-events: none; transform: translate(-50%, -50%) scale(.6); mix-blend-mode: screen; opacity: 0; animation: dvFx .7s ease-out forwards; }
 @keyframes dvFx { 15% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 60% { opacity: .9; } to { opacity: 0; transform: translate(-50%, -50%) scale(1.15); } }
@@ -764,3 +764,50 @@ img.emblem { object-fit: contain; }
 .cb-res.ready .cb-pw { animation: pwSpin 3s linear infinite; }
 @keyframes pwSpin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .cb-res.ready .cb-pw { animation: none; } }
+
+/* ——— Sanctuaire (ancien menu « Plus ») ——— */
+.mn-head h1 { margin-bottom: 4px; }
+.mn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-height: calc(100dvh - 300px); align-content: stretch; }
+.mn-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 16px 10px; min-height: 140px; border-radius: 20px; text-align: center; text-decoration: none; color: var(--ink); font: inherit; background: radial-gradient(120% 90% at 50% 0%, rgba(242, 193, 78, .14), transparent 60%), linear-gradient(180deg, rgba(28, 22, 44, .95), rgba(12, 10, 20, .95)); border: 1px solid rgba(232, 195, 90, .3); box-shadow: 0 8px 22px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .06); }
+.mn-tile:active { transform: scale(.97); }
+.mn-tile-ic .picon { width: 64px; height: 64px; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .7)); }
+.mn-tile b { font: 700 1rem/1.1 var(--f-display); letter-spacing: .04em; color: var(--gold-hi); }
+.mn-tile > span:last-child { font-size: .72rem; color: var(--mute); line-height: 1.3; }
+@media (max-width: 360px) { .mn-tile { min-height: 118px; } .mn-tile-ic .picon { width: 50px; height: 50px; } }
+/* Coffres : l'aide n'est plus collée aux coffres */
+.ch-grid + .dc-fold { margin-top: 22px !important; }
+.dc-fold { padding: 12px 14px !important; }
+.dc-fold > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; list-style: none; font-weight: 700; min-height: 32px; }
+.dc-fold > summary::-webkit-details-marker { display: none; }
+.dc-fold[open] > summary { margin-bottom: 8px; }
+.dc-fold ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+/* Chiffre du dé : gravé à l'or sur la face avant */
+.cb-d20 b { position: absolute !important; left: 50%; top: 53%; margin: 0 !important; transform: translate(-50%, -50%) perspective(160px) rotateX(14deg); font: 900 2.25rem/1 var(--f-display) !important; letter-spacing: -.02em; background: linear-gradient(180deg, #FFF6DA 10%, #F2C14E 50%, #9A6A1E 92%); -webkit-background-clip: text; background-clip: text; color: transparent !important; -webkit-text-stroke: 1px rgba(40, 18, 60, .55); text-shadow: none !important; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .85)) drop-shadow(0 0 6px rgba(242, 193, 78, .45)); }
+.cb-dice:not(.done) .cb-d20 b { opacity: .85; filter: blur(.4px) drop-shadow(0 2px 2px rgba(0, 0, 0, .85)); }
+.cb-dice.t-crit .cb-d20 b { background: linear-gradient(180deg, #fff, #FFE9A8 60%, #F2C14E); -webkit-background-clip: text; background-clip: text; -webkit-text-stroke: 1px rgba(120, 70, 0, .7); filter: drop-shadow(0 0 10px #fff) drop-shadow(0 2px 2px rgba(0, 0, 0, .7)); }
+.cb-dice.t-fumble .cb-d20 b { background: linear-gradient(180deg, #FFD0D8, #FF4D6A 60%, #7A0F24); -webkit-background-clip: text; background-clip: text; -webkit-text-stroke: 1px rgba(40, 0, 10, .8); }
+.btn-die { width: 26px; height: 26px; margin: -6px 6px -6px -4px; vertical-align: middle; filter: drop-shadow(0 0 4px rgba(169, 112, 255, .6)); }
+.cb-ultsheet { text-align: center; display: grid; gap: 10px; justify-items: center; }
+.cb-ult-hero { width: 120px; height: 120px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: radial-gradient(circle, color-mix(in srgb, var(--uc) 35%, transparent), transparent 70%); border: 2px solid var(--uc); box-shadow: 0 0 26px color-mix(in srgb, var(--uc) 55%, transparent); }
+.cb-ult-hero img { width: 100%; height: 100%; object-fit: cover; }
+.cb-ultsheet h2 { margin: 0; color: var(--uc); font-family: var(--f-display); }
+.cb-ultsheet p { margin: 0; }
+.cb-ult-need { color: #E9E1CC; padding: 8px 12px; border-radius: 12px; background: rgba(255, 255, 255, .05); }
+.wallet button.pill { font: inherit; color: inherit; cursor: pointer; }
+.wal-sheet { text-align: center; display: grid; gap: 8px; justify-items: center; }
+.wal-sheet h2, .wal-sheet p { margin: 0; }
+.wal-big .ic, .wal-big { width: 64px; height: 64px; color: var(--gold-hi); }
+.wal-n { font: 900 1.8rem/1 var(--f-display); color: var(--gold-hi); }
+.wal-sheet .btn { margin-top: 6px; }
+/* Rituel en pleine page */
+.col-head-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.col-ritual { flex: none; }
+.ri-hub-head h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; }
+.ri-hub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; margin-top: 12px; }
+.ri-hub-c { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 6px 10px; border-radius: 14px; background: rgba(255, 255, 255, .04); border: 1px solid color-mix(in srgb, var(--rc) 45%, transparent); color: var(--ink); font: inherit; text-align: center; opacity: .6; }
+.ri-hub-c.ok { opacity: 1; box-shadow: 0 0 14px rgba(242, 193, 78, .25); border-color: rgba(242, 193, 78, .6); }
+.ri-hub-c img { width: 72px; height: 100px; object-fit: cover; border-radius: 8px; }
+.ri-hub-c b { font-size: .74rem; line-height: 1.15; }
+.ri-hub-cost { display: inline-flex; align-items: center; gap: 3px; font: 800 .75rem/1 var(--f-ui); color: var(--gold-hi); }
+.ri-hub-cost .ic { width: 13px; height: 13px; }
+.ritual-sheet.sheet, .sheet-full .ritual-sheet { max-width: 640px; }

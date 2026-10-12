@@ -16,18 +16,19 @@ export const RARITY_ORDER = RARITIES.map((r) => r.key);
 
 // Tables de rareté (poids en %). Chaque emplacement d'un booster utilise une table.
 export const TABLES = {
-  base:   { label: 'Emplacement normal',       weights: { C: 55, PC: 25, R: 13, HR: 5, M: 1.7, S: 0.3 } },
-  pcPlus: { label: 'Peu commune ou mieux',     weights: { PC: 25, R: 13, HR: 5, M: 1.7, S: 0.3 } },
-  rPlus:  { label: 'Rare ou mieux',            weights: { R: 13, HR: 5, M: 1.7, S: 0.3 } },
-  hrPlus: { label: 'Hyper rare ou mieux',      weights: { HR: 5, M: 1.7, S: 0.3 } },
-  mPlus:  { label: 'Mythique ou mieux',        weights: { M: 1.7, S: 0.3 } },
-  event:  { label: 'Emplacement événement',    weights: { C: 50, PC: 25, R: 15, HR: 7, M: 2.5, S: 0.5 } },
+// Volontairement avare : les grandes créatures se gagnent surtout dans la Descente (gardiens, coffres).
+  base:   { label: 'Emplacement normal',       weights: { C: 74, PC: 20, R: 4.8, HR: 1, M: 0.17, S: 0.03 } },
+  pcPlus: { label: 'Peu commune ou mieux',     weights: { PC: 82, R: 14, HR: 3.3, M: 0.6, S: 0.1 } },
+  rPlus:  { label: 'Rare ou mieux',            weights: { R: 82, HR: 15, M: 2.6, S: 0.4 } },
+  hrPlus: { label: 'Hyper rare ou mieux',      weights: { HR: 88, M: 10.5, S: 1.5 } },
+  mPlus:  { label: 'Mythique ou mieux',        weights: { M: 90, S: 10 } },
+  event:  { label: 'Emplacement événement',    weights: { C: 66, PC: 24, R: 7.5, HR: 2, M: 0.4, S: 0.1 } },
 };
 
 // Garanties réellement appliquées par boosters.js (comptées par booster ouvert).
 export const PITY = {
-  hr: 10, // au plus tard au 10e booster sans Hyper rare ou mieux, le dernier emplacement est HR ou mieux
-  m: 40,  // au plus tard au 40e booster sans Mythique ou mieux, le dernier emplacement est M ou mieux
+  hr: 25, // au plus tard au 25e booster sans Hyper rare ou mieux, le dernier emplacement est HR ou mieux
+  m: 100, // au plus tard au 100e booster sans Mythique ou mieux, le dernier emplacement est M ou mieux
 };
 
 export const BOOSTERS = {
@@ -85,7 +86,7 @@ export const EVENTS = [
 ];
 
 export const ECONOMY = {
-  start: { shards: 300, ash: 0, tickets: { standard: 2 } },
+  start: { shards: 0, ash: 0, tickets: { standard: 2 } },
   discoveryShards: { C: 5, PC: 10, R: 25, HR: 50, M: 100, S: 200 },
   duplicateAsh: { C: 2, PC: 5, R: 15, HR: 40, M: 100, S: 250 },
   craftAsh: { C: 40, PC: 100, R: 250, HR: 600, M: 1600 }, // les secrètes ne s'invoquent pas
@@ -116,7 +117,7 @@ export const FRAMES = {
 };
 
 // Booster standard gratuit qui se recharge avec le temps (aucune obligation de revenir).
-export const FREE_PACK = { everyHours: 6, max: 3 };
+export const FREE_PACK = { everyHours: 8, max: 2 };
 
 export const FACTION_ORDER = ['infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel'];
 

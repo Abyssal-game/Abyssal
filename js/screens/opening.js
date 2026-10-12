@@ -3,6 +3,7 @@
 // dans la sauvegarde avant la première animation.
 import { BOOSTERS, RARITY, VARIANTS } from '../config.js';
 import { cardHTML } from '../ui/card.js';
+import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM, roleIcon } from '../ui/icons.js';
 import { esc, fmt, toast } from '../ui/dom.js';
 import { packHTML, payLabel, pityHTML } from './shop.js';
@@ -24,6 +25,9 @@ export function openPack(app, type, { faction, onDone } = {}) {
     return;
   }
   const { opening } = result;
+  // illustrations chargées dès maintenant : la carte se retourne sans passer par un fond noir
+  const pre = opening.cards.map((c) => { const im = new Image(); im.decoding = 'async'; im.src = artUrl(cat.get(c.id), { variant: c.variant }); return im; });
+  const ready = (i) => Promise.race([pre[i]?.decode ? pre[i].decode().catch(() => {}) : Promise.resolve(), new Promise((r) => setTimeout(r, 900))]);
   const reduced = app.reduced();
   const fast = g.s.settings.fastOpen;
   const def = BOOSTERS[type];
@@ -263,6 +267,8 @@ export function openPack(app, type, { faction, onDone } = {}) {
       el.classList.add('flash');
       setTimeout(() => el.classList.remove('flash'), 700);
     }
+    await ready(index);
+    if (phase === 'summary') { busy = false; return; }
     app.sfx.flip();
     inner.classList.add('half');
     await wait(lvl >= 4 ? 320 : 170);

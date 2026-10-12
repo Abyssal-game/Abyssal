@@ -4,7 +4,7 @@ import { Game } from './core/game.js';
 import { loadArtManifest, artUrl, hasRealArt } from './art/assets.js';
 import { setCardCatalog } from './ui/card.js';
 import { icon, EMBLEM } from './ui/icons.js';
-import { toast, esc, fmt, reducedMotion, closeTopSheet } from './ui/dom.js';
+import { toast, esc, fmt, reducedMotion, closeTopSheet, openSheet } from './ui/dom.js';
 import { sfx, configureSound } from './ui/sound.js';
 import { VERSION } from './config.js';
 import { openCardDetail } from './screens/detail.js';
@@ -33,7 +33,7 @@ const ROUTES = {
 };
 const TABS = [
   ['antre', 'tab-home', 'Accueil'], ['collection', 'tab-collection', 'Collection'], ['boutique', 'tab-boosters', 'Boosters'],
-  ['descente', 'tab-adventure', 'Aventure'], ['menu', 'tab-more', 'Plus'],
+  ['descente', 'tab-adventure', 'Aventure'], ['menu', 'tab-more', 'Sanctuaire'],
 ];
 // icônes peintes de la barre du bas (assets/icons)
 const tabIcon = (k) => `<img class="tab-pic" alt="" src="assets/icons/${k}.webp">`;
@@ -73,6 +73,20 @@ function applySettings() {
   configureSound(s);
 }
 
+// Explication des deux monnaies (toucher le compteur en haut à droite)
+const WALLET = {
+  shards: ['Éclats', 'La monnaie principale. Ils servent à acheter des boosters dans la Boutique.', 'Tu en gagnes avec l’offrande du jour, les missions, les succès, les nouvelles créatures découvertes et surtout dans la Descente (combats, trésors, gardiens).', 'boutique', 'Aller aux Boosters'],
+  ash: ['Cendres', 'Ce qui reste de tes doublons. Elles servent au Rituel d’élévation (holographique, or, cosmique), à invoquer une carte manquante et à déchiffrer les noms inconnus.', 'Tu en gagnes à chaque doublon obtenu dans un booster : plus la carte est rare, plus elle en donne.', 'collection', 'Aller à la Collection'],
+};
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-wallet]');
+  if (!b) return;
+  const [name, what, how, route, go] = WALLET[b.dataset.wallet];
+  const n = b.dataset.wallet === 'shards' ? app.game.s.shards : app.game.s.ash;
+  const sh = openSheet(`<div class="wal-sheet"><span class="wal-big">${icon(b.dataset.wallet === 'shards' ? 'crystal' : 'ash')}</span><h2>${name}</h2><p class="wal-n">${fmt(n)}</p><p>${what}</p><p class="small muted">${how}</p><a class="btn primary block" href="#/${route}">${go}</a></div>`, { label: name });
+  sh.body.querySelector('a').addEventListener('click', () => sh.close());
+});
+
 function renderChrome() {
   const g = app.game, s = g.s, lv = g.levelInfo();
   const avatarCard = s.avatar && g.catalog.get(s.avatar);
@@ -85,8 +99,8 @@ function renderChrome() {
       <span class="top-meta"><b>${esc(s.title)}</b><span class="xpbar" aria-hidden="true"><i style="width:${(lv.into / lv.need) * 100}%"></i></span></span>
     </a>
     <div class="wallet">
-      <a class="pill shards" href="#/boutique" title="Éclats" aria-label="${fmt(s.shards)} éclats">${icon('crystal')}<span>${fmt(s.shards)}</span></a>
-      <a class="pill ash" href="#/collection" title="Cendres" aria-label="${fmt(s.ash)} cendres">${icon('ash')}<span>${fmt(s.ash)}</span></a>
+      <button class="pill shards" data-wallet="shards" title="Éclats" aria-label="${fmt(s.shards)} éclats : à quoi ça sert ?">${icon('crystal')}<span>${fmt(s.shards)}</span></button>
+      <button class="pill ash" data-wallet="ash" title="Cendres" aria-label="${fmt(s.ash)} cendres : à quoi ça sert ?">${icon('ash')}<span>${fmt(s.ash)}</span></button>
     </div>`;
   const tab = TAB_OF[app.route] ?? 'antre';
   const nNew = g.newCount();
