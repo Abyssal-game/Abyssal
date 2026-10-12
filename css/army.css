@@ -914,3 +914,9 @@ img.emblem { object-fit: contain; }
 /* ===== Lot 5 : menus et monnaies peints ===== */
 img.ic.ic-cur { object-fit: contain; transform: scale(1.18); filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .7)); }
 .dc-fold > summary > .picon { display: inline-block; width: 32px; height: 32px; flex: none; }
+
+/* ===== Lot 6 : écran Équipe ===== */
+.v2-slot:not(.full) { border: 0; border-radius: 0; background: url(../assets/ui/slot-gold.webp) center / 100% 100% no-repeat; color: #F2D68A; text-shadow: 0 0 10px rgba(242, 193, 78, .8); }
+.v2-slots.res .v2-slot:not(.full) { background-image: url(../assets/ui/slot-silver.webp); color: #A9D4F2; text-shadow: 0 0 10px rgba(120, 190, 255, .8); }
+.v2-slot:not(.full) > span { font-size: 2.2rem; }
+.v2-slot:not(.full) small { font: 700 .66rem/1 var(--f-ui); letter-spacing: .12em; text-transform: uppercase; }
