@@ -23,6 +23,8 @@ const bgOf = (run) => `assets/battle/bg-${run.room === 'boss' ? 'boss' : run.flo
 const FX = ['slash', 'impact', 'dodge', 'heal', 'venom', 'frost', 'seal', 'death', 'd20', 'd20-crit', 'd20-fumble'];
 const fxUrl = (n) => `assets/fx/${n}.webp`;
 const DANGER = ['', '!', '!!', '!!!'];
+// Icône peinte d'une intention ennemie
+const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${k}.webp">`;
 
 export function runDuel(app, root, { title, onEnd }) {
   const g = app.game, cat = app.catalog, run = g.descent().run, st = run.battle;
@@ -82,7 +84,7 @@ export function runDuel(app, root, { title, onEnd }) {
     if (!i || st.turn !== 'ally') return '';
     const named = ['charge', 'channel', 'shield', 'heal', 'rally', 'frost'].includes(i.kind);
     const label = named ? esc(i.def.name) : `${i.dmg}${i.kind === 'blast' ? ' ×3' : ''}`;
-    return `<span class="cb-int d${i.danger} k-${i.kind}" title="${esc(i.def.name)} : ${esc(i.def.desc)}">${icon(i.def.icon)}<b>${label}</b>${i.danger >= 2 ? `<em>${DANGER[i.danger]}</em>` : ''}</span>`;
+    return `<span class="cb-int d${i.danger} k-${i.kind}" title="${esc(i.def.name)} : ${esc(i.def.desc)}">${intentIcon(i.kind)}<b>${label}</b>${i.danger >= 2 ? `<em>${DANGER[i.danger]}</em>` : ''}</span>`;
   };
   const cardEl = (u) => {
     const c = cat.get(u.id), kit = KITS[u.role];
@@ -250,7 +252,7 @@ export function runDuel(app, root, { title, onEnd }) {
           break;
         case 'eact': {
           const def = INTENTS[e.kind];
-          if (e.kind === 'heavy' || e.kind === 'blast') banner(`${icon(def.icon)} ${esc(def.name)} !`, 'danger', 700);
+          if (e.kind === 'heavy' || e.kind === 'blast') banner(`${intentIcon(e.kind)} ${esc(def.name)} !`, 'danger', 700);
           if (e.tgt && st.units[e.tgt]?.side === 'ally') lunge(e.a, e.tgt);
           await wait(T(200));
           break;
@@ -348,7 +350,7 @@ export function runDuel(app, root, { title, onEnd }) {
       const def = INTENTS[s.kind];
       const bar = document.createElement('div');
       bar.className = 'dv-dodge cb-def';
-      bar.innerHTML = `<span class="dv-dodge-t">${esc(def.name)} ! <small>Touche dans l’or pour esquiver, au cœur blanc pour parer</small></span><span class="dv-dodge-bar"><i class="z"><i class="p"></i></i><i class="c"></i></span>`;
+      bar.innerHTML = `<span class="dv-dodge-t">${intentIcon(s.kind)} ${esc(def.name)} ! <small>Touche dans l’or pour esquiver, au cœur blanc pour parer</small></span><span class="dv-dodge-bar"><i class="z"><i class="p"></i></i><i class="c"></i></span>`;
       $('.dv-mid').appendChild(bar); $('.dv-mid').classList.add('qte');
       const cur = bar.querySelector('.c'), zEl = bar.querySelector('.z'), pEl = bar.querySelector('.p');
       zEl.style.cssText = `left:${z0 * 100}%;width:${zw * 100}%`;
@@ -510,7 +512,7 @@ export function runDuel(app, root, { title, onEnd }) {
     openSheet(`<div class="tb-info"><div class="tb-info-card ${u.side === 'enemy' ? 'corrupt' : ''}">${cardHTML(c, { size: 'full', nameKnown: true })}</div>
       <h3>${esc(c.name)}${u.side === 'enemy' ? ' corrompu' : ''}</h3>
       <dl class="facts"><div><dt>Attaque</dt><dd>${u.atk + (u.boost || 0)}</dd></div><div><dt>PV</dt><dd>${Math.max(0, u.hp)} / ${u.maxHp}</dd></div><div><dt>Niveau</dt><dd>${u.level || 1}</dd></div>${u.brkMax ? `<div><dt>Brisure</dt><dd>${u.broken ? 'Brisé' : `${u.brk} / ${u.brkMax}`}</dd></div>` : ''}</dl>
-      ${i ? `<p class="small cb-iline"><b>${icon(i.def.icon)} Intention : ${esc(i.def.name)}</b>${i.dmg ? ` · ${i.dmg} dégâts${i.kind === 'blast' ? ' à chacune' : ''}` : ''}${tgtName ? ` sur ${esc(tgtName)}` : ''}. ${esc(i.def.desc)}${i.qte && defMode !== 'off' ? ' <b>Défense active possible.</b>' : ''}</p>` : ''}
+      ${i ? `<p class="small cb-iline"><b>${intentIcon(i.kind)} Intention : ${esc(i.def.name)}</b>${i.dmg ? ` · ${i.dmg} dégâts${i.kind === 'blast' ? ' à chacune' : ''}` : ''}${tgtName ? ` sur ${esc(tgtName)}` : ''}. ${esc(i.def.desc)}${i.qte && defMode !== 'off' ? ' <b>Défense active possible.</b>' : ''}</p>` : ''}
       ${fam ? `<p class="small"><b>${esc(fam.name)}</b> : ${esc(fam.desc)} <span class="dc-good">${esc(fam.counter)}</span></p>` : ''}
       ${u.boss && st.bossPower ? `<p class="small dc-bad"><b>${esc(BOSS_POWERS[st.bossPower].name)}</b> : ${esc(BOSS_POWERS[st.bossPower].desc)} Sous la moitié de ses PV, il entre en phase 2.</p><p class="small dc-good"><b>Point faible</b> : ${esc(BOSS_POWERS[st.bossPower].counter)}</p>` : ''}
       ${u.side === 'enemy' ? `<p class="small">${weakF ? `<b>Faiblesse</b> : ${sigil(weakF)} ${esc(cat.faction[weakF]?.name || weakF)} (+50 % de dégâts)` : '<b>Faiblesse</b> : inconnue. Frappe-la avec la bonne faction, ou marque-la, pour la découvrir.'}</p>` : `
