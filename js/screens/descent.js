@@ -78,6 +78,7 @@ export default function descent(app, root) {
       ${crestHTML(!s.wiped, s.floor, 'Étage', 'dc-sum2-crest')}
       <h2>${s.wiped ? 'L’équipe est tombée' : 'Retour à la surface'}</h2>
       <p class="dc-sum2-sub">${s.wiped ? 'Tes créatures ont été vaincues, mais ton butin est sauvé.' : 'Tu remontes avec tout ton butin.'}</p>
+      ${s.report?.length ? `<div class="dc-why"><b>${icon('info')} Ce qui s’est passé</b>${s.report.map((l) => `<p class="small">${esc(l)}</p>`).join('')}</div>` : ''}
       <div class="dc-sum2-loot">${s.chests.map((c) => `<span class="dc-sum2-chest" style="--cc:${CHESTS[c].color}">${chestSVG(c)}<b>${esc(CHESTS[c].name)}</b></span>`).join('')}${s.shards ? `<span class="dc-sum2-shards">${icon('crystal')}<b>+${fmt(s.shards)}</b><small>éclats</small></span>` : ''}${!s.chests.length && !s.shards ? '<span class="dc-sum2-sub">Aucun butin cette fois.</span>' : ''}</div>
       ${s.chests.length ? `<a class="btn primary block dc-plq dc-plq-red" href="#/coffres">${icon('p:chest')}Ouvrir ${s.chests.length > 1 ? 'mes coffres' : 'mon coffre'}</a>` : ''}
       <div class="dc-sum2-row"><button class="btn dc-plq dc-plq-dark" data-act="share">${icon('copy')}Partager</button><button class="btn dc-plq dc-plq-dark" data-act="dismiss">Continuer</button></div>
@@ -136,6 +137,7 @@ export default function descent(app, root) {
         ${w?.recruit ? `<p class="vx-week">${icon('crown')} Le gardien vaincu, <b>${esc(cat.get(w.recruit).name)}</b>, rejoint ta collection !</p>` : ''}
         ${w?.weekly ? `<p class="vx-week">${icon('sparkle')} <b>${esc(cat.get(w.weekly).name)}</b> rejoint ta collection !</p>` : ''}
         ${w?.boss ? bossRecap(w.boss) : ''}
+        ${w?.report?.length ? `<p class="vx-week vx-best">${icon('star')} ${esc(w.report[0])}</p>` : ''}
         ${w?.relNew?.length ? `<p class="vx-week">${icon('p:combo')} Relation découverte : <b>${w.relNew.map((k) => esc(RELATION[k]?.name || k)).join(', ')}</b>. Retrouve-la dans le Bestiaire.</p>` : ''}
         ${w?.disc?.length ? `<div class="vx-disc"><span class="small muted">${picon('discover')}Nouvelles rencontres</span>${w.disc.slice(0, 5).map((id) => `<img alt="${esc(cat.get(id).name)}" title="${esc(cat.get(id).name)}" src="${artUrl(cat.get(id), { lite: true })}">`).join('')}</div>` : ''}
       </div>
@@ -165,7 +167,7 @@ export default function descent(app, root) {
       else {
         app.sfx.reveal(out.room === 'boss' ? 'M' : 'R');
         const r = g.descent().run;
-        ui.win = { floor: r.floor, room: out.room, shards: out.shards, chest: out.chest || null, disc: out.discovered.filter((id) => cat.get(id)), weekly: out.weekly?.id || null, recruit: out.recruit?.id || null, stats, boss: out.boss || null, relNew: out.relNew || [] };
+        ui.win = { floor: r.floor, room: out.room, shards: out.shards, chest: out.chest || null, disc: out.discovered.filter((id) => cat.get(id)), weekly: out.weekly?.id || null, recruit: out.recruit?.id || null, stats, boss: out.boss || null, relNew: out.relNew || [], report: out.report || [] };
         rewardView(r);
       }
       window.scrollTo(0, 0);

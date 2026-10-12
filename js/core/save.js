@@ -43,6 +43,7 @@ export function defaultSave(now = Date.now()) {
     // Arsenal : objets (id -> { b: modèle, r: rareté, f: forge, a: propriété }), équipement par héros,
     // coffres et clés (un cadeau de départ pour découvrir), fer runique, garantie de légendaire.
     team: [],             // 5 cartes : 3 au combat, 2 en réserve
+    teamPresets: [],      // équipes enregistrées : { name, ids }
     chests: { bois: 0, fer: 0, or: 0, abyssal: 0 }, // coffres (pleins de boosters)
     descent: { day: null, used: 0, bestToday: 0, best: 0, runs: 0, run: null },
     history: [],          // dernières ouvertures
@@ -93,6 +94,8 @@ export function migrate(raw) {
   s.stats.pulls = { ...d.stats.pulls, ...(s.stats.pulls || {}) };
   for (const k of ['descent', 'missions', 'freePack', 'daily', 'itemBuys', 'chests', 'sceaux', 'relics', 'war']) s[k] = { ...d[k], ...(s[k] && typeof s[k] === 'object' ? s[k] : {}) };
   if (!Array.isArray(s.team)) s.team = [];
+  if (!Array.isArray(s.teamPresets)) s.teamPresets = [];
+  s.teamPresets = s.teamPresets.filter((p) => p && typeof p.name === 'string' && Array.isArray(p.ids)).slice(0, 4);
   for (const k of ['items', 'fervor', 'collection', 'deciphered', 'achievements', 'setsDone', 'factionsDone', 'hunt', 'bossesBeaten', 'relations', 'forms', 'lore']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
   for (const [k, sub] of [['sceaux', 'beaten'], ['war', 'used'], ['war', 'claimed']]) if (!s[k][sub] || typeof s[k][sub] !== 'object') s[k][sub] = {};
   for (const [k, sub] of [['sceaux', 'history'], ['war', 'history']]) if (!Array.isArray(s[k][sub])) s[k][sub] = [];

@@ -55,7 +55,7 @@ export function openPack(app, type, { faction, onDone } = {}) {
     const r = RARITY[c.rarity];
     let s = `<b style="color:${r.color}">${r.name}</b>`;
     if (c.variant !== 'normal') s += ` · <span class="vtag">${VARIANTS[c.variant].name}</span>`;
-    if (c.isNewCard) s += ` · <span class="newtag">Nouvelle découverte</span><br><span class="op-gain">${icon('swords')} Elle peut rejoindre ton équipe</span>`;
+    if (c.isNewCard) { const card = cat.get(c.id), fp = app.game.factionProgress(card.faction); s += ` · <span class="newtag">Nouvelle entrée au Bestiaire</span><br><span class="op-gain">${icon('book')} ${esc(cat.faction[card.faction].name)} : ${fp.owned} / ${fp.total}</span> <span class="op-gain">${icon('swords')} Elle peut rejoindre ton équipe</span>`; }
     else if (c.isNewVariant) s += ` · <span class="newtag">Nouvelle variante</span>${c.levelUp ? `<br><span class="op-gain">${icon('star')} Niveau ${c.levelUp} !</span>` : ''}`;
     else s += ` · doublon <span class="muted">+${c.ash} cendres</span>${c.levelUp ? `<br><span class="op-gain">${icon('star')} Niveau ${c.levelUp} !</span>` : ''}`;
     // rôle et capacité en combat
@@ -282,7 +282,7 @@ export function openPack(app, type, { faction, onDone } = {}) {
     if (RI(c.rarity) >= 4) epic(c.rarity);
     else app.sfx.reveal(c.rarity);
     if (c.variant !== 'normal') shine(c.variant, RI(c.rarity) >= 4 ? 1400 : 200);
-    if (c.isNewCard) setTimeout(() => app.sfx.discover(), 250);
+    if (c.isNewCard) { setTimeout(() => app.sfx.discover(), 250); if (!reduced) { const cc = stage.querySelector('.op-card, .tcg'); cc?.classList.add('op-first'); setTimeout(() => cc?.classList.remove('op-first'), 1300); } }
     await wait(RI(c.rarity) >= 4 ? 900 : 250);
     busy = false;
     hint.textContent = index < opening.cards.length - 1 ? 'Glisse la carte sur le côté, ou touche-la pour la suivante.' : 'Glisse ou touche pour voir le récapitulatif.';

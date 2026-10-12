@@ -42,6 +42,16 @@ export default function home(app, root) {
     return `<section class="panel today"><div class="today-head"><h2>Aujourd’hui</h2></div>${rows.join('')}</section>`;
   }
 
+  // Objectifs : un proche, un de progression, un de collection ; chacun mène à son écran
+  function goalsHTML() {
+    const list = g.goals();
+    if (!list.length) return '';
+    const col = { run: '#E0485E', depth: '#9C7BFF', boss: '#FF6B7F', sceaux: '#E8C35A', collection: '#7FA8D8' };
+    return `<section class="panel hg"><h2>Tes objectifs</h2>${list.map((x) => `<a class="hg-row" href="${x.href}" style="--mc:${x.faction ? cat.faction[x.faction].colors.secondary : col[x.kind]}">
+      <span class="td-ic mi">${x.faction ? sigil(x.faction) : picon(x.icon)}</span>
+      <span class="td-t"><b>${esc(x.title)}</b><span class="small muted">${esc(x.sub)}</span>${x.n ? `<span class="progress"><i style="width:${(x.p / x.n) * 100}%"></i></span>` : ''}</span>${icon('next')}</a>`).join('')}</section>`;
+  }
+
   root.innerHTML = `
     <section class="home-brand">
       <h1 class="hb-title"><img src="assets/brand/title.webp" alt="ABYSSAL — Le Bestiaire interdit"></h1>
@@ -52,6 +62,7 @@ export default function home(app, root) {
       <a class="ha ha-dive" href="#/descente"><span class="ha-art"></span><b>Aventure</b><span>${g.descent().run ? `En cours · étage ${g.descent().run.floor}` : g.torchesLeft() ? `${g.torchesLeft()} torche${g.torchesLeft() > 1 ? 's' : ''} aujourd’hui` : 'Reviens demain'}</span></a>
     </div>
 
+    ${goalsHTML()}
     ${todayHTML()}
     <p class="home-col small muted center"><a href="#/collection">${owned} / ${total} créatures découvertes</a></p>
     <div class="online-pill" role="status" aria-live="polite"><img class="on-ic" alt="" src="assets/icons/online.webp"><span class="on-dot"></span><span class="on-t">Connexion…</span></div>

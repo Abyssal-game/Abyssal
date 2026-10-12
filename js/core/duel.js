@@ -161,7 +161,14 @@ export function dmgOf(st, a, t, mult = 1, { basic = false } = {}) {
     if (R_.includes('oeil')) n *= 1.15;
   }
   if (t.boss && st.law === 'fer' && !t.broken) n *= 0.6;
+  if (a.side === 'ally' && t.side === 'enemy' && mult > 0) n += comboOf(st, a, t);
   return mult > 0 ? Math.max(1, Math.round(n)) : 0;
+}
+// Enchaînement : +1 dégât par autre créature de ton équipe qui a déjà frappé cette cible ce tour-ci (+2 au plus)
+export const COMBO_MAX = 2;
+export function comboOf(st, a, t) {
+  const by = st.hitBy?.[t.uid];
+  return by ? Math.min(COMBO_MAX, by.filter((x) => x !== a.uid).length) : 0;
 }
 // Part des PV perdus par toute l'équipe (0 à 1), pour la Couronne des Cendres
 function teamLoss(st) {
@@ -180,6 +187,13 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   u.hp -= d;
   if (d > 0) ev.push({ t: 'dmg', u: u.uid, d, hp: u.hp, src });
   const a = src && st.units[src];
+  if (a && d > 0 && a.side === 'ally' && u.side === 'enemy' && st.turn === 'ally') {
+    const by = ((st.hitBy ||= {})[u.uid] ||= []);
+    const combo = comboOf(st, a, u);
+    if (!by.includes(a.uid)) by.push(a.uid);
+    if (combo > 0) { st.stats.combos = (st.stats.combos || 0) + 1; ev.push({ t: 'combo', u: u.uid, n: combo + 1 }); }
+  }
+  if (a && d > 0 && a.side === 'enemy' && u.side === 'ally') (st.taken ||= {})[a.uid] = ((st.taken || {})[a.uid] || 0) + d;
   // Relations (prédation, rivalité) : annoncées la première fois qu'elles jouent
   const rel = a ? relationMult(a, u).rel : null;
   if (rel && d > 0 && !(st.relSeen ||= {})[rel]) { st.relSeen[rel] = true; ev.push({ t: 'status', u: u.uid, s: rel.startsWith('r-') ? 'Rivaux !' : 'Proie !', syn: true, rel }); }
@@ -198,6 +212,9 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
     }
     ev.push({ t: 'die', u: u.uid });
     if (u.side === 'enemy') st.kills.push(u.id);
+    // Coup de grâce : achever un ennemi donne 1 Ferveur
+    if (u.side === 'enemy' && a && a.side === 'ally') { st.stats.finishers = (st.stats.finishers || 0) + 1; ev.push({ t: 'finisher', u: u.uid, a: a.uid }); gainFervor(st, 1, ev, 'Coup de grâce'); }
+    if (u.side === 'ally') (st.fallenLog ||= []).push({ u: u.uid, by: a?.uid || null, round: st.round, kind: st.curKind || null });
     if (u.side === 'ally') alive(st, 'ally').filter((x) => x.form === 'vengeance').forEach((x) => { x.atk += 2; ev.push({ t: 'status', u: x.uid, s: 'Vengeance : +2 ATQ', syn: true }); });
   }
   return d;
@@ -472,7 +489,7 @@ function startAllyTurn(st, ev) {
   st.turn = 'ally';
   const R_ = st.relics || [];
   st.ap = AP_MAX + (st.law === 'hate' ? 1 : 0) + (st.round === 1 ? (R_.includes('sablier') ? 1 : 0) - (R_.includes('miroir') ? 1 : 0) : 0);
-  st.swapped = false; st.ombreUsed = false;
+  st.swapped = false; st.ombreUsed = false; st.hitBy = {}; st.curKind = null;
   for (const u of alive(st, 'ally')) { u.acts = 0; u.boost = 0; u.defend = false; u.guardBy = null; u.rempart = null; u.exposed = false; u.stunned = false; }
   for (const u of front(st, 'ally')) {
     if (u.frozen) { u.frozen = 0; u.stunned = true; ev.push({ t: 'status', u: u.uid, s: 'Gelée : passe son tour', k: 'frost' }); }
@@ -587,6 +604,8 @@ export function enemyAct(st, aUid, defense = 'none') {
   ev.push({ t: 'eact', a: aUid, kind, tgt: it.t });
   let dealt = 0;
   const big = ['heavy', 'blast', 'gorge', 'blizzard', 'copy'].includes(kind);
+  st.curKind = kind;
+  if (big && defense === 'none') st.stats.missed = (st.stats.missed || 0) + 1;
   const evStart = ev.length;
   const strike = (t, mult) => {
     if (!t || t.hp <= 0) return null;
@@ -877,4 +896,28 @@ export function endTurn(st, defense = () => 'none') {
   for (let s = nextEnemy(st); s; s = nextEnemy(st)) ev.push(...enemyAct(st, s.a, s.qte ? defense(st, s) : 'none'));
   ev.push(...endEnemyTurn(st));
   return ev;
+}
+
+// Bilan d'un combat terminé, en quelques phrases simples (noms fournis par l'appelant).
+// Défaite : qui a fait le plus de dégâts, quelle attaque a été décisive, défenses manquées, conseil.
+// Victoire : le fait marquant (Brisure, parades, enchaînements, coups de grâce).
+const KIND_TXT = { heavy: 'un coup chargé', blast: 'une déflagration', gorge: 'le festin du Dévoreur', blizzard: 'une tempête de givre', copy: 'une copie de ta créature', hit: 'une attaque', poison: 'le poison', frost: 'le gel' };
+export function battleReport(st, name) {
+  const s = st.stats || {}, out = [];
+  if (st.over === 'lost') {
+    const top = Object.entries(st.taken || {}).sort((a, b) => b[1] - a[1])[0];
+    if (top) out.push(`${name(top[0])} t’a infligé le plus de dégâts (${top[1]}).`);
+    const first = (st.fallenLog || [])[0];
+    if (first) out.push(`${name(first.u)} est tombé${first.round ? ` au tour ${first.round}` : ''}${first.by ? `, sous ${KIND_TXT[first.kind] || 'une attaque'} de ${name(first.by)}` : ''}.`);
+    if (s.missed) out.push(`${s.missed} attaque${s.missed > 1 ? 's' : ''} dangereuse${s.missed > 1 ? 's' : ''} n’${s.missed > 1 ? 'ont' : 'a'} pas été parée${s.missed > 1 ? 's' : ''}.`);
+    const tip = s.missed ? 'Contre les attaques annoncées « Danger », touche au bon moment pour esquiver ou parer.'
+      : !s.breaks && Object.values(st.units).some((u) => u.side === 'enemy' && (u.boss || u.elite)) ? 'Concentre tes coups sur l’élite ou le gardien pour le briser : il perd son tour.'
+      : 'Frappe la même cible avec plusieurs créatures : chaque coup suivant gagne un bonus d’Enchaînement.';
+    out.push(tip);
+  } else if (st.over === 'won') {
+    const best = [[s.parries, (n) => `${n} parade${n > 1 ? 's' : ''} parfaite${n > 1 ? 's' : ''}`], [s.breaks, (n) => `${n} Brisure${n > 1 ? 's' : ''}`], [s.combos, (n) => `${n} enchaînement${n > 1 ? 's' : ''}`], [s.finishers, (n) => `${n} coup${n > 1 ? 's' : ''} de grâce`], [s.crits, (n) => `${n} critique${n > 1 ? 's' : ''} au dé`]]
+      .filter(([n]) => n > 0).map(([n, f]) => f(n));
+    if (best.length) out.push(`Fait marquant : ${best.slice(0, 2).join(' et ')}.`);
+  }
+  return out;
 }

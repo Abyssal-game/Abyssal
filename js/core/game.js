@@ -4,7 +4,7 @@ import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_O
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
 import { DESCENT, CHESTS, floorDoors, floorEnemies, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, huntStage, HUNT_STAGES } from './descent.js';
-import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel } from './duel.js';
+import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport } from './duel.js';
 import { bossOf, BOSSES } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
 import { FORMS, formUnlocked } from './forms.js';
@@ -133,7 +133,7 @@ export class Game {
     if ((this.s.tickets[type] || 0) > 0) { this.s.tickets[type]--; paidWith = 'ticket'; }
     else if (free && free.stock > 0) { this.s.freePack = { stock: free.stock - 1, since: free.since }; paidWith = 'free'; }
     else if (this.s.shards >= def.price) { this.s.shards -= def.price; this.s.stats.shardsSpent += def.price; paidWith = 'shards'; }
-    else throw new Error('Pas assez d’éclats.');
+    else throw new Error(`Il te manque ${def.price - this.s.shards} éclats (tu en as ${this.s.shards}). La Descente et les Duels des Sceaux en rapportent.`);
 
     const ev = this.event();
     const res = drawBooster(type, this.catalog, { rng: this.rng, pity: this.s.pity, faction, event: ev });
@@ -245,7 +245,7 @@ export class Game {
     if (this.owns(id)) throw new Error('Tu possèdes déjà cette carte.');
     const cost = ECONOMY.craftAsh[c.rarity];
     if (cost === undefined) throw new Error('Les cartes secrètes ne peuvent pas être invoquées.');
-    if (this.s.ash < cost) throw new Error('Pas assez de cendres.');
+    if (this.s.ash < cost) throw new Error(`Il te manque ${cost - this.s.ash} cendres (tu en as ${this.s.ash}). Les doublons en donnent.`);
     this.s.ash -= cost;
     this.s.stats.crafted++;
     const r = this.addCard(id, 'normal', 'craft');
@@ -256,7 +256,7 @@ export class Game {
 
   decipher(id) {
     if (this.nameKnown(id)) throw new Error('Ce nom est déjà connu.');
-    if (this.s.ash < ECONOMY.decipherAsh) throw new Error('Pas assez de cendres.');
+    if (this.s.ash < ECONOMY.decipherAsh) throw new Error(`Il te manque ${ECONOMY.decipherAsh - this.s.ash} cendres (tu en as ${this.s.ash}).`);
     this.s.ash -= ECONOMY.decipherAsh;
     this.s.deciphered[id] = true;
     this.persist();
@@ -338,7 +338,7 @@ export class Game {
     const to = this.ritualTarget(id, from);
     if (!to) throw new Error('Cette carte ne peut plus être élevée.');
     const cost = this.ritualCost(id, from);
-    if (this.s.ash < cost) throw new Error('Pas assez de cendres.');
+    if (this.s.ash < cost) throw new Error(`Il te manque ${cost - this.s.ash} cendres (tu en as ${this.s.ash}). Les doublons en donnent.`);
     this.s.ash -= cost;
     this.s.ritualBoost = 0;
     delete this.s.fervor[`${id}:${to}`];
@@ -394,6 +394,27 @@ export class Game {
     this.persist();
     return list;
   }
+  // Équipes enregistrées (4 au plus) : un nom et 5 cartes, rechargées d'un toucher
+  teamPresets() { return Array.isArray(this.s.teamPresets) ? this.s.teamPresets : (this.s.teamPresets = []); }
+  saveTeamPreset(name, ids = this.s.team) {
+    const list = this.teamPresets(), nm = String(name || '').trim().slice(0, 18);
+    if (!nm) throw new Error('Donne un nom à cette équipe.');
+    if (!ids.length) throw new Error('Ton équipe est vide.');
+    const i = list.findIndex((p) => p.name.toLowerCase() === nm.toLowerCase());
+    if (i < 0 && list.length >= 4) throw new Error('4 équipes au plus : supprimes-en une d’abord.');
+    const p = { name: nm, ids: ids.slice(0, TEAM.active + TEAM.reserve) };
+    if (i >= 0) list[i] = p; else list.push(p);
+    this.persist();
+    return p;
+  }
+  loadTeamPreset(i) {
+    const p = this.teamPresets()[i];
+    if (!p) throw new Error('Équipe introuvable.');
+    const missing = p.ids.filter((id) => !this.owns(id)).length;
+    const team = this.setTeam(p.ids);
+    return { team, missing };
+  }
+  deleteTeamPreset(i) { const list = this.teamPresets(); if (list[i]) { list.splice(i, 1); this.persist(); } }
   // La carte qui porte le pouvoir ultime : la Mythique ou Secrète la plus rare de l'équipe
   ultCard(ids = this.s.team) {
     return ids.map((id) => this.catalog.get(id)).filter(canUlt).sort((a, b) => RI(b.rarity) - RI(a.rarity))[0] || null;
@@ -535,6 +556,30 @@ export class Game {
     return out;
   }
   sceauxQuit() { this.s.sceaux.cur = null; this.persist(); }
+  // Trois objectifs pour l'accueil : un proche (Descente), un de progression (gardien ou Sceaux),
+  // un de collection (le royaume le plus proche d'être complet). Chacun mène à son écran.
+  goals() {
+    const out = [], d = this.descent(), best = d.best || 0;
+    if (d.run) out.push({ kind: 'run', title: `Reprends ton expédition à l’étage ${d.run.floor}`, sub: 'Ton équipe t’attend dans l’Abysse', href: '#/descente', icon: 'descend' });
+    else {
+      const target = best < 3 ? 3 : (Math.floor(best / 5) + 1) * 5;
+      const chest = target >= 15 ? 'abyssal' : target >= 10 ? 'or' : target >= 5 ? 'fer' : 'bois';
+      out.push({ kind: 'depth', title: `Atteins l’étage ${target}`, sub: best ? `Ton record : étage ${best} · ${(CHESTS[chest]?.name || 'un coffre').toLowerCase()} à la clé` : 'Ta première descente t’attend', href: '#/descente', icon: 'depth', p: Math.min(best, target), n: target });
+    }
+    let bf = 0;
+    for (let f = 5; f <= 60; f += 5) if (!this.s.bossesBeaten[bossOf(f)]) { bf = f; break; }
+    if (bf) { const B = BOSSES[bossOf(bf)]; out.push({ kind: 'boss', title: `Vaincs ${B.name}`, sub: `Gardien de l’étage ${bf} · son récit t’attend dans le Bestiaire`, href: '#/descente', icon: 'crest-boss' }); }
+    else {
+      const i = SC.RIVALS.findIndex((r) => !this.s.sceaux.beaten[r.key]);
+      if (i >= 0 && SC.rivalUnlocked(this.s, i)) out.push({ kind: 'sceaux', title: `Bats ${SC.RIVALS[i].name} aux Duels des Sceaux`, sub: `${SC.RIVALS[i].title} · première victoire : +${SC.SCEAUX_REWARD.firstWin} éclats`, href: '#/sceaux', icon: 'seal' });
+    }
+    const fac = FACTION_ORDER.map((f) => ({ f, ...this.factionProgress(f) })).filter((x) => x.owned < x.total).sort((a, b) => b.owned / b.total - a.owned / a.total || (a.total - a.owned) - (b.total - b.owned))[0];
+    if (fac) {
+      const left = fac.total - fac.owned, name = this.catalog.faction[fac.f].name;
+      out.push({ kind: 'collection', title: left === 1 ? `Plus qu’une créature pour compléter ${name}` : left <= 10 ? `Plus que ${left} créatures pour compléter ${name}` : `Complète le royaume ${name}`, sub: `${fac.owned} / ${fac.total} · une récompense t’attend au bout`, href: `#/faction/${fac.f}`, icon: 'book', faction: fac.f, p: fac.owned, n: fac.total });
+    }
+    return out.slice(0, 3);
+  }
   // Forme choisie pour une carte (corrompue si débloquée et sélectionnée)
   formOf(id) { return this.s.forms?.[id] === 'corrompue' && formUnlocked(this, id) ? 'corrompue' : null; }
   setForm(id, form) {
@@ -678,7 +723,7 @@ export class Game {
     }
     run.battle = null;
     const won = st.over === 'won' && run.team.some((m) => !m.fallen);
-    const out = { room, won, discovered, relNew, pact: pactUsed };
+    const out = { room, won, discovered, relNew, pact: pactUsed, report: battleReport(st, (uid) => this.catalog.get(st.units[uid]?.id)?.name || 'Une créature') };
     if (bossKey) {
       out.boss = { key: bossKey, log: (st.bossLog || []).slice(), interrupts: st.stats?.interrupts || 0, feasts: st.stats?.feasts || 0, weak: Object.keys(st.discovered || {}), first: won && !this.s.bossesBeaten[bossKey] };
       if (won) { this.s.bossesBeaten[bossKey] = this.s.bossesBeaten[bossKey] || Date.now(); }
@@ -712,6 +757,7 @@ export class Game {
     } else {
       out.lost = true;
       out.summary = this.endRun(true);
+      out.summary.report = out.report;
     }
     return out;
   }
@@ -834,7 +880,7 @@ export class Game {
     const it = ITEMS[k];
     if (!it) throw new Error('Objet inconnu.');
     if (it.limit && this.boughtToday(k) >= it.limit) throw new Error(`Limite atteinte : ${it.limit} par jour.`);
-    if (this.s.shards < it.price) throw new Error('Pas assez d’éclats.');
+    if (this.s.shards < it.price) throw new Error(`Il te manque ${it.price - this.s.shards} éclats (tu en as ${this.s.shards}).`);
     this.s.shards -= it.price;
     this.s.stats.shardsSpent += it.price;
     if (it.chests) this.addChests(it.chests);

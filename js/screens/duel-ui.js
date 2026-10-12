@@ -12,7 +12,7 @@ import { tuto } from '../ui/tutos.js';
 import { cardHTML } from '../ui/card.js';
 import {
   BOSS_POWERS, INTENTS, SYNERGIES, PACK_BONUS, FERVOR_MAX, AP_MAX, front, reserve, actionsFor, actionTargets, act, preview,
-  beginEnemyTurn, nextEnemy, enemyAct, endEnemyTurn, takeSkips, defenseWindow, threats, intentInfo, useUlt, ultReady, autoActs,
+  beginEnemyTurn, nextEnemy, enemyAct, endEnemyTurn, takeSkips, defenseWindow, threats, intentInfo, useUlt, ultReady, autoActs, comboOf,
 } from '../core/duel.js';
 import { KITS, AI_FAMILIES, DICE_TIERS, WEAK_TO } from '../core/skills.js';
 import { BOSSES, LAWS, ASPECTS } from '../core/bosses.js';
@@ -42,7 +42,7 @@ const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${IN_P
 
 export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.' }) {
   const g = app.game, cat = app.catalog, run = runOpt || g.descent().run, st = run.battle;
-  const ui = (app.state.duel ||= { fast: false });
+  const ui = (app.state.duel ||= { fast: !!g.s.settings?.fastCombat });
   const reduced = app.reduced();
   const T = (ms) => (reduced ? Math.min(ms, 80) : ui.fast ? ms * 0.45 : ms);
   const defMode = 'on'; // la défense active est la même pour tout le monde
@@ -176,7 +176,8 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
     if (mode && sel && st.turn === 'ally') {
       for (const id of actionTargets(st, sel, mode.key)) {
         const p = preview(st, sel, mode.key, id);
-        tgtInfo[id] = p.roll ? `${p.roll.chance}%` : p.dmg ? (p.dmg >= st.units[id].hp && st.units[id].side === 'enemy' ? `<b class="ko">K.O.</b> -${p.dmg}` : `-${p.dmg}${p.weak ? ' ★' : ''}`) : 'Cible';
+        const cb = p.dmg && st.units[id].side === 'enemy' ? comboOf(st, st.units[sel], st.units[id]) : 0, cbTxt = cb ? ` <i class="cmb">+${cb}</i>` : '';
+        tgtInfo[id] = p.roll ? `${p.roll.chance}%` : p.dmg ? (p.dmg >= st.units[id].hp && st.units[id].side === 'enemy' ? `<b class="ko">K.O.</b> -${p.dmg}${cbTxt}` : `-${p.dmg}${p.weak ? ' ★' : ''}${cbTxt}`) : 'Cible';
       }
     }
     enEl.innerHTML = front(st, 'enemy').map(cardEl).join('') + resHTML('enemy');
@@ -315,6 +316,8 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
           draw();
           await wait(T(e.syn ? 480 : 260));
           break;
+        case 'combo': float(e.u, `Chaîne ×${e.n}`, 'combo'); app.sfx.crit?.(); await wait(T(260)); if (!g.s.tips?.['cb-combo']) tuto(app, 'cb-combo'); break;
+        case 'finisher': { if (!reduced) { const d = $('.dv'); d.classList.add('slowmo'); setTimeout(() => d.classList.remove('slowmo'), 700); } banner('Coup de grâce !', 'finisher', 800); await wait(T(380)); break; }
         case 'die': app.sfx.death(); fxAt(e.u, 'death', { big: true }); sparks(e.u, 'big'); el(e.u)?.classList.add('dying'); await wait(T(440)); draw(); break;
         case 'enter': draw(); el(e.u)?.classList.add('enter'); await wait(T(340)); break;
         case 'revive': draw(); float(e.u, 'Relevée !', 'heal'); await wait(T(280)); break;
@@ -541,7 +544,7 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
     if (b) {
       const k = b.dataset.d;
       if (k === 'quit') { toast(pause, { icon: 'swords' }); app.go(''); return; }
-      if (k === 'fast') { ui.fast = !ui.fast; b.classList.toggle('on', ui.fast); return; }
+      if (k === 'fast') { ui.fast = !ui.fast; b.classList.toggle('on', ui.fast); g.s.settings = { ...g.s.settings, fastCombat: ui.fast }; g.persist(); return; }
       if (k === 'help') return help();
       if (k === 'rule') return ruleSheet(b.dataset.k);
       if (busy) return;
@@ -647,6 +650,8 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
       <li><b>Intentions</b> : au-dessus de chaque ennemi, ce qu’il fera et les dégâts prévus ; « ! » = danger. Le badge rouge sur tes cartes annonce les dégâts qu’elles vont prendre.</li>
       <li><b>Défense active</b> (coups chargés, attaques de zone, sorts, élites et gardiens) : touche dans l’or pour esquiver (+1 Ferveur), sur le trait blanc, au tout dernier instant, pour parer (aucun dégât, +2 Ferveur, Brisure, contre-attaque des Gardes et des Assauts).</li>
       <li><b>Dés</b> : Coup d’estoc, Contagion et Entrave lancent un D20 contre une difficulté (DD). 1 : échec critique ; sous le DD : réussite partielle ; DD atteint : réussite ; 20 : critique. Marque, gel, Brisure et faiblesse donnent des bonus.</li>
+      <li><b>Enchaînement</b> : chaque créature qui frappe un ennemi déjà touché ce tour-ci par une autre de tes créatures gagne +1 dégât (+2 au plus). Le « +1 » doré sur la cible l’annonce.</li>
+      <li><b>Coup de grâce</b> : achever un ennemi donne +1 Ferveur.</li>
       <li><b>Brisure</b> (élites, gardiens) : vide, l’ennemi perd son action, subit +50 % de dégâts et +5 aux jets contre lui jusqu’à la fin de ton tour suivant.</li>
       <li><b>Faiblesses</b> : chaque faction en craint une autre (+50 % de dégâts) ; contre sa propre faction : -25 %. ★ sur une cible = faiblesse exploitée.</li>
       <li><b>Instinct de meute</b> : tes Communes font +${PACK_BONUS} dégât aux élites et aux gardiens.</li></ul>
