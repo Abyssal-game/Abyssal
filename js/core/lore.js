@@ -1,6 +1,6 @@
 // ABYSSAL : bestiaire narratif (données). Trois sortes de récits, tous débloqués par le jeu :
 // - les fragments de royaume : un quart, la moitié, puis toute la faction en collection ;
-// - les récits des gardiens : en battant chaque gardien (Descente ou Chasse aux Reliques) ;
+// - les récits des gardiens : en battant chaque gardien ;
 // - les formes corrompues : quand la forme s'éveille (voir forms.js).
 // Les relations entre créatures (relations.js) se découvrent en combat.
 import { BOSSES, BOSS_ORDER } from './bosses.js';
@@ -56,7 +56,7 @@ export function loreEntries(g, cat) {
   }
   for (const k of BOSS_ORDER) {
     const b = BOSSES[k];
-    out.push({ key: `boss:${k}`, kind: 'boss', boss: k, title: b.name, sub: b.title, text: b.story, mechanic: b.mechanic, counter: b.counter, unlocked: !!g.s.bossesBeaten[k], hint: 'Vaincs ce gardien dans la Descente ou la Chasse aux Reliques.' });
+    out.push({ key: `boss:${k}`, kind: 'boss', boss: k, title: b.name, sub: b.title, text: b.story, mechanic: b.mechanic, counter: b.counter, unlocked: !!g.s.bossesBeaten[k], hint: 'Vaincs ce gardien dans la Descente.' });
   }
   for (const [id, f] of Object.entries(FORMS)) {
     out.push({ key: `form:${id}`, kind: 'form', id, title: f.name, sub: f.title, text: f.lore, unlocked: formUnlocked(g, id), hint: g.owns(id) ? f.condText : `Possède ${cat.get(id)?.name || 'cette carte'}, puis : ${f.condText.charAt(0).toLowerCase()}${f.condText.slice(1)}.` });

@@ -58,8 +58,6 @@ export default function descent(app, root) {
       <h2 class="section-title">Autres modes</h2>
       <div class="om-grid">
         <a class="panel om-tile" href="#/sceaux"><span class="om-ic">${picon('seal')}</span><span><b>Duels des Sceaux</b><span class="small muted">Plateau 3 × 3, capture les cartes adverses</span></span>${icon('next')}</a>
-        <a class="panel om-tile" href="#/reliques"><span class="om-ic">${picon('crown')}</span><span><b>Chasse aux Reliques</b><span class="small muted">${g.relicRun() ? 'Une chasse est en cours : reprends-la' : 'Neuf salles, des reliques, un butin à ramener vivant'}</span></span>${icon('next')}</a>
-        <a class="panel om-tile" href="#/guerre"><span class="om-ic">${g.war().side ? sigil(g.war().side) : picon('conflicts')}</span><span><b>Guerre des Factions</b><span class="small muted">${g.war().side ? `${fmt(g.war().points)} points pour ${esc(cat.faction[g.war().side].name)} cette semaine` : 'Prête serment à un royaume pour la semaine'}</span></span>${icon('next')}</a>
       </div>
       ${Object.values(g.s.items).some((n) => n > 0) ? bagHTML(g) : ''}
       <details class="panel dc-fold bn-ranking" id="lb"><summary><span class="dc-sum-t">Classement du jour</span></summary><div class="lb-body small muted">Chargement…</div></details>
@@ -138,7 +136,6 @@ export default function descent(app, root) {
         ${w?.recruit ? `<p class="vx-week">${icon('crown')} Le gardien vaincu, <b>${esc(cat.get(w.recruit).name)}</b>, rejoint ta collection !</p>` : ''}
         ${w?.weekly ? `<p class="vx-week">${icon('sparkle')} <b>${esc(cat.get(w.weekly).name)}</b> rejoint ta collection !</p>` : ''}
         ${w?.boss ? bossRecap(w.boss) : ''}
-        ${w?.war ? `<p class="vx-week">${icon('p:conflicts')} <b>+${w.war}</b> points de guerre pour ${esc(cat.faction[g.war().side]?.name || '')}</p>` : ''}
         ${w?.relNew?.length ? `<p class="vx-week">${icon('p:combo')} Relation découverte : <b>${w.relNew.map((k) => esc(RELATION[k]?.name || k)).join(', ')}</b>. Retrouve-la dans le Bestiaire.</p>` : ''}
         ${w?.disc?.length ? `<div class="vx-disc"><span class="small muted">${picon('discover')}Nouvelles rencontres</span>${w.disc.slice(0, 5).map((id) => `<img alt="${esc(cat.get(id).name)}" title="${esc(cat.get(id).name)}" src="${artUrl(cat.get(id), { lite: true })}">`).join('')}</div>` : ''}
       </div>
@@ -168,7 +165,7 @@ export default function descent(app, root) {
       else {
         app.sfx.reveal(out.room === 'boss' ? 'M' : 'R');
         const r = g.descent().run;
-        ui.win = { floor: r.floor, room: out.room, shards: out.shards, chest: out.chest || null, disc: out.discovered.filter((id) => cat.get(id)), weekly: out.weekly?.id || null, recruit: out.recruit?.id || null, stats, boss: out.boss || null, relNew: out.relNew || [], war: out.war || 0 };
+        ui.win = { floor: r.floor, room: out.room, shards: out.shards, chest: out.chest || null, disc: out.discovered.filter((id) => cat.get(id)), weekly: out.weekly?.id || null, recruit: out.recruit?.id || null, stats, boss: out.boss || null, relNew: out.relNew || [] };
         rewardView(r);
       }
       window.scrollTo(0, 0);

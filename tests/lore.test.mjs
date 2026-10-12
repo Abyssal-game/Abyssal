@@ -51,8 +51,8 @@ test('formes corrompues : verrouillées, éveillées, choisies, et appliquées a
   assert.ok(cor.maxHp < base.maxHp);
   g.setForm(id, null);
   assert.equal(g.formOf(id), null);
-  // pas de changement pendant une chasse en cours
+  // pas de changement pendant une expédition en cours
   g.setForm(id, 'corrompue');
-  g.s.relics.run = { phase: 'paths' };
-  assert.throws(() => g.setForm(id, null), /chasse/);
+  g.s.descent.run = { phase: 'doors' };
+  assert.throws(() => g.setForm(id, null), /expédition/);
 });

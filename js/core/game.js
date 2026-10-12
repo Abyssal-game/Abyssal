@@ -9,8 +9,6 @@ import { bossOf, BOSSES } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
 import { FORMS, formUnlocked } from './forms.js';
 import * as SC from './sceaux.js';
-import * as HT from './hunt.js';
-import * as WR from './war.js';
 import { FERVOR_START, FERVOR_MAX } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
 export const WEEKLY_FLOOR = 8;
@@ -390,7 +388,7 @@ export class Game {
   setTeam(ids) {
     const list = [...new Set(ids)].filter((id) => this.owns(id)).slice(0, TEAM.active + TEAM.reserve);
     if (this.teamCost(list) > BUDGET) throw new Error(`Ton équipe dépasse le budget de ${BUDGET} points.`);
-    if (this.s.descent.run || this.s.relics.run) throw new Error('Termine d’abord ton expédition ou ta chasse en cours.');
+    if (this.s.descent.run) throw new Error('Termine d’abord ton expédition.');
     this.s.team = list;
     this.s.teamSet = true;
     this.persist();
@@ -520,7 +518,6 @@ export class Game {
     const out = { result: st.over, shards: 0, first: false, title: null, daily: st.daily, capped: false };
     if (st.over === 'won') {
       sc.wins++; sc.streak++; sc.best = Math.max(sc.best, sc.streak);
-      out.war = this.warAdd('sceaux');
       if (!sc.beaten[R.key]) { sc.beaten[R.key] = Date.now(); out.first = true; out.shards += SC.SCEAUX_REWARD.firstWin; }
       if (st.daily && sc.dailyDone !== day) { sc.dailyDone = day; out.shards += SC.SCEAUX_REWARD.daily; }
       if (sc.paidToday < SC.SCEAUX_REWARD.dailyPaid) { sc.paidToday++; out.shards += R.reward; } else out.capped = true;
@@ -538,300 +535,11 @@ export class Game {
     return out;
   }
   sceauxQuit() { this.s.sceaux.cur = null; this.persist(); }
-  // ——— Chasse aux Reliques ———
-  relicHunt() {
-    const h = this.s.relics, day = today(this.clock());
-    if (h.day !== day) { h.day = day; h.paidToday = 0; }
-    return h;
-  }
-  relicPaidLeft() { return Math.max(0, HT.HUNT.paidPerDay - this.relicHunt().paidToday); }
-  relicStart() {
-    const h = this.relicHunt();
-    if (h.run) throw new Error('Une chasse est déjà en cours.');
-    const team = this.team();
-    if (team.length < TEAM.active) throw new Error(`Il faut au moins ${TEAM.active} créatures dans ton équipe.`);
-    const paid = h.paidToday < HT.HUNT.paidPerDay;
-    if (paid) h.paidToday++;
-    const seed = Math.floor(this.rng() * 2 ** 31);
-    const ult = this.ultimate(team);
-    h.run = {
-      v: 1, seed, step: 0, phase: 'start', paid, relics: [], offer: HT.relicOffer(seed, 'start', [], 3), paths: null,
-      gauge: FERVOR_START, ult: { key: ult.key, power: ult.power, card: ult.card },
-      team: team.map((id) => { const u = duelUnit(this.catalog.get(id), { level: this.cardLevel(id), form: this.formOf(id) }); return { id, hp: u.maxHp, maxHp: u.maxHp, fallen: false, form: this.formOf(id) }; }),
-      risk: 0, safe: 0, total: 0, kills: {}, log: [], floor: 2, room: 'fight',
-    };
-    this.persist();
-    return h.run;
-  }
-  relicRun() { return this.relicHunt().run; }
-  // Butin en jeu (plafonné par chasse ; une chasse non payée ne rapporte rien à la fin)
-  relicLoot(n) {
-    const run = this.relicRun();
-    if (n <= 0) return 0;
-    const got = Math.max(0, Math.min(n, HT.HUNT.lootCap - run.total));
-    run.total += got; run.risk += got;
-    return got;
-  }
-  relicSecure() { const run = this.relicRun(); run.safe += run.risk; const n = run.risk; run.risk = 0; return n; }
-  // Choisir une relique (key) ou passer (null). À 4 reliques, il faut en remplacer une (replace).
-  relicPick(key, replace = null) {
-    const run = this.relicRun();
-    if (!run || !['start', 'relic'].includes(run.phase)) throw new Error('Aucune relique à choisir.');
-    if (key) {
-      if (!run.offer.includes(key)) throw new Error('Relique inconnue.');
-      this.relicAdd(key, replace);
-    }
-    run.offer = null;
-    if (run.phase === 'start') { run.step = 1; run.paths = HT.pathChoices(run.seed, 1); run.phase = 'paths'; this.persist(); return run; }
-    return this.relicRoomDone();
-  }
-  relicAdd(key, replace = null) {
-    const run = this.relicRun();
-    if (run.relics.includes(key)) throw new Error('Tu portes déjà cette relique.');
-    if (run.relics.length >= HT.RELIC_MAX) {
-      if (!run.relics.includes(replace)) throw new Error(`Tu portes déjà ${HT.RELIC_MAX} reliques : choisis celle à laisser.`);
-      run.relics = run.relics.filter((k) => k !== replace);
-    }
-    run.relics.push(key);
-    run.log.push(`Relique : ${HT.RELICS[key].name}`);
-  }
-  // Entrer dans une salle (l'un des deux chemins proposés)
-  relicGo(room) {
-    const run = this.relicRun();
-    if (!run || run.phase !== 'paths' || !run.paths.includes(room)) throw new Error('Chemin inconnu.');
-    run.cur = room; run.paths = null;
-    const out = { room };
-    if (room === 'combat' || room === 'special' || room === 'boss') {
-      const kind = room === 'boss' ? 'boss' : room === 'special' ? 'elite' : 'fight';
-      const floor = HT.HUNT.floorOf(run.step);
-      const list = floorEnemies(this.catalog, `relic:${run.seed}`, floor, kind);
-      const sc = enemyScale(floor), lvl = enemyLevel(floor, kind);
-      const enemies = list.map((e) => duelUnit(this.catalog.get(e.id), { side: 'enemy', scale: sc, level: e.boss || e.elite ? lvl : enemyLevel(floor, 'fight'), boss: e.boss, elite: e.elite }));
-      const known = {};
-      enemies.forEach((e) => { if (this.knows(e.id)) known[e.id] = true; });
-      const allies = run.team.filter((m) => !m.fallen).map((m) => ({ ...duelUnit(this.catalog.get(m.id), { level: this.cardLevel(m.id), form: m.form || null }), maxHp: m.maxHp, hp: Math.min(m.hp, m.maxHp) }));
-      run.floor = floor; run.room = kind;
-      run.battle = createDuel(allies, enemies, { fervor: run.gauge || 0, ult: run.ult.key, power: run.ult.power, known, boss: room === 'boss' ? HT.bossOfHunt(run.seed) : null, relics: run.relics, discovered: this.s.weakSeen || {}, seed: Math.floor(this.rng() * 2 ** 31) });
-      run.phase = 'battle'; out.battle = true;
-    } else if (room === 'event') {
-      run.event = HT.eventOf(run.seed, run.step); run.phase = 'event'; out.event = run.event;
-    } else if (room === 'merchant') {
-      run.shop = { relics: HT.relicOffer(run.seed, `shop${run.step}`, run.relics, 2), heal: 0, revive: 0 }; run.phase = 'merchant';
-    } else if (room === 'relic') {
-      run.offer = HT.relicOffer(run.seed, run.step, run.relics, 2); run.phase = 'relic';
-      if (!run.offer.length) { run.offer = null; return { ...out, done: this.relicRoomDone() }; }
-    }
-    this.persist();
-    return out;
-  }
-  // Salle terminée : seuil (butin à l'abri), salle suivante, ou fin après le gardien
-  relicRoomDone() {
-    const run = this.relicRun();
-    run.cur = null; run.event = null; run.shop = null;
-    if (HT.HUNT.seuils.includes(run.step) && run.risk > 0) { run.secured = this.relicSecure(); run.log.push(`Seuil franchi : ${run.secured} éclats à l’abri`); }
-    else run.secured = 0;
-    if (run.step >= HT.HUNT.rooms) return this.relicEnd({ won: true });
-    run.step++;
-    run.paths = HT.pathChoices(run.seed, run.step);
-    run.phase = 'paths';
-    this.persist();
-    return run;
-  }
-  relicFinishBattle() {
-    const run = this.relicRun();
-    if (!run || run.phase !== 'battle' || !run.battle?.over) throw new Error('Aucun combat terminé.');
-    const st = run.battle, room = run.cur;
-    const units = Object.values(st.units).filter((u) => u.side === 'ally');
-    run.team.forEach((m) => {
-      const u = units.find((x) => x.id === m.id);
-      if (!u) return;
-      // les PV gardent leur proportion (les reliques changent les PV max le temps du combat)
-      m.hp = Math.max(0, Math.min(m.maxHp, Math.round((u.hp / u.maxHp) * m.maxHp)));
-      if (m.hp <= 0) m.fallen = true;
-    });
-    run.gauge = st.fervor ?? 0;
-    const relNew = this.learnRelations(st);
-    this.s.weakSeen = { ...(this.s.weakSeen || {}), ...(st.discovered || {}) };
-    const discovered = [];
-    for (const id of st.kills) {
-      if (!this.s.hunt[id]) discovered.push(id);
-      this.s.hunt[id] = (this.s.hunt[id] || 0) + 1;
-      run.kills[id] = (run.kills[id] || 0) + 1;
-    }
-    run.battle = null;
-    const won = st.over === 'won' && run.team.some((m) => !m.fallen);
-    const out = { room, won, discovered, relNew };
-    if (st.bossKey && won) this.s.bossesBeaten[st.bossKey] = this.s.bossesBeaten[st.bossKey] || Date.now();
-    if (!won) { out.summary = this.relicEnd({ wiped: true }); return out; }
-    this.track('win', 1);
-    out.war = this.warAdd(room === 'boss' ? 'relicBoss' : 'relic', run.team.filter((m) => !m.fallen).map((m) => m.id));
-    out.shards = this.relicLoot(HT.combatLoot(run.step, room));
-    if (run.relics.includes('lanterne')) { run.team.forEach((m) => { if (!m.fallen) m.hp = Math.min(m.maxHp, m.hp + Math.ceil(m.maxHp * 0.15)); }); out.lantern = true; }
-    run.log.push(`${HT.ROOMS[room].name} gagné (+${out.shards} éclats)`);
-    if (room === 'special') {
-      run.offer = HT.relicOffer(run.seed, `sp${run.step}`, run.relics, 2);
-      if (run.offer.length) { run.phase = 'relic'; out.relic = run.offer; this.persist(); return out; }
-      run.offer = null;
-    }
-    out.next = this.relicRoomDone();
-    return out;
-  }
-  relicAuto() { autoDuel(this.relicRun().battle); return this.relicFinishBattle(); }
-  // Événement : appliquer le choix i
-  relicEvent(i) {
-    const run = this.relicRun();
-    if (!run || run.phase !== 'event') throw new Error('Aucun événement en cours.');
-    const ev = HT.EVENT[run.event], c = ev.choices[i];
-    if (!c) throw new Error('Choix inconnu.');
-    if (c.needRelic && !run.relics.length) throw new Error('Tu n’as aucune relique à vendre.');
-    const e = c.effect, out = { text: [] };
-    const alive = run.team.filter((m) => !m.fallen);
-    if (e.heal) alive.forEach((m) => { m.hp = Math.min(m.maxHp, m.hp + Math.ceil(m.maxHp * e.heal)); });
-    if (e.hurt) alive.forEach((m) => { m.hp = Math.max(1, m.hp - Math.ceil(m.maxHp * e.hurt)); });
-    if (e.fervor) run.gauge = Math.min(FERVOR_MAX, (run.gauge || 0) + e.fervor);
-    if (e.lose) { const k = run.relics.pop(); out.lost = k; }
-    if (e.loot) out.shards = this.relicLoot(e.loot);
-    if (e.relic) {
-      const k = HT.relicOffer(run.seed, `ev${run.step}`, run.relics, 1)[0];
-      if (k && run.relics.length < HT.RELIC_MAX) { this.relicAdd(k); out.relic = k; }
-      else if (k) { out.relicFull = true; out.shards = (out.shards || 0) + this.relicLoot(30); }
-    }
-    if (e.secure) out.secured = this.relicSecure();
-    if (e.risk) {
-      const stake = Math.floor(run.risk * e.risk);
-      if (this.rng() < 0.5) { out.won = true; out.shards = this.relicLoot(stake); }
-      else { out.won = false; run.risk -= stake; out.lostShards = stake; }
-    }
-    run.log.push(`${ev.title} : ${c.label}`);
-    out.next = this.relicRoomDone();
-    return out;
-  }
-  // Marchand : payer avec le butin (d'abord celui en jeu, puis celui à l'abri)
-  relicPay(n) {
-    const run = this.relicRun();
-    if (run.risk + run.safe < n) throw new Error('Pas assez de butin.');
-    const a = Math.min(run.risk, n); run.risk -= a; run.safe -= n - a;
-  }
-  relicBuy(kind, arg = null, replace = null) {
-    const run = this.relicRun();
-    if (!run || run.phase !== 'merchant') throw new Error('Aucun marchand ici.');
-    if (kind === 'passeur') {
-      if (!run.risk) throw new Error('Aucun butin en jeu à mettre à l’abri.');
-      const fee = Math.ceil(run.risk * 0.15); run.risk -= fee;
-      const n = this.relicSecure(); this.persist(); return { secured: n, fee };
-    }
-    const price = HT.shopPrice(kind, run.relics);
-    if (kind === 'heal') {
-      if (run.shop.heal) throw new Error('Déjà acheté.');
-      this.relicPay(price); run.shop.heal = 1;
-      run.team.forEach((m) => { if (!m.fallen) m.hp = Math.min(m.maxHp, m.hp + Math.ceil(m.maxHp * 0.35)); });
-    } else if (kind === 'revive') {
-      const m = run.team.find((x) => x.id === arg && x.fallen);
-      if (!m) throw new Error('Cette créature n’est pas tombée.');
-      this.relicPay(price); m.fallen = false; m.hp = Math.ceil(m.maxHp / 2); run.shop.revive++;
-    } else if (kind === 'relic') {
-      if (!run.shop.relics.includes(arg)) throw new Error('Relique indisponible.');
-      if (run.risk + run.safe < price) throw new Error('Pas assez de butin.');
-      this.relicAdd(arg, replace);
-      this.relicPay(price);
-      run.shop.relics = run.shop.relics.filter((k) => k !== arg);
-    } else throw new Error('Article inconnu.');
-    this.persist();
-    return { price };
-  }
-  relicLeaveShop() {
-    const run = this.relicRun();
-    if (!run || run.phase !== 'merchant') throw new Error('Aucun marchand ici.');
-    return this.relicRoomDone();
-  }
-  // Sortie volontaire (entre deux salles) : tout le butin est gardé
-  relicExit() {
-    const run = this.relicRun();
-    if (!run || run.phase !== 'paths') throw new Error('Tu ne peux sortir qu’entre deux salles.');
-    return this.relicEnd({});
-  }
-  // Fin de chasse : butin à l'abri (et en jeu, sauf si l'équipe tombe), coffre si le gardien est vaincu
-  relicEnd({ wiped = false, won = false }) {
-    const h = this.s.relics, run = h.run;
-    const shards = run.paid ? run.safe + (wiped ? 0 : run.risk) : 0;
-    const chest = won && run.paid ? HT.COFFRE_HUNT : null;
-    this.s.shards += shards;
-    if (chest) this.s.chests[chest] = (this.s.chests[chest] || 0) + 1;
-    const reached = won ? HT.HUNT.rooms : Math.max(0, run.step - (wiped ? 1 : 0) - (run.phase === 'paths' ? 1 : 0));
-    const out = { wiped, won, shards, lost: wiped ? run.risk : 0, chest, rooms: reached, relics: run.relics.slice(), paid: run.paid, kills: run.kills, title: null, frame: null };
-    h.runs++; h.best = Math.max(h.best, reached);
-    if (won) {
-      h.wins = (h.wins || 0) + 1;
-      const t = 'Chasseur de reliques';
-      if (!this.s.titles.includes(t)) { this.s.titles.push(t); out.title = t; }
-      if (!this.s.frames.includes('reliques')) { this.s.frames.push('reliques'); out.frame = 'reliques'; }
-    }
-    h.last = out;
-    h.run = null;
-    this.s.xp += reached * 6;
-    this.checkProgress();
-    this.persist();
-    return out;
-  }
-  // ——— Guerre des Factions (hebdomadaire, en solo contre l'Abîme) ———
-  war() {
-    const w = this.s.war, week = weekIndex(this.clock());
-    if (w.week !== week) {
-      if (w.week != null && w.side) {
-        // semaine terminée : les paliers atteints et non réclamés sont versés automatiquement
-        const paid = [];
-        for (const i of WR.tiersReached(w.points)) if (!w.claimed[i]) { this.warGrant(i); paid.push(i); }
-        w.history.unshift({ week: w.week, side: w.side, points: w.points, tiers: WR.tiersReached(w.points).length });
-        w.history = w.history.slice(0, 12);
-        w.report = { side: w.side, points: w.points, tiers: WR.tiersReached(w.points).length, paid: paid.reduce((a, i) => a + WR.WAR.tiers[i].shards, 0) };
-      }
-      Object.assign(w, { week, side: null, points: 0, used: {}, claimed: {} });
-      this.persist();
-    }
-    return w;
-  }
-  warJoin(f) {
-    const w = this.war();
-    if (w.side) throw new Error('Ton serment est déjà prêté pour cette semaine.');
-    if (!FACTION_ORDER.includes(f)) throw new Error('Royaume inconnu.');
-    w.side = f; this.persist();
-    return w;
-  }
-  // Victoire comptée pour la Guerre ; ids : créatures au combat (pour le bonus de serment)
-  warAdd(kind, ids = null) {
-    const w = this.war();
-    if (!w.side || !WR.WAR.sources[kind]) return 0;
-    const day = today(this.clock()), key = `${kind}:${day}`;
-    for (const k of Object.keys(w.used)) if (!k.endsWith(day)) delete w.used[k];
-    const oath = !!ids && ids.slice(0, 3).filter((id) => this.catalog.get(id)?.faction === w.side).length >= 2;
-    const pts = WR.warPoints(kind, w.used[key] || 0, oath);
-    w.used[key] = (w.used[key] || 0) + 1;
-    w.points += pts;
-    this.persist();
-    return pts;
-  }
-  warGrant(i) {
-    const w = this.s.war, t = WR.WAR.tiers[i];
-    w.claimed[i] = true;
-    this.s.shards += t.shards;
-    if (t.frame && !this.s.frames.includes(t.frame)) this.s.frames.push(t.frame);
-    if (t.title && !this.s.titles.includes(t.title)) this.s.titles.push(t.title);
-    return t;
-  }
-  warClaim(i) {
-    const w = this.war();
-    if (!WR.tiersReached(w.points).includes(i)) throw new Error('Palier pas encore atteint.');
-    if (w.claimed[i]) throw new Error('Récompense déjà reçue.');
-    const t = this.warGrant(i);
-    this.checkProgress();
-    this.persist();
-    return t;
-  }
   // Forme choisie pour une carte (corrompue si débloquée et sélectionnée)
   formOf(id) { return this.s.forms?.[id] === 'corrompue' && formUnlocked(this, id) ? 'corrompue' : null; }
   setForm(id, form) {
     if (form === 'corrompue' && !formUnlocked(this, id)) throw new Error('Cette forme n’est pas encore éveillée.');
-    if (this.s.descent.run || this.s.relics.run) throw new Error('Termine d’abord ton expédition ou ta chasse en cours.');
+    if (this.s.descent.run) throw new Error('Termine d’abord ton expédition.');
     if (form === 'corrompue') this.s.forms[id] = 'corrompue'; else delete this.s.forms[id];
     this.persist();
   }
@@ -987,7 +695,6 @@ export class Game {
       if (b && this.rng() < BOSS_RECRUIT) out.recruit = { id: b.id, ...this.addCard(b.id, 'normal', 'booster') };
     }
     if (won) {
-      out.war = this.warAdd(room, run.team.filter((m) => !m.fallen).map((m) => m.id));
       const hunt = room === 'elite' && this.rule(run.day).key === 'chasse';
       out.shards = this.gainShards((8 + 3 * run.floor) * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1) * (hunt ? 2 : 1));
       // les gardiens donnent un coffre tout de suite ; règle « Chasse aux élites » : les élites aussi
