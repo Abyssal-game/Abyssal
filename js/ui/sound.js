@@ -76,6 +76,8 @@ export const sfx = {
   achievement() { [523, 659, 784, 1047].forEach((f, i) => tone(f, { type: 'triangle', dur: 0.35, gain: 0.1, delay: i * 0.09 })); },
   hit() { noise({ dur: 0.12, gain: 0.25, freq: 500 }); tone(120, { dur: 0.15, gain: 0.2, slide: -50 }); },
   // Sons du combat
+  pose() { noise({ dur: 0.1, gain: 0.22, freq: 220, q: 0.6 }); tone(90, { dur: 0.16, gain: 0.16, slide: -30 }); tone(1175, { type: 'sine', dur: 0.35, gain: 0.04, delay: 0.06 }); },
+  capture() { noise({ dur: 0.22, gain: 0.14, freq: 1200, sweep: 4200, q: 0.7 }); tone(1047, { type: 'triangle', dur: 0.3, gain: 0.07, delay: 0.12 }); tone(1568, { type: 'sine', dur: 0.4, gain: 0.05, delay: 0.18 }); },
   slash() { noise({ dur: 0.14, gain: 0.22, freq: 2600, sweep: 900, q: 1.1 }); tone(240, { type: 'triangle', dur: 0.09, gain: 0.08, slide: -120 }); },
   smash() { noise({ dur: 0.3, gain: 0.32, freq: 260, q: 0.5 }); tone(70, { type: 'sawtooth', dur: 0.35, gain: 0.2, slide: -35 }); tone(55, { dur: 0.4, gain: 0.22 }); },
   dodge() { noise({ dur: 0.28, gain: 0.14, freq: 600, sweep: 4200, q: 0.8 }); tone(880, { type: 'sine', dur: 0.18, gain: 0.06, slide: 440, delay: 0.05 }); },
