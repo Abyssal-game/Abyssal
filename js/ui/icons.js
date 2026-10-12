@@ -72,4 +72,7 @@ export const sigil = (faction) => (factionArtReady(Object.keys(SIGILS)) && SIGIL
 export const picon = (name) => `<img class="picon" alt="" src="assets/icons/${name}.webp">`;
 
 // Emblème peint d'un rôle de combat (garde, assaut, soin, venin, gel, cri, deferlante)
+// Icônes peintes des actions de combat (attaque, défense, relève et les 7 compétences)
+const ACT_PICS = new Set(['attack', 'defend', 'swap', 'rempart', 'estoc', 'priere', 'contagion', 'entrave', 'marque', 'raz']);
+export const actIcon = (key, fallback) => (ACT_PICS.has(key) ? `<img class="aicon" alt="" src="assets/icons/act-${key}.webp">` : icon(fallback));
 export const roleIcon = (kw) => `<img class="ricon" alt="" src="assets/icons/role-${kw}.webp">`;

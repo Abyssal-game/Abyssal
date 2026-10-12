@@ -5,7 +5,7 @@
 // active (esquive dans l'or, parade parfaite sur le trait blanc, au dernier instant). Toute la logique est dans core/duel.js.
 import { RARITY } from '../config.js';
 import { artUrl } from '../art/assets.js';
-import { icon, EMBLEM, sigil, roleIcon } from '../ui/icons.js';
+import { icon, EMBLEM, sigil, roleIcon, actIcon } from '../ui/icons.js';
 import { esc, openSheet, toast } from '../ui/dom.js';
 import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
@@ -129,7 +129,7 @@ export function runDuel(app, root, { title, onEnd }) {
     const list = actionsFor(st, u.uid);
     return `<div class="cb-head"><b>${esc(cat.get(u.id).name)}</b><span>${esc(kit.name)} · ${u.acts}/2 actions</span><button class="cb-x" data-d="desel" aria-label="Annuler la sélection">${icon('close')}</button></div>
       <div class="cb-grid">${list.map((a) => `<button class="cb-a ${a.ok ? '' : 'off'} ${mode?.key === a.key ? 'on' : ''} ${a.key === kit.skill.key ? 'sig' : ''}" data-a="${a.key}" aria-disabled="${!a.ok}">
-        <span class="cb-ai">${icon(a.icon)}</span><b>${esc(a.name)}</b>
+        <span class="cb-ai">${actIcon(a.key, a.icon)}</span><b>${esc(a.name)}</b>
         <span class="cb-cost">${'<i class="pa"></i>'.repeat(a.ap) || '<i class="free">0</i>'}${a.fervor ? `<i class="fv">${a.fervor}</i>` : ''}${a.dice ? '<i class="d20">D20</i>' : ''}</span></button>`).join('')}</div>`;
   }
   function confirmHTML() {
@@ -256,7 +256,7 @@ export function runDuel(app, root, { title, onEnd }) {
       if (!alive_) return;
       switch (e.t) {
         case 'act':
-          if (e.skill) { app.sfx.skill(); banner(`${icon(KITS[st.units[e.u].role].skill.icon)} ${esc(e.name)}`, 'skill', 700); await wait(T(360)); }
+          if (e.skill) { app.sfx.skill(); banner(`${actIcon(KITS[st.units[e.u].role].skill.key, KITS[st.units[e.u].role].skill.icon)} ${esc(e.name)}`, 'skill', 700); await wait(T(360)); }
           if (e.tgt && st.units[e.tgt]?.side === 'enemy' && e.key !== 'marque') lunge(e.u, e.tgt);
           break;
         case 'eact': {
@@ -557,7 +557,7 @@ export function runDuel(app, root, { title, onEnd }) {
       ${u.boss && st.bossPower ? `<p class="small dc-bad"><b>${esc(BOSS_POWERS[st.bossPower].name)}</b> : ${esc(BOSS_POWERS[st.bossPower].desc)} Sous la moitié de ses PV, il entre en phase 2.</p><p class="small dc-good"><b>Point faible</b> : ${esc(BOSS_POWERS[st.bossPower].counter)}</p>` : ''}
       ${u.side === 'enemy' ? `<p class="small">${weakF ? `<b>Faiblesse</b> : ${sigil(weakF)} ${esc(cat.faction[weakF]?.name || weakF)} (+50 % de dégâts)` : '<b>Faiblesse</b> : inconnue. Frappe-la avec la bonne faction, ou marque-la, pour la découvrir.'}</p>` : `
       <p class="small"><b>${icon('swords')} ${esc(kit.basic.name)}</b> (1 action) : ${esc(kit.basic.desc)}</p>
-      <p class="small"><b>${icon(kit.skill.icon)} ${esc(kit.skill.name)}</b> (${kit.skill.ap} action${kit.skill.ap > 1 ? 's' : ''}, ${kit.skill.fervor} Ferveur) : ${esc(kit.skill.desc)}</p>
+      <p class="small"><b>${actIcon(kit.skill.key, kit.skill.icon)} ${esc(kit.skill.name)}</b> (${kit.skill.ap} action${kit.skill.ap > 1 ? 's' : ''}, ${kit.skill.fervor} Ferveur) : ${esc(kit.skill.desc)}</p>
       <p class="small"><b>${esc(kit.passive.name)}</b> : ${esc(kit.passive.desc)}</p>
       ${u.rarity === 'C' ? `<p class="small dc-good">${icon('star')} Instinct de meute : +${PACK_BONUS} dégât aux élites et aux gardiens.</p>` : ''}`}
       ${u.side === 'enemy' && g.owns(u.id) ? `<p class="small dc-good">${icon('book')} Tu possèdes sa carte : tes créatures lui font +1 dégât.</p>` : ''}

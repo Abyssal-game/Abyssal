@@ -1,7 +1,7 @@
 // L'équipe de cartes : fiche de combat d'une créature, écran Équipe et écran Coffres.
 import { RARITY } from '../config.js';
 import { cardHTML, lazyArt } from '../ui/card.js';
-import { icon, roleIcon } from '../ui/icons.js';
+import { icon, roleIcon, actIcon } from '../ui/icons.js';
 import { esc, toast, openSheet, bindActions } from '../ui/dom.js';
 import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
@@ -30,7 +30,7 @@ export function combatHTML(g, c) {
     <div class="v2-big-stats"><span class="dv-atk">${icon('swords')}<b>${u.atk}</b><small>Attaque</small></span><span class="dv-hp">${icon('heart')}<b>${u.maxHp}</b><small>PV</small></span></div>
     <div class="panel v2-skill cb-kit">
       <p class="small"><b>${icon('swords')} ${esc(kit.basic.name)}</b> <span class="cb-k">1 action</span><br>${esc(kit.basic.desc)} +1 Ferveur.</p>
-      <p class="small"><b class="gold">${icon(kit.skill.icon)} ${esc(kit.skill.name)}</b> <span class="cb-k">${kit.skill.ap} action${kit.skill.ap > 1 ? 's' : ''} · ${kit.skill.fervor} Ferveur${kit.skill.dice ? ' · D20' : ''}</span><br>${esc(kit.skill.desc)}</p>
+      <p class="small"><b class="gold">${actIcon(kit.skill.key, kit.skill.icon)} ${esc(kit.skill.name)}</b> <span class="cb-k">${kit.skill.ap} action${kit.skill.ap > 1 ? 's' : ''} · ${kit.skill.fervor} Ferveur${kit.skill.dice ? ' · D20' : ''}</span><br>${esc(kit.skill.desc)}</p>
       <p class="small"><b>${roleIcon(kit.kw)} ${esc(kit.passive.name)}</b> <span class="cb-k">passif</span><br>${esc(kit.passive.desc)}</p>
       ${c.rarity === 'C' ? `<p class="small dc-good">${icon('star')} Instinct de meute : +1 dégât aux élites et aux gardiens.</p>` : ''}
     </div>
