@@ -4,12 +4,14 @@ import { cardHTML, lazyArt } from '../ui/card.js';
 import { icon } from '../ui/icons.js';
 import { esc, toast, openSheet, bindActions } from '../ui/dom.js';
 import { coach } from '../ui/coach.js';
+import { tuto } from '../ui/tutos.js';
 import { chestSVG } from '../ui/chest.js';
 import { CHESTS, CHEST_ORDER } from '../core/descent.js';
 import { ROLES, COST, BUDGET, TEAM, MAX_LEVEL, ULTS, roleOf, canUlt, ultOf } from '../core/army.js';
 import { duelUnit } from '../core/duel.js';
 import { kitOf, synergiesFor, KEYWORDS, keywordOf } from '../core/skills.js';
 import { openPack } from './opening.js';
+import { openChestScene } from './chest-open.js';
 
 // Étiquettes posées sur une carte : capacité, niveau, coût, attaque et PV
 export const armyBadges = (g, c) => {
@@ -106,7 +108,7 @@ export function teamScreen(app, root) {
     clear() { try { g.setTeam([]); app.sfx.tap(); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
   });
   draw();
-  coach(app, 'army-team', 'Ton équipe : <b>3 créatures au combat</b> et <b>2 en réserve</b>. Chaque carte a une <b>capacité</b> (icône en haut à gauche), son <b>attaque</b> et ses <b>PV</b>, et un <b>coût</b> (en haut à droite) : le total ne doit pas dépasser 15. Chaque doublon fait <b>monter de niveau</b> la créature.', { title: 'Compose ton équipe' });
+  tuto(app, 'army-team');
   app.refreshView = draw;
   return () => { app.refreshView = null; };
 }
@@ -123,34 +125,8 @@ export function chestsScreen(app, root) {
         <li>Chaque gardien vaincu (tous les 5 étages) donne aussi un coffre.</li>
         <li>Si toute l’équipe tombe, le coffre perd une qualité. En descente maudite, il en gagne une, mais tout est perdu si l’équipe tombe.</li></ul></details>`;
   };
-  // Ouvre les boosters trouvés dans le coffre, l'un après l'autre
-  const openAll = (packs) => {
-    const next = () => { const k = packs.shift(); if (!k) { app.refresh(); return; } openPack(app, k, { onDone: () => setTimeout(next, 300) }); };
-    next();
-  };
   bindActions(root, {
-    open(el) {
-      const t = el.dataset.t;
-      const sh = openSheet(`<div class="cho" style="--cc:${CHESTS[t].color};--bc:${CHESTS[t].color}"><p class="cho-t">${esc(CHESTS[t].name)}</p>
-        <button class="cho-chest" aria-label="Ouvrir le coffre">${chestSVG(t)}<span class="cho-glow"></span></button><p class="cho-msg small muted">Touche le coffre pour l’ouvrir.</p><div class="cho-out"></div></div>`, { cls: 'chest-sheet', label: CHESTS[t].name, onClose: () => draw() });
-      if (sh.body.querySelector('.ch-img')) new Image().src = `assets/chests/${t}-open.webp`;
-      sh.body.querySelector('.cho-chest').addEventListener('click', async (e) => {
-        const chest = e.currentTarget;
-        if (chest.classList.contains('open')) return;
-        let packs;
-        try { packs = g.openChest(t); } catch (err) { toast(esc(err.message), { kind: 'error' }); sh.close(); return; }
-        chest.classList.add('shake'); app.sfx.rumble(1);
-        await new Promise((r) => setTimeout(r, app.reduced() ? 50 : 900));
-        chest.classList.remove('shake'); chest.classList.add('open');
-        const img = chest.querySelector('.ch-img'); if (img) img.src = `assets/chests/${t}-open.webp`;
-        app.sfx.reveal('R');
-        const n = packs.length, prem = packs.filter((k) => k === 'premium').length;
-        sh.body.querySelector('.cho-msg').innerHTML = `<b>${n} booster${n > 1 ? 's' : ''}${prem ? ` dont ${prem === n ? (n > 1 ? 'tous premium' : 'premium') : `${prem} premium`}` : ''} !</b>`;
-        sh.body.querySelector('.cho-out').innerHTML = `<button class="btn gold block big-cta" data-go>${icon('booster')}Ouvrir ${n > 1 ? 'les boosters' : 'le booster'}</button><button class="btn small ghost block" data-later>Plus tard (dans Boosters)</button>`;
-        sh.body.querySelector('[data-go]').addEventListener('click', () => { sh.close(); openAll(packs.slice()); });
-        sh.body.querySelector('[data-later]').addEventListener('click', () => sh.close());
-      });
-    },
+    open(el) { openChestScene(app, el.dataset.t, { onDone: () => (app.refresh ? app.refresh() : draw()) }); },
   });
   draw();
   app.refreshView = draw;

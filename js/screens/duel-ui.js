@@ -8,6 +8,7 @@ import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM, sigil } from '../ui/icons.js';
 import { esc, openSheet, toast } from '../ui/dom.js';
 import { coach } from '../ui/coach.js';
+import { tuto } from '../ui/tutos.js';
 import { cardHTML } from '../ui/card.js';
 import {
   BOSS_POWERS, INTENTS, SYNERGIES, PACK_BONUS, FERVOR_MAX, AP_MAX, front, reserve, actionsFor, actionTargets, act, preview,
@@ -378,7 +379,7 @@ export function runDuel(app, root, { title, onEnd }) {
       if (skips.length) await play(skips);
       let res = 'none';
       if (s.qte && defMode !== 'off') {
-        if (!g.s.tips?.['cb-defense']) await coach(app, 'cb-defense', 'Cet ennemi lance une attaque dangereuse. Une barre va apparaître : touche l’écran quand le curseur passe dans la <b>zone dorée</b> pour <b>esquiver</b> (+1 Ferveur), ou en plein <b>cœur blanc</b> pour une <b>parade parfaite</b> : aucun dégât, +2 Ferveur, l’ennemi est ébranlé, et tes Gardes et Assauts contre-attaquent.<br><br>Les attaques ordinaires ne demandent rien : la Défense et le Rempart les réduisent. Tu peux faciliter ou couper la défense active dans les Réglages.', { title: 'Défense active' });
+        if (!g.s.tips?.['cb-defense']) await tuto(app, 'cb-defense');
         if (!alive_) return;
         res = await defenseQTE(s);
       }
@@ -405,9 +406,9 @@ export function runDuel(app, root, { title, onEnd }) {
   async function tips() {
     if (busy || st.over || guide) return;
     const foes = front(st, 'enemy');
-    if (foes.some((e) => e.brkMax)) await coach(app, 'cb-break', 'Les <b>élites</b> et les <b>gardiens</b> ont une <b>jauge de Brisure</b> (barre dorée sur leur carte). Chaque coup l’entame ; les coups lourds, le Gel et les parades parfaites l’entament plus. Vide, l’ennemi est <b>BRISÉ</b> : son attaque préparée est annulée, il perd son tour, subit +50 % de dégâts et tes jets de dés gagnent +5. Il se relève ensuite plus solide.', { title: 'La Brisure' });
-    if (foes.some((e) => ['charge', 'channel', 'heavy', 'blast'].includes(e.intent?.kind))) await coach(app, 'cb-intent', 'Au-dessus de chaque ennemi, son <b>intention</b> : ce qu’il fera à son tour et les dégâts prévus (les « ! » montrent le danger). Le badge rouge sur tes cartes annonce les coups qu’elles vont prendre.<br><br>Un ennemi qui <b>se charge</b> frappera très fort au tour suivant : <b>gèle-le</b>, <b>brise-le</b>, protège sa cible avec un <b>Rempart</b> ou une <b>Défense</b>, ou prépare-toi à parer.', { title: 'Lire les intentions' });
-    if (st.fervor >= 1 && g.s.tips?.['cb-guide']) await coach(app, 'cb-skill', 'Chaque créature a une <b>compétence signature</b> (bouton doré) selon son rôle : Rempart, Coup d’estoc, Prière, Contagion, Entrave, Marque ou Raz-de-marée. Elles coûtent des <b>actions</b> et de la <b>Ferveur</b> (losanges en bas).<br><br>La Ferveur se gagne en attaquant, en exploitant une faiblesse, en esquivant ou en brisant un ennemi, et elle se <b>garde d’un combat à l’autre</b>. Pleine, elle lance ton <b>pouvoir d’équipe</b>.', { title: 'Compétences et Ferveur' });
+    if (foes.some((e) => e.brkMax)) await tuto(app, 'cb-break');
+    if (foes.some((e) => ['charge', 'channel', 'heavy', 'blast'].includes(e.intent?.kind))) await tuto(app, 'cb-intent');
+    if (st.fervor >= 1 && g.s.tips?.['cb-guide']) await tuto(app, 'cb-skill');
     draw();
   }
 
@@ -430,7 +431,7 @@ export function runDuel(app, root, { title, onEnd }) {
     if (a.target === 'none') { mode = null; return exec(() => act(st, u, key)); }
     const ts = actionTargets(st, u, key);
     if (key === 'swap') { if (ts.length === 1) { mode = null; return exec(() => act(st, u, 'swap', ts[0])); } return pickReserve(); }
-    if (a.dice && !g.s.tips?.['cb-dice']) await coach(app, 'cb-dice', 'Cette compétence lance un <b>dé à 20 faces</b>. Avant de lancer, tu vois tes <b>chances</b> et les <b>modificateurs</b> : une cible marquée, gelée, brisée ou faible face à ta créature est plus facile.<br><br><b>1</b> : échec critique. Sous la difficulté (DD) : réussite partielle (l’effet est réduit, pas perdu). DD atteint : réussite. <b>20</b> : réussite critique. Une immunité reste une immunité.', { title: 'Les dés' });
+    if (a.dice && !g.s.tips?.['cb-dice']) await tuto(app, 'cb-dice');
     if (ts.length === 1 && (key === 'rempart' || key === 'priere')) { mode = null; return exec(() => act(st, u, key, ts[0])); }
     mode = { key, name: a.name };
     draw();
@@ -550,7 +551,7 @@ export function runDuel(app, root, { title, onEnd }) {
   // combat repris pendant le tour ennemi (application fermée en plein tour)
   if (st.turn === 'enemy' && !st.over) { busy = true; draw(); enemyTurn().then(() => { busy = false; draw(); if (st.over) finish(); }); }
   else if (st.over) finish();
-  else if (guide) coach(app, 'cb-intro', `Ton équipe a <b>${AP_MAX} actions par tour</b>, à partager entre tes créatures. Chaque carte a son <b>attaque</b> (épée) et ses <b>PV</b> (cœur).<br><br>Touche une créature, choisis <b>Attaque</b>, puis l’ennemi. Quand tes actions sont épuisées, touche <b>Fin du tour</b>.`, { title: 'Le combat' }).then(() => draw());
+  else if (guide) tuto(app, 'cb-intro').then(() => draw());
   else tips();
   return { stop() { alive_ = false; ctl.abort(); document.body.classList.remove('battle-mode'); } };
 }

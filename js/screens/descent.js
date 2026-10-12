@@ -8,6 +8,7 @@ import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM, sigil, picon } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, bindActions } from '../ui/dom.js';
 import { coach } from '../ui/coach.js';
+import { tuto } from '../ui/tutos.js';
 import { bagHTML, bindBag } from './items.js';
 import { runDuel } from './duel-ui.js';
 import { setScene, sceneUrl } from '../ui/scene.js';
@@ -106,10 +107,23 @@ export default function descent(app, root) {
         <div><span class="small muted">Étage ${run.floor + 1}${(run.floor + 1) % DESCENT.bossEvery === 0 ? ' · gardien' : ''}</span>${run.free ? '<span class="small">Descente libre</span>' : `<span class="small">${next !== chestForDepth(run.floor) ? `Coffre amélioré : ${esc(CHESTS[next].name)}` : 'Même coffre'}</span>`}<span class="small muted">Si l’équipe tombe : ${run.cursed ? 'tout est perdu' : 'coffre d’une qualité en dessous'}</span></div></section>
       <div class="dc-choice">${alive ? `<button class="btn primary block big-cta" data-act="next">${icon('next')}Descendre à l’étage ${run.floor + 1}</button>` : ''}<button class="btn block" data-act="leave">${icon('back')}Remonter avec le coffre</button></div>`;
   }
-  // Bonus choisi après une victoire
-  function rewardView(run, extra = '') {
-    root.innerHTML = `${runHead(run)}${extra}<p class="dc-prompt">Choisis ton bonus.</p>
-      <div class="dc-doors ${run.rewards.length > 2 ? 'three' : ''}">${run.rewards.map((r) => `<button class="dc-door r-${r} has-art" data-act="reward" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic">${icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'treasure' ? `+${fmt(Math.round((15 + run.floor * 6) * (run.free ? 0.5 : 1)))} éclats environ` : ROOMS[r].desc}</span></button>`).join('')}</div>`;
+  // Fin de combat : la victoire et son butin, l'état de l'équipe, puis un seul choix (le bonus)
+  function rewardView(run) {
+    const w = ui.win && ui.win.floor === run.floor ? ui.win : null;
+    const hp = run.team.filter((m) => !m.fallen), pct = Math.round((hp.reduce((a, m) => a + m.hp, 0) / Math.max(1, hp.reduce((a, m) => a + m.maxHp, 0))) * 100);
+    const heal = g.rule(run.day).key === 'sources' ? 80 : 40;
+    const effect = (r) => (r === 'rest' ? `Soigne ${heal} % des PV de chaque créature` : r === 'altar' ? 'Une bénédiction au choix pour toute l’expédition' : `Environ +${fmt(Math.round((15 + run.floor * 6) * (run.free ? 0.5 : 1)))} éclats`);
+    const feats = w?.stats ? [w.stats.parries && `${w.stats.parries} parade${w.stats.parries > 1 ? 's' : ''}`, w.stats.breaks && `${w.stats.breaks} Brisure${w.stats.breaks > 1 ? 's' : ''}`, w.stats.crits && `${w.stats.crits} critique${w.stats.crits > 1 ? 's' : ''}`].filter(Boolean) : [];
+    root.innerHTML = `<section class="vx ${w?.room || ''}">
+      <div class="vx-hero"><span class="vx-k">Étage ${run.floor}${w?.room === 'boss' ? ' · Gardien vaincu' : w?.room === 'elite' ? ' · Élite' : ''}</span><h1>Victoire</h1>
+        ${w ? `<div class="vx-loot"><span class="vx-chip">${icon('crystal')}+${fmt(w.shards)}</span>${w.chest ? `<span class="vx-chip gold" style="--cc:${CHESTS[w.chest].color}">${icon('lock')}${esc(CHESTS[w.chest].name)}</span>` : ''}${feats.length ? `<span class="vx-chip feat">${icon('sparkle')}${feats.join(' · ')}</span>` : ''}</div>` : ''}
+        ${w?.weekly ? `<p class="vx-week">${icon('sparkle')} <b>${esc(cat.get(w.weekly).name)}</b> rejoint ta collection !</p>` : ''}
+        ${w?.disc?.length ? `<div class="vx-disc"><span class="small muted">Nouvelles rencontres</span>${w.disc.slice(0, 5).map((id) => `<img alt="${esc(cat.get(id).name)}" title="${esc(cat.get(id).name)}" src="${artUrl(cat.get(id), { lite: true })}">`).join('')}</div>` : ''}
+      </div>
+      <div class="vx-team"><span class="small muted">Ton équipe · ${pct} % des PV</span>${teamStrip(run.team.map((m) => m.id), run)}</div>
+      <h2 class="vx-h">Choisis ton bonus</h2>
+      <div class="vx-picks">${run.rewards.map((r) => `<button class="vx-pick r-${r}" data-act="reward" data-r="${r}"><span class="vx-pic" style="--art:url(${sceneUrl(DOOR_ART[r])})"></span><span class="vx-pt"><b>${icon(ROOM_ICON[r])} ${ROOMS[r].name}</b><span class="small">${effect(r)}</span></span>${icon('next')}</button>`).join('')}</div>
+    </section>`;
   }
   function altarView(run) {
     root.innerHTML = `${runHead(run)}<p class="dc-prompt">L’autel murmure. Choisis une bénédiction.</p>
@@ -121,15 +135,17 @@ export default function descent(app, root) {
     const title = `Étage ${run.floor}${run.room === 'boss' ? ' · Gardien' : run.room === 'elite' ? ' · Élite' : ''}`;
     battle = runDuel(app, root, { title, onEnd: () => {
       battle = null; playing = false;
+      const stats = run.battle?.stats || null;
       app.pendingProgress = [];
       let out;
       try { out = g.finishBattle(); } catch (e) { app.flushProgress(); toast(esc(e.message), { kind: 'error' }); return render(); }
       app.chrome();
-      if (out.lost) { app.sfx.error(); ui.outcome = out.summary; render(); }
+      if (out.lost) { app.sfx.error(); ui.outcome = out.summary; ui.win = null; render(); }
       else {
         app.sfx.reveal(out.room === 'boss' ? 'M' : 'R');
-        const disc = out.discovered.map((id) => cat.get(id)?.name).filter(Boolean);
-        rewardView(g.descent().run, `<p class="dc-event dc-win">${icon('swords')} <b>Victoire !</b> +${fmt(out.shards)} éclats${out.chest ? ` · <b>${esc(CHESTS[out.chest].name)}</b> gagné !` : ''}${disc.length ? `<br><span class="small">${icon('book')} Première rencontre : ${disc.map(esc).join(', ')}</span>` : ''}${out.weekly ? `<br><b class="dc-good">${icon('sparkle')} Créature de la semaine vaincue : ${esc(cat.get(out.weekly.id).name)} rejoint ta collection !</b>` : ''}</p>`);
+        const r = g.descent().run;
+        ui.win = { floor: r.floor, room: out.room, shards: out.shards, chest: out.chest || null, disc: out.discovered.filter((id) => cat.get(id)), weekly: out.weekly?.id || null, stats };
+        rewardView(r);
       }
       window.scrollTo(0, 0);
       app.flushProgress();
@@ -162,7 +178,7 @@ export default function descent(app, root) {
       if (ui.cursed && g.torchesLeft() && !(await confirmBox('Descente maudite : si toute l’équipe tombe, <b>tu ne rapportes rien</b>. Tu es sûr ?', { ok: 'Je descends', danger: true }))) return;
       try {
         g.startRun({ cursed: ui.cursed }); ui.outcome = null; app.sfx.tear(); app.chrome(); render(); window.scrollTo(0, 0);
-        coach(app, 'army-doors', 'Choisis une porte à chaque étage. Plus tu descends, plus le <b>coffre</b> que tu rapporteras est beau. Tu peux <b>remonter</b> après chaque étage pour garder ton coffre.', { title: 'La Descente' });
+        tuto(app, 'army-doors');
       } catch (e) { toast(esc(e.message), { kind: 'error' }); }
     },
     door(el) {
@@ -175,6 +191,7 @@ export default function descent(app, root) {
     reward(el) {
       let out;
       try { out = g.chooseReward(el.dataset.r); } catch (e) { toast(esc(e.message), { kind: 'error' }); return; }
+      ui.win = null;
       if (out.altar) return render();
       app.sfx.coin();
       clearedView(g.descent().run, el.dataset.r === 'rest' ? `<p class="dc-event">${icon('heart')} L’eau de la source soigne tes créatures.</p>` : el.dataset.r === 'treasure' ? `<p class="dc-event">${icon('crystal')} +${fmt(out.shards)} éclats</p>` : out.healed ? `<p class="dc-event">${icon('star')} L’autel est muet, mais sa lumière soigne ton équipe.</p>` : '');

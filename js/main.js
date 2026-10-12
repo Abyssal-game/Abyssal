@@ -22,6 +22,7 @@ import accountScreen from './screens/account.js';
 import menuScreen from './screens/menu.js';
 import { teamScreen, chestsScreen } from './screens/army.js';
 import { startSync } from './cloud/sync.js';
+import { startPresence } from './cloud/presence.js';
 import { showWelcome } from './screens/welcome.js';
 import { setScene } from './ui/scene.js';
 
@@ -218,6 +219,7 @@ async function boot() {
     app.applySettings = applySettings;
     applySettings();
     startSync(app);
+    startPresence();
     lastShards = app.game.s.shards;
     window.addEventListener('hashchange', render);
     render();

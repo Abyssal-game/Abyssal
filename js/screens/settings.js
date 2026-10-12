@@ -1,5 +1,6 @@
 // Réglages : son, animations, accessibilité, sauvegarde, outils de développement.
 import { resetTips } from '../ui/coach.js';
+import { TUTOS, tuto } from '../ui/tutos.js';
 import { icon } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, openSheet, bindActions } from '../ui/dom.js';
 import { exportCode, importCode } from '../core/save.js';
@@ -21,13 +22,15 @@ export default function settings(app, root) {
     return `<div class="set-row col"><b>${label}</b><div class="seg" role="radiogroup" aria-label="${esc(label)}">${opts.map(([v, l]) => `<button class="seg-b" role="radio" data-act="seg" data-k="${key}" data-v="${v}" aria-checked="${g.s.settings[key] === v}" aria-pressed="${g.s.settings[key] === v}">${l}</button>`).join('')}</div></div>`;
   }
 
-  function render() {
-    const s = g.s.settings;
-    root.innerHTML = `
-      <header class="screen-head ui-hero bn-settings"><h1>Réglages</h1><p class="muted">Son, animations, sauvegarde et compte.</p></header>
-      <section class="panel stack">
+  const ui = (app.state.settings ||= { tab: 'jeu' });
+  const TABS = [['jeu', 'Jeu', 'set-game', 'dodge'], ['tutos', 'Tutoriels', 'set-tutos', 'book'], ['save', 'Sauvegarde', 'set-save', 'seal'], ['about', 'À propos', 'set-about', 'crown']];
+  // icônes peintes (en attendant les icônes dédiées set-game, set-tutos, set-save, set-about)
+  const tabIcon = (k, fb) => `<img class="picon" alt="" src="assets/icons/${fb}.webp">`;
+
+  function tabJeu(s) {
+    return `<section class="panel stack">
         <h2>Son et animations</h2>
-        ${toggle('sound', 'Effets sonores', 'Sons synthétisés : ouverture, révélation, succès.')}
+        ${toggle('sound', 'Effets sonores', 'Sons synthétisés : ouverture, révélation, combat.')}
         <div class="set-row col"><label for="vol"><b>Volume</b></label><input id="vol" type="range" min="0" max="1" step="0.05" value="${s.volume}" ${s.sound ? '' : 'disabled'}></div>
         ${seg('motion', 'Animations', [['auto', 'Selon l’appareil'], ['reduced', 'Réduites'], ['full', 'Complètes']])}
         ${toggle('fastOpen', 'Ouverture rapide des boosters', 'Affiche directement le récapitulatif, sans révéler les cartes une par une.')}
@@ -36,10 +39,23 @@ export default function settings(app, root) {
         <h2>Combat</h2>
         ${seg('defense', 'Défense active (esquive et parade au bon moment)', [['on', 'Normale'], ['easy', 'Facile'], ['off', 'Désactivée']])}
         <p class="small muted">Désactivée : plus de barre de timing pendant le tour ennemi ; tu te protèges avec la Défense, le Rempart et la Prière.</p>
-      </section>
-      <section class="panel stack">
+      </section>`;
+  }
+  function tabTutos() {
+    const seen = g.s.tips || {};
+    const groups = [...new Set(TUTOS.map((t) => t.group))];
+    return `<section class="panel stack">
+        <h2>Revoir les tutoriels</h2>
+        <p class="small muted">Touche un tutoriel pour le relire. Ceux que tu n’as pas encore rencontrés apparaîtront d’eux-mêmes au bon moment.</p>
+        <button class="set-tuto big" data-act="welcome"><span class="set-tuto-ic">${icon('sparkle')}</span><span><b>Le guide de départ</b><span class="small muted">Les bases d’ABYSSAL en quelques pages</span></span>${icon('next')}</button>
+        ${groups.map((gr) => `<h3 class="set-tuto-g">${esc(gr)}</h3>${TUTOS.filter((t) => t.group === gr).map((t) => `<button class="set-tuto ${seen[t.key] ? '' : 'new'}" data-act="tuto" data-k="${t.key}"><span class="set-tuto-ic">${icon('info')}</span><span><b>${esc(t.title)}</b><span class="small muted">${seen[t.key] ? 'Déjà vu' : 'Pas encore rencontré'}</span></span>${icon('next')}</button>`).join('')}`).join('')}
+        <button class="btn small ghost" data-act="guide">${icon('back')}Réactiver toutes les bulles d’aide</button>
+      </section>`;
+  }
+  function tabSave() {
+    return `<section class="panel stack">
         <h2>Sauvegarde</h2>
-        <p class="small">Ta progression est enregistrée <b>uniquement sur cet appareil</b>, dans ce navigateur, après chaque action. Elle n’est synchronisée nulle part. Pour la conserver ou la transférer, exporte-la régulièrement.</p>
+        <p class="small">Ta progression est enregistrée <b>uniquement sur cet appareil</b>, dans ce navigateur, après chaque action. Pour la conserver ou la transférer, exporte-la régulièrement, ou connecte ton compte en ligne.</p>
         ${app.persistent ? '' : '<p class="small err">Le stockage local est indisponible : la progression sera perdue à la fermeture.</p>'}
         <div class="row gap wrap">
           <button class="btn small" data-act="export">${icon('copy')}Copier le code</button>
@@ -51,16 +67,25 @@ export default function settings(app, root) {
       <section class="panel stack">
         <h2>Zone sensible</h2>
         <button class="btn danger small" data-act="reset">${icon('trash')}Effacer toute la progression</button>
-      </section>
-      ${sync.profile?.badge === 'createur' ? `<section class="panel stack cr-entry"><h2>${icon('crown')} Mode Créateur</h2>
-        <p class="small muted">Réservé au badge Créateur : ressources, cartes, variantes, boosters imposés, rituels et Descente à volonté.</p>
+      </section>`;
+  }
+  function tabAbout(s) {
+    return `${sync.profile?.badge === 'createur' ? `<section class="panel stack cr-entry"><h2>${icon('crown')} Mode Créateur</h2>
+        <p class="small muted">Réservé au badge Créateur : ressources, cartes, variantes, boosters imposés et Descente à volonté.</p>
         <button class="btn gold block" data-act="creator">${s.dev ? 'Ouvrir les pouvoirs' : 'Activer le Mode Créateur'}</button></section>` : ''}
       <section class="panel stack about">
         <h2>À propos</h2>
         <p class="small">ABYSSAL — Le Bestiaire interdit. Créé par <b>Alexis Seguin</b>.</p>
-        <button class="btn small" data-act="guide">${icon('info')}Revoir le guide et les bulles d’aide</button>
         <p class="small muted">Version ${esc(app.version)} · ${app.catalog.cards.length} cartes</p>
       </section>`;
+  }
+  function render() {
+    const s = g.s.settings;
+    const body = { jeu: tabJeu, tutos: tabTutos, save: tabSave, about: tabAbout }[ui.tab] || tabJeu;
+    root.innerHTML = `
+      <header class="screen-head ui-hero bn-settings"><h1>Réglages</h1><p class="muted">Jeu, tutoriels, sauvegarde.</p></header>
+      <nav class="set-tabs" role="tablist">${TABS.map(([k, l, ic, fb]) => `<button class="set-tab" role="tab" aria-selected="${ui.tab === k}" data-act="tab" data-k="${k}">${tabIcon(ic, fb)}<span>${l}</span></button>`).join('')}</nav>
+      <div class="set-body">${body(s)}</div>`;
     root.querySelector('#vol')?.addEventListener('change', (e) => { g.setSetting('volume', Number(e.target.value)); app.applySettings(); sfx.tap(); });
   }
 
@@ -112,7 +137,10 @@ export default function settings(app, root) {
       toast('Progression effacée.', { icon: 'trash' });
       app.go('');
     },
-    guide() { resetTips(app); showWelcome(app, { force: true }); },
+    tab(el) { ui.tab = el.dataset.k; sfx.tap(); render(); },
+    tuto(el) { tuto(app, el.dataset.k, { force: true }).then(() => render()); },
+    welcome() { showWelcome(app, { force: true }); },
+    guide() { resetTips(app); toast('Les bulles d’aide réapparaîtront au bon moment.', { icon: 'info' }); render(); },
     creator() { if (!g.s.settings.dev) g.setSetting('dev', true); render(); openCreator(app); },
     dev(el) {
       const x = el.dataset.x;

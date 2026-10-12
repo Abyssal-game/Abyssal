@@ -1,0 +1,22 @@
+// Les bulles d'aide du jeu, au même endroit : affichées au bon moment (une seule fois),
+// et consultables à nouveau depuis les Réglages (onglet Tutoriels).
+import { coach } from './coach.js';
+
+export const TUTOS = [
+  { key: 'cb-intro', group: 'Combat', title: 'Le combat', html: 'Ton équipe a <b>3 actions par tour</b>, à partager entre tes créatures. Chaque carte a son <b>attaque</b> (épée) et ses <b>PV</b> (cœur).<br><br>Touche une créature, choisis <b>Attaque</b>, puis l’ennemi. Quand tes actions sont épuisées, touche <b>Fin du tour</b>.' },
+  { key: 'cb-skill', group: 'Combat', title: 'Compétences et Ferveur', html: 'Chaque créature a une <b>compétence signature</b> (bouton doré) selon son rôle : Rempart, Coup d’estoc, Prière, Contagion, Entrave, Marque ou Raz-de-marée. Elles coûtent des <b>actions</b> et de la <b>Ferveur</b> (losanges en bas).<br><br>La Ferveur se gagne en attaquant, en exploitant une faiblesse, en esquivant ou en brisant un ennemi, et elle se <b>garde d’un combat à l’autre</b>. Pleine, elle lance ton <b>pouvoir d’équipe</b>.' },
+  { key: 'cb-intent', group: 'Combat', title: 'Lire les intentions', html: 'Au-dessus de chaque ennemi, son <b>intention</b> : ce qu’il fera à son tour et les dégâts prévus (les « ! » montrent le danger). Le badge rouge sur tes cartes annonce les coups qu’elles vont prendre.<br><br>Un ennemi qui <b>se charge</b> frappera très fort au tour suivant : <b>gèle-le</b>, <b>brise-le</b>, protège sa cible avec un <b>Rempart</b> ou une <b>Défense</b>, ou prépare-toi à parer.' },
+  { key: 'cb-defense', group: 'Combat', title: 'Défense active', html: 'Cet ennemi lance une attaque dangereuse. Une barre va apparaître : touche l’écran quand le curseur passe dans la <b>zone dorée</b> pour <b>esquiver</b> (+1 Ferveur), ou en plein <b>cœur blanc</b> pour une <b>parade parfaite</b> : aucun dégât, +2 Ferveur, l’ennemi est ébranlé, et tes Gardes et Assauts contre-attaquent.<br><br>Les attaques ordinaires ne demandent rien : la Défense et le Rempart les réduisent. Tu peux faciliter ou couper la défense active dans les Réglages.' },
+  { key: 'cb-dice', group: 'Combat', title: 'Les dés', html: 'Cette compétence lance un <b>dé à 20 faces</b>. Avant de lancer, tu vois tes <b>chances</b> et les <b>modificateurs</b> : une cible marquée, gelée, brisée ou faible face à ta créature est plus facile.<br><br><b>1</b> : échec critique. Sous la difficulté (DD) : réussite partielle (l’effet est réduit, pas perdu). DD atteint : réussite. <b>20</b> : réussite critique. Une immunité reste une immunité.' },
+  { key: 'cb-break', group: 'Combat', title: 'La Brisure', html: 'Les <b>élites</b> et les <b>gardiens</b> ont une <b>jauge de Brisure</b> (barre dorée sur leur carte). Chaque coup l’entame ; les coups lourds, le Gel et les parades parfaites l’entament plus. Vide, l’ennemi est <b>BRISÉ</b> : son attaque préparée est annulée, il perd son tour, subit +50 % de dégâts et tes jets de dés gagnent +5. Il se relève ensuite plus solide.' },
+  { key: 'army-team', group: 'Équipe', title: 'Compose ton équipe', html: 'Ton équipe : <b>3 créatures au combat</b> et <b>2 en réserve</b>. Chaque carte a une <b>capacité</b> (icône en haut à gauche), son <b>attaque</b> et ses <b>PV</b>, et un <b>coût</b> (en haut à droite) : le total ne doit pas dépasser 15. Chaque doublon fait <b>monter de niveau</b> la créature.' },
+  { key: 'army-doors', group: 'Aventure', title: 'La Descente', html: 'Choisis une porte à chaque étage. Plus tu descends, plus le <b>coffre</b> que tu rapporteras est beau. Tu peux <b>remonter</b> après chaque étage pour garder ton coffre.' },
+];
+const BY_KEY = Object.fromEntries(TUTOS.map((t) => [t.key, t]));
+// Affiche la bulle si elle n'a pas encore été vue (force : la remontrer quand même)
+export function tuto(app, key, { force = false } = {}) {
+  const t = BY_KEY[key];
+  if (!t) return Promise.resolve(false);
+  if (force && app.game.s.tips?.[key]) { const tips = { ...app.game.s.tips }; delete tips[key]; app.game.s.tips = tips; }
+  return coach(app, key, t.html, { title: t.title });
+}
