@@ -8,6 +8,7 @@ import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel } from './duel
 import { bossOf, BOSSES } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
 import { FORMS, formUnlocked } from './forms.js';
+import * as SC from './sceaux.js';
 import { FERVOR_START, FERVOR_MAX } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
 export const WEEKLY_FLOOR = 8;
@@ -460,6 +461,80 @@ export class Game {
     this.persist();
     return d.run;
   }
+  // ——— Duels des Sceaux ———
+  // Main du joueur : 5 cartes possédées (complétée par les cartes de départ prêtées s'il en manque)
+  sceauxHand() {
+    const owned = Object.keys(this.s.collection);
+    const saved = (this.s.sceaux.hand || []).filter((id) => this.owns(id) || STARTER.includes(id));
+    return saved.length === 5 ? saved : SC.autoHand(this.catalog, owned);
+  }
+  setSceauxHand(ids) {
+    const list = [...new Set(ids)].filter((id) => this.owns(id) || STARTER.includes(id));
+    if (list.length !== 5) throw new Error('Choisis exactement 5 cartes.');
+    this.s.sceaux.hand = list; this.persist(); return list;
+  }
+  sceauxUnlocked() { return SC.RIVALS.filter((_, i) => SC.rivalUnlocked(this.s, i)).length; }
+  sceauxDaily() { return SC.dailyChallenge(today(this.clock()), this.sceauxUnlocked()); }
+  sceauxStart({ rival, daily = false } = {}) {
+    const sc = this.s.sceaux;
+    let R = SC.RIVAL[rival], seed = Math.floor(this.rng() * 2 ** 31);
+    if (daily) {
+      const d = this.sceauxDaily();
+      if (sc.dailyDone === today(this.clock())) throw new Error('Défi du jour déjà relevé. Reviens demain !');
+      R = { ...SC.RIVAL[d.rival], rule: d.rule }; seed = d.seed;
+    } else {
+      const i = SC.RIVALS.findIndex((r) => r.key === rival);
+      if (i < 0) throw new Error('Adversaire inconnu.');
+      if (!SC.rivalUnlocked(this.s, i)) throw new Error('Bats d’abord l’adversaire précédent.');
+    }
+    sc.cur = SC.newGame(this.catalog, { hand: this.sceauxHand(), rival: R, seed, daily });
+    sc.cur.ruleKey = R.rule; sc.cur.rule = R.rule;
+    this.persist();
+    return sc.cur;
+  }
+  sceauxPlay(handIdx, cell) {
+    const st = this.s.sceaux.cur;
+    if (!st) throw new Error('Aucune partie en cours.');
+    const flips = SC.place(this.catalog, st, 'p', handIdx, cell);
+    this.persist();
+    return flips;
+  }
+  sceauxAi() {
+    const st = this.s.sceaux.cur;
+    if (!st || st.over || st.turn !== 'o') return null;
+    const m = SC.aiMove(this.catalog, st, SC.RIVAL[st.rival].level, this.rng);
+    const flips = SC.place(this.catalog, st, 'o', m[0], m[1]);
+    this.persist();
+    return { cell: m[1], flips };
+  }
+  // Fin de partie : récompenses (une seule fois par partie, plafonnées par jour), titres, historique
+  sceauxFinish() {
+    const sc = this.s.sceaux, st = sc.cur;
+    if (!st || !st.over) throw new Error('La partie n’est pas terminée.');
+    if (st.rewarded) return st.result;
+    const day = today(this.clock());
+    if (sc.day !== day) { sc.day = day; sc.paidToday = 0; }
+    const R = SC.RIVAL[st.rival];
+    const out = { result: st.over, shards: 0, first: false, title: null, daily: st.daily, capped: false };
+    if (st.over === 'won') {
+      sc.wins++; sc.streak++; sc.best = Math.max(sc.best, sc.streak);
+      if (!sc.beaten[R.key]) { sc.beaten[R.key] = Date.now(); out.first = true; out.shards += SC.SCEAUX_REWARD.firstWin; }
+      if (st.daily && sc.dailyDone !== day) { sc.dailyDone = day; out.shards += SC.SCEAUX_REWARD.daily; }
+      if (sc.paidToday < SC.SCEAUX_REWARD.dailyPaid) { sc.paidToday++; out.shards += R.reward; } else out.capped = true;
+      const t = SC.SCEAUX_TITLES[R.key] || (sc.wins === 1 ? SC.SCEAUX_TITLES.initie : null);
+      if (t && !this.s.titles.includes(t)) { this.s.titles.push(t); out.title = t; }
+      if (R.key === 'echo' && !this.s.frames.includes('sceaux')) { this.s.frames.push('sceaux'); out.frame = 'sceaux'; }
+    } else if (st.over === 'lost') { sc.losses++; sc.streak = 0; } else { sc.draws++; if (st.daily && sc.dailyDone !== day) { sc.dailyDone = day; out.shards += 10; } }
+    this.s.shards += out.shards;
+    sc.history.unshift({ t: Date.now(), rival: R.key, r: st.over, s: st.final });
+    sc.history = sc.history.slice(0, 20);
+    st.rewarded = true; st.result = out;
+    this.track('sceaux', 1);
+    this.checkProgress();
+    this.persist();
+    return out;
+  }
+  sceauxQuit() { this.s.sceaux.cur = null; this.persist(); }
   // Forme choisie pour une carte (corrompue si débloquée et sélectionnée)
   formOf(id) { return this.s.forms?.[id] === 'corrompue' && formUnlocked(this, id) ? 'corrompue' : null; }
   setForm(id, form) {

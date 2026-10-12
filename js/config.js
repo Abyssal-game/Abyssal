@@ -114,6 +114,7 @@ export const FRAMES = {
   infernal: 'Cadre infernal', abyssal: 'Cadre abyssal', celeste: 'Cadre céleste', sauvage: 'Cadre sauvage',
   necrotique: 'Cadre nécrotique', primordial: 'Cadre primordial', artificiel: 'Cadre artificiel',
   abysse: 'Cadre des Profondeurs', chasseur: 'Cadre du Chasseur',
+  sceaux: 'Cadre des Sceaux', reliques: 'Cadre des Reliques', guerre: 'Cadre de la Guerre',
 };
 
 // Booster standard gratuit qui se recharge avec le temps (aucune obligation de revenir).
