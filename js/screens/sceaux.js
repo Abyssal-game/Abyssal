@@ -11,6 +11,8 @@ const V = SC.showVal;
 // Salle de chaque adversaire (assets/sceaux) : le plateau reste le même, le décor change
 const THEME = { initie: 'salle', collectionneur: 'salle-artificiel', stratege: 'salle-celeste', maitre: 'salle-necrotique', echo: 'salle-abyssal' };
 const themeOf = (r) => THEME[r] || 'salle';
+// Portrait peint de l'adversaire (assets/sceaux/rival-*.webp), avec l'ancienne image de créature en secours
+const rivalPic = (cat, R) => `<img alt="" src="assets/sceaux/rival-${R.key}.webp" onerror="this.onerror=null;this.src='${artUrl(cat.get(R.portrait), { lite: true })}'">`;
 // Petite carte du jeu : illustration, nom, emblème de faction et quatre valeurs sur les bords
 function scCard(cat, id, { vals = null, owner = '', cls = '', back = false } = {}) {
   const c = cat.get(id);
@@ -44,7 +46,7 @@ export default function sceauxScreen(app, root) {
         <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : `+${SC.SCEAUX_REWARD.daily} éclats en plus en cas de victoire`}</span></span>${dailyDone ? icon('check') : icon('next')}</button>
       <h2 class="section-title">Adversaires</h2>
       <div class="sc-rivals">${SC.RIVALS.map((r, i) => { const open = SC.rivalUnlocked(g.s, i), won = sc.beaten[r.key]; return `<button class="sc-rival ${open ? '' : 'locked'} ${won ? 'won' : ''}" data-sc="play" data-r="${r.key}" ${open ? '' : 'disabled'} style="background-image:linear-gradient(90deg, rgba(12, 13, 20, .97) 38%, rgba(12, 13, 20, .45) 72%, rgba(12, 13, 20, .15)), url(assets/sceaux/${themeOf(r.key)}.webp)">
-        <span class="sc-por"><img alt="" src="${artUrl(cat.get(r.portrait), { lite: true })}"></span>
+        <span class="sc-por">${rivalPic(cat, r)}</span>
         <span class="sc-ri"><b>${esc(r.name)}</b><span class="small">${esc(r.title)} · ${'★'.repeat(r.level)}${'☆'.repeat(4 - r.level)}</span>
         <span class="small muted">${open ? `Règle « ${esc(SC.RULES[r.rule].name)} » · +${r.reward} éclats${won ? '' : ` · 1re victoire +${SC.SCEAUX_REWARD.firstWin}`}` : `Bats ${esc(SC.RIVALS[i - 1].name)} pour l’affronter`}</span></span>
         ${won ? `<span class="sc-won">${icon('check')}</span>` : open ? icon('next') : icon('p:mysteries')}</button>`; }).join('')}</div>
@@ -83,7 +85,7 @@ export default function sceauxScreen(app, root) {
       return `<div class="sc-cell full ${drop === i ? 'drop' : ''}" style="--d:${i * 45}ms" data-i="${i}">${scCard(cat, c.id, { vals: c.vals, owner: own, back: true })}${rs(i)}${tags(i)}</div>`;
     };
     root.innerHTML = `<div class="sc-game ${app.reduced() ? 'rm' : ''}">
-      <div class="sc-bar"><span class="sc-who ${st.turn === 'o' && !st.over ? 'on' : ''}"><span class="sc-med"><img alt="" src="${artUrl(cat.get(R.portrait), { lite: true })}"></span><span><b>${esc(R.name)}</b><small>${esc(R.title)}</small></span></span>
+      <div class="sc-bar"><span class="sc-who ${st.turn === 'o' && !st.over ? 'on' : ''}"><span class="sc-med">${rivalPic(cat, R)}</span><span><b>${esc(R.name)}</b><small>${esc(R.title)}</small></span></span>
         <span class="sc-score" aria-label="Score : toi ${s.p}, ${esc(R.name)} ${s.o}"><b class="p">${s.p}</b><i>·</i><b class="o">${s.o}</b></span>
         <button class="btn small ghost" data-sc="quit" aria-label="Quitter la partie">${icon('close')}</button></div>
       <div class="sc-sub"><span class="sc-ohand" aria-label="${st.hands.o.length} cartes dans sa main">${'<i></i>'.repeat(st.hands.o.length)}</span>
@@ -151,7 +153,7 @@ export default function sceauxScreen(app, root) {
     document.querySelector('.sc-dlg')?.remove();
     const el = document.createElement('div');
     el.className = 'sc-dlg';
-    el.innerHTML = `<b class="n">${esc(R.name)}</b><p>« ${esc(text)} »</p><small><span>${sub}</span><span>Touche pour fermer</span></small>`;
+    el.innerHTML = `<b class="n">${esc(R.name)}</b><div class="sc-dlg-in"><span class="sc-dlg-por">${rivalPic(cat, R)}</span><p>« ${esc(text)} »</p></div><small><span>${sub}</span><span>Touche pour fermer</span></small>`;
     document.body.appendChild(el);
     const close = () => { el.remove(); document.removeEventListener('pointerdown', close, true); };
     document.addEventListener('pointerdown', close, true);
@@ -172,7 +174,7 @@ export default function sceauxScreen(app, root) {
     el.innerHTML = `${st.over === 'won' && !app.reduced() ? '<div class="sc-rays"></div>' : ''}<div class="sc-end-in">${st.over === 'draw' ? '<h1 class="sc-draw">Égalité</h1>' : crestHTML(st.over === 'won', st.over === 'won' ? 'Victoire' : 'Défaite', '', 'sc-crest')}
       <div class="sc-final"><span class="sc-score"><b class="p">${f.p}</b><i>contre</i><b class="o">${f.o}</b></span></div>
       <p class="sc-caps">Tes captures : <b>${caps.p}</b> · Les siennes : <b>${caps.o}</b></p>
-      <p class="sc-say"><img alt="" src="${artUrl(cat.get(R.portrait), { lite: true })}"><span>« ${esc(st.over === 'won' ? R.win : st.over === 'lost' ? R.lose : 'Partie nulle. On recommence ?')} »</span></p>
+      <p class="sc-say">${rivalPic(cat, R)}<span>« ${esc(st.over === 'won' ? R.win : st.over === 'lost' ? R.lose : 'Partie nulle. On recommence ?')} »</span></p>
       ${out.shards ? `<p class="sc-gain">${icon('crystal')} <b>+${fmt(out.shards)}</b> éclats${out.first ? ' (première victoire)' : ''}</p>` : ''}
       ${out.war ? `<p class="sc-gain">${icon('p:conflicts')} <b>+${out.war}</b> points de guerre</p>` : ''}
       ${out.capped ? '<p class="small muted">Plus de victoires payées aujourd’hui : tu joues pour la gloire.</p>' : ''}
