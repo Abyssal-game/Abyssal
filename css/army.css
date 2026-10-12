@@ -1171,3 +1171,17 @@ img.veiled { filter: grayscale(1) brightness(.1) contrast(1.8) blur(6px) !import
 .ri-hub-hero .ri-hub-ash b { font: 900 1rem/1 var(--f-display); color: var(--gold-hi); }
 .ri-hub-hero .ri-hub-ash .ic { width: 22px !important; height: 22px !important; }
 .ri-hub-hero h1 { font-size: 1.5rem; } .ri-hub-hero p { max-width: 58%; }
+/* Icônes d'escalier : bords fondus, elles se mêlent au fond des tuiles */
+.dc-stair .picon, .dr-stair { -webkit-mask-image: radial-gradient(closest-side, #000 62%, transparent 100%); mask-image: radial-gradient(closest-side, #000 62%, transparent 100%); border-radius: 0 !important; }
+/* Intention ennemie : nom complet lisible, niveau de danger en clair */
+.cb-int { max-width: none !important; white-space: nowrap; }
+.cb-int b { overflow: visible !important; text-overflow: clip !important; font-size: .62rem !important; }
+.cb-int em { font: 900 .56rem/1 var(--f-ui); text-transform: uppercase; letter-spacing: .04em; padding: 2px 5px; border-radius: 6px; background: #C0182F; color: #fff !important; margin-left: 3px; }
+/* Reflet de la carte : sans mode de fusion (évite un trait parasite qui clignote sur iPhone) */
+.tcg-glare { mix-blend-mode: normal !important; background: radial-gradient(circle at var(--mx) var(--my), rgba(255, 255, 255, .14), transparent 48%) !important; }
+/* L'intention tient dans la largeur de la carte : le nom passe sur deux lignes si besoin, le danger se lit à la couleur */
+.cb-int { max-width: calc(100% + 4px) !important; white-space: normal !important; }
+.cb-int b { white-space: normal; line-height: 1.05; text-align: left; font-size: .6rem !important; }
+.cb-int em { display: none !important; }
+.cb-int.d2 { box-shadow: 0 0 10px rgba(255, 140, 60, .8); }
+.cb-int.d3 { box-shadow: 0 0 14px rgba(255, 40, 70, .95); }
