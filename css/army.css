@@ -1109,3 +1109,10 @@ img.ic.ic-cur { display: inline-block; vertical-align: -0.3em; }
 .cb-recap .r-me { color: #FF8A9A; font-weight: 700; } .cb-recap .r-foe { color: #9FE3B4; font-weight: 700; }
 .cb-recap .r-heal { color: #9FE3B4; } .cb-recap .r-good { color: #F2D27A; font-weight: 700; }
 @media (prefers-reduced-motion: reduce) { .dv-threat.lethal { animation: none; } }
+/* En-tête parfaitement net : la zone de l'heure et de la batterie est bouchée, plus d'ombre floue */
+body::after { content: ''; position: fixed; left: 0; right: 0; top: 0; height: calc(var(--safe-t) + 2px); z-index: 25; background: #06070B; pointer-events: none; }
+body.battle-mode::after { display: none; }
+#topbar { box-shadow: none !important; background: #06070B !important; border-bottom: 1px solid rgba(232, 195, 90, .35) !important; }
+.top-meta b { color: #F3E3B8; font-weight: 700; text-shadow: none; -webkit-font-smoothing: antialiased; }
+.wallet .pill { background: #12141C !important; border-color: rgba(232, 195, 90, .3) !important; }
+.wallet .pill span { color: #FFFFFF; font-weight: 800; }
