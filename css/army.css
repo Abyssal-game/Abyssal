@@ -1096,3 +1096,17 @@ img.ic.ic-cur { display: inline-block; vertical-align: -0.3em; }
 .dc-sum2-chest .ch-img, .dc-sum2-chest svg { width: 50px !important; height: 42px !important; }
 .dc-sum2-chest b { font-size: .64rem !important; }
 .dc-sum2-shards .ic { width: 30px !important; height: 30px !important; }
+/* Combat : caractère des ennemis, résumé du tour ennemi, K.O. annoncé */
+.dv-kw.fam { background: rgba(70, 8, 20, .85) !important; border-color: rgba(255, 90, 110, .55) !important; }
+.dv-kw.fam em { color: #FFC4CC; }
+.cb-tgt .ko { color: #fff; background: #C0182F; padding: 1px 5px; border-radius: 6px; margin-right: 3px; font-weight: 900; letter-spacing: .03em; }
+.dv-threat.lethal { background: linear-gradient(#E0203E, #7A0718) !important; color: #fff !important; font-weight: 900; box-shadow: 0 0 12px rgba(255, 40, 70, .9); animation: dvThreat .9s ease-in-out infinite; }
+.cb-recap { position: absolute; z-index: 30; left: 50%; top: 43%; transform: translate(-50%, -50%); width: min(92%, 420px); padding: 10px 14px 12px; border-radius: 16px; text-align: left; color: var(--ink); font: inherit; background: rgba(10, 7, 16, .94); border: 1px solid rgba(255, 90, 110, .45); box-shadow: 0 12px 34px rgba(0, 0, 0, .8); animation: dvIn .2s ease-out; }
+.cb-recap-h { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font: 800 .82rem/1 var(--f-display); letter-spacing: .08em; text-transform: uppercase; color: #FF9AA8; margin-bottom: 6px; }
+.cb-recap-h small { font: 600 .62rem/1 var(--f-ui); letter-spacing: 0; text-transform: none; color: var(--mute); }
+.cb-recap ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.cb-recap li { font-size: .76rem; line-height: 1.3; color: #D9D3C4; }
+.cb-recap li b { color: #F3E7C8; } .cb-recap li i { font-style: normal; color: var(--mute); }
+.cb-recap .r-me { color: #FF8A9A; font-weight: 700; } .cb-recap .r-foe { color: #9FE3B4; font-weight: 700; }
+.cb-recap .r-heal { color: #9FE3B4; } .cb-recap .r-good { color: #F2D27A; font-weight: 700; }
+@media (prefers-reduced-motion: reduce) { .dv-threat.lethal { animation: none; } }

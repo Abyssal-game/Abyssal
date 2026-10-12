@@ -102,13 +102,13 @@ export function runDuel(app, root, { title, onEnd }) {
     const tgt = tgtInfo[u.uid];
     return `<button class="dv-c ${u.side} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.broken ? 'broken' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(c.name)}, ${Math.max(0, u.hp)} PV">
       <span class="dv-art"><img alt="" src="${artUrl(c)}"></span>
-      <span class="dv-kw" title="${esc(kit.name)}">${roleIcon(kit.kw)}<em>${esc(kit.name)}</em></span>
+      <span class="dv-kw ${enemy && u.fam ? 'fam' : ''}" title="${esc(enemy && u.fam ? AI_FAMILIES[u.fam].desc : kit.name)}">${roleIcon(kit.kw)}<em>${esc(enemy && u.fam ? AI_FAMILIES[u.fam].name : kit.name)}</em></span>
       ${u.boss ? `<span class="dv-boss"><img alt="" src="assets/icons/crest-boss.webp">${u.phase2 ? 'Furie' : 'Gardien'}</span>` : u.elite ? '<span class="dv-boss elite"><img alt="" src="assets/icons/crest-elite.webp">Élite</span>' : ''}
       <span class="dv-nm">${esc(c.name)}</span>
       ${u.brkMax ? `<span class="cb-brk ${u.broken ? 'is-broken' : ''}" title="Brisure">${u.broken ? '<img alt="" src="assets/icons/st-broken.webp"><b>BRISÉ</b>' : `<i style="width:${(u.brk / u.brkMax) * 100}%"></i>`}</span>` : ''}
       <span class="dv-atk">${icon('swords')}<b>${u.atk + (u.boost || 0)}</b></span>
       <span class="dv-hp ${u.hp < u.maxHp ? 'hurt' : ''}">${icon('heart')}<b>${Math.max(0, u.hp)}</b></span>
-      ${!enemy && th[u.uid] ? `<span class="dv-threat" title="Dégâts annoncés"><img alt="" src="assets/icons/danger.webp">-${th[u.uid]}</span>` : ''}
+      ${!enemy && th[u.uid] ? `<span class="dv-threat ${th[u.uid] >= u.hp && !u.shield ? 'lethal' : ''}" title="Dégâts annoncés"><img alt="" src="assets/icons/danger.webp">${th[u.uid] >= u.hp && !u.shield ? 'K.O.' : `-${th[u.uid]}`}</span>` : ''}
       ${enemy ? intentChip(u) : ''}
       ${tgt ? `<span class="cb-tgt">${tgt}</span>` : ''}
       <span class="dv-st">${statusHTML(u)}</span>
@@ -169,7 +169,7 @@ export function runDuel(app, root, { title, onEnd }) {
     if (mode && sel && st.turn === 'ally') {
       for (const id of actionTargets(st, sel, mode.key)) {
         const p = preview(st, sel, mode.key, id);
-        tgtInfo[id] = p.roll ? `${p.roll.chance}%` : p.dmg ? `-${p.dmg}${p.weak ? ' ★' : ''}` : 'Cible';
+        tgtInfo[id] = p.roll ? `${p.roll.chance}%` : p.dmg ? (p.dmg >= st.units[id].hp && st.units[id].side === 'enemy' ? `<b class="ko">K.O.</b> -${p.dmg}` : `-${p.dmg}${p.weak ? ' ★' : ''}`) : 'Cible';
       }
     }
     enEl.innerHTML = front(st, 'enemy').map(cardEl).join('') + resHTML('enemy');
@@ -389,9 +389,45 @@ export function runDuel(app, root, { title, onEnd }) {
       setTimeout(() => { if (!done && alive_) { t0 = performance.now(); raf = requestAnimationFrame(step); } }, (reduced ? 250 : 300) + Math.random() * 450);
     });
   }
+  // Résumé du tour ennemi : une ligne par ennemi, affichée au début de ton tour
+  let log = null;
+  const nm = (uid) => { const u = st.units[uid]; return u ? esc(cat.get(u.id).name) : ''; };
+  function logEvents(ev) {
+    if (!log) return;
+    for (const e of ev) {
+      if (e.t === 'eact') { log.push({ a: e.a, k: INTENTS[e.kind]?.name || '', parts: [] }); continue; }
+      const cur = log[log.length - 1] || (log.push({ a: null, k: '', parts: [] }), log[log.length - 1]);
+      const who = e.u ? nm(e.u) : '', mine = e.u && st.units[e.u]?.side === 'ally';
+      const tag = (t) => `<span class="${mine ? 'r-me' : 'r-foe'}">${t}</span>`;
+      if (e.t === 'dmg') cur.parts.push(tag(`${who} −${e.d}`));
+      else if (e.t === 'die') cur.parts.push(tag(`${who} tombe`));
+      else if (e.t === 'heal') cur.parts.push(`<span class="r-heal">${who} +${e.d}</span>`);
+      else if (e.t === 'block') cur.parts.push(`${who} bloque`);
+      else if (e.t === 'dodge') cur.parts.push('<span class="r-good">esquivé</span>');
+      else if (e.t === 'parry') cur.parts.push('<span class="r-good">parade parfaite</span>');
+      else if (e.t === 'status' && e.u && !e.syn && e.u !== cur.a) cur.parts.push(`${who} : ${esc(e.s)}`);
+    }
+  }
+  function showLog() {
+    root.querySelector('.cb-recap')?.remove();
+    const rows = (log || []).filter((r) => r.parts.length || r.a);
+    log = null;
+    if (!rows.length || st.over || !alive_) return;
+    const html = rows.slice(-5).map((r) => `<li>${r.a ? `<b>${nm(r.a)}</b> <i>${esc(r.k)}</i>` : '<b>Fin du tour</b>'}${r.parts.length ? ` · ${r.parts.slice(0, 4).join(', ')}` : ''}</li>`).join('');
+    const box = document.createElement('button');
+    box.className = 'cb-recap';
+    box.setAttribute('aria-label', 'Résumé du tour ennemi, touche pour fermer');
+    box.innerHTML = `<span class="cb-recap-h">Tour ennemi <small>touche pour fermer</small></span><ul>${html}</ul>`;
+    box.addEventListener('click', (ev) => { ev.stopPropagation(); box.remove(); });
+    $('.dv').appendChild(box);
+    // le premier toucher n'importe où ferme le résumé (et agit normalement)
+    setTimeout(() => $('.dv')?.addEventListener('pointerdown', () => box.remove(), { once: true, capture: true }), 50);
+  }
   async function enemyTurn() {
+    log = [];
     for (let s = nextEnemy(st); s && alive_; s = nextEnemy(st)) {
       const skips = takeSkips(st);
+      logEvents(skips);
       if (skips.length) await play(skips);
       let res = 'none';
       if (s.qte && defMode !== 'off') {
@@ -401,10 +437,12 @@ export function runDuel(app, root, { title, onEnd }) {
       }
       if (!alive_) return;
       const ev = enemyAct(st, s.a, res); g.persist();
+      logEvents(ev);
       await play(ev);
     }
     if (!alive_) return;
     const ev = endEnemyTurn(st); g.persist();
+    logEvents(ev.filter((e) => e.t !== 'eact'));
     await play(ev);
   }
   async function doEnd() {
@@ -416,6 +454,7 @@ export function runDuel(app, root, { title, onEnd }) {
     if (guide) endGuide();
     busy = false; draw();
     if (st.over) return finish();
+    showLog();
     tips();
   }
   // Bulles d'aide au bon moment (une seule fois chacune)
