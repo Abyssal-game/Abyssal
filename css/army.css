@@ -1334,3 +1334,70 @@ img.veiled { filter: grayscale(1) brightness(.1) contrast(1.8) blur(6px) !import
 .pf-sceaux { border-color: #4FA3E8; border-style: double; border-width: 5px; box-shadow: 0 0 0 2px #071526, 0 0 14px rgba(79, 163, 232, .65); }
 .pf-reliques { border-color: #D9A441; box-shadow: 0 0 0 2px #1E1406, 0 0 16px rgba(217, 164, 65, .75), inset 0 0 8px rgba(217, 164, 65, .45); }
 .pf-guerre { border-color: #C8422A; border-style: double; border-width: 5px; box-shadow: 0 0 0 2px #1A0604, 0 0 14px rgba(200, 66, 42, .7); }
+
+/* ——— Chasse aux Reliques ——————————————————————————————————————————————— */
+.rq-how ul { padding-left: 18px; display: grid; gap: 6px; margin: 6px 0 0; }
+.rq-how h2 { margin: 0; font-size: 1.1rem; }
+.rq-list { display: grid; gap: 8px; margin-bottom: 12px; }
+.rq-rc { display: flex; align-items: flex-start; gap: 12px; width: 100%; text-align: left; padding: 12px; border-radius: 16px; border: 1px solid rgba(217, 164, 65, .35); background: linear-gradient(135deg, rgba(50, 36, 12, .55), rgba(12, 13, 20, .94) 60%); color: inherit; font: inherit; cursor: pointer; }
+.rq-rc.on { border-color: var(--gold-hi); box-shadow: 0 0 0 1px var(--gold-hi), 0 0 18px rgba(240, 200, 100, .35); }
+.rq-rc-ic { flex: none; width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; background: radial-gradient(circle, rgba(217, 164, 65, .3), rgba(0, 0, 0, .6) 70%); border: 1px solid rgba(217, 164, 65, .5); }
+.rq-rc-ic .picon { width: 34px; height: 34px; }
+.rq-rc-ic.big { width: 84px; height: 84px; margin: 0 auto 8px; } .rq-rc-ic.big .picon { width: 60px; height: 60px; }
+.rq-rc-t { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.rq-rc-t b { font: 700 1.05rem/1.15 var(--f-display); color: var(--gold-hi); }
+.rq-g, .rq-c { font-size: .84rem; line-height: 1.3; }
+.rq-g i, .rq-c i { font-style: normal; font-weight: 800; font-size: .66rem; text-transform: uppercase; letter-spacing: .06em; padding: 1px 6px; border-radius: 99px; margin-right: 6px; }
+.rq-g i { background: #1F5E3A; color: #BFF5D3; } .rq-c i { background: #5E1F24; color: #FFC9CC; }
+.rq-price { flex: none; align-self: center; display: inline-flex; align-items: center; gap: 4px; font: 800 .95rem/1 var(--f-ui); color: var(--gold-hi); }
+.rq-price .ic { width: 18px; height: 18px; }
+.rq-sheet { text-align: center; } .rq-sheet p { text-align: left; }
+/* En-tête de chasse */
+.rq-head { display: flex; flex-direction: column; gap: 8px; padding: 12px; margin-bottom: 10px; border-radius: 16px; border: 1px solid var(--line); background: rgba(12, 13, 20, .94); }
+.rq-ht { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.rq-ht b { font: 700 1.1rem/1 var(--f-display); color: var(--gold-hi); }
+.rq-track { display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px; }
+.rq-track i { height: 8px; border-radius: 4px; background: rgba(255, 255, 255, .1); position: relative; }
+.rq-track i.done { background: #B88A2E; } .rq-track i.cur { background: var(--gold-hi); box-shadow: 0 0 8px rgba(240, 200, 100, .8); }
+.rq-track i.seuil::after { content: ''; position: absolute; right: -3px; top: -3px; bottom: -3px; width: 2px; background: #7FE0A0; border-radius: 1px; }
+.rq-track i.boss { background: rgba(216, 65, 58, .5); } .rq-track i.boss.cur { background: #FF5C52; }
+.rq-hb { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rq-loot { display: flex; gap: 8px; }
+.rq-loot > span { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 99px; background: rgba(0, 0, 0, .5); border: 1px solid var(--line); }
+.rq-loot b { font: 800 .95rem/1 var(--f-ui); } .rq-loot small { color: var(--mute); font-size: .7rem; }
+.rq-loot .ic, .rq-loot .picon { width: 18px; height: 18px; }
+.rq-risk { border-color: rgba(255, 140, 90, .5) !important; } .rq-risk b { color: #FFB38A; }
+.rq-safe { border-color: rgba(127, 224, 160, .5) !important; } .rq-safe b { color: #9FEFC0; }
+.rq-relics { display: flex; gap: 6px; }
+.rq-relics.center { justify-content: center; margin: 6px 0; }
+.rq-rel { width: 38px; height: 38px; display: grid; place-items: center; padding: 0; border-radius: 50%; border: 1px solid rgba(217, 164, 65, .55); background: radial-gradient(circle, rgba(217, 164, 65, .25), rgba(0, 0, 0, .6) 70%); cursor: pointer; }
+.rq-rel .picon { width: 26px; height: 26px; }
+.rq-rel.empty { border-style: dashed; border-color: rgba(255, 255, 255, .15); background: none; cursor: default; }
+.rq-rel.drop { border-color: #FF5C52; box-shadow: 0 0 10px rgba(255, 92, 82, .7); opacity: .6; }
+.rq-head .v2-strip { margin: 0; }
+.rq-note { margin: 0 0 8px; padding: 8px 12px; border-radius: 12px; background: rgba(30, 90, 60, .3); border: 1px solid rgba(127, 224, 160, .4); font-size: .88rem; display: flex; align-items: center; gap: 6px; }
+.rq-note .picon { width: 22px; height: 22px; }
+/* Chemins */
+.rq-paths { display: grid; gap: 10px; margin-bottom: 14px; }
+.rq-path { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; min-height: 84px; padding: 12px 14px; border-radius: 16px; border: 1px solid var(--line); background: linear-gradient(90deg, rgba(30, 26, 40, .9), rgba(12, 13, 20, .94)); color: inherit; font: inherit; cursor: pointer; }
+.rq-path > span:nth-child(2) { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.rq-path b { font: 700 1.08rem/1.15 var(--f-display); }
+.rq-pi { flex: none; width: 50px; height: 50px; display: grid; place-items: center; border-radius: 12px; background: rgba(0, 0, 0, .45); }
+.rq-pi .ic, .rq-pi .picon { width: 38px; height: 38px; }
+.rq-path.r-combat { border-color: rgba(216, 65, 58, .45); } .rq-path.r-special { border-color: rgba(255, 140, 60, .6); background: linear-gradient(90deg, rgba(70, 30, 10, .7), rgba(12, 13, 20, .94)); }
+.rq-path.r-event { border-color: rgba(170, 120, 255, .45); } .rq-path.r-merchant { border-color: rgba(127, 224, 160, .45); }
+.rq-path.r-relic { border-color: rgba(217, 164, 65, .6); background: linear-gradient(90deg, rgba(60, 44, 12, .7), rgba(12, 13, 20, .94)); }
+.rq-path.r-boss { border-color: #FF5C52; background: linear-gradient(90deg, rgba(90, 14, 14, .75), rgba(12, 13, 20, .94)); min-height: 100px; }
+.rq-exit .picon { width: 26px; height: 26px; margin-right: 6px; }
+/* Événement et marchand */
+.rq-ev h2, .rq-shop h2 { margin: 0 0 6px; display: flex; align-items: center; gap: 8px; }
+.rq-ev > p { font-style: italic; color: #D9D3C4; }
+.rq-evc { display: grid; gap: 8px; }
+.rq-ch { display: flex !important; flex-direction: column; align-items: flex-start !important; text-align: left; gap: 2px; padding: 12px 14px !important; height: auto !important; white-space: normal; }
+.rq-shop h2 .picon { width: 30px; height: 30px; }
+.rq-shop h3 { margin: 12px 0 6px; font-size: 1rem; }
+.rq-item { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; width: 100%; text-align: left; padding: 10px 12px; margin-bottom: 8px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255, 255, 255, .04); color: inherit; font: inherit; cursor: pointer; }
+.rq-item b { grid-column: 1; } .rq-item .small { grid-column: 1; color: var(--mute); } .rq-item .rq-price { grid-column: 2; grid-row: 1 / span 2; }
+.rq-item:disabled, .rq-ch:disabled { opacity: .45; cursor: default; }
+.rq-sum { margin: 4px 0 8px; display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
+.rq-sum .ic { width: 20px; height: 20px; }

@@ -1,12 +1,12 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v121';
+const VERSION = 'abyssal-v122';
 const CORE = [
   './', 'index.html', 'manifest.webmanifest',
   'css/base.css', 'css/card.css', 'css/screens.css', 'css/army.css',
   'js/main.js', 'js/config.js',
-  'js/core/catalog.js', 'js/core/game.js', 'js/core/save.js', 'js/core/boosters.js', 'js/core/bosses.js', 'js/core/relations.js', 'js/core/pacts.js', 'js/core/forms.js', 'js/core/relics.js', 'js/core/sceaux.js', 'js/screens/sceaux.js',
+  'js/core/catalog.js', 'js/core/game.js', 'js/core/save.js', 'js/core/boosters.js', 'js/core/bosses.js', 'js/core/relations.js', 'js/core/pacts.js', 'js/core/forms.js', 'js/core/relics.js', 'js/core/sceaux.js', 'js/screens/sceaux.js', 'js/core/hunt.js', 'js/screens/reliques.js',
   'js/art/geometry.js', 'js/art/scenes.js', 'js/art/creatures.js', 'js/art/procedural.js', 'js/art/assets.js',
   'js/ui/dom.js', 'js/ui/icons.js', 'js/ui/card.js', 'js/ui/sound.js',
   'js/screens/home.js', 'js/screens/collection.js', 'js/screens/shop.js', 'js/screens/opening.js', 'js/screens/detail.js',

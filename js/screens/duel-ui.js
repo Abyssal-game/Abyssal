@@ -40,8 +40,8 @@ const DANGER = ['', '', 'Danger', 'Mortel'];
 const IN_PIC = { gorge: 'heavy', gather: 'channel', blizzard: 'frost', mimic: 'channel', copy: 'heavy', decree: 'rally', shift: 'charge' };
 const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${IN_PIC[k] || k}.webp">`;
 
-export function runDuel(app, root, { title, onEnd }) {
-  const g = app.game, cat = app.catalog, run = g.descent().run, st = run.battle;
+export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.' }) {
+  const g = app.game, cat = app.catalog, run = runOpt || g.descent().run, st = run.battle;
   const ui = (app.state.duel ||= { fast: false });
   const reduced = app.reduced();
   const T = (ms) => (reduced ? Math.min(ms, 80) : ui.fast ? ms * 0.45 : ms);
@@ -540,7 +540,7 @@ export function runDuel(app, root, { title, onEnd }) {
     const b = e.target.closest('[data-d]');
     if (b) {
       const k = b.dataset.d;
-      if (k === 'quit') { toast('Combat en pause : il t’attend dans la Descente.', { icon: 'swords' }); app.go(''); return; }
+      if (k === 'quit') { toast(pause, { icon: 'swords' }); app.go(''); return; }
       if (k === 'fast') { ui.fast = !ui.fast; b.classList.toggle('on', ui.fast); return; }
       if (k === 'help') return help();
       if (k === 'rule') return ruleSheet(b.dataset.k);

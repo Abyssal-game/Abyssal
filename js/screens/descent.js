@@ -58,6 +58,7 @@ export default function descent(app, root) {
       <h2 class="section-title">Autres modes</h2>
       <div class="om-grid">
         <a class="panel om-tile" href="#/sceaux"><span class="om-ic">${picon('seal')}</span><span><b>Duels des Sceaux</b><span class="small muted">Plateau 3 × 3, capture les cartes adverses</span></span>${icon('next')}</a>
+        <a class="panel om-tile" href="#/reliques"><span class="om-ic">${picon('crown')}</span><span><b>Chasse aux Reliques</b><span class="small muted">${g.relicRun() ? 'Une chasse est en cours : reprends-la' : 'Neuf salles, des reliques, un butin à ramener vivant'}</span></span>${icon('next')}</a>
       </div>
       ${Object.values(g.s.items).some((n) => n > 0) ? bagHTML(g) : ''}
       <details class="panel dc-fold bn-ranking" id="lb"><summary><span class="dc-sum-t">Classement du jour</span></summary><div class="lb-body small muted">Chargement…</div></details>
