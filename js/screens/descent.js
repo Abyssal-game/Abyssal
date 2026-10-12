@@ -67,10 +67,14 @@ export default function descent(app, root) {
       <span><span class="small muted dc-week-lbl">${picon('hunt')}Créature de la semaine</span><b>${esc(c.name)}</b><span class="small">${w.done ? `${icon('check')} Vaincue : sa carte est à toi ! Nouvelle créature lundi.` : 'Elle rôde dans l’Abysse, comme <b>élite redoutable</b> à partir de l’étage 8. Vaincs-la pour gagner sa carte.'}</span></span></section>`;
   }
   function summaryHTML(s) {
-    return `<section class="panel ornate dc-sum ${s.wiped ? 'lost' : 'won'}">${crestHTML(!s.wiped, s.floor, 'Étage', 'dc-crest')}<h2>${s.wiped ? 'L’équipe est tombée' : 'Retour à la surface'}</h2>
-      <p class="small">${s.chests.length ? s.chests.map((c) => chestChip(c)).join(' ') : 'Aucun coffre cette fois.'} ${s.shards ? `· ${icon('crystal')} ${fmt(s.shards)} éclats` : ''}</p>
-      ${s.chests.length ? `<a class="btn gold block" href="#/coffres">${icon('p:chest')}Ouvrir mes coffres</a>` : ''}
-      <div class="row gap"><button class="btn small ghost" data-act="share">${icon('copy')}Partager</button><button class="btn small ghost" data-act="dismiss">OK</button></div></section>`;
+    return `<section class="dc-sum2 ${s.wiped ? 'lost' : 'won'}">
+      ${crestHTML(!s.wiped, s.floor, 'Étage', 'dc-sum2-crest')}
+      <h2>${s.wiped ? 'L’équipe est tombée' : 'Retour à la surface'}</h2>
+      <p class="dc-sum2-sub">${s.wiped ? 'Tes créatures ont été vaincues, mais ton butin est sauvé.' : 'Tu remontes avec tout ton butin.'}</p>
+      <div class="dc-sum2-loot">${s.chests.map((c) => `<span class="dc-sum2-chest" style="--cc:${CHESTS[c].color}">${chestSVG(c)}<b>${esc(CHESTS[c].name)}</b></span>`).join('')}${s.shards ? `<span class="dc-sum2-shards">${icon('crystal')}<b>+${fmt(s.shards)}</b><small>éclats</small></span>` : ''}${!s.chests.length && !s.shards ? '<span class="dc-sum2-sub">Aucun butin cette fois.</span>' : ''}</div>
+      ${s.chests.length ? `<a class="btn primary block dc-plq dc-plq-red" href="#/coffres">${icon('p:chest')}Ouvrir ${s.chests.length > 1 ? 'mes coffres' : 'mon coffre'}</a>` : ''}
+      <div class="dc-sum2-row"><button class="btn dc-plq dc-plq-dark" data-act="share">${icon('copy')}Partager</button><button class="btn dc-plq dc-plq-dark" data-act="dismiss">Continuer</button></div>
+    </section>`;
   }
 
   async function loadBoard() {

@@ -525,7 +525,7 @@ export function runDuel(app, root, { title, onEnd }) {
       <h2>${esc(ult.name)}</h2>
       <p class="small muted">Pouvoir d’équipe${c ? ` de ${esc(c.name)}` : ''} · coûte <b>1 action</b> et <b>toute la Ferveur (${FERVOR_MAX})</b></p>
       <p>${esc(ULT_HOW[st.ult] || ult.desc)}</p>
-      ${ready ? `<button class="btn gold block big-cta" data-u="go">Lancer ${esc(ult.name)}</button>` : `<p class="small cb-ult-need">${st.fervor < FERVOR_MAX ? `Encore ${FERVOR_MAX - st.fervor} Ferveur à gagner : attaque, exploite les faiblesses, esquive, pare et brise les ennemis.` : 'Il te faut encore 1 action ce tour-ci.'}</p>`}
+      ${ready ? `<button class="btn primary block big-cta dc-plq dc-plq-red" data-u="go">${icon('p:power')}Lancer le pouvoir</button>` : `<p class="small cb-ult-need">${st.fervor < FERVOR_MAX ? `Encore ${FERVOR_MAX - st.fervor} Ferveur à gagner : attaque, exploite les faiblesses, esquive, pare et brise les ennemis.` : 'Il te faut encore 1 action ce tour-ci.'}</p>`}
     </div>`, { label: ult.name });
     sh.body.addEventListener('click', (e) => { if (e.target.closest('[data-u="go"]')) { sh.close(); castUlt(); } });
   }
