@@ -2,7 +2,9 @@
 // Chaîne : chaque son → (sec + réverbération de salle) → compresseur → volume général.
 // Les sons sont faits de couches : transitoire (le « clic » du contact), corps (le grave), queue (la résonance).
 // Petites variations aléatoires de hauteur pour que les sons répétés ne sonnent pas mécaniques.
-let ctx = null, master = null, bus = null, verb = null, enabled = true, volume = 0.7;
+let ctx = null, master = null, bus = null, verb = null, enabled = true, volume = 0.7, haptics = true, loud = false;
+// Branchements de la musique (js/ui/music.js) : baisse de la musique pendant les grands moments
+export const hooks = { duck: null };
 let noiseBuf = null, brownBuf = null, voices = 0;
 const MAX_VOICES = 48;
 
@@ -26,16 +28,42 @@ function ensure() {
     verb.connect(hp).connect(wet).connect(comp);
     noiseBuf = makeNoise(false); brownBuf = makeNoise(true);
     // iPhone : l'audio peut être suspendu en revenant dans l'app
-    document.addEventListener('visibilitychange', () => { if (!document.hidden && ctx.state !== 'running') ctx.resume().catch(() => {}); });
+    // app en arrière-plan : tout est suspendu (batterie)
+    document.addEventListener('visibilitychange', () => { if (document.hidden) ctx.suspend().catch(() => {}); else if (ctx.state !== 'running') ctx.resume().catch(() => {}); });
   }
   if (ctx.state !== 'running') ctx.resume().catch(() => {});
   return ctx;
 }
 
-export function configureSound({ sound, volume: v }) {
+export function configureSound({ sound, volume: v, haptics: h, loud: l }) {
   enabled = sound !== false;
   if (typeof v === 'number') volume = v;
+  haptics = h !== false; loud = !!l;
   if (master) master.gain.value = volume * 0.9;
+  // iPhone (iOS 17+) : « playback » joue même quand le bouton silencieux est activé
+  try { if (navigator.audioSession) navigator.audioSession.type = loud ? 'playback' : 'ambient'; } catch (e) { /* rien */ }
+}
+// Contexte audio partagé avec la musique (créé au premier toucher)
+export function audioCtx() { return ensure(); }
+
+// Vibrations. Android : navigator.vibrate. iPhone (iOS 18+) : Safari n'a pas de vibration pour le web,
+// mais basculer un interrupteur natif (<input type=checkbox switch>) produit un petit retour haptique.
+let hapEl = null;
+function hapOnce() {
+  if (navigator.vibrate) { try { navigator.vibrate(18); } catch (e) { /* rien */ } return; }
+  if (!hapEl) {
+    hapEl = document.createElement('label');
+    hapEl.setAttribute('aria-hidden', 'true');
+    hapEl.style.cssText = 'position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none';
+    const i = document.createElement('input'); i.type = 'checkbox'; i.setAttribute('switch', ''); i.tabIndex = -1;
+    hapEl.appendChild(i); document.body.appendChild(hapEl);
+    hapEl.addEventListener('click', (e) => e.stopPropagation());
+  }
+  hapEl.click();
+}
+export function hap(n = 1) {
+  if (!haptics || !enabled) return;
+  for (let i = 0; i < n; i++) setTimeout(hapOnce, i * 90);
 }
 
 function impulse(sec, decay) {
@@ -252,6 +280,14 @@ export const sfx = {
     [N.D6, N.A5, N.F6].forEach((f, i) => bell(f, { dur: 2, gain: 0.05, ratio: 2, index: 1.6, delay: 0.62 + i * 0.07, pan: i - 1 }));
   },
   dice() { grains(9, { span: 0.55, freq: 2600, spread: 900, gain: 0.16, dur: 0.018, q: 2.5, accel: 1.2, wet: 0.15 }); thump(160, { to: 110, dur: 0.06, gain: 0.15, delay: 0.55 }); },
+  // ——— Navigation ———
+  nav() { whoosh({ dur: 0.16, gain: 0.05, from: vary(900), to: 2400, q: 0.9 }); noise({ dur: 0.05, gain: 0.06, type: 'lowpass', freq: 700, delay: 0.1, wet: 0.2 }); },
+  sheet() { whoosh({ dur: 0.18, gain: 0.06, from: 600, to: 1800, q: 0.8 }); grains(4, { span: 0.12, freq: 2200, spread: 900, gain: 0.03, q: 1.2 }); },
+  fury() {
+    noise({ dur: 0.45, gain: 0.16, type: 'bandpass', freq: 300, to: 2400, q: 0.9, attack: 0.04, brown: true, wet: 0.3 });
+    grit(82, { dur: 0.5, gain: 0.12, to: 55, lp: 800 }); grains(12, { span: 0.4, freq: 2800, spread: 1500, gain: 0.05, q: 1.5, delay: 0.05 });
+    thump(90, { to: 35, dur: 0.4, gain: 0.45, delay: 0.05 });
+  },
   // ——— Fins de combat ———
   victory() {
     thump(70, { gain: 0.5 }); thump(70, { gain: 0.45, delay: 0.18 });
@@ -264,6 +300,18 @@ export const sfx = {
     bell(98, { dur: 3, gain: 0.12, ratio: 1.41, index: 3, delay: 0.1, wet: 0.8 }); thump(55, { to: 28, dur: 1, gain: 0.5, delay: 0.1 });
   },
 };
+
+// Vibrations associées (nombre de petites impulsions) et baisse de la musique pendant les grands moments
+const HAP = { hit: 1, slash: 1, smash: 2, crit: 2, capture: 1, block: 1, parry: 1, shatter: 3, boss: 3, ult: 2, victory: 3, defeat: 2, error: 1, dice: 1, tear: 1, achievement: 2, pose: 1, fury: 2, death: 1 };
+const DUCK = { victory: 3.5, defeat: 4, ult: 2.5, achievement: 2, boss: 2 };
+for (const k of Object.keys(sfx)) {
+  const f = sfx[k];
+  sfx[k] = (...a) => {
+    if (k === 'reveal') { const big = a[0] === 'M' || a[0] === 'S'; if (big || a[0] === 'HR') { hooks.duck?.(big ? 3.5 : 2); } hap(big ? 3 : a[0] === 'R' || a[0] === 'HR' ? 1 : 0); }
+    else { if (HAP[k]) hap(HAP[k]); if (DUCK[k]) hooks.duck?.(DUCK[k]); }
+    return f(...a);
+  };
+}
 
 // Liste d'écoute (Réglages)
 export const SFX_DEMO = [

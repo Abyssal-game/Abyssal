@@ -1,5 +1,6 @@
 // Petits outils d'interface : échappement, fenêtres, notifications, confirmation.
 import { icon } from './icons.js';
+import { sfx } from './sound.js';
 
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 export const $ = (sel, root = document) => root.querySelector(sel);
@@ -36,6 +37,7 @@ export function openSheet(html, { cls = '', onClose, label = 'Fenêtre', full = 
   wrap.className = `sheet-wrap ${full ? 'sheet-full' : ''}`;
   wrap.innerHTML = `<div class="sheet-backdrop"></div><section class="sheet ${cls}" role="dialog" aria-modal="true" aria-label="${esc(label)}"><button class="sheet-close icon-btn" aria-label="Fermer">${icon('close')}</button><div class="sheet-body">${html}</div></section>`;
   root.appendChild(wrap);
+  sfx.sheet();
   document.body.classList.add('has-sheet');
   const prevFocus = document.activeElement;
   const api = {

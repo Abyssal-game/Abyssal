@@ -6,6 +6,7 @@ import { setCardCatalog } from './ui/card.js';
 import { icon, EMBLEM } from './ui/icons.js';
 import { toast, esc, fmt, reducedMotion, closeTopSheet, openSheet } from './ui/dom.js';
 import { sfx, configureSound } from './ui/sound.js';
+import { musicRoute, configureMusic } from './ui/music.js';
 import { VERSION } from './config.js';
 import { openCardDetail } from './screens/detail.js';
 
@@ -82,6 +83,7 @@ function applySettings() {
   const s = app.game.s.settings;
   document.documentElement.classList.toggle('reduce-motion', s.motion === 'reduced');
   configureSound(s);
+  configureMusic(s);
 }
 
 // Explication des deux monnaies (toucher le compteur en haut à droite)
@@ -178,7 +180,9 @@ function render() {
   scrollKey = null; // pas d'enregistrement pendant le changement de page
   const screen = ROUTES[route] || homeScreen;
   if (app.cleanup) { try { app.cleanup(); } catch (e) { /* rien */ } app.cleanup = null; }
+  if (app.route !== (ROUTES[route] ? route : '') && app.game) sfx.nav();
   app.route = ROUTES[route] ? route : '';
+  musicRoute(app.route);
   app.params = params.map(decodeURIComponent);
   renderChrome();
   setScene(ROUTE_SCENE[app.route] || null);
@@ -285,7 +289,7 @@ async function boot() {
     bootEl.addEventListener('click', finish); // un toucher passe l'introduction
     if (!persistent) toast('Le stockage local est désactivé dans ce navigateur : ta progression ne sera pas conservée après fermeture.', { kind: 'error', icon: 'info', ms: 9000 });
     if (app.game.loadedFrom && app.game.loadedFrom.endsWith('backup')) toast('La sauvegarde principale était abîmée : la copie de secours a été restaurée.', { kind: 'error', icon: 'info', ms: 8000 });
-    document.addEventListener('pointerdown', () => configureSound(app.game.s.settings), { once: true });
+    document.addEventListener('pointerdown', () => applySettings(), { once: true });
   } catch (e) {
     console.error(e);
     bootEl.querySelector('.err').textContent = `Impossible d’ouvrir le Bestiaire : ${e.message}. Vérifie ta connexion puis recharge la page.`;

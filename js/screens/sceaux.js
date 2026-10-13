@@ -143,7 +143,7 @@ export default function sceauxScreen(app, root) {
         shown = f.rule;
         const b = document.createElement('div'); b.className = `sc-combo ${f.rule}`; b.innerHTML = `<img class="sc-cburst" alt="" src="assets/fx/burst.webp"><img class="sc-cico" alt="" src="assets/icons/${{ identique: 'sc-same', somme: 'sc-sum', combo: 'sc-combo', fureur: 'sc-combo' }[f.rule]}.webp"><span>${{ identique: 'Identique !', somme: 'Somme !', combo: 'Combo !', fureur: 'Fureur !' }[f.rule]}</span>`;
         root.querySelector('.sc-board')?.appendChild(b); setTimeout(() => b.remove(), 1100);
-        (f.rule === 'combo' ? app.sfx.crit : app.sfx.skill)?.(); await wait(380);
+        (f.rule === 'combo' ? app.sfx.crit : f.rule === 'fureur' ? app.sfx.fury : app.sfx.skill)?.(); await wait(380);
       }
       beam(grid, f.from ?? m.cell, f.cell, m.who);
       const cmp = f.rule === 'identique' || f.rule === 'fureur' ? `${V(f.mine)} = ${V(f.theirs)}` : f.rule === 'somme' ? `${V(f.mine)} + ${V(f.theirs)}` : `${V(f.mine)} &gt; ${V(f.theirs)}`;
