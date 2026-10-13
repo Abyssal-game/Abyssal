@@ -5,7 +5,7 @@ import { esc, fmt } from '../ui/dom.js';
 import { sync } from '../cloud/sync.js';
 import { isLoggedIn } from '../cloud/cloud.js';
 import { openCreator } from './creator.js';
-import { openRitualHub } from './ritual.js';
+import { openFurnace } from './furnace.js';
 
 export default function menu(app, root) {
   const g = app.game, cat = app.catalog, s = g.s, lv = g.levelInfo();
@@ -21,7 +21,7 @@ export default function menu(app, root) {
       ${T('#/profil', 'seal', 'Profil', 'Vitrine, titres, statistiques')}
       ${T('#/succes', 'crown', 'Succès', `${achDone} / ${cat.achievements.length} débloqués`)}
       ${T('#/bestiaire', 'book', 'Bestiaire', 'Créatures, royaumes, histoire')}
-      ${A('ritual', 'ritual', 'Rituel d’élévation', 'Holographique, or, cosmique')}
+      ${A('furnace', 'ritual', 'La Fournaise', 'Brûler des cartes, renforcer ses créatures')}
       ${T('#/compte', 'account', 'Compte en ligne', isLoggedIn() ? `Connecté${sync.profile?.pseudo ? ` · ${esc(sync.profile.pseudo)}` : ''}` : 'Sauvegarde, classement')}
       ${T('#/parametres', 'settings', 'Réglages', 'Son, tutoriels, sauvegarde')}
       ${creator ? A('creator', 'creator', 'Mode Créateur', s.settings.dev ? 'Actif' : 'Pouvoirs du créateur') : ''}
@@ -29,7 +29,7 @@ export default function menu(app, root) {
   root.addEventListener('click', (e) => {
     const b = e.target.closest('[data-mn]');
     if (!b) return;
-    if (b.dataset.mn === 'ritual') openRitualHub(app);
+    if (b.dataset.mn === 'furnace') openFurnace(app);
     if (b.dataset.mn === 'creator') { if (!g.s.settings.dev) g.setSetting('dev', true); openCreator(app); }
   });
   app.refreshView = () => app.refresh();

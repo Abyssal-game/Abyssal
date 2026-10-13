@@ -1719,3 +1719,19 @@ i.cmb { font-style: normal; color: #FFC266; font-weight: 800; }
 @media (prefers-reduced-motion: reduce) { .cb-cpop { animation: none; opacity: 0; } }
 .bn-team { --bn: url(../assets/ui/bn-team.webp); } .bn-chests { --bn: url(../assets/ui/bn-chests.webp); } .bn-account { --bn: url(../assets/ui/bn-account.webp); } .bn-sanctuary { --bn: url(../assets/ui/bn-sanctuary.webp); } .bn-factions { --bn: url(../assets/ui/bn-factions.webp); }
 .dc-night-row { background: #0b0812 url(../assets/ui/ph-eclipse.webp) right center / cover no-repeat !important; border-color: rgba(140, 90, 220, .5) !important; }
+
+/* Fournaise : brûler une carte, monter de niveau */
+.fz-burn { display: grid; gap: 10px; }
+.fz-burn h2 { display: flex; align-items: center; gap: 8px; margin: 0; }
+.fz-rows { display: grid; gap: 8px; }
+.fz-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 12px; background: rgba(255, 255, 255, .04); border: 1px solid rgba(232, 195, 90, .25); }
+.fz-row > span { display: grid; gap: 3px; min-width: 0; }
+.fz-row small { display: inline-flex; align-items: center; gap: 4px; }
+.fz-row small .ic, .fz-burn p .ic { width: 15px; height: 15px; vertical-align: -3px; }
+.fz-up { margin-top: 4px; }
+.fz-up small { font-weight: 600; opacity: .85; }
+.op-loot .op-burn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 99px; border: 1px solid rgba(255, 140, 60, .7); background: linear-gradient(180deg, rgba(150, 50, 20, .85), rgba(70, 18, 10, .9)); color: #FFE2C4; font: inherit; box-shadow: 0 0 14px rgba(255, 120, 40, .35); }
+.op-loot .op-burn b { font-weight: 800; }
+.op-loot .op-burn small { display: inline-flex; align-items: center; gap: 2px; }
+.op-loot .op-burn .ic { width: 16px; height: 16px; }
+.op-tag .ic { width: 13px; height: 13px; vertical-align: -2px; }

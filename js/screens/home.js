@@ -10,7 +10,7 @@ import { setScene } from '../ui/scene.js';
 import { onPresence } from '../cloud/presence.js';
 
 // Icône et couleur de chaque type de mission du jour
-const MISSION_LOOK = { booster: ['booster', '#E0485E'], new: ['book', '#B48CFF'], rare: ['crystal', '#6FB4FF'], variant: ['holo', '#FF8AD8'], ritual: ['ritual', '#FF9A3A'], depth: ['depth', '#9C7BFF'], win: ['crown', '#F2C14E'], daily: ['crystal', '#7FD3FF'], chest: ['chest', '#E8C35A'] };
+const MISSION_LOOK = { booster: ['booster', '#E0485E'], new: ['book', '#B48CFF'], rare: ['crystal', '#6FB4FF'], variant: ['holo', '#FF8AD8'], burn: ['ritual', '#FF9A3A'], depth: ['depth', '#9C7BFF'], win: ['crown', '#F2C14E'], daily: ['crystal', '#7FD3FF'], chest: ['chest', '#E8C35A'] };
 
 export default function home(app, root) {
   const g = app.game, cat = app.catalog, s = g.s;

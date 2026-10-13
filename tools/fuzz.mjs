@@ -90,6 +90,9 @@ for (let i = 1; i <= N; i++) {
   const pool = cat.cards.filter((c) => tier.includes(c.rarity));
   const ids = []; while (ids.length < 5) { const c = pool[Math.floor(r() * pool.length)]; if (!ids.includes(c.id)) ids.push(c.id); }
   ids.forEach((id) => { for (let k = 0; k < 1 + Math.floor(r() * 8); k++) g.addCard(id); });
+  // Fournaise : doublons brûlés, puis niveaux achetés au hasard (jusqu'au niveau 10)
+  g.burnSpares(); g.s.ash = 1e6;
+  ids.forEach((id) => { const n = Math.floor(r() * 10); for (let k = 0; k < n; k++) g.upgrade(id); });
   g.s.team = ids; g.s.teamSet = true;
   if (g.team().length < 3) { g.s.team = g.s.team.slice(0, 3); if (g.team().length < 3) continue; } // équipe trop chère pour le budget : on en garde une valide
   const nightmare = r() < 0.3; if (nightmare) g.s.descent.best = 25;

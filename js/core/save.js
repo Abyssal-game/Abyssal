@@ -1,6 +1,7 @@
 // Sauvegarde locale versionnée (localStorage), migration, export / import.
 // La sauvegarde reste sur l'appareil : elle n'est synchronisée nulle part.
 import { ECONOMY, OLD_VARIANTS, SAVE_VERSION, SAVE_KEY, SAVE_BACKUP_KEY, EXPORT_PREFIX } from '../config.js';
+import { levelFromDups } from './army.js';
 
 export function today(date = new Date()) {
   const p = (n) => String(n).padStart(2, '0');
@@ -37,7 +38,6 @@ export function defaultSave(now = Date.now()) {
     fervor: {},           // 'id:variante' -> échecs de rituel accumulés
     items: {},            // objets possédés : clé -> nombre
     itemBuys: { day: null },
-    ritualBoost: 0,       // bonus d'encens pour le prochain rituel
     tips: {},             // bulles d'aide déjà vues
     hunt: {},             // Bestiaire de chasse : id de créature -> nombre de victoires
     // Arsenal : objets (id -> { b: modèle, r: rareté, f: forge, a: propriété }), équipement par héros,
@@ -104,6 +104,8 @@ export function migrate(raw) {
   for (const e of Object.values(s.collection)) {
     if (!e || !e.v) continue;
     for (const [o, to] of Object.entries(OLD_VARIANTS)) if (e.v[o]) { e.v[to] = (e.v[to] || 0) + e.v[o]; delete e.v[o]; }
+    // Fournaise : le niveau ne vient plus des doublons, il est enregistré (ancien niveau conservé)
+    if (!e.lv) e.lv = levelFromDups(Math.max(0, (e.n || 1) - 1)).level;
   }
   for (const k of Object.keys(s.fervor)) if (OLD_VARIANTS[k.split(':')[1]]) delete s.fervor[k];
   for (const h of [...s.history, ...s.best]) for (const c of h?.cards || []) if (OLD_VARIANTS[c.v]) c.v = OLD_VARIANTS[c.v];

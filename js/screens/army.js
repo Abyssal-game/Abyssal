@@ -13,6 +13,7 @@ import { duelUnit } from '../core/duel.js';
 import { kitOf, synergiesFor, KEYWORDS, keywordOf } from '../core/skills.js';
 import { openPack } from './opening.js';
 import { openChestScene } from './chest-open.js';
+import { upgradeCard } from './furnace.js';
 
 // Étiquettes posées sur une carte : capacité, niveau, coût, attaque et PV
 export const armyBadges = (g, c) => {
@@ -38,7 +39,7 @@ export function combatHTML(g, c) {
     </div>
     ${syn.length ? `<div class="panel v2-skill"><b>${icon('p:combo')} Combinaisons</b>${syn.map((x) => `<p class="small"><b>${esc(x.name)}</b> : ${esc(x.desc)}</p>`).join('')}</div>` : ''}
     ${ult ? `<div class="panel v2-skill ult" style="--uc:${ult.color}"><b>${icon('p:power')} Pouvoir : ${esc(ult.name)}</b><p class="small">${esc(ult.desc)}</p><p class="small muted">Dans l’équipe, la Mythique ou Secrète la plus rare remplace le Sceau du Gardien par son pouvoir.</p></div>` : ''}
-    ${owned ? `<div class="v2-lvl"><b>Niveau ${li.level}</b><span class="xpbar"><i style="width:${li.need ? (li.into / li.need) * 100 : 100}%"></i></span><span class="small muted">${li.need ? `${li.into} / ${li.need} doublon${li.need > 1 ? 's' : ''} pour le niveau ${li.level + 1}${nx && (nx.atk > u.atk || nx.maxHp > u.maxHp) ? ` (${nx.atk > u.atk ? `+${nx.atk - u.atk} ATQ ` : ''}${nx.maxHp > u.maxHp ? `+${nx.maxHp - u.maxHp} PV` : ''})` : ''}` : 'Niveau maximum'}</span></div>` : ''}
+    ${owned ? `<div class="v2-lvl"><b>Niveau ${li.level} / ${MAX_LEVEL}</b><span class="xpbar"><i style="width:${(li.level / MAX_LEVEL) * 100}%"></i></span>${li.cost ? `<button class="btn small gold block fz-up" data-act="lvup">${icon('ash')}Niveau ${li.level + 1} · ${li.cost} cendres${nx && (nx.atk > u.atk || nx.maxHp > u.maxHp) ? ` <small>(${nx.atk > u.atk ? `+${nx.atk - u.atk} ATQ ` : ''}${nx.maxHp > u.maxHp ? `+${nx.maxHp - u.maxHp} PV` : ''})</small>` : ''}</button><span class="small muted">Tu as ${g.s.ash} cendres. Brûle tes doublons dans la Fournaise pour en gagner.</span>` : '<span class="small muted">Niveau maximum</span>'}</div>` : ''}
   </div>`;
 }
 
@@ -75,6 +76,7 @@ export function openCreature(app, id, { onChange } = {}) {
   sh.body.addEventListener('click', (e) => {
     if (e.target.closest('[data-v="team"]')) { if (toggleTeam(app, id)) draw(); }
     if (e.target.closest('[data-v="card"]')) { sh.close(); app.openCard(id); }
+    if (e.target.closest('[data-act="lvup"]') && upgradeCard(app, id)) draw();
   });
   draw();
 }

@@ -1,6 +1,6 @@
 // État du joueur et règles de progression. Toute modification passe par ici
 // et est enregistrée immédiatement : une carte affichée est une carte sauvegardée.
-import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, LUCK_POINTS, RITUAL, ITEMS } from '../config.js';
+import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, LUCK_POINTS, ITEMS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
 import { rngOf, DESCENT, CHESTS, floorDoors, floorEnemies, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, huntStage, HUNT_STAGES } from './descent.js';
@@ -14,7 +14,7 @@ import { FERVOR_START, FERVOR_MAX, TALENTS } from './skills.js';
 export const WEEKLY_FLOOR = 8;
 export const BOSS_RECRUIT = 0.25;
 export const DESCENT_SHARDS = 0.4; // éclats gagnés dans la Descente : 40 % des montants de base
-import { STARTER, COST, BUDGET, TEAM, ULTS, levelFromDups, canUlt, ultOf, roleOf } from './army.js';
+import { STARTER, COST, BUDGET, TEAM, ULTS, MAX_LEVEL, canUlt, ultOf, roleOf } from './army.js';
 
 const RI = (r) => RARITY_ORDER.indexOf(r);
 const ITEM_REFUND = { baume: 80, elixir: 260, parchemin: 120 };
@@ -193,7 +193,7 @@ export class Game {
     if (!card) throw new Error(`Carte inconnue : ${id}`);
     let e = this.s.collection[id];
     const isNewCard = !e;
-    if (!e) e = this.s.collection[id] = { n: 0, v: {}, first: Date.now(), isNew: true };
+    if (!e) e = this.s.collection[id] = { n: 0, v: {}, lv: 1, first: Date.now(), isNew: true };
     const isNewVariant = !e.v[variant];
     e.n++;
     e.v[variant] = (e.v[variant] || 0) + 1;
@@ -205,15 +205,14 @@ export class Game {
       this.s.recent = [id, ...this.s.recent.filter((x) => x !== id)].slice(0, 12);
       if (this.s.deciphered[id]) delete this.s.deciphered[id];
     } else if (!isNewVariant) {
-      out.ash = ECONOMY.duplicateAsh[card.rarity];
+      // doublon : il ne rapporte rien tout seul, il se brûle dans la Fournaise
+      out.dup = true;
+      out.burn = this.burnValue(id, variant);
       out.xp = XP.duplicate;
     } else {
       out.xp = XP.duplicate * 2;
       e.isNew = true;
     }
-    // niveau de la créature : chaque exemplaire en plus la renforce
-    out.level = levelFromDups(e.n - 1).level;
-    out.levelUp = !isNewCard && levelFromDups(e.n - 2).level < out.level ? out.level : 0;
     if (source !== 'reward') {
       this.s.shards += out.shards;
       this.s.ash += out.ash;
@@ -320,49 +319,86 @@ export class Game {
     return { shards: x.shards, progress };
   }
 
-  // Doublons ---------------------------------------------------------------
-  // Un doublon = un exemplaire normal en plus du premier (les variantes sont gardées).
-  spare(id) { const e = this.s.collection[id]; return e ? Math.max(0, (e.v.normal || 0) - 1) : 0; }
+  // Doublons et Fournaise -------------------------------------------------
+  // Un doublon = un exemplaire en plus du premier, dans la même finition (chaque finition gardée une fois).
+  spare(id) { const e = this.s.collection[id]; return e ? Object.values(e.v).reduce((a, k) => a + Math.max(0, (k || 0) - 1), 0) : 0; }
   spareCount(r) { return this.catalog.byRarity[r].reduce((a, c) => a + this.spare(c.id), 0); }
-
-  // Rituel d'élévation -----------------------------------------------------
-  ritualTarget(id, from) {
-    const card = this.catalog.get(id);
-    const i = RITUAL.ladder.indexOf(from);
-    if (i < 0) return null;
-    return RITUAL.ladder.slice(i + 1).find((v) => card.variants.includes(v)) || null;
-  }
-  // Coût en cendres (réduit par l'ancienne ferveur et l'encens)
-  ritualCost(id, from) {
-    const to = this.ritualTarget(id, from);
-    if (!to) return 0;
-    const card = this.catalog.get(id);
-    const off = Math.min(50, (this.s.fervor[`${id}:${to}`] || 0) * RITUAL.fervor) + (this.s.ritualBoost || 0);
-    return Math.max(10, Math.round(RITUAL.cost[to] * RITUAL.rarityMult[card.rarity] * (1 - off / 100) / 5) * 5);
-  }
-  ritual(id, from) {
+  // Cendres rendues par un exemplaire brûlé : rareté × finition
+  burnValue(id, variant = 'normal') { return Math.round((ECONOMY.burnAsh[this.catalog.get(id).rarity] || 0) * (ECONOMY.burnFinish[variant] || 1)); }
+  // Brûle n exemplaires d'une finition. Le dernier exemplaire peut partir : la créature quitte alors la collection.
+  burn(id, variant = 'normal', n = 1) {
     const e = this.s.collection[id];
-    if (!e || !(e.v[from] > 0)) throw new Error('Tu ne possèdes pas cette carte dans cette version.');
-    const to = this.ritualTarget(id, from);
-    if (!to) throw new Error('Cette carte ne peut plus être élevée.');
-    const cost = this.ritualCost(id, from);
-    if (this.s.ash < cost) throw new Error(`Il te manque ${cost - this.s.ash} cendres (tu en as ${this.s.ash}). Les doublons en donnent.`);
-    this.s.ash -= cost;
-    this.s.ritualBoost = 0;
-    delete this.s.fervor[`${id}:${to}`];
-    e.v[from]--; e.v[to] = (e.v[to] || 0) + 1; e.isNew = true;
-    this.s.stats.rituals++;
-    this.s.stats.ritualsWon++;
-    this.s.xp += 30;
-    this.track('ritual', 1);
+    if (!e || !((e.v[variant] || 0) >= n) || n < 1) throw new Error('Tu ne possèdes pas assez d’exemplaires de cette version.');
+    const last = e.n - n <= 0;
+    if (last) {
+      if (this.uniqueCount() <= TEAM.active) throw new Error(`Garde au moins ${TEAM.active} créatures pour pouvoir combattre.`);
+      if (this.s.descent.run?.team?.some((m) => m.id === id)) throw new Error('Cette créature est en pleine expédition.');
+    }
+    const ash = this.burnValue(id, variant) * n;
+    e.v[variant] -= n; if (!e.v[variant]) delete e.v[variant];
+    e.n -= n;
+    if (last) this.forget(id);
+    this.s.ash += ash;
+    this.s.stats.ashEarned += ash;
+    this.s.stats.burned = (this.s.stats.burned || 0) + n;
+    this.track('burn', n);
     const progress = this.checkProgress();
     this.persist();
-    return { success: true, cost, to, progress };
+    return { ash, gone: last, progress };
+  }
+  // Brûle tous les doublons (ou seulement ceux de la liste d'ids) en gardant un exemplaire de chaque finition
+  burnSpares(ids = null) {
+    let ash = 0, n = 0;
+    for (const id of ids || Object.keys(this.s.collection)) {
+      const e = this.s.collection[id];
+      if (!e) continue;
+      for (const [v, k] of Object.entries(e.v)) if (k > 1) { const x = this.burnValue(id, v) * (k - 1); ash += x; n += k - 1; e.n -= k - 1; e.v[v] = 1; }
+    }
+    if (!n) return { ash: 0, n: 0, progress: [] };
+    this.s.ash += ash;
+    this.s.stats.ashEarned += ash;
+    this.s.stats.burned = (this.s.stats.burned || 0) + n;
+    this.track('burn', n);
+    const progress = this.checkProgress();
+    this.persist();
+    return { ash, n, progress };
+  }
+  spareAsh(ids = null) {
+    let ash = 0, n = 0;
+    for (const id of ids || Object.keys(this.s.collection)) { const e = this.s.collection[id]; if (e) for (const [v, k] of Object.entries(e.v)) if (k > 1) { ash += this.burnValue(id, v) * (k - 1); n += k - 1; } }
+    return { ash, n };
+  }
+  // Une créature qui quitte la collection quitte aussi l'équipe, la vitrine, l'avatar et sa forme
+  forget(id) {
+    delete this.s.collection[id];
+    this.s.team = (this.s.team || []).filter((x) => x !== id);
+    this.s.showcase = this.s.showcase.filter((x) => x !== id);
+    if (this.s.avatar === id) this.s.avatar = null;
+    delete this.s.forms[id];
+  }
+  // Niveau d'une créature : acheté avec des cendres (coût = base de la rareté × niveau actuel)
+  upgradeCost(id) {
+    const e = this.entry(id), lv = e?.lv || 1;
+    return lv >= MAX_LEVEL ? 0 : ECONOMY.levelAsh[this.catalog.get(id).rarity] * lv;
+  }
+  upgrade(id) {
+    const e = this.entry(id);
+    if (!e) throw new Error('Tu ne possèdes pas cette créature.');
+    const lv = e.lv || 1;
+    if (lv >= MAX_LEVEL) throw new Error('Niveau maximum atteint.');
+    const cost = this.upgradeCost(id);
+    if (this.s.ash < cost) throw new Error(`Il te manque ${cost - this.s.ash} cendres (tu en as ${this.s.ash}). Brûle des doublons dans la Fournaise.`);
+    this.s.ash -= cost;
+    e.lv = lv + 1;
+    this.s.xp += 10;
+    const progress = this.checkProgress();
+    this.persist();
+    return { level: e.lv, cost, progress };
   }
 
   // L'équipe : les cartes combattent ---------------------------------------
-  // Niveau d'une carte : chaque exemplaire en plus (doublon) la fait progresser.
-  cardLevelInfo(id) { const e = this.entry(id); return levelFromDups(e ? e.n - 1 : 0); }
+  // Niveau d'une carte (1 à MAX_LEVEL), monté avec des cendres.
+  cardLevelInfo(id) { const e = this.entry(id), level = Math.min(MAX_LEVEL, e?.lv || 1); return { level, cost: e ? this.upgradeCost(id) : 0, max: MAX_LEVEL }; }
   cardLevel(id) { return this.cardLevelInfo(id).level; }
   teamCost(ids = this.s.team) { return ids.reduce((a, id) => a + (COST[this.catalog.get(id)?.rarity] || 0), 0); }
   // Équipe valable : cartes possédées, budget respecté. Complétée automatiquement si besoin
@@ -1025,7 +1061,6 @@ export class Game {
     if (!this.itemCount(k)) throw new Error('Tu n’as pas cet objet.');
     const d = this.descent();
     if (k === 'torche') { if (d.used <= 0) throw new Error('Toutes tes torches du jour sont déjà disponibles.'); d.used--; }
-    else if (k === 'encens') { if (this.s.ritualBoost) throw new Error('Un encens brûle déjà pour ton prochain rituel.'); this.s.ritualBoost = 15; }
     else throw new Error('Objet inconnu.');
     this.s.items[k]--;
     this.persist();

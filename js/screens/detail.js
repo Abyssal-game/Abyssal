@@ -2,7 +2,7 @@
 // lore, capacités, lignée, ensembles, actions.
 import { combatHTML, toggleTeam } from './army.js';
 import { RARITY, VARIANTS, ECONOMY, VARIANT_RATES } from '../config.js';
-import { openRitual } from './ritual.js';
+import { openBurn, upgradeCard } from './furnace.js';
 import { cardHTML, enableTilt } from '../ui/card.js';
 import { boosterOdds } from '../core/boosters.js';
 import { openSheet, esc, toast, confirmBox, fmt, bindActions } from '../ui/dom.js';
@@ -35,13 +35,6 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
       const n = Math.round(1 / (pCard * pct / 100));
       return `<div><span>${esc(VARIANTS[v].name)}</span><b>1 / ${n.toLocaleString('fr-FR')}</b></div>`;
     }).join('');
-  }
-  // Version à élever : celle affichée si elle est sur l'échelle du rituel, sinon la version normale.
-  function ritualFrom() {
-    const e = g.entry(current);
-    if (!e) return null;
-    for (const v of [shownVariant, 'normal', 'holo', 'gold']) if (e.v[v] > 0 && g.ritualTarget(current, v)) return v;
-    return null;
   }
   // Forme corrompue : présentation, condition d'éveil et choix de la forme emmenée au combat
   function formHTML(card) {
@@ -86,7 +79,6 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
       const isAvatar = g.s.avatar === current;
       const inShow = g.s.showcase.includes(current);
       const inTeam = g.s.team.includes(current), li = g.cardLevelInfo(current);
-      const rit = ritualFrom();
       const tabs = [['combat', 'team', 'Combat'], ['story', 'history', 'Histoire'], ['rarity', 'crystal', 'Rareté']];
       const TAB = {
         combat: `${formHTML(card)}${combatHTML(g, card)}`,
@@ -96,7 +88,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
           ${line ? `<h3 class="section-title">${esc(line.name)}</h3><div class="strip">${line.cards.map((c) => cardHTML(c, { mystery: !g.owns(c.id), nameKnown: g.nameKnown(c.id) })).join('')}</div><p class="small muted">Stade ${card.evolution.stage} sur ${card.evolution.stages}.</p>` : ''}
           ${sets.length ? `<h3 class="section-title">Ensembles</h3><div class="stack">${sets.map((s) => { const p = g.setProgress(s.key); return `<a class="set-link panel" href="#/succes/ensembles"><b>${esc(s.name)}</b><span class="small muted">${p.owned} / ${p.total}${p.done ? ' · complété' : ''}</span><span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span></a>`; }).join('')}</div>` : ''}`,
         rarity: `<p>${odds(card)}</p><p class="small muted">Chance de la trouver dans une version spéciale, par booster standard :</p><div class="var-odds">${variantOdds(card)}</div>
-          ${rit ? `<div class="panel ri-cta"><div><b>${icon('p:ritual')} Rituel d’élévation</b><p class="small muted">Fais-la passer en ${esc(VARIANTS[g.ritualTarget(current, rit)].name.toLowerCase())} pour ${g.ritualCost(current, rit)} cendres. Réussite garantie.</p></div><button class="btn primary small" data-act="ritual">Élever</button></div>` : ''}`,
+          <p class="small muted">Les finitions ne s’obtiennent que dans les boosters (deux fois plus souvent dans un premium). Brûlée dans la Fournaise, une carte holographique vaut ×${ECONOMY.burnFinish.holo} cendres, or ×${ECONOMY.burnFinish.gold}, cosmique ×${ECONOMY.burnFinish.galaxy}.</p>`,
       };
       body = `
         <div class="dt-sum">
@@ -110,7 +102,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
           <button class="dt-act ${isAvatar ? 'on' : ''}" data-act="avatar">${picon('avatar')}<span>${isAvatar ? 'Mon avatar' : 'Avatar'}</span></button>
           <button class="dt-act ${inShow ? 'on' : ''}" data-act="showcase">${picon('showcase')}<span>${inShow ? 'En vitrine' : 'Vitrine'}</span></button>
           <button class="dt-act" data-act="artonly">${picon('illus')}<span>Illustration</span></button>
-          ${rit ? `<button class="dt-act" data-act="ritual">${picon('ritual')}<span>Élever</span></button>` : ''}
+          <button class="dt-act" data-act="burn">${picon('ritual')}<span>Brûler</span></button>
         </div>
         <div class="dt-tabs" role="tablist">${tabs.map(([k, ic, l]) => `<button class="dt-tab" role="tab" data-act="tab" data-v="${k}" aria-selected="${dtab === k}">${picon(ic)}<span>${l}</span></button>`).join('')}</div>
         <div class="panel dt-pane">${TAB[dtab]}</div>`;
@@ -144,7 +136,8 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     avatar() { g.setAvatar(current); toast('Avatar mis à jour.', { icon: 'user' }); draw(); },
     showcase() { g.toggleShowcase(current); draw(); },
     team() { if (toggleTeam(app, current)) draw(); },
-    ritual() { openRitual(app, current, ritualFrom(), { onClose: () => { shownVariant = null; draw(); } }); },
+    burn() { openBurn(app, current, { onClose: () => { shownVariant = null; draw(); } }); },
+    lvup() { if (upgradeCard(app, current)) draw(); },
     tab(el) { dtab = el.dataset.v; draw(); },
     form(el) {
       try { g.setForm(current, el.dataset.v || null); app.sfx.discover?.(); toast(el.dataset.v ? `<b>${esc(FORMS[current].name)}</b> combattra sous sa forme corrompue.` : 'Elle combattra sous sa forme originelle.', { icon: 'sparkle' }); draw(); }

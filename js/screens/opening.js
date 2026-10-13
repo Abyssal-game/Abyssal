@@ -56,8 +56,8 @@ export function openPack(app, type, { faction, onDone } = {}) {
     let s = `<b style="color:${r.color}">${r.name}</b>`;
     if (c.variant !== 'normal') s += ` · <span class="vtag">${VARIANTS[c.variant].name}</span>`;
     if (c.isNewCard) { const card = cat.get(c.id), fp = app.game.factionProgress(card.faction); s += ` · <span class="newtag">Nouvelle entrée au Bestiaire</span><br><span class="op-gain">${icon('book')} ${esc(cat.faction[card.faction].name)} : ${fp.owned} / ${fp.total}</span> <span class="op-gain">${icon('swords')} Elle peut rejoindre ton équipe</span>`; }
-    else if (c.isNewVariant) s += ` · <span class="newtag">Nouvelle variante</span>${c.levelUp ? `<br><span class="op-gain">${icon('star')} Niveau ${c.levelUp} !</span>` : ''}`;
-    else s += ` · doublon <span class="muted">+${c.ash} cendres</span>${c.levelUp ? `<br><span class="op-gain">${icon('star')} Niveau ${c.levelUp} !</span>` : ''}`;
+    else if (c.isNewVariant) s += ` · <span class="newtag">Nouvelle variante</span>`;
+    else s += ` · doublon <span class="muted">à brûler : ${icon('ash')} ${c.burn} cendres</span>`;
     // rôle et capacité en combat
     const card = cat.get(c.id), role = ROLES[roleOf(card)], kw = KEYWORDS[keywordOf(card)];
     s += `<br><span class="op-role" style="--rlc:${role.color}" title="${esc(kw.desc)}">${roleIcon(keywordOf(card))}<b>${esc(role.name)}</b> <em>· ${esc(kw.name)} : ${esc(kw.desc)}</em></span>`;
@@ -347,14 +347,18 @@ export function openPack(app, type, { faction, onDone } = {}) {
     const newCount = opening.cards.filter((c) => c.isNewCard).length;
     dots.forEach((d, i) => { d.style.background = RARITY[opening.cards[i].rarity].color; d.classList.add('on'); });
     const canAgain = g.canBuy(type);
+    // doublons de ce booster encore en trop dans la collection : à brûler d'un toucher
+    const dupIds = [...new Set(opening.cards.filter((c) => !c.isNewCard && !c.isNewVariant).map((c) => c.id))];
+    const dupAsh = dupIds.length ? g.spareAsh(dupIds).ash : 0;
     stage.innerHTML = `<div class="op-summary">
       <h2 class="op-sum-title"><span>${newCount ? `${newCount} nouvelle${newCount > 1 ? 's' : ''} créature${newCount > 1 ? 's' : ''}` : 'Booster ouvert'}</span></h2>
       ${opening.guaranteed ? `<p class="small guarantee">${icon('star')} Garantie appliquée : ${opening.guaranteed === 'm' ? 'Mythique ou mieux' : 'Hyper rare ou mieux'}.</p>` : ''}
-      <div class="op-grid">${opening.cards.map((c, i) => `<div class="op-cell" style="--i:${i}">${cardHTML(cat.get(c.id), { variant: c.variant, isNew: c.isNewCard || c.isNewVariant, lazy: false })}<span class="op-tag">${c.isNewCard ? 'Nouvelle recrue' : c.levelUp ? `Niveau ${c.levelUp} !` : c.isNewVariant ? VARIANTS[c.variant].short : `+${c.ash} cendres`}</span></div>`).join('')}</div>
+      <div class="op-grid">${opening.cards.map((c, i) => `<div class="op-cell" style="--i:${i}">${cardHTML(cat.get(c.id), { variant: c.variant, isNew: c.isNewCard || c.isNewVariant, lazy: false })}<span class="op-tag">${c.isNewCard ? 'Nouvelle recrue' : c.isNewVariant ? VARIANTS[c.variant].short : `Doublon · ${c.burn} ${icon('ash')}`}</span></div>`).join('')}</div>
       <div class="op-loot">
         ${r.shards ? `<span>${icon('crystal')}<b>+${fmt(r.shards)}</b><small>éclats</small></span>` : ''}
         ${r.ash ? `<span>${icon('ash')}<b>+${fmt(r.ash)}</b><small>cendres</small></span>` : ''}
         <span>${picon('xp')}<b>+${fmt(r.xp)}</b><small>XP</small></span>
+        ${dupAsh ? `<button class="op-burn" data-op="burn" aria-label="Brûler les doublons de ce booster pour ${fmt(dupAsh)} cendres">${icon('p:ritual')}<b>Brûler</b><small>+${fmt(dupAsh)} ${icon('ash')}</small></button>` : ''}
       </div>
       <p class="small muted center op-sum-hint">Touche une carte pour l’examiner.</p>
     </div>`;
@@ -400,6 +404,14 @@ export function openPack(app, type, { faction, onDone } = {}) {
     if (a.dataset.op === 'all') summary();
     if (closed) return;
     if (a.dataset.op === 'close') close();
+    if (a.dataset.op === 'burn') {
+      const ids = [...new Set(opening.cards.filter((c) => !c.isNewCard && !c.isNewVariant).map((c) => c.id))];
+      app.pendingProgress = [];
+      const r = app.game.burnSpares(ids);
+      app.sfx.rumble?.(0.9);
+      a.outerHTML = `<span class="op-burnt">${icon('ash')}<b>+${fmt(r.ash)}</b><small>cendres</small></span>`;
+      app.flushProgress(); app.chrome?.();
+    }
     if (a.dataset.op === 'again') { close(); setTimeout(() => openPack(app, type, { faction, onDone }), 280); }
   });
 

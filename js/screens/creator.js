@@ -45,7 +45,7 @@ export function openCreator(app) {
         <div class="row gap wrap cr-fv">${['', 'holo', 'gold', 'galaxy'].map((v) => `<button class="chip" data-fvar="${v}" aria-pressed="${(f?.variant || '') === v}">${v ? esc(VARIANTS[v].short) : 'Au hasard'}</button>`).join('')}</div>
       </section>
 
-      <section class="cr-sec"><h3>Rituel et Descente</h3>
+      <section class="cr-sec"><h3>Descente</h3>
         <div class="row gap wrap">${B('torches', 'Rendre les torches')}${B('missions', 'Accomplir les missions')}</div>
         <form class="cr-give" id="floor"><input class="input plain" name="n" type="number" min="1" max="200" placeholder="Étage" ${d.run ? '' : 'disabled'}><button class="btn small" type="submit" ${d.run ? '' : 'disabled'}>Aller à l’étage</button></form>
         <p class="small muted">${d.run ? `Expédition en cours : étage ${d.run.floor}.` : 'Lance une Descente pour pouvoir sauter d’étage.'}</p>

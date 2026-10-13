@@ -78,7 +78,7 @@ function applySettings() {
 // Explication des deux monnaies (toucher le compteur en haut à droite)
 const WALLET = {
   shards: ['Éclats', 'La monnaie principale. Ils servent à acheter des boosters dans la Boutique.', 'Tu en gagnes avec l’offrande du jour, les missions, les succès, les nouvelles créatures découvertes et surtout dans la Descente (combats, trésors, gardiens).', 'boutique', 'Aller aux Boosters'],
-  ash: ['Cendres', 'Ce qui reste de tes doublons. Elles servent au Rituel d’élévation (holographique, or, cosmique), à invoquer une carte manquante et à déchiffrer les noms inconnus.', 'Tu en gagnes à chaque doublon obtenu dans un booster : plus la carte est rare, plus elle en donne.', 'collection', 'Aller à la Collection'],
+  ash: ['Cendres', 'Ce qui reste des cartes brûlées dans la Fournaise. Elles font monter le niveau de tes créatures, invoquent une carte manquante et déchiffrent les noms inconnus.', 'Brûle tes doublons dans la Fournaise (Collection ou Sanctuaire) : plus la carte est rare, plus elle en donne, et les finitions rares encore plus.', 'collection', 'Aller à la Collection'],
 };
 // iPhone, app posée sur l'écran d'accueil : la hauteur annoncée par le navigateur peut être plus
 // courte que l'écran réel (une bande noire reste en bas). On mesure la vraie hauteur et on la donne

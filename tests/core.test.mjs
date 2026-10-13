@@ -88,7 +88,7 @@ test('rotation hebdomadaire des événements', () => {
   assert.equal(weekIndex(new Date(2026, 9, 12)), weekIndex(new Date(2026, 9, 11)) + 1);
 });
 
-test('ouverture : monnaie débitée, cartes enregistrées, doublons en cendres', () => {
+test('ouverture : monnaie débitée, cartes enregistrées, doublons à brûler', () => {
   const store = new MemoryStorage();
   const g = new Game(catalog, store, { rng: rngFrom('game') });
   g.s.tickets.standard = 0;
@@ -102,12 +102,14 @@ test('ouverture : monnaie débitée, cartes enregistrées, doublons en cendres',
   // la sauvegarde contient bien les cartes
   const reloaded = new Game(catalog, store);
   opening.cards.forEach((c) => assert.ok(reloaded.owns(c.id)));
-  // doublon : cendres
+  // doublon : à brûler dans la Fournaise
   const id = opening.cards[0].id;
   const ash = g.s.ash;
   const r = g.addCard(id, 'normal');
   assert.equal(r.isNewCard, false);
-  assert.equal(g.s.ash, ash + ECONOMY.duplicateAsh[catalog.get(id).rarity]);
+  assert.equal(g.s.ash, ash);
+  g.burnSpares([id]);
+  assert.ok(g.s.ash > ash);
 });
 
 test('ticket utilisé avant les éclats ; refus sans fonds', () => {

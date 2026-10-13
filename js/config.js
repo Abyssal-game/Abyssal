@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v165'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v166'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -51,21 +51,12 @@ export const BOOSTERS = {
   },
 };
 
-// Probabilité (%) qu'une carte tirée soit une variante cosmétique (multipliée par variantMult).
-// Chance (en %) qu'une carte tirée sorte dans chaque variante. Volontairement rare :
-// le Rituel d'élévation est l'autre moyen de les obtenir.
-export const VARIANT_RATES = { holo: 4, gold: 0.6, galaxy: 0.2 };
+// Chance (en %) qu'une carte tirée sorte dans chaque finition (×2 dans un booster premium).
+// Les boosters sont la seule source de finitions : elles restent rares.
+// Par booster standard de 5 cartes : ~12 % d'une holographique, ~2,5 % d'une or, ~0,5 % d'une cosmique.
+export const VARIANT_RATES = { holo: 2.5, gold: 0.5, galaxy: 0.1 };
 // Anciennes variantes retirées : les exemplaires possédés deviennent la variante indiquée.
 export const OLD_VARIANTS = { chroma: 'holo', corrupt: 'holo', alt: 'holo', ancestral: 'gold' };
-
-// Rituel d'élévation : toujours réussi, payé en cendres (les doublons, qui font monter
-// le niveau des créatures, ne sont jamais sacrifiés). Coût = base de la variante × rareté.
-export const RITUAL = {
-  ladder: ['normal', 'holo', 'gold', 'galaxy'],
-  cost: { holo: 120, gold: 400, galaxy: 1200 },
-  rarityMult: { C: 0.5, PC: 0.7, R: 1, HR: 1.4, M: 2, S: 2.5 },
-  fervor: 10,         // ancienne ferveur (échecs passés) : -10 % du coût par échec, jusqu'à -50 %
-};
 
 export const VARIANTS = {
   normal:    { name: 'Normale',                  short: 'Normale' },
@@ -88,7 +79,11 @@ export const EVENTS = [
 export const ECONOMY = {
   start: { shards: 0, ash: 0, tickets: { standard: 2 } },
   discoveryShards: { C: 1, PC: 3, R: 6, HR: 13, M: 25, S: 50 },
-  duplicateAsh: { C: 2, PC: 5, R: 15, HR: 40, M: 100, S: 250 },
+  // Fournaise : cendres rendues par un exemplaire brûlé (rareté × finition)
+  burnAsh: { C: 3, PC: 6, R: 15, HR: 40, M: 100, S: 250 },
+  burnFinish: { normal: 1, holo: 3, gold: 8, galaxy: 20, special: 4 },
+  // Niveau des créatures : passer du niveau n à n+1 coûte levelAsh × n cendres (niveau 10 au plus)
+  levelAsh: { C: 10, PC: 15, R: 25, HR: 40, M: 60, S: 80 },
   craftAsh: { C: 40, PC: 100, R: 250, HR: 600, M: 1600 }, // les secrètes ne s'invoquent pas
   decipherAsh: 15,
   revealNamesAt: 0.5, // les noms d'une faction se révèlent à 50 % de complétion
@@ -137,7 +132,7 @@ export const MISSIONS = [
   { key: 'faction',  kind: 'faction',  n: 3, shards: 50, text: 'Obtiens 3 cartes {faction}' },
   { key: 'rare',     kind: 'rare',     n: 2, shards: 60, text: 'Obtiens 2 cartes Rares ou mieux' },
   { key: 'variant',  kind: 'variant',  n: 1, shards: 60, text: 'Obtiens une variante (holographique, or…)' },
-  { key: 'ritual',   kind: 'ritual',   n: 1, shards: 60, text: 'Accomplis un rituel d’élévation' },
+  { key: 'burn',     kind: 'burn',     n: 3, shards: 50, text: 'Brûle 3 cartes dans la Fournaise' },
   { key: 'depth4',   kind: 'depth',    n: 4, shards: 70, text: 'Atteins l’étage 4 de la Descente' },
   { key: 'wins',     kind: 'win',      n: 5, shards: 60, text: 'Remporte 5 combats dans la Descente' },
   { key: 'offering', kind: 'daily',    n: 1, shards: 30, text: 'Récupère l’offrande du jour' },
@@ -152,5 +147,4 @@ export const LUCK_POINTS = { C: 1, PC: 2, R: 6, HR: 20, M: 80, S: 200, variant: 
 // Boutique d'objets (payés en éclats). limit : achats maximum par jour.
 export const ITEMS = {
   torche:    { name: 'Torche bénie',           price: 220, icon: 'flame',   desc: 'Rallume une torche déjà utilisée : une expédition de plus aujourd’hui.', limit: 2 },
-  encens:    { name: 'Encens de ferveur',      price: 150, icon: 'sparkle', desc: 'Ton prochain rituel d’élévation coûte 15 % de cendres en moins.', hidden: true },
 };

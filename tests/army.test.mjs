@@ -23,12 +23,17 @@ test('équipe : 5 Communes offertes à qui n’a pas 3 créatures, sinon les mei
   assert.ok(t.every((id) => h.owns(id)));
 });
 
-test('niveaux : chaque doublon renforce la créature', () => {
+test('niveaux : achetés avec des cendres, plafonnés', () => {
   const g = newGame('d');
   const id = STARTER[0];
-  assert.equal(g.addCard(id).levelUp, 0, 'nouvelle carte');
+  g.addCard(id);
   assert.equal(g.cardLevel(id), 1);
-  assert.equal(g.addCard(id).levelUp, 2);
+  g.addCard(id);
+  assert.equal(g.cardLevel(id), 1, 'les doublons ne montent plus le niveau : ils se brûlent');
+  g.s.ash = 10000;
+  for (let i = 1; i < MAX_LEVEL; i++) g.upgrade(id);
+  assert.equal(g.cardLevel(id), MAX_LEVEL);
+  assert.throws(() => g.upgrade(id));
   assert.equal(levelFromDups(100).level, MAX_LEVEL);
   assert.ok(duelUnit(catalog.get(id), { level: 10 }).maxHp > duelUnit(catalog.get(id), { level: 1 }).maxHp);
 });

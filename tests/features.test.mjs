@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { loadCatalog, MemoryStorage, rngFrom } from './helpers.mjs';
 import { Game } from '../js/core/game.js';
-import { RITUAL } from '../js/config.js';
+import { ECONOMY } from '../js/config.js';
 
 const catalog = loadCatalog();
 const newGame = (seed = 'f', day = new Date(2026, 9, 10, 12)) => new Game(catalog, new MemoryStorage(), { rng: rngFrom(seed), clock: () => day });
@@ -52,26 +52,43 @@ test('chance : statistiques et plus belles ouvertures', () => {
   for (let i = 1; i < 5; i++) assert.ok(g.s.best[i - 1].score >= g.s.best[i].score);
 });
 
-test('rituel : toujours réussi, payé en cendres, les doublons sont gardés', () => {
+test('Fournaise : brûler des doublons ou la dernière carte, monter de niveau avec les cendres', () => {
   const g = new Game(catalog, new MemoryStorage(), { rng: () => 0.999, clock: () => new Date(2026, 9, 10) });
+  g.team(); // créatures de départ
   const target = catalog.byRarity.R[0];
-  for (let i = 0; i < 3; i++) g.addCard(target.id);
-  const lvl = g.cardLevel(target.id);
-  assert.equal(g.ritualTarget(target.id, 'normal'), 'holo');
-  const cost = g.ritualCost(target.id, 'normal');
-  assert.equal(cost, RITUAL.cost.holo);
-  g.s.ash = cost - 1;
-  assert.throws(() => g.ritual(target.id, 'normal'));
-  g.s.ash = cost + 5;
-  const r = g.ritual(target.id, 'normal');
-  assert.ok(r.success);
-  assert.equal(g.s.ash, 5);
-  assert.equal(g.entry(target.id).v.holo, 1);
-  assert.equal(g.entry(target.id).v.normal, 2);
-  assert.equal(g.cardLevel(target.id), lvl);
-  // ancienne ferveur : réduction du coût
-  g.s.fervor[`${target.id}:gold`] = 2;
-  assert.equal(g.ritualCost(target.id, 'holo'), Math.round(RITUAL.cost.gold * 0.8 / 5) * 5);
-  // les C et PC n'ont pas de feuille d'or : holographique -> cosmique
-  assert.equal(g.ritualTarget(catalog.byRarity.C[0].id, 'holo'), 'galaxy');
+  const r1 = g.addCard(target.id);
+  assert.equal(r1.isNewCard, true);
+  const r2 = g.addCard(target.id);
+  assert.equal(r2.dup, true);
+  assert.equal(r2.burn, ECONOMY.burnAsh.R);
+  assert.equal(g.s.ash, 0, 'un doublon ne donne rien tout seul');
+  assert.equal(g.cardLevel(target.id), 1, 'un doublon ne fait plus monter de niveau');
+  g.addCard(target.id); g.addCard(target.id, 'holo');
+  assert.equal(g.spare(target.id), 2);
+  // tout brûler : on garde un exemplaire de chaque finition
+  const b = g.burnSpares();
+  assert.equal(b.n, 2);
+  assert.equal(g.s.ash, 2 * ECONOMY.burnAsh.R);
+  assert.deepEqual(g.entry(target.id).v, { normal: 1, holo: 1 });
+  // la finition rare vaut plus
+  assert.equal(g.burnValue(target.id, 'holo'), ECONOMY.burnAsh.R * ECONOMY.burnFinish.holo);
+  // niveau : coût = base × niveau
+  g.s.ash = 1000;
+  assert.equal(g.upgradeCost(target.id), ECONOMY.levelAsh.R);
+  g.upgrade(target.id);
+  assert.equal(g.cardLevel(target.id), 2);
+  assert.equal(g.s.ash, 1000 - ECONOMY.levelAsh.R);
+  assert.equal(g.upgradeCost(target.id), ECONOMY.levelAsh.R * 2);
+  g.s.ash = 0;
+  assert.throws(() => g.upgrade(target.id));
+  // brûler la dernière carte : elle quitte la collection (et l'équipe)
+  g.s.team = [target.id, ...g.s.team.slice(0, 2)];
+  g.burn(target.id, 'holo');
+  const last = g.burn(target.id, 'normal');
+  assert.equal(last.gone, true);
+  assert.equal(g.owns(target.id), false);
+  assert.ok(!g.s.team.includes(target.id));
+  // retrouvée plus tard : elle repart du niveau 1
+  g.addCard(target.id);
+  assert.equal(g.cardLevel(target.id), 1);
 });
