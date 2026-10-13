@@ -1641,3 +1641,4 @@ i.cmb { font-style: normal; color: #FFC266; font-weight: 800; }
 .dv-c.dying.ashes { transition: transform 1.1s ease-in, opacity 1.1s ease-in, filter 1.1s !important; transform: translateY(-14px) scale(.92) !important; filter: sepia(1) brightness(.4) blur(1px); opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .dv.cam, .cb-ring, .dv-c.cracking::after, .dv-c.cracked::after, .dv.bossfall::before { animation: none !important; } .cb-ring { display: none; } }
 .dv-pick-e { display: block; margin-top: 4px; font: 500 .7rem/1.3 var(--f-ui); color: var(--mute); text-align: left; } .dv-pick-e b { color: #C9A6FF; }
+.set-sfx { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; } .set-sfx .chip { min-height: 36px; }

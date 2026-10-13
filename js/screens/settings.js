@@ -6,7 +6,7 @@ import { esc, fmt, toast, confirmBox, openSheet, bindActions } from '../ui/dom.j
 import { exportCode, importCode } from '../core/save.js';
 import { drawBooster } from '../core/boosters.js';
 import { RARITIES, RARITY_ORDER, BOOSTERS } from '../config.js';
-import { sfx } from '../ui/sound.js';
+import { sfx, SFX_DEMO } from '../ui/sound.js';
 import { sync, onSync, refreshProfile } from '../cloud/sync.js';
 import { openCreator } from './creator.js';
 import { showWelcome } from './welcome.js';
@@ -29,8 +29,9 @@ export default function settings(app, root) {
   function tabJeu(s) {
     return `<section class="panel stack">
         <h2>Son et animations</h2>
-        ${toggle('sound', 'Effets sonores', 'Sons synthétisés : ouverture, révélation, combat.')}
+        ${toggle('sound', 'Effets sonores', 'Ouverture, révélation, combat. Le mode silencieux de l’iPhone peut les couper.')}
         <div class="set-row col"><label for="vol"><b>Volume</b></label><input id="vol" type="range" min="0" max="1" step="0.05" value="${s.volume}" ${s.sound ? '' : 'disabled'}></div>
+        ${s.sound ? `<div class="set-row col"><b>Écouter les sons</b><div class="set-sfx">${SFX_DEMO.map(([n], i) => `<button class="chip" data-sfx="${i}">${n}</button>`).join('')}</div></div>` : ''}
         ${seg('motion', 'Animations', [['auto', 'Selon l’appareil'], ['reduced', 'Réduites'], ['full', 'Complètes']])}
         ${toggle('fastOpen', 'Ouverture rapide des boosters', 'Affiche directement le récapitulatif, sans révéler les cartes une par une.')}
       </section>
@@ -81,6 +82,7 @@ export default function settings(app, root) {
       <header class="screen-head ui-hero bn-settings"><h1>Réglages</h1><p class="muted">Jeu, tutoriels, sauvegarde.</p></header>
       <nav class="set-tabs" role="tablist">${TABS.map(([k, l, ic, fb]) => `<button class="set-tab" role="tab" aria-selected="${ui.tab === k}" data-act="tab" data-k="${k}">${tabIcon(ic, fb)}<span>${l}</span></button>`).join('')}</nav>
       <div class="set-body">${body(s)}</div>`;
+    root.querySelectorAll('[data-sfx]').forEach((b) => b.addEventListener('click', () => SFX_DEMO[+b.dataset.sfx]?.[1]()));
     root.querySelector('#vol')?.addEventListener('change', (e) => { g.setSetting('volume', Number(e.target.value)); app.applySettings(); sfx.tap(); });
   }
 
