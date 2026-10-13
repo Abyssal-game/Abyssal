@@ -1821,3 +1821,97 @@ body.battle-mode #subnav { display: none !important; }
 /* Combat : la barre de sous-onglets disparaît et ne décale plus la vue (corrige le grand vide en haut) */
 body.battle-mode #subnav { display: none !important; }
 body.battle-mode.has-subnav #view, body.battle-mode #view { padding: calc(var(--safe-t) + 6px) 8px calc(var(--safe-b) + 8px) !important; }
+
+/* ——— Les Salles Oubliées : table, plateau, figurines, main de cartes ——— */
+.bn-salles { --bn: url(../assets/ui/bn-salles.webp); }
+.sl { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: calc(var(--app-h, 100dvh) - var(--safe-t) - var(--safe-b) - 12px); }
+.sl-bg { position: fixed; inset: 0; z-index: -1; background: #0A0806 url(../assets/salles/table.webp) center top / cover no-repeat; }
+.sl-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0, 0, 0, .35), rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, .55) 100%); }
+.sl-top { width: 100%; display: flex; align-items: center; gap: 8px; min-height: 36px; }
+.sl-room { font: 700 .9rem/1 var(--f-display); color: var(--gold-hi); white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
+.sl-room .ic { width: 16px; height: 16px; }
+.sl-msg { flex: 1; min-width: 0; font-size: .74rem; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sl-btns { display: flex; gap: 6px; } .sl-btns .btn { min-height: 34px; padding: 0 10px; }
+/* Plateau : 8 colonnes × 9 rangées, cadre peint en 9 tranches */
+.sl-board { position: relative; width: max(300px, min(100%, 440px, calc((var(--app-h, 100dvh) - 330px) * 8 / 9))); aspect-ratio: var(--cols) / var(--rows); border: 14px solid transparent; border-image: url(../assets/salles/frame.webp) 90 round; background: #0B0E16; box-shadow: 0 14px 30px rgba(0, 0, 0, .7); touch-action: manipulation; }
+.sl-cells, .sl-props, .sl-tokens, .sl-fx { position: absolute; inset: 0; }
+.sl-cells { background: url(../assets/salles/floor.webp) 0 0 / 25% auto repeat; }
+.sl-c { position: absolute; width: calc(100% / var(--cols)); height: calc(100% / var(--rows)); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .25); }
+.sl-c.wall { background: url(../assets/salles/wall.webp) center / 100% 100% no-repeat; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .5), 0 3px 6px rgba(0, 0, 0, .6); }
+.sl-c.can-move { background: radial-gradient(circle, rgba(242, 193, 78, .55), rgba(242, 193, 78, .18) 70%); box-shadow: inset 0 0 0 2px rgba(255, 220, 120, .9); cursor: pointer; animation: slPulse 1.2s ease-in-out infinite; }
+.sl-c.can-target { background: radial-gradient(circle, rgba(255, 90, 110, .55), rgba(255, 90, 110, .18) 70%); box-shadow: inset 0 0 0 2px rgba(255, 140, 160, .95); cursor: pointer; animation: slPulse 1.2s ease-in-out infinite; }
+.sl-c.aoe { background: radial-gradient(circle, rgba(255, 160, 60, .85), rgba(255, 90, 30, .3) 70%); }
+@keyframes slPulse { 50% { filter: brightness(1.35); } }
+.sl-props { pointer-events: none; }
+.sl-prop { position: absolute; width: calc(100% / var(--cols)); height: calc(100% / var(--rows)); object-fit: contain; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .7)); }
+.sl-prop.pillar { transform: translateY(-22%) scale(1.3); transform-origin: 50% 85%; }
+.sl-prop.door { transform: scale(1.12); }
+.sl-prop.chest { transform: scale(1.05) translateY(-4%); }
+.sl-prop.trap { filter: drop-shadow(0 0 6px rgba(255, 215, 120, .8)); animation: slPulse 1.6s ease-in-out infinite; }
+/* Figurines */
+.sl-tokens { pointer-events: none; }
+.sl-tok { position: absolute; width: calc(100% / var(--cols)); height: calc(100% / var(--rows)); pointer-events: auto; cursor: pointer; transition: left .25s ease, top .25s ease, opacity .4s, transform .25s; z-index: 2; }
+.sl-tok.boss { z-index: 3; }
+.sl-base { position: absolute; left: -8%; top: 2%; width: 116%; height: 116%; object-fit: contain; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .7)); }
+.sl-tok.boss .sl-base { left: -22%; top: -12%; width: 144%; height: 144%; }
+.sl-pt { position: absolute; left: 14%; top: 10%; width: 72%; height: 72%; object-fit: cover; object-position: 50% 18%; border-radius: 50%; }
+.sl-tok.boss .sl-pt { left: 6%; top: 0; width: 88%; height: 88%; }
+.sl-tok.portal .sl-pt { left: -10%; top: -14%; width: 120%; height: 120%; object-fit: contain; border-radius: 0; animation: slPortal 2.2s ease-in-out infinite; }
+@keyframes slPortal { 50% { transform: scale(1.06); filter: brightness(1.25); } }
+.sl-tok.minion .sl-pt { object-fit: contain; object-position: 50% 30%; }
+.sl-tok.enemy .sl-pt { filter: saturate(.85); }
+.sl-hp { position: absolute; left: 8%; right: 8%; bottom: -6%; height: 5px; border-radius: 3px; background: rgba(0, 0, 0, .8); border: 1px solid rgba(0, 0, 0, .9); overflow: hidden; }
+.sl-hp i { display: block; height: 100%; background: linear-gradient(90deg, #5BD37A, #9CF0A8); transition: width .3s; }
+.sl-tok.enemy .sl-hp i { background: linear-gradient(90deg, #D2384E, #FF8A9A); }
+.sl-hp.low i { background: linear-gradient(90deg, #FF5A3A, #FFB03A) !important; }
+.sl-badges { position: absolute; left: -2%; top: -8%; display: flex; gap: 1px; }
+.sb { display: inline-grid; place-items: center; min-width: 14px; height: 14px; padding: 0 2px; border-radius: 7px; font: 800 .55rem/1 var(--f-ui); font-style: normal; color: #fff; background: #333; border: 1px solid rgba(255, 255, 255, .5); }
+.sb.poison { background: #4F9A3A; } .sb.frost { background: #3A8AC8; } .sb.guard { background: #B8862C; } .sb.bad { background: #B0303F; } .sb.buff { background: #7B5CFF; }
+.sl-acts { position: absolute; right: -2%; top: -6%; display: flex; gap: 2px; }
+.sl-acts i { width: 8px; height: 8px; border-radius: 50%; background: #2A2512; border: 1px solid #F2C14E; } .sl-acts i.on { background: #F2C14E; box-shadow: 0 0 4px #F2C14E; }
+.sl-tok.sel { z-index: 4; } .sl-tok.sel .sl-base { filter: drop-shadow(0 0 7px rgba(255, 225, 130, .95)) drop-shadow(0 3px 3px rgba(0, 0, 0, .7)); }
+.sl-tok.sel::before { content: ''; position: absolute; left: 50%; top: -34%; width: 0; height: 0; border: 7px solid transparent; border-top: 10px solid #F2C14E; transform: translateX(-50%); animation: slBob .9s ease-in-out infinite; }
+@keyframes slBob { 50% { transform: translate(-50%, -4px); } }
+.sl-tok.done { opacity: .72; }
+.sl-tok.can-hit .sl-base, .sl-tok.can-target .sl-base { filter: drop-shadow(0 0 8px rgba(255, 90, 110, 1)) drop-shadow(0 3px 3px rgba(0, 0, 0, .7)); }
+.sl-tok.can-hit::after, .sl-tok.can-target::after { content: ''; position: absolute; inset: -6%; border-radius: 50%; border: 2px dashed rgba(255, 120, 140, .95); animation: slSpin 6s linear infinite; pointer-events: none; }
+@keyframes slSpin { to { transform: rotate(360deg); } }
+.sl-tok.bump { transform: scale(1.12); } .sl-tok.hit { animation: slShake .35s ease; } .sl-tok.dead { opacity: 0; transform: scale(.6); } .sl-tok.spawn { animation: slIn .4s ease-out; }
+@keyframes slShake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+@keyframes slIn { from { opacity: 0; transform: scale(.3); } }
+.sl-tok .dv-float { top: -10%; font-size: 1.1rem; }
+.sl-banner { font-size: 1.3rem !important; }
+/* Panneau du bas : figurine choisie, cartes en main */
+.sl-panel { width: min(100%, 440px); display: grid; gap: 6px; padding: 8px 10px 10px; border-radius: 14px; background: rgba(10, 8, 12, .86); border: 1px solid rgba(232, 195, 90, .3); }
+.sl-sel { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.sl-sel-name { display: grid; gap: 2px; min-width: 0; } .sl-sel-name b { font: 700 .9rem/1.1 var(--f-display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sl-sel-btns { display: flex; gap: 6px; flex: none; } .sl-sel-btns .btn { min-height: 34px; padding: 0 10px; }
+.sl-hint { margin: 0; }
+.sl-hand { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px 0 4px; } .sl-hand::-webkit-scrollbar { display: none; }
+.sl-card { position: relative; flex: 0 0 auto; width: 96px; aspect-ratio: 2 / 3; padding: 0; border: 0; border-radius: 8px; background: url(../assets/salles/card-power.webp) center / 100% 100% no-repeat; color: #2A1A0C; font: inherit; text-align: center; opacity: .5; transition: transform .15s, opacity .15s; }
+.sl-card.bag { background-image: url(../assets/salles/card-item.webp); }
+.sl-card.ok { opacity: 1; } .sl-card.on { transform: translateY(-6px) scale(1.04); filter: drop-shadow(0 0 8px rgba(255, 225, 130, .9)); }
+.sl-card-ic { position: absolute; left: 24%; top: 12%; width: 52%; height: 33%; display: grid; place-items: center; } .sl-card-ic .ic { width: 78%; height: 78%; color: #F7DE9A; filter: drop-shadow(0 0 4px rgba(255, 200, 90, .7)) drop-shadow(0 1px 1px #000); }
+.sl-card b { position: absolute; left: 10%; right: 10%; top: 60%; font: 700 .6rem/1.1 var(--f-display); color: #2A1A0C; } .sl-card small { position: absolute; left: 10%; right: 10%; top: 78%; font: 600 .52rem/1.1 var(--f-ui); color: #5A4428; }
+.sl-bag { margin: 0; }
+.sl-wait { margin: 6px 0; }
+.sl-clear { display: grid; gap: 6px; text-align: center; } .sl-clear b { display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: var(--gold-hi); font-family: var(--f-display); }
+/* Dés */
+.sl-dice { position: fixed; z-index: 30; left: 50%; top: 40%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+.sl-dice img { width: 110px; height: 110px; filter: drop-shadow(0 8px 14px rgba(0, 0, 0, .8)); }
+.sl-dice b { position: absolute; top: 36px; left: 50%; transform: translateX(-50%); font: 900 2.2rem/1 var(--f-display); color: #FFF4DA; text-shadow: 0 0 6px #000, 0 2px 4px #000; }
+.sl-dice-t { margin-top: 4px; padding: 3px 10px; border-radius: 99px; background: rgba(0, 0, 0, .8); font: 800 .8rem/1 var(--f-ui); color: #F2E6C8; }
+.sl-dice-t.crit { color: #F2C14E; } .sl-dice-t.fumble { color: #FF4D6A; } .sl-dice-t.miss { color: #9FB4C8; } .sl-dice-t.success { color: #7FE0A0; }
+.sl-dice small { margin-top: 2px; font-size: .68rem; color: var(--mute); text-shadow: 0 1px 2px #000; }
+.sl-dice.roll img { animation: slRoll .5s ease-out; }
+@keyframes slRoll { from { transform: rotate(-200deg) scale(.4); opacity: 0; } 70% { transform: rotate(15deg) scale(1.08); } to { transform: none; opacity: 1; } }
+/* Accueil */
+.sl-picks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+.sl-pick { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 4px 8px; border-radius: 12px; border: 2px solid rgba(255, 255, 255, .12); background: rgba(0, 0, 0, .35); color: var(--ink); font: inherit; text-align: center; opacity: .8; }
+.sl-pick.on { opacity: 1; border-color: var(--gold); box-shadow: 0 0 12px rgba(242, 193, 78, .35); background: rgba(60, 45, 15, .5); }
+.sl-pick-art { width: 100%; aspect-ratio: 5 / 7; border-radius: 8px; overflow: hidden; border: 1px solid var(--rc); } .sl-pick-art img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; }
+.sl-pick b { font: 700 .7rem/1.1 var(--f-display); } .sl-pick small { font-size: .62rem; color: var(--mute); }
+.sl-last { display: grid; gap: 3px; } .sl-last.won { border-color: rgba(120, 210, 140, .5) !important; } .sl-last.lost { border-color: rgba(255, 90, 110, .4) !important; }
+.sl-end { display: grid; gap: 10px; text-align: center; } .sl-end h2 { margin: 0; color: var(--gold-hi); }
+.sl-info h2 { margin: 0 0 4px; }
+@media (max-width: 360px) { .sl-card { width: 84px; } .sl-board { border-width: 10px; } .sl-panel { padding: 6px 8px 8px; } }

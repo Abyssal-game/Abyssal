@@ -3,6 +3,7 @@
 import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, LUCK_POINTS, ITEMS, SHOW_ORDER, SHADOW } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
+import { createDungeon, ROOMS as SALLES_ROOMS } from './dungeon.js';
 import { rngOf, DESCENT, CHESTS, floorDoors, floorEnemies, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState } from './duel.js';
 import { bossOf, BOSSES } from './bosses.js';
@@ -332,6 +333,49 @@ export class Game {
     e.show = v;
     this.persist();
   }
+  // Les Salles Oubliées : plateau tactique à 3 figurines, libre d'accès ---------------------
+  // Difficultés : facile ×0,7, normale ×1, difficile ×1,4 (force des ennemis et récompenses)
+  static SALLES_DIFF = { facile: { name: 'Facile', scale: 0.7, mult: 0.6 }, normal: { name: 'Normale', scale: 1, mult: 1 }, difficile: { name: 'Difficile', scale: 1.4, mult: 1.6 } };
+  sallesState() { const s = this.s.salles; if (!s.run) return null; return s.run; }
+  sallesStart(ids, diff = 'normal') {
+    const s = this.s.salles;
+    if (s.run) throw new Error('Une partie est déjà en cours.');
+    const cards = [...new Set(ids)].filter((id) => this.owns(id)).slice(0, 3).map((id) => this.catalog.get(id));
+    if (cards.length < 3) throw new Error('Choisis 3 créatures.');
+    const D = Game.SALLES_DIFF[diff] || Game.SALLES_DIFF.normal;
+    const rng = this.rng || Math.random;
+    const fac = FACTION_ORDER[Math.floor(rng() * FACTION_ORDER.length)];
+    const pool = this.catalog.byFaction[fac];
+    const bosses = pool.filter((c) => ['M', 'HR'].includes(c.rarity));
+    const bossCard = bosses[Math.floor(rng() * bosses.length)];
+    const seed = `salles:${today(this.clock())}:${Math.floor(rng() * 1e9)}`;
+    const levels = Object.fromEntries(cards.map((c) => [c.id, this.cardLevel(c.id)]));
+    const run = createDungeon({ cards, levels, pool, bossCard, seed, catalog: this.catalog, scale: D.scale });
+    run.diff = diff; run.faction = fac; run.startedAt = Date.now();
+    s.run = run; s.runs++;
+    this.persist();
+    return run;
+  }
+  // Fin de partie : éclats selon les salles nettoyées, coffre si le gardien tombe
+  sallesFinish() {
+    const s = this.s.salles, run = s.run;
+    if (!run || !['won', 'lost'].includes(run.phase)) throw new Error('La partie n’est pas finie.');
+    const D = Game.SALLES_DIFF[run.diff] || Game.SALLES_DIFF.normal;
+    const won = run.phase === 'won';
+    const shards = Math.round((10 + 12 * run.stats.rooms + (won ? 40 : 0)) * D.mult);
+    const chest = won ? (run.diff === 'difficile' ? 'or' : run.diff === 'facile' ? 'bois' : 'fer') : null;
+    this.s.shards += shards;
+    if (chest) this.addChests({ [chest]: 1 });
+    this.s.xp += 10 * run.stats.rooms + (won ? 30 : 0);
+    if (won) s.wins++;
+    s.best = Math.max(s.best || 0, run.stats.rooms);
+    const summary = { won, rooms: run.stats.rooms, kills: run.stats.kills, crits: run.stats.crits, shards, chest, diff: run.diff, boss: run.bossId };
+    s.last = summary; s.run = null;
+    const progress = this.checkProgress();
+    this.persist();
+    return { ...summary, progress };
+  }
+  sallesAbandon() { const s = this.s.salles; if (!s.run) return; s.run.phase = 'lost'; return this.sallesFinish(); }
   // Tirage des Ombres (local : participation et prix ; le tirage et le classement sont sur le serveur)
   shadowState() {
     const sh = (this.s.shadow && typeof this.s.shadow === 'object') ? this.s.shadow : (this.s.shadow = {});
