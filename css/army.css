@@ -1915,3 +1915,19 @@ body.battle-mode.has-subnav #view, body.battle-mode #view { padding: calc(var(--
 .sl-end { display: grid; gap: 10px; text-align: center; } .sl-end h2 { margin: 0; color: var(--gold-hi); }
 .sl-info h2 { margin: 0 0 4px; }
 @media (max-width: 360px) { .sl-card { width: 84px; } .sl-board { border-width: 10px; } .sl-panel { padding: 6px 8px 8px; } }
+/* Salles Oubliées sur petit écran (iPhone SE…) : tout tient sans défiler */
+@media (max-height: 620px) {
+  .sl { gap: 4px; min-height: 0; }
+  .sl-top { min-height: 30px; } .sl-btns .btn { min-height: 30px; }
+  .sl-board { width: min(100%, calc((var(--app-h, 100dvh) - var(--safe-t) - var(--safe-b) - 214px) * 8 / 9)) !important; border-width: 9px; }
+  .sl-panel { gap: 4px; padding: 6px 8px; }
+  .sl-hint { display: none; }
+  .sl-sel-name .small { font-size: .68rem; }
+  .sl-hand { padding: 0; }
+  .sl-card { width: 64px !important; }
+  .sl-card b { font-size: .5rem; } .sl-card small { font-size: .44rem; top: 80%; }
+  .sl-bag { display: none; }
+}
+.sl { min-height: 0 !important; }
+@media (max-height: 620px) { .sl-card b { font-size: .44rem !important; letter-spacing: 0; left: 6%; right: 6%; } }
+.sl-card b { letter-spacing: 0; }
