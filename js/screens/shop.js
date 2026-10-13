@@ -112,9 +112,7 @@ export default function shop(app, root, params = []) {
       </article>`;
     };
     root.innerHTML = `
-      <header class="screen-head">
-        <h1>Boosters</h1>
-      </header>
+      <header class="screen-head ui-hero bn-boosters"><h1>Boosters</h1><p class="muted">Ouvre des boosters pour agrandir ton Bestiaire.</p></header>
       <a class="panel sh-banner" href="#/tirage"><span class="sh-b-ic">${icon('p:shadow')}</span><span><b>Le Tirage des Ombres</b><span class="small muted">${g.shadowState().paid[parisDay()] ? 'Tirage du jour fait · voir le classement' : 'Ton booster gratuit du jour pour le classement de la semaine'}</span></span><span class="sh-b-go">${icon('next')}</span></a>
       <div class="products">
         ${card('standard')}

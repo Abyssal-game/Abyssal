@@ -19,7 +19,7 @@ export function forgeScreen(app, root) {
     const ids = ui.all ? Object.keys(g.s.collection) : team;
     const list = ids.map((id) => cat.get(id)).filter(Boolean)
       .sort((a, b) => (team.indexOf(b.id) >= 0) - (team.indexOf(a.id) >= 0) || RI(b.rarity) - RI(a.rarity) || g.cardLevel(b.id) - g.cardLevel(a.id) || a.name.localeCompare(b.name, 'fr'));
-    root.innerHTML = `<header class="screen-head ui-hero bn-team"><h1>Renforcer</h1><p class="muted">Chaque niveau rend une créature plus forte (attaque et PV), jusqu’au niveau ${MAX_LEVEL}. Ça se paie en cendres.</p>${ashLine(g)}</header>
+    root.innerHTML = `<header class="screen-head ui-hero bn-renfort"><h1>Renforcer</h1><p class="muted">Chaque niveau rend une créature plus forte (attaque et PV), jusqu’au niveau ${MAX_LEVEL}. Ça se paie en cendres.</p>${ashLine(g)}</header>
       <div class="seg fg-seg" role="group" aria-label="Créatures affichées"><button class="seg-b" data-act="show" data-v="team" aria-pressed="${!ui.all}">Mon équipe</button><button class="seg-b" data-act="show" data-v="all" aria-pressed="${ui.all}">Toutes mes créatures</button></div>
       ${list.length ? `<div class="fg-list">${list.map((c) => {
         const li = g.cardLevelInfo(c.id), gain = nextLevelGain(g, c), ok = li.cost && li.cost <= g.s.ash;
