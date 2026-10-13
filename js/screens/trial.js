@@ -1,6 +1,13 @@
 // Épreuve du jour : le même combat pour tous les joueurs (équipe imposée, ennemis et dés fixés).
 // On peut la rejouer autant qu'on veut ; seul le meilleur score du jour compte, la récompense une fois par jour.
 import { RARITY } from '../config.js';
+const HOW = [
+  ['trial', '#E0485E', 'Le même combat pour tous', 'Chaque jour, une équipe imposée affronte les mêmes ennemis, avec les mêmes dés, pour tous les joueurs.'],
+  ['team-ic', '#7FA8D8', 'Ton équipe imposée', '3 créatures au combat, 2 en réserve, toutes au niveau 3 : tes propres cartes ne comptent pas.'],
+  ['crown', '#F2C14E', 'Le score', '1 000 points, moins 80 par tour, plus 3 par % de PV restants : gagne vite et sans trop de blessures.'],
+  ['crystal', '#7FD3FF', 'La récompense', 'Ta première victoire du jour rapporte 40 éclats. Rejoue autant que tu veux : seul ton meilleur score compte.'],
+  ['online', '#9C7BFF', 'Le classement', 'Connecté, ton meilleur score entre au classement du jour. Partage-le pour défier tes amis.'],
+];
 import { artUrl } from '../art/assets.js';
 import { icon, picon } from '../ui/icons.js';
 import { esc, fmt, toast, bindActions } from '../ui/dom.js';
@@ -36,6 +43,8 @@ export default function trialScreen(app, root) {
         ${t.best ? `<button class="btn ghost block" data-act="share">${icon('copy')}Partager mon score</button>` : ''}
       </section>
       <details class="panel dc-fold bn-ranking" id="tlb"><summary><span class="dc-sum-t">Classement de l’Épreuve</span></summary><div class="lb-body small muted">Chargement…</div></details>
+      <details class="panel dc-fold dc-how"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/help.webp"><span class="dc-sum-t">Comment ça marche</span></summary>
+        <ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol></details>
       <a class="btn ghost block" href="#/descente">${icon('back')}Retour à l’Aventure</a>`;
     root.querySelector('#tlb')?.addEventListener('toggle', (e) => { if (e.target.open) loadBoard(); }, { once: true });
     if (result?.won) root.querySelector('#tlb').open = true;

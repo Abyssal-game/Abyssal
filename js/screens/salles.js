@@ -14,6 +14,14 @@ import * as DG from '../core/dungeon.js';
 import { POWERS, powerOf } from '../core/powers.js';
 
 const SL = 'assets/salles/';
+const HOW = [
+  ['salles', '#C9A24E', 'Tes 3 figurines', 'Choisis 3 créatures : chacune a son propre pouvoir (un ange soigne, un dragon crache le feu…). Leur niveau compte.'],
+  ['act-attack', '#E0485E', '2 actions par tour', 'Touche une figurine, puis une case jaune pour la déplacer, un ennemi entouré de rouge pour l’attaquer, ou une carte.'],
+  ['luck', '#F2C14E', 'Les dés', 'Chaque attaque lance un D20 : 1 = échec critique, 20 = critique (dégâts doublés). Certains coups ajoutent un D6.'],
+  ['cards', '#9C7BFF', 'Les cartes', 'Chaque figurine pioche une carte par tour (3 en main au plus). Les coffres donnent des objets, rangés dans le sac.'],
+  ['danger', '#FF8A3A', 'Les ennemis', 'Ils avancent et frappent à leur tour. Un portail fait venir un renfort tous les 3 tours : détruis-le vite.'],
+  ['crown', '#7FD3FF', 'Les salles', 'Quand tout est mort, la porte s’ouvre (+40 % de PV). 3 salles, puis le gardien : un coffre si tu gagnes.'],
+];
 const ST_TXT = { poison: ['Poison', 'poison'], frozen: ['Gelée', 'frost'], shield: ['Bouclier', 'guard'], mark: ['Marquée', 'bad'], curse: ['Maudite', 'bad'], slow: ['Ralentie', 'bad'], armor: ['Carapace', 'guard'], armor2: ['Garde', 'guard'], taunt: ['Provocation', 'guard'], elusive: ['Insaisissable', 'buff'], regen: ['Régénération', 'buff'], lucky: ['Présage', 'buff'], buffT: ['Attaque +', 'buff'] };
 const TIER_TXT = { crit: 'Critique !', success: 'Touché', miss: 'Raté', fumble: 'Échec critique', bonus: '' };
 
@@ -49,12 +57,8 @@ export default function sallesScreen(app, root) {
         <p class="small muted">${ui.diff === 'facile' ? 'Ennemis plus faibles, récompenses réduites (coffre de bois si tu gagnes).' : ui.diff === 'difficile' ? 'Ennemis bien plus forts, récompenses ×1,6 (coffre d’or si tu gagnes).' : 'Récompenses normales (coffre de fer si tu gagnes).'}</p>
         <button class="btn primary block big-cta dc-plq dc-plq-red" data-act="start" ${picked.length === 3 ? '' : 'disabled'}>${icon('p:salles')}Ouvrir les Salles</button>
         <p class="small muted center">Libre et sans limite. Tu peux quitter en cours de partie : elle t’attend.</p></section>
-      <details class="panel dc-fold"><summary><span class="dc-sum-t">Comment ça marche</span></summary><div class="small">
-        <p><b>Ton tour.</b> Chaque figurine a <b>2 actions</b> : se déplacer, attaquer un ennemi à portée, jouer une carte, ouvrir un coffre voisin.</p>
-        <p><b>Les dés.</b> Chaque attaque lance un <b>D20</b> : 1 = échec critique, 20 = critique (dégâts doublés), sinon il faut battre la défense de la cible. Certains coups ajoutent un <b>D6</b>.</p>
-        <p><b>Les cartes.</b> Chaque figurine pioche une carte par tour (3 en main au plus) : son pouvoir, ou Garde. Les coffres donnent des objets, dans un sac commun.</p>
-        <p><b>Les ennemis</b> avancent et frappent à leur tour. Un <b>portail</b> fait venir un renfort tous les 3 tours : détruis-le vite.</p>
-        <p><b>Les salles.</b> Quand tout est mort, la porte s’ouvre. Tes figurines récupèrent 40 % de leurs PV entre deux salles. La 4e salle est celle du gardien.</p></div></details>
+      <details class="panel dc-fold dc-how"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/help.webp"><span class="dc-sum-t">Comment ça marche</span></summary>
+        <ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol></details>
       <p class="small muted center">Record : ${s.best || 0} salle${(s.best || 0) > 1 ? 's' : ''} · ${s.wins || 0} victoire${(s.wins || 0) > 1 ? 's' : ''} sur ${s.runs || 0} partie${(s.runs || 0) > 1 ? 's' : ''}</p>`;
   }
   const powerName = (c) => POWERS[powerOf(c, cat)]?.name || '';
