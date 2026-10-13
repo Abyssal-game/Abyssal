@@ -58,7 +58,9 @@ test('la partie se termine après 9 poses ; le total compte la carte restée en 
     assert.equal(st.placed, 9);
     assert.ok(st.board.every(Boolean));
     assert.equal(st.final.p + st.final.o, 10);
-    assert.equal(st.over, st.final.p > 5 ? 'won' : st.final.p < 5 ? 'lost' : 'draw');
+    const heart = st.board[SC.CENTER].owner;
+    assert.equal(st.over, st.final.p > 5 ? 'won' : st.final.p < 5 ? 'lost' : heart === 'p' ? 'won' : 'lost', 'à 5 contre 5, le cœur du Sceau départage');
+    assert.equal(st.tiebreak, st.final.p === 5);
     assert.throws(() => SC.place(catalog, st, st.turn, 0, 0), /terminée/);
   }
 });
@@ -162,4 +164,90 @@ test('main : 5 cartes possédées ou prêtées ; la partie en cours survit à un
   const m = migrate(old);
   assert.equal(m.sceaux.wins, 0);
   assert.deepEqual(m.sceaux.beaten, {});
+});
+
+// Pose directe de cartes aux valeurs choisies (sans passer par la main)
+const put = (st, cell, owner, vals) => { st.board[cell] = { id: ids[20 + cell], owner, vals }; st.placed++; };
+
+test('Identique : deux valeurs égales capturent, puis Combo en cascade', () => {
+  // carte à poser : chercher une carte réelle et construire le plateau autour de ses valeurs
+  const id = ids.find((x) => { const v = SC.sideValues(catalog.get(x)); return v[0] >= 2 && v[3] >= 2; });
+  const v = SC.sideValues(catalog.get(id));
+  const st = game('p', 'identique');
+  st.hands.p = [id];
+  // pose en 4 : voisin du haut (1) et de gauche (3) ont des valeurs égales en face
+  put(st, 1, 'o', [5, 5, v[0], 5]);
+  put(st, 3, 'o', [5, v[3], 5, 5]);
+  put(st, 0, 'o', [5, 5, 5, 5]);      // voisine de 1 et de 3
+  st.board[1].vals[3] = 9;            // la carte 1 capturée bat la carte 0 par sa gauche (9 > 5)
+  const flips = SC.place(catalog, st, 'p', 0, 4);
+  const rules = flips.map((f) => f.rule);
+  assert.ok(rules.filter((r) => r === 'identique').length === 2, JSON.stringify(flips));
+  assert.ok(rules.includes('combo'));
+  assert.equal(st.board[0].owner, 'p');
+});
+
+test('Identique ne se déclenche pas sans la règle, ni avec une seule égalité', () => {
+  const id = ids.find((x) => SC.sideValues(catalog.get(x))[0] >= 2);
+  const v = SC.sideValues(catalog.get(id));
+  const st = game('p', 'classique');
+  st.hands.p = [id];
+  put(st, 1, 'o', [5, 5, v[0], 5]);
+  put(st, 3, 'o', [5, v[3], 5, 5]);
+  assert.equal(SC.place(catalog, st, 'p', 0, 4).filter((f) => f.rule).length, 0);
+  const st2 = game('p', 'identique');
+  st2.hands.p = [id];
+  put(st2, 1, 'o', [5, 5, v[0], 5]);
+  put(st2, 3, 'o', [5, 10, 5, 5]);
+  assert.equal(SC.place(catalog, st2, 'p', 0, 4).filter((f) => f.rule).length, 0);
+});
+
+test('Somme : même somme sur deux côtés ; une carte alliée compte pour déclencher', () => {
+  const id = ids.find((x) => { const v = SC.sideValues(catalog.get(x)); return v[0] <= 8 && v[1] <= 8; });
+  const v = SC.sideValues(catalog.get(id));
+  const st = game('p', 'somme');
+  st.hands.p = [id];
+  const S = 11;
+  put(st, 1, 'o', [5, 5, S - v[0], 5]);   // haut
+  put(st, 5, 'p', [5, 5, 5, S - v[1]]);   // droite, à moi
+  const flips = SC.place(catalog, st, 'p', 0, 4);
+  assert.ok(flips.some((f) => f.cell === 1 && f.rule === 'somme'), JSON.stringify(flips));
+  assert.equal(st.board[5].owner, 'p');
+});
+
+test('Abîme : Identique, Somme et plateau instable à la fois', () => {
+  const st = SC.newGame(catalog, { hand: ids.slice(0, 5), rival: SC.RIVAL.echo, seed: 4 });
+  assert.ok(SC.ruleHas(st, 'identique') && SC.ruleHas(st, 'somme') && SC.ruleHas(st, 'instable'));
+  assert.ok(st.cells.blessed != null);
+});
+
+test('aucune égalité possible : 300 parties simulées', () => {
+  for (let seed = 0; seed < 300; seed++) {
+    const R = SC.RIVALS[seed % SC.RIVALS.length];
+    const st = SC.newGame(catalog, { hand: ids.slice(seed % 50, seed % 50 + 5), rival: R, seed });
+    const rnd = rngFrom('d' + seed);
+    while (!st.over) { const m = SC.aiMove(catalog, st, 2, rnd); SC.place(catalog, st, st.turn, m[0], m[1]); }
+    assert.notEqual(st.over, 'draw');
+    assert.equal(st.final.p + st.final.o, 10);
+  }
+});
+
+test('trophée : une carte adverse contrôlée, une fois par jour, Héroïque au plus', () => {
+  const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('t'), clock });
+  g.sceauxStart({ rival: 'initie' });
+  const st = g.s.sceaux.cur;
+  const opp = st.oppHand.find((id) => SC.TROPHY_MAX.includes(catalog.get(id).rarity));
+  st.board = st.board.map((_, i) => ({ id: i === 0 ? opp : ids[i], owner: 'p', vals: [5, 5, 5, 5] }));
+  st.hands.o = st.oppHand.filter((x) => x !== opp).slice(0, 1);
+  st.over = 'won'; st.final = SC.score(st);
+  const out = g.sceauxFinish();
+  assert.deepEqual(out.trophy, [opp]);
+  const had = g.owns(opp) ? g.entry(opp).n : 0;
+  g.sceauxTrophy(opp);
+  assert.equal(g.entry(opp).n, had + 1);
+  assert.throws(() => g.sceauxTrophy(opp));
+  g.sceauxQuit(); g.sceauxStart({ rival: 'initie' });
+  const st2 = g.s.sceaux.cur; st2.board = st2.board.map((_, i) => ({ id: i === 0 ? st2.oppHand[0] : ids[i], owner: 'p', vals: [5, 5, 5, 5] }));
+  st2.over = 'won'; st2.final = SC.score(st2);
+  assert.equal(g.sceauxFinish().trophy, undefined, 'déjà pris aujourd’hui');
 });

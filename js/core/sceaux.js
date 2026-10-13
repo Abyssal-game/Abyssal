@@ -4,7 +4,9 @@
 // (10 s'affiche « A »). On pose une carte par tour sur une case libre ; si une valeur dépasse
 // strictement la valeur d'en face d'une carte adverse voisine, cette carte est capturée.
 // Après les 9 poses, on compte les cartes contrôlées sur le plateau, plus la carte restée en main :
-// le plus grand total gagne ; 5 contre 5 donne une égalité.
+// le plus grand total gagne. À 5 contre 5, le joueur qui tient la case centrale (le cœur du Sceau) l'emporte.
+// Règles à combinaisons : Identique et Somme capturent sur deux côtés à la fois, puis les cartes ainsi prises
+// capturent à leur tour leurs voisines (Combo), en cascade.
 //
 // Les valeurs ne dépendent pas des statistiques de combat. Toutes les cartes ont le même total (20) :
 // la rareté rend seulement le profil plus tranché (un 9 mais des 1), jamais plus fort au total.
@@ -43,19 +45,27 @@ export const RULES = {
   sacre:     { name: 'Cases sacrées', desc: 'Une case bénie (+1 à toutes les valeurs de la carte posée) et une case maudite (−1).' },
   instable:  { name: 'Plateau instable', desc: 'Une case bénie et une case maudite, qui changent de place toutes les deux poses.' },
   faction:   { name: 'Fraternité', desc: 'Avec au moins 3 cartes d’une même faction en main, leur plus faible valeur gagne +1.' },
+  identique: { name: 'Identique', desc: 'Si ta carte touche deux cartes voisines (ou plus) avec des valeurs égales à celles d’en face, les cartes adverses parmi elles sont capturées. Puis Combo : chaque carte prise capture à son tour ses voisines plus faibles.' },
+  somme:     { name: 'Somme', desc: 'Si ta carte forme la même somme (ta valeur + celle d’en face) avec deux voisines ou plus, les cartes adverses parmi elles sont capturées. Puis Combo : chaque carte prise capture à son tour ses voisines plus faibles.' },
+  abime:     { name: 'Abîme', desc: 'Identique, Somme et Combo, sur un plateau instable : une case bénie et une case maudite qui changent de place toutes les deux poses.' },
 };
+// Une règle peut en combiner plusieurs
+const PARTS = { abime: ['identique', 'somme', 'instable'] };
+export const ruleHas = (st, k) => st.rule === k || (PARTS[st.rule] || []).includes(k);
+// Le cœur du Sceau : départage les égalités
+export const CENTER = 4;
 
 // Adversaires : du plus simple au plus redoutable. level : force de l'IA (1 à 4).
 export const RIVALS = [
   { key: 'initie', name: 'Ilda', title: 'l’Initiée', level: 1, faction: null, portrait: 'CEL-006', rule: 'classique', reward: 20,
     hello: 'Tu connais les Sceaux ? Moi, j’apprends encore. On joue doucement ?', win: 'Oh ! Tu m’apprendras ce coup-là ?', lose: 'J’ai gagné ? J’ai gagné !' },
-  { key: 'collectionneur', name: 'Maître Orvel', title: 'le Collectionneur', level: 2, faction: 'artificiel', portrait: 'ART-004', rule: 'classique', reward: 30,
+  { key: 'collectionneur', name: 'Maître Orvel', title: 'le Collectionneur', level: 2, faction: 'artificiel', portrait: 'ART-004', rule: 'identique', reward: 30,
     hello: 'Chaque carte que je pose vaut une fortune. Ne les abîme pas.', win: 'Ma collection pleure.', lose: 'Une carte de plus pour ma vitrine.' },
   { key: 'stratege', name: 'Sœur Vesna', title: 'la Stratège', level: 3, faction: 'celeste', portrait: 'CEL-005', rule: 'sacre', reward: 40,
     hello: 'Chaque case est une prière. Choisis bien où tu t’agenouilles.', win: 'La lumière t’a guidé, cette fois.', lose: 'Tu as joué au hasard. La lumière, jamais.' },
-  { key: 'maitre', name: 'Le Maître des Sceaux', title: 'gardien des règles', level: 4, faction: 'necrotique', portrait: 'NEC-001', rule: 'faction', reward: 55,
+  { key: 'maitre', name: 'Le Maître des Sceaux', title: 'gardien des règles', level: 4, faction: 'necrotique', portrait: 'NEC-001', rule: 'somme', reward: 55,
     hello: 'J’ai scellé plus de créatures que tu n’en verras jamais.', win: 'Tu as brisé mon sceau. Ce n’est pas rien.', lose: 'Reviens quand tu sauras compter.' },
-  { key: 'echo', name: 'L’Écho de l’Abîme', title: 'adversaire ultime', level: 4, faction: 'abyssal', portrait: 'ABY-039', rule: 'instable', reward: 70,
+  { key: 'echo', name: 'L’Écho de l’Abîme', title: 'adversaire ultime', level: 4, faction: 'abyssal', portrait: 'ABY-039', rule: 'abime', reward: 70,
     hello: 'Je joue tes coups avant toi. Je les ai déjà joués mille fois.', win: '… l’écho se tait.', lose: 'Tu m’entends ? C’est toi, en bas.' },
 ];
 export const RIVAL = Object.fromEntries(RIVALS.map((r) => [r.key, r]));
@@ -63,6 +73,13 @@ export const rivalUnlocked = (s, i) => i === 0 || !!s.sceaux?.beaten?.[RIVALS[i 
 
 // Récompenses : plafonnées par jour pour qu'aucun mode ne devienne la seule source d'éclats
 export const SCEAUX_REWARD = { dailyPaid: 5, firstWin: 100, daily: 40 };
+// Trophée : après une victoire, une fois par jour, tu gardes une carte adverse que tu contrôles (rareté HR au plus)
+export const TROPHY_MAX = ['C', 'PC', 'R', 'HR'];
+export function trophyChoices(cat, st) {
+  if (st.over !== 'won') return [];
+  const ids = st.board.filter((c) => c && c.owner === 'p' && st.hands.o.indexOf(c.id) < 0 && st.oppHand?.includes(c.id)).map((c) => c.id);
+  return [...new Set(ids)].filter((id) => TROPHY_MAX.includes(cat.get(id)?.rarity));
+}
 export const SCEAUX_TITLES = { initie: 'Initié des Sceaux', maitre: 'Maître des Sceaux', echo: 'Briseur d’Échos' };
 
 // Main d'un adversaire : 5 cartes de sa faction, de plus en plus rares avec son niveau (déterministe)
@@ -106,13 +123,13 @@ export function newGame(cat, { hand, rival, seed = Date.now(), daily = false }) 
   const rnd = mulberry(seed);
   const opp = rivalHand(cat, R, daily ? `jour:${seed}` : '');
   const st = {
-    v: 1, rival: R.key, rule: R.rule, daily, seed,
+    v: 1, rival: R.key, rule: R.rule, daily, seed, oppHand: opp.slice(),
     board: Array(9).fill(null), hands: { p: hand.slice(0, 5), o: opp }, turn: rnd() < 0.5 ? 'p' : 'o', placed: 0,
     cells: { blessed: null, cursed: null }, over: null, last: null, log: [],
     fac: { p: dominant(cat, hand), o: dominant(cat, opp) },
   };
   st.first = st.turn;
-  if (st.rule === 'sacre' || st.rule === 'instable') moveCells(st, rnd);
+  if (st.rule === 'sacre' || ruleHas(st, 'instable')) moveCells(st, rnd);
   st.rng = Math.floor(rnd() * 2 ** 31);
   return st;
 }
@@ -150,16 +167,35 @@ export function place(cat, st, who, handIdx, cell) {
   st.hands[who] = st.hands[who].filter((_, k) => k !== handIdx);
   st.board[cell] = { id, owner: who, vals };
   const flips = [];
-  neighbors(cell).forEach((n, d) => {
-    if (n < 0) return;
-    const o = st.board[n];
-    if (!o || o.owner === who) return;
-    if (vals[d] > o.vals[OPP[d]]) { o.owner = who; flips.push({ cell: n, dir: d, mine: vals[d], theirs: o.vals[OPP[d]] }); }
+  const near = neighbors(cell).map((n, d) => (n >= 0 && st.board[n] ? { n, d, o: st.board[n], mine: vals[d], theirs: st.board[n].vals[OPP[d]] } : null)).filter(Boolean);
+  // Identique / Somme : deux voisines ou plus (les tiennes comptent pour déclencher, seules les adverses sont prises)
+  const special = new Map();
+  if (ruleHas(st, 'identique')) { const eq = near.filter((x) => x.mine === x.theirs); if (eq.length >= 2) eq.forEach((x) => special.set(x.n, ['identique', x])); }
+  if (ruleHas(st, 'somme')) {
+    const sums = {};
+    near.forEach((x) => { (sums[x.mine + x.theirs] ||= []).push(x); });
+    Object.values(sums).forEach((g) => { if (g.length >= 2) g.forEach((x) => { if (!special.has(x.n)) special.set(x.n, ['somme', x]); }); });
+  }
+  const chain = [];
+  for (const [n, [rule, x]] of special) if (x.o.owner !== who) { x.o.owner = who; flips.push({ cell: n, dir: x.d, mine: x.mine, theirs: x.theirs, rule, from: cell }); chain.push(n); }
+  // capture simple
+  near.forEach((x) => {
+    if (x.o.owner === who) return;
+    if (x.mine > x.theirs) { x.o.owner = who; flips.push({ cell: x.n, dir: x.d, mine: x.mine, theirs: x.theirs, from: cell }); }
   });
+  // Combo : chaque carte prise par Identique ou Somme capture à son tour (en cascade, chaque carte une seule fois)
+  while (chain.length) {
+    const c = chain.shift(), src = st.board[c];
+    neighbors(c).forEach((n, d) => {
+      const o = n >= 0 && st.board[n];
+      if (!o || o.owner === who || src.vals[d] <= o.vals[OPP[d]]) return;
+      o.owner = who; flips.push({ cell: n, dir: d, mine: src.vals[d], theirs: o.vals[OPP[d]], rule: 'combo', from: c }); chain.push(n);
+    });
+  }
   st.placed++;
   st.last = { cell, who, flips };
   st.log.push({ who, id, cell, flips: flips.map((f) => f.cell) });
-  if (st.rule === 'instable' && st.placed % 2 === 0 && st.placed < 9) { const r = mulberry(st.rng + st.placed); moveCells(st, r); }
+  if (ruleHas(st, 'instable') && st.placed % 2 === 0 && st.placed < 9) { const r = mulberry(st.rng + st.placed); moveCells(st, r); }
   if (st.placed >= 9) finish(st);
   else st.turn = who === 'p' ? 'o' : 'p';
   return flips;
@@ -171,14 +207,16 @@ export function score(st) {
 }
 function finish(st) {
   const s = score(st);
-  st.over = s.p > s.o ? 'won' : s.p < s.o ? 'lost' : 'draw';
+  const heart = st.board[CENTER]?.owner || null;
+  st.over = s.p > s.o ? 'won' : s.p < s.o ? 'lost' : heart === 'p' ? 'won' : heart === 'o' ? 'lost' : 'draw';
   st.final = s;
+  st.tiebreak = s.p === s.o && !!heart;
 }
 
 // ——— Intelligence de l'adversaire ———
 function cloneGame(st) { return { ...st, board: st.board.map((c) => (c ? { ...c, vals: c.vals.slice() } : null)), hands: { p: st.hands.p.slice(), o: st.hands.o.slice() }, cells: { ...st.cells }, log: [], last: null }; }
 const legalMoves = (st, who) => { const m = []; st.hands[who].forEach((_, h) => st.board.forEach((c, i) => { if (!c) m.push([h, i]); })); return m; };
-const boardDiff = (st, who) => { const s = score(st); return who === 'o' ? s.o - s.p : s.p - s.o; };
+const boardDiff = (st, who) => { const s = score(st), h = st.board[CENTER]?.owner; const d = who === 'o' ? s.o - s.p : s.p - s.o; return d + (h ? (h === who ? 0.5 : -0.5) : 0); };
 // Risque : côtés d'une carte tournés vers une case vide, plus faibles que ce que l'adversaire peut y poser
 function exposure(cat, st, cell, who) {
   const other = who === 'o' ? 'p' : 'o';
@@ -202,7 +240,7 @@ export function aiMove(cat, st, level = 2, rnd = Math.random) {
   for (const [h, c] of moves) {
     const t = cloneGame(st);
     const flips = place(cat, t, who, h, c);
-    let v = flips.length * 10;
+    let v = flips.length * 10 + (c === CENTER && level >= 2 ? 4 : 0);
     if (level >= 3) v -= exposure(cat, t, c, who) * 6;
     if (level >= 4 && !t.over) {
       // l'adversaire répond au mieux : on garde le coup qui laisse le plus d'avance après sa réponse
@@ -223,6 +261,6 @@ export function aiMove(cat, st, level = 2, rnd = Math.random) {
 export function dailyChallenge(day, unlockedCount) {
   const h = hash(`defi:${day}`);
   const rival = RIVALS[h % Math.max(1, unlockedCount)];
-  const rule = ['sacre', 'instable', 'faction'][(h >>> 8) % 3];
+  const rule = ['sacre', 'instable', 'faction', 'identique', 'somme'][(h >>> 8) % 5];
   return { rival: rival.key, rule, seed: h };
 }

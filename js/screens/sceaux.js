@@ -12,8 +12,9 @@ const V = SC.showVal;
 const HOW = [['cards', '#7FA8D8', 'Ta main', '5 cartes. Chacune a quatre valeurs, une par côté (de 1 à 10 ; 10 s’écrit A).'],
   ['seal', '#E8C35A', 'Le plateau', 'À tour de rôle, chacun pose une carte sur une case libre du plateau de 3 × 3.'],
   ['swords', '#E0485E', 'Capturer', 'Si ta valeur est plus grande que celle d’en face d’une carte adverse voisine, tu la captures. À égalité, rien ne se passe.'],
-  ['crown', '#F2C14E', 'La victoire', 'Après les 9 poses, on compte les cartes de chaque couleur, plus celle restée en main. 5 contre 5 : égalité.'],
-  ['rule', '#B48CFF', 'Règles spéciales', 'Certains adversaires jouent avec une règle en plus : cases sacrées, plateau instable ou fraternité.'],
+  ['crown', '#F2C14E', 'La victoire', 'Après les 9 poses, on compte les cartes de chaque couleur, plus celle restée en main. À 5 contre 5, celui qui tient la case centrale (le cœur du Sceau) gagne.'],
+  ['rule', '#B48CFF', 'Règles spéciales', 'Certains adversaires jouent avec une règle en plus : Identique, Somme (avec Combo en cascade), cases sacrées, plateau instable, fraternité ou Abîme.'],
+  ['crystal', '#7FE0A0', 'Trophée', 'Une fois par jour, après une victoire, tu gardes une carte adverse que tu contrôles sur le plateau (Héroïque au plus).'],
   ['hourglass', '#9FE0FF', 'Adversaires et défi', 'Bats chaque adversaire pour débloquer le suivant. Un défi du jour t’attend aussi.']];
 // Salle de chaque adversaire (assets/sceaux) : le plateau reste le même, le décor change
 const THEME = { initie: 'salle', collectionneur: 'salle-artificiel', stratege: 'salle-celeste', maitre: 'salle-necrotique', echo: 'salle-abyssal' };
@@ -91,9 +92,9 @@ export default function sceauxScreen(app, root) {
     const rs = (i) => `${i === st.cells.blessed ? '<span class="sc-rs bless"></span>' : ''}${i === st.cells.cursed ? '<span class="sc-rs curse"></span>' : ''}`;
     const tags = (i) => `${i === st.cells.blessed ? '<span class="sc-tag bless">+1</span>' : ''}${i === st.cells.cursed ? '<span class="sc-tag curse">−1</span>' : ''}`;
     const cell = (c, i) => {
-      if (!c) return `<button class="sc-cell ${ui.sel != null && myTurn ? 'can' : ''}" style="--d:${i * 45}ms" data-sc="cell" data-i="${i}" aria-label="Case ${i + 1}${i === st.cells.blessed ? ', bénie' : i === st.cells.cursed ? ', maudite' : ''}">${rs(i)}${tags(i)}</button>`;
+      if (!c) return `<button class="sc-cell ${i === SC.CENTER ? 'heart' : ''} ${ui.sel != null && myTurn ? 'can' : ''}" style="--d:${i * 45}ms" data-sc="cell" data-i="${i}" aria-label="Case ${i + 1}${i === st.cells.blessed ? ', bénie' : i === st.cells.cursed ? ', maudite' : ''}">${rs(i)}${tags(i)}</button>`;
       const own = pending?.has(i) ? (c.owner === 'p' ? 'o' : 'p') : c.owner;
-      return `<div class="sc-cell full ${drop === i ? 'drop' : ''}" style="--d:${i * 45}ms" data-i="${i}">${scCard(cat, c.id, { vals: c.vals, owner: own, back: true })}${rs(i)}${tags(i)}</div>`;
+      return `<div class="sc-cell full ${i === SC.CENTER ? 'heart' : ''} ${drop === i ? 'drop' : ''}" style="--d:${i * 45}ms" data-i="${i}">${scCard(cat, c.id, { vals: c.vals, owner: own, back: true })}${rs(i)}${tags(i)}</div>`;
     };
     root.innerHTML = `<div class="sc-game ${app.reduced() ? 'rm' : ''}">
       <div class="sc-bar"><span class="sc-who ${st.turn === 'o' && !st.over ? 'on' : ''}"><span class="sc-med">${rivalPic(cat, R)}</span><span><b>${esc(R.name)}</b><small>${esc(R.title)}</small></span></span>
@@ -126,12 +127,20 @@ export default function sceauxScreen(app, root) {
     const board = root.querySelector('.sc-board');
     board?.classList.add('flash'); setTimeout(() => board?.classList.remove('flash'), 300);
     await wait(340);
+    let shown = null;
     for (const f of m.flips) {
       const grid = root.querySelector('.sc-plate');
       const el = grid?.querySelector(`.sc-cell[data-i="${f.cell}"]`);
       if (!el) break;
-      beam(grid, m.cell, f.cell, m.who);
-      el.insertAdjacentHTML('beforeend', `<span class="sc-cmp d${(f.dir + 2) % 4}">${V(f.mine)} &gt; ${V(f.theirs)}</span><span class="sc-seal ${m.who}"></span>`);
+      if (f.rule && f.rule !== shown) {
+        shown = f.rule;
+        const b = document.createElement('div'); b.className = `sc-combo ${f.rule}`; b.textContent = { identique: 'Identique !', somme: 'Somme !', combo: 'Combo !' }[f.rule];
+        root.querySelector('.sc-board')?.appendChild(b); setTimeout(() => b.remove(), 1100);
+        (f.rule === 'combo' ? app.sfx.crit : app.sfx.skill)?.(); await wait(380);
+      }
+      beam(grid, f.from ?? m.cell, f.cell, m.who);
+      const cmp = f.rule === 'identique' ? `${V(f.mine)} = ${V(f.theirs)}` : f.rule === 'somme' ? `${V(f.mine)} + ${V(f.theirs)}` : `${V(f.mine)} &gt; ${V(f.theirs)}`;
+      el.insertAdjacentHTML('beforeend', `<span class="sc-cmp d${(f.dir + 2) % 4}">${cmp}</span><span class="sc-seal ${m.who}"></span>`);
       const card = el.querySelector('.sc-card');
       card.classList.add('cap');
       app.sfx.capture?.();
@@ -184,7 +193,9 @@ export default function sceauxScreen(app, root) {
     el.className = `sc-end ${st.over}`;
     el.innerHTML = `${st.over === 'won' && !app.reduced() ? '<div class="sc-rays"></div>' : ''}<div class="sc-end-in">${st.over === 'draw' ? '<h1 class="sc-draw">Égalité</h1>' : crestHTML(st.over === 'won', st.over === 'won' ? 'Victoire' : 'Défaite', '', 'sc-crest')}
       <div class="sc-final"><span class="sc-score"><b class="p">${f.p}</b><i>contre</i><b class="o">${f.o}</b></span></div>
+      ${st.tiebreak ? `<p class="sc-caps"><b>Égalité de cartes</b> : ${st.over === 'won' ? 'tu tiens' : 'il tient'} le cœur du Sceau.</p>` : ''}
       <p class="sc-caps">Tes captures : <b>${caps.p}</b> · Les siennes : <b>${caps.o}</b></p>
+      ${out.trophy?.length ? `<div class="sc-trophy"><b>Trophée du jour</b><span class="small">Garde une de ces cartes :</span><div class="sc-tro-row">${out.trophy.map((id) => `<button class="sc-tro" data-tro="${id}">${scCard(cat, id, { owner: 'p' })}</button>`).join('')}</div></div>` : ''}
       <p class="sc-say">${rivalPic(cat, R)}<span>« ${esc(st.over === 'won' ? R.win : st.over === 'lost' ? R.lose : 'Partie nulle. On recommence ?')} »</span></p>
       ${out.shards ? `<p class="sc-gain">${icon('crystal')} <b>+${fmt(out.shards)}</b> éclats${out.first ? ' (première victoire)' : ''}</p>` : ''}
       ${out.capped ? '<p class="small muted">Plus de victoires payées aujourd’hui : tu joues pour la gloire.</p>' : ''}
@@ -193,6 +204,12 @@ export default function sceauxScreen(app, root) {
       <div class="sc-end-act">${st.daily ? '' : '<button class="btn primary dc-plq dc-plq-red" data-x="again">Revanche</button>'}<button class="btn dc-plq dc-plq-dark" data-x="back">Retour</button></div></div>`;
     document.body.appendChild(el);
     el.addEventListener('click', (e) => {
+      const tb = e.target.closest('[data-tro]');
+      if (tb) {
+        try { const r = g.sceauxTrophy(tb.dataset.tro); app.sfx.reveal?.(cat.get(tb.dataset.tro).rarity); el.querySelector('.sc-trophy').innerHTML = `<b>Trophée gagné</b><span class="small">${esc(cat.get(tb.dataset.tro).name)} rejoint ta collection${r.isNewCard ? ' (nouvelle carte !)' : ''}.</span>`; app.chrome?.(); }
+        catch (err) { toast(esc(err.message), { kind: 'error' }); }
+        return;
+      }
       const b = e.target.closest('[data-x]');
       if (!b) return;
       el.remove();

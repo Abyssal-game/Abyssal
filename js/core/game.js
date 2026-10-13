@@ -549,6 +549,8 @@ export class Game {
       const t = SC.SCEAUX_TITLES[R.key] || (sc.wins === 1 ? SC.SCEAUX_TITLES.initie : null);
       if (t && !this.s.titles.includes(t)) { this.s.titles.push(t); out.title = t; }
       if (R.key === 'echo' && !this.s.frames.includes('sceaux')) { this.s.frames.push('sceaux'); out.frame = 'sceaux'; }
+      // Trophée : une carte adverse capturée, une fois par jour
+      if (sc.trophyDay !== day) { const ch = SC.trophyChoices(this.catalog, st); if (ch.length) { st.trophy = ch; out.trophy = ch; } }
     } else if (st.over === 'lost') { sc.losses++; sc.streak = 0; } else { sc.draws++; if (st.daily && sc.dailyDone !== day) { sc.dailyDone = day; out.shards += 10; } }
     this.s.shards += out.shards;
     sc.history.unshift({ t: Date.now(), rival: R.key, r: st.over, s: st.final });
@@ -558,6 +560,15 @@ export class Game {
     this.checkProgress();
     this.persist();
     return out;
+  }
+  // Garde la carte choisie parmi les trophées de la partie (une fois par jour)
+  sceauxTrophy(id) {
+    const sc = this.s.sceaux, st = sc.cur, day = today(this.clock());
+    if (!st?.trophy?.includes(id) || sc.trophyDay === day) throw new Error('Trophée indisponible.');
+    sc.trophyDay = day; st.trophy = null;
+    const r = this.addCard(id, 'normal', 'reward');
+    this.persist();
+    return r;
   }
   sceauxQuit() { this.s.sceaux.cur = null; this.persist(); }
   // Trois objectifs pour l'accueil : un proche (Descente), un de progression (gardien ou Sceaux),
