@@ -6,7 +6,7 @@ const PAGES = [
   { ic: null, img: 1, t: 'Bienvenue dans l’Abysse', p: 'Le Bestiaire interdit a été déchiré. Ses créatures se cachent dans des boosters scellés. À toi de les retrouver.' },
   { ic: 'booster', img: 2, t: 'Ouvre des boosters', p: 'Le gros bouton du milieu. Déchire le paquet du doigt, puis retourne les cartes. Des boosters offerts se rechargent toutes les 6 heures.' },
   { ic: 'swords', img: 3, t: 'Pars à l’aventure', p: 'Tes cartes combattent pour toi ! Dans l’onglet Aventure, ton équipe de 5 créatures descend dans l’Abysse et rapporte des coffres pleins de boosters.' },
-  { ic: 'home', img: 4, t: 'Reviens chaque jour', p: 'L’Accueil rassemble ce qui t’attend aujourd’hui : l’offrande, les missions et les coffres à ouvrir. Le reste est dans l’onglet Plus.' },
+  { ic: 'home', img: 4, t: 'Reviens chaque jour', p: 'L’Accueil rassemble ce qui t’attend aujourd’hui : l’offrande, les missions et les coffres à ouvrir. Ton profil, tes succès, le bestiaire et les réglages sont dans l’onglet Sanctuaire.' },
 ];
 
 export function showWelcome(app, { force = false } = {}) {
