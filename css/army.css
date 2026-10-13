@@ -1765,3 +1765,14 @@ p.dt-showv .ic { width: 14px; height: 14px; }
 .sh-c small { position: absolute; left: 0; right: 0; bottom: 0; padding: 2px 0; background: rgba(0, 0, 0, .7); text-align: center; font: 800 .7rem/1.2 var(--f-ui); color: var(--gold-hi); }
 .sh-c.v-holo { border-color: #FF8AD8; } .sh-c.v-gold { border-color: #F2C14E; } .sh-c.v-galaxy { border-color: #9C7BFF; }
 .op-pts { color: var(--gold-hi); }
+/* Stèles : la taille du nom s'adapte à son mot le plus long, toujours centré dans l'arche */
+.dc-altar .dc-bl { padding: 36% 24% 0 24% !important; container-type: inline-size; }
+.dc-altar .dc-bl b { font-size: min(21cqw, calc(178cqw / var(--bw, 8))) !important; text-transform: none !important; line-height: 1.1 !important; font-family: var(--f-ui) !important; font-weight: 800 !important; letter-spacing: 0 !important; overflow-wrap: normal !important; word-break: normal !important; hyphens: none !important; overflow: visible !important; width: 100%; }
+/* Pastilles ATQ / PV : l'icône reste visible, le nombre passe sur une petite plaque en bas */
+.dv-atk .ic { display: block !important; position: absolute; inset: 24%; width: 52% !important; height: 52% !important; opacity: 1 !important; color: #F7DE9A; filter: drop-shadow(0 1px 1px #000); }
+.dv-atk b, .dv-hp b { position: absolute !important; left: 50%; bottom: -5px; transform: translateX(-50%); margin: 0 !important; min-width: 1.7em; padding: 2px 5px 1px; border-radius: 8px; text-align: center; font: 900 .82rem/1 var(--f-display) !important; color: #FFF4DA !important; background: linear-gradient(#2A1C0C, #120A04); border: 1px solid rgba(255, 214, 120, .85); text-shadow: none !important; box-shadow: 0 2px 4px rgba(0, 0, 0, .7); }
+.dv-hp b { border-color: rgba(255, 140, 160, .9); background: linear-gradient(#3A0C16, #18040A); }
+.dv-hp.hurt b { color: #FFC2CC !important; }
+.v2-big-stats .dv-atk b, .v2-big-stats .dv-hp b { font-size: 1.15rem !important; bottom: -8px; padding: 3px 8px 2px; }
+@media (max-width: 360px) { .dv-c .dv-atk b, .dv-c .dv-hp b { font-size: .72rem !important; padding: 1px 4px; } }
+.v2-big-stats small { transform: translateY(12px); } .v2-big-stats { margin-bottom: 20px !important; }
