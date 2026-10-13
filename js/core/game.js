@@ -13,6 +13,7 @@ import { FERVOR_START, FERVOR_MAX, TALENTS } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
 export const WEEKLY_FLOOR = 8;
 export const BOSS_RECRUIT = 0.25;
+export const DESCENT_SHARDS = 0.4; // éclats gagnés dans la Descente : 40 % des montants de base
 import { STARTER, COST, BUDGET, TEAM, ULTS, levelFromDups, canUlt, ultOf, roleOf } from './army.js';
 
 const RI = (r) => RARITY_ORDER.indexOf(r);
@@ -786,7 +787,8 @@ export class Game {
   }
   gainShards(n) {
     const run = this.s.descent.run;
-    const k = (run.blessings.includes('greed') ? 1.3 : 1) * (this.rule(run.day).key === 'ruee' ? 1.5 : 1) * (run.free ? 0.5 : 1) * (run.nightmare ? 1.5 : 1);
+    // DESCENT_SHARDS : part des éclats de la Descente (économie resserrée)
+    const k = DESCENT_SHARDS * (run.blessings.includes('greed') ? 1.3 : 1) * (this.rule(run.day).key === 'ruee' ? 1.5 : 1) * (run.free ? 0.5 : 1) * (run.nightmare ? 1.5 : 1);
     const got = Math.round(n * k);
     run.shards += got;
     return got;

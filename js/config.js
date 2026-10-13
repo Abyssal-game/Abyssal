@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v164'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v165'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -87,7 +87,7 @@ export const EVENTS = [
 
 export const ECONOMY = {
   start: { shards: 0, ash: 0, tickets: { standard: 2 } },
-  discoveryShards: { C: 2, PC: 5, R: 12, HR: 25, M: 50, S: 100 },
+  discoveryShards: { C: 1, PC: 3, R: 6, HR: 13, M: 25, S: 50 },
   duplicateAsh: { C: 2, PC: 5, R: 15, HR: 40, M: 100, S: 250 },
   craftAsh: { C: 40, PC: 100, R: 250, HR: 600, M: 1600 }, // les secrètes ne s'invoquent pas
   decipherAsh: 15,
@@ -101,7 +101,7 @@ export const XP = {
   duplicate: 2,
   // XP nécessaire pour passer du niveau n au niveau n+1
   toNext: (n) => 150 + (n - 1) * 90,
-  levelReward: (n) => (n % 5 === 0 ? { shards: 100, tickets: { premium: 1 } } : { shards: 60 }),
+  levelReward: (n) => (n % 5 === 0 ? { shards: 60, tickets: { premium: 1 } } : { shards: 30 }),
 };
 
 export const LEVEL_TITLES = [
@@ -118,7 +118,7 @@ export const FRAMES = {
 };
 
 // Booster standard gratuit qui se recharge avec le temps (aucune obligation de revenir).
-export const FREE_PACK = { everyHours: 8, max: 2 };
+export const FREE_PACK = { everyHours: 12, max: 1 };
 
 export const FACTION_ORDER = ['infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel'];
 
@@ -143,7 +143,7 @@ export const MISSIONS = [
   { key: 'offering', kind: 'daily',    n: 1, shards: 30, text: 'Récupère l’offrande du jour' },
   { key: 'chest2',   kind: 'chest',    n: 2, shards: 50, text: 'Ouvre 2 coffres' },
 ];
-export const MISSION_BONUS = { tickets: { standard: 1 }, chests: { fer: 1 } }; // les 3 missions du jour accomplies
+export const MISSION_BONUS = { tickets: { standard: 1 } }; // les 3 missions du jour accomplies
 
 
 // Points d'une ouverture, pour le classement des plus belles ouvertures.
@@ -153,6 +153,4 @@ export const LUCK_POINTS = { C: 1, PC: 2, R: 6, HR: 20, M: 80, S: 200, variant: 
 export const ITEMS = {
   torche:    { name: 'Torche bénie',           price: 220, icon: 'flame',   desc: 'Rallume une torche déjà utilisée : une expédition de plus aujourd’hui.', limit: 2 },
   encens:    { name: 'Encens de ferveur',      price: 150, icon: 'sparkle', desc: 'Ton prochain rituel d’élévation coûte 15 % de cendres en moins.', hidden: true },
-  // Coffre : rejoint tes coffres (2 boosters à l'intérieur)
-  coffreFer: { name: 'Coffre de fer',  price: 180, icon: 'lock', desc: 'Un coffre qui contient 2 boosters standard.', limit: 2, chests: { fer: 1 } },
 };
