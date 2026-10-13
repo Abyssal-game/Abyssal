@@ -16,7 +16,7 @@ import { bagHTML, bindBag } from './items.js';
 import { chestSVG } from '../ui/chest.js';
 import { runDuel } from './duel-ui.js';
 import { PHASE2 } from '../core/duel.js';
-import { WEEKLY_FLOOR } from '../core/game.js';
+import { WEEKLY_FLOOR, NIGHTMARE_AT, AWAKEN_AT } from '../core/game.js';
 import { setScene, sceneUrl } from '../ui/scene.js';
 import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
@@ -29,7 +29,7 @@ const ROOM_ICON = { fight: 'swords', elite: 'skull', altar: 'star', rest: 'heart
 
 export default function descent(app, root) {
   const g = app.game, cat = app.catalog;
-  const ui = (app.state.descent ||= { cursed: false, outcome: null });
+  const ui = (app.state.descent ||= { cursed: false, nightmare: false, outcome: null });
   let battle = null, playing = false;
 
   const teamStrip = (ids, run) => `<div class="v2-strip">${ids.map((id, i) => { const c = cat.get(id); const m = run?.team.find((x) => x.id === id); return `<span class="v2-mini ${i >= TEAM.active ? 'res' : ''} ${m?.fallen ? 'fallen' : ''}" style="--rc:${RARITY[c.rarity].color}"><img alt="" src="${artUrl(c, { lite: true })}">${m ? `<span class="hpbar"><i style="width:${(m.hp / m.maxHp) * 100}%"></i></span>` : `<small>${i < TEAM.active ? `Niv. ${g.cardLevel(id)}` : 'Rés.'}</small>`}</span>`; }).join('')}</div>`;
@@ -55,6 +55,7 @@ export default function descent(app, root) {
         <a class="btn small ghost block dc-plq dc-plq-dark" href="#/equipe">${icon('p:team-ic')}Modifier l’équipe</a>
         ${team.length < TEAM.active ? `<p class="small v2-warn center">${icon('info')} Ajoute au moins ${TEAM.active} créatures à ton équipe pour descendre.</p>` : ''}
         <button class="btn ${ui.cursed && torches ? 'danger' : 'primary'} block big-cta dc-plq dc-plq-red" data-act="start" ${team.length >= TEAM.active ? '' : 'disabled'}>${icon('p:descend')}${torches ? 'Descendre' : 'Descendre (sans coffre)'}</button>
+        ${g.nightmareUnlocked() ? `<div class="dc-curse-row dc-night-row ${ui.nightmare ? 'on' : ''}"><span><b>${icon('skull')} Mode Cauchemar</b><span class="small muted">ennemis plus forts (+35 % PV, +25 % ATQ), gardiens éveillés dès le début ; coffre d’une qualité au-dessus, +50 % d’éclats${d.bestNightmare ? ` · record : étage ${d.bestNightmare}` : ''}</span></span><button class="switch" role="switch" aria-checked="${ui.nightmare}" data-act="night" aria-label="Mode Cauchemar"><i></i></button></div>` : `<p class="small muted center">${icon('skull')} Mode Cauchemar : atteins l’étage ${NIGHTMARE_AT} pour l’ouvrir.</p>`}
         ${torches ? `<div class="dc-curse-row ${ui.cursed ? 'on' : ''}"><span><b>${icon('skull')} Descente maudite</b><span class="small muted">coffre d’une qualité au-dessus, mais rien si l’équipe tombe</span></span><button class="switch" role="switch" aria-checked="${ui.cursed}" data-act="curse" aria-label="Descente maudite"><i></i></button></div>` : ''}
       </section>
       <h2 class="section-title">Autres modes</h2>
@@ -81,6 +82,7 @@ export default function descent(app, root) {
       ${crestHTML(!s.wiped, s.floor, 'Étage', 'dc-sum2-crest')}
       <h2>${s.wiped ? 'L’équipe est tombée' : 'Retour à la surface'}</h2>
       <p class="dc-sum2-sub">${s.wiped ? 'Tes créatures ont été vaincues, mais ton butin est sauvé.' : 'Tu remontes avec tout ton butin.'}</p>
+      ${s.nightmareRecord ? `<p class="vx-week">${icon('skull')} Nouveau record en mode Cauchemar : étage ${s.floor} !</p>` : ''}
       ${s.report?.length ? `<div class="dc-why"><b>${icon('info')} Ce qui s’est passé</b>${s.report.map((l) => `<p class="small">${esc(l)}</p>`).join('')}</div>` : ''}
       <div class="dc-sum2-loot">${s.chests.map((c) => `<span class="dc-sum2-chest" style="--cc:${CHESTS[c].color}">${chestSVG(c)}<b>${esc(CHESTS[c].name)}</b></span>`).join('')}${s.shards ? `<span class="dc-sum2-shards">${icon('crystal')}<b>+${fmt(s.shards)}</b><small>éclats</small></span>` : ''}${!s.chests.length && !s.shards ? '<span class="dc-sum2-sub">Aucun butin cette fois.</span>' : ''}</div>
       ${s.chests.length ? `<a class="btn primary block dc-plq dc-plq-red" href="#/coffres">${icon('p:chest')}Ouvrir ${s.chests.length > 1 ? 'mes coffres' : 'mon coffre'}</a>` : ''}
@@ -108,13 +110,13 @@ export default function descent(app, root) {
   }
 
   // ——— Expédition ———————————————————————————————————————————————————
-  const runHead = (run) => `<header class="dc-run-head"><div><span class="small muted">${run.free ? 'Descente libre (sans coffre)' : run.cursed ? `<span class="dc-bad">${icon('skull')} Maudite</span>` : 'La Descente'}</span><h1>Étage ${run.floor}</h1></div><div class="dc-loot"><span>${icon('crystal')}${fmt(run.shards)}</span>${run.chests.length ? `<span>${icon('p:chest')}${run.chests.length}</span>` : ''}</div></header>
+  const runHead = (run) => `<header class="dc-run-head"><div><span class="small muted">${run.nightmare ? `<span class="dc-bad">${icon('skull')} Cauchemar</span> · ` : ''}${run.free ? 'Descente libre (sans coffre)' : run.cursed ? `<span class="dc-bad">${icon('skull')} Maudite</span>` : 'La Descente'}</span><h1>Étage ${run.floor}</h1></div><div class="dc-loot"><span>${icon('crystal')}${fmt(run.shards)}</span>${run.chests.length ? `<span>${icon('p:chest')}${run.chests.length}</span>` : ''}</div></header>
     ${teamStrip(run.team.map((m) => m.id), run)}
     <p class="dc-rule-line small">${picon('rule')} <b>${esc(g.rule(run.day).name)}</b> · ${esc(g.rule(run.day).desc)}</p>`;
   function doorsView(run) {
     const doors = g.doors();
     root.innerHTML = `${runHead(run)}<p class="dc-prompt">${doors.includes('boss') ? 'Un gardien barre la route.' : doors.length > 1 ? 'Deux passages. Le plus dangereux rapporte plus.' : 'Des créatures barrent le passage.'}</p>
-      <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r} has-art" data-act="door" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic ${DOOR_PIC[r] ? 'pic' : ''}">${DOOR_PIC[r] ? picon(DOOR_PIC[r]) : icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'boss' ? `<b class="dc-bad">${esc(BOSSES[bossOf(run.floor)].name)}</b> : ${esc(BOSSES[bossOf(run.floor)].mechanic)}${g.s.bossesBeaten[bossOf(run.floor)] ? ` <b class="dc-good">Contre : ${esc(BOSSES[bossOf(run.floor)].counter)}</b>` : ''}` : r === 'elite' && run.floor >= WEEKLY_FLOOR && !g.weekly().done ? `${ROOMS[r].desc} <b class="dc-good">La créature de la semaine t’y attend !</b>` : ROOMS[r].desc}</span></button>`).join('')}</div>
+      <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r} has-art" data-act="door" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic ${DOOR_PIC[r] ? 'pic' : ''}">${DOOR_PIC[r] ? picon(DOOR_PIC[r]) : icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'boss' ? `<b class="dc-bad">${esc(BOSSES[bossOf(run.floor)].name)}${run.nightmare || run.floor >= AWAKEN_AT ? ' (éveillé)' : ''}</b> : ${esc(BOSSES[bossOf(run.floor)].mechanic)}${run.nightmare || run.floor >= AWAKEN_AT ? ' <b class="dc-bad">Éveillé : sa phase 2 commence dès le premier tour.</b>' : ''}${g.s.bossesBeaten[bossOf(run.floor)] ? ` <b class="dc-good">Contre : ${esc(BOSSES[bossOf(run.floor)].counter)}</b>` : ''}` : r === 'elite' && run.floor >= WEEKLY_FLOOR && !g.weekly().done ? `${ROOMS[r].desc} <b class="dc-good">La créature de la semaine t’y attend !</b>` : ROOMS[r].desc}</span></button>`).join('')}</div>
       ${run.cleared ? `<button class="btn ghost block" data-act="leave">${icon('back')}Remonter</button>` : ''}`;
   }
   function clearedView(run, extra = '') {
@@ -174,6 +176,7 @@ export default function descent(app, root) {
         const r = g.descent().run;
         ui.win = { goal: out.goal || null, goalShards: out.goalShards || 0, floor: r.floor, room: out.room, shards: out.shards, chest: out.chest || null, disc: out.discovered.filter((id) => cat.get(id)), weekly: out.weekly?.id || null, recruit: out.recruit?.id || null, stats, boss: out.boss || null, relNew: out.relNew || [], report: out.report || [] };
         rewardView(r);
+        if (r.talentOffer?.length) tuto(app, 'cb-talent');
       }
       window.scrollTo(0, 0);
       app.flushProgress();
@@ -243,12 +246,13 @@ export default function descent(app, root) {
 
   bindActions(root, {
     curse() { ui.cursed = !ui.cursed; render(); },
+    night() { ui.nightmare = !ui.nightmare; render(); },
     weekcard(el) { app.openCard(el.dataset.id); },
     news() { delete g.s.armyNews; g.persist(); render(); },
     async start() {
       if (ui.cursed && g.torchesLeft() && !(await confirmBox('Descente maudite : si toute l’équipe tombe, <b>tu ne rapportes rien</b>. Tu es sûr ?', { ok: 'Je descends', danger: true }))) return;
       try {
-        g.startRun({ cursed: ui.cursed }); ui.outcome = null; app.sfx.tear(); app.chrome(); render(); window.scrollTo(0, 0);
+        g.startRun({ cursed: ui.cursed, nightmare: ui.nightmare && g.nightmareUnlocked() }); ui.outcome = null; app.sfx.tear(); app.chrome(); render(); window.scrollTo(0, 0);
         tuto(app, 'army-doors');
       } catch (e) { toast(esc(e.message), { kind: 'error' }); }
     },

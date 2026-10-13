@@ -228,7 +228,7 @@ export default function sceauxScreen(app, root) {
     boardView({ intro: true });
     app.sfx.enter?.();
     dialog(R, R.hello, st.first === 'p' ? 'Tu commences.' : `${esc(R.name)} commence.`);
-    tuto(app, 'sceaux-board');
+    tuto(app, 'sceaux-board').then(() => { if (SC.ruleHas(st, 'identique') || SC.ruleHas(st, 'somme')) tuto(app, 'sceaux-combo'); });
     aiTurn();
   }
   // Règles en cours de partie : la même présentation que le volet « Comment ça marche »

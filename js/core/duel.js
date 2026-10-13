@@ -609,7 +609,7 @@ export const PHASE2 = {
 export const DOOM_TURNS = 3;
 function bossPhase(st, ev) {
   const b = front(st, 'enemy').find((u) => u.boss && u.hp > 0);
-  if (!b || b.phase2 || b.hp > b.maxHp / 2) return;
+  if (!b || b.phase2 || (b.hp > b.maxHp / 2 && !b.awakened)) return;
   b.phase2 = true; b.atk = Math.round(b.atk * 1.2 + 0.5);
   const P = PHASE2[st.bossKey];
   ev.push({ t: 'phase2', u: b.uid, s: `${BOSSES[st.bossKey].name} : ${P ? P.name : 'phase 2'} !`, key: st.bossKey });

@@ -34,6 +34,9 @@ export function levelFromXp(xp) {
 // Cartes retirées (identifiant → rareté, pour rembourser les exemplaires possédés)
 const REMOVED_CARDS = { 'ABY-050': 'HR', 'CEL-046': 'HR' };
 
+export const NIGHTMARE_AT = 20; // record à atteindre pour ouvrir le mode Cauchemar
+export const AWAKEN_AT = 30;   // gardiens éveillés à partir de cet étage
+
 export class Game {
   constructor(catalog, storage, { rng = cryptoRandom, clock = () => new Date() } = {}) {
     this.catalog = catalog;
@@ -468,7 +471,10 @@ export class Game {
   huntKills(id) { return this.s.hunt[id] || 0; }
   huntCount() { return Object.keys(this.s.hunt).length; }
 
-  startRun({ cursed = false } = {}) {
+  // Mode Cauchemar : débloqué au record de l'étage 20
+  nightmareUnlocked() { return (this.descent().best || 0) >= NIGHTMARE_AT; }
+  startRun({ cursed = false, nightmare = false } = {}) {
+    if (nightmare && !this.nightmareUnlocked()) throw new Error(`Le mode Cauchemar s’ouvre quand tu as atteint l’étage ${NIGHTMARE_AT}.`);
     const d = this.descent();
     if (d.run) throw new Error('Une expédition est déjà en cours.');
     const team = this.team();
@@ -478,7 +484,7 @@ export class Game {
     d.runs = (d.runs || 0) + 1;
     const ult = this.ultimate(team);
     d.run = {
-      v: 3, day: d.day, floor: 1, cleared: 0, phase: 'doors', cursed: cursed && !free, free, blessings: [], altar: null,
+      v: 3, day: d.day, floor: 1, cleared: 0, phase: 'doors', cursed: cursed && !free, free, nightmare: !!nightmare, blessings: [], altar: null,
       gauge: this.rule(d.day).key === 'lune' ? FERVOR_MAX - 2 : FERVOR_START, ult: { key: ult.key, power: ult.power, card: ult.card },
       team: team.map((id) => { const u = duelUnit(this.catalog.get(id), { level: this.cardLevel(id), form: this.formOf(id) }); return { id, hp: u.maxHp, maxHp: u.maxHp, fallen: false, form: this.formOf(id) }; }),
       shards: 0, chests: [], kills: {},
@@ -526,7 +532,7 @@ export class Game {
     const out = { won: st.over === 'won', rounds: st.round, hp, record: false, shards: 0 };
     if (out.won) {
       out.score = Math.max(0, 1000 - 80 * st.round + hp * 3);
-      if (!t.best || out.score > t.best.score) { out.record = !!t.best; t.best = { score: out.score, rounds: st.round, hp }; }
+      if (!t.best || out.score > t.best.score) { out.record = !!t.best; t.best = { score: out.score, rounds: st.round, hp }; t.sent = null; }
       if (!t.paid) { t.paid = true; t.wins = (t.wins || 0) + 1; out.shards = 40; this.s.shards += 40; }
     }
     t.run = null;
@@ -672,7 +678,7 @@ export class Game {
   // Coffre rapporté si l'on remonte maintenant
   chestNow(run = this.s.descent.run) {
     if (!run || run.free) return null;
-    return shiftChest(chestForDepth(run.cleared), run.cursed ? 1 : 0);
+    return shiftChest(chestForDepth(run.cleared), (run.cursed ? 1 : 0) + (run.nightmare ? 1 : 0));
   }
   chooseDoor(room) {
     const run = this.s.descent.run;
@@ -716,6 +722,9 @@ export class Game {
         const f = this.catalog.get(e.id)?.faction;
         if (rule.key === 'furie' && f === rule.faction) e.atk = Math.round(e.atk * 1.25 + 0.4);
         if (rule.key === 'sommeil' && f === rule.faction) { e.maxHp = Math.max(1, Math.round(e.maxHp * 0.75)); e.hp = e.maxHp; }
+        if (run.nightmare) { e.maxHp = Math.round(e.maxHp * 1.35); e.hp = e.maxHp; e.atk = Math.round(e.atk * 1.25 + 0.4); }
+        // Gardien éveillé (Cauchemar, ou à partir de l'étage 30) : sa phase 2 commence dès le premier tour
+        if (e.boss && (run.nightmare || run.floor >= AWAKEN_AT)) e.awakened = true;
       }
       const known = {};
       enemies.forEach((e) => { if (this.knows(e.id)) known[e.id] = true; });
@@ -728,6 +737,7 @@ export class Game {
   }
   // Objectif bonus du combat : le même pour un étage donné du jour
   goalFor(run, room) {
+    if (run.floor < 3 && (this.descent().best || 0) < 5) return null; // dévoilés progressivement
     const keys = Object.keys(GOALS).filter((k) => GOALS[k].rooms.includes(room));
     return keys[Math.floor(rngOf(`goal:${run.day}:${run.floor}:${room}`)() * keys.length)];
   }
@@ -776,7 +786,7 @@ export class Game {
   }
   gainShards(n) {
     const run = this.s.descent.run;
-    const k = (run.blessings.includes('greed') ? 1.3 : 1) * (this.rule(run.day).key === 'ruee' ? 1.5 : 1) * (run.free ? 0.5 : 1);
+    const k = (run.blessings.includes('greed') ? 1.3 : 1) * (this.rule(run.day).key === 'ruee' ? 1.5 : 1) * (run.free ? 0.5 : 1) * (run.nightmare ? 1.5 : 1);
     const got = Math.round(n * k);
     run.shards += got;
     return got;
@@ -836,7 +846,7 @@ export class Game {
       const hunt = room === 'elite' && this.rule(run.day).key === 'chasse';
       out.shards = this.gainShards((8 + 3 * run.floor) * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1) * (hunt ? 2 : 1));
       // objectif réussi : éclats en plus et 1 Ferveur pour la suite
-      if (goal?.state === 'done') { out.goalShards = this.gainShards((6 + 2 * run.floor) * (room === 'boss' ? 2 : 1)); run.gauge = Math.min(FERVOR_MAX, run.gauge + 1); this.s.stats.goals = (this.s.stats.goals || 0) + 1; }
+      if (goal?.state === 'done') { out.goalShards = this.gainShards((3 + run.floor) * (room === 'boss' ? 2 : 1)); run.gauge = Math.min(FERVOR_MAX, run.gauge + 1); this.s.stats.goals = (this.s.stats.goals || 0) + 1; }
       if (room === 'elite') { const t = this.talentOffers(run); if (t.length) { run.talentOffer = t; out.talents = t; } }
       // les gardiens donnent un coffre tout de suite ; règle « Chasse aux élites » : les élites aussi
       if (!run.free && (room === 'boss' || hunt)) {
@@ -898,7 +908,7 @@ export class Game {
     if (!run) throw new Error('Aucune expédition en cours.');
     let chest = null;
     if (!run.free) {
-      chest = shiftChest(chestForDepth(run.cleared), (run.cursed ? 1 : 0) - (wiped ? 1 : 0));
+      chest = shiftChest(chestForDepth(run.cleared), (run.cursed ? 1 : 0) + (run.nightmare ? 1 : 0) - (wiped ? 1 : 0));
       if (wiped && run.cursed) chest = null;
     }
     let shards = run.shards;
@@ -906,7 +916,8 @@ export class Game {
     const chests = [...(wiped && run.cursed ? [] : run.chests), ...(chest ? [chest] : [])];
     chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });
     this.s.shards += shards;
-    const summary = { wiped, floor: run.cleared, day: run.day, chests, shards, kills: run.kills, free: run.free, cursed: run.cursed };
+    const summary = { wiped, floor: run.cleared, day: run.day, chests, shards, kills: run.kills, free: run.free, cursed: run.cursed, nightmare: !!run.nightmare };
+    if (run.nightmare && run.cleared > (d.bestNightmare || 0)) { d.bestNightmare = run.cleared; summary.nightmareRecord = true; }
     this.emit('descentEnd', summary);
     d.last = summary;
     d.run = null;

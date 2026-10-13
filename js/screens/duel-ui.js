@@ -359,6 +359,7 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
           app.sfx.boss(); draw(); banner(`${icon('skull')} ${esc(e.s)}`, 'danger', 1200); shake(true); await wait(T(900));
           const P = PHASE2[e.key];
           if (P) await phaseCard(P);
+          if (P && !g.s.tips?.['cb-phase2']) await tuto(app, 'cb-phase2');
           break;
         }
         case 'swallow': {
@@ -564,6 +565,7 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
   async function tips() {
     if (busy || st.over || guide) return;
     const foes = front(st, 'enemy');
+    if (st.goal) await tuto(app, 'cb-goal');
     if (foes.some((e) => e.brkMax)) await tuto(app, 'cb-break');
     if (foes.some((e) => ['charge', 'channel', 'heavy', 'blast'].includes(e.intent?.kind))) await tuto(app, 'cb-intent');
     if (st.fervor >= 1 && g.s.tips?.['cb-guide']) await tuto(app, 'cb-skill');
@@ -607,7 +609,8 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
     const u = sel; mode = null;
     return exec(() => act(st, u, key, uid));
   }
-  function pickReserve() {
+  async function pickReserve() {
+    if (!g.s.tips?.['cb-entrance']) await tuto(app, 'cb-entrance');
     const r = reserve(st, 'ally'), su = st.units[sel];
     const sh = openSheet(`<h2>Qui entre en jeu ?</h2><p class="small muted">À la place de <b>${esc(cat.get(su.id).name)}</b>. Coût : ${st.freeSwap ? 'gratuit (Relais d’ombre)' : '1 action'}. Elle peut agir ce tour-ci ; PV et états sont conservés.</p>
       <div class="dv-pick">${r.map((x) => `<button class="dv-pick-c" data-in="${x.uid}"><img alt="" src="${artUrl(cat.get(x.id), { lite: true })}"><b>${esc(cat.get(x.id).name)}</b><span>${esc(KITS[x.role].name)} · ${icon('swords')}${x.atk} · ${icon('heart')}${x.hp}/${x.maxHp}</span>${ENTRANCES[x.role] ? `<small class="dv-pick-e"><b>${esc(ENTRANCES[x.role].name)}</b> : ${esc(ENTRANCES[x.role].desc)}</small>` : ''}</button>`).join('')}</div>`, { label: 'Permuter' });

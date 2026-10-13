@@ -131,6 +131,14 @@ export async function leaderboard(day, limit = 20) {
   return authed(`/rest/v1/descent_scores?day=eq.${day}&select=floor,cursed,user_id,profiles(pseudo,avatar,title,badge)&order=floor.desc,updated_at.asc&limit=${limit}`);
 }
 
+// ——— Classement de l'Épreuve du jour (table créée par supabase/04-epreuve.sql) ———
+export async function submitTrial(day, score, rounds, hp) {
+  await authed('/rest/v1/rpc/submit_trial', { method: 'POST', body: { p_day: day, p_score: score, p_rounds: rounds, p_hp: hp } });
+}
+export async function trialBoard(day, limit = 30) {
+  return authed(`/rest/v1/trial_scores?day=eq.${day}&select=score,rounds,hp,user_id,profiles(pseudo,avatar,title,badge)&order=score.desc,updated_at.asc&limit=${limit}`);
+}
+
 // Badges attribués par le serveur
 export const BADGES = { createur: { name: 'Créateur', cls: 'b-createur' } };
 export function badgeHTML(key) {

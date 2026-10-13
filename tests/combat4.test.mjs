@@ -150,3 +150,30 @@ test('épreuve du jour : identique pour tous le même jour, score et récompense
   assert.equal(g1.trialFinish().shards, 0, 'récompense une seule fois par jour');
   assert.equal(g1.trial().best.score, out.score, 'le meilleur score reste');
 });
+
+test('mode Cauchemar : verrouillé avant l’étage 20, ennemis renforcés, gardien éveillé dès le début', () => {
+  const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('nm'), clock });
+  const ids = catalog.cards.filter((c) => c.rarity === 'C').slice(0, 5).map((c) => c.id);
+  ids.forEach((id) => g.addCard(id)); g.s.team = ids; g.s.teamSet = true;
+  assert.throws(() => g.startRun({ nightmare: true }), /Cauchemar/);
+  g.s.descent.best = 20;
+  g.startRun({ nightmare: true });
+  const run = g.s.descent.run;
+  run.floor = 5; run.phase = 'doors';
+  g.startBattle('boss');
+  const st = run.battle, b = Object.values(st.units).find((u) => u.boss);
+  assert.equal(b.awakened, true);
+  D.beginEnemyTurn(st);
+  assert.equal(b.phase2, true, 'phase 2 dès le premier tour ennemi');
+});
+
+test('objectifs : dévoilés à partir de l’étage 3 pour un nouveau joueur', () => {
+  const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('gl'), clock });
+  const ids = catalog.cards.filter((c) => c.rarity === 'C').slice(0, 5).map((c) => c.id);
+  ids.forEach((id) => g.addCard(id)); g.s.team = ids; g.s.teamSet = true;
+  g.startRun();
+  const run = g.s.descent.run;
+  assert.equal(g.goalFor(run, 'fight'), null);
+  run.floor = 3;
+  assert.ok(g.goalFor(run, 'fight'));
+});

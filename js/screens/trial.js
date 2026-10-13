@@ -9,6 +9,10 @@ import { PACTS } from '../core/pacts.js';
 import { KITS } from '../core/skills.js';
 import { roleOf } from '../core/army.js';
 import { runDuel } from './duel-ui.js';
+import { tuto } from '../ui/tutos.js';
+import { EMBLEM } from '../ui/icons.js';
+import * as cloud from '../cloud/cloud.js';
+import { sync } from '../cloud/sync.js';
 
 export default function trialScreen(app, root) {
   const g = app.game, cat = app.catalog;
@@ -31,7 +35,31 @@ export default function trialScreen(app, root) {
         <button class="btn primary block big-cta dc-plq dc-plq-red" data-act="go">${icon('swords')}${t.run ? 'Reprendre l’épreuve' : t.tries ? 'Retenter l’épreuve' : 'Lancer l’épreuve'}</button>
         ${t.best ? `<button class="btn ghost block" data-act="share">${icon('copy')}Partager mon score</button>` : ''}
       </section>
+      <details class="panel dc-fold bn-ranking" id="tlb"><summary><span class="dc-sum-t">Classement de l’Épreuve</span></summary><div class="lb-body small muted">Chargement…</div></details>
       <a class="btn ghost block" href="#/descente">${icon('back')}Retour à l’Aventure</a>`;
+    root.querySelector('#tlb')?.addEventListener('toggle', (e) => { if (e.target.open) loadBoard(); }, { once: true });
+    if (result?.won) root.querySelector('#tlb').open = true;
+  }
+  async function loadBoard() {
+    const box = root.querySelector('#tlb .lb-body');
+    if (!box) return;
+    if (!cloud.isLoggedIn()) { box.innerHTML = 'Connecte-toi pour comparer ton score avec les autres joueurs. <a href="#/compte">Se connecter</a>'; return; }
+    try {
+      const t = g.trial();
+      if (t.best && !t.sent) { await cloud.submitTrial(t.day, t.best.score, t.best.rounds, t.best.hp); t.sent = t.best.score; g.persist(); }
+      const rows = await cloud.trialBoard(t.day, 30);
+      if (!root.contains(box)) return;
+      const me = cloud.currentUser()?.id;
+      box.classList.remove('muted');
+      box.innerHTML = (rows.length ? rows.map((r, i) => {
+        const av = r.profiles?.avatar && cat.get(r.profiles.avatar);
+        return `<div class="lb-row ${r.user_id === me ? 'me' : ''}"><span class="lb-rank">${i + 1}</span><span class="lb-av">${av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM}</span><span class="lb-name"><b>${esc(r.profiles?.pseudo || '?')}${cloud.badgeHTML(r.profiles?.badge)}</b><span class="small muted">${r.rounds} tour${r.rounds > 1 ? 's' : ''} · ${r.hp} % de PV</span></span><span class="lb-floor">${fmt(r.score)}</span></div>`;
+      }).join('') : '<p class="small muted">Personne n’a encore réussi l’Épreuve aujourd’hui. À toi !</p>')
+        + (!sync.profile?.pseudo ? '<p class="small acc-warn"><a href="#/compte">Choisis un pseudo</a> pour apparaître au classement.</p>' : '');
+    } catch (e) {
+      if (!root.contains(box)) return;
+      box.textContent = e.status === 404 ? 'Le classement en ligne de l’Épreuve n’est pas encore activé sur le serveur.' : e.message;
+    }
   }
   function resultHTML(r) {
     return `<section class="panel tr-res ${r.won ? 'won' : 'lost'}"><b>${r.won ? 'Épreuve réussie' : 'Épreuve perdue'}</b>
@@ -59,5 +87,6 @@ export default function trialScreen(app, root) {
   }
   bindActions(root, { go() { result = null; play(); }, share() { share(); } });
   lobby();
+  tuto(app, 'trial');
   return () => { if (battle) { battle.stop(); battle = null; } document.body.classList.remove('battle-mode'); };
 }
