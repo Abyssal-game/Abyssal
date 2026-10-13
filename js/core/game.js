@@ -941,6 +941,24 @@ export class Game {
   }
   // Fin d'expédition : coffre selon la profondeur (une qualité de moins si l'équipe tombe ;
   // en descente maudite, une de plus, mais rien si l'équipe tombe). Éclats : moitié perdue si l'équipe tombe.
+  // Abandon : compte comme une défaite (moitié des éclats, coffre d'un rang plus bas, rien si maudite ; la torche reste utilisée)
+  abandonPreview() {
+    const run = this.s.descent.run;
+    if (!run) return null;
+    const chest = run.free || run.cursed ? null : shiftChest(chestForDepth(run.cleared), (run.nightmare ? 1 : 0) - 1);
+    return { shards: run.cursed ? 0 : Math.floor(run.shards / 2), chest, kept: run.cursed ? 0 : run.chests.length, cursed: !!run.cursed, free: !!run.free };
+  }
+  abandonRun() {
+    const run = this.s.descent.run;
+    if (!run) throw new Error('Aucune expédition en cours.');
+    if (run.trial) throw new Error('L’Épreuve du jour ne s’abandonne pas : rejoue-la quand tu veux.');
+    run.battle = null; run.phase = 'doors'; run.altar = null; run.rewards = null; run.talentOffer = null;
+    this.s.stats.abandons = (this.s.stats.abandons || 0) + 1;
+    const summary = this.endRun(true);
+    summary.abandoned = true;
+    this.persist();
+    return summary;
+  }
   endRun(wiped = false) {
     const d = this.s.descent, run = d.run;
     if (!run) throw new Error('Aucune expédition en cours.');

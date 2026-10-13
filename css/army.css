@@ -1735,3 +1735,10 @@ i.cmb { font-style: normal; color: #FFC266; font-weight: 800; }
 .op-loot .op-burn small { display: inline-flex; align-items: center; gap: 2px; }
 .op-loot .op-burn .ic { width: 16px; height: 16px; }
 .op-tag .ic { width: 13px; height: 13px; vertical-align: -2px; }
+
+/* Pause du combat et abandon de l'expédition */
+.cb-pause { display: grid; gap: 6px; }
+.cb-pause h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; }
+.cb-pause p { margin: 0 0 8px; }
+.cb-abandon, .dc-abandon { color: #FF8A9A !important; border-color: rgba(255, 90, 110, .4) !important; }
+.dc-abandon { margin-top: 10px; opacity: .85; }

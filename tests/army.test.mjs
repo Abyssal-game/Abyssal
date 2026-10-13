@@ -157,3 +157,28 @@ test('changement de rareté : une variante devenue impossible passe en holograph
   assert.equal(g.s.collection[pc.id].v.gold, undefined);
   assert.equal(g.s.collection[pc.id].v.holo, 2);
 });
+
+test('abandon de la Descente : compte comme une défaite, combat effacé', () => {
+  const g = newGame('ab');
+  g.team();
+  g.startRun();
+  const run = g.s.descent.run;
+  run.shards = 41; run.cleared = 6; run.floor = 7;
+  const p = g.abandonPreview();
+  assert.equal(p.shards, 20);
+  assert.equal(p.chest, 'bois', 'coffre d’un rang plus bas (fer → bois)');
+  g.chooseDoor(g.doors()[0]);
+  const s = g.abandonRun();
+  assert.equal(s.abandoned, true);
+  assert.equal(s.wiped, true);
+  assert.equal(s.shards, 20);
+  assert.deepEqual(s.chests, ['bois']);
+  assert.equal(g.s.descent.run, null);
+  // maudite : rien
+  g.s.descent.used = 0;
+  g.startRun({ cursed: true });
+  g.s.descent.run.shards = 50; g.s.descent.run.cleared = 4;
+  const s2 = g.abandonRun();
+  assert.equal(s2.shards, 0);
+  assert.deepEqual(s2.chests, []);
+});

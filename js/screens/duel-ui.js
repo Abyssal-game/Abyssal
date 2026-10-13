@@ -40,7 +40,7 @@ const DANGER = ['', '', 'Danger', 'Mortel'];
 const IN_PIC = { gorge: 'heavy', gather: 'channel', blizzard: 'frost', mimic: 'channel', copy: 'heavy', decree: 'rally', shift: 'charge' };
 const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${IN_PIC[k] || k}.webp">`;
 
-export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.' }) {
+export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.' }) {
   const g = app.game, cat = app.catalog, run = runOpt || g.descent().run, st = run.battle;
   const ui = (app.state.duel ||= { fast: !!g.s.settings?.fastCombat });
   const reduced = app.reduced();
@@ -635,7 +635,21 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
     const b = e.target.closest('[data-d]');
     if (b) {
       const k = b.dataset.d;
-      if (k === 'quit') { toast(pause, { icon: 'swords' }); app.go(''); return; }
+      if (k === 'quit') {
+        if (!onAbandon) { toast(pause, { icon: 'swords' }); app.go(''); return; }
+        const sh = openSheet(`<div class="cb-pause"><h2>${icon('swords')} Pause</h2>
+          <button class="btn primary block" data-p="pause">Mettre en pause</button><p class="small muted">Le combat t’attend dans la Descente, exactement là où tu l’as laissé.</p>
+          <button class="btn ghost block cb-abandon" data-p="abandon">${icon('skull')}Abandonner l’expédition</button><p class="small muted">Compte comme une défaite.</p>
+          <button class="btn ghost block" data-p="back">Reprendre le combat</button></div>`, { label: 'Pause' });
+        sh.body.addEventListener('click', (ev) => {
+          const p = ev.target.closest('[data-p]')?.dataset.p;
+          if (!p) return;
+          sh.close();
+          if (p === 'pause') { toast(pause, { icon: 'swords' }); app.go(''); }
+          if (p === 'abandon') onAbandon();
+        });
+        return;
+      }
       if (k === 'fast') { ui.fast = !ui.fast; b.classList.toggle('on', ui.fast); g.s.settings = { ...g.s.settings, fastCombat: ui.fast }; g.persist(); return; }
       if (k === 'help') return help();
       if (k === 'rule') return ruleSheet(b.dataset.k);

@@ -80,8 +80,8 @@ export default function descent(app, root) {
   function summaryHTML(s) {
     return `<section class="dc-sum2 ${s.wiped ? 'lost' : 'won'}">
       ${crestHTML(!s.wiped, s.floor, 'Étage', 'dc-sum2-crest')}
-      <h2>${s.wiped ? 'L’équipe est tombée' : 'Retour à la surface'}</h2>
-      <p class="dc-sum2-sub">${s.wiped ? 'Tes créatures ont été vaincues, mais ton butin est sauvé.' : 'Tu remontes avec tout ton butin.'}</p>
+      <h2>${s.abandoned ? 'Expédition abandonnée' : s.wiped ? 'L’équipe est tombée' : 'Retour à la surface'}</h2>
+      <p class="dc-sum2-sub">${s.wiped ? (s.cursed ? 'Descente maudite : le butin est perdu.' : 'Tu gardes la moitié des éclats et un coffre plus modeste.') : 'Tu remontes avec tout ton butin.'}</p>
       ${s.nightmareRecord ? `<p class="vx-week">${icon('skull')} Nouveau record en mode Cauchemar : étage ${s.floor} !</p>` : ''}
       ${s.report?.length ? `<div class="dc-why"><b>${icon('info')} Ce qui s’est passé</b>${s.report.map((l) => `<p class="small">${esc(l)}</p>`).join('')}</div>` : ''}
       <div class="dc-sum2-loot">${s.chests.map((c) => `<span class="dc-sum2-chest" style="--cc:${CHESTS[c].color}">${chestSVG(c)}<b>${esc(CHESTS[c].name)}</b></span>`).join('')}${s.shards ? `<span class="dc-sum2-shards">${icon('crystal')}<b>+${fmt(s.shards)}</b><small>éclats</small></span>` : ''}${!s.chests.length && !s.shards ? '<span class="dc-sum2-sub">Aucun butin cette fois.</span>' : ''}</div>
@@ -117,7 +117,8 @@ export default function descent(app, root) {
     const doors = g.doors();
     root.innerHTML = `${runHead(run)}<p class="dc-prompt">${doors.includes('boss') ? 'Un gardien barre la route.' : doors.length > 1 ? 'Deux passages. Le plus dangereux rapporte plus.' : 'Des créatures barrent le passage.'}</p>
       <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r} has-art" data-act="door" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic ${DOOR_PIC[r] ? 'pic' : ''}">${DOOR_PIC[r] ? picon(DOOR_PIC[r]) : icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'boss' ? `<b class="dc-bad">${esc(BOSSES[bossOf(run.floor)].name)}${run.nightmare || run.floor >= AWAKEN_AT ? ' (éveillé)' : ''}</b> : ${esc(BOSSES[bossOf(run.floor)].mechanic)}${run.nightmare || run.floor >= AWAKEN_AT ? ' <b class="dc-bad">Éveillé : sa phase 2 commence dès le premier tour.</b>' : ''}${g.s.bossesBeaten[bossOf(run.floor)] ? ` <b class="dc-good">Contre : ${esc(BOSSES[bossOf(run.floor)].counter)}</b>` : ''}` : r === 'elite' && run.floor >= WEEKLY_FLOOR && !g.weekly().done ? `${ROOMS[r].desc} <b class="dc-good">La créature de la semaine t’y attend !</b>` : ROOMS[r].desc}</span></button>`).join('')}</div>
-      ${run.cleared ? `<button class="btn ghost block" data-act="leave">${icon('back')}Remonter</button>` : ''}`;
+      ${run.cleared ? `<button class="btn ghost block" data-act="leave">${icon('back')}Remonter</button>` : ''}
+      <button class="btn ghost small block dc-abandon" data-act="abandon">Abandonner l’expédition</button>`;
   }
   function clearedView(run, extra = '') {
     const now = g.chestNow(run), next = run.free ? null : chestForDepth(run.floor + 1);
@@ -163,7 +164,7 @@ export default function descent(app, root) {
     if (battle) return;
     playing = true;
     const title = `Étage ${run.floor}${run.room === 'boss' ? ' · Gardien' : run.room === 'elite' ? ' · Élite' : ''}`;
-    battle = runDuel(app, root, { title, onEnd: () => {
+    battle = runDuel(app, root, { title, onAbandon: () => abandon(), onEnd: () => {
       battle = null; playing = false;
       const stats = run.battle?.stats || null;
       app.pendingProgress = [];
@@ -181,6 +182,22 @@ export default function descent(app, root) {
       window.scrollTo(0, 0);
       app.flushProgress();
     } });
+  }
+  // Abandon : confirmation avec les conséquences exactes, puis bilan comme une défaite
+  async function abandon() {
+    const p = g.abandonPreview();
+    if (!p) return;
+    const lines = p.cursed ? ['Descente maudite : <b>tu perds tout</b> (éclats et coffres).']
+      : [`Tu gardes <b>${fmt(p.shards)} éclats</b> (la moitié).`, p.free ? 'Descente libre : pas de coffre.' : p.chest ? `Coffre de fin : <b>${esc(CHESTS[p.chest].name.toLowerCase())}</b> (un rang plus bas).` : 'Pas de coffre de fin (tu n’as passé aucun étage).', p.kept ? `Les ${p.kept} coffre${p.kept > 1 ? 's' : ''} trouvé${p.kept > 1 ? 's' : ''} en route sont gardés.` : ''];
+    lines.push('Ta torche reste utilisée. L’expédition compte comme une défaite.');
+    if (!(await confirmBox(`<b>Abandonner l’expédition ?</b><br>${lines.filter(Boolean).map((l) => `• ${l}`).join('<br>')}`, { ok: 'Abandonner', danger: true }))) return;
+    if (battle) { battle.stop(); battle = null; }
+    playing = false;
+    document.body.classList.remove('battle-mode');
+    app.pendingProgress = [];
+    try { ui.outcome = g.abandonRun(); ui.win = null; } catch (e) { toast(esc(e.message), { kind: 'error' }); }
+    app.sfx.error(); app.chrome(); render(); window.scrollTo(0, 0);
+    app.flushProgress();
   }
   // Pactes de l'Abîme : trois propositions facultatives avant un combat d'élite ou de gardien
   function pactView(run) {
@@ -282,6 +299,7 @@ export default function descent(app, root) {
     bless(el) { ui.bless = null;  try { g.chooseBlessing(el.dataset.k); app.sfx.discover(); clearedView(g.descent().run, `<p class="dc-event">${icon('p:rule')} ${esc(BLESSINGS[el.dataset.k].name)} : ${esc(BLESSINGS[el.dataset.k].desc)}</p>`); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     unaltar() { try { g.cancelAltar(); app.sfx.tap(); render(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     next() { try { g.nextFloor(); app.sfx.swipe(); render(); window.scrollTo(0, 0); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
+    abandon() { abandon(); },
     async leave() {
       if (!(await confirmBox('Remonter maintenant avec ton coffre ?', { ok: 'Remonter' }))) return;
       app.pendingProgress = [];
