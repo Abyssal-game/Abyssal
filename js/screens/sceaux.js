@@ -8,7 +8,7 @@ import { setScene } from '../ui/scene.js';
 import { tuto } from '../ui/tutos.js';
 
 const V = SC.showVal;
-const RULE_ICON = { identique: 'sc-same', somme: 'sc-sum', abime: 'sc-abyss' };
+const RULE_ICON = { identique: 'sc-same', somme: 'sc-sum', abime: 'sc-abyss', sacre: 'sc-sacre', instable: 'sc-instable', faction: 'sc-faction', usure: 'sc-usure', archive: 'sc-archive', neant: 'sc-neant' };
 // « Comment ça marche » : même présentation que la Descente (icône, couleur, numéro)
 const HOW = [['cards', '#7FA8D8', 'Ta main', '5 cartes. Chacune a quatre valeurs, une par côté (de 1 à 10 ; 10 s’écrit A).'],
   ['seal', '#E8C35A', 'Le plateau', 'À tour de rôle, chacun pose une carte sur une case libre du plateau de 3 × 3.'],
@@ -23,7 +23,7 @@ const HOW = [['cards', '#7FA8D8', 'Ta main', '5 cartes. Chacune a quatre valeurs
 const THEME = { initie: 'salle', collectionneur: 'salle-artificiel', stratege: 'salle-celeste', maitre: 'salle-necrotique', echo: 'salle-abyssal', banquier: 'salle-necrotique', archiviste: 'salle-artificiel', souverain: 'salle-abyssal' };
 const RIVAL_OF = (st) => (st.awake ? SC.awakened(SC.RIVAL[st.rival]) : SC.RIVAL[st.rival]);
 const stars = (n) => `${'★'.repeat(n)}${'☆'.repeat(Math.max(0, 5 - n))}`;
-const PERK_IC = { rempart: '🛡', fureur: '⚔' };
+const PERK_IC = { rempart: '<img alt="" src="assets/icons/pk-rempart.webp">', fureur: '<img alt="" src="assets/icons/pk-fureur.webp">' };
 const themeOf = (r) => THEME[r] || 'salle';
 // Portrait peint de l'adversaire (assets/sceaux/rival-*.webp), avec l'ancienne image de créature en secours
 const rivalPic = (cat, R) => `<img alt="" src="assets/sceaux/rival-${R.key}.webp" onerror="this.onerror=null;this.src='${artUrl(cat.get(R.portrait), { lite: true })}'">`;
@@ -138,7 +138,7 @@ export default function sceauxScreen(app, root) {
       const grid = root.querySelector('.sc-plate');
       const el = grid?.querySelector(`.sc-cell[data-i="${f.cell}"]`);
       if (!el) break;
-      if (f.blocked) { el.insertAdjacentHTML('beforeend', '<span class="sc-block">🛡 Rempart !</span>'); el.querySelector('.sc-perk.rempart')?.classList.add('gone'); app.sfx.block?.(); await wait(650); continue; }
+      if (f.blocked) { el.insertAdjacentHTML('beforeend', `<span class="sc-block">${PERK_IC.rempart}Rempart !</span>`); el.querySelector('.sc-perk.rempart')?.classList.add('gone'); app.sfx.block?.(); await wait(650); continue; }
       if (f.rule && f.rule !== shown) {
         shown = f.rule;
         const b = document.createElement('div'); b.className = `sc-combo ${f.rule}`; b.innerHTML = `<img class="sc-cburst" alt="" src="assets/fx/burst.webp"><img class="sc-cico" alt="" src="assets/icons/${{ identique: 'sc-same', somme: 'sc-sum', combo: 'sc-combo', fureur: 'sc-combo' }[f.rule]}.webp"><span>${{ identique: 'Identique !', somme: 'Somme !', combo: 'Combo !', fureur: 'Fureur !' }[f.rule]}</span>`;
@@ -242,7 +242,7 @@ export default function sceauxScreen(app, root) {
     openSheet(`<div class="sc-rules"><h2>Règles des Sceaux</h2>
       <ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol>
       ${Object.values(SC.RULES).filter((r) => r.name !== 'Classique').map((r) => `<p class="small"><b>${esc(r.name)}</b> : ${esc(r.desc)}</p>`).join('')}
-      ${Object.entries(SC.PERKS).map(([k, p]) => `<p class="small"><b>${PERK_IC[k]} ${esc(p.name)}</b> (${p.rar.join(', ')}) : ${esc(p.desc)}</p>`).join('')}
+      ${Object.entries(SC.PERKS).map(([k, p]) => `<p class="small"><b><span class="sc-pkic">${PERK_IC[k]}</span>${esc(p.name)}</b> (${p.rar.join(', ')}) : ${esc(p.desc)}</p>`).join('')}
       <p class="small muted">Victoires payées : ${SC.SCEAUX_REWARD.dailyPaid} par jour. Première victoire contre un adversaire : +${SC.SCEAUX_REWARD.firstWin} éclats. Défi du jour : +${SC.SCEAUX_REWARD.daily}.</p></div>`, { label: 'Règles des Sceaux' });
   }
   function handSheet() {
