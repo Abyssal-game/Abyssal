@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v177';
+const VERSION = 'abyssal-v178';
 const ART_CACHE = 'abyssal-media';  // images du jeu : gardées entre les versions
 const FONT_CACHE = 'abyssal-fonts';
 const CORE = [
@@ -74,7 +74,8 @@ self.addEventListener('fetch', (e) => {
       const hit = await c.match(req);
       // une seule vérification par version du jeu (réponse « inchangée » très légère si l'image n'a pas bougé)
       if (hit && hit.headers.get('x-sw-ver') === VERSION) return hit;
-      const fresh = fetch(req).then(async (res) => {
+      // revalidation auprès du serveur (pas du cache HTTP du navigateur) : une image remplacée arrive vraiment
+      const fresh = fetch(new Request(req, { cache: 'no-cache' })).then(async (res) => {
         if (!res.ok) return null;
         const h = new Headers(res.headers); h.set('x-sw-ver', VERSION);
         const body = await res.clone().blob();

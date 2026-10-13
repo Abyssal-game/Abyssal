@@ -1818,3 +1818,6 @@ body.battle-mode #subnav { display: none !important; }
 .fg-search input { flex: 1; min-height: 40px; background: none; border: 0; color: var(--ink); }
 .fg-mid > b { white-space: normal !important; overflow: visible !important; font-size: .82rem !important; line-height: 1.1 !important; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden !important; }
 .fg-row { grid-template-columns: 46px 1fr auto !important; gap: 8px !important; } .fg-art { width: 46px; } .fg-cell .fg-art { width: 100%; }
+/* Combat : la barre de sous-onglets disparaît et ne décale plus la vue (corrige le grand vide en haut) */
+body.battle-mode #subnav { display: none !important; }
+body.battle-mode.has-subnav #view, body.battle-mode #view { padding: calc(var(--safe-t) + 6px) 8px calc(var(--safe-b) + 8px) !important; }
