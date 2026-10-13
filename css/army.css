@@ -1931,3 +1931,4 @@ body.battle-mode.has-subnav #view, body.battle-mode #view { padding: calc(var(--
 .sl { min-height: 0 !important; }
 @media (max-height: 620px) { .sl-card b { font-size: .44rem !important; letter-spacing: 0; left: 6%; right: 6%; } }
 .sl-card b { letter-spacing: 0; }
+.bn-descente { --bn: url(../assets/ui/bn-descente.webp); }
