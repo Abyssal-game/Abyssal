@@ -32,7 +32,7 @@ export function floorBg(floor, room) {
 }
 const abs = (u) => new URL(u, document.baseURI).href;
 const bgOf = (run) => `url(${abs(floorBg(run.floor, run.room))}), url(${abs(bgOld(run))})`;
-const FX = ['slash', 'impact', 'dodge', 'heal', 'venom', 'frost', 'seal', 'death', 'd20', 'd20-crit', 'd20-fumble'];
+const FX = ['break', 'parry', 'crit', 'swallow', 'iceshatter', 'collapse', 'prey', 'slash', 'impact', 'dodge', 'heal', 'venom', 'frost', 'seal', 'death', 'd20', 'd20-crit', 'd20-fumble'];
 const fxUrl = (n) => `assets/fx/${n}.webp`;
 const DANGER = ['', '', 'Danger', 'Mortel'];
 // Icône peinte d'une intention ennemie
@@ -315,7 +315,7 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
           const crit = lastTier === 'crit', heavy = crit || e.d >= 8;
           lastTier = null;
           if (heavy) await hitstop(crit ? 140 : 70);
-          fxAt(e.u, heavy ? 'impact' : 'slash', { big: heavy });
+          fxAt(e.u, crit ? 'crit' : heavy ? 'impact' : 'slash', { big: heavy });
           float(e.u, crit ? `CRITIQUE −${e.d}` : `-${e.d}`, crit ? 'dmg big crit' : heavy ? 'dmg big' : 'dmg'); (heavy ? app.sfx.smash : app.sfx.slash)(); sparks(e.u, crit ? 'gold' : ''); if (heavy || e.hp <= 0) shake(crit || e.d >= 12);
           await wait(T(heavy ? 300 : 220));
           break;
@@ -329,7 +329,7 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
           await wait(T(320));
           break;
         }
-        case 'parry': app.sfx.parry(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxAt(e.u, 'dodge', { big: true }); sparks(e.u, 'gold'); cam(e.u, -0.8); } banner('Parade parfaite !', 'parry', 800); shake(false); await wait(T(420)); break;
+        case 'parry': app.sfx.parry(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxAt(e.u, 'parry', { big: true }); sparks(e.u, 'gold'); cam(e.u, -0.8); } banner('Parade parfaite !', 'parry', 800); shake(false); await wait(T(420)); break;
         case 'fervor': fervorPop(e.d, e.why); draw(); break;
         case 'brk': { const t = el(e.u)?.querySelector('.cb-brk i'); if (t) t.style.width = `${(e.brk / e.max) * 100}%`; break; }
         case 'broken': {
@@ -339,13 +339,13 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
           await hitstop(160);
           app.sfx.shatter(); draw();
           const t2 = el(e.u); t2?.classList.add('shatter', 'cracked'); ring(e.u, 'break');
-          banner('BRISURE !', 'broken', 1000); sparks(e.u, 'big'); shake(true);
+          banner('BRISURE !', 'broken', 1000); fxAt(e.u, 'break', { big: true }); sparks(e.u, 'big'); shake(true);
           await wait(T(700)); d?.classList.remove('focus');
           break;
         }
         case 'recover': float(e.u, 'Se relève', 'info'); await wait(T(260)); break;
         case 'roll': await rollFx(e); lastTier = e.tier; break;
-        case 'boss': { app.sfx.boss(); const t = el(e.u); if (t) { t.classList.remove('roar'); void t.offsetWidth; t.classList.add('roar'); } float(e.u, e.s, 'boss'); shake(true); await wait(T(650)); break; }
+        case 'boss': { if (e.s === 'Effondrement !') fxAt(null, 'collapse', { center: true }); app.sfx.boss(); const t = el(e.u); if (t) { t.classList.remove('roar'); void t.offsetWidth; t.classList.add('roar'); } float(e.u, e.s, 'boss'); shake(true); await wait(T(650)); break; }
         case 'phase2': {
           app.sfx.boss(); draw(); banner(`${icon('skull')} ${esc(e.s)}`, 'danger', 1200); shake(true); await wait(T(900));
           const P = PHASE2[e.key];
@@ -355,7 +355,7 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
         case 'swallow': {
           const t = el(e.u), b = el(e.a);
           if (t && b && !reduced) { const rt = t.getBoundingClientRect(), rb = b.getBoundingClientRect(); t.style.setProperty('--dx', `${rb.left - rt.left}px`); t.style.setProperty('--dy', `${rb.top - rt.top}px`); t.classList.add('swallowed'); }
-          app.sfx.death(); float(e.a, 'Engloutie !', 'boss'); shake(true); await wait(T(800)); draw(); break;
+          app.sfx.death(); fxAt(e.a, 'swallow', { big: true }); float(e.a, 'Engloutie !', 'boss'); shake(true); await wait(T(800)); draw(); break;
         }
         case 'release': app.sfx.enter(); draw(); el(e.u)?.classList.add('enter'); ring(e.u, 'enter'); await wait(T(400)); break;
         case 'swap': app.sfx.enter(); draw(); el(e.u)?.classList.add('enter'); float(e.u, 'Entre en jeu', 'info'); await wait(T(340)); break;
@@ -364,6 +364,8 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
           if (e.k === 'poison') { if (/\+|×/.test(e.s)) { app.sfx.poison(); fxAt(e.u, 'venom', { big: !!e.syn }); } }
           else if (e.k === 'frost' && /^Gel/.test(e.s) && !/passe/.test(e.s)) { app.sfx.freeze(); fxAt(e.u, 'frost'); }
           else if (e.k === 'guard') { app.sfx.block(); ring(e.u, 'guard'); }
+          if (/vole en éclats/.test(e.s)) { app.sfx.shatter(); fxAt(e.u, 'iceshatter', { big: true }); }
+          if (e.s === 'Proie désignée') fxAt(e.u, 'prey', { big: true });
           else if (e.syn) app.sfx.skill();
           if (e.k === 'entrance') ring(e.u, 'enter');
           float(e.u, e.s, e.syn ? 'syn' : e.k === 'bad' ? 'dmg' : 'info');

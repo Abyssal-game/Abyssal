@@ -1702,3 +1702,15 @@ i.cmb { font-style: normal; color: #FFC266; font-weight: 800; }
 .cb-phimg { width: calc(100% + 36px); margin: -16px -18px 4px; height: 120px; object-fit: cover; border-radius: 14px 14px 0 0; }
 .bx-ph { display: block; width: 100%; max-height: 140px; object-fit: cover; border-radius: 10px; margin-bottom: 6px; }
 .vx-week .vx-gico { display: inline-block !important; width: 20px !important; height: 20px !important; margin: 0 4px 0 0 !important; vertical-align: -4px; }
+
+/* Sceaux : icônes des règles, cœur du Sceau, combinaisons, trophée */
+.sc-ricon { width: 22px; height: 22px; object-fit: contain; margin-right: 4px; vertical-align: -5px; }
+.sc-cell.heart::before { inset: 14% !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important; background: url(../assets/icons/sc-heart.webp) center / contain no-repeat; opacity: .55; }
+.sc-cell.full.heart::before { inset: auto 4px 4px auto !important; width: 26%; height: 26%; opacity: .95; z-index: 4; filter: drop-shadow(0 1px 3px #000); }
+.sc-combo { display: flex; align-items: center; gap: 8px; overflow: visible; }
+.sc-combo .sc-cburst { position: absolute; left: 50%; top: 50%; width: 240px; height: 240px; transform: translate(-50%, -50%); mix-blend-mode: screen; z-index: -1; pointer-events: none; animation: scBurst 1s ease-out forwards; }
+.sc-combo .sc-cico { width: 40px; height: 40px; object-fit: contain; }
+@keyframes scBurst { from { transform: translate(-50%, -50%) scale(.3); opacity: .55; } to { transform: translate(-50%, -50%) scale(1.4); opacity: 0; } }
+.sc-tico { width: 48px; height: 58px; object-fit: contain; }
+@media (prefers-reduced-motion: reduce) { .sc-combo .sc-cburst { display: none; } }
+.sc-combo span { position: relative; text-shadow: 0 0 8px #000, 0 2px 4px #000; }
