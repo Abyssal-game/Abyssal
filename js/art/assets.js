@@ -54,11 +54,12 @@ export function proceduralUrl(card, { alt = false, lite = false, mystery = false
 export function artUrl(card, { variant = 'normal', lite = false, mystery = false } = {}) {
   if (!mystery) {
     const alt = variant === 'alt';
-    if (hasRealArt(card.id, alt)) return `assets/art/${card.id}${alt ? '-alt' : ''}.webp`;
+    const dir = lite ? 'assets/art/lite/' : 'assets/art/'; // miniature légère pour les petites cartes
+    if (hasRealArt(card.id, alt)) return `${dir}${card.id}${alt ? '-alt' : ''}.webp`;
     // Pas d'illustration alternative dédiée : on reprend la vraie image (retournée par le CSS).
-    if (alt && hasRealArt(card.id)) return `assets/art/${card.id}.webp`;
+    if (alt && hasRealArt(card.id)) return `${dir}${card.id}.webp`;
     return proceduralUrl(card, { alt, lite });
   }
-  if (hasRealArt(card.id)) return `assets/art/${card.id}.webp`; // assombrie par le CSS (.is-mystery.real)
+  if (hasRealArt(card.id)) return `assets/art/${lite ? 'lite/' : ''}${card.id}.webp`; // assombrie par le CSS (.is-mystery.real)
   return proceduralUrl(card, { mystery: true });
 }

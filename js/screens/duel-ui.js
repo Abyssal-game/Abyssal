@@ -401,7 +401,7 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
         case 'revive': draw(); float(e.u, 'Relevée !', 'heal'); await wait(T(280)); break;
         case 'phase': draw(); say(e.side === 'enemy' ? '<b class="dc-bad">Tour des créatures corrompues</b>' : 'À toi !'); await wait(T(e.side === 'enemy' ? 380 : 160)); break;
         case 'ult': await ultFx(); break;
-        case 'law': draw(); banner(e.law ? esc(LAWS[e.law].name) : esc(ASPECTS[e.aspect].name), 'skill', 1100); await wait(T(700)); break;
+        case 'law': draw(); banner(e.fatigue ? `${icon('skull')} Épuisement : chaque tour blesse tout le monde` : e.law ? esc(LAWS[e.law].name) : esc(ASPECTS[e.aspect].name), e.fatigue ? 'danger' : 'skill', 1300); await wait(T(e.fatigue ? 900 : 700)); break;
         default: break;
       }
     }

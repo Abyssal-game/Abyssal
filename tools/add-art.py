@@ -34,6 +34,9 @@ im = im.resize((600, 840), Image.LANCZOS) if im.size != (600, 840) else im
 name = f'{card_id}-alt' if alt else card_id
 out = root / 'assets/art' / f'{name}.webp'
 im.save(out, 'WEBP', quality=84, method=6)
+# miniature légère pour les grilles (Collection, équipe, réserve…)
+(root / 'assets/art/lite').mkdir(exist_ok=True)
+im.resize((330, 462), Image.LANCZOS).save(root / 'assets/art/lite' / f'{name}.webp', 'WEBP', quality=72, method=6)
 mf = root / 'assets/art/manifest.json'
 data = json.loads(mf.read_text())
 if name not in data['available']:

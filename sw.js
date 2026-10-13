@@ -1,7 +1,9 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v163';
+const VERSION = 'abyssal-v164';
+const ART_CACHE = 'abyssal-media';  // images du jeu : gardées entre les versions
+const FONT_CACHE = 'abyssal-fonts';
 const CORE = [
   './', 'index.html', 'manifest.webmanifest',
   'css/base.css', 'css/card.css', 'css/screens.css', 'css/army.css',
@@ -39,7 +41,8 @@ self.addEventListener('install', (e) => {
 });
 
 self.addEventListener('activate', (e) => {
-  e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
+  // Les illustrations et les polices gardent leur cache d'une version à l'autre (elles ne changent presque jamais)
+  e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION && k !== ART_CACHE && k !== FONT_CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
 });
 
 self.addEventListener('message', (e) => { if (e.data === 'skipWaiting') self.skipWaiting(); });
@@ -50,7 +53,7 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(req.url);
   // Polices Google : cache au fil de l'eau
   if (url.hostname.endsWith('googleapis.com') || url.hostname.endsWith('gstatic.com')) {
-    e.respondWith(caches.open(VERSION + '-fonts').then(async (c) => {
+    e.respondWith(caches.open(FONT_CACHE).then(async (c) => {
       const hit = await c.match(req);
       if (hit) return hit;
       try { const res = await fetch(req); c.put(req, res.clone()); return res; } catch (err) { return Response.error(); }
@@ -63,14 +66,23 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(fetch(req).then((res) => { if (res.ok) caches.open(VERSION).then((c) => c.put(req, res.clone())); return res; }).catch(() => caches.match(req, { ignoreSearch: true })));
     return;
   }
-  // Illustrations définitives : réseau, puis cache
-  if (url.pathname.includes('/assets/art/') && !url.pathname.endsWith('manifest.json')) {
-    e.respondWith(caches.open(VERSION + '-art').then(async (c) => {
+  // Images (illustrations, icônes, décors, effets) : tout de suite depuis le cache, puis mise à jour
+  // discrète en arrière-plan (une image remplacée apparaît à l'ouverture suivante, sans tout
+  // retélécharger à chaque version)
+  if (url.pathname.includes('/assets/') && /\.(webp|png|jpg)$/.test(url.pathname)) {
+    e.respondWith(caches.open(ART_CACHE).then(async (c) => {
       const hit = await c.match(req);
-      if (hit) return hit;
-      const res = await fetch(req);
-      if (res.ok) c.put(req, res.clone());
-      return res;
+      // une seule vérification par version du jeu (réponse « inchangée » très légère si l'image n'a pas bougé)
+      if (hit && hit.headers.get('x-sw-ver') === VERSION) return hit;
+      const fresh = fetch(req).then(async (res) => {
+        if (!res.ok) return null;
+        const h = new Headers(res.headers); h.set('x-sw-ver', VERSION);
+        const body = await res.clone().blob();
+        await c.put(req, new Response(body, { status: res.status, statusText: res.statusText, headers: h }));
+        return res;
+      }).catch(() => null);
+      if (hit) { e.waitUntil(fresh); return hit; }
+      return (await fresh) || Response.error();
     }));
     return;
   }

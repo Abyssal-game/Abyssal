@@ -589,6 +589,14 @@ export function beginEnemyTurn(st) {
   }
   st.turn = 'enemy';
   for (const u of alive(st, 'enemy')) u.boost = 0;
+  // Épuisement : un combat qui s'éternise blesse tout le monde, de plus en plus (évite les combats sans fin)
+  if (st.round >= FATIGUE_AT) {
+    const d = st.round - FATIGUE_AT + 1;
+    if (d === 1) ev.push({ t: 'law', fatigue: true });
+    for (const u of [...front(st, 'ally'), ...front(st, 'enemy')]) { u.shield = 0; ev.push({ t: 'status', u: u.uid, s: `Épuisement −${d}`, k: 'bad' }); hurt(st, u, d, ev); }
+    check(st, ev);
+    if (st.over) return ev;
+  }
   for (const u of front(st, 'enemy')) tickPoison(st, u, ev);
   check(st, ev);
   if (!st.over && st.bossKey) { bossPhase(st, ev); if (!st.over) bossTick(st, ev); }
@@ -607,6 +615,7 @@ export const PHASE2 = {
   eclipse:    { name: 'Totalité', desc: 'Seules ses faiblesses la blessent pleinement : toutes les autres factions font −40 %.' },
 };
 export const DOOM_TURNS = 3;
+export const FATIGUE_AT = 15; // tour à partir duquel l'Épuisement commence
 function bossPhase(st, ev) {
   const b = front(st, 'enemy').find((u) => u.boss && u.hp > 0);
   if (!b || b.phase2 || (b.hp > b.maxHp / 2 && !b.awakened)) return;
