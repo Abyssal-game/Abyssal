@@ -20,7 +20,7 @@ export default function collection(app, root, params) {
       <span class="progress ui-prog"><i id="col-prog"></i></span>
     </header>
     <div class="col-head-row">
-      <button class="btn small gold col-ritual" data-act="furnace">${icon('p:ritual')}Fournaise</button>
+      <button class="btn small gold col-ritual" data-act="furnace">${icon('p:furnace')}Fournaise</button>
       <div class="seg" role="group" aria-label="Mode d’affichage">${[['grid', 'Grille'], ['album', 'Classeur']].map(([k, l]) => `<button class="seg-b" data-act="view" data-v="${k}" aria-pressed="${(st.view || 'grid') === k}">${l}</button>`).join('')}</div>
     </div>
     <div id="col-main">

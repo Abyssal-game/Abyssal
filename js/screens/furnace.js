@@ -37,17 +37,17 @@ export function openBurn(app, id, { onClose } = {}) {
   const sheet = openSheet('', { cls: 'ritual-sheet', label: 'Fournaise', onClose: () => { onClose && onClose(); app.refreshView && app.refreshView(); } });
   function draw() {
     const e = g.entry(id);
-    if (!e) { sheet.setContent(`<div class="fz-burn"><h2>${icon('p:ritual')} Fournaise</h2><p class="muted">${esc(card.name)} a quitté ta collection.</p><button class="btn block" data-fz="close">Fermer</button></div>`); return; }
+    if (!e) { sheet.setContent(`<div class="fz-burn"><h2>${icon('p:furnace')} Fournaise</h2><p class="muted">${esc(card.name)} a quitté ta collection.</p><button class="btn block" data-fz="close">Fermer</button></div>`); return; }
     const rows = FIN_ORDER.filter((v) => e.v[v] > 0).map((v) => {
       const k = e.v[v], val = g.burnValue(id, v), last = e.n === 1;
       return `<div class="fz-row"><span><b>${esc(VARIANTS[v].name)}</b><small class="muted">×${k} · ${icon('ash')} ${fmt(val)} chacune</small></span>
-        <button class="btn small ${last ? 'danger' : 'gold'}" data-fz="one" data-v="${v}">${icon('p:ritual')}Brûler${last ? ' la dernière' : ''}</button></div>`;
+        <button class="btn small ${last ? 'danger' : 'gold'}" data-fz="one" data-v="${v}">${icon('p:furnace')}Brûler${last ? ' la dernière' : ''}</button></div>`;
     }).join('');
     const sp = g.spareAsh([id]);
     sheet.setContent(`<div class="fz-burn">
-      <h2>${icon('p:ritual')} Fournaise</h2>
+      <h2>${icon('p:furnace')} Fournaise</h2>
       <p class="small muted">${esc(card.name)} · ${e.n} exemplaire${e.n > 1 ? 's' : ''} · niveau ${g.cardLevel(id)}. Une carte brûlée disparaît et laisse des cendres. Les finitions rares en laissent bien plus.</p>
-      ${sp.n ? `<button class="btn primary block" data-fz="spares">${icon('p:ritual')}Brûler les ${sp.n} doublon${sp.n > 1 ? 's' : ''} · +${fmt(sp.ash)} cendres</button>` : ''}
+      ${sp.n ? `<button class="btn primary block" data-fz="spares">${icon('p:furnace')}Brûler les ${sp.n} doublon${sp.n > 1 ? 's' : ''} · +${fmt(sp.ash)} cendres</button>` : ''}
       <div class="fz-rows">${rows}</div>
       <p class="small muted">Tu as ${icon('ash')} <b>${fmt(g.s.ash)}</b> cendres.</p>
     </div>`);
@@ -88,10 +88,10 @@ export function openFurnace(app) {
     const team = g.team().map((id) => cat.get(id)).filter(Boolean);
     const cell = (c, foot, cls = '') => `<button class="ri-hub-c ${cls}" data-id="${c.id}" style="--rc:${RARITY[c.rarity].color}"><span class="ri-hub-art"><img alt="" src="${artUrl(c, { lite: true })}"></span><b>${esc(c.name)}</b>${foot}</button>`;
     sheet.setContent(`<div class="ri-hub-in">
-      <header class="screen-head ui-hero bn-ritual ri-hub-hero"><h1>La Fournaise</h1><p class="muted">Brûle tes cartes pour des cendres, et les cendres renforcent tes créatures.</p>
+      <header class="screen-head ui-hero bn-furnace ri-hub-hero"><h1>La Fournaise</h1><p class="muted">Brûle tes cartes pour des cendres, et les cendres renforcent tes créatures.</p>
         <span class="ri-hub-ash">${icon('ash')}<b>${fmt(g.s.ash)}</b> cendres</span></header>
       <h2 class="section-title">Doublons</h2>
-      ${sp.n ? `<button class="btn primary block" data-fz="all">${icon('p:ritual')}Tout brûler : ${sp.n} doublon${sp.n > 1 ? 's' : ''} · +${fmt(sp.ash)} cendres</button>
+      ${sp.n ? `<button class="btn primary block" data-fz="all">${icon('p:furnace')}Tout brûler : ${sp.n} doublon${sp.n > 1 ? 's' : ''} · +${fmt(sp.ash)} cendres</button>
         <p class="small muted">Un exemplaire de chaque finition est toujours gardé.</p>
         <div class="ri-hub-grid">${spares.map((c) => cell(c, `<span class="ri-hub-step">×${g.spare(c.id)} en trop</span><span class="ri-hub-cost">${icon('ash')} ${fmt(g.spareAsh([c.id]).ash)}</span>`, 'ok')).join('')}</div>`
         : '<p class="small muted">Aucun doublon pour l’instant. Ceux que tu tires dans les boosters arrivent ici.</p>'}
@@ -128,8 +128,8 @@ function openFurnaceCard(app, id, onChange) {
     sh.setContent(`<div class="fz-burn">
       <h2>${esc(c.name)}</h2>
       <p class="small muted">Niveau ${li.level} / ${MAX_LEVEL} · ${g.entry(id).n} exemplaire${g.entry(id).n > 1 ? 's' : ''}</p>
-      ${li.cost ? `<button class="btn gold block" data-fz="up">${icon('star')}Niveau ${li.level + 1} · ${fmt(li.cost)} cendres${gain ? ` <small>(${gain})</small>` : ''}</button>` : '<p class="small dc-good">Niveau maximum.</p>'}
-      <button class="btn ghost block" data-fz="burn">${icon('p:ritual')}La brûler…</button>
+      ${li.cost ? `<button class="btn gold block" data-fz="up">${icon('p:level-up')}Niveau ${li.level + 1} · ${fmt(li.cost)} cendres${gain ? ` <small>(${gain})</small>` : ''}</button>` : '<p class="small dc-good">Niveau maximum.</p>'}
+      <button class="btn ghost block" data-fz="burn">${icon('p:furnace')}La brûler…</button>
       <p class="small muted">Tu as ${icon('ash')} <b>${fmt(g.s.ash)}</b> cendres.</p>
     </div>`);
   };

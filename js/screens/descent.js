@@ -118,7 +118,7 @@ export default function descent(app, root) {
     root.innerHTML = `${runHead(run)}<p class="dc-prompt">${doors.includes('boss') ? 'Un gardien barre la route.' : doors.length > 1 ? 'Deux passages. Le plus dangereux rapporte plus.' : 'Des créatures barrent le passage.'}</p>
       <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r} has-art" data-act="door" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic ${DOOR_PIC[r] ? 'pic' : ''}">${DOOR_PIC[r] ? picon(DOOR_PIC[r]) : icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'boss' ? `<b class="dc-bad">${esc(BOSSES[bossOf(run.floor)].name)}${run.nightmare || run.floor >= AWAKEN_AT ? ' (éveillé)' : ''}</b> : ${esc(BOSSES[bossOf(run.floor)].mechanic)}${run.nightmare || run.floor >= AWAKEN_AT ? ' <b class="dc-bad">Éveillé : sa phase 2 commence dès le premier tour.</b>' : ''}${g.s.bossesBeaten[bossOf(run.floor)] ? ` <b class="dc-good">Contre : ${esc(BOSSES[bossOf(run.floor)].counter)}</b>` : ''}` : r === 'elite' && run.floor >= WEEKLY_FLOOR && !g.weekly().done ? `${ROOMS[r].desc} <b class="dc-good">La créature de la semaine t’y attend !</b>` : ROOMS[r].desc}</span></button>`).join('')}</div>
       ${run.cleared ? `<button class="btn ghost block" data-act="leave">${icon('back')}Remonter</button>` : ''}
-      <button class="btn ghost small block dc-abandon" data-act="abandon">Abandonner l’expédition</button>`;
+      <button class="btn ghost small block dc-abandon" data-act="abandon">${icon('p:abandon')}Abandonner l’expédition</button>`;
   }
   function clearedView(run, extra = '') {
     const now = g.chestNow(run), next = run.free ? null : chestForDepth(run.floor + 1);

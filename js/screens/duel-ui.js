@@ -85,7 +85,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   const statusHTML = (u) => [
     u.broken ? st_('broken', 'Brisé : +50 % de dégâts subis, +5 aux jets') : '',
     u.shield ? st_('shield', 'Bouclier : bloque un coup') : '',
-    u.ward ? st_('shield', `Sceau : absorbe encore ${u.ward} dégâts`, u.ward) : '',
+    u.ward ? st_('seal', `Sceau : absorbe encore ${u.ward} dégâts`, u.ward) : '',
     u.poison ? st_('poison', `Poison : ${u.poison} dégâts au début de son tour`, u.poison) : '',
     u.frozen || u.stunned ? st_('frost', 'Gelé : passe son tour') : '',
     u.slow ? st_('slow', 'Ralenti : prochaine attaque -50 %') : '',
@@ -639,7 +639,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         if (!onAbandon) { toast(pause, { icon: 'swords' }); app.go(''); return; }
         const sh = openSheet(`<div class="cb-pause"><h2>${icon('swords')} Pause</h2>
           <button class="btn primary block" data-p="pause">Mettre en pause</button><p class="small muted">Le combat t’attend dans la Descente, exactement là où tu l’as laissé.</p>
-          <button class="btn ghost block cb-abandon" data-p="abandon">${icon('skull')}Abandonner l’expédition</button><p class="small muted">Compte comme une défaite.</p>
+          <button class="btn ghost block cb-abandon" data-p="abandon">${icon('p:abandon')}Abandonner l’expédition</button><p class="small muted">Compte comme une défaite.</p>
           <button class="btn ghost block" data-p="back">Reprendre le combat</button></div>`, { label: 'Pause' });
         sh.body.addEventListener('click', (ev) => {
           const p = ev.target.closest('[data-p]')?.dataset.p;

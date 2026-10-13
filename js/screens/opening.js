@@ -13,7 +13,7 @@ import { keywordOf, KEYWORDS } from '../core/duel.js';
 const RI = (r) => ['C', 'PC', 'R', 'HR', 'M', 'S'].indexOf(r);
 
 // preset : ouverture déjà tirée ailleurs (Tirage des Ombres) : rien n'est ajouté à la collection
-export function openPack(app, type, { faction, onDone, preset = null, title = null } = {}) {
+export function openPack(app, type, { faction, onDone, preset = null, title = null, packKey = null } = {}) {
   const g = app.game, cat = app.catalog;
   let result;
   if (!preset) app.pendingProgress = [];
@@ -86,7 +86,7 @@ export function openPack(app, type, { faction, onDone, preset = null, title = nu
   };
 
   function showPack() {
-    const pk = packHTML(type, cat, { faction, event: ev });
+    const pk = packHTML(packKey || type, cat, { faction, event: ev });
     const slices = Array.from({ length: SLICES }, (_, i) => `<div class="pk-slice" style="clip-path:${sliceClip(i / SLICES, (i + 1) / SLICES)};transform-origin:${(((i + 0.5) / SLICES) * 100).toFixed(1)}% 10.5%">${pk}</div>`).join('');
     stage.innerHTML = `<div class="op-pack" role="button" tabindex="0" aria-label="Ouvrir le booster : glisse le doigt le long de la ligne pointillée, ou touche-le">
       <div class="pk-inside"><div class="pk-cards"><div class="tcg-back">${EMBLEM}</div></div></div>
@@ -360,7 +360,7 @@ export function openPack(app, type, { faction, onDone, preset = null, title = nu
         ${r.shards ? `<span>${icon('crystal')}<b>+${fmt(r.shards)}</b><small>éclats</small></span>` : ''}
         ${r.ash ? `<span>${icon('ash')}<b>+${fmt(r.ash)}</b><small>cendres</small></span>` : ''}
         ${r.xp ? `<span>${picon('xp')}<b>+${fmt(r.xp)}</b><small>XP</small></span>` : ''}
-        ${dupAsh ? `<button class="op-burn" data-op="burn" aria-label="Brûler les doublons de ce booster pour ${fmt(dupAsh)} cendres">${icon('p:ritual')}<b>Brûler</b><small>+${fmt(dupAsh)} ${icon('ash')}</small></button>` : ''}
+        ${dupAsh ? `<button class="op-burn" data-op="burn" aria-label="Brûler les doublons de ce booster pour ${fmt(dupAsh)} cendres">${icon('p:furnace')}<b>Brûler</b><small>+${fmt(dupAsh)} ${icon('ash')}</small></button>` : ''}
       </div>
       <p class="small muted center op-sum-hint">Touche une carte pour l’examiner.</p>
     </div>`;

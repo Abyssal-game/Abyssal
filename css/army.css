@@ -1746,7 +1746,7 @@ i.cmb { font-style: normal; color: #FFC266; font-weight: 800; }
 p.dt-showv .ic { width: 14px; height: 14px; }
 
 /* Tirage des Ombres */
-.bn-shadow { --bn: url(../assets/ui/bn-event.webp); }
+.bn-shadow { --bn: url(../assets/ui/bn-shadow.webp); } .bn-furnace { --bn: url(../assets/ui/bn-furnace.webp); }
 .sh-banner { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 12px 14px; color: var(--ink); text-decoration: none; border: 1px solid rgba(176, 75, 255, .55); background: linear-gradient(120deg, rgba(60, 20, 90, .85), rgba(16, 10, 26, .95)); box-shadow: 0 0 18px rgba(176, 75, 255, .25); }
 .sh-banner > span:nth-child(2) { display: grid; gap: 2px; flex: 1; min-width: 0; }
 .sh-b-ic .picon, .sh-b-ic img { width: 38px; height: 38px; }

@@ -33,8 +33,8 @@ export function pityHTML(g) {
 }
 
 export function packHTML(type, cat, { faction, event } = {}) {
-  const def = BOOSTERS[type];
-  let label = def.name.replace('Booster ', '');
+  const def = BOOSTERS[type] || { name: type === 'shadow' ? 'Booster des Ombres' : 'Booster' };
+  let label = type === 'shadow' ? 'Ombres' : def.name.replace('Booster ', '');
   let key = type;
   if (type === 'faction' && faction) { label = cat.faction[faction].name; key = faction; }
   if (type === 'event' && event) label = event.name;
@@ -115,7 +115,7 @@ export default function shop(app, root, params = []) {
       <header class="screen-head">
         <h1>Boosters</h1>
       </header>
-      <a class="panel sh-banner" href="#/tirage"><span class="sh-b-ic">${icon('p:booster')}</span><span><b>Le Tirage des Ombres</b><span class="small muted">${g.shadowState().paid[parisDay()] ? 'Tirage du jour fait · voir le classement' : 'Ton booster gratuit du jour pour le classement de la semaine'}</span></span><span class="sh-b-go">${icon('next')}</span></a>
+      <a class="panel sh-banner" href="#/tirage"><span class="sh-b-ic">${icon('p:shadow')}</span><span><b>Le Tirage des Ombres</b><span class="small muted">${g.shadowState().paid[parisDay()] ? 'Tirage du jour fait · voir le classement' : 'Ton booster gratuit du jour pour le classement de la semaine'}</span></span><span class="sh-b-go">${icon('next')}</span></a>
       <div class="products">
         ${card('standard')}
         ${card('faction', '', `<div class="chips fac-pick fac-grid" role="radiogroup" aria-label="Faction du booster">${FACTION_ORDER.map((f) => `<button class="chip" role="radio" data-act="pickfac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}" aria-checked="${st.faction === f}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>`)}

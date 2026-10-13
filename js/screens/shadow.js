@@ -63,7 +63,7 @@ export default function shadowScreen(app, root) {
     return `<section class="panel sh-pick"><h2 class="section-title">Ton tirage du jour</h2>
       <p class="small">Choisis d’abord une faction : ses cartes vaudront <b>le double</b>. Valeur : Commune ${LUCK_POINTS.C}, Peu commune ${LUCK_POINTS.PC}, Rare ${LUCK_POINTS.R}, Hyper rare ${LUCK_POINTS.HR}, Mythique ${LUCK_POINTS.M}, Secrète ${LUCK_POINTS.S}, +${LUCK_POINTS.variant} par finition.</p>
       <div class="chips fac-grid sh-fac" role="radiogroup" aria-label="Faction double">${FACTION_ORDER.map((f) => `<button class="chip" role="radio" data-act="fac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${ui.faction === f}" aria-checked="${ui.faction === f}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>
-      <button class="btn primary block big-cta dc-plq dc-plq-red" data-act="draw" ${ui.faction && !busy ? '' : 'disabled'}>${icon('p:booster')}${ui.faction ? 'Ouvrir le booster des Ombres' : 'Choisis une faction'}</button>
+      <button class="btn primary block big-cta dc-plq dc-plq-red" data-act="draw" ${ui.faction && !busy ? '' : 'disabled'}>${icon('p:shadow')}${ui.faction ? 'Ouvrir le booster des Ombres' : 'Choisis une faction'}</button>
     </section>`;
   }
   function mineHTML() {
@@ -116,7 +116,7 @@ export default function shadowScreen(app, root) {
     mine = { cards, score: res.score, faction: ui.faction, day: res.day };
     const shards = g.shadowPay(res.day);
     app.chrome?.();
-    openPack(app, 'standard', { title: 'Booster des Ombres', preset: { cards, score: res.score, rewards: { shards, xp: 0 } }, onDone: () => draw() });
+    openPack(app, 'standard', { title: 'Booster des Ombres', packKey: 'shadow', preset: { cards, score: res.score, rewards: { shards, xp: 0 } }, onDone: () => draw() });
     draw();
   }
   bindActions(root, {

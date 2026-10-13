@@ -21,7 +21,7 @@ export default function menu(app, root) {
       ${T('#/profil', 'seal', 'Profil', 'Vitrine, titres, statistiques')}
       ${T('#/succes', 'crown', 'Succès', `${achDone} / ${cat.achievements.length} débloqués`)}
       ${T('#/bestiaire', 'book', 'Bestiaire', 'Créatures, royaumes, histoire')}
-      ${A('furnace', 'ritual', 'La Fournaise', 'Brûler des cartes, renforcer ses créatures')}
+      ${A('furnace', 'furnace', 'La Fournaise', 'Brûler des cartes, renforcer ses créatures')}
       ${T('#/compte', 'account', 'Compte en ligne', isLoggedIn() ? `Connecté${sync.profile?.pseudo ? ` · ${esc(sync.profile.pseudo)}` : ''}` : 'Sauvegarde, classement')}
       ${T('#/parametres', 'settings', 'Réglages', 'Son, tutoriels, sauvegarde')}
       ${creator ? A('creator', 'creator', 'Mode Créateur', s.settings.dev ? 'Actif' : 'Pouvoirs du créateur') : ''}

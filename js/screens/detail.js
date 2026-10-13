@@ -104,7 +104,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
           <button class="dt-act ${isAvatar ? 'on' : ''}" data-act="avatar">${picon('avatar')}<span>${isAvatar ? 'Mon avatar' : 'Avatar'}</span></button>
           <button class="dt-act ${inShow ? 'on' : ''}" data-act="showcase">${picon('showcase')}<span>${inShow ? 'En vitrine' : 'Vitrine'}</span></button>
           <button class="dt-act" data-act="artonly">${picon('illus')}<span>Illustration</span></button>
-          <button class="dt-act" data-act="burn">${picon('ritual')}<span>Brûler</span></button>
+          <button class="dt-act" data-act="burn">${picon('furnace')}<span>Brûler</span></button>
         </div>
         <div class="dt-tabs" role="tablist">${tabs.map(([k, ic, l]) => `<button class="dt-tab" role="tab" data-act="tab" data-v="${k}" aria-selected="${dtab === k}">${picon(ic)}<span>${l}</span></button>`).join('')}</div>
         <div class="panel dt-pane">${TAB[dtab]}</div>`;
