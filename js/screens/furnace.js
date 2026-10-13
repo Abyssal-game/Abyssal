@@ -7,7 +7,7 @@ import { openSheet, confirmBox, esc, toast, fmt } from '../ui/dom.js';
 import { duelUnit } from '../core/duel.js';
 import { MAX_LEVEL } from '../core/army.js';
 
-const FIN_ORDER = ['normal', 'holo', 'gold', 'galaxy', 'special'];
+const FIN_ORDER = ['normal', 'holo', 'gold', 'galaxy'];
 
 // Monte d'un niveau (bouton « Niveau suivant » des fiches)
 export function upgradeCard(app, id) {

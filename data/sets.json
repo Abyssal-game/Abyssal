@@ -5,8 +5,7 @@
   "desc": "Orgueil, avarice, luxure, envie, gourmandise, colère, paresse : un prince pour chaque faute.",
   "reward": {
    "shards": 500,
-   "title": "Pécheur accompli",
-   "special": "INF-052"
+   "title": "Pécheur accompli"
   },
   "cards": [
    "INF-039",
@@ -25,8 +24,7 @@
   "reward": {
    "shards": 600,
    "title": "Héritier de la Titanomachie",
-   "frame": "titan",
-   "special": "PRI-050"
+   "frame": "titan"
   },
   "cards": [
    "PRI-015",
@@ -50,8 +48,7 @@
   "reward": {
    "shards": 500,
    "title": "Vassal des Enfers",
-   "frame": "infernal",
-   "special": "INF-053"
+   "frame": "infernal"
   },
   "cards": [
    "INF-033",
@@ -74,8 +71,7 @@
    "tickets": {
     "premium": 1
    },
-   "title": "Dompteur de wyrms",
-   "special": "PRI-051"
+   "title": "Dompteur de wyrms"
   },
   "cards": [
    "PRI-019",
@@ -96,8 +92,7 @@
   "reward": {
    "shards": 500,
    "title": "Porteur d’auréole",
-   "frame": "celeste",
-   "special": "CEL-043"
+   "frame": "celeste"
   },
   "cards": [
    "CEL-017",
@@ -119,8 +114,7 @@
   "reward": {
    "shards": 600,
    "title": "Chasseur de fléaux",
-   "frame": "sauvage",
-   "special": "SAU-044"
+   "frame": "sauvage"
   },
   "cards": [
    "INF-049",
@@ -145,8 +139,7 @@
   "reward": {
    "shards": 450,
    "title": "Dernier fidèle",
-   "frame": "primordial",
-   "special": "NEC-043"
+   "frame": "primordial"
   },
   "cards": [
    "INF-041",
@@ -166,8 +159,7 @@
   "reward": {
    "shards": 500,
    "title": "Souverain des fosses",
-   "frame": "abyssal",
-   "special": "ABY-039"
+   "frame": "abyssal"
   },
   "cards": [
    "ABY-030",
@@ -189,8 +181,7 @@
   "reward": {
    "shards": 400,
    "title": "Témoin des plaies",
-   "frame": "necrotique",
-   "special": "CEL-030"
+   "frame": "necrotique"
   },
   "cards": [
    "INF-010",
@@ -213,8 +204,7 @@
     "premium": 1
    },
    "title": "Celui qui a regardé le Néant",
-   "frame": "neant",
-   "special": "PRI-052"
+   "frame": "neant"
   },
   "cards": [
    "ABY-042",
@@ -232,8 +222,7 @@
   "desc": "Signatures, dîmes et promesses : la comptabilité de l’Enfer.",
   "reward": {
    "shards": 300,
-   "title": "Signataire",
-   "special": "INF-038"
+   "title": "Signataire"
   },
   "cards": [
    "INF-001",
@@ -252,8 +241,7 @@
   "reward": {
    "shards": 300,
    "title": "Lecteur de la Goétie",
-   "frame": "artificiel",
-   "special": "INF-036"
+   "frame": "artificiel"
   },
   "cards": [
    "INF-023",

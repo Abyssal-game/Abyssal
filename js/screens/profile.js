@@ -8,7 +8,7 @@ import { RARITIES, FRAMES, BOOSTERS, FACTION_ORDER, VARIANTS, RARITY, RARITY_ORD
 export default function profile(app, root) {
   const g = app.game, cat = app.catalog;
 
-  const VORDER = ['special', 'galaxy', 'gold', 'holo'];
+  const VORDER = ['galaxy', 'gold', 'holo'];
   function luckHTML() {
     const s = g.s, st = s.stats;
     if (!st.boosters) return '';
@@ -16,7 +16,7 @@ export default function profile(app, root) {
     const owned = Object.keys(s.collection).map((id) => cat.get(id)).filter(Boolean);
     const vRank = (id) => { const e = g.entry(id); const i = VORDER.findIndex((v) => e.v[v]); return i < 0 ? 99 : i; };
     const rarest = owned.sort((a, b) => RARITY_ORDER.indexOf(b.rarity) - RARITY_ORDER.indexOf(a.rarity) || vRank(a.id) - vRank(b.id) || g.entry(a.id).first - g.entry(b.id).first)[0];
-    const rv = rarest ? (VORDER.find((v) => g.entry(rarest.id).v[v]) || 'normal') : 'normal';
+    const rv = rarest ? g.shownVariant(rarest.id) : 'normal';
     const ratio = st.expHR > 0.5 ? st.gotHR / st.expHR : null;
     const verdict = ratio === null ? 'Ouvre encore quelques boosters pour mesurer ta chance.'
       : ratio >= 1.5 ? 'Les sceaux te sourient : une chance insolente.' : ratio >= 1.1 ? 'Plus chanceux que la moyenne.' : ratio >= 0.9 ? 'Pile dans la moyenne.' : ratio >= 0.6 ? 'Un peu en dessous de la moyenne… pour l’instant.' : 'Le Néant te met à l’épreuve. Ça va tourner.';
@@ -51,7 +51,7 @@ export default function profile(app, root) {
       </section>
 
       <h2 class="section-title">Vitrine</h2>
-      ${show.length ? `<div class="showcase" id="showcase">${show.map((c) => { const e = g.entry(c.id); const v = ['special', 'galaxy', 'gold', 'holo'].find((x) => e.v[x]) || 'normal'; return cardHTML(c, { variant: v }); }).join('')}</div><p class="small muted">${s.showcase.length ? 'Tes cartes mises en vitrine.' : 'Tes cartes les plus prestigieuses. Mets-en d’autres en vitrine depuis leur fiche.'}</p>` : '<p class="muted">Ta vitrine est vide : ouvre ton premier booster.</p>'}
+      ${show.length ? `<div class="showcase" id="showcase">${show.map((c) => { const e = g.entry(c.id); const v = g.shownVariant(c.id); return cardHTML(c, { variant: v }); }).join('')}</div><p class="small muted">${s.showcase.length ? 'Tes cartes mises en vitrine.' : 'Tes cartes les plus prestigieuses. Mets-en d’autres en vitrine depuis leur fiche.'}</p>` : '<p class="muted">Ta vitrine est vide : ouvre ton premier booster.</p>'}
 
       <div class="stats-grid pf-3">
         <div class="panel stat"><b>${owned}</b><span>créatures sur ${total}</span></div>

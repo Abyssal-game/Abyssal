@@ -63,14 +63,16 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     const r = RARITY[card.rarity];
     if (owned && e.isNew) g.markSeen(current);
     const ownedVariants = owned ? Object.keys(e.v).filter((v) => e.v[v] > 0) : [];
-    if (!shownVariant || !ownedVariants.includes(shownVariant)) shownVariant = ownedVariants.includes('normal') ? 'normal' : ownedVariants[0] || 'normal';
+    if (!shownVariant || !ownedVariants.includes(shownVariant)) shownVariant = owned ? g.shownVariant(current) : 'normal';
     const idx = list ? list.indexOf(current) : -1;
     const nav = list && list.length > 1 ? `<div class="detail-nav"><button class="icon-btn" data-act="prev" aria-label="Carte précédente" ${idx <= 0 ? 'disabled' : ''}>${icon('prev')}</button><span class="small muted">${idx + 1} / ${list.length}</span><button class="icon-btn" data-act="next" aria-label="Carte suivante" ${idx >= list.length - 1 ? 'disabled' : ''}>${icon('next')}</button></div>` : '';
 
     const variantsRow = owned ? `<div class="variant-row" role="group" aria-label="Variantes">${card.variants.map((v) => {
       const has = ownedVariants.includes(v);
       return `<button class="chip" data-act="variant" data-v="${v}" aria-pressed="${v === shownVariant}" ${has ? '' : 'disabled'} title="${has ? 'Afficher' : 'Pas encore obtenue'}">${has ? '' : icon('lock')}${VARIANTS[v].short}${has && e.v[v] > 1 ? ` ×${e.v[v]}` : ''}</button>`;
-    }).join('')}</div>` : '';
+    }).join('')}</div>${ownedVariants.length > 1 ? (g.shownVariant(current) === shownVariant
+      ? `<p class="small muted center dt-showv">${icon('check')} Apparence affichée partout</p>`
+      : `<button class="btn small gold dt-showv" data-act="showv">${icon('eye')}Afficher cette apparence partout</button>`) : ''}` : '';
 
     let body;
     if (owned) {
@@ -133,6 +135,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     prev() { const i = list.indexOf(current); if (i > 0) { current = list[i - 1]; shownVariant = null; draw(); } },
     next() { const i = list.indexOf(current); if (i < list.length - 1) { current = list[i + 1]; shownVariant = null; draw(); } },
     variant(el) { shownVariant = el.dataset.v; draw(); },
+    showv() { try { g.setShownVariant(current, shownVariant); app.sfx.tap(); toast(`Apparence <b>${esc(VARIANTS[shownVariant].name.toLowerCase())}</b> affichée partout.`, { icon: 'eye' }); draw(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } },
     avatar() { g.setAvatar(current); toast('Avatar mis à jour.', { icon: 'user' }); draw(); },
     showcase() { g.toggleShowcase(current); draw(); },
     team() { if (toggleTeam(app, current)) draw(); },

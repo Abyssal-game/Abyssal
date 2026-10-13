@@ -149,7 +149,6 @@ test('changement de rareté : une variante devenue impossible passe en holograph
   const g = newGame('fix');
   const c = catalog.get('INF-048'); // passée de Hyper rare à Rare
   g.addCard(c.id);
-  g.s.collection[c.id].v.special = 0;
   const pc = catalog.byRarity.PC[0];
   g.addCard(pc.id);
   g.s.collection[pc.id].v.gold = 2; // l'or n'existe pas pour les Peu communes
@@ -181,4 +180,23 @@ test('abandon de la Descente : compte comme une défaite, combat effacé', () =>
   const s2 = g.abandonRun();
   assert.equal(s2.shards, 0);
   assert.deepEqual(s2.chests, []);
+});
+
+test('apparence affichée : choisie par le joueur, sinon la plus rare ; ancienne Édition des Sceaux convertie', async () => {
+  const g = newGame('show');
+  const c = catalog.byRarity.R[0];
+  g.addCard(c.id); g.addCard(c.id, 'holo');
+  assert.equal(g.shownVariant(c.id), 'holo', 'par défaut : la plus rare');
+  g.setShownVariant(c.id, 'normal');
+  assert.equal(g.shownVariant(c.id), 'normal');
+  assert.throws(() => g.setShownVariant(c.id, 'gold'));
+  g.burn(c.id, 'normal');
+  assert.equal(g.shownVariant(c.id), 'holo', 'finition choisie brûlée : retour à la plus rare');
+  assert.ok(catalog.cards.every((x) => !x.variants.includes('special')));
+  const { migrate } = await import('../js/core/save.js');
+  const raw = JSON.parse(JSON.stringify(g.s));
+  raw.collection[c.id].v.special = 2;
+  const s = migrate(raw);
+  assert.equal(s.collection[c.id].v.special, undefined);
+  assert.equal(s.collection[c.id].v.normal, 2);
 });

@@ -26,7 +26,7 @@ test('les ensembles référencent des cartes existantes', () => {
   for (const s of catalog.sets) {
     assert.ok(s.cards.length >= 5, `${s.key} trop petit`);
     s.cards.forEach((id) => assert.ok(catalog.get(id), `${s.key} : ${id}`));
-    if (s.reward.special) assert.ok(catalog.get(s.reward.special).variants.includes('special'));
+    assert.ok(!s.reward.special, 'l’Édition des Sceaux n’existe plus');
   }
 });
 
@@ -138,7 +138,6 @@ test('succès et ensembles débloqués et sauvegardés', () => {
   const again = new Game(catalog, store);
   assert.ok(again.s.achievements.first_card);
   assert.ok(again.s.setsDone.peches);
-  assert.ok(again.s.collection[set.reward.special].v.special);
 });
 
 test('faction complète : récompense et cadre', () => {

@@ -21,7 +21,7 @@ export const armyBadges = (g, c) => {
   const u = duelUnit(c, { level: g.owns(c.id) ? g.cardLevel(c.id) : 1, form: fm }), kw = KEYWORDS[keywordOf(c)];
   return `${fm ? '<span class="fm-tag">Corrompue</span>' : ''}<span class="v2-badges"><span class="v2-role" style="--ro:${ROLES[roleOf(c)].color}" title="${esc(kw.name)}">${roleIcon(keywordOf(c))}</span>${g.owns(c.id) ? `<span class="v2-lv">Niv. ${g.cardLevel(c.id)}</span>` : ''}<span class="v2-cost">${COST[c.rarity]}</span><span class="v2-ah"><i>${icon('swords')}${u.atk}</i><i>${icon('heart')}${u.maxHp}</i></span></span>`;
 };
-export const armyCard = (g, c, opts = {}) => cardHTML(c, { ...opts, tag: armyBadges(g, c) });
+export const armyCard = (g, c, opts = {}) => cardHTML(c, { variant: g.owns(c.id) ? g.shownVariant(c.id) : 'normal', ...opts, tag: armyBadges(g, c) });
 
 // Bloc « Au combat » d'une carte : attaque, PV, capacité, pouvoir, niveau
 export function combatHTML(g, c) {

@@ -70,7 +70,8 @@ export default function collection(app, root, params) {
   }
 
   function bestVariant(e) {
-    for (const v of ['special', 'galaxy', 'gold', 'holo']) if (e.v[v]) return v;
+    if (e.show && e.v[e.show] > 0) return e.show;
+    for (const v of ['galaxy', 'gold', 'holo']) if (e.v[v]) return v;
     return 'normal';
   }
 

@@ -25,8 +25,8 @@ export function cardHTML(card, opts = {}) {
     ? `<img alt="" decoding="async" data-lazy="${lite ? 1 : 0}${mystery ? 1 : 0}" data-card="${card.id}" data-variant="${variant}">`
     : `<img alt="" decoding="async" src="${artUrl(card, { variant, lite, mystery })}" data-card="${card.id}" data-variant="${variant}">`;
   const name = mystery ? (nameKnown ? esc(card.name) : 'Inconnue') : esc(card.name);
-  // Cadre illustré des variantes Or, Cosmique et Édition des Sceaux (posé au-dessus de la carte)
-  const vframe = !mystery && ['gold', 'galaxy', 'special'].includes(variant) ? '<div class="tcg-vframe"></div>' : '';
+  // Cadre illustré des variantes Or et Cosmique (posé au-dessus de la carte)
+  const vframe = !mystery && ['gold', 'galaxy'].includes(variant) ? '<div class="tcg-vframe"></div>' : '';
   const label = mystery ? `Carte non découverte ${card.id}${nameKnown ? ', ' + card.name : ''}` : `${card.name}, ${r.name}${variant !== 'normal' ? ', ' + VARIANTS[variant].name : ''}`;
 
   if (size === 'mini') {

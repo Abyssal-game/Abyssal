@@ -2279,8 +2279,7 @@
    "normal",
    "holo",
    "galaxy",
-   "gold",
-   "special"
+   "gold"
   ],
   "art": {
    "form": "hum",
@@ -2335,8 +2334,7 @@
    "normal",
    "holo",
    "galaxy",
-   "gold",
-   "special"
+   "gold"
   ],
   "art": {
    "form": "dragon",
@@ -2384,8 +2382,7 @@
    "normal",
    "holo",
    "galaxy",
-   "gold",
-   "special"
+   "gold"
   ],
   "art": {
    "form": "orb",

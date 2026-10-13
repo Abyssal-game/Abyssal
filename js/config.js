@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v169'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v170'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -56,14 +56,15 @@ export const BOOSTERS = {
 // Par booster standard de 5 cartes : ~12 % d'une holographique, ~2,5 % d'une or, ~0,5 % d'une cosmique.
 export const VARIANT_RATES = { holo: 2.5, gold: 0.5, galaxy: 0.1 };
 // Anciennes variantes retirées : les exemplaires possédés deviennent la variante indiquée.
-export const OLD_VARIANTS = { chroma: 'holo', corrupt: 'holo', alt: 'holo', ancestral: 'gold' };
+export const OLD_VARIANTS = { chroma: 'holo', corrupt: 'holo', alt: 'holo', ancestral: 'gold', special: 'normal' };
+// Ordre d'affichage par défaut : la finition la plus rare possédée
+export const SHOW_ORDER = ['galaxy', 'gold', 'holo', 'normal'];
 
 export const VARIANTS = {
   normal:    { name: 'Normale',                  short: 'Normale' },
   holo:      { name: 'Holographique',            short: 'Holo' },
   gold:      { name: 'Feuille d’or',             short: 'Or' },
   galaxy:    { name: 'Cosmique',                 short: 'Cosmique' },
-  special:   { name: 'Édition des Sceaux',       short: 'Édition' },
 };
 
 // Événements hebdomadaires : rotation chaque lundi (heure locale).
@@ -81,7 +82,7 @@ export const ECONOMY = {
   discoveryShards: { C: 1, PC: 3, R: 6, HR: 13, M: 25, S: 50 },
   // Fournaise : cendres rendues par un exemplaire brûlé (rareté × finition)
   burnAsh: { C: 3, PC: 6, R: 15, HR: 40, M: 100, S: 250 },
-  burnFinish: { normal: 1, holo: 3, gold: 8, galaxy: 20, special: 4 },
+  burnFinish: { normal: 1, holo: 3, gold: 8, galaxy: 20 },
   // Niveau des créatures : passer du niveau n à n+1 coûte levelAsh × n cendres (niveau 10 au plus)
   levelAsh: { C: 10, PC: 15, R: 25, HR: 40, M: 60, S: 80 },
   craftAsh: { C: 40, PC: 100, R: 250, HR: 600, M: 1600 }, // les secrètes ne s'invoquent pas

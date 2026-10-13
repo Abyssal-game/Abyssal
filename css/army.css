@@ -1742,3 +1742,5 @@ i.cmb { font-style: normal; color: #FFC266; font-weight: 800; }
 .cb-pause p { margin: 0 0 8px; }
 .cb-abandon, .dc-abandon { color: #FF8A9A !important; border-color: rgba(255, 90, 110, .4) !important; }
 .dc-abandon { margin-top: 10px; opacity: .85; }
+.dt-showv { display: flex; justify-content: center; align-items: center; gap: 4px; margin: 6px auto 12px !important; }
+p.dt-showv .ic { width: 14px; height: 14px; }

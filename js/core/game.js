@@ -1,6 +1,6 @@
 // État du joueur et règles de progression. Toute modification passe par ici
 // et est enregistrée immédiatement : une carte affichée est une carte sauvegardée.
-import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, LUCK_POINTS, ITEMS } from '../config.js';
+import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, LUCK_POINTS, ITEMS, SHOW_ORDER } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
 import { rngOf, DESCENT, CHESTS, floorDoors, floorEnemies, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES } from './descent.js';
@@ -319,6 +319,19 @@ export class Game {
     return { shards: x.shards, progress };
   }
 
+  // Apparence affichée partout : celle choisie par le joueur, sinon la plus rare possédée
+  shownVariant(id) {
+    const e = this.entry(id);
+    if (!e) return 'normal';
+    if (e.show && e.v[e.show] > 0) return e.show;
+    return SHOW_ORDER.find((v) => e.v[v] > 0) || 'normal';
+  }
+  setShownVariant(id, v) {
+    const e = this.entry(id);
+    if (!e || !(e.v[v] > 0)) throw new Error('Tu ne possèdes pas cette finition.');
+    e.show = v;
+    this.persist();
+  }
   // Doublons et Fournaise -------------------------------------------------
   // Un doublon = un exemplaire en plus du premier, dans la même finition (chaque finition gardée une fois).
   spare(id) { const e = this.s.collection[id]; return e ? Object.values(e.v).reduce((a, k) => a + Math.max(0, (k || 0) - 1), 0) : 0; }
@@ -1015,7 +1028,7 @@ export class Game {
       const card = this.catalog.get(id);
       if (!card) continue;
       for (const v of Object.keys(e.v)) {
-        if (!e.v[v] || card.variants.includes(v) || v === 'special') continue;
+        if (!e.v[v] || card.variants.includes(v)) continue;
         const to = card.variants.includes('holo') ? 'holo' : 'normal';
         e.v[to] = (e.v[to] || 0) + e.v[v]; delete e.v[v]; changed = true;
       }
@@ -1103,7 +1116,6 @@ export class Game {
     for (const [k, n] of Object.entries(reward.tickets || {})) this.s.tickets[k] = (this.s.tickets[k] || 0) + n;
     if (reward.title && !this.s.titles.includes(reward.title)) this.s.titles.push(reward.title);
     if (reward.frame && !this.s.frames.includes(reward.frame)) this.s.frames.push(reward.frame);
-    if (reward.special) this.addCard(reward.special, 'special', 'reward');
     if (reward.chests) this.addChests(reward.chests);
   }
 
