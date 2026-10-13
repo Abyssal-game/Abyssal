@@ -1,0 +1,189 @@
+/* ——— Décor du plateau de combat : donjon miniature (js/ui/diorama.js) ———
+   Ordre des couches : peinture lointaine (vue par l'arche) → monument → mur du fond →
+   sol et murs latéraux en perspective → accessoires → lumière → torches → rebord → particules.
+   Le décor est sous les cartes (z-index -1 dans un .dv isolé) et ne reçoit aucun toucher. */
+.dv.has-dio { isolation: isolate; background: #07060A !important; }
+.dio { position: absolute; inset: 0; z-index: -1; overflow: hidden; border-radius: inherit; pointer-events: none; background: #07060A; contain: paint; }
+.dio * { pointer-events: none; }
+
+/* Peinture vue à travers l'arche (le reste de la salle, très loin) */
+.dio-far { position: absolute; left: 0; right: 0; top: 0; height: calc(var(--yb) + 24px); background-image: var(--bgimg); background-position: center 40%; background-size: cover; background-repeat: no-repeat; }
+.dio-far { filter: brightness(1.25) saturate(1.1); }
+.dio-far.view { background-size: auto 118%; background-position: center 34%; filter: brightness(1.1) saturate(1.1); }
+.dio-far::after { content: ''; position: absolute; inset: 0; background: radial-gradient(50% 60% at 50% 55%, color-mix(in srgb, var(--glow) 22%, transparent), transparent 70%); mix-blend-mode: screen; }
+
+/* Mur du fond (SVG) */
+.dio-back { position: absolute; left: 0; top: 0; overflow: visible; }
+.dio-tint { mix-blend-mode: multiply; }
+.dio-keyrune { filter: drop-shadow(0 0 3px var(--glow)); }
+.dio-rune { filter: drop-shadow(0 0 2px var(--glow)); }
+
+/* Sol et murs latéraux : plans en perspective (le parent porte la perspective, pas de preserve-3d) */
+.dio-3d { position: absolute; inset: 0; }
+.dio-floor { position: absolute; transform: rotateX(90deg); }
+.dio-floor > * { position: absolute; inset: 0; }
+.dio-ftex { background-repeat: repeat; background-size: var(--ts) var(--ts); background-color: var(--stone); background-blend-mode: multiply; filter: brightness(1.05) contrast(1.15); }
+.dio-ov { background-color: var(--glow); -webkit-mask-image: var(--m); mask-image: var(--m); -webkit-mask-size: var(--ts) var(--ts); mask-size: var(--ts) var(--ts); -webkit-mask-repeat: repeat; mask-repeat: repeat; mix-blend-mode: screen; }
+.ov-joints { animation: dioEmber 5s ease-in-out infinite; }
+.ov-moss { background-color: #4E6E2E; mix-blend-mode: normal; }
+.ov-grime { background-color: #050407; mix-blend-mode: normal; }
+.ov-puddle { background-color: #07060c; mix-blend-mode: normal; }
+.ov-sheen { background: linear-gradient(180deg, color-mix(in srgb, var(--glow) 70%, #fff), transparent 70%); mix-blend-mode: screen; }
+.ov-frost { background-color: #E6F7FF; mix-blend-mode: normal; }
+.ov-cracks { background-color: var(--glow); }
+@keyframes dioEmber { 50% { opacity: .55; } }
+/* cercle de runes au centre du sol (céleste, primordial, Architecte) */
+.dio-runes { left: 22% !important; right: 22% !important; top: 34% !important; bottom: auto !important; aspect-ratio: 1; background: url(../assets/fx/seal.webp) center / contain no-repeat; mix-blend-mode: screen; opacity: .22; }
+.dio-runes.geo { left: 8% !important; right: 8% !important; top: 18% !important; opacity: .55; animation: dioSpin 60s linear infinite; }
+.dio-runes.geo::after { content: ''; position: absolute; inset: -40%; background: repeating-linear-gradient(0deg, transparent 0 38px, rgba(255, 211, 106, .35) 38px 40px), repeating-linear-gradient(90deg, transparent 0 38px, rgba(255, 211, 106, .35) 38px 40px); -webkit-mask-image: radial-gradient(closest-side, #000 40%, transparent); mask-image: radial-gradient(closest-side, #000 40%, transparent); }
+@keyframes dioSpin { to { transform: rotate(360deg); } }
+/* flaques de lumière (en perspective, puisque posées sur le sol) et assombrissement des bords */
+.dio-fpool { background:
+  linear-gradient(90deg, rgba(0, 0, 0, .8), transparent 24%, transparent 76%, rgba(0, 0, 0, .8)),
+  linear-gradient(180deg, rgba(0, 0, 0, .75), rgba(0, 0, 0, .15) 30%, transparent 55%, rgba(0, 0, 0, .35)); }
+/* lumières posées sur le sol : ajoutées en « screen » pour éclairer vraiment la pierre */
+.dio-fpool::before { content: ''; position: absolute; inset: 0; mix-blend-mode: screen; background:
+  radial-gradient(40% 22% at 50% 3%, color-mix(in srgb, var(--glow) 70%, transparent), transparent 80%),
+  radial-gradient(30% 16% at 14% 22%, rgba(255, 140, 60, .55), transparent 80%),
+  radial-gradient(30% 16% at 86% 22%, rgba(255, 140, 60, .55), transparent 80%),
+  radial-gradient(55% 26% at 50% 70%, rgba(255, 185, 120, .32), transparent 80%); }
+.dio-brk { background-color: #FFE6A8; -webkit-mask-image: url(../assets/dio/cracks.webp); mask-image: url(../assets/dio/cracks.webp); -webkit-mask-size: var(--ts) var(--ts); mask-size: var(--ts) var(--ts); mix-blend-mode: screen; opacity: 0; }
+.dio-sealring { left: 22% !important; right: 22% !important; top: auto !important; bottom: 34% !important; aspect-ratio: 1; background: url(../assets/fx/seal.webp) center / contain no-repeat; mix-blend-mode: screen; opacity: 0; }
+
+.dio-side { position: absolute; background: url(../assets/dio/wall-stone.webp) repeat; background-size: var(--tw) var(--tw); background-color: var(--wallc); background-blend-mode: multiply; filter: brightness(1.05) contrast(1.1); }
+.dio-side.l { transform: rotateY(90deg); }
+.dio-side.r { transform: rotateY(-90deg); }
+.dio-side::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0, 0, 0, .65), rgba(0, 0, 0, .1) 55%, rgba(0, 0, 0, .35)); }
+.dio-side.l::after { background: linear-gradient(180deg, rgba(0, 0, 0, .65), rgba(0, 0, 0, .1) 55%, rgba(0, 0, 0, .35)), linear-gradient(90deg, rgba(0, 0, 0, .6), transparent 60%); }
+.dio-side.r::after { background: linear-gradient(180deg, rgba(0, 0, 0, .65), rgba(0, 0, 0, .1) 55%, rgba(0, 0, 0, .35)), linear-gradient(270deg, rgba(0, 0, 0, .6), transparent 60%); }
+
+/* Accessoires */
+.dio-props, .dio-torches, .dio-parts { position: absolute; inset: 0; }
+.dio-prop { position: absolute; width: max-content; transform: translateX(-50%); filter: drop-shadow(0 4px 4px rgba(0, 0, 0, .7)); }
+.dio-prop::before { content: ''; position: absolute; left: 50%; bottom: -6%; width: 120%; height: 18%; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(0, 0, 0, .7), transparent); z-index: -1; }
+.dio-svg { display: block; height: 100%; width: auto; overflow: visible; }
+.p-crystal { filter: drop-shadow(0 0 6px var(--glow)); animation: dioPulse 4.5s ease-in-out infinite; }
+.p-amber { filter: drop-shadow(0 0 6px #FFB347); }
+.p-ice { filter: drop-shadow(0 0 5px #bff3ff); }
+.p-mush { filter: drop-shadow(0 0 5px var(--glow)); animation: dioPulse 5s ease-in-out infinite; }
+.p-gear { animation: dioSpin 18s linear infinite; transform-origin: 50% 50%; }
+@keyframes dioPulse { 50% { opacity: .72; } }
+/* flammes (braseros, bougies) */
+.dio-fire { position: absolute; left: 50%; top: 6%; width: 62%; aspect-ratio: .7; transform: translate(-50%, -40%); border-radius: 50% 50% 46% 46% / 62% 62% 38% 38%;
+  background: radial-gradient(40% 50% at 50% 70%, #FFF6C8, #FFB13D 40%, rgba(255, 80, 20, .85) 65%, transparent 75%); filter: blur(.4px); mix-blend-mode: screen; animation: dioFlame .9s ease-in-out infinite alternate; transform-origin: 50% 90%; }
+.dio-fire::after { content: ''; position: absolute; left: 50%; top: 40%; width: 280%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 140, 50, .45), transparent); }
+.dio-flame { position: absolute; left: var(--x); top: var(--y); width: 11%; aspect-ratio: .6; transform: translate(-50%, -100%); border-radius: 50% 50% 46% 46% / 62% 62% 38% 38%; background: radial-gradient(45% 55% at 50% 70%, #FFF8D0, #FFB54A 55%, transparent 75%); mix-blend-mode: screen; animation: dioFlame .7s ease-in-out infinite alternate; transform-origin: 50% 100%; }
+.dio-flame::after { content: ''; position: absolute; left: 50%; top: 50%; width: 600%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 170, 80, .28), transparent); }
+@keyframes dioFlame { 0% { transform: translate(-50%, -40%) scale(1, 1) skewX(0); opacity: .95; } 50% { transform: translate(-50%, -42%) scale(.92, 1.08) skewX(3deg); } 100% { transform: translate(-50%, -40%) scale(1.05, .94) skewX(-2deg); opacity: .85; } }
+.dio-flame { animation-name: dioCandle; }
+@keyframes dioCandle { 0% { transform: translate(-50%, -100%) scale(1, 1); } 100% { transform: translate(-50%, -100%) scale(.9, 1.12) skewX(4deg); } }
+
+/* Torches (peintes) et leur halo qui vacille */
+.dio-torch { position: absolute; transform: translateX(-50%); }
+.dio-torch img { height: 100%; width: auto; display: block; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .8)) brightness(.95); }
+.dio-tglow { position: absolute; left: 50%; top: 18%; width: 520%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 170, 80, .42), rgba(255, 120, 40, .14) 45%, transparent 72%); mix-blend-mode: screen; animation: dioTorch 2.4s ease-in-out infinite; }
+@keyframes dioTorch { 0%, 100% { opacity: .9; } 22% { opacity: .72; } 48% { opacity: 1; } 70% { opacity: .78; } }
+
+/* Lumière d'ensemble : vignette, lueur de l'arche, ombre du premier plan */
+.dio-light { position: absolute; inset: 0; background:
+  radial-gradient(70% 34% at 50% calc(var(--ash) + 10px), color-mix(in srgb, var(--glow) 26%, transparent), transparent 70%),
+  radial-gradient(120% 75% at 50% 58%, transparent 52%, rgba(0, 0, 0, .62) 100%),
+  linear-gradient(180deg, rgba(0, 0, 0, .35), transparent 16%); }
+
+/* Rebord de la maquette (épaisseur du socle) et table dessous */
+.dio-ledge { position: absolute; left: -3%; right: -3%; height: 6.5%; background: url(../assets/dio/wall-stone.webp) repeat 0 0 / 120px 120px; background-color: var(--wallc); background-blend-mode: multiply; filter: brightness(1.15);
+  box-shadow: inset 0 2px 0 rgba(255, 240, 210, .28), inset 0 3px 0 rgba(0, 0, 0, .5), inset 0 -10px 12px rgba(0, 0, 0, .7), 0 10px 18px rgba(0, 0, 0, .8); }
+.dio-ledge::before { content: ''; position: absolute; left: 0; right: 0; top: 34%; height: 2px; background: linear-gradient(90deg, transparent, #C9A24E 15%, #F0D28A 50%, #C9A24E 85%, transparent); opacity: .7; }
+.dio-ledge::after { content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 400px; background: linear-gradient(180deg, #1b130d, #0c0806 40%), repeating-linear-gradient(90deg, rgba(255, 255, 255, .02) 0 2px, transparent 2px 9px); }
+
+/* Particules : peu nombreuses, lentes, sous les cartes */
+.dio-pt { position: absolute; left: var(--px); top: var(--py); width: 3px; height: 3px; border-radius: 50%; opacity: 0; animation: var(--an, dioRise) var(--pd) linear infinite; animation-delay: var(--pl); }
+.pt-ember { --an: dioRise; background: #FFB060; box-shadow: 0 0 6px #FF6A2A; }
+.pt-mote { --an: dioFloat; background: #E4C8FF; box-shadow: 0 0 8px var(--glow); width: 4px; height: 4px; }
+.pt-glint { --an: dioTwinkle; background: #FFF3C4; box-shadow: 0 0 6px #FFE3A0; width: 3px; height: 3px; }
+.pt-spore { --an: dioFloat; background: #D8FFB0; box-shadow: 0 0 7px var(--glow); }
+.pt-dust { --an: dioFloat; background: #FFE2AA; opacity: .5; width: 2px; height: 2px; }
+.pt-spark { --an: dioTwinkle; background: #CFF3FF; box-shadow: 0 0 6px var(--glow); width: 2px; height: 2px; }
+.pt-snow { --an: dioSnow; background: #F4FBFF; width: 3px; height: 3px; }
+@keyframes dioRise { 0% { opacity: 0; transform: translate(0, 0); } 15% { opacity: .9; } 100% { opacity: 0; transform: translate(14px, -150px); } }
+@keyframes dioFloat { 0% { opacity: 0; transform: translate(0, 0); } 25% { opacity: .8; } 75% { opacity: .6; } 100% { opacity: 0; transform: translate(-12px, -60px); } }
+@keyframes dioTwinkle { 0%, 100% { opacity: 0; transform: scale(.4); } 50% { opacity: 1; transform: scale(1.4); } }
+@keyframes dioSnow { 0% { opacity: 0; transform: translate(0, -60px); } 15% { opacity: .85; } 100% { opacity: 0; transform: translate(18px, 160px); } }
+.dio-mist { position: absolute; left: -30%; width: 160%; height: 22%; border-radius: 50%; background: radial-gradient(closest-side, rgba(170, 230, 210, .16), transparent); filter: blur(6px); animation: dioMist 26s ease-in-out infinite alternate; }
+.dio-mist.m1 { top: 40%; } .dio-mist.m2 { top: 74%; animation-duration: 34s; animation-direction: alternate-reverse; }
+@keyframes dioMist { to { transform: translateX(14%); } }
+
+/* ——— Monuments des gardiens ——— */
+.dio-mon { position: absolute; left: 50%; transform: translateX(-50%); }
+.dio-eclipse { top: calc(var(--atop) + var(--aw) * .1); width: calc(var(--aw) * .62); aspect-ratio: 1; }
+.dio-eclipse .dio-disc { position: absolute; inset: 14%; border-radius: 50%; background: radial-gradient(circle at 40% 38%, #1a1416, #000 70%); box-shadow: 0 0 0 2px rgba(255, 190, 90, .9), 0 0 18px 6px rgba(255, 120, 40, .8), 0 0 40px 14px rgba(255, 80, 20, .45); }
+.dio-eclipse .dio-corona { position: absolute; inset: -30%; border-radius: 50%; background: repeating-conic-gradient(from 0deg, rgba(255, 170, 70, .5) 0 4deg, transparent 4deg 13deg); -webkit-mask-image: radial-gradient(closest-side, transparent 40%, #000 46%, transparent 100%); mask-image: radial-gradient(closest-side, transparent 40%, #000 46%, transparent 100%); animation: dioSpin 40s linear infinite; }
+.dio.asp-lune .dio-eclipse .dio-disc { box-shadow: 0 0 0 2px rgba(200, 230, 255, .9), 0 0 18px 6px rgba(120, 190, 255, .8), 0 0 40px 14px rgba(80, 140, 255, .45); }
+.dio.asp-lune .dio-eclipse .dio-corona { background: repeating-conic-gradient(from 0deg, rgba(170, 215, 255, .5) 0 4deg, transparent 4deg 13deg); }
+.dio.asp-lune { --glow: #8FC8FF !important; }
+.dio-maw { top: calc(var(--atop) + var(--aw) * .25); width: var(--aw); aspect-ratio: 1; }
+.dio-maw .dio-gullet { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 40, 70, .55), rgba(120, 0, 30, .3) 55%, transparent); mix-blend-mode: screen; animation: dioBreath 3.6s ease-in-out infinite; }
+@keyframes dioBreath { 50% { transform: scale(1.18); opacity: .6; } }
+.dio-teeth { filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .8)); }
+.dio-frostcrown { top: calc(var(--atop) - 6px); height: calc(var(--aw) * .55); transform: translateX(-50%) scaleY(-1); filter: drop-shadow(0 0 10px #A8ECFF); }
+.dio-crown { top: calc(var(--atop) - 30px); width: 54px; filter: drop-shadow(0 0 12px rgba(255, 200, 90, .8)); }
+.dio-crown img { width: 100%; display: block; }
+.dio-geo { top: calc(var(--atop) + 2px); width: calc(var(--aw) * .7); aspect-ratio: 1; mix-blend-mode: screen; opacity: .8; animation: dioSpinC 50s linear infinite reverse; }
+@keyframes dioSpinC { from { transform: translateX(-50%) rotate(0); } to { transform: translateX(-50%) rotate(360deg); } }
+.dio-geo img { width: 100%; display: block; }
+
+/* ——— Réactions ——— */
+.dio.flare .dio-tglow { animation: dioFlare .7s ease-out; }
+.dio.flare .dio-fire, .dio.flare .dio-flame { filter: brightness(1.7); }
+@keyframes dioFlare { 30% { opacity: 1; filter: brightness(1.8); transform: translate(-50%, -50%) scale(1.35); } }
+.dio.roar .dio-back, .dio.roar .dio-props, .dio.roar .dio-torches { animation: dioQuake .55s ease-out; }
+@keyframes dioQuake { 15% { transform: translate(-3px, 1px); } 30% { transform: translate(3px, -1px); } 45% { transform: translate(-2px, 1px); } 60% { transform: translate(2px, 0); } }
+.dio-fx { position: absolute; inset: 0; opacity: 0; background: radial-gradient(90% 70% at 50% 45%, transparent 35%, var(--fxc, rgba(255, 30, 40, .5)) 100%); }
+.dio.roar .dio-fx { --fxc: rgba(255, 30, 40, .55); animation: dioFlashOp .9s ease-out; }
+@keyframes dioFlashOp { 25% { opacity: 1; } 100% { opacity: 0; } }
+.dio.brk .dio-brk { animation: dioBrk 1.1s ease-out; }
+@keyframes dioBrk { 12% { opacity: 1; } 100% { opacity: 0; } }
+.dio.seal .dio-sealring { animation: dioSeal 1.6s ease-out; }
+@keyframes dioSeal { 0% { opacity: 0; transform: scale(.6) rotate(0); } 25% { opacity: 1; } 100% { opacity: 0; transform: scale(1.1) rotate(40deg); } }
+.dio.ultl .dio-fx, .dio.seal .dio-fx { --fxc: rgba(255, 210, 120, .45); animation: dioFlashOp 1.2s ease-out; }
+.dio-fury { position: absolute; inset: 0; opacity: 0; background: radial-gradient(90% 70% at 50% 40%, transparent 40%, rgba(255, 30, 40, .4) 100%); transition: opacity 1.2s; }
+.dio.fury .dio-fury { opacity: .6; animation: dioFuryOp 3.2s ease-in-out infinite; }
+@keyframes dioFuryOp { 50% { opacity: 1; } }
+.dio.fury .dio-mon { filter: brightness(1.3) saturate(1.3); }
+.dio.fallen .dio-mon { opacity: .25; filter: grayscale(.8); transition: opacity 2.5s, filter 2.5s; }
+.dio.fallen .dio-archglow { opacity: .3; transition: opacity 2.5s; }
+/* arrivée du gardien : la salle s'allume */
+.dio.awake .dio-fx { background: #000; animation: dioWake 2.2s ease-out; }
+@keyframes dioWake { 0% { opacity: .85; } 100% { opacity: 0; } }
+.dio.awake .dio-mon { animation: dioMonIn 2.2s ease-out; }
+@keyframes dioMonIn { 0% { opacity: 0; } 60% { opacity: 1; filter: brightness(2); } }
+
+/* Décor sobre (réglage) et animations réduites */
+.dio.sobre .dio-parts { display: none; }
+.dio.sobre .dio-tglow, .dio.sobre .ov-joints, .dio.sobre .p-crystal, .dio.sobre .p-mush, .dio.sobre .dio-spin, .dio.sobre .dio-runes.geo, .dio.sobre .dio-mist { animation: none; }
+.dio.still *, .dio.still { animation: none !important; transition: none !important; }
+.dio.still .dio-parts { display: none; }
+.reduce-motion .dio * { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .dio * { animation: none !important; } .dio-parts { display: none; } }
+
+/* ——— Les créatures sur le plateau : socle de figurine et ombre de contact ——— */
+.dv-base { position: absolute; z-index: -1; left: 50%; bottom: 0; width: 94%; aspect-ratio: 4.4; transform: translate(-50%, 48%); border-radius: 50%; pointer-events: none;
+  --bt: #2d2620; --bs: #120d08; --br: color-mix(in srgb, var(--rc) 45%, #B8862C);
+  background: radial-gradient(closest-side, #3a3440, var(--bt) 62%, var(--br) 66%, color-mix(in srgb, var(--br) 60%, #000) 78%, var(--bs) 100%);
+  box-shadow: 0 4px 0 var(--bs), 0 5px 0 rgba(255, 220, 160, .12), 0 0 0 1px color-mix(in srgb, var(--br) 50%, transparent), 0 10px 16px 2px rgba(0, 0, 0, .8); }
+.dv-row.enemy .dv-base { --bt: #2a1820; --bs: #12070b; --br: color-mix(in srgb, #8E1630 60%, var(--rc)); aspect-ratio: 5; }
+.dv-c.boss .dv-base { width: 108%; --bt: #251a14; --bs: #0c0705; --br: #C9A24E; box-shadow: 0 5px 0 var(--bs), 0 6px 0 rgba(255, 210, 120, .25), 0 0 26px 6px color-mix(in srgb, var(--glow, #FF6A2A) 45%, transparent), 0 12px 18px 2px rgba(0, 0, 0, .85); }
+.dv-c.boss .dv-base::after { content: ''; position: absolute; inset: -14% -6%; border-radius: 50%; background: url(../assets/fx/seal.webp) center / 100% 100% no-repeat; mix-blend-mode: screen; opacity: .45; }
+/* Mythiques et Secrètes : un reflet lent sur le socle (rien sur la carte elle-même) */
+.dv-c[data-rar="M"] .dv-base::before, .dv-c[data-rar="S"] .dv-base::before { content: ''; position: absolute; inset: -30% -8%; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--rc) 60%, transparent), transparent); opacity: .35; animation: dvBaseShine 4s ease-in-out infinite; }
+@keyframes dvBaseShine { 50% { opacity: .9; } }
+.dv-c.def .dv-base { --br: #7FB8FF; }
+.dv-c.def .dv-base::after { content: ''; position: absolute; inset: -18% -4%; border-radius: 50%; border: 2px solid rgba(127, 184, 255, .7); box-shadow: 0 0 10px rgba(127, 184, 255, .6); }
+.dv-c.p2 .dv-base { --br: #FF3B4E; }
+.dv-c.target .dv-base { --br: #FF5A6E; }
+.dv-c.sel .dv-base { --br: #F1DB9E; box-shadow: 0 4px 0 var(--bs), 0 0 16px 3px rgba(241, 219, 158, .55), 0 10px 16px 2px rgba(0, 0, 0, .8); }
+.dv-c.dead .dv-base, .dv-c.dying .dv-base { opacity: 0; transition: opacity .4s; }
+.reduce-motion .dv-base { animation: none !important; }
+
+/* La rangée ennemie se tient au fond de la salle : un peu plus petite, la profondeur se lit mieux */
+.dv.has-dio .dv-row.enemy { transform: scale(.9); transform-origin: 50% 80%; }

@@ -1,16 +1,16 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v194';
+const VERSION = 'abyssal-v195';
 const ART_CACHE = 'abyssal-media';  // images du jeu : gardées entre les versions
 const FONT_CACHE = 'abyssal-fonts';
 const CORE = [
   './', 'index.html', 'manifest.webmanifest',
-  'css/base.css', 'css/card.css', 'css/screens.css', 'css/army.css',
+  'css/base.css', 'css/card.css', 'css/screens.css', 'css/army.css', 'css/diorama.css',
   'js/main.js', 'js/config.js',
   'js/core/catalog.js', 'js/core/game.js', 'js/core/save.js', 'js/core/boosters.js', 'js/core/bosses.js', 'js/core/relations.js', 'js/core/pacts.js', 'js/core/forms.js', 'js/core/relics.js', 'js/core/sceaux.js', 'js/screens/sceaux.js', 'js/screens/trial.js', 'js/core/lore.js',
   'js/art/geometry.js', 'js/art/scenes.js', 'js/art/creatures.js', 'js/art/procedural.js', 'js/art/assets.js',
-  'js/ui/dom.js', 'js/ui/icons.js', 'js/ui/card.js', 'js/ui/sound.js', 'js/ui/music.js',
+  'js/ui/dom.js', 'js/ui/icons.js', 'js/ui/card.js', 'js/ui/sound.js', 'js/ui/music.js', 'js/ui/diorama.js',
   'js/screens/home.js', 'js/screens/collection.js', 'js/screens/shop.js', 'js/screens/opening.js', 'js/screens/detail.js',
   'js/screens/bestiary.js', 'js/screens/factions.js', 'js/screens/achievements.js', 'js/screens/profile.js',
   'js/screens/settings.js', 'js/screens/furnace.js', 'js/screens/shadow.js', 'js/screens/forge.js', 'js/screens/salles.js', 'js/screens/salles3d.js',  'js/core/dungeon.js', 'js/core/powers.js', 'js/screens/chest-open.js', 'js/screens/descent.js', 'js/screens/items.js', 'js/screens/account.js', 'js/screens/creator.js', 'js/screens/menu.js', 'js/screens/welcome.js', 'js/cloud/cloud.js', 'js/cloud/sync.js', 'js/cloud/presence.js', 'js/ui/tutos.js', 'js/core/descent.js', 'js/core/skills.js', 'js/ui/coach.js',

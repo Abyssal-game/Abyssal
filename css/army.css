@@ -1986,3 +1986,5 @@ body.battle-mode.has-subnav #view, body.battle-mode #view { padding: calc(var(--
 .s3-die.miss span { color: #9FB4C8; } .s3-die.success span { color: #7FE0A0; }
 .s3-die.out { opacity: 0; transform: translate(-50%, -130%); }
 @keyframes s3DieIn { from { opacity: 0; transform: translate(-50%, -60%) scale(.6); } to { opacity: 1; transform: translate(-50%, -100%) scale(1); } }
+/* Petits écrans : le titre du combat (« Étage 25 · Gardien ») ne passe plus sous les boutons */
+@media (max-width: 360px) { .dv-top > b { max-width: 52%; font-size: .78rem; padding: 2px 22px 0; } .dv-top .btn.small { padding: 0 9px; } }

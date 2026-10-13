@@ -39,6 +39,8 @@ export default function settings(app, root) {
         ${toggle('haptics', 'Vibrations', 'Petites vibrations sur les coups, les victoires et les cartes rares. Sur iPhone, il faut iOS 18 ou plus.')}
         ${s.sound ? `<div class="set-row col"><b>Écouter les sons</b><div class="set-sfx">${SFX_DEMO.map(([n], i) => `<button class="chip" data-sfx="${i}">${n}</button>`).join('')}</div></div>` : ''}
         ${seg('motion', 'Animations', [['auto', 'Selon l’appareil'], ['reduced', 'Réduites'], ['full', 'Complètes']])}
+        ${seg('decor', 'Décor des combats', [['riche', 'Riche'], ['sobre', 'Sobre']])}
+        <p class="small muted set-note">Sobre : la salle reste en place, sans particules ni flammes qui vacillent. Plus reposant, et un peu plus économe en batterie.</p>
         ${toggle('fastOpen', 'Ouverture rapide des boosters', 'Affiche directement le récapitulatif, sans révéler les cartes une par une.')}
       </section>
 `;

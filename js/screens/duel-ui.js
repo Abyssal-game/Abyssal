@@ -19,6 +19,7 @@ import { BOSSES, LAWS, ASPECTS } from '../core/bosses.js';
 import { PACTS } from '../core/pacts.js';
 import { RELICS } from '../core/relics.js';
 import { ULTS } from '../core/army.js';
+import { mountDiorama, roomFor } from '../ui/diorama.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 // Décor selon la profondeur (salle du Gardien à part) et effets illustrés (fond noir fondu en mode « écran »)
@@ -53,7 +54,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   document.body.classList.add('battle-mode');
 
   FX.forEach((n) => { new Image().src = fxUrl(n); });
-  root.innerHTML = `<div class="dv cb ${run.room} has-bg" style="--bgimg:${bgOf(run)}">
+  // Décor de la salle : la peinture de l'étage, ou la salle propre au gardien
+  const room = roomFor(floorBg(run.floor, run.room), st.bossKey);
+  root.innerHTML = `<div class="dv cb ${run.room} has-bg" style="--bgimg:${room.paint ? `url(${abs(room.paint)})` : bgOf(run)}">
     <div class="dv-top"><b>${esc(title)}</b><span class="row gap">
       <button class="btn small ghost" data-d="help" aria-label="Règles du combat">?</button>
       <button class="btn small ghost ${ui.fast ? 'on' : ''}" data-d="fast" aria-label="Animations accélérées">×2</button>
@@ -74,6 +77,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     </div>
   </div>`;
   const $ = (s) => root.querySelector(s);
+  const dio = mountDiorama($('.dv'), { room, decor: g.s.settings?.decor || 'riche', reduced, aspect: st.aspect });
   const enEl = $('.dv-row.enemy'), alEl = $('.dv-row.ally'), msgEl = $('.dv-msg'), actsEl = $('.cb-acts');
   const say = (h) => { msgEl.innerHTML = h; };
   const el = (uid) => root.querySelector(`[data-uid="${uid}"]`);
@@ -115,7 +119,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const dead = u.hp <= 0, enemy = u.side === 'enemy';
     const ready = !enemy && st.turn === 'ally' && actionsFor(st, u.uid).some((a) => a.ok && a.key !== 'swap');
     const tgt = tgtInfo[u.uid];
-    return `<button class="dv-c ${u.side} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.broken ? 'broken' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(c.name)}, ${Math.max(0, u.hp)} PV">
+    return `<button class="dv-c ${u.side} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.phase2 ? 'p2' : ''} ${u.defend ? 'def' : ''} ${u.broken ? 'broken' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" data-rar="${u.rarity}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(c.name)}, ${Math.max(0, u.hp)} PV">
+      <span class="dv-base" aria-hidden="true"></span>
       <span class="dv-art"><img alt="" src="${artUrl(c)}"></span>
       <span class="dv-kw ${enemy && u.fam ? 'fam' : ''}" title="${esc(enemy && u.fam ? AI_FAMILIES[u.fam].desc : kit.name)}">${roleIcon(kit.kw)}<em>${esc(enemy && u.fam ? AI_FAMILIES[u.fam].name : kit.name)}</em></span>
       ${u.boss ? `<span class="dv-boss"><img alt="" src="assets/icons/crest-boss.webp">${u.phase2 ? 'Furie' : 'Gardien'}</span>` : u.elite ? '<span class="dv-boss elite"><img alt="" src="assets/icons/crest-elite.webp">Élite</span>' : ''}
@@ -327,6 +332,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           lastTier = null;
           if (heavy) await hitstop(crit ? 140 : 70);
           fxAt(e.u, crit ? 'crit' : heavy ? 'impact' : 'slash', { big: heavy });
+          if (crit) dio.flare();
           float(e.u, crit ? `CRITIQUE −${e.d}` : `-${e.d}`, crit ? 'dmg big crit' : heavy ? 'dmg big' : 'dmg'); (heavy ? app.sfx.smash : app.sfx.slash)(); sparks(e.u, crit ? 'gold' : ''); if (heavy || e.hp <= 0) shake(crit || e.d >= 12);
           await wait(T(heavy ? 300 : 220));
           break;
@@ -340,7 +346,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           await wait(T(320));
           break;
         }
-        case 'parry': app.sfx.parry(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxAt(e.u, 'parry', { big: true }); sparks(e.u, 'gold'); cam(e.u, -0.8); } banner('Parade parfaite !', 'parry', 800); shake(false); await wait(T(420)); break;
+        case 'parry': app.sfx.parry(); dio.flare(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxAt(e.u, 'parry', { big: true }); sparks(e.u, 'gold'); cam(e.u, -0.8); } banner('Parade parfaite !', 'parry', 800); shake(false); await wait(T(420)); break;
         case 'fervor': fervorPop(e.d, e.why); draw(); break;
         case 'brk': { const t = el(e.u)?.querySelector('.cb-brk i'); if (t) t.style.width = `${(e.brk / e.max) * 100}%`; break; }
         case 'broken': {
@@ -350,15 +356,15 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           await hitstop(160);
           app.sfx.shatter(); draw();
           const t2 = el(e.u); t2?.classList.add('shatter', 'cracked'); ring(e.u, 'break');
-          banner('BRISURE !', 'broken', 1000); fxAt(e.u, 'break', { big: true }); sparks(e.u, 'big'); shake(true);
+          banner('BRISURE !', 'broken', 1000); fxAt(e.u, 'break', { big: true }); sparks(e.u, 'big'); shake(true); dio.brk();
           await wait(T(700)); d?.classList.remove('focus');
           break;
         }
         case 'recover': float(e.u, 'Se relève', 'info'); await wait(T(260)); break;
         case 'roll': await rollFx(e); lastTier = e.tier; break;
-        case 'boss': { if (e.s === 'Effondrement !') fxAt(null, 'collapse', { center: true }); app.sfx.boss(); const t = el(e.u); if (t) { t.classList.remove('roar'); void t.offsetWidth; t.classList.add('roar'); } float(e.u, e.s, 'boss'); shake(true); await wait(T(650)); break; }
+        case 'boss': { if (e.s === 'Effondrement !') fxAt(null, 'collapse', { center: true }); app.sfx.boss(); dio.roar(); const t = el(e.u); if (t) { t.classList.remove('roar'); void t.offsetWidth; t.classList.add('roar'); } float(e.u, e.s, 'boss'); shake(true); await wait(T(650)); break; }
         case 'phase2': {
-          app.sfx.boss(); draw(); banner(`${icon('skull')} ${esc(e.s)}`, 'danger', 1200); shake(true); await wait(T(900));
+          app.sfx.boss(); dio.fury(); dio.roar(); draw(); banner(`${icon('skull')} ${esc(e.s)}`, 'danger', 1200); shake(true); await wait(T(900));
           const P = PHASE2[e.key];
           if (P) await phaseCard(P);
           if (P && !g.s.tips?.['cb-phase2']) await tuto(app, 'cb-phase2');
@@ -392,6 +398,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           if (u?.boss) {
             // mort d'un gardien : ralenti, le décor réagit, il se dissipe en cendres
             const d = $('.dv'); if (!reduced) d?.classList.add('slowmo', 'bossfall');
+            dio.fallen();
             app.sfx.boss(); await hitstop(220); app.sfx.death();
             fxAt(e.u, 'death', { big: true }); sparks(e.u, 'big'); el(e.u)?.classList.add('dying', 'ashes'); shake(true);
             banner(`${esc(cat.get(u.id).name)} est vaincu`, 'finisher', 1300);
@@ -402,8 +409,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         case 'enter': draw(); el(e.u)?.classList.add('enter'); await wait(T(340)); break;
         case 'revive': draw(); float(e.u, 'Relevée !', 'heal'); await wait(T(280)); break;
         case 'phase': draw(); say(e.side === 'enemy' ? '<b class="dc-bad">Tour des créatures corrompues</b>' : 'À toi !'); await wait(T(e.side === 'enemy' ? 380 : 160)); break;
-        case 'ult': await ultFx(); break;
-        case 'law': draw(); banner(e.fatigue ? `${icon('skull')} Épuisement : chaque tour blesse tout le monde` : e.law ? esc(LAWS[e.law].name) : esc(ASPECTS[e.aspect].name), e.fatigue ? 'danger' : 'skill', 1300); await wait(T(e.fatigue ? 900 : 700)); break;
+        case 'ult': if (st.ult === 'sceau') dio.seal(); else dio.ult(); await ultFx(); break;
+        case 'law': if (e.aspect) dio.aspect(e.aspect); draw(); banner(e.fatigue ? `${icon('skull')} Épuisement : chaque tour blesse tout le monde` : e.law ? esc(LAWS[e.law].name) : esc(ASPECTS[e.aspect].name), e.fatigue ? 'danger' : 'skill', 1300); await wait(T(e.fatigue ? 900 : 700)); break;
         default: break;
       }
     }
@@ -447,7 +454,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     (st.over === 'won' ? app.sfx.victory : app.sfx.defeat)();
     $('.dv').insertAdjacentHTML('beforeend', `<div class="cb-end">${crestHTML(st.over === 'won', st.over === 'won' ? 'Victoire' : 'Défaite')}</div>`);
     await wait(T(1300));
-    if (alive_) { alive_ = false; ctl.abort(); document.body.classList.remove('battle-mode'); onEnd(); }
+    if (alive_) { alive_ = false; ctl.abort(); dio.destroy(); document.body.classList.remove('battle-mode'); onEnd(); }
   }
 
   // ——— Défense active ———
@@ -777,5 +784,5 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   else if (st.over) finish();
   else if (guide) tuto(app, 'cb-intro').then(() => draw());
   else tips();
-  return { stop() { alive_ = false; ctl.abort(); document.body.classList.remove('battle-mode'); } };
+  return { stop() { alive_ = false; ctl.abort(); dio.destroy(); document.body.classList.remove('battle-mode'); } };
 }
