@@ -23,6 +23,7 @@ import menuScreen from './screens/menu.js';
 import sceauxScreen from './screens/sceaux.js';
 import trialScreen from './screens/trial.js';
 import shadowScreen, { claimShadowPrize } from './screens/shadow.js';
+import { forgeScreen, furnaceScreen } from './screens/forge.js';
 import { teamScreen, chestsScreen } from './screens/army.js';
 import { startSync } from './cloud/sync.js';
 import { startPresence } from './cloud/presence.js';
@@ -32,7 +33,7 @@ import { setScene } from './ui/scene.js';
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,
   factions: factionsScreen, faction: factionsScreen, succes: achievementsScreen, profil: profileScreen,
-  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen, sceaux: sceauxScreen, epreuve: trialScreen, tirage: shadowScreen,
+  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen, sceaux: sceauxScreen, epreuve: trialScreen, tirage: shadowScreen, renfort: forgeScreen, fournaise: furnaceScreen,
 };
 const TABS = [
   ['antre', 'tab-home', 'Accueil'], ['collection', 'tab-collection', 'Collection'], ['boutique', 'tab-boosters', 'Boosters'],
@@ -40,11 +41,17 @@ const TABS = [
 ];
 // icônes peintes de la barre du bas (assets/icons)
 const tabIcon = (k) => `<img class="tab-pic" alt="" src="assets/icons/${k}.webp">`;
-const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', equipe: 'descente', coffres: 'descente', heros: 'descente', arsenal: 'descente', marchand: 'descente', sceaux: 'descente', epreuve: 'descente', tirage: 'boutique' };
+const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', equipe: 'collection', renfort: 'collection', fournaise: 'collection', coffres: 'boutique', heros: 'descente', arsenal: 'boutique', marchand: 'descente', sceaux: 'descente', epreuve: 'descente', tirage: 'boutique' };
 // Fond illustré de chaque page (l'Accueil et la Descente posent le leur)
-const ROUTE_SCENE = { boutique: 'shop', tirage: 'shop', collection: 'collection', equipe: 'team', coffres: 'chests', bestiaire: 'bestiary', succes: 'trophies', profil: 'profile', menu: 'menu', parametres: 'menu', compte: 'menu', factions: 'factions', faction: 'factions' };
+const ROUTE_SCENE = { boutique: 'shop', tirage: 'shop', renfort: 'collection', fournaise: 'collection', collection: 'collection', equipe: 'team', coffres: 'chests', bestiaire: 'bestiary', succes: 'trophies', profil: 'profile', menu: 'menu', parametres: 'menu', compte: 'menu', factions: 'factions', faction: 'factions' };
 // Page parente des sous-pages (bouton retour en haut)
-const PARENT = { bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', equipe: 'descente', coffres: 'descente', heros: 'descente', arsenal: 'descente', marchand: 'descente', sceaux: 'descente', epreuve: 'descente', tirage: 'boutique' };
+const PARENT = { bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente', arsenal: 'coffres', marchand: 'descente' };
+// Sous-onglets de chaque onglet principal (barre en haut de la page)
+const SUBNAV = {
+  collection: [['collection', 'cards', 'Cartes'], ['equipe', 'team-ic', 'Équipe'], ['renfort', 'level-up', 'Renforcer'], ['fournaise', 'furnace', 'Fournaise']],
+  boutique: [['boutique', 'booster', 'Boosters'], ['coffres', 'chest', 'Coffres'], ['tirage', 'shadow', 'Tirage']],
+  descente: [['descente', 'descend', 'Descente'], ['epreuve', 'trial', 'Épreuve'], ['sceaux', 'seal', 'Sceaux']],
+};
 
 function storageOrMemory() {
   try {
@@ -79,7 +86,7 @@ function applySettings() {
 // Explication des deux monnaies (toucher le compteur en haut à droite)
 const WALLET = {
   shards: ['Éclats', 'La monnaie principale. Ils servent à acheter des boosters dans la Boutique.', 'Tu en gagnes avec l’offrande du jour, les missions, les succès, les nouvelles créatures découvertes et surtout dans la Descente (combats, trésors, gardiens).', 'boutique', 'Aller aux Boosters'],
-  ash: ['Cendres', 'Ce qui reste des cartes brûlées dans la Fournaise. Elles font monter le niveau de tes créatures, invoquent une carte manquante et déchiffrent les noms inconnus.', 'Brûle tes doublons dans la Fournaise (Collection ou Sanctuaire) : plus la carte est rare, plus elle en donne, et les finitions rares encore plus.', 'collection', 'Aller à la Collection'],
+  ash: ['Cendres', 'Ce qui reste des cartes brûlées dans la Fournaise. Elles font monter le niveau de tes créatures, invoquent une carte manquante et déchiffrent les noms inconnus.', 'Brûle tes doublons dans la Fournaise (onglet Collection) : plus la carte est rare, plus elle en donne, et les finitions rares encore plus.', 'fournaise', 'Aller à la Fournaise'],
 };
 // iPhone, app posée sur l'écran d'accueil : la hauteur annoncée par le navigateur peut être plus
 // courte que l'écran réel (une bande noire reste en bas). On mesure la vraie hauteur et on la donne
@@ -121,11 +128,24 @@ function renderChrome() {
       <button class="pill ash" data-wallet="ash" title="Cendres" aria-label="${fmt(s.ash)} cendres : à quoi ça sert ?">${icon('ash')}<span>${fmt(s.ash)}</span></button>
     </div>`;
   const tab = TAB_OF[app.route] ?? 'antre';
+  // sous-onglets : seulement sur les pages d'un groupe
+  const sub = SUBNAV[tab] && SUBNAV[tab].some(([r]) => r === app.route) ? SUBNAV[tab] : null;
+  const subBadge = (r) => {
+    if (r === 'coffres') return g.chestCount() || '';
+    if (r === 'fournaise') { const n = g.spareAsh().n; return n ? (n > 99 ? '99+' : n) : ''; }
+    if (r === 'renfort') return g.team().some((id) => { const c = g.upgradeCost(id); return c && c <= s.ash; }) ? '↑' : '';
+    if (r === 'collection') return nNewSub || '';
+    return '';
+  };
+  const nNewSub = g.newCount() > 99 ? '99+' : g.newCount();
+  const sn = document.getElementById('subnav');
+  document.body.classList.toggle('has-subnav', !!sub);
+  sn.innerHTML = sub ? sub.map(([r, ic, label]) => { const bd = subBadge(r); return `<a class="sn-tab" href="#/${r}"${r === app.route ? ' aria-current="page"' : ''}><img class="sn-ic" alt="" src="assets/icons/${ic}.webp"><span>${label}</span>${bd ? `<i class="sn-badge">${bd}</i>` : ''}</a>`; }).join('') : '';
   const nNew = g.newCount();
   const ticketCount = Object.values(s.tickets).reduce((a, b) => a + b, 0) + g.freePack().stock;
   document.getElementById('tabbar').innerHTML = TABS.map(([key, ic, label]) => {
     const cur = key === tab ? ' aria-current="page"' : '';
-    const badge = key === 'collection' && nNew ? `<span class="badge">${nNew > 99 ? '99+' : nNew}</span>` : key === 'boutique' && ticketCount ? `<span class="badge">${ticketCount}</span>` : key === 'antre' && (g.canDailyClaim() || g.missionsToClaim()) ? '<span class="badge">!</span>' : key === 'descente' && (g.chestCount() || g.torchesLeft()) ? `<span class="badge">${g.chestCount() || g.torchesLeft()}</span>` : '';
+    const badge = key === 'collection' && nNew ? `<span class="badge">${nNew > 99 ? '99+' : nNew}</span>` : key === 'boutique' && (ticketCount + g.chestCount()) ? `<span class="badge">${ticketCount + g.chestCount()}</span>` : key === 'antre' && (g.canDailyClaim() || g.missionsToClaim()) ? '<span class="badge">!</span>' : key === 'descente' && g.torchesLeft() ? `<span class="badge">${g.torchesLeft()}</span>` : '';
     if (key === 'boutique') return `<a class="tab tab-main" href="#/boutique"${cur}><span class="orb">${tabIcon(ic)}</span>${label}${badge}</a>`;
     return `<a class="tab" href="#/${key}"${cur}>${tabIcon(ic)}${label}${badge}</a>`;
   }).join('');

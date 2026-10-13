@@ -2,7 +2,6 @@
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { icon, sigil } from '../ui/icons.js';
 import { esc, bindActions, pct } from '../ui/dom.js';
-import { openFurnace } from './furnace.js';
 import { RARITIES, FACTION_ORDER, RARITY_ORDER, RARITY } from '../config.js';
 
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -20,7 +19,6 @@ export default function collection(app, root, params) {
       <span class="progress ui-prog"><i id="col-prog"></i></span>
     </header>
     <div class="col-head-row">
-      <button class="btn small gold col-ritual" data-act="furnace">${icon('p:furnace')}Fournaise</button>
       <div class="seg" role="group" aria-label="Mode d’affichage">${[['grid', 'Grille'], ['album', 'Classeur']].map(([k, l]) => `<button class="seg-b" data-act="view" data-v="${k}" aria-pressed="${(st.view || 'grid') === k}">${l}</button>`).join('')}</div>
     </div>
     <div id="col-main">
@@ -141,7 +139,6 @@ export default function collection(app, root, params) {
   const toggle = (arr, v) => (arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
 
   bindActions(root, {
-    furnace() { openFurnace(app); },
     fac(el) { st.factions = toggle(st.factions, el.dataset.v); syncPressed(); drawGrid(); },
     rar(el) { st.rarities = toggle(st.rarities, el.dataset.v); syncPressed(); drawGrid(); },
     show(el) { st.show = el.dataset.v; syncPressed(); drawGrid(); },
