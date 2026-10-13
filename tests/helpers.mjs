@@ -17,6 +17,7 @@ export function loadCatalog() {
     abilities: read('data/abilities.json'),
     achievements: read('data/achievements.json'),
     lore: read('data/lore.json'),
+    powers: (() => { try { return read('data/powers.json'); } catch (e) { return {}; } })(),
   });
 }
 
