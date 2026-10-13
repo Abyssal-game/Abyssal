@@ -14,6 +14,9 @@ import * as DG from '../core/dungeon.js';
 import { POWERS, powerOf } from '../core/powers.js';
 
 const SL = 'assets/salles/';
+// Pouvoirs qui ont déjà leur icône peinte (assets/salles/pw/<clé>.webp) ; les autres gardent l'icône générique
+const PW_ART = new Set(['grace', 'hymne', 'egide', 'sanctuaire', 'jugement', 'drain', 'releve', 'maledict', 'terreur', 'linceul', 'brasier', 'souffle', 'cataclysme', 'pacte', 'venin', 'nuee']);
+const cardIcon = (k, def) => (PW_ART.has(k) ? `<img class="sl-pw" alt="" src="${SL}pw/${k}.webp">` : icon(def.icon || 'sparkle'));
 const HOW = [
   ['salles', '#C9A24E', 'Tes 3 figurines', 'Choisis 3 créatures : chacune a son propre pouvoir (un ange soigne, un dragon crache le feu…). Leur niveau compte.'],
   ['act-attack', '#E0485E', '2 actions par tour', 'Touche une figurine, puis une case jaune pour la déplacer, un ennemi entouré de rouge pour l’attaquer, ou une carte.'],
@@ -146,7 +149,7 @@ export default function sallesScreen(app, root) {
     const u = sel && st.units[sel];
     const chest = u && DG.chestNear(st, sel);
     const cards = u ? DG.playable(st, sel) : [];
-    const hand = u ? `<div class="sl-hand">${cards.map((c, i) => `<button class="sl-card ${c.from} ${c.ok ? 'ok' : ''} ${mode && mode.k === c.k && mode.i === i ? 'on' : ''}" data-d="card" data-k="${c.k}" data-i="${i}" ${c.ok ? '' : 'disabled'}><span class="sl-card-ic">${icon(c.def.icon || 'sparkle')}</span><b>${esc(c.def.name)}</b><small>${c.def.acts ? `${c.def.acts} action${c.def.acts > 1 ? 's' : ''}` : 'gratuit'}${c.def.range > 1 ? ` · ${c.def.range} cases` : ''}</small></button>`).join('')}${cards.length ? '' : '<span class="small muted">Aucune carte en main.</span>'}</div>` : '';
+    const hand = u ? `<div class="sl-hand">${cards.map((c, i) => `<button class="sl-card ${c.from} ${c.ok ? 'ok' : ''} ${mode && mode.k === c.k && mode.i === i ? 'on' : ''}" data-d="card" data-k="${c.k}" data-i="${i}" ${c.ok ? '' : 'disabled'}><span class="sl-card-ic">${cardIcon(c.k, c.def)}</span><b>${esc(c.def.name)}</b><small>${c.def.acts ? `${c.def.acts} action${c.def.acts > 1 ? 's' : ''}` : 'gratuit'}${c.def.range > 1 ? ` · ${c.def.range} cases` : ''}</small></button>`).join('')}${cards.length ? '' : '<span class="small muted">Aucune carte en main.</span>'}</div>` : '';
     panel.innerHTML = `<div class="sl-sel">${u ? `<span class="sl-sel-name"><b>${esc(u.name)}</b><span class="small">${u.hp}/${u.maxHp} PV · ATQ ${u.atk} · ${u.acts} action${u.acts > 1 ? 's' : ''}${u.range > 1 ? ' · tir à ' + u.range : ''}</span></span>` : `<span class="small muted">${alive(st).some((x) => x.acts > 0) ? 'Touche une de tes figurines.' : 'Plus d’action : termine le tour.'}</span>`}
         <span class="sl-sel-btns">${chest && u.acts > 0 ? `<button class="btn small gold" data-d="chest">${icon('p:chest')}Coffre</button>` : ''}${mode ? `<button class="btn small ghost" data-d="cancel">Annuler</button>` : ''}<button class="btn small primary dc-plq dc-plq-red sl-end" data-d="end">Fin du tour</button></span></div>
       ${mode ? `<p class="small sl-hint">${esc(DG.cardDef(mode.k).desc)}<br><b>Choisis la cible.</b></p>` : u && u.acts > 0 ? `<p class="small muted sl-hint">${mode ? '' : 'Touche une case pour te déplacer, un ennemi pour attaquer, ou une carte.'}</p>` : ''}

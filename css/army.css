@@ -1932,3 +1932,4 @@ body.battle-mode.has-subnav #view, body.battle-mode #view { padding: calc(var(--
 @media (max-height: 620px) { .sl-card b { font-size: .44rem !important; letter-spacing: 0; left: 6%; right: 6%; } }
 .sl-card b { letter-spacing: 0; }
 .bn-descente { --bn: url(../assets/ui/bn-descente.webp); }
+.sl-card-ic .sl-pw { width: 92%; height: 92%; object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .8)); }
