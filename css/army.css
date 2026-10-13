@@ -1934,3 +1934,11 @@ body.battle-mode.has-subnav #view, body.battle-mode #view { padding: calc(var(--
 .bn-descente { --bn: url(../assets/ui/bn-descente.webp); }
 .sl-card-ic .sl-pw { width: 92%; height: 92%; object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .8)); }
 .bn-boosters { --bn: url(../assets/ui/bn-boosters.webp); } .bn-renfort { --bn: url(../assets/ui/bn-renfort.webp); }
+/* Sceaux : pouvoirs de rareté, rempart, revanches éveillées */
+.sc-perk { position: absolute; z-index: 3; bottom: 18%; right: 4%; display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; font-size: 9px; font-style: normal; line-height: 1; background: rgba(0, 0, 0, .8); border: 1px solid #F2C14E; }
+.sc-perk.fureur { right: auto; left: 4%; border-color: #FF6B7F; }
+.sc-perk.gone, .sc-perk.broken { display: none; }
+.sc-block { position: absolute; z-index: 6; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 3px 7px; border-radius: 99px; background: rgba(20, 16, 6, .92); border: 1px solid #F2C14E; color: #FFE7A0; font: 800 .7rem/1 var(--f-ui); white-space: nowrap; animation: dvIn .25s ease-out; pointer-events: none; }
+.sc-awake { display: flex; align-items: center; gap: 10px; width: calc(100% - 22px); margin: -4px 0 6px 22px; padding: 8px 12px; border-radius: 0 0 12px 12px; border: 1px solid rgba(255, 84, 104, .45); border-top: 0; background: linear-gradient(90deg, rgba(70, 10, 20, .9), rgba(20, 8, 12, .9)); color: var(--ink); font: inherit; text-align: left; }
+.sc-awake > span { flex: 1; display: grid; gap: 2px; } .sc-awake b { font: 700 .82rem/1.1 var(--f-display); color: #FF9AA8; } .sc-awake small { font-size: .68rem; color: var(--mute); }
+.sc-awake .ic { width: 18px; height: 18px; color: #FF6B7F; } .sc-awake.won b { color: var(--gold-hi); }

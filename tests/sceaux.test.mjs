@@ -251,3 +251,48 @@ test('trophée : une carte adverse contrôlée, une fois par jour, Héroïque au
   st2.over = 'won'; st2.final = SC.score(st2);
   assert.equal(g.sceauxFinish().trophy, undefined, 'déjà pris aujourd’hui');
 });
+
+test('pouvoirs de rareté : Rempart résiste une fois, Fureur capture à égalité', () => {
+  const hr = catalog.cards.find((c) => c.rarity === 'HR'), m = catalog.cards.find((c) => c.rarity === 'M');
+  assert.deepEqual(SC.perksOf(hr), ['rempart']); assert.deepEqual(SC.perksOf(m), ['fureur']);
+  assert.deepEqual(SC.perksOf(catalog.cards.find((c) => c.rarity === 'S')), ['rempart', 'fureur']);
+  assert.deepEqual(SC.perksOf(catalog.cards.find((c) => c.rarity === 'C')), []);
+  // Rempart : une carte HR adverse au centre, on la frappe deux fois avec des valeurs supérieures
+  const st = game('p');
+  st.board[4] = { id: hr.id, owner: 'o', vals: [1, 1, 1, 1], guard: true };
+  st.hands.p = [ids[0], ids[1]];
+  const f1 = SC.place(catalog, st, 'p', 0, 1);
+  assert.ok(f1.some((f) => f.blocked)); assert.equal(st.board[4].owner, 'o'); assert.equal(st.board[4].guard, false);
+  st.turn = 'p';
+  const f2 = SC.place(catalog, st, 'p', 0, 3);
+  assert.ok(f2.some((f) => f.cell === 4 && !f.blocked)); assert.equal(st.board[4].owner, 'p');
+  // Fureur : une Mythique posée à côté d'une valeur égale capture
+  const st2 = game('p');
+  const vm = SC.sideValues(m);
+  st2.board[4] = { id: ids[5], owner: 'o', vals: [1, 1, 1, vm[1]], guard: false };
+  st2.hands.p = [m.id];
+  const f3 = SC.place(catalog, st2, 'p', 0, 3);
+  assert.ok(f3.some((f) => f.cell === 4 && f.rule === 'fureur')); assert.equal(st2.board[4].owner, 'p');
+});
+
+test('nouveaux adversaires et revanches éveillées', () => {
+  assert.equal(SC.RIVALS.length, 8);
+  for (const r of SC.RIVALS) { assert.ok(SC.RULES[r.rule], r.key); assert.ok(catalog.get(r.portrait), r.key); assert.equal(SC.rivalHand(catalog, r).length, 5); }
+  const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('aw'), clock });
+  assert.throws(() => g.sceauxStart({ rival: 'initie', awake: true }), /Bats/);
+  forceWin(g, 'initie');
+  g.sceauxQuit();
+  g.sceauxStart({ rival: 'initie', awake: true });
+  const st = g.s.sceaux.cur;
+  assert.equal(st.awake, true); assert.equal(st.level, 2);
+  while (!st.over) { if (st.turn === 'o') g.sceauxAi(); else { const m = SC.aiMove(catalog, st, 4, rngFrom('x')); g.sceauxPlay(m[0], m[1]); } }
+  st.over = 'won'; st.final = { p: 7, o: 3 };
+  const before = g.s.shards;
+  const out = g.sceauxFinish();
+  assert.ok(out.first); assert.ok(g.s.sceaux.awake.initie);
+  assert.ok(g.s.shards - before >= SC.SCEAUX_REWARD.firstAwake);
+  // règles combinées : Usure = Identique + cases sacrées
+  const u = SC.newGame(catalog, { hand: ids.slice(0, 5), rival: SC.RIVAL.banquier, seed: 9 });
+  assert.ok(SC.ruleHas(u, 'identique') && SC.ruleHas(u, 'sacre'));
+  assert.ok(u.cells.blessed != null);
+});

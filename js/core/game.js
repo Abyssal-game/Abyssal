@@ -675,7 +675,7 @@ export class Game {
   }
   sceauxUnlocked() { return SC.RIVALS.filter((_, i) => SC.rivalUnlocked(this.s, i)).length; }
   sceauxDaily() { return SC.dailyChallenge(today(this.clock()), this.sceauxUnlocked()); }
-  sceauxStart({ rival, daily = false } = {}) {
+  sceauxStart({ rival, daily = false, awake = false } = {}) {
     const sc = this.s.sceaux;
     let R = SC.RIVAL[rival], seed = Math.floor(this.rng() * 2 ** 31);
     if (daily) {
@@ -686,6 +686,7 @@ export class Game {
       const i = SC.RIVALS.findIndex((r) => r.key === rival);
       if (i < 0) throw new Error('Adversaire inconnu.');
       if (!SC.rivalUnlocked(this.s, i)) throw new Error('Bats d’abord l’adversaire précédent.');
+      if (awake) { if (!sc.beaten[rival]) throw new Error('Bats-le d’abord une fois.'); R = SC.awakened(R); }
     }
     sc.cur = SC.newGame(this.catalog, { hand: this.sceauxHand(), rival: R, seed, daily });
     sc.cur.ruleKey = R.rule; sc.cur.rule = R.rule;
@@ -702,7 +703,7 @@ export class Game {
   sceauxAi() {
     const st = this.s.sceaux.cur;
     if (!st || st.over || st.turn !== 'o') return null;
-    const m = SC.aiMove(this.catalog, st, SC.RIVAL[st.rival].level, this.rng);
+    const m = SC.aiMove(this.catalog, st, st.level || SC.RIVAL[st.rival].level, this.rng);
     const flips = SC.place(this.catalog, st, 'o', m[0], m[1]);
     this.persist();
     return { cell: m[1], flips };
@@ -714,14 +715,16 @@ export class Game {
     if (st.rewarded) return st.result;
     const day = today(this.clock());
     if (sc.day !== day) { sc.day = day; sc.paidToday = 0; }
-    const R = SC.RIVAL[st.rival];
+    const R = st.awake ? SC.awakened(SC.RIVAL[st.rival]) : SC.RIVAL[st.rival];
+    sc.awake ||= {};
     const out = { result: st.over, shards: 0, first: false, title: null, daily: st.daily, capped: false };
     if (st.over === 'won') {
       sc.wins++; sc.streak++; sc.best = Math.max(sc.best, sc.streak);
-      if (!sc.beaten[R.key]) { sc.beaten[R.key] = Date.now(); out.first = true; out.shards += SC.SCEAUX_REWARD.firstWin; }
+      if (st.awake) { if (!sc.awake[R.key]) { sc.awake[R.key] = Date.now(); out.first = true; out.shards += SC.SCEAUX_REWARD.firstAwake; } }
+      else if (!sc.beaten[R.key]) { sc.beaten[R.key] = Date.now(); out.first = true; out.shards += SC.SCEAUX_REWARD.firstWin; }
       if (st.daily && sc.dailyDone !== day) { sc.dailyDone = day; out.shards += SC.SCEAUX_REWARD.daily; }
       if (sc.paidToday < SC.SCEAUX_REWARD.dailyPaid) { sc.paidToday++; out.shards += R.reward; } else out.capped = true;
-      const t = SC.SCEAUX_TITLES[R.key] || (sc.wins === 1 ? SC.SCEAUX_TITLES.initie : null);
+      const t = st.awake ? (Object.keys(sc.awake).length >= SC.RIVALS.length ? 'Éveilleur des Sceaux' : null) : SC.SCEAUX_TITLES[R.key] || (sc.wins === 1 ? SC.SCEAUX_TITLES.initie : null);
       if (t && !this.s.titles.includes(t)) { this.s.titles.push(t); out.title = t; }
       if (R.key === 'echo' && !this.s.frames.includes('sceaux')) { this.s.frames.push('sceaux'); out.frame = 'sceaux'; }
       // Trophée : une carte adverse capturée, une fois par jour

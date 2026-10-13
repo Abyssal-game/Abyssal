@@ -48,9 +48,19 @@ export const RULES = {
   identique: { name: 'Identique', desc: 'Si ta carte touche deux cartes voisines (ou plus) avec des valeurs égales à celles d’en face, les cartes adverses parmi elles sont capturées. Puis Combo : chaque carte prise capture à son tour ses voisines plus faibles.' },
   somme:     { name: 'Somme', desc: 'Si ta carte forme la même somme (ta valeur + celle d’en face) avec deux voisines ou plus, les cartes adverses parmi elles sont capturées. Puis Combo : chaque carte prise capture à son tour ses voisines plus faibles.' },
   abime:     { name: 'Abîme', desc: 'Identique, Somme et Combo, sur un plateau instable : une case bénie et une case maudite qui changent de place toutes les deux poses.' },
+  usure:     { name: 'Usure', desc: 'Identique et Combo, avec une case bénie (+1) et une case maudite (−1) fixes.' },
+  archive:   { name: 'Archives', desc: 'Somme et Combo, et la Fraternité : 3 cartes d’une même faction en main renforcent leur plus faible valeur.' },
+  neant:     { name: 'Néant', desc: 'Toutes les règles à la fois : Identique, Somme, Combo, Fraternité et plateau instable.' },
 };
+// Pouvoirs de rareté (la rareté ne change pas le total des valeurs, elle donne un pouvoir)
+// Rempart : la première capture qui la viserait échoue. Fureur : à sa pose, elle capture aussi à égalité.
+export const PERKS = {
+  rempart: { name: 'Rempart', desc: 'La première fois qu’on devrait la capturer, elle résiste.', rar: ['HR', 'S'] },
+  fureur:  { name: 'Fureur', desc: 'Quand tu la poses, elle capture aussi les cartes voisines à égalité.', rar: ['M', 'S'] },
+};
+export const perksOf = (card) => Object.keys(PERKS).filter((k) => PERKS[k].rar.includes(card?.rarity));
 // Une règle peut en combiner plusieurs
-const PARTS = { abime: ['identique', 'somme', 'instable'] };
+const PARTS = { abime: ['identique', 'somme', 'instable'], usure: ['identique', 'sacre'], archive: ['somme', 'faction'], neant: ['identique', 'somme', 'instable', 'faction'] };
 export const ruleHas = (st, k) => st.rule === k || (PARTS[st.rule] || []).includes(k);
 // Le cœur du Sceau : départage les égalités
 export const CENTER = 4;
@@ -65,14 +75,22 @@ export const RIVALS = [
     hello: 'Chaque case est une prière. Choisis bien où tu t’agenouilles.', win: 'La lumière t’a guidé, cette fois.', lose: 'Tu as joué au hasard. La lumière, jamais.' },
   { key: 'maitre', name: 'Le Maître des Sceaux', title: 'gardien des règles', level: 4, faction: 'necrotique', portrait: 'NEC-001', rule: 'somme', reward: 55,
     hello: 'J’ai scellé plus de créatures que tu n’en verras jamais.', win: 'Tu as brisé mon sceau. Ce n’est pas rien.', lose: 'Reviens quand tu sauras compter.' },
-  { key: 'echo', name: 'L’Écho de l’Abîme', title: 'adversaire ultime', level: 4, faction: 'abyssal', portrait: 'ABY-039', rule: 'abime', reward: 70,
+  { key: 'echo', name: 'L’Écho de l’Abîme', title: 'gardien des profondeurs', level: 4, faction: 'abyssal', portrait: 'ABY-039', rule: 'abime', reward: 70,
     hello: 'Je joue tes coups avant toi. Je les ai déjà joués mille fois.', win: '… l’écho se tait.', lose: 'Tu m’entends ? C’est toi, en bas.' },
+  { key: 'banquier', name: 'Mammon', title: 'le Banquier des Enfers', level: 5, faction: 'infernal', portrait: 'INF-040', rule: 'usure', reward: 80,
+    hello: 'Tout se paie, ici. Même une égalité.', win: 'Une perte… je la noterai dans mon grand livre.', lose: 'Intérêts encaissés. Merci de ta visite.' },
+  { key: 'archiviste', name: 'L’Archiviste', title: 'mémoire d’engrenages', level: 5, faction: 'artificiel', portrait: 'ART-041', rule: 'archive', reward: 90,
+    hello: 'J’ai catalogué chacune de tes parties. Elles se terminent toutes pareil.', win: 'Erreur… à… réindexer.', lose: 'Résultat conforme aux prévisions.' },
+  { key: 'souverain', name: 'La Souveraine du Néant', title: 'avant le premier Sceau', level: 5, faction: 'primordial', portrait: 'PRI-053', rule: 'neant', reward: 100,
+    hello: 'Avant les Sceaux, il n’y avait que moi. Il n’y aura que moi après.', win: 'Alors… le Néant peut perdre.', lose: 'Retourne au silence, petite flamme.' },
 ];
+// Revanche « éveillée » : après une victoire, l'adversaire revient plus fort (main plus rare, jeu plus fin)
+export const awakened = (R) => ({ ...R, awake: true, level: Math.min(5, R.level + 1), reward: Math.round(R.reward * 1.5), name: R.name, title: `${R.title} · éveillé` });
 export const RIVAL = Object.fromEntries(RIVALS.map((r) => [r.key, r]));
 export const rivalUnlocked = (s, i) => i === 0 || !!s.sceaux?.beaten?.[RIVALS[i - 1].key];
 
 // Récompenses : plafonnées par jour pour qu'aucun mode ne devienne la seule source d'éclats
-export const SCEAUX_REWARD = { dailyPaid: 5, firstWin: 100, daily: 40 };
+export const SCEAUX_REWARD = { dailyPaid: 5, firstWin: 100, daily: 40, firstAwake: 150 };
 // Trophée : après une victoire, une fois par jour, tu gardes une carte adverse que tu contrôles (rareté HR au plus)
 export const TROPHY_MAX = ['C', 'PC', 'R', 'HR'];
 export function trophyChoices(cat, st) {
@@ -80,13 +98,13 @@ export function trophyChoices(cat, st) {
   const ids = st.board.filter((c) => c && c.owner === 'p' && st.hands.o.indexOf(c.id) < 0 && st.oppHand?.includes(c.id)).map((c) => c.id);
   return [...new Set(ids)].filter((id) => TROPHY_MAX.includes(cat.get(id)?.rarity));
 }
-export const SCEAUX_TITLES = { initie: 'Initié des Sceaux', maitre: 'Maître des Sceaux', echo: 'Briseur d’Échos' };
+export const SCEAUX_TITLES = { initie: 'Initié des Sceaux', maitre: 'Maître des Sceaux', echo: 'Briseur d’Échos', souverain: 'Souverain des Sceaux' };
 
 // Main d'un adversaire : 5 cartes de sa faction, de plus en plus rares avec son niveau (déterministe)
 export function rivalHand(cat, rival, salt = '') {
-  const r = mulberry(hash(`rival:${rival.key}:${salt}`));
+  const r = mulberry(hash(`rival:${rival.key}:${rival.awake ? 'eveil:' : ''}${salt}`));
   const pool = (rival.faction ? cat.byFaction[rival.faction] : cat.cards).filter((c) => c.rarity !== 'S' || rival.level >= 4);
-  const tiers = { 1: ['C', 'C', 'C', 'PC', 'PC'], 2: ['C', 'PC', 'PC', 'R', 'R'], 3: ['PC', 'R', 'R', 'HR', 'HR'], 4: ['R', 'HR', 'HR', 'M', 'M'] }[rival.level];
+  const tiers = { 1: ['C', 'C', 'C', 'PC', 'PC'], 2: ['C', 'PC', 'PC', 'R', 'R'], 3: ['PC', 'R', 'R', 'HR', 'HR'], 4: ['R', 'HR', 'HR', 'M', 'M'], 5: ['HR', 'HR', 'M', 'M', 'S'] }[rival.level];
   const out = [];
   for (const t of tiers) {
     const cands = pool.filter((c) => c.rarity === t && !out.includes(c.id));
@@ -123,13 +141,13 @@ export function newGame(cat, { hand, rival, seed = Date.now(), daily = false }) 
   const rnd = mulberry(seed);
   const opp = rivalHand(cat, R, daily ? `jour:${seed}` : '');
   const st = {
-    v: 1, rival: R.key, rule: R.rule, daily, seed, oppHand: opp.slice(),
+    v: 1, rival: R.key, rule: R.rule, daily, seed, oppHand: opp.slice(), level: R.level, awake: !!R.awake, rname: R.name,
     board: Array(9).fill(null), hands: { p: hand.slice(0, 5), o: opp }, turn: rnd() < 0.5 ? 'p' : 'o', placed: 0,
     cells: { blessed: null, cursed: null }, over: null, last: null, log: [],
     fac: { p: dominant(cat, hand), o: dominant(cat, opp) },
   };
   st.first = st.turn;
-  if (st.rule === 'sacre' || ruleHas(st, 'instable')) moveCells(st, rnd);
+  if (ruleHas(st, 'sacre') || ruleHas(st, 'instable')) moveCells(st, rnd);
   st.rng = Math.floor(rnd() * 2 ** 31);
   return st;
 }
@@ -150,7 +168,7 @@ function moveCells(st, rnd) {
 export function valuesOn(cat, st, id, cell, who) {
   const card = cat.get(id);
   const v = sideValues(card).slice();
-  if (st.rule === 'faction' && st.fac[who] && card.faction === st.fac[who]) { const i = v.indexOf(Math.min(...v)); v[i]++; }
+  if (ruleHas(st, 'faction') && st.fac[who] && card.faction === st.fac[who]) { const i = v.indexOf(Math.min(...v)); v[i]++; }
   const mod = cell === st.cells.blessed ? 1 : cell === st.cells.cursed ? -1 : 0;
   return v.map((x) => Math.max(1, Math.min(10, x + mod)));
 }
@@ -165,7 +183,11 @@ export function place(cat, st, who, handIdx, cell) {
   if (!id) throw new Error('Carte introuvable.');
   const vals = valuesOn(cat, st, id, cell, who);
   st.hands[who] = st.hands[who].filter((_, k) => k !== handIdx);
-  st.board[cell] = { id, owner: who, vals };
+  const perks = perksOf(cat.get(id));
+  st.board[cell] = { id, owner: who, vals, guard: perks.includes('rempart') };
+  const fury = perks.includes('fureur');
+  // Rempart : la carte visée résiste une fois (le rempart tombe)
+  const take = (o) => { if (o.guard) { o.guard = false; flips.push({ cell: st.board.indexOf(o), blocked: true }); return false; } return true; };
   const flips = [];
   const near = neighbors(cell).map((n, d) => (n >= 0 && st.board[n] ? { n, d, o: st.board[n], mine: vals[d], theirs: st.board[n].vals[OPP[d]] } : null)).filter(Boolean);
   // Identique / Somme : deux voisines ou plus (les tiennes comptent pour déclencher, seules les adverses sont prises)
@@ -177,24 +199,24 @@ export function place(cat, st, who, handIdx, cell) {
     Object.values(sums).forEach((g) => { if (g.length >= 2) g.forEach((x) => { if (!special.has(x.n)) special.set(x.n, ['somme', x]); }); });
   }
   const chain = [];
-  for (const [n, [rule, x]] of special) if (x.o.owner !== who) { x.o.owner = who; flips.push({ cell: n, dir: x.d, mine: x.mine, theirs: x.theirs, rule, from: cell }); chain.push(n); }
+  for (const [n, [rule, x]] of special) if (x.o.owner !== who && take(x.o)) { x.o.owner = who; flips.push({ cell: n, dir: x.d, mine: x.mine, theirs: x.theirs, rule, from: cell }); chain.push(n); }
   // capture simple
   near.forEach((x) => {
     if (x.o.owner === who) return;
-    if (x.mine > x.theirs) { x.o.owner = who; flips.push({ cell: x.n, dir: x.d, mine: x.mine, theirs: x.theirs, from: cell }); }
+    if ((x.mine > x.theirs || (fury && x.mine === x.theirs)) && take(x.o)) { x.o.owner = who; flips.push({ cell: x.n, dir: x.d, mine: x.mine, theirs: x.theirs, from: cell, rule: x.mine === x.theirs ? 'fureur' : undefined }); }
   });
   // Combo : chaque carte prise par Identique ou Somme capture à son tour (en cascade, chaque carte une seule fois)
   while (chain.length) {
     const c = chain.shift(), src = st.board[c];
     neighbors(c).forEach((n, d) => {
       const o = n >= 0 && st.board[n];
-      if (!o || o.owner === who || src.vals[d] <= o.vals[OPP[d]]) return;
+      if (!o || o.owner === who || src.vals[d] <= o.vals[OPP[d]] || !take(o)) return;
       o.owner = who; flips.push({ cell: n, dir: d, mine: src.vals[d], theirs: o.vals[OPP[d]], rule: 'combo', from: c }); chain.push(n);
     });
   }
   st.placed++;
   st.last = { cell, who, flips };
-  st.log.push({ who, id, cell, flips: flips.map((f) => f.cell) });
+  st.log.push({ who, id, cell, flips: flips.filter((f) => !f.blocked).map((f) => f.cell) });
   if (ruleHas(st, 'instable') && st.placed % 2 === 0 && st.placed < 9) { const r = mulberry(st.rng + st.placed); moveCells(st, r); }
   if (st.placed >= 9) finish(st);
   else st.turn = who === 'p' ? 'o' : 'p';
@@ -239,7 +261,7 @@ export function aiMove(cat, st, level = 2, rnd = Math.random) {
   let best = null, bs = -Infinity;
   for (const [h, c] of moves) {
     const t = cloneGame(st);
-    const flips = place(cat, t, who, h, c);
+    const flips = place(cat, t, who, h, c).filter((f) => !f.blocked);
     let v = flips.length * 10 + (c === CENTER && level >= 2 ? 4 : 0);
     if (level >= 3) v -= exposure(cat, t, c, who) * 6;
     if (level >= 4 && !t.over) {
@@ -261,6 +283,6 @@ export function aiMove(cat, st, level = 2, rnd = Math.random) {
 export function dailyChallenge(day, unlockedCount) {
   const h = hash(`defi:${day}`);
   const rival = RIVALS[h % Math.max(1, unlockedCount)];
-  const rule = ['sacre', 'instable', 'faction', 'identique', 'somme'][(h >>> 8) % 5];
+  const rule = ['sacre', 'instable', 'faction', 'identique', 'somme', 'usure', 'archive'][(h >>> 8) % 7];
   return { rival: rival.key, rule, seed: h };
 }
