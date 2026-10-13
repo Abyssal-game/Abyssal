@@ -19,7 +19,7 @@ const PW_ART = { has: (k) => !!POWERS[k] || !!DG.ITEMS[k] || k === 'garde' }; //
 const cardIcon = (k, def) => (PW_ART.has(k) ? `<img class="sl-pw" alt="" src="${SL}pw/${k}.webp">` : icon(def.icon || 'sparkle'));
 const HOW = [
   ['salles', '#C9A24E', 'Tes 3 figurines', 'Choisis 3 créatures : chacune a son propre pouvoir (un ange soigne, un dragon crache le feu…). Leur niveau compte.'],
-  ['act-attack', '#E0485E', '2 actions par tour', 'Touche une figurine, puis une case jaune pour la déplacer, un ennemi entouré de rouge pour l’attaquer, ou une carte.'],
+  ['act-attack', '#E0485E', '2 actions par tour', 'Touche une figurine, puis une case dorée pour la déplacer, un ennemi entouré de rouge pour l’attaquer, ou une carte. Fais glisser un doigt pour tourner la vue, pince pour zoomer.'],
   ['luck', '#F2C14E', 'Les dés', 'Chaque attaque lance un D20 : 1 = échec critique, 20 = critique (dégâts doublés). Certains coups ajoutent un D6.'],
   ['cards', '#9C7BFF', 'Les cartes', 'Chaque figurine pioche une carte par tour (3 en main au plus). Les coffres donnent des objets, rangés dans le sac.'],
   ['danger', '#FF8A3A', 'Les ennemis', 'Ils avancent et frappent à leur tour. Un portail fait venir un renfort tous les 3 tours : détruis-le vite.'],
@@ -33,6 +33,7 @@ export default function sallesScreen(app, root) {
   const ui = (app.state.salles ||= { pick: null, diff: 'normal' });
   let st = g.sallesState();
   let sel = null, mode = null, busy = false, alive_ = true;
+  let V = null; // vue 3D (salles3d.js) quand l'appareil la gère ; sinon plateau 2D
   const reduced = app.reduced();
   const T = (ms) => (reduced ? Math.min(ms, 40) : ms);
   const wait = (ms) => new Promise((r) => setTimeout(r, T(ms)));
@@ -42,6 +43,7 @@ export default function sallesScreen(app, root) {
 
   // ——— Accueil : choisir 3 figurines et la difficulté ———
   function lobby() {
+    V?.destroy(); V = null;
     document.body.classList.remove('battle-mode');
     setScene('descent');
     const s = g.s.salles;
@@ -79,6 +81,25 @@ export default function sallesScreen(app, root) {
     drawRoom();
     drawTokens();
     draw();
+    init3D();
+  }
+  // Plateau en 3D : chargé à la demande ; en cas d'échec, le plateau 2D reste en place
+  async function init3D() {
+    if (V || !st) return;
+    try {
+      const test = document.createElement('canvas');
+      if (!(test.getContext('webgl2') || test.getContext('webgl'))) return;
+      const { create3D } = await import('./salles3d.js');
+      const b = $('.sl-board'); if (!b || !alive_ || !st) return;
+      const host = document.createElement('div'); host.className = 's3-host';
+      b.appendChild(host); b.classList.add('s3'); root.querySelector('.sl')?.classList.add('s3mode');
+      V = await create3D(host, { artFor: (u) => (u.minion ? `${SL}goule.webp` : artUrl(cardOf(u), { lite: true })), onTap: (hit) => hit && boardTap(hit), reduced });
+      V.room(st); drawTokens(); drawHints(); drawHints3D();
+      app.s3 = V; // accès pour les tests automatisés
+    } catch (err) {
+      console.warn('3D indisponible', err);
+      V = null; root.querySelector('.s3-host')?.remove(); $('.sl-board')?.classList.remove('s3'); root.querySelector('.sl')?.classList.remove('s3mode');
+    }
   }
   function drawRoom() {
     const cells = $('.sl-cells'), props = $('.sl-props');
@@ -91,6 +112,7 @@ export default function sallesScreen(app, root) {
       if (c === 'x') p += `<img class="sl-prop pillar" alt="" src="${SL}pillar.webp" style="${pos}">`;
       if (c === 'D') p += `<img class="sl-prop door" data-door alt="" src="${SL}door-${st.doorOpen ? 'open' : 'closed'}.webp" style="${pos}">`;
     }));
+    V?.room(st);
     for (const ch of st.chests) p += `<img class="sl-prop chest" data-chest="${ch.x},${ch.y}" alt="" src="${SL}chest-${ch.open ? 'open' : 'closed'}.webp" style="left:${(ch.x / W) * 100}%;top:${(ch.y / H) * 100}%">`;
     cells.innerHTML = h; props.innerHTML = p;
     $('.sl-tokens').innerHTML = '';
@@ -124,6 +146,20 @@ export default function sallesScreen(app, root) {
       el.classList.toggle('done', u.side === 'ally' && u.acts === 0 && st.turn === 'ally');
     }
     root.querySelectorAll('.sl-tok').forEach((e) => { if (!seen.has(e.dataset.uid)) e.remove(); });
+    V?.sync(st, { selUid: sel, labels: (u) => {
+      const el = tokEl(u.uid);
+      return { badges: el?.querySelector('.sl-badges')?.innerHTML || '', acts: el?.querySelector('.sl-acts')?.innerHTML || '', done: u.side === 'ally' && u.acts === 0 && st.turn === 'ally' };
+    } });
+  }
+  // Ce qu'on peut faire maintenant (pour la 2D comme pour la 3D)
+  function hintsNow() {
+    const h = { move: [], target: [], hit: [], tUnits: [] };
+    if (!st || !sel || st.turn !== 'ally' || st.phase !== 'play') return h;
+    const u = st.units[sel]; if (!u || u.acts <= 0) return h;
+    if (mode) { for (const t of DG.targets(st, sel, mode.k)) { if (t.uid) h.tUnits.push(t.uid); else h.target.push({ x: t.x, y: t.y }); } return h; }
+    h.move = DG.reach(st, u).map((c) => ({ x: c.x, y: c.y }));
+    h.hit = DG.attackTargets(st, sel).map((t) => t.uid);
+    return h;
   }
   // Surbrillances : cases atteignables, cibles possibles
   function drawHints() {
@@ -138,10 +174,11 @@ export default function sallesScreen(app, root) {
     for (const c of DG.reach(st, u)) root.querySelector(`.sl-c[data-x="${c.x}"][data-y="${c.y}"]`)?.classList.add('can-move');
     for (const t of DG.attackTargets(st, sel)) tokEl(t.uid)?.classList.add('can-hit');
   }
+  function drawHints3D() { V?.hints(hintsNow()); }
   function draw() {
     if (!alive_) return;
     $('.sl-room').innerHTML = st.room === DG.ROOMS ? `${icon('skull')} Le gardien` : `Salle ${st.room} / ${DG.ROOMS - 1}`;
-    drawTokens(); drawHints();
+    drawTokens(); drawHints(); drawHints3D();
     const panel = $('.sl-panel');
     if (st.phase === 'cleared') { panel.innerHTML = `<div class="sl-clear"><b>${icon('check')} Salle nettoyée</b><span class="small muted">${st.room < DG.ROOMS ? 'La porte s’ouvre. Tes figurines récupèrent 40 % de leurs PV.' : 'Le gardien est tombé !'}</span><button class="btn primary block dc-plq dc-plq-red" data-d="next">${st.room < DG.ROOMS ? (st.room === DG.ROOMS - 1 ? 'Affronter le gardien' : `Passer la porte · salle ${st.room + 1}`) : 'Remonter avec le butin'}</button></div>`; return; }
     if (st.phase !== 'play') { panel.innerHTML = ''; return; }
@@ -158,9 +195,17 @@ export default function sallesScreen(app, root) {
   }
   const alive = (s) => DG.alive(s, 'ally').filter((x) => !x.minion);
   const say = (m) => { const e = $('.sl-msg'); if (e) e.innerHTML = m; };
-  const float = (uid, txt, cls) => { const t = tokEl(uid); if (!t) return; const f = document.createElement('span'); f.className = `dv-float ${cls}`; f.textContent = txt; t.appendChild(f); setTimeout(() => f.remove(), 900); };
-  const flashCell = (x, y, r = 0) => { const W = st.grid[0].length, H = st.grid.length; for (let yy = y - r; yy <= y + r; yy++) for (let xx = x - r; xx <= x + r; xx++) { const e = root.querySelector(`.sl-c[data-x="${xx}"][data-y="${yy}"]`); if (e) { e.classList.add('aoe'); setTimeout(() => e.classList.remove('aoe'), 600); } } };
+  const float = (uid, txt, cls) => { if (V) return V.float(uid, txt, cls); const t = tokEl(uid); if (!t) return; const f = document.createElement('span'); f.className = `dv-float ${cls}`; f.textContent = txt; t.appendChild(f); setTimeout(() => f.remove(), 900); };
+  const flashCell = (x, y, r = 0) => { if (V) return V.flash(x, y, r); const W = st.grid[0].length, H = st.grid.length; for (let yy = y - r; yy <= y + r; yy++) for (let xx = x - r; xx <= x + r; xx++) { const e = root.querySelector(`.sl-c[data-x="${xx}"][data-y="${yy}"]`); if (e) { e.classList.add('aoe'); setTimeout(() => e.classList.remove('aoe'), 600); } } };
   async function showDice(e) {
+    if (V) {
+      app.sfx.dice?.();
+      const roll = V.dice(e, e.d === 6 ? `+${e.n} dégâts` : `${TIER_TXT[e.tier] || ''}${e.d === 20 && e.bonus ? ` (+${e.bonus})` : ''}`);
+      await wait(560);
+      if (e.tier === 'crit') app.sfx.crit?.(); else if (e.tier === 'fumble') app.sfx.fumble?.(); else if (e.tier === 'miss') app.sfx.miss?.();
+      await roll;
+      return;
+    }
     const d = $('.sl-dice'); if (!d) return;
     const who = st.units[e.u];
     d.hidden = false;
@@ -175,32 +220,34 @@ export default function sallesScreen(app, root) {
   // Rejoue la liste d'événements du moteur, avec les animations
   async function play(ev) {
     busy = true;
+    V?.expect(ev.filter((e) => e.t === 'move').map((e) => e.u));
     for (const e of ev) {
       if (!alive_) return;
       switch (e.t) {
-        case 'move': { drawTokens(); await wait(260); break; }
+        case 'move': { if (V) { V.hints({}); await V.walk(e.u, e.path); drawTokens(); } else { drawTokens(); await wait(260); } break; }
         case 'dice': await showDice(e); break;
-        case 'attack': { const a = tokEl(e.a); a?.classList.add('bump'); setTimeout(() => a?.classList.remove('bump'), 300); app.sfx.slash?.(); await wait(120); break; }
-        case 'dmg': { drawTokens(); float(e.u, `−${e.d}`, 'dmg'); const t = tokEl(e.u); t?.classList.add('hit'); setTimeout(() => t?.classList.remove('hit'), 350); app.sfx.hit?.(); await wait(320); break; }
+        case 'attack': { V?.bump(e.a, e.u); const a = tokEl(e.a); a?.classList.add('bump'); setTimeout(() => a?.classList.remove('bump'), 300); app.sfx.slash?.(); await wait(120); break; }
+        case 'dmg': { drawTokens(); V?.hit(e.u); float(e.u, `−${e.d}`, 'dmg'); const t = tokEl(e.u); t?.classList.add('hit'); setTimeout(() => t?.classList.remove('hit'), 350); app.sfx.hit?.(); await wait(320); break; }
         case 'heal': { drawTokens(); float(e.u, `+${e.d}`, 'heal'); app.sfx.heal?.(); await wait(260); break; }
         case 'miss': { float(e.u, e.fumble ? 'Échec !' : 'Raté', 'dodge'); await wait(260); break; }
         case 'status': { float(e.u, e.s, 'info'); await wait(220); break; }
-        case 'death': { const t = tokEl(e.u); t?.classList.add('dead'); app.sfx.death?.(); await wait(420); drawTokens(); break; }
-        case 'spawn': { drawTokens(); const t = tokEl(e.u); t?.classList.add('spawn'); app.sfx.summon?.(); await wait(380); break; }
+        case 'death': { const t = tokEl(e.u); t?.classList.add('dead'); app.sfx.death?.(); if (V) await V.death(e.u); else await wait(420); drawTokens(); break; }
+        case 'spawn': { drawTokens(); V?.spawn(e.u); const t = tokEl(e.u); t?.classList.add('spawn'); app.sfx.summon?.(); await wait(380); break; }
         case 'push': case 'swap': { drawTokens(); await wait(240); break; }
         case 'card': { say(`${esc(st.units[e.u]?.name || '')} : <b>${esc(DG.cardDef(e.k).name)}</b>`); app.sfx.skill?.(); await wait(200); break; }
-        case 'ecard': { say(`${esc(st.units[e.u]?.name || 'Ennemi')} utilise <b>${esc(DG.cardDef(e.k)?.name || e.k)}</b>`); app.sfx.boss?.(); await wait(450); break; }
+        case 'ecard': { say(`${esc(st.units[e.u]?.name || 'Ennemi')} utilise <b>${esc(DG.cardDef(e.k)?.name || e.k)}</b>`); app.sfx.boss?.(); if (st.units[e.u]?.boss) V?.shake(0.15); await wait(450); break; }
         case 'aoe': { flashCell(e.x, e.y, e.r); await wait(200); break; }
         case 'draw': break;
-        case 'chest': { const im = root.querySelector(`.sl-prop[data-chest="${e.x},${e.y}"]`); if (im) im.src = `${SL}chest-open.webp`; app.sfx.coin?.(); toast(`Dans le coffre : <b>${esc(DG.ITEMS[e.k].name)}</b>. ${esc(DG.ITEMS[e.k].desc)}`, { kind: 'success', icon: 'chest' }); await wait(300); break; }
-        case 'trapset': { drawTraps(); await wait(200); break; }
-        case 'trap': { drawTraps(); float(e.u, 'Piège !', 'dmg'); await wait(260); break; }
-        case 'cleared': { const d = root.querySelector('[data-door]'); if (d) d.src = `${SL}door-open.webp`; app.sfx.achievement?.(); say(`<b>Salle ${e.n} nettoyée</b>`); await wait(500); break; }
+        case 'chest': { const im = root.querySelector(`.sl-prop[data-chest="${e.x},${e.y}"]`); if (im) im.src = `${SL}chest-open.webp`; V?.chest(e.x, e.y); app.sfx.coin?.(); toast(`Dans le coffre : <b>${esc(DG.ITEMS[e.k].name)}</b>. ${esc(DG.ITEMS[e.k].desc)}`, { kind: 'success', icon: 'chest' }); await wait(300); break; }
+        case 'trapset': { drawTraps(); V?.traps(st); await wait(200); break; }
+        case 'trap': { drawTraps(); V?.traps(st); float(e.u, 'Piège !', 'dmg'); await wait(260); break; }
+        case 'cleared': { const d = root.querySelector('[data-door]'); if (d) d.src = `${SL}door-open.webp`; V?.door(true); app.sfx.achievement?.(); say(`<b>Salle ${e.n} nettoyée</b>`); await wait(500); break; }
         case 'room': { drawRoom(); drawTokens(); banner(e.boss ? `${icon('skull')} Le gardien` : `Salle ${e.n}`); app.sfx.enter?.(); await wait(900); break; }
         case 'won': case 'lost': break;
         default: break;
       }
     }
+    V?.settle();
     busy = false;
   }
   function banner(html) { const b = document.createElement('div'); b.className = 'cb-banner sl-banner'; b.innerHTML = html; $('.sl-board')?.appendChild(b); setTimeout(() => b.remove(), T(1100)); }
@@ -258,23 +305,29 @@ export default function sallesScreen(app, root) {
       }
       return;
     }
-    if (busy || !st || st.turn !== 'ally' || st.phase !== 'play') return;
     const tok = e.target.closest('.sl-tok');
-    if (tok) {
-      const u = st.units[tok.dataset.uid]; if (!u) return;
-      if (mode) { if (tok.classList.contains('can-target')) return run(() => DG.play(st, sel, mode.k, { uid: u.uid })); mode = null; return draw(); }
+    if (tok) return boardTap({ uid: tok.dataset.uid });
+    const cell = e.target.closest('.sl-c');
+    if (cell) return boardTap({ cell: { x: +cell.dataset.x, y: +cell.dataset.y } });
+  });
+  // Toucher sur le plateau (2D ou 3D) : une figurine ({ uid }) ou une case ({ cell })
+  function boardTap(hit) {
+    if (busy || !st || st.turn !== 'ally' || st.phase !== 'play' || !alive_) return;
+    const h = hintsNow();
+    if (hit.uid) {
+      const u = st.units[hit.uid]; if (!u) return;
+      if (mode) { if (h.tUnits.includes(u.uid)) return run(() => DG.play(st, sel, mode.k, { uid: u.uid })); mode = null; return draw(); }
       if (u.side === 'ally' && !u.minion) { sel = u.uid; app.sfx.tap?.(); return draw(); }
-      if (u.side === 'enemy' && sel && tok.classList.contains('can-hit')) return run(() => DG.attack(st, sel, u.uid));
+      if (u.side === 'enemy' && sel && h.hit.includes(u.uid)) return run(() => DG.attack(st, sel, u.uid));
       if (u.side === 'enemy') return info(u);
       return;
     }
-    const cell = e.target.closest('.sl-c');
-    if (cell && sel) {
-      const x = +cell.dataset.x, y = +cell.dataset.y;
-      if (mode) { if (cell.classList.contains('can-target')) return run(() => DG.play(st, sel, mode.k, { x, y })); mode = null; return draw(); }
-      if (cell.classList.contains('can-move')) return run(() => DG.move(st, sel, x, y));
+    if (hit.cell && sel) {
+      const { x, y } = hit.cell, has = (arr) => arr.some((c) => c.x === x && c.y === y);
+      if (mode) { if (has(h.target)) return run(() => DG.play(st, sel, mode.k, { x, y })); mode = null; return draw(); }
+      if (has(h.move)) return run(() => DG.move(st, sel, x, y));
     }
-  });
+  }
   function info(u) {
     const pw = u.power && POWERS[u.power];
     openSheet(`<div class="sl-info"><h2>${esc(u.name)}</h2><p class="small muted">${u.boss ? 'Gardien' : u.elite ? 'Élite' : u.portal ? 'Portail : un renfort tous les 3 tours tant qu’il tient' : 'Ennemi'}${u.id ? ` · ${esc(RARITY[u.rarity].name)}` : ''}</p>
@@ -305,5 +358,5 @@ export default function sallesScreen(app, root) {
   });
 
   if (st) { sel = nextFigure(); board(); if (st.phase === 'won' || st.phase === 'lost') finish(); } else lobby();
-  return () => { alive_ = false; document.body.classList.remove('battle-mode'); };
+  return () => { alive_ = false; V?.destroy(); V = null; document.body.classList.remove('battle-mode'); };
 }

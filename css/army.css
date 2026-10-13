@@ -1954,3 +1954,35 @@ body.battle-mode.has-subnav #view, body.battle-mode #view { padding: calc(var(--
 .wl-art.wl-bn { aspect-ratio: 900 / 297; object-position: center; }
 /* Salles : le calque d'effets ne doit jamais intercepter les touchers (sinon les cases ne répondent plus) */
 .sl-fx { pointer-events: none; }
+/* ——— Salles Oubliées en 3D ——— */
+.sl.s3mode { height: calc(var(--app-h, 100dvh) - var(--safe-t) - var(--safe-b) - 12px); }
+.sl-board.s3 { flex: 1 1 auto; width: calc(100% + 24px); margin: 0 -12px; min-height: 220px; aspect-ratio: auto; border: 0; border-image: none; background: none; box-shadow: none; }
+.sl-board.s3 > .sl-cells, .sl-board.s3 > .sl-props, .sl-board.s3 > .sl-tokens, .sl-board.s3 > .sl-fx { display: none; }
+.s3-host { position: absolute; inset: 0; overflow: hidden; }
+.s3-cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.s3-ov { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.s3-lab { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; margin: -14px 0 0 -22px; width: 44px; transition: opacity .2s; will-change: transform; }
+.s3-hp { width: 40px; height: 6px; border-radius: 4px; background: rgba(0, 0, 0, .75); border: 1px solid rgba(255, 255, 255, .25); overflow: hidden; }
+.s3-hp i { display: block; height: 100%; background: linear-gradient(90deg, #3FBF6A, #8BE08A); transition: width .3s; }
+.s3-lab.enemy .s3-hp i { background: linear-gradient(90deg, #C8324A, #FF6B7F); }
+.s3-hp.low i { background: linear-gradient(90deg, #E0485E, #FF8A3A); }
+.s3-badges { display: flex; gap: 2px; } .s3-badges:empty { display: none; }
+.s3-badges .sb { position: static; }
+.s3-acts { display: flex; gap: 3px; } .s3-acts:empty { display: none; }
+.s3-acts i { width: 7px; height: 7px; border-radius: 50%; background: rgba(0, 0, 0, .7); border: 1px solid rgba(242, 193, 78, .6); }
+.s3-acts i.on { background: #F2C14E; box-shadow: 0 0 6px #F2C14E; }
+.s3-float { position: absolute; transform: translate(-50%, -100%); z-index: 3; }
+.sl-board.s3 .sl-banner { z-index: 4; }
+/* Pastilles d'état des Salles : une autre règle « .sb » (grille à 3 colonnes) les étirait */
+.sl-badges .sb, .s3-badges .sb { grid-template-columns: none; gap: 0; width: auto; font-size: .55rem; }
+.s3-host::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse 75% 70% at 50% 45%, transparent 55%, rgba(0, 0, 0, .55) 100%); }
+.s3-ov { z-index: 2; }
+/* Résultat du dé 3D, posé au-dessus du dé sur la table */
+.s3-die { position: absolute; z-index: 3; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: none; animation: s3DieIn .25s ease-out; transition: opacity .3s, transform .3s; }
+.s3-die b { font: 900 2rem/1 var(--f-display); color: #FFF4DA; text-shadow: 0 0 8px #000, 0 2px 4px #000, 0 0 18px rgba(255, 210, 120, .5); }
+.s3-die span { padding: 2px 8px; border-radius: 99px; background: rgba(0, 0, 0, .8); font: 800 .7rem/1.2 var(--f-ui); color: #F2E6C8; white-space: nowrap; }
+.s3-die.crit b { color: #FFD36A; font-size: 2.4rem; } .s3-die.crit span { color: #F2C14E; }
+.s3-die.fumble b, .s3-die.fumble span { color: #FF4D6A; }
+.s3-die.miss span { color: #9FB4C8; } .s3-die.success span { color: #7FE0A0; }
+.s3-die.out { opacity: 0; transform: translate(-50%, -130%); }
+@keyframes s3DieIn { from { opacity: 0; transform: translate(-50%, -60%) scale(.6); } to { opacity: 1; transform: translate(-50%, -100%) scale(1); } }

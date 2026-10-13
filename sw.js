@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v193';
+const VERSION = 'abyssal-v194';
 const ART_CACHE = 'abyssal-media';  // images du jeu : gardées entre les versions
 const FONT_CACHE = 'abyssal-fonts';
 const CORE = [
@@ -13,7 +13,7 @@ const CORE = [
   'js/ui/dom.js', 'js/ui/icons.js', 'js/ui/card.js', 'js/ui/sound.js', 'js/ui/music.js',
   'js/screens/home.js', 'js/screens/collection.js', 'js/screens/shop.js', 'js/screens/opening.js', 'js/screens/detail.js',
   'js/screens/bestiary.js', 'js/screens/factions.js', 'js/screens/achievements.js', 'js/screens/profile.js',
-  'js/screens/settings.js', 'js/screens/furnace.js', 'js/screens/shadow.js', 'js/screens/forge.js', 'js/screens/salles.js', 'js/core/dungeon.js', 'js/core/powers.js', 'js/screens/chest-open.js', 'js/screens/descent.js', 'js/screens/items.js', 'js/screens/account.js', 'js/screens/creator.js', 'js/screens/menu.js', 'js/screens/welcome.js', 'js/cloud/cloud.js', 'js/cloud/sync.js', 'js/cloud/presence.js', 'js/ui/tutos.js', 'js/core/descent.js', 'js/core/skills.js', 'js/ui/coach.js',
+  'js/screens/settings.js', 'js/screens/furnace.js', 'js/screens/shadow.js', 'js/screens/forge.js', 'js/screens/salles.js', 'js/screens/salles3d.js',  'js/core/dungeon.js', 'js/core/powers.js', 'js/screens/chest-open.js', 'js/screens/descent.js', 'js/screens/items.js', 'js/screens/account.js', 'js/screens/creator.js', 'js/screens/menu.js', 'js/screens/welcome.js', 'js/cloud/cloud.js', 'js/cloud/sync.js', 'js/cloud/presence.js', 'js/ui/tutos.js', 'js/core/descent.js', 'js/core/skills.js', 'js/ui/coach.js',
   'js/core/army.js', 'js/core/duel.js', 'js/screens/army.js', 'js/screens/duel-ui.js', 'js/ui/chest.js', 'js/ui/scene.js',
   'data/factions.json', 'data/sets.json', 'data/abilities.json', 'data/achievements.json', 'data/lore.json', 'data/powers.json',
   'data/cards/infernal.json', 'data/cards/abyssal.json', 'data/cards/celeste.json', 'data/cards/sauvage.json',
@@ -86,6 +86,11 @@ self.addEventListener('fetch', (e) => {
       if (hit) { e.waitUntil(fresh); return hit; }
       return (await fresh) || Response.error();
     }));
+    return;
+  }
+  // Bibliothèques (three.js pour la 3D des Salles) : gardées d'une version à l'autre, téléchargées une seule fois
+  if (url.pathname.includes('/js/vendor/')) {
+    e.respondWith(caches.open(ART_CACHE).then(async (c) => { const hit = await c.match(req); if (hit) return hit; const res = await fetch(req); if (res.ok) c.put(req, res.clone()); return res; }));
     return;
   }
   // Prototype v2 : toujours le réseau d'abord (il change souvent), le cache en secours hors ligne
