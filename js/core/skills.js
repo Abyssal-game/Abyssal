@@ -5,6 +5,7 @@ import { roleOf } from './army.js';
 
 // ——— Ressources du joueur ———————————————————————————————————————————
 export const AP_MAX = 3;          // points d'action d'équipe par tour
+export const FERVOR_CARRY = 3;    // Ferveur gardée au plus d'un combat à l'autre
 export const FERVOR_MAX = 6;      // Ferveur : jauge commune, gardée d'un combat à l'autre
 export const FERVOR_START = 2;    // au début d'une expédition
 export const ACTS_PER_UNIT = 2;   // une créature agit au plus 2 fois par tour

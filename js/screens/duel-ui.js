@@ -85,6 +85,7 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
   const statusHTML = (u) => [
     u.broken ? st_('broken', 'Brisé : +50 % de dégâts subis, +5 aux jets') : '',
     u.shield ? st_('shield', 'Bouclier : bloque un coup') : '',
+    u.ward ? st_('shield', `Sceau : absorbe encore ${u.ward} dégâts`, u.ward) : '',
     u.poison ? st_('poison', `Poison : ${u.poison} dégâts au début de son tour`, u.poison) : '',
     u.frozen || u.stunned ? st_('frost', 'Gelé : passe son tour') : '',
     u.slow ? st_('slow', 'Ralenti : prochaine attaque -50 %') : '',
@@ -209,7 +210,7 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
     $('.cb-gems').innerHTML = Array.from({ length: FERVOR_MAX }, (_, i) => `<i class="${i < st.fervor ? 'on' : ''}"></i>`).join('');
     const ready = ultReady(st);
     $('.cb-res').classList.toggle('ready', ready);
-    $('.cb-ult small').textContent = ready ? 'Prêt ! Touche' : `${st.fervor}/${FERVOR_MAX}`;
+    $('.cb-ult small').textContent = st.ultUsed ? 'Utilisé' : ready ? 'Prêt ! Touche' : `${st.fervor}/${FERVOR_MAX}`;
     const canMore = st.ap > 0 && front(st, 'ally').some((u) => actionsFor(st, u.uid).some((a) => a.ok && a.key !== 'swap' && a.key !== 'defend'));
     $('.dv-end').classList.toggle('pulse', st.turn === 'ally' && !canMore && !busy);
     root.querySelectorAll('.dv-bar button').forEach((b) => { b.disabled = busy || st.turn !== 'ally' || !!st.over; });
@@ -668,7 +669,7 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
 
   // ——— Pouvoir d'équipe : explication avant, récapitulatif après ———
   const ULT_HOW = {
-    sceau: 'Chacune de tes créatures au combat récupère 30 % de ses PV et reçoit un bouclier qui bloque complètement le prochain coup.',
+    sceau: 'Chacune de tes créatures au combat récupère 30 % de ses PV et reçoit un bouclier qui absorbe des dégâts jusqu’à la moitié de ses PV max.',
     revive: 'Tes créatures tombées reviennent au combat avec la moitié de leurs PV. Si aucune n’est tombée, tes créatures au combat récupèrent 40 % de leurs PV.',
     nova: 'Chaque ennemi au combat subit des dégâts (plus forts à chaque tour qui passe) et sa jauge de Brisure baisse.',
     smite: 'L’ennemi qui a le plus de PV subit un coup énorme (plus fort à chaque tour) et sa jauge de Brisure baisse fortement.',
@@ -679,9 +680,9 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
     const sh = openSheet(`<div class="cb-ultsheet" style="--uc:${ult.color}">
       <div class="cb-ult-hero">${c ? `<img alt="" src="${artUrl(c)}">` : '<img alt="" src="assets/icons/power.webp">'}</div>
       <h2>${esc(ult.name)}</h2>
-      <p class="small muted">Pouvoir d’équipe${c ? ` de ${esc(c.name)}` : ''} · coûte <b>1 action</b> et <b>toute la Ferveur (${FERVOR_MAX})</b></p>
+      <p class="small muted">Pouvoir d’équipe${c ? ` de ${esc(c.name)}` : ''} · coûte <b>1 action</b> et <b>toute la Ferveur (${FERVOR_MAX})</b> · <b>une fois par combat</b></p>
       <p>${esc(ULT_HOW[st.ult] || ult.desc)}</p>
-      ${ready ? `<button class="btn primary block big-cta dc-plq dc-plq-red" data-u="go">${icon('p:power')}Lancer le pouvoir</button>` : `<p class="small cb-ult-need">${st.fervor < FERVOR_MAX ? `Encore ${FERVOR_MAX - st.fervor} Ferveur à gagner : attaque, exploite les faiblesses, esquive, pare et brise les ennemis.` : 'Il te faut encore 1 action ce tour-ci.'}</p>`}
+      ${ready ? `<button class="btn primary block big-cta dc-plq dc-plq-red" data-u="go">${icon('p:power')}Lancer le pouvoir</button>` : `<p class="small cb-ult-need">${st.ultUsed ? 'Déjà utilisé dans ce combat. Il revient au prochain.' : st.fervor < FERVOR_MAX ? `Encore ${FERVOR_MAX - st.fervor} Ferveur à gagner : attaque, exploite les faiblesses, esquive, pare et brise les ennemis.` : 'Il te faut encore 1 action ce tour-ci.'}</p>`}
     </div>`, { label: ult.name });
     sh.body.addEventListener('click', (e) => { if (e.target.closest('[data-u="go"]')) { sh.close(); castUlt(); } });
   }
@@ -724,6 +725,7 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
   function statusLines(u) {
     const s = [];
     if (u.shield) s.push('Bouclier : bloque le prochain coup.');
+    if (u.ward) s.push(`Sceau du Gardien : absorbe encore ${u.ward} dégâts.`);
     if (u.poison) s.push(`Poison ${u.poison} : perd ${u.poison} PV au début de son tour, puis le poison diminue de moitié.`);
     if (u.frozen || u.stunned) s.push('Gelé : passe son prochain tour.');
     if (u.slow) s.push('Ralenti : sa prochaine attaque fait moitié moins mal.');

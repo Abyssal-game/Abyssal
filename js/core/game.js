@@ -9,7 +9,7 @@ import { bossOf, BOSSES } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
 import { FORMS, formUnlocked } from './forms.js';
 import * as SC from './sceaux.js';
-import { FERVOR_START, FERVOR_MAX, TALENTS } from './skills.js';
+import { FERVOR_START, FERVOR_MAX, FERVOR_CARRY, TALENTS } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
 export const WEEKLY_FLOOR = 8;
 export const BOSS_RECRUIT = 0.25;
@@ -846,7 +846,7 @@ export class Game {
       m.hp = Math.max(0, Math.min(m.maxHp, u.hp));
       if (m.hp <= 0) m.fallen = true;
     });
-    run.gauge = st.fervor ?? st.gauge ?? 0; // la Ferveur se garde d'un combat à l'autre
+    run.gauge = Math.min(FERVOR_CARRY, st.fervor ?? st.gauge ?? 0); // une partie de la Ferveur se garde d'un combat à l'autre (3 au plus)
     const relNew = this.learnRelations(st);
     const bossKey = st.bossKey;
     const pactUsed = st.pact || null;
@@ -884,7 +884,7 @@ export class Game {
       const hunt = room === 'elite' && this.rule(run.day).key === 'chasse';
       out.shards = this.gainShards((8 + 3 * run.floor) * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1) * (hunt ? 2 : 1));
       // objectif réussi : éclats en plus et 1 Ferveur pour la suite
-      if (goal?.state === 'done') { out.goalShards = this.gainShards((3 + run.floor) * (room === 'boss' ? 2 : 1)); run.gauge = Math.min(FERVOR_MAX, run.gauge + 1); this.s.stats.goals = (this.s.stats.goals || 0) + 1; }
+      if (goal?.state === 'done') { out.goalShards = this.gainShards((3 + run.floor) * (room === 'boss' ? 2 : 1)); run.gauge = Math.min(FERVOR_CARRY, run.gauge + 1); this.s.stats.goals = (this.s.stats.goals || 0) + 1; }
       if (room === 'elite') { const t = this.talentOffers(run); if (t.length) { run.talentOffer = t; out.talents = t; } }
       // les gardiens donnent un coffre tout de suite ; règle « Chasse aux élites » : les élites aussi
       if (!run.free && (room === 'boss' || hunt)) {

@@ -64,7 +64,7 @@ test('Ferveur : gagnée en attaquant, compétence refusée sans Ferveur, dépens
   D.autoDuel(run.battle, 60, () => 'parry');
   const f1 = run.battle.fervor;
   g.finishBattle();
-  if (g.s.descent.run) assert.equal(g.s.descent.run.gauge, f1);
+  if (g.s.descent.run) assert.equal(g.s.descent.run.gauge, Math.min(3, f1), 'gardée, 3 au plus');
   assert.ok(f0 >= 0);
 });
 

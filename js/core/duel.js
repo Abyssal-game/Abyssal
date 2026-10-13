@@ -199,6 +199,13 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   if (u.side === 'ally' && src && st.units[src]?.side === 'enemy') n = Math.min(n, allyCap(u, st.curKind));
   if (u.shield && pierce) { u.shield = 0; ev.push({ t: 'status', u: u.uid, s: 'Perce-bouclier', syn: true }); }
   if (u.shield) { u.shield = 0; ev.push({ t: 'block', u: u.uid }); return 0; }
+  // Sceau du Gardien : absorbe les dégâts jusqu'à épuisement
+  if (u.ward > 0) {
+    const took = Math.min(u.ward, Math.round(n));
+    u.ward -= took; n = Math.round(n) - took;
+    ev.push({ t: 'status', u: u.uid, s: u.ward ? `Sceau −${took} (${u.ward})` : 'Le Sceau se brise', k: 'guard' });
+    if (n <= 0) return 0;
+  }
   // Carapace de glace (Matriarche, phase 2) : absorbe les coups ; l'Infernal la fait fondre deux fois plus vite
   if (u.ice > 0) {
     const s0 = src && st.units[src];
@@ -540,16 +547,17 @@ function entrance(st, u, aimed, ev) {
   else if (u.role === 'zone') front(st, 'enemy').forEach((x) => breakHit(st, x, 1, ev, u));
 }
 
-// ——— Pouvoir d'équipe : coûte 1 PA et toute la Ferveur ———
-export const ultReady = (st) => !st.over && st.turn === 'ally' && st.fervor >= ULT_COST.fervor && st.ap >= ULT_COST.ap;
+// ——— Pouvoir d'équipe : coûte 1 PA et toute la Ferveur, une seule fois par combat ———
+export const ultReady = (st) => !st.over && !st.ultUsed && st.turn === 'ally' && st.fervor >= ULT_COST.fervor && st.ap >= ULT_COST.ap;
+export const SEAL_WARD = 0.5; // bouclier du Sceau : absorbe jusqu'à 50 % des PV max
 export function useUlt(st) {
   const ev = [];
   if (!ultReady(st)) return ev;
-  st.fervor = 0; st.gauge = 0; st.ap -= ULT_COST.ap;
+  st.fervor = 0; st.gauge = 0; st.ap -= ULT_COST.ap; st.ultUsed = true;
   st.stats.ults = (st.stats.ults || 0) + 1;
   const p = st.power || 1, allies = front(st, 'ally'), foes = front(st, 'enemy');
   ev.push({ t: 'ult', key: st.ult });
-  if (st.ult === 'sceau') allies.forEach((u) => { heal(u, u.maxHp * 0.3 * p, ev); u.shield = 1; });
+  if (st.ult === 'sceau') allies.forEach((u) => { heal(u, u.maxHp * 0.3 * p, ev); u.ward = Math.max(u.ward || 0, Math.round(u.maxHp * SEAL_WARD)); ev.push({ t: 'status', u: u.uid, s: `Sceau : ${u.ward}` }); });
   else if (st.ult === 'revive') {
     const fallen = st.order.ally.map((id) => st.units[id]).filter((u) => u.hp <= 0);
     if (fallen.length) fallen.forEach((u) => { u.hp = Math.round(u.maxHp * 0.5 * p); u.poison = 0; u.inPlay = false; ev.push({ t: 'revive', u: u.uid }); });
