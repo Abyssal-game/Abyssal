@@ -16,7 +16,7 @@ export default function menu(app, root) {
   const T = (href, ic, title, sub) => `<a class="mn-tile" href="${href}"><span class="mn-tile-ic">${picon(ic)}</span><b>${title}</b><span>${sub}</span></a>`;
   const A = (act, ic, title, sub) => `<button class="mn-tile" data-mn="${act}"><span class="mn-tile-ic">${picon(ic)}</span><b>${title}</b><span>${sub}</span></button>`;
   root.innerHTML = `
-    <header class="screen-head mn-head"><h1>Le Sanctuaire</h1><p class="muted">Ton profil, tes trophées et les réglages du jeu.</p></header>
+    <header class="screen-head mn-head ui-hero bn-sanctuary"><h1>Le Sanctuaire</h1><p class="muted">Ton profil, tes trophées et les réglages du jeu.</p></header>
     <nav class="mn-grid">
       ${T('#/profil', 'seal', 'Profil', 'Vitrine, titres, statistiques')}
       ${T('#/succes', 'crown', 'Succès', `${achDone} / ${cat.achievements.length} débloqués`)}

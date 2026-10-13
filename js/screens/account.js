@@ -18,7 +18,7 @@ export default function account(app, root) {
     const u = cloud.currentUser();
     if (!u) {
       root.innerHTML = `
-        <header class="screen-head"><h1>Compte</h1><p class="muted">Garde ta progression en ligne, retrouve-la sur n’importe quel appareil et affronte les joueurs du monde entier.</p></header>
+        <header class="screen-head ui-hero bn-account"><h1>Compte</h1><p class="muted">Garde ta progression en ligne, retrouve-la sur n’importe quel appareil et affronte les joueurs du monde entier.</p></header>
         <form class="panel stack acc-form" id="login">
           <label class="acc-l"><span class="small muted">E-mail</span><input class="input plain" type="email" name="email" autocomplete="username" required value="${esc(lastEmail)}"></label>
           <label class="acc-l"><span class="small muted">Mot de passe</span><input class="input plain" type="password" name="password" autocomplete="current-password" required minlength="6"></label>
@@ -44,7 +44,7 @@ export default function account(app, root) {
     const p = sync.profile;
     const st = { ok: `${icon('check')} Sauvegardée en ligne ${ago(sync.lastPush)}`, saving: 'Sauvegarde en cours…', error: `${icon('info')} ${esc(sync.error || 'Erreur')}`, paused: 'Synchronisation en pause : choisis quelle partie garder.', off: '' }[sync.status] || '';
     root.innerHTML = `
-      <header class="screen-head"><h1>Compte</h1><p class="muted">${esc(u.email || '')}</p></header>
+      <header class="screen-head ui-hero bn-account"><h1>Compte</h1><p class="muted">${esc(u.email || '')}</p></header>
       <section class="panel stack">
         <h2>Pseudo</h2>
         <p class="small muted">C’est le nom que les autres joueurs voient dans les classements.</p>

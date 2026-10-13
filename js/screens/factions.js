@@ -11,7 +11,7 @@ export default function factions(app, root, params) {
   if (key && cat.faction[key]) return factionPage(app, root, key);
 
   root.innerHTML = `
-    <header class="screen-head"><h1>Factions</h1><p class="muted">Sept forces nées du premier souffle, sept royaumes qui ne se sont jamais réconciliés.</p></header>
+    <header class="screen-head ui-hero bn-factions"><h1>Factions</h1><p class="muted">Sept forces nées du premier souffle, sept royaumes qui ne se sont jamais réconciliés.</p></header>
     <div class="fac-list">${cat.factions.map((f) => {
       const p = g.factionProgress(f.key);
       const feat = cat.get(f.featured);

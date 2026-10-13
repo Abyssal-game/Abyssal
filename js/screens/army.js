@@ -94,7 +94,7 @@ export function teamScreen(app, root) {
     const owned = Object.keys(g.s.collection).map((id) => cat.get(id)).filter(Boolean);
     const RI = (r) => ['C', 'PC', 'R', 'HR', 'M', 'S'].indexOf(r);
     owned.sort(ui.sort === 'cost' ? (a, b) => COST[a.rarity] - COST[b.rarity] || g.cardLevel(b.id) - g.cardLevel(a.id) : (a, b) => g.cardLevel(b.id) - g.cardLevel(a.id) || RI(b.rarity) - RI(a.rarity));
-    root.innerHTML = `<header class="screen-head"><h1>Mon équipe</h1><p class="muted">3 créatures au combat, 2 en réserve qui prennent la relève.</p></header>
+    root.innerHTML = `<header class="screen-head ui-hero bn-team"><h1>Mon équipe</h1><p class="muted">3 créatures au combat, 2 en réserve qui prennent la relève.</p></header>
       ${run ? `<p class="panel small center">${icon('info')} Une expédition est en cours : l’équipe ne peut pas changer avant ton retour.</p>` : ''}
       <section class="panel v2-team">
         <div class="v2-budget"><span>Budget</span><span class="progress"><i style="width:${Math.min(100, (cost / BUDGET) * 100)}%;--bar:${cost > BUDGET ? '#FF5468' : 'var(--gold)'}"></i></span><b>${cost} / ${BUDGET}</b></div>
@@ -154,7 +154,7 @@ export function teamScreen(app, root) {
 export function chestsScreen(app, root) {
   const g = app.game;
   const draw = () => {
-    root.innerHTML = `<header class="screen-head"><h1>Coffres</h1><p class="muted">Gagnés dans l’Aventure. Chaque coffre contient des boosters.</p></header>
+    root.innerHTML = `<header class="screen-head ui-hero bn-chests"><h1>Coffres</h1><p class="muted">Gagnés dans l’Aventure. Chaque coffre contient des boosters.</p></header>
       <div class="ch-grid">${CHEST_ORDER.map((t) => { const n = g.s.chests[t] || 0; return `<button class="ch-c ${n ? '' : 'none'}" data-act="open" data-t="${t}" style="--cc:${CHESTS[t].color}" ${n ? '' : 'disabled'}>
         <span class="ch-art">${chestSVG(t)}</span>${n ? `<span class="ch-n">${n}</span>` : ''}<b>${esc(CHESTS[t].name)}</b><span class="small">${esc(CHESTS[t].desc)}</span></button>`; }).join('')}</div>
       <details class="panel dc-fold"><summary>${icon('info')} D’où viennent les coffres ?</summary><ul class="small">
