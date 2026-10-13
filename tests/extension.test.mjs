@@ -129,7 +129,7 @@ test('pactes : un avantage réel et un prix réel', () => {
   // Gardien : la première créature qui tombe se relève
   const gard = D.createDuel(team(), [E(FOE, { scale: 6 })], { seed: 3, pact: 'gardien' });
   const v = units(gard, 'ally')[0];
-  v.hp = 1;
+  units(gard, 'ally').forEach((u) => { u.hp = 1; }); // plafond par coup : il faut être déjà blessé pour tomber
   const foe = units(gard, 'enemy')[0];
   foe.intent = { kind: 'heavy', t: v.uid, qte: true };
   pass(gard);
@@ -215,4 +215,25 @@ test('sauvegarde : une ancienne sauvegarde reçoit les nouveaux champs sans rien
   const bad = migrate({ ...s, sceaux: 'n’importe quoi', war: { history: 3 } });
   assert.equal(bad.sceaux.wins, 0);
   assert.ok(Array.isArray(bad.war.history));
+});
+
+test('difficulté : plafond par coup sur tes créatures, cumul de bonus plafonné, fenêtre d’esquive minimale', () => {
+  const st = D.createDuel(team(), [E(FOE, { scale: 30 })], { seed: 5 });
+  const v = units(st, 'ally')[0], foe = units(st, 'enemy')[0];
+  units(st, 'ally').forEach((u) => { u.guardBy = null; });
+  foe.intent = { kind: 'hit', t: v.uid };
+  D.enemyAct(st, foe.uid);
+  assert.ok(v.maxHp - v.hp <= Math.round(v.maxHp * D.ALLY_HIT_CAP), 'coup normal : 45 % au plus');
+  const w = units(st, 'ally')[1];
+  foe.intent = { kind: 'heavy', t: w.uid };
+  D.enemyAct(st, foe.uid);
+  assert.ok(w.hp > 0 && w.maxHp - w.hp <= Math.round(w.maxHp * D.ALLY_BIG_CAP), 'coup chargé : 75 % au plus');
+  // cumul : marque + Brisure + exposé + règle… jamais plus de ×3
+  const a = units(st, 'ally')[0];
+  Object.assign(foe, { mark: 2, broken: true, exposed: true });
+  st.ruleMult = 1.25;
+  assert.ok(D.dmgOf(st, a, foe) <= (a.atk + (a.boost || 0) + 2) * D.MULT_CAP + D.COMBO_MAX);
+  // esquive : jamais sous 160 ms, même contre un gardien bien plus fort
+  const b = D.createDuel(team(), [E(FOE, { boss: true, scale: 5, level: 40 })], { seed: 5 });
+  assert.ok(D.defenseWindow(b, units(b, 'enemy')[0].uid, units(b, 'ally')[0].uid).dodge >= 160);
 });

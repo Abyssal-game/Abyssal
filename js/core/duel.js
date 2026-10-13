@@ -36,7 +36,7 @@ export function duelUnit(card, { side = 'ally', level = 1, scale = null, boss = 
   const role = roleOf(card), [a, h] = BASE[role];
   const fm = side === 'ally' && form ? FORMS[card.id] : null;
   const k = RARITY_MULT[card.rarity] * (scale ?? (1 + 0.08 * (level - 1)));
-  const atk = Math.max(1, Math.round(a * k * (boss ? 1.25 : 1) * (side === 'enemy' ? 1.2 : 1)));
+  const atk = Math.max(1, Math.round(a * k * (boss ? 1.25 : 1)));
   const hp = Math.max(1, Math.round(h * k * (boss ? 3 : elite ? 1.6 : 1)));
   const brkMax = boss ? 10 : elite ? 6 : 0;
   return {
@@ -142,6 +142,7 @@ export function dmgOf(st, a, t, mult = 1, { basic = false } = {}) {
   let n = a.atk + (a.boost || 0);
   if (a.side === 'ally' && st.known?.[t.id]) n += 1;
   if (a.side === 'ally' && a.rarity === 'C' && (t.boss || t.elite)) n += PACK_BONUS;
+  const flat = n * mult;
   n *= mult * (st.ruleMult || 1) * factionMult(a, t);
   if (t.mark) n *= 1.3;
   if (t.broken) n *= 1.5;
@@ -164,6 +165,8 @@ export function dmgOf(st, a, t, mult = 1, { basic = false } = {}) {
     if (st.law === 'hate') n *= 1.3;
     if (R_.includes('oeil')) n *= 1.15;
   }
+  // les bonus situationnels se cumulent, mais jamais au-delà de ×3 la force de base du coup
+  n = Math.min(n, flat * MULT_CAP);
   if (t.boss && st.law === 'fer' && !t.broken) n *= 0.6;
   if (a.side === 'ally' && t.side === 'enemy' && mult > 0) n += comboOf(st, a, t);
   return mult > 0 ? Math.max(1, Math.round(n)) : 0;
@@ -185,9 +188,15 @@ function teamLoss(st) {
 // Un seul coup ne retire jamais plus de 40 % des PV max d'un gardien (les cumuls de bonus restent forts, sans tuer en un coup)
 export const BOSS_HIT_CAP = 0.4;
 const bossCap = (u) => Math.max(1, Math.round(u.maxHp * BOSS_HIT_CAP));
+export const MULT_CAP = 3;
+// Tes créatures : un coup normal retire au plus 45 % de leurs PV max, un coup annoncé (chargé, déflagration…) 75 %
+export const ALLY_HIT_CAP = 0.45, ALLY_BIG_CAP = 0.75;
+const BIG = ['heavy', 'blast', 'gorge', 'blizzard', 'copy'];
+export const allyCap = (u, kind) => Math.max(1, Math.round(u.maxHp * (BIG.includes(kind) ? ALLY_BIG_CAP : ALLY_HIT_CAP)));
 function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   if (u.hp <= 0 || n <= 0) return 0;
   if (u.boss && u.side === 'enemy') n = Math.min(n, bossCap(u));
+  if (u.side === 'ally' && src && st.units[src]?.side === 'enemy') n = Math.min(n, allyCap(u, st.curKind));
   if (u.shield && pierce) { u.shield = 0; ev.push({ t: 'status', u: u.uid, s: 'Perce-bouclier', syn: true }); }
   if (u.shield) { u.shield = 0; ev.push({ t: 'block', u: u.uid }); return 0; }
   // Carapace de glace (Matriarche, phase 2) : absorbe les coups ; l'Infernal la fait fondre deux fois plus vite
@@ -912,10 +921,11 @@ export function intentInfo(st, e) {
   let dmg = 0;
   const copyM = it.kind === 'copy' ? { estoc: 2, entrave: 0.6, marque: 1.5 }[it.copy] : null;
   const m = copyM || { hit: 1, heavy: e.boss ? 2.5 : 2.2, poison: 0.6, frost: 0.5, gorge: 1.6 }[it.kind];
-  if (m && eff) dmg = dmgOf(st, e, eff, m * (eff !== t ? 0.6 : 1));
-  if (it.kind === 'blast') dmg = Math.max(0, ...front(st, 'ally').map((x) => dmgOf(st, e, x, e.boss ? 1 : 0.8)));
-  if (it.kind === 'blizzard') dmg = Math.max(0, ...front(st, 'ally').map((x) => dmgOf(st, e, x, 0.9)));
-  if (it.kind === 'copy' && it.copy === 'raz') dmg = Math.max(0, ...front(st, 'ally').map((x) => dmgOf(st, e, x, 0.7)));
+  const capd = (x, n) => Math.min(n, allyCap(x, it.kind));
+  if (m && eff) dmg = capd(eff, dmgOf(st, e, eff, m * (eff !== t ? 0.6 : 1)));
+  if (it.kind === 'blast') dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, e.boss ? 1 : 0.8))));
+  if (it.kind === 'blizzard') dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, 0.9))));
+  if (it.kind === 'copy' && it.copy === 'raz') dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, 0.7))));
   const single = SINGLE.includes(it.kind) || !!(it.kind === 'copy' && it.t);
   const lethal = !!eff && single && dmg >= eff.hp;
   const danger = ['heavy', 'blast', 'gorge', 'blizzard', 'copy'].includes(it.kind) || lethal ? 3 : ['frost', 'charge', 'channel', 'gather', 'mimic', 'decree', 'shift', 'hunt'].includes(it.kind) || (e.boss && it.kind === 'hit') ? 2 : dmg ? 1 : 0;
@@ -938,10 +948,13 @@ export function threats(st) {
 export function defenseWindow(st, aUid, tUid) {
   const e = st.units[aUid], u = st.units[tUid] || front(st, 'ally')[0];
   const kind = e?.intent?.kind || 'hit';
-  let w = { hit: 230, poison: 230, frost: 210, heavy: 180, blast: 200 }[kind] || 220;
-  w += 15 * ((u?.level || 1) - (e?.level || 1));
+  let w = { hit: 230, poison: 230, frost: 210, heavy: 190, blast: 200 }[kind] || 220;
+  // écart de niveau : il aide (ou gêne) un peu, sans jamais rendre l'esquive impossible
+  w += Math.max(-30, Math.min(45, 10 * ((u?.level || 1) - (e?.level || 1))));
+  // plancher selon la catégorie de l'ennemi : 200 ms (normal), 180 ms (élite), 160 ms (gardien)
+  const floor = e?.boss ? 160 : e?.elite ? 180 : 200;
   if (e?.boss) w -= 30; else if (e?.elite) w -= 15;
-  w = Math.max(110, Math.min(320, Math.round(w)));
+  w = Math.max(floor, Math.min(320, Math.round(w)));
   // parade : fenêtre étroite (environ 1/5 de l'esquive), au tout dernier instant avant l'impact
   return { dodge: w, parry: Math.max(32, Math.round(w * 0.2)) };
 }

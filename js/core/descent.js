@@ -29,7 +29,10 @@ export const chestForDepth = (floor) => (floor >= 15 ? 'abyssal' : floor >= 10 ?
 export const shiftChest = (c, n) => { const i = c ? CHEST_ORDER.indexOf(c) + n : n - 1; return i < 0 ? null : CHEST_ORDER[Math.min(CHEST_ORDER.length - 1, i)]; };
 
 // Force des créatures corrompues selon la profondeur
-export const enemyScale = (floor) => 1 + 0.09 * (floor - 1);
+// Force des ennemis : +6 % par étage jusqu'au 20e, puis +3 % (la progression du joueur plafonne au niveau 10)
+// Niveau de créature attendu pour un joueur qui arrive à cet étage (calibré par simulation, mode Créateur)
+export const expectedLevel = (floor) => Math.max(1, Math.min(10, Math.round((floor - 6) * 0.75)));
+export const enemyScale = (floor) => 1 + 0.06 * Math.min(19, floor - 1) + 0.03 * Math.max(0, floor - 20);
 
 // Familles de comportement des créatures (page du Bestiaire)
 export const FAMILIES = {

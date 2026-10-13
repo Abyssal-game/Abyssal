@@ -3,7 +3,7 @@
 import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, LUCK_POINTS, ITEMS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
-import { rngOf, DESCENT, CHESTS, floorDoors, floorEnemies, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, huntStage, HUNT_STAGES } from './descent.js';
+import { rngOf, DESCENT, CHESTS, floorDoors, floorEnemies, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState } from './duel.js';
 import { bossOf, BOSSES } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
@@ -704,7 +704,7 @@ export class Game {
   runUnits() {
     const run = this.s.descent.run, b = run.blessings;
     return run.team.filter((m) => !m.fallen).map((m) => {
-      const u = duelUnit(this.catalog.get(m.id), { level: this.cardLevel(m.id), form: m.form || null });
+      const u = duelUnit(this.catalog.get(m.id), { level: run.devLevel || this.cardLevel(m.id), form: m.form || null });
       if (m.talent) { u.talent = m.talent; if (m.talent === 'vif') u.atk += 2; }
       if (b.includes('blades')) u.atk += 1;
       if (b.includes('ward')) u.shield = 1;
@@ -1183,7 +1183,17 @@ export class Game {
   devFreePacks() { this.s.freePack = { stock: FREE_PACK.max, since: Date.now() }; this.persist(); }
   devMissions() { this.missions().list.forEach((x) => { x.p = x.n; }); this.persist(); }
   devItems(n = 5) { Object.keys(ITEMS).forEach((k) => { this.s.items[k] = (this.s.items[k] || 0) + n; }); this.persist(); }
-  devFloor(n) { const run = this.s.descent.run; if (!run) throw new Error('Lance d’abord une Descente.'); run.floor = Math.max(1, n); run.phase = 'doors'; this.persist(); }
+  // power : l'équipe prend le niveau attendu à cet étage (pour essayer la difficulté réelle)
+  devFloor(n, { power = false } = {}) {
+    const run = this.s.descent.run; if (!run) throw new Error('Lance d’abord une Descente.');
+    run.floor = Math.max(1, n); run.phase = 'doors';
+    if (power) {
+      run.devLevel = expectedLevel(run.floor);
+      run.team.forEach((m) => { const u = duelUnit(this.catalog.get(m.id), { level: run.devLevel, form: m.form || null }); m.maxHp = u.maxHp; if (!m.fallen) m.hp = u.maxHp; });
+    }
+    this.persist();
+    return run.devLevel || null;
+  }
   devUnlockAll() {
     this.catalog.cards.forEach((c) => { if (!this.owns(c.id)) this.addCard(c.id, 'normal', 'reward'); });
     const progress = this.checkProgress();

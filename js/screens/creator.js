@@ -47,7 +47,7 @@ export function openCreator(app) {
 
       <section class="cr-sec"><h3>Descente</h3>
         <div class="row gap wrap">${B('torches', 'Rendre les torches')}${B('missions', 'Accomplir les missions')}</div>
-        <form class="cr-give" id="floor"><input class="input plain" name="n" type="number" min="1" max="200" placeholder="Étage" ${d.run ? '' : 'disabled'}><button class="btn small" type="submit" ${d.run ? '' : 'disabled'}>Aller à l’étage</button></form>
+        <form class="cr-give" id="floor"><input class="input plain" name="n" type="number" min="1" max="200" placeholder="Étage" ${d.run ? '' : 'disabled'}><button class="btn small" type="submit" ${d.run ? '' : 'disabled'}>Aller à l’étage</button><button class="btn small" type="submit" name="power" value="1" ${d.run ? '' : 'disabled'}>Avec la puissance attendue</button></form>
         <p class="small muted">${d.run ? `Expédition en cours : étage ${d.run.floor}.` : 'Lance une Descente pour pouvoir sauter d’étage.'}</p>
       </section>
 
@@ -95,7 +95,7 @@ export function openCreator(app) {
         g.devGive(c.id, String(f.get('v')));
         toast(`<b>${esc(c.name)}</b> ajoutée (${esc(VARIANTS[String(f.get('v'))].name)}).`, { kind: 'success', icon: 'crown' });
       }
-      if (e.target.id === 'floor') { g.devFloor(Number(f.get('n'))); toast(`Expédition placée à l’étage ${Number(f.get('n'))}.`, { icon: 'crown' }); }
+      if (e.target.id === 'floor') { const lv = g.devFloor(Number(f.get('n')), { power: e.submitter?.name === 'power' }); toast(`Expédition placée à l’étage ${Number(f.get('n'))}${lv ? `, équipe au niveau ${lv}` : ''}.`, { icon: 'crown' }); }
     } catch (err) { toast(esc(err.message), { kind: 'error' }); }
     draw();
   });
