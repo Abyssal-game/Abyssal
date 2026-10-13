@@ -59,7 +59,7 @@ export default function descent(app, root) {
       </section>
       <h2 class="section-title">Autres modes</h2>
       <div class="om-grid">
-        <a class="panel om-tile" href="#/epreuve"><span class="om-ic">${picon('swords')}</span><span><b>Épreuve du jour</b><span class="small muted">${g.trial().best ? `Ton score du jour : ${fmt(g.trial().best.score)}` : 'Le même combat pour tous, une équipe imposée'}</span></span>${icon('next')}</a>
+        <a class="panel om-tile" href="#/epreuve"><span class="om-ic">${picon('trial')}</span><span><b>Épreuve du jour</b><span class="small muted">${g.trial().best ? `Ton score du jour : ${fmt(g.trial().best.score)}` : 'Le même combat pour tous, une équipe imposée'}</span></span>${icon('next')}</a>
         <a class="panel om-tile" href="#/sceaux"><span class="om-ic">${picon('seal')}</span><span><b>Duels des Sceaux</b><span class="small muted">Plateau 3 × 3, capture les cartes adverses</span></span>${icon('next')}</a>
       </div>
       ${Object.values(g.s.items).some((n) => n > 0) ? bagHTML(g) : ''}
@@ -140,7 +140,7 @@ export default function descent(app, root) {
         ${w?.recruit ? `<p class="vx-week">${icon('crown')} Le gardien vaincu, <b>${esc(cat.get(w.recruit).name)}</b>, rejoint ta collection !</p>` : ''}
         ${w?.weekly ? `<p class="vx-week">${icon('sparkle')} <b>${esc(cat.get(w.weekly).name)}</b> rejoint ta collection !</p>` : ''}
         ${w?.boss ? bossRecap(w.boss) : ''}
-        ${w?.goal ? `<p class="vx-week vx-goal ${w.goal.state}">${icon('star')} Objectif « ${esc(w.goal.name)} » : ${w.goal.state === 'done' ? `<b class="dc-good">réussi</b> · +${fmt(w.goalShards)} éclats et +1 Ferveur` : '<b>manqué</b>'}</p>` : ''}
+        ${w?.goal ? `<p class="vx-week vx-goal ${w.goal.state}"><img class="vx-gico" alt="" src="assets/icons/goal.webp"> Objectif « ${esc(w.goal.name)} » : ${w.goal.state === 'done' ? `<b class="dc-good">réussi</b> · +${fmt(w.goalShards)} éclats et +1 Ferveur` : '<b>manqué</b>'}</p>` : ''}
         ${w?.report?.length ? `<p class="vx-week vx-best">${icon('star')} ${esc(w.report[0])}</p>` : ''}
         ${w?.relNew?.length ? `<p class="vx-week">${icon('p:combo')} Relation découverte : <b>${w.relNew.map((k) => esc(RELATION[k]?.name || k)).join(', ')}</b>. Retrouve-la dans le Bestiaire.</p>` : ''}
         ${w?.disc?.length ? `<div class="vx-disc"><span class="small muted">${picon('discover')}Nouvelles rencontres</span>${w.disc.slice(0, 5).map((id) => `<img alt="${esc(cat.get(id).name)}" title="${esc(cat.get(id).name)}" src="${artUrl(cat.get(id), { lite: true })}">`).join('')}</div>` : ''}

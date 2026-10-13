@@ -18,7 +18,7 @@ export default function trialScreen(app, root) {
   function lobby() {
     setScene('descent');
     const t = g.trial(), d = g.trialDef(t.day), P = d.pact && PACTS[d.pact];
-    root.innerHTML = `<header class="screen-head"><h1>Épreuve du jour</h1><p class="muted">Le même combat pour tout le monde aujourd’hui. Gagne en peu de tours, avec le plus de PV possible.</p></header>
+    root.innerHTML = `<header class="screen-head tr-head"><img class="tr-hico" alt="" src="assets/icons/trial.webp"><h1>Épreuve du jour</h1><p class="muted">Le même combat pour tout le monde aujourd’hui. Gagne en peu de tours, avec le plus de PV possible.</p></header>
       ${result ? resultHTML(result) : ''}
       <section class="panel tr-box">
         <h2 class="section-title">Ton équipe imposée <small class="muted">niveau 3</small></h2>

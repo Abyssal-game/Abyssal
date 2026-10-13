@@ -37,7 +37,7 @@ const fxUrl = (n) => `assets/fx/${n}.webp`;
 const DANGER = ['', '', 'Danger', 'Mortel'];
 // Icône peinte d'une intention ennemie
 // les intentions des gardiens réutilisent les icônes peintes les plus proches
-const IN_PIC = { hunt: 'rally', gorge: 'heavy', gather: 'channel', blizzard: 'frost', mimic: 'channel', copy: 'heavy', decree: 'rally', shift: 'charge' };
+const IN_PIC = { gorge: 'heavy', gather: 'channel', blizzard: 'frost', mimic: 'channel', copy: 'heavy', decree: 'rally', shift: 'charge' };
 const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${IN_PIC[k] || k}.webp">`;
 
 export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.' }) {
@@ -93,11 +93,11 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
     u.guardBy ? st_('guard', 'Protégé par un Rempart') : '',
     u.exposed ? st_('exposed', 'Exposée : +25 % de dégâts subis') : '',
     u.boost ? `<i class="bo" title="Attaque renforcée pour ce tour">+${u.boost} ATQ</i>` : '',
-    u.prey ? st_('mark', 'Proie désignée : tous les ennemis la visent (+20 % de dégâts)') : '',
-    u.ice ? st_('frost', `Carapace de glace : absorbe ${u.ice} dégâts`, u.ice) : '',
-    u.doom != null && !u.broken ? `<i class="bo doom" title="Effondrement dans ${u.doom} tour(s) : brise-le pour le repousser">⏳ ${u.doom}</i>` : '',
-    u.mask ? `<i class="bo mask" title="Il porte ce visage : il résiste à cette faction (−50 %)">${esc(cat.faction[u.mask]?.name || u.mask)}</i>` : '',
-    u.totality ? '<i class="bo mask" title="Totalité : seules ses faiblesses le blessent pleinement">Totalité</i>' : '',
+    u.prey ? st_('prey', 'Proie désignée : tous les ennemis la visent (+20 % de dégâts)') : '',
+    u.ice ? st_('ice', `Carapace de glace : absorbe ${u.ice} dégâts`, u.ice) : '',
+    u.doom != null && !u.broken ? st_('doom', `Effondrement dans ${u.doom} tour(s) : brise-le pour le repousser`, u.doom) : '',
+    u.mask ? st_('mask', `Il porte le visage ${cat.faction[u.mask]?.name || u.mask} : il résiste à cette faction (−50 %)`) : '',
+    u.totality ? st_('totality', 'Totalité : seules ses faiblesses le blessent pleinement') : '',
     u.talent && TALENTS[u.talent] ? `<i class="bo tal" title="Talent : ${esc(TALENTS[u.talent].name)} · ${esc(TALENTS[u.talent].desc)}">★</i>` : '',
   ].join('');
   const intentChip = (u) => {
@@ -193,7 +193,7 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
     if (gl && gl.state === 'done' && lastGoal !== 'done' && lastGoal !== null) { app.sfx.achievement?.(); banner(`${icon('star')} Objectif réussi !`, 'good', 1100); }
     if (gl && gl.state === 'fail' && lastGoal === 'pending') toast(`Objectif « ${esc(gl.name)} » manqué.`, { icon: 'info' });
     lastGoal = gl ? gl.state : null;
-    const rules = [gl ? `<span class="cb-law cb-goal s-${gl.state}" data-d="rule" data-k="goal">${gl.state === 'done' ? '✓' : gl.state === 'fail' ? '✗' : '◎'} <b>${esc(gl.name)}</b>${gl.p && gl.state === 'pending' ? ` <small>${gl.p}</small>` : ''}</span>` : '',
+    const rules = [gl ? `<span class="cb-law cb-goal s-${gl.state}" data-d="rule" data-k="goal"><img class="cb-gico" alt="" src="assets/icons/goal.webp">${gl.state === 'done' ? '✓ ' : gl.state === 'fail' ? '✗ ' : ''}<b>${esc(gl.name)}</b>${gl.p && gl.state === 'pending' ? ` <small>${gl.p}</small>` : ''}</span>` : '',
       st.pact && PACTS[st.pact] ? `<span class="cb-law" style="--pk:${PACTS[st.pact].color}" data-d="rule" data-k="pact">${icon('p:seal')}<b>${esc(PACTS[st.pact].name)}</b></span>` : '',
       st.law ? `<span class="cb-law" data-d="rule" data-k="law"><b>${esc(LAWS[st.law].name)}</b></span>` : '',
       st.aspect ? `<span class="cb-law" data-d="rule" data-k="aspect"><b>${esc(ASPECTS[st.aspect].name)}</b></span>` : '',

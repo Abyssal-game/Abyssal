@@ -1692,3 +1692,6 @@ i.cmb { font-style: normal; color: #FFC266; font-weight: 800; }
 .vx-talc img { width: 52px; height: 68px; object-fit: cover; border-radius: 8px; }
 .vx-talc b { display: block; color: var(--gold-hi); }
 .vx-goal.done { color: #CFFFE0; }
+.cb-gico { width: 16px; height: 16px; vertical-align: -3px; margin-right: 4px; }
+.vx-gico { width: 20px; height: 20px; vertical-align: -4px; }
+.tr-head { position: relative; } .tr-hico { width: 56px; height: 56px; float: right; margin: 0 0 4px 8px; filter: drop-shadow(0 0 10px rgba(242, 193, 78, .4)); }
