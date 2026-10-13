@@ -1,6 +1,6 @@
 // État du joueur et règles de progression. Toute modification passe par ici
 // et est enregistrée immédiatement : une carte affichée est une carte sauvegardée.
-import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, LUCK_POINTS, ITEMS, SHOW_ORDER } from '../config.js';
+import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, LUCK_POINTS, ITEMS, SHOW_ORDER, SHADOW } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
 import { rngOf, DESCENT, CHESTS, floorDoors, floorEnemies, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES } from './descent.js';
@@ -331,6 +331,32 @@ export class Game {
     if (!e || !(e.v[v] > 0)) throw new Error('Tu ne possèdes pas cette finition.');
     e.show = v;
     this.persist();
+  }
+  // Tirage des Ombres (local : participation et prix ; le tirage et le classement sont sur le serveur)
+  shadowState() {
+    const sh = (this.s.shadow && typeof this.s.shadow === 'object') ? this.s.shadow : (this.s.shadow = {});
+    sh.paid ||= {}; sh.prizes ||= {};
+    return sh;
+  }
+  // Récompense de participation, une fois par jour
+  shadowPay(day) {
+    const sh = this.shadowState();
+    if (sh.paid[day]) return 0;
+    sh.paid = Object.fromEntries(Object.entries(sh.paid).slice(-13));
+    sh.paid[day] = true;
+    this.s.shards += SHADOW.participation;
+    this.persist();
+    return SHADOW.participation;
+  }
+  // Prix d'une semaine (rang 1 à 3, validé par le serveur), une seule fois
+  shadowPrize(week, rank) {
+    const sh = this.shadowState();
+    if (sh.prizes[week] !== undefined) return null;
+    sh.prizes[week] = rank;
+    const chest = SHADOW.prizes[rank - 1] || null;
+    if (chest) this.addChests({ [chest]: 1 });
+    this.persist();
+    return chest;
   }
   // Doublons et Fournaise -------------------------------------------------
   // Un doublon = un exemplaire en plus du premier, dans la même finition (chaque finition gardée une fois).

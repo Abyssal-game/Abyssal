@@ -7,6 +7,7 @@ import { esc, fmt, openSheet, bindActions, toast } from '../ui/dom.js';
 import { artUrl, hasRealArt } from '../art/assets.js';
 import { RARITY } from '../config.js';
 import { openPack } from './opening.js';
+import { parisDay, claimShadowPrize } from './shadow.js';
 
 export function waitText(ms) {
   const m = Math.max(1, Math.ceil(ms / 60000));
@@ -63,7 +64,9 @@ export function showOdds(app, type) {
     <p class="small">Un doublon se brûle dans la Fournaise pour des cendres (${RARITIES.map((r) => `${r.short} ${ECONOMY.burnAsh[r.key]}`).join(', ')} ; ×${ECONOMY.burnFinish.holo} holographique, ×${ECONOMY.burnFinish.gold} or, ×${ECONOMY.burnFinish.galaxy} cosmique). Les cendres font monter le niveau de tes créatures et invoquent une carte manquante.</p>`, { label: 'Probabilités' });
 }
 
+
 export default function shop(app, root, params = []) {
+  claimShadowPrize(app);
   const g = app.game, cat = app.catalog;
   const st = (app.state.shop ||= { faction: 'infernal' });
   const ev = g.event();
@@ -112,6 +115,7 @@ export default function shop(app, root, params = []) {
       <header class="screen-head">
         <h1>Boosters</h1>
       </header>
+      <a class="panel sh-banner" href="#/tirage"><span class="sh-b-ic">${icon('p:booster')}</span><span><b>Le Tirage des Ombres</b><span class="small muted">${g.shadowState().paid[parisDay()] ? 'Tirage du jour fait · voir le classement' : 'Ton booster gratuit du jour pour le classement de la semaine'}</span></span><span class="sh-b-go">${icon('next')}</span></a>
       <div class="products">
         ${card('standard')}
         ${card('faction', '', `<div class="chips fac-pick fac-grid" role="radiogroup" aria-label="Faction du booster">${FACTION_ORDER.map((f) => `<button class="chip" role="radio" data-act="pickfac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}" aria-checked="${st.faction === f}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>`)}

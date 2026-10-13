@@ -139,6 +139,19 @@ export async function trialBoard(day, limit = 30) {
   return authed(`/rest/v1/trial_scores?day=eq.${day}&select=score,rounds,hp,user_id,profiles(pseudo,avatar,title,badge)&order=score.desc,updated_at.asc&limit=${limit}`);
 }
 
+// Tirage des Ombres : le serveur tire le booster du jour et tient le classement de la semaine
+export async function shadowDraw(faction) { return authed('/rest/v1/rpc/shadow_draw', { method: 'POST', body: { p_faction: faction } }); }
+export async function shadowMine(day) {
+  const me = currentUser()?.id;
+  const rows = await authed(`/rest/v1/shadow_draws?day=eq.${day}&user_id=eq.${me}&select=cards,score,faction,day`);
+  return rows?.[0] || null;
+}
+export async function shadowDay(day, limit = 10) {
+  return authed(`/rest/v1/shadow_draws?day=eq.${day}&select=score,faction,user_id,created_at,profiles(pseudo,avatar,badge)&order=score.desc,created_at.asc&limit=${limit}`);
+}
+export async function shadowWeek(week, limit = 10) { return authed('/rest/v1/rpc/shadow_week', { method: 'POST', body: { p_week: week, p_limit: limit } }); }
+export async function shadowClaim(week) { return authed('/rest/v1/rpc/shadow_claim', { method: 'POST', body: { p_week: week } }); }
+
 // Badges attribués par le serveur
 export const BADGES = { createur: { name: 'Créateur', cls: 'b-createur' } };
 export function badgeHTML(key) {

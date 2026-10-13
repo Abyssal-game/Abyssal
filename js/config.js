@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v170'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v171'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -141,6 +141,10 @@ export const MISSIONS = [
 ];
 export const MISSION_BONUS = { tickets: { standard: 1 } }; // les 3 missions du jour accomplies
 
+
+// Tirage des Ombres : un booster gratuit par jour tiré par le serveur (cartes non gagnées),
+// classement de la semaine, coffres pour les 3 premiers s'il y a assez de participants.
+export const SHADOW = { participation: 15, prizes: ['abyssal', 'or', 'fer'], minPlayers: 5 };
 
 // Points d'une ouverture, pour le classement des plus belles ouvertures.
 export const LUCK_POINTS = { C: 1, PC: 2, R: 6, HR: 20, M: 80, S: 200, variant: 8 };

@@ -200,3 +200,16 @@ test('apparence affichée : choisie par le joueur, sinon la plus rare ; ancienne
   assert.equal(s.collection[c.id].v.special, undefined);
   assert.equal(s.collection[c.id].v.normal, 2);
 });
+
+test('Tirage des Ombres : participation une fois par jour, prix une fois par semaine, cartes non gagnées', () => {
+  const g = newGame('sh');
+  const s0 = g.s.shards, n0 = g.uniqueCount();
+  assert.equal(g.shadowPay('2026-10-13'), 15);
+  assert.equal(g.shadowPay('2026-10-13'), 0);
+  assert.equal(g.s.shards, s0 + 15);
+  assert.equal(g.shadowPrize('2026-10-05', 1), 'abyssal');
+  assert.equal(g.shadowPrize('2026-10-05', 1), null, 'pas deux fois');
+  assert.equal(g.shadowPrize('2026-10-12', 3), 'fer');
+  assert.equal(g.s.chests.abyssal, 1);
+  assert.equal(g.uniqueCount(), n0);
+});

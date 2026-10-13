@@ -1744,3 +1744,24 @@ i.cmb { font-style: normal; color: #FFC266; font-weight: 800; }
 .dc-abandon { margin-top: 10px; opacity: .85; }
 .dt-showv { display: flex; justify-content: center; align-items: center; gap: 4px; margin: 6px auto 12px !important; }
 p.dt-showv .ic { width: 14px; height: 14px; }
+
+/* Tirage des Ombres */
+.bn-shadow { --bn: url(../assets/ui/bn-event.webp); }
+.sh-banner { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 12px 14px; color: var(--ink); text-decoration: none; border: 1px solid rgba(176, 75, 255, .55); background: linear-gradient(120deg, rgba(60, 20, 90, .85), rgba(16, 10, 26, .95)); box-shadow: 0 0 18px rgba(176, 75, 255, .25); }
+.sh-banner > span:nth-child(2) { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.sh-b-ic .picon, .sh-b-ic img { width: 38px; height: 38px; }
+.sh-b-go .ic { width: 18px; height: 18px; color: var(--gold); }
+.sh-pz { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 6px 0 10px; }
+.sh-p { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--mc) 55%, transparent); background: rgba(0, 0, 0, .3); text-align: center; }
+.sh-p svg { width: 54px; height: 44px; }
+.sh-p b { color: var(--mc); font: 900 1rem/1 var(--f-display); }
+.sh-p small { font-size: .7rem; color: var(--mute); }
+.sh-fac { margin: 8px 0 12px; }
+.sh-score { font-size: 1rem; margin: 4px 0 10px; }
+.sh-score b { font: 900 1.6rem/1 var(--f-display); color: var(--gold-hi); }
+.sh-cards { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.sh-c { position: relative; display: block; aspect-ratio: 5 / 7; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, .2); }
+.sh-c img { width: 100%; height: 100%; object-fit: cover; }
+.sh-c small { position: absolute; left: 0; right: 0; bottom: 0; padding: 2px 0; background: rgba(0, 0, 0, .7); text-align: center; font: 800 .7rem/1.2 var(--f-ui); color: var(--gold-hi); }
+.sh-c.v-holo { border-color: #FF8AD8; } .sh-c.v-gold { border-color: #F2C14E; } .sh-c.v-galaxy { border-color: #9C7BFF; }
+.op-pts { color: var(--gold-hi); }
