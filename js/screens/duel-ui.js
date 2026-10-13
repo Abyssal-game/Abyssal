@@ -12,7 +12,7 @@ import { tuto } from '../ui/tutos.js';
 import { cardHTML } from '../ui/card.js';
 import {
   BOSS_POWERS, INTENTS, SYNERGIES, PACK_BONUS, FERVOR_MAX, AP_MAX, front, reserve, actionsFor, actionTargets, act, preview,
-  beginEnemyTurn, nextEnemy, enemyAct, endEnemyTurn, takeSkips, defenseWindow, threats, intentInfo, useUlt, ultReady, autoActs, comboOf,
+  ENTRANCES, beginEnemyTurn, nextEnemy, enemyAct, endEnemyTurn, takeSkips, defenseWindow, threats, intentInfo, useUlt, ultReady, autoActs, comboOf,
 } from '../core/duel.js';
 import { KITS, AI_FAMILIES, DICE_TIERS, WEAK_TO } from '../core/skills.js';
 import { BOSSES, LAWS, ASPECTS } from '../core/bosses.js';
@@ -100,7 +100,8 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
     const named = ['charge', 'channel', 'shield', 'heal', 'rally', 'frost', 'gather', 'mimic', 'decree', 'shift'].includes(i.kind);
     const label = i.kind === 'mimic' ? `Copie : ${esc(i.copyName)}` : i.kind === 'decree' ? esc(LAWS[i.law]?.name || 'Décret') : i.kind === 'shift' ? esc(ASPECTS[i.aspect]?.name || 'Bascule')
       : named ? esc(i.def.name) : i.kind === 'copy' ? `${esc(i.copyName)}${i.dmg ? ` ${i.dmg}` : ''}` : `${i.dmg}${i.aoe ? ' ×3' : ''}`;
-    return `<span class="cb-int d${i.danger} k-${i.kind}" title="${esc(i.def.name)} : ${esc(i.def.desc)}">${intentIcon(i.kind)}<b>${label}</b>${i.danger >= 2 ? `<em>${DANGER[i.danger]}</em>` : ''}</span>`;
+    const brk = u.brkMax && !u.broken && i.danger >= 2 ? `<small class="cb-ibrk" title="Brise-le pour annuler cette action">◆ ${u.brk}</small>` : '';
+    return `<span class="cb-int d${i.danger} k-${i.kind}" title="${esc(i.def.name)} : ${esc(i.def.desc)}">${intentIcon(i.kind)}<b>${label}</b>${i.danger >= 2 ? `<em>${DANGER[i.danger]}</em>` : ''}${brk}</span>`;
   };
   const cardEl = (u) => {
     const c = cat.get(u.id), kit = KITS[u.role];
@@ -177,7 +178,8 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
       for (const id of actionTargets(st, sel, mode.key)) {
         const p = preview(st, sel, mode.key, id);
         const cb = p.dmg && st.units[id].side === 'enemy' ? comboOf(st, st.units[sel], st.units[id]) : 0, cbTxt = cb ? ` <i class="cmb">+${cb}</i>` : '';
-        tgtInfo[id] = p.roll ? `${p.roll.chance}%` : p.dmg ? (p.dmg >= st.units[id].hp && st.units[id].side === 'enemy' ? `<b class="ko">K.O.</b> -${p.dmg}${cbTxt}` : `-${p.dmg}${p.weak ? ' ★' : ''}${cbTxt}`) : 'Cible';
+        const bk = p.brk ? (p.breaks ? ' <i class="brk on">BRISE !</i>' : ` <i class="brk">◆${p.brk}</i>`) : '';
+        tgtInfo[id] = (p.roll ? `${p.roll.chance}%` : p.dmg ? (p.dmg >= st.units[id].hp && st.units[id].side === 'enemy' ? `<b class="ko">K.O.</b> -${p.dmg}${cbTxt}` : `-${p.dmg}${p.weak ? ' ★' : ''}${cbTxt}`) : 'Cible') + bk;
       }
     }
     enEl.innerHTML = front(st, 'enemy').map(cardEl).join('') + resHTML('enemy');
@@ -228,6 +230,18 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
     im.style.cssText = `left:${x}px;top:${y}px;width:${size}px;height:${size}px`;
     box.appendChild(im); setTimeout(() => im.remove(), center ? 1400 : 750);
   };
+  // Caméra simulée : léger glissement vers un point de l'écran (jamais sur les commandes)
+  const cam = (uid, k = 1) => {
+    if (reduced) return;
+    const d = $('.dv'), t = el(uid); if (!d || !t) return;
+    const b = d.getBoundingClientRect(), r = t.getBoundingClientRect();
+    d.style.setProperty('--cx', `${((r.left + r.width / 2 - b.left) / b.width - 0.5) * -10 * k}px`);
+    d.style.setProperty('--cy', `${((r.top + r.height / 2 - b.top) / b.height - 0.5) * -10 * k}px`);
+    d.classList.remove('cam'); void d.offsetWidth; d.classList.add('cam');
+  };
+  // Arrêt sur image : le coup « pèse » un instant
+  const hitstop = async (ms) => { if (reduced) return; const d = $('.dv'); d?.classList.add('hitstop'); await wait(T(ms)); d?.classList.remove('hitstop'); };
+  const ring = (uid, cls) => { if (reduced) return; const t = el(uid); if (!t) return; const r = document.createElement('span'); r.className = `cb-ring ${cls}`; t.appendChild(r); setTimeout(() => r.remove(), 750); };
   const float = (uid, txt, cls) => { const t = el(uid); if (!t) return; const f = document.createElement('span'); f.className = `dv-float ${cls}`; f.textContent = txt; t.appendChild(f); setTimeout(() => f.remove(), 900); };
   const banner = (html, cls = '', ms = 900) => {
     const b = document.createElement('div'); b.className = `cb-banner ${cls}`; b.innerHTML = html;
@@ -264,33 +278,38 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
   }
 
   // ——— Lecture des événements (animations) ———
+  let lastTier = null; // résultat du dernier jet de dé : le coup qui suit le montre
   async function play(ev) {
     for (const e of ev) {
       if (!alive_) return;
       switch (e.t) {
         case 'act':
           if (e.skill) { app.sfx.skill(); banner(`${actIcon(KITS[st.units[e.u].role].skill.key, KITS[st.units[e.u].role].skill.icon)} ${esc(e.name)}`, 'skill', 700); await wait(T(360)); }
-          if (e.tgt && st.units[e.tgt]?.side === 'enemy' && e.key !== 'marque') lunge(e.u, e.tgt);
+          if (e.tgt && st.units[e.tgt]?.side === 'enemy' && e.key !== 'marque' && e.key !== 'entrave') { lunge(e.u, e.tgt); cam(e.tgt, 0.6); await wait(T(LUNGE_HIT)); }
+          else if (e.key === 'marque' && e.tgt) { fxAt(e.tgt, 'seal'); ring(e.tgt, 'mark'); await wait(T(260)); }
           break;
         case 'eact': {
           const def = INTENTS[e.kind];
           if (e.kind === 'heavy' || e.kind === 'blast') banner(`${intentIcon(e.kind)} ${esc(def.name)} !`, 'danger', 700);
-          if (e.tgt && st.units[e.tgt]?.side === 'ally') lunge(e.a, e.tgt);
-          await wait(T(200));
+          if (e.tgt && st.units[e.tgt]?.side === 'ally') { lunge(e.a, e.tgt); cam(e.tgt, 0.6); await wait(T(LUNGE_HIT)); }
+          else await wait(T(200));
           break;
         }
-        case 'attack': await wait(T(110)); break;
+        case 'attack': break;
         case 'counter': lunge(e.a, e.u); float(e.a, 'Riposte !', 'syn'); await wait(T(260)); break;
         case 'dmg': {
           const t = el(e.u);
           if (t) { t.classList.remove('hit'); void t.offsetWidth; t.classList.add('hit'); const hp = t.querySelector('.dv-hp b'); if (hp) hp.textContent = Math.max(0, e.hp); t.querySelector('.dv-hp')?.classList.add('hurt'); }
-          fxAt(e.u, e.d >= 8 ? 'impact' : 'slash', { big: e.d >= 8 });
-          float(e.u, `-${e.d}`, e.d >= 8 ? 'dmg big' : 'dmg'); (e.d >= 8 ? app.sfx.smash : app.sfx.slash)(); sparks(e.u); if (e.d >= 8 || e.hp <= 0) shake(e.d >= 12);
-          await wait(T(240));
+          const crit = lastTier === 'crit', heavy = crit || e.d >= 8;
+          lastTier = null;
+          if (heavy) await hitstop(crit ? 140 : 70);
+          fxAt(e.u, heavy ? 'impact' : 'slash', { big: heavy });
+          float(e.u, crit ? `CRITIQUE −${e.d}` : `-${e.d}`, crit ? 'dmg big crit' : heavy ? 'dmg big' : 'dmg'); (heavy ? app.sfx.smash : app.sfx.slash)(); sparks(e.u, crit ? 'gold' : ''); if (heavy || e.hp <= 0) shake(crit || e.d >= 12);
+          await wait(T(heavy ? 300 : 220));
           break;
         }
         case 'heal': { app.sfx.heal(); fxAt(e.u, 'heal'); float(e.u, `+${e.d}`, 'heal'); const hp = el(e.u)?.querySelector('.dv-hp b'); if (hp) hp.textContent = st.units[e.u].hp; await wait(T(200)); break; }
-        case 'block': app.sfx.block(); float(e.u, 'Bloqué', 'info'); sparks(e.u, 'blue'); await wait(T(240)); break;
+        case 'block': app.sfx.block(); ring(e.u, 'guard'); float(e.u, 'Bloqué', 'info'); sparks(e.u, 'blue'); await wait(T(240)); break;
         case 'dodge': {
           app.sfx.dodge();
           if (e.u) { fxAt(e.u, 'dodge', { big: true }); const t = el(e.u); if (t) { t.classList.remove('dodge'); void t.offsetWidth; t.classList.add('dodge'); } float(e.u, 'Esquive !', 'dodge'); }
@@ -298,12 +317,22 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
           await wait(T(320));
           break;
         }
-        case 'parry': app.sfx.parry(); banner('Parade parfaite !', 'parry', 800); if (e.u) { fxAt(e.u, 'dodge', { big: true }); sparks(e.u, 'gold'); } shake(false); await wait(T(420)); break;
+        case 'parry': app.sfx.parry(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxAt(e.u, 'dodge', { big: true }); sparks(e.u, 'gold'); cam(e.u, -0.8); } banner('Parade parfaite !', 'parry', 800); shake(false); await wait(T(420)); break;
         case 'fervor': fervorPop(e.d, e.why); draw(); break;
         case 'brk': { const t = el(e.u)?.querySelector('.cb-brk i'); if (t) t.style.width = `${(e.brk / e.max) * 100}%`; break; }
-        case 'broken': app.sfx.shatter(); draw(); el(e.u)?.classList.add('shatter'); banner('BRISURE !', 'broken', 1000); sparks(e.u, 'big'); shake(true); await wait(T(700)); break;
+        case 'broken': {
+          // suspension, fissures lumineuses, rupture, puis l'état vulnérable apparaît
+          const d = $('.dv'), t = el(e.u);
+          if (!reduced) { d?.classList.add('focus'); t?.classList.add('cracking'); }
+          await hitstop(160);
+          app.sfx.shatter(); draw();
+          const t2 = el(e.u); t2?.classList.add('shatter', 'cracked'); ring(e.u, 'break');
+          banner('BRISURE !', 'broken', 1000); sparks(e.u, 'big'); shake(true);
+          await wait(T(700)); d?.classList.remove('focus');
+          break;
+        }
         case 'recover': float(e.u, 'Se relève', 'info'); await wait(T(260)); break;
-        case 'roll': await rollFx(e); break;
+        case 'roll': await rollFx(e); lastTier = e.tier; break;
         case 'boss': { app.sfx.boss(); const t = el(e.u); if (t) { t.classList.remove('roar'); void t.offsetWidth; t.classList.add('roar'); } float(e.u, e.s, 'boss'); shake(true); await wait(T(650)); break; }
         case 'phase2': app.sfx.boss(); draw(); banner(`${icon('skull')} ${esc(e.s)}`, 'danger', 1200); shake(true); await wait(T(900)); break;
         case 'swap': app.sfx.enter(); draw(); el(e.u)?.classList.add('enter'); float(e.u, 'Entre en jeu', 'info'); await wait(T(340)); break;
@@ -311,14 +340,27 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
         case 'status':
           if (e.k === 'poison') { if (/\+|×/.test(e.s)) { app.sfx.poison(); fxAt(e.u, 'venom', { big: !!e.syn }); } }
           else if (e.k === 'frost' && /^Gel/.test(e.s) && !/passe/.test(e.s)) { app.sfx.freeze(); fxAt(e.u, 'frost'); }
+          else if (e.k === 'guard') { app.sfx.block(); ring(e.u, 'guard'); }
           else if (e.syn) app.sfx.skill();
+          if (e.k === 'entrance') ring(e.u, 'enter');
           float(e.u, e.s, e.syn ? 'syn' : e.k === 'bad' ? 'dmg' : 'info');
           draw();
           await wait(T(e.syn ? 480 : 260));
           break;
         case 'combo': float(e.u, `Chaîne ×${e.n}`, 'combo'); app.sfx.crit?.(); await wait(T(260)); if (!g.s.tips?.['cb-combo']) tuto(app, 'cb-combo'); break;
         case 'finisher': { if (!reduced) { const d = $('.dv'); d.classList.add('slowmo'); setTimeout(() => d.classList.remove('slowmo'), 700); } banner('Coup de grâce !', 'finisher', 800); await wait(T(380)); break; }
-        case 'die': app.sfx.death(); fxAt(e.u, 'death', { big: true }); sparks(e.u, 'big'); el(e.u)?.classList.add('dying'); await wait(T(440)); draw(); break;
+        case 'die': {
+          const u = st.units[e.u];
+          if (u?.boss) {
+            // mort d'un gardien : ralenti, le décor réagit, il se dissipe en cendres
+            const d = $('.dv'); if (!reduced) d?.classList.add('slowmo', 'bossfall');
+            app.sfx.boss(); await hitstop(220); app.sfx.death();
+            fxAt(e.u, 'death', { big: true }); sparks(e.u, 'big'); el(e.u)?.classList.add('dying', 'ashes'); shake(true);
+            banner(`${esc(cat.get(u.id).name)} est vaincu`, 'finisher', 1300);
+            await wait(T(1100)); d?.classList.remove('slowmo', 'bossfall'); draw(); break;
+          }
+          app.sfx.death(); fxAt(e.u, 'death', { big: true }); sparks(e.u, 'big'); el(e.u)?.classList.add('dying'); await wait(T(440)); draw(); break;
+        }
         case 'enter': draw(); el(e.u)?.classList.add('enter'); await wait(T(340)); break;
         case 'revive': draw(); float(e.u, 'Relevée !', 'heal'); await wait(T(280)); break;
         case 'phase': draw(); say(e.side === 'enemy' ? '<b class="dc-bad">Tour des créatures corrompues</b>' : 'À toi !'); await wait(T(e.side === 'enemy' ? 380 : 160)); break;
@@ -329,12 +371,14 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
     }
     draw();
   }
+  const LUNGE_HIT = 190; // instant du contact dans l'élan (ms), synchronisé avec dvLunge
   function lunge(aUid, tUid) {
     const a = el(aUid), t = el(tUid);
     if (!a || !t || reduced) return;
     const ra = a.getBoundingClientRect(), rt = t.getBoundingClientRect();
     a.style.setProperty('--dx', `${(rt.left - ra.left) * 0.55}px`);
     a.style.setProperty('--dy', `${(rt.top - ra.top) * 0.55}px`);
+    a.style.setProperty('--ld', `${T(420)}ms`);
     a.classList.remove('lunge'); void a.offsetWidth; a.classList.add('lunge');
   }
   async function ultFx() {
@@ -523,7 +567,7 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
   function pickReserve() {
     const r = reserve(st, 'ally'), su = st.units[sel];
     const sh = openSheet(`<h2>Qui entre en jeu ?</h2><p class="small muted">À la place de <b>${esc(cat.get(su.id).name)}</b>. Coût : ${st.freeSwap ? 'gratuit (Relais d’ombre)' : '1 action'}. Elle peut agir ce tour-ci ; PV et états sont conservés.</p>
-      <div class="dv-pick">${r.map((x) => `<button class="dv-pick-c" data-in="${x.uid}"><img alt="" src="${artUrl(cat.get(x.id), { lite: true })}"><b>${esc(cat.get(x.id).name)}</b><span>${esc(KITS[x.role].name)} · ${icon('swords')}${x.atk} · ${icon('heart')}${x.hp}/${x.maxHp}</span></button>`).join('')}</div>`, { label: 'Permuter' });
+      <div class="dv-pick">${r.map((x) => `<button class="dv-pick-c" data-in="${x.uid}"><img alt="" src="${artUrl(cat.get(x.id), { lite: true })}"><b>${esc(cat.get(x.id).name)}</b><span>${esc(KITS[x.role].name)} · ${icon('swords')}${x.atk} · ${icon('heart')}${x.hp}/${x.maxHp}</span>${ENTRANCES[x.role] ? `<small class="dv-pick-e"><b>${esc(ENTRANCES[x.role].name)}</b> : ${esc(ENTRANCES[x.role].desc)}</small>` : ''}</button>`).join('')}</div>`, { label: 'Permuter' });
     sh.body.addEventListener('click', (ev) => { const p = ev.target.closest('[data-in]'); if (p) { sh.close(); const u = sel; mode = null; exec(() => act(st, u, 'swap', p.dataset.in)); } });
   }
 
@@ -645,7 +689,8 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
   function help() {
     openSheet(`<h2>Le combat</h2><ul class="small">
       <li><b>${AP_MAX} actions par tour</b> pour toute l’équipe. Touche une créature, puis une action, puis la cible. Une créature agit au plus 2 fois par tour. Raccourci : ta créature puis un ennemi = Attaque.</li>
-      <li><b>Attaque</b> (1 action) : dégâts fiables, +1 Ferveur. <b>Défense</b> (1 action) : -50 % de dégâts jusqu’à ton prochain tour. <b>Permuter</b> (1 action, une fois par tour) : une créature de la réserve prend la place ; PV et états sont gardés, et la réserve récupère 10 % de PV par tour.</li>
+      <li><b>Attaque</b> (1 action) : dégâts fiables, +1 Ferveur. <b>Défense</b> (1 action) : -50 % de dégâts jusqu’à ton prochain tour. <b>Permuter</b> (1 action, une fois par tour) : une créature de la réserve prend la place ; PV et états sont gardés, et la réserve récupère 10 % de PV par tour. En entrant, elle déclenche un petit effet lié à son rôle (bouclier, soin, Ferveur, ralentissement…).</li>
+      <li><b>Brisure</b> : en visant un élite ou un gardien, la cible affiche la Brisure que ton coup va infliger (◆), et « BRISE ! » quand il va le briser. Sur son intention, ◆ indique ce qu’il reste à briser pour annuler son action. Un seul coup ne retire jamais plus de 40 % des PV d’un gardien.</li>
       <li><b>Ferveur</b> (${FERVOR_MAX} au plus, gardée d’un combat à l’autre) : attaques, faiblesses, esquives (+1), parades parfaites (+2) et Brisures (+2) la remplissent. Les compétences la dépensent ; pleine, elle lance le <b>pouvoir d’équipe</b> (${esc(ult.name)} : ${esc(ult.desc)}).</li>
       <li><b>Intentions</b> : au-dessus de chaque ennemi, ce qu’il fera et les dégâts prévus ; « ! » = danger. Le badge rouge sur tes cartes annonce les dégâts qu’elles vont prendre.</li>
       <li><b>Défense active</b> (coups chargés, attaques de zone, sorts, élites et gardiens) : touche dans l’or pour esquiver (+1 Ferveur), sur le trait blanc, au tout dernier instant, pour parer (aucun dégât, +2 Ferveur, Brisure, contre-attaque des Gardes et des Assauts).</li>

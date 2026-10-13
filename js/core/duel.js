@@ -178,8 +178,12 @@ function teamLoss(st) {
 }
 
 // ——— Effets élémentaires ———
+// Un seul coup ne retire jamais plus de 40 % des PV max d'un gardien (les cumuls de bonus restent forts, sans tuer en un coup)
+export const BOSS_HIT_CAP = 0.4;
+const bossCap = (u) => Math.max(1, Math.round(u.maxHp * BOSS_HIT_CAP));
 function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   if (u.hp <= 0 || n <= 0) return 0;
+  if (u.boss && u.side === 'enemy') n = Math.min(n, bossCap(u));
   if (u.shield && pierce) { u.shield = 0; ev.push({ t: 'status', u: u.uid, s: 'Perce-bouclier', syn: true }); }
   if (u.shield) { u.shield = 0; ev.push({ t: 'block', u: u.uid }); return 0; }
   let d = Math.min(u.hp, Math.round(n));
@@ -370,6 +374,10 @@ export function preview(st, uid, key, tUid) {
   if (t && t.side === 'enemy') {
     if (key === 'attack') out.dmg = dmgOf(st, u, t, 1, { basic: true });
     if (key === 'estoc') out.dmg = dmgOf(st, u, t, 2);
+    if (out.dmg && t.boss) out.dmg = Math.min(out.dmg, bossCap(t));
+    // Brisure prévue (réussite pour le Coup d'estoc) ; l'ennemi doit survivre au coup pour être brisé
+    const b = t.brkMax && !t.broken && !t.shield ? brkTotal(st, u, brkOf(st, u, t, key)) : 0;
+    if (b) { out.brk = b; out.breaks = b >= t.brk && (out.dmg || 0) < t.hp; }
     out.weak = isWeak(u, t) && !!(st.discovered[t.faction] || t.mark);
   }
   return out;
@@ -393,19 +401,23 @@ export function act(st, uid, key, tUid = null) {
   else if (key === 'rempart') { t.guardBy = uid; u.rempart = tUid; ev.push({ t: 'status', u: tUid, s: 'Rempart', k: 'guard' }); }
   else if (key === 'priere') {
     heal(t, t.maxHp * 0.4, ev);
+    if (t.guardBy && !t.shield) { t.shield = 1; ev.push({ t: 'status', u: tUid, s: 'Bastion !', syn: true, combo: 'bastion', k: 'guard' }); }
     if (t.poison || t.frozen || t.stunned) { t.poison = 0; t.frozen = 0; t.stunned = false; ev.push({ t: 'status', u: tUid, s: 'Purifiée', k: 'heal' }); }
   } else if (key === 'marque') { t.mark = 2; discover(st, t, ev); ev.push({ t: 'status', u: tUid, s: 'Marquée', k: 'mark' }); }
   else if (key === 'raz') {
     ev.push({ t: 'aoe', u: uid, side: 'ally' });
-    front(st, 'enemy').forEach((x) => { const d = hurt(st, x, dmgOf(st, u, x, 0.7), ev, uid); if (d) breakHit(st, x, 1 + (x.frozen ? 2 : 0), ev, u); });
+    front(st, 'enemy').forEach((x) => { const b = brkOf(st, u, x, 'raz'); const d = hurt(st, x, dmgOf(st, u, x, 0.7), ev, uid); if (d) breakHit(st, x, b, ev, u); });
   } else if (key === 'estoc') {
     const info = rollInfo(st, uid, key, tUid);
     const tier = resolveRoll(st, info, ev, uid, tUid);
-    const [m, b] = { crit: [3, 4], success: [2, 3], partial: [1.2, 1], fumble: [0.5, 0] }[tier];
+    const m = { crit: 3, success: 2, partial: 1.2, fumble: 0.5 }[tier];
+    // Combinaisons nommées : la Marque prépare la Chasse, le gel prépare le Bris de glace
+    if (t.mark && tier !== 'fumble') ev.push({ t: 'status', u: tUid, s: 'Chasse !', syn: true, combo: 'chasse' });
+    if (t.frozen > 0 && tier !== 'fumble') ev.push({ t: 'status', u: tUid, s: 'Bris de glace !', syn: true, combo: 'glace' });
     weakBonus(st, u, t, ev);
     const frozen = t.frozen > 0;
     const d = hurt(st, t, dmgOf(st, u, t, m), ev, uid);
-    if (d && t.hp > 0) breakHit(st, t, b + (frozen ? 2 : 0) + (isWeak(u, t) ? 1 : 0), ev, u);
+    if (d && t.hp > 0) breakHit(st, t, brkOf(st, u, { ...t, frozen: frozen ? 1 : 0 }, 'estoc', tier), ev, u);
     if (d && t.boss) t.wound = 1;
     if (tier === 'fumble') { u.exposed = true; ev.push({ t: 'status', u: uid, s: 'Exposée', k: 'bad' }); }
   } else if (key === 'contagion') {
@@ -430,6 +442,16 @@ export function act(st, uid, key, tUid = null) {
   check(st, ev);
   return ev;
 }
+// Brisure infligée par une attaque (hors bénédiction, ajoutée dans breakHit). tier : résultat du D20 pour le Coup d'estoc.
+export function brkOf(st, u, t, key, tier = 'success') {
+  if (!t?.brkMax) return 0;
+  const frozen = t.frozen > 0, weak = isWeak(u, t) ? 1 : 0;
+  if (key === 'attack') return 1 + (u.role === 'protecteur' ? 1 : 0) + (u.role === 'controle' && frozen ? 2 : 0) + weak + (u.form === 'shatter' ? 1 : 0);
+  if (key === 'estoc') return { crit: 4, success: 3, partial: 1, fumble: 0 }[tier] + (frozen ? 2 : 0) + weak;
+  if (key === 'raz') return 1 + (frozen ? 2 : 0);
+  return 0;
+}
+const brkTotal = (st, u, n) => (n > 0 && u?.side === 'ally' && has(st, 'brise') ? n + 1 : n);
 function weakBonus(st, u, t, ev) {
   if (!isWeak(u, t)) return;
   discover(st, t, ev);
@@ -441,7 +463,7 @@ function basicAttack(st, u, t, ev) {
   const d = hurt(st, t, dmgOf(st, u, t, 1, { basic: true }), ev, u.uid, { pierce: u.role === 'poison' });
   if (d && t.hp > 0) {
     if (u.role === 'poison') addPoison(st, t, 2, ev, u);
-    breakHit(st, t, 1 + (u.role === 'protecteur' ? 1 : 0) + (u.role === 'controle' && frozen ? 2 : 0) + (isWeak(u, t) ? 1 : 0) + (u.form === 'shatter' ? 1 : 0), ev, u);
+    breakHit(st, t, brkOf(st, u, { ...t, frozen: frozen ? 1 : 0 }, 'attack'), ev, u);
     if (u.role === 'degats' && t.boss) t.wound = 1;
   }
   if (u.role === 'zone') {
@@ -460,8 +482,33 @@ function doSwap(st, out, inn, ev) {
   st.freeSwap = false;
   st.swapped = true;
   // les intentions qui visaient la créature sortie frappent celle qui entre (elle prend sa place)
-  front(st, 'enemy').forEach((e) => { if (e.intent?.t === out.uid) e.intent = { ...e.intent, t: inn.uid }; });
+  const aimed = front(st, 'enemy').filter((e) => e.intent?.t === out.uid);
+  aimed.forEach((e) => { e.intent = { ...e.intent, t: inn.uid }; });
   ev.push({ t: 'swap', u: inn.uid, out: out.uid });
+  entrance(st, inn, aimed, ev);
+}
+// Effets d'entrée (permutation volontaire seulement, une fois par tour comme la permutation)
+export const ENTRANCES = {
+  protecteur: { name: 'Prise de garde', desc: 'Elle entre avec un bouclier qui bloque le prochain coup.' },
+  degats:     { name: 'Entrée fracassante', desc: '+2 en attaque pour ce tour.' },
+  soin:       { name: 'Main secourable', desc: 'Soigne l’allié au combat le plus blessé (15 % de ses PV max).' },
+  poison:     { name: 'Nuée toxique', desc: '+2 poison à l’ennemi qui visait la créature remplacée (sinon au premier ennemi).' },
+  controle:   { name: 'Souffle glacé', desc: 'L’ennemi qui visait la créature remplacée est ralenti : sa prochaine attaque fait moitié moins mal.' },
+  soutien:    { name: 'Appel aux armes', desc: '+1 Ferveur.' },
+  zone:       { name: 'Ressac', desc: '+1 Brisure à chaque élite ou gardien au combat.' },
+};
+function entrance(st, u, aimed, ev) {
+  const E = ENTRANCES[u.role];
+  if (!E) return;
+  ev.push({ t: 'status', u: u.uid, s: E.name, syn: true, k: 'entrance' });
+  const foe = aimed[0] || front(st, 'enemy')[0];
+  if (u.role === 'protecteur') { u.shield = 1; ev.push({ t: 'status', u: u.uid, s: 'Bouclier', k: 'guard' }); }
+  else if (u.role === 'degats') u.boost = (u.boost || 0) + 2;
+  else if (u.role === 'soin') { const w = front(st, 'ally').filter((x) => x.hp < x.maxHp).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0]; if (w) heal(w, w.maxHp * 0.15, ev); }
+  else if (u.role === 'poison' && foe) addPoison(st, foe, 2, ev, u);
+  else if (u.role === 'controle' && aimed.length) { aimed.forEach((e) => { e.slow = true; ev.push({ t: 'status', u: e.uid, s: 'Ralenti', k: 'frost' }); }); }
+  else if (u.role === 'soutien') gainFervor(st, 1, ev, 'Appel aux armes');
+  else if (u.role === 'zone') front(st, 'enemy').forEach((x) => breakHit(st, x, 1, ev, u));
 }
 
 // ——— Pouvoir d'équipe : coûte 1 PA et toute la Ferveur ———
@@ -736,7 +783,10 @@ function planIntents(st) {
     const kind = intentKind(st, e);
     let t = null;
     if (SINGLE.includes(kind)) t = pickTarget(st, e);
-    if (kind === 'shield') t = front(st, 'enemy').filter((x) => !x.shield).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0]?.uid || e.uid;
+    if (kind === 'shield') {
+      const free = front(st, 'enemy').filter((x) => !x.shield);
+      t = (free.find((x) => x !== e && x.charged) || free.sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0])?.uid || e.uid;
+    }
     if (kind === 'heal') t = front(st, 'enemy').slice().sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0]?.uid;
     const extra = {};
     if (kind === 'gorge') t = targetsFor(st, 'enemy', e).map((id) => st.units[id]).sort((x, y) => y.hp - x.hp)[0]?.uid || null;
