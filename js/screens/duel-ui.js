@@ -98,7 +98,7 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
     u.doom != null && !u.broken ? st_('doom', `Effondrement dans ${u.doom} tour(s) : brise-le pour le repousser`, u.doom) : '',
     u.mask ? st_('mask', `Il porte le visage ${cat.faction[u.mask]?.name || u.mask} : il résiste à cette faction (−50 %)`) : '',
     u.totality ? st_('totality', 'Totalité : seules ses faiblesses le blessent pleinement') : '',
-    u.talent && TALENTS[u.talent] ? `<i class="bo tal" title="Talent : ${esc(TALENTS[u.talent].name)} · ${esc(TALENTS[u.talent].desc)}">★</i>` : '',
+    u.talent && TALENTS[u.talent] ? `<i class="sti" title="Talent : ${esc(TALENTS[u.talent].name)} · ${esc(TALENTS[u.talent].desc)}"><img alt="" src="assets/icons/tal-${u.talent}.webp"></i>` : '',
   ].join('');
   const intentChip = (u) => {
     const i = intentInfo(st, u);
@@ -408,7 +408,7 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
   async function phaseCard(P) {
     const b = document.createElement('div');
     b.className = 'cb-phase';
-    b.innerHTML = `<b>${esc(P.name)}</b><p>${esc(P.desc)}</p><small>Touche pour continuer</small>`;
+    b.innerHTML = `${st.bossKey ? `<img class="cb-phimg" alt="" src="assets/ui/ph-${st.bossKey}.webp">` : ''}<b>${esc(P.name)}</b><p>${esc(P.desc)}</p><small>Touche pour continuer</small>`;
     $('.dv').appendChild(b);
     await new Promise((res) => { const go = () => { b.remove(); res(); }; b.addEventListener('pointerdown', go, { once: true }); setTimeout(go, reduced ? 2500 : 6000); });
   }
