@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v188';
+const VERSION = 'abyssal-v189';
 const ART_CACHE = 'abyssal-media';  // images du jeu : gardées entre les versions
 const FONT_CACHE = 'abyssal-fonts';
 const CORE = [
@@ -29,7 +29,7 @@ const CORE = [
   ...['table', 'floor', 'wall', 'pillar', 'door-closed', 'door-open', 'chest-closed', 'chest-open', 'portal', 'trap', 'goule', 'base-ally', 'base-enemy', 'base-elite', 'base-boss', 'card-power', 'card-item', 'card-back', 'd20', 'd6', 'frame'].map((k) => `assets/salles/${k}.webp`),
   ...['booster', 'book', 'crystal', 'holo', 'ritual', 'depth', 'crown', 'chest', 'cards', 'swords', 'dodge', 'seal', 'hunt', 'streak', 'tab-home', 'tab-collection', 'tab-boosters', 'tab-adventure', 'tab-more', 'avatar', 'showcase', 'illus', 'team', 'history', 'stat-atk', 'stat-hp', 'role-garde', 'role-assaut', 'role-soin', 'role-venin', 'role-gel', 'role-cri', 'role-deferlante', 'gem-fv', 'gem-fv0', 'gem-ap', 'gem-ap0', 'crest-boss', 'crest-elite', 'danger', 'power', 'in-hit', 'in-heavy', 'in-charge', 'in-channel', 'in-blast', 'in-shield', 'in-heal', 'in-rally', 'in-poison', 'in-frost', 'st-poison', 'st-frost', 'st-shield', 'st-mark', 'st-defend', 'st-guard', 'st-exposed', 'st-slow', 'st-broken', 'set-game', 'set-tutos', 'set-save', 'set-about', 'online', 'rule', 'torch-on', 'torch-off', 'door-fight', 'door-elite', 'door-boss', 'stairs-up', 'stairs-down', 'hand', 'act-attack', 'act-defend', 'act-swap', 'act-rempart', 'act-estoc', 'act-priere', 'act-contagion', 'act-entrave', 'act-marque', 'act-raz', 'discover', 'xp', 'luck', 'titles', 'stats', 'openings', 'genesis', 'chronicles', 'conflicts', 'figures', 'mysteries', 'account', 'settings', 'creator', 'cur-shard', 'cur-ash', 'combo', 'team-ic', 'descend', 'free-pack', 'ticket', 'hourglass', 'feats', 'help'].map((k) => `assets/icons/${k}.webp`),
   ...['slash', 'impact', 'dodge', 'heal', 'venom', 'frost', 'seal', 'death', 'd20', 'd20-crit', 'd20-fumble'].map((k) => `assets/fx/${k}.webp`),
-  ...['salle', 'salle-artificiel', 'salle-celeste', 'salle-necrotique', 'salle-abyssal', 'plateau', 'case', 'dos', 'benie', 'maudite', 'rival-initie', 'rival-collectionneur', 'rival-stratege', 'rival-maitre', 'rival-echo'].map((k) => `assets/sceaux/${k}.webp`),
+  ...['salle', 'salle-artificiel', 'salle-celeste', 'salle-necrotique', 'salle-abyssal', 'plateau', 'case', 'dos', 'benie', 'maudite', 'rival-initie', 'rival-collectionneur', 'rival-stratege', 'rival-maitre', 'rival-echo', 'rival-banquier', 'rival-archiviste', 'rival-souverain'].map((k) => `assets/sceaux/${k}.webp`),
   ...['infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel'].map((k) => `assets/realms/${k}.webp`),
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/favicon.png',
 ];
