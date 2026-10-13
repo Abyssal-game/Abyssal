@@ -87,6 +87,8 @@ function fitHeight() {
   // installée sur l'écran d'accueil, en portrait, le jeu occupe tout l'écran : on prend sa hauteur réelle
   const h = standalone && innerHeight > innerWidth ? Math.max(screen.height, innerHeight) : innerHeight;
   document.documentElement.style.setProperty('--app-h', `${h}px`);
+  // partie de l'écran que l'iPhone peut ne pas afficher sous la zone visible : le bas des pages plein écran remonte d'autant
+  document.documentElement.style.setProperty('--vh-gap', `${Math.max(0, h - innerHeight)}px`);
 }
 fitHeight();
 addEventListener('resize', fitHeight);

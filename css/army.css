@@ -1590,3 +1590,8 @@ i.cmb { font-style: normal; color: #FFC266; font-weight: 800; }
 .op-card.op-first { animation: opFirst 1.2s ease-out; }
 @keyframes opFirst { 0% { box-shadow: 0 0 0 0 rgba(255, 220, 140, .9); } 40% { box-shadow: 0 0 0 14px rgba(255, 220, 140, .35), 0 0 60px rgba(255, 220, 140, .7); } 100% { box-shadow: 0 0 0 26px rgba(255, 220, 140, 0); } }
 .op-label .op-gain { display: inline-flex; align-items: center; gap: 4px; margin-right: 8px; }
+
+/* Ouverture de booster : le bas (points, consigne, boutons) reste dans la partie visible de l'écran */
+.opening .op-bottom { padding-bottom: calc(14px + max(var(--safe-b), var(--vh-gap, 0px))) !important; }
+.opening .op-actions-fixed { padding-bottom: calc(14px + max(var(--safe-b), var(--vh-gap, 0px))) !important; }
+.opening.is-summary .op-stage { padding-bottom: calc(84px + max(var(--safe-b), var(--vh-gap, 0px))) !important; }
