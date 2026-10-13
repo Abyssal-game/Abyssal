@@ -3,17 +3,17 @@
 import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, LUCK_POINTS, RITUAL, ITEMS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
-import { DESCENT, CHESTS, floorDoors, floorEnemies, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, huntStage, HUNT_STAGES } from './descent.js';
-import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport } from './duel.js';
+import { rngOf, DESCENT, CHESTS, floorDoors, floorEnemies, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, huntStage, HUNT_STAGES } from './descent.js';
+import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState } from './duel.js';
 import { bossOf, BOSSES } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
 import { FORMS, formUnlocked } from './forms.js';
 import * as SC from './sceaux.js';
-import { FERVOR_START, FERVOR_MAX } from './skills.js';
+import { FERVOR_START, FERVOR_MAX, TALENTS } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
 export const WEEKLY_FLOOR = 8;
 export const BOSS_RECRUIT = 0.25;
-import { STARTER, COST, BUDGET, TEAM, ULTS, levelFromDups, canUlt, ultOf } from './army.js';
+import { STARTER, COST, BUDGET, TEAM, ULTS, levelFromDups, canUlt, ultOf, roleOf } from './army.js';
 
 const RI = (r) => RARITY_ORDER.indexOf(r);
 const ITEM_REFUND = { baume: 80, elixir: 260, parchemin: 120 };
@@ -486,6 +486,55 @@ export class Game {
     this.persist();
     return d.run;
   }
+  // ——— Épreuve du jour : le même combat pour tout le monde (équipe imposée, ennemis et dés fixés) ———
+  trialDef(day = today(this.clock())) {
+    const r = rngOf(`trial:${day}`);
+    const pick = (list) => list[Math.floor(r() * list.length)];
+    const pool = this.catalog.cards.filter((c) => ['PC', 'R'].includes(c.rarity));
+    const roles = ['protecteur', 'degats', 'soin', pick(['poison', 'controle', 'soutien', 'zone']), pick(['degats', 'zone', 'soutien', 'controle'])];
+    const team = [];
+    for (const role of roles) { const c = pick(pool.filter((x) => roleOf(x) === role && !team.includes(x.id))); if (c) team.push(c.id); }
+    const foes = this.catalog.cards.filter((c) => ['PC', 'R', 'HR'].includes(c.rarity));
+    const enemies = [{ id: pick(foes.filter((c) => c.rarity === 'HR')).id, elite: true }, { id: pick(foes).id }, { id: pick(foes).id }];
+    const twist = pick(['none', 'sang', 'reflet']);
+    return { day, team, enemies, floor: 9, pact: twist === 'none' ? null : twist, seed: Math.floor(r() * 2 ** 31) };
+  }
+  trial() {
+    const day = today(this.clock());
+    const t = (this.s.trial ||= { day: null, best: null, wins: 0, tries: 0, run: null });
+    if (t.day !== day) Object.assign(t, { day, best: null, tries: 0, run: null, paid: false });
+    return t;
+  }
+  trialStart() {
+    const t = this.trial(), d = this.trialDef(t.day);
+    const allies = d.team.map((id) => duelUnit(this.catalog.get(id), { level: 3 }));
+    const enemies = d.enemies.map((e) => duelUnit(this.catalog.get(e.id), { side: 'enemy', scale: enemyScale(d.floor), level: 3, elite: !!e.elite }));
+    const c = d.team.map((id) => this.catalog.get(id)).filter(canUlt).sort((a, b) => RI(b.rarity) - RI(a.rarity))[0] || null;
+    const ult = { key: ultOf(c), card: c?.id || null, power: 1.16 };
+    t.tries++;
+    t.run = { trial: true, day: t.day, floor: d.floor, room: 'elite', ult, blessings: [], team: d.team.map((id) => ({ id })),
+      battle: createDuel(allies, enemies, { fervor: FERVOR_START, ult: ult.key, power: ult.power, pact: d.pact, seed: d.seed }) };
+    this.persist();
+    return t.run;
+  }
+  // Score : victoire en peu de tours, avec le plus de PV restants
+  trialFinish() {
+    const t = this.trial(), st = t.run?.battle;
+    if (!st?.over) throw new Error('L’épreuve n’est pas terminée.');
+    const allies = st.order.ally.map((id) => st.units[id]);
+    const hp = Math.round((allies.reduce((a, u) => a + Math.max(0, u.hp), 0) / allies.reduce((a, u) => a + u.maxHp, 0)) * 100);
+    const out = { won: st.over === 'won', rounds: st.round, hp, record: false, shards: 0 };
+    if (out.won) {
+      out.score = Math.max(0, 1000 - 80 * st.round + hp * 3);
+      if (!t.best || out.score > t.best.score) { out.record = !!t.best; t.best = { score: out.score, rounds: st.round, hp }; }
+      if (!t.paid) { t.paid = true; t.wins = (t.wins || 0) + 1; out.shards = 40; this.s.shards += 40; }
+    }
+    t.run = null;
+    this.track('trial', 1);
+    this.persist();
+    return out;
+  }
+  trialQuit() { const t = this.trial(); t.run = null; this.persist(); }
   // ——— Duels des Sceaux ———
   // Main du joueur : 5 cartes possédées (complétée par les cartes de départ prêtées s'il en manque)
   sceauxHand() {
@@ -613,6 +662,7 @@ export class Game {
     const run = this.s.descent.run, b = run.blessings;
     return run.team.filter((m) => !m.fallen).map((m) => {
       const u = duelUnit(this.catalog.get(m.id), { level: this.cardLevel(m.id), form: m.form || null });
+      if (m.talent) { u.talent = m.talent; if (m.talent === 'vif') u.atk += 2; }
       if (b.includes('blades')) u.atk += 1;
       if (b.includes('ward')) u.shield = 1;
       return { ...u, maxHp: m.maxHp, hp: Math.min(m.hp, m.maxHp) };
@@ -669,17 +719,43 @@ export class Game {
       }
       const known = {};
       enemies.forEach((e) => { if (this.knows(e.id)) known[e.id] = true; });
-      run.battle = createDuel(this.runUnits(), enemies, { fervor: run.gauge || 0, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, boss: room === 'boss' ? bossOf(run.floor) : null, pact: room === 'fight' ? null : run.pact || null, blessings: run.blessings, discovered: this.s.weakSeen || {}, seed: this.rng ? Math.floor(this.rng() * 2 ** 31) : null });
+      run.battle = createDuel(this.runUnits(), enemies, { fervor: run.gauge || 0, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, boss: room === 'boss' ? bossOf(run.floor) : null, pact: room === 'fight' ? null : run.pact || null, blessings: run.blessings, discovered: this.s.weakSeen || {}, seed: this.rng ? Math.floor(this.rng() * 2 ** 31) : null, goal: this.goalFor(run, room) });
       run.room = room; run.phase = 'battle'; out.battle = true;
     }
     if (run.phase === 'cleared') this.clearFloor();
     this.persist();
     return out;
   }
+  // Objectif bonus du combat : le même pour un étage donné du jour
+  goalFor(run, room) {
+    const keys = Object.keys(GOALS).filter((k) => GOALS[k].rooms.includes(room));
+    return keys[Math.floor(rngOf(`goal:${run.day}:${run.floor}:${room}`)() * keys.length)];
+  }
+  // Talents proposés après une élite : 3 couples (créature encore debout sans talent, talent), toujours les mêmes pour l'étage
+  talentOffers(run) {
+    const r = rngOf(`talent:${run.day}:${run.floor}`);
+    const team = run.team.filter((m) => !m.fallen && !m.talent).map((m) => m.id);
+    const tal = Object.keys(TALENTS).sort(() => r() - 0.5);
+    const out = [];
+    for (let i = 0; i < 3 && team.length; i++) out.push({ id: team[Math.floor(r() * team.length)], talent: tal[i] });
+    return out;
+  }
+  chooseTalent(i) {
+    const run = this.s.descent.run;
+    const o = run?.talentOffer?.[i];
+    if (!o) throw new Error('Aucun talent à choisir.');
+    const m = run.team.find((x) => x.id === o.id);
+    m.talent = o.talent;
+    if (o.talent === 'robuste') { const add = Math.round(m.maxHp * 0.25); m.maxHp += add; m.hp += add; }
+    run.talentOffer = null;
+    this.persist();
+    return o;
+  }
   // Bonus choisi après une victoire : source (soin), autel (bénédiction) ou trésor (éclats)
   chooseReward(room) {
     const run = this.s.descent.run;
     if (!run || run.phase !== 'reward' || !(run.rewards || []).includes(room)) throw new Error('Bonus indisponible.');
+    if (run.talentOffer?.length) throw new Error('Choisis d’abord un talent.');
     const rule = this.rule(run.day);
     const out = { room };
     run.rewardsBak = run.rewards; // pour revenir en arrière depuis l'autel
@@ -754,9 +830,14 @@ export class Game {
       const b = Object.values(st.units).find((u) => u.boss);
       if (b && this.rng() < BOSS_RECRUIT) out.recruit = { id: b.id, ...this.addCard(b.id, 'normal', 'booster') };
     }
+    const goal = goalState(st);
+    if (goal) out.goal = goal;
     if (won) {
       const hunt = room === 'elite' && this.rule(run.day).key === 'chasse';
       out.shards = this.gainShards((8 + 3 * run.floor) * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1) * (hunt ? 2 : 1));
+      // objectif réussi : éclats en plus et 1 Ferveur pour la suite
+      if (goal?.state === 'done') { out.goalShards = this.gainShards((6 + 2 * run.floor) * (room === 'boss' ? 2 : 1)); run.gauge = Math.min(FERVOR_MAX, run.gauge + 1); this.s.stats.goals = (this.s.stats.goals || 0) + 1; }
+      if (room === 'elite') { const t = this.talentOffers(run); if (t.length) { run.talentOffer = t; out.talents = t; } }
       // les gardiens donnent un coffre tout de suite ; règle « Chasse aux élites » : les élites aussi
       if (!run.free && (room === 'boss' || hunt)) {
         const c = room === 'boss' ? chestForDepth(run.floor) : 'bois';

@@ -105,7 +105,7 @@ export const AI_FAMILIES = {
   mage:       { name: 'Mage', desc: 'Concentre son énergie, puis frappe toute ton équipe.', counter: 'Gèle-le pendant sa concentration, ou prépare une parade.' },
   parasite:   { name: 'Parasite', desc: 'Empoisonne ta créature la plus dangereuse.', counter: 'La Prière purge le poison.' },
   controleur: { name: 'Contrôleur', desc: 'Gèle régulièrement ta créature la plus forte.', counter: 'Esquive son sort, ou garde un Soigneur pour la libérer.' },
-  soutien:    { name: 'Soutien', desc: 'Soigne ou renforce les autres ennemis.', counter: 'Abats-le en premier.' },
+  soutien:    { name: 'Soutien', desc: 'Soigne, renforce les autres ennemis, ou leur désigne une proie.', counter: 'Abats-le en premier, ou mets la proie désignée en réserve.' },
   gardien:    { name: 'Gardien', desc: 'Prépare des attaques dévastatrices annoncées.', counter: 'Brise sa garde ou interromps sa charge.' },
 };
 export function aiFamily(card, { boss = false, uid = '' } = {}) {
@@ -125,6 +125,7 @@ export const INTENTS = {
   blast:   { name: 'Déflagration',   icon: 'flame',   desc: 'Frappe toutes tes créatures au combat.' },
   shield:  { name: 'Protection',     icon: 'shield',  desc: 'Donne un bouclier à un allié (bloque un coup).' },
   heal:    { name: 'Soin',           icon: 'heart',   desc: 'Soigne l’ennemi le plus blessé.' },
+  hunt:    { name: 'Désigne une proie', icon: 'eye', desc: 'Désigne ta créature la plus affaiblie : pendant 2 tours, tous les ennemis la visent et lui font +20 % de dégâts. Mets-la en réserve ou protège-la.' },
   rally:   { name: 'Renfort',        icon: 'sparkle', desc: 'Les autres ennemis gagnent +2 en attaque pour ce tour.' },
   poison:  { name: 'Empoisonnement', icon: 'skull',   desc: 'Frappe et empoisonne la cible (+3 poison).' },
   frost:   { name: 'Sort de gel',    icon: 'eye',     desc: 'Gèle la cible : elle ne pourra pas agir à ton prochain tour.' },
@@ -169,4 +170,14 @@ export const COMBAT_BLESSINGS = {
   sursis:  { name: 'Sursis', desc: 'Une fois par combat, une créature qui devrait tomber survit à 1 PV avec un bouclier.' },
   des:     { name: 'Faveur du destin', desc: '+2 à tous tes jets de dés.' },
   ferveur: { name: 'Braise sacrée', desc: 'Chaque combat commence avec +1 Ferveur.' },
+};
+
+// ——— Talents d'expédition (récompense des élites) : un par créature, pour l'expédition en cours ———
+export const TALENTS = {
+  vif:     { name: 'Instinct', desc: '+2 en attaque.' },
+  robuste: { name: 'Carapace', desc: '+25 % de PV maximum (et autant de soin).' },
+  brise:   { name: 'Brise-garde', desc: 'Ses attaques font +1 Brisure.' },
+  sangsue: { name: 'Sangsue', desc: 'Récupère 30 % des dégâts qu’elle inflige.' },
+  epines:  { name: 'Épines', desc: 'Renvoie 2 dégâts à chaque ennemi qui la blesse.' },
+  garde:   { name: 'Sceau de garde', desc: 'Commence chaque combat avec un bouclier.' },
 };

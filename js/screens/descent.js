@@ -5,6 +5,7 @@ import { DESCENT, ROOMS, BLESSINGS, CHESTS, chestForDepth } from '../core/descen
 import { TEAM, BUDGET } from '../core/army.js';
 import { BOSSES, bossOf } from '../core/bosses.js';
 import { PACTS } from '../core/pacts.js';
+import { TALENTS } from '../core/skills.js';
 import { RELATION } from '../core/relations.js';
 import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM, sigil, picon, crestHTML } from '../ui/icons.js';
@@ -14,6 +15,7 @@ import { tuto } from '../ui/tutos.js';
 import { bagHTML, bindBag } from './items.js';
 import { chestSVG } from '../ui/chest.js';
 import { runDuel } from './duel-ui.js';
+import { PHASE2 } from '../core/duel.js';
 import { WEEKLY_FLOOR } from '../core/game.js';
 import { setScene, sceneUrl } from '../ui/scene.js';
 import * as cloud from '../cloud/cloud.js';
@@ -57,6 +59,7 @@ export default function descent(app, root) {
       </section>
       <h2 class="section-title">Autres modes</h2>
       <div class="om-grid">
+        <a class="panel om-tile" href="#/epreuve"><span class="om-ic">${picon('swords')}</span><span><b>Épreuve du jour</b><span class="small muted">${g.trial().best ? `Ton score du jour : ${fmt(g.trial().best.score)}` : 'Le même combat pour tous, une équipe imposée'}</span></span>${icon('next')}</a>
         <a class="panel om-tile" href="#/sceaux"><span class="om-ic">${picon('seal')}</span><span><b>Duels des Sceaux</b><span class="small muted">Plateau 3 × 3, capture les cartes adverses</span></span>${icon('next')}</a>
       </div>
       ${Object.values(g.s.items).some((n) => n > 0) ? bagHTML(g) : ''}
@@ -137,13 +140,15 @@ export default function descent(app, root) {
         ${w?.recruit ? `<p class="vx-week">${icon('crown')} Le gardien vaincu, <b>${esc(cat.get(w.recruit).name)}</b>, rejoint ta collection !</p>` : ''}
         ${w?.weekly ? `<p class="vx-week">${icon('sparkle')} <b>${esc(cat.get(w.weekly).name)}</b> rejoint ta collection !</p>` : ''}
         ${w?.boss ? bossRecap(w.boss) : ''}
+        ${w?.goal ? `<p class="vx-week vx-goal ${w.goal.state}">${icon('star')} Objectif « ${esc(w.goal.name)} » : ${w.goal.state === 'done' ? `<b class="dc-good">réussi</b> · +${fmt(w.goalShards)} éclats et +1 Ferveur` : '<b>manqué</b>'}</p>` : ''}
         ${w?.report?.length ? `<p class="vx-week vx-best">${icon('star')} ${esc(w.report[0])}</p>` : ''}
         ${w?.relNew?.length ? `<p class="vx-week">${icon('p:combo')} Relation découverte : <b>${w.relNew.map((k) => esc(RELATION[k]?.name || k)).join(', ')}</b>. Retrouve-la dans le Bestiaire.</p>` : ''}
         ${w?.disc?.length ? `<div class="vx-disc"><span class="small muted">${picon('discover')}Nouvelles rencontres</span>${w.disc.slice(0, 5).map((id) => `<img alt="${esc(cat.get(id).name)}" title="${esc(cat.get(id).name)}" src="${artUrl(cat.get(id), { lite: true })}">`).join('')}</div>` : ''}
       </div>
       <div class="vx-team"><span class="small muted">Ton équipe · ${pct} % des PV</span>${teamStrip(run.team.map((m) => m.id), run)}</div>
-      <h2 class="vx-h">Choisis ton bonus</h2>
-      <div class="vx-picks">${run.rewards.map((r) => `<button class="vx-pick r-${r}" data-act="reward" data-r="${r}"><span class="vx-pic" style="--art:url(${sceneUrl(DOOR_ART[r])})"></span><span class="vx-pt"><b>${icon(ROOM_ICON[r])} ${ROOMS[r].name}</b><span class="small">${effect(r)}</span></span>${icon('next')}</button>`).join('')}</div>
+      ${run.talentOffer?.length ? `<h2 class="vx-h">Éveil : choisis un talent</h2><p class="small muted center">Pour cette expédition seulement.</p>
+      <div class="vx-tal">${run.talentOffer.map((o, i) => { const c = cat.get(o.id); return `<button class="vx-talc" data-act="talent" data-i="${i}"><img alt="" src="${artUrl(c, { lite: true })}"><span><b>${esc(TALENTS[o.talent].name)}</b><span class="small">${esc(c.name)} : ${esc(TALENTS[o.talent].desc)}</span></span>${icon('next')}</button>`; }).join('')}</div>` : `<h2 class="vx-h">Choisis ton bonus</h2>
+      <div class="vx-picks">${run.rewards.map((r) => `<button class="vx-pick r-${r}" data-act="reward" data-r="${r}"><span class="vx-pic" style="--art:url(${sceneUrl(DOOR_ART[r])})"></span><span class="vx-pt"><b>${icon(ROOM_ICON[r])} ${ROOMS[r].name}</b><span class="small">${effect(r)}</span></span>${icon('next')}</button>`).join('')}</div>`}
     </section>`;
   }
   function altarView(run) {
@@ -167,7 +172,7 @@ export default function descent(app, root) {
       else {
         app.sfx.reveal(out.room === 'boss' ? 'M' : 'R');
         const r = g.descent().run;
-        ui.win = { floor: r.floor, room: out.room, shards: out.shards, chest: out.chest || null, disc: out.discovered.filter((id) => cat.get(id)), weekly: out.weekly?.id || null, recruit: out.recruit?.id || null, stats, boss: out.boss || null, relNew: out.relNew || [], report: out.report || [] };
+        ui.win = { goal: out.goal || null, goalShards: out.goalShards || 0, floor: r.floor, room: out.room, shards: out.shards, chest: out.chest || null, disc: out.discovered.filter((id) => cat.get(id)), weekly: out.weekly?.id || null, recruit: out.recruit?.id || null, stats, boss: out.boss || null, relNew: out.relNew || [], report: out.report || [] };
         rewardView(r);
       }
       window.scrollTo(0, 0);
@@ -208,7 +213,7 @@ export default function descent(app, root) {
     const b = BOSSES[key], seen = g.s.bossesBeaten[key];
     const el = document.createElement('div');
     el.className = 'bx-intro';
-    el.innerHTML = `<div class="bx-in"><span class="bx-k">Étage ${run.floor} · Gardien</span><h1>${esc(b.name)}</h1><p class="bx-t">${esc(b.title)}</p><p class="bx-p">${esc(b.intro)}</p><p class="bx-m"><b>Sa mécanique</b> ${esc(b.mechanic)}</p>${seen ? `<p class="bx-m good"><b>Pour le contrer</b> ${esc(b.counter)}</p>` : ''}<span class="bx-tap">Touche pour combattre</span></div>`;
+    el.innerHTML = `<div class="bx-in"><span class="bx-k">Étage ${run.floor} · Gardien</span><h1>${esc(b.name)}</h1><p class="bx-t">${esc(b.title)}</p><p class="bx-p">${esc(b.intro)}</p><p class="bx-m"><b>Sa mécanique</b> ${esc(b.mechanic)}</p>${PHASE2[key] ? `<p class="bx-m"><b>À mi-vie : ${esc(PHASE2[key].name)}</b> ${esc(PHASE2[key].desc)}</p>` : ''}${seen ? `<p class="bx-m good"><b>Pour le contrer</b> ${esc(b.counter)}</p>` : ''}<span class="bx-tap">Touche pour combattre</span></div>`;
     document.body.appendChild(el);
     app.sfx.boss?.();
     let done = false;
@@ -254,6 +259,9 @@ export default function descent(app, root) {
       if (out.pact) { ui.pact = null; app.sfx.boss?.(); window.scrollTo(0, 0); tuto(app, 'pacts'); return render(); }
       if (out.battle) return enterBattle();
       render();
+    },
+    talent(el) {
+      try { const o = g.chooseTalent(+el.dataset.i); app.sfx.discover(); toast(`${esc(cat.get(o.id).name)} : ${esc(TALENTS[o.talent].name)}`, { icon: 'star' }); rewardView(g.descent().run); } catch (e) { toast(esc(e.message), { kind: 'error' }); }
     },
     pactpick(el) { ui.pact = el.dataset.k; app.sfx.tap(); render(); },
     pactgo() { startPact(ui.pact); },

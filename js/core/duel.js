@@ -28,7 +28,7 @@ const BASE = { protecteur: [2, 12], degats: [4, 7], soin: [2, 8], poison: [2, 8]
 const RARITY_MULT = { C: 1, PC: 1.15, R: 1.3, HR: 1.45, M: 1.6, S: 1.75 };
 const SINGLE = ['hit', 'heavy', 'poison', 'frost', 'gorge'];
 // Intentions spéciales des gardiens (comptent comme « actions spéciales » pour le Pacte du Reflet)
-const SPECIAL = ['heavy', 'blast', 'shield', 'heal', 'rally', 'charge', 'channel', 'gorge', 'gather', 'blizzard', 'mimic', 'copy', 'decree', 'shift'];
+const SPECIAL = ['heavy', 'blast', 'shield', 'heal', 'rally', 'hunt', 'charge', 'channel', 'gorge', 'gather', 'blizzard', 'mimic', 'copy', 'decree', 'shift'];
 
 let seq = 0;
 // Une carte de combat. scale : force (niveau pour les alliés, profondeur pour les ennemis).
@@ -59,7 +59,7 @@ export function rand(st) {
 const d20 = (st) => 1 + Math.floor(rand(st) * 20);
 
 // ——— État ———
-export function createDuel(allies, enemies, { gauge = 0, fervor = gauge, ult = 'sceau', power = 1, known = {}, ruleMult = 1, bossPower = null, boss = null, pact = null, relics = [], blessings = [], seed = null, discovered = {} } = {}) {
+export function createDuel(allies, enemies, { gauge = 0, fervor = gauge, ult = 'sceau', power = 1, known = {}, ruleMult = 1, bossPower = null, boss = null, pact = null, relics = [], blessings = [], seed = null, discovered = {}, goal = null } = {}) {
   const st = {
     ver: 2, units: {}, order: { ally: [], enemy: [] }, turn: 'ally', round: 1, ap: AP_MAX,
     fervor: Math.min(FERVOR_MAX, fervor + (blessings.includes('ferveur') ? 1 : 0)), gauge: 0,
@@ -67,6 +67,7 @@ export function createDuel(allies, enemies, { gauge = 0, fervor = gauge, ult = '
     freeSwap: blessings.includes('relais'), sursis: blessings.includes('sursis'), queue: [], skipEv: [], discovered: { ...discovered },
     seed: seed ?? Math.floor(Math.random() * 2 ** 31), stats: { parries: 0, dodges: 0, breaks: 0, crits: 0, fumbles: 0, interrupts: 0, feasts: 0 },
     bossKey: boss && BOSSES[boss] ? boss : null, law: null, aspect: null, pact: pact || null, relics: relics.slice(), relSeen: {}, bossLog: [], legends: [],
+    goal: goal && GOALS[goal] ? goal : null,
   };
   for (const u of [...allies, ...enemies]) { st.units[u.uid] = { ...u }; st.order[u.side].push(u.uid); }
   setupExtras(st);
@@ -86,6 +87,7 @@ function setupExtras(st) {
     st.relSeen[L.key] = true;
     allies.filter((u) => L.members.includes(u.id)).forEach((u) => { u.atk += L.members.length >= 3 ? 2 : 1; scaleHp(u, 1.1); u.legend = L.key; });
   }
+  allies.forEach((u) => { if (u.talent === 'garde') u.shield = 1; });
   // Formes corrompues
   allies.forEach((u) => { if (u.form === 'rebirth') { u.hp = Math.max(1, Math.round(u.maxHp * 0.7)); u.reborn = false; } });
   // Pactes
@@ -117,7 +119,7 @@ export function upgradeDuel(st) {
   return st;
 }
 
-export const alive = (st, side) => st.order[side].map((id) => st.units[id]).filter((u) => u.hp > 0);
+export const alive = (st, side) => st.order[side].map((id) => st.units[id]).filter((u) => u.hp > 0 && !u.swallowed);
 export const front = (st, side) => alive(st, side).slice(0, FRONT);
 export const reserve = (st, side) => alive(st, side).slice(FRONT);
 const other = (side) => (side === 'ally' ? 'enemy' : 'ally');
@@ -126,7 +128,8 @@ const inFront = (st, u) => !!u && u.hp > 0 && front(st, u.side).includes(u);
 
 // Multiplicateur de faction : faiblesse ×1,5 ; même faction ×0,75
 export function factionMult(a, t) {
-  if (t?.aspect && a?.faction && ASPECTS[t.aspect]) return ASPECTS[t.aspect].weak.includes(a.faction) ? 1.6 : ASPECTS[t.aspect].resist.includes(a.faction) ? 0.5 : 1;
+  if (t?.mask && a?.faction === t.mask) return 0.5; // Roi sans Visage (phase 2) : il porte le visage de son dernier agresseur
+  if (t?.aspect && a?.faction && ASPECTS[t.aspect]) return ASPECTS[t.aspect].weak.includes(a.faction) ? 1.6 : ASPECTS[t.aspect].resist.includes(a.faction) ? 0.5 : t.totality ? 0.6 : 1;
   if (!a?.faction || !t?.faction) return 1;
   if (WEAK_TO[t.faction] === a.faction) return WEAK_MULT;
   if (a.faction === t.faction) return RESIST_MULT;
@@ -148,6 +151,7 @@ export function dmgOf(st, a, t, mult = 1, { basic = false } = {}) {
   if (a.slow) n *= 0.5;
   if (t.defend) n *= 0.5;
   if (t.exposed) n *= 1.25;
+  if (t.prey && a.side === 'enemy') n *= 1.2; // proie désignée par un ennemi
   n *= relationMult(a, t).m;
   const R_ = st.relics || [];
   if (a.side === 'ally') {
@@ -186,6 +190,14 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   if (u.boss && u.side === 'enemy') n = Math.min(n, bossCap(u));
   if (u.shield && pierce) { u.shield = 0; ev.push({ t: 'status', u: u.uid, s: 'Perce-bouclier', syn: true }); }
   if (u.shield) { u.shield = 0; ev.push({ t: 'block', u: u.uid }); return 0; }
+  // Carapace de glace (Matriarche, phase 2) : absorbe les coups ; l'Infernal la fait fondre deux fois plus vite
+  if (u.ice > 0) {
+    const s0 = src && st.units[src];
+    const k = s0?.faction === 'infernal' ? 2 : 1, took = Math.min(u.ice, Math.round(n) * k);
+    u.ice -= took; ev.push({ t: 'status', u: u.uid, s: u.ice ? `Glace −${took} (${u.ice})` : 'La glace vole en éclats !', k: 'frost', syn: !u.ice });
+    n = Math.max(0, Math.round(n) - Math.ceil(took / k));
+    if (n <= 0) return 0;
+  }
   let d = Math.min(u.hp, Math.round(n));
   if (u.side === 'ally' && d >= u.hp && st.sursis) { st.sursis = false; d = u.hp - 1; u.shield = 1; ev.push({ t: 'status', u: u.uid, s: 'Sursis !', syn: true }); }
   u.hp -= d;
@@ -198,6 +210,11 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
     if (combo > 0) { st.stats.combos = (st.stats.combos || 0) + 1; ev.push({ t: 'combo', u: u.uid, n: combo + 1 }); }
   }
   if (a && d > 0 && a.side === 'enemy' && u.side === 'ally') (st.taken ||= {})[a.uid] = ((st.taken || {})[a.uid] || 0) + d;
+  // Talents d'expédition
+  if (a && d > 0 && a.side === 'ally' && a.talent === 'sangsue' && a.hp > 0) heal(a, Math.max(1, Math.round(d * 0.3)), ev);
+  if (a && d > 0 && u.side === 'ally' && u.talent === 'epines' && a.side === 'enemy' && a.hp > 0 && !st.thorns) { st.thorns = true; ev.push({ t: 'status', u: a.uid, s: 'Épines', k: 'bad' }); hurt(st, a, 2, ev); st.thorns = false; }
+  // Roi sans Visage (phase 2) : il prend le visage de son agresseur et résiste désormais à sa faction
+  if (a && d > 0 && u.boss && u.phase2 && st.bossKey === 'roi' && a.side === 'ally' && a.faction && u.mask !== a.faction) { u.mask = a.faction; ev.push({ t: 'status', u: u.uid, s: 'Nouveau visage', k: 'mask', syn: true }); }
   // Relations (prédation, rivalité) : annoncées la première fois qu'elles jouent
   const rel = a ? relationMult(a, u).rel : null;
   if (rel && d > 0 && !(st.relSeen ||= {})[rel]) { st.relSeen[rel] = true; ev.push({ t: 'status', u: u.uid, s: rel.startsWith('r-') ? 'Rivaux !' : 'Proie !', syn: true, rel }); }
@@ -215,6 +232,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
       return d;
     }
     ev.push({ t: 'die', u: u.uid });
+    if (u.boss) release(st, ev);
     if (u.side === 'enemy') st.kills.push(u.id);
     // Coup de grâce : achever un ennemi donne 1 Ferveur
     if (u.side === 'enemy' && a && a.side === 'ally') { st.stats.finishers = (st.stats.finishers || 0) + 1; ev.push({ t: 'finisher', u: u.uid, a: a.uid }); gainFervor(st, 1, ev, 'Coup de grâce'); }
@@ -260,11 +278,12 @@ function interruptBoss(st, t) {
 // jusqu'à la fin de ton prochain tour. Il se relève ensuite avec une jauge plus solide (+40 %).
 export function breakHit(st, t, n, ev, src = null) {
   if (!t.brkMax || t.broken || t.hp <= 0 || n <= 0) return;
-  const k = n + (src?.side === 'ally' && has(st, 'brise') ? 1 : 0);
+  const k = src?.side === 'ally' && src.uid ? brkTotal(st, src, n) : n + (src?.side === 'ally' && has(st, 'brise') ? 1 : 0);
   t.brk = Math.max(0, t.brk - k);
   ev.push({ t: 'brk', u: t.uid, brk: t.brk, max: t.brkMax });
   if (t.brk > 0) return;
   t.broken = true; t.brokenSkip = true; t.brokenEnd = st.round + 1;
+  if (t.boss) { release(st, ev); if (t.ice) { t.ice = 0; ev.push({ t: 'status', u: t.uid, s: 'La glace vole en éclats !', k: 'frost', syn: true }); } if (t.doom != null) { t.doom = DOOM_TURNS + 1; ev.push({ t: 'status', u: t.uid, s: 'Effondrement repoussé', syn: true }); } }
   interruptBoss(st, t);
   if (t.charged) { t.charged = null; ev.push({ t: 'status', u: t.uid, s: 'Charge interrompue', syn: true }); }
   if (t.intent) t.intent = { ...t.intent, cancelled: true };
@@ -401,7 +420,7 @@ export function act(st, uid, key, tUid = null) {
   else if (key === 'rempart') { t.guardBy = uid; u.rempart = tUid; ev.push({ t: 'status', u: tUid, s: 'Rempart', k: 'guard' }); }
   else if (key === 'priere') {
     heal(t, t.maxHp * 0.4, ev);
-    if (t.guardBy && !t.shield) { t.shield = 1; ev.push({ t: 'status', u: tUid, s: 'Bastion !', syn: true, combo: 'bastion', k: 'guard' }); }
+    if (t.guardBy && !t.shield) { t.shield = 1; st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: tUid, s: 'Bastion !', syn: true, combo: 'bastion', k: 'guard' }); }
     if (t.poison || t.frozen || t.stunned) { t.poison = 0; t.frozen = 0; t.stunned = false; ev.push({ t: 'status', u: tUid, s: 'Purifiée', k: 'heal' }); }
   } else if (key === 'marque') { t.mark = 2; discover(st, t, ev); ev.push({ t: 'status', u: tUid, s: 'Marquée', k: 'mark' }); }
   else if (key === 'raz') {
@@ -412,8 +431,8 @@ export function act(st, uid, key, tUid = null) {
     const tier = resolveRoll(st, info, ev, uid, tUid);
     const m = { crit: 3, success: 2, partial: 1.2, fumble: 0.5 }[tier];
     // Combinaisons nommées : la Marque prépare la Chasse, le gel prépare le Bris de glace
-    if (t.mark && tier !== 'fumble') ev.push({ t: 'status', u: tUid, s: 'Chasse !', syn: true, combo: 'chasse' });
-    if (t.frozen > 0 && tier !== 'fumble') ev.push({ t: 'status', u: tUid, s: 'Bris de glace !', syn: true, combo: 'glace' });
+    if (t.mark && tier !== 'fumble') { st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: tUid, s: 'Chasse !', syn: true, combo: 'chasse' }); }
+    if (t.frozen > 0 && tier !== 'fumble') { st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: tUid, s: 'Bris de glace !', syn: true, combo: 'glace' }); }
     weakBonus(st, u, t, ev);
     const frozen = t.frozen > 0;
     const d = hurt(st, t, dmgOf(st, u, t, m), ev, uid);
@@ -451,9 +470,10 @@ export function brkOf(st, u, t, key, tier = 'success') {
   if (key === 'raz') return 1 + (frozen ? 2 : 0);
   return 0;
 }
-const brkTotal = (st, u, n) => (n > 0 && u?.side === 'ally' && has(st, 'brise') ? n + 1 : n);
+const brkTotal = (st, u, n) => (n > 0 && u?.side === 'ally' ? n + (has(st, 'brise') ? 1 : 0) + (u.talent === 'brise' ? 1 : 0) : n);
 function weakBonus(st, u, t, ev) {
   if (!isWeak(u, t)) return;
+  st.stats.weak = (st.stats.weak || 0) + 1;
   discover(st, t, ev);
   gainFervor(st, 1, ev, 'Faiblesse');
 }
@@ -517,6 +537,7 @@ export function useUlt(st) {
   const ev = [];
   if (!ultReady(st)) return ev;
   st.fervor = 0; st.gauge = 0; st.ap -= ULT_COST.ap;
+  st.stats.ults = (st.stats.ults || 0) + 1;
   const p = st.power || 1, allies = front(st, 'ally'), foes = front(st, 'enemy');
   ev.push({ t: 'ult', key: st.ult });
   if (st.ult === 'sceau') allies.forEach((u) => { heal(u, u.maxHp * 0.3 * p, ev); u.shield = 1; });
@@ -570,20 +591,63 @@ export function beginEnemyTurn(st) {
   for (const u of alive(st, 'enemy')) u.boost = 0;
   for (const u of front(st, 'enemy')) tickPoison(st, u, ev);
   check(st, ev);
-  if (!st.over && st.bossKey) bossPhase(st, ev);
+  if (!st.over && st.bossKey) { bossPhase(st, ev); if (!st.over) bossTick(st, ev); }
   else if (!st.over && st.bossPower) bossPower(st, ev);
   ev.push({ t: 'phase', side: 'enemy' });
   st.queue = front(st, 'enemy').map((u) => u.uid);
   st.skipEv = [];
   return ev;
 }
-// Gardiens à mécaniques : phase 2 sous la moitié de leurs PV (plus agressifs, motif accéléré)
+// Gardiens à mécaniques : phase 2 sous la moitié de leurs PV. Chacun change la façon de jouer.
+export const PHASE2 = {
+  devoreur:   { name: 'Engloutir', desc: 'Il avale ta créature la plus vigoureuse : elle quitte le combat et se fait digérer à chaque tour. Brise-le (ou abats-le) pour la libérer.' },
+  matriarche: { name: 'Carapace de glace', desc: 'Une carapace absorbe les coups (le quart de ses PV). Les créatures infernales la font fondre deux fois plus vite ; une Brisure la fait voler en éclats.' },
+  roi:        { name: 'Mille visages', desc: 'Il prend le visage de la dernière créature qui l’a blessé et résiste à sa faction (−50 %). Change d’attaquant à chaque coup.' },
+  architecte: { name: 'Effondrement', desc: 'Un compte à rebours de 3 tours : à zéro, la salle s’écroule sur toute ton équipe. Chaque Brisure le repousse.' },
+  eclipse:    { name: 'Totalité', desc: 'Seules ses faiblesses la blessent pleinement : toutes les autres factions font −40 %.' },
+};
+export const DOOM_TURNS = 3;
 function bossPhase(st, ev) {
   const b = front(st, 'enemy').find((u) => u.boss && u.hp > 0);
   if (!b || b.phase2 || b.hp > b.maxHp / 2) return;
   b.phase2 = true; b.atk = Math.round(b.atk * 1.2 + 0.5);
-  ev.push({ t: 'phase2', u: b.uid, s: `${BOSSES[st.bossKey].name} : phase 2 !` });
-  logBoss(st, 'Phase 2');
+  const P = PHASE2[st.bossKey];
+  ev.push({ t: 'phase2', u: b.uid, s: `${BOSSES[st.bossKey].name} : ${P ? P.name : 'phase 2'} !`, key: st.bossKey });
+  logBoss(st, P ? P.name : 'Phase 2');
+  if (st.bossKey === 'devoreur') {
+    const v = front(st, 'ally').filter((x) => x.hp > 0).sort((x, y) => y.hp - x.hp)[0];
+    if (v && alive(st, 'ally').length > 1) { v.swallowed = true; v.inPlay = false; v.defend = false; st.swallowed = v.uid; ev.push({ t: 'swallow', u: v.uid, a: b.uid }); check(st, ev); }
+  } else if (st.bossKey === 'matriarche') { b.ice = Math.round(b.maxHp * 0.25); ev.push({ t: 'status', u: b.uid, s: `Carapace de glace (${b.ice})`, k: 'frost', syn: true }); }
+  else if (st.bossKey === 'architecte') { b.doom = DOOM_TURNS; ev.push({ t: 'status', u: b.uid, s: `Effondrement : ${b.doom} tours`, k: 'charge', syn: true }); }
+  else if (st.bossKey === 'eclipse') { b.totality = true; }
+}
+// Le Dévoreur relâche sa proie (Brisure ou mort du gardien)
+function release(st, ev) {
+  const v = st.swallowed && st.units[st.swallowed];
+  st.swallowed = null;
+  if (!v || !v.swallowed) return;
+  v.swallowed = false;
+  if (v.hp > 0) { ev.push({ t: 'release', u: v.uid }); ev.push({ t: 'status', u: v.uid, s: 'Libérée !', syn: true, k: 'heal' }); }
+  check(st, ev);
+}
+// Début du tour ennemi en phase 2 : digestion, compte à rebours de l'Effondrement
+function bossTick(st, ev) {
+  const b = front(st, 'enemy').find((u) => u.boss && u.hp > 0);
+  const v = st.swallowed && st.units[st.swallowed];
+  if (v && v.swallowed && v.hp > 0) {
+    const d = Math.min(v.hp, Math.max(1, Math.round(v.maxHp * 0.15)));
+    v.hp -= d; ev.push({ t: 'status', u: b?.uid || v.uid, s: `Digère ${v.name} : −${d}`, k: 'bad' });
+    if (v.hp <= 0) { v.swallowed = false; st.swallowed = null; (st.fallenLog ||= []).push({ u: v.uid, by: b?.uid || null, round: st.round, kind: 'gorge' }); ev.push({ t: 'status', u: b?.uid || v.uid, s: 'Dévorée…', k: 'bad' }); check(st, ev); }
+  }
+  if (b && b.doom != null && !b.broken) {
+    b.doom--;
+    if (b.doom > 0) ev.push({ t: 'status', u: b.uid, s: `Effondrement : ${b.doom}`, k: 'charge' });
+    else {
+      ev.push({ t: 'boss', u: b.uid, s: 'Effondrement !' }); ev.push({ t: 'aoe', u: b.uid, side: 'enemy' });
+      front(st, 'ally').forEach((x) => hurt(st, x, Math.max(2, Math.round(x.maxHp * 0.45)), ev, b.uid));
+      b.doom = DOOM_TURNS; check(st, ev);
+    }
+  }
 }
 const logBoss = (st, m) => { const l = (st.bossLog ||= []); if (!l.includes(m)) l.push(m); };
 // Pouvoir du gardien, au début de son tour. Phase 2 sous la moitié de ses PV.
@@ -678,6 +742,7 @@ export function enemyAct(st, aUid, defense = 'none') {
   else if (kind === 'channel') { e.charged = 'blast'; ev.push({ t: 'status', u: aUid, s: 'Concentration…', k: 'charge' }); }
   else if (kind === 'shield') { const t = st.units[it.t]; if (t && t.hp > 0) { t.shield = 1; ev.push({ t: 'status', u: t.uid, s: 'Bouclier', k: 'guard' }); } }
   else if (kind === 'heal') { const t = st.units[it.t]; if (t) heal(t, t.maxHp * 0.25, ev); }
+  else if (kind === 'hunt') { const t = st.units[it.t]; if (t && t.hp > 0 && !t.swallowed) { t.prey = 2; ev.push({ t: 'status', u: t.uid, s: 'Proie désignée', k: 'bad' }); } }
   else if (kind === 'rally') { front(st, 'enemy').forEach((x) => { if (x !== e) x.boost += 2; }); ev.push({ t: 'status', u: aUid, s: 'Renfort : +2 ATQ', k: 'charge' }); }
   else if (kind === 'gorge') {
     // Le Dévoreur : morsure qui le nourrit ; chaque festin réussi le rend plus fort
@@ -754,6 +819,7 @@ export function endEnemyTurn(st) {
   }
   // Repos : les créatures en réserve récupèrent 10 % de leurs PV (le poison reste)
   reserve(st, 'ally').forEach((x) => { if (x.hp < x.maxHp) heal(x, Math.ceil(x.maxHp * 0.1), ev); });
+  st.order.ally.forEach((id) => { const x = st.units[id]; if (x.prey) x.prey--; });
   for (const u of alive(st, 'enemy')) {
     if (u.mark) u.mark--;
     if (u.frostCD) u.frostCD--;
@@ -770,6 +836,9 @@ export function endEnemyTurn(st) {
 function pickTarget(st, e) {
   const ts = targetsFor(st, 'enemy', e).map((id) => st.units[id]).filter(Boolean);
   if (!ts.length) return null;
+  // coopération : tous les ennemis s'acharnent sur la proie désignée (si elle est attaquable)
+  const prey = ts.find((x) => x.prey > 0);
+  if (prey) return prey.uid;
   const by = (f) => ts.slice().sort(f)[0].uid;
   if (e.fam === 'predateur') return by((x, y) => x.hp - y.hp);
   if (e.fam === 'assassin') return by((x, y) => x.maxHp - y.maxHp || x.hp - y.hp);
@@ -783,6 +852,7 @@ function planIntents(st) {
     const kind = intentKind(st, e);
     let t = null;
     if (SINGLE.includes(kind)) t = pickTarget(st, e);
+    if (kind === 'hunt') t = front(st, 'ally').filter((x) => x.hp > 0).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp || x.maxHp - y.maxHp)[0]?.uid || null;
     if (kind === 'shield') {
       const free = front(st, 'enemy').filter((x) => !x.shield);
       t = (free.find((x) => x !== e && x.charged) || free.sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0])?.uid || e.uid;
@@ -817,6 +887,7 @@ function intentKind(st, e) {
     case 'controleur': return st.round % 3 === 2 ? 'frost' : 'hit';
     case 'soutien':
       if (e.role === 'soin' && front(st, 'enemy').some((x) => x.hp < x.maxHp * 0.5)) return 'heal';
+      if (e.role === 'soutien' && others && st.round % 4 === 1 && !front(st, 'ally').some((x) => x.prey > 0)) return 'hunt';
       if (e.role === 'soutien' && others && st.round % 2 === 1) return 'rally';
       return 'hit';
     default: return st.round >= 2 && r < (e.elite ? 0.3 : 0.15) ? 'charge' : 'hit';
@@ -838,7 +909,7 @@ export function intentInfo(st, e) {
   if (it.kind === 'copy' && it.copy === 'raz') dmg = Math.max(0, ...front(st, 'ally').map((x) => dmgOf(st, e, x, 0.7)));
   const single = SINGLE.includes(it.kind) || !!(it.kind === 'copy' && it.t);
   const lethal = !!eff && single && dmg >= eff.hp;
-  const danger = ['heavy', 'blast', 'gorge', 'blizzard', 'copy'].includes(it.kind) || lethal ? 3 : ['frost', 'charge', 'channel', 'gather', 'mimic', 'decree', 'shift'].includes(it.kind) || (e.boss && it.kind === 'hit') ? 2 : dmg ? 1 : 0;
+  const danger = ['heavy', 'blast', 'gorge', 'blizzard', 'copy'].includes(it.kind) || lethal ? 3 : ['frost', 'charge', 'channel', 'gather', 'mimic', 'decree', 'shift', 'hunt'].includes(it.kind) || (e.boss && it.kind === 'hit') ? 2 : dmg ? 1 : 0;
   return { ...it, def: INTENTS[it.kind], dmg, target: single ? eff?.uid || null : it.t, lethal, danger, aoe: ['blast', 'blizzard'].includes(it.kind) || (it.kind === 'copy' && it.copy === 'raz') };
 }
 // Dégâts annoncés sur chacune de tes cartes (badges rouges)
@@ -952,6 +1023,33 @@ export function endTurn(st, defense = () => 'none') {
 // Défaite : qui a fait le plus de dégâts, quelle attaque a été décisive, défenses manquées, conseil.
 // Victoire : le fait marquant (Brisure, parades, enchaînements, coups de grâce).
 const KIND_TXT = { heavy: 'un coup chargé', blast: 'une déflagration', gorge: 'le festin du Dévoreur', blizzard: 'une tempête de givre', copy: 'une copie de ta créature', hit: 'une attaque', poison: 'le poison', frost: 'le gel' };
+// ——— Objectifs bonus : un par combat de la Descente ———
+// rooms : salles où l'objectif peut tomber. state : 'done' (réussi), 'fail' (raté), sinon en cours.
+export const GOALS = {
+  nofall: { name: 'Sans perte', desc: 'Gagne sans qu’aucune créature ne tombe.', rooms: ['fight', 'elite', 'boss'] },
+  swift:  { name: 'Éclair', desc: 'Gagne en 3 tours au plus.', rooms: ['fight'], limit: 3 },
+  swift5: { name: 'Assaut rapide', desc: 'Gagne en 5 tours au plus.', rooms: ['elite', 'boss'], limit: 5 },
+  weak:   { name: 'Points faibles', desc: 'Exploite 2 faiblesses de faction.', rooms: ['fight', 'elite', 'boss'], n: 2 },
+  combo:  { name: 'Coordination', desc: 'Réussis une combinaison : Chasse, Bris de glace, Bastion ou un Enchaînement.', rooms: ['fight', 'elite', 'boss'] },
+  parry:  { name: 'Lame-miroir', desc: 'Réussis une parade parfaite.', rooms: ['elite', 'boss'] },
+  brk:    { name: 'Briseur', desc: 'Brise l’ennemi au moins une fois.', rooms: ['elite', 'boss'] },
+  ferveur:{ name: 'Brasier', desc: 'Lance le pouvoir d’équipe.', rooms: ['fight', 'elite', 'boss'] },
+};
+export function goalState(st) {
+  const k = st.goal, G = GOALS[k];
+  if (!G) return null;
+  const S = st.stats || {}, fell = (st.fallenLog || []).length > 0;
+  let state = 'pending', p = '';
+  if (k === 'nofall') state = fell ? 'fail' : st.over === 'won' ? 'done' : 'pending';
+  else if (k === 'swift' || k === 'swift5') { state = st.round > G.limit ? 'fail' : st.over === 'won' ? 'done' : 'pending'; p = `tour ${Math.min(st.round, G.limit)}/${G.limit}`; }
+  else if (k === 'weak') { state = (S.weak || 0) >= G.n ? 'done' : 'pending'; p = `${Math.min(G.n, S.weak || 0)}/${G.n}`; }
+  else if (k === 'combo') state = (S.named || 0) + (S.combos || 0) > 0 ? 'done' : 'pending';
+  else if (k === 'parry') state = S.parries > 0 ? 'done' : 'pending';
+  else if (k === 'brk') state = S.breaks > 0 ? 'done' : 'pending';
+  else if (k === 'ferveur') state = S.ults > 0 ? 'done' : 'pending';
+  if (st.over === 'lost' && state !== 'done') state = 'fail';
+  return { key: k, ...G, state, p };
+}
 export function battleReport(st, name) {
   const s = st.stats || {}, out = [];
   if (st.over === 'lost') {

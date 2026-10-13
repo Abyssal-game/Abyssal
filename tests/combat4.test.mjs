@@ -1,0 +1,152 @@
+// Objectifs bonus, phases 2 des gardiens, proie désignée, talents d'expédition, épreuve du jour.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { loadCatalog, MemoryStorage, rngFrom } from './helpers.mjs';
+import * as D from '../js/core/duel.js';
+import { Game } from '../js/core/game.js';
+import { roleOf } from '../js/core/army.js';
+
+const catalog = loadCatalog();
+const byRole = (role, n = 0) => catalog.cards.filter((c) => c.rarity === 'C' && roleOf(c) === role)[n].id;
+const A = (id, o = {}) => D.duelUnit(catalog.get(id), o);
+const E = (id, o = {}) => D.duelUnit(catalog.get(id), { side: 'enemy', ...o });
+const ally = (st) => st.order.ally.map((id) => st.units[id]);
+const foe = (st) => st.order.enemy.map((id) => st.units[id]);
+const team = () => [A(byRole('protecteur')), A(byRole('degats')), A(byRole('soin')), A(byRole('degats', 1)), A(byRole('soutien'))];
+const clock = () => new Date(2026, 9, 14, 12);
+
+test('objectifs : « Sans perte » échoue dès qu’une créature tombe, « Briseur » réussit à la Brisure', () => {
+  const st = D.createDuel(team(), [E('NEC-010', { elite: true, scale: 3 })], { seed: 2, goal: 'nofall' });
+  assert.equal(D.goalState(st).state, 'pending');
+  st.fallenLog = [{ u: 'x' }];
+  assert.equal(D.goalState(st).state, 'fail');
+  const st2 = D.createDuel(team(), [E('NEC-010', { elite: true, scale: 3 })], { seed: 2, goal: 'brk' });
+  const t = foe(st2)[0]; t.brk = 1;
+  D.act(st2, ally(st2)[0].uid, 'attack', t.uid);
+  assert.equal(D.goalState(st2).state, 'done');
+});
+
+test('objectifs : « Éclair » échoue après 3 tours ; objectif inconnu ignoré', () => {
+  const st = D.createDuel(team(), [E('NEC-010', { scale: 9 })], { seed: 2, goal: 'swift' });
+  for (let i = 0; i < 3 && !st.over; i++) D.endTurn(st);
+  if (!st.over) assert.equal(D.goalState(st).state, 'fail');
+  assert.equal(D.createDuel(team(), [E('NEC-010')], { goal: 'nimporte' }).goal, null);
+});
+
+const bossDuel = (key, seed = 3) => {
+  const st = D.createDuel(team(), [E('NEC-010', { boss: true, scale: 3 })], { seed, boss: key });
+  const b = foe(st)[0]; b.hp = Math.floor(b.maxHp / 2) - 1;
+  return { st, b };
+};
+
+test('Dévoreur, phase 2 : il engloutit une créature, la Brisure la libère', () => {
+  const { st, b } = bossDuel('devoreur');
+  D.beginEnemyTurn(st);
+  const v = st.units[st.swallowed];
+  assert.ok(v?.swallowed, 'une créature est engloutie');
+  assert.ok(!D.front(st, 'ally').includes(v), 'elle a quitté le combat');
+  const hp = v.hp;
+  while (D.nextEnemy(st)) D.enemyAct(st, st.queue[0], 'dodge');
+  D.endEnemyTurn(st);
+  D.beginEnemyTurn(st); // digestion
+  assert.ok(v.hp < hp);
+  if (st.over) return;
+  while (D.nextEnemy(st)) D.enemyAct(st, st.queue[0], 'dodge');
+  D.endEnemyTurn(st);
+  b.brk = 1; b.broken = false;
+  const ev = D.act(st, D.front(st, 'ally')[0].uid, 'attack', b.uid);
+  assert.ok(ev.some((e) => e.t === 'release'));
+  assert.equal(v.swallowed, false);
+});
+
+test('Matriarche, phase 2 : la carapace de glace absorbe, l’Infernal la fait fondre plus vite', () => {
+  const { st, b } = bossDuel('matriarche');
+  D.beginEnemyTurn(st);
+  assert.ok(b.ice > 0);
+  const ice = b.ice, hp = b.hp;
+  while (D.nextEnemy(st)) D.enemyAct(st, st.queue[0], 'dodge');
+  D.endEnemyTurn(st);
+  const a = D.front(st, 'ally').find((u) => u.faction !== 'infernal' && D.actionsFor(st, u.uid)[0].ok);
+  if (!a) return;
+  D.act(st, a.uid, 'attack', b.uid);
+  assert.ok(b.ice < ice);
+  assert.equal(b.hp, hp, 'la glace a tout pris');
+});
+
+test('Roi sans Visage, phase 2 : il résiste à la faction de son dernier agresseur', () => {
+  const { st, b } = bossDuel('roi');
+  D.beginEnemyTurn(st);
+  while (D.nextEnemy(st)) D.enemyAct(st, st.queue[0], 'dodge');
+  D.endEnemyTurn(st);
+  const a = D.front(st, 'ally').find((u) => D.actionsFor(st, u.uid)[0].ok);
+  D.act(st, a.uid, 'attack', b.uid);
+  assert.equal(b.mask, a.faction);
+  assert.equal(D.factionMult(a, b), 0.5);
+});
+
+test('Architecte, phase 2 : l’Effondrement frappe à zéro ; la Brisure le repousse', () => {
+  const { st, b } = bossDuel('architecte');
+  D.beginEnemyTurn(st);
+  assert.equal(b.doom, D.DOOM_TURNS - 1, 'le compte commence à décroître');
+  b.brk = 1;
+  while (D.nextEnemy(st)) D.enemyAct(st, st.queue[0], 'dodge');
+  D.endEnemyTurn(st);
+  const a = D.front(st, 'ally').find((u) => D.actionsFor(st, u.uid)[0].ok);
+  D.act(st, a.uid, 'attack', b.uid);
+  if (b.broken) assert.equal(b.doom, D.DOOM_TURNS + 1);
+});
+
+test('Éclipse, phase 2 : Totalité, les factions non faibles font −40 %', () => {
+  const { st, b } = bossDuel('eclipse');
+  D.beginEnemyTurn(st);
+  assert.equal(b.totality, true);
+  const neutral = { faction: ['sauvage', 'infernal', 'abyssal', 'artificiel', 'primordial', 'celeste', 'necrotique'].find((f) => !['necrotique', 'abyssal', 'celeste', 'infernal'].includes(f)) };
+  assert.equal(D.factionMult(neutral, b), 0.6);
+});
+
+test('proie désignée : tous les ennemis la visent et frappent plus fort', () => {
+  const sup = catalog.cards.find((c) => c.rarity === 'C' && roleOf(c) === 'soutien').id;
+  const st = D.createDuel(team(), [E(sup, { scale: 2 }), E('NEC-010', { scale: 2 }), E('NEC-010', { scale: 2 })], { seed: 5 });
+  const [s] = foe(st);
+  s.intent = { kind: 'hunt', t: D.front(st, 'ally')[2].uid };
+  const prey = st.units[s.intent.t];
+  const before = D.dmgOf(st, foe(st)[1], prey);
+  D.beginEnemyTurn(st);
+  D.enemyAct(st, s.uid);
+  assert.equal(prey.prey, 2);
+  assert.ok(D.dmgOf(st, foe(st)[1], prey) > before);
+});
+
+test('talents : proposés après une élite, à choisir avant le bonus, appliqués au combat', () => {
+  const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('tal'), clock });
+  const ids = catalog.cards.filter((c) => c.rarity === 'C').slice(0, 5).map((c) => c.id);
+  ids.forEach((id) => g.addCard(id)); g.s.team = ids; g.s.teamSet = true;
+  g.startRun();
+  const run = g.s.descent.run;
+  run.floor = 3; run.phase = 'doors';
+  g.startBattle('elite');
+  const st = run.battle; foe(st).forEach((e) => { e.hp = 0; }); st.over = 'won';
+  const out = g.finishBattle();
+  assert.equal(out.talents.length, 3);
+  assert.throws(() => g.chooseReward(run.rewards[0]), /talent/);
+  const o = g.chooseTalent(0);
+  assert.equal(run.team.find((m) => m.id === o.id).talent, o.talent);
+  g.chooseReward(run.rewards[0]);
+  assert.ok(g.runUnits().some((u) => u.talent === o.talent));
+});
+
+test('épreuve du jour : identique pour tous le même jour, score et récompense une fois par jour', () => {
+  const g1 = new Game(catalog, new MemoryStorage(), { rng: rngFrom('a'), clock });
+  const g2 = new Game(catalog, new MemoryStorage(), { rng: rngFrom('b'), clock });
+  assert.deepEqual(g1.trialDef(), g2.trialDef());
+  const r1 = g1.trialStart(), r2 = g2.trialStart();
+  assert.deepEqual(Object.values(r1.battle.units).map((u) => [u.id, u.hp, u.atk]), Object.values(r2.battle.units).map((u) => [u.id, u.hp, u.atk]));
+  const st = r1.battle; foe(st).forEach((e) => { e.hp = 0; }); st.over = 'won';
+  const sh = g1.s.shards;
+  const out = g1.trialFinish();
+  assert.ok(out.won && out.score > 0);
+  assert.equal(g1.s.shards, sh + 40);
+  g1.trialStart(); const st2 = g1.s.trial.run.battle; st2.over = 'won'; st2.round = 9;
+  assert.equal(g1.trialFinish().shards, 0, 'récompense une seule fois par jour');
+  assert.equal(g1.trial().best.score, out.score, 'le meilleur score reste');
+});

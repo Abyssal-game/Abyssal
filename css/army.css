@@ -1655,3 +1655,40 @@ i.cmb { font-style: normal; color: #FFC266; font-weight: 800; }
 .sc-tro { width: 72px; padding: 0; border: 0; background: none; border-radius: 8px; }
 .sc-tro .sc-card { width: 100%; }
 @media (prefers-reduced-motion: reduce) { .sc-combo { animation: none; } }
+
+/* Combat : objectif, phase 2, créature engloutie, talents */
+.cb-goal { border-color: rgba(127, 224, 160, .45) !important; }
+.cb-goal.s-done { background: rgba(60, 160, 100, .35) !important; color: #CFFFE0; }
+.cb-goal.s-fail { opacity: .55; text-decoration: line-through; }
+.cb-goal small { opacity: .8; font-weight: 600; }
+.cb-phase { position: absolute; z-index: 40; left: 0; right: 0; top: 30%; margin: 0 auto; width: min(88%, 340px); padding: 16px 18px 12px; border-radius: 16px; background: rgba(14, 8, 22, .94); border: 2px solid #E0485E; box-shadow: 0 0 40px rgba(224, 72, 94, .5); text-align: center; display: grid; gap: 6px; animation: viewIn .25s ease both; }
+.cb-phase b { font: 900 1.25rem/1.1 var(--f-display); color: #FFB3BE; text-transform: uppercase; letter-spacing: .04em; }
+.cb-phase p { margin: 0; font-size: .9rem; line-height: 1.35; }
+.cb-phase small { color: var(--mute); }
+.dv-c.swallowed { animation: cbSwallow .7s ease-in forwards !important; z-index: 9; }
+@keyframes cbSwallow { to { transform: translate(var(--dx), var(--dy)) scale(.15) rotate(25deg); opacity: 0; filter: brightness(.3); } }
+.cb-swal { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; margin-left: 6px; padding: 3px; border-radius: 8px; border: 1px dashed #E0485E; background: rgba(224, 72, 94, .12); }
+.cb-swal img { width: 30px; height: 40px; object-fit: cover; border-radius: 4px; filter: sepia(.6) hue-rotate(-30deg); }
+.cb-swal small { font: 700 .55rem/1 var(--f-ui); color: #FFB3BE; white-space: nowrap; }
+.bo.doom { background: rgba(224, 72, 94, .85) !important; color: #fff !important; }
+.bo.mask { background: rgba(140, 100, 220, .8) !important; color: #fff !important; }
+.bo.tal { background: rgba(242, 193, 78, .9) !important; color: #2A1E05 !important; }
+@media (prefers-reduced-motion: reduce) { .dv-c.swallowed { animation: none !important; opacity: 0; } .cb-phase { animation: none; } }
+
+/* Épreuve du jour, talents, objectif (écran de victoire) */
+.tr-box { display: grid; gap: 10px; }
+.tr-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; }
+.tr-c { display: grid; gap: 3px; justify-items: center; text-align: center; min-width: 0; }
+.tr-c img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 8px; border: 2px solid var(--rc); }
+.tr-c b { font: 700 .72rem/1.1 var(--f-ui); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.tr-c small { font-size: .62rem; color: var(--mute); }
+.tr-pact { border-left: 3px solid var(--pk); padding-left: 8px; }
+.tr-best { margin: 0; }
+.tr-res { display: grid; gap: 4px; justify-items: center; text-align: center; margin-bottom: 12px; }
+.tr-res.won { border-color: rgba(127, 224, 160, .5); }
+.tr-res .tr-score { font: 900 2.4rem/1 var(--f-display); color: var(--gold-hi); }
+.vx-tal { display: grid; gap: 8px; }
+.vx-talc { display: grid; grid-template-columns: 52px 1fr auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 14px; border: 1px solid rgba(242, 193, 78, .45); background: rgba(30, 22, 10, .75); color: var(--ink); text-align: left; }
+.vx-talc img { width: 52px; height: 68px; object-fit: cover; border-radius: 8px; }
+.vx-talc b { display: block; color: var(--gold-hi); }
+.vx-goal.done { color: #CFFFE0; }

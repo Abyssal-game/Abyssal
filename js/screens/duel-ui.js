@@ -12,9 +12,9 @@ import { tuto } from '../ui/tutos.js';
 import { cardHTML } from '../ui/card.js';
 import {
   BOSS_POWERS, INTENTS, SYNERGIES, PACK_BONUS, FERVOR_MAX, AP_MAX, front, reserve, actionsFor, actionTargets, act, preview,
-  ENTRANCES, beginEnemyTurn, nextEnemy, enemyAct, endEnemyTurn, takeSkips, defenseWindow, threats, intentInfo, useUlt, ultReady, autoActs, comboOf,
+  ENTRANCES, GOALS, goalState, PHASE2, beginEnemyTurn, nextEnemy, enemyAct, endEnemyTurn, takeSkips, defenseWindow, threats, intentInfo, useUlt, ultReady, autoActs, comboOf,
 } from '../core/duel.js';
-import { KITS, AI_FAMILIES, DICE_TIERS, WEAK_TO } from '../core/skills.js';
+import { KITS, AI_FAMILIES, DICE_TIERS, WEAK_TO, TALENTS } from '../core/skills.js';
 import { BOSSES, LAWS, ASPECTS } from '../core/bosses.js';
 import { PACTS } from '../core/pacts.js';
 import { RELICS } from '../core/relics.js';
@@ -37,7 +37,7 @@ const fxUrl = (n) => `assets/fx/${n}.webp`;
 const DANGER = ['', '', 'Danger', 'Mortel'];
 // Icône peinte d'une intention ennemie
 // les intentions des gardiens réutilisent les icônes peintes les plus proches
-const IN_PIC = { gorge: 'heavy', gather: 'channel', blizzard: 'frost', mimic: 'channel', copy: 'heavy', decree: 'rally', shift: 'charge' };
+const IN_PIC = { hunt: 'rally', gorge: 'heavy', gather: 'channel', blizzard: 'frost', mimic: 'channel', copy: 'heavy', decree: 'rally', shift: 'charge' };
 const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${IN_PIC[k] || k}.webp">`;
 
 export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.' }) {
@@ -79,7 +79,7 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
   const el = (uid) => root.querySelector(`[data-uid="${uid}"]`);
 
   // ——— Carte de combat ———
-  let th = {}, tgtInfo = {};
+  let th = {}, tgtInfo = {}, lastGoal = null;
   // États : icônes peintes (le chiffre du poison et du bonus d'attaque en pastille)
   const st_ = (k, title, val = '') => `<i class="sti" title="${title}"><img alt="${title}" src="assets/icons/st-${k}.webp">${val !== '' ? `<b>${val}</b>` : ''}</i>`;
   const statusHTML = (u) => [
@@ -93,11 +93,17 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
     u.guardBy ? st_('guard', 'Protégé par un Rempart') : '',
     u.exposed ? st_('exposed', 'Exposée : +25 % de dégâts subis') : '',
     u.boost ? `<i class="bo" title="Attaque renforcée pour ce tour">+${u.boost} ATQ</i>` : '',
+    u.prey ? st_('mark', 'Proie désignée : tous les ennemis la visent (+20 % de dégâts)') : '',
+    u.ice ? st_('frost', `Carapace de glace : absorbe ${u.ice} dégâts`, u.ice) : '',
+    u.doom != null && !u.broken ? `<i class="bo doom" title="Effondrement dans ${u.doom} tour(s) : brise-le pour le repousser">⏳ ${u.doom}</i>` : '',
+    u.mask ? `<i class="bo mask" title="Il porte ce visage : il résiste à cette faction (−50 %)">${esc(cat.faction[u.mask]?.name || u.mask)}</i>` : '',
+    u.totality ? '<i class="bo mask" title="Totalité : seules ses faiblesses le blessent pleinement">Totalité</i>' : '',
+    u.talent && TALENTS[u.talent] ? `<i class="bo tal" title="Talent : ${esc(TALENTS[u.talent].name)} · ${esc(TALENTS[u.talent].desc)}">★</i>` : '',
   ].join('');
   const intentChip = (u) => {
     const i = intentInfo(st, u);
     if (!i || st.turn !== 'ally') return '';
-    const named = ['charge', 'channel', 'shield', 'heal', 'rally', 'frost', 'gather', 'mimic', 'decree', 'shift'].includes(i.kind);
+    const named = ['hunt', 'charge', 'channel', 'shield', 'heal', 'rally', 'frost', 'gather', 'mimic', 'decree', 'shift'].includes(i.kind);
     const label = i.kind === 'mimic' ? `Copie : ${esc(i.copyName)}` : i.kind === 'decree' ? esc(LAWS[i.law]?.name || 'Décret') : i.kind === 'shift' ? esc(ASPECTS[i.aspect]?.name || 'Bascule')
       : named ? esc(i.def.name) : i.kind === 'copy' ? `${esc(i.copyName)}${i.dmg ? ` ${i.dmg}` : ''}` : `${i.dmg}${i.aoe ? ' ×3' : ''}`;
     const brk = u.brkMax && !u.broken && i.danger >= 2 ? `<small class="cb-ibrk" title="Brise-le pour annuler cette action">◆ ${u.brk}</small>` : '';
@@ -183,13 +189,19 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
       }
     }
     enEl.innerHTML = front(st, 'enemy').map(cardEl).join('') + resHTML('enemy');
-    const rules = [st.pact && PACTS[st.pact] ? `<span class="cb-law" style="--pk:${PACTS[st.pact].color}" data-d="rule" data-k="pact">${icon('p:seal')}<b>${esc(PACTS[st.pact].name)}</b></span>` : '',
+    const gl = goalState(st);
+    if (gl && gl.state === 'done' && lastGoal !== 'done' && lastGoal !== null) { app.sfx.achievement?.(); banner(`${icon('star')} Objectif réussi !`, 'good', 1100); }
+    if (gl && gl.state === 'fail' && lastGoal === 'pending') toast(`Objectif « ${esc(gl.name)} » manqué.`, { icon: 'info' });
+    lastGoal = gl ? gl.state : null;
+    const rules = [gl ? `<span class="cb-law cb-goal s-${gl.state}" data-d="rule" data-k="goal">${gl.state === 'done' ? '✓' : gl.state === 'fail' ? '✗' : '◎'} <b>${esc(gl.name)}</b>${gl.p && gl.state === 'pending' ? ` <small>${gl.p}</small>` : ''}</span>` : '',
+      st.pact && PACTS[st.pact] ? `<span class="cb-law" style="--pk:${PACTS[st.pact].color}" data-d="rule" data-k="pact">${icon('p:seal')}<b>${esc(PACTS[st.pact].name)}</b></span>` : '',
       st.law ? `<span class="cb-law" data-d="rule" data-k="law"><b>${esc(LAWS[st.law].name)}</b></span>` : '',
       st.aspect ? `<span class="cb-law" data-d="rule" data-k="aspect"><b>${esc(ASPECTS[st.aspect].name)}</b></span>` : '',
       (st.relics || []).length ? `<span class="cb-law" data-d="rule" data-k="relics">${icon('p:crown')}<b>${st.relics.length} relique${st.relics.length > 1 ? 's' : ''}</b></span>` : ''].join('');
     const rulesEl = $('.cb-rules'); if (rulesEl) { rulesEl.innerHTML = rules; rulesEl.hidden = !rules; }
     alEl.innerHTML = front(st, 'ally').map(cardEl).join('');
-    $('.dv-resw').innerHTML = resHTML('ally');
+    const sw = st.swallowed && st.units[st.swallowed];
+    $('.dv-resw').innerHTML = resHTML('ally') + (sw?.swallowed ? `<span class="cb-swal" title="Engloutie : brise le Dévoreur pour la libérer"><img alt="" src="${artUrl(cat.get(sw.id), { lite: true })}"><small>Engloutie · ${sw.hp} PV</small></span>` : '');
     const showActs = !!sel && st.turn === 'ally' && !busy && !st.over;
     actsEl.hidden = !showActs;
     actsEl.innerHTML = showActs ? (confirm ? confirmHTML() : actsHTML()) : '';
@@ -334,7 +346,18 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
         case 'recover': float(e.u, 'Se relève', 'info'); await wait(T(260)); break;
         case 'roll': await rollFx(e); lastTier = e.tier; break;
         case 'boss': { app.sfx.boss(); const t = el(e.u); if (t) { t.classList.remove('roar'); void t.offsetWidth; t.classList.add('roar'); } float(e.u, e.s, 'boss'); shake(true); await wait(T(650)); break; }
-        case 'phase2': app.sfx.boss(); draw(); banner(`${icon('skull')} ${esc(e.s)}`, 'danger', 1200); shake(true); await wait(T(900)); break;
+        case 'phase2': {
+          app.sfx.boss(); draw(); banner(`${icon('skull')} ${esc(e.s)}`, 'danger', 1200); shake(true); await wait(T(900));
+          const P = PHASE2[e.key];
+          if (P) await phaseCard(P);
+          break;
+        }
+        case 'swallow': {
+          const t = el(e.u), b = el(e.a);
+          if (t && b && !reduced) { const rt = t.getBoundingClientRect(), rb = b.getBoundingClientRect(); t.style.setProperty('--dx', `${rb.left - rt.left}px`); t.style.setProperty('--dy', `${rb.top - rt.top}px`); t.classList.add('swallowed'); }
+          app.sfx.death(); float(e.a, 'Engloutie !', 'boss'); shake(true); await wait(T(800)); draw(); break;
+        }
+        case 'release': app.sfx.enter(); draw(); el(e.u)?.classList.add('enter'); ring(e.u, 'enter'); await wait(T(400)); break;
         case 'swap': app.sfx.enter(); draw(); el(e.u)?.classList.add('enter'); float(e.u, 'Entre en jeu', 'info'); await wait(T(340)); break;
         case 'aoe': if (e.side === 'enemy') shake(true); await wait(T(150)); break;
         case 'status':
@@ -380,6 +403,14 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
     a.style.setProperty('--dy', `${(rt.top - ra.top) * 0.55}px`);
     a.style.setProperty('--ld', `${T(420)}ms`);
     a.classList.remove('lunge'); void a.offsetWidth; a.classList.add('lunge');
+  }
+  // Explication courte d'une phase 2 (touche pour passer)
+  async function phaseCard(P) {
+    const b = document.createElement('div');
+    b.className = 'cb-phase';
+    b.innerHTML = `<b>${esc(P.name)}</b><p>${esc(P.desc)}</p><small>Touche pour continuer</small>`;
+    $('.dv').appendChild(b);
+    await new Promise((res) => { const go = () => { b.remove(); res(); }; b.addEventListener('pointerdown', go, { once: true }); setTimeout(go, reduced ? 2500 : 6000); });
   }
   async function ultFx() {
     const c = run.ult.card ? cat.get(run.ult.card) : null;
@@ -574,7 +605,8 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
   // Règles en vigueur : pacte, loi de l'Architecte, aspect de l'Éclipse, reliques
   function ruleSheet(k) {
     let h = '';
-    if (k === 'pact' && PACTS[st.pact]) h = `<h2>${esc(PACTS[st.pact].name)}</h2><p><b class="dc-good">Gain</b> : ${esc(PACTS[st.pact].gain)}</p><p><b class="dc-bad">Prix</b> : ${esc(PACTS[st.pact].cost)}</p>`;
+    if (k === 'goal') { const gl = goalState(st); if (gl) h = `<h2>Objectif : ${esc(gl.name)}</h2><p>${esc(gl.desc)}</p><p class="small muted">Facultatif. Réussi et combat gagné : des éclats en plus et 1 Ferveur pour la suite de l’expédition.</p><p><b>${gl.state === 'done' ? 'Réussi !' : gl.state === 'fail' ? 'Manqué pour ce combat.' : `En cours${gl.p ? ` (${gl.p})` : ''}.`}</b></p>`; }
+    else if (k === 'pact' && PACTS[st.pact]) h = `<h2>${esc(PACTS[st.pact].name)}</h2><p><b class="dc-good">Gain</b> : ${esc(PACTS[st.pact].gain)}</p><p><b class="dc-bad">Prix</b> : ${esc(PACTS[st.pact].cost)}</p>`;
     else if (k === 'law' && LAWS[st.law]) h = `<h2>${esc(LAWS[st.law].name)}</h2><p>${esc(LAWS[st.law].desc)}</p><p class="small muted">L’Architecte change de Loi tous les deux tours ; la prochaine est annoncée sur sa carte.</p>`;
     else if (k === 'aspect' && ASPECTS[st.aspect]) { const A = ASPECTS[st.aspect]; h = `<h2>${esc(A.name)}</h2><p>Faible face à <b>${A.weak.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}</b> (+60 %), résiste à <b>${A.resist.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}</b> (−50 %).</p>`; }
     else if (k === 'relics') h = `<h2>Tes reliques</h2>${(st.relics || []).map((r) => `<p class="small"><b>${esc(RELICS[r].name)}</b> : ${esc(RELICS[r].gain)} <span class="dc-bad">${esc(RELICS[r].cost)}</span></p>`).join('')}`;
