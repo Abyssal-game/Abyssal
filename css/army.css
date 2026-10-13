@@ -1952,3 +1952,5 @@ body.battle-mode.has-subnav #view, body.battle-mode #view { padding: calc(var(--
 .sc-block img { width: 13px; height: 13px; }
 /* Guide de départ : pages illustrées par une bannière du jeu */
 .wl-art.wl-bn { aspect-ratio: 900 / 297; object-position: center; }
+/* Salles : le calque d'effets ne doit jamais intercepter les touchers (sinon les cases ne répondent plus) */
+.sl-fx { pointer-events: none; }
