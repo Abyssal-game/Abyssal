@@ -15,7 +15,7 @@ import { POWERS, powerOf } from '../core/powers.js';
 
 const SL = 'assets/salles/';
 // Pouvoirs qui ont déjà leur icône peinte (assets/salles/pw/<clé>.webp) ; les autres gardent l'icône générique
-const PW_ART = new Set(['grace', 'hymne', 'egide', 'sanctuaire', 'jugement', 'drain', 'releve', 'maledict', 'terreur', 'linceul', 'brasier', 'souffle', 'cataclysme', 'pacte', 'venin', 'nuee', 'bond', 'frenesie', 'devorer', 'regen', 'noyade', 'maree', 'abime', 'tentacules', 'carapace', 'provoc']);
+const PW_ART = { has: (k) => !!POWERS[k] }; // les 38 pouvoirs ont leur icône peinte
 const cardIcon = (k, def) => (PW_ART.has(k) ? `<img class="sl-pw" alt="" src="${SL}pw/${k}.webp">` : icon(def.icon || 'sparkle'));
 const HOW = [
   ['salles', '#C9A24E', 'Tes 3 figurines', 'Choisis 3 créatures : chacune a son propre pouvoir (un ange soigne, un dragon crache le feu…). Leur niveau compte.'],
