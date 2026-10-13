@@ -209,6 +209,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     $('.cb-pips').innerHTML = Array.from({ length: Math.max(AP_MAX, st.ap) }, (_, i) => `<i class="${i < st.ap ? 'on' : ''}"></i>`).join('');
     $('.cb-gems').innerHTML = Array.from({ length: FERVOR_MAX }, (_, i) => `<i class="${i < st.fervor ? 'on' : ''}"></i>`).join('');
     const ready = ultReady(st);
+    if (ready && !g.s.tips?.['cb-ult']) tuto(app, 'cb-ult');
     $('.cb-res').classList.toggle('ready', ready);
     $('.cb-ult small').textContent = st.ultUsed ? 'Utilisé' : ready ? 'Prêt ! Touche' : `${st.fervor}/${FERVOR_MAX}`;
     const canMore = st.ap > 0 && front(st, 'ally').some((u) => actionsFor(st, u.uid).some((a) => a.ok && a.key !== 'swap' && a.key !== 'defend'));

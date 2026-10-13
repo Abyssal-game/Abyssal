@@ -14,8 +14,8 @@ const HOW = [['cards', '#7FA8D8', 'Ta main', '5 cartes. Chacune a quatre valeurs
   ['seal', '#E8C35A', 'Le plateau', 'À tour de rôle, chacun pose une carte sur une case libre du plateau de 3 × 3.'],
   ['swords', '#E0485E', 'Capturer', 'Si ta valeur est plus grande que celle d’en face d’une carte adverse voisine, tu la captures. À égalité, rien ne se passe.'],
   ['crown', '#F2C14E', 'La victoire', 'Après les 9 poses, on compte les cartes de chaque couleur, plus celle restée en main. À 5 contre 5, celui qui tient la case centrale (le cœur du Sceau) gagne.'],
-  ['holo', '#FF8AD8', 'Pouvoirs de rareté', 'Les Hyper rares ont le Rempart (🛡 : elles résistent à la première capture). Les Mythiques ont la Fureur (⚔ : elles capturent aussi à égalité quand tu les poses). Les Secrètes ont les deux.'],
-  ['rule', '#B48CFF', 'Règles spéciales', 'Certains adversaires jouent avec une règle en plus : Identique, Somme (avec Combo en cascade), cases sacrées, plateau instable, fraternité ou Abîme.'],
+  ['holo', '#FF8AD8', 'Pouvoirs de rareté', 'Les Hyper rares ont le Rempart (bouclier doré : elles résistent à la première capture). Les Mythiques ont la Fureur (épées en flammes : elles capturent aussi à égalité quand tu les poses). Les Secrètes ont les deux.'],
+  ['rule', '#B48CFF', 'Règles spéciales', 'Certains adversaires jouent avec une règle en plus : Identique, Somme (avec Combo en cascade), cases sacrées, plateau instable, fraternité, Abîme, Usure, Archives ou Néant.'],
   ['crystal', '#7FE0A0', 'Trophée', 'Une fois par jour, après une victoire, tu gardes une carte adverse que tu contrôles sur le plateau (Héroïque au plus).'],
   ['hourglass', '#9FE0FF', 'Adversaires et défi', 'Bats chaque adversaire pour débloquer le suivant. Un défi du jour t’attend aussi.'],
   ['danger', '#FF5468', 'Revanches éveillées', 'Une fois un adversaire battu, tu peux l’affronter éveillé : main plus rare, jeu plus fin, récompense ×1,5 et +150 éclats la première fois.']];
@@ -69,7 +69,7 @@ export default function sceauxScreen(app, root) {
         <ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol>
         ${Object.values(SC.RULES).filter((r) => r.name !== 'Classique').map((r) => `<p class="small sc-rl"><b>${esc(r.name)}</b> : ${esc(r.desc)}</p>`).join('')}
         <p class="small muted center">Toutes les cartes ont le même total de valeurs (20) : une Commune bien placée peut capturer une Mythique.</p></details>`;
-    tuto(app, 'sceaux');
+    tuto(app, 'sceaux').then(() => { if (Object.keys(sc.beaten || {}).length) tuto(app, 'sceaux-awake'); });
   }
   const todayKey = () => { const d = g.clock(), p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; };
 
@@ -234,7 +234,8 @@ export default function sceauxScreen(app, root) {
     boardView({ intro: true });
     app.sfx.enter?.();
     dialog(R, R.hello, st.first === 'p' ? 'Tu commences.' : `${esc(R.name)} commence.`);
-    tuto(app, 'sceaux-board').then(() => { if (SC.ruleHas(st, 'identique') || SC.ruleHas(st, 'somme')) tuto(app, 'sceaux-combo'); });
+    tuto(app, 'sceaux-board').then(() => (SC.ruleHas(st, 'identique') || SC.ruleHas(st, 'somme') ? tuto(app, 'sceaux-combo') : null))
+      .then(() => { if ([...st.hands.p, ...st.hands.o].some((id) => SC.perksOf(cat.get(id)).length)) tuto(app, 'sceaux-perks'); });
     aiTurn();
   }
   // Règles en cours de partie : la même présentation que le volet « Comment ça marche »

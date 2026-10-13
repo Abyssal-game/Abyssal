@@ -1,24 +1,34 @@
-// Guide de bienvenue : quelques pages, montré une seule fois (rejouable depuis les Réglages).
+// Guide de bienvenue : quelques pages, montré une fois (et à nouveau quand le guide change),
+// rejouable depuis les Réglages.
 import { icon, EMBLEM } from '../ui/icons.js';
 import { openSheet } from '../ui/dom.js';
 
+// Version du guide : l'augmenter le remontre une fois à tout le monde
+const GUIDE_V = 2;
+// img : illustration (assets/ui/tuto-N.webp) ; bn : bannière d'une page du jeu (assets/ui/bn-*.webp)
 const PAGES = [
-  { ic: null, img: 1, t: 'Bienvenue dans l’Abysse', p: 'Le Bestiaire interdit a été déchiré. Ses créatures se cachent dans des boosters scellés. À toi de les retrouver.' },
-  { ic: 'booster', img: 2, t: 'Ouvre des boosters', p: 'Le gros bouton du milieu. Déchire le paquet du doigt, puis retourne les cartes. Des boosters offerts se rechargent toutes les 6 heures.' },
-  { ic: 'swords', img: 3, t: 'Pars à l’aventure', p: 'Tes cartes combattent pour toi ! Dans l’onglet Aventure, ton équipe de 5 créatures descend dans l’Abysse et rapporte des coffres pleins de boosters.' },
-  { ic: 'home', img: 4, t: 'Reviens chaque jour', p: 'L’Accueil rassemble ce qui t’attend aujourd’hui : l’offrande, les missions et les coffres à ouvrir. Ton profil, tes succès, le bestiaire et les réglages sont dans l’onglet Sanctuaire.' },
+  { img: 1, t: 'Bienvenue dans l’Abysse', p: 'Le Bestiaire interdit a été déchiré. Ses créatures se cachent dans des boosters scellés. À toi de les retrouver, de les renforcer et de les mener au combat.' },
+  { img: 2, t: 'Ouvre des boosters', p: 'Le gros bouton du milieu. Déchire le paquet du doigt, puis retourne les cartes. Un booster gratuit t’attend toutes les 12 heures. Certaines cartes sortent en finition rare : holographique, feuille d’or ou cosmique.' },
+  { bn: 'collection', t: 'Ta collection', p: 'L’onglet Collection a quatre pages, en haut : Cartes (tout le Bestiaire), Équipe (tes 5 combattants), Renforcer et Fournaise.' },
+  { bn: 'furnace', t: 'Cendres et niveaux', p: 'Dans la Fournaise, brûle tes doublons : ils deviennent des cendres. Dans Renforcer, les cendres font monter tes créatures de niveau, pour plus d’attaque et de PV.' },
+  { img: 3, t: 'La Descente', p: 'Dans l’onglet Aventure, ton équipe descend dans l’Abysse : 3 créatures au combat, 2 en réserve. Un gardien tous les 5 étages. Remonte quand tu veux pour garder ton coffre, plein de boosters.' },
+  { bn: 'salles', t: 'Trois autres aventures', p: 'Toujours dans Aventure : les Salles Oubliées (un jeu de plateau avec dés), l’Épreuve du jour (le même combat pour tous les joueurs) et les Duels des Sceaux (un jeu de cartes où l’on capture celles de l’adversaire).' },
+  { bn: 'shadow', t: 'Coffres et Tirage des Ombres', p: 'Dans l’onglet Boosters, ouvre les coffres gagnés en Aventure. Le Tirage des Ombres donne un booster par jour : sa valeur compte pour le classement de la semaine, et les 3 premiers gagnent un coffre.' },
+  { img: 4, t: 'Reviens chaque jour', p: 'L’Accueil rassemble ce qui t’attend : l’offrande, les missions et les coffres. Le Sanctuaire garde ton profil, tes succès, le bestiaire et les réglages (son, musique, vibrations, tutoriels).' },
 ];
 
 export function showWelcome(app, { force = false } = {}) {
   const g = app.game;
-  if (g.s.seenIntro && !force) return;
+  if ((g.s.seenIntro || 0) >= GUIDE_V && !force) return;
   let i = 0;
-  const sheet = openSheet('', { cls: 'welcome', label: 'Bienvenue', onClose: () => { g.s.seenIntro = true; g.persist(); } });
-  [1, 2, 3, 4].forEach((n) => { new Image().src = `assets/ui/tuto-${n}.webp`; });
+  const sheet = openSheet('', { cls: 'welcome', label: 'Bienvenue', onClose: () => { g.s.seenIntro = GUIDE_V; g.persist(); } });
+  PAGES.forEach((pg) => { new Image().src = pg.img ? `assets/ui/tuto-${pg.img}.webp` : `assets/ui/bn-${pg.bn}.webp`; });
   const draw = () => {
     const pg = PAGES[i];
+    const art = pg.img ? `<img class="wl-art" alt="" src="assets/ui/tuto-${pg.img}.webp">`
+      : pg.bn ? `<img class="wl-art wl-bn" alt="" src="assets/ui/bn-${pg.bn}.webp">` : `<div class="wl-ic">${pg.ic ? icon(pg.ic) : EMBLEM}</div>`;
     sheet.setContent(`<div class="wl">
-      ${pg.img ? `<img class="wl-art" alt="" src="assets/ui/tuto-${pg.img}.webp">` : `<div class="wl-ic">${pg.ic ? icon(pg.ic) : EMBLEM}</div>`}
+      ${art}
       <h2>${pg.t}</h2><p>${pg.p}</p>
       <div class="wl-dots">${PAGES.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</div>
       <div class="row gap wl-btns">${i ? '<button class="btn ghost" data-w="prev">Retour</button>' : '<button class="btn ghost" data-w="skip">Passer</button>'}<button class="btn primary" data-w="next">${i < PAGES.length - 1 ? 'Suivant' : 'C’est parti !'}</button></div>

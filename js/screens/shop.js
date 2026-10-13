@@ -1,5 +1,6 @@
 import { itemsShopHTML, bindItemShop } from './items.js';
 // Boutique : boosters achetables avec la monnaie du jeu uniquement.
+import { tuto } from '../ui/tutos.js';
 import { BOOSTERS, RARITIES, PITY, FACTION_ORDER, ECONOMY, VARIANT_RATES } from '../config.js';
 import { boosterOdds } from '../core/boosters.js';
 import { icon, sigil, EMBLEM } from '../ui/icons.js';
@@ -82,6 +83,7 @@ export default function shop(app, root, params = []) {
     const keepX = root.querySelector('.fac-pick')?.scrollLeft || 0;
     const keepY = window.scrollY;
     draw();
+    tuto(app, 'boosters');
     const fp = root.querySelector('.fac-pick');
     if (fp) fp.scrollLeft = keepX;
     window.scrollTo(0, keepY);

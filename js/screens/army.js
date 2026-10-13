@@ -168,6 +168,7 @@ export function chestsScreen(app, root) {
     open(el) { openChestScene(app, el.dataset.t, { onDone: () => (app.refresh ? app.refresh() : draw()) }); },
   });
   draw();
+  tuto(app, 'coffres');
   app.refreshView = draw;
   return () => { app.refreshView = null; };
 }

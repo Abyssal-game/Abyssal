@@ -1,5 +1,6 @@
 // Tirage des Ombres : un booster gratuit par jour, tiré par le serveur. Les cartes ne sont pas gagnées :
 // seule compte leur valeur. Classement de la semaine, coffres pour les 3 premiers.
+import { tuto } from '../ui/tutos.js';
 import { FACTION_ORDER, SHADOW, LUCK_POINTS } from '../config.js';
 import { CHESTS } from '../core/descent.js';
 import { artUrl } from '../art/assets.js';
@@ -125,4 +126,5 @@ export default function shadowScreen(app, root) {
   });
   draw();
   load();
+  tuto(app, 'tirage');
 }

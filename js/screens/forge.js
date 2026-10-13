@@ -1,4 +1,5 @@
 // Pages « Renforcer » et « Fournaise » (sous-onglets de la Collection)
+import { tuto } from '../ui/tutos.js';
 import { RARITY, RARITY_ORDER } from '../config.js';
 import { artUrl } from '../art/assets.js';
 import { icon } from '../ui/icons.js';
@@ -39,6 +40,7 @@ export function forgeScreen(app, root) {
   });
   app.refreshView = draw;
   draw();
+  tuto(app, 'renfort');
   return () => { app.refreshView = null; };
 }
 
@@ -86,5 +88,6 @@ export function furnaceScreen(app, root) {
   });
   app.refreshView = draw;
   draw();
+  tuto(app, 'fournaise');
   return () => { app.refreshView = null; clearTimeout(draw.t); };
 }

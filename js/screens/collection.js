@@ -1,4 +1,5 @@
 // Collection : recherche, filtres (faction, rareté, possession), tri, grille.
+import { tuto } from '../ui/tutos.js';
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { icon, sigil } from '../ui/icons.js';
 import { esc, bindActions, pct } from '../ui/dom.js';
@@ -11,6 +12,7 @@ export default function collection(app, root, params) {
   const st = (app.state.col ||= { q: '', factions: [], rarities: [], show: 'all', sort: 'num', view: 'grid', albumFac: 'infernal', albumPage: 0 });
   if (params[0] && FACTION_ORDER.includes(params[0])) { st.factions = [params[0]]; }
   const total = g.total();
+  tuto(app, 'collection');
 
   root.innerHTML = `
     <header class="screen-head ui-hero bn-collection">
