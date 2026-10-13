@@ -253,6 +253,15 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
   };
   // Arrêt sur image : le coup « pèse » un instant
   const hitstop = async (ms) => { if (reduced) return; const d = $('.dv'); d?.classList.add('hitstop'); await wait(T(ms)); d?.classList.remove('hitstop'); };
+  // Icône d'une combinaison réussie, qui jaillit de la carte
+  // (posée sur le combat, pas dans la carte : la carte est redessinée pendant l'animation)
+  const comboPop = (uid, key) => {
+    const t = el(uid), box = $('.dv'); if (!t || !box) return;
+    const b = box.getBoundingClientRect(), r = t.getBoundingClientRect();
+    const i = document.createElement('img'); i.className = 'cb-cpop'; i.alt = ''; i.src = `assets/icons/cb-${key}.webp`;
+    i.style.cssText = `left:${r.left - b.left + r.width / 2}px;top:${r.top - b.top + r.height * 0.4}px;width:${Math.min(76, r.width * 0.64)}px`;
+    box.appendChild(i); setTimeout(() => i.remove(), 1200);
+  };
   const ring = (uid, cls) => { if (reduced) return; const t = el(uid); if (!t) return; const r = document.createElement('span'); r.className = `cb-ring ${cls}`; t.appendChild(r); setTimeout(() => r.remove(), 750); };
   const float = (uid, txt, cls) => { const t = el(uid); if (!t) return; const f = document.createElement('span'); f.className = `dv-float ${cls}`; f.textContent = txt; t.appendChild(f); setTimeout(() => f.remove(), 900); };
   const banner = (html, cls = '', ms = 900) => {
@@ -368,11 +377,12 @@ export function runDuel(app, root, { title, onEnd, run: runOpt = null, pause = '
           if (e.s === 'Proie désignée') fxAt(e.u, 'prey', { big: true });
           else if (e.syn) app.sfx.skill();
           if (e.k === 'entrance') ring(e.u, 'enter');
+          if (e.combo) comboPop(e.u, e.combo);
           float(e.u, e.s, e.syn ? 'syn' : e.k === 'bad' ? 'dmg' : 'info');
           draw();
           await wait(T(e.syn ? 480 : 260));
           break;
-        case 'combo': float(e.u, `Chaîne ×${e.n}`, 'combo'); app.sfx.crit?.(); await wait(T(260)); if (!g.s.tips?.['cb-combo']) tuto(app, 'cb-combo'); break;
+        case 'combo': comboPop(e.u, 'chain'); float(e.u, `Chaîne ×${e.n}`, 'combo'); app.sfx.crit?.(); await wait(T(260)); if (!g.s.tips?.['cb-combo']) tuto(app, 'cb-combo'); break;
         case 'finisher': { if (!reduced) { const d = $('.dv'); d.classList.add('slowmo'); setTimeout(() => d.classList.remove('slowmo'), 700); } banner('Coup de grâce !', 'finisher', 800); await wait(T(380)); break; }
         case 'die': {
           const u = st.units[e.u];
