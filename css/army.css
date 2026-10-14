@@ -2382,3 +2382,12 @@ body.has-subnav #subnav .sn-tab { background: #16121E; }
 .ry-out.near { border-color: #FFF6DA; }
 .ry.perfect .ry-tgt { border-color: #FFF6DA; box-shadow: 0 0 40px 14px rgba(255, 230, 150, 1); }
 .ry.miss .ry-tgt { border-color: #7A6A50; box-shadow: none; animation: none; }
+
+/* v256 : ennemi K.O. — fissures, éclats et braises (planches de 8 images jouées image par image) */
+.kx-crack { position: absolute; z-index: 26; pointer-events: none; mix-blend-mode: screen; border-radius: 8px; animation: kxCrack .22s ease-out both; }
+@keyframes kxCrack { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: none; } }
+.dv-c.kx-flash { filter: brightness(1.9) saturate(.6) !important; transition: filter .12s; }
+.kx-sprite { position: absolute; z-index: 27; pointer-events: none; transform: translate(-50%, -50%); background-repeat: no-repeat; background-size: 800% 100%; background-position: 0 0; animation: kxPlay var(--d, 760ms) steps(8) forwards; }
+.kx-shatter { background-image: url(../assets/fx/kill-shatter.webp); filter: drop-shadow(0 0 10px rgba(255, 170, 80, .45)); }
+.kx-embers { background-image: url(../assets/fx/kill-embers.webp); mix-blend-mode: screen; }
+@keyframes kxPlay { from { background-position: 0 0; } to { background-position: 114.2857% 0; } }

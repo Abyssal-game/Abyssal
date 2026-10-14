@@ -307,6 +307,23 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     box.appendChild(beam); setTimeout(() => beam.remove(), 900);
     a.classList.remove('synlit'); void a.offsetWidth; a.classList.add('synlit');
   };
+  // Carte ennemie qui vole en éclats : calque de fissures, puis deux planches de 8 images jouées image par image
+  const shatterFx = async (uid) => {
+    const t = el(uid), box = $('.dv'); if (!t || !box || reduced) return false;
+    const b = box.getBoundingClientRect(), r = t.getBoundingClientRect();
+    const x = r.left - b.left, y = r.top - b.top, cx = x + r.width / 2, cy = y + r.height / 2, S = r.height / 0.69;
+    const ck = document.createElement('img'); ck.className = 'kx-crack'; ck.alt = ''; ck.src = 'assets/fx/kill-crack.webp';
+    ck.style.cssText = `left:${x}px;top:${y}px;width:${r.width}px;height:${r.height}px`;
+    box.appendChild(ck); t.classList.add('kx-flash'); app.sfx.shatter?.();
+    await hitstop(120);
+    const sp = (cls, k, dy, d) => { const n = document.createElement('span'); n.className = `kx-sprite ${cls}`; n.style.cssText = `left:${cx}px;top:${cy + dy}px;width:${S * k}px;height:${S * k}px;--d:${d}ms`; box.appendChild(n); return n; };
+    const sh = sp('kx-shatter', 1, 0, T(760));
+    await wait(T(170)); t.style.visibility = 'hidden'; ck.remove(); app.sfx.death(); shake(false);
+    const em = sp('kx-embers', 1.15, -r.height * 0.12, T(950));
+    await wait(T(520));
+    setTimeout(() => { sh.remove(); em.remove(); }, T(520));
+    return true;
+  };
   const ring = (uid, cls) => { if (reduced) return; const t = el(uid); if (!t) return; const r = document.createElement('span'); r.className = `cb-ring ${cls}`; t.appendChild(r); setTimeout(() => r.remove(), 750); };
   const float = (uid, txt, cls) => { const t = el(uid); if (!t) return; const f = document.createElement('span'); f.className = `dv-float ${cls}`; f.textContent = txt; t.appendChild(f); setTimeout(() => f.remove(), 900); };
   const banner = (html, cls = '', ms = 900) => {
@@ -467,6 +484,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           }
           // coup fatal : le dernier ennemi tombe sous un coup allié → gros plan, une fois par combat
           if (u?.side === 'enemy' && st.over === 'won' && lastAtk && !fatalDone) { fatalDone = true; await closeup(lastAtk, e.u, 'Coup fatal', { crit: true, sub: '' }); }
+          // ennemi K.O. : fissures et flash, la carte vole en éclats, les braises montent (planches Gemini, v256)
+          if (u?.side === 'enemy' && await shatterFx(e.u)) { draw(); break; }
           // la carte blanchit, se fissure, puis part en cendres (braises qui montent)
           app.sfx.death(); fxAt(e.u, 'death', { big: true }); sparks(e.u, 'ember'); el(e.u)?.classList.add('dying', 'cracking'); await wait(T(640)); draw(); break;
         }
