@@ -318,3 +318,8 @@ test('noms : une compétence propre ne reprend jamais le nom d’une compétence
     assert.ok(!passNames.includes(n.split(' ')[0]), `${id} : « ${n} » porte le nom d’un passif`);
   }
 });
+
+test('icônes : chaque icône de passif annoncée existe', async () => {
+  const { passiveIconUrl } = await import('../js/core/kits.js');
+  for (const k of Object.keys(PASSIVES)) { const u = passiveIconUrl(k); if (u) assert.ok(fs.existsSync(path.join(ROOT, u)), u); }
+});

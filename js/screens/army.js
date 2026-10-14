@@ -11,7 +11,7 @@ import { CHESTS, CHEST_ORDER } from '../core/descent.js';
 import { ROLES, COST, BUDGET, TEAM, MAX_LEVEL, ULTS, roleOf, canUlt, ultOf } from '../core/army.js';
 import { duelUnit } from '../core/duel.js';
 import { kitOf, synergiesFor, KEYWORDS, keywordOf } from '../core/skills.js';
-import { CREATURE_KITS, kitSteps, nextUnlock, moveIconUrl } from '../core/kits.js';
+import { CREATURE_KITS, kitSteps, nextUnlock } from '../core/kits.js';
 import { openPack } from './opening.js';
 import { openChestScene } from './chest-open.js';
 import { upgradeCard } from './furnace.js';
@@ -34,7 +34,7 @@ export function identityHTML(c, level) {
     <div class="ck-h"><b>${icon('sparkle')} ${esc(k.style)}</b><span class="small muted">Son identité se révèle en montant de niveau</span></div>
     <ol class="ck-steps">${kitSteps(c.id, level).map((x) => `<li class="ck-s ${x.open ? 'on' : 'locked'}">
       <span class="ck-lv">${x.open ? icon('check') : icon('lock')}<small>Niv. ${x.lv}</small></span>
-      ${x.icon ? `<img class="ck-ic" alt="" src="${moveIconUrl(x.icon)}">` : ''}
+      ${x.img ? `<img class="ck-ic" alt="" src="${x.img}">` : ''}
       <span class="ck-t"><b><span class="ck-k">${x.kind}</span> ${esc(x.name)}</b>${x.cost ? `<span class="cb-k">${x.cost}</span>` : ''}<span class="small">${esc(x.desc)}</span></span></li>`).join('')}</ol>
     ${nx ? `<p class="small ck-next">${icon('p:level-up')} Prochain déblocage au niveau ${nx.lv} : <b>${esc(nx.kind === 'Éveil' ? 'l’Éveil' : nx.name)}</b></p>` : '<p class="small ck-next gold">Identité complète : tout est débloqué.</p>'}
     <div class="ck-traits"><p class="small"><b class="dc-good">Forces</b> ${esc(k.plus)}</p><p class="small"><b class="dc-bad">Faiblesses</b> ${esc(k.moins)}</p><p class="small"><b>Alliés</b> ${esc(k.synergy)}</p></div>
