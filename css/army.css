@@ -1988,3 +1988,35 @@ body.battle-mode.has-subnav #view, body.battle-mode #view { padding: calc(var(--
 @keyframes s3DieIn { from { opacity: 0; transform: translate(-50%, -60%) scale(.6); } to { opacity: 1; transform: translate(-50%, -100%) scale(1); } }
 /* Petits écrans : le titre du combat (« Étage 25 · Gardien ») ne passe plus sous les boutons */
 @media (max-width: 360px) { .dv-top > b { max-width: 52%; font-size: .78rem; padding: 2px 22px 0; } .dv-top .btn.small { padding: 0 9px; } }
+
+/* ——— Identité de la créature (étapes par niveau) ——— */
+.ck-panel { margin-top: 10px; padding: 12px; }
+.ck-h { display: flex; flex-direction: column; gap: 2px; margin-bottom: 8px; }
+.ck-h .ic { width: 15px; height: 15px; vertical-align: -2px; color: var(--gold-hi); }
+.ck-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.ck-s { display: flex; align-items: flex-start; gap: 8px; padding: 8px; border-radius: 10px; background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .06); }
+.ck-s.on { border-color: rgba(226, 184, 92, .28); background: linear-gradient(180deg, rgba(226, 184, 92, .08), rgba(255, 255, 255, .02)); }
+.ck-s.locked { opacity: .58; }
+.ck-s.locked .ck-ic { filter: grayscale(1) brightness(.7); }
+.ck-lv { flex: 0 0 38px; display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: .64rem; color: var(--mute); }
+.ck-lv .ic { width: 15px; height: 15px; }
+.ck-s.on .ck-lv { color: var(--gold-hi); }
+.ck-ic { flex: 0 0 34px; width: 34px; height: 34px; border-radius: 8px; object-fit: cover; }
+.ck-t { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ck-t b { font-size: .86rem; }
+.ck-t .cb-k { align-self: flex-start; margin-left: 0; }
+.ck-k { font-size: .62rem; text-transform: uppercase; letter-spacing: .06em; color: var(--mute); font-weight: 600; margin-right: 2px; }
+.ck-next { margin: 8px 0 0; }
+.ck-next .ic { width: 14px; height: 14px; vertical-align: -2px; }
+.ck-traits { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+.ck-traits p { margin: 0; }
+.ck-unl { color: var(--gold-hi); }
+.ck-fg { display: block; margin-top: 2px; color: var(--gold-hi); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ck-fg .ic { width: 12px; height: 12px; vertical-align: -1px; }
+.cb-grid.n5 { grid-template-columns: repeat(5, 1fr); gap: 5px; }
+.cb-grid.n5 .cb-a b { font-size: .6rem; }
+.cb-a.own { border-color: rgba(226, 184, 92, .55); background: linear-gradient(#2c2238, #150f20); }
+.cb-a.own .aicon { border-radius: 6px; }
+@media (max-width: 360px) { .cb-grid.n5 { gap: 4px; } .cb-grid.n5 .cb-a b { font-size: .55rem; } }
+.cb-cost .cdw { padding: 1px 4px; border-radius: 4px; background: rgba(255, 255, 255, .14); color: var(--ink); }
+.cb-cost .cdw::before { content: '↻'; margin-right: 1px; }

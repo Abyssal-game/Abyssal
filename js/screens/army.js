@@ -11,6 +11,7 @@ import { CHESTS, CHEST_ORDER } from '../core/descent.js';
 import { ROLES, COST, BUDGET, TEAM, MAX_LEVEL, ULTS, roleOf, canUlt, ultOf } from '../core/army.js';
 import { duelUnit } from '../core/duel.js';
 import { kitOf, synergiesFor, KEYWORDS, keywordOf } from '../core/skills.js';
+import { CREATURE_KITS, kitSteps, nextUnlock, moveIconUrl } from '../core/kits.js';
 import { openPack } from './opening.js';
 import { openChestScene } from './chest-open.js';
 import { upgradeCard } from './furnace.js';
@@ -23,23 +24,42 @@ export const armyBadges = (g, c) => {
 };
 export const armyCard = (g, c, opts = {}) => cardHTML(c, { variant: g.owns(c.id) ? g.shownVariant(c.id) : 'normal', ...opts, tag: armyBadges(g, c) });
 
+// Identité propre de la créature : ses 4 étapes (ouvertes ou verrouillées selon le niveau),
+// ses forces, ses faiblesses et ses alliés
+export function identityHTML(c, level) {
+  const k = CREATURE_KITS[c.id];
+  if (!k) return '';
+  const nx = nextUnlock(c.id, level);
+  return `<div class="panel ck-panel">
+    <div class="ck-h"><b>${icon('sparkle')} ${esc(k.style)}</b><span class="small muted">Son identité se révèle en montant de niveau</span></div>
+    <ol class="ck-steps">${kitSteps(c.id, level).map((x) => `<li class="ck-s ${x.open ? 'on' : 'locked'}">
+      <span class="ck-lv">${x.open ? icon('check') : icon('lock')}<small>Niv. ${x.lv}</small></span>
+      ${x.icon ? `<img class="ck-ic" alt="" src="${moveIconUrl(x.icon)}">` : ''}
+      <span class="ck-t"><b><span class="ck-k">${x.kind}</span> ${esc(x.name)}</b>${x.cost ? `<span class="cb-k">${x.cost}</span>` : ''}<span class="small">${esc(x.desc)}</span></span></li>`).join('')}</ol>
+    ${nx ? `<p class="small ck-next">${icon('p:level-up')} Prochain déblocage au niveau ${nx.lv} : <b>${esc(nx.kind === 'Éveil' ? 'l’Éveil' : nx.name)}</b></p>` : '<p class="small ck-next gold">Identité complète : tout est débloqué.</p>'}
+    <div class="ck-traits"><p class="small"><b class="dc-good">Forces</b> ${esc(k.plus)}</p><p class="small"><b class="dc-bad">Faiblesses</b> ${esc(k.moins)}</p><p class="small"><b>Alliés</b> ${esc(k.synergy)}</p></div>
+  </div>`;
+}
+
 // Bloc « Au combat » d'une carte : attaque, PV, capacité, pouvoir, niveau
 export function combatHTML(g, c) {
   const owned = g.owns(c.id), kit = kitOf(c), role = ROLES[roleOf(c)], syn = synergiesFor(roleOf(c));
+  const strike = CREATURE_KITS[c.id]?.strike || kit.basic;
   const li = g.cardLevelInfo(c.id), fm = owned ? g.formOf(c.id) : null, u = duelUnit(c, { level: li.level, form: fm }), nx = li.level < MAX_LEVEL ? duelUnit(c, { level: li.level + 1, form: fm }) : null;
   const ult = canUlt(c) ? ULTS[ultOf(c)] : null;
   return `<div class="army-combat">
     <p class="small muted">${esc(role.name)} · coût d’équipe ${COST[c.rarity]}</p>
     <div class="v2-big-stats"><span class="dv-atk">${icon('swords')}<b>${u.atk}</b><small>Attaque</small></span><span class="dv-hp">${icon('heart')}<b>${u.maxHp}</b><small>PV</small></span></div>
     <div class="panel v2-skill cb-kit">
-      <p class="small"><b>${actIcon('attack')} ${esc(kit.basic.name)}</b> <span class="cb-k">1 action</span><br>${esc(kit.basic.desc)} +1 Ferveur.</p>
+      <p class="small"><b>${actIcon('attack')} ${esc(strike.name)}</b> <span class="cb-k">1 action</span><br>${esc(strike.desc)} +1 Ferveur.</p>
       <p class="small"><b class="gold">${actIcon(kit.skill.key, kit.skill.icon)} ${esc(kit.skill.name)}</b> <span class="cb-k">${kit.skill.ap} action${kit.skill.ap > 1 ? 's' : ''} · ${kit.skill.fervor} Ferveur${kit.skill.dice ? ' · D20' : ''}</span><br>${esc(kit.skill.desc)}</p>
       <p class="small"><b>${roleIcon(kit.kw)} ${esc(kit.passive.name)}</b> <span class="cb-k">passif</span><br>${esc(kit.passive.desc)}</p>
       ${c.rarity === 'C' ? `<p class="small dc-good">${icon('star')} Instinct de meute : +1 dégât aux élites et aux gardiens.</p>` : ''}
     </div>
+    ${identityHTML(c, owned ? li.level : 1)}
     ${syn.length ? `<div class="panel v2-skill"><b>${icon('p:combo')} Combinaisons</b>${syn.map((x) => `<p class="small"><b>${esc(x.name)}</b> : ${esc(x.desc)}</p>`).join('')}</div>` : ''}
     ${ult ? `<div class="panel v2-skill ult" style="--uc:${ult.color}"><b>${icon('p:power')} Pouvoir : ${esc(ult.name)}</b><p class="small">${esc(ult.desc)}</p><p class="small muted">Dans l’équipe, la Mythique ou Secrète la plus rare remplace le Sceau du Gardien par son pouvoir.</p></div>` : ''}
-    ${owned ? `<div class="v2-lvl"><b>Niveau ${li.level} / ${MAX_LEVEL}</b><span class="xpbar"><i style="width:${(li.level / MAX_LEVEL) * 100}%"></i></span>${li.cost ? `<button class="btn small gold block fz-up" data-act="lvup">${icon('p:level-up')}Niveau ${li.level + 1} · ${li.cost} cendres${nx && (nx.atk > u.atk || nx.maxHp > u.maxHp) ? ` <small>(${nx.atk > u.atk ? `+${nx.atk - u.atk} ATQ ` : ''}${nx.maxHp > u.maxHp ? `+${nx.maxHp - u.maxHp} PV` : ''})</small>` : ''}</button><span class="small muted">Tu as ${g.s.ash} cendres. Brûle tes doublons dans la Fournaise pour en gagner.</span>` : '<span class="small muted">Niveau maximum</span>'}</div>` : ''}
+    ${owned ? `<div class="v2-lvl"><b>Niveau ${li.level} / ${MAX_LEVEL}</b><span class="xpbar"><i style="width:${(li.level / MAX_LEVEL) * 100}%"></i></span>${li.cost ? `<button class="btn small gold block fz-up" data-act="lvup">${icon('p:level-up')}Niveau ${li.level + 1} · ${li.cost} cendres${nx && (nx.atk > u.atk || nx.maxHp > u.maxHp) ? ` <small>(${nx.atk > u.atk ? `+${nx.atk - u.atk} ATQ ` : ''}${nx.maxHp > u.maxHp ? `+${nx.maxHp - u.maxHp} PV` : ''})</small>` : ''}${nextUnlock(c.id, li.level)?.lv === li.level + 1 ? ` <small class="ck-unl">+ ${esc(nextUnlock(c.id, li.level).name)}</small>` : ''}</button><span class="small muted">Tu as ${g.s.ash} cendres. Brûle tes doublons dans la Fournaise pour en gagner.</span>` : '<span class="small muted">Niveau maximum</span>'}</div>` : ''}
   </div>`;
 }
 

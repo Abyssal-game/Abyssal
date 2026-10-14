@@ -20,6 +20,7 @@ import { PACTS } from '../core/pacts.js';
 import { RELICS } from '../core/relics.js';
 import { ULTS } from '../core/army.js';
 import { mountDiorama, roomFor } from '../ui/diorama.js';
+import { moveIconUrl } from '../core/kits.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 // Décor selon la profondeur (salle du Gardien à part) et effets illustrés (fond noir fondu en mode « écran »)
@@ -148,9 +149,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const kit = KITS[u.role];
     const list = actionsFor(st, u.uid);
     return `<div class="cb-head"><b>${esc(cat.get(u.id).name)}</b><span>${esc(kit.name)} · ${u.acts}/2 actions</span><button class="cb-x" data-d="desel" aria-label="Annuler la sélection">${icon('close')}</button></div>
-      <div class="cb-grid">${list.map((a) => `<button class="cb-a ${a.ok ? '' : 'off'} ${mode?.key === a.key ? 'on' : ''} ${a.key === kit.skill.key ? 'sig' : ''}" data-a="${a.key}" aria-disabled="${!a.ok}">
-        <span class="cb-ai">${actIcon(a.key, a.icon)}</span><b>${esc(a.name)}</b>
-        <span class="cb-cost">${'<i class="pa"></i>'.repeat(a.ap) || '<i class="free">0</i>'}${a.fervor ? `<i class="fv">${a.fervor}</i>` : ''}${a.dice ? '<i class="d20">D20</i>' : ''}</span></button>`).join('')}</div>`;
+      <div class="cb-grid ${list.length > 4 ? 'n5' : ''}">${list.map((a) => `<button class="cb-a ${a.ok ? '' : 'off'} ${mode?.key === a.key ? 'on' : ''} ${a.key === kit.skill.key ? 'sig' : ''} ${a.own ? 'own' : ''}" data-a="${a.key}" aria-disabled="${!a.ok}">
+        <span class="cb-ai">${a.own ? `<img class="aicon" alt="" src="${moveIconUrl(a.icon)}">` : actIcon(a.key, a.icon)}</span><b>${esc(a.name)}</b>
+        <span class="cb-cost">${'<i class="pa"></i>'.repeat(a.ap) || '<i class="free">0</i>'}${a.fervor ? `<i class="fv">${a.fervor}</i>` : ''}${a.dice ? '<i class="d20">D20</i>' : ''}${a.own && a.wait ? `<i class="cdw" title="Se recharge">${a.wait}</i>` : ''}</span></button>`).join('')}</div>`;
   }
   function confirmHTML() {
     const { key, t } = confirm;
@@ -174,7 +175,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     let t = null, txt = '';
     const first = front(st, 'ally').find((u) => actionsFor(st, u.uid)[0].ok);
     if (mode?.key === 'attack') { t = el(actionTargets(st, sel, 'attack')[0]); txt = 'Touche un ennemi pour l’attaquer'; }
-    else if (sel && actionsFor(st, sel)[0].ok) { t = actsEl.querySelector('[data-a="attack"]'); txt = `Choisis « ${esc(KITS[st.units[sel].role].basic.name)} » : son attaque (1 action)`; }
+    else if (sel && actionsFor(st, sel)[0].ok) { t = actsEl.querySelector('[data-a="attack"]'); txt = `Choisis « ${esc(actionsFor(st, sel)[0].name)} » : son attaque (1 action)`; }
     else if (first) { t = el(first.uid); txt = `Touche une de tes créatures · ${st.ap} action${st.ap > 1 ? 's' : ''} restante${st.ap > 1 ? 's' : ''}`; }
     else { t = $('.dv-end'); txt = 'Plus d’actions : touche « Fin du tour »'; }
     if (t) { t.classList.add('guide'); say(`<b class="dc-good">${txt}</b>`); }
@@ -591,11 +592,14 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     draw();
     if (st.over) return finish();
   }
+  const seenMv = new Set();
   async function choose(key) {
     const a = actionsFor(st, sel).find((x) => x.key === key);
     if (!a) return;
     if (!a.ok) { app.sfx.error(); toast(esc(a.why), { icon: 'info' }); return; }
     app.sfx.tap();
+    // compétence propre : son effet est rappelé la première fois dans le combat
+    if (a.own && !seenMv.has(key)) { seenMv.add(key); toast(`<b>${esc(a.name)}</b> : ${esc(a.desc)}`, { icon: 'sparkle', ms: 4200 }); }
     const u = sel;
     if (a.target === 'none') { mode = null; return exec(() => act(st, u, key)); }
     const ts = actionTargets(st, u, key);
@@ -771,6 +775,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       <li><b>Brisure</b> (élites, gardiens) : vide, l’ennemi perd son action, subit +50 % de dégâts et +5 aux jets contre lui jusqu’à la fin de ton tour suivant.</li>
       <li><b>Faiblesses</b> : chaque faction en craint une autre (+50 % de dégâts) ; contre sa propre faction : -25 %. ★ sur une cible = faiblesse exploitée.</li>
       <li><b>Instinct de meute</b> : tes Communes font +${PACK_BONUS} dégât aux élites et aux gardiens.</li></ul>
+      <h3>L’identité des créatures</h3><p class="small">Certaines créatures ont leur propre identité, qui se révèle en montant de niveau : leur <b>frappe</b> (niveau 1) remplace l’attaque de leur rôle, puis viennent un <b>passif</b> (niveau 3), une <b>compétence propre</b> (niveau 6, la case dorée en plus de celle du rôle) et l’<b>Éveil</b> (niveau 9). Tout est détaillé sur la fiche de la carte.</p>
       <h3>Les rôles</h3>${Object.values(KITS).map((k) => `<p class="small">${roleIcon(k.kw)} <b>${esc(k.name)}</b> · <b>${esc(k.skill.name)}</b> (${k.skill.ap} act., ${k.skill.fervor} Ferveur) : ${esc(k.skill.desc)} <i>${esc(k.passive.name)} : ${esc(k.passive.desc)}</i></p>`).join('')}
       <h3>Les combinaisons</h3>${SYNERGIES.map((x) => `<p class="small"><b class="dv-syn-n">${esc(x.name)}</b> : ${esc(x.desc)}</p>`).join('')}
       <h3>Les ennemis</h3>${Object.values(AI_FAMILIES).map((f) => `<p class="small"><b>${esc(f.name)}</b> : ${esc(f.desc)} <span class="dc-good">${esc(f.counter)}</span></p>`).join('')}

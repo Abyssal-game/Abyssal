@@ -5,6 +5,7 @@ import { icon } from '../ui/icons.js';
 import { openSheet, confirmBox, esc, toast, fmt } from '../ui/dom.js';
 import { duelUnit } from '../core/duel.js';
 import { MAX_LEVEL } from '../core/army.js';
+import { unlockAt } from '../core/kits.js';
 
 const FIN_ORDER = ['normal', 'holo', 'gold', 'galaxy'];
 
@@ -16,6 +17,8 @@ export function upgradeCard(app, id) {
     const r = g.upgrade(id);
     app.sfx.discover?.();
     toast(`<b>${esc(c.name)}</b> passe au niveau <b>${r.level}</b> (−${fmt(r.cost)} cendres).`, { kind: 'success', icon: 'star' });
+    const un = unlockAt(id, r.level);
+    if (un) { toast(`${un.kind === 'Éveil' ? `<b>${esc(c.name)}</b> s’éveille !` : `${un.kind === 'Compétence' ? 'Nouvelle compétence' : 'Nouveau passif'} : <b>${esc(un.name)}</b>`}<br><span class="small">${esc(un.desc)}</span>`, { kind: 'success', icon: 'sparkle' }); app.sfx.fury?.(); }
     app.flushProgress();
     app.chrome?.();
     return true;
@@ -27,7 +30,8 @@ export function nextLevelGain(g, c) {
   const lv = g.cardLevel(c.id);
   if (lv >= MAX_LEVEL) return '';
   const fm = g.formOf(c.id), u = duelUnit(c, { level: lv, form: fm }), nx = duelUnit(c, { level: lv + 1, form: fm });
-  return [nx.atk > u.atk ? `+${nx.atk - u.atk} ATQ` : '', nx.maxHp > u.maxHp ? `+${nx.maxHp - u.maxHp} PV` : ''].filter(Boolean).join(' ');
+  const un = unlockAt(c.id, lv + 1);
+  return [nx.atk > u.atk ? `+${nx.atk - u.atk} ATQ` : '', nx.maxHp > u.maxHp ? `+${nx.maxHp - u.maxHp} PV` : '', un ? `+ ${un.kind === 'Éveil' ? 'Éveil' : un.name}` : ''].filter(Boolean).join(' ');
 }
 
 // Brûler une créature précise : une finition au choix, le dernier exemplaire compris

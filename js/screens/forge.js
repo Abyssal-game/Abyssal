@@ -6,6 +6,7 @@ import { icon } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, bindActions } from '../ui/dom.js';
 import { MAX_LEVEL } from '../core/army.js';
 import { upgradeCard, nextLevelGain, openBurn } from './furnace.js';
+import { nextUnlock } from '../core/kits.js';
 
 const RI = (r) => RARITY_ORDER.indexOf(r);
 const ashLine = (g) => `<span class="fg-ash">${icon('ash')}<b>${fmt(g.s.ash)}</b> cendres</span>`;
@@ -27,7 +28,7 @@ export function forgeScreen(app, root) {
         return `<div class="panel fg-row ${team.includes(c.id) ? 'in-team' : ''}">
           <button class="fg-open" data-act="open" data-id="${c.id}" aria-label="Voir ${esc(c.name)}">${mini(c)}</button>
           <span class="fg-mid"><b>${esc(c.name)}</b><span class="small" style="color:${RARITY[c.rarity].color}">${RARITY[c.rarity].name}${ui.all && team.includes(c.id) ? ' · <span class="muted">équipe</span>' : ''}</span>
-            <span class="fg-lv"><span class="xpbar"><i style="width:${(li.level / MAX_LEVEL) * 100}%"></i></span><span class="small">Niv. ${li.level}/${MAX_LEVEL}</span></span></span>
+            <span class="fg-lv"><span class="xpbar"><i style="width:${(li.level / MAX_LEVEL) * 100}%"></i></span><span class="small">Niv. ${li.level}/${MAX_LEVEL}</span></span>${(() => { const nu = nextUnlock(c.id, li.level); return nu ? `<span class="small ck-fg">${icon('sparkle')} Niv. ${nu.lv} : ${esc(nu.kind === 'Éveil' ? 'Éveil' : nu.name)}</span>` : ''; })()}</span>
           ${li.cost ? `<button class="btn small ${ok ? 'gold' : 'ghost'} fg-up" data-act="up" data-id="${c.id}">${icon('p:level-up')}<span><b>Niv. ${li.level + 1}</b><small>${icon('ash')}${fmt(li.cost)}${gain ? ` · ${gain}` : ''}</small></span></button>` : '<span class="fg-max">Max</span>'}
         </div>`;
       }).join('')}</div>` : '<p class="panel small muted center">Ton équipe est vide : compose-la dans l’onglet Équipe.</p>'}

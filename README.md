@@ -68,6 +68,14 @@ Les cartes sont dans `data/cards/<faction>.json`. Ces fichiers **font foi**.
 
 Le champ `art` décrit l’illustration provisoire : `form` (`hum`, `beast`, `dragon`, `serpent`, `tentacle`, `wheel`, `golem`, `spectre`, `skeleton`, `bird`, `fish`, `insect`, `tree`, `orb`, `swarm`, `blob`, `object`) et ses paramètres (tête, cornes, ailes, queue, décor…). Voir `js/art/creatures.js`.
 
+## Donner une identité propre à une créature
+
+Chaque créature garde le kit de son rôle (`js/core/skills.js`). Celles listées dans `CREATURE_KITS` (`js/core/kits.js`, 12 pour l’instant) y ajoutent leur identité, débloquée par niveau : **frappe** (niv. 1), **passif** (niv. 3), **compétence propre** (niv. 6, sans Ferveur, avec un temps de recharge) et **Éveil** (niv. 9). Aucune donnée de sauvegarde en plus : seul le niveau déjà stocké compte.
+
+1. Ajouter une entrée à `CREATURE_KITS` : `style`, `stat` (répartition attaque / PV, produit proche de 1), `strike` (effets reconnus : `mult`, `hits`, `brk`, `brkCharging`, `pierce`, `poisonMore`, `splashPoison`, `healLowest`, `lowBonus`, `lifeShare`), `passive`, `move`, `plus`, `moins`, `synergy`.
+2. Un nouveau passif : une entrée dans `PASSIVES` et son effet dans `duel.js` (chercher `passiveOf(`). Une nouvelle compétence : une entrée dans `MOVES` avec `run` (effet), `ai` (quand l’IA la joue), `cd` (recharge) et l’icône peinte `assets/salles/pw/<icon>.webp`.
+3. `npm test` vérifie qu’aucun passif ni aucune compétence n’est affiché sans effet. `node tools/balance.mjs` compare des équipes ; `depth()` mesure la profondeur moyenne atteinte en Descente.
+
 ## Remplacer les illustrations
 
 1. Produire l’image (format vertical 5:7, idéalement 600 × 840 px, en WebP). Les prompts de toutes les cartes s’exportent avec `npm run prompts` (fichier `prompts.csv`) ; chaque fiche de carte les affiche aussi (« Fiche d’illustration »).
