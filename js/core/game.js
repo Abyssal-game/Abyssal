@@ -524,6 +524,7 @@ export class Game {
     this.s.chests[type]--;
     const packs = CHESTS[type].packs.slice();
     packs.forEach((k) => { this.s.tickets[k] = (this.s.tickets[k] || 0) + 1; });
+    if (CHESTS[type].shards) this.s.shards += CHESTS[type].shards; // éclats en plus des boosters (fer et au-dessus)
     this.s.stats.chests = (this.s.stats.chests || 0) + 1;
     this.track('chest', 1);
     this.checkProgress();

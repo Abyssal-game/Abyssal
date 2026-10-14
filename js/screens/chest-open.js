@@ -65,8 +65,15 @@ export function openChestScene(app, type, { onDone } = {}) {
       app.sfx.swipe(); if (k === 'premium') setTimeout(() => app.sfx.discover(), 200);
       await wait(520);
     }
+    if (def.shards) { // les éclats jaillissent après les boosters
+      const p = document.createElement('div');
+      p.className = 'chx-pack chx-shards'; p.style.setProperty('--i', packs.length); p.style.setProperty('--n', packs.length + 1);
+      p.innerHTML = `<span class="chx-sh-ic">${icon('crystal')}</span><b>+${def.shards}</b><span class="chx-pname">éclats</span>`;
+      row.appendChild(p); app.sfx.coin(); app.chrome?.();
+      await wait(520);
+    }
     const n = packs.length, prem = packs.filter((k) => k === 'premium').length;
-    msg.innerHTML = `<b class="chx-count">${n} booster${n > 1 ? 's' : ''}${prem ? ` dont ${prem === n ? (n > 1 ? 'tous premium' : 'premium') : `${prem} premium`}` : ''} !</b>`;
+    msg.innerHTML = `<b class="chx-count">${n} booster${n > 1 ? 's' : ''}${prem ? ` dont ${prem === n ? (n > 1 ? 'tous premium' : 'premium') : `${prem} premium`}` : ''}${def.shards ? ` et ${def.shards} éclats` : ''} !</b>`;
     acts.innerHTML = `<button class="btn primary block big-cta dc-plq dc-plq-red" data-x="go">${icon('p:booster')}Ouvrir ${n > 1 ? 'les boosters' : 'le booster'}</button><button class="btn block dc-plq dc-plq-dark" data-x="later">Plus tard (dans Boosters)</button>`;
     acts.hidden = false;
     busy = false;

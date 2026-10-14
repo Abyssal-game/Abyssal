@@ -1881,3 +1881,8 @@ body.battle-mode.has-subnav #view, body.battle-mode #view { padding: calc(var(--
 .dt-fame-tx { display: grid; gap: 3px; min-width: 0; flex: 1; }
 .dt-fame.fm2 { border-color: rgba(200, 210, 230, .5); }
 .dt-fame.fm3 { border-color: rgba(242, 193, 78, .7); box-shadow: 0 0 18px rgba(242, 193, 78, .18); }
+/* éclats d'un coffre (v219) */
+.chx-pack.chx-shards { width: min(26vw, 14vh, 104px); justify-content: center; align-self: center; }
+.chx-shards .chx-sh-ic { width: 64%; aspect-ratio: 1; display: grid; place-items: center; filter: drop-shadow(0 0 14px rgba(120, 200, 255, .55)); }
+.chx-shards .chx-sh-ic img, .chx-shards .chx-sh-ic svg { width: 100%; height: 100%; }
+.chx-shards b { font: 800 1.3rem/1 var(--f-display); color: #CFE8FF; }
