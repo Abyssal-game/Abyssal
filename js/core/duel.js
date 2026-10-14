@@ -27,6 +27,8 @@ const FAM_BY_ROLE = { protecteur: 'protecteur', soin: 'soutien', poison: 'parasi
 // Gabarit par rôle à la rareté Commune, niveau 1 : [attaque, PV]
 const BASE = { protecteur: [2, 12], degats: [4, 7], soin: [2, 8], poison: [2, 8], controle: [2, 8], soutien: [2, 9], zone: [2, 7] };
 const RARITY_MULT = { C: 1, PC: 1.15, R: 1.3, HR: 1.45, M: 1.6, S: 1.75 };
+// Bonus au jet de l'Entrave glaciale (rôle contrôle) selon la rareté
+export const FROST_MASTERY = { R: 1, HR: 2, M: 3, S: 4 };
 const SINGLE = ['hit', 'heavy', 'poison', 'frost', 'gorge'];
 // Intentions spéciales des gardiens (comptent comme « actions spéciales » pour le Pacte du Reflet)
 const SPECIAL = ['heavy', 'blast', 'shield', 'heal', 'rally', 'hunt', 'charge', 'channel', 'gorge', 'gather', 'blizzard', 'mimic', 'copy', 'decree', 'shift'];
@@ -347,8 +349,8 @@ function addPoison(st, t, n, ev, src) {
   t.poison = Math.min(14, (t.poison || 0) + k);
   ev.push({ t: 'status', u: t.uid, s: combo ? `Givre-venin : +${k}` : `Poison +${k}`, syn: combo, k: 'poison' });
 }
-function freeze(st, t, ev) {
-  t.frozen = 1;
+function freeze(st, t, ev, turns = 1) {
+  t.frozen = turns;
   if (t.boss || t.elite) t.frostCD = 2;
   ev.push({ t: 'status', u: t.uid, s: 'Gelé', k: 'frost' });
   interruptBoss(st, t);
@@ -472,7 +474,9 @@ export function rollInfo(st, uid, key, tUid) {
     if (t.frozen) mods.push(['Cible gelée', 3]);
     if (has(st, 'venin')) mods.push(['Fiole noire', 3]);
   } else if (key === 'entrave') {
-    dc = 10 + (t.boss ? 6 : t.elite ? 3 : 0);
+    // v235 : gel plus fiable (8 au lieu de 10) et maîtrise du givre selon la rareté de la créature
+    dc = 8 + (t.boss ? 6 : t.elite ? 3 : 0);
+    if (FROST_MASTERY[u.rarity]) mods.push(['Maîtrise du givre', FROST_MASTERY[u.rarity]]);
     if (t.frostCD > 0) immune = 'Elle vient d’être gelée : immunisée au gel ce tour-ci.';
   } else return null;
   if (t.mark) mods.push(['Marquée', 3]);
@@ -561,7 +565,8 @@ export function act(st, uid, key, tUid = null) {
   } else if (key === 'entrave') {
     const info = rollInfo(st, uid, key, tUid);
     const tier = resolveRoll(st, info, ev, uid, tUid);
-    if (tier === 'crit' || tier === 'success') { freeze(st, t, ev); if (tier === 'crit') breakHit(st, t, 3, ev, u); }
+    // critique d'une Mythique ou Secrète sur un ennemi ordinaire : gelé 2 tours
+    if (tier === 'crit' || tier === 'success') { freeze(st, t, ev, tier === 'crit' && (u.rarity === 'M' || u.rarity === 'S') && !t.boss && !t.elite ? 2 : 1); if (tier === 'crit') breakHit(st, t, 3, ev, u); }
     else if (tier === 'partial') { t.slow = true; ev.push({ t: 'status', u: tUid, s: 'Ralentie', k: 'frost' }); }
   } else if (moveFor(u, key)) { u.mvReady = st.round + rechargeOf(u, key); u.struck = true; u.lastStruck = st.round; moveFor(u, key).run(st, u, t, ev, API); }
   if (['attack', 'estoc', 'raz'].includes(key) || moveFor(u, key)?.pv) st.ombreUsed = true;
@@ -847,7 +852,7 @@ export function nextEnemy(st) {
   return null;
 }
 function skipUnit(st, e) {
-  if (e.frozen) { e.frozen = 0; st.skipEv.push({ t: 'status', u: e.uid, s: 'Gelé : passe son tour', k: 'frost' }); }
+  if (e.frozen) { e.frozen -= 1; st.skipEv.push({ t: 'status', u: e.uid, s: e.frozen ? 'Gelé : passe son tour (encore 1)' : 'Gelé : passe son tour', k: 'frost' }); }
   else if (e.brokenSkip) { e.brokenSkip = false; st.skipEv.push({ t: 'status', u: e.uid, s: 'Brisé : passe son tour', k: 'broken' }); }
   e.intent = null;
 }

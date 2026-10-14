@@ -42,7 +42,7 @@ export const KITS = {
   controle: {
     kw: 'gel', name: 'Gel', icon: 'eye',
     basic: { name: 'Morsure du froid', desc: 'Dégâts normaux, +2 Brisure sur une cible gelée.' },
-    skill: { key: 'entrave', name: 'Entrave glaciale', icon: 'eye', ap: 1, fervor: 2, target: 'enemy', dice: { dc: 10 }, desc: 'Jet de D20. Réussite : la cible est gelée et perd sa prochaine action (sa charge est annulée). Critique : gelée et +3 Brisure. Partielle : ralentie, sa prochaine attaque fait moitié moins mal.' },
+    skill: { key: 'entrave', name: 'Entrave glaciale', icon: 'eye', ap: 1, fervor: 2, target: 'enemy', dice: { dc: 10 }, desc: 'Jet de D20 (8 ou plus ; bonus selon la rareté : Rare +1, Hyper rare +2, Mythique +3, Secrète +4). Réussite : la cible est gelée et perd sa prochaine action (sa charge est annulée). Critique : gelée et +3 Brisure ; une Mythique ou Secrète la gèle 2 tours (sauf élites et gardiens). Partielle : ralentie, sa prochaine attaque fait moitié moins mal.' },
     passive: { name: 'Bris de glace', desc: 'Tes coups sur une cible gelée font +2 Brisure.' },
   },
   soutien: {
