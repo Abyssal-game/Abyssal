@@ -320,11 +320,20 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
 
   // ——— Lecture des événements (animations) ———
   let lastTier = null; // résultat du dernier jet de dé : le coup qui suit le montre
+  let pendingCU = null; // gros plan d'une compétence à dé, joué après le dé
+  const DICE_KEYS = ['estoc', 'contagion', 'entrave'];
   async function play(ev) {
     for (const e of ev) {
       if (!alive_) return;
       switch (e.t) {
         case 'act':
+          // gros plan : une compétence sur un ennemi (sauf la Marque). Avec un jet de dé, il vient après le dé.
+          if (e.skill && e.key !== 'marque' && e.tgt && st.units[e.tgt]?.side === 'enemy') {
+            const own = moveFor(st.units[e.u], e.key);
+            app.sfx.skill();
+            if (DICE_KEYS.includes(e.key)) { pendingCU = { u: e.u, tgt: e.tgt, name: e.name, own }; break; }
+            if (await closeup(e.u, e.tgt, e.name, { own })) break;
+          }
           if (e.skill) {
             const own = moveFor(st.units[e.u], e.key);
             app.sfx.skill();
@@ -336,6 +345,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           break;
         case 'eact': {
           const def = INTENTS[e.kind];
+          // gros plan sur les coups lourds ennemis contre une seule cible
+          if (e.kind === 'heavy' && e.tgt && st.units[e.tgt]?.side === 'ally' && await closeup(e.a, e.tgt, def.name)) break;
           if (e.kind === 'heavy' || e.kind === 'blast') banner(`${intentIcon(e.kind)} ${esc(def.name)} !`, 'danger', 700);
           if (e.tgt && st.units[e.tgt]?.side === 'ally') { lunge(e.a, e.tgt); cam(e.tgt, 0.6); await wait(T(LUNGE_HIT)); }
           else await wait(T(200));
@@ -380,7 +391,12 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           break;
         }
         case 'recover': float(e.u, 'Se relève', 'info'); await wait(T(260)); break;
-        case 'roll': await rollFx(e); lastTier = e.tier; break;
+        case 'roll': {
+          await rollFx(e); lastTier = e.tier;
+          const P = pendingCU; pendingCU = null;
+          if (P && !(await closeup(P.u, P.tgt, P.name, { crit: e.tier === 'crit', own: P.own })) && e.tier !== 'fumble') { lunge(P.u, P.tgt); cam(P.tgt, 0.6); await wait(T(LUNGE_HIT)); }
+          break;
+        }
         case 'boss': { if (e.s === 'Effondrement !') fxAt(null, 'collapse', { center: true }); app.sfx.boss(); dio.roar(); const t = el(e.u); if (t) { t.classList.remove('roar'); void t.offsetWidth; t.classList.add('roar'); } float(e.u, e.s, 'boss'); shake(true); await wait(T(650)); break; }
         case 'phase2': {
           app.sfx.boss(); dio.fury(); dio.roar(); draw(); banner(`${icon('skull')} ${esc(e.s)}`, 'danger', 1200); shake(true); await wait(T(900));
@@ -439,6 +455,29 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     draw();
   }
   const LUNGE_HIT = 190; // instant du contact dans l'élan (ms), synchronisé avec dvLunge
+  // ——— Gros plan (v236) : compétences et coups critiques. Bandes de cinéma, les deux cartes au centre,
+  // l'attaquant s'élance, impact. Accéléré avec la vitesse ×2/×3, absent si les animations sont réduites.
+  async function closeup(aUid, tUid, label, { crit = false, own = null } = {}) {
+    const a = el(aUid), t = el(tUid), box = $('.dv');
+    if (!a || !t || !box || reduced || ui.fast === 3) return false;
+    const enemyAtk = st.units[aUid]?.side === 'enemy';
+    const ov = document.createElement('div');
+    ov.className = `cu ${enemyAtk ? 'foe' : ''} ${crit ? 'crit' : ''}`;
+    ov.style.setProperty('--cu', `${T(1000)}ms`);
+    const cw = Math.min(150, Math.max(a.getBoundingClientRect().width, t.getBoundingClientRect().width));
+    const clone = (n, cls) => { const c = n.cloneNode(true); c.className = `${n.className} cu-card ${cls}`; c.style.width = `${cw}px`; c.removeAttribute('data-uid'); c.querySelectorAll('[data-uid]').forEach((x) => x.removeAttribute('data-uid')); return c; };
+    ov.innerHTML = `<span class="cu-bar top"></span><span class="cu-bar bot"></span><span class="cu-flash"></span>
+      <div class="cu-stage"></div><p class="cu-lbl">${own ? `<img class="aicon" alt="" src="${moveIconUrl(own.icon)}">` : ''}<b>${esc(label)}</b>${crit ? '<small>Critique !</small>' : ''}</p>`;
+    const stage = ov.querySelector('.cu-stage');
+    stage.append(clone(a, 'cu-a'), clone(t, 'cu-t'));
+    const fx = document.createElement('img'); fx.className = 'cu-fx'; fx.alt = ''; fx.src = `assets/fx/${crit ? 'crit' : 'impact'}.webp`; stage.appendChild(fx);
+    box.appendChild(ov);
+    await wait(T(470)); // l'élan atteint la cible
+    (crit ? app.sfx.crit : app.sfx.smash)(); if (crit) shake(true);
+    await wait(T(530));
+    ov.classList.add('out'); setTimeout(() => ov.remove(), T(220));
+    return true;
+  }
   function lunge(aUid, tUid) {
     const a = el(aUid), t = el(tUid);
     if (!a || !t || reduced) return;
