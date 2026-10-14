@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v231'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v232'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -139,7 +139,7 @@ export const MISSIONS = [
   { key: 'offering', kind: 'daily',    n: 1, shards: 20, text: 'Récupère l’offrande du jour' },
   { key: 'chest2',   kind: 'chest',    n: 2, shards: 30, text: 'Ouvre 2 coffres' },
 ];
-export const MISSION_BONUS = { shards: 60 }; // les 3 missions du jour accomplies
+// (le bonus des 3 missions du jour a été retiré en v232)
 
 
 // Tirage des Ombres : un booster gratuit par jour tiré par le serveur (cartes non gagnées),

@@ -18,7 +18,7 @@ test('missions du jour : trois types différents, stables dans la journée, reno
   assert.equal(g2.missions().day, '2026-10-11');
 });
 
-test('missions : progression, récompense et bonus', () => {
+test('missions : progression et récompense', () => {
   const g = newGame();
   const m = g.missions();
   m.list = [
@@ -38,10 +38,7 @@ test('missions : progression, récompense et bonus', () => {
   const lvlShards = Array.from({ length: g.s.level - lvl0 }, (_, i) => XP.levelReward(lvl0 + i + 1).shards).reduce((a, b) => a + b, 0);
   assert.equal(g.s.shards, before + 130 + lvlShards);
   assert.throws(() => g.claimMission(0));
-  const sh = g.s.shards;
-  g.claimMission('bonus');
-  assert.equal(g.s.shards, sh + 60);
-  assert.throws(() => g.claimMission('bonus'));
+  assert.throws(() => g.claimMission('bonus'), 'plus de bonus des 3 missions');
 });
 
 test('chance : statistiques et plus belles ouvertures', () => {

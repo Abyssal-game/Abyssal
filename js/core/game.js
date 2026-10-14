@@ -10,7 +10,7 @@ export const CHALLENGES = [
 export const WEEK_DAYS = 5; // jours joués dans la semaine pour le coffre de la semaine
 export const FIRST_WIN = 50;
 export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par combat n'augmentent plus // éclats de la toute première victoire
-import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, LUCK_POINTS, ITEMS, SHOW_ORDER, SHADOW } from '../config.js';
+import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ITEMS, SHOW_ORDER, SHADOW } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
 import { rngOf, DESCENT, CHESTS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES } from './descent.js';
@@ -307,17 +307,10 @@ export class Game {
   }
   missionsToClaim() {
     const m = this.missions();
-    return m.list.filter((x) => x.p >= x.n && !x.claimed).length + (!m.bonus && m.list.every((x) => x.claimed) ? 1 : 0);
+    return m.list.filter((x) => x.p >= x.n && !x.claimed).length;
   }
   claimMission(i) {
     const m = this.missions();
-    if (i === 'bonus') {
-      if (m.bonus || !m.list.every((x) => x.claimed)) throw new Error('Termine d’abord les trois missions.');
-      m.bonus = true;
-      this.grant(MISSION_BONUS);
-      this.persist();
-      return MISSION_BONUS;
-    }
     const x = m.list[i];
     if (!x || x.claimed || x.p < x.n) throw new Error('Mission pas encore accomplie.');
     x.claimed = true;
