@@ -36,7 +36,13 @@ export function forgeScreen(app, root) {
   }
   bindActions(root, {
     show(el) { ui.all = el.dataset.v === 'all'; app.sfx.tap(); draw(); },
-    up(el) { const y = window.scrollY; if (upgradeCard(app, el.dataset.id)) { draw(); window.scrollTo(0, y); } },
+    up(el) {
+      const y = window.scrollY, id = el.dataset.id;
+      if (!upgradeCard(app, id)) return;
+      draw(); window.scrollTo(0, y);
+      const row = root.querySelector(`.fg-up[data-id="${id}"], .fg-open[data-id="${id}"]`)?.closest('.fg-row');
+      if (row && !app.reduced()) { row.classList.add('fg-lvl'); setTimeout(() => row.classList.remove('fg-lvl'), 1100); }
+    },
     open(el) { app.openCard(el.dataset.id); },
   });
   app.refreshView = draw;
@@ -66,11 +72,12 @@ export function furnaceScreen(app, root) {
           ${grid(spares, (c) => `<small>×${g.spare(c.id)} · ${icon('ash')}${fmt(g.spareAsh([c.id]).ash)}</small>`)}`
           : '<p class="small muted">Aucun doublon pour l’instant. Ceux que tu tires dans les boosters arrivent ici.</p>'}
       </section>
-      <section class="panel"><h2 class="section-title">Brûler une autre carte</h2>
+      <details class="panel dc-fold fg-adv" ${ui.q || ui.adv ? 'open' : ''}><summary>${icon('p:furnace')} Avancé : brûler une autre carte</summary><div>
         <p class="small muted">Même ta dernière copie : la créature quitte alors ta collection (on te demande toujours de confirmer).</p>
         <label class="search fg-search">${icon('search')}<input class="input plain" type="search" placeholder="Rechercher une créature…" value="${esc(ui.q || '')}" data-q></label>
         ${owned.length ? grid(owned, (c) => `<small>${icon('ash')}${fmt(g.burnValue(c.id, 'normal'))}</small>`) : '<p class="small muted">Aucune créature trouvée.</p>'}
-      </section>`;
+      </div></details>`;
+    root.querySelector('.fg-adv')?.addEventListener('toggle', (e) => { ui.adv = e.target.open; });
     const inp = root.querySelector('[data-q]');
     inp?.addEventListener('input', () => { ui.q = inp.value; clearTimeout(draw.t); draw.t = setTimeout(() => { const pos = inp.selectionStart; draw(); const n = root.querySelector('[data-q]'); n.focus(); n.setSelectionRange(pos, pos); }, 250); });
   }

@@ -65,6 +65,7 @@ export default function descent(app, root) {
       <details class="panel dc-fold dc-how"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/help.webp"><span class="dc-sum-t">Comment ça marche</span></summary>
         <ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol>
         <p class="small muted center">${DESCENT.torches} expéditions avec coffre par jour, puis tu peux rejouer sans coffre.</p></details>`;
+    if (last?.record && !last.cheered) { last.cheered = true; setTimeout(() => app.sfx.achievement?.(), 250); root.querySelector('.dc-sum2')?.classList.add('cheer'); } // record battu : on fête
     root.querySelector('#lb').addEventListener('toggle', (e) => { if (e.target.open) loadBoard(); }, { once: true });
   }
 
@@ -89,6 +90,7 @@ export default function descent(app, root) {
       ${crestHTML(!s.wiped, s.floor, 'Étage', 'dc-sum2-crest')}
       <h2>${s.abandoned ? 'Expédition abandonnée' : s.wiped ? 'L’équipe est tombée' : 'Retour à la surface'}</h2>
       <p class="dc-sum2-sub">${s.wiped ? (s.cursed ? 'Descente maudite : le butin est perdu.' : 'Tu gardes la moitié des éclats et un coffre plus modeste.') : 'Tu remontes avec tout ton butin.'}</p>
+      ${s.record ? `<p class="vx-week dc-record">${icon('crown')} <b>Nouveau record !</b> Jamais tu n’étais descendu aussi bas : étage ${s.floor}.</p>` : ''}
       ${s.nightmareRecord ? `<p class="vx-week">${icon('skull')} Nouveau record en mode Cauchemar : étage ${s.floor} !</p>` : ''}
       ${s.report?.length ? `<div class="dc-why"><b>${icon('info')} Ce qui s’est passé</b>${s.report.map((l) => `<p class="small">${esc(l)}</p>`).join('')}</div>` : ''}
       <div class="dc-sum2-loot">${s.chests.map((c) => `<span class="dc-sum2-chest" style="--cc:${CHESTS[c].color}">${chestSVG(c)}<b>${esc(CHESTS[c].name)}</b></span>`).join('')}${s.shards ? `<span class="dc-sum2-shards">${icon('crystal')}<b>+${fmt(s.shards)}</b><small>éclats</small></span>` : ''}${!s.chests.length && !s.shards ? '<span class="dc-sum2-sub">Aucun butin cette fois.</span>' : ''}</div>
@@ -147,6 +149,7 @@ export default function descent(app, root) {
     root.innerHTML = `<section class="vx ${w?.room || ''}">
       <div class="vx-hero">${crestHTML(true, run.floor, 'Étage', 'vx-crest')}<h1>Victoire</h1><span class="vx-k">${w?.room === 'boss' ? 'Gardien vaincu' : w?.room === 'elite' ? 'Élite vaincue' : `Étage ${run.floor} franchi`}</span>
         ${w ? `<div class="vx-loot"><span class="vx-chip">${icon('crystal')}+${fmt(w.shards)}</span>${w.chest ? `<span class="vx-chip gold" style="--cc:${CHESTS[w.chest].color}">${icon('p:chest')}${esc(CHESTS[w.chest].name)}</span>` : ''}${feats.length ? `<span class="vx-chip feat">${icon('p:feats')}${feats.join(' · ')}</span>` : ''}</div>` : ''}
+        ${w?.firstWin ? `<p class="vx-week vx-first">${icon('star')} <b>Ta toute première victoire !</b> L’Abysse t’offre <b>+${fmt(w.firstWin)} éclats</b>.</p>` : ''}
         ${w?.recruit ? `<p class="vx-week">${icon('crown')} Le gardien vaincu, <b>${esc(cat.get(w.recruit).name)}</b>, rejoint ta collection !</p>` : ''}
         ${w?.weekly ? `<p class="vx-week">${icon('sparkle')} <b>${esc(cat.get(w.weekly).name)}</b> rejoint ta collection !</p>` : ''}
         ${w?.boss ? bossRecap(w.boss) : ''}
@@ -182,7 +185,7 @@ export default function descent(app, root) {
       else {
         app.sfx.reveal(out.room === 'boss' ? 'M' : 'R');
         const r = g.descent().run;
-        ui.win = { goal: out.goal || null, goalShards: out.goalShards || 0, floor: r.floor, room: out.room, shards: out.shards, chest: out.chest || null, disc: out.discovered.filter((id) => cat.get(id)), weekly: out.weekly?.id || null, recruit: out.recruit?.id || null, stats, boss: out.boss || null, relNew: out.relNew || [], report: out.report || [] };
+        ui.win = { goal: out.goal || null, goalShards: out.goalShards || 0, floor: r.floor, room: out.room, shards: out.shards, chest: out.chest || null, disc: out.discovered.filter((id) => cat.get(id)), weekly: out.weekly?.id || null, recruit: out.recruit?.id || null, stats, boss: out.boss || null, relNew: out.relNew || [], report: out.report || [], firstWin: out.firstWin || 0 };
         rewardView(r);
         if (r.talentOffer?.length) tuto(app, 'cb-talent');
       }

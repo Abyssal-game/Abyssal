@@ -2,6 +2,7 @@
 // et est enregistrée immédiatement : une carte affichée est une carte sauvegardée.
 import { suggestTeam, teamSynergies } from './synergy.js';
 import { fameTier, FAME_TIERS, SEASON_STEPS, seasonId } from './renown.js';
+export const FIRST_WIN = 150; // éclats de la toute première victoire
 import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, LUCK_POINTS, ITEMS, SHOW_ORDER, SHADOW } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
@@ -575,7 +576,7 @@ export class Game {
       v: 3, day: d.day, floor: 1, cleared: 0, phase: 'doors', cursed: cursed && !free, free, nightmare: !!nightmare, blessings: [], altar: null,
       gauge: this.rule(d.day).key === 'lune' ? FERVOR_MAX - 2 : FERVOR_START, ult: { key: ult.key, power: ult.power, card: ult.card },
       team: team.map((id) => { const u = duelUnit(this.catalog.get(id), { level: this.cardLevel(id), form: this.formOf(id) }); return { id, hp: u.maxHp, maxHp: u.maxHp, fallen: false, form: this.formOf(id) }; }),
-      shards: 0, chests: [], kills: {},
+      shards: 0, chests: [], kills: {}, bestBefore: d.best || 0,
     };
     this.persist();
     return d.run;
@@ -945,6 +946,8 @@ export class Game {
         const c = room === 'boss' ? chestForDepth(run.floor) : 'bois';
         run.chests.push(c); out.chest = c;
       }
+      // toute première victoire : un vrai cadeau (une seule fois)
+      if (!this.s.stats.firstWin) { this.s.stats.firstWin = Date.now(); this.s.shards += FIRST_WIN; out.firstWin = FIRST_WIN; }
       out.fame = this.gainFame(run.team.filter((m) => !m.fallen).map((m) => m.id), room === 'boss' || room === 'elite' ? 2 : 1);
       run.phase = 'reward';
       run.rewards = floorRewards(run.day, run.floor, room, run.blessings);
@@ -1060,6 +1063,7 @@ export class Game {
     chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });
     this.s.shards += shards;
     const summary = { wiped, floor: run.cleared, day: run.day, chests, shards, kills: run.kills, free: run.free, cursed: run.cursed, nightmare: !!run.nightmare };
+    if (!run.free && run.cleared > 0 && run.bestBefore !== undefined && run.cleared > run.bestBefore) summary.record = true;
     if (run.nightmare && run.cleared > (d.bestNightmare || 0)) { d.bestNightmare = run.cleared; summary.nightmareRecord = true; }
     this.emit('descentEnd', summary);
     d.last = summary;
@@ -1173,6 +1177,7 @@ export class Game {
 
   setTitle(t) { if (this.s.titles.includes(t)) { this.s.title = t; this.persist(); } }
   setFrame(f) { if (this.s.frames.includes(f)) { this.s.frame = f; this.persist(); } }
+  setName(n) { this.s.name = String(n || '').replace(/[<>]/g, '').trim().slice(0, 16); this.persist(); }
   setAvatar(id) { if (this.owns(id)) { this.s.avatar = id; this.persist(); } }
   toggleShowcase(id) {
     if (!this.owns(id)) return;

@@ -1318,3 +1318,25 @@ html.reduce-motion .tb-u, html.reduce-motion .tb-u::after { animation: none !imp
 @media (prefers-reduced-motion: reduce) { .hw-welcome { animation: none; } }
 .chips.pf-titles { flex-wrap: wrap; overflow: visible; }
 .chips.pf-titles { gap: 6px; } .chips.pf-titles .chip { padding: 5px 10px; font-size: .78rem; min-height: 32px; }
+.sh-banner.off { display: none; } /* Tirage des Ombres : bannière masquée tant qu’on n’est pas connecté (v223) */
+.tr-lock { display: grid; justify-items: center; gap: 8px; text-align: center; padding: 18px 16px; }
+.tr-lock > .ic { width: 34px; height: 34px; color: var(--gold); }
+/* Accueil : logo plus discret (v223) */
+.home-brand { padding: 4px 0 8px !important; }
+.hb-title img { width: min(62vw, 280px) !important; }
+/* Sanctuaire : la dernière tuile seule prend toute la largeur (v223) */
+.mn-grid > .mn-tile:last-child:nth-child(odd) { grid-column: 1 / -1; display: grid !important; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 14px; row-gap: 2px; align-items: center; justify-items: start; text-align: left; min-height: 0 !important; padding: 14px 18px; }
+.mn-grid > .mn-tile:last-child:nth-child(odd) .mn-tile-ic { grid-row: 1 / 3; margin: 0; }
+.mn-grid > .mn-tile:last-child:nth-child(odd) .mn-tile-ic .picon { width: 54px; height: 54px; }
+/* Profil : avatar et nom modifiables (v223) */
+button.avatar-big { position: relative; padding: 0; cursor: pointer; font: inherit; color: inherit; }
+.av-edit { position: absolute; right: 2px; bottom: 2px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--gold); color: #1a1205; box-shadow: 0 2px 6px rgba(0,0,0,.6); }
+.av-edit .ic { width: 15px; height: 15px; }
+.ph-name { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.ph-name .ic { width: 16px; height: 16px; vertical-align: -2px; }
+.ph-title { margin: 2px 0 4px; font: 600 .82rem/1.2 var(--f-display); color: var(--gold); letter-spacing: .04em; }
+.av-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 8px; margin-top: 10px; }
+.av-pick { display: grid; gap: 4px; padding: 4px; border-radius: 12px; background: rgba(255,255,255,.04); border: 1px solid color-mix(in srgb, var(--rc) 50%, transparent); color: var(--ink); font: inherit; }
+.av-pick img { width: 100%; aspect-ratio: 5 / 7; object-fit: cover; border-radius: 8px; }
+.av-pick small { font-size: .62rem; line-height: 1.1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.av-pick.on { border-color: var(--gold); box-shadow: 0 0 10px rgba(242,193,78,.4); }

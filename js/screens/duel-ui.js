@@ -133,7 +133,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       ${u.brkMax ? `<span class="cb-brk ${u.broken ? 'is-broken' : ''}" title="Brisure">${u.broken ? '<img alt="" src="assets/icons/st-broken.webp"><b>BRISÉ</b>' : `<i style="width:${(u.brk / u.brkMax) * 100}%"></i>`}</span>` : ''}
       <span class="dv-atk">${icon('swords')}<b>${u.atk + (u.boost || 0)}</b></span>
       <span class="dv-hp ${u.hp < u.maxHp ? 'hurt' : ''}">${icon('heart')}<b>${Math.max(0, u.hp)}</b></span>
-      ${!enemy && th[u.uid] ? `<span class="dv-threat ${th[u.uid] >= u.hp && !u.shield ? 'lethal' : ''}" title="Dégâts annoncés"><img alt="" src="assets/icons/danger.webp">${th[u.uid] >= u.hp && !u.shield ? 'K.O.' : `-${th[u.uid]}`}</span>` : ''}
+      ${!enemy && th[u.uid] ? `<span class="dv-threat ${th[u.uid] >= u.hp && !u.shield ? 'lethal' : ''}" title="Dégâts annoncés"><img alt="" src="assets/icons/danger.webp">${th[u.uid] >= u.hp && !u.shield ? 'K.O.' : `-${th[u.uid]}`}<small>prévu</small></span>` : ''}
       ${enemy ? intentChip(u) : ''}
       ${tgt ? `<span class="cb-tgt">${tgt}</span>` : ''}
       <span class="dv-st">${statusHTML(u)}</span>

@@ -32,7 +32,7 @@ export function identityHTML(c, level) {
   if (!k) return '';
   const nx = nextUnlock(c.id, level);
   return `<div class="panel ck-panel">
-    <div class="ck-h"><b>${icon('sparkle')} ${esc(k.style)}</b><span class="small muted">Son identité se révèle en montant de niveau</span></div>
+    <div class="ck-h"><b>${icon('sparkle')} Propre à ${esc(c.name)} · ${esc(k.style)}</b><span class="small muted">Sa frappe, puis ce qu’elle débloque en montant de niveau</span></div>
     <ol class="ck-steps">${kitSteps(c.id, level).map((x) => `<li class="ck-s ${x.open ? 'on' : 'locked'}">
       <span class="ck-lv">${x.open ? icon('check') : icon('lock')}<small>Niv. ${x.lv}</small></span>
       ${x.img ? `<img class="ck-ic" alt="" src="${x.img}">` : ''}
@@ -52,9 +52,10 @@ export function combatHTML(g, c) {
     <p class="small muted">${esc(role.name)} · coût d’équipe ${COST[c.rarity]}</p>
     <div class="v2-big-stats"><span class="dv-atk">${icon('swords')}<b>${u.atk}</b><small>Attaque</small></span><span class="dv-hp">${icon('heart')}<b>${u.maxHp}</b><small>PV</small></span></div>
     <div class="panel v2-skill cb-kit">
-      <p class="small"><b>${actIcon('attack')} ${esc(strike.name)}</b> <span class="cb-k">1 action</span><br>${esc(strike.desc)} +1 Ferveur.</p>
+      <div class="ck-h"><b>${roleIcon(kit.kw)} Rôle : ${esc(role.name)}</b><span class="small muted">Commun à toutes les créatures de ce rôle, dès le niveau 1</span></div>
+      ${CREATURE_KITS[c.id] ? '' : `<p class="small"><b>${actIcon('attack')} ${esc(strike.name)}</b> <span class="cb-k">1 action</span><br>${esc(strike.desc)} +1 Ferveur.</p>`}
       <p class="small"><b class="gold">${actIcon(kit.skill.key, kit.skill.icon)} ${esc(kit.skill.name)}</b> <span class="cb-k">${kit.skill.ap} action${kit.skill.ap > 1 ? 's' : ''} · ${kit.skill.fervor} Ferveur${kit.skill.dice ? ' · D20' : ''}</span><br>${esc(kit.skill.desc)}</p>
-      <p class="small"><b>${roleIcon(kit.kw)} ${esc(kit.passive.name)}</b> <span class="cb-k">passif</span><br>${esc(kit.passive.desc)}</p>
+      <p class="small"><b>${esc(kit.passive.name)}</b> <span class="cb-k">trait du rôle</span><br>${esc(kit.passive.desc)}</p>
       ${c.rarity === 'C' ? `<p class="small dc-good">${icon('star')} Instinct de meute : +1 dégât aux élites et aux gardiens.</p>` : ''}
     </div>
     ${identityHTML(c, owned ? li.level : 1)}

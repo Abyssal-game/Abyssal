@@ -11,7 +11,7 @@ const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 export default function collection(app, root, params) {
   const g = app.game, cat = app.catalog;
-  const st = (app.state.col ||= { q: '', factions: [], rarities: [], show: 'all', sort: 'num', view: 'grid', albumFac: 'infernal', albumPage: 0 });
+  const st = (app.state.col ||= { q: '', factions: [], rarities: [], show: app.game.uniqueCount() < 100 ? 'owned' : 'all', sort: 'num', view: 'grid', albumFac: 'infernal', albumPage: 0 });
   st.roles ||= []; st.passive ||= '';
   const nf = () => st.factions.length + st.rarities.length + st.roles.length + (st.passive ? 1 : 0);
   // passifs proposés au filtre : ceux des cartes, par ordre alphabétique

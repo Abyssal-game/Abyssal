@@ -125,7 +125,7 @@ function renderChrome() {
     ${parent !== undefined ? `<a class="top-back" href="#/${parent}" aria-label="Retour">${icon('back')}</a>` : ''}
     <a class="top-brand" href="#/profil" aria-label="Profil : niveau ${lv.level}, ${esc(s.title)}">
       <span class="top-avatar pf pf-${s.frame}">${avatarCard ? `<img alt="" src="${artUrl(avatarCard, { lite: true })}">` : EMBLEM}<span class="lv">${lv.level}</span></span>
-      <span class="top-meta"><b>${esc(s.title)}</b><span class="xpbar" aria-hidden="true"><i style="width:${(lv.into / lv.need) * 100}%"></i></span></span>
+      <span class="top-meta"><b>${esc(s.name || s.title)}</b><span class="xpbar" aria-hidden="true"><i style="width:${(lv.into / lv.need) * 100}%"></i></span></span>
     </a>
     <div class="wallet">
       <button class="pill shards" data-wallet="shards" title="Éclats" aria-label="${fmt(s.shards)} éclats : à quoi ça sert ?">${icon('crystal')}<span>${fmt(s.shards)}</span></button>
@@ -149,7 +149,12 @@ function renderChrome() {
   const ticketCount = Object.values(s.tickets).reduce((a, b) => a + b, 0) + g.freePack().stock;
   document.getElementById('tabbar').innerHTML = TABS.map(([key, ic, label]) => {
     const cur = key === tab ? ' aria-current="page"' : '';
-    const badge = key === 'collection' && nNew ? `<span class="badge">${nNew > 99 ? '99+' : nNew}</span>` : key === 'boutique' && (ticketCount + g.chestCount()) ? `<span class="badge">${ticketCount + g.chestCount()}</span>` : key === 'antre' && (g.canDailyClaim() || g.missionsToClaim()) ? '<span class="badge">!</span>' : key === 'descente' && g.torchesLeft() ? `<span class="badge">${g.torchesLeft()}</span>` : '';
+    // moins de pastilles : un chiffre seulement pour ce qui attend d'être ouvert (boosters, coffres), sinon un simple point
+    const dot = '<span class="badge dot"></span>';
+    const badge = key === 'boutique' && (ticketCount + g.chestCount()) ? `<span class="badge">${ticketCount + g.chestCount()}</span>`
+      : key === 'collection' && nNew ? dot
+      : key === 'antre' && (g.canDailyClaim() || g.missionsToClaim()) ? dot
+      : key === 'descente' && (g.descent().run || g.descent().used === 0) ? dot : '';
     if (key === 'boutique') return `<a class="tab tab-main" href="#/boutique"${cur}><span class="orb">${tabIcon(ic)}</span>${label}${badge}</a>`;
     return `<a class="tab" href="#/${key}"${cur}>${tabIcon(ic)}${label}${badge}</a>`;
   }).join('');

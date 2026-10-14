@@ -11,7 +11,7 @@ const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 export default function bestiary(app, root) {
   const g = app.game, cat = app.catalog, lore = cat.lore;
-  const st = (app.state.best ||= { tab: 'creatures', faction: 'infernal', q: '' });
+  const st = (app.state.best ||= { tab: 'creatures', faction: FACTION_ORDER.reduce((b, f) => (g.factionProgress(f).owned > g.factionProgress(b).owned ? f : b), FACTION_ORDER[0]), q: '' });
 
   function chronicles() {
     const n = g.uniqueCount();

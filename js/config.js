@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v222'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v223'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -78,7 +78,7 @@ export const EVENTS = [
 ];
 
 export const ECONOMY = {
-  start: { shards: 0, ash: 0, tickets: { standard: 2 } },
+  start: { shards: 0, ash: 60, tickets: { standard: 2 } }, // 60 cendres : de quoi monter tout de suite 2 ou 3 créatures
   discoveryShards: { C: 1, PC: 3, R: 6, HR: 13, M: 25, S: 50 },
   // Fournaise : cendres rendues par un exemplaire brûlé (rareté × finition)
   burnAsh: { C: 3, PC: 6, R: 15, HR: 40, M: 100, S: 250 },

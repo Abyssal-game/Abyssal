@@ -55,7 +55,7 @@ test('chance : statistiques et plus belles ouvertures', () => {
 
 test('Fournaise : brûler des doublons ou la dernière carte, monter de niveau avec les cendres', () => {
   const g = noWelcome(new Game(catalog, new MemoryStorage(), { rng: () => 0.999, clock: () => new Date(2026, 9, 10) }));
-  g.team(); // créatures de départ
+  g.team(); g.s.ash = 0; // créatures de départ ; on part sans les cendres offertes
   const target = catalog.byRarity.R[0];
   const r1 = g.addCard(target.id);
   assert.equal(r1.isNewCard, true);

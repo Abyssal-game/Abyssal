@@ -62,7 +62,7 @@ export function openPack(app, type, { faction, onDone, preset = null, title = nu
     else s += ` · doublon <span class="muted">à brûler : ${icon('ash')} ${c.burn} cendres</span>`;
     // rôle et capacité en combat
     const card = cat.get(c.id), role = ROLES[roleOf(card)], kw = KEYWORDS[keywordOf(card)];
-    s += `<br><span class="op-role" style="--rlc:${role.color}" title="${esc(kw.desc)}">${roleIcon(keywordOf(card))}<b>${esc(role.name)}</b> <em>· ${esc(kw.name)} : ${esc(kw.desc)}</em></span>`;
+    s += `<br><span class="op-role" style="--rlc:${role.color}" title="${esc(kw.desc)}">${roleIcon(keywordOf(card))}<b>${esc(role.name)}</b> <em>· ${esc(kw.name)}</em></span>`;
     return s;
   }
 

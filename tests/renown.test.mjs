@@ -85,3 +85,22 @@ test('Sauvegarde : Renommée et saison ajoutées aux anciennes sauvegardes', () 
   assert.deepEqual(g2.s.fame, {});
   assert.deepEqual(g2.s.season.claimed, []);
 });
+
+test('première victoire : un cadeau une seule fois ; record d’étage signalé en fin d’expédition', async () => {
+  const { FIRST_WIN } = await import('../js/core/game.js');
+  const g = newGame('first');
+  g.startRun();
+  let first = null, wins = 0;
+  for (let k = 0; k < 300 && g.s.descent.run; k++) {
+    const r = g.s.descent.run;
+    if (r.phase === 'doors') { const o = g.chooseDoor(g.doors()[0]); if (o.battle) { const out = g.autoResolve(); if (out.won) { wins++; if (out.firstWin) { assert.equal(first, null, 'une seule fois'); first = out.firstWin; } } } }
+    else if (r.phase === 'reward') g.chooseReward(r.rewards[0]);
+    else if (r.phase === 'altar') g.chooseBlessing(r.altar[0]);
+    else if (r.cleared >= 2) g.endRun(false);
+    else g.nextFloor();
+  }
+  assert.ok(wins >= 1); assert.equal(first, FIRST_WIN);
+  assert.equal(g.s.descent.last.record, true, 'première expédition : record');
+  g.startRun(); g.endRun(false);
+  assert.ok(!g.s.descent.last.record, 'expédition plus courte : pas de record');
+});

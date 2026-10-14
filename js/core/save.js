@@ -25,6 +25,7 @@ export function defaultSave(now = Date.now()) {
     setsDone: {},         // clé -> date
     factionsDone: {},     // faction -> date
     titles: ['Novice des Sceaux'],
+    name: '',             // nom choisi par le joueur (profil)
     title: 'Novice des Sceaux',
     frames: ['base'],
     frame: 'base',

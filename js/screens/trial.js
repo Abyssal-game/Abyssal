@@ -21,6 +21,8 @@ import { EMBLEM } from '../ui/icons.js';
 import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
 
+const TRIAL_UNLOCK = 3; // expéditions avant d'ouvrir l'Épreuve du jour
+
 export default function trialScreen(app, root) {
   const g = app.game, cat = app.catalog;
   let battle = null, result = null;
@@ -28,6 +30,13 @@ export default function trialScreen(app, root) {
   const mini = (id, extra = '') => { const c = cat.get(id); return `<span class="tr-c" style="--rc:${RARITY[c.rarity].color}"><img alt="" src="${artUrl(c, { lite: true })}"><b>${esc(c.name)}</b><small>${esc(KITS[roleOf(c)].name)}${extra}</small></span>`; };
   function lobby() {
     setScene('descent');
+    // l'Épreuve s'ouvre après quelques expéditions : elle ne dévoile pas trop tôt des créatures rares
+    const runs = g.s.descent.runs || 0;
+    if (runs < TRIAL_UNLOCK && !g.s.trial?.wins && !g.s.trial?.run) {
+      root.innerHTML = `<header class="screen-head ui-hero bn-trial"><h1>Épreuve du jour</h1><p class="muted">Le même combat pour tout le monde aujourd’hui.</p></header>
+        <section class="panel tr-lock">${icon('lock')}<b>Encore scellée</b><p class="small">Termine <b>${TRIAL_UNLOCK} expéditions</b> dans la Descente pour l’ouvrir (${runs} / ${TRIAL_UNLOCK}).</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`;
+      return;
+    }
     const t = g.trial(), d = g.trialDef(t.day), P = d.pact && PACTS[d.pact];
     root.innerHTML = `<header class="screen-head ui-hero bn-trial"><h1>Épreuve du jour</h1><p class="muted">Le même combat pour tout le monde aujourd’hui. Gagne en peu de tours, avec le plus de PV possible.</p></header>
       ${result ? resultHTML(result) : ''}

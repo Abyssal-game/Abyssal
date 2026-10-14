@@ -9,6 +9,7 @@ import { artUrl, hasRealArt } from '../art/assets.js';
 import { RARITY } from '../config.js';
 import { openPack } from './opening.js';
 import { parisDay, claimShadowPrize } from './shadow.js';
+import * as cloud from '../cloud/cloud.js';
 
 export function waitText(ms) {
   const m = Math.max(1, Math.ceil(ms / 60000));
@@ -74,7 +75,7 @@ export default function shop(app, root, params = []) {
 
   function freeLine() {
     const f = g.freePack();
-    if (!f.nextAt) return `<p class="free-line full">${icon('p:free-pack')}<span><b>${f.stock} boosters gratuits</b><small>Réserve pleine : ouvre-les !</small></span></p>`;
+    if (!f.nextAt) return `<p class="free-line full">${icon('p:free-pack')}<span><b>${f.stock} booster${f.stock > 1 ? 's' : ''} gratuit${f.stock > 1 ? 's' : ''}</b><small>Réserve pleine : ouvre-les !</small></span></p>`;
     return `<p class="free-line">${icon('hourglass')}<span>Prochain booster gratuit dans <b>${waitText(f.nextAt - Date.now())}</b><small>${f.stock ? `${f.stock} en réserve` : 'Aucun en réserve'}</small></span></p>`;
   }
 
@@ -115,7 +116,7 @@ export default function shop(app, root, params = []) {
     };
     root.innerHTML = `
       <header class="screen-head ui-hero bn-boosters"><h1>Boosters</h1><p class="muted">Ouvre des boosters pour agrandir ton Bestiaire.</p></header>
-      <a class="panel sh-banner" href="#/tirage"><span class="sh-b-ic">${icon('p:shadow')}</span><span><b>Le Tirage des Ombres</b><span class="small muted">${g.shadowState().paid[parisDay()] ? 'Tirage du jour fait · voir le classement' : 'Ton booster gratuit du jour pour le classement de la semaine'}</span></span><span class="sh-b-go">${icon('next')}</span></a>
+      ${cloud.isLoggedIn() ? '' : '<!-- Tirage : réservé aux joueurs connectés -->'}<a class="panel sh-banner ${cloud.isLoggedIn() ? '' : 'off'}" href="#/tirage"><span class="sh-b-ic">${icon('p:shadow')}</span><span><b>Le Tirage des Ombres</b><span class="small muted">${g.shadowState().paid[parisDay()] ? 'Tirage du jour fait · voir le classement' : 'Ton booster gratuit du jour pour le classement de la semaine'}</span></span><span class="sh-b-go">${icon('next')}</span></a>
       <div class="products">
         ${card('standard')}
         ${card('faction', '', `<div class="chips fac-pick fac-grid" role="radiogroup" aria-label="Faction du booster">${FACTION_ORDER.map((f) => `<button class="chip" role="radio" data-act="pickfac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}" aria-checked="${st.faction === f}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>`)}

@@ -2,7 +2,7 @@
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, EMBLEM, picon, setIcon } from '../ui/icons.js';
-import { esc, fmt, pct, bindActions, toast } from '../ui/dom.js';
+import { esc, fmt, pct, bindActions, toast, openSheet } from '../ui/dom.js';
 import { unlockSources } from '../core/unlocks.js';
 import { RARITIES, FRAMES, BOOSTERS, FACTION_ORDER, VARIANTS, RARITY, RARITY_ORDER } from '../config.js';
 
@@ -43,12 +43,13 @@ export default function profile(app, root) {
     const show = (s.showcase.length ? s.showcase.map((id) => cat.get(id)) : g.bestCards(3)).filter(Boolean);
     root.innerHTML = `
       <section class="panel ornate profile-head bn-profile">
-        <div class="avatar-big pf pf-${s.frame}">${av ? `<img alt="" src="${artUrl(av)}">` : EMBLEM}</div>
+        <button class="avatar-big pf pf-${s.frame}" data-act="pickav" aria-label="Changer d’avatar">${av ? `<img alt="" src="${artUrl(av)}">` : EMBLEM}<span class="av-edit">${icon('edit')}</span></button>
         <div class="ph-text">
-          <h1>${esc(s.title)}</h1>
+          <h1><button class="ph-name" data-act="rename">${esc(s.name || 'Ton nom')} <span class="small muted">${icon('edit')}</span></button></h1>
+          <p class="ph-title">${esc(s.title)}</p>
           <p class="muted small">Niveau ${lv.level} · ${fmt(lv.into)} / ${fmt(lv.need)} XP</p>
           <span class="xpbar"><i style="width:${(lv.into / lv.need) * 100}%"></i></span>
-          <p class="small muted">${av ? `Avatar : ${esc(av.name)}` : 'Choisis un avatar depuis la fiche d’une carte possédée.'}</p>
+          <p class="small muted">${av ? `Avatar : ${esc(av.name)} · touche-le pour en changer` : 'Touche le sceau pour choisir un avatar parmi tes créatures.'}</p>
         </div>
       </section>
 
@@ -91,6 +92,19 @@ export default function profile(app, root) {
   bindActions(root, {
     title(el) { g.setTitle(el.dataset.v); render(); },
     frame(el) { g.setFrame(el.dataset.v); render(); },
+    pickav() {
+      const ids = Object.keys(g.s.collection).filter((id) => cat.get(id));
+      if (!ids.length) { toast('Obtiens d’abord une créature dans un booster.', { icon: 'info' }); return; }
+      const sh = openSheet('<h2>Choisis ton avatar</h2>', { label: 'Avatar' });
+      sh.setContent(`<h2 class="center">Choisis ton avatar</h2><div class="av-grid">${ids.map((id) => { const c = cat.get(id); return `<button class="av-pick ${g.s.avatar === id ? 'on' : ''}" data-id="${id}" style="--rc:${RARITY[c.rarity].color}"><img alt="" loading="lazy" src="${artUrl(c, { lite: true })}"><small>${esc(c.name)}</small></button>`; }).join('')}</div>`);
+      sh.body.addEventListener('click', (e) => { const b = e.target.closest('.av-pick'); if (!b) return; g.setAvatar(b.dataset.id); app.sfx?.tap?.(); sh.close(); render(); app.chrome?.(); });
+    },
+    async rename() {
+      const sh = openSheet('', { label: 'Ton nom', cls: 'sheet-small' });
+      sh.setContent(`<h2 class="center">Ton nom</h2><p class="small muted center">Il s’affiche en haut de l’écran et sur ton profil.</p><input class="input" id="pf-name" maxlength="16" autocomplete="off" value="${esc(g.s.name || '')}" placeholder="Ton nom"><div class="row gap"><button class="btn ghost" data-n="no">Annuler</button><button class="btn primary" data-n="ok">Enregistrer</button></div>`);
+      const inp = sh.body.querySelector('#pf-name'); setTimeout(() => inp.focus(), 50);
+      sh.body.addEventListener('click', (e) => { const b = e.target.closest('[data-n]'); if (!b) return; if (b.dataset.n === 'ok') { g.setName(inp.value); app.chrome?.(); render(); } sh.close(); });
+    },
     how(el) { toast(`${icon('lock')} <b>${esc(el.dataset.v)}</b><br><span class="small">${esc(el.dataset.how || 'Pas encore disponible.')}</span>`, { ms: 6000 }); },
   });
   root.addEventListener('click', (e) => {
