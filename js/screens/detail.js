@@ -94,12 +94,11 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     if (owned) {
       const line = card.evolution ? cat.lines[card.evolution.line] : null;
       const sets = card.sets.map((k) => cat.set[k]).filter(Boolean);
-      const isAvatar = g.s.avatar === current;
-      const inShow = g.s.showcase.includes(current);
-      const inTeam = g.s.team.includes(current), li = g.cardLevelInfo(current);
-      const tabs = [['combat', 'team', 'Combat'], ['story', 'history', 'Histoire'], ['rarity', 'crystal', 'Rareté']];
+      const li = g.cardLevelInfo(current);
+      const tabs = [['combat', 'team', 'Combat'], ['chal', 'feats', 'Défis'], ['story', 'history', 'Histoire'], ['rarity', 'crystal', 'Rareté']];
       const TAB = {
         combat: `${formHTML(card)}${combatHTML(g, card)}`,
+        chal: `${fameHTML(g.fameOf(current))}${challengesHTML(g, current)}`,
         story: `<p class="lore big">« ${esc(card.lore)} »</p>
           <dl class="facts dt-facts"><div><dt>Catégorie</dt><dd>${esc(card.category)}</dd></div><div><dt>Faction</dt><dd><span class="fac-dot" style="color:${fac.colors.secondary}">${sigil(card.faction)}</span>${esc(fac.name)}</dd></div><div><dt>Découverte le</dt><dd>${dateFr(e.first)}</dd></div><div><dt>Numéro</dt><dd>${card.id}</dd></div></dl>
           ${relHTML(card)}
@@ -114,16 +113,8 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
           <span class="dt-chip" style="--c:${fac.colors.secondary}">${sigil(card.faction)}${esc(fac.name)}</span>
           <span class="dt-chip">×${e.n} exemplaire${e.n > 1 ? 's' : ''}</span>
           <span class="dt-chip gold">Niv. ${li.level}${li.level >= li.max ? ' · Apogée' : ''}</span>
-        </div>
-        ${fameHTML(g.fameOf(current))}
-        ${challengesHTML(g, current)}
-        <button class="btn ${inTeam ? 'ghost' : 'primary'} block dt-team" data-act="team">${picon('team')}${inTeam ? 'Dans ton équipe · retirer' : 'Ajouter à mon équipe'}</button>
-        <div class="dt-acts">
-          <button class="dt-act ${isAvatar ? 'on' : ''}" data-act="avatar">${picon('avatar')}<span>${isAvatar ? 'Mon avatar' : 'Avatar'}</span></button>
-          <button class="dt-act ${inShow ? 'on' : ''}" data-act="showcase">${picon('showcase')}<span>${inShow ? 'En vitrine' : 'Vitrine'}</span></button>
-          <button class="dt-act ${g.isFav(current) ? 'on' : ''}" data-act="fav">${icon('star')}<span>${g.isFav(current) ? 'Favori' : 'Favori'}</span></button>
-          <button class="dt-act" data-act="artonly">${picon('illus')}<span>Illustration</span></button>
-          <button class="dt-act" data-act="burn">${picon('furnace')}<span>Brûler</span></button>
+          <button class="dt-chip dt-chipb ${g.isFav(current) ? 'on' : ''}" data-act="fav" aria-pressed="${g.isFav(current)}">${icon('star')}Favori</button>
+          <button class="dt-chip dt-chipb burn" data-act="burn">${picon('furnace')}Brûler</button>
         </div>
         <div class="dt-tabs" role="tablist">${tabs.map(([k, ic, l]) => `<button class="dt-tab" role="tab" data-act="tab" data-v="${k}" aria-selected="${dtab === k}">${picon(ic)}<span>${l}</span></button>`).join('')}</div>
         <div class="panel dt-pane">${TAB[dtab]}</div>`;
@@ -141,7 +132,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     sheet.setContent(`<div class="detail ${owned ? '' : 'is-sealed'}">
       ${nav}
       <div class="detail-card ${owned && g.formOf(current) ? 'fm-on' : ''}">${cardHTML(card, { size: 'full', variant: shownVariant, mystery: !owned, nameKnown: known })}${owned && g.formOf(current) ? `<span class="fm-badge">${esc(FORMS[current].name)}</span>` : ''}</div>
-      ${owned ? `<p class="tilt-hint small muted">${icon('refresh')} Fais glisser ton doigt sur la carte pour la faire pivoter.</p>` : ''}
+      ${owned ? `<p class="tilt-hint small muted">${icon('refresh')} Touche la carte pour masquer ou remettre son texte · fais-la glisser pour la faire pivoter.</p>` : ''}
       ${variantsRow}
       <div class="detail-info">${body}</div>
     </div>`);
@@ -153,9 +144,6 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     next() { const i = list.indexOf(current); if (i < list.length - 1) { current = list[i + 1]; shownVariant = null; draw(); } },
     variant(el) { shownVariant = el.dataset.v; draw(); },
     showv() { try { g.setShownVariant(current, shownVariant); app.sfx.tap(); toast(`Apparence <b>${esc(VARIANTS[shownVariant].name.toLowerCase())}</b> affichée partout.`, { icon: 'eye' }); draw(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } },
-    avatar() { g.setAvatar(current); toast('Avatar mis à jour.', { icon: 'user' }); draw(); },
-    showcase() { g.toggleShowcase(current); draw(); },
-    team() { if (toggleTeam(app, current)) draw(); },
     fav() { const on = g.toggleFav(current); app.sfx?.tap?.(); toast(on ? 'Ajoutée à tes favoris : elle ne pourra pas être brûlée par erreur.' : 'Retirée de tes favoris.', { icon: 'star' }); draw(); },
     chal(el) { try { const x = g.claimChallenge(current, el.dataset.k); app.sfx?.levelup?.(); toast(`Défi « ${esc(x.name)} » réussi : <b>+${x.ash} cendres</b> et +${x.fame} Renommée`, { kind: 'success', icon: 'ash' }); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     burn() { openBurn(app, current, { onClose: () => { shownVariant = null; draw(); } }); },
@@ -165,16 +153,18 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
       try { g.setForm(current, el.dataset.v || null); app.sfx.discover?.(); toast(el.dataset.v ? `<b>${esc(FORMS[current].name)}</b> combattra sous sa forme corrompue.` : 'Elle combattra sous sa forme originelle.', { icon: 'sparkle' }); draw(); }
       catch (err) { toast(esc(err.message), { kind: 'error' }); }
     },
-    artonly(el) {
-      const c = sheet.body.querySelector('.detail-card .tcg');
-      const on = c.classList.toggle('art-only');
-      el.querySelector('span').textContent = on ? 'Texte' : 'Illustration';
-      if (on) sheet.el.scrollTo({ top: 0, behavior: 'smooth' });
-    },
     decipher() {
       try { g.decipher(current); toast(`Nom déchiffré : <b>${esc(cat.get(current).name)}</b>`, { icon: 'eye' }); draw(); }
       catch (err) { toast(esc(err.message), { kind: 'error' }); }
     },
+  });
+  // Toucher la carte (sans la faire glisser) : masque ou remet son texte (v252)
+  let dp = null;
+  sheet.body.addEventListener('pointerdown', (ev) => { dp = ev.target.closest('.detail-card .tcg') ? { x: ev.clientX, y: ev.clientY, t: Date.now() } : null; }, { passive: true });
+  sheet.body.addEventListener('click', (ev) => {
+    const c = ev.target.closest('.detail-card .tcg');
+    if (!c || !dp || Math.hypot(ev.clientX - dp.x, ev.clientY - dp.y) > 10 || Date.now() - dp.t > 600) return;
+    c.classList.toggle('art-only'); app.sfx?.tap?.();
   });
   // Ouvre une carte de la lignée
   sheet.body.addEventListener('click', (ev) => {
