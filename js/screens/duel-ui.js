@@ -245,8 +245,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const moved = tlSig && tlSig.split(',')[0] !== sig.split(',')[0];
     tlSig = sig;
     box.innerHTML = list.map((x, i) => (x.team
-      ? `<span class="cb-tlr team ${i === 0 ? 'now' : ''}" title="Ton équipe">${allies.slice(0, 3).map(pic).join('')}</span>`
-      : `<span class="cb-tlr foe ${i === 0 ? 'now' : ''} ${x.boss ? 'boss' : x.elite ? 'elite' : ''}" title="${esc(cat.get(x.id).name)}">${pic(x)}</span>`)).join('');
+      ? `<span class="cb-tlr team ${i === 0 ? 'now' : ''}" title="Ton équipe"><span class="cb-tlp">${allies.slice(0, 3).map(pic).join('')}</span></span>`
+      : `<span class="cb-tlr foe ${i === 0 ? 'now' : ''} ${x.boss ? 'boss' : x.elite ? 'elite' : ''}" title="${esc(cat.get(x.id).name)}"><span class="cb-tlp">${pic(x)}</span></span>`)).join('');
     if (moved && !reduced) { box.classList.remove('shift'); void box.offsetWidth; box.classList.add('shift'); }
   }
   function drawAims() {
@@ -345,6 +345,19 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     setTimeout(() => { sh.remove(); em.remove(); }, T(520));
     return true;
   };
+  // Planche peinte de 8 images (assets/fx/<nom>.webp) jouée sur une carte, au centre, ou sur toute la rangée ennemie
+  const ROLE_FX = { protecteur: 'role-shock', degats: 'role-claw', poison: 'role-venom', controle: 'role-frost', soin: 'role-shock', soutien: 'role-claw', zone: 'role-claw' };
+  const fxSheet = (uid, name, { k = 1.6, d = 600, center = false, row = false } = {}) => {
+    if (reduced) return;
+    const box = $('.dv'); if (!box) return;
+    const b = box.getBoundingClientRect(); let x = b.width / 2, y = b.height / 2, w = b.width * 0.9, h = w;
+    if (row) { const r = $('.dv-row.enemy')?.getBoundingClientRect(); if (!r) return; x = r.left - b.left + r.width / 2; y = r.top - b.top + r.height / 2; w = r.width * 1.1; h = r.height * 1.25; }
+    else if (!center) { const t = el(uid); if (!t) return; const r = t.getBoundingClientRect(); x = r.left - b.left + r.width / 2; y = r.top - b.top + r.height / 2; w = h = r.width * k; }
+    const n = document.createElement('span'); n.className = 'kx-sprite fxs';
+    n.style.cssText = `left:${x}px;top:${y}px;width:${w}px;height:${h}px;--d:${T(d)}ms;background-image:url(assets/fx/${name}.webp)`;
+    box.appendChild(n); setTimeout(() => n.remove(), T(d) + 80);
+  };
+  let aoeHit = false; // pendant un Raz-de-marée : une seule vague pour toute la rangée
   const ring = (uid, cls) => { if (reduced) return; const t = el(uid); if (!t) return; const r = document.createElement('span'); r.className = `cb-ring ${cls}`; t.appendChild(r); setTimeout(() => r.remove(), 750); };
   const float = (uid, txt, cls) => { const t = el(uid); if (!t) return; const f = document.createElement('span'); f.className = `dv-float ${cls}`; f.textContent = txt; t.appendChild(f); setTimeout(() => f.remove(), 900); };
   const banner = (html, cls = '', ms = 900) => {
@@ -402,7 +415,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           }
           if (e.tgt && st.units[e.tgt]?.side === 'enemy' && DICE_KEYS.includes(e.key)) pendingLunge = { u: e.u, tgt: e.tgt };
           else if (e.tgt && st.units[e.tgt]?.side === 'enemy' && e.key !== 'marque' && e.key !== 'entrave') { lunge(e.u, e.tgt); cam(e.tgt, 0.6); await wait(T(LUNGE_HIT)); }
-          else if (e.key === 'marque' && e.tgt) { fxAt(e.tgt, 'seal'); ring(e.tgt, 'mark'); await wait(T(260)); }
+          else if (e.key === 'marque' && e.tgt) { fxSheet(e.tgt, 'role-mark', { k: 1.7, d: 650 }); ring(e.tgt, 'mark'); await wait(T(420)); }
           break;
         case 'eact': {
           const def = INTENTS[e.kind];
@@ -420,13 +433,15 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           const crit = lastTier === 'crit', heavy = crit || e.d >= 8;
           lastTier = null;
           if (heavy) await hitstop(crit ? 140 : 70);
-          fxAt(e.u, crit ? 'crit' : heavy ? 'impact' : 'slash', { big: heavy });
+          const sU = e.src && st.units[e.src];
+          if (sU?.side === 'ally' && ROLE_FX[sU.role] && !aoeHit) { fxSheet(e.u, ROLE_FX[sU.role], { k: heavy ? 2 : 1.7 }); if (crit) fxAt(e.u, 'crit', { big: true }); }
+          else if (!aoeHit) fxAt(e.u, crit ? 'crit' : heavy ? 'impact' : 'slash', { big: heavy });
           if (crit) dio.flare();
           float(e.u, crit ? `CRITIQUE −${e.d}` : `-${e.d}`, crit ? 'dmg big crit' : heavy ? 'dmg big' : 'dmg'); (heavy ? app.sfx.smash : app.sfx.slash)(); sparks(e.u, crit ? 'gold' : ''); if (heavy || e.hp <= 0) shake(crit || e.d >= 12);
           await wait(T(heavy ? 300 : 220));
           break;
         }
-        case 'heal': { app.sfx.heal(); fxAt(e.u, 'heal'); float(e.u, `+${e.d}`, 'heal'); const hp = el(e.u)?.querySelector('.dv-hp b'); if (hp) hp.textContent = st.units[e.u].hp; await wait(T(200)); break; }
+        case 'heal': { app.sfx.heal(); fxSheet(e.u, 'role-heal', { k: 1.5, d: 700 }); float(e.u, `+${e.d}`, 'heal'); const hp = el(e.u)?.querySelector('.dv-hp b'); if (hp) hp.textContent = st.units[e.u].hp; await wait(T(200)); break; }
         case 'block': app.sfx.block(); ring(e.u, 'guard'); float(e.u, 'Bloqué', 'info'); sparks(e.u, 'blue'); await wait(T(240)); break;
         case 'dodge': {
           app.sfx.dodge();
@@ -472,10 +487,10 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         }
         case 'release': app.sfx.enter(); draw(); el(e.u)?.classList.add('enter'); ring(e.u, 'enter'); await wait(T(400)); break;
         case 'swap': app.sfx.enter(); draw(); el(e.u)?.classList.add('enter'); float(e.u, 'Entre en jeu', 'info'); await wait(T(340)); break;
-        case 'aoe': if (e.side === 'enemy') shake(true); await wait(T(150)); break;
+        case 'aoe': if (e.side === 'enemy') shake(true); else if (st.units[e.u]?.side === 'ally') { fxSheet(null, 'role-wave', { row: true, d: 720 }); aoeHit = true; setTimeout(() => { aoeHit = false; }, T(900)); await wait(T(260)); } await wait(T(150)); break;
         case 'status':
           if (e.k === 'poison') { if (/\+|×/.test(e.s)) { app.sfx.poison(); fxAt(e.u, 'venom', { big: !!e.syn }); } }
-          else if (e.k === 'frost' && /^Gel/.test(e.s) && !/passe/.test(e.s)) { app.sfx.freeze(); fxAt(e.u, 'frost'); }
+          else if (e.k === 'frost' && /^Gel/.test(e.s) && !/passe/.test(e.s)) { app.sfx.freeze(); fxSheet(e.u, 'role-frost', { k: 1.7, d: 650 }); }
           else if (e.k === 'guard' && /^(Tous sur elle|Hurlement)/.test(e.s)) { app.sfx.taunt?.(); fxAt(e.u, 'taunt', { big: true }); ring(e.u, 'guard'); }
           else if (e.k === 'guard') { app.sfx.shield?.(); fxAt(e.u, 'shield'); ring(e.u, 'guard'); }
           else if (e.k === 'heal' && /^\+\d+ ATQ/.test(e.s)) { app.sfx.boost?.(); fxAt(e.u, 'boost'); }
@@ -570,7 +585,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     fx.innerHTML = `${c ? `<img alt="" src="${artUrl(c)}">` : `<span class="tb-sceau">${EMBLEM}</span>`}<b>${esc(ult.name)}</b>`;
     $('.dv').appendChild(fx);
     $('.dv').style.setProperty('--uc', ult.color);
-    $('.dv').classList.add('ultflash'); fxAt(null, 'seal', { center: true }); setTimeout(() => $('.dv')?.classList.remove('ultflash'), 900);
+    $('.dv').classList.add('ultflash'); fxSheet(null, 'ult-seal', { center: true, d: 1100 }); setTimeout(() => $('.dv')?.classList.remove('ultflash'), 900);
     app.sfx.ult();
     await wait(reduced ? 300 : T(1200));
     fx.classList.add('out'); setTimeout(() => fx.remove(), 400);
