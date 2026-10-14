@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { loadCatalog, MemoryStorage, rngFrom } from './helpers.mjs';
+import { noWelcome } from './helpers.mjs';
 import { Game } from '../js/core/game.js';
 import { STARTER, roleOf, levelFromDups, MAX_LEVEL, BUDGET } from '../js/core/army.js';
 import { chestForDepth } from '../js/core/descent.js';
@@ -9,7 +10,7 @@ import { SAVE_KEY } from '../js/config.js';
 
 const catalog = loadCatalog();
 const day = new Date(2026, 9, 12, 12);
-const newGame = (seed = 'a', storage = new MemoryStorage()) => new Game(catalog, storage, { rng: rngFrom(seed), clock: () => day });
+const newGame = (seed = 'a', storage = new MemoryStorage()) => noWelcome(new Game(catalog, storage, { rng: rngFrom(seed), clock: () => day }));
 
 test('équipe : 5 Communes offertes à qui n’a pas 3 créatures, sinon les meilleures cartes sous le budget', () => {
   const g = newGame();

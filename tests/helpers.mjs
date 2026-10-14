@@ -28,3 +28,6 @@ export class MemoryStorage {
 }
 
 export const rngFrom = (seed) => seeded(seed);
+
+// Joueur qui a déjà ouvert ses boosters de bienvenue (les tests de combat partent des 5 Communes de secours)
+export const noWelcome = (g) => { g.s.tickets.standard = 0; return g; };

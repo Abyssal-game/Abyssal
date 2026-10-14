@@ -1300,3 +1300,21 @@ html.reduce-motion .tb-u, html.reduce-motion .tb-u::after { animation: none !imp
 .pf-abysse { border-color: #3FA9C9; box-shadow: 0 0 0 2px #04121A, 0 0 18px rgba(63, 169, 201, .8), inset 0 0 10px rgba(63, 169, 201, .5); }
 .pf-chasseur { border-color: #8FCB5A; border-style: double; border-width: 5px; box-shadow: 0 0 12px rgba(143, 203, 90, .55); }
 .mn-proto { border-bottom: 1px solid var(--line-soft); background: linear-gradient(100deg, rgba(200, 164, 93, .14), transparent 70%); }
+/* titres et cadres à débloquer (v210) */
+.chip.pf-lock, .frame-pick.pf-lock { opacity: .5; filter: grayscale(.7); }
+.chip.pf-lock .ic { width: 14px; height: 14px; margin-right: 4px; }
+/* emblèmes des ensembles (v210) */
+.set-h { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.set-ic { width: 30px; height: 30px; flex: none; object-fit: contain; display: inline-grid; place-items: center; }
+.set-ic-0 { border-radius: 50%; border: 1px solid rgba(200, 164, 93, .45); background: rgba(200, 164, 93, .1); color: var(--gold); }
+.set-ic-0 .ic, .set-ic-0 svg { width: 15px; height: 15px; }
+.fac-row .set-ic { width: 22px; height: 22px; }
+.set-h .set-ic { width: 34px; height: 34px; }
+/* boosters de bienvenue (v210) */
+.hw-welcome { display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin-bottom: 12px; color: var(--ink); text-decoration: none; border-color: var(--gold); box-shadow: 0 0 18px rgba(200, 164, 93, .3); animation: hwPulse 2.4s ease-in-out infinite; }
+.hw-welcome > span:nth-child(2) { display: grid; gap: 3px; flex: 1; min-width: 0; }
+.hw-ic .picon { width: 40px; height: 40px; }
+@keyframes hwPulse { 50% { box-shadow: 0 0 28px rgba(200, 164, 93, .55); } }
+@media (prefers-reduced-motion: reduce) { .hw-welcome { animation: none; } }
+.chips.pf-titles { flex-wrap: wrap; overflow: visible; }
+.chips.pf-titles { gap: 6px; } .chips.pf-titles .chip { padding: 5px 10px; font-size: .78rem; min-height: 32px; }

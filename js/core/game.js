@@ -450,7 +450,8 @@ export class Game {
     while (t.length && this.teamCost(t) > BUDGET) t = t.slice(0, -1);
     // remplissage automatique seulement tant que le joueur n'a jamais composé son équipe lui-même
     if (t.length < TEAM.active && !this.s.teamSet) {
-      if (this.uniqueCount() < TEAM.active) {
+      if (this.welcomePending()) t = []; // nouveau joueur : il ouvre d'abord ses boosters de bienvenue
+      else if (this.uniqueCount() < TEAM.active) { // filet de sécurité : plus de booster à ouvrir et pas assez de créatures
         STARTER.forEach((id) => { if (!this.owns(id)) { this.addCard(id, 'normal', 'reward'); this.s.collection[id].isNew = false; } });
         t = STARTER.slice(); // rôles complémentaires, dans le bon ordre
       } else t = this.autoTeam(t);
@@ -458,6 +459,8 @@ export class Game {
     if (t.join() !== (this.s.team || []).join()) { this.s.team = t; this.persist(); }
     return t;
   }
+  // Nouveau joueur : pas encore assez de créatures, mais des boosters de bienvenue à ouvrir
+  welcomePending() { return this.uniqueCount() < TEAM.active && (this.s.tickets.standard || 0) > 0; }
   // Équipe suggérée : force, synergies et rôles complémentaires (synergy.js)
   suggestTeam() {
     const owned = Object.keys(this.s.collection).map((id) => this.catalog.get(id)).filter(Boolean);

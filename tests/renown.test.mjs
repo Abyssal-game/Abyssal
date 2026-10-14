@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { loadCatalog, MemoryStorage, rngFrom } from './helpers.mjs';
+import { noWelcome } from './helpers.mjs';
 import { Game } from '../js/core/game.js';
 import { fameTier, fameNext, SEASON_STEPS, seasonId, seasonName, seasonDaysLeft } from '../js/core/renown.js';
 import { loadSave, writeSave } from '../js/core/save.js';
@@ -8,7 +9,7 @@ import { SAVE_KEY } from '../js/config.js';
 
 const catalog = loadCatalog();
 let now = new Date(2026, 9, 12, 12);
-const newGame = (seed = 'a', storage = new MemoryStorage()) => new Game(catalog, storage, { rng: rngFrom(seed), clock: () => now });
+const newGame = (seed = 'a', storage = new MemoryStorage()) => noWelcome(new Game(catalog, storage, { rng: rngFrom(seed), clock: () => now }));
 
 test('Renommée : paliers Vétéran, Héros, Légende', () => {
   assert.equal(fameTier(0), 0); assert.equal(fameTier(9), 0); assert.equal(fameTier(10), 1);

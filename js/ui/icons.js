@@ -75,6 +75,10 @@ export const icon = (name) => {
 // Emblème peint de la faction, toujours (le dessin au trait ne sert plus qu'en secours si l'image échoue)
 export const sigil = (faction) => (SIGILS[faction] ? `<img class="sigil sigil-img" alt="" src="assets/factions/${faction}.webp">` : '');
 
+// Emblèmes des ensembles (assets/sets/<clé>.webp) : ajouter la clé ici quand l'image peinte est livrée
+const SET_ART = new Set([]);
+export const setIcon = (key) => (SET_ART.has(key) ? `<img class="set-ic" alt="" src="assets/sets/${key}.webp">` : `<span class="set-ic set-ic-0">${icon('star')}</span>`);
+
 // Icônes peintes (assets/icons) : défis du jour, étapes de l'Aventure
 export const picon = (name) => `<img class="picon" alt="" src="assets/icons/${name}.webp">`;
 

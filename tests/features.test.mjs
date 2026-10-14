@@ -1,11 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { loadCatalog, MemoryStorage, rngFrom } from './helpers.mjs';
+import { noWelcome } from './helpers.mjs';
 import { Game } from '../js/core/game.js';
 import { ECONOMY } from '../js/config.js';
 
 const catalog = loadCatalog();
-const newGame = (seed = 'f', day = new Date(2026, 9, 10, 12)) => new Game(catalog, new MemoryStorage(), { rng: rngFrom(seed), clock: () => day });
+const newGame = (seed = 'f', day = new Date(2026, 9, 10, 12)) => noWelcome(new Game(catalog, new MemoryStorage(), { rng: rngFrom(seed), clock: () => day }));
 
 test('missions du jour : trois types différents, stables dans la journée, renouvelées le lendemain', () => {
   const g = newGame();
@@ -53,7 +54,7 @@ test('chance : statistiques et plus belles ouvertures', () => {
 });
 
 test('Fournaise : brûler des doublons ou la dernière carte, monter de niveau avec les cendres', () => {
-  const g = new Game(catalog, new MemoryStorage(), { rng: () => 0.999, clock: () => new Date(2026, 9, 10) });
+  const g = noWelcome(new Game(catalog, new MemoryStorage(), { rng: () => 0.999, clock: () => new Date(2026, 9, 10) }));
   g.team(); // créatures de départ
   const target = catalog.byRarity.R[0];
   const r1 = g.addCard(target.id);

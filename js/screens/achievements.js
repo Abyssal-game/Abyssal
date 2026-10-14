@@ -1,6 +1,6 @@
 // Succès et ensembles thématiques.
 import { cardHTML, lazyArt } from '../ui/card.js';
-import { icon } from '../ui/icons.js';
+import { icon, setIcon } from '../ui/icons.js';
 import { esc, bindActions } from '../ui/dom.js';
 
 export default function achievements(app, root, params) {
@@ -35,7 +35,7 @@ export default function achievements(app, root, params) {
     return cat.sets.map((s) => {
       const p = g.setProgress(s.key);
       return `<article class="panel set ${p.done ? 'done' : ''}">
-        <div class="row between"><h3>${esc(s.name)}</h3><b class="${p.done ? 'ok' : 'muted'}">${p.owned} / ${p.total}</b></div>
+        <div class="row between"><h3 class="set-h">${setIcon(s.key)}<span>${esc(s.name)}</span></h3><b class="${p.done ? 'ok' : 'muted'}">${p.owned} / ${p.total}</b></div>
         <p class="small muted">${esc(s.desc)}</p>
         <span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span>
         <p class="small">${icon('star')} Récompense : ${app.rewardText(s.reward)}${p.done ? ' · <span class="ok">obtenue</span>' : ''}</p>

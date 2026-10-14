@@ -1,8 +1,9 @@
 // Profil : titre, cadre, niveau, statistiques, vitrine, historique.
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
-import { icon, sigil, EMBLEM, picon } from '../ui/icons.js';
-import { esc, fmt, pct, bindActions } from '../ui/dom.js';
+import { icon, sigil, EMBLEM, picon, setIcon } from '../ui/icons.js';
+import { esc, fmt, pct, bindActions, toast } from '../ui/dom.js';
+import { unlockSources } from '../core/unlocks.js';
 import { RARITIES, FRAMES, BOOSTERS, FACTION_ORDER, VARIANTS, RARITY, RARITY_ORDER } from '../config.js';
 
 export default function profile(app, root) {
@@ -34,6 +35,7 @@ export default function profile(app, root) {
       ${s.best.length ? `<h3>Tes plus belles ouvertures</h3><div class="stack">${s.best.map((b, i) => `<div class="panel hist best-op"><span class="best-rank">${i + 1}</span><div><div class="row between small"><b>${esc(BOOSTERS[b.type]?.name || b.type)}</b><span class="muted">${new Date(b.t).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} · ${b.score} pts</span></div><div class="hist-cards">${b.cards.map((c) => { const card = cat.get(c.id); return card ? `<button class="hist-c" data-id="${c.id}" style="--rc:${RARITY[card.rarity].color}" title="${esc(card.name)}"><img alt="${esc(card.name)}" loading="lazy" src="${artUrl(card, { lite: true })}">${c.v !== 'normal' ? `<em>${esc(VARIANTS[c.v].short)}</em>` : ''}</button>` : ''; }).join('')}</div></div></div>`).join('')}</div>` : ''}</div></details>`;
   }
 
+  const U = unlockSources(cat);
   function render() {
     const s = g.s, lv = g.levelInfo();
     const owned = g.uniqueCount(), total = g.total();
@@ -60,8 +62,9 @@ export default function profile(app, root) {
       </div>
 
       <details class="panel dc-fold"><summary>${picon('titles')} Titres et cadres</summary><div>
-        <div class="chips">${s.titles.map((t) => `<button class="chip" data-act="title" data-v="${esc(t)}" aria-pressed="${t === s.title}">${esc(t)}</button>`).join('')}</div>
-        <div class="frames">${Object.entries(FRAMES).map(([k, name]) => { const has = s.frames.includes(k); return `<button class="frame-pick" data-act="frame" data-v="${k}" ${has ? '' : 'disabled'} aria-pressed="${s.frame === k}"><span class="avatar-mini pf pf-${k}">${has ? '' : icon('lock')}</span><span class="small">${esc(name)}</span></button>`; }).join('')}</div>
+        <p class="small muted">Touche un titre ou un cadre grisé pour savoir comment l’obtenir.</p>
+        <div class="chips pf-titles">${s.titles.map((t) => `<button class="chip" data-act="title" data-v="${esc(t)}" aria-pressed="${t === s.title}">${esc(t)}</button>`).join('')}${U.titles.filter((t) => !s.titles.includes(t.name)).map((t) => `<button class="chip pf-lock" data-act="how" data-how="${esc(t.how)}" data-v="${esc(t.name)}">${icon('lock')}${esc(t.name)}</button>`).join('')}</div>
+        <div class="frames">${Object.entries(FRAMES).filter(([k]) => s.frames.includes(k) || U.frames.some((f) => f.key === k)).map(([k, name]) => { const has = s.frames.includes(k), how = U.frames.find((f) => f.key === k)?.how || ''; return `<button class="frame-pick ${has ? '' : 'pf-lock'}" data-act="${has ? 'frame' : 'how'}" data-v="${has ? k : esc(name)}" data-how="${esc(how)}" aria-pressed="${s.frame === k}"><span class="avatar-mini pf pf-${k}">${has ? '' : icon('lock')}</span><span class="small">${esc(name)}</span></button>`; }).join('')}</div>
       </div></details>
 
       ${luckHTML()}
@@ -78,7 +81,7 @@ export default function profile(app, root) {
         <h3>Par faction</h3>
         ${FACTION_ORDER.map((f) => { const p = g.factionProgress(f); return `<div class="fac-row"><span style="color:${cat.faction[f].colors.secondary}">${sigil(f)}</span><span>${esc(cat.faction[f].name)}</span><span class="progress"><i style="width:${p.ratio * 100}%;--bar:${cat.faction[f].colors.secondary}"></i></span><b>${p.owned}/${p.total}</b></div>`; }).join('')}
         <h3>Ensembles</h3>
-        ${cat.sets.map((st) => { const p = g.setProgress(st.key); return `<div class="fac-row"><span>${p.done ? icon('star') : ''}</span><span>${esc(st.name)}</span><span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span><b>${p.owned}/${p.total}</b></div>`; }).join('')}
+        ${cat.sets.map((st) => { const p = g.setProgress(st.key); return `<div class="fac-row ${p.done ? 'set-done' : ''}"><span>${setIcon(st.key)}</span><span>${esc(st.name)}${p.done ? ` ${icon('check')}` : ''}</span><span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span><b>${p.owned}/${p.total}</b></div>`; }).join('')}
       </div></details>
 
       ${s.history.length ? `<details class="panel dc-fold"><summary>${picon('openings')} Dernières ouvertures</summary><div class="history">${s.history.slice(0, 10).map((h) => `<div class="panel hist"><div class="row between small"><b>${esc(BOOSTERS[h.type]?.name || h.type)}${h.faction ? ` · ${esc(cat.faction[h.faction].name)}` : ''}</b><span class="muted">${new Date(h.t).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}</span></div><div class="hist-cards">${h.cards.map((c) => { const card = cat.get(c.id); return card ? `<button class="hist-c" data-id="${c.id}" style="--rc:${RARITIES.find((r) => r.key === card.rarity).color}" title="${esc(card.name)}"><img alt="${esc(card.name)}" loading="lazy" src="${artUrl(card, { lite: true })}">${c.n ? '<i>N</i>' : ''}${c.v !== 'normal' ? `<em>${esc(VARIANTS[c.v].short)}</em>` : ''}</button>` : ''; }).join('')}</div></div>`).join('')}</div></details>` : ''}
@@ -88,6 +91,7 @@ export default function profile(app, root) {
   bindActions(root, {
     title(el) { g.setTitle(el.dataset.v); render(); },
     frame(el) { g.setFrame(el.dataset.v); render(); },
+    how(el) { toast(`${icon('lock')} <b>${esc(el.dataset.v)}</b><br><span class="small">${esc(el.dataset.how || 'Pas encore disponible.')}</span>`, { ms: 6000 }); },
   });
   root.addEventListener('click', (e) => {
     const t = e.target.closest('#showcase .tcg, .hist-c, .rarest .tcg');

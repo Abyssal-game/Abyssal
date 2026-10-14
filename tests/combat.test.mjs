@@ -2,6 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { loadCatalog, MemoryStorage, rngFrom } from './helpers.mjs';
+import { noWelcome } from './helpers.mjs';
 import { Game } from '../js/core/game.js';
 import * as D from '../js/core/duel.js';
 import { AP_MAX, FERVOR_MAX, diceChance } from '../js/core/skills.js';
@@ -55,7 +56,7 @@ test('Ferveur : gagnée en attaquant, compétence refusée sans Ferveur, dépens
   assert.equal(st.fervor, 0);
   assert.ok(atk.hp > 2);
   // Descente : la Ferveur du combat suivant reprend celle de la fin du précédent
-  const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('fv'), clock: () => new Date(2026, 9, 12, 12) });
+  const g = noWelcome(new Game(catalog, new MemoryStorage(), { rng: rngFrom('fv'), clock: () => new Date(2026, 9, 12, 12) }));
   g.team();
   const run = g.startRun();
   const f0 = run.gauge;
@@ -229,13 +230,13 @@ test('reprise : l’état sauvegardé redonne exactement le même combat ; ancie
   assert.deepEqual(copy.units, st.units, 'même graine, même combat');
   // ancien combat (avant la refonte) dans une expédition en cours
   const storage = new MemoryStorage();
-  const g = new Game(catalog, storage, { rng: rngFrom('old'), clock: () => new Date(2026, 9, 12, 12) });
+  const g = noWelcome(new Game(catalog, storage, { rng: rngFrom('old'), clock: () => new Date(2026, 9, 12, 12) }));
   g.team(); g.startRun(); g.chooseDoor('fight');
   const old = g.s.descent.run.battle;
   delete old.ver; delete old.ap; delete old.fervor; old.gauge = 3; old.turn = 'enemy';
   Object.values(old.units).forEach((u) => { delete u.acts; delete u.brk; delete u.fam; });
   g.persist();
-  const g2 = new Game(catalog, storage, { rng: rngFrom('old2'), clock: () => new Date(2026, 9, 12, 12) });
+  const g2 = noWelcome(new Game(catalog, storage, { rng: rngFrom('old2'), clock: () => new Date(2026, 9, 12, 12) }));
   const st2 = g2.descent().run.battle;
   assert.equal(st2.ver, 2); assert.equal(st2.turn, 'ally'); assert.equal(st2.ap, AP_MAX); assert.equal(st2.fervor, 3);
   D.autoDuel(st2, 40);
@@ -243,7 +244,7 @@ test('reprise : l’état sauvegardé redonne exactement le même combat ; ancie
 });
 
 test('Descente : PV et créatures tombées gardés d’un étage à l’autre, bénédictions de combat', () => {
-  const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('ds'), clock: () => new Date(2026, 9, 12, 12) });
+  const g = noWelcome(new Game(catalog, new MemoryStorage(), { rng: rngFrom('ds'), clock: () => new Date(2026, 9, 12, 12) }));
   g.team();
   const run = g.startRun();
   g.chooseDoor('fight');
