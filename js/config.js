@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v229'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v230'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -81,11 +81,11 @@ export const ECONOMY = {
   start: { shards: 0, ash: 60, tickets: { standard: 2 } }, // 60 cendres : de quoi monter tout de suite 2 ou 3 créatures
   discoveryShards: { C: 1, PC: 2, R: 3, HR: 7, M: 12, S: 25 },
   // Fournaise : cendres rendues par un exemplaire brûlé (rareté × finition)
-  burnAsh: { C: 3, PC: 6, R: 15, HR: 40, M: 100, S: 250 },
+  burnAsh: { C: 5, PC: 10, R: 25, HR: 60, M: 150, S: 375 },
   burnFinish: { normal: 1, holo: 3, gold: 8, galaxy: 20 },
   // Niveau des créatures : passer du niveau n à n+1 coûte levelAsh × n cendres (niveau 10 au plus)
   levelAsh: { C: 10, PC: 15, R: 25, HR: 40, M: 60, S: 80 },
-  craftAsh: { C: 40, PC: 100, R: 250, HR: 600, M: 1600 }, // les secrètes ne s'invoquent pas
+  craftAsh: { C: 40, PC: 100, R: 250, HR: 600, M: 1600 }, // invocation retirée : sert seulement à rembourser les cartes retirées du jeu
   decipherAsh: 15,
   revealNamesAt: 0.5, // les noms d'une faction se révèlent à 50 % de complétion
   daily: { base: 50, perStreakDay: 5, maxStreakBonus: 30 },

@@ -139,3 +139,19 @@ test('Descente : ennemis nommés de temps en temps, créatures de l’événemen
   for (let f = 1; f < 60; f++) { const l = eventSwap(catalog, floorEnemies(catalog, 'd', f, 'fight'), 'd', f, ['infernal', 'necrotique']); l.forEach((e) => { tot++; if (['infernal', 'necrotique'].includes(catalog.get(e.id).faction)) evc++; }); }
   assert.ok(evc / tot > 0.4, `part de l’événement : ${(evc / tot).toFixed(2)}`);
 });
+
+test('cendres : chaque victoire dans la Descente et chaque coffre en donnent', async () => {
+  const { CHESTS } = await import('../js/core/descent.js');
+  const g = noWelcome(new Game(loadCatalog(), new MemoryStorage(), { rng: rngFrom('ash'), clock: () => new Date(2026, 9, 10, 12) }));
+  g.team(); g.s.ash = 0;
+  g.startRun();
+  for (let k = 0; k < 50 && g.s.descent.run && !g.s.descent.run.battle?.over; k++) {
+    const r = g.s.descent.run;
+    if (r.phase === 'doors') { const o = g.chooseDoor(g.doors()[0]); if (o.battle) { const out = g.autoResolve(); if (out?.won) { assert.ok(out.ash >= 2, 'cendres de victoire'); break; } } } else break;
+  }
+  assert.ok(g.s.ash > 0);
+  for (const t of ['bois', 'fer', 'or', 'abyssal']) {
+    assert.ok(CHESTS[t].ash > 0);
+    g.s.chests[t] = 1; const a = g.s.ash; g.openChest(t); assert.equal(g.s.ash, a + CHESTS[t].ash);
+  }
+});

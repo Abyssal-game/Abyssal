@@ -1,7 +1,7 @@
 // Ouverture d'un coffre en plein écran : un vrai événement, comme un booster.
 // Le coffre tremble, s'illumine, s'ouvre dans un éclat de lumière, et les boosters en
 // jaillissent un par un avant de se ranger ; on peut les ouvrir aussitôt ou plus tard.
-// Les coffres de bois et de fer ne donnent que des éclats.
+// Les coffres de bois et de fer ne donnent pas de booster : des éclats et des cendres.
 import { CHESTS } from '../core/descent.js';
 import { BOOSTERS } from '../config.js';
 import { chestSVG } from '../ui/chest.js';
@@ -66,20 +66,24 @@ export function openChestScene(app, type, { onDone } = {}) {
       app.sfx.swipe(); if (k === 'premium') setTimeout(() => app.sfx.discover(), 200);
       await wait(520);
     }
-    if (def.shards) { // les éclats jaillissent après les boosters
+    // les éclats puis les cendres jaillissent après les boosters
+    const extras = [def.shards && ['crystal', def.shards, 'éclats'], def.ash && ['ash', def.ash, 'cendres']].filter(Boolean);
+    for (let j = 0; j < extras.length; j++) {
+      const [ic, v, l] = extras[j];
       const p = document.createElement('div');
-      p.className = 'chx-pack chx-shards'; p.style.setProperty('--i', packs.length); p.style.setProperty('--n', packs.length + 1);
-      p.innerHTML = `<span class="chx-sh-ic">${icon('crystal')}</span><b>+${def.shards}</b><span class="chx-pname">éclats</span>`;
+      p.className = 'chx-pack chx-shards'; p.style.setProperty('--i', packs.length + j); p.style.setProperty('--n', packs.length + extras.length);
+      p.innerHTML = `<span class="chx-sh-ic">${icon(ic)}</span><b>+${v}</b><span class="chx-pname">${l}</span>`;
       row.appendChild(p); app.sfx.coin(); app.chrome?.();
       await wait(520);
     }
+    const gains = [def.shards && `${def.shards} éclats`, def.ash && `${def.ash} cendres`].filter(Boolean);
     const n = packs.length, prem = packs.filter((k) => k === 'premium').length;
     if (!n) { // coffre sans booster : seulement des éclats
-      msg.innerHTML = `<b class="chx-count">+${def.shards} éclats !</b>`;
+      msg.innerHTML = `<b class="chx-count">+${gains.join(' et +')} !</b>`;
       acts.innerHTML = '<button class="btn primary block big-cta dc-plq dc-plq-red" data-x="later">Continuer</button>';
       acts.hidden = false; busy = false; return;
     }
-    msg.innerHTML = `<b class="chx-count">${n} booster${n > 1 ? 's' : ''}${prem ? ` dont ${prem === n ? (n > 1 ? 'tous premium' : 'premium') : `${prem} premium`}` : ''}${def.shards ? ` et ${def.shards} éclats` : ''} !</b>`;
+    msg.innerHTML = `<b class="chx-count">${n} booster${n > 1 ? 's' : ''}${prem ? ` dont ${prem === n ? (n > 1 ? 'tous premium' : 'premium') : `${prem} premium`}` : ''}${gains.length ? ` et ${gains.join(' et ')}` : ''} !</b>`;
     acts.innerHTML = `<button class="btn primary block big-cta dc-plq dc-plq-red" data-x="go">${icon('p:booster')}Ouvrir ${n > 1 ? 'les boosters' : 'le booster'}</button><button class="btn block dc-plq dc-plq-dark" data-x="later">Plus tard (dans Boosters)</button>`;
     acts.hidden = false;
     busy = false;

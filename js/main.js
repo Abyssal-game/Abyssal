@@ -90,7 +90,7 @@ function applySettings() {
 // Explication des deux monnaies (toucher le compteur en haut à droite)
 const WALLET = {
   shards: ['Éclats', 'La monnaie principale. Ils servent à acheter des boosters dans la Boutique.', 'Tu en gagnes avec l’offrande du jour, les missions, les succès, les nouvelles créatures découvertes et surtout dans la Descente (combats, trésors, gardiens).', 'boutique', 'Aller aux Boosters'],
-  ash: ['Cendres', 'Ce qui reste des cartes brûlées dans la Fournaise. Elles font monter le niveau de tes créatures, invoquent une carte manquante et déchiffrent les noms inconnus.', 'Brûle tes doublons dans la Fournaise (onglet Collection) : plus la carte est rare, plus elle en donne, et les finitions rares encore plus.', 'fournaise', 'Aller à la Fournaise'],
+  ash: ['Cendres', 'Ce qui reste des cartes brûlées dans la Fournaise. Elles font monter le niveau de tes créatures et déchiffrent les noms inconnus.', 'Chaque combat gagné dans la Descente en donne, les coffres aussi. Brûle tes doublons dans la Fournaise (onglet Collection) : plus la carte est rare, plus elle en donne, et les finitions rares encore plus.', 'fournaise', 'Aller à la Fournaise'],
 };
 // iPhone, app posée sur l'écran d'accueil : la hauteur annoncée par le navigateur peut être plus
 // courte que l'écran réel (une bande noire reste en bas). On mesure la vraie hauteur et on la donne

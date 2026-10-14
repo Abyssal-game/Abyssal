@@ -128,17 +128,15 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
         <div class="dt-tabs" role="tablist">${tabs.map(([k, ic, l]) => `<button class="dt-tab" role="tab" data-act="tab" data-v="${k}" aria-selected="${dtab === k}">${picon(ic)}<span>${l}</span></button>`).join('')}</div>
         <div class="panel dt-pane">${TAB[dtab]}</div>`;
     } else {
-      const craft = ECONOMY.craftAsh[card.rarity];
       body = `
         <div class="panel detail-facts dt-sealed">
           <dl class="facts">
             <div><dt>Faction</dt><dd><span class="fac-dot" style="color:${fac.colors.secondary}">${sigil(card.faction)}</span>${esc(fac.name)}</dd></div>
             <div><dt>Rareté</dt><dd style="color:${r.color}">${r.name}</dd></div>
           </dl>
-          <p class="small">Page encore scellée : trouve la carte dans un booster${craft ? ' ou invoque-la avec des cendres' : ''}. ${odds(card)}</p>
+          <p class="small">Page encore scellée : trouve la carte dans un booster ou dans la Descente. ${odds(card)}</p>
           <p class="small muted">Son nom se révèle quand tu possèdes la moitié de sa faction.</p>
-        </div>
-        ${craft ? `<button class="btn primary block" data-act="craft" ${g.s.ash < craft ? 'disabled' : ''}>${icon('ash')}Invoquer · ${fmt(craft)} cendres <small>(tu en as ${fmt(g.s.ash)})</small></button>` : '<p class="small muted center">Les cartes secrètes ne peuvent pas être invoquées : seul le hasard les révèle.</p>'}`;
+        </div>`;
     }
     sheet.setContent(`<div class="detail ${owned ? '' : 'is-sealed'}">
       ${nav}
@@ -172,13 +170,6 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
       const on = c.classList.toggle('art-only');
       el.querySelector('span').textContent = on ? 'Texte' : 'Illustration';
       if (on) sheet.el.scrollTo({ top: 0, behavior: 'smooth' });
-    },
-    async craft() {
-      const card = cat.get(current);
-      const cost = ECONOMY.craftAsh[card.rarity];
-      if (!(await confirmBox(`Invoquer cette carte pour <b>${fmt(cost)} cendres</b> ?`, { ok: 'Invoquer' }))) return;
-      try { g.craft(current); app.sfx.reveal(card.rarity); toast(`<b>${esc(card.name)}</b> rejoint ta collection.`, { kind: 'success', icon: 'sparkle' }); draw(); }
-      catch (err) { app.sfx.error(); toast(esc(err.message), { kind: 'error' }); }
     },
     decipher() {
       try { g.decipher(current); toast(`Nom déchiffré : <b>${esc(cat.get(current).name)}</b>`, { icon: 'eye' }); draw(); }

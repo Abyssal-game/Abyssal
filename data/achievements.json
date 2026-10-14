@@ -21,7 +21,7 @@
  { "key": "boosters_150",  "name": "Pilleur de bibliothèques", "desc": "Ouvre 150 boosters.",                             "cond": { "type": "boosters", "n": 150 },        "reward": { "shards": 150, "title": "Pilleur de grimoires" } },
  { "key": "variant_1",     "name": "Reflet changeant",        "desc": "Obtiens une première variante cosmétique.",        "cond": { "type": "variants", "n": 1 },          "reward": { "shards": 15 } },
  { "key": "variant_15",    "name": "Galerie des reflets",     "desc": "Possède 15 variantes cosmétiques.",                "cond": { "type": "variants", "n": 15 },         "reward": { "shards": 60, "frame": "prisme" } },
- { "key": "craft_1",       "name": "Rituel d’invocation",     "desc": "Invoque une carte avec des cendres.",              "cond": { "type": "crafted", "n": 1 },           "reward": { "shards": 10 } },
+ { "key": "craft_1",       "name": "Premières cendres",   "desc": "Brûle une carte dans la Fournaise.",        "cond": { "type": "burned", "n": 1 },             "reward": { "shards": 10 } },
  { "key": "daily_7",       "name": "Fidèle des sceaux",       "desc": "Récupère 7 offrandes quotidiennes.",               "cond": { "type": "daily", "n": 7 },             "reward": { "shards": 40 } },
  { "key": "unique_150",    "name": "Cent cinquante noms",     "desc": "Découvre 150 cartes différentes.",                 "cond": { "type": "unique", "n": 150 },          "reward": { "shards": 75, "tickets": { "standard": 1 } } },
  { "key": "boosters_300",  "name": "Gardien des Sceaux",      "desc": "Ouvre 300 boosters.",                              "cond": { "type": "boosters", "n": 300 },        "reward": { "shards": 250, "title": "Gardien des Sceaux", "frame": "or" } },

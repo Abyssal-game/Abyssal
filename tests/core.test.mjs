@@ -161,14 +161,10 @@ test('offrande quotidienne : une par jour, série', () => {
   assert.equal(g.claimDaily().streak, 1);
 });
 
-test('invocation par cendres et déchiffrement', () => {
+test('plus d’invocation par cendres ; déchiffrement des noms', () => {
   const g = new Game(catalog, new MemoryStorage());
   g.s.ash = 1000;
-  g.craft('CEL-001');
-  assert.ok(g.owns('CEL-001'));
-  assert.throws(() => g.craft('CEL-001'));
-  const secret = catalog.cards.find((c) => c.rarity === 'S');
-  assert.throws(() => g.craft(secret.id));
+  assert.equal(g.craft, undefined, 'l’invocation de cartes a été retirée');
   const unknown = catalog.byFaction.necrotique.find((c) => !g.nameKnown(c.id));
   g.decipher(unknown.id);
   assert.ok(g.nameKnown(unknown.id));

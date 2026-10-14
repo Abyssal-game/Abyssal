@@ -19,10 +19,10 @@ export const BLESSINGS = {
 
 // Coffres : la profondeur atteinte décide du coffre ; il contient des boosters.
 export const CHESTS = {
-  bois:    { name: 'Coffre de bois',  color: '#B07A45', packs: [], shards: 50, desc: '50 éclats' },
-  fer:     { name: 'Coffre de fer',   color: '#A9B6C9', packs: [], shards: 150, desc: '150 éclats' },
-  or:      { name: 'Coffre d’or',     color: '#F2C14E', packs: ['standard'], shards: 0, desc: '1 booster standard' },
-  abyssal: { name: 'Coffre abyssal',  color: '#B04BFF', packs: ['premium'], shards: 0, desc: '1 booster premium' },
+  bois:    { name: 'Coffre de bois',  color: '#B07A45', packs: [], shards: 50, ash: 20, desc: '50 éclats et 20 cendres' },
+  fer:     { name: 'Coffre de fer',   color: '#A9B6C9', packs: [], shards: 150, ash: 40, desc: '150 éclats et 40 cendres' },
+  or:      { name: 'Coffre d’or',     color: '#F2C14E', packs: ['standard'], shards: 0, ash: 60, desc: '1 booster standard et 60 cendres' },
+  abyssal: { name: 'Coffre abyssal',  color: '#B04BFF', packs: ['premium'], shards: 0, ash: 100, desc: '1 booster premium et 100 cendres' },
 };
 export const CHEST_ORDER = ['bois', 'fer', 'or', 'abyssal'];
 export const chestForDepth = (floor) => (floor >= 25 ? 'abyssal' : floor >= 16 ? 'or' : floor >= 8 ? 'fer' : floor >= 3 ? 'bois' : null);

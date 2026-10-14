@@ -270,20 +270,8 @@ export class Game {
     return { amount, streak, chest, progress };
   }
 
-  craftCost(id) { return ECONOMY.craftAsh[this.catalog.get(id).rarity]; }
-  craft(id) {
-    const c = this.catalog.get(id);
-    if (this.owns(id)) throw new Error('Tu possèdes déjà cette carte.');
-    const cost = ECONOMY.craftAsh[c.rarity];
-    if (cost === undefined) throw new Error('Les cartes secrètes ne peuvent pas être invoquées.');
-    if (this.s.ash < cost) throw new Error(`Il te manque ${cost - this.s.ash} cendres (tu en as ${this.s.ash}). Les doublons en donnent.`);
-    this.s.ash -= cost;
-    this.s.stats.crafted++;
-    const r = this.addCard(id, 'normal', 'craft');
-    const progress = this.checkProgress();
-    this.persist();
-    return { ...r, progress };
-  }
+  // L'invocation de cartes manquantes avec des cendres a été retirée (v230) : la collection
+  // se construit avec les boosters et la Descente. Les cendres servent aux niveaux.
 
   decipher(id) {
     if (this.nameKnown(id)) throw new Error('Ce nom est déjà connu.');
@@ -547,7 +535,8 @@ export class Game {
     this.s.chests[type]--;
     const packs = CHESTS[type].packs.slice();
     packs.forEach((k) => { this.s.tickets[k] = (this.s.tickets[k] || 0) + 1; });
-    if (CHESTS[type].shards) this.s.shards += CHESTS[type].shards; // éclats en plus des boosters (fer et au-dessus)
+    if (CHESTS[type].shards) this.s.shards += CHESTS[type].shards; // éclats (bois et fer)
+    if (CHESTS[type].ash) { this.s.ash += CHESTS[type].ash; this.s.stats.ashEarned += CHESTS[type].ash; } // cendres (tous les coffres)
     this.s.stats.chests = (this.s.stats.chests || 0) + 1;
     this.track('chest', 1);
     this.checkProgress();
@@ -963,6 +952,8 @@ export class Game {
     if (won) {
       const hunt = room === 'elite' && this.rule(run.day).key === 'chasse';
       out.shards = this.gainShards((8 + 2 * Math.min(run.floor, SHARD_FLOOR_CAP)) * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1) * (hunt ? 2 : 1));
+      // cendres de combat : de quoi faire monter son équipe même sans doublons (pas en descente libre)
+      if (!run.free) { out.ash = Math.round((2 + Math.min(run.floor, SHARD_FLOOR_CAP) / 2) * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1)); this.s.ash += out.ash; this.s.stats.ashEarned += out.ash; }
       const named = Object.values(st.units).find((u) => u.side === 'enemy' && u.named);
       if (named) out.named = { title: named.title, id: named.id, shards: this.gainShards(20 + Math.min(run.floor, SHARD_FLOOR_CAP) * 4) };
       // objectif réussi : éclats en plus et 1 Ferveur pour la suite
@@ -1258,6 +1249,7 @@ export class Game {
       case 'boosters': return this.s.stats.boosters;
       case 'variants': return this.variantCount();
       case 'crafted': return this.s.stats.crafted;
+      case 'burned': return this.s.stats.burned || 0;
       case 'daily': return this.s.stats.daily;
       case 'depth': return this.s.descent.best || 0;
       case 'hunted': return this.huntCount();
