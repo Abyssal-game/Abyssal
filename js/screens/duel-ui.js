@@ -225,7 +225,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const ready = ultReady(st);
     if (ready && !g.s.tips?.['cb-ult']) tuto(app, 'cb-ult');
     $('.cb-res').classList.toggle('ready', ready);
-    $('.cb-ult small').textContent = st.ultUsed ? 'Utilisé' : ready ? 'Prêt ! Touche' : `${st.fervor}/${FERVOR_MAX}`;
+    $('.cb-ult small').textContent = st.ultUsed ? 'Utilisé' : ready ? '' : `${st.fervor}/${FERVOR_MAX}`;
     const canMore = st.ap > 0 && front(st, 'ally').some((u) => actionsFor(st, u.uid).some((a) => a.ok && a.key !== 'swap' && a.key !== 'defend'));
     $('.dv-end').classList.toggle('pulse', st.turn === 'ally' && !canMore && !busy);
     root.querySelectorAll('.dv-bar button').forEach((b) => { b.disabled = busy || st.turn !== 'ally' || !!st.over; });

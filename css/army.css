@@ -2277,3 +2277,16 @@ input[type="range"]:disabled { opacity: .45; }
 @media (max-width: 360px) { .alb-tab { flex-basis: 38px; } .album-page { border-image-width: 50px 48px 50px 52px !important; padding: 24px 20px 24px 26px !important; } }
 .album-page .album-ph { margin: 2px 12px 10px 6px !important; }
 .progress { display: block; min-width: 40px; }
+
+/* v248 : pouvoir d'équipe — symbole centré dans le cercle doré, nom lisible en entier ; « Fin du tour » reste rouge quand il est inactif ; sous-onglets opaques */
+.cb-res { position: relative; }
+.cb-res .cb-ult .cb-pw { position: absolute; left: 7.3%; top: 70.3%; width: 7.4% !important; height: auto !important; aspect-ratio: 1; margin: 0 !important; }
+.cb-res .cb-ult { padding-left: 13% !important; gap: 4px; align-items: center !important; }
+.cb-res .cb-ult b { white-space: normal; overflow: hidden; text-overflow: clip; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-size: .6rem; line-height: 1.05; flex: 1 1 auto; min-width: 0; }
+.cb-res .cb-ult small:empty { display: none; }
+.cb-res.ready .cb-ult b { color: #FFE7A6; text-shadow: 0 0 6px color-mix(in srgb, var(--uc) 80%, transparent), 0 1px 0 #000; }
+.cb-bar .dv-end:disabled { filter: brightness(.62) saturate(.85) drop-shadow(0 3px 6px rgba(0, 0, 0, .75)) !important; opacity: 1; }
+body.has-subnav #subnav { background: #06070B !important; border-bottom: 1px solid rgba(232, 195, 90, .28); box-shadow: 0 6px 14px rgba(0, 0, 0, .65); transform: translateZ(0); }
+body.has-subnav #subnav::before { content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: 24px; background: #06070B; pointer-events: none; }
+body.has-subnav #subnav .sn-tab { background: #16121E; }
+@media (max-width: 360px) { .cb-res .cb-ult b { display: -webkit-box !important; font-size: .5rem; } }
