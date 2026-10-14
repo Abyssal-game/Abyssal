@@ -321,5 +321,7 @@ test('noms : une compétence propre ne reprend jamais le nom d’une compétence
 
 test('icônes : chaque icône de passif annoncée existe', async () => {
   const { passiveIconUrl } = await import('../js/core/kits.js');
-  for (const k of Object.keys(PASSIVES)) { const u = passiveIconUrl(k); if (u) assert.ok(fs.existsSync(path.join(ROOT, u)), u); }
+  const { kitSteps } = await import('../js/core/kits.js');
+  for (const k of Object.keys(PASSIVES)) { const u = passiveIconUrl(k); assert.ok(u && fs.existsSync(path.join(ROOT, u)), `${k} : ${u}`); }
+  for (const id of Object.keys(CREATURE_KITS)) kitSteps(id, 10).forEach((x) => assert.ok(x.img && fs.existsSync(path.join(ROOT, x.img)), `${id} ${x.k} : ${x.img}`));
 });
