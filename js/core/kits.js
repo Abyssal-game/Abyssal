@@ -409,7 +409,7 @@ export function passiveMult(st, a, t, front) {
 }
 
 // ——— Présentation (fiche de la créature, Renforcer, montée de niveau) ———
-export const moveIconUrl = (k) => `assets/salles/pw/${k}.webp`;
+export const moveIconUrl = (k) => `assets/pw/${k}.webp`;
 // Passifs qui ont leur icône peinte (assets/icons/pp-<clé>.webp)
 const PASSIVE_ART = new Set(['attiser', 'inebranlable', 'choeur', 'filaments', 'elue', 'presage', 'chasseur', 'colere', 'enfers', 'profondeurs', 'faim', 'renaissance', 'ruee', 'sentinelle', 'drain', 'premiere', 'eruption', 'malediction', 'benediction', 'egide', 'reliquat', 'commandement', 'engloutir', 'regeneration', 'venin', 'frenesie', 'blindage', 'augure', 'cataclysme', 'insaisissable', 'devoreur', 'effroi']);
 export const passiveIconUrl = (k) => (PASSIVE_ART.has(k) ? `assets/icons/pp-${k}.webp` : null);

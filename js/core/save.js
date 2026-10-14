@@ -58,7 +58,6 @@ export function defaultSave(now = Date.now()) {
     lore: {},             // fragment de récit -> date de déblocage
     sceaux: { wins: 0, losses: 0, draws: 0, beaten: {}, day: null, paidToday: 0, streak: 0, best: 0, history: [] },
     relics: { best: 0, runs: 0, wins: 0, run: null, last: null, day: null, paidToday: 0 },
-    salles: { run: null, runs: 0, wins: 0, best: 0, last: null }, // les Salles Oubliées (plateau tactique)
     war: { week: null, side: null, points: 0, used: {}, claimed: {}, history: [], report: null },
   };
 }
@@ -98,7 +97,7 @@ export function migrate(raw) {
   if (!Array.isArray(s.teamPresets)) s.teamPresets = [];
   s.teamPresets = s.teamPresets.filter((p) => p && typeof p.name === 'string' && Array.isArray(p.ids)).slice(0, 4);
   for (const k of ['items', 'fervor', 'collection', 'deciphered', 'achievements', 'setsDone', 'factionsDone', 'hunt', 'bossesBeaten', 'relations', 'forms', 'lore']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
-  if (!s.salles || typeof s.salles !== 'object') s.salles = d.salles;
+  delete s.salles; // les Salles Oubliées ont été supprimées (v206)
   for (const [k, sub] of [['sceaux', 'beaten'], ['war', 'used'], ['war', 'claimed']]) if (!s[k][sub] || typeof s[k][sub] !== 'object') s[k][sub] = {};
   for (const [k, sub] of [['sceaux', 'history'], ['war', 'history']]) if (!Array.isArray(s[k][sub])) s[k][sub] = [];
   for (const k of ['best', 'recent', 'history', 'showcase', 'titles', 'frames']) if (!Array.isArray(s[k])) s[k] = d[k];

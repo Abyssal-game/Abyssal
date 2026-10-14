@@ -33,19 +33,15 @@ const THEMES = {
     root: 43, scale: [0, 1, 3, 6, 7, 8, 11], chords: [[0, 3, 6], [1, 4, 8], [0, 1, 7], [-1, 3, 6]],
     drone: 0.07, lp: 420, every: [4, 6], pad: 0.016, bells: [8, 14], bell: 0.014, choir: 0.01, wind: 0.015, pulse: 96, brass: true,
   },
-  salles: { // Salles Oubliées : donjon humide, gouttes, cordes pincées
-    root: 47, scale: [0, 2, 3, 5, 7, 8, 11], chords: [[0, 3, 7], [-4, 0, 3], [-1, 2, 5], [5, 8, 12]],
-    drone: 0.05, lp: 360, every: [9, 12], pad: 0.012, bells: [9, 15], bell: 0.016, choir: 0, wind: 0.02, drips: [1.5, 5], pluck: [3, 7],
-  },
   sceaux: { // Sceaux : salle des règles, harpe et chœur
     root: 50, scale: [0, 2, 3, 5, 7, 9, 10], chords: [[0, 3, 7], [5, 9, 12], [-2, 2, 5], [3, 7, 10]],
     drone: 0.04, lp: 460, every: [8, 11], pad: 0.012, bells: [7, 12], bell: 0.016, choir: 0.012, wind: 0, pluck: [2.5, 5],
   },
 };
-export const MUSIC_DEMO = [['Antre', 'antre'], ['Boutique', 'boutique'], ['Descente', 'descente'], ['Combat', 'combat'], ['Gardien', 'boss'], ['Salles', 'salles'], ['Sceaux', 'sceaux']];
+export const MUSIC_DEMO = [['Antre', 'antre'], ['Boutique', 'boutique'], ['Descente', 'descente'], ['Combat', 'combat'], ['Gardien', 'boss'], ['Sceaux', 'sceaux']];
 
 // Lieu → ambiance
-const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', descente: 'descente', epreuve: 'descente', heros: 'descente', marchand: 'descente', salles: 'salles', sceaux: 'sceaux' };
+const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', descente: 'descente', epreuve: 'descente', heros: 'descente', marchand: 'descente', sceaux: 'sceaux' };
 
 function init() {
   if (ctx) return ctx;

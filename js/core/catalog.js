@@ -1,7 +1,7 @@
 // Index du catalogue (cartes, factions, ensembles…) construit une fois au démarrage.
 import { RARITY_ORDER, FACTION_ORDER } from '../config.js';
 
-export function createCatalog({ cards, factions, sets, abilities, achievements, lore, powers = {} }) {
+export function createCatalog({ cards, factions, sets, abilities, achievements, lore }) {
   const byId = new Map(cards.map((c) => [c.id, c]));
   const byFaction = Object.fromEntries(FACTION_ORDER.map((f) => [f, cards.filter((c) => c.faction === f)]));
   const byRarity = Object.fromEntries(RARITY_ORDER.map((r) => [r, cards.filter((c) => c.rarity === r)]));
@@ -23,7 +23,6 @@ export function createCatalog({ cards, factions, sets, abilities, achievements, 
     abilities,
     achievements,
     lore,
-    powers, // pouvoirs des Salles Oubliées, carte par carte (data/powers.json)
     lines,
     get(id) { return byId.get(id); },
   };
@@ -36,9 +35,9 @@ export async function loadCatalogData(base = './') {
     return r.json();
   };
   const factions = await get('data/factions.json');
-  const [cardLists, sets, abilities, achievements, lore, powers] = await Promise.all([
+  const [cardLists, sets, abilities, achievements, lore] = await Promise.all([
     Promise.all(FACTION_ORDER.map((f) => get(`data/cards/${f}.json`))),
-    get('data/sets.json'), get('data/abilities.json'), get('data/achievements.json'), get('data/lore.json'), get('data/powers.json').catch(() => ({})),
+    get('data/sets.json'), get('data/abilities.json'), get('data/achievements.json'), get('data/lore.json')
   ]);
-  return { cards: cardLists.flat(), factions, sets, abilities, achievements, lore, powers };
+  return { cards: cardLists.flat(), factions, sets, abilities, achievements, lore };
 }

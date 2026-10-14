@@ -77,7 +77,7 @@ Les 395 identités : 12 écrites à la main (`HAND_KITS`), les autres générée
 Pour écrire une identité à la main :
 
 1. Ajouter une entrée à `HAND_KITS` : `style`, `stat` (répartition attaque / PV, produit proche de 1), `strike` (effets reconnus : `mult`, `hits`, `brk`, `brkCharging`, `pierce`, `poisonMore`, `splashPoison`, `burn`, `healLowest`, `lowBonus`, `lifeShare`), `passive`, `move`, `plus`, `moins`, `synergy`.
-2. Un nouveau passif : une entrée dans `PASSIVES` et son effet dans `duel.js` (chercher `passiveOf(`). Une nouvelle compétence : une entrée dans `MOVES` avec `run` (effet), `ai` (quand l’IA la joue), `cd` (recharge) et l’icône peinte `assets/salles/pw/<icon>.webp`.
+2. Un nouveau passif : une entrée dans `PASSIVES` et son effet dans `duel.js` (chercher `passiveOf(`). Une nouvelle compétence : une entrée dans `MOVES` avec `run` (effet), `ai` (quand l’IA la joue), `cd` (recharge) et l’icône peinte `assets/pw/<icon>.webp`.
 3. `npm test` vérifie qu’aucun passif ni aucune compétence n’est affiché sans effet. `node tools/balance.mjs` compare des équipes ; `depth()` mesure la profondeur moyenne atteinte en Descente.
 
 ## Remplacer les illustrations

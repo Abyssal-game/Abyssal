@@ -37,7 +37,7 @@ test('kits : les 395 créatures ont une identité complète, chaque effet est d�
     assert.ok(m, `${id} : compétence`);
     assert.ok(k.strike?.name && k.strike?.desc && k.plus && k.moins && k.synergy && k.style, `${id} : fiche complète`);
     assert.ok(typeof m.run === 'function' && typeof m.ai === 'function' && m.desc && m.name, `${id} : effet, IA et texte`);
-    assert.ok(fs.existsSync(path.join(ROOT, `assets/salles/pw/${m.icon}.webp`)), `${id} : icône peinte ${m.icon}`);
+    assert.ok(fs.existsSync(path.join(ROOT, `assets/pw/${m.icon}.webp`)), `${id} : icône peinte ${m.icon}`);
     if (m.ops) m.ops.forEach((o) => assert.ok(OPS[o.op], `${id} : effet ${o.op}`));
   }
   // chaque passif et chaque compétence écrite à la main sert, et le moteur lit chaque passif (aucun passif affiché sans effet)

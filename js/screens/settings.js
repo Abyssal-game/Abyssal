@@ -32,7 +32,7 @@ export default function settings(app, root) {
         <h2>Son et animations</h2>
         ${toggle('sound', 'Effets sonores', 'Ouverture, révélation, combat. Le mode silencieux de l’iPhone peut les couper.')}
         <div class="set-row col"><label for="vol"><b>Volume</b></label><input id="vol" type="range" min="0" max="1" step="0.05" value="${s.volume}" ${s.sound ? '' : 'disabled'}></div>
-        ${toggle('music', 'Musique d’ambiance', 'Une ambiance différente selon le lieu : Antre, Boutique, Descente, combat, gardien, Salles, Sceaux.')}
+        ${toggle('music', 'Musique d’ambiance', 'Une ambiance différente selon le lieu : Antre, Boutique, Descente, combat, gardien, Sceaux.')}
         <div class="set-row col"><label for="mvol"><b>Volume de la musique</b></label><input id="mvol" type="range" min="0" max="1" step="0.05" value="${s.musicVol ?? 0.55}" ${s.sound && s.music !== false ? '' : 'disabled'}></div>
         ${s.sound && s.music !== false ? `<div class="set-row col"><b>Écouter les ambiances</b><div class="set-sfx">${MUSIC_DEMO.map(([n], i) => `<button class="chip" data-mus="${i}">${n}</button>`).join('')}</div></div>` : ''}
         ${toggle('loud', 'Son même en mode silencieux', 'Le jeu reste audible quand le bouton silencieux de l’iPhone est activé (iOS 17 ou plus). Peut couper la musique d’une autre app.')}
