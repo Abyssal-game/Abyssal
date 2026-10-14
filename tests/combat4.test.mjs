@@ -135,22 +135,6 @@ test('talents : proposés après une élite, à choisir avant le bonus, appliqu�
   assert.ok(g.runUnits().some((u) => u.talent === o.talent));
 });
 
-test('épreuve du jour : identique pour tous le même jour, score et récompense une fois par jour', () => {
-  const g1 = new Game(catalog, new MemoryStorage(), { rng: rngFrom('a'), clock });
-  const g2 = new Game(catalog, new MemoryStorage(), { rng: rngFrom('b'), clock });
-  assert.deepEqual(g1.trialDef(), g2.trialDef());
-  const r1 = g1.trialStart(), r2 = g2.trialStart();
-  assert.deepEqual(Object.values(r1.battle.units).map((u) => [u.id, u.hp, u.atk]), Object.values(r2.battle.units).map((u) => [u.id, u.hp, u.atk]));
-  const st = r1.battle; foe(st).forEach((e) => { e.hp = 0; }); st.over = 'won';
-  const sh = g1.s.shards;
-  const out = g1.trialFinish();
-  assert.ok(out.won && out.score > 0);
-  assert.equal(g1.s.shards, sh + 40);
-  g1.trialStart(); const st2 = g1.s.trial.run.battle; st2.over = 'won'; st2.round = 9;
-  assert.equal(g1.trialFinish().shards, 0, 'récompense une seule fois par jour');
-  assert.equal(g1.trial().best.score, out.score, 'le meilleur score reste');
-});
-
 test('mode Cauchemar : verrouillé avant l’étage 20, ennemis renforcés, gardien éveillé dès le début', () => {
   const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('nm'), clock });
   const ids = catalog.cards.filter((c) => c.rarity === 'C').slice(0, 5).map((c) => c.id);

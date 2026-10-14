@@ -583,55 +583,6 @@ export class Game {
     this.persist();
     return d.run;
   }
-  // ——— Épreuve du jour : le même combat pour tout le monde (équipe imposée, ennemis et dés fixés) ———
-  trialDef(day = today(this.clock())) {
-    const r = rngOf(`trial:${day}`);
-    const pick = (list) => list[Math.floor(r() * list.length)];
-    const pool = this.catalog.cards.filter((c) => ['PC', 'R'].includes(c.rarity));
-    const roles = ['protecteur', 'degats', 'soin', pick(['poison', 'controle', 'soutien', 'zone']), pick(['degats', 'zone', 'soutien', 'controle'])];
-    const team = [];
-    for (const role of roles) { const c = pick(pool.filter((x) => roleOf(x) === role && !team.includes(x.id))); if (c) team.push(c.id); }
-    const foes = this.catalog.cards.filter((c) => ['PC', 'R', 'HR'].includes(c.rarity));
-    const enemies = [{ id: pick(foes.filter((c) => c.rarity === 'HR')).id, elite: true }, { id: pick(foes).id }, { id: pick(foes).id }];
-    const twist = pick(['none', 'sang', 'reflet']);
-    return { day, team, enemies, floor: 9, pact: twist === 'none' ? null : twist, seed: Math.floor(r() * 2 ** 31) };
-  }
-  trial() {
-    const day = today(this.clock());
-    const t = (this.s.trial ||= { day: null, best: null, wins: 0, tries: 0, run: null });
-    if (t.day !== day) Object.assign(t, { day, best: null, tries: 0, run: null, paid: false });
-    return t;
-  }
-  trialStart() {
-    const t = this.trial(), d = this.trialDef(t.day);
-    const allies = d.team.map((id) => duelUnit(this.catalog.get(id), { level: 3 }));
-    const enemies = d.enemies.map((e) => duelUnit(this.catalog.get(e.id), { side: 'enemy', scale: enemyScale(d.floor), level: 3, elite: !!e.elite }));
-    const c = d.team.map((id) => this.catalog.get(id)).filter(canUlt).sort((a, b) => RI(b.rarity) - RI(a.rarity))[0] || null;
-    const ult = { key: ultOf(c), card: c?.id || null, power: 1.16 };
-    t.tries++;
-    t.run = { trial: true, day: t.day, floor: d.floor, room: 'elite', ult, blessings: [], team: d.team.map((id) => ({ id })),
-      battle: createDuel(allies, enemies, { fervor: FERVOR_START, ult: ult.key, power: ult.power, pact: d.pact, seed: d.seed }) };
-    this.persist();
-    return t.run;
-  }
-  // Score : victoire en peu de tours, avec le plus de PV restants
-  trialFinish() {
-    const t = this.trial(), st = t.run?.battle;
-    if (!st?.over) throw new Error('L’épreuve n’est pas terminée.');
-    const allies = st.order.ally.map((id) => st.units[id]);
-    const hp = Math.round((allies.reduce((a, u) => a + Math.max(0, u.hp), 0) / allies.reduce((a, u) => a + u.maxHp, 0)) * 100);
-    const out = { won: st.over === 'won', rounds: st.round, hp, record: false, shards: 0 };
-    if (out.won) {
-      out.score = Math.max(0, 1000 - 80 * st.round + hp * 3);
-      if (!t.best || out.score > t.best.score) { out.record = !!t.best; t.best = { score: out.score, rounds: st.round, hp }; t.sent = null; }
-      if (!t.paid) { t.paid = true; t.wins = (t.wins || 0) + 1; out.shards = 40; this.s.shards += 40; }
-    }
-    t.run = null;
-    this.track('trial', 1);
-    this.persist();
-    return out;
-  }
-  trialQuit() { const t = this.trial(); t.run = null; this.persist(); }
   // ——— Duels des Sceaux ———
   // Main du joueur : 5 cartes possédées (complétée par les cartes de départ prêtées s'il en manque)
   sceauxHand() {
@@ -1022,7 +973,7 @@ export class Game {
   recordDepth(floor) {
     const d = this.descent(), run = d.run;
     d.best = Math.max(d.best, floor);
-    if (!run || (!run.free && !run.trial)) this.seasonDepth(floor);
+    if (!run || !run.free) this.seasonDepth(floor);
     // une expédition commencée la veille ne compte pas pour le record ni les missions du jour
     if (!run || run.day === d.day) { d.bestToday = Math.max(d.bestToday, floor); this.track('depth', floor); }
   }
@@ -1094,7 +1045,6 @@ export class Game {
   abandonRun() {
     const run = this.s.descent.run;
     if (!run) throw new Error('Aucune expédition en cours.');
-    if (run.trial) throw new Error('L’Épreuve du jour ne s’abandonne pas : rejoue-la quand tu veux.');
     run.battle = null; run.phase = 'doors'; run.altar = null; run.rewards = null; run.talentOffer = null;
     this.s.stats.abandons = (this.s.stats.abandons || 0) + 1;
     const summary = this.endRun(true);

@@ -62,7 +62,7 @@ test('Saison : paliers récompensés une fois, remise à zéro au changement de 
   now = new Date(2026, 9, 12, 12);
 });
 
-test('Saison : les expéditions sans coffre et l’Épreuve du jour ne comptent pas', () => {
+test('Saison : les expéditions sans coffre ne comptent pas', () => {
   const g = newGame('season2');
   g.s.descent.run = { free: true, day: g.descent().day };
   g.recordDepth(8);

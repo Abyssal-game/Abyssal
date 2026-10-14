@@ -1,4 +1,4 @@
-// Test de robustesse : des milliers de parties jouées au hasard (Descente, Cauchemar, gardiens, Épreuve, Sceaux).
+// Test de robustesse : des milliers de parties jouées au hasard (Descente, Cauchemar, gardiens, Sceaux).
 // Après chaque action, on vérifie que l'état reste cohérent. Usage : node tools/fuzz.mjs [nombre]
 import fs from 'node:fs';
 import path from 'node:path';
@@ -19,7 +19,7 @@ function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>>
 const N = +(process.argv[2] || 400);
 const problems = new Map();
 const report = (kind, detail) => { const k = kind; if (!problems.has(k)) problems.set(k, { n: 0, ex: detail }); problems.get(k).n++; };
-const stats = { battles: 0, turns: 0, actions: 0, stalls: 0, bosses: {}, bossWins: {}, floors: [], nightmare: [], trial: { won: 0, n: 0 }, sceaux: { n: 0, draw: 0, won: 0 }, talents: {}, maxDmg: 0 };
+const stats = { battles: 0, turns: 0, actions: 0, stalls: 0, bosses: {}, bossWins: {}, floors: [], nightmare: [], sceaux: { n: 0, draw: 0, won: 0 }, talents: {}, maxDmg: 0 };
 
 function check(st, where) {
   if (!Number.isFinite(st.ap) || st.ap < 0) report('Points d’action invalides', `${where} ap=${st.ap}`);
@@ -118,11 +118,6 @@ for (let i = 1; i <= N; i++) {
   } catch (e) { report('Plantage dans la Descente', `seed ${i} : ${e.stack.split('\n').slice(0, 3).join(' | ')}`); }
   // Sauvegarde : relecture après la partie
   try { const st2 = new Game(cat, g.storage, { rng: r, clock: () => new Date(2026, 9, 1 + (i % 28), 12) }); if (st2.s.shards !== g.s.shards) report('Sauvegarde relue différente', `seed ${i}`); } catch (e) { report('Plantage au rechargement de la sauvegarde', e.message); }
-  // Épreuve du jour
-  if (i % 4 === 0) {
-    try { const tr = g.trialStart(); duel(tr.battle, r, 'épreuve'); const out = g.trialFinish(); stats.trial.n++; if (out.won) stats.trial.won++; }
-    catch (e) { report('Plantage dans l’Épreuve', e.stack.split('\n').slice(0, 3).join(' | ')); }
-  }
   // Duels des Sceaux, tous rivaux et règles
   for (let k = 0; k < 3; k++) {
     try {
@@ -142,10 +137,10 @@ for (let i = 1; i <= N; i++) {
   }
 }
 const avg = (a) => (a.length ? (a.reduce((x, y) => x + y, 0) / a.length).toFixed(1) : '-');
-console.log(`${N} joueurs simulés · ${stats.battles} combats · ${stats.turns} tours · ${stats.actions} actions · ${stats.sceaux.n} parties des Sceaux · ${stats.trial.n} Épreuves`);
+console.log(`${N} joueurs simulés · ${stats.battles} combats · ${stats.turns} tours · ${stats.actions} actions · ${stats.sceaux.n} parties des Sceaux`);
 console.log(`Étage moyen : ${avg(stats.floors)} (normal) · ${avg(stats.nightmare)} (Cauchemar) · plus gros coup : ${stats.maxDmg}`);
 console.log('Gardiens (victoires / combats) :', Object.keys(stats.bosses).map((k) => `${k} ${stats.bossWins[k] || 0}/${stats.bosses[k]}`).join(' · '));
-console.log('Talents choisis :', JSON.stringify(stats.talents), '· Épreuves gagnées :', `${stats.trial.won}/${stats.trial.n}`);
+console.log('Talents choisis :', JSON.stringify(stats.talents));
 if (!problems.size) console.log('AUCUN PROBLÈME DÉTECTÉ');
 else for (const [k, v] of problems) console.log(`PROBLÈME ×${v.n} : ${k}\n   exemple : ${v.ex}`);
 process.exit(problems.size ? 1 : 0);

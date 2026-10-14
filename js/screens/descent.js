@@ -76,7 +76,7 @@ export default function descent(app, root) {
     return `<section class="panel dc-season"><div class="dc-season-h"><img class="dc-season-ic" alt="" src="assets/icons/season.webp" onerror="this.remove()"><span><b>${esc(seasonName(se.id))}</b><span class="small muted">Meilleur étage du mois : ${se.best || '—'} · fin dans ${left} jour${left > 1 ? 's' : ''}</span></span></div>
       <div class="dc-season-track"><i style="width:${Math.min(100, (se.best / max) * 100)}%"></i></div>
       <ol class="dc-season-steps">${SEASON_STEPS.map((st) => { const ok = se.claimed.includes(st.floor); return `<li class="${ok ? 'ok' : ''}"><span class="dc-season-rw">${ok ? icon('check') : rw(st.reward)}</span><small>Étage ${st.floor}</small></li>`; }).join('')}</ol>
-      <p class="small muted">Atteins ces étages ce mois-ci (expéditions avec coffre, hors Épreuve du jour) : chaque palier se gagne une fois par saison. Tout repart à zéro le 1er du mois.</p></section>`;
+      <p class="small muted">Atteins ces étages ce mois-ci (expéditions avec coffre) : chaque palier se gagne une fois par saison. Tout repart à zéro le 1er du mois.</p></section>`;
   }
 
   // Créature de la semaine

@@ -24,7 +24,6 @@ import descentScreen from './screens/descent.js';
 import accountScreen from './screens/account.js';
 import menuScreen from './screens/menu.js';
 import sceauxScreen from './screens/sceaux.js';
-import trialScreen from './screens/trial.js';
 import shadowScreen, { claimShadowPrize } from './screens/shadow.js';
 import { forgeScreen, furnaceScreen } from './screens/forge.js';
 import { teamScreen, chestsScreen } from './screens/army.js';
@@ -36,7 +35,7 @@ import { setScene } from './ui/scene.js';
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,
   factions: factionsScreen, faction: factionsScreen, succes: achievementsScreen, profil: profileScreen,
-  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen, sceaux: sceauxScreen, epreuve: trialScreen, tirage: shadowScreen, renfort: forgeScreen, fournaise: furnaceScreen,
+  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen, sceaux: sceauxScreen, epreuve: descentScreen, tirage: shadowScreen, renfort: forgeScreen, fournaise: furnaceScreen,
 };
 const TABS = [
   ['antre', 'tab-home', 'Accueil'], ['collection', 'tab-collection', 'Collection'], ['boutique', 'tab-boosters', 'Boosters'],
@@ -53,7 +52,7 @@ const PARENT = { bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire',
 const SUBNAV = {
   collection: [['collection', 'cards', 'Cartes'], ['equipe', 'team-ic', 'Équipe'], ['renfort', 'level-up', 'Renforcer'], ['fournaise', 'furnace', 'Fournaise']],
   boutique: [['boutique', 'booster', 'Boosters'], ['coffres', 'chest', 'Coffres'], ['tirage', 'shadow', 'Tirage']],
-  descente: [['descente', 'descend', 'Descente'], ['epreuve', 'trial', 'Épreuve'], ['sceaux', 'seal', 'Sceaux']],
+  descente: [['descente', 'descend', 'Descente'], ['sceaux', 'seal', 'Sceaux']],
 };
 
 function storageOrMemory() {
