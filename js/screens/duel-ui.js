@@ -36,7 +36,7 @@ const abs = (u) => new URL(u, document.baseURI).href;
 const bgOf = (run) => `url(${abs(floorBg(run.floor, run.room))}), url(${abs(bgOld(run))})`;
 const FX = ['break', 'parry', 'crit', 'swallow', 'iceshatter', 'collapse', 'prey', 'slash', 'impact', 'dodge', 'heal', 'venom', 'frost', 'seal', 'death', 'd20', 'd20-crit', 'd20-fumble'];
 // Effets des compétences propres : image peinte quand elle existe, sinon l'effet le plus proche
-const FX_NEW = new Set([]); // ajouter ici 'shield', 'boost', 'taunt', 'fervor', 'curse' quand les images peintes sont livrées
+const FX_NEW = new Set(['shield', 'boost', 'taunt', 'fervor', 'curse']); // effets peints livrés (lot X)
 const FX_FALLBACK = { shield: 'parry', boost: 'burst', taunt: 'prey', fervor: 'seal', curse: 'seal' };
 const fxUrl = (n) => `assets/fx/${FX_FALLBACK[n] && !FX_NEW.has(n) ? FX_FALLBACK[n] : n}.webp`;
 const DANGER = ['', '', 'Danger', 'Mortel'];
