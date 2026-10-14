@@ -2255,3 +2255,24 @@ input[type="range"]:disabled { opacity: .45; }
 .col-filters .chips[aria-label="Filtrer par rareté"]::before { content: 'Rareté'; }
 .col-filters .chips[aria-label="Filtrer par rôle"]::before { content: 'Rôle'; }
 .col-filters > .sort { padding: 0 !important; margin-left: 14px; margin-right: 14px; }
+
+/* v244 : classeur peint — marque-pages, page en cuir, pochettes vides, pierre de rareté, sceau de page complète */
+.alb-tabs { display: flex; justify-content: center; gap: 4px; margin: 2px 0 -14px; position: relative; z-index: 2; }
+.alb-tab { position: relative; flex: 0 1 41px; aspect-ratio: 90 / 285; max-height: 146px; padding: 0; border: 0; background: url(../assets/ui/album-tab.webp) top center / 100% 100% no-repeat; isolation: isolate; cursor: pointer; transform: translateY(-14px); filter: brightness(.62) saturate(.8) drop-shadow(0 3px 4px rgba(0, 0, 0, .7)); transition: transform .25s cubic-bezier(.2, .9, .3, 1.2), filter .2s; }
+.alb-tab::before { content: ''; position: absolute; left: 12%; right: 12%; top: 30%; bottom: 22%; background: var(--chip); mix-blend-mode: color; opacity: .75; z-index: -1; pointer-events: none; }
+.alb-tab .sigil { position: absolute; left: 50%; top: 43%; width: 64%; height: auto; aspect-ratio: 1; transform: translate(-50%, -50%); }
+.alb-tab .alb-tc { position: absolute; left: 0; right: 0; top: 63%; text-align: center; font: 700 .58rem/1 var(--f-ui); color: #F4E7C6; text-shadow: 0 1px 2px #000, 0 0 4px #000; }
+.alb-tab[aria-checked="true"] { transform: translateY(0); filter: brightness(1.08) drop-shadow(0 0 8px var(--chip)) drop-shadow(0 3px 4px rgba(0, 0, 0, .8)); }
+.album-page { border-width: 0 !important; border-style: solid !important; border-color: transparent !important; border-radius: 0 !important; background: none !important; box-shadow: none !important; border-image: url(../assets/ui/album-page.webp) 200 200 200 215 fill / 64px 62px 64px 68px stretch !important; padding: 30px 26px 30px 32px !important; position: relative; isolation: isolate; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .7)); }
+.album-page::after { content: ''; position: absolute; inset: 14% 10%; z-index: -1; pointer-events: none; background: radial-gradient(closest-side, color-mix(in srgb, var(--fc) 22%, transparent), transparent); }
+.album-page.full { filter: drop-shadow(0 0 10px rgba(242, 193, 78, .55)) drop-shadow(0 6px 14px rgba(0, 0, 0, .7)); }
+.album-ph { color: var(--fc) !important; text-shadow: 0 1px 2px #000; align-items: center !important; gap: 6px; }
+.album-ph .sigil { width: 18px; height: 18px; vertical-align: -4px; }
+.alb-seal { display: inline-flex; align-items: center; gap: 4px; color: #F2C14E; font-size: .66rem; letter-spacing: .08em; }
+.alb-seal img { width: 22px; height: 22px; filter: drop-shadow(0 0 5px rgba(242, 193, 78, .7)); }
+.album-page .slot-empty { border: 0 !important; border-radius: 6px; background: url(../assets/ui/album-slot.webp) center / 100% 100% no-repeat !important; justify-content: flex-end; gap: 3px; padding-bottom: 12%; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .6)); }
+.album-page .slot-empty .slot-num { order: 2; font-size: .72rem; color: #9B8BB4; opacity: .9; text-shadow: 0 -1px 0 rgba(0, 0, 0, .8), 0 1px 0 rgba(255, 255, 255, .08); }
+.album-page .slot-empty .alb-gem { order: 1; width: 22%; min-width: 14px; height: auto; opacity: .85; filter: drop-shadow(0 1px 2px #000); }
+.album-page .slot-empty:active { transform: scale(.97); }
+@media (max-width: 360px) { .alb-tab { flex-basis: 38px; } .album-page { border-image-width: 50px 48px 50px 52px !important; padding: 24px 20px 24px 26px !important; } }
+.album-page .album-ph { margin: 2px 12px 10px 6px !important; }

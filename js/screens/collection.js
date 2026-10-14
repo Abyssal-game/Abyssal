@@ -112,13 +112,13 @@ export default function collection(app, root, params) {
     for (let i = 0; i < cards.length; i += 9) pages.push(cards.slice(i, i + 9));
     const box = root.querySelector('#col-album');
     box.innerHTML = `
-      <div class="chips fac-grid" role="radiogroup" aria-label="Faction du classeur">${FACTION_ORDER.map((k) => { const p = g.factionProgress(k); return `<button class="chip" role="radio" data-act="afac" data-v="${k}" style="--chip:${cat.faction[k].colors.secondary}" aria-pressed="${k === f}" aria-checked="${k === f}">${sigil(k)}<span class="fg-n">${esc(cat.faction[k].name)}</span><span class="muted fg-c">${p.owned}/${p.total}</span></button>`; }).join('')}</div>
-      <div class="album" style="--fc:${fac.colors.secondary}">${pages.map((pg, i) => `<section class="album-page" aria-label="Page ${i + 1}">
-        <div class="album-ph"><span>${sigil(f)} ${esc(fac.name)}</span><span>Page ${i + 1} / ${pages.length}</span></div>
+      <div class="alb-tabs" role="radiogroup" aria-label="Faction du classeur">${FACTION_ORDER.map((k) => { const p = g.factionProgress(k); return `<button class="alb-tab" role="radio" data-act="afac" data-v="${k}" style="--chip:${cat.faction[k].colors.secondary}" aria-checked="${k === f}" aria-label="${esc(cat.faction[k].name)}, ${p.owned} sur ${p.total}">${sigil(k)}<span class="alb-tc">${p.owned}/${p.total}</span></button>`; }).join('')}</div>
+      <div class="album" style="--fc:${fac.colors.secondary}">${pages.map((pg, i) => { const full = pg.every((c) => g.entry(c.id)); return `<section class="album-page ${full ? 'full' : ''}" aria-label="Page ${i + 1}${full ? ', complète' : ''}">
+        <div class="album-ph"><span>${sigil(f)} ${esc(fac.name)}</span>${full ? '<span class="alb-seal"><img alt="" src="assets/icons/seal.webp">Complète</span>' : ''}<span>Page ${i + 1} / ${pages.length}</span></div>
         <div class="album-grid">${pg.map((c) => { const e = g.entry(c.id); return e
           ? `<div class="slot">${cardHTML(c, { lazy: true, isNew: e.isNew, variant: bestVariant(e) })}</div>`
-          : `<div class="slot slot-empty" role="button" tabindex="0" data-id="${c.id}" aria-label="Emplacement ${c.number} vide, ${RARITY[c.rarity].name}"><span class="slot-num">${c.number}</span><span class="fu-gem rgem" data-r="${c.rarity}" style="--rc:${RARITY[c.rarity].color}">${RARITY[c.rarity].short}</span></div>`; }).join('')}</div>
-      </section>`).join('')}</div>
+          : `<div class="slot slot-empty" role="button" tabindex="0" data-id="${c.id}" aria-label="Emplacement ${c.number} vide, ${RARITY[c.rarity].name}"><span class="slot-num">${c.number}</span><img class="alb-gem" alt="" src="assets/ui/rar-${c.rarity}.webp"></div>`; }).join('')}</div>
+      </section>`; }).join('')}</div>
       <div class="album-nav"><button class="album-arr" data-pg="-1" aria-label="Page précédente">${icon('prev')}</button><div class="album-dots">${pages.map((_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</div><button class="album-arr" data-pg="1" aria-label="Page suivante">${icon('next')}</button></div>
       <p class="small muted center">Glisse pour tourner les pages. ${g.factionProgress(f).owned} / ${cards.length} emplacements remplis.</p>`;
     lazyArt(box);
