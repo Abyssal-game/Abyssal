@@ -6,7 +6,7 @@ import { esc, fmt, toast, confirmBox, openSheet, bindActions } from '../ui/dom.j
 import { exportCode, importCode } from '../core/save.js';
 import { drawBooster } from '../core/boosters.js';
 import { RARITIES, RARITY_ORDER, BOOSTERS } from '../config.js';
-import { sfx, SFX_DEMO } from '../ui/sound.js';
+import { sfx } from '../ui/sound.js';
 import { MUSIC_DEMO, musicPreview } from '../ui/music.js';
 import { sync, onSync, refreshProfile } from '../cloud/sync.js';
 import { openCreator } from './creator.js';
@@ -37,7 +37,6 @@ export default function settings(app, root) {
         ${s.sound && s.music !== false ? `<div class="set-row col"><b>Écouter les ambiances</b><div class="set-sfx">${MUSIC_DEMO.map(([n], i) => `<button class="chip" data-mus="${i}">${n}</button>`).join('')}</div></div>` : ''}
         ${toggle('loud', 'Son même en mode silencieux', 'Le jeu reste audible quand le bouton silencieux de l’iPhone est activé (iOS 17 ou plus). Peut couper la musique d’une autre app.')}
         ${toggle('haptics', 'Vibrations', 'Petites vibrations sur les coups, les victoires et les cartes rares. Sur iPhone, il faut iOS 18 ou plus.')}
-        ${s.sound ? `<div class="set-row col"><b>Écouter les sons</b><div class="set-sfx">${SFX_DEMO.map(([n], i) => `<button class="chip" data-sfx="${i}">${n}</button>`).join('')}</div></div>` : ''}
         ${seg('motion', 'Animations', [['auto', 'Selon l’appareil'], ['reduced', 'Réduites'], ['full', 'Complètes']])}
         ${seg('decor', 'Décor des combats', [['riche', 'Riche'], ['sobre', 'Sobre']])}
         <p class="small muted set-note">Sobre : la salle reste en place, sans particules ni flammes qui vacillent. Plus reposant, et un peu plus économe en batterie.</p>
@@ -90,7 +89,6 @@ export default function settings(app, root) {
       <header class="screen-head ui-hero bn-settings"><h1>Réglages</h1><p class="muted">Jeu, tutoriels, sauvegarde.</p></header>
       <nav class="set-tabs" role="tablist">${TABS.map(([k, l, ic, fb]) => `<button class="set-tab" role="tab" aria-selected="${ui.tab === k}" data-act="tab" data-k="${k}">${tabIcon(ic, fb)}<span>${l}</span></button>`).join('')}</nav>
       <div class="set-body">${body(s)}</div>`;
-    root.querySelectorAll('[data-sfx]').forEach((b) => b.addEventListener('click', () => SFX_DEMO[+b.dataset.sfx]?.[1]()));
     root.querySelectorAll('[data-mus]').forEach((b) => b.addEventListener('click', () => { musicPreview(MUSIC_DEMO[+b.dataset.mus][1]); root.querySelectorAll('[data-mus]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); }));
     root.querySelector('#mvol')?.addEventListener('input', (e) => { g.s.settings.musicVol = Number(e.target.value); app.applySettings(); });
     root.querySelector('#mvol')?.addEventListener('change', (e) => g.setSetting('musicVol', Number(e.target.value)));
