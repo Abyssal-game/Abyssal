@@ -2451,3 +2451,8 @@ body.has-subnav #subnav .sn-tab { background: #16121E; }
 .cb-beam { height: 22px !important; margin-top: -11px !important; border-radius: 0 !important; background: url(../assets/fx/syn-beam.webp) center / 100% 100% no-repeat !important; box-shadow: none !important; mix-blend-mode: screen; }
 .cb-banner.synergy { padding: 22px 64px 20px; border: 0; background: url(../assets/ui/syn-banner.webp) center / 100% 100% no-repeat !important; box-shadow: none !important; min-width: min(92%, 380px); }
 .dc-feat-ic { width: 34px; height: 34px; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .7)); }
+
+/* v260 : plaque peinte du butin des portes */
+.dc-loot { border: 0 !important; border-radius: 0 !important; background: url(../assets/ui/loot-plaque.webp) center / 100% 100% no-repeat !important; padding: 26px 16px 14px !important; min-width: 82%; filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .7)); }
+.dc-loot-k { color: #E8C878; text-shadow: 0 1px 0 #000; }
+.dc-loot { padding: 26px 26px 20px !important; }
