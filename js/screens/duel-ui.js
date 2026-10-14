@@ -76,7 +76,6 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         <span class="cb-fv"><small>Ferveur</small><span class="cb-gems"></span></span>
         <span class="cb-ult"><img class="cb-pw" alt="" src="assets/icons/power.webp"><b>${esc(ult.name)}</b><small></small></span>
       </button>
-      <button class="btn small ghost dv-auto" data-d="auto">Auto</button>
       <button class="btn primary dv-end" data-d="end">Fin du tour</button>
     </div>
   </div>`;
@@ -788,7 +787,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       if (k === 'ult') {
         return ultSheet();
       }
-      if (k === 'auto') { sel = null; mode = null; confirm = null; busy = true; draw(); const ev = autoActs(st); g.persist(); await play(ev); busy = false; draw(); if (st.over) return finish(); return doEnd(); }
+      // (mode Auto retiré en v240 : chaque combat se joue)
       return;
     }
     const ab = e.target.closest('[data-a]');

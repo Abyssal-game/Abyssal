@@ -2202,3 +2202,9 @@ body.battle-mode.has-subnav #view, body.battle-mode #view { padding: calc(var(--
   .cb-res .cb-gems i { width: 7px; height: 7px; }
 }
 @media (max-width: 440px) { .cb-res > .cb-ap > small, .cb-res > .cb-fv > small { display: none; } .cb-res { grid-template-columns: 1fr; padding-left: 8%; } }
+
+/* v240 : plus de bouton Auto, la barre du bas n'a que deux éléments */
+.cb-bar { grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
+.cb-bar .dv-end { min-width: 170px; }
+.cb-res { max-width: 168px; }
+@media (max-width: 360px) { .cb-bar { grid-template-columns: minmax(0, 1fr) auto; gap: 6px; } .cb-bar .dv-end { min-width: 140px; font-size: .74rem; } }

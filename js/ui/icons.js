@@ -68,7 +68,9 @@ export const EMBLEM = '<img class="emblem" src="assets/brand/emblem.webp" alt=""
 // Les monnaies (éclats, cendres) sont peintes ; les autres icônes restent en traits
 // Les petits dessins au trait les plus visibles sont remplacés par des icônes peintes ;
 // icon('p:nom') donne directement l'icône peinte assets/icons/nom.webp.
-const CUR_PIC = { crystal: 'cur-shard', ash: 'cur-ash', sparkle: 'xp', star: 'xp', lock: 'mysteries', skull: 'danger', ticket: 'ticket', hourglass: 'hourglass' };
+const CUR_PIC = { crystal: 'cur-shard', ash: 'cur-ash', sparkle: 'xp', star: 'xp', lock: 'mysteries', skull: 'danger', ticket: 'ticket', hourglass: 'hourglass',
+  // v240 : icônes peintes déjà livrées, utilisées partout à la place du dessin au trait
+  'swords': 'swords', 'crown': 'crown', 'rule': 'rule', 'book': 'book', 'chest': 'chest', 'booster': 'booster', 'xp': 'xp', 'titles': 'titles', 'team': 'team', 'streak': 'streak', 'stats': 'stats', 'stairs-up': 'stairs-up', 'stairs-down': 'stairs-down', 'showcase': 'showcase', 'openings': 'openings', 'luck': 'luck', 'illus': 'illus', 'hunt': 'hunt', 'genesis': 'genesis', 'furnace': 'furnace', 'figures': 'figures', 'discover': 'discover', 'conflicts': 'conflicts', 'chronicles': 'chronicles', 'cards': 'cards', 'avatar': 'avatar' };
 export const icon = (name) => {
   const pic = name.startsWith('p:') ? name.slice(2) : CUR_PIC[name];
   return pic ? `<img class="ic ic-cur" alt="" src="assets/icons/${pic}.webp">` : ICONS[name] || '';
