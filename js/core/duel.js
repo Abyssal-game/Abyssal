@@ -25,7 +25,7 @@ export const PACK_BONUS = 1;         // Instinct de meute : les Communes frappen
 const KW_BY_ROLE = { protecteur: 'garde', degats: 'assaut', soin: 'soin', poison: 'venin', controle: 'gel', soutien: 'cri', zone: 'deferlante' };
 const FAM_BY_ROLE = { protecteur: 'protecteur', soin: 'soutien', poison: 'parasite', controle: 'controleur', soutien: 'soutien', zone: 'mage' };
 // Gabarit par rôle à la rareté Commune, niveau 1 : [attaque, PV]
-const BASE = { protecteur: [2, 12], degats: [4, 7], soin: [2, 8], poison: [2, 8], controle: [2, 8], soutien: [2, 9], zone: [2, 7] };
+const BASE = { protecteur: [2, 12], degats: [4, 7], soin: [2, 8], poison: [2, 8], controle: [3, 8], soutien: [2, 9], zone: [2, 7] };
 const RARITY_MULT = { C: 1, PC: 1.15, R: 1.3, HR: 1.45, M: 1.6, S: 1.75 };
 // Bonus au jet de l'Entrave glaciale (rôle contrôle) selon la rareté
 export const FROST_MASTERY = { R: 1, HR: 2, M: 3, S: 4 };
