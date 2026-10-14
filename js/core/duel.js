@@ -29,6 +29,8 @@ const BASE = { protecteur: [2, 12], degats: [4, 7], soin: [2, 8], poison: [2, 8]
 const RARITY_MULT = { C: 1, PC: 1.15, R: 1.3, HR: 1.45, M: 1.6, S: 1.75 };
 // Bonus au jet de l'Entrave glaciale (rôle contrôle) selon la rareté
 export const FROST_MASTERY = { R: 1, HR: 2, M: 3, S: 4 };
+// Attaque rythmée : bonus au jet selon la précision du toucher (bon / parfait)
+export const RHYTHM = { good: 1, perfect: 3 };
 const SINGLE = ['hit', 'heavy', 'poison', 'frost', 'gorge'];
 // Intentions spéciales des gardiens (comptent comme « actions spéciales » pour le Pacte du Reflet)
 const SPECIAL = ['heavy', 'blast', 'shield', 'heal', 'rally', 'hunt', 'charge', 'channel', 'gorge', 'gather', 'blizzard', 'mimic', 'copy', 'decree', 'shift'];
@@ -481,6 +483,8 @@ export function rollInfo(st, uid, key, tUid) {
   } else return null;
   if (t.mark) mods.push(['Marquée', 3]);
   if (t.broken) mods.push(['Brisée', 5]);
+  // attaque rythmée (v236) : bonus gagné par le joueur en tapant au bon moment, consommé par le jet
+  if (u.side === 'ally' && st.rhythm > 0) mods.push([st.rhythm >= RHYTHM.perfect ? 'Frappe parfaite' : 'Frappe rythmée', st.rhythm]);
   if (isWeak(u, t)) mods.push(['Faiblesse', 2]);
   if (has(st, 'des')) mods.push(['Faveur du destin', 2]);
   const mod = mods.reduce((a, [, v]) => a + v, 0);
@@ -488,6 +492,7 @@ export function rollInfo(st, uid, key, tUid) {
 }
 function resolveRoll(st, info, ev, uid, tUid) {
   const r = d20(st);
+  st.rhythm = 0; // le bonus rythmé ne vaut que pour ce jet
   const total = r + info.mod;
   const tier = r === 1 ? 'fumble' : r === 20 ? 'crit' : total >= info.dc ? 'success' : 'partial';
   if (tier === 'crit') st.stats.crits++;

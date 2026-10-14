@@ -114,3 +114,18 @@ test('équipes enregistrées : 4 au plus, rechargées d’un toucher, gardées p
   const old = defaultSave(); delete old.teamPresets;
   assert.deepEqual(migrate(old).teamPresets, []);
 });
+
+test('attaque rythmée : le bonus s’ajoute au jet suivant, une seule fois', async () => {
+  const D = await import('../js/core/duel.js');
+  const { Game } = await import('../js/core/game.js');
+  const { MemoryStorage, rngFrom, noWelcome } = await import('./helpers.mjs');
+  const g = noWelcome(new Game(catalog, new MemoryStorage(), { rng: rngFrom('ry'), clock: () => new Date(2026, 9, 12, 12) }));
+  g.team(); g.startRun(); g.chooseDoor(g.doors()[0]);
+  const st = g.s.descent.run.battle;
+  const ally = D.front(st, 'ally')[0], foe = D.front(st, 'enemy')[0];
+  const base = D.rollInfo(st, ally.uid, 'estoc', foe.uid);
+  st.rhythm = D.RHYTHM.perfect;
+  const boosted = D.rollInfo(st, ally.uid, 'estoc', foe.uid);
+  assert.equal(boosted.mod, base.mod + D.RHYTHM.perfect);
+  assert.ok(boosted.mods.some(([n]) => n === 'Frappe parfaite'));
+});

@@ -12,7 +12,7 @@ import { tuto } from '../ui/tutos.js';
 import { cardHTML } from '../ui/card.js';
 import {
   BOSS_POWERS, INTENTS, SYNERGIES, PACK_BONUS, FERVOR_MAX, AP_MAX, front, reserve, actionsFor, actionTargets, act, preview,
-  ENTRANCES, GOALS, goalState, PHASE2, beginEnemyTurn, nextEnemy, enemyAct, endEnemyTurn, takeSkips, defenseWindow, threats, intentInfo, useUlt, ultReady, autoActs, comboOf,
+  ENTRANCES, GOALS, goalState, RHYTHM, PHASE2, beginEnemyTurn, nextEnemy, enemyAct, endEnemyTurn, takeSkips, defenseWindow, threats, intentInfo, useUlt, ultReady, autoActs, comboOf,
 } from '../core/duel.js';
 import { KITS, AI_FAMILIES, DICE_TIERS, WEAK_TO, TALENTS } from '../core/skills.js';
 import { BOSSES, LAWS, ASPECTS } from '../core/bosses.js';
@@ -482,6 +482,39 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   // ——— Défense active ———
   // Un curseur traverse la barre en accélérant. Toucher dans l'or : esquive. Sur le trait blanc, au tout dernier instant : parade parfaite.
   let defTap = null;
+  // ——— Attaque rythmée : un anneau se resserre sur le cercle de runes ; toucher au bon moment donne un bonus au jet ———
+  function rhythmQTE(name) {
+    return new Promise((resolve) => {
+      const D = 1150, from = 2.5, to = 0.35; // durée et échelle de l'anneau (1 = aligné sur le cercle)
+      const ov = document.createElement('div');
+      ov.className = 'ry';
+      ov.innerHTML = `<div class="ry-c"><span class="ry-glow"></span><span class="ry-in"></span><span class="ry-out"></span><b class="ry-res"></b></div>
+        <p class="ry-t"><b>${esc(name)}</b><small>Touche quand l’anneau épouse le cercle</small></p>`;
+      $('.dv').appendChild(ov);
+      const out = ov.querySelector('.ry-out'), res = ov.querySelector('.ry-res');
+      let t0 = 0, done = false, raf = 0;
+      const scaleAt = (x) => from + (to - from) * Math.min(1, x) ** 1.35;
+      const end = (s) => {
+        if (done) return; done = true; cancelAnimationFrame(raf); defTap = null;
+        const gap = s === null ? 9 : Math.abs(s - 1);
+        const bonus = gap <= 0.09 ? RHYTHM.perfect : gap <= 0.26 ? RHYTHM.good : 0;
+        ov.classList.add(bonus === RHYTHM.perfect ? 'perfect' : bonus ? 'good' : 'miss');
+        res.textContent = bonus === RHYTHM.perfect ? `Parfait ! +${bonus}` : bonus ? `Bien ! +${bonus}` : s === null ? 'Trop tard' : 'Raté';
+        if (bonus === RHYTHM.perfect) { app.sfx.parry(); if (!reduced) { const d = $('.dv'); d.classList.remove('ry-shake'); void d.offsetWidth; d.classList.add('ry-shake'); } }
+        else if (bonus) app.sfx.hit(); else app.sfx.miss();
+        setTimeout(() => { ov.classList.add('out'); setTimeout(() => { ov.remove(); resolve(bonus); }, 220); }, bonus === RHYTHM.perfect ? 650 : 480);
+      };
+      const step = () => {
+        const x = (performance.now() - t0) / D, s = scaleAt(x);
+        out.style.transform = `translate(-50%, -50%) scale(${s})`;
+        out.classList.toggle('near', Math.abs(s - 1) <= 0.26);
+        if (x >= 1) end(null); else raf = requestAnimationFrame(step);
+      };
+      defTap = () => { if (!t0) return; end(scaleAt((performance.now() - t0) / D)); };
+      app.sfx.swipe?.();
+      setTimeout(() => { if (!done && alive_) { t0 = performance.now(); raf = requestAnimationFrame(step); } }, reduced ? 200 : 380);
+    });
+  }
   function defenseQTE(s) {
     return new Promise((resolve) => {
       const e = st.units[s.a], moving = e?.boss || e?.elite;
@@ -692,7 +725,13 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       if (busy) return;
       if (k === 'desel') { sel = null; mode = null; confirm = null; draw(); return; }
       if (k === 'cancel') { mode = null; confirm = null; draw(); return; }
-      if (k === 'go' && confirm) { const { key, t } = confirm; confirm = null; const u = sel; return exec(() => act(st, u, key, t)); }
+      if (k === 'go' && confirm) {
+        const { key, t } = confirm; confirm = null; const u = sel;
+        const a = actionsFor(st, u).find((x) => x.key === key);
+        busy = true; draw();
+        st.rhythm = await rhythmQTE(a?.name || 'Compétence'); // attaque rythmée : bonus au jet
+        return exec(() => act(st, u, key, t));
+      }
       if (k === 'end') return doEnd();
       if (k === 'ult') {
         return ultSheet();
