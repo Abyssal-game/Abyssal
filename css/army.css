@@ -2276,3 +2276,4 @@ input[type="range"]:disabled { opacity: .45; }
 .album-page .slot-empty:active { transform: scale(.97); }
 @media (max-width: 360px) { .alb-tab { flex-basis: 38px; } .album-page { border-image-width: 50px 48px 50px 52px !important; padding: 24px 20px 24px 26px !important; } }
 .album-page .album-ph { margin: 2px 12px 10px 6px !important; }
+.progress { display: block; min-width: 40px; }
