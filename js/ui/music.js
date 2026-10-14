@@ -146,19 +146,28 @@ function brass(grp, f, t) {
 // ——— Une ambiance = un groupe (volume propre pour les fondus) + couches continues + événements ———
 // ——— Musiques enregistrées (assets/music/<ambiance>.mp3, liste dans assets/music/manifest.json) ———
 // Une musique livrée remplace l'ambiance calculée de son lieu ; elle tourne en boucle.
-const tracks = {}; let trackLoad = null;
+const tracks = {}, trackGet = {}; let trackList = null, trackLoad = null;
+// Seule la liste est lue au démarrage ; chaque musique est téléchargée la première fois que son lieu est visité
 function loadTracks() {
   if (trackLoad) return;
-  trackLoad = fetch('assets/music/manifest.json').then((r) => (r.ok ? r.json() : [])).catch(() => []).then((list) => list.forEach((k) => fetch(`assets/music/${k}.mp3`)
-    .then((r) => (r.ok ? r.arrayBuffer() : null)).then((b) => b && new Promise((ok, ko) => ctx.decodeAudioData(b, ok, ko))).then((buf) => { if (buf) tracks[k] = buf; }).catch(() => {})));
+  trackLoad = fetch('assets/music/manifest.json').then((r) => (r.ok ? r.json() : [])).catch(() => []).then((list) => { trackList = new Set(list); });
+}
+function needTrack(key) {
+  if (!trackList?.has(key) || trackGet[key]) return;
+  trackGet[key] = fetch(`assets/music/${key}.mp3`).then((r) => (r.ok ? r.arrayBuffer() : null))
+    .then((b) => b && new Promise((ok, ko) => ctx.decodeAudioData(b, ok, ko)))
+    .then((buf) => { if (!buf) return; tracks[key] = buf; if (cur && cur.key === key && !cur.file) { stopTheme(cur); cur = startTheme(key); } }) // l'ambiance calculée cède la place au fichier
+    .catch(() => {});
 }
 function startTheme(key) {
   const th = THEMES[key], t = ctx.currentTime;
   const grp = { key, th, g: ctx.createGain(), stops: [], next: {}, chord: th.chords[0] };
   grp.g.gain.setValueAtTime(0.0001, t); grp.g.gain.linearRampToValueAtTime(1, t + 3);
   grp.g.connect(duckG);
+  needTrack(key);
   if (tracks[key]) {
     const s = ctx.createBufferSource(); s.buffer = tracks[key]; s.loop = true;
+    s.loopStart = 0.05; s.loopEnd = tracks[key].duration - 0.05; // évite le petit blanc d'encodage du mp3 (la boucle est déjà fondue)
     const g = ctx.createGain(); g.gain.value = 1.6; // les fichiers sont mixés plus bas que les ambiances calculées
     s.connect(g).connect(grp.g); s.start(t); grp.stops.push(s); grp.file = true;
     return grp;
