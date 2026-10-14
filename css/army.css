@@ -2162,3 +2162,43 @@ body.battle-mode.has-subnav #view, body.battle-mode #view { padding: calc(var(--
 .cu-bar.bot::after { bottom: 100%; margin-bottom: -10px; transform: scaleY(-1); }
 @media (max-width: 360px) { .dv .cb-acts { border-image-width: 30px; padding: 14px 14px 16px; } .dv .cb-a b { font-size: .5rem; } .cb-por { width: 48px; height: 48px; } }
 @media (prefers-reduced-motion: reduce) { .dv .cb-a.sig::after { animation: none; } }
+
+/* ——— Boutons et panneaux peints du combat (v239) ——— */
+/* boutons ronds du haut : ?, vitesse, pause */
+.dv-top .btn.small.ghost { width: 42px; min-width: 42px; height: 42px; min-height: 42px; padding: 0; border: 0; border-radius: 50%; background: url(../assets/ui/btn-round.webp) center / 100% 100% no-repeat; box-shadow: none; color: #F2D68A; font: 800 .95rem/1 var(--f-display); text-shadow: 0 0 8px rgba(242, 193, 78, .55), 0 1px 0 #000; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .7)); }
+.dv-top .btn.small.ghost .ic { width: 16px; height: 16px; color: #F2D68A; }
+.dv-top .btn.small.ghost.on { color: #FFF4CC; filter: drop-shadow(0 0 8px rgba(242, 193, 78, .9)) drop-shadow(0 2px 4px rgba(0, 0, 0, .7)); background-color: transparent; }
+.dv-top .btn.small.ghost:active { transform: scale(.94); }
+/* réserve : coffret à chaînes */
+.dv-resw .dv-resv { min-width: 100px; padding: 15% 11% 21%; border: 0; border-radius: 0; background: url(../assets/ui/reserve-frame.webp) center / 100% 100% no-repeat; box-shadow: none; filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .7)); }
+.dv-resw .dv-resv small { position: absolute; left: 0; right: 0; bottom: 4%; font: 700 .52rem/1 var(--f-display); letter-spacing: .1em; text-transform: uppercase; color: #E8D9B0; }
+.dv-resw .dv-resv { position: relative; }
+.dv-resw .dv-resv.on { border: 0; filter: drop-shadow(0 0 12px rgba(241, 219, 158, .85)); }
+/* panneau des ressources : trois rangées et l'alvéole du Sceau */
+.cb-res { min-width: 0; width: 100%; align-self: center; aspect-ratio: 1.9; padding: 4% 5% 5% 6%; grid-template-rows: 1fr 1fr 1fr; row-gap: 5%; border: 0; border-radius: 0; background: url(../assets/ui/res-tray.webp) center / 100% 100% no-repeat !important; box-shadow: none; filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .7)); }
+.cb-res small { padding-left: 4px; color: #D8CBA6; }
+.cb-res .cb-ult { gap: 9px; padding-left: 1%; }
+.cb-res .cb-ult .cb-pw { width: 17px; height: 17px; }
+.cb-res.ready { box-shadow: none; filter: drop-shadow(0 0 12px color-mix(in srgb, var(--uc) 80%, transparent)); }
+/* Auto : plaque d'acier aux engrenages */
+.cb-bar .dv-auto { min-width: 80px; min-height: 42px; padding: 0 14px; border: 0; border-radius: 0; background: url(../assets/ui/btn-auto.webp) center / 100% 100% no-repeat; box-shadow: none; color: #E6DCC6; font: 800 .8rem/1 var(--f-display); letter-spacing: .12em; text-transform: uppercase; text-shadow: 0 1px 0 #000; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .7)); }
+.cb-bar .dv-auto:active { transform: scale(.96); }
+/* Fin du tour : plaque de rubis aux dragons */
+.cb-bar .dv-end { min-width: 128px; min-height: 50px; padding: 0 24px; border: 0; border-radius: 0; background: url(../assets/ui/btn-end.webp) center / 100% 100% no-repeat !important; box-shadow: none; color: #FFF1DA; font: 900 .95rem/1 var(--f-display); letter-spacing: .1em; text-transform: uppercase; text-shadow: 0 2px 0 #3A0610, 0 0 10px rgba(255, 80, 90, .6); filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .75)); }
+.cb-bar .dv-end:active { transform: scale(.96); }
+.cb-bar .dv-end:disabled { filter: grayscale(.8) brightness(.7); }
+@media (max-width: 360px) { .cb-bar .dv-end { min-width: 120px; padding: 0 22px; font-size: .78rem; } .cb-bar .dv-auto { min-width: 74px; padding: 0 12px; font-size: .68rem; } .dv-top .btn.small.ghost { width: 38px; min-width: 38px; height: 38px; min-height: 38px; } }
+
+.cb-bar { grid-template-columns: minmax(118px, 1fr) auto auto; gap: 6px; }
+.cb-res small { font-size: .5rem; }
+.cb-res .cb-gems { gap: 2px; }
+.cb-res .cb-gems i { width: 9px; height: 9px; }
+.cb-res .cb-pips i { width: 11px; height: 11px; }
+.cb-res .cb-ult small { font-size: .5rem; flex: none; }
+@media (max-width: 360px) {
+  .cb-bar { grid-template-columns: minmax(96px, 1fr) auto auto; gap: 4px; }
+  .cb-bar .dv-auto { min-width: 62px; padding: 0 8px; font-size: .6rem; letter-spacing: .06em; }
+  .cb-bar .dv-end { min-width: 100px; padding: 0 16px; font-size: .68rem; }
+  .cb-res .cb-gems i { width: 7px; height: 7px; }
+}
+@media (max-width: 440px) { .cb-res > .cb-ap > small, .cb-res > .cb-fv > small { display: none; } .cb-res { grid-template-columns: 1fr; padding-left: 8%; } }
