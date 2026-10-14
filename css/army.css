@@ -1790,7 +1790,7 @@ p.dt-showv .ic { width: 14px; height: 14px; }
 
 /* Sous-onglets (Collection, Boosters, Aventure) : barre fixe sous l'en-tête */
 #subnav { display: none; }
-body.has-subnav #subnav { display: flex; position: fixed; z-index: 19; left: 0; right: 0; top: calc(var(--safe-t) + var(--top-h)); gap: 4px; padding: 6px var(--gutter) 8px; background: linear-gradient(180deg, #06070B 70%, rgba(6, 7, 11, 0)); }
+body.has-subnav #subnav { display: flex; position: absolute; z-index: 19; left: 0; right: 0; top: calc(var(--safe-t) + var(--top-h)); gap: 4px; padding: 6px var(--gutter) 8px; background: linear-gradient(180deg, #06070B 70%, rgba(6, 7, 11, 0)); }
 body.has-subnav #view { padding-top: calc(var(--safe-t) + var(--top-h) + 62px) !important; }
 body.battle-mode #subnav { display: none !important; }
 .sn-tab { position: relative; flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 5px 2px 4px; border-radius: 12px; border: 1px solid rgba(232, 195, 90, .18); background: rgba(22, 18, 30, .92); color: var(--mute); text-decoration: none; font: 700 .7rem/1.1 var(--f-ui); }
@@ -2364,3 +2364,9 @@ body.has-subnav #subnav .sn-tab { background: #16121E; }
 .cb-int .cb-icd { font-size: .6rem; color: #DCCBFF; margin-left: 2px; }
 @media (prefers-reduced-motion: reduce) { .cb-aim { display: none; } }
 .dv:has(.cb-acts:not([hidden])) .cb-aim { opacity: .3; }
+
+/* v254 : menus de la Descente et des Sceaux réorganisés (volets), barre Descente/Sceaux qui défile avec la page */
+.dc-fold.dc-evt > .panel, .dc-fold > .dc-week, .dc-fold > .dc-season { margin: 0; }
+.dc-fold > .sc-rivals { display: grid; gap: 8px; padding: 0 0 4px; }
+.dc-fold.sc-handfold .sc-row { padding: 2px 0 8px; }
+.dc-fold.sc-handfold .btn { margin-top: 4px; }

@@ -46,9 +46,6 @@ export default function descent(app, root) {
       ${news ? `<section class="panel ornate dc-news"><div class="dc-new-h"><span class="dc-new-ic">${icon('sparkle')}</span><span><b>Tes cartes combattent !</b><span class="small">Les héros ont quitté l’Abysse : ce sont maintenant tes créatures qui descendent. Chaque doublon fait monter une carte de niveau.</span>${news.shards ? `<span class="small">Ton ancien équipement et l’expérience de tes héros ont été changés en <b>${fmt(news.shards)} éclats</b>. Tes coffres sont gardés : ils contiennent maintenant des boosters.</span>` : ''}</span></div><button class="btn small ghost" data-act="news">OK</button></section>` : ''}
       ${last ? summaryHTML(last) : ''}
       ${chests ? `<a class="panel dc-chests" href="#/coffres"><span class="dc-new-ic">${icon('p:chest')}</span><span><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Éclats et boosters</span></span>${icon('next')}</a>` : ''}
-      ${ruleHTML(g.rule())}
-      ${weeklyHTML()}
-      ${seasonHTML()}
       <section class="panel dc-go">
         <div class="dc-banner bn-expedition"><b>Expédition</b><span class="small">${d.best ? `Record : étage ${d.best}` : 'Ta première descente t’attend'}</span></div>
         <div class="dc-go-top"><span class="dc-torches">${Array.from({ length: DESCENT.torches }, (_, i) => `<i class="${i < torches ? 'on' : ''}">${picon(i < torches ? 'torch-on' : 'torch-off')}</i>`).join('')}</span><span class="small muted">${torches ? `${torches} expédition${torches > 1 ? 's' : ''} avec coffre aujourd’hui` : 'Expéditions du jour faites : tu peux rejouer, sans coffre'}</span></div>
@@ -60,6 +57,9 @@ export default function descent(app, root) {
         ${g.nightmareUnlocked() ? `<div class="dc-curse-row dc-night-row ${ui.nightmare ? 'on' : ''}"><span><b>${icon('skull')} Mode Cauchemar</b><span class="small muted">ennemis plus forts (+35 % PV, +25 % ATQ), gardiens éveillés dès le début ; coffre d’une qualité au-dessus, +50 % d’éclats${d.bestNightmare ? ` · record : étage ${d.bestNightmare}` : ''}</span></span><button class="switch" role="switch" aria-checked="${ui.nightmare}" data-act="night" aria-label="Mode Cauchemar"><i></i></button></div>` : `<p class="small muted center">${icon('skull')} Mode Cauchemar : atteins l’étage ${NIGHTMARE_AT} pour l’ouvrir.</p>`}
         ${torches ? `<div class="dc-curse-row ${ui.cursed ? 'on' : ''}"><span><b>${icon('skull')} Descente maudite</b><span class="small muted">coffre d’une qualité au-dessus, mais rien si l’équipe tombe</span></span><button class="switch" role="switch" aria-checked="${ui.cursed}" data-act="curse" aria-label="Descente maudite"><i></i></button></div>` : ''}
       </section>
+      ${ruleHTML(g.rule())}
+      ${(() => { const w = weeklyHTML(); return w ? `<details class="panel dc-fold dc-evt"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/hunt.webp"><span class="dc-sum-t">Créature de la semaine</span></summary>${w}</details>` : ''; })()}
+      ${(() => { const s = seasonHTML(); return s ? `<details class="panel dc-fold dc-evt"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/season.webp" onerror="this.remove()"><span class="dc-sum-t">Saison et paliers</span></summary>${s}</details>` : ''; })()}
       ${Object.values(g.s.items).some((n) => n > 0) ? bagHTML(g) : ''}
       <details class="panel dc-fold bn-ranking" id="lb"><summary><span class="dc-sum-t">Classement du jour</span></summary><div class="lb-body small muted">Chargement…</div></details>
       <details class="panel dc-fold dc-how"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/help.webp"><span class="dc-sum-t">Comment ça marche</span></summary>
