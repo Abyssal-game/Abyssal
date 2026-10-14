@@ -3,7 +3,7 @@ import * as SC from '../core/sceaux.js';
 import { STARTER } from '../core/army.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, picon, crestHTML } from '../ui/icons.js';
-import { openSheet, esc, fmt, toast } from '../ui/dom.js';
+import { openSheet, esc, fmt, toast, confirmBox } from '../ui/dom.js';
 import { setScene } from '../ui/scene.js';
 import { tuto } from '../ui/tutos.js';
 
@@ -284,10 +284,9 @@ export default function sceauxScreen(app, root) {
     if (k === 'awake') return start({ rival: b.dataset.r, awake: true });
     if (k === 'quit') {
       if (busy) return;
-      if (!g.s.sceaux.cur?.over && !confirm('Abandonner la partie ? Elle sera comptée comme une défaite.')) return;
-      const st = g.s.sceaux.cur;
-      if (st && !st.over) { st.over = 'lost'; st.final = SC.score(st); g.sceauxFinish(); }
-      g.sceauxQuit(); return lobby();
+      const leave = () => { const st = g.s.sceaux.cur; if (st && !st.over) { st.over = 'lost'; st.final = SC.score(st); g.sceauxFinish(); } g.sceauxQuit(); lobby(); };
+      if (!g.s.sceaux.cur?.over) { confirmBox('Abandonner la partie ? Elle sera comptée comme une défaite.', { ok: 'Abandonner', cancel: 'Continuer', danger: true }).then((yes) => { if (yes) leave(); }); return; }
+      return leave();
     }
     const st = g.s.sceaux.cur;
     if (!st || st.over || busy || st.turn !== 'p') return;

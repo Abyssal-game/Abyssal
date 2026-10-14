@@ -2330,3 +2330,15 @@ body.has-subnav #subnav .sn-tab { background: #16121E; }
 .ry.perfect .ry-in .ry-med { filter: drop-shadow(0 0 18px rgba(242, 193, 78, 1)) drop-shadow(0 0 40px rgba(255, 240, 200, .8)); transition: filter .12s; }
 .ry.perfect .ry-in img { filter: brightness(1.5) saturate(1.2); transition: filter .12s; }
 .ry.miss .ry-in { filter: grayscale(.8) brightness(.6); transition: filter .2s; }
+
+/* v251 : Sceaux — scores en gemmes, croix sur le bouton rond doré, règle sur plaque dorée */
+.sc-score { gap: 10px; }
+.sc-score b { position: relative; width: 42px; height: 46px; clip-path: none !important; background: none !important; isolation: isolate; color: #FFF8E6; font-size: 1.25rem; text-shadow: 0 1px 0 #000, 0 0 8px rgba(0, 0, 0, .9), 0 2px 4px #000; }
+.sc-score b::before { content: ''; position: absolute; inset: 0; z-index: -1; background: url(../assets/icons/gem-p.webp) center / 100% 100% no-repeat; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .8)); }
+.sc-score b.o::before { background-image: url(../assets/icons/gem-o.webp); }
+.sc-score i { color: #C9A45D; font-size: 1.2rem; }
+.sc-final .sc-score b { width: 60px; height: 66px; font-size: 1.7rem; }
+.sc-bar .btn.small.ghost { width: 42px; min-width: 42px; height: 42px; min-height: 42px; padding: 0; border: 0; border-radius: 50%; background: url(../assets/ui/btn-round.webp) center / 100% 100% no-repeat !important; box-shadow: none; color: #F2D68A; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .7)); }
+.sc-bar .btn.small.ghost img.ic { width: 20px; height: 20px; }
+.sc-rule { border-width: 0 !important; border-style: solid !important; border-color: transparent !important; border-radius: 0 !important; background: none !important; border-image: url(../assets/ui/tab-on.webp) 0 64 fill / 0 15px stretch; padding: 7px 16px; min-height: 34px; color: #FFE7A6; font: 700 .76rem/1 var(--f-display); letter-spacing: .06em; text-transform: uppercase; text-shadow: 0 0 8px rgba(242, 193, 78, .55), 0 1px 0 #000; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .6)); }
+.sc-rule .sc-ricon, .sc-rule img.ic { width: 18px; height: 18px; }
