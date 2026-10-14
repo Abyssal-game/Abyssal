@@ -156,7 +156,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       <span class="cb-who"><b>${esc(c.name)}</b><span class="cb-role">${roleIcon(kit.kw)}${esc(kit.name)}</span></span>
       <span class="cb-upips" title="${left} action${left > 1 ? 's' : ''} possible${left > 1 ? 's' : ''} pour elle">${[0, 1].map((i) => `<i class="${i < left ? 'on' : ''}"></i>`).join('')}</span>
       <button class="cb-x" data-d="desel" aria-label="Annuler la sélection">${icon('close')}</button></div>
-      <div class="cb-grid ${list.length > 4 ? 'n5' : ''}">${list.map((a) => `<button class="cb-a ${a.ok ? '' : 'off'} ${mode?.key === a.key ? 'on' : ''} ${a.key === kit.skill.key ? 'sig' : ''} ${a.own ? 'own' : ''}" data-a="${a.key}" aria-disabled="${!a.ok}">
+      <div class="cb-grid ${list.length > 4 ? 'n5' : ''}">${list.map((a) => `<button class="cb-a ${a.ok ? '' : 'off'} ${mode?.key === a.key ? 'on' : ''} ${a.key === kit.skill.key ? 'sig' : ''} ${a.own ? 'own' : ''}" data-a="${a.key}" aria-disabled="${!a.ok}"><span class="cb-tile" aria-hidden="true"></span>
         <span class="cb-ai">${a.own ? `<img class="aicon" alt="" src="${moveIconUrl(a.icon)}">` : actIcon(a.key, a.icon)}</span><b>${esc(a.name)}</b>
         <span class="cb-cost">${'<i class="pa"></i>'.repeat(a.ap) || '<i class="free">0</i>'}${a.fervor ? `<i class="fv">${a.fervor}</i>` : ''}${a.dice ? '<i class="d20">D20</i>' : ''}${a.own && a.wait ? `<i class="cdw" title="Se recharge">${a.wait}</i>` : ''}</span></button>`).join('')}</div>`;
   }
