@@ -10,6 +10,7 @@ Usage : python3 tools/cutout.py source.jpg sortie.webp [hauteur=420] [--holes] [
   --holes : retire aussi le fond vu à travers l'objet (roue dentée)
   --glow  : retire le halo lumineux teinté qui entoure l'objet (obélisque)
   --strict : retire aussi le liseré clair au pied d'un objet sombre (pas pour le marbre)
+  --square=N : icône carrée de N pixels
 """
 import sys
 import numpy as np
@@ -118,5 +119,12 @@ if __name__ == '__main__':
     args = [x for x in sys.argv[1:] if not x.startswith('--')]
     src, dst = args[0], args[1]
     h = int(args[2]) if len(args) > 2 else 420
-    cutout(src, h, holes='--holes' in sys.argv, glow='--glow' in sys.argv, strict='--strict' in sys.argv).save(dst, 'WEBP', quality=82, method=6)
+    im = cutout(src, h, holes='--holes' in sys.argv, glow='--glow' in sys.argv, strict='--strict' in sys.argv)
+    sq = next((int(x.split('=')[1]) for x in sys.argv if x.startswith('--square=')), 0)
+    if sq:  # icône : centrée dans un carré transparent
+        side = max(im.size)
+        canvas = Image.new('RGBA', (side, side), (0, 0, 0, 0))
+        canvas.paste(im, ((side - im.width) // 2, (side - im.height) // 2), im)
+        im = canvas.resize((sq, sq), Image.LANCZOS)
+    im.save(dst, 'WEBP', quality=82, method=6)
     print(dst)
