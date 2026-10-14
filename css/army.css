@@ -2370,3 +2370,15 @@ body.has-subnav #subnav .sn-tab { background: #16121E; }
 .dc-fold > .sc-rivals { display: grid; gap: 8px; padding: 0 0 4px; }
 .dc-fold.sc-handfold .sc-row { padding: 2px 0 8px; }
 .dc-fold.sc-handfold .btn { margin-top: 4px; }
+
+/* v255 : Fin du tour sans filtre (Safari gardait le gris), plus de ×2, anneau rythmé avec cible dorée visible */
+.cb-bar .dv-end { -webkit-appearance: none; appearance: none; -webkit-text-fill-color: #FFF1DA; }
+.cb-bar .dv-end:disabled, .cb-bar .dv-end.off { filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .75)) !important; opacity: .62; color: #FFF1DA !important; -webkit-text-fill-color: #FFF1DA; }
+.cb-bar .dv-end:not(.off):not(:disabled) { opacity: 1; }
+.ry-tgt { position: absolute; left: 50%; top: 50%; width: 104%; height: 104%; border-radius: 50%; border: 4px solid #F2C14E; box-shadow: 0 0 12px 2px rgba(242, 193, 78, .7), inset 0 0 10px rgba(242, 193, 78, .4); transform: translate(-50%, -50%); animation: ryTgt 1s ease-in-out infinite; }
+@keyframes ryTgt { 50% { box-shadow: 0 0 20px 4px rgba(242, 193, 78, .95), inset 0 0 14px rgba(242, 193, 78, .6); } }
+.ry.near .ry-tgt { border-color: #FFF6DA; box-shadow: 0 0 26px 8px rgba(255, 240, 200, .95); animation: none; }
+.ry-out { width: 104%; height: 104%; border: 5px solid #FFFFFF; box-shadow: 0 0 14px 3px rgba(255, 255, 255, .8), inset 0 0 12px rgba(255, 255, 255, .5); }
+.ry-out.near { border-color: #FFF6DA; }
+.ry.perfect .ry-tgt { border-color: #FFF6DA; box-shadow: 0 0 40px 14px rgba(255, 230, 150, 1); }
+.ry.miss .ry-tgt { border-color: #7A6A50; box-shadow: none; animation: none; }

@@ -47,7 +47,7 @@ const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${IN_P
 
 export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.' }) {
   const g = app.game, cat = app.catalog, run = runOpt || g.descent().run, st = run.battle;
-  const ui = (app.state.duel ||= { fast: g.s.settings?.fastCombat === 3 ? 3 : g.s.settings?.fastCombat ? 2 : 0 });
+  const ui = (app.state.duel ||= { fast: 0 }); // v255 : plus de bouton ×2, vitesse unique
   const reduced = app.reduced();
   const T = (ms) => (reduced ? Math.min(ms, 80) : ui.fast === 3 ? ms * 0.25 : ui.fast ? ms * 0.45 : ms); // vitesse ×1, ×2 ou ×3
   const defMode = 'on'; // la défense active est la même pour tout le monde
@@ -63,7 +63,6 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   root.innerHTML = `<div class="dv cb ${run.room} has-bg" style="--bgimg:${room.paint ? `url(${abs(room.paint)})` : bgOf(run)}">
     <div class="dv-top"><b>${esc(title)}</b><span class="row gap">
       <button class="btn small ghost" data-d="help" aria-label="Règles du combat">?</button>
-      <button class="btn small ghost ${ui.fast ? 'on' : ''}" data-d="fast" aria-label="Vitesse des animations">×${ui.fast === 3 ? 3 : 2}</button>
       <button class="btn small ghost" data-d="quit" aria-label="Pause">${icon('close')}</button></span></div>
     <div class="cb-rules"></div>
     <div class="dv-row enemy"></div>
@@ -219,7 +218,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     $('.cb-ult small').textContent = st.ultUsed ? 'Utilisé' : ready ? '' : `${st.fervor}/${FERVOR_MAX}`;
     const canMore = st.ap > 0 && front(st, 'ally').some((u) => actionsFor(st, u.uid).some((a) => a.ok && a.key !== 'swap' && a.key !== 'defend'));
     $('.dv-end').classList.toggle('pulse', st.turn === 'ally' && !canMore && !busy);
-    root.querySelectorAll('.dv-bar button').forEach((b) => { b.disabled = busy || st.turn !== 'ally' || !!st.over; });
+    root.querySelectorAll('.dv-bar button').forEach((b) => { const off = busy || st.turn !== 'ally' || !!st.over; b.disabled = off; b.classList.toggle('off', off); });
     if (!busy && st.turn === 'ally' && !st.over) {
       if (mode) say(`<b>${esc(mode.name)}</b> : touche la cible${mode.dice ? ' · chances affichées dessus' : ''} <button class="cb-cancel" data-d="cancel">Annuler</button>`);
       else if (sel) say(`Choisis une action · <b>${st.ap}</b> action${st.ap > 1 ? 's' : ''} pour l’équipe`);
@@ -551,20 +550,20 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   // ——— Attaque rythmée : un anneau se resserre sur le cercle de runes ; toucher au bon moment donne un bonus au jet ———
   function rhythmQTE(name, uid) {
     return new Promise((resolve) => {
-      const D = 1150, from = 2.5, to = 0.35; // durée et échelle de l'anneau (1 = aligné sur le cercle)
+      const D = 1250, from = 2.4, to = 0.4; // durée et échelle de l'anneau (1 = posé sur la cible dorée)
       const ov = document.createElement('div');
       ov.className = 'ry';
       const cu = uid && st.units[uid] ? cat.get(st.units[uid].id) : null;
-      ov.innerHTML = `<div class="ry-c"><span class="ry-glow"></span><span class="ry-in">${cu ? `<img alt="" src="${artUrl(cu, { lite: true })}">` : ''}<i class="ry-med"></i></span><span class="ry-out"></span><b class="ry-res"></b></div>
-        <p class="ry-t"><b>${esc(name)}</b><small>Touche quand l’anneau se referme sur le médaillon</small></p>`;
+      ov.innerHTML = `<div class="ry-c"><span class="ry-glow"></span><span class="ry-in">${cu ? `<img alt="" src="${artUrl(cu, { lite: true })}">` : ''}<i class="ry-med"></i></span><span class="ry-tgt"></span><span class="ry-out"></span><b class="ry-res"></b></div>
+        <p class="ry-t"><b>${esc(name)}</b><small>Touche quand l’anneau blanc rejoint le cercle d’or</small></p>`;
       $('.dv').appendChild(ov);
       const out = ov.querySelector('.ry-out'), res = ov.querySelector('.ry-res');
       let t0 = 0, done = false, raf = 0;
-      const scaleAt = (x) => from + (to - from) * Math.min(1, x) ** 1.35;
+      const scaleAt = (x) => from + (to - from) * Math.min(1, x); // vitesse constante : le moment se lit à l'œil
       const end = (s) => {
         if (done) return; done = true; cancelAnimationFrame(raf); defTap = null;
         const gap = s === null ? 9 : Math.abs(s - 1);
-        const bonus = gap <= 0.09 ? RHYTHM.perfect : gap <= 0.26 ? RHYTHM.good : 0;
+        const bonus = gap <= 0.1 ? RHYTHM.perfect : gap <= 0.28 ? RHYTHM.good : 0;
         ov.classList.add(bonus === RHYTHM.perfect ? 'perfect' : bonus ? 'good' : 'miss');
         res.textContent = bonus === RHYTHM.perfect ? `Parfait ! +${bonus}` : bonus ? `Bien ! +${bonus}` : s === null ? 'Trop tard' : 'Raté';
         if (bonus === RHYTHM.perfect) { app.sfx.parry(); if (!reduced) { const d = $('.dv'); d.classList.remove('ry-shake'); void d.offsetWidth; d.classList.add('ry-shake'); } }
@@ -574,7 +573,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       const step = () => {
         const x = (performance.now() - t0) / D, s = scaleAt(x);
         out.style.transform = `translate(-50%, -50%) scale(${s})`;
-        out.classList.toggle('near', Math.abs(s - 1) <= 0.26);
+        const near = Math.abs(s - 1) <= 0.28; out.classList.toggle('near', near); ov.classList.toggle('near', near);
         if (x >= 1) end(null); else raf = requestAnimationFrame(step);
       };
       defTap = () => { if (!t0) return; end(scaleAt((performance.now() - t0) / D)); };
@@ -784,7 +783,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (h) openSheet(`<div class="cb-rulesheet">${h}</div>`, { label: 'Règle en vigueur' });
   }
   // ——— Touchers ———
-  root.addEventListener('pointerdown', (e) => { if (defTap && !e.target.closest('[data-d="quit"],[data-d="help"],[data-d="fast"]')) { e.preventDefault(); defTap(); } }, { signal: ctl.signal });
+  root.addEventListener('pointerdown', (e) => { if (defTap && !e.target.closest('[data-d="quit"],[data-d="help"]')) { e.preventDefault(); defTap(); } }, { signal: ctl.signal });
   root.addEventListener('pointerdown', (e) => { const ab = e.target.closest('[data-a]'); clearTimeout(holdT); held = false; if (!ab || busy || !sel) return; holdT = setTimeout(() => { held = true; actInfo(ab.dataset.a); }, 420); }, { signal: ctl.signal });
   for (const t of ['pointerup', 'pointercancel']) root.addEventListener(t, () => clearTimeout(holdT), { signal: ctl.signal });
   root.addEventListener('pointermove', (e) => { if (holdT && e.target.closest('[data-a]') == null) clearTimeout(holdT); }, { signal: ctl.signal });
@@ -808,7 +807,6 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         });
         return;
       }
-      if (k === 'fast') { ui.fast = !ui.fast ? 2 : ui.fast === 2 || ui.fast === true ? 3 : 0; b.classList.toggle('on', !!ui.fast); b.textContent = `×${ui.fast === 3 ? 3 : 2}`; g.s.settings = { ...g.s.settings, fastCombat: ui.fast }; g.persist(); return; }
       if (k === 'help') return help();
       if (k === 'rule') return ruleSheet(b.dataset.k);
       if (busy) return;
