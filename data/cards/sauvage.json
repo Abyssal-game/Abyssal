@@ -2742,5 +2742,467 @@
   },
   "image": "assets/art/SAU-062.webp",
   "artPrompt": "Tsuchigumo — Araignée géante à tête de tigre, toile tendue entre des cèdres, dans une forêt brumeuse du Japon. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-063",
+  "number": 63,
+  "name": "Méduse",
+  "title": "Le regard qui fige",
+  "faction": "sauvage",
+  "rarity": "HR",
+  "category": "Gorgone",
+  "power": 7,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 3,
+   "spd": 7,
+   "mag": 8,
+   "hp": 14,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "drown"
+   },
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Femme à la peau d’écailles vert-de-gris, chevelure de serpents vivants qui sifflent, yeux luisants d’un or pâle, statues de guerriers pétrifiés derrière elle.",
+  "lore": "Elle n’a jamais voulu être un monstre. On l’a regardée d’abord.",
+  "evolution": null,
+  "sets": [
+   "legendes"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "human",
+   "wings": "feather",
+   "tail": "lion",
+   "size": "big",
+   "scene": "temple"
+  },
+  "image": "assets/art/SAU-063.webp",
+  "artPrompt": "Méduse — Femme à la peau d’écailles vert-de-gris, chevelure de serpents vivants qui sifflent, yeux luisants d’un or pâle, statues de guerriers pétrifiés derrière elle. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-064",
+  "number": 64,
+  "name": "Centaure des Plaines",
+  "title": "L’arc et le galop",
+  "faction": "sauvage",
+  "rarity": "R",
+  "category": "Créature mythologique",
+  "power": 6,
+  "role": "S",
+  "stats": {
+   "atk": 7,
+   "def": 2,
+   "spd": 10,
+   "mag": 3,
+   "hp": 11,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "first"
+   },
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Centaure musclé au pelage bai sombre, torse humain tatoué, grand arc bandé, flèche à pointe de bronze, crinière au vent dans une plaine au crépuscule.",
+  "lore": "Il décoche avant que tu l’aies vu, et il est déjà loin quand tu tombes.",
+  "evolution": null,
+  "sets": [
+   "legendes"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "bird",
+   "wings": "feather",
+   "tail": "lion",
+   "size": "big"
+  },
+  "image": "assets/art/SAU-064.webp",
+  "artPrompt": "Centaure des Plaines — Centaure musclé au pelage bai sombre, torse humain tatoué, grand arc bandé, flèche à pointe de bronze, crinière au vent dans une plaine au crépuscule. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-065",
+  "number": 65,
+  "name": "Harpie",
+  "title": "Voleuse de festins",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Créature mythologique",
+  "power": 3,
+  "role": "S",
+  "stats": {
+   "atk": 4,
+   "def": 1,
+   "spd": 8,
+   "mag": 1,
+   "hp": 7,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Femme-oiseau aux ailes déplumées gris sale, serres crochues, visage anguleux au rictus affamé, plongeant en criant au-dessus de ruines.",
+  "lore": "Elle ne tue pas pour manger. Elle mange pour que tu ne manges pas.",
+  "evolution": null,
+  "sets": [
+   "legendes"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "bird",
+   "wings": "feather",
+   "hooves": true,
+   "tail": "bushy"
+  },
+  "image": "assets/art/SAU-065.webp",
+  "artPrompt": "Harpie — Femme-oiseau aux ailes déplumées gris sale, serres crochues, visage anguleux au rictus affamé, plongeant en criant au-dessus de ruines. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-066",
+  "number": 66,
+  "name": "Troll des Cavernes",
+  "title": "Il se nourrit de pierre et de patience",
+  "faction": "sauvage",
+  "rarity": "R",
+  "category": "Bête",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 5,
+   "spd": 4,
+   "mag": 2,
+   "hp": 20,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "regen",
+    "value": 2
+   },
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Troll massif à la peau de roche moussue, long nez crochu, petits yeux brillants, bras démesurés traînant au sol, caverne humide éclairée par des champignons.",
+  "lore": "Coupe-lui un bras : il te regardera le faire repousser.",
+  "evolution": null,
+  "sets": [
+   "legendes"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lion",
+   "mane": true,
+   "tail": "lion",
+   "size": "big",
+   "scene": "mountain"
+  },
+  "image": "assets/art/SAU-066.webp",
+  "artPrompt": "Troll des Cavernes — Troll massif à la peau de roche moussue, long nez crochu, petits yeux brillants, bras démesurés traînant au sol, caverne humide éclairée par des champignons. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-067",
+  "number": 67,
+  "name": "Ogre Mangeur d’Hommes",
+  "title": "La table est toujours mise",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Géant",
+  "power": 3,
+  "role": "S",
+  "stats": {
+   "atk": 4,
+   "def": 1,
+   "spd": 8,
+   "mag": 1,
+   "hp": 7,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Ogre ventripotent au sourire édenté, couteau de boucher rouillé, colliers d’os, chaudron fumant derrière lui dans une chaumière sombre.",
+  "lore": "Il compte ses invités. Il ne compte jamais ceux qui repartent.",
+  "evolution": null,
+  "sets": [
+   "legendes"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "bird",
+   "wings": "feather",
+   "hooves": true,
+   "tail": "bushy"
+  },
+  "image": "assets/art/SAU-067.webp",
+  "artPrompt": "Ogre Mangeur d’Hommes — Ogre ventripotent au sourire édenté, couteau de boucher rouillé, colliers d’os, chaudron fumant derrière lui dans une chaumière sombre. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-068",
+  "number": 68,
+  "name": "Gobelin Pillard",
+  "title": "Petit, rapide, partout",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Bête",
+  "power": 2,
+  "role": "S",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 7,
+   "mag": 1,
+   "hp": 4,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Petit gobelin vert aux grandes oreilles pointues, dague courbe, sac de butin sur l’épaule, sourire plein de dents pointues.",
+  "lore": "Ce qui brille est à lui. Le reste aussi, s’il a le temps.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "dog",
+   "tail": "bushy"
+  },
+  "image": "assets/art/SAU-068.webp",
+  "artPrompt": "Gobelin Pillard — Petit gobelin vert aux grandes oreilles pointues, dague courbe, sac de butin sur l’épaule, sourire plein de dents pointues. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-069",
+  "number": 69,
+  "name": "Yéti",
+  "title": "L’ombre des cimes",
+  "faction": "sauvage",
+  "rarity": "R",
+  "category": "Bête",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 5,
+   "spd": 4,
+   "mag": 2,
+   "hp": 20,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Immense créature au pelage blanc givré, visage simiesque bleuté, crocs, empreintes géantes dans la neige, tempête sur un col de montagne.",
+  "lore": "Les alpinistes l’appellent une légende. Ceux qui l’ont vu ne grimpent plus.",
+  "evolution": null,
+  "sets": [
+   "legendes"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lion",
+   "mane": true,
+   "tail": "lion",
+   "size": "big",
+   "scene": "mountain"
+  },
+  "image": "assets/art/SAU-069.webp",
+  "artPrompt": "Yéti — Immense créature au pelage blanc givré, visage simiesque bleuté, crocs, empreintes géantes dans la neige, tempête sur un col de montagne. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-070",
+  "number": 70,
+  "name": "Chupacabra",
+  "title": "Le buveur de troupeaux",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Bête",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 6,
+   "mag": 5,
+   "hp": 9,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   }
+  ],
+  "visual": "Créature décharnée et voûtée, peau grise, épines dorsales, grands yeux rouges, langue fine, tapie près d’une bergerie sous la lune.",
+  "lore": "Au matin, les chèvres sont là. Il ne leur manque que le sang.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "insect",
+   "type": "spider",
+   "face": true,
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-070.webp",
+  "artPrompt": "Chupacabra — Créature décharnée et voûtée, peau grise, épines dorsales, grands yeux rouges, langue fine, tapie près d’une bergerie sous la lune. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-071",
+  "number": 71,
+  "name": "Tanuki Farceur",
+  "title": "Une feuille sur la tête, et le voilà moine",
+  "faction": "sauvage",
+  "rarity": "C",
+  "category": "Yōkai",
+  "power": 2,
+  "role": "M",
+  "stats": {
+   "atk": 1,
+   "def": 1,
+   "spd": 5,
+   "mag": 2,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Chien viverrin rondouillard au masque sombre, une feuille posée sur la tête, chapeau de paille, petite bouteille de saké, sourire malicieux dans une forêt de bambous.",
+  "lore": "Il t’a vendu ce bol hier. Ce matin, c’était une feuille.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "owl",
+   "scene": "forest"
+  },
+  "image": "assets/art/SAU-071.webp",
+  "artPrompt": "Tanuki Farceur — Chien viverrin rondouillard au masque sombre, une feuille posée sur la tête, chapeau de paille, petite bouteille de saké, sourire malicieux dans une forêt de bambous. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-072",
+  "number": 72,
+  "name": "Sekhmet",
+  "title": "La lionne au souffle brûlant",
+  "faction": "sauvage",
+  "rarity": "HR",
+  "category": "Dieu ancien",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 7,
+   "mag": 3,
+   "hp": 19,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "frenzy"
+   },
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Déesse à tête de lionne, disque solaire et serpent au-dessus de la tête, robe rouge, crocs dénudés, souffle de flammes, désert sous un soleil de sang.",
+  "lore": "On l’a apaisée une fois, avec un lac de bière teint en rouge. On n’a plus de bière.",
+  "evolution": null,
+  "sets": [
+   "pantheons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "ram",
+   "wings": "bat",
+   "body": "bulky",
+   "arms": "spread",
+   "tail": true,
+   "claws": true,
+   "legs": "goat"
+  },
+  "image": "assets/art/SAU-072.webp",
+  "artPrompt": "Sekhmet — Déesse à tête de lionne, disque solaire et serpent au-dessus de la tête, robe rouge, crocs dénudés, souffle de flammes, désert sous un soleil de sang. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

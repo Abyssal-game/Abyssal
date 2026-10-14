@@ -2898,5 +2898,155 @@
   },
   "image": "assets/art/INF-064.webp",
   "artPrompt": "Le Roi des Ombres — Roi fait d’ombre vivante, couronne de flammes noires, cape qui dévore la lumière autour de lui. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "INF-065",
+  "number": 65,
+  "name": "Krampus",
+  "title": "Celui qui vient pour les vilains",
+  "faction": "infernal",
+  "rarity": "HR",
+  "category": "Démon",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 6,
+   "spd": 4,
+   "mag": 4,
+   "hp": 26,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 2
+   },
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Démon velu aux cornes de bouc, longue langue rouge, chaînes et clochettes, verges de bouleau à la main, hotte sur le dos, village alpin enneigé la nuit.",
+  "lore": "Tu entends les clochettes ? Il a déjà la liste.",
+  "evolution": null,
+  "sets": [
+   "legendes"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "tentacle",
+   "core": "mantle",
+   "count": 10,
+   "scale": 1.1,
+   "scene": "ocean"
+  },
+  "image": "assets/art/INF-065.webp",
+  "artPrompt": "Krampus — Démon velu aux cornes de bouc, longue langue rouge, chaînes et clochettes, verges de bouleau à la main, hotte sur le dos, village alpin enneigé la nuit. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "INF-066",
+  "number": 66,
+  "name": "Arès",
+  "title": "La guerre pour la guerre",
+  "faction": "infernal",
+  "rarity": "HR",
+  "category": "Dieu ancien",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 7,
+   "mag": 3,
+   "hp": 19,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   },
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Dieu guerrier au casque grec à haute crête rouge, armure de bronze éclaboussée de sang, lance et bouclier rond, champ de bataille en flammes, deux chiens de guerre à ses pieds.",
+  "lore": "Il ne choisit jamais de camp. Il choisit la bataille.",
+  "evolution": null,
+  "sets": [
+   "pantheons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "ram",
+   "wings": "bat",
+   "body": "bulky",
+   "arms": "spread",
+   "tail": true,
+   "claws": true,
+   "legs": "goat"
+  },
+  "image": "assets/art/INF-066.webp",
+  "artPrompt": "Arès — Dieu guerrier au casque grec à haute crête rouge, armure de bronze éclaboussée de sang, lance et bouclier rond, champ de bataille en flammes, deux chiens de guerre à ses pieds. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "INF-067",
+  "number": 67,
+  "name": "Loki",
+  "title": "Le père des monstres",
+  "faction": "infernal",
+  "rarity": "HR",
+  "category": "Dieu ancien",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 6,
+   "spd": 4,
+   "mag": 4,
+   "hp": 26,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   },
+   {
+    "key": "curse",
+    "value": 2
+   }
+  ],
+  "visual": "Dieu élancé au sourire rusé, cheveux roux flamboyants, tunique verte et noire, serpent enroulé autour du bras, silhouette qui se dédouble en flammes vertes.",
+  "lore": "Il a ri le premier. Il rira le dernier, au Ragnarök.",
+  "evolution": null,
+  "sets": [
+   "pantheons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "tentacle",
+   "core": "mantle",
+   "count": 10,
+   "scale": 1.1,
+   "scene": "ocean"
+  },
+  "image": "assets/art/INF-067.webp",
+  "artPrompt": "Loki — Dieu élancé au sourire rusé, cheveux roux flamboyants, tunique verte et noire, serpent enroulé autour du bras, silhouette qui se dédouble en flammes vertes. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

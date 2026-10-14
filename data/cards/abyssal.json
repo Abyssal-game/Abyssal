@@ -2225,5 +2225,105 @@
   },
   "image": "assets/art/ABY-052.webp",
   "artPrompt": "Vritra — Dragon-serpent immense enroulé autour d’une montagne, retenant derrière lui des fleuves entiers prisonniers. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-053",
+  "number": 53,
+  "name": "Le Monstre du Loch Ness",
+  "title": "Le dos qui affleure",
+  "faction": "abyssal",
+  "rarity": "R",
+  "category": "Créature marine",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 4,
+   "def": 4,
+   "spd": 3,
+   "mag": 2,
+   "hp": 22,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   },
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Long cou de plésiosaure émergeant d’un lac noir écossais dans la brume, tête reptilienne, bosses sur l’eau, ruines de château sur la rive.",
+  "lore": "On a passé le lac au sonar cent fois. Il était dessous, cent fois.",
+  "evolution": null,
+  "sets": [
+   "legendes"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "robe",
+   "arms": "down",
+   "scale": 1.25,
+   "dy": 30,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-053.webp",
+  "artPrompt": "Le Monstre du Loch Ness — Long cou de plésiosaure émergeant d’un lac noir écossais dans la brume, tête reptilienne, bosses sur l’eau, ruines de château sur la rive. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-054",
+  "number": 54,
+  "name": "Poséidon",
+  "title": "L’ébranleur de la terre",
+  "faction": "abyssal",
+  "rarity": "M",
+  "category": "Dieu ancien",
+  "power": 9,
+  "role": "M",
+  "stats": {
+   "atk": 6,
+   "def": 4,
+   "spd": 6,
+   "mag": 10,
+   "hp": 18,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "drown"
+   },
+   {
+    "key": "curse",
+    "value": 3
+   }
+  ],
+  "visual": "Dieu colossal à la barbe d’écume verte, trident de bronze brandi, chevaux marins écumants, vague gigantesque qui s’élève derrière lui sous un ciel d’orage.",
+  "lore": "La mer n’est pas en colère. Elle est simplement à lui.",
+  "evolution": null,
+  "sets": [
+   "pantheons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "tentacle",
+   "core": "head",
+   "count": 11,
+   "crown": true,
+   "eyes": 5,
+   "scale": 1.05
+  },
+  "image": "assets/art/ABY-054.webp",
+  "artPrompt": "Poséidon — Dieu colossal à la barbe d’écume verte, trident de bronze brandi, chevaux marins écumants, vague gigantesque qui s’élève derrière lui sous un ciel d’orage. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

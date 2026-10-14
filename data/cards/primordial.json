@@ -3060,5 +3060,200 @@
   },
   "image": "assets/art/PRI-066.webp",
   "artPrompt": "Le Cœur du Chaos — Cœur titanesque fait de magma et d’étoiles, battant au centre d’une nébuleuse, veines de feu qui s’étendent. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "PRI-067",
+  "number": 67,
+  "name": "Polyphème",
+  "title": "Le berger à l’œil unique",
+  "faction": "primordial",
+  "rarity": "HR",
+  "category": "Géant",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 6,
+   "def": 6,
+   "spd": 3,
+   "mag": 3,
+   "hp": 26,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "armor",
+    "value": 2
+   }
+  ],
+  "visual": "Cyclope colossal à l’œil unique énorme, barbe hirsute, peau de mouton sur les épaules, gourdin taillé dans un tronc, à l’entrée d’une caverne marine.",
+  "lore": "Personne ne l’a aveuglé. Il s’en souvient, de Personne.",
+  "evolution": null,
+  "sets": [
+   "legendes"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "dragon",
+   "legs": 4,
+   "wings": "none",
+   "scene": "ruins"
+  },
+  "image": "assets/art/PRI-067.webp",
+  "artPrompt": "Polyphème — Cyclope colossal à l’œil unique énorme, barbe hirsute, peau de mouton sur les épaules, gourdin taillé dans un tronc, à l’entrée d’une caverne marine. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "PRI-068",
+  "number": 68,
+  "name": "Thor",
+  "title": "Le tonnerre en marche",
+  "faction": "primordial",
+  "rarity": "M",
+  "category": "Dieu ancien",
+  "power": 10,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 7,
+   "mag": 4,
+   "hp": 24,
+   "cost": 10
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 3
+   },
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Dieu nordique massif à la barbe rousse tressée, cotte de mailles et fourrures, marteau runique court crépitant d’éclairs, char tiré par deux boucs dans un ciel d’orage.",
+  "lore": "Chaque orage est un coup de marteau. Il y a beaucoup d’orages.",
+  "evolution": null,
+  "sets": [
+   "pantheons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "dragon",
+   "heads": 5,
+   "legs": 4,
+   "fire": true,
+   "scene": "cosmos"
+  },
+  "image": "assets/art/PRI-068.webp",
+  "artPrompt": "Thor — Dieu nordique massif à la barbe rousse tressée, cotte de mailles et fourrures, marteau runique court crépitant d’éclairs, char tiré par deux boucs dans un ciel d’orage. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "PRI-069",
+  "number": 69,
+  "name": "Seth",
+  "title": "Le seigneur du désert rouge",
+  "faction": "primordial",
+  "rarity": "HR",
+  "category": "Dieu ancien",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 6,
+   "spd": 4,
+   "mag": 4,
+   "hp": 26,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "cataclysm",
+    "value": 1
+   },
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Dieu à tête d’animal étrange au museau courbe et aux oreilles carrées, peau rouge, sceptre, tempête de sable furieuse et pyramides dans le lointain.",
+  "lore": "Le désert avance d’un grain chaque jour. C’est lui qui le pousse.",
+  "evolution": null,
+  "sets": [
+   "pantheons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "tentacle",
+   "core": "mantle",
+   "count": 10,
+   "scale": 1.1,
+   "scene": "ruins"
+  },
+  "image": "assets/art/PRI-069.webp",
+  "artPrompt": "Seth — Dieu à tête d’animal étrange au museau courbe et aux oreilles carrées, peau rouge, sceptre, tempête de sable furieuse et pyramides dans le lointain. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "PRI-070",
+  "number": 70,
+  "name": "Tezcatlipoca",
+  "title": "Le miroir fumant",
+  "faction": "primordial",
+  "rarity": "HR",
+  "category": "Dieu ancien",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 6,
+   "spd": 4,
+   "mag": 4,
+   "hp": 26,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 2
+   },
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Dieu aztèque au visage peint de bandes noires et jaunes, miroir d’obsidienne fumant à la place d’un pied, coiffe de plumes, jaguar dans l’ombre, nuit étoilée.",
+  "lore": "Dans son miroir, tu vois ce que tu ferais si personne ne regardait.",
+  "evolution": null,
+  "sets": [
+   "pantheons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "tentacle",
+   "core": "mantle",
+   "count": 10,
+   "scale": 1.1,
+   "scene": "ruins"
+  },
+  "image": "assets/art/PRI-070.webp",
+  "artPrompt": "Tezcatlipoca — Dieu aztèque au visage peint de bandes noires et jaunes, miroir d’obsidienne fumant à la place d’un pied, coiffe de plumes, jaguar dans l’ombre, nuit étoilée. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

@@ -1902,5 +1902,151 @@
   },
   "image": "assets/art/ART-043.webp",
   "artPrompt": "Le Gardien du Temps — Automate d’airain dont le torse est une horloge ouverte, rouages et sabliers tournant en orbite autour de lui. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-044",
+  "number": 44,
+  "name": "La Créature de Frankenstein",
+  "title": "Le Prométhée moderne",
+  "faction": "artificiel",
+  "rarity": "HR",
+  "category": "Créature alchimique",
+  "power": 7,
+  "role": "M",
+  "stats": {
+   "atk": 6,
+   "def": 3,
+   "spd": 6,
+   "mag": 9,
+   "hp": 12,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "regen",
+    "value": 1
+   },
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Géant cousu de pièces humaines, cicatrices et points de suture, longs cheveux noirs, regard triste et furieux, éclairs dans un laboratoire gothique plein d’appareils de cuivre.",
+  "lore": "Il a appris à lire avant d’apprendre qu’on le haïssait.",
+  "evolution": null,
+  "sets": [
+   "legendes"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "goat",
+   "horns": "long",
+   "wings": "feather",
+   "body": "bulky",
+   "legs": "goat",
+   "arms": "up",
+   "halo": "ring"
+  },
+  "image": "assets/art/ART-044.webp",
+  "artPrompt": "La Créature de Frankenstein — Géant cousu de pièces humaines, cicatrices et points de suture, longs cheveux noirs, regard triste et furieux, éclairs dans un laboratoire gothique plein d’appareils de cuivre. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-045",
+  "number": 45,
+  "name": "Gremlin",
+  "title": "Saboteur de rouages",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Automate",
+  "power": 2,
+  "role": "S",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 3,
+   "mag": 2,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Petite créature aux oreilles de chauve-souris, peau grise huileuse, clé à molette volée, arrachant des câbles dans une machine à vapeur pleine d’étincelles.",
+  "lore": "Si une machine tombe en panne sans raison, regarde dedans. Ou plutôt non.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "spider",
+   "scale": 0.82
+  },
+  "image": "assets/art/ART-045.webp",
+  "artPrompt": "Gremlin — Petite créature aux oreilles de chauve-souris, peau grise huileuse, clé à molette volée, arrachant des câbles dans une machine à vapeur pleine d’étincelles. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-046",
+  "number": 46,
+  "name": "Héphaïstos",
+  "title": "Le forgeron des dieux",
+  "faction": "artificiel",
+  "rarity": "M",
+  "category": "Dieu ancien",
+  "power": 10,
+  "role": "M",
+  "stats": {
+   "atk": 8,
+   "def": 6,
+   "spd": 6,
+   "mag": 10,
+   "hp": 17,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "command",
+    "value": 2
+   },
+   {
+    "key": "armor",
+    "value": 2
+   }
+  ],
+  "visual": "Dieu forgeron boiteux aux bras énormes, barbe roussie, tablier de cuir, marteau levé au-dessus d’une enclume en fusion, automates d’or qui l’assistent dans une forge volcanique.",
+  "lore": "Ses servantes d’or pensent, parlent et obéissent. Il est le seul à qui elles obéissent.",
+  "evolution": null,
+  "sets": [
+   "pantheons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "void",
+   "body": "armor",
+   "arms": "spread",
+   "multi": 2,
+   "halo": "ring",
+   "wings": "bone",
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-046.webp",
+  "artPrompt": "Héphaïstos — Dieu forgeron boiteux aux bras énormes, barbe roussie, tablier de cuir, marteau levé au-dessus d’une enclume en fusion, automates d’or qui l’assistent dans une forge volcanique. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

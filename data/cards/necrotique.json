@@ -2520,5 +2520,298 @@
   },
   "image": "assets/art/NEC-057.webp",
   "artPrompt": "La Mort incarnée — Grande silhouette encapuchonnée faite de nuit, faux d’os luisante, sablier brisé à la ceinture, ailes de corbeau. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "NEC-058",
+  "number": 58,
+  "name": "Momie Royale",
+  "title": "La malédiction du tombeau",
+  "faction": "necrotique",
+  "rarity": "R",
+  "category": "Mort-vivant",
+  "power": 5,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 4,
+   "spd": 3,
+   "mag": 2,
+   "hp": 15,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 2
+   },
+   {
+    "key": "armor",
+    "value": 2
+   }
+  ],
+  "visual": "Momie de pharaon enveloppée de bandelettes jaunies, masque funéraire d’or fendu, yeux de braise bleue, scarabées qui s’échappent, salle de tombeau aux hiéroglyphes.",
+  "lore": "Ils ont ouvert la porte pour l’or. Ils ont trouvé le propriétaire.",
+  "evolution": null,
+  "sets": [
+   "legendes"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "goat",
+   "horns": "curl",
+   "body": "bulky",
+   "arms": "down",
+   "legs": "goat"
+  },
+  "image": "assets/art/NEC-058.webp",
+  "artPrompt": "Momie Royale — Momie de pharaon enveloppée de bandelettes jaunies, masque funéraire d’or fendu, yeux de braise bleue, scarabées qui s’échappent, salle de tombeau aux hiéroglyphes. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "NEC-059",
+  "number": 59,
+  "name": "La Dame Blanche",
+  "title": "Elle attend au bord de la route",
+  "faction": "necrotique",
+  "rarity": "PC",
+  "category": "Spectre",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 3,
+   "mag": 6,
+   "hp": 8,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 1
+   },
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Silhouette spectrale de femme en longue robe blanche, voile qui flotte, visage pâle et triste, debout au bord d’une route de campagne dans la brume nocturne.",
+  "lore": "Elle demande qu’on la ramène chez elle. Elle descend toujours au même virage.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "spectre",
+   "head": "woman",
+   "hair": true,
+   "scream": true,
+   "arms": "up"
+  },
+  "image": "assets/art/NEC-059.webp",
+  "artPrompt": "La Dame Blanche — Silhouette spectrale de femme en longue robe blanche, voile qui flotte, visage pâle et triste, debout au bord d’une route de campagne dans la brume nocturne. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "NEC-060",
+  "number": 60,
+  "name": "La Llorona",
+  "title": "La femme qui pleure",
+  "faction": "necrotique",
+  "rarity": "R",
+  "category": "Spectre",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 2,
+   "spd": 5,
+   "mag": 2,
+   "hp": 12,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "fear"
+   },
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Spectre de femme en robe de mariée trempée, longs cheveux noirs collés au visage, larmes noires, au bord d’une rivière sombre éclairée par la lune.",
+  "lore": "Si tu l’entends pleurer près de toi, elle est loin. Si elle semble loin, cours.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "none",
+   "body": "armor",
+   "arms": "down"
+  },
+  "image": "assets/art/NEC-060.webp",
+  "artPrompt": "La Llorona — Spectre de femme en robe de mariée trempée, longs cheveux noirs collés au visage, larmes noires, au bord d’une rivière sombre éclairée par la lune. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "NEC-061",
+  "number": 61,
+  "name": "Hadès",
+  "title": "Le maître des morts",
+  "faction": "necrotique",
+  "rarity": "M",
+  "category": "Dieu ancien",
+  "power": 10,
+  "role": "T",
+  "stats": {
+   "atk": 8,
+   "def": 8,
+   "spd": 4,
+   "mag": 5,
+   "hp": 26,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "death",
+    "value": 3
+   }
+  ],
+  "visual": "Dieu sombre et sévère au teint pâle, couronne de fer noir, manteau de nuit étoilée, sceptre à deux pointes, chien à trois têtes dans l’ombre, fleuve des morts derrière lui.",
+  "lore": "Tout finit par lui revenir. Il n’a jamais eu besoin de se presser.",
+  "evolution": null,
+  "sets": [
+   "pantheons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "many",
+   "body": "bulky",
+   "wings": "bat",
+   "arms": "spread",
+   "legs": "goat",
+   "tail": true,
+   "hornScale": 1.3
+  },
+  "image": "assets/art/NEC-061.webp",
+  "artPrompt": "Hadès — Dieu sombre et sévère au teint pâle, couronne de fer noir, manteau de nuit étoilée, sceptre à deux pointes, chien à trois têtes dans l’ombre, fleuve des morts derrière lui. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "NEC-062",
+  "number": 62,
+  "name": "Anubis",
+  "title": "Le peseur des cœurs",
+  "faction": "necrotique",
+  "rarity": "HR",
+  "category": "Dieu ancien",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 6,
+   "def": 7,
+   "spd": 3,
+   "mag": 4,
+   "hp": 23,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   },
+   {
+    "key": "armor",
+    "value": 2
+   }
+  ],
+  "visual": "Dieu à tête de chacal noir aux yeux dorés, pagne et collier d’or, sceptre ouas, balance de pesée des cœurs, salle funéraire égyptienne éclairée de torches.",
+  "lore": "Une plume d’un côté, ton cœur de l’autre. Il n’a jamais triché.",
+  "evolution": null,
+  "sets": [
+   "pantheons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "gown",
+   "arms": "spread",
+   "hair": true,
+   "horns": "crown",
+   "scene": "ice"
+  },
+  "image": "assets/art/NEC-062.webp",
+  "artPrompt": "Anubis — Dieu à tête de chacal noir aux yeux dorés, pagne et collier d’or, sceptre ouas, balance de pesée des cœurs, salle funéraire égyptienne éclairée de torches. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "NEC-063",
+  "number": 63,
+  "name": "La Morrígan",
+  "title": "La reine fantôme des batailles",
+  "faction": "necrotique",
+  "rarity": "HR",
+  "category": "Dieu ancien",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 6,
+   "mag": 3,
+   "hp": 16,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "curse",
+    "value": 2
+   }
+  ],
+  "visual": "Déesse celte aux longs cheveux noirs, cape de plumes de corbeau, regard perçant, nuée de corbeaux, champ de bataille brumeux au crépuscule.",
+  "lore": "Quand elle lave une armure au gué, son propriétaire ne verra pas le soir.",
+  "evolution": null,
+  "sets": [
+   "pantheons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "skeleton",
+   "pose": "giant"
+  },
+  "image": "assets/art/NEC-063.webp",
+  "artPrompt": "La Morrígan — Déesse celte aux longs cheveux noirs, cape de plumes de corbeau, regard perçant, nuée de corbeaux, champ de bataille brumeux au crépuscule. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

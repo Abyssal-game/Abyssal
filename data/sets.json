@@ -251,5 +251,55 @@
    "INF-033",
    "INF-036"
   ]
+ },
+ {
+  "key": "pantheons",
+  "name": "Les Anciens Panthéons",
+  "desc": "Olympe, Asgard, Égypte, Mexique ancien : leurs fidèles ont disparu, eux n’ont jamais cessé d’exister.",
+  "reward": {
+   "shards": 700,
+   "tickets": {
+    "premium": 1
+   },
+   "title": "Celui que les dieux craignent"
+  },
+  "cards": [
+   "CEL-056",
+   "NEC-061",
+   "ABY-054",
+   "INF-066",
+   "CEL-057",
+   "PRI-068",
+   "INF-067",
+   "NEC-062",
+   "PRI-069",
+   "SAU-072",
+   "NEC-063",
+   "PRI-070",
+   "CEL-058",
+   "ART-046"
+  ]
+ },
+ {
+  "key": "legendes",
+  "name": "Les Monstres de légende",
+  "desc": "Ceux des contes du soir, des cartes anciennes et des lacs trop profonds.",
+  "reward": {
+   "shards": 500,
+   "title": "Conteur de veillées"
+  },
+  "cards": [
+   "SAU-063",
+   "SAU-064",
+   "SAU-065",
+   "PRI-067",
+   "SAU-066",
+   "SAU-067",
+   "NEC-058",
+   "ART-044",
+   "SAU-069",
+   "ABY-053",
+   "INF-065"
+  ]
  }
 ]

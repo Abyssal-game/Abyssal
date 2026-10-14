@@ -2359,5 +2359,256 @@
   },
   "image": "assets/art/CEL-053.webp",
   "artPrompt": "Le Roi des Sceaux — Roi d’ivoire et de laiton sans visage, couronne en forme d’astrolabe, sept sceaux lumineux tournant autour de lui. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-054",
+  "number": 54,
+  "name": "Sleipnir",
+  "title": "Le coursier aux huit jambes",
+  "faction": "celeste",
+  "rarity": "HR",
+  "category": "Créature mythologique",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 7,
+   "mag": 3,
+   "hp": 19,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   },
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Cheval gris colossal à huit jambes, crinière tressée de runes lumineuses, galopant sur un pont d’arc-en-ciel au-dessus des nuages.",
+  "lore": "Il franchit en une foulée ce qu’un dieu met une nuit à traverser.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "ram",
+   "wings": "bat",
+   "body": "bulky",
+   "arms": "spread",
+   "tail": true,
+   "claws": true,
+   "legs": "goat",
+   "scene": "sky"
+  },
+  "image": "assets/art/CEL-054.webp",
+  "artPrompt": "Sleipnir — Cheval gris colossal à huit jambes, crinière tressée de runes lumineuses, galopant sur un pont d’arc-en-ciel au-dessus des nuages. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-055",
+  "number": 55,
+  "name": "Dragon d’Azur",
+  "title": "Le gardien de l’Orient",
+  "faction": "celeste",
+  "rarity": "M",
+  "category": "Dragon",
+  "power": 9,
+  "role": "U",
+  "stats": {
+   "atk": 6,
+   "def": 6,
+   "spd": 5,
+   "mag": 10,
+   "hp": 22,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 3
+   },
+   {
+    "key": "command",
+    "value": 3
+   }
+  ],
+  "visual": "Long dragon serpentin oriental aux écailles bleu azur et or, moustaches flottantes, bois de cerf, perle lumineuse entre les griffes, ondulant parmi les nuages et la pluie.",
+  "lore": "Quand il remue, il pleut. Quand il dort, les rizières prient.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "orb",
+   "type": "crystal",
+   "scene": "forge",
+   "tint": "#ff5050"
+  },
+  "image": "assets/art/CEL-055.webp",
+  "artPrompt": "Dragon d’Azur — Long dragon serpentin oriental aux écailles bleu azur et or, moustaches flottantes, bois de cerf, perle lumineuse entre les griffes, ondulant parmi les nuages et la pluie. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-056",
+  "number": 56,
+  "name": "Zeus",
+  "title": "Le roi de l’Olympe",
+  "faction": "celeste",
+  "rarity": "S",
+  "category": "Dieu ancien",
+  "power": 10,
+  "role": "M",
+  "stats": {
+   "atk": 8,
+   "def": 5,
+   "spd": 6,
+   "mag": 10,
+   "hp": 17,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 3
+   },
+   {
+    "key": "command",
+    "value": 3
+   }
+  ],
+  "visual": "Dieu majestueux à la barbe blanche ondoyante, musculature puissante, toge drapée, foudre éclatante dans la main levée, aigle à ses côtés, trône de nuages et colonnes de marbre.",
+  "lore": "Il a renversé son père. Il dort d’un œil, depuis.",
+  "evolution": null,
+  "sets": [
+   "pantheons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "dragon",
+   "legs": 4,
+   "wings": "bat",
+   "scale": 1.1,
+   "scene": "forge"
+  },
+  "image": "assets/art/CEL-056.webp",
+  "artPrompt": "Zeus — Dieu majestueux à la barbe blanche ondoyante, musculature puissante, toge drapée, foudre éclatante dans la main levée, aigle à ses côtés, trône de nuages et colonnes de marbre. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-057",
+  "number": 57,
+  "name": "Odin",
+  "title": "Le Père-de-tout",
+  "faction": "celeste",
+  "rarity": "M",
+  "category": "Dieu ancien",
+  "power": 9,
+  "role": "M",
+  "stats": {
+   "atk": 7,
+   "def": 4,
+   "spd": 6,
+   "mag": 10,
+   "hp": 16,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "command",
+    "value": 3
+   }
+  ],
+  "visual": "Vieux dieu borgne à la longue barbe grise, chapeau à large bord et manteau bleu sombre, lance runique, deux corbeaux sur les épaules, deux loups à ses pieds, aurores boréales.",
+  "lore": "Il a donné un œil pour savoir. Il donnerait l’autre pour comprendre.",
+  "evolution": null,
+  "sets": [
+   "pantheons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "gown",
+   "arms": "up",
+   "hair": true,
+   "horns": "crown",
+   "halo": "ring",
+   "scene": "temple"
+  },
+  "image": "assets/art/CEL-057.webp",
+  "artPrompt": "Odin — Vieux dieu borgne à la longue barbe grise, chapeau à large bord et manteau bleu sombre, lance runique, deux corbeaux sur les épaules, deux loups à ses pieds, aurores boréales. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-058",
+  "number": 58,
+  "name": "Perun",
+  "title": "La hache de la foudre",
+  "faction": "celeste",
+  "rarity": "HR",
+  "category": "Dieu ancien",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 6,
+   "mag": 4,
+   "hp": 17,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 2
+   },
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Dieu slave à la barbe cuivrée, hache de pierre brandie, éclairs autour de lui, chêne immense frappé par la foudre, plaines sous un ciel d’orage.",
+  "lore": "Il frappe toujours le plus haut chêne. Il n’aime pas qu’on le dépasse.",
+  "evolution": null,
+  "sets": [
+   "pantheons"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "void",
+   "wings": "six",
+   "body": "robe",
+   "arms": "spread",
+   "halo": "spike",
+   "tint": "#ff4a4a"
+  },
+  "image": "assets/art/CEL-058.webp",
+  "artPrompt": "Perun — Dieu slave à la barbe cuivrée, hache de pierre brandie, éclairs autour de lui, chêne immense frappé par la foudre, plaines sous un ciel d’orage. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]
