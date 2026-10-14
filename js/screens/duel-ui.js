@@ -320,6 +320,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
 
   // ——— Lecture des événements (animations) ———
   let lastTier = null; // résultat du dernier jet de dé : le coup qui suit le montre
+  let lastDef = 'none'; // résultat de la dernière défense active
   let pendingCU = null; // gros plan d'une compétence à dé, joué après le dé
   const DICE_KEYS = ['estoc', 'contagion', 'entrave'];
   async function play(ev) {
@@ -346,7 +347,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         case 'eact': {
           const def = INTENTS[e.kind];
           // gros plan sur les coups lourds ennemis contre une seule cible
-          if (e.kind === 'heavy' && e.tgt && st.units[e.tgt]?.side === 'ally' && await closeup(e.a, e.tgt, def.name)) break;
+          if (e.kind === 'heavy' && lastDef === 'none' && e.tgt && st.units[e.tgt]?.side === 'ally' && await closeup(e.a, e.tgt, def.name)) break;
           if (e.kind === 'heavy' || e.kind === 'blast') banner(`${intentIcon(e.kind)} ${esc(def.name)} !`, 'danger', 700);
           if (e.tgt && st.units[e.tgt]?.side === 'ally') { lunge(e.a, e.tgt); cam(e.tgt, 0.6); await wait(T(LUNGE_HIT)); }
           else await wait(T(200));
@@ -567,8 +568,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       const def = INTENTS[s.kind];
       const bar = document.createElement('div');
       bar.className = 'dv-dodge cb-def';
-      bar.innerHTML = `<span class="dv-dodge-t">${intentIcon(s.kind)} ${esc(def.name)} ! <small>Or : esquive · trait blanc, au dernier instant : parade</small></span><span class="dv-dodge-bar"><i class="z"><i class="p"></i></i><i class="c"></i></span>`;
-      $('.dv-mid').appendChild(bar); $('.dv-mid').classList.add('qte');
+      bar.innerHTML = `<span class="dv-dodge-t">${intentIcon(s.kind)} ${esc(def.name)} ! <small>Zone dorée : esquive · trait blanc, au dernier instant : parade</small></span><span class="dv-dodge-bar"><i class="rail"></i><i class="z"><i class="p"></i></i><i class="c"></i></span>`;
+      $('.dv-mid').appendChild(bar); $('.dv-mid').classList.add('qte'); $('.dv')?.classList.add('qte-on');
       const cur = bar.querySelector('.c'), zEl = bar.querySelector('.z'), pEl = bar.querySelector('.p');
       zEl.style.cssText = `left:${z0 * 100}%;width:${zw * 100}%`;
       pEl.style.cssText = `left:${((zw - pw) / zw) * 100}%;width:${(pw / zw) * 100}%`;
@@ -578,6 +579,11 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         if (done) return; done = true; cancelAnimationFrame(raf); defTap = null;
         bar.classList.add(res === 'none' ? 'ko' : 'ok', `r-${res}`);
         bar.querySelector('.dv-dodge-t').textContent = res === 'parry' ? 'Parade parfaite !' : res === 'dodge' ? 'Esquive !' : 'Raté…';
+        $('.dv')?.classList.remove('qte-on');
+        // tampon du résultat, au centre de l'écran
+        const stamp = document.createElement('div'); stamp.className = `dv-stamp s-${res}`;
+        stamp.innerHTML = `<b>${res === 'parry' ? 'Parade parfaite !' : res === 'dodge' ? 'Esquive !' : 'Touché…'}</b>`;
+        $('.dv')?.appendChild(stamp); setTimeout(() => stamp.remove(), 900);
         if (res === 'none') app.sfx.miss();
         setTimeout(() => { bar.remove(); $('.dv-mid')?.classList.remove('qte'); el(s.a)?.classList.remove('aim'); tEls.forEach((x) => x?.classList.remove('aimed')); resolve(res); }, res === 'none' ? 200 : 300);
       };
@@ -648,7 +654,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       if (!alive_) return;
       const ev = enemyAct(st, s.a, res); g.persist();
       logEvents(ev);
+      lastDef = res; // pas de gros plan d'impact si le coup est esquivé ou paré
       await play(ev);
+      lastDef = 'none';
     }
     if (!alive_) return;
     const ev = endEnemyTurn(st); g.persist();
