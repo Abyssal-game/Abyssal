@@ -2238,3 +2238,20 @@ input[type="range"]:disabled { opacity: .45; }
 .col-tools .seg.wide { grid-template-columns: repeat(4, minmax(0, 1fr)) 34px !important; padding-left: 14px !important; padding-right: 14px !important; }
 .input-wrap img.ic.ic-cur { left: 22px; width: 20px; height: 20px; transform: translateY(-50%) !important; }
 .col-tools .seg-b[aria-pressed="true"] { border-image-width: 0 9px; }
+/* v243 : panneau « Filtres et tri » remis en ordre (pastilles sur plusieurs lignes, icônes dans les menus) */
+.col-filters { overflow: hidden; }
+.col-filters > summary img.ic.ic-cur { width: 22px; height: 22px; transform: none; }
+.col-filters .chips:not(.fac-grid) { flex-wrap: wrap; overflow: visible; justify-content: center; gap: 6px; }
+.col-filters .chips:not(.fac-grid) .chip { min-height: 34px; padding: 4px 12px; font-size: .82rem; }
+.col-filters .sort { flex: 1 1 100%; min-width: 0; margin-top: 8px; }
+.col-filters .sort select.input { width: 100%; padding-left: 42px; }
+.col-filters .sort img.ic.ic-cur { left: 12px; width: 20px; height: 20px; transform: none; z-index: 1; }
+.col-filters .row.between { align-items: center; }
+.col-filters .row.between .sort { flex: 1 1 0; }
+.col-filters .sort img.ic.ic-cur { left: 18px !important; width: 20px !important; height: 20px !important; max-width: 20px; }
+.col-filters[open] { background: linear-gradient(180deg, rgba(20, 16, 30, .88), rgba(12, 10, 18, .92)) !important; border: 1px solid rgba(232, 195, 90, .22) !important; border-radius: 16px; }
+.col-filters .chips[aria-label]::before { flex: 0 0 100%; grid-column: 1 / -1; margin: 6px 0 0; text-align: left; font: 700 .7rem/1 var(--f-ui); letter-spacing: .14em; text-transform: uppercase; color: #C8A45D; }
+.col-filters .chips[aria-label="Filtrer par faction"]::before { content: 'Faction'; margin-top: 0; }
+.col-filters .chips[aria-label="Filtrer par rareté"]::before { content: 'Rareté'; }
+.col-filters .chips[aria-label="Filtrer par rôle"]::before { content: 'Rôle'; }
+.col-filters > .sort { padding: 0 !important; margin-left: 14px; margin-right: 14px; }
