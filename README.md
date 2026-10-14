@@ -70,9 +70,13 @@ Le champ `art` décrit l’illustration provisoire : `form` (`hum`, `beast`, `dr
 
 ## Donner une identité propre à une créature
 
-Chaque créature garde le kit de son rôle (`js/core/skills.js`). Celles listées dans `CREATURE_KITS` (`js/core/kits.js`, 12 pour l’instant) y ajoutent leur identité, débloquée par niveau : **frappe** (niv. 1), **passif** (niv. 3), **compétence propre** (niv. 6, sans Ferveur, avec un temps de recharge) et **Éveil** (niv. 9). Aucune donnée de sauvegarde en plus : seul le niveau déjà stocké compte.
+Chaque créature garde le kit de son rôle (`js/core/skills.js`) et y ajoute son identité (`js/core/kits.js`), débloquée par niveau : **frappe** (niv. 1), **passif** (niv. 3), **compétence propre** (niv. 6, sans Ferveur, avec un temps de recharge) et **Éveil** (niv. 9). Aucune donnée de sauvegarde en plus : seul le niveau déjà stocké compte.
 
-1. Ajouter une entrée à `CREATURE_KITS` : `style`, `stat` (répartition attaque / PV, produit proche de 1), `strike` (effets reconnus : `mult`, `hits`, `brk`, `brkCharging`, `pierce`, `poisonMore`, `splashPoison`, `healLowest`, `lowBonus`, `lifeShare`), `passive`, `move`, `plus`, `moins`, `synergy`.
+Les 395 identités : 12 écrites à la main (`HAND_KITS`), les autres générées par `node tools/gen-kits.mjs` dans `js/core/kits-data.js` (à relancer après l'ajout d'une carte). Le passif vient de la première capacité de la carte, le second passif (Éveil) de la deuxième ; la frappe dépend de la faction ; la compétence est un modèle du rôle composé d'effets élémentaires (`OPS`), réglé sur un budget de puissance.
+
+Pour écrire une identité à la main :
+
+1. Ajouter une entrée à `HAND_KITS` : `style`, `stat` (répartition attaque / PV, produit proche de 1), `strike` (effets reconnus : `mult`, `hits`, `brk`, `brkCharging`, `pierce`, `poisonMore`, `splashPoison`, `burn`, `healLowest`, `lowBonus`, `lifeShare`), `passive`, `move`, `plus`, `moins`, `synergy`.
 2. Un nouveau passif : une entrée dans `PASSIVES` et son effet dans `duel.js` (chercher `passiveOf(`). Une nouvelle compétence : une entrée dans `MOVES` avec `run` (effet), `ai` (quand l’IA la joue), `cd` (recharge) et l’icône peinte `assets/salles/pw/<icon>.webp`.
 3. `npm test` vérifie qu’aucun passif ni aucune compétence n’est affiché sans effet. `node tools/balance.mjs` compare des équipes ; `depth()` mesure la profondeur moyenne atteinte en Descente.
 

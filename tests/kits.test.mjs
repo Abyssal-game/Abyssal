@@ -6,14 +6,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { loadCatalog, ROOT } from './helpers.mjs';
 import * as D from '../js/core/duel.js';
-import { CREATURE_KITS, PASSIVES, MOVES, KIT_LEVELS, kitOf, moveOf, passiveOf, statShape } from '../js/core/kits.js';
+import { CREATURE_KITS, PASSIVES, MOVES, KIT_LEVELS, OPS, kitOf, moveOf, passiveOf, statShape, moveDefOf, opsValue } from '../js/core/kits.js';
 import { roleOf } from '../js/core/army.js';
 
 const catalog = loadCatalog();
-const FOE = catalog.cards.find((c) => roleOf(c) === 'degats' && c.rarity === 'C' && !CREATURE_KITS[c.id]);
+const HAND = ['INF-001', 'NEC-001', 'CEL-001', 'ABY-003', 'CEL-018', 'NEC-017', 'SAU-031', 'INF-012', 'SAU-043', 'ABY-039', 'SAU-049', 'CEL-031'];
+const FOE = catalog.cards.find((c) => roleOf(c) === 'degats' && c.rarity === 'C' && !HAND.includes(c.id));
 const ally = (id, level = 1) => D.duelUnit(catalog.get(id), { level });
 const foe = (o = {}) => { const u = D.duelUnit(FOE, { side: 'enemy', scale: 1, ...o }); u.faction = null; return u; };
-const filler = (n) => catalog.cards.filter((c) => roleOf(c) === 'degats' && c.rarity === 'C' && !CREATURE_KITS[c.id]).slice(1, 1 + n).map((c) => D.duelUnit(c, { level: 1 }));
+// alliés de remplissage sans identité (pour isoler l'effet testé)
+const filler = (n) => catalog.cards.filter((c) => roleOf(c) === 'degats' && c.rarity === 'C' && !HAND.includes(c.id)).slice(1, 1 + n).map((c) => { const u = D.duelUnit(c, { level: 1 }); delete u.ck; delete u.ckLv; return u; });
 // Un combat prêt à jouer : l'unité testée en tête, des ennemis neutres (sans faction)
 function duel(units, enemies = [foe(), foe(), foe()]) {
   const st = D.createDuel(units, enemies, { seed: 7 });
@@ -23,25 +25,37 @@ function duel(units, enemies = [foe(), foe(), foe()]) {
 }
 const uidOf = (st, id) => Object.values(st.units).find((u) => u.id === id).uid;
 const enemies = (st) => D.front(st, 'enemy');
+const mkey = (k) => (typeof k.move === 'string' ? k.move : 'own');
 
-test('kits : chaque créature existe, chaque passif et compétence est défini et illustré', () => {
+test('kits : les 395 créatures ont une identité complète, chaque effet est défini et illustré', () => {
+  assert.equal(Object.keys(CREATURE_KITS).length, catalog.cards.length, 'une identité par carte');
   for (const [id, k] of Object.entries(CREATURE_KITS)) {
     assert.ok(catalog.get(id), `${id} existe`);
     assert.ok(PASSIVES[k.passive], `${id} : passif ${k.passive}`);
-    assert.ok(MOVES[k.move], `${id} : compétence ${k.move}`);
-    assert.ok(k.strike?.name && k.strike?.desc && k.plus && k.moins && k.synergy, `${id} : fiche complète`);
-    const m = MOVES[k.move];
-    assert.ok(typeof m.run === 'function' && typeof m.ai === 'function', `${k.move} : effet et IA`);
-    assert.ok(fs.existsSync(path.join(ROOT, `assets/salles/pw/${m.icon}.webp`)), `${k.move} : icône peinte ${m.icon}`);
+    if (k.passive2) assert.ok(PASSIVES[k.passive2] && k.passive2 !== k.passive, `${id} : second passif ${k.passive2}`);
+    const m = moveDefOf(k);
+    assert.ok(m, `${id} : compétence`);
+    assert.ok(k.strike?.name && k.strike?.desc && k.plus && k.moins && k.synergy && k.style, `${id} : fiche complète`);
+    assert.ok(typeof m.run === 'function' && typeof m.ai === 'function' && m.desc && m.name, `${id} : effet, IA et texte`);
+    assert.ok(fs.existsSync(path.join(ROOT, `assets/salles/pw/${m.icon}.webp`)), `${id} : icône peinte ${m.icon}`);
+    if (m.ops) m.ops.forEach((o) => assert.ok(OPS[o.op], `${id} : effet ${o.op}`));
   }
-  // pas de définition en double : chaque passif et chaque compétence sert à une seule créature
-  const ps = Object.values(CREATURE_KITS).map((k) => k.passive), ms = Object.values(CREATURE_KITS).map((k) => k.move);
-  assert.equal(new Set(ps).size, ps.length); assert.equal(new Set(ms).size, ms.length);
-  assert.deepEqual(Object.keys(PASSIVES).sort(), [...new Set(ps)].sort(), 'aucun passif orphelin');
-  assert.deepEqual(Object.keys(MOVES).sort(), [...new Set(ms)].sort(), 'aucune compétence orpheline');
-  // chaque passif est lu par le moteur (aucun passif affiché sans effet)
+  // chaque passif et chaque compétence écrite à la main sert, et le moteur lit chaque passif (aucun passif affiché sans effet)
+  const used = new Set(Object.values(CREATURE_KITS).flatMap((k) => [k.passive, k.passive2].filter(Boolean)));
+  assert.deepEqual(Object.keys(PASSIVES).sort(), [...used].sort(), 'aucun passif orphelin');
+  const hand = Object.values(CREATURE_KITS).map((k) => k.move).filter((m) => typeof m === 'string');
+  assert.deepEqual(Object.keys(MOVES).sort(), [...new Set(hand)].sort(), 'aucune compétence orpheline');
   const src = fs.readFileSync(path.join(ROOT, 'js/core/duel.js'), 'utf8') + fs.readFileSync(path.join(ROOT, 'js/core/kits.js'), 'utf8');
-  for (const p of Object.keys(PASSIVES)) assert.ok(src.includes(`=== '${p}'`), `passif ${p} branché`);
+  for (const p of Object.keys(PASSIVES)) assert.ok(new RegExp(`hasP\\([^)]*'${p}'\\)`).test(src), `passif ${p} branché`);
+});
+
+test('kits générés : compétences dans leur budget de puissance', () => {
+  const BUDGET = { '1/2': 1.45, '1/3': 1.9, '2/3': 2.9 }, BONUS = { C: 0, PC: 0.1, R: 0.2, HR: 0.3, M: 0.45, S: 0.6 };
+  for (const [id, k] of Object.entries(CREATURE_KITS)) {
+    if (typeof k.move === 'string') continue;
+    const b = BUDGET[`${k.move.ap}/${k.move.cd}`] + BONUS[catalog.get(id).rarity], v = opsValue(k.move.ops);
+    assert.ok(v <= b * 1.3 && v >= b * 0.7, `${id} : valeur ${v.toFixed(2)} pour un budget ${b}`);
+  }
 });
 
 test('kits : budget attaque × PV conservé, variantes sans effet, ennemis sans kit', () => {
@@ -63,13 +77,13 @@ test('kits : déblocages par niveau (frappe 1, passif 3, compétence 6, éveil 9
     let { st, u } = at(1);
     assert.equal(D.actionsFor(st, u.uid)[0].name, k.strike.name, `${id} : frappe propre dès le niveau 1`);
     assert.equal(passiveOf(u), null); assert.equal(moveOf(u), null);
-    assert.ok(!D.actionsFor(st, u.uid).some((a) => a.key === k.move));
+    assert.ok(!D.actionsFor(st, u.uid).some((a) => a.key === mkey(k)));
     ({ st, u } = at(KIT_LEVELS.passive)); assert.equal(passiveOf(u), k.passive);
     ({ st, u } = at(KIT_LEVELS.move - 1)); assert.equal(moveOf(u), null);
     ({ st, u } = at(KIT_LEVELS.move));
     const acts = D.actionsFor(st, u.uid);
     assert.deepEqual(acts.map((a) => a.key).slice(-2), ['defend', 'swap'], 'défense et permutation restent en fin de liste');
-    const mv = acts.find((a) => a.key === k.move);
+    const mv = acts.find((a) => a.key === mkey(k));
     assert.ok(mv && mv.own, `${id} : compétence propre au niveau ${KIT_LEVELS.move}`);
   }
 });
@@ -79,16 +93,17 @@ test('kits : chaque compétence propre agit vraiment', () => {
     const units = [ally(id, 10), ...filler(2)];
     units.slice(1).forEach((x) => { x.hp = Math.ceil(x.maxHp / 3); });
     const st = duel(units, [foe({ elite: true }), foe(), foe()]);
+    st.fervor = 2; // une compétence qui donne de la Ferveur doit pouvoir en donner
     const u = st.units[uidOf(st, id)];
     u.hp = Math.ceil(u.maxHp / 2); u.absorbed = 10;
     D.front(st, 'enemy').forEach((e) => { e.intent = { kind: 'hit', t: D.front(st, 'ally')[1].uid }; });
     const before = JSON.stringify(st.units);
-    const ts = D.actionTargets(st, u.uid, k.move);
-    const a = D.actionsFor(st, u.uid).find((x) => x.key === k.move);
-    assert.ok(a.ok, `${id} : ${k.move} jouable (${a.why})`);
-    const ev = D.act(st, u.uid, k.move, a.target === 'none' ? null : ts[0]);
-    assert.ok(ev.length > 1, `${id} : ${k.move} produit des événements`);
-    assert.notEqual(JSON.stringify(st.units), before, `${id} : ${k.move} change le combat`);
+    const ts = D.actionTargets(st, u.uid, mkey(k));
+    const a = D.actionsFor(st, u.uid).find((x) => x.key === mkey(k));
+    assert.ok(a.ok, `${id} : ${mkey(k)} jouable (${a.why})`);
+    const ev = D.act(st, u.uid, mkey(k), a.target === 'none' ? null : ts[0]);
+    assert.ok(ev.length > 1, `${id} : ${mkey(k)} produit des événements`);
+    assert.notEqual(JSON.stringify(st.units), before, `${id} : ${mkey(k)} change le combat`);
   }
 });
 
@@ -247,5 +262,59 @@ test('kits : 150 combats aux actions tirées au hasard, aucun état impossible',
       assert.ok(u.atk <= 60, `${u.id} : attaque qui s’emballe (${u.atk})`);
     }
     assert.ok(st.fervor >= 0 && st.fervor <= 6 && st.ap >= 0);
+  }
+});
+
+test('les 20 passifs de capacités changent vraiment le combat (avec le passif contre sans)', () => {
+  const withP = (key) => Object.keys(CREATURE_KITS).find((id) => !HAND.includes(id) && CREATURE_KITS[id].passive === key && roleOf(catalog.get(id)) !== 'zone');
+  // mesure(st, u) dans un combat où la créature est en tête ; lv 3 (passif) contre lv 1 (sans passif, mêmes stats)
+  const run = (key, setup, measure, { creation = false } = {}) => {
+    const id = withP(key) || Object.keys(CREATURE_KITS).find((x) => CREATURE_KITS[x].passive === key);
+    const at = (lv) => {
+      const me = ally(id, 3); if (!creation) me.ckLv = 3; else me.ckLv = lv;
+      const st = duel([me, ...filler(2)], [foe({ scale: 2 }), foe({ scale: 1.5 }), foe()]);
+      const u = st.units[uidOf(st, id)];
+      if (!creation) u.ckLv = lv;
+      setup?.(st, u);
+      return measure(st, u);
+    };
+    return [at(3), at(1), id];
+  };
+  const hitBy = (st, e, t) => { st.turn = 'enemy'; e.intent = { kind: 'hit', t: t.uid }; st.queue = [e.uid]; D.enemyAct(st, e.uid); };
+  const E = (st, i = 0) => enemies(st)[i];
+  const cases = {
+    ruee: run('ruee', null, (st, u) => { const t = E(st), h = t.hp; D.act(st, u.uid, 'attack', t.uid); return h - t.hp; }),
+    premiere: run('premiere', null, (st, u) => { const t = E(st), h = t.hp; D.act(st, u.uid, 'attack', t.uid); return h - t.hp; }),
+    venin: run('venin', null, (st, u) => { const t = E(st); D.act(st, u.uid, 'attack', t.uid); return t.poison; }),
+    malediction: run('malediction', null, (st, u) => { const t = E(st); t.mark = 0; D.act(st, u.uid, 'attack', t.uid); return t.mark; }),
+    drain: run('drain', (st, u) => { u.hp = 1; }, (st, u) => { D.act(st, u.uid, 'attack', E(st).uid); return u.hp; }),
+    frenesie: run('frenesie', (st, u) => { u.hp = 1; }, (st, u) => D.dmgOf(st, u, E(st))),
+    devoreur: run('devoreur', null, (st, u) => { E(st).hp = 1; D.act(st, u.uid, 'attack', E(st).uid); return u.atk; }),
+    blindage: run('blindage', null, (st, u) => { const h = u.hp; E(st, 2).atk = 5; hitBy(st, E(st, 2), u); return -(h - u.hp); }),
+    effroi: run('effroi', null, (st, u) => { const h = u.hp; hitBy(st, E(st, 2), u); return -(h - u.hp); }),
+    sentinelle: run('sentinelle', null, (st, u) => { const pal = D.front(st, 'ally')[1]; D.act(st, u.uid, 'rempart', pal.uid); const h = u.hp; hitBy(st, E(st), pal); return -(h - u.hp); }),
+    benediction: run('benediction', (st) => { const pal = D.front(st, 'ally')[1]; pal.hp = Math.ceil(pal.maxHp * 0.4); E(st, 2).atk = Math.max(1, Math.round(pal.maxHp * 0.2)); }, (st) => { const pal = D.front(st, 'ally')[1]; hitBy(st, E(st, 2), pal); return pal.hp; }),
+    reliquat: run('reliquat', (st) => { st.fervor = 0; }, (st, u) => { u.hp = 1; hitBy(st, E(st), u); return st.fervor; }),
+    regeneration: run('regeneration', (st, u) => { u.hp = Math.ceil(u.maxHp / 2); enemies(st).forEach((e) => { e.atk = 0; }); }, (st, u) => { D.endTurn(st); return u.hp; }),
+    commandement: run('commandement', (st) => { enemies(st).forEach((e) => { e.atk = 0; }); }, (st) => { D.endTurn(st); return D.front(st, 'ally')[1].boost; }),
+    egide: run('egide', null, (st, u) => u.shield, { creation: true }),
+    augure: run('augure', null, (st) => (st.openEv || []).filter((e) => e.t === 'fervor').length, { creation: true }),
+    engloutir: run('engloutir', null, (st) => enemies(st).filter((e) => e.slow).length, { creation: true }),
+    eruption: run('eruption', null, (st) => -enemies(st).reduce((x, e) => x + e.hp, 0), { creation: true }),
+    cataclysme: run('cataclysme', null, (st) => -enemies(st).reduce((x, e) => x + e.hp, 0), { creation: true }),
+    insaisissable: run('insaisissable', (st, u) => { u.atk = 99; u.hp = 2; u.maxHp = 2; enemies(st).forEach((e) => { e.atk = 0; e.intent = null; }); }, (st, u) => { D.endTurn(st); return -enemies(st).filter((e) => e.intent?.t === u.uid).length; }),
+  };
+  for (const [key, [a, b, id]] of Object.entries(cases)) assert.ok(a > b, `${key} (${id}) : avec ${a}, sans ${b}`);
+  assert.equal(Object.keys(cases).length, 20);
+});
+
+test('noms : une compétence propre ne reprend jamais le nom d’une compétence de rôle ou d’un passif', async () => {
+  const { KITS } = await import('../js/core/skills.js');
+  const roleNames = Object.values(KITS).map((k) => k.skill.name.split(' ')[0]);
+  const passNames = Object.values(PASSIVES).map((p) => p.name);
+  for (const [id, k] of Object.entries(CREATURE_KITS)) {
+    const n = moveDefOf(k).name;
+    assert.ok(!roleNames.some((r) => n.startsWith(r)), `${id} : « ${n} » ressemble à une compétence de rôle`);
+    assert.ok(!passNames.includes(n.split(' ')[0]), `${id} : « ${n} » porte le nom d’un passif`);
   }
 });

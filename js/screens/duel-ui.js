@@ -20,7 +20,7 @@ import { PACTS } from '../core/pacts.js';
 import { RELICS } from '../core/relics.js';
 import { ULTS } from '../core/army.js';
 import { mountDiorama, roomFor } from '../ui/diorama.js';
-import { moveIconUrl } from '../core/kits.js';
+import { moveIconUrl, passivesOf, PASSIVES } from '../core/kits.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 // Décor selon la profondeur (salle du Gardien à part) et effets illustrés (fond noir fondu en mode « écran »)
@@ -599,7 +599,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (!a.ok) { app.sfx.error(); toast(esc(a.why), { icon: 'info' }); return; }
     app.sfx.tap();
     // compétence propre : son effet est rappelé la première fois dans le combat
-    if (a.own && !seenMv.has(key)) { seenMv.add(key); toast(`<b>${esc(a.name)}</b> : ${esc(a.desc)}`, { icon: 'sparkle', ms: 4200 }); }
+    if (a.own && !seenMv.has(sel + key)) { seenMv.add(sel + key); toast(`<b>${esc(a.name)}</b> : ${esc(a.desc)}`, { icon: 'sparkle', ms: 4200 }); }
     const u = sel;
     if (a.target === 'none') { mode = null; return exec(() => act(st, u, key)); }
     const ts = actionTargets(st, u, key);
@@ -775,7 +775,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       <li><b>Brisure</b> (élites, gardiens) : vide, l’ennemi perd son action, subit +50 % de dégâts et +5 aux jets contre lui jusqu’à la fin de ton tour suivant.</li>
       <li><b>Faiblesses</b> : chaque faction en craint une autre (+50 % de dégâts) ; contre sa propre faction : -25 %. ★ sur une cible = faiblesse exploitée.</li>
       <li><b>Instinct de meute</b> : tes Communes font +${PACK_BONUS} dégât aux élites et aux gardiens.</li></ul>
-      <h3>L’identité des créatures</h3><p class="small">Certaines créatures ont leur propre identité, qui se révèle en montant de niveau : leur <b>frappe</b> (niveau 1) remplace l’attaque de leur rôle, puis viennent un <b>passif</b> (niveau 3), une <b>compétence propre</b> (niveau 6, la case dorée en plus de celle du rôle) et l’<b>Éveil</b> (niveau 9). Tout est détaillé sur la fiche de la carte.</p>
+      <h3>L’identité des créatures</h3><p class="small">Chaque créature a sa propre identité, qui se révèle en montant de niveau : leur <b>frappe</b> (niveau 1) remplace l’attaque de leur rôle, puis viennent un <b>passif</b> (niveau 3), une <b>compétence propre</b> (niveau 6, la case dorée en plus de celle du rôle) et l’<b>Éveil</b> (niveau 9). Tout est détaillé sur la fiche de la carte.</p>
       <h3>Les rôles</h3>${Object.values(KITS).map((k) => `<p class="small">${roleIcon(k.kw)} <b>${esc(k.name)}</b> · <b>${esc(k.skill.name)}</b> (${k.skill.ap} act., ${k.skill.fervor} Ferveur) : ${esc(k.skill.desc)} <i>${esc(k.passive.name)} : ${esc(k.passive.desc)}</i></p>`).join('')}
       <h3>Les combinaisons</h3>${SYNERGIES.map((x) => `<p class="small"><b class="dv-syn-n">${esc(x.name)}</b> : ${esc(x.desc)}</p>`).join('')}
       <h3>Les ennemis</h3>${Object.values(AI_FAMILIES).map((f) => `<p class="small"><b>${esc(f.name)}</b> : ${esc(f.desc)} <span class="dc-good">${esc(f.counter)}</span></p>`).join('')}
@@ -784,6 +784,13 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   }
 
   draw();
+  // passifs qui ont agi dès le début du combat (Égide, Augure, Engloutir, Éruption, Cataclysme) : on le dit une fois
+  if (st.round === 1 && st.turn === 'ally' && !st.openShown) {
+    st.openShown = true;
+    const OPEN = ['egide', 'augure', 'engloutir', 'eruption', 'cataclysme'];
+    const lines = front(st, 'ally').map((u) => { const ps = passivesOf(u).filter((p) => OPEN.includes(p)); return ps.length ? `<b>${esc(cat.get(u.id).name)}</b> : ${ps.map((p) => esc(PASSIVES[p].name)).join(', ')}` : ''; }).filter(Boolean);
+    if (lines.length) setTimeout(() => toast(`Début du combat<br>${lines.join('<br>')}`, { icon: 'sparkle', ms: 4200 }), 600);
+  }
   // combat repris pendant le tour ennemi (application fermée en plein tour)
   if (st.turn === 'enemy' && !st.over) { busy = true; draw(); enemyTurn().then(() => { busy = false; draw(); if (st.over) finish(); }); }
   else if (st.over) finish();

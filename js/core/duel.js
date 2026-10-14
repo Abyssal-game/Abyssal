@@ -15,7 +15,7 @@ import {
 import { BOSSES, LAWS, ASPECTS } from './bosses.js';
 import { familyOf, relationMult, activeLegends } from './relations.js';
 import { FORMS } from './forms.js';
-import { CREATURE_KITS, MOVES, kitOf, moveOf, passiveOf, awake, statShape, passiveMult, rechargeOf } from './kits.js';
+import { CREATURE_KITS, kitOf, moveOf, moveFor, hasP, boosted, awake, statShape, passiveMult, rechargeOf } from './kits.js';
 
 export { KEYWORDS, keywordOf, INTENTS, BOSS_POWERS, bossPowerOf, SYNERGIES, FERVOR_MAX, AP_MAX, BOSSES, LAWS, ASPECTS };
 export const FRONT = 3;
@@ -76,6 +76,7 @@ export function createDuel(allies, enemies, { gauge = 0, fervor = gauge, ult = '
   for (const u of [...allies, ...enemies]) { st.units[u.uid] = { ...u }; st.order[u.side].push(u.uid); }
   setupExtras(st);
   ['ally', 'enemy'].forEach((side) => front(st, side).forEach((u) => { u.inPlay = true; }));
+  openingPassives(st);
   st.gauge = st.fervor;
   startAllyTurn(st, []);
   return st;
@@ -107,6 +108,20 @@ function setupExtras(st) {
   if (R_.includes('oeil')) st.order.enemy.forEach((id) => { const f = st.units[id].faction; if (f) st.discovered[f] = true; });
   st.miroir = R_.includes('miroir');
   st.gauge = st.fervor;
+}
+// Passifs qui agissent au début du combat (créatures au combat) : Égide, Augure, Engloutir, Éruption, Cataclysme
+function openingPassives(st) {
+  const ev = [];
+  const strongest = () => front(st, 'enemy').slice().sort((x, y) => y.atk - x.atk)[0];
+  for (const u of front(st, 'ally')) {
+    if (hasP(u, 'egide')) u.shield = 1;
+    if (hasP(u, 'augure') && st.fervor < (boosted(u, 'augure') ? 4 : 3)) gainFervor(st, 1, ev, 'Augure');
+    if (hasP(u, 'engloutir')) { const e = strongest(); if (e) e.slow = true; }
+    if (hasP(u, 'eruption')) { const e = strongest(); if (e) hurt(st, e, dmgOf(st, u, e, boosted(u, 'eruption') ? 1 : 0.6), ev, u.uid); }
+    if (hasP(u, 'cataclysme')) front(st, 'enemy').forEach((e) => hurt(st, e, dmgOf(st, u, e, boosted(u, 'cataclysme') ? 0.5 : 0.3), ev, u.uid));
+  }
+  st.openEv = ev.filter((e) => e.t !== 'status');
+  check(st, []);
 }
 // Ancienne sauvegarde (combat en cours avant la refonte) : on complète l'état et on reprend au tour du joueur.
 export function upgradeDuel(st) {
@@ -157,7 +172,9 @@ export function dmgOf(st, a, t, mult = 1, { basic = false } = {}) {
   if (t.defend) n *= 0.5;
   if (t.exposed) n *= 1.25;
   if (t.prey && a.side === 'enemy') n *= 1.2; // proie désignée par un ennemi
-  n *= passiveMult(st, a, t, front); // passifs des créatures (Venin du chasseur, Présage, Profondeurs)
+  n *= passiveMult(st, a, t, front); // passifs des créatures (Venin du chasseur, Présage, Profondeurs, Frénésie…)
+  if (a.side === 'enemy' && !a.boss && !a.elite && hasP(t, 'effroi')) n *= boosted(t, 'effroi') ? 0.7 : 0.8;
+  if (a.side === 'enemy' && hasP(t, 'blindage')) n *= boosted(t, 'blindage') ? 0.8 : 0.88;
   n *= relationMult(a, t).m;
   const R_ = st.relics || [];
   if (a.side === 'ally') {
@@ -220,8 +237,8 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
     if (n <= 0) return 0;
   }
   let d = Math.min(u.hp, Math.round(n));
-  if (u.side === 'ally' && d >= u.hp && d > 0 && u.hp > 1 && passiveOf(u) === 'inebranlable' && !u.ckSaved) {
-    u.ckSaved = true; d = u.hp - 1; if (awake(u)) u.shield = 1;
+  if (u.side === 'ally' && d >= u.hp && d > 0 && u.hp > 1 && hasP(u, 'inebranlable') && !u.ckSaved) {
+    u.ckSaved = true; d = u.hp - 1; if (boosted(u, 'inebranlable')) u.shield = 1;
     ev.push({ t: 'status', u: u.uid, s: 'Inébranlable !', syn: true, k: 'guard' });
   }
   if (u.side === 'ally' && d >= u.hp && st.sursis) { st.sursis = false; d = u.hp - 1; u.shield = 1; ev.push({ t: 'status', u: u.uid, s: 'Sursis !', syn: true }); }
@@ -237,6 +254,12 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   if (a && d > 0 && a.side === 'enemy' && u.side === 'ally') { (st.taken ||= {})[a.uid] = ((st.taken || {})[a.uid] || 0) + d; u.absorbed = (u.absorbed || 0) + d; }
   // Talents d'expédition
   if (a && d > 0 && a.side === 'ally' && a.talent === 'sangsue' && a.hp > 0) heal(a, Math.max(1, Math.round(d * 0.3)), ev);
+  if (a && d > 0 && a !== u && a.side === 'ally' && a.hp > 0 && hasP(a, 'drain')) heal(a, Math.max(1, Math.round(d * (boosted(a, 'drain') ? 0.3 : 0.2))), ev);
+  // Bénédiction : un allié qui passe sous 30 % de ses PV est soigné (une ou deux fois par combat)
+  if (u.side === 'ally' && d > 0 && u.hp > 0 && u.hp < u.maxHp * 0.3 && u.hp + d >= u.maxHp * 0.3) {
+    const b = front(st, 'ally').find((x) => hasP(x, 'benediction') && (x.blessN || 0) < (boosted(x, 'benediction') ? 2 : 1));
+    if (b) { b.blessN = (b.blessN || 0) + 1; ev.push({ t: 'status', u: u.uid, s: 'Bénédiction', syn: true, k: 'heal' }); heal(u, u.maxHp * 0.2, ev, b); }
+  }
   if (a && d > 0 && u.side === 'ally' && u.talent === 'epines' && a.side === 'enemy' && a.hp > 0 && !st.thorns) { st.thorns = true; ev.push({ t: 'status', u: a.uid, s: 'Épines', k: 'bad' }); hurt(st, a, 2, ev); st.thorns = false; }
   // Roi sans Visage (phase 2) : il prend le visage de son agresseur et résiste désormais à sa faction
   if (a && d > 0 && u.boss && u.phase2 && st.bossKey === 'roi' && a.side === 'ally' && a.faction && u.mask !== a.faction) { u.mask = a.faction; ev.push({ t: 'status', u: u.uid, s: 'Nouveau visage', k: 'mask', syn: true }); }
@@ -251,10 +274,10 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
       ev.push({ t: 'revive', u: u.uid }); ev.push({ t: 'status', u: u.uid, s: 'Renaissance noire', syn: true });
       return d;
     }
-    if (u.side === 'ally' && passiveOf(u) === 'renaissance' && !u.ckReborn) {
+    if (u.side === 'ally' && hasP(u, 'renaissance') && !u.ckReborn) {
       u.ckReborn = true; u.hp = Math.max(1, Math.round(u.maxHp * 0.4)); u.poison = 0;
       ev.push({ t: 'revive', u: u.uid }); ev.push({ t: 'status', u: u.uid, s: 'Renaissance !', syn: true, k: 'heal' });
-      if (awake(u)) front(st, 'ally').forEach((x) => { if (x !== u) heal(x, x.maxHp * 0.15, ev); });
+      if (boosted(u, 'renaissance')) front(st, 'ally').forEach((x) => { if (x !== u) heal(x, x.maxHp * 0.15, ev); });
       return d;
     }
     if (u.side === 'ally' && st.guardianPact) {
@@ -270,7 +293,8 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
     if (u.side === 'ally') (st.fallenLog ||= []).push({ u: u.uid, by: a?.uid || null, round: st.round, kind: st.curKind || null });
     if (u.side === 'ally') alive(st, 'ally').filter((x) => x.form === 'vengeance').forEach((x) => { x.atk += 2; ev.push({ t: 'status', u: x.uid, s: 'Vengeance : +2 ATQ', syn: true }); });
     if (u.side === 'enemy') onEnemyDeath(st, u, a, ev);
-    if (u.side === 'ally') front(st, 'ally').filter((x) => passiveOf(x) === 'elue').forEach((x) => { const k = awake(x) ? 3 : 2; x.atk += k; ev.push({ t: 'status', u: x.uid, s: `Élue des braves : +${k} ATQ`, syn: true }); gainFervor(st, 1, ev, 'Élue des braves'); });
+    if (u.side === 'ally' && hasP(u, 'reliquat')) { gainFervor(st, 2, ev, 'Reliquat'); if (boosted(u, 'reliquat')) front(st, 'ally').forEach((x) => { x.atk += 1; }); }
+    if (u.side === 'ally') front(st, 'ally').filter((x) => hasP(x, 'elue')).forEach((x) => { const k = boosted(x, 'elue') ? 3 : 2; x.atk += k; ev.push({ t: 'status', u: x.uid, s: `Élue des braves : +${k} ATQ`, syn: true }); gainFervor(st, 1, ev, 'Élue des braves'); });
   }
   return d;
 }
@@ -279,20 +303,25 @@ function heal(u, n, ev, healer = null) {
   const h = Math.min(u.maxHp - u.hp, Math.round(n * (u.healMult || 1)));
   if (h > 0) { u.hp += h; ev.push({ t: 'heal', u: u.uid, d: h }); }
   // Chœur : la créature soignée gagne de l'attaque pour ce tour (une fois par tour)
-  if (h > 0 && healer && passiveOf(healer) === 'choeur' && !u.chB) { u.chB = awake(healer) ? 2 : 1; u.boost = (u.boost || 0) + u.chB; ev.push({ t: 'status', u: u.uid, s: `Chœur : +${u.chB} ATQ`, syn: true }); }
+  if (h > 0 && healer && hasP(healer, 'choeur') && !u.chB) { u.chB = boosted(healer, 'choeur') ? 2 : 1; u.boost = (u.boost || 0) + u.chB; ev.push({ t: 'status', u: u.uid, s: `Chœur : +${u.chB} ATQ`, syn: true }); }
   return h;
 }
 // Mort d'un ennemi : passifs des créatures (Faim sans fin, Filaments, Venin du chasseur)
 function onEnemyDeath(st, u, a, ev) {
-  if (a && a.side === 'ally' && a.hp > 0 && passiveOf(a) === 'faim') {
+  if (a && a.side === 'ally' && a.hp > 0 && hasP(a, 'faim')) {
     a.atk += 1; heal(a, a.maxHp * 0.2, ev);
     ev.push({ t: 'status', u: a.uid, s: 'Faim sans fin : +1 ATQ', syn: true });
-    if (awake(a) && a.faimT !== st.round && st.turn === 'ally' && a.acts > 0) { a.faimT = st.round; a.acts--; ev.push({ t: 'status', u: a.uid, s: 'Encore faim : il peut rejouer', syn: true }); }
+    if (boosted(a, 'faim') && a.faimT !== st.round && st.turn === 'ally' && a.acts > 0) { a.faimT = st.round; a.acts--; ev.push({ t: 'status', u: a.uid, s: 'Encore faim : il peut rejouer', syn: true }); }
+  }
+  if (a && a.side === 'ally' && a.hp > 0 && hasP(a, 'devoreur') && (a.devN || 0) < (boosted(a, 'devoreur') ? 5 : 3)) {
+    a.devN = (a.devN || 0) + 1; a.atk += 1;
+    ev.push({ t: 'status', u: a.uid, s: 'Dévoreur : +1 ATQ', syn: true });
+    if (boosted(a, 'devoreur')) heal(a, a.maxHp * 0.15, ev);
   }
   if (!(u.poison > 0)) return;
-  const fil = front(st, 'ally').find((x) => passiveOf(x) === 'filaments');
-  let k = fil ? (awake(fil) ? u.poison + 2 : Math.ceil(u.poison / 2)) : 0;
-  if (a && a.side === 'ally' && passiveOf(a) === 'chasseur' && awake(a)) k = Math.max(k, u.poison);
+  const fil = front(st, 'ally').find((x) => hasP(x, 'filaments'));
+  let k = fil ? (boosted(fil, 'filaments') ? u.poison + 2 : Math.ceil(u.poison / 2)) : 0;
+  if (a && a.side === 'ally' && hasP(a, 'chasseur') && boosted(a, 'chasseur')) k = Math.max(k, u.poison);
   if (!k) return;
   const o = st.order.enemy, i = o.indexOf(u.uid);
   const n = front(st, 'enemy').slice().sort((x, y) => Math.abs(o.indexOf(x.uid) - i) - Math.abs(o.indexOf(y.uid) - i))[0];
@@ -391,7 +420,7 @@ export function actionsFor(st, uid) {
   // Compétence propre de la créature (niveau 6), à côté de celle de son rôle
   const mk = moveOf(u);
   if (mk) {
-    const M = MOVES[mk];
+    const M = moveFor(u, mk);
     const mv = base(mk, { name: M.name, icon: M.icon, ap: M.ap, fervor: 0, target: M.target === 'anyEnemy' ? 'enemy' : M.target, desc: M.desc + (awake(u) && M.awaken ? ` Éveil : ${M.awaken}` : '') });
     mv.own = true; mv.cd = rechargeOf(u, mk); mv.wait = Math.max(0, (u.mvReady || 0) - st.round);
     if (mv.ok && mv.wait) { mv.ok = false; mv.why = `${M.name} se recharge : prête dans ${mv.wait} tour${mv.wait > 1 ? 's' : ''}.`; }
@@ -415,8 +444,8 @@ export function actionTargets(st, uid, key) {
   if (key === 'rempart') return front(st, 'ally').filter((x) => x.uid !== uid).map((x) => x.uid);
   if (key === 'priere') return front(st, 'ally').map((x) => x.uid);
   if (key === 'swap') return reserve(st, 'ally').map((x) => x.uid);
-  if (MOVES[key] && moveOf(u) === key) {
-    const M = MOVES[key];
+  const M = moveFor(u, key);
+  if (M) {
     if (M.targets) return M.targets(st, u, API);
     if (M.target === 'enemy') return targetsFor(st, 'ally', u);
     if (M.target === 'anyEnemy') return front(st, 'enemy').map((x) => x.uid);
@@ -466,7 +495,7 @@ export function preview(st, uid, key, tUid) {
   if (t && t.side === 'enemy') {
     if (key === 'attack') out.dmg = strikeDmg(st, u, t);
     if (key === 'estoc') out.dmg = dmgOf(st, u, t, 2);
-    if (MOVES[key]?.pv && moveOf(u) === key) out.dmg = MOVES[key].pv(st, u, t, API);
+    if (moveFor(u, key)?.pv) out.dmg = moveFor(u, key).pv(st, u, t, API);
     if (out.dmg && t.boss) out.dmg = Math.min(out.dmg, bossCap(t));
     // Brisure prévue (réussite pour le Coup d'estoc) ; l'ennemi doit survivre au coup pour être brisé
     const b = t.brkMax && !t.broken && !t.shield ? brkTotal(st, u, brkOf(st, u, t, key) + (key === 'attack' ? strikeBrk(u, t) : 0)) : 0;
@@ -530,8 +559,8 @@ export function act(st, uid, key, tUid = null) {
     const tier = resolveRoll(st, info, ev, uid, tUid);
     if (tier === 'crit' || tier === 'success') { freeze(st, t, ev); if (tier === 'crit') breakHit(st, t, 3, ev, u); }
     else if (tier === 'partial') { t.slow = true; ev.push({ t: 'status', u: tUid, s: 'Ralentie', k: 'frost' }); }
-  } else if (MOVES[key] && moveOf(u) === key) { u.mvReady = st.round + rechargeOf(u, key); MOVES[key].run(st, u, t, ev, API); }
-  if (['attack', 'estoc', 'raz'].includes(key) || MOVES[key]?.pv) st.ombreUsed = true;
+  } else if (moveFor(u, key)) { u.mvReady = st.round + rechargeOf(u, key); u.struck = true; u.lastStruck = st.round; moveFor(u, key).run(st, u, t, ev, API); }
+  if (['attack', 'estoc', 'raz'].includes(key) || moveFor(u, key)?.pv) st.ombreUsed = true;
   check(st, ev);
   return ev;
 }
@@ -566,7 +595,10 @@ function strikeDmg(st, u, t) {
 const lowestAlly = (st) => front(st, 'ally').filter((x) => x.hp < x.maxHp).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
 function basicAttack(st, u, t, ev) {
   weakBonus(st, u, t, ev);
-  const S = strikeOf(u), frozen = t.frozen > 0, hits = S.hits || 1, m = strikeMult(u, t);
+  const S = strikeOf(u), frozen = t.frozen > 0, hits = S.hits || 1;
+  let m = strikeMult(u, t), rush = 0;
+  if (hasP(u, 'ruee') && !u.rushed) { u.rushed = true; m *= boosted(u, 'ruee') ? 2.5 : 2; rush = 1; ev.push({ t: 'status', u: u.uid, s: 'Ruée !', syn: true }); }
+  u.struck = true; u.lastStruck = st.round;
   const marked = !!(t.mark || t.broken), poisoned = t.poison > 0, extraBrk = (S.brk || 0) + (S.brkCharging && charging(t) ? S.brkCharging : 0);
   let d = 0, landed = 0;
   for (let h = 0; h < hits && t.hp > 0; h++) {
@@ -576,15 +608,18 @@ function basicAttack(st, u, t, ev) {
   if (d && t.hp > 0) {
     if (u.role === 'poison') addPoison(st, t, 2 + (S.poisonMore && poisoned ? S.poisonMore : 0), ev, u);
     if (S.splashPoison) { const row = front(st, t.side), i = row.indexOf(t), n = row[i + 1] || row[i - 1]; if (n) addPoison(st, n, S.splashPoison, ev, u); }
-    breakHit(st, t, brkOf(st, u, { ...t, frozen: frozen ? 1 : 0 }, 'attack') + extraBrk + Math.max(0, landed - 1), ev, u);
+    breakHit(st, t, brkOf(st, u, { ...t, frozen: frozen ? 1 : 0 }, 'attack') + extraBrk + rush + Math.max(0, landed - 1), ev, u);
+    if (hasP(u, 'venin')) addPoison(st, t, boosted(u, 'venin') ? 2 : 1, ev, u);
+    if (S.burn) addPoison(st, t, S.burn, ev, u);
+    if (hasP(u, 'malediction') && u.curseT !== st.round && !t.mark && t.hp > 0) { u.curseT = st.round; t.mark = boosted(u, 'malediction') ? 2 : 1; ev.push({ t: 'status', u: t.uid, s: 'Maudite', k: 'mark' }); }
     if (u.role === 'degats' && t.boss) t.wound = 1;
   }
   if (S.healLowest) { const w = lowestAlly(st); if (w) heal(w, S.healLowest, ev, u); }
   if (S.lifeShare && d) { const w = lowestAlly(st); if (w) heal(w, Math.max(1, Math.round(d * S.lifeShare)), ev, u); }
   // Attiser : frapper une cible marquée ou brisée rapporte de la Ferveur (une fois par tour)
-  if (d && marked && passiveOf(u) === 'attiser' && !u.attised) {
+  if (d && marked && hasP(u, 'attiser') && !u.attised) {
     u.attised = true; gainFervor(st, 1, ev, 'Attiser');
-    if (awake(u) && t.hp > 0) breakHit(st, t, 1, ev, u);
+    if (boosted(u, 'attiser') && t.hp > 0) breakHit(st, t, 1, ev, u);
   }
   if (u.role === 'zone') {
     const row = front(st, t.side), i = row.indexOf(t), full = u.boost > 0;
@@ -665,6 +700,15 @@ function startAllyTurn(st, ev) {
     tickPoison(st, u, ev);
     // Pacte du Sang : le prix se paie à chaque tour (jamais mortel)
     if (st.pact === 'sang' && st.round > 1 && u.hp > 1) { const d = Math.min(u.hp - 1, Math.max(1, Math.round(u.maxHp * 0.06))); u.hp -= d; ev.push({ t: 'dmg', u: u.uid, d, hp: u.hp }); ev.push({ t: 'status', u: u.uid, s: 'Prix du sang', k: 'bad' }); }
+  }
+  for (const u of front(st, 'ally')) {
+    if (hasP(u, 'regeneration') && u.hp > 0 && u.hp < u.maxHp) heal(u, Math.max(1, u.maxHp * (boosted(u, 'regeneration') ? 0.08 : 0.05)), ev);
+    if (st.round === 4 && boosted(u, 'egide') && !u.shield) { u.shield = 1; ev.push({ t: 'status', u: u.uid, s: 'Égide', k: 'guard' }); }
+    if (st.round === 3 && boosted(u, 'engloutir')) { const e = front(st, 'enemy').slice().sort((x, y) => y.atk - x.atk)[0]; if (e) { e.slow = true; ev.push({ t: 'status', u: e.uid, s: 'Ralenti', k: 'frost' }); } }
+  }
+  for (const c of front(st, 'ally').filter((u) => hasP(u, 'commandement'))) {
+    const best = front(st, 'ally').filter((x) => x !== c && !x.stunned).sort((x, y) => y.atk - x.atk)[0];
+    if (best) { const n = boosted(c, 'commandement') ? 3 : 2; best.boost += n; ev.push({ t: 'status', u: best.uid, s: `Commandement : +${n} ATQ` }); }
   }
   const criers = front(st, 'ally').filter((u) => u.kw === 'cri' && u.hp > 0);
   if (criers.length) { front(st, 'ally').forEach((u) => { u.boost += criers.length; }); ev.push({ t: 'status', u: criers[0].uid, s: `Cri : +${criers.length} ATQ` }); }
@@ -834,19 +878,19 @@ export function enemyAct(st, aUid, defense = 'none') {
     // Rempart : le protecteur prend le coup à la place, avec 40 % de dégâts en moins
     let target = t, m = mult;
     const g = t.guardBy && st.units[t.guardBy];
-    if (g && inFront(st, g) && g.uid !== t.uid) { target = g; m *= 0.6; ev.push({ t: 'status', u: g.uid, s: 'Rempart !', k: 'guard' }); }
+    if (g && inFront(st, g) && g.uid !== t.uid) { target = g; m *= 0.6 * (hasP(g, 'sentinelle') ? (boosted(g, 'sentinelle') ? 0.6 : 0.75) : 1); ev.push({ t: 'status', u: g.uid, s: 'Rempart !', k: 'guard' }); }
     ev.push({ t: 'attack', a: aUid, u: target.uid, kind });
     if (defense === 'dodge' || defense === 'parry') { defended(st, e, target, ev, defense, kind); return null; }
     const d = hurt(st, target, dmgOf(st, e, target, m), ev, aUid);
-    if (target !== t && d > 0 && passiveOf(target) === 'colere') {
-      const cap = awake(target) ? 5 : 3;
+    if (target !== t && d > 0 && hasP(target, 'colere')) {
+      const cap = boosted(target, 'colere') ? 5 : 3;
       if ((target.colere || 0) < cap) { target.colere = (target.colere || 0) + 1; target.atk += 1; ev.push({ t: 'status', u: target.uid, s: `Colère : +1 ATQ (${target.colere}/${cap})`, syn: true }); }
     }
     const hound = target !== t || target.taunt === st.round ? target : null;
-    if (hound && passiveOf(hound) === 'enfers' && hound.hp > 0 && e.hp > 0) {
+    if (hound && hasP(hound, 'enfers') && hound.hp > 0 && e.hp > 0) {
       ev.push({ t: 'status', u: aUid, s: 'Gardien des Enfers', k: 'bad', syn: true });
-      hurt(st, e, awake(hound) ? 5 : 3, ev, hound.uid);
-      if (awake(hound) && e.hp > 0) breakHit(st, e, 1, ev, hound);
+      hurt(st, e, boosted(hound, 'enfers') ? 5 : 3, ev, hound.uid);
+      if (boosted(hound, 'enfers') && e.hp > 0) breakHit(st, e, 1, ev, hound);
     }
     return target;
   };
@@ -954,9 +998,12 @@ export function endEnemyTurn(st) {
 
 // ——— Intentions ennemies ———
 // Cible selon la famille (Prédateur : la plus blessée ; Assassin : la plus fragile ; sinon la plus forte)
+const elusive = (st, x) => hasP(x, 'insaisissable') && (boosted(x, 'insaisissable') ? x.lastStruck !== st.round - 1 && x.lastStruck !== st.round : !x.struck);
 function pickTarget(st, e) {
-  const ts = targetsFor(st, 'enemy', e).map((id) => st.units[id]).filter(Boolean);
+  let ts = targetsFor(st, 'enemy', e).map((id) => st.units[id]).filter(Boolean);
   if (!ts.length) return null;
+  const seen = ts.filter((x) => !elusive(st, x));
+  if (seen.length) ts = seen;
   // coopération : tous les ennemis s'acharnent sur la proie désignée (si elle est attaquable)
   const prey = ts.find((x) => x.prey > 0);
   if (prey) return prey.uid;
@@ -1050,7 +1097,7 @@ export function threats(st) {
 // Outils du moteur prêtés aux compétences et passifs des créatures (kits.js) : un seul code par effet
 const targetScore = (st, a, t) => (t.hp <= dmgOf(st, a, t, 1, { basic: true }) ? 1000 : 0) + (intentInfo(st, t)?.danger || 0) * 20 + (isWeak(a, t) ? 15 : 0) + (t.broken ? 25 : 0) - t.hp;
 const API = {
-  front, hurt, dmgOf, breakHit, heal, addPoison, freeze, awake,
+  front, hurt, dmgOf, breakHit, heal, addPoison, freeze, awake, gainFervor,
   targetsOf: (st, u) => targetsFor(st, 'ally', u),
   // meilleure cible d'attaque (même calcul que le pilote automatique)
   bestTarget: (st, u) => targetsFor(st, 'ally', u).map((id) => st.units[id]).sort((x, y) => targetScore(st, u, y) - targetScore(st, u, x))[0]?.uid || null,
@@ -1123,7 +1170,7 @@ function smartMove(st, go) {
   for (const u of allies) {
     const k = moveOf(u);
     if (!k || !can(u, k)) continue;
-    const r = MOVES[k].ai(st, u, API);
+    const r = moveFor(u, k).ai(st, u, API);
     if (r && go(u.uid, k, r === 'none' ? null : r)) return true;
   }
   // 3. Coup d'estoc sur une cible brisée, marquée ou gelée
