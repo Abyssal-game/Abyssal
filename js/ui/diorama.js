@@ -9,6 +9,7 @@ const DIO = 'assets/dio/';
 const abs = (u) => new URL(u, document.baseURI).href;
 // Images peintes (Gemini) déjà livrées, dans assets/dio/p/<nom>.webp : elles remplacent le dessin
 // fait par le code (accessoires) ou la texture calculée (sol « floor-<royaume> »). Ajouter le nom ici à la livraison.
+const SHOW_PROPS = false;
 export const PAINTED = new Set(['brazier', 'crystal', 'mushrooms', 'column', 'column-broken', 'angel', 'horned', 'rock', 'candles', 'tomb', 'obelisk', 'amber', 'gear', 'ice',
   'floor-infernal', 'floor-abyssal', 'floor-celeste', 'floor-sauvage', 'floor-necrotique', 'floor-primordial', 'floor-artificiel', 'floor-givre']);
 const painted = (name, h = '') => (PAINTED.has(name) ? `<img class="dio-img" alt="" src="${DIO}p/${name}.webp" ${h}>` : null);
@@ -288,8 +289,11 @@ export function mountDiorama(dv, { room, decor = 'riche', reduced = false, bossK
       const hh = h * p.s;
       return `<div class="dio-prop ${cls}" style="left:${p.x}px;top:${p.y - hh}px;height:${hh}px;--s:${p.s.toFixed(3)}">${html}</div>`;
     };
+    // Accessoires posés au sol : retirés du plateau (v201). Photographiés ou dessinés, ils se voyaient
+    // collés par-dessus la peinture. La peinture, le sol peint et les lumières suffisent.
     let props = '';
     const corner = T.corner, sideP = T.side;
+    if (SHOW_PROPS) {
     const cornerHTML = painted(corner) || (corner === 'column' ? P.column(c) : P[corner] ? P[corner](c) : '');
     props += place(-0.86, 0.94, corner === 'column' ? 230 : corner === 'obelisk' ? 210 : 120, cornerHTML, `pc-${corner}`);
     props += place(0.86, 0.94, corner === 'column' ? 230 : corner === 'obelisk' ? 210 : 120, corner === 'column' ? (painted('column-broken') || P.column(c, true)) : cornerHTML, `pc-${corner}`);
@@ -298,6 +302,7 @@ export function mountDiorama(dv, { room, decor = 'riche', reduced = false, bossK
     props += place(-0.86, 0.6, sideH, sideHTML, `ps-${sideP}`);
     props += place(0.86, 0.62, sideH, sideP === 'tomb' ? (painted('candles') || P.candles(c)) : sideHTML, `ps-${sideP}`);
     props += place(-0.62, 0.985, 60, painted('rock') || P.rock(), 'p-rubble');
+    }
     // torches des murs latéraux (peintes) et leur halo
     const torch = (s, fz) => { const p = proj(s * half, yFront - 175, -fz * D); const h = 92 * p.s; return `<div class="dio-torch ${s < 0 ? 'l' : 'r'}" style="left:${p.x + s * 2}px;top:${p.y - h / 2}px;height:${h}px"><img alt="" src="assets/icons/torch-on.webp"><i class="dio-tglow"></i></div>`; };
     const torches = torch(-1, 0.82) + torch(1, 0.82) + (() => { const y = yBack * 0.58, h = 72 * k * 1.9; return [arch.l - 34, arch.r + 34].map((x) => `<div class="dio-torch b" style="left:${x}px;top:${y - h / 2}px;height:${h}px"><img alt="" src="assets/icons/torch-on.webp"><i class="dio-tglow"></i></div>`).join(''); })();
