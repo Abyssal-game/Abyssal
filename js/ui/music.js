@@ -61,6 +61,7 @@ function init() {
   const d = brown.getChannelData(0); let last = 0;
   for (let i = 0; i < bn; i++) { last = (last + 0.02 * (Math.random() * 2 - 1)) / 1.02; d[i] = last * 3.5; }
   hooks.duck = duck;
+  loadTracks();
   return ctx;
 }
 
@@ -143,11 +144,25 @@ function brass(grp, f, t) {
 }
 
 // ——— Une ambiance = un groupe (volume propre pour les fondus) + couches continues + événements ———
+// ——— Musiques enregistrées (assets/music/<ambiance>.mp3, liste dans assets/music/manifest.json) ———
+// Une musique livrée remplace l'ambiance calculée de son lieu ; elle tourne en boucle.
+const tracks = {}; let trackLoad = null;
+function loadTracks() {
+  if (trackLoad) return;
+  trackLoad = fetch('assets/music/manifest.json').then((r) => (r.ok ? r.json() : [])).catch(() => []).then((list) => list.forEach((k) => fetch(`assets/music/${k}.mp3`)
+    .then((r) => (r.ok ? r.arrayBuffer() : null)).then((b) => b && new Promise((ok, ko) => ctx.decodeAudioData(b, ok, ko))).then((buf) => { if (buf) tracks[k] = buf; }).catch(() => {})));
+}
 function startTheme(key) {
   const th = THEMES[key], t = ctx.currentTime;
   const grp = { key, th, g: ctx.createGain(), stops: [], next: {}, chord: th.chords[0] };
   grp.g.gain.setValueAtTime(0.0001, t); grp.g.gain.linearRampToValueAtTime(1, t + 3);
   grp.g.connect(duckG);
+  if (tracks[key]) {
+    const s = ctx.createBufferSource(); s.buffer = tracks[key]; s.loop = true;
+    const g = ctx.createGain(); g.gain.value = 1.6; // les fichiers sont mixés plus bas que les ambiances calculées
+    s.connect(g).connect(grp.g); s.start(t); grp.stops.push(s); grp.file = true;
+    return grp;
+  }
   // nappe grave continue : fondamentale + quinte, filtre qui respire lentement
   const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = th.lp; lp.Q.value = 1.5;
   const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 0.05; lg.gain.value = th.lp * 0.45; lfo.connect(lg).connect(lp.frequency); lfo.start(t);
@@ -176,6 +191,7 @@ function stopTheme(grp) {
 }
 // Programme les notes des prochaines secondes
 function schedule(grp) {
+  if (grp.file) return;
   const th = grp.th, now = ctx.currentTime, ahead = now + 1.2, nx = grp.next;
   // retour d'arrière-plan : on ne rattrape pas les notes manquées
   for (const k of ['pad', 'bell', 'choir', 'pluck', 'drip', 'pulse', 'brass']) if (nx[k] < now - 0.3) nx[k] = now + rnd(0.1, 0.6);

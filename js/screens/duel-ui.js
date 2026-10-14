@@ -20,7 +20,7 @@ import { PACTS } from '../core/pacts.js';
 import { RELICS } from '../core/relics.js';
 import { ULTS } from '../core/army.js';
 import { mountDiorama, roomFor } from '../ui/diorama.js';
-import { moveIconUrl, passivesOf, PASSIVES } from '../core/kits.js';
+import { moveIconUrl, passivesOf, passiveIconUrl, moveFor, PASSIVES } from '../core/kits.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 // Décor selon la profondeur (salle du Gardien à part) et effets illustrés (fond noir fondu en mode « écran »)
@@ -35,7 +35,10 @@ export function floorBg(floor, room) {
 const abs = (u) => new URL(u, document.baseURI).href;
 const bgOf = (run) => `url(${abs(floorBg(run.floor, run.room))}), url(${abs(bgOld(run))})`;
 const FX = ['break', 'parry', 'crit', 'swallow', 'iceshatter', 'collapse', 'prey', 'slash', 'impact', 'dodge', 'heal', 'venom', 'frost', 'seal', 'death', 'd20', 'd20-crit', 'd20-fumble'];
-const fxUrl = (n) => `assets/fx/${n}.webp`;
+// Effets des compétences propres : image peinte quand elle existe, sinon l'effet le plus proche
+const FX_NEW = new Set([]); // ajouter ici 'shield', 'boost', 'taunt', 'fervor', 'curse' quand les images peintes sont livrées
+const FX_FALLBACK = { shield: 'parry', boost: 'burst', taunt: 'prey', fervor: 'seal', curse: 'seal' };
+const fxUrl = (n) => `assets/fx/${FX_FALLBACK[n] && !FX_NEW.has(n) ? FX_FALLBACK[n] : n}.webp`;
 const DANGER = ['', '', 'Danger', 'Mortel'];
 // Icône peinte d'une intention ennemie
 // les intentions des gardiens réutilisent les icônes peintes les plus proches
@@ -104,6 +107,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     u.doom != null && !u.broken ? st_('doom', `Effondrement dans ${u.doom} tour(s) : brise-le pour le repousser`, u.doom) : '',
     u.mask ? st_('mask', `Il porte le visage ${cat.faction[u.mask]?.name || u.mask} : il résiste à cette faction (−50 %)`) : '',
     u.totality ? st_('totality', 'Totalité : seules ses faiblesses le blessent pleinement') : '',
+    ...passivesOf(u).map((p) => (passiveIconUrl(p) ? `<i class="sti ckp" title="Passif : ${esc(PASSIVES[p].name)} · ${esc(PASSIVES[p].desc)}"><img alt="" src="${passiveIconUrl(p)}"></i>` : '')),
     u.talent && TALENTS[u.talent] ? `<i class="sti" title="Talent : ${esc(TALENTS[u.talent].name)} · ${esc(TALENTS[u.talent].desc)}"><img alt="" src="assets/icons/tal-${u.talent}.webp"></i>` : '',
   ].join('');
   const intentChip = (u) => {
@@ -270,6 +274,14 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     i.style.cssText = `left:${r.left - b.left + r.width / 2}px;top:${r.top - b.top + r.height * 0.4}px;width:${Math.min(76, r.width * 0.64)}px`;
     box.appendChild(i); setTimeout(() => i.remove(), 1200);
   };
+  // Un passif d'identité agit : son icône jaillit de la carte, avec son nom
+  const passivePop = (uid, p) => {
+    const t = el(uid), box = $('.dv'); if (!t || !box || !passiveIconUrl(p)) return;
+    const b = box.getBoundingClientRect(), r = t.getBoundingClientRect();
+    const i = document.createElement('img'); i.className = 'cb-cpop ckpop'; i.alt = ''; i.src = passiveIconUrl(p);
+    i.style.cssText = `left:${r.left - b.left + r.width / 2}px;top:${r.top - b.top + r.height * 0.4}px;width:${Math.min(70, r.width * 0.6)}px`;
+    box.appendChild(i); setTimeout(() => i.remove(), 1200);
+  };
   const ring = (uid, cls) => { if (reduced) return; const t = el(uid); if (!t) return; const r = document.createElement('span'); r.className = `cb-ring ${cls}`; t.appendChild(r); setTimeout(() => r.remove(), 750); };
   const float = (uid, txt, cls) => { const t = el(uid); if (!t) return; const f = document.createElement('span'); f.className = `dv-float ${cls}`; f.textContent = txt; t.appendChild(f); setTimeout(() => f.remove(), 900); };
   const banner = (html, cls = '', ms = 900) => {
@@ -313,7 +325,12 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       if (!alive_) return;
       switch (e.t) {
         case 'act':
-          if (e.skill) { app.sfx.skill(); banner(`${actIcon(KITS[st.units[e.u].role].skill.key, KITS[st.units[e.u].role].skill.icon)} ${esc(e.name)}`, 'skill', 700); await wait(T(360)); }
+          if (e.skill) {
+            const own = moveFor(st.units[e.u], e.key);
+            app.sfx.skill();
+            banner(`${own ? `<img class="aicon" alt="" src="${moveIconUrl(own.icon)}">` : actIcon(KITS[st.units[e.u].role].skill.key, KITS[st.units[e.u].role].skill.icon)} ${esc(e.name)}`, own ? 'skill own' : 'skill', 700);
+            await wait(T(360));
+          }
           if (e.tgt && st.units[e.tgt]?.side === 'enemy' && e.key !== 'marque' && e.key !== 'entrave') { lunge(e.u, e.tgt); cam(e.tgt, 0.6); await wait(T(LUNGE_HIT)); }
           else if (e.key === 'marque' && e.tgt) { fxAt(e.tgt, 'seal'); ring(e.tgt, 'mark'); await wait(T(260)); }
           break;
@@ -349,6 +366,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         }
         case 'parry': app.sfx.parry(); dio.flare(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxAt(e.u, 'parry', { big: true }); sparks(e.u, 'gold'); cam(e.u, -0.8); } banner('Parade parfaite !', 'parry', 800); shake(false); await wait(T(420)); break;
         case 'fervor': fervorPop(e.d, e.why); draw(); break;
+        case 'passive': app.sfx.passive?.(); passivePop(e.u, e.p); float(e.u, PASSIVES[e.p]?.name || '', 'syn'); await wait(T(320)); break;
         case 'brk': { const t = el(e.u)?.querySelector('.cb-brk i'); if (t) t.style.width = `${(e.brk / e.max) * 100}%`; break; }
         case 'broken': {
           // suspension, fissures lumineuses, rupture, puis l'état vulnérable apparaît
@@ -382,7 +400,10 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         case 'status':
           if (e.k === 'poison') { if (/\+|×/.test(e.s)) { app.sfx.poison(); fxAt(e.u, 'venom', { big: !!e.syn }); } }
           else if (e.k === 'frost' && /^Gel/.test(e.s) && !/passe/.test(e.s)) { app.sfx.freeze(); fxAt(e.u, 'frost'); }
-          else if (e.k === 'guard') { app.sfx.block(); ring(e.u, 'guard'); }
+          else if (e.k === 'guard' && /^(Tous sur elle|Hurlement)/.test(e.s)) { app.sfx.taunt?.(); fxAt(e.u, 'taunt', { big: true }); ring(e.u, 'guard'); }
+          else if (e.k === 'guard') { app.sfx.shield?.(); fxAt(e.u, 'shield'); ring(e.u, 'guard'); }
+          else if (e.k === 'heal' && /^\+\d+ ATQ/.test(e.s)) { app.sfx.boost?.(); fxAt(e.u, 'boost'); }
+          else if (e.k === 'mark') { app.sfx.mark?.(); fxAt(e.u, /Maudite/.test(e.s) ? 'curse' : 'seal'); ring(e.u, 'mark'); }
           if (/vole en éclats/.test(e.s)) { app.sfx.shatter(); fxAt(e.u, 'iceshatter', { big: true }); }
           if (e.s === 'Proie désignée') fxAt(e.u, 'prey', { big: true });
           else if (e.syn) app.sfx.skill();

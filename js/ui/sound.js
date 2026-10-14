@@ -295,20 +295,53 @@ export const sfx = {
     pad([N.D4, N.F4, N.A4, N.D5], { dur: 1.4, gain: 0.035, attack: 0.04, delay: 0.54, lp: 1200, lpTo: 3500 });
     bell(N.D6, { dur: 2, gain: 0.06, ratio: 2, index: 1.2, delay: 0.54 }); thump(60, { to: 30, dur: 0.8, gain: 0.55, delay: 0.54 });
   },
+  // Identités des créatures : passif qui agit, bouclier, renfort, provocation, marque
+  passive() { bell(N.A5, { dur: 0.7, gain: 0.06, ratio: 2.4, index: 1.1 }); bell(N.E6, { dur: 0.6, gain: 0.04, ratio: 2, index: 0.8, delay: 0.06 }); grains(5, { span: 0.15, freq: 5200, spread: 1400, gain: 0.05, delay: 0.02 }); },
+  shield() { bell(vary(392, 0.03), { dur: 0.9, gain: 0.1, ratio: 1.5, index: 2.6, wet: 0.5 }); noise({ dur: 0.25, gain: 0.06, freq: 900, to: 2400, q: 1.2, attack: 0.08 }); },
+  boost() { [N.D5, N.A5, N.D6].forEach((f, i) => osc(f, { type: 'triangle', dur: 0.32, gain: 0.05, delay: i * 0.06, wet: 0.4 })); whoosh({ dur: 0.3, gain: 0.08, from: 400, to: 2600, q: 1.6 }); },
+  taunt() { grit(N.D3 * 0.5, { dur: 0.7, gain: 0.12, to: N.A3 * 0.5, lp: 700, vib: 6 }); thump(80, { to: 45, dur: 0.4, gain: 0.35 }); },
+  mark() { bell(N.F6, { dur: 0.5, gain: 0.05, ratio: 3, index: 1.5 }); noise({ dur: 0.08, gain: 0.08, type: 'highpass', freq: 4000 }); },
   defeat() {
     pad([N.D3, N.F3, N.A3], { dur: 2.2, gain: 0.04, attack: 0.3, lp: 700, lpTo: 200 });
     bell(98, { dur: 3, gain: 0.12, ratio: 1.41, index: 3, delay: 0.1, wet: 0.8 }); thump(55, { to: 28, dur: 1, gain: 0.5, delay: 0.1 });
   },
 };
 
+// ——— Sons enregistrés (assets/sfx/<clé>.mp3) ———
+// La liste des fichiers livrés est dans assets/sfx/manifest.json. Un son enregistré remplace son équivalent
+// synthétisé ; sans fichier (ou sans réseau), le son synthétisé reste joué. Clés de l'ouverture de carte :
+// reveal-1 (Commune, Peu commune), reveal-2 (Rare, Hyper rare), reveal-3 (Mythique, Secrète).
+const samples = {}; let sampleList = null, sampleLoad = null;
+function loadSamples() {
+  if (sampleLoad || !ctx) return;
+  sampleLoad = fetch('assets/sfx/manifest.json').then((r) => (r.ok ? r.json() : [])).catch(() => []).then((list) => {
+    sampleList = new Set(list);
+    list.forEach((k) => fetch(`assets/sfx/${k}.mp3`).then((r) => (r.ok ? r.arrayBuffer() : null))
+      .then((b) => b && new Promise((ok, ko) => ctx.decodeAudioData(b, ok, ko))).then((buf) => { if (buf) samples[k] = buf; }).catch(() => {}));
+  });
+}
+const sampleKey = (k, a) => (k === 'reveal' ? `reveal-${a[0] === 'M' || a[0] === 'S' ? 3 : a[0] === 'R' || a[0] === 'HR' ? 2 : 1}` : k);
+function playSample(key) {
+  const buf = samples[key];
+  if (!buf || !ensure()) return false;
+  const src = ctx.createBufferSource(); src.buffer = buf;
+  src.playbackRate.value = 1 + (Math.random() - 0.5) * 0.04; // petite variation : moins mécanique
+  const g = ctx.createGain(); g.gain.value = 0.9;
+  src.connect(g); g.connect(bus); src.start();
+  return true;
+}
+
 // Vibrations associées (nombre de petites impulsions) et baisse de la musique pendant les grands moments
-const HAP = { hit: 1, slash: 1, smash: 2, crit: 2, capture: 1, block: 1, parry: 1, shatter: 3, boss: 3, ult: 2, victory: 3, defeat: 2, error: 1, dice: 1, tear: 1, achievement: 2, pose: 1, fury: 2, death: 1 };
+const HAP = { shield: 1, taunt: 1, hit: 1, slash: 1, smash: 2, crit: 2, capture: 1, block: 1, parry: 1, shatter: 3, boss: 3, ult: 2, victory: 3, defeat: 2, error: 1, dice: 1, tear: 1, achievement: 2, pose: 1, fury: 2, death: 1 };
 const DUCK = { victory: 3.5, defeat: 4, ult: 2.5, achievement: 2, boss: 2 };
 for (const k of Object.keys(sfx)) {
   const f = sfx[k];
   sfx[k] = (...a) => {
     if (k === 'reveal') { const big = a[0] === 'M' || a[0] === 'S'; if (big || a[0] === 'HR') { hooks.duck?.(big ? 3.5 : 2); } hap(big ? 3 : a[0] === 'R' || a[0] === 'HR' ? 1 : 0); }
     else { if (HAP[k]) hap(HAP[k]); if (DUCK[k]) hooks.duck?.(DUCK[k]); }
+    if (!ensure()) return undefined;
+    loadSamples();
+    if (playSample(sampleKey(k, a))) return undefined;
     return f(...a);
   };
 }
@@ -317,6 +350,6 @@ for (const k of Object.keys(sfx)) {
 export const SFX_DEMO = [
   ['Toucher', () => sfx.tap()], ['Ouverture', () => sfx.tear()], ['Rare', () => sfx.reveal('R')], ['Mythique', () => sfx.reveal('M')],
   ['Coup', () => sfx.slash()], ['Coup lourd', () => sfx.smash()], ['Parade', () => sfx.parry()], ['Brisure', () => sfx.shatter()],
-  ['Soin', () => sfx.heal()], ['Gel', () => sfx.freeze()], ['Gardien', () => sfx.boss()], ['Pouvoir', () => sfx.ult()],
+  ['Soin', () => sfx.heal()], ['Gel', () => sfx.freeze()], ['Passif', () => sfx.passive()], ['Bouclier', () => sfx.shield()], ['Renfort', () => sfx.boost()], ['Gardien', () => sfx.boss()], ['Pouvoir', () => sfx.ult()],
   ['Dé', () => sfx.dice()], ['Victoire', () => sfx.victory()], ['Défaite', () => sfx.defeat()],
 ];

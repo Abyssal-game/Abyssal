@@ -1856,3 +1856,7 @@ body.battle-mode.has-subnav #view, body.battle-mode #view { padding: calc(var(--
 @media (max-width: 360px) { .cb-grid.n5 { gap: 4px; } .cb-grid.n5 .cb-a b { font-size: .55rem; } }
 .cb-cost .cdw { padding: 1px 4px; border-radius: 4px; background: rgba(255, 255, 255, .14); color: var(--ink); }
 .cb-cost .cdw::before { content: '↻'; margin-right: 1px; }
+/* Identité en combat : pastilles des passifs, icône qui jaillit, bannière de compétence propre */
+.dv-st .ckp img { border-radius: 50%; box-shadow: 0 0 0 1px rgba(226, 184, 92, .7); }
+.cb-cpop.ckpop { filter: drop-shadow(0 0 12px rgba(226, 184, 92, .9)) drop-shadow(0 2px 4px #000); }
+.cb-banner.own .aicon, .skill.own .aicon { border-radius: 6px; }
