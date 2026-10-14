@@ -7,6 +7,10 @@
 const DIO = 'assets/dio/';
 // adresse absolue : une url() relative placée dans une variable CSS serait résolue depuis la feuille de style
 const abs = (u) => new URL(u, document.baseURI).href;
+// Images peintes (Gemini) déjà livrées, dans assets/dio/p/<nom>.webp : elles remplacent le dessin
+// fait par le code (accessoires) ou la texture calculée (sol « floor-<royaume> »). Ajouter le nom ici à la livraison.
+export const PAINTED = new Set([]);
+const painted = (name, h = '') => (PAINTED.has(name) ? `<img class="dio-img" alt="" src="${DIO}p/${name}.webp" ${h}>` : null);
 
 // ——— Royaumes : matériaux, teintes, accessoires, particules ———
 // stone / wall : teintes multipliées sur les textures grises ; glow : couleur des lueurs du royaume.
@@ -265,11 +269,12 @@ export function mountDiorama(dv, { room, decor = 'riche', reduced = false, bossK
     // sol en perspective (plan CSS couché) : texture, joints lumineux, mousse, givre, flaques de lumière
     const fw = half * 2, fl = W / 2 - half;
     const tileF = T.tile;
+    const pFloor = PAINTED.has(`floor-${room.key}`);
     const mask = (name, cls, op) => `<div class="dio-ov ${cls}" style="--m:url(${abs(`${DIO}${name}.webp`)});--ts:${tileF}px;opacity:${op}"></div>`;
     const floor = `<div class="dio-floor" style="left:${fl}px;top:${yFront - D}px;width:${fw}px;height:${D}px;transform-origin:50% 100%;--ts:${tileF}px">
-      <div class="dio-ftex" style="background-image:url(${DIO}${T.floor}.webp)"></div>
-      ${mask('grime', 'ov-grime', 0.75).replace(`--ts:${tileF}px`, `--ts:${Math.round(tileF * 2.6)}px`)}${T.puddles ? mask('puddle', 'ov-puddle', T.puddles).replace(`--ts:${tileF}px`, `--ts:${Math.round(tileF * 2.2)}px`) + mask('puddle', 'ov-sheen', 0.5).replace(`--ts:${tileF}px`, `--ts:${Math.round(tileF * 2.2)}px`) : ''}
-      ${T.joints ? mask('joints', 'ov-joints', T.joints) : ''}${T.moss ? mask('moss', 'ov-moss', T.moss) : ''}${T.frost ? mask('frost', 'ov-frost', T.frost) : ''}
+      <div class="dio-ftex ${pFloor ? 'painted' : ''}" style="background-image:url(${pFloor ? `${DIO}p/floor-${room.key}.webp` : `${DIO}${T.floor}.webp`})"></div>
+      ${pFloor ? '' : `${mask('grime', 'ov-grime', 0.75).replace(`--ts:${tileF}px`, `--ts:${Math.round(tileF * 2.6)}px`)}${T.puddles ? mask('puddle', 'ov-puddle', T.puddles).replace(`--ts:${tileF}px`, `--ts:${Math.round(tileF * 2.2)}px`) + mask('puddle', 'ov-sheen', 0.5).replace(`--ts:${tileF}px`, `--ts:${Math.round(tileF * 2.2)}px`) : ''}
+      ${T.joints ? mask('joints', 'ov-joints', T.joints) : ''}${T.moss ? mask('moss', 'ov-moss', T.moss) : ''}${T.frost ? mask('frost', 'ov-frost', T.frost) : ''}`}
       ${T.floorDeco === 'cracks' ? mask('cracks', 'ov-cracks', 0.8) : ''}${T.floorDeco === 'runes' || room.monument === 'geometry' ? `<div class="dio-runes ${room.monument === 'geometry' ? 'geo' : ''}"></div>` : ''}
       <div class="dio-brk"></div><div class="dio-sealring"></div>
       <div class="dio-fpool"></div></div>`;
@@ -284,14 +289,14 @@ export function mountDiorama(dv, { room, decor = 'riche', reduced = false, bossK
     };
     let props = '';
     const corner = T.corner, sideP = T.side;
-    const cornerHTML = corner === 'column' ? P.column(c) : P[corner] ? P[corner](c) : '';
+    const cornerHTML = painted(corner) || (corner === 'column' ? P.column(c) : P[corner] ? P[corner](c) : '');
     props += place(-0.86, 0.94, corner === 'column' ? 230 : corner === 'obelisk' ? 210 : 120, cornerHTML, `pc-${corner}`);
-    props += place(0.86, 0.94, corner === 'column' ? 230 : corner === 'obelisk' ? 210 : 120, corner === 'column' ? P.column(c, true) : cornerHTML, `pc-${corner}`);
-    const sideHTML = P[sideP] ? P[sideP](c) : '';
+    props += place(0.86, 0.94, corner === 'column' ? 230 : corner === 'obelisk' ? 210 : 120, corner === 'column' ? (painted('column-broken') || P.column(c, true)) : cornerHTML, `pc-${corner}`);
+    const sideHTML = painted(sideP) || (P[sideP] ? P[sideP](c) : '');
     const sideH = ['angel', 'horned'].includes(sideP) ? 200 : sideP === 'tomb' ? 110 : sideP === 'gear' ? 110 : 100;
     props += place(-0.86, 0.6, sideH, sideHTML, `ps-${sideP}`);
-    props += place(0.86, 0.62, sideH, sideP === 'tomb' ? P.candles(c) : sideHTML, `ps-${sideP}`);
-    props += place(-0.62, 0.985, 60, P.rock(), 'p-rubble');
+    props += place(0.86, 0.62, sideH, sideP === 'tomb' ? (painted('candles') || P.candles(c)) : sideHTML, `ps-${sideP}`);
+    props += place(-0.62, 0.985, 60, painted('rock') || P.rock(), 'p-rubble');
     // torches des murs latéraux (peintes) et leur halo
     const torch = (s, fz) => { const p = proj(s * half, yFront - 175, -fz * D); const h = 92 * p.s; return `<div class="dio-torch ${s < 0 ? 'l' : 'r'}" style="left:${p.x + s * 2}px;top:${p.y - h / 2}px;height:${h}px"><img alt="" src="assets/icons/torch-on.webp"><i class="dio-tglow"></i></div>`; };
     const torches = torch(-1, 0.82) + torch(1, 0.82) + (() => { const y = yBack * 0.58, h = 72 * k * 1.9; return [arch.l - 34, arch.r + 34].map((x) => `<div class="dio-torch b" style="left:${x}px;top:${y - h / 2}px;height:${h}px"><img alt="" src="assets/icons/torch-on.webp"><i class="dio-tglow"></i></div>`).join(''); })();
@@ -300,13 +305,11 @@ export function mountDiorama(dv, { room, decor = 'riche', reduced = false, bossK
     let parts = '';
     if (pk === 'mist') parts = '<i class="dio-mist m1"></i><i class="dio-mist m2"></i>';
     else for (let i = 0; i < pn; i++) parts += `<i class="dio-pt pt-${pk}" style="--px:${(i * 37 + 11) % 100}%;--py:${30 + ((i * 53) % 60)}%;--pd:${6 + ((i * 7) % 7)}s;--pl:${-((i * 1.7) % 6).toFixed(1)}s"></i>`;
-    el.innerHTML = `<div class="dio-far ${room.view ? 'view' : ''}" style="${room.view ? `background-image:url(${abs(room.view)})` : room.paint ? `background-image:url(${abs(room.paint)})` : ''}"></div>
-      ${monument(room.monument, c)}
-      ${wall}
-      <div class="dio-3d" style="perspective:${G.P}px;perspective-origin:50% ${oy}px">${floor}${side(-1)}${side(1)}</div>
+    // Mélange : la peinture de l'étage remplit le fond ; le sol de la maquette apparaît en fondu par-dessus
+    el.innerHTML = `<div class="dio-far" style="${room.paint ? `background-image:url(${abs(room.paint)})` : ''}"></div>
+      <div class="dio-3d" style="perspective:${G.P}px;perspective-origin:50% ${oy}px">${floor}</div>
       <div class="dio-props">${props}</div>
       <div class="dio-light"></div><div class="dio-fury"></div><div class="dio-fx"></div>
-      <div class="dio-torches">${torches}</div>
       <div class="dio-ledge" style="top:${yFront}px"></div>
       <div class="dio-parts">${parts}</div>`;
     el.style.setProperty('--yb', `${yBack}px`);

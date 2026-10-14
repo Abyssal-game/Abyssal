@@ -187,3 +187,13 @@
 
 /* La rangée ennemie se tient au fond de la salle : un peu plus petite, la profondeur se lit mieux */
 .dv.has-dio .dv-row.enemy { transform: scale(.9); transform-origin: 50% 80%; }
+
+/* ——— Mélange peinture + maquette (v196) ———
+   La peinture de l'étage occupe tout le fond ; le sol apparaît en fondu à partir du milieu. */
+.dio-far { height: 100% !important; background-position: center 38%; filter: brightness(.9) saturate(1.05); }
+.dio-far::after { background: linear-gradient(180deg, rgba(0, 0, 0, .25), transparent 30%, transparent 55%, rgba(0, 0, 0, .35)); mix-blend-mode: normal; }
+.dio-floor { -webkit-mask-image: linear-gradient(180deg, transparent 0%, transparent 18%, rgba(0, 0, 0, .55) 42%, #000 62%); mask-image: linear-gradient(180deg, transparent 0%, transparent 18%, rgba(0, 0, 0, .55) 42%, #000 62%); }
+.dio-ftex { opacity: .9; }
+.dio-ftex.painted { background-blend-mode: normal; background-color: transparent; filter: none; opacity: .95; }
+.dio-img { display: block; height: 100%; width: auto; }
+.dio-light { background: radial-gradient(120% 75% at 50% 58%, transparent 55%, rgba(0, 0, 0, .55) 100%); }
