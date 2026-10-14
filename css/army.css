@@ -2133,7 +2133,8 @@ body.battle-mode.has-subnav #view, body.battle-mode #view { padding: calc(var(--
 .dv .cb-a { aspect-ratio: .8; min-height: 0; padding: 0; border: 0; border-radius: 10px; background: none; box-shadow: none; overflow: visible; isolation: isolate; }
 .dv .cb-a::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: 10px; background: url(../assets/ui/act-tile.webp) center / 100% 100% no-repeat; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .7)); }
 .dv .cb-a.sig::before { background-image: url(../assets/ui/act-tile-sig.webp); filter: sepia(.35) saturate(1.5) brightness(1.15) drop-shadow(0 0 8px rgba(242, 193, 78, .75)); }
-.dv .cb-a.own::before { background-image: url(../assets/ui/act-tile-own.webp); filter: sepia(1) hue-rotate(225deg) saturate(2.2) brightness(.95) drop-shadow(0 0 8px rgba(194, 102, 255, .7)); }
+.dv .cb-a.own::before { background-image: url(../assets/ui/act-tile-own.webp); filter: drop-shadow(0 0 8px rgba(194, 102, 255, .7)); }
+.dv .cb-a.own .cb-ai { width: 36%; }
 .dv .cb-a.sig, .dv .cb-a.own { background: none; box-shadow: none; animation: none; }
 .dv .cb-a.sig::after { content: ''; position: absolute; inset: -2px; z-index: -2; border-radius: 12px; box-shadow: 0 0 14px rgba(242, 193, 78, .45); animation: cbSigGlow 2.4s ease-in-out infinite; }
 .dv .cb-a .cb-ai { position: absolute; left: 50%; top: 37%; width: 44%; height: auto; aspect-ratio: 1; transform: translate(-50%, -50%); background: none; box-shadow: none; }
