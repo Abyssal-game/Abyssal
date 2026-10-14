@@ -9,7 +9,8 @@ const DIO = 'assets/dio/';
 const abs = (u) => new URL(u, document.baseURI).href;
 // Images peintes (Gemini) déjà livrées, dans assets/dio/p/<nom>.webp : elles remplacent le dessin
 // fait par le code (accessoires) ou la texture calculée (sol « floor-<royaume> »). Ajouter le nom ici à la livraison.
-export const PAINTED = new Set(['floor-infernal', 'floor-abyssal', 'floor-celeste', 'floor-sauvage', 'floor-necrotique', 'floor-primordial', 'floor-artificiel', 'floor-givre']);
+export const PAINTED = new Set(['brazier', 'crystal', 'column', 'column-broken', 'angel', 'horned', 'rock', 'candles', 'tomb', 'obelisk', 'amber', 'gear', 'ice',
+  'floor-infernal', 'floor-abyssal', 'floor-celeste', 'floor-sauvage', 'floor-necrotique', 'floor-primordial', 'floor-artificiel', 'floor-givre']);
 const painted = (name, h = '') => (PAINTED.has(name) ? `<img class="dio-img" alt="" src="${DIO}p/${name}.webp" ${h}>` : null);
 
 // ——— Royaumes : matériaux, teintes, accessoires, particules ———
