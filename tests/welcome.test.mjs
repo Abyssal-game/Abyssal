@@ -39,3 +39,15 @@ test('titres et cadres : chacun a une explication pour le débloquer', () => {
   assert.ok(U.frames.every((f) => FRAMES[f.key] && f.how));
   assert.ok(U.frames.find((f) => f.key === 'or').how.includes(' Ou : '), 'deux façons d’obtenir le cadre d’or');
 });
+
+test('lot Z (en attente des images) : se construit sans erreur, noms uniques, ensembles complets', async () => {
+  const fs = await import('node:fs');
+  const { buildLot } = await import('../tools/add-lot.mjs');
+  const lot = JSON.parse(fs.readFileSync(new URL('../data/lot-z.json', import.meta.url)));
+  const { cards, sets, errors } = buildLot(lot);
+  assert.deepEqual(errors, []);
+  assert.equal(cards.length, 33);
+  assert.equal(new Set(cards.map((x) => x.card.id)).size, 33);
+  assert.ok(sets.every((s) => s.cards.every(Boolean)));
+  assert.ok(cards.every((x) => x.card.artPrompt.length > 200));
+});
