@@ -99,7 +99,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     u.mark ? st_('mark', 'Marqué : +30 % de dégâts, +3 aux jets') : '',
     u.defend ? st_('defend', 'Défense : -50 % de dégâts') : '',
     u.guardBy ? st_('guard', 'Protégé par un Rempart') : '',
-    u.exposed ? st_('exposed', 'Exposée : +25 % de dégâts subis') : '',
+    u.exposed ? st_('exposed', 'Déséquilibrée : +25 % de dégâts subis') : '',
+    u.breach ? st_('breach', 'Brèche : le prochain coup d’un autre allié perce son bouclier, +20 % de dégâts, +3 Brisure') : '',
+    u.open ? st_('open', 'Exposé : la prochaine attaque d’un autre allié fait +50 % de dégâts et +1 Ferveur') : '',
     u.boost ? `<i class="bo" title="Attaque renforcée pour ce tour">+${u.boost} ATQ</i>` : '',
     u.prey ? st_('prey', 'Proie désignée : tous les ennemis la visent (+20 % de dégâts)') : '',
     u.ice ? st_('ice', `Carapace de glace : absorbe ${u.ice} dégâts`, u.ice) : '',
@@ -180,12 +182,15 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (!alive_) return;
     th = threats(st);
     tgtInfo = {};
-    if (mode && sel && st.turn === 'ally') {
-      for (const id of actionTargets(st, sel, mode.key)) {
-        const p = preview(st, sel, mode.key, id);
+    const pk = mode ? mode.key : sel && st.turn === 'ally' && actionsFor(st, sel)[0]?.ok ? 'attack' : null;
+    if (pk && sel && st.turn === 'ally') {
+      for (const id of actionTargets(st, sel, pk)) {
+        const p = preview(st, sel, pk, id);
         const cb = p.dmg && st.units[id].side === 'enemy' ? comboOf(st, st.units[sel], st.units[id]) : 0, cbTxt = cb ? ` <i class="cmb">+${cb}</i>` : '';
         const bk = p.brk ? (p.breaks ? ' <i class="brk on">BRISE !</i>' : ` <i class="brk">◆${p.brk}</i>`) : '';
-        tgtInfo[id] = (p.roll ? `${p.roll.chance}%` : p.dmg ? (p.dmg >= st.units[id].hp && st.units[id].side === 'enemy' ? `<b class="ko">K.O.</b> -${p.dmg}${cbTxt}` : `-${p.dmg}${p.weak ? ' ★' : ''}${cbTxt}`) : 'Cible') + bk;
+        const tu = st.units[id], synOk = tu.side === 'enemy' && p.dmg && ((tu.breach && tu.breach.by !== sel) || (pk === 'attack' && tu.open && tu.open.by !== sel) || (tu.mark && pk === 'estoc') || (tu.frozen > 0 && pk === 'estoc'));
+        const syTxt = synOk ? ' <i class="cmb sy">Synergie</i>' : '';
+        tgtInfo[id] = (p.roll ? `${p.roll.chance}%` : p.dmg ? (p.dmg >= st.units[id].hp && st.units[id].side === 'enemy' ? `<b class="ko">K.O.</b> -${p.dmg}${cbTxt}` : `-${p.dmg}${p.weak ? ' ★' : ''}${cbTxt}`) : 'Cible') + bk + syTxt;
       }
     }
     enEl.innerHTML = front(st, 'enemy').map(cardEl).join('') + resHTML('enemy');
@@ -270,6 +275,20 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     i.style.cssText = `left:${r.left - b.left + r.width / 2}px;top:${r.top - b.top + r.height * 0.4}px;width:${Math.min(70, r.width * 0.6)}px`;
     box.appendChild(i); setTimeout(() => i.remove(), 1200);
   };
+  // Synergie entre deux alliés : un trait de lumière relie la poseuse à celle qui exploite, et la bannière le nomme
+  const synergy = (byUid, aUid, label) => {
+    app.sfx.crit?.();
+    banner(`<small>Synergie</small>${esc(label)}`, 'synergy', 1000);
+    if (reduced) return;
+    const box = $('.dv'), a = el(byUid), b = el(aUid); if (!box || !a || !b) return;
+    const r0 = box.getBoundingClientRect(), ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+    const x1 = ra.left - r0.left + ra.width / 2, y1 = ra.top - r0.top + ra.height * .45, x2 = rb.left - r0.left + rb.width / 2, y2 = rb.top - r0.top + rb.height * .45;
+    const len = Math.hypot(x2 - x1, y2 - y1), ang = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+    const beam = document.createElement('span'); beam.className = 'cb-beam';
+    beam.style.cssText = `left:${x1}px;top:${y1}px;width:${len}px;transform:rotate(${ang}deg)`;
+    box.appendChild(beam); setTimeout(() => beam.remove(), 900);
+    a.classList.remove('synlit'); void a.offsetWidth; a.classList.add('synlit');
+  };
   const ring = (uid, cls) => { if (reduced) return; const t = el(uid); if (!t) return; const r = document.createElement('span'); r.className = `cb-ring ${cls}`; t.appendChild(r); setTimeout(() => r.remove(), 750); };
   const float = (uid, txt, cls) => { const t = el(uid); if (!t) return; const f = document.createElement('span'); f.className = `dv-float ${cls}`; f.textContent = txt; t.appendChild(f); setTimeout(() => f.remove(), 900); };
   const banner = (html, cls = '', ms = 900) => {
@@ -284,6 +303,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
 
   // Jet de D20 animé (toucher pour passer)
   async function rollFx(e) {
+    if (e.perfect && e.tier === 'success') banner('Frappe parfaite : réussite assurée', 'parry', 800);
     const tier = DICE_TIERS[e.tier];
     const box = document.createElement('div');
     box.className = `cb-dice t-${e.tier}`;
@@ -408,6 +428,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           if (e.s === 'Proie désignée') fxAt(e.u, 'prey', { big: true });
           else if (e.syn) app.sfx.skill();
           if (e.k === 'entrance') ring(e.u, 'enter');
+          if (e.combo && e.by && e.a && e.by !== e.a && st.units[e.by]?.side === 'ally') { synergy(e.by, e.a, e.s); await wait(T(380)); if (!g.s.tips?.['cb-combo']) tuto(app, 'cb-combo'); }
           if (e.combo) comboPop(e.u, e.combo);
           float(e.u, e.s, e.syn ? 'syn' : e.k === 'bad' ? 'dmg' : 'info');
           draw();
@@ -509,13 +530,14 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   // Un curseur traverse la barre en accélérant. Toucher dans l'or : esquive. Sur le trait blanc, au tout dernier instant : parade parfaite.
   let defTap = null;
   // ——— Attaque rythmée : un anneau se resserre sur le cercle de runes ; toucher au bon moment donne un bonus au jet ———
-  function rhythmQTE(name) {
+  function rhythmQTE(name, uid) {
     return new Promise((resolve) => {
       const D = 1150, from = 2.5, to = 0.35; // durée et échelle de l'anneau (1 = aligné sur le cercle)
       const ov = document.createElement('div');
       ov.className = 'ry';
-      ov.innerHTML = `<div class="ry-c"><span class="ry-glow"></span><span class="ry-in"></span><span class="ry-out"></span><b class="ry-res"></b></div>
-        <p class="ry-t"><b>${esc(name)}</b><small>Touche quand l’anneau épouse le cercle</small></p>`;
+      const cu = uid && st.units[uid] ? cat.get(st.units[uid].id) : null;
+      ov.innerHTML = `<div class="ry-c"><span class="ry-glow"></span><span class="ry-in">${cu ? `<img alt="" src="${artUrl(cu, { lite: true })}">` : ''}<i class="ry-med"></i></span><span class="ry-out"></span><b class="ry-res"></b></div>
+        <p class="ry-t"><b>${esc(name)}</b><small>Touche quand l’anneau se referme sur le médaillon</small></p>`;
       $('.dv').appendChild(ov);
       const out = ov.querySelector('.ry-out'), res = ov.querySelector('.ry-res');
       let t0 = 0, done = false, raf = 0;
@@ -719,7 +741,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const u = sel; mode = null;
     if (a.dice) { // compétence à dé : la frappe rythmée part tout de suite, puis le jet
       busy = true; app.sfx.tap(); draw();
-      st.rhythm = await rhythmQTE(a.name);
+      st.rhythm = await rhythmQTE(a.name, u);
       if (!alive_) return;
     }
     return exec(() => act(st, u, key, uid));

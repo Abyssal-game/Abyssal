@@ -136,7 +136,7 @@ export function upgradeDuel(st) {
   st.seed = Math.floor(Math.random() * 2 ** 31);
   st.stats = { parries: 0, dodges: 0, breaks: 0, crits: 0, fumbles: 0 };
   for (const u of Object.values(st.units)) {
-    Object.assign(u, { acts: 0, frostCD: u.frostCD || 0, mark: 0, broken: false, charged: null, exposed: false, intent: null });
+    Object.assign(u, { acts: 0, frostCD: u.frostCD || 0, mark: 0, markBy: null, breach: null, open: null, broken: false, charged: null, exposed: false, intent: null });
     u.role = u.role || 'degats';
     if (u.side === 'enemy') { u.fam = u.boss ? 'gardien' : FAM_BY_ROLE[u.role] || 'predateur'; u.brkMax = u.boss ? 10 : u.elite ? 6 : 0; u.brk = u.brkMax; }
   }
@@ -225,6 +225,9 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   if (u.hp <= 0 || n <= 0) return 0;
   if (u.boss && u.side === 'enemy') n = Math.min(n, bossCap(u));
   if (u.side === 'ally' && src && st.units[src]?.side === 'enemy') n = Math.min(n, allyCap(u, st.curKind));
+  // Brèche (v250) : posée par un allié, exploitée par un autre → le coup perce le bouclier, +20 %, +3 Brisure
+  let breached = null;
+  if (src && u.side === 'enemy' && u.breach && st.units[src]?.side === 'ally' && u.breach.by !== src) { breached = u.breach; u.breach = null; pierce = true; n *= 1.2; }
   if (u.shield && pierce) { u.shield = 0; ev.push({ t: 'status', u: u.uid, s: 'Perce-bouclier', syn: true }); }
   if (u.shield) { u.shield = 0; ev.push({ t: 'block', u: u.uid }); return 0; }
   // Sceau du Gardien : absorbe les dégâts jusqu'à épuisement
@@ -250,6 +253,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   if (u.side === 'ally' && d >= u.hp && st.sursis) { st.sursis = false; d = u.hp - 1; u.shield = 1; ev.push({ t: 'status', u: u.uid, s: 'Sursis !', syn: true }); }
   u.hp -= d;
   if (d > 0) ev.push({ t: 'dmg', u: u.uid, d, hp: u.hp, src });
+  if (breached && d > 0) { st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: u.uid, s: 'Brèche exploitée !', syn: true, combo: 'breche', by: breached.by, a: src }); if (u.hp > 0) breakHit(st, u, 3, ev, st.units[src]); }
   const a = src && st.units[src];
   if (a && d > 0 && a.side === 'ally' && u.side === 'enemy' && st.turn === 'ally') {
     const by = ((st.hitBy ||= {})[u.uid] ||= []);
@@ -349,8 +353,11 @@ function addPoison(st, t, n, ev, src) {
   const combo = t.frozen > 0 && src?.role === 'poison';
   if (combo) k *= 2;
   t.poison = Math.min(14, (t.poison || 0) + k);
-  ev.push({ t: 'status', u: t.uid, s: combo ? `Givre-venin : +${k}` : `Poison +${k}`, syn: combo, k: 'poison' });
+  ev.push({ t: 'status', u: t.uid, s: combo ? `Givre-venin : +${k}` : `Poison +${k}`, syn: combo, k: 'poison', ...(combo ? { combo: 'glace', by: t.frozenBy, a: src.uid } : {}) });
 }
+// Brèche et Exposé (v250) : états posés par une créature, exploités par une autre, valables jusqu'à la fin du tour suivant
+function setBreach(st, t, by, ev) { if (!t || t.hp <= 0 || t.side !== 'enemy' || t.breach) return; t.breach = { by, until: st.round + 1 }; ev.push({ t: 'status', u: t.uid, s: 'Brèche', k: 'breach' }); }
+function openUp(st, t, by, ev) { if (!t || t.hp <= 0 || t.side !== 'enemy' || t.open) return; t.open = { by, until: st.round + 1 }; ev.push({ t: 'status', u: t.uid, s: 'Exposé', k: 'open' }); }
 function freeze(st, t, ev, turns = 1) {
   t.frozen = turns;
   if (t.boss || t.elite) t.frostCD = 2;
@@ -492,12 +499,14 @@ export function rollInfo(st, uid, key, tUid) {
 }
 function resolveRoll(st, info, ev, uid, tUid) {
   const r = d20(st);
+  const perfect = st.rhythm >= RHYTHM.perfect; // frappe parfaite (v250) : la compétence réussit à coup sûr
   st.rhythm = 0; // le bonus rythmé ne vaut que pour ce jet
   const total = r + info.mod;
-  const tier = r === 1 ? 'fumble' : r === 20 ? 'crit' : total >= info.dc ? 'success' : 'partial';
+  let tier = r === 1 ? 'fumble' : r === 20 ? 'crit' : total >= info.dc ? 'success' : 'partial';
+  if (perfect && (tier === 'fumble' || tier === 'partial')) tier = 'success';
   if (tier === 'crit') st.stats.crits++;
   if (tier === 'fumble') st.stats.fumbles++;
-  ev.push({ t: 'roll', u: uid, tgt: tUid, r, mod: info.mod, mods: info.mods, dc: info.dc, total, tier });
+  ev.push({ t: 'roll', u: uid, tgt: tUid, r, mod: info.mod, mods: info.mods, dc: info.dc, total, tier, perfect });
   return tier;
 }
 
@@ -536,25 +545,26 @@ export function act(st, uid, key, tUid = null) {
   else if (key === 'rempart') { t.guardBy = uid; u.rempart = tUid; ev.push({ t: 'status', u: tUid, s: 'Rempart', k: 'guard' }); }
   else if (key === 'priere') {
     heal(t, t.maxHp * 0.4, ev, u);
-    if (t.guardBy && !t.shield) { t.shield = 1; st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: tUid, s: 'Bastion !', syn: true, combo: 'bastion', k: 'guard' }); }
+    if (t.guardBy && !t.shield) { t.shield = 1; st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: tUid, s: 'Bastion !', syn: true, combo: 'bastion', k: 'guard', by: t.guardBy, a: uid }); }
     if (t.poison || t.frozen || t.stunned) { t.poison = 0; t.frozen = 0; t.stunned = false; ev.push({ t: 'status', u: tUid, s: 'Purifiée', k: 'heal' }); }
-  } else if (key === 'marque') { t.mark = 2; discover(st, t, ev); ev.push({ t: 'status', u: tUid, s: 'Marquée', k: 'mark' }); }
+  } else if (key === 'marque') { t.mark = 2; t.markBy = uid; discover(st, t, ev); ev.push({ t: 'status', u: tUid, s: 'Marquée', k: 'mark' }); }
   else if (key === 'raz') {
     ev.push({ t: 'aoe', u: uid, side: 'ally' });
-    front(st, 'enemy').forEach((x) => { const b = brkOf(st, u, x, 'raz'); const d = hurt(st, x, dmgOf(st, u, x, 0.7), ev, uid); if (d) breakHit(st, x, b, ev, u); });
+    front(st, 'enemy').forEach((x) => { const b = brkOf(st, u, x, 'raz'); const d = hurt(st, x, dmgOf(st, u, x, 0.7), ev, uid); if (d) breakHit(st, x, b, ev, u); if (d) setBreach(st, x, uid, ev); });
   } else if (key === 'estoc') {
     const info = rollInfo(st, uid, key, tUid);
     const tier = resolveRoll(st, info, ev, uid, tUid);
     const m = { crit: 3, success: 2, partial: 1.2, fumble: 0.5 }[tier];
     // Combinaisons nommées : la Marque prépare la Chasse, le gel prépare le Bris de glace
-    if (t.mark && tier !== 'fumble') { st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: tUid, s: 'Chasse !', syn: true, combo: 'chasse' }); }
-    if (t.frozen > 0 && tier !== 'fumble') { st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: tUid, s: 'Bris de glace !', syn: true, combo: 'glace' }); }
+    if (t.mark && tier !== 'fumble') { st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: tUid, s: 'Chasse !', syn: true, combo: 'chasse', by: t.markBy, a: uid }); }
+    if (t.frozen > 0 && tier !== 'fumble') { st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: tUid, s: 'Bris de glace !', syn: true, combo: 'glace', by: t.frozenBy, a: uid }); }
     weakBonus(st, u, t, ev);
     const frozen = t.frozen > 0;
     const d = hurt(st, t, dmgOf(st, u, t, m), ev, uid);
     if (d && t.hp > 0) breakHit(st, t, brkOf(st, u, { ...t, frozen: frozen ? 1 : 0 }, 'estoc', tier), ev, u);
     if (d && t.boss) t.wound = 1;
-    if (tier === 'fumble') { u.exposed = true; ev.push({ t: 'status', u: uid, s: 'Exposée', k: 'bad' }); }
+    if (tier === 'crit' || tier === 'success') openUp(st, t, uid, ev);
+    if (tier === 'fumble') { u.exposed = true; ev.push({ t: 'status', u: uid, s: 'Déséquilibrée', k: 'bad' }); }
   } else if (key === 'contagion') {
     if (!t.poison) addPoison(st, t, 3, ev, u);
     const info = rollInfo(st, uid, key, tUid);
@@ -566,12 +576,13 @@ export function act(st, uid, key, tUid = null) {
       const spread = tier === 'crit' ? row.filter((x) => x !== t) : tier === 'success' ? [row[i - 1], row[i + 1]].filter(Boolean) : [];
       const k = Math.ceil(t.poison / 2);
       spread.forEach((x) => { x.poison = Math.min(14, (x.poison || 0) + k); ev.push({ t: 'status', u: x.uid, s: `Contagion +${k}`, k: 'poison' }); });
+      if (tier !== 'partial') openUp(st, t, uid, ev);
     }
   } else if (key === 'entrave') {
     const info = rollInfo(st, uid, key, tUid);
     const tier = resolveRoll(st, info, ev, uid, tUid);
     // critique d'une Mythique ou Secrète sur un ennemi ordinaire : gelé 2 tours
-    if (tier === 'crit' || tier === 'success') { freeze(st, t, ev, tier === 'crit' && (u.rarity === 'M' || u.rarity === 'S') && !t.boss && !t.elite ? 2 : 1); if (tier === 'crit') breakHit(st, t, 3, ev, u); }
+    if (tier === 'crit' || tier === 'success') { freeze(st, t, ev, tier === 'crit' && (u.rarity === 'M' || u.rarity === 'S') && !t.boss && !t.elite ? 2 : 1); t.frozenBy = uid; if (tier === 'crit') breakHit(st, t, 3, ev, u); openUp(st, t, uid, ev); }
     else if (tier === 'partial') { t.slow = true; ev.push({ t: 'status', u: tUid, s: 'Ralentie', k: 'frost' }); }
   } else if (moveFor(u, key)) { u.mvReady = st.round + rechargeOf(u, key); u.struck = true; u.lastStruck = st.round; moveFor(u, key).run(st, u, t, ev, API); }
   if (['attack', 'estoc', 'raz'].includes(key) || moveFor(u, key)?.pv) st.ombreUsed = true;
@@ -611,6 +622,9 @@ function basicAttack(st, u, t, ev) {
   weakBonus(st, u, t, ev);
   const S = strikeOf(u), frozen = t.frozen > 0, hits = S.hits || 1;
   let m = strikeMult(u, t), rush = 0;
+  // Exposé (v250) : posé par la compétence à dé d'un allié, exploité par l'attaque d'un autre → +50 %, +1 Ferveur
+  let opened = null;
+  if (t.side === 'enemy' && t.open && t.open.by !== u.uid) { opened = t.open; t.open = null; m *= 1.5; }
   if (hasP(u, 'ruee') && !u.rushed) { u.rushed = true; m *= boosted(u, 'ruee') ? 2.5 : 2; rush = 1; pfx(ev, u, 'ruee'); }
   u.struck = true; u.lastStruck = st.round;
   const marked = !!(t.mark || t.broken), poisoned = t.poison > 0, extraBrk = (S.brk || 0) + (S.brkCharging && charging(t) ? S.brkCharging : 0);
@@ -619,13 +633,15 @@ function basicAttack(st, u, t, ev) {
     const x = hurt(st, t, dmgOf(st, u, t, m, { basic: true }), ev, u.uid, { pierce: u.role === 'poison' || !!S.pierce });
     d += x; if (x) landed++;
   }
+  if (d && t.hp > 0 && u.role === 'protecteur') setBreach(st, t, u.uid, ev);
+  if (opened && d) { st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: t.uid, s: 'Exposé exploité !', syn: true, combo: 'expose', by: opened.by, a: u.uid }); gainFervor(st, 1, ev, 'Exposé'); }
   if (d && t.hp > 0) {
     if (u.role === 'poison') addPoison(st, t, 2 + (S.poisonMore && poisoned ? S.poisonMore : 0), ev, u);
     if (S.splashPoison) { const row = front(st, t.side), i = row.indexOf(t), n = row[i + 1] || row[i - 1]; if (n) addPoison(st, n, S.splashPoison, ev, u); }
     breakHit(st, t, brkOf(st, u, { ...t, frozen: frozen ? 1 : 0 }, 'attack') + extraBrk + rush + Math.max(0, landed - 1), ev, u);
     if (hasP(u, 'venin')) addPoison(st, t, boosted(u, 'venin') ? 2 : 1, ev, u);
     if (S.burn) addPoison(st, t, S.burn, ev, u);
-    if (hasP(u, 'malediction') && u.curseT !== st.round && !t.mark && t.hp > 0) { u.curseT = st.round; t.mark = boosted(u, 'malediction') ? 2 : 1; pfx(ev, u, 'malediction'); ev.push({ t: 'status', u: t.uid, s: 'Maudite', k: 'mark' }); }
+    if (hasP(u, 'malediction') && u.curseT !== st.round && !t.mark && t.hp > 0) { u.curseT = st.round; t.mark = boosted(u, 'malediction') ? 2 : 1; t.markBy = u.uid; pfx(ev, u, 'malediction'); ev.push({ t: 'status', u: t.uid, s: 'Maudite', k: 'mark' }); }
     if (u.role === 'degats' && t.boss) t.wound = 1;
   }
   if (S.healLowest) { const w = lowestAlly(st); if (w) heal(w, S.healLowest, ev, u); }
@@ -1001,6 +1017,8 @@ export function endEnemyTurn(st) {
   st.order.ally.forEach((id) => { const x = st.units[id]; if (x.prey) x.prey--; });
   for (const u of alive(st, 'enemy')) {
     if (u.mark) u.mark--;
+    if (u.breach && st.round >= u.breach.until) u.breach = null;
+    if (u.open && st.round >= u.open.until) u.open = null;
     if (u.frostCD) u.frostCD--;
     if (u.broken && st.round >= u.brokenEnd) { u.broken = false; u.brokenSkip = false; u.brkMax = Math.round(u.brkMax * 1.4); u.brk = u.brkMax; ev.push({ t: 'recover', u: u.uid }); }
   }

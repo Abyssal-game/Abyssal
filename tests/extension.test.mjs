@@ -183,7 +183,7 @@ test('formes corrompues : un autre passif, sans toucher à la carte d’origine'
   assert.equal(plain.form, undefined, 'la forme originelle ne change pas');
 });
 
-test('Descente : pacte proposé avant le gardien, puis combat contre le gardien de l’étage', () => {
+test('Descente : plus de pacte avant le gardien (v250), combat direct contre le gardien de l’étage', () => {
   const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom(9) });
   ['INF-001', 'INF-009', 'INF-003', 'INF-011', 'INF-005'].forEach((id) => g.addCard(id));
   g.setTeam(['INF-001', 'INF-009', 'INF-003', 'INF-011', 'INF-005']);

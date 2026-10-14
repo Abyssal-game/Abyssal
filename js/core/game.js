@@ -749,12 +749,7 @@ export class Game {
     if (!this.doors().includes(room)) throw new Error('Porte inconnue.');
     const rule = this.rule(run.day);
     const out = { room };
-    // Élite ou gardien : un Pacte de l'Abîme est proposé avant le combat (facultatif)
-    if ((room === 'elite' || room === 'boss') && !run.free) {
-      run.pactOffer = pactChoices(`${run.day}:${run.floor}:${room}`); run.pendingRoom = room; run.phase = 'pact';
-      this.persist();
-      return { room, pact: run.pactOffer };
-    }
+    // (v250 : les Pactes de l'Abîme ne sont plus proposés ; choosePact reste pour une expédition sauvegardée en plein choix)
     return this.startBattle(room, out);
   }
   // Pacte accepté (clé) ou refusé (null), puis le combat commence

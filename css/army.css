@@ -2308,3 +2308,25 @@ body.has-subnav #subnav .sn-tab { background: #16121E; }
 .dv-float.crit { font-size: 2.05rem !important; letter-spacing: 0; }
 @media (max-width: 360px) { .dv-float.dmg { font-size: 1.55rem; } .dv-float.dmg.big { font-size: 1.95rem; } .dv-float.crit { font-size: 1.7rem !important; } }
 @media (prefers-reduced-motion: reduce) { .dv-c.dying:not(.ashes) { animation: none !important; opacity: 0; transition: opacity .2s !important; } .dv-burst.ember { display: none; } }
+
+/* v250 : synergies entre créatures (trait de lumière, bannière), aperçu « Synergie » sur la cible, anneau rythmé refait */
+.cb-beam { position: absolute; z-index: 26; height: 6px; margin-top: -3px; transform-origin: 0 50%; border-radius: 3px; pointer-events: none; background: linear-gradient(90deg, rgba(255, 230, 160, 0), #FFE9A8 25%, #FFF 50%, #FFE9A8 75%, rgba(255, 230, 160, 0)); box-shadow: 0 0 10px 2px rgba(242, 193, 78, .9), 0 0 24px 6px rgba(155, 92, 255, .55); animation: cbBeam .8s ease-out both; }
+@keyframes cbBeam { 0% { opacity: 0; scale: 0 1; } 25% { opacity: 1; scale: 1 1; } 70% { opacity: 1; } 100% { opacity: 0; scale: 1 .2; } }
+.dv-c.synlit { animation: cbSynlit .8s ease-out; }
+@keyframes cbSynlit { 20% { box-shadow: 0 0 0 3px #FFE9A8, 0 0 28px 6px rgba(242, 193, 78, .9); filter: brightness(1.35); } }
+.cb-banner.synergy { display: grid; justify-items: center; gap: 2px; color: #FFF4C8; -webkit-text-stroke: .6px #6A4310; text-shadow: 0 3px 0 #4A2C08, 0 0 24px rgba(255, 210, 110, 1), 0 0 48px rgba(155, 92, 255, .8); }
+.cb-banner.synergy small { font: 800 .62rem/1 var(--f-ui); letter-spacing: .3em; text-transform: uppercase; color: #C9A0FF; -webkit-text-stroke: 0; text-shadow: 0 1px 0 #000, 0 0 12px rgba(155, 92, 255, .9); }
+.cb-tgt .cmb.sy { background: linear-gradient(90deg, #8A5CFF, #F2C14E); color: #FFF; font-style: normal; font-size: .62rem; letter-spacing: .06em; text-transform: uppercase; padding: 1px 6px; border-radius: 6px; margin-left: 3px; }
+/* Anneau rythmé : le médaillon doré de la créature qui frappe, un fin anneau d'or se referme dessus */
+.ry { background: radial-gradient(circle at 50% 44%, rgba(40, 20, 70, .55), rgba(4, 3, 8, .93) 66%); }
+.ry-c { width: min(56vw, 220px); }
+.ry-in { background: none; mix-blend-mode: normal; opacity: 1; animation: none; overflow: visible; }
+.ry-in::after { display: none; }
+.ry-in img { position: absolute; inset: 19%; width: 62%; height: 62%; border-radius: 50%; object-fit: cover; object-position: 50% 22%; border: 1px solid rgba(0, 0, 0, .8); }
+.ry-in .ry-med { position: absolute; inset: 0; background: url(../assets/ui/medal-ring.webp) center / 100% 100% no-repeat; pointer-events: none; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .8)); }
+.ry-glow { inset: -18%; background: radial-gradient(circle, rgba(155, 92, 255, .35), rgba(242, 193, 78, .12) 40%, transparent 64%); }
+.ry-out { width: 76%; height: 76%; border: 3px solid #F2C14E; box-shadow: 0 0 10px 2px rgba(242, 193, 78, .6), inset 0 0 14px rgba(242, 193, 78, .45), 0 0 30px 8px rgba(155, 92, 255, .25); }
+.ry-out.near { border-color: #FFF1C4; box-shadow: 0 0 22px 5px rgba(255, 236, 190, .95), inset 0 0 18px rgba(255, 240, 200, .7); }
+.ry.perfect .ry-in .ry-med { filter: drop-shadow(0 0 18px rgba(242, 193, 78, 1)) drop-shadow(0 0 40px rgba(255, 240, 200, .8)); transition: filter .12s; }
+.ry.perfect .ry-in img { filter: brightness(1.5) saturate(1.2); transition: filter .12s; }
+.ry.miss .ry-in { filter: grayscale(.8) brightness(.6); transition: filter .2s; }
