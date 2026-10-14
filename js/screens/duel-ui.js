@@ -152,7 +152,11 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (!u || st.turn !== 'ally' || busy) return '';
     const kit = KITS[u.role];
     const list = actionsFor(st, u.uid);
-    return `<div class="cb-head"><b>${esc(cat.get(u.id).name)}</b><span>${esc(kit.name)} · ${u.acts}/2 actions</span><button class="cb-x" data-d="desel" aria-label="Annuler la sélection">${icon('close')}</button></div>
+    const c = cat.get(u.id), left = Math.max(0, 2 - u.acts);
+    return `<div class="cb-head"><span class="cb-por" style="--rc:${RARITY[c.rarity].color}"><img alt="" src="${artUrl(c, { lite: true })}"></span>
+      <span class="cb-who"><b>${esc(c.name)}</b><span class="cb-role">${roleIcon(kit.kw)}${esc(kit.name)}</span></span>
+      <span class="cb-upips" title="${left} action${left > 1 ? 's' : ''} possible${left > 1 ? 's' : ''} pour elle">${[0, 1].map((i) => `<i class="${i < left ? 'on' : ''}"></i>`).join('')}</span>
+      <button class="cb-x" data-d="desel" aria-label="Annuler la sélection">${icon('close')}</button></div>
       <div class="cb-grid ${list.length > 4 ? 'n5' : ''}">${list.map((a) => `<button class="cb-a ${a.ok ? '' : 'off'} ${mode?.key === a.key ? 'on' : ''} ${a.key === kit.skill.key ? 'sig' : ''} ${a.own ? 'own' : ''}" data-a="${a.key}" aria-disabled="${!a.ok}">
         <span class="cb-ai">${a.own ? `<img class="aicon" alt="" src="${moveIconUrl(a.icon)}">` : actIcon(a.key, a.icon)}</span><b>${esc(a.name)}</b>
         <span class="cb-cost">${'<i class="pa"></i>'.repeat(a.ap) || '<i class="free">0</i>'}${a.fervor ? `<i class="fv">${a.fervor}</i>` : ''}${a.dice ? '<i class="d20">D20</i>' : ''}${a.own && a.wait ? `<i class="cdw" title="Se recharge">${a.wait}</i>` : ''}</span></button>`).join('')}</div>`;
@@ -167,7 +171,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       <ul><li>Difficulté (DD) : <b>${r.dc}</b></li>${r.mods.length ? r.mods.map(([n, v]) => `<li class="mod">${esc(n)} <b>+${v}</b></li>`).join('') : '<li class="muted">Aucun bonus : marque, gel, Brisure ou faiblesse aident.</li>'}
       <li class="muted">1 : échec critique · 20 : critique</li></ul></div>
       <p class="small muted">${esc(KITS[u.role].skill.desc)}</p>
-      <div class="row gap"><button class="btn ghost" data-d="cancel">Annuler</button><button class="btn primary cb-roll" data-d="go"><img class="btn-die" alt="" src="assets/fx/d20.webp">Lancer le dé</button></div>
+      <p class="cb-ryhint">${icon('sparkle')} Frappe en rythme : <b>+${RHYTHM.good}</b> au dé, <b>+${RHYTHM.perfect}</b> si parfait</p>
+      <div class="row gap"><button class="btn dc-plq dc-plq-dark" data-d="cancel">Annuler</button><button class="btn primary cb-roll dc-plq dc-plq-red" data-d="go"><img class="btn-die" alt="" src="assets/fx/d20.webp">Frapper</button></div>
     </div>`;
   }
 
