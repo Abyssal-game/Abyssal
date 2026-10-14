@@ -2407,3 +2407,24 @@ body.has-subnav #subnav .sn-tab { background: #16121E; }
 .dc-feat small { font-size: .62rem; color: #CFC4A8; text-align: center; }
 .cb-trico { width: 22px; height: 22px; vertical-align: -6px; margin-right: 2px; }
 .cb-trait { display: flex; align-items: center; gap: 6px; }
+
+/* v258 : ordre des tours (colonne de portraits en haut à gauche), intentions ennemies masquées */
+.cb-tl { position: absolute; z-index: 12; left: max(6px, env(safe-area-inset-left, 0px)); top: 64px; display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
+.cb-tl.shift { animation: tlShift .35s cubic-bezier(.2, .9, .3, 1); }
+@keyframes tlShift { from { transform: translateY(40px); } }
+.cb-tlr { position: relative; display: flex; width: 34px; height: 34px; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 2px #6E5524, 0 2px 6px rgba(0, 0, 0, .8); background: #120E18; opacity: .8; }
+.cb-tlr img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; }
+.cb-tlr.foe { box-shadow: 0 0 0 2px #8E2236, 0 2px 6px rgba(0, 0, 0, .8); }
+.cb-tlr.foe.elite { box-shadow: 0 0 0 2px #C77BFF, 0 2px 6px rgba(0, 0, 0, .8); }
+.cb-tlr.foe.boss { box-shadow: 0 0 0 2px #FF5468, 0 0 10px rgba(255, 60, 90, .7); }
+.cb-tlr.team { width: 34px; border-radius: 17px; }
+.cb-tlr.team img { flex: 1 1 0; min-width: 0; }
+.cb-tlr.now { width: 46px; height: 46px; opacity: 1; box-shadow: 0 0 0 2px #F2C14E, 0 0 14px rgba(242, 193, 78, .75), 0 2px 8px rgba(0, 0, 0, .8); }
+.cb-tlr.team.now { border-radius: 23px; }
+.cb-tlr.foe.now { box-shadow: 0 0 0 2px #FF6B7F, 0 0 14px rgba(255, 70, 100, .8), 0 2px 8px rgba(0, 0, 0, .8); }
+.cb-tlr.now::after { content: ''; position: absolute; right: -9px; top: 50%; width: 0; height: 0; margin-top: -5px; border-left: 6px solid #F2C14E; border-top: 5px solid transparent; border-bottom: 5px solid transparent; }
+.cb-tl { overflow: visible; }
+.dv .dv-row.enemy { padding-left: 46px; }
+.cb-int, .dv-threat, .cb-aim { display: none !important; }
+@media (max-width: 360px) { .cb-tlr { width: 28px; height: 28px; } .cb-tlr.now { width: 38px; height: 38px; } .dv .dv-row.enemy { padding-left: 38px; } }
+@media (prefers-reduced-motion: reduce) { .cb-tl.shift { animation: none; } }
