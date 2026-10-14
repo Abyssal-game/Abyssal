@@ -118,7 +118,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const label = i.kind === 'mimic' ? `Copie : ${esc(i.copyName)}` : i.kind === 'decree' ? esc(LAWS[i.law]?.name || 'Décret') : i.kind === 'shift' ? esc(ASPECTS[i.aspect]?.name || 'Bascule')
       : named ? esc(i.def.name) : i.kind === 'copy' ? `${esc(i.copyName)}${i.dmg ? ` ${i.dmg}` : ''}` : `${i.dmg}${i.aoe ? ' ×3' : ''}`;
     const brk = u.brkMax && !u.broken && i.danger >= 2 ? `<small class="cb-ibrk" title="Brise-le pour annuler cette action">◆ ${u.brk}</small>` : '';
-    return `<span class="cb-int d${i.danger} k-${i.kind}" title="${esc(i.def.name)} : ${esc(i.def.desc)}">${intentIcon(i.kind)}<b>${label}</b>${i.danger >= 2 ? `<em>${DANGER[i.danger]}</em>` : ''}${brk}</span>`;
+    const cd = ['charge', 'channel', 'gather', 'mimic'].includes(i.kind) ? '<em class="cb-icd" title="Frappe au prochain tour">⏳1</em>' : '';
+    return `<span class="cb-int d${i.danger} k-${i.kind}" title="${esc(i.def.name)} : ${esc(i.def.desc)}">${intentIcon(i.kind)}<b>${label}</b>${i.danger >= 2 ? `<em>${DANGER[i.danger]}</em>` : ''}${cd}${brk}</span>`;
   };
   const cardEl = (u) => {
     const c = cat.get(u.id), kit = KITS[u.role];
@@ -225,6 +226,24 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       else say(canMore ? `Touche une créature · <b>${st.ap}</b> action${st.ap > 1 ? 's' : ''} pour l’équipe` : 'Touche <b>Fin du tour</b>');
     } else if (st.turn === 'enemy' && !st.over) say('<b class="dc-bad">Tour des créatures corrompues</b>');
     guideStep();
+    drawAims();
+  }
+  // Tracés rouges : d'un ennemi qui prépare un coup dangereux vers la créature qu'il vise (v253)
+  function drawAims() {
+    root.querySelectorAll('.cb-aim').forEach((x) => x.remove());
+    if (reduced || st.turn !== 'ally' || st.over || busy) return;
+    const box = $('.dv'); if (!box) return;
+    const r0 = box.getBoundingClientRect();
+    for (const e of front(st, 'enemy')) {
+      const i = intentInfo(st, e); if (!i || i.danger < 2 || !i.target) continue;
+      const a = el(e.uid), b = el(i.target); if (!a || !b) continue;
+      const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+      const x1 = ra.left - r0.left + ra.width / 2, y1 = ra.bottom - r0.top - 8, x2 = rb.left - r0.left + rb.width / 2, y2 = rb.top - r0.top + 10;
+      const len = Math.hypot(x2 - x1, y2 - y1), ang = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+      const s = document.createElement('span'); s.className = `cb-aim d${i.danger}`;
+      s.style.cssText = `left:${x1}px;top:${y1}px;width:${len}px;transform:rotate(${ang}deg)`;
+      box.appendChild(s);
+    }
   }
 
   // ——— Effets ———

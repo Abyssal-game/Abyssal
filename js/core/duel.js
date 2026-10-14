@@ -136,7 +136,7 @@ export function upgradeDuel(st) {
   st.seed = Math.floor(Math.random() * 2 ** 31);
   st.stats = { parries: 0, dodges: 0, breaks: 0, crits: 0, fumbles: 0 };
   for (const u of Object.values(st.units)) {
-    Object.assign(u, { acts: 0, frostCD: u.frostCD || 0, mark: 0, markBy: null, breach: null, open: null, broken: false, charged: null, exposed: false, intent: null });
+    Object.assign(u, { acts: 0, frostCD: u.frostCD || 0, mark: 0, markBy: null, breach: null, open: null, broken: false, charged: null, exposed: false, intent: null, faimUsed: false, tenSaved: false, elanUsed: false });
     u.role = u.role || 'degats';
     if (u.side === 'enemy') { u.fam = u.boss ? 'gardien' : FAM_BY_ROLE[u.role] || 'predateur'; u.brkMax = u.boss ? 10 : u.elite ? 6 : 0; u.brk = u.brkMax; }
   }
@@ -250,6 +250,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
     u.ckSaved = true; d = u.hp - 1; if (boosted(u, 'inebranlable')) u.shield = 1;
     pfx(ev, u, 'inebranlable'); ev.push({ t: 'status', u: u.uid, s: 'Inébranlable !', syn: true, k: 'guard' });
   }
+  if (u.side === 'ally' && d >= u.hp && d > 0 && u.hp > 1 && u.talent === 'tenacite' && !u.tenSaved) { u.tenSaved = true; d = u.hp - 1; ev.push({ t: 'status', u: u.uid, s: 'Ténacité !', syn: true, k: 'guard' }); }
   if (u.side === 'ally' && d >= u.hp && st.sursis) { st.sursis = false; d = u.hp - 1; u.shield = 1; ev.push({ t: 'status', u: u.uid, s: 'Sursis !', syn: true }); }
   u.hp -= d;
   if (d > 0) ev.push({ t: 'dmg', u: u.uid, d, hp: u.hp, src });
@@ -300,7 +301,11 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
     if (u.side === 'enemy') st.kills.push(u.id);
     // Coup de grâce : achever un ennemi donne 1 Ferveur
     if (u.side === 'enemy' && a && a.side === 'ally') { (st.finishedBy ||= {})[a.id] = (st.finishedBy[a.id] || 0) + 1; if (u.boss) (st.bossBy ||= {})[a.id] = 1; }
-    if (u.side === 'enemy' && a && a.side === 'ally') { st.stats.finishers = (st.stats.finishers || 0) + 1; ev.push({ t: 'finisher', u: u.uid, a: a.uid }); gainFervor(st, 1, ev, 'Coup de grâce'); }
+    if (u.side === 'enemy' && a && a.side === 'ally') {
+      st.stats.finishers = (st.stats.finishers || 0) + 1; ev.push({ t: 'finisher', u: u.uid, a: a.uid }); gainFervor(st, 1, ev, 'Coup de grâce');
+      if (a.talent === 'faim' && !a.faimUsed) { a.faimUsed = true; gainFervor(st, 1, ev, 'Faim abyssale'); }
+      if (a.talent === 'elan' && !a.elanUsed && st.turn === 'ally') { a.elanUsed = true; st.ap += 1; ev.push({ t: 'status', u: a.uid, s: 'Élan : +1 action', syn: true }); }
+    }
     if (u.side === 'ally') (st.fallenLog ||= []).push({ u: u.uid, by: a?.uid || null, round: st.round, kind: st.curKind || null });
     if (u.side === 'ally') alive(st, 'ally').filter((x) => x.form === 'vengeance').forEach((x) => { x.atk += 2; ev.push({ t: 'status', u: x.uid, s: 'Vengeance : +2 ATQ', syn: true }); });
     if (u.side === 'enemy') onEnemyDeath(st, u, a, ev);
@@ -356,8 +361,9 @@ function addPoison(st, t, n, ev, src) {
   ev.push({ t: 'status', u: t.uid, s: combo ? `Givre-venin : +${k}` : `Poison +${k}`, syn: combo, k: 'poison', ...(combo ? { combo: 'glace', by: t.frozenBy, a: src.uid } : {}) });
 }
 // Brèche et Exposé (v250) : états posés par une créature, exploités par une autre, valables jusqu'à la fin du tour suivant
-function setBreach(st, t, by, ev) { if (!t || t.hp <= 0 || t.side !== 'enemy' || t.breach) return; t.breach = { by, until: st.round + 1 }; ev.push({ t: 'status', u: t.uid, s: 'Brèche', k: 'breach' }); }
-function openUp(st, t, by, ev) { if (!t || t.hp <= 0 || t.side !== 'enemy' || t.open) return; t.open = { by, until: st.round + 1 }; ev.push({ t: 'status', u: t.uid, s: 'Exposé', k: 'open' }); }
+const linger = (st, by) => (st.units[by]?.talent === 'remanence' ? 1 : 0); // Rémanence : les états posés durent 1 tour de plus
+function setBreach(st, t, by, ev) { if (!t || t.hp <= 0 || t.side !== 'enemy' || t.breach) return; t.breach = { by, until: st.round + 1 + linger(st, by) }; ev.push({ t: 'status', u: t.uid, s: 'Brèche', k: 'breach' }); }
+function openUp(st, t, by, ev) { if (!t || t.hp <= 0 || t.side !== 'enemy' || t.open) return; t.open = { by, until: st.round + 1 + linger(st, by) }; ev.push({ t: 'status', u: t.uid, s: 'Exposé', k: 'open' }); }
 function freeze(st, t, ev, turns = 1) {
   t.frozen = turns;
   if (t.boss || t.elite) t.frostCD = 2;
@@ -386,6 +392,7 @@ export function breakHit(st, t, n, ev, src = null) {
   if (t.intent) t.intent = { ...t.intent, cancelled: true };
   st.stats.breaks++;
   ev.push({ t: 'broken', u: t.uid });
+  if (!st.rempartUsed && front(st, 'ally').some((x) => x.talent === 'rempart')) { st.rempartUsed = true; front(st, 'ally').forEach((x) => { x.shield = 1; ev.push({ t: 'status', u: x.uid, s: 'Dernier rempart', k: 'guard', syn: true }); }); }
   gainFervor(st, 2, ev, 'Brisure');
 }
 function discover(st, t, ev) {
@@ -420,7 +427,7 @@ export function actionsFor(st, uid) {
   const kit = KITS[u.role];
   const base = (key, def) => {
     const ap = key === 'swap' && st.freeSwap ? 0 : def.ap;
-    const fervor = def.fervor + (st.law === 'silence' && !['attack', 'defend', 'swap'].includes(key) ? 1 : 0);
+    const fervor = Math.max(0, def.fervor - (u.talent === 'ardente' && def.fervor > 0 && key === KITS[u.role].skill.key ? 1 : 0)) + (st.law === 'silence' && !['attack', 'defend', 'swap'].includes(key) ? 1 : 0);
     let why = '';
     if (st.turn !== 'ally' || st.over) why = 'Ce n’est pas ton tour.';
     else if (!inFront(st, u)) why = 'Elle n’est pas au combat.';
@@ -547,7 +554,7 @@ export function act(st, uid, key, tUid = null) {
     heal(t, t.maxHp * 0.4, ev, u);
     if (t.guardBy && !t.shield) { t.shield = 1; st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: tUid, s: 'Bastion !', syn: true, combo: 'bastion', k: 'guard', by: t.guardBy, a: uid }); }
     if (t.poison || t.frozen || t.stunned) { t.poison = 0; t.frozen = 0; t.stunned = false; ev.push({ t: 'status', u: tUid, s: 'Purifiée', k: 'heal' }); }
-  } else if (key === 'marque') { t.mark = 2; t.markBy = uid; discover(st, t, ev); ev.push({ t: 'status', u: tUid, s: 'Marquée', k: 'mark' }); }
+  } else if (key === 'marque') { t.mark = 2 + linger(st, uid); t.markBy = uid; discover(st, t, ev); ev.push({ t: 'status', u: tUid, s: 'Marquée', k: 'mark' }); }
   else if (key === 'raz') {
     ev.push({ t: 'aoe', u: uid, side: 'ally' });
     front(st, 'enemy').forEach((x) => { const b = brkOf(st, u, x, 'raz'); const d = hurt(st, x, dmgOf(st, u, x, 0.7), ev, uid); if (d) breakHit(st, x, b, ev, u); if (d) setBreach(st, x, uid, ev); });
@@ -630,10 +637,11 @@ function basicAttack(st, u, t, ev) {
   const marked = !!(t.mark || t.broken), poisoned = t.poison > 0, extraBrk = (S.brk || 0) + (S.brkCharging && charging(t) ? S.brkCharging : 0);
   let d = 0, landed = 0;
   for (let h = 0; h < hits && t.hp > 0; h++) {
-    const x = hurt(st, t, dmgOf(st, u, t, m, { basic: true }), ev, u.uid, { pierce: u.role === 'poison' || !!S.pierce });
+    const x = hurt(st, t, dmgOf(st, u, t, m, { basic: true }), ev, u.uid, { pierce: u.role === 'poison' || !!S.pierce || u.talent === 'perce' });
     d += x; if (x) landed++;
   }
   if (d && t.hp > 0 && u.role === 'protecteur') setBreach(st, t, u.uid, ev);
+  if (d && t.hp > 0 && u.talent === 'vigilance' && (t.charged || charging(t))) { interruptBoss(st, t); t.charged = null; if (t.intent) t.intent = { ...t.intent, cancelled: true }; ev.push({ t: 'status', u: t.uid, s: 'Vigilance : charge interrompue', syn: true }); }
   if (opened && d) { st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: t.uid, s: 'Exposé exploité !', syn: true, combo: 'expose', by: opened.by, a: u.uid }); gainFervor(st, 1, ev, 'Exposé'); }
   if (d && t.hp > 0) {
     if (u.role === 'poison') addPoison(st, t, 2 + (S.poisonMore && poisoned ? S.poisonMore : 0), ev, u);
@@ -724,7 +732,7 @@ function startAllyTurn(st, ev) {
   const R_ = st.relics || [];
   st.ap = AP_MAX + (st.law === 'hate' ? 1 : 0) + (st.round === 1 ? (R_.includes('sablier') ? 1 : 0) - (R_.includes('miroir') ? 1 : 0) : 0);
   st.swapped = false; st.ombreUsed = false; st.hitBy = {}; st.curKind = null;
-  for (const u of alive(st, 'ally')) { u.acts = 0; u.boost = 0; u.defend = false; u.guardBy = null; u.rempart = null; u.exposed = false; u.stunned = false; u.attised = false; u.chB = 0; }
+  for (const u of alive(st, 'ally')) { u.acts = 0; u.boost = 0; u.defend = false; u.guardBy = null; u.rempart = null; u.exposed = false; u.stunned = false; u.attised = false; u.chB = 0; u.elanUsed = false; }
   for (const u of front(st, 'ally')) {
     if (u.frozen) { u.frozen = 0; u.stunned = true; ev.push({ t: 'status', u: u.uid, s: 'Gelée : passe son tour', k: 'frost' }); }
     tickPoison(st, u, ev);

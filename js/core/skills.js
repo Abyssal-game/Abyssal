@@ -174,11 +174,21 @@ export const COMBAT_BLESSINGS = {
 };
 
 // ——— Talents d'expédition (récompense des élites) : un par créature, pour l'expédition en cours ———
+// v253 : chaque talent change une règle du combat (plus de simples bonus de chiffres). Instinct et Carapace
+// restent reconnus pour les expéditions en cours, mais ne sont plus proposés (legacy).
 export const TALENTS = {
-  vif:     { name: 'Instinct', desc: '+2 en attaque.' },
-  robuste: { name: 'Carapace', desc: '+25 % de PV maximum (et autant de soin).' },
-  brise:   { name: 'Brise-garde', desc: 'Ses attaques font +1 Brisure.' },
-  sangsue: { name: 'Sangsue', desc: 'Récupère 30 % des dégâts qu’elle inflige.' },
-  epines:  { name: 'Épines', desc: 'Renvoie 2 dégâts à chaque ennemi qui la blesse.' },
-  garde:   { name: 'Sceau de garde', desc: 'Commence chaque combat avec un bouclier.' },
+  brise:     { name: 'Brise-garde', desc: 'Ses attaques font +1 Brisure.' },
+  garde:     { name: 'Sceau de garde', desc: 'Commence chaque combat avec un bouclier.' },
+  sangsue:   { name: 'Sangsue', desc: 'Récupère 30 % des dégâts qu’elle inflige.' },
+  epines:    { name: 'Épines', desc: 'Renvoie 2 dégâts à chaque ennemi qui la blesse.' },
+  faim:      { name: 'Faim abyssale', desc: 'Quand elle achève un ennemi : +1 Ferveur de plus (une fois par combat).' },
+  elan:      { name: 'Élan', desc: 'Quand elle achève un ennemi, l’équipe récupère 1 action (une fois par tour).' },
+  remanence: { name: 'Rémanence', desc: 'La Marque, la Brèche et l’Exposé qu’elle pose durent 1 tour de plus.' },
+  rempart:   { name: 'Dernier rempart', desc: 'La première Brisure de chaque combat donne un bouclier à toute ton équipe au combat.' },
+  vigilance: { name: 'Vigilance', desc: 'Ses attaques interrompent un ennemi qui se charge ou se concentre.' },
+  ardente:   { name: 'Ferveur ardente', desc: 'Sa compétence signature coûte 1 Ferveur de moins.' },
+  tenacite:  { name: 'Ténacité', desc: 'La première fois qu’elle devrait tomber dans un combat, elle tient à 1 PV.' },
+  perce:     { name: 'Perce-armure', desc: 'Ses attaques ignorent les boucliers.' },
+  vif:       { name: 'Instinct', desc: '+2 en attaque.', legacy: true },
+  robuste:   { name: 'Carapace', desc: '+25 % de PV maximum (et autant de soin).', legacy: true },
 };

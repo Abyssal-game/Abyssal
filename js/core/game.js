@@ -810,7 +810,7 @@ export class Game {
   talentOffers(run) {
     const r = rngOf(`talent:${run.day}:${run.floor}`);
     const team = run.team.filter((m) => !m.fallen && !m.talent).map((m) => m.id);
-    const tal = Object.keys(TALENTS).sort(() => r() - 0.5);
+    const tal = Object.keys(TALENTS).filter((k) => !TALENTS[k].legacy).sort(() => r() - 0.5);
     const out = [];
     for (let i = 0; i < 3 && team.length; i++) out.push({ id: team[Math.floor(r() * team.length)], talent: tal[i] });
     return out;
