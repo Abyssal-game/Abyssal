@@ -2,7 +2,7 @@
 import { loadCatalogData, createCatalog } from './core/catalog.js';
 import { Game } from './core/game.js';
 import { loadArtManifest, artUrl, hasRealArt } from './art/assets.js';
-import { setCardCatalog, setFameLookup, setApexLookup } from './ui/card.js';
+import { setCardCatalog, setFameLookup, setApexLookup, setFavLookup } from './ui/card.js';
 import { MAX_LEVEL } from './core/army.js';
 import { fameTier } from './core/renown.js';
 import { icon, EMBLEM } from './ui/icons.js';
@@ -161,6 +161,7 @@ function renderChrome() {
 }
 
 let lastShards = null;
+let lastTabIdx = -1;
 function pulseWallet() {
   const s = app.game.s;
   if (lastShards !== null && s.shards !== lastShards) document.querySelector('.pill.shards')?.classList.add('bump');
@@ -197,7 +198,13 @@ function render() {
   const view = old.cloneNode(false);
   old.replaceWith(view);
   view.classList.remove('view-in');
-  if (!same) view.classList.add('view-in');
+  if (!same) {
+    // changement d'onglet : la page glisse du côté de l'onglet choisi
+    const ti = TABS.findIndex(([k]) => k === (TAB_OF[app.route] || 'antre')), dir = lastTabIdx < 0 || ti === lastTabIdx ? 0 : ti > lastTabIdx ? 1 : -1;
+    lastTabIdx = ti;
+    view.style.setProperty('--vdx', `${dir * 26}px`);
+    view.classList.add('view-in');
+  }
   view.innerHTML = '';
   app.cleanup = screen(app, view, app.params) || null;
   window.scrollTo(0, keepY);
@@ -276,6 +283,7 @@ async function boot() {
     app.catalog = catalog;
     app.game = new Game(catalog, storage);
     app.persistent = persistent;
+    setFavLookup((id) => app.game.isFav(id));
     setApexLookup((id) => !!app.game.s.collection[id] && app.game.cardLevel(id) >= MAX_LEVEL);
     setFameLookup((id) => (app.game.s.collection[id] ? fameTier(app.game.s.fame[id]) : 0));
     app.game.on('change', () => { renderChrome(); pulseWallet(); });

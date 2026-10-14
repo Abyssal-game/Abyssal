@@ -29,6 +29,13 @@ function fameHTML(pts) {
     ${nx ? `<span class="progress"><i style="width:${((pts - prev) / (nx.n - prev)) * 100}%"></i></span>` : ''}</span></div>`;
 }
 
+// Défis de la créature : trois objectifs, chacun récompensé en cendres et en Renommée
+function challengesHTML(g, id) {
+  return `<div class="panel dt-ch"><b class="dt-ch-h">${icon('star')} Ses défis</b>${g.challenges(id).map((x) => `<div class="dt-ch-r ${x.claimed ? 'done' : x.ok ? 'ok' : ''}">
+    <span class="dt-ch-t"><b>${esc(x.name)}</b><span class="small muted">${esc(x.desc)} · ${x.v} / ${x.n}</span>${x.claimed ? '' : `<span class="progress"><i style="width:${(x.v / x.n) * 100}%"></i></span>`}</span>
+    ${x.claimed ? `<span class="small dc-good">${icon('check')} Fait</span>` : x.ok ? `<button class="btn small gold" data-act="chal" data-k="${x.key}">+${x.ash} ${icon('ash')}</button>` : `<span class="small muted">${icon('ash')} ${x.ash}</span>`}</div>`).join('')}</div>`;
+}
+
 export function openCardDetail(app, id, { list = null, variant = null } = {}) {
   const g = app.game, cat = app.catalog;
   let current = id;
@@ -109,10 +116,12 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
           <span class="dt-chip gold">Niv. ${li.level}${li.level >= li.max ? ' · Apogée' : ''}</span>
         </div>
         ${fameHTML(g.fameOf(current))}
+        ${challengesHTML(g, current)}
         <button class="btn ${inTeam ? 'ghost' : 'primary'} block dt-team" data-act="team">${picon('team')}${inTeam ? 'Dans ton équipe · retirer' : 'Ajouter à mon équipe'}</button>
         <div class="dt-acts">
           <button class="dt-act ${isAvatar ? 'on' : ''}" data-act="avatar">${picon('avatar')}<span>${isAvatar ? 'Mon avatar' : 'Avatar'}</span></button>
           <button class="dt-act ${inShow ? 'on' : ''}" data-act="showcase">${picon('showcase')}<span>${inShow ? 'En vitrine' : 'Vitrine'}</span></button>
+          <button class="dt-act ${g.isFav(current) ? 'on' : ''}" data-act="fav">${icon('star')}<span>${g.isFav(current) ? 'Favori' : 'Favori'}</span></button>
           <button class="dt-act" data-act="artonly">${picon('illus')}<span>Illustration</span></button>
           <button class="dt-act" data-act="burn">${picon('furnace')}<span>Brûler</span></button>
         </div>
@@ -149,6 +158,8 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     avatar() { g.setAvatar(current); toast('Avatar mis à jour.', { icon: 'user' }); draw(); },
     showcase() { g.toggleShowcase(current); draw(); },
     team() { if (toggleTeam(app, current)) draw(); },
+    fav() { const on = g.toggleFav(current); app.sfx?.tap?.(); toast(on ? 'Ajoutée à tes favoris : elle ne pourra pas être brûlée par erreur.' : 'Retirée de tes favoris.', { icon: 'star' }); draw(); },
+    chal(el) { try { const x = g.claimChallenge(current, el.dataset.k); app.sfx?.levelup?.(); toast(`Défi « ${esc(x.name)} » réussi : <b>+${x.ash} cendres</b> et +${x.fame} Renommée`, { kind: 'success', icon: 'ash' }); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     burn() { openBurn(app, current, { onClose: () => { shownVariant = null; draw(); } }); },
     lvup() { if (upgradeCard(app, current)) draw(); },
     tab(el) { dtab = el.dataset.v; draw(); },

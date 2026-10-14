@@ -2,11 +2,17 @@
 // et est enregistrée immédiatement : une carte affichée est une carte sauvegardée.
 import { suggestTeam, teamSynergies } from './synergy.js';
 import { fameTier, FAME_TIERS, SEASON_STEPS, seasonId } from './renown.js';
+export const CHALLENGES = [
+  { key: 'w', stat: 'w', n: 10, ash: 25, fame: 3, name: 'Compagnon d’armes', desc: 'Gagne 10 combats avec elle, en restant debout' },
+  { key: 'k', stat: 'k', n: 25, ash: 40, fame: 5, name: 'Faucheuse', desc: 'Achève 25 ennemis avec elle' },
+  { key: 'b', stat: 'b', n: 1, ash: 60, fame: 8, name: 'Tueuse de gardien', desc: 'Porte le coup fatal à un gardien' },
+];
+export const WEEK_DAYS = 5; // jours joués dans la semaine pour le coffre de la semaine
 export const FIRST_WIN = 150; // éclats de la toute première victoire
 import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, LUCK_POINTS, ITEMS, SHOW_ORDER, SHADOW } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
-import { rngOf, DESCENT, CHESTS, floorDoors, floorEnemies, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES } from './descent.js';
+import { rngOf, DESCENT, CHESTS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState } from './duel.js';
 import { bossOf, BOSSES } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
@@ -61,6 +67,7 @@ export class Game {
   emit(evt, payload) { (this.listeners[evt] || []).forEach((f) => f(payload)); }
 
   persist() {
+    this.markPlayed();
     try {
       writeSave(this.storage, this.s);
       this.emit('change', this.s);
@@ -234,6 +241,19 @@ export class Game {
     this.persist();
   }
 
+  // Coffre de la semaine : jouer 5 jours différents dans la semaine (lundi → dimanche) ouvre un coffre d'or
+  markPlayed() {
+    const w = weekIndex(this.clock()), d = today(this.clock());
+    if (!this.s.week || this.s.week.w !== w) this.s.week = { w, days: [], claimed: false };
+    if (!this.s.week.days.includes(d)) this.s.week.days.push(d);
+  }
+  weekChest() { this.markPlayed(); const k = this.s.week; return { days: k.days.length, need: WEEK_DAYS, ready: k.days.length >= WEEK_DAYS && !k.claimed, claimed: k.claimed }; }
+  claimWeekChest() {
+    const wc = this.weekChest();
+    if (!wc.ready) throw new Error(wc.claimed ? 'Le coffre de la semaine est déjà ouvert.' : `Joue ${WEEK_DAYS} jours cette semaine pour l’ouvrir.`);
+    this.s.week.claimed = true; this.addChests({ or: 1 }); this.persist();
+    return 'or';
+  }
   claimDaily() {
     if (!this.canDailyClaim()) throw new Error('L’offrande du jour a déjà été récupérée.');
     const { streak, amount } = this.dailyAmount();
@@ -373,6 +393,7 @@ export class Game {
     if (!e || !((e.v[variant] || 0) >= n) || n < 1) throw new Error('Tu ne possèdes pas assez d’exemplaires de cette version.');
     const last = e.n - n <= 0;
     if (last) {
+      if (this.isFav(id)) throw new Error('Cette créature est dans tes favoris : retire-la des favoris pour pouvoir la brûler.');
       if (this.uniqueCount() <= TEAM.active) throw new Error(`Garde au moins ${TEAM.active} créatures pour pouvoir combattre.`);
       if (this.s.descent.run?.team?.some((m) => m.id === id)) throw new Error('Cette créature est en pleine expédition.');
     }
@@ -804,7 +825,7 @@ export class Game {
       const sc = enemyScale(run.floor);
       const lvl = enemyLevel(run.floor, room);
       const wk = this.weekly();
-      const list = floorEnemies(this.catalog, run.day, run.floor, room);
+      const list = eventSwap(this.catalog, floorEnemies(this.catalog, run.day, run.floor, room), run.day, run.floor, this.event().factions);
       const hunt = room === 'elite' && run.floor >= WEEKLY_FLOOR && !wk.done;
       if (hunt) list.forEach((e) => { if (e.elite) e.id = wk.id; });
       const enemies = list.map((e) => duelUnit(this.catalog.get(e.id), { side: 'enemy', scale: sc, level: e.boss || e.elite ? lvl : enemyLevel(run.floor, 'fight'), boss: e.boss, elite: e.elite }));
@@ -818,6 +839,9 @@ export class Game {
         // Gardien éveillé (Cauchemar, ou à partir de l'étage 30) : sa phase 2 commence dès le premier tour
         if (e.boss && (run.nightmare || run.floor >= AWAKEN_AT)) e.awakened = true;
       }
+      // un ennemi nommé : plus coriace, il rapporte un butin en plus
+      const nm = namedFoe(run.day, run.floor, room), nf = nm && enemies.find((e) => !e.boss && !e.weekly);
+      if (nf) { nf.title = nm; nf.named = true; nf.maxHp = Math.round(nf.maxHp * 1.3); nf.hp = nf.maxHp; nf.atk = Math.round(nf.atk * 1.15 + 0.4); }
       const known = {};
       enemies.forEach((e) => { if (this.knows(e.id)) known[e.id] = true; });
       run.battle = createDuel(this.runUnits(), enemies, { fervor: run.gauge || 0, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, boss: room === 'boss' ? bossOf(run.floor) : null, pact: room === 'fight' ? null : run.pact || null, blessings: run.blessings, discovered: this.s.weakSeen || {}, seed: this.rng ? Math.floor(this.rng() * 2 ** 31) : null, goal: this.goalFor(run, room) });
@@ -938,6 +962,8 @@ export class Game {
     if (won) {
       const hunt = room === 'elite' && this.rule(run.day).key === 'chasse';
       out.shards = this.gainShards((8 + 3 * run.floor) * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1) * (hunt ? 2 : 1));
+      const named = Object.values(st.units).find((u) => u.side === 'enemy' && u.named);
+      if (named) out.named = { title: named.title, id: named.id, shards: this.gainShards(20 + run.floor * 4) };
       // objectif réussi : éclats en plus et 1 Ferveur pour la suite
       if (goal?.state === 'done') { out.goalShards = this.gainShards((3 + run.floor) * (room === 'boss' ? 2 : 1)); run.gauge = Math.min(FERVOR_CARRY, run.gauge + 1); this.s.stats.goals = (this.s.stats.goals || 0) + 1; }
       if (room === 'elite') { const t = this.talentOffers(run); if (t.length) { run.talentOffer = t; out.talents = t; } }
@@ -948,6 +974,11 @@ export class Game {
       }
       // toute première victoire : un vrai cadeau (une seule fois)
       if (!this.s.stats.firstWin) { this.s.stats.firstWin = Date.now(); this.s.shards += FIRST_WIN; out.firstWin = FIRST_WIN; }
+      // défis de créature : combats gagnés, ennemis achevés, gardiens achevés
+      const cs = (this.s.cstats ||= {});
+      run.team.filter((m) => !m.fallen).forEach((m) => { (cs[m.id] ||= {}).w = (cs[m.id].w || 0) + 1; });
+      for (const [id, n] of Object.entries(st.finishedBy || {})) (cs[id] ||= {}).k = (cs[id].k || 0) + n;
+      for (const id of Object.keys(st.bossBy || {})) (cs[id] ||= {}).b = (cs[id].b || 0) + 1;
       out.fame = this.gainFame(run.team.filter((m) => !m.fallen).map((m) => m.id), room === 'boss' || room === 'elite' ? 2 : 1);
       run.phase = 'reward';
       run.rewards = floorRewards(run.day, run.floor, room, run.blessings);
@@ -1000,6 +1031,22 @@ export class Game {
     }
     if (ups.length) this.emit('progress', ups);
     return ups;
+  }
+  // Favoris : une étoile sur la carte, et sa dernière copie ne peut pas être brûlée
+  isFav(id) { return !!this.s.favs?.[id]; }
+  toggleFav(id) { const f = (this.s.favs ||= {}); if (f[id]) delete f[id]; else f[id] = Date.now(); this.persist(); return !!f[id]; }
+  // Défis de créature : trois par créature, récompensés en cendres une fois chacun
+  challenges(id) {
+    const c = this.s.cstats?.[id] || {}, done = this.s.cdone?.[id] || {};
+    return CHALLENGES.map((x) => ({ ...x, v: Math.min(c[x.stat] || 0, x.n), ok: (c[x.stat] || 0) >= x.n, claimed: !!done[x.key] }));
+  }
+  claimChallenge(id, key) {
+    const x = this.challenges(id).find((y) => y.key === key);
+    if (!x || !x.ok || x.claimed) throw new Error('Défi pas encore réussi.');
+    ((this.s.cdone ||= {})[id] ||= {})[key] = Date.now();
+    this.s.ash += x.ash; this.s.fame[id] = (this.s.fame[id] || 0) + x.fame;
+    this.persist();
+    return x;
   }
   fameOf(id) { return this.s.fame?.[id] || 0; }
   // Saison du mois : remise à zéro au changement de mois, paliers de profondeur récompensés une fois

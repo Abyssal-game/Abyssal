@@ -104,3 +104,38 @@ test('première victoire : un cadeau une seule fois ; record d’étage signalé
   g.startRun(); g.endRun(false);
   assert.ok(!g.s.descent.last.record, 'expédition plus courte : pas de record');
 });
+
+test('coffre de la semaine, favoris et défis de créature', async () => {
+  const { WEEK_DAYS } = await import('../js/core/game.js');
+  const g = newGame('week');
+  const wc = g.weekChest();
+  assert.equal(wc.days, 1); assert.ok(!wc.ready);
+  assert.throws(() => g.claimWeekChest());
+  g.s.week.days = ['a', 'b', 'c', 'd', 'e'].slice(0, WEEK_DAYS);
+  const or = g.s.chests.or || 0;
+  g.claimWeekChest();
+  assert.equal(g.s.chests.or, or + 1); assert.throws(() => g.claimWeekChest(), /déjà/);
+  // favoris : la dernière copie ne se brûle pas
+  g.team(); const ids = Object.keys(g.s.collection); const id = ids[0];
+  g.toggleFav(id); assert.ok(g.isFav(id));
+  assert.throws(() => g.burn(id, Object.keys(g.s.collection[id].v)[0], g.s.collection[id].n), /favoris/);
+  g.toggleFav(id); assert.ok(!g.isFav(id));
+  // défis
+  g.s.cstats[id] = { w: 10 };
+  const ash = g.s.ash;
+  g.claimChallenge(id, 'w');
+  assert.equal(g.s.ash, ash + 25);
+  assert.throws(() => g.claimChallenge(id, 'w'));
+  assert.throws(() => g.claimChallenge(id, 'k'));
+});
+
+test('Descente : ennemis nommés de temps en temps, créatures de l’événement plus fréquentes', async () => {
+  const { namedFoe, eventSwap, floorEnemies } = await import('../js/core/descent.js');
+  let named = 0;
+  for (let f = 2; f < 202; f++) if (namedFoe('2026-10-14', f, 'fight')) named++;
+  assert.ok(named > 10 && named < 60, `${named} ennemis nommés sur 200 étages`);
+  assert.equal(namedFoe('2026-10-14', 5, 'boss'), null);
+  let evc = 0, tot = 0;
+  for (let f = 1; f < 60; f++) { const l = eventSwap(catalog, floorEnemies(catalog, 'd', f, 'fight'), 'd', f, ['infernal', 'necrotique']); l.forEach((e) => { tot++; if (['infernal', 'necrotique'].includes(catalog.get(e.id).faction)) evc++; }); }
+  assert.ok(evc / tot > 0.4, `part de l’événement : ${(evc / tot).toFixed(2)}`);
+});

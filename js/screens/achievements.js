@@ -1,7 +1,8 @@
 // Succès et ensembles thématiques.
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { icon, setIcon } from '../ui/icons.js';
-import { esc, bindActions } from '../ui/dom.js';
+import { esc, bindActions, fmt, toast, confirmBox } from '../ui/dom.js';
+import { ECONOMY } from '../config.js';
 
 export default function achievements(app, root, params) {
   const g = app.game, cat = app.catalog;
@@ -39,6 +40,7 @@ export default function achievements(app, root, params) {
         <p class="small muted">${esc(s.desc)}</p>
         <span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span>
         <p class="small">${icon('star')} Récompense : ${app.rewardText(s.reward)}${p.done ? ' · <span class="ok">obtenue</span>' : ''}</p>
+        ${(() => { if (p.done) return ''; const miss = s.cards.filter((id) => !g.owns(id)).map((id) => cat.get(id)).filter((c) => ECONOMY.craftAsh[c.rarity] !== undefined).sort((a, b) => ECONOMY.craftAsh[a.rarity] - ECONOMY.craftAsh[b.rarity]); if (!miss.length || miss.length > 3) return ''; const c = miss[0], cost = ECONOMY.craftAsh[c.rarity]; return `<button class="btn small ${g.s.ash >= cost ? 'gold' : 'ghost'} set-craft" data-act="setcraft" data-id="${c.id}">${icon('ash')}Plus que ${miss.length} : invoquer ${g.nameKnown(c.id) ? esc(c.name) : 'la moins chère'} · ${fmt(cost)} cendres</button>`; })()}
         <div class="strip" data-set="${s.key}">${s.cards.map((id) => { const c = cat.get(id); return g.owns(id) ? cardHTML(c, { lazy: true }) : cardHTML(c, { lazy: true, mystery: true, nameKnown: g.nameKnown(id) }); }).join('')}</div>
       </article>`;
     }).join('');
@@ -52,7 +54,15 @@ export default function achievements(app, root, params) {
       <div class="stack">${st.tab === 'succes' ? succes() : ensembles()}</div>`;
     lazyArt(root);
   }
-  bindActions(root, { tab(el) { st.tab = el.dataset.v; render(); } });
+  bindActions(root, {
+    tab(el) { st.tab = el.dataset.v; render(); },
+    async setcraft(el) {
+      const c = cat.get(el.dataset.id), cost = ECONOMY.craftAsh[c.rarity];
+      if (!(await confirmBox(`Invoquer <b>${esc(g.nameKnown(c.id) ? c.name : 'cette créature')}</b> pour <b>${fmt(cost)} cendres</b> ?`, { ok: 'Invoquer' }))) return;
+      try { g.craft(c.id); app.sfx?.summon?.(); toast(`<b>${esc(c.name)}</b> rejoint ta collection !`, { kind: 'success', icon: 'star' }); app.flushProgress?.(); render(); }
+      catch (e) { toast(esc(e.message), { kind: 'error' }); }
+    },
+  });
   root.addEventListener('click', (e) => {
     const t = e.target.closest('.strip .tcg');
     if (t) { const set = cat.set[t.closest('.strip').dataset.set]; app.openCard(t.dataset.id, { list: set.cards }); }

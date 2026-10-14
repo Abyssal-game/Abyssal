@@ -1346,3 +1346,20 @@ button.avatar-big { position: relative; padding: 0; cursor: pointer; font: inher
 .av-custom { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px 5px 7px; border-radius: 99px; border: 1px solid rgba(232, 195, 90, .55); background: linear-gradient(rgba(60, 44, 12, .85), rgba(20, 14, 6, .9)); color: #F2D27A; font: 700 .7rem/1 var(--f-ui); letter-spacing: .02em; box-shadow: 0 2px 8px rgba(0, 0, 0, .5); cursor: pointer; }
 .av-custom-ic, .av-custom .ic { width: 18px; height: 18px; object-fit: contain; flex: none; }
 .av-custom-ic { width: 26px !important; height: 26px !important; margin: -4px 0; }
+/* événement de la semaine sur l'Accueil (v227) */
+.hw-event { display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin-bottom: 12px; color: var(--ink); text-decoration: none; border-color: color-mix(in srgb, var(--e1) 55%, transparent); background: linear-gradient(110deg, color-mix(in srgb, var(--e1) 22%, rgba(12, 10, 20, .94)), rgba(12, 10, 20, .94) 55%, color-mix(in srgb, var(--e2) 22%, rgba(12, 10, 20, .94))); }
+.hw-event > span:nth-child(2) { display: grid; gap: 3px; flex: 1; min-width: 0; }
+.hw-ev-sig { display: flex; flex: none; }
+.hw-ev-sig .sigil { width: 30px; height: 30px; }
+.hw-ev-sig .sigil + .sigil { margin-left: -8px; }
+.td-row.wait .progress { margin-top: 4px; }
+/* Classeur façon livre (v227) */
+.album-page { background: radial-gradient(120% 90% at 0% 50%, rgba(0, 0, 0, .35), transparent 22%), linear-gradient(160deg, #2a2016, #1a140e 60%, #120d09) !important; border: 1px solid rgba(200, 164, 93, .4) !important; box-shadow: inset 6px 0 14px rgba(0, 0, 0, .55), inset 0 0 0 4px rgba(90, 60, 30, .35), 0 8px 20px rgba(0, 0, 0, .6) !important; }
+.album-page .slot-empty { background: repeating-linear-gradient(135deg, rgba(200, 164, 93, .05) 0 6px, transparent 6px 12px), rgba(0, 0, 0, .25); border: 1px dashed rgba(200, 164, 93, .35); }
+.album-page.turn { animation: pageTurn .45s cubic-bezier(.2, .8, .3, 1); transform-origin: left center; }
+@keyframes pageTurn { 0% { transform: perspective(900px) rotateY(-14deg) scale(.98); filter: brightness(.7); } 100% { transform: none; filter: none; } }
+.album-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 8px; }
+.album-arr { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; border: 1px solid rgba(200, 164, 93, .45); background: rgba(16, 12, 8, .85); color: var(--gold); }
+.album-arr .ic { width: 18px; height: 18px; }
+.album-nav .album-dots { margin: 0; }
+@media (prefers-reduced-motion: reduce) { .album-page.turn { animation: none; } }

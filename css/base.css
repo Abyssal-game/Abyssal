@@ -254,3 +254,8 @@ img.veiled { filter: grayscale(1) brightness(.28) contrast(1.4) blur(3px); trans
 @media (max-width: 380px) { .toast { padding: 7px 12px; font-size: .82rem; } }
 body:has(.opening) #toasts { top: auto; bottom: calc(var(--safe-b, 0px) + 120px); }
 .tab .badge.dot { min-width: 0; width: 10px; height: 10px; padding: 0; border-radius: 50%; }
+/* transition entre onglets : glissé léger dans le sens de l'onglet choisi (v227) */
+#view.view-in { animation: viewSlide .32s cubic-bezier(.2, .8, .3, 1) both !important; }
+@keyframes viewSlide { from { opacity: 0; transform: translateX(var(--vdx, 0px)) translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { #view.view-in { animation: none !important; } }
+html.reduce-motion #view.view-in { animation: none !important; }

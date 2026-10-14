@@ -1912,3 +1912,29 @@ body.battle-mode.has-subnav #view, body.battle-mode #view { padding: calc(var(--
 @media (prefers-reduced-motion: reduce) { .dc-sum2.cheer, .dc-sum2.cheer::after, .fg-row.fg-lvl, .fg-row.fg-lvl .fg-open { animation: none; } }
 .cb-kit .ck-h b { display: flex; align-items: center; gap: 6px; }
 .cb-kit .ck-h b img, .cb-kit .ck-h b svg { width: 22px; height: 22px; flex: none; }
+/* ennemis nommés (v227) */
+.dv-nm.named { color: #F2C14E !important; text-shadow: 0 0 6px rgba(242, 193, 78, .6), 0 1px 3px #000; }
+.dv-c.enemy:has(.dv-nm.named) { box-shadow: 0 0 0 2px rgba(242, 193, 78, .7), 0 0 16px rgba(242, 193, 78, .35); }
+.dc-last summary { cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+.dc-last-ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 4px; font-size: .8rem; text-align: left; }
+.dc-last-ul b { color: #F3E7C8; } .dc-last-ul i { font-style: normal; color: var(--mute); }
+.dc-last-ul .r-me { color: #FF8A9A; font-weight: 700; } .dc-last-ul .r-good { color: #F2D27A; }
+/* écran de chargement : l'œil du sceau s'éveille et palpite (v227) */
+.boot-sealw { position: relative; display: block; width: fit-content; margin: 0 auto; }
+.boot-eye { position: absolute; left: 50%; top: 50%; width: 22%; aspect-ratio: 1; transform: translate(-50%, -50%) scale(.4); border-radius: 50%; pointer-events: none; mix-blend-mode: screen;
+  background: radial-gradient(circle, rgba(255, 190, 90, .95), rgba(255, 110, 30, .55) 35%, rgba(255, 60, 20, 0) 70%); opacity: 0; animation: bootEye 2.4s ease-out .5s forwards, bootPulse 1.6s ease-in-out 2.9s infinite; }
+.boot-seal { animation-name: brandIn, bootBreath !important; animation-duration: 1s, 4s !important; animation-delay: 0s, 1s !important; animation-iteration-count: 1, infinite !important; animation-timing-function: ease-out, ease-in-out !important; }
+@keyframes bootEye { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.2); } 60% { opacity: 1; transform: translate(-50%, -50%) scale(1.25); } 100% { opacity: .75; transform: translate(-50%, -50%) scale(1); } }
+@keyframes bootPulse { 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.12); } }
+@keyframes bootBreath { 50% { transform: scale(1.02); filter: drop-shadow(0 0 22px rgba(176, 75, 255, .45)); } }
+@media (prefers-reduced-motion: reduce) { .boot-eye, .boot-seal { animation: none !important; } .boot-eye { opacity: .7; transform: translate(-50%, -50%); } }
+/* défis de créature (v227) */
+.dt-ch { display: grid; gap: 10px; padding: 12px; margin: 8px 0; }
+.dt-ch-h { display: flex; align-items: center; gap: 6px; }
+.dt-ch-r { display: flex; align-items: center; gap: 10px; }
+.dt-ch-t { display: grid; gap: 3px; flex: 1; min-width: 0; }
+.dt-ch-r.ok .dt-ch-t b { color: #9FE3B4; }
+.dt-ch-r.done { opacity: .6; }
+.dt-ch-r .btn { flex: none; }
+.dt-ch-r > .small { flex: none; display: inline-flex; align-items: center; gap: 3px; }
+.dt-ch-r .ic, .dt-ch-r .picon { width: 16px; height: 16px; }

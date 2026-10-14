@@ -132,6 +132,23 @@ export function floorEnemies(catalog, day, floor, room) {
   return out;
 }
 
+// Événement de la semaine : une partie des créatures ordinaires viennent des deux factions à l'honneur
+export function eventSwap(catalog, list, day, floor, factions) {
+  const rng = rngOf(`event:${day}:${floor}`);
+  const pool = enemyPool(catalog, floor).filter((c) => factions.includes(c.faction));
+  if (!pool.length) return list;
+  return list.map((e) => (e.boss || e.elite || rng() >= 0.4 ? e : { ...e, id: pick(rng, pool).id }));
+}
+// Ennemis nommés : de temps en temps, une créature corrompue porte un nom, plus coriace, avec un butin en plus
+const NAMED_FIRST = ['Grak', 'Morvenn', 'Sylth', 'Ourgal', 'Vesk', 'Ithra', 'Bralm', 'Kesh', 'Noct', 'Thalm', 'Ruvh', 'Zoryn'];
+const NAMED_EPI = ['le Rongé', 'la Maudite', 'l’Affamé', 'aux Mille Plaies', 'le Sans-Sommeil', 'la Veuve', 'le Parjure', 'l’Écorché', 'des Fosses', 'le Dernier', 'la Cendreuse', 'l’Oublié'];
+export const NAMED_CHANCE = 0.15;
+export function namedFoe(day, floor, room) {
+  const rng = rngOf(`named:${day}:${floor}:${room}`);
+  if (room === 'boss' || floor < 2 || rng() >= NAMED_CHANCE) return null;
+  return `${pick(rng, NAMED_FIRST)} ${pick(rng, NAMED_EPI)}`;
+}
+
 export function blessingChoices(day, floor, owned = []) {
   const rng = rngOf(`altar:${day}:${floor}`);
   const keys = Object.keys(BLESSINGS).filter((k) => !owned.includes(k));

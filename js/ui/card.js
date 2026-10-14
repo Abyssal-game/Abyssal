@@ -12,6 +12,8 @@ let fameRef = () => 0;
 export function setFameLookup(f) { fameRef = f; }
 // Apogée (niveau maximum atteint) : cadre doré animé
 let apexRef = () => false;
+let favRef = () => false;
+export function setFavLookup(f) { favRef = f; }
 export function setApexLookup(f) { apexRef = f; }
 const FAME_NAMES = ['', 'Vétéran', 'Héros', 'Légende'];
 
@@ -44,7 +46,7 @@ export function cardHTML(card, opts = {}) {
       ${mystery ? `<div class="tcg-lock">${icon('lock')}</div>` : variant !== 'normal' ? `<span class="tcg-vbadge">${VARIANTS[variant].short}</span>` : ''}
       <span class="tcg-sig">${sigil(card.faction)}</span>
       <div class="tcg-plate"><span class="tcg-gem">${r.short}</span><span class="tcg-nm">${name}</span></div>
-      ${vframe}${fameB}${count > 1 ? `<span class="tcg-count">×${count}</span>` : ''}${isNew ? '<span class="tcg-new">Nouveau</span>' : ''}${tag}
+      ${vframe}${fameB}${!mystery && favRef(card.id) ? '<span class="tcg-fav" aria-label="Favori">★</span>' : ''}${count > 1 ? `<span class="tcg-count">×${count}</span>` : ''}${isNew ? '<span class="tcg-new">Nouveau</span>' : ''}${tag}
     </div>`;
   }
   // Grand format : l'illustration d'abord, un bandeau de nom et un court texte.

@@ -40,6 +40,9 @@ export function defaultSave(now = Date.now()) {
     items: {},            // objets possédés : clé -> nombre
     itemBuys: { day: null },
     tips: {},             // bulles d'aide déjà vues
+    favs: {},             // favoris : id -> date
+    cstats: {},           // défis de créature : id -> { w, k, b }
+    cdone: {},            // défis récompensés : id -> { clé: date }
     fame: {},             // Renommée : id de créature -> points (victoires vécues)
     season: { id: null, best: 0, claimed: [] }, // saison mensuelle de la Descente
     hunt: {},             // Bestiaire de chasse : id de créature -> nombre de victoires
@@ -99,7 +102,7 @@ export function migrate(raw) {
   if (!Array.isArray(s.team)) s.team = [];
   if (!Array.isArray(s.teamPresets)) s.teamPresets = [];
   s.teamPresets = s.teamPresets.filter((p) => p && typeof p.name === 'string' && Array.isArray(p.ids)).slice(0, 4);
-  for (const k of ['items', 'fervor', 'collection', 'deciphered', 'achievements', 'setsDone', 'factionsDone', 'hunt', 'fame', 'bossesBeaten', 'relations', 'forms', 'lore']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
+  for (const k of ['items', 'fervor', 'collection', 'deciphered', 'achievements', 'setsDone', 'factionsDone', 'hunt', 'fame', 'favs', 'cstats', 'cdone', 'bossesBeaten', 'relations', 'forms', 'lore']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
   delete s.salles; // les Salles Oubliées ont été supprimées (v206)
   for (const [k, sub] of [['sceaux', 'beaten'], ['war', 'used'], ['war', 'claimed']]) if (!s[k][sub] || typeof s[k][sub] !== 'object') s[k][sub] = {};
   for (const [k, sub] of [['sceaux', 'history'], ['war', 'history']]) if (!Array.isArray(s[k][sub])) s[k][sub] = [];

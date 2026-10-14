@@ -291,6 +291,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
     if (u.boss) release(st, ev);
     if (u.side === 'enemy') st.kills.push(u.id);
     // Coup de grâce : achever un ennemi donne 1 Ferveur
+    if (u.side === 'enemy' && a && a.side === 'ally') { (st.finishedBy ||= {})[a.id] = (st.finishedBy[a.id] || 0) + 1; if (u.boss) (st.bossBy ||= {})[a.id] = 1; }
     if (u.side === 'enemy' && a && a.side === 'ally') { st.stats.finishers = (st.stats.finishers || 0) + 1; ev.push({ t: 'finisher', u: u.uid, a: a.uid }); gainFervor(st, 1, ev, 'Coup de grâce'); }
     if (u.side === 'ally') (st.fallenLog ||= []).push({ u: u.uid, by: a?.uid || null, round: st.round, kind: st.curKind || null });
     if (u.side === 'ally') alive(st, 'ally').filter((x) => x.form === 'vengeance').forEach((x) => { x.atk += 2; ev.push({ t: 'status', u: x.uid, s: 'Vengeance : +2 ATQ', syn: true }); });

@@ -302,6 +302,7 @@ export const sfx = {
   taunt() { grit(N.D3 * 0.5, { dur: 0.7, gain: 0.12, to: N.A3 * 0.5, lp: 700, vib: 6 }); thump(80, { to: 45, dur: 0.4, gain: 0.35 }); },
   mark() { bell(N.F6, { dur: 0.5, gain: 0.05, ratio: 3, index: 1.5 }); noise({ dur: 0.08, gain: 0.08, type: 'highpass', freq: 4000 }); },
   // Moments propres (v214) : un son enregistré peut les remplacer ; sinon, une variante synthétisée
+  bossvictory() { sfx.victory(); }, // victoire contre un gardien (fichier bossvictory.mp3 s'il est livré)
   levelup() { [N.D5, N.A5, N.D6].forEach((f, i) => bell(f, { dur: 0.8, gain: 0.07, ratio: 2, index: 0.9, delay: i * 0.08 })); whoosh({ dur: 0.3, gain: 0.08, from: 400, to: 3000 }); },
   burn() { sfx.rumble(0.8); },
   burnall() { sfx.rumble(1.2); },
@@ -348,8 +349,8 @@ function playSample(key) {
 }
 
 // Vibrations associées (nombre de petites impulsions) et baisse de la musique pendant les grands moments
-const HAP = { shield: 1, taunt: 1, hit: 1, slash: 1, smash: 2, crit: 2, capture: 1, block: 1, parry: 1, shatter: 3, boss: 3, ult: 2, victory: 3, defeat: 2, error: 1, dice: 1, tear: 1, achievement: 2, pose: 1, fury: 2, death: 1, levelup: 1, burnall: 2, chest: 2, apogee: 2, fame: 1, season: 1 };
-const DUCK = { victory: 3.5, defeat: 4, ult: 2.5, achievement: 2, boss: 2, apogee: 2.5, fame: 2, season: 2 };
+const HAP = { bossvictory: 3, shield: 1, taunt: 1, hit: 1, slash: 1, smash: 2, crit: 2, capture: 1, block: 1, parry: 1, shatter: 3, boss: 3, ult: 2, victory: 3, defeat: 2, error: 1, dice: 1, tear: 1, achievement: 2, pose: 1, fury: 2, death: 1, levelup: 1, burnall: 2, chest: 2, apogee: 2, fame: 1, season: 1 };
+const DUCK = { bossvictory: 5, victory: 3.5, defeat: 4, ult: 2.5, achievement: 2, boss: 2, apogee: 2.5, fame: 2, season: 2 };
 for (const k of Object.keys(sfx)) {
   const f = sfx[k];
   sfx[k] = (...a) => {

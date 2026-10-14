@@ -47,9 +47,9 @@ const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${IN_P
 
 export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.' }) {
   const g = app.game, cat = app.catalog, run = runOpt || g.descent().run, st = run.battle;
-  const ui = (app.state.duel ||= { fast: !!g.s.settings?.fastCombat });
+  const ui = (app.state.duel ||= { fast: g.s.settings?.fastCombat === 3 ? 3 : g.s.settings?.fastCombat ? 2 : 0 });
   const reduced = app.reduced();
-  const T = (ms) => (reduced ? Math.min(ms, 80) : ui.fast ? ms * 0.45 : ms);
+  const T = (ms) => (reduced ? Math.min(ms, 80) : ui.fast === 3 ? ms * 0.25 : ui.fast ? ms * 0.45 : ms); // vitesse ×1, ×2 ou ×3
   const defMode = 'on'; // la défense active est la même pour tout le monde
   let alive_ = true, busy = false, sel = null, mode = null; // mode : action en attente de cible
   let confirm = null; // { key, t } : compétence à risque en attente de confirmation
@@ -63,7 +63,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   root.innerHTML = `<div class="dv cb ${run.room} has-bg" style="--bgimg:${room.paint ? `url(${abs(room.paint)})` : bgOf(run)}">
     <div class="dv-top"><b>${esc(title)}</b><span class="row gap">
       <button class="btn small ghost" data-d="help" aria-label="Règles du combat">?</button>
-      <button class="btn small ghost ${ui.fast ? 'on' : ''}" data-d="fast" aria-label="Animations accélérées">×2</button>
+      <button class="btn small ghost ${ui.fast ? 'on' : ''}" data-d="fast" aria-label="Vitesse des animations">×${ui.fast === 3 ? 3 : 2}</button>
       <button class="btn small ghost" data-d="quit" aria-label="Pause">${icon('close')}</button></span></div>
     <div class="cb-rules"></div>
     <div class="dv-row enemy"></div>
@@ -129,7 +129,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       <span class="dv-art"><img alt="" src="${artUrl(c)}"></span>
       <span class="dv-kw ${enemy && u.fam ? 'fam' : ''}" title="${esc(enemy && u.fam ? AI_FAMILIES[u.fam].desc : kit.name)}">${roleIcon(kit.kw)}<em>${esc(enemy && u.fam ? AI_FAMILIES[u.fam].name : kit.name)}</em></span>
       ${u.boss ? `<span class="dv-boss"><img alt="" src="assets/icons/crest-boss.webp">${u.phase2 ? 'Furie' : 'Gardien'}</span>` : u.elite ? '<span class="dv-boss elite"><img alt="" src="assets/icons/crest-elite.webp">Élite</span>' : ''}
-      <span class="dv-nm">${esc(c.name)}</span>
+      <span class="dv-nm ${u.named ? 'named' : ''}">${esc(u.named ? u.title : c.name)}</span>
       ${u.brkMax ? `<span class="cb-brk ${u.broken ? 'is-broken' : ''}" title="Brisure">${u.broken ? '<img alt="" src="assets/icons/st-broken.webp"><b>BRISÉ</b>' : `<i style="width:${(u.brk / u.brkMax) * 100}%"></i>`}</span>` : ''}
       <span class="dv-atk">${icon('swords')}<b>${u.atk + (u.boost || 0)}</b></span>
       <span class="dv-hp ${u.hp < u.maxHp ? 'hurt' : ''}">${icon('heart')}<b>${Math.max(0, u.hp)}</b></span>
@@ -473,7 +473,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (!st.over || !alive_) return;
     busy = true; sel = null; mode = null; confirm = null; draw();
     say(st.over === 'won' ? '<b class="dc-good">Victoire !</b>' : '<b class="dc-bad">Défaite…</b>');
-    (st.over === 'won' ? app.sfx.victory : app.sfx.defeat)();
+    (st.over === 'won' ? (st.bossKey ? app.sfx.bossvictory : app.sfx.victory) : app.sfx.defeat)();
     $('.dv').insertAdjacentHTML('beforeend', `<div class="cb-end">${crestHTML(st.over === 'won', st.over === 'won' ? 'Victoire' : 'Défaite')}</div>`);
     await wait(T(1300));
     if (alive_) { alive_ = false; ctl.abort(); dio.destroy(); document.body.classList.remove('battle-mode'); onEnd(); }
@@ -547,7 +547,10 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     root.querySelector('.cb-recap')?.remove();
     const rows = (log || []).filter((r) => r.parts.length || r.a);
     log = null;
-    if (!rows.length || st.over || !alive_) return;
+    if (!rows.length) return;
+    const html0 = rows.slice(-6).map((r) => `<li>${r.a ? `<b>${nm(r.a)}</b> <i>${esc(r.k)}</i>` : '<b>Fin du tour</b>'}${r.parts.length ? ` · ${r.parts.slice(0, 4).join(', ')}` : ''}</li>`).join('');
+    app.state.lastEnemyTurn = html0; // gardé pour « Voir ce qui s'est passé » après une défaite
+    if (st.over || !alive_) return;
     const html = rows.slice(-5).map((r) => `<li>${r.a ? `<b>${nm(r.a)}</b> <i>${esc(r.k)}</i>` : '<b>Fin du tour</b>'}${r.parts.length ? ` · ${r.parts.slice(0, 4).join(', ')}` : ''}</li>`).join('');
     const box = document.createElement('button');
     box.className = 'cb-recap';
@@ -683,7 +686,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         });
         return;
       }
-      if (k === 'fast') { ui.fast = !ui.fast; b.classList.toggle('on', ui.fast); g.s.settings = { ...g.s.settings, fastCombat: ui.fast }; g.persist(); return; }
+      if (k === 'fast') { ui.fast = !ui.fast ? 2 : ui.fast === 2 || ui.fast === true ? 3 : 0; b.classList.toggle('on', !!ui.fast); b.textContent = `×${ui.fast === 3 ? 3 : 2}`; g.s.settings = { ...g.s.settings, fastCombat: ui.fast }; g.persist(); return; }
       if (k === 'help') return help();
       if (k === 'rule') return ruleSheet(b.dataset.k);
       if (busy) return;

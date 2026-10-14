@@ -63,7 +63,7 @@ export function furnaceScreen(app, root) {
     const sp = g.spareAsh();
     const spares = cat.cards.filter((c) => g.spare(c.id) > 0);
     const q = norm(ui.q || '');
-    const owned = Object.keys(g.s.collection).map((id) => cat.get(id)).filter((c) => c && (!q || norm(c.name).includes(q)))
+    const owned = Object.keys(g.s.collection).map((id) => cat.get(id)).filter((c) => c && !g.isFav(c.id) && (!q || norm(c.name).includes(q)))
       .sort((a, b) => RI(a.rarity) - RI(b.rarity) || a.name.localeCompare(b.name, 'fr'));
     root.innerHTML = `<header class="screen-head ui-hero bn-furnace"><h1>La Fournaise</h1><p class="muted">Brûle des cartes pour des cendres. Les cendres font monter tes créatures de niveau (onglet Renforcer).</p>${ashLine(g)}</header>
       <section class="panel"><h2 class="section-title">Tes doublons</h2>

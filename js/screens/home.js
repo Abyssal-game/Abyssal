@@ -32,6 +32,8 @@ export default function home(app, root) {
     const sd = g.canDailyClaim() ? daily.streak : (s.daily.streak || 0), pos = ((sd - 1) % 7) + 1;
     const streakBar = `<span class="td-streak">${Array.from({ length: 7 }, (_, k) => `<i class="${k < (g.canDailyClaim() ? pos - 1 : pos) ? 'on' : ''} ${k === pos - 1 && g.canDailyClaim() ? 'now' : ''} ${k === 6 ? 'chest' : ''}">${k === 6 ? icon('lock') : k + 1}</i>`).join('')}</span>`;
     rows.push(`<div class="td-row td-daily ${g.canDailyClaim() ? '' : 'done'}"><span class="td-ic mi" style="--mc:#F2C14E">${picon('streak')}</span><span class="td-t"><b>Offrande du jour</b><span class="small muted">${g.canDailyClaim() ? `Jour ${pos} sur 7${pos === 7 ? ' : un coffre de fer en plus !' : ''}` : `Récupérée · série de ${sd} jour${sd > 1 ? 's' : ''}`}</span>${streakBar}</span>${g.canDailyClaim() ? `<button class="btn small gold" data-act="daily">+${daily.amount}</button>` : `<span class="small muted">Demain</span>`}</div>`);
+    const wch = g.weekChest();
+    if (!wch.claimed) rows.push(`<div class="td-row ${wch.ready ? '' : 'wait'}"><span class="td-ic mi" style="--mc:#F2C14E">${picon('chest')}</span><span class="td-t"><b>Coffre de la semaine</b><span class="small muted">${wch.ready ? 'Tu as joué 5 jours cette semaine : un coffre d’or t’attend !' : `Joue ${wch.need} jours cette semaine pour un coffre d’or · ${wch.days} / ${wch.need}`}</span>${wch.ready ? '' : `<span class="progress"><i style="width:${(wch.days / wch.need) * 100}%"></i></span>`}</span>${wch.ready ? '<button class="btn small gold td-claim" data-act="weekchest">Ouvrir</button>' : ''}</div>`);
     const wk = g.weekly(), wc = cat.get(wk.id);
     if (!wk.done) rows.push(`<a class="td-row" href="#/descente"><span class="td-ic mi td-wk" style="--mc:#FF6B7F"><img alt="" src="${artUrl(wc, { lite: true })}"></span><span class="td-t"><b>Créature de la semaine</b><span class="small muted">Vaincs ${esc(wc.name)} dans l’Abysse pour gagner sa carte</span></span>${icon('next')}</a>`);
     m.list.forEach((x, i) => {
@@ -64,6 +66,9 @@ export default function home(app, root) {
       <a class="ha ha-dive" href="#/descente"><span class="ha-art"></span><b>Aventure</b><span>${g.descent().run ? `En cours · étage ${g.descent().run.floor}` : g.torchesLeft() ? `${g.torchesLeft()} torche${g.torchesLeft() > 1 ? 's' : ''} aujourd’hui` : 'Reviens demain'}</span></a>
     </div>
 
+    <a class="panel hw-event" href="#/boutique" style="--e1:${cat.faction[ev.factions[0]].colors.secondary};--e2:${cat.faction[ev.factions[1]].colors.secondary}">
+      <span class="hw-ev-sig">${sigil(ev.factions[0])}${sigil(ev.factions[1])}</span>
+      <span><span class="small muted">Événement de la semaine · encore ${ev.daysLeft} jour${ev.daysLeft > 1 ? 's' : ''}</span><b>${esc(ev.name)}</b><span class="small">${esc(ev.desc)} Leurs créatures rôdent plus souvent dans l’Abysse, et le booster événement les met à l’honneur.</span></span>${icon('next')}</a>
     ${goalsHTML()}
     ${todayHTML()}
     <p class="home-col small muted center"><a href="#/collection">${owned} / ${total} créatures découvertes</a></p>
@@ -81,6 +86,10 @@ export default function home(app, root) {
   lazyArt(root);
   setScene('home');
   bindActions(root, {
+    weekchest() {
+      try { g.claimWeekChest(); app.sfx.chest?.(); toast('Coffre de la semaine : <b>un coffre d’or</b> rejoint tes coffres !', { kind: 'epic', icon: 'trophy' }); app.refresh(); }
+      catch (e) { toast(esc(e.message), { kind: 'error' }); }
+    },
     mission(el) {
       try { const r = g.claimMission(Number(el.dataset.i)); app.sfx.coin(); toast(`Mission accomplie : <b>+${r.shards} éclats</b>`, { kind: 'success', icon: 'crystal' }); app.refresh(); }
       catch (e) { toast(esc(e.message), { kind: 'error' }); }
