@@ -197,3 +197,6 @@
 .dio-ftex.painted { background-blend-mode: normal; background-color: transparent; filter: none; opacity: .95; }
 .dio-img { display: block; height: 100%; width: auto; }
 .dio-light { background: radial-gradient(120% 75% at 50% 58%, transparent 55%, rgba(0, 0, 0, .55) 100%); }
+/* Sol peint (assets/dio/p/floor-<royaume>.webp) : une dalle peinte couvre plus de pierres qu'une dalle calculée */
+.dio-ftex.painted { background-size: calc(var(--ts) * 2.2) calc(var(--ts) * 2.2); }
+.th-celeste .dio-ftex.painted { filter: brightness(.8) saturate(.95); }

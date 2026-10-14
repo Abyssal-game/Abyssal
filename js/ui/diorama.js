@@ -9,7 +9,7 @@ const DIO = 'assets/dio/';
 const abs = (u) => new URL(u, document.baseURI).href;
 // Images peintes (Gemini) déjà livrées, dans assets/dio/p/<nom>.webp : elles remplacent le dessin
 // fait par le code (accessoires) ou la texture calculée (sol « floor-<royaume> »). Ajouter le nom ici à la livraison.
-export const PAINTED = new Set([]);
+export const PAINTED = new Set(['floor-infernal', 'floor-abyssal', 'floor-celeste', 'floor-sauvage', 'floor-necrotique', 'floor-primordial', 'floor-artificiel', 'floor-givre']);
 const painted = (name, h = '') => (PAINTED.has(name) ? `<img class="dio-img" alt="" src="${DIO}p/${name}.webp" ${h}>` : null);
 
 // ——— Royaumes : matériaux, teintes, accessoires, particules ———
@@ -275,7 +275,7 @@ export function mountDiorama(dv, { room, decor = 'riche', reduced = false, bossK
       <div class="dio-ftex ${pFloor ? 'painted' : ''}" style="background-image:url(${pFloor ? `${DIO}p/floor-${room.key}.webp` : `${DIO}${T.floor}.webp`})"></div>
       ${pFloor ? '' : `${mask('grime', 'ov-grime', 0.75).replace(`--ts:${tileF}px`, `--ts:${Math.round(tileF * 2.6)}px`)}${T.puddles ? mask('puddle', 'ov-puddle', T.puddles).replace(`--ts:${tileF}px`, `--ts:${Math.round(tileF * 2.2)}px`) + mask('puddle', 'ov-sheen', 0.5).replace(`--ts:${tileF}px`, `--ts:${Math.round(tileF * 2.2)}px`) : ''}
       ${T.joints ? mask('joints', 'ov-joints', T.joints) : ''}${T.moss ? mask('moss', 'ov-moss', T.moss) : ''}${T.frost ? mask('frost', 'ov-frost', T.frost) : ''}`}
-      ${T.floorDeco === 'cracks' ? mask('cracks', 'ov-cracks', 0.8) : ''}${T.floorDeco === 'runes' || room.monument === 'geometry' ? `<div class="dio-runes ${room.monument === 'geometry' ? 'geo' : ''}"></div>` : ''}
+      ${T.floorDeco === 'cracks' && !pFloor ? mask('cracks', 'ov-cracks', 0.8) : ''}${(T.floorDeco === 'runes' && !pFloor) || room.monument === 'geometry' ? `<div class="dio-runes ${room.monument === 'geometry' ? 'geo' : ''}"></div>` : ''}
       <div class="dio-brk"></div><div class="dio-sealring"></div>
       <div class="dio-fpool"></div></div>`;
     // murs latéraux (plans CSS dressés)
