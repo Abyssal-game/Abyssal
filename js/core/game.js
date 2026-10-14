@@ -13,7 +13,7 @@ export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par c
 import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ITEMS, SHOW_ORDER, SHADOW } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
-import { rngOf, DESCENT, CHESTS, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES } from './descent.js';
+import { rngOf, DESCENT, CHESTS, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES, foeTraits } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState } from './duel.js';
 import { bossOf, BOSSES } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
@@ -738,6 +738,12 @@ export class Game {
     });
   }
   doors() { const run = this.s.descent.run; return run ? floorDoors(run.day, run.floor) : []; }
+  // Ce qu'une porte rapporte si on gagne (affiché dessus avant de choisir)
+  doorPreview(room) {
+    const run = this.s.descent.run; if (!run) return null;
+    const k = room === 'boss' ? 3 : room === 'elite' ? 2 : 1, f = Math.min(run.floor, SHARD_FLOOR_CAP);
+    return { rewards: floorRewards(run.day, run.floor, room, run.blessings), talent: room !== 'fight' && run.team.some((m) => !m.fallen && !m.talent), shards: (8 + 2 * f) * k, ash: run.free ? 0 : Math.round((2 + f / 2) * k) };
+  }
   // Coffre rapporté si l'on remonte maintenant
   chestNow(run = this.s.descent.run) {
     if (!run || run.free) return null;
@@ -789,6 +795,7 @@ export class Game {
         if (e.boss && (run.nightmare || run.floor >= AWAKEN_AT)) e.awakened = true;
       }
       // un ennemi nommé : plus coriace, il rapporte un butin en plus
+      foeTraits(run.day, run.floor, room, enemies.length).forEach((t, i) => { if (t && !enemies[i].boss && !enemies[i].weekly) enemies[i].trait = t; });
       const nm = namedFoe(run.day, run.floor, room), nf = nm && enemies.find((e) => !e.boss && !e.weekly);
       if (nf) { nf.title = nm; nf.named = true; nf.maxHp = Math.round(nf.maxHp * 1.3); nf.hp = nf.maxHp; nf.atk = Math.round(nf.atk * 1.15 + 0.4); }
       const known = {};
@@ -917,7 +924,10 @@ export class Game {
       if (named) out.named = { title: named.title, id: named.id, shards: this.gainShards(20 + Math.min(run.floor, SHARD_FLOOR_CAP) * 4) };
       // objectif réussi : éclats en plus et 1 Ferveur pour la suite
       if (goal?.state === 'done') { out.goalShards = this.gainShards((3 + Math.min(run.floor, SHARD_FLOOR_CAP)) * (room === 'boss' ? 2 : 1)); run.gauge = Math.min(FERVOR_CARRY, run.gauge + 1); this.s.stats.goals = (this.s.stats.goals || 0) + 1; }
-      if (room === 'elite') { const t = this.talentOffers(run); if (t.length) { run.talentOffer = t; out.talents = t; } }
+      if (room === 'elite' || room === 'boss') { const t = this.talentOffers(run); if (t.length) { run.talentOffer = t; out.talents = t; } }
+      // exploits de l'expédition (fêtés dans le résumé)
+      const F = (run.feats ||= { hit: 0, syn: 0, breaks: 0, parries: 0, perfect: 0, crits: 0, kills: 0, wins: 0 }), S = st.stats || {};
+      F.hit = Math.max(F.hit, S.maxHit || 0); F.syn += (S.named || 0) + (S.combos || 0); F.breaks += S.breaks || 0; F.parries += S.parries || 0; F.perfect += S.perfect || 0; F.crits += S.crits || 0; F.kills += st.kills.length; F.wins++;
       // les gardiens donnent un coffre tout de suite ; règle « Chasse aux élites » : les élites aussi
       // économie : un coffre de gardien seulement la première fois qu'on bat ce gardien
       if (!run.free && ((room === 'boss' && out.boss?.first) || hunt)) {
@@ -1063,6 +1073,7 @@ export class Game {
     const summary = { wiped, floor: run.cleared, day: run.day, chests, shards, kills: run.kills, free: run.free, cursed: run.cursed, nightmare: !!run.nightmare };
     if (!run.free && run.cleared > 0 && run.bestBefore !== undefined && run.cleared > run.bestBefore) summary.record = true;
     // bilan : la créature qui a achevé le plus d'ennemis, le prochain palier de coffre, les éclats vers un booster
+    if (run.feats) summary.feats = { ...run.feats };
     const mvp = Object.entries(run.fin || {}).sort((a, b) => b[1] - a[1])[0];
     if (mvp && mvp[1] >= 2) summary.mvp = { id: mvp[0], n: mvp[1] };
     const nf = CHEST_FLOORS.find((f) => f > run.cleared);

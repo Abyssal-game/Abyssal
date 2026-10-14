@@ -2391,3 +2391,19 @@ body.has-subnav #subnav .sn-tab { background: #16121E; }
 .kx-shatter { background-image: url(../assets/fx/kill-shatter.webp); filter: drop-shadow(0 0 10px rgba(255, 170, 80, .45)); }
 .kx-embers { background-image: url(../assets/fx/kill-embers.webp); mix-blend-mode: screen; }
 @keyframes kxPlay { from { background-position: 0 0; } to { background-position: 114.2857% 0; } }
+
+/* v257 : butin visible sur les portes, exploits de l'expédition, badges de trait des ennemis */
+.dc-loot { display: grid; justify-items: center; gap: 4px; margin-top: 4px; padding: 6px 8px; border-radius: 12px; background: rgba(6, 6, 12, .72); border: 1px solid rgba(242, 193, 78, .25); position: relative; z-index: 2; }
+.dc-loot-k { font: 700 .6rem/1 var(--f-ui); letter-spacing: .14em; text-transform: uppercase; color: #C8A45D; }
+.dc-loot-r { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+.dc-loot-r i { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 99px; font: 700 .66rem/1.2 var(--f-ui); font-style: normal; color: #EDE3C8; background: rgba(255, 255, 255, .07); }
+.dc-loot-r i.tal { color: #FFE7A6; background: rgba(242, 193, 78, .18); }
+.dc-loot-r .ic, .dc-loot-c .ic { width: 14px; height: 14px; }
+.dc-loot-c { display: inline-flex; align-items: center; gap: 3px; font: 600 .66rem/1.2 var(--f-ui); color: #D8CDB3; }
+.dc-feats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 10px 0; }
+.dc-feat { display: grid; justify-items: center; gap: 2px; padding: 8px 4px; border-radius: 12px; background: rgba(242, 193, 78, .08); border: 1px solid rgba(242, 193, 78, .25); }
+.dc-feat .ic { width: 22px; height: 22px; }
+.dc-feat b { font: 800 1.15rem/1 var(--f-display); color: #FFE7A6; }
+.dc-feat small { font-size: .62rem; color: #CFC4A8; text-align: center; }
+.cb-trico { width: 22px; height: 22px; vertical-align: -6px; margin-right: 2px; }
+.cb-trait { display: flex; align-items: center; gap: 6px; }

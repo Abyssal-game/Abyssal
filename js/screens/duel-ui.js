@@ -17,6 +17,7 @@ import {
 import { KITS, AI_FAMILIES, DICE_TIERS, WEAK_TO, TALENTS } from '../core/skills.js';
 import { BOSSES, LAWS, ASPECTS } from '../core/bosses.js';
 import { PACTS } from '../core/pacts.js';
+import { TRAITS } from '../core/descent.js';
 import { RELICS } from '../core/relics.js';
 import { ULTS } from '../core/army.js';
 import { mountDiorama, roomFor } from '../ui/diorama.js';
@@ -99,6 +100,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     u.defend ? st_('defend', 'Défense : -50 % de dégâts') : '',
     u.guardBy ? st_('guard', 'Protégé par un Rempart') : '',
     u.exposed ? st_('exposed', 'Déséquilibrée : +25 % de dégâts subis') : '',
+    u.trait && TRAITS[u.trait] ? st_(u.trait, `${TRAITS[u.trait].name} : ${TRAITS[u.trait].desc}`) : '',
     u.breach ? st_('breach', 'Brèche : le prochain coup d’un autre allié perce son bouclier, +20 % de dégâts, +3 Brisure') : '',
     u.open ? st_('open', 'Exposé : la prochaine attaque d’un autre allié fait +50 % de dégâts et +1 Ferveur') : '',
     u.boost ? `<i class="bo" title="Attaque renforcée pour ce tour">+${u.boost} ATQ</i>` : '',
@@ -463,6 +465,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           if (e.s === 'Proie désignée') fxAt(e.u, 'prey', { big: true });
           else if (e.syn) app.sfx.skill();
           if (e.k === 'entrance') ring(e.u, 'enter');
+          if (e.trait === 'explosif') { fxAt(e.u, 'burst', { big: true }); app.sfx.smash?.(); shake(true); banner(`<img class="cb-trico" alt="" src="assets/icons/st-explosif.webp"> Explosion !`, 'danger', 800); }
+          else if (e.trait) { app.sfx.boss?.(); banner(`<img class="cb-trico" alt="" src="assets/icons/st-${e.trait}.webp"> ${esc(e.s)}`, 'danger', 800); }
           if (e.combo && e.by && e.a && e.by !== e.a && st.units[e.by]?.side === 'ally') { synergy(e.by, e.a, e.s); await wait(T(380)); if (!g.s.tips?.['cb-combo']) tuto(app, 'cb-combo'); }
           if (e.combo) comboPop(e.u, e.combo);
           float(e.u, e.s, e.syn ? 'syn' : e.k === 'bad' ? 'dmg' : 'info');
@@ -725,6 +729,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (busy || st.over || guide) return;
     const foes = front(st, 'enemy');
     if (st.goal) await tuto(app, 'cb-goal');
+    if (foes.some((e) => e.trait)) await tuto(app, 'cb-traits');
     if (foes.some((e) => e.brkMax)) await tuto(app, 'cb-break');
     if (foes.some((e) => ['charge', 'channel', 'heavy', 'blast'].includes(e.intent?.kind))) await tuto(app, 'cb-intent');
     if (st.fervor >= 1 && g.s.tips?.['cb-guide']) await tuto(app, 'cb-skill');
@@ -899,6 +904,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       <h3>${esc(c.name)}${u.side === 'enemy' ? ' corrompu' : ''}</h3>
       <dl class="facts"><div><dt>Attaque</dt><dd>${u.atk + (u.boost || 0)}</dd></div><div><dt>PV</dt><dd>${Math.max(0, u.hp)} / ${u.maxHp}</dd></div><div><dt>Niveau</dt><dd>${u.level || 1}</dd></div>${u.brkMax ? `<div><dt>Brisure</dt><dd>${u.broken ? 'Brisé' : `${u.brk} / ${u.brkMax}`}</dd></div>` : ''}</dl>
       ${i ? `<p class="small cb-iline"><b>${intentIcon(i.kind)} Intention : ${esc(i.kind === 'mimic' ? `Copie de « ${i.copyName} »` : i.kind === 'copy' ? `${i.copyName} (copiée)` : i.kind === 'decree' ? LAWS[i.law]?.name || i.def.name : i.kind === 'shift' ? ASPECTS[i.aspect]?.name || i.def.name : i.def.name)}</b>${i.kind === 'decree' && LAWS[i.law] ? ` : ${esc(LAWS[i.law].desc)}` : ''}${i.dmg ? ` · ${i.dmg} dégâts${i.kind === 'blast' ? ' à chacune' : ''}` : ''}${tgtName ? ` sur ${esc(tgtName)}` : ''}. ${esc(i.def.desc)}${i.qte && defMode !== 'off' ? ' <b>Défense active possible.</b>' : ''}</p>` : ''}
+      ${u.trait && TRAITS[u.trait] ? `<p class="small dc-bad cb-trait"><img class="cb-trico" alt="" src="assets/icons/st-${u.trait}.webp"><b>${esc(TRAITS[u.trait].name)}</b> : ${esc(TRAITS[u.trait].desc)}</p>` : ''}
       ${fam ? `<p class="small"><b>${esc(fam.name)}</b> : ${esc(fam.desc)} <span class="dc-good">${esc(fam.counter)}</span></p>` : ''}
       ${u.boss && st.bossKey ? `<p class="small dc-bad"><b>${esc(BOSSES[st.bossKey].name)}</b> : ${esc(BOSSES[st.bossKey].mechanic)} Sous la moitié de ses PV, il entre en phase 2 et accélère.</p>${g.s.bossesBeaten[st.bossKey] ? `<p class="small dc-good"><b>Pour le contrer</b> : ${esc(BOSSES[st.bossKey].counter)}</p>` : ''}${u.aspect ? `<p class="small"><b>${esc(ASPECTS[u.aspect].name)}</b> : faible face à ${ASPECTS[u.aspect].weak.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}, résiste à ${ASPECTS[u.aspect].resist.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}.</p>` : ''}` : ''}
       ${u.boss && st.bossPower && !st.bossKey ? `<p class="small dc-bad"><b>${esc(BOSS_POWERS[st.bossPower].name)}</b> : ${esc(BOSS_POWERS[st.bossPower].desc)} Sous la moitié de ses PV, il entre en phase 2.</p><p class="small dc-good"><b>Point faible</b> : ${esc(BOSS_POWERS[st.bossPower].counter)}</p>` : ''}
@@ -954,6 +960,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (lines.length) setTimeout(() => toast(`Début du combat<br>${lines.join('<br>')}`, { icon: 'sparkle', ms: 4200 }), 600);
   }
   // combat repris pendant le tour ennemi (application fermée en plein tour)
+  if (st.turn === 'ally' && !st.over && front(st, 'enemy').some((e) => e.trait) && !g.s.tips?.['cb-traits']) setTimeout(() => { if (alive_) tuto(app, 'cb-traits'); }, 900);
   if (st.turn === 'enemy' && !st.over) { busy = true; draw(); enemyTurn().then(() => { busy = false; draw(); if (st.over) finish(); }); }
   else if (st.over) finish();
   else if (guide) tuto(app, 'cb-intro').then(() => draw());

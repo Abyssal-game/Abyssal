@@ -116,9 +116,9 @@ export function floorDoors(day, floor) {
 // Après une victoire : un bonus au choix (2 propositions, 3 après une élite)
 export const REWARD_ROOMS = ['rest', 'altar', 'treasure'];
 export function floorRewards(day, floor, room, owned = []) {
-  const rng = rngOf(`rewards:${day}:${floor}`);
+  const rng = rngOf(`rewards:${day}:${floor}:${room}`); // v257 : propre à chaque porte (affiché dessus avant de choisir)
   const keys = REWARD_ROOMS.filter((k) => k !== 'altar' || Object.keys(BLESSINGS).some((b) => !owned.includes(b)));
-  if (room === 'elite') return keys;
+  if (room === 'elite' || room === 'boss') return keys;
   const out = [];
   while (out.length < 2 && keys.length) out.push(keys.splice(Math.floor(rng() * keys.length), 1)[0]);
   return out;
@@ -144,6 +144,20 @@ export function eventSwap(catalog, list, day, floor, factions) {
   const pool = enemyPool(catalog, floor).filter((c) => factions.includes(c.faction));
   if (!pool.length) return list;
   return list.map((e) => (e.boss || e.elite || rng() >= 0.4 ? e : { ...e, id: pick(rng, pool).id }));
+}
+// Traits (v257) : dès l'étage 3, certains ennemis ordinaires (et des élites dès l'étage 6) ont une mécanique propre
+export const TRAITS = {
+  explosif: { name: 'Explosif', desc: 'À sa mort, il explose et blesse toutes tes créatures au combat.' },
+  voleur:   { name: 'Voleur d’action', desc: 'Tant qu’il est debout, ton équipe a 1 action de moins à partir du 3e tour.' },
+  egide:    { name: 'Lien d’égide', desc: 'Il subit 35 % de dégâts en moins tant qu’un autre ennemi est au combat.' },
+  enrage:   { name: 'Enragé', desc: 'Sous la moitié de ses PV, il entre en rage : +2 en attaque.' },
+};
+export function foeTraits(day, floor, room, n) {
+  const rng = rngOf(`traits:${day}:${floor}:${room}`), keys = Object.keys(TRAITS), out = Array(n).fill(null);
+  if (room === 'boss' || floor < 3) return out;
+  const chance = room === 'elite' ? (floor >= 8 ? 0.4 : 0) : Math.min(0.5, 0.2 + floor * 0.02);
+  for (let i = 0; i < n; i++) if (rng() < chance && out.filter(Boolean).length < (floor >= 15 ? 2 : 1)) out[i] = pick(rng, keys);
+  return out;
 }
 // Ennemis nommés : de temps en temps, une créature corrompue porte un nom, plus coriace, avec un butin en plus
 const NAMED_FIRST = ['Grak', 'Morvenn', 'Sylth', 'Ourgal', 'Vesk', 'Ithra', 'Bralm', 'Kesh', 'Noct', 'Thalm', 'Ruvh', 'Zoryn'];

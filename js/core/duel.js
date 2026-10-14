@@ -177,6 +177,7 @@ export function dmgOf(st, a, t, mult = 1, { basic = false } = {}) {
   if (a.slow) n *= 0.5;
   if (t.defend) n *= 0.5;
   if (t.exposed) n *= 1.25;
+  if (t.trait === 'egide' && t.side === 'enemy' && front(st, 'enemy').some((x) => x !== t && x.hp > 0)) n *= 0.65;
   if (t.prey && a.side === 'enemy') n *= 1.2; // proie désignée par un ennemi
   n *= passiveMult(st, a, t, front); // passifs des créatures (Venin du chasseur, Présage, Profondeurs, Frénésie…)
   if (a.side === 'enemy' && !a.boss && !a.elite && hasP(t, 'effroi')) n *= boosted(t, 'effroi') ? 0.7 : 0.8;
@@ -254,6 +255,8 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   if (u.side === 'ally' && d >= u.hp && st.sursis) { st.sursis = false; d = u.hp - 1; u.shield = 1; ev.push({ t: 'status', u: u.uid, s: 'Sursis !', syn: true }); }
   u.hp -= d;
   if (d > 0) ev.push({ t: 'dmg', u: u.uid, d, hp: u.hp, src });
+  if (d > 0 && u.side === 'enemy' && src && st.units[src]?.side === 'ally') st.stats.maxHit = Math.max(st.stats.maxHit || 0, d);
+  if (d > 0 && u.trait === 'enrage' && !u.enraged && u.hp > 0 && u.hp <= u.maxHp / 2) { u.enraged = true; u.atk += 2; ev.push({ t: 'status', u: u.uid, s: 'Enragé : +2 ATQ', k: 'bad', trait: 'enrage' }); }
   if (breached && d > 0) { st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: u.uid, s: 'Brèche exploitée !', syn: true, combo: 'breche', by: breached.by, a: src }); if (u.hp > 0) breakHit(st, u, 3, ev, st.units[src]); }
   const a = src && st.units[src];
   if (a && d > 0 && a.side === 'ally' && u.side === 'enemy' && st.turn === 'ally') {
@@ -324,6 +327,11 @@ function heal(u, n, ev, healer = null) {
 }
 // Mort d'un ennemi : passifs des créatures (Faim sans fin, Filaments, Venin du chasseur)
 function onEnemyDeath(st, u, a, ev) {
+  if (u.trait === 'explosif' && !u.exploded) {
+    u.exploded = true; const k = Math.max(2, Math.round(u.atk * 0.5));
+    ev.push({ t: 'status', u: u.uid, s: 'Explosion !', k: 'bad', trait: 'explosif' }); ev.push({ t: 'aoe', u: u.uid, side: 'enemy' });
+    front(st, 'ally').forEach((x) => hurt(st, x, k, ev));
+  }
   if (a && a.side === 'ally' && a.hp > 0 && hasP(a, 'faim')) {
     a.atk += 1; heal(a, a.maxHp * 0.2, ev);
     pfx(ev, a, 'faim'); ev.push({ t: 'status', u: a.uid, s: 'Faim sans fin : +1 ATQ', syn: true });
@@ -507,6 +515,7 @@ export function rollInfo(st, uid, key, tUid) {
 function resolveRoll(st, info, ev, uid, tUid) {
   const r = d20(st);
   const perfect = st.rhythm >= RHYTHM.perfect; // frappe parfaite (v250) : la compétence réussit à coup sûr
+  if (perfect) st.stats.perfect = (st.stats.perfect || 0) + 1;
   st.rhythm = 0; // le bonus rythmé ne vaut que pour ce jet
   const total = r + info.mod;
   let tier = r === 1 ? 'fumble' : r === 20 ? 'crit' : total >= info.dc ? 'success' : 'partial';
@@ -732,6 +741,8 @@ function startAllyTurn(st, ev) {
   const R_ = st.relics || [];
   st.ap = AP_MAX + (st.law === 'hate' ? 1 : 0) + (st.round === 1 ? (R_.includes('sablier') ? 1 : 0) - (R_.includes('miroir') ? 1 : 0) : 0);
   st.swapped = false; st.ombreUsed = false; st.hitBy = {}; st.curKind = null;
+  const thief = st.round >= 3 && front(st, 'enemy').find((x) => x.trait === 'voleur' && x.hp > 0);
+  if (thief && st.ap > 1) { st.ap -= 1; ev.push({ t: 'status', u: thief.uid, s: 'Vole 1 action', k: 'bad', trait: 'voleur' }); }
   for (const u of alive(st, 'ally')) { u.acts = 0; u.boost = 0; u.defend = false; u.guardBy = null; u.rempart = null; u.exposed = false; u.stunned = false; u.attised = false; u.chB = 0; u.elanUsed = false; }
   for (const u of front(st, 'ally')) {
     if (u.frozen) { u.frozen = 0; u.stunned = true; ev.push({ t: 'status', u: u.uid, s: 'Gelée : passe son tour', k: 'frost' }); }
