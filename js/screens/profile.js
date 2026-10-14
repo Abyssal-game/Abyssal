@@ -43,13 +43,14 @@ export default function profile(app, root) {
     const show = (s.showcase.length ? s.showcase.map((id) => cat.get(id)) : g.bestCards(3)).filter(Boolean);
     root.innerHTML = `
       <section class="panel ornate profile-head bn-profile">
-        <button class="avatar-big pf pf-${s.frame}" data-act="pickav" aria-label="Changer d’avatar">${av ? `<img alt="" src="${artUrl(av)}">` : EMBLEM}<span class="av-edit">${icon('edit')}</span></button>
+        <div class="av-col"><button class="avatar-big pf pf-${s.frame}" data-act="pickav" aria-label="Changer d’avatar">${av ? `<img alt="" src="${artUrl(av)}">` : EMBLEM}</button>
+          <button class="av-custom" data-act="pickav"><img class="av-custom-ic" alt="" src="assets/icons/customize.webp" onerror="this.remove()">Personnaliser</button></div>
         <div class="ph-text">
           <h1><button class="ph-name" data-act="rename">${esc(s.name || 'Ton nom')} <span class="small muted">${icon('edit')}</span></button></h1>
           <p class="ph-title">${esc(s.title)}</p>
           <p class="muted small">Niveau ${lv.level} · ${fmt(lv.into)} / ${fmt(lv.need)} XP</p>
           <span class="xpbar"><i style="width:${(lv.into / lv.need) * 100}%"></i></span>
-          <p class="small muted">${av ? `Avatar : ${esc(av.name)} · touche-le pour en changer` : 'Touche le sceau pour choisir un avatar parmi tes créatures.'}</p>
+          <p class="small muted">${av ? `Avatar : ${esc(av.name)}` : 'Touche le sceau pour choisir un avatar parmi tes créatures.'}</p>
         </div>
       </section>
 
