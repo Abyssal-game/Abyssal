@@ -319,7 +319,7 @@ export const sfx = {
 // ——— Sons enregistrés (assets/sfx/<clé>.mp3) ———
 // La liste des fichiers livrés est dans assets/sfx/manifest.json. Un son enregistré remplace son équivalent
 // synthétisé ; sans fichier (ou sans réseau), le son synthétisé reste joué. Clés de l'ouverture de carte :
-// reveal-1 (Commune, Peu commune), reveal-2 (Rare, Hyper rare), reveal-3 (Mythique, Secrète).
+// reveal-1 (Commune, Peu commune), reveal-2 (Rare, Hyper rare), reveal-3 (Mythique), reveal-4 (Secrète).
 const samples = {}; let sampleList = null, sampleLoad = null;
 function loadSamples() {
   if (sampleLoad || !ctx) return;
@@ -329,7 +329,8 @@ function loadSamples() {
       .then((b) => b && new Promise((ok, ko) => ctx.decodeAudioData(b, ok, ko))).then((buf) => { if (buf) samples[k] = buf; }).catch(() => {}));
   });
 }
-const sampleKey = (k, a) => (k === 'reveal' ? `reveal-${a[0] === 'M' || a[0] === 'S' ? 3 : a[0] === 'R' || a[0] === 'HR' ? 2 : 1}` : k);
+// reveal-4 : Secrète (sans fichier reveal-4, elle reprend reveal-3)
+const sampleKey = (k, a) => (k === 'reveal' ? (a[0] === 'S' && samples['reveal-4'] ? 'reveal-4' : `reveal-${a[0] === 'M' || a[0] === 'S' ? 3 : a[0] === 'R' || a[0] === 'HR' ? 2 : 1}`) : k);
 function playSample(key) {
   const buf = samples[key];
   if (!buf || !ensure()) return false;
