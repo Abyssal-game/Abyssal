@@ -45,7 +45,7 @@ export function openChestScene(app, type, { onDone } = {}) {
     el.querySelector('[data-x="close"]').hidden = true;
     // 1. tension : le coffre tremble, la lumière monte
     msg.textContent = 'Le sceau cède…';
-    chest.classList.add('charging'); app.sfx.rumble(1.3);
+    chest.classList.add('charging'); app.sfx.chest();
     await wait(1100);
     // 2. ouverture : éclair, couvercle, rayons
     chest.classList.remove('charging'); chest.classList.add('open');

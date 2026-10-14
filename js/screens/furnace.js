@@ -15,10 +15,10 @@ export function upgradeCard(app, id) {
   try {
     app.pendingProgress = [];
     const r = g.upgrade(id);
-    app.sfx.discover?.();
+    app.sfx.levelup?.();
     toast(`<b>${esc(c.name)}</b> passe au niveau <b>${r.level}</b> (−${fmt(r.cost)} cendres).`, { kind: 'success', icon: 'star' });
     const un = unlockAt(id, r.level);
-    if (un) { toast(`${un.kind === 'Éveil' ? `<b>${esc(c.name)}</b> s’éveille !` : un.kind === 'Apogée' ? `<b>${esc(c.name)}</b> atteint son Apogée !` : `${un.kind === 'Compétence' ? 'Nouvelle compétence' : 'Nouveau passif'} : <b>${esc(un.name)}</b>`}<br><span class="small">${esc(un.desc)}</span>`, { kind: 'success', icon: 'sparkle' }); app.sfx.fury?.(); }
+    if (un) { setTimeout(() => (un.kind === 'Apogée' ? app.sfx.apogee?.() : app.sfx.unlock?.()), 450); toast(`${un.kind === 'Éveil' ? `<b>${esc(c.name)}</b> s’éveille !` : un.kind === 'Apogée' ? `<b>${esc(c.name)}</b> atteint son Apogée !` : `${un.kind === 'Compétence' ? 'Nouvelle compétence' : 'Nouveau passif'} : <b>${esc(un.name)}</b>`}<br><span class="small">${esc(un.desc)}</span>`, { kind: 'success', icon: 'sparkle' }); app.sfx.fury?.(); }
     app.flushProgress();
     app.chrome?.();
     return true;
@@ -71,7 +71,7 @@ export function openBurn(app, id, { onClose } = {}) {
         const r = g.burn(id, v);
         toast(r.gone ? `${esc(card.name)} est partie en fumée : <b>+${fmt(r.ash)} cendres</b>` : `<b>+${fmt(r.ash)} cendres</b>`, { kind: 'success', icon: 'ash' });
       }
-      app.sfx.rumble?.(0.8);
+      app.sfx.burn?.();
       app.flushProgress();
       app.chrome?.();
     } catch (err) { app.pendingProgress = null; app.sfx.error(); toast(esc(err.message), { kind: 'error' }); }

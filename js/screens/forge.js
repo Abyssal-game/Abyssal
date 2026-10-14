@@ -80,7 +80,7 @@ export function furnaceScreen(app, root) {
       if (!(await confirmBox(`Brûler <b>${sp.n} doublon${sp.n > 1 ? 's' : ''}</b> pour <b>${fmt(sp.ash)} cendres</b> ?<br><span class="small">Tu gardes un exemplaire de chaque finition.</span>`, { ok: 'Tout brûler' }))) return;
       app.pendingProgress = [];
       const r = g.burnSpares();
-      app.sfx.rumble?.(1.2);
+      app.sfx.burnall?.();
       toast(`La Fournaise rugit : <b>+${fmt(r.ash)} cendres</b>`, { kind: 'epic', icon: 'ash' });
       app.flushProgress(); app.chrome?.();
       draw();

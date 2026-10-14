@@ -230,7 +230,7 @@ function onProgress(events) {
     if (e.kind === 'fame') toast(`Renommée : <b>${esc(e.name)}</b>`, { kind: 'epic', icon: 'star', ms: 4200 });
     if (e.kind === 'season') toast(`<b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'epic', icon: 'trophy', ms: 4600 });
     if (e.kind === 'level') toast(`<img class="picon toast-xp" alt="" src="assets/icons/xp.webp"><span>Niveau <b>${e.level}</b> atteint !<br><span class="small">${rewardText(e.reward)}</span></span>`, { kind: 'level', ms: 3800 });
-    sfx.achievement();
+    (e.kind === 'fame' ? sfx.fame : e.kind === 'season' ? sfx.season : sfx.achievement)();
   }, (app.holdToasts ? 0 : 300) + i * 650));
 }
 
