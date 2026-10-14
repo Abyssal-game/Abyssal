@@ -37,7 +37,7 @@ export function identityHTML(c, level) {
       <span class="ck-lv">${x.open ? icon('check') : icon('lock')}<small>Niv. ${x.lv}</small></span>
       ${x.img ? `<img class="ck-ic" alt="" src="${x.img}">` : ''}
       <span class="ck-t"><b><span class="ck-k">${x.kind}</span> ${esc(x.name)}</b>${x.cost ? `<span class="cb-k">${x.cost}</span>` : ''}<span class="small">${esc(x.desc)}</span></span></li>`).join('')}</ol>
-    ${nx ? `<p class="small ck-next">${icon('p:level-up')} Prochain déblocage au niveau ${nx.lv} : <b>${esc(nx.kind === 'Éveil' ? 'l’Éveil' : nx.name)}</b></p>` : '<p class="small ck-next gold">Identité complète : tout est débloqué.</p>'}
+    ${nx ? `<p class="small ck-next">${icon('p:level-up')} Prochain déblocage au niveau ${nx.lv} : <b>${esc(nx.kind === 'Éveil' ? 'l’Éveil' : nx.kind === 'Apogée' ? 'l’Apogée' : nx.name)}</b></p>` : '<p class="small ck-next gold">Identité complète : tout est débloqué.</p>'}
     <div class="ck-traits"><p class="small"><b class="dc-good">Forces</b> ${esc(k.plus)}</p><p class="small"><b class="dc-bad">Faiblesses</b> ${esc(k.moins)}</p><p class="small"><b>Alliés</b> ${esc(k.synergy)}</p></div>
   </div>`;
 }

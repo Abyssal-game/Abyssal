@@ -2,7 +2,8 @@
 import { loadCatalogData, createCatalog } from './core/catalog.js';
 import { Game } from './core/game.js';
 import { loadArtManifest, artUrl, hasRealArt } from './art/assets.js';
-import { setCardCatalog, setFameLookup } from './ui/card.js';
+import { setCardCatalog, setFameLookup, setApexLookup } from './ui/card.js';
+import { MAX_LEVEL } from './core/army.js';
 import { fameTier } from './core/renown.js';
 import { icon, EMBLEM } from './ui/icons.js';
 import { toast, esc, fmt, reducedMotion, closeTopSheet, openSheet } from './ui/dom.js';
@@ -270,6 +271,7 @@ async function boot() {
     app.catalog = catalog;
     app.game = new Game(catalog, storage);
     app.persistent = persistent;
+    setApexLookup((id) => !!app.game.s.collection[id] && app.game.cardLevel(id) >= MAX_LEVEL);
     setFameLookup((id) => (app.game.s.collection[id] ? fameTier(app.game.s.fame[id]) : 0));
     app.game.on('change', () => { renderChrome(); pulseWallet(); });
     app.game.on('progress', (ev) => (app.pendingProgress ? app.pendingProgress.push(...ev) : onProgress(ev)));

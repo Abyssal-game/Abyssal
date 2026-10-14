@@ -2265,8 +2265,8 @@
  {
   "id": "CEL-052",
   "number": 52,
-  "name": "Buraq",
-  "title": "La monture d’un seul voyage",
+  "name": "Coursier de l’Aube",
+  "title": "Le galop qui précède le jour",
   "faction": "celeste",
   "rarity": "R",
   "category": "Créature céleste",
@@ -2289,7 +2289,7 @@
     "value": 1
    }
   ],
-  "visual": "Coursier blanc ailé, plus grand qu’un âne et plus petit qu’un mulet, galopant sur un chemin de lumière.",
+  "visual": "Grand destrier blanc aux ailes pourpres et argentées, deux cornes dorées torsadées, galopant sur un chemin de lumière entre les étoiles.",
   "lore": "Chacun de ses pas se pose aussi loin que son regard porte.",
   "evolution": null,
   "sets": [],
@@ -2309,7 +2309,7 @@
    "scene": null
   },
   "image": "assets/art/CEL-052.webp",
-  "artPrompt": "Buraq — Coursier blanc ailé, plus grand qu’un âne et plus petit qu’un mulet, galopant sur un chemin de lumière. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+  "artPrompt": "Coursier de l’Aube — Grand destrier blanc aux ailes pourpres et argentées, deux cornes dorées torsadées, galopant sur un chemin de lumière entre les étoiles. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "CEL-053",

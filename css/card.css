@@ -280,3 +280,14 @@
 .tcg.fm1 { box-shadow: 0 6px 18px rgba(0, 0, 0, .55), 0 0 0 1px rgba(205, 127, 50, .55), 0 0 10px rgba(205, 127, 50, .25); }
 .tcg.fm2 { box-shadow: 0 6px 18px rgba(0, 0, 0, .55), 0 0 0 1px rgba(210, 220, 240, .6), 0 0 12px rgba(210, 220, 240, .3); }
 .tcg.fm3 { box-shadow: 0 6px 18px rgba(0, 0, 0, .55), 0 0 0 1.5px rgba(242, 193, 78, .8), 0 0 16px rgba(242, 193, 78, .4); }
+
+/* Apogée (niveau maximum, v211) : liseré doré qui tourne autour de la carte */
+.tcg.apex::before { content: ''; position: absolute; inset: 0; z-index: 5; border-radius: inherit; padding: 2px; pointer-events: none;
+  background: conic-gradient(from var(--apx, 0deg), #7a5410, #F2C14E, #fff3c4, #F2C14E, #7a5410 40%, #7a5410 60%, #F2C14E 80%, #7a5410);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: apexSpin 4s linear infinite; }
+@property --apx { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes apexSpin { to { --apx: 360deg; } }
+.tcg.apex { box-shadow: 0 6px 18px rgba(0, 0, 0, .55), 0 0 18px rgba(242, 193, 78, .45); }
+@media (prefers-reduced-motion: reduce) { .tcg.apex::before { animation: none; } }
+html.reduce-motion .tcg.apex::before { animation: none; }

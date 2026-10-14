@@ -210,15 +210,16 @@ test('kits : combats complets sans erreur, l’IA utilise les compétences propr
   assert.ok(won > 0);
 });
 
-test('fiche : 4 étapes par créature, chacune décrite, et le déblocage annoncé au bon niveau', async () => {
+test('fiche : 5 étapes par créature, chacune décrite, et le déblocage annoncé au bon niveau', async () => {
   const { kitSteps, nextUnlock, unlockAt } = await import('../js/core/kits.js');
   for (const id of Object.keys(CREATURE_KITS)) {
     const s1 = kitSteps(id, 1);
-    assert.deepEqual(s1.map((x) => x.lv), [1, 3, 6, 9]);
+    assert.deepEqual(s1.map((x) => x.lv), [1, 3, 6, 9, 10]);
     assert.ok(s1.every((x) => x.name && x.desc), `${id} : chaque étape a un texte`);
-    assert.deepEqual(s1.map((x) => x.open), [true, false, false, false]);
+    assert.deepEqual(s1.map((x) => x.open), [true, false, false, false, false]);
     assert.equal(nextUnlock(id, 1).k, 'passive');
-    assert.equal(nextUnlock(id, 9), null);
+    assert.equal(nextUnlock(id, 9).k, 'apogee'); assert.equal(nextUnlock(id, 10), null);
+    assert.equal(unlockAt(id, 10).k, 'apogee');
     assert.equal(unlockAt(id, 6).k, 'move'); assert.equal(unlockAt(id, 9).k, 'awaken');
     assert.equal(unlockAt(id, 1), null); assert.equal(unlockAt(id, 5), null);
   }
@@ -339,4 +340,20 @@ test('équipe suggérée : dans le budget, 5 créatures possédées, avec des sy
   }
   assert.ok(tagsOf(catalog.get('NEC-017'), 6).gives.has('slow'), 'la Banshee ralentit');
   assert.ok(tagsOf(catalog.get('ABY-039'), 3).wants.has('slow'), 'le Kraken profite du gel');
+});
+
+test('Apogée : au niveau 10, la compétence propre d’une créature du joueur se recharge un tour plus vite', async () => {
+  const { rechargeOf, moveOf } = await import('../js/core/kits.js');
+  const { duelUnit } = await import('../js/core/duel.js');
+  let n = 0;
+  for (const id of Object.keys(CREATURE_KITS).slice(0, 60)) {
+    const c = catalog.get(id); if (!c) continue;
+    const u9 = duelUnit(c, { level: 9 }), u10 = duelUnit(c, { level: 10 }), e10 = duelUnit(c, { level: 10, side: 'enemy' });
+    const k = moveOf(u10); if (!k) continue;
+    const a = rechargeOf(u9, k), b = rechargeOf(u10, k);
+    assert.equal(b, Math.max(1, a - 1), id);
+    if (moveOf(e10) === k) assert.equal(rechargeOf(e10, k), a, 'les ennemis n’en profitent pas');
+    n++;
+  }
+  assert.ok(n > 30);
 });

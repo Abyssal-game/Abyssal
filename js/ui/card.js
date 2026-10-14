@@ -10,6 +10,9 @@ export function setCardCatalog(c) { catalogRef = c; }
 // Renommée (palier 0 à 3) des créatures possédées : badge et lueur sur la carte
 let fameRef = () => 0;
 export function setFameLookup(f) { fameRef = f; }
+// Apogée (niveau maximum atteint) : cadre doré animé
+let apexRef = () => false;
+export function setApexLookup(f) { apexRef = f; }
 const FAME_NAMES = ['', 'Vétéran', 'Héros', 'Légende'];
 
 function hueFor(id) { return Math.floor(seeded('hue:' + id)() * 300) + 30; }
@@ -23,7 +26,7 @@ export function cardHTML(card, opts = {}) {
   const r = RARITY[card.rarity];
   const fc = catalogRef?.faction[card.faction]?.colors.secondary || '#888';
   const fame = mystery ? 0 : fameRef(card.id);
-  const cls = ['tcg', `tcg-${size}`, `r-${card.rarity}`, `f-${card.faction}`, mystery ? 'is-mystery' : `v-${variant}`, hasRealArt(card.id) ? 'real' : '', fame ? `fm${fame}` : ''].join(' ');
+  const cls = ['tcg', `tcg-${size}`, `r-${card.rarity}`, `f-${card.faction}`, mystery ? 'is-mystery' : `v-${variant}`, hasRealArt(card.id) ? 'real' : '', fame ? `fm${fame}` : '', !mystery && apexRef(card.id) ? 'apex' : ''].join(' ');
   const fameB = fame ? `<span class="tcg-fame" title="${FAME_NAMES[fame]}" aria-label="Renommée : ${FAME_NAMES[fame]}"><img alt="" src="assets/icons/fame-${fame}.webp" onerror="this.remove()"></span>` : '';
   const style = `--rc:${r.color};--fc:${fc};--hue:${hueFor(card.id)}deg`;
   const lite = size === 'mini';

@@ -14,7 +14,7 @@
 
 import { GEN_KITS } from './kits-data.js';
 
-export const KIT_LEVELS = { strike: 1, passive: 3, move: 6, awaken: 9 };
+export const KIT_LEVELS = { strike: 1, passive: 3, move: 6, awaken: 9, apogee: 10 };
 export const KIT_STEPS = [
   { k: 'strike', lv: 1, name: 'Frappe' }, { k: 'passive', lv: 3, name: 'Passif' },
   { k: 'move', lv: 6, name: 'Compétence' }, { k: 'awaken', lv: 9, name: 'Éveil' },
@@ -389,7 +389,12 @@ export const passiveOf = (u) => passivesOf(u)[0] || null;
 // Passif renforcé par l'Éveil (seulement si l'Éveil n'apporte pas un second passif)
 export const boosted = (u, key) => awake(u) && kitOf(u)?.passive === key && !kitOf(u).passive2 && hasP(u, key);
 // Recharge (en tours) d'une compétence propre
-export const rechargeOf = (u, key) => { const M = moveFor(u, key) || MOVES[key]; return M.recharge ? M.recharge(u, { awake }) : M.cd; };
+// Apogée (niveau 10, créatures du joueur) : la compétence propre se recharge un tour plus vite
+export const apogee = (u) => u.side !== 'enemy' && hasPerk(u, 'apogee');
+export const rechargeOf = (u, key) => {
+  const own = moveFor(u, key), M = own || MOVES[key], cd = M.recharge ? M.recharge(u, { awake }) : M.cd;
+  return own && apogee(u) ? Math.max(1, cd - 1) : cd;
+};
 // Répartition attaque / PV d'une carte (fiche et duelUnit)
 export const statShape = (id) => CREATURE_KITS[id]?.stat || { atk: 1, hp: 1 };
 
@@ -427,6 +432,7 @@ export function kitSteps(id, level = 1) {
     { k: 'passive', kind: 'Passif', name: P.name, desc: P.desc, img: passiveIconUrl(k.passive) },
     { k: 'move', kind: 'Compétence', name: M.name, desc: M.desc, img: moveIconUrl(M.icon), cost: `${M.ap} action${M.ap > 1 ? 's' : ''} · recharge ${M.cd} tours` },
     { k: 'awaken', kind: 'Éveil', name: 'Éveil', desc: aw, img: (P2 && passiveIconUrl(k.passive2)) || 'assets/icons/ck-eveil.webp' },
+    { k: 'apogee', kind: 'Apogée', name: 'Apogée', desc: `${M.name} se recharge un tour plus vite${M.cd > 1 ? ` (${M.cd - 1} tour${M.cd > 2 ? 's' : ''} au lieu de ${M.cd})` : ''}, et la carte reçoit un cadre doré animé.`, img: 'assets/icons/ck-apogee.webp' },
   ].map((x) => ({ ...x, lv: KIT_LEVELS[x.k], open: level >= KIT_LEVELS[x.k] }));
 }
 export const nextUnlock = (id, level) => kitSteps(id, level).find((x) => !x.open) || null;

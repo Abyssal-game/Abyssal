@@ -106,7 +106,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
           <span class="dt-chip" style="--c:${r.color}">${r.name}</span>
           <span class="dt-chip" style="--c:${fac.colors.secondary}">${sigil(card.faction)}${esc(fac.name)}</span>
           <span class="dt-chip">×${e.n} exemplaire${e.n > 1 ? 's' : ''}</span>
-          <span class="dt-chip gold">Niv. ${li.level}</span>
+          <span class="dt-chip gold">Niv. ${li.level}${li.level >= li.max ? ' · Apogée' : ''}</span>
         </div>
         ${fameHTML(g.fameOf(current))}
         <button class="btn ${inTeam ? 'ghost' : 'primary'} block dt-team" data-act="team">${picon('team')}${inTeam ? 'Dans ton équipe · retirer' : 'Ajouter à mon équipe'}</button>
