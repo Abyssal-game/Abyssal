@@ -52,7 +52,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   const T = (ms) => (reduced ? Math.min(ms, 80) : ui.fast === 3 ? ms * 0.25 : ui.fast ? ms * 0.45 : ms); // vitesse ×1, ×2 ou ×3
   const defMode = 'on'; // la défense active est la même pour tout le monde
   let alive_ = true, busy = false, sel = null, mode = null; // mode : action en attente de cible
-  let confirm = null; // { key, t } : compétence à risque en attente de confirmation
+  let holdT = null, held = false; // appui long sur une action : sa description (v249, plus de fenêtre de confirmation)
   const ctl = new AbortController();
   const ult = ULTS[st.ult];
   document.body.classList.add('battle-mode');
@@ -160,21 +160,6 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         <span class="cb-ai">${a.own ? `<img class="aicon" alt="" src="${moveIconUrl(a.icon)}">` : actIcon(a.key, a.icon)}</span><b>${esc(a.name)}</b>
         <span class="cb-cost">${'<i class="pa"></i>'.repeat(a.ap) || '<i class="free">0</i>'}${a.fervor ? `<i class="fv">${a.fervor}</i>` : ''}${a.dice ? '<i class="d20">D20</i>' : ''}${a.own && a.wait ? `<i class="cdw" title="Se recharge">${a.wait}</i>` : ''}</span></button>`).join('')}</div>`;
   }
-  function confirmHTML() {
-    const { key, t } = confirm;
-    const u = st.units[sel], tg = st.units[t], a = actionsFor(st, sel).find((x) => x.key === key);
-    const r = preview(st, sel, key, t).roll;
-    return `<div class="cb-confirm">
-      <p><b>${esc(a.name)}</b> → ${esc(cat.get(tg.id).name)}</p>
-      <div class="cb-odds"><span class="cb-pct" style="--p:${r.chance}"><b>${r.chance}%</b><small>réussite</small></span>
-      <ul><li>Difficulté (DD) : <b>${r.dc}</b></li>${r.mods.length ? r.mods.map(([n, v]) => `<li class="mod">${esc(n)} <b>+${v}</b></li>`).join('') : '<li class="muted">Aucun bonus : marque, gel, Brisure ou faiblesse aident.</li>'}
-      <li class="muted">1 : échec critique · 20 : critique</li></ul></div>
-      <p class="small muted">${esc(KITS[u.role].skill.desc)}</p>
-      <p class="cb-ryhint">${icon('sparkle')} Frappe en rythme : <b>+${RHYTHM.good}</b> au dé, <b>+${RHYTHM.perfect}</b> si parfait</p>
-      <div class="row gap"><button class="btn dc-plq dc-plq-dark" data-d="cancel">Annuler</button><button class="btn primary cb-roll dc-plq dc-plq-red" data-d="go"><img class="btn-die" alt="" src="assets/fx/d20.webp">Frapper</button></div>
-    </div>`;
-  }
-
   // ——— Tutoriel du premier combat : une main dorée montre quoi toucher ———
   let guide = !g.s.tips?.['cb-guide'];
   function guideStep() {
@@ -219,7 +204,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     $('.dv-resw').innerHTML = resHTML('ally') + (sw?.swallowed ? `<span class="cb-swal" title="Engloutie : brise le Dévoreur pour la libérer"><img alt="" src="${artUrl(cat.get(sw.id), { lite: true })}"><small>Engloutie · ${sw.hp} PV</small></span>` : '');
     const showActs = !!sel && st.turn === 'ally' && !busy && !st.over;
     actsEl.hidden = !showActs;
-    actsEl.innerHTML = showActs ? (confirm ? confirmHTML() : actsHTML()) : '';
+    actsEl.innerHTML = showActs ? actsHTML() : '';
     $('.cb-pips').innerHTML = Array.from({ length: Math.max(AP_MAX, st.ap) }, (_, i) => `<i class="${i < st.ap ? 'on' : ''}"></i>`).join('');
     $('.cb-gems').innerHTML = Array.from({ length: FERVOR_MAX }, (_, i) => `<i class="${i < st.fervor ? 'on' : ''}"></i>`).join('');
     const ready = ultReady(st);
@@ -230,8 +215,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     $('.dv-end').classList.toggle('pulse', st.turn === 'ally' && !canMore && !busy);
     root.querySelectorAll('.dv-bar button').forEach((b) => { b.disabled = busy || st.turn !== 'ally' || !!st.over; });
     if (!busy && st.turn === 'ally' && !st.over) {
-      if (confirm) say('Vérifie tes chances, puis lance le dé');
-      else if (mode) say(`${esc(mode.name)} : choisis la cible <button class="cb-cancel" data-d="cancel">Annuler</button>`);
+      if (mode) say(`<b>${esc(mode.name)}</b> : touche la cible${mode.dice ? ' · chances affichées dessus' : ''} <button class="cb-cancel" data-d="cancel">Annuler</button>`);
       else if (sel) say(`Choisis une action · <b>${st.ap}</b> action${st.ap > 1 ? 's' : ''} pour l’équipe`);
       else say(canMore ? `Touche une créature · <b>${st.ap}</b> action${st.ap > 1 ? 's' : ''} pour l’équipe` : 'Touche <b>Fin du tour</b>');
     } else if (st.turn === 'enemy' && !st.over) say('<b class="dc-bad">Tour des créatures corrompues</b>');
@@ -245,7 +229,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const t = el(uid); if (!t) return;
     const b = document.createElement('span'); b.className = `dv-burst ${cls}`;
     b.innerHTML = Array.from({ length: 10 }, (_, i) => `<i style="--a:${i * 36 + Math.round(Math.random() * 20)}deg;--r:${30 + Math.round(Math.random() * 26)}px"></i>`).join('');
-    t.appendChild(b); setTimeout(() => b.remove(), 650);
+    t.appendChild(b); setTimeout(() => b.remove(), cls === 'ember' ? 1000 : 650);
   };
   const fxAt = (uid, name, { big = false, center = false } = {}) => {
     if (reduced) return;
@@ -325,33 +309,28 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   // ——— Lecture des événements (animations) ———
   let lastTier = null; // résultat du dernier jet de dé : le coup qui suit le montre
   let lastDef = 'none'; // résultat de la dernière défense active
-  let pendingCU = null; // gros plan d'une compétence à dé, joué après le dé
+  let pendingLunge = null; // élan d'une compétence à dé, joué après le jet (pas avant)
+  let lastAtk = null, fatalDone = false; // dernière créature alliée à avoir agi : gros plan du coup fatal sur le dernier ennemi
   const DICE_KEYS = ['estoc', 'contagion', 'entrave'];
   async function play(ev) {
     for (const e of ev) {
       if (!alive_) return;
       switch (e.t) {
         case 'act':
-          // gros plan : une compétence sur un ennemi (sauf la Marque). Avec un jet de dé, il vient après le dé.
-          if (e.skill && e.key !== 'marque' && e.tgt && st.units[e.tgt]?.side === 'enemy') {
-            const own = moveFor(st.units[e.u], e.key);
-            app.sfx.skill();
-            if (DICE_KEYS.includes(e.key)) { pendingCU = { u: e.u, tgt: e.tgt, name: e.name, own }; break; }
-            if (await closeup(e.u, e.tgt, e.name, { own })) break;
-          }
+          lastAtk = st.units[e.u]?.side === 'ally' ? e.u : null;
           if (e.skill) {
             const own = moveFor(st.units[e.u], e.key);
             app.sfx.skill();
             banner(`${own ? `<img class="aicon" alt="" src="${moveIconUrl(own.icon)}">` : actIcon(KITS[st.units[e.u].role].skill.key, KITS[st.units[e.u].role].skill.icon)} ${esc(e.name)}`, own ? 'skill own' : 'skill', 700);
             await wait(T(360));
           }
-          if (e.tgt && st.units[e.tgt]?.side === 'enemy' && e.key !== 'marque' && e.key !== 'entrave') { lunge(e.u, e.tgt); cam(e.tgt, 0.6); await wait(T(LUNGE_HIT)); }
+          if (e.tgt && st.units[e.tgt]?.side === 'enemy' && DICE_KEYS.includes(e.key)) pendingLunge = { u: e.u, tgt: e.tgt };
+          else if (e.tgt && st.units[e.tgt]?.side === 'enemy' && e.key !== 'marque' && e.key !== 'entrave') { lunge(e.u, e.tgt); cam(e.tgt, 0.6); await wait(T(LUNGE_HIT)); }
           else if (e.key === 'marque' && e.tgt) { fxAt(e.tgt, 'seal'); ring(e.tgt, 'mark'); await wait(T(260)); }
           break;
         case 'eact': {
           const def = INTENTS[e.kind];
-          // gros plan sur les coups lourds ennemis contre une seule cible
-          if (e.kind === 'heavy' && lastDef === 'none' && e.tgt && st.units[e.tgt]?.side === 'ally' && await closeup(e.a, e.tgt, def.name)) break;
+          lastAtk = null;
           if (e.kind === 'heavy' || e.kind === 'blast') banner(`${intentIcon(e.kind)} ${esc(def.name)} !`, 'danger', 700);
           if (e.tgt && st.units[e.tgt]?.side === 'ally') { lunge(e.a, e.tgt); cam(e.tgt, 0.6); await wait(T(LUNGE_HIT)); }
           else await wait(T(200));
@@ -398,8 +377,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         case 'recover': float(e.u, 'Se relève', 'info'); await wait(T(260)); break;
         case 'roll': {
           await rollFx(e); lastTier = e.tier;
-          const P = pendingCU; pendingCU = null;
-          if (P && !(await closeup(P.u, P.tgt, P.name, { crit: e.tier === 'crit', own: P.own })) && e.tier !== 'fumble') { lunge(P.u, P.tgt); cam(P.tgt, 0.6); await wait(T(LUNGE_HIT)); }
+          const P = pendingLunge; pendingLunge = null;
+          if (P && e.tier !== 'fumble') { lunge(P.u, P.tgt); cam(P.tgt, 0.6); await wait(T(LUNGE_HIT)); }
           break;
         }
         case 'boss': { if (e.s === 'Effondrement !') fxAt(null, 'collapse', { center: true }); app.sfx.boss(); dio.roar(); const t = el(e.u); if (t) { t.classList.remove('roar'); void t.offsetWidth; t.classList.add('roar'); } float(e.u, e.s, 'boss'); shake(true); await wait(T(650)); break; }
@@ -435,7 +414,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           await wait(T(e.syn ? 480 : 260));
           break;
         case 'combo': comboPop(e.u, 'chain'); float(e.u, `Chaîne ×${e.n}`, 'combo'); app.sfx.crit?.(); await wait(T(260)); if (!g.s.tips?.['cb-combo']) tuto(app, 'cb-combo'); break;
-        case 'finisher': { if (!reduced) { const d = $('.dv'); d.classList.add('slowmo'); setTimeout(() => d.classList.remove('slowmo'), 700); } banner('Coup de grâce !', 'finisher', 800); await wait(T(380)); break; }
+        case 'finisher': { if (st.over === 'won') break; if (!reduced) { const d = $('.dv'); d.classList.add('slowmo'); setTimeout(() => d.classList.remove('slowmo'), 700); } banner('Coup de grâce !', 'finisher', 800); await wait(T(380)); break; }
         case 'die': {
           const u = st.units[e.u];
           if (u?.boss) {
@@ -447,7 +426,10 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
             banner(`${esc(cat.get(u.id).name)} est vaincu`, 'finisher', 1300);
             await wait(T(1100)); d?.classList.remove('slowmo', 'bossfall'); draw(); break;
           }
-          app.sfx.death(); fxAt(e.u, 'death', { big: true }); sparks(e.u, 'big'); el(e.u)?.classList.add('dying'); await wait(T(440)); draw(); break;
+          // coup fatal : le dernier ennemi tombe sous un coup allié → gros plan, une fois par combat
+          if (u?.side === 'enemy' && st.over === 'won' && lastAtk && !fatalDone) { fatalDone = true; await closeup(lastAtk, e.u, 'Coup fatal', { crit: true, sub: '' }); }
+          // la carte blanchit, se fissure, puis part en cendres (braises qui montent)
+          app.sfx.death(); fxAt(e.u, 'death', { big: true }); sparks(e.u, 'ember'); el(e.u)?.classList.add('dying', 'cracking'); await wait(T(640)); draw(); break;
         }
         case 'enter': draw(); el(e.u)?.classList.add('enter'); await wait(T(340)); break;
         case 'revive': draw(); float(e.u, 'Relevée !', 'heal'); await wait(T(280)); break;
@@ -462,7 +444,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   const LUNGE_HIT = 190; // instant du contact dans l'élan (ms), synchronisé avec dvLunge
   // ——— Gros plan (v236) : compétences et coups critiques. Bandes de cinéma, les deux cartes au centre,
   // l'attaquant s'élance, impact. Accéléré avec la vitesse ×2/×3, absent si les animations sont réduites.
-  async function closeup(aUid, tUid, label, { crit = false, own = null } = {}) {
+  async function closeup(aUid, tUid, label, { crit = false, own = null, sub = null } = {}) {
     const a = el(aUid), t = el(tUid), box = $('.dv');
     if (!a || !t || !box || reduced || ui.fast === 3) return false;
     const enemyAtk = st.units[aUid]?.side === 'enemy';
@@ -470,9 +452,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     ov.className = `cu ${enemyAtk ? 'foe' : ''} ${crit ? 'crit' : ''}`;
     ov.style.setProperty('--cu', `${T(1000)}ms`);
     const cw = Math.min(150, Math.max(a.getBoundingClientRect().width, t.getBoundingClientRect().width));
-    const clone = (n, cls) => { const c = n.cloneNode(true); c.className = `${n.className} cu-card ${cls}`; c.style.width = `${cw}px`; c.removeAttribute('data-uid'); c.querySelectorAll('[data-uid]').forEach((x) => x.removeAttribute('data-uid')); return c; };
+    const clone = (n, cls) => { const c = n.cloneNode(true); c.className = `${n.className} cu-card ${cls}`; c.classList.remove('lunge', 'hit', 'dodge', 'roar', 'enter', 'cracking', 'dying', 'guide'); c.style.width = `${cw}px`; c.removeAttribute('data-uid'); c.querySelectorAll('[data-uid]').forEach((x) => x.removeAttribute('data-uid')); return c; };
     ov.innerHTML = `<span class="cu-bar top"></span><span class="cu-bar bot"></span><span class="cu-flash"></span>
-      <div class="cu-stage"></div><p class="cu-lbl">${own ? `<img class="aicon" alt="" src="${moveIconUrl(own.icon)}">` : ''}<b>${esc(label)}</b>${crit ? '<small>Critique !</small>' : ''}</p>`;
+      <div class="cu-stage"></div><p class="cu-lbl">${own ? `<img class="aicon" alt="" src="${moveIconUrl(own.icon)}">` : ''}<b>${esc(label)}</b>${sub ?? (crit ? 'Critique !' : '') ? `<small>${sub ?? 'Critique !'}</small>` : ''}</p>`;
     const stage = ov.querySelector('.cu-stage');
     stage.append(clone(a, 'cu-a'), clone(t, 'cu-t'));
     const fx = document.createElement('img'); fx.className = 'cu-fx'; fx.alt = ''; fx.src = `assets/fx/${crit ? 'crit' : 'impact'}.webp`; stage.appendChild(fx);
@@ -487,8 +469,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const a = el(aUid), t = el(tUid);
     if (!a || !t || reduced) return;
     const ra = a.getBoundingClientRect(), rt = t.getBoundingClientRect();
-    a.style.setProperty('--dx', `${(rt.left - ra.left) * 0.55}px`);
-    a.style.setProperty('--dy', `${(rt.top - ra.top) * 0.55}px`);
+    a.style.setProperty('--dx', `${(rt.left - ra.left) * 0.62}px`);
+    a.style.setProperty('--dy', `${(rt.top - ra.top) * 0.62}px`);
     a.style.setProperty('--ld', `${T(420)}ms`);
     a.classList.remove('lunge'); void a.offsetWidth; a.classList.add('lunge');
   }
@@ -515,11 +497,11 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
 
   async function finish() {
     if (!st.over || !alive_) return;
-    busy = true; sel = null; mode = null; confirm = null; draw();
+    busy = true; sel = null; mode = null; draw();
     say(st.over === 'won' ? '<b class="dc-good">Victoire !</b>' : '<b class="dc-bad">Défaite…</b>');
     (st.over === 'won' ? (st.bossKey ? app.sfx.bossvictory : app.sfx.victory) : app.sfx.defeat)();
     $('.dv').insertAdjacentHTML('beforeend', `<div class="cb-end">${crestHTML(st.over === 'won', st.over === 'won' ? 'Victoire' : 'Défaite')}</div>`);
-    await wait(T(1300));
+    await wait(T(st.over === 'won' ? 850 : 1200));
     if (alive_) { alive_ = false; ctl.abort(); dio.destroy(); document.body.classList.remove('battle-mode'); onEnd(); }
   }
 
@@ -669,7 +651,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   }
   async function doEnd() {
     if (busy || st.turn !== 'ally' || st.over) return;
-    busy = true; sel = null; mode = null; confirm = null; draw();
+    busy = true; sel = null; mode = null; draw();
     const ev = beginEnemyTurn(st); g.persist();
     await play(ev);
     if (!st.over) await enemyTurn();
@@ -714,10 +696,18 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (key === 'swap') { if (ts.length === 1) { mode = null; return exec(() => act(st, u, 'swap', ts[0])); } return pickReserve(); }
     if (a.dice && !g.s.tips?.['cb-dice']) await tuto(app, 'cb-dice');
     if (ts.length === 1 && (key === 'rempart' || key === 'priere')) { mode = null; return exec(() => act(st, u, key, ts[0])); }
-    mode = { key, name: a.name };
+    mode = { key, name: a.name, dice: !!a.dice };
     draw();
   }
-  function pickTarget(uid) {
+  // Description d'une action (appui long sur sa tuile)
+  function actInfo(key) {
+    const u = sel && st.units[sel]; if (!u) return;
+    const a = actionsFor(st, sel).find((x) => x.key === key); if (!a) return;
+    const d = a.desc || (key === KITS[u.role].skill.key ? KITS[u.role].skill.desc : '');
+    app.sfx.tap();
+    toast(`<b>${esc(a.name)}</b>${a.dice ? ' · dé à 20 faces' : ''}${a.ap ? ` · ${a.ap} action${a.ap > 1 ? 's' : ''}` : ' · gratuit'}${d ? `<br>${esc(d)}` : ''}${!a.ok && a.why ? `<br><i>${esc(a.why)}</i>` : ''}`, { icon: 'sparkle', ms: 4200 });
+  }
+  async function pickTarget(uid) {
     const key = mode.key;
     if (!actionTargets(st, sel, key).includes(uid)) {
       const t = st.units[uid];
@@ -726,8 +716,12 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       return;
     }
     const a = actionsFor(st, sel).find((x) => x.key === key);
-    if (a.dice) { confirm = { key, t: uid }; mode = null; app.sfx.tap(); draw(); return; }
     const u = sel; mode = null;
+    if (a.dice) { // compétence à dé : la frappe rythmée part tout de suite, puis le jet
+      busy = true; app.sfx.tap(); draw();
+      st.rhythm = await rhythmQTE(a.name);
+      if (!alive_) return;
+    }
     return exec(() => act(st, u, key, uid));
   }
   async function pickReserve() {
@@ -750,6 +744,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   }
   // ——— Touchers ———
   root.addEventListener('pointerdown', (e) => { if (defTap && !e.target.closest('[data-d="quit"],[data-d="help"],[data-d="fast"]')) { e.preventDefault(); defTap(); } }, { signal: ctl.signal });
+  root.addEventListener('pointerdown', (e) => { const ab = e.target.closest('[data-a]'); clearTimeout(holdT); held = false; if (!ab || busy || !sel) return; holdT = setTimeout(() => { held = true; actInfo(ab.dataset.a); }, 420); }, { signal: ctl.signal });
+  for (const t of ['pointerup', 'pointercancel']) root.addEventListener(t, () => clearTimeout(holdT), { signal: ctl.signal });
+  root.addEventListener('pointermove', (e) => { if (holdT && e.target.closest('[data-a]') == null) clearTimeout(holdT); }, { signal: ctl.signal });
   root.addEventListener('click', async (e) => {
     if (!alive_) return;
     const b = e.target.closest('[data-d]');
@@ -774,15 +771,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       if (k === 'help') return help();
       if (k === 'rule') return ruleSheet(b.dataset.k);
       if (busy) return;
-      if (k === 'desel') { sel = null; mode = null; confirm = null; draw(); return; }
-      if (k === 'cancel') { mode = null; confirm = null; draw(); return; }
-      if (k === 'go' && confirm) {
-        const { key, t } = confirm; confirm = null; const u = sel;
-        const a = actionsFor(st, u).find((x) => x.key === key);
-        busy = true; draw();
-        st.rhythm = await rhythmQTE(a?.name || 'Compétence'); // attaque rythmée : bonus au jet
-        return exec(() => act(st, u, key, t));
-      }
+      if (k === 'desel') { sel = null; mode = null; draw(); return; }
+      if (k === 'cancel') { mode = null; draw(); return; }
       if (k === 'end') return doEnd();
       if (k === 'ult') {
         return ultSheet();
@@ -791,9 +781,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       return;
     }
     const ab = e.target.closest('[data-a]');
-    if (ab) { if (!busy && sel) choose(ab.dataset.a); return; }
+    if (ab) { if (held) { held = false; return; } if (!busy && sel) choose(ab.dataset.a); return; }
     const c = e.target.closest('.dv-c');
-    if (!c || busy || st.over || confirm) return;
+    if (!c || busy || st.over) return;
     const u = st.units[c.dataset.uid];
     if (mode) return pickTarget(u.uid);
     if (u.side === 'ally') {
@@ -828,7 +818,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   }
   async function castUlt() {
     if (!ultReady(st)) return;
-    sel = null; mode = null; confirm = null; busy = true; draw();
+    sel = null; mode = null; busy = true; draw();
     const ev = useUlt(st); g.persist();
     await play(ev);
     const healed = ev.filter((x) => x.t === 'heal').reduce((a, x) => a + x.d, 0);

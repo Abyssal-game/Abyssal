@@ -2290,3 +2290,21 @@ body.has-subnav #subnav { background: #06070B !important; border-bottom: 1px sol
 body.has-subnav #subnav::before { content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: 24px; background: #06070B; pointer-events: none; }
 body.has-subnav #subnav .sn-tab { background: #16121E; }
 @media (max-width: 360px) { .cb-res .cb-ult b { display: -webkit-box !important; font-size: .5rem; } }
+
+/* v249 : combat direct et impacts — mort en cendres, braises, chiffres de dégâts plus grands, appui long sur les actions */
+.dv .cb-a { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.dv-c.dying:not(.ashes) { transition: none !important; animation: cbDie .68s cubic-bezier(.4, 0, .85, .45) both !important; -webkit-mask: linear-gradient(to top, transparent 0 42%, #000 66%) 0 0 / 100% 300% no-repeat; mask: linear-gradient(to top, transparent 0 42%, #000 66%) 0 0 / 100% 300% no-repeat; }
+@keyframes cbDie {
+  0% { transform: none; filter: brightness(2.8) saturate(0); opacity: 1; -webkit-mask-position: 0 0; mask-position: 0 0; }
+  16% { transform: translateX(-5px) rotate(-2deg); filter: brightness(1.1) saturate(.5) sepia(.5); -webkit-mask-position: 0 0; mask-position: 0 0; }
+  40% { -webkit-mask-position: 0 20%; mask-position: 0 20%; opacity: 1; }
+  100% { transform: translateY(-24px) scale(.94) rotate(2deg); filter: brightness(.3) saturate(0) sepia(.9); opacity: 0; -webkit-mask-position: 0 100%; mask-position: 0 100%; }
+}
+.dv-burst.ember { animation: cbRise .95s ease-in both; }
+.dv-burst.ember i { width: 5px; height: 5px; background: #FFC070; box-shadow: 0 0 8px #FF6A2B, 0 0 2px #FFF2C0; animation: dvSpark .9s ease-out forwards; }
+@keyframes cbRise { 25% { opacity: 1; } to { transform: translateY(-56px); opacity: 0; } }
+.dv-float.dmg { font-size: 1.85rem; }
+.dv-float.dmg.big { font-size: 2.35rem; }
+.dv-float.crit { font-size: 2.05rem !important; letter-spacing: 0; }
+@media (max-width: 360px) { .dv-float.dmg { font-size: 1.55rem; } .dv-float.dmg.big { font-size: 1.95rem; } .dv-float.crit { font-size: 1.7rem !important; } }
+@media (prefers-reduced-motion: reduce) { .dv-c.dying:not(.ashes) { animation: none !important; opacity: 0; transition: opacity .2s !important; } .dv-burst.ember { display: none; } }
