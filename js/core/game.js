@@ -125,16 +125,13 @@ export class Game {
   }
 
   // Actions ----------------------------------------------------------------
-  // Boosters gratuits accumulés (un toutes les FREE_PACK.everyHours, FREE_PACK.max au plus).
+  // Booster gratuit du jour : un par jour (heure locale), sans réserve. Pas récupéré aujourd'hui = perdu.
+  // s.freePack.day : le jour où il a été ouvert. nextAt : minuit, si celui du jour est déjà pris.
   freePack(now = this.clock().getTime()) {
-    const per = FREE_PACK.everyHours * 3600000;
-    let { stock, since } = this.s.freePack;
-    if (stock < FREE_PACK.max) {
-      const gained = Math.floor((now - since) / per);
-      if (gained > 0) { stock = Math.min(FREE_PACK.max, stock + gained); since += gained * per; }
-    }
-    if (stock >= FREE_PACK.max) since = now;
-    return { stock, since, nextAt: stock >= FREE_PACK.max ? null : since + per };
+    const d = new Date(now);
+    const taken = this.s.freePack.day === today(d);
+    const midnight = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1).getTime();
+    return { stock: taken ? 0 : FREE_PACK.perDay, nextAt: taken ? midnight : null };
   }
 
   canBuy(type) {
@@ -150,7 +147,7 @@ export class Game {
     let paidWith;
     const free = type === 'standard' ? this.freePack() : null;
     if ((this.s.tickets[type] || 0) > 0) { this.s.tickets[type]--; paidWith = 'ticket'; }
-    else if (free && free.stock > 0) { this.s.freePack = { stock: free.stock - 1, since: free.since }; paidWith = 'free'; }
+    else if (free && free.stock > 0) { this.s.freePack = { day: today(this.clock()) }; paidWith = 'free'; }
     else if (this.s.shards >= def.price) { this.s.shards -= def.price; this.s.stats.shardsSpent += def.price; paidWith = 'shards'; }
     else throw new Error(`Il te manque ${def.price - this.s.shards} éclats (tu en as ${this.s.shards}). La Descente et les Duels des Sceaux en rapportent.`);
 
@@ -1330,7 +1327,7 @@ export class Game {
   }
   devChests() { this.addChests({ bois: 5, fer: 5, or: 3, abyssal: 3 }); this.persist(); }
   devTorches() { this.descent().used = 0; this.persist(); }
-  devFreePacks() { this.s.freePack = { stock: FREE_PACK.max, since: Date.now() }; this.persist(); }
+  devFreePacks() { this.s.freePack = { day: null }; this.persist(); }
   devMissions() { this.missions().list.forEach((x) => { x.p = x.n; }); this.persist(); }
   devItems(n = 5) { Object.keys(ITEMS).forEach((k) => { this.s.items[k] = (this.s.items[k] || 0) + n; }); this.persist(); }
   // power : l'équipe prend le niveau attendu à cet étage (pour essayer la difficulté réelle)

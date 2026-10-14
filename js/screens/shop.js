@@ -75,8 +75,8 @@ export default function shop(app, root, params = []) {
 
   function freeLine() {
     const f = g.freePack();
-    if (!f.nextAt) return `<p class="free-line full">${icon('p:free-pack')}<span><b>${f.stock} booster${f.stock > 1 ? 's' : ''} gratuit${f.stock > 1 ? 's' : ''}</b><small>Réserve pleine : ouvre-les !</small></span></p>`;
-    return `<p class="free-line">${icon('hourglass')}<span>Prochain booster gratuit dans <b>${waitText(f.nextAt - Date.now())}</b><small>${f.stock ? `${f.stock} en réserve` : 'Aucun en réserve'}</small></span></p>`;
+    if (!f.nextAt) return `<p class="free-line full">${icon('p:free-pack')}<span><b>Booster gratuit du jour</b><small>À ouvrir aujourd’hui : il ne s’accumule pas.</small></span></p>`;
+    return `<p class="free-line">${icon('hourglass')}<span>Prochain booster gratuit dans <b>${waitText(f.nextAt - Date.now())}</b><small>Un booster gratuit chaque jour, à minuit.</small></span></p>`;
   }
 
   function render() {

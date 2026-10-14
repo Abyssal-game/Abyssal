@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v230'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v231'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -113,8 +113,8 @@ export const FRAMES = {
   sceaux: 'Cadre des Sceaux', reliques: 'Cadre des Reliques', guerre: 'Cadre de la Guerre',
 };
 
-// Booster standard gratuit qui se recharge avec le temps (aucune obligation de revenir).
-export const FREE_PACK = { everyHours: 48, max: 1 };
+// Booster standard gratuit du jour : un par jour, il ne s'accumule pas (reviens chaque jour).
+export const FREE_PACK = { perDay: 1 };
 
 export const FACTION_ORDER = ['infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel'];
 

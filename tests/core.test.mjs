@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { loadCatalog, MemoryStorage, rngFrom } from './helpers.mjs';
 import { drawBooster, boosterOdds, rollRarity, currentEvent, weekIndex } from '../js/core/boosters.js';
 import { Game, levelFromXp } from '../js/core/game.js';
-import { defaultSave, exportCode, importCode, migrate, loadSave, writeSave } from '../js/core/save.js';
+import { defaultSave, exportCode, importCode, migrate, loadSave, writeSave, today } from '../js/core/save.js';
 import { TABLES, PITY, BOOSTERS, RARITY_ORDER, ECONOMY, SAVE_KEY } from '../js/config.js';
 
 const catalog = loadCatalog();
@@ -92,7 +92,7 @@ test('ouverture : monnaie débitée, cartes enregistrées, doublons à brûler',
   const store = new MemoryStorage();
   const g = new Game(catalog, store, { rng: rngFrom('game') });
   g.s.tickets.standard = 0;
-  g.s.freePack.stock = 0;
+  g.s.freePack.day = today(); // booster gratuit du jour déjà pris
   g.s.shards = 500;
   const before = g.s.shards;
   const { opening, progress } = g.openBooster('standard');
@@ -209,20 +209,21 @@ test('sauvegarde corrompue : repli sur la copie de secours', () => {
   assert.notEqual(source, SAVE_KEY);
 });
 
-test('booster gratuit : se recharge avec le temps, plafonné', () => {
+test('booster gratuit du jour : un par jour, sans réserve', () => {
   let now = new Date(2026, 9, 10, 8);
   const g = new Game(catalog, new MemoryStorage(), { clock: () => now, rng: rngFrom('free') });
-  g.s.freePack = { stock: 0, since: now.getTime() };
   g.s.tickets.standard = 0; g.s.shards = 0;
-  assert.equal(g.canBuy('standard'), false);
-  now = new Date(2026, 9, 11, 20);
-  assert.equal(g.freePack().stock, 0, 'pas avant 48 h');
-  now = new Date(2026, 9, 12, 8, 1);
-  assert.equal(g.freePack().stock, 1);
+  assert.equal(g.freePack().stock, 1, 'disponible dès aujourd’hui');
+  assert.equal(g.freePack().nextAt, null);
   const { opening } = g.openBooster('standard');
   assert.equal(opening.paidWith, 'free');
   assert.equal(g.freePack().stock, 0);
+  assert.equal(g.canBuy('standard'), false);
+  assert.equal(g.freePack().nextAt, new Date(2026, 9, 11).getTime(), 'le suivant à minuit');
+  now = new Date(2026, 9, 10, 23, 59);
+  assert.equal(g.freePack().stock, 0, 'pas deux le même jour');
+  now = new Date(2026, 9, 11, 0, 1);
+  assert.equal(g.freePack().stock, 1, 'un nouveau le lendemain');
   now = new Date(2026, 9, 20, 8);
-  assert.equal(g.freePack().stock, 1, 'plafonné au maximum');
-  assert.equal(g.freePack().nextAt, null);
+  assert.equal(g.freePack().stock, 1, 'les jours manqués ne s’accumulent pas');
 });
