@@ -2121,3 +2121,43 @@ body.battle-mode.has-subnav #view, body.battle-mode #view { padding: calc(var(--
   .dv .cb-pct { width: 54px; height: 54px; }
   .dv .cb-acts:has(.cb-confirm) { padding: 10px 22px 10px; }
 }
+
+/* ——— Images peintes (v237) : cadre, tuiles, médaillon, épée d'esquive, bandeaux du gros plan ——— */
+.dv .cb-acts { border-image: url(../assets/ui/act-panel.webp) 170 fill / 40px stretch; padding: 18px 22px 20px; }
+/* médaillon du portrait */
+.cb-por { width: 56px; height: 56px; padding: 0; background: none; box-shadow: none; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--rc) 60%, transparent)); }
+.cb-por img { position: absolute; inset: 19%; width: 62%; height: 62%; border: 0; }
+.cb-por::after { content: ''; position: absolute; inset: 0; background: url(../assets/ui/medal-ring.webp) center / 100% 100% no-repeat; pointer-events: none; }
+/* tuiles d'action peintes */
+.dv .cb-grid { gap: 7px; }
+.dv .cb-a { aspect-ratio: .8; min-height: 0; padding: 0; border: 0; border-radius: 10px; background: none; box-shadow: none; overflow: visible; isolation: isolate; }
+.dv .cb-a::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: 10px; background: url(../assets/ui/act-tile.webp) center / 100% 100% no-repeat; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .7)); }
+.dv .cb-a.sig::before { background-image: url(../assets/ui/act-tile-sig.webp); filter: sepia(.35) saturate(1.5) brightness(1.15) drop-shadow(0 0 8px rgba(242, 193, 78, .75)); }
+.dv .cb-a.own::before { background-image: url(../assets/ui/act-tile-own.webp); filter: sepia(1) hue-rotate(225deg) saturate(2.2) brightness(.95) drop-shadow(0 0 8px rgba(194, 102, 255, .7)); }
+.dv .cb-a.sig, .dv .cb-a.own { background: none; box-shadow: none; animation: none; }
+.dv .cb-a.sig::after { content: ''; position: absolute; inset: -2px; z-index: -2; border-radius: 12px; box-shadow: 0 0 14px rgba(242, 193, 78, .45); animation: cbSigGlow 2.4s ease-in-out infinite; }
+.dv .cb-a .cb-ai { position: absolute; left: 50%; top: 37%; width: 44%; height: auto; aspect-ratio: 1; transform: translate(-50%, -50%); background: none; box-shadow: none; }
+.dv .cb-a.sig .cb-ai, .dv .cb-a.own .cb-ai { box-shadow: none; }
+.dv .cb-a .cb-ai .aicon, .dv .cb-a .cb-ai img { width: 100%; height: 100%; }
+.dv .cb-a .cb-ai .ic { width: 70%; height: 70%; }
+.dv .cb-a b { position: absolute; left: 7%; right: 7%; top: 59%; font-size: .54rem; letter-spacing: 0; line-height: 1.05; text-shadow: 0 1px 2px #000; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.dv .cb-a .cb-cost { position: absolute; left: 0; right: 0; bottom: 7%; }
+.dv .cb-a.on { box-shadow: none; }
+.dv .cb-a.on::before { filter: brightness(1.25) drop-shadow(0 0 10px rgba(255, 240, 200, .95)); }
+.dv .cb-a.off::before { filter: grayscale(1) brightness(.6); }
+@keyframes cbSigGlow { 50% { box-shadow: 0 0 24px rgba(242, 193, 78, .75); } }
+/* barre d'esquive : la rainure de l'épée sert de rail (rainure : x 240→1120 sur 1241, y 52→90 sur 150, étirée ×1,5 en hauteur) */
+.cb-def .dv-dodge-bar { width: 66%; height: auto; aspect-ratio: 15.4; margin: 30px 0 34px; position: relative; left: 4.5%; background: none; border: 0; border-radius: 4px; box-shadow: inset 0 0 8px rgba(0, 0, 0, .9); overflow: visible; }
+.cb-def .dv-dodge-bar::before { content: ''; position: absolute; z-index: -1; left: -27.3%; right: -13.75%; top: -136.8%; bottom: -157.9%; background: url(../assets/ui/dodge-sword.webp) 0 0 / 100% 100% no-repeat; filter: drop-shadow(0 0 10px rgba(255, 60, 70, .35)); pointer-events: none; }
+.cb-def .dv-dodge-bar .rail { display: none; }
+.cb-def .dv-dodge-bar .z { top: 1px; bottom: 1px; border-radius: 3px; }
+.cb-def .dv-dodge-bar .z .p { border-radius: 2px; }
+.cb-def .dv-dodge-bar .c { top: -11px; bottom: -11px; }
+/* bandeaux du gros plan : liseré doré et ailes au bord intérieur */
+.cu-bar.top { border-bottom: 0; }
+.cu-bar.bot { border-top: 0; }
+.cu-bar::after { content: ''; position: absolute; left: 0; right: 0; height: 24px; background: url(../assets/ui/cine-trim.webp) center / auto 100% no-repeat; pointer-events: none; }
+.cu-bar.top::after { top: 100%; margin-top: -10px; }
+.cu-bar.bot::after { bottom: 100%; margin-bottom: -10px; transform: scaleY(-1); }
+@media (max-width: 360px) { .dv .cb-acts { border-image-width: 30px; padding: 14px 14px 16px; } .dv .cb-a b { font-size: .5rem; } .cb-por { width: 48px; height: 48px; } }
+@media (prefers-reduced-motion: reduce) { .dv .cb-a.sig::after { animation: none; } }
