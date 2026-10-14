@@ -4,12 +4,18 @@ import { cardHTML, lazyArt } from '../ui/card.js';
 import { icon, sigil } from '../ui/icons.js';
 import { esc, bindActions, pct } from '../ui/dom.js';
 import { RARITIES, FACTION_ORDER, RARITY_ORDER, RARITY } from '../config.js';
+import { ROLES, roleOf } from '../core/army.js';
+import { CREATURE_KITS, PASSIVES } from '../core/kits.js';
 
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 export default function collection(app, root, params) {
   const g = app.game, cat = app.catalog;
   const st = (app.state.col ||= { q: '', factions: [], rarities: [], show: 'all', sort: 'num', view: 'grid', albumFac: 'infernal', albumPage: 0 });
+  st.roles ||= []; st.passive ||= '';
+  const nf = () => st.factions.length + st.rarities.length + st.roles.length + (st.passive ? 1 : 0);
+  // passifs proposés au filtre : ceux des cartes, par ordre alphabétique
+  const passOpts = Object.keys(PASSIVES).sort((a, b) => PASSIVES[a].name.localeCompare(PASSIVES[b].name, 'fr'));
   if (params[0] && FACTION_ORDER.includes(params[0])) { st.factions = [params[0]]; }
   const total = g.total();
   tuto(app, 'collection');
@@ -27,9 +33,11 @@ export default function collection(app, root, params) {
     <div class="col-tools">
       <label class="input-wrap"><span class="sr">Rechercher une créature</span>${icon('search')}<input class="input" id="col-q" type="search" placeholder="Rechercher une créature…" value="${esc(st.q)}" autocomplete="off" enterkeyhint="search"></label>
       <div class="seg wide" role="group" aria-label="Afficher">${[['all', 'Toutes'], ['owned', 'Possédées'], ['missing', 'Manquantes'], ['new', 'Nouvelles']].map(([k, l]) => `<button class="seg-b" data-act="show" data-v="${k}" aria-pressed="${st.show === k}">${l}</button>`).join('')}</div>
-      <details class="dc-fold col-filters" ${st.factions.length || st.rarities.length ? 'open' : ''}><summary>${icon('filter')} Filtres et tri${st.factions.length + st.rarities.length ? ` <span class="badge">${st.factions.length + st.rarities.length}</span>` : ''}</summary>
+      <details class="dc-fold col-filters" ${nf() ? 'open' : ''}><summary>${icon('filter')} Filtres et tri${nf() ? ` <span class="badge">${nf()}</span>` : ''}</summary>
         <div class="chips fac-grid" role="group" aria-label="Filtrer par faction">${FACTION_ORDER.map((f) => `<button class="chip" data-act="fac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.factions.includes(f)}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>
         <div class="chips" role="group" aria-label="Filtrer par rareté">${RARITIES.map((r) => `<button class="chip" data-act="rar" data-v="${r.key}" style="--chip:${r.color}" aria-pressed="${st.rarities.includes(r.key)}"><span class="dot" style="background:${r.color}"></span>${r.name}</button>`).join('')}</div>
+        <div class="chips" role="group" aria-label="Filtrer par rôle">${Object.entries(ROLES).map(([k, r]) => `<button class="chip" data-act="role" data-v="${k}" style="--chip:${r.color}" aria-pressed="${st.roles.includes(k)}">${esc(r.name)}</button>`).join('')}</div>
+        <label class="sort"><span class="sr">Filtrer par passif</span>${icon('sparkle')}<select class="input" id="col-pass"><option value="">Tous les passifs</option>${passOpts.map((k) => `<option value="${k}" ${st.passive === k ? 'selected' : ''}>${esc(PASSIVES[k].name)}</option>`).join('')}</select></label>
         <div class="row between gap wrap"><label class="sort"><span class="sr">Trier par</span>${icon('sort')}<select class="input" id="col-sort">${[['num', 'Numéro'], ['name', 'Nom'], ['rarity', 'Rareté'], ['date', 'Date de découverte']].map(([k, l]) => `<option value="${k}" ${st.sort === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label><button class="linkish" data-act="reset">Réinitialiser</button></div>
       </details>
       <div class="row between small"><span id="col-count" class="muted" aria-live="polite"></span><button class="linkish" data-act="seen" id="col-seen">Tout marquer comme vu</button></div>
@@ -47,6 +55,8 @@ export default function collection(app, root, params) {
       const e = g.entry(c.id);
       if (st.factions.length && !st.factions.includes(c.faction)) return false;
       if (st.rarities.length && !st.rarities.includes(c.rarity)) return false;
+      if (st.roles.length && !st.roles.includes(roleOf(c))) return false;
+      if (st.passive && CREATURE_KITS[c.id]?.passive !== st.passive && CREATURE_KITS[c.id]?.passive2 !== st.passive) return false;
       if (st.show === 'owned' && !e) return false;
       if (st.show === 'missing' && e) return false;
       if (st.show === 'new' && !(e && e.isNew)) return false;
@@ -136,6 +146,7 @@ export default function collection(app, root, params) {
   function syncPressed() {
     root.querySelectorAll('[data-act="fac"]').forEach((b) => b.setAttribute('aria-pressed', st.factions.includes(b.dataset.v)));
     root.querySelectorAll('[data-act="rar"]').forEach((b) => b.setAttribute('aria-pressed', st.rarities.includes(b.dataset.v)));
+    root.querySelectorAll('[data-act="role"]').forEach((b) => b.setAttribute('aria-pressed', st.roles.includes(b.dataset.v)));
     root.querySelectorAll('[data-act="show"]').forEach((b) => b.setAttribute('aria-pressed', st.show === b.dataset.v));
   }
   const toggle = (arr, v) => (arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
@@ -143,8 +154,9 @@ export default function collection(app, root, params) {
   bindActions(root, {
     fac(el) { st.factions = toggle(st.factions, el.dataset.v); syncPressed(); drawGrid(); },
     rar(el) { st.rarities = toggle(st.rarities, el.dataset.v); syncPressed(); drawGrid(); },
+    role(el) { st.roles = toggle(st.roles, el.dataset.v); syncPressed(); drawGrid(); },
     show(el) { st.show = el.dataset.v; syncPressed(); drawGrid(); },
-    reset() { Object.assign(st, { q: '', factions: [], rarities: [], show: 'all', sort: 'num' }); root.querySelector('#col-q').value = ''; root.querySelector('#col-sort').value = 'num'; syncPressed(); drawGrid(); },
+    reset() { Object.assign(st, { q: '', factions: [], rarities: [], roles: [], passive: '', show: 'all', sort: 'num' }); const ps = root.querySelector('#col-pass'); if (ps) ps.value = ''; root.querySelector('#col-q').value = ''; root.querySelector('#col-sort').value = 'num'; syncPressed(); drawGrid(); },
     seen() { g.markAllSeen(); drawGrid(); },
     view(el) { st.view = el.dataset.v; drawView(); },
     afac(el) { st.albumFac = el.dataset.v; st.albumPage = 0; drawAlbum(); },
@@ -152,6 +164,7 @@ export default function collection(app, root, params) {
   let tq;
   root.querySelector('#col-q').addEventListener('input', (e) => { clearTimeout(tq); tq = setTimeout(() => { st.q = e.target.value; drawGrid(); }, 140); });
   root.querySelector('#col-sort').addEventListener('change', (e) => { st.sort = e.target.value; drawGrid(); });
+  root.querySelector('#col-pass').addEventListener('change', (e) => { st.passive = e.target.value; drawGrid(); });
   const open = (t) => app.openCard(t.dataset.id, { list: ids });
   for (const box of [root.querySelector('#col-grid'), root.querySelector('#col-album')]) {
     box.addEventListener('click', (e) => { const t = e.target.closest('.tcg, .slot-empty'); if (t) open(t); });

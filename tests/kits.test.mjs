@@ -325,3 +325,18 @@ test('icônes : chaque icône de passif annoncée existe', async () => {
   for (const k of Object.keys(PASSIVES)) { const u = passiveIconUrl(k); assert.ok(u && fs.existsSync(path.join(ROOT, u)), `${k} : ${u}`); }
   for (const id of Object.keys(CREATURE_KITS)) kitSteps(id, 10).forEach((x) => assert.ok(x.img && fs.existsSync(path.join(ROOT, x.img)), `${id} ${x.k} : ${x.img}`));
 });
+
+test('équipe suggérée : dans le budget, 5 créatures possédées, avec des synergies', async () => {
+  const { suggestTeam, teamSynergies, tagsOf } = await import('../js/core/synergy.js');
+  const { COST, BUDGET } = await import('../js/core/army.js');
+  const owned = catalog.cards.filter((c, i) => i % 5 === 0);
+  for (const lv of [1, 6, 10]) {
+    const t = suggestTeam(owned, () => lv).map((id) => catalog.get(id));
+    assert.equal(t.length, 5);
+    assert.ok(t.every((c) => owned.includes(c)));
+    assert.ok(t.reduce((x, c) => x + COST[c.rarity], 0) <= BUDGET);
+    if (lv >= 6) assert.ok(teamSynergies(t, () => lv).length >= 2, `niveau ${lv} : synergies`);
+  }
+  assert.ok(tagsOf(catalog.get('NEC-017'), 6).gives.has('slow'), 'la Banshee ralentit');
+  assert.ok(tagsOf(catalog.get('ABY-039'), 3).wants.has('slow'), 'le Kraken profite du gel');
+});

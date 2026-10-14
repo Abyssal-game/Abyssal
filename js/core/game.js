@@ -1,5 +1,6 @@
 // État du joueur et règles de progression. Toute modification passe par ici
 // et est enregistrée immédiatement : une carte affichée est une carte sauvegardée.
+import { suggestTeam, teamSynergies } from './synergy.js';
 import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, LUCK_POINTS, ITEMS, SHOW_ORDER, SHADOW } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
@@ -456,6 +457,12 @@ export class Game {
     if (t.join() !== (this.s.team || []).join()) { this.s.team = t; this.persist(); }
     return t;
   }
+  // Équipe suggérée : force, synergies et rôles complémentaires (synergy.js)
+  suggestTeam() {
+    const owned = Object.keys(this.s.collection).map((id) => this.catalog.get(id)).filter(Boolean);
+    return suggestTeam(owned, (id) => this.cardLevel(id));
+  }
+  teamSynergies(ids = this.team()) { return teamSynergies(ids.map((id) => this.catalog.get(id)).filter(Boolean), (id) => this.cardLevel(id)); }
   // Complète l'équipe avec les meilleures cartes possédées, sans dépasser le budget
   autoTeam(keep = []) {
     const t = keep.slice(), size = TEAM.active + TEAM.reserve;

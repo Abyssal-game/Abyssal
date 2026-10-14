@@ -12,6 +12,7 @@ import { ROLES, COST, BUDGET, TEAM, MAX_LEVEL, ULTS, roleOf, canUlt, ultOf } fro
 import { duelUnit } from '../core/duel.js';
 import { kitOf, synergiesFor, KEYWORDS, keywordOf } from '../core/skills.js';
 import { CREATURE_KITS, kitSteps, nextUnlock } from '../core/kits.js';
+import { TAGS, toName } from '../core/synergy.js';
 import { openPack } from './opening.js';
 import { openChestScene } from './chest-open.js';
 import { upgradeCard } from './furnace.js';
@@ -110,6 +111,14 @@ export function teamScreen(app, root) {
     const list = g.teamPresets();
     return `<div class="tp"><span class="small muted">Mes équipes</span><div class="tp-row">${list.map((p, i) => `<span class="tp-c"><button class="tp-load" data-act="pload" data-i="${i}"><span class="tp-av">${p.ids.slice(0, 3).map((id) => { const c = cat.get(id); return c ? `<img alt="" src="${artUrl(c, { lite: true })}">` : ''; }).join('')}</span><b>${esc(p.name)}</b></button><button class="tp-x" data-act="pdel" data-i="${i}" aria-label="Supprimer l’équipe ${esc(p.name)}">✕</button></span>`).join('')}${list.length < 4 ? `<button class="tp-new" data-act="psave" ${g.team().length ? '' : 'disabled'}>${icon('plus')}<b>Enregistrer</b></button>` : ''}</div></div>`;
   };
+  // Synergies de l'équipe : qui profite de quoi
+  const synHTML = (team) => {
+    const syn = g.teamSynergies(team);
+    if (team.length < 2) return '';
+    const nm = (id) => esc(cat.get(id).name);
+    const toB = (n) => { const t = toName(n), i = t.indexOf(' '); return `${t.slice(0, i)} <b>${esc(t.slice(i + 1))}</b>`; };
+    return `<div class="panel v2-skill tm-syn"><b>${icon('p:combo')} Synergies de l’équipe</b>${syn.length ? syn.slice(0, 6).map((x) => `<p class="small"><b>${nm(x.b)}</b> apporte ${esc(TAGS[x.tag])} ${toB(cat.get(x.a).name)}.</p>`).join('') : '<p class="small muted">Aucune pour l’instant : « Suggérer une équipe » cherche des créatures qui se complètent.</p>'}</div>`;
+  };
   const draw = () => {
     const team = g.team(), cost = g.teamCost(team), ult = g.ultimate(team), run = g.descent().run;
     const slot = (i) => { const c = team[i] && cat.get(team[i]); return c ? `<div class="v2-slot full">${armyCard(g, c)}${run ? '' : `<span class="tm-ctl"><button class="tm-b" data-act="move" data-id="${c.id}" aria-label="${i < TEAM.active ? 'Mettre en réserve' : 'Envoyer au combat'}">${i < TEAM.active ? '▼' : '▲'}</button><button class="tm-b x" data-act="drop" data-id="${c.id}" aria-label="Retirer de l’équipe">✕</button></span>`}</div>` : `<div class="v2-slot"><span>+</span><small>${i < TEAM.active ? 'Combat' : 'Réserve'}</small></div>`; };
@@ -122,10 +131,11 @@ export function teamScreen(app, root) {
         <div class="v2-budget"><span>Budget</span><span class="progress"><i style="width:${Math.min(100, (cost / BUDGET) * 100)}%;--bar:${cost > BUDGET ? '#FF5468' : 'var(--gold)'}"></i></span><b>${cost} / ${BUDGET}</b></div>
         <p class="small muted">Coût : Commune 1, Peu commune 2, Rare 3, Hyper rare 4, Mythique 5, Secrète 6.</p>
         ${team.length < TEAM.active ? `<p class="small v2-warn">${icon('info')} Il faut au moins ${TEAM.active} créatures pour partir dans la Descente (encore ${TEAM.active - team.length}).</p>` : ''}
-        ${run ? '' : `<div class="tm-tools"><button class="btn small primary" data-act="auto">${icon('sparkle')}Équipe automatique</button>${team.length ? '<button class="btn small ghost" data-act="clear">Vider</button>' : ''}</div><p class="small muted tm-help">Touche <b>+</b> sous une créature pour l’ajouter, <b>▲▼</b> pour la passer du combat à la réserve, <b>✕</b> pour la retirer.</p>`}
+        ${run ? '' : `<div class="tm-tools"><button class="btn small primary" data-act="auto">${icon('sparkle')}Suggérer une équipe</button>${team.length ? '<button class="btn small ghost" data-act="clear">Vider</button>' : ''}</div><p class="small muted tm-help">Touche <b>+</b> sous une créature pour l’ajouter, <b>▲▼</b> pour la passer du combat à la réserve, <b>✕</b> pour la retirer.</p>`}
         ${run ? '' : presetsHTML()}
         <h3 class="section-title">Au combat</h3><div class="v2-slots">${[0, 1, 2].map(slot).join('')}</div>
         <h3 class="section-title">En réserve</h3><div class="v2-slots res">${[3, 4].map(slot).join('')}</div>
+        ${synHTML(team)}
         <div class="panel v2-skill ult" style="--uc:${ult.color}"><b>${icon('p:power')} Pouvoir : ${esc(ult.name)}</b><p class="small">${esc(ult.desc)}</p><p class="small muted">${ult.card ? `Porté par ${esc(cat.get(ult.card).name)}.` : 'Ajoute une Mythique ou une Secrète pour un pouvoir plus puissant.'}</p></div>
       </section>
       <h2 class="section-title">Ta collection <span class="more small"><button class="linkish" data-act="sort">${ui.sort === 'cost' ? 'Trier par niveau' : 'Trier par coût'}</button></span></h2>
@@ -163,7 +173,7 @@ export function teamScreen(app, root) {
       sh.body.addEventListener('click', (e) => { const b = e.target.closest('[data-t]'); if (!b) return; if (b.dataset.t === 'ok') go(); else sh.close(); });
       inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
     },
-    auto() { try { g.setTeam(g.autoTeam([])); app.sfx.discover(); toast('Équipe composée : les plus fortes créatures qui tiennent dans le budget.', { icon: 'sparkle' }); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
+    auto() { try { g.setTeam(g.suggestTeam()); app.sfx.discover(); toast(`Équipe suggérée : tes créatures les plus fortes qui se complètent (${g.teamSynergies().length} synergie${g.teamSynergies().length > 1 ? 's' : ''}).`, { icon: 'sparkle' }); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     clear() { try { g.setTeam([]); app.sfx.tap(); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
   });
   draw();
