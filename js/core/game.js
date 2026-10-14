@@ -13,7 +13,7 @@ export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par c
 import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ITEMS, SHOW_ORDER, SHADOW } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
-import { rngOf, DESCENT, CHESTS, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES } from './descent.js';
+import { rngOf, DESCENT, CHESTS, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState } from './duel.js';
 import { bossOf, BOSSES } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
@@ -23,6 +23,7 @@ import { FERVOR_START, FERVOR_MAX, FERVOR_CARRY, TALENTS } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
 export const WEEKLY_FLOOR = 8;
 export const BOSS_RECRUIT = 0.25;
+export const FIGHT_ATK = 1; // force des ennemis ordinaires (réglée par simulation)
 export const DESCENT_SHARDS = 0.15; // éclats gagnés dans la Descente : 15 % des montants de base
 import { STARTER, COST, BUDGET, TEAM, ULTS, MAX_LEVEL, canUlt, ultOf, roleOf } from './army.js';
 
@@ -577,7 +578,7 @@ export class Game {
       v: 3, day: d.day, floor: 1, cleared: 0, phase: 'doors', cursed: cursed && !free, free, nightmare: !!nightmare, blessings: [], altar: null,
       gauge: this.rule(d.day).key === 'lune' ? FERVOR_MAX - 2 : FERVOR_START, ult: { key: ult.key, power: ult.power, card: ult.card },
       team: team.map((id) => { const u = duelUnit(this.catalog.get(id), { level: this.cardLevel(id), form: this.formOf(id) }); return { id, hp: u.maxHp, maxHp: u.maxHp, fallen: false, form: this.formOf(id) }; }),
-      shards: 0, chests: [], kills: {}, bestBefore: d.best || 0,
+      shards: 0, chests: [], kills: {}, bestBefore: d.best || 0, minFloor: floorFloor(team.reduce((a, id) => a + this.cardLevel(id), 0) / team.length),
     };
     this.persist();
     return d.run;
@@ -820,14 +821,18 @@ export class Game {
     const rule = this.rule(run.day);
     if (room === 'fight' || room === 'elite' || room === 'boss') {
       // les créatures du Bestiaire, corrompues ; l'état du duel est gardé dans l'expédition (reprise exacte)
-      const sc = enemyScale(run.floor);
-      const lvl = enemyLevel(run.floor, room);
+      // plancher : ennemis ordinaires et élites au moins au niveau de l'étage équivalent à l'équipe (pas les gardiens)
+      const eff = room === 'boss' ? run.floor : Math.max(run.floor, run.minFloor || 1);
+      const sc = enemyScale(eff);
+      const lvl = enemyLevel(eff, room);
       const wk = this.weekly();
       const list = eventSwap(this.catalog, floorEnemies(this.catalog, run.day, run.floor, room), run.day, run.floor, this.event().factions);
       const hunt = room === 'elite' && run.floor >= WEEKLY_FLOOR && !wk.done;
       if (hunt) list.forEach((e) => { if (e.elite) e.id = wk.id; });
-      const enemies = list.map((e) => duelUnit(this.catalog.get(e.id), { side: 'enemy', scale: sc, level: e.boss || e.elite ? lvl : enemyLevel(run.floor, 'fight'), boss: e.boss, elite: e.elite }));
+      const enemies = list.map((e) => duelUnit(this.catalog.get(e.id), { side: 'enemy', scale: sc, level: e.boss || e.elite ? lvl : enemyLevel(eff, 'fight'), boss: e.boss, elite: e.elite }));
       for (const e of enemies) {
+        // combats ordinaires : des ennemis qui frappent plus fort, pour que chaque combat ait un enjeu
+        if (!e.boss && !e.elite) e.atk = Math.round(e.atk * FIGHT_ATK + 0.4);
         // la créature de la semaine est une proie redoutable : plus solide et plus forte qu'une élite
         if (hunt && e.elite && e.id === wk.id) { e.maxHp = Math.round(e.maxHp * 1.7); e.hp = e.maxHp; e.atk = Math.round(e.atk * 1.25 + 0.5); e.brkMax = 9; e.brk = 9; e.weekly = true; }
         const f = this.catalog.get(e.id)?.faction;

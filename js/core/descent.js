@@ -33,6 +33,10 @@ export const shiftChest = (c, n) => { const i = c ? CHEST_ORDER.indexOf(c) + n :
 // Force des créatures corrompues selon la profondeur
 // Force des ennemis : +6 % par étage jusqu'au 20e, puis +3 % (la progression du joueur plafonne au niveau 10)
 // Niveau de créature attendu pour un joueur qui arrive à cet étage (calibré par simulation, mode Créateur)
+// Plancher de difficulté (v236) : l'étage « équivalent » au niveau moyen de l'équipe, moins une marge.
+// Les combats ordinaires et les élites ne sont jamais plus faciles que cet étage : plus de combats sans enjeu.
+export const FLOOR_MARGIN = 5;
+export const floorFloor = (avgLevel) => Math.max(1, Math.round(avgLevel / 0.75 + 6 - FLOOR_MARGIN));
 export const expectedLevel = (floor) => Math.max(1, Math.min(10, Math.round((floor - 6) * 0.75)));
 export const enemyScale = (floor) => 1 + 0.06 * Math.min(19, floor - 1) + 0.03 * Math.max(0, floor - 20);
 
