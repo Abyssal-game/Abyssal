@@ -9,6 +9,7 @@
 Usage : python3 tools/cutout.py source.jpg sortie.webp [hauteur=420] [--holes] [--glow]
   --holes : retire aussi le fond vu à travers l'objet (roue dentée)
   --glow  : retire le halo lumineux teinté qui entoure l'objet (obélisque)
+  --strict : retire aussi le liseré clair au pied d'un objet sombre (pas pour le marbre)
 """
 import sys
 import numpy as np
@@ -65,7 +66,7 @@ def components(mask):
     return out
 
 
-def cutout(src, height=420, holes=False, glow=False):
+def cutout(src, height=420, holes=False, glow=False, strict=False):
     a = np.asarray(Image.open(src).convert('RGB'), float)
     bg = fit_background(a)
     diff = np.abs(a - bg).max(-1)
@@ -77,12 +78,12 @@ def cutout(src, height=420, holes=False, glow=False):
     shadowish = (chroma < 14) & (ratio > 0.55) & (ratio < 0.995) & smooth
     region = flood(near | shadowish)          # fond + ombre reliés au bord
     # 2e passe : le halo clair resté au pied de l'objet (proche du fond, sans couleur) rejoint le fond
-    bglike = (diff < 30) & (chroma < 14) & (ratio > 0.82)
+    bglike = (diff < 42) & (chroma < 16) & (ratio > 0.78) if strict else (diff < 30) & (chroma < 14) & (ratio > 0.82)
     if glow:  # halo lumineux teinté autour de l'objet (obélisque)
         bglike |= (ratio > 0.86) & (diff < 70)
     region = flood(region | bglike)
     if holes:  # trous fermés où l'on voit le fond (roue dentée) : grandes zones unies proches du fond
-        for comp in components(~region & (diff < 16) & (chroma < 12)):
+        for comp in components(~region & (chroma < 14) & (ratio > 0.62)):
             if comp.sum() > 120:
                 region |= comp
     bgzone = region & near
@@ -117,5 +118,5 @@ if __name__ == '__main__':
     args = [x for x in sys.argv[1:] if not x.startswith('--')]
     src, dst = args[0], args[1]
     h = int(args[2]) if len(args) > 2 else 420
-    cutout(src, h, holes='--holes' in sys.argv, glow='--glow' in sys.argv).save(dst, 'WEBP', quality=82, method=6)
+    cutout(src, h, holes='--holes' in sys.argv, glow='--glow' in sys.argv, strict='--strict' in sys.argv).save(dst, 'WEBP', quality=82, method=6)
     print(dst)
