@@ -41,18 +41,18 @@ test('la distribution des raretés respecte les tables (100 000 tirages)', () =>
   }
 });
 
-test('booster standard : 5 cartes, dernier emplacement au moins PC', () => {
+test('booster standard : 3 cartes, dernier emplacement au moins PC', () => {
   const rng = rngFrom('std');
   for (let i = 0; i < 2000; i++) {
     const r = drawBooster('standard', catalog, { rng });
-    assert.equal(r.cards.length, 5);
-    assert.ok(RARITY_ORDER.indexOf(r.cards[4].rarity) >= 1);
+    assert.equal(r.cards.length, 3);
+    assert.ok(RARITY_ORDER.indexOf(r.cards[2].rarity) >= 1);
   }
 });
 
 test('booster premium : dernier emplacement au moins Rare', () => {
   const rng = rngFrom('prem');
-  for (let i = 0; i < 2000; i++) assert.ok(RARITY_ORDER.indexOf(drawBooster('premium', catalog, { rng }).cards[4].rarity) >= 2);
+  for (let i = 0; i < 2000; i++) assert.ok(RARITY_ORDER.indexOf(drawBooster('premium', catalog, { rng }).cards[2].rarity) >= 2);
 });
 
 test('booster de faction et événement restent dans leur pool', () => {
@@ -68,13 +68,13 @@ test('garantie HR au 10e booster sans HR, garantie M au 40e', () => {
   for (let i = 1; i <= PITY.hr; i++) {
     const r = drawBooster('standard', catalog, { rng: alwaysCommon, pity });
     if (i < PITY.hr) assert.equal(r.guaranteed, null);
-    else { assert.equal(r.guaranteed, 'hr'); assert.equal(r.cards[4].rarity, 'HR'); }
+    else { assert.equal(r.guaranteed, 'hr'); assert.equal(r.cards[2].rarity, 'HR'); }
     pity = r.pity;
   }
   assert.equal(pity.sinceHR, 0);
   const r = drawBooster('standard', catalog, { rng: alwaysCommon, pity: { sinceHR: 0, sinceM: PITY.m - 1 } });
   assert.equal(r.guaranteed, 'm');
-  assert.equal(r.cards[4].rarity, 'M');
+  assert.equal(r.cards[2].rarity, 'M');
 });
 
 test('probabilités affichées cohérentes', () => {

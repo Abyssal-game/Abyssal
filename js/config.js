@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v228'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v229'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -33,27 +33,27 @@ export const PITY = {
 
 export const BOOSTERS = {
   standard: {
-    name: 'Booster standard', price: 400, slots: ['base', 'base', 'base', 'base', 'pcPlus'], pool: 'all', variantMult: 1,
-    desc: '5 cartes de toutes les factions. Le 5e emplacement est au moins Peu commune.',
+    name: 'Booster standard', price: 400, slots: ['base', 'base', 'pcPlus'], pool: 'all', variantMult: 1,
+    desc: '3 cartes de toutes les factions. La 3e est au moins Peu commune.',
   },
   faction: {
-    name: 'Booster de faction', price: 500, slots: ['base', 'base', 'base', 'base', 'pcPlus'], pool: 'faction', variantMult: 1,
-    desc: '5 cartes d’une seule faction, au choix. Le 5e emplacement est au moins Peu commune.',
+    name: 'Booster de faction', price: 500, slots: ['base', 'base', 'pcPlus'], pool: 'faction', variantMult: 1,
+    desc: '3 cartes d’une seule faction, au choix. La 3e est au moins Peu commune.',
   },
   event: {
-    name: 'Booster événement', price: 550, slots: ['event', 'event', 'event', 'event', 'pcPlus'], pool: 'event', variantMult: 1.5,
-    desc: '5 cartes des deux factions de l’événement de la semaine, avec des chances accrues de Rare et mieux.',
+    name: 'Booster événement', price: 550, slots: ['event', 'event', 'pcPlus'], pool: 'event', variantMult: 1.5,
+    desc: '3 cartes des deux factions de l’événement de la semaine, avec des chances accrues de Rare et mieux.',
   },
   premium: {
     rewardOnly: true, // ne s'achète pas : récompense des gardiens et des niveaux
-    name: 'Booster premium', price: 750, slots: ['base', 'base', 'pcPlus', 'pcPlus', 'rPlus'], pool: 'all', variantMult: 2,
-    desc: '5 cartes : deux emplacements Peu commune ou mieux, le dernier Rare ou mieux. Variantes deux fois plus fréquentes.',
+    name: 'Booster premium', price: 750, slots: ['base', 'pcPlus', 'rPlus'], pool: 'all', variantMult: 2,
+    desc: '3 cartes : la 2e Peu commune ou mieux, la 3e Rare ou mieux. Variantes deux fois plus fréquentes.',
   },
 };
 
 // Chance (en %) qu'une carte tirée sorte dans chaque finition (×2 dans un booster premium).
 // Les boosters sont la seule source de finitions : elles restent rares.
-// Par booster standard de 5 cartes : ~12 % d'une holographique, ~2,5 % d'une or, ~0,5 % d'une cosmique.
+// Par booster standard de 3 cartes : ~7,5 % d'une holographique, ~1,5 % d'une or, ~0,3 % d'une cosmique.
 export const VARIANT_RATES = { holo: 2.5, gold: 0.5, galaxy: 0.1 };
 // Anciennes variantes retirées : les exemplaires possédés deviennent la variante indiquée.
 export const OLD_VARIANTS = { chroma: 'holo', corrupt: 'holo', alt: 'holo', ancestral: 'gold', special: 'normal' };

@@ -187,7 +187,7 @@ export function teamScreen(app, root) {
 export function chestsScreen(app, root) {
   const g = app.game;
   const draw = () => {
-    root.innerHTML = `<header class="screen-head ui-hero bn-chests"><h1>Coffres</h1><p class="muted">Gagnés dans l’Aventure. Chaque coffre contient des boosters.</p></header>
+    root.innerHTML = `<header class="screen-head ui-hero bn-chests"><h1>Coffres</h1><p class="muted">Gagnés dans l’Aventure : des éclats, ou un booster pour l’or et l’abyssal.</p></header>
       <div class="ch-grid">${CHEST_ORDER.map((t) => { const n = g.s.chests[t] || 0; return `<button class="ch-c ${n ? '' : 'none'}" data-act="open" data-t="${t}" style="--cc:${CHESTS[t].color}" ${n ? '' : 'disabled'}>
         <span class="ch-art">${chestSVG(t)}</span>${n ? `<span class="ch-n">${n}</span>` : ''}<b>${esc(CHESTS[t].name)}</b><span class="small">${esc(CHESTS[t].desc)}</span></button>`; }).join('')}</div>
       <details class="panel dc-fold"><summary>${icon('info')} D’où viennent les coffres ?</summary><ul class="small">

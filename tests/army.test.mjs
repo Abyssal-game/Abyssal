@@ -49,7 +49,7 @@ test('budget d’équipe et pouvoir ultime', () => {
   assert.equal(g.ultimate().key, 'sceau');
 });
 
-test('aventure : une expédition rapporte un coffre selon la profondeur ; le coffre donne des boosters', () => {
+test('aventure : une expédition rapporte un coffre selon la profondeur ; bois/fer donnent des éclats, or/abyssal un booster', () => {
   assert.equal(chestForDepth(2), null); assert.equal(chestForDepth(3), 'bois'); assert.equal(chestForDepth(7), 'bois'); assert.equal(chestForDepth(8), 'fer'); assert.equal(chestForDepth(16), 'or'); assert.equal(chestForDepth(25), 'abyssal');
   const g = newGame('r');
   g.startRun();
@@ -67,10 +67,15 @@ test('aventure : une expédition rapporte un coffre selon la profondeur ; le cof
   assert.ok(g.chestCount() >= 1, 'au moins un coffre');
   assert.ok(Object.keys(g.s.hunt).length > 0, 'les créatures vaincues entrent au Bestiaire de chasse');
   const type = Object.keys(g.s.chests).find((k) => g.s.chests[k] > 0);
+  const sh0 = g.s.shards;
+  g.openChest(type);
+  assert.ok(g.s.shards > sh0 || type === 'or' || type === 'abyssal', 'un coffre de bois ou de fer donne des éclats');
+  g.s.chests.or = (g.s.chests.or || 0) + 1; g.s.chests.abyssal = (g.s.chests.abyssal || 0) + 1;
+  assert.deepEqual(g.openChest('abyssal'), ['premium']);
   const tickets = { ...g.s.tickets };
-  const packs = g.openChest(type);
-  assert.ok(packs.length >= 1);
-  packs.forEach((k) => assert.ok(g.s.tickets[k] > (tickets[k] || 0)));
+  const packs = g.openChest('or');
+  assert.deepEqual(packs, ['standard']);
+  assert.equal(g.s.tickets.standard, (tickets.standard || 0) + 1);
   const res = g.openBooster(packs[0]);
   assert.equal(res.opening.paidWith, 'ticket');
   // après les 3 torches : on peut rejouer, sans coffre

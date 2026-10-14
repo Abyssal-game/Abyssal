@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { loadCatalog, MemoryStorage, rngFrom } from './helpers.mjs';
 import { noWelcome } from './helpers.mjs';
 import { Game } from '../js/core/game.js';
-import { ECONOMY } from '../js/config.js';
+import { ECONOMY, XP } from '../js/config.js';
 
 const catalog = loadCatalog();
 const newGame = (seed = 'f', day = new Date(2026, 9, 10, 12)) => noWelcome(new Game(catalog, new MemoryStorage(), { rng: rngFrom(seed), clock: () => day }));
@@ -32,9 +32,11 @@ test('missions : progression, récompense et bonus', () => {
   assert.equal(m.list[0].p, 2);
   assert.equal(m.list[1].p, 1);
   assert.ok(m.list[2].p >= 3);
-  const before = g.s.shards;
+  const before = g.s.shards, lvl0 = g.s.level;
   g.claimMission(0); g.claimMission(1); g.claimMission(2);
-  assert.equal(g.s.shards, before + 130);
+  // l'XP des missions peut faire monter de niveau : ses éclats s'ajoutent
+  const lvlShards = Array.from({ length: g.s.level - lvl0 }, (_, i) => XP.levelReward(lvl0 + i + 1).shards).reduce((a, b) => a + b, 0);
+  assert.equal(g.s.shards, before + 130 + lvlShards);
   assert.throws(() => g.claimMission(0));
   const sh = g.s.shards;
   g.claimMission('bonus');
@@ -47,7 +49,7 @@ test('chance : statistiques et plus belles ouvertures', () => {
   g.s.shards = 100000;
   for (let i = 0; i < 12; i++) g.openBooster('standard');
   const st = g.s.stats;
-  assert.equal(Object.values(st.pulls).reduce((a, b) => a + b, 0), 60);
+  assert.equal(Object.values(st.pulls).reduce((a, b) => a + b, 0), 36);
   assert.ok(st.expHR > 0);
   assert.ok(g.s.best.length === 5);
   for (let i = 1; i < 5; i++) assert.ok(g.s.best[i - 1].score >= g.s.best[i].score);

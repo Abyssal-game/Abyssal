@@ -331,6 +331,7 @@ img.emblem { object-fit: contain; }
 .op-grid .op-cell:nth-child(1) { grid-column: 2 / span 2; }
 .op-grid .op-cell:nth-child(2) { grid-column: 4 / span 2; }
 .op-grid .op-cell:only-child { grid-column: 3 / span 2; }
+.op-grid .op-cell:nth-child(3):last-child { grid-column: 3 / span 2; } /* booster de 3 : la 3e carte centrée sous les deux autres */
 /* Choix de faction : la dernière ligne centrée */
 .chips.fac-grid { display: flex !important; flex-wrap: wrap; justify-content: center; }
 .chips.fac-grid .chip { flex: 0 0 calc((100% - 18px) / 4); }

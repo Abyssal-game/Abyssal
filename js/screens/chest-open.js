@@ -1,6 +1,7 @@
 // Ouverture d'un coffre en plein écran : un vrai événement, comme un booster.
 // Le coffre tremble, s'illumine, s'ouvre dans un éclat de lumière, et les boosters en
 // jaillissent un par un avant de se ranger ; on peut les ouvrir aussitôt ou plus tard.
+// Les coffres de bois et de fer ne donnent que des éclats.
 import { CHESTS } from '../core/descent.js';
 import { BOOSTERS } from '../config.js';
 import { chestSVG } from '../ui/chest.js';
@@ -73,6 +74,11 @@ export function openChestScene(app, type, { onDone } = {}) {
       await wait(520);
     }
     const n = packs.length, prem = packs.filter((k) => k === 'premium').length;
+    if (!n) { // coffre sans booster : seulement des éclats
+      msg.innerHTML = `<b class="chx-count">+${def.shards} éclats !</b>`;
+      acts.innerHTML = '<button class="btn primary block big-cta dc-plq dc-plq-red" data-x="later">Continuer</button>';
+      acts.hidden = false; busy = false; return;
+    }
     msg.innerHTML = `<b class="chx-count">${n} booster${n > 1 ? 's' : ''}${prem ? ` dont ${prem === n ? (n > 1 ? 'tous premium' : 'premium') : `${prem} premium`}` : ''}${def.shards ? ` et ${def.shards} éclats` : ''} !</b>`;
     acts.innerHTML = `<button class="btn primary block big-cta dc-plq dc-plq-red" data-x="go">${icon('p:booster')}Ouvrir ${n > 1 ? 'les boosters' : 'le booster'}</button><button class="btn block dc-plq dc-plq-dark" data-x="later">Plus tard (dans Boosters)</button>`;
     acts.hidden = false;

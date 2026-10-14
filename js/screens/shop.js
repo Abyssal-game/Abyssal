@@ -40,7 +40,7 @@ export function packHTML(type, cat, { faction, event } = {}) {
   let key = type;
   if (type === 'faction' && faction) { label = cat.faction[faction].name; key = faction; }
   if (type === 'event' && event) label = event.name;
-  const tag = type === 'premium' ? 'Rare garantie' : '5 cartes';
+  const tag = type === 'premium' ? 'Rare garantie' : '3 cartes';
   return `<div class="pack pack-${type}">
     <img class="pk-img" alt="" src="assets/packs/${key}.webp">
     <div class="pk-logo">ABYSSAL</div>
