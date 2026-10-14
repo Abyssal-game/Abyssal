@@ -2,7 +2,8 @@
 import { loadCatalogData, createCatalog } from './core/catalog.js';
 import { Game } from './core/game.js';
 import { loadArtManifest, artUrl, hasRealArt } from './art/assets.js';
-import { setCardCatalog } from './ui/card.js';
+import { setCardCatalog, setFameLookup } from './ui/card.js';
+import { fameTier } from './core/renown.js';
 import { icon, EMBLEM } from './ui/icons.js';
 import { toast, esc, fmt, reducedMotion, closeTopSheet, openSheet } from './ui/dom.js';
 import { sfx, configureSound } from './ui/sound.js';
@@ -225,6 +226,8 @@ function onProgress(events) {
     if (e.kind === 'achievement') toast(`Succès débloqué : <b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'ach', ms: 4200 });
     if (e.kind === 'set') toast(`Ensemble complété : <b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'epic', icon: 'star', ms: 5000 });
     if (e.kind === 'faction') toast(`Faction complétée : <b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'epic', icon: 'shield', ms: 5000 });
+    if (e.kind === 'fame') toast(`Renommée : <b>${esc(e.name)}</b>`, { kind: 'epic', icon: 'star', ms: 4200 });
+    if (e.kind === 'season') toast(`<b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'epic', icon: 'trophy', ms: 4600 });
     if (e.kind === 'level') toast(`<img class="picon toast-xp" alt="" src="assets/icons/xp.webp"><span>Niveau <b>${e.level}</b> atteint !<br><span class="small">${rewardText(e.reward)}</span></span>`, { kind: 'level', ms: 3800 });
     sfx.achievement();
   }, (app.holdToasts ? 0 : 300) + i * 650));
@@ -267,6 +270,7 @@ async function boot() {
     app.catalog = catalog;
     app.game = new Game(catalog, storage);
     app.persistent = persistent;
+    setFameLookup((id) => (app.game.s.collection[id] ? fameTier(app.game.s.fame[id]) : 0));
     app.game.on('change', () => { renderChrome(); pulseWallet(); });
     app.game.on('progress', (ev) => (app.pendingProgress ? app.pendingProgress.push(...ev) : onProgress(ev)));
     app.game.on('error', (m) => toast(esc(m), { kind: 'error', icon: 'info', ms: 6000 }));

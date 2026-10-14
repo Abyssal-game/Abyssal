@@ -9,6 +9,7 @@ import { openSheet, esc, toast, confirmBox, fmt, bindActions } from '../ui/dom.j
 import { icon, sigil, picon } from '../ui/icons.js';
 import { FORMS, formUnlocked } from '../core/forms.js';
 import { relationsOf } from '../core/relations.js';
+import { fameTier, fameNext, FAME_TIERS } from '../core/renown.js';
 
 // Chance réelle d'obtenir cette carte précise dans un booster standard.
 function oddsFor(cat, card) {
@@ -19,6 +20,14 @@ function oddsFor(cat, card) {
 }
 
 const dateFr = (t) => new Date(t).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+// Renommée : palier, points et prochain palier
+function fameHTML(pts) {
+  const t = fameTier(pts), nx = fameNext(pts), prev = t ? FAME_TIERS[t - 1].n : 0;
+  return `<div class="panel dt-fame fm${t}"><span class="dt-fame-ic">${t ? `<img alt="" src="assets/icons/fame-${t}.webp" onerror="this.replaceWith(document.createTextNode('★'))">` : '★'}</span>
+    <span class="dt-fame-tx"><b>${t ? `Renommée : ${FAME_TIERS[t - 1].name}` : 'Renommée'}</b><span class="small muted">${nx ? `${pts} / ${nx.n} pour devenir ${nx.name} · +1 par victoire de Descente où elle reste debout (+2 contre une élite ou un gardien)` : `${pts} points · le plus haut palier`}</span>
+    ${nx ? `<span class="progress"><i style="width:${((pts - prev) / (nx.n - prev)) * 100}%"></i></span>` : ''}</span></div>`;
+}
 
 export function openCardDetail(app, id, { list = null, variant = null } = {}) {
   const g = app.game, cat = app.catalog;
@@ -99,6 +108,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
           <span class="dt-chip">×${e.n} exemplaire${e.n > 1 ? 's' : ''}</span>
           <span class="dt-chip gold">Niv. ${li.level}</span>
         </div>
+        ${fameHTML(g.fameOf(current))}
         <button class="btn ${inTeam ? 'ghost' : 'primary'} block dt-team" data-act="team">${picon('team')}${inTeam ? 'Dans ton équipe · retirer' : 'Ajouter à mon équipe'}</button>
         <div class="dt-acts">
           <button class="dt-act ${isAvatar ? 'on' : ''}" data-act="avatar">${picon('avatar')}<span>${isAvatar ? 'Mon avatar' : 'Avatar'}</span></button>

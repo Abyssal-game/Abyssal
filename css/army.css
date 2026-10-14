@@ -1860,3 +1860,24 @@ body.battle-mode.has-subnav #view, body.battle-mode #view { padding: calc(var(--
 .dv-st .ckp img { border-radius: 50%; box-shadow: 0 0 0 1px rgba(226, 184, 92, .7); }
 .cb-cpop.ckpop { filter: drop-shadow(0 0 12px rgba(226, 184, 92, .9)) drop-shadow(0 2px 4px #000); }
 .cb-banner.own .aicon, .skill.own .aicon { border-radius: 6px; }
+
+/* Saison du mois (v209) */
+.dc-season { display: grid; gap: 10px; padding: 12px 14px; border-color: rgba(242, 193, 78, .45); background: linear-gradient(160deg, rgba(60, 44, 12, .55), rgba(12, 12, 18, .94) 70%); }
+.dc-season-h { display: flex; gap: 10px; align-items: center; }
+.dc-season-h > span { display: grid; gap: 2px; min-width: 0; }
+.dc-season-ic { width: 42px; height: 42px; object-fit: contain; flex: none; }
+.dc-season-track { height: 6px; border-radius: 4px; background: rgba(255, 255, 255, .08); overflow: hidden; }
+.dc-season-track i { display: block; height: 100%; background: linear-gradient(90deg, #a8781f, #F2C14E); }
+.dc-season-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.dc-season-steps li { display: grid; justify-items: center; gap: 3px; padding: 6px 2px; border-radius: 10px; background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .07); text-align: center; }
+.dc-season-steps li.ok { border-color: rgba(242, 193, 78, .6); background: rgba(242, 193, 78, .12); color: #F2C14E; }
+.dc-season-rw { display: flex; align-items: center; gap: 2px; min-height: 28px; font-size: 12px; font-weight: 700; }
+.dc-season-rw svg { width: 28px; height: 28px; }
+.dc-season-steps small { font-size: 11px; opacity: .8; white-space: nowrap; }
+/* Renommée sur la fiche */
+.dt-fame { display: flex; gap: 10px; align-items: center; padding: 10px 12px; margin: 8px 0; }
+.dt-fame-ic { width: 40px; height: 40px; flex: none; display: grid; place-items: center; font-size: 22px; color: #F2C14E; }
+.dt-fame-ic img { width: 100%; height: 100%; object-fit: contain; }
+.dt-fame-tx { display: grid; gap: 3px; min-width: 0; flex: 1; }
+.dt-fame.fm2 { border-color: rgba(200, 210, 230, .5); }
+.dt-fame.fm3 { border-color: rgba(242, 193, 78, .7); box-shadow: 0 0 18px rgba(242, 193, 78, .18); }

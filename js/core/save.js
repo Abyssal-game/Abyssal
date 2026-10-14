@@ -39,6 +39,8 @@ export function defaultSave(now = Date.now()) {
     items: {},            // objets possédés : clé -> nombre
     itemBuys: { day: null },
     tips: {},             // bulles d'aide déjà vues
+    fame: {},             // Renommée : id de créature -> points (victoires vécues)
+    season: { id: null, best: 0, claimed: [] }, // saison mensuelle de la Descente
     hunt: {},             // Bestiaire de chasse : id de créature -> nombre de victoires
     // Arsenal : objets (id -> { b: modèle, r: rareté, f: forge, a: propriété }), équipement par héros,
     // coffres et clés (un cadeau de départ pour découvrir), fer runique, garantie de légendaire.
@@ -92,14 +94,15 @@ export function migrate(raw) {
   s.pity = { ...d.pity, ...s.pity };
   // objets imbriqués ajoutés au fil des versions : complétés sans écraser l'existant
   s.stats.pulls = { ...d.stats.pulls, ...(s.stats.pulls || {}) };
-  for (const k of ['descent', 'missions', 'freePack', 'daily', 'itemBuys', 'chests', 'sceaux', 'relics', 'war']) s[k] = { ...d[k], ...(s[k] && typeof s[k] === 'object' ? s[k] : {}) };
+  for (const k of ['descent', 'missions', 'freePack', 'daily', 'itemBuys', 'chests', 'sceaux', 'relics', 'war', 'season']) s[k] = { ...d[k], ...(s[k] && typeof s[k] === 'object' ? s[k] : {}) };
   if (!Array.isArray(s.team)) s.team = [];
   if (!Array.isArray(s.teamPresets)) s.teamPresets = [];
   s.teamPresets = s.teamPresets.filter((p) => p && typeof p.name === 'string' && Array.isArray(p.ids)).slice(0, 4);
-  for (const k of ['items', 'fervor', 'collection', 'deciphered', 'achievements', 'setsDone', 'factionsDone', 'hunt', 'bossesBeaten', 'relations', 'forms', 'lore']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
+  for (const k of ['items', 'fervor', 'collection', 'deciphered', 'achievements', 'setsDone', 'factionsDone', 'hunt', 'fame', 'bossesBeaten', 'relations', 'forms', 'lore']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
   delete s.salles; // les Salles Oubliées ont été supprimées (v206)
   for (const [k, sub] of [['sceaux', 'beaten'], ['war', 'used'], ['war', 'claimed']]) if (!s[k][sub] || typeof s[k][sub] !== 'object') s[k][sub] = {};
   for (const [k, sub] of [['sceaux', 'history'], ['war', 'history']]) if (!Array.isArray(s[k][sub])) s[k][sub] = [];
+  if (!Array.isArray(s.season.claimed)) s.season.claimed = [];
   for (const k of ['best', 'recent', 'history', 'showcase', 'titles', 'frames']) if (!Array.isArray(s[k])) s[k] = d[k];
   // Variantes retirées : les exemplaires deviennent holographiques ou or (rien n'est perdu)
   for (const e of Object.values(s.collection)) {

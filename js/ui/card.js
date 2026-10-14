@@ -7,6 +7,10 @@ import { seeded } from '../art/geometry.js';
 
 let catalogRef = null;
 export function setCardCatalog(c) { catalogRef = c; }
+// Renommée (palier 0 à 3) des créatures possédées : badge et lueur sur la carte
+let fameRef = () => 0;
+export function setFameLookup(f) { fameRef = f; }
+const FAME_NAMES = ['', 'Vétéran', 'Héros', 'Légende'];
 
 function hueFor(id) { return Math.floor(seeded('hue:' + id)() * 300) + 30; }
 
@@ -18,7 +22,9 @@ export function cardHTML(card, opts = {}) {
   const { size = 'mini', variant = 'normal', lazy = false, count = 0, isNew = false, mystery = false, nameKnown = false, tag = '' } = opts;
   const r = RARITY[card.rarity];
   const fc = catalogRef?.faction[card.faction]?.colors.secondary || '#888';
-  const cls = ['tcg', `tcg-${size}`, `r-${card.rarity}`, `f-${card.faction}`, mystery ? 'is-mystery' : `v-${variant}`, hasRealArt(card.id) ? 'real' : ''].join(' ');
+  const fame = mystery ? 0 : fameRef(card.id);
+  const cls = ['tcg', `tcg-${size}`, `r-${card.rarity}`, `f-${card.faction}`, mystery ? 'is-mystery' : `v-${variant}`, hasRealArt(card.id) ? 'real' : '', fame ? `fm${fame}` : ''].join(' ');
+  const fameB = fame ? `<span class="tcg-fame" title="${FAME_NAMES[fame]}" aria-label="Renommée : ${FAME_NAMES[fame]}"><img alt="" src="assets/icons/fame-${fame}.webp" onerror="this.remove()"></span>` : '';
   const style = `--rc:${r.color};--fc:${fc};--hue:${hueFor(card.id)}deg`;
   const lite = size === 'mini';
   const img = lazy
@@ -35,7 +41,7 @@ export function cardHTML(card, opts = {}) {
       ${mystery ? `<div class="tcg-lock">${icon('lock')}</div>` : variant !== 'normal' ? `<span class="tcg-vbadge">${VARIANTS[variant].short}</span>` : ''}
       <span class="tcg-sig">${sigil(card.faction)}</span>
       <div class="tcg-plate"><span class="tcg-gem">${r.short}</span><span class="tcg-nm">${name}</span></div>
-      ${vframe}${count > 1 ? `<span class="tcg-count">×${count}</span>` : ''}${isNew ? '<span class="tcg-new">Nouveau</span>' : ''}${tag}
+      ${vframe}${fameB}${count > 1 ? `<span class="tcg-count">×${count}</span>` : ''}${isNew ? '<span class="tcg-new">Nouveau</span>' : ''}${tag}
     </div>`;
   }
   // Grand format : l'illustration d'abord, un bandeau de nom et un court texte.
@@ -50,7 +56,7 @@ export function cardHTML(card, opts = {}) {
     <div class="tcg-body">
       ${mystery ? '<p class="tcg-hidden">Page scellée du Bestiaire</p>' : `<div class="tcg-type">${esc(card.category)} · ${esc(fac?.name || '')}</div><p class="tcg-lore">« ${esc(card.lore)} »</p>`}
       <div class="tcg-foot"><span class="tcg-gem">${r.short}</span><span>${card.id} · ${card.number}/${total}</span><span>${!mystery && variant !== 'normal' ? esc(VARIANTS[variant].name) : r.name}</span></div>
-    </div>${vframe}
+    </div>${vframe}${fameB}
   </div>`;
 }
 

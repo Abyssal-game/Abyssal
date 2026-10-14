@@ -1,6 +1,7 @@
 // État du joueur et règles de progression. Toute modification passe par ici
 // et est enregistrée immédiatement : une carte affichée est une carte sauvegardée.
 import { suggestTeam, teamSynergies } from './synergy.js';
+import { fameTier, FAME_TIERS, SEASON_STEPS, seasonId } from './renown.js';
 import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, LUCK_POINTS, ITEMS, SHOW_ORDER, SHADOW } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
@@ -940,6 +941,7 @@ export class Game {
         const c = room === 'boss' ? chestForDepth(run.floor) : 'bois';
         run.chests.push(c); out.chest = c;
       }
+      out.fame = this.gainFame(run.team.filter((m) => !m.fallen).map((m) => m.id), room === 'boss' || room === 'elite' ? 2 : 1);
       run.phase = 'reward';
       run.rewards = floorRewards(run.day, run.floor, room, run.blessings);
       out.rewards = run.rewards;
@@ -976,8 +978,40 @@ export class Game {
   recordDepth(floor) {
     const d = this.descent(), run = d.run;
     d.best = Math.max(d.best, floor);
+    if (!run || (!run.free && !run.trial)) this.seasonDepth(floor);
     // une expédition commencée la veille ne compte pas pour le record ni les missions du jour
     if (!run || run.day === d.day) { d.bestToday = Math.max(d.bestToday, floor); this.track('depth', floor); }
+  }
+  // Renommée : chaque victoire rapporte des points aux créatures restées debout ; un palier franchi s'annonce
+  gainFame(ids, n = 1) {
+    const ups = [];
+    for (const id of ids) {
+      const before = fameTier(this.s.fame[id]);
+      this.s.fame[id] = (this.s.fame[id] || 0) + n;
+      const t = fameTier(this.s.fame[id]);
+      if (t > before) ups.push({ kind: 'fame', id, tier: t, name: `${this.catalog.get(id)?.name || 'Une créature'} devient ${FAME_TIERS[t - 1].name}` });
+    }
+    if (ups.length) this.emit('progress', ups);
+    return ups;
+  }
+  fameOf(id) { return this.s.fame?.[id] || 0; }
+  // Saison du mois : remise à zéro au changement de mois, paliers de profondeur récompensés une fois
+  season() {
+    const id = seasonId(this.clock());
+    if (this.s.season.id !== id) this.s.season = { id, best: 0, claimed: [] };
+    return this.s.season;
+  }
+  seasonDepth(floor) {
+    const se = this.season(), ev = [];
+    se.best = Math.max(se.best, floor);
+    for (const st of SEASON_STEPS) {
+      if (se.best < st.floor || se.claimed.includes(st.floor)) continue;
+      se.claimed.push(st.floor);
+      this.grant(st.reward);
+      ev.push({ kind: 'season', floor: st.floor, name: `Saison : étage ${st.floor} atteint`, reward: st.reward });
+    }
+    if (ev.length) this.emit('progress', ev);
+    return ev;
   }
   nextFloor() {
     const run = this.s.descent.run;

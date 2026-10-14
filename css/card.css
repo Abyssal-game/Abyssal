@@ -272,3 +272,11 @@
 @keyframes vPulse { 50% { filter: brightness(1.35); } }
 @media (prefers-reduced-motion: reduce) { .v-holo .tcg-shine, .v-galaxy .tcg-shine, .v-galaxy .tcg-vframe { animation: none; } }
 .tcg-art img { display: block; }
+
+/* Renommée (v209) : badge et lueur */
+.tcg-fame { position: absolute; z-index: 6; left: 4%; bottom: 17%; width: 26%; aspect-ratio: 1; pointer-events: none; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .7)); }
+.tcg-fame img { width: 100%; height: 100%; object-fit: contain; }
+.tcg-full .tcg-fame { width: 16%; bottom: auto; top: 14%; left: 5%; }
+.tcg.fm1 { box-shadow: 0 6px 18px rgba(0, 0, 0, .55), 0 0 0 1px rgba(205, 127, 50, .55), 0 0 10px rgba(205, 127, 50, .25); }
+.tcg.fm2 { box-shadow: 0 6px 18px rgba(0, 0, 0, .55), 0 0 0 1px rgba(210, 220, 240, .6), 0 0 12px rgba(210, 220, 240, .3); }
+.tcg.fm3 { box-shadow: 0 6px 18px rgba(0, 0, 0, .55), 0 0 0 1.5px rgba(242, 193, 78, .8), 0 0 16px rgba(242, 193, 78, .4); }
