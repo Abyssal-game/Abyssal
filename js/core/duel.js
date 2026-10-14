@@ -1175,6 +1175,13 @@ function smartMove(st, go) {
   const low = allies.filter((u) => u.hp < u.maxHp * 0.35).sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0];
   const healer = allies.find((u) => u.role === 'soin' && can(u, 'priere'));
   if (low && healer && go(healer.uid, 'priere', low.uid)) return true;
+  // 2 ter. geler d'avance l'ennemi qui annonce le plus de dégâts, si le jet est favorable et la Ferveur suffit
+  const icer = allies.find((u) => u.role === 'controle' && can(u, 'entrave'));
+  if (icer && st.fervor >= 3) {
+    const hot = actionTargets(st, icer.uid, 'entrave').map((id) => ({ e: st.units[id], i: intentInfo(st, st.units[id]) }))
+      .filter((x) => x.i && x.i.dmg > 0 && (rollInfo(st, icer.uid, 'entrave', x.e.uid)?.chance || 0) >= 55).sort((a, b) => b.i.dmg - a.i.dmg)[0];
+    if (hot && go(icer.uid, 'entrave', hot.e.uid)) return true;
+  }
   // 2 bis. compétences propres des créatures, quand leur conseil s'applique
   for (const u of allies) {
     const k = moveOf(u);
