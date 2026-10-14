@@ -61,17 +61,33 @@ test('objectifs : trois cibles concrètes, qui suivent la progression', async ()
   const { Game } = await import('../js/core/game.js');
   const { MemoryStorage, rngFrom } = await import('./helpers.mjs');
   const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('obj'), clock: () => new Date(2026, 9, 12, 12) });
+  g.s.ash = 0; // pas de cendres : pas d'objectif « Renforce »
+  assert.equal(g.sceauxOpen(), false, 'Sceaux scellés avant le premier gardien');
   let gl = g.goals();
   assert.equal(gl.length, 3);
+  assert.match(gl[0].title, /première expédition/);
   assert.deepEqual(gl.map((x) => x.kind), ['depth', 'boss', 'collection']);
   assert.ok(gl.every((x) => x.href && x.title));
   assert.match(gl[1].title, /Dévoreur/);
   g.s.bossesBeaten.devoreur = 1;
+  assert.equal(g.sceauxOpen(), true, 'Sceaux ouverts après le premier gardien');
   assert.match(g.goals()[1].title, /Matriarche/);
   g.s.descent.best = 7;
-  assert.match(g.goals()[0].title, /étage 10/);
+  assert.match(g.goals()[0].title, /étage 8/, 'prochain palier de coffre (fer)');
+  g.s.descent.best = 9;
+  assert.match(g.goals()[0].title, /étage 10/, 'le gardien de l’étage 10 avant l’or de l’étage 16');
+  assert.match(g.goals()[0].sub, /Matriarche/);
+  // équipe trop faible et assez de cendres : objectif « Renforce »
+  (await import('./helpers.mjs')).noWelcome(g); g.team(); // équipe de départ, niveau 1
+  g.s.ash = 500;
+  assert.ok(g.goals().some((x) => x.kind === 'forge' && /Renforce/.test(x.title)));
+  g.s.ash = 0;
   for (const k of ['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse']) g.s.bossesBeaten[k] = 1;
   assert.equal(g.goals()[1].kind, 'sceaux');
+  // ensemble presque complet : il passe devant le royaume
+  const set = catalog.sets[0];
+  set.cards.slice(0, -2).forEach((id) => g.addCard(id));
+  assert.match(g.goals().find((x) => x.kind === 'collection').title, new RegExp(`ensemble ${set.name}`));
 });
 
 test('équipes enregistrées : 4 au plus, rechargées d’un toucher, gardées par la sauvegarde', async () => {

@@ -47,6 +47,12 @@ export default function sceauxScreen(app, root) {
     document.body.classList.remove('battle-mode', 'sc-lost');
     document.querySelector('.sc-scene')?.remove();
     setScene('menu');
+    // les Duels des Sceaux s'ouvrent après le premier gardien vaincu : un nouveau joueur découvre d'abord la Descente
+    if (!g.sceauxOpen()) {
+      root.innerHTML = `<header class="screen-head ui-hero bn-sceaux"><h1>Duels des Sceaux</h1><p class="muted">Un jeu de cartes à part, contre les gardiens des règles.</p></header>
+        <section class="panel tr-lock">${icon('lock')}<b>Encore scellés</b><p class="small">Vaincs ton <b>premier gardien</b> dans la Descente (étage 5) pour ouvrir les Duels des Sceaux.</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`;
+      return;
+    }
     const sc = g.s.sceaux, hand = g.sceauxHand(), d = g.sceauxDaily();
     const dailyDone = sc.dailyDone === todayKey();
     const R = SC.RIVAL[d.rival];

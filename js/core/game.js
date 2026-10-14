@@ -13,7 +13,7 @@ export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par c
 import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ITEMS, SHOW_ORDER, SHADOW } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
-import { rngOf, DESCENT, CHESTS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES } from './descent.js';
+import { rngOf, DESCENT, CHESTS, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState } from './duel.js';
 import { bossOf, BOSSES } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
@@ -643,6 +643,7 @@ export class Game {
     if (list.length !== 5) throw new Error('Choisis exactement 5 cartes.');
     this.s.sceaux.hand = list; this.persist(); return list;
   }
+  sceauxOpen() { const sc = this.s.sceaux; return Object.keys(this.s.bossesBeaten || {}).length > 0 || (sc.wins + sc.losses + sc.draws) > 0 || !!sc.cur; }
   sceauxUnlocked() { return SC.RIVALS.filter((_, i) => SC.rivalUnlocked(this.s, i)).length; }
   sceauxDaily() { return SC.dailyChallenge(today(this.clock()), this.sceauxUnlocked()); }
   sceauxStart({ rival, daily = false, awake = false } = {}) {
@@ -723,23 +724,40 @@ export class Game {
   // un de collection (le royaume le plus proche d'être complet). Chacun mène à son écran.
   goals() {
     const out = [], d = this.descent(), best = d.best || 0;
-    if (d.run) out.push({ kind: 'run', title: `Reprends ton expédition à l’étage ${d.run.floor}`, sub: 'Ton équipe t’attend dans l’Abysse', href: '#/descente', icon: 'descend' });
-    else {
-      const target = best < 3 ? 3 : (Math.floor(best / 5) + 1) * 5;
-      const chest = target >= 15 ? 'abyssal' : target >= 10 ? 'or' : target >= 5 ? 'fer' : 'bois';
-      out.push({ kind: 'depth', title: `Atteins l’étage ${target}`, sub: best ? `Ton record : étage ${best} · ${(CHESTS[chest]?.name || 'un coffre').toLowerCase()} à la clé` : 'Ta première descente t’attend', href: '#/descente', icon: 'depth', p: Math.min(best, target), n: target });
-    }
     let bf = 0;
     for (let f = 5; f <= 60; f += 5) if (!this.s.bossesBeaten[bossOf(f)]) { bf = f; break; }
-    if (bf) { const B = BOSSES[bossOf(bf)]; out.push({ kind: 'boss', title: `Vaincs ${B.name}`, sub: `Gardien de l’étage ${bf} · son récit t’attend dans le Bestiaire`, href: '#/descente', icon: 'crest-boss' }); }
+    if (d.run) out.push({ kind: 'run', title: `Reprends ton expédition à l’étage ${d.run.floor}`, sub: 'Ton équipe t’attend dans l’Abysse', href: '#/descente', icon: 'descend' });
     else {
+      // prochain palier : un meilleur coffre ou le prochain gardien, le plus proche des deux
+      const nf = CHEST_FLOORS.find((f) => f > best) || (Math.floor(best / 5) + 1) * 5;
+      const target = bf && bf > best && bf < nf ? bf : nf;
+      const chest = chestForDepth(target);
+      const what = target === bf ? `le gardien ${BOSSES[bossOf(bf)].name} t’y attend` : `${CHESTS[chest].name.toLowerCase()} à la clé`;
+      out.push({ kind: 'depth', title: best ? `Atteins l’étage ${target}` : 'Lance ta première expédition', sub: best ? `Ton record : étage ${best} · ${what}` : 'Descends dans l’Abysse : un coffre t’attend dès l’étage 3', href: '#/descente', icon: 'depth', p: Math.min(best, target), n: target });
+    }
+    // équipe trop faible pour la suite, et assez de cendres pour la renforcer
+    const team = this.team(), need = expectedLevel(Math.max(best + 1, 4));
+    const weak = team.map((id) => ({ id, lv: this.cardLevel(id) })).filter((x) => x.lv < Math.min(MAX_LEVEL, need)).sort((a, b) => a.lv - b.lv)[0];
+    if (weak && this.s.ash >= this.upgradeCost(weak.id)) {
+      const c = this.catalog.get(weak.id);
+      out.push({ kind: 'forge', title: `Renforce ${c.name}`, sub: `Niveau ${weak.lv} · tu as ${this.s.ash} cendres, de quoi le faire monter`, href: '#/renfort', icon: 'level-up' });
+    }
+    if (bf && out.length < 3 && !out.some((x) => x.sub?.includes(BOSSES[bossOf(bf)].name))) { const B = BOSSES[bossOf(bf)]; out.push({ kind: 'boss', title: `Vaincs ${B.name}`, sub: `Gardien de l’étage ${bf} · son récit t’attend dans le Bestiaire`, href: '#/descente', icon: 'crest-boss' }); }
+    else if (!bf && this.sceauxOpen()) {
       const i = SC.RIVALS.findIndex((r) => !this.s.sceaux.beaten[r.key]);
       if (i >= 0 && SC.rivalUnlocked(this.s, i)) out.push({ kind: 'sceaux', title: `Bats ${SC.RIVALS[i].name} aux Duels des Sceaux`, sub: `${SC.RIVALS[i].title} · première victoire : +${SC.SCEAUX_REWARD.firstWin} éclats`, href: '#/sceaux', icon: 'seal' });
     }
-    const fac = FACTION_ORDER.map((f) => ({ f, ...this.factionProgress(f) })).filter((x) => x.owned < x.total).sort((a, b) => b.owned / b.total - a.owned / a.total || (a.total - a.owned) - (b.total - b.owned))[0];
-    if (fac) {
-      const left = fac.total - fac.owned, name = this.catalog.faction[fac.f].name;
-      out.push({ kind: 'collection', title: left === 1 ? `Plus qu’une créature pour compléter ${name}` : left <= 10 ? `Plus que ${left} créatures pour compléter ${name}` : `Complète le royaume ${name}`, sub: `${fac.owned} / ${fac.total} · une récompense t’attend au bout`, href: `#/faction/${fac.f}`, icon: 'book', faction: fac.f, p: fac.owned, n: fac.total });
+    // collection : un ensemble presque complet, sinon le royaume le plus avancé
+    const set = this.catalog.sets.map((x) => ({ x, ...this.setProgress(x.key) })).filter((x) => !x.done && x.owned > 0 && x.total - x.owned <= 3).sort((a, b) => (a.total - a.owned) - (b.total - b.owned))[0];
+    if (set) {
+      const left = set.total - set.owned;
+      out.push({ kind: 'collection', title: left === 1 ? `Plus qu’une créature pour l’ensemble ${set.x.name}` : `Plus que ${left} créatures pour l’ensemble ${set.x.name}`, sub: `${set.owned} / ${set.total} · une récompense t’attend au bout`, href: '#/succes', icon: 'book', p: set.owned, n: set.total });
+    } else {
+      const fac = FACTION_ORDER.map((f) => ({ f, ...this.factionProgress(f) })).filter((x) => x.owned < x.total).sort((a, b) => b.owned / b.total - a.owned / a.total || (a.total - a.owned) - (b.total - b.owned))[0];
+      if (fac) {
+        const left = fac.total - fac.owned, name = this.catalog.faction[fac.f].name;
+        out.push({ kind: 'collection', title: left === 1 ? `Plus qu’une créature pour compléter ${name}` : left <= 10 ? `Plus que ${left} créatures pour compléter ${name}` : `Complète le royaume ${name}`, sub: `${fac.owned} / ${fac.total} · une récompense t’attend au bout`, href: `#/faction/${fac.f}`, icon: 'book', faction: fac.f, p: fac.owned, n: fac.total });
+      }
     }
     return out.slice(0, 3);
   }
@@ -960,7 +978,7 @@ export class Game {
       // défis de créature : combats gagnés, ennemis achevés, gardiens achevés
       const cs = (this.s.cstats ||= {});
       run.team.filter((m) => !m.fallen).forEach((m) => { (cs[m.id] ||= {}).w = (cs[m.id].w || 0) + 1; });
-      for (const [id, n] of Object.entries(st.finishedBy || {})) (cs[id] ||= {}).k = (cs[id].k || 0) + n;
+      for (const [id, n] of Object.entries(st.finishedBy || {})) { (cs[id] ||= {}).k = (cs[id].k || 0) + n; (run.fin ||= {})[id] = (run.fin[id] || 0) + n; }
       for (const id of Object.keys(st.bossBy || {})) (cs[id] ||= {}).b = (cs[id].b || 0) + 1;
       out.fame = this.gainFame(run.team.filter((m) => !m.fallen).map((m) => m.id), room === 'boss' || room === 'elite' ? 2 : 1);
       run.phase = 'reward';
@@ -1094,6 +1112,12 @@ export class Game {
     this.s.shards += shards;
     const summary = { wiped, floor: run.cleared, day: run.day, chests, shards, kills: run.kills, free: run.free, cursed: run.cursed, nightmare: !!run.nightmare };
     if (!run.free && run.cleared > 0 && run.bestBefore !== undefined && run.cleared > run.bestBefore) summary.record = true;
+    // bilan : la créature qui a achevé le plus d'ennemis, le prochain palier de coffre, les éclats vers un booster
+    const mvp = Object.entries(run.fin || {}).sort((a, b) => b[1] - a[1])[0];
+    if (mvp && mvp[1] >= 2) summary.mvp = { id: mvp[0], n: mvp[1] };
+    const nf = CHEST_FLOORS.find((f) => f > run.cleared);
+    if (nf && !run.free) summary.nextChest = { floor: nf, chest: chestForDepth(nf) };
+    summary.shardsNow = this.s.shards;
     if (run.nightmare && run.cleared > (d.bestNightmare || 0)) { d.bestNightmare = run.cleared; summary.nightmareRecord = true; }
     this.emit('descentEnd', summary);
     d.last = summary;

@@ -25,6 +25,8 @@ export const CHESTS = {
   abyssal: { name: 'Coffre abyssal',  color: '#B04BFF', packs: ['premium'], shards: 0, ash: 100, desc: '1 booster premium et 100 cendres' },
 };
 export const CHEST_ORDER = ['bois', 'fer', 'or', 'abyssal'];
+// Étages où le coffre de fin s'améliore (bois, fer, or, abyssal)
+export const CHEST_FLOORS = [3, 8, 16, 25];
 export const chestForDepth = (floor) => (floor >= 25 ? 'abyssal' : floor >= 16 ? 'or' : floor >= 8 ? 'fer' : floor >= 3 ? 'bois' : null);
 export const shiftChest = (c, n) => { const i = c ? CHEST_ORDER.indexOf(c) + n : n - 1; return i < 0 ? null : CHEST_ORDER[Math.min(CHEST_ORDER.length - 1, i)]; };
 

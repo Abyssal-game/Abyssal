@@ -6,7 +6,7 @@ import { CHESTS } from '../core/descent.js';
 import { BOOSTERS } from '../config.js';
 import { chestSVG } from '../ui/chest.js';
 import { icon } from '../ui/icons.js';
-import { esc, toast } from '../ui/dom.js';
+import { esc, toast, fmt } from '../ui/dom.js';
 import { packHTML } from './shop.js';
 import { openPack } from './opening.js';
 
@@ -79,7 +79,8 @@ export function openChestScene(app, type, { onDone } = {}) {
     const gains = [def.shards && `${def.shards} éclats`, def.ash && `${def.ash} cendres`].filter(Boolean);
     const n = packs.length, prem = packs.filter((k) => k === 'premium').length;
     if (!n) { // coffre sans booster : seulement des éclats
-      msg.innerHTML = `<b class="chx-count">+${gains.join(' et +')} !</b>`;
+      const price = BOOSTERS.standard.price, have = g.s.shards;
+      msg.innerHTML = `<b class="chx-count">+${gains.join(' et +')} !</b><span class="chx-bp small">${have >= price ? `Tu as ${fmt(have)} éclats : de quoi acheter un booster.` : `${fmt(have)} / ${fmt(price)} éclats pour ton prochain booster`}</span>`;
       acts.innerHTML = '<button class="btn primary block big-cta dc-plq dc-plq-red" data-x="later">Continuer</button>';
       acts.hidden = false; busy = false; return;
     }

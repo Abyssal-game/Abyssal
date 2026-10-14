@@ -44,13 +44,17 @@ export default function home(app, root) {
   }
 
   // Objectifs : un proche, un de progression, un de collection ; chacun mène à son écran
-  function goalsHTML() {
-    const list = g.goals();
-    if (!list.length) return '';
-    const col = { run: '#E0485E', depth: '#9C7BFF', boss: '#FF6B7F', sceaux: '#E8C35A', collection: '#7FA8D8' };
-    return `<section class="panel hg"><h2>Tes objectifs</h2>${list.map((x) => `<a class="hg-row" href="${x.href}" style="--mc:${x.faction ? cat.faction[x.faction].colors.secondary : col[x.kind]}">
+  // Objectifs : le premier en grand en haut de l'accueil (« Ton prochain objectif »), les autres plus bas
+  const goals = g.welcomePending() ? [] : g.goals();
+  const GCOL = { run: '#E0485E', depth: '#9C7BFF', boss: '#FF6B7F', sceaux: '#E8C35A', collection: '#7FA8D8', forge: '#F08A3C' };
+  const goalRow = (x, cls = 'hg-row') => `<a class="${cls}" href="${x.href}" style="--mc:${x.faction ? cat.faction[x.faction].colors.secondary : GCOL[x.kind]}">
       <span class="td-ic mi">${x.faction ? sigil(x.faction) : picon(x.icon)}</span>
-      <span class="td-t"><b>${esc(x.title)}</b><span class="small muted">${esc(x.sub)}</span>${x.n ? `<span class="progress"><i style="width:${(x.p / x.n) * 100}%"></i></span>` : ''}</span>${icon('next')}</a>`).join('')}</section>`;
+      <span class="td-t">${cls === 'hg-main' ? '<span class="hg-k">Ton prochain objectif</span>' : ''}<b>${esc(x.title)}</b><span class="small muted">${esc(x.sub)}</span>${x.n ? `<span class="progress"><i style="width:${(x.p / x.n) * 100}%"></i></span>` : ''}</span>${icon('next')}</a>`;
+  function mainGoalHTML() { return goals.length ? `<section class="panel ornate hg-main-wrap">${goalRow(goals[0], 'hg-main')}</section>` : ''; }
+  function goalsHTML() {
+    const list = goals.slice(1);
+    if (!list.length) return '';
+    return `<section class="panel hg"><h2>Ensuite</h2>${list.map((x) => goalRow(x)).join('')}</section>`;
   }
 
   root.innerHTML = `
@@ -59,6 +63,7 @@ export default function home(app, root) {
     </section>
 
     ${g.welcomePending() ? `<a class="panel ornate hw-welcome" href="#/boutique"><span class="hw-ic">${picon('ticket')}</span><span><b>${g.s.tickets.standard > 1 ? `Tes ${g.s.tickets.standard} boosters de bienvenue t’attendent` : 'Ton booster de bienvenue t’attend'}</b><span class="small">Ouvre-les pour découvrir tes premières créatures : elles formeront ton équipe.</span></span>${icon('next')}</a>` : ''}
+    ${mainGoalHTML()}
     <div class="home-acts">
       <a class="ha ha-pack" href="#/boutique"><span class="ha-art"></span><b>Boosters</b><span>${freeCount ? `${freeCount} offert${freeCount > 1 ? 's' : ''}` : g.freePack().nextAt ? `Gratuit dans ${waitText(g.freePack().nextAt - Date.now())}` : 'Tente ta chance'}</span></a>
       <a class="ha ha-dive" href="#/descente"><span class="ha-art"></span><b>Aventure</b><span>${g.descent().run ? `En cours · étage ${g.descent().run.floor}` : g.torchesLeft() ? `${g.torchesLeft()} torche${g.torchesLeft() > 1 ? 's' : ''} aujourd’hui` : 'Reviens demain'}</span></a>

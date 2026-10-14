@@ -1573,6 +1573,16 @@ i.cmb { font-style: normal; color: #FFC266; font-weight: 800; }
 .hg-row .td-t b { font-size: .95rem; }
 .hg-row .progress { margin-top: 2px; }
 .hg-row .td-ic.mi .sigil-img { width: 26px; height: 26px; }
+.hg-main-wrap { margin-bottom: 12px; padding: 4px 14px; border-color: color-mix(in srgb, var(--gold) 70%, transparent); }
+.hg-main { display: flex; align-items: center; gap: 12px; padding: 10px 0; color: var(--ink); text-decoration: none; min-height: 64px; }
+.hg-main .td-t { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.hg-main .td-t b { font: 700 1.05rem/1.25 var(--f-display); }
+.hg-main .td-ic.mi { width: 46px; height: 46px; }
+.hg-main .td-ic.mi .sigil-img { width: 30px; height: 30px; }
+.dc-bp { display: grid !important; gap: 6px; justify-items: stretch; }
+.dc-bp > span:first-child { display: block; }
+.chx-bp { display: block; margin-top: 6px; color: var(--muted); font-weight: 600; letter-spacing: .02em; text-transform: none; }
+.hg-k { font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); font-weight: 700; }
 /* Mes équipes enregistrées */
 .tp { margin: 6px 0 10px; }
 .tp-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; margin-top: 6px; }
