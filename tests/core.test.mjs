@@ -219,12 +219,14 @@ test('booster gratuit : se recharge avec le temps, plafonné', () => {
   g.s.freePack = { stock: 0, since: now.getTime() };
   g.s.tickets.standard = 0; g.s.shards = 0;
   assert.equal(g.canBuy('standard'), false);
-  now = new Date(2026, 9, 10, 20, 1);
+  now = new Date(2026, 9, 11, 20);
+  assert.equal(g.freePack().stock, 0, 'pas avant 48 h');
+  now = new Date(2026, 9, 12, 8, 1);
   assert.equal(g.freePack().stock, 1);
   const { opening } = g.openBooster('standard');
   assert.equal(opening.paidWith, 'free');
   assert.equal(g.freePack().stock, 0);
-  now = new Date(2026, 9, 13, 8);
+  now = new Date(2026, 9, 20, 8);
   assert.equal(g.freePack().stock, 1, 'plafonné au maximum');
   assert.equal(g.freePack().nextAt, null);
 });

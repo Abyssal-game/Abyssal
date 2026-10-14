@@ -8,7 +8,8 @@ export const CHALLENGES = [
   { key: 'b', stat: 'b', n: 1, ash: 60, fame: 8, name: 'Tueuse de gardien', desc: 'Porte le coup fatal à un gardien' },
 ];
 export const WEEK_DAYS = 5; // jours joués dans la semaine pour le coffre de la semaine
-export const FIRST_WIN = 150; // éclats de la toute première victoire
+export const FIRST_WIN = 50;
+export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par combat n'augmentent plus // éclats de la toute première victoire
 import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, MISSION_BONUS, LUCK_POINTS, ITEMS, SHOW_ORDER, SHADOW } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
@@ -22,7 +23,7 @@ import { FERVOR_START, FERVOR_MAX, FERVOR_CARRY, TALENTS } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
 export const WEEKLY_FLOOR = 8;
 export const BOSS_RECRUIT = 0.25;
-export const DESCENT_SHARDS = 0.4; // éclats gagnés dans la Descente : 40 % des montants de base
+export const DESCENT_SHARDS = 0.15; // éclats gagnés dans la Descente : 15 % des montants de base
 import { STARTER, COST, BUDGET, TEAM, ULTS, MAX_LEVEL, canUlt, ultOf, roleOf } from './army.js';
 
 const RI = (r) => RARITY_ORDER.indexOf(r);
@@ -891,7 +892,7 @@ export class Game {
       const k = rule.key === 'sources' ? 0.6 : 0.3;
       run.team.forEach((m) => { if (!m.fallen) m.hp = Math.min(m.maxHp, m.hp + Math.ceil(m.maxHp * k)); });
     } else if (room === 'treasure') {
-      out.shards = this.gainShards(15 + run.floor * 6);
+      out.shards = this.gainShards(15 + Math.min(run.floor, SHARD_FLOOR_CAP) * 6);
     } else if (room === 'altar') {
       run.altar = blessingChoices(run.day, run.floor, run.blessings);
       if (run.altar.length) { run.phase = 'altar'; out.altar = run.altar; }
@@ -961,15 +962,16 @@ export class Game {
     if (goal) out.goal = goal;
     if (won) {
       const hunt = room === 'elite' && this.rule(run.day).key === 'chasse';
-      out.shards = this.gainShards((8 + 3 * run.floor) * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1) * (hunt ? 2 : 1));
+      out.shards = this.gainShards((8 + 2 * Math.min(run.floor, SHARD_FLOOR_CAP)) * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1) * (hunt ? 2 : 1));
       const named = Object.values(st.units).find((u) => u.side === 'enemy' && u.named);
-      if (named) out.named = { title: named.title, id: named.id, shards: this.gainShards(20 + run.floor * 4) };
+      if (named) out.named = { title: named.title, id: named.id, shards: this.gainShards(20 + Math.min(run.floor, SHARD_FLOOR_CAP) * 4) };
       // objectif réussi : éclats en plus et 1 Ferveur pour la suite
-      if (goal?.state === 'done') { out.goalShards = this.gainShards((3 + run.floor) * (room === 'boss' ? 2 : 1)); run.gauge = Math.min(FERVOR_CARRY, run.gauge + 1); this.s.stats.goals = (this.s.stats.goals || 0) + 1; }
+      if (goal?.state === 'done') { out.goalShards = this.gainShards((3 + Math.min(run.floor, SHARD_FLOOR_CAP)) * (room === 'boss' ? 2 : 1)); run.gauge = Math.min(FERVOR_CARRY, run.gauge + 1); this.s.stats.goals = (this.s.stats.goals || 0) + 1; }
       if (room === 'elite') { const t = this.talentOffers(run); if (t.length) { run.talentOffer = t; out.talents = t; } }
       // les gardiens donnent un coffre tout de suite ; règle « Chasse aux élites » : les élites aussi
-      if (!run.free && (room === 'boss' || hunt)) {
-        const c = room === 'boss' ? chestForDepth(run.floor) : 'bois';
+      // économie : un coffre de gardien seulement la première fois qu'on bat ce gardien
+      if (!run.free && ((room === 'boss' && out.boss?.first) || hunt)) {
+        const c = room === 'boss' ? shiftChest(chestForDepth(run.floor), -1) || 'bois' : 'bois';
         run.chests.push(c); out.chest = c;
       }
       // toute première victoire : un vrai cadeau (une seule fois)

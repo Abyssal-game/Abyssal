@@ -50,7 +50,7 @@ test('budget d’équipe et pouvoir ultime', () => {
 });
 
 test('aventure : une expédition rapporte un coffre selon la profondeur ; le coffre donne des boosters', () => {
-  assert.equal(chestForDepth(3), 'bois'); assert.equal(chestForDepth(7), 'fer'); assert.equal(chestForDepth(12), 'or'); assert.equal(chestForDepth(16), 'abyssal');
+  assert.equal(chestForDepth(2), null); assert.equal(chestForDepth(3), 'bois'); assert.equal(chestForDepth(7), 'bois'); assert.equal(chestForDepth(8), 'fer'); assert.equal(chestForDepth(16), 'or'); assert.equal(chestForDepth(25), 'abyssal');
   const g = newGame('r');
   g.startRun();
   assert.equal(g.torchesLeft(), 2);
@@ -163,7 +163,7 @@ test('abandon de la Descente : compte comme une défaite, combat effacé', () =>
   g.team();
   g.startRun();
   const run = g.s.descent.run;
-  run.shards = 41; run.cleared = 6; run.floor = 7;
+  run.shards = 41; run.cleared = 9; run.floor = 10;
   const p = g.abandonPreview();
   assert.equal(p.shards, 20);
   assert.equal(p.chest, 'bois', 'coffre d’un rang plus bas (fer → bois)');

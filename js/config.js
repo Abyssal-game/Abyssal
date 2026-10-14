@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v227'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v228'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -33,15 +33,15 @@ export const PITY = {
 
 export const BOOSTERS = {
   standard: {
-    name: 'Booster standard', price: 200, slots: ['base', 'base', 'base', 'base', 'pcPlus'], pool: 'all', variantMult: 1,
+    name: 'Booster standard', price: 400, slots: ['base', 'base', 'base', 'base', 'pcPlus'], pool: 'all', variantMult: 1,
     desc: '5 cartes de toutes les factions. Le 5e emplacement est au moins Peu commune.',
   },
   faction: {
-    name: 'Booster de faction', price: 300, slots: ['base', 'base', 'base', 'base', 'pcPlus'], pool: 'faction', variantMult: 1,
+    name: 'Booster de faction', price: 500, slots: ['base', 'base', 'base', 'base', 'pcPlus'], pool: 'faction', variantMult: 1,
     desc: '5 cartes d’une seule faction, au choix. Le 5e emplacement est au moins Peu commune.',
   },
   event: {
-    name: 'Booster événement', price: 360, slots: ['event', 'event', 'event', 'event', 'pcPlus'], pool: 'event', variantMult: 1.5,
+    name: 'Booster événement', price: 550, slots: ['event', 'event', 'event', 'event', 'pcPlus'], pool: 'event', variantMult: 1.5,
     desc: '5 cartes des deux factions de l’événement de la semaine, avec des chances accrues de Rare et mieux.',
   },
   premium: {
@@ -79,7 +79,7 @@ export const EVENTS = [
 
 export const ECONOMY = {
   start: { shards: 0, ash: 60, tickets: { standard: 2 } }, // 60 cendres : de quoi monter tout de suite 2 ou 3 créatures
-  discoveryShards: { C: 1, PC: 3, R: 6, HR: 13, M: 25, S: 50 },
+  discoveryShards: { C: 1, PC: 2, R: 3, HR: 7, M: 12, S: 25 },
   // Fournaise : cendres rendues par un exemplaire brûlé (rareté × finition)
   burnAsh: { C: 3, PC: 6, R: 15, HR: 40, M: 100, S: 250 },
   burnFinish: { normal: 1, holo: 3, gold: 8, galaxy: 20 },
@@ -88,7 +88,7 @@ export const ECONOMY = {
   craftAsh: { C: 40, PC: 100, R: 250, HR: 600, M: 1600 }, // les secrètes ne s'invoquent pas
   decipherAsh: 15,
   revealNamesAt: 0.5, // les noms d'une faction se révèlent à 50 % de complétion
-  daily: { base: 80, perStreakDay: 10, maxStreakBonus: 60 },
+  daily: { base: 50, perStreakDay: 5, maxStreakBonus: 30 },
 };
 
 export const XP = {
@@ -97,7 +97,7 @@ export const XP = {
   duplicate: 2,
   // XP nécessaire pour passer du niveau n au niveau n+1
   toNext: (n) => 150 + (n - 1) * 90,
-  levelReward: (n) => (n % 5 === 0 ? { shards: 60, tickets: { premium: 1 } } : { shards: 30 }),
+  levelReward: (n) => (n % 5 === 0 ? { shards: 50, tickets: { premium: 1 } } : { shards: 20 }),
 };
 
 export const LEVEL_TITLES = [
@@ -114,7 +114,7 @@ export const FRAMES = {
 };
 
 // Booster standard gratuit qui se recharge avec le temps (aucune obligation de revenir).
-export const FREE_PACK = { everyHours: 12, max: 1 };
+export const FREE_PACK = { everyHours: 48, max: 1 };
 
 export const FACTION_ORDER = ['infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel'];
 
@@ -126,20 +126,20 @@ export const EXPORT_PREFIX = 'ABYSSAL1:';
 // Missions du jour : 3 tirées chaque jour parmi ces modèles (renouvelées à minuit).
 // kind : ce qui fait avancer la mission ; n : objectif ; shards : récompense.
 export const MISSIONS = [
-  { key: 'open2',    kind: 'booster',  n: 2, shards: 50, text: 'Ouvre 2 boosters' },
-  { key: 'open3',    kind: 'booster',  n: 3, shards: 70, text: 'Ouvre 3 boosters' },
-  { key: 'new3',     kind: 'new',      n: 3, shards: 50, text: 'Découvre 3 nouvelles créatures' },
-  { key: 'new5',     kind: 'new',      n: 5, shards: 70, text: 'Découvre 5 nouvelles créatures' },
-  { key: 'faction',  kind: 'faction',  n: 3, shards: 50, text: 'Obtiens 3 cartes {faction}' },
-  { key: 'rare',     kind: 'rare',     n: 2, shards: 60, text: 'Obtiens 2 cartes Rares ou mieux' },
-  { key: 'variant',  kind: 'variant',  n: 1, shards: 60, text: 'Obtiens une variante (holographique, or…)' },
-  { key: 'burn',     kind: 'burn',     n: 3, shards: 50, text: 'Brûle 3 cartes dans la Fournaise' },
-  { key: 'depth4',   kind: 'depth',    n: 4, shards: 70, text: 'Atteins l’étage 4 de la Descente' },
-  { key: 'wins',     kind: 'win',      n: 5, shards: 60, text: 'Remporte 5 combats dans la Descente' },
-  { key: 'offering', kind: 'daily',    n: 1, shards: 30, text: 'Récupère l’offrande du jour' },
-  { key: 'chest2',   kind: 'chest',    n: 2, shards: 50, text: 'Ouvre 2 coffres' },
+  { key: 'open2',    kind: 'booster',  n: 2, shards: 30, text: 'Ouvre 2 boosters' },
+  { key: 'open3',    kind: 'booster',  n: 3, shards: 40, text: 'Ouvre 3 boosters' },
+  { key: 'new3',     kind: 'new',      n: 3, shards: 30, text: 'Découvre 3 nouvelles créatures' },
+  { key: 'new5',     kind: 'new',      n: 5, shards: 40, text: 'Découvre 5 nouvelles créatures' },
+  { key: 'faction',  kind: 'faction',  n: 3, shards: 30, text: 'Obtiens 3 cartes {faction}' },
+  { key: 'rare',     kind: 'rare',     n: 2, shards: 35, text: 'Obtiens 2 cartes Rares ou mieux' },
+  { key: 'variant',  kind: 'variant',  n: 1, shards: 35, text: 'Obtiens une variante (holographique, or…)' },
+  { key: 'burn',     kind: 'burn',     n: 3, shards: 30, text: 'Brûle 3 cartes dans la Fournaise' },
+  { key: 'depth4',   kind: 'depth',    n: 4, shards: 40, text: 'Atteins l’étage 4 de la Descente' },
+  { key: 'wins',     kind: 'win',      n: 5, shards: 35, text: 'Remporte 5 combats dans la Descente' },
+  { key: 'offering', kind: 'daily',    n: 1, shards: 20, text: 'Récupère l’offrande du jour' },
+  { key: 'chest2',   kind: 'chest',    n: 2, shards: 30, text: 'Ouvre 2 coffres' },
 ];
-export const MISSION_BONUS = { tickets: { standard: 1 } }; // les 3 missions du jour accomplies
+export const MISSION_BONUS = { shards: 60 }; // les 3 missions du jour accomplies
 
 
 // Tirage des Ombres : un booster gratuit par jour tiré par le serveur (cartes non gagnées),

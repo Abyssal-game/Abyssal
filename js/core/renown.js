@@ -10,10 +10,10 @@ export const fameNext = (pts = 0) => FAME_TIERS.find((t) => pts < t.n) || null;
 
 // Saison : un mois du calendrier. Paliers de profondeur atteints pendant le mois, récompensés une fois.
 export const SEASON_STEPS = [
-  { floor: 5, reward: { shards: 150 } },
+  { floor: 5, reward: { shards: 80 } },
   { floor: 10, reward: { chests: { fer: 1 } } },
   { floor: 20, reward: { chests: { or: 1 } } },
-  { floor: 30, reward: { shards: 400 } },
+  { floor: 30, reward: { shards: 250 } },
   { floor: 40, reward: { chests: { abyssal: 1 } } },
 ];
 const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];

@@ -40,7 +40,7 @@ export default function home(app, root) {
       const done = x.p >= x.n;
       rows.push(`<div class="td-row ${x.claimed ? 'done' : ''}"><span class="td-ic mi" style="--mc:${x.faction ? cat.faction[x.faction].colors.secondary : MISSION_LOOK[x.kind]?.[1] || '#C8A45D'}">${x.claimed ? icon('check') : x.faction ? sigil(x.faction) : picon(MISSION_LOOK[x.kind]?.[0] || 'seal')}</span><span class="td-t"><b>${esc(x.text)}</b>${x.claimed ? '' : `<span class="progress"><i style="width:${(x.p / x.n) * 100}%"></i></span>`}</span>${x.claimed ? '<span class="small muted">Fait</span>' : done ? `<button class="btn small gold" data-act="mission" data-i="${i}">+${x.shards}</button>` : `<span class="td-n small muted">${x.p}/${x.n}</span>`}</div>`);
     });
-    if (allClaimed && !m.bonus) rows.push(`<div class="td-row"><span class="td-ic mi" style="--mc:#F2C14E">${picon('booster')}</span><span class="td-t"><b>Bonus des 3 missions</b><span class="small muted">Un booster standard</span></span><button class="btn small primary" data-act="mbonus">Récupérer</button></div>`);
+    if (allClaimed && !m.bonus) rows.push(`<div class="td-row"><span class="td-ic mi" style="--mc:#F2C14E">${picon('crystal')}</span><span class="td-t"><b>Bonus des 3 missions</b><span class="small muted">60 éclats</span></span><button class="btn small primary" data-act="mbonus">Récupérer</button></div>`);
     if (chests) rows.push(`<a class="td-row" href="#/coffres"><span class="td-ic mi" style="--mc:#E8C35A">${picon('chest')}</span><span class="td-t"><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Pleins de boosters</span></span>${icon('next')}</a>`);
     return `<section class="panel today"><div class="today-head"><h2>Aujourd’hui</h2></div>${rows.join('')}</section>`;
   }
@@ -95,7 +95,7 @@ export default function home(app, root) {
       catch (e) { toast(esc(e.message), { kind: 'error' }); }
     },
     mbonus() {
-      try { g.claimMission('bonus'); app.sfx.achievement(); toast('Bonus des missions : <b>1 booster standard</b> !', { kind: 'epic', icon: 'ticket' }); app.refresh(); }
+      try { g.claimMission('bonus'); app.sfx.achievement(); toast('Bonus des missions : <b>+60 éclats</b> !', { kind: 'epic', icon: 'crystal' }); app.refresh(); }
       catch (e) { toast(esc(e.message), { kind: 'error' }); }
     },
     daily() {

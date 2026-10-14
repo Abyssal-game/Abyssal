@@ -36,9 +36,9 @@ test('missions : progression, récompense et bonus', () => {
   g.claimMission(0); g.claimMission(1); g.claimMission(2);
   assert.equal(g.s.shards, before + 130);
   assert.throws(() => g.claimMission(0));
-  const t = g.s.tickets.standard;
+  const sh = g.s.shards;
   g.claimMission('bonus');
-  assert.equal(g.s.tickets.standard, t + 1);
+  assert.equal(g.s.shards, sh + 60);
   assert.throws(() => g.claimMission('bonus'));
 });
 
