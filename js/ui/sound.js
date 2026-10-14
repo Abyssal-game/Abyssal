@@ -319,7 +319,7 @@ export const sfx = {
 // ——— Sons enregistrés (assets/sfx/<clé>.mp3) ———
 // La liste des fichiers livrés est dans assets/sfx/manifest.json. Un son enregistré remplace son équivalent
 // synthétisé ; sans fichier (ou sans réseau), le son synthétisé reste joué. Clés de l'ouverture de carte :
-// reveal-1 (Commune, Peu commune), reveal-2 (Rare, Hyper rare), reveal-3 (Mythique), reveal-4 (Secrète).
+// reveal-c, reveal-pc, reveal-r, reveal-hr, reveal-m, reveal-s (une par rareté).
 const samples = {}; let sampleList = null, sampleLoad = null;
 function loadSamples() {
   if (sampleLoad || !ctx) return;
@@ -329,8 +329,14 @@ function loadSamples() {
       .then((b) => b && new Promise((ok, ko) => ctx.decodeAudioData(b, ok, ko))).then((buf) => { if (buf) samples[k] = buf; }).catch(() => {}));
   });
 }
-// reveal-4 : Secrète (sans fichier reveal-4, elle reprend reveal-3)
-const sampleKey = (k, a) => (k === 'reveal' ? (a[0] === 'S' && samples['reveal-4'] ? 'reveal-4' : `reveal-${a[0] === 'M' || a[0] === 'S' ? 3 : a[0] === 'R' || a[0] === 'HR' ? 2 : 1}`) : k);
+// Un son par rareté (reveal-c, reveal-pc, reveal-r, reveal-hr, reveal-m, reveal-s) ;
+// sans fichier pour une rareté, on prend le plus proche en dessous, puis le son synthétisé
+const REVEAL_UP = ['C', 'PC', 'R', 'HR', 'M', 'S'];
+const sampleKey = (k, a) => {
+  if (k !== 'reveal') return k;
+  for (let i = Math.max(0, REVEAL_UP.indexOf(a[0])); i >= 0; i--) { const key = `reveal-${REVEAL_UP[i].toLowerCase()}`; if (samples[key]) return key; }
+  return 'reveal-c';
+};
 function playSample(key) {
   const buf = samples[key];
   if (!buf || !ensure()) return false;
