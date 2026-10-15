@@ -10,7 +10,7 @@
     "check": "node tools/validate.mjs",
     "sim": "node tools/simulate.mjs",
     "prompts": "node tools/export-prompts.mjs",
-    "icons": "node tools/make-icons.mjs"
+    "icons": "python3 tools/brand.py"
   },
   "dependencies": {
     "@capacitor/app": "8.1.2",

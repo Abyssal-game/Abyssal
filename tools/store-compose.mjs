@@ -45,7 +45,7 @@ const featureHTML = () => `<!doctype html><html><head><meta charset="utf-8">${FO
   .bg{position:absolute;inset:0;background:url(${url('assets/scenes/home.webp')}) center 35%/cover;opacity:.55;}
   .fade{position:absolute;inset:0;background:radial-gradient(70% 90% at 50% 45%, rgba(8,9,13,.1), rgba(8,9,13,.9));}
   .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-  img{width:620px;filter:drop-shadow(0 0 24px rgba(200,164,93,.45));}
+  img{width:470px;filter:drop-shadow(0 0 24px rgba(200,164,93,.45));}
   p{margin:14px 0 0;font:600 30px/1.2 'Alegreya Sans',sans-serif;color:#E9DEF5;letter-spacing:.03em;text-shadow:0 2px 8px #000;}
 </style></head><body><div class="bg"></div><div class="fade"></div><div class="c"><img src="${url('assets/brand/title.webp')}"><p>Collectionne · Combats · Descends dans l’Abysse</p></div></body></html>`;
 
@@ -72,8 +72,5 @@ for (const [file, title, sub] of SHOTS) {
   await render(shotHTML(file, title, sub, 1080, 1920), 1080, 1920, path.join(ROOT, 'store/google', name));
 }
 await render(featureHTML(), 1024, 500, path.join(ROOT, 'store/google/presentation-1024x500.png'));
-// Icônes : même dessin que l'icône du jeu, rendu à la taille demandée par chaque store
-const iconHTML = (S) => `<!doctype html><html><body style="margin:0;background:#08090D"><img src="${url('icons/icon-512.png')}" style="width:${S}px;height:${S}px;display:block;image-rendering:auto"></body></html>`;
-await render(iconHTML(1024), 1024, 1024, path.join(ROOT, 'store/apple/icone-1024.png'));
-await render(iconHTML(512), 512, 512, path.join(ROOT, 'store/google/icone-512.png'));
+// Icônes des stores : fabriquées par tools/brand.py à partir de l'image source (pleine résolution)
 await b.close();

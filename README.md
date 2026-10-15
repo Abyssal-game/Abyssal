@@ -126,7 +126,7 @@ js/art/         geometry.js, scenes.js, creatures.js, procedural.js (illustratio
 js/ui/          dom.js, icons.js, card.js (composant carte), sound.js (sons synthétisés)
 js/screens/     un module par écran
 tests/          tests Node (node --test)
-tools/          validate, simulate, export-prompts, make-icons
+tools/          validate, simulate, export-prompts, brand (logo et icônes)
 ```
 
 La logique (`js/core`) ne dépend pas du navigateur et se teste dans Node. La sauvegarde est versionnée (`SAVE_VERSION`) et migrée automatiquement ; une copie de secours est conservée et restaurée si la sauvegarde principale est abîmée.

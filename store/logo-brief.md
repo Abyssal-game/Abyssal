@@ -1,6 +1,6 @@
 # ABYSSAL — Direction artistique du nouveau logo
 
-Dossier préparé pour générer le nouveau logo avec Gemini. Rien n'est encore généré : ce sont des instructions. Le logo sera intégré dans le jeu une fois l'image reçue.
+Dossier qui a servi à générer le nouveau logo avec Gemini. **Fait le 15 octobre 2026 (v312)** : les deux images (emblème et logo complet) sont dans `store/logo/`, et `python3 tools/brand.py` en tire toutes les tailles. Variante restante, facultative : le logo avec la signature « Le Bestiaire interdit » (prompt de la section 7).
 
 ## 1. Diagnostic du logo actuel
 

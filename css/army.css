@@ -2757,3 +2757,9 @@ body.battle-mode .dv.cb { gap: 5px; }
 .tm-b::after, .dt-chipb::after, .linkish::after, .top-back::after, .switch::after { content: ''; position: absolute; inset: -7px -4px; }
 .seg-b::after { content: ''; position: absolute; inset: -7px 0; }
 .op-all[hidden] { display: none !important; }
+
+/* v312 : nouveau logo (le Sceau fendu) — l'écran d'ouverture montre le logo complet, la lueur animée suit l'œil */
+.boot-seal.boot-logo { width: min(88vw, 56vh, 460px); -webkit-mask: none; mask: none; }
+.boot-title.boot-sealw { margin: 0 !important; }
+.boot-eye { left: 50.1%; top: 51.3%; width: 13%; }
+.hb-title img { width: min(62vw, 270px) !important; }

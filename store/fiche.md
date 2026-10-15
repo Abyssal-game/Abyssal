@@ -144,7 +144,7 @@ Ordre des captures et titres affichés dessus :
 7. Bestiaire : « Un monde à découvrir »
 8. Accueil : « Gratuit, sans publicité »
 
-L'icône 1024 × 1024 est un agrandissement de l'icône 512 actuelle : elle est un peu moins nette. Pour une icône parfaite, il faudra une version 1024 de l'œil dans le sceau doré.
+L'icône 1024 × 1024 est tirée de l'image source du nouveau logo (2048 × 2048) : pleine netteté.
 
 L'iPad n'est pas prévu : l'application sera déclarée « iPhone uniquement », ce qui évite de fournir des captures iPad.
 
