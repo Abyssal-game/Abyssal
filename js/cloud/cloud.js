@@ -26,7 +26,13 @@ function frError(status, body) {
   const m = String(body?.msg || body?.message || body?.error_description || body?.error || '').toLowerCase();
   if (m.includes('invalid login') || m.includes('invalid_grant') || m.includes('invalid credentials')) return 'E-mail ou mot de passe incorrect.';
   if (m.includes('email not confirmed')) return 'Ce compte n’est pas encore confirmé.';
-  if (m.includes('signups not allowed') || m.includes('signup is disabled')) return 'Les inscriptions sont fermées pendant la construction du jeu : il faut une invitation.';
+  if (m.includes('signups not allowed') || m.includes('signup is disabled')) return 'Les inscriptions sont fermées pour le moment.';
+  if (m.includes('already registered') || m.includes('already exists') || m.includes('already been registered')) return 'Un compte existe déjà avec cet e-mail : connecte-toi.';
+  if (m.includes('password should be') || m.includes('password is too short') || m.includes('weak password')) return 'Mot de passe trop court : 6 caractères au moins.';
+  if (m.includes('rate limit') || m.includes('too many requests') || status === 429) return 'Trop de tentatives : réessaie dans quelques minutes.';
+  if (m.includes('unable to validate email') || m.includes('invalid email') || m.includes('invalid format')) return 'Adresse e-mail invalide.';
+  if (m.includes('same password') || m.includes('different from the old')) return 'Choisis un mot de passe différent de l’ancien.';
+  if (m.includes('otp_expired') || m.includes('expired') || m.includes('invalid or has expired')) return 'Ce lien a expiré : demande-en un nouveau.';
   if (m.includes('duplicate') || m.includes('profiles_pseudo_key') || status === 409) return 'Ce pseudo est déjà pris.';
   if (m.includes('check constraint') || m.includes('violates check')) return 'Pseudo invalide : 3 à 16 lettres, chiffres, espaces, - ou _.';
   if (status === 401 || status === 403) return 'Session expirée : reconnecte-toi.';
@@ -61,10 +67,41 @@ export async function signIn(email, password) {
   store(tok);
   return currentUser();
 }
+// Inscription. Avec la confirmation par e-mail (réglage Supabase par défaut), la réponse n'a pas de jeton :
+// le joueur reçoit un lien, qui ramène au jeu connecté (voir consumeAuthHash). Sans confirmation, il est connecté tout de suite.
 export async function signUp(email, password) {
-  const r = await call('/auth/v1/signup', { method: 'POST', auth: false, body: { email: email.trim(), password } });
+  const r = await call('/auth/v1/signup', { method: 'POST', auth: false, body: { email: email.trim(), password, data: {} } });
   if (r?.access_token) store(r);
-  return r;
+  return { loggedIn: !!r?.access_token, user: r?.user || r };
+}
+// Mot de passe oublié : Supabase envoie un lien qui ramène au jeu avec un jeton « recovery » (voir consumeAuthHash).
+export async function recover(email) {
+  await call('/auth/v1/recover', { method: 'POST', auth: false, body: { email: email.trim() } });
+}
+// Nouveau mot de passe (après un lien de récupération, ou connecté).
+export async function updatePassword(password) {
+  const u = await call('/auth/v1/user', { method: 'PUT', body: { password } });
+  if (session && u?.id) setSession({ ...session, user: { id: u.id, email: u.email } });
+  return u;
+}
+// v318 : les liens des e-mails de Supabase (confirmation, récupération, lien magique) reviennent sur le site avec les jetons
+// dans la partie « # » de l'adresse. On les lit une fois, on ouvre la session, et on nettoie l'adresse.
+// Renvoie le type du lien ('signup', 'recovery', 'magiclink', 'email_change'…) ou null s'il n'y a rien.
+export function consumeAuthHash() {
+  const h = location.hash || '';
+  if (!/^#(?!\/)/.test(h) || !/(^|&)access_token=/.test(h.slice(1))) {
+    const m = /(^|[#&?])error_description=([^&]+)/.exec(h);
+    if (m) { history.replaceState(null, '', location.pathname + location.search + '#/compte'); return { type: 'error', message: decodeURIComponent(m[2].replace(/\+/g, ' ')) }; }
+    return null;
+  }
+  const q = new URLSearchParams(h.slice(1));
+  const tok = { access_token: q.get('access_token'), refresh_token: q.get('refresh_token'), expires_in: Number(q.get('expires_in')) || 3600 };
+  let user = null;
+  try { user = JSON.parse(atob(tok.access_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))); } catch (e) { user = null; }
+  setSession({ access_token: tok.access_token, refresh_token: tok.refresh_token, expires_at: Date.now() + tok.expires_in * 1000, user: { id: user?.sub, email: user?.email } });
+  const type = q.get('type') || 'magiclink';
+  history.replaceState(null, '', location.pathname + location.search + (type === 'recovery' ? '#/compte/motdepasse' : '#/compte'));
+  return { type };
 }
 async function refresh() {
   if (!session?.refresh_token) throw new Error('Session expirée : reconnecte-toi.');

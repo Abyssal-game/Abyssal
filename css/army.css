@@ -2773,3 +2773,7 @@ body.battle-mode .dv.cb { gap: 5px; }
 .mn-grid > .mn-tile.mn-wide > span:not(.mn-tile-ic) { font-size: .78rem; color: var(--ink); line-height: 1.3; }
 .mn-grid > .mn-tile.mn-wide > em { font-style: normal; font-size: .72rem; color: var(--mute); line-height: 1.3; }
 @media (max-width: 360px) { .mn-grid { grid-auto-rows: minmax(118px, 1fr); } .mn-grid > .mn-tile.mn-wide .mn-tile-ic.avatar-big { width: 56px; height: 56px; } }
+
+/* v318 : écran Compte — inscription, mot de passe oublié ; le texte des champs peints ne touche plus le cadre */
+.acc-form .input.plain { padding: 0 34px; }
+.acc-seg { margin-bottom: 12px; }

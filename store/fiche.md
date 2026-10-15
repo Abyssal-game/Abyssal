@@ -233,9 +233,9 @@ Aucun achat intégré, aucune publicité, aucun pistage.
 
 ## 8. Avant de soumettre : à faire
 
-- [ ] Exécuter `supabase/06-signalements.sql` dans Supabase (signalement des pseudos).
-- [ ] Ouvrir les inscriptions dans Supabase (Authentication → Sign In / Providers → autoriser les nouvelles inscriptions). Aujourd'hui le jeu affiche « il faut une invitation » si elles sont fermées.
-- [ ] Retirer du jeu la phrase « Pendant la construction du jeu, les comptes sont créés sur invitation » (`js/screens/account.js`) au moment d'ouvrir les inscriptions.
+- [x] Exécuter `supabase/06-signalements.sql` dans Supabase (signalement des pseudos).
+- [x] Ouvrir les inscriptions dans Supabase (fait le 15 octobre 2026). Le jeu propose « Créer un compte » et « Mot de passe oublié » depuis la v318 ; vérifier dans Supabase → Authentication → Email Templates que les liens pointent vers `https://abyssal-game.github.io/Abyssal/`.
+- [x] Retirer du jeu la phrase « sur invitation » (fait en v318).
 - [x] Refaire l'illustration de Pandore (ART-068), habillée (fait en v300).
 - [ ] Vérifier que le nom « ABYSSAL » n'est pas déjà pris sur les deux stores et en marque déposée (base INPI / EUIPO).
 - [ ] Créer les comptes développeur : Google (25 $ une fois), Apple (99 $ par an).

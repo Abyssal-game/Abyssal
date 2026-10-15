@@ -14,19 +14,47 @@ const ago = (t) => {
 };
 
 export default function account(app, root) {
-  let busy = false, lastEmail = '';
+  let busy = false, lastEmail = '', mode = app.params?.[0] === 'motdepasse' ? 'newpass' : 'login';
   function render() {
     const u = cloud.currentUser();
+    // v318 : nouveau mot de passe après un lien de récupération (adresse #/compte/motdepasse), même connecté
+    if (mode === 'newpass' && u) {
+      root.innerHTML = `
+        <header class="screen-head ui-hero bn-account"><h1>Nouveau mot de passe</h1><p class="muted">${esc(u.email || '')}</p></header>
+        <form class="panel stack acc-form" id="newpass">
+          <label class="acc-l"><span class="small muted">Nouveau mot de passe</span><input class="input plain" type="password" name="password" autocomplete="new-password" required minlength="6" placeholder="6 caractères au moins"></label>
+          <label class="acc-l"><span class="small muted">Encore une fois</span><input class="input plain" type="password" name="password2" autocomplete="new-password" required minlength="6"></label>
+          <button class="btn primary block" type="submit" ${busy ? 'disabled' : ''}>${icon('lock')}${busy ? 'Enregistrement…' : 'Enregistrer'}</button>
+        </form>`;
+      root.querySelector('#newpass').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (busy) return;
+        const f = new FormData(e.target);
+        if (f.get('password') !== f.get('password2')) { toast('Les deux mots de passe sont différents.', { kind: 'error', icon: 'info' }); return; }
+        busy = true; render();
+        try {
+          await cloud.updatePassword(String(f.get('password')));
+          toast('Mot de passe enregistré.', { kind: 'success', icon: 'lock' });
+          mode = 'login'; await afterLogin();
+        } catch (err) { toast(esc(err.message), { kind: 'error', icon: 'info', ms: 6000 }); }
+        busy = false; render();
+      });
+      return;
+    }
     if (!u) {
+      const signup = mode === 'signup', forgot = mode === 'forgot';
       root.innerHTML = `
         <header class="screen-head ui-hero bn-account"><h1>Compte</h1><p class="muted">Garde ta progression en ligne, retrouve-la sur n’importe quel appareil et affronte les joueurs du monde entier.</p></header>
+        <div class="seg wide acc-seg" role="group" aria-label="Connexion ou inscription"><button type="button" class="seg-b" data-mode="login" aria-pressed="${!signup}">Se connecter</button><button type="button" class="seg-b" data-mode="signup" aria-pressed="${signup}">Créer un compte</button></div>
         <form class="panel stack acc-form" id="login">
-          <label class="acc-l"><span class="small muted">E-mail</span><input class="input plain" type="email" name="email" autocomplete="username" required value="${esc(lastEmail)}"></label>
-          <label class="acc-l"><span class="small muted">Mot de passe</span><input class="input plain" type="password" name="password" autocomplete="current-password" required minlength="6"></label>
-          <button class="btn primary block" type="submit" ${busy ? 'disabled' : ''}>${icon('user')}${busy ? 'Connexion…' : 'Se connecter'}</button>
-          <p class="small muted">Pendant la construction du jeu, les comptes sont créés <b>sur invitation</b>.</p>
+          <label class="acc-l"><span class="small muted">E-mail</span><input class="input plain" type="email" name="email" autocomplete="username" inputmode="email" required value="${esc(lastEmail)}"></label>
+          ${forgot ? '' : `<label class="acc-l"><span class="small muted">Mot de passe</span><input class="input plain" type="password" name="password" autocomplete="${signup ? 'new-password' : 'current-password'}" required minlength="6" ${signup ? 'placeholder="6 caractères au moins"' : ''}></label>`}
+          ${forgot ? '<p class="small muted">Tu recevras un e-mail avec un lien : il te ramène au jeu pour choisir un nouveau mot de passe.</p>' : ''}
+          <button class="btn primary block" type="submit" ${busy ? 'disabled' : ''}>${icon(forgot ? 'key' : 'user')}${busy ? 'Un instant…' : forgot ? 'Envoyer le lien' : signup ? 'Créer mon compte' : 'Se connecter'}</button>
+          ${signup ? `<p class="small muted">En créant un compte, tu acceptes la <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité</a>. Il faut avoir 13 ans ou plus.</p>` : forgot ? `<button type="button" class="btn ghost small" data-mode="login">Retour</button>` : `<button type="button" class="btn ghost small" data-mode="forgot">Mot de passe oublié ?</button>`}
         </form>
         <p class="small muted acc-privacy">${icon('lock')} Données conservées : ton e-mail, ton pseudo et ta sauvegarde de jeu. Rien d’autre. Tu peux supprimer ton compte à tout moment.</p>`;
+      root.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => { lastEmail = root.querySelector('[name=email]')?.value || lastEmail; mode = b.dataset.mode; render(); }));
       root.querySelector('#login').addEventListener('submit', async (e) => {
         e.preventDefault();
         if (busy) return;
@@ -34,9 +62,24 @@ export default function account(app, root) {
         lastEmail = String(f.get('email'));
         busy = true; render();
         try {
-          await cloud.signIn(String(f.get('email')), String(f.get('password')));
-          const r = await afterLogin();
-          toast(r === 'pulled' ? 'Connecté : ta partie en ligne est chargée.' : 'Connecté : ta partie est sauvegardée en ligne.', { kind: 'success', icon: 'user' });
+          if (forgot) {
+            await cloud.recover(lastEmail);
+            mode = 'login';
+            toast('Si un compte existe avec cet e-mail, un lien vient d’être envoyé. Regarde aussi les indésirables.', { kind: 'success', icon: 'key', ms: 8000 });
+          } else if (signup) {
+            const r = await cloud.signUp(lastEmail, String(f.get('password')));
+            if (r.loggedIn) {
+              const k = await afterLogin();
+              toast(k === 'pulled' ? 'Compte créé et connecté : ta partie en ligne est chargée.' : 'Compte créé : ta partie est maintenant sauvegardée en ligne.', { kind: 'success', icon: 'user' });
+            } else {
+              mode = 'login';
+              toast('Compte créé ! Un e-mail de confirmation t’a été envoyé : touche son lien, puis reviens te connecter ici.', { kind: 'success', icon: 'user', ms: 10000 });
+            }
+          } else {
+            await cloud.signIn(lastEmail, String(f.get('password')));
+            const r = await afterLogin();
+            toast(r === 'pulled' ? 'Connecté : ta partie en ligne est chargée.' : 'Connecté : ta partie est sauvegardée en ligne.', { kind: 'success', icon: 'user' });
+          }
         } catch (err) { toast(esc(err.message), { kind: 'error', icon: 'info', ms: 6000 }); }
         busy = false; render();
       });

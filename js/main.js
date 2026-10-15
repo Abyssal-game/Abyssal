@@ -28,6 +28,7 @@ import shadowScreen, { claimShadowPrize } from './screens/shadow.js';
 import { forgeScreen, furnaceScreen } from './screens/forge.js';
 import { teamScreen, chestsScreen } from './screens/army.js';
 import { startSync } from './cloud/sync.js';
+import { consumeAuthHash } from './cloud/cloud.js';
 import { startPresence } from './cloud/presence.js';
 import { showWelcome } from './screens/welcome.js';
 import { setScene } from './ui/scene.js';
@@ -268,6 +269,8 @@ async function boot() {
     app.flushProgress = () => { const ev = app.pendingProgress || []; app.pendingProgress = null; if (ev.length) onProgress(ev); };
     app.applySettings = applySettings;
     applySettings();
+    // v318 : lien reçu par e-mail (confirmation d'inscription, mot de passe oublié) : ouvre la session avant tout
+    const authLink = consumeAuthHash();
     startSync(app);
     startPresence();
     setTimeout(() => claimShadowPrize(app), 5000); // coffre du Tirage des Ombres de la semaine passée
@@ -289,6 +292,9 @@ async function boot() {
     if (!persistent) toast('Le stockage local est désactivé dans ce navigateur : ta progression ne sera pas conservée après fermeture.', { kind: 'error', icon: 'info', ms: 9000 });
     if (app.game.unreadable) toast('Ta partie précédente n’a pas pu être lue par cette version du jeu. Elle est gardée de côté : ferme et rouvre l’app pour recevoir la mise à jour, elle sera restaurée.', { kind: 'error', icon: 'info', ms: 12000 });
     if (app.game.restoredStash) toast('Ta partie a été restaurée.', { kind: 'success', icon: 'check' });
+    if (authLink?.type === 'error') toast(`Ce lien n’a pas fonctionné : ${esc(authLink.message)}`, { kind: 'error', icon: 'info', ms: 8000 });
+    else if (authLink?.type === 'recovery') toast('Choisis ton nouveau mot de passe.', { icon: 'key', ms: 6000 });
+    else if (authLink) toast('Compte confirmé : tu es connecté, ta partie sera sauvegardée en ligne.', { kind: 'success', icon: 'user', ms: 7000 }); // startSync a déjà pris la session en compte
     if (app.game.loadedFrom && app.game.loadedFrom.endsWith('backup')) toast('La sauvegarde principale était abîmée : la copie de secours a été restaurée.', { kind: 'error', icon: 'info', ms: 8000 });
     document.addEventListener('pointerdown', () => applySettings(), { once: true });
     document.addEventListener('click', () => applySettings(), { once: true });
