@@ -21,7 +21,7 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Le réseau de la session bloque github.io : pour vérifier la publication, passe par l'outil GitHub (déploiements Pages) ou demande une capture au propriétaire.
 
 ## 2. Routine de livraison
-1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v305**.
+1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v306**.
 2. Tests : `node --test tests/*.test.mjs` (187 tests), `node tools/validate.mjs`. Si le combat ou l'équilibre change : `node tools/fuzz.mjs 300` (étage moyen ≈ 12 à 14 en normal).
 3. Vérification dans le navigateur avec Playwright (`/opt/node-tools/node_modules/playwright/index.mjs`, Chromium déjà installé), avec un serveur local `python3 -m http.server 8092` lancé dans le dossier. Tailles iPhone SE et iPhone 13. **L'écran d'ouverture attend un toucher** (« Touche l'écran pour entrer ») : dans les scripts, cliquer au milieu de l'écran (dans la fenêtre 390×664) avant tout le reste.
 4. Commit, push, réponse en français.
@@ -52,6 +52,11 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Numéro de version Android = numéro du jeu (`versionCode` lu dans `js/config.js`).
 - Le kit Android ne se télécharge pas dans la session (dl.google.com bloqué) : la construction se fait sur **GitHub Actions** (`.github/workflows/android.yml`), avec essai sur téléphone simulé (`tools/android-smoke.mjs`, captures dans l'artefact `abyssal-android-captures`). Le propriétaire n'a **pas de téléphone Android**.
 - Pas encore fait : version signée pour le Play Store (clé d'envoi à créer et à mettre dans les secrets GitHub), iOS (attend le Mac).
+
+## 4 ter. Duels des Sceaux : difficulté (v306)
+- Chaque rival a `ai` et `aiAwake` = [force, part de coups imparfaits] dans `js/core/sceaux.js` (forces 1 à 6, 6 = fin de partie calculée). Mains des rivaux allégées en pouvoirs (Rempart, Fureur).
+- Réglé par simulation (joueur « bon » = IA niveau 3) : Ilda ~90 %, Orvel ~83 %, Vesna ~63 %, Maître ~70 %, Écho ~52 %, Mammon ~38 %, Archiviste ~33 %, Souveraine ~33 % de victoires ; revanches éveillées plus dures.
+- Si on retouche les Sceaux, refaire la mesure (scripts de simulation dans les sessions précédentes : partie contre chaque rival, 150 parties).
 
 ## 5. Décisions déjà prises
 - Pas de « salle d'épreuve » ni de version de test : tout va sur main.

@@ -65,23 +65,25 @@ export const ruleHas = (st, k) => st.rule === k || (PARTS[st.rule] || []).includ
 // Le cœur du Sceau : départage les égalités
 export const CENTER = 4;
 
-// Adversaires : du plus simple au plus redoutable. level : force de l'IA (1 à 4).
+// Adversaires : du plus simple au plus redoutable. level : étoiles affichées et rareté de leur main.
+// ai / aiAwake : [force du jeu (voir aiMove), part de coups imparfaits], réglés par simulation (v306) pour qu'un
+// bon joueur gagne environ 90 % contre Ilda, puis de moins en moins, jusqu'à environ 1 partie sur 3 contre la Souveraine.
 export const RIVALS = [
-  { key: 'initie', name: 'Ilda', title: 'l’Initiée', level: 1, faction: null, portrait: 'CEL-006', rule: 'classique', reward: 20,
+  { key: 'initie', ai: [3, 0.3], aiAwake: [4, 0.3], name: 'Ilda', title: 'l’Initiée', level: 1, faction: null, portrait: 'CEL-006', rule: 'classique', reward: 20,
     hello: 'Tu connais les Sceaux ? Moi, j’apprends encore. On joue doucement ?', win: 'Oh ! Tu m’apprendras ce coup-là ?', lose: 'J’ai gagné ? J’ai gagné !' },
-  { key: 'collectionneur', name: 'Maître Orvel', title: 'le Collectionneur', level: 2, faction: 'artificiel', portrait: 'ART-004', rule: 'identique', reward: 30,
+  { key: 'collectionneur', ai: [4, 0.3], aiAwake: [4, 0.15], name: 'Maître Orvel', title: 'le Collectionneur', level: 2, faction: 'artificiel', portrait: 'ART-004', rule: 'identique', reward: 30,
     hello: 'Chaque carte que je pose vaut une fortune. Ne les abîme pas.', win: 'Ma collection pleure.', lose: 'Une carte de plus pour ma vitrine.' },
-  { key: 'stratege', name: 'Sœur Vesna', title: 'la Stratège', level: 3, faction: 'celeste', portrait: 'CEL-005', rule: 'sacre', reward: 40,
+  { key: 'stratege', ai: [4, 0.15], aiAwake: [5, 0.6], name: 'Sœur Vesna', title: 'la Stratège', level: 3, faction: 'celeste', portrait: 'CEL-005', rule: 'sacre', reward: 40,
     hello: 'Chaque case est une prière. Choisis bien où tu t’agenouilles.', win: 'La lumière t’a guidé, cette fois.', lose: 'Tu as joué au hasard. La lumière, jamais.' },
-  { key: 'maitre', name: 'Le Maître des Sceaux', title: 'gardien des règles', level: 4, faction: 'necrotique', portrait: 'NEC-001', rule: 'somme', reward: 55,
+  { key: 'maitre', ai: [3, 0.15], aiAwake: [4, 0.3], name: 'Le Maître des Sceaux', title: 'gardien des règles', level: 4, faction: 'necrotique', portrait: 'NEC-001', rule: 'somme', reward: 55,
     hello: 'J’ai scellé plus de créatures que tu n’en verras jamais.', win: 'Tu as brisé mon sceau. Ce n’est pas rien.', lose: 'Reviens quand tu sauras compter.' },
-  { key: 'echo', name: 'L’Écho de l’Abîme', title: 'gardien des profondeurs', level: 4, faction: 'abyssal', portrait: 'ABY-039', rule: 'abime', reward: 70,
+  { key: 'echo', ai: [4, 0.45], aiAwake: [6, 0.75], name: 'L’Écho de l’Abîme', title: 'gardien des profondeurs', level: 4, faction: 'abyssal', portrait: 'ABY-039', rule: 'abime', reward: 70,
     hello: 'Je joue tes coups avant toi. Je les ai déjà joués mille fois.', win: '… l’écho se tait.', lose: 'Tu m’entends ? C’est toi, en bas.' },
-  { key: 'banquier', name: 'Mammon', title: 'le Banquier des Enfers', level: 5, faction: 'infernal', portrait: 'INF-040', rule: 'usure', reward: 80,
+  { key: 'banquier', ai: [4, 0.6], aiAwake: [5, 0.3], name: 'Mammon', title: 'le Banquier des Enfers', level: 5, faction: 'infernal', portrait: 'INF-040', rule: 'usure', reward: 80,
     hello: 'Tout se paie, ici. Même une égalité.', win: 'Une perte… je la noterai dans mon grand livre.', lose: 'Intérêts encaissés. Merci de ta visite.' },
-  { key: 'archiviste', name: 'L’Archiviste', title: 'mémoire d’engrenages', level: 5, faction: 'artificiel', portrait: 'ART-041', rule: 'archive', reward: 90,
+  { key: 'archiviste', ai: [4, 0.45], aiAwake: [6, 0.6], name: 'L’Archiviste', title: 'mémoire d’engrenages', level: 5, faction: 'artificiel', portrait: 'ART-041', rule: 'archive', reward: 90,
     hello: 'J’ai catalogué chacune de tes parties. Elles se terminent toutes pareil.', win: 'Erreur… à… réindexer.', lose: 'Résultat conforme aux prévisions.' },
-  { key: 'souverain', name: 'La Souveraine du Néant', title: 'avant le premier Sceau', level: 5, faction: 'primordial', portrait: 'PRI-053', rule: 'neant', reward: 100,
+  { key: 'souverain', ai: [5, 0.6], aiAwake: [6, 0.45], name: 'La Souveraine du Néant', title: 'avant le premier Sceau', level: 5, faction: 'primordial', portrait: 'PRI-053', rule: 'neant', reward: 100,
     hello: 'Avant les Sceaux, il n’y avait que moi. Il n’y aura que moi après.', win: 'Alors… le Néant peut perdre.', lose: 'Retourne au silence, petite flamme.' },
 ];
 // Revanche « éveillée » : après une victoire, l'adversaire revient plus fort (main plus rare, jeu plus fin)
@@ -104,7 +106,8 @@ export const SCEAUX_TITLES = { initie: 'Initié des Sceaux', maitre: 'Maître de
 export function rivalHand(cat, rival, salt = '') {
   const r = mulberry(hash(`rival:${rival.key}:${rival.awake ? 'eveil:' : ''}${salt}`));
   const pool = (rival.faction ? cat.byFaction[rival.faction] : cat.cards).filter((c) => c.rarity !== 'S' || rival.level >= 4);
-  const tiers = { 1: ['C', 'C', 'C', 'PC', 'PC'], 2: ['C', 'PC', 'PC', 'R', 'R'], 3: ['PC', 'R', 'R', 'HR', 'HR'], 4: ['R', 'HR', 'HR', 'M', 'M'], 5: ['HR', 'HR', 'M', 'M', 'S'] }[rival.level];
+  // v304 : mains moins chargées en pouvoirs (Rempart, Fureur) : la difficulté vient surtout du jeu de l'adversaire
+  const tiers = { 1: ['C', 'C', 'C', 'PC', 'PC'], 2: ['C', 'PC', 'PC', 'R', 'R'], 3: ['PC', 'PC', 'R', 'R', 'HR'], 4: ['PC', 'R', 'R', 'HR', 'HR'], 5: ['R', 'R', 'HR', 'HR', 'M'] }[rival.level];
   const out = [];
   for (const t of tiers) {
     const cands = pool.filter((c) => c.rarity === t && !out.includes(c.id));

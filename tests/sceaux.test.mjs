@@ -296,3 +296,40 @@ test('nouveaux adversaires et revanches éveillées', () => {
   assert.ok(SC.ruleHas(u, 'identique') && SC.ruleHas(u, 'sacre'));
   assert.ok(u.cells.blessed != null);
 });
+
+test('v306 : chaque rival a sa force de jeu, et sa revanche éveillée joue au moins aussi fort', () => {
+  for (const R of SC.RIVALS) {
+    assert.ok(Array.isArray(R.ai) && Array.isArray(R.aiAwake), R.key);
+    assert.ok(R.aiAwake[0] >= R.ai[0], `${R.key} éveillé`);
+    const st = SC.newGame(catalog, { hand: SC.autoHand(catalog, []), rival: R, seed: 3 });
+    assert.deepEqual(st.ai, { level: R.ai[0], slip: R.ai[1] });
+    const A = SC.awakened(R);
+    assert.deepEqual(SC.newGame(catalog, { hand: SC.autoHand(catalog, []), rival: A, seed: 3 }).ai, { level: R.aiAwake[0], slip: R.aiAwake[1] });
+  }
+  assert.deepEqual(SC.RIVALS.at(-1).aiAwake[0], 6, 'la Souveraine éveillée calcule la fin de partie');
+});
+
+test('v306 : le jeu le plus fort (fin de partie calculée) reste rapide et joue des coups valides', () => {
+  const r = rngFrom('rapide');
+  let slowest = 0;
+  for (let g = 0; g < 4; g++) {
+    const st = SC.newGame(catalog, { hand: SC.autoHand(catalog, []), rival: SC.awakened(SC.RIVAL.souverain), seed: 40 + g });
+    while (!st.over) {
+      const t0 = Date.now();
+      const m = st.turn === 'o' ? SC.aiMove(catalog, st, 6, r, 0) : SC.aiMove(catalog, st, 2, r);
+      slowest = Math.max(slowest, Date.now() - t0);
+      SC.place(catalog, st, st.turn, m[0], m[1]);
+    }
+  }
+  assert.ok(slowest < 1500, `coup le plus long : ${slowest} ms`);
+});
+
+test('v306 : une partie commencée avant la mise à jour (sans réglage) se termine normalement', () => {
+  const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('ancienne') });
+  g.s.bossesBeaten.devoreur = Date.now();
+  const st = g.sceauxStart({ rival: 'initie' });
+  delete st.ai; st.level = 5; // comme une ancienne sauvegarde
+  const r = rngFrom('a');
+  while (!st.over) { if (st.turn === 'o') assert.ok(g.sceauxAi()); else { const m = SC.aiMove(catalog, st, 2, r); g.sceauxPlay(m[0], m[1]); } }
+  assert.ok(['won', 'lost', 'draw'].includes(st.over));
+});
