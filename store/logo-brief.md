@@ -197,3 +197,7 @@ Garde la même image, mais rends-la plus lisible : éclaircis légèrement l'ann
 | `store/google/presentation-1024x500.png` | 1024 × 500 | Image de présentation Play Store |
 
 Pour que toutes ces versions soient nettes, il faut une image source de **1024 × 1024 au minimum** (idéalement 2048).
+
+## 11. Suite de l'identité : dos des cartes et boosters (prompts donnés le 15 octobre 2026)
+
+Trois prompts ont été fournis au propriétaire pour aligner le dos des cartes (`assets/backs/back.webp`, 600 × 840), le booster standard (`assets/packs/standard.webp`, 464 × 800) et le booster événement (`assets/packs/event.webp`, 464 × 800) sur le sceau fendu du logo. Chaque prompt est à envoyer à Gemini avec l'image de l'emblème jointe (`store/logo/embleme-source.jpg`). Formats demandés : 5:7 pour le dos, 9:16 pour les sachets (fond noir uni, à détourer). Les prompts complets sont dans la conversation du 15 octobre 2026 ; principe commun : sachet métallisé à bords crantés vu de face, emblème au centre dans un cadre d'or, bande d'or vide en dessous, aucun texte, aucun symbole religieux, pas d'aspect électrique.
