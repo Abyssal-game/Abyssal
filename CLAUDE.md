@@ -56,6 +56,7 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 ## 4 ter. Duels des Sceaux : difficulté (v306)
 - Chaque rival a `ai` et `aiAwake` = [force, part de coups imparfaits] dans `js/core/sceaux.js` (forces 1 à 6, 6 = fin de partie calculée). Mains des rivaux allégées en pouvoirs (Rempart, Fureur).
 - Réglé par simulation (joueur « bon » = IA niveau 3) : Ilda ~90 %, Orvel ~83 %, Vesna ~63 %, Maître ~70 %, Écho ~52 %, Mammon ~38 %, Archiviste ~33 %, Souveraine ~33 % de victoires ; revanches éveillées plus dures.
+- Décision du 15 octobre 2026 : **toutes les cartes gardent le même total (20) aux Sceaux** ; ni la rareté, ni le niveau, ni les finitions ne donnent de bonus de valeurs (idée « bonus de niveau » proposée et refusée). Pas d'échange de cartes.
 - Si on retouche les Sceaux, refaire la mesure (scripts de simulation dans les sessions précédentes : partie contre chaque rival, 150 parties).
 
 ## 5. Décisions déjà prises
