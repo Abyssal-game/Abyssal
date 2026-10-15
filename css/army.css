@@ -2709,3 +2709,30 @@ body.battle-mode .dv.cb { gap: 5px; }
 .dr-down { border-color: rgba(150, 120, 210, .28) !important; background: radial-gradient(120% 80% at 50% 25%, rgba(120, 90, 200, .08), transparent 65%), linear-gradient(180deg, rgba(18, 16, 24, .95), rgba(9, 8, 12, .95)) !important; }
 .dc-stair.down { border-color: rgba(150, 120, 210, .3) !important; background: linear-gradient(100deg, rgba(60, 46, 96, .28), rgba(14, 12, 18, .96) 70%) !important; box-shadow: none !important; }
 .dc-stair.down b { color: #EDE6F7; }
+
+/* v303 : frise d'initiative du combat plus grande — on reconnaît les créatures (portraits ~ +60 %), 7 au plus */
+.dv.cb .cb-tl { height: 60px; gap: 5px; }
+.dv.cb .cb-tl .cb-tlr { width: 44px !important; height: 44px !important; opacity: .9; }
+.dv.cb .cb-tl .cb-tlr.now { width: 58px !important; height: 58px !important; }
+.dv.cb .cb-tl .cb-tlp { inset: 11%; }
+.dv.cb .cb-tl .cb-tlr.now .cb-tlp { inset: 12% 13% 12% 11%; }
+.dv.cb .cb-tl .cb-tlsep { padding: 2px 7px; font-size: .68rem; }
+.dv.cb .cb-tl .cb-tlx { width: 16px; height: 16px; font-size: .65rem; }
+/* autant de portraits que la largeur le permet (le premier, en grand, est celui qui joue) */
+.dv.cb .cb-tl > .cb-tlr:nth-child(-n+7) { display: flex; }
+.dv.cb .cb-tl > .cb-tlsep:nth-child(-n+7) { display: inline-block; }
+.dv.cb .cb-tl > :nth-child(n+8) { display: none; }
+@media (max-width: 380px) { .dv.cb .cb-tl > :nth-child(n+7) { display: none; } }
+@media (max-height: 620px) {
+  .dv.cb .cb-tl { height: 48px; gap: 4px; }
+  .dv.cb .cb-tl .cb-tlr { width: 36px !important; height: 36px !important; }
+  .dv.cb .cb-tl .cb-tlr.now { width: 46px !important; height: 46px !important; }
+}
+/* v303 : portraits en attente — anneau fin de couleur au lieu du grand cadre, la créature remplit le rond */
+.dv.cb .cb-tl .cb-tlr:not(.now)::before { display: none; }
+.dv.cb .cb-tl .cb-tlr:not(.now) .cb-tlp { inset: 2px; box-shadow: 0 0 0 2px #C8A45D, 0 2px 6px rgba(0, 0, 0, .8); }
+.dv.cb .cb-tl .cb-tlr.foe:not(.now) .cb-tlp { box-shadow: 0 0 0 2px #D0435A, 0 2px 6px rgba(0, 0, 0, .8); }
+.dv.cb .cb-tl .cb-tlr.foe.elite:not(.now) .cb-tlp { box-shadow: 0 0 0 2px #C77BFF, 0 0 8px rgba(199, 123, 255, .5); }
+.dv.cb .cb-tl .cb-tlr.foe.boss:not(.now) .cb-tlp { box-shadow: 0 0 0 2px #FF5468, 0 0 10px rgba(255, 60, 90, .7); }
+.dv.cb .cb-tl .cb-tlr.warn:not(.now) .cb-tlp { box-shadow: 0 0 0 3px #FF6B7F, 0 0 12px rgba(255, 60, 90, .9); }
+.dv.cb .cb-tl .cb-tlp img { filter: brightness(1.18) contrast(1.05); object-position: 50% 25%; }
