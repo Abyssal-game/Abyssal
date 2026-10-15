@@ -2688,3 +2688,14 @@ body.battle-mode .dv.cb { gap: 5px; }
 .dv.cb .dv-c.has-brk.fele .dv-nm, .dv.cb .dv-c.has-brk.broken .dv-nm { bottom: 43px !important; }
 /* v288 : Favori et Brûler côte à côte, sur leur propre ligne */
 .dt-sum .dt-acts { flex: 1 0 100%; display: flex; justify-content: center; gap: 6px; }
+/* v289 : réserve consultable en combat */
+.dv.cb .dv-resw button.dv-resv { cursor: pointer; font: inherit; color: inherit; }
+.dv.cb .dv-resw button.dv-resv:active { transform: scale(.95); }
+.cb-rsv { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 10px; }
+.cb-rsv-c { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px; border-radius: 14px; border: 1px solid rgba(242, 193, 78, .3); background: rgba(10, 8, 18, .6); color: var(--ink); font: inherit; text-align: center; cursor: pointer; min-width: 0; }
+.cb-rsv-card { width: 100%; max-width: 170px; }
+.cb-rsv-card .tcg { pointer-events: none; }
+.cb-rsv-st { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 3px; font-size: .8rem; }
+.cb-rsv-st .ic, .cb-rsv-st .role-ic { width: 16px; height: 16px; }
+.cb-rsv-e { font-size: .72rem; color: var(--muted, #B8AE98); line-height: 1.25; }
+.cb-rsv-st { column-gap: 8px; } .cb-rsv-st > span { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }

@@ -155,7 +155,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const r = reserve(st, side);
     if (!r.length) return '';
     if (side === 'enemy') return `<span class="dv-res" title="Réserve ennemie">+${r.length}</span>`;
-    return `<span class="dv-resv cb-resv" aria-label="Réserve">${r.map((u) => `<img alt="" src="${artUrl(cat.get(u.id), { lite: true })}" title="${esc(cat.get(u.id).name)} : ${u.hp}/${u.maxHp} PV">`).join('')}<small>Réserve</small></span>`;
+    return `<button class="dv-resv cb-resv" data-d="reserve" aria-label="Voir la réserve">${r.map((u) => `<img alt="" src="${artUrl(cat.get(u.id), { lite: true })}" title="${esc(cat.get(u.id).name)} : ${u.hp}/${u.maxHp} PV">`).join('')}<small>Réserve</small></button>`;
   };
 
   // ——— Barre d'actions de la créature choisie ———
@@ -946,6 +946,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       }
       if (k === 'help') return help();
       if (k === 'rule') return ruleSheet(b.dataset.k);
+      if (k === 'reserve') return reserveSheet();
       if (busy) return;
       if (k === 'desel') { sel = null; mode = null; draw(); return; }
       if (k === 'cancel') { mode = null; draw(); return; }
@@ -1028,6 +1029,18 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       ${u.rarity === 'C' ? `<p class="small dc-good">${icon('star')} Instinct de meute : +${PACK_BONUS} dégât aux élites et aux gardiens.</p>` : ''}`}
       ${u.side === 'enemy' && g.owns(u.id) ? `<p class="small dc-good">${icon('book')} Tu possèdes sa carte : tes créatures lui font +1 dégât.</p>` : ''}
       <p class="small muted">${statusLines(u)}</p></div>`, { label: c.name });
+  }
+  // v289 : la réserve au toucher — les cartes des créatures en attente, pour juger d'un remplacement
+  function reserveSheet() {
+    const r = reserve(st, 'ally');
+    if (!r.length) return;
+    const sh = openSheet(`<h2>${icon('team')} Ta réserve</h2>
+      <p class="small muted">Pour faire entrer l’une d’elles, choisis l’action <b>Permuter</b> de la créature qui joue. Touche une carte pour tout voir.</p>
+      <div class="cb-rsv">${r.map((x) => { const c = cat.get(x.id), kit = KITS[x.role]; return `<button class="cb-rsv-c" data-u="${x.uid}">
+        <span class="cb-rsv-card">${cardHTML(c, { size: 'full', nameKnown: true, variant: g.shownVariant(x.id) })}</span>
+        <span class="cb-rsv-st"><span>${roleIcon(kit.kw)}<b>${esc(kit.name)}</b></span><span>${icon('swords')}${x.atk + (x.boost || 0)}</span><span>${icon('heart')}${Math.max(0, x.hp)}/${x.maxHp}</span></span>
+        ${ENTRANCES[x.role] ? `<small class="cb-rsv-e"><b>En entrant</b> : ${esc(ENTRANCES[x.role].desc)}</small>` : ''}</button>`; }).join('')}</div>`, { label: 'Réserve' });
+    sh.body.addEventListener('click', (ev) => { const id = ev.target.closest('[data-u]')?.dataset.u; if (id) { sh.close(); info(st.units[id]); } });
   }
   function statusLines(u) {
     const s = [];
