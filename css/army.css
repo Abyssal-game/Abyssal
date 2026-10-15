@@ -2465,3 +2465,21 @@ body.has-subnav #subnav .sn-tab { background: #16121E; }
 @keyframes cbTurn { 0% { opacity: 0; transform: translate(-50%, -50%) scaleX(.4); } 18% { opacity: 1; transform: translate(-50%, -50%) scaleX(1.04); } 28% { transform: translate(-50%, -50%) scaleX(1); } 78% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -62%); } }
 @media (prefers-reduced-motion: reduce) { .cb-turn { animation: none; } }
 .cb-turn { z-index: 70; } .cb-turn.ally { top: 30%; }
+
+/* v262 : chacun son tour (ordre d'initiative à la Clair Obscur), PA personnels */
+.cb-tlsep { position: relative; z-index: 3; padding: 1px 6px; border-radius: 99px; background: linear-gradient(#3A2A12, #1A120A); border: 1px solid rgba(242, 193, 78, .7); color: #FFE7A6; font: 800 .6rem/1.3 var(--f-ui); letter-spacing: .04em; box-shadow: 0 2px 6px rgba(0, 0, 0, .8); }
+.cb-tlr.al.now .cb-tlp { box-shadow: 0 0 10px rgba(242, 193, 78, .9); }
+.dv .cb-cost .gain { padding: 2px 5px; border-radius: 99px; background: rgba(79, 213, 132, .18); border: 1px solid rgba(127, 224, 160, .6); color: #CFFFE0; }
+.dv-float.pa { color: #9FF0BE; font-size: .95rem; top: 58%; text-shadow: 0 0 10px rgba(80, 230, 140, .8), 0 2px 4px #000; }
+.cb-myturn { font-style: normal; color: #FFE7A6; }
+.dv-c.ally.sel { z-index: 3; }
+.dv-c.myturn { animation: cbMyTurn .6s cubic-bezier(.2, .9, .3, 1.3); }
+@keyframes cbMyTurn { 0% { transform: translateY(0) scale(1); } 40% { transform: translateY(-10px) scale(1.06); filter: brightness(1.35); } 100% { transform: translateY(0) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .dv-c.myturn { animation: none; } }
+.cb-upips { flex: none; gap: 4px; }
+.dv .cb-upips i { width: 11px; height: 11px; }
+.cb-role { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cb-tl { z-index: 7; } /* sous la fenêtre d'actions et le message */
+.dv-mid { z-index: 9; }
+@media (max-height: 700px) { .cb-tl > :nth-child(n+5) { display: none; } }
+@media (max-width: 360px) { .dv .cb-upips i { width: 8px; height: 8px; border-radius: 2px; } .cb-upips { gap: 3px; } .cb-myturn { display: none; } }

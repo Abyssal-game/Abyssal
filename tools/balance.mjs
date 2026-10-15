@@ -35,7 +35,7 @@ export function fight(ids, { floor = 3, room = 'fight', level = 1, seed = 1 } = 
   const def = () => { const x = r(); return x < 0.15 ? 'parry' : x < 0.55 ? 'dodge' : 'none'; };
   const dmg = { dealt: 0, actions: 0 };
   let t = 0;
-  for (; t < 40 && !st.over; t++) {
+  for (; t < (st.init ? 160 : 40) && !st.over; t++) {
     if (D.ultReady(st) && r() < 0.5) D.useUlt(st);
     const ev = D.autoActs(st);
     for (const e of ev) if (e.t === 'dmg' && st.units[e.u]?.side === 'enemy') dmg.dealt += e.d;
@@ -67,7 +67,7 @@ export function runDepth(ids, { level = 1, seed = 1, cap = 80 } = {}) {
   g.s.team = ids; g.s.teamSet = true;
   g.startRun();
   const def = () => { const x = r(); return x < 0.15 ? 'parry' : x < 0.55 ? 'dodge' : 'none'; };
-  const play = (st) => { for (let t = 0; t < 60 && !st.over; t++) { if (D.ultReady(st) && r() < 0.5) D.useUlt(st); D.autoActs(st); if (!st.over) D.endTurn(st, def); } };
+  const play = (st) => { for (let t = 0; t < (st.init ? 240 : 60) && !st.over; t++) { if (D.ultReady(st) && r() < 0.5) D.useUlt(st); D.autoActs(st); if (!st.over) D.endTurn(st, def); } };
   for (let k = 0; k < 600 && g.s.descent.run; k++) {
     const R = g.s.descent.run;
     if (R.floor > cap) { g.endRun(false); break; }

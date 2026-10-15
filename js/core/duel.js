@@ -9,7 +9,7 @@
 // Élites et gardiens ont une jauge de Brisure : vide, l'ennemi perd son action et devient vulnérable.
 import { roleOf } from './army.js';
 import {
-  AP_MAX, FERVOR_MAX, ACTS_PER_UNIT, ULT_COST, KITS, COMMON_ACTS, WEAK_TO, WEAK_MULT, RESIST_MULT,
+  AP_MAX, FERVOR_MAX, ACTS_PER_UNIT, ULT_COST, PA_START, PA_TURN, PA_MAX, PA_GAIN, KITS, COMMON_ACTS, WEAK_TO, WEAK_MULT, RESIST_MULT,
   aiFamily, INTENTS, BOSS_POWERS, bossPowerOf, diceChance, KEYWORDS, keywordOf, SYNERGIES,
 } from './skills.js';
 import { BOSSES, LAWS, ASPECTS } from './bosses.js';
@@ -17,7 +17,7 @@ import { familyOf, relationMult, activeLegends } from './relations.js';
 import { FORMS } from './forms.js';
 import { CREATURE_KITS, kitOf, moveOf, moveFor, hasP, boosted, awake, statShape, passiveMult, rechargeOf } from './kits.js';
 
-export { KEYWORDS, keywordOf, INTENTS, BOSS_POWERS, bossPowerOf, SYNERGIES, FERVOR_MAX, AP_MAX, BOSSES, LAWS, ASPECTS };
+export { KEYWORDS, keywordOf, INTENTS, BOSS_POWERS, bossPowerOf, SYNERGIES, FERVOR_MAX, AP_MAX, PA_MAX, BOSSES, LAWS, ASPECTS };
 export const FRONT = 3;
 export const GAUGE_MAX = FERVOR_MAX; // compatibilité : l'ancienne jauge du pouvoir est devenue la Ferveur
 export const PACK_BONUS = 1;         // Instinct de meute : les Communes frappent plus fort élites et gardiens
@@ -307,7 +307,11 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
     if (u.side === 'enemy' && a && a.side === 'ally') {
       st.stats.finishers = (st.stats.finishers || 0) + 1; ev.push({ t: 'finisher', u: u.uid, a: a.uid }); gainFervor(st, 1, ev, 'Coup de grâce');
       if (a.talent === 'faim' && !a.faimUsed) { a.faimUsed = true; gainFervor(st, 1, ev, 'Faim abyssale'); }
-      if (a.talent === 'elan' && !a.elanUsed && st.turn === 'ally') { a.elanUsed = true; st.ap += 1; ev.push({ t: 'status', u: a.uid, s: 'Élan : +1 action', syn: true }); }
+      if (a.talent === 'elan' && !a.elanUsed && st.turn === 'ally') {
+        a.elanUsed = true;
+        if (st.init) { front(st, 'ally').forEach((x) => gainPA(x, 1)); ev.push({ t: 'status', u: a.uid, s: 'Élan : +1 PA à l’équipe', syn: true }); }
+        else { st.ap += 1; ev.push({ t: 'status', u: a.uid, s: 'Élan : +1 action', syn: true }); }
+      }
     }
     if (u.side === 'ally') (st.fallenLog ||= []).push({ u: u.uid, by: a?.uid || null, round: st.round, kind: st.curKind || null });
     if (u.side === 'ally') alive(st, 'ally').filter((x) => x.form === 'vengeance').forEach((x) => { x.atk += 2; ev.push({ t: 'status', u: x.uid, s: 'Vengeance : +2 ATQ', syn: true }); });
@@ -433,25 +437,37 @@ export function targetsFor(st, side, attacker = null) {
 export function actionsFor(st, uid) {
   const u = st.units[uid];
   const kit = KITS[u.role];
+  const common = (key) => ['attack', 'defend', 'swap'].includes(key);
   const base = (key, def) => {
-    const ap = key === 'swap' && st.freeSwap ? 0 : def.ap;
-    const fervor = Math.max(0, def.fervor - (u.talent === 'ardente' && def.fervor > 0 && key === KITS[u.role].skill.key ? 1 : 0)) + (st.law === 'silence' && !['attack', 'defend', 'swap'].includes(key) ? 1 : 0);
+    let ap, fervor;
+    if (st.init) {
+      // ordre d'initiative : la compétence se paie avec les PA de la créature ; attaque et défense en rapportent
+      ap = common(key) ? 0 : Math.max(0, (def.pa ?? def.ap) - (u.talent === 'ardente' && key === KITS[u.role].skill.key ? 1 : 0)) + (st.law === 'silence' ? 1 : 0);
+      fervor = 0;
+    } else {
+      ap = key === 'swap' && st.freeSwap ? 0 : def.ap;
+      fervor = Math.max(0, def.fervor - (u.talent === 'ardente' && def.fervor > 0 && key === KITS[u.role].skill.key ? 1 : 0)) + (st.law === 'silence' && !common(key) ? 1 : 0);
+    }
     let why = '';
     if (st.turn !== 'ally' || st.over) why = 'Ce n’est pas ton tour.';
     else if (!inFront(st, u)) why = 'Elle n’est pas au combat.';
+    else if (st.init && st.actor !== u.uid) why = 'Ce n’est pas encore son tour : regarde l’ordre des tours, en haut à gauche.';
     else if (u.stunned && key !== 'swap') why = 'Gelée : elle passe ce tour.';
-    else if (key !== 'swap' && u.acts >= ACTS_PER_UNIT) why = `Elle a déjà agi ${ACTS_PER_UNIT} fois ce tour.`;
-    else if (st.ap < ap) why = 'Plus assez de points d’action.';
+    else if (st.init && key !== 'swap' && u.acts >= 1) why = 'Elle a déjà joué ce tour.';
+    else if (!st.init && key !== 'swap' && u.acts >= ACTS_PER_UNIT) why = `Elle a déjà agi ${ACTS_PER_UNIT} fois ce tour.`;
+    else if (st.init && (u.pa || 0) < ap) why = `Il faut ${ap} PA (elle en a ${u.pa || 0}). Attaque ou défends-toi pour en gagner.`;
+    else if (!st.init && st.ap < ap) why = 'Plus assez de points d’action.';
     else if (st.fervor < fervor) why = `Il faut ${fervor} Ferveur.`;
-    return { key, name: def.name, icon: def.icon, ap, fervor, target: def.target, desc: def.desc, dice: !!def.dice, ok: !why, why };
+    const gain = st.init && (key === 'attack' || key === 'defend') ? PA_GAIN : 0;
+    return { key, name: def.name, icon: def.icon, ap, fervor, gain, target: def.target, desc: def.desc, dice: !!def.dice, ok: !why, why };
   };
   const strike = kitOf(u)?.strike || kit.basic;
-  const out = [base('attack', { ...COMMON_ACTS.attack, name: strike.name, desc: `${strike.desc} +1 Ferveur.` }), base(kit.skill.key, kit.skill), base('defend', COMMON_ACTS.defend), base('swap', COMMON_ACTS.swap)];
+  const out = [base('attack', { ...COMMON_ACTS.attack, name: strike.name, desc: `${strike.desc}${st.init ? ' +1 PA,' : ''} +1 Ferveur.` }), base(kit.skill.key, kit.skill), base('defend', COMMON_ACTS.defend), base('swap', COMMON_ACTS.swap)];
   // Compétence propre de la créature (niveau 6), à côté de celle de son rôle
   const mk = moveOf(u);
   if (mk) {
     const M = moveFor(u, mk);
-    const mv = base(mk, { name: M.name, icon: M.icon, ap: M.ap, fervor: 0, target: M.target === 'anyEnemy' ? 'enemy' : M.target, desc: M.desc + (awake(u) && M.awaken ? ` Éveil : ${M.awaken}` : '') });
+    const mv = base(mk, { name: M.name, icon: M.icon, ap: M.ap, pa: M.ap, fervor: 0, target: M.target === 'anyEnemy' ? 'enemy' : M.target, desc: M.desc + (awake(u) && M.awaken ? ` Éveil : ${M.awaken}` : '') });
     mv.own = true; mv.cd = rechargeOf(u, mk); mv.wait = Math.max(0, (u.mvReady || 0) - st.round);
     if (mv.ok && mv.wait) { mv.ok = false; mv.why = `${M.name} se recharge : prête dans ${mv.wait} tour${mv.wait > 1 ? 's' : ''}.`; }
     if (mv.ok && mv.target !== 'none' && !actionTargets(st, uid, mk).length) { mv.ok = false; mv.why = 'Aucune cible possible.'; }
@@ -465,7 +481,7 @@ export function actionsFor(st, uid) {
   if (sk.ok && sk.target !== 'none' && !actionTargets(st, uid, sk.key).length) { sk.ok = false; sk.why = 'Aucune cible possible.'; }
   return out;
 }
-export const canAct = (st, u) => st.turn === 'ally' && u.side === 'ally' && !st.over && inFront(st, u) && !u.stunned && u.acts < ACTS_PER_UNIT && st.ap > 0;
+export const canAct = (st, u) => st.turn === 'ally' && u.side === 'ally' && !st.over && inFront(st, u) && !u.stunned && (st.init ? st.actor === u.uid && u.acts < 1 : u.acts < ACTS_PER_UNIT && st.ap > 0);
 // Cibles valides d'une action
 export function actionTargets(st, uid, key) {
   const u = st.units[uid];
@@ -551,7 +567,8 @@ export function act(st, uid, key, tUid = null) {
   const a = actionsFor(st, uid).find((x) => x.key === key);
   if (!a || !a.ok) return ev;
   if (a.target !== 'none' && !actionTargets(st, uid, key).includes(tUid)) return ev;
-  st.ap -= a.ap; st.fervor -= a.fervor; st.gauge = st.fervor;
+  if (st.init) u.pa = Math.max(0, (u.pa || 0) - a.ap);
+  else { st.ap -= a.ap; st.fervor -= a.fervor; st.gauge = st.fervor; }
   if (key !== 'swap') u.acts++;
   const t = tUid ? st.units[tUid] : null;
   ev.push({ t: 'act', u: uid, key, tgt: tUid, name: a.name, skill: !['attack', 'defend', 'swap'].includes(key) });
@@ -602,7 +619,10 @@ export function act(st, uid, key, tUid = null) {
     else if (tier === 'partial') { t.slow = true; ev.push({ t: 'status', u: tUid, s: 'Ralentie', k: 'frost' }); }
   } else if (moveFor(u, key)) { u.mvReady = st.round + rechargeOf(u, key); u.struck = true; u.lastStruck = st.round; moveFor(u, key).run(st, u, t, ev, API); }
   if (['attack', 'estoc', 'raz'].includes(key) || moveFor(u, key)?.pv) st.ombreUsed = true;
+  if (st.init && a.gain && u.hp > 0) gainPA(u, a.gain, ev);
   check(st, ev);
+  // ordre d'initiative : son tour est joué, la suite de la file prend la main (Faim sans fin peut la faire rejouer)
+  if (st.init && !st.over && key !== 'swap' && (st.actor !== uid || u.acts >= 1 || u.hp <= 0)) advance(st, ev);
   return ev;
 }
 // Brisure infligée par une attaque (hors bénédiction, ajoutée dans breakHit). tier : résultat du D20 pour le Coup d'estoc.
@@ -681,6 +701,11 @@ function doSwap(st, out, inn, ev) {
   [o[i], o[j]] = [o[j], o[i]];
   inn.inPlay = true; out.inPlay = false; inn.acts = 0;
   out.defend = false;
+  if (st.init) {
+    // elle prend sa place dans l'ordre des tours et joue tout de suite
+    const k = st.init.indexOf(out.uid); if (k >= 0) st.init[k] = inn.uid;
+    if (st.actor === out.uid) { st.actor = inn.uid; gainPA(inn, PA_TURN); if (st.freeSwap) gainPA(inn, 2, ev); ev.push({ t: 'actor', u: inn.uid }); }
+  }
   st.freeSwap = false;
   st.swapped = true;
   // les intentions qui visaient la créature sortie frappent celle qui entre (elle prend sa place)
@@ -714,12 +739,12 @@ function entrance(st, u, aimed, ev) {
 }
 
 // ——— Pouvoir d'équipe : coûte 1 PA et toute la Ferveur, une seule fois par combat ———
-export const ultReady = (st) => !st.over && !st.ultUsed && st.turn === 'ally' && st.fervor >= ULT_COST.fervor && st.ap >= ULT_COST.ap;
+export const ultReady = (st) => !st.over && !st.ultUsed && st.turn === 'ally' && st.fervor >= ULT_COST.fervor && (st.init ? !!st.actor : st.ap >= ULT_COST.ap);
 export const SEAL_WARD = 0.5; // bouclier du Sceau : absorbe jusqu'à 50 % des PV max
 export function useUlt(st) {
   const ev = [];
   if (!ultReady(st)) return ev;
-  st.fervor = 0; st.gauge = 0; st.ap -= ULT_COST.ap; st.ultUsed = true;
+  st.fervor = 0; st.gauge = 0; if (!st.init) st.ap -= ULT_COST.ap; st.ultUsed = true; // en ordre d'initiative : ne coûte aucun PA et ne termine pas le tour
   st.stats.ults = (st.stats.ults || 0) + 1;
   const p = st.power || 1, allies = front(st, 'ally'), foes = front(st, 'enemy');
   ev.push({ t: 'ult', key: st.ult });
@@ -730,7 +755,7 @@ export function useUlt(st) {
     else allies.forEach((u) => heal(u, u.maxHp * 0.4 * p, ev));
   } else if (st.ult === 'nova') foes.forEach((u) => { hurt(st, u, (3 + st.round) * p, ev); breakHit(st, u, 2, ev, { side: 'ally' }); });
   else if (st.ult === 'smite') { const t = foes.slice().sort((x, y) => y.hp - x.hp)[0]; if (t) { hurt(st, t, (8 + 2 * st.round) * p, ev); breakHit(st, t, 4, ev, { side: 'ally' }); } }
-  else if (st.ult === 'aegis') { allies.forEach((u) => { u.shield = 1; u.stunned = false; ev.push({ t: 'status', u: u.uid, s: 'Égide' }); }); st.ap += 2; }
+  else if (st.ult === 'aegis') { allies.forEach((u) => { u.shield = 1; u.stunned = false; u.frozen = 0; ev.push({ t: 'status', u: u.uid, s: 'Égide' }); if (st.init) gainPA(u, 2); }); if (!st.init) st.ap += 2; }
   check(st, ev);
   return ev;
 }
@@ -742,10 +767,16 @@ function startAllyTurn(st, ev) {
   st.ap = AP_MAX + (st.law === 'hate' ? 1 : 0) + (st.round === 1 ? (R_.includes('sablier') ? 1 : 0) - (R_.includes('miroir') ? 1 : 0) : 0);
   st.swapped = false; st.ombreUsed = false; st.hitBy = {}; st.curKind = null;
   const thief = st.round >= 3 && front(st, 'enemy').find((x) => x.trait === 'voleur' && x.hp > 0);
-  if (thief && st.ap > 1) { st.ap -= 1; ev.push({ t: 'status', u: thief.uid, s: 'Vole 1 action', k: 'bad', trait: 'voleur' }); }
-  for (const u of alive(st, 'ally')) { u.acts = 0; u.boost = 0; u.defend = false; u.guardBy = null; u.rempart = null; u.exposed = false; u.stunned = false; u.attised = false; u.chB = 0; u.elanUsed = false; }
+  if (st.init) {
+    // Loi de la hâte : +1 PA à chacune ; Voleur : vole 1 PA à ta créature qui en a le plus
+    if (st.law === 'hate') front(st, 'ally').forEach((u) => gainPA(u, 1));
+    const rich = thief && front(st, 'ally').filter((x) => (x.pa || 0) > 0).sort((x, y) => y.pa - x.pa)[0];
+    if (rich) { rich.pa -= 1; ev.push({ t: 'status', u: thief.uid, s: 'Vole 1 PA', k: 'bad', trait: 'voleur' }); }
+  } else if (thief && st.ap > 1) { st.ap -= 1; ev.push({ t: 'status', u: thief.uid, s: 'Vole 1 action', k: 'bad', trait: 'voleur' }); }
+  // en ordre d'initiative, Défense, Rempart et gel durent jusqu'au prochain tour de la créature (remis à zéro dans advance)
+  for (const u of alive(st, 'ally')) { u.acts = 0; u.boost = 0; u.attised = false; u.chB = 0; u.elanUsed = false; if (!st.init) { u.defend = false; u.guardBy = null; u.rempart = null; u.exposed = false; u.stunned = false; } }
   for (const u of front(st, 'ally')) {
-    if (u.frozen) { u.frozen = 0; u.stunned = true; ev.push({ t: 'status', u: u.uid, s: 'Gelée : passe son tour', k: 'frost' }); }
+    if (u.frozen && !st.init) { u.frozen = 0; u.stunned = true; ev.push({ t: 'status', u: u.uid, s: 'Gelée : passe son tour', k: 'frost' }); }
     tickPoison(st, u, ev);
     // Pacte du Sang : le prix se paie à chaque tour (jamais mortel)
     if (st.pact === 'sang' && st.round > 1 && u.hp > 1) { const d = Math.min(u.hp - 1, Math.max(1, Math.round(u.maxHp * 0.06))); u.hp -= d; ev.push({ t: 'dmg', u: u.uid, d, hp: u.hp }); ev.push({ t: 'status', u: u.uid, s: 'Prix du sang', k: 'bad' }); }
@@ -776,12 +807,25 @@ function tickPoison(st, u, ev) {
 export function beginEnemyTurn(st) {
   const ev = [];
   if (st.over || st.turn !== 'ally') return ev;
-  // Souffle de vie : chaque Soigneur soigne un peu l'allié le plus blessé
+  if (st.init) return passTurn(st); // ordre d'initiative : « Passer » à la place de « Fin du tour »
+  breathOfLife(st, ev);
+  st.turn = 'enemy';
+  enemyRound(st, ev);
+  if (st.over) return ev;
+  ev.push({ t: 'phase', side: 'enemy' });
+  st.queue = front(st, 'enemy').map((u) => u.uid);
+  st.skipEv = [];
+  return ev;
+}
+// Souffle de vie : chaque Soigneur soigne un peu l'allié le plus blessé (fin du tour)
+function breathOfLife(st, ev) {
   for (const u of front(st, 'ally').filter((x) => x.kw === 'soin')) {
     const w = front(st, 'ally').filter((x) => x.hp < x.maxHp).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
     if (w) heal(w, Math.max(2, Math.round(u.atk + 1)), ev);
   }
-  st.turn = 'enemy';
+}
+// Effets de tour côté ennemi : Épuisement, poison des ennemis, pouvoirs et phases des gardiens
+function enemyRound(st, ev) {
   for (const u of alive(st, 'enemy')) u.boost = 0;
   for (const u of alive(st, 'ally')) u.absorbed = 0;
   // Épuisement : un combat qui s'éternise blesse tout le monde, de plus en plus (évite les combats sans fin)
@@ -790,16 +834,12 @@ export function beginEnemyTurn(st) {
     if (d === 1) ev.push({ t: 'law', fatigue: true });
     for (const u of [...front(st, 'ally'), ...front(st, 'enemy')]) { u.shield = 0; ev.push({ t: 'status', u: u.uid, s: `Épuisement −${d}`, k: 'bad' }); hurt(st, u, d, ev); }
     check(st, ev);
-    if (st.over) return ev;
+    if (st.over) return;
   }
   for (const u of front(st, 'enemy')) tickPoison(st, u, ev);
   check(st, ev);
   if (!st.over && st.bossKey) { bossPhase(st, ev); if (!st.over) bossTick(st, ev); }
   else if (!st.over && st.bossPower) bossPower(st, ev);
-  ev.push({ t: 'phase', side: 'enemy' });
-  st.queue = front(st, 'enemy').map((u) => u.uid);
-  st.skipEv = [];
-  return ev;
 }
 // Gardiens à mécaniques : phase 2 sous la moitié de leurs PV. Chacun change la façon de jouer.
 export const PHASE2 = {
@@ -1018,6 +1058,7 @@ function defended(st, e, t, ev, defense, kind) {
   }
   st.stats.parries++;
   ev.push({ t: 'parry', u: t?.uid || null, a: e.uid });
+  if (st.init) (t ? [t] : front(st, 'ally')).forEach((x) => gainPA(x, PA_GAIN, ev)); // parade parfaite : +1 PA
   gainFervor(st, 2 + (has(st, 'parade') ? 1 : 0), ev, 'Parade parfaite');
   breakHit(st, e, 2 + (has(st, 'parade') ? 1 : 0), ev, { side: 'ally' });
   const c = t && ['protecteur', 'degats'].includes(t.role) && t.hp > 0 ? t : null;
@@ -1027,6 +1068,17 @@ export function endEnemyTurn(st) {
   const ev = takeSkips(st);
   st.queue = [];
   if (st.over || st.turn !== 'enemy') return ev;
+  if (st.init) { advance(st, ev); if (!st.over && st.turn === 'ally') ev.push({ t: 'phase', side: 'ally' }); return ev; }
+  roundCleanup(st, ev);
+  st.round++;
+  startAllyTurn(st, ev);
+  ev.push({ t: 'phase', side: 'ally' });
+  // combat commencé avant l'ordre d'initiative : on passe aux nouvelles règles au début du tour suivant
+  if (st.initPending && !st.over) { delete st.initPending; ev.push(...startInitiative(st)); }
+  return ev;
+}
+// Fin du tour (round) : dégel, repos de la réserve, états qui expirent, ennemis qui se relèvent
+function roundCleanup(st, ev) {
   // Dégel : face au Souffle de givre, tes Soigneurs libèrent les créatures gelées
   if ((st.bossPower === 'givre' || st.bossKey === 'matriarche') && front(st, 'ally').some((x) => x.kw === 'soin')) {
     front(st, 'ally').filter((x) => x.frozen).forEach((x) => { x.frozen = 0; ev.push({ t: 'status', u: x.uid, s: 'Dégel', syn: true }); });
@@ -1041,9 +1093,89 @@ export function endEnemyTurn(st) {
     if (u.frostCD) u.frostCD--;
     if (u.broken && st.round >= u.brokenEnd) { u.broken = false; u.brokenSkip = false; u.brkMax = Math.round(u.brkMax * 1.4); u.brk = u.brkMax; ev.push({ t: 'recover', u: u.uid }); }
   }
-  st.round++;
-  startAllyTurn(st, ev);
-  ev.push({ t: 'phase', side: 'ally' });
+}
+
+// ——— Ordre d'initiative (v262, à la Clair Obscur) ———
+// Chaque créature, alliée ou ennemie, joue une fois par tour, dans l'ordre de sa vitesse. Chaque alliée a ses
+// propres PA : +1 au début de chacun de ses tours, +1 en attaquant, en se défendant ou sur une parade parfaite ;
+// ses compétences les dépensent. La Ferveur ne sert plus qu'au pouvoir d'équipe.
+export const INIT_FOE_HP = 0.85; // équilibre v262 : les ennemis ont 15 % de PV en moins
+const SPEED = { degats: 6, controle: 6, soutien: 5, poison: 5, zone: 4, soin: 4, protecteur: 3 };
+const RSPEED = { C: 0, PC: 0, R: 1, HR: 1, M: 2, S: 2 };
+export const ALLY_SPEED = 3;     // tes créatures sont un peu plus vives que les créatures corrompues
+export const speedOf = (u) => (SPEED[u.role] || 4) + (RSPEED[u.rarity] || 0) + (u.side === 'ally' ? ALLY_SPEED + Math.floor((u.level || 1) / 4) : u.boss || u.elite ? 1 : 0);
+function gainPA(u, n, ev = null) {
+  const before = u.pa || 0;
+  u.pa = Math.max(0, Math.min(PA_MAX, before + n));
+  if (ev && u.pa > before) ev.push({ t: 'pa', u: u.uid, d: u.pa - before });
+}
+function buildInit(st) {
+  return [...front(st, 'ally'), ...front(st, 'enemy')].map((u) => ({ id: u.uid, s: speedOf(u) + rand(st) * 0.95 })).sort((a, b) => b.s - a.s).map((x) => x.id);
+}
+// Passe au prochain dans l'ordre des tours : une alliée (elle devient l'actrice) ou un groupe d'ennemis consécutifs.
+function advance(st, ev) {
+  for (let guard = 0; guard < 400 && !st.over; guard++) {
+    st.ip = (st.ip ?? -1) + 1;
+    if (st.ip >= st.init.length) {
+      // fin du tour complet : Souffle de vie, états qui expirent ; puis nouveau tour
+      st.actor = null;
+      breathOfLife(st, ev);
+      roundCleanup(st, ev);
+      st.round++;
+      enemyRound(st, ev);
+      if (st.over) return;
+      startAllyTurn(st, ev);
+      if (st.over) return;
+      st.init = buildInit(st); st.ip = -1;
+      ev.push({ t: 'round', n: st.round });
+      continue;
+    }
+    const u = st.units[st.init[st.ip]];
+    if (!u || !inFront(st, u)) continue;
+    if (u.side === 'ally') {
+      // son tour commence : sa Défense et son Rempart s'arrêtent
+      u.defend = false; u.exposed = false;
+      if (u.rempart) { const p = st.units[u.rempart]; if (p && p.guardBy === u.uid) p.guardBy = null; u.rempart = null; }
+      if (u.frozen || u.stunned) { u.frozen = 0; u.stunned = false; ev.push({ t: 'status', u: u.uid, s: 'Gelée : passe son tour', k: 'frost' }); continue; }
+      u.acts = 0; gainPA(u, PA_TURN);
+      st.turn = 'ally'; st.actor = u.uid; st.queue = [];
+      ev.push({ t: 'actor', u: u.uid });
+      return;
+    }
+    // ennemis consécutifs : ils jouent ensemble (la défense active reste coup par coup)
+    const q = [u.uid];
+    while (st.ip + 1 < st.init.length) {
+      const n = st.units[st.init[st.ip + 1]];
+      if (n && n.side === 'ally' && inFront(st, n)) break;
+      st.ip++;
+      if (n && inFront(st, n)) q.push(n.uid);
+    }
+    st.turn = 'enemy'; st.actor = null; st.queue = q; st.skipEv = [];
+    ev.push({ t: 'phase', side: 'enemy' });
+    return;
+  }
+}
+// Active l'ordre d'initiative sur un combat (Descente). Renvoie les événements du premier passage.
+export function startInitiative(st) {
+  const ev = [];
+  if (st.init || st.over) return ev;
+  const R_ = st.relics || [];
+  const first = st.round === 1 ? (R_.includes('sablier') ? 1 : 0) - (R_.includes('miroir') ? 1 : 0) : 0;
+  for (const id of st.order.ally) { const u = st.units[id]; u.pa = Math.max(0, Math.min(PA_MAX, PA_START + first)); u.acts = 0; if (u.stunned) { u.stunned = false; u.frozen = Math.max(u.frozen || 0, 1); } }
+  // équilibre : chaque créature ne joue qu'une fois par tour, les ennemis ont un peu moins de PV
+  if (st.round === 1) for (const id of st.order.enemy) { const e = st.units[id]; const k = INIT_FOE_HP; e.maxHp = Math.max(1, Math.round(e.maxHp * k)); e.hp = Math.min(e.maxHp, Math.max(1, Math.round(e.hp * k))); }
+  if (st.bossKey && st.round === 1) bossPhase(st, ev); // gardien éveillé (Cauchemar) : sa phase 2 commence tout de suite
+  st.init = buildInit(st); st.ip = -1; st.actor = null;
+  advance(st, ev);
+  return ev;
+}
+// « Passer » : l'actrice ne fait rien ce tour-ci
+export function passTurn(st) {
+  const ev = [];
+  if (!st.init || st.over || st.turn !== 'ally' || !st.actor) return ev;
+  const u = st.units[st.actor];
+  if (u) { u.acts = 1; ev.push({ t: 'status', u: u.uid, s: 'Passe son tour', k: 'defend' }); }
+  advance(st, ev);
   return ev;
 }
 
@@ -1179,6 +1311,19 @@ export function defenseWindow(st, aUid, tUid) {
 export function autoActs(st, { smart = true } = {}) {
   const ev = [];
   const go = (uid, key, t) => { const e = act(st, uid, key, t); ev.push(...e); return e.length > 0; };
+  if (st.init) {
+    // ordre d'initiative : joue chaque alliée qui a la main, jusqu'au tour des ennemis
+    for (let guard = 0; guard < 24 && !st.over && st.turn === 'ally'; guard++) {
+      if (smart && ultReady(st) && shouldUlt(st)) { ev.push(...useUlt(st)); continue; }
+      if (smart && smartMove(st, go)) continue;
+      const a = st.units[st.actor];
+      const ts = a && actionsFor(st, a.uid)[0].ok ? actionTargets(st, a.uid, 'attack').map((id) => st.units[id]) : [];
+      const score = (t) => (t.hp <= dmgOf(st, a, t, 1, { basic: true }) ? 1000 : 0) + (smart ? (intentInfo(st, t)?.danger || 0) * 20 + (isWeak(a, t) ? 15 : 0) + (t.broken ? 25 : 0) : 0) - t.hp;
+      const t = ts.sort((x, y) => score(y) - score(x))[0];
+      if (!t || !go(a.uid, 'attack', t.uid)) ev.push(...passTurn(st));
+    }
+    return ev;
+  }
   for (let guard = 0; guard < 12 && !st.over && st.turn === 'ally' && st.ap > 0; guard++) {
     if (smart && ultReady(st) && shouldUlt(st)) { ev.push(...useUlt(st)); continue; }
     if (smart && smartMove(st, go)) continue;
@@ -1232,14 +1377,25 @@ function smartMove(st, go) {
   // 4. Marquer un gardien ou une élite
   const big = foes.find((e) => (e.boss || e.elite) && !e.mark);
   const marker = allies.find((u) => u.role === 'soutien' && can(u, 'marque'));
-  if (big && marker && st.fervor >= 3 && st.ap >= 2 && go(marker.uid, 'marque', big.uid)) return true;
+  const spare = (f, ap = 0) => !!st.init || (st.fervor >= f && st.ap >= ap);
+  if (big && marker && spare(3, 2) && go(marker.uid, 'marque', big.uid)) return true;
   // 5. Contagion sur une cible déjà bien empoisonnée
   const vn = allies.find((u) => u.role === 'poison' && can(u, 'contagion'));
   const sick = vn && actionTargets(st, vn.uid, 'contagion').map((id) => st.units[id]).find((x) => x.poison >= 3 && (x.boss || x.elite || foes.length >= 3));
-  if (sick && st.fervor >= 3 && go(vn.uid, 'contagion', sick.uid)) return true;
+  if (sick && spare(3) && go(vn.uid, 'contagion', sick.uid)) return true;
   // 6. Raz-de-marée contre 3 ennemis ou plus
   const raz = allies.find((u) => u.role === 'zone' && can(u, 'raz'));
-  if (raz && foes.length >= 3 && st.fervor >= 4 && go(raz.uid, 'raz')) return true;
+  if (raz && foes.length >= (st.init ? 2 : 3) && spare(4) && go(raz.uid, 'raz')) return true;
+  // 7. ordre d'initiative : PA presque pleins → la compétence signature plutôt que de les perdre
+  const me = st.init && st.units[st.actor];
+  if (me && (me.pa || 0) >= PA_MAX - 1) {
+    const sk = KITS[me.role].skill.key;
+    if (can(me, sk)) {
+      const ts = actionTargets(st, me.uid, sk);
+      const tg = sk === 'raz' ? null : sk === 'priere' ? front(st, 'ally').slice().sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0]?.uid : sk === 'rempart' ? (API.threatened(st)?.uid !== me.uid && API.threatened(st)?.uid) || ts[0] : API.bestTarget(st, me);
+      if ((sk === 'raz' || (tg && ts.includes(tg))) && go(me.uid, sk, tg)) return true;
+    }
+  }
   return false;
 }
 // Tour complet automatique. defense(st, coup) → 'none' | 'dodge' | 'parry' (talent du joueur simulé)
@@ -1250,15 +1406,18 @@ export function autoTurn(st, defense = () => 'none', opts = {}) {
   return ev;
 }
 export function autoDuel(st, max = 60, defense, opts) {
-  for (let i = 0; i < max && !st.over; i++) autoTurn(st, defense, opts);
+  for (let i = 0; i < (st.init ? max * 4 : max) && !st.over; i++) autoTurn(st, defense, opts);
   if (!st.over) st.over = 'lost';
   return st;
 }
 // Fin de tour d'un bloc (simulations et tests)
 export function endTurn(st, defense = () => 'none') {
   const ev = beginEnemyTurn(st);
-  for (let s = nextEnemy(st); s; s = nextEnemy(st)) ev.push(...enemyAct(st, s.a, s.qte ? defense(st, s) : 'none'));
-  ev.push(...endEnemyTurn(st));
+  // ordre d'initiative : « Passer » si une alliée a la main, puis les ennemis jouent jusqu'à la prochaine alliée
+  for (let k = 0; k < (st.init ? 12 : 1) && !st.over && st.turn === 'enemy'; k++) {
+    for (let s = nextEnemy(st); s; s = nextEnemy(st)) ev.push(...enemyAct(st, s.a, s.qte ? defense(st, s) : 'none'));
+    ev.push(...endEnemyTurn(st));
+  }
   return ev;
 }
 

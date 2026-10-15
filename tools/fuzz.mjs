@@ -8,7 +8,7 @@ import { FACTION_ORDER } from '../js/config.js';
 import { Game } from '../js/core/game.js';
 import * as D from '../js/core/duel.js';
 import * as SC from '../js/core/sceaux.js';
-import { FERVOR_MAX } from '../js/core/skills.js';
+import { FERVOR_MAX, PA_MAX } from '../js/core/skills.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8'));
@@ -23,6 +23,11 @@ const stats = { battles: 0, turns: 0, actions: 0, stalls: 0, bosses: {}, bossWin
 
 function check(st, where) {
   if (!Number.isFinite(st.ap) || st.ap < 0) report('Points d’action invalides', `${where} ap=${st.ap}`);
+  if (st.init) {
+    for (const id of st.order.ally) { const p = st.units[id].pa; if (!Number.isFinite(p) || p < 0 || p > PA_MAX) report('PA d’une créature hors limites', `${where} ${id} pa=${p}`); }
+    if (!st.over && st.turn === 'ally' && !(st.actor && D.front(st, 'ally').some((u) => u.uid === st.actor))) report('Tour allié sans créature qui a la main', `${where} actor=${st.actor}`);
+    if (!st.over && st.turn === 'enemy' && !st.queue.length) report('Tour ennemi sans ennemi', where);
+  }
   if (!Number.isFinite(st.fervor) || st.fervor < 0 || st.fervor > FERVOR_MAX) report('Ferveur hors limites', `${where} ${st.fervor}`);
   for (const u of Object.values(st.units)) {
     if (!Number.isFinite(u.hp) || !Number.isFinite(u.maxHp) || !Number.isFinite(u.atk)) report('Valeur non numérique (PV/ATQ)', `${where} ${u.id} hp=${u.hp} atk=${u.atk}`);
@@ -43,7 +48,7 @@ function checkEv(ev, where) {
 // Un tour joué : au hasard ou avec le pilote automatique
 function playerTurn(st, r, where) {
   if (r() < 0.5) { const ev = D.autoActs(st); checkEv(ev, where); stats.actions += ev.length; return; }
-  for (let k = 0; k < 10 && !st.over && st.turn === 'ally' && st.ap > 0; k++) {
+  for (let k = 0; k < 10 && !st.over && st.turn === 'ally' && (st.init || st.ap > 0); k++) {
     if (D.ultReady(st) && r() < 0.3) { checkEv(D.useUlt(st), where + ' pouvoir'); continue; }
     const us = D.front(st, 'ally').filter((u) => D.actionsFor(st, u.uid).some((a) => a.ok));
     if (!us.length) break;
@@ -53,16 +58,17 @@ function playerTurn(st, r, where) {
     const ts = a.target === 'none' ? [null] : D.actionTargets(st, u.uid, a.key);
     if (!ts.length) continue;
     const t = ts[Math.floor(r() * ts.length)];
-    const ap = st.ap;
+    const ap = st.ap, pa = u.pa;
     const ev = D.act(st, u.uid, a.key, t);
     if (!ev.length) report('Action autorisée mais refusée', `${where} ${a.key}`);
-    else if (st.ap > ap && a.key !== 'swap') report('Points d’action qui augmentent', `${where} ${a.key}`);
+    else if (!st.init && st.ap > ap && a.key !== 'swap') report('Points d’action qui augmentent', `${where} ${a.key}`);
+    else if (st.init && a.ap > 0 && u.pa > pa - a.ap + 1) report('Compétence qui ne coûte pas ses PA', `${where} ${a.key} ${pa}→${u.pa}`);
     // double toucher : la même action renvoyée tout de suite ne doit jamais dépenser deux fois plus que prévu
     checkEv(ev, where + ' ' + a.key); stats.actions++;
     check(st, where + ' après ' + a.key);
   }
 }
-function duel(st, r, where, maxTurns = 80) {
+function duel(st, r, where, maxTurns = 320) {
   stats.battles++;
   const def = () => { const x = r(); return x < 0.25 ? 'parry' : x < 0.65 ? 'dodge' : 'none'; };
   let t = 0;
@@ -77,7 +83,7 @@ function duel(st, r, where, maxTurns = 80) {
   if (!st.over) {
     stats.stalls++;
     const desc = Object.values(st.units).filter((u) => u.hp > 0).map((u) => `${u.side[0]}:${u.id} ${u.hp}/${u.maxHp} atk${u.atk} sh${u.shield || 0} ice${u.ice || 0} fam:${u.fam || u.role}${u.inPlay ? '' : ' (réserve)'}${u.swallowed ? ' (avalé)' : ''}`).join(' ; ');
-    report('Combat qui ne finit jamais (80 tours)', `${where} → ${desc}`);
+    report('Combat qui ne finit jamais', `${where} → ${desc}`);
     st.over = 'lost';
   }
   try { D.battleReport(st, (u) => u); D.goalState(st); } catch (e) { report('Plantage du bilan de combat', e.message); }

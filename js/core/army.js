@@ -48,7 +48,7 @@ export const ULTS = {
   revive: { name: 'Renaissance',      color: '#FF9A3A', desc: 'Relève les créatures tombées (50 % des PV) ; sinon soigne l’équipe de 40 %.' },
   nova:   { name: 'Cataclysme',       color: '#FF5A3A', desc: 'Frappe tous les ennemis au combat, plus fort à chaque tour.' },
   smite:  { name: 'Croc du Néant',    color: '#7FD3FF', desc: 'Énorme coup sur l’ennemi qui a le plus de PV.' },
-  aegis:  { name: 'Égide mécanique',  color: '#C9D1DE', desc: 'Bouclier sur tes créatures au combat et +2 actions ce tour-ci.' },
+  aegis:  { name: 'Égide mécanique',  color: '#C9D1DE', desc: 'Bouclier sur tes créatures au combat, dégel, et +2 PA pour chacune.' },
 };
 const ULT_BY_FACTION = { celeste: 'revive', necrotique: 'revive', infernal: 'nova', primordial: 'nova', abyssal: 'smite', sauvage: 'smite', artificiel: 'aegis' };
 export const canUlt = (card) => card && (card.rarity === 'M' || card.rarity === 'S');

@@ -5,10 +5,10 @@
 
 // Lois de l'Architecte : une règle du combat change, annoncée un tour avant.
 export const LAWS = {
-  silence: { name: 'Loi du silence', desc: 'Tes compétences coûtent 1 Ferveur de plus.' },
+  silence: { name: 'Loi du silence', desc: 'Tes compétences coûtent 1 PA de plus.' },
   fer:     { name: 'Loi du fer', desc: 'L’Architecte subit 40 % de dégâts en moins, sauf s’il est brisé.' },
   echo:    { name: 'Loi de l’écho', desc: 'Chaque coup porté à l’Architecte renvoie 2 dégâts à l’attaquant.' },
-  hate:    { name: 'Loi de la hâte', desc: 'Tu as 4 actions par tour, mais les ennemis frappent 30 % plus fort.' },
+  hate:    { name: 'Loi de la hâte', desc: 'Tes créatures gagnent 1 PA de plus à chaque tour, mais les ennemis frappent 30 % plus fort.' },
 };
 
 // Aspects de l'Éclipse : ses faiblesses et résistances changent (×1,6 / ×0,5).

@@ -148,7 +148,7 @@ export function eventSwap(catalog, list, day, floor, factions) {
 // Traits (v257) : dès l'étage 3, certains ennemis ordinaires (et des élites dès l'étage 6) ont une mécanique propre
 export const TRAITS = {
   explosif: { name: 'Explosif', desc: 'À sa mort, il explose et blesse toutes tes créatures au combat.' },
-  voleur:   { name: 'Voleur d’action', desc: 'Tant qu’il est debout, ton équipe a 1 action de moins à partir du 3e tour.' },
+  voleur:   { name: 'Voleur d’action', desc: 'Tant qu’il est debout, il vole 1 PA à ta créature qui en a le plus, à chaque tour à partir du 3e.' },
   egide:    { name: 'Lien d’égide', desc: 'Il subit 35 % de dégâts en moins tant qu’un autre ennemi est au combat.' },
   enrage:   { name: 'Enragé', desc: 'Sous la moitié de ses PV, il entre en rage : +2 en attaque.' },
 };

@@ -11,7 +11,7 @@ import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
 import { cardHTML } from '../ui/card.js';
 import {
-  BOSS_POWERS, INTENTS, SYNERGIES, PACK_BONUS, FERVOR_MAX, AP_MAX, front, reserve, actionsFor, actionTargets, act, preview,
+  BOSS_POWERS, INTENTS, SYNERGIES, PACK_BONUS, FERVOR_MAX, AP_MAX, PA_MAX, passTurn, speedOf, front, reserve, actionsFor, actionTargets, act, preview,
   ENTRANCES, GOALS, goalState, RHYTHM, PHASE2, beginEnemyTurn, nextEnemy, enemyAct, endEnemyTurn, takeSkips, defenseWindow, threats, intentInfo, useUlt, ultReady, autoActs, comboOf,
 } from '../core/duel.js';
 import { KITS, AI_FAMILIES, DICE_TIERS, WEAK_TO, TALENTS } from '../core/skills.js';
@@ -73,11 +73,11 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     <div class="dv-row ally"></div>
     <div class="dv-bar cb-bar">
       <button class="cb-res" data-d="ult" style="--uc:${ult.color}" aria-label="Actions, Ferveur et pouvoir d’équipe">
-        <span class="cb-ap"><small>Actions</small><span class="cb-pips"></span></span>
+        <span class="cb-ap"><small>PA</small><span class="cb-pips"></span></span>
         <span class="cb-fv"><small>Ferveur</small><span class="cb-gems"></span></span>
         <span class="cb-ult"><img class="cb-pw" alt="" src="assets/icons/power.webp"><b>${esc(ult.name)}</b><small></small></span>
       </button>
-      <button class="btn primary dv-end" data-d="end">Fin du tour</button>
+      <button class="btn primary dv-end" data-d="end">Passer</button>
     </div>
   </div>`;
   const $ = (s) => root.querySelector(s);
@@ -154,14 +154,14 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (!u || st.turn !== 'ally' || busy) return '';
     const kit = KITS[u.role];
     const list = actionsFor(st, u.uid);
-    const c = cat.get(u.id), left = Math.max(0, 2 - u.acts);
+    const c = cat.get(u.id), pa = u.pa || 0;
+    // v262 : c'est son tour ; ses PA (points d'action personnels) s'affichent en losanges
     return `<div class="cb-head"><span class="cb-por" style="--rc:${RARITY[c.rarity].color}"><img alt="" src="${artUrl(c, { lite: true })}"></span>
-      <span class="cb-who"><b>${esc(c.name)}</b><span class="cb-role">${roleIcon(kit.kw)}${esc(kit.name)}</span></span>
-      <span class="cb-upips" title="${left} action${left > 1 ? 's' : ''} possible${left > 1 ? 's' : ''} pour elle">${[0, 1].map((i) => `<i class="${i < left ? 'on' : ''}"></i>`).join('')}</span>
-      <button class="cb-x" data-d="desel" aria-label="Annuler la sélection">${icon('close')}</button></div>
+      <span class="cb-who"><b>${esc(c.name)}</b><span class="cb-role">${roleIcon(kit.kw)}${esc(kit.name)}<em class="cb-myturn"> · son tour</em></span></span>
+      <span class="cb-upips" title="${pa} PA : attaque ou défense +1, compétences selon leur coût">${Array.from({ length: PA_MAX }, (_, i) => `<i class="${i < pa ? 'on' : ''}"></i>`).join('')}</span></div>
       <div class="cb-grid ${list.length > 4 ? 'n5' : ''}">${list.map((a) => `<button class="cb-a ${a.ok ? '' : 'off'} ${mode?.key === a.key ? 'on' : ''} ${a.key === kit.skill.key ? 'sig' : ''} ${a.own ? 'own' : ''}" data-a="${a.key}" aria-disabled="${!a.ok}"><span class="cb-tile" aria-hidden="true"></span>
         <span class="cb-ai">${a.own ? `<img class="aicon" alt="" src="${moveIconUrl(a.icon)}">` : actIcon(a.key, a.icon)}</span><b>${esc(a.name)}</b>
-        <span class="cb-cost">${'<i class="pa"></i>'.repeat(a.ap) || '<i class="free">0</i>'}${a.fervor ? `<i class="fv">${a.fervor}</i>` : ''}${a.dice ? '<i class="d20">D20</i>' : ''}${a.own && a.wait ? `<i class="cdw" title="Se recharge">${a.wait}</i>` : ''}</span></button>`).join('')}</div>`;
+        <span class="cb-cost">${a.gain ? `<i class="gain">+${a.gain} PA</i>` : '<i class="pa"></i>'.repeat(a.ap) || `<i class="free">${st.init ? 'libre' : '0'}</i>`}${a.fervor ? `<i class="fv">${a.fervor}</i>` : ''}${a.dice ? '<i class="d20">D20</i>' : ''}${a.own && a.wait ? `<i class="cdw" title="Se recharge">${a.wait}</i>` : ''}</span></button>`).join('')}</div>`;
   }
   // ——— Tutoriel du premier combat : une main dorée montre quoi toucher ———
   let guide = !g.s.tips?.['cb-guide'];
@@ -169,11 +169,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     root.querySelectorAll('.guide').forEach((x) => x.classList.remove('guide'));
     if (!guide || busy || st.turn !== 'ally' || st.over) return;
     let t = null, txt = '';
-    const first = front(st, 'ally').find((u) => actionsFor(st, u.uid)[0].ok);
     if (mode?.key === 'attack') { t = el(actionTargets(st, sel, 'attack')[0]); txt = 'Touche un ennemi pour l’attaquer'; }
-    else if (sel && actionsFor(st, sel)[0].ok) { t = actsEl.querySelector('[data-a="attack"]'); txt = `Choisis « ${esc(actionsFor(st, sel)[0].name)} » : son attaque (1 action)`; }
-    else if (first) { t = el(first.uid); txt = `Touche une de tes créatures · ${st.ap} action${st.ap > 1 ? 's' : ''} restante${st.ap > 1 ? 's' : ''}`; }
-    else { t = $('.dv-end'); txt = 'Plus d’actions : touche « Fin du tour »'; }
+    else if (sel && actionsFor(st, sel)[0].ok) { t = actsEl.querySelector('[data-a="attack"]'); txt = `C’est au tour de ${esc(cat.get(st.units[sel].id).name)} : « ${esc(actionsFor(st, sel)[0].name)} » attaque et rapporte 1 PA`; }
+    else { t = $('.dv-end'); txt = 'Rien à faire : touche « Passer »'; }
     if (t) { t.classList.add('guide'); say(`<b class="dc-good">${txt}</b>`); }
   }
   function endGuide() { if (!guide) return; guide = false; g.s.tips = { ...(g.s.tips || {}), 'cb-guide': Date.now() }; g.persist(); }
@@ -181,6 +179,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   // ——— Affichage ———
   function draw() {
     if (!alive_) return;
+    // v262 : la créature dont c'est le tour est toujours celle qui est choisie
+    if (st.init && st.turn === 'ally' && !st.over) sel = st.actor; else if (st.init) sel = null;
     th = threats(st);
     tgtInfo = {};
     const pk = mode ? mode.key : sel && st.turn === 'ally' && actionsFor(st, sel)[0]?.ok ? 'attack' : null;
@@ -211,19 +211,21 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const showActs = !!sel && st.turn === 'ally' && !busy && !st.over;
     actsEl.hidden = !showActs;
     actsEl.innerHTML = showActs ? actsHTML() : '';
-    $('.cb-pips').innerHTML = Array.from({ length: Math.max(AP_MAX, st.ap) }, (_, i) => `<i class="${i < st.ap ? 'on' : ''}"></i>`).join('');
+    const pu = st.init ? st.units[st.actor] : null, paNow = st.init ? (st.turn === 'ally' && pu ? pu.pa || 0 : 0) : st.ap;
+    $('.cb-pips').innerHTML = Array.from({ length: st.init ? PA_MAX : Math.max(AP_MAX, st.ap) }, (_, i) => `<i class="${i < paNow ? 'on' : ''}"></i>`).join('');
     $('.cb-gems').innerHTML = Array.from({ length: FERVOR_MAX }, (_, i) => `<i class="${i < st.fervor ? 'on' : ''}"></i>`).join('');
     const ready = ultReady(st);
     if (ready && !g.s.tips?.['cb-ult']) tuto(app, 'cb-ult');
     $('.cb-res').classList.toggle('ready', ready);
     $('.cb-ult small').textContent = st.ultUsed ? 'Utilisé' : ready ? '' : `${st.fervor}/${FERVOR_MAX}`;
-    const canMore = st.ap > 0 && front(st, 'ally').some((u) => actionsFor(st, u.uid).some((a) => a.ok && a.key !== 'swap' && a.key !== 'defend'));
+    const canMore = (st.init || st.ap > 0) && front(st, 'ally').some((u) => actionsFor(st, u.uid).some((a) => a.ok && a.key !== 'swap' && a.key !== 'defend'));
     $('.dv-end').classList.toggle('pulse', st.turn === 'ally' && !canMore && !busy);
     root.querySelectorAll('.dv-bar button').forEach((b) => { const off = busy || st.turn !== 'ally' || !!st.over; b.disabled = off; b.classList.toggle('off', off); });
     if (!busy && st.turn === 'ally' && !st.over) {
       if (mode) say(`<b>${esc(mode.name)}</b> : touche la cible${mode.dice ? ' · chances affichées dessus' : ''} <button class="cb-cancel" data-d="cancel">Annuler</button>`);
+      else if (sel && st.init) say(`Tour de <b>${esc(cat.get(st.units[sel].id).name)}</b> · <b>${st.units[sel].pa || 0}</b> PA`);
       else if (sel) say(`Choisis une action · <b>${st.ap}</b> action${st.ap > 1 ? 's' : ''} pour l’équipe`);
-      else say(canMore ? `Touche une créature · <b>${st.ap}</b> action${st.ap > 1 ? 's' : ''} pour l’équipe` : 'Touche <b>Fin du tour</b>');
+      else say(canMore ? `Touche une créature · <b>${st.ap}</b> action${st.ap > 1 ? 's' : ''} pour l’équipe` : 'Touche <b>Passer</b>');
     } else if (st.turn === 'enemy' && !st.over) say('<b class="dc-bad">Tour des créatures corrompues</b>');
     guideStep();
     drawTimeline();
@@ -234,6 +236,22 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   function drawTimeline() {
     const box = $('.cb-tl'); if (!box) return;
     if (st.over) { box.innerHTML = ''; return; }
+    if (st.init) {
+      // v262 : chaque créature a sa place dans l'ordre (vitesse) ; après le séparateur, le tour suivant
+      const ok = (u) => u && u.hp > 0 && !u.swallowed && front(st, u.side).includes(u);
+      const now = st.turn === 'enemy' ? [...(acting && !st.queue.includes(acting) ? [acting] : []), ...st.queue] : st.actor ? [st.actor] : [];
+      const cur = [...now, ...st.init.slice((st.ip ?? -1) + 1)].map((id) => st.units[id]).filter(ok);
+      const nxt = st.init.map((id) => st.units[id]).filter(ok);
+      const list = [...cur, { sep: st.round + 1 }, ...nxt].slice(0, 5);
+      const pic = (u) => `<img alt="" src="${artUrl(cat.get(u.id), { lite: true })}">`;
+      const sig = list.map((x) => x.sep ? `T${x.sep}` : x.uid).join(',');
+      const moved = tlSig && tlSig.split(',')[0] !== sig.split(',')[0];
+      tlSig = sig;
+      box.innerHTML = list.map((x, i) => (x.sep ? `<span class="cb-tlsep" title="Tour suivant">T${x.sep}</span>`
+        : `<span class="cb-tlr ${x.side === 'enemy' ? 'foe' : 'al'} ${i === 0 ? 'now' : ''} ${x.boss ? 'boss' : x.elite ? 'elite' : ''}" title="${esc(cat.get(x.id).name)}"><span class="cb-tlp">${pic(x)}</span></span>`)).join('');
+      if (moved && !reduced) { box.classList.remove('shift'); void box.offsetWidth; box.classList.add('shift'); }
+      return;
+    }
     const allies = front(st, 'ally').filter((u) => u.hp > 0), foes = front(st, 'enemy').filter((u) => u.hp > 0);
     const team = { team: true, key: `T${st.round}` };
     const q = [...(acting && !st.queue.includes(acting) ? [acting] : []), ...st.queue];
@@ -536,6 +554,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         }
         case 'enter': draw(); el(e.u)?.classList.add('enter'); await wait(T(340)); break;
         case 'revive': draw(); float(e.u, 'Relevée !', 'heal'); await wait(T(280)); break;
+        case 'actor': draw(); if (!reduced) { const t = el(e.u); t?.classList.remove('myturn'); void t?.offsetWidth; t?.classList.add('myturn'); } app.sfx.tap?.(); await wait(T(260)); break;
+        case 'pa': { const t = el(e.u); if (t && st.units[e.u]?.side === 'ally') float(e.u, `+${e.d} PA`, 'pa'); break; }
         case 'phase': draw(); say(e.side === 'enemy' ? '<b class="dc-bad">Tour des créatures corrompues</b>' : 'À toi !'); turnBanner(e.side); await wait(T(e.side === 'enemy' ? 520 : 420)); break;
         case 'ult': if (st.ult === 'sceau') dio.seal(); else dio.ult(); await ultFx(); break;
         case 'law': if (e.aspect) dio.aspect(e.aspect); draw(); banner(e.fatigue ? `${icon('skull')} Épuisement : chaque tour blesse tout le monde` : e.law ? esc(LAWS[e.law].name) : esc(ASPECTS[e.aspect].name), e.fatigue ? 'danger' : 'skill', 1300); await wait(T(e.fatigue ? 900 : 700)); break;
@@ -730,7 +750,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     setTimeout(() => $('.dv')?.addEventListener('pointerdown', () => box.remove(), { once: true, capture: true }), 50);
   }
   async function enemyTurn() {
-    log = [];
+    log ||= [];
     for (let s = nextEnemy(st); s && alive_; s = nextEnemy(st)) {
       const skips = takeSkips(st);
       logEvents(skips);
@@ -754,16 +774,22 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     logEvents(ev.filter((e) => e.t !== 'eact'));
     await play(ev);
   }
+  // Les ennemis jouent jusqu'au tour de ta prochaine créature (v262 : l'ordre alterne entre les deux camps)
+  async function foesPlay() {
+    log = [];
+    for (let k = 0; k < 16 && alive_ && !st.over && st.turn === 'enemy'; k++) await enemyTurn();
+    if (guide) endGuide();
+    if (!alive_ || st.over) return;
+    setTimeout(() => { if (alive_ && !busy && st.turn === 'ally') showLog(); }, reduced ? 0 : 1000); // après le bandeau « À toi ! »
+  }
   async function doEnd() {
     if (busy || st.turn !== 'ally' || st.over) return;
-    busy = true; sel = null; mode = null; draw();
-    const ev = beginEnemyTurn(st); g.persist();
+    busy = true; mode = null; if (!st.init) sel = null; draw();
+    const ev = beginEnemyTurn(st); g.persist(); // en ordre d'initiative : « Passer »
     await play(ev);
-    if (!st.over) await enemyTurn();
-    if (guide) endGuide();
+    if (!st.over && st.turn === 'enemy') await foesPlay();
     busy = false; draw();
     if (st.over) return finish();
-    setTimeout(() => { if (alive_ && !busy && st.turn === 'ally') showLog(); }, reduced ? 0 : 1000); // après le bandeau « À toi ! »
     tips();
   }
   // Bulles d'aide au bon moment (une seule fois chacune)
@@ -782,6 +808,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     busy = true; draw();
     const ev = fn(); g.persist();
     await play(ev);
+    if (!st.over && st.turn === 'enemy') { await foesPlay(); if (!st.over) tips(); }
     busy = false;
     if (sel && !actionsFor(st, sel).some((a) => a.ok && a.key !== 'swap')) sel = null;
     draw();
@@ -810,7 +837,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const a = actionsFor(st, sel).find((x) => x.key === key); if (!a) return;
     const d = a.desc || (key === KITS[u.role].skill.key ? KITS[u.role].skill.desc : '');
     app.sfx.tap();
-    toast(`<b>${esc(a.name)}</b>${a.dice ? ' · dé à 20 faces' : ''}${a.ap ? ` · ${a.ap} action${a.ap > 1 ? 's' : ''}` : ' · gratuit'}${d ? `<br>${esc(d)}` : ''}${!a.ok && a.why ? `<br><i>${esc(a.why)}</i>` : ''}`, { icon: 'sparkle', ms: 4200 });
+    toast(`<b>${esc(a.name)}</b>${a.dice ? ' · dé à 20 faces' : ''}${a.gain ? ` · gratuit, +${a.gain} PA` : a.ap ? ` · ${a.ap} ${st.init ? 'PA' : `action${a.ap > 1 ? 's' : ''}`}` : ' · gratuit'}${d ? `<br>${esc(d)}` : ''}${!a.ok && a.why ? `<br><i>${esc(a.why)}</i>` : ''}`, { icon: 'sparkle', ms: 4200 });
   }
   async function pickTarget(uid) {
     const key = mode.key;
@@ -832,7 +859,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   async function pickReserve() {
     if (!g.s.tips?.['cb-entrance']) await tuto(app, 'cb-entrance');
     const r = reserve(st, 'ally'), su = st.units[sel];
-    const sh = openSheet(`<h2>Qui entre en jeu ?</h2><p class="small muted">À la place de <b>${esc(cat.get(su.id).name)}</b>. Coût : ${st.freeSwap ? 'gratuit (Relais d’ombre)' : '1 action'}. Elle peut agir ce tour-ci ; PV et états sont conservés.</p>
+    const sh = openSheet(`<h2>Qui entre en jeu ?</h2><p class="small muted">À la place de <b>${esc(cat.get(su.id).name)}</b>. ${st.init ? `Gratuit : elle prend sa place dans l’ordre des tours et joue tout de suite${st.freeSwap ? ' (Relais d’ombre : +2 PA)' : ''}` : `Coût : ${st.freeSwap ? 'gratuit (Relais d’ombre)' : '1 action'}. Elle peut agir ce tour-ci`} ; PV, PA et états sont conservés.</p>
       <div class="dv-pick">${r.map((x) => `<button class="dv-pick-c" data-in="${x.uid}"><img alt="" src="${artUrl(cat.get(x.id), { lite: true })}"><b>${esc(cat.get(x.id).name)}</b><span>${esc(KITS[x.role].name)} · ${icon('swords')}${x.atk} · ${icon('heart')}${x.hp}/${x.maxHp}</span>${ENTRANCES[x.role] ? `<small class="dv-pick-e"><b>${esc(ENTRANCES[x.role].name)}</b> : ${esc(ENTRANCES[x.role].desc)}</small>` : ''}</button>`).join('')}</div>`, { label: 'Permuter' });
     sh.body.addEventListener('click', (ev) => { const p = ev.target.closest('[data-in]'); if (p) { sh.close(); const u = sel; mode = null; exec(() => act(st, u, 'swap', p.dataset.in)); } });
   }
@@ -907,16 +934,16 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     revive: 'Tes créatures tombées reviennent au combat avec la moitié de leurs PV. Si aucune n’est tombée, tes créatures au combat récupèrent 40 % de leurs PV.',
     nova: 'Chaque ennemi au combat subit des dégâts (plus forts à chaque tour qui passe) et sa jauge de Brisure baisse.',
     smite: 'L’ennemi qui a le plus de PV subit un coup énorme (plus fort à chaque tour) et sa jauge de Brisure baisse fortement.',
-    aegis: 'Tes créatures au combat reçoivent un bouclier, sont libérées du gel, et ton équipe gagne 2 actions de plus ce tour-ci.',
+    aegis: 'Tes créatures au combat reçoivent un bouclier, sont libérées du gel et gagnent chacune 2 PA.',
   };
   function ultSheet() {
     const ready = ultReady(st), c = run.ult.card ? cat.get(run.ult.card) : null;
     const sh = openSheet(`<div class="cb-ultsheet" style="--uc:${ult.color}">
       <div class="cb-ult-hero">${c ? `<img alt="" src="${artUrl(c)}">` : '<img alt="" src="assets/icons/power.webp">'}</div>
       <h2>${esc(ult.name)}</h2>
-      <p class="small muted">Pouvoir d’équipe${c ? ` de ${esc(c.name)}` : ''} · coûte <b>1 action</b> et <b>toute la Ferveur (${FERVOR_MAX})</b> · <b>une fois par combat</b></p>
+      <p class="small muted">Pouvoir d’équipe${c ? ` de ${esc(c.name)}` : ''} · coûte <b>toute la Ferveur (${FERVOR_MAX})</b>, ${st.init ? 'se lance pendant le tour d’une de tes créatures sans le terminer' : 'et <b>1 action</b>'} · <b>une fois par combat</b></p>
       <p>${esc(ULT_HOW[st.ult] || ult.desc)}</p>
-      ${ready ? `<button class="btn primary block big-cta dc-plq dc-plq-red" data-u="go">${icon('p:power')}Lancer le pouvoir</button>` : `<p class="small cb-ult-need">${st.ultUsed ? 'Déjà utilisé dans ce combat. Il revient au prochain.' : st.fervor < FERVOR_MAX ? `Encore ${FERVOR_MAX - st.fervor} Ferveur à gagner : attaque, exploite les faiblesses, esquive, pare et brise les ennemis.` : 'Il te faut encore 1 action ce tour-ci.'}</p>`}
+      ${ready ? `<button class="btn primary block big-cta dc-plq dc-plq-red" data-u="go">${icon('p:power')}Lancer le pouvoir</button>` : `<p class="small cb-ult-need">${st.ultUsed ? 'Déjà utilisé dans ce combat. Il revient au prochain.' : st.fervor < FERVOR_MAX ? `Encore ${FERVOR_MAX - st.fervor} Ferveur à gagner : attaque, exploite les faiblesses, esquive, pare et brise les ennemis.` : st.init ? 'Attends le tour d’une de tes créatures.' : 'Il te faut encore 1 action ce tour-ci.'}</p>`}
     </div>`, { label: ult.name });
     sh.body.addEventListener('click', (e) => { if (e.target.closest('[data-u="go"]')) { sh.close(); castUlt(); } });
   }
@@ -928,7 +955,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const healed = ev.filter((x) => x.t === 'heal').reduce((a, x) => a + x.d, 0);
     const dmg = ev.filter((x) => x.t === 'dmg').reduce((a, x) => a + x.d, 0);
     const revived = ev.filter((x) => x.t === 'revive').length;
-    const parts = [revived && `${revived} créature${revived > 1 ? 's' : ''} relevée${revived > 1 ? 's' : ''}`, healed && `+${healed} PV rendus`, dmg && `${dmg} dégâts infligés`, ['sceau', 'aegis'].includes(st.ult) && 'boucliers sur tes créatures', st.ult === 'aegis' && '+2 actions'].filter(Boolean);
+    const parts = [revived && `${revived} créature${revived > 1 ? 's' : ''} relevée${revived > 1 ? 's' : ''}`, healed && `+${healed} PV rendus`, dmg && `${dmg} dégâts infligés`, ['sceau', 'aegis'].includes(st.ult) && 'boucliers sur tes créatures', st.ult === 'aegis' && (st.init ? '+2 PA chacune' : '+2 actions')].filter(Boolean);
     toast(`<b>${esc(ult.name)}</b> : ${parts.join(' · ') || 'aucun effet'}`, { icon: 'sparkle', kind: 'success' });
     busy = false; draw();
     if (st.over) finish();
@@ -943,14 +970,14 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const tgtName = i?.target && st.units[i.target]?.side === 'ally' ? cat.get(st.units[i.target].id).name : '';
     openSheet(`<div class="tb-info"><div class="tb-info-card ${u.side === 'enemy' ? 'corrupt' : ''}">${cardHTML(c, { size: 'full', nameKnown: true })}</div>
       <h3>${esc(c.name)}${u.side === 'enemy' ? ' corrompu' : ''}</h3>
-      <dl class="facts"><div><dt>Attaque</dt><dd>${u.atk + (u.boost || 0)}</dd></div><div><dt>PV</dt><dd>${Math.max(0, u.hp)} / ${u.maxHp}</dd></div><div><dt>Niveau</dt><dd>${u.level || 1}</dd></div>${u.brkMax ? `<div><dt>Brisure</dt><dd>${u.broken ? 'Brisé' : `${u.brk} / ${u.brkMax}`}</dd></div>` : ''}</dl>
+      <dl class="facts"><div><dt>Attaque</dt><dd>${u.atk + (u.boost || 0)}</dd></div><div><dt>PV</dt><dd>${Math.max(0, u.hp)} / ${u.maxHp}</dd></div><div><dt>Niveau</dt><dd>${u.level || 1}</dd></div>${st.init ? `<div><dt>Vitesse</dt><dd>${speedOf(u)}</dd></div>` : ''}${st.init && u.side === 'ally' ? `<div><dt>PA</dt><dd>${u.pa || 0} / ${PA_MAX}</dd></div>` : ''}${u.brkMax ? `<div><dt>Brisure</dt><dd>${u.broken ? 'Brisé' : `${u.brk} / ${u.brkMax}`}</dd></div>` : ''}</dl>
       ${u.trait && TRAITS[u.trait] ? `<p class="small dc-bad cb-trait"><img class="cb-trico" alt="" src="assets/icons/st-${u.trait}.webp"><b>${esc(TRAITS[u.trait].name)}</b> : ${esc(TRAITS[u.trait].desc)}</p>` : ''}
       ${fam ? `<p class="small"><b>${esc(fam.name)}</b> : ${esc(fam.desc)} <span class="dc-good">${esc(fam.counter)}</span></p>` : ''}
       ${u.boss && st.bossKey ? `<p class="small dc-bad"><b>${esc(BOSSES[st.bossKey].name)}</b> : ${esc(BOSSES[st.bossKey].mechanic)} Sous la moitié de ses PV, il entre en phase 2 et accélère.</p>${g.s.bossesBeaten[st.bossKey] ? `<p class="small dc-good"><b>Pour le contrer</b> : ${esc(BOSSES[st.bossKey].counter)}</p>` : ''}${u.aspect ? `<p class="small"><b>${esc(ASPECTS[u.aspect].name)}</b> : faible face à ${ASPECTS[u.aspect].weak.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}, résiste à ${ASPECTS[u.aspect].resist.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}.</p>` : ''}` : ''}
       ${u.boss && st.bossPower && !st.bossKey ? `<p class="small dc-bad"><b>${esc(BOSS_POWERS[st.bossPower].name)}</b> : ${esc(BOSS_POWERS[st.bossPower].desc)} Sous la moitié de ses PV, il entre en phase 2.</p><p class="small dc-good"><b>Point faible</b> : ${esc(BOSS_POWERS[st.bossPower].counter)}</p>` : ''}
       ${u.side === 'enemy' ? `<p class="small">${weakF ? `<b>Faiblesse</b> : ${sigil(weakF)} ${esc(cat.faction[weakF]?.name || weakF)} (+50 % de dégâts)` : '<b>Faiblesse</b> : inconnue. Frappe-la avec la bonne faction, ou marque-la, pour la découvrir.'}</p>` : `
-      <p class="small"><b>${actIcon('attack')} ${esc(kit.basic.name)}</b> (1 action) : ${esc(kit.basic.desc)}</p>
-      <p class="small"><b>${actIcon(kit.skill.key, kit.skill.icon)} ${esc(kit.skill.name)}</b> (${kit.skill.ap} action${kit.skill.ap > 1 ? 's' : ''}, ${kit.skill.fervor} Ferveur) : ${esc(kit.skill.desc)}</p>
+      <p class="small"><b>${actIcon('attack')} ${esc(kit.basic.name)}</b> (gratuit, +1 PA) : ${esc(kit.basic.desc)}</p>
+      <p class="small"><b>${actIcon(kit.skill.key, kit.skill.icon)} ${esc(kit.skill.name)}</b> (${kit.skill.pa} PA) : ${esc(kit.skill.desc)}</p>
       <p class="small"><b>${esc(kit.passive.name)}</b> : ${esc(kit.passive.desc)}</p>
       ${u.rarity === 'C' ? `<p class="small dc-good">${icon('star')} Instinct de meute : +${PACK_BONUS} dégât aux élites et aux gardiens.</p>` : ''}`}
       ${u.side === 'enemy' && g.owns(u.id) ? `<p class="small dc-good">${icon('book')} Tu possèdes sa carte : tes créatures lui font +1 dégât.</p>` : ''}
@@ -971,20 +998,20 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   }
   function help() {
     openSheet(`<h2>Le combat</h2><ul class="small">
-      <li><b>${AP_MAX} actions par tour</b> pour toute l’équipe. Touche une créature, puis une action, puis la cible. Une créature agit au plus 2 fois par tour. Raccourci : ta créature puis un ennemi = Attaque.</li>
-      <li><b>Attaque</b> (1 action) : dégâts fiables, +1 Ferveur. <b>Défense</b> (1 action) : -50 % de dégâts jusqu’à ton prochain tour. <b>Permuter</b> (1 action, une fois par tour) : une créature de la réserve prend la place ; PV et états sont gardés, et la réserve récupère 10 % de PV par tour. En entrant, elle déclenche un petit effet lié à son rôle (bouclier, soin, Ferveur, ralentissement…).</li>
-      <li><b>Brisure</b> : en visant un élite ou un gardien, la cible affiche la Brisure que ton coup va infliger (◆), et « BRISE ! » quand il va le briser. Sur son intention, ◆ indique ce qu’il reste à briser pour annuler son action. Un seul coup ne retire jamais plus de 40 % des PV d’un gardien.</li>
-      <li><b>Ferveur</b> (${FERVOR_MAX} au plus, gardée d’un combat à l’autre) : attaques, faiblesses, esquives (+1), parades parfaites (+2) et Brisures (+2) la remplissent. Les compétences la dépensent ; pleine, elle lance le <b>pouvoir d’équipe</b> (${esc(ult.name)} : ${esc(ult.desc)}).</li>
-      <li><b>Intentions</b> : au-dessus de chaque ennemi, ce qu’il fera et les dégâts prévus ; « ! » = danger. Le badge rouge sur tes cartes annonce les dégâts qu’elles vont prendre.</li>
-      <li><b>Défense active</b> (coups chargés, attaques de zone, sorts, élites et gardiens) : touche dans l’or pour esquiver (+1 Ferveur), sur le trait blanc, au tout dernier instant, pour parer (aucun dégât, +2 Ferveur, Brisure, contre-attaque des Gardes et des Assauts).</li>
+      <li><b>Chacun son tour</b> : toutes les créatures, les tiennes et les ennemies, jouent une fois par tour, dans l’ordre de leur vitesse. L’ordre s’affiche en haut à gauche ; « T2 » marque le début du tour suivant. Quand c’est le tour d’une de tes créatures, ses actions s’ouvrent : choisis l’action, puis la cible. Raccourci : touche un ennemi pour l’attaquer.</li>
+      <li><b>PA</b> (points d’action, ${PA_MAX} au plus) : chaque créature a les siens. Elle en gagne 1 au début de chacun de ses tours, 1 en attaquant, 1 en se défendant et 1 sur une parade parfaite. Ses compétences les dépensent : alterne attaques et compétences, et fais jouer toute ton équipe.</li>
+      <li><b>Attaque</b> (gratuite, +1 PA) : dégâts fiables, +1 Ferveur. <b>Défense</b> (gratuite, +1 PA) : -50 % de dégâts jusqu’à son prochain tour. <b>Passer</b> : elle ne fait rien. <b>Permuter</b> (une fois par tour) : une créature de la réserve prend sa place et joue tout de suite ; PV, PA et états sont gardés, et la réserve récupère 10 % de PV par tour. En entrant, elle déclenche un petit effet lié à son rôle (bouclier, soin, Ferveur, ralentissement…).</li>
+      <li><b>Brisure</b> : en visant un élite ou un gardien, la cible affiche la Brisure que ton coup va infliger (◆), et « BRISE ! » quand il va le briser. Un seul coup ne retire jamais plus de 40 % des PV d’un gardien.</li>
+      <li><b>Ferveur</b> (${FERVOR_MAX} au plus, commune à l’équipe et gardée d’un combat à l’autre) : attaques, faiblesses, esquives (+1), parades parfaites (+2) et Brisures (+2) la remplissent. Pleine, elle lance le <b>pouvoir d’équipe</b> (${esc(ult.name)} : ${esc(ult.desc)}), pendant le tour d’une de tes créatures, sans le terminer.</li>
+      <li><b>Défense active</b> (coups chargés, attaques de zone, sorts, élites et gardiens) : touche dans l’or pour esquiver (+1 Ferveur), sur le trait blanc, au tout dernier instant, pour parer (aucun dégât, +1 PA, +2 Ferveur, Brisure, contre-attaque des Gardes et des Assauts).</li>
       <li><b>Dés</b> : Coup d’estoc, Contagion et Entrave lancent un D20 contre une difficulté (DD). 1 : échec critique ; sous le DD : réussite partielle ; DD atteint : réussite ; 20 : critique. Marque, gel, Brisure et faiblesse donnent des bonus.</li>
       <li><b>Enchaînement</b> : chaque créature qui frappe un ennemi déjà touché ce tour-ci par une autre de tes créatures gagne +1 dégât (+2 au plus). Le « +1 » doré sur la cible l’annonce.</li>
       <li><b>Coup de grâce</b> : achever un ennemi donne +1 Ferveur.</li>
-      <li><b>Brisure</b> (élites, gardiens) : vide, l’ennemi perd son action, subit +50 % de dégâts et +5 aux jets contre lui jusqu’à la fin de ton tour suivant.</li>
+      <li><b>Brisure</b> (élites, gardiens) : vide, l’ennemi perd sa prochaine action, subit +50 % de dégâts et +5 aux jets contre lui jusqu’à la fin du tour suivant.</li>
       <li><b>Faiblesses</b> : chaque faction en craint une autre (+50 % de dégâts) ; contre sa propre faction : -25 %. ★ sur une cible = faiblesse exploitée.</li>
       <li><b>Instinct de meute</b> : tes Communes font +${PACK_BONUS} dégât aux élites et aux gardiens.</li></ul>
       <h3>L’identité des créatures</h3><p class="small">Chaque créature a sa propre identité, qui se révèle en montant de niveau : leur <b>frappe</b> (niveau 1) remplace l’attaque de leur rôle, puis viennent un <b>passif</b> (niveau 3), une <b>compétence propre</b> (niveau 6, la case dorée en plus de celle du rôle) et l’<b>Éveil</b> (niveau 9). Tout est détaillé sur la fiche de la carte.</p>
-      <h3>Les rôles</h3>${Object.values(KITS).map((k) => `<p class="small">${roleIcon(k.kw)} <b>${esc(k.name)}</b> · <b>${esc(k.skill.name)}</b> (${k.skill.ap} act., ${k.skill.fervor} Ferveur) : ${esc(k.skill.desc)} <i>${esc(k.passive.name)} : ${esc(k.passive.desc)}</i></p>`).join('')}
+      <h3>Les rôles</h3>${Object.values(KITS).map((k) => `<p class="small">${roleIcon(k.kw)} <b>${esc(k.name)}</b> · <b>${esc(k.skill.name)}</b> (${k.skill.pa} PA) : ${esc(k.skill.desc)} <i>${esc(k.passive.name)} : ${esc(k.passive.desc)}</i></p>`).join('')}
       <h3>Les combinaisons</h3>${SYNERGIES.map((x) => `<p class="small"><b class="dv-syn-n">${esc(x.name)}</b> : ${esc(x.desc)}</p>`).join('')}
       <h3>Les ennemis</h3>${Object.values(AI_FAMILIES).map((f) => `<p class="small"><b>${esc(f.name)}</b> : ${esc(f.desc)} <span class="dc-good">${esc(f.counter)}</span></p>`).join('')}
       <h3>Les gardiens</h3>${Object.entries(BOSSES).map(([k, x]) => `<p class="small"><b>${esc(x.name)}</b> : ${esc(x.mechanic)}${g.s.bossesBeaten[k] ? ` <span class="dc-good">${esc(x.counter)}</span>` : ''}</p>`).join('')}
@@ -1001,9 +1028,15 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   }
   // combat repris pendant le tour ennemi (application fermée en plein tour)
   if (st.turn === 'ally' && !st.over && front(st, 'enemy').some((e) => e.trait) && !g.s.tips?.['cb-traits']) setTimeout(() => { if (alive_) tuto(app, 'cb-traits'); }, 900);
-  if (st.turn === 'enemy' && !st.over) { busy = true; draw(); enemyTurn().then(() => { busy = false; draw(); if (st.over) finish(); }); }
-  else if (st.over) finish();
-  else if (guide) tuto(app, 'cb-intro').then(() => draw());
-  else tips();
+  if (st.over) finish();
+  else {
+    // l'ordre des tours peut commencer par les ennemis : ils jouent après le tutoriel éventuel
+    busy = st.turn === 'enemy'; draw();
+    (guide ? tuto(app, 'cb-intro') : Promise.resolve()).then(async () => {
+      if (!alive_) return;
+      if (st.turn === 'enemy' && !st.over) { busy = true; draw(); await foesPlay(); busy = false; draw(); if (st.over) return finish(); }
+      draw(); if (!guide) tips();
+    });
+  }
   return { stop() { alive_ = false; ctl.abort(); dio.destroy(); document.body.classList.remove('battle-mode'); } };
 }

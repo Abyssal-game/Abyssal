@@ -14,7 +14,7 @@ import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_O
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
 import { rngOf, DESCENT, CHESTS, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES, foeTraits } from './descent.js';
-import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState } from './duel.js';
+import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative } from './duel.js';
 import { bossOf, BOSSES } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
 import { FORMS, formUnlocked } from './forms.js';
@@ -552,6 +552,9 @@ export class Game {
     const day = today(this.clock());
     if (d.day !== day) { d.day = day; d.used = 0; d.bestToday = 0; }
     if (d.run?.battle && d.run.battle.ver !== 2) upgradeDuel(d.run.battle); // combat en cours d'avant la refonte
+    // combat en cours d'avant l'ordre d'initiative (v262) : il passe aux nouvelles règles
+    const b = d.run?.battle;
+    if (b && !b.init && !b.over && !b.initPending) { if (b.turn === 'ally') startInitiative(b); else b.initPending = true; }
     return d;
   }
   // Règle du jour (celle de l'expédition en cours si elle a commencé la veille)
@@ -801,6 +804,7 @@ export class Game {
       const known = {};
       enemies.forEach((e) => { if (this.knows(e.id)) known[e.id] = true; });
       run.battle = createDuel(this.runUnits(), enemies, { fervor: run.gauge || 0, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, boss: room === 'boss' ? bossOf(run.floor) : null, pact: room === 'fight' ? null : run.pact || null, blessings: run.blessings, discovered: this.s.weakSeen || {}, seed: this.rng ? Math.floor(this.rng() * 2 ** 31) : null, goal: this.goalFor(run, room) });
+      startInitiative(run.battle); // v262 : chaque créature joue à son tour (ordre d'initiative, PA personnels)
       run.room = room; run.phase = 'battle'; out.battle = true;
     }
     if (run.phase === 'cleared') this.clearFloor();

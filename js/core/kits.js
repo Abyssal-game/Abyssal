@@ -354,7 +354,7 @@ export function composeMove(spec) {
         return d && !d.slow && !(d.frostCD > 0 && first.op === 'freeze') ? pickT((x) => x === d) : null;
       }
       if (first.op === 'mark') return pickT((x) => (x.boss || x.elite) && !x.mark);
-      if (first.op === 'boost') return allies.filter((x) => x.acts < 2).length >= 2 && st.ap >= 2 ? (target === 'ally' ? allies.sort((a, b) => b.atk - a.atk)[0].uid : 'none') : null;
+      if (first.op === 'boost') return (st.init ? allies.filter((x) => x.uid !== u.uid && !x.acts).length >= 1 : allies.filter((x) => x.acts < 2).length >= 2 && st.ap >= 2) ? (target === 'ally' ? allies.sort((a, b) => b.atk - a.atk)[0].uid : 'none') : null;
       if (first.op === 'fervor') return st.fervor <= 3 ? 'none' : null;
       if (first.op === 'poison') return pickT((x) => (x.poison || 0) < 3 && (x.boss || x.elite || x.hp > 6));
       if (first.on === 'foes') return foes.length >= 2 ? 'none' : null;
@@ -430,7 +430,7 @@ export function kitSteps(id, level = 1) {
   return [
     { k: 'strike', kind: 'Frappe', name: k.strike.name, desc: k.strike.desc, img: strikeIconUrl(id) },
     { k: 'passive', kind: 'Passif', name: P.name, desc: P.desc, img: passiveIconUrl(k.passive) },
-    { k: 'move', kind: 'Compétence', name: M.name, desc: M.desc, img: moveIconUrl(M.icon), cost: `${M.ap} action${M.ap > 1 ? 's' : ''} · recharge ${M.cd} tours` },
+    { k: 'move', kind: 'Compétence', name: M.name, desc: M.desc, img: moveIconUrl(M.icon), cost: `${M.ap} PA · recharge ${M.cd} tours` },
     { k: 'awaken', kind: 'Éveil', name: 'Éveil', desc: aw, img: (P2 && passiveIconUrl(k.passive2)) || 'assets/icons/ck-eveil.webp' },
     { k: 'apogee', kind: 'Apogée', name: 'Apogée', desc: `${M.name} se recharge un tour plus vite${M.cd > 1 ? ` (${M.cd - 1} tour${M.cd > 2 ? 's' : ''} au lieu de ${M.cd})` : ''}, et la carte reçoit un cadre doré animé.`, img: 'assets/icons/ck-apogee.webp' },
   ].map((x) => ({ ...x, lv: KIT_LEVELS[x.k], open: level >= KIT_LEVELS[x.k] }));
