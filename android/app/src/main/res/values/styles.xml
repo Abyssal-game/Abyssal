@@ -13,6 +13,10 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:background">@null</item>
+        <!-- fond du jeu derrière les barres du téléphone (sinon bandes blanches) -->
+        <item name="android:windowBackground">@color/abyssal_fond</item>
+        <item name="android:statusBarColor">@color/abyssal_fond</item>
+        <item name="android:navigationBarColor">@color/abyssal_fond</item>
     </style>
 
 

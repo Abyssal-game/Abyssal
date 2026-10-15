@@ -9,9 +9,16 @@ const PKG = 'com.abyssalgame.abyssal';
 const sh = (c) => execSync(c, { encoding: 'utf8' }).trim();
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const report = { steps: [], errors: [] };
+// le rapport est écrit même si l'essai s'interrompt (téléphone simulé arrêté…)
+process.on('exit', () => { fs.writeFileSync(`${OUT}/rapport.json`, JSON.stringify(report, null, 1)); console.log('RAPPORT', JSON.stringify(report)); });
 const step = (name, data = {}) => { report.steps.push({ name, ...data }); console.log('•', name, JSON.stringify(data)); };
 let n = 0;
-const shot = (name) => { const f = `${OUT}/${String(++n).padStart(2, '0')}-${name}.png`; execSync(`adb exec-out screencap -p > ${f}`); step(`capture ${f}`); };
+const shot = (name) => {
+  const f = `${OUT}/${String(++n).padStart(2, '0')}-${name}.png`;
+  try { execSync(`adb exec-out screencap -p > ${f}`); step(`capture ${f}`); }
+  catch (e) { fs.rmSync(f, { force: true }); report.errors.push(`capture ${name} impossible : ${String(e.message).split('\n')[1] || e.message}`); }
+};
+const alive = () => { try { return !!sh(`adb shell pidof ${PKG}`); } catch (e) { return false; } };
 
 sh(`adb install -r ${process.argv[2] || 'android/app/build/outputs/apk/debug/app-debug.apk'}`);
 sh('adb logcat -c');
@@ -59,8 +66,15 @@ const info = await page.evaluate(() => ({
 }));
 step('état', info);
 
+// premier lancement : le guide d'accueil est ouvert, le bouton retour doit le fermer
+const sheets = () => page.evaluate(() => document.querySelectorAll('.sheet-wrap').length);
+const before = await sheets();
+sh('adb shell input keyevent KEYCODE_BACK'); await sleep(1500);
+step('retour sur le guide d’accueil', { fenetresAvant: before, fenetresApres: await sheets() });
+const closeTips = async () => { for (let i = 0; i < 4 && await page.evaluate(() => !!document.querySelector('.coach button')); i++) { sh('adb shell input keyevent KEYCODE_BACK'); await sleep(700); } };
 for (const [h, name] of [['#/collection', 'collection'], ['#/boutique', 'boosters'], ['#/descente', 'aventure'], ['#/parametres', 'reglages']]) {
-  await page.evaluate((x) => { location.hash = x; }, h); await sleep(2500); shot(name);
+  await page.evaluate((x) => { location.hash = x; }, h); await sleep(3500); await closeTips(); shot(name);
+  step(`écran ${name}`, { appEnVie: alive() });
 }
 // bouton retour : depuis Réglages, on doit revenir à l'écran précédent, pas quitter le jeu
 sh('adb shell input keyevent KEYCODE_BACK'); await sleep(1500);
@@ -73,7 +87,5 @@ sh('adb shell input keyevent KEYCODE_BACK'); await sleep(1500);
 step('retour à l’accueil (l’app passe en arrière-plan)', { focus: sh('adb shell dumpsys window | grep -m1 mCurrentFocus || true') });
 
 fs.writeFileSync(`${OUT}/logcat.txt`, sh('adb logcat -d -s Capacitor:* Capacitor/Console:* chromium:* AndroidRuntime:E || true'));
-fs.writeFileSync(`${OUT}/rapport.json`, JSON.stringify(report, null, 1));
-console.log('RAPPORT', JSON.stringify(report));
 console.log('ERREURS JS :', report.errors.length ? report.errors : 'aucune');
 ws.close();
