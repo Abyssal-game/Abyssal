@@ -94,7 +94,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     const idx = list ? list.indexOf(current) : -1;
     const nav = list && list.length > 1 ? `<div class="detail-nav"><button class="icon-btn" data-act="prev" aria-label="Carte précédente" ${idx <= 0 ? 'disabled' : ''}>${icon('prev')}</button><span class="small muted">${idx + 1} / ${list.length}</span><button class="icon-btn" data-act="next" aria-label="Carte suivante" ${idx >= list.length - 1 ? 'disabled' : ''}>${icon('next')}</button></div>` : '';
 
-    const variantsRow = owned ? `<div class="variant-row" role="group" aria-label="Variantes">${card.variants.map((v) => {
+    const variantsRow = owned ? `<div class="variant-row" role="group" aria-label="Variantes">${['normal', 'holo', 'gold', 'galaxy'].filter((v) => card.variants.includes(v)).map((v) => { // v288 : ordre de rareté
       const has = ownedVariants.includes(v);
       return `<button class="chip" data-act="variant" data-v="${v}" aria-pressed="${v === shownVariant}" ${has ? '' : 'disabled'} title="${has ? 'Afficher' : 'Pas encore obtenue'}">${has ? '' : icon('lock')}${VARIANTS[v].short}${has && e.v[v] > 1 ? ` ×${e.v[v]}` : ''}</button>`;
     }).join('')}</div>${ownedVariants.length > 1 ? (g.shownVariant(current) === shownVariant
@@ -126,8 +126,8 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
           <span class="dt-chip" style="--c:${fac.colors.secondary}">${sigil(card.faction)}${esc(fac.name)}</span>
           <span class="dt-chip">×${e.n} exemplaire${e.n > 1 ? 's' : ''}</span>
           <span class="dt-chip gold">Niv. ${li.level}${li.level >= li.max ? ' · Apogée' : ''}</span>
-          <button class="dt-chip dt-chipb ${g.isFav(current) ? 'on' : ''}" data-act="fav" aria-pressed="${g.isFav(current)}">${icon('star')}Favori</button>
-          <button class="dt-chip dt-chipb burn" data-act="burn">${picon('furnace')}Brûler</button>
+          <span class="dt-acts"><button class="dt-chip dt-chipb ${g.isFav(current) ? 'on' : ''}" data-act="fav" aria-pressed="${g.isFav(current)}">${icon('star')}Favori</button>
+          <button class="dt-chip dt-chipb burn" data-act="burn">${picon('furnace')}Brûler</button></span>
         </div>
         <div class="dt-tabs" role="tablist">${tabs.map(([k, ic, l]) => `<button class="dt-tab" role="tab" data-act="tab" data-v="${k}" aria-selected="${dtab === k}">${picon(ic)}<span>${l}</span></button>`).join('')}</div>
         <div class="panel dt-pane">${TAB[dtab]}</div>`;

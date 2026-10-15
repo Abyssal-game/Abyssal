@@ -2686,3 +2686,5 @@ body.battle-mode .dv.cb { gap: 5px; }
 @media (max-width: 360px) { .dv.cb .cb-res .cb-ult b { font-size: .5rem; letter-spacing: 0; } }
 /* étiquette FÊLÉ / BRISÉ : le nom remonte au-dessus au lieu d'être recouvert */
 .dv.cb .dv-c.has-brk.fele .dv-nm, .dv.cb .dv-c.has-brk.broken .dv-nm { bottom: 43px !important; }
+/* v288 : Favori et Brûler côte à côte, sur leur propre ligne */
+.dt-sum .dt-acts { flex: 1 0 100%; display: flex; justify-content: center; gap: 6px; }
