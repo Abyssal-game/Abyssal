@@ -85,7 +85,7 @@ export const RIVALS = [
     hello: 'Avant les Sceaux, il n’y avait que moi. Il n’y aura que moi après.', win: 'Alors… le Néant peut perdre.', lose: 'Retourne au silence, petite flamme.' },
 ];
 // Revanche « éveillée » : après une victoire, l'adversaire revient plus fort (main plus rare, jeu plus fin)
-export const awakened = (R) => ({ ...R, awake: true, level: Math.min(5, R.level + 1), reward: Math.round(R.reward * 1.5), name: R.name, title: `${R.title} · éveillé` });
+export const awakened = (R) => ({ ...R, awake: true, level: Math.min(5, R.level + 1), ai: R.aiAwake, reward: Math.round(R.reward * 1.5), name: R.name, title: `${R.title} · éveillé` });
 export const RIVAL = Object.fromEntries(RIVALS.map((r) => [r.key, r]));
 export const rivalUnlocked = (s, i) => i === 0 || !!s.sceaux?.beaten?.[RIVALS[i - 1].key];
 
@@ -141,7 +141,7 @@ export function newGame(cat, { hand, rival, seed = Date.now(), daily = false }) 
   const rnd = mulberry(seed);
   const opp = rivalHand(cat, R, daily ? `jour:${seed}` : '');
   const st = {
-    v: 1, rival: R.key, rule: R.rule, daily, seed, oppHand: opp.slice(), level: R.level, awake: !!R.awake, rname: R.name,
+    v: 1, rival: R.key, rule: R.rule, daily, seed, oppHand: opp.slice(), level: R.level, ai: R.ai ? { level: R.ai[0], slip: R.ai[1] } : null, awake: !!R.awake, rname: R.name,
     board: Array(9).fill(null), hands: { p: hand.slice(0, 5), o: opp }, turn: rnd() < 0.5 ? 'p' : 'o', placed: 0,
     cells: { blessed: null, cursed: null }, over: null, last: null, log: [],
     fac: { p: dominant(cat, hand), o: dominant(cat, opp) },
@@ -253,18 +253,38 @@ function exposure(cat, st, cell, who) {
   });
   return risk;
 }
-export function aiMove(cat, st, level = 2, rnd = Math.random) {
+// Recherche : valeur d'une position pour `who` en jouant `plies` poses de plus (alpha-bêta).
+// Sans pose restante (ou en fin de partie), on compte simplement l'avance sur le plateau.
+function search(cat, st, who, plies, alpha, beta) {
+  if (st.over || plies <= 0) return boardDiff(st, who) + (st.over ? (st.over === (who === 'p' ? 'won' : 'lost') ? 50 : st.over === 'draw' ? 0 : -50) : 0);
+  const max = st.turn === who;
+  let best = max ? -Infinity : Infinity;
+  for (const [h, c] of legalMoves(st, st.turn)) {
+    const t = cloneGame(st);
+    place(cat, t, t.turn, h, c);
+    const v = search(cat, t, who, plies - 1, alpha, beta);
+    if (max) { if (v > best) best = v; if (best > alpha) alpha = best; } else { if (v < best) best = v; if (best < beta) beta = best; }
+    if (alpha >= beta) break;
+  }
+  return best;
+}
+// Force de l'adversaire (level) :
+//   1 : souvent au hasard ; 2 : prend le plus de cartes ; 3 : se méfie des côtés faibles exposés ;
+//   4 : prévoit ta meilleure réponse ; 5 : prévoit deux coups de plus ; 6 : calcule la fin de partie parfaitement.
+// slip : part de coups imparfaits (il choisit alors parmi ses 3 meilleurs coups) — rend un adversaire plus humain.
+export function aiMove(cat, st, level = 2, rnd = Math.random, slip = 0) {
   const who = st.turn;
   const moves = legalMoves(st, who);
   if (!moves.length) return null;
   if (level <= 1 && rnd() < 0.6) return moves[Math.floor(rnd() * moves.length)];
-  let best = null, bs = -Infinity;
+  const scored = [];
+  const left = 9 - st.placed;
   for (const [h, c] of moves) {
     const t = cloneGame(st);
     const flips = place(cat, t, who, h, c).filter((f) => !f.blocked);
     let v = flips.length * 10 + (c === CENTER && level >= 2 ? 4 : 0);
     if (level >= 3) v -= exposure(cat, t, c, who) * 6;
-    if (level >= 4 && !t.over) {
+    if (level === 4 && !t.over) {
       // l'adversaire répond au mieux : on garde le coup qui laisse le plus d'avance après sa réponse
       let worst = Infinity;
       for (const [h2, c2] of legalMoves(t, t.turn)) {
@@ -274,10 +294,17 @@ export function aiMove(cat, st, level = 2, rnd = Math.random) {
       }
       v = boardDiff(t, who) * 10 + (worst === Infinity ? 0 : worst * 12) - exposure(cat, t, c, who) * 3;
     }
+    if (level >= 5) {
+      // 5 : trois poses d'avance ; 6 : jusqu'au bout dès que la fin est assez proche
+      const plies = level >= 6 && left <= 6 ? left - 1 : 2;
+      v = search(cat, t, who, plies, -Infinity, Infinity) * 12 - exposure(cat, t, c, who) * 2 + (c === CENTER ? 1 : 0);
+    }
     v += rnd() * (level >= 3 ? 0.5 : 3);
-    if (v > bs) { bs = v; best = [h, c]; }
+    scored.push([v, h, c]);
   }
-  return best;
+  scored.sort((a, b) => b[0] - a[0]);
+  const k = slip > 0 && rnd() < slip ? Math.floor(rnd() * Math.min(3, scored.length)) : 0;
+  return [scored[k][1], scored[k][2]];
 }
 // Défi du jour : un adversaire déjà débloqué et une règle spéciale, les mêmes pour toute la journée
 export function dailyChallenge(day, unlockedCount) {

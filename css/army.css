@@ -2736,3 +2736,6 @@ body.battle-mode .dv.cb { gap: 5px; }
 .dv.cb .cb-tl .cb-tlr.foe.boss:not(.now) .cb-tlp { box-shadow: 0 0 0 2px #FF5468, 0 0 10px rgba(255, 60, 90, .7); }
 .dv.cb .cb-tl .cb-tlr.warn:not(.now) .cb-tlp { box-shadow: 0 0 0 3px #FF6B7F, 0 0 12px rgba(255, 60, 90, .9); }
 .dv.cb .cb-tl .cb-tlp img { filter: brightness(1.18) contrast(1.05); object-position: 50% 25%; }
+
+/* v304 : Duels des Sceaux — valeurs des cartes plus grandes (lisibles sur iPhone SE) */
+.sc-v { font-size: clamp(.66rem, 19cqw, 1.08rem); min-width: 1.3em; }
