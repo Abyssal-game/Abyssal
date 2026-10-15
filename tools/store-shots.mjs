@@ -34,7 +34,7 @@ async function open(mode = '') {
   p = await ctx.newPage();
   p.on('pageerror', (e) => errs.push(e.message));
   await p.goto(URL0 + 'robots.txt');
-  await p.evaluate(([k, v]) => { localStorage.clear(); localStorage.setItem(k, v); }, [SAVE_KEY, saveFor(mode)]);
+  await p.evaluate(([k, v]) => { localStorage.clear(); localStorage.setItem(k, v); localStorage.setItem('abyssal.nogate', '1'); }, [SAVE_KEY, saveFor(mode)]);
   await p.goto(URL0); await p.waitForTimeout(3000);
   await p.mouse.click(220, 478); await p.waitForTimeout(2500);
 }

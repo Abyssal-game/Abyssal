@@ -11,6 +11,7 @@ export function coach(app, key, html, { title = '' } = {}) {
   html = frSpaces(html); title = frSpaces(title);
   const g = app.game;
   if (g.s.tips?.[key]) return Promise.resolve(false);
+  if (document.body.classList.contains('gated')) return Promise.resolve(false); // v325 : pas de bulle derrière l'écran de compte
   g.s.tips = { ...(g.s.tips || {}), [key]: Date.now() };
   g.persist();
   return new Promise((resolve) => {

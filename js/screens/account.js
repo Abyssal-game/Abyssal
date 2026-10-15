@@ -18,7 +18,7 @@ const ago = (t) => {
 };
 
 export default function account(app, root) {
-  let busy = false, lastEmail = '', mode = app.params?.[0] === 'motdepasse' ? 'newpass' : 'login';
+  let busy = false, lastEmail = '', mode = app.params?.[0] === 'motdepasse' ? 'newpass' : app.params?.[0] === 'inscription' ? 'signup' : 'login';
   function render() {
     const u = cloud.currentUser();
     // v318 : nouveau mot de passe après un lien de récupération (adresse #/compte/motdepasse), même connecté

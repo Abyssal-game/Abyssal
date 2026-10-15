@@ -55,6 +55,13 @@ const page = {
 };
 step('page', { url: page.url() });
 
+// v325 : premier écran = compte obligatoire ; capture, puis on le passe pour visiter le jeu
+sh(`adb shell input tap ${W / 2} ${H / 2}`);
+await sleep(5000);
+shot('compte-obligatoire');
+step('écran de compte', { affiché: await page.evaluate(() => !!document.querySelector('.gate')) });
+await page.evaluate(() => { localStorage.setItem('abyssal.nogate', '1'); setTimeout(() => location.reload(), 50); return true; });
+await sleep(4000);
 sh(`adb shell input tap ${W / 2} ${H / 2}`);
 await sleep(5000);
 shot('accueil');

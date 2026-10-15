@@ -31,6 +31,8 @@ import { startSync } from './cloud/sync.js';
 import { consumeAuthHash } from './cloud/cloud.js';
 import { startPresence } from './cloud/presence.js';
 import { showWelcome } from './screens/welcome.js';
+import { showGate } from './ui/gate.js';
+import { onAuth } from './cloud/cloud.js';
 import { setScene } from './ui/scene.js';
 import { initNative, isNative } from './native.js';
 
@@ -288,7 +290,9 @@ async function boot() {
     render();
     const wait = Math.max(0, (window.__introUntil || 0) - performance.now());
     let done = false;
-    const finish = () => { if (done) return; done = true; applySettings(); render(); bootEl.classList.add('out'); setTimeout(() => bootEl.remove(), 900); setTimeout(() => showWelcome(app), 700); };
+    const finish = () => { if (done) return; done = true; applySettings(); render(); bootEl.classList.add('out'); setTimeout(() => bootEl.remove(), 900); setTimeout(() => showGate(app, () => showWelcome(app)), 700); };
+    // v325 : compte obligatoire — après une déconnexion ou une suppression du compte, l'écran de compte revient
+    onAuth((sess) => { if (!sess && done) setTimeout(() => showGate(app), 300); });
     // v293 : iPhone et navigateurs n'autorisent le son qu'après un premier toucher. L'écran d'ouverture attend donc
     // « Touche pour entrer » : ce toucher lance la musique et les sons dès l'arrivée au menu (sauf si on a déjà touché l'écran, ex. code d'accès).
     setTimeout(() => {

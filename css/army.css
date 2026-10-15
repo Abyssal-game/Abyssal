@@ -2810,3 +2810,13 @@ body.battle-mode .dv.cb { gap: 5px; }
 @media (max-width: 360px) { .dc-link { min-height: 88px; } .dc-link .picon { width: 34px; height: 34px; } .dc-link b { font-size: .68rem; } }
 .dc-sheet h2.center { padding: 0 38px; font-size: 1.2rem; }
 .acc-pwrule { margin: -4px 0 0; }
+
+/* v325 : écran de compte obligatoire au lancement (au-dessus du jeu et des fenêtres, sous les annonces) */
+.gate { position: fixed; inset: 0; z-index: 75; overflow-y: auto; -webkit-overflow-scrolling: touch; background: radial-gradient(120% 60% at 50% 0%, rgba(58, 26, 74, .55), transparent 60%), #090810; opacity: 0; transition: opacity .35s; }
+.gate.on { opacity: 1; }
+.gate-in { max-width: 460px; margin: 0 auto; padding: calc(var(--safe-t, 0px) + 20px) 16px calc(var(--safe-b, 0px) + 28px); }
+.gate-logo { display: block; width: min(70vw, 300px); margin: 0 auto 6px; }
+.gate-lead { text-align: center; margin: 0 0 14px; color: #D9CFE6; font-size: .92rem; line-height: 1.4; }
+.gate .screen-head { display: none; }
+body.gated #tabbar, body.gated #topbar { visibility: hidden; }
+body.gated { overflow: hidden; }

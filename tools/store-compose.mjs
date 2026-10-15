@@ -20,7 +20,7 @@ export const SHOTS = [
   ['collection', 'Complète le Bestiaire', '7 factions, 6 raretés, 17 ensembles'],
   ['sceaux', 'Les Duels des Sceaux', 'Un second jeu de cartes, contre 8 rivaux'],
   ['bestiaire', 'Un monde à découvrir', 'Chaque créature a son histoire'],
-  ['accueil', 'Gratuit, sans publicité', 'Jouable hors ligne, sans compte'],
+  ['accueil', 'Gratuit, sans publicité', 'Ta collection sauvegardée en ligne'],
 ];
 
 const FONTS = `<link rel="stylesheet" href="${url('css/fonts.css')}">`;

@@ -94,8 +94,8 @@ UN MONDE À DÉCOUVRIR
 • Gratuit, sans publicité
 • Aucun achat : toutes les cartes se gagnent en jouant
 • Un booster gratuit chaque jour
-• Jouable hors ligne, sans compte
-• Compte en ligne facultatif, pour sauvegarder ta partie et entrer dans les classements
+• Jouable hors ligne une fois ton compte créé
+• Ta collection sauvegardée en ligne avec ton compte, et les classements du monde entier
 
 Le Bestiaire interdit t'attend. Jusqu'où oseras-tu descendre ?
 ```
@@ -199,7 +199,7 @@ Résultat attendu : PEGI 12 en Europe (au pire PEGI 7). Public cible (Contenu de
 
 | Type de données | Collectée | Facultative | Usage |
 |---|---|---|---|
-| Informations personnelles → Adresse e-mail | Oui | Oui (compte facultatif) | Gestion du compte |
+| Informations personnelles → Adresse e-mail | Oui | Oui (compte nécessaire pour jouer) | Gestion du compte |
 | Informations personnelles → ID utilisateur | Oui | Oui | Gestion du compte, fonctionnalités de l'appli |
 | Activité dans l'appli → Autre contenu généré par l'utilisateur (pseudo, sauvegarde, scores) | Oui | Oui | Fonctionnalités de l'appli |
 | Position, contacts, photos, audio, finances, santé, navigation | Non | — | — |
@@ -217,9 +217,9 @@ Résultat attendu : PEGI 12 en Europe (au pire PEGI 7). Public cible (Contenu de
 
 ## 7. Notes pour la vérification d'Apple (App Review Information → Notes)
 ```
-ABYSSAL se joue entièrement sans compte : touchez l'écran d'ouverture pour entrer, puis ouvrez les 2 boosters de bienvenue (onglet Boosters) pour former votre équipe.
+ABYSSAL demande un compte au premier lancement (e-mail et mot de passe ; utilisez le compte de démonstration ci-dessus, onglet « Se connecter »). Touchez l'écran d'ouverture, connectez-vous, puis ouvrez les 2 boosters de bienvenue (onglet Boosters) pour former votre équipe.
 
-Compte en ligne facultatif (sauvegarde et classements) : Sanctuaire → Compte en ligne. Un compte de démonstration est fourni ci-dessus.
+Le compte sert à sauvegarder la partie en ligne et aux classements. Suppression du compte dans le jeu : Sanctuaire → Compte → Supprimer mon compte.
 
 Modération des pseudos (seul contenu créé par les joueurs) : les pseudos insultants sont refusés. Dans un classement (Aventure → La Descente → Classement du jour), touchez le pseudo d'un autre joueur pour le signaler ou le masquer. Un pseudo signalé par plusieurs joueurs est remplacé automatiquement. Contact : abyssal.gamecards@gmail.com
 
