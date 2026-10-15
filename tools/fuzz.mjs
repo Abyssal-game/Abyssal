@@ -62,7 +62,8 @@ function playerTurn(st, r, where) {
     const ev = D.act(st, u.uid, a.key, t);
     if (!ev.length) report('Action autorisée mais refusée', `${where} ${a.key}`);
     else if (!st.init && st.ap > ap && a.key !== 'swap') report('Points d’action qui augmentent', `${where} ${a.key}`);
-    else if (st.init && a.ap > 0 && u.pa > pa - a.ap + 1) report('Compétence qui ne coûte pas ses PA', `${where} ${a.key} ${pa}→${u.pa}`);
+    else if (st.init && a.ap > 0 && u.pa > pa - a.ap + 1 && !ev.some((e) => e.t === 'round')) report( // (un nouveau tour qui commence redonne des PA : normal)
+      'Compétence qui ne coûte pas ses PA', `${where} ${a.key} ${pa}→${u.pa}`);
     // double toucher : la même action renvoyée tout de suite ne doit jamais dépenser deux fois plus que prévu
     checkEv(ev, where + ' ' + a.key); stats.actions++;
     check(st, where + ' après ' + a.key);

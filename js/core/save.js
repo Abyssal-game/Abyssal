@@ -82,7 +82,8 @@ const MIGRATIONS = {
 export function migrate(raw) {
   if (!raw || typeof raw !== 'object') throw new Error('Sauvegarde illisible');
   let s = { ...raw };
-  if (typeof s.version !== 'number') s.version = 1;
+  // v310 : « version » absente ou en texte : une sauvegarde qui a déjà une collection n'est pas un prototype v1
+  if (typeof s.version !== 'number') s.version = s.collection && typeof s.collection === 'object' ? (Number(s.version) || SAVE_VERSION) : 1;
   if (s.version > SAVE_VERSION) throw new Error('Cette sauvegarde provient d’une version plus récente du jeu.');
   while (s.version < SAVE_VERSION) {
     const m = MIGRATIONS[s.version];
@@ -120,16 +121,27 @@ export function migrate(raw) {
   return s;
 }
 
+// v310 : une sauvegarde illisible n'est plus jamais écrasée sans trace. Elle est mise de côté (clé « .illisible ») ;
+// si une version plus récente du jeu sait la relire plus tard (cas d'un ancien service worker), elle est restaurée.
+export const SAVE_STASH_KEY = `${SAVE_KEY}.illisible`;
 export function loadSave(storage) {
+  try {
+    const stash = storage.getItem(SAVE_STASH_KEY);
+    if (stash) { const save = migrate(JSON.parse(stash)); return { save, source: SAVE_STASH_KEY, restored: true }; }
+  } catch (e) { /* toujours illisible : elle reste de côté */ }
+  let bad = null;
   for (const key of [SAVE_KEY, SAVE_BACKUP_KEY]) {
+    let txt = null;
     try {
-      const txt = storage.getItem(key);
+      txt = storage.getItem(key);
       if (txt) return { save: migrate(JSON.parse(txt)), source: key };
     } catch (e) {
-      // sauvegarde corrompue : on tente la copie de secours
+      // sauvegarde corrompue (ou d'une version plus récente) : on tente la copie de secours
+      if (txt && !bad) bad = txt;
     }
   }
-  return { save: defaultSave(), source: null };
+  if (bad) { try { if (!storage.getItem(SAVE_STASH_KEY)) storage.setItem(SAVE_STASH_KEY, bad); } catch (e) { /* stockage plein */ } }
+  return { save: defaultSave(), source: null, unreadable: !!bad };
 }
 
 export function writeSave(storage, save) {

@@ -284,6 +284,8 @@ async function boot() {
     // « click » (après le relâchement du doigt) : c'est ce geste qu'iPhone accepte pour débloquer le son
     bootEl.addEventListener('click', () => { if (performance.now() >= (window.__introUntil || 0) - 2000) finish(); });
     if (!persistent) toast('Le stockage local est désactivé dans ce navigateur : ta progression ne sera pas conservée après fermeture.', { kind: 'error', icon: 'info', ms: 9000 });
+    if (app.game.unreadable) toast('Ta partie précédente n’a pas pu être lue par cette version du jeu. Elle est gardée de côté : ferme et rouvre l’app pour recevoir la mise à jour, elle sera restaurée.', { kind: 'error', icon: 'info', ms: 12000 });
+    if (app.game.restoredStash) toast('Ta partie a été restaurée.', { kind: 'success', icon: 'check' });
     if (app.game.loadedFrom && app.game.loadedFrom.endsWith('backup')) toast('La sauvegarde principale était abîmée : la copie de secours a été restaurée.', { kind: 'error', icon: 'info', ms: 8000 });
     document.addEventListener('pointerdown', () => applySettings(), { once: true });
     document.addEventListener('click', () => applySettings(), { once: true });

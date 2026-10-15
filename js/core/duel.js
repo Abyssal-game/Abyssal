@@ -98,7 +98,7 @@ function setupExtras(st) {
   }
   allies.forEach((u) => { if (u.talent === 'garde') u.shield = 1; });
   // Formes corrompues
-  allies.forEach((u) => { if (u.form === 'rebirth') { u.hp = Math.max(1, Math.round(u.maxHp * 0.7)); u.reborn = false; } });
+  allies.forEach((u) => { if (u.form === 'rebirth') { u.hp = Math.min(u.hp, Math.max(1, Math.round(u.maxHp * 0.7))); u.reborn = false; } }); // v310 : un coût, jamais un soin
   // Pactes
   if (st.pact === 'reflet') st.fervor = Math.max(0, st.fervor - 2);
   if (st.pact === 'cendre') { st.fervor = FERVOR_MAX; allies.forEach((u) => { u.healMult = 0.5; }); }
@@ -345,6 +345,8 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   if (rel && d > 0 && !(st.relSeen ||= {})[rel]) { st.relSeen[rel] = true; ev.push({ t: 'status', u: u.uid, s: rel.startsWith('r-') ? 'Rivaux !' : 'Proie !', syn: true, rel }); }
   // Loi de l'écho : frapper l'Architecte blesse en retour
   if (u.boss && st.law === 'echo' && a && a.side === 'ally' && d > 0 && a.hp > 0) { ev.push({ t: 'status', u: a.uid, s: 'Écho', k: 'bad' }); hurt(st, a, 2, ev); }
+  // v310 : une mort déjà traitée (ex. Épines → explosion qui achève la cible dans un appel imbriqué) ne l'est pas deux fois
+  if (u.hp <= 0 && u.down) return d;
   if (u.hp <= 0) {
     if (u.side === 'ally' && u.form === 'rebirth' && !u.reborn) {
       u.reborn = true; u.hp = Math.max(1, Math.round(u.maxHp * 0.3)); u.poison = 0;
@@ -362,6 +364,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
       ev.push({ t: 'revive', u: u.uid }); ev.push({ t: 'status', u: u.uid, s: 'Pacte du Gardien', syn: true });
       return d;
     }
+    u.down = true;
     ev.push({ t: 'die', u: u.uid });
     if (u.boss) release(st, ev);
     if (u.side === 'enemy') st.kills.push(u.id);
@@ -419,6 +422,7 @@ function onEnemyDeath(st, u, a, ev) {
   const n = front(st, 'enemy').slice().sort((x, y) => Math.abs(o.indexOf(x.uid) - i) - Math.abs(o.indexOf(y.uid) - i))[0];
   if (!n) return;
   n.poison = Math.min(14, (n.poison || 0) + k);
+  if (n.boss && n.side === 'enemy' && n.poison >= DETONATE_AT) runeHit(st, 'poison', ev);
   if (fil) pfx(ev, fil, 'filaments'); else if (a) pfx(ev, a, 'chasseur');
   ev.push({ t: 'status', u: n.uid, s: `Le poison passe : +${k}`, syn: true, k: 'poison' });
 }
@@ -492,8 +496,9 @@ function discover(st, t, ev) {
 }
 function check(st, ev) {
   if (st.over) return;
-  if (!alive(st, 'enemy').length) st.over = 'won';
-  else if (!alive(st, 'ally').length) st.over = 'lost';
+  // v310 : si les deux camps tombent en même temps (explosion du dernier ennemi), c'est une défaite (comme le compte la Descente)
+  if (!alive(st, 'ally').length) st.over = 'lost';
+  else if (!alive(st, 'enemy').length) st.over = 'won';
   // une carte de réserve qui entre en jeu après une chute ne peut pas agir ce tour-ci
   for (const side of ['ally', 'enemy']) front(st, side).forEach((u) => { if (!u.inPlay) { u.inPlay = true; u.acts = ACTS_PER_UNIT; ev.push({ t: 'enter', u: u.uid }); } });
   if (st.over) ev.push({ t: 'over', r: st.over });
@@ -673,6 +678,7 @@ export function act(st, uid, key, tUid = null) {
   if (key !== 'swap') u.acts++;
   const t = tUid ? st.units[tUid] : null;
   ev.push({ t: 'act', u: uid, key, tgt: tUid, name: a.name, skill: !['attack', 'defend', 'swap'].includes(key) });
+  if (key === 'estoc' || key === 'raz' || key === 'contagion') { u.struck = true; u.lastStruck = st.round; } // v310 : une créature qui frappe n'est plus Insaisissable
   if (key === 'attack') basicAttack(st, u, t, ev);
   else if (key === 'defend') { u.defend = true; ev.push({ t: 'status', u: uid, s: 'En défense', k: 'defend' }); }
   else if (key === 'swap') doSwap(st, u, t, ev);
@@ -715,11 +721,13 @@ export function act(st, uid, key, tUid = null) {
     const tier = resolveRoll(st, info, ev, uid, tUid);
     if (tier !== 'fumble') {
       t.poison = Math.min(14, t.poison * 2);
+      const poisonRune = (x) => { if (x.boss && x.side === 'enemy' && x.poison >= DETONATE_AT) runeHit(st, 'poison', ev); }; // v310 : la Rune de la Rouille cède aussi par Contagion
+      poisonRune(t);
       ev.push({ t: 'status', u: tUid, s: `Poison ×2 (${t.poison})`, k: 'poison', syn: true });
       const row = front(st, 'enemy'), i = row.indexOf(t);
       const spread = tier === 'crit' ? row.filter((x) => x !== t) : tier === 'success' ? [row[i - 1], row[i + 1]].filter(Boolean) : [];
       const k = Math.ceil(t.poison / 2);
-      spread.forEach((x) => { x.poison = Math.min(14, (x.poison || 0) + k); ev.push({ t: 'status', u: x.uid, s: `Contagion +${k}`, k: 'poison' }); });
+      spread.forEach((x) => { x.poison = Math.min(14, (x.poison || 0) + k); poisonRune(x); ev.push({ t: 'status', u: x.uid, s: `Contagion +${k}`, k: 'poison' }); });
       if (tier !== 'partial') openUp(st, t, uid, ev);
     }
   } else if (key === 'entrave') {
@@ -776,8 +784,11 @@ function strikeDmg(st, u, t) {
   const hits = strikeOf(u).hits || 1, one = dmgOf(st, u, t, strikeMult(u, t), { basic: true });
   return (t.boss ? Math.min(one, bossCap(t)) : one) * hits;
 }
+// v310 : voisines d'une cible, calculées AVANT le coup (si la cible meurt, elle n'est plus dans la rangée)
+const neighborsOf = (st, t) => { const row = front(st, t.side), i = row.indexOf(t); return i < 0 ? [] : [row[i - 1], row[i + 1]].filter(Boolean); };
 const lowestAlly = (st) => front(st, 'ally').filter((x) => x.hp < x.maxHp).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
 function basicAttack(st, u, t, ev) {
+  const nb = neighborsOf(st, t);
   weakBonus(st, u, t, ev);
   const S = strikeOf(u), frozen = t.frozen > 0, hits = S.hits || 1;
   let m = strikeMult(u, t), rush = 0;
@@ -812,9 +823,9 @@ function basicAttack(st, u, t, ev) {
     if (boosted(u, 'attiser') && t.hp > 0) breakHit(st, t, 1, ev, u);
   }
   if (u.role === 'zone') {
-    const row = front(st, t.side), i = row.indexOf(t), full = u.boost > 0;
-    if (full && (row[i - 1] || row[i + 1])) ev.push({ t: 'status', u: u.uid, s: 'Raz-de-marée !', syn: true });
-    [row[i - 1], row[i + 1]].filter(Boolean).forEach((n) => hurt(st, n, full ? dmgOf(st, u, n) : Math.ceil(dmgOf(st, u, n) / 2), ev, u.uid));
+    const full = u.boost > 0, near = nb.filter((n) => n.hp > 0);
+    if (full && near.length) ev.push({ t: 'status', u: u.uid, s: 'Raz-de-marée !', syn: true });
+    near.forEach((n) => hurt(st, n, full ? dmgOf(st, u, n) : Math.ceil(dmgOf(st, u, n) / 2), ev, u.uid));
   }
   if ((st.relics || []).includes('coeur')) { st.coeurTick = !st.coeurTick; if (st.coeurTick) return; }
   gainFervor(st, 1, ev);
@@ -835,6 +846,7 @@ function duoStrike(st, u, t, ev) {
   st.duoUsed = true; p.skipTurn = st.round;
   if (t.boss) runeHit(st, 'conjoint', ev); st.stats.duos = (st.stats.duos || 0) + 1; st.stats.named = (st.stats.named || 0) + 1;
   ev.push({ t: 'duo', u: u.uid, p: p.uid, tgt: t.uid });
+  const nb = neighborsOf(st, t);
   let total = 0;
   for (const x of [u, p]) {
     if (t.hp <= 0) break;
@@ -843,17 +855,17 @@ function duoStrike(st, u, t, ev) {
     total += d;
     if (d && t.hp > 0) breakHit(st, t, 2, ev, x);
   }
-  for (const x of [u, p]) duoEffect(st, x, t, total, ev);
+  for (const x of [u, p]) duoEffect(st, x, t, total, ev, nb);
   check(st, ev);
 }
-function duoEffect(st, x, t, total, ev) {
+function duoEffect(st, x, t, total, ev, nb = neighborsOf(st, t)) {
   const r = x.role;
   if (r === 'protecteur') { if (t.hp > 0) setBreach(st, t, x.uid, ev); const w = lowestAlly(st); if (w) { w.shield = 1; ev.push({ t: 'status', u: w.uid, s: 'Bouclier', k: 'guard' }); } }
   else if (r === 'soin') front(st, 'ally').forEach((a) => heal(a, a.maxHp * 0.15, ev, x));
   else if (r === 'poison' && t.hp > 0) addPoison(st, t, 4, ev, x);
   else if (r === 'controle' && t.hp > 0) { if (t.boss || t.elite || t.frostCD > 0) { t.slow = true; ev.push({ t: 'status', u: t.uid, s: 'Ralentie', k: 'frost' }); } else { freeze(st, t, ev, 1); t.frozenBy = x.uid; } }
   else if (r === 'soutien') front(st, 'ally').forEach((a) => gainPA(a, 1, ev));
-  else if (r === 'zone') { const row = front(st, t.side), i = row.indexOf(t); [row[i - 1], row[i + 1]].filter(Boolean).forEach((n) => hurt(st, n, Math.max(1, Math.round(total / 2)), ev, x.uid)); }
+  else if (r === 'zone') nb.filter((n) => n.hp > 0).forEach((n) => hurt(st, n, Math.max(1, Math.round(total / 2)), ev, x.uid));
 }
 function doSwap(st, out, inn, ev) {
   const o = st.order.ally, i = o.indexOf(out.uid), j = o.indexOf(inn.uid);
@@ -911,12 +923,14 @@ export function useUlt(st) {
   if (st.ult === 'sceau') allies.forEach((u) => { heal(u, u.maxHp * 0.3 * p, ev); u.ward = Math.max(u.ward || 0, Math.round(u.maxHp * SEAL_WARD)); ev.push({ t: 'status', u: u.uid, s: `Sceau : ${u.ward}` }); });
   else if (st.ult === 'revive') {
     const fallen = st.order.ally.map((id) => st.units[id]).filter((u) => u.hp <= 0);
-    if (fallen.length) fallen.forEach((u) => { u.hp = Math.round(u.maxHp * 0.5 * p); u.poison = 0; u.inPlay = false; ev.push({ t: 'revive', u: u.uid }); });
+    if (fallen.length) fallen.forEach((u) => { u.hp = Math.round(u.maxHp * 0.5 * p); u.poison = 0; u.inPlay = false; u.down = false; toBack(st, u); ev.push({ t: 'revive', u: u.uid }); });
     else allies.forEach((u) => heal(u, u.maxHp * 0.4 * p, ev));
   } else if (st.ult === 'nova') foes.forEach((u) => { hurt(st, u, Math.round((3 + st.round) * p * (u.broken || u.cracked ? 1.5 : 1)), ev); breakHit(st, u, 2, ev, { side: 'ally' }); });
   else if (st.ult === 'smite') { const t = foes.slice().sort((x, y) => (y.broken || y.cracked ? 1e4 : 0) + y.hp - ((x.broken || x.cracked ? 1e4 : 0) + x.hp))[0]; if (t) { hurt(st, t, Math.round((8 + 2 * st.round) * p * (t.broken || t.cracked ? 1.5 : 1)), ev); breakHit(st, t, 4, ev, { side: 'ally' }); } }
   else if (st.ult === 'aegis') { allies.forEach((u) => { u.shield = 1; u.stunned = false; u.frozen = 0; ev.push({ t: 'status', u: u.uid, s: 'Égide' }); if (st.init) gainPA(u, 2); }); if (!st.init) st.ap += 2; }
   check(st, ev);
+  // v310 : si l'actrice a quitté le combat pendant le pouvoir (tombée, repoussée), le tour passe à la suivante
+  if (st.init && !st.over && st.turn === 'ally' && st.actor) { const ac = st.units[st.actor]; if (!ac || ac.hp <= 0 || !front(st, 'ally').includes(ac)) advance(st, ev); }
   return ev;
 }
 
@@ -987,7 +1001,8 @@ function breathOfLife(st, ev) {
 // Effets de tour côté ennemi : Épuisement, poison des ennemis, pouvoirs et phases des gardiens
 function enemyRound(st, ev) {
   for (const u of alive(st, 'enemy')) u.boost = 0;
-  for (const u of alive(st, 'ally')) u.absorbed = 0;
+  // v310 : en ordre d'initiative, les coups du tour précédent restent comptés pour Représailles (avant, ils étaient effacés)
+  for (const u of alive(st, 'ally')) { u.absPrev = st.init ? (u.absorbed || 0) : 0; u.absorbed = 0; }
   // Épuisement : un combat qui s'éternise blesse tout le monde, de plus en plus (évite les combats sans fin)
   if (st.round >= FATIGUE_AT) {
     const d = st.round - FATIGUE_AT + 1;
@@ -1026,11 +1041,15 @@ function bossPhase(st, ev) {
   else if (st.bossKey === 'eclipse') { b.totality = true; }
 }
 // Le Dévoreur relâche sa proie (Brisure ou mort du gardien)
+// v310 : une créature qui revient (Renaissance, proie relâchée) reprend place en fin de file : elle ne repousse plus
+// en réserve celle qui l'a remplacée (l'actrice perdait son tour, ou une créature rejouait dans le même tour)
+function toBack(st, u) { const o = st.order[u.side], i = o.indexOf(u.uid); if (i >= 0) { o.splice(i, 1); o.push(u.uid); } }
 function release(st, ev) {
   const v = st.swallowed && st.units[st.swallowed];
   st.swallowed = null;
   if (!v || !v.swallowed) return;
   v.swallowed = false;
+  toBack(st, v);
   if (v.hp > 0) { ev.push({ t: 'release', u: v.uid }); ev.push({ t: 'status', u: v.uid, s: 'Libérée !', syn: true, k: 'heal' }); }
   check(st, ev);
 }
@@ -1377,7 +1396,7 @@ export function startInitiative(st) {
   const first = st.round === 1 ? (R_.includes('sablier') ? 1 : 0) - (R_.includes('miroir') ? 1 : 0) : 0;
   for (const id of st.order.ally) { const u = st.units[id]; u.pa = Math.max(0, Math.min(PA_MAX, PA_START + first)); u.acts = 0; if (u.stunned) { u.stunned = false; u.frozen = Math.max(u.frozen || 0, 1); } }
   // équilibre : chaque créature ne joue qu'une fois par tour, les ennemis ont un peu moins de PV
-  if (st.round === 1) for (const id of st.order.enemy) { const e = st.units[id]; const k = INIT_FOE_HP; e.maxHp = Math.max(1, Math.round(e.maxHp * k)); e.hp = Math.min(e.maxHp, Math.max(1, Math.round(e.hp * k))); }
+  if (st.round === 1) for (const id of st.order.enemy) { const e = st.units[id]; const k = INIT_FOE_HP; e.maxHp = Math.max(1, Math.round(e.maxHp * k)); e.hp = e.hp <= 0 ? 0 : Math.min(e.maxHp, Math.max(1, Math.round(e.hp * k))); } // v310 : un ennemi tué par un passif d'ouverture reste mort
   if (st.bossKey && st.round === 1) bossPhase(st, ev); // gardien éveillé (Cauchemar) : sa phase 2 commence tout de suite
   if (st.round === 1) setupRunes(st);
   st.init = buildInit(st); st.ip = -1; st.actor = null;

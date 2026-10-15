@@ -227,9 +227,9 @@ export const MOVES = {
   represailles: {
     name: 'Représailles', icon: 'martel', ap: 1, cd: 2, target: 'enemy',
     desc: 'Frappe avec son attaque + la moitié des dégâts encaissés au dernier tour ennemi (8 au plus), +2 Brisure.',
-    pv: (st, u, t, api) => api.dmgOf(st, u, t, 1) + Math.min(8, Math.round((u.absorbed || 0) / 2)),
-    run(st, u, t, ev, api) { const extra = Math.min(8, Math.round((u.absorbed || 0) / 2)); u.absorbed = 0; const d = api.hurt(st, t, api.dmgOf(st, u, t, 1) + extra, ev, u.uid); if (extra) ev.push({ t: 'status', u: u.uid, s: `Représailles +${extra}`, syn: true }); if (d && t.hp > 0) api.breakHit(st, t, 2, ev, u); },
-    ai: (st, u, api) => ((u.absorbed || 0) >= 6 ? api.bestTarget(st, u) : null),
+    pv: (st, u, t, api) => api.dmgOf(st, u, t, 1) + Math.min(8, Math.round(((u.absorbed || 0) + (u.absPrev || 0)) / 2)),
+    run(st, u, t, ev, api) { const extra = Math.min(8, Math.round(((u.absorbed || 0) + (u.absPrev || 0)) / 2)); u.absorbed = 0; u.absPrev = 0; const d = api.hurt(st, t, api.dmgOf(st, u, t, 1) + extra, ev, u.uid); if (extra) ev.push({ t: 'status', u: u.uid, s: `Représailles +${extra}`, syn: true }); if (d && t.hp > 0) api.breakHit(st, t, 2, ev, u); },
+    ai: (st, u, api) => (((u.absorbed || 0) + (u.absPrev || 0)) >= 6 ? api.bestTarget(st, u) : null),
   },
   hurlement: {
     name: 'Hurlement', icon: 'provoc', ap: 1, cd: 3, target: 'none',

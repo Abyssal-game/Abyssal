@@ -12,7 +12,7 @@ export const FIRST_WIN = 50;
 export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par combat n'augmentent plus // éclats de la toute première victoire
 import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ITEMS, SHOW_ORDER, SHADOW, SUBLIME_ASH } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
-import { loadSave, writeSave, defaultSave, today } from './save.js';
+import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
 import { rngOf, DESCENT, CHESTS, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES, foeTraits } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative } from './duel.js';
 import { bossOf, BOSSES } from './bosses.js';
@@ -56,9 +56,11 @@ export class Game {
     this.rng = rng;
     this.clock = clock;
     this.listeners = {};
-    const { save, source } = loadSave(storage);
+    const { save, source, restored, unreadable } = loadSave(storage);
     this.s = save;
     this.loadedFrom = source;
+    this.unreadable = !!unreadable; // v310 : la partie précédente n'a pas pu être lue (mise de côté, rien d'écrasé)
+    if (restored) { this.restoredStash = true; try { writeSave(storage, save); storage.removeItem(SAVE_STASH_KEY); } catch (e) { /* rien */ } }
     try { this.convertHeroes(); } catch (e) { /* rien */ }
     try { this.fixVariants(); } catch (e) { /* rien */ }
     try { this.dropRemoved(); } catch (e) { /* rien */ }
@@ -385,7 +387,7 @@ export class Game {
     this.persist();
     return { ...x, progress };
   }
-  burnValue(id, variant = 'normal') { return Math.round((ECONOMY.burnAsh[this.catalog.get(id).rarity] || 0) * (ECONOMY.burnFinish[variant] || 1)); }
+  burnValue(id, variant = 'normal') { return Math.round((ECONOMY.burnAsh[this.catalog.get(id)?.rarity] || 0) * (ECONOMY.burnFinish[variant] || 1)); }
   // Brûle n exemplaires d'une finition. Le dernier exemplaire peut partir : la créature quitte alors la collection.
   burn(id, variant = 'normal', n = 1) {
     const e = this.s.collection[id];
@@ -413,7 +415,7 @@ export class Game {
     let ash = 0, n = 0;
     for (const id of ids || Object.keys(this.s.collection)) {
       const e = this.s.collection[id];
-      if (!e) continue;
+      if (!e || !this.catalog.get(id)) continue; // v310 : carte d'une version plus récente du jeu : on n'y touche pas
       for (const [v, k] of Object.entries(e.v)) if (k > 1) { const x = this.burnValue(id, v) * (k - 1); ash += x; n += k - 1; e.n -= k - 1; e.v[v] = 1; }
     }
     if (!n) return { ash: 0, n: 0, progress: [] };
@@ -427,7 +429,7 @@ export class Game {
   }
   spareAsh(ids = null) {
     let ash = 0, n = 0;
-    for (const id of ids || Object.keys(this.s.collection)) { const e = this.s.collection[id]; if (e) for (const [v, k] of Object.entries(e.v)) if (k > 1) { ash += this.burnValue(id, v) * (k - 1); n += k - 1; } }
+    for (const id of ids || Object.keys(this.s.collection)) { const e = this.s.collection[id]; if (e && this.catalog.get(id)) for (const [v, k] of Object.entries(e.v)) if (k > 1) { ash += this.burnValue(id, v) * (k - 1); n += k - 1; } }
     return { ash, n };
   }
   // Une créature qui quitte la collection quitte aussi l'équipe, la vitrine, l'avatar et sa forme
@@ -440,8 +442,8 @@ export class Game {
   }
   // Niveau d'une créature : acheté avec des cendres (coût = base de la rareté × niveau actuel)
   upgradeCost(id) {
-    const e = this.entry(id), lv = e?.lv || 1;
-    return lv >= MAX_LEVEL ? 0 : ECONOMY.levelAsh[this.catalog.get(id).rarity] * lv;
+    const e = this.entry(id), lv = e?.lv || 1, c = this.catalog.get(id);
+    return !c || lv >= MAX_LEVEL ? 0 : ECONOMY.levelAsh[c.rarity] * lv; // v310 : carte inconnue (version plus récente) ignorée
   }
   upgrade(id) {
     const e = this.entry(id);
@@ -1268,7 +1270,7 @@ export class Game {
       case 'hunted': return this.huntCount();
       case 'mastered': return Object.values(this.s.hunt).filter((k) => k >= HUNT_STAGES[2].k).length;
       case 'trophies': return Object.values(this.s.hunt).filter((k) => k >= HUNT_STAGES[3].k).length;
-      case 'cardLevel': return Math.max(0, ...Object.keys(this.s.collection).map((id) => this.cardLevel(id)));
+      case 'cardLevel': return Math.max(0, ...Object.keys(this.s.collection).filter((id) => this.catalog.get(id)).map((id) => this.cardLevel(id)));
       default: return 0;
     }
   }

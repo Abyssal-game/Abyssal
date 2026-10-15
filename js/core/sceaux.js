@@ -97,7 +97,7 @@ export const SCEAUX_REWARD = { dailyPaid: 5, firstWin: 100, daily: 40, firstAwak
 export const TROPHY_MAX = ['C', 'PC', 'R', 'HR'];
 export function trophyChoices(cat, st) {
   if (st.over !== 'won') return [];
-  const ids = st.board.filter((c) => c && c.owner === 'p' && st.hands.o.indexOf(c.id) < 0 && st.oppHand?.includes(c.id)).map((c) => c.id);
+  const ids = st.board.filter((c) => c && c.owner === 'p' && (c.from ? c.from === 'o' : true) && st.hands.o.indexOf(c.id) < 0 && st.oppHand?.includes(c.id)).map((c) => c.id); // v310 : jamais ta propre carte
   return [...new Set(ids)].filter((id) => TROPHY_MAX.includes(cat.get(id)?.rarity));
 }
 export const SCEAUX_TITLES = { initie: 'Initié des Sceaux', maitre: 'Maître des Sceaux', echo: 'Briseur d’Échos', souverain: 'Souverain des Sceaux' };
@@ -187,7 +187,7 @@ export function place(cat, st, who, handIdx, cell) {
   const vals = valuesOn(cat, st, id, cell, who);
   st.hands[who] = st.hands[who].filter((_, k) => k !== handIdx);
   const perks = perksOf(cat.get(id));
-  st.board[cell] = { id, owner: who, vals, guard: perks.includes('rempart') };
+  st.board[cell] = { id, owner: who, from: who, vals, guard: perks.includes('rempart') }; // from : qui l'a posée (trophée)
   const fury = perks.includes('fureur');
   // Rempart : la carte visée résiste une fois (le rempart tombe)
   const take = (o) => { if (o.guard) { o.guard = false; flips.push({ cell: st.board.indexOf(o), blocked: true }); return false; } return true; };
