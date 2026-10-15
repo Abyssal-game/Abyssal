@@ -219,7 +219,7 @@ Résultat attendu : PEGI 12 en Europe (au pire PEGI 7). Public cible (Contenu de
 ```
 ABYSSAL demande un compte au premier lancement (e-mail et mot de passe ; utilisez le compte de démonstration ci-dessus, onglet « Se connecter »). Touchez l'écran d'ouverture, connectez-vous, puis ouvrez les 2 boosters de bienvenue (onglet Boosters) pour former votre équipe.
 
-Le compte sert à sauvegarder la partie en ligne et aux classements. Suppression du compte dans le jeu : Sanctuaire → Compte → Supprimer mon compte.
+Pourquoi le compte est demandé : la collection de cartes (500 créatures, plusieurs semaines de jeu) est sauvegardée en ligne pour ne jamais être perdue (changement ou perte de téléphone, suppression de l'application) ; il sert aussi aux classements quotidiens, aux saisons, au Tirage des Ombres et au profil public. Seuls un e-mail et un pseudo sont demandés, et le compte se supprime dans le jeu. Suppression du compte dans le jeu : Sanctuaire → Compte → Supprimer mon compte.
 
 Modération des pseudos (seul contenu créé par les joueurs) : les pseudos insultants sont refusés. Dans un classement (Aventure → La Descente → Classement du jour), touchez le pseudo d'un autre joueur pour le signaler ou le masquer. Un pseudo signalé par plusieurs joueurs est remplacé automatiquement. Contact : abyssal.gamecards@gmail.com
 
