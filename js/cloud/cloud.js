@@ -118,6 +118,10 @@ export async function saveProfile(p) {
     body: { id: currentUser().id, ...p, updated_at: new Date().toISOString() },
   });
 }
+// Signaler le pseudo d'un autre joueur : renvoie 'ok', ou 'masqué' si le pseudo vient d'être masqué.
+export async function reportPseudo(target, reason) {
+  return authed('/rest/v1/rpc/report_pseudo', { method: 'POST', body: { p_target: target, p_reason: reason } });
+}
 export async function deleteAccount() {
   await authed('/rest/v1/rpc/delete_my_account', { method: 'POST', body: {} });
   setSession(null);

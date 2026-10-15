@@ -9,7 +9,7 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Travaille directement sur `main`, sans version d'essai ni salle de test.
 - Prompts d'images (Gemini) : écrits en entier, **un bloc de code par prompt**.
 - Ne jamais toucher au projet **Psynapse** (autre jeu, dépôt psynapsegame/Psynapse).
-- Ne jamais demander la clé `service_role` ni le mot de passe Supabase.
+- Ne jamais demander la clé `service_role` ni le mot de passe Supabase. Les fichiers `supabase/*.sql` sont collés par le propriétaire dans Supabase → SQL Editor → New query → Run. Pour tester un SQL avant livraison : PostgreSQL 16 est installé (`/usr/lib/postgresql/16/bin`), lancer une base temporaire avec l'utilisateur `postgres` et simuler `auth.users` / `auth.uid()`.
 - Messages de commit : terminés par les lignes Co-Authored-By et Claude-Session habituelles, **sans nom de modèle**.
 
 ## 1. Le jeu
@@ -21,7 +21,7 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Le réseau de la session bloque github.io : pour vérifier la publication, passe par l'outil GitHub (déploiements Pages) ou demande une capture au propriétaire.
 
 ## 2. Routine de livraison
-1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v297**.
+1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v298**.
 2. Tests : `node --test tests/*.test.mjs` (187 tests), `node tools/validate.mjs`. Si le combat ou l'équilibre change : `node tools/fuzz.mjs 300` (étage moyen ≈ 12 à 14 en normal).
 3. Vérification dans le navigateur avec Playwright (`/opt/node-tools/node_modules/playwright/index.mjs`, Chromium déjà installé), avec un serveur local `python3 -m http.server 8092` lancé dans le dossier. Tailles iPhone SE et iPhone 13. **L'écran d'ouverture attend un toucher** (« Touche l'écran pour entrer ») : dans les scripts, cliquer au milieu de l'écran (dans la fenêtre 390×664) avant tout le reste.
 4. Commit, push, réponse en français.
@@ -53,5 +53,5 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Pas de boosters vendus contre de l'argent réel, ni d'achats qui donnent de la puissance. Si un jour il y a des achats : surtout cosmétiques (cadres, dos de cartes…), pack fondateur, passe de saison.
 
 ## 6. Projets en cours / idées
-- Publication sur les stores. Le propriétaire aura un **Mac**. Plan : Android d'abord, puis iOS via Xcode et TestFlight. Emballage avec Capacitor. Code d'accès : fait (retiré en v297). Fiche de store (captures, description, âge 12+). Signalement des pseudos pour le classement.
+- Publication sur les stores. Le propriétaire aura un **Mac**. Plan : Android d'abord, puis iOS via Xcode et TestFlight. Emballage avec Capacitor. Code d'accès : fait (retiré en v297). Signalement et filtre des pseudos : fait en v298 (`js/core/moderation.js`, `js/ui/report.js`, `supabase/06-signalements.sql` — les listes de mots du JS et du SQL doivent rester identiques, un test le vérifie). Reste : fiche de store (captures, description, âge 12+), emballage Capacitor, ouverture des inscriptions dans Supabase, tests sur vrais téléphones, vérifier que le nom « ABYSSAL » est libre, refaire Nosferatu (NEC-035) et peut-être Pandore (Z22) habillée.
 - Proposition d'achats intégrés (surtout cosmétiques) : à préparer **seulement si le propriétaire le demande**.

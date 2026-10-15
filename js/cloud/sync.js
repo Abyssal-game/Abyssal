@@ -1,6 +1,7 @@
 // Synchronisation : la sauvegarde part en ligne quelques secondes après chaque changement,
 // le profil public suit, et les scores de la Descente sont envoyés au classement.
 import * as cloud from './cloud.js';
+import { pseudoProblem } from '../core/moderation.js';
 import { migrate, today } from '../core/save.js';
 import { openSheet, esc, toast } from '../ui/dom.js';
 
@@ -105,6 +106,8 @@ export async function restoreFromCloud() {
 
 export async function setPseudo(pseudo) {
   const p = pseudo.trim();
+  const bad = pseudoProblem(p);
+  if (bad) throw new Error(bad);
   await cloud.saveProfile({ pseudo: p, ...profilePayload() });
   sync.profile = { ...(sync.profile || {}), pseudo: p };
   await refreshProfile();

@@ -14,6 +14,8 @@ import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
 import { bagHTML, bindBag } from './items.js';
 import { chestSVG } from '../ui/chest.js';
+import { rowAttrs, shownName, bindReport } from '../ui/report.js';
+import { isBlocked } from '../core/moderation.js';
 import { runDuel } from './duel-ui.js';
 import { PHASE2 } from '../core/duel.js';
 import { SEASON_STEPS, seasonName, seasonDaysLeft } from '../core/renown.js';
@@ -115,10 +117,11 @@ export default function descent(app, root) {
       const mine = g.descent().bestToday;
       box.classList.remove('muted');
       box.innerHTML = (rows.length ? rows.map((r, i) => {
-        const av = r.profiles?.avatar && cat.get(r.profiles.avatar);
-        return `<div class="lb-row ${r.user_id === me ? 'me' : ''}"><span class="lb-rank">${i + 1}</span><span class="lb-av">${av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM}</span><span class="lb-name"><b>${esc(r.profiles?.pseudo || '?')}${cloud.badgeHTML(r.profiles?.badge)}</b><span class="small muted">${esc(r.profiles?.title || '')}</span></span><span class="lb-floor">${r.cursed ? `${icon('skull')} ` : ''}Étage ${r.floor}</span></div>`;
+        const hid = isBlocked(r.user_id), av = !hid && r.profiles?.avatar && cat.get(r.profiles.avatar);
+        return `<div class="lb-row ${r.user_id === me ? 'me' : ''}"${rowAttrs(r.user_id, r.profiles?.pseudo, me)}><span class="lb-rank">${i + 1}</span><span class="lb-av">${av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM}</span><span class="lb-name"><b>${esc(shownName(r.user_id, r.profiles?.pseudo))}${hid ? '' : cloud.badgeHTML(r.profiles?.badge)}</b><span class="small muted">${hid ? '' : esc(r.profiles?.title || '')}</span></span><span class="lb-floor">${r.cursed ? `${icon('skull')} ` : ''}Étage ${r.floor}</span></div>`;
       }).join('') : '<p class="small muted">Personne n’est encore descendu aujourd’hui. À toi d’ouvrir la voie !</p>')
         + (!sync.profile?.pseudo ? '<p class="small acc-warn"><a href="#/compte">Choisis un pseudo</a> pour apparaître au classement.</p>' : !rows.some((r) => r.user_id === me) && mine ? `<p class="small muted">Ton meilleur étage aujourd’hui : ${mine}.</p>` : '');
+      bindReport(box, loadBoard);
     } catch (e) { if (root.contains(box)) box.textContent = e.message; }
   }
 

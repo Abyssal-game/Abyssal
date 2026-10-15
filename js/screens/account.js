@@ -3,6 +3,7 @@ import * as cloud from '../cloud/cloud.js';
 import { sync, onSync, afterLogin, pushNow, restoreFromCloud, setPseudo, refreshProfile, resumeSync } from '../cloud/sync.js';
 import { icon } from '../ui/icons.js';
 import { esc, toast, confirmBox, bindActions } from '../ui/dom.js';
+import { blockedIds, clearBlocked, isMaskedPseudo } from '../core/moderation.js';
 
 const ago = (t) => {
   if (!t) return 'jamais';
@@ -52,6 +53,9 @@ export default function account(app, root) {
         ${p?.badge === 'createur' ? '<a class="btn gold small" href="#/parametres">Mode Créateur (dans Réglages)</a>' : ''}
         <form class="row gap acc-pseudo" id="pseudo"><input class="input plain" name="pseudo" maxlength="16" minlength="3" placeholder="Ton pseudo" value="${esc(p?.pseudo || '')}" required><button class="btn primary" type="submit">OK</button></form>
         ${p?.pseudo ? '' : '<p class="small acc-warn">Choisis un pseudo pour apparaître au classement de la Descente.</p>'}
+        ${isMaskedPseudo(p?.pseudo) ? '<p class="small acc-warn">Ton pseudo a été signalé par plusieurs joueurs et a été masqué. Choisis-en un autre.</p>' : ''}
+        <p class="small muted">Dans un classement, touche le pseudo d’un joueur pour le signaler ou le masquer.${blockedIds().length ? ` Joueurs masqués sur cet appareil : <b>${blockedIds().length}</b>.` : ''}</p>
+        ${blockedIds().length ? `<button class="btn small" data-act="unblock">${icon('eye')}Réafficher les joueurs masqués</button>` : ''}
       </section>
       <section class="panel stack">
         <h2>Sauvegarde en ligne</h2>
@@ -71,6 +75,7 @@ export default function account(app, root) {
     });
   }
   bindActions(root, {
+    unblock() { clearBlocked(); toast('Tous les joueurs sont de nouveau affichés.', { icon: 'user' }); render(); },
     async resume() { try { await resumeSync(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } render(); },
     async push() { if (sync.status === 'paused') { toast('Choisis d’abord quelle partie garder (Reprendre la synchronisation).', { icon: 'info' }); return; } await pushNow(); toast(sync.status === 'ok' ? 'Partie sauvegardée en ligne.' : esc(sync.error || 'Échec de la sauvegarde.'), { kind: sync.status === 'ok' ? 'success' : 'error', icon: 'upload' }); render(); },
     async pull() {

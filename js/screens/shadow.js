@@ -7,6 +7,8 @@ import { artUrl } from '../art/assets.js';
 import { icon, sigil, EMBLEM } from '../ui/icons.js';
 import { esc, fmt, toast, bindActions } from '../ui/dom.js';
 import { chestSVG } from '../ui/chest.js';
+import { rowAttrs, shownName, bindReport } from '../ui/report.js';
+import { isBlocked } from '../core/moderation.js';
 import { openPack } from './opening.js';
 import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
@@ -40,8 +42,8 @@ export default function shadowScreen(app, root) {
   let mine = null, day = parisDay(), loading = true, err = null, busy = false;
 
   const row = (r, i, val, sub) => {
-    const av = r.profiles?.avatar || r.avatar, c = av && cat.get(av), me = r.user_id === cloud.currentUser()?.id;
-    return `<div class="lb-row ${me ? 'me' : ''}"><span class="lb-rank" ${i < 3 ? `style="color:${MEDAL[i]}"` : ''}>${i + 1}</span><span class="lb-av">${c ? `<img alt="" src="${artUrl(c, { lite: true })}">` : EMBLEM}</span><span class="lb-name"><b>${esc(r.profiles?.pseudo || r.pseudo || '?')}${cloud.badgeHTML(r.profiles?.badge || r.badge)}</b><span class="small muted">${sub}</span></span><span class="lb-floor">${fmt(val)}</span></div>`;
+    const hid = isBlocked(r.user_id), av = !hid && (r.profiles?.avatar || r.avatar), c = av && cat.get(av), uid = cloud.currentUser()?.id, me = r.user_id === uid, pseudo = r.profiles?.pseudo || r.pseudo;
+    return `<div class="lb-row ${me ? 'me' : ''}"${rowAttrs(r.user_id, pseudo, uid)}><span class="lb-rank" ${i < 3 ? `style="color:${MEDAL[i]}"` : ''}>${i + 1}</span><span class="lb-av">${c ? `<img alt="" src="${artUrl(c, { lite: true })}">` : EMBLEM}</span><span class="lb-name"><b>${esc(shownName(r.user_id, pseudo))}${hid ? '' : cloud.badgeHTML(r.profiles?.badge || r.badge)}</b><span class="small muted">${sub}</span></span><span class="lb-floor">${fmt(val)}</span></div>`;
   };
 
   function draw() {
@@ -85,6 +87,7 @@ export default function shadowScreen(app, root) {
       box.innerHTML = (rows.length ? rows.map((r, i) => row(r, i, r.total, `${r.days} tirage${r.days > 1 ? 's' : ''}`)).join('') : '<p class="small muted">Personne n’a encore tiré cette semaine. À toi !</p>')
         + `<p class="small muted">${n} participant${n > 1 ? 's' : ''} cette semaine${n < SHADOW.minPlayers ? ` : il en faut ${SHADOW.minPlayers} pour que les coffres soient donnés.` : '.'}</p>`
         + (!sync.profile?.pseudo ? '<p class="small acc-warn"><a href="#/compte">Choisis un pseudo</a> pour apparaître au classement.</p>' : '');
+      bindReport(box, loadWeek);
     } catch (e) { if (root.contains(box)) box.textContent = e.status === 404 ? 'Le Tirage des Ombres n’est pas encore activé sur le serveur.' : e.message; }
   }
   async function loadDay() {
@@ -95,6 +98,7 @@ export default function shadowScreen(app, root) {
       if (!root.contains(box)) return;
       box.classList.remove('muted');
       box.innerHTML = rows.length ? rows.map((r, i) => row(r, i, r.score, `faction ${esc(cat.faction[r.faction]?.name || '')}`)).join('') : '<p class="small muted">Aucun tirage aujourd’hui pour l’instant.</p>';
+      bindReport(box, loadDay);
     } catch (e) { if (root.contains(box)) box.textContent = e.message; }
   }
   async function load() {
