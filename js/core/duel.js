@@ -15,7 +15,7 @@ import {
 import { BOSSES, LAWS, ASPECTS } from './bosses.js';
 import { familyOf, relationMult, activeLegends } from './relations.js';
 import { FORMS } from './forms.js';
-import { CREATURE_KITS, kitOf, moveOf, moveFor, hasP, boosted, awake, statShape, passiveMult, rechargeOf } from './kits.js';
+import { CREATURE_KITS, kitOf, moveOf, moveFor, hasP, boosted, awake, statShape, passiveMult, rechargeOf, ROLE_AWAKEN } from './kits.js';
 
 export { KEYWORDS, keywordOf, INTENTS, BOSS_POWERS, bossPowerOf, SYNERGIES, FERVOR_MAX, AP_MAX, PA_MAX, BOSSES, LAWS, ASPECTS };
 export const FRONT = 3;
@@ -197,6 +197,7 @@ export function dmgOf(st, a, t, mult = 1, { basic = false } = {}) {
   // les bonus situationnels se cumulent, mais jamais au-delà de ×3 la force de base du coup
   n = Math.min(n, flat * MULT_CAP);
   if (t.boss && st.law === 'fer' && !t.broken) n *= 0.6;
+  if (t.boss && t.side === 'enemy' && a.side === 'ally' && st.runes) n *= 1 - RUNE_GUARD * runesLeft(st);
   if (a.side === 'ally' && t.side === 'enemy' && mult > 0) n += comboOf(st, a, t);
   return mult > 0 ? Math.max(1, Math.round(n)) : 0;
 }
@@ -204,6 +205,7 @@ export function dmgOf(st, a, t, mult = 1, { basic = false } = {}) {
 export const COMBO_MAX = 2;
 export const MARK_MULT = 1.5, MARK_BRK = 2, RIPOSTE_MAX = 3, HEAL_WARD = 0.2;
 // v269 : Hâte, Assaut conjoint, détonation du poison
+export const SERVANT_POWER = 0.2;
 export const HASTE_PA = 2, DUO_FERVOR = 3, DUO_MULT = 1.25, DETONATE_AT = 6, DETONATE_MULT = 1.5;
 export const DUO_FX = {
   protecteur: 'Brèche sur la cible et bouclier sur ta créature la plus blessée',
@@ -225,6 +227,30 @@ export function duoPartner(st, u) {
   return null;
 }
 const later = (st, uid) => !!st.init && st.init.indexOf(uid) > (st.ip ?? -1);
+// Retard : recule dans l'ordre de ce tour (2 places, 1 pour un gardien)
+function delayUnit(st, t, ev) {
+  if (!later(st, t.uid)) return false;
+  const i = st.init.indexOf(t.uid), j = Math.min(st.init.length - 1, i + (t.boss ? 1 : 2));
+  st.init.splice(i, 1); st.init.splice(j, 0, t.uid);
+  ev.push({ t: 'status', u: t.uid, s: 'Retardée', k: 'frost', syn: true });
+  return true;
+}
+// Hâte : joue juste après la créature qui agit
+function hasteUnit(st, x, ev) {
+  if (!st.init || !x) return false;
+  const i = st.init.indexOf(x.uid); if (i <= (st.ip ?? -1) + 1) return false;
+  st.init.splice(i, 1); st.init.splice(st.ip + 1, 0, x.uid);
+  ev.push({ t: 'status', u: x.uid, s: 'Hâte : elle joue juste après', syn: true, k: 'haste' });
+  return true;
+}
+// Détonation : un poison de 6 ou plus explose (poison × 1,5)
+function detonate(st, x, src, ev) {
+  if (!(x.hp > 0) || (x.poison || 0) < DETONATE_AT) return false;
+  const k = Math.round(x.poison * DETONATE_MULT); x.poison = 0; st.stats.named = (st.stats.named || 0) + 1;
+  ev.push({ t: 'status', u: x.uid, s: `Détonation ! −${k}`, syn: true, k: 'poison', combo: 'glace' });
+  hurt(st, x, k, ev, src);
+  return true;
+}
 export function comboOf(st, a, t) {
   const by = st.hitBy?.[t.uid];
   return by ? Math.min(COMBO_MAX, by.filter((x) => x !== a.uid).length) : 0;
@@ -289,6 +315,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
       ate = true; const by = u.markBy; u.mark = 0; u.markBy = null;
       st.stats.named = (st.stats.named || 0) + 1;
       ev.push({ t: 'status', u: u.uid, s: 'Marque consommée !', syn: true, combo: 'chasse', by, a: src });
+      if (u.boss) runeHit(st, 'marque', ev);
       if (!wasCracked) breakHit(st, u, MARK_BRK, ev, s0);
     }
     if (wasCracked && u.cracked && (ate || st.rupture === src || st.rupture === '*')) fracture(st, u, ev);
@@ -352,6 +379,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
     if (u.side === 'ally') (st.fallenLog ||= []).push({ u: u.uid, by: a?.uid || null, round: st.round, kind: st.curKind || null });
     if (u.side === 'ally') alive(st, 'ally').filter((x) => x.form === 'vengeance').forEach((x) => { x.atk += 2; ev.push({ t: 'status', u: x.uid, s: 'Vengeance : +2 ATQ', syn: true }); });
     if (u.side === 'enemy') onEnemyDeath(st, u, a, ev);
+    if (u.side === 'enemy' && !u.boss && st.runes && st.order.enemy.every((id) => st.units[id].boss || st.units[id].hp <= 0)) runeHit(st, 'serviteurs', ev);
     if (u.side === 'ally' && hasP(u, 'reliquat')) { pfx(ev, u, 'reliquat'); gainFervor(st, 2, ev, 'Reliquat'); if (boosted(u, 'reliquat')) front(st, 'ally').forEach((x) => { x.atk += 1; }); }
     if (u.side === 'ally') front(st, 'ally').filter((x) => hasP(x, 'elue')).forEach((x) => { const k = boosted(x, 'elue') ? 3 : 2; x.atk += k; pfx(ev, x, 'elue'); ev.push({ t: 'status', u: x.uid, s: `Élue des braves : +${k} ATQ`, syn: true }); gainFervor(st, 1, ev, 'Élue des braves'); });
   }
@@ -406,6 +434,7 @@ function addPoison(st, t, n, ev, src) {
   const combo = t.frozen > 0 && src?.role === 'poison';
   if (combo) k *= 2;
   t.poison = Math.min(14, (t.poison || 0) + k);
+  if (t.boss && t.side === 'enemy' && t.poison >= DETONATE_AT) runeHit(st, 'poison', ev);
   ev.push({ t: 'status', u: t.uid, s: combo ? `Givre-venin : +${k}` : `Poison +${k}`, syn: combo, k: 'poison', ...(combo ? { combo: 'glace', by: t.frozenBy, a: src.uid } : {}) });
 }
 // Brèche et Exposé (v250) : états posés par une créature, exploités par une autre, valables jusqu'à la fin du tour suivant
@@ -445,7 +474,8 @@ export const RUPTURE_KEYS = ['estoc', 'raz'];
 export const isRupture = (st, u, key, t) => !!t?.cracked && (RUPTURE_KEYS.includes(key) || (key === 'attack' && u.role === 'protecteur') || (!!t.mark && t.markBy !== u.uid && (key === 'attack' || !!moveFor(u, key)?.pv)));
 function fracture(st, t, ev) {
   t.cracked = null;
-  t.broken = true; t.brokenSkip = true; t.brokenEnd = st.round + 1;
+  t.broken = true;
+  if (t.boss) runeHit(st, 'brisure', ev); t.brokenSkip = true; t.brokenEnd = st.round + 1;
   if (t.boss) { release(st, ev); if (t.ice) { t.ice = 0; ev.push({ t: 'status', u: t.uid, s: 'La glace vole en éclats !', k: 'frost', syn: true }); } if (t.doom != null) { t.doom = DOOM_TURNS + 1; ev.push({ t: 'status', u: t.uid, s: 'Effondrement repoussé', syn: true }); } }
   interruptBoss(st, t);
   if (t.charged) { t.charged = null; ev.push({ t: 'status', u: t.uid, s: 'Charge interrompue', syn: true }); }
@@ -664,8 +694,7 @@ export function act(st, uid, key, tUid = null) {
     ev.push({ t: 'aoe', u: uid, side: 'ally' });
     front(st, 'enemy').forEach((x) => {
       const b = brkOf(st, u, x, 'raz'); const d = hurt(st, x, dmgOf(st, u, x, 0.7), ev, uid); if (d) breakHit(st, x, b, ev, u); if (d) setBreach(st, x, uid, ev);
-      // Condamnation (v269) : un poison lourd détone sous la vague
-      if (x.hp > 0 && (x.poison || 0) >= DETONATE_AT) { const k = Math.round(x.poison * DETONATE_MULT); x.poison = 0; st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: x.uid, s: `Détonation ! −${k}`, syn: true, k: 'poison', combo: 'glace' }); hurt(st, x, k, ev, uid); }
+      detonate(st, x, uid, ev); // Condamnation (v269) : un poison lourd détone sous la vague
     });
   } else if (key === 'estoc') {
     const info = rollInfo(st, uid, key, tUid);
@@ -700,10 +729,16 @@ export function act(st, uid, key, tUid = null) {
     if (tier === 'crit' || tier === 'success') { freeze(st, t, ev, tier === 'crit' && (u.rarity === 'M' || u.rarity === 'S') && !t.boss && !t.elite ? 2 : 1); t.frozenBy = uid; if (tier === 'crit') breakHit(st, t, 3, ev, u); openUp(st, t, uid, ev); }
     else if (tier === 'partial') {
       // v269 : Retard — elle recule dans l'ordre de ce tour (2 places, 1 pour un gardien) ; si elle a déjà joué, elle est ralentie
-      if (later(st, tUid)) { const i = st.init.indexOf(tUid), j = Math.min(st.init.length - 1, i + (t.boss ? 1 : 2)); st.init.splice(i, 1); st.init.splice(j, 0, tUid); ev.push({ t: 'status', u: tUid, s: 'Retardée', k: 'frost', syn: true }); }
+      if (delayUnit(st, t, ev)) { /* retardée */ }
       else { t.slow = true; ev.push({ t: 'status', u: tUid, s: 'Ralentie', k: 'frost' }); }
     }
-  } else if (moveFor(u, key)) { u.mvReady = st.round + rechargeOf(u, key); u.struck = true; u.lastStruck = st.round; moveFor(u, key).run(st, u, t, ev, API); }
+  } else if (moveFor(u, key)) {
+    u.mvReady = st.round + rechargeOf(u, key); u.struck = true; u.lastStruck = st.round;
+    const aw = awake(u) && u.side === 'ally';
+    if (aw && (u.role === 'degats' || u.role === 'zone')) st.rupture = '*'; // Éveil tactique : coup de rupture
+    moveFor(u, key).run(st, u, t, ev, API);
+    if (aw) roleAwaken(st, u, t, ev);
+  }
   if (['attack', 'estoc', 'raz'].includes(key) || moveFor(u, key)?.pv) st.ombreUsed = true;
   if (st.init && a.gain && u.hp > 0) gainPA(u, a.gain, ev);
   st.rupture = null;
@@ -724,6 +759,7 @@ export function brkOf(st, u, t, key, tier = 'success') {
 const brkTotal = (st, u, n) => (n > 0 && u?.side === 'ally' ? n + (has(st, 'brise') ? 1 : 0) + (u.talent === 'brise' ? 1 : 0) : n);
 function weakBonus(st, u, t, ev) {
   if (!isWeak(u, t)) return;
+  if (t.boss) runeHit(st, 'faiblesse', ev);
   st.stats.weak = (st.stats.weak || 0) + 1;
   discover(st, t, ev);
   gainFervor(st, 1, ev, 'Faiblesse');
@@ -783,10 +819,21 @@ function basicAttack(st, u, t, ev) {
   if ((st.relics || []).includes('coeur')) { st.coeurTick = !st.coeurTick; if (st.coeurTick) return; }
   gainFervor(st, 1, ev);
 }
+// Éveil tactique (v271) : l'effet lié au rôle, après la compétence propre
+function roleAwaken(st, u, t, ev) {
+  if (!ROLE_AWAKEN[u.role]) return;
+  const foe = t && t.side === 'enemy' && t.hp > 0 ? t : null;
+  if (u.role === 'protecteur') chargeRiposte(u, ev);
+  else if (u.role === 'soin' && st.init) { const w = lowestAlly(st) || u; gainPA(w, 1, ev); }
+  else if (u.role === 'poison' && foe) detonate(st, foe, u.uid, ev);
+  else if (u.role === 'controle' && foe) delayUnit(st, foe, ev);
+  else if (u.role === 'soutien') { const best = front(st, 'ally').filter((x) => x !== u && later(st, x.uid) && x.skipTurn !== st.round).sort((a, b) => b.atk - a.atk)[0]; if (best) hasteUnit(st, best, ev); }
+}
 function duoStrike(st, u, t, ev) {
   const p = duoPartner(st, u);
   if (!p || !t) return;
-  st.duoUsed = true; p.skipTurn = st.round; st.stats.duos = (st.stats.duos || 0) + 1; st.stats.named = (st.stats.named || 0) + 1;
+  st.duoUsed = true; p.skipTurn = st.round;
+  if (t.boss) runeHit(st, 'conjoint', ev); st.stats.duos = (st.stats.duos || 0) + 1; st.stats.named = (st.stats.named || 0) + 1;
   ev.push({ t: 'duo', u: u.uid, p: p.uid, tgt: t.uid });
   let total = 0;
   for (const x of [u, p]) {
@@ -1074,12 +1121,16 @@ export function enemyAct(st, aUid, defense = 'none') {
   let dealt = 0;
   const big = ['heavy', 'blast', 'gorge', 'blizzard', 'copy'].includes(kind);
   st.curKind = kind;
+  // v271 : chaque serviteur encore debout renforce la grosse attaque du gardien (+20 %, +40 % au plus)
+  const helpers = big && e.boss ? Math.min(2, front(st, 'enemy').filter((x) => x !== e && x.hp > 0).length) : 0;
+  const pow = 1 + SERVANT_POWER * helpers;
+  if (helpers) ev.push({ t: 'status', u: aUid, s: `Renforcé par ${helpers > 1 ? 'ses serviteurs' : 'son serviteur'} : +${Math.round(SERVANT_POWER * helpers * 100)} %`, k: 'bad' });
   if (big && defense === 'none') st.stats.missed = (st.stats.missed || 0) + 1;
   const evStart = ev.length;
   const strike = (t, mult) => {
     if (!t || t.hp <= 0) return null;
     // Rempart : le protecteur prend le coup à la place, avec 40 % de dégâts en moins
-    let target = t, m = mult;
+    let target = t, m = mult * pow;
     const g = t.guardBy && st.units[t.guardBy];
     if (g && inFront(st, g) && g.uid !== t.uid) { target = g; m *= 0.6 * (hasP(g, 'sentinelle') ? (boosted(g, 'sentinelle') ? 0.6 : 0.75) : 1); ev.push({ t: 'status', u: g.uid, s: 'Rempart !', k: 'guard' }); }
     if (target.role === 'protecteur') chargeRiposte(target, ev); // elle encaisse pour l'équipe : sa riposte se charge
@@ -1106,7 +1157,7 @@ export function enemyAct(st, aUid, defense = 'none') {
     e.charged = null;
     ev.push({ t: 'aoe', u: aUid, side: 'enemy' });
     if (defense !== 'none') defended(st, e, null, ev, defense, kind);
-    else front(st, 'ally').forEach((x) => hurt(st, x, dmgOf(st, e, x, e.boss ? 1 : 0.8), ev, aUid));
+    else front(st, 'ally').forEach((x) => hurt(st, x, dmgOf(st, e, x, (e.boss ? 1 : 0.8) * pow), ev, aUid));
   } else if (kind === 'charge') { e.charged = 'heavy'; ev.push({ t: 'status', u: aUid, s: 'Se charge…', k: 'charge' }); }
   else if (kind === 'channel') { e.charged = 'blast'; ev.push({ t: 'status', u: aUid, s: 'Concentration…', k: 'charge' }); }
   else if (kind === 'shield') { const t = st.units[it.t]; if (t && t.hp > 0) { t.shield = 1; ev.push({ t: 'status', u: t.uid, s: 'Bouclier', k: 'guard' }); } }
@@ -1125,7 +1176,7 @@ export function enemyAct(st, aUid, defense = 'none') {
     ev.push({ t: 'aoe', u: aUid, side: 'enemy' });
     if (defense !== 'none') defended(st, e, null, ev, defense, 'blast');
     else {
-      front(st, 'ally').forEach((x) => hurt(st, x, dmgOf(st, e, x, 0.9), ev, aUid));
+      front(st, 'ally').forEach((x) => hurt(st, x, dmgOf(st, e, x, 0.9 * pow), ev, aUid));
       front(st, 'ally').filter((x) => x.hp > 0 && !x.frozen).sort((x, y) => y.atk - x.atk).slice(0, e.phase2 ? 2 : 1).forEach((x) => { x.frozen = 1; ev.push({ t: 'status', u: x.uid, s: 'Gelée', k: 'frost' }); });
     }
   } else if (kind === 'mimic') {
@@ -1178,6 +1229,7 @@ function defended(st, e, t, ev, defense, kind) {
   }
   st.stats.parries++;
   ev.push({ t: 'parry', u: t?.uid || null, a: e.uid });
+  if (e.boss) runeHit(st, 'parade', ev);
   if (st.init) (t ? [t] : front(st, 'ally')).forEach((x) => gainPA(x, PA_GAIN, ev)); // parade parfaite : +1 PA
   gainFervor(st, 2 + (has(st, 'parade') ? 1 : 0), ev, 'Parade parfaite');
   breakHit(st, e, 2 + (has(st, 'parade') ? 1 : 0), ev, { side: 'ally' });
@@ -1277,6 +1329,46 @@ function advance(st, ev) {
     return;
   }
 }
+// ——— Runes du gardien (v271) : une énigme à trois sceaux ———
+// Trois runes protègent le gardien : chacune retire 10 % des dégâts qu'il subit. Chaque rune cède à une action précise ;
+// les trois brisées, le gardien est Fêlé sur-le-champ. Les runes sont tirées selon ce que ton équipe sait faire.
+export const RUNES = {
+  brisure:    { name: 'Rune de la Faille', hint: 'Elle cède quand le gardien est brisé.', icon: 'st-broken' },
+  marque:     { name: 'Rune de l’Œil', hint: 'Elle cède quand une Marque est consommée sur lui.', icon: 'st-mark' },
+  parade:     { name: 'Rune du Miroir', hint: 'Elle cède sur une parade parfaite contre lui.', icon: 'st-defend' },
+  faiblesse:  { name: 'Rune du Sang', hint: 'Elle cède quand on exploite sa faiblesse de faction.', icon: 'st-open' },
+  poison:     { name: 'Rune de la Rouille', hint: 'Elle cède quand il porte 6 poisons ou plus.', icon: 'st-poison' },
+  conjoint:   { name: 'Rune des Jumeaux', hint: 'Elle cède sous un Assaut conjoint.', icon: 'st-breach' },
+  serviteurs: { name: 'Rune de la Cour', hint: 'Elle cède quand tous ses serviteurs sont tombés.', icon: 'st-prey' },
+};
+export const RUNE_GUARD = 0.1;
+function setupRunes(st) {
+  const b = Object.values(st.units).find((u) => u.boss && u.side === 'enemy');
+  if (!b || st.runes) return;
+  const team = st.order.ally.map((id) => st.units[id]), roles = new Set(team.map((u) => u.role));
+  const pool = ['brisure', 'parade'];
+  if (st.order.enemy.length > 1) pool.push('serviteurs');
+  if (roles.has('soutien') || roles.has('degats') || roles.has('controle') || roles.has('poison')) pool.push('marque');
+  if (roles.has('poison')) pool.push('poison');
+  if (b.faction && team.some((u) => u.faction === WEAK_TO[b.faction])) pool.push('faiblesse');
+  pool.push('conjoint');
+  const pick = [];
+  while (pick.length < 3 && pool.length) pick.push(pool.splice(Math.floor(rand(st) * pool.length), 1)[0]);
+  st.runes = pick.map((k) => ({ k, broken: false }));
+}
+export const runesLeft = (st) => (st.runes || []).filter((r) => !r.broken).length;
+function runeHit(st, k, ev) {
+  const r = (st.runes || []).find((x) => x.k === k && !x.broken);
+  if (!r) return;
+  r.broken = true; st.stats.runes = (st.stats.runes || 0) + 1;
+  const b = front(st, 'enemy').find((u) => u.boss);
+  ev.push({ t: 'rune', u: b?.uid || null, k, left: runesLeft(st) });
+  gainFervor(st, 1, ev, 'Rune brisée');
+  if (!runesLeft(st) && b && b.hp > 0 && !b.broken && !b.cracked) {
+    ev.push({ t: 'status', u: b.uid, s: 'Les trois sceaux sont rompus !', syn: true, k: 'broken' });
+    b.brk = 0; b.cracked = { seq: -1, until: st.round + 1 }; ev.push({ t: 'brk', u: b.uid, brk: 0, max: b.brkMax }); ev.push({ t: 'cracked', u: b.uid });
+  }
+}
 // Active l'ordre d'initiative sur un combat (Descente). Renvoie les événements du premier passage.
 export function startInitiative(st) {
   const ev = [];
@@ -1287,6 +1379,7 @@ export function startInitiative(st) {
   // équilibre : chaque créature ne joue qu'une fois par tour, les ennemis ont un peu moins de PV
   if (st.round === 1) for (const id of st.order.enemy) { const e = st.units[id]; const k = INIT_FOE_HP; e.maxHp = Math.max(1, Math.round(e.maxHp * k)); e.hp = Math.min(e.maxHp, Math.max(1, Math.round(e.hp * k))); }
   if (st.bossKey && st.round === 1) bossPhase(st, ev); // gardien éveillé (Cauchemar) : sa phase 2 commence tout de suite
+  if (st.round === 1) setupRunes(st);
   st.init = buildInit(st); st.ip = -1; st.actor = null;
   advance(st, ev);
   return ev;

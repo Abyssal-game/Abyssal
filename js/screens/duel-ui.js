@@ -12,7 +12,7 @@ import { tuto } from '../ui/tutos.js';
 import { cardHTML } from '../ui/card.js';
 import {
   BOSS_POWERS, INTENTS, SYNERGIES, PACK_BONUS, FERVOR_MAX, AP_MAX, PA_MAX, passTurn, speedOf, front, reserve, actionsFor, actionTargets, act, preview,
-  ENTRANCES, GOALS, goalState, RHYTHM, PHASE2, beginEnemyTurn, nextEnemy, enemyAct, endEnemyTurn, takeSkips, defenseWindow, threats, intentInfo, useUlt, ultReady, autoActs, comboOf,
+  ENTRANCES, GOALS, goalState, RUNES, runesLeft, SERVANT_POWER, RHYTHM, PHASE2, beginEnemyTurn, nextEnemy, enemyAct, endEnemyTurn, takeSkips, defenseWindow, threats, intentInfo, useUlt, ultReady, autoActs, comboOf,
 } from '../core/duel.js';
 import { KITS, AI_FAMILIES, DICE_TIERS, WEAK_TO, TALENTS } from '../core/skills.js';
 import { BOSSES, LAWS, ASPECTS } from '../core/bosses.js';
@@ -126,7 +126,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     return `<span class="cb-int d${i.danger} k-${i.kind}" title="${esc(i.def.name)} : ${esc(i.def.desc)}">${intentIcon(i.kind)}<b>${label}</b>${i.danger >= 2 ? `<em>${DANGER[i.danger]}</em>` : ''}${cd}${brk}</span>`;
   };
   // v265 : la grosse attaque annoncée d'un gardien ou d'une élite, aussi sur sa carte
-  const cardWarn = (u) => { const now = bigOf(u, false), nx = now ? null : bigOf(u, true), k = now || nx; if (!k) return ''; const real = PREP_IT[k] || k; return `<span class="cb-warn ${PREP_IT[k] || nx ? 'prep' : ''}" title="${esc(INTENTS[real].desc)}">${intentIcon(real)}<b>${esc(INTENTS[real].name)}</b><small>${now && !PREP_IT[now] ? 'à son tour' : 'au tour suivant'}</small></span>`; };
+  const cardWarn = (u) => { const now = bigOf(u, false), nx = now ? null : bigOf(u, true), k = now || nx; if (!k) return ''; const real = PREP_IT[k] || k; const help = u.boss ? Math.min(2, front(st, 'enemy').filter((x) => x !== u && x.hp > 0).length) : 0;
+    return `<span class="cb-warn ${PREP_IT[k] || nx ? 'prep' : ''}" title="${esc(INTENTS[real].desc)}${help ? ` Renforcée par ses serviteurs : +${help * SERVANT_POWER * 100} %.` : ''}">${intentIcon(real)}<b>${esc(INTENTS[real].name)}${help ? ` +${help * SERVANT_POWER * 100} %` : ''}</b><small>${now && !PREP_IT[now] ? 'à son tour' : 'au tour suivant'}</small></span>`; };
   const cardEl = (u) => {
     const c = cat.get(u.id), kit = KITS[u.role];
     const dead = u.hp <= 0, enemy = u.side === 'enemy';
@@ -210,6 +211,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       st.pact && PACTS[st.pact] ? `<span class="cb-law" style="--pk:${PACTS[st.pact].color}" data-d="rule" data-k="pact">${icon('p:seal')}<b>${esc(PACTS[st.pact].name)}</b></span>` : '',
       st.law ? `<span class="cb-law" data-d="rule" data-k="law"><b>${esc(LAWS[st.law].name)}</b></span>` : '',
       st.aspect ? `<span class="cb-law" data-d="rule" data-k="aspect"><b>${esc(ASPECTS[st.aspect].name)}</b></span>` : '',
+      st.runes ? `<span class="cb-law cb-runes" data-d="rule" data-k="runes" title="Runes du gardien">${st.runes.map((r) => `<img alt="" src="assets/ui/${r.broken ? 'rune-broken' : 'rune'}.webp" class="${r.broken ? 'off' : ''}">`).join('')}<b>${runesLeft(st) ? `−${runesLeft(st) * 10} %` : 'Rompues'}</b></span>` : '',
       (st.relics || []).length ? `<span class="cb-law" data-d="rule" data-k="relics">${icon('p:crown')}<b>${st.relics.length} relique${st.relics.length > 1 ? 's' : ''}</b></span>` : ''].join('');
     const rulesEl = $('.cb-rules'); if (rulesEl) { rulesEl.innerHTML = rules; rulesEl.hidden = !rules; }
     alEl.innerHTML = front(st, 'ally').map(cardEl).join('');
@@ -504,6 +506,12 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           const t2 = el(e.u); t2?.classList.add('shatter', 'cracked'); ring(e.u, 'break');
           banner('BRISURE !', 'broken', 1000); fxAt(e.u, 'break', { big: true }); sparks(e.u, 'big'); shake(true); dio.brk();
           await wait(T(700)); d?.classList.remove('focus');
+          break;
+        }
+        case 'rune': {
+          app.sfx.shatter?.(); if (e.u) fxSheet(e.u, 'fx-rune', { k: 2.2, d: 760 }); shake(false); draw();
+          banner(`<small>Rune brisée</small>${esc(RUNES[e.k]?.name || '')}${e.left ? ` · ${e.left} restante${e.left > 1 ? 's' : ''}` : ''}`, 'synergy', 1000);
+          await wait(T(620));
           break;
         }
         case 'cracked': {
@@ -829,6 +837,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (st.goal) await tuto(app, 'cb-goal');
     if (foes.some((e) => e.trait)) await tuto(app, 'cb-traits');
     if (foes.some((e) => e.brkMax)) await tuto(app, 'cb-break');
+    if (st.runes) await tuto(app, 'cb-runes');
     if (st.fervor >= 1 && g.s.tips?.['cb-guide']) await tuto(app, 'cb-skill');
     draw();
   }
@@ -901,6 +910,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     else if (k === 'pact' && PACTS[st.pact]) h = `<h2>${esc(PACTS[st.pact].name)}</h2><p><b class="dc-good">Gain</b> : ${esc(PACTS[st.pact].gain)}</p><p><b class="dc-bad">Prix</b> : ${esc(PACTS[st.pact].cost)}</p>`;
     else if (k === 'law' && LAWS[st.law]) h = `<h2>${esc(LAWS[st.law].name)}</h2><p>${esc(LAWS[st.law].desc)}</p><p class="small muted">L’Architecte change de Loi tous les deux tours ; la prochaine est annoncée sur sa carte.</p>`;
     else if (k === 'aspect' && ASPECTS[st.aspect]) { const A = ASPECTS[st.aspect]; h = `<h2>${esc(A.name)}</h2><p>Faible face à <b>${A.weak.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}</b> (+60 %), résiste à <b>${A.resist.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}</b> (−50 %).</p>`; }
+    else if (k === 'runes' && st.runes) h = `<h2>Les runes du gardien</h2><p class="small">Tant qu’elles tiennent, chaque rune retire <b>10 %</b> des dégâts que subit le gardien. Brise les trois : il est <b>Fêlé</b> sur-le-champ.</p>${st.runes.map((r) => `<p class="small cb-runeline ${r.broken ? 'off' : ''}"><img alt="" src="assets/ui/${r.broken ? 'rune-broken' : 'rune'}.webp"><span><b>${esc(RUNES[r.k].name)}</b>${r.broken ? ' · <span class="dc-good">brisée</span>' : ''}<br>${esc(RUNES[r.k].hint)}</span></p>`).join('')}`;
     else if (k === 'relics') h = `<h2>Tes reliques</h2>${(st.relics || []).map((r) => `<p class="small"><b>${esc(RELICS[r].name)}</b> : ${esc(RELICS[r].gain)} <span class="dc-bad">${esc(RELICS[r].cost)}</span></p>`).join('')}`;
     if (h) openSheet(`<div class="cb-rulesheet">${h}</div>`, { label: 'Règle en vigueur' });
   }
@@ -1021,7 +1031,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (u.poison) s.push(`Poison ${u.poison} : perd ${u.poison} PV au début de son tour, puis le poison diminue de moitié.`);
     if (u.frozen || u.stunned) s.push('Gelé : passe son prochain tour.');
     if (u.slow) s.push('Ralenti : sa prochaine attaque fait moitié moins mal.');
-    if (u.mark) s.push('Marqué : +30 % de dégâts subis, +3 aux jets de dés contre lui.');
+    if (u.mark) s.push('Marqué : le prochain coup d’une autre de tes créatures fait +50 % et +2 Brisure, +3 aux jets de dés contre lui.');
     if (u.broken) s.push('Brisé : +50 % de dégâts subis, +5 aux jets.');
     if (u.defend) s.push('En défense : -50 % de dégâts.');
     if (u.guardBy) s.push('Protégé par un Rempart.');
@@ -1043,6 +1053,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       <li><b>Hâte</b> (Soutien, ${2} PA, une fois par tour) : une de tes créatures qui n’a pas encore joué joue juste après elle. <b>Retard</b> : une Entrave partielle fait reculer l’ennemi de 2 places dans l’ordre du tour (1 pour un gardien).</li>
       <li><b>Assaut conjoint</b> (3 Ferveur, une fois par combat) : sur un ennemi Fêlé, Brisé ou Marqué, ta créature et celle qui joue juste après frappent ensemble (×1,25 chacune), avec l’effet de leurs deux rôles. L’alliée appelée perd son tour à venir. C’est aussi un coup de rupture.</li>
       <li><b>Détonation</b> : un ennemi à 6 poisons ou plus explose sous un Raz-de-marée (poison × 1,5 de dégâts d’un coup).</li>
+      <li><b>Runes du gardien</b> : trois runes le protègent (−10 % de dégâts chacune). Chacune cède à une action précise : touche la pastille des runes en haut pour les lire. Les trois brisées, il est Fêlé.</li>
+      <li><b>Serviteurs</b> : chaque serviteur encore debout renforce la grosse attaque du gardien (+20 %, +40 % au plus). Les abattre d’abord l’affaiblit.</li>
       <li><b>Annonces</b> : les grosses attaques des gardiens et des élites s’affichent sur la frise, à côté de leur portrait. Brise-les avant qu’ils jouent pour les annuler.</li>
       <li><b>Riposte chargée</b> : chaque coup encaissé par un Protecteur charge sa riposte (3 au plus) : +1 dégât et +1 Brisure par charge à sa prochaine attaque. <b>Prière</b> : le soin en trop devient un bouclier.</li>
       <li><b>Faiblesses</b> : chaque faction en craint une autre (+50 % de dégâts) ; contre sa propre faction : -25 %. ★ sur une cible = faiblesse exploitée.</li>

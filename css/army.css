@@ -2615,3 +2615,12 @@ body.battle-mode .dv.cb { gap: 5px; }
 /* annonce du gardien en haut de la carte, entre l'icône de rôle et le blason */
 .dv.cb .dv-c .cb-warn { top: 3px; max-width: calc(100% - 46px); }
 .dv.cb .dv-c.enemy .dv-st { top: 26%; }
+
+/* v271 : runes du gardien (pastille des règles, fiche) */
+.dv.cb .cb-runes { gap: 2px; padding-left: 6px; }
+.dv.cb .cb-runes img { width: 9px; height: 18px; object-fit: contain; filter: drop-shadow(0 0 3px rgba(150, 120, 255, .8)); }
+.dv.cb .cb-runes img.off { filter: grayscale(1) brightness(.6); opacity: .7; }
+.dv.cb .cb-runes b { margin-left: 4px; }
+.cb-runeline { display: flex; align-items: center; gap: 10px; }
+.cb-runeline img { width: 22px; height: 44px; object-fit: contain; flex: none; }
+.cb-runeline.off { opacity: .6; }

@@ -58,7 +58,6 @@ export default function descent(app, root) {
         ${torches ? `<div class="dc-curse-row ${ui.cursed ? 'on' : ''}"><span><b>${icon('skull')} Descente maudite</b><span class="small muted">coffre d’une qualité au-dessus, mais rien si l’équipe tombe</span></span><button class="switch" role="switch" aria-checked="${ui.cursed}" data-act="curse" aria-label="Descente maudite"><i></i></button></div>` : ''}
       </section>
       ${ruleHTML(g.rule())}
-      ${(() => { const w = weeklyHTML(); return w ? `<details class="panel dc-fold dc-evt"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/hunt.webp"><span class="dc-sum-t">Créature de la semaine</span></summary>${w}</details>` : ''; })()}
       ${(() => { const s = seasonHTML(); return s ? `<details class="panel dc-fold dc-evt"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/season.webp" onerror="this.remove()"><span class="dc-sum-t">Saison et paliers</span></summary>${s}</details>` : ''; })()}
       ${Object.values(g.s.items).some((n) => n > 0) ? bagHTML(g) : ''}
       <details class="panel dc-fold bn-ranking" id="lb"><summary><span class="dc-sum-t">Classement du jour</span></summary><div class="lb-body small muted">Chargement…</div></details>
@@ -79,12 +78,6 @@ export default function descent(app, root) {
       <p class="small muted">Atteins ces étages ce mois-ci (expéditions avec coffre) : chaque palier se gagne une fois par saison. Tout repart à zéro le 1er du mois.</p></section>`;
   }
 
-  // Créature de la semaine
-  function weeklyHTML() {
-    const w = g.weekly(), c = cat.get(w.id);
-    return `<section class="panel dc-week ${w.done ? 'done' : ''}" data-act="weekcard" data-id="${c.id}"><span class="dc-week-art" style="--rc:${RARITY[c.rarity].color}"><img alt="" src="${artUrl(c, { lite: true })}"></span>
-      <span><span class="small muted dc-week-lbl">${picon('hunt')}Créature de la semaine</span><b>${esc(c.name)}</b><span class="small">${w.done ? `${icon('check')} Vaincue : sa carte est à toi ! Nouvelle créature lundi.` : 'Elle rôde dans l’Abysse, comme <b>élite redoutable</b> à partir de l’étage 8. Vaincs-la pour gagner sa carte.'}</span></span></section>`;
-  }
   // Éclats possédés et progression vers le prochain booster standard
   function boosterProgressHTML(have) {
     const price = BOOSTERS.standard.price;
@@ -136,7 +129,7 @@ export default function descent(app, root) {
   function doorsView(run) {
     const doors = g.doors();
     root.innerHTML = `${runHead(run)}<p class="dc-prompt">${doors.includes('boss') ? 'Un gardien barre la route.' : doors.length > 1 ? 'Deux passages. Le plus dangereux rapporte plus.' : 'Des créatures barrent le passage.'}</p>
-      <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r} has-art" data-act="door" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic ${DOOR_PIC[r] ? 'pic' : ''}">${DOOR_PIC[r] ? picon(DOOR_PIC[r]) : icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'boss' ? `<b class="dc-bad">${esc(BOSSES[bossOf(run.floor)].name)}${run.nightmare || run.floor >= AWAKEN_AT ? ' (éveillé)' : ''}</b> : ${esc(BOSSES[bossOf(run.floor)].mechanic)}${run.nightmare || run.floor >= AWAKEN_AT ? ' <b class="dc-bad">Éveillé : sa phase 2 commence dès le premier tour.</b>' : ''}${g.s.bossesBeaten[bossOf(run.floor)] ? ` <b class="dc-good">Contre : ${esc(BOSSES[bossOf(run.floor)].counter)}</b>` : ''}` : r === 'elite' && run.floor >= WEEKLY_FLOOR && !g.weekly().done ? `${ROOMS[r].desc} <b class="dc-good">La créature de la semaine t’y attend !</b>` : ROOMS[r].desc}</span></button>`).join('')}</div>
+      <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r} has-art" data-act="door" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic ${DOOR_PIC[r] ? 'pic' : ''}">${DOOR_PIC[r] ? picon(DOOR_PIC[r]) : icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'boss' ? `<b class="dc-bad">${esc(BOSSES[bossOf(run.floor)].name)}${run.nightmare || run.floor >= AWAKEN_AT ? ' (éveillé)' : ''}</b> : ${esc(BOSSES[bossOf(run.floor)].mechanic)}${run.nightmare || run.floor >= AWAKEN_AT ? ' <b class="dc-bad">Éveillé : sa phase 2 commence dès le premier tour.</b>' : ''}${g.s.bossesBeaten[bossOf(run.floor)] ? ` <b class="dc-good">Contre : ${esc(BOSSES[bossOf(run.floor)].counter)}</b>` : ''}` : ROOMS[r].desc}</span></button>`).join('')}</div>
       ${run.cleared ? `<button class="btn ghost block" data-act="leave">${icon('back')}Remonter</button>` : ''}
       <button class="btn ghost small block dc-abandon" data-act="abandon">${icon('p:abandon')}Abandonner l’expédition</button>`;
   }

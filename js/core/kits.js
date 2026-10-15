@@ -120,7 +120,7 @@ export const PASSIVES = {
   drain: { name: 'Drain', desc: 'Ses coups lui rendent 20 % des dégâts infligés.', awaken: '30 %.' },
   premiere: { name: 'Première frappe', desc: '+40 % de dégâts sur un ennemi qui a encore tous ses PV.', awaken: '+60 %.' },
   eruption: { name: 'Éruption', desc: 'Au début de chaque combat, frappe l’ennemi le plus fort à 60 % de son attaque.', awaken: '100 %.' },
-  malediction: { name: 'Malédiction', desc: 'Sa première frappe de chaque tour marque la cible jusqu’à la fin du tour ennemi (+30 % de dégâts subis).', awaken: 'La marque dure un tour de plus.' },
+  malediction: { name: 'Malédiction', desc: 'Sa première frappe de chaque tour marque la cible : le prochain coup d’une autre de tes créatures fait +50 % et +2 Brisure.', awaken: 'La marque dure un tour de plus.' },
   benediction: { name: 'Bénédiction', desc: 'Une fois par combat, quand un allié passe sous 30 % de ses PV, elle le soigne de 20 %.', awaken: 'Deux fois par combat.' },
   egide: { name: 'Égide', desc: 'Commence chaque combat avec un bouclier (il bloque un coup).', awaken: 'Le bouclier revient au 4e tour.' },
   reliquat: { name: 'Reliquat', desc: 'Quand elle tombe, ton équipe gagne 2 Ferveur.', awaken: 'Et tes créatures au combat +1 ATQ.' },
@@ -159,7 +159,7 @@ export const ROLE_TXT = {
 function expandKit(g) {
   const P = PASSIVES[g.p], [plus, moins, syn] = ROLE_TXT[g.r];
   return {
-    style: g.s, stat: { atk: g.a, hp: +(1 / g.a).toFixed(2) },
+    style: g.s, role: g.r, stat: { atk: g.a, hp: +(1 / g.a).toFixed(2) },
     strike: { name: g.k, desc: FAC_STRIKE[g.f].txt, ...FAC_STRIKE[g.f].fx },
     passive: g.p, ...(g.p2 ? { passive2: g.p2 } : {}), move: g.m,
     plus: `${plus} ${P.name} : ${P.desc.charAt(0).toLowerCase()}${P.desc.slice(1)}`,
@@ -290,7 +290,7 @@ const OP_TXT = {
   slow: (o) => (o.on === 'foes' ? 'ralentit tous les ennemis' : o.on === 'tn' ? 'ralentit la cible et un voisin' : o.on === 'n' ? 'ralentit un voisin de la cible' : 'ralentit la cible'),
   freeze: () => 'gèle la cible',
   brk: (o) => `+${o.n} Brisure${o.on === 'foes' ? ' à chaque ennemi' : ''}`,
-  mark: () => 'marque la cible (+30 % de dégâts subis, 2 tours)',
+  mark: () => 'marque la cible (le prochain coup d’une autre créature : +50 % et +2 Brisure)',
   shield: (o) => ({ self: 'se donne un bouclier', ally: 'donne un bouclier à l’allié choisi', team: 'donne un bouclier à toute l’équipe', low: 'donne un bouclier à l’allié le plus blessé' }[o.on]),
   heal: (o) => ({ self: `se soigne de ${pct(o.p)}`, ally: `soigne l’allié choisi de ${pct(o.p)}`, team: `soigne toute l’équipe de ${pct(o.p)}`, low: `soigne l’allié le plus blessé de ${pct(o.p)}` }[o.on]),
   boost: (o) => ({ self: `gagne +${o.n} ATQ ce tour-ci`, ally: `donne +${o.n} ATQ à l’allié choisi ce tour-ci`, team: `donne +${o.n} ATQ à toute l’équipe ce tour-ci` }[o.on]),
@@ -413,6 +413,16 @@ export function passiveMult(st, a, t, front) {
   return m;
 }
 
+// v271 : Éveil tactique — à l'Éveil (niveau 9), la compétence propre gagne un effet lié au rôle de la créature
+export const ROLE_AWAKEN = {
+  degats: 'devient un coup de rupture (elle brise un ennemi Fêlé).',
+  zone: 'devient un coup de rupture pour tous les ennemis touchés.',
+  protecteur: 'charge sa riposte (+1).',
+  soin: 'donne aussi +1 PA à ta créature la plus blessée.',
+  poison: 'fait détoner un poison de 6 ou plus sur sa cible (poison × 1,5).',
+  controle: 'retarde sa cible de 2 places dans l’ordre du tour.',
+  soutien: 'fait jouer juste après elle ta créature la plus forte qui n’a pas encore joué.',
+};
 // ——— Présentation (fiche de la créature, Renforcer, montée de niveau) ———
 export const moveIconUrl = (k) => `assets/pw/${k}.webp`;
 // Passifs qui ont leur icône peinte (assets/icons/pp-<clé>.webp)
@@ -426,7 +436,8 @@ export function kitSteps(id, level = 1) {
   const k = CREATURE_KITS[id];
   if (!k) return [];
   const P = PASSIVES[k.passive], M = moveDefOf(k), P2 = k.passive2 && PASSIVES[k.passive2];
-  const aw = P2 ? `Gagne un second passif, ${P2.name} : ${P2.desc}` : [P.awaken && `${P.name} : ${P.awaken}`, M.awaken && `${M.name} : ${M.awaken}`].filter(Boolean).join(' ');
+  const RA = ROLE_AWAKEN[k.role];
+  const aw = [P2 ? `Gagne un second passif, ${P2.name} : ${P2.desc}` : [P.awaken && `${P.name} : ${P.awaken}`, M.awaken && `${M.name} : ${M.awaken}`].filter(Boolean).join(' '), RA && `${M.name} ${RA}`].filter(Boolean).join(' ');
   return [
     { k: 'strike', kind: 'Frappe', name: k.strike.name, desc: k.strike.desc, img: strikeIconUrl(id) },
     { k: 'passive', kind: 'Passif', name: P.name, desc: P.desc, img: passiveIconUrl(k.passive) },

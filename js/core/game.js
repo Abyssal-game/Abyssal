@@ -780,16 +780,11 @@ export class Game {
       const eff = room === 'boss' ? run.floor : Math.max(run.floor, run.minFloor || 1);
       const sc = enemyScale(eff);
       const lvl = enemyLevel(eff, room);
-      const wk = this.weekly();
       const list = eventSwap(this.catalog, floorEnemies(this.catalog, run.day, run.floor, room), run.day, run.floor, this.event().factions);
-      const hunt = room === 'elite' && run.floor >= WEEKLY_FLOOR && !wk.done;
-      if (hunt) list.forEach((e) => { if (e.elite) e.id = wk.id; });
       const enemies = list.map((e) => duelUnit(this.catalog.get(e.id), { side: 'enemy', scale: sc, level: e.boss || e.elite ? lvl : enemyLevel(eff, 'fight'), boss: e.boss, elite: e.elite }));
       for (const e of enemies) {
         // combats ordinaires : des ennemis qui frappent plus fort, pour que chaque combat ait un enjeu
         if (!e.boss && !e.elite) e.atk = Math.round(e.atk * FIGHT_ATK + 0.4);
-        // la créature de la semaine est une proie redoutable : plus solide et plus forte qu'une élite
-        if (hunt && e.elite && e.id === wk.id) { e.maxHp = Math.round(e.maxHp * 1.7); e.hp = e.maxHp; e.atk = Math.round(e.atk * 1.25 + 0.5); e.brkMax = 9; e.brk = 9; e.weekly = true; }
         const f = this.catalog.get(e.id)?.faction;
         if (rule.key === 'furie' && f === rule.faction) e.atk = Math.round(e.atk * 1.25 + 0.4);
         if (rule.key === 'sommeil' && f === rule.faction) { e.maxHp = Math.max(1, Math.round(e.maxHp * 0.75)); e.hp = e.maxHp; }
@@ -907,11 +902,7 @@ export class Game {
       if (won) { this.s.bossesBeaten[bossKey] = this.s.bossesBeaten[bossKey] || Date.now(); }
     }
     if (!won && pactUsed === 'gardien') run.shards = 0; // le prix du Pacte du Gardien
-    const wk = this.weekly();
-    if (won && !wk.done && st.kills.includes(wk.id)) {
-      this.s.weekly = { week: wk.week, done: true };
-      out.weekly = { id: wk.id, ...this.addCard(wk.id, 'normal', 'booster') };
-    }
+    // (v271 : la créature de la semaine est retirée ; un combat commencé avant reste valable mais ne donne plus sa carte)
     // gardien vaincu : une chance sur quatre qu'il rejoigne ta collection (la vraie voie vers les grandes créatures)
     if (won && room === 'boss' && !run.free) {
       const b = Object.values(st.units).find((u) => u.boss);
