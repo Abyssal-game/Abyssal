@@ -1,4 +1,5 @@
-// Effets sonores synthétisés (Web Audio) : aucun fichier audio à télécharger.
+// Effets sonores : fichiers enregistrés (assets/sfx, ElevenLabs) joués par Web Audio. Les sons synthétisés ci-dessous ne
+// servent plus que pour « rip » et « rumble » (sans fichier) : depuis la v308, rien de synthétisé pendant le chargement.
 // Chaîne : chaque son → (sec + réverbération de salle) → compresseur → volume général.
 // Les sons sont faits de couches : transitoire (le « clic » du contact), corps (le grave), queue (la résonance).
 // Petites variations aléatoires de hauteur pour que les sons répétés ne sonnent pas mécaniques.
@@ -30,6 +31,7 @@ function ensure() {
     // iPhone : l'audio peut être suspendu en revenant dans l'app
     // app en arrière-plan : tout est suspendu (batterie)
     document.addEventListener('visibilitychange', () => { if (document.hidden) ctx.suspend().catch(() => {}); else if (ctx.state !== 'running') ctx.resume().catch(() => {}); });
+    loadSamples(); // v308 : tous les sons sont chargés dès le premier toucher
   }
   if (ctx.state !== 'running') ctx.resume().catch(() => {});
   return ctx;
@@ -349,19 +351,33 @@ function loadSamples() {
 const REVEAL_UP = ['C', 'PC', 'R', 'HR', 'M', 'S'];
 const sampleKey = (k, a) => {
   if (k === 'discover') return 'sheet'; // v290 : l'ancien carillon « discover » sonnait comme un bip, remplacé partout par un froissement doux
+  if (k === 'actor') return 'sheet'; // v308 : « actor » (tour d'une créature) était un bip mesuré (raies pures vers 2 kHz)
   if (k !== 'reveal') return k;
   for (let i = Math.max(0, REVEAL_UP.indexOf(a[0])); i >= 0; i--) { const key = `reveal-${REVEAL_UP[i].toLowerCase()}`; if (samples[key]) return key; }
   return 'reveal-c';
 };
-function playSample(key) {
+// v308 (audit audio mesuré à l'ffmpeg) : volume propre à certains fichiers, et aigus adoucis pour ceux qui sonnaient comme des bips
+const SAMPLE_GAIN = { 'reveal-c': 7, chest: 1.4, tear: 1.4, bossvictory: 1.26, 'reveal-s': 1.26, unlock: 1.6 };
+const SAMPLE_LOWPASS = { yourturn: 1200, passive: 1200, mark: 1400 };
+const lastPlay = {}, playing = {};
+function playSample(key, gain = 1) {
   const buf = samples[key];
   if (!buf || !ensure()) return false;
+  // anti-rebond : pas deux fois le même son à moins de 45 ms, ni plus de 3 fois en même temps
+  const now = ctx.currentTime;
+  if (now - (lastPlay[key] ?? -1) < 0.045 || (playing[key] || 0) >= 3) return true;
+  lastPlay[key] = now; playing[key] = (playing[key] || 0) + 1;
   const src = ctx.createBufferSource(); src.buffer = buf;
   src.playbackRate.value = 1 + (Math.random() - 0.5) * 0.04; // petite variation : moins mécanique
-  const g = ctx.createGain(); g.gain.value = 0.9;
-  src.connect(g); g.connect(bus); src.start();
+  src.onended = () => { playing[key] = Math.max(0, (playing[key] || 1) - 1); };
+  const g = ctx.createGain(); g.gain.value = 0.9 * (SAMPLE_GAIN[key] || 1) * gain;
+  let out = src;
+  if (SAMPLE_LOWPASS[key]) { const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = SAMPLE_LOWPASS[key]; lp.Q.value = 0.5; out = src.connect(lp); }
+  out.connect(g); g.connect(bus); src.start();
   return true;
 }
+// sons sans fichier : seuls ceux-là restent synthétisés (bruits, jamais des notes)
+const SYNTH_ONLY = new Set(['rip', 'rumble']);
 
 // Vibrations associées (nombre de petites impulsions) et baisse de la musique pendant les grands moments
 const HAP = { explode: 2, finisher: 2, synergy: 1, enemyturn: 1, suspensebig: 2, bossvictory: 3, shield: 1, taunt: 1, hit: 1, slash: 1, smash: 2, crit: 2, capture: 1, block: 1, parry: 1, shatter: 3, boss: 3, ult: 2, victory: 3, defeat: 2, error: 1, dice: 1, tear: 1, achievement: 2, pose: 1, fury: 2, death: 1, levelup: 1, burnall: 2, chest: 2, apogee: 2, fame: 1, season: 1 };
@@ -375,8 +391,10 @@ for (const k of Object.keys(sfx)) {
     try {
       if (!ensure()) return undefined;
       loadSamples();
-      if (playSample(sampleKey(k, a))) return undefined;
-      return f(...a);
+      const key = sampleKey(k, a);
+      if (playSample(key, k === 'actor' ? 0.6 : 1)) return undefined;
+      // v308 : fichier pas encore chargé (ou introuvable) : silence plutôt qu'un son synthétisé (bips)
+      return SYNTH_ONLY.has(k) ? f(...a) : undefined;
     } catch (e) { return undefined; }
   };
 }

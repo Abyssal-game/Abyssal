@@ -21,7 +21,7 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Le réseau de la session bloque github.io : pour vérifier la publication, passe par l'outil GitHub (déploiements Pages) ou demande une capture au propriétaire.
 
 ## 2. Routine de livraison
-1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v308**.
+1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v309**.
 2. Tests : `node --test tests/*.test.mjs` (187 tests), `node tools/validate.mjs`. Si le combat ou l'équilibre change : `node tools/fuzz.mjs 300` (étage moyen ≈ 12 à 14 en normal).
 3. Vérification dans le navigateur avec Playwright (`/opt/node-tools/node_modules/playwright/index.mjs`, Chromium déjà installé), avec un serveur local `python3 -m http.server 8092` lancé dans le dossier. Tailles iPhone SE et iPhone 13. **L'écran d'ouverture attend un toucher** (« Touche l'écran pour entrer ») : dans les scripts, cliquer au milieu de l'écran (dans la fenêtre 390×664) avant tout le reste.
 4. Commit, push, réponse en français.
@@ -31,6 +31,7 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Ajouter des créatures : fichier de lot `data/lot-*.json` → `node tools/add-lot.mjs data/lot-x.json --write` → `node tools/gen-kits.mjs` (identités de combat dans `js/core/kits-data.js`) → `python3 tools/add-art.py <ID> <image>` pour chaque illustration (recadrage 5:7, 600×840 et miniature dans `assets/art/lite/`).
 - Refaire une illustration existante : `tools/redo-art.json` liste les descriptions, `node tools/redo-art.mjs` affiche les prompts, `node tools/redo-art.mjs <ID> --write` enregistre la description après réception de l'image.
 - Emblèmes d'ensembles : image sur fond blanc → `python3 tools/cutout.py src.jpg out.webp` → 192×192 dans `assets/sets/`, puis ajouter la clé dans `SET_ART` (`js/ui/icons.js`).
+- Audio (v309, audit mesuré à l'ffmpeg) : plus aucun son ni musique synthétisés pendant le chargement (silence, puis le fichier) ; seuls `rip` et `rumble` restent synthétisés. `actor` joue `sheet`. Volumes et passe-bas par fichier dans `SAMPLE_GAIN` / `SAMPLE_LOWPASS` (`js/ui/sound.js`), volume par musique dans `TRACK_GAIN` (`js/ui/music.js`). Musiques en boucle sur le fichier entier ; 2 musiques décodées au plus en mémoire.
 - Sons : fichiers dans `assets/sfx/` (liste dans `assets/sfx/manifest.json`), avec un repli synthétisé dans `js/ui/sound.js`. Sons et musiques faits avec ElevenLabs (abonnement payant). **Aucun bip** : le carillon « discover » a été supprimé (remplacé par le son « sheet »), et les fins tonales des sons de rareté Commune et Rare ont été coupées. Le propriétaire déteste les bips.
 - Illustrations : Gemini. Polices intégrées au jeu (`css/fonts.css`, `assets/fonts/`, licences OFL). Aucun appel à Google.
 - CSS en couches : plus loin dans `css/army.css` = prioritaire. On ajoute les nouvelles règles **à la fin**, avec un commentaire `/* vNNN : … */`.

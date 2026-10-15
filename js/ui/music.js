@@ -41,7 +41,7 @@ const THEMES = {
 export const MUSIC_DEMO = [['Accueil', 'antre'], ['Boosters', 'boutique'], ['Descente', 'descente'], ['Combat', 'combat'], ['Gardien', 'boss'], ['Sceaux', 'sceaux']];
 
 // Lieu → ambiance
-const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', descente: 'descente', heros: 'descente', marchand: 'descente', sceaux: 'sceaux' };
+const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', arsenal: 'boutique', descente: 'descente', heros: 'descente', marchand: 'descente', sceaux: 'sceaux' };
 
 function init() {
   if (ctx) return ctx;
@@ -146,18 +146,20 @@ function brass(grp, f, t) {
 // ——— Une ambiance = un groupe (volume propre pour les fondus) + couches continues + événements ———
 // ——— Musiques enregistrées (assets/music/<ambiance>.mp3, liste dans assets/music/manifest.json) ———
 // Une musique livrée remplace l'ambiance calculée de son lieu ; elle tourne en boucle.
-const tracks = {}, trackGet = {}; let trackList = null, trackLoad = null;
+const tracks = {}, trackGet = {}; let trackList = null, trackLoad = null, recent = [];
+// v308 : réglage de volume par musique (mesuré : le gardien était la plus basse alors qu'elle doit être la plus intense)
+const TRACK_GAIN = { boss: 1.26, boutique: 1.19, descente: 1.19 };
 // Seule la liste est lue au démarrage ; chaque musique est téléchargée la première fois que son lieu est visité
 function loadTracks() {
   if (trackLoad) return;
-  trackLoad = fetch('assets/music/manifest.json').then((r) => (r.ok ? r.json() : [])).catch(() => []).then((list) => { trackList = new Set(list); });
+  trackLoad = fetch('assets/music/manifest.json').then((r) => (r.ok ? r.json() : [])).catch(() => []).then((list) => { trackList = new Set(list); if (cur?.pending) needTrack(cur.key); }); // v308 : la musique du premier écran n'attendait pas la liste
 }
 function needTrack(key) {
   if (!trackList?.has(key) || trackGet[key]) return;
   trackGet[key] = fetch(`assets/music/${key}.mp3`).then((r) => (r.ok ? r.arrayBuffer() : null))
     .then((b) => b && new Promise((ok, ko) => ctx.decodeAudioData(b, ok, ko)))
-    .then((buf) => { if (!buf) return; tracks[key] = buf; if (cur && cur.key === key && !cur.file) { stopTheme(cur); cur = startTheme(key); } }) // l'ambiance calculée cède la place au fichier
-    .catch(() => {});
+    .then((buf) => { if (!buf) return; tracks[key] = buf; if (cur && cur.key === key && cur.pending) { stopTheme(cur); cur = startTheme(key); } }) // le silence d'attente cède la place au fichier
+    .catch(() => { delete trackGet[key]; }); // nouvel essai à la prochaine visite
 }
 function startTheme(key) {
   const th = THEMES[key], t = ctx.currentTime;
@@ -166,12 +168,18 @@ function startTheme(key) {
   grp.g.connect(duckG);
   needTrack(key);
   if (tracks[key]) {
+    // v308 : boucle sur le fichier entier (il boucle déjà proprement : couper 50 ms à chaque bout faisait sauter le rythme)
     const s = ctx.createBufferSource(); s.buffer = tracks[key]; s.loop = true;
-    s.loopStart = 0.05; s.loopEnd = tracks[key].duration - 0.05; // évite le petit blanc d'encodage du mp3 (la boucle est déjà fondue)
-    const g = ctx.createGain(); g.gain.value = 1.6; // les fichiers sont mixés plus bas que les ambiances calculées
+    const g = ctx.createGain(); g.gain.value = 1.6 * (TRACK_GAIN[key] || 1); // les fichiers sont mixés plus bas que les ambiances calculées
     s.connect(g).connect(grp.g); s.start(t); grp.stops.push(s); grp.file = true;
+    // mémoire : on ne garde décodées que cette musique et la précédente (une musique décodée pèse ~45 Mo)
+    recent = [key, ...recent.filter((k) => k !== key)].slice(0, 2);
+    for (const k of Object.keys(tracks)) if (!recent.includes(k)) { delete tracks[k]; delete trackGet[k]; }
     return grp;
   }
+  // v308 : pas d'ambiance calculée (ses cloches sonnaient comme des bips) : silence le temps que le fichier arrive
+  if (!trackList || trackList.has(key)) { grp.file = true; grp.pending = true; return grp; }
+  return Object.assign(grp, { file: true }); // lieu sans musique enregistrée : silence
   // nappe grave continue : fondamentale + quinte, filtre qui respire lentement
   const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = th.lp; lp.Q.value = 1.5;
   const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 0.05; lg.gain.value = th.lp * 0.45; lfo.connect(lg).connect(lp.frequency); lfo.start(t);
