@@ -5,3 +5,7 @@ prompts.csv
 # captures brutes des stores (regénérées par tools/store-shots.mjs)
 store/raw/
 store/.compose.html
+
+# application Capacitor : copie du jeu, refaite par tools/build-www.mjs
+www/
+android-smoke/

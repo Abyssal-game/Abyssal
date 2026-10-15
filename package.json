@@ -11,5 +11,16 @@
     "sim": "node tools/simulate.mjs",
     "prompts": "node tools/export-prompts.mjs",
     "icons": "node tools/make-icons.mjs"
+  },
+  "dependencies": {
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.5.3",
+    "@capacitor/filesystem": "8.1.5",
+    "@capacitor/share": "8.0.3",
+    "@capacitor/splash-screen": "8.0.2"
+  },
+  "devDependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/cli": "8.5.3"
   }
 }

@@ -21,7 +21,7 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Le réseau de la session bloque github.io : pour vérifier la publication, passe par l'outil GitHub (déploiements Pages) ou demande une capture au propriétaire.
 
 ## 2. Routine de livraison
-1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v300**.
+1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v301**.
 2. Tests : `node --test tests/*.test.mjs` (187 tests), `node tools/validate.mjs`. Si le combat ou l'équilibre change : `node tools/fuzz.mjs 300` (étage moyen ≈ 12 à 14 en normal).
 3. Vérification dans le navigateur avec Playwright (`/opt/node-tools/node_modules/playwright/index.mjs`, Chromium déjà installé), avec un serveur local `python3 -m http.server 8092` lancé dans le dossier. Tailles iPhone SE et iPhone 13. **L'écran d'ouverture attend un toucher** (« Touche l'écran pour entrer ») : dans les scripts, cliquer au milieu de l'écran (dans la fenêtre 390×664) avant tout le reste.
 4. Commit, push, réponse en français.
@@ -45,6 +45,14 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Annonces : `toast()` dans `js/ui/dom.js`. **File d'attente**, une seule annonce à la fois, le son joue à l'affichage.
 - Tutoriels : `js/ui/tutos.js`.
 
+## 4 bis. Application Android / iPhone (Capacitor 8)
+- Identifiant définitif : **com.abyssalgame.abyssal** (ne jamais le changer après publication). Config : `capacitor.config.json`, projet natif : `android/`.
+- Le jeu est copié dans `www/` (ignoré par git) par `node tools/build-www.mjs`, puis `npx cap sync android`. Ne pas éditer `android/app/src/main/assets/public`.
+- Code propre à l'app : `js/native.js` (bouton retour Android, son coupé en arrière-plan, export de sauvegarde par Partager). Dans l'app, le service worker n'est **pas** enregistré.
+- Numéro de version Android = numéro du jeu (`versionCode` lu dans `js/config.js`).
+- Le kit Android ne se télécharge pas dans la session (dl.google.com bloqué) : la construction se fait sur **GitHub Actions** (`.github/workflows/android.yml`), avec essai sur téléphone simulé (`tools/android-smoke.mjs`, captures dans l'artefact `abyssal-android-captures`). Le propriétaire n'a **pas de téléphone Android**.
+- Pas encore fait : version signée pour le Play Store (clé d'envoi à créer et à mettre dans les secrets GitHub), iOS (attend le Mac).
+
 ## 5. Décisions déjà prises
 - Pas de « salle d'épreuve » ni de version de test : tout va sur main.
 - Pas de créature de la semaine, pas de butin « Si tu gagnes » sur les portes, pas de Salles Oubliées / 3D (retirées).
@@ -54,4 +62,4 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 
 ## 6. Projets en cours / idées
 - Publication sur les stores. Le propriétaire aura un **Mac**. Plan : Android d'abord, puis iOS via Xcode et TestFlight. Emballage avec Capacitor. Code d'accès : fait (retiré en v297). Signalement et filtre des pseudos : fait en v298 (`js/core/moderation.js`, `js/ui/report.js`, `supabase/06-signalements.sql` — les listes de mots du JS et du SQL doivent rester identiques, un test le vérifie). Fiche des stores : faite en v299 (`store/fiche.md` : textes, catégories, âge 13+ / PEGI 12, questionnaires de données, notes pour Apple ; images dans `store/google/` et `store/apple/`, refaites par `node tools/store-shots.mjs` puis `node tools/store-compose.mjs`). Reste : emballage Capacitor, ouverture des inscriptions dans Supabase, tests sur vrais téléphones, vérifier que le nom « ABYSSAL » est libre, Pandore (ART-068) refaite habillée en v300 et Nosferatu en v282.
-- Proposition d'achats intégrés (surtout cosmétiques) : à préparer **seulement si le propriétaire le demande**.
+- Achats intégrés : **validés dans le principe** (15 octobre 2026), à faire **après** la sortie gratuite, dans une mise à jour : dos de cartes et cadres spéciaux (1,99 à 2,99 €), pack fondateur vendu une seule fois (vers 9,99 € : cadre exclusif, titre « Fondateur », badge au classement), passe de saison cosmétique (vers 4,99 €, sur les saisons de Renommée). **Pas** de bouton « Soutenir le créateur », pas de boosters payants, pas de publicité. Paiement par les stores (RevenueCat envisagé), « Restaurer mes achats » obligatoire. Le propriétaire n'a pas encore de statut (micro-entreprise à créer).

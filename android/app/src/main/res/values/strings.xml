@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ABYSSAL</string>
+    <string name="title_activity_main">ABYSSAL</string>
+    <string name="package_name">com.abyssalgame.abyssal</string>
+    <string name="custom_url_scheme">com.abyssalgame.abyssal</string>
+</resources>

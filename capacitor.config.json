@@ -1,0 +1,24 @@
+{
+  "appId": "com.abyssalgame.abyssal",
+  "appName": "ABYSSAL",
+  "webDir": "www",
+  "backgroundColor": "#08090D",
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1200,
+      "launchAutoHide": true,
+      "backgroundColor": "#08090D",
+      "showSpinner": false,
+      "androidScaleType": "CENTER_INSIDE"
+    },
+    "SystemBars": {
+      "insetsHandling": "css",
+      "initialViewportFitValueHint": "cover",
+      "style": "DARK"
+    }
+  }
+}

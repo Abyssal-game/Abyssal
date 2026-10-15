@@ -11,6 +11,7 @@ import { MUSIC_DEMO, musicPreview } from '../ui/music.js';
 import { sync, onSync, refreshProfile } from '../cloud/sync.js';
 import { openCreator } from './creator.js';
 import { showWelcome } from './welcome.js';
+import { shareFile } from '../native.js';
 
 export default function settings(app, root) {
   const g = app.game;
@@ -109,11 +110,13 @@ export default function settings(app, root) {
         sh.body.querySelector('textarea').select();
       }
     },
-    download() {
-      const blob = new Blob([JSON.stringify(g.s, null, 1)], { type: 'application/json' });
+    async download() {
+      const name = `abyssal-sauvegarde-${new Date().toISOString().slice(0, 10)}.json`, text = JSON.stringify(g.s, null, 1);
+      try { if (await shareFile(name, text)) return; } catch (e) { toast(esc(`Partage impossible : ${e.message || e}`), { kind: 'error', icon: 'info' }); return; }
+      const blob = new Blob([text], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `abyssal-sauvegarde-${new Date().toISOString().slice(0, 10)}.json`;
+      a.download = name;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 2000);
       toast('Fichier de sauvegarde créé.', { kind: 'success', icon: 'download' });

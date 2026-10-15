@@ -7,7 +7,7 @@ import { MAX_LEVEL } from './core/army.js';
 import { fameTier } from './core/renown.js';
 import { icon, EMBLEM } from './ui/icons.js';
 import { toast, esc, fmt, reducedMotion, closeTopSheet, openSheet } from './ui/dom.js';
-import { sfx, configureSound } from './ui/sound.js';
+import { sfx, configureSound, audioCtx } from './ui/sound.js';
 import { musicRoute, configureMusic } from './ui/music.js';
 import { VERSION } from './config.js';
 import { openCardDetail } from './screens/detail.js';
@@ -31,6 +31,7 @@ import { startSync } from './cloud/sync.js';
 import { startPresence } from './cloud/presence.js';
 import { showWelcome } from './screens/welcome.js';
 import { setScene } from './ui/scene.js';
+import { initNative, isNative } from './native.js';
 
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,
@@ -292,8 +293,11 @@ async function boot() {
   }
 }
 
-// Service worker et mises à jour
-if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+// Application des stores : bouton retour, son coupé en arrière-plan (rien dans un navigateur)
+initNative({ suspendAudio: () => audioCtx()?.suspend?.().catch(() => {}), resumeAudio: () => audioCtx()?.resume?.().catch(() => {}) });
+
+// Service worker et mises à jour (version web seulement : l'application des stores se met à jour par le store)
+if ('serviceWorker' in navigator && location.protocol !== 'file:' && !isNative()) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').then((reg) => {
       const notify = (w) => {
