@@ -645,7 +645,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     b.className = 'cb-phase';
     b.innerHTML = `${st.bossKey ? `<img class="cb-phimg" alt="" src="assets/ui/ph-${st.bossKey}.webp">` : ''}<b>${esc(P.name)}</b><p>${esc(P.desc)}</p><small>Touche pour continuer</small>`;
     $('.dv').appendChild(b);
-    await new Promise((res) => { const go = () => { b.remove(); res(); }; b.addEventListener('pointerdown', go, { once: true }); setTimeout(go, reduced ? 2500 : 6000); });
+    await new Promise((res) => { const go = () => { b.remove(); res(); }; b.addEventListener('pointerdown', go, { once: true }); }); // v295 : attend le toucher, plus de fermeture automatique
   }
   async function ultFx() {
     const c = run.ult.card ? cat.get(run.ult.card) : null;

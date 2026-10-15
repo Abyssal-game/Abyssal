@@ -254,7 +254,7 @@ export default function descent(app, root) {
     let done = false;
     const go = () => { if (done) return; done = true; el.classList.add('out'); setTimeout(() => el.remove(), 300); battleView(g.descent().run); };
     el.addEventListener('click', go);
-    setTimeout(go, 9000);
+    // v295 : plus de lancement automatique — on lit à son rythme, le combat commence au toucher
   }
   function render() {
     const run = g.descent().run;
