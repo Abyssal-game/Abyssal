@@ -2646,3 +2646,43 @@ body.battle-mode .dv.cb { gap: 5px; }
 .dv.cb .dv-c .cb-above .dv-st { gap: 3px !important; }
 .dv.cb .dv-c.enemy .cb-above { margin-bottom: -3px; }
 .dv.cb .dv-c.ally .cb-above { margin-bottom: -13px; }
+/* ——— v279 : passe de finition de l'écran de combat ——— */
+/* ennemis : l'attaque annoncée devient un médaillon (son nom au toucher de la carte), les états en trop un « +N » */
+.dv.cb .dv-c .cb-above .cb-warn { padding: 2px !important; border-radius: 50%; gap: 0; flex: none; }
+.dv.cb .dv-c .cb-above .cb-warn b, .dv.cb .dv-c .cb-above .cb-warn small, .dv.cb .dv-c .cb-above .cb-warn em { display: none !important; }
+.dv.cb .dv-c .cb-above .cb-warn .iicon { width: clamp(15px, 19cqw, 19px); height: clamp(15px, 19cqw, 19px); }
+.dv.cb .dv-c .cb-above .cb-more { display: grid; place-items: center; width: auto !important; min-width: clamp(17px, 22cqw, 22px); padding: 0 4px !important; border-radius: 99px; background: rgba(12, 9, 20, .9) !important; border: 1px solid rgba(242, 193, 78, .55); color: #FFE7A6; font: 800 .6rem/1 var(--f-ui); font-style: normal; }
+/* visée : l'icône de rôle descend sous l'étiquette au lieu de la toucher */
+.dv.cb .dv-c.enemy.target .dv-kw { top: 30px; }
+/* noms plus lisibles sur toutes les cartes */
+.dv.cb .dv-c .dv-nm { color: #FFF4DC; text-shadow: 0 1px 2px #000, 0 0 6px rgba(0, 0, 0, .95), 0 0 14px rgba(0, 0, 0, .8); }
+/* tes créatures : en attente = à peine atténuée ; indisponible (gelée, étourdie) = grisée ; active = cadre doré existant */
+.dv.cb .dv-c.ally.spent { filter: brightness(.8) saturate(.85); }
+.dv.cb .dv-c.ally.unav { filter: grayscale(.85) brightness(.55); }
+/* coûts des actions : une seule pastille sombre, toujours en haut à droite */
+.dv.cb .cb-a .cb-cost { top: 5%; right: 5%; left: auto; bottom: auto; transform: none; width: auto; display: inline-flex; align-items: center; gap: 3px; min-height: 0; padding: 2px 5px; border-radius: 99px; background: rgba(10, 8, 16, .85); border: 1px solid rgba(242, 193, 78, .4); font: 800 .55rem/1 var(--f-ui); }
+.dv.cb .cb-a .cb-cost:empty { display: none; }
+.dv.cb .cb-a .cb-cost .gain, .dv.cb .cb-a .cb-cost .d20, .dv.cb .cb-a .cb-cost .free { padding: 0; background: none; border: 0; box-shadow: none; font: inherit; }
+.dv.cb .cb-a .cb-cost .gain { color: #9FF0BE; }
+.dv.cb .cb-a .cb-cost .d20 { color: #F2C14E; }
+.dv.cb .cb-a .cb-cost .free { color: #D9C79A; }
+.dv.cb .cb-a .cb-cost .fv { padding: 1px 4px; }
+.dv.cb .cb-a .cb-cost .pa { width: 7px; height: 7px; }
+/* consigne de visée : action, consigne, puis Annuler bien séparé ; la réserve s'efface pendant la visée */
+.dv.cb .dv-msg .cb-hint { color: #E9E1CC; font-weight: 600; }
+.dv.cb .dv-msg:has(.cb-cancel) { flex: 1 1 auto; justify-content: flex-start; gap: 8px; padding-right: 5px; }
+.dv.cb .dv-msg .cb-cancel { margin-left: auto; flex: none; }
+.dv.cb.cb-aiming .dv-resw { display: none; }
+/* nom du pouvoir d'équipe : sur deux lignes plutôt que coupé */
+.dv.cb .cb-res .cb-ult b { -webkit-line-clamp: 2; white-space: normal; text-overflow: clip; line-height: 1.05; }
+.dv.cb .dv-c.ally:has(.cb-above .sti, .cb-above .bo) .dv-kw { top: 14px; }
+/* riposte et attaque renforcée : même gabarit que les autres pastilles du bandeau */
+.dv.cb .cb-above .bo { display: grid; place-items: center; min-width: clamp(17px, 22cqw, 22px); height: clamp(17px, 22cqw, 22px); padding: 0 4px !important; border-radius: 99px; background: rgba(12, 9, 20, .9) !important; border: 1px solid rgba(140, 180, 255, .7); color: #CFE0FF !important; font: 800 .58rem/1 var(--f-ui); font-style: normal; white-space: nowrap; }
+/* petits écrans : noms d'actions et nom de la créature active entiers */
+@media (max-width: 360px) {
+  .dv.cb .cb-a b { font-size: .5rem; left: 3%; right: 3%; }
+  .dv.cb .cb-who b { font-size: .74rem; white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.05; }
+}
+@media (max-width: 360px) { .dv.cb .cb-res .cb-ult b { font-size: .5rem; letter-spacing: 0; } }
+/* étiquette FÊLÉ / BRISÉ : le nom remonte au-dessus au lieu d'être recouvert */
+.dv.cb .dv-c.has-brk.fele .dv-nm, .dv.cb .dv-c.has-brk.broken .dv-nm { bottom: 43px !important; }

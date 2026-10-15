@@ -91,7 +91,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   let th = {}, tgtInfo = {}, lastGoal = null;
   // États : icônes peintes (le chiffre du poison et du bonus d'attaque en pastille)
   const st_ = (k, title, val = '') => `<i class="sti" title="${title}"><img alt="${title}" src="assets/icons/st-${k}.webp">${val !== '' ? `<b>${val}</b>` : ''}</i>`;
-  const statusHTML = (u) => [
+  const statusList = (u) => [
     u.broken ? st_('broken', 'Brisé : +50 % de dégâts subis, +5 aux jets') : '',
     u.cracked ? st_('broken', 'Fêlé : un coup de rupture le brise (attaque d’un Protecteur, Coup d’estoc, Raz-de-marée, ou coup qui consomme une Marque)') : '',
     u.riposte ? `<i class="bo cb-rip" title="Riposte chargée : sa prochaine attaque fait +${u.riposte} dégât(s) et +${u.riposte} Brisure">⚔${u.riposte}</i>` : '',
@@ -115,7 +115,11 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     u.totality ? st_('totality', 'Totalité : seules ses faiblesses le blessent pleinement') : '',
     ...passivesOf(u).map((p) => (passiveIconUrl(p) ? `<i class="sti ckp" title="Passif : ${esc(PASSIVES[p].name)} · ${esc(PASSIVES[p].desc)}"><img alt="" src="${passiveIconUrl(p)}"></i>` : '')),
     u.talent && TALENTS[u.talent] ? `<i class="sti" title="Talent : ${esc(TALENTS[u.talent].name)} · ${esc(TALENTS[u.talent].desc)}"><img alt="" src="assets/icons/tal-${u.talent}.webp"></i>` : '',
-  ].join('');
+  ].filter(Boolean);
+  const statusHTML = (u) => statusList(u).join('');
+  // v279 : bandeau d'états au-dessus de la carte, 3 pastilles au plus (2 si une attaque est annoncée) ; le reste en « +N », détaillé au toucher
+  const statusBand = (u, warn) => { const L = statusList(u), max = warn ? 2 : 3, more = L.length - max;
+    return `<span class="dv-st">${(more > 0 ? L.slice(0, max) : L).join('')}${more > 0 ? `<i class="sti cb-more" title="${more} autre(s) effet(s) : touche la carte">+${more}</i>` : ''}</span>`; };
   const intentChip = (u) => {
     const i = intentInfo(st, u);
     if (!i || st.turn !== 'ally') return '';
@@ -134,7 +138,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const dead = u.hp <= 0, enemy = u.side === 'enemy';
     const ready = !enemy && st.turn === 'ally' && actionsFor(st, u.uid).some((a) => a.ok && a.key !== 'swap');
     const tgt = tgtInfo[u.uid];
-    return `<button class="dv-c ${u.side} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.phase2 ? 'p2' : ''} ${u.defend ? 'def' : ''} ${u.broken ? 'broken' : ''} ${u.cracked ? 'fele' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" data-rar="${u.rarity}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(c.name)}, ${Math.max(0, u.hp)} PV">
+    return `<button class="dv-c ${u.side} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.phase2 ? 'p2' : ''} ${u.defend ? 'def' : ''} ${!enemy && !dead && (u.frozen || u.stunned) ? 'unav' : ''} ${u.broken ? 'broken' : ''} ${u.cracked ? 'fele' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" data-rar="${u.rarity}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(c.name)}, ${Math.max(0, u.hp)} PV">
       <span class="dv-base" aria-hidden="true"></span>
       <span class="dv-art"><img alt="" src="${artUrl(c)}"></span>
       <span class="dv-kw ${enemy && u.fam ? 'fam' : ''}" title="${esc(enemy && u.fam ? AI_FAMILIES[u.fam].desc : kit.name)}">${roleIcon(kit.kw)}<em>${esc(enemy && u.fam ? AI_FAMILIES[u.fam].name : kit.name)}</em></span>
@@ -144,7 +148,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       <span class="dv-atk">${icon('swords')}<b>${u.atk + (u.boost || 0)}</b></span>
       <span class="dv-hp ${u.hp < u.maxHp ? 'hurt' : ''}">${icon('heart')}<b>${Math.max(0, u.hp)}</b></span>
             ${tgt ? `<span class="cb-tgt">${tgt}</span>` : ''}
-      <span class="cb-above"><span class="dv-st">${statusHTML(u)}</span>${enemy && !dead ? cardWarn(u) : ''}</span>
+      ${(() => { const w = enemy && !dead ? cardWarn(u) : ''; return `<span class="cb-above">${statusBand(u, !!w)}${w}</span>`; })()}
     </button>`;
   };
   const resHTML = (side) => {
@@ -231,13 +235,14 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     $('.dv-end').classList.toggle('pulse', st.turn === 'ally' && !canMore && !busy);
     root.querySelectorAll('.dv-bar button').forEach((b) => { const off = busy || st.turn !== 'ally' || !!st.over; b.disabled = off; b.classList.toggle('off', off); });
     if (!busy && st.turn === 'ally' && !st.over) {
-      if (mode) say(`<b>${esc(mode.name)}</b> · touche la cible <button class="cb-cancel" data-d="cancel">Annuler</button>`);
+      if (mode) say(`<b>${esc(mode.name)}</b><span class="cb-hint">${mode.key === 'duo' ? 'Choisis l’ennemi à frapper ensemble' : mode.key === 'rempart' ? 'Choisis l’allié à protéger' : mode.key === 'priere' ? 'Choisis l’allié à soigner' : mode.target === 'ally' ? 'Choisis un allié' : 'Choisis une cible'}</span><button class="cb-cancel" data-d="cancel">Annuler</button>`);
       else if (sel && st.init) say(''); // v270 : le panneau d'actions montre déjà qui joue et ses PA
       else if (sel) say(`Choisis une action · <b>${st.ap}</b> action${st.ap > 1 ? 's' : ''} pour l’équipe`);
       else say(canMore ? `Touche une créature · <b>${st.ap}</b> action${st.ap > 1 ? 's' : ''} pour l’équipe` : 'Touche <b>Passer</b>');
     } else if (st.turn === 'enemy' && !st.over) say('<b class="dc-bad">Tour des créatures corrompues</b>');
     guideStep();
     drawTimeline();
+    $('.dv')?.classList.toggle('cb-aiming', !!mode); // v279 : en visée, la réserve s'efface
   }
   // Tracés rouges : d'un ennemi qui prépare un coup dangereux vers la créature qu'il vise (v253)
   // Ordre des tours (v258) : frise horizontale de portraits en haut de l’écran (v270). Ton équipe joue ensemble, puis chaque ennemi à son tour.
@@ -867,7 +872,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (key === 'swap') { if (ts.length === 1) { mode = null; return exec(() => act(st, u, 'swap', ts[0])); } return pickReserve(); }
     if (a.dice && !g.s.tips?.['cb-dice']) await tuto(app, 'cb-dice');
     if (ts.length === 1 && (key === 'rempart' || key === 'priere')) { mode = null; return exec(() => act(st, u, key, ts[0])); }
-    mode = { key, name: a.name, dice: !!a.dice };
+    mode = { key, name: a.name, dice: !!a.dice, target: a.target };
     draw();
   }
   // Description d'une action (appui long sur sa tuile)
