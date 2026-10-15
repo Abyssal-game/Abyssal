@@ -143,8 +143,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       <span class="dv-atk">${icon('swords')}<b>${u.atk + (u.boost || 0)}</b></span>
       <span class="dv-hp ${u.hp < u.maxHp ? 'hurt' : ''}">${icon('heart')}<b>${Math.max(0, u.hp)}</b></span>
             ${tgt ? `<span class="cb-tgt">${tgt}</span>` : ''}
-      <span class="dv-st">${statusHTML(u)}</span>
-      ${enemy && !dead ? cardWarn(u) : ''}
+      ${enemy ? `<span class="cb-above"><span class="dv-st">${statusHTML(u)}</span>${dead ? '' : cardWarn(u)}</span>` : `<span class="dv-st">${statusHTML(u)}</span>`}
     </button>`;
   };
   const resHTML = (side) => {

@@ -2626,3 +2626,14 @@ body.battle-mode .dv.cb { gap: 5px; }
 .cb-runeline.off { opacity: .6; }
 /* v274 : l'étiquette de visée (dégâts prévus, K.O.) quitte le centre de l'image : elle chevauche le bord haut de la carte */
 .dv.cb .dv-c .cb-tgt { top: 0; bottom: auto; transform: translate(-50%, -55%); z-index: 9; }
+/* v275 : sur les cartes ennemies, états et grosse attaque annoncée sortent de l'image : un bandeau collé au-dessus de la carte.
+   L'étiquette de visée passe juste à l'intérieur du bord haut. */
+.dv.cb .dv-c .cb-above { position: absolute; z-index: 8; left: 0; right: 0; bottom: 100%; margin-bottom: 2px; display: flex; align-items: center; justify-content: center; gap: 3px; pointer-events: none; }
+.dv.cb .dv-c .cb-above:empty, .dv.cb .dv-c .cb-above .dv-st:empty { display: none; }
+.dv.cb .dv-c .cb-above .dv-st { position: static !important; flex-direction: row !important; flex-wrap: nowrap !important; max-height: none !important; gap: 1px !important; flex: none; }
+.dv.cb .dv-c .cb-above .dv-st .sti { width: clamp(13px, 16cqw, 17px); height: clamp(13px, 16cqw, 17px); }
+.dv.cb .dv-c .cb-above .dv-st .sti b { min-width: 11px; height: 11px; font-size: .48rem; right: -3px; bottom: -3px; }
+.dv.cb .dv-c .cb-above .cb-warn { position: static !important; transform: none !important; flex: 0 1 auto; min-width: 0; max-width: none !important; padding: 1px 5px 1px 1px; }
+.dv.cb .dv-c .cb-above .cb-warn .iicon { width: 14px; height: 14px; flex: none; }
+.dv.cb .dv-c .cb-above .cb-warn b { font-size: .58rem; }
+.dv.cb .dv-c.enemy .cb-tgt { top: 3px; transform: translateX(-50%); }
