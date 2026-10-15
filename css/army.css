@@ -2624,3 +2624,5 @@ body.battle-mode .dv.cb { gap: 5px; }
 .cb-runeline { display: flex; align-items: center; gap: 10px; }
 .cb-runeline img { width: 22px; height: 44px; object-fit: contain; flex: none; }
 .cb-runeline.off { opacity: .6; }
+/* v274 : l'étiquette de visée (dégâts prévus, K.O.) quitte le centre de l'image : elle chevauche le bord haut de la carte */
+.dv.cb .dv-c .cb-tgt { top: 0; bottom: auto; transform: translate(-50%, -55%); z-index: 9; }
