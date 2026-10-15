@@ -2505,3 +2505,113 @@ body.has-subnav #subnav .sn-tab { background: #16121E; }
 .cb-a[data-a="duo"] { box-shadow: 0 0 14px rgba(180, 120, 255, .75); border-radius: 12px; animation: cbDuo 1.4s ease-in-out infinite; }
 @keyframes cbDuo { 50% { box-shadow: 0 0 22px rgba(200, 150, 255, .95); } }
 @media (prefers-reduced-motion: reduce) { .cb-a[data-a="duo"] { animation: none; } }
+
+/* ═══ v270 : refonte de l'écran de combat ═══
+   Zones empilées, chacune à sa place : en-tête · objectifs · frise · ennemis · message · actions · alliés · barre.
+   Les blocs fixes sont compacts pour laisser la hauteur aux deux rangées de cartes ; tout ce qui se pose sur
+   une carte est mesuré en largeur de carte (cqw) et reste à l'intérieur. */
+body.battle-mode .dv.cb { gap: 5px; }
+/* A. En-tête */
+.dv.cb .dv-top { flex: none; min-height: 38px; }
+.dv.cb .dv-top > b { min-height: 32px; font-size: .8rem; max-width: 64%; padding: 2px 24px 0; }
+.dv.cb .dv-top .btn.small.ghost { width: 36px; min-width: 36px; height: 36px; min-height: 36px; }
+.dv.cb .cb-rules { flex: none; flex-wrap: nowrap; overflow: hidden; gap: 6px; max-height: 24px; }
+.dv.cb .cb-rules .cb-law { margin: 0; min-height: 22px; padding: 2px 9px; font-size: .62rem; white-space: nowrap; }
+.dv.cb .cb-rules .cb-law .ic, .dv.cb .cb-rules .cb-gico { width: 14px !important; height: 14px !important; }
+/* Frise horizontale : qui joue maintenant (à gauche, en grand), puis la suite ; « T2 » ouvre le tour suivant */
+.dv.cb .cb-tl { position: static !important; flex: none; flex-direction: row !important; align-items: center; justify-content: center; gap: 4px; height: 38px; padding: 0 !important; overflow: hidden; pointer-events: none; z-index: auto; animation: none; }
+.dv.cb .cb-tl::before { display: none; }
+.dv.cb .cb-tl .cb-tlr { width: 28px !important; height: 28px !important; flex: none; opacity: .82; }
+.dv.cb .cb-tl .cb-tlr.now { width: 36px !important; height: 36px !important; opacity: 1; }
+.dv.cb .cb-tl .cb-tlr.now::after { display: none; }
+.dv.cb .cb-tl .cb-tlsep { flex: none; padding: 1px 5px; font-size: .55rem; }
+.cb-tlx { position: absolute; z-index: 5; right: -3px; top: -3px; width: 13px; height: 13px; border-radius: 50%; display: grid; place-items: center; background: #E0283F; color: #fff; font: 900 .55rem/1 var(--f-ui); font-style: normal; box-shadow: 0 0 6px rgba(255, 60, 90, .9); }
+.dv.cb .cb-tlw { display: none; }
+/* B / D. Rangées de cartes : toute la hauteur restante, sans marge réservée à l'ancienne frise */
+.dv.cb .dv-row.enemy { padding-left: 0 !important; flex: 1.25 1 0; }
+.dv.cb .dv-row.ally { flex: 1 1 0; }
+.dv.cb .dv-c { container-type: inline-size; }
+/* C. Message : une pastille sobre, seulement quand il y a quelque chose à dire */
+.dv.cb .dv-mid { flex: none; min-height: 0; justify-content: center; gap: 8px; }
+.dv.cb .dv-msg:empty { display: none; }
+.dv.cb .dv-msg:not(:empty) { flex: 0 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 28px; padding: 4px 14px; border: 1px solid rgba(242, 193, 78, .45); border-image: none; border-radius: 99px; background: rgba(10, 8, 18, .9); color: #F2E6C8; font: 700 .74rem/1.2 var(--f-ui); }
+.dv.cb .dv-msg:not(:empty) b, .dv.cb .dv-msg:not(:empty) .gold { color: #FFE7A6 !important; }
+.dv.cb .dv-msg:not(:empty) .dc-good { color: #8FE8AE !important; }
+.dv.cb .dv-msg:not(:empty) .dc-bad { color: #FF95A5 !important; }
+.dv.cb .dv-msg .cb-cancel { background: rgba(255, 255, 255, .1); color: #FFF3DA; border-color: rgba(242, 193, 78, .45); }
+/* réserve : une pastille de portraits */
+.dv.cb .dv-resw .dv-resv { min-width: 0; max-width: none; flex-wrap: nowrap; gap: 3px; padding: 3px 6px; border: 1px solid rgba(242, 193, 78, .35); border-radius: 99px; background: rgba(10, 8, 18, .85); filter: none; }
+.dv.cb .dv-resw .dv-resv img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; object-position: 50% 22%; }
+.dv.cb .dv-resw .dv-resv small { display: none; }
+/* E. Panneau d'actions : en-tête d'une ligne, tuiles régulières */
+.dv.cb .cb-acts { margin-bottom: 0; padding: 10px 14px 12px; border-image-width: 26px; }
+.dv.cb .cb-head { margin-bottom: 6px; gap: 8px; }
+.dv.cb .cb-por { width: 38px; height: 38px; flex: none; }
+.dv.cb .cb-who b { font-size: .86rem; }
+.dv.cb .cb-role { font-size: .62rem; }
+.dv.cb .cb-grid { gap: 6px; }
+.dv.cb .cb-a { aspect-ratio: 1.05; }
+.dv.cb .cb-a .cb-ai { top: 33%; width: 38%; }
+.dv.cb .cb-a.own .cb-ai { width: 32%; }
+.dv.cb .cb-a b { top: 56%; font-size: .56rem; }
+.dv.cb .cb-a .cb-cost { bottom: 6%; }
+.dv.cb .cb-grid.n5 .cb-a, .dv.cb .cb-grid.n8 .cb-a { aspect-ratio: .95; }
+/* F. Barre : Ferveur et pouvoir d'équipe à gauche, « Passer » à droite, même hauteur */
+.dv.cb .cb-bar { flex: none; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: stretch; padding-top: 0; }
+.dv.cb .cb-res { min-height: 50px; padding: 6px 12px; row-gap: 4px; }
+.dv.cb .cb-bar .dv-end { min-width: 116px; min-height: 50px; padding: 0 18px; font-size: .82rem; }
+/* Étiquettes posées sur une carte : à l'intérieur, à la taille de la carte */
+.dv.cb .dv-c .cb-tgt { top: auto; bottom: 30%; left: 50%; transform: translateX(-50%); max-width: 98%; padding: .25em .5em; white-space: nowrap; overflow: hidden; font-size: clamp(.6rem, 11cqw, .9rem); border-radius: 8px; }
+.dv.cb .dv-c .cb-tgt i, .dv.cb .dv-c .cb-tgt b { font-size: .8em; }
+.dv.cb .dv-c .cb-warn { top: 3px; max-width: 96%; padding: 2px 6px 2px 2px; font-size: clamp(.5rem, 8cqw, .7rem); }
+.dv.cb .dv-c .cb-warn b { font-size: 1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dv.cb .dv-c .cb-warn .iicon { width: 1.5em; height: 1.5em; }
+.dv.cb .dv-c .cb-warn small { display: none; }
+.dv.cb .dv-c .dv-nm { font-size: clamp(.5rem, 9cqw, .78rem); }
+.dv.cb .dv-c .dv-kw { max-width: 92%; font-size: clamp(.5rem, 8cqw, .66rem); overflow: hidden; }
+.dv.cb .dv-c .dv-boss { max-width: 94%; font-size: clamp(.45rem, 7cqw, .56rem); }
+.dv.cb .dv-c .dv-st .sti { width: clamp(14px, 17cqw, 24px); height: clamp(14px, 17cqw, 24px); }
+@container (max-width: 92px) { .dv.cb .dv-c .dv-kw em { display: none; } .dv.cb .dv-c .dv-boss { font-size: 0; padding: 2px !important; } .dv.cb .dv-c .dv-boss img { width: 16px; height: 16px; margin: 0; } }
+/* Petits écrans (iPhone SE) : frise et panneau plus serrés */
+@media (max-height: 620px) {
+  .dv.cb .cb-tl { height: 32px; } .dv.cb .cb-tl .cb-tlr { width: 24px !important; height: 24px !important; } .dv.cb .cb-tl .cb-tlr.now { width: 30px !important; height: 30px !important; }
+  .dv.cb .cb-acts { padding: 8px 12px 10px; } .dv.cb .cb-por { width: 32px; height: 32px; } .dv.cb .cb-head { margin-bottom: 4px; }
+  .dv.cb .cb-a { aspect-ratio: 1.2; } .dv.cb .cb-grid.n5 .cb-a, .dv.cb .cb-grid.n8 .cb-a { aspect-ratio: 1.05; }
+  .dv.cb .cb-res, .dv.cb .cb-bar .dv-end { min-height: 44px; }
+}
+/* v270 (suite) */
+.dv.cb .cb-res .cb-pips[hidden] { display: none !important; }
+.dv.cb .cb-res { display: flex !important; align-items: center; gap: 10px; min-height: 48px; padding: 6px 12px; }
+.dv.cb .cb-res .cb-fv { display: flex; align-items: center; }
+.dv.cb .cb-res .cb-fv small { display: none; }
+.dv.cb .cb-res .cb-ult { flex: 1 1 auto; min-width: 0; margin: 0; padding: 0; background: none; border: 0; }
+.dv.cb .cb-res .cb-ult b { font-size: .62rem; }
+.dv.cb .cb-bar .dv-end { min-height: 48px; min-width: 112px; }
+/* carte ennemie : rôle en icône seule, sceau du gardien réduit à son blason, étiquette de visée au centre de l'image */
+.dv.cb .dv-c.enemy .dv-kw { padding: 2px !important; }
+.dv.cb .dv-c.enemy .dv-kw em { display: none; }
+.dv.cb .dv-c .dv-boss { font-size: 0 !important; padding: 2px !important; gap: 0; bottom: auto !important; top: 4px !important; left: auto !important; right: 4px !important; transform: none; background: none !important; }
+.dv.cb .dv-c .dv-boss img { width: clamp(16px, 20cqw, 24px); height: clamp(16px, 20cqw, 24px); margin: 0; }
+.dv.cb .dv-c .cb-warn { top: 18%; }
+.dv.cb .dv-c .cb-tgt { bottom: auto; top: 44%; transform: translate(-50%, -50%); }
+/* la carte de la créature qui joue brille, sans sauter hors de sa rangée */
+.dv.cb .dv-row.ally .dv-c.sel { transform: none !important; }
+/* tuiles : coût dans le coin, le nom a toute la largeur sur deux lignes */
+.dv.cb .cb-a .cb-cost { top: 5%; bottom: auto; left: auto; right: 6%; justify-content: flex-end; min-height: 0; transform: scale(.85); transform-origin: top right; }
+.dv.cb .cb-a .cb-ai { top: 36%; }
+.dv.cb .cb-a b { top: 62%; }
+.dv.cb .cb-tl .cb-tlr.now { background: none !important; }
+/* barre du bas : un seul rang (Ferveur · pouvoir d'équipe), sur un fond sobre au lieu du plateau à trois cases */
+.dv.cb .cb-res { aspect-ratio: auto !important; max-width: none !important; width: 100%; align-self: stretch; background: linear-gradient(180deg, #1C1626, #0F0B17) !important; border: 1px solid rgba(242, 193, 78, .45) !important; border-radius: 14px !important; box-shadow: inset 0 0 12px rgba(0, 0, 0, .7) !important; }
+.dv.cb .cb-res .cb-ult { display: flex !important; align-items: center !important; gap: 6px; padding-left: 0 !important; }
+.dv.cb .cb-res .cb-ult .cb-pw { position: static !important; width: 22px !important; height: 22px !important; flex: none; }
+.dv.cb .cb-res .cb-ult b { -webkit-line-clamp: 1; white-space: nowrap; text-overflow: ellipsis; font-size: .66rem; }
+.dv.cb .cb-res .cb-ult small { margin-left: auto; font-size: .6rem; }
+.dv.cb .cb-res .cb-gems i { width: 10px !important; height: 14px !important; }
+@media (max-width: 360px) { .dv.cb .cb-res { gap: 6px; padding: 5px 8px; } .dv.cb .cb-res .cb-gems i { width: 8px !important; height: 12px !important; } .dv.cb .cb-res .cb-ult b { font-size: .56rem; } }
+/* les pastilles ATQ/PV dépassent sous les cartes : la rangée leur réserve la place, rien ne touche la barre */
+.dv.cb .dv-row.ally { padding-bottom: 10px; }
+.dv.cb .dv-row.enemy { padding-bottom: 8px; }
+/* annonce du gardien en haut de la carte, entre l'icône de rôle et le blason */
+.dv.cb .dv-c .cb-warn { top: 3px; max-width: calc(100% - 46px); }
+.dv.cb .dv-c.enemy .dv-st { top: 26%; }

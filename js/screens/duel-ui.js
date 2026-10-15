@@ -73,7 +73,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     <div class="dv-row ally"></div>
     <div class="dv-bar cb-bar">
       <button class="cb-res" data-d="ult" style="--uc:${ult.color}" aria-label="Actions, Ferveur et pouvoir d’équipe">
-        <span class="cb-ap"><small>PA</small><span class="cb-pips"></span></span>
+        ${st.init ? '<span class="cb-pips" hidden></span>' : '<span class="cb-ap"><small>PA</small><span class="cb-pips"></span></span>'}
         <span class="cb-fv"><small>Ferveur</small><span class="cb-gems"></span></span>
         <span class="cb-ult"><img class="cb-pw" alt="" src="assets/icons/power.webp"><b>${esc(ult.name)}</b><small></small></span>
       </button>
@@ -195,8 +195,10 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         const cb = p.dmg && st.units[id].side === 'enemy' ? comboOf(st, st.units[sel], st.units[id]) : 0, cbTxt = cb ? ` <i class="cmb">+${cb}</i>` : '';
         const bk = p.breaks ? ' <i class="brk on">BRISE !</i>' : p.brk ? (p.cracks ? ' <i class="brk fl">FÊLE</i>' : ` <i class="brk">◆${p.brk}</i>`) : '';
         const tu = st.units[id], synOk = tu.side === 'enemy' && p.dmg && ((tu.breach && tu.breach.by !== sel) || (tu.mark && tu.markBy !== sel) || (tu.frozen > 0 && pk === 'estoc'));
-        const syTxt = synOk && !p.breaks ? ` <i class="cmb sy">${tu.mark && tu.markBy !== sel ? '+50 %' : 'Synergie'}</i>` : '';
-        tgtInfo[id] = (p.roll ? `${p.roll.chance}%` : p.dmg ? (p.dmg >= st.units[id].hp && st.units[id].side === 'enemy' ? `<b class="ko">K.O.</b> -${p.dmg}${cbTxt}` : `-${p.dmg}${p.weak ? ' ★' : ''}${cbTxt}`) : 'Cible') + bk + syTxt;
+        // v270 : une valeur et une seule mention, la plus importante (K.O. > Brise > Fêle > Marque/Synergie > Enchaînement > Brisure)
+        const ko = !p.roll && p.dmg && p.dmg >= tu.hp && tu.side === 'enemy';
+        const tag = ko ? '' : p.breaks || p.cracks ? bk : synOk ? ` <i class="cmb sy">${tu.mark && tu.markBy !== sel ? '+50 %' : 'Syn.'}</i>` : cb ? cbTxt : bk;
+        tgtInfo[id] = (p.roll ? `${p.roll.chance}%` : p.dmg ? (ko ? '<b class="ko">K.O.</b>' : `-${p.dmg}${p.weak ? '★' : ''}`) : 'Cible') + tag;
       }
     }
     enEl.innerHTML = front(st, 'enemy').map(cardEl).join('') + resHTML('enemy');
@@ -227,8 +229,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     $('.dv-end').classList.toggle('pulse', st.turn === 'ally' && !canMore && !busy);
     root.querySelectorAll('.dv-bar button').forEach((b) => { const off = busy || st.turn !== 'ally' || !!st.over; b.disabled = off; b.classList.toggle('off', off); });
     if (!busy && st.turn === 'ally' && !st.over) {
-      if (mode) say(`<b>${esc(mode.name)}</b> : touche la cible${mode.dice ? ' · chances affichées dessus' : ''} <button class="cb-cancel" data-d="cancel">Annuler</button>`);
-      else if (sel && st.init) say(`Tour de <b>${esc(cat.get(st.units[sel].id).name)}</b> · <b>${st.units[sel].pa || 0}</b> PA`);
+      if (mode) say(`<b>${esc(mode.name)}</b> · touche la cible <button class="cb-cancel" data-d="cancel">Annuler</button>`);
+      else if (sel && st.init) say(''); // v270 : le panneau d'actions montre déjà qui joue et ses PA
       else if (sel) say(`Choisis une action · <b>${st.ap}</b> action${st.ap > 1 ? 's' : ''} pour l’équipe`);
       else say(canMore ? `Touche une créature · <b>${st.ap}</b> action${st.ap > 1 ? 's' : ''} pour l’équipe` : 'Touche <b>Passer</b>');
     } else if (st.turn === 'enemy' && !st.over) say('<b class="dc-bad">Tour des créatures corrompues</b>');
@@ -246,7 +248,6 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (!next) return it && (BIG_IT.includes(it) || PREP_IT[it]) ? it : null;
     return (u.charged && BIG_IT.includes(u.charged) ? u.charged : null) || (it && PREP_IT[it]) || null;
   };
-  const warnHTML = (k) => (k ? `<em class="cb-tlw ${PREP_IT[k] ? 'prep' : ''}">${intentIcon(PREP_IT[k] || k)}<b>${esc(PREP_IT[k] ? `Prépare : ${INTENTS[PREP_IT[k]].name}` : INTENTS[k].name)}</b></em>` : '');
   function drawTimeline() {
     const box = $('.cb-tl'); if (!box) return;
     if (st.over) { box.innerHTML = ''; return; }
@@ -256,13 +257,13 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       const now = st.turn === 'enemy' ? [...(acting && !st.queue.includes(acting) ? [acting] : []), ...st.queue] : st.actor ? [st.actor] : [];
       const cur = [...now, ...st.init.slice((st.ip ?? -1) + 1)].map((id) => st.units[id]).filter(ok);
       const nxt = st.init.map((id) => st.units[id]).filter(ok);
-      const list = [...cur.map((u) => ({ u, w: bigOf(u, false) })), { sep: st.round + 1 }, ...nxt.map((u) => ({ u, w: bigOf(u, true) }))].slice(0, 5);
+      const list = [...cur.map((u) => ({ u, w: bigOf(u, false) })), { sep: st.round + 1 }, ...nxt.map((u) => ({ u, w: bigOf(u, true) }))].slice(0, 9); // v270 : frise horizontale
       const pic = (u) => `<img alt="" src="${artUrl(cat.get(u.id), { lite: true })}">`;
       const sig = list.map((x) => x.sep ? `T${x.sep}` : x.u.uid).join(',');
       const moved = tlSig && tlSig.split(',')[0] !== sig.split(',')[0];
       tlSig = sig;
       box.innerHTML = list.map((x, i) => (x.sep ? `<span class="cb-tlsep" title="Tour suivant">T${x.sep}</span>`
-        : `<span class="cb-tlr ${x.u.side === 'enemy' ? 'foe' : 'al'} ${i === 0 ? 'now' : ''} ${x.u.boss ? 'boss' : x.u.elite ? 'elite' : ''} ${x.w ? 'warn' : ''}" title="${esc(cat.get(x.u.id).name)}"><span class="cb-tlp">${pic(x.u)}</span>${warnHTML(x.w)}</span>`)).join('');
+        : `<span class="cb-tlr ${x.u.side === 'enemy' ? 'foe' : 'al'} ${i === 0 ? 'now' : ''} ${x.u.boss ? 'boss' : x.u.elite ? 'elite' : ''} ${x.w ? 'warn' : ''}" title="${esc(cat.get(x.u.id).name)}${x.w ? ` : ${esc(INTENTS[PREP_IT[x.w] || x.w].name)}` : ''}"><span class="cb-tlp">${pic(x.u)}</span>${x.w ? '<i class="cb-tlx">!</i>' : ''}</span>`)).join('');
       if (moved && !reduced) { box.classList.remove('shift'); void box.offsetWidth; box.classList.add('shift'); }
       return;
     }
