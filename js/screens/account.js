@@ -5,6 +5,10 @@ import { icon } from '../ui/icons.js';
 import { esc, toast, confirmBox, bindActions } from '../ui/dom.js';
 import { blockedIds, clearBlocked, isMaskedPseudo } from '../core/moderation.js';
 
+// v321 : règle des mots de passe réglée dans Supabase (Authentication → Password requirements)
+const PW_RULE = '8 caractères au moins, avec une majuscule, une minuscule, un chiffre et un symbole (! ? # …)';
+const pwOk = (p) => p.length >= 8 && /[a-z]/.test(p) && /[A-Z]/.test(p) && /[0-9]/.test(p) && /[^A-Za-z0-9]/.test(p);
+
 const ago = (t) => {
   if (!t) return 'jamais';
   const s = Math.round((Date.now() - t) / 1000);
@@ -22,14 +26,16 @@ export default function account(app, root) {
       root.innerHTML = `
         <header class="screen-head ui-hero bn-account"><h1>Nouveau mot de passe</h1><p class="muted">${esc(u.email || '')}</p></header>
         <form class="panel stack acc-form" id="newpass">
-          <label class="acc-l"><span class="small muted">Nouveau mot de passe</span><input class="input plain" type="password" name="password" autocomplete="new-password" required minlength="6" placeholder="6 caractères au moins"></label>
-          <label class="acc-l"><span class="small muted">Encore une fois</span><input class="input plain" type="password" name="password2" autocomplete="new-password" required minlength="6"></label>
+          <label class="acc-l"><span class="small muted">Nouveau mot de passe</span><input class="input plain" type="password" name="password" autocomplete="new-password" required minlength="8" placeholder="8 caractères, Aa1 et symbole"></label>
+          <p class="small muted acc-pwrule">${PW_RULE}.</p>
+          <label class="acc-l"><span class="small muted">Encore une fois</span><input class="input plain" type="password" name="password2" autocomplete="new-password" required minlength="8"></label>
           <button class="btn primary block" type="submit" ${busy ? 'disabled' : ''}>${icon('lock')}${busy ? 'Enregistrement…' : 'Enregistrer'}</button>
         </form>`;
       root.querySelector('#newpass').addEventListener('submit', async (e) => {
         e.preventDefault();
         if (busy) return;
         const f = new FormData(e.target);
+        if (!pwOk(String(f.get('password')))) { toast(`Mot de passe trop faible : ${PW_RULE}.`, { kind: 'error', icon: 'info', ms: 7000 }); return; }
         if (f.get('password') !== f.get('password2')) { toast('Les deux mots de passe sont différents.', { kind: 'error', icon: 'info' }); return; }
         busy = true; render();
         try {
@@ -48,7 +54,7 @@ export default function account(app, root) {
         <div class="seg wide acc-seg" role="group" aria-label="Connexion ou inscription"><button type="button" class="seg-b" data-mode="login" aria-pressed="${!signup}">Se connecter</button><button type="button" class="seg-b" data-mode="signup" aria-pressed="${signup}">Créer un compte</button></div>
         <form class="panel stack acc-form" id="login">
           <label class="acc-l"><span class="small muted">E-mail</span><input class="input plain" type="email" name="email" autocomplete="username" inputmode="email" required value="${esc(lastEmail)}"></label>
-          ${forgot ? '' : `<label class="acc-l"><span class="small muted">Mot de passe</span><input class="input plain" type="password" name="password" autocomplete="${signup ? 'new-password' : 'current-password'}" required minlength="6" ${signup ? 'placeholder="6 caractères au moins"' : ''}></label>`}
+          ${forgot ? '' : `<label class="acc-l"><span class="small muted">Mot de passe</span><input class="input plain" type="password" name="password" autocomplete="${signup ? 'new-password' : 'current-password'}" required ${signup ? 'minlength="8" placeholder="8 caractères, Aa1 et symbole"' : ''}></label>${signup ? `<p class="small muted acc-pwrule">${PW_RULE}.</p>` : ''}`}
           ${forgot ? '<p class="small muted">Tu recevras un e-mail avec un lien : il te ramène au jeu pour choisir un nouveau mot de passe.</p>' : ''}
           <button class="btn primary block" type="submit" ${busy ? 'disabled' : ''}>${icon(forgot ? 'key' : 'user')}${busy ? 'Un instant…' : forgot ? 'Envoyer le lien' : signup ? 'Créer mon compte' : 'Se connecter'}</button>
           ${signup ? `<p class="small muted">En créant un compte, tu acceptes la <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité</a>. Il faut avoir 13 ans ou plus.</p>` : forgot ? `<button type="button" class="btn ghost small" data-mode="login">Retour</button>` : `<button type="button" class="btn ghost small" data-mode="forgot">Mot de passe oublié ?</button>`}
@@ -67,6 +73,7 @@ export default function account(app, root) {
             mode = 'login';
             toast('Si un compte existe avec cet e-mail, un lien vient d’être envoyé. Regarde aussi les indésirables.', { kind: 'success', icon: 'key', ms: 8000 });
           } else if (signup) {
+            if (!pwOk(String(f.get('password')))) throw new Error(`Mot de passe trop faible : ${PW_RULE}.`);
             const r = await cloud.signUp(lastEmail, String(f.get('password')));
             if (r.loggedIn) {
               const k = await afterLogin();

@@ -2809,3 +2809,4 @@ body.battle-mode .dv.cb { gap: 5px; }
 .dc-sheet .how-steps { margin: 0; }
 @media (max-width: 360px) { .dc-link { min-height: 88px; } .dc-link .picon { width: 34px; height: 34px; } .dc-link b { font-size: .68rem; } }
 .dc-sheet h2.center { padding: 0 38px; font-size: 1.2rem; }
+.acc-pwrule { margin: -4px 0 0; }

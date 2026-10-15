@@ -28,7 +28,7 @@ function frError(status, body) {
   if (m.includes('email not confirmed')) return 'Ce compte n’est pas encore confirmé.';
   if (m.includes('signups not allowed') || m.includes('signup is disabled')) return 'Les inscriptions sont fermées pour le moment.';
   if (m.includes('already registered') || m.includes('already exists') || m.includes('already been registered')) return 'Un compte existe déjà avec cet e-mail : connecte-toi.';
-  if (m.includes('password should be') || m.includes('password is too short') || m.includes('weak password')) return 'Mot de passe trop court : 6 caractères au moins.';
+  if (m.includes('password should') || m.includes('password is too short') || m.includes('weak password') || m.includes('weak_password')) return 'Mot de passe trop faible : 8 caractères au moins, avec une majuscule, une minuscule, un chiffre et un symbole (! ? # …).';
   if (m.includes('rate limit') || m.includes('too many requests') || status === 429) return 'Trop de tentatives : réessaie dans quelques minutes.';
   if (m.includes('unable to validate email') || m.includes('invalid email') || m.includes('invalid format')) return 'Adresse e-mail invalide.';
   if (m.includes('same password') || m.includes('different from the old')) return 'Choisis un mot de passe différent de l’ancien.';
