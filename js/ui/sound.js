@@ -180,7 +180,7 @@ function grit(freq, { dur = 0.6, gain = 0.15, to = 0, lp = 900, delay = 0, vib =
 }
 
 // Gammes (Hz) : ré mineur, sombre mais noble
-const N = { D3: 146.8, F3: 174.6, A3: 220, C4: 261.6, D4: 293.7, E4: 329.6, F4: 349.2, G4: 392, A4: 440, Bb4: 466.2, C5: 523.3, D5: 587.3, E5: 659.3, F5: 698.5, G5: 784, A5: 880, C6: 1046.5, D6: 1174.7, F6: 1396.9, A6: 1760 };
+const N = { D3: 146.8, F3: 174.6, A3: 220, C4: 261.6, D4: 293.7, E4: 329.6, F4: 349.2, G4: 392, A4: 440, Bb4: 466.2, C5: 523.3, D5: 587.3, E5: 659.3, F5: 698.5, G5: 784, A5: 880, C6: 1046.5, D6: 1174.7, E6: 1318.5, F6: 1396.9, A6: 1760 };
 const REVEAL = {
   C: [N.A5], PC: [N.D5, N.A5], R: [N.D5, N.F5, N.A5, N.D6],
   HR: [N.D5, N.F5, N.A5, N.C6, N.D6], M: [N.D4, N.A4, N.D5, N.F5, N.A5, N.D6], S: [N.D4, N.A4, N.D5, N.E5, N.A5, N.D6, N.F6],
@@ -370,10 +370,13 @@ for (const k of Object.keys(sfx)) {
   sfx[k] = (...a) => {
     if (k === 'reveal') { const big = a[0] === 'M' || a[0] === 'S'; if (big || a[0] === 'HR') { hooks.duck?.(big ? 3.5 : 2); } hap(big ? 3 : a[0] === 'R' || a[0] === 'HR' ? 1 : 0); }
     else { if (HAP[k]) hap(HAP[k]); if (DUCK[k]) hooks.duck?.(DUCK[k]); }
-    if (!ensure()) return undefined;
-    loadSamples();
-    if (playSample(sampleKey(k, a))) return undefined;
-    return f(...a);
+    // un son ne doit jamais bloquer le jeu (v265) : toute erreur audio est ignorée
+    try {
+      if (!ensure()) return undefined;
+      loadSamples();
+      if (playSample(sampleKey(k, a))) return undefined;
+      return f(...a);
+    } catch (e) { return undefined; }
   };
 }
 
