@@ -2763,3 +2763,13 @@ body.battle-mode .dv.cb { gap: 5px; }
 .boot-title.boot-sealw { margin: 0 !important; }
 .boot-eye { left: 50.1%; top: 51.3%; width: 13%; }
 .hb-title img { width: min(62vw, 270px) !important; }
+
+/* v316 : Sanctuaire — tuile Profil en largeur (avatar, nom, niveau) puis tuiles carrées ; plus de tuile impaire étirée en bas */
+.mn-grid { grid-template-rows: auto; grid-auto-rows: minmax(140px, 1fr); }
+.mn-grid > .mn-tile.mn-wide { align-content: center; grid-template-rows: auto auto auto; row-gap: 3px; padding: 14px 16px; }
+.mn-grid > .mn-tile.mn-wide .mn-tile-ic { grid-row: 1 / 4; }
+.mn-grid > .mn-tile.mn-wide .mn-tile-ic.avatar-big { width: 64px; height: 64px; display: block; }
+.mn-grid > .mn-tile.mn-wide b { font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.mn-grid > .mn-tile.mn-wide > span:not(.mn-tile-ic) { font-size: .78rem; color: var(--ink); line-height: 1.3; }
+.mn-grid > .mn-tile.mn-wide > em { font-style: normal; font-size: .72rem; color: var(--mute); line-height: 1.3; }
+@media (max-width: 360px) { .mn-grid { grid-auto-rows: minmax(118px, 1fr); } .mn-grid > .mn-tile.mn-wide .mn-tile-ic.avatar-big { width: 56px; height: 56px; } }
