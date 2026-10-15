@@ -299,13 +299,20 @@ async function boot() {
     render();
     const wait = Math.max(0, (window.__introUntil || 0) - performance.now());
     let done = false;
-    const finish = () => { if (done) return; done = true; bootEl.classList.add('out'); setTimeout(() => bootEl.remove(), 900); };
-    setTimeout(finish, wait);
-    setTimeout(() => showWelcome(app), wait + 700);
-    bootEl.addEventListener('click', finish); // un toucher passe l'introduction
+    const finish = () => { if (done) return; done = true; applySettings(); render(); bootEl.classList.add('out'); setTimeout(() => bootEl.remove(), 900); setTimeout(() => showWelcome(app), 700); };
+    // v293 : iPhone et navigateurs n'autorisent le son qu'après un premier toucher. L'écran d'ouverture attend donc
+    // « Touche pour entrer » : ce toucher lance la musique et les sons dès l'arrivée au menu (sauf si on a déjà touché l'écran, ex. code d'accès).
+    setTimeout(() => {
+      if (navigator.userActivation?.hasBeenActive) return finish();
+      const t = document.createElement('p'); t.className = 'boot-tap'; t.textContent = 'Touche l’écran pour entrer';
+      bootEl.querySelector('.boot-inner')?.appendChild(t);
+    }, wait);
+    // « click » (après le relâchement du doigt) : c'est ce geste qu'iPhone accepte pour débloquer le son
+    bootEl.addEventListener('click', () => { if (performance.now() >= (window.__introUntil || 0) - 2000) finish(); });
     if (!persistent) toast('Le stockage local est désactivé dans ce navigateur : ta progression ne sera pas conservée après fermeture.', { kind: 'error', icon: 'info', ms: 9000 });
     if (app.game.loadedFrom && app.game.loadedFrom.endsWith('backup')) toast('La sauvegarde principale était abîmée : la copie de secours a été restaurée.', { kind: 'error', icon: 'info', ms: 8000 });
     document.addEventListener('pointerdown', () => applySettings(), { once: true });
+    document.addEventListener('click', () => applySettings(), { once: true });
   } catch (e) {
     console.error(e);
     bootEl.querySelector('.err').textContent = `Impossible d’ouvrir le Bestiaire : ${e.message}. Vérifie ta connexion puis recharge la page.`;

@@ -2701,3 +2701,7 @@ body.battle-mode .dv.cb { gap: 5px; }
 .cb-rsv-st { column-gap: 8px; } .cb-rsv-st > span { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }
 /* v290 : texte des stèles centré sur le panneau (le panneau de l'image est décalé vers la gauche) */
 .dc-altar .dc-bl { padding-left: 21% !important; padding-right: 27% !important; }
+/* v293 : invitation à toucher l'écran d'ouverture (débloque le son sur iPhone) */
+.boot-tap { margin: 18px 0 0; font: 700 clamp(.85rem, 3.8vw, 1.05rem)/1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; color: #E2B860; text-shadow: 0 0 12px rgba(226, 184, 96, .6), 0 2px 4px #000; animation: bootTap 1.8s ease-in-out infinite, dvIn .6s ease-out both; }
+@keyframes bootTap { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .boot-tap { animation: none; } }
