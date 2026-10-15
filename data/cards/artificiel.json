@@ -43,7 +43,7 @@
    "scale": 0.86
   },
   "image": "assets/art/ART-001.webp",
-  "artPrompt": "Golem de Glaise — Golem trapu de terre glaise encore humide, empreintes de doigts sur le torse, rune unique au front. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+  "artPrompt": "Golem de Glaise — Golem trapu et massif modelé dans une argile rouge-brun encore humide, empreintes de mains géantes sur le torse et les épaules, fissures qui laissent passer une lueur, unique rune hébraïque gravée sur le front qui brille, mains énormes qui gouttent, atelier de potier nocturne éclairé par un four rougeoyant. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "ART-002",
@@ -540,7 +540,7 @@
    "scene": "forge"
   },
   "image": "assets/art/ART-013.webp",
-  "artPrompt": "Tisseur de Câbles — Mille-pattes de câbles tressés et de vertèbres d’acier, étincelles bleues à chaque segment. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+  "artPrompt": "Tisseur de Câbles — Grand mille-pattes mécanique bien détaillé, corps fait de câbles de cuivre tressés et de vertèbres d'acier articulées, dizaines de pattes en pinces de télégraphe, tête en ampoule de verre où grésille un éclair bleu, reliant des poteaux électriques sur un toit d'usine la nuit. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "ART-014",
