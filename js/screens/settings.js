@@ -82,6 +82,7 @@ export default function settings(app, root) {
         <h2>À propos</h2>
         <p class="small">ABYSSAL — Le Bestiaire interdit.</p>
         <p class="small muted">Version ${esc(app.version)} · ${app.catalog.cards.length} cartes</p>
+        <a class="btn ghost small" href="confidentialite.html" target="_blank" rel="noopener">${icon('book')} Politique de confidentialité</a>
       </section>`;
   }
   function render() {

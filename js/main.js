@@ -234,15 +234,15 @@ function onProgress(events) {
     sfx.achievement();
     return;
   }
-  events.forEach((e, i) => setTimeout(() => {
-    if (e.kind === 'achievement') toast(`Succès débloqué : <b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'ach', ms: 4200 });
-    if (e.kind === 'set') toast(`Ensemble complété : <b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'epic', icon: 'star', ms: 5000 });
-    if (e.kind === 'faction') toast(`Faction complétée : <b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'epic', icon: 'shield', ms: 5000 });
-    if (e.kind === 'fame') toast(`Renommée : <b>${esc(e.name)}</b>`, { kind: 'epic', icon: 'star', ms: 4200 });
-    if (e.kind === 'season') toast(`<b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'epic', icon: 'trophy', ms: 4600 });
-    if (e.kind === 'level') toast(`<img class="picon toast-xp" alt="" src="assets/icons/xp.webp"><span>Niveau <b>${e.level}</b> atteint !<br><span class="small">${rewardText(e.reward)}</span></span>`, { kind: 'level', ms: 3800 });
-    (e.kind === 'fame' ? sfx.fame : e.kind === 'season' ? sfx.season : sfx.achievement)();
-  }, (app.holdToasts ? 0 : 300) + i * 650));
+  events.forEach((e) => { // v292 : les annonces passent l'une après l'autre (file de toast), le son joue à l'affichage
+    const snd = { onShow: () => (e.kind === 'fame' ? sfx.fame : e.kind === 'season' ? sfx.season : sfx.achievement)() };
+    if (e.kind === 'achievement') toast(`Succès débloqué : <b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'ach', ms: 4200 , ...snd });
+    if (e.kind === 'set') toast(`Ensemble complété : <b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'epic', icon: 'star', ms: 5000 , ...snd });
+    if (e.kind === 'faction') toast(`Faction complétée : <b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'epic', icon: 'shield', ms: 5000 , ...snd });
+    if (e.kind === 'fame') toast(`Renommée : <b>${esc(e.name)}</b>`, { kind: 'epic', icon: 'star', ms: 4200 , ...snd });
+    if (e.kind === 'season') toast(`<b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'epic', icon: 'trophy', ms: 4600 , ...snd });
+    if (e.kind === 'level') toast(`<img class="picon toast-xp" alt="" src="assets/icons/xp.webp"><span>Niveau <b>${e.level}</b> atteint !<br><span class="small">${rewardText(e.reward)}</span></span>`, { kind: 'level', ms: 3800 , ...snd });
+  });
 }
 
 // Accès restreint pendant la construction : un code est demandé une seule fois par appareil.
@@ -317,8 +317,7 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').then((reg) => {
       const notify = (w) => {
-        toast('Une nouvelle version d’ABYSSAL est prête. <b>Touche ici pour l’installer.</b>', { icon: 'refresh', ms: 15000 });
-        document.getElementById('toasts').lastElementChild?.addEventListener('click', () => w.postMessage('skipWaiting'));
+        toast('Une nouvelle version d’ABYSSAL est prête. <b>Touche ici pour l’installer.</b>', { icon: 'refresh', ms: 15000, onClick: () => w.postMessage('skipWaiting') });
       };
       if (reg.waiting && navigator.serviceWorker.controller) notify(reg.waiting);
       // au retour dans l'app (iPhone : elle reste souvent ouverte en arrière-plan), on cherche une mise à jour

@@ -15,18 +15,33 @@ export function reducedMotion(settings) {
 }
 
 // Notifications courtes -------------------------------------------------------
-export function toast(html, { kind = 'info', ms = 3200, icon: ic } = {}) {
+// v292 : une annonce à la fois — les suivantes attendent que la précédente s'efface (les erreurs passent devant)
+const toastQueue = [];
+let toastBusy = false;
+export function toast(html, opts = {}) {
+  if (opts.kind === 'error') toastQueue.unshift([html, opts]); else toastQueue.push([html, opts]);
+  if (toastQueue.length > 6) toastQueue.splice(1, toastQueue.length - 6); // pas de file interminable
+  if (!toastBusy) nextToast();
+}
+function nextToast() {
+  const n = toastQueue.shift();
+  if (!n) { toastBusy = false; return; }
+  toastBusy = true;
+  const [html, { kind = 'info', ms = 3200, icon: ic, onClick, onShow } = {}] = n;
   const root = document.getElementById('toasts');
+  if (!root) { toastBusy = false; return; }
   const el = document.createElement('div');
   el.className = `toast toast-${kind}`;
   el.setAttribute('role', kind === 'error' ? 'alert' : 'status');
   el.innerHTML = `${ic ? `<span class="toast-ic">${icon(ic)}</span>` : ''}<div>${html}</div>`;
-  root.appendChild(el);
-  while (root.children.length > 2) root.firstElementChild.remove();
+  root.replaceChildren(el);
   requestAnimationFrame(() => el.classList.add('in'));
-  const close = () => { el.classList.remove('in'); setTimeout(() => el.remove(), 300); };
-  el.addEventListener('click', close);
-  setTimeout(close, ms);
+  try { onShow?.(); } catch (e) { /* un son ne bloque jamais l'annonce */ }
+  let done = false;
+  const close = () => { if (done) return; done = true; el.classList.remove('in'); setTimeout(() => { el.remove(); nextToast(); }, 300); };
+  el.addEventListener('click', () => { onClick?.(); close(); });
+  // file chargée : chaque annonce reste un peu moins longtemps
+  setTimeout(close, toastQueue.length ? Math.min(ms, 3400) : ms);
 }
 
 // Fenêtres superposées (feuilles) ----------------------------------------------
