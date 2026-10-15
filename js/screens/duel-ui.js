@@ -331,7 +331,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   // Carte ennemie qui vole en éclats : calque de fissures, puis deux planches de 8 images jouées image par image
   const shatterFx = async (uid) => {
     const t = el(uid), box = $('.dv'); if (!t || !box || reduced) return false;
-    const b = box.getBoundingClientRect(), r = t.getBoundingClientRect();
+    const b = box.getBoundingClientRect(), r = t.getBoundingClientRect(); lastRect[uid] = r;
     const x = r.left - b.left, y = r.top - b.top, cx = x + r.width / 2, cy = y + r.height / 2, S = r.height / 0.69;
     const ck = document.createElement('img'); ck.className = 'kx-crack'; ck.alt = ''; ck.src = 'assets/fx/kill-crack.webp';
     ck.style.cssText = `left:${x}px;top:${y}px;width:${r.width}px;height:${r.height}px`;
@@ -352,12 +352,19 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const box = $('.dv'); if (!box) return;
     const b = box.getBoundingClientRect(); let x = b.width / 2, y = b.height / 2, w = b.width * 0.9, h = w;
     if (row) { const r = $('.dv-row.enemy')?.getBoundingClientRect(); if (!r) return; x = r.left - b.left + r.width / 2; y = r.top - b.top + r.height / 2; w = r.width * 1.1; h = r.height * 1.25; }
-    else if (!center) { const t = el(uid); if (!t) return; const r = t.getBoundingClientRect(); x = r.left - b.left + r.width / 2; y = r.top - b.top + r.height / 2; w = h = r.width * k; }
+    else if (!center) { const t = el(uid), r = t ? t.getBoundingClientRect() : lastRect[uid]; if (!r) return; x = r.left - b.left + r.width / 2; y = r.top - b.top + r.height / 2; w = h = r.width * k; }
     const n = document.createElement('span'); n.className = 'kx-sprite fxs';
     n.style.cssText = `left:${x}px;top:${y}px;width:${w}px;height:${h}px;--d:${T(d)}ms;background-image:url(assets/fx/${name}.webp)`;
     box.appendChild(n); setTimeout(() => n.remove(), T(d) + 80);
   };
-  let aoeHit = false; // pendant un Raz-de-marée : une seule vague pour toute la rangée
+  // Bandeau peint de changement de tour : or « À toi ! », épines rouges « Tour ennemi »
+  const turnBanner = (side) => {
+    if (st.over) return;
+    const b = document.createElement('div'); b.className = `cb-turn ${side === 'enemy' ? 'foe' : 'ally'}`;
+    b.innerHTML = `<b>${side === 'enemy' ? 'Tour ennemi' : 'À toi !'}</b>`;
+    $('.dv')?.appendChild(b); setTimeout(() => b.remove(), reduced ? 500 : 1100);
+  };
+  let aoeHit = false; const lastRect = {}; // place d'une carte disparue (pour l'explosion d'un ennemi déjà tombé) // pendant un Raz-de-marée : une seule vague pour toute la rangée
   const ring = (uid, cls) => { if (reduced) return; const t = el(uid); if (!t) return; const r = document.createElement('span'); r.className = `cb-ring ${cls}`; t.appendChild(r); setTimeout(() => r.remove(), 750); };
   const float = (uid, txt, cls) => { const t = el(uid); if (!t) return; const f = document.createElement('span'); f.className = `dv-float ${cls}`; f.textContent = txt; t.appendChild(f); setTimeout(() => f.remove(), 900); };
   const banner = (html, cls = '', ms = 900) => {
@@ -499,8 +506,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           if (e.s === 'Proie désignée') fxAt(e.u, 'prey', { big: true });
           else if (e.syn) app.sfx.skill();
           if (e.k === 'entrance') ring(e.u, 'enter');
-          if (e.trait === 'explosif') { fxAt(e.u, 'burst', { big: true }); app.sfx.smash?.(); shake(true); banner(`<img class="cb-trico" alt="" src="assets/icons/st-explosif.webp"> Explosion !`, 'danger', 800); }
-          else if (e.trait) { app.sfx.boss?.(); banner(`<img class="cb-trico" alt="" src="assets/icons/st-${e.trait}.webp"> ${esc(e.s)}`, 'danger', 800); }
+          if (e.trait === 'explosif') { fxSheet(e.u, 'fx-explode', { k: 2.6, d: 760 }); app.sfx.smash?.(); shake(true); banner(`<img class="cb-trico" alt="" src="assets/icons/st-explosif.webp"> Explosion !`, 'danger', 800); }
+          else if (e.trait) { if (e.trait === 'enrage') fxSheet(e.u, 'fx-enrage', { k: 1.9, d: 820 }); app.sfx.boss?.(); banner(`<img class="cb-trico" alt="" src="assets/icons/st-${e.trait}.webp"> ${esc(e.s)}`, 'danger', 800); }
           if (e.combo && e.by && e.a && e.by !== e.a && st.units[e.by]?.side === 'ally') { synergy(e.by, e.a, e.s); await wait(T(380)); if (!g.s.tips?.['cb-combo']) tuto(app, 'cb-combo'); }
           if (e.combo) comboPop(e.u, e.combo);
           float(e.u, e.s, e.syn ? 'syn' : e.k === 'bad' ? 'dmg' : 'info');
@@ -529,7 +536,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         }
         case 'enter': draw(); el(e.u)?.classList.add('enter'); await wait(T(340)); break;
         case 'revive': draw(); float(e.u, 'Relevée !', 'heal'); await wait(T(280)); break;
-        case 'phase': draw(); say(e.side === 'enemy' ? '<b class="dc-bad">Tour des créatures corrompues</b>' : 'À toi !'); await wait(T(e.side === 'enemy' ? 380 : 160)); break;
+        case 'phase': draw(); say(e.side === 'enemy' ? '<b class="dc-bad">Tour des créatures corrompues</b>' : 'À toi !'); turnBanner(e.side); await wait(T(e.side === 'enemy' ? 520 : 420)); break;
         case 'ult': if (st.ult === 'sceau') dio.seal(); else dio.ult(); await ultFx(); break;
         case 'law': if (e.aspect) dio.aspect(e.aspect); draw(); banner(e.fatigue ? `${icon('skull')} Épuisement : chaque tour blesse tout le monde` : e.law ? esc(LAWS[e.law].name) : esc(ASPECTS[e.aspect].name), e.fatigue ? 'danger' : 'skill', 1300); await wait(T(e.fatigue ? 900 : 700)); break;
         default: break;
@@ -756,7 +763,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (guide) endGuide();
     busy = false; draw();
     if (st.over) return finish();
-    showLog();
+    setTimeout(() => { if (alive_ && !busy && st.turn === 'ally') showLog(); }, reduced ? 0 : 1000); // après le bandeau « À toi ! »
     tips();
   }
   // Bulles d'aide au bon moment (une seule fois chacune)

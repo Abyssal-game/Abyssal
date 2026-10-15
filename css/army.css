@@ -2456,3 +2456,12 @@ body.has-subnav #subnav .sn-tab { background: #16121E; }
 .dc-loot { border: 0 !important; border-radius: 0 !important; background: url(../assets/ui/loot-plaque.webp) center / 100% 100% no-repeat !important; padding: 26px 16px 14px !important; min-width: 82%; filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .7)); }
 .dc-loot-k { color: #E8C878; text-shadow: 0 1px 0 #000; }
 .dc-loot { padding: 26px 26px 20px !important; }
+
+/* v261 : bandeaux peints de changement de tour, explosion et rage peintes */
+.cb-turn { position: absolute; z-index: 40; left: 50%; top: 38%; transform: translate(-50%, -50%); width: min(78%, 330px); aspect-ratio: 627 / 120; display: grid; place-items: center; pointer-events: none; background: url(../assets/ui/turn-ally.webp) center / 100% 100% no-repeat; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .8)); animation: cbTurn 1.1s cubic-bezier(.2, .9, .3, 1) both; }
+.cb-turn.foe { aspect-ratio: 549 / 120; width: min(70%, 300px); background-image: url(../assets/ui/turn-foe.webp); }
+.cb-turn b { font: 800 1.15rem/1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; color: #FFE7A6; text-shadow: 0 0 10px rgba(242, 193, 78, .7), 0 2px 0 #000; }
+.cb-turn.foe b { color: #FFD0D6; text-shadow: 0 0 10px rgba(255, 60, 90, .8), 0 2px 0 #000; }
+@keyframes cbTurn { 0% { opacity: 0; transform: translate(-50%, -50%) scaleX(.4); } 18% { opacity: 1; transform: translate(-50%, -50%) scaleX(1.04); } 28% { transform: translate(-50%, -50%) scaleX(1); } 78% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -62%); } }
+@media (prefers-reduced-motion: reduce) { .cb-turn { animation: none; } }
+.cb-turn { z-index: 70; } .cb-turn.ally { top: 30%; }
