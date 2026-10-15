@@ -2393,13 +2393,6 @@ body.has-subnav #subnav .sn-tab { background: #16121E; }
 @keyframes kxPlay { from { background-position: 0 0; } to { background-position: 114.2857% 0; } }
 
 /* v257 : butin visible sur les portes, exploits de l'expédition, badges de trait des ennemis */
-.dc-loot { display: grid; justify-items: center; gap: 4px; margin-top: 4px; padding: 6px 8px; border-radius: 12px; background: rgba(6, 6, 12, .72); border: 1px solid rgba(242, 193, 78, .25); position: relative; z-index: 2; }
-.dc-loot-k { font: 700 .6rem/1 var(--f-ui); letter-spacing: .14em; text-transform: uppercase; color: #C8A45D; }
-.dc-loot-r { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
-.dc-loot-r i { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 99px; font: 700 .66rem/1.2 var(--f-ui); font-style: normal; color: #EDE3C8; background: rgba(255, 255, 255, .07); }
-.dc-loot-r i.tal { color: #FFE7A6; background: rgba(242, 193, 78, .18); }
-.dc-loot-r .ic, .dc-loot-c .ic { width: 14px; height: 14px; }
-.dc-loot-c { display: inline-flex; align-items: center; gap: 3px; font: 600 .66rem/1.2 var(--f-ui); color: #D8CDB3; }
 .dc-feats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 10px 0; }
 .dc-feat { display: grid; justify-items: center; gap: 2px; padding: 8px 4px; border-radius: 12px; background: rgba(242, 193, 78, .08); border: 1px solid rgba(242, 193, 78, .25); }
 .dc-feat .ic { width: 22px; height: 22px; }
@@ -2452,10 +2445,6 @@ body.has-subnav #subnav .sn-tab { background: #16121E; }
 .cb-banner.synergy { padding: 22px 64px 20px; border: 0; background: url(../assets/ui/syn-banner.webp) center / 100% 100% no-repeat !important; box-shadow: none !important; min-width: min(92%, 380px); }
 .dc-feat-ic { width: 34px; height: 34px; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .7)); }
 
-/* v260 : plaque peinte du butin des portes */
-.dc-loot { border: 0 !important; border-radius: 0 !important; background: url(../assets/ui/loot-plaque.webp) center / 100% 100% no-repeat !important; padding: 26px 16px 14px !important; min-width: 82%; filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .7)); }
-.dc-loot-k { color: #E8C878; text-shadow: 0 1px 0 #000; }
-.dc-loot { padding: 26px 26px 20px !important; }
 
 /* v261 : bandeaux peints de changement de tour, explosion et rage peintes */
 .cb-turn { position: absolute; z-index: 40; left: 50%; top: 38%; transform: translate(-50%, -50%); width: min(78%, 330px); aspect-ratio: 627 / 120; display: grid; place-items: center; pointer-events: none; background: url(../assets/ui/turn-ally.webp) center / 100% 100% no-repeat; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .8)); animation: cbTurn 1.1s cubic-bezier(.2, .9, .3, 1) both; }
