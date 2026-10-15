@@ -3039,7 +3039,7 @@
     "value": 3
    }
   ],
-  "visual": "Femme façonnée dans l'argile et l'or, veines lumineuses de forge sur la peau, tenant une grande jarre antique entrouverte d'où s'échappent des ombres ailées, une petite lumière restée au fond, temple grec au crépuscule.",
+  "visual": "Femme façonnée dans l'argile et l'or, vêtue d'une longue robe grecque bleu nuit à bordures dorées, veines lumineuses de forge sur le visage et les bras, tenant contre elle une grande jarre antique entrouverte d'où s'échappent des ombres ailées, une petite lumière restée au fond, temple grec au crépuscule.",
   "lore": "Tout s'est envolé. Sauf ce qui était au fond, et c'est pour ça qu'elle ne referme jamais tout à fait.",
   "evolution": null,
   "sets": [
@@ -3058,7 +3058,7 @@
    "tint": "#ff5050"
   },
   "image": "assets/art/ART-068.webp",
-  "artPrompt": "Pandore — Femme façonnée dans l'argile et l'or, veines lumineuses de forge sur la peau, tenant une grande jarre antique entrouverte d'où s'échappent des ombres ailées, une petite lumière restée au fond, temple grec au crépuscule. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+  "artPrompt": "Pandore — Femme façonnée dans l'argile et l'or, entièrement vêtue d'une longue robe grecque drapée bleu nuit à bordures dorées qui couvre le corps des épaules aux pieds, bras et visage d'argile parcourus de veines lumineuses de forge, tenant contre elle une grande jarre antique entrouverte d'où s'échappent des ombres ailées, une petite lumière restée au fond, temple grec au crépuscule, tenue pudique et non suggestive. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "ART-069",

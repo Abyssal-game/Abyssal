@@ -154,7 +154,7 @@ L'iPad n'est pas prévu : l'application sera déclarée « iPhone uniquement »,
 
 **Objectif : 13+ chez Apple, PEGI 12 en Europe chez Google.** Le jeu montre des créatures inquiétantes et des combats, mais sans sang réaliste ni contenu sexuel. Il n'y a ni achat, ni pari, ni discussion entre joueurs.
 
-**À faire avant la soumission :** refaire **Pandore** (ART-068), dessinée nue. Le prompt d'une version habillée est dans `tools/redo-art.mjs` (`node tools/redo-art.mjs`). Avec l'image actuelle, il faudrait déclarer de la nudité, et l'âge minimum monterait.
+Pandore (ART-068), autrefois dessinée nue, a été refaite habillée en v300 : aucune nudité n'est à déclarer.
 
 ### Apple (App Store Connect → Informations sur l'app → Classification par âge)
 | Question | Réponse |
@@ -235,7 +235,7 @@ Aucun achat intégré, aucune publicité, aucun pistage.
 
 - [ ] Exécuter `supabase/06-signalements.sql` dans Supabase (signalement des pseudos).
 - [ ] Ouvrir les inscriptions dans Supabase (Authentication → Sign In / Providers → autoriser les nouvelles inscriptions). Aujourd'hui le jeu affiche « il faut une invitation » si elles sont fermées.
-- [ ] Refaire l'illustration de Pandore (ART-068), habillée.
+- [x] Refaire l'illustration de Pandore (ART-068), habillée (fait en v300).
 - [ ] Vérifier que le nom « ABYSSAL » n'est pas déjà pris sur les deux stores et en marque déposée (base INPI / EUIPO).
 - [ ] Créer les comptes développeur : Google (25 $ une fois), Apple (99 $ par an).
 - [ ] Google, compte personnel récent : test fermé avec au moins 12 testeurs pendant 14 jours avant la publication.
