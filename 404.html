@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ABYSSAL</title>
+<meta name="robots" content="noindex">
+<style>
+  html, body { margin: 0; height: 100%; background: #090810; color: #E8DCCB; font: 16px/1.4 Georgia, serif; }
+  body { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; text-align: center; padding: 0 16px; }
+  img { width: min(70vw, 320px); }
+  a { color: #F1DB9E; }
+</style>
+<script>
+  // v323 : toute adresse inconnue sous /Abyssal/ (ancien lien, lien d'e-mail mal formé…) ramène au jeu,
+  // en gardant la partie « # » et « ? » (jetons de confirmation de compte ou de mot de passe oublié).
+  (function () {
+    var base = '/Abyssal/';
+    if (location.pathname.indexOf(base) !== 0) base = '/';
+    location.replace(base + location.search + location.hash);
+  })();
+</script>
+</head>
+<body>
+  <img src="/Abyssal/assets/brand/title.webp" alt="ABYSSAL">
+  <p>Ouverture du Bestiaire…</p>
+  <p><a href="/Abyssal/">Entrer dans le jeu</a></p>
+</body>
+</html>
