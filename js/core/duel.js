@@ -529,7 +529,7 @@ export function actionsFor(st, uid) {
     let why = '';
     if (st.turn !== 'ally' || st.over) why = 'Ce n’est pas ton tour.';
     else if (!inFront(st, u)) why = 'Elle n’est pas au combat.';
-    else if (st.init && st.actor !== u.uid) why = 'Ce n’est pas encore son tour : regarde l’ordre des tours, en haut à gauche.';
+    else if (st.init && st.actor !== u.uid) why = 'Ce n’est pas encore son tour : regarde l’ordre des tours, en haut de l’écran.';
     else if (u.stunned && key !== 'swap') why = 'Gelée : elle passe ce tour.';
     else if (st.init && key !== 'swap' && u.acts >= 1) why = 'Elle a déjà joué ce tour.';
     else if (!st.init && key !== 'swap' && u.acts >= ACTS_PER_UNIT) why = `Elle a déjà agi ${ACTS_PER_UNIT} fois ce tour.`;

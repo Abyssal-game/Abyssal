@@ -240,7 +240,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     drawTimeline();
   }
   // Tracés rouges : d'un ennemi qui prépare un coup dangereux vers la créature qu'il vise (v253)
-  // Ordre des tours (v258) : colonne de portraits en haut à gauche. Ton équipe joue ensemble, puis chaque ennemi à son tour.
+  // Ordre des tours (v258) : frise horizontale de portraits en haut de l’écran (v270). Ton équipe joue ensemble, puis chaque ennemi à son tour.
   let tlSig = '', acting = null;
   // v265 : seules les grosses attaques des gardiens et des élites s'annoncent sur la frise (les coups ordinaires restent cachés)
   const BIG_IT = ['heavy', 'blast', 'gorge', 'blizzard', 'copy'], PREP_IT = { charge: 'heavy', channel: 'blast', gather: 'blizzard', mimic: 'copy' };
@@ -1039,7 +1039,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   }
   function help() {
     openSheet(`<h2>Le combat</h2><ul class="small">
-      <li><b>Chacun son tour</b> : toutes les créatures, les tiennes et les ennemies, jouent une fois par tour, dans l’ordre de leur vitesse. L’ordre s’affiche en haut à gauche ; « T2 » marque le début du tour suivant. Quand c’est le tour d’une de tes créatures, ses actions s’ouvrent : choisis l’action, puis la cible. Raccourci : touche un ennemi pour l’attaquer.</li>
+      <li><b>Chacun son tour</b> : toutes les créatures, les tiennes et les ennemies, jouent une fois par tour, dans l’ordre de leur vitesse. L’ordre s’affiche en haut de l’écran ; « T2 » marque le début du tour suivant. Quand c’est le tour d’une de tes créatures, ses actions s’ouvrent : choisis l’action, puis la cible. Raccourci : touche un ennemi pour l’attaquer.</li>
       <li><b>PA</b> (points d’action, ${PA_MAX} au plus) : chaque créature a les siens. Elle en gagne 1 au début de chacun de ses tours, 1 en attaquant, 1 en se défendant et 1 sur une parade parfaite. Ses compétences les dépensent : alterne attaques et compétences, et fais jouer toute ton équipe.</li>
       <li><b>Attaque</b> (gratuite, +1 PA) : dégâts fiables, +1 Ferveur. <b>Défense</b> (gratuite, +1 PA) : -50 % de dégâts jusqu’à son prochain tour. <b>Passer</b> : elle ne fait rien. <b>Permuter</b> (une fois par tour) : une créature de la réserve prend sa place et joue tout de suite ; PV, PA et états sont gardés, et la réserve récupère 10 % de PV par tour. En entrant, elle déclenche un petit effet lié à son rôle (bouclier, soin, Ferveur, ralentissement…).</li>
       <li><b>Brisure</b> : en visant un élite ou un gardien, la cible affiche la Brisure que ton coup va infliger (◆), et « BRISE ! » quand il va le briser. Un seul coup ne retire jamais plus de 40 % des PV d’un gardien.</li>
