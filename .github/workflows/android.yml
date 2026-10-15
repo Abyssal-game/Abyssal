@@ -9,6 +9,9 @@ on:
     paths: ['js/**', 'css/**', 'data/**', 'assets/**', 'index.html', 'android/**', 'capacitor.config.json', 'package*.json', 'tools/build-www.mjs', 'tools/android-smoke.mjs', '.github/workflows/android.yml']
   workflow_dispatch:
 
+permissions:
+  contents: write  # pour publier les captures sur la branche android-captures
+
 concurrency:
   group: android
   cancel-in-progress: true
@@ -49,8 +52,6 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - name: Outil de pilotage
-        run: npm install --no-save playwright-core@1.56.1
       - name: Essai sur un téléphone simulé (Android 15)
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -67,3 +68,12 @@ jobs:
           name: abyssal-android-captures
           path: android-smoke/
           retention-days: 14
+      - name: Publier les captures (branche android-captures, séparée du jeu)
+        if: always()
+        run: |
+          [ -d android-smoke ] || exit 0
+          cd android-smoke
+          git init -q -b android-captures
+          git add -A
+          git -c user.name="Essai Android" -c user.email="actions@users.noreply.github.com" commit -qm "Captures de l'essai Android ($GITHUB_SHA)"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" android-captures

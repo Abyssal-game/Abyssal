@@ -3,7 +3,6 @@
 // des captures + un rapport dans android-smoke/. Pilote la page du jeu par le débogage de la WebView.
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
-import { chromium } from 'playwright-core';
 
 const OUT = 'android-smoke'; fs.mkdirSync(OUT, { recursive: true });
 const PKG = 'com.abyssalgame.abyssal';
@@ -25,10 +24,28 @@ step('écran', { W, H });
 // débogage de la WebView : on s'y connecte comme à un navigateur
 const pid = sh(`adb shell pidof ${PKG}`);
 sh(`adb forward tcp:9222 localabstract:webview_devtools_remote_${pid}`);
-const browser = await chromium.connectOverCDP('http://127.0.0.1:9222');
-const page = browser.contexts()[0].pages().find((p) => !p.url().startsWith('about:')) || browser.contexts()[0].pages()[0];
-page.on('pageerror', (e) => report.errors.push(e.message));
-page.on('console', (m) => { if (m.type() === 'error') report.errors.push(m.text()); });
+// petit client du protocole de débogage (la WebView d'Android n'accepte pas les outils de navigateur complets)
+const targets = await (await fetch('http://127.0.0.1:9222/json')).json();
+const target = targets.find((t) => t.type === 'page' && !t.url.startsWith('about:')) || targets[0];
+const ws = new WebSocket(target.webSocketDebuggerUrl);
+await new Promise((r, j) => { ws.onopen = r; ws.onerror = j; });
+let id = 0; const waiting = new Map();
+ws.onmessage = (m) => {
+  const d = JSON.parse(m.data);
+  if (d.id && waiting.has(d.id)) { waiting.get(d.id)(d); waiting.delete(d.id); }
+  if (d.method === 'Runtime.exceptionThrown') report.errors.push(d.params.exceptionDetails?.exception?.description || d.params.exceptionDetails?.text);
+  if (d.method === 'Runtime.consoleAPICalled' && d.params.type === 'error') report.errors.push(d.params.args.map((a) => a.value ?? a.description).join(' '));
+};
+const cdp = (method, params = {}) => new Promise((r) => { const i = ++id; waiting.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
+await cdp('Runtime.enable');
+const page = {
+  url: () => target.url,
+  evaluate: async (fn, arg) => {
+    const res = await cdp('Runtime.evaluate', { expression: `(${fn})(${JSON.stringify(arg)})`, awaitPromise: true, returnByValue: true });
+    if (res.result?.exceptionDetails) throw new Error(res.result.exceptionDetails.exception?.description || 'erreur');
+    return res.result?.result?.value;
+  },
+};
 step('page', { url: page.url() });
 
 sh(`adb shell input tap ${W / 2} ${H / 2}`);
@@ -57,5 +74,6 @@ step('retour à l’accueil (l’app passe en arrière-plan)', { focus: sh('adb 
 
 fs.writeFileSync(`${OUT}/logcat.txt`, sh('adb logcat -d -s Capacitor:* Capacitor/Console:* chromium:* AndroidRuntime:E || true'));
 fs.writeFileSync(`${OUT}/rapport.json`, JSON.stringify(report, null, 1));
+console.log('RAPPORT', JSON.stringify(report));
 console.log('ERREURS JS :', report.errors.length ? report.errors : 'aucune');
-await browser.close().catch(() => {});
+ws.close();
