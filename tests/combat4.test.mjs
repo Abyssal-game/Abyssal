@@ -21,7 +21,7 @@ test('objectifs : « Sans perte » échoue dès qu’une créature tombe, « Bri
   st.fallenLog = [{ u: 'x' }];
   assert.equal(D.goalState(st).state, 'fail');
   const st2 = D.createDuel(team(), [E('NEC-010', { elite: true, scale: 3 })], { seed: 2, goal: 'brk' });
-  const t = foe(st2)[0]; t.brk = 1;
+  const t = foe(st2)[0]; t.cracked = { seq: -1, until: 9 };
   D.act(st2, ally(st2)[0].uid, 'attack', t.uid);
   assert.equal(D.goalState(st2).state, 'done');
 });
@@ -53,8 +53,10 @@ test('Dévoreur, phase 2 : il engloutit une créature, la Brisure la libère', (
   if (st.over) return;
   while (D.nextEnemy(st)) D.enemyAct(st, st.queue[0], 'dodge');
   D.endEnemyTurn(st);
-  b.brk = 1; b.broken = false;
-  const ev = D.act(st, D.front(st, 'ally')[0].uid, 'attack', b.uid);
+  b.brk = 0; b.broken = false; b.cracked = { seq: -1, until: 99 }; // Fêlé : le coup de rupture le brise
+  const p = D.front(st, 'ally').find((u) => u.role === 'protecteur') || D.front(st, 'ally')[0];
+  if (p.role !== 'protecteur') { b.mark = 2; b.markBy = 'x'; }
+  const ev = D.act(st, p.uid, 'attack', b.uid);
   assert.ok(ev.some((e) => e.t === 'release'));
   assert.equal(v.swallowed, false);
 });

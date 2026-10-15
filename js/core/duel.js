@@ -169,7 +169,7 @@ export function dmgOf(st, a, t, mult = 1, { basic = false } = {}) {
   if (a.side === 'ally' && a.rarity === 'C' && (t.boss || t.elite)) n += PACK_BONUS;
   const flat = n * mult;
   n *= mult * (st.ruleMult || 1) * factionMult(a, t);
-  if (t.mark) n *= 1.3;
+  if (t.mark && !(a.side === 'ally' && a.uid === t.markBy)) n *= MARK_MULT; // Marque (v265) : le prochain coup d'un autre allié, puis elle part
   if (t.broken) n *= 1.5;
   if (t.broken && basic && a.side === 'ally' && has(st, 'curee')) n *= 1.5;
   if (a.role === 'degats' && a.side === 'ally' && (t.broken || t.hp <= t.maxHp * 0.3)) n *= 1.5; // Exécution
@@ -202,6 +202,7 @@ export function dmgOf(st, a, t, mult = 1, { basic = false } = {}) {
 }
 // Enchaînement : +1 dégât par autre créature de ton équipe qui a déjà frappé cette cible ce tour-ci (+2 au plus)
 export const COMBO_MAX = 2;
+export const MARK_MULT = 1.5, MARK_BRK = 2, RIPOSTE_MAX = 3, HEAL_WARD = 0.2;
 export function comboOf(st, a, t) {
   const by = st.hitBy?.[t.uid];
   return by ? Math.min(COMBO_MAX, by.filter((x) => x !== a.uid).length) : 0;
@@ -257,6 +258,19 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   if (d > 0) ev.push({ t: 'dmg', u: u.uid, d, hp: u.hp, src });
   if (d > 0 && u.side === 'enemy' && src && st.units[src]?.side === 'ally') st.stats.maxHit = Math.max(st.stats.maxHit || 0, d);
   if (d > 0 && u.trait === 'enrage' && !u.enraged && u.hp > 0 && u.hp <= u.maxHp / 2) { u.enraged = true; u.atk += 2; ev.push({ t: 'status', u: u.uid, s: 'Enragé : +2 ATQ', k: 'bad', trait: 'enrage' }); }
+  // Marque consommée (v265) et coup de rupture sur une cible Fêlée (Fracture en deux temps)
+  const s0 = src && st.units[src];
+  if (d > 0 && u.side === 'enemy' && s0?.side === 'ally' && u.hp > 0) {
+    const wasCracked = !!u.cracked && u.cracked.seq !== st.seq;
+    let ate = false;
+    if (u.mark && u.markBy !== src) {
+      ate = true; const by = u.markBy; u.mark = 0; u.markBy = null;
+      st.stats.named = (st.stats.named || 0) + 1;
+      ev.push({ t: 'status', u: u.uid, s: 'Marque consommée !', syn: true, combo: 'chasse', by, a: src });
+      if (!wasCracked) breakHit(st, u, MARK_BRK, ev, s0);
+    }
+    if (wasCracked && u.cracked && (ate || st.rupture === src)) fracture(st, u, ev);
+  }
   if (breached && d > 0) { st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: u.uid, s: 'Brèche exploitée !', syn: true, combo: 'breche', by: breached.by, a: src }); if (u.hp > 0) breakHit(st, u, 3, ev, st.units[src]); }
   const a = src && st.units[src];
   if (a && d > 0 && a.side === 'ally' && u.side === 'enemy' && st.turn === 'ally') {
@@ -375,7 +389,8 @@ function addPoison(st, t, n, ev, src) {
 // Brèche et Exposé (v250) : états posés par une créature, exploités par une autre, valables jusqu'à la fin du tour suivant
 const linger = (st, by) => (st.units[by]?.talent === 'remanence' ? 1 : 0); // Rémanence : les états posés durent 1 tour de plus
 function setBreach(st, t, by, ev) { if (!t || t.hp <= 0 || t.side !== 'enemy' || t.breach) return; t.breach = { by, until: st.round + 1 + linger(st, by) }; ev.push({ t: 'status', u: t.uid, s: 'Brèche', k: 'breach' }); }
-function openUp(st, t, by, ev) { if (!t || t.hp <= 0 || t.side !== 'enemy' || t.open) return; t.open = { by, until: st.round + 1 + linger(st, by) }; ev.push({ t: 'status', u: t.uid, s: 'Exposé', k: 'open' }); }
+// v265 : l'Exposé est devenu une Marque (une seule marque à retenir) : posée par la compétence à dé réussie
+function openUp(st, t, by, ev) { if (!t || t.hp <= 0 || t.side !== 'enemy' || t.mark) return; t.mark = 2 + linger(st, by); t.markBy = by; ev.push({ t: 'status', u: t.uid, s: 'Marquée', k: 'mark' }); }
 function freeze(st, t, ev, turns = 1) {
   t.frozen = turns;
   if (t.boss || t.elite) t.frostCD = 2;
@@ -392,11 +407,22 @@ function interruptBoss(st, t) {
 // Brisure (élites et gardiens) : à zéro, l'ennemi perd sa prochaine action et devient vulnérable
 // jusqu'à la fin de ton prochain tour. Il se relève ensuite avec une jauge plus solide (+40 %).
 export function breakHit(st, t, n, ev, src = null) {
-  if (!t.brkMax || t.broken || t.hp <= 0 || n <= 0) return;
+  if (!t.brkMax || t.broken || t.cracked || t.hp <= 0 || n <= 0) return;
   const k = src?.side === 'ally' && src.uid ? brkTotal(st, src, n) : n + (src?.side === 'ally' && has(st, 'brise') ? 1 : 0);
   t.brk = Math.max(0, t.brk - k);
   ev.push({ t: 'brk', u: t.uid, brk: t.brk, max: t.brkMax });
   if (t.brk > 0) return;
+  // v265 : jauge vide → Fêlé. Le prochain coup de rupture (attaque d'un Protecteur, Coup d'estoc, Raz-de-marée,
+  // ou un coup qui consomme une Marque) le brise. Sans rupture avant la fin du tour suivant, il se ressaisit.
+  t.cracked = { seq: st.seq || 0, until: st.round + 1 };
+  ev.push({ t: 'cracked', u: t.uid });
+  gainFervor(st, 1, ev, 'Fêlure');
+}
+// Coups de rupture : ce qui brise un ennemi Fêlé
+export const RUPTURE_KEYS = ['estoc', 'raz'];
+export const isRupture = (st, u, key, t) => !!t?.cracked && (RUPTURE_KEYS.includes(key) || (key === 'attack' && u.role === 'protecteur') || (!!t.mark && t.markBy !== u.uid && (key === 'attack' || !!moveFor(u, key)?.pv)));
+function fracture(st, t, ev) {
+  t.cracked = null;
   t.broken = true; t.brokenSkip = true; t.brokenEnd = st.round + 1;
   if (t.boss) { release(st, ev); if (t.ice) { t.ice = 0; ev.push({ t: 'status', u: t.uid, s: 'La glace vole en éclats !', k: 'frost', syn: true }); } if (t.doom != null) { t.doom = DOOM_TURNS + 1; ev.push({ t: 'status', u: t.uid, s: 'Effondrement repoussé', syn: true }); } }
   interruptBoss(st, t);
@@ -553,7 +579,8 @@ export function preview(st, uid, key, tUid) {
     if (out.dmg && t.boss) out.dmg = Math.min(out.dmg, bossCap(t));
     // Brisure prévue (réussite pour le Coup d'estoc) ; l'ennemi doit survivre au coup pour être brisé
     const b = t.brkMax && !t.broken && !t.shield ? brkTotal(st, u, brkOf(st, u, t, key) + (key === 'attack' ? strikeBrk(u, t) : 0)) : 0;
-    if (b) { out.brk = b; out.breaks = b >= t.brk && (out.dmg || 0) < t.hp; }
+    if (b) { out.brk = b; out.cracks = b + (t.mark && t.markBy !== uid && out.dmg ? MARK_BRK : 0) >= t.brk && (out.dmg || 0) < t.hp; }
+    out.breaks = isRupture(st, u, key, t) && (out.dmg || 0) < t.hp; // ennemi Fêlé : ce coup le brise
     out.weak = isWeak(u, t) && !!(st.discovered[t.faction] || t.mark);
   }
   return out;
@@ -569,6 +596,8 @@ export function act(st, uid, key, tUid = null) {
   if (a.target !== 'none' && !actionTargets(st, uid, key).includes(tUid)) return ev;
   if (st.init) u.pa = Math.max(0, (u.pa || 0) - a.ap);
   else { st.ap -= a.ap; st.fervor -= a.fervor; st.gauge = st.fervor; }
+  st.seq = (st.seq || 0) + 1; // une cible Fêlée par cette action ne peut pas être brisée par elle
+  st.rupture = RUPTURE_KEYS.includes(key) || (key === 'attack' && u.role === 'protecteur') ? uid : null;
   if (key !== 'swap') u.acts++;
   const t = tUid ? st.units[tUid] : null;
   ev.push({ t: 'act', u: uid, key, tgt: tUid, name: a.name, skill: !['attack', 'defend', 'swap'].includes(key) });
@@ -577,9 +606,11 @@ export function act(st, uid, key, tUid = null) {
   else if (key === 'swap') doSwap(st, u, t, ev);
   else if (key === 'rempart') { t.guardBy = uid; u.rempart = tUid; ev.push({ t: 'status', u: tUid, s: 'Rempart', k: 'guard' }); }
   else if (key === 'priere') {
-    heal(t, t.maxHp * 0.4, ev, u);
+    const raw = Math.round(t.maxHp * 0.4 * (t.healMult || 1)), got = heal(t, t.maxHp * 0.4, ev, u);
+    const over = Math.min(raw - got, Math.round(t.maxHp * HEAL_WARD));
+    if (over > 0 && (t.ward || 0) < over) { t.ward = over; ev.push({ t: 'status', u: tUid, s: `Bouclier de soin ${over}`, k: 'guard', syn: true }); }
     if (t.guardBy && !t.shield) { t.shield = 1; st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: tUid, s: 'Bastion !', syn: true, combo: 'bastion', k: 'guard', by: t.guardBy, a: uid }); }
-    if (t.poison || t.frozen || t.stunned) { t.poison = 0; t.frozen = 0; t.stunned = false; ev.push({ t: 'status', u: tUid, s: 'Purifiée', k: 'heal' }); }
+    if (t.poison || t.frozen || t.stunned) { t.poison = 0; t.frozen = 0; t.stunned = false; ev.push({ t: 'status', u: tUid, s: 'Purifiée', k: 'heal' }); if (st.init) gainPA(t, 1, ev); }
   } else if (key === 'marque') { t.mark = 2 + linger(st, uid); t.markBy = uid; discover(st, t, ev); ev.push({ t: 'status', u: tUid, s: 'Marquée', k: 'mark' }); }
   else if (key === 'raz') {
     ev.push({ t: 'aoe', u: uid, side: 'ally' });
@@ -589,7 +620,6 @@ export function act(st, uid, key, tUid = null) {
     const tier = resolveRoll(st, info, ev, uid, tUid);
     const m = { crit: 3, success: 2, partial: 1.2, fumble: 0.5 }[tier];
     // Combinaisons nommées : la Marque prépare la Chasse, le gel prépare le Bris de glace
-    if (t.mark && tier !== 'fumble') { st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: tUid, s: 'Chasse !', syn: true, combo: 'chasse', by: t.markBy, a: uid }); }
     if (t.frozen > 0 && tier !== 'fumble') { st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: tUid, s: 'Bris de glace !', syn: true, combo: 'glace', by: t.frozenBy, a: uid }); }
     weakBonus(st, u, t, ev);
     const frozen = t.frozen > 0;
@@ -620,6 +650,7 @@ export function act(st, uid, key, tUid = null) {
   } else if (moveFor(u, key)) { u.mvReady = st.round + rechargeOf(u, key); u.struck = true; u.lastStruck = st.round; moveFor(u, key).run(st, u, t, ev, API); }
   if (['attack', 'estoc', 'raz'].includes(key) || moveFor(u, key)?.pv) st.ombreUsed = true;
   if (st.init && a.gain && u.hp > 0) gainPA(u, a.gain, ev);
+  st.rupture = null;
   check(st, ev);
   // ordre d'initiative : son tour est joué, la suite de la file prend la main (Faim sans fin peut la faire rejouer)
   if (st.init && !st.over && key !== 'swap' && (st.actor !== uid || u.acts >= 1 || u.hp <= 0)) advance(st, ev);
@@ -658,20 +689,20 @@ function basicAttack(st, u, t, ev) {
   weakBonus(st, u, t, ev);
   const S = strikeOf(u), frozen = t.frozen > 0, hits = S.hits || 1;
   let m = strikeMult(u, t), rush = 0;
-  // Exposé (v250) : posé par la compétence à dé d'un allié, exploité par l'attaque d'un autre → +50 %, +1 Ferveur
-  let opened = null;
-  if (t.side === 'enemy' && t.open && t.open.by !== u.uid) { opened = t.open; t.open = null; m *= 1.5; }
   if (hasP(u, 'ruee') && !u.rushed) { u.rushed = true; m *= boosted(u, 'ruee') ? 2.5 : 2; rush = 1; pfx(ev, u, 'ruee'); }
   u.struck = true; u.lastStruck = st.round;
-  const marked = !!(t.mark || t.broken), poisoned = t.poison > 0, extraBrk = (S.brk || 0) + (S.brkCharging && charging(t) ? S.brkCharging : 0);
+  const marked = !!(t.mark || t.broken), poisoned = t.poison > 0;
+  // Riposte chargée (v265) : les coups encaissés pour un allié et les parades du Protecteur renforcent sa prochaine attaque
+  const rip = u.role === 'protecteur' && u.riposte > 0 && t.side === 'enemy' ? u.riposte : 0;
+  if (rip) { u.riposte = 0; st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: u.uid, s: `Riposte chargée ×${rip}`, syn: true, k: 'guard' }); }
+  const extraBrk = (S.brk || 0) + (S.brkCharging && charging(t) ? S.brkCharging : 0) + rip;
   let d = 0, landed = 0;
   for (let h = 0; h < hits && t.hp > 0; h++) {
-    const x = hurt(st, t, dmgOf(st, u, t, m, { basic: true }), ev, u.uid, { pierce: u.role === 'poison' || !!S.pierce || u.talent === 'perce' });
+    const x = hurt(st, t, dmgOf(st, u, t, m, { basic: true }) + (h === 0 ? rip : 0), ev, u.uid, { pierce: u.role === 'poison' || !!S.pierce || u.talent === 'perce' });
     d += x; if (x) landed++;
   }
   if (d && t.hp > 0 && u.role === 'protecteur') setBreach(st, t, u.uid, ev);
   if (d && t.hp > 0 && u.talent === 'vigilance' && (t.charged || charging(t))) { interruptBoss(st, t); t.charged = null; if (t.intent) t.intent = { ...t.intent, cancelled: true }; ev.push({ t: 'status', u: t.uid, s: 'Vigilance : charge interrompue', syn: true }); }
-  if (opened && d) { st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: t.uid, s: 'Exposé exploité !', syn: true, combo: 'expose', by: opened.by, a: u.uid }); gainFervor(st, 1, ev, 'Exposé'); }
   if (d && t.hp > 0) {
     if (u.role === 'poison') addPoison(st, t, 2 + (S.poisonMore && poisoned ? S.poisonMore : 0), ev, u);
     if (S.splashPoison) { const row = front(st, t.side), i = row.indexOf(t), n = row[i + 1] || row[i - 1]; if (n) addPoison(st, n, S.splashPoison, ev, u); }
@@ -744,7 +775,7 @@ export const SEAL_WARD = 0.5; // bouclier du Sceau : absorbe jusqu'à 50 % des P
 export function useUlt(st) {
   const ev = [];
   if (!ultReady(st)) return ev;
-  st.fervor = 0; st.gauge = 0; if (!st.init) st.ap -= ULT_COST.ap; st.ultUsed = true; // en ordre d'initiative : ne coûte aucun PA et ne termine pas le tour
+  st.fervor = 0; st.gauge = 0; if (!st.init) st.ap -= ULT_COST.ap; st.ultUsed = true; st.seq = (st.seq || 0) + 1; // en ordre d'initiative : ne coûte aucun PA et ne termine pas le tour
   st.stats.ults = (st.stats.ults || 0) + 1;
   const p = st.power || 1, allies = front(st, 'ally'), foes = front(st, 'enemy');
   ev.push({ t: 'ult', key: st.ult });
@@ -951,6 +982,7 @@ function refreshIntent(st, e) {
 // Résout l'action d'un ennemi. defense : 'none' | 'dodge' | 'parry' (défense active réussie).
 export function enemyAct(st, aUid, defense = 'none') {
   const ev = takeSkips(st);
+  st.seq = (st.seq || 0) + 1;
   if (st.queue[0] === aUid) st.queue.shift();
   const e = st.units[aUid];
   if (!e || e.hp <= 0 || st.over || !e.intent) return ev;
@@ -968,6 +1000,7 @@ export function enemyAct(st, aUid, defense = 'none') {
     let target = t, m = mult;
     const g = t.guardBy && st.units[t.guardBy];
     if (g && inFront(st, g) && g.uid !== t.uid) { target = g; m *= 0.6 * (hasP(g, 'sentinelle') ? (boosted(g, 'sentinelle') ? 0.6 : 0.75) : 1); ev.push({ t: 'status', u: g.uid, s: 'Rempart !', k: 'guard' }); }
+    if (target.role === 'protecteur') chargeRiposte(target, ev); // elle encaisse pour l'équipe : sa riposte se charge
     ev.push({ t: 'attack', a: aUid, u: target.uid, kind });
     if (defense === 'dodge' || defense === 'parry') { defended(st, e, target, ev, defense, kind); return null; }
     const d = hurt(st, target, dmgOf(st, e, target, m), ev, aUid);
@@ -1049,6 +1082,11 @@ export function enemyAct(st, aUid, defense = 'none') {
 }
 // Défense active réussie. Esquive : aucun dégât, +1 Ferveur. Parade parfaite : aucun dégât,
 // +2 Ferveur, +2 Brisure à l'attaquant, contre-attaque des Gardes et des Assauts.
+function chargeRiposte(g, ev) {
+  if (g.role !== 'protecteur' || g.side !== 'ally' || (g.riposte || 0) >= RIPOSTE_MAX) return;
+  g.riposte = (g.riposte || 0) + 1;
+  ev.push({ t: 'status', u: g.uid, s: `Riposte +1 (${g.riposte}/${RIPOSTE_MAX})`, k: 'guard' });
+}
 function defended(st, e, t, ev, defense, kind) {
   if (defense === 'dodge') {
     st.stats.dodges++;
@@ -1091,6 +1129,7 @@ function roundCleanup(st, ev) {
     if (u.breach && st.round >= u.breach.until) u.breach = null;
     if (u.open && st.round >= u.open.until) u.open = null;
     if (u.frostCD) u.frostCD--;
+    if (u.cracked && st.round >= u.cracked.until) { u.cracked = null; u.brk = Math.ceil(u.brkMax / 2); ev.push({ t: 'brk', u: u.uid, brk: u.brk, max: u.brkMax }); ev.push({ t: 'status', u: u.uid, s: 'Se ressaisit', k: 'bad' }); }
     if (u.broken && st.round >= u.brokenEnd) { u.broken = false; u.brokenSkip = false; u.brkMax = Math.round(u.brkMax * 1.4); u.brk = u.brkMax; ev.push({ t: 'recover', u: u.uid }); }
   }
 }
@@ -1318,7 +1357,7 @@ export function autoActs(st, { smart = true } = {}) {
       if (smart && smartMove(st, go)) continue;
       const a = st.units[st.actor];
       const ts = a && actionsFor(st, a.uid)[0].ok ? actionTargets(st, a.uid, 'attack').map((id) => st.units[id]) : [];
-      const score = (t) => (t.hp <= dmgOf(st, a, t, 1, { basic: true }) ? 1000 : 0) + (smart ? (intentInfo(st, t)?.danger || 0) * 20 + (isWeak(a, t) ? 15 : 0) + (t.broken ? 25 : 0) : 0) - t.hp;
+      const score = (t) => (t.hp <= dmgOf(st, a, t, 1, { basic: true }) ? 1000 : 0) + (smart ? (intentInfo(st, t)?.danger || 0) * 20 + (isWeak(a, t) ? 15 : 0) + (t.broken ? 25 : 0) + (t.mark && t.markBy !== a.uid ? 20 : 0) : 0) - t.hp;
       const t = ts.sort((x, y) => score(y) - score(x))[0];
       if (!t || !go(a.uid, 'attack', t.uid)) ev.push(...passTurn(st));
     }
@@ -1331,7 +1370,7 @@ export function autoActs(st, { smart = true } = {}) {
     if (!me.length) break;
     const a = me.sort((x, y) => (y.atk + y.boost) - (x.atk + x.boost))[0];
     const ts = actionTargets(st, a.uid, 'attack').map((id) => st.units[id]);
-    const score = (t) => (t.hp <= dmgOf(st, a, t, 1, { basic: true }) ? 1000 : 0) + (smart ? (intentInfo(st, t)?.danger || 0) * 20 + (isWeak(a, t) ? 15 : 0) + (t.broken ? 25 : 0) : 0) - t.hp;
+    const score = (t) => (t.hp <= dmgOf(st, a, t, 1, { basic: true }) ? 1000 : 0) + (smart ? (intentInfo(st, t)?.danger || 0) * 20 + (isWeak(a, t) ? 15 : 0) + (t.broken ? 25 : 0) + (t.mark && t.markBy !== a.uid ? 20 : 0) : 0) - t.hp;
     const t = ts.sort((x, y) => score(y) - score(x))[0];
     if (!t || !go(a.uid, 'attack', t.uid)) break;
   }
@@ -1356,6 +1395,15 @@ function smartMove(st, go) {
       const wall = allies.find((u) => u.role === 'protecteur' && u.uid !== tgt.uid && can(u, 'rempart') && !tgt.guardBy);
       if (wall && go(wall.uid, 'rempart', tgt.uid)) return true;
       if (i.lethal && !tgt.defend && tgt.acts === 0 && can(tgt, 'defend') && go(tgt.uid, 'defend')) return true;
+    }
+  }
+  // 1 bis (v265). briser un ennemi Fêlé avec un coup de rupture, sinon consommer une Marque posée par un autre
+  for (const e of foes.filter((x) => x.cracked)) {
+    for (const u of allies) {
+      if (u.role === 'protecteur' && can(u, 'attack') && actionTargets(st, u.uid, 'attack').includes(e.uid) && go(u.uid, 'attack', e.uid)) return true;
+      if (u.role === 'degats' && can(u, 'estoc') && actionTargets(st, u.uid, 'estoc').includes(e.uid) && go(u.uid, 'estoc', e.uid)) return true;
+      if (u.role === 'zone' && can(u, 'raz') && go(u.uid, 'raz')) return true;
+      if (e.mark && e.markBy !== u.uid && can(u, 'attack') && actionTargets(st, u.uid, 'attack').includes(e.uid) && go(u.uid, 'attack', e.uid)) return true;
     }
   }
   // 2. soigner une créature en danger

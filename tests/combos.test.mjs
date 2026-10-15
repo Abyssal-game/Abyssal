@@ -41,7 +41,7 @@ test('Brèche : posée par l’attaque d’un Protecteur, exploitée par un autr
   assert.equal(foe.breach, null, 'consommée');
 });
 
-test('Exposé : posé par une compétence à dé réussie, exploité par l’attaque d’un autre allié (+1 Ferveur)', () => {
+test('v265 : la compétence à dé réussie pose une Marque, consommée par l’attaque d’un autre allié (+50 %, +2 Brisure)', () => {
   const { st, foe } = mk(['controle', 'degats', 'soin'], 10);
   const cu = st.order.ally.map((id) => st.units[id]).find((u) => u.role === 'controle');
   const du = st.order.ally.map((id) => st.units[id]).find((u) => u.role === 'degats');
@@ -49,13 +49,15 @@ test('Exposé : posé par une compétence à dé réussie, exploité par l’att
   let ev = D.act(st, cu.uid, 'entrave', foe.uid);
   const roll = ev.find((e) => e.t === 'roll');
   assert.ok(roll.perfect && roll.tier !== 'fumble' && roll.tier !== 'partial', 'frappe parfaite → réussite');
-  assert.ok(foe.open && foe.open.by === cu.uid, 'Exposé posé');
-  const fv = st.fervor; st.ap = 3;
+  assert.ok(foe.mark && foe.markBy === cu.uid, 'Marque posée');
+  st.ap = 3;
+  const plain = D.dmgOf(st, du, { ...foe, mark: 0 }, 1, { basic: true }), boosted = D.dmgOf(st, du, foe, 1, { basic: true });
+  assert.ok(boosted > plain, 'la Marque amplifie le coup d’un autre allié');
+  assert.equal(D.dmgOf(st, cu, foe, 1, { basic: true }) <= D.dmgOf(st, cu, { ...foe, mark: 0 }, 1, { basic: true }), true, 'pas pour celle qui l’a posée');
   ev = D.act(st, du.uid, 'attack', foe.uid);
-  const syn = ev.find((e) => e.combo === 'expose');
-  assert.ok(syn && syn.by === cu.uid && syn.a === du.uid, 'Exposé exploité');
-  assert.ok(st.fervor > fv - 0 || ev.some((e) => e.t === 'fervor' && e.why === 'Exposé'), '+1 Ferveur');
-  assert.equal(foe.open, null);
+  const syn = ev.find((e) => e.combo === 'chasse');
+  assert.ok(syn && syn.by === cu.uid && syn.a === du.uid, 'Marque consommée');
+  assert.equal(foe.mark, 0);
 });
 
 test('Brèche et Exposé expirent à la fin du tour suivant', () => {

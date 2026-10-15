@@ -48,8 +48,8 @@ test('Rémanence : la Marque qu’elle pose dure 3 tours au lieu de 2', () => {
 
 test('Dernier rempart : la première Brisure donne un bouclier à toute l’équipe au combat', () => {
   const { st, unit, foe } = mk(['protecteur', 'degats', 'soin'], { foeScale: 6, elite: true, talents: { protecteur: 'rempart' } });
-  assert.ok(foe.brkMax > 0); foe.brk = 1; foe.hp = foe.maxHp;
-  const ev = D.act(st, unit('degats').uid, 'attack', foe.uid);
+  assert.ok(foe.brkMax > 0); foe.brk = 0; foe.cracked = { seq: -1, until: 9 }; foe.hp = foe.maxHp;
+  const ev = D.act(st, unit('protecteur').uid, 'attack', foe.uid);
   assert.ok(ev.some((e) => e.t === 'broken'), 'brisé');
   assert.ok(st.order.ally.map((id) => st.units[id]).filter((u) => u.hp > 0).every((u) => u.shield === 1), 'bouclier sur toute l’équipe');
 });

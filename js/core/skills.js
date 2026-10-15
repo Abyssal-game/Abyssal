@@ -24,18 +24,18 @@ export const KITS = {
     kw: 'garde', name: 'Garde', icon: 'shield',
     basic: { name: 'Coup de bouclier', desc: 'Dégâts normaux, +1 Brisure en plus.' },
     skill: { key: 'rempart', pa: 1, name: 'Rempart', icon: 'shield', ap: 1, fervor: 1, target: 'ally', desc: 'Jusqu’à ton prochain tour, protège un allié : les coups qui le visent la frappent à sa place, et elle en prend 40 % de moins.' },
-    passive: { name: 'Riposte', desc: 'Les ennemis doivent la viser en premier (sauf les assassins). Après une parade parfaite, elle contre-attaque.' },
+    passive: { name: 'Riposte', desc: 'Les ennemis doivent la viser en premier (sauf les assassins). Chaque coup qu’elle encaisse charge sa riposte (3 au plus) : sa prochaine attaque fait +1 dégât et +1 Brisure par charge. Son attaque est un coup de rupture. Après une parade parfaite, elle contre-attaque.' },
   },
   degats: {
     kw: 'assaut', name: 'Assaut', icon: 'swords',
     basic: { name: 'Frappe', desc: 'Dégâts normaux.' },
-    skill: { key: 'estoc', pa: 2, name: 'Coup d’estoc', icon: 'swords', ap: 2, fervor: 2, target: 'enemy', dice: { dc: 10 }, desc: 'Jet de D20. Réussite : dégâts ×2 et +3 Brisure. Critique : ×3 et +4 Brisure. Partielle : ×1,2. Échec critique : moitié des dégâts, et elle est exposée (+25 % de dégâts subis).' },
+    skill: { key: 'estoc', pa: 2, name: 'Coup d’estoc', icon: 'swords', ap: 2, fervor: 2, target: 'enemy', dice: { dc: 10 }, desc: 'Coup de rupture. Jet de D20. Réussite : dégâts ×2, +3 Brisure, et la cible est marquée. Critique : ×3 et +4 Brisure. Partielle : ×1,2. Échec critique : moitié des dégâts, et elle est exposée (+25 % de dégâts subis).' },
     passive: { name: 'Exécution', desc: '+50 % de dégâts sur une cible brisée ou sous 30 % de ses PV. Contre-attaque après une parade parfaite.' },
   },
   soin: {
     kw: 'soin', name: 'Soin', icon: 'heart',
     basic: { name: 'Frappe', desc: 'Dégâts normaux.' },
-    skill: { key: 'priere', pa: 2, name: 'Prière', icon: 'heart', ap: 1, fervor: 2, target: 'ally', desc: 'Soigne un allié de 40 % de ses PV maximum et le libère du poison et du gel.' },
+    skill: { key: 'priere', pa: 2, name: 'Prière', icon: 'heart', ap: 1, fervor: 2, target: 'ally', desc: 'Soigne un allié de 40 % de ses PV maximum ; ce qui dépasse devient un bouclier (20 % de ses PV max au plus). Le libère du poison et du gel (+1 PA s’il en avait).' },
     passive: { name: 'Souffle de vie', desc: 'À la fin de ton tour, soigne un peu l’allié le plus blessé.' },
   },
   poison: {
@@ -53,13 +53,13 @@ export const KITS = {
   soutien: {
     kw: 'cri', name: 'Cri', icon: 'sparkle',
     basic: { name: 'Frappe', desc: 'Dégâts normaux.' },
-    skill: { key: 'marque', pa: 1, name: 'Marque du chasseur', icon: 'sparkle', ap: 1, fervor: 1, target: 'enemy', desc: 'Marque un ennemi pendant 2 tours : +30 % de dégâts subis, +3 à tous tes jets de dés contre lui, et sa faiblesse est révélée.' },
+    skill: { key: 'marque', pa: 1, name: 'Marque du chasseur', icon: 'sparkle', ap: 1, fervor: 1, target: 'enemy', desc: 'Marque un ennemi : le prochain coup d’une AUTRE de tes créatures fait +50 % de dégâts et +2 Brisure, puis la Marque part (2 tours au plus). +3 à tes jets de dés contre lui, et sa faiblesse est révélée.' },
     passive: { name: 'Cri de guerre', desc: 'Au début de ton tour, tes créatures au combat gagnent +1 en attaque.' },
   },
   zone: {
     kw: 'deferlante', name: 'Déferlante', icon: 'flame',
     basic: { name: 'Vague', desc: 'Touche aussi les voisins de la cible (moitié des dégâts).' },
-    skill: { key: 'raz', pa: 3, name: 'Raz-de-marée', icon: 'flame', ap: 2, fervor: 3, target: 'none', desc: 'Frappe tous les ennemis au combat (70 % de son attaque) et +1 Brisure à chacun.' },
+    skill: { key: 'raz', pa: 3, name: 'Raz-de-marée', icon: 'flame', ap: 2, fervor: 3, target: 'none', desc: 'Coup de rupture. Frappe tous les ennemis au combat (70 % de son attaque), +1 Brisure à chacun, et consomme toutes les Marques.' },
     passive: { name: 'Marée montante', desc: 'Renforcée par un Cri, sa Vague frappe les voisins à pleine puissance.' },
   },
 };
@@ -155,13 +155,14 @@ export const bossPowerOf = (floor) => ['carapace', 'givre', 'fureur', 'devoreur'
 
 // ——— Combinaisons (affichées dans les règles et les fiches) ————————————
 export const SYNERGIES = [
-  { roles: ['soutien', 'degats'], name: 'Chasse', desc: 'Marque puis Coup d’estoc : +3 au jet et +30 % de dégâts.' },
+  { roles: ['soutien', 'degats'], name: 'Chasse', desc: 'Marque, puis le coup d’une autre créature : +50 % de dégâts et +2 Brisure. Avec le Coup d’estoc : +3 au jet en plus.' },
   { roles: ['controle', 'degats'], name: 'Bris de glace', desc: 'Un Coup d’estoc sur une cible gelée : +3 au jet et +2 Brisure.' },
   { roles: ['controle', 'poison'], name: 'Givre-venin', desc: 'Le poison appliqué sur une cible gelée est doublé.' },
   { roles: ['poison', 'poison'], name: 'Épidémie', desc: 'Accumule le poison, puis Contagion pour le propager.' },
-  { roles: ['protecteur', 'soin'], name: 'Bastion', desc: 'Rempart sur l’allié menacé, puis Prière : il est soigné et reçoit un bouclier.' },
+  { roles: ['protecteur', 'soin'], name: 'Bastion', desc: 'Rempart sur l’allié menacé, puis Prière : il est soigné et reçoit un bouclier. Chaque coup encaissé par le Protecteur charge sa riposte.' },
   { roles: ['soutien', 'zone'], name: 'Raz-de-marée', desc: 'Renforcée par un Cri, la Vague frappe les voisins à pleine puissance.' },
   { roles: ['degats', null], name: 'Curée', desc: 'Une cible brisée subit +50 % de dégâts, et l’Assaut l’exécute (+50 % encore).' },
+  { roles: ['protecteur', null], name: 'Coup de rupture', desc: 'Jauge de Brisure vide : l’ennemi est Fêlé. L’attaque d’un Protecteur, un Coup d’estoc, un Raz-de-marée ou un coup qui consomme une Marque le brise : son attaque annoncée est annulée.' },
   { roles: ['protecteur', null], name: 'Parade et riposte', desc: 'Parade parfaite : aucun dégât, +1 PA, +2 Ferveur, Brisure de l’attaquant, et contre-attaque des Gardes et des Assauts.' },
 ];
 export const synergiesFor = (role) => SYNERGIES.filter((s) => s.roles.includes(role) || s.roles[1] === null);
@@ -188,7 +189,7 @@ export const TALENTS = {
   epines:    { name: 'Épines', desc: 'Renvoie 2 dégâts à chaque ennemi qui la blesse.' },
   faim:      { name: 'Faim abyssale', desc: 'Quand elle achève un ennemi : +1 Ferveur de plus (une fois par combat).' },
   elan:      { name: 'Élan', desc: 'Quand elle achève un ennemi, chacune de tes créatures au combat gagne 1 PA (une fois par tour).' },
-  remanence: { name: 'Rémanence', desc: 'La Marque, la Brèche et l’Exposé qu’elle pose durent 1 tour de plus.' },
+  remanence: { name: 'Rémanence', desc: 'La Marque et la Brèche qu’elle pose durent 1 tour de plus.' },
   rempart:   { name: 'Dernier rempart', desc: 'La première Brisure de chaque combat donne un bouclier à toute ton équipe au combat.' },
   vigilance: { name: 'Vigilance', desc: 'Ses attaques interrompent un ennemi qui se charge ou se concentre.' },
   ardente:   { name: 'Ferveur ardente', desc: 'Sa compétence signature coûte 1 PA de moins.' },

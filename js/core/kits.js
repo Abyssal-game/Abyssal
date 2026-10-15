@@ -272,7 +272,7 @@ export const OPS = {
   slow: { v: () => 0.5, run: (st, u, x, o, ev) => { x.slow = true; ev.push({ t: 'status', u: x.uid, s: 'Ralenti', k: 'frost' }); } },
   freeze: { v: () => 1.3, run: (st, u, x, o, ev, api) => { if (!(x.frostCD > 0)) api.freeze(st, x, ev); else { x.slow = true; ev.push({ t: 'status', u: x.uid, s: 'Ralenti', k: 'frost' }); } } },
   brk: { v: (o) => 0.25 * o.n, run: (st, u, x, o, ev, api) => api.breakHit(st, x, o.n, ev, u) },
-  mark: { v: () => 0.6, run: (st, u, x, o, ev) => { x.mark = Math.max(x.mark || 0, 2); ev.push({ t: 'status', u: x.uid, s: 'Marquée', k: 'mark' }); } },
+  mark: { v: () => 0.6, run: (st, u, x, o, ev) => { x.mark = Math.max(x.mark || 0, 2); x.markBy = u.uid; ev.push({ t: 'status', u: x.uid, s: 'Marquée', k: 'mark' }); } },
   shield: { v: () => 0.7, run: (st, u, x, o, ev) => { if (!x.shield) { x.shield = 1; ev.push({ t: 'status', u: x.uid, s: 'Bouclier', k: 'guard' }); } } },
   heal: { v: (o) => 4 * o.p, run: (st, u, x, o, ev, api) => api.heal(x, x.maxHp * o.p, ev, u) },
   boost: { v: (o) => 0.3 * o.n, run: (st, u, x, o, ev) => { x.boost = (x.boost || 0) + o.n; ev.push({ t: 'status', u: x.uid, s: `+${o.n} ATQ`, k: 'heal' }); } },

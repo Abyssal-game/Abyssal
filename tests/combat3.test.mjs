@@ -22,10 +22,14 @@ test('aperçu : la Brisure annoncée est celle infligée', () => {
   assert.equal(before - t.brk, pv.brk);
 });
 
-test('aperçu : « BRISE ! » quand le coup vide la jauge, et l’intention est annulée', () => {
+test('aperçu : « FÊLE » quand le coup vide la jauge, « BRISE ! » au coup de rupture suivant, et l’intention est annulée', () => {
   const st = D.createDuel([A(byRole('protecteur')), A(byRole('degats')), A(byRole('soin'))], [E('NEC-010', { elite: true, scale: 4 })], { seed: 3 });
   const [p] = ally(st), t = foe(st)[0];
   t.brk = 1; t.intent = { kind: 'charge', t: null };
+  assert.equal(D.preview(st, p.uid, 'attack', t.uid).cracks, true);
+  D.act(st, p.uid, 'attack', t.uid);
+  assert.ok(t.cracked && !t.broken, 'Fêlé, pas encore brisé');
+  st.ap = 3; p.acts = 0;
   const pv = D.preview(st, p.uid, 'attack', t.uid);
   assert.equal(pv.breaks, true);
   const ev = D.act(st, p.uid, 'attack', t.uid);

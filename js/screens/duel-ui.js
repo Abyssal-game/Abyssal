@@ -92,12 +92,14 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   const st_ = (k, title, val = '') => `<i class="sti" title="${title}"><img alt="${title}" src="assets/icons/st-${k}.webp">${val !== '' ? `<b>${val}</b>` : ''}</i>`;
   const statusHTML = (u) => [
     u.broken ? st_('broken', 'Brisé : +50 % de dégâts subis, +5 aux jets') : '',
+    u.cracked ? st_('broken', 'Fêlé : un coup de rupture le brise (attaque d’un Protecteur, Coup d’estoc, Raz-de-marée, ou coup qui consomme une Marque)') : '',
+    u.riposte ? `<i class="bo cb-rip" title="Riposte chargée : sa prochaine attaque fait +${u.riposte} dégât(s) et +${u.riposte} Brisure">⚔${u.riposte}</i>` : '',
     u.shield ? st_('shield', 'Bouclier : bloque un coup') : '',
     u.ward ? st_('seal', `Sceau : absorbe encore ${u.ward} dégâts`, u.ward) : '',
     u.poison ? st_('poison', `Poison : ${u.poison} dégâts au début de son tour`, u.poison) : '',
     u.frozen || u.stunned ? st_('frost', 'Gelé : passe son tour') : '',
     u.slow ? st_('slow', 'Ralenti : prochaine attaque -50 %') : '',
-    u.mark ? st_('mark', 'Marqué : +30 % de dégâts, +3 aux jets') : '',
+    u.mark ? st_('mark', 'Marqué : le prochain coup d’une autre de tes créatures fait +50 % et +2 Brisure, puis la Marque part. +3 aux jets') : '',
     u.defend ? st_('defend', 'Défense : -50 % de dégâts') : '',
     u.guardBy ? st_('guard', 'Protégé par un Rempart') : '',
     u.exposed ? st_('exposed', 'Déséquilibrée : +25 % de dégâts subis') : '',
@@ -123,22 +125,25 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const cd = ['charge', 'channel', 'gather', 'mimic'].includes(i.kind) ? '<em class="cb-icd" title="Frappe au prochain tour">⏳1</em>' : '';
     return `<span class="cb-int d${i.danger} k-${i.kind}" title="${esc(i.def.name)} : ${esc(i.def.desc)}">${intentIcon(i.kind)}<b>${label}</b>${i.danger >= 2 ? `<em>${DANGER[i.danger]}</em>` : ''}${cd}${brk}</span>`;
   };
+  // v265 : la grosse attaque annoncée d'un gardien ou d'une élite, aussi sur sa carte
+  const cardWarn = (u) => { const now = bigOf(u, false), nx = now ? null : bigOf(u, true), k = now || nx; if (!k) return ''; const real = PREP_IT[k] || k; return `<span class="cb-warn ${PREP_IT[k] || nx ? 'prep' : ''}" title="${esc(INTENTS[real].desc)}">${intentIcon(real)}<b>${esc(INTENTS[real].name)}</b><small>${now && !PREP_IT[now] ? 'à son tour' : 'au tour suivant'}</small></span>`; };
   const cardEl = (u) => {
     const c = cat.get(u.id), kit = KITS[u.role];
     const dead = u.hp <= 0, enemy = u.side === 'enemy';
     const ready = !enemy && st.turn === 'ally' && actionsFor(st, u.uid).some((a) => a.ok && a.key !== 'swap');
     const tgt = tgtInfo[u.uid];
-    return `<button class="dv-c ${u.side} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.phase2 ? 'p2' : ''} ${u.defend ? 'def' : ''} ${u.broken ? 'broken' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" data-rar="${u.rarity}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(c.name)}, ${Math.max(0, u.hp)} PV">
+    return `<button class="dv-c ${u.side} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.phase2 ? 'p2' : ''} ${u.defend ? 'def' : ''} ${u.broken ? 'broken' : ''} ${u.cracked ? 'fele' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" data-rar="${u.rarity}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(c.name)}, ${Math.max(0, u.hp)} PV">
       <span class="dv-base" aria-hidden="true"></span>
       <span class="dv-art"><img alt="" src="${artUrl(c)}"></span>
       <span class="dv-kw ${enemy && u.fam ? 'fam' : ''}" title="${esc(enemy && u.fam ? AI_FAMILIES[u.fam].desc : kit.name)}">${roleIcon(kit.kw)}<em>${esc(enemy && u.fam ? AI_FAMILIES[u.fam].name : kit.name)}</em></span>
       ${u.boss ? `<span class="dv-boss"><img alt="" src="assets/icons/crest-boss.webp">${u.phase2 ? 'Furie' : 'Gardien'}</span>` : u.elite ? '<span class="dv-boss elite"><img alt="" src="assets/icons/crest-elite.webp">Élite</span>' : ''}
       <span class="dv-nm ${u.named ? 'named' : ''}">${esc(u.named ? u.title : c.name)}</span>
-      ${u.brkMax ? `<span class="cb-brk ${u.broken ? 'is-broken' : ''}" title="Brisure">${u.broken ? '<img alt="" src="assets/icons/st-broken.webp"><b>BRISÉ</b>' : `<i style="width:${(u.brk / u.brkMax) * 100}%"></i>`}</span>` : ''}
+      ${u.brkMax ? `<span class="cb-brk ${u.broken || u.cracked ? 'is-broken' : ''} ${u.cracked ? 'is-fele' : ''}" title="Brisure">${u.broken ? '<img alt="" src="assets/icons/st-broken.webp"><b>BRISÉ</b>' : u.cracked ? '<b>FÊLÉ</b>' : `<i style="width:${(u.brk / u.brkMax) * 100}%"></i>`}</span>` : ''}
       <span class="dv-atk">${icon('swords')}<b>${u.atk + (u.boost || 0)}</b></span>
       <span class="dv-hp ${u.hp < u.maxHp ? 'hurt' : ''}">${icon('heart')}<b>${Math.max(0, u.hp)}</b></span>
             ${tgt ? `<span class="cb-tgt">${tgt}</span>` : ''}
       <span class="dv-st">${statusHTML(u)}</span>
+      ${enemy && !dead ? cardWarn(u) : ''}
     </button>`;
   };
   const resHTML = (side) => {
@@ -188,9 +193,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       for (const id of actionTargets(st, sel, pk)) {
         const p = preview(st, sel, pk, id);
         const cb = p.dmg && st.units[id].side === 'enemy' ? comboOf(st, st.units[sel], st.units[id]) : 0, cbTxt = cb ? ` <i class="cmb">+${cb}</i>` : '';
-        const bk = p.brk ? (p.breaks ? ' <i class="brk on">BRISE !</i>' : ` <i class="brk">◆${p.brk}</i>`) : '';
-        const tu = st.units[id], synOk = tu.side === 'enemy' && p.dmg && ((tu.breach && tu.breach.by !== sel) || (pk === 'attack' && tu.open && tu.open.by !== sel) || (tu.mark && pk === 'estoc') || (tu.frozen > 0 && pk === 'estoc'));
-        const syTxt = synOk ? ' <i class="cmb sy">Synergie</i>' : '';
+        const bk = p.breaks ? ' <i class="brk on">BRISE !</i>' : p.brk ? (p.cracks ? ' <i class="brk fl">FÊLE</i>' : ` <i class="brk">◆${p.brk}</i>`) : '';
+        const tu = st.units[id], synOk = tu.side === 'enemy' && p.dmg && ((tu.breach && tu.breach.by !== sel) || (tu.mark && tu.markBy !== sel) || (tu.frozen > 0 && pk === 'estoc'));
+        const syTxt = synOk && !p.breaks ? ` <i class="cmb sy">${tu.mark && tu.markBy !== sel ? '+50 %' : 'Synergie'}</i>` : '';
         tgtInfo[id] = (p.roll ? `${p.roll.chance}%` : p.dmg ? (p.dmg >= st.units[id].hp && st.units[id].side === 'enemy' ? `<b class="ko">K.O.</b> -${p.dmg}${cbTxt}` : `-${p.dmg}${p.weak ? ' ★' : ''}${cbTxt}`) : 'Cible') + bk + syTxt;
       }
     }
@@ -233,6 +238,15 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   // Tracés rouges : d'un ennemi qui prépare un coup dangereux vers la créature qu'il vise (v253)
   // Ordre des tours (v258) : colonne de portraits en haut à gauche. Ton équipe joue ensemble, puis chaque ennemi à son tour.
   let tlSig = '', acting = null;
+  // v265 : seules les grosses attaques des gardiens et des élites s'annoncent sur la frise (les coups ordinaires restent cachés)
+  const BIG_IT = ['heavy', 'blast', 'gorge', 'blizzard', 'copy'], PREP_IT = { charge: 'heavy', channel: 'blast', gather: 'blizzard', mimic: 'copy' };
+  const bigOf = (u, next) => {
+    if (!(u.boss || u.elite) || u.hp <= 0) return null;
+    const it = u.intent && !u.intent.cancelled ? u.intent.kind : null;
+    if (!next) return it && (BIG_IT.includes(it) || PREP_IT[it]) ? it : null;
+    return (u.charged && BIG_IT.includes(u.charged) ? u.charged : null) || (it && PREP_IT[it]) || null;
+  };
+  const warnHTML = (k) => (k ? `<em class="cb-tlw ${PREP_IT[k] ? 'prep' : ''}">${intentIcon(PREP_IT[k] || k)}<b>${esc(PREP_IT[k] ? `Prépare : ${INTENTS[PREP_IT[k]].name}` : INTENTS[k].name)}</b></em>` : '');
   function drawTimeline() {
     const box = $('.cb-tl'); if (!box) return;
     if (st.over) { box.innerHTML = ''; return; }
@@ -242,13 +256,13 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       const now = st.turn === 'enemy' ? [...(acting && !st.queue.includes(acting) ? [acting] : []), ...st.queue] : st.actor ? [st.actor] : [];
       const cur = [...now, ...st.init.slice((st.ip ?? -1) + 1)].map((id) => st.units[id]).filter(ok);
       const nxt = st.init.map((id) => st.units[id]).filter(ok);
-      const list = [...cur, { sep: st.round + 1 }, ...nxt].slice(0, 5);
+      const list = [...cur.map((u) => ({ u, w: bigOf(u, false) })), { sep: st.round + 1 }, ...nxt.map((u) => ({ u, w: bigOf(u, true) }))].slice(0, 5);
       const pic = (u) => `<img alt="" src="${artUrl(cat.get(u.id), { lite: true })}">`;
-      const sig = list.map((x) => x.sep ? `T${x.sep}` : x.uid).join(',');
+      const sig = list.map((x) => x.sep ? `T${x.sep}` : x.u.uid).join(',');
       const moved = tlSig && tlSig.split(',')[0] !== sig.split(',')[0];
       tlSig = sig;
       box.innerHTML = list.map((x, i) => (x.sep ? `<span class="cb-tlsep" title="Tour suivant">T${x.sep}</span>`
-        : `<span class="cb-tlr ${x.side === 'enemy' ? 'foe' : 'al'} ${i === 0 ? 'now' : ''} ${x.boss ? 'boss' : x.elite ? 'elite' : ''}" title="${esc(cat.get(x.id).name)}"><span class="cb-tlp">${pic(x)}</span></span>`)).join('');
+        : `<span class="cb-tlr ${x.u.side === 'enemy' ? 'foe' : 'al'} ${i === 0 ? 'now' : ''} ${x.u.boss ? 'boss' : x.u.elite ? 'elite' : ''} ${x.w ? 'warn' : ''}" title="${esc(cat.get(x.u.id).name)}"><span class="cb-tlp">${pic(x.u)}</span>${warnHTML(x.w)}</span>`)).join('');
       if (moved && !reduced) { box.classList.remove('shift'); void box.offsetWidth; box.classList.add('shift'); }
       return;
     }
@@ -489,6 +503,11 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           const t2 = el(e.u); t2?.classList.add('shatter', 'cracked'); ring(e.u, 'break');
           banner('BRISURE !', 'broken', 1000); fxAt(e.u, 'break', { big: true }); sparks(e.u, 'big'); shake(true); dio.brk();
           await wait(T(700)); d?.classList.remove('focus');
+          break;
+        }
+        case 'cracked': {
+          app.sfx.shatter?.(); draw(); el(e.u)?.classList.add('cracking'); ring(e.u, 'break'); banner('FÊLÉ !', 'broken', 900); float(e.u, 'Coup de rupture pour le briser', 'syn'); shake(false);
+          await wait(T(600)); if (!g.s.tips?.['cb-break']) await tuto(app, 'cb-break');
           break;
         }
         case 'recover': app.sfx.recover?.(); float(e.u, 'Se relève', 'info'); await wait(T(260)); break;
@@ -972,6 +991,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     openSheet(`<div class="tb-info"><div class="tb-info-card ${u.side === 'enemy' ? 'corrupt' : ''}">${cardHTML(c, { size: 'full', nameKnown: true })}</div>
       <h3>${esc(c.name)}${u.side === 'enemy' ? ' corrompu' : ''}</h3>
       <dl class="facts"><div><dt>Attaque</dt><dd>${u.atk + (u.boost || 0)}</dd></div><div><dt>PV</dt><dd>${Math.max(0, u.hp)} / ${u.maxHp}</dd></div><div><dt>Niveau</dt><dd>${u.level || 1}</dd></div>${st.init ? `<div><dt>Vitesse</dt><dd>${speedOf(u)}</dd></div>` : ''}${st.init && u.side === 'ally' ? `<div><dt>PA</dt><dd>${u.pa || 0} / ${PA_MAX}</dd></div>` : ''}${u.brkMax ? `<div><dt>Brisure</dt><dd>${u.broken ? 'Brisé' : `${u.brk} / ${u.brkMax}`}</dd></div>` : ''}</dl>
+      ${u.side === 'enemy' && (bigOf(u, false) || bigOf(u, true)) ? `<p class="small dc-bad"><b>Annonce</b> : ${esc(bigOf(u, false) ? (PREP_IT[bigOf(u, false)] ? `il prépare ${INTENTS[PREP_IT[bigOf(u, false)]].name} pour le tour suivant` : `${INTENTS[bigOf(u, false)].name} à son prochain tour`) : `${INTENTS[bigOf(u, true)].name} au tour suivant`)}. ${esc(INTENTS[PREP_IT[bigOf(u, false)] || bigOf(u, false) || bigOf(u, true)].desc)} Brise-le pour l’annuler.</p>` : ''}
       ${u.trait && TRAITS[u.trait] ? `<p class="small dc-bad cb-trait"><img class="cb-trico" alt="" src="assets/icons/st-${u.trait}.webp"><b>${esc(TRAITS[u.trait].name)}</b> : ${esc(TRAITS[u.trait].desc)}</p>` : ''}
       ${fam ? `<p class="small"><b>${esc(fam.name)}</b> : ${esc(fam.desc)} <span class="dc-good">${esc(fam.counter)}</span></p>` : ''}
       ${u.boss && st.bossKey ? `<p class="small dc-bad"><b>${esc(BOSSES[st.bossKey].name)}</b> : ${esc(BOSSES[st.bossKey].mechanic)} Sous la moitié de ses PV, il entre en phase 2 et accélère.</p>${g.s.bossesBeaten[st.bossKey] ? `<p class="small dc-good"><b>Pour le contrer</b> : ${esc(BOSSES[st.bossKey].counter)}</p>` : ''}${u.aspect ? `<p class="small"><b>${esc(ASPECTS[u.aspect].name)}</b> : faible face à ${ASPECTS[u.aspect].weak.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}, résiste à ${ASPECTS[u.aspect].resist.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}.</p>` : ''}` : ''}
@@ -1008,7 +1028,10 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       <li><b>Dés</b> : Coup d’estoc, Contagion et Entrave lancent un D20 contre une difficulté (DD). 1 : échec critique ; sous le DD : réussite partielle ; DD atteint : réussite ; 20 : critique. Marque, gel, Brisure et faiblesse donnent des bonus.</li>
       <li><b>Enchaînement</b> : chaque créature qui frappe un ennemi déjà touché ce tour-ci par une autre de tes créatures gagne +1 dégât (+2 au plus). Le « +1 » doré sur la cible l’annonce.</li>
       <li><b>Coup de grâce</b> : achever un ennemi donne +1 Ferveur.</li>
-      <li><b>Brisure</b> (élites, gardiens) : vide, l’ennemi perd sa prochaine action, subit +50 % de dégâts et +5 aux jets contre lui jusqu’à la fin du tour suivant.</li>
+      <li><b>Fêlure et Brisure</b> (élites, gardiens) : jauge vide, l’ennemi est <b>Fêlé</b>. Un <b>coup de rupture</b> (attaque d’un Protecteur, Coup d’estoc, Raz-de-marée, ou coup qui consomme une Marque) le <b>brise</b> : son attaque annoncée est annulée, il perd sa prochaine action, subit +50 % de dégâts et +5 aux jets contre lui jusqu’à la fin du tour suivant. Sans rupture avant la fin du tour suivant, il se ressaisit (jauge à moitié).</li>
+      <li><b>Marque</b> : le prochain coup d’une <b>autre</b> de tes créatures fait +50 % et +2 Brisure, puis elle part. Garde-la pour ton plus gros coup.</li>
+      <li><b>Annonces</b> : les grosses attaques des gardiens et des élites s’affichent sur la frise, à côté de leur portrait. Brise-les avant qu’ils jouent pour les annuler.</li>
+      <li><b>Riposte chargée</b> : chaque coup encaissé par un Protecteur charge sa riposte (3 au plus) : +1 dégât et +1 Brisure par charge à sa prochaine attaque. <b>Prière</b> : le soin en trop devient un bouclier.</li>
       <li><b>Faiblesses</b> : chaque faction en craint une autre (+50 % de dégâts) ; contre sa propre faction : -25 %. ★ sur une cible = faiblesse exploitée.</li>
       <li><b>Instinct de meute</b> : tes Communes font +${PACK_BONUS} dégât aux élites et aux gardiens.</li></ul>
       <h3>L’identité des créatures</h3><p class="small">Chaque créature a sa propre identité, qui se révèle en montant de niveau : leur <b>frappe</b> (niveau 1) remplace l’attaque de leur rôle, puis viennent un <b>passif</b> (niveau 3), une <b>compétence propre</b> (niveau 6, la case dorée en plus de celle du rôle) et l’<b>Éveil</b> (niveau 9). Tout est détaillé sur la fiche de la carte.</p>
