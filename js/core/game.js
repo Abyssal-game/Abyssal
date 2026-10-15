@@ -750,6 +750,17 @@ export class Game {
     for (const k of Object.keys(st?.relSeen || {})) if (!this.s.relations[k]) { this.s.relations[k] = Date.now(); out.push(k); }
     return out;
   }
+  // v307 : entre deux combats, échanger la place de deux créatures de l'expédition (les 3 premières combattent)
+  swapRunTeam(i, j) {
+    const run = this.s.descent.run;
+    if (!run || run.phase === 'battle') throw new Error('Impossible pendant un combat.');
+    const t = run.team, a = t[i], b = t[j];
+    if (!a || !b || i === j) throw new Error('Choisis deux créatures.');
+    if (a.fallen || b.fallen) throw new Error('Une créature tombée ne peut plus changer de place.');
+    [t[i], t[j]] = [b, a];
+    this.persist();
+    return t;
+  }
   runUnits() {
     const run = this.s.descent.run, b = run.blessings;
     return run.team.filter((m) => !m.fallen).map((m) => {
@@ -900,6 +911,12 @@ export class Game {
       m.hp = Math.max(0, Math.min(m.maxHp, u.hp));
       if (m.hp <= 0) m.fallen = true;
     });
+    // v307 : la formation de fin de combat (permutations comprises) devient celle des étages suivants
+    const ord = (st.order?.ally || []).map((uid) => st.units[uid]?.id).filter(Boolean);
+    if (ord.length) {
+      const pos = (m) => { const i = ord.indexOf(m.id); return (m.fallen ? 1000 : 0) + (i < 0 ? 99 : i); }; // les créatures tombées passent à la fin
+      run.team = run.team.slice().sort((a, b) => pos(a) - pos(b));
+    }
     run.gauge = Math.min(FERVOR_CARRY, st.fervor ?? st.gauge ?? 0); // une partie de la Ferveur se garde d'un combat à l'autre (3 au plus)
     const relNew = this.learnRelations(st);
     const bossKey = st.bossKey;

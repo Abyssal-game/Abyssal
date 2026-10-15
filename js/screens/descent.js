@@ -35,7 +35,8 @@ export default function descent(app, root) {
   const ui = (app.state.descent ||= { cursed: false, nightmare: false, outcome: null });
   let battle = null, playing = false;
 
-  const teamStrip = (ids, run) => `<div class="v2-strip">${ids.map((id, i) => { const c = cat.get(id); const m = run?.team.find((x) => x.id === id); return `<span class="v2-mini ${i >= TEAM.active ? 'res' : ''} ${m?.fallen ? 'fallen' : ''}" style="--rc:${RARITY[c.rarity].color}"><img alt="" src="${artUrl(c, { lite: true })}">${m ? `<span class="hpbar"><i style="width:${(m.hp / m.maxHp) * 100}%"></i></span>` : `<small>${i < TEAM.active ? `Niv. ${g.cardLevel(id)}` : 'Rés.'}</small>`}</span>`; }).join('')}</div>`;
+  // swap (v307) : entre deux étages, toucher deux créatures échange leur place (les 3 premières combattent)
+  const teamStrip = (ids, run, swap = false) => `<div class="v2-strip ${swap ? 'swappable' : ''}">${ids.map((id, i) => { const c = cat.get(id); const m = run?.team.find((x) => x.id === id); const can = swap && m && !m.fallen; return `<${can ? 'button' : 'span'} class="v2-mini ${i >= TEAM.active ? 'res' : ''} ${m?.fallen ? 'fallen' : ''} ${can && ui.tsel === i ? 'sel' : ''}" style="--rc:${RARITY[c.rarity].color}"${can ? ` data-act="tswap" data-i="${i}" aria-label="${esc(c.name)} : ${i < TEAM.active ? 'au combat' : 'en réserve'}, ${m.hp} PV sur ${m.maxHp}"` : ''}><img alt="" src="${artUrl(c, { lite: true })}">${m ? `<span class="hpbar"><i style="width:${(m.hp / m.maxHp) * 100}%"></i></span>` : `<small>${i < TEAM.active ? `Niv. ${g.cardLevel(id)}` : 'Rés.'}</small>`}</${can ? 'button' : 'span'}>`; }).join('')}</div>`;
   const ruleHTML = (r) => `<section class="panel dc-rule bn-rule" style="--rf:${r.faction ? cat.faction[r.faction].colors.secondary : 'var(--gold)'}"><span class="dc-rule-ic">${r.faction ? sigil(r.faction) : picon('rule')}</span><span><span class="small muted">Règle du jour</span><b>${esc(r.name)}</b><span class="small">${esc(r.desc)}</span></span></section>`;
   const chestChip = (c) => (c ? `<span class="v2-chest-chip" style="--cc:${CHESTS[c].color}">${icon('p:chest')} ${esc(CHESTS[c].name)}</span>` : '<span class="v2-chest-chip none">aucun coffre</span>');
 
@@ -127,7 +128,8 @@ export default function descent(app, root) {
 
   // ——— Expédition ———————————————————————————————————————————————————
   const runHead = (run) => `<header class="dc-run-head"><div><span class="small muted">${run.nightmare ? `<span class="dc-bad">${icon('skull')} Cauchemar</span> · ` : ''}${run.free ? 'Descente libre (sans coffre)' : run.cursed ? `<span class="dc-bad">${icon('skull')} Maudite</span>` : 'La Descente'}</span><h1>Étage ${run.floor}</h1></div><div class="dc-loot"><span>${icon('crystal')}${fmt(run.shards)}</span>${run.chests.length ? `<span>${icon('p:chest')}${run.chests.length}</span>` : ''}</div></header>
-    ${teamStrip(run.team.map((m) => m.id), run)}
+    ${teamStrip(run.team.map((m) => m.id), run, run.phase !== 'battle')}
+    ${run.phase !== 'battle' && run.team.filter((m) => !m.fallen).length > 1 ? `<p class="dc-swap-hint small muted">${ui.tsel != null ? 'Touche la créature avec qui échanger sa place.' : 'Touche deux créatures pour échanger leur place : les 3 premières combattent.'}</p>` : ''}
     <p class="dc-rule-line small">${picon('rule')} <b>${esc(g.rule(run.day).name)}</b> · ${esc(g.rule(run.day).desc)}</p>`;
   function doorsView(run) {
     const doors = g.doors();
@@ -280,6 +282,12 @@ export default function descent(app, root) {
   }
 
   bindActions(root, {
+    tswap(el) {
+      const i = Number(el.dataset.i);
+      if (ui.tsel == null || ui.tsel === i) { ui.tsel = ui.tsel === i ? null : i; render(); return; }
+      try { g.swapRunTeam(ui.tsel, i); app.sfx.sheet?.(); } catch (e) { toast(esc(e.message), { kind: 'error' }); }
+      ui.tsel = null; render();
+    },
     curse() { ui.cursed = !ui.cursed; render(); },
     night() { ui.nightmare = !ui.nightmare; render(); },
     weekcard(el) { app.openCard(el.dataset.id); },
@@ -287,7 +295,7 @@ export default function descent(app, root) {
     async start() {
       if (ui.cursed && g.torchesLeft() && !(await confirmBox('Descente maudite : si toute l’équipe tombe, <b>tu ne rapportes rien</b>. Tu es sûr ?', { ok: 'Je descends', danger: true }))) return;
       try {
-        g.startRun({ cursed: ui.cursed, nightmare: ui.nightmare && g.nightmareUnlocked() }); ui.outcome = null; app.sfx.tear(); app.chrome(); render(); window.scrollTo(0, 0);
+        g.startRun({ cursed: ui.cursed, nightmare: ui.nightmare && g.nightmareUnlocked() }); ui.outcome = null; ui.tsel = null; app.sfx.tear(); app.chrome(); render(); window.scrollTo(0, 0);
         tuto(app, 'army-doors');
       } catch (e) { toast(esc(e.message), { kind: 'error' }); }
     },

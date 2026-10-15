@@ -163,3 +163,31 @@ test('objectifs : dévoilés à partir de l’étage 3 pour un nouveau joueur', 
   run.floor = 3;
   assert.ok(g.goalFor(run, 'fight'));
 });
+
+test('v307 : la formation choisie en combat (permutation) est gardée aux étages suivants, et se change entre deux étages', () => {
+  const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('formation'), clock: () => new Date(2026, 9, 15, 12) });
+  g.s.tickets.standard = 0;
+  const ids = catalog.cards.filter((c) => c.rarity === 'C').slice(0, 5).map((c) => c.id);
+  ids.forEach((id) => g.addCard(id, 'normal', 'reward'));
+  g.setTeam(ids);
+  const run = g.startRun();
+  assert.deepEqual(run.team.map((m) => m.id), ids);
+  g.chooseDoor(g.doors().includes('fight') ? 'fight' : g.doors()[0]);
+  const st = run.battle;
+  // permutation : la 1re créature (au combat) part en réserve, la 4e entre
+  const front0 = D.front(st, 'ally')[0], res0 = D.reserve(st, 'ally')[0];
+  const o = st.order.ally, i = o.indexOf(front0.uid), j = o.indexOf(res0.uid); [o[i], o[j]] = [o[j], o[i]];
+  for (const u of Object.values(st.units)) if (u.side === 'enemy') u.hp = 0;
+  st.over = 'won';
+  g.finishBattle();
+  const team = g.s.descent.run.team.map((m) => m.id);
+  assert.equal(team[0], res0.id, 'la créature entrée reste au combat');
+  assert.ok(team.indexOf(front0.id) >= 3, 'la créature sortie reste en réserve');
+  // entre deux étages : échange manuel
+  assert.throws(() => g.swapRunTeam(0, 0), /deux créatures/);
+  g.swapRunTeam(0, 4);
+  assert.equal(g.s.descent.run.team[4].id, res0.id);
+  // une créature tombée passe à la fin et ne s'échange plus
+  g.s.descent.run.team[1].fallen = true;
+  assert.throws(() => g.swapRunTeam(1, 2), /tombée/);
+});

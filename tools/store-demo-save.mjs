@@ -29,6 +29,7 @@ if (mode === 'sceaux') { // partie de Sceaux commencée : quelques cartes déjà
   const r = rngFrom('pose');
   for (let k = 0; k < 4 && !g.s.sceaux.cur.over; k++) { if (g.s.sceaux.cur.turn === 'o') g.sceauxAi(); else { const m = SC.aiMove(catalog, g.s.sceaux.cur, 4, r); g.sceauxPlay(m[0], m[1]); } }
 }
+if (mode === 'portes') g.startRun(); // expédition commencée, sur l'écran des portes
 if (mode === 'combat') { g.startRun(); const d = g.doors(); g.chooseDoor(d.includes('fight') ? 'fight' : d[0]); }
 g.persist();
 process.stdout.write(st.getItem(SAVE_KEY));
