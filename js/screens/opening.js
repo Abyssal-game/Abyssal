@@ -284,7 +284,7 @@ export function openPack(app, type, { faction, onDone, preset = null, title = nu
     if (RI(c.rarity) >= 4) epic(c.rarity);
     else app.sfx.reveal(c.rarity);
     if (c.variant !== 'normal') shine(c.variant, RI(c.rarity) >= 4 ? 1400 : 200);
-    if (c.isNewCard) { setTimeout(() => app.sfx.discover(), 250); if (!reduced) { const cc = stage.querySelector('.op-card, .tcg'); cc?.classList.add('op-first'); setTimeout(() => cc?.classList.remove('op-first'), 1300); } }
+    if (c.isNewCard) { /* v272 : plus de carillon ici, il couvrait le son de la rareté (le badge « Nouvelle » suffit) */ if (!reduced) { const cc = stage.querySelector('.op-card, .tcg'); cc?.classList.add('op-first'); setTimeout(() => cc?.classList.remove('op-first'), 1300); } }
     await wait(RI(c.rarity) >= 4 ? 900 : 250);
     busy = false;
     hint.textContent = index < opening.cards.length - 1 ? 'Glisse la carte sur le côté, ou touche-la pour la suivante.' : 'Glisse ou touche pour voir le récapitulatif.';
