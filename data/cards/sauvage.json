@@ -3204,5 +3204,49 @@
   },
   "image": "assets/art/SAU-072.webp",
   "artPrompt": "Sekhmet — Déesse à tête de lionne, disque solaire et serpent au-dessus de la tête, robe rouge, crocs dénudés, souffle de flammes, désert sous un soleil de sang. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-073",
+  "number": 73,
+  "name": "Mothman",
+  "title": "Les yeux rouges sur le pont",
+  "faction": "sauvage",
+  "rarity": "PC",
+  "category": "Créature mythologique",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 6,
+   "def": 1,
+   "spd": 9,
+   "mag": 3,
+   "hp": 7,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Créature humanoïde grise aux immenses ailes de papillon de nuit, sans tête distincte, deux grands yeux rouges luisants dans le torse, perchée sur la poutre d'un vieux pont métallique dans la brume.",
+  "lore": "On le voit toujours juste avant. Personne ne sait s'il prévient ou s'il attend.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "dog",
+   "size": "big",
+   "tail": "bushy",
+   "mane": true,
+   "scene": "ice"
+  },
+  "image": "assets/art/SAU-073.webp",
+  "artPrompt": "Mothman — Créature humanoïde grise aux immenses ailes de papillon de nuit, sans tête distincte, deux grands yeux rouges luisants dans le torse, perchée sur la poutre d'un vieux pont métallique dans la brume. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

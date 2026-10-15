@@ -3255,5 +3255,56 @@
   },
   "image": "assets/art/PRI-070.webp",
   "artPrompt": "Tezcatlipoca — Dieu aztèque au visage peint de bandes noires et jaunes, miroir d’obsidienne fumant à la place d’un pied, coiffe de plumes, jaguar dans l’ombre, nuit étoilée. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "PRI-071",
+  "number": 71,
+  "name": "Coatlicue",
+  "title": "La jupe de serpents",
+  "faction": "primordial",
+  "rarity": "S",
+  "category": "Dieu ancien",
+  "power": 10,
+  "role": "M",
+  "stats": {
+   "atk": 9,
+   "def": 3,
+   "spd": 7,
+   "mag": 10,
+   "hp": 19,
+   "cost": 10
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   },
+   {
+    "key": "cataclysm",
+    "value": 2
+   },
+   {
+    "key": "regen",
+    "value": 3
+   }
+  ],
+  "visual": "Déesse aztèque colossale à la tête faite de deux serpents qui se font face, jupe de serpents entrelacés, collier de mains et de cœurs, griffes aux pieds, sculpture de pierre vivante sur une pyramide sous un soleil noir.",
+  "lore": "Mère de la lune, des étoiles et du soleil. Elle les a tous mis au monde, elle peut tous les reprendre.",
+  "evolution": null,
+  "sets": [
+   "pantheons2"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "serpent",
+   "scale": 1.1,
+   "scene": "void"
+  },
+  "image": "assets/art/PRI-071.webp",
+  "artPrompt": "Coatlicue — Déesse aztèque colossale à la tête faite de deux serpents qui se font face, jupe de serpents entrelacés, collier de mains et de cœurs, griffes aux pieds, sculpture de pierre vivante sur une pyramide sous un soleil noir. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

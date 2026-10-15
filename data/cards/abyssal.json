@@ -2325,5 +2325,796 @@
   },
   "image": "assets/art/ABY-054.webp",
   "artPrompt": "Poséidon — Dieu colossal à la barbe d’écume verte, trident de bronze brandi, chevaux marins écumants, vague gigantesque qui s’élève derrière lui sous un ciel d’orage. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-055",
+  "number": 55,
+  "name": "Siphonophore des Fosses",
+  "title": "Une colonie qui chasse",
+  "faction": "abyssal",
+  "rarity": "PC",
+  "category": "Créature marine",
+  "power": 4,
+  "role": "U",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 3,
+   "mag": 4,
+   "hp": 14,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Immense chaîne vivante de cloches translucides bleu et rose, filaments urticants très longs pendant comme une pluie lumineuse, eaux noires des grandes profondeurs.",
+  "lore": "Mille bêtes, un seul corps. Toutes ont faim en même temps.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "serpent",
+   "tint": "#e0303c",
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-055.webp",
+  "artPrompt": "Siphonophore des Fosses — Immense chaîne vivante de cloches translucides bleu et rose, filaments urticants très longs pendant comme une pluie lumineuse, eaux noires des grandes profondeurs. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-056",
+  "number": 56,
+  "name": "Isopode Géant",
+  "title": "Le charognard des fonds",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Créature marine",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 1,
+   "def": 2,
+   "spd": 2,
+   "mag": 0,
+   "hp": 11,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Énorme isopode à carapace segmentée gris nacré, nombreuses pattes, gros yeux composés, rampant sur un squelette de baleine posé sur le fond marin.",
+  "lore": "Il peut attendre cinq ans sans manger. Il a tout son temps pour toi.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "insect",
+   "type": "scarab"
+  },
+  "image": "assets/art/ABY-056.webp",
+  "artPrompt": "Isopode Géant — Énorme isopode à carapace segmentée gris nacré, nombreuses pattes, gros yeux composés, rampant sur un squelette de baleine posé sur le fond marin. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-057",
+  "number": 57,
+  "name": "Calmar Vampire",
+  "title": "La cape des profondeurs",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Créature marine",
+  "power": 1,
+  "role": "S",
+  "stats": {
+   "atk": 2,
+   "def": 0,
+   "spd": 3,
+   "mag": 0,
+   "hp": 7,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Petit céphalopode rouge sombre aux yeux bleus démesurés, membranes entre les bras formant une cape qu'il retourne sur lui, pointes molles, nuage de mucus lumineux bleu, abysses noirs.",
+  "lore": "Il ne boit pas de sang. Mais il s'enveloppe dans sa cape comme s'il en avait honte.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "serpent",
+   "fins": true,
+   "scale": 0.72
+  },
+  "image": "assets/art/ABY-057.webp",
+  "artPrompt": "Calmar Vampire — Petit céphalopode rouge sombre aux yeux bleus démesurés, membranes entre les bras formant une cape qu'il retourne sur lui, pointes molles, nuage de mucus lumineux bleu, abysses noirs. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-058",
+  "number": 58,
+  "name": "Nautile Ancien",
+  "title": "La spirale parfaite",
+  "faction": "abyssal",
+  "rarity": "PC",
+  "category": "Créature marine",
+  "power": 4,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 4,
+   "spd": 2,
+   "mag": 1,
+   "hp": 15,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "aegis"
+   }
+  ],
+  "visual": "Nautile à la coquille spiralée rayée de brun et de nacre, tentacules courts, œil simple, coquille couverte de gravures fossiles lumineuses, nageant devant une falaise sous-marine.",
+  "lore": "Il nageait déjà avant les dinosaures. Sa coquille a appris à tout encaisser.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lizard",
+   "tail": "snake",
+   "spikes": true,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-058.webp",
+  "artPrompt": "Nautile Ancien — Nautile à la coquille spiralée rayée de brun et de nacre, tentacules courts, œil simple, coquille couverte de gravures fossiles lumineuses, nageant devant une falaise sous-marine. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-059",
+  "number": 59,
+  "name": "Triton",
+  "title": "Le souffle de la conque",
+  "faction": "abyssal",
+  "rarity": "R",
+  "category": "Créature mythologique",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 2,
+   "spd": 5,
+   "mag": 2,
+   "hp": 15,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "command",
+    "value": 1
+   }
+  ],
+  "visual": "Homme-poisson musclé à la double queue de dauphin vert d'eau, barbe d'algues, soufflant dans une grande conque torsadée, vagues qui se dressent derrière lui, rochers battus par l'écume.",
+  "lore": "Quand il souffle dans sa conque, la mer se lève ou se couche. Il décide.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "goat",
+   "wings": "feather",
+   "body": "armor",
+   "arms": "sword"
+  },
+  "image": "assets/art/ABY-059.webp",
+  "artPrompt": "Triton — Homme-poisson musclé à la double queue de dauphin vert d'eau, barbe d'algues, soufflant dans une grande conque torsadée, vagues qui se dressent derrière lui, rochers battus par l'écume. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-060",
+  "number": 60,
+  "name": "Bunyip",
+  "title": "Le cri des billabongs",
+  "faction": "abyssal",
+  "rarity": "R",
+  "category": "Créature mythologique",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 4,
+   "def": 4,
+   "spd": 3,
+   "mag": 2,
+   "hp": 22,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "fear"
+   },
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Créature amphibie massive au corps de phoque, tête de chien à longues défenses, pelage sombre et trempé, surgissant d'un marécage brumeux bordé d'eucalyptus à l'aube.",
+  "lore": "On l'entend la nuit au bord des points d'eau. On ne le voit qu'une fois.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "robe",
+   "arms": "down",
+   "scale": 1.25,
+   "dy": 30,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-060.webp",
+  "artPrompt": "Bunyip — Créature amphibie massive au corps de phoque, tête de chien à longues défenses, pelage sombre et trempé, surgissant d'un marécage brumeux bordé d'eucalyptus à l'aube. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-061",
+  "number": 61,
+  "name": "Ningen",
+  "title": "La forme blanche des mers froides",
+  "faction": "abyssal",
+  "rarity": "HR",
+  "category": "Créature marine",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 6,
+   "spd": 4,
+   "mag": 4,
+   "hp": 26,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   },
+   {
+    "key": "curse",
+    "value": 2
+   }
+  ],
+  "visual": "Silhouette humanoïde blanche et lisse, longue comme un navire, sans traits sauf deux yeux noirs et une fente de bouche, émergeant à demi d'une mer polaire noire entre des icebergs, sous un ciel nocturne.",
+  "lore": "Les marins des mers du Sud l'ont vu flotter à côté de la coque. Il les a regardés partir.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "tentacle",
+   "core": "mantle",
+   "count": 10,
+   "scale": 1.1,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-061.webp",
+  "artPrompt": "Ningen — Silhouette humanoïde blanche et lisse, longue comme un navire, sans traits sauf deux yeux noirs et une fente de bouche, émergeant à demi d'une mer polaire noire entre des icebergs, sous un ciel nocturne. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-062",
+  "number": 62,
+  "name": "Encantado",
+  "title": "Le dauphin qui danse au village",
+  "faction": "abyssal",
+  "rarity": "PC",
+  "category": "Esprit des eaux",
+  "power": 4,
+  "role": "U",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 3,
+   "mag": 4,
+   "hp": 14,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   }
+  ],
+  "visual": "Dauphin d'eau douce rose pâle au long bec, à demi transformé en homme élégant en blanc avec un chapeau, sortant d'un fleuve de forêt tropicale sous la lune, lucioles.",
+  "lore": "Il vient aux fêtes sous un chapeau qu'il n'enlève jamais. À l'aube, quelqu'un a disparu avec lui.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "serpent",
+   "tint": "#e0303c",
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-062.webp",
+  "artPrompt": "Encantado — Dauphin d'eau douce rose pâle au long bec, à demi transformé en homme élégant en blanc avec un chapeau, sortant d'un fleuve de forêt tropicale sous la lune, lucioles. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-063",
+  "number": 63,
+  "name": "Afanc",
+  "title": "Le dompteur des crues",
+  "faction": "abyssal",
+  "rarity": "R",
+  "category": "Créature mythologique",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 4,
+   "spd": 3,
+   "mag": 3,
+   "hp": 21,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Monstre de lac massif mi-castor mi-crocodile, écailles et fourrure mêlées, queue plate énorme, dents orange, retenant un barrage de troncs dans un lac gallois brumeux.",
+  "lore": "Tant qu'il dort dans le lac, la vallée reste sèche. Ne le réveille pas.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "fish",
+   "whale": true,
+   "fins": false,
+   "scale": 1.15,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-063.webp",
+  "artPrompt": "Afanc — Monstre de lac massif mi-castor mi-crocodile, écailles et fourrure mêlées, queue plate énorme, dents orange, retenant un barrage de troncs dans un lac gallois brumeux. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-064",
+  "number": 64,
+  "name": "Jenny Dents-Vertes",
+  "title": "Elle attend sous les lentilles d'eau",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Esprit des eaux",
+  "power": 2,
+  "role": "U",
+  "stats": {
+   "atk": 2,
+   "def": 2,
+   "spd": 3,
+   "mag": 2,
+   "hp": 9,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Vieille sorcière des eaux à la peau verdâtre, longs cheveux emmêlés de lentilles d'eau, dents vertes et pointues, bras maigres tendus hors d'un étang couvert de plantes, nuit brumeuse.",
+  "lore": "Quand l'étang est vert et lisse comme un pré, c'est qu'elle est juste dessous.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "tentacle",
+   "core": "mantle",
+   "count": 8,
+   "scale": 0.82
+  },
+  "image": "assets/art/ABY-064.webp",
+  "artPrompt": "Jenny Dents-Vertes — Vieille sorcière des eaux à la peau verdâtre, longs cheveux emmêlés de lentilles d'eau, dents vertes et pointues, bras maigres tendus hors d'un étang couvert de plantes, nuit brumeuse. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-065",
+  "number": 65,
+  "name": "Sazae-oni",
+  "title": "L'escargot de mer devenu démon",
+  "faction": "abyssal",
+  "rarity": "PC",
+  "category": "Yōkai",
+  "power": 3,
+  "role": "B",
+  "stats": {
+   "atk": 6,
+   "def": 0,
+   "spd": 3,
+   "mag": 1,
+   "hp": 11,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Énorme coquillage turbo hérissé de pointes, d'où sort un corps de démon visqueux à cornes et à grands yeux, tentacules à la place des mains, sur un rocher battu par les vagues la nuit.",
+  "lore": "Trente ans dans la mer et le coquillage s'est mis à penser. À manger, surtout.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "fish",
+   "spikes": true,
+   "fins": true
+  },
+  "image": "assets/art/ABY-065.webp",
+  "artPrompt": "Sazae-oni — Énorme coquillage turbo hérissé de pointes, d'où sort un corps de démon visqueux à cornes et à grands yeux, tentacules à la place des mains, sur un rocher battu par les vagues la nuit. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-066",
+  "number": 66,
+  "name": "Anémone Carnivore",
+  "title": "La fleur qui se referme",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Créature marine",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 2,
+   "def": 2,
+   "spd": 2,
+   "mag": 2,
+   "hp": 12,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Anémone de mer géante aux tentacules rouge et blanc ondulants, bouche centrale entrouverte, petits poissons qui s'approchent, éclairage de récif sombre et bioluminescent.",
+  "lore": "Elle a l'air d'une fleur. C'est tout ce qu'on lui demande.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "tentacle",
+   "core": "bell",
+   "count": 11
+  },
+  "image": "assets/art/ABY-066.webp",
+  "artPrompt": "Anémone Carnivore — Anémone de mer géante aux tentacules rouge et blanc ondulants, bouche centrale entrouverte, petits poissons qui s'approchent, éclairage de récif sombre et bioluminescent. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-067",
+  "number": 67,
+  "name": "Le Hollandais Volant",
+  "title": "Il ne touchera jamais le port",
+  "faction": "abyssal",
+  "rarity": "M",
+  "category": "Esprit marin",
+  "power": 9,
+  "role": "M",
+  "stats": {
+   "atk": 6,
+   "def": 4,
+   "spd": 6,
+   "mag": 10,
+   "hp": 18,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "fear"
+   },
+   {
+    "key": "relic"
+   }
+  ],
+  "visual": "Trois-mâts fantôme aux voiles déchirées rouge sang, coque rongée et couverte de coquillages, lanternes vertes, équipage de silhouettes translucides, voguant au-dessus des vagues dans une tempête nocturne.",
+  "lore": "Son capitaine a juré de franchir le cap, dût-il naviguer jusqu'au Jugement. On l'a pris au mot.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "tentacle",
+   "core": "head",
+   "count": 11,
+   "crown": true,
+   "eyes": 5,
+   "scale": 1.05
+  },
+  "image": "assets/art/ABY-067.webp",
+  "artPrompt": "Le Hollandais Volant — Trois-mâts fantôme aux voiles déchirées rouge sang, coque rongée et couverte de coquillages, lanternes vertes, équipage de silhouettes translucides, voguant au-dessus des vagues dans une tempête nocturne. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-068",
+  "number": 68,
+  "name": "Mosasaure",
+  "title": "Le roi des mers d'avant",
+  "faction": "abyssal",
+  "rarity": "HR",
+  "category": "Bête primordiale",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 3,
+   "spd": 6,
+   "mag": 2,
+   "hp": 19,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   },
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Reptile marin géant au corps de varan allongé, nageoires puissantes, mâchoires immenses à double rangée de dents, gueule ouverte sur un banc de poissons, eaux préhistoriques bleu-vert.",
+  "lore": "Avant les requins, avant les baleines, il y avait lui. Il n'a pas fini sa journée.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "fish",
+   "fins": true,
+   "spikes": true,
+   "scale": 1.15,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-068.webp",
+  "artPrompt": "Mosasaure — Reptile marin géant au corps de varan allongé, nageoires puissantes, mâchoires immenses à double rangée de dents, gueule ouverte sur un banc de poissons, eaux préhistoriques bleu-vert. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-069",
+  "number": 69,
+  "name": "Dunkleosteus",
+  "title": "La mâchoire de plaques",
+  "faction": "abyssal",
+  "rarity": "R",
+  "category": "Bête primordiale",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 4,
+   "spd": 3,
+   "mag": 3,
+   "hp": 21,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "first"
+   },
+   {
+    "key": "armor",
+    "value": 2
+   }
+  ],
+  "visual": "Poisson cuirassé préhistorique énorme, tête couverte de plaques osseuses sombres, mâchoire en lames tranchantes à la place des dents, nageant dans une mer obscure parmi des fossiles géants.",
+  "lore": "Il n'a pas de dents. Ses os tranchent mieux.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "fish",
+   "whale": true,
+   "fins": false,
+   "scale": 1.15,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-069.webp",
+  "artPrompt": "Dunkleosteus — Poisson cuirassé préhistorique énorme, tête couverte de plaques osseuses sombres, mâchoire en lames tranchantes à la place des dents, nageant dans une mer obscure parmi des fossiles géants. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-070",
+  "number": 70,
+  "name": "Trilobite des Abysses",
+  "title": "Il a vu les premiers jours",
+  "faction": "abyssal",
+  "rarity": "C",
+  "category": "Créature marine",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 1,
+   "def": 2,
+   "spd": 2,
+   "mag": 0,
+   "hp": 11,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Grand trilobite à la carapace segmentée bronze et noire, yeux en cristal de calcite brillants, pointes sur les flancs, rampant sur des sédiments luminescents au fond de l'océan.",
+  "lore": "Il a survécu à trois fins du monde. Celle-ci ne l'inquiète pas.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "insect",
+   "type": "scarab"
+  },
+  "image": "assets/art/ABY-070.webp",
+  "artPrompt": "Trilobite des Abysses — Grand trilobite à la carapace segmentée bronze et noire, yeux en cristal de calcite brillants, pointes sur les flancs, rampant sur des sédiments luminescents au fond de l'océan. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-071",
+  "number": 71,
+  "name": "Cécaelia",
+  "title": "La sorcière aux huit bras",
+  "faction": "abyssal",
+  "rarity": "R",
+  "category": "Créature mythologique",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 4,
+   "def": 4,
+   "spd": 3,
+   "mag": 2,
+   "hp": 22,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   },
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Femme au buste humain pâle vêtue d'un corsage d'écailles noires et de perles, longs cheveux noirs, bas du corps en huit tentacules de pieuvre violets, colliers de perles noires, dans une grotte sous-marine pleine de fioles et d'ossements.",
+  "lore": "Elle échange tout ce que tu veux. Elle prend toujours plus que tu n'as offert.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "robe",
+   "arms": "down",
+   "scale": 1.25,
+   "dy": 30,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-071.webp",
+  "artPrompt": "Cécaelia — Femme au buste humain pâle vêtue d'un corsage d'écailles noires et de perles, longs cheveux noirs, bas du corps en huit tentacules de pieuvre violets, colliers de perles noires, dans une grotte sous-marine pleine de fioles et d'ossements. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-072",
+  "number": 72,
+  "name": "Bénitier Géant",
+  "title": "La perle qui regarde",
+  "faction": "abyssal",
+  "rarity": "PC",
+  "category": "Créature marine",
+  "power": 4,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 4,
+   "spd": 2,
+   "mag": 1,
+   "hp": 15,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "regen",
+    "value": 1
+   }
+  ],
+  "visual": "Bénitier colossal aux valves ondulées couvertes de coraux, manteau charnu bleu électrique, perle énorme au centre qui ressemble à un œil, posé sur un récif sombre.",
+  "lore": "Les plongeurs y voient une perle. La perle, elle, voit des plongeurs.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lizard",
+   "tail": "snake",
+   "spikes": true,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-072.webp",
+  "artPrompt": "Bénitier Géant — Bénitier colossal aux valves ondulées couvertes de coraux, manteau charnu bleu électrique, perle énorme au centre qui ressemble à un œil, posé sur un récif sombre. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

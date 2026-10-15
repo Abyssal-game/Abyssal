@@ -158,7 +158,9 @@ for (const c of cards.sort((a, b) => a.id.localeCompare(b.id))) {
     const onEnemy = ops.some((o) => ['t', 'tn'].includes(o.on)), allFoes = ops.some((o) => o.on === 'foes');
     const fill = onEnemy ? { op: 'hit', on: 't', m: 0.5 } : allFoes ? { op: 'brk', on: 'foes', n: 1 }
       : role === 'protecteur' ? { op: 'heal', on: 'self', p: 0.1 } : role === 'soin' ? { op: 'heal', on: 'low', p: 0.1 } : { op: 'fervor', on: 'self', n: 1 };
-    if (!ops.some((o) => o.op === fill.op && o.on === fill.on)) ops = fit([...ops, fill], budget);
+    // effet déjà présent et plafonné, compétence nettement trop faible : un renfort d'équipe complète à la place (lot 500)
+    const alt = ops.some((o) => o.op === fill.op && o.on === fill.on) && opsValue(ops) < budget * 0.7 ? { op: 'boost', on: 'team', n: 1 } : fill;
+    if (!ops.some((o) => o.op === alt.op && o.on === alt.on)) ops = fit([...ops, alt], budget);
   }
   const [mn, mg] = pick(tpl.names, c.id, 'mv');
   const mname = ['M', 'S'].includes(c.rarity) ? `${mn} ${ofName(c.name)}` : mn.includes(' ') ? mn : `${mn} ${FAC_ADJ[c.faction][mg === 'f' ? 1 : 0]}`;

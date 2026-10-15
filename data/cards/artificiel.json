@@ -2048,5 +2048,1155 @@
   },
   "image": "assets/art/ART-046.webp",
   "artPrompt": "Héphaïstos — Dieu forgeron boiteux aux bras énormes, barbe roussie, tablier de cuir, marteau levé au-dessus d’une enclume en fusion, automates d’or qui l’assistent dans une forge volcanique. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-047",
+  "number": 47,
+  "name": "Kasa-obake",
+  "title": "Le parapluie qui sautille",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Yōkai",
+  "power": 2,
+  "role": "S",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 3,
+   "mag": 2,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Vieux parapluie japonais en papier huilé déchiré, un seul gros œil au milieu de la toile, longue langue pendante, une unique jambe poilue chaussée d'une sandale de bois, sautillant sous la pluie dans une ruelle d'Edo.",
+  "lore": "Cent ans dans un coin du grenier, puis un soir de pluie, il est sorti tout seul.",
+  "evolution": null,
+  "sets": [
+   "objets"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "spider",
+   "scale": 0.82
+  },
+  "image": "assets/art/ART-047.webp",
+  "artPrompt": "Kasa-obake — Vieux parapluie japonais en papier huilé déchiré, un seul gros œil au milieu de la toile, longue langue pendante, une unique jambe poilue chaussée d'une sandale de bois, sautillant sous la pluie dans une ruelle d'Edo. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-048",
+  "number": 48,
+  "name": "Chōchin-obake",
+  "title": "La lanterne qui ricane",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Yōkai",
+  "power": 1,
+  "role": "M",
+  "stats": {
+   "atk": 1,
+   "def": 1,
+   "spd": 2,
+   "mag": 1,
+   "hp": 5,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Lanterne de papier japonaise ronde et fendue, la déchirure forme une bouche ricanante avec une langue, un œil unique qui brille d'une flamme orange, suspendue à un poteau de bambou dans un cimetière nocturne.",
+  "lore": "Elle éclaire le chemin. Pas forcément le tien.",
+  "evolution": null,
+  "sets": [
+   "objets"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "lean",
+   "arms": "reach",
+   "scale": 0.62,
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-048.webp",
+  "artPrompt": "Chōchin-obake — Lanterne de papier japonaise ronde et fendue, la déchirure forme une bouche ricanante avec une langue, un œil unique qui brille d'une flamme orange, suspendue à un poteau de bambou dans un cimetière nocturne. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-049",
+  "number": 49,
+  "name": "Danseuse de la Boîte à Musique",
+  "title": "Le dernier tour de clé",
+  "faction": "artificiel",
+  "rarity": "PC",
+  "category": "Automate",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 5,
+   "def": 2,
+   "spd": 5,
+   "mag": 2,
+   "hp": 7,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Ballerine automate en porcelaine fêlée, tutu de dentelle jauni, articulations à ressorts apparentes, tournant sur la pointe sur le couvercle d'une boîte à musique géante ouverte, mécanisme doré visible, poussière qui danse dans la lumière.",
+  "lore": "Tant que la mélodie joue, elle danse. Quand elle s'arrête, elle te cherche.",
+  "evolution": null,
+  "sets": [
+   "objets"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "dog",
+   "mech": true,
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-049.webp",
+  "artPrompt": "Danseuse de la Boîte à Musique — Ballerine automate en porcelaine fêlée, tutu de dentelle jauni, articulations à ressorts apparentes, tournant sur la pointe sur le couvercle d'une boîte à musique géante ouverte, mécanisme doré visible, poussière qui danse dans la lumière. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-050",
+  "number": 50,
+  "name": "Le Turc Mécanique",
+  "title": "Il n'a jamais perdu",
+  "faction": "artificiel",
+  "rarity": "R",
+  "category": "Automate",
+  "power": 6,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 3,
+   "spd": 5,
+   "mag": 8,
+   "hp": 11,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "curse",
+    "value": 2
+   }
+  ],
+  "visual": "Automate joueur d'échecs du XVIIIe siècle assis derrière un grand meuble en bois verni, turban et robe ottomane, bras articulé tendu vers un échiquier, rouages visibles par les portes ouvertes du meuble, regard de verre fixe, salon de cour éclairé aux bougies.",
+  "lore": "On a ouvert le meuble cent fois pour y chercher un homme. On n'a jamais pensé à regarder dans ses yeux.",
+  "evolution": null,
+  "sets": [
+   "merveilles"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "wings": "tatter",
+   "body": "robe",
+   "halo": "spike",
+   "arms": "staff"
+  },
+  "image": "assets/art/ART-050.webp",
+  "artPrompt": "Le Turc Mécanique — Automate joueur d'échecs du XVIIIe siècle assis derrière un grand meuble en bois verni, turban et robe ottomane, bras articulé tendu vers un échiquier, rouages visibles par les portes ouvertes du meuble, regard de verre fixe, salon de cour éclairé aux bougies. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-051",
+  "number": 51,
+  "name": "Le Canard de Vaucanson",
+  "title": "Il mange, il digère",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Automate",
+  "power": 1,
+  "role": "U",
+  "stats": {
+   "atk": 1,
+   "def": 1,
+   "spd": 1,
+   "mag": 2,
+   "hp": 7,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "regen",
+    "value": 1
+   }
+  ],
+  "visual": "Canard automate en cuivre doré posé sur un piédestal ouvragé, plumes en lamelles de métal, ventre transparent laissant voir des tubes et des engrenages, bec ouvert picorant des graines, atelier d'horloger encombré.",
+  "lore": "On le nourrit de grain, il ne meurt jamais de faim. On ne sait pas ce qu'il digère vraiment.",
+  "evolution": null,
+  "sets": [
+   "merveilles"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "mask",
+   "body": "robe",
+   "arms": "down",
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-051.webp",
+  "artPrompt": "Le Canard de Vaucanson — Canard automate en cuivre doré posé sur un piédestal ouvragé, plumes en lamelles de métal, ventre transparent laissant voir des tubes et des engrenages, bec ouvert picorant des graines, atelier d'horloger encombré. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-052",
+  "number": 52,
+  "name": "La Tête d'Airain",
+  "title": "Le temps est, le temps fut",
+  "faction": "artificiel",
+  "rarity": "R",
+  "category": "Automate",
+  "power": 6,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 3,
+   "spd": 5,
+   "mag": 8,
+   "hp": 11,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Tête humaine géante en bronze patiné posée sur un autel de pierre, bouche entrouverte d'où sort une lueur, yeux creux brillants, cabinet d'alchimiste plein de manuscrits et de sabliers renversés.",
+  "lore": "Elle n'a parlé que trois fois. La troisième, la tour s'est effondrée.",
+  "evolution": null,
+  "sets": [
+   "merveilles"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "wings": "tatter",
+   "body": "robe",
+   "halo": "spike",
+   "arms": "staff"
+  },
+  "image": "assets/art/ART-052.webp",
+  "artPrompt": "La Tête d'Airain — Tête humaine géante en bronze patiné posée sur un autel de pierre, bouche entrouverte d'où sort une lueur, yeux creux brillants, cabinet d'alchimiste plein de manuscrits et de sabliers renversés. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-053",
+  "number": 53,
+  "name": "Mannequin d'Atelier",
+  "title": "Il prend tes mesures",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Construction maudite",
+  "power": 2,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 1,
+   "mag": 1,
+   "hp": 8,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Mannequin de couture sans tête en toile beige recousue, pied en fonte, épingles plantées dans le torse, bras en bois articulés qui tiennent des ciseaux, atelier de tailleur sombre plein de rouleaux de tissu.",
+  "lore": "Le tailleur est parti. Le mannequin, lui, a gardé ses mesures en tête. Il cherche quelqu'un qui leur corresponde.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "block",
+   "head": "block",
+   "scale": 0.86
+  },
+  "image": "assets/art/ART-053.webp",
+  "artPrompt": "Mannequin d'Atelier — Mannequin de couture sans tête en toile beige recousue, pied en fonte, épingles plantées dans le torse, bras en bois articulés qui tiennent des ciseaux, atelier de tailleur sombre plein de rouleaux de tissu. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-054",
+  "number": 54,
+  "name": "Épouvantail des Moissons",
+  "title": "Les corbeaux ne reviennent pas",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Construction maudite",
+  "power": 2,
+  "role": "M",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 3,
+   "mag": 3,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Épouvantail de paille au chapeau troué, visage de sac de toile cousu d'un sourire, yeux de boutons, mains de fourches, planté au milieu d'un champ de blé noir sous une lune rousse, corbeaux morts au sol.",
+  "lore": "Il effraie les corbeaux. Les corbeaux ont raison.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "body": "lean",
+   "horns": "short",
+   "arms": "reach"
+  },
+  "image": "assets/art/ART-054.webp",
+  "artPrompt": "Épouvantail des Moissons — Épouvantail de paille au chapeau troué, visage de sac de toile cousu d'un sourire, yeux de boutons, mains de fourches, planté au milieu d'un champ de blé noir sous une lune rousse, corbeaux morts au sol. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-055",
+  "number": 55,
+  "name": "L'Homme d'Osier",
+  "title": "La cage qui marche",
+  "faction": "artificiel",
+  "rarity": "HR",
+  "category": "Construction maudite",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 7,
+   "spd": 3,
+   "mag": 3,
+   "hp": 24,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "cataclysm",
+    "value": 2
+   }
+  ],
+  "visual": "Géant d'osier tressé haut comme une tour, cage thoracique creuse et vide, braises qui couvent entre les tiges, cornes de branchages, debout au milieu d'une lande de pierres levées sous un ciel d'orage.",
+  "lore": "On l'a construit pour le brûler. Il a décidé de ne pas attendre.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "colossus",
+   "head": "helm",
+   "scale": 1.06,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ART-055.webp",
+  "artPrompt": "L'Homme d'Osier — Géant d'osier tressé haut comme une tour, cage thoracique creuse et vide, braises qui couvent entre les tiges, cornes de branchages, debout au milieu d'une lande de pierres levées sous un ciel d'orage. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-056",
+  "number": 56,
+  "name": "Le Lion Vert des Alchimistes",
+  "title": "Il dévore le soleil",
+  "faction": "artificiel",
+  "rarity": "HR",
+  "category": "Créature alchimique",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 7,
+   "mag": 3,
+   "hp": 19,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   },
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Lion émeraude translucide comme du verre liquide, crinière de vapeur verte, gueule ouverte qui avale un soleil d'or, symboles alchimiques gravés dans l'air, laboratoire envahi de cornues brisées.",
+  "lore": "Le vitriol des sages. Il ronge l'or, puis il ronge celui qui le tenait.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "ram",
+   "wings": "bat",
+   "body": "bulky",
+   "arms": "spread",
+   "tail": true,
+   "claws": true,
+   "legs": "goat"
+  },
+  "image": "assets/art/ART-056.webp",
+  "artPrompt": "Le Lion Vert des Alchimistes — Lion émeraude translucide comme du verre liquide, crinière de vapeur verte, gueule ouverte qui avale un soleil d'or, symboles alchimiques gravés dans l'air, laboratoire envahi de cornues brisées. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-057",
+  "number": 57,
+  "name": "Alambic Vivant",
+  "title": "Il distille ce qu'il attrape",
+  "faction": "artificiel",
+  "rarity": "PC",
+  "category": "Créature alchimique",
+  "power": 4,
+  "role": "B",
+  "stats": {
+   "atk": 6,
+   "def": 3,
+   "spd": 3,
+   "mag": 2,
+   "hp": 10,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "venom"
+   }
+  ],
+  "visual": "Alambic de cuivre bosselé monté sur six pattes d'araignée en laiton, serpentin enroulé comme une queue, liquide vert bouillonnant dans la cucurbite, vapeur toxique, cave d'alchimiste.",
+  "lore": "Ce qui entre dans son ballon en ressort goutte à goutte. Il n'en reste jamais beaucoup.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lizard",
+   "tail": "scorpion",
+   "mech": true,
+   "size": "small",
+   "scene": "temple"
+  },
+  "image": "assets/art/ART-057.webp",
+  "artPrompt": "Alambic Vivant — Alambic de cuivre bosselé monté sur six pattes d'araignée en laiton, serpentin enroulé comme une queue, liquide vert bouillonnant dans la cucurbite, vapeur toxique, cave d'alchimiste. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-058",
+  "number": 58,
+  "name": "Shikigami de Papier",
+  "title": "Plié pour obéir",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Construction",
+  "power": 2,
+  "role": "S",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 3,
+   "mag": 2,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Silhouette humaine découpée dans du papier blanc, couverte de calligraphies à l'encre rouge, volant en se pliant et se dépliant, nuée de petits papiers qui la suivent, temple japonais nocturne.",
+  "lore": "Un souffle d'onmyōji, un papier plié, et le voilà prêt à servir. Ou à frapper.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "spider",
+   "scale": 0.82
+  },
+  "image": "assets/art/ART-058.webp",
+  "artPrompt": "Shikigami de Papier — Silhouette humaine découpée dans du papier blanc, couverte de calligraphies à l'encre rouge, volant en se pliant et se dépliant, nuée de petits papiers qui la suivent, temple japonais nocturne. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-059",
+  "number": 59,
+  "name": "Matriochka Maudite",
+  "title": "Il y en a toujours une autre",
+  "faction": "artificiel",
+  "rarity": "PC",
+  "category": "Objet maudit",
+  "power": 3,
+  "role": "M",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 2,
+   "mag": 4,
+   "hp": 8,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "relic"
+   }
+  ],
+  "visual": "Poupée russe en bois peint craquelé, sourire trop large, s'ouvrant en deux pour laisser voir une poupée plus petite au regard furieux, poupées vides éparpillées sur une table d'isba éclairée à la bougie.",
+  "lore": "Ouvre-la. Puis la suivante. Ne regarde pas la toute dernière.",
+  "evolution": null,
+  "sets": [
+   "objets"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "tall",
+   "head": "mask",
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-059.webp",
+  "artPrompt": "Matriochka Maudite — Poupée russe en bois peint craquelé, sourire trop large, s'ouvrant en deux pour laisser voir une poupée plus petite au regard furieux, poupées vides éparpillées sur une table d'isba éclairée à la bougie. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-060",
+  "number": 60,
+  "name": "Le Cheval de Troie",
+  "title": "Le présent des Grecs",
+  "faction": "artificiel",
+  "rarity": "M",
+  "category": "Construction",
+  "power": 9,
+  "role": "M",
+  "stats": {
+   "atk": 7,
+   "def": 4,
+   "spd": 6,
+   "mag": 10,
+   "hp": 16,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "command",
+    "value": 3
+   },
+   {
+    "key": "relic"
+   }
+  ],
+  "visual": "Cheval de bois colossal aux planches cloutées de bronze, trappe ouverte dans le ventre d'où descendent des ombres armées, yeux peints, roues massives, porte d'une cité antique en flammes la nuit.",
+  "lore": "Une ville l'a fait entrer en chantant. Elle n'a plus jamais chanté.",
+  "evolution": null,
+  "sets": [
+   "merveilles"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "gown",
+   "arms": "up",
+   "hair": true,
+   "horns": "crown",
+   "halo": "ring",
+   "scene": "temple"
+  },
+  "image": "assets/art/ART-060.webp",
+  "artPrompt": "Le Cheval de Troie — Cheval de bois colossal aux planches cloutées de bronze, trappe ouverte dans le ventre d'où descendent des ombres armées, yeux peints, roues massives, porte d'une cité antique en flammes la nuit. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-061",
+  "number": 61,
+  "name": "Vimana",
+  "title": "Le char volant des épopées",
+  "faction": "artificiel",
+  "rarity": "HR",
+  "category": "Construction sacrée",
+  "power": 7,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 2,
+   "spd": 5,
+   "mag": 2,
+   "hp": 16,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 2
+   },
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Char volant en forme de temple à étages doré et ciselé, propulsé par des flammes bleues, rubans et clochettes, survolant des nuages au-dessus de montagnes au crépuscule, rayons de lumière.",
+  "lore": "Les épopées disent qu'il allait plus vite que la pensée. Elles ne disent pas qui le pilote aujourd'hui.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "ram",
+   "wings": "flame",
+   "body": "bulky",
+   "legs": "goat",
+   "arms": "spread",
+   "tail": true
+  },
+  "image": "assets/art/ART-061.webp",
+  "artPrompt": "Vimana — Char volant en forme de temple à étages doré et ciselé, propulsé par des flammes bleues, rubans et clochettes, survolant des nuages au-dessus de montagnes au crépuscule, rayons de lumière. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-062",
+  "number": 62,
+  "name": "Astrolabe Vivant",
+  "title": "Il lit le ciel pour toi",
+  "faction": "artificiel",
+  "rarity": "R",
+  "category": "Automate cosmique",
+  "power": 6,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 6,
+   "spd": 2,
+   "mag": 3,
+   "hp": 18,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "aegis"
+   }
+  ],
+  "visual": "Petit automate astronome bossu au corps de laiton, tête en lunette télescopique, portant sur le dos un grand astrolabe plat gravé de constellations comme une carapace, doigt fin pointé vers une étoile, coupole d'observatoire ouverte sur la nuit.",
+  "lore": "Chacun de ses anneaux suit une étoile. L'un d'eux suit la tienne.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "block",
+   "head": "mask",
+   "runes": true,
+   "scale": 1.05,
+   "scene": "ruins"
+  },
+  "image": "assets/art/ART-062.webp",
+  "artPrompt": "Astrolabe Vivant — Petit automate astronome bossu au corps de laiton, tête en lunette télescopique, portant sur le dos un grand astrolabe plat gravé de constellations comme une carapace, doigt fin pointé vers une étoile, coupole d'observatoire ouverte sur la nuit. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-063",
+  "number": 63,
+  "name": "Guerrier de Terre Cuite",
+  "title": "Il garde un empereur qui ne se réveillera pas",
+  "faction": "artificiel",
+  "rarity": "PC",
+  "category": "Construction sacrée",
+  "power": 4,
+  "role": "T",
+  "stats": {
+   "atk": 4,
+   "def": 5,
+   "spd": 2,
+   "mag": 2,
+   "hp": 12,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "armor",
+    "value": 1
+   }
+  ],
+  "visual": "Soldat de terre cuite grandeur nature à l'armure à lamelles, visage sculpté impassible, fissures d'où s'échappe une lueur ambrée, lance de bronze, rangées d'autres soldats dans une fosse funéraire poussiéreuse.",
+  "lore": "Huit mille ont été enterrés. Un seul a ouvert les yeux.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "block",
+   "head": "block"
+  },
+  "image": "assets/art/ART-063.webp",
+  "artPrompt": "Guerrier de Terre Cuite — Soldat de terre cuite grandeur nature à l'armure à lamelles, visage sculpté impassible, fissures d'où s'échappe une lueur ambrée, lance de bronze, rangées d'autres soldats dans une fosse funéraire poussiéreuse. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-064",
+  "number": 64,
+  "name": "Ittan-momen",
+  "title": "Le ruban qui étouffe",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Yōkai",
+  "power": 2,
+  "role": "M",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 3,
+   "mag": 3,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Longue bande d'étoffe de coton blanc flottant dans le ciel nocturne comme un serpent, deux petits yeux noirs à une extrémité, s'enroulant autour d'un réverbère de papier au-dessus de toits de tuiles.",
+  "lore": "Le soir, un tissu blanc passe au-dessus des toits. Celui qu'il frôle ne respire plus.",
+  "evolution": null,
+  "sets": [
+   "objets"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "body": "lean",
+   "horns": "short",
+   "arms": "reach"
+  },
+  "image": "assets/art/ART-064.webp",
+  "artPrompt": "Ittan-momen — Longue bande d'étoffe de coton blanc flottant dans le ciel nocturne comme un serpent, deux petits yeux noirs à une extrémité, s'enroulant autour d'un réverbère de papier au-dessus de toits de tuiles. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-065",
+  "number": 65,
+  "name": "Locomotive Hurlante",
+  "title": "Elle n'a pas besoin de rails",
+  "faction": "artificiel",
+  "rarity": "R",
+  "category": "Automate",
+  "power": 6,
+  "role": "S",
+  "stats": {
+   "atk": 7,
+   "def": 3,
+   "spd": 7,
+   "mag": 3,
+   "hp": 10,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "charge"
+   },
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Locomotive à vapeur noire déformée en bête, chasse-pierres en mâchoire d'acier, phares rouges comme des yeux, cheminée crachant une fumée violette, roues motrices écrasant des rails tordus dans un tunnel.",
+  "lore": "Le dernier train de la nuit. Il ne s'arrête dans aucune gare.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "tall",
+   "head": "mask",
+   "scene": "void"
+  },
+  "image": "assets/art/ART-065.webp",
+  "artPrompt": "Locomotive Hurlante — Locomotive à vapeur noire déformée en bête, chasse-pierres en mâchoire d'acier, phares rouges comme des yeux, cheminée crachant une fumée violette, roues motrices écrasant des rails tordus dans un tunnel. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-066",
+  "number": 66,
+  "name": "Main de Gloire",
+  "title": "Que tous dorment",
+  "faction": "artificiel",
+  "rarity": "PC",
+  "category": "Objet maudit",
+  "power": 3,
+  "role": "M",
+  "stats": {
+   "atk": 3,
+   "def": 3,
+   "spd": 3,
+   "mag": 4,
+   "hp": 7,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Main desséchée de pendu tenant cinq chandelles noires allumées au bout des doigts, flammes bleues immobiles, posée sur un coussin de velours dans une chambre où dorment des silhouettes.",
+  "lore": "Tant qu'elle brûle, personne ne se réveille. Les voleurs l'aiment beaucoup.",
+  "evolution": null,
+  "sets": [
+   "objets"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "object",
+   "kind": "mirror",
+   "scene": "ruins"
+  },
+  "image": "assets/art/ART-066.webp",
+  "artPrompt": "Main de Gloire — Main desséchée de pendu tenant cinq chandelles noires allumées au bout des doigts, flammes bleues immobiles, posée sur un coussin de velours dans une chambre où dorment des silhouettes. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-067",
+  "number": 67,
+  "name": "Grimoire Dévoreur",
+  "title": "Il lit ceux qui le lisent",
+  "faction": "artificiel",
+  "rarity": "R",
+  "category": "Objet maudit",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 2,
+   "spd": 5,
+   "mag": 2,
+   "hp": 15,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   },
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Énorme grimoire relié de cuir sombre et de fermoirs de fer, pages couvertes de rangées de dents, sceau-œil sur la couverture, chaînes brisées, flottant au-dessus d'une bibliothèque interdite pleine de pages arrachées.",
+  "lore": "Chaque page porte le nom de quelqu'un qui a voulu savoir.",
+  "evolution": null,
+  "sets": [
+   "objets"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "goat",
+   "wings": "feather",
+   "body": "armor",
+   "arms": "sword",
+   "scene": "ruins"
+  },
+  "image": "assets/art/ART-067.webp",
+  "artPrompt": "Grimoire Dévoreur — Énorme grimoire relié de cuir sombre et de fermoirs de fer, pages couvertes de rangées de dents, sceau-œil sur la couverture, chaînes brisées, flottant au-dessus d'une bibliothèque interdite pleine de pages arrachées. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-068",
+  "number": 68,
+  "name": "Pandore",
+  "title": "La première façonnée",
+  "faction": "artificiel",
+  "rarity": "M",
+  "category": "Construction",
+  "power": 9,
+  "role": "U",
+  "stats": {
+   "atk": 6,
+   "def": 6,
+   "spd": 5,
+   "mag": 10,
+   "hp": 22,
+   "cost": 8
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 3
+   },
+   {
+    "key": "cataclysm",
+    "value": 3
+   }
+  ],
+  "visual": "Femme façonnée dans l'argile et l'or, veines lumineuses de forge sur la peau, tenant une grande jarre antique entrouverte d'où s'échappent des ombres ailées, une petite lumière restée au fond, temple grec au crépuscule.",
+  "lore": "Tout s'est envolé. Sauf ce qui était au fond, et c'est pour ça qu'elle ne referme jamais tout à fait.",
+  "evolution": null,
+  "sets": [
+   "merveilles"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "orb",
+   "type": "crystal",
+   "scene": "forge",
+   "tint": "#ff5050"
+  },
+  "image": "assets/art/ART-068.webp",
+  "artPrompt": "Pandore — Femme façonnée dans l'argile et l'or, veines lumineuses de forge sur la peau, tenant une grande jarre antique entrouverte d'où s'échappent des ombres ailées, une petite lumière restée au fond, temple grec au crépuscule. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-069",
+  "number": 69,
+  "name": "Le Coq de Strasbourg",
+  "title": "Il chante l'heure de trop",
+  "faction": "artificiel",
+  "rarity": "PC",
+  "category": "Automate",
+  "power": 4,
+  "role": "S",
+  "stats": {
+   "atk": 5,
+   "def": 2,
+   "spd": 5,
+   "mag": 2,
+   "hp": 7,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Coq automate en fer forgé doré, ailes en lamelles de métal déployées, bec ouvert en plein chant, perché au sommet d'une immense horloge astronomique gothique, cadrans et aiguilles dorés.",
+  "lore": "Il chante à midi depuis six siècles. Le jour où il chantera à minuit, quelque chose finira.",
+  "evolution": null,
+  "sets": [
+   "merveilles"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "dog",
+   "mech": true,
+   "scene": "forge"
+  },
+  "image": "assets/art/ART-069.webp",
+  "artPrompt": "Le Coq de Strasbourg — Coq automate en fer forgé doré, ailes en lamelles de métal déployées, bec ouvert en plein chant, perché au sommet d'une immense horloge astronomique gothique, cadrans et aiguilles dorés. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-070",
+  "number": 70,
+  "name": "L'Éléphant-Horloge",
+  "title": "La merveille d'al-Jazari",
+  "faction": "artificiel",
+  "rarity": "HR",
+  "category": "Automate",
+  "power": 8,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 7,
+   "spd": 3,
+   "mag": 3,
+   "hp": 24,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "command",
+    "value": 2
+   }
+  ],
+  "visual": "Éléphant mécanique paré d'or et de mosaïques portant sur son dos une tour-horloge ornée, scribe automate et serpents de bronze sur la tour, oiseau mécanique au sommet, cour d'un palais oriental la nuit.",
+  "lore": "Toutes les demi-heures, l'oiseau siffle et les serpents se tournent. Personne ne sait vers quoi ils regardent.",
+  "evolution": null,
+  "sets": [
+   "merveilles"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "golem",
+   "shape": "colossus",
+   "head": "helm",
+   "scale": 1.06,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ART-070.webp",
+  "artPrompt": "L'Éléphant-Horloge — Éléphant mécanique paré d'or et de mosaïques portant sur son dos une tour-horloge ornée, scribe automate et serpents de bronze sur la tour, oiseau mécanique au sommet, cour d'un palais oriental la nuit. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ART-071",
+  "number": 71,
+  "name": "Nain de Jardin Maudit",
+  "title": "Il n'était pas là hier",
+  "faction": "artificiel",
+  "rarity": "C",
+  "category": "Objet maudit",
+  "power": 2,
+  "role": "M",
+  "stats": {
+   "atk": 2,
+   "def": 1,
+   "spd": 3,
+   "mag": 3,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "curse",
+    "value": 1
+   }
+  ],
+  "visual": "Nain de jardin en plâtre peint écaillé, bonnet rouge, barbe blanche, sourire édenté inquiétant, une petite hachette à la main, dans un jardin abandonné envahi de ronces sous la lune.",
+  "lore": "Chaque matin, il est un peu plus près de la maison.",
+  "evolution": null,
+  "sets": [
+   "objets"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "body": "lean",
+   "horns": "short",
+   "arms": "reach"
+  },
+  "image": "assets/art/ART-071.webp",
+  "artPrompt": "Nain de Jardin Maudit — Nain de jardin en plâtre peint écaillé, bonnet rouge, barbe blanche, sourire édenté inquiétant, une petite hachette à la main, dans un jardin abandonné envahi de ronces sous la lune. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, runes cyan électrique, reflets de bronze et d’acier, vapeur de forge, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

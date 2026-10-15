@@ -2813,5 +2813,365 @@
   },
   "image": "assets/art/NEC-063.webp",
   "artPrompt": "La Morrígan — Déesse celte aux longs cheveux noirs, cape de plumes de corbeau, regard perçant, nuée de corbeaux, champ de bataille brumeux au crépuscule. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "NEC-064",
+  "number": 64,
+  "name": "Gaki",
+  "title": "La faim qui ne finit pas",
+  "faction": "necrotique",
+  "rarity": "C",
+  "category": "Esprit des morts",
+  "power": 1,
+  "role": "B",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 3,
+   "mag": 0,
+   "hp": 3,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Esprit affamé squelettique à la peau grise tendue, ventre énormément gonflé, cou minuscule, bouche en trou d'aiguille, mains griffues tendues vers des offrandes de riz dans un cimetière bouddhique.",
+  "lore": "Sa bouche est trop petite, son ventre trop grand. Rien ne le rassasie, il essaie quand même.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "swarm",
+   "kind": "rat",
+   "count": 28
+  },
+  "image": "assets/art/NEC-064.webp",
+  "artPrompt": "Gaki — Esprit affamé squelettique à la peau grise tendue, ventre énormément gonflé, cou minuscule, bouche en trou d'aiguille, mains griffues tendues vers des offrandes de riz dans un cimetière bouddhique. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "NEC-065",
+  "number": 65,
+  "name": "Le Cygne de Tuonela",
+  "title": "Il chante sur la rivière noire",
+  "faction": "necrotique",
+  "rarity": "PC",
+  "category": "Esprit des morts",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 4,
+   "def": 2,
+   "spd": 4,
+   "mag": 5,
+   "hp": 11,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "relic"
+   }
+  ],
+  "visual": "Grand cygne noir majestueux aux yeux rouges, glissant sur une rivière sombre et immobile, brume au ras de l'eau, rive des morts plantée de pins noirs, reflet parfait.",
+  "lore": "Tirer sur lui, c'est entrer dans l'histoire. Personne ne dit comment elle finit.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "void",
+   "body": "cloak",
+   "arms": "staff",
+   "scene": "ocean"
+  },
+  "image": "assets/art/NEC-065.webp",
+  "artPrompt": "Le Cygne de Tuonela — Grand cygne noir majestueux aux yeux rouges, glissant sur une rivière sombre et immobile, brume au ras de l'eau, rive des morts plantée de pins noirs, reflet parfait. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "NEC-066",
+  "number": 66,
+  "name": "Mictlantecuhtli",
+  "title": "Le seigneur du neuvième monde",
+  "faction": "necrotique",
+  "rarity": "M",
+  "category": "Dieu ancien",
+  "power": 10,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 7,
+   "mag": 4,
+   "hp": 18,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "death",
+    "value": 3
+   },
+   {
+    "key": "curse",
+    "value": 3
+   }
+  ],
+  "visual": "Dieu aztèque de la mort au corps squelettique taché de sang, crâne souriant, coiffe de plumes de hibou et de papier, collier d'yeux, assis sur un trône d'ossements dans une caverne souterraine éclairée de braises.",
+  "lore": "Quatre ans de voyage pour atteindre sa demeure. À l'arrivée, il te demande ce que tu as apporté.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "skull",
+   "body": "cloak",
+   "arms": "spread",
+   "horns": "crown",
+   "wings": "bone",
+   "halo": "spike"
+  },
+  "image": "assets/art/NEC-066.webp",
+  "artPrompt": "Mictlantecuhtli — Dieu aztèque de la mort au corps squelettique taché de sang, crâne souriant, coiffe de plumes de hibou et de papier, collier d'yeux, assis sur un trône d'ossements dans une caverne souterraine éclairée de braises. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "NEC-067",
+  "number": 67,
+  "name": "Kuchisake-onna",
+  "title": "Me trouves-tu belle ?",
+  "faction": "necrotique",
+  "rarity": "R",
+  "category": "Yōkai",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 10,
+   "def": 2,
+   "spd": 5,
+   "mag": 2,
+   "hp": 12,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "first"
+   },
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Femme pâle aux longs cheveux noirs en long manteau sombre, visage à demi caché par un masque blanc, grands ciseaux à la main, sous un réverbère dans une rue japonaise déserte la nuit.",
+  "lore": "Elle pose une seule question. Il n'existe aucune bonne réponse.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "none",
+   "body": "armor",
+   "arms": "down"
+  },
+  "image": "assets/art/NEC-067.webp",
+  "artPrompt": "Kuchisake-onna — Femme pâle aux longs cheveux noirs en long manteau sombre, visage à demi caché par un masque blanc, grands ciseaux à la main, sous un réverbère dans une rue japonaise déserte la nuit. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "NEC-068",
+  "number": 68,
+  "name": "Gisant Éveillé",
+  "title": "La pierre se lève",
+  "faction": "necrotique",
+  "rarity": "PC",
+  "category": "Construction maudite",
+  "power": 4,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 3,
+   "spd": 2,
+   "mag": 2,
+   "hp": 14,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   }
+  ],
+  "visual": "Statue funéraire de chevalier en pierre se redressant de son tombeau, mains encore jointes sur l'épée, lion sculpté à ses pieds, poussière qui tombe, crypte gothique aux vitraux brisés.",
+  "lore": "On l'a sculpté pour qu'il prie pour toujours. Il a fini sa prière.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "skull",
+   "body": "bulky",
+   "arms": "sword",
+   "scene": "ice"
+  },
+  "image": "assets/art/NEC-068.webp",
+  "artPrompt": "Gisant Éveillé — Statue funéraire de chevalier en pierre se redressant de son tombeau, mains encore jointes sur l'épée, lion sculpté à ses pieds, poussière qui tombe, crypte gothique aux vitraux brisés. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "NEC-069",
+  "number": 69,
+  "name": "Jack-la-Lanterne",
+  "title": "Ni le ciel ni l'enfer",
+  "faction": "necrotique",
+  "rarity": "C",
+  "category": "Esprit",
+  "power": 2,
+  "role": "S",
+  "stats": {
+   "atk": 4,
+   "def": 1,
+   "spd": 5,
+   "mag": 1,
+   "hp": 6,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 1
+   }
+  ],
+  "visual": "Silhouette maigre en haillons à tête de navet sculpté d'où sort un sourire de braises, tenant une lanterne avec un charbon ardent, errant sur un chemin de campagne brumeux à minuit.",
+  "lore": "Il a trompé le Diable, alors le Diable ne veut pas de lui. Il cherche un endroit où aller.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "lizard",
+   "tail": "normal",
+   "fire": true,
+   "size": "small",
+   "legs": 4
+  },
+  "image": "assets/art/NEC-069.webp",
+  "artPrompt": "Jack-la-Lanterne — Silhouette maigre en haillons à tête de navet sculpté d'où sort un sourire de braises, tenant une lanterne avec un charbon ardent, errant sur un chemin de campagne brumeux à minuit. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "NEC-070",
+  "number": 70,
+  "name": "Les Moires",
+  "title": "Le fil, la mesure et la coupe",
+  "faction": "necrotique",
+  "rarity": "HR",
+  "category": "Dieu ancien",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 6,
+   "mag": 3,
+   "hp": 19,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "death",
+    "value": 2
+   }
+  ],
+  "visual": "Trois vieilles femmes voilées de gris assises côte à côte, l'une file un fil d'or au fuseau, l'autre le mesure, la troisième lève de grands ciseaux, fils lumineux qui s'emmêlent dans une salle de pierre.",
+  "lore": "Même les dieux leur demandent combien de temps il leur reste.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "wings": "insect",
+   "body": "armor",
+   "arms": "sword"
+  },
+  "image": "assets/art/NEC-070.webp",
+  "artPrompt": "Les Moires — Trois vieilles femmes voilées de gris assises côte à côte, l'une file un fil d'or au fuseau, l'autre le mesure, la troisième lève de grands ciseaux, fils lumineux qui s'emmêlent dans une salle de pierre. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "NEC-071",
+  "number": 71,
+  "name": "Baba Yaga",
+  "title": "La maison aux pattes de poule",
+  "faction": "necrotique",
+  "rarity": "HR",
+  "category": "Sorcière",
+  "power": 8,
+  "role": "M",
+  "stats": {
+   "atk": 7,
+   "def": 2,
+   "spd": 7,
+   "mag": 10,
+   "hp": 13,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "drain"
+   },
+   {
+    "key": "curse",
+    "value": 2
+   }
+  ],
+  "visual": "Vieille sorcière slave au long nez crochu et aux dents de fer, assise dans un mortier volant avec un pilon et un balai, cabane en rondins sur deux pattes de poule géantes derrière elle, clôture de crânes, forêt enneigée.",
+  "lore": "Elle aide parfois. Mais elle mange toujours.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "insect",
+   "type": "spider",
+   "face": true,
+   "scene": "crypt"
+  },
+  "image": "assets/art/NEC-071.webp",
+  "artPrompt": "Baba Yaga — Vieille sorcière slave au long nez crochu et aux dents de fer, assise dans un mortier volant avec un pilon et un balai, cabane en rondins sur deux pattes de poule géantes derrière elle, clôture de crânes, forêt enneigée. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

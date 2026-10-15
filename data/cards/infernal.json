@@ -3048,5 +3048,242 @@
   },
   "image": "assets/art/INF-067.webp",
   "artPrompt": "Loki — Dieu élancé au sourire rusé, cheveux roux flamboyants, tunique verte et noire, serpent enroulé autour du bras, silhouette qui se dédouble en flammes vertes. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "INF-068",
+  "number": 68,
+  "name": "Paimon",
+  "title": "Le roi qui chevauche le dromadaire",
+  "faction": "infernal",
+  "rarity": "HR",
+  "category": "Démon de la Goétie",
+  "power": 8,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 6,
+   "mag": 3,
+   "hp": 19,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "command",
+    "value": 2
+   },
+   {
+    "key": "omen"
+   }
+  ],
+  "visual": "Roi démoniaque au visage efféminé couronné de joyaux, chevauchant un dromadaire paré d'or, précédé de musiciens infernaux aux trompettes, tempête de sable rougeoyante.",
+  "lore": "Il enseigne tous les arts et tous les secrets. Il demande seulement qu'on s'incline, longtemps.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "wings": "insect",
+   "body": "armor",
+   "arms": "sword"
+  },
+  "image": "assets/art/INF-068.webp",
+  "artPrompt": "Paimon — Roi démoniaque au visage efféminé couronné de joyaux, chevauchant un dromadaire paré d'or, précédé de musiciens infernaux aux trompettes, tempête de sable rougeoyante. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "INF-069",
+  "number": 69,
+  "name": "Buer",
+  "title": "La roue qui guérit",
+  "faction": "infernal",
+  "rarity": "R",
+  "category": "Démon de la Goétie",
+  "power": 6,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 2,
+   "spd": 6,
+   "mag": 9,
+   "hp": 12,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "regen",
+    "value": 2
+   },
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Démon en forme d'étoile vivante : tête de lion rugissante au centre, cinq pattes de bouc disposées en roue autour d'elle, roulant sur un sol de braises en laissant des herbes médicinales enflammées.",
+  "lore": "Il connaît toutes les plantes qui soignent. Il roule vers toi pour te les montrer.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "void",
+   "wings": "six",
+   "body": "robe",
+   "arms": "pray",
+   "halo": "ring"
+  },
+  "image": "assets/art/INF-069.webp",
+  "artPrompt": "Buer — Démon en forme d'étoile vivante : tête de lion rugissante au centre, cinq pattes de bouc disposées en roue autour d'elle, roulant sur un sol de braises en laissant des herbes médicinales enflammées. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "INF-070",
+  "number": 70,
+  "name": "Asag",
+  "title": "Le démon de pierre",
+  "faction": "infernal",
+  "rarity": "R",
+  "category": "Démon mésopotamien",
+  "power": 5,
+  "role": "T",
+  "stats": {
+   "atk": 5,
+   "def": 4,
+   "spd": 3,
+   "mag": 2,
+   "hp": 15,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "armor",
+    "value": 2
+   },
+   {
+    "key": "curse",
+    "value": 2
+   }
+  ],
+  "visual": "Démon colossal fait de roches noires et de basalte fissuré de lave, sans visage sauf une gueule rougeoyante, rochers qui s'élèvent autour de lui, rivières qui bouillonnent, montagnes de Mésopotamie.",
+  "lore": "Sa seule présence fait bouillir les rivières. Les pierres sont ses enfants, et elles se battent pour lui.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "goat",
+   "horns": "curl",
+   "body": "bulky",
+   "arms": "down",
+   "legs": "goat"
+  },
+  "image": "assets/art/INF-070.webp",
+  "artPrompt": "Asag — Démon colossal fait de roches noires et de basalte fissuré de lave, sans visage sauf une gueule rougeoyante, rochers qui s'élèvent autour de lui, rivières qui bouillonnent, montagnes de Mésopotamie. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "INF-071",
+  "number": 71,
+  "name": "Tchernobog",
+  "title": "Le dieu noir",
+  "faction": "infernal",
+  "rarity": "M",
+  "category": "Dieu oublié",
+  "power": 10,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 7,
+   "mag": 3,
+   "hp": 21,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "cataclysm",
+    "value": 3
+   },
+   {
+    "key": "fear"
+   }
+  ],
+  "visual": "Divinité slave des ténèbres aux immenses ailes noires déployées, cornes recourbées, corps d'ombre et de fumée, yeux rouges, dominant un sommet de montagne sous un ciel d'orage, âmes qui montent vers lui.",
+  "lore": "Chaque malheur qui t'arrive, on disait autrefois qu'il l'avait voulu. On disait vrai.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "crown",
+   "wings": "tatter",
+   "body": "armor",
+   "arms": "spread",
+   "halo": "spike",
+   "horns": "long"
+  },
+  "image": "assets/art/INF-071.webp",
+  "artPrompt": "Tchernobog — Divinité slave des ténèbres aux immenses ailes noires déployées, cornes recourbées, corps d'ombre et de fumée, yeux rouges, dominant un sommet de montagne sous un ciel d'orage, âmes qui montent vers lui. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "INF-072",
+  "number": 72,
+  "name": "Hannya",
+  "title": "Le masque de la jalousie",
+  "faction": "infernal",
+  "rarity": "PC",
+  "category": "Démone",
+  "power": 4,
+  "role": "M",
+  "stats": {
+   "atk": 4,
+   "def": 2,
+   "spd": 4,
+   "mag": 4,
+   "hp": 10,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Démone à visage de masque japonais blanc aux cornes pointues, yeux dorés, bouche fendue jusqu'aux oreilles, kimono rouge déchiré, longs cheveux noirs, sur une scène de théâtre nô éclairée aux flambeaux.",
+  "lore": "Elle a tant aimé que sa colère lui a fait pousser des cornes.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "horns": "long",
+   "wings": "tatter",
+   "body": "lean",
+   "arms": "spread"
+  },
+  "image": "assets/art/INF-072.webp",
+  "artPrompt": "Hannya — Démone à visage de masque japonais blanc aux cornes pointues, yeux dorés, bouche fendue jusqu'aux oreilles, kimono rouge déchiré, longs cheveux noirs, sur une scène de théâtre nô éclairée aux flambeaux. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

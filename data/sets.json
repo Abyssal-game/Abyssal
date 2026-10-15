@@ -301,5 +301,62 @@
    "ABY-053",
    "INF-065"
   ]
+ },
+ {
+  "key": "merveilles",
+  "name": "Les Merveilles mécaniques",
+  "desc": "Les automates des cours royales, des horloges de cathédrale et des légendes antiques. Certains jouaient. D'autres attendaient.",
+  "reward": {
+   "shards": 500,
+   "title": "Horloger de l'impossible"
+  },
+  "cards": [
+   "ART-050",
+   "ART-051",
+   "ART-052",
+   "ART-060",
+   "ART-068",
+   "ART-069",
+   "ART-070"
+  ]
+ },
+ {
+  "key": "objets",
+  "name": "Les Objets qui s'éveillent",
+  "desc": "Un parapluie, une lanterne, un livre, une poupée. Laisse-les cent ans dans le noir et ils ouvriront les yeux.",
+  "reward": {
+   "shards": 400,
+   "title": "Gardien du grenier"
+  },
+  "cards": [
+   "ART-047",
+   "ART-048",
+   "ART-049",
+   "ART-059",
+   "ART-064",
+   "ART-066",
+   "ART-067",
+   "ART-071"
+  ]
+ },
+ {
+  "key": "pantheons2",
+  "name": "Les Soleils anciens",
+  "desc": "Ils ont porté le jour, la sagesse et la guerre. Leurs temples sont tombés, pas eux.",
+  "reward": {
+   "shards": 600,
+   "tickets": {
+    "premium": 1
+   },
+   "title": "Porteur d'aube"
+  },
+  "cards": [
+   "CEL-063",
+   "CEL-064",
+   "CEL-065",
+   "CEL-066",
+   "CEL-071",
+   "PRI-071"
+  ]
  }
 ]

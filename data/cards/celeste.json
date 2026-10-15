@@ -2610,5 +2610,660 @@
   },
   "image": "assets/art/CEL-058.webp",
   "artPrompt": "Perun — Dieu slave à la barbe cuivrée, hache de pierre brandie, éclairs autour de lui, chêne immense frappé par la foudre, plaines sous un ciel d’orage. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-059",
+  "number": 59,
+  "name": "Kinnari",
+  "title": "Le chant entre deux mondes",
+  "faction": "celeste",
+  "rarity": "PC",
+  "category": "Créature céleste",
+  "power": 3,
+  "role": "U",
+  "stats": {
+   "atk": 2,
+   "def": 2,
+   "spd": 4,
+   "mag": 5,
+   "hp": 11,
+   "cost": 3
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 2
+   }
+  ],
+  "visual": "Femme céleste vêtue d'une robe de soie blanche et de bijoux d'or, ailes et pattes de cygne blanc, tenant une petite harpe, posée au bord d'un lac de lotus sous une lumière dorée.",
+  "lore": "Son chant guérit ceux qui l'écoutent jusqu'au bout. Peu y parviennent.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "eagle",
+   "scene": "sky"
+  },
+  "image": "assets/art/CEL-059.webp",
+  "artPrompt": "Kinnari — Femme céleste vêtue d'une robe de soie blanche et de bijoux d'or, ailes et pattes de cygne blanc, tenant une petite harpe, posée au bord d'un lac de lotus sous une lumière dorée. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-060",
+  "number": 60,
+  "name": "Apsara",
+  "title": "La danseuse des nuées",
+  "faction": "celeste",
+  "rarity": "R",
+  "category": "Esprit céleste",
+  "power": 6,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 2,
+   "spd": 6,
+   "mag": 9,
+   "hp": 12,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   },
+   {
+    "key": "bless",
+    "value": 2
+   }
+  ],
+  "visual": "Danseuse céleste en robe de soie brodée, voiles flottants et parures d'or, en pleine figure de danse au-dessus des nuages, rubans de soie qui ondulent, pétales de fleurs autour d'elle, lumière d'aube.",
+  "lore": "Elle danse pour les dieux. Les mortels qui la voient oublient de rentrer chez eux.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "void",
+   "wings": "six",
+   "body": "robe",
+   "arms": "pray",
+   "halo": "ring"
+  },
+  "image": "assets/art/CEL-060.webp",
+  "artPrompt": "Apsara — Danseuse céleste en robe de soie brodée, voiles flottants et parures d'or, en pleine figure de danse au-dessus des nuages, rubans de soie qui ondulent, pétales de fleurs autour d'elle, lumière d'aube. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-061",
+  "number": 61,
+  "name": "Yatagarasu",
+  "title": "Le guide aux trois pattes",
+  "faction": "celeste",
+  "rarity": "R",
+  "category": "Créature céleste",
+  "power": 6,
+  "role": "B",
+  "stats": {
+   "atk": 8,
+   "def": 2,
+   "spd": 5,
+   "mag": 3,
+   "hp": 13,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "omen"
+   },
+   {
+    "key": "first"
+   }
+  ],
+  "visual": "Grand corbeau noir aux reflets d'or à trois pattes, devant un immense disque solaire rouge, plumes qui s'embrasent sur les bords, survolant des montagnes boisées au lever du jour.",
+  "lore": "Il a montré la route au premier empereur. Il montre encore le chemin, à qui sait le suivre.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "wings": "feather",
+   "body": "armor",
+   "arms": "sword",
+   "halo": "ring"
+  },
+  "image": "assets/art/CEL-061.webp",
+  "artPrompt": "Yatagarasu — Grand corbeau noir aux reflets d'or à trois pattes, devant un immense disque solaire rouge, plumes qui s'embrasent sur les bords, survolant des montagnes boisées au lever du jour. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-062",
+  "number": 62,
+  "name": "Le Lièvre de Jade",
+  "title": "Il pile l'élixir sur la lune",
+  "faction": "celeste",
+  "rarity": "C",
+  "category": "Créature céleste",
+  "power": 1,
+  "role": "U",
+  "stats": {
+   "atk": 1,
+   "def": 0,
+   "spd": 2,
+   "mag": 1,
+   "hp": 4,
+   "cost": 1
+  },
+  "abilities": [
+   {
+    "key": "regen",
+    "value": 1
+   }
+  ],
+  "visual": "Lièvre blanc lumineux au pelage nacré, debout sur ses pattes arrière, pilant un élixir dans un mortier de jade avec un grand pilon, sur la surface argentée de la lune, Terre au loin.",
+  "lore": "Depuis des siècles il pile la même potion. Il dit qu'elle sera bientôt prête.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "body": "robe",
+   "arms": "pray",
+   "wings": "feather",
+   "halo": "ring",
+   "scale": 0.8
+  },
+  "image": "assets/art/CEL-062.webp",
+  "artPrompt": "Le Lièvre de Jade — Lièvre blanc lumineux au pelage nacré, debout sur ses pattes arrière, pilant un élixir dans un mortier de jade avec un grand pilon, sur la surface argentée de la lune, Terre au loin. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-063",
+  "number": 63,
+  "name": "Apollon",
+  "title": "La flèche et la lyre",
+  "faction": "celeste",
+  "rarity": "HR",
+  "category": "Dieu ancien",
+  "power": 7,
+  "role": "U",
+  "stats": {
+   "atk": 5,
+   "def": 4,
+   "spd": 5,
+   "mag": 9,
+   "hp": 19,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 2
+   },
+   {
+    "key": "bless",
+    "value": 3
+   }
+  ],
+  "visual": "Dieu grec jeune et rayonnant aux boucles dorées, couronne de laurier, arc d'or bandé d'une flèche de lumière, lyre à la ceinture, char solaire tiré par des chevaux de feu derrière lui.",
+  "lore": "Il guérit et il frappe de la même main. Ses flèches portent la peste ou la fin de la peste.",
+  "evolution": null,
+  "sets": [
+   "pantheons2"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "eagle",
+   "crest": true,
+   "scale": 1.1,
+   "scene": "mountain"
+  },
+  "image": "assets/art/CEL-063.webp",
+  "artPrompt": "Apollon — Dieu grec jeune et rayonnant aux boucles dorées, couronne de laurier, arc d'or bandé d'une flèche de lumière, lyre à la ceinture, char solaire tiré par des chevaux de feu derrière lui. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-064",
+  "number": 64,
+  "name": "Râ",
+  "title": "L'œil du jour",
+  "faction": "celeste",
+  "rarity": "S",
+  "category": "Dieu ancien",
+  "power": 10,
+  "role": "M",
+  "stats": {
+   "atk": 8,
+   "def": 5,
+   "spd": 6,
+   "mag": 10,
+   "hp": 17,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "cataclysm",
+    "value": 3
+   },
+   {
+    "key": "command",
+    "value": 3
+   }
+  ],
+  "visual": "Dieu égyptien à tête de faucon coiffé d'un immense disque solaire entouré d'un cobra dressé, sceptre d'or, debout à la proue d'une barque solaire qui traverse un ciel embrasé.",
+  "lore": "Chaque nuit il traverse le monde des morts. Chaque matin il revient. Pour l'instant.",
+  "evolution": null,
+  "sets": [
+   "pantheons2"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "dragon",
+   "legs": 4,
+   "wings": "bat",
+   "scale": 1.1,
+   "scene": "forge"
+  },
+  "image": "assets/art/CEL-064.webp",
+  "artPrompt": "Râ — Dieu égyptien à tête de faucon coiffé d'un immense disque solaire entouré d'un cobra dressé, sceptre d'or, debout à la proue d'une barque solaire qui traverse un ciel embrasé. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-065",
+  "number": 65,
+  "name": "Athéna",
+  "title": "La sagesse en armes",
+  "faction": "celeste",
+  "rarity": "HR",
+  "category": "Dieu ancien",
+  "power": 8,
+  "role": "M",
+  "stats": {
+   "atk": 6,
+   "def": 3,
+   "spd": 6,
+   "mag": 10,
+   "hp": 15,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "aegis"
+   },
+   {
+    "key": "command",
+    "value": 2
+   }
+  ],
+  "visual": "Déesse guerrière grecque au casque corinthien à haut cimier, égide à tête de gorgone sur la poitrine, lance et grand bouclier rond, chouette perchée sur l'épaule, devant un temple de marbre.",
+  "lore": "Elle n'aime pas la guerre. Elle aime la gagner.",
+  "evolution": null,
+  "sets": [
+   "pantheons2"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "wheel",
+   "rings": 3,
+   "eyes": 16
+  },
+  "image": "assets/art/CEL-065.webp",
+  "artPrompt": "Athéna — Déesse guerrière grecque au casque corinthien à haut cimier, égide à tête de gorgone sur la poitrine, lance et grand bouclier rond, chouette perchée sur l'épaule, devant un temple de marbre. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-066",
+  "number": 66,
+  "name": "Freyja",
+  "title": "Le char aux chats sauvages",
+  "faction": "celeste",
+  "rarity": "HR",
+  "category": "Dieu ancien",
+  "power": 7,
+  "role": "U",
+  "stats": {
+   "atk": 5,
+   "def": 4,
+   "spd": 5,
+   "mag": 9,
+   "hp": 19,
+   "cost": 7
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 3
+   },
+   {
+    "key": "charge"
+   }
+  ],
+  "visual": "Déesse nordique aux longs cheveux blonds tressés, cape de plumes de faucon, collier d'ambre lumineux, debout sur un char tiré par deux grands chats sauvages gris, forêt de bouleaux enneigée.",
+  "lore": "La moitié des guerriers tombés lui reviennent. Elle choisit toujours avant Odin.",
+  "evolution": null,
+  "sets": [
+   "pantheons2"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "eagle",
+   "crest": true,
+   "scale": 1.1,
+   "scene": "mountain"
+  },
+  "image": "assets/art/CEL-066.webp",
+  "artPrompt": "Freyja — Déesse nordique aux longs cheveux blonds tressés, cape de plumes de faucon, collier d'ambre lumineux, debout sur un char tiré par deux grands chats sauvages gris, forêt de bouleaux enneigée. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-067",
+  "number": 67,
+  "name": "Sylphe",
+  "title": "Un souffle qui pense",
+  "faction": "celeste",
+  "rarity": "C",
+  "category": "Élémentaire",
+  "power": 2,
+  "role": "S",
+  "stats": {
+   "atk": 3,
+   "def": 1,
+   "spd": 5,
+   "mag": 1,
+   "hp": 5,
+   "cost": 2
+  },
+  "abilities": [
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Esprit de l'air presque transparent, silhouette élancée faite de courants de vent et de volutes blanches, ailes de libellule, feuilles et plumes emportées autour, au sommet d'une falaise.",
+  "lore": "Tu l'as sentie passer sur ta nuque. Elle t'a déjà oublié.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "wings": "feather",
+   "body": "armor",
+   "arms": "staff"
+  },
+  "image": "assets/art/CEL-067.webp",
+  "artPrompt": "Sylphe — Esprit de l'air presque transparent, silhouette élancée faite de courants de vent et de volutes blanches, ailes de libellule, feuilles et plumes emportées autour, au sommet d'une falaise. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-068",
+  "number": 68,
+  "name": "Pixiu",
+  "title": "Il garde ce qu'il avale",
+  "faction": "celeste",
+  "rarity": "R",
+  "category": "Créature céleste",
+  "power": 5,
+  "role": "U",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 3,
+   "mag": 6,
+   "hp": 13,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "devour"
+   }
+  ],
+  "visual": "Lion ailé chinois trapu à une corne, crinière bouclée de jade, écailles dorées sur le dos, gueule ouverte sur des pièces d'or, posé sur un toit de temple aux tuiles vertes.",
+  "lore": "Tout ce qu'il mange reste en lui. Les trésors, et les voleurs.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "eagle",
+   "crest": true,
+   "scene": "heaven"
+  },
+  "image": "assets/art/CEL-068.webp",
+  "artPrompt": "Pixiu — Lion ailé chinois trapu à une corne, crinière bouclée de jade, écailles dorées sur le dos, gueule ouverte sur des pièces d'or, posé sur un toit de temple aux tuiles vertes. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-069",
+  "number": 69,
+  "name": "Byakko",
+  "title": "Le Tigre Blanc de l'Ouest",
+  "faction": "celeste",
+  "rarity": "R",
+  "category": "Créature céleste",
+  "power": 6,
+  "role": "S",
+  "stats": {
+   "atk": 8,
+   "def": 3,
+   "spd": 8,
+   "mag": 3,
+   "hp": 10,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "first"
+   },
+   {
+    "key": "frenzy"
+   }
+  ],
+  "visual": "Tigre blanc immense aux rayures argentées, yeux d'or, aura de vent d'automne et de feuilles rouges, bondissant au-dessus d'une porte de temple à l'ouest, lune pâle.",
+  "lore": "Le Dragon garde l'Orient. Lui garde l'Occident, et il ne partage pas.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "beast",
+   "head": "horse",
+   "rider": true,
+   "hooves": true,
+   "mane": true,
+   "scene": "heaven"
+  },
+  "image": "assets/art/CEL-069.webp",
+  "artPrompt": "Byakko — Tigre blanc immense aux rayures argentées, yeux d'or, aura de vent d'automne et de feuilles rouges, bondissant au-dessus d'une porte de temple à l'ouest, lune pâle. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-070",
+  "number": 70,
+  "name": "Nephilim",
+  "title": "Le fils des Veilleurs",
+  "faction": "celeste",
+  "rarity": "R",
+  "category": "Géant",
+  "power": 5,
+  "role": "U",
+  "stats": {
+   "atk": 3,
+   "def": 2,
+   "spd": 3,
+   "mag": 6,
+   "hp": 13,
+   "cost": 5
+  },
+  "abilities": [
+   {
+    "key": "devour"
+   },
+   {
+    "key": "armor",
+    "value": 2
+   }
+  ],
+  "visual": "Géant à demi-céleste haut comme une colline, ailes atrophiées et grises dans le dos, armure de bronze antique, visage noble et affamé, dominant une ville antique de briques au crépuscule.",
+  "lore": "Ni ange ni homme. Le ciel l'a renié, la terre ne peut pas le nourrir.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "bird",
+   "head": "eagle",
+   "crest": true,
+   "scene": "heaven"
+  },
+  "image": "assets/art/CEL-070.webp",
+  "artPrompt": "Nephilim — Géant à demi-céleste haut comme une colline, ailes atrophiées et grises dans le dos, armure de bronze antique, visage noble et affamé, dominant une ville antique de briques au crépuscule. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-071",
+  "number": 71,
+  "name": "Fūjin",
+  "title": "Le sac des vents",
+  "faction": "celeste",
+  "rarity": "R",
+  "category": "Dieu ancien",
+  "power": 6,
+  "role": "M",
+  "stats": {
+   "atk": 5,
+   "def": 2,
+   "spd": 5,
+   "mag": 9,
+   "hp": 11,
+   "cost": 6
+  },
+  "abilities": [
+   {
+    "key": "strike",
+    "value": 2
+   },
+   {
+    "key": "elusive"
+   }
+  ],
+  "visual": "Dieu du vent japonais à la peau verte, crinière rousse ébouriffée, sourire féroce, portant sur les épaules un grand sac de vent gonflé d'où jaillissent des tourbillons, au milieu des nuages.",
+  "lore": "Il ouvre son sac et le monde se couche. Il le referme quand il en a envie.",
+  "evolution": null,
+  "sets": [
+   "pantheons2"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "wings": "feather",
+   "body": "armor",
+   "arms": "up",
+   "halo": "ring"
+  },
+  "image": "assets/art/CEL-071.webp",
+  "artPrompt": "Fūjin — Dieu du vent japonais à la peau verte, crinière rousse ébouriffée, sourire féroce, portant sur les épaules un grand sac de vent gonflé d'où jaillissent des tourbillons, au milieu des nuages. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, contre-plongée héroïque, effets magiques marqués, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-072",
+  "number": 72,
+  "name": "Gardien des Aurores",
+  "title": "Les voiles du nord",
+  "faction": "celeste",
+  "rarity": "PC",
+  "category": "Esprit céleste",
+  "power": 4,
+  "role": "T",
+  "stats": {
+   "atk": 3,
+   "def": 4,
+   "spd": 2,
+   "mag": 2,
+   "hp": 13,
+   "cost": 4
+  },
+  "abilities": [
+   {
+    "key": "aegis"
+   }
+  ],
+  "visual": "Esprit céleste en forme de grand cerf translucide dont les bois sont des rubans d'aurore boréale verte et violette, galopant dans le ciel au-dessus d'une toundra enneigée.",
+  "lore": "Les anciens disaient qu'il ne fallait pas siffler sous les aurores. Il pourrait répondre.",
+  "evolution": null,
+  "sets": [],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "face",
+   "wings": "six",
+   "body": "robe",
+   "arms": "spread",
+   "eyes": 3,
+   "halo": "ring"
+  },
+  "image": "assets/art/CEL-072.webp",
+  "artPrompt": "Gardien des Aurores — Esprit céleste en forme de grand cerf translucide dont les bois sont des rubans d'aurore boréale verte et violette, galopant dans le ciel au-dessus d'une toundra enneigée. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]
