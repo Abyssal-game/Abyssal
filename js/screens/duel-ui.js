@@ -59,6 +59,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   document.body.classList.add('battle-mode');
 
   FX.forEach((n) => { new Image().src = fxUrl(n); });
+  new Image().src = 'assets/fx/fx-duo.webp'; // v276 : planche de l'Assaut conjoint, chargée d'avance
   // Décor de la salle : la peinture de l'étage, ou la salle propre au gardien
   const room = roomFor(floorBg(run.floor, run.room), st.bossKey);
   root.innerHTML = `<div class="dv cb ${run.room} has-bg" style="--bgimg:${room.paint ? `url(${abs(room.paint)})` : bgOf(run)}">
@@ -542,7 +543,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         case 'duo': {
           // Assaut conjoint : les deux créatures s'élancent l'une après l'autre
           app.sfx.synergy?.(); banner(`<small>${esc(cat.get(st.units[e.u].id).name)} + ${esc(cat.get(st.units[e.p].id).name)}</small>Assaut conjoint`, 'synergy', 1100);
-          if (!reduced) { lunge(e.u, e.tgt); await wait(T(160)); lunge(e.p, e.tgt); cam(e.tgt, 0.8); }
+          if (!reduced) { lunge(e.u, e.tgt); await wait(T(160)); lunge(e.p, e.tgt); cam(e.tgt, 0.8); fxSheet(e.tgt, 'fx-duo', { k: 2.4, d: 960 }); } // v276 : deux traînées qui se croisent, cercle, éclats (planche Gemini)
           await wait(T(LUNGE_HIT + 120)); shake(true);
           if (!g.s.tips?.['cb-duo']) tuto(app, 'cb-duo');
           break;
