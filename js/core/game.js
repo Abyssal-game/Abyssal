@@ -886,11 +886,17 @@ export class Game {
     this.persist();
     return out;
   }
+  // v308 : montant réel d'un gain d'éclats dans la Descente (bonus compris), pour l'annoncer avant de choisir
+  shardsPreview(n) {
+    const run = this.s.descent.run; if (!run) return 0;
+    const k = DESCENT_SHARDS * (run.blessings.includes('greed') ? 1.3 : 1) * (this.rule(run.day).key === 'ruee' ? 1.5 : 1) * (run.free ? 0.5 : 1) * (run.nightmare ? 1.5 : 1);
+    return Math.round(n * k);
+  }
+  treasurePreview() { const run = this.s.descent.run; return run ? this.shardsPreview(15 + Math.min(run.floor, SHARD_FLOOR_CAP) * 6) : 0; }
   gainShards(n) {
     const run = this.s.descent.run;
-    // DESCENT_SHARDS : part des éclats de la Descente (économie resserrée)
-    const k = DESCENT_SHARDS * (run.blessings.includes('greed') ? 1.3 : 1) * (this.rule(run.day).key === 'ruee' ? 1.5 : 1) * (run.free ? 0.5 : 1) * (run.nightmare ? 1.5 : 1);
-    const got = Math.round(n * k);
+    // DESCENT_SHARDS : part des éclats de la Descente (économie resserrée), bonus compris
+    const got = this.shardsPreview(n);
     run.shards += got;
     return got;
   }

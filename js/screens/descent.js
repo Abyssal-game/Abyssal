@@ -26,7 +26,7 @@ import { sync } from '../cloud/sync.js';
 
 // Illustrations des portes et des bonus
 const DOOR_ART = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss', rest: 'rest', altar: 'altar', treasure: 'treasure' };
-const HOW = [['cards', '#7FA8D8', 'Ton équipe', '5 de tes cartes : 3 au combat, 2 en réserve. Les cendres de la Fournaise les font monter de niveau.'], ['swords', '#E0485E', 'Le combat', 'Chacun son tour, dans l’ordre de la vitesse : chaque créature joue une fois par tour avec ses propres PA. L’attaque en rapporte, les compétences en coûtent. La Ferveur, gardée d’un combat à l’autre, lance le pouvoir d’équipe.'], ['dodge', '#9FE0FF', 'Lire et parer', 'Les ennemis annoncent leurs attaques. Contre les plus dangereuses, touche au bon moment : esquive, ou parade parfaite. Brise les élites et les gardiens.'], ['book', '#B48CFF', 'Connaître l’ennemi', 'Posséder la carte d’une créature corrompue donne +1 dégât contre elle.'], ['depth', '#F2C14E', 'Chaque étage', 'Combat simple ou élite, puis un bonus au choix : source, autel ou trésor. Gardien tous les 5 étages.'], ['chest', '#E8C35A', 'Le coffre', 'Remonte quand tu veux : plus tu descends, plus le coffre est beau [bois, fer, or, abyssal].']];
+const HOW = [['cards', '#7FA8D8', 'Ton équipe', '5 de tes cartes : 3 au combat, 2 en réserve. Les cendres de la Fournaise les font monter de niveau.'], ['swords', '#E0485E', 'Le combat', 'Chacun son tour, dans l’ordre de la vitesse : chaque créature joue une fois par tour avec ses propres PA. L’attaque en rapporte, les compétences en coûtent. La Ferveur lance le pouvoir d’équipe ; tu en gardes 3 au plus d’un combat à l’autre.'], ['dodge', '#9FE0FF', 'Lire et parer', 'Les gardiens et les élites annoncent leurs grosses attaques. Contre les attaques dangereuses, touche au bon moment : esquive, ou parade parfaite. Brise les élites et les gardiens pour annuler leur coup.'], ['book', '#B48CFF', 'Connaître l’ennemi', 'Posséder la carte d’une créature corrompue donne +1 dégât contre elle.'], ['depth', '#F2C14E', 'Chaque étage', 'Combat simple ou élite, puis un bonus au choix : source, autel ou trésor. Gardien tous les 5 étages.'], ['chest', '#E8C35A', 'Le coffre', 'Remonte quand tu veux : plus tu descends, plus le coffre est beau (bois, fer, or, abyssal).']];
 const DOOR_PIC = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss' };
 const ROOM_ICON = { fight: 'swords', elite: 'skull', altar: 'star', rest: 'heart', treasure: 'crystal', boss: 'crown' };
 
@@ -152,8 +152,8 @@ export default function descent(app, root) {
   function rewardView(run) {
     const w = ui.win && ui.win.floor === run.floor ? ui.win : null;
     const hp = run.team.filter((m) => !m.fallen), pct = Math.round((hp.reduce((a, m) => a + m.hp, 0) / Math.max(1, hp.reduce((a, m) => a + m.maxHp, 0))) * 100);
-    const heal = g.rule(run.day).key === 'sources' ? 80 : 40;
-    const effect = (r) => (r === 'rest' ? `Soigne ${heal} % des PV de chaque créature` : r === 'altar' ? 'Une bénédiction au choix pour toute l’expédition' : `Environ +${fmt(Math.round((15 + run.floor * 6) * (run.free ? 0.5 : 1)))} éclats`);
+    const heal = g.rule(run.day).key === 'sources' ? 60 : 30; // v308 : valeurs réelles (game.js : 0.3, 0.6 avec Sources bénies)
+    const effect = (r) => (r === 'rest' ? `Soigne ${heal} % des PV de chaque créature` : r === 'altar' ? 'Une bénédiction au choix pour toute l’expédition' : `Environ +${fmt(g.treasurePreview())} éclats`);
     const feats = w?.stats ? [w.stats.parries && `${w.stats.parries} parade${w.stats.parries > 1 ? 's' : ''}`, w.stats.breaks && `${w.stats.breaks} Brisure${w.stats.breaks > 1 ? 's' : ''}`, w.stats.crits && `${w.stats.crits} critique${w.stats.crits > 1 ? 's' : ''}`].filter(Boolean) : [];
     root.innerHTML = `<section class="vx ${w?.room || ''}">
       <div class="vx-hero">${crestHTML(true, run.floor, 'Étage', 'vx-crest')}<h1>Victoire</h1><span class="vx-k">${w?.room === 'boss' ? 'Gardien vaincu' : w?.room === 'elite' ? 'Élite vaincue' : `Étage ${run.floor} franchi`}</span>
@@ -303,7 +303,7 @@ export default function descent(app, root) {
       if (playing) return;
       let out;
       try { out = g.chooseDoor(el.dataset.r); } catch (e) { toast(esc(e.message), { kind: 'error' }); return; }
-      if (out.pact) { ui.pact = null; app.sfx.boss?.(); window.scrollTo(0, 0); tuto(app, 'pacts'); return render(); }
+      if (out.pact) { ui.pact = null; app.sfx.boss?.(); window.scrollTo(0, 0); return render(); }
       if (out.battle) return enterBattle();
       render();
     },

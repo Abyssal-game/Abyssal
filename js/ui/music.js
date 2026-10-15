@@ -38,7 +38,7 @@ const THEMES = {
     drone: 0.04, lp: 460, every: [8, 11], pad: 0.012, bells: [7, 12], bell: 0.016, choir: 0.012, wind: 0, pluck: [2.5, 5],
   },
 };
-export const MUSIC_DEMO = [['Antre', 'antre'], ['Boutique', 'boutique'], ['Descente', 'descente'], ['Combat', 'combat'], ['Gardien', 'boss'], ['Sceaux', 'sceaux']];
+export const MUSIC_DEMO = [['Accueil', 'antre'], ['Boosters', 'boutique'], ['Descente', 'descente'], ['Combat', 'combat'], ['Gardien', 'boss'], ['Sceaux', 'sceaux']];
 
 // Lieu → ambiance
 const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', descente: 'descente', heros: 'descente', marchand: 'descente', sceaux: 'sceaux' };

@@ -102,9 +102,9 @@ export const ROOMS = {
   fight:    { name: 'Combat',         desc: 'Des créatures barrent le passage. Victoire : un bonus au choix.' },
   elite:    { name: 'Élite',          desc: 'Plus dangereux : éclats doublés et 3 bonus au choix.' },
   altar:    { name: 'Autel ancien',   desc: 'Choisis une bénédiction pour toute l’expédition.' },
-  rest:     { name: 'Source sacrée',  desc: 'Tes créatures récupèrent 40 % de leurs PV.' },
+  rest:     { name: 'Source sacrée',  desc: 'Tes créatures récupèrent 30 % de leurs PV.' },
   treasure: { name: 'Trésor oublié',  desc: 'Une poignée d’éclats.' },
-  boss:     { name: 'Gardien',        desc: 'Le gardien de l’étage. Victoire : un coffre.' },
+  boss:     { name: 'Gardien',        desc: 'Le gardien de l’étage. Première victoire contre lui : un coffre.' },
 };
 
 // Chaque étage se gagne au combat : combat simple ou élite (plus dur, mieux payé).
@@ -183,7 +183,7 @@ export function blessingChoices(day, floor, owned = []) {
 export const DAILY_RULES = {
   furie:    { name: 'Furie · {faction}',   desc: 'Les créatures de la faction {faction} frappent 25 % plus fort.', faction: true },
   sommeil:  { name: 'Sommeil · {faction}', desc: 'Les créatures de la faction {faction} ont 25 % de PV en moins.', faction: true },
-  sources:  { name: 'Sources bénies',      desc: 'Les sources sacrées soignent 80 % des PV au lieu de 40 %.' },
+  sources:  { name: 'Sources bénies',      desc: 'Les sources sacrées soignent 60 % des PV au lieu de 30 %.' },
   ruee:     { name: 'Ruée vers les éclats', desc: 'Les éclats trouvés sont augmentés de 50 %.' },
   lune:     { name: 'Nuit du pouvoir', desc: 'La Ferveur commence l’expédition à 4 au lieu de 2.' },
   chasse:   { name: 'Chasse aux élites',   desc: 'Chaque élite vaincue rapporte un coffre et deux fois plus d’éclats.' },

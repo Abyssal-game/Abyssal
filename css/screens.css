@@ -1373,3 +1373,6 @@ button.avatar-big { position: relative; padding: 0; cursor: pointer; font: inher
 .lb-row[data-uid]:active { background: rgba(255, 255, 255, .04); border-radius: 10px; }
 .rep h2 { margin: 0; overflow-wrap: anywhere; }
 .rep-reasons { display: flex; flex-direction: column; gap: 8px; }
+
+/* v308 : bulles d’aide — jamais plus hautes que l’écran (défilent si besoin) */
+.coach-box { max-height: calc(var(--app-h, 100dvh) - 48px); overflow-y: auto; -webkit-overflow-scrolling: touch; }

@@ -4,7 +4,11 @@ import { icon } from './icons.js';
 
 export function tipSeen(app, key) { return !!app.game.s.tips?.[key]; }
 
+// v308 : espace insécable avant « : ; ! ? % » et après « (typographie française : jamais de « : » seul en début de ligne)
+export const frSpaces = (h) => String(h).replace(/ ([:;!?»%])/g, '\u00a0$1').replace(/« /g, '«\u00a0');
+
 export function coach(app, key, html, { title = '' } = {}) {
+  html = frSpaces(html); title = frSpaces(title);
   const g = app.game;
   if (g.s.tips?.[key]) return Promise.resolve(false);
   g.s.tips = { ...(g.s.tips || {}), [key]: Date.now() };
