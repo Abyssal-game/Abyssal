@@ -293,6 +293,10 @@ async function boot() {
   }
 }
 
+// Image introuvable (hors ligne, réseau coupé) : on la masque au lieu du carré « ? » de Safari (v305)
+document.addEventListener('error', (e) => { const t = e.target; if (t && t.tagName === 'IMG') { t.style.visibility = 'hidden'; t.dataset.broken = '1'; } }, true);
+document.addEventListener('load', (e) => { const t = e.target; if (t && t.tagName === 'IMG' && t.dataset.broken) { t.style.visibility = ''; delete t.dataset.broken; } }, true);
+
 // Application des stores : bouton retour, son coupé en arrière-plan (rien dans un navigateur)
 initNative({ suspendAudio: () => audioCtx()?.suspend?.().catch(() => {}), resumeAudio: () => audioCtx()?.resume?.().catch(() => {}) });
 
