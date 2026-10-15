@@ -235,6 +235,7 @@ Aucun achat intégré, aucune publicité, aucun pistage.
 
 - [ ] Exécuter `supabase/06-signalements.sql` dans Supabase (signalement des pseudos).
 - [ ] Ouvrir les inscriptions dans Supabase (Authentication → Sign In / Providers → autoriser les nouvelles inscriptions). Aujourd'hui le jeu affiche « il faut une invitation » si elles sont fermées.
+- [ ] Retirer du jeu la phrase « Pendant la construction du jeu, les comptes sont créés sur invitation » (`js/screens/account.js`) au moment d'ouvrir les inscriptions.
 - [x] Refaire l'illustration de Pandore (ART-068), habillée (fait en v300).
 - [ ] Vérifier que le nom « ABYSSAL » n'est pas déjà pris sur les deux stores et en marque déposée (base INPI / EUIPO).
 - [ ] Créer les comptes développeur : Google (25 $ une fois), Apple (99 $ par an).

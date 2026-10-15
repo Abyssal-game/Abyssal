@@ -74,7 +74,7 @@ step('retour sur le guide d’accueil', { fenetresAvant: before, fenetresApres: 
 const closeTips = async () => { for (let i = 0; i < 4 && await page.evaluate(() => !!document.querySelector('.coach button')); i++) { sh('adb shell input keyevent KEYCODE_BACK'); await sleep(700); } };
 for (const [h, name] of [['#/collection', 'collection'], ['#/boutique', 'boosters'], ['#/descente', 'aventure'], ['#/parametres', 'reglages']]) {
   await page.evaluate((x) => { location.hash = x; }, h); await sleep(3500); await closeTips(); shot(name);
-  step(`écran ${name}`, { appEnVie: alive() });
+  step(`écran ${name}`, { appEnVie: alive(), contenu: await page.evaluate(() => { const m = document.querySelector('#app, main') || document.body; const ps = [...m.querySelectorAll('.panel')]; return { panneaux: ps.length, visibles: ps.filter((x) => { const r = x.getBoundingClientRect(), cs = getComputedStyle(x); return r.height > 0 && cs.visibility !== 'hidden' && Number(cs.opacity) > 0.1; }).length, texte: (m.innerText || '').length }; }) });
 }
 // bouton retour : depuis Réglages, on doit revenir à l'écran précédent, pas quitter le jeu
 sh('adb shell input keyevent KEYCODE_BACK'); await sleep(1500);

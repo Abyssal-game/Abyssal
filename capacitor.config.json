@@ -16,7 +16,7 @@
       "androidScaleType": "CENTER_INSIDE"
     },
     "SystemBars": {
-      "insetsHandling": "css",
+      "insetsHandling": "native",
       "initialViewportFitValueHint": "cover",
       "style": "DARK"
     }
