@@ -133,4 +133,8 @@ La logique (`js/core`) ne dépend pas du navigateur et se teste dans Node. La sa
 
 ## Licence et contenus
 
-Code et textes originaux. Les créatures issues des mythologies et du folklore du monde sont réinterprétées pour l’univers d’ABYSSAL. Aucune image externe n’est utilisée : toutes les illustrations actuelles sont générées par le jeu.
+Code et textes originaux. Les créatures issues des mythologies, du folklore et de la littérature du domaine public sont réinterprétées pour l’univers d’ABYSSAL.
+
+- Illustrations : générées avec Gemini (Google) à partir de descriptions écrites pour le jeu, puis intégrées au projet. Aucune ne reprend une franchise ou le style d’un artiste nommé.
+- Sons et musiques : générés avec ElevenLabs, abonnement payant (usage commercial autorisé, sans mention obligatoire).
+- Polices : Cinzel, Alegreya et Alegreya Sans, sous licence SIL Open Font License 1.1, intégrées dans `assets/fonts/` avec leurs licences (`OFL-*.txt`).

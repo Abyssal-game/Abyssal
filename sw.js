@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v280';
+const VERSION = 'abyssal-v281';
 const ART_CACHE = 'abyssal-media';  // images du jeu : gardées entre les versions
 const FONT_CACHE = 'abyssal-fonts';
 const CORE = [
@@ -31,6 +31,7 @@ const CORE = [
   ...['salle', 'salle-artificiel', 'salle-celeste', 'salle-necrotique', 'salle-abyssal', 'plateau', 'case', 'dos', 'benie', 'maudite', 'rival-initie', 'rival-collectionneur', 'rival-stratege', 'rival-maitre', 'rival-echo', 'rival-banquier', 'rival-archiviste', 'rival-souverain'].map((k) => `assets/sceaux/${k}.webp`),
   ...['infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel'].map((k) => `assets/realms/${k}.webp`),
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/favicon.png',
+  'css/fonts.css', ...['Alegreya-0f8ee632.woff2', 'Alegreya-2e945cf5.woff2', 'Alegreya-88cee5eb.woff2', 'Alegreya-db6a5c78.woff2', 'AlegreyaSans-0c0c571a.woff2', 'AlegreyaSans-2a89a09d.woff2', 'AlegreyaSans-3e467a04.woff2', 'AlegreyaSans-8a53b32d.woff2', 'AlegreyaSans-8bed4c5f.woff2', 'AlegreyaSans-a73a507d.woff2', 'AlegreyaSans-b9a4a97d.woff2', 'AlegreyaSans-f03ce63a.woff2', 'Cinzel-1bec9af0.woff2', 'Cinzel-c0fe750f.woff2'].map((k) => `assets/fonts/${k}`),
 ];
 
 // Une nouvelle version s'installe d'elle-même, sans attendre que toutes les fenêtres soient fermées
