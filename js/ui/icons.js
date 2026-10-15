@@ -81,7 +81,7 @@ export const icon = (name) => {
 export const sigil = (faction) => (SIGILS[faction] ? `<img class="sigil sigil-img" alt="" src="assets/factions/${faction}.webp">` : '');
 
 // Emblèmes des ensembles (assets/sets/<clé>.webp) : ajouter la clé ici quand l'image peinte est livrée
-const SET_ART = new Set(['peches', 'titans', 'souverains', 'dragons', 'firmament', 'fleaux', 'oublies', 'seigneurs', 'plaies', 'neant', 'pactes', 'goetie', 'pantheons', 'legendes']);
+const SET_ART = new Set(['peches', 'titans', 'souverains', 'dragons', 'firmament', 'fleaux', 'oublies', 'seigneurs', 'plaies', 'neant', 'pactes', 'goetie', 'pantheons', 'legendes', 'merveilles', 'objets', 'pantheons2']);
 export const setIcon = (key) => (SET_ART.has(key) ? `<img class="set-ic" alt="" src="assets/sets/${key}.webp">` : `<span class="set-ic set-ic-0">${icon('star')}</span>`);
 
 // Icônes peintes (assets/icons) : défis du jour, étapes de l'Aventure
