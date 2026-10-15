@@ -184,7 +184,7 @@ export const DAILY_RULES = {
   furie:    { name: 'Furie · {faction}',   desc: 'Les créatures de la faction {faction} frappent 25 % plus fort.', faction: true },
   sommeil:  { name: 'Sommeil · {faction}', desc: 'Les créatures de la faction {faction} ont 25 % de PV en moins.', faction: true },
   sources:  { name: 'Sources bénies',      desc: 'Les sources sacrées soignent 60 % des PV au lieu de 30 %.' },
-  ruee:     { name: 'Ruée vers les éclats', desc: 'Les éclats trouvés sont augmentés de 50 %.' },
+  ruee:     { name: 'Ruée vers les éclats', desc: 'Les éclats trouvés sont augmentés de 50 %.' },
   lune:     { name: 'Nuit du pouvoir', desc: 'La Ferveur commence l’expédition à 4 au lieu de 2.' },
   chasse:   { name: 'Chasse aux élites',   desc: 'Chaque élite vaincue rapporte un coffre et deux fois plus d’éclats.' },
   instable: { name: 'Abysse instable',     desc: 'Tout le monde frappe 25 % plus fort : tes créatures comme les corrompues.' },

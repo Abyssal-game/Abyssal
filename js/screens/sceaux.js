@@ -286,7 +286,7 @@ export default function sceauxScreen(app, root) {
     if (k === 'quit') {
       if (busy) return;
       const leave = () => { const st = g.s.sceaux.cur; if (st && !st.over) { st.over = 'lost'; st.final = SC.score(st); g.sceauxFinish(); } g.sceauxQuit(); lobby(); };
-      if (!g.s.sceaux.cur?.over) { confirmBox('Abandonner la partie ? Elle sera comptée comme une défaite.', { ok: 'Abandonner', cancel: 'Continuer', danger: true }).then((yes) => { if (yes) leave(); }); return; }
+      if (!g.s.sceaux.cur?.over) { confirmBox('Abandonner la partie ? Elle sera comptée comme une défaite.', { ok: 'Abandonner', cancel: 'Reprendre la partie', danger: true }).then((yes) => { if (yes) leave(); }); return; }
       return leave();
     }
     const st = g.s.sceaux.cur;

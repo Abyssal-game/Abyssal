@@ -342,6 +342,7 @@ export function openPack(app, type, { faction, onDone, preset = null, title = nu
   function summary() {
     if (phase === 'summary') return;
     phase = 'summary';
+    el.querySelector('.op-all')?.setAttribute('hidden', ''); // v311 : tout est révélé, le bouton n'a plus de sens
     busy = false;
     el.classList.add('is-summary');
     el.querySelector('[data-op="all"]').hidden = true;

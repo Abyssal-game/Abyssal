@@ -34,8 +34,13 @@ export function openChestScene(app, type, { onDone } = {}) {
   const chest = el.querySelector('.chx-chest'), msg = el.querySelector('.chx-msg'), row = el.querySelector('.chx-packs'), acts = el.querySelector('.chx-actions');
   let packs = null, busy = false, closed = false;
 
+  // v311 : Échap et changement d'écran ferment le coffre (il restait affiché par-dessus les autres écrans)
+  const onKey = (e) => { if (e.key === 'Escape' && !busy) close(); };
+  const onRoute = () => close();
+  document.addEventListener('keydown', onKey); window.addEventListener('hashchange', onRoute);
   function close(then) {
     if (closed) return; closed = true;
+    document.removeEventListener('keydown', onKey); window.removeEventListener('hashchange', onRoute);
     el.classList.add('out');
     setTimeout(() => { el.remove(); document.body.classList.remove('has-sheet'); then ? then() : onDone && onDone(); }, 250);
   }

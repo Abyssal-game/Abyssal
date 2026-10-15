@@ -9,6 +9,9 @@ export const TAGS = {
   slow: 'du gel', poison: 'du poison', mark: 'sa Marque', heal: 'des soins', guard: 'sa protection', boost: 'de l’attaque', attack: 'ses dégâts',
 };
 // « à » + nom (Le Roi → au Roi, Les → aux)
+// v311 : « de Le Rêveur » → « du Rêveur », « dans Le Royaume » → « dans le Royaume »
+export const deName = (n) => (/^Le /.test(n) ? `du ${n.slice(3)}` : /^Les /.test(n) ? `des ${n.slice(4)}` : /^La /.test(n) ? `de la ${n.slice(3)}` : /^[AEIOUYÉÈÊH]/i.test(n) ? `d’${n}` : `de ${n}`);
+export const lowArt = (n) => n.replace(/^(Le|La|Les) /, (m) => m.toLowerCase());
 export const toName = (n) => (/^Le /.test(n) ? `au ${n.slice(3)}` : /^Les /.test(n) ? `aux ${n.slice(4)}` : `à ${n}`);
 const ROLE_GIVES = { controle: ['slow'], poison: ['poison'], soutien: ['mark', 'boost'], soin: ['heal'], protecteur: ['guard'], degats: ['attack'], zone: ['attack'] };
 const ROLE_WANTS = { degats: ['mark', 'boost'], zone: ['boost'], protecteur: ['heal'], poison: ['slow'], controle: ['attack'], soin: ['guard'], soutien: ['attack'] };

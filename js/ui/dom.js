@@ -2,6 +2,8 @@
 import { icon } from './icons.js';
 import { sfx } from './sound.js';
 
+// v308 : espace insécable avant « : ; ! ? % » et après « (typographie française : jamais de « : » seul en début de ligne)
+export const frSpaces = (h) => String(h).replace(/ ([:;!?»%])/g, '\u00a0$1').replace(/« /g, '«\u00a0');
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 export const $ = (sel, root = document) => root.querySelector(sel);
 export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -19,6 +21,7 @@ export function reducedMotion(settings) {
 const toastQueue = [];
 let toastBusy = false;
 export function toast(html, opts = {}) {
+  html = frSpaces(html);
   if (opts.kind === 'error') toastQueue.unshift([html, opts]); else toastQueue.push([html, opts]);
   if (toastQueue.length > 6) toastQueue.splice(1, toastQueue.length - 6); // pas de file interminable
   if (!toastBusy) nextToast();
@@ -82,7 +85,7 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeTopSh
 export function confirmBox(text, { ok = 'Confirmer', cancel = 'Annuler', danger = false } = {}) {
   return new Promise((resolve) => {
     let done = false;
-    const s = openSheet(`<div class="confirm"><p>${text}</p><div class="row gap"><button class="btn ghost" data-a="no">${esc(cancel)}</button><button class="btn ${danger ? 'danger' : 'primary'}" data-a="yes">${esc(ok)}</button></div></div>`, {
+    const s = openSheet(`<div class="confirm"><p>${frSpaces(text)}</p><div class="row gap"><button class="btn ghost" data-a="no">${esc(cancel)}</button><button class="btn ${danger ? 'danger' : 'primary'}" data-a="yes">${esc(ok)}</button></div></div>`, {
       cls: 'sheet-small', label: 'Confirmation', onClose: () => { if (!done) resolve(false); },
     });
     s.body.addEventListener('click', (e) => {

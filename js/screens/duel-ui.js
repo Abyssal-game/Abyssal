@@ -7,6 +7,7 @@ import { RARITY } from '../config.js';
 import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM, sigil, roleIcon, actIcon, crestHTML } from '../ui/icons.js';
 import { esc, openSheet, toast } from '../ui/dom.js';
+import { deName } from '../core/synergy.js';
 import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
 import { cardHTML } from '../ui/card.js';
@@ -180,7 +181,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (!guide || busy || st.turn !== 'ally' || st.over) return;
     let t = null, txt = '';
     if (mode?.key === 'attack') { t = el(actionTargets(st, sel, 'attack')[0]); txt = 'Touche un ennemi pour l’attaquer'; }
-    else if (sel && actionsFor(st, sel)[0].ok) { t = actsEl.querySelector('[data-a="attack"]'); txt = `C’est au tour de ${esc(cat.get(st.units[sel].id).name)} : « ${esc(actionsFor(st, sel)[0].name)} » attaque et rapporte 1 PA`; }
+    else if (sel && actionsFor(st, sel)[0].ok) { t = actsEl.querySelector('[data-a="attack"]'); txt = `C’est au tour ${esc(deName(cat.get(st.units[sel].id).name))} : « ${esc(actionsFor(st, sel)[0].name)} » attaque et rapporte 1 PA`; }
     else { t = $('.dv-end'); txt = 'Rien à faire : touche « Passer »'; }
     if (t) { t.classList.add('guide'); say(`<b class="dc-good">${txt}</b>`); }
   }

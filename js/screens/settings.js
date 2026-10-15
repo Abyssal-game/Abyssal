@@ -142,7 +142,7 @@ export default function settings(app, root) {
       });
     },
     async reset() {
-      if (!(await confirmBox('Effacer définitivement toute ta progression sur cet appareil ?', { ok: 'Continuer', danger: true }))) return;
+      if (!(await confirmBox('Effacer définitivement toute ta progression sur cet appareil ?', { ok: 'Effacer', danger: true }))) return;
       if (!(await confirmBox('Dernière confirmation : la collection, les éclats et les succès seront perdus. Pense à exporter d’abord.', { ok: 'Tout effacer', danger: true }))) return;
       g.reset();
       app.applySettings();

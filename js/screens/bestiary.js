@@ -3,6 +3,7 @@
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, EMBLEM, picon } from '../ui/icons.js';
 import { esc, bindActions } from '../ui/dom.js';
+import { deName, lowArt } from '../core/synergy.js';
 import { FACTION_ORDER, RARITY } from '../config.js';
 import { FAMILIES, HUNT_STAGES, huntStage, familyOf } from '../core/descent.js';
 import { loreEntries, markLoreRead, unreadLore } from '../core/lore.js';
@@ -53,7 +54,7 @@ export default function bestiary(app, root) {
     return `
       <div class="chips fac-grid" role="group" aria-label="Faction">${FACTION_ORDER.map((f) => `<button class="chip" data-act="fac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>
       <label class="input-wrap"><span class="sr">Rechercher dans le bestiaire</span>${icon('search')}<input class="input" id="best-q" type="search" placeholder="Rechercher une créature connue…" value="${esc(st.q)}"></label>
-      <p class="small muted">${fp.owned} entrées sur ${fp.total} dans ${esc(cat.faction[st.faction].realm)}.</p>
+      <p class="small muted">${fp.owned} entrée${fp.owned > 1 ? 's' : ''} sur ${fp.total} dans ${esc(lowArt(cat.faction[st.faction].realm))}.</p>
       ${keys.map((k) => `<h3 class="section-title">${esc(k)}</h3><div class="codex">${groups[k].map((c) => entry(c)).join('')}</div>`).join('') || '<p class="muted">Aucune créature connue ne correspond.</p>'}
       ${sealedN && !q ? `<p class="small muted center sealed-n">${icon('lock')} ${sealedN} page${sealedN > 1 ? 's' : ''} encore scellée${sealedN > 1 ? 's' : ''} dans ce royaume. Ouvre des boosters pour les révéler.</p>` : ''}`;
   }
@@ -65,7 +66,7 @@ export default function bestiary(app, root) {
     return `
       <p class="small muted">Chaque créature vaincue dans la Descente s’inscrit ici (${g.huntCount()} au total). À ${HUNT_STAGES[2].k} victoires, tu la maîtrises : tes créatures lui font +1 dégât.</p>
       <div class="chips fac-grid" role="group" aria-label="Faction">${FACTION_ORDER.map((f) => `<button class="chip" data-act="fac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>
-      <p class="small muted">${seen} / ${fp.length} créatures de ${esc(cat.faction[st.faction].realm)} chassées.</p>
+      <p class="small muted">${seen} / ${fp.length} créatures ${esc(deName(cat.faction[st.faction].realm))} chassées.</p>
       <div class="codex">${fp.filter((c) => g.huntKills(c.id) > 0).map((c) => {
         const k = g.huntKills(c.id), stg = huntStage(k), r = RARITY[c.rarity];
         const fam = FAMILIES[familyOf(c)];

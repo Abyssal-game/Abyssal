@@ -175,7 +175,10 @@ export function teamScreen(app, root) {
       inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
     },
     auto() { try { g.setTeam(g.suggestTeam()); app.sfx.discover(); toast(`Équipe suggérée : tes créatures les plus fortes qui se complètent (${g.teamSynergies().length} synergie${g.teamSynergies().length > 1 ? 's' : ''}).`, { icon: 'sparkle' }); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
-    clear() { try { g.setTeam([]); app.sfx.tap(); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
+    async clear() { // v311 : confirmation (avant, un toucher effaçait l'équipe)
+      if (!(await confirmBox('Retirer toutes les créatures de l’équipe ?', { ok: 'Vider l’équipe' }))) return;
+      try { g.setTeam([]); app.sfx.sheet?.(); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); }
+    },
   });
   draw();
   tuto(app, 'army-team');

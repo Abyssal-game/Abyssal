@@ -4,8 +4,8 @@ import { icon } from './icons.js';
 
 export function tipSeen(app, key) { return !!app.game.s.tips?.[key]; }
 
-// v308 : espace insécable avant « : ; ! ? % » et après « (typographie française : jamais de « : » seul en début de ligne)
-export const frSpaces = (h) => String(h).replace(/ ([:;!?»%])/g, '\u00a0$1').replace(/« /g, '«\u00a0');
+import { frSpaces } from './dom.js';
+export { frSpaces };
 
 export function coach(app, key, html, { title = '' } = {}) {
   html = frSpaces(html); title = frSpaces(title);
@@ -23,8 +23,12 @@ export function coach(app, key, html, { title = '' } = {}) {
       <button class="btn primary small" type="button">J’ai compris</button></div>`;
     document.body.appendChild(el);
     requestAnimationFrame(() => el.classList.add('on'));
-    const done = () => { el.classList.remove('on'); setTimeout(() => el.remove(), 250); resolve(true); };
+    // v311 : la bulle se ferme aussi avec Échap, et toute seule si on change d'écran (elle restait affichée par-dessus)
+    let shut = false;
+    const done = () => { if (shut) return; shut = true; window.removeEventListener('hashchange', done); document.removeEventListener('keydown', esc); el.classList.remove('on'); setTimeout(() => el.remove(), 250); resolve(true); };
+    const esc = (e) => { if (e.key === 'Escape') done(); };
     el.querySelector('button').addEventListener('click', done, { once: true });
+    window.addEventListener('hashchange', done); document.addEventListener('keydown', esc);
   });
 }
 

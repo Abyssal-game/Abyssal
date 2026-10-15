@@ -180,6 +180,9 @@ window.addEventListener('scroll', () => {
 
 function render() {
   const [route, ...params] = (location.hash.replace(/^#\/?/, '') || '').split('/');
+  // v311 : anciennes adresses (fonctions retirées) : renvoyées vers leur page actuelle, sans entrée d'historique en plus
+  const ALIAS = { heros: 'descente', marchand: 'descente', epreuve: 'descente', arsenal: 'coffres' };
+  if (ALIAS[route]) { location.replace(`#/${ALIAS[route]}`); return; }
   const key = location.hash || '#/';
   const same = key === scrollKey;
   const keepY = same ? window.scrollY : (scrollMem.get(key) || 0);
