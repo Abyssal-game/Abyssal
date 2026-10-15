@@ -9,7 +9,7 @@ import { TALENTS } from '../core/skills.js';
 import { RELATION } from '../core/relations.js';
 import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM, sigil, picon, crestHTML } from '../ui/icons.js';
-import { esc, fmt, toast, confirmBox, bindActions } from '../ui/dom.js';
+import { esc, fmt, toast, confirmBox, bindActions, openSheet } from '../ui/dom.js';
 import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
 import { bagHTML, bindBag } from './items.js';
@@ -57,18 +57,20 @@ export default function descent(app, root) {
         <a class="btn small ghost block dc-plq dc-plq-dark" href="#/equipe">${icon('p:team-ic')}Modifier l’équipe</a>
         ${team.length < TEAM.active ? (g.welcomePending() ? `<a class="btn gold block" href="#/boutique">${icon('ticket')}Ouvre d’abord tes boosters de bienvenue</a>` : `<p class="small v2-warn center">${icon('info')} Ajoute au moins ${TEAM.active} créatures à ton équipe pour descendre.</p>`) : ''}
         <button class="btn ${ui.cursed && torches ? 'danger' : 'primary'} block big-cta dc-plq dc-plq-red" data-act="start" ${team.length >= TEAM.active ? '' : 'disabled'}>${icon('p:descend')}${torches ? 'Descendre' : 'Descendre (sans coffre)'}</button>
-        ${g.nightmareUnlocked() ? `<div class="dc-curse-row dc-night-row ${ui.nightmare ? 'on' : ''}"><span><b>${icon('skull')} Mode Cauchemar</b><span class="small muted">ennemis plus forts (+35 % PV, +25 % ATQ), gardiens déchaînés dès le début ; coffre d’une qualité au-dessus, +50 % d’éclats${d.bestNightmare ? ` · record : étage ${d.bestNightmare}` : ''}</span></span><button class="switch" role="switch" aria-checked="${ui.nightmare}" data-act="night" aria-label="Mode Cauchemar"><i></i></button></div>` : `<p class="small muted center">${icon('skull')} Mode Cauchemar : atteins l’étage ${NIGHTMARE_AT} pour l’ouvrir.</p>`}
-        ${torches ? `<div class="dc-curse-row ${ui.cursed ? 'on' : ''}"><span><b>${icon('skull')} Descente maudite</b><span class="small muted">coffre d’une qualité au-dessus, mais rien si l’équipe tombe</span></span><button class="switch" role="switch" aria-checked="${ui.cursed}" data-act="curse" aria-label="Descente maudite"><i></i></button></div>` : ''}
+        <div class="dc-opts">
+          ${torches ? `<button class="dc-opt ${ui.cursed ? 'on' : ''}" data-act="curse" aria-pressed="${ui.cursed}">${icon('skull')}<b>Maudite</b><small>coffre +1, rien si l’équipe tombe</small></button>` : ''}
+          ${g.nightmareUnlocked() ? `<button class="dc-opt dc-opt-night ${ui.nightmare ? 'on' : ''}" data-act="night" aria-pressed="${ui.nightmare}">${icon('skull')}<b>Cauchemar</b><small>${d.bestNightmare ? `record : étage ${d.bestNightmare}` : 'ennemis plus forts, coffre +1'}</small></button>` : `<button class="dc-opt off" data-act="optinfo">${icon('lock')}<b>Cauchemar</b><small>dès l’étage ${NIGHTMARE_AT}</small></button>`}
+          <button class="dc-opt-info icon-btn" data-act="optinfo" aria-label="Explications des modes">${icon('info')}</button>
+        </div>
       </section>
       ${ruleHTML(g.rule())}
-      ${(() => { const s = seasonHTML(); return s ? `<details class="panel dc-fold dc-evt"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/season.webp" onerror="this.remove()"><span class="dc-sum-t">Saison et paliers</span></summary>${s}</details>` : ''; })()}
       ${Object.values(g.s.items).some((n) => n > 0) ? bagHTML(g) : ''}
-      <details class="panel dc-fold bn-ranking" id="lb"><summary><span class="dc-sum-t">Classement du jour</span></summary><div class="lb-body small muted">Chargement…</div></details>
-      <details class="panel dc-fold dc-how"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/help.webp"><span class="dc-sum-t">Comment ça marche</span></summary>
-        <ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol>
-        <p class="small muted center">${DESCENT.torches} expéditions avec coffre par jour, puis tu peux rejouer sans coffre.</p></details>`;
+      <div class="dc-links">
+        ${seasonHTML() ? `<button class="dc-link" data-act="open" data-f="season">${picon('season')}<b>Saison</b><small>paliers du mois</small></button>` : ''}
+        <button class="dc-link" data-act="open" data-f="board">${picon('crown')}<b>Classement</b><small>du jour</small></button>
+        <button class="dc-link" data-act="open" data-f="how">${picon('help')}<b>Comment ça marche</b><small>en ${HOW.length} étapes</small></button>
+      </div>`;
     if (last?.record && !last.cheered) { last.cheered = true; setTimeout(() => app.sfx.achievement?.(), 250); root.querySelector('.dc-sum2')?.classList.add('cheer'); } // record battu : on fête
-    root.querySelector('#lb').addEventListener('toggle', (e) => { if (e.target.open) loadBoard(); }, { once: true });
   }
 
   // Saison du mois : paliers de profondeur récompensés une fois
@@ -106,14 +108,13 @@ export default function descent(app, root) {
     </section>`;
   }
 
-  async function loadBoard() {
-    const box = root.querySelector('#lb .lb-body');
+  async function loadBoard(box) {
     if (!box) return;
     if (!cloud.isLoggedIn()) { box.innerHTML = 'Connecte-toi pour comparer ton étage avec les joueurs du monde entier. <a href="#/compte">Se connecter</a>'; return; }
     try {
       const day = g.descent().day;
       const rows = await cloud.leaderboard(day, 30);
-      if (!root.contains(box)) return;
+      if (!document.contains(box)) return;
       const me = cloud.currentUser()?.id;
       const mine = g.descent().bestToday;
       box.classList.remove('muted');
@@ -122,8 +123,8 @@ export default function descent(app, root) {
         return `<div class="lb-row ${r.user_id === me ? 'me' : ''}"${rowAttrs(r.user_id, r.profiles?.pseudo, me)}><span class="lb-rank">${i + 1}</span><span class="lb-av">${av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM}</span><span class="lb-name"><b>${esc(shownName(r.user_id, r.profiles?.pseudo))}${hid ? '' : cloud.badgeHTML(r.profiles?.badge)}</b><span class="small muted">${hid ? '' : esc(r.profiles?.title || '')}</span></span><span class="lb-floor">${r.cursed ? `${icon('skull')} ` : ''}Étage ${r.floor}</span></div>`;
       }).join('') : '<p class="small muted">Personne n’est encore descendu aujourd’hui. À toi d’ouvrir la voie !</p>')
         + (!sync.profile?.pseudo ? '<p class="small acc-warn"><a href="#/compte">Choisis un pseudo</a> pour apparaître au classement.</p>' : !rows.some((r) => r.user_id === me) && mine ? `<p class="small muted">Ton meilleur étage aujourd’hui : ${mine}.</p>` : '');
-      bindReport(box, loadBoard);
-    } catch (e) { if (root.contains(box)) box.textContent = e.message; }
+      bindReport(box, () => loadBoard(box));
+    } catch (e) { if (document.contains(box)) box.textContent = e.message; }
   }
 
   // ——— Expédition ———————————————————————————————————————————————————
@@ -290,6 +291,18 @@ export default function descent(app, root) {
     },
     curse() { ui.cursed = !ui.cursed; render(); },
     night() { ui.nightmare = !ui.nightmare; render(); },
+    // v320 : saison, classement et aide s'ouvrent dans une fenêtre (la page ne les empile plus)
+    open(el) {
+      const f = el.dataset.f;
+      if (f === 'season') openSheet(`<h2 class="center">Saison et paliers</h2>${seasonHTML()}`, { label: 'Saison', cls: 'dc-sheet' });
+      else if (f === 'board') { const sh = openSheet('<h2 class="center">Classement du jour</h2><div class="lb-body small muted">Chargement…</div>', { label: 'Classement', cls: 'dc-sheet' }); loadBoard(sh.body.querySelector('.lb-body')); }
+      else openSheet(`<h2 class="center">Comment ça marche</h2><ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol><p class="small muted center">${DESCENT.torches} expéditions avec coffre par jour, puis tu peux rejouer sans coffre.</p>`, { label: 'Aide', cls: 'dc-sheet' });
+    },
+    optinfo() {
+      openSheet(`<h2 class="center">Les modes de descente</h2>
+        <p><b>${icon('skull')} Descente maudite</b><br><span class="small">Le coffre rapporté est d’une qualité au-dessus, mais si l’équipe tombe, tu ne rapportes rien.</span></p>
+        <p><b>${icon('skull')} Mode Cauchemar</b><br><span class="small">${g.nightmareUnlocked() ? '' : `S’ouvre quand tu as atteint l’étage ${NIGHTMARE_AT}. `}Ennemis plus forts (+35 % PV, +25 % ATQ), gardiens déchaînés dès le début ; coffre d’une qualité au-dessus et +50 % d’éclats.</span></p>`, { label: 'Modes', cls: 'dc-sheet sheet-small' });
+    },
     weekcard(el) { app.openCard(el.dataset.id); },
     news() { delete g.s.armyNews; g.persist(); render(); },
     async start() {
