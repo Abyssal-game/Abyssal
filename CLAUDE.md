@@ -21,7 +21,7 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Le réseau de la session bloque github.io : pour vérifier la publication, passe par l'outil GitHub (déploiements Pages) ou demande une capture au propriétaire.
 
 ## 2. Routine de livraison
-1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v316**.
+1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v317**.
 2. Tests : `node --test tests/*.test.mjs` (187 tests), `node tools/validate.mjs`. Si le combat ou l'équilibre change : `node tools/fuzz.mjs 300` (étage moyen ≈ 12 à 14 en normal).
 3. Vérification dans le navigateur avec Playwright (`/opt/node-tools/node_modules/playwright/index.mjs`, Chromium déjà installé), avec un serveur local `python3 -m http.server 8092` lancé dans le dossier. Tailles iPhone SE et iPhone 13. **L'écran d'ouverture attend un toucher** (« Touche l'écran pour entrer ») : dans les scripts, cliquer au milieu de l'écran (dans la fenêtre 390×664) avant tout le reste.
 4. Commit, push, réponse en français.
@@ -64,6 +64,7 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 
 ## 5. Décisions déjà prises
 - Pas de « salle d'épreuve » ni de version de test : tout va sur main.
+- Accueil (v317) : plus de tuiles « Boosters » et « Aventure » (doublons de la barre du bas) ; il reste le logo, la bienvenue, l’objectif, l’événement, Aujourd’hui.
 - Pas de créature de la semaine, pas de butin « Si tu gagnes » sur les portes, pas de Salles Oubliées / 3D (retirées).
 - Finitions : plus fréquentes qu'au début, et **Sublimer** (finition suivante contre des cendres, toujours plus cher que ce que rapporte la carte brûlée).
 - Écran de combat : le violet doit rester discret. Les pastilles d'état sont au-dessus des cartes, les infos de visée en haut de la carte.

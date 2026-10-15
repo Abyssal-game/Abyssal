@@ -8,7 +8,6 @@ import { seeded } from '../art/geometry.js';
 import { today } from '../core/save.js';
 import { setScene } from '../ui/scene.js';
 import { onPresence } from '../cloud/presence.js';
-import { waitText } from './shop.js';
 
 // Icône et couleur de chaque type de mission du jour
 const MISSION_LOOK = { booster: ['booster', '#E0485E'], new: ['book', '#B48CFF'], rare: ['crystal', '#6FB4FF'], variant: ['holo', '#FF8AD8'], burn: ['furnace', '#FF9A3A'], depth: ['depth', '#9C7BFF'], win: ['crown', '#F2C14E'], daily: ['crystal', '#7FD3FF'], chest: ['chest', '#E8C35A'] };
@@ -19,7 +18,6 @@ export default function home(app, root) {
   const ev = g.event();
   const daily = g.dailyAmount();
   const recent = s.recent.map((id) => cat.get(id)).filter(Boolean).slice(0, 10);
-  const freeCount = Object.values(s.tickets).reduce((a, b) => a + b, 0) + g.freePack().stock;
 
   const chests = g.chestCount();
 
@@ -62,10 +60,6 @@ export default function home(app, root) {
 
     ${g.welcomePending() ? `<a class="panel ornate hw-welcome" href="#/boutique"><span class="hw-ic">${picon('ticket')}</span><span><b>${g.s.tickets.standard > 1 ? `Tes ${g.s.tickets.standard} boosters de bienvenue t’attendent` : 'Ton booster de bienvenue t’attend'}</b><span class="small">Ouvre-les pour découvrir tes premières créatures : elles formeront ton équipe.</span></span>${icon('next')}</a>` : ''}
     ${mainGoalHTML()}
-    <div class="home-acts">
-      <a class="ha ha-pack" href="#/boutique"><span class="ha-art"></span><b>Boosters</b><span>${freeCount ? `${freeCount} offert${freeCount > 1 ? 's' : ''}` : g.freePack().nextAt ? `Gratuit dans ${waitText(g.freePack().nextAt - Date.now())}` : 'Tente ta chance'}</span></a>
-      <a class="ha ha-dive" href="#/descente"><span class="ha-art"></span><b>Aventure</b><span>${g.descent().run ? `En cours · étage ${g.descent().run.floor}` : g.torchesLeft() ? `${g.torchesLeft()} torche${g.torchesLeft() > 1 ? 's' : ''} aujourd’hui` : 'Reviens demain'}</span></a>
-    </div>
 
     <a class="panel hw-event" href="#/boutique" style="--e1:${cat.faction[ev.factions[0]].colors.secondary};--e2:${cat.faction[ev.factions[1]].colors.secondary}">
       <span class="hw-ev-sig">${sigil(ev.factions[0])}${sigil(ev.factions[1])}</span>
