@@ -191,7 +191,7 @@ export const sfx = {
   tap() { noise({ dur: 0.03, gain: 0.5, freq: vary(3200, 0.1), q: 1.2, wet: 0.05 }); osc(vary(1500, 0.05), { dur: 0.05, gain: 0.1, to: 900, wet: 0.05 }); },
   error() { osc(N.A3, { type: 'triangle', dur: 0.14, gain: 0.12, lp: 900, wet: 0.15 }); osc(N.F3, { type: 'triangle', dur: 0.22, gain: 0.12, lp: 700, delay: 0.1, wet: 0.2 }); },
   coin() { bell(vary(N.A6 * 0.75, 0.02), { dur: 0.35, gain: 0.14, ratio: 2.76, index: 1.2 }); bell(N.A6, { dur: 0.5, ratio: 2.76, index: 1.2, delay: 0.06, pan: 0.2, gain: 0.12 }); noise({ dur: 0.12, gain: 0.04, type: 'highpass', freq: 7000, delay: 0.04 }); },
-  discover() { bell(N.D5, { dur: 1.1, gain: 0.08, ratio: 2, index: 0.8 }); bell(N.A5, { dur: 1.4, gain: 0.07, ratio: 2, index: 0.8, delay: 0.1, pan: 0.2 }); },
+  discover() { whoosh({ dur: 0.25, gain: 0.12, from: 600, to: 2400 }); },
   achievement() {
     [N.D4, N.F4, N.A4, N.D5].forEach((f, i) => osc(f, { type: 'sawtooth', dur: i === 3 ? 0.8 : 0.18, gain: 0.07, attack: 0.02, lp: 700, lpTo: 2600, delay: i * 0.11, wet: 0.5 }));
     bell(N.D6, { dur: 1.4, gain: 0.06, ratio: 2, index: 1, delay: 0.33 }); thump(90, { delay: 0.33, gain: 0.3 });
@@ -348,6 +348,7 @@ function loadSamples() {
 // sans fichier pour une rareté, on prend le plus proche en dessous, puis le son synthétisé
 const REVEAL_UP = ['C', 'PC', 'R', 'HR', 'M', 'S'];
 const sampleKey = (k, a) => {
+  if (k === 'discover') return 'sheet'; // v290 : l'ancien carillon « discover » sonnait comme un bip, remplacé partout par un froissement doux
   if (k !== 'reveal') return k;
   for (let i = Math.max(0, REVEAL_UP.indexOf(a[0])); i >= 0; i--) { const key = `reveal-${REVEAL_UP[i].toLowerCase()}`; if (samples[key]) return key; }
   return 'reveal-c';
