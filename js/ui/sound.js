@@ -380,7 +380,7 @@ function playSample(key, gain = 1) {
 const SYNTH_ONLY = new Set(['rip', 'rumble']);
 
 // Vibrations associées (nombre de petites impulsions) et baisse de la musique pendant les grands moments
-const HAP = { explode: 2, finisher: 2, synergy: 1, enemyturn: 1, suspensebig: 2, bossvictory: 3, shield: 1, taunt: 1, hit: 1, slash: 1, smash: 2, crit: 2, capture: 1, block: 1, parry: 1, shatter: 3, boss: 3, ult: 2, victory: 3, defeat: 2, error: 1, dice: 1, tear: 1, achievement: 2, pose: 1, fury: 2, death: 1, levelup: 1, burnall: 2, chest: 2, apogee: 2, fame: 1, season: 1 };
+const HAP = { explode: 2, finisher: 2, synergy: 1, enemyturn: 1, suspensebig: 2, bossvictory: 3, shield: 1, taunt: 1, hit: 1, slash: 1, smash: 2, crit: 2, capture: 1, block: 1, parry: 1, shatter: 3, boss: 3, ult: 2, victory: 3, defeat: 2, error: 1, dice: 1, tear: 1, achievement: 2, pose: 1, fury: 2, death: 1, levelup: 1, burnall: 2, chest: 2, apogee: 2, fame: 1, season: 1, summon: 1 };
 const DUCK = { bossvictory: 5, victory: 3.5, defeat: 4, ult: 2.5, achievement: 2, boss: 2, apogee: 2.5, fame: 2, season: 2 };
 for (const k of Object.keys(sfx)) {
   const f = sfx[k];

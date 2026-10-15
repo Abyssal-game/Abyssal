@@ -201,3 +201,52 @@ Pour que toutes ces versions soient nettes, il faut une image source de **1024 �
 ## 11. Suite de l'identité : dos des cartes et boosters (prompts donnés le 15 octobre 2026)
 
 Trois prompts ont été fournis au propriétaire pour aligner le dos des cartes (`assets/backs/back.webp`, 600 × 840), le booster standard (`assets/packs/standard.webp`, 464 × 800) et le booster événement (`assets/packs/event.webp`, 464 × 800) sur le sceau fendu du logo. Chaque prompt est à envoyer à Gemini avec l'image de l'emblème jointe (`store/logo/embleme-source.jpg`). Formats demandés : 5:7 pour le dos, 9:16 pour les sachets (fond noir uni, à détourer). Les prompts complets sont dans la conversation du 15 octobre 2026 ; principe commun : sachet métallisé à bords crantés vu de face, emblème au centre dans un cadre d'or, bande d'or vide en dessous, aucun texte, aucun symbole religieux, pas d'aspect électrique.
+
+## 12. Boosters restants : factions, premium, Tirage des Ombres (prompts du 15 octobre 2026)
+
+Même recette que le booster standard : joindre à Gemini l'image `store/logo/embleme-source.jpg` **et** le booster standard reçu (`store/logo/booster-standard-source.jpg`) pour qu'il garde la même forme de sachet. Format 9:16, fond noir uni, sachet vu de face, bords crantés, emblème au centre dans un cadre d'or, bande d'or vide en bas, **aucun texte, aucun symbole religieux, aucune étoile à cinq ou six branches**. À l'arrivée : `python3 tools/pack-art.py <clé> <image>` recadre en 464 × 800 dans `assets/packs/<clé>.webp` (clés : infernal, abyssal, celeste, sauvage, necrotique, primordial, artificiel, premium, shadow).
+
+### Booster Infernal
+```
+Reprends exactement le sachet de booster de la deuxième image (même forme, même cadrage de face, mêmes bords crantés, même emblème central au cadre d'or, même bande d'or vide en bas), mais change sa matière et sa couleur : un sachet métallisé rouge sang profond, aux reflets de cuivre chauffé, avec de fines braises et des volutes de fumée sombre gravées dans le métal autour de l'emblème. L'emblème de la première image reste au centre, inchangé, avec son œil orange. Ambiance de forge infernale, sans flamme vive qui déborde du sachet. Fond noir uni, format 9:16, aucun texte, aucun symbole religieux, aucune étoile.
+```
+
+### Booster Abyssal
+```
+Reprends exactement le sachet de booster de la deuxième image (même forme, même cadrage de face, mêmes bords crantés, même emblème central au cadre d'or, même bande d'or vide en bas), mais change sa matière et sa couleur : un sachet métallisé bleu des grands fonds, reflets turquoise froids, avec de fines écailles, des bulles et des tentacules à peine visibles gravés dans le métal autour de l'emblème, comme vus à travers l'eau noire. L'emblème de la première image reste au centre, inchangé. Fond noir uni, format 9:16, aucun texte, aucun symbole religieux, aucune étoile.
+```
+
+### Booster Céleste
+```
+Reprends exactement le sachet de booster de la deuxième image (même forme, même cadrage de face, mêmes bords crantés, même emblème central au cadre d'or, même bande d'or vide en bas), mais change sa matière et sa couleur : un sachet métallisé ivoire et or pâle, lumineux mais mat, avec de fines plumes, des rayons et des nuages gravés dans le métal autour de l'emblème. L'emblème de la première image reste au centre, inchangé, et garde son obsidienne sombre pour contraster. Fond noir uni, format 9:16, aucun texte, aucun symbole religieux, aucune croix, aucune étoile, aucune auréole.
+```
+
+### Booster Sauvage
+```
+Reprends exactement le sachet de booster de la deuxième image (même forme, même cadrage de face, mêmes bords crantés, même emblème central au cadre d'or, même bande d'or vide en bas), mais change sa matière et sa couleur : un sachet métallisé vert forêt profond aux reflets de mousse et de bronze, avec des griffures, des crocs, des ronces et des feuilles gravés dans le métal autour de l'emblème. L'emblème de la première image reste au centre, inchangé. Fond noir uni, format 9:16, aucun texte, aucun symbole religieux, aucune étoile.
+```
+
+### Booster Nécrotique
+```
+Reprends exactement le sachet de booster de la deuxième image (même forme, même cadrage de face, mêmes bords crantés, même emblème central au cadre d'or, même bande d'or vide en bas), mais change sa matière et sa couleur : un sachet métallisé violet funèbre, presque noir, aux reflets d'argent terni, avec des os fins, des toiles d'araignée et des voiles de brume gravés dans le métal autour de l'emblème. L'emblème de la première image reste au centre, inchangé. Fond noir uni, format 9:16, aucun texte, aucun symbole religieux, aucune croix, aucune étoile.
+```
+
+### Booster Primordial
+```
+Reprends exactement le sachet de booster de la deuxième image (même forme, même cadrage de face, mêmes bords crantés, même emblème central au cadre d'or, même bande d'or vide en bas), mais change sa matière et sa couleur : un sachet métallisé brun terre cuite et or ancien, comme une pierre volcanique polie, avec des fissures de lave refroidie, des écailles de dragon et des motifs de roche gravés dans le métal autour de l'emblème. L'emblème de la première image reste au centre, inchangé. Fond noir uni, format 9:16, aucun texte, aucun symbole religieux, aucune étoile.
+```
+
+### Booster Artificiel
+```
+Reprends exactement le sachet de booster de la deuxième image (même forme, même cadrage de face, mêmes bords crantés, même emblème central au cadre d'or, même bande d'or vide en bas), mais change sa matière et sa couleur : un sachet métallisé gris acier bleuté aux reflets de cuivre, avec des engrenages, des rivets, des plaques vissées et de fines gravures mécaniques dans le métal autour de l'emblème. L'emblème de la première image reste au centre, inchangé. Fond noir uni, format 9:16, aucun texte, aucun symbole religieux, aucune étoile, aucun aspect électrique ou néon.
+```
+
+### Booster Premium (rare garantie)
+```
+Reprends exactement le sachet de booster de la deuxième image (même forme, même cadrage de face, mêmes bords crantés, même emblème central au cadre d'or, même bande d'or vide en bas), mais rends-le plus précieux : un sachet entièrement noir obsidienne, très brillant, aux reflets dorés, avec un cadre d'or plus épais autour de l'emblème, des arabesques d'or fin gravées sur tout le sachet, et quelques petits cabochons de pierre rouge sertis aux coins. L'emblème de la première image reste au centre, inchangé. Il doit se voir tout de suite que ce booster vaut plus que le booster standard. Fond noir uni, format 9:16, aucun texte, aucun symbole religieux, aucune étoile.
+```
+
+### Booster des Ombres (Tirage des Ombres)
+```
+Reprends exactement le sachet de booster de la deuxième image (même forme, même cadrage de face, mêmes bords crantés, même emblème central au cadre d'or, même bande d'or vide en bas), mais rends-le mystérieux : un sachet noir mat, presque absorbant, avec une fumée violette sombre qui s'enroule autour de l'emblème et semble sortir de la fente de l'œil, de fines runes abstraites gravées dans le métal (aucune lettre réelle), et un cadre d'or terni, plus ancien. L'emblème de la première image reste au centre, inchangé, et son œil est le seul point lumineux du sachet. Fond noir uni, format 9:16, aucun texte, aucun symbole religieux, aucune étoile.
+```

@@ -87,20 +87,19 @@ Quatre audits ont été menés en parallèle, chacun avec des tests réellement 
 - Export et import de sauvegarde, taille de sauvegarde stable (environ 26 Ko).
 - Combats toujours terminés, PV, PA et Ferveur toujours dans leurs bornes (23 000 combats simulés).
 
+## 4 bis. Suite donnée le 15 octobre 2026 (v319)
+
+- Rôles : une seule série de noms (Protecteur, Attaquant, Soigneur, Empoisonneur, Entraveur, Soutien, Fléau) partout. Homonymes levés par des renommages de textes (liste dans CLAUDE.md, section 3).
+- Hurlement : la provocation couvre maintenant le tour ennemi suivant quand elle est lancée après eux. Rune du Sang : cède à tout dégât qui exploite la faiblesse de faction. Rémanence : appliquée à toutes les Marques posées par la créature. Dévoreur : la digestion passe par la mort normale (Renaissance, Ténacité, etc.). Six tests ajoutés (`tests/combat5.test.mjs`), endurance sans dérive (étage moyen 14,2).
+- Bouton retour : les feuilles ajoutent une entrée d'historique (le retour les ferme sans quitter la page) ; le bouton retour du haut n'ajoute plus d'entrée.
+- Noms coupés : barre du haut (16 lettres tiennent, deux lignes sur une sous-page), en-tête du profil, cartes en combat (3 lignes), bandeau d'action (2 lignes).
+- Audio : silences initiaux coupés sur 9 sons, fondu de sortie sur `suspense`, `summon` joué quand une créature se relève.
+
 ## 4. Problèmes restants (non corrigés, à décider)
 
-- **Deux séries de noms de rôles mélangées :** Protecteur/Attaquant/Soigneur… d'un côté, Garde/Assaut/Soin… de l'autre. Il faut en choisir une, ce qui demande une relecture large.
-- **Homonymes :** Curée, Rempart, Éveil, Gardien et Trophée désignent chacun plusieurs choses différentes.
-- **Hurlement :** la provocation ne dure que le tour en cours.
-- **Rune du Sang :** elle ne cède que par l'attaque et le Coup d'estoc.
-- **Rémanence :** le talent est ignoré par certaines Marques.
-- **Créature digérée par le Dévoreur :** elle meurt sans déclencher la Renaissance.
-- **Bouton retour :** celui du haut ajoute une entrée d'historique, et le retour avec une fiche ouverte (version web) quitte la page.
-- **Noms de cartes coupés** dans les petites vignettes, et nom du joueur coupé dans la barre du haut sur les sous-pages.
 - **Pages chargées :** Bestiaire → Récits (longue liste de récits scellés) et Profil → Titres.
 - **Familles d'ennemis :** celles du Bestiaire diffèrent des comportements réels en combat.
 - **Textes et code jamais affichés :** pactes, reliques, anciens textes de capacités.
-- **Audio :** silence au début de 4 sons, fin coupée net de `suspense`, et `summon` jamais utilisé.
 
 ## 5. Nouveau logo
 

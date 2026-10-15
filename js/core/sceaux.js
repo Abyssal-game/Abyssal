@@ -55,7 +55,7 @@ export const RULES = {
 // Pouvoirs de rareté (la rareté ne change pas le total des valeurs, elle donne un pouvoir)
 // Rempart : la première capture qui la viserait échoue. Fureur : à sa pose, elle capture aussi à égalité.
 export const PERKS = {
-  rempart: { name: 'Rempart', desc: 'La première fois qu’on devrait la capturer, elle résiste.', rar: ['HR', 'S'] },
+  rempart: { name: 'Inviolable', desc: 'La première fois qu’on devrait la capturer, elle résiste.', rar: ['HR', 'S'] },
   fureur:  { name: 'Fureur', desc: 'Quand tu la poses, elle capture aussi les cartes voisines à égalité.', rar: ['M', 'S'] },
 };
 export const perksOf = (card) => Object.keys(PERKS).filter((k) => PERKS[k].rar.includes(card?.rarity));
@@ -75,9 +75,9 @@ export const RIVALS = [
     hello: 'Chaque carte que je pose vaut une fortune. Ne les abîme pas.', win: 'Ma collection pleure.', lose: 'Une carte de plus pour ma vitrine.' },
   { key: 'stratege', ai: [4, 0.15], aiAwake: [5, 0.6], name: 'Sœur Vesna', title: 'la Stratège', level: 3, faction: 'celeste', portrait: 'CEL-005', rule: 'sacre', reward: 40,
     hello: 'Chaque case est une prière. Choisis bien où tu t’agenouilles.', win: 'La lumière t’a guidé, cette fois.', lose: 'Tu as joué au hasard. La lumière, jamais.' },
-  { key: 'maitre', ai: [3, 0.15], aiAwake: [4, 0.3], name: 'Le Maître des Sceaux', title: 'gardien des règles', level: 4, faction: 'necrotique', portrait: 'NEC-001', rule: 'somme', reward: 55,
+  { key: 'maitre', ai: [3, 0.15], aiAwake: [4, 0.3], name: 'Le Maître des Sceaux', title: 'arbitre des règles', level: 4, faction: 'necrotique', portrait: 'NEC-001', rule: 'somme', reward: 55,
     hello: 'J’ai scellé plus de créatures que tu n’en verras jamais.', win: 'Tu as brisé mon sceau. Ce n’est pas rien.', lose: 'Reviens quand tu sauras compter.' },
-  { key: 'echo', ai: [4, 0.45], aiAwake: [6, 0.75], name: 'L’Écho de l’Abîme', title: 'gardien des profondeurs', level: 4, faction: 'abyssal', portrait: 'ABY-039', rule: 'abime', reward: 70,
+  { key: 'echo', ai: [4, 0.45], aiAwake: [6, 0.75], name: 'L’Écho de l’Abîme', title: 'veilleur des profondeurs', level: 4, faction: 'abyssal', portrait: 'ABY-039', rule: 'abime', reward: 70,
     hello: 'Je joue tes coups avant toi. Je les ai déjà joués mille fois.', win: '… l’écho se tait.', lose: 'Tu m’entends ? C’est toi, en bas.' },
   { key: 'banquier', ai: [4, 0.6], aiAwake: [5, 0.3], name: 'Mammon', title: 'le Banquier des Enfers', level: 5, faction: 'infernal', portrait: 'INF-040', rule: 'usure', reward: 80,
     hello: 'Tout se paie, ici. Même une égalité.', win: 'Une perte… je la noterai dans mon grand livre.', lose: 'Intérêts encaissés. Merci de ta visite.' },
@@ -86,8 +86,8 @@ export const RIVALS = [
   { key: 'souverain', ai: [5, 0.6], aiAwake: [6, 0.45], name: 'La Souveraine du Néant', title: 'avant le premier Sceau', level: 5, faction: 'primordial', portrait: 'PRI-053', rule: 'neant', reward: 100,
     hello: 'Avant les Sceaux, il n’y avait que moi. Il n’y aura que moi après.', win: 'Alors… le Néant peut perdre.', lose: 'Retourne au silence, petite flamme.' },
 ];
-// Revanche « éveillée » : après une victoire, l'adversaire revient plus fort (main plus rare, jeu plus fin)
-export const awakened = (R) => ({ ...R, awake: true, level: Math.min(5, R.level + 1), ai: R.aiAwake, reward: Math.round(R.reward * 1.5), name: R.name, title: `${R.title} · éveillé` });
+// Revanche « implacable » (anciennement éveillée) : après une victoire, l'adversaire revient plus fort (main plus rare, jeu plus fin)
+export const awakened = (R) => ({ ...R, awake: true, level: Math.min(5, R.level + 1), ai: R.aiAwake, reward: Math.round(R.reward * 1.5), name: R.name, title: `${R.title} · implacable` });
 export const RIVAL = Object.fromEntries(RIVALS.map((r) => [r.key, r]));
 export const rivalUnlocked = (s, i) => i === 0 || !!s.sceaux?.beaten?.[RIVALS[i - 1].key];
 

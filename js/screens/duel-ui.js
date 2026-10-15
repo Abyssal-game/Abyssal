@@ -6,7 +6,7 @@
 import { RARITY } from '../config.js';
 import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM, sigil, roleIcon, actIcon, crestHTML } from '../ui/icons.js';
-import { esc, openSheet, toast } from '../ui/dom.js';
+import { esc, openSheet, toast, frSpaces } from '../ui/dom.js';
 import { deName } from '../core/synergy.js';
 import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
@@ -85,7 +85,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   const $ = (s) => root.querySelector(s);
   const dio = mountDiorama($('.dv'), { room, decor: g.s.settings?.decor || 'riche', reduced, aspect: st.aspect });
   const enEl = $('.dv-row.enemy'), alEl = $('.dv-row.ally'), msgEl = $('.dv-msg'), actsEl = $('.cb-acts');
-  const say = (h) => { msgEl.innerHTML = h; };
+  const say = (h) => { msgEl.innerHTML = frSpaces(h); }; // v319 : « » et : ! ? ne se retrouvent plus seuls en début de ligne
   const el = (uid) => root.querySelector(`[data-uid="${uid}"]`);
 
   // ——— Carte de combat ———
@@ -596,7 +596,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           app.sfx.death(); fxAt(e.u, 'death', { big: true }); sparks(e.u, 'ember'); el(e.u)?.classList.add('dying', 'cracking'); await wait(T(640)); draw(); break;
         }
         case 'enter': draw(); el(e.u)?.classList.add('enter'); await wait(T(340)); break;
-        case 'revive': draw(); float(e.u, 'Relevée !', 'heal'); await wait(T(280)); break;
+        case 'revive': draw(); app.sfx.summon?.(); float(e.u, 'Relevée !', 'heal'); await wait(T(280)); break;
         case 'actor': draw(); if (!reduced) { const t = el(e.u); t?.classList.remove('myturn'); void t?.offsetWidth; t?.classList.add('myturn'); } app.sfx.actor?.(); await wait(T(260)); break;
         case 'pa': { const t = el(e.u); if (t && st.units[e.u]?.side === 'ally') { float(e.u, `+${e.d} PA`, 'pa'); app.sfx.pa?.(); } break; }
         case 'phase': draw(); say(e.side === 'enemy' ? '<b class="dc-bad">Tour des créatures corrompues</b>' : 'À toi !'); turnBanner(e.side); await wait(T(e.side === 'enemy' ? 520 : 420)); break;
@@ -889,7 +889,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (!actionTargets(st, sel, key).includes(uid)) {
       const t = st.units[uid];
       if (key === 'entrave' && t?.frostCD > 0) toast('Elle vient d’être gelée : immunisée au gel ce tour-ci.', { icon: 'info' });
-      else if (t?.side === 'enemy' && key !== 'priere' && key !== 'rempart') toast('Une créature avec <b>Garde</b> protège les autres : vise-la d’abord.', { icon: 'shield' });
+      else if (t?.side === 'enemy' && key !== 'priere' && key !== 'rempart') toast('Un <b>Protecteur</b> ennemi protège les autres : vise-le d’abord.', { icon: 'shield' });
       return;
     }
     const a = actionsFor(st, sel).find((x) => x.key === key);
@@ -1046,7 +1046,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   function statusLines(u) {
     const s = [];
     if (u.shield) s.push('Bouclier : bloque le prochain coup.');
-    if (u.ward) s.push(`Sceau du Gardien : absorbe encore ${u.ward} dégâts.`);
+    if (u.ward) s.push(`Sceau du Serment : absorbe encore ${u.ward} dégâts.`);
     if (u.poison) s.push(`Poison ${u.poison} : perd ${u.poison} PV au début de son tour, puis le poison diminue de moitié.`);
     if (u.frozen || u.stunned) s.push('Gelé : passe son prochain tour.');
     if (u.slow) s.push('Ralenti : sa prochaine attaque fait moitié moins mal.');
@@ -1063,7 +1063,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       <li><b>Attaque</b> (gratuite, +1 PA) : dégâts fiables, +1 Ferveur. <b>Défense</b> (gratuite, +1 PA) : -50 % de dégâts jusqu’à son prochain tour. <b>Passer</b> : elle ne fait rien. <b>Permuter</b> (une fois par tour) : une créature de la réserve prend sa place et joue tout de suite ; PV, PA et états sont gardés, et la réserve récupère 10 % de PV par tour. En entrant, elle déclenche un petit effet lié à son rôle (bouclier, soin, Ferveur, ralentissement…).</li>
       <li><b>Brisure</b> : en visant une élite ou un gardien, la cible affiche la Brisure que ton coup va infliger (◆), et « BRISE ! » quand il va le briser. Un seul coup ne retire jamais plus de 40 % des PV d’un gardien.</li>
       <li><b>Ferveur</b> (${FERVOR_MAX} au plus, commune à l’équipe ; tu en gardes 3 au plus d’un combat à l’autre) : attaques, faiblesses, esquives (+1), parades parfaites (+2) et Brisures (+2) la remplissent. Pleine, elle lance le <b>pouvoir d’équipe</b> (${esc(ult.name)} : ${esc(ult.desc)}), pendant le tour d’une de tes créatures, sans le terminer.</li>
-      <li><b>Défense active</b> (coups chargés, attaques de zone, sorts, élites et gardiens) : touche dans l’or pour esquiver (+1 Ferveur), sur le trait blanc, au tout dernier instant, pour parer (aucun dégât, +1 PA, +2 Ferveur, Brisure, contre-attaque des Gardes et des Assauts).</li>
+      <li><b>Défense active</b> (coups chargés, attaques de zone, sorts, élites et gardiens) : touche dans l’or pour esquiver (+1 Ferveur), sur le trait blanc, au tout dernier instant, pour parer (aucun dégât, +1 PA, +2 Ferveur, Brisure, contre-attaque des Protecteurs et des Attaquants).</li>
       <li><b>Dés</b> : Coup d’estoc, Contagion et Entrave lancent un D20 contre une difficulté (DD). 1 : échec critique ; sous le DD : réussite partielle ; DD atteint : réussite ; 20 : critique. Marque, gel, Brisure et faiblesse donnent des bonus.</li>
       <li><b>Enchaînement</b> : chaque créature qui frappe un ennemi déjà touché ce tour-ci par une autre de tes créatures gagne +1 dégât (+2 au plus). Le « +1 » doré sur la cible l’annonce.</li>
       <li><b>Coup de grâce</b> : achever un ennemi donne +1 Ferveur.</li>

@@ -6,7 +6,7 @@ import { setCardCatalog, setFameLookup, setApexLookup, setFavLookup } from './ui
 import { MAX_LEVEL } from './core/army.js';
 import { fameTier } from './core/renown.js';
 import { icon, EMBLEM } from './ui/icons.js';
-import { toast, esc, fmt, reducedMotion, closeTopSheet, openSheet } from './ui/dom.js';
+import { toast, esc, fmt, reducedMotion, closeTopSheet, openSheet, handlePopstate } from './ui/dom.js';
 import { sfx, configureSound, audioCtx } from './ui/sound.js';
 import { musicRoute, configureMusic } from './ui/music.js';
 import { VERSION } from './config.js';
@@ -123,7 +123,7 @@ function renderChrome() {
   const top = document.getElementById('topbar');
   const parent = PARENT[app.route];
   top.innerHTML = `
-    ${parent !== undefined ? `<a class="top-back" href="#/${parent}" aria-label="Retour">${icon('back')}</a>` : ''}
+    ${parent !== undefined ? `<a class="top-back" href="#/${parent}" aria-label="Retour" data-parent="${parent}">${icon('back')}</a>` : ''}
     <a class="top-brand" href="#/profil" aria-label="Profil : niveau ${lv.level}, ${esc(s.title)}">
       <span class="top-avatar pf pf-${s.frame}">${avatarCard ? `<img alt="" src="${artUrl(avatarCard, { lite: true })}">` : EMBLEM}<span class="lv">${lv.level}</span></span>
       <span class="top-meta"><b>${esc(s.name || s.title)}</b><span class="xpbar" aria-hidden="true"><i style="width:${(lv.into / lv.need) * 100}%"></i></span></span>
@@ -132,6 +132,14 @@ function renderChrome() {
       <button class="pill shards" data-wallet="shards" title="Éclats" aria-label="${fmt(s.shards)} éclats : à quoi ça sert ?">${icon('crystal')}<span>${fmt(s.shards)}</span></button>
       <button class="pill ash" data-wallet="ash" title="Cendres" aria-label="${fmt(s.ash)} cendres : à quoi ça sert ?">${icon('ash')}<span>${fmt(s.ash)}</span></button>
     </div>`;
+  // v319 : le bouton retour du haut revient en arrière dans l'historique quand la page précédente est bien le parent,
+  // sinon il remplace la page courante : jamais d'entrée d'historique en plus
+  top.querySelector('.top-back')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const parent = e.currentTarget.dataset.parent;
+    if (app.prevHash === `#/${parent}` || (parent === '' && (app.prevHash === '#/' || app.prevHash === ''))) history.back();
+    else location.replace(`#/${parent}`);
+  });
   const tab = TAB_OF[app.route] ?? 'antre';
   // sous-onglets : seulement sur les pages d'un groupe
   const sub = SUBNAV[tab] && SUBNAV[tab].some(([r]) => r === app.route) ? SUBNAV[tab] : null;
@@ -185,6 +193,7 @@ function render() {
   const ALIAS = { heros: 'descente', marchand: 'descente', epreuve: 'descente', arsenal: 'coffres' };
   if (ALIAS[route]) { location.replace(`#/${ALIAS[route]}`); return; }
   const key = location.hash || '#/';
+  if (app.curHash !== key) { app.prevHash = app.curHash; app.curHash = key; }
   const same = key === scrollKey;
   const keepY = same ? window.scrollY : (scrollMem.get(key) || 0);
   scrollKey = null; // pas d'enregistrement pendant le changement de page
@@ -331,5 +340,5 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:' && !isNative()
   });
 }
 
-window.addEventListener('popstate', () => closeTopSheet());
+window.addEventListener('popstate', handlePopstate);
 boot();

@@ -14,11 +14,11 @@ const HOW = [['cards', '#7FA8D8', 'Ta main', '5 cartes. Chacune a quatre valeurs
   ['seal', '#E8C35A', 'Le plateau', 'À tour de rôle, chacun pose une carte sur une case libre du plateau de 3 × 3.'],
   ['swords', '#E0485E', 'Capturer', 'Si ta valeur est plus grande que celle d’en face d’une carte adverse voisine, tu la captures. À égalité, rien ne se passe.'],
   ['crown', '#F2C14E', 'La victoire', 'Après les 9 poses, on compte les cartes de chaque couleur, plus celle restée en main. À 5 contre 5, celui qui tient la case centrale (le cœur du Sceau) gagne.'],
-  ['holo', '#FF8AD8', 'Pouvoirs de rareté', 'Les Hyper rares ont le Rempart (bouclier doré : elles résistent à la première capture). Les Mythiques ont la Fureur (épées en flammes : elles capturent aussi à égalité quand tu les poses). Les Secrètes ont les deux.'],
+  ['holo', '#FF8AD8', 'Pouvoirs de rareté', 'Les Hyper rares sont Inviolables (bouclier doré : elles résistent à la première capture). Les Mythiques ont la Fureur (épées en flammes : elles capturent aussi à égalité quand tu les poses). Les Secrètes ont les deux.'],
   ['rule', '#B48CFF', 'Règles spéciales', 'Certains adversaires jouent avec une règle en plus : Identique, Somme (avec Combo en cascade), cases sacrées, plateau instable, fraternité, Abîme, Usure, Archives ou Néant.'],
-  ['crystal', '#7FE0A0', 'Trophée', 'Une fois par jour, après une victoire, tu gardes une carte adverse que tu contrôles sur le plateau (Hyper rare au plus).'],
+  ['crystal', '#7FE0A0', 'Butin', 'Une fois par jour, après une victoire, tu gardes une carte adverse que tu contrôles sur le plateau (Hyper rare au plus).'],
   ['hourglass', '#9FE0FF', 'Adversaires et défi', 'Bats chaque adversaire pour débloquer le suivant. Un défi du jour t’attend aussi.'],
-  ['danger', '#FF5468', 'Revanches éveillées', 'Une fois un adversaire battu, tu peux l’affronter éveillé : main plus rare, jeu plus fin, récompense ×1,5 et +150 éclats la première fois.']];
+  ['danger', '#FF5468', 'Revanches implacables', 'Une fois un adversaire battu, tu peux l’affronter implacable : main plus rare, jeu plus fin, récompense ×1,5 et +150 éclats la première fois.']];
 // Salle de chaque adversaire (assets/sceaux) : le plateau reste le même, le décor change
 const THEME = { initie: 'salle', collectionneur: 'salle-artificiel', stratege: 'salle-celeste', maitre: 'salle-necrotique', echo: 'salle-abyssal', banquier: 'salle-necrotique', archiviste: 'salle-artificiel', souverain: 'salle-abyssal' };
 const RIVAL_OF = (st) => (st.awake ? SC.awakened(SC.RIVAL[st.rival]) : SC.RIVAL[st.rival]);
@@ -49,7 +49,7 @@ export default function sceauxScreen(app, root) {
     setScene('menu');
     // les Duels des Sceaux s'ouvrent après le premier gardien vaincu : un nouveau joueur découvre d'abord la Descente
     if (!g.sceauxOpen()) {
-      root.innerHTML = `<header class="screen-head ui-hero bn-sceaux"><h1>Duels des Sceaux</h1><p class="muted">Un jeu de cartes à part, contre les gardiens des règles.</p></header>
+      root.innerHTML = `<header class="screen-head ui-hero bn-sceaux"><h1>Duels des Sceaux</h1><p class="muted">Un jeu de cartes à part, contre les arbitres des Sceaux.</p></header>
         <section class="panel tr-lock">${icon('lock')}<b>Encore scellés</b><p class="small">Vaincs ton <b>premier gardien</b> dans la Descente (étage 5) pour ouvrir les Duels des Sceaux.</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`;
       return;
     }
@@ -66,7 +66,7 @@ export default function sceauxScreen(app, root) {
         <span class="sc-por">${rivalPic(cat, r)}</span>
         <span class="sc-ri"><b>${esc(r.name)}</b><span class="small">${esc(r.title)} · ${stars(r.level)}</span>
         <span class="small muted">${open ? `Règle « ${esc(SC.RULES[r.rule].name)} » · +${r.reward} éclats${won ? '' : ` · 1re victoire +${SC.SCEAUX_REWARD.firstWin}`}` : `Bats ${esc(SC.RIVALS[i - 1].name)} pour l’affronter`}</span></span>
-        ${won ? `<span class="sc-won">${icon('check')}</span>` : open ? icon('next') : icon('p:mysteries')}</button>${won ? `<button class="sc-awake ${(sc.awake || {})[r.key] ? 'won' : ''}" data-sc="awake" data-r="${r.key}">${icon('skull')}<span><b>Revanche éveillée</b><small>${stars(Math.min(5, r.level + 1))} · +${Math.round(r.reward * 1.5)} éclats${(sc.awake || {})[r.key] ? ' · battu' : ` · 1re victoire +${SC.SCEAUX_REWARD.firstAwake}`}</small></span>${(sc.awake || {})[r.key] ? icon('check') : icon('next')}</button>` : ''}`]; }); const o = items.filter((x) => x[0]).map((x) => x[1]).join(''), l = items.filter((x) => !x[0]); return `<div class="sc-rivals">${o}</div>${l.length ? `<details class="panel dc-fold"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/mysteries.webp"><span class="dc-sum-t">Adversaires à venir (${l.length})</span></summary><div class="sc-rivals">${l.map((x) => x[1]).join('')}</div></details>` : ''}`; })()}
+        ${won ? `<span class="sc-won">${icon('check')}</span>` : open ? icon('next') : icon('p:mysteries')}</button>${won ? `<button class="sc-awake ${(sc.awake || {})[r.key] ? 'won' : ''}" data-sc="awake" data-r="${r.key}">${icon('skull')}<span><b>Revanche implacable</b><small>${stars(Math.min(5, r.level + 1))} · +${Math.round(r.reward * 1.5)} éclats${(sc.awake || {})[r.key] ? ' · battu' : ` · 1re victoire +${SC.SCEAUX_REWARD.firstAwake}`}</small></span>${(sc.awake || {})[r.key] ? icon('check') : icon('next')}</button>` : ''}`]; }); const o = items.filter((x) => x[0]).map((x) => x[1]).join(''), l = items.filter((x) => !x[0]); return `<div class="sc-rivals">${o}</div>${l.length ? `<details class="panel dc-fold"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/mysteries.webp"><span class="dc-sum-t">Adversaires à venir (${l.length})</span></summary><div class="sc-rivals">${l.map((x) => x[1]).join('')}</div></details>` : ''}`; })()}
       <details class="panel dc-fold sc-handfold"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/cards.webp"><span class="dc-sum-t">Ta main</span></summary>
         <div class="sc-row">${hand.map((id) => scCard(cat, id, { owner: 'p' })).join('')}</div>
         ${hand.some((id) => !g.owns(id)) ? '<p class="small muted">Les cartes de départ qui te manquent sont prêtées pour la partie.</p>' : ''}
@@ -145,7 +145,7 @@ export default function sceauxScreen(app, root) {
       const grid = root.querySelector('.sc-plate');
       const el = grid?.querySelector(`.sc-cell[data-i="${f.cell}"]`);
       if (!el) break;
-      if (f.blocked) { el.insertAdjacentHTML('beforeend', `<span class="sc-block">${PERK_IC.rempart}Rempart !</span>`); el.querySelector('.sc-perk.rempart')?.classList.add('gone'); app.sfx.block?.(); await wait(650); continue; }
+      if (f.blocked) { el.insertAdjacentHTML('beforeend', `<span class="sc-block">${PERK_IC.rempart}Inviolable !</span>`); el.querySelector('.sc-perk.rempart')?.classList.add('gone'); app.sfx.block?.(); await wait(650); continue; }
       if (f.rule && f.rule !== shown) {
         shown = f.rule;
         const b = document.createElement('div'); b.className = `sc-combo ${f.rule}`; b.innerHTML = `<img class="sc-cburst" alt="" src="assets/fx/burst.webp"><img class="sc-cico" alt="" src="assets/icons/${{ identique: 'sc-same', somme: 'sc-sum', combo: 'sc-combo', fureur: 'sc-combo' }[f.rule]}.webp"><span>${{ identique: 'Identique !', somme: 'Somme !', combo: 'Combo !', fureur: 'Fureur !' }[f.rule]}</span>`;
@@ -209,7 +209,7 @@ export default function sceauxScreen(app, root) {
       <div class="sc-final"><span class="sc-score"><b class="p">${f.p}</b><i>contre</i><b class="o">${f.o}</b></span></div>
       ${st.tiebreak ? `<p class="sc-caps"><b>Égalité de cartes</b> : ${st.over === 'won' ? 'tu tiens' : 'il tient'} le cœur du Sceau.</p>` : ''}
       <p class="sc-caps">Tes captures : <b>${caps.p}</b> · Les siennes : <b>${caps.o}</b></p>
-      ${out.trophy?.length ? `<div class="sc-trophy"><img class="sc-tico" alt="" src="assets/icons/sc-trophy.webp"><b>Trophée du jour</b><span class="small">Garde une de ces cartes :</span><div class="sc-tro-row">${out.trophy.map((id) => `<button class="sc-tro" data-tro="${id}">${scCard(cat, id, { owner: 'p' })}</button>`).join('')}</div></div>` : ''}
+      ${out.trophy?.length ? `<div class="sc-trophy"><img class="sc-tico" alt="" src="assets/icons/sc-trophy.webp"><b>Butin du jour</b><span class="small">Garde une de ces cartes :</span><div class="sc-tro-row">${out.trophy.map((id) => `<button class="sc-tro" data-tro="${id}">${scCard(cat, id, { owner: 'p' })}</button>`).join('')}</div></div>` : ''}
       <p class="sc-say">${rivalPic(cat, R)}<span>« ${esc(st.over === 'won' ? R.win : st.over === 'lost' ? R.lose : 'Partie nulle. On recommence ?')} »</span></p>
       ${out.shards ? `<p class="sc-gain">${icon('crystal')} <b>+${fmt(out.shards)}</b> éclats${out.first ? ' (première victoire)' : ''}</p>` : ''}
       ${out.capped ? '<p class="small muted">Plus de victoires payées aujourd’hui : tu joues pour la gloire.</p>' : ''}
@@ -220,7 +220,7 @@ export default function sceauxScreen(app, root) {
     el.addEventListener('click', (e) => {
       const tb = e.target.closest('[data-tro]');
       if (tb) {
-        try { const r = g.sceauxTrophy(tb.dataset.tro); app.sfx.reveal?.(cat.get(tb.dataset.tro).rarity); el.querySelector('.sc-trophy').innerHTML = `<b>Trophée gagné</b><span class="small">${esc(cat.get(tb.dataset.tro).name)} rejoint ta collection${r.isNewCard ? ' (nouvelle carte !)' : ''}.</span>`; app.chrome?.(); }
+        try { const r = g.sceauxTrophy(tb.dataset.tro); app.sfx.reveal?.(cat.get(tb.dataset.tro).rarity); el.querySelector('.sc-trophy').innerHTML = `<b>Butin gagné</b><span class="small">${esc(cat.get(tb.dataset.tro).name)} rejoint ta collection${r.isNewCard ? ' (nouvelle carte !)' : ''}.</span>`; app.chrome?.(); }
         catch (err) { toast(esc(err.message), { kind: 'error' }); }
         return;
       }

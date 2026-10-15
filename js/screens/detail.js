@@ -69,7 +69,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     if (!f) return '';
     const open = formUnlocked(g, card.id), on = g.formOf(card.id) === 'corrompue';
     return `<div class="fm-panel ${on ? 'on' : ''} ${open ? '' : 'locked'}"><span class="fm-k">${icon(open ? 'sparkle' : 'lock')} Forme corrompue</span>
-      <b>${open ? esc(f.name) : 'Forme endormie'}</b><span class="small fm-t">${open ? esc(f.title) : `Pour l’éveiller : ${esc(f.condText.charAt(0).toLowerCase() + f.condText.slice(1))}.`}</span>
+      <b>${open ? esc(f.name) : 'Forme endormie'}</b><span class="small fm-t">${open ? esc(f.title) : `Pour la libérer : ${esc(f.condText.charAt(0).toLowerCase() + f.condText.slice(1))}.`}</span>
       ${open ? `<p class="small"><b>${esc(f.passiveName)}.</b> ${esc(f.passiveDesc)}</p><p class="lore small">« ${esc(f.lore)} »</p>
       <div class="seg fm-seg" role="group" aria-label="Forme au combat"><button class="seg-b" data-act="form" data-v="" aria-pressed="${!on}">Originelle</button><button class="seg-b" data-act="form" data-v="corrompue" aria-pressed="${on}">Corrompue</button></div>` : ''}</div>`;
   }

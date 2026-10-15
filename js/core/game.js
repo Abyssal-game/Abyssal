@@ -690,7 +690,7 @@ export class Game {
   // Garde la carte choisie parmi les trophées de la partie (une fois par jour)
   sceauxTrophy(id) {
     const sc = this.s.sceaux, st = sc.cur, day = today(this.clock());
-    if (!st?.trophy?.includes(id) || sc.trophyDay === day) throw new Error('Trophée indisponible.');
+    if (!st?.trophy?.includes(id) || sc.trophyDay === day) throw new Error('Butin indisponible.');
     sc.trophyDay = day; st.trophy = null;
     const r = this.addCard(id, 'normal', 'reward');
     this.persist();
@@ -741,7 +741,7 @@ export class Game {
   // Forme choisie pour une carte (corrompue si débloquée et sélectionnée)
   formOf(id) { return this.s.forms?.[id] === 'corrompue' && formUnlocked(this, id) ? 'corrompue' : null; }
   setForm(id, form) {
-    if (form === 'corrompue' && !formUnlocked(this, id)) throw new Error('Cette forme n’est pas encore éveillée.');
+    if (form === 'corrompue' && !formUnlocked(this, id)) throw new Error('Cette forme n’est pas encore libérée.');
     if (this.s.descent.run) throw new Error('Termine d’abord ton expédition.');
     if (form === 'corrompue') this.s.forms[id] = 'corrompue'; else delete this.s.forms[id];
     this.persist();

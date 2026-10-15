@@ -308,6 +308,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   if (d > 0 && u.trait === 'enrage' && !u.enraged && u.hp > 0 && u.hp <= u.maxHp / 2) { u.enraged = true; u.atk += 2; ev.push({ t: 'status', u: u.uid, s: 'Enragé : +2 ATQ', k: 'bad', trait: 'enrage' }); }
   // Marque consommée (v265) et coup de rupture sur une cible Fêlée (Fracture en deux temps)
   const s0 = src && st.units[src];
+  if (d > 0 && u.boss && u.side === 'enemy' && s0?.side === 'ally' && isWeak(s0, u)) runeHit(st, 'faiblesse', ev); // Rune du Sang : tout dégât qui exploite la faiblesse de faction (compétences comprises)
   if (d > 0 && u.side === 'enemy' && s0?.side === 'ally' && u.hp > 0) {
     const wasCracked = !!u.cracked && u.cracked.seq !== st.seq;
     let ate = false;
@@ -443,6 +444,14 @@ function addPoison(st, t, n, ev, src) {
 }
 // Brèche et Exposé (v250) : états posés par une créature, exploités par une autre, valables jusqu'à la fin du tour suivant
 const linger = (st, by) => (st.units[by]?.talent === 'remanence' ? 1 : 0); // Rémanence : les états posés durent 1 tour de plus
+// Provocation (Hurlement, « Tous sur elle ») : chaque ennemi la vise à sa prochaine action. En ordre d'initiative, si des ennemis
+// ont déjà joué ce tour-ci, elle tient aussi tout le tour suivant (lancée en fin de tour, elle ne tombait pas dans le vide).
+const taunting = (st, u) => (u.taunt || 0) >= st.round;
+function provoke(st, x) {
+  const acted = !!st.init && front(st, 'enemy').some((e) => st.init.indexOf(e.uid) < (st.ip ?? -1));
+  x.taunt = st.round + (acted ? 1 : 0);
+  front(st, 'enemy').forEach((e) => { if (e.intent?.t && st.units[e.intent.t]?.side === 'ally') e.intent = { ...e.intent, t: x.uid }; });
+}
 function setBreach(st, t, by, ev) { if (!t || t.hp <= 0 || t.side !== 'enemy' || t.breach) return; t.breach = { by, until: st.round + 1 + linger(st, by) }; ev.push({ t: 'status', u: t.uid, s: 'Brèche', k: 'breach' }); }
 // v265 : l'Exposé est devenu une Marque (une seule marque à retenir) : posée par la compétence à dé réussie
 function openUp(st, t, by, ev) { if (!t || t.hp <= 0 || t.side !== 'enemy' || t.mark) return; t.mark = 2 + linger(st, by); t.markBy = by; ev.push({ t: 'status', u: t.uid, s: 'Marquée', k: 'mark' }); }
@@ -508,7 +517,7 @@ function check(st, ev) {
 // Une créature avec Garde doit être visée en premier (les assassins l'ignorent)
 export function targetsFor(st, side, attacker = null) {
   const f = front(st, other(side));
-  const howl = side === 'enemy' && f.find((u) => u.taunt === st.round); // Hurlement : tous sur lui
+  const howl = side === 'enemy' && f.find((u) => taunting(st, u)); // Hurlement : tous sur lui
   if (howl) return [howl.uid];
   if (attacker?.fam === 'assassin') return f.map((u) => u.uid);
   const g = f.filter((u) => u.kw === 'garde');
@@ -812,7 +821,7 @@ function basicAttack(st, u, t, ev) {
     breakHit(st, t, brkOf(st, u, { ...t, frozen: frozen ? 1 : 0 }, 'attack') + extraBrk + rush + Math.max(0, landed - 1), ev, u);
     if (hasP(u, 'venin')) addPoison(st, t, boosted(u, 'venin') ? 2 : 1, ev, u);
     if (S.burn) addPoison(st, t, S.burn, ev, u);
-    if (hasP(u, 'malediction') && u.curseT !== st.round && !t.mark && t.hp > 0) { u.curseT = st.round; t.mark = boosted(u, 'malediction') ? 2 : 1; t.markBy = u.uid; pfx(ev, u, 'malediction'); ev.push({ t: 'status', u: t.uid, s: 'Maudite', k: 'mark' }); }
+    if (hasP(u, 'malediction') && u.curseT !== st.round && !t.mark && t.hp > 0) { u.curseT = st.round; t.mark = (boosted(u, 'malediction') ? 2 : 1) + linger(st, u.uid); t.markBy = u.uid; pfx(ev, u, 'malediction'); ev.push({ t: 'status', u: t.uid, s: 'Maudite', k: 'mark' }); }
     if (u.role === 'degats' && t.boss) t.wound = 1;
   }
   if (S.healLowest) { const w = lowestAlly(st); if (w) heal(w, S.healLowest, ev, u); }
@@ -871,7 +880,7 @@ function doSwap(st, out, inn, ev) {
   const o = st.order.ally, i = o.indexOf(out.uid), j = o.indexOf(inn.uid);
   [o[i], o[j]] = [o[j], o[i]];
   inn.inPlay = true; out.inPlay = false; inn.acts = 0;
-  out.defend = false;
+  out.defend = false; out.taunt = 0;
   if (st.init) {
     // elle prend sa place dans l'ordre des tours et joue tout de suite
     const k = st.init.indexOf(out.uid); if (k >= 0) st.init[k] = inn.uid;
@@ -965,7 +974,7 @@ function startAllyTurn(st, ev) {
     if (best) { const n = boosted(c, 'commandement') ? 3 : 2; best.boost += n; ev.push({ t: 'status', u: best.uid, s: `Commandement : +${n} ATQ` }); }
   }
   const criers = front(st, 'ally').filter((u) => u.kw === 'cri' && u.hp > 0);
-  if (criers.length) { front(st, 'ally').forEach((u) => { u.boost += criers.length; }); ev.push({ t: 'status', u: criers[0].uid, s: `Cri : +${criers.length} ATQ` }); }
+  if (criers.length) { front(st, 'ally').forEach((u) => { u.boost += criers.length; }); ev.push({ t: 'status', u: criers[0].uid, s: `Cri de guerre : +${criers.length} ATQ` }); }
   check(st, ev);
   planIntents(st);
 }
@@ -1059,8 +1068,10 @@ function bossTick(st, ev) {
   const v = st.swallowed && st.units[st.swallowed];
   if (v && v.swallowed && v.hp > 0) {
     const d = Math.min(v.hp, Math.max(1, Math.round(v.maxHp * 0.15)));
-    v.hp -= d; ev.push({ t: 'status', u: b?.uid || v.uid, s: `Digère ${v.name} : −${d}`, k: 'bad' });
-    if (v.hp <= 0) { v.swallowed = false; st.swallowed = null; (st.fallenLog ||= []).push({ u: v.uid, by: b?.uid || null, round: st.round, kind: 'gorge' }); ev.push({ t: 'status', u: b?.uid || v.uid, s: 'Dévorée…', k: 'bad' }); check(st, ev); }
+    ev.push({ t: 'status', u: b?.uid || v.uid, s: `Digère ${v.name} : −${d}`, k: 'bad' });
+    // la digestion blesse comme un coup du gardien : Renaissance, Ténacité, Sursis, Épines et les effets « à la mort » jouent comme pour une mort normale
+    st.curKind = 'gorge'; hurt(st, v, d, ev, b?.uid || null, { pierce: true });
+    if (v.hp <= 0) { v.swallowed = false; st.swallowed = null; ev.push({ t: 'status', u: b?.uid || v.uid, s: 'Dévorée…', k: 'bad' }); check(st, ev); }
   }
   if (b && b.doom != null && !b.broken) {
     b.doom--;
@@ -1160,9 +1171,9 @@ export function enemyAct(st, aUid, defense = 'none') {
       const cap = boosted(target, 'colere') ? 5 : 3;
       if ((target.colere || 0) < cap) { target.colere = (target.colere || 0) + 1; target.atk += 1; pfx(ev, target, 'colere'); ev.push({ t: 'status', u: target.uid, s: `Colère : +1 ATQ (${target.colere}/${cap})`, syn: true }); }
     }
-    const hound = target !== t || target.taunt === st.round ? target : null;
+    const hound = target !== t || taunting(st, target) ? target : null;
     if (hound && hasP(hound, 'enfers') && hound.hp > 0 && e.hp > 0) {
-      pfx(ev, hound, 'enfers'); ev.push({ t: 'status', u: aUid, s: 'Gardien des Enfers', k: 'bad', syn: true });
+      pfx(ev, hound, 'enfers'); ev.push({ t: 'status', u: aUid, s: 'Molosse des Enfers', k: 'bad', syn: true });
       hurt(st, e, boosted(hound, 'enfers') ? 5 : 3, ev, hound.uid);
       if (boosted(hound, 'enfers') && e.hp > 0) breakHit(st, e, 1, ev, hound);
     }
@@ -1233,7 +1244,7 @@ export function enemyAct(st, aUid, defense = 'none') {
   return ev;
 }
 // Défense active réussie. Esquive : aucun dégât, +1 Ferveur. Parade parfaite : aucun dégât,
-// +2 Ferveur, +2 Brisure à l'attaquant, contre-attaque des Gardes et des Assauts.
+// +2 Ferveur, +2 Brisure à l'attaquant, contre-attaque des Protecteurs et des Attaquants.
 function chargeRiposte(g, ev) {
   if (g.role !== 'protecteur' || g.side !== 'ally' || (g.riposte || 0) >= RIPOSTE_MAX) return;
   g.riposte = (g.riposte || 0) + 1;
@@ -1514,7 +1525,7 @@ export function threats(st) {
 // Outils du moteur prêtés aux compétences et passifs des créatures (kits.js) : un seul code par effet
 const targetScore = (st, a, t) => (t.hp <= dmgOf(st, a, t, 1, { basic: true }) ? 1000 : 0) + (intentInfo(st, t)?.danger || 0) * 20 + (isWeak(a, t) ? 15 : 0) + (t.broken ? 25 : 0) - t.hp;
 const API = {
-  front, hurt, dmgOf, breakHit, heal, addPoison, freeze, awake, gainFervor,
+  front, hurt, dmgOf, breakHit, heal, addPoison, freeze, awake, gainFervor, linger, taunt: provoke,
   targetsOf: (st, u) => targetsFor(st, 'ally', u),
   // meilleure cible d'attaque (même calcul que le pilote automatique)
   bestTarget: (st, u) => targetsFor(st, 'ally', u).map((id) => st.units[id]).sort((x, y) => targetScore(st, u, y) - targetScore(st, u, x))[0]?.uid || null,

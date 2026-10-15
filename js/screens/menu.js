@@ -18,7 +18,7 @@ export default function menu(app, root) {
   // la tuile du Créateur, rare, prend aussi toute la largeur en bas.
   const profile = `<a class="mn-tile mn-wide" href="#/profil"><span class="mn-tile-ic avatar-big pf pf-${s.frame}">${av ? `<img alt="" src="${artUrl(av)}">` : EMBLEM}</span><b>${esc(s.name || 'Ton profil')}</b><span>Niveau ${lv.level} · ${esc(s.title)}</span><em>Vitrine, titres, statistiques</em></a>`;
   root.innerHTML = `
-    <header class="screen-head mn-head ui-hero bn-sanctuary"><h1>Le Sanctuaire</h1><p class="muted">Ton profil, tes trophées et les réglages du jeu.</p></header>
+    <header class="screen-head mn-head ui-hero bn-sanctuary"><h1>Le Sanctuaire</h1><p class="muted">Ton profil, tes succès, tes titres et les réglages du jeu.</p></header>
     <nav class="mn-grid">
       ${profile}
       ${T('#/succes', 'crown', 'Succès', `${achDone} / ${cat.achievements.length} débloqués`)}

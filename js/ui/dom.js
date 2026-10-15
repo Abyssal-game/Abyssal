@@ -49,6 +49,16 @@ function nextToast() {
 
 // Fenêtres superposées (feuilles) ----------------------------------------------
 const stack = [];
+// v319 : chaque feuille ouverte ajoute une entrée d'historique. Le bouton retour (navigateur, Android, geste) ferme
+// alors la feuille au lieu de quitter la page. Quand on ferme la feuille autrement (croix, fond, Échap), on retire
+// cette entrée avec history.back(), et on ignore le popstate que cela provoque.
+let popPending = 0;
+export function handlePopstate() {
+  if (popPending > 0) { popPending--; return; }
+  closeTopSheet(true);
+}
+// changement de page pendant qu'une feuille est ouverte : on la ferme sans toucher à l'historique
+window.addEventListener('hashchange', () => { while (stack.length) stack[stack.length - 1].close(true); });
 export function openSheet(html, { cls = '', onClose, label = 'Fenêtre', full = false } = {}) {
   const root = document.getElementById('overlay-root');
   const wrap = document.createElement('div');
@@ -58,12 +68,15 @@ export function openSheet(html, { cls = '', onClose, label = 'Fenêtre', full = 
   sfx.sheet();
   document.body.classList.add('has-sheet');
   const prevFocus = document.activeElement;
+  let pushed = false;
+  try { history.pushState({ sheet: true }, ''); pushed = true; } catch (e) { pushed = false; }
   const api = {
     el: wrap.querySelector('.sheet'),
     body: wrap.querySelector('.sheet-body'),
-    close() {
+    close(fromHistory) {
       if (api.closed) return;
       api.closed = true;
+      if (pushed && fromHistory !== true) { popPending++; history.back(); }
       wrap.classList.remove('in');
       const i = stack.indexOf(api); if (i >= 0) stack.splice(i, 1);
       if (!stack.length && !document.querySelector('.opening')) document.body.classList.remove('has-sheet');
@@ -73,13 +86,13 @@ export function openSheet(html, { cls = '', onClose, label = 'Fenêtre', full = 
     },
     setContent(h) { api.body.innerHTML = h; },
   };
-  wrap.querySelector('.sheet-backdrop').addEventListener('click', api.close);
-  wrap.querySelector('.sheet-close').addEventListener('click', api.close);
+  wrap.querySelector('.sheet-backdrop').addEventListener('click', () => api.close());
+  wrap.querySelector('.sheet-close').addEventListener('click', () => api.close());
   stack.push(api);
   requestAnimationFrame(() => { wrap.classList.add('in'); api.el.querySelector('.sheet-close').focus({ preventScroll: true }); });
   return api;
 }
-export function closeTopSheet() { const s = stack[stack.length - 1]; if (s) { s.close(); return true; } return false; }
+export function closeTopSheet(fromHistory) { const s = stack[stack.length - 1]; if (s) { s.close(fromHistory === true); return true; } return false; }
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeTopSheet(); });
 
 export function confirmBox(text, { ok = 'Confirmer', cancel = 'Annuler', danger = false } = {}) {

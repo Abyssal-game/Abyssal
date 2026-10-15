@@ -81,7 +81,7 @@ export default function bestiary(app, root) {
     const nb = (e) => (fresh.has(e.key) ? '<span class="lr-new">Nouveau</span>' : '');
     const lock = (e) => `<div class="lr-e locked"><b>${icon('lock')} ${e.kind === 'boss' || e.kind === 'form' ? 'Récit scellé' : esc(e.title)}</b><span class="small muted">${esc(e.hint)}</span></div>`;
     const of = (k) => all.filter((e) => e.kind === k);
-    const html = `<p class="small muted">${open.length} récit${open.length > 1 ? 's' : ''} sur ${all.length}. Ils s’ouvrent en jouant : gardiens vaincus, formes éveillées, relations rencontrées, royaumes complétés.</p>
+    const html = `<p class="small muted">${open.length} récit${open.length > 1 ? 's' : ''} sur ${all.length}. Ils s’ouvrent en jouant : gardiens vaincus, formes libérées, relations rencontrées, royaumes complétés.</p>
       <h2 class="section-title">Les gardiens de l’Abîme</h2>
       <div class="stack">${of('boss').map((e) => (e.unlocked ? `<div class="lr-e boss">${nb(e)}<b>${esc(e.title)}</b><span class="small lr-sub">${esc(e.sub)}</span><p class="lore">${esc(e.text)}</p><p class="small"><b>Sa mécanique.</b> ${esc(e.mechanic)}</p><p class="small"><b>Pour le contrer.</b> ${esc(e.counter)}</p></div>` : lock(e))).join('')}</div>
       <h2 class="section-title">Formes corrompues</h2>

@@ -39,9 +39,9 @@ test('récits : gardien vaincu, relation découverte, quart d’une faction', ()
 test('formes corrompues : verrouillées, éveillées, choisies, et appliquées au combat', () => {
   const g = newGame();
   const id = 'NEC-001', f = FORMS[id];
-  assert.throws(() => g.setForm(id, 'corrompue'), /éveillée/);
+  assert.throws(() => g.setForm(id, 'corrompue'), /libérée/);
   g.addCard(id);
-  assert.throws(() => g.setForm(id, 'corrompue'), /éveillée/);
+  assert.throws(() => g.setForm(id, 'corrompue'), /libérée/);
   g.s.bossesBeaten[f.cond.boss] = Date.now();
   g.setForm(id, 'corrompue');
   assert.equal(g.formOf(id), 'corrompue');

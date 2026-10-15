@@ -33,7 +33,7 @@ const HAND_KITS = {
     plus: 'Rapide à remplir la Ferveur sur les cibles marquées ou brisées.', moins: 'Fragile, peu de PV.', synergy: 'Marque du chasseur, Brisure, Entraveurs.',
   },
   'NEC-001': {
-    style: 'Rempart increvable', stat: { atk: 0.9, hp: 1.12 },
+    style: 'Increvable', stat: { atk: 0.9, hp: 1.12 },
     strike: { name: 'Coup de bouclier', desc: 'Dégâts normaux, +1 Brisure en plus.' },
     passive: 'inebranlable', move: 'murdos',
     plus: 'Survit une fois à un coup mortel par combat.', moins: 'Dégâts faibles.', synergy: 'Soigneurs (Bastion), Défense.',
@@ -69,7 +69,7 @@ const HAND_KITS = {
     plus: 'Achève les cibles empoisonnées, et son poison passe à un voisin (Éveil).', moins: 'Contre une cible sans poison, elle est moyenne.', synergy: 'Méduse Funèbre, Entraveurs.',
   },
   'INF-012': {
-    style: 'Gardien qui rend les coups', stat: { atk: 1.05, hp: 0.96 },
+    style: 'Protecteur qui rend les coups', stat: { atk: 1.05, hp: 0.96 },
     strike: { name: 'Masse ardente', desc: '120 % des dégâts, +1 Brisure en plus.', mult: 1.2 },
     passive: 'colere', move: 'represailles',
     plus: 'Plus il protège, plus il frappe fort.', moins: 'Doit encaisser pour briller.', synergy: 'Soigneurs, Rempart sur l’allié menacé.',
@@ -109,8 +109,8 @@ export const PASSIVES = {
   elue: { name: 'Élue des braves', desc: 'Quand une de tes créatures tombe : +2 ATQ (pour le combat) et +1 Ferveur.', awaken: '+3 ATQ.' },
   presage: { name: 'Présage funeste', desc: 'Tant qu’elle est au combat, ton équipe fait +25 % de dégâts aux ennemis ralentis ou gelés.', awaken: '+40 %.' },
   chasseur: { name: 'Venin du chasseur', desc: '+40 % de dégâts sur les cibles empoisonnées.', awaken: 'Quand sa cible meurt, son poison passe à un ennemi voisin.' },
-  colere: { name: 'Colère du gardien', desc: 'Chaque coup encaissé à la place d’un allié (Rempart) : +1 ATQ pour le combat (3 au plus).', awaken: '5 au plus.' },
-  enfers: { name: 'Gardien des Enfers', desc: 'Un ennemi qui frappe une créature qu’il protège (Rempart), ou qui le frappe pendant son Hurlement, subit 3 dégâts.', awaken: '5 dégâts et +1 Brisure.' },
+  colere: { name: 'Colère du rempart', desc: 'Chaque coup encaissé à la place d’un allié (Rempart) : +1 ATQ pour le combat (3 au plus).', awaken: '5 au plus.' },
+  enfers: { name: 'Molosse des Enfers', desc: 'Un ennemi qui frappe une créature qu’il protège (Rempart), ou qui le frappe pendant son Hurlement, subit 3 dégâts.', awaken: '5 dégâts et +1 Brisure.' },
   profondeurs: { name: 'Profondeurs', desc: 'Ses coups font +30 % de dégâts aux ennemis gelés ou ralentis.', awaken: 'Étreinte se recharge en 2 tours au lieu de 3.' },
   faim: { name: 'Faim sans fin', desc: 'Chaque ennemi qu’il achève : +1 ATQ (pour le combat) et 20 % de PV rendus.', awaken: 'Et il peut agir une fois de plus ce tour-ci.' },
   renaissance: { name: 'Renaissance', desc: 'Une fois par combat, se relève avec 40 % de ses PV.', awaken: 'En renaissant, soigne toute l’équipe de 15 %.' },
@@ -152,8 +152,8 @@ export const ROLE_TXT = {
   soin: ['Garde l’équipe debout et la libère du poison et du gel.', 'Frappe faiblement.', 'Protecteurs, équipes qui encaissent.'],
   poison: ['Son poison ronge les grosses cibles et traverse les boucliers.', 'Lente à faire effet contre une cible fragile.', 'Entraveurs (Givre-venin), Venin du chasseur.'],
   controle: ['Annule les coups dangereux en gelant ou en ralentissant.', 'Peu de dégâts ; les gardiens résistent au gel.', 'Attaquants (Bris de glace), Empoisonneurs.'],
-  soutien: ['Rend toute l’équipe plus forte (Cri, Marque, Ferveur).', 'Faible seule : elle brille avec des attaquants.', 'Attaquants et Fléaux.'],
-  zone: ['Frappe plusieurs ennemis à la fois.', 'Chaque coup est faible contre une seule grosse cible.', 'Soutiens (Cri : Raz-de-marée), Brisure.'],
+  soutien: ['Rend toute l’équipe plus forte (Cri de guerre, Marque, Ferveur).', 'Faible seule : elle brille avec des attaquants.', 'Attaquants et Fléaux.'],
+  zone: ['Frappe plusieurs ennemis à la fois.', 'Chaque coup est faible contre une seule grosse cible.', 'Soutiens (Cri de guerre : Raz-de-marée), Brisure.'],
 };
 // Une entrée compacte de kits-data.js → la même forme qu'un kit écrit à la main
 function expandKit(g) {
@@ -218,7 +218,7 @@ export const MOVES = {
   },
   epines: {
     name: 'Épines empoisonnées', icon: 'venin', ap: 1, cd: 2, target: 'anyEnemy',
-    desc: 'Frappe n’importe quel ennemi, même derrière une Garde : dégâts normaux et +3 poison.',
+    desc: 'Frappe n’importe quel ennemi, même derrière un Protecteur : dégâts normaux et +3 poison.',
     pv: (st, u, t, api) => api.dmgOf(st, u, t, 1),
     run(st, u, t, ev, api) { api.hurt(st, t, api.dmgOf(st, u, t, 1), ev, u.uid, { pierce: true }); if (t.hp > 0) api.addPoison(st, t, 3, ev, u); },
     // utile surtout pour atteindre ce qu'une Garde protège : un dangereux, un gardien, une élite
@@ -234,7 +234,7 @@ export const MOVES = {
   hurlement: {
     name: 'Hurlement', icon: 'provoc', ap: 1, cd: 3, target: 'none',
     desc: 'Tous les ennemis le visent à leur prochain tour, et il se met en Défense.', awaken: 'Et ton équipe gagne +1 ATQ ce tour-ci.',
-    run(st, u, t, ev, api) { u.taunt = st.round; u.defend = true; api.front(st, 'enemy').forEach((e) => { if (e.intent?.t && st.units[e.intent.t]?.side === 'ally') e.intent = { ...e.intent, t: u.uid }; }); ev.push({ t: 'status', u: u.uid, s: 'Hurlement : tous sur lui !', syn: true, k: 'guard' }); if (api.awake(u)) api.front(st, 'ally').forEach((x) => { x.boost = (x.boost || 0) + 1; }); },
+    run(st, u, t, ev, api) { api.taunt(st, u); u.defend = true; ev.push({ t: 'status', u: u.uid, s: 'Hurlement : tous sur lui !', syn: true, k: 'guard' }); if (api.awake(u)) api.front(st, 'ally').forEach((x) => { x.boost = (x.boost || 0) + 1; }); },
     ai: (st, u, api) => { const th = api.threatened(st); return th && th.uid !== u.uid && u.hp > u.maxHp * 0.5 ? 'none' : null; },
   },
   etreinte: {
@@ -272,12 +272,12 @@ export const OPS = {
   slow: { v: () => 0.5, run: (st, u, x, o, ev) => { x.slow = true; ev.push({ t: 'status', u: x.uid, s: 'Ralenti', k: 'frost' }); } },
   freeze: { v: () => 1.3, run: (st, u, x, o, ev, api) => { if (!(x.frostCD > 0)) api.freeze(st, x, ev); else { x.slow = true; ev.push({ t: 'status', u: x.uid, s: 'Ralenti', k: 'frost' }); } } },
   brk: { v: (o) => 0.25 * o.n, run: (st, u, x, o, ev, api) => api.breakHit(st, x, o.n, ev, u) },
-  mark: { v: () => 0.6, run: (st, u, x, o, ev) => { x.mark = Math.max(x.mark || 0, 2); x.markBy = u.uid; ev.push({ t: 'status', u: x.uid, s: 'Marquée', k: 'mark' }); } },
+  mark: { v: () => 0.6, run: (st, u, x, o, ev, api) => { x.mark = Math.max(x.mark || 0, 2 + api.linger(st, u.uid)); x.markBy = u.uid; ev.push({ t: 'status', u: x.uid, s: 'Marquée', k: 'mark' }); } },
   shield: { v: () => 0.7, run: (st, u, x, o, ev) => { if (!x.shield) { x.shield = 1; ev.push({ t: 'status', u: x.uid, s: 'Bouclier', k: 'guard' }); } } },
   heal: { v: (o) => 4 * o.p, run: (st, u, x, o, ev, api) => api.heal(x, x.maxHp * o.p, ev, u) },
   boost: { v: (o) => 0.3 * o.n, run: (st, u, x, o, ev) => { x.boost = (x.boost || 0) + o.n; ev.push({ t: 'status', u: x.uid, s: `+${o.n} ATQ`, k: 'heal' }); } },
   defend: { v: () => 0.4, run: (st, u, x, o, ev) => { x.defend = true; ev.push({ t: 'status', u: x.uid, s: 'En défense', k: 'defend' }); } },
-  taunt: { v: () => 1.1, run: (st, u, x, o, ev, api) => { x.taunt = st.round; api.front(st, 'enemy').forEach((e) => { if (e.intent?.t && st.units[e.intent.t]?.side === 'ally') e.intent = { ...e.intent, t: x.uid }; }); ev.push({ t: 'status', u: x.uid, s: 'Tous sur elle !', syn: true, k: 'guard' }); } },
+  taunt: { v: () => 1.1, run: (st, u, x, o, ev, api) => { api.taunt(st, x); ev.push({ t: 'status', u: x.uid, s: 'Tous sur elle !', syn: true, k: 'guard' }); } },
   cleanse: { v: () => 0.3, run: (st, u, x, o, ev) => { if (x.poison || x.frozen) { x.poison = 0; x.frozen = 0; ev.push({ t: 'status', u: x.uid, s: 'Purifiée', k: 'heal' }); } } },
   fervor: { v: (o) => 0.5 * o.n, run: (st, u, x, o, ev, api) => api.gainFervor(st, o.n, ev, 'Compétence') },
 };
@@ -326,7 +326,7 @@ export function composeMove(spec) {
   const hitT = ops.find((o) => o.op === 'hit' && ['t', 'tn'].includes(o.on));
   const M = {
     name: spec.name, icon: spec.icon, ap: spec.ap, cd: spec.cd, target, ops,
-    desc: `${describeOps(ops)}${spec.reach ? ' Même derrière une Garde.' : ''}`,
+    desc: `${describeOps(ops)}${spec.reach ? ' Même derrière un Protecteur.' : ''}`,
     pv: hitT ? (st, u, t, api) => api.dmgOf(st, u, t, hitT.m) : null,
     run(st, u, t, ev, api) {
       const sets = ops.map((o) => opTargets(st, u, t, o.on, api));

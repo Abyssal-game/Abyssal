@@ -38,7 +38,7 @@ const STRIKE_NOUN = [
   [/.*/, ['Assaut', 'm']],
 ];
 // (la frappe de chaque faction et les textes de la fiche sont dans kits.js : FAC_STRIKE, ROLE_TXT)
-const ROLE_NOUN = { protecteur: 'Gardien', degats: 'Chasseur', soin: 'Guérisseur', poison: 'Empoisonneur', controle: 'Entraveur', soutien: 'Meneur', zone: 'Fléau' };
+const ROLE_NOUN = { protecteur: 'Protecteur', degats: 'Chasseur', soin: 'Guérisseur', poison: 'Empoisonneur', controle: 'Entraveur', soutien: 'Meneur', zone: 'Fléau' };
 const ABILITY_ADJ = { charge: 'fonceur', guard: 'inflexible', drain: 'vampirique', first: 'vif', strike: 'explosif', curse: 'maudit', bless: 'béni', aegis: 'protégé', relic: 'éternel', command: 'inspirant', drown: 'étouffant', regen: 'tenace', venom: 'venimeux', frenzy: 'frénétique', armor: 'cuirassé', omen: 'prophétique', cataclysm: 'dévastateur', elusive: 'insaisissable', devour: 'vorace', fear: 'terrifiant' };
 const DEFAULT_ABILITY = ['first', 'frenzy', 'charge']; // créatures sans capacité (rôle Assaut)
 
@@ -48,7 +48,7 @@ const MOVE_TEMPLATES = {
   degats: [
     T([{ op: 'hit', on: 'tn', m: 0.7 }], 1, 2, 'frenesie', [['Balayage', 'm'], ['Tourbillon', 'm'], ['Fauchage', 'm']]),
     T([{ op: 'hit', on: 't', m: 1.4 }, { op: 'brk', on: 't', n: 2 }], 1, 3, 'ecrasement', [['Fracas', 'm'], ['Frappe brutale', 'f'], ['Assaut furieux', 'm']]),
-    T([{ op: 'mark', on: 't' }, { op: 'hit', on: 't', m: 1.0 }], 1, 3, 'embuscade', [['Traque', 'f'], ['Embuscade', 'f'], ['Curée', 'f']]),
+    T([{ op: 'mark', on: 't' }, { op: 'hit', on: 't', m: 1.0 }], 1, 3, 'embuscade', [['Traque', 'f'], ['Embuscade', 'f'], ['Battue', 'f']]),
   ],
   protecteur: [
     T([{ op: 'shield', on: 'self' }, { op: 'shield', on: 'ally' }], 1, 3, 'carapace', [['Carapace', 'f'], ['Mur', 'm'], ['Bouclier double', 'm']]),
