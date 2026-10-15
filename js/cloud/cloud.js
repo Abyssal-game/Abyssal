@@ -29,6 +29,8 @@ function frError(status, body) {
   if (m.includes('signups not allowed') || m.includes('signup is disabled')) return 'Les inscriptions sont fermées pour le moment.';
   if (m.includes('already registered') || m.includes('already exists') || m.includes('already been registered')) return 'Un compte existe déjà avec cet e-mail : connecte-toi.';
   if (m.includes('password should') || m.includes('password is too short') || m.includes('weak password') || m.includes('weak_password')) return 'Mot de passe trop faible : 8 caractères au moins, avec une majuscule, une minuscule, un chiffre et un symbole (! ? # …).';
+  // v324 : le service d'e-mails intégré à Supabase n'envoie que quelques e-mails par heure pour tout le jeu
+  if (m.includes('email rate limit') || m.includes('over_email_send_rate_limit')) return 'Trop d’e-mails envoyés en ce moment : réessaie dans une heure.';
   if (m.includes('rate limit') || m.includes('too many requests') || status === 429) return 'Trop de tentatives : réessaie dans quelques minutes.';
   if (m.includes('unable to validate email') || m.includes('invalid email') || m.includes('invalid format')) return 'Adresse e-mail invalide.';
   if (m.includes('same password') || m.includes('different from the old')) return 'Choisis un mot de passe différent de l’ancien.';
