@@ -1,3 +1,7 @@
 node_modules/
 prompts.csv
 .DS_Store
+
+# captures brutes des stores (regénérées par tools/store-shots.mjs)
+store/raw/
+store/.compose.html
