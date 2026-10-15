@@ -334,7 +334,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   };
   // Synergie entre deux alliés : un trait de lumière relie la poseuse à celle qui exploite, et la bannière le nomme
   const synergy = (byUid, aUid, label) => {
-    app.sfx.crit?.();
+    app.sfx.synergy?.();
     banner(`<small>Synergie</small>${esc(label)}`, 'synergy', 1000);
     if (reduced) return;
     const box = $('.dv'), a = el(byUid), b = el(aUid); if (!box || !a || !b) return;
@@ -380,6 +380,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (st.over) return;
     const b = document.createElement('div'); b.className = `cb-turn ${side === 'enemy' ? 'foe' : 'ally'}`;
     b.innerHTML = `<b>${side === 'enemy' ? 'Tour ennemi' : 'À toi !'}</b>`;
+    (side === 'enemy' ? app.sfx.enemyturn : app.sfx.yourturn)?.();
     $('.dv')?.appendChild(b); setTimeout(() => b.remove(), reduced ? 500 : 1100);
   };
   let aoeHit = false; const lastRect = {}; // place d'une carte disparue (pour l'explosion d'un ennemi déjà tombé) // pendant un Raz-de-marée : une seule vague pour toute la rangée
@@ -490,7 +491,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           await wait(T(700)); d?.classList.remove('focus');
           break;
         }
-        case 'recover': float(e.u, 'Se relève', 'info'); await wait(T(260)); break;
+        case 'recover': app.sfx.recover?.(); float(e.u, 'Se relève', 'info'); await wait(T(260)); break;
         case 'roll': {
           await rollFx(e); lastTier = e.tier;
           const P = pendingLunge; pendingLunge = null;
@@ -524,16 +525,16 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           if (e.s === 'Proie désignée') fxAt(e.u, 'prey', { big: true });
           else if (e.syn) app.sfx.skill();
           if (e.k === 'entrance') ring(e.u, 'enter');
-          if (e.trait === 'explosif') { fxSheet(e.u, 'fx-explode', { k: 2.6, d: 760 }); app.sfx.smash?.(); shake(true); banner(`<img class="cb-trico" alt="" src="assets/icons/st-explosif.webp"> Explosion !`, 'danger', 800); }
-          else if (e.trait) { if (e.trait === 'enrage') fxSheet(e.u, 'fx-enrage', { k: 1.9, d: 820 }); app.sfx.boss?.(); banner(`<img class="cb-trico" alt="" src="assets/icons/st-${e.trait}.webp"> ${esc(e.s)}`, 'danger', 800); }
+          if (e.trait === 'explosif') { fxSheet(e.u, 'fx-explode', { k: 2.6, d: 760 }); app.sfx.explode?.(); shake(true); banner(`<img class="cb-trico" alt="" src="assets/icons/st-explosif.webp"> Explosion !`, 'danger', 800); }
+          else if (e.trait) { if (e.trait === 'enrage') fxSheet(e.u, 'fx-enrage', { k: 1.9, d: 820 }); (e.trait === 'enrage' ? app.sfx.enrage : app.sfx.boss)?.(); banner(`<img class="cb-trico" alt="" src="assets/icons/st-${e.trait}.webp"> ${esc(e.s)}`, 'danger', 800); }
           if (e.combo && e.by && e.a && e.by !== e.a && st.units[e.by]?.side === 'ally') { synergy(e.by, e.a, e.s); await wait(T(380)); if (!g.s.tips?.['cb-combo']) tuto(app, 'cb-combo'); }
           if (e.combo) comboPop(e.u, e.combo);
           float(e.u, e.s, e.syn ? 'syn' : e.k === 'bad' ? 'dmg' : 'info');
           draw();
           await wait(T(e.syn ? 480 : 260));
           break;
-        case 'combo': comboPop(e.u, 'chain'); float(e.u, `Chaîne ×${e.n}`, 'combo'); app.sfx.crit?.(); await wait(T(260)); if (!g.s.tips?.['cb-combo']) tuto(app, 'cb-combo'); break;
-        case 'finisher': { if (st.over === 'won') break; if (!reduced) { const d = $('.dv'); d.classList.add('slowmo'); setTimeout(() => d.classList.remove('slowmo'), 700); } banner('Coup de grâce !', 'finisher', 800); await wait(T(380)); break; }
+        case 'combo': comboPop(e.u, 'chain'); float(e.u, `Chaîne ×${e.n}`, 'combo'); app.sfx.chain?.(); await wait(T(260)); if (!g.s.tips?.['cb-combo']) tuto(app, 'cb-combo'); break;
+        case 'finisher': { if (st.over === 'won') break; if (!reduced) { const d = $('.dv'); d.classList.add('slowmo'); setTimeout(() => d.classList.remove('slowmo'), 700); } banner('Coup de grâce !', 'finisher', 800); app.sfx.finisher?.(); await wait(T(380)); break; }
         case 'die': {
           const u = st.units[e.u];
           if (u?.boss) {
@@ -554,8 +555,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         }
         case 'enter': draw(); el(e.u)?.classList.add('enter'); await wait(T(340)); break;
         case 'revive': draw(); float(e.u, 'Relevée !', 'heal'); await wait(T(280)); break;
-        case 'actor': draw(); if (!reduced) { const t = el(e.u); t?.classList.remove('myturn'); void t?.offsetWidth; t?.classList.add('myturn'); } app.sfx.tap?.(); await wait(T(260)); break;
-        case 'pa': { const t = el(e.u); if (t && st.units[e.u]?.side === 'ally') float(e.u, `+${e.d} PA`, 'pa'); break; }
+        case 'actor': draw(); if (!reduced) { const t = el(e.u); t?.classList.remove('myturn'); void t?.offsetWidth; t?.classList.add('myturn'); } app.sfx.actor?.(); await wait(T(260)); break;
+        case 'pa': { const t = el(e.u); if (t && st.units[e.u]?.side === 'ally') { float(e.u, `+${e.d} PA`, 'pa'); app.sfx.pa?.(); } break; }
         case 'phase': draw(); say(e.side === 'enemy' ? '<b class="dc-bad">Tour des créatures corrompues</b>' : 'À toi !'); turnBanner(e.side); await wait(T(e.side === 'enemy' ? 520 : 420)); break;
         case 'ult': if (st.ult === 'sceau') dio.seal(); else dio.ult(); await ultFx(); break;
         case 'law': if (e.aspect) dio.aspect(e.aspect); draw(); banner(e.fatigue ? `${icon('skull')} Épuisement : chaque tour blesse tout le monde` : e.law ? esc(LAWS[e.law].name) : esc(ASPECTS[e.aspect].name), e.fatigue ? 'danger' : 'skill', 1300); await wait(T(e.fatigue ? 900 : 700)); break;
@@ -650,7 +651,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         const bonus = gap <= 0.1 ? RHYTHM.perfect : gap <= 0.28 ? RHYTHM.good : 0;
         ov.classList.add(bonus === RHYTHM.perfect ? 'perfect' : bonus ? 'good' : 'miss');
         res.textContent = bonus === RHYTHM.perfect ? `Parfait ! +${bonus}` : bonus ? `Bien ! +${bonus}` : s === null ? 'Trop tard' : 'Raté';
-        if (bonus === RHYTHM.perfect) { app.sfx.parry(); if (!reduced) { const d = $('.dv'); d.classList.remove('ry-shake'); void d.offsetWidth; d.classList.add('ry-shake'); } }
+        if (bonus === RHYTHM.perfect) { app.sfx.perfect(); if (!reduced) { const d = $('.dv'); d.classList.remove('ry-shake'); void d.offsetWidth; d.classList.add('ry-shake'); } }
         else if (bonus) app.sfx.hit(); else app.sfx.miss();
         setTimeout(() => { ov.classList.add('out'); setTimeout(() => { ov.remove(); resolve(bonus); }, 220); }, bonus === RHYTHM.perfect ? 650 : 480);
       };

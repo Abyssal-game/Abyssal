@@ -260,7 +260,7 @@ export function openPack(app, type, { faction, onDone, preset = null, title = nu
       btn.classList.add('charging');
       el.classList.add('hush');
       if (big) el.classList.add('hush-big');
-      app.sfx.rumble(big ? 1.3 : 0.6);
+      (big ? app.sfx.suspensebig : app.sfx.suspense)();
       try { navigator.vibrate?.(big ? [40, 60, 40, 60, 60, 40, 120] : [30, 50, 40]); } catch (e) { /* rien */ }
       await wait(big ? 1300 : 600);
       if (phase === 'summary') { busy = false; return; }

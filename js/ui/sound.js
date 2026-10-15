@@ -311,6 +311,20 @@ export const sfx = {
   apogee() { sfx.achievement(); },
   fame() { sfx.achievement(); },
   season() { sfx.achievement(); },
+  // v263 : sons propres au combat chacun son tour et aux synergies (un fichier livré les remplace ; sinon une variante synthétisée)
+  yourturn() { bell(N.D5, { dur: 0.7, gain: 0.07, ratio: 2, index: 1 }); bell(N.A5, { dur: 0.9, gain: 0.06, ratio: 2, index: 1, delay: 0.08, pan: 0.2 }); whoosh({ dur: 0.25, gain: 0.07, from: 500, to: 3000 }); },
+  enemyturn() { grit(N.D3 * 0.5, { dur: 0.5, gain: 0.1, to: N.A3 * 0.5, lp: 600 }); thump(70, { to: 35, dur: 0.4, gain: 0.35 }); },
+  actor() { bell(N.A5, { dur: 0.35, gain: 0.05, ratio: 2, index: 0.8 }); noise({ dur: 0.03, gain: 0.2, freq: 3000, q: 1.2 }); },
+  pa() { bell(N.E6, { dur: 0.3, gain: 0.035, ratio: 2, index: 0.6 }); },
+  synergy() { sfx.crit(); },
+  chain() { sfx.crit(); },
+  finisher() { sfx.smash(); },
+  explode() { sfx.smash(); sfx.shatter(); },
+  enrage() { sfx.fury(); },
+  perfect() { sfx.parry(); },
+  recover() { osc(N.D3, { type: 'sawtooth', dur: 0.5, gain: 0.04, to: N.A3, lp: 500, lpTo: 1500, wet: 0.4 }); thump(90, { gain: 0.2, delay: 0.3 }); },
+  suspense() { sfx.rumble(0.6); },
+  suspensebig() { sfx.rumble(1.3); },
   defeat() {
     pad([N.D3, N.F3, N.A3], { dur: 2.2, gain: 0.04, attack: 0.3, lp: 700, lpTo: 200 });
     bell(98, { dur: 3, gain: 0.12, ratio: 1.41, index: 3, delay: 0.1, wet: 0.8 }); thump(55, { to: 28, dur: 1, gain: 0.5, delay: 0.1 });
@@ -349,7 +363,7 @@ function playSample(key) {
 }
 
 // Vibrations associées (nombre de petites impulsions) et baisse de la musique pendant les grands moments
-const HAP = { bossvictory: 3, shield: 1, taunt: 1, hit: 1, slash: 1, smash: 2, crit: 2, capture: 1, block: 1, parry: 1, shatter: 3, boss: 3, ult: 2, victory: 3, defeat: 2, error: 1, dice: 1, tear: 1, achievement: 2, pose: 1, fury: 2, death: 1, levelup: 1, burnall: 2, chest: 2, apogee: 2, fame: 1, season: 1 };
+const HAP = { explode: 2, finisher: 2, synergy: 1, enemyturn: 1, suspensebig: 2, bossvictory: 3, shield: 1, taunt: 1, hit: 1, slash: 1, smash: 2, crit: 2, capture: 1, block: 1, parry: 1, shatter: 3, boss: 3, ult: 2, victory: 3, defeat: 2, error: 1, dice: 1, tear: 1, achievement: 2, pose: 1, fury: 2, death: 1, levelup: 1, burnall: 2, chest: 2, apogee: 2, fame: 1, season: 1 };
 const DUCK = { bossvictory: 5, victory: 3.5, defeat: 4, ult: 2.5, achievement: 2, boss: 2, apogee: 2.5, fame: 2, season: 2 };
 for (const k of Object.keys(sfx)) {
   const f = sfx[k];
@@ -368,5 +382,6 @@ export const SFX_DEMO = [
   ['Toucher', () => sfx.tap()], ['Ouverture', () => sfx.tear()], ['Rare', () => sfx.reveal('R')], ['Mythique', () => sfx.reveal('M')],
   ['Coup', () => sfx.slash()], ['Coup lourd', () => sfx.smash()], ['Parade', () => sfx.parry()], ['Brisure', () => sfx.shatter()],
   ['Soin', () => sfx.heal()], ['Gel', () => sfx.freeze()], ['Passif', () => sfx.passive()], ['Bouclier', () => sfx.shield()], ['Renfort', () => sfx.boost()], ['Gardien', () => sfx.boss()], ['Pouvoir', () => sfx.ult()],
-  ['Dé', () => sfx.dice()], ['Victoire', () => sfx.victory()], ['Défaite', () => sfx.defeat()],
+  ['Dé', () => sfx.dice()], ['À toi', () => sfx.yourturn()], ['Tour ennemi', () => sfx.enemyturn()], ['Synergie', () => sfx.synergy()], ['Explosion', () => sfx.explode()],
+  ['Victoire', () => sfx.victory()], ['Défaite', () => sfx.defeat()],
 ];
