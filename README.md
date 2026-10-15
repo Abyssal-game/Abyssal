@@ -53,7 +53,7 @@ Node.js 18 ou plus suffit pour ces commandes ; aucune dépendance n’est à ins
 
 1. Pousser le contenu du dossier à la racine d’un dépôt (branche `main`).
 2. Dans le dépôt : **Settings → Pages → Build and deployment → Deploy from a branch**, choisir `main` et `/ (root)`.
-3. Le jeu sera disponible à `https://<utilisateur>.github.io/<dépôt>/`.
+3. Le jeu est disponible à l’adresse publique https://abyssal-game.github.io/Abyssal/ et la page de confidentialité à https://abyssal-game.github.io/Abyssal/confidentialite.html.
 
 Tous les chemins sont relatifs : le jeu fonctionne dans un sous-dossier. Sur iPhone : ouvrir le lien dans Safari, bouton Partager, « Sur l’écran d’accueil ». Après une première visite, le jeu fonctionne hors ligne (les polices Google sont mises en cache si elles ont été chargées une fois).
 
