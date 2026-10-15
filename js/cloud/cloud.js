@@ -69,14 +69,17 @@ export async function signIn(email, password) {
 }
 // Inscription. Avec la confirmation par e-mail (réglage Supabase par défaut), la réponse n'a pas de jeton :
 // le joueur reçoit un lien, qui ramène au jeu connecté (voir consumeAuthHash). Sans confirmation, il est connecté tout de suite.
+// v322 : les liens des e-mails (confirmation, mot de passe oublié) ramènent toujours à l'adresse publique du jeu,
+// même si le « Site URL » de Supabase est mal réglé (l'adresse doit figurer dans les Redirect URLs de Supabase).
+const RETURN_TO = '?redirect_to=' + encodeURIComponent('https://abyssal-game.github.io/Abyssal/');
 export async function signUp(email, password) {
-  const r = await call('/auth/v1/signup', { method: 'POST', auth: false, body: { email: email.trim(), password, data: {} } });
+  const r = await call('/auth/v1/signup' + RETURN_TO, { method: 'POST', auth: false, body: { email: email.trim(), password, data: {} } });
   if (r?.access_token) store(r);
   return { loggedIn: !!r?.access_token, user: r?.user || r };
 }
 // Mot de passe oublié : Supabase envoie un lien qui ramène au jeu avec un jeton « recovery » (voir consumeAuthHash).
 export async function recover(email) {
-  await call('/auth/v1/recover', { method: 'POST', auth: false, body: { email: email.trim() } });
+  await call('/auth/v1/recover' + RETURN_TO, { method: 'POST', auth: false, body: { email: email.trim() } });
 }
 // Nouveau mot de passe (après un lien de récupération, ou connecté).
 export async function updatePassword(password) {
