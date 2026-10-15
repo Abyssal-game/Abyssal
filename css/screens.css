@@ -1363,3 +1363,7 @@ button.avatar-big { position: relative; padding: 0; cursor: pointer; font: inher
 .album-arr .ic { width: 18px; height: 18px; }
 .album-nav .album-dots { margin: 0; }
 @media (prefers-reduced-motion: reduce) { .album-page.turn { animation: none; } }
+/* v280 : Sublimer une carte (fiche, onglet Rareté) */
+.dt-sub { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin: 10px 0; padding: 12px 14px; border-color: rgba(242, 193, 78, .45); }
+.dt-sub > b { display: flex; align-items: center; gap: 6px; color: #FFE7A6; }
+.dt-sub .btn { align-self: stretch; justify-content: center; }

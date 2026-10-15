@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v279'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v280'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -52,9 +52,12 @@ export const BOOSTERS = {
 };
 
 // Chance (en %) qu'une carte tirée sorte dans chaque finition (×2 dans un booster premium).
-// Les boosters sont la seule source de finitions : elles restent rares.
-// Par booster standard de 3 cartes : ~7,5 % d'une holographique, ~1,5 % d'une or, ~0,3 % d'une cosmique.
-export const VARIANT_RATES = { holo: 2.5, gold: 0.5, galaxy: 0.1 };
+// v280 : plus fréquentes qu'avant (2,5 / 0,5 / 0,1) ; on peut aussi sublimer une carte avec des cendres (SUBLIME_ASH).
+// Par booster standard de 3 cartes : ~12 % d'une holographique, ~3,6 % d'une or, ~1,2 % d'une cosmique.
+export const VARIANT_RATES = { holo: 4, gold: 1.2, galaxy: 0.4 };
+// Sublimer : obtenir la finition suivante d'une carte qu'on possède déjà dans la finition précédente.
+// Coût = cendres de base de la rareté × ce facteur ; toujours plus que ce que la carte rapporte brûlée (burnFinish).
+export const SUBLIME_ASH = { holo: 4, gold: 10, galaxy: 24 };
 // Anciennes variantes retirées : les exemplaires possédés deviennent la variante indiquée.
 export const OLD_VARIANTS = { chroma: 'holo', corrupt: 'holo', alt: 'holo', ancestral: 'gold', special: 'normal' };
 // Ordre d'affichage par défaut : la finition la plus rare possédée

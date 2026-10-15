@@ -52,6 +52,17 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
       return `<div><span>${esc(VARIANTS[v].name)}</span><b>1 / ${n.toLocaleString('fr-FR')}</b></div>`;
     }).join('');
   }
+  // v280 : chance qu'un booster standard (3 cartes) contienne au moins une carte de cette finition
+  const anyOdds = (v) => Math.round(1 / (1 - (1 - VARIANT_RATES[v] / 100) ** 3));
+  // v280 : Sublimer — la finition suivante contre des cendres
+  function sublimeHTML() {
+    const x = g.sublimeInfo(current);
+    if (!x) return '';
+    const can = g.s.ash >= x.cost;
+    return `<div class="panel dt-sub"><b>${icon('sparkle')} Sublimer en ${esc(VARIANTS[x.to].name.toLowerCase())}</b>
+      <span class="small muted">Tu la possèdes en ${esc(VARIANTS[x.from].name.toLowerCase())} : obtiens un exemplaire ${esc(VARIANTS[x.to].name.toLowerCase())} contre des cendres. Ta carte actuelle est conservée.</span>
+      <button class="btn small ${can ? 'gold' : ''}" data-act="sub" ${can ? '' : 'disabled'}>Sublimer · ${x.cost.toLocaleString('fr-FR')} ${icon('ash')}${can ? '' : ` · tu en as ${g.s.ash.toLocaleString('fr-FR')}`}</button></div>`;
+  }
   // Forme corrompue : présentation, condition d'éveil et choix de la forme emmenée au combat
   function formHTML(card) {
     const f = FORMS[card.id];
@@ -105,7 +116,9 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
           ${line ? `<h3 class="section-title">${esc(line.name)}</h3><div class="strip">${line.cards.map((c) => cardHTML(c, { mystery: !g.owns(c.id), nameKnown: g.nameKnown(c.id) })).join('')}</div><p class="small muted">Stade ${card.evolution.stage} sur ${card.evolution.stages}.</p>` : ''}
           ${sets.length ? `<h3 class="section-title">Ensembles</h3><div class="stack">${sets.map((s) => { const p = g.setProgress(s.key); return `<a class="set-link panel" href="#/succes/ensembles"><b class="set-h">${setIcon(s.key)}<span>${esc(s.name)}</span></b><span class="small muted">${p.owned} / ${p.total}${p.done ? ' · complété' : ''}</span><span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span></a>`; }).join('')}</div>` : ''}`,
         rarity: `<p>${odds(card)}</p><p class="small muted">Chance de la trouver dans une version spéciale, par booster standard :</p><div class="var-odds">${variantOdds(card)}</div>
-          <p class="small muted">Les finitions ne s’obtiennent que dans les boosters (deux fois plus souvent dans un premium). Brûlée dans la Fournaise, une carte holographique vaut ×${ECONOMY.burnFinish.holo} cendres, or ×${ECONOMY.burnFinish.gold}, cosmique ×${ECONOMY.burnFinish.galaxy}.</p>`,
+          <p class="small muted">Toutes cartes confondues, environ un booster standard sur ${anyOdds('holo')} contient une holographique, un sur ${anyOdds('gold')} une feuille d’or et un sur ${anyOdds('galaxy')} une cosmique (deux fois plus souvent dans un premium).</p>
+          ${sublimeHTML()}
+          <p class="small muted">Brûlée dans la Fournaise, une carte holographique vaut ×${ECONOMY.burnFinish.holo} cendres, or ×${ECONOMY.burnFinish.gold}, cosmique ×${ECONOMY.burnFinish.galaxy}.</p>`,
       };
       body = `
         <div class="dt-sum">
@@ -143,6 +156,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     prev() { const i = list.indexOf(current); if (i > 0) { current = list[i - 1]; shownVariant = null; draw(); } },
     next() { const i = list.indexOf(current); if (i < list.length - 1) { current = list[i + 1]; shownVariant = null; draw(); } },
     variant(el) { shownVariant = el.dataset.v; draw(); },
+    sub() { try { const x = g.sublime(current); shownVariant = x.to; app.sfx?.levelup?.(); toast(`Carte sublimée : la voici en <b>${esc(VARIANTS[x.to].name.toLowerCase())}</b> (−${x.cost.toLocaleString('fr-FR')} cendres).`, { kind: 'success', icon: 'sparkle' }); draw(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } },
     showv() { try { g.setShownVariant(current, shownVariant); app.sfx.tap(); toast(`Apparence <b>${esc(VARIANTS[shownVariant].name.toLowerCase())}</b> affichée partout.`, { icon: 'eye' }); draw(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } },
     fav() { const on = g.toggleFav(current); app.sfx?.tap?.(); toast(on ? 'Ajoutée à tes favoris : elle ne pourra pas être brûlée par erreur.' : 'Retirée de tes favoris.', { icon: 'star' }); draw(); },
     chal(el) { try { const x = g.claimChallenge(current, el.dataset.k); app.sfx?.levelup?.(); toast(`Défi « ${esc(x.name)} » réussi : <b>+${x.ash} cendres</b> et +${x.fame} Renommée`, { kind: 'success', icon: 'ash' }); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },

@@ -10,7 +10,7 @@ export const CHALLENGES = [
 export const WEEK_DAYS = 5; // jours joués dans la semaine pour le coffre de la semaine
 export const FIRST_WIN = 50;
 export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par combat n'augmentent plus // éclats de la toute première victoire
-import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ITEMS, SHOW_ORDER, SHADOW } from '../config.js';
+import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ITEMS, SHOW_ORDER, SHADOW, SUBLIME_ASH } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today } from './save.js';
 import { rngOf, DESCENT, CHESTS, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES, foeTraits } from './descent.js';
@@ -366,6 +366,25 @@ export class Game {
   spare(id) { const e = this.s.collection[id]; return e ? Object.values(e.v).reduce((a, k) => a + Math.max(0, (k || 0) - 1), 0) : 0; }
   spareCount(r) { return this.catalog.byRarity[r].reduce((a, c) => a + this.spare(c.id), 0); }
   // Cendres rendues par un exemplaire brûlé : rareté × finition
+  // v280 : Sublimer — la finition suivante contre des cendres, si la carte est déjà possédée dans la finition précédente
+  sublimeInfo(id) {
+    const card = this.catalog.get(id), e = this.s.collection[id];
+    if (!card || !e) return null;
+    const order = ['normal', ...['holo', 'gold', 'galaxy'].filter((v) => card.variants.includes(v))];
+    const to = order.find((v, i) => i > 0 && !e.v[v] && e.v[order[i - 1]]);
+    if (!to) return null;
+    return { to, from: order[order.indexOf(to) - 1], cost: Math.round((ECONOMY.burnAsh[card.rarity] || 0) * SUBLIME_ASH[to]) };
+  }
+  sublime(id) {
+    const x = this.sublimeInfo(id);
+    if (!x) throw new Error('Rien à sublimer pour cette carte.');
+    if (this.s.ash < x.cost) throw new Error(`Il te manque ${x.cost - this.s.ash} cendres (tu en as ${this.s.ash}).`);
+    this.s.ash -= x.cost;
+    this.addCard(id, x.to, 'reward');
+    const progress = this.checkProgress();
+    this.persist();
+    return { ...x, progress };
+  }
   burnValue(id, variant = 'normal') { return Math.round((ECONOMY.burnAsh[this.catalog.get(id).rarity] || 0) * (ECONOMY.burnFinish[variant] || 1)); }
   // Brûle n exemplaires d'une finition. Le dernier exemplaire peut partir : la créature quitte alors la collection.
   burn(id, variant = 'normal', n = 1) {
