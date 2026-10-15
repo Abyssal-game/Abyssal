@@ -2705,3 +2705,7 @@ body.battle-mode .dv.cb { gap: 5px; }
 .boot-tap { margin: 18px 0 0; font: 700 clamp(.85rem, 3.8vw, 1.05rem)/1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; color: #E2B860; text-shadow: 0 0 12px rgba(226, 184, 96, .6), 0 2px 4px #000; animation: bootTap 1.8s ease-in-out infinite, dvIn .6s ease-out both; }
 @keyframes bootTap { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .boot-tap { animation: none; } }
+/* v294 : « Étage suivant » et « Descendre » — violet adouci : cadre fin et discret, fond sombre neutre à peine teinté, plus de halo */
+.dr-down { border-color: rgba(150, 120, 210, .28) !important; background: radial-gradient(120% 80% at 50% 25%, rgba(120, 90, 200, .08), transparent 65%), linear-gradient(180deg, rgba(18, 16, 24, .95), rgba(9, 8, 12, .95)) !important; }
+.dc-stair.down { border-color: rgba(150, 120, 210, .3) !important; background: linear-gradient(100deg, rgba(60, 46, 96, .28), rgba(14, 12, 18, .96) 70%) !important; box-shadow: none !important; }
+.dc-stair.down b { color: #EDE6F7; }
