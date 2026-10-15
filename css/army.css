@@ -2499,3 +2499,9 @@ body.has-subnav #subnav .sn-tab { background: #16121E; }
 @media (max-width: 360px) { .cb-warn small { display: none; } }
 @media (prefers-reduced-motion: reduce) { .cb-warn { animation: none; } }
 .cb-warn { z-index: 9; top: -18px; }
+
+/* v269 : Hâte et Assaut conjoint dans la fenêtre d'actions (deux rangées de 4 au besoin) */
+.cb-grid.n8 { grid-template-columns: repeat(4, 1fr); row-gap: 6px; }
+.cb-a[data-a="duo"] { box-shadow: 0 0 14px rgba(180, 120, 255, .75); border-radius: 12px; animation: cbDuo 1.4s ease-in-out infinite; }
+@keyframes cbDuo { 50% { box-shadow: 0 0 22px rgba(200, 150, 255, .95); } }
+@media (prefers-reduced-motion: reduce) { .cb-a[data-a="duo"] { animation: none; } }

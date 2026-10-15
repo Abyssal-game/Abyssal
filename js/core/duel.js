@@ -203,6 +203,28 @@ export function dmgOf(st, a, t, mult = 1, { basic = false } = {}) {
 // Enchaînement : +1 dégât par autre créature de ton équipe qui a déjà frappé cette cible ce tour-ci (+2 au plus)
 export const COMBO_MAX = 2;
 export const MARK_MULT = 1.5, MARK_BRK = 2, RIPOSTE_MAX = 3, HEAL_WARD = 0.2;
+// v269 : Hâte, Assaut conjoint, détonation du poison
+export const HASTE_PA = 2, DUO_FERVOR = 3, DUO_MULT = 1.25, DETONATE_AT = 6, DETONATE_MULT = 1.5;
+export const DUO_FX = {
+  protecteur: 'Brèche sur la cible et bouclier sur ta créature la plus blessée',
+  degats: 'son coup fait +50 %',
+  soin: 'soigne tes créatures au combat (15 % de leurs PV)',
+  poison: '+4 poison sur la cible',
+  controle: 'gèle la cible (ralentit un gardien ou une élite)',
+  soutien: '+1 PA à chacune de tes créatures au combat',
+  zone: 'les voisins de la cible subissent la moitié des dégâts',
+};
+// Assaut conjoint : l'alliée qui joue juste après dans l'ordre des tours (elle perd ce tour à venir)
+export function duoPartner(st, u) {
+  if (!st.init || !u) return null;
+  for (const id of st.init.slice((st.ip ?? -1) + 1)) {
+    const x = st.units[id];
+    if (!x || x.side !== 'ally') continue;
+    if (x.uid !== u.uid && inFront(st, x) && !x.frozen && !x.stunned && x.skipTurn !== st.round) return x;
+  }
+  return null;
+}
+const later = (st, uid) => !!st.init && st.init.indexOf(uid) > (st.ip ?? -1);
 export function comboOf(st, a, t) {
   const by = st.hitBy?.[t.uid];
   return by ? Math.min(COMBO_MAX, by.filter((x) => x !== a.uid).length) : 0;
@@ -269,7 +291,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
       ev.push({ t: 'status', u: u.uid, s: 'Marque consommée !', syn: true, combo: 'chasse', by, a: src });
       if (!wasCracked) breakHit(st, u, MARK_BRK, ev, s0);
     }
-    if (wasCracked && u.cracked && (ate || st.rupture === src)) fracture(st, u, ev);
+    if (wasCracked && u.cracked && (ate || st.rupture === src || st.rupture === '*')) fracture(st, u, ev);
   }
   if (breached && d > 0) { st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: u.uid, s: 'Brèche exploitée !', syn: true, combo: 'breche', by: breached.by, a: src }); if (u.hp > 0) breakHit(st, u, 3, ev, st.units[src]); }
   const a = src && st.units[src];
@@ -499,6 +521,22 @@ export function actionsFor(st, uid) {
     if (mv.ok && mv.target !== 'none' && !actionTargets(st, uid, mk).length) { mv.ok = false; mv.why = 'Aucune cible possible.'; }
     out.splice(2, 0, mv);
   }
+  if (st.init && u.role === 'soutien') {
+    const h = base('hate', { name: 'Hâte', icon: 'p:hourglass', pa: HASTE_PA, fervor: 0, target: 'ally', desc: 'Une de tes créatures qui n’a pas encore joué ce tour-ci joue juste après elle. Une fois par tour.' });
+    if (h.ok && st.hasteRound === st.round) { h.ok = false; h.why = 'Une seule Hâte par tour.'; }
+    if (h.ok && !actionTargets(st, uid, 'hate').length) { h.ok = false; h.why = 'Aucune de tes créatures ne joue plus tard ce tour-ci.'; }
+    out.push(h);
+  }
+  if (st.init) {
+    const p = duoPartner(st, u);
+    const c = base('duo', { name: 'Assaut conjoint', icon: 'p:combo', pa: 0, fervor: 0, target: 'enemy', desc: `Elle et ${p ? p.name : 'l’alliée qui joue juste après'} frappent ensemble (×1,25 chacune), avec l’effet de leurs deux rôles. Sur un ennemi Fêlé, Brisé ou Marqué. ${DUO_FERVOR} Ferveur, une fois par combat ; l’alliée appelée perd son tour à venir.` });
+    c.ap = 0; c.fervor = DUO_FERVOR; c.partner = p?.uid || null;
+    if (c.ok && st.duoUsed) { c.ok = false; c.why = 'Une seule fois par combat.'; }
+    else if (c.ok && !p) { c.ok = false; c.why = 'Il faut une de tes créatures qui joue après elle ce tour-ci.'; }
+    else if (c.ok && st.fervor < DUO_FERVOR) { c.ok = false; c.why = `Il faut ${DUO_FERVOR} Ferveur.`; }
+    else if (c.ok && !actionTargets(st, uid, 'duo').length) { c.ok = false; c.why = 'Il faut un ennemi Fêlé, Brisé ou Marqué.'; }
+    out.push(c);
+  }
   const sw = out.find((x) => x.key === 'swap'), d = out.find((x) => x.key === 'defend');
   if (sw.ok && st.swapped) { sw.ok = false; sw.why = 'Une seule permutation par tour.'; }
   if (sw.ok && !reserve(st, 'ally').length) { sw.ok = false; sw.why = 'Ta réserve est vide.'; }
@@ -516,6 +554,8 @@ export function actionTargets(st, uid, key) {
   if (key === 'rempart') return front(st, 'ally').filter((x) => x.uid !== uid).map((x) => x.uid);
   if (key === 'priere') return front(st, 'ally').map((x) => x.uid);
   if (key === 'swap') return reserve(st, 'ally').map((x) => x.uid);
+  if (key === 'hate') return front(st, 'ally').filter((x) => x.uid !== uid && st.init && st.init.indexOf(x.uid) > (st.ip ?? -1) + 1 && x.skipTurn !== st.round).map((x) => x.uid);
+  if (key === 'duo') return targetsFor(st, 'ally', u).filter((id) => { const t = st.units[id]; return t.cracked || t.broken || t.mark; });
   const M = moveFor(u, key);
   if (M) {
     if (M.targets) return M.targets(st, u, API);
@@ -576,6 +616,7 @@ export function preview(st, uid, key, tUid) {
     if (key === 'attack') out.dmg = strikeDmg(st, u, t);
     if (key === 'estoc') out.dmg = dmgOf(st, u, t, 2);
     if (moveFor(u, key)?.pv) out.dmg = moveFor(u, key).pv(st, u, t, API);
+    if (key === 'duo') { const pa = duoPartner(st, u); out.dmg = dmgOf(st, u, t, DUO_MULT * (u.role === 'degats' ? 1.5 : 1), { basic: true }) + (pa ? dmgOf(st, pa, { ...t, mark: 0 }, DUO_MULT * (pa.role === 'degats' ? 1.5 : 1), { basic: true }) : 0); }
     if (out.dmg && t.boss) out.dmg = Math.min(out.dmg, bossCap(t));
     // Brisure prévue (réussite pour le Coup d'estoc) ; l'ennemi doit survivre au coup pour être brisé
     const b = t.brkMax && !t.broken && !t.shield ? brkTotal(st, u, brkOf(st, u, t, key) + (key === 'attack' ? strikeBrk(u, t) : 0)) : 0;
@@ -597,13 +638,20 @@ export function act(st, uid, key, tUid = null) {
   if (st.init) u.pa = Math.max(0, (u.pa || 0) - a.ap);
   else { st.ap -= a.ap; st.fervor -= a.fervor; st.gauge = st.fervor; }
   st.seq = (st.seq || 0) + 1; // une cible Fêlée par cette action ne peut pas être brisée par elle
-  st.rupture = RUPTURE_KEYS.includes(key) || (key === 'attack' && u.role === 'protecteur') ? uid : null;
+  st.rupture = key === 'duo' ? '*' : RUPTURE_KEYS.includes(key) || (key === 'attack' && u.role === 'protecteur') ? uid : null;
+  if (key === 'duo') { st.fervor -= DUO_FERVOR; st.gauge = st.fervor; }
   if (key !== 'swap') u.acts++;
   const t = tUid ? st.units[tUid] : null;
   ev.push({ t: 'act', u: uid, key, tgt: tUid, name: a.name, skill: !['attack', 'defend', 'swap'].includes(key) });
   if (key === 'attack') basicAttack(st, u, t, ev);
   else if (key === 'defend') { u.defend = true; ev.push({ t: 'status', u: uid, s: 'En défense', k: 'defend' }); }
   else if (key === 'swap') doSwap(st, u, t, ev);
+  else if (key === 'hate') {
+    // la créature choisie joue juste après la Soutien
+    const i = st.init.indexOf(tUid); st.init.splice(i, 1); st.init.splice(st.ip + 1, 0, tUid);
+    st.hasteRound = st.round; st.stats.hastes = (st.stats.hastes || 0) + 1;
+    ev.push({ t: 'status', u: tUid, s: 'Hâte : elle joue juste après', syn: true, k: 'haste' });
+  } else if (key === 'duo') duoStrike(st, u, t, ev);
   else if (key === 'rempart') { t.guardBy = uid; u.rempart = tUid; ev.push({ t: 'status', u: tUid, s: 'Rempart', k: 'guard' }); }
   else if (key === 'priere') {
     const raw = Math.round(t.maxHp * 0.4 * (t.healMult || 1)), got = heal(t, t.maxHp * 0.4, ev, u);
@@ -614,7 +662,11 @@ export function act(st, uid, key, tUid = null) {
   } else if (key === 'marque') { t.mark = 2 + linger(st, uid); t.markBy = uid; discover(st, t, ev); ev.push({ t: 'status', u: tUid, s: 'Marquée', k: 'mark' }); }
   else if (key === 'raz') {
     ev.push({ t: 'aoe', u: uid, side: 'ally' });
-    front(st, 'enemy').forEach((x) => { const b = brkOf(st, u, x, 'raz'); const d = hurt(st, x, dmgOf(st, u, x, 0.7), ev, uid); if (d) breakHit(st, x, b, ev, u); if (d) setBreach(st, x, uid, ev); });
+    front(st, 'enemy').forEach((x) => {
+      const b = brkOf(st, u, x, 'raz'); const d = hurt(st, x, dmgOf(st, u, x, 0.7), ev, uid); if (d) breakHit(st, x, b, ev, u); if (d) setBreach(st, x, uid, ev);
+      // Condamnation (v269) : un poison lourd détone sous la vague
+      if (x.hp > 0 && (x.poison || 0) >= DETONATE_AT) { const k = Math.round(x.poison * DETONATE_MULT); x.poison = 0; st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: x.uid, s: `Détonation ! −${k}`, syn: true, k: 'poison', combo: 'glace' }); hurt(st, x, k, ev, uid); }
+    });
   } else if (key === 'estoc') {
     const info = rollInfo(st, uid, key, tUid);
     const tier = resolveRoll(st, info, ev, uid, tUid);
@@ -646,7 +698,11 @@ export function act(st, uid, key, tUid = null) {
     const tier = resolveRoll(st, info, ev, uid, tUid);
     // critique d'une Mythique ou Secrète sur un ennemi ordinaire : gelé 2 tours
     if (tier === 'crit' || tier === 'success') { freeze(st, t, ev, tier === 'crit' && (u.rarity === 'M' || u.rarity === 'S') && !t.boss && !t.elite ? 2 : 1); t.frozenBy = uid; if (tier === 'crit') breakHit(st, t, 3, ev, u); openUp(st, t, uid, ev); }
-    else if (tier === 'partial') { t.slow = true; ev.push({ t: 'status', u: tUid, s: 'Ralentie', k: 'frost' }); }
+    else if (tier === 'partial') {
+      // v269 : Retard — elle recule dans l'ordre de ce tour (2 places, 1 pour un gardien) ; si elle a déjà joué, elle est ralentie
+      if (later(st, tUid)) { const i = st.init.indexOf(tUid), j = Math.min(st.init.length - 1, i + (t.boss ? 1 : 2)); st.init.splice(i, 1); st.init.splice(j, 0, tUid); ev.push({ t: 'status', u: tUid, s: 'Retardée', k: 'frost', syn: true }); }
+      else { t.slow = true; ev.push({ t: 'status', u: tUid, s: 'Ralentie', k: 'frost' }); }
+    }
   } else if (moveFor(u, key)) { u.mvReady = st.round + rechargeOf(u, key); u.struck = true; u.lastStruck = st.round; moveFor(u, key).run(st, u, t, ev, API); }
   if (['attack', 'estoc', 'raz'].includes(key) || moveFor(u, key)?.pv) st.ombreUsed = true;
   if (st.init && a.gain && u.hp > 0) gainPA(u, a.gain, ev);
@@ -727,6 +783,31 @@ function basicAttack(st, u, t, ev) {
   if ((st.relics || []).includes('coeur')) { st.coeurTick = !st.coeurTick; if (st.coeurTick) return; }
   gainFervor(st, 1, ev);
 }
+function duoStrike(st, u, t, ev) {
+  const p = duoPartner(st, u);
+  if (!p || !t) return;
+  st.duoUsed = true; p.skipTurn = st.round; st.stats.duos = (st.stats.duos || 0) + 1; st.stats.named = (st.stats.named || 0) + 1;
+  ev.push({ t: 'duo', u: u.uid, p: p.uid, tgt: t.uid });
+  let total = 0;
+  for (const x of [u, p]) {
+    if (t.hp <= 0) break;
+    const m = DUO_MULT * (x.role === 'degats' ? 1.5 : 1);
+    const d = hurt(st, t, dmgOf(st, x, t, m, { basic: true }), ev, x.uid);
+    total += d;
+    if (d && t.hp > 0) breakHit(st, t, 2, ev, x);
+  }
+  for (const x of [u, p]) duoEffect(st, x, t, total, ev);
+  check(st, ev);
+}
+function duoEffect(st, x, t, total, ev) {
+  const r = x.role;
+  if (r === 'protecteur') { if (t.hp > 0) setBreach(st, t, x.uid, ev); const w = lowestAlly(st); if (w) { w.shield = 1; ev.push({ t: 'status', u: w.uid, s: 'Bouclier', k: 'guard' }); } }
+  else if (r === 'soin') front(st, 'ally').forEach((a) => heal(a, a.maxHp * 0.15, ev, x));
+  else if (r === 'poison' && t.hp > 0) addPoison(st, t, 4, ev, x);
+  else if (r === 'controle' && t.hp > 0) { if (t.boss || t.elite || t.frostCD > 0) { t.slow = true; ev.push({ t: 'status', u: t.uid, s: 'Ralentie', k: 'frost' }); } else { freeze(st, t, ev, 1); t.frozenBy = x.uid; } }
+  else if (r === 'soutien') front(st, 'ally').forEach((a) => gainPA(a, 1, ev));
+  else if (r === 'zone') { const row = front(st, t.side), i = row.indexOf(t); [row[i - 1], row[i + 1]].filter(Boolean).forEach((n) => hurt(st, n, Math.max(1, Math.round(total / 2)), ev, x.uid)); }
+}
 function doSwap(st, out, inn, ev) {
   const o = st.order.ally, i = o.indexOf(out.uid), j = o.indexOf(inn.uid);
   [o[i], o[j]] = [o[j], o[i]];
@@ -779,13 +860,14 @@ export function useUlt(st) {
   st.stats.ults = (st.stats.ults || 0) + 1;
   const p = st.power || 1, allies = front(st, 'ally'), foes = front(st, 'enemy');
   ev.push({ t: 'ult', key: st.ult });
+  if (st.ult === 'sceau' && st.init && allies.some((u) => u.hp < u.maxHp * 0.3)) allies.forEach((u) => gainPA(u, 1, ev)); // à condition : un allié en danger
   if (st.ult === 'sceau') allies.forEach((u) => { heal(u, u.maxHp * 0.3 * p, ev); u.ward = Math.max(u.ward || 0, Math.round(u.maxHp * SEAL_WARD)); ev.push({ t: 'status', u: u.uid, s: `Sceau : ${u.ward}` }); });
   else if (st.ult === 'revive') {
     const fallen = st.order.ally.map((id) => st.units[id]).filter((u) => u.hp <= 0);
     if (fallen.length) fallen.forEach((u) => { u.hp = Math.round(u.maxHp * 0.5 * p); u.poison = 0; u.inPlay = false; ev.push({ t: 'revive', u: u.uid }); });
     else allies.forEach((u) => heal(u, u.maxHp * 0.4 * p, ev));
-  } else if (st.ult === 'nova') foes.forEach((u) => { hurt(st, u, (3 + st.round) * p, ev); breakHit(st, u, 2, ev, { side: 'ally' }); });
-  else if (st.ult === 'smite') { const t = foes.slice().sort((x, y) => y.hp - x.hp)[0]; if (t) { hurt(st, t, (8 + 2 * st.round) * p, ev); breakHit(st, t, 4, ev, { side: 'ally' }); } }
+  } else if (st.ult === 'nova') foes.forEach((u) => { hurt(st, u, Math.round((3 + st.round) * p * (u.broken || u.cracked ? 1.5 : 1)), ev); breakHit(st, u, 2, ev, { side: 'ally' }); });
+  else if (st.ult === 'smite') { const t = foes.slice().sort((x, y) => (y.broken || y.cracked ? 1e4 : 0) + y.hp - ((x.broken || x.cracked ? 1e4 : 0) + x.hp))[0]; if (t) { hurt(st, t, Math.round((8 + 2 * st.round) * p * (t.broken || t.cracked ? 1.5 : 1)), ev); breakHit(st, t, 4, ev, { side: 'ally' }); } }
   else if (st.ult === 'aegis') { allies.forEach((u) => { u.shield = 1; u.stunned = false; u.frozen = 0; ev.push({ t: 'status', u: u.uid, s: 'Égide' }); if (st.init) gainPA(u, 2); }); if (!st.init) st.ap += 2; }
   check(st, ev);
   return ev;
@@ -1176,6 +1258,7 @@ function advance(st, ev) {
       u.defend = false; u.exposed = false;
       if (u.rempart) { const p = st.units[u.rempart]; if (p && p.guardBy === u.uid) p.guardBy = null; u.rempart = null; }
       if (u.frozen || u.stunned) { u.frozen = 0; u.stunned = false; ev.push({ t: 'status', u: u.uid, s: 'Gelée : passe son tour', k: 'frost' }); continue; }
+      if (u.skipTurn === st.round) { u.skipTurn = null; ev.push({ t: 'status', u: u.uid, s: 'A déjà frappé (Assaut conjoint)', k: 'defend' }); continue; }
       u.acts = 0; gainPA(u, PA_TURN);
       st.turn = 'ally'; st.actor = u.uid; st.queue = [];
       ev.push({ t: 'actor', u: u.uid });
@@ -1405,6 +1488,13 @@ function smartMove(st, go) {
       if (u.role === 'zone' && can(u, 'raz') && go(u.uid, 'raz')) return true;
       if (e.mark && e.markBy !== u.uid && can(u, 'attack') && actionTargets(st, u.uid, 'attack').includes(e.uid) && go(u.uid, 'attack', e.uid)) return true;
     }
+  }
+  // 1 ter (v269). Assaut conjoint sur un ennemi Fêlé ou Brisé ; Hâte pour faire jouer l'Assaut juste après une Marque
+  const me0 = st.init && st.units[st.actor];
+  if (me0 && can(me0, 'duo')) { const ts = actionTargets(st, me0.uid, 'duo').map((id) => st.units[id]).sort((a, b) => (b.cracked || b.broken ? 1 : 0) - (a.cracked || a.broken ? 1 : 0) || b.maxHp - a.maxHp); if (ts[0] && (ts[0].cracked || ts[0].broken || ts[0].boss || ts[0].elite) && go(me0.uid, 'duo', ts[0].uid)) return true; }
+  if (me0 && me0.role === 'soutien' && can(me0, 'hate') && foes.some((e) => e.cracked || (e.mark && e.markBy === me0.uid))) {
+    const h = actionTargets(st, me0.uid, 'hate').map((id) => st.units[id]).find((x) => ['degats', 'protecteur', 'zone'].includes(x.role));
+    if (h && go(me0.uid, 'hate', h.uid)) return true;
   }
   // 2. soigner une créature en danger
   const low = allies.filter((u) => u.hp < u.maxHp * 0.35).sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0];

@@ -47,19 +47,19 @@ export const KITS = {
   controle: {
     kw: 'gel', name: 'Gel', icon: 'eye',
     basic: { name: 'Morsure du froid', desc: 'Dégâts normaux, +2 Brisure sur une cible gelée.' },
-    skill: { key: 'entrave', pa: 2, name: 'Entrave glaciale', icon: 'eye', ap: 1, fervor: 2, target: 'enemy', dice: { dc: 10 }, desc: 'Jet de D20 (8 ou plus ; bonus selon la rareté : Rare +1, Hyper rare +2, Mythique +3, Secrète +4). Réussite : la cible est gelée et perd sa prochaine action (sa charge est annulée). Critique : gelée et +3 Brisure ; une Mythique ou Secrète la gèle 2 tours (sauf élites et gardiens). Partielle : ralentie, sa prochaine attaque fait moitié moins mal.' },
+    skill: { key: 'entrave', pa: 2, name: 'Entrave glaciale', icon: 'eye', ap: 1, fervor: 2, target: 'enemy', dice: { dc: 10 }, desc: 'Jet de D20 (8 ou plus ; bonus selon la rareté : Rare +1, Hyper rare +2, Mythique +3, Secrète +4). Réussite : la cible est gelée et perd sa prochaine action (sa charge est annulée). Critique : gelée et +3 Brisure ; une Mythique ou Secrète la gèle 2 tours (sauf élites et gardiens). Partielle : elle recule de 2 places dans l’ordre du tour (1 pour un gardien) ; si elle a déjà joué, elle est ralentie.' },
     passive: { name: 'Bris de glace', desc: 'Tes coups sur une cible gelée font +2 Brisure.' },
   },
   soutien: {
     kw: 'cri', name: 'Cri', icon: 'sparkle',
     basic: { name: 'Frappe', desc: 'Dégâts normaux.' },
     skill: { key: 'marque', pa: 1, name: 'Marque du chasseur', icon: 'sparkle', ap: 1, fervor: 1, target: 'enemy', desc: 'Marque un ennemi : le prochain coup d’une AUTRE de tes créatures fait +50 % de dégâts et +2 Brisure, puis la Marque part (2 tours au plus). +3 à tes jets de dés contre lui, et sa faiblesse est révélée.' },
-    passive: { name: 'Cri de guerre', desc: 'Au début de ton tour, tes créatures au combat gagnent +1 en attaque.' },
+    passive: { name: 'Cri de guerre', desc: 'Au début de chaque tour, tes créatures au combat gagnent +1 en attaque. Hâte (2 PA, une fois par tour) : une de tes créatures joue juste après elle.' },
   },
   zone: {
     kw: 'deferlante', name: 'Déferlante', icon: 'flame',
     basic: { name: 'Vague', desc: 'Touche aussi les voisins de la cible (moitié des dégâts).' },
-    skill: { key: 'raz', pa: 3, name: 'Raz-de-marée', icon: 'flame', ap: 2, fervor: 3, target: 'none', desc: 'Coup de rupture. Frappe tous les ennemis au combat (70 % de son attaque), +1 Brisure à chacun, et consomme toutes les Marques.' },
+    skill: { key: 'raz', pa: 3, name: 'Raz-de-marée', icon: 'flame', ap: 2, fervor: 3, target: 'none', desc: 'Coup de rupture. Frappe tous les ennemis au combat (70 % de son attaque), +1 Brisure à chacun, et consomme toutes les Marques. Un ennemi à 6 poisons ou plus détone (poison × 1,5).' },
     passive: { name: 'Marée montante', desc: 'Renforcée par un Cri, sa Vague frappe les voisins à pleine puissance.' },
   },
 };
@@ -157,6 +157,8 @@ export const bossPowerOf = (floor) => ['carapace', 'givre', 'fureur', 'devoreur'
 export const SYNERGIES = [
   { roles: ['soutien', 'degats'], name: 'Chasse', desc: 'Marque, puis le coup d’une autre créature : +50 % de dégâts et +2 Brisure. Avec le Coup d’estoc : +3 au jet en plus.' },
   { roles: ['controle', 'degats'], name: 'Bris de glace', desc: 'Un Coup d’estoc sur une cible gelée : +3 au jet et +2 Brisure.' },
+  { roles: ['poison', 'zone'], name: 'Détonation', desc: 'Accumule 6 poisons ou plus, puis Raz-de-marée : le poison explose (× 1,5 en dégâts d’un coup).' },
+  { roles: ['soutien', null], name: 'Hâte', desc: 'La Soutien fait jouer une créature juste après elle : Marque, puis le gros coup tout de suite.' },
   { roles: ['controle', 'poison'], name: 'Givre-venin', desc: 'Le poison appliqué sur une cible gelée est doublé.' },
   { roles: ['poison', 'poison'], name: 'Épidémie', desc: 'Accumule le poison, puis Contagion pour le propager.' },
   { roles: ['protecteur', 'soin'], name: 'Bastion', desc: 'Rempart sur l’allié menacé, puis Prière : il est soigné et reçoit un bouclier. Chaque coup encaissé par le Protecteur charge sa riposte.' },

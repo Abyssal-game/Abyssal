@@ -51,7 +51,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   const ui = (app.state.duel ||= { fast: 0 }); // v255 : plus de bouton ×2, vitesse unique
   const reduced = app.reduced();
   const T = (ms) => (reduced ? Math.min(ms, 80) : ui.fast === 3 ? ms * 0.25 : ui.fast ? ms * 0.45 : ms); // vitesse ×1, ×2 ou ×3
-  const defMode = 'on'; // la défense active est la même pour tout le monde
+  const defMode = g.s.settings?.defense === 'auto' ? 'auto' : 'on'; // v269 : défense active manuelle, ou automatique (réglages)
   let alive_ = true, busy = false, sel = null, mode = null; // mode : action en attente de cible
   let holdT = null, held = false; // appui long sur une action : sa description (v249, plus de fenêtre de confirmation)
   const ctl = new AbortController();
@@ -158,15 +158,15 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const u = sel && st.units[sel];
     if (!u || st.turn !== 'ally' || busy) return '';
     const kit = KITS[u.role];
-    const list = actionsFor(st, u.uid);
+    const list = actionsFor(st, u.uid).filter((a) => a.key !== 'duo' || a.ok); // l'Assaut conjoint n'apparaît que lorsqu'il est possible
     const c = cat.get(u.id), pa = u.pa || 0;
     // v262 : c'est son tour ; ses PA (points d'action personnels) s'affichent en losanges
     return `<div class="cb-head"><span class="cb-por" style="--rc:${RARITY[c.rarity].color}"><img alt="" src="${artUrl(c, { lite: true })}"></span>
       <span class="cb-who"><b>${esc(c.name)}</b><span class="cb-role">${roleIcon(kit.kw)}${esc(kit.name)}<em class="cb-myturn"> · son tour</em></span></span>
       <span class="cb-upips" title="${pa} PA : attaque ou défense +1, compétences selon leur coût">${Array.from({ length: PA_MAX }, (_, i) => `<i class="${i < pa ? 'on' : ''}"></i>`).join('')}</span></div>
-      <div class="cb-grid ${list.length > 4 ? 'n5' : ''}">${list.map((a) => `<button class="cb-a ${a.ok ? '' : 'off'} ${mode?.key === a.key ? 'on' : ''} ${a.key === kit.skill.key ? 'sig' : ''} ${a.own ? 'own' : ''}" data-a="${a.key}" aria-disabled="${!a.ok}"><span class="cb-tile" aria-hidden="true"></span>
+      <div class="cb-grid ${list.length > 5 ? 'n8' : list.length > 4 ? 'n5' : ''}">${list.map((a) => `<button class="cb-a ${a.ok ? '' : 'off'} ${mode?.key === a.key ? 'on' : ''} ${a.key === kit.skill.key ? 'sig' : ''} ${a.own ? 'own' : ''}" data-a="${a.key}" aria-disabled="${!a.ok}"><span class="cb-tile" aria-hidden="true"></span>
         <span class="cb-ai">${a.own ? `<img class="aicon" alt="" src="${moveIconUrl(a.icon)}">` : actIcon(a.key, a.icon)}</span><b>${esc(a.name)}</b>
-        <span class="cb-cost">${a.gain ? `<i class="gain">+${a.gain} PA</i>` : '<i class="pa"></i>'.repeat(a.ap) || `<i class="free">${st.init ? 'libre' : '0'}</i>`}${a.fervor ? `<i class="fv">${a.fervor}</i>` : ''}${a.dice ? '<i class="d20">D20</i>' : ''}${a.own && a.wait ? `<i class="cdw" title="Se recharge">${a.wait}</i>` : ''}</span></button>`).join('')}</div>`;
+        <span class="cb-cost">${a.gain ? `<i class="gain">+${a.gain} PA</i>` : '<i class="pa"></i>'.repeat(a.ap) || (a.key === 'duo' ? '' : `<i class="free">${st.init ? 'libre' : '0'}</i>`)}${a.fervor ? `<i class="fv">${a.fervor}</i>` : ''}${a.dice ? '<i class="d20">D20</i>' : ''}${a.own && a.wait ? `<i class="cdw" title="Se recharge">${a.wait}</i>` : ''}</span></button>`).join('')}</div>`;
   }
   // ——— Tutoriel du premier combat : une main dorée montre quoi toucher ———
   let guide = !g.s.tips?.['cb-guide'];
@@ -531,6 +531,14 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           app.sfx.death(); fxAt(e.a, 'swallow', { big: true }); float(e.a, 'Engloutie !', 'boss'); shake(true); await wait(T(800)); draw(); break;
         }
         case 'release': app.sfx.enter(); draw(); el(e.u)?.classList.add('enter'); ring(e.u, 'enter'); await wait(T(400)); break;
+        case 'duo': {
+          // Assaut conjoint : les deux créatures s'élancent l'une après l'autre
+          app.sfx.synergy?.(); banner(`<small>${esc(cat.get(st.units[e.u].id).name)} + ${esc(cat.get(st.units[e.p].id).name)}</small>Assaut conjoint`, 'synergy', 1100);
+          if (!reduced) { lunge(e.u, e.tgt); await wait(T(160)); lunge(e.p, e.tgt); cam(e.tgt, 0.8); }
+          await wait(T(LUNGE_HIT + 120)); shake(true);
+          if (!g.s.tips?.['cb-duo']) tuto(app, 'cb-duo');
+          break;
+        }
         case 'swap': app.sfx.enter(); draw(); el(e.u)?.classList.add('enter'); float(e.u, 'Entre en jeu', 'info'); await wait(T(340)); break;
         case 'aoe': if (e.side === 'enemy') shake(true); else if (st.units[e.u]?.side === 'ally') { fxSheet(null, 'role-wave', { row: true, d: 720 }); aoeHit = true; setTimeout(() => { aoeHit = false; }, T(900)); await wait(T(260)); } await wait(T(150)); break;
         case 'status':
@@ -776,7 +784,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       logEvents(skips);
       if (skips.length) await play(skips);
       let res = 'none';
-      if (s.qte && defMode !== 'off') {
+      if (s.qte && defMode === 'auto') res = Math.random() < 0.4 ? 'dodge' : 'none'; // automatique : 40 % d'esquives, jamais de parade
+      else if (s.qte && defMode !== 'off') {
         if (!g.s.tips?.['cb-defense']) await tuto(app, 'cb-defense');
         if (!alive_) return;
         res = await defenseQTE(s);
@@ -1030,6 +1039,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       <li><b>Coup de grâce</b> : achever un ennemi donne +1 Ferveur.</li>
       <li><b>Fêlure et Brisure</b> (élites, gardiens) : jauge vide, l’ennemi est <b>Fêlé</b>. Un <b>coup de rupture</b> (attaque d’un Protecteur, Coup d’estoc, Raz-de-marée, ou coup qui consomme une Marque) le <b>brise</b> : son attaque annoncée est annulée, il perd sa prochaine action, subit +50 % de dégâts et +5 aux jets contre lui jusqu’à la fin du tour suivant. Sans rupture avant la fin du tour suivant, il se ressaisit (jauge à moitié).</li>
       <li><b>Marque</b> : le prochain coup d’une <b>autre</b> de tes créatures fait +50 % et +2 Brisure, puis elle part. Garde-la pour ton plus gros coup.</li>
+      <li><b>Hâte</b> (Soutien, ${2} PA, une fois par tour) : une de tes créatures qui n’a pas encore joué joue juste après elle. <b>Retard</b> : une Entrave partielle fait reculer l’ennemi de 2 places dans l’ordre du tour (1 pour un gardien).</li>
+      <li><b>Assaut conjoint</b> (3 Ferveur, une fois par combat) : sur un ennemi Fêlé, Brisé ou Marqué, ta créature et celle qui joue juste après frappent ensemble (×1,25 chacune), avec l’effet de leurs deux rôles. L’alliée appelée perd son tour à venir. C’est aussi un coup de rupture.</li>
+      <li><b>Détonation</b> : un ennemi à 6 poisons ou plus explose sous un Raz-de-marée (poison × 1,5 de dégâts d’un coup).</li>
       <li><b>Annonces</b> : les grosses attaques des gardiens et des élites s’affichent sur la frise, à côté de leur portrait. Brise-les avant qu’ils jouent pour les annuler.</li>
       <li><b>Riposte chargée</b> : chaque coup encaissé par un Protecteur charge sa riposte (3 au plus) : +1 dégât et +1 Brisure par charge à sa prochaine attaque. <b>Prière</b> : le soin en trop devient un bouclier.</li>
       <li><b>Faiblesses</b> : chaque faction en craint une autre (+50 % de dégâts) ; contre sa propre faction : -25 %. ★ sur une cible = faiblesse exploitée.</li>
