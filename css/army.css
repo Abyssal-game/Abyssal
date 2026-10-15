@@ -2639,3 +2639,10 @@ body.battle-mode .dv.cb { gap: 5px; }
 .dv.cb .dv-c.enemy .cb-tgt { top: 3px; transform: translateX(-50%); }
 /* v277 : mêmes bandeaux pour tes créatures ; posés à cheval sur le bord haut (la fenêtre d'actions est juste au-dessus) */
 .dv.cb .dv-c.ally .cb-above { margin-bottom: -9px; }
+/* v278 : pastilles d'état plus grandes */
+.dv.cb .dv-c .cb-above .dv-st .sti { width: clamp(17px, 22cqw, 22px); height: clamp(17px, 22cqw, 22px); }
+.dv.cb .dv-c .cb-above .dv-st .sti b { min-width: 13px; height: 13px; font-size: .56rem; right: -4px; bottom: -3px; }
+.dv.cb .dv-c .cb-above { gap: 4px; }
+.dv.cb .dv-c .cb-above .dv-st { gap: 3px !important; }
+.dv.cb .dv-c.enemy .cb-above { margin-bottom: -3px; }
+.dv.cb .dv-c.ally .cb-above { margin-bottom: -13px; }
