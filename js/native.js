@@ -29,6 +29,16 @@ export function initNative({ suspendAudio, resumeAudio } = {}) {
   document.documentElement.classList.add('native');
   const App = plugin('App');
   App?.addListener?.('backButton', onBack);
+  // v372 : dans l'application, un lien « nouvelle fenêtre » vers une page du jeu (politique de confidentialité) partait
+  // vers une autre application de l'iPhone (adresse capacitor://). On l'ouvre dans l'app ; sa croix ramène au jeu.
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest?.('a[target="_blank"]');
+    if (!a) return;
+    const href = a.getAttribute('href') || '';
+    if (/^[a-z]+:/i.test(href)) return; // lien vers un autre site : comportement normal
+    e.preventDefault();
+    location.href = href;
+  }, true);
   // musique et sons coupés quand l'application passe en arrière-plan
   App?.addListener?.('appStateChange', ({ isActive }) => { (isActive ? resumeAudio : suspendAudio)?.(); });
   return true;
