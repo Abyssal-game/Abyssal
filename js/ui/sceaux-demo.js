@@ -56,7 +56,7 @@ export const SCENES = {
 // Scènes à montrer pour chaque règle d'adversaire
 export const RULE_SCENES = {
   classique: ['base', 'perks'], sacre: ['sacre', 'base'], instable: ['instable', 'base'], faction: ['faction', 'base'],
-  identique: ['identique', 'base'], somme: ['somme', 'base'], abime: ['identique', 'somme', 'instable'], usure: ['identique', 'sacre'],
+  identique: ['identique', 'base'], somme: ['somme', 'base'], abime: ['identique', 'somme', 'sacre'], usure: ['identique', 'sacre'],
   archive: ['somme', 'faction'], neant: ['identique', 'somme', 'faction', 'instable'],
 };
 

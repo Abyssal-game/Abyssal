@@ -217,9 +217,9 @@ test('Somme : même somme sur deux côtés ; une carte alliée compte pour décl
   assert.equal(st.board[5].owner, 'p');
 });
 
-test('Abîme : Identique, Somme et plateau instable à la fois', () => {
+test('Abîme (v358) : Identique, Somme et cases sacrées fixes à la fois', () => {
   const st = SC.newGame(catalog, { hand: ids.slice(0, 5), rival: SC.RIVAL.echo, seed: 4 });
-  assert.ok(SC.ruleHas(st, 'identique') && SC.ruleHas(st, 'somme') && SC.ruleHas(st, 'instable'));
+  assert.ok(SC.ruleHas(st, 'identique') && SC.ruleHas(st, 'somme') && SC.ruleHas(st, 'sacre') && !SC.ruleHas(st, 'instable'));
   assert.ok(st.cells.blessed != null);
 });
 
@@ -293,10 +293,26 @@ test('nouveaux adversaires et revanches éveillées', () => {
   const out = g.sceauxFinish();
   assert.ok(out.first); assert.ok(g.s.sceaux.awake.initie);
   assert.ok(g.s.shards - before >= SC.SCEAUX_REWARD.firstAwake);
-  // règles combinées : Usure = Identique + cases sacrées
-  const u = SC.newGame(catalog, { hand: ids.slice(0, 5), rival: SC.RIVAL.banquier, seed: 9 });
-  assert.ok(SC.ruleHas(u, 'identique') && SC.ruleHas(u, 'sacre'));
-  assert.ok(u.cells.blessed != null);
+  // v358 : seules les règles gardées sont jouées par les adversaires et le défi du jour
+  for (const r of SC.RIVALS) assert.ok(SC.RULE_LIST.includes(r.rule), r.key);
+  for (let d = 0; d < 40; d++) assert.ok(SC.RULE_LIST.includes(SC.dailyChallenge(`2026-11-${d}`, 8).rule));
+  assert.deepEqual(SC.RULE_LIST, ['classique', 'sacre', 'identique', 'somme', 'abime']);
+});
+
+test('v358 : une carte Inviolable qui résiste ne tombe pas dans la même pose', () => {
+  const card = (id, vals, owner, guard = false) => ({ id, owner, from: owner, vals, guard });
+  const shield = catalog.cards.find((c) => c.rarity === 'HR').id;
+  // une carte posée dont le haut bat la carte du dessus ET forme une Somme avec la carte de gauche
+  const plain = catalog.cards.find((c) => { if (c.rarity !== 'C') return false; const v = SC.sideValues(c); const t = 2 * v[0] - 1 - v[3]; return v[0] >= 2 && t >= 1 && t <= 10; }).id;
+  const st = SC.newGame(catalog, { hand: [plain, plain, plain, plain, plain], rival: { ...SC.RIVAL.maitre, rule: 'somme' }, seed: 1 });
+  st.turn = 'p'; st.cells = { blessed: null, cursed: null };
+  const v = SC.valuesOn(catalog, st, plain, 4, 'p');
+  st.board[1] = card(shield, [1, 1, v[0] - 1, 1], 'o', true); // au-dessus : plus faible, et Inviolable
+  st.board[3] = card(plain, [1, 2 * v[0] - 1 - v[3], 1, 1], 'o'); // à gauche : même somme
+  SC.place(catalog, st, 'p', 0, 4);
+  assert.equal(st.board[1].owner, 'o', 'le bouclier résiste à la Somme, et la capture simple ne passe pas derrière');
+  assert.equal(st.board[1].guard, false);
+  assert.equal(st.board[3].owner, 'p');
 });
 
 test('v306 : chaque rival a sa force de jeu, et sa revanche éveillée joue au moins aussi fort', () => {

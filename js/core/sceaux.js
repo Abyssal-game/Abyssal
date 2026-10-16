@@ -40,18 +40,21 @@ export function sideValues(card) {
 export const showVal = (n) => (n >= 10 ? 'A' : String(n));
 
 // Règles spéciales (une seule à la fois ; le mode classique n'en a aucune)
+// v358 : tri à la demande du propriétaire (« trop de règles ») : on garde Classique, Identique, Somme, Cases sacrées
+// et Abîme. Les autres (retired) ne sont plus proposées ni montrées, mais restent lisibles pour une partie déjà commencée.
 export const RULES = {
   classique: { name: 'Classique', desc: 'Les règles de base, sans surprise.' },
   sacre:     { name: 'Cases sacrées', desc: 'Une case bénie (+1 à toutes les valeurs de la carte posée) et une case maudite (−1).' },
-  instable:  { name: 'Plateau instable', desc: 'Une case bénie et une case maudite, qui changent de place toutes les deux poses.' },
-  faction:   { name: 'Fraternité', desc: 'Avec au moins 3 cartes d’une même faction en main, leur plus faible valeur gagne +1.' },
+  instable:  { name: 'Plateau instable', desc: 'Une case bénie et une case maudite, qui changent de place toutes les deux poses.', retired: true },
+  faction:   { name: 'Fraternité', desc: 'Avec au moins 3 cartes d’une même faction en main, leur plus faible valeur gagne +1.', retired: true },
   identique: { name: 'Identique', desc: 'Si ta carte touche deux cartes voisines (ou plus) avec des valeurs égales à celles d’en face, les cartes adverses parmi elles sont capturées. Puis Combo : chaque carte prise capture à son tour ses voisines plus faibles.' },
   somme:     { name: 'Somme', desc: 'Si ta carte forme la même somme (ta valeur + celle d’en face) avec deux voisines ou plus, les cartes adverses parmi elles sont capturées. Puis Combo : chaque carte prise capture à son tour ses voisines plus faibles.' },
-  abime:     { name: 'Abîme', desc: 'Identique, Somme et Combo, sur un plateau instable : une case bénie et une case maudite qui changent de place toutes les deux poses.' },
-  usure:     { name: 'Usure', desc: 'Identique et Combo, avec une case bénie (+1) et une case maudite (−1) fixes.' },
-  archive:   { name: 'Archives', desc: 'Somme et Combo, et la Fraternité : 3 cartes d’une même faction en main renforcent leur plus faible valeur.' },
-  neant:     { name: 'Néant', desc: 'Toutes les règles à la fois : Identique, Somme, Combo, Fraternité et plateau instable.' },
+  abime:     { name: 'Abîme', desc: 'Identique, Somme et Combo à la fois, avec une case bénie (+1) et une case maudite (−1).' },
+  usure:     { name: 'Usure', desc: 'Identique et Combo, avec une case bénie (+1) et une case maudite (−1) fixes.', retired: true },
+  archive:   { name: 'Archives', desc: 'Somme et Combo, et la Fraternité : 3 cartes d’une même faction en main renforcent leur plus faible valeur.', retired: true },
+  neant:     { name: 'Néant', desc: 'Toutes les règles à la fois : Identique, Somme, Combo, Fraternité et plateau instable.', retired: true },
 };
+export const RULE_LIST = Object.keys(RULES).filter((k) => !RULES[k].retired);
 // Pouvoirs de rareté (la rareté ne change pas le total des valeurs, elle donne un pouvoir)
 // Rempart : la première capture qui la viserait échoue. Fureur : à sa pose, elle capture aussi à égalité.
 export const PERKS = {
@@ -60,7 +63,7 @@ export const PERKS = {
 };
 export const perksOf = (card) => Object.keys(PERKS).filter((k) => PERKS[k].rar.includes(card?.rarity));
 // Une règle peut en combiner plusieurs
-const PARTS = { abime: ['identique', 'somme', 'instable'], usure: ['identique', 'sacre'], archive: ['somme', 'faction'], neant: ['identique', 'somme', 'instable', 'faction'] };
+const PARTS = { abime: ['identique', 'somme', 'sacre'], usure: ['identique', 'sacre'], archive: ['somme', 'faction'], neant: ['identique', 'somme', 'instable', 'faction'] };
 export const ruleHas = (st, k) => st.rule === k || (PARTS[st.rule] || []).includes(k);
 // Le cœur du Sceau : départage les égalités
 export const CENTER = 4;
@@ -79,11 +82,11 @@ export const RIVALS = [
     hello: 'J’ai scellé plus de créatures que tu n’en verras jamais.', win: 'Tu as brisé mon sceau. Ce n’est pas rien.', lose: 'Reviens quand tu sauras compter.' },
   { key: 'echo', ai: [4, 0.45], aiAwake: [6, 0.75], name: 'L’Écho de l’Abîme', title: 'veilleur des profondeurs', level: 4, faction: 'abyssal', portrait: 'ABY-039', rule: 'abime', reward: 70,
     hello: 'Je joue tes coups avant toi. Je les ai déjà joués mille fois.', win: '… l’écho se tait.', lose: 'Tu m’entends ? C’est toi, en bas.' },
-  { key: 'banquier', ai: [4, 0.6], aiAwake: [5, 0.3], name: 'Mammon', title: 'le Banquier des Enfers', level: 5, faction: 'infernal', portrait: 'INF-040', rule: 'usure', reward: 80,
+  { key: 'banquier', ai: [4, 0.6], aiAwake: [5, 0.3], name: 'Mammon', title: 'le Banquier des Enfers', level: 5, faction: 'infernal', portrait: 'INF-040', rule: 'somme', reward: 80,
     hello: 'Tout se paie, ici. Même une égalité.', win: 'Une perte… je la noterai dans mon grand livre.', lose: 'Intérêts encaissés. Merci de ta visite.' },
-  { key: 'archiviste', ai: [4, 0.45], aiAwake: [6, 0.6], name: 'L’Archiviste', title: 'mémoire d’engrenages', level: 5, faction: 'artificiel', portrait: 'ART-041', rule: 'archive', reward: 90,
+  { key: 'archiviste', ai: [4, 0.45], aiAwake: [6, 0.6], name: 'L’Archiviste', title: 'mémoire d’engrenages', level: 5, faction: 'artificiel', portrait: 'ART-041', rule: 'identique', reward: 90,
     hello: 'J’ai catalogué chacune de tes parties. Elles se terminent toutes pareil.', win: 'Erreur… à… réindexer.', lose: 'Résultat conforme aux prévisions.' },
-  { key: 'souverain', ai: [5, 0.6], aiAwake: [6, 0.45], name: 'La Souveraine du Néant', title: 'avant le premier Sceau', level: 5, faction: 'primordial', portrait: 'PRI-053', rule: 'neant', reward: 100,
+  { key: 'souverain', ai: [5, 0.6], aiAwake: [6, 0.45], name: 'La Souveraine du Néant', title: 'avant le premier Sceau', level: 5, faction: 'primordial', portrait: 'PRI-053', rule: 'abime', reward: 100,
     hello: 'Avant les Sceaux, il n’y avait que moi. Il n’y aura que moi après.', win: 'Alors… le Néant peut perdre.', lose: 'Retourne au silence, petite flamme.' },
 ];
 // Revanche « implacable » (anciennement éveillée) : après une victoire, l'adversaire revient plus fort (main plus rare, jeu plus fin)
@@ -190,7 +193,8 @@ export function place(cat, st, who, handIdx, cell) {
   st.board[cell] = { id, owner: who, from: who, vals, guard: perks.includes('rempart') }; // from : qui l'a posée (trophée)
   const fury = perks.includes('fureur');
   // Rempart : la carte visée résiste une fois (le rempart tombe)
-  const take = (o) => { if (o.guard) { o.guard = false; flips.push({ cell: st.board.indexOf(o), blocked: true }); return false; } return true; };
+  const held = new Set(); // v358 : une carte Inviolable qui vient de résister ne peut pas être prise dans la même pose
+  const take = (o) => { if (held.has(o)) return false; if (o.guard) { o.guard = false; held.add(o); flips.push({ cell: st.board.indexOf(o), blocked: true }); return false; } return true; };
   const flips = [];
   const near = neighbors(cell).map((n, d) => (n >= 0 && st.board[n] ? { n, d, o: st.board[n], mine: vals[d], theirs: st.board[n].vals[OPP[d]] } : null)).filter(Boolean);
   // Identique / Somme : deux voisines ou plus (les tiennes comptent pour déclencher, seules les adverses sont prises)
@@ -313,6 +317,6 @@ export function aiMove(cat, st, level = 2, rnd = Math.random, slip = 0) {
 export function dailyChallenge(day, unlockedCount) {
   const h = hash(`defi:${day}`);
   const rival = RIVALS[h % Math.max(1, unlockedCount)];
-  const rule = ['sacre', 'instable', 'faction', 'identique', 'somme', 'usure', 'archive'][(h >>> 8) % 7];
+  const rule = ['sacre', 'identique', 'somme', 'abime'][(h >>> 8) % 4]; // v358 : seulement les règles gardées
   return { rival: rival.key, rule, seed: h };
 }

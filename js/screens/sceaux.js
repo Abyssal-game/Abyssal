@@ -16,7 +16,7 @@ const HOW = [['cards', '#7FA8D8', 'Ta main', '5 cartes. Chacune a quatre valeurs
   ['swords', '#E0485E', 'Capturer', 'Si ta valeur est plus grande que celle d’en face d’une carte adverse voisine, tu la captures. À égalité, rien ne se passe.'],
   ['crown', '#F2C14E', 'La victoire', 'Après les 9 poses, on compte les cartes de chaque couleur, plus celle restée en main. À 5 contre 5, celui qui tient la case centrale (le cœur du Sceau) gagne.'],
   ['holo', '#FF8AD8', 'Pouvoirs de rareté', 'Les Hyper rares sont Inviolables (bouclier doré : elles résistent à la première capture). Les Mythiques ont la Fureur (épées en flammes : elles capturent aussi à égalité quand tu les poses). Les Secrètes ont les deux.'],
-  ['rule', '#B48CFF', 'Règles spéciales', 'Certains adversaires jouent avec une règle en plus : Identique, Somme (avec Combo en cascade), cases sacrées, plateau instable, fraternité, Abîme, Usure, Archives ou Néant.'],
+  ['rule', '#B48CFF', 'Règles spéciales', 'Certains adversaires jouent avec une règle en plus : Cases sacrées, Identique, Somme (avec Combo en cascade) ou Abîme (les trois à la fois).'],
   ['crystal', '#7FE0A0', 'Butin', 'Une fois par jour, après une victoire, tu gardes une carte adverse que tu contrôles sur le plateau (Hyper rare au plus).'],
   ['hourglass', '#9FE0FF', 'Adversaires et défi', 'Bats chaque adversaire pour débloquer le suivant. Un défi du jour t’attend aussi.'],
   ['danger', '#FF5468', 'Revanches implacables', 'Une fois un adversaire battu, tu peux l’affronter implacable : main plus rare, jeu plus fin, récompense ×1,5 et +150 éclats la première fois.']];
@@ -26,6 +26,9 @@ const RIVAL_OF = (st) => (st.awake ? SC.awakened(SC.RIVAL[st.rival]) : SC.RIVAL[
 const stars = (n) => `${'★'.repeat(n)}${'☆'.repeat(Math.max(0, 5 - n))}`;
 const PERK_IC = { rempart: '<img alt="" src="assets/icons/pk-rempart.webp">', fureur: '<img alt="" src="assets/icons/pk-fureur.webp">' };
 const themeOf = (r) => THEME[r] || 'salle';
+// v358 : les explications animées en tuiles (icône, nom, résumé, lecture), à la place de la liste de textes
+const RULE_SHORT = { classique: 'Plus fort que la carte d’en face : capturée. Et les pouvoirs de rareté.', sacre: 'Une case bénie (+1) et une case maudite (−1).', identique: 'Deux égalités d’un coup : les deux cartes sont prises.', somme: 'Deux fois la même somme : les deux cartes sont prises.', abime: 'Identique, Somme et cases sacrées à la fois.' };
+const ruleTiles = () => `<div class="sc-rgrid">${SC.RULE_LIST.map((k) => `<button class="sc-rtile k-${k}" data-sc="demo" data-k="${k}"><span class="sc-rt-ic">${RULE_ICON[k] ? `<img alt="" src="assets/icons/${RULE_ICON[k]}.webp">` : picon('swords')}</span><b>${k === 'classique' ? 'Les bases' : esc(SC.RULES[k].name)}</b><small>${esc(RULE_SHORT[k] || SC.RULES[k].desc)}</small><span class="sc-rt-play" aria-hidden="true">▶</span></button>`).join('')}</div>`;
 // Portrait peint de l'adversaire (assets/sceaux/rival-*.webp), avec l'ancienne image de créature en secours
 const rivalPic = (cat, R) => `<img alt="" src="assets/sceaux/rival-${R.key}.webp" onerror="this.onerror=null;this.src='${artUrl(cat.get(R.portrait), { lite: true })}'">`;
 // Petite carte du jeu : illustration, nom, emblème de faction et quatre valeurs sur les bords
@@ -75,8 +78,7 @@ export default function sceauxScreen(app, root) {
       <p class="small muted center">Récompenses : ${SC.SCEAUX_REWARD.dailyPaid} victoires payées par jour (${Math.max(0, SC.SCEAUX_REWARD.dailyPaid - (sc.day === todayKey() ? sc.paidToday : 0))} restantes aujourd’hui). Au-delà, tu peux jouer pour le plaisir.</p>
       <details class="panel dc-fold dc-how"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/help.webp"><span class="dc-sum-t">Comment ça marche</span></summary>
         <ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol>
-        <button class="btn small gold block sc-demo-b" data-sc="demo" data-k="classique">${icon('p:rule')}Voir comment on capture (animation)</button>
-        ${Object.entries(SC.RULES).filter(([k]) => k !== 'classique').map(([k, r]) => `<button class="sc-rl sc-rl-b" data-sc="demo" data-k="${k}"><span><b>${esc(r.name)}</b> : ${esc(r.desc)}</span><span class="sc-rl-play">▶ Voir</span></button>`).join('')}
+        <h3 class="sc-rg-h">Les règles en animation</h3>${ruleTiles()}
         <p class="small muted center">Toutes les cartes ont le même total de valeurs (20) : une Commune bien placée peut capturer une Mythique.</p></details>`;
     tuto(app, 'sceaux').then(() => { if (Object.keys(sc.beaten || {}).length) tuto(app, 'sceaux-awake'); });
   }
@@ -132,16 +134,40 @@ export default function sceauxScreen(app, root) {
     grid.appendChild(el);
     setTimeout(() => el.remove(), 700);
   }
+  // v358 : effets vivants — planche d'effet (assets/fx, 8 images) jouée sur une case du plateau
+  const fx = (cellEl, name, k = 1.6, d = 640) => {
+    if (app.reduced() || !cellEl) return;
+    const board = root.querySelector('.sc-board'); if (!board) return;
+    const b = board.getBoundingClientRect(), r = cellEl.getBoundingClientRect();
+    const n = document.createElement('span'); n.className = 'kx-sprite fxs sc-fx';
+    n.style.cssText = `left:${r.left - b.left + r.width / 2}px;top:${r.top - b.top + r.height / 2}px;width:${r.width * k}px;height:${r.width * k}px;--d:${d}ms;background-image:url(assets/fx/${name}.webp)`;
+    board.appendChild(n); setTimeout(() => n.remove(), d + 80);
+  };
+  const react = (cls) => { const w = root.querySelector('.sc-who'); if (!w || app.reduced()) return; w.classList.remove('hurt', 'gloat'); void w.offsetWidth; w.classList.add(cls); };
   // Pose puis captures, une par une : trait, comparaison, carte qui se retourne, éclat du sceau, score
   async function animateMove(m, cellsBefore) {
     busy = true;
     const st = g.s.sceaux.cur;
     const pending = new Set(m.flips.filter((f) => !f.blocked).map((f) => f.cell));
     boardView({ pending, drop: m.cell });
-    app.sfx.pose?.();
     const board = root.querySelector('.sc-board');
-    board?.classList.add('flash'); setTimeout(() => board?.classList.remove('flash'), 300);
-    await wait(340);
+    // v358 : la carte vole depuis la main (ou depuis la main adverse) jusqu'à sa case, puis s'écrase avec une onde
+    const dropCell = root.querySelector(`.sc-cell[data-i="${m.cell}"]`), dropCard = dropCell?.querySelector('.sc-card');
+    const src = m.fromRect || (m.who === 'o' ? root.querySelector('.sc-ohand')?.getBoundingClientRect() : null);
+    if (dropCard && src && !app.reduced()) {
+      const r = dropCard.getBoundingClientRect(), sx = src.width / r.width || 1;
+      const dx = src.left + src.width / 2 - (r.left + r.width / 2), dy = src.top + src.height / 2 - (r.top + r.height / 2);
+      dropCard.animate([{ transform: `translate(${dx}px, ${dy}px) scale(${Math.min(1.4, Math.max(0.5, sx))}) rotate(${m.who === 'p' ? -8 : 8}deg)`, opacity: m.who === 'o' ? 0.2 : 1 },
+        { transform: 'translate(0, -14px) scale(1.18)', opacity: 1, offset: 0.75 }, { transform: 'none', opacity: 1 }], { duration: 380, easing: 'cubic-bezier(.3, .7, .3, 1)' });
+      await wait(330);
+    }
+    app.sfx.pose?.();
+    fx(dropCell, 'dice-land', 1.9, 620);
+    board?.classList.add('flash', 'thud'); setTimeout(() => board?.classList.remove('flash', 'thud'), 320);
+    // case bénie ou maudite : le bonus ou le malus s'affiche en grand sur la carte posée
+    const mod = cellsBefore ? (m.cell === cellsBefore.blessed ? 1 : m.cell === cellsBefore.cursed ? -1 : 0) : 0;
+    if (mod && dropCell) dropCell.insertAdjacentHTML('beforeend', `<span class="sc-modst ${mod > 0 ? 'bless' : 'curse'}">${mod > 0 ? '+1' : '−1'}<small>${mod > 0 ? 'case bénie' : 'case maudite'}</small></span>`);
+    await wait(mod ? 620 : 340);
     let shown = null;
     for (const f of m.flips) {
       const grid = root.querySelector('.sc-plate');
@@ -159,6 +185,7 @@ export default function sceauxScreen(app, root) {
       el.insertAdjacentHTML('beforeend', `<span class="sc-cmp d${(f.dir + 2) % 4}">${cmp}</span><span class="sc-seal ${m.who}"></span>`);
       const card = el.querySelector('.sc-card');
       card.classList.add('cap');
+      fx(el, f.rule === 'combo' || f.rule === 'identique' || f.rule === 'somme' ? 'crit-strike' : m.who === 'p' ? 'strike' : 'foe-strike', 1.7, 600);
       app.sfx.capture?.();
       await wait(470);
       card.classList.remove('sc-p', 'sc-o'); card.classList.add(`sc-${m.who}`);
@@ -166,6 +193,20 @@ export default function sceauxScreen(app, root) {
       const s = shownScore(st, pending), sb = root.querySelector('.sc-score');
       if (sb) { sb.querySelector('.p').textContent = s.p; sb.querySelector('.o').textContent = s.o; sb.querySelector(`.${m.who}`).classList.add('bump'); }
       await wait(220);
+    }
+    const took = m.flips.filter((f) => !f.blocked).length;
+    if (took) react(m.who === 'p' ? 'hurt' : 'gloat');
+    if (took >= 3 && !app.reduced()) { board?.classList.remove('shake'); void board?.offsetWidth; board?.classList.add('shake'); }
+    // v358 : quand ta carte ne prend pas une voisine adverse, on montre pourquoi (égalité ou plus faible)
+    const placed = st.board[m.cell];
+    if (m.who === 'p' && placed) {
+      const grid = root.querySelector('.sc-plate'); let shown = 0;
+      SC.neighbors(m.cell).forEach((n, d) => {
+        const o = n >= 0 && st.board[n]; if (!o || o.owner === 'p' || m.flips.some((f) => f.cell === n)) return;
+        const a = placed.vals[d], t = o.vals[(d + 2) % 4], el = grid?.querySelector(`.sc-cell[data-i="${n}"]`); if (!el) return;
+        el.insertAdjacentHTML('beforeend', `<span class="sc-cmp nope d${(d + 2) % 4}">${V(a)} ${a === t ? '=' : '&lt;'} ${V(t)}<small>${a === t ? 'égalité' : 'trop faible'}</small></span>`); shown++;
+      });
+      if (shown) await wait(900);
     }
     if (m.flips.length) await wait(420);
     busy = false;
@@ -251,7 +292,7 @@ export default function sceauxScreen(app, root) {
   function rules() {
     const sh = openSheet(`<div class="sc-rules"><h2>Règles des Sceaux</h2>
       <ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol>
-      ${Object.entries(SC.RULES).filter(([k]) => k !== 'classique').map(([k, r]) => `<button class="sc-rl sc-rl-b" data-sc="demo" data-k="${k}"><span><b>${esc(r.name)}</b> : ${esc(r.desc)}</span><span class="sc-rl-play">▶ Voir</span></button>`).join('')}
+      <h3 class="sc-rg-h">Les règles en animation</h3>${ruleTiles()}
       ${Object.entries(SC.PERKS).map(([k, p]) => `<p class="small"><b><span class="sc-pkic">${PERK_IC[k]}</span>${esc(p.name)}</b> (${p.rar.join(', ')}) : ${esc(p.desc)}</p>`).join('')}
       <p class="small muted">Victoires payées : ${SC.SCEAUX_REWARD.dailyPaid} par jour. Première victoire contre un adversaire : +${SC.SCEAUX_REWARD.firstWin} éclats. Défi du jour : +${SC.SCEAUX_REWARD.daily}.</p></div>`, { label: 'Règles des Sceaux' });
     // la fenêtre est hors de l'écran des Sceaux : ses boutons « Voir » ont leur propre écouteur
@@ -300,10 +341,11 @@ export default function sceauxScreen(app, root) {
     if (k === 'cell' && ui.sel != null) {
       let flips;
       const before = { ...st.cells }, cell = Number(b.dataset.i);
+      const fromRect = root.querySelector('.sc-hc.sel .sc-card')?.getBoundingClientRect();
       try { flips = g.sceauxPlay(ui.sel, cell); } catch (err) { toast(esc(err.message), { kind: 'error' }); return; }
       ui.sel = null;
       document.querySelector('.sc-dlg')?.remove();
-      animateMove({ cell, flips, who: 'p' }, before).then(async () => {
+      animateMove({ cell, flips, who: 'p', fromRect }, before).then(async () => {
         if (g.s.sceaux.cur?.over) { busy = true; await wait(500); busy = false; end(); }
         else aiTurn();
       });
