@@ -405,7 +405,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     return true;
   };
   // Planche peinte de 8 images (assets/fx/<nom>.webp) jouée sur une carte, au centre, ou sur toute la rangée ennemie
-  const ROLE_FX = { protecteur: 'role-shock', degats: 'strike', poison: 'role-venom', controle: 'role-frost', soin: 'role-shock', soutien: 'strike', zone: 'strike' }; // v343 : « strike » (lame d'or) remplace la griffure
+  const ROLE_FX = { protecteur: 'strike', degats: 'strike', poison: 'strike', controle: 'strike', soin: 'strike', soutien: 'strike', zone: 'strike' }; // v343 : « strike » (lame d'or) ; v350 : sur tous les coups, quel que soit le rôle (le poison et le gel gardent leur propre effet quand ils s'appliquent)
   const fxSheet = (uid, name, { k = 1.6, d = 600, center = false, row = false } = {}) => {
     if (reduced) return;
     const box = $('.dv'); if (!box) return;
