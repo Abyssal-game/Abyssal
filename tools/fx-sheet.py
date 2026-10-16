@@ -4,7 +4,7 @@
 Usage : python3 tools/fx-sheet.py source.jpg assets/fx/<nom>.webp [colonnes=4] [lignes=2] [part de la case=0.96]
 (baisser la part, par ex. 0.88, si Gemini a dessiné un cadre gris dans chaque case)
 La grille est lue de gauche à droite puis de haut en bas. Chaque case est recadrée en carré autour de son centre,
-le fond est ramené au noir pur (le jeu affiche ces planches en mode « screen » : le noir devient transparent),
+le fond est ramené au noir pur puis rendu transparent (v362),
 puis les 8 images sont mises bout à bout.
 """
 import sys
@@ -35,5 +35,10 @@ for r in range(rows):
 strip = Image.new('RGB', (256 * len(frames), 256))
 for i, f in enumerate(frames):
     strip.paste(f, (256 * i, 0))
-strip.save(out, quality=88)
+# v362 : vraie transparence (alpha = luminosité, couleur dé-mélangée du noir) : le jeu n'utilise plus le fondu « screen »
+import numpy as np
+arr = np.asarray(strip).astype(np.float32); al = arr.max(2)
+rgb = np.clip(arr * 255 / np.maximum(al, 1)[..., None], 0, 255); al = np.where(al < 10, 0, al); rgb[al == 0] = 0
+strip = Image.fromarray(np.dstack([rgb, al]).astype(np.uint8), 'RGBA')
+strip.save(out, quality=80, method=4, alpha_quality=60)
 print(f'{out} : {len(frames)} images, {strip.size[0]} x {strip.size[1]}')
