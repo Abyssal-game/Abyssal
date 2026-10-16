@@ -41,7 +41,7 @@ export const showVal = (n) => (n >= 10 ? 'A' : String(n));
 
 // Règles spéciales (une seule à la fois ; le mode classique n'en a aucune)
 // v358 : tri à la demande du propriétaire (« trop de règles ») : on garde Classique, Identique, Somme, Cases sacrées
-// et Abîme. Les autres (retired) ne sont plus proposées ni montrées, mais restent lisibles pour une partie déjà commencée.
+// et Abîme (v359 : Abîme retirée aussi, à la demande du propriétaire). Les autres (retired) ne sont plus proposées ni montrées, mais restent lisibles pour une partie déjà commencée.
 export const RULES = {
   classique: { name: 'Classique', desc: 'Les règles de base, sans surprise.' },
   sacre:     { name: 'Cases sacrées', desc: 'Une case bénie (+1 à toutes les valeurs de la carte posée) et une case maudite (−1).' },
@@ -49,7 +49,7 @@ export const RULES = {
   faction:   { name: 'Fraternité', desc: 'Avec au moins 3 cartes d’une même faction en main, leur plus faible valeur gagne +1.', retired: true },
   identique: { name: 'Identique', desc: 'Si ta carte touche deux cartes voisines (ou plus) avec des valeurs égales à celles d’en face, les cartes adverses parmi elles sont capturées. Puis Combo : chaque carte prise capture à son tour ses voisines plus faibles.' },
   somme:     { name: 'Somme', desc: 'Si ta carte forme la même somme (ta valeur + celle d’en face) avec deux voisines ou plus, les cartes adverses parmi elles sont capturées. Puis Combo : chaque carte prise capture à son tour ses voisines plus faibles.' },
-  abime:     { name: 'Abîme', desc: 'Identique, Somme et Combo à la fois, avec une case bénie (+1) et une case maudite (−1).' },
+  abime:     { name: 'Abîme', desc: 'Identique, Somme et Combo à la fois, avec une case bénie (+1) et une case maudite (−1).', retired: true },
   usure:     { name: 'Usure', desc: 'Identique et Combo, avec une case bénie (+1) et une case maudite (−1) fixes.', retired: true },
   archive:   { name: 'Archives', desc: 'Somme et Combo, et la Fraternité : 3 cartes d’une même faction en main renforcent leur plus faible valeur.', retired: true },
   neant:     { name: 'Néant', desc: 'Toutes les règles à la fois : Identique, Somme, Combo, Fraternité et plateau instable.', retired: true },
@@ -80,13 +80,13 @@ export const RIVALS = [
     hello: 'Chaque case est une prière. Choisis bien où tu t’agenouilles.', win: 'La lumière t’a guidé, cette fois.', lose: 'Tu as joué au hasard. La lumière, jamais.' },
   { key: 'maitre', ai: [3, 0.15], aiAwake: [4, 0.3], name: 'Le Maître des Sceaux', title: 'arbitre des règles', level: 4, faction: 'necrotique', portrait: 'NEC-001', rule: 'somme', reward: 55,
     hello: 'J’ai scellé plus de créatures que tu n’en verras jamais.', win: 'Tu as brisé mon sceau. Ce n’est pas rien.', lose: 'Reviens quand tu sauras compter.' },
-  { key: 'echo', ai: [4, 0.45], aiAwake: [6, 0.75], name: 'L’Écho de l’Abîme', title: 'veilleur des profondeurs', level: 4, faction: 'abyssal', portrait: 'ABY-039', rule: 'abime', reward: 70,
+  { key: 'echo', ai: [4, 0.45], aiAwake: [6, 0.75], name: 'L’Écho de l’Abîme', title: 'veilleur des profondeurs', level: 4, faction: 'abyssal', portrait: 'ABY-039', rule: 'sacre', reward: 70,
     hello: 'Je joue tes coups avant toi. Je les ai déjà joués mille fois.', win: '… l’écho se tait.', lose: 'Tu m’entends ? C’est toi, en bas.' },
   { key: 'banquier', ai: [4, 0.6], aiAwake: [5, 0.3], name: 'Mammon', title: 'le Banquier des Enfers', level: 5, faction: 'infernal', portrait: 'INF-040', rule: 'somme', reward: 80,
     hello: 'Tout se paie, ici. Même une égalité.', win: 'Une perte… je la noterai dans mon grand livre.', lose: 'Intérêts encaissés. Merci de ta visite.' },
   { key: 'archiviste', ai: [4, 0.45], aiAwake: [6, 0.6], name: 'L’Archiviste', title: 'mémoire d’engrenages', level: 5, faction: 'artificiel', portrait: 'ART-041', rule: 'identique', reward: 90,
     hello: 'J’ai catalogué chacune de tes parties. Elles se terminent toutes pareil.', win: 'Erreur… à… réindexer.', lose: 'Résultat conforme aux prévisions.' },
-  { key: 'souverain', ai: [5, 0.6], aiAwake: [6, 0.45], name: 'La Souveraine du Néant', title: 'avant le premier Sceau', level: 5, faction: 'primordial', portrait: 'PRI-053', rule: 'abime', reward: 100,
+  { key: 'souverain', ai: [5, 0.6], aiAwake: [6, 0.45], name: 'La Souveraine du Néant', title: 'avant le premier Sceau', level: 5, faction: 'primordial', portrait: 'PRI-053', rule: 'identique', reward: 100,
     hello: 'Avant les Sceaux, il n’y avait que moi. Il n’y aura que moi après.', win: 'Alors… le Néant peut perdre.', lose: 'Retourne au silence, petite flamme.' },
 ];
 // Revanche « implacable » (anciennement éveillée) : après une victoire, l'adversaire revient plus fort (main plus rare, jeu plus fin)
@@ -317,6 +317,6 @@ export function aiMove(cat, st, level = 2, rnd = Math.random, slip = 0) {
 export function dailyChallenge(day, unlockedCount) {
   const h = hash(`defi:${day}`);
   const rival = RIVALS[h % Math.max(1, unlockedCount)];
-  const rule = ['sacre', 'identique', 'somme', 'abime'][(h >>> 8) % 4]; // v358 : seulement les règles gardées
+  const rule = ['sacre', 'identique', 'somme'][(h >>> 8) % 3]; // v358-v359 : seulement les règles gardées
   return { rival: rival.key, rule, seed: h };
 }

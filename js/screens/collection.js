@@ -32,7 +32,7 @@ export default function collection(app, root, params) {
     <div id="col-main">
     <div class="col-tools">
       <label class="input-wrap"><span class="sr">Rechercher une créature</span>${icon('search')}<input class="input" id="col-q" type="search" placeholder="Rechercher une créature…" value="${esc(st.q)}" autocomplete="off" enterkeyhint="search"></label>
-      <div class="seg wide" role="group" aria-label="Afficher">${[['all', 'Toutes'], ['owned', 'Possédées'], ['missing', 'Manquantes'], ['new', 'Nouvelles'], ['var', `Finitions${(() => { const n = Object.values(g.s.collection).filter((e) => ['holo', 'gold', 'galaxy'].some((v) => e.v?.[v] > 0)).length; return n ? ` (${n})` : ''; })()}`], ['fav', '★']].map(([k, l]) => `<button class="seg-b" data-act="show" data-v="${k}" aria-pressed="${st.show === k}">${l}</button>`).join('')}</div>
+      <div class="seg wide" role="group" aria-label="Afficher">${[['all', 'Toutes'], ['owned', 'Possédées'], ['missing', 'Manquantes'], ['new', 'Nouvelles'], ['var', `Finitions${(() => { const n = Object.values(g.s.collection).filter((e) => ['holo', 'gold', 'galaxy'].some((v) => e.v?.[v] > 0)).length; return n ? ` (${n})` : ''; })()}`], ['fav', 'Favoris']].map(([k, l]) => `<button class="seg-b" data-act="show" data-v="${k}" aria-pressed="${st.show === k}">${l}</button>`).join('')}</div>
       <details class="dc-fold col-filters" ${nf() ? 'open' : ''}><summary>${icon('filter')} Filtres et tri${nf() ? ` <span class="badge">${nf()}</span>` : ''}</summary>
         <div class="chips fac-grid" role="group" aria-label="Filtrer par faction">${FACTION_ORDER.map((f) => `<button class="chip" data-act="fac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.factions.includes(f)}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>
         <div class="chips" role="group" aria-label="Filtrer par rareté">${RARITIES.map((r) => `<button class="chip" data-act="rar" data-v="${r.key}" style="--chip:${r.color}" aria-pressed="${st.rarities.includes(r.key)}"><span class="dot" style="background:${r.color}"></span>${r.name}</button>`).join('')}</div>
@@ -170,7 +170,7 @@ export default function collection(app, root, params) {
     reset() { Object.assign(st, { q: '', factions: [], rarities: [], roles: [], passive: '', show: 'all', sort: 'num' }); const ps = root.querySelector('#col-pass'); if (ps) ps.value = ''; root.querySelector('#col-q').value = ''; root.querySelector('#col-sort').value = 'num'; syncPressed(); drawGrid(); },
     seen() { g.markAllSeen(); drawGrid(); },
     view(el) { st.view = el.dataset.v; drawView(); },
-    afac(el) { st.albumFac = el.dataset.v; st.albumPage = 0; drawAlbum(); },
+    afac(el) { app.sfx?.sheet?.(); st.albumFac = el.dataset.v; st.albumPage = 0; drawAlbum(); }, // v359 : un petit froissement de page à chaque faction
   });
   let tq;
   root.querySelector('#col-q').addEventListener('input', (e) => { clearTimeout(tq); tq = setTimeout(() => { st.q = e.target.value; drawGrid(); }, 140); });

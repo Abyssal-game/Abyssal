@@ -217,8 +217,8 @@ test('Somme : même somme sur deux côtés ; une carte alliée compte pour décl
   assert.equal(st.board[5].owner, 'p');
 });
 
-test('Abîme (v358) : Identique, Somme et cases sacrées fixes à la fois', () => {
-  const st = SC.newGame(catalog, { hand: ids.slice(0, 5), rival: SC.RIVAL.echo, seed: 4 });
+test('Abîme (v358, retirée en v359) : une partie commencée garde Identique, Somme et cases sacrées', () => {
+  const st = SC.newGame(catalog, { hand: ids.slice(0, 5), rival: { ...SC.RIVAL.echo, rule: 'abime' }, seed: 4 });
   assert.ok(SC.ruleHas(st, 'identique') && SC.ruleHas(st, 'somme') && SC.ruleHas(st, 'sacre') && !SC.ruleHas(st, 'instable'));
   assert.ok(st.cells.blessed != null);
 });
@@ -296,7 +296,7 @@ test('nouveaux adversaires et revanches éveillées', () => {
   // v358 : seules les règles gardées sont jouées par les adversaires et le défi du jour
   for (const r of SC.RIVALS) assert.ok(SC.RULE_LIST.includes(r.rule), r.key);
   for (let d = 0; d < 40; d++) assert.ok(SC.RULE_LIST.includes(SC.dailyChallenge(`2026-11-${d}`, 8).rule));
-  assert.deepEqual(SC.RULE_LIST, ['classique', 'sacre', 'identique', 'somme', 'abime']);
+  assert.deepEqual(SC.RULE_LIST, ['classique', 'sacre', 'identique', 'somme']);
 });
 
 test('v358 : une carte Inviolable qui résiste ne tombe pas dans la même pose', () => {
