@@ -3097,3 +3097,6 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 /* v349 : Sublimer, finition et prix sur deux lignes (le « · » se retrouvait seul et le prix débordait de la case) */
 .fg-cell small.fg-sub { display: flex; flex-direction: column; align-items: center; gap: 3px; line-height: 1.1; text-align: center; }
 .fg-cell small.fg-sub span { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
+/* v351 : icône du Présage (trois cartes en éventail), sans le cadre rond de l'ancien œil */
+.om-head img { border-radius: 0; object-fit: contain; filter: drop-shadow(0 0 10px rgba(180, 140, 255, .45)); }
+.om-head img { width: 96px; height: 96px; flex: none; }
