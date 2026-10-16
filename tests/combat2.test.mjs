@@ -54,7 +54,7 @@ test('bilan : une défaite explique qui a frappé, qui est tombé, et donne un c
   const r = D.battleReport(st, (uid) => catalog.get(st.units[uid].id).name);
   assert.ok(r.length >= 2);
   assert.ok(r.some((l) => /infligé le plus/.test(l)));
-  assert.ok(r.some((l) => /tombé/.test(l)));
+  assert.ok(r.some((l) => /succombé/.test(l)));
 });
 
 test('objectifs : trois cibles concrètes, qui suivent la progression', async () => {

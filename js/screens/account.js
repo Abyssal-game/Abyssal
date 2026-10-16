@@ -25,7 +25,7 @@ export default function account(app, root) {
     if (mode === 'newpass' && u) {
       root.innerHTML = `
         <header class="screen-head ui-hero bn-account"><h1>Nouveau mot de passe</h1><p class="muted">${esc(u.email || '')}</p></header>
-        <form class="panel stack acc-form" id="newpass">
+        <form class="panel stack acc-form" id="newpass" novalidate>
           <label class="acc-l"><span class="small muted">Nouveau mot de passe</span><input class="input plain" type="password" name="password" autocomplete="new-password" required minlength="8" placeholder="8 caractères, Aa1 et symbole"></label>
           <p class="small muted acc-pwrule">${PW_RULE}.</p>
           <label class="acc-l"><span class="small muted">Encore une fois</span><input class="input plain" type="password" name="password2" autocomplete="new-password" required minlength="8"></label>
@@ -52,7 +52,7 @@ export default function account(app, root) {
       root.innerHTML = `
         <header class="screen-head ui-hero bn-account"><h1>Compte</h1><p class="muted">Garde ta progression en ligne, retrouve-la sur n’importe quel appareil et affronte les joueurs du monde entier.</p></header>
         <div class="seg wide acc-seg" role="group" aria-label="Connexion ou inscription"><button type="button" class="seg-b" data-mode="login" aria-pressed="${!signup}">Se connecter</button><button type="button" class="seg-b" data-mode="signup" aria-pressed="${signup}">Créer un compte</button></div>
-        <form class="panel stack acc-form" id="login">
+        <form class="panel stack acc-form" id="login" novalidate>
           <label class="acc-l"><span class="small muted">E-mail</span><input class="input plain" type="email" name="email" autocomplete="username" inputmode="email" required value="${esc(lastEmail)}"></label>
           ${forgot ? '' : `<label class="acc-l"><span class="small muted">Mot de passe</span><input class="input plain" type="password" name="password" autocomplete="${signup ? 'new-password' : 'current-password'}" required ${signup ? 'minlength="8" placeholder="8 caractères, Aa1 et symbole"' : ''}></label>${signup ? `<p class="small muted acc-pwrule">${PW_RULE}.</p>` : ''}`}
           ${forgot ? '<p class="small muted">Tu recevras un e-mail avec un lien : il te ramène au jeu pour choisir un nouveau mot de passe.</p>' : ''}
@@ -65,7 +65,10 @@ export default function account(app, root) {
         e.preventDefault();
         if (busy) return;
         const f = new FormData(e.target);
-        lastEmail = String(f.get('email'));
+        lastEmail = String(f.get('email')).trim();
+        // v328 : validation du jeu, en français (le navigateur affichait son infobulle, parfois en anglais)
+        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(lastEmail)) { toast('Adresse e-mail invalide.', { kind: 'error', icon: 'info' }); return; }
+        if (!forgot && !String(f.get('password') || '')) { toast('Entre ton mot de passe.', { kind: 'error', icon: 'info' }); return; }
         busy = true; render();
         try {
           if (forgot) {

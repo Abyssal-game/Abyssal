@@ -15,7 +15,7 @@
  { "key": "set_1",         "name": "Premier ensemble",        "desc": "Complète un ensemble thématique.",                 "cond": { "type": "sets", "n": 1 },              "reward": { "shards": 25 } },
  { "key": "set_6",         "name": "Collectionneur d’ensembles", "desc": "Complète six ensembles thématiques.",           "cond": { "type": "sets", "n": 6 },              "reward": { "shards": 100, "tickets": { "premium": 1 } } },
  { "key": "evo_1",         "name": "Lignée complète",         "desc": "Possède tous les stades d’une lignée d’évolution.", "cond": { "type": "evolines", "n": 1 },         "reward": { "shards": 30 } },
- { "key": "boosters_1",    "name": "Le premier sceau",        "desc": "Ouvre ton premier booster.",                       "cond": { "type": "boosters", "n": 1 },          "reward": { "shards": 10 } },
+ { "key": "boosters_1",    "name": "Premier paquet déchiré",  "desc": "Ouvre ton premier booster.",                       "cond": { "type": "boosters", "n": 1 },          "reward": { "shards": 10 } },
  { "key": "boosters_10",   "name": "Briseur de sceaux",       "desc": "Ouvre 10 boosters.",                               "cond": { "type": "boosters", "n": 10 },         "reward": { "shards": 25 } },
  { "key": "boosters_50",   "name": "Insatiable",              "desc": "Ouvre 50 boosters.",                               "cond": { "type": "boosters", "n": 50 },         "reward": { "shards": 75, "tickets": { "premium": 1 } } },
  { "key": "boosters_150",  "name": "Pilleur de bibliothèques", "desc": "Ouvre 150 boosters.",                             "cond": { "type": "boosters", "n": 150 },        "reward": { "shards": 150, "title": "Pilleur de grimoires" } },

@@ -22,7 +22,7 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Le réseau de la session bloque github.io : pour vérifier la publication, passe par l'outil GitHub (déploiements Pages) ou demande une capture au propriétaire.
 
 ## 2. Routine de livraison
-1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v327**.
+1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v328**.
 2. Tests : `node --test tests/*.test.mjs` (206 tests), `node tools/validate.mjs`. Si le combat ou l'équilibre change : `node tools/fuzz.mjs 300` (étage moyen ≈ 12 à 14 en normal).
 3. Vérification dans le navigateur avec Playwright (`/opt/node-tools/node_modules/playwright/index.mjs`, Chromium déjà installé), avec un serveur local `python3 -m http.server 8092` lancé dans le dossier. Tailles iPhone SE et iPhone 13. **L'écran d'ouverture attend un toucher** (« Touche l'écran pour entrer ») : dans les scripts, cliquer au milieu de l'écran (dans la fenêtre 390×664) avant tout le reste.
 4. Commit, push, réponse en français.
@@ -65,6 +65,11 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Réglé par simulation (joueur « bon » = IA niveau 3) : Ilda ~90 %, Orvel ~83 %, Vesna ~63 %, Maître ~70 %, Écho ~52 %, Mammon ~38 %, Archiviste ~33 %, Souveraine ~33 % de victoires ; revanches éveillées plus dures.
 - Décision du 15 octobre 2026 : **toutes les cartes gardent le même total (20) aux Sceaux** ; ni la rareté, ni le niveau, ni les finitions ne donnent de bonus de valeurs (idée « bonus de niveau » proposée et refusée). Pas d'échange de cartes.
 - Si on retouche les Sceaux, refaire la mesure (scripts de simulation dans les sessions précédentes : partie contre chaque rival, 150 parties).
+
+## 4 quater. Étude joueurs simulée (16 octobre 2026) et suites
+- Dossier `docs/etude-joueurs-2026-10/` : rapport exécutif, 100 fiches (7 familles), analyse collective, backlog (34 propositions P0-P3), rétention simulée, annexes (modèle de référence du jeu, parcours réel en navigateur, simulateur 30 jours qui pilote le vrai moteur).
+- v328 applique les 10 priorités + 3 corrections rapides : palier des étages 1-2 sans faux coffre et conseil « l'expédition t'attendra demain » ; PV d'équipe comptant les tombées ; relecture (Sceau du Serment, Butin, « a succombé », succès « Premier paquet déchiré », texte de sauvegarde) ; nom du gardien sur sa carte en combat ; icône de combinaison manquante remplacée ; « Pas assez de cendres ? » seulement si vrai ; niveau moyen / niveau conseillé et explication du plancher au vestibule, bouton Renforcer ; bilan de défaite « équipe trop faible » avec bouton ; objectifs Accueil (Renforcer dès la 1re expédition, 1re partie des Sceaux, Sublimer quand l'équipe est au max) ; annonce d'ouverture des Sceaux après le 1er gardien ; guide : Sceaux ouverts après le 1er gardien ; premier combat allégé (bulles Marque, pouvoir d'équipe, dés repoussées après les 2 premiers étages de la 1re expédition) ; Sublimer dans la Fournaise ; une expédition reprise compte pour la mission d'étage du jour (pas pour le classement du jour) ; formulaire de compte validé en français ; bouton du coffre en haut du résumé ; zones tactiles ≥ 44 px.
+- Reste du backlog (P1-6 et suivants) : à reprendre depuis `03-backlog-et-priorites.md`.
 
 ## 5. Décisions déjà prises
 - Pas de « salle d'épreuve » ni de version de test : tout va sur main.

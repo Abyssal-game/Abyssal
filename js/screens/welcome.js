@@ -12,7 +12,7 @@ const PAGES = [
   { bn: 'collection', t: 'Ta collection', p: 'L’onglet Collection a quatre pages, en haut : Cartes (tout le Bestiaire), Équipe (tes 5 combattants), Renforcer et Fournaise.' },
   { bn: 'furnace', t: 'Cendres et niveaux', p: 'Dans la Fournaise, brûle tes doublons : ils deviennent des cendres. Dans Renforcer, les cendres font monter tes créatures de niveau, pour plus d’attaque et de PV.' },
   { img: 3, t: 'La Descente', p: 'Dans l’onglet Aventure, ton équipe descend dans l’Abysse : 3 créatures au combat, 2 en réserve. Un gardien tous les 5 étages. Remonte quand tu veux pour garder ton coffre.' },
-  { bn: 'sceaux', t: 'Une autre aventure', p: 'Toujours dans Aventure : les Duels des Sceaux, un jeu de cartes où l’on capture celles de l’adversaire.' },
+  { bn: 'sceaux', t: 'Une autre aventure', p: 'Toujours dans Aventure : les Duels des Sceaux, un jeu de cartes où l’on capture celles de l’adversaire. Ils s’ouvrent quand tu as vaincu ton premier gardien de la Descente.' },
   { bn: 'shadow', t: 'Coffres et Tirage des Ombres', p: 'Dans l’onglet Boosters, ouvre les coffres gagnés en Aventure. Le Tirage des Ombres donne un booster par jour : sa valeur compte pour le classement de la semaine, et les 3 premiers gagnent un coffre.' },
   { img: 4, t: 'Reviens chaque jour', p: 'L’Accueil rassemble ce qui t’attend : l’offrande, les missions et les coffres. Le Sanctuaire garde ton profil, tes succès, le bestiaire et les réglages (son, musique, vibrations, tutoriels).' },
 ];

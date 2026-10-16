@@ -2841,3 +2841,27 @@ body.gated { overflow: hidden; }
 .pf-more > summary .ic { width: 16px; height: 16px; }
 .pf-more[open] { padding-bottom: 10px; }
 .lr-fac > summary .small { white-space: nowrap; }
+
+/* v328 : suites de l'étude joueurs — niveau conseillé et boutons du vestibule, bilan « équipe trop faible », Sublimer dans la Fournaise, conseil de pause */
+.dc-teambtns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.dc-teambtns .btn { margin: 0; }
+.dc-lvl { margin: 6px 0 2px; }
+.dc-lvl.ok b { color: var(--gold-hi); }
+.dc-lvl.low b { color: #FF8FA3; }
+.dc-lvl a { color: var(--gold-hi); }
+.dc-floorhelp { margin: 0 0 8px; text-align: center; }
+.dc-floorhelp > summary { cursor: pointer; list-style: none; min-height: 32px; display: inline-flex; align-items: center; text-decoration: underline dotted; }
+.dc-floorhelp > summary::-webkit-details-marker { display: none; }
+.dc-floorhelp p { text-align: left; margin: 6px 0 0; }
+.dc-weak { border-color: rgba(255, 120, 140, .45) !important; }
+.dc-weak .btn { margin-top: 8px; }
+.dc-pause { margin: 10px 4px 0; }
+.fg-hint { margin-top: 10px; }
+.fg-cell.fg-dim { opacity: .55; }
+/* v328 : bouton du coffre en haut du résumé d'expédition ; zones tactiles d'au moins 44 px (étude joueurs, recommandation Apple) */
+.dc-chestcta { margin: 10px 0 4px; } /* placé juste sous le titre du résumé : visible sans défiler */
+.tm-b { min-width: 44px; min-height: 44px; }
+.dt-chipb { min-height: 44px; }
+.ph-name { min-height: 44px; }
+.av-custom { min-height: 44px; }
+.cb-resv { min-height: 44px; }

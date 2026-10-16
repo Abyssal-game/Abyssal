@@ -1,6 +1,6 @@
 // Pages « Renforcer » et « Fournaise » (sous-onglets de la Collection)
 import { tuto } from '../ui/tutos.js';
-import { RARITY, RARITY_ORDER } from '../config.js';
+import { RARITY, RARITY_ORDER, VARIANTS } from '../config.js';
 import { artUrl } from '../art/assets.js';
 import { icon } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, bindActions } from '../ui/dom.js';
@@ -32,7 +32,13 @@ export function forgeScreen(app, root) {
           ${li.cost ? `<button class="btn small ${ok ? 'gold' : 'ghost'} fg-up" data-act="up" data-id="${c.id}">${icon('p:level-up')}<span><b>Niv. ${li.level + 1}</b><small>${icon('ash')}${fmt(li.cost)}${gain ? ` · ${gain}` : ''}</small></span></button>` : '<span class="fg-max">Max</span>'}
         </div>`;
       }).join('')}</div>` : '<p class="panel small muted center">Ton équipe est vide : compose-la dans l’onglet Équipe.</p>'}
-      <a class="panel fg-link" href="#/fournaise">${icon('p:furnace')}<span><b>Pas assez de cendres ?</b><span class="small muted">Brûle tes doublons dans la Fournaise.</span></span>${icon('next')}</a>`;
+      ${(() => {
+        // v328 : « Pas assez de cendres ? » seulement quand c'est vrai (le message s'affichait avec 94 cendres et des niveaux à 10)
+        const can = list.filter((c) => { const li = g.cardLevelInfo(c.id); return li.cost && li.cost <= g.s.ash; });
+        return can.length
+          ? `<p class="panel small fg-hint">${icon('ash')} Tu as <b>${fmt(g.s.ash)} cendres</b> : ${can.length > 1 ? `${can.length} créatures peuvent` : `<b>${esc(can[0].name)}</b> peut`} monter d’un niveau dès maintenant (boutons dorés). Plus de niveaux = des étages plus profonds.</p>`
+          : `<a class="panel fg-link" href="#/fournaise">${icon('p:furnace')}<span><b>Pas assez de cendres ?</b><span class="small muted">Brûle tes doublons dans la Fournaise.</span></span>${icon('next')}</a>`;
+      })()}`;
   }
   bindActions(root, {
     show(el) { ui.all = el.dataset.v === 'all'; app.sfx.tap(); draw(); },
@@ -59,6 +65,18 @@ export function furnaceScreen(app, root) {
   function grid(cards, foot) {
     return `<div class="fg-grid">${cards.map((c) => `<button class="fg-cell" data-act="burn" data-id="${c.id}">${mini(c)}<b>${esc(c.name)}</b>${foot(c)}</button>`).join('')}</div>`;
   }
+  // v328 : Sublimer à côté des cendres (avant, seulement dans l'onglet Rareté d'une fiche : presque personne ne le trouvait)
+  function sublimeHTML() {
+    const list = Object.keys(g.s.collection).map((id) => ({ c: cat.get(id), x: g.sublimeInfo(id) })).filter((o) => o.c && o.x)
+      .sort((a, b) => (g.isFav(b.c.id) - g.isFav(a.c.id)) || (g.s.team.includes(b.c.id) - g.s.team.includes(a.c.id)) || (a.x.cost - b.x.cost));
+    if (!list.length) return '';
+    const shown = list.slice(0, ui.subAll ? 60 : 6), can = list.filter((o) => o.x.cost <= g.s.ash).length;
+    return `<section class="panel"><h2 class="section-title">Sublimer</h2>
+      <p class="small muted">Donne à une carte que tu possèdes sa finition suivante (holo, puis or, puis cosmique) contre des cendres. Tes favorites et ton équipe d’abord.${can ? ` Tu peux en sublimer <b>${can}</b> maintenant.` : ''}</p>
+      <div class="fg-grid">${shown.map(({ c, x }) => `<button class="fg-cell ${x.cost <= g.s.ash ? '' : 'fg-dim'}" data-act="sub" data-id="${c.id}">${mini(c)}<b>${esc(c.name)}</b><small>${esc(VARIANTS[x.to].name)} · ${icon('ash')}${fmt(x.cost)}</small></button>`).join('')}</div>
+      ${list.length > shown.length ? `<button class="btn small ghost block" data-act="subAll">Voir les ${list.length} cartes sublimables</button>` : ''}
+    </section>`;
+  }
   function draw() {
     const sp = g.spareAsh();
     const spares = cat.cards.filter((c) => g.spare(c.id) > 0);
@@ -72,6 +90,7 @@ export function furnaceScreen(app, root) {
           ${grid(spares, (c) => `<small>×${g.spare(c.id)} · ${icon('ash')}${fmt(g.spareAsh([c.id]).ash)}</small>`)}`
           : '<p class="small muted">Aucun doublon pour l’instant. Ceux que tu tires dans les boosters arrivent ici.</p>'}
       </section>
+      ${sublimeHTML()}
       <details class="panel dc-fold fg-adv" ${ui.q || ui.adv ? 'open' : ''}><summary>${icon('p:furnace')} Avancé : brûler une autre carte</summary><div>
         <p class="small muted">Même ta dernière copie : la créature quitte alors ta collection (on te demande toujours de confirmer).</p>
         <label class="search fg-search">${icon('search')}<input class="input plain" type="search" placeholder="Rechercher une créature…" value="${esc(ui.q || '')}" data-q></label>
@@ -93,6 +112,22 @@ export function furnaceScreen(app, root) {
       draw();
     },
     burn(el) { openBurn(app, el.dataset.id, { onClose: draw }); },
+    subAll() { ui.subAll = true; draw(); },
+    async sub(el) {
+      const id = el.dataset.id, c = cat.get(id), x = g.sublimeInfo(id);
+      if (!x) return;
+      if (x.cost > g.s.ash) { toast(`Il te manque <b>${fmt(x.cost - g.s.ash)} cendres</b> pour sublimer ${esc(c.name)}.`, { icon: 'ash' }); return; }
+      if (!(await confirmBox(`Sublimer <b>${esc(c.name)}</b> en <b>${esc(VARIANTS[x.to].name.toLowerCase())}</b> pour <b>${fmt(x.cost)} cendres</b> ?`, { ok: 'Sublimer' }))) return;
+      try {
+        app.pendingProgress = [];
+        const r = g.sublime(id);
+        g.setShownVariant?.(id, r.to);
+        app.sfx.levelup?.();
+        toast(`Carte sublimée : <b>${esc(c.name)}</b> en <b>${esc(VARIANTS[r.to].name.toLowerCase())}</b> (−${fmt(r.cost)} cendres).`, { kind: 'epic', icon: 'sparkle' });
+        app.flushProgress(); app.chrome?.();
+      } catch (err) { app.pendingProgress = null; app.sfx.error(); toast(esc(err.message), { kind: 'error' }); }
+      draw();
+    },
   });
   app.refreshView = draw;
   draw();

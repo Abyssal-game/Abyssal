@@ -61,7 +61,7 @@ export default function settings(app, root) {
   function tabSave() {
     return `<section class="panel stack">
         <h2>Sauvegarde</h2>
-        <p class="small">Ta progression est enregistrée <b>uniquement sur cet appareil</b>, dans ce navigateur, après chaque action. Pour la conserver ou la transférer, exporte-la régulièrement, ou connecte ton compte en ligne.</p>
+        <p class="small">Ta progression est enregistrée sur cet appareil après chaque action, et envoyée sur ton compte en ligne dès que tu as du réseau : tu la retrouves sur n’importe quel appareil en te connectant. Tu peux aussi l’exporter pour en garder une copie.</p>
         ${app.persistent ? '' : '<p class="small err">Le stockage local est indisponible : la progression sera perdue à la fermeture.</p>'}
         <div class="row gap wrap">
           <button class="btn small" data-act="export">${icon('copy')}Copier le code</button>

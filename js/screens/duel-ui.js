@@ -17,6 +17,9 @@ import {
 } from '../core/duel.js';
 import { KITS, AI_FAMILIES, DICE_TIERS, WEAK_TO, TALENTS } from '../core/skills.js';
 import { BOSSES, LAWS, ASPECTS } from '../core/bosses.js';
+// v328 : premier combat allégé — pendant les deux premiers étages de la première expédition, seules la main dorée et les
+// bulles de base s'affichent ; Marque/enchaînement, pouvoir d'équipe et dés attendent la suite (relisibles dans Réglages)
+const CB_ICON = new Set(['bastion', 'chain', 'chasse', 'glace']); // images présentes dans assets/icons/cb-*.webp
 import { PACTS } from '../core/pacts.js';
 import { TRAITS } from '../core/descent.js';
 import { RELICS } from '../core/relics.js';
@@ -48,6 +51,7 @@ const IN_PIC = { gorge: 'heavy', gather: 'channel', blizzard: 'frost', mimic: 'c
 const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${IN_PIC[k] || k}.webp">`;
 
 export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.' }) {
+  const settling = () => { const d = app.game.s.descent; return (d.runs || 0) <= 1 && (d.run?.floor || 1) <= 2; }; // v328 : voir plus haut
   const g = app.game, cat = app.catalog, run = runOpt || g.descent().run, st = run.battle;
   const ui = (app.state.duel ||= { fast: 0 }); // v255 : plus de bouton ×2, vitesse unique
   const reduced = app.reduced();
@@ -144,7 +148,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       <span class="dv-art"><img alt="" src="${artUrl(c)}"></span>
       <span class="dv-kw ${enemy && u.fam ? 'fam' : ''}" title="${esc(enemy && u.fam ? AI_FAMILIES[u.fam].desc : kit.name)}">${roleIcon(kit.kw)}<em>${esc(enemy && u.fam ? AI_FAMILIES[u.fam].name : kit.name)}</em></span>
       ${u.boss ? `<span class="dv-boss"><img alt="" src="assets/icons/crest-boss.webp">${u.phase2 ? 'Furie' : 'Gardien'}</span>` : u.elite ? '<span class="dv-boss elite"><img alt="" src="assets/icons/crest-elite.webp">Élite</span>' : ''}
-      <span class="dv-nm ${u.named ? 'named' : ''}">${esc(u.named ? u.title : c.name)}</span>
+      <span class="dv-nm ${u.named || (u.boss && st.bossKey) ? 'named' : ''}">${esc(u.boss && st.bossKey && BOSSES[st.bossKey] ? BOSSES[st.bossKey].name : u.named ? u.title : c.name)}</span>
       ${u.brkMax ? `<span class="cb-brk ${u.broken || u.cracked ? 'is-broken' : ''} ${u.cracked ? 'is-fele' : ''}" title="Brisure">${u.broken ? '<img alt="" src="assets/icons/st-broken.webp"><b>BRISÉ</b>' : u.cracked ? '<b>FÊLÉ</b>' : `<i style="width:${(u.brk / u.brkMax) * 100}%"></i>`}</span>` : ''}
       <span class="dv-atk">${icon('swords')}<b>${u.atk + (u.boost || 0)}</b></span>
       <span class="dv-hp ${u.hp < u.maxHp ? 'hurt' : ''}">${icon('heart')}<b>${Math.max(0, u.hp)}</b></span>
@@ -229,7 +233,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     $('.cb-pips').innerHTML = Array.from({ length: st.init ? PA_MAX : Math.max(AP_MAX, st.ap) }, (_, i) => `<i class="${i < paNow ? 'on' : ''}"></i>`).join('');
     $('.cb-gems').innerHTML = Array.from({ length: FERVOR_MAX }, (_, i) => `<i class="${i < st.fervor ? 'on' : ''}"></i>`).join('');
     const ready = ultReady(st);
-    if (ready && !g.s.tips?.['cb-ult']) tuto(app, 'cb-ult');
+    if (ready && !g.s.tips?.['cb-ult'] && !settling()) tuto(app, 'cb-ult');
     $('.cb-res').classList.toggle('ready', ready);
     $('.cb-ult small').textContent = st.ultUsed ? 'Utilisé' : ready ? '' : `${st.fervor}/${FERVOR_MAX}`;
     const canMore = (st.init || st.ap > 0) && front(st, 'ally').some((u) => actionsFor(st, u.uid).some((a) => a.ok && a.key !== 'swap' && a.key !== 'defend'));
@@ -343,7 +347,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   const comboPop = (uid, key) => {
     const t = el(uid), box = $('.dv'); if (!t || !box) return;
     const b = box.getBoundingClientRect(), r = t.getBoundingClientRect();
-    const i = document.createElement('img'); i.className = 'cb-cpop'; i.alt = ''; i.src = `assets/icons/cb-${key}.webp`;
+    const i = document.createElement('img'); i.className = 'cb-cpop'; i.alt = ''; i.src = `assets/icons/cb-${CB_ICON.has(key) ? key : 'chain'}.webp`; // v328 : pas d'image pour chaque combinaison (cb-breche manquait)
     i.style.cssText = `left:${r.left - b.left + r.width / 2}px;top:${r.top - b.top + r.height * 0.4}px;width:${Math.min(76, r.width * 0.64)}px`;
     box.appendChild(i); setTimeout(() => i.remove(), 1200);
   };
@@ -569,13 +573,13 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           if (e.k === 'entrance') ring(e.u, 'enter');
           if (e.trait === 'explosif') { fxSheet(e.u, 'fx-explode', { k: 2.6, d: 760 }); app.sfx.explode?.(); shake(true); banner(`<img class="cb-trico" alt="" src="assets/icons/st-explosif.webp"> Explosion !`, 'danger', 800); }
           else if (e.trait) { if (e.trait === 'enrage') fxSheet(e.u, 'fx-enrage', { k: 1.9, d: 820 }); (e.trait === 'enrage' ? app.sfx.enrage : app.sfx.boss)?.(); banner(`<img class="cb-trico" alt="" src="assets/icons/st-${e.trait}.webp"> ${esc(e.s)}`, 'danger', 800); }
-          if (e.combo && e.by && e.a && e.by !== e.a && st.units[e.by]?.side === 'ally') { synergy(e.by, e.a, e.s); await wait(T(380)); if (!g.s.tips?.['cb-combo']) tuto(app, 'cb-combo'); }
+          if (e.combo && e.by && e.a && e.by !== e.a && st.units[e.by]?.side === 'ally') { synergy(e.by, e.a, e.s); await wait(T(380)); if (!g.s.tips?.['cb-combo'] && !settling()) tuto(app, 'cb-combo'); }
           if (e.combo) comboPop(e.u, e.combo);
           float(e.u, e.s, e.syn ? 'syn' : e.k === 'bad' ? 'dmg' : 'info');
           draw();
           await wait(T(e.syn ? 480 : 260));
           break;
-        case 'combo': comboPop(e.u, 'chain'); float(e.u, `Chaîne ×${e.n}`, 'combo'); app.sfx.chain?.(); await wait(T(260)); if (!g.s.tips?.['cb-combo']) tuto(app, 'cb-combo'); break;
+        case 'combo': comboPop(e.u, 'chain'); float(e.u, `Chaîne ×${e.n}`, 'combo'); app.sfx.chain?.(); await wait(T(260)); if (!g.s.tips?.['cb-combo'] && !settling()) tuto(app, 'cb-combo'); break;
         case 'finisher': { if (st.over === 'won') break; if (!reduced) { const d = $('.dv'); d.classList.add('slowmo'); setTimeout(() => d.classList.remove('slowmo'), 700); } banner('Coup de grâce !', 'finisher', 800); app.sfx.finisher?.(); await wait(T(380)); break; }
         case 'die': {
           const u = st.units[e.u];
@@ -871,7 +875,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (a.target === 'none') { mode = null; return exec(() => act(st, u, key)); }
     const ts = actionTargets(st, u, key);
     if (key === 'swap') { if (ts.length === 1) { mode = null; return exec(() => act(st, u, 'swap', ts[0])); } return pickReserve(); }
-    if (a.dice && !g.s.tips?.['cb-dice']) await tuto(app, 'cb-dice');
+    if (a.dice && !g.s.tips?.['cb-dice'] && !settling()) await tuto(app, 'cb-dice');
     if (ts.length === 1 && (key === 'rempart' || key === 'priere')) { mode = null; return exec(() => act(st, u, key, ts[0])); }
     mode = { key, name: a.name, dice: !!a.dice, target: a.target };
     draw();

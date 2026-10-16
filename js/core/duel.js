@@ -1719,7 +1719,7 @@ export function battleReport(st, name) {
     const top = Object.entries(st.taken || {}).sort((a, b) => b[1] - a[1])[0];
     if (top) out.push(`${name(top[0])} t’a infligé le plus de dégâts (${top[1]}).`);
     const first = (st.fallenLog || [])[0];
-    if (first) out.push(`${name(first.u)} est tombé${first.round ? ` au tour ${first.round}` : ''}${first.by ? `, sous ${KIND_TXT[first.kind] || 'une attaque'} de ${name(first.by)}` : ''}.`);
+    if (first) out.push(`${name(first.u)} a succombé${first.round ? ` au tour ${first.round}` : ''}${first.by ? `, sous ${KIND_TXT[first.kind] || 'une attaque'} de ${name(first.by)}` : ''}.`);
     if (s.missed) out.push(`${s.missed} attaque${s.missed > 1 ? 's' : ''} dangereuse${s.missed > 1 ? 's' : ''} n’${s.missed > 1 ? 'ont' : 'a'} pas été parée${s.missed > 1 ? 's' : ''}.`);
     const tip = s.missed ? 'Contre les attaques annoncées « Danger », touche au bon moment pour esquiver ou parer.'
       : !s.breaks && Object.values(st.units).some((u) => u.side === 'enemy' && (u.boss || u.elite)) ? 'Concentre tes coups sur l’élite ou le gardien pour le briser : il perd son tour.'

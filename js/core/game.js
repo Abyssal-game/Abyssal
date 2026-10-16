@@ -10,7 +10,7 @@ export const CHALLENGES = [
 export const WEEK_DAYS = 5; // jours joués dans la semaine pour le coffre de la semaine
 export const FIRST_WIN = 50;
 export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par combat n'augmentent plus // éclats de la toute première victoire
-import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ITEMS, SHOW_ORDER, SHADOW, SUBLIME_ASH } from '../config.js';
+import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ITEMS, SHOW_ORDER, SHADOW, SUBLIME_ASH, VARIANTS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
 import { rngOf, DESCENT, CHESTS, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES, foeTraits } from './descent.js';
@@ -713,17 +713,30 @@ export class Game {
       out.push({ kind: 'depth', title: best ? `Atteins l’étage ${target}` : 'Lance ta première expédition', sub: best ? `Ton record : étage ${best} · ${what}` : 'Descends dans l’Abysse : un coffre t’attend dès l’étage 3', href: '#/descente', icon: 'depth', p: Math.min(best, target), n: target });
     }
     // équipe trop faible pour la suite, et assez de cendres pour la renforcer
-    const team = this.team(), need = expectedLevel(Math.max(best + 1, 4));
+    // v328 : dès la première expédition, Renforcer est mis sur le chemin (avant, le niveau demandé valait 1 jusqu'à l'étage 8,
+    // et des joueurs finissaient le mois avec une équipe entière au niveau 1 et des cendres plein les poches)
+    const team = this.team(), need = Math.max(expectedLevel(Math.max(best + 1, 4)), best >= 1 ? 2 : 1);
     const weak = team.map((id) => ({ id, lv: this.cardLevel(id) })).filter((x) => x.lv < Math.min(MAX_LEVEL, need)).sort((a, b) => a.lv - b.lv)[0];
     if (weak && this.s.ash >= this.upgradeCost(weak.id)) {
-      const c = this.catalog.get(weak.id);
-      out.push({ kind: 'forge', title: `Renforce ${c.name}`, sub: `Niveau ${weak.lv} · tu as ${this.s.ash} cendres, de quoi le faire monter`, href: '#/renfort', icon: 'level-up' });
+      const c = this.catalog.get(weak.id), cost = this.upgradeCost(weak.id);
+      const forge = { kind: 'forge', title: `Renforce ${c.name}`, sub: `Niveau ${weak.lv} → ${weak.lv + 1} pour ${cost} cendres (tu en as ${this.s.ash}) : plus de PV et d’attaque`, href: '#/renfort', icon: 'level-up' };
+      // jamais rien monté : c'est l'objectif principal (affiché en grand), sauf pendant une expédition
+      if (!d.run && team.every((id) => this.cardLevel(id) <= 1)) out.unshift(forge); else out.push(forge);
+    }
+    // v328 : équipe au niveau maximal et cendres qui dorment : Sublimer (finition supérieure) devient l'objectif
+    if (team.length && team.every((id) => this.cardLevel(id) >= MAX_LEVEL)) {
+      const sub = Object.keys(this.s.collection).map((id) => ({ id, x: this.sublimeInfo(id) })).filter((o) => o.x && o.x.cost <= this.s.ash)
+        .sort((a, b) => (this.isFav(b.id) - this.isFav(a.id)) || (b.x.cost - a.x.cost))[0];
+      if (sub) out.push({ kind: 'sublime', title: `Sublime ${this.catalog.get(sub.id).name}`, sub: `${VARIANTS[sub.x.to].name} pour ${sub.x.cost} cendres (tu en as ${this.s.ash}) · Fournaise → Sublimer`, href: '#/fournaise', icon: 'sparkle' });
     }
     if (bf && out.length < 3 && !out.some((x) => x.sub?.includes(BOSSES[bossOf(bf)].name))) { const B = BOSSES[bossOf(bf)]; out.push({ kind: 'boss', title: `Vaincs ${B.name}`, sub: `Gardien de l’étage ${bf} · son récit t’attend dans le Bestiaire`, href: '#/descente', icon: 'crest-boss' }); }
     else if (!bf && this.sceauxOpen()) {
       const i = SC.RIVALS.findIndex((r) => !this.s.sceaux.beaten[r.key]);
       if (i >= 0 && SC.rivalUnlocked(this.s, i)) out.push({ kind: 'sceaux', title: `Bats ${SC.RIVALS[i].name} aux Duels des Sceaux`, sub: `${SC.RIVALS[i].title} · première victoire : +${SC.SCEAUX_REWARD.firstWin} éclats`, href: '#/sceaux', icon: 'seal' });
     }
+    // v328 : les Duels des Sceaux s'ouvrent après le premier gardien ; la première partie devient un objectif
+    const sc = this.s.sceaux;
+    if (this.sceauxOpen() && !(sc.wins + sc.losses + sc.draws) && !sc.cur && !out.some((x) => x.kind === 'sceaux')) out.push({ kind: 'sceaux', title: 'Joue ta première partie des Sceaux', sub: 'Un second jeu de cartes, en 2 minutes, contre 8 rivaux · Aventure → Sceaux', href: '#/sceaux', icon: 'seal' });
     // collection : un ensemble presque complet, sinon le royaume le plus avancé
     const set = this.catalog.sets.map((x) => ({ x, ...this.setProgress(x.key) })).filter((x) => !x.done && x.owned > 0 && x.total - x.owned <= 3).sort((a, b) => (a.total - a.owned) - (b.total - b.owned))[0];
     if (set) {
@@ -1019,8 +1032,10 @@ export class Game {
     const d = this.descent(), run = d.run;
     d.best = Math.max(d.best, floor);
     if (!run || !run.free) this.seasonDepth(floor);
-    // une expédition commencée la veille ne compte pas pour le record ni les missions du jour
-    if (!run || run.day === d.day) { d.bestToday = Math.max(d.bestToday, floor); this.track('depth', floor); }
+    // une expédition commencée la veille ne compte pas pour le classement du jour (le donjon change chaque jour) ;
+    // v328 : elle compte en revanche pour le record personnel (d.best) et pour la mission du jour « atteins l'étage N »
+    if (!run || run.day === d.day) d.bestToday = Math.max(d.bestToday, floor);
+    this.track('depth', floor);
   }
   // Renommée : chaque victoire rapporte des points aux créatures restées debout ; un palier franchi s'annonce
   gainFame(ids, n = 1) {
