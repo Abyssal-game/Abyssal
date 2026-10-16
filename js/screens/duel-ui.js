@@ -19,7 +19,7 @@ import { KITS, AI_FAMILIES, DICE_TIERS, WEAK_TO, TALENTS } from '../core/skills.
 import { BOSSES, LAWS, ASPECTS } from '../core/bosses.js';
 // v328 : premier combat allégé — pendant les deux premiers étages de la première expédition, seules la main dorée et les
 // bulles de base s'affichent ; Marque/enchaînement, pouvoir d'équipe et dés attendent la suite (relisibles dans Réglages)
-const CB_ICON = new Set(['bastion', 'chain', 'chasse', 'glace']); // images présentes dans assets/icons/cb-*.webp
+const CB_ICON = new Set(['bastion', 'chasse', 'glace']); // images présentes dans assets/icons/cb-*.webp
 import { PACTS } from '../core/pacts.js';
 import { TRAITS, traitIcon, OMENS } from '../core/descent.js';
 import { RELICS } from '../core/relics.js';
@@ -359,9 +359,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   // Icône d'une combinaison réussie, qui jaillit de la carte
   // (posée sur le combat, pas dans la carte : la carte est redessinée pendant l'animation)
   const comboPop = (uid, key) => {
-    const t = el(uid), box = $('.dv'); if (!t || !box) return;
+    const t = el(uid), box = $('.dv'); if (!t || !box || !CB_ICON.has(key)) return; // v353 : plus de petite épée de repli (cb-chain) par-dessus la lame d'or
     const b = box.getBoundingClientRect(), r = t.getBoundingClientRect();
-    const i = document.createElement('img'); i.className = 'cb-cpop'; i.alt = ''; i.src = `assets/icons/cb-${CB_ICON.has(key) ? key : 'chain'}.webp`; // v328 : pas d'image pour chaque combinaison (cb-breche manquait)
+    const i = document.createElement('img'); i.className = 'cb-cpop'; i.alt = ''; i.src = `assets/icons/cb-${key}.webp`;
     i.style.cssText = `left:${r.left - b.left + r.width / 2}px;top:${r.top - b.top + r.height * 0.4}px;width:${Math.min(76, r.width * 0.64)}px`;
     box.appendChild(i); setTimeout(() => i.remove(), 1200);
   };
@@ -602,7 +602,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           draw();
           await wait(T(e.syn ? 480 : 260));
           break;
-        case 'combo': comboPop(e.u, 'chain'); float(e.u, `Chaîne ×${e.n}`, 'combo'); app.sfx.chain?.(); await wait(T(260)); if (!g.s.tips?.['cb-combo'] && !settling()) tuto(app, 'cb-combo'); break;
+        case 'combo': float(e.u, `Chaîne ×${e.n}`, 'combo'); app.sfx.chain?.(); await wait(T(260)); if (!g.s.tips?.['cb-combo'] && !settling()) tuto(app, 'cb-combo'); break;
         case 'finisher': { if (st.over === 'won') break; if (!reduced) { const d = $('.dv'); d.classList.add('slowmo'); setTimeout(() => d.classList.remove('slowmo'), 700); } banner('Coup de grâce !', 'finisher', 800); app.sfx.finisher?.(); await wait(T(380)); break; }
         case 'die': {
           const u = st.units[e.u];
