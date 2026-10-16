@@ -3007,3 +3007,19 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 /* v340 : image de la fenêtre de phase 2 des gardiens : la règle générale img { max-width: 100% } l'empêchait de remplir
    tout le haut de l'encadré (image décalée à gauche, vide à droite) */
 .cb-phimg { max-width: none; display: block; }
+/* v341 : impact des coups — recul franc de la carte touchée (éclair blanc, poussée vers l'arrière, secousse)
+   et entaille lumineuse qui la traverse ; plus forte sur les gros coups */
+.dv-row.enemy .dv-c { --kb: -14px; }
+.dv-row.ally .dv-c { --kb: 14px; }
+.dv-c.hit { animation: dvHit2 .42s cubic-bezier(.2, .8, .3, 1) !important; }
+@keyframes dvHit2 {
+  0% { transform: rotateX(var(--tilt, 8deg)) translateY(var(--kb)) scale(.93); filter: brightness(3.2) saturate(0); }
+  22% { transform: rotateX(var(--tilt, 8deg)) translate(-6px, calc(var(--kb) * .45)) rotate(-2.5deg) scale(.97); filter: brightness(1.5) saturate(.6); }
+  48% { transform: rotateX(var(--tilt, 8deg)) translate(5px, 0) rotate(1.5deg); filter: none; }
+  72% { transform: rotateX(var(--tilt, 8deg)) translateX(-2px); }
+  100% { transform: rotateX(var(--tilt, 8deg)); }
+}
+.dv-cut { position: absolute; z-index: 8; left: 50%; top: 46%; width: 150%; height: 5px; pointer-events: none; border-radius: 3px; background: linear-gradient(90deg, transparent, rgba(255, 240, 210, .9) 30%, #fff 50%, rgba(255, 200, 120, .9) 70%, transparent); box-shadow: 0 0 14px rgba(255, 190, 90, .95), 0 0 30px rgba(255, 140, 40, .6); transform: translate(-50%, -50%) rotate(var(--ca, -30deg)) scaleX(0); animation: dvCut .42s cubic-bezier(.2, .9, .2, 1) forwards; mix-blend-mode: screen; }
+.dv-cut.foe { background: linear-gradient(90deg, transparent, rgba(255, 150, 170, .9) 30%, #fff 50%, rgba(200, 80, 255, .9) 70%, transparent); box-shadow: 0 0 14px rgba(255, 60, 100, .95), 0 0 30px rgba(170, 60, 255, .6); }
+.dv-cut.big { height: 8px; width: 175%; }
+@keyframes dvCut { 0% { transform: translate(-50%, -50%) rotate(var(--ca, -30deg)) scaleX(0); opacity: 1; } 35% { transform: translate(-50%, -50%) rotate(var(--ca, -30deg)) scaleX(1); opacity: 1; } 100% { transform: translate(-50%, -50%) rotate(var(--ca, -30deg)) scaleX(1.05) scaleY(.2); opacity: 0; } }

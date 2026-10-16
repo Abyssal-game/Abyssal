@@ -491,7 +491,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           if (t) { t.classList.remove('hit'); void t.offsetWidth; t.classList.add('hit'); const hp = t.querySelector('.dv-hp b'); if (hp) hp.textContent = Math.max(0, e.hp); t.querySelector('.dv-hp')?.classList.add('hurt'); }
           const crit = lastTier === 'crit', heavy = crit || e.d >= 8;
           lastTier = null;
-          if (heavy) await hitstop(crit ? 140 : 70);
+          // v341 : chaque coup marque l'impact — entaille lumineuse sur la carte touchée et court arrêt sur image
+          if (t && !reduced && !aoeHit) { const k = document.createElement('span'); k.className = `dv-cut ${st.units[e.u]?.side === 'ally' ? 'foe' : ''} ${heavy ? 'big' : ''}`; k.style.setProperty('--ca', `${-38 + Math.round(Math.random() * 30)}deg`); t.appendChild(k); setTimeout(() => k.remove(), 520); }
+          await hitstop(crit ? 140 : heavy ? 80 : 45);
           const sU = e.src && st.units[e.src];
           if (sU?.side === 'ally' && ROLE_FX[sU.role] && !aoeHit) { fxSheet(e.u, ROLE_FX[sU.role], { k: heavy ? 2 : 1.7 }); if (crit) fxAt(e.u, 'crit', { big: true }); }
           else if (!aoeHit) fxAt(e.u, crit ? 'crit' : heavy ? 'impact' : 'slash', { big: heavy });
