@@ -90,6 +90,12 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   </div>`;
   const $ = (s) => root.querySelector(s);
   const dio = mountDiorama($('.dv'), { room, decor: g.s.settings?.decor || 'riche', reduced, aspect: st.aspect });
+  // v362 : les planches d'effets les plus jouées sont décodées dès l'entrée en combat (sinon le premier coup saccade)
+  if (!reduced) {
+    const keep = new Set(['strike', 'foe-strike', 'crit-strike', 'fx-dodge', 'fx-parry', 'def-clash', 'def-ring', 'dice-ring', 'dice-charge', 'dice-perfect', 'dice-land']);
+    Object.values(st.units).forEach((u) => { if (u.side !== 'ally') return; const c = cat.get(u.id); if (c) keep.add(`circle-${c.faction}`); const k = KITS[u.role]?.skill?.key; if (k) keep.add(`sk-${k}`); });
+    keep.forEach((n) => { const im = new Image(); im.src = `assets/fx/${n}.webp`; im.decode?.().catch(() => {}); });
+  }
   const enEl = $('.dv-row.enemy'), alEl = $('.dv-row.ally'), msgEl = $('.dv-msg'), actsEl = $('.cb-acts');
   const say = (h) => { msgEl.innerHTML = frSpaces(h); }; // v319 : « » et : ! ? ne se retrouvent plus seuls en début de ligne
   const el = (uid) => root.querySelector(`[data-uid="${uid}"]`);
@@ -429,7 +435,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   const ghost = (uid) => {
     if (reduced) return; const t = el(uid), box = $('.dv'); if (!t || !box) return;
     const b = box.getBoundingClientRect(), r = t.getBoundingClientRect();
-    [1, 2].forEach((i) => { const g = t.cloneNode(true); g.removeAttribute('data-uid'); g.querySelectorAll('[data-uid]').forEach((x) => x.removeAttribute('data-uid'));
+    [1].forEach((i) => { const g = t.cloneNode(true); g.removeAttribute('data-uid'); /* v362 : une seule silhouette (plus léger) */ g.querySelectorAll('[data-uid]').forEach((x) => x.removeAttribute('data-uid'));
       g.className = `${t.className} dv-ghost g${i}`; g.classList.remove('dodge', 'hit', 'aimed', 'aim');
       g.style.cssText = `position:absolute;left:${r.left - b.left}px;top:${r.top - b.top}px;width:${r.width}px;height:${r.height}px;margin:0`;
       box.appendChild(g); setTimeout(() => g.remove(), 560); });
@@ -545,7 +551,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           await wait(T(320));
           break;
         }
-        case 'parry': app.sfx.parry(); dio.flare(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxSheet(e.u, 'def-clash', { k: 2.7, d: 760 }); fxSheet(e.u, 'fx-parry', { k: 2.1, d: 820 }); recoil(e.a); // v361 : choc des lames (Gemini) + anneau d'or impactFlash(e.u, true); sparks(e.u, 'gold'); cam(e.u, -0.8); } banner('Parade parfaite !', 'parry', 800); shake(false); await wait(T(420)); break;
+        case 'parry': app.sfx.parry(); dio.flare(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxSheet(e.u, 'def-clash', { k: 2.7, d: 760 }); fxSheet(e.u, 'fx-parry', { k: 2.1, d: 820 }); recoil(e.a); /* v361 : choc des lames (Gemini) + anneau d'or */ impactFlash(e.u, true); sparks(e.u, 'gold'); cam(e.u, -0.8); } banner('Parade parfaite !', 'parry', 800); shake(false); await wait(T(420)); break;
         case 'fervor': fervorPop(e.d, e.why); draw(); break;
         case 'passive': app.sfx.passive?.(); passivePop(e.u, e.p); float(e.u, PASSIVES[e.p]?.name || '', 'syn'); await wait(T(320)); break;
         case 'brk': { const t = el(e.u)?.querySelector('.cb-brk i'); if (t) t.style.width = `${(e.brk / e.max) * 100}%`; break; }

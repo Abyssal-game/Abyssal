@@ -1619,8 +1619,7 @@ i.cmb { font-style: normal; color: #FFC266; font-weight: 800; }
   100% { transform: none; }
 }
 /* Arrêt sur image : tout se fige un instant au moment de l'impact */
-.dv.hitstop .dv-c, .dv.hitstop .dv-c * { animation-play-state: paused !important; }
-.dv.hitstop .dv-row { filter: contrast(1.15) brightness(1.08); }
+.dv.hitstop .dv-c { animation-play-state: paused !important; } /* v362 : plus de filtre sur les rangées ni de pause de chaque élément (trop lourd sur iPhone) */
 /* Caméra simulée : glissement bref vers l'action (propriété translate, indépendante des secousses) */
 .dv.cam { animation: cbCam .45s ease-out; }
 @keyframes cbCam { 35% { translate: var(--cx, 0) var(--cy, 0); } 100% { translate: 0 0; } }
@@ -3242,3 +3241,24 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 .cb-dring .zg { stroke: rgba(242, 193, 78, .6); }
 .cb-dring svg { position: relative; z-index: 1; }
 .cb-dring .dr-img { z-index: 0; }
+
+/* v362 : fluidité des combats (retour du propriétaire : « ça freeze, ça lag ») et carré noir autour du dé sur iPhone.
+   Les images d'effets ont désormais une vraie transparence : plus besoin du fondu « screen » (coûteux, et parfois ignoré
+   par Safari, d'où le carré noir). On retire aussi les filtres animés sur des rangées entières et le zoom de caméra. */
+.kx-sprite, .kx-sprite.fxs, .dv-fx, .cast-circ, .ry2-ring, .ry2-chg, .cb-dring, .cb-dring .dr-img, .kx-embers, .kx-crack, .dv-iflash,
+.sc-seal, .sc-halo, .sc-rs, .sc-combo .sc-cburst, .cb-beam, .dv-ghost { mix-blend-mode: normal !important; }
+@keyframes cbCam { 30% { translate: var(--cx, 0) var(--cy, 0); } 100% { translate: 0 0; } }
+.dv { will-change: translate, transform; }
+.ry2-ring { filter: none; opacity: calc(.55 + var(--ch) * .45); }
+.dv-c.cast { animation-name: castLift2; box-shadow: 0 0 0 2px var(--fc), 0 0 22px var(--fc); }
+@keyframes castLift2 { 0% { transform: none; } 30% { transform: translateY(-14px) scale(1.1); } 80% { transform: translateY(-10px) scale(1.08); } 100% { transform: none; } }
+.dv-c.cast-foe { animation-name: castFoe2; box-shadow: 0 0 0 2px #FF3B4E, 0 0 24px #FF3B4E; }
+@keyframes castFoe2 { 0% { transform: none; } 20% { transform: scale(1.14); } 30%, 50%, 70% { transform: scale(1.12) translateX(-3px); } 40%, 60% { transform: scale(1.12) translateX(3px); } 85% { transform: scale(1.1); } 100% { transform: none; } }
+.dv-ghost { filter: none; opacity: .4; }
+@keyframes dvHit2 {
+  0% { transform: rotateX(var(--tilt, 8deg)) translateY(var(--kb)) scale(.93); }
+  22% { transform: rotateX(var(--tilt, 8deg)) translate(-6px, calc(var(--kb) * .45)) rotate(-2.5deg) scale(.97); }
+  48% { transform: rotateX(var(--tilt, 8deg)) translate(5px, 0) rotate(1.5deg); }
+  72% { transform: rotateX(var(--tilt, 8deg)) translateX(-2px); }
+  100% { transform: rotateX(var(--tilt, 8deg)); }
+}
