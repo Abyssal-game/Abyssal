@@ -464,9 +464,10 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           lastAtk = st.units[e.u]?.side === 'ally' ? e.u : null;
           if (e.skill) {
             const own = moveFor(st.units[e.u], e.key);
+            const ic = own ? `<img class="aicon" alt="" src="${moveIconUrl(own.icon)}">` : actIcon(KITS[st.units[e.u].role].skill.key, KITS[st.units[e.u].role].skill.icon);
             app.sfx.skill();
-            banner(`${own ? `<img class="aicon" alt="" src="${moveIconUrl(own.icon)}">` : actIcon(KITS[st.units[e.u].role].skill.key, KITS[st.units[e.u].role].skill.icon)} ${esc(e.name)}`, own ? 'skill own' : 'skill', 700);
-            await wait(T(360));
+            // v338 : la compétence s'ouvre sur l'illustration de la créature en plein écran (repli : le bandeau)
+            if (!(await artShot(e.u, e.name, { ic }))) { banner(`${ic} ${esc(e.name)}`, own ? 'skill own' : 'skill', 700); await wait(T(360)); }
           }
           if (e.tgt && st.units[e.tgt]?.side === 'enemy' && DICE_KEYS.includes(e.key)) pendingLunge = { u: e.u, tgt: e.tgt };
           else if (e.tgt && st.units[e.tgt]?.side === 'enemy' && e.key !== 'marque' && e.key !== 'entrave') { lunge(e.u, e.tgt); cam(e.tgt, 0.6); await wait(T(LUNGE_HIT)); }
@@ -475,7 +476,10 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         case 'eact': {
           const def = INTENTS[e.kind];
           lastAtk = null;
-          if (e.kind === 'heavy' || e.kind === 'blast') banner(`${intentIcon(e.kind)} ${esc(def.name)} !`, 'danger', 700);
+          // v338 : la grosse attaque d'une élite, et chaque coup spécial d'un gardien, s'annoncent sur son illustration en plein écran
+          const ua = st.units[e.a], bigK = ua?.boss ? BOSS_SHOT.has(e.kind) : ua?.elite && (e.kind === 'heavy' || e.kind === 'blast');
+          const shot = bigK && def && (await artShot(e.a, `${def.name} !`, { ic: intentIcon(e.kind), foe: true }));
+          if (!shot && (e.kind === 'heavy' || e.kind === 'blast')) banner(`${intentIcon(e.kind)} ${esc(def.name)} !`, 'danger', 700);
           if (e.tgt && st.units[e.tgt]?.side === 'ally') { lunge(e.a, e.tgt); cam(e.tgt, 0.6); await wait(T(LUNGE_HIT)); }
           else await wait(T(200));
           break;
@@ -612,6 +616,37 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       }
     }
     draw();
+  }
+  // ——— Plan en pleine illustration (v338) : la créature qui lance une compétence (ou la grosse attaque d'un gardien,
+  // d'une élite) occupe tout l'écran le temps d'un plan de cinéma : lente poussée de caméra, lumière de sa faction,
+  // nom du coup. Plus court quand la créature l'a déjà eu dans ce combat ; un toucher le passe ; absent si les
+  // animations sont réduites ou en vitesse ×3.
+  const shotSeen = new Set();
+  const BOSS_SHOT = new Set(['heavy', 'blast', 'charge', 'gorge', 'gather', 'blizzard', 'mimic', 'copy', 'decree', 'shift']);
+  async function artShot(uid, label, { ic = '', foe = false } = {}) {
+    const u = st.units[uid], box = $('.dv');
+    if (!u || !box || reduced || ui.fast === 3) return false;
+    const c = cat.get(u.id); if (!c) return false;
+    const again = shotSeen.has(uid); shotSeen.add(uid);
+    const d = T(again ? 620 : 980);
+    const who = u.boss && st.bossKey && BOSSES[st.bossKey] ? BOSSES[st.bossKey].name : u.named ? u.title : c.name;
+    const ov = document.createElement('div');
+    ov.className = `as ${foe ? 'foe' : ''} ${u.boss ? 'boss' : ''} ${again ? 'again' : ''}`;
+    ov.style.setProperty('--as', `${d}ms`);
+    ov.style.setProperty('--fc', cat.faction[c.faction]?.colors?.secondary || '#F2C14E');
+    ov.innerHTML = `<span class="as-art"><img alt="" src="${artUrl(c)}"></span><span class="as-veil"></span><span class="as-shine"></span>
+      <span class="cu-bar as-bar top"></span><span class="cu-bar as-bar bot"></span>
+      <p class="as-lbl"><span class="as-k">${ic}<b>${esc(label)}</b></span><small>${esc(who)}</small></p>`;
+    let skip = false;
+    ov.addEventListener('pointerdown', () => { skip = true; }, { once: true });
+    const img = ov.querySelector('img');
+    await Promise.race([img.decode?.().catch(() => {}), wait(160)]);
+    box.appendChild(ov);
+    const t0 = performance.now();
+    while (!skip && alive_ && performance.now() - t0 < d) await wait(40);
+    ov.classList.add('out'); setTimeout(() => ov.remove(), 260);
+    await wait(T(120));
+    return true;
   }
   const LUNGE_HIT = 190; // instant du contact dans l'élan (ms), synchronisé avec dvLunge
   // ——— Gros plan (v236) : compétences et coups critiques. Bandes de cinéma, les deux cartes au centre,

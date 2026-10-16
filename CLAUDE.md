@@ -22,7 +22,7 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Le réseau de la session bloque github.io : pour vérifier la publication, passe par l'outil GitHub (déploiements Pages) ou demande une capture au propriétaire.
 
 ## 2. Routine de livraison
-1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v337**.
+1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v338**.
 2. Tests : `node --test tests/*.test.mjs` (215 tests), `node tools/validate.mjs`. Si le combat ou l'équilibre change : `node tools/fuzz.mjs 300` (étage moyen ≈ 12 à 14 en normal).
 3. Vérification dans le navigateur avec Playwright (`/opt/node-tools/node_modules/playwright/index.mjs`, Chromium déjà installé), avec un serveur local `python3 -m http.server 8092` lancé dans le dossier. Tailles iPhone SE et iPhone 13. **L'écran d'ouverture attend un toucher** (« Touche l'écran pour entrer ») : dans les scripts, cliquer au milieu de l'écran (dans la fenêtre 390×664) avant tout le reste.
 4. Commit, push, réponse en français.
@@ -66,6 +66,11 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - v335 : ouverture de booster sur l'app posée à l'écran d'accueil : la carte (`.op-pile`) se règle sur `--app-h` moins les zones réservées et 330 px, pour que le texte sous la carte (rôle) ne soit plus coupé. Pour reproduire dans Playwright, simuler les zones réservées (`--safe-t: 47px`, `--safe-b: 34px` sur `:root`) et retourner les cartes avec `page.mouse.click` (le booster s'ouvre avec Entrée sur `.op-pack`).
 - v336 : capture du propriétaire (iPhone, app de l'écran d'accueil) : une bande noire d'environ 55 pt en bas n'affiche rien alors que le navigateur annonce tout l'écran ; le texte du bas de l'ouverture y était coupé. `fitHeight` (`js/main.js`) prend la plus petite des hauteurs (innerHeight, visualViewport, clientHeight) pour `--vh-gap` et pose `html.standalone` ; l'ouverture y garde au moins 56 px de réserve en bas. Si le défaut revient ailleurs (bouton Passer en combat, feuilles), même remède. Onglets des Réglages : 3 colonnes.
 - Le simulateur (`tools/fuzz.mjs`) donne à la moitié des joueurs le premier gardien vaincu et affiche l'étage moyen par présage.
+
+## 4 sexies. Mise en scène des combats (avis du 17 octobre 2026)
+- Décision : garder les cartes au combat et en faire des « cartes vivantes » (pas de champ de bataille de RPG, pas de détourage des 500 illustrations : scènes complètes à fond intégré, détourage inégal). Analyse complète donnée au propriétaire le 17 octobre 2026.
+- v338, premier pas : **plan en pleine illustration** (`artShot` dans `js/screens/duel-ui.js`, styles `.as*` en fin de `css/army.css`). Chaque compétence d'une de tes créatures, chaque grosse attaque d'élite (heavy, blast) et chaque coup spécial d'un gardien (`BOSS_SHOT`) ouvre l'illustration en plein écran : poussée de caméra, lumière de la faction (`colors.secondary`), bandes de cinéma, nom du coup. 980 ms la première fois pour une créature dans le combat, 620 ms ensuite (×0,45 en vitesse ×2), un toucher le passe, absent en animations réduites. Repli : l'ancien bandeau.
+- Suites proposées (non faites) : arrêt sur image et recul à l'impact, fissures selon les PV, mort par faction, gardiens qui débordent de leur carte (5 images détourées), option « Grand spectacle (essai) » dans Réglages.
 
 ## 4 bis. Application Android / iPhone (Capacitor 8)
 - Identifiant définitif : **com.abyssalgame.abyssal** (ne jamais le changer après publication). Config : `capacitor.config.json`, projet natif : `android/`.
