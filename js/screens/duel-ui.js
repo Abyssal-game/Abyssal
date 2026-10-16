@@ -442,10 +442,17 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (e.perfect && e.tier === 'success') banner('Frappe parfaite : réussite assurée', 'parry', 800);
     const tier = DICE_TIERS[e.tier];
     const box = document.createElement('div');
-    box.className = `cb-dice t-${e.tier} ${performance.now() - lastThrow < 1600 ? 'landing' : ''}`; // v352 : le dé lancé retombe
+    box.className = `cb-dice t-${e.tier} ${lastThrow ? 'landing' : ''}`; // v352 : le dé lancé retombe (v356 : même après le plan de la compétence)
+    lastThrow = 0;
     box.innerHTML = `<div class="cb-d20"><img class="cb-die" alt="" src="assets/fx/d20.webp"><b>?</b></div>
       <p class="cb-dline"></p><p class="cb-dtier"></p>`;
     $('.dv').appendChild(box);
+    if (box.classList.contains('landing') && !reduced) { // v356 : onde d'impact quand le dé lancé touche le sol
+      const d = box.querySelector('.cb-d20'), S = d.offsetWidth * 2.6;
+      setTimeout(() => { if (!box.isConnected) return; const n = document.createElement('span'); n.className = 'kx-sprite fxs';
+        n.style.cssText = `left:${d.offsetLeft + d.offsetWidth / 2}px;top:${d.offsetTop + d.offsetHeight * 0.92 - S * 0.22}px;width:${S}px;height:${S}px;--d:720ms;background-image:url(assets/fx/dice-land.webp)`;
+        box.appendChild(n); setTimeout(() => n.remove(), 800); }, 260);
+    }
     const num = box.querySelector('b');
     app.sfx.dice();
     let skip = false;
@@ -754,12 +761,12 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       const ov = document.createElement('div');
       ov.className = 'ry ry2';
       ov.style.setProperty('--fc', fc);
-      ov.innerHTML = `<div class="ry2-c"><span class="ry-glow"></span>
+      ov.innerHTML = `<div class="ry2-c"><span class="ry-glow"></span><img class="ry2-ring" alt="" src="assets/fx/dice-ring.webp"><span class="ry2-chg"></span>
           <svg class="ry2-g" viewBox="0 0 100 100" aria-hidden="true"><circle class="trk" cx="50" cy="50" r="44"/><circle class="zg" cx="50" cy="50" r="44" ${arc(TGT - GOOD, TGT + GOOD)}/><circle class="zp" cx="50" cy="50" r="44" ${arc(TGT - PERF, TGT + PERF)}/><circle class="fill" cx="50" cy="50" r="44" stroke-dasharray="0 ${C.toFixed(1)}"/></svg>
           <div class="ry2-die"><img alt="" src="assets/fx/d20.webp"></div><span class="ry2-flash"></span><b class="ry-res"></b></div>
         <p class="ry-t"><b>${esc(name)}</b><small>Maintiens le doigt pour charger le dé, relâche dans l’or</small></p>`;
       $('.dv').appendChild(ov);
-      const fill = ov.querySelector('.fill'), die = ov.querySelector('.ry2-die'), res = ov.querySelector('.ry-res');
+      const chg = ov.querySelector('.ry2-chg'), fill = ov.querySelector('.fill'), die = ov.querySelector('.ry2-die'), res = ov.querySelector('.ry-res');
       let t0 = 0, x = 0, done = false, raf = 0, holding = false;
       const idle = setTimeout(() => { if (!holding) finish(null); }, 6000);
       const level = (ms) => { const k = (ms / RISE) % 2; return k <= 1 ? k : 2 - k; }; // monte puis redescend
@@ -769,6 +776,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         const g = Math.abs(x - TGT);
         ov.classList.toggle('near', g <= GOOD); ov.classList.toggle('hot', g <= PERF);
         ov.style.setProperty('--ch', x.toFixed(3));
+        chg.style.backgroundPositionX = `${(Math.min(7, Math.floor(x * 8)) * 100 / 7).toFixed(2)}%`; // v356 : planche « charge » réglée sur la jauge
         if (!reduced) die.style.translate = `${((Math.random() - 0.5) * 9 * x).toFixed(1)}px ${((Math.random() - 0.5) * 9 * x).toFixed(1)}px`;
         if (performance.now() - t0 > RISE * 6) release(); else raf = requestAnimationFrame(step);
       };
@@ -782,10 +790,11 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         ov.classList.remove('hold', 'near', 'hot'); ov.classList.add(bonus === RHYTHM.perfect ? 'perfect' : bonus ? 'good' : 'miss', 'thrown');
         die.style.translate = '';
         res.textContent = bonus === RHYTHM.perfect ? `Parfait ! +${bonus}` : bonus ? `Bien ! +${bonus}` : v === null ? 'Lancé au hasard' : 'Raté';
+        if (bonus && !reduced) { const n = document.createElement('span'); n.className = `kx-sprite fxs ry2-burst${bonus === RHYTHM.perfect ? '' : ' small'}`; n.style.cssText = `--d:${bonus === RHYTHM.perfect ? 760 : 600}ms;background-image:url(assets/fx/dice-perfect.webp)`; ov.querySelector('.ry2-c').appendChild(n); } // v356 : éclat d'or au lâcher réussi
         if (bonus === RHYTHM.perfect) { app.sfx.perfect(); if (!reduced) { const d = $('.dv'); d.classList.remove('ry-shake'); void d.offsetWidth; d.classList.add('ry-shake'); } }
         else if (bonus) app.sfx.hit(); else app.sfx.miss();
         app.sfx.swipe?.();
-        lastThrow = performance.now();
+        lastThrow = 1;
         setTimeout(() => { ov.classList.add('out'); setTimeout(() => { ov.remove(); resolve(bonus); }, 200); }, bonus === RHYTHM.perfect ? 700 : 520);
       }
       ov.addEventListener('pointerdown', press);

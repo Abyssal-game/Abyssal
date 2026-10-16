@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Planche d'effet Gemini (grille de 8 images sur fond noir) -> bande d'animation du jeu (2048 x 256, 8 images de 256).
 
-Usage : python3 tools/fx-sheet.py source.jpg assets/fx/<nom>.webp [colonnes=4] [lignes=2]
+Usage : python3 tools/fx-sheet.py source.jpg assets/fx/<nom>.webp [colonnes=4] [lignes=2] [part de la case=0.96]
+(baisser la part, par ex. 0.88, si Gemini a dessiné un cadre gris dans chaque case)
 La grille est lue de gauche à droite puis de haut en bas. Chaque case est recadrée en carré autour de son centre,
 le fond est ramené au noir pur (le jeu affiche ces planches en mode « screen » : le noir devient transparent),
 puis les 8 images sont mises bout à bout.
@@ -15,7 +16,7 @@ rows = int(sys.argv[4]) if len(sys.argv) > 4 else 2
 im = Image.open(src).convert('RGB')
 W, H = im.size
 cw, ch = W / cols, H / rows
-side = int(min(cw, ch) * 0.96)
+side = int(min(cw, ch) * (float(sys.argv[5]) if len(sys.argv) > 5 else 0.96))
 frames = []
 for r in range(rows):
     for c in range(cols):
