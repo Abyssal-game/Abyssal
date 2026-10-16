@@ -116,7 +116,6 @@ export default function shop(app, root, params = []) {
     };
     root.innerHTML = `
       <header class="screen-head ui-hero bn-boosters"><h1>Boosters</h1><p class="muted">Ouvre des boosters pour agrandir ton Bestiaire.</p></header>
-      ${walletLine()}
       ${cloud.isLoggedIn() ? '' : '<!-- Tirage : réservé aux joueurs connectés -->'}<a class="panel sh-banner ${cloud.isLoggedIn() ? '' : 'off'}" href="#/tirage"><span class="sh-b-ic">${icon('p:shadow')}</span><span><b>Le Tirage des Ombres</b><span class="small muted">${g.shadowState().paid[parisDay()] ? 'Tirage du jour fait · voir le classement' : 'Ton booster gratuit du jour pour le classement de la semaine'}</span></span><span class="sh-b-go">${icon('next')}</span></a>
       <div class="products">
         ${card('standard')}
@@ -127,17 +126,8 @@ export default function shop(app, root, params = []) {
     `;
   }
   // v331 : ce que tes éclats permettent, les taux réels par carte, et d'où viennent vraiment les Secrètes
-  function walletLine() {
-    const n = Math.floor(g.s.shards / BOOSTERS.standard.price);
-    const o = boosterOdds('standard').slots[0].odds, pct = (x) => String(+x.toFixed(x >= 1 ? 1 : 2)).replace('.', ',');
-    return `<section class="panel sh-wallet">
-      <p class="small">${icon('crystal')} Tu as <b>${fmt(g.s.shards)} éclats</b>${n ? ` : de quoi ouvrir <b>${n} booster${n > 1 ? 's' : ''} standard</b>` : ` · prochain booster à ${fmt(BOOSTERS.standard.price)}`}.${n ? ' <a href="#" data-act="gostd">Voir</a>' : ''}</p>
-      <p class="small muted sh-rates">Chances par carte (booster standard) : Commune ${pct(o.C)} % · Peu commune ${pct(o.PC)} % · Rare ${pct(o.R)} % · Hyper rare ${pct(o.HR)} % · Mythique ${pct(o.M)} % · Secrète ${pct(o.S)} %. Les gardiens de la Descente, eux, ont <b>1 chance sur 4</b> de te laisser leur carte quand tu les bats : c’est la meilleure source de Mythiques et de Secrètes.</p>
-    </section>`;
-  }
   render();
   bindActions(root, {
-    gostd() { root.querySelector('[data-type="standard"]')?.closest('article')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); },
     pickfac(el) { st.faction = el.dataset.v; render(); },
     odds(el) { showOdds(app, el.dataset.type); },
     buy(el) {

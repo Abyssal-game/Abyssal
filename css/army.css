@@ -2930,8 +2930,6 @@ body.gated { overflow: hidden; }
 .dc-riskwarn { margin: 8px 2px 0; padding: 8px 10px; border-radius: 10px; color: #FFD4DC; background: rgba(90, 14, 30, .45); border: 1px solid rgba(255, 90, 120, .35); }
 .cb-speed { min-width: 44px; font: 800 .85rem/1 var(--f-display); }
 .cb-speed.on { color: #FFE7A6 !important; text-shadow: 0 0 8px rgba(242, 193, 78, .7); }
-.sh-wallet p { margin: 0; }
-.sh-wallet p + p { margin-top: 6px; }
 .set-note { margin: 4px 0 0; }
 /* v331 : départs avancés (étages 6, 11, 16… après un gardien vaincu) */
 .dc-starts { display: grid; gap: 6px; margin: 4px 0 10px; }
