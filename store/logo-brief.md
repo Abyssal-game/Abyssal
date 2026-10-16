@@ -202,7 +202,21 @@ Pour que toutes ces versions soient nettes, il faut une image source de **1024 �
 
 Trois prompts ont été fournis au propriétaire pour aligner le dos des cartes (`assets/backs/back.webp`, 600 × 840), le booster standard (`assets/packs/standard.webp`, 464 × 800) et le booster événement (`assets/packs/event.webp`, 464 × 800) sur le sceau fendu du logo. Chaque prompt est à envoyer à Gemini avec l'image de l'emblème jointe (`store/logo/embleme-source.jpg`). Formats demandés : 5:7 pour le dos, 9:16 pour les sachets (fond noir uni, à détourer). Les prompts complets sont dans la conversation du 15 octobre 2026 ; principe commun : sachet métallisé à bords crantés vu de face, emblème au centre dans un cadre d'or, bande d'or vide en dessous, aucun texte, aucun symbole religieux, pas d'aspect électrique.
 
-## 12. Boosters restants : factions, premium, Tirage des Ombres (prompts du 15 octobre 2026)
+## 12 bis. Décision du 16 octobre 2026
+
+Les boosters de faction, premium et des Ombres **gardent leur visuel** : chacun a son symbole propre, qui fait reconnaître la faction d'un coup d'œil. Seuls **Primordial** (œil dans un triangle, trop proche de l'« œil de la Providence ») et **Artificiel** (grande lettre « R » lumineuse) sont refaits, avec les prompts ci-dessous, en joignant à Gemini le visuel actuel du booster.
+
+### Booster Primordial (refait)
+```
+Reprends exactement ce sachet de booster : même forme, même cadrage de face, mêmes bords crantés en haut et en bas, même fond de lave et de cosmos aux reflets holographiques, même cadre circulaire doré au centre. Change seulement le symbole au centre du cadre : retire le triangle et l'œil, et mets à la place la tête d'un dragon ancien vue de profil, sculptée en or massif, avec des cornes recourbées vers l'arrière, des écailles finement ciselées, la gueule fermée, et un œil reptilien orange incandescent. Le dragon semble taillé dans un bijou ancien, comme un médaillon. Aucun triangle, aucune pyramide, aucun œil isolé, aucun texte, aucune lettre, aucun symbole religieux, aucune étoile. Format 9:16.
+```
+
+### Booster Artificiel (refait)
+```
+Reprends exactement ce sachet de booster : même forme, même cadrage de face, mêmes bords crantés en haut et en bas, même plaque métallique rivetée aux reflets holographiques. Change le centre : retire la lettre R lumineuse et l'anneau de runes bleues. Mets à la place le masque d'un automate ancien, en laiton et cuivre patiné, au visage impassible et symétrique, aux yeux faits de deux petites lentilles ambrées qui luisent doucement, entouré d'un grand engrenage de bronze et de rouages imbriqués finement gravés. Remplace l'anneau de runes par un anneau d'engrenages et de rivets en cuivre. Couleurs dominantes : laiton, cuivre, acier bleuté, lueur ambrée. Aucune lettre, aucun chiffre, aucun texte, aucune rune, aucun néon, aucun éclair électrique, aucun symbole religieux, aucune étoile. Format 9:16.
+```
+
+## 12. Prompts écartés : alignement de tous les boosters sur le sceau (15 octobre 2026, non retenus)
 
 Même recette que le booster standard : joindre à Gemini l'image `store/logo/embleme-source.jpg` **et** le booster standard reçu (`store/logo/booster-standard-source.jpg`) pour qu'il garde la même forme de sachet. Format 9:16, fond noir uni, sachet vu de face, bords crantés, emblème au centre dans un cadre d'or, bande d'or vide en bas, **aucun texte, aucun symbole religieux, aucune étoile à cinq ou six branches**. À l'arrivée : `python3 tools/pack-art.py <clé> <image>` recadre en 464 × 800 dans `assets/packs/<clé>.webp` (clés : infernal, abyssal, celeste, sauvage, necrotique, primordial, artificiel, premium, shadow).
 
