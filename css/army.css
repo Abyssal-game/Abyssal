@@ -3092,3 +3092,8 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 .fg-frame small { font-size: .72rem; color: var(--gold-hi); display: inline-flex; gap: 3px; align-items: center; }
 .fg-frame.own { opacity: .65; }
 .dv.cb .dv-c .cb-above .cb-oint { position: static; transform: none; flex: none; }
+/* v349 : Collection, 6 filtres depuis l'ajout de « Finitions » : deux rangées de trois (l'étoile passait seule à la ligne) */
+.col-tools .seg.wide { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; row-gap: 4px; }
+/* v349 : Sublimer, finition et prix sur deux lignes (le « · » se retrouvait seul et le prix débordait de la case) */
+.fg-cell small.fg-sub { display: flex; flex-direction: column; align-items: center; gap: 3px; line-height: 1.1; text-align: center; }
+.fg-cell small.fg-sub span { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
