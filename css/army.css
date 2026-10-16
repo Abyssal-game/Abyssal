@@ -2964,28 +2964,43 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 .dc-door.r-gouffre.has-art .dc-door-ic { display: none; }
 .dc-door.r-gouffre.has-art { justify-content: flex-start; padding-top: 16px; }
 .dc-door.r-gouffre.has-art .dc-door-art { background: linear-gradient(0deg, rgba(8, 9, 13, 0) 50%, rgba(8, 9, 13, .82) 72%, rgba(8, 9, 13, .95)), var(--art) center 92% / cover no-repeat; }
-/* v338 : plan en pleine illustration (compétences, grosses attaques des gardiens et des élites) */
-.as { position: absolute; inset: 0; z-index: 56; overflow: hidden; background: #050407; pointer-events: auto; animation: asIn var(--as) ease both; }
-.as.out { opacity: 0; transition: opacity .25s ease-in; }
-.as-art { position: absolute; inset: 0; }
-.as-art img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 36%; transform-origin: 50% 40%; animation: asPush var(--as) cubic-bezier(.2, .7, .2, 1) both; }
+/* v339 : plan en pleine illustration, refait : vrai plein écran (posé sur la page), entrée en coup de lame, lignes
+   d'énergie, braises de la faction, titre qui frappe, sortie en éclair. Remplace le plan de la v338. */
+.as { position: fixed; left: 0; right: 0; top: 0; height: var(--app-h, 100dvh); z-index: 79; overflow: hidden; background: #040306; pointer-events: auto; }
+.as.out { opacity: 0; transition: opacity .22s ease-in; }
+.as-art { position: absolute; inset: 0; animation: asReveal var(--as) cubic-bezier(.2, .8, .2, 1) both; }
+.as-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 34%; transform-origin: 50% 38%; animation: asPush var(--as) cubic-bezier(.15, .7, .25, 1) both; }
 .as.foe .as-art img { animation-name: asPushFoe; }
-.as-veil { position: absolute; inset: 0; background: radial-gradient(120% 75% at 50% 42%, transparent 40%, rgba(5, 4, 7, .88) 100%), linear-gradient(0deg, color-mix(in srgb, var(--fc) 38%, transparent), transparent 42%); }
-.as.foe .as-veil { background: radial-gradient(120% 75% at 50% 42%, transparent 35%, rgba(12, 2, 8, .92) 100%), linear-gradient(0deg, rgba(150, 20, 60, .45), transparent 45%), linear-gradient(180deg, rgba(90, 20, 140, .35), transparent 35%); }
-.as-shine { position: absolute; inset: -20% -60%; background: linear-gradient(105deg, transparent 42%, color-mix(in srgb, var(--fc) 40%, rgba(255, 240, 200, .5)) 50%, transparent 58%); mix-blend-mode: screen; transform: translateX(-60%); animation: asShine var(--as) ease-out both; pointer-events: none; }
-.as.foe .as-shine { background: linear-gradient(105deg, transparent 42%, rgba(255, 70, 90, .45) 50%, transparent 58%); }
-.as-bar { z-index: 3; height: 11%; animation-duration: var(--as) !important; }
-.as-bar.top { animation-name: cuBarT; } .as-bar.bot { animation-name: cuBarB; }
-.as-lbl { position: absolute; left: 0; right: 0; bottom: 2.6%; z-index: 5; margin: 0; display: grid; justify-items: center; gap: 4px; padding: 0 16px; text-align: center; animation: cuLbl var(--as) ease both; }
-.as-k { display: inline-flex; align-items: center; gap: 8px; }
-.as-k b { font: 800 1.3rem/1.05 var(--f-display); letter-spacing: .12em; text-transform: uppercase; color: var(--gold-hi); text-shadow: 0 0 14px color-mix(in srgb, var(--fc) 70%, transparent), 0 2px 4px #000; }
-.as-k .aicon, .as-k .iicon, .as-k img { width: 30px; height: 30px; }
-.as-lbl small { font: 600 .85rem/1 var(--f-body, inherit); letter-spacing: .04em; color: #D9CFE6; text-shadow: 0 1px 3px #000; }
-.as.foe .as-k b { color: #FF8A98; text-shadow: 0 0 14px rgba(255, 84, 104, .75), 0 2px 4px #000; }
-.as.boss .as-art img { object-position: 50% 32%; }
-@keyframes asIn { 0% { opacity: 0; } 12%, 86% { opacity: 1; } 100% { opacity: 1; } }
-@keyframes asPush { 0% { transform: scale(1.22) translateY(3%); filter: brightness(.35) saturate(.8); } 22% { filter: brightness(1.05) saturate(1.05); } 100% { transform: scale(1.04) translateY(-1.5%); filter: brightness(1); } }
-@keyframes asPushFoe { 0% { transform: scale(1.02); filter: brightness(.3) saturate(.5) hue-rotate(-18deg); } 25% { filter: brightness(.95) saturate(.7) hue-rotate(-18deg) contrast(1.1); } 100% { transform: scale(1.2) translateY(2%); filter: brightness(.9) saturate(.7) hue-rotate(-18deg) contrast(1.1); } }
-@keyframes asShine { 0%, 15% { transform: translateX(-60%); opacity: 0; } 25% { opacity: 1; } 60%, 100% { transform: translateX(60%); opacity: 0; } }
-.as.again .as-shine { display: none; }
-.as-lbl { bottom: calc(11% + 14px); }
+.as.boss .as-art img { object-position: 50% 30%; }
+.as-lines { position: absolute; inset: -40%; background: repeating-conic-gradient(from 0deg at 50% 50%, color-mix(in srgb, var(--fc) 55%, transparent) 0deg 1.2deg, transparent 1.2deg 9deg); -webkit-mask: radial-gradient(circle at 50% 50%, transparent 28%, #000 62%); mask: radial-gradient(circle at 50% 50%, transparent 28%, #000 62%); mix-blend-mode: screen; opacity: 0; animation: asLines var(--as) linear both; }
+.as.foe .as-lines { background: repeating-conic-gradient(from 0deg at 50% 50%, rgba(255, 60, 90, .55) 0deg 1.2deg, transparent 1.2deg 9deg); }
+.as-veil { position: absolute; inset: 0; background: radial-gradient(130% 80% at 50% 40%, transparent 42%, rgba(4, 3, 6, .9) 100%), linear-gradient(0deg, rgba(4, 3, 6, .96) 0%, rgba(4, 3, 6, .75) 18%, transparent 42%), linear-gradient(0deg, color-mix(in srgb, var(--fc) 30%, transparent), transparent 55%); }
+.as.foe .as-veil { background: radial-gradient(130% 80% at 50% 40%, transparent 36%, rgba(14, 2, 8, .94) 100%), linear-gradient(0deg, rgba(8, 2, 6, .96) 0%, rgba(8, 2, 6, .75) 18%, transparent 42%), linear-gradient(0deg, rgba(160, 20, 60, .4), transparent 50%), linear-gradient(180deg, rgba(90, 20, 140, .4), transparent 30%); }
+.as-embers { position: absolute; inset: 0; pointer-events: none; }
+.as-embers i { position: absolute; bottom: -12px; width: var(--sz); height: var(--sz); border-radius: 50%; background: radial-gradient(circle, #fff 0%, var(--fc) 45%, transparent 72%); box-shadow: 0 0 8px var(--fc); opacity: 0; animation: asEmber var(--as) ease-out both; animation-delay: calc(var(--as) * var(--dl)); }
+.as.foe .as-embers i { background: radial-gradient(circle, #ffd0d8 0%, #ff3b5c 45%, transparent 72%); box-shadow: 0 0 8px #ff3b5c; }
+.as-slash { position: absolute; left: -20%; right: -20%; top: 50%; height: 3px; background: linear-gradient(90deg, transparent, #fff 40%, var(--fc) 60%, transparent); box-shadow: 0 0 22px var(--fc), 0 0 6px #fff; transform: rotate(-24deg) scaleX(0); animation: asSlash var(--as) ease-out both; }
+.as-flash { position: absolute; inset: 0; background: #fff; opacity: 0; animation: asFlash var(--as) ease-out both; mix-blend-mode: screen; }
+.as-lbl { position: absolute; left: 0; right: 0; bottom: calc(max(var(--safe-b, 0px), var(--vh-gap, 0px)) + 34px); z-index: 5; margin: 0; display: grid; justify-items: center; gap: 6px; padding: 0 18px; text-align: center; }
+.as-who { font: 700 .8rem/1 var(--f-display); letter-spacing: .18em; text-transform: uppercase; color: #D9CFE6; text-shadow: 0 1px 3px #000; opacity: 0; animation: asWho var(--as) ease both; }
+.as-who em { font-style: normal; color: var(--rc); }
+.as-k { display: inline-flex; align-items: center; gap: 10px; animation: asSlam var(--as) cubic-bezier(.2, 1.4, .3, 1) both; }
+.as-k b { font: 900 clamp(1.6rem, 8.4vw, 2.4rem)/1 var(--f-display); letter-spacing: .08em; text-transform: uppercase; color: var(--gold-hi); text-shadow: 0 0 22px color-mix(in srgb, var(--fc) 80%, transparent), 0 3px 0 rgba(0, 0, 0, .65), 0 6px 18px #000; }
+.as-k .aicon, .as-k .iicon, .as-k img { width: 40px; height: 40px; filter: drop-shadow(0 0 10px color-mix(in srgb, var(--fc) 80%, transparent)); }
+.as.foe .as-k b { color: #FF8A98; text-shadow: 0 0 22px rgba(255, 60, 90, .85), 0 3px 0 rgba(0, 0, 0, .65), 0 6px 18px #000; }
+.as-rule { width: min(78%, 320px); height: 2px; background: linear-gradient(90deg, transparent, var(--gold-hi), transparent); box-shadow: 0 0 10px rgba(242, 193, 78, .8); transform: scaleX(0); animation: asRule var(--as) ease-out both; }
+.as.foe .as-rule { background: linear-gradient(90deg, transparent, #FF5C70, transparent); box-shadow: 0 0 10px rgba(255, 60, 90, .8); }
+@keyframes asReveal { 0% { clip-path: polygon(0 58%, 100% 38%, 100% 40%, 0 60%); } 14% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); } 100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); } }
+@keyframes asPush { 0% { transform: scale(1.32); filter: brightness(1.8) saturate(.6); } 14% { filter: brightness(1.1) saturate(1.1); } 82% { transform: scale(1.06); filter: brightness(1); } 100% { transform: scale(1.34); filter: brightness(2.2) saturate(.5); } }
+@keyframes asPushFoe { 0% { transform: scale(1.02); filter: brightness(1.6) saturate(.4) hue-rotate(-18deg); } 14% { filter: brightness(.95) saturate(.7) hue-rotate(-18deg) contrast(1.12); } 82% { transform: scale(1.22); filter: brightness(.95) saturate(.7) hue-rotate(-18deg) contrast(1.12); } 100% { transform: scale(1.4); filter: brightness(2) saturate(.4) hue-rotate(-18deg); } }
+@keyframes asLines { 0%, 8% { opacity: 0; transform: rotate(0); } 20% { opacity: .5; } 80% { opacity: .35; } 100% { opacity: .8; transform: rotate(14deg); } }
+@keyframes asEmber { 0% { opacity: 0; transform: translate(0, 0) scale(.6); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), -85vh) scale(1.1); } }
+@keyframes asSlash { 0% { transform: rotate(-24deg) scaleX(0); opacity: 1; } 10% { transform: rotate(-24deg) scaleX(1); opacity: 1; } 18%, 100% { transform: rotate(-24deg) scaleX(1.1); opacity: 0; } }
+@keyframes asFlash { 0% { opacity: .9; } 10% { opacity: 0; } 84% { opacity: 0; } 100% { opacity: .85; } }
+@keyframes asWho { 0%, 14% { opacity: 0; transform: translateY(8px); } 26%, 100% { opacity: 1; transform: none; } }
+@keyframes asSlam { 0%, 16% { opacity: 0; transform: scale(2.2); letter-spacing: .3em; } 28% { opacity: 1; transform: scale(1); } 86% { opacity: 1; transform: scale(1.04); } 100% { opacity: 0; transform: scale(1.3); } }
+@keyframes asRule { 0%, 24% { transform: scaleX(0); } 40%, 100% { transform: scaleX(1); } }
+.as.again .as-lines { display: none; }
+.as { z-index: 81; }
+.as-k b { font-size: clamp(1.25rem, 7.2vw, 2.4rem); }
+@media (max-width: 380px) { .as-who { letter-spacing: .1em; font-size: .72rem; } .as-k .aicon, .as-k .iicon, .as-k img { width: 30px; height: 30px; } }

@@ -624,28 +624,35 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   const shotSeen = new Set();
   const BOSS_SHOT = new Set(['heavy', 'blast', 'charge', 'gorge', 'gather', 'blizzard', 'mimic', 'copy', 'decree', 'shift']);
   async function artShot(uid, label, { ic = '', foe = false } = {}) {
-    const u = st.units[uid], box = $('.dv');
-    if (!u || !box || reduced || ui.fast === 3) return false;
+    const u = st.units[uid];
+    if (!u || !$('.dv') || reduced || ui.fast === 3) return false;
     const c = cat.get(u.id); if (!c) return false;
     const again = shotSeen.has(uid); shotSeen.add(uid);
-    const d = T(again ? 620 : 980);
+    const d = T(again ? 760 : 1250);
     const who = u.boss && st.bossKey && BOSSES[st.bossKey] ? BOSSES[st.bossKey].name : u.named ? u.title : c.name;
+    const rar = RARITY[c.rarity];
+    // v339 : vrai plein écran (posé sur la page, pas dans le plateau), entrée en coup de lame, lignes d'énergie,
+    // braises de la faction, titre qui frappe, sortie en éclair vers l'attaque
     const ov = document.createElement('div');
     ov.className = `as ${foe ? 'foe' : ''} ${u.boss ? 'boss' : ''} ${again ? 'again' : ''}`;
     ov.style.setProperty('--as', `${d}ms`);
     ov.style.setProperty('--fc', cat.faction[c.faction]?.colors?.secondary || '#F2C14E');
-    ov.innerHTML = `<span class="as-art"><img alt="" src="${artUrl(c)}"></span><span class="as-veil"></span><span class="as-shine"></span>
-      <span class="cu-bar as-bar top"></span><span class="cu-bar as-bar bot"></span>
-      <p class="as-lbl"><span class="as-k">${ic}<b>${esc(label)}</b></span><small>${esc(who)}</small></p>`;
+    ov.style.setProperty('--rc', rar?.color || '#F2C14E');
+    const embers = Array.from({ length: again ? 8 : 16 }, () => `<i style="left:${(Math.random() * 100).toFixed(1)}%;--dl:${(Math.random() * 0.45).toFixed(2)};--sz:${(3 + Math.random() * 5).toFixed(1)}px;--dx:${(Math.random() * 60 - 30).toFixed(0)}px"></i>`).join('');
+    ov.innerHTML = `<span class="as-art"><img alt="" src="${artUrl(c)}"></span><span class="as-lines"></span><span class="as-veil"></span>
+      <span class="as-embers">${embers}</span><span class="as-slash"></span><span class="as-flash"></span>
+      <p class="as-lbl"><small class="as-who"><em>${esc(rar?.name || '')}</em> · ${esc(who)}</small><span class="as-k">${ic}<b>${esc(label)}</b></span><span class="as-rule"></span></p>`;
     let skip = false;
     ov.addEventListener('pointerdown', () => { skip = true; }, { once: true });
     const img = ov.querySelector('img');
     await Promise.race([img.decode?.().catch(() => {}), wait(160)]);
-    box.appendChild(ov);
+    document.body.appendChild(ov);
+    setTimeout(() => { if (!skip && ov.isConnected) { if (foe) shake(true); } }, d * 0.22);
+    setTimeout(() => { if (ov.isConnected) app.sfx.swipe?.(); }, d * 0.8);
     const t0 = performance.now();
     while (!skip && alive_ && performance.now() - t0 < d) await wait(40);
-    ov.classList.add('out'); setTimeout(() => ov.remove(), 260);
-    await wait(T(120));
+    ov.classList.add('out'); setTimeout(() => ov.remove(), 240);
+    await wait(T(90));
     return true;
   }
   const LUNGE_HIT = 190; // instant du contact dans l'élan (ms), synchronisé avec dvLunge
