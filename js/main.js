@@ -7,7 +7,7 @@ import { MAX_LEVEL } from './core/army.js';
 import { fameTier } from './core/renown.js';
 import { icon, EMBLEM } from './ui/icons.js';
 import { toast, esc, fmt, reducedMotion, closeTopSheet, openSheet, handlePopstate } from './ui/dom.js';
-import { sfx, configureSound, audioCtx } from './ui/sound.js';
+import { sfx, configureSound, audioCtx, audioCtxIfAny } from './ui/sound.js';
 import { musicRoute, configureMusic } from './ui/music.js';
 import { VERSION } from './config.js';
 import { openCardDetail } from './screens/detail.js';
@@ -354,7 +354,7 @@ document.addEventListener('error', (e) => { const t = e.target; if (t && t.tagNa
 document.addEventListener('load', (e) => { const t = e.target; if (t && t.tagName === 'IMG' && t.dataset.broken) { t.style.visibility = ''; delete t.dataset.broken; } }, true);
 
 // Application des stores : bouton retour, son coupé en arrière-plan (rien dans un navigateur)
-initNative({ suspendAudio: () => audioCtx()?.suspend?.().catch(() => {}), resumeAudio: () => audioCtx()?.resume?.().catch(() => {}) });
+initNative({ suspendAudio: () => audioCtxIfAny()?.suspend?.().catch(() => {}), resumeAudio: () => audioCtxIfAny()?.resume?.().catch(() => {}) }); // v370 : ne crée plus le son hors d'un toucher
 
 // Service worker et mises à jour (version web seulement : l'application des stores se met à jour par le store)
 if ('serviceWorker' in navigator && location.protocol !== 'file:' && !isNative()) {

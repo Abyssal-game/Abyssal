@@ -6,7 +6,7 @@ import { esc, fmt, toast, confirmBox, openSheet, bindActions } from '../ui/dom.j
 import { exportCode, importCode } from '../core/save.js';
 import { drawBooster } from '../core/boosters.js';
 import { RARITIES, RARITY_ORDER, BOOSTERS } from '../config.js';
-import { sfx } from '../ui/sound.js';
+import { sfx, audioInfo } from '../ui/sound.js';
 import { MUSIC_DEMO, musicPreview } from '../ui/music.js';
 import { sync, onSync, refreshProfile } from '../cloud/sync.js';
 import { openCreator } from './creator.js';
@@ -81,6 +81,8 @@ export default function settings(app, root) {
         <h2>À propos</h2>
         <p class="small">ABYSSAL — Le Bestiaire interdit.</p>
         <p class="small muted">Version ${esc(app.version)} · ${app.catalog.cards.length} cartes</p>
+        <p class="small muted set-audio">${(() => { const a = audioInfo(); return `Son : ${esc(a.state)} · ${a.samples}${a.expected ? `/${a.expected}` : ''} sons chargés · session ${esc(String(a.session))}${a.enabled ? '' : ' · coupé dans les réglages'}`; })()}</p>
+        <button class="btn ghost small" data-act="sndtest">${icon('dodge')} Tester le son</button>
         <a class="btn ghost small" href="confidentialite.html" target="_blank" rel="noopener">${icon('book')} Politique de confidentialité</a>
       </section>`;
   }
@@ -148,6 +150,7 @@ export default function settings(app, root) {
       app.go('');
     },
     tab(el) { ui.tab = el.dataset.k; sfx.tap(); render(); },
+    sndtest() { app.applySettings(); sfx.victory?.(); setTimeout(render, 900); },
     tuto(el) { tuto(app, el.dataset.k, { force: true }).then(() => render()); },
     welcome() { showWelcome(app, { force: true }); },
     guide() { resetTips(app); toast('Les bulles d’aide réapparaîtront au bon moment.', { icon: 'info' }); render(); },

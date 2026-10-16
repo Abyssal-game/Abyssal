@@ -49,6 +49,21 @@ export function configureSound({ sound, volume: v, haptics: h, loud: l }) {
 }
 // Contexte audio partagé avec la musique (créé au premier toucher)
 export function audioCtx() { return ensure(); }
+export const audioCtxIfAny = () => ctx;
+// v370 : déblocage robuste (iPhone, surtout dans l'application) : à chaque fin de toucher, si le son est suspendu
+// ou interrompu, on le relance et on joue un échantillon muet (geste accepté par WebKit)
+let unlocking = false;
+const kick = () => {
+  if (!ctx || ctx.state === 'running' || unlocking) return;
+  unlocking = true;
+  try { const b = ctx.createBuffer(1, 1, 22050), src = ctx.createBufferSource(); src.buffer = b; src.connect(ctx.destination); src.start(0); } catch (e) { /* rien */ }
+  ctx.resume().catch(() => {}).finally(() => { unlocking = false; });
+};
+if (typeof document !== 'undefined') ['touchend', 'click', 'keydown'].forEach((t) => document.addEventListener(t, kick, { capture: true, passive: true }));
+// v370 : état du son, affiché dans Réglages → À propos (diagnostic sur téléphone)
+export function audioInfo() {
+  return { state: ctx ? ctx.state : 'pas encore créé', samples: Object.keys(samples).length, expected: sampleList ? sampleList.length : null, session: navigator.audioSession ? navigator.audioSession.type : 'sans objet', enabled, volume };
+}
 
 // Vibrations. Android : navigator.vibrate. iPhone (iOS 18+) : Safari n'a pas de vibration pour le web,
 // mais basculer un interrupteur natif (<input type=checkbox switch>) produit un petit retour haptique.
