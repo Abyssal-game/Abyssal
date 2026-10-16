@@ -3361,3 +3361,12 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 .dc-wb-loot span { display: inline-flex; align-items: center; gap: 3px; }
 .dc-wb-loot svg { width: 14px; height: 14px; }
 @keyframes wbIn { from { opacity: 0; transform: translateY(-8px) scale(.97); } }
+
+/* v368 : gardiens qui débordent de leur carte — la figure peinte part du milieu de la carte et sort par le haut */
+.dv-c.has-fig { overflow: visible; }
+.dv-c.has-fig .dv-bfig { position: absolute; z-index: 3; left: 50%; bottom: 40%; width: 128%; max-width: none; height: auto; translate: -50% 0; pointer-events: none; transform-origin: 50% 100%; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .85)); animation: bfigBreath 3.6s ease-in-out infinite; }
+.dv-c.has-fig.p2 .dv-bfig { filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .85)) drop-shadow(0 0 14px rgba(255, 40, 70, .75)); }
+.dv-c.has-fig .dv-art img { filter: brightness(.55) saturate(.8); }
+.dv-c.has-fig.dead .dv-bfig, .dv-c.has-fig.dying .dv-bfig { opacity: 0; transition: opacity .4s; }
+@keyframes bfigBreath { 50% { transform: scale(1.025) translateY(-2px); } }
+@media (prefers-reduced-motion: reduce) { .dv-c.has-fig .dv-bfig { animation: none; } }
