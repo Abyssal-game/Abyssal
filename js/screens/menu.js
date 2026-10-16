@@ -24,7 +24,7 @@ export default function menu(app, root) {
       ${T('#/succes', 'crown', 'Succès', `${achDone} / ${cat.achievements.length} débloqués`)}
       ${T('#/bestiaire', 'book', 'Bestiaire', 'Créatures, royaumes, histoire')}
       ${T('#/compte', 'account', 'Compte', isLoggedIn() ? `Connecté${sync.profile?.pseudo ? ` · ${esc(sync.profile.pseudo)}` : ''}` : 'Sauvegarde, classement')}
-      ${T('#/parametres', 'settings', 'Réglages', 'Son, tutoriels, sauvegarde')}
+      ${T('#/parametres', 'settings', 'Réglages', 'Son, musique, tutoriels')}
       ${creator ? A('creator', 'creator', 'Mode Créateur', s.settings.dev ? 'Actif' : 'Pouvoirs du créateur').replace('class="mn-tile"', 'class="mn-tile mn-wide"') : ''}
     </nav>`;
   root.addEventListener('click', (e) => {

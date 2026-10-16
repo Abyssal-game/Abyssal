@@ -107,7 +107,7 @@ export default function descent(app, root) {
   }
   function summaryHTML(s) {
     return `<section class="dc-sum2 ${s.wiped ? 'lost' : 'won'}">
-      ${crestHTML(!s.wiped, s.floor, 'Étage', 'dc-sum2-crest')}
+      ${crestHTML(!s.wiped, s.floor, s.floor > 1 ? 'Étages' : 'Étage', 'dc-sum2-crest')}
       <h2>${s.abandoned ? 'Expédition abandonnée' : s.wiped ? 'L’équipe est tombée' : 'Retour à la surface'}</h2>
       <p class="dc-sum2-sub">${s.wiped ? (s.cursed ? 'Descente maudite : le butin est perdu.' : 'Tu gardes la moitié des éclats et un coffre plus modeste.') : 'Tu remontes avec tout ton butin.'}</p>
       ${s.chests.length ? `<a class="btn primary block dc-plq dc-plq-red dc-chestcta" href="#/coffres">${icon('p:chest')}Ouvrir ${s.chests.length > 1 ? 'mes coffres' : 'mon coffre'}</a>` : ''}

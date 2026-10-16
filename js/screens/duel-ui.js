@@ -926,9 +926,16 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   }
   // ——— Touchers ———
   root.addEventListener('pointerdown', (e) => { if (defTap && !e.target.closest('[data-d="quit"],[data-d="help"]')) { e.preventDefault(); defTap(); } }, { signal: ctl.signal });
-  root.addEventListener('pointerdown', (e) => { const ab = e.target.closest('[data-a]'); clearTimeout(holdT); held = false; if (!ab || busy || !sel) return; holdT = setTimeout(() => { held = true; actInfo(ab.dataset.a); }, 420); }, { signal: ctl.signal });
+  root.addEventListener('pointerdown', (e) => {
+    const ab = e.target.closest('[data-a]'); clearTimeout(holdT); held = false;
+    // v329 : appui long sur une carte (ennemie ou alliée) = sa fiche ; le toucher court garde l'attaque rapide
+    const cd = !ab && e.target.closest('.dv-c');
+    if (cd) { const u = st.units[cd.dataset.uid]; if (u) holdT = setTimeout(() => { held = true; app.sfx.tap?.(); navigator.vibrate?.(12); info(u); }, 420); return; }
+    if (!ab || busy || !sel) return; holdT = setTimeout(() => { held = true; actInfo(ab.dataset.a); }, 420);
+  }, { signal: ctl.signal });
   for (const t of ['pointerup', 'pointercancel']) root.addEventListener(t, () => clearTimeout(holdT), { signal: ctl.signal });
-  root.addEventListener('pointermove', (e) => { if (holdT && e.target.closest('[data-a]') == null) clearTimeout(holdT); }, { signal: ctl.signal });
+  root.addEventListener('pointermove', (e) => { if (holdT && e.target.closest('[data-a]') == null && e.target.closest('.dv-c') == null) clearTimeout(holdT); }, { signal: ctl.signal });
+  root.addEventListener('contextmenu', (e) => { if (e.target.closest('.dv-c, [data-a]')) e.preventDefault(); }, { signal: ctl.signal });
   root.addEventListener('click', async (e) => {
     if (!alive_) return;
     const b = e.target.closest('[data-d]');
@@ -965,6 +972,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const ab = e.target.closest('[data-a]');
     if (ab) { if (held) { held = false; return; } if (!busy && sel) choose(ab.dataset.a); return; }
     const c = e.target.closest('.dv-c');
+    if (c && held) { held = false; return; } // l'appui long a déjà ouvert la fiche
     if (!c || busy || st.over) return;
     const u = st.units[c.dataset.uid];
     if (mode) return pickTarget(u.uid);
@@ -1067,6 +1075,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       <li><b>Attaque</b> (gratuite, +1 PA) : dégâts fiables, +1 Ferveur. <b>Défense</b> (gratuite, +1 PA) : -50 % de dégâts jusqu’à son prochain tour. <b>Passer</b> : elle ne fait rien. <b>Permuter</b> (une fois par tour) : une créature de la réserve prend sa place et joue tout de suite ; PV, PA et états sont gardés, et la réserve récupère 10 % de PV par tour. En entrant, elle déclenche un petit effet lié à son rôle (bouclier, soin, Ferveur, ralentissement…).</li>
       <li><b>Brisure</b> : en visant une élite ou un gardien, la cible affiche la Brisure que ton coup va infliger (◆), et « BRISE ! » quand il va le briser. Un seul coup ne retire jamais plus de 40 % des PV d’un gardien.</li>
       <li><b>Ferveur</b> (${FERVOR_MAX} au plus, commune à l’équipe ; tu en gardes 3 au plus d’un combat à l’autre) : attaques, faiblesses, esquives (+1), parades parfaites (+2) et Brisures (+2) la remplissent. Pleine, elle lance le <b>pouvoir d’équipe</b> (${esc(ult.name)} : ${esc(ult.desc)}), pendant le tour d’une de tes créatures, sans le terminer.</li>
+      <li><b>Voir une carte</b> : garde le doigt appuyé sur une carte (ennemie ou alliée) pour ouvrir sa fiche : PV, attaque, intention, passifs. Un toucher court sur un ennemi attaque toujours directement.</li>
       <li><b>Défense active</b> (coups chargés, attaques de zone, sorts, élites et gardiens) : touche dans l’or pour esquiver (+1 Ferveur), sur le trait blanc, au tout dernier instant, pour parer (aucun dégât, +1 PA, +2 Ferveur, Brisure, contre-attaque des Protecteurs et des Attaquants).</li>
       <li><b>Dés</b> : Coup d’estoc, Contagion et Entrave lancent un D20 contre une difficulté (DD). 1 : échec critique ; sous le DD : réussite partielle ; DD atteint : réussite ; 20 : critique. Marque, gel, Brisure et faiblesse donnent des bonus.</li>
       <li><b>Enchaînement</b> : chaque créature qui frappe un ennemi déjà touché ce tour-ci par une autre de tes créatures gagne +1 dégât (+2 au plus). Le « +1 » doré sur la cible l’annonce.</li>

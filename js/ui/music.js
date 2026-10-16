@@ -66,11 +66,11 @@ function init() {
 }
 
 // Baisse la musique quelques secondes (victoire, carte mythique…)
-function duck(sec = 3) {
+function duck(sec = 3, depth = 0.25) {
   if (!ctx || !duckG) return;
   const t = ctx.currentTime, g = duckG.gain;
   g.cancelScheduledValues(t); g.setValueAtTime(g.value, t);
-  g.linearRampToValueAtTime(0.25, t + 0.15); g.setValueAtTime(0.25, t + sec); g.linearRampToValueAtTime(1, t + sec + 2);
+  g.linearRampToValueAtTime(depth, t + 0.15); g.setValueAtTime(depth, t + sec); g.linearRampToValueAtTime(1, t + sec + 2);
 }
 
 // ——— Instruments (chacun sort dans le groupe de l'ambiance en cours) ———

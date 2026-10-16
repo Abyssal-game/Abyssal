@@ -25,7 +25,7 @@ export default function settings(app, root) {
   }
 
   const ui = (app.state.settings ||= { tab: 'jeu' });
-  const TABS = [['jeu', 'Jeu', 'set-game', 'dodge'], ['tutos', 'Tutoriels', 'set-tutos', 'book'], ['save', 'Sauvegarde', 'set-save', 'seal'], ['about', 'À propos', 'set-about', 'crown']];
+  const TABS = [['jeu', 'Jeu', 'set-game', 'dodge'], ['tutos', 'Tutoriels', 'set-tutos', 'book'], ['about', 'À propos', 'set-about', 'crown']];
   const tabIcon = (k) => `<img class="picon" alt="" src="assets/icons/${k}.webp">`;
 
   function tabJeu(s) {
@@ -58,10 +58,11 @@ export default function settings(app, root) {
         <button class="btn small ghost" data-act="guide">${icon('back')}Réactiver toutes les bulles d’aide</button>
       </section>`;
   }
+  // v329 : depuis le compte obligatoire, la sauvegarde est automatique (compte en ligne) ; l'ancien onglet Sauvegarde
+  // devient un bloc replié « Avancé » en bas de l'onglet Jeu (copie de secours et effacement)
   function tabSave() {
-    return `<section class="panel stack">
-        <h2>Sauvegarde</h2>
-        <p class="small">Ta progression est enregistrée sur cet appareil après chaque action, et envoyée sur ton compte en ligne dès que tu as du réseau : tu la retrouves sur n’importe quel appareil en te connectant. Tu peux aussi l’exporter pour en garder une copie.</p>
+    return `<details class="panel dc-fold set-adv"><summary>${icon('seal')} Avancé : copie de secours, effacement</summary><div class="stack">
+        <p class="small">Ta partie est sauvegardée <b>automatiquement</b> sur ton compte en ligne : tu n’as rien à faire, et tu la retrouves sur n’importe quel appareil en te connectant. Une copie de secours reste possible ici.</p>
         ${app.persistent ? '' : '<p class="small err">Le stockage local est indisponible : la progression sera perdue à la fermeture.</p>'}
         <div class="row gap wrap">
           <button class="btn small" data-act="export">${icon('copy')}Copier le code</button>
@@ -69,11 +70,8 @@ export default function settings(app, root) {
           <button class="btn small" data-act="import">${icon('upload')}Importer</button>
         </div>
         <p class="small muted">Dernier enregistrement : ${new Date(g.s.updatedAt).toLocaleString('fr-FR')}.</p>
-      </section>
-      <section class="panel stack">
-        <h2>Zone sensible</h2>
         <button class="btn danger small" data-act="reset">${icon('trash')}Effacer toute la progression</button>
-      </section>`;
+      </div></details>`;
   }
   function tabAbout(s) {
     return `${sync.profile?.badge === 'createur' ? `<section class="panel stack cr-entry"><h2>${icon('crown')} Mode Créateur</h2>
@@ -88,9 +86,9 @@ export default function settings(app, root) {
   }
   function render() {
     const s = g.s.settings;
-    const body = { jeu: tabJeu, tutos: tabTutos, save: tabSave, about: tabAbout }[ui.tab] || tabJeu;
+    const body = { jeu: (x) => tabJeu(x) + tabSave(), tutos: tabTutos, about: tabAbout }[ui.tab] || ((x) => tabJeu(x) + tabSave());
     root.innerHTML = `
-      <header class="screen-head ui-hero bn-settings"><h1>Réglages</h1><p class="muted">Jeu, tutoriels, sauvegarde.</p></header>
+      <header class="screen-head ui-hero bn-settings"><h1>Réglages</h1><p class="muted">Jeu, son, tutoriels.</p></header>
       <nav class="set-tabs" role="tablist">${TABS.map(([k, l, ic, fb]) => `<button class="set-tab" role="tab" aria-selected="${ui.tab === k}" data-act="tab" data-k="${k}">${tabIcon(ic, fb)}<span>${l}</span></button>`).join('')}</nav>
       <div class="set-body">${body(s)}</div>`;
     root.querySelectorAll('[data-mus]').forEach((b) => b.addEventListener('click', () => { musicPreview(MUSIC_DEMO[+b.dataset.mus][1]); root.querySelectorAll('[data-mus]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); }));
@@ -142,7 +140,7 @@ export default function settings(app, root) {
       });
     },
     async reset() {
-      if (!(await confirmBox('Effacer définitivement toute ta progression sur cet appareil ?', { ok: 'Effacer', danger: true }))) return;
+      if (!(await confirmBox('Effacer définitivement toute ta progression, sur cet appareil <b>et sur ton compte en ligne</b> ?', { ok: 'Effacer', danger: true }))) return;
       if (!(await confirmBox('Dernière confirmation : la collection, les éclats et les succès seront perdus. Pense à exporter d’abord.', { ok: 'Tout effacer', danger: true }))) return;
       g.reset();
       app.applySettings();

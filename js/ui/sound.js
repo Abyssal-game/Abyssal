@@ -357,7 +357,8 @@ const sampleKey = (k, a) => {
   return 'reveal-c';
 };
 // v308 (audit audio mesuré à l'ffmpeg) : volume propre à certains fichiers, et aigus adoucis pour ceux qui sonnaient comme des bips
-const SAMPLE_GAIN = { 'reveal-c': 7, chest: 1.4, tear: 1.4, bossvictory: 1.26, 'reveal-s': 1.26, unlock: 1.6 };
+const SAMPLE_GAIN = { 'reveal-c': 7, chest: 1.4, tear: 1.4, bossvictory: 1.26, 'reveal-s': 2.2, // v329 : la Secrète doit claquer (demande du propriétaire) ; le compresseur du bus évite la saturation
+  unlock: 1.6 };
 const SAMPLE_LOWPASS = { yourturn: 1200, passive: 1200, mark: 1400 };
 const lastPlay = {}, playing = {};
 function playSample(key, gain = 1) {
@@ -385,7 +386,7 @@ const DUCK = { bossvictory: 5, victory: 3.5, defeat: 4, ult: 2.5, achievement: 2
 for (const k of Object.keys(sfx)) {
   const f = sfx[k];
   sfx[k] = (...a) => {
-    if (k === 'reveal') { const big = a[0] === 'M' || a[0] === 'S'; if (big || a[0] === 'HR') { hooks.duck?.(big ? 3.5 : 2); } hap(big ? 3 : a[0] === 'R' || a[0] === 'HR' ? 1 : 0); }
+    if (k === 'reveal') { const big = a[0] === 'M' || a[0] === 'S'; if (big || a[0] === 'HR') { hooks.duck?.(a[0] === 'S' ? 5 : big ? 3.5 : 2, a[0] === 'S' ? 0.08 : 0.25); } hap(big ? 3 : a[0] === 'R' || a[0] === 'HR' ? 1 : 0); }
     else { if (HAP[k]) hap(HAP[k]); if (DUCK[k]) hooks.duck?.(DUCK[k]); }
     // un son ne doit jamais bloquer le jeu (v265) : toute erreur audio est ignorée
     try {

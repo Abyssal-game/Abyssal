@@ -306,6 +306,7 @@ export function openPack(app, type, { faction, onDone, preset = null, title = nu
 
   function epic(r) {
     app.sfx.reveal(r);
+    if (r === 'S') app.sfx.rumble?.(1.6); // v329 : grondement grave sous la révélation d'une Secrète
     el.classList.add('epic', `epic-${r}`);
     const banner = document.createElement('div');
     banner.className = 'op-banner';

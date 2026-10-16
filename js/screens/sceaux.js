@@ -1,5 +1,6 @@
 // Duels des Sceaux : accueil (adversaires, défi du jour, main), plateau 3 × 3 et fin de partie.
 import * as SC from '../core/sceaux.js';
+import { openRuleHelp } from '../ui/sceaux-demo.js';
 import { STARTER } from '../core/army.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, picon, crestHTML } from '../ui/icons.js';
@@ -74,7 +75,8 @@ export default function sceauxScreen(app, root) {
       <p class="small muted center">Récompenses : ${SC.SCEAUX_REWARD.dailyPaid} victoires payées par jour (${Math.max(0, SC.SCEAUX_REWARD.dailyPaid - (sc.day === todayKey() ? sc.paidToday : 0))} restantes aujourd’hui). Au-delà, tu peux jouer pour le plaisir.</p>
       <details class="panel dc-fold dc-how"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/help.webp"><span class="dc-sum-t">Comment ça marche</span></summary>
         <ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol>
-        ${Object.values(SC.RULES).filter((r) => r.name !== 'Classique').map((r) => `<p class="small sc-rl"><b>${esc(r.name)}</b> : ${esc(r.desc)}</p>`).join('')}
+        <button class="btn small gold block sc-demo-b" data-sc="demo" data-k="classique">${icon('p:rule')}Voir comment on capture (animation)</button>
+        ${Object.entries(SC.RULES).filter(([k]) => k !== 'classique').map(([k, r]) => `<button class="sc-rl sc-rl-b" data-sc="demo" data-k="${k}"><span><b>${esc(r.name)}</b> : ${esc(r.desc)}</span><span class="sc-rl-play">▶ Voir</span></button>`).join('')}
         <p class="small muted center">Toutes les cartes ont le même total de valeurs (20) : une Commune bien placée peut capturer une Mythique.</p></details>`;
     tuto(app, 'sceaux').then(() => { if (Object.keys(sc.beaten || {}).length) tuto(app, 'sceaux-awake'); });
   }
@@ -247,11 +249,13 @@ export default function sceauxScreen(app, root) {
   }
   // Règles en cours de partie : la même présentation que le volet « Comment ça marche »
   function rules() {
-    openSheet(`<div class="sc-rules"><h2>Règles des Sceaux</h2>
+    const sh = openSheet(`<div class="sc-rules"><h2>Règles des Sceaux</h2>
       <ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol>
-      ${Object.values(SC.RULES).filter((r) => r.name !== 'Classique').map((r) => `<p class="small"><b>${esc(r.name)}</b> : ${esc(r.desc)}</p>`).join('')}
+      ${Object.entries(SC.RULES).filter(([k]) => k !== 'classique').map(([k, r]) => `<button class="sc-rl sc-rl-b" data-sc="demo" data-k="${k}"><span><b>${esc(r.name)}</b> : ${esc(r.desc)}</span><span class="sc-rl-play">▶ Voir</span></button>`).join('')}
       ${Object.entries(SC.PERKS).map(([k, p]) => `<p class="small"><b><span class="sc-pkic">${PERK_IC[k]}</span>${esc(p.name)}</b> (${p.rar.join(', ')}) : ${esc(p.desc)}</p>`).join('')}
       <p class="small muted">Victoires payées : ${SC.SCEAUX_REWARD.dailyPaid} par jour. Première victoire contre un adversaire : +${SC.SCEAUX_REWARD.firstWin} éclats. Défi du jour : +${SC.SCEAUX_REWARD.daily}.</p></div>`, { label: 'Règles des Sceaux' });
+    // la fenêtre est hors de l'écran des Sceaux : ses boutons « Voir » ont leur propre écouteur
+    sh.body.addEventListener('click', (e) => { const b = e.target.closest('[data-sc="demo"]'); if (b) openRuleHelp(app, b.dataset.k); });
   }
   function handSheet() {
     const owned = Object.keys(g.s.collection).filter((id) => cat.get(id));
@@ -278,7 +282,8 @@ export default function sceauxScreen(app, root) {
     const b = e.target.closest('[data-sc]');
     if (!b || b.disabled) return;
     const k = b.dataset.sc;
-    if (k === 'rules') return rules();
+    if (k === 'rules') { const cur = g.s.sceaux.cur; return cur && !cur.over ? openRuleHelp(app, cur.rule, { onAll: rules }) : rules(); } // v329 : la pastille de règle ouvre son animation
+    if (k === 'demo') return openRuleHelp(app, b.dataset.k);
     if (k === 'hand') return handSheet();
     if (k === 'daily') return start({ daily: true });
     if (k === 'play') return start({ rival: b.dataset.r });
