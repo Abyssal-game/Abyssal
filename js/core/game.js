@@ -10,7 +10,7 @@ export const CHALLENGES = [
 export const WEEK_DAYS = 5; // jours joués dans la semaine pour le coffre de la semaine
 export const FIRST_WIN = 50;
 export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par combat n'augmentent plus // éclats de la toute première victoire
-import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ITEMS, SHOW_ORDER, SHADOW, SUBLIME_ASH, VARIANTS } from '../config.js';
+import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, SHOW_ORDER, SHADOW, SUBLIME_ASH, VARIANTS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
 import { rngOf, DESCENT, CHESTS, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES, foeTraits, CHECKPOINT_MIN, DEEP_MILESTONE, gouffreAt, GOUFFRE, OMENS, omenChoices } from './descent.js';
@@ -1292,31 +1292,7 @@ export class Game {
     this.persist();
   }
 
-  // Boutique d'objets --------------------------------------------------------
-  itemCount(k) { return this.s.items[k] || 0; }
-  boughtToday(k) { const b = this.s.itemBuys; return b.day === today(this.clock()) ? b[k] || 0 : 0; }
-  buyItem(k) {
-    const it = ITEMS[k];
-    if (!it) throw new Error('Objet inconnu.');
-    if (it.limit && this.boughtToday(k) >= it.limit) throw new Error(`Limite atteinte : ${it.limit} par jour.`);
-    if (this.s.shards < it.price) throw new Error(`Il te manque ${it.price - this.s.shards} éclats (tu en as ${this.s.shards}).`);
-    this.s.shards -= it.price;
-    this.s.stats.shardsSpent += it.price;
-    if (it.chests) this.addChests(it.chests);
-    else this.s.items[k] = this.itemCount(k) + 1;
-    const day = today(this.clock());
-    if (this.s.itemBuys.day !== day) this.s.itemBuys = { day };
-    this.s.itemBuys[k] = (this.s.itemBuys[k] || 0) + 1;
-    this.persist();
-  }
-  useItem(k, target = null) {
-    if (!this.itemCount(k)) throw new Error('Tu n’as pas cet objet.');
-    const d = this.descent();
-    if (k === 'torche') { if (d.used <= 0) throw new Error('Toutes tes torches du jour sont déjà disponibles.'); d.used--; }
-    else throw new Error('Objet inconnu.');
-    this.s.items[k]--;
-    this.persist();
-  }
+  // (v340 : la boutique d'objets et le sac — Torche bénie — sont retirés du jeu ; s.items reste dans la sauvegarde, inutilisé)
 
   setTitle(t) { if (this.s.titles.includes(t)) { this.s.title = t; this.persist(); } }
   setFrame(f) { if (this.s.frames.includes(f)) { this.s.frame = f; this.persist(); } }
@@ -1435,7 +1411,6 @@ export class Game {
   devTorches() { this.descent().used = 0; this.persist(); }
   devFreePacks() { this.s.freePack = { day: null }; this.persist(); }
   devMissions() { this.missions().list.forEach((x) => { x.p = x.n; }); this.persist(); }
-  devItems(n = 5) { Object.keys(ITEMS).forEach((k) => { this.s.items[k] = (this.s.items[k] || 0) + n; }); this.persist(); }
   // power : l'équipe prend le niveau attendu à cet étage (pour essayer la difficulté réelle)
   devFloor(n, { power = false } = {}) {
     const run = this.s.descent.run; if (!run) throw new Error('Lance d’abord une Descente.');

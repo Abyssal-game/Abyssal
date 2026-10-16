@@ -26,7 +26,7 @@ export function openCreator(app) {
         <div class="row gap wrap">${B('snap', `${icon('download')}Copier ma partie actuelle`)}${snap ? B('restore', `${icon('upload')}Revenir à la copie`, 'gold') : ''}</div></section>
 
       <section class="cr-sec"><h3>Ressources</h3><div class="row gap wrap">
-        ${B('shards', '+10 000 éclats')}${B('ash', '+10 000 cendres')}${B('tickets', '+10 boosters de chaque')}${B('items', '+5 de chaque objet')}${B('chests', 'Des coffres de chaque')}${B('free', 'Recharger les boosters gratuits')}
+        ${B('shards', '+10 000 éclats')}${B('ash', '+10 000 cendres')}${B('tickets', '+10 boosters de chaque')}${B('chests', 'Des coffres de chaque')}${B('free', 'Recharger les boosters gratuits')}
       </div></section>
 
       <section class="cr-sec"><h3>Cartes</h3><div class="row gap wrap">
@@ -71,7 +71,6 @@ export function openCreator(app) {
       if (x === 'shards') g.devGrant({ shards: 10000 });
       if (x === 'ash') g.devGrant({ ash: 10000 });
       if (x === 'tickets') g.devGrant({ tickets: Object.fromEntries(Object.keys(BOOSTERS).map((k) => [k, 10])) });
-      if (x === 'items') g.devItems(5);
       if (x === 'chests') g.devChests();
       if (x === 'free') g.devFreePacks();
       if (x === 'all') g.devUnlockAll();

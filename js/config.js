@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v339'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v340'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -151,7 +151,3 @@ export const SHADOW = { participation: 15, prizes: ['abyssal', 'or', 'fer'], min
 // Points d'une ouverture, pour le classement des plus belles ouvertures.
 export const LUCK_POINTS = { C: 1, PC: 2, R: 6, HR: 20, M: 80, S: 200, variant: 8 };
 
-// Boutique d'objets (payés en éclats). limit : achats maximum par jour.
-export const ITEMS = {
-  torche:    { name: 'Torche bénie',           price: 220, icon: 'flame',   desc: 'Rallume une torche déjà utilisée : une expédition de plus aujourd’hui.', limit: 2 },
-};

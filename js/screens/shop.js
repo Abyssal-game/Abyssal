@@ -1,4 +1,3 @@
-import { itemsShopHTML, bindItemShop } from './items.js';
 // Boutique : boosters achetables avec la monnaie du jeu uniquement.
 import { tuto } from '../ui/tutos.js';
 import { BOOSTERS, RARITIES, PITY, FACTION_ORDER, ECONOMY, VARIANT_RATES } from '../config.js';

@@ -12,7 +12,6 @@ import { icon, EMBLEM, sigil, picon, crestHTML } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, bindActions, openSheet } from '../ui/dom.js';
 import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
-import { bagHTML, bindBag } from './items.js';
 import { chestSVG } from '../ui/chest.js';
 import { rowAttrs, shownName, bindReport } from '../ui/report.js';
 import { isBlocked } from '../core/moderation.js';
@@ -77,7 +76,6 @@ export default function descent(app, root) {
         ${ui.cursed || ui.nightmare ? `<p class="small dc-riskwarn">${icon('skull')} ${[ui.cursed ? 'Maudite : si l’équipe tombe, <b>tu perds tout</b> (éclats et coffres).' : '', ui.nightmare ? 'Cauchemar : ennemis bien plus forts et gardiens déchaînés dès le début.' : ''].filter(Boolean).join(' ')}${riskAdvice()}</p>` : ''}
       </section>
       ${ruleHTML(g.rule())}
-      ${Object.values(g.s.items).some((n) => n > 0) ? bagHTML(g) : ''}
       <div class="dc-links">
         ${seasonHTML() ? `<button class="dc-link" data-act="open" data-f="season">${picon('season')}<b>Saison</b><small>paliers du mois</small></button>` : ''}
         <button class="dc-link" data-act="open" data-f="board">${picon('crown')}<b>Classement</b><small>du jour</small></button>
@@ -411,7 +409,6 @@ export default function descent(app, root) {
     share() { share(); },
     dismiss() { ui.outcome = null; render(); },
   });
-  bindBag(app, root, () => render());
   render();
   app.refreshView = () => { if (!playing) render(); };
   return () => { app.refreshView = null; if (battle) { battle.stop(); battle = null; } };

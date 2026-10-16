@@ -3004,3 +3004,6 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 .as { z-index: 81; }
 .as-k b { font-size: clamp(1.25rem, 7.2vw, 2.4rem); }
 @media (max-width: 380px) { .as-who { letter-spacing: .1em; font-size: .72rem; } .as-k .aicon, .as-k .iicon, .as-k img { width: 30px; height: 30px; } }
+/* v340 : image de la fenêtre de phase 2 des gardiens : la règle générale img { max-width: 100% } l'empêchait de remplir
+   tout le haut de l'encadré (image décalée à gauche, vide à droite) */
+.cb-phimg { max-width: none; display: block; }
