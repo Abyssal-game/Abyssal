@@ -2952,3 +2952,10 @@ body.gated .sheet-wrap { z-index: 78; }
    zones réservées (encoche, barre d'accueil) déduites, pour que le texte sous la carte ne passe plus sous les points */
 .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - var(--safe-t) - max(var(--safe-b), var(--vh-gap, 0px)) - 330px) * .714)) !important; }
 .opening:not(.is-summary) .op-stage { justify-content: safe center; }
+/* v336 : Réglages, trois onglets depuis le retrait de Sauvegarde (v329) : trois colonnes */
+.set-tabs { grid-template-columns: repeat(3, 1fr); }
+/* v336 : app posée sur l'écran d'accueil de l'iPhone. Une bande en bas (≈ 55 pt) peut ne rien afficher alors que le
+   navigateur annonce tout l'écran : l'ouverture de booster garde au moins 56 px de réserve sous ses textes et boutons */
+html.standalone .opening .op-bottom, html.standalone .opening .op-actions-fixed { padding-bottom: calc(14px + max(var(--safe-b), var(--vh-gap, 0px), 56px)) !important; }
+html.standalone .opening.is-summary .op-stage { padding-bottom: calc(84px + max(var(--safe-b), var(--vh-gap, 0px), 56px)) !important; }
+html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - var(--safe-t) - max(var(--safe-b), var(--vh-gap, 0px), 56px) - 330px) * .714)) !important; }

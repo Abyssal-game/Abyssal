@@ -22,7 +22,7 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Le réseau de la session bloque github.io : pour vérifier la publication, passe par l'outil GitHub (déploiements Pages) ou demande une capture au propriétaire.
 
 ## 2. Routine de livraison
-1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v335**.
+1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v336**.
 2. Tests : `node --test tests/*.test.mjs` (215 tests), `node tools/validate.mjs`. Si le combat ou l'équilibre change : `node tools/fuzz.mjs 300` (étage moyen ≈ 12 à 14 en normal).
 3. Vérification dans le navigateur avec Playwright (`/opt/node-tools/node_modules/playwright/index.mjs`, Chromium déjà installé), avec un serveur local `python3 -m http.server 8092` lancé dans le dossier. Tailles iPhone SE et iPhone 13. **L'écran d'ouverture attend un toucher** (« Touche l'écran pour entrer ») : dans les scripts, cliquer au milieu de l'écran (dans la fenêtre 390×664) avant tout le reste.
 4. Commit, push, réponse en français.
@@ -64,6 +64,7 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - **Gouffre** : porte en plus (`gouffreAt`, 35 %) aux étages 6-8, 11-13… (dès 3, jamais par-dessus un gardien), seulement après le premier gardien ; `takeGouffre()` : +2 étages, sans combat ni butin, −20 % des PV max à chaque créature (jamais mortel). Image de porte : la scène `descent` en attendant une image dédiée.
 - **Règles du jour v2** (tirées à partir du 17 octobre 2026, `RULES_V2_FROM` : les jours passés gardent leur règle) : Nuée explosive (tous les ennemis ordinaires Explosifs, +25 % d'éclats), Disette (source 15 %, trésor ×2, `restHeal`), Chasse à la Marque (`st.markMult = 2`), Réserve de Ferveur (départ à 0, toute la Ferveur se garde).
 - v335 : ouverture de booster sur l'app posée à l'écran d'accueil : la carte (`.op-pile`) se règle sur `--app-h` moins les zones réservées et 330 px, pour que le texte sous la carte (rôle) ne soit plus coupé. Pour reproduire dans Playwright, simuler les zones réservées (`--safe-t: 47px`, `--safe-b: 34px` sur `:root`) et retourner les cartes avec `page.mouse.click` (le booster s'ouvre avec Entrée sur `.op-pack`).
+- v336 : capture du propriétaire (iPhone, app de l'écran d'accueil) : une bande noire d'environ 55 pt en bas n'affiche rien alors que le navigateur annonce tout l'écran ; le texte du bas de l'ouverture y était coupé. `fitHeight` (`js/main.js`) prend la plus petite des hauteurs (innerHeight, visualViewport, clientHeight) pour `--vh-gap` et pose `html.standalone` ; l'ouverture y garde au moins 56 px de réserve en bas. Si le défaut revient ailleurs (bouton Passer en combat, feuilles), même remède. Onglets des Réglages : 3 colonnes.
 - Le simulateur (`tools/fuzz.mjs`) donne à la moitié des joueurs le premier gardien vaincu et affiche l'étage moyen par présage.
 
 ## 4 bis. Application Android / iPhone (Capacitor 8)

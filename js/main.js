@@ -104,8 +104,13 @@ function fitHeight() {
   const h = standalone && innerHeight > innerWidth ? Math.max(screen.height, innerHeight) : innerHeight;
   document.documentElement.style.setProperty('--app-h', `${h}px`);
   // partie de l'écran que l'iPhone peut ne pas afficher sous la zone visible : le bas des pages plein écran remonte d'autant
-  document.documentElement.style.setProperty('--vh-gap', `${Math.max(0, h - innerHeight)}px`);
+  // v336 : la hauteur vraiment visible est la plus petite des mesures du navigateur (sur l'app posée à l'écran
+  // d'accueil, innerHeight peut annoncer tout l'écran alors qu'une bande en bas n'affiche rien)
+  const vis = Math.min(innerHeight, window.visualViewport?.height || innerHeight, document.documentElement.clientHeight || innerHeight);
+  document.documentElement.style.setProperty('--vh-gap', `${Math.max(0, Math.round(h - vis))}px`);
+  document.documentElement.classList.toggle('standalone', !!standalone);
 }
+window.visualViewport?.addEventListener('resize', () => fitHeight());
 fitHeight();
 addEventListener('resize', fitHeight);
 addEventListener('orientationchange', () => setTimeout(fitHeight, 300));
