@@ -31,9 +31,13 @@
   .tw { overflow-x: auto; }
   a { color: var(--gold); }
   footer { margin-top: 36px; padding-top: 16px; border-top: 1px solid var(--line); text-align: center; color: var(--muted); font-size: .9rem; }
+  /* croix de fermeture (l'app posée sur l'écran d'accueil n'a pas de bouton retour) */
+  .close { position: fixed; z-index: 10; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); width: 44px; height: 44px; display: grid; place-items: center;
+    border-radius: 50%; background: rgba(21, 19, 28, .92); border: 1px solid var(--line); color: var(--gold); font: 400 1.6rem/1 system-ui, sans-serif; text-decoration: none; box-shadow: 0 4px 14px rgba(0, 0, 0, .6); }
 </style>
 </head>
 <body>
+<a class="close" href="./#/parametres" aria-label="Fermer la politique de confidentialité" id="close">✕</a>
 <main>
   <header>
     <img src="icons/icon-192.png" alt="">
@@ -94,5 +98,13 @@
 
   <footer>ABYSSAL — Le Bestiaire interdit</footer>
 </main>
+<script>
+  // Fermer : la fenêtre ouverte par le jeu se ferme ; sinon retour à la page précédente ; sinon le jeu (Réglages)
+  document.getElementById('close').addEventListener('click', (e) => {
+    e.preventDefault();
+    try { window.close(); } catch (err) { /* rien */ }
+    setTimeout(() => { if (history.length > 1) history.back(); else location.href = './#/parametres'; }, 150);
+  });
+</script>
 </body>
 </html>
