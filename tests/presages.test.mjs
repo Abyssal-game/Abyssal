@@ -1,0 +1,79 @@
+// v334 : présages de départ, porte Gouffre, règles du jour qui changent la façon de jouer.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { loadCatalog, MemoryStorage, rngFrom, noWelcome } from './helpers.mjs';
+import { Game } from '../js/core/game.js';
+import { OMENS, omenChoices, dailyRule, DAILY_RULES, gouffreAt, RULES_V2_FROM } from '../js/core/descent.js';
+
+const catalog = loadCatalog();
+const mk = (seed, d = 18) => noWelcome(new Game(catalog, new MemoryStorage(), { rng: rngFrom(seed), clock: () => new Date(2026, 9, d, 12) }));
+
+test('présage : proposé après le premier gardien, trois choix fixes du jour, gardé pour toute l’expédition', () => {
+  const g = mk('om');
+  g.team();
+  assert.equal(g.startRun().phase, 'doors', 'pas de présage avant le premier gardien');
+  g.endRun(false);
+  g.s.bossesBeaten.devoreur = 1;
+  const run = g.startRun();
+  assert.equal(run.phase, 'omen');
+  assert.deepEqual(run.omenOffer, omenChoices(run.day));
+  assert.equal(new Set(run.omenOffer).size, 3);
+  assert.throws(() => g.chooseDoor('fight'), /porte/i);
+  const k = run.omenOffer[0];
+  g.chooseOmen(k);
+  assert.equal(run.omen, k);
+  assert.equal(run.phase, 'doors');
+  g.chooseDoor('fight');
+  if (OMENS[k].relic) assert.deepEqual(run.battle.relics, [OMENS[k].relic]);
+});
+
+test('Présage de la Soif : plus de source, et les créatures se soignent en frappant', () => {
+  const g = mk('soif');
+  g.team(); g.s.bossesBeaten.devoreur = 1;
+  const run = g.startRun(); run.omenOffer = ['soif', 'avare', 'dent']; g.chooseOmen('soif');
+  for (const room of ['fight', 'elite']) assert.ok(!g.rewardsFor(run, room).includes('rest'));
+  assert.ok(g.rewardsFor(run, 'fight').length >= 1);
+  g.chooseDoor('fight');
+  assert.equal(run.battle.soif, true);
+});
+
+test('Gouffre : saute 2 étages, jamais par-dessus un gardien, et blesse l’équipe', () => {
+  for (let f = 1; f < 60; f++) for (let d = 0; d < 30; d++) if (gouffreAt(`2026-11-${d}`, f)) { assert.ok(f >= 3); assert.notEqual((f + 1) % 5, 0); assert.notEqual(f % 5, 0); }
+  const g = mk('gf');
+  g.team(); g.s.bossesBeaten.devoreur = 1;
+  const run = g.startRun(); g.chooseOmen(run.omenOffer[0]);
+  let f = 3; while (!gouffreAt(run.day, f)) f++;
+  run.floor = f;
+  assert.ok(g.doors().includes('gouffre'));
+  const hp = run.team.map((m) => m.hp);
+  const out = g.chooseDoor('gouffre');
+  assert.equal(out.to, f + 2);
+  assert.equal(run.floor, f + 2);
+  assert.equal(run.cleared, f + 1);
+  assert.equal(run.phase, 'doors');
+  run.team.forEach((m, i) => assert.ok(m.hp < hp[i] && m.hp >= 1));
+});
+
+test('règles du jour : les nouvelles n’apparaissent qu’à partir du 17 octobre 2026, les jours passés gardent la leur', () => {
+  const v2 = Object.keys(DAILY_RULES).filter((k) => DAILY_RULES[k].v2);
+  assert.equal(v2.length, 4);
+  for (let d = 1; d < 17; d++) assert.ok(!v2.includes(dailyRule(`2026-10-${String(d).padStart(2, '0')}`).key));
+  const seen = new Set();
+  for (let d = 0; d < 200; d++) seen.add(dailyRule(`2027-${String(1 + (d % 12)).padStart(2, '0')}-${String(1 + (d % 28)).padStart(2, '0')}-${d}`).key);
+  assert.ok(v2.every((k) => seen.has(k)));
+  assert.ok(RULES_V2_FROM === '2026-10-17');
+});
+
+test('Disette : source à 15 %, trésor doublé', () => {
+  const g = mk('dis');
+  g.team();
+  const run = g.startRun();
+  const real = g.rule.bind(g);
+  g.rule = () => ({ ...real(), key: 'disette' });
+  assert.equal(g.restHeal(run), 0.15);
+  const t2 = g.treasurePreview();
+  g.rule = () => ({ ...real(), key: 'calme' });
+  assert.ok(t2 >= g.treasurePreview() * 2 - 1, 'trésor doublé');
+  assert.equal(g.restHeal(run), 0.3);
+  g.rule = real;
+});

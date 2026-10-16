@@ -103,6 +103,7 @@ for (let i = 1; i <= N; i++) {
   g.s.team = ids; g.s.teamSet = true;
   if (g.team().length < 3) { g.s.team = g.s.team.slice(0, 3); if (g.team().length < 3) continue; } // équipe trop chère pour le budget : on en garde une valide
   const nightmare = r() < 0.3; if (nightmare) g.s.descent.best = 25;
+  if (i % 2) g.s.bossesBeaten.devoreur = 1; // v334 : la moitié des joueurs a déjà vaincu le premier gardien (présages, gouffres)
   try {
     g.startRun({ cursed: r() < 0.3, nightmare });
     const run = g.s.descent.run;
@@ -113,6 +114,7 @@ for (let i = 1; i <= N; i++) {
         const ds = g.doors(); const room = ds[Math.floor(r() * ds.length)];
         const o = g.chooseDoor(room);
         if (o.battle) { const bk = R.battle.bossKey; if (bk) stats.bosses[bk] = (stats.bosses[bk] || 0) + 1; duel(R.battle, r, `${room} étage ${R.floor}${bk ? ' ' + bk : ''}${R.nightmare ? ' cauchemar' : ''}`); const out = g.finishBattle(); if (bk && out.won) stats.bossWins[bk] = (stats.bossWins[bk] || 0) + 1; }
+      } else if (R.phase === 'omen') { const k = R.omenOffer[Math.floor(r() * R.omenOffer.length)]; g.chooseOmen(k); stats.omens = stats.omens || {}; stats.omens[k] = (stats.omens[k] || 0) + 1;
       } else if (R.phase === 'pact') { const offers = [...R.pactOffer, null]; g.choosePact(offers[Math.floor(r() * offers.length)]); const bk = R.battle.bossKey; if (bk) stats.bosses[bk] = (stats.bosses[bk] || 0) + 1; duel(R.battle, r, `pacte ${R.pact} ${R.room} étage ${R.floor}${bk ? ' ' + bk : ''}`); const out = g.finishBattle(); if (bk && out.won) stats.bossWins[bk] = (stats.bossWins[bk] || 0) + 1; }
       else if (R.phase === 'reward' && R.talentOffer?.length) { const o = g.chooseTalent(Math.floor(r() * R.talentOffer.length)); stats.talents[o.talent] = (stats.talents[o.talent] || 0) + 1; }
       else if (R.phase === 'reward') g.chooseReward(R.rewards[Math.floor(r() * R.rewards.length)]);
@@ -121,7 +123,7 @@ for (let i = 1; i <= N; i++) {
       else { report('Phase de Descente inconnue', R.phase); break; }
     }
     if (g.s.descent.run) report('Expédition jamais terminée (300 étapes)', `seed ${i}`);
-    else (nightmare ? stats.nightmare : stats.floors).push(g.s.descent.last.floor);
+    else { (nightmare ? stats.nightmare : stats.floors).push(g.s.descent.last.floor); const om = g.s.stats.omens && Object.keys(g.s.stats.omens)[0]; if (om && !nightmare) ((stats.omenFloors ||= {})[om] ||= []).push(g.s.descent.last.floor); }
   } catch (e) { report('Plantage dans la Descente', `seed ${i} : ${e.stack.split('\n').slice(0, 3).join(' | ')}`); }
   // Sauvegarde : relecture après la partie
   try { const st2 = new Game(cat, g.storage, { rng: r, clock: () => new Date(2026, 9, 1 + (i % 28), 12) }); if (st2.s.shards !== g.s.shards) report('Sauvegarde relue différente', `seed ${i}`); } catch (e) { report('Plantage au rechargement de la sauvegarde', e.message); }
@@ -148,6 +150,7 @@ console.log(`${N} joueurs simulés · ${stats.battles} combats · ${stats.turns}
 console.log(`Étage moyen : ${avg(stats.floors)} (normal) · ${avg(stats.nightmare)} (Cauchemar) · plus gros coup : ${stats.maxDmg}`);
 console.log('Gardiens (victoires / combats) :', Object.keys(stats.bosses).map((k) => `${k} ${stats.bossWins[k] || 0}/${stats.bosses[k]}`).join(' · '));
 console.log('Talents choisis :', JSON.stringify(stats.talents));
+if (stats.omenFloors) console.log('Étage moyen par présage (normal) :', Object.entries(stats.omenFloors).map(([k, v]) => `${k} ${avg(v)} (${v.length})`).join(' · '));
 if (!problems.size) console.log('AUCUN PROBLÈME DÉTECTÉ');
 else for (const [k, v] of problems) console.log(`PROBLÈME ×${v.n} : ${k}\n   exemple : ${v.ex}`);
 process.exit(problems.size ? 1 : 0);

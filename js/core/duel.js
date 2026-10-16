@@ -106,8 +106,8 @@ function setupExtras(st) {
   if (st.pact === 'gardien') st.guardianPact = true;
   // Reliques (Chasse aux Reliques)
   const R_ = st.relics || [];
-  if (R_.includes('coeur')) allies.forEach((u) => scaleHp(u, 1.35));
-  if (R_.includes('sablier')) allies.forEach((u) => scaleHp(u, 0.9));
+  if (R_.includes('coeur')) allies.forEach((u) => scaleHp(u, 1.15)); // v334 : 1,35 → 1,15 (mesuré trop fort comme présage)
+  if (R_.includes('sablier')) allies.forEach((u) => scaleHp(u, 0.95));
   if (R_.includes('dent')) st.fervor = Math.max(0, st.fervor - 1);
   if (R_.includes('oeil')) st.order.enemy.forEach((id) => { const f = st.units[id].faction; if (f) st.discovered[f] = true; });
   st.miroir = R_.includes('miroir');
@@ -169,7 +169,7 @@ export function dmgOf(st, a, t, mult = 1, { basic = false } = {}) {
   if (a.side === 'ally' && a.rarity === 'C' && (t.boss || t.elite)) n += PACK_BONUS;
   const flat = n * mult;
   n *= mult * (st.ruleMult || 1) * factionMult(a, t);
-  if (t.mark && !(a.side === 'ally' && a.uid === t.markBy)) n *= MARK_MULT; // Marque (v265) : le prochain coup d'un autre allié, puis elle part
+  if (t.mark && !(a.side === 'ally' && a.uid === t.markBy)) n *= st.markMult || MARK_MULT; // Marque (v265) : le prochain coup d'un autre allié, puis elle part
   if (t.broken) n *= 1.5;
   if (t.broken && basic && a.side === 'ally' && has(st, 'curee')) n *= 1.5;
   if (a.role === 'degats' && a.side === 'ally' && (t.broken || t.hp <= t.maxHp * 0.3)) n *= 1.5; // Exécution
@@ -192,7 +192,7 @@ export function dmgOf(st, a, t, mult = 1, { basic = false } = {}) {
     if (R_.includes('couronne')) n += Math.min(3, Math.floor(teamLoss(st) / 0.25)) * mult;
   } else {
     if (st.law === 'hate') n *= 1.3;
-    if (R_.includes('oeil')) n *= 1.15;
+    if (R_.includes('oeil')) n *= 1.08;
   }
   // les bonus situationnels se cumulent, mais jamais au-delà de ×3 la force de base du coup
   n = Math.min(n, flat * MULT_CAP);
@@ -340,6 +340,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   if (a && d > 0 && a.side === 'enemy' && u.side === 'ally') { (st.taken ||= {})[a.uid] = ((st.taken || {})[a.uid] || 0) + d; u.absorbed = (u.absorbed || 0) + d; }
   // Talents d'expédition
   if (a && d > 0 && a.side === 'ally' && a.talent === 'sangsue' && a.hp > 0) heal(a, Math.max(1, Math.round(d * 0.3)), ev);
+  if (a && d > 0 && a !== u && a.side === 'ally' && st.soif && a.hp > 0) heal(a, Math.max(1, Math.round(d * 0.1)), ev); // v334 : Présage de la Soif (10 %, mesuré)
   if (a && d > 0 && a !== u && a.side === 'ally' && a.hp > 0 && hasP(a, 'drain')) heal(a, Math.max(1, Math.round(d * (boosted(a, 'drain') ? 0.3 : 0.2))), ev);
   // Bénédiction : un allié qui passe sous 30 % de ses PV est soigné (une ou deux fois par combat)
   if (u.side === 'ally' && d > 0 && u.hp > 0 && u.hp < u.maxHp * 0.3 && u.hp + d >= u.maxHp * 0.3) {

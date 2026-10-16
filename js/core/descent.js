@@ -82,6 +82,7 @@ export const ROOMS = {
   altar:    { name: 'Autel ancien',   desc: 'Choisis une bénédiction pour toute l’expédition.' },
   rest:     { name: 'Source sacrée',  desc: 'Tes créatures récupèrent 30 % de leurs PV.' },
   treasure: { name: 'Trésor oublié',  desc: 'Une poignée d’éclats.' },
+  gouffre:  { name: 'Gouffre',        desc: 'Un raccourci : tu descends de 2 étages d’un coup, sans combat ni butin, mais la chute coûte 20 % des PV à chaque créature.' },
   boss:     { name: 'Gardien',        desc: 'Le gardien de l’étage. Première victoire contre lui : un coffre.' },
 };
 
@@ -91,6 +92,10 @@ export function floorDoors(day, floor) {
   if (floor % DESCENT.bossEvery === 0) return ['boss'];
   return floor === 1 ? ['fight'] : ['fight', 'elite'];
 }
+// v334 : le Gouffre, une porte qui fait descendre de 2 étages d'un coup (sans combat ni butin, l'équipe y perd des PV).
+// Jamais par-dessus un gardien : seulement aux étages 1, 2 et 3 de chaque tranche de 5 (6, 7, 8, 11, 12, 13…), dès l'étage 3.
+export const GOUFFRE = { chance: 0.35, jump: 2, hurt: 0.2 };
+export const gouffreAt = (day, floor) => floor >= 3 && [1, 2, 3].includes(floor % DESCENT.bossEvery) && rngOf(`gouffre:${day}:${floor}`)() < GOUFFRE.chance;
 // Après une victoire : un bonus au choix (2 propositions, 3 après une élite)
 export const REWARD_ROOMS = ['rest', 'altar', 'treasure'];
 export function floorRewards(day, floor, room, owned = []) {
@@ -176,14 +181,40 @@ export const DAILY_RULES = {
   lune:     { name: 'Nuit du pouvoir', desc: 'La Ferveur commence l’expédition à 4 au lieu de 2.' },
   chasse:   { name: 'Chasse aux élites',   desc: 'Chaque élite vaincue rapporte un coffre et deux fois plus d’éclats.' },
   instable: { name: 'Abysse instable',     desc: 'Tout le monde frappe 25 % plus fort : tes créatures comme les corrompues.' },
+  // v334 : règles qui changent la façon de jouer (tirées à partir du 17 octobre 2026)
+  nuee:     { name: 'Nuée explosive',      desc: 'Toutes les créatures corrompues ordinaires explosent en mourant. En échange, +25 % d’éclats.', v2: true },
+  disette:  { name: 'Disette',             desc: 'Les sources sacrées ne soignent que 15 % des PV, mais les trésors rapportent deux fois plus.', v2: true },
+  marque:   { name: 'Chasse à la Marque',  desc: 'Le coup qui consomme une Marque fait ×2 dégâts au lieu de ×1,5.', v2: true },
+  reserve:  { name: 'Réserve de Ferveur',  desc: 'L’expédition commence sans Ferveur, mais toute la Ferveur se garde d’un combat à l’autre (au lieu de 3).', v2: true },
 };
-const RULE_KEYS = Object.keys(DAILY_RULES);
+export const RULES_V2_FROM = '2026-10-17';
+const RULE_KEYS_V1 = Object.keys(DAILY_RULES).filter((k) => !DAILY_RULES[k].v2), RULE_KEYS_V2 = Object.keys(DAILY_RULES);
 const RULE_FACTIONS = ['infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel'];
 export function dailyRule(day, factionNames = {}) {
   const rng = rngOf(`rule:${day}`);
-  const key = RULE_KEYS[Math.floor(rng() * RULE_KEYS.length)];
+  const keys = String(day) >= RULES_V2_FROM ? RULE_KEYS_V2 : RULE_KEYS_V1; // les jours passés gardent leur règle
+  const key = keys[Math.floor(rng() * keys.length)];
   const faction = DAILY_RULES[key].faction ? RULE_FACTIONS[Math.floor(rng() * RULE_FACTIONS.length)] : null;
   const fname = faction ? (factionNames[faction] || faction) : '';
   const fill = (t) => t.replace('{faction}', fname);
   return { key, faction, name: fill(DAILY_RULES[key].name), desc: fill(DAILY_RULES[key].desc) };
+}
+
+// ——— Présages de départ (v334) ————————————————————————————————————————
+// Après le premier gardien vaincu, chaque expédition commence par un choix parmi trois présages, les mêmes pour
+// tout le monde le même jour. Un présage dure toute l'expédition : un vrai avantage, et un vrai prix.
+// Cinq d'entre eux reprennent les reliques que le moteur de combat connaît déjà (st.relics).
+export const OMENS = {
+  coeur:   { relic: 'coeur', name: 'Présage du Titan', icon: 'stat-hp', gain: 'Tes créatures ont 15 % de PV en plus en combat.', cost: 'Tes attaques ne donnent de la Ferveur qu’une fois sur deux.' },
+  oeil:    { relic: 'oeil', name: 'Présage du Traître', icon: 'danger', gain: 'Les faiblesses de tous les ennemis sont révélées dès le début du combat.', cost: 'Tes créatures subissent 8 % de dégâts en plus.' },
+  miroir:  { relic: 'miroir', name: 'Présage du Miroir', icon: 'showcase', gain: 'Une fois par combat, la première grosse attaque ennemie lui renvoie la moitié de ses dégâts.', cost: 'Tes créatures commencent chaque combat avec 1 PA de moins.' },
+  sablier: { relic: 'sablier', name: 'Présage du Sablier', icon: 'hourglass', gain: 'Tes créatures commencent chaque combat avec 1 PA de plus.', cost: 'Tes créatures ont 5 % de PV en moins en combat.' },
+  dent:    { relic: 'dent', name: 'Présage du Léviathan', icon: 'swords', gain: '+30 % de dégâts contre les élites et les gardiens.', cost: 'Chaque combat commence avec 1 Ferveur de moins.' },
+  soif:    { name: 'Présage de la Soif', icon: 'heart', gain: 'Tes créatures récupèrent 10 % des dégâts qu’elles infligent.', cost: 'Les sources sacrées ne sont plus proposées.' },
+  avare:   { name: 'Présage de l’Avare', icon: 'crystal', gain: '+50 % d’éclats pendant toute l’expédition.', cost: 'Les créatures corrompues frappent 10 % plus fort.' },
+};
+export function omenChoices(day) {
+  const rng = rngOf(`omen:${day}`), keys = Object.keys(OMENS), out = [];
+  while (out.length < 3) out.push(keys.splice(Math.floor(rng() * keys.length), 1)[0]);
+  return out;
 }

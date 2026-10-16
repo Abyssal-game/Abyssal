@@ -22,8 +22,8 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Le réseau de la session bloque github.io : pour vérifier la publication, passe par l'outil GitHub (déploiements Pages) ou demande une capture au propriétaire.
 
 ## 2. Routine de livraison
-1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v333**.
-2. Tests : `node --test tests/*.test.mjs` (210 tests), `node tools/validate.mjs`. Si le combat ou l'équilibre change : `node tools/fuzz.mjs 300` (étage moyen ≈ 12 à 14 en normal).
+1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v334**.
+2. Tests : `node --test tests/*.test.mjs` (215 tests), `node tools/validate.mjs`. Si le combat ou l'équilibre change : `node tools/fuzz.mjs 300` (étage moyen ≈ 12 à 14 en normal).
 3. Vérification dans le navigateur avec Playwright (`/opt/node-tools/node_modules/playwright/index.mjs`, Chromium déjà installé), avec un serveur local `python3 -m http.server 8092` lancé dans le dossier. Tailles iPhone SE et iPhone 13. **L'écran d'ouverture attend un toucher** (« Touche l'écran pour entrer ») : dans les scripts, cliquer au milieu de l'écran (dans la fenêtre 390×664) avant tout le reste.
 4. Commit, push, réponse en français.
 
@@ -58,6 +58,12 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Boutique : objectif « ouvre un booster » ; pseudo demandé après la première inscription (`askPseudo`).
 - Vestibule : risque de Maudite/Cauchemar affiché avec le bilan personnel (`descent.risk`). **Départs avancés** : chaque gardien vaincu ouvre un départ juste après lui (`startFloors()`, `startRun({ start })`), coffre d'un rang plus bas et 3 étages minimum (`runChest`, `CHECKPOINT_MIN`), hors classement du jour et de la saison.
 - Au-delà de l'étage 30 : traits Vampire, Épineux, Carapace (`TRAITS[k].deep`, icônes de repli `traitIcon`), jusqu'à 3 ennemis à trait ; premier passage aux étages 40, 50, 60… : ticket premium + éclats (`DEEP_MILESTONE`).
+
+## 4 ter-ter. Lot v334 (après l'avis de ChatGPT sur la répétition de la Descente)
+- **Présages** (`OMENS`, `omenChoices(day)` dans `js/core/descent.js`) : après le premier gardien vaincu (`omensOpen()`), `startRun` met l'expédition en phase `omen` ; `chooseOmen(k)` (3 choix, les mêmes pour tous le même jour). 5 présages reprennent les reliques du moteur (`relics` de `createDuel` : coeur, oeil, miroir, sablier, dent), plus Soif (`st.soif`, 10 % de vol de vie, la source est remplacée par le trésor via `rewardsFor`) et Avare (+50 % d'éclats, ennemis +10 % ATQ). Réglage mesuré (60 expéditions par présage, même équipe et même façon de jouer ; sans présage : étage 20,6) : Titan ramené de +35 % à +15 % de PV (23,5), Traître 15 → 8 % de dégâts subis, Sablier −10 → −5 % de PV ; écart maximal ≈ +3 étages (Titan, Miroir). Pastille du présage sous « Étage N » (fenêtre au toucher). Nom « Présage » choisi car « Serment » est déjà pris (Sceau du Serment).
+- **Gouffre** : porte en plus (`gouffreAt`, 35 %) aux étages 6-8, 11-13… (dès 3, jamais par-dessus un gardien), seulement après le premier gardien ; `takeGouffre()` : +2 étages, sans combat ni butin, −20 % des PV max à chaque créature (jamais mortel). Image de porte : la scène `descent` en attendant une image dédiée.
+- **Règles du jour v2** (tirées à partir du 17 octobre 2026, `RULES_V2_FROM` : les jours passés gardent leur règle) : Nuée explosive (tous les ennemis ordinaires Explosifs, +25 % d'éclats), Disette (source 15 %, trésor ×2, `restHeal`), Chasse à la Marque (`st.markMult = 2`), Réserve de Ferveur (départ à 0, toute la Ferveur se garde).
+- Le simulateur (`tools/fuzz.mjs`) donne à la moitié des joueurs le premier gardien vaincu et affiche l'étage moyen par présage.
 
 ## 4 bis. Application Android / iPhone (Capacitor 8)
 - Identifiant définitif : **com.abyssalgame.abyssal** (ne jamais le changer après publication). Config : `capacitor.config.json`, projet natif : `android/`.

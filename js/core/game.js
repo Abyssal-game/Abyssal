@@ -13,7 +13,7 @@ export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par c
 import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ITEMS, SHOW_ORDER, SHADOW, SUBLIME_ASH, VARIANTS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
-import { rngOf, DESCENT, CHESTS, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES, foeTraits, CHECKPOINT_MIN, DEEP_MILESTONE } from './descent.js';
+import { rngOf, DESCENT, CHESTS, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES, foeTraits, CHECKPOINT_MIN, DEEP_MILESTONE, gouffreAt, GOUFFRE, OMENS, omenChoices } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative } from './duel.js';
 import { bossOf, BOSSES } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
@@ -601,6 +601,40 @@ export class Game {
     if (s > 1 && cleared - s + 1 < CHECKPOINT_MIN) return null;
     return shiftChest(chestForDepth(cleared), mod - (s > 1 ? 1 : 0));
   }
+  // ——— Présages et Gouffre (v334) ———
+  omensOpen() { return !!this.s.bossesBeaten?.devoreur; }
+  chooseOmen(key) {
+    const run = this.s.descent.run;
+    if (!run || run.phase !== 'omen') throw new Error('Aucun présage à choisir.');
+    if (!(run.omenOffer || []).includes(key)) throw new Error('Présage inconnu.');
+    run.omen = key; run.omenOffer = null; run.phase = 'doors';
+    this.s.stats.omens = { ...(this.s.stats.omens || {}), [key]: ((this.s.stats.omens || {})[key] || 0) + 1 };
+    this.persist();
+    return OMENS[key];
+  }
+  // Bonus proposés après une victoire (Présage de la Soif : plus de source ; on garde deux propositions)
+  rewardsFor(run, room) {
+    const list = floorRewards(run.day, run.floor, room, run.blessings);
+    if (run.omen !== 'soif' || !list.includes('rest')) return list;
+    // la source est remplacée par le trésor (l'autel reste aussi rare que sans présage)
+    const out = list.filter((r) => r !== 'rest');
+    if (!out.includes('treasure')) out.push('treasure');
+    return out;
+  }
+  restHeal(run = this.s.descent.run) { const k = this.rule(run?.day).key; return k === 'sources' ? 0.6 : k === 'disette' ? 0.15 : 0.3; }
+  // Gouffre : on saute deux étages d'un coup (jamais un gardien), sans butin, et la chute blesse toute l'équipe
+  takeGouffre() {
+    const run = this.s.descent.run;
+    run.team.forEach((m) => { if (!m.fallen) m.hp = Math.max(1, m.hp - Math.round(m.maxHp * GOUFFRE.hurt)); });
+    const from = run.floor;
+    run.floor = from + GOUFFRE.jump - 1;
+    this.clearFloor();
+    run.floor = from + GOUFFRE.jump;
+    run.phase = 'doors';
+    this.s.stats.gouffres = (this.s.stats.gouffres || 0) + 1;
+    this.persist();
+    return { room: 'gouffre', from, to: run.floor };
+  }
   startRun({ cursed = false, nightmare = false, start = 1 } = {}) {
     if (nightmare && !this.nightmareUnlocked()) throw new Error(`Le mode Cauchemar s’ouvre quand tu as atteint l’étage ${NIGHTMARE_AT}.`);
     if (!this.startFloors().includes(start)) throw new Error('Ce départ n’est pas encore ouvert : bats d’abord le gardien qui le précède.');
@@ -614,10 +648,12 @@ export class Game {
     const ult = this.ultimate(team);
     d.run = {
       v: 3, day: d.day, floor: start, cleared: start - 1, start, phase: 'doors', cursed: cursed && !free, free, nightmare: !!nightmare, blessings: [], altar: null,
-      gauge: this.rule(d.day).key === 'lune' ? FERVOR_MAX - 2 : FERVOR_START, ult: { key: ult.key, power: ult.power, card: ult.card },
+      gauge: this.rule(d.day).key === 'lune' ? FERVOR_MAX - 2 : this.rule(d.day).key === 'reserve' ? 0 : FERVOR_START, ult: { key: ult.key, power: ult.power, card: ult.card },
       team: team.map((id) => { const u = duelUnit(this.catalog.get(id), { level: this.cardLevel(id), form: this.formOf(id) }); return { id, hp: u.maxHp, maxHp: u.maxHp, fallen: false, form: this.formOf(id) }; }),
       shards: 0, chests: [], kills: {}, bestBefore: d.best || 0, minFloor: floorFloor(team.reduce((a, id) => a + this.cardLevel(id), 0) / team.length),
     };
+    // v334 : présage de départ, dès que le premier gardien est tombé
+    if (this.omensOpen()) { d.run.phase = 'omen'; d.run.omenOffer = omenChoices(d.day); }
     this.persist();
     return d.run;
   }
@@ -802,12 +838,17 @@ export class Game {
       return { ...u, maxHp: m.maxHp, hp: Math.min(m.hp, m.maxHp) };
     });
   }
-  doors() { const run = this.s.descent.run; return run ? floorDoors(run.day, run.floor) : []; }
+  doors() {
+    const run = this.s.descent.run; if (!run) return [];
+    const out = floorDoors(run.day, run.floor);
+    if (this.omensOpen() && out.length > 1 && gouffreAt(run.day, run.floor)) out.push('gouffre');
+    return out;
+  }
   // Ce qu'une porte rapporte si on gagne (affiché dessus avant de choisir)
   doorPreview(room) {
     const run = this.s.descent.run; if (!run) return null;
     const k = room === 'boss' ? 3 : room === 'elite' ? 2 : 1, f = Math.min(run.floor, SHARD_FLOOR_CAP);
-    return { rewards: floorRewards(run.day, run.floor, room, run.blessings), talent: room !== 'fight' && run.team.some((m) => !m.fallen && !m.talent), shards: (8 + 2 * f) * k, ash: run.free ? 0 : Math.round((2 + f / 2) * k) };
+    return { rewards: this.rewardsFor(run, room), talent: room !== 'fight' && run.team.some((m) => !m.fallen && !m.talent), shards: (8 + 2 * f) * k, ash: run.free ? 0 : Math.round((2 + f / 2) * k) };
   }
   // Coffre rapporté si l'on remonte maintenant
   chestNow(run = this.s.descent.run) {
@@ -820,6 +861,7 @@ export class Game {
     if (!this.doors().includes(room)) throw new Error('Porte inconnue.');
     const rule = this.rule(run.day);
     const out = { room };
+    if (room === 'gouffre') return this.takeGouffre();
     // (v250 : les Pactes de l'Abîme ne sont plus proposés ; choosePact reste pour une expédition sauvegardée en plein choix)
     return this.startBattle(room, out);
   }
@@ -851,16 +893,21 @@ export class Game {
         if (rule.key === 'furie' && f === rule.faction) e.atk = Math.round(e.atk * 1.25 + 0.4);
         if (rule.key === 'sommeil' && f === rule.faction) { e.maxHp = Math.max(1, Math.round(e.maxHp * 0.75)); e.hp = e.maxHp; }
         if (run.nightmare) { e.maxHp = Math.round(e.maxHp * 1.35); e.hp = e.maxHp; e.atk = Math.round(e.atk * 1.25 + 0.4); }
+        if (run.omen === 'avare') e.atk = Math.round(e.atk * 1.1 + 0.4);
         // Gardien éveillé (Cauchemar, ou à partir de l'étage 30) : sa phase 2 commence dès le premier tour
         if (e.boss && (run.nightmare || run.floor >= AWAKEN_AT)) e.awakened = true;
       }
       // un ennemi nommé : plus coriace, il rapporte un butin en plus
       foeTraits(run.day, run.floor, room, enemies.length).forEach((t, i) => { if (t && !enemies[i].boss && !enemies[i].weekly) { enemies[i].trait = t; if (t === 'carapace') enemies[i].shield = 1; } });
+      if (rule.key === 'nuee') enemies.forEach((e) => { if (!e.boss && !e.elite && !e.weekly && !e.trait) e.trait = 'explosif'; });
       const nm = namedFoe(run.day, run.floor, room), nf = nm && enemies.find((e) => !e.boss && !e.weekly);
       if (nf) { nf.title = nm; nf.named = true; nf.maxHp = Math.round(nf.maxHp * 1.3); nf.hp = nf.maxHp; nf.atk = Math.round(nf.atk * 1.15 + 0.4); }
       const known = {};
       enemies.forEach((e) => { if (this.knows(e.id)) known[e.id] = true; });
-      run.battle = createDuel(this.runUnits(), enemies, { fervor: run.gauge || 0, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, boss: room === 'boss' ? bossOf(run.floor) : null, pact: room === 'fight' ? null : run.pact || null, blessings: run.blessings, discovered: this.s.weakSeen || {}, seed: this.rng ? Math.floor(this.rng() * 2 ** 31) : null, goal: this.goalFor(run, room) });
+      run.battle = createDuel(this.runUnits(), enemies, { fervor: run.gauge || 0, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, boss: room === 'boss' ? bossOf(run.floor) : null, pact: room === 'fight' ? null : run.pact || null, relics: OMENS[run.omen]?.relic ? [OMENS[run.omen].relic] : [], blessings: run.blessings, discovered: this.s.weakSeen || {}, seed: this.rng ? Math.floor(this.rng() * 2 ** 31) : null, goal: this.goalFor(run, room) });
+      if (rule.key === 'marque') run.battle.markMult = 2;
+      if (run.omen === 'soif') run.battle.soif = true;
+      if (run.omen) run.battle.omen = run.omen;
       startInitiative(run.battle); // v262 : chaque créature joue à son tour (ordre d'initiative, PA personnels)
       run.room = room; run.phase = 'battle'; out.battle = true;
     }
@@ -905,10 +952,10 @@ export class Game {
     run.rewards = null;
     run.phase = 'cleared';
     if (room === 'rest') {
-      const k = rule.key === 'sources' ? 0.6 : 0.3;
+      const k = this.restHeal(run);
       run.team.forEach((m) => { if (!m.fallen) m.hp = Math.min(m.maxHp, m.hp + Math.ceil(m.maxHp * k)); });
     } else if (room === 'treasure') {
-      out.shards = this.gainShards(15 + Math.min(run.floor, SHARD_FLOOR_CAP) * 6);
+      out.shards = this.gainShards((15 + Math.min(run.floor, SHARD_FLOOR_CAP) * 6) * (rule.key === 'disette' ? 2 : 1));
     } else if (room === 'altar') {
       run.altar = blessingChoices(run.day, run.floor, run.blessings);
       if (run.altar.length) { run.phase = 'altar'; out.altar = run.altar; }
@@ -920,10 +967,10 @@ export class Game {
   // v308 : montant réel d'un gain d'éclats dans la Descente (bonus compris), pour l'annoncer avant de choisir
   shardsPreview(n) {
     const run = this.s.descent.run; if (!run) return 0;
-    const k = DESCENT_SHARDS * (run.blessings.includes('greed') ? 1.3 : 1) * (this.rule(run.day).key === 'ruee' ? 1.5 : 1) * (run.free ? 0.5 : 1) * (run.nightmare ? 1.5 : 1);
+    const k = DESCENT_SHARDS * (run.blessings.includes('greed') ? 1.3 : 1) * (this.rule(run.day).key === 'ruee' ? 1.5 : this.rule(run.day).key === 'nuee' ? 1.25 : 1) * (run.omen === 'avare' ? 1.5 : 1) * (run.free ? 0.5 : 1) * (run.nightmare ? 1.5 : 1);
     return Math.round(n * k);
   }
-  treasurePreview() { const run = this.s.descent.run; return run ? this.shardsPreview(15 + Math.min(run.floor, SHARD_FLOOR_CAP) * 6) : 0; }
+  treasurePreview() { const run = this.s.descent.run; return run ? this.shardsPreview((15 + Math.min(run.floor, SHARD_FLOOR_CAP) * 6) * (this.rule(run.day).key === 'disette' ? 2 : 1)) : 0; }
   gainShards(n) {
     const run = this.s.descent.run;
     // DESCENT_SHARDS : part des éclats de la Descente (économie resserrée), bonus compris
@@ -954,7 +1001,8 @@ export class Game {
       const pos = (m) => { const i = ord.indexOf(m.id); return (m.fallen ? 1000 : 0) + (i < 0 ? 99 : i); }; // les créatures tombées passent à la fin
       run.team = run.team.slice().sort((a, b) => pos(a) - pos(b));
     }
-    run.gauge = Math.min(FERVOR_CARRY, st.fervor ?? st.gauge ?? 0); // une partie de la Ferveur se garde d'un combat à l'autre (3 au plus)
+    const carry = this.rule(run.day).key === 'reserve' ? FERVOR_MAX : FERVOR_CARRY; // v334 : Réserve de Ferveur
+    run.gauge = Math.min(carry, st.fervor ?? st.gauge ?? 0); // une partie de la Ferveur se garde d'un combat à l'autre (3 au plus)
     const relNew = this.learnRelations(st);
     const bossKey = st.bossKey;
     const pactUsed = st.pact || null;
@@ -992,7 +1040,7 @@ export class Game {
       const named = Object.values(st.units).find((u) => u.side === 'enemy' && u.named);
       if (named) out.named = { title: named.title, id: named.id, shards: this.gainShards(20 + Math.min(run.floor, SHARD_FLOOR_CAP) * 4) };
       // objectif réussi : éclats en plus et 1 Ferveur pour la suite
-      if (goal?.state === 'done') { out.goalShards = this.gainShards((3 + Math.min(run.floor, SHARD_FLOOR_CAP)) * (room === 'boss' ? 2 : 1)); run.gauge = Math.min(FERVOR_CARRY, run.gauge + 1); this.s.stats.goals = (this.s.stats.goals || 0) + 1; }
+      if (goal?.state === 'done') { out.goalShards = this.gainShards((3 + Math.min(run.floor, SHARD_FLOOR_CAP)) * (room === 'boss' ? 2 : 1)); run.gauge = Math.min(carry, run.gauge + 1); this.s.stats.goals = (this.s.stats.goals || 0) + 1; }
       if (room === 'elite' || room === 'boss') { const t = this.talentOffers(run); if (t.length) { run.talentOffer = t; out.talents = t; } }
       // exploits de l'expédition (fêtés dans le résumé)
       const F = (run.feats ||= { hit: 0, syn: 0, breaks: 0, parries: 0, perfect: 0, crits: 0, kills: 0, wins: 0 }), S = st.stats || {};
@@ -1012,7 +1060,7 @@ export class Game {
       for (const id of Object.keys(st.bossBy || {})) (cs[id] ||= {}).b = (cs[id].b || 0) + 1;
       out.fame = this.gainFame(run.team.filter((m) => !m.fallen).map((m) => m.id), room === 'boss' || room === 'elite' ? 2 : 1);
       run.phase = 'reward';
-      run.rewards = floorRewards(run.day, run.floor, room, run.blessings);
+      run.rewards = this.rewardsFor(run, room);
       out.rewards = run.rewards;
       this.clearFloor();
       this.track('win', 1);

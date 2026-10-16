@@ -2940,3 +2940,11 @@ body.gated { overflow: hidden; }
 .dc-starts p { margin: 0; }
 /* v331 : les fenêtres (confirmation « Jouer sans compte »…) passent au-dessus de l'écran de compte */
 body.gated .sheet-wrap { z-index: 78; }
+/* v334 : Présage de départ et porte Gouffre */
+.dc-omen-pill { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; min-height: 32px; padding: 2px 12px; border-radius: 999px; border: 1px solid rgba(212,175,55,.45); background: rgba(212,175,55,.08); color: var(--gold); font: inherit; font-size: .78rem; }
+.dc-omen-pill .ic { width: 14px; height: 14px; }
+.om-head img { border-radius: 50%; }
+.om-c b .ic { width: 18px; height: 18px; vertical-align: -3px; margin-right: 4px; }
+.dc-door.r-gouffre { grid-column: 1 / -1; }
+.dc-door.r-gouffre.has-art { min-height: 150px; border-color: rgba(90, 200, 190, .55); box-shadow: inset 0 0 30px rgba(0, 0, 0, .75), 0 0 18px rgba(90, 200, 190, .2); }
+.dc-door.r-gouffre.has-art .dc-door-art { background: linear-gradient(180deg, rgba(8, 9, 13, .2) 10%, rgba(8, 9, 13, .82) 55%, rgba(8, 9, 13, .97)), var(--art) center 60% / cover no-repeat; }

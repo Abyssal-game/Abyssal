@@ -21,7 +21,7 @@ import { BOSSES, LAWS, ASPECTS } from '../core/bosses.js';
 // bulles de base s'affichent ; Marque/enchaînement, pouvoir d'équipe et dés attendent la suite (relisibles dans Réglages)
 const CB_ICON = new Set(['bastion', 'chain', 'chasse', 'glace']); // images présentes dans assets/icons/cb-*.webp
 import { PACTS } from '../core/pacts.js';
-import { TRAITS, traitIcon } from '../core/descent.js';
+import { TRAITS, traitIcon, OMENS } from '../core/descent.js';
 import { RELICS } from '../core/relics.js';
 import { ULTS } from '../core/army.js';
 import { mountDiorama, roomFor } from '../ui/diorama.js';
@@ -223,7 +223,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       st.law ? `<span class="cb-law" data-d="rule" data-k="law"><b>${esc(LAWS[st.law].name)}</b></span>` : '',
       st.aspect ? `<span class="cb-law" data-d="rule" data-k="aspect"><b>${esc(ASPECTS[st.aspect].name)}</b></span>` : '',
       st.runes ? `<span class="cb-law cb-runes" data-d="rule" data-k="runes" title="Runes du gardien">${st.runes.map((r) => `<img alt="" src="assets/ui/${r.broken ? 'rune-broken' : 'rune'}.webp" class="${r.broken ? 'off' : ''}">`).join('')}<b>${runesLeft(st) ? `−${runesLeft(st) * 10} %` : 'Rompues'}</b></span>` : '',
-      (st.relics || []).length ? `<span class="cb-law" data-d="rule" data-k="relics">${icon('p:crown')}<b>${st.relics.length} relique${st.relics.length > 1 ? 's' : ''}</b></span>` : ''].join('');
+      st.omen && OMENS[st.omen] ? `<span class="cb-law" data-d="rule" data-k="omen">${icon(OMENS[st.omen].icon)}<b>Présage</b></span>` : (st.relics || []).length ? `<span class="cb-law" data-d="rule" data-k="relics">${icon('p:crown')}<b>${st.relics.length} relique${st.relics.length > 1 ? 's' : ''}</b></span>` : ''].join('');
     const rulesEl = $('.cb-rules'); if (rulesEl) { rulesEl.innerHTML = rules; rulesEl.hidden = !rules; }
     alEl.innerHTML = front(st, 'ally').map(cardEl).join('');
     const sw = st.swallowed && st.units[st.swallowed];
@@ -924,6 +924,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     else if (k === 'law' && LAWS[st.law]) h = `<h2>${esc(LAWS[st.law].name)}</h2><p>${esc(LAWS[st.law].desc)}</p><p class="small muted">L’Architecte change de Loi tous les deux tours ; la prochaine est annoncée sur sa carte.</p>`;
     else if (k === 'aspect' && ASPECTS[st.aspect]) { const A = ASPECTS[st.aspect]; h = `<h2>${esc(A.name)}</h2><p>Faible face à <b>${A.weak.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}</b> (+60 %), résiste à <b>${A.resist.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}</b> (−50 %).</p>`; }
     else if (k === 'runes' && st.runes) h = `<h2>Les runes du gardien</h2><p class="small">Tant qu’elles tiennent, chaque rune retire <b>10 %</b> des dégâts que subit le gardien. Brise les trois : il est <b>Fêlé</b> sur-le-champ.</p>${st.runes.map((r) => `<p class="small cb-runeline ${r.broken ? 'off' : ''}"><img alt="" src="assets/ui/${r.broken ? 'rune-broken' : 'rune'}.webp"><span><b>${esc(RUNES[r.k].name)}</b>${r.broken ? ' · <span class="dc-good">brisée</span>' : ''}<br>${esc(RUNES[r.k].hint)}</span></p>`).join('')}`;
+    else if (k === 'omen' && OMENS[st.omen]) h = `<h2>${esc(OMENS[st.omen].name)}</h2><p class="small"><b class="dc-good">Gain</b> ${esc(OMENS[st.omen].gain)}</p><p class="small"><b class="dc-bad">Prix</b> ${esc(OMENS[st.omen].cost)}</p>`;
     else if (k === 'relics') h = `<h2>Tes reliques</h2>${(st.relics || []).map((r) => `<p class="small"><b>${esc(RELICS[r].name)}</b> : ${esc(RELICS[r].gain)} <span class="dc-bad">${esc(RELICS[r].cost)}</span></p>`).join('')}`;
     if (h) openSheet(`<div class="cb-rulesheet">${h}</div>`, { label: 'Règle en vigueur' });
   }

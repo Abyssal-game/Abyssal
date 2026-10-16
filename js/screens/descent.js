@@ -1,7 +1,7 @@
 // L'Aventure (la Descente) : ton équipe de cartes descend dans l'Abysse, étage par étage,
 // affronte les créatures corrompues en duel et rapporte un coffre (éclats ou booster).
 import { RARITY, BOOSTERS } from '../config.js';
-import { DESCENT, ROOMS, BLESSINGS, CHESTS, expectedLevel, floorFloor, CHECKPOINT_MIN } from '../core/descent.js';
+import { DESCENT, ROOMS, BLESSINGS, CHESTS, expectedLevel, floorFloor, CHECKPOINT_MIN, OMENS } from '../core/descent.js';
 import { TEAM, BUDGET } from '../core/army.js';
 import { BOSSES, bossOf } from '../core/bosses.js';
 import { PACTS } from '../core/pacts.js';
@@ -25,10 +25,10 @@ import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
 
 // Illustrations des portes et des bonus
-const DOOR_ART = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss', rest: 'rest', altar: 'altar', treasure: 'treasure' };
-const HOW = [['cards', '#7FA8D8', 'Ton équipe', '5 de tes cartes : 3 au combat, 2 en réserve. Les cendres de la Fournaise les font monter de niveau.'], ['swords', '#E0485E', 'Le combat', 'Chacun son tour, dans l’ordre de la vitesse : chaque créature joue une fois par tour avec ses propres PA. L’attaque en rapporte, les compétences en coûtent. La Ferveur lance le pouvoir d’équipe ; tu en gardes 3 au plus d’un combat à l’autre.'], ['dodge', '#9FE0FF', 'Lire et parer', 'Les gardiens et les élites annoncent leurs grosses attaques. Contre les attaques dangereuses, touche au bon moment : esquive, ou parade parfaite. Brise les élites et les gardiens pour annuler leur coup.'], ['book', '#B48CFF', 'Connaître l’ennemi', 'Posséder la carte d’une créature corrompue donne +1 dégât contre elle.'], ['depth', '#F2C14E', 'Chaque étage', 'Combat simple ou élite, puis un bonus au choix : source, autel ou trésor. Gardien tous les 5 étages.'], ['chest', '#E8C35A', 'Le coffre', 'Remonte quand tu veux : plus tu descends, plus le coffre est beau (bois, fer, or, abyssal).']];
-const DOOR_PIC = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss' };
-const ROOM_ICON = { fight: 'swords', elite: 'skull', altar: 'star', rest: 'heart', treasure: 'crystal', boss: 'crown' };
+const DOOR_ART = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss', gouffre: 'descent', rest: 'rest', altar: 'altar', treasure: 'treasure' };
+const HOW = [['cards', '#7FA8D8', 'Ton équipe', '5 de tes cartes : 3 au combat, 2 en réserve. Les cendres de la Fournaise les font monter de niveau.'], ['swords', '#E0485E', 'Le combat', 'Chacun son tour, dans l’ordre de la vitesse : chaque créature joue une fois par tour avec ses propres PA. L’attaque en rapporte, les compétences en coûtent. La Ferveur lance le pouvoir d’équipe ; tu en gardes 3 au plus d’un combat à l’autre.'], ['dodge', '#9FE0FF', 'Lire et parer', 'Les gardiens et les élites annoncent leurs grosses attaques. Contre les attaques dangereuses, touche au bon moment : esquive, ou parade parfaite. Brise les élites et les gardiens pour annuler leur coup.'], ['book', '#B48CFF', 'Connaître l’ennemi', 'Posséder la carte d’une créature corrompue donne +1 dégât contre elle.'], ['depth', '#F2C14E', 'Chaque étage', 'Combat simple ou élite, puis un bonus au choix : source, autel ou trésor. Gardien tous les 5 étages. Parfois, un gouffre permet de sauter 2 étages, au prix de 20 % des PV.'], ['ui-eye', '#5AC8BE', 'Le présage', 'Après ton premier gardien vaincu, chaque expédition commence par un présage au choix parmi trois : un avantage et un prix pour toute l’expédition.'], ['chest', '#E8C35A', 'Le coffre', 'Remonte quand tu veux : plus tu descends, plus le coffre est beau (bois, fer, or, abyssal).']];
+const DOOR_PIC = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss', gouffre: 'stairs-down' };
+const ROOM_ICON = { gouffre: 'next', fight: 'swords', elite: 'skull', altar: 'star', rest: 'heart', treasure: 'crystal', boss: 'crown' };
 
 export default function descent(app, root) {
   const g = app.game, cat = app.catalog;
@@ -168,14 +168,14 @@ export default function descent(app, root) {
   }
 
   // ——— Expédition ———————————————————————————————————————————————————
-  const runHead = (run) => `<header class="dc-run-head"><div><span class="small muted">${run.nightmare ? `<span class="dc-bad">${icon('skull')} Cauchemar</span> · ` : ''}${run.free ? 'Descente libre (sans coffre)' : run.cursed ? `<span class="dc-bad">${icon('skull')} Maudite</span>` : 'La Descente'}</span><h1>Étage ${run.floor}</h1></div><div class="dc-loot"><span>${icon('crystal')}${fmt(run.shards)}</span>${run.chests.length ? `<span>${icon('p:chest')}${run.chests.length}</span>` : ''}</div></header>
+  const runHead = (run) => `<header class="dc-run-head"><div><span class="small muted">${run.nightmare ? `<span class="dc-bad">${icon('skull')} Cauchemar</span> · ` : ''}${run.free ? 'Descente libre (sans coffre)' : run.cursed ? `<span class="dc-bad">${icon('skull')} Maudite</span>` : 'La Descente'}</span><h1>Étage ${run.floor}</h1>${run.omen && OMENS[run.omen] ? `<button class="dc-omen-pill" data-act="omeninfo">${icon(OMENS[run.omen].icon)} ${esc(OMENS[run.omen].name)}</button>` : ''}</div><div class="dc-loot"><span>${icon('crystal')}${fmt(run.shards)}</span>${run.chests.length ? `<span>${icon('p:chest')}${run.chests.length}</span>` : ''}</div></header>
     ${teamStrip(run.team.map((m) => m.id), run, run.phase !== 'battle')}
     ${run.phase !== 'battle' && run.team.filter((m) => !m.fallen).length > 1 ? `<p class="dc-swap-hint small muted">${ui.tsel != null ? 'Touche la créature avec qui échanger sa place.' : 'Touche deux créatures pour échanger leur place : les 3 premières combattent.'}</p>` : ''}
     <p class="dc-rule-line small">${picon('rule')} <b>${esc(g.rule(run.day).name)}</b> · ${esc(g.rule(run.day).desc)}</p>`;
   function doorsView(run) {
     const doors = g.doors();
-    root.innerHTML = `${runHead(run)}<p class="dc-prompt">${doors.includes('boss') ? 'Un gardien barre la route.' : doors.length > 1 ? 'Deux passages. Le plus dangereux rapporte plus.' : 'Des créatures barrent le passage.'}</p>
-      <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r} has-art" data-act="door" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic ${DOOR_PIC[r] ? 'pic' : ''}">${DOOR_PIC[r] ? picon(DOOR_PIC[r]) : icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'boss' ? `<b class="dc-bad">${esc(BOSSES[bossOf(run.floor)].name)}${run.nightmare || run.floor >= AWAKEN_AT ? ' (déchaîné)' : ''}</b> : ${esc(BOSSES[bossOf(run.floor)].mechanic)}${run.nightmare || run.floor >= AWAKEN_AT ? ' <b class="dc-bad">Déchaîné : sa phase 2 commence dès le premier tour.</b>' : ''}${g.s.bossesBeaten[bossOf(run.floor)] ? ` <b class="dc-good">Contre : ${esc(BOSSES[bossOf(run.floor)].counter)}</b>` : ''}` : ROOMS[r].desc}</span></button>`).join('')}</div>
+    root.innerHTML = `${runHead(run)}<p class="dc-prompt">${doors.includes('boss') ? 'Un gardien barre la route.' : doors.includes('gouffre') ? 'Deux passages… et un gouffre qui plonge plus bas.' : doors.length > 1 ? 'Deux passages. Le plus dangereux rapporte plus.' : 'Des créatures barrent le passage.'}</p>
+      <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r} has-art" data-act="door" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic ${DOOR_PIC[r] ? 'pic' : ''}">${DOOR_PIC[r] ? picon(DOOR_PIC[r]) : icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'boss' ? `<b class="dc-bad">${esc(BOSSES[bossOf(run.floor)].name)}${run.nightmare || run.floor >= AWAKEN_AT ? ' (déchaîné)' : ''}</b> : ${esc(BOSSES[bossOf(run.floor)].mechanic)}${run.nightmare || run.floor >= AWAKEN_AT ? ' <b class="dc-bad">Déchaîné : sa phase 2 commence dès le premier tour.</b>' : ''}${g.s.bossesBeaten[bossOf(run.floor)] ? ` <b class="dc-good">Contre : ${esc(BOSSES[bossOf(run.floor)].counter)}</b>` : ''}` : r === 'gouffre' ? `Tu arrives directement à l’étage ${run.floor + 2}${(run.floor + 2) % DESCENT.bossEvery === 0 ? ', <strong class="dc-bad">devant le gardien</strong>' : ''}, sans combat ni butin. La chute coûte <strong>20 % des PV</strong> à chaque créature.` : ROOMS[r].desc}</span></button>`).join('')}</div>
       ${run.cleared >= (run.start || 1) ? `<button class="btn ghost block" data-act="leave">${icon('back')}Remonter</button>` : ''}
       <button class="btn ghost small block dc-abandon" data-act="abandon">${icon('p:abandon')}Abandonner l’expédition</button>`;
   }
@@ -195,7 +195,7 @@ export default function descent(app, root) {
     const w = ui.win && ui.win.floor === run.floor ? ui.win : null;
     // v328 : PV calculés sur toute l'équipe, créatures tombées comprises (« 100 % » s'affichait avec une créature à 0 PV)
     const fallenN = run.team.filter((m) => m.fallen).length, pct = Math.round((run.team.reduce((a, m) => a + (m.fallen ? 0 : m.hp), 0) / Math.max(1, run.team.reduce((a, m) => a + m.maxHp, 0))) * 100);
-    const heal = g.rule(run.day).key === 'sources' ? 60 : 30; // v308 : valeurs réelles (game.js : 0.3, 0.6 avec Sources bénies)
+    const heal = Math.round(g.restHeal(run) * 100); // v308 : valeurs réelles (v334 : Disette 15 %)
     const effect = (r) => (r === 'rest' ? `Soigne ${heal} % des PV de chaque créature` : r === 'altar' ? 'Une bénédiction au choix pour toute l’expédition' : `Environ +${fmt(g.treasurePreview())} éclats`);
     const feats = w?.stats ? [w.stats.parries && `${w.stats.parries} parade${w.stats.parries > 1 ? 's' : ''}`, w.stats.breaks && `${w.stats.breaks} Brisure${w.stats.breaks > 1 ? 's' : ''}`, w.stats.crits && `${w.stats.crits} critique${w.stats.crits > 1 ? 's' : ''}`].filter(Boolean) : [];
     root.innerHTML = `<section class="vx ${w?.room || ''}">
@@ -265,6 +265,16 @@ export default function descent(app, root) {
     app.flushProgress();
   }
   // Pactes de l'Abîme : trois propositions facultatives avant un combat d'élite ou de gardien
+  // v334 : Présage de départ, un choix parmi trois pour toute l'expédition
+  function omenView(run) {
+    const offer = run.omenOffer || [];
+    root.innerHTML = `${runHead(run)}
+      <section class="pk-head om-head"><img alt="" src="assets/icons/ui-eye.webp"><div><h2>Présage</h2><p class="small">Avant de descendre, l’Abysse te montre trois présages. Choisis-en un : il dure <b>toute l’expédition</b>, avec un vrai avantage et un vrai prix. Les mêmes pour tout le monde aujourd’hui.</p></div></section>
+      <div class="pk-list">${offer.map((k) => { const o = OMENS[k]; return `<button class="pk-c om-c ${ui.omen === k ? 'on' : ''}" data-act="omenpick" data-k="${k}" aria-pressed="${ui.omen === k}">
+        <b>${icon(o.icon)} ${esc(o.name)}</b><span class="pk-gain"><i>Gain</i>${esc(o.gain)}</span><span class="pk-cost"><i>Prix</i>${esc(o.cost)}</span></button>`; }).join('')}</div>
+      <div class="pk-actions">${offer.includes(ui.omen) ? `<button class="btn primary block big-cta dc-plq dc-plq-red" data-act="omengo">Suivre le ${esc(OMENS[ui.omen].name)}</button>` : '<p class="small muted center">Touche un présage pour le choisir.</p>'}</div>
+      <button class="btn ghost small block dc-abandon" data-act="abandon">${icon('p:abandon')}Abandonner l’expédition</button>`;
+  }
   function pactView(run) {
     const boss = run.pendingRoom === 'boss' ? BOSSES[bossOf(run.floor)] : null;
     root.innerHTML = `${runHead(run)}
@@ -315,6 +325,7 @@ export default function descent(app, root) {
     if (run.phase === 'reward') return rewardView(run);
     if (run.phase === 'battle') return battleView(run);
     if (run.phase === 'pact') return pactView(run);
+    if (run.phase === 'omen') return omenView(run);
     return clearedView(run);
   }
 
@@ -354,13 +365,19 @@ export default function descent(app, root) {
       if (ui.cursed && g.torchesLeft() && !(await confirmBox('Descente maudite : si toute l’équipe tombe, <b>tu ne rapportes rien</b>. Tu es sûr ?', { ok: 'Je descends', danger: true }))) return;
       try {
         g.startRun({ cursed: ui.cursed, nightmare: ui.nightmare && g.nightmareUnlocked(), start: startFloor() }); ui.outcome = null; ui.tsel = null; app.sfx.tear(); app.chrome(); render(); window.scrollTo(0, 0);
-        tuto(app, 'army-doors');
+        if (g.descent().run?.phase === 'doors') tuto(app, 'army-doors');
       } catch (e) { toast(esc(e.message), { kind: 'error' }); }
+    },
+    omeninfo() { const o = OMENS[g.descent().run?.omen]; if (o) openSheet(`<h2 class="center">${esc(o.name)}</h2><p><b class="dc-good">Gain</b> ${esc(o.gain)}</p><p><b class="dc-bad">Prix</b> ${esc(o.cost)}</p><p class="small muted">Il dure toute l’expédition.</p>`, { label: 'Présage', cls: 'dc-sheet sheet-small' }); },
+    omenpick(el) { ui.omen = el.dataset.k; app.sfx.tap(); render(); },
+    omengo() {
+      try { const o = g.chooseOmen(ui.omen); ui.omen = null; app.sfx.discover(); toast(`${esc(o.name)} : ${esc(o.gain)}`, { icon: 'star' }); render(); window.scrollTo(0, 0); tuto(app, 'army-doors'); } catch (e) { toast(esc(e.message), { kind: 'error' }); }
     },
     door(el) {
       if (playing) return;
       let out;
       try { out = g.chooseDoor(el.dataset.r); } catch (e) { toast(esc(e.message), { kind: 'error' }); return; }
+      if (out.room === 'gouffre') { app.sfx.swipe(); app.sfx.rumble?.(0.8); render(); window.scrollTo(0, 0); toast(`Tu plonges dans le gouffre : te voilà à l’étage ${out.to}. La chute a blessé ton équipe.`, { icon: 'skull' }); return; }
       if (out.pact) { ui.pact = null; app.sfx.boss?.(); window.scrollTo(0, 0); return render(); }
       if (out.battle) return enterBattle();
       render();
