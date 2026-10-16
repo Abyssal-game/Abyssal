@@ -425,6 +425,17 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     $('.dv')?.appendChild(b); setTimeout(() => b.remove(), reduced ? 500 : 1100);
   };
   let aoeHit = false; const lastRect = {}; // place d'une carte disparue (pour l'explosion d'un ennemi déjà tombé) // pendant un Raz-de-marée : une seule vague pour toute la rangée
+  // v357 : esquive — deux silhouettes fantômes de la carte restent derrière elle et s'effacent
+  const ghost = (uid) => {
+    if (reduced) return; const t = el(uid), box = $('.dv'); if (!t || !box) return;
+    const b = box.getBoundingClientRect(), r = t.getBoundingClientRect();
+    [1, 2].forEach((i) => { const g = t.cloneNode(true); g.removeAttribute('data-uid'); g.querySelectorAll('[data-uid]').forEach((x) => x.removeAttribute('data-uid'));
+      g.className = `${t.className} dv-ghost g${i}`; g.classList.remove('dodge', 'hit', 'aimed', 'aim');
+      g.style.cssText = `position:absolute;left:${r.left - b.left}px;top:${r.top - b.top}px;width:${r.width}px;height:${r.height}px;margin:0`;
+      box.appendChild(g); setTimeout(() => g.remove(), 560); });
+  };
+  // v357 : parade — l'attaquant est repoussé en arrière, comme s'il avait encaissé le contre
+  const recoil = (uid) => { if (reduced || !uid) return; const a = el(uid); if (!a) return; a.classList.remove('recoil'); void a.offsetWidth; a.classList.add('recoil'); setTimeout(() => a.classList.remove('recoil'), 520); };
   const ring = (uid, cls) => { if (reduced) return; const t = el(uid); if (!t) return; const r = document.createElement('span'); r.className = `cb-ring ${cls}`; t.appendChild(r); setTimeout(() => r.remove(), 750); };
   const float = (uid, txt, cls) => { const t = el(uid); if (!t) return; const f = document.createElement('span'); f.className = `dv-float ${cls}`; f.textContent = txt; t.appendChild(f); setTimeout(() => f.remove(), 900); };
   const banner = (html, cls = '', ms = 900) => {
@@ -485,8 +496,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
             const own = moveFor(st.units[e.u], e.key);
             const ic = own ? `<img class="aicon" alt="" src="${moveIconUrl(own.icon)}">` : actIcon(KITS[st.units[e.u].role].skill.key, KITS[st.units[e.u].role].skill.icon);
             app.sfx.skill();
-            // v338 : la compétence s'ouvre sur l'illustration de la créature en plein écran (repli : le bandeau)
-            if (!(await artShot(e.u, e.name, { ic }))) { banner(`${ic} ${esc(e.name)}`, own ? 'skill own' : 'skill', 700); await wait(T(360)); }
+            // v357 : la carte s'éveille sur place (repli : le bandeau), puis la planche de la compétence part sur la cible
+            if (!(await castFx(e.u, e.name, { ic }))) { banner(`${ic} ${esc(e.name)}`, own ? 'skill own' : 'skill', 700); await wait(T(360)); }
+            if (skillFx(KITS[st.units[e.u].role].skill.key, e.u, e.tgt)) await wait(T(240));
           }
           if (e.tgt && st.units[e.tgt]?.side === 'enemy' && DICE_KEYS.includes(e.key)) pendingLunge = { u: e.u, tgt: e.tgt };
           else if (e.tgt && st.units[e.tgt]?.side === 'enemy' && e.key !== 'marque' && e.key !== 'entrave') { lunge(e.u, e.tgt); cam(e.tgt, 0.6); await wait(T(LUNGE_HIT)); }
@@ -497,7 +509,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           lastAtk = null;
           // v338 : la grosse attaque d'une élite, et chaque coup spécial d'un gardien, s'annoncent sur son illustration en plein écran
           const ua = st.units[e.a], bigK = ua?.boss ? BOSS_SHOT.has(e.kind) : ua?.elite && (e.kind === 'heavy' || e.kind === 'blast');
-          const shot = bigK && def && (await artShot(e.a, `${def.name} !`, { ic: intentIcon(e.kind), foe: true }));
+          const shot = bigK && def && (await castFx(e.a, `${def.name} !`, { ic: intentIcon(e.kind), foe: true }));
           if (!shot && (e.kind === 'heavy' || e.kind === 'blast')) banner(`${intentIcon(e.kind)} ${esc(def.name)} !`, 'danger', 700);
           if (e.tgt && st.units[e.tgt]?.side === 'ally') { lunge(e.a, e.tgt); cam(e.tgt, 0.6); await wait(T(LUNGE_HIT)); }
           else await wait(T(200));
@@ -528,12 +540,12 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         case 'block': app.sfx.block(); ring(e.u, 'guard'); float(e.u, 'Bloqué', 'info'); sparks(e.u, 'blue'); await wait(T(240)); break;
         case 'dodge': {
           app.sfx.dodge();
-          if (e.u) { fxSheet(e.u, 'fx-dodge', { k: 2.3, d: 720 }); cam(e.u, 0.6); shake(false, true); const t = el(e.u); if (t) { t.classList.remove('dodge'); void t.offsetWidth; t.classList.add('dodge'); } float(e.u, 'Esquive !', 'dodge'); }
+          if (e.u) { ghost(e.u); fxSheet(e.u, 'fx-dodge', { k: 2.3, d: 720 }); cam(e.u, 0.6); shake(false, true); const t = el(e.u); if (t) { t.classList.remove('dodge'); void t.offsetWidth; t.classList.add('dodge'); } float(e.u, 'Esquive !', 'dodge'); }
           else banner('Esquive !', 'good', 600);
           await wait(T(320));
           break;
         }
-        case 'parry': app.sfx.parry(); dio.flare(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxSheet(e.u, 'fx-parry', { k: 2.5, d: 820 }); impactFlash(e.u, true); sparks(e.u, 'gold'); cam(e.u, -0.8); } banner('Parade parfaite !', 'parry', 800); shake(false); await wait(T(420)); break;
+        case 'parry': app.sfx.parry(); dio.flare(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxSheet(e.u, 'fx-parry', { k: 2.5, d: 820 }); recoil(e.a); impactFlash(e.u, true); sparks(e.u, 'gold'); cam(e.u, -0.8); } banner('Parade parfaite !', 'parry', 800); shake(false); await wait(T(420)); break;
         case 'fervor': fervorPop(e.d, e.why); draw(); break;
         case 'passive': app.sfx.passive?.(); passivePop(e.u, e.p); float(e.u, PASSIVES[e.p]?.name || '', 'syn'); await wait(T(320)); break;
         case 'brk': { const t = el(e.u)?.querySelector('.cb-brk i'); if (t) t.style.width = `${(e.brk / e.max) * 100}%`; break; }
@@ -647,38 +659,40 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   // animations sont réduites ou en vitesse ×3.
   const shotSeen = new Set();
   const BOSS_SHOT = new Set(['heavy', 'blast', 'charge', 'gorge', 'gather', 'blizzard', 'mimic', 'copy', 'decree', 'shift']);
-  async function artShot(uid, label, { ic = '', foe = false } = {}) {
-    const u = st.units[uid];
-    if (!u || !$('.dv') || reduced || ui.fast === 3) return false;
+  // v357 : « la carte s'éveille » (remplace le plan en pleine illustration, jugé sans intérêt par le propriétaire) :
+  // la carte se soulève et s'illumine à la couleur de sa faction, un cercle magique de la faction tourne sous elle,
+  // le nom du coup s'affiche au-dessus. Ennemis : la carte gronde, rougit et tremble. Puis le sort part sur la cible.
+  const CIRCLES = new Set([]); // factions dont le cercle Gemini est arrivé (assets/fx/circle-<faction>.webp) ; repli : dice-ring
+  async function castFx(uid, label, { ic = '', foe = false } = {}) {
+    const u = st.units[uid], t = el(uid);
+    if (!u || !t || reduced || ui.fast === 3) return false;
     const c = cat.get(u.id); if (!c) return false;
     const again = shotSeen.has(uid); shotSeen.add(uid);
-    const d = T(again ? 760 : 1250);
-    const who = u.boss && st.bossKey && BOSSES[st.bossKey] ? BOSSES[st.bossKey].name : u.named ? u.title : c.name;
-    const rar = RARITY[c.rarity];
-    // v339 : vrai plein écran (posé sur la page, pas dans le plateau), entrée en coup de lame, lignes d'énergie,
-    // braises de la faction, titre qui frappe, sortie en éclair vers l'attaque
-    const ov = document.createElement('div');
-    ov.className = `as ${foe ? 'foe' : ''} ${u.boss ? 'boss' : ''} ${again ? 'again' : ''}`;
-    ov.style.setProperty('--as', `${d}ms`);
-    ov.style.setProperty('--fc', cat.faction[c.faction]?.colors?.secondary || '#F2C14E');
-    ov.style.setProperty('--rc', rar?.color || '#F2C14E');
-    const embers = Array.from({ length: again ? 8 : 16 }, () => `<i style="left:${(Math.random() * 100).toFixed(1)}%;--dl:${(Math.random() * 0.45).toFixed(2)};--sz:${(3 + Math.random() * 5).toFixed(1)}px;--dx:${(Math.random() * 60 - 30).toFixed(0)}px"></i>`).join('');
-    ov.innerHTML = `<span class="as-art"><img alt="" src="${artUrl(c)}"></span><span class="as-lines"></span><span class="as-veil"></span>
-      <span class="as-embers">${embers}</span><span class="as-slash"></span><span class="as-flash"></span>
-      <p class="as-lbl" aria-label="${esc(who)}"><span class="as-k">${ic}<b>${esc(label)}</b></span><span class="as-rule"></span></p>`;
-    let skip = false;
-    ov.addEventListener('pointerdown', () => { skip = true; }, { once: true });
-    const img = ov.querySelector('img');
-    await Promise.race([img.decode?.().catch(() => {}), wait(160)]);
-    document.body.appendChild(ov);
-    setTimeout(() => { if (!skip && ov.isConnected) { if (foe) shake(true); } }, d * 0.22);
-    setTimeout(() => { if (ov.isConnected) app.sfx.swipe?.(); }, d * 0.8);
-    const t0 = performance.now();
-    while (!skip && alive_ && performance.now() - t0 < d) await wait(40);
-    ov.classList.add('out'); setTimeout(() => ov.remove(), 240);
-    await wait(T(90));
+    const d = T(again ? 520 : 760);
+    t.style.setProperty('--fc', foe ? '#FF3B4E' : cat.faction[c.faction]?.colors?.secondary || '#F2C14E');
+    t.style.setProperty('--cd', `${d}ms`);
+    t.classList.remove('cast', 'cast-foe'); void t.offsetWidth; t.classList.add(foe ? 'cast-foe' : 'cast');
+    // posés sur le plateau (pas dans la carte) : cercle à ses pieds, nom au-dessus d'elle (en dessous pour un ennemi)
+    const box = $('.dv'), bb = box.getBoundingClientRect(), r = t.getBoundingClientRect(), cx = r.left - bb.left + r.width / 2;
+    const circ = document.createElement('img'); circ.alt = ''; circ.className = `cast-circ ${foe ? 'foe' : ''}`;
+    circ.src = !foe && CIRCLES.has(c.faction) ? `assets/fx/circle-${c.faction}.webp` : 'assets/fx/dice-ring.webp';
+    circ.style.cssText = `left:${cx}px;top:${r.bottom - bb.top - r.height * 0.06}px;width:${r.width * 1.8}px;--cd:${d}ms`;
+    const lbl = document.createElement('span'); lbl.className = `cast-lbl ${foe ? 'foe' : ''}`; lbl.innerHTML = `${ic}<b>${esc(label)}</b>`;
+    lbl.style.cssText = foe ? `left:${cx}px;top:${r.bottom - bb.top + 10}px;--fc:#FF3B4E` : `left:${cx}px;top:${r.top - bb.top - 10}px;translate:-50% -100%;--fc:${t.style.getPropertyValue('--fc')}`;
+    box.append(circ, lbl);
+    if (foe) { shake(true); dio.roar?.(); } else impactFlash(uid, false);
+    await wait(d);
+    t.classList.remove('cast', 'cast-foe'); circ.classList.add('out'); lbl.classList.add('out');
+    setTimeout(() => { circ.remove(); lbl.remove(); }, 260);
     return true;
   }
+  // Planche propre à chaque compétence de rôle, jouée sur la cible (assets/fx/sk-<clé>.webp, ajoutées à l'arrivée des images)
+  const SKILL_FX = {}; // ex. estoc: { k: 2.8, d: 820 } ; raz : rangée entière
+  const skillFx = (key, uid, tgt) => {
+    const f = SKILL_FX[key]; if (!f) return false;
+    if (f.row) fxSheet(null, `sk-${key}`, { row: true, d: f.d }); else fxSheet(tgt || uid, `sk-${key}`, { k: f.k, d: f.d });
+    return true;
+  };
   const LUNGE_HIT = 190; // instant du contact dans l'élan (ms), synchronisé avec dvLunge
   // ——— Gros plan (v236) : compétences et coups critiques. Bandes de cinéma, les deux cartes au centre,
   // l'attaquant s'élance, impact. Accéléré avec la vitesse ×2/×3, absent si les animations sont réduites.
@@ -813,16 +827,35 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       el(s.a)?.classList.add('aim'); tEls.forEach((x) => x?.classList.add('aimed'));
       const def = INTENTS[s.kind];
       const bar = document.createElement('div');
-      bar.className = 'dv-dodge cb-def';
-      bar.innerHTML = `<span class="dv-dodge-t">${intentIcon(s.kind)} ${esc(def.name)} ! <small>Zone dorée : esquive · trait blanc, au dernier instant : parade</small></span><span class="dv-dodge-bar"><i class="rail"></i><i class="z"><i class="p"></i></i><i class="c"></i></span>`;
+      bar.className = `dv-dodge cb-def${reduced ? '' : ' ring'}`;
+      bar.innerHTML = `<span class="dv-dodge-t">${intentIcon(s.kind)} ${esc(def.name)} ! <small>${reduced ? 'Zone dorée : esquive · trait blanc, au dernier instant : parade' : 'Touche dans l’or · trait blanc : parade'}</small></span><span class="dv-dodge-bar"><i class="rail"></i><i class="z"><i class="p"></i></i><i class="c"></i></span>`;
       $('.dv-mid').appendChild(bar); $('.dv-mid').classList.add('qte'); $('.dv')?.classList.add('qte-on');
       const cur = bar.querySelector('.c'), zEl = bar.querySelector('.z'), pEl = bar.querySelector('.p');
       zEl.style.cssText = `left:${z0 * 100}%;width:${zw * 100}%`;
       pEl.style.cssText = `left:${((zw - pw) / zw) * 100}%;width:${(pw / zw) * 100}%`;
       let t0 = 0, done = false, raf = 0;
       const zoneAt = (x) => (moving ? Math.min(0.97 - zw, Math.max(0.3, z0 + Math.sin(x * 9) * 0.1)) : z0);
+      // v357 : « l'anneau qui se referme » — un anneau de visée se resserre sur ta créature visée (même minutage que la barre,
+      // qui reste en repli pour les animations réduites) : la bande d'or = esquive, le trait blanc juste avant l'impact = parade
+      const dr = reduced ? null : (() => {
+        const box = $('.dv'), bb = box?.getBoundingClientRect(), rs = tEls.filter(Boolean).map((x) => x.getBoundingClientRect());
+        if (!box || !rs.length) return null;
+        const L = Math.min(...rs.map((r) => r.left)), R = Math.max(...rs.map((r) => r.right)), T_ = Math.min(...rs.map((r) => r.top)), B = Math.max(...rs.map((r) => r.bottom));
+        const H = Math.max(B - T_, (R - L) * 0.75), D0 = H * 2.4, dOf = (p) => H * 1.04 + (1 - p) * (D0 - H * 1.04);
+        const rOf = (p) => (50 * dOf(p)) / D0 - 1.2;
+        const n = document.createElement('div'); n.className = 'cb-dring';
+        n.style.cssText = `left:${(L + R) / 2 - bb.left}px;top:${(T_ + B) / 2 - bb.top}px;width:${D0}px;height:${D0}px`;
+        n.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="zg" cx="50" cy="50"/><circle class="zp" cx="50" cy="50"/><circle class="cl" cx="50" cy="50"/><circle class="cl2" cx="50" cy="50"/></svg>`;
+        box.appendChild(n);
+        const [zg, zp, cl, cl2] = n.querySelectorAll('circle');
+        const band = (c, a, b) => { const ra = rOf(a), rb = rOf(b); c.setAttribute('r', ((ra + rb) / 2).toFixed(2)); c.setAttribute('stroke-width', Math.max(0.8, ra - rb).toFixed(2)); };
+        const zone = (zz) => { band(zg, zz, zz + zw); band(zp, zz + zw - pw, zz + zw); };
+        zone(z0); cl.setAttribute('r', rOf(0).toFixed(2)); cl2.setAttribute('r', rOf(0).toFixed(2));
+        return { n, zone, at: (p) => { const r = rOf(p).toFixed(2); cl.setAttribute('r', r); cl2.setAttribute('r', r); }, end: (res) => { n.classList.add(`r-${res}`); setTimeout(() => n.remove(), 420); } };
+      })();
       const end = (res) => {
         if (done) return; done = true; cancelAnimationFrame(raf); defTap = null;
+        dr?.end(res);
         bar.classList.add(res === 'none' ? 'ko' : 'ok', `r-${res}`);
         bar.querySelector('.dv-dodge-t').textContent = res === 'parry' ? 'Parade parfaite !' : res === 'dodge' ? 'Esquive !' : 'Raté…';
         $('.dv')?.classList.remove('qte-on');
@@ -837,6 +870,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         const x = (performance.now() - t0) / D, pos = ease(Math.min(1, x));
         cur.style.left = `${pos * 100}%`;
         if (moving) zEl.style.left = `${zoneAt(x) * 100}%`;
+        if (dr) { dr.at(pos); if (moving) dr.zone(zoneAt(x)); }
         if (x >= 1) end('none'); else raf = requestAnimationFrame(step);
       };
       defTap = () => {

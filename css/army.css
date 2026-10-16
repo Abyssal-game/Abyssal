@@ -3142,3 +3142,50 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 .ry2-burst.small { width: 135%; height: 135%; opacity: .75; }
 .ry2.miss .ry2-ring { filter: grayscale(.8) brightness(.5); }
 @media (prefers-reduced-motion: reduce) { .ry2-ring { animation: none; } }
+
+/* v357 : « la carte s'éveille » à la place du plan en pleine illustration — soulèvement, lueur de faction, cercle magique à ses pieds, nom du coup au-dessus */
+.dv-c.cast, .dv-c.cast-foe { z-index: 8; }
+.dv-c.cast { animation: castLift var(--cd, 760ms) cubic-bezier(.2, .8, .3, 1) both; }
+@keyframes castLift { 0% { transform: none; filter: none; } 30% { transform: translateY(-14px) scale(1.1); filter: brightness(1.35) drop-shadow(0 0 18px var(--fc)); } 80% { transform: translateY(-10px) scale(1.08); filter: brightness(1.2) drop-shadow(0 0 24px var(--fc)); } 100% { transform: none; filter: none; } }
+.dv-c.cast-foe { animation: castFoe var(--cd, 760ms) ease both; }
+@keyframes castFoe { 0% { transform: none; } 20% { transform: scale(1.14); filter: brightness(1.5) saturate(1.5) drop-shadow(0 0 22px #FF3B4E); } 30%, 50%, 70% { transform: scale(1.12) translateX(-3px); } 40%, 60% { transform: scale(1.12) translateX(3px); } 85% { transform: scale(1.1); filter: brightness(1.3) drop-shadow(0 0 26px #FF3B4E); } 100% { transform: none; filter: none; } }
+.cast-circ { position: absolute; z-index: 26; max-width: none; aspect-ratio: 1; translate: -50% -50%; pointer-events: none; mix-blend-mode: screen; transform: scaleY(.36); animation: castCirc var(--cd, 760ms) ease-out both; }
+.cast-circ.foe { filter: hue-rotate(-50deg) saturate(2.2) brightness(.95); }
+@keyframes castCirc { 0% { opacity: 0; scale: .4; rotate: 0deg; } 30% { opacity: 1; scale: 1; } 100% { opacity: 1; scale: 1.05; rotate: 90deg; } }
+.cast-circ.out { animation: castOut .26s ease forwards; }
+.cast-lbl { position: absolute; z-index: 32; translate: -50% 0; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; padding: 5px 12px; border-radius: 999px; background: rgba(10, 6, 16, .92); border: 1px solid color-mix(in srgb, var(--fc, #F2C14E) 70%, transparent); box-shadow: 0 0 16px color-mix(in srgb, var(--fc, #F2C14E) 55%, transparent); font-family: var(--font-display, serif); font-size: 14px; color: #FFF3D6; pointer-events: none; animation: castLbl .3s cubic-bezier(.2, 1.5, .4, 1) both; }
+.cast-lbl .aicon, .cast-lbl svg, .cast-lbl img { width: 18px; height: 18px; }
+.cast-lbl.foe { color: #FFD9DD; }
+@keyframes castLbl { from { opacity: 0; transform: translateY(8px) scale(.7); } to { opacity: 1; transform: none; } }
+.cast-lbl.out { animation: castOut .26s ease forwards; }
+@keyframes castOut { to { opacity: 0; } }
+
+/* v357 : défense « l'anneau qui se referme » sur la créature visée (la barre reste pour les animations réduites) */
+.cb-def.ring .dv-dodge-bar { display: none; }
+.cb-dring { position: absolute; z-index: 25; translate: -50% -50%; pointer-events: none; animation: dringIn .2s ease-out both; }
+.cb-dring svg { width: 100%; height: 100%; overflow: visible; }
+.cb-dring circle { fill: none; }
+.cb-dring .zg { stroke: rgba(242, 193, 78, .5); filter: drop-shadow(0 0 4px rgba(242, 193, 78, .8)); }
+.cb-dring .zp { stroke: #FFF6DC; filter: drop-shadow(0 0 5px #fff); }
+.cb-dring .cl { stroke: #FF3B4E; stroke-width: 1.6; filter: drop-shadow(0 0 6px #FF3B4E); }
+.cb-dring .cl2 { stroke: rgba(255, 120, 130, .9); stroke-width: .5; stroke-dasharray: 2 3; }
+.cb-dring.r-dodge .cl, .cb-dring.r-dodge .zg { stroke: #9FE3FF; }
+.cb-dring.r-parry .cl, .cb-dring.r-parry .zp, .cb-dring.r-parry .zg { stroke: #FFE7A0; }
+.cb-dring.r-dodge, .cb-dring.r-parry { animation: dringOk .42s ease-out forwards; }
+.cb-dring.r-none { animation: dringKo .42s ease-in forwards; }
+@keyframes dringIn { from { opacity: 0; scale: 1.15; } }
+@keyframes dringOk { to { opacity: 0; scale: 1.25; } }
+@keyframes dringKo { 30% { opacity: 1; scale: .96; } to { opacity: 0; scale: .9; } }
+
+/* v357 : traînée fantôme de l'esquive et recul de l'attaquant sur une parade */
+.dv-ghost { pointer-events: none; z-index: 5; mix-blend-mode: screen; filter: grayscale(.3) brightness(1.4) hue-rotate(160deg); animation: dvGhost .55s ease-out forwards; }
+.dv-ghost.g2 { animation-delay: .06s; opacity: 0; }
+@keyframes dvGhost { 0% { opacity: .55; transform: none; } 100% { opacity: 0; transform: translateX(-26px) scale(.97); } }
+.dv-ghost.g2 { animation-name: dvGhost2; }
+@keyframes dvGhost2 { 0% { opacity: .35; transform: none; } 100% { opacity: 0; transform: translateX(26px) scale(.97); } }
+.dv-c.recoil { animation: dvRecoil .5s cubic-bezier(.2, .9, .3, 1); }
+@keyframes dvRecoil { 0% { transform: none; } 25% { transform: translateY(-26px) rotate(-4deg) scale(.95); filter: brightness(1.8); } 60% { transform: translateY(-10px) rotate(2deg); } 100% { transform: none; } }
+.dv-dodge.cb-def.ring { left: 50%; right: auto; width: min(330px, 92%); translate: -50% 0; z-index: 30; padding: 10px 22px 12px; }
+.cb-dring .zg { stroke: rgba(242, 193, 78, .3); }
+.dv-dodge.cb-def.ring { translate: -50% -38%; }
+.cb-def.ring .dv-dodge-t small { white-space: nowrap; }
