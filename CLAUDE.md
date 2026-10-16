@@ -22,7 +22,7 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Le réseau de la session bloque github.io : pour vérifier la publication, passe par l'outil GitHub (déploiements Pages) ou demande une capture au propriétaire.
 
 ## 2. Routine de livraison
-1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v332**.
+1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v333**.
 2. Tests : `node --test tests/*.test.mjs` (210 tests), `node tools/validate.mjs`. Si le combat ou l'équilibre change : `node tools/fuzz.mjs 300` (étage moyen ≈ 12 à 14 en normal).
 3. Vérification dans le navigateur avec Playwright (`/opt/node-tools/node_modules/playwright/index.mjs`, Chromium déjà installé), avec un serveur local `python3 -m http.server 8092` lancé dans le dossier. Tailles iPhone SE et iPhone 13. **L'écran d'ouverture attend un toucher** (« Touche l'écran pour entrer ») : dans les scripts, cliquer au milieu de l'écran (dans la fenêtre 390×664) avant tout le reste.
 4. Commit, push, réponse en français.
@@ -53,7 +53,7 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Bestiaire (v326) : Récits scellés regroupés en blocs compacts (« × N ») avec un compteur par section ; la Chasse affiche la famille de combat réelle (`AI_FAMILIES` / `aiFamily`, `js/core/skills.js`) ; les anciennes familles (Brute, Lanceur…) sont retirées. Profil : titres et cadres possédés d'abord, ceux à gagner repliés.
 
 ## 4 ter-bis. Lot v331 (retours de l'étude des 100 joueurs)
-- Combat : bouton ×1/×2 (`settings.combatFast`) ; défense Manuelle / **Assistée** (fenêtre élargie) / Automatique (ne pare jamais, dit dans Réglages) ; après 3 défenses ratées, conseil unique (`tips['def-help']`) ; bilan de défaite qui compte les ennemis Fêlés sans être Brisés (`st.stats.cracks`).
+- Combat : bouton ×1/×2 (`settings.combatFast`) ; défense Manuelle / Automatique (le mode « Assistée » ajouté en v331 a été retiré en v333 à la demande du propriétaire) (ne pare jamais, dit dans Réglages) ; après 3 défenses ratées, conseil unique (`tips['def-help']`) ; bilan de défaite qui compte les ennemis Fêlés sans être Brisés (`st.stats.cracks`).
 - Offrande, missions finies et coffre de la semaine encaissés seuls (`autoClaim` dans `js/main.js`, jamais pendant un combat, une ouverture ou une feuille).
 - Boutique : objectif « ouvre un booster » ; pseudo demandé après la première inscription (`askPseudo`).
 - Vestibule : risque de Maudite/Cauchemar affiché avec le bilan personnel (`descent.risk`). **Départs avancés** : chaque gardien vaincu ouvre un départ juste après lui (`startFloors()`, `startRun({ start })`), coffre d'un rang plus bas et 3 étages minimum (`runChest`, `CHECKPOINT_MIN`), hors classement du jour et de la saison.

@@ -94,6 +94,7 @@ export function migrate(raw) {
   const d = defaultSave(s.createdAt || Date.now());
   for (const k of Object.keys(d)) if (s[k] === undefined) s[k] = d[k];
   s.settings = { ...d.settings, ...s.settings };
+  if (s.settings.defense === 'easy') s.settings.defense = 'on'; // v333 : défense « assistée » retirée
   s.stats = { ...d.stats, ...s.stats };
   s.tickets = { ...d.tickets, ...s.tickets };
   s.pity = { ...d.pity, ...s.pity };

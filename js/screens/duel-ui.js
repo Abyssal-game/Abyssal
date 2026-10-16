@@ -57,7 +57,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   ui.fast = g.s.settings.combatFast ? 1 : 0; // v331 : bouton ×2 de retour (étude joueurs : un combat ≈ 1,2 min) ; la défense active garde son rythme
   const reduced = app.reduced();
   const T = (ms) => (reduced ? Math.min(ms, 80) : ui.fast === 3 ? ms * 0.25 : ui.fast ? ms * 0.45 : ms); // vitesse ×1, ×2 ou ×3
-  const defMode = ['auto', 'easy'].includes(g.s.settings?.defense) ? g.s.settings.defense : 'on'; // v269 : manuelle ou automatique ; v331 : « assistée » (zones 1,6 fois plus larges)
+  const defMode = g.s.settings?.defense === 'auto' ? 'auto' : 'on'; // v269 : manuelle ou automatique (v333 : mode « assistée » retiré, il redevient manuel)
   let alive_ = true, busy = false, sel = null, mode = null; // mode : action en attente de cible
   let holdT = null, held = false; // appui long sur une action : sa description (v249, plus de fenêtre de confirmation)
   const ctl = new AbortController();
@@ -718,8 +718,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     return new Promise((resolve) => {
       const e = st.units[s.a], moving = e?.boss || e?.elite;
       const w = defenseWindow(st, s.a, s.t), ease = (x) => x ** 1.7, D = 900;
-      const k = defMode === 'easy' ? 1.6 : 1;
-      const width = (ms) => Math.max(0.03, ease(Math.min(1, 0.75 + (ms * k) / D)) - ease(0.75));
+      const width = (ms) => Math.max(0.03, ease(Math.min(1, 0.75 + ms / D)) - ease(0.75));
       const zw = width(w.dodge), pw = Math.min(zw, width(w.parry));
       const z0 = 0.35 + Math.random() * (0.6 - zw);
       const tEls = s.kind === 'blast' ? front(st, 'ally').map((u) => el(u.uid)) : [el(s.t)];
@@ -811,7 +810,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         if (!alive_) return;
         res = await defenseQTE(s);
         // v331 : après 3 défenses ratées dans l'expédition, on rappelle qu'il existe une défense assistée ou automatique (une seule fois)
-        if (res === 'none') { run.defMiss = (run.defMiss || 0) + 1; if (run.defMiss >= 3 && !g.s.tips?.['def-help']) { g.s.tips = { ...(g.s.tips || {}), 'def-help': Date.now() }; toast('Les défenses sont difficiles ? Dans <b>Réglages → Jeu</b>, choisis la défense <b>assistée</b> (zones plus larges) ou <b>automatique</b> (40 % d’esquives, sans parade).', { icon: 'info', ms: 8000 }); } }
+        if (res === 'none') { run.defMiss = (run.defMiss || 0) + 1; if (run.defMiss >= 3 && !g.s.tips?.['def-help']) { g.s.tips = { ...(g.s.tips || {}), 'def-help': Date.now() }; toast('Les défenses sont difficiles ? Dans <b>Réglages → Jeu</b>, tu peux choisir la défense <b>automatique</b> (4 esquives sur 10, sans parade).', { icon: 'info', ms: 8000 }); } }
       }
       if (!alive_) return;
       acting = s.a; drawTimeline();
