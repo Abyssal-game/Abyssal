@@ -41,7 +41,8 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
   let current = id;
   let shownVariant = variant;
   let stopTilt = () => {};
-  let dtab = 'combat';
+  // v348 : la fiche se rouvre sur le dernier onglet consulté (Histoire pour qui lit les légendes, Combat pour les stratèges)
+  let dtab = (() => { try { return localStorage.getItem('abyssal.dtab') || 'combat'; } catch (e) { return 'combat'; } })();
   const sheet = openSheet('', { full: true, cls: 'detail-sheet', label: 'Carte', onClose: () => { stopTilt(); app.refreshView && app.refreshView(); } });
 
   const odds = (card) => `Une chance sur <b>${oddsFor(cat, card).toLocaleString('fr-FR')}</b> de la trouver dans un booster standard (sans compter les garanties).`;
@@ -130,7 +131,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
           <button class="dt-chip dt-chipb burn" data-act="burn">${picon('furnace')}Brûler</button></span>
         </div>
         <div class="dt-tabs" role="tablist">${tabs.map(([k, ic, l]) => `<button class="dt-tab" role="tab" data-act="tab" data-v="${k}" aria-selected="${dtab === k}">${picon(ic)}<span>${l}</span></button>`).join('')}</div>
-        <div class="panel dt-pane">${TAB[dtab]}</div>`;
+        <div class="panel dt-pane">${TAB[dtab] || TAB.combat}</div>`;
     } else {
       body = `
         <div class="panel detail-facts dt-sealed">
@@ -162,7 +163,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     chal(el) { try { const x = g.claimChallenge(current, el.dataset.k); app.sfx?.levelup?.(); toast(`Défi « ${esc(x.name)} » réussi : <b>+${x.ash} cendres</b> et +${x.fame} Renommée`, { kind: 'success', icon: 'ash' }); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     burn() { openBurn(app, current, { onClose: () => { shownVariant = null; draw(); } }); },
     lvup() { if (upgradeCard(app, current)) draw(); },
-    tab(el) { dtab = el.dataset.v; draw(); },
+    tab(el) { dtab = el.dataset.v; try { localStorage.setItem('abyssal.dtab', dtab); } catch (e) { /* rien */ } draw(); },
     form(el) {
       try { g.setForm(current, el.dataset.v || null); app.sfx.discover?.(); toast(el.dataset.v ? `<b>${esc(FORMS[current].name)}</b> combattra sous sa forme corrompue.` : 'Elle combattra sous sa forme originelle.', { icon: 'sparkle' }); draw(); }
       catch (err) { toast(esc(err.message), { kind: 'error' }); }

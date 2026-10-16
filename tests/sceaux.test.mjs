@@ -113,7 +113,8 @@ test('récompenses : jamais payées deux fois, plafond quotidien, déblocage dan
   const s0 = g.s.shards;
   const out = forceWin(g, 'initie');
   assert.ok(out.first);
-  assert.equal(g.s.shards - s0, SC.SCEAUX_REWARD.firstWin + SC.RIVAL.initie.reward);
+  assert.equal(out.shards, SC.SCEAUX_REWARD.firstWin + SC.RIVAL.initie.reward);
+  assert.ok(g.s.shards - s0 >= out.shards);
   assert.ok(g.s.titles.includes(SC.SCEAUX_TITLES.initie));
   const s1 = g.s.shards;
   assert.deepEqual(g.sceauxFinish(), out, 'la même partie ne paie pas deux fois');
@@ -126,7 +127,8 @@ test('récompenses : jamais payées deux fois, plafond quotidien, déblocage dan
   const s2 = g.s.shards;
   const capped = forceWin(g, 'initie');
   assert.ok(capped.capped);
-  assert.equal(g.s.shards, s2);
+  assert.equal(capped.shards, SC.SCEAUX_REWARD.afterCap, 'v348 : au-delà du plafond, un petit gain reste');
+  assert.ok(g.s.shards >= s2 + SC.SCEAUX_REWARD.afterCap);
   assert.equal(g.s.sceaux.wins, 10);
   assert.ok(g.s.sceaux.history.length <= 20);
 });

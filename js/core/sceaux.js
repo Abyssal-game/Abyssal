@@ -92,7 +92,7 @@ export const RIVAL = Object.fromEntries(RIVALS.map((r) => [r.key, r]));
 export const rivalUnlocked = (s, i) => i === 0 || !!s.sceaux?.beaten?.[RIVALS[i - 1].key];
 
 // Récompenses : plafonnées par jour pour qu'aucun mode ne devienne la seule source d'éclats
-export const SCEAUX_REWARD = { dailyPaid: 5, firstWin: 100, daily: 40, firstAwake: 150 };
+export const SCEAUX_REWARD = { dailyPaid: 5, firstWin: 100, daily: 40, firstAwake: 150, afterCap: 5, xp: 10 };
 // Trophée : après une victoire, une fois par jour, tu gardes une carte adverse que tu contrôles (rareté HR au plus)
 export const TROPHY_MAX = ['C', 'PC', 'R', 'HR'];
 export function trophyChoices(cat, st) {

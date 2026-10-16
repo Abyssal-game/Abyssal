@@ -1,5 +1,5 @@
 // Titres et cadres : d'où vient chacun (pour expliquer comment débloquer ceux qui manquent).
-import { LEVEL_TITLES, FRAMES } from '../config.js';
+import { LEVEL_TITLES, FRAMES, ASH_FRAMES } from '../config.js';
 import { SCEAUX_TITLES, RIVALS } from './sceaux.js';
 
 const lc = (t) => t.charAt(0).toLowerCase() + t.slice(1);
@@ -8,6 +8,7 @@ export function unlockSources(cat) {
   const titles = new Map(), frames = new Map();
   const add = (m, k, how) => { if (!k) return; const l = m.get(k) || []; if (!l.includes(how)) l.push(how); m.set(k, l); };
   frames.set('base', ['Offert dès le départ.']);
+  for (const [k, n] of Object.entries(ASH_FRAMES)) frames.set(k, [`À acheter ${n} cendres à la Fournaise.`]);
   for (const [n, t] of LEVEL_TITLES) add(titles, t, n === 1 ? 'Offert dès le départ.' : `Atteins le niveau ${n} de profil (l’expérience se gagne en jouant).`);
   for (const a of cat.achievements) {
     const how = `Succès « ${a.name} » : ${lc(a.desc)}`;

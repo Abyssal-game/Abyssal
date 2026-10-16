@@ -10,7 +10,7 @@ export const CHALLENGES = [
 export const WEEK_DAYS = 5; // jours joués dans la semaine pour le coffre de la semaine
 export const FIRST_WIN = 50;
 export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par combat n'augmentent plus // éclats de la toute première victoire
-import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, SHOW_ORDER, SHADOW, SUBLIME_ASH, VARIANTS } from '../config.js';
+import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, SUBLIME_ASH, VARIANTS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
 import { rngOf, DESCENT, CHESTS, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, cardPower, powerFor, huntStage, HUNT_STAGES, foeTraits, CHECKPOINT_MIN, DEEP_MILESTONE, gouffreAt, GOUFFRE, OMENS, omenChoices } from './descent.js';
@@ -48,6 +48,9 @@ const REMOVED_CARDS = { 'ABY-050': 'HR', 'CEL-046': 'HR' };
 
 export const NIGHTMARE_AT = 20; // record à atteindre pour ouvrir le mode Cauchemar
 export const AWAKEN_AT = 30;   // gardiens éveillés à partir de cet étage
+
+// v348 : nombre de jours entre deux dates « AAAA-MM-JJ » (heure locale)
+const dayGap = (a, b) => { const p = (x) => { const [y, m, d] = x.split('-').map(Number); return new Date(y, m - 1, d).getTime(); }; return Math.round((p(b) - p(a)) / 864e5); };
 
 export class Game {
   constructor(catalog, storage, { rng = cryptoRandom, clock = () => new Date() } = {}) {
@@ -123,18 +126,20 @@ export class Game {
   dailyAmount() {
     const t = this.clock();
     const y = new Date(t); y.setDate(y.getDate() - 1);
-    const streak = this.s.daily.last === today(y) ? this.s.daily.streak + 1 : 1;
+    // v348 : un jour manqué fait perdre un cran à la série (au lieu de la remettre à 1)
+    const missed = this.s.daily.last ? Math.max(0, dayGap(this.s.daily.last, today(t)) - 1) : 0;
+    const streak = this.s.daily.last === today(y) ? this.s.daily.streak + 1 : this.s.daily.last ? Math.max(0, (this.s.daily.streak || 0) - missed) + 1 : 1;
     return { streak, amount: ECONOMY.daily.base + Math.min(ECONOMY.daily.maxStreakBonus, (streak - 1) * ECONOMY.daily.perStreakDay) };
   }
 
   // Actions ----------------------------------------------------------------
-  // Booster gratuit du jour : un par jour (heure locale), sans réserve. Pas récupéré aujourd'hui = perdu.
-  // s.freePack.day : le jour où il a été ouvert. nextAt : minuit, si celui du jour est déjà pris.
+  // Booster gratuit du jour : un par jour (heure locale). v348 : il se garde, jusqu'à FREE_PACK.max en réserve
+  // (un jour sans jouer n'est plus perdu). s.freePack.day : le jour de la dernière ouverture ; left : ce qui restait.
   freePack(now = this.clock().getTime()) {
-    const d = new Date(now);
-    const taken = this.s.freePack.day === today(d);
+    const d = new Date(now), fp = this.s.freePack, day = today(d);
+    const stock = !fp.day ? FREE_PACK.perDay : fp.day === day ? (fp.left || 0) : Math.min(FREE_PACK.max, (fp.left || 0) + dayGap(fp.day, day) * FREE_PACK.perDay);
     const midnight = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1).getTime();
-    return { stock: taken ? 0 : FREE_PACK.perDay, nextAt: taken ? midnight : null };
+    return { stock, nextAt: stock ? null : midnight };
   }
 
   canBuy(type) {
@@ -150,7 +155,7 @@ export class Game {
     let paidWith;
     const free = type === 'standard' ? this.freePack() : null;
     if ((this.s.tickets[type] || 0) > 0) { this.s.tickets[type]--; paidWith = 'ticket'; }
-    else if (free && free.stock > 0) { this.s.freePack = { day: today(this.clock()) }; paidWith = 'free'; }
+    else if (free && free.stock > 0) { this.s.freePack = { day: today(this.clock()), left: free.stock - 1 }; paidWith = 'free'; }
     else if (this.s.shards >= def.price) { this.s.shards -= def.price; this.s.stats.shardsSpent += def.price; paidWith = 'shards'; }
     else throw new Error(`Il te manque ${def.price - this.s.shards} éclats (tu en as ${this.s.shards}). La Descente et les Duels des Sceaux en rapportent.`);
 
@@ -294,7 +299,12 @@ export class Game {
         if (list.some((x) => x.kind === def.kind)) continue;
         const faction = def.kind === 'faction' ? FACTION_ORDER[Math.floor(rnd() * FACTION_ORDER.length)] : null;
         const fname = faction ? this.catalog.faction[faction]?.name || faction : '';
-        list.push({ key: def.key, kind: def.kind, n: def.n, shards: def.shards, faction, text: def.text.replace('{faction}', fname), p: 0, claimed: false });
+        // v348 : missions à la mesure du joueur — l'étage visé suit le record (60 %, entre 4 et 20) ; « Ouvre 2 coffres »
+        // devient « Ouvre un coffre » pour qui n'en a pas deux d'avance
+        let n = def.n, shards = def.shards, text = def.text.replace('{faction}', fname);
+        if (def.kind === 'depth') { n = Math.max(4, Math.min(20, Math.round((this.s.descent.best || 0) * 0.6))); shards = def.shards + (n - 4) * 3; text = `Atteins l’étage ${n} de la Descente`; }
+        if (def.kind === 'chest' && this.chestCount() < 2) { n = 1; shards = 20; text = 'Ouvre un coffre'; }
+        list.push({ key: def.key, kind: def.kind, n, shards, faction, text, p: 0, claimed: false });
       }
       this.s.missions = { day, list, bonus: false };
     }
@@ -580,6 +590,24 @@ export class Game {
   }
   // Règle du jour (celle de l'expédition en cours si elle a commencé la veille)
   rule(day = this.descent().run?.day || this.descent().day) { return dailyRule(day, Object.fromEntries(Object.entries(this.catalog.faction).map(([k, f]) => [k, f.name]))); }
+  // v348 : force réelle des premiers ennemis en Cauchemar (+35 % PV, +25 % ATQ, ≈ ×1,3), exprimée en étage « normal »
+  // équivalent, plancher de difficulté compris : une équipe au niveau 10 y affronte dès l'étage 1 l'équivalent de l'étage 25 environ
+  nightmareEquiv(start = 1) {
+    const team = this.team(); if (!team.length) return start;
+    const eff = Math.max(start, floorFloor(team.reduce((a, id) => a + this.cardLevel(id), 0) / team.length));
+    const want = enemyScale(eff) * Math.sqrt(1.35 * 1.25);
+    let f = eff; while (enemyScale(f) < want && f < 200) f++;
+    return f;
+  }
+  // v348 : cadre de profil acheté avec des cendres (cosmétique)
+  buyAshFrame(k) {
+    const cost = ASH_FRAMES[k];
+    if (!cost) throw new Error('Cadre inconnu.');
+    if (this.s.frames.includes(k)) throw new Error('Tu as déjà ce cadre.');
+    if (this.s.ash < cost) throw new Error(`Il te manque ${cost - this.s.ash} cendres.`);
+    this.s.ash -= cost; this.s.frames.push(k); this.persist();
+    return k;
+  }
   cardPower(id) { const c = this.catalog.get(id); return c ? cardPower(c.rarity, this.cardLevel(id)) : 1; }
   teamPower(ids = this.team()) { return ids.length ? ids.reduce((a, id) => a + this.cardPower(id), 0) / ids.length : 1; }
   torchesLeft() { return Math.max(0, DESCENT.torches - this.descent().used); }
@@ -723,7 +751,7 @@ export class Game {
       if (st.awake) { if (!sc.awake[R.key]) { sc.awake[R.key] = Date.now(); out.first = true; out.shards += SC.SCEAUX_REWARD.firstAwake; } }
       else if (!sc.beaten[R.key]) { sc.beaten[R.key] = Date.now(); out.first = true; out.shards += SC.SCEAUX_REWARD.firstWin; }
       if (st.daily && sc.dailyDone !== day) { sc.dailyDone = day; out.shards += SC.SCEAUX_REWARD.daily; }
-      if (sc.paidToday < SC.SCEAUX_REWARD.dailyPaid) { sc.paidToday++; out.shards += R.reward; } else out.capped = true;
+      if (sc.paidToday < SC.SCEAUX_REWARD.dailyPaid) { sc.paidToday++; out.shards += R.reward; } else { out.capped = true; out.shards += SC.SCEAUX_REWARD.afterCap; } // v348 : un petit gain reste au-delà du plafond
       const t = st.awake ? (Object.keys(sc.awake).length >= SC.RIVALS.length ? 'Éveilleur des Sceaux' : null) : SC.SCEAUX_TITLES[R.key] || (sc.wins === 1 ? SC.SCEAUX_TITLES.initie : null);
       if (t && !this.s.titles.includes(t)) { this.s.titles.push(t); out.title = t; }
       if (R.key === 'echo' && !this.s.frames.includes('sceaux')) { this.s.frames.push('sceaux'); out.frame = 'sceaux'; }
@@ -731,6 +759,7 @@ export class Game {
       if (sc.trophyDay !== day) { const ch = SC.trophyChoices(this.catalog, st); if (ch.length) { st.trophy = ch; out.trophy = ch; } }
     } else if (st.over === 'lost') { sc.losses++; sc.streak = 0; } else { sc.draws++; if (st.daily && sc.dailyDone !== day) { sc.dailyDone = day; out.shards += 10; } }
     this.s.shards += out.shards;
+    out.xp = SC.SCEAUX_REWARD.xp; this.s.xp += out.xp; // v348 : chaque partie terminée donne un peu d'expérience
     sc.history.unshift({ t: Date.now(), rival: R.key, r: st.over, s: st.final });
     sc.history = sc.history.slice(0, 20);
     st.rewarded = true; st.result = out;
@@ -1025,7 +1054,7 @@ export class Game {
     const out = { room, won, discovered, relNew, pact: pactUsed, report: battleReport(st, (uid) => this.catalog.get(st.units[uid]?.id)?.name || 'Une créature') };
     if (bossKey) {
       out.boss = { key: bossKey, log: (st.bossLog || []).slice(), interrupts: st.stats?.interrupts || 0, feasts: st.stats?.feasts || 0, weak: Object.keys(st.discovered || {}), first: won && !this.s.bossesBeaten[bossKey] };
-      if (won) { this.s.bossesBeaten[bossKey] = this.s.bossesBeaten[bossKey] || Date.now(); }
+      if (won) { this.s.bossesBeaten[bossKey] = this.s.bossesBeaten[bossKey] || Date.now(); const bw = (this.s.bossWins ||= {}); bw[bossKey] = (bw[bossKey] || 0) + 1; } // v348 : victoires par gardien (présentation courte après 3)
     }
     if (!won && pactUsed === 'gardien') run.shards = 0; // le prix du Pacte du Gardien
     // (v271 : la créature de la semaine est retirée ; un combat commencé avant reste valable mais ne donne plus sa carte)

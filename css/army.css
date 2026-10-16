@@ -3069,3 +3069,26 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 /* v347 : plateau repeint sans l'anneau ovale (store/sceaux/plateau-avant-v347.webp garde l'ancien) ; les cases s'écartent
    un peu des médaillons des coins */
 .sc-plate { top: 9.6%; bottom: 9.7%; left: 10.4%; right: 10.9%; }
+/* v348 : intention des ennemis ordinaires (dès l'étage 5), discrète, à la place du bandeau des grosses attaques */
+.cb-oint { position: absolute; z-index: 7; left: 50%; top: -12px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px 2px 3px; border-radius: 99px; background: rgba(20, 14, 24, .92); border: 1px solid rgba(255, 140, 150, .55); white-space: nowrap; pointer-events: none; }
+.cb-oint .iicon { width: 16px; height: 16px; }
+.cb-oint b { font: 800 .64rem/1 var(--f-ui); color: #FFD6DC; }
+.cb-oint small { font: 600 .52rem/1 var(--f-ui); color: #D9C6CF; }
+.cb-oint.d2, .cb-oint.d3 { border-color: #FF6B7F; background: rgba(60, 8, 18, .95); }
+@media (max-width: 360px) { .cb-oint small { display: none; } }
+/* v348 : présentation courte d'un gardien déjà vaincu 3 fois */
+.bx-intro.short .bx-in { gap: 8px; }
+.bx-intro.short h1 { font-size: clamp(1.6rem, 8vw, 2.2rem); }
+/* v348 : cadres de profil achetés en cendres (Fournaise) */
+.pf-braise { border-color: #E2702E; box-shadow: 0 0 0 2px #2a0e04, 0 0 14px rgba(255, 110, 40, .7); }
+.pf-forge { border-color: #B8B2A6; border-style: double; border-width: 5px; box-shadow: 0 0 0 2px #1a1714, 0 0 16px rgba(255, 150, 60, .55), inset 0 0 8px rgba(255, 120, 40, .5); }
+.pf-phenix { border-color: #FFC24A; box-shadow: 0 0 0 2px #3a1400, 0 0 10px #FF6A1A, 0 0 26px rgba(255, 190, 70, .8); animation: pfPhenix 2.4s ease-in-out infinite; }
+@keyframes pfPhenix { 50% { box-shadow: 0 0 0 2px #3a1400, 0 0 16px #FF8A2A, 0 0 36px rgba(255, 210, 90, 1); } }
+@media (prefers-reduced-motion: reduce) { .pf-phenix { animation: none; } }
+.fg-frames { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.fg-frame { display: grid; justify-items: center; gap: 4px; padding: 10px 4px; border-radius: 12px; border: 1px solid rgba(201, 164, 90, .3); background: rgba(255, 255, 255, .03); color: inherit; font: inherit; min-height: 44px; }
+.fg-frame .avatar-mini { width: 46px; height: 46px; border-radius: 50%; border-width: 3px; border-style: solid; background: #121018; }
+.fg-frame b { font-size: .75rem; text-align: center; }
+.fg-frame small { font-size: .72rem; color: var(--gold-hi); display: inline-flex; gap: 3px; align-items: center; }
+.fg-frame.own { opacity: .65; }
+.dv.cb .dv-c .cb-above .cb-oint { position: static; transform: none; flex: none; }

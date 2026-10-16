@@ -7,7 +7,7 @@ import { esc, toast, openSheet, bindActions, confirmBox } from '../ui/dom.js';
 import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
 import { chestSVG } from '../ui/chest.js';
-import { CHESTS, CHEST_ORDER } from '../core/descent.js';
+import { CHESTS, CHEST_ORDER, powerPts } from '../core/descent.js';
 import { ROLES, COST, BUDGET, TEAM, MAX_LEVEL, ULTS, roleOf, canUlt, ultOf } from '../core/army.js';
 import { duelUnit } from '../core/duel.js';
 import { kitOf, synergiesFor, KEYWORDS, keywordOf } from '../core/skills.js';
@@ -131,6 +131,7 @@ export function teamScreen(app, root) {
       <section class="panel v2-team">
         <div class="v2-budget"><span>Budget</span><span class="progress"><i style="width:${Math.min(100, (cost / BUDGET) * 100)}%;--bar:${cost > BUDGET ? '#FF5468' : 'var(--gold)'}"></i></span><b>${cost} / ${BUDGET}</b></div>
         <p class="small muted">Coût : Commune 1, Peu commune 2, Rare 3, Hyper rare 4, Mythique 5, Secrète 6.</p>
+        ${team.length ? (() => { const fl = team.slice(0, TEAM.active), tp = g.teamPower(fl), reach = Math.max(1, Math.round(6 + (tp - 1) * 22)); return `<p class="small tm-power">${icon('p:level-up')} Force au combat : <b>${powerPts(tp)}</b> · de quoi viser l’étage <b>${reach}</b> environ. <span class="muted">La force d’une créature dépend de sa rareté et de son niveau : une Secrète au niveau 1 est plus faible qu’une Hyper rare au niveau 5.</span></p>`; })() : ''}
         ${team.length < TEAM.active ? `<p class="small v2-warn">${icon('info')} Il faut au moins ${TEAM.active} créatures pour partir dans la Descente (encore ${TEAM.active - team.length}).</p>` : ''}
         ${run ? '' : `<div class="tm-tools"><button class="btn small primary" data-act="auto">${icon('sparkle')}Suggérer une équipe</button>${team.length ? '<button class="btn small ghost" data-act="clear">Vider</button>' : ''}</div><p class="small muted tm-help">Touche <b>+</b> sous une créature pour l’ajouter, <b>▲▼</b> pour la passer du combat à la réserve, <b>✕</b> pour la retirer.</p>`}
         ${run ? '' : presetsHTML()}

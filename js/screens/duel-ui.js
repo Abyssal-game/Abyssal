@@ -137,6 +137,16 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const cd = ['charge', 'channel', 'gather', 'mimic'].includes(i.kind) ? '<em class="cb-icd" title="Frappe au prochain tour">⏳1</em>' : '';
     return `<span class="cb-int d${i.danger} k-${i.kind}" title="${esc(i.def.name)} : ${esc(i.def.desc)}">${intentIcon(i.kind)}<b>${label}</b>${i.danger >= 2 ? `<em>${DANGER[i.danger]}</em>` : ''}${cd}${brk}</span>`;
   };
+  // v348 : dès l'étage 5 de la Descente, les ennemis ordinaires annoncent aussi leur coup (dégâts → cible), en discret
+  const ORD_INT_FROM = 5;
+  const ordIntent = (u) => {
+    if (u.boss || u.elite || st.turn !== 'ally' || !run || (run.floor || 0) < ORD_INT_FROM) return '';
+    const i = intentInfo(st, u); if (!i) return '';
+    const t = u.intent?.t && st.units[u.intent.t];
+    const who = i.aoe ? 'tous' : t ? esc(cat.get(t.id)?.name.split(/[\s,’']/)[0] || '') : '';
+    const val = i.dmg ? `${i.dmg}` : esc(i.def.name);
+    return `<span class="cb-oint d${i.danger}" title="${esc(i.def.name)} : ${esc(i.def.desc)}">${intentIcon(i.kind)}<b>${val}</b>${who ? `<small>→ ${who}</small>` : ''}</span>`;
+  };
   // v265 : la grosse attaque annoncée d'un gardien ou d'une élite, aussi sur sa carte
   const cardWarn = (u) => { const now = bigOf(u, false), nx = now ? null : bigOf(u, true), k = now || nx; if (!k) return ''; const real = PREP_IT[k] || k; const help = u.boss ? Math.min(2, front(st, 'enemy').filter((x) => x !== u && x.hp > 0).length) : 0;
     return `<span class="cb-warn ${PREP_IT[k] || nx ? 'prep' : ''}" title="${esc(INTENTS[real].desc)}${help ? ` Renforcée par ses serviteurs : +${help * SERVANT_POWER * 100} %.` : ''}">${intentIcon(real)}<b>${esc(INTENTS[real].name)}${help ? ` +${help * SERVANT_POWER * 100} %` : ''}</b><small>${now && !PREP_IT[now] ? 'à son tour' : 'au tour suivant'}</small></span>`; };
@@ -155,7 +165,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       <span class="dv-atk">${icon('swords')}<b>${u.atk + (u.boost || 0)}</b></span>
       <span class="dv-hp ${u.hp < u.maxHp ? 'hurt' : ''}">${icon('heart')}<b>${Math.max(0, u.hp)}</b></span>
             ${tgt ? `<span class="cb-tgt">${tgt}</span>` : ''}
-      ${(() => { const w = enemy && !dead ? cardWarn(u) : ''; return `<span class="cb-above">${statusBand(u, !!w)}${w}</span>`; })()}
+      ${(() => { const w = enemy && !dead ? cardWarn(u) || ordIntent(u) : ''; return `<span class="cb-above">${statusBand(u, !!w)}${w}</span>`; })()}
     </button>`;
   };
   const resHTML = (side) => {
@@ -897,6 +907,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (busy || st.over || guide) return;
     const foes = front(st, 'enemy');
     if (st.goal) await tuto(app, 'cb-goal');
+    if (foes.some((e) => e.boss || e.elite) || (run?.floor || 0) >= ORD_INT_FROM) await tuto(app, 'cb-intent'); // v348 : la bulle n'était jamais montrée
     if (foes.some((e) => e.trait)) await tuto(app, 'cb-traits');
     if (foes.some((e) => e.brkMax)) await tuto(app, 'cb-break');
     if (st.runes) await tuto(app, 'cb-runes');

@@ -60,20 +60,21 @@ export default function descent(app, root) {
       ${chests ? `<a class="panel dc-chests" href="#/coffres"><span class="dc-new-ic">${icon('p:chest')}</span><span><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Éclats et boosters</span></span>${icon('next')}</a>` : ''}
       <section class="panel dc-go">
         <div class="dc-banner bn-expedition"><b>Expédition</b><span class="small">${d.best ? `Record : étage ${d.best}` : 'Ta première descente t’attend'}</span></div>
-        <div class="dc-go-top"><span class="dc-torches">${Array.from({ length: DESCENT.torches }, (_, i) => `<i class="${i < torches ? 'on' : ''}">${picon(i < torches ? 'torch-on' : 'torch-off')}</i>`).join('')}</span><span class="small muted">${torches ? `${torches} expédition${torches > 1 ? 's' : ''} avec coffre aujourd’hui` : 'Expéditions du jour faites : tu peux rejouer, sans coffre'}</span></div>
+        <div class="dc-go-top"><span class="dc-torches">${Array.from({ length: DESCENT.torches }, (_, i) => `<i class="${i < torches ? 'on' : ''}">${picon(i < torches ? 'torch-on' : 'torch-off')}</i>`).join('')}</span><span class="small muted">${torches ? `${torches} expédition${torches > 1 ? 's' : ''} avec coffre aujourd’hui` : 'Expéditions du jour faites : tu peux encore t’entraîner'}</span></div>
         ${teamStrip(team)}
         <p class="small muted center">Pouvoir : <b>${esc(g.ultimate(team).name)}</b> · budget ${g.teamCost(team)} / ${BUDGET}</p>
         ${levelHint(team, d)}
         <div class="dc-teambtns"><a class="btn small ghost dc-plq dc-plq-dark" href="#/equipe">${icon('p:team-ic')}Mon équipe</a><a class="btn small ghost dc-plq dc-plq-dark" href="#/renfort">${icon('p:level-up')}Renforcer</a></div>
         ${team.length < TEAM.active ? (g.welcomePending() ? `<a class="btn gold block" href="#/boutique">${icon('ticket')}Ouvre d’abord tes boosters de bienvenue</a>` : `<p class="small v2-warn center">${icon('info')} Ajoute au moins ${TEAM.active} créatures à ton équipe pour descendre.</p>`) : ''}
         ${startsHTML()}
-        <button class="btn ${ui.cursed && torches ? 'danger' : 'primary'} block big-cta dc-plq dc-plq-red" data-act="start" ${team.length >= TEAM.active ? '' : 'disabled'}>${icon('p:descend')}${torches ? 'Descendre' : 'Descendre (sans coffre)'}</button>
+        <button class="btn ${!torches ? 'ghost' : ui.cursed ? 'danger' : 'primary'} block big-cta dc-plq ${torches ? 'dc-plq-red' : 'dc-plq-dark'}" data-act="start" ${team.length >= TEAM.active ? '' : 'disabled'}>${icon('p:descend')}${torches ? 'Descendre' : 'Entraînement'}</button>
+        ${torches ? '' : '<p class="small muted center dc-train">Entraînement : ni coffre, ni cendres, ni saison, éclats réduits de moitié. Les créatures vaincues comptent quand même pour ta Chasse. Tes torches reviennent à minuit.</p>'}
         <div class="dc-opts">
           ${torches ? `<button class="dc-opt ${ui.cursed ? 'on' : ''}" data-act="curse" aria-pressed="${ui.cursed}">${icon('skull')}<b>Maudite</b><small>${riskLine('cursed', 'coffre +1, rien si l’équipe tombe')}</small></button>` : ''}
-          ${g.nightmareUnlocked() ? `<button class="dc-opt dc-opt-night ${ui.nightmare ? 'on' : ''}" data-act="night" aria-pressed="${ui.nightmare}">${icon('skull')}<b>Cauchemar</b><small>${riskLine('night', d.bestNightmare ? `record : étage ${d.bestNightmare}` : 'ennemis +35 % PV, +25 % ATQ')}</small></button>` : `<button class="dc-opt off" data-act="optinfo">${icon('lock')}<b>Cauchemar</b><small>dès l’étage ${NIGHTMARE_AT}</small></button>`}
+          ${g.nightmareUnlocked() ? `<button class="dc-opt dc-opt-night ${ui.nightmare ? 'on' : ''}" data-act="night" aria-pressed="${ui.nightmare}">${icon('skull')}<b>Cauchemar</b><small>${riskLine('night', d.bestNightmare ? `record : étage ${d.bestNightmare}` : 'ennemis +35 % PV, +25 % ATQ')} · départ ≈ étage ${g.nightmareEquiv(startFloor())}</small></button>` : `<button class="dc-opt off" data-act="optinfo">${icon('lock')}<b>Cauchemar</b><small>dès l’étage ${NIGHTMARE_AT}</small></button>`}
           <button class="dc-opt-info icon-btn" data-act="optinfo" aria-label="Explications des modes">${icon('info')}</button>
         </div>
-        ${ui.cursed || ui.nightmare ? `<p class="small dc-riskwarn">${icon('skull')} ${[ui.cursed ? 'Maudite : si l’équipe tombe, <b>tu perds tout</b> (éclats et coffres).' : '', ui.nightmare ? 'Cauchemar : ennemis bien plus forts et gardiens déchaînés dès le début.' : ''].filter(Boolean).join(' ')}${riskAdvice()}</p>` : ''}
+        ${ui.cursed || ui.nightmare ? `<p class="small dc-riskwarn">${icon('skull')} ${[ui.cursed ? 'Maudite : si l’équipe tombe, <b>tu perds tout</b> (éclats et coffres).' : '', ui.nightmare ? `Cauchemar : dès ton premier combat, les ennemis ont la force de l’<b>étage ${g.nightmareEquiv(startFloor())}</b> en mode normal, et les gardiens sont déchaînés.` : ''].filter(Boolean).join(' ')}${riskAdvice()}</p>` : ''}
       </section>
       ${ruleHTML(g.rule())}
       <div class="dc-links">
@@ -167,7 +168,7 @@ export default function descent(app, root) {
   }
 
   // ——— Expédition ———————————————————————————————————————————————————
-  const runHead = (run) => `<header class="dc-run-head"><div><span class="small muted">${run.nightmare ? `<span class="dc-bad">${icon('skull')} Cauchemar</span> · ` : ''}${run.free ? 'Descente libre (sans coffre)' : run.cursed ? `<span class="dc-bad">${icon('skull')} Maudite</span>` : 'La Descente'}</span><h1>Étage ${run.floor}</h1>${run.omen && OMENS[run.omen] ? `<button class="dc-omen-pill" data-act="omeninfo">${icon(OMENS[run.omen].icon)} ${esc(OMENS[run.omen].name)}</button>` : ''}</div><div class="dc-loot"><span>${icon('crystal')}${fmt(run.shards)}</span>${run.chests.length ? `<span>${icon('p:chest')}${run.chests.length}</span>` : ''}</div></header>
+  const runHead = (run) => `<header class="dc-run-head"><div><span class="small muted">${run.nightmare ? `<span class="dc-bad">${icon('skull')} Cauchemar</span> · ` : ''}${run.free ? 'Entraînement (ni coffre, ni cendres)' : run.cursed ? `<span class="dc-bad">${icon('skull')} Maudite</span>` : 'La Descente'}</span><h1>Étage ${run.floor}</h1>${run.omen && OMENS[run.omen] ? `<button class="dc-omen-pill" data-act="omeninfo">${icon(OMENS[run.omen].icon)} ${esc(OMENS[run.omen].name)}</button>` : ''}</div><div class="dc-loot"><span>${icon('crystal')}${fmt(run.shards)}</span>${run.chests.length ? `<span>${icon('p:chest')}${run.chests.length}</span>` : ''}</div></header>
     ${teamStrip(run.team.map((m) => m.id), run, run.phase !== 'battle')}
     ${run.phase !== 'battle' && run.team.filter((m) => !m.fallen).length > 1 ? `<p class="dc-swap-hint small muted">${ui.tsel != null ? 'Touche la créature avec qui échanger sa place.' : 'Touche deux créatures pour échanger leur place : les 3 premières combattent.'}</p>` : ''}
     <p class="dc-rule-line small">${picon('rule')} <b>${esc(g.rule(run.day).name)}</b> · ${esc(g.rule(run.day).desc)}</p>`;
@@ -183,10 +184,10 @@ export default function descent(app, root) {
     const alive = run.team.some((m) => !m.fallen);
     root.innerHTML = `${runHead(run)}${extra}
       <section class="dc-risk2">
-        <div class="dr-up"><span class="dr-k">Si tu remontes</span>${now ? `<span class="dr-chest">${chestSVG(now)}</span><b style="color:${CHESTS[now].color}">${esc(CHESTS[now].name)}</b><span class="dr-sub">${esc(CHESTS[now].desc)}</span>` : `<span class="dr-sub">${run.free ? 'Pas de coffre (descente libre)' : 'Pas encore de coffre : il arrive dès l’étage 3'}</span>`}<span class="dr-shards">${icon('crystal')}<b>${fmt(run.shards)}</b> éclats</span></div>
-        <div class="dr-down"><span class="dr-k">Étage ${run.floor + 1}${(run.floor + 1) % DESCENT.bossEvery === 0 ? ' · gardien' : ''}</span><img class="dr-stair" alt="" src="assets/icons/stairs-down.webp">${run.free ? '<b>Descente libre</b>' : !now && !next ? `<b>Pas encore de coffre</b><span class="dr-sub">Le premier arrive à l’étage ${Math.max(3, (run.start || 1) + CHECKPOINT_MIN - 1)}</span>` : next !== now ? `<b class="dc-good">${now ? 'Coffre amélioré' : 'Premier coffre'}</b><span class="dr-sub">${esc(CHESTS[next].name)}</span>` : '<b>Même coffre</b><span class="dr-sub">Il s’améliore aux étages 3, 8, 16 et 25</span>'}<span class="dr-risk">${icon('skull')}${run.cursed ? 'Si l’équipe tombe : tout est perdu' : now ? 'Si l’équipe tombe : coffre d’une qualité en dessous' : 'Si l’équipe tombe : la moitié des éclats'}</span></div>
+        <div class="dr-up"><span class="dr-k">Si tu remontes</span>${now ? `<span class="dr-chest">${chestSVG(now)}</span><b style="color:${CHESTS[now].color}">${esc(CHESTS[now].name)}</b><span class="dr-sub">${esc(CHESTS[now].desc)}</span>` : `<span class="dr-sub">${run.free ? 'Pas de coffre (entraînement)' : 'Pas encore de coffre : il arrive dès l’étage 3'}</span>`}<span class="dr-shards">${icon('crystal')}<b>${fmt(run.shards)}</b> éclats</span></div>
+        <div class="dr-down"><span class="dr-k">Étage ${run.floor + 1}${(run.floor + 1) % DESCENT.bossEvery === 0 ? ' · gardien' : ''}</span><img class="dr-stair" alt="" src="assets/icons/stairs-down.webp">${run.free ? '<b>Entraînement</b>' : !now && !next ? `<b>Pas encore de coffre</b><span class="dr-sub">Le premier arrive à l’étage ${Math.max(3, (run.start || 1) + CHECKPOINT_MIN - 1)}</span>` : next !== now ? `<b class="dc-good">${now ? 'Coffre amélioré' : 'Premier coffre'}</b><span class="dr-sub">${esc(CHESTS[next].name)}</span>` : '<b>Même coffre</b><span class="dr-sub">Il s’améliore aux étages 3, 8, 16 et 25</span>'}<span class="dr-risk">${icon('skull')}${run.cursed ? 'Si l’équipe tombe : tout est perdu' : now ? 'Si l’équipe tombe : coffre d’une qualité en dessous' : 'Si l’équipe tombe : la moitié des éclats'}</span></div>
       </section>
-      <div class="dc-choice">${alive ? `<button class="dc-stair down" data-act="next">${picon('stairs-down')}<span><b>Descendre à l’étage ${run.floor + 1}</b><span class="small">${run.free ? 'Plus profond, plus dangereux' : next !== now ? `Plus dangereux, mais ${esc(CHESTS[next].name.toLowerCase())} à la clé` : 'Plus profond, plus dangereux'}</span></span></button>` : ''}<button class="dc-stair up" data-act="leave">${picon('stairs-up')}<span><b>${now ? 'Remonter avec le coffre' : 'Remonter'}</b><span class="small">${run.free ? 'Fin de la descente libre' : now ? 'Tu gardes le coffre et tes éclats' : 'Tu gardes seulement tes éclats'}</span></span></button></div>
+      <div class="dc-choice">${alive ? `<button class="dc-stair down" data-act="next">${picon('stairs-down')}<span><b>Descendre à l’étage ${run.floor + 1}</b><span class="small">${run.free ? 'Plus profond, plus dangereux' : next !== now ? `Plus dangereux, mais ${esc(CHESTS[next].name.toLowerCase())} à la clé` : 'Plus profond, plus dangereux'}</span></span></button>` : ''}<button class="dc-stair up" data-act="leave">${picon('stairs-up')}<span><b>${now ? 'Remonter avec le coffre' : 'Remonter'}</b><span class="small">${run.free ? 'Fin de l’entraînement' : now ? 'Tu gardes le coffre et tes éclats' : 'Tu gardes seulement tes éclats'}</span></span></button></div>
       <p class="small muted center dc-pause">${icon('hourglass')} Pas le temps ? Ferme simplement le jeu : l’expédition t’attendra ici, même demain, et ses étages comptent pour ton record.</p>`;
   }
   // Fin de combat : la victoire et son butin, l'état de l'équipe, puis un seul choix (le bonus)
@@ -252,7 +253,7 @@ export default function descent(app, root) {
     const p = g.abandonPreview();
     if (!p) return;
     const lines = p.cursed ? ['Descente maudite : <b>tu perds tout</b> (éclats et coffres).']
-      : [`Tu gardes <b>${fmt(p.shards)} éclats</b> (la moitié).`, p.free ? 'Descente libre : pas de coffre.' : p.chest ? `Coffre de fin : <b>${esc(CHESTS[p.chest].name.toLowerCase())}</b> (un rang plus bas).` : 'Pas de coffre de fin (pas encore assez profond).', p.kept ? `Les ${p.kept} coffre${p.kept > 1 ? 's' : ''} trouvé${p.kept > 1 ? 's' : ''} en route sont gardés.` : ''];
+      : [`Tu gardes <b>${fmt(p.shards)} éclats</b> (la moitié).`, p.free ? 'Entraînement : pas de coffre.' : p.chest ? `Coffre de fin : <b>${esc(CHESTS[p.chest].name.toLowerCase())}</b> (un rang plus bas).` : 'Pas de coffre de fin (pas encore assez profond).', p.kept ? `Les ${p.kept} coffre${p.kept > 1 ? 's' : ''} trouvé${p.kept > 1 ? 's' : ''} en route sont gardés.` : ''];
     lines.push('Ta torche reste utilisée. L’expédition compte comme une défaite.');
     if (!(await confirmBox(`<b>Abandonner l’expédition ?</b><br>${lines.filter(Boolean).map((l) => `• ${l}`).join('<br>')}`, { ok: 'Abandonner', danger: true }))) return;
     if (battle) { battle.stop(); battle = null; }
@@ -307,6 +308,17 @@ export default function descent(app, root) {
     const b = BOSSES[key], seen = g.s.bossesBeaten[key];
     const el = document.createElement('div');
     el.className = 'bx-intro';
+    // v348 : gardien déjà vaincu 3 fois : présentation courte (nom, mécanique, contre), qui se ferme seule après 2 s
+    const short = (g.s.bossWins?.[key] || 0) >= 3;
+    if (short) {
+      el.classList.add('short');
+      el.innerHTML = `<div class="bx-in"><span class="bx-k">Étage ${run.floor} · Gardien</span><h1>${esc(b.name)}</h1><p class="bx-m"><b>Sa mécanique</b> ${esc(b.mechanic)}</p><p class="bx-m good"><b>Pour le contrer</b> ${esc(b.counter)}</p><span class="bx-tap">Touche pour combattre</span></div>`;
+      document.body.appendChild(el); app.sfx.boss?.();
+      let done = false;
+      const go = () => { if (done) return; done = true; el.classList.add('out'); setTimeout(() => el.remove(), 300); battleView(g.descent().run); };
+      el.addEventListener('click', go); setTimeout(go, 2000);
+      return;
+    }
     el.innerHTML = `<div class="bx-in"><span class="bx-k">Étage ${run.floor} · Gardien</span><h1>${esc(b.name)}</h1><p class="bx-t">${esc(b.title)}</p><p class="bx-p">${esc(b.intro)}</p><p class="bx-m"><b>Sa mécanique</b> ${esc(b.mechanic)}</p><p class="bx-m bx-loot"><b>Butin</b> Vaincu, il a 1 chance sur 4 de rejoindre ta collection${seen ? '' : ', et sa première défaite donne un coffre'}.</p>${PHASE2[key] ? `<p class="bx-m"><img class="bx-ph" alt="" src="assets/ui/ph-${key}.webp"><b>À mi-vie : ${esc(PHASE2[key].name)}</b> ${esc(PHASE2[key].desc)}</p>` : ''}${seen ? `<p class="bx-m good"><b>Pour le contrer</b> ${esc(b.counter)}</p>` : ''}<span class="bx-tap">Touche pour combattre</span></div>`;
     document.body.appendChild(el);
     app.sfx.boss?.();
@@ -345,13 +357,13 @@ export default function descent(app, root) {
     },
     curse() { ui.cursed = !ui.cursed; render(); },
     startat(el) { ui.start = +el.dataset.f || 1; render(); },
-    night() { ui.nightmare = !ui.nightmare; render(); },
+    night() { ui.nightmare = !ui.nightmare; render(); if (ui.nightmare) tuto(app, 'dc-nightmare', { force: false }); },
     // v320 : saison, classement et aide s'ouvrent dans une fenêtre (la page ne les empile plus)
     open(el) {
       const f = el.dataset.f;
       if (f === 'season') openSheet(`<h2 class="center">Saison et paliers</h2>${seasonHTML()}`, { label: 'Saison', cls: 'dc-sheet' });
       else if (f === 'board') { const sh = openSheet('<h2 class="center">Classement du jour</h2><div class="lb-body small muted">Chargement…</div>', { label: 'Classement', cls: 'dc-sheet' }); loadBoard(sh.body.querySelector('.lb-body')); }
-      else openSheet(`<h2 class="center">Comment ça marche</h2><ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol><p class="small muted center">${DESCENT.torches} expéditions avec coffre par jour, puis tu peux rejouer sans coffre.</p>`, { label: 'Aide', cls: 'dc-sheet' });
+      else openSheet(`<h2 class="center">Comment ça marche</h2><ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol><p class="small muted center">${DESCENT.torches} expéditions avec coffre par jour, puis tu peux t’entraîner (ni coffre, ni cendres).</p>`, { label: 'Aide', cls: 'dc-sheet' });
     },
     optinfo() {
       openSheet(`<h2 class="center">Les modes de descente</h2>

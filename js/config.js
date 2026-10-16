@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v347'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v348'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -114,10 +114,14 @@ export const FRAMES = {
   necrotique: 'Cadre nécrotique', primordial: 'Cadre primordial', artificiel: 'Cadre artificiel',
   abysse: 'Cadre des Profondeurs', chasseur: 'Cadre du Chasseur',
   sceaux: 'Cadre des Sceaux', reliques: 'Cadre des Reliques', guerre: 'Cadre de la Guerre',
+  braise: 'Cadre de braise', forge: 'Cadre de la Forge', phenix: 'Cadre du Phénix',
 };
+// v348 : cadres de profil achetés avec des cendres à la Fournaise (purement cosmétiques : une utilité aux cendres
+// quand l'équipe est au niveau maximal)
+export const ASH_FRAMES = { braise: 600, forge: 2000, phenix: 6000 };
 
-// Booster standard gratuit du jour : un par jour, il ne s'accumule pas (reviens chaque jour).
-export const FREE_PACK = { perDay: 1 };
+// Booster standard gratuit du jour : un par jour ; v348 : il se garde, 2 au plus en réserve.
+export const FREE_PACK = { perDay: 1, max: 2 }; // v348 : cumulable jusqu'à 2
 
 export const FACTION_ORDER = ['infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel'];
 

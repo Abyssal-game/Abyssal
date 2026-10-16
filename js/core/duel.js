@@ -10,7 +10,7 @@
 import { roleOf } from './army.js';
 import {
   AP_MAX, FERVOR_MAX, ACTS_PER_UNIT, ULT_COST, PA_START, PA_TURN, PA_MAX, PA_GAIN, KITS, COMMON_ACTS, WEAK_TO, WEAK_MULT, RESIST_MULT,
-  aiFamily, INTENTS, BOSS_POWERS, bossPowerOf, diceChance, KEYWORDS, keywordOf, SYNERGIES,
+  aiFamily, INTENTS, DICE_DC, BOSS_POWERS, bossPowerOf, diceChance, KEYWORDS, keywordOf, SYNERGIES,
 } from './skills.js';
 import { BOSSES, LAWS, ASPECTS } from './bosses.js';
 import { familyOf, relationMult, activeLegends } from './relations.js';
@@ -627,15 +627,15 @@ export function rollInfo(st, uid, key, tUid) {
   const mods = [];
   let dc = 10, immune = '';
   if (key === 'estoc') {
-    dc = 10 + (t.boss ? 3 : t.elite ? 1 : 0);
+    dc = DICE_DC.estoc.base + (t.boss ? DICE_DC.estoc.boss : t.elite ? DICE_DC.estoc.elite : 0);
     if (t.frozen) mods.push(['Bris de glace (gelée)', 3]);
   } else if (key === 'contagion') {
-    dc = 9 + (t.boss ? 2 : 0);
+    dc = DICE_DC.contagion.base + (t.boss ? DICE_DC.contagion.boss : t.elite ? DICE_DC.contagion.elite : 0);
     if (t.frozen) mods.push(['Cible gelée', 3]);
     if (has(st, 'venin')) mods.push(['Fiole noire', 3]);
   } else if (key === 'entrave') {
     // v235 : gel plus fiable (8 au lieu de 10) et maîtrise du givre selon la rareté de la créature
-    dc = 8 + (t.boss ? 6 : t.elite ? 3 : 0);
+    dc = DICE_DC.entrave.base + (t.boss ? DICE_DC.entrave.boss : t.elite ? DICE_DC.entrave.elite : 0);
     if (FROST_MASTERY[u.rarity]) mods.push(['Maîtrise du givre', FROST_MASTERY[u.rarity]]);
     if (t.frostCD > 0) immune = 'Elle vient d’être gelée : immunisée au gel ce tour-ci.';
   } else return null;

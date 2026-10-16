@@ -19,6 +19,9 @@ export const PA_GAIN = 1;         // l'attaque et la défense rapportent 1 PA ; 
 // ——— Kits par rôle ——————————————————————————————————————————————————
 // kw : nom de la capacité (compatibilité) ; basic : attaque de base ; skill : compétence signature ;
 // passive : passif ou réaction. target : 'enemy' | 'ally' | 'none'. dice : jet de D20 (dc : difficulté).
+// v348 : une seule table des difficultés de jet (DD), lue par le moteur (duel.js) et par les descriptions ci-dessous
+export const DICE_DC = { estoc: { base: 10, elite: 1, boss: 3 }, contagion: { base: 9, elite: 0, boss: 2 }, entrave: { base: 8, elite: 3, boss: 6 } };
+const dcText = (k) => { const d = DICE_DC[k]; return `${d.base} ou plus${d.elite ? ` ; +${d.elite} contre une élite` : ''}, +${d.boss} contre un gardien`; };
 export const KITS = {
   protecteur: {
     kw: 'garde', name: 'Protecteur', icon: 'shield',
@@ -29,7 +32,7 @@ export const KITS = {
   degats: {
     kw: 'assaut', name: 'Attaquant', icon: 'swords',
     basic: { name: 'Frappe', desc: 'Dégâts normaux.' },
-    skill: { key: 'estoc', pa: 2, name: 'Coup d’estoc', icon: 'swords', ap: 2, fervor: 2, target: 'enemy', dice: { dc: 10 }, desc: 'Coup de rupture. Jet de D20. Réussite : dégâts ×2, +3 Brisure, et la cible est marquée. Critique : ×3 et +4 Brisure. Partielle : ×1,2. Échec critique : moitié des dégâts, et elle est exposée (+25 % de dégâts subis).' },
+    skill: { key: 'estoc', pa: 2, name: 'Coup d’estoc', icon: 'swords', ap: 2, fervor: 2, target: 'enemy', dice: { dc: DICE_DC.estoc.base }, desc: `Coup de rupture. Jet de D20 (${dcText('estoc')}). Réussite : dégâts ×2, +3 Brisure, et la cible est marquée. Critique : ×3 et +4 Brisure. Partielle : ×1,2. Échec critique : moitié des dégâts, et elle est exposée (+25 % de dégâts subis).` },
     passive: { name: 'Exécution', desc: '+50 % de dégâts sur une cible brisée ou sous 30 % de ses PV. Contre-attaque après une parade parfaite.' },
   },
   soin: {
@@ -41,13 +44,13 @@ export const KITS = {
   poison: {
     kw: 'venin', name: 'Empoisonneur', icon: 'skull',
     basic: { name: 'Morsure', desc: 'Dégâts normaux et +2 poison. Traverse les boucliers.' },
-    skill: { key: 'contagion', pa: 2, name: 'Contagion', icon: 'skull', ap: 1, fervor: 2, target: 'enemy', dice: { dc: 9 }, desc: 'Jet de D20. Réussite : le poison de la cible double et se propage à ses voisins. Critique : à tous les ennemis. Partielle : double seulement sur la cible. Une cible saine reçoit d’abord 3 poison.' },
+    skill: { key: 'contagion', pa: 2, name: 'Contagion', icon: 'skull', ap: 1, fervor: 2, target: 'enemy', dice: { dc: DICE_DC.contagion.base }, desc: `Jet de D20 (${dcText('contagion')}). Réussite : le poison de la cible double et se propage à ses voisins. Critique : à tous les ennemis. Partielle : double seulement sur la cible. Une cible saine reçoit d’abord 3 poison.` },
     passive: { name: 'Givre-venin', desc: 'Sur une cible gelée, le poison appliqué est doublé.' },
   },
   controle: {
     kw: 'gel', name: 'Entraveur', icon: 'eye',
     basic: { name: 'Morsure du froid', desc: 'Dégâts normaux, +2 Brisure sur une cible gelée.' },
-    skill: { key: 'entrave', pa: 2, name: 'Entrave glaciale', icon: 'eye', ap: 1, fervor: 2, target: 'enemy', dice: { dc: 10 }, desc: 'Jet de D20 (8 ou plus ; bonus selon la rareté : Rare +1, Hyper rare +2, Mythique +3, Secrète +4). Réussite : la cible est gelée et perd sa prochaine action (sa charge est annulée). Critique : gelée et +3 Brisure ; une Mythique ou Secrète la gèle 2 tours (sauf élites et gardiens). Partielle : elle recule de 2 places dans l’ordre du tour (1 pour un gardien) ; si elle a déjà joué, elle est ralentie.' },
+    skill: { key: 'entrave', pa: 2, name: 'Entrave glaciale', icon: 'eye', ap: 1, fervor: 2, target: 'enemy', dice: { dc: DICE_DC.entrave.base }, desc: `Jet de D20 (${dcText('entrave')} ; bonus selon la rareté : Rare +1, Hyper rare +2, Mythique +3, Secrète +4). Réussite : la cible est gelée et perd sa prochaine action (sa charge est annulée). Critique : gelée et +3 Brisure ; une Mythique ou Secrète la gèle 2 tours (sauf élites et gardiens). Partielle : elle recule de 2 places dans l’ordre du tour (1 pour un gardien) ; si elle a déjà joué, elle est ralentie.` },
     passive: { name: 'Bris de glace', desc: 'Tes coups sur une cible gelée font +2 Brisure.' },
   },
   soutien: {

@@ -158,7 +158,11 @@ test('offrande quotidienne : une par jour, série', () => {
   day = new Date(2026, 9, 10, 9);
   assert.equal(g.claimDaily().streak, 2);
   day = new Date(2026, 9, 13, 9);
-  assert.equal(g.claimDaily().streak, 1);
+  assert.equal(g.claimDaily().streak, 1, 'deux jours manqués : la série de 2 perd deux crans');
+  day = new Date(2026, 9, 14, 9); g.claimDaily(); day = new Date(2026, 9, 15, 9); g.claimDaily(); day = new Date(2026, 9, 16, 9);
+  assert.equal(g.claimDaily().streak, 4);
+  day = new Date(2026, 9, 18, 9);
+  assert.equal(g.claimDaily().streak, 4, 'v348 : un jour manqué fait perdre un cran (4 → 3), puis le jour compte');
 });
 
 test('plus d’invocation par cendres ; déchiffrement des noms', () => {
@@ -225,5 +229,9 @@ test('booster gratuit du jour : un par jour, sans réserve', () => {
   now = new Date(2026, 9, 11, 0, 1);
   assert.equal(g.freePack().stock, 1, 'un nouveau le lendemain');
   now = new Date(2026, 9, 20, 8);
-  assert.equal(g.freePack().stock, 1, 'les jours manqués ne s’accumulent pas');
+  assert.equal(g.freePack().stock, 2, 'v348 : les jours manqués s’accumulent, 2 au plus');
+  g.openBooster('standard');
+  assert.equal(g.freePack().stock, 1, 'il en reste un');
+  now = new Date(2026, 9, 21, 8);
+  assert.equal(g.freePack().stock, 2);
 });

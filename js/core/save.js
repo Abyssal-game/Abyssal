@@ -59,6 +59,7 @@ export function defaultSave(now = Date.now()) {
     // Extension : gardiens vaincus, relations découvertes, formes choisies, récits, Duels des Sceaux,
     // Chasse aux Reliques et Guerre des Factions. Tous facultatifs : une sauvegarde ancienne les reçoit vides.
     bossesBeaten: {},     // clé de gardien -> date de la première victoire
+    bossWins: {},         // v348 : clé de gardien -> nombre de victoires
     relations: {},        // clé de relation -> date de découverte
     forms: {},            // id -> 'corrompue' (forme choisie)
     lore: {},             // fragment de récit -> date de déblocage
@@ -104,7 +105,7 @@ export function migrate(raw) {
   if (!Array.isArray(s.team)) s.team = [];
   if (!Array.isArray(s.teamPresets)) s.teamPresets = [];
   s.teamPresets = s.teamPresets.filter((p) => p && typeof p.name === 'string' && Array.isArray(p.ids)).slice(0, 4);
-  for (const k of ['items', 'fervor', 'collection', 'deciphered', 'achievements', 'setsDone', 'factionsDone', 'hunt', 'fame', 'favs', 'cstats', 'cdone', 'bossesBeaten', 'relations', 'forms', 'lore']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
+  for (const k of ['items', 'bossWins', 'fervor', 'collection', 'deciphered', 'achievements', 'setsDone', 'factionsDone', 'hunt', 'fame', 'favs', 'cstats', 'cdone', 'bossesBeaten', 'relations', 'forms', 'lore']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
   delete s.salles; // les Salles Oubliées ont été supprimées (v206)
   for (const [k, sub] of [['sceaux', 'beaten'], ['war', 'used'], ['war', 'claimed']]) if (!s[k][sub] || typeof s[k][sub] !== 'object') s[k][sub] = {};
   for (const [k, sub] of [['sceaux', 'history'], ['war', 'history']]) if (!Array.isArray(s[k][sub])) s[k][sub] = [];

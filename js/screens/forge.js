@@ -1,6 +1,6 @@
 // Pages « Renforcer » et « Fournaise » (sous-onglets de la Collection)
 import { tuto } from '../ui/tutos.js';
-import { RARITY, RARITY_ORDER, VARIANTS } from '../config.js';
+import { RARITY, RARITY_ORDER, VARIANTS, FRAMES, ASH_FRAMES } from '../config.js';
 import { artUrl } from '../art/assets.js';
 import { icon } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, bindActions } from '../ui/dom.js';
@@ -91,6 +91,8 @@ export function furnaceScreen(app, root) {
           : '<p class="small muted">Aucun doublon pour l’instant. Ceux que tu tires dans les boosters arrivent ici.</p>'}
       </section>
       ${sublimeHTML()}
+      <section class="panel"><h2 class="section-title">Cadres de cendres</h2><p class="small muted">Des cadres de profil forgés dans les cendres, rien qu’à toi : ils ne donnent aucune puissance.</p>
+        <div class="fg-frames">${Object.entries(ASH_FRAMES).map(([k, n]) => { const has = g.s.frames.includes(k); return `<button class="fg-frame ${has ? 'own' : n <= g.s.ash ? '' : 'fg-dim'}" data-act="frame" data-k="${k}" ${has ? 'disabled' : ''}><span class="avatar-mini pf pf-${k}"></span><b>${esc(FRAMES[k])}</b><small>${has ? 'Obtenu' : `${icon('ash')}${fmt(n)}`}</small></button>`; }).join('')}</div></section>
       <details class="panel dc-fold fg-adv" ${ui.q || ui.adv ? 'open' : ''}><summary>${icon('p:furnace')} Avancé : brûler une autre carte</summary><div>
         <p class="small muted">Même ta dernière copie : la créature quitte alors ta collection (on te demande toujours de confirmer).</p>
         <label class="search fg-search">${icon('search')}<input class="input plain" type="search" placeholder="Rechercher une créature…" value="${esc(ui.q || '')}" data-q></label>
@@ -113,6 +115,12 @@ export function furnaceScreen(app, root) {
     },
     burn(el) { openBurn(app, el.dataset.id, { onClose: draw }); },
     subAll() { ui.subAll = true; draw(); },
+    async frame(el) {
+      const k = el.dataset.k, n = ASH_FRAMES[k];
+      if (n > g.s.ash) { toast(`Il te manque <b>${fmt(n - g.s.ash)} cendres</b>.`, { icon: 'ash' }); return; }
+      if (!(await confirmBox(`Forger le <b>${esc(FRAMES[k])}</b> pour <b>${fmt(n)} cendres</b> ? Tu pourras le choisir dans ton Profil.`, { ok: 'Forger' }))) return;
+      try { g.buyAshFrame(k); app.sfx.levelup?.(); toast(`${esc(FRAMES[k])} forgé : choisis-le dans ton Profil.`, { kind: 'success', icon: 'star' }); app.chrome?.(); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); }
+    },
     async sub(el) {
       const id = el.dataset.id, c = cat.get(id), x = g.sublimeInfo(id);
       if (!x) return;
