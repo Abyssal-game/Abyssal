@@ -5,7 +5,8 @@ import { icon, sigil, EMBLEM, picon } from '../ui/icons.js';
 import { esc, bindActions } from '../ui/dom.js';
 import { deName, lowArt } from '../core/synergy.js';
 import { FACTION_ORDER, RARITY } from '../config.js';
-import { FAMILIES, HUNT_STAGES, huntStage, familyOf } from '../core/descent.js';
+import { HUNT_STAGES, huntStage } from '../core/descent.js';
+import { AI_FAMILIES, aiFamily } from '../core/skills.js';
 import { loreEntries, markLoreRead, unreadLore } from '../core/lore.js';
 
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -69,7 +70,7 @@ export default function bestiary(app, root) {
       <p class="small muted">${seen} / ${fp.length} créatures ${esc(deName(cat.faction[st.faction].realm))} chassées.</p>
       <div class="codex">${fp.filter((c) => g.huntKills(c.id) > 0).map((c) => {
         const k = g.huntKills(c.id), stg = huntStage(k), r = RARITY[c.rarity];
-        const fam = FAMILIES[familyOf(c)];
+        const fam = AI_FAMILIES[aiFamily(c)]; // v326 : le comportement réel de la créature quand elle est ennemie (même nom qu'en combat)
         return `<button class="codex-row hunt-row" data-id="${c.id}"><span class="codex-thumb"><img alt="" loading="lazy" src="${artUrl(c, { lite: true, mystery: !g.owns(c.id) && false })}"></span><span class="codex-text"><b>${esc(c.name)}</b><span class="small"><span class="hunt-stage s${stg}">${esc(HUNT_STAGES[stg].name)}</span> · ${k} victoire${k > 1 ? 's' : ''}</span><span class="small muted">${stg >= 1 ? `${esc(fam.name)} : ${esc(fam.desc)}` : `Encore ${HUNT_STAGES[1].k - k} victoire${HUNT_STAGES[1].k - k > 1 ? 's' : ''} pour l’étudier.`}</span></span></button>`;
       }).join('')}</div>`;
   }
@@ -80,14 +81,26 @@ export default function bestiary(app, root) {
     const fresh = new Set(all.filter((e) => e.unlocked && !g.s.lore[e.key]).map((e) => e.key));
     const nb = (e) => (fresh.has(e.key) ? '<span class="lr-new">Nouveau</span>' : '');
     const lock = (e) => `<div class="lr-e locked"><b>${icon('lock')} ${e.kind === 'boss' || e.kind === 'form' ? 'Récit scellé' : esc(e.title)}</b><span class="small muted">${esc(e.hint)}</span></div>`;
+    // v326 : les récits encore scellés d'une section sont regroupés en un seul bloc compact (même indice = une ligne « × N »)
+    const relLabel = (e) => (e.rel.type === 'proie' ? 'Prédation inconnue' : e.rel.type === 'rival' ? 'Rivalité inconnue' : 'Légende inconnue');
+    const locks = (list, label) => {
+      if (!list.length) return '';
+      const groups = new Map();
+      list.forEach((e) => { const l = label(e), k = `${l}|${e.hint}`; groups.set(k, { l, hint: e.hint, n: (groups.get(k)?.n || 0) + 1 }); });
+      return `<div class="lr-locks">${[...groups.values()].map((x) => `<div class="lr-lock">${icon('lock')}<span><b>${esc(x.l)}${x.n > 1 ? ` <em>× ${x.n}</em>` : ''}</b><span class="small muted">${esc(x.hint)}</span></span></div>`).join('')}</div>`;
+    };
+    const head = (t, list) => `<h2 class="section-title">${t} <span class="lr-count">${list.filter((e) => e.unlocked).length} / ${list.length}</span></h2>`;
     const of = (k) => all.filter((e) => e.kind === k);
     const html = `<p class="small muted">${open.length} récit${open.length > 1 ? 's' : ''} sur ${all.length}. Ils s’ouvrent en jouant : gardiens vaincus, formes libérées, relations rencontrées, royaumes complétés.</p>
-      <h2 class="section-title">Les gardiens de l’Abîme</h2>
-      <div class="stack">${of('boss').map((e) => (e.unlocked ? `<div class="lr-e boss">${nb(e)}<b>${esc(e.title)}</b><span class="small lr-sub">${esc(e.sub)}</span><p class="lore">${esc(e.text)}</p><p class="small"><b>Sa mécanique.</b> ${esc(e.mechanic)}</p><p class="small"><b>Pour le contrer.</b> ${esc(e.counter)}</p></div>` : lock(e))).join('')}</div>
-      <h2 class="section-title">Formes corrompues</h2>
-      <div class="stack">${of('form').map((e) => { const c = cat.get(e.id); return e.unlocked ? `<button class="lr-e form" data-act="card" data-id="${e.id}">${nb(e)}<span class="lr-th"><img alt="" src="${artUrl(c, { lite: true })}"></span><span><b>${esc(e.title)}</b><span class="small lr-sub">${esc(c.name)} · ${esc(e.sub)}</span><p class="lore small">${esc(e.text)}</p></span></button>` : lock(e); }).join('')}</div>
-      <h2 class="section-title">Relations entre créatures</h2>
-      <div class="stack">${of('rel').map((e) => (e.unlocked ? `<div class="lr-e rel t-${e.rel.type}">${nb(e)}<span class="lr-type">${e.rel.type === 'proie' ? 'Prédation' : e.rel.type === 'rival' ? 'Rivalité' : 'Légende'}</span><b>${esc(e.title)}</b><span class="small">${esc(e.text)}</span></div>` : `<div class="lr-e locked"><b>${icon('lock')} ${e.rel.type === 'proie' ? 'Prédation' : e.rel.type === 'rival' ? 'Rivalité' : 'Légende'} inconnue</b><span class="small muted">${esc(e.hint)}</span></div>`)).join('')}</div>
+      ${head('Les gardiens de l’Abîme', of('boss'))}
+      <div class="stack">${of('boss').filter((e) => e.unlocked).map((e) => (e.unlocked ? `<div class="lr-e boss">${nb(e)}<b>${esc(e.title)}</b><span class="small lr-sub">${esc(e.sub)}</span><p class="lore">${esc(e.text)}</p><p class="small"><b>Sa mécanique.</b> ${esc(e.mechanic)}</p><p class="small"><b>Pour le contrer.</b> ${esc(e.counter)}</p></div>` : lock(e))).join('')}</div>
+      ${locks(of('boss').filter((e) => !e.unlocked), () => 'Gardien scellé')}
+      ${head('Formes corrompues', of('form'))}
+      <div class="stack">${of('form').filter((e) => e.unlocked).map((e) => { const c = cat.get(e.id); return e.unlocked ? `<button class="lr-e form" data-act="card" data-id="${e.id}">${nb(e)}<span class="lr-th"><img alt="" src="${artUrl(c, { lite: true })}"></span><span><b>${esc(e.title)}</b><span class="small lr-sub">${esc(c.name)} · ${esc(e.sub)}</span><p class="lore small">${esc(e.text)}</p></span></button>` : lock(e); }).join('')}</div>
+      ${locks(of('form').filter((e) => !e.unlocked), () => 'Forme endormie')}
+      ${head('Relations entre créatures', of('rel'))}
+      <div class="stack">${of('rel').filter((e) => e.unlocked).map((e) => (e.unlocked ? `<div class="lr-e rel t-${e.rel.type}">${nb(e)}<span class="lr-type">${e.rel.type === 'proie' ? 'Prédation' : e.rel.type === 'rival' ? 'Rivalité' : 'Légende'}</span><b>${esc(e.title)}</b><span class="small">${esc(e.text)}</span></div>` : `<div class="lr-e locked"><b>${icon('lock')} ${e.rel.type === 'proie' ? 'Prédation' : e.rel.type === 'rival' ? 'Rivalité' : 'Légende'} inconnue</b><span class="small muted">${esc(e.hint)}</span></div>`)).join('')}</div>
+      ${locks(of('rel').filter((e) => !e.unlocked), relLabel)}
       <h2 class="section-title">Fragments des royaumes</h2>
       ${FACTION_ORDER.map((f) => { const fr = of('frag').filter((e) => e.faction === f), n = fr.filter((e) => e.unlocked).length; return `<details class="panel dc-fold lr-fac" style="--fc:${cat.faction[f].colors.secondary}"><summary>${sigil(f)} ${esc(cat.faction[f].realm)} <span class="small muted">${n} / ${fr.length}</span>${fr.some((e) => fresh.has(e.key)) ? '<span class="lr-new">Nouveau</span>' : ''}</summary><div>${fr.map((e) => (e.unlocked ? `<h3>${esc(e.title)}</h3><p class="lore">${esc(e.text)}</p>` : `<p class="small muted">${icon('lock')} ${esc(e.hint)}</p>`)).join('')}</div></details>`; }).join('')}`;
     // les récits affichés une fois ne sont plus « nouveaux »

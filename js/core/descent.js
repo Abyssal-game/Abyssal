@@ -40,30 +40,8 @@ export const floorFloor = (avgLevel) => Math.max(1, Math.round(avgLevel / 0.75 +
 export const expectedLevel = (floor) => Math.max(1, Math.min(10, Math.round((floor - 6) * 0.75)));
 export const enemyScale = (floor) => 1 + 0.06 * Math.min(19, floor - 1) + 0.03 * Math.max(0, floor - 20);
 
-// Familles de comportement des créatures (page du Bestiaire)
-export const FAMILIES = {
-  brute:      { name: 'Brute', desc: 'Frappe fort, sans finesse.' },
-  gardien:    { name: 'Gardien', desc: 'Protège ses alliés : il faut l’abattre en premier.' },
-  lanceur:    { name: 'Lanceur de sorts', desc: 'Ses attaques touchent aussi ses voisins.' },
-  venimeux:   { name: 'Venimeux', desc: 'Empoisonne ses proies.' },
-  guerisseur: { name: 'Guérisseur', desc: 'Soigne ses alliés blessés : abats-le vite.' },
-  enrage:     { name: 'Enragé', desc: 'Frappe sans relâche.' },
-  traqueur:   { name: 'Traqueur', desc: 'S’acharne sur la proie la plus faible.' },
-  controleur: { name: 'Contrôleur', desc: 'Gèle ses adversaires.' },
-  essaim:     { name: 'Essaim', desc: 'Nombreux et fragiles.' },
-};
-export function familyOf(card) {
-  const a = new Set((card.abilities || []).map((x) => x.key));
-  if (/essaim|insecte/i.test(card.category)) return 'essaim';
-  if (a.has('bless') || a.has('regen')) return 'guerisseur';
-  if (a.has('guard') || a.has('armor') || a.has('aegis')) return 'gardien';
-  if (a.has('venom')) return 'venimeux';
-  if (a.has('drown') || a.has('fear')) return 'controleur';
-  if (a.has('frenzy') || a.has('devour')) return 'enrage';
-  if (a.has('curse') || a.has('cataclysm') || a.has('strike')) return 'lanceur';
-  if (a.has('elusive') || a.has('first')) return 'traqueur';
-  return 'brute';
-}
+// v326 : les anciennes familles du Bestiaire (Brute, Lanceur, Essaim…) ont été retirées : le Bestiaire affiche
+// désormais les familles réellement utilisées en combat (AI_FAMILIES et aiFamily, js/core/skills.js).
 
 // Étapes du Bestiaire de chasse
 export const HUNT_STAGES = [

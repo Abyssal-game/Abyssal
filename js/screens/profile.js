@@ -63,11 +63,21 @@ export default function profile(app, root) {
         <div class="panel stat"><b>${g.descent().best || 0}</b><span>étage record</span></div>
       </div>
 
-      <details class="panel dc-fold"><summary>${picon('titles')} Titres et cadres</summary><div>
-        <p class="small muted">Touche un titre ou un cadre grisé pour savoir comment l’obtenir.</p>
-        <div class="chips pf-titles">${s.titles.map((t) => `<button class="chip" data-act="title" data-v="${esc(t)}" aria-pressed="${t === s.title}">${esc(t)}</button>`).join('')}${U.titles.filter((t) => !s.titles.includes(t.name)).map((t) => `<button class="chip pf-lock" data-act="how" data-how="${esc(t.how)}" data-v="${esc(t.name)}">${icon('lock')}${esc(t.name)}</button>`).join('')}</div>
-        <div class="frames">${Object.entries(FRAMES).filter(([k]) => s.frames.includes(k) || U.frames.some((f) => f.key === k)).map(([k, name]) => { const has = s.frames.includes(k), how = U.frames.find((f) => f.key === k)?.how || ''; return `<button class="frame-pick ${has ? '' : 'pf-lock'}" data-act="${has ? 'frame' : 'how'}" data-v="${has ? k : esc(name)}" data-how="${esc(how)}" aria-pressed="${s.frame === k}"><span class="avatar-mini pf pf-${k}">${has ? '' : icon('lock')}</span><span class="small">${esc(name)}</span></button>`; }).join('')}</div>
-      </div></details>
+      ${(() => {
+        // v326 : titres et cadres possédés d'abord ; ceux à gagner sont repliés (la liste complète faisait plusieurs écrans)
+        const lockedT = U.titles.filter((t) => !s.titles.includes(t.name));
+        const allF = Object.entries(FRAMES).filter(([k]) => s.frames.includes(k) || U.frames.some((f) => f.key === k));
+        const frameBtn = ([k, name]) => { const has = s.frames.includes(k), how = U.frames.find((f) => f.key === k)?.how || ''; return `<button class="frame-pick ${has ? '' : 'pf-lock'}" data-act="${has ? 'frame' : 'how'}" data-v="${has ? k : esc(name)}" data-how="${esc(how)}" aria-pressed="${s.frame === k}"><span class="avatar-mini pf pf-${k}">${has ? '' : icon('lock')}</span><span class="small">${esc(name)}</span></button>`; };
+        const ownF = allF.filter(([k]) => s.frames.includes(k)), lockedF = allF.filter(([k]) => !s.frames.includes(k));
+        return `<details class="panel dc-fold pf-tf"><summary>${picon('titles')} Titres et cadres <span class="small muted pf-tf-n">${s.titles.length} titre${s.titles.length > 1 ? "s" : ""} · ${ownF.length} cadre${ownF.length > 1 ? "s" : ""}</span></summary><div>
+        <h3 class="pf-tf-h">Tes titres</h3>
+        <div class="chips pf-titles">${s.titles.map((t) => `<button class="chip" data-act="title" data-v="${esc(t)}" aria-pressed="${t === s.title}">${esc(t)}</button>`).join('')}</div>
+        ${lockedT.length ? `<details class="pf-more"><summary>${icon('lock')} ${lockedT.length} titre${lockedT.length > 1 ? 's' : ''} à gagner</summary><p class="small muted">Touche un titre pour savoir comment l’obtenir.</p><div class="chips pf-titles">${lockedT.map((t) => `<button class="chip pf-lock" data-act="how" data-how="${esc(t.how)}" data-v="${esc(t.name)}">${icon('lock')}${esc(t.name)}</button>`).join('')}</div></details>` : ''}
+        <h3 class="pf-tf-h">Tes cadres</h3>
+        <div class="frames">${ownF.map(frameBtn).join('')}</div>
+        ${lockedF.length ? `<details class="pf-more"><summary>${icon('lock')} ${lockedF.length} cadre${lockedF.length > 1 ? 's' : ''} à gagner</summary><p class="small muted">Touche un cadre pour savoir comment l’obtenir.</p><div class="frames">${lockedF.map(frameBtn).join('')}</div></details>` : ''}
+      </div></details>`;
+      })()}
 
       ${luckHTML()}
 

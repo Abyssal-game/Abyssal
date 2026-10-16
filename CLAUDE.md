@@ -22,7 +22,7 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Le réseau de la session bloque github.io : pour vérifier la publication, passe par l'outil GitHub (déploiements Pages) ou demande une capture au propriétaire.
 
 ## 2. Routine de livraison
-1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v325**.
+1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v326**.
 2. Tests : `node --test tests/*.test.mjs` (206 tests), `node tools/validate.mjs`. Si le combat ou l'équilibre change : `node tools/fuzz.mjs 300` (étage moyen ≈ 12 à 14 en normal).
 3. Vérification dans le navigateur avec Playwright (`/opt/node-tools/node_modules/playwright/index.mjs`, Chromium déjà installé), avec un serveur local `python3 -m http.server 8092` lancé dans le dossier. Tailles iPhone SE et iPhone 13. **L'écran d'ouverture attend un toucher** (« Touche l'écran pour entrer ») : dans les scripts, cliquer au milieu de l'écran (dans la fenêtre 390×664) avant tout le reste.
 4. Commit, push, réponse en français.
@@ -50,6 +50,7 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Partie, économie, sauvegarde : `js/core/game.js`, `js/core/save.js`, `js/config.js` (`VARIANT_RATES` holo 4 / or 1,2 / cosmique 0,4 % ; `SUBLIME_ASH`).
 - Annonces : `toast()` dans `js/ui/dom.js`. **File d'attente**, une seule annonce à la fois, le son joue à l'affichage.
 - Tutoriels : `js/ui/tutos.js`.
+- Bestiaire (v326) : Récits scellés regroupés en blocs compacts (« × N ») avec un compteur par section ; la Chasse affiche la famille de combat réelle (`AI_FAMILIES` / `aiFamily`, `js/core/skills.js`) ; les anciennes familles (Brute, Lanceur…) sont retirées. Profil : titres et cadres possédés d'abord, ceux à gagner repliés.
 
 ## 4 bis. Application Android / iPhone (Capacitor 8)
 - Identifiant définitif : **com.abyssalgame.abyssal** (ne jamais le changer après publication). Config : `capacitor.config.json`, projet natif : `android/`.

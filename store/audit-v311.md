@@ -95,11 +95,14 @@ Quatre audits ont été menés en parallèle, chacun avec des tests réellement 
 - Noms coupés : barre du haut (16 lettres tiennent, deux lignes sur une sous-page), en-tête du profil, cartes en combat (3 lignes), bandeau d'action (2 lignes).
 - Audio : silences initiaux coupés sur 9 sons, fondu de sortie sur `suspense`, `summon` joué quand une créature se relève.
 
+## 4 ter. Suite donnée le 16 octobre 2026 (v326)
+
+- Pages chargées : Récits (récits scellés regroupés, page 36 % plus courte) et Profil → Titres (titres et cadres à gagner repliés).
+- Familles d'ennemis : le Bestiaire affiche maintenant la famille réellement utilisée en combat, avec le même nom que le badge des cartes ennemies.
+- Textes jamais affichés : examinés et laissés en place. Les Pactes (`js/core/pacts.js`) et les Reliques (`js/core/relics.js`) ne sont plus proposés, mais le moteur les lit encore pour les expéditions commencées dans d'anciennes versions ; `data/abilities.json` (2,5 Ko) n'est plus affiché. Les retirer ne changerait rien pour le joueur et risquerait de casser une ancienne partie.
+
 ## 4. Problèmes restants (non corrigés, à décider)
 
-- **Pages chargées :** Bestiaire → Récits (longue liste de récits scellés) et Profil → Titres.
-- **Familles d'ennemis :** celles du Bestiaire diffèrent des comportements réels en combat.
-- **Textes et code jamais affichés :** pactes, reliques, anciens textes de capacités.
 
 ## 5. Nouveau logo
 
