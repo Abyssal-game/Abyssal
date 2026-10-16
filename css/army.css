@@ -3128,3 +3128,6 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 .cb-dice.landing:not(.done) .cb-d20 { animation: ry2Land .5s cubic-bezier(.3, 1.4, .4, 1), cbSpin .55s linear .5s infinite; }
 @keyframes ry2Land { 0% { transform: translateY(-120%) scale(.5) rotate(-300deg); opacity: 0; } 60% { transform: translateY(6%) scale(1.06) rotate(10deg); opacity: 1; } 100% { transform: none; } }
 @media (prefers-reduced-motion: reduce) { .ry2-die, .ry2.thrown .ry2-die, .cb-dice.landing .cb-d20 { animation: none !important; } }
+
+/* v354 : planche du pouvoir d'équipe jouée devant la carte invoquée (.tb-summon), en plus grand */
+.kx-sprite.fxs.ultfx { z-index: 31; width: 120% !important; height: auto !important; aspect-ratio: 1; }

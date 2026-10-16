@@ -406,13 +406,13 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   };
   // Planche peinte de 8 images (assets/fx/<nom>.webp) jouée sur une carte, au centre, ou sur toute la rangée ennemie
   const ROLE_FX = { protecteur: 'strike', degats: 'strike', poison: 'strike', controle: 'strike', soin: 'strike', soutien: 'strike', zone: 'strike' }; // v343 : « strike » (lame d'or) ; v350 : sur tous les coups, quel que soit le rôle (le poison et le gel gardent leur propre effet quand ils s'appliquent)
-  const fxSheet = (uid, name, { k = 1.6, d = 600, center = false, row = false } = {}) => {
+  const fxSheet = (uid, name, { k = 1.6, d = 600, center = false, row = false, cls = '' } = {}) => {
     if (reduced) return;
     const box = $('.dv'); if (!box) return;
     const b = box.getBoundingClientRect(); let x = b.width / 2, y = b.height / 2, w = b.width * 0.9, h = w;
     if (row) { const r = $('.dv-row.enemy')?.getBoundingClientRect(); if (!r) return; x = r.left - b.left + r.width / 2; y = r.top - b.top + r.height / 2; w = r.width * 1.1; h = r.height * 1.25; }
     else if (!center) { const t = el(uid), r = t ? t.getBoundingClientRect() : lastRect[uid]; if (!r) return; x = r.left - b.left + r.width / 2; y = r.top - b.top + r.height / 2; w = h = r.width * k; }
-    const n = document.createElement('span'); n.className = 'kx-sprite fxs';
+    const n = document.createElement('span'); n.className = `kx-sprite fxs ${cls}`;
     n.style.cssText = `left:${x}px;top:${y}px;width:${w}px;height:${h}px;--d:${T(d)}ms;background-image:url(assets/fx/${name}.webp)`;
     box.appendChild(n); setTimeout(() => n.remove(), T(d) + 80);
   };
@@ -521,12 +521,12 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         case 'block': app.sfx.block(); ring(e.u, 'guard'); float(e.u, 'Bloqué', 'info'); sparks(e.u, 'blue'); await wait(T(240)); break;
         case 'dodge': {
           app.sfx.dodge();
-          if (e.u) { fxAt(e.u, 'dodge', { big: true }); cam(e.u, 0.6); shake(false, true); const t = el(e.u); if (t) { t.classList.remove('dodge'); void t.offsetWidth; t.classList.add('dodge'); } float(e.u, 'Esquive !', 'dodge'); }
+          if (e.u) { fxSheet(e.u, 'fx-dodge', { k: 2.3, d: 720 }); cam(e.u, 0.6); shake(false, true); const t = el(e.u); if (t) { t.classList.remove('dodge'); void t.offsetWidth; t.classList.add('dodge'); } float(e.u, 'Esquive !', 'dodge'); }
           else banner('Esquive !', 'good', 600);
           await wait(T(320));
           break;
         }
-        case 'parry': app.sfx.parry(); dio.flare(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxAt(e.u, 'parry', { big: true }); impactFlash(e.u, true); sparks(e.u, 'gold'); cam(e.u, -0.8); } banner('Parade parfaite !', 'parry', 800); shake(false); await wait(T(420)); break;
+        case 'parry': app.sfx.parry(); dio.flare(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxSheet(e.u, 'fx-parry', { k: 2.5, d: 820 }); impactFlash(e.u, true); sparks(e.u, 'gold'); cam(e.u, -0.8); } banner('Parade parfaite !', 'parry', 800); shake(false); await wait(T(420)); break;
         case 'fervor': fervorPop(e.d, e.why); draw(); break;
         case 'passive': app.sfx.passive?.(); passivePop(e.u, e.p); float(e.u, PASSIVES[e.p]?.name || '', 'syn'); await wait(T(320)); break;
         case 'brk': { const t = el(e.u)?.querySelector('.cb-brk i'); if (t) t.style.width = `${(e.brk / e.max) * 100}%`; break; }
@@ -537,7 +537,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           await hitstop(160);
           app.sfx.shatter(); draw();
           const t2 = el(e.u); t2?.classList.add('shatter', 'cracked'); ring(e.u, 'break');
-          banner('BRISURE !', 'broken', 1000); fxAt(e.u, 'break', { big: true }); impactFlash(e.u, true); cam(e.u, 1.6); await hitstop(110); sparks(e.u, 'big'); shake(true); dio.brk();
+          banner('BRISURE !', 'broken', 1000); fxSheet(e.u, 'fx-break', { k: 2.7, d: 880 }); impactFlash(e.u, true); cam(e.u, 1.6); await hitstop(110); sparks(e.u, 'big'); shake(true); dio.brk();
           await wait(T(700)); d?.classList.remove('focus');
           break;
         }
@@ -559,7 +559,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           if (P && e.tier !== 'fumble') { lunge(P.u, P.tgt); cam(P.tgt, 0.6); await wait(T(LUNGE_HIT)); }
           break;
         }
-        case 'boss': { if (e.s === 'Effondrement !') fxAt(null, 'collapse', { center: true }); app.sfx.boss(); dio.roar(); const t = el(e.u); if (t) { t.classList.remove('roar'); void t.offsetWidth; t.classList.add('roar'); } float(e.u, e.s, 'boss'); shake(true); await wait(T(650)); break; }
+        case 'boss': { if (e.s === 'Effondrement !') fxSheet(null, 'fx-collapse', { center: true, d: 1100 }); app.sfx.boss(); dio.roar(); const t = el(e.u); if (t) { t.classList.remove('roar'); void t.offsetWidth; t.classList.add('roar'); } float(e.u, e.s, 'boss'); shake(true); await wait(T(650)); break; }
         case 'phase2': {
           app.sfx.boss(); dio.fury(); dio.roar(); draw(); banner(`${icon('skull')} ${esc(e.s)}`, 'danger', 1200); shake(true); await wait(T(900));
           const P = PHASE2[e.key];
@@ -570,7 +570,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         case 'swallow': {
           const t = el(e.u), b = el(e.a);
           if (t && b && !reduced) { const rt = t.getBoundingClientRect(), rb = b.getBoundingClientRect(); t.style.setProperty('--dx', `${rb.left - rt.left}px`); t.style.setProperty('--dy', `${rb.top - rt.top}px`); t.classList.add('swallowed'); }
-          app.sfx.death(); fxAt(e.a, 'swallow', { big: true }); float(e.a, 'Engloutie !', 'boss'); shake(true); await wait(T(800)); draw(); break;
+          app.sfx.death(); fxSheet(e.a, 'fx-swallow', { k: 2.8, d: 950 }); float(e.a, 'Engloutie !', 'boss'); shake(true); await wait(T(800)); draw(); break;
         }
         case 'release': app.sfx.enter(); draw(); el(e.u)?.classList.add('enter'); ring(e.u, 'enter'); await wait(T(400)); break;
         case 'duo': {
@@ -584,14 +584,14 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         case 'swap': app.sfx.enter(); draw(); el(e.u)?.classList.add('enter'); float(e.u, 'Entre en jeu', 'info'); await wait(T(340)); break;
         case 'aoe': if (e.side === 'enemy') shake(true); else if (st.units[e.u]?.side === 'ally') { fxSheet(null, 'role-wave', { row: true, d: 720 }); aoeHit = true; setTimeout(() => { aoeHit = false; }, T(900)); await wait(T(260)); } await wait(T(150)); break;
         case 'status':
-          if (e.k === 'poison') { if (/\+|×/.test(e.s)) { app.sfx.poison(); fxAt(e.u, 'venom', { big: !!e.syn }); } }
+          if (e.k === 'poison') { if (/\+|×/.test(e.s)) { app.sfx.poison(); fxSheet(e.u, 'fx-venom', { k: e.syn ? 2.5 : 2.1, d: 850 }); } }
           else if (e.k === 'frost' && /^Gel/.test(e.s) && !/passe/.test(e.s)) { app.sfx.freeze(); fxSheet(e.u, 'role-frost', { k: 2.5, d: 800 }); impactFlash(e.u, false); }
-          else if (e.k === 'guard' && /^(Tous sur elle|Hurlement)/.test(e.s)) { app.sfx.taunt?.(); fxAt(e.u, 'taunt', { big: true }); ring(e.u, 'guard'); }
-          else if (e.k === 'guard') { app.sfx.shield?.(); fxAt(e.u, 'shield'); ring(e.u, 'guard'); }
-          else if (e.k === 'heal' && /^\+\d+ ATQ/.test(e.s)) { app.sfx.boost?.(); fxAt(e.u, 'boost'); }
-          else if (e.k === 'mark') { app.sfx.mark?.(); fxAt(e.u, /Maudite/.test(e.s) ? 'curse' : 'seal'); ring(e.u, 'mark'); }
-          if (/vole en éclats/.test(e.s)) { app.sfx.shatter(); fxAt(e.u, 'iceshatter', { big: true }); }
-          if (e.s === 'Proie désignée') fxAt(e.u, 'prey', { big: true });
+          else if (e.k === 'guard' && /^(Tous sur elle|Hurlement)/.test(e.s)) { app.sfx.taunt?.(); fxSheet(e.u, 'fx-taunt', { k: 2.5, d: 820 }); ring(e.u, 'guard'); }
+          else if (e.k === 'guard') { app.sfx.shield?.(); fxSheet(e.u, 'fx-shield', { k: 2.2, d: 820 }); ring(e.u, 'guard'); }
+          else if (e.k === 'heal' && /^\+\d+ ATQ/.test(e.s)) { app.sfx.boost?.(); fxSheet(e.u, 'fx-boost', { k: 2.2, d: 820 }); }
+          else if (e.k === 'mark') { app.sfx.mark?.(); if (/Maudite/.test(e.s)) fxSheet(e.u, 'fx-curse', { k: 2.4, d: 880 }); else fxAt(e.u, 'seal'); ring(e.u, 'mark'); }
+          if (/vole en éclats/.test(e.s)) { app.sfx.shatter(); fxSheet(e.u, 'fx-iceshatter', { k: 2.5, d: 820 }); }
+          if (e.s === 'Proie désignée') fxSheet(e.u, 'fx-prey', { k: 2.4, d: 820 });
           else if (e.syn) app.sfx.skill();
           if (e.k === 'entrance') ring(e.u, 'enter');
           if (e.trait === 'explosif') { fxSheet(e.u, 'fx-explode', { k: 2.6, d: 760 }); app.sfx.explode?.(); shake(true); banner(`<img class="cb-trico" alt="" src="assets/icons/st-explosif.webp"> Explosion !`, 'danger', 800); }
@@ -713,6 +713,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     $('.dv').appendChild(b);
     await new Promise((res) => { const go = () => { b.remove(); res(); }; b.addEventListener('pointerdown', go, { once: true }); }); // v295 : attend le toucher, plus de fermeture automatique
   }
+  const ULT_FX = { sceau: 'ult-sceau', revive: 'ult-revive', nova: 'ult-nova', smite: 'ult-smite' }; // v354 : une planche Gemini par pouvoir d'équipe (l'Égide mécanique garde « ult-seal » en attendant la sienne)
   async function ultFx() {
     const c = run.ult.card ? cat.get(run.ult.card) : null;
     const fx = document.createElement('div');
@@ -720,7 +721,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     fx.innerHTML = `${c ? `<img alt="" src="${artUrl(c)}">` : `<span class="tb-sceau">${EMBLEM}</span>`}<b>${esc(ult.name)}</b>`;
     $('.dv').appendChild(fx);
     $('.dv').style.setProperty('--uc', ult.color);
-    $('.dv').classList.add('ultflash'); fxSheet(null, 'ult-seal', { center: true, d: 1100 }); setTimeout(() => $('.dv')?.classList.remove('ultflash'), 900);
+    $('.dv').classList.add('ultflash'); fxSheet(null, ULT_FX[st.ult] || 'ult-seal', { center: true, d: 1300, cls: 'ultfx' }); setTimeout(() => $('.dv')?.classList.remove('ultflash'), 900);
     app.sfx.ult();
     await wait(reduced ? 300 : T(1200));
     fx.classList.add('out'); setTimeout(() => fx.remove(), 400);
