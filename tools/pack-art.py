@@ -21,6 +21,10 @@ h = bot - top + 1
 w = int(round(h * 464 / 800))  # cadre 29:50, centré sur le sachet
 cx = (left + right) / 2
 box = (int(round(cx - w / 2)), int(top), int(round(cx + w / 2)), int(bot + 1))
+if right - left + 1 >= im.width - 4 and w > im.width:
+    # sachet plein cadre, plus étroit que 29:50 : on rogne un peu le haut et le bas au lieu d'ajouter des marges noires
+    w = im.width; h2 = int(round(w * 800 / 464)); cy = (top + bot) / 2
+    box = (0, int(round(cy - h2 / 2)), w, int(round(cy - h2 / 2)) + h2)
 canvas = Image.new('RGB', (box[2] - box[0], box[3] - box[1]), (0, 0, 0))
 crop = im.crop((max(0, box[0]), box[1], min(im.width, box[2]), box[3]))
 canvas.paste(crop, (max(0, -box[0]), 0))
@@ -31,4 +35,4 @@ name = {'event': 'evenement', 'shadow': 'ombres'}.get(key, key)
 dst = os.path.join(ROOT, 'store/logo', f'booster-{name}-source.jpg')
 if os.path.abspath(src) != os.path.abspath(dst):
     Image.open(src).convert('RGB').save(dst, quality=92)
-print(f'sachet détecté : {right - left + 1} × {h} px, marges latérales {(w - (right - left + 1)) / 2:.0f} px → assets/packs/{key}.webp (464 × 800), source gardée dans store/logo/')
+print(f'sachet détecté : {right - left + 1} × {bot - top + 1} px, cadre {box} → assets/packs/{key}.webp (464 × 800), source gardée dans store/logo/')
