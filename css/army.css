@@ -3060,3 +3060,12 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 .dv-float.dmg.crit { font-size: 2.2rem !important; color: #FFE7A0 !important; -webkit-text-stroke: 1.5px #7a4a00; text-shadow: 0 0 20px rgba(255, 190, 60, 1), 0 3px 0 #4a2a00, 0 6px 10px rgba(0, 0, 0, .8) !important; }
 @keyframes dvDmgSlam { 0% { opacity: 0; transform: translate(-50%, 0) scale(2.6); } 14% { opacity: 1; transform: translate(-50%, 0) scale(.9); } 24% { transform: translate(-50%, -4px) scale(1.08); } 34% { transform: translate(-50%, -6px) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -40px) scale(.95); } }
 @media (max-width: 360px) { .dv-float.dmg { font-size: 1.9rem !important; } .dv-float.dmg.big { font-size: 2.4rem !important; } }
+/* v347 : Sceaux — cases (« supports ») qui dépassaient du cadre sur iPhone : une piste de grille « 1fr » peut grandir
+   jusqu'à la taille minimale de son contenu (Safari) ; minmax(0, 1fr) l'en empêche. Les cases restent exactement dans
+   le cadre peint, et le plateau garde les proportions de son image. */
+.sc-plate { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); overflow: visible; }
+.sc-cell { width: 100%; height: 100%; max-width: 100%; max-height: 100%; box-sizing: border-box; overflow: visible; }
+.sc-board { max-width: 100%; max-height: 100%; }
+/* v347 : plateau repeint sans l'anneau ovale (store/sceaux/plateau-avant-v347.webp garde l'ancien) ; les cases s'écartent
+   un peu des médaillons des coins */
+.sc-plate { top: 9.6%; bottom: 9.7%; left: 10.4%; right: 10.9%; }
