@@ -135,9 +135,9 @@ export const TRAITS = {
   egide:    { name: 'Lien d’égide', desc: 'Il subit 35 % de dégâts en moins tant qu’un autre ennemi est au combat.' },
   enrage:   { name: 'Enragé', desc: 'Sous la moitié de ses PV, il entre en rage : +2 en attaque.' },
   // v331 : traits des profondeurs, seulement au-delà de l'étage 30
-  vampire:  { name: 'Vampire', desc: 'Il se soigne de la moitié des dégâts qu’il inflige.', deep: true, icon: 'prey' },
-  epineux:  { name: 'Épineux', desc: 'Chaque coup qui le blesse renvoie 2 dégâts à ta créature qui frappe.', deep: true, icon: 'breach' },
-  carapace: { name: 'Carapace', desc: 'Un bouclier bloque le premier coup qu’il reçoit, et revient un tour sur deux.', deep: true, icon: 'shield' },
+  vampire:  { name: 'Vampire', desc: 'Il se soigne de la moitié des dégâts qu’il inflige.', deep: true },
+  epineux:  { name: 'Épineux', desc: 'Chaque coup qui le blesse renvoie 2 dégâts à ta créature qui frappe.', deep: true },
+  carapace: { name: 'Carapace', desc: 'Un bouclier bloque le premier coup qu’il reçoit, et revient un tour sur deux.', deep: true },
 };
 export const DEEP_FROM = 31;
 export const DEEP_MILESTONE = 40; // v331 : premier passage aux étages 40, 50, 60… récompensé

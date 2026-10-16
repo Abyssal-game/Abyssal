@@ -2959,3 +2959,8 @@ body.gated .sheet-wrap { z-index: 78; }
 html.standalone .opening .op-bottom, html.standalone .opening .op-actions-fixed { padding-bottom: calc(14px + max(var(--safe-b), var(--vh-gap, 0px), 56px)) !important; }
 html.standalone .opening.is-summary .op-stage { padding-bottom: calc(84px + max(var(--safe-b), var(--vh-gap, 0px), 56px)) !important; }
 html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - var(--safe-t) - max(var(--safe-b), var(--vh-gap, 0px), 56px) - 330px) * .714)) !important; }
+/* v337 : image dédiée de la porte Gouffre (arche runique et puits vers l'œil) */
+.dc-door.r-gouffre.has-art { min-height: 320px; }
+.dc-door.r-gouffre.has-art .dc-door-ic { display: none; }
+.dc-door.r-gouffre.has-art { justify-content: flex-start; padding-top: 16px; }
+.dc-door.r-gouffre.has-art .dc-door-art { background: linear-gradient(0deg, rgba(8, 9, 13, 0) 50%, rgba(8, 9, 13, .82) 72%, rgba(8, 9, 13, .95)), var(--art) center 92% / cover no-repeat; }

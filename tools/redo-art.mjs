@@ -26,5 +26,8 @@ if (id && process.argv.includes('--write')) {
   fs.writeFileSync(path.join(ROOT, `data/cards/${c.faction}.json`), JSON.stringify(factions[c.faction], null, 1) + '\n');
   console.log(`${id} : description mise à jour.`);
 } else {
-  for (const [k, r] of Object.entries(redo)) { const c = find(k); console.log(`${k} ${c.name} (${c.rarity}) — ${r.why}\n${promptOf(c, r.visual)}\n`); }
+  // v337 : une carte déjà refaite (description enregistrée) n'est plus proposée
+  const todo = Object.entries(redo).filter(([k, r]) => !find(k).artPrompt.includes(r.visual));
+  if (!todo.length) console.log('Aucune illustration à refaire.');
+  for (const [k, r] of todo) { const c = find(k); console.log(`${k} ${c.name} (${c.rarity}) — ${r.why}\n${promptOf(c, r.visual)}\n`); }
 }
