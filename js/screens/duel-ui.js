@@ -393,7 +393,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     return true;
   };
   // Planche peinte de 8 images (assets/fx/<nom>.webp) jouée sur une carte, au centre, ou sur toute la rangée ennemie
-  const ROLE_FX = { protecteur: 'role-shock', degats: 'role-claw', poison: 'role-venom', controle: 'role-frost', soin: 'role-shock', soutien: 'role-claw', zone: 'role-claw' };
+  const ROLE_FX = { protecteur: 'role-shock', degats: 'strike', poison: 'role-venom', controle: 'role-frost', soin: 'role-shock', soutien: 'strike', zone: 'strike' }; // v343 : « strike » (lame d'or) remplace la griffure
   const fxSheet = (uid, name, { k = 1.6, d = 600, center = false, row = false } = {}) => {
     if (reduced) return;
     const box = $('.dv'); if (!box) return;
@@ -495,8 +495,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           if (t && !reduced && !aoeHit) { const k = document.createElement('span'); k.className = `dv-cut ${st.units[e.u]?.side === 'ally' ? 'foe' : ''} ${heavy ? 'big' : ''}`; k.style.setProperty('--ca', `${-38 + Math.round(Math.random() * 30)}deg`); t.appendChild(k); setTimeout(() => k.remove(), 520); }
           await hitstop(crit ? 140 : heavy ? 80 : 45);
           const sU = e.src && st.units[e.src];
-          if (sU?.side === 'ally' && ROLE_FX[sU.role] && !aoeHit) { fxSheet(e.u, ROLE_FX[sU.role], { k: heavy ? 2 : 1.7 }); if (crit) fxAt(e.u, 'crit', { big: true }); }
-          else if (!aoeHit) fxAt(e.u, crit ? 'crit' : heavy ? 'impact' : 'slash', { big: heavy });
+          // v343 : planches peintes (Gemini) — lame d'or pour tes coups, griffes corrompues pour les ennemis, croix runique pour les critiques
+          if (sU?.side === 'ally' && ROLE_FX[sU.role] && !aoeHit) { if (crit) fxSheet(e.u, 'crit-strike', { k: 2.5, d: 820 }); else fxSheet(e.u, ROLE_FX[sU.role], { k: heavy ? 2.2 : 1.9, d: 640 }); }
+          else if (!aoeHit) { if (crit) fxSheet(e.u, 'crit-strike', { k: 2.5, d: 820 }); else fxSheet(e.u, 'foe-strike', { k: heavy ? 2.2 : 1.9, d: 640 }); }
           if (crit) dio.flare();
           float(e.u, crit ? `CRITIQUE −${e.d}` : `-${e.d}`, crit ? 'dmg big crit' : heavy ? 'dmg big' : 'dmg'); (heavy ? app.sfx.smash : app.sfx.slash)(); sparks(e.u, crit ? 'gold' : ''); if (heavy || e.hp <= 0) shake(crit || e.d >= 12);
           await wait(T(heavy ? 300 : 220));
