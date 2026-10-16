@@ -62,7 +62,7 @@ const kick = () => {
 if (typeof document !== 'undefined') ['touchend', 'click', 'keydown'].forEach((t) => document.addEventListener(t, kick, { capture: true, passive: true }));
 // v370 : état du son, affiché dans Réglages → À propos (diagnostic sur téléphone)
 export function audioInfo() {
-  return { state: ctx ? ctx.state : 'pas encore créé', samples: Object.keys(samples).length, expected: sampleList ? sampleList.length : null, session: navigator.audioSession ? navigator.audioSession.type : 'sans objet', enabled, volume };
+  return { state: ctx ? ctx.state : 'pas encore créé', samples: Object.keys(samples).length, expected: sampleList ? sampleList.size : null, diag: audioDiag, session: navigator.audioSession ? navigator.audioSession.type : 'sans objet', enabled, volume };
 }
 
 // Vibrations. Android : navigator.vibrate. iPhone (iOS 18+) : Safari n'a pas de vibration pour le web,
@@ -355,12 +355,25 @@ export const sfx = {
 // synthétisé ; sans fichier (ou sans réseau), le son synthétisé reste joué. Clés de l'ouverture de carte :
 // reveal-c, reveal-pc, reveal-r, reveal-hr, reveal-m, reveal-s (une par rareté).
 const samples = {}; let sampleList = null, sampleLoad = null;
+// v371 : lecture d'un fichier local robuste (application iPhone : fetch, sinon XMLHttpRequest) et diagnostic
+export const audioDiag = { got: 0, failGet: 0, failDecode: 0, err: '' };
+const viaXhr = (url) => new Promise((ok, ko) => { const x = new XMLHttpRequest(); x.open('GET', url); x.responseType = 'arraybuffer'; x.onload = () => (x.response && x.response.byteLength ? ok(x.response) : ko(new Error(`XHR ${x.status}`))); x.onerror = () => ko(new Error('XHR erreur')); x.send(); });
+export async function getBytes(url) {
+  try { const r = await fetch(url); if (r.ok) { const b = await r.arrayBuffer(); if (b.byteLength) return b; } throw new Error(`fetch ${r.status}`); }
+  catch (e) { try { return await viaXhr(url); } catch (e2) { audioDiag.failGet++; audioDiag.err = `${url.split('/').pop()} : ${e.message} / ${e2.message}`; throw e2; } }
+}
+export function decodeBytes(b) {
+  return new Promise((ok, ko) => {
+    let p;
+    try { p = ctx.decodeAudioData(b, ok, ko); } catch (e) { ko(e); return; }
+    if (p && p.then) p.then(ok, ko);
+  }).then((buf) => { audioDiag.got++; return buf; }, (e) => { audioDiag.failDecode++; audioDiag.err = `décodage : ${e?.message || e}`; throw e; });
+}
 function loadSamples() {
   if (sampleLoad || !ctx) return;
-  sampleLoad = fetch('assets/sfx/manifest.json').then((r) => (r.ok ? r.json() : [])).catch(() => []).then((list) => {
+  sampleLoad = getBytes('assets/sfx/manifest.json').then((b) => JSON.parse(new TextDecoder().decode(b))).catch((e) => { audioDiag.err = `liste : ${e.message}`; return []; }).then((list) => {
     sampleList = new Set(list);
-    list.forEach((k) => fetch(`assets/sfx/${k}.mp3`).then((r) => (r.ok ? r.arrayBuffer() : null))
-      .then((b) => b && new Promise((ok, ko) => ctx.decodeAudioData(b, ok, ko))).then((buf) => { if (buf) samples[k] = buf; }).catch(() => {}));
+    list.forEach((k) => getBytes(`assets/sfx/${k}.mp3`).then(decodeBytes).then((buf) => { if (buf) samples[k] = buf; }).catch(() => {}));
   });
 }
 // Un son par rareté (reveal-c, reveal-pc, reveal-r, reveal-hr, reveal-m, reveal-s) ;

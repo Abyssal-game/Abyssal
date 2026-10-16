@@ -81,7 +81,7 @@ export default function settings(app, root) {
         <h2>À propos</h2>
         <p class="small">ABYSSAL — Le Bestiaire interdit.</p>
         <p class="small muted">Version ${esc(app.version)} · ${app.catalog.cards.length} cartes</p>
-        <p class="small muted set-audio">${(() => { const a = audioInfo(); return `Son : ${esc(a.state)} · ${a.samples}${a.expected ? `/${a.expected}` : ''} sons chargés · session ${esc(String(a.session))}${a.enabled ? '' : ' · coupé dans les réglages'}`; })()}</p>
+        <p class="small muted set-audio">${(() => { const a = audioInfo(); return `Son : ${esc(a.state)} · ${a.samples}${a.expected != null ? `/${a.expected}` : ''} sons chargés · session ${esc(String(a.session))}${a.enabled ? '' : ' · coupé dans les réglages'}${a.diag.failGet || a.diag.failDecode || a.diag.err ? ` · échecs lecture ${a.diag.failGet}, décodage ${a.diag.failDecode}${a.diag.err ? ` · ${esc(a.diag.err)}` : ''}` : ''}`; })()}</p>
         <button class="btn ghost small" data-act="sndtest">${icon('dodge')} Tester le son</button>
         <a class="btn ghost small" href="confidentialite.html" target="_blank" rel="noopener">${icon('book')} Politique de confidentialité</a>
       </section>`;

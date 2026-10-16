@@ -2,7 +2,7 @@
 // Chaque lieu a son ambiance (nappe grave, accords lents, cloches, chœur, vent, gouttes, pulsation),
 // tirée au hasard dans une gamme : elle ne se répète jamais exactement.
 // Passage d'une ambiance à l'autre en fondu. Volume séparé des effets sonores.
-import { audioCtx, hooks } from './sound.js';
+import { audioCtx, hooks, getBytes, decodeBytes } from './sound.js';
 
 let ctx = null, out = null, verb = null, duckG = null, on = true, vol = 0.5;
 let cur = null, want = 'antre', preview = null, timer = null, brown = null;
@@ -152,12 +152,12 @@ const TRACK_GAIN = { boss: 1.26, boutique: 1.19, descente: 1.19 };
 // Seule la liste est lue au démarrage ; chaque musique est téléchargée la première fois que son lieu est visité
 function loadTracks() {
   if (trackLoad) return;
-  trackLoad = fetch('assets/music/manifest.json').then((r) => (r.ok ? r.json() : [])).catch(() => []).then((list) => { trackList = new Set(list); if (cur?.pending) needTrack(cur.key); }); // v308 : la musique du premier écran n'attendait pas la liste
+  trackLoad = getBytes('assets/music/manifest.json').then((b) => JSON.parse(new TextDecoder().decode(b))).catch(() => []).then((list) => { trackList = new Set(list); if (cur?.pending) needTrack(cur.key); }); // v308 : la musique du premier écran n'attendait pas la liste
 }
 function needTrack(key) {
   if (!trackList?.has(key) || trackGet[key]) return;
-  trackGet[key] = fetch(`assets/music/${key}.mp3`).then((r) => (r.ok ? r.arrayBuffer() : null))
-    .then((b) => b && new Promise((ok, ko) => ctx.decodeAudioData(b, ok, ko)))
+  trackGet[key] = getBytes(`assets/music/${key}.mp3`) /* v371 : lecture robuste (application iPhone) */
+    .then((b) => b && decodeBytes(b))
     .then((buf) => { if (!buf) return; tracks[key] = buf; if (cur && cur.key === key && cur.pending) { stopTheme(cur); cur = startTheme(key); } }) // le silence d'attente cède la place au fichier
     .catch(() => { delete trackGet[key]; }); // nouvel essai à la prochaine visite
 }
