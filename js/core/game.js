@@ -47,6 +47,14 @@ export function levelFromXp(xp) {
 const REMOVED_CARDS = { 'ABY-050': 'HR', 'CEL-046': 'HR' };
 
 export const NIGHTMARE_AT = 20; // record à atteindre pour ouvrir le mode Cauchemar
+// v367 : trois paliers de Cauchemar. Chacun s'ouvre en atteignant l'étage NIGHT_TIER_OPEN au palier précédent.
+// hp / atk : force des ennemis ; chest : rangs de coffre en plus ; shards : multiplicateur d'éclats
+export const NIGHT_TIERS = [null,
+  { name: 'Cauchemar', hp: 1.35, atk: 1.25, chest: 1, shards: 1.5 },
+  { name: 'Cauchemar II', hp: 1.6, atk: 1.4, chest: 1, shards: 2 },
+  { name: 'Cauchemar III', hp: 1.9, atk: 1.6, chest: 2, shards: 2.5 }];
+export const NIGHT_TIER_OPEN = 10;
+export const nightTier = (run) => (run?.nightmare ? NIGHT_TIERS[run.nightTier || 1] : null);
 export const AWAKEN_AT = 30;   // gardiens éveillés à partir de cet étage
 
 // v348 : nombre de jours entre deux dates « AAAA-MM-JJ » (heure locale)
@@ -592,10 +600,11 @@ export class Game {
   rule(day = this.descent().run?.day || this.descent().day) { return dailyRule(day, Object.fromEntries(Object.entries(this.catalog.faction).map(([k, f]) => [k, f.name]))); }
   // v348 : force réelle des premiers ennemis en Cauchemar (+35 % PV, +25 % ATQ, ≈ ×1,3), exprimée en étage « normal »
   // équivalent, plancher de difficulté compris : une équipe au niveau 10 y affronte dès l'étage 1 l'équivalent de l'étage 25 environ
-  nightmareEquiv(start = 1) {
+  nightmareEquiv(start = 1, tier = 1) {
     const team = this.team(); if (!team.length) return start;
     const eff = Math.max(start, floorFloor(team.reduce((a, id) => a + this.cardLevel(id), 0) / team.length));
-    const want = enemyScale(eff) * Math.sqrt(1.35 * 1.25);
+    const nt = NIGHT_TIERS[tier] || NIGHT_TIERS[1];
+    const want = enemyScale(eff) * Math.sqrt(nt.hp * nt.atk);
     let f = eff; while (enemyScale(f) < want && f < 200) f++;
     return f;
   }
@@ -618,6 +627,10 @@ export class Game {
 
   // Mode Cauchemar : débloqué au record de l'étage 20
   nightmareUnlocked() { return (this.descent().best || 0) >= NIGHTMARE_AT; }
+  // v367 : record par palier de Cauchemar (l'ancien record unique compte pour le palier I)
+  nightBest(t) { const d = this.descent(); return Math.max(d.nightBest?.[t] || 0, t === 1 ? d.bestNightmare || 0 : 0); }
+  nightTierOpen(t) { return t <= 1 ? this.nightmareUnlocked() : this.nightmareUnlocked() && this.nightBest(t - 1) >= NIGHT_TIER_OPEN; }
+  nightTiersOpen() { return [1, 2, 3].filter((t) => this.nightTierOpen(t)); }
   // v331 : départs avancés. Chaque gardien déjà vaincu (record ≥ 5, 10, 15…) ouvre un départ juste après lui (6, 11, 16…).
   // Le coffre y est d'un rang plus bas, et il faut franchir au moins CHECKPOINT_MIN étages pour en rapporter un.
   startFloors() {
@@ -666,7 +679,9 @@ export class Game {
     return { room: 'gouffre', from, to: run.floor };
   }
   startRun({ cursed = false, nightmare = false, start = 1 } = {}) {
-    if (nightmare && !this.nightmareUnlocked()) throw new Error(`Le mode Cauchemar s’ouvre quand tu as atteint l’étage ${NIGHTMARE_AT}.`);
+    const tier = nightmare === true ? 1 : Math.max(0, Math.min(3, Number(nightmare) || 0));
+    if (tier && !this.nightmareUnlocked()) throw new Error(`Le mode Cauchemar s’ouvre quand tu as atteint l’étage ${NIGHTMARE_AT}.`);
+    if (tier > 1 && !this.nightTierOpen(tier)) throw new Error(`${NIGHT_TIERS[tier].name} s’ouvre quand tu as atteint l’étage ${NIGHT_TIER_OPEN} en ${NIGHT_TIERS[tier - 1].name}.`);
     if (!this.startFloors().includes(start)) throw new Error('Ce départ n’est pas encore ouvert : bats d’abord le gardien qui le précède.');
     const d = this.descent();
     if (d.run) throw new Error('Une expédition est déjà en cours.');
@@ -677,7 +692,7 @@ export class Game {
     d.runs = (d.runs || 0) + 1;
     const ult = this.ultimate(team);
     d.run = {
-      v: 3, day: d.day, floor: start, cleared: start - 1, start, phase: 'doors', cursed: cursed && !free, free, nightmare: !!nightmare, blessings: [], altar: null,
+      v: 3, day: d.day, floor: start, cleared: start - 1, start, phase: 'doors', cursed: cursed && !free, free, nightmare: !!tier, nightTier: tier || undefined, blessings: [], altar: null,
       gauge: this.rule(d.day).key === 'lune' ? FERVOR_MAX - 2 : this.rule(d.day).key === 'reserve' ? 0 : FERVOR_START, ult: { key: ult.key, power: ult.power, card: ult.card },
       team: team.map((id) => { const u = duelUnit(this.catalog.get(id), { level: this.cardLevel(id), form: this.formOf(id) }); return { id, hp: u.maxHp, maxHp: u.maxHp, fallen: false, form: this.formOf(id) }; }),
       shards: 0, chests: [], kills: {}, bestBefore: d.best || 0, minFloor: floorFloor(team.reduce((a, id) => a + this.cardLevel(id), 0) / team.length),
@@ -886,7 +901,7 @@ export class Game {
   // Coffre rapporté si l'on remonte maintenant
   chestNow(run = this.s.descent.run) {
     if (!run || run.free) return null;
-    return this.runChest(run, (run.cursed ? 1 : 0) + (run.nightmare ? 1 : 0));
+    return this.runChest(run, (run.cursed ? 1 : 0) + (nightTier(run)?.chest || 0));
   }
   chooseDoor(room) {
     const run = this.s.descent.run;
@@ -925,7 +940,7 @@ export class Game {
         const f = this.catalog.get(e.id)?.faction;
         if (rule.key === 'furie' && f === rule.faction) e.atk = Math.round(e.atk * 1.25 + 0.4);
         if (rule.key === 'sommeil' && f === rule.faction) { e.maxHp = Math.max(1, Math.round(e.maxHp * 0.75)); e.hp = e.maxHp; }
-        if (run.nightmare) { e.maxHp = Math.round(e.maxHp * 1.35); e.hp = e.maxHp; e.atk = Math.round(e.atk * 1.25 + 0.4); }
+        const nt = nightTier(run); if (nt) { e.maxHp = Math.round(e.maxHp * nt.hp); e.hp = e.maxHp; e.atk = Math.round(e.atk * nt.atk + 0.4); }
         if (run.omen === 'avare') e.atk = Math.round(e.atk * 1.1 + 0.4);
         // Gardien éveillé (Cauchemar, ou à partir de l'étage 30) : sa phase 2 commence dès le premier tour
         if (e.boss && (run.nightmare || run.floor >= AWAKEN_AT)) e.awakened = true;
@@ -1000,7 +1015,7 @@ export class Game {
   // v308 : montant réel d'un gain d'éclats dans la Descente (bonus compris), pour l'annoncer avant de choisir
   shardsPreview(n) {
     const run = this.s.descent.run; if (!run) return 0;
-    const k = DESCENT_SHARDS * (run.blessings.includes('greed') ? 1.3 : 1) * (this.rule(run.day).key === 'ruee' ? 1.5 : this.rule(run.day).key === 'nuee' ? 1.25 : 1) * (run.omen === 'avare' ? 1.5 : 1) * (run.free ? 0.5 : 1) * (run.nightmare ? 1.5 : 1);
+    const k = DESCENT_SHARDS * (run.blessings.includes('greed') ? 1.3 : 1) * (this.rule(run.day).key === 'ruee' ? 1.5 : this.rule(run.day).key === 'nuee' ? 1.25 : 1) * (run.omen === 'avare' ? 1.5 : 1) * (run.free ? 0.5 : 1) * (nightTier(run)?.shards || 1);
     return Math.round(n * k);
   }
   treasurePreview() { const run = this.s.descent.run; return run ? this.shardsPreview((15 + Math.min(run.floor, SHARD_FLOOR_CAP) * 6) * (this.rule(run.day).key === 'disette' ? 2 : 1)) : 0; }
@@ -1203,7 +1218,7 @@ export class Game {
   abandonPreview() {
     const run = this.s.descent.run;
     if (!run) return null;
-    const chest = run.free || run.cursed ? null : this.runChest(run, (run.nightmare ? 1 : 0) - 1);
+    const chest = run.free || run.cursed ? null : this.runChest(run, (nightTier(run)?.chest || 0) - 1);
     return { shards: run.cursed ? 0 : Math.floor(run.shards / 2), chest, kept: run.cursed ? 0 : run.chests.length, cursed: !!run.cursed, free: !!run.free };
   }
   abandonRun() {
@@ -1221,7 +1236,7 @@ export class Game {
     if (!run) throw new Error('Aucune expédition en cours.');
     let chest = null;
     if (!run.free) {
-      chest = this.runChest(run, (run.cursed ? 1 : 0) + (run.nightmare ? 1 : 0) - (wiped ? 1 : 0));
+      chest = this.runChest(run, (run.cursed ? 1 : 0) + (nightTier(run)?.chest || 0) - (wiped ? 1 : 0));
       if (wiped && run.cursed) chest = null;
     }
     let shards = run.shards;
@@ -1229,7 +1244,7 @@ export class Game {
     const chests = [...(wiped && run.cursed ? [] : run.chests), ...(chest ? [chest] : [])];
     chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });
     this.s.shards += shards;
-    const summary = { wiped, floor: run.cleared, day: run.day, chests, shards, kills: run.kills, free: run.free, cursed: run.cursed, nightmare: !!run.nightmare, start: run.start || 1 };
+    const summary = { wiped, floor: run.cleared, day: run.day, chests, shards, kills: run.kills, free: run.free, cursed: run.cursed, nightmare: !!run.nightmare, nightTier: run.nightmare ? run.nightTier || 1 : 0, start: run.start || 1 };
     if (!run.free && run.cleared > 0 && run.bestBefore !== undefined && run.cleared > run.bestBefore) summary.record = true;
     // bilan : la créature qui a achevé le plus d'ennemis, le prochain palier de coffre, les éclats vers un booster
     if (run.feats) summary.feats = { ...run.feats };
@@ -1238,7 +1253,7 @@ export class Game {
     const nf = CHEST_FLOORS.find((f) => f > run.cleared);
     if (nf && !run.free) summary.nextChest = { floor: nf, chest: chestForDepth(nf) };
     summary.shardsNow = this.s.shards;
-    if (run.nightmare && run.cleared > (d.bestNightmare || 0)) { d.bestNightmare = run.cleared; summary.nightmareRecord = true; }
+    if (run.nightmare) { const t = run.nightTier || 1; if (run.cleared > (d.bestNightmare || 0)) d.bestNightmare = run.cleared; if (run.cleared > this.nightBest(t)) { (d.nightBest ||= {})[t] = run.cleared; summary.nightmareRecord = true; } }
     // v331 : bilan personnel des modes à risque (affiché au vestibule : la famille roguelite perdait deux fois plus sans le voir)
     for (const [k, on] of [['cursed', run.cursed], ['night', run.nightmare]]) if (on) { const r = ((d.risk ||= {})[k] ||= { n: 0, lost: 0 }); r.n++; if (wiped) r.lost++; }
     this.emit('descentEnd', summary);

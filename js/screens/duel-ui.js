@@ -180,9 +180,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const dead = u.hp <= 0, enemy = u.side === 'enemy';
     const ready = !enemy && st.turn === 'ally' && actionsFor(st, u.uid).some((a) => a.ok && a.key !== 'swap');
     const tgt = tgtInfo[u.uid];
-    return `<button class="dv-c ${u.side} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.phase2 ? 'p2' : ''} ${u.defend ? 'def' : ''} ${!enemy && !dead && (u.frozen || u.stunned) ? 'unav' : ''} ${u.broken ? 'broken' : ''} ${u.cracked ? 'fele' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" data-rar="${u.rarity}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(c.name)}, ${Math.max(0, u.hp)} PV">
+    return `<button class="dv-c ${u.side} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${!dead && u.hp <= u.maxHp * 0.3 ? 'hp3' : !dead && u.hp <= u.maxHp * 0.6 ? 'hp2' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.phase2 ? 'p2' : ''} ${u.defend ? 'def' : ''} ${!enemy && !dead && (u.frozen || u.stunned) ? 'unav' : ''} ${u.broken ? 'broken' : ''} ${u.cracked ? 'fele' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" data-rar="${u.rarity}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(c.name)}, ${Math.max(0, u.hp)} PV">
       <span class="dv-base" aria-hidden="true"></span>
-      <span class="dv-art"><img alt="" src="${artUrl(c)}"></span>
+      <span class="dv-art"><img alt="" src="${artUrl(c)}"><span class="dv-crk" aria-hidden="true"></span></span>
       <span class="dv-kw ${enemy && u.fam ? 'fam' : ''}" title="${esc(enemy && u.fam ? AI_FAMILIES[u.fam].desc : kit.name)}">${roleIcon(kit.kw)}<em>${esc(enemy && u.fam ? AI_FAMILIES[u.fam].name : kit.name)}</em></span>
       ${u.boss ? `<span class="dv-boss"><img alt="" src="assets/icons/crest-boss.webp">${u.phase2 ? 'Furie' : 'Gardien'}</span>` : u.elite ? '<span class="dv-boss elite"><img alt="" src="assets/icons/crest-elite.webp">Élite</span>' : ''}
       <span class="dv-nm ${u.named || (u.boss && st.bossKey) ? 'named' : ''}">${esc(u.boss && st.bossKey && BOSSES[st.bossKey] ? BOSSES[st.bossKey].name : u.named ? u.title : c.name)}</span>
@@ -476,6 +476,15 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   };
   // v357 : parade — l'attaquant est repoussé en arrière, comme s'il avait encaissé le contre
   const recoil = (uid) => { if (reduced || !uid) return; const a = el(uid); if (!a) return; a.classList.remove('recoil'); void a.offsetWidth; a.classList.add('recoil'); setTimeout(() => a.classList.remove('recoil'), 520); };
+  // v367 : chaque faction meurt à sa façon (braises, bulles, lumière, feuilles, âme, éclats de pierre, étincelles)
+  const deathFx = (uid) => {
+    if (reduced) return; const u = st.units[uid], t = el(uid), box = $('.dv'); if (!u || !t || !box) return;
+    const f = cat.get(u.id)?.faction || 'infernal', b = box.getBoundingClientRect(), r = t.getBoundingClientRect();
+    const n = document.createElement('span'); n.className = `dv-soul f-${f}`;
+    n.style.cssText = `left:${r.left - b.left + r.width / 2}px;top:${r.top - b.top + r.height / 2}px;width:${r.width}px;height:${r.height}px`;
+    n.innerHTML = Array.from({ length: 16 }, () => `<i style="--x:${(Math.random() * 100 - 50).toFixed(0)}%;--y:${(Math.random() * 60 - 20).toFixed(0)}%;--dx:${(Math.random() * 80 - 40).toFixed(0)}px;--dl:${(Math.random() * 0.35).toFixed(2)}s;--sz:${(4 + Math.random() * 7).toFixed(1)}px;--rt:${Math.round(Math.random() * 360)}deg"></i>`).join('');
+    box.appendChild(n); setTimeout(() => n.remove(), 1500);
+  };
   const ring = (uid, cls) => { if (reduced) return; const t = el(uid); if (!t) return; const r = document.createElement('span'); r.className = `cb-ring ${cls}`; t.appendChild(r); setTimeout(() => r.remove(), 750); };
   const float = (uid, txt, cls) => { const t = el(uid); if (!t) return; const f = document.createElement('span'); f.className = `dv-float ${cls}`; f.textContent = txt; t.appendChild(f); setTimeout(() => f.remove(), 900); };
   const banner = (html, cls = '', ms = 900) => {
@@ -670,13 +679,14 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
             const d = $('.dv'); if (!reduced) d?.classList.add('slowmo', 'bossfall');
             dio.fallen();
             app.sfx.boss(); await hitstop(220); app.sfx.death();
-            fxAt(e.u, 'death', { big: true }); sparks(e.u, 'big'); el(e.u)?.classList.add('dying', 'ashes'); shake(true);
+            fxAt(e.u, 'death', { big: true }); sparks(e.u, 'big'); deathFx(e.u); el(e.u)?.classList.add('dying', 'ashes'); shake(true);
             banner(`${esc(cat.get(u.id).name)} est vaincu`, 'finisher', 1300);
             await wait(T(1100)); d?.classList.remove('slowmo', 'bossfall'); draw(); break;
           }
           // coup fatal : le dernier ennemi tombe sous un coup allié → gros plan, une fois par combat
           if (u?.side === 'enemy' && st.over === 'won' && lastAtk && !fatalDone) { fatalDone = true; await closeup(lastAtk, e.u, 'Coup fatal', { crit: true, sub: '' }); }
           // ennemi K.O. : fissures et flash, la carte vole en éclats, les braises montent (planches Gemini, v256)
+          deathFx(e.u);
           if (u?.side === 'enemy' && await shatterFx(e.u)) { draw(); break; }
           // la carte blanchit, se fissure, puis part en cendres (braises qui montent)
           app.sfx.death(); fxAt(e.u, 'death', { big: true }); sparks(e.u, 'ember'); el(e.u)?.classList.add('dying', 'cracking'); await wait(T(640)); draw(); break;

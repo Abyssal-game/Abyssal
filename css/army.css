@@ -1636,7 +1636,7 @@ i.cmb { font-style: normal; color: #FFC266; font-weight: 800; }
 @keyframes cbRing { 0% { transform: translate(-50%, -50%) scale(.3); opacity: 0; } 25% { opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1.35); opacity: 0; } }
 /* Brisure : la scène se resserre sur l'ennemi, fissures lumineuses puis rupture */
 .dv.focus .dv-row .dv-c:not(.cracking) { filter: brightness(.45) saturate(.6); transition: filter .15s; }
-.dv-c.cracking, .dv-c.cracked { --crk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'%3E%3Cg fill='none' stroke='%23fff' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M50 70 L38 48 L42 30 L30 8'/%3E%3Cpath d='M50 70 L66 52 L62 34 L78 14'/%3E%3Cpath d='M50 70 L30 82 L18 104'/%3E%3Cpath d='M50 70 L64 92 L60 116 L72 136'/%3E%3Cpath d='M50 70 L80 72 L96 86'/%3E%3Cpath d='M50 70 L22 64 L4 70'/%3E%3C/g%3E%3C/svg%3E"); }
+.dv-c.cracking, .dv-c.cracked { --crk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'%3E%3Cg fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M50 70 L38 48 L42 30 L30 8'/%3E%3Cpath d='M50 70 L66 52 L62 34 L78 14'/%3E%3Cpath d='M50 70 L30 82 L18 104'/%3E%3Cpath d='M50 70 L64 92 L60 116 L72 136'/%3E%3Cpath d='M50 70 L80 72 L96 86'/%3E%3Cpath d='M50 70 L22 64 L4 70'/%3E%3C/g%3E%3C/svg%3E"); }
 .dv-c.cracking::after, .dv-c.cracked::after { content: ''; position: absolute; inset: 0; z-index: 6; pointer-events: none; background: var(--crk) center / 100% 100% no-repeat; filter: drop-shadow(0 0 4px #FFE6A8) drop-shadow(0 0 10px #FFB86B); animation: cbCrack .5s ease-out both; }
 .dv-c.cracked::after { animation: cbCrackFade 1.6s ease-out .2s both; }
 @keyframes cbCrack { from { opacity: 0; clip-path: circle(0% at 50% 50%); } to { opacity: 1; clip-path: circle(75% at 50% 50%); } }
@@ -2473,7 +2473,7 @@ body.has-subnav #subnav .sn-tab { background: #16121E; }
 @media (max-width: 360px) { .dv .cb-upips i { width: 8px; height: 8px; border-radius: 2px; } .cb-upips { gap: 3px; } .cb-myturn { display: none; } }
 
 /* v265 : Fêlé (fissures qui restent), riposte chargée, annonces des grosses attaques sur la frise */
-.dv-c.fele { --crk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'%3E%3Cg fill='none' stroke='%23fff' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M50 70 L38 48 L42 30 L30 8'/%3E%3Cpath d='M50 70 L66 52 L62 34 L78 14'/%3E%3Cpath d='M50 70 L30 82 L18 104'/%3E%3Cpath d='M50 70 L64 92 L60 116 L72 136'/%3E%3Cpath d='M50 70 L80 72 L96 86'/%3E%3Cpath d='M50 70 L22 64 L4 70'/%3E%3C/g%3E%3C/svg%3E"); }
+.dv-c.fele { --crk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'%3E%3Cg fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M50 70 L38 48 L42 30 L30 8'/%3E%3Cpath d='M50 70 L66 52 L62 34 L78 14'/%3E%3Cpath d='M50 70 L30 82 L18 104'/%3E%3Cpath d='M50 70 L64 92 L60 116 L72 136'/%3E%3Cpath d='M50 70 L80 72 L96 86'/%3E%3Cpath d='M50 70 L22 64 L4 70'/%3E%3C/g%3E%3C/svg%3E"); }
 .dv-c.fele::before { content: ''; position: absolute; inset: 0; z-index: 6; pointer-events: none; background: var(--crk) center / 100% 100% no-repeat; opacity: .75; filter: drop-shadow(0 0 3px #FFE6A8) drop-shadow(0 0 8px #FFB86B); animation: cbFele 1.6s ease-in-out infinite; }
 @keyframes cbFele { 50% { opacity: .45; } }
 .cb-brk.is-fele { background: linear-gradient(90deg, #8A5A12, #F2C14E) !important; border-color: #FFE7A6 !important; }
@@ -3310,3 +3310,54 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 .cb-def .df-pp { color: #10131A; background: linear-gradient(#FFFFFF, #D8ECFF); box-shadow: 0 0 24px rgba(220, 240, 255, 1); }
 .cb-def.go .df-go, .cb-def.pp .df-pp { opacity: 1; }
 .cb-def.ok .df-go, .cb-def.ok .df-pp, .cb-def.ko .df-go, .cb-def.ko .df-pp { opacity: 0; }
+
+/* v367 : les cartes se fissurent quand elles perdent leurs PV (sous 60 % puis sous 30 %), fissures sombres de verre brisé */
+.dv-crk { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; background: center / 100% 100% no-repeat; transition: opacity .35s; }
+.dv-c.hp2 .dv-crk { opacity: .9; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140' preserveAspectRatio='none'%3E%3Cg fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg stroke='rgba(0,0,0,.85)' stroke-width='2.4'%3E%3Cpath d='M100 16 L84 28 L78 42 L66 49'/%3E%3Cpath d='M84 28 L92 44'/%3E%3Cpath d='M78 42 L72 60 L61 67'/%3E%3Cpath d='M66 49 L54 47'/%3E%3C/g%3E%3Cg stroke='rgba(255,240,220,.55)' stroke-width='.8' transform='translate(.6 .4)'%3E%3Cpath d='M100 16 L84 28 L78 42 L66 49'/%3E%3Cpath d='M84 28 L92 44'/%3E%3Cpath d='M78 42 L72 60 L61 67'/%3E%3Cpath d='M66 49 L54 47'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
+.dv-c.hp3 .dv-crk { opacity: 1; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140' preserveAspectRatio='none'%3E%3Cg fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg stroke='rgba(0,0,0,.85)' stroke-width='2.4'%3E%3Cpath d='M100 16 L84 28 L78 42 L66 49'/%3E%3Cpath d='M84 28 L92 44'/%3E%3Cpath d='M78 42 L72 60 L61 67'/%3E%3Cpath d='M66 49 L54 47'/%3E%3Cpath d='M0 110 L15 103 L25 92 L39 88 L51 77 L61 67'/%3E%3Cpath d='M15 103 L19 121 L28 136'/%3E%3Cpath d='M25 92 L21 77 L10 70'/%3E%3Cpath d='M39 88 L46 101 L44 116'/%3E%3Cpath d='M51 77 L60 86'/%3E%3Cpath d='M0 40 L12 46 L18 58'/%3E%3Cpath d='M100 96 L88 100 L80 112'/%3E%3C/g%3E%3Cg stroke='rgba(255,240,220,.55)' stroke-width='.8' transform='translate(.6 .4)'%3E%3Cpath d='M100 16 L84 28 L78 42 L66 49'/%3E%3Cpath d='M84 28 L92 44'/%3E%3Cpath d='M78 42 L72 60 L61 67'/%3E%3Cpath d='M66 49 L54 47'/%3E%3Cpath d='M0 110 L15 103 L25 92 L39 88 L51 77 L61 67'/%3E%3Cpath d='M15 103 L19 121 L28 136'/%3E%3Cpath d='M25 92 L21 77 L10 70'/%3E%3Cpath d='M39 88 L46 101 L44 116'/%3E%3Cpath d='M51 77 L60 86'/%3E%3Cpath d='M0 40 L12 46 L18 58'/%3E%3Cpath d='M100 96 L88 100 L80 112'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
+.dv-c.hp3 .dv-art::after { background: linear-gradient(180deg, rgba(0, 0, 0, .35), transparent 25%, transparent 55%, rgba(4, 4, 8, .92)), radial-gradient(120% 90% at 50% 50%, transparent 55%, rgba(170, 20, 40, .35)); }
+
+/* v367 : mort par faction — une envolée de particules à la couleur et au geste de la faction (transform/opacity seulement) */
+.dv-soul { position: absolute; z-index: 27; translate: -50% -50%; pointer-events: none; }
+.dv-soul::before { content: ''; position: absolute; inset: -30%; border-radius: 50%; background: radial-gradient(closest-side, var(--sc, #FF8A3A), transparent); opacity: 0; animation: soulFlash .7s ease-out; }
+.dv-soul i { position: absolute; left: calc(50% + var(--x)); top: calc(50% + var(--y)); width: var(--sz); height: var(--sz); border-radius: 50%; background: var(--sc, #FF8A3A); box-shadow: 0 0 6px var(--sc, #FF8A3A); opacity: 0; animation: soulUp 1.1s ease-out var(--dl) forwards; }
+@keyframes soulFlash { 0% { opacity: 0; scale: .5; } 30% { opacity: .8; } 100% { opacity: 0; scale: 1.2; } }
+@keyframes soulUp { 0% { opacity: 0; transform: none; } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), -120px) scale(.5); } }
+@keyframes soulDown { 0% { opacity: 0; transform: none; } 12% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), 110px) rotate(var(--rt)); } }
+@keyframes soulBurst { 0% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translate(calc(var(--dx) * 2.4), calc(var(--dx) * -1.6)) rotate(var(--rt)); } }
+@keyframes soulWobble { 0% { opacity: 0; transform: none; } 15% { opacity: .9; } 50% { transform: translate(8px, -60px); } 100% { opacity: 0; transform: translate(-6px, -130px); } }
+.dv-soul.f-infernal { --sc: #FF7A2A; }
+.dv-soul.f-abyssal { --sc: #4FD3FF; }
+.dv-soul.f-abyssal i { background: transparent; border: 1.5px solid #9FEAFF; box-shadow: 0 0 6px rgba(80, 210, 255, .8), inset 0 0 4px rgba(160, 235, 255, .6); animation-name: soulWobble; animation-duration: 1.3s; }
+.dv-soul.f-celeste { --sc: #FFF2C8; }
+.dv-soul.f-celeste::after { content: ''; position: absolute; left: 30%; right: 30%; top: -60%; bottom: 20%; background: linear-gradient(0deg, rgba(255, 240, 200, .75), transparent); opacity: 0; animation: soulFlash 1s ease-out; }
+.dv-soul.f-celeste i { animation-duration: 1.4s; }
+.dv-soul.f-sauvage { --sc: #7BE06A; }
+.dv-soul.f-sauvage i { border-radius: 0 100% 0 100%; width: calc(var(--sz) * 1.4); animation-name: soulDown; animation-duration: 1.3s; }
+.dv-soul.f-necrotique { --sc: #B07CFF; }
+.dv-soul.f-necrotique i { width: calc(var(--sz) * 1.8); height: calc(var(--sz) * 1.8); background: radial-gradient(closest-side, rgba(200, 160, 255, .9), transparent); box-shadow: none; animation-name: soulWobble; animation-duration: 1.5s; }
+.dv-soul.f-primordial { --sc: #E0A040; }
+.dv-soul.f-primordial i { border-radius: 2px; clip-path: polygon(50% 0, 100% 40%, 70% 100%, 0 70%); background: linear-gradient(#F2C470, #7A4A18); box-shadow: none; animation-name: soulDown; animation-timing-function: cubic-bezier(.5, 0, 1, 1); }
+.dv-soul.f-artificiel { --sc: #5FE0FF; }
+.dv-soul.f-artificiel i { width: 2px; height: calc(var(--sz) * 2); border-radius: 1px; background: #CFF6FF; box-shadow: 0 0 6px #35BDE5; animation-name: soulBurst; animation-duration: .7s; }
+@media (prefers-reduced-motion: reduce) { .dv-soul { display: none; } }
+
+/* v367 : paliers du Cauchemar (I, II, III) sous les options de descente */
+.dc-ntiers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 8px 0 2px; }
+.dc-nt { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 52px; padding: 6px 4px; border-radius: 10px; border: 1px solid rgba(200, 60, 80, .35); background: rgba(30, 8, 14, .75); color: var(--ink); font: inherit; }
+.dc-nt b { font: 800 1.05rem/1 var(--f-display); color: #FF9AA8; }
+.dc-nt small { font-size: .62rem; line-height: 1.2; color: #CDBFAE; text-align: center; }
+.dc-nt.on { border-color: #FF5A6E; background: linear-gradient(#4A0F1C, #24070E); box-shadow: 0 0 14px rgba(255, 60, 90, .45); }
+.dc-nt.off { opacity: .5; }
+.dc-nt.off small svg { width: 10px; height: 10px; vertical-align: -1px; }
+
+/* v367 : résumé de la victoire en tête de la décision « remonter / descendre » (un seul écran de fin d'étage) */
+.dc-wonbar { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; padding: 10px 12px; border-radius: 14px; background: linear-gradient(90deg, rgba(60, 46, 14, .9), rgba(20, 14, 8, .9)); border: 1px solid rgba(242, 193, 78, .5); box-shadow: 0 0 18px rgba(242, 193, 78, .18); animation: wbIn .35s cubic-bezier(.2, 1.3, .4, 1) both; }
+.dc-wb-ic { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 50%; background: #F2C14E; color: #2A1A04; }
+.dc-wb-ic svg { width: 18px; height: 18px; }
+.dc-wb-t { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.dc-wb-t b { font: 700 1rem/1.1 var(--f-display); color: #FFE7A0; }
+.dc-wb-loot { display: flex; flex-wrap: wrap; gap: 10px; font-size: .82rem; color: #E8DCC0; }
+.dc-wb-loot span { display: inline-flex; align-items: center; gap: 3px; }
+.dc-wb-loot svg { width: 14px; height: 14px; }
+@keyframes wbIn { from { opacity: 0; transform: translateY(-8px) scale(.97); } }

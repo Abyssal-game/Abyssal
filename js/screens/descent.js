@@ -18,7 +18,7 @@ import { isBlocked } from '../core/moderation.js';
 import { runDuel } from './duel-ui.js';
 import { PHASE2 } from '../core/duel.js';
 import { SEASON_STEPS, seasonName, seasonDaysLeft } from '../core/renown.js';
-import { WEEKLY_FLOOR, NIGHTMARE_AT, AWAKEN_AT } from '../core/game.js';
+import { WEEKLY_FLOOR, NIGHTMARE_AT, AWAKEN_AT, NIGHT_TIERS, NIGHT_TIER_OPEN, nightTier } from '../core/game.js';
 import { setScene, sceneUrl } from '../ui/scene.js';
 import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
@@ -32,6 +32,7 @@ const ROOM_ICON = { gouffre: 'next', fight: 'swords', elite: 'skull', altar: 'st
 export default function descent(app, root) {
   const g = app.game, cat = app.catalog;
   const ui = (app.state.descent ||= { cursed: false, nightmare: false, outcome: null });
+  const nt = () => { const t = ui.ntier || 1; return g.nightTierOpen(t) ? t : 1; }; // v367 : palier de Cauchemar choisi
   let battle = null, playing = false;
 
   // swap (v307) : entre deux étages, toucher deux créatures échange leur place (les 3 premières combattent)
@@ -71,10 +72,11 @@ export default function descent(app, root) {
         ${torches ? '' : '<p class="small muted center dc-train">Entraînement : ni coffre, ni cendres, ni saison, éclats réduits de moitié. Les créatures vaincues comptent quand même pour ta Chasse. Tes torches reviennent à minuit.</p>'}
         <div class="dc-opts">
           ${torches ? `<button class="dc-opt ${ui.cursed ? 'on' : ''}" data-act="curse" aria-pressed="${ui.cursed}">${icon('skull')}<b>Maudite</b><small>${riskLine('cursed', 'coffre +1, rien si l’équipe tombe')}</small></button>` : ''}
-          ${g.nightmareUnlocked() ? `<button class="dc-opt dc-opt-night ${ui.nightmare ? 'on' : ''}" data-act="night" aria-pressed="${ui.nightmare}">${icon('skull')}<b>Cauchemar</b><small>${riskLine('night', d.bestNightmare ? `record : étage ${d.bestNightmare}` : 'ennemis +35 % PV, +25 % ATQ')} · départ ≈ étage ${g.nightmareEquiv(startFloor())}</small></button>` : `<button class="dc-opt off" data-act="optinfo">${icon('lock')}<b>Cauchemar</b><small>dès l’étage ${NIGHTMARE_AT}</small></button>`}
+          ${g.nightmareUnlocked() ? `<button class="dc-opt dc-opt-night ${ui.nightmare ? 'on' : ''}" data-act="night" aria-pressed="${ui.nightmare}">${icon('skull')}<b>Cauchemar</b><small>${riskLine('night', g.nightBest(nt()) ? `record : étage ${g.nightBest(nt())}` : `ennemis +${Math.round((NIGHT_TIERS[nt()].hp - 1) * 100)} % PV, +${Math.round((NIGHT_TIERS[nt()].atk - 1) * 100)} % ATQ`)} · départ ≈ étage ${g.nightmareEquiv(startFloor(), nt())}</small></button>` : `<button class="dc-opt off" data-act="optinfo">${icon('lock')}<b>Cauchemar</b><small>dès l’étage ${NIGHTMARE_AT}</small></button>`}
           <button class="dc-opt-info icon-btn" data-act="optinfo" aria-label="Explications des modes">${icon('info')}</button>
         </div>
-        ${ui.cursed || ui.nightmare ? `<p class="small dc-riskwarn">${icon('skull')} ${[ui.cursed ? 'Maudite : si l’équipe tombe, <b>tu perds tout</b> (éclats et coffres).' : '', ui.nightmare ? `Cauchemar : dès ton premier combat, les ennemis ont la force de l’<b>étage ${g.nightmareEquiv(startFloor())}</b> en mode normal, et les gardiens sont déchaînés.` : ''].filter(Boolean).join(' ')}${riskAdvice()}</p>` : ''}
+        ${ui.nightmare && g.nightmareUnlocked() ? `<div class="dc-ntiers" role="radiogroup" aria-label="Palier du Cauchemar">${[1, 2, 3].map((t) => { const open = g.nightTierOpen(t); return `<button class="dc-nt ${nt() === t ? 'on' : ''} ${open ? '' : 'off'}" role="radio" aria-checked="${nt() === t}" data-act="ntier" data-t="${t}" ${open ? '' : 'disabled'}><b>${['', 'I', 'II', 'III'][t]}</b><small>${open ? `coffre +${NIGHT_TIERS[t].chest} · éclats ×${String(NIGHT_TIERS[t].shards).replace('.', ',')}` : `${icon('lock')} étage ${NIGHT_TIER_OPEN} en ${['', 'I', 'II'][t - 1]}`}</small></button>`; }).join('')}</div>` : ''}
+        ${ui.cursed || ui.nightmare ? `<p class="small dc-riskwarn">${icon('skull')} ${[ui.cursed ? 'Maudite : si l’équipe tombe, <b>tu perds tout</b> (éclats et coffres).' : '', ui.nightmare ? `${NIGHT_TIERS[nt()].name} : dès ton premier combat, les ennemis ont la force de l’<b>étage ${g.nightmareEquiv(startFloor(), nt())}</b> en mode normal, et les gardiens sont déchaînés.` : ''].filter(Boolean).join(' ')}${riskAdvice()}</p>` : ''}
       </section>
       ${ruleHTML(g.rule())}
       <div class="dc-links">
@@ -135,7 +137,7 @@ export default function descent(app, root) {
       <p class="dc-sum2-sub">${s.wiped ? (s.cursed ? 'Descente maudite : le butin est perdu.' : 'Tu gardes la moitié des éclats et un coffre plus modeste.') : 'Tu remontes avec tout ton butin.'}</p>
       ${s.chests.length ? `<a class="btn primary block dc-plq dc-plq-red dc-chestcta" href="#/coffres">${icon('p:chest')}Ouvrir ${s.chests.length > 1 ? 'mes coffres' : 'mon coffre'}</a>` : ''}
       ${s.record ? `<p class="vx-week dc-record">${icon('crown')} <b>Nouveau record !</b> Jamais tu n’étais descendu aussi bas : étage ${s.floor}.</p>` : ''}
-      ${s.nightmareRecord ? `<p class="vx-week">${icon('skull')} Nouveau record en mode Cauchemar : étage ${s.floor} !</p>` : ''}
+      ${s.nightmareRecord ? `<p class="vx-week">${icon('skull')} Nouveau record en ${(NIGHT_TIERS[s.nightTier || 1] || NIGHT_TIERS[1]).name} : étage ${s.floor} !</p>` : ''}
       ${s.wiped && app.state.lastEnemyTurn ? `<details class="dc-why dc-last"><summary>${icon('eye')} Voir le dernier tour ennemi</summary><ul class="dc-last-ul">${app.state.lastEnemyTurn}</ul></details>` : ''}
       ${s.feats && s.feats.wins ? `<div class="dc-feats">${[[s.feats.hit, 'Plus gros coup', 'hit'], [s.feats.kills, 'Ennemis vaincus', 'kills'], [s.feats.syn, 'Synergies', 'syn'], [s.feats.breaks, 'Brisures', 'breaks'], [s.feats.perfect, 'Frappes parfaites', 'perfect'], [s.feats.parries, 'Parades', 'parries']].filter(([n]) => n > 0).map(([n, l, ic]) => `<span class="dc-feat"><img class="dc-feat-ic" alt="" src="assets/icons/ft-${ic}.webp"><b>${n}</b><small>${l}</small></span>`).join('')}</div>` : ''}
       ${s.mvp && cat.get(s.mvp.id) ? `<p class="vx-week dc-mvp">${icon('star')} <b>${esc(cat.get(s.mvp.id).name)}</b> a achevé ${s.mvp.n} ennemis pendant l’expédition.</p>` : ''}
@@ -168,7 +170,7 @@ export default function descent(app, root) {
   }
 
   // ——— Expédition ———————————————————————————————————————————————————
-  const runHead = (run) => `<header class="dc-run-head"><div><span class="small muted">${run.nightmare ? `<span class="dc-bad">${icon('skull')} Cauchemar</span> · ` : ''}${run.free ? 'Entraînement (ni coffre, ni cendres)' : run.cursed ? `<span class="dc-bad">${icon('skull')} Maudite</span>` : 'La Descente'}</span><h1>Étage ${run.floor}</h1>${run.omen && OMENS[run.omen] ? `<button class="dc-omen-pill" data-act="omeninfo">${icon(OMENS[run.omen].icon)} ${esc(OMENS[run.omen].name)}</button>` : ''}</div><div class="dc-loot"><span>${icon('crystal')}${fmt(run.shards)}</span>${run.chests.length ? `<span>${icon('p:chest')}${run.chests.length}</span>` : ''}</div></header>
+  const runHead = (run) => `<header class="dc-run-head"><div><span class="small muted">${run.nightmare ? `<span class="dc-bad">${icon('skull')} ${nightTier(run).name}</span> · ` : ''}${run.free ? 'Entraînement (ni coffre, ni cendres)' : run.cursed ? `<span class="dc-bad">${icon('skull')} Maudite</span>` : 'La Descente'}</span><h1>Étage ${run.floor}</h1>${run.omen && OMENS[run.omen] ? `<button class="dc-omen-pill" data-act="omeninfo">${icon(OMENS[run.omen].icon)} ${esc(OMENS[run.omen].name)}</button>` : ''}</div><div class="dc-loot"><span>${icon('crystal')}${fmt(run.shards)}</span>${run.chests.length ? `<span>${icon('p:chest')}${run.chests.length}</span>` : ''}</div></header>
     ${teamStrip(run.team.map((m) => m.id), run, run.phase !== 'battle')}
     ${run.phase !== 'battle' && run.team.filter((m) => !m.fallen).length > 1 ? `<p class="dc-swap-hint small muted">${ui.tsel != null ? 'Touche la créature avec qui échanger sa place.' : 'Touche deux créatures pour échanger leur place : les 3 premières combattent.'}</p>` : ''}
     <p class="dc-rule-line small">${picon('rule')} <b>${esc(g.rule(run.day).name)}</b> · ${esc(g.rule(run.day).desc)}</p>`;
@@ -180,7 +182,7 @@ export default function descent(app, root) {
       <button class="btn ghost small block dc-abandon" data-act="abandon">${icon('p:abandon')}Abandonner l’expédition</button>`;
   }
   function clearedView(run, extra = '') {
-    const now = g.chestNow(run), next = run.free ? null : g.runChest(run, (run.cursed ? 1 : 0) + (run.nightmare ? 1 : 0), run.floor + 1);
+    const now = g.chestNow(run), next = run.free ? null : g.runChest(run, (run.cursed ? 1 : 0) + (nightTier(run)?.chest || 0), run.floor + 1);
     const alive = run.team.some((m) => !m.fallen);
     root.innerHTML = `${runHead(run)}${extra}
       <section class="dc-risk2">
@@ -357,6 +359,7 @@ export default function descent(app, root) {
     },
     curse() { ui.cursed = !ui.cursed; render(); },
     startat(el) { ui.start = +el.dataset.f || 1; render(); },
+    ntier(el) { ui.ntier = +el.dataset.t || 1; app.sfx.tap?.(); render(); },
     night() { ui.nightmare = !ui.nightmare; render(); if (ui.nightmare) tuto(app, 'dc-nightmare', { force: false }); },
     // v320 : saison, classement et aide s'ouvrent dans une fenêtre (la page ne les empile plus)
     open(el) {
@@ -368,14 +371,14 @@ export default function descent(app, root) {
     optinfo() {
       openSheet(`<h2 class="center">Les modes de descente</h2>
         <p><b>${icon('skull')} Descente maudite</b><br><span class="small">Le coffre rapporté est d’une qualité au-dessus, mais si l’équipe tombe, tu ne rapportes rien.</span></p>
-        <p><b>${icon('skull')} Mode Cauchemar</b><br><span class="small">${g.nightmareUnlocked() ? '' : `S’ouvre quand tu as atteint l’étage ${NIGHTMARE_AT}. `}Ennemis plus forts (+35 % PV, +25 % ATQ), gardiens déchaînés dès le début ; coffre d’une qualité au-dessus et +50 % d’éclats.</span></p>`, { label: 'Modes', cls: 'dc-sheet sheet-small' });
+        <p><b>${icon('skull')} Mode Cauchemar</b><br><span class="small">${g.nightmareUnlocked() ? '' : `S’ouvre quand tu as atteint l’étage ${NIGHTMARE_AT}. `}Ennemis plus forts, gardiens déchaînés dès le début, coffre de meilleure qualité et plus d’éclats. Trois paliers : ${[1, 2, 3].map((t) => `<b>${NIGHT_TIERS[t].name}</b> (ennemis +${Math.round((NIGHT_TIERS[t].hp - 1) * 100)} % PV et +${Math.round((NIGHT_TIERS[t].atk - 1) * 100)} % ATQ, coffre +${NIGHT_TIERS[t].chest}, éclats ×${String(NIGHT_TIERS[t].shards).replace('.', ',')})`).join(', ')}. Chaque palier s’ouvre quand tu atteins l’étage ${NIGHT_TIER_OPEN} au palier précédent.</span></p>`, { label: 'Modes', cls: 'dc-sheet sheet-small' });
     },
     weekcard(el) { app.openCard(el.dataset.id); },
     news() { delete g.s.armyNews; g.persist(); render(); },
     async start() {
       if (ui.cursed && g.torchesLeft() && !(await confirmBox('Descente maudite : si toute l’équipe tombe, <b>tu ne rapportes rien</b>. Tu es sûr ?', { ok: 'Je descends', danger: true }))) return;
       try {
-        g.startRun({ cursed: ui.cursed, nightmare: ui.nightmare && g.nightmareUnlocked(), start: startFloor() }); ui.outcome = null; ui.tsel = null; app.sfx.tear(); app.chrome(); render(); window.scrollTo(0, 0);
+        g.startRun({ cursed: ui.cursed, nightmare: ui.nightmare && g.nightmareUnlocked() ? nt() : 0, start: startFloor() }); ui.outcome = null; ui.tsel = null; app.sfx.tear(); app.chrome(); render(); window.scrollTo(0, 0);
         if (g.descent().run?.phase === 'doors') tuto(app, 'army-doors');
       } catch (e) { toast(esc(e.message), { kind: 'error' }); }
     },
@@ -402,15 +405,18 @@ export default function descent(app, root) {
     reward(el) {
       let out;
       try { out = g.chooseReward(el.dataset.r); } catch (e) { toast(esc(e.message), { kind: 'error' }); return; }
+      // v367 : écrans de fin d'étage rapprochés — la décision (remonter / descendre) garde en tête le résumé de la victoire
+      const w = ui.win;
+      ui.winBar = w ? `<div class="dc-wonbar"><span class="dc-wb-ic">${icon('check')}</span><span class="dc-wb-t"><b>Victoire · étage ${w.floor}</b><span class="dc-wb-loot"><span>${icon('crystal')}+${fmt(w.shards)}</span>${w.ash ? `<span>${icon('ash')}+${fmt(w.ash)}</span>` : ''}${w.chest ? `<span style="color:${CHESTS[w.chest].color}">${icon('p:chest')}${esc(CHESTS[w.chest].name)}</span>` : ''}</span></span></div>` : '';
       ui.win = null;
       if (out.altar) return render();
       app.sfx.coin();
-      clearedView(g.descent().run, el.dataset.r === 'rest' ? `<p class="dc-event">${icon('heart')} L’eau de la source soigne tes créatures.</p>` : el.dataset.r === 'treasure' ? `<p class="dc-event">${icon('crystal')} +${fmt(out.shards)} éclats</p>` : out.healed ? `<p class="dc-event">${icon('star')} L’autel est muet, mais sa lumière soigne ton équipe.</p>` : '');
+      clearedView(g.descent().run, ui.winBar + (el.dataset.r === 'rest' ? `<p class="dc-event">${icon('heart')} L’eau de la source soigne tes créatures.</p>` : el.dataset.r === 'treasure' ? `<p class="dc-event">${icon('crystal')} +${fmt(out.shards)} éclats</p>` : out.healed ? `<p class="dc-event">${icon('star')} L’autel est muet, mais sa lumière soigne ton équipe.</p>` : ''));
     },
     blesspick(el) { ui.bless = el.dataset.k; app.sfx.tap(); altarView(g.descent().run); },
-    bless(el) { ui.bless = null;  try { g.chooseBlessing(el.dataset.k); app.sfx.discover(); clearedView(g.descent().run, `<p class="dc-event">${icon('p:rule')} ${esc(BLESSINGS[el.dataset.k].name)} : ${esc(BLESSINGS[el.dataset.k].desc)}</p>`); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
+    bless(el) { ui.bless = null;  try { g.chooseBlessing(el.dataset.k); app.sfx.discover(); clearedView(g.descent().run, (ui.winBar || '') + `<p class="dc-event">${icon('p:rule')} ${esc(BLESSINGS[el.dataset.k].name)} : ${esc(BLESSINGS[el.dataset.k].desc)}</p>`); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     unaltar() { try { g.cancelAltar(); app.sfx.tap(); render(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
-    next() { try { g.nextFloor(); app.sfx.swipe(); render(); window.scrollTo(0, 0); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
+    next() { ui.winBar = ''; try { g.nextFloor(); app.sfx.swipe(); render(); window.scrollTo(0, 0); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     abandon() { abandon(); },
     async leave() {
       if (!(await confirmBox('Remonter maintenant avec ton coffre ?', { ok: 'Remonter' }))) return;
