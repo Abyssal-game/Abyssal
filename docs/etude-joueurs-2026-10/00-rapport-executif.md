@@ -51,7 +51,7 @@ Les sept premières sont des textes ou des conditions d'affichage : quelques heu
 9. **Premier combat allégé** : au plus une bulle à l'étage 1, les bulles avancées plus tard.
 10. **Sublimer visible dans la Fournaise**, avec un objectif qui y mène quand l'équipe est au niveau 10.
 
-Le backlog complet (39 propositions P0 à P3, avec preuves, difficulté, risque et critère de succès) est dans `03-backlog-et-priorites.md`.
+Le backlog complet (34 propositions P0 à P3 (7 P0, 12 P1, 11 P2, 4 P3), avec preuves, difficulté, risque et critère de succès) est dans `03-backlog-et-priorites.md`.
 
 ## Fausses bonnes idées (à ne pas suivre)
 
@@ -68,7 +68,7 @@ Des joueurs demandent l'inverse les uns des autres : plus de bulles contre moins
 - `00-rapport-executif.md` : ce document.
 - `fiches/` : les 100 fiches de joueurs, par famille (A collectionneurs, B stratèges, C roguelite, D occasionnels, E très investis, F univers et style, G sceptiques), chacune avec profil, évolution, notes J3 et J30, verdict et témoignage, puis un bilan de famille.
 - `02-analyse-collective.md` : 18 thèmes, contradictions, 10 conclusions, limites de la méthode.
-- `03-backlog-et-priorites.md` : 39 propositions P0 à P3, les 10 premières, ce qu'il ne faut pas changer, incertitudes.
+- `03-backlog-et-priorites.md` : 34 propositions P0 à P3 (7 P0, 12 P1, 11 P2, 4 P3), les 10 premières, ce qu'il ne faut pas changer, incertitudes.
 - `04-retention-simulee.md` : tableau par jour et par famille, causes d'abandon.
 - `annexes/` : modèle de référence du jeu (chiffres et règles lus dans le code), parcours réel d'un nouveau joueur, mesures du moteur par famille et par joueur, profils, simulateur et générateur de profils.
 
