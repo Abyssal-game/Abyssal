@@ -1090,7 +1090,7 @@ function bossTick(st, ev) {
     if (b.doom > 0) ev.push({ t: 'status', u: b.uid, s: `Effondrement : ${b.doom}`, k: 'charge' });
     else {
       ev.push({ t: 'boss', u: b.uid, s: 'Effondrement !' }); ev.push({ t: 'aoe', u: b.uid, side: 'enemy' });
-      front(st, 'ally').forEach((x) => hurt(st, x, Math.max(2, Math.round(x.maxHp * 0.45)), ev, b.uid));
+      for (const x of front(st, 'ally')) { if (b.hp <= 0) break; hurt(st, x, Math.max(2, Math.round(x.maxHp * 0.45)), ev, b.uid); }
       b.doom = DOOM_TURNS; check(st, ev);
     }
   }
@@ -1199,7 +1199,7 @@ export function enemyAct(st, aUid, defense = 'none') {
     e.charged = null;
     ev.push({ t: 'aoe', u: aUid, side: 'enemy' });
     if (defense !== 'none') defended(st, e, null, ev, defense, kind);
-    else front(st, 'ally').forEach((x) => hurt(st, x, dmgOf(st, e, x, (e.boss ? 1 : 0.8) * pow), ev, aUid));
+    else for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, (e.boss ? 1 : 0.8) * pow), ev, aUid); } // v344 : un ennemi tué en plein coup de zone (riposte, épines) s'arrête
   } else if (kind === 'charge') { e.charged = 'heavy'; ev.push({ t: 'status', u: aUid, s: 'Se charge…', k: 'charge' }); }
   else if (kind === 'channel') { e.charged = 'blast'; ev.push({ t: 'status', u: aUid, s: 'Concentration…', k: 'charge' }); }
   else if (kind === 'shield') { const t = st.units[it.t]; if (t && t.hp > 0) { t.shield = 1; ev.push({ t: 'status', u: t.uid, s: 'Bouclier', k: 'guard' }); } }
@@ -1218,8 +1218,8 @@ export function enemyAct(st, aUid, defense = 'none') {
     ev.push({ t: 'aoe', u: aUid, side: 'enemy' });
     if (defense !== 'none') defended(st, e, null, ev, defense, 'blast');
     else {
-      front(st, 'ally').forEach((x) => hurt(st, x, dmgOf(st, e, x, 0.9 * pow), ev, aUid));
-      front(st, 'ally').filter((x) => x.hp > 0 && !x.frozen).sort((x, y) => y.atk - x.atk).slice(0, e.phase2 ? 2 : 1).forEach((x) => { x.frozen = 1; ev.push({ t: 'status', u: x.uid, s: 'Gelée', k: 'frost' }); });
+      for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, 0.9 * pow), ev, aUid); }
+      if (e.hp > 0) front(st, 'ally').filter((x) => x.hp > 0 && !x.frozen).sort((x, y) => y.atk - x.atk).slice(0, e.phase2 ? 2 : 1).forEach((x) => { x.frozen = 1; ev.push({ t: 'status', u: x.uid, s: 'Gelée', k: 'frost' }); });
     }
   } else if (kind === 'mimic') {
     e.charged = 'copy'; e.copyKey = it.copy; e.copyName = it.copyName; logBoss(st, 'Copie');
@@ -1233,7 +1233,7 @@ export function enemyAct(st, aUid, defense = 'none') {
     else if (k === 'rempart') front(st, 'enemy').forEach((x) => { x.shield = 1; ev.push({ t: 'status', u: x.uid, s: 'Bouclier', k: 'guard' }); });
     else if (k === 'priere') heal(e, e.maxHp * 0.25, ev);
     else if (k === 'contagion') { if (defense !== 'none') defended(st, e, null, ev, defense, 'blast'); else front(st, 'ally').forEach((x) => addPoison(st, x, 3, ev, e)); }
-    else { ev.push({ t: 'aoe', u: aUid, side: 'enemy' }); if (defense !== 'none') defended(st, e, null, ev, defense, 'blast'); else front(st, 'ally').forEach((x) => hurt(st, x, dmgOf(st, e, x, 0.7), ev, aUid)); }
+    else { ev.push({ t: 'aoe', u: aUid, side: 'enemy' }); if (defense !== 'none') defended(st, e, null, ev, defense, 'blast'); else for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, 0.7), ev, aUid); } }
   } else if (kind === 'decree') {
     st.law = it.law; logBoss(st, LAWS[it.law].name);
     ev.push({ t: 'boss', u: aUid, s: LAWS[it.law].name }); ev.push({ t: 'law', law: it.law });

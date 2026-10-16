@@ -22,8 +22,8 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Le réseau de la session bloque github.io : pour vérifier la publication, passe par l'outil GitHub (déploiements Pages) ou demande une capture au propriétaire.
 
 ## 2. Routine de livraison
-1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v343**.
-2. Tests : `node --test tests/*.test.mjs` (215 tests), `node tools/validate.mjs`. Si le combat ou l'équilibre change : `node tools/fuzz.mjs 300` (étage moyen ≈ 12 à 14 en normal).
+1. Version : **ligne 4** de `js/config.js` **et** de `sw.js`, toujours le même numéro (`sed -i "4s/vX/vY/" js/config.js sw.js`). Actuellement **v344**.
+2. Tests : `node --test tests/*.test.mjs` (216 tests), `node tools/validate.mjs`. Si le combat ou l'équilibre change : `node tools/fuzz.mjs 300` (étage moyen ≈ 12 à 14 en normal).
 3. Vérification dans le navigateur avec Playwright (`/opt/node-tools/node_modules/playwright/index.mjs`, Chromium déjà installé), avec un serveur local `python3 -m http.server 8092` lancé dans le dossier. Tailles iPhone SE et iPhone 13. **L'écran d'ouverture attend un toucher** (« Touche l'écran pour entrer ») : dans les scripts, cliquer au milieu de l'écran (dans la fenêtre 390×664) avant tout le reste.
 4. Commit, push, réponse en français.
 
@@ -99,6 +99,7 @@ Ce texte reprend tout ce qu'il faut savoir du projet. Ce fichier est lu automati
 - Amis par pseudo (voir stats et collection), puis versus 1 contre 1 (Sceaux et combats façon Descente). Le propriétaire veut que le perdant **perde vraiment** une carte. Cadre conseillé si on le fait : mode « Duel à enjeu » séparé et consenti (duel normal sans perte à côté), mise de même rareté des deux côtés, favoris jamais mis en jeu, adversaires de niveau proche, accès après quelques jours et duels normaux (contre les comptes jetables et le trafic de cartes), uniquement entre joueurs présents ou amis ayant accepté (jamais sur une partie jouée par l'IA à la place d'un absent).
 
 ## 5. Décisions déjà prises
+- v344 (bug signalé par le propriétaire) : un ennemi tué au milieu de son attaque de zone (épines, Molosse des Enfers…) continuait de frapper les créatures suivantes. Les boucles de zone de `enemyAct` (blast, tempête de givre, déflagration des élites) et l'Effondrement s'arrêtent dès que l'attaquant tombe (test `tests/zone-mort.test.mjs`). L'explosion d'un ennemi Explosif à sa mort reste voulue (trait, règle « Nuée explosive »).
 - v340 : **boutique d'objets et sac retirés** (Torche bénie, `js/screens/items.js` supprimé, `ITEMS`, `buyItem`/`useItem` retirés ; `s.items` reste dans la sauvegarde, inutilisé). Image de la fenêtre de phase 2 (`.cb-phimg`) : `max-width: none`, sinon la règle générale `img { max-width: 100% }` la décale à gauche.
 - Pas de « salle d'épreuve » ni de version de test : tout va sur main.
 - Accueil (v317) : plus de tuiles « Boosters » et « Aventure » (doublons de la barre du bas) ; il reste le logo, la bienvenue, l’objectif, l’événement, Aujourd’hui.
