@@ -103,7 +103,8 @@ Quatre audits ont été menés en parallèle, chacun avec des tests réellement 
 
 ## 4. Problèmes restants (non corrigés, à décider)
 
+Aucun : tous les points relevés le 15 octobre 2026 ont été traités (voir 4 bis et 4 ter).
 
 ## 5. Nouveau logo
 
-Dossier complet dans `store/logo-brief.md` : diagnostic, concept retenu (le Sceau fendu), prompts Gemini, variantes, révisions et dimensions. Le logo sera intégré une fois l'image générée par Gemini.
+Dossier complet dans `store/logo-brief.md` : diagnostic, concept retenu (le Sceau fendu), prompts Gemini, variantes, révisions et dimensions. Le logo a été intégré en v312.
