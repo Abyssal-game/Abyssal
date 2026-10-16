@@ -3100,3 +3100,31 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 /* v351 : icône du Présage (trois cartes en éventail), sans le cadre rond de l'ancien œil */
 .om-head img { border-radius: 0; object-fit: contain; filter: drop-shadow(0 0 10px rgba(180, 140, 255, .45)); }
 .om-head img { width: 96px; height: 96px; flex: none; }
+/* v352 : lancer chargé (remplace l'anneau qui se resserre avant les jets de dé) */
+.ry2 { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; cursor: pointer; --ch: 0; }
+.ry2-c { position: relative; width: min(64vw, 250px); aspect-ratio: 1; }
+.ry2 .ry-glow { background: radial-gradient(circle, color-mix(in srgb, var(--fc) calc(18% + var(--ch) * 40%), transparent), transparent 62%); }
+.ry2-g { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
+.ry2-g circle { fill: none; stroke-linecap: round; }
+.ry2-g .trk { stroke: rgba(255, 255, 255, .1); stroke-width: 5; }
+.ry2-g .zg { stroke: rgba(242, 193, 78, .45); stroke-width: 7; }
+.ry2-g .zp { stroke: #FFE9A8; stroke-width: 9; filter: drop-shadow(0 0 4px rgba(255, 220, 140, .9)); }
+.ry2-g .fill { stroke: var(--fc); stroke-width: 5; filter: drop-shadow(0 0 5px var(--fc)); }
+.ry2.near .ry2-g .fill { stroke: #FFE7A0; }
+.ry2.hot .ry2-g .fill { stroke: #fff; stroke-width: 7; }
+.ry2-die { position: absolute; left: 50%; top: 50%; width: 58%; aspect-ratio: 1; margin: -29% 0 0 -29%; transform: scale(calc(.9 + var(--ch) * .22)) rotate(calc(var(--ch) * 40deg)); filter: drop-shadow(0 0 calc(6px + var(--ch) * 30px) var(--fc)) brightness(calc(.9 + var(--ch) * .7)); animation: ry2Idle 1.6s ease-in-out infinite; }
+.ry2-die img { width: 100%; height: 100%; object-fit: contain; }
+.ry2.hold .ry2-die { animation: none; }
+.ry2.hot .ry2-die { filter: drop-shadow(0 0 34px #fff) drop-shadow(0 0 18px var(--fc)) brightness(1.7); }
+@keyframes ry2Idle { 50% { transform: translateY(-6px) scale(.95); } }
+.ry2.thrown .ry2-die { animation: ry2Throw .55s cubic-bezier(.3, .1, .3, 1) forwards; }
+@keyframes ry2Throw { 0% { transform: scale(1.1) rotate(0); opacity: 1; } 35% { transform: translateY(-36%) scale(1.25) rotate(380deg); opacity: 1; } 100% { transform: translateY(-140%) scale(.4) rotate(900deg); opacity: 0; } }
+.ry2-flash { position: absolute; inset: -20%; border-radius: 50%; background: radial-gradient(circle, #fff, color-mix(in srgb, var(--fc) 60%, transparent) 30%, transparent 62%); opacity: 0; pointer-events: none; mix-blend-mode: screen; }
+.ry2.thrown .ry2-flash { animation: ry2Flash .45s ease-out; }
+.ry2.perfect .ry2-flash { background: radial-gradient(circle, #fff, rgba(255, 215, 120, .9) 30%, transparent 64%); animation-duration: .6s; }
+@keyframes ry2Flash { 0% { opacity: 1; transform: scale(.5); } 100% { opacity: 0; transform: scale(1.4); } }
+.ry2.miss .ry2-g { filter: grayscale(.8) brightness(.6); }
+/* le dé du jet retombe à la place du dé lancé (continuité) */
+.cb-dice.landing:not(.done) .cb-d20 { animation: ry2Land .5s cubic-bezier(.3, 1.4, .4, 1), cbSpin .55s linear .5s infinite; }
+@keyframes ry2Land { 0% { transform: translateY(-120%) scale(.5) rotate(-300deg); opacity: 0; } 60% { transform: translateY(6%) scale(1.06) rotate(10deg); opacity: 1; } 100% { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .ry2-die, .ry2.thrown .ry2-die, .cb-dice.landing .cb-d20 { animation: none !important; } }

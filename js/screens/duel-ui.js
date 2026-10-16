@@ -442,7 +442,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (e.perfect && e.tier === 'success') banner('Frappe parfaite : réussite assurée', 'parry', 800);
     const tier = DICE_TIERS[e.tier];
     const box = document.createElement('div');
-    box.className = `cb-dice t-${e.tier}`;
+    box.className = `cb-dice t-${e.tier} ${performance.now() - lastThrow < 1600 ? 'landing' : ''}`; // v352 : le dé lancé retombe
     box.innerHTML = `<div class="cb-d20"><img class="cb-die" alt="" src="assets/fx/d20.webp"><b>?</b></div>
       <p class="cb-dline"></p><p class="cb-dtier"></p>`;
     $('.dv').appendChild(box);
@@ -483,7 +483,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           }
           if (e.tgt && st.units[e.tgt]?.side === 'enemy' && DICE_KEYS.includes(e.key)) pendingLunge = { u: e.u, tgt: e.tgt };
           else if (e.tgt && st.units[e.tgt]?.side === 'enemy' && e.key !== 'marque' && e.key !== 'entrave') { lunge(e.u, e.tgt); cam(e.tgt, 0.6); await wait(T(LUNGE_HIT)); }
-          else if (e.key === 'marque' && e.tgt) { fxSheet(e.tgt, 'role-mark', { k: 1.7, d: 650 }); ring(e.tgt, 'mark'); await wait(T(420)); }
+          else if (e.key === 'marque' && e.tgt) { fxSheet(e.tgt, 'role-mark', { k: 2.5, d: 800 }); ring(e.tgt, 'mark'); await wait(T(420)); }
           break;
         case 'eact': {
           const def = INTENTS[e.kind];
@@ -517,16 +517,16 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           await wait(T(heavy ? 300 : 220));
           break;
         }
-        case 'heal': { app.sfx.heal(); fxSheet(e.u, 'role-heal', { k: 1.5, d: 700 }); float(e.u, `+${e.d}`, 'heal'); const hp = el(e.u)?.querySelector('.dv-hp b'); if (hp) hp.textContent = st.units[e.u].hp; await wait(T(200)); break; }
+        case 'heal': { app.sfx.heal(); fxSheet(e.u, 'role-heal', { k: 2.3, d: 850 }); float(e.u, `+${e.d}`, 'heal'); const hp = el(e.u)?.querySelector('.dv-hp b'); if (hp) hp.textContent = st.units[e.u].hp; await wait(T(200)); break; }
         case 'block': app.sfx.block(); ring(e.u, 'guard'); float(e.u, 'Bloqué', 'info'); sparks(e.u, 'blue'); await wait(T(240)); break;
         case 'dodge': {
           app.sfx.dodge();
-          if (e.u) { fxAt(e.u, 'dodge', { big: true }); const t = el(e.u); if (t) { t.classList.remove('dodge'); void t.offsetWidth; t.classList.add('dodge'); } float(e.u, 'Esquive !', 'dodge'); }
+          if (e.u) { fxAt(e.u, 'dodge', { big: true }); cam(e.u, 0.6); shake(false, true); const t = el(e.u); if (t) { t.classList.remove('dodge'); void t.offsetWidth; t.classList.add('dodge'); } float(e.u, 'Esquive !', 'dodge'); }
           else banner('Esquive !', 'good', 600);
           await wait(T(320));
           break;
         }
-        case 'parry': app.sfx.parry(); dio.flare(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxAt(e.u, 'parry', { big: true }); sparks(e.u, 'gold'); cam(e.u, -0.8); } banner('Parade parfaite !', 'parry', 800); shake(false); await wait(T(420)); break;
+        case 'parry': app.sfx.parry(); dio.flare(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxAt(e.u, 'parry', { big: true }); impactFlash(e.u, true); sparks(e.u, 'gold'); cam(e.u, -0.8); } banner('Parade parfaite !', 'parry', 800); shake(false); await wait(T(420)); break;
         case 'fervor': fervorPop(e.d, e.why); draw(); break;
         case 'passive': app.sfx.passive?.(); passivePop(e.u, e.p); float(e.u, PASSIVES[e.p]?.name || '', 'syn'); await wait(T(320)); break;
         case 'brk': { const t = el(e.u)?.querySelector('.cb-brk i'); if (t) t.style.width = `${(e.brk / e.max) * 100}%`; break; }
@@ -537,7 +537,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           await hitstop(160);
           app.sfx.shatter(); draw();
           const t2 = el(e.u); t2?.classList.add('shatter', 'cracked'); ring(e.u, 'break');
-          banner('BRISURE !', 'broken', 1000); fxAt(e.u, 'break', { big: true }); sparks(e.u, 'big'); shake(true); dio.brk();
+          banner('BRISURE !', 'broken', 1000); fxAt(e.u, 'break', { big: true }); impactFlash(e.u, true); cam(e.u, 1.6); await hitstop(110); sparks(e.u, 'big'); shake(true); dio.brk();
           await wait(T(700)); d?.classList.remove('focus');
           break;
         }
@@ -585,7 +585,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         case 'aoe': if (e.side === 'enemy') shake(true); else if (st.units[e.u]?.side === 'ally') { fxSheet(null, 'role-wave', { row: true, d: 720 }); aoeHit = true; setTimeout(() => { aoeHit = false; }, T(900)); await wait(T(260)); } await wait(T(150)); break;
         case 'status':
           if (e.k === 'poison') { if (/\+|×/.test(e.s)) { app.sfx.poison(); fxAt(e.u, 'venom', { big: !!e.syn }); } }
-          else if (e.k === 'frost' && /^Gel/.test(e.s) && !/passe/.test(e.s)) { app.sfx.freeze(); fxSheet(e.u, 'role-frost', { k: 1.7, d: 650 }); }
+          else if (e.k === 'frost' && /^Gel/.test(e.s) && !/passe/.test(e.s)) { app.sfx.freeze(); fxSheet(e.u, 'role-frost', { k: 2.5, d: 800 }); impactFlash(e.u, false); }
           else if (e.k === 'guard' && /^(Tous sur elle|Hurlement)/.test(e.s)) { app.sfx.taunt?.(); fxAt(e.u, 'taunt', { big: true }); ring(e.u, 'guard'); }
           else if (e.k === 'guard') { app.sfx.shield?.(); fxAt(e.u, 'shield'); ring(e.u, 'guard'); }
           else if (e.k === 'heal' && /^\+\d+ ATQ/.test(e.s)) { app.sfx.boost?.(); fxAt(e.u, 'boost'); }
@@ -740,37 +740,56 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   // Un curseur traverse la barre en accélérant. Toucher dans l'or : esquive. Sur le trait blanc, au tout dernier instant : parade parfaite.
   let defTap = null;
   // ——— Attaque rythmée : un anneau se resserre sur le cercle de runes ; toucher au bon moment donne un bonus au jet ———
+  // v352 : « lancer chargé ». Le d20 apparaît au centre ; on maintient le doigt pour le charger (il vibre et s'illumine
+  // à la couleur de la faction, une jauge circulaire se remplit puis redescend), on relâche dans l'or : le dé part en
+  // tournoyant et retombe dans le jet. Mêmes bonus qu'avant (RHYTHM.good / RHYTHM.perfect), seule la mise en scène change.
+  let lastThrow = 0;
   function rhythmQTE(name, uid) {
     return new Promise((resolve) => {
-      const D = 1250, from = 2.4, to = 0.4; // durée et échelle de l'anneau (1 = posé sur la cible dorée)
-      const ov = document.createElement('div');
-      ov.className = 'ry';
+      const RISE = 1000, TGT = 0.82, PERF = 0.06, GOOD = 0.16, C = 2 * Math.PI * 44;
       const cu = uid && st.units[uid] ? cat.get(st.units[uid].id) : null;
-      ov.innerHTML = `<div class="ry-c"><span class="ry-glow"></span><span class="ry-in">${cu ? `<img alt="" src="${artUrl(cu, { lite: true })}">` : ''}<i class="ry-med"></i></span><span class="ry-tgt"></span><span class="ry-out"></span><b class="ry-res"></b></div>
-        <p class="ry-t"><b>${esc(name)}</b><small>Touche quand l’anneau blanc rejoint le cercle d’or</small></p>`;
+      const fc = (cu && cat.faction[cu.faction]?.colors?.secondary) || '#F2C14E';
+      const arc = (a, b) => `stroke-dasharray="${((b - a) * C).toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="${(-a * C).toFixed(1)}"`;
+      const ov = document.createElement('div');
+      ov.className = 'ry ry2';
+      ov.style.setProperty('--fc', fc);
+      ov.innerHTML = `<div class="ry2-c"><span class="ry-glow"></span>
+          <svg class="ry2-g" viewBox="0 0 100 100" aria-hidden="true"><circle class="trk" cx="50" cy="50" r="44"/><circle class="zg" cx="50" cy="50" r="44" ${arc(TGT - GOOD, TGT + GOOD)}/><circle class="zp" cx="50" cy="50" r="44" ${arc(TGT - PERF, TGT + PERF)}/><circle class="fill" cx="50" cy="50" r="44" stroke-dasharray="0 ${C.toFixed(1)}"/></svg>
+          <div class="ry2-die"><img alt="" src="assets/fx/d20.webp"></div><span class="ry2-flash"></span><b class="ry-res"></b></div>
+        <p class="ry-t"><b>${esc(name)}</b><small>Maintiens le doigt pour charger le dé, relâche dans l’or</small></p>`;
       $('.dv').appendChild(ov);
-      const out = ov.querySelector('.ry-out'), res = ov.querySelector('.ry-res');
-      let t0 = 0, done = false, raf = 0;
-      const scaleAt = (x) => from + (to - from) * Math.min(1, x); // vitesse constante : le moment se lit à l'œil
-      const end = (s) => {
-        if (done) return; done = true; cancelAnimationFrame(raf); defTap = null;
-        const gap = s === null ? 9 : Math.abs(s - 1);
-        const bonus = gap <= 0.1 ? RHYTHM.perfect : gap <= 0.28 ? RHYTHM.good : 0;
-        ov.classList.add(bonus === RHYTHM.perfect ? 'perfect' : bonus ? 'good' : 'miss');
-        res.textContent = bonus === RHYTHM.perfect ? `Parfait ! +${bonus}` : bonus ? `Bien ! +${bonus}` : s === null ? 'Trop tard' : 'Raté';
+      const fill = ov.querySelector('.fill'), die = ov.querySelector('.ry2-die'), res = ov.querySelector('.ry-res');
+      let t0 = 0, x = 0, done = false, raf = 0, holding = false;
+      const idle = setTimeout(() => { if (!holding) finish(null); }, 6000);
+      const level = (ms) => { const k = (ms / RISE) % 2; return k <= 1 ? k : 2 - k; }; // monte puis redescend
+      const step = () => {
+        x = level(performance.now() - t0);
+        fill.setAttribute('stroke-dasharray', `${(x * C).toFixed(1)} ${C.toFixed(1)}`);
+        const g = Math.abs(x - TGT);
+        ov.classList.toggle('near', g <= GOOD); ov.classList.toggle('hot', g <= PERF);
+        ov.style.setProperty('--ch', x.toFixed(3));
+        if (!reduced) die.style.translate = `${((Math.random() - 0.5) * 9 * x).toFixed(1)}px ${((Math.random() - 0.5) * 9 * x).toFixed(1)}px`;
+        if (performance.now() - t0 > RISE * 6) release(); else raf = requestAnimationFrame(step);
+      };
+      const press = (e) => { if (done || holding) return; e.preventDefault(); holding = true; clearTimeout(idle); ov.classList.add('hold'); t0 = performance.now(); app.sfx.tap?.(); raf = requestAnimationFrame(step); };
+      const release = () => { if (!holding || done) return; holding = false; finish(x); };
+      function finish(v) {
+        if (done) return; done = true; cancelAnimationFrame(raf); clearTimeout(idle);
+        ov.removeEventListener('pointerdown', press); removeEventListener('pointerup', release); removeEventListener('pointercancel', release);
+        const gap = v === null ? 9 : Math.abs(v - TGT);
+        const bonus = gap <= PERF ? RHYTHM.perfect : gap <= GOOD ? RHYTHM.good : 0;
+        ov.classList.remove('hold', 'near', 'hot'); ov.classList.add(bonus === RHYTHM.perfect ? 'perfect' : bonus ? 'good' : 'miss', 'thrown');
+        die.style.translate = '';
+        res.textContent = bonus === RHYTHM.perfect ? `Parfait ! +${bonus}` : bonus ? `Bien ! +${bonus}` : v === null ? 'Lancé au hasard' : 'Raté';
         if (bonus === RHYTHM.perfect) { app.sfx.perfect(); if (!reduced) { const d = $('.dv'); d.classList.remove('ry-shake'); void d.offsetWidth; d.classList.add('ry-shake'); } }
         else if (bonus) app.sfx.hit(); else app.sfx.miss();
-        setTimeout(() => { ov.classList.add('out'); setTimeout(() => { ov.remove(); resolve(bonus); }, 220); }, bonus === RHYTHM.perfect ? 650 : 480);
-      };
-      const step = () => {
-        const x = (performance.now() - t0) / D, s = scaleAt(x);
-        out.style.transform = `translate(-50%, -50%) scale(${s})`;
-        const near = Math.abs(s - 1) <= 0.28; out.classList.toggle('near', near); ov.classList.toggle('near', near);
-        if (x >= 1) end(null); else raf = requestAnimationFrame(step);
-      };
-      defTap = () => { if (!t0) return; end(scaleAt((performance.now() - t0) / D)); };
+        app.sfx.swipe?.();
+        lastThrow = performance.now();
+        setTimeout(() => { ov.classList.add('out'); setTimeout(() => { ov.remove(); resolve(bonus); }, 200); }, bonus === RHYTHM.perfect ? 700 : 520);
+      }
+      ov.addEventListener('pointerdown', press);
+      addEventListener('pointerup', release); addEventListener('pointercancel', release);
       app.sfx.swipe?.();
-      setTimeout(() => { if (!done && alive_) { t0 = performance.now(); raf = requestAnimationFrame(step); } }, reduced ? 200 : 380);
     });
   }
   function defenseQTE(s) {
