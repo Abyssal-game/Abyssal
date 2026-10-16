@@ -502,7 +502,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           }
           if (e.tgt && st.units[e.tgt]?.side === 'enemy' && DICE_KEYS.includes(e.key)) pendingLunge = { u: e.u, tgt: e.tgt };
           else if (e.tgt && st.units[e.tgt]?.side === 'enemy' && e.key !== 'marque' && e.key !== 'entrave') { lunge(e.u, e.tgt); cam(e.tgt, 0.6); await wait(T(LUNGE_HIT)); }
-          else if (e.key === 'marque' && e.tgt) { fxSheet(e.tgt, 'role-mark', { k: 2.5, d: 800 }); ring(e.tgt, 'mark'); await wait(T(420)); }
+          else if (e.key === 'marque' && e.tgt) { if (!e.skill || !SKILL_FX.marque) fxSheet(e.tgt, 'role-mark', { k: 2.5, d: 800 }); ring(e.tgt, 'mark'); await wait(T(420)); }
           break;
         case 'eact': {
           const def = INTENTS[e.kind];
@@ -662,7 +662,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   // v357 : « la carte s'éveille » (remplace le plan en pleine illustration, jugé sans intérêt par le propriétaire) :
   // la carte se soulève et s'illumine à la couleur de sa faction, un cercle magique de la faction tourne sous elle,
   // le nom du coup s'affiche au-dessus. Ennemis : la carte gronde, rougit et tremble. Puis le sort part sur la cible.
-  const CIRCLES = new Set([]); // factions dont le cercle Gemini est arrivé (assets/fx/circle-<faction>.webp) ; repli : dice-ring
+  const CIRCLES = new Set(['infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel']); // v359 : les 7 cercles Gemini // factions dont le cercle Gemini est arrivé (assets/fx/circle-<faction>.webp) ; repli : dice-ring
   async function castFx(uid, label, { ic = '', foe = false } = {}) {
     const u = st.units[uid], t = el(uid);
     if (!u || !t || reduced || ui.fast === 3) return false;
@@ -687,7 +687,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     return true;
   }
   // Planche propre à chaque compétence de rôle, jouée sur la cible (assets/fx/sk-<clé>.webp, ajoutées à l'arrivée des images)
-  const SKILL_FX = {}; // ex. estoc: { k: 2.8, d: 820 } ; raz : rangée entière
+  const SKILL_FX = { estoc: { k: 2.8, d: 820 }, contagion: { k: 2.6, d: 850 }, entrave: { k: 2.6, d: 880 }, marque: { k: 2.5, d: 850 }, raz: { row: true, d: 900 }, rempart: { k: 2.5, d: 900 }, priere: { k: 2.5, d: 920 } }; // v359
   const skillFx = (key, uid, tgt) => {
     const f = SKILL_FX[key]; if (!f) return false;
     if (f.row) fxSheet(null, `sk-${key}`, { row: true, d: f.d }); else fxSheet(tgt || uid, `sk-${key}`, { k: f.k, d: f.d });
@@ -845,13 +845,13 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         const rOf = (p) => (50 * dOf(p)) / D0 - 1.2;
         const n = document.createElement('div'); n.className = 'cb-dring';
         n.style.cssText = `left:${(L + R) / 2 - bb.left}px;top:${(T_ + B) / 2 - bb.top}px;width:${D0}px;height:${D0}px`;
-        n.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="zg" cx="50" cy="50"/><circle class="zp" cx="50" cy="50"/><circle class="cl" cx="50" cy="50"/><circle class="cl2" cx="50" cy="50"/></svg>`;
+        n.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="zg" cx="50" cy="50"/><circle class="zp" cx="50" cy="50"/><circle class="cl" cx="50" cy="50"/><circle class="cl2" cx="50" cy="50"/></svg><img class="dr-img" alt="" src="assets/fx/def-ring.webp">`;
         box.appendChild(n);
-        const [zg, zp, cl, cl2] = n.querySelectorAll('circle');
+        const [zg, zp, cl, cl2] = n.querySelectorAll('circle'), img = n.querySelector('.dr-img'); // v359 : anneau de visée peint (bord à 34 % de l'image)
         const band = (c, a, b) => { const ra = rOf(a), rb = rOf(b); c.setAttribute('r', ((ra + rb) / 2).toFixed(2)); c.setAttribute('stroke-width', Math.max(0.8, ra - rb).toFixed(2)); };
         const zone = (zz) => { band(zg, zz, zz + zw); band(zp, zz + zw - pw, zz + zw); };
-        zone(z0); cl.setAttribute('r', rOf(0).toFixed(2)); cl2.setAttribute('r', rOf(0).toFixed(2));
-        return { n, zone, at: (p) => { const r = rOf(p).toFixed(2); cl.setAttribute('r', r); cl2.setAttribute('r', r); }, end: (res) => { n.classList.add(`r-${res}`); setTimeout(() => n.remove(), 420); } };
+        zone(z0); cl.setAttribute('r', rOf(0).toFixed(2)); cl2.setAttribute('r', rOf(0).toFixed(2)); img.style.transform = `scale(${(rOf(0) / 34).toFixed(3)})`;
+        return { n, zone, at: (p) => { const r = rOf(p).toFixed(2); cl.setAttribute('r', r); cl2.setAttribute('r', r); img.style.transform = `scale(${(rOf(p) / 34).toFixed(3)}) rotate(${(p * 90).toFixed(1)}deg)`; }, end: (res) => { n.classList.add(`r-${res}`); setTimeout(() => n.remove(), 420); } };
       })();
       const end = (res) => {
         if (done) return; done = true; cancelAnimationFrame(raf); defTap = null;
