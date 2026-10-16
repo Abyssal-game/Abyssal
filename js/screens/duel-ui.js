@@ -713,7 +713,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     $('.dv').appendChild(b);
     await new Promise((res) => { const go = () => { b.remove(); res(); }; b.addEventListener('pointerdown', go, { once: true }); }); // v295 : attend le toucher, plus de fermeture automatique
   }
-  const ULT_FX = { sceau: 'ult-sceau', revive: 'ult-revive', nova: 'ult-nova', smite: 'ult-smite' }; // v354 : une planche Gemini par pouvoir d'équipe (l'Égide mécanique garde « ult-seal » en attendant la sienne)
+  const ULT_FX = { sceau: 'ult-sceau', revive: 'ult-revive', nova: 'ult-nova', smite: 'ult-smite', aegis: 'ult-aegis' }; // v354-v355 : une planche Gemini par pouvoir d'équipe
   async function ultFx() {
     const c = run.ult.card ? cat.get(run.ult.card) : null;
     const fx = document.createElement('div');
