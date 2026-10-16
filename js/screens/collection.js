@@ -91,12 +91,31 @@ export default function collection(app, root, params) {
     const list = filtered();
     ids = list.map((c) => c.id);
     const grid = root.querySelector('#col-grid');
-    grid.innerHTML = list.map((c) => {
+    const html = (c) => {
       const e = g.entry(c.id);
       return e ? cardHTML(c, { lazy: true, count: e.n, isNew: e.isNew, variant: bestVariant(e), tag: g.formOf(c.id) ? '<span class="fm-tag">Corrompue</span>' : '' })
         : cardHTML(c, { lazy: true, mystery: true, nameKnown: g.nameKnown(c.id) });
-    }).join('');
+    };
+    // v364 : les premières cartes tout de suite, le reste par paquets entre deux images (l'écran s'ouvre sans à-coup)
+    const run = (drawGrid.run = (drawGrid.run || 0) + 1), FIRST = 24, STEP = 30;
+    grid.innerHTML = list.slice(0, FIRST).map(html).join('');
     lazyArt(grid);
+    // hauteur finale réservée tout de suite : le retour depuis une fiche retrouve sa position de défilement
+    grid.style.minHeight = '';
+    const k0 = grid.children[0];
+    if (k0 && list.length > FIRST) {
+      const cols = [...grid.children].filter((x) => x.offsetTop === k0.offsetTop).length || 1;
+      const gap = parseFloat(getComputedStyle(grid).rowGap) || 0;
+      grid.style.minHeight = `${Math.ceil(list.length / cols) * (k0.offsetHeight + gap)}px`;
+    }
+    const more = (from) => {
+      if (run !== drawGrid.run || !grid.isConnected) return;
+      if (from >= list.length) { grid.style.minHeight = ''; return; }
+      grid.insertAdjacentHTML('beforeend', list.slice(from, from + STEP).map(html).join(''));
+      lazyArt(grid);
+      setTimeout(() => requestAnimationFrame(() => more(from + STEP)), 0);
+    };
+    requestAnimationFrame(() => more(FIRST));
     root.querySelector('#col-empty').hidden = list.length > 0;
     const owned = g.uniqueCount();
     root.querySelector('#col-summary').textContent = `${owned} créatures découvertes sur ${total} (${pct(owned / total)}) · ${g.newCount()} nouvelle${g.newCount() > 1 ? 's' : ''}`;

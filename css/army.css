@@ -3269,3 +3269,14 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 /* v363 : 4 règles → grille 2 × 2 (la tuile « Les bases » ne prend plus toute la largeur) */
 .sc-rtile:first-child { grid-column: auto; min-height: 128px; flex-direction: column; text-align: center; gap: 4px; padding-right: 10px; }
 .sc-rtile:first-child small { flex: none; }
+
+/* v364 : fluidité des menus — ombres plus légères sur les petites cartes des grilles, pas de flou sur les cartes inconnues,
+   ombre fixe sous la grande carte (elle était recalculée 60 fois par seconde), décor de combat sans fondu ni flou */
+.grid-cards .tcg-mini, .slot .tcg-mini { box-shadow: 0 4px 10px rgba(0, 0, 0, .55); transition: transform .18s ease; }
+.grid-cards .r-M, .grid-cards .r-S, .slot .r-M, .slot .r-S { box-shadow: 0 4px 10px rgba(0, 0, 0, .55), 0 0 12px color-mix(in srgb, var(--rc) 35%, transparent); }
+.grid-cards .r-HR .tcg-frame, .slot .r-HR .tcg-frame, .grid-cards .v-galaxy .tcg-vframe, .grid-cards .v-corrupt .tcg-frame { animation: none; }
+.grid-cards .is-mystery.real .tcg-art img, .slot .is-mystery.real .tcg-art img, .tcg-mini.is-mystery.real .tcg-art img { filter: grayscale(1) brightness(.1) contrast(1.8) !important; }
+.tiltable { box-shadow: 0 14px 34px rgba(0, 0, 0, .65); }
+.dio-flame, .dio-flame *, .dio-maw .dio-gullet, .dio-geo { mix-blend-mode: normal !important; }
+.dio-mist { filter: none; }
+.dio-fire, .dio-fire::after, .dio-flame::after { mix-blend-mode: normal !important; filter: none !important; }

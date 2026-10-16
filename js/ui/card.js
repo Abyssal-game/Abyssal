@@ -97,8 +97,8 @@ export function enableTilt(el, { reduced = false } = {}) {
     card.style.setProperty('--mx', `${(50 + (cur.y / MAX) * 50).toFixed(1)}%`);
     card.style.setProperty('--my', `${(50 - (cur.x / MAX) * 50).toFixed(1)}%`);
     card.style.setProperty('--tilt', (Math.min(1, Math.hypot(cur.x, cur.y) / MAX)).toFixed(3));
-    card.style.boxShadow = `${(-cur.y * 0.6).toFixed(1)}px ${(14 + cur.x * 0.5).toFixed(1)}px 34px rgba(0, 0, 0, .65)`;
   };
+  let frame = 0;
   const loop = (now) => {
     if (!alive) return;
     if (!touching) {
@@ -107,7 +107,9 @@ export function enableTilt(el, { reduced = false } = {}) {
     }
     const k = touching ? 0.45 : 0.07;
     cur.x += (tgt.x - cur.x) * k; cur.y += (tgt.y - cur.y) * k;
-    apply();
+    // v364 : au repos, la carte se balance à 30 images par seconde (la lueur suit), et plus du tout si l'app est en arrière-plan
+    frame++;
+    if (touching || frame % 2 === 0) { if (!document.hidden) apply(); }
     raf = requestAnimationFrame(loop);
   };
   const clamp = (v) => Math.max(-MAX, Math.min(MAX, v));

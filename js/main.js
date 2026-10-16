@@ -237,6 +237,14 @@ function render() {
 // v331 : offrande du jour, missions terminées et coffre de la semaine versés automatiquement, avec une annonce
 // (l'étude joueurs montrait des récompenses restées en attente toute une séance faute d'aller les toucher sur l'Accueil)
 let claiming = false;
+// v364 : quelques secondes après le lancement, les fonds des écrans principaux sont décodés un par un en arrière-plan :
+// changer d'onglet ne décode plus une grande image sur le moment (gardés en mémoire tant que l'app tourne)
+const warmed = [];
+setTimeout(() => {
+  const list = ['home', 'collection', 'menu', 'descent', 'shop'].map((n) => `assets/scenes/${n}.webp`).concat('assets/brand/title.webp');
+  const next = () => { const u = list.shift(); if (!u) return; const im = new Image(); im.src = u; warmed.push(im); (im.decode ? im.decode() : Promise.resolve()).catch(() => {}).then(() => setTimeout(next, 400)); };
+  next();
+}, 4000);
 function autoClaim() {
   const g = app.game;
   if (!g || claiming || document.body.classList.contains('gated') || document.getElementById('boot') || document.querySelector('.opening, .sheet-wrap')) return;
