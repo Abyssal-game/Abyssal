@@ -545,7 +545,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           await wait(T(320));
           break;
         }
-        case 'parry': app.sfx.parry(); dio.flare(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxSheet(e.u, 'fx-parry', { k: 2.5, d: 820 }); recoil(e.a); impactFlash(e.u, true); sparks(e.u, 'gold'); cam(e.u, -0.8); } banner('Parade parfaite !', 'parry', 800); shake(false); await wait(T(420)); break;
+        case 'parry': app.sfx.parry(); dio.flare(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxSheet(e.u, 'def-clash', { k: 2.7, d: 760 }); fxSheet(e.u, 'fx-parry', { k: 2.1, d: 820 }); recoil(e.a); // v361 : choc des lames (Gemini) + anneau d'or impactFlash(e.u, true); sparks(e.u, 'gold'); cam(e.u, -0.8); } banner('Parade parfaite !', 'parry', 800); shake(false); await wait(T(420)); break;
         case 'fervor': fervorPop(e.d, e.why); draw(); break;
         case 'passive': app.sfx.passive?.(); passivePop(e.u, e.p); float(e.u, PASSIVES[e.p]?.name || '', 'syn'); await wait(T(320)); break;
         case 'brk': { const t = el(e.u)?.querySelector('.cb-brk i'); if (t) t.style.width = `${(e.brk / e.max) * 100}%`; break; }
