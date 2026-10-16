@@ -19,7 +19,7 @@ g.devGrant({ shards: 2400, ash: 1800 });
 g.devChests();
 g.setTeam(g.autoTeam());
 g.s.seenIntro = GUIDE_V;
-g.s.tips = Object.fromEntries('army-doors army-team boosters cb-break cb-combo cb-defense cb-dice cb-duo cb-entrance cb-goal cb-intro cb-phase2 cb-runes cb-skill cb-talent cb-traits cb-ult coffres collection fournaise pacts renfort sceaux sceaux-awake sceaux-board sceaux-combo sceaux-perks tirage'.split(' ').map((k) => [k, 1]));
+g.s.tips = Object.fromEntries('army-doors army-team boosters cb-break cb-combo cb-defense cb-defense2 cb-dice cb-dice2 cb-duo cb-entrance cb-goal cb-intro cb-phase2 cb-runes cb-skill cb-talent cb-traits cb-ult coffres collection fournaise pacts renfort sceaux sceaux-awake sceaux-board sceaux-combo sceaux-perks tirage'.split(' ').map((k) => [k, 1]));
 g.markAllSeen();
 g.s.bossesBeaten.devoreur = Date.now(); // ouvre les Duels des Sceaux
 g.devGrant({ tickets: { premium: 1 } }); // un booster à ouvrir pour la capture d'ouverture

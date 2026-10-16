@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v364';
+const VERSION = 'abyssal-v365';
 const ART_CACHE = 'abyssal-media';  // images du jeu : gardées entre les versions
 const FONT_CACHE = 'abyssal-fonts';
 const CORE = [
@@ -84,6 +84,9 @@ self.addEventListener('fetch', (e) => {
         await c.put(req, new Response(body, { status: res.status, statusText: res.statusText, headers: h }));
         return res;
       }).catch(() => null);
+      // v365 : les effets de combat (assets/fx) attendent la vérification (réponse « inchangée » très légère) :
+      // une ancienne copie sur fond noir ne doit jamais s'afficher avec le code qui suppose la transparence
+      if (hit && url.pathname.includes('/assets/fx/')) return (await fresh) || hit;
       if (hit) { e.waitUntil(fresh); return hit; }
       return (await fresh) || Response.error();
     }));

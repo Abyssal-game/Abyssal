@@ -3280,3 +3280,33 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 .dio-flame, .dio-flame *, .dio-maw .dio-gullet, .dio-geo { mix-blend-mode: normal !important; }
 .dio-mist { filter: none; }
 .dio-fire, .dio-fire::after, .dio-flame::after { mix-blend-mode: normal !important; filter: none !important; }
+
+/* v365 : plus aucune lueur qui pulse en redessinant à chaque image pendant les combats.
+   Grandes zones : lueur fixe ; petites pastilles de menace : pulsation de taille (calculée par la puce graphique). */
+.dv-c.target { animation: none; box-shadow: 0 0 0 3px #FF6B7F, 0 0 20px rgba(255, 80, 100, .7), 0 12px 20px rgba(0, 0, 0, .7); }
+.dv-c.target .cb-tgt { animation: tgtBeat .8s ease-in-out infinite; }
+@keyframes tgtBeat { 50% { scale: 1.12; } }
+.dv-ult.ready, .cb-res.ready { animation: none; box-shadow: 0 0 22px color-mix(in srgb, var(--uc) 80%, transparent); }
+.dv-end.pulse, .dv-resv.on { animation: none; box-shadow: 0 0 0 3px var(--gold-hi), 0 0 18px rgba(241, 219, 158, .6); }
+.dv .cb-a.sig { animation: none; }
+.dv .cb-a.sig::after { box-shadow: 0 0 22px rgba(242, 193, 78, .7); animation: sigBeat 2.4s ease-in-out infinite; }
+@keyframes sigBeat { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+.cb-a[data-a="duo"] { animation: none; box-shadow: 0 0 20px rgba(200, 150, 255, .9); }
+.dv-int.k-charge, .dv-int.k-heavy, .cb-int.d3, .cb-int.k-charge, .cb-int.k-channel, .dv-threat.lethal, .cb-warn { animation: threatBeat 1s ease-in-out infinite; }
+@keyframes threatBeat { 50% { scale: 1.1; } }
+@media (prefers-reduced-motion: reduce) { .dv-c.target .cb-tgt, .dv .cb-a.sig::after, .dv-int, .cb-int, .dv-threat, .cb-warn { animation: none !important; } }
+
+/* v365 : défense plus lisible — la bande d'or s'allume au bon moment (« Maintenant ! »), le trait blanc ensuite (« Parade ! ») */
+.cb-dring .dr-go, .cb-dring .dr-pp { position: absolute; z-index: 2; left: 50%; top: 50%; translate: -50% -50%; white-space: nowrap; padding: 5px 12px; border-radius: 99px; font: 800 1.05rem/1 var(--f-display); letter-spacing: .05em; text-transform: uppercase; opacity: 0; pointer-events: none; transition: opacity .06s; }
+.cb-dring .dr-go { color: #2A1A04; background: linear-gradient(#FFE7A0, #F2C14E); box-shadow: 0 0 18px rgba(242, 193, 78, .9); }
+.cb-dring .dr-pp { color: #10131A; background: linear-gradient(#FFFFFF, #D8ECFF); box-shadow: 0 0 20px rgba(220, 240, 255, 1); }
+.cb-dring.go .dr-go, .cb-dring.pp .dr-pp { opacity: 1; }
+.cb-dring.go .zg { stroke: #FFD86A; }
+.cb-dring.pp .zp { stroke: #FFFFFF; stroke-width: 3; }
+.cb-dring.go .dr-img, .cb-dring.pp .dr-img { filter: brightness(1.6) saturate(.6); }
+.cb-dring.r-dodge .dr-go, .cb-dring.r-parry .dr-pp, .cb-dring.r-none .dr-go, .cb-dring.r-none .dr-pp { opacity: 0; }
+.cb-def .df-go, .cb-def .df-pp { position: absolute; z-index: 3; left: 50%; top: 50%; translate: -50% -50%; white-space: nowrap; padding: 6px 16px; border-radius: 99px; font: 800 1.25rem/1 var(--f-display); letter-spacing: .06em; text-transform: uppercase; opacity: 0; pointer-events: none; }
+.cb-def .df-go { color: #2A1A04; background: linear-gradient(#FFE7A0, #F2C14E); box-shadow: 0 0 22px rgba(242, 193, 78, .95); }
+.cb-def .df-pp { color: #10131A; background: linear-gradient(#FFFFFF, #D8ECFF); box-shadow: 0 0 24px rgba(220, 240, 255, 1); }
+.cb-def.go .df-go, .cb-def.pp .df-pp { opacity: 1; }
+.cb-def.ok .df-go, .cb-def.ok .df-pp, .cb-def.ko .df-go, .cb-def.ko .df-pp { opacity: 0; }

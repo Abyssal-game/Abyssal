@@ -99,6 +99,25 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   const enEl = $('.dv-row.enemy'), alEl = $('.dv-row.ally'), msgEl = $('.dv-msg'), actsEl = $('.cb-acts');
   const say = (h) => { msgEl.innerHTML = frSpaces(h); }; // v319 : « » et : ! ? ne se retrouvent plus seuls en début de ligne
   const el = (uid) => root.querySelector(`[data-uid="${uid}"]`);
+  // v365 : mises à jour ciblées (avant, chaque événement reconstruisait tout : cartes, illustrations, frise…).
+  // setHTML : ne réécrit une zone que si son contenu a changé. patchRow : ne remplace que les cartes qui ont changé,
+  // et une carte remplacée garde son illustration déjà décodée.
+  const setHTML = (node, html) => { if (node && node._h !== html) { node.innerHTML = html; node._h = html; } };
+  const tpl = document.createElement('template');
+  const patchRow = (row, parts) => {
+    if (!row) return;
+    const old = new Map([...row.children].filter((x) => x.dataset.uid).map((x) => [x.dataset.uid, x]));
+    const out = parts.map(({ uid, html }) => {
+      const o = uid && old.get(uid);
+      if (o && o._h === html) { if (o.className !== o._cls) o.className = o._cls; return o; } // comme une carte neuve, sans la reconstruire
+      tpl.innerHTML = html.trim(); const n = tpl.content.firstElementChild; n._h = html; n._cls = n.className;
+      const oi = o?.querySelector('.dv-art img'), ni = n.querySelector('.dv-art img');
+      if (oi && ni && oi.getAttribute('src') === ni.getAttribute('src')) ni.replaceWith(oi);
+      return n;
+    });
+    if (out.length === row.children.length && out.every((n, i) => row.children[i] === n)) return;
+    row.replaceChildren(...out);
+  };
 
   // ——— Carte de combat ———
   let th = {}, tgtInfo = {}, lastGoal = null;
@@ -229,7 +248,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         tgtInfo[id] = (p.roll ? `${p.roll.chance}%` : p.dmg ? (ko ? '<b class="ko">K.O.</b>' : `-${p.dmg}${p.weak ? '★' : ''}`) : 'Cible') + tag;
       }
     }
-    enEl.innerHTML = front(st, 'enemy').map(cardEl).join('') + resHTML('enemy');
+    patchRow(enEl, [...front(st, 'enemy').map((u) => ({ uid: u.uid, html: cardEl(u) })), ...(resHTML('enemy') ? [{ uid: null, html: resHTML('enemy') }] : [])]);
     const gl = goalState(st);
     if (gl && gl.state === 'done' && lastGoal !== 'done' && lastGoal !== null) { app.sfx.achievement?.(); banner(`${icon('star')} Objectif réussi !`, 'good', 1100); }
     if (gl && gl.state === 'fail' && lastGoal === 'pending') toast(`Objectif « ${esc(gl.name)} » manqué.`, { icon: 'info' });
@@ -240,16 +259,16 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       st.aspect ? `<span class="cb-law" data-d="rule" data-k="aspect"><b>${esc(ASPECTS[st.aspect].name)}</b></span>` : '',
       st.runes ? `<span class="cb-law cb-runes" data-d="rule" data-k="runes" title="Runes du gardien">${st.runes.map((r) => `<img alt="" src="assets/ui/${r.broken ? 'rune-broken' : 'rune'}.webp" class="${r.broken ? 'off' : ''}">`).join('')}<b>${runesLeft(st) ? `−${runesLeft(st) * 10} %` : 'Rompues'}</b></span>` : '',
       st.omen && OMENS[st.omen] ? `<span class="cb-law" data-d="rule" data-k="omen">${icon(OMENS[st.omen].icon)}<b>Présage</b></span>` : (st.relics || []).length ? `<span class="cb-law" data-d="rule" data-k="relics">${icon('p:crown')}<b>${st.relics.length} relique${st.relics.length > 1 ? 's' : ''}</b></span>` : ''].join('');
-    const rulesEl = $('.cb-rules'); if (rulesEl) { rulesEl.innerHTML = rules; rulesEl.hidden = !rules; }
-    alEl.innerHTML = front(st, 'ally').map(cardEl).join('');
+    const rulesEl = $('.cb-rules'); if (rulesEl) { setHTML(rulesEl, rules); rulesEl.hidden = !rules; }
+    patchRow(alEl, front(st, 'ally').map((u) => ({ uid: u.uid, html: cardEl(u) })));
     const sw = st.swallowed && st.units[st.swallowed];
-    $('.dv-resw').innerHTML = resHTML('ally') + (sw?.swallowed ? `<span class="cb-swal" title="Engloutie : brise le Dévoreur pour la libérer"><img alt="" src="${artUrl(cat.get(sw.id), { lite: true })}"><small>Engloutie · ${sw.hp} PV</small></span>` : '');
+    setHTML($('.dv-resw'), resHTML('ally') + (sw?.swallowed ? `<span class="cb-swal" title="Engloutie : brise le Dévoreur pour la libérer"><img alt="" src="${artUrl(cat.get(sw.id), { lite: true })}"><small>Engloutie · ${sw.hp} PV</small></span>` : ''));
     const showActs = !!sel && st.turn === 'ally' && !busy && !st.over;
     actsEl.hidden = !showActs;
-    actsEl.innerHTML = showActs ? actsHTML() : '';
+    setHTML(actsEl, showActs ? actsHTML() : '');
     const pu = st.init ? st.units[st.actor] : null, paNow = st.init ? (st.turn === 'ally' && pu ? pu.pa || 0 : 0) : st.ap;
-    $('.cb-pips').innerHTML = Array.from({ length: st.init ? PA_MAX : Math.max(AP_MAX, st.ap) }, (_, i) => `<i class="${i < paNow ? 'on' : ''}"></i>`).join('');
-    $('.cb-gems').innerHTML = Array.from({ length: FERVOR_MAX }, (_, i) => `<i class="${i < st.fervor ? 'on' : ''}"></i>`).join('');
+    setHTML($('.cb-pips'), Array.from({ length: st.init ? PA_MAX : Math.max(AP_MAX, st.ap) }, (_, i) => `<i class="${i < paNow ? 'on' : ''}"></i>`).join(''));
+    setHTML($('.cb-gems'), Array.from({ length: FERVOR_MAX }, (_, i) => `<i class="${i < st.fervor ? 'on' : ''}"></i>`).join(''));
     const ready = ultReady(st);
     if (ready && !g.s.tips?.['cb-ult'] && !settling()) tuto(app, 'cb-ult');
     $('.cb-res').classList.toggle('ready', ready);
@@ -280,7 +299,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   };
   function drawTimeline() {
     const box = $('.cb-tl'); if (!box) return;
-    if (st.over) { box.innerHTML = ''; return; }
+    if (st.over) { setHTML(box, ''); return; }
     if (st.init) {
       // v262 : chaque créature a sa place dans l'ordre (vitesse) ; après le séparateur, le tour suivant
       const ok = (u) => u && u.hp > 0 && !u.swallowed && front(st, u.side).includes(u);
@@ -292,8 +311,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       const sig = list.map((x) => x.sep ? `T${x.sep}` : x.u.uid).join(',');
       const moved = tlSig && tlSig.split(',')[0] !== sig.split(',')[0];
       tlSig = sig;
-      box.innerHTML = list.map((x, i) => (x.sep ? `<span class="cb-tlsep" title="Tour suivant">T${x.sep}</span>`
-        : `<span class="cb-tlr ${x.u.side === 'enemy' ? 'foe' : 'al'} ${i === 0 ? 'now' : ''} ${x.u.boss ? 'boss' : x.u.elite ? 'elite' : ''} ${x.w ? 'warn' : ''}" title="${esc(cat.get(x.u.id).name)}${x.w ? ` : ${esc(INTENTS[PREP_IT[x.w] || x.w].name)}` : ''}"><span class="cb-tlp">${pic(x.u)}</span>${x.w ? '<i class="cb-tlx">!</i>' : ''}</span>`)).join('');
+      setHTML(box, list.map((x, i) => (x.sep ? `<span class="cb-tlsep" title="Tour suivant">T${x.sep}</span>`
+        : `<span class="cb-tlr ${x.u.side === 'enemy' ? 'foe' : 'al'} ${i === 0 ? 'now' : ''} ${x.u.boss ? 'boss' : x.u.elite ? 'elite' : ''} ${x.w ? 'warn' : ''}" title="${esc(cat.get(x.u.id).name)}${x.w ? ` : ${esc(INTENTS[PREP_IT[x.w] || x.w].name)}` : ''}"><span class="cb-tlp">${pic(x.u)}</span>${x.w ? '<i class="cb-tlx">!</i>' : ''}</span>`)).join(''));
       if (moved && !reduced) { box.classList.remove('shift'); void box.offsetWidth; box.classList.add('shift'); }
       return;
     }
@@ -307,9 +326,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const sig = list.map((x) => (x.team ? x.key : x.uid)).join(',');
     const moved = tlSig && tlSig.split(',')[0] !== sig.split(',')[0];
     tlSig = sig;
-    box.innerHTML = list.map((x, i) => (x.team
+    setHTML(box, list.map((x, i) => (x.team
       ? `<span class="cb-tlr team ${i === 0 ? 'now' : ''}" title="Ton équipe"><span class="cb-tlp">${allies.slice(0, 3).map(pic).join('')}</span></span>`
-      : `<span class="cb-tlr foe ${i === 0 ? 'now' : ''} ${x.boss ? 'boss' : x.elite ? 'elite' : ''}" title="${esc(cat.get(x.id).name)}"><span class="cb-tlp">${pic(x)}</span></span>`)).join('');
+      : `<span class="cb-tlr foe ${i === 0 ? 'now' : ''} ${x.boss ? 'boss' : x.elite ? 'elite' : ''}" title="${esc(cat.get(x.id).name)}"><span class="cb-tlp">${pic(x)}</span></span>`)).join(''));
     if (moved && !reduced) { box.classList.remove('shift'); void box.offsetWidth; box.classList.add('shift'); }
   }
   function drawAims() {
@@ -330,7 +349,16 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   }
 
   // ——— Effets ———
-  const shake = (big, small = false) => { if (reduced) return; const d = $('.dv'); d.classList.remove('shake', 'big', 'small'); void d.offsetWidth; d.classList.add('shake'); d.classList.toggle('big', !!big); d.classList.toggle('small', !big && !!small); };
+  // v365 : secousse et caméra en animations directes sur le plateau (avant : une classe ajoutée sur tout le plateau,
+  // donc tous les styles recalculés, et une mise en page forcée à chaque coup)
+  const SHAKE = { small: [220, [[-3, 1], [3, -1], [-1, 0]]], norm: [300, [[-5, 2], [5, -2], [-3, 1], [2, 0]]], big: [500, [[-9, 4, -0.4], [8, -4, 0.4], [-6, 3], [5, -2], [-3, 1]]] };
+  let shakeA = null, camA = null;
+  const shake = (big, small = false) => {
+    if (reduced) return; const d = $('.dv'); if (!d?.animate) return;
+    const [dur, pts] = SHAKE[big ? 'big' : small ? 'small' : 'norm'];
+    shakeA?.cancel();
+    shakeA = d.animate([{ transform: 'none' }, ...pts.map(([x, y, r = 0]) => ({ transform: `translate(${x}px, ${y}px) rotate(${r}deg)` })), { transform: 'none' }], { duration: dur, easing: 'ease' });
+  };
   // v346 : éclair d'impact — une lumière blanche et dorée jaillit du point touché
   const impactFlash = (uid, big) => { if (reduced) return; const t = el(uid), box = $('.dv'); if (!t || !box) return; const b = box.getBoundingClientRect(), r = t.getBoundingClientRect(); const f = document.createElement('span'); f.className = `dv-iflash ${big ? 'big' : ''} ${st.units[uid]?.side === 'ally' ? 'foe' : ''}`; f.style.cssText = `left:${r.left - b.left + r.width / 2}px;top:${r.top - b.top + r.height / 2}px`; box.appendChild(f); setTimeout(() => f.remove(), 420); };
   const sparks = (uid, cls = '') => {
@@ -356,12 +384,18 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (reduced) return;
     const d = $('.dv'), t = el(uid); if (!d || !t) return;
     const b = d.getBoundingClientRect(), r = t.getBoundingClientRect();
-    d.style.setProperty('--cx', `${((r.left + r.width / 2 - b.left) / b.width - 0.5) * -10 * k}px`);
-    d.style.setProperty('--cy', `${((r.top + r.height / 2 - b.top) / b.height - 0.5) * -10 * k}px`);
-    d.classList.remove('cam'); void d.offsetWidth; d.classList.add('cam');
+    const cx = ((r.left + r.width / 2 - b.left) / b.width - 0.5) * -10 * k, cy = ((r.top + r.height / 2 - b.top) / b.height - 0.5) * -10 * k;
+    if (!d.animate) return;
+    camA?.cancel();
+    camA = d.animate([{ translate: '0 0' }, { translate: `${cx.toFixed(1)}px ${cy.toFixed(1)}px`, offset: 0.3 }, { translate: '0 0' }], { duration: 450, easing: 'ease-out' });
   };
   // Arrêt sur image : le coup « pèse » un instant
-  const hitstop = async (ms) => { if (reduced) return; const d = $('.dv'); d?.classList.add('hitstop'); await wait(T(ms)); d?.classList.remove('hitstop'); };
+  const hitstop = async (ms) => {
+    if (reduced) return;
+    // v365 : on fige seulement les animations des cartes, sans changer de classe (plus de recalcul de tout le plateau)
+    const cards = [...root.querySelectorAll('.dv-c')], an = cards.flatMap((c) => c.getAnimations?.() || []).filter((a) => a.playState === 'running');
+    an.forEach((a) => a.pause()); await wait(T(ms)); an.forEach((a) => { try { a.play(); } catch (e) { /* animation terminée */ } });
+  };
   // Icône d'une combinaison réussie, qui jaillit de la carte
   // (posée sur le combat, pas dans la carte : la carte est redessinée pendant l'animation)
   const comboPop = (uid, key) => {
@@ -834,7 +868,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       const def = INTENTS[s.kind];
       const bar = document.createElement('div');
       bar.className = `dv-dodge cb-def${reduced ? '' : ' ring'}`;
-      bar.innerHTML = `<span class="dv-dodge-t">${intentIcon(s.kind)} ${esc(def.name)} ! <small>${reduced ? 'Zone dorée : esquive · trait blanc, au dernier instant : parade' : 'Touche dans l’or · trait blanc : parade'}</small></span><span class="dv-dodge-bar"><i class="rail"></i><i class="z"><i class="p"></i></i><i class="c"></i></span>`;
+      bar.innerHTML = `<span class="dv-dodge-t">${intentIcon(s.kind)} ${esc(def.name)} ! <small>${reduced ? 'Zone dorée : esquive · trait blanc, au dernier instant : parade' : 'Touche quand l’anneau rouge arrive sur l’or'}</small></span><b class="df-go" aria-hidden="true">Maintenant !</b><b class="df-pp" aria-hidden="true">Parade !</b><span class="dv-dodge-bar"><i class="rail"></i><i class="z"><i class="p"></i></i><i class="c"></i></span>`;
       $('.dv-mid').appendChild(bar); $('.dv-mid').classList.add('qte'); $('.dv')?.classList.add('qte-on');
       const cur = bar.querySelector('.c'), zEl = bar.querySelector('.z'), pEl = bar.querySelector('.p');
       zEl.style.cssText = `left:${z0 * 100}%;width:${zw * 100}%`;
@@ -876,7 +910,12 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         const x = (performance.now() - t0) / D, pos = ease(Math.min(1, x));
         cur.style.left = `${pos * 100}%`;
         if (moving) zEl.style.left = `${zoneAt(x) * 100}%`;
-        if (dr) { dr.at(pos); if (moving) dr.zone(zoneAt(x)); }
+        if (dr) {
+          dr.at(pos); const zz = moving ? zoneAt(x) : z0; if (moving) dr.zone(zz);
+          // v365 : la bande s'allume pile au bon moment (« Maintenant ! »), puis le trait blanc (« Parade ! »)
+          const pz = zz + zw - pw, inP = pos >= pz && pos <= pz + pw, inZ = !inP && pos >= zz && pos <= zz + zw;
+          if (inZ !== dr.n._z || inP !== dr.n._p) { dr.n._z = inZ; dr.n._p = inP; dr.n.classList.toggle('go', inZ); dr.n.classList.toggle('pp', inP); bar.classList.toggle('go', inZ); bar.classList.toggle('pp', inP); }
+        }
         if (x >= 1) end('none'); else raf = requestAnimationFrame(step);
       };
       defTap = () => {
@@ -934,7 +973,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       let res = 'none';
       if (s.qte && defMode === 'auto') res = Math.random() < 0.4 ? 'dodge' : 'none'; // automatique : 40 % d'esquives, jamais de parade
       else if (s.qte && defMode !== 'off') {
-        if (!g.s.tips?.['cb-defense']) await tuto(app, 'cb-defense');
+        if (!g.s.tips?.['cb-defense2']) await tuto(app, 'cb-defense2'); // v365 : texte de l'anneau (l'ancien parlait de la barre), remontré une fois
         if (!alive_) return;
         res = await defenseQTE(s);
         // v331 : après 3 défenses ratées dans l'expédition, on rappelle qu'il existe une défense assistée ou automatique (une seule fois)
@@ -1007,7 +1046,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (a.target === 'none') { mode = null; return exec(() => act(st, u, key)); }
     const ts = actionTargets(st, u, key);
     if (key === 'swap') { if (ts.length === 1) { mode = null; return exec(() => act(st, u, 'swap', ts[0])); } return pickReserve(); }
-    if (a.dice && !g.s.tips?.['cb-dice'] && !settling()) await tuto(app, 'cb-dice');
+    if (a.dice && !g.s.tips?.['cb-dice2'] && !settling()) await tuto(app, 'cb-dice2');
     if (ts.length === 1 && (key === 'rempart' || key === 'priere')) { mode = null; return exec(() => act(st, u, key, ts[0])); }
     mode = { key, name: a.name, dice: !!a.dice, target: a.target };
     draw();
