@@ -9,6 +9,7 @@ import { setScene } from '../ui/scene.js';
 import { tuto } from '../ui/tutos.js';
 
 const V = SC.showVal;
+const RULE_MED = { classique: 'sc-rule-classique', sacre: 'sc-rule-sacre', identique: 'sc-rule-identique', somme: 'sc-rule-somme' }; // v363 : médaillons Gemini des règles gardées
 const RULE_ICON = { identique: 'sc-same', somme: 'sc-sum', abime: 'sc-abyss', sacre: 'sc-sacre', instable: 'sc-instable', faction: 'sc-faction', usure: 'sc-usure', archive: 'sc-archive', neant: 'sc-neant' };
 // « Comment ça marche » : même présentation que la Descente (icône, couleur, numéro)
 const HOW = [['cards', '#7FA8D8', 'Ta main', '5 cartes. Chacune a quatre valeurs, une par côté (de 1 à 10 ; 10 s’écrit A).'],
@@ -28,7 +29,7 @@ const PERK_IC = { rempart: '<img alt="" src="assets/icons/pk-rempart.webp">', fu
 const themeOf = (r) => THEME[r] || 'salle';
 // v358 : les explications animées en tuiles (icône, nom, résumé, lecture), à la place de la liste de textes
 const RULE_SHORT = { classique: 'Plus fort que la carte d’en face : capturée. Et les pouvoirs de rareté.', sacre: 'Une case bénie (+1) et une case maudite (−1).', identique: 'Deux égalités d’un coup : les deux cartes sont prises.', somme: 'Deux fois la même somme : les deux cartes sont prises.', abime: 'Identique, Somme et cases sacrées à la fois.' };
-const ruleTiles = () => `<div class="sc-rgrid">${SC.RULE_LIST.map((k) => `<button class="sc-rtile k-${k}" data-sc="demo" data-k="${k}"><span class="sc-rt-ic">${RULE_ICON[k] ? `<img alt="" src="assets/icons/${RULE_ICON[k]}.webp">` : picon('swords')}</span><b>${k === 'classique' ? 'Les bases' : esc(SC.RULES[k].name)}</b><small>${esc(RULE_SHORT[k] || SC.RULES[k].desc)}</small><span class="sc-rt-play" aria-hidden="true">▶</span></button>`).join('')}</div>`;
+const ruleTiles = () => `<div class="sc-rgrid">${SC.RULE_LIST.map((k) => `<button class="sc-rtile k-${k}" data-sc="demo" data-k="${k}"><span class="sc-rt-ic">${RULE_MED[k] || RULE_ICON[k] ? `<img alt="" src="assets/icons/${RULE_MED[k] || RULE_ICON[k]}.webp">` : picon('swords')}</span><b>${k === 'classique' ? 'Les bases' : esc(SC.RULES[k].name)}</b><small>${esc(RULE_SHORT[k] || SC.RULES[k].desc)}</small><span class="sc-rt-play" aria-hidden="true">▶</span></button>`).join('')}</div>`;
 // Portrait peint de l'adversaire (assets/sceaux/rival-*.webp), avec l'ancienne image de créature en secours
 const rivalPic = (cat, R) => `<img alt="" src="assets/sceaux/rival-${R.key}.webp" onerror="this.onerror=null;this.src='${artUrl(cat.get(R.portrait), { lite: true })}'">`;
 // Petite carte du jeu : illustration, nom, emblème de faction et quatre valeurs sur les bords
@@ -118,7 +119,7 @@ export default function sceauxScreen(app, root) {
         <span class="sc-score" aria-label="Score : toi ${s.p}, ${esc(R.name)} ${s.o}"><b class="p">${s.p}</b><i>·</i><b class="o">${s.o}</b></span>
         <button class="btn small ghost" data-sc="quit" aria-label="Quitter la partie">${icon('close')}</button></div>
       <div class="sc-sub"><span class="sc-ohand" aria-label="${st.hands.o.length} cartes dans sa main">${'<i></i>'.repeat(st.hands.o.length)}</span>
-        <button class="sc-rule" data-sc="rules">${RULE_ICON[st.rule] ? `<img class="sc-ricon" alt="" src="assets/icons/${RULE_ICON[st.rule]}.webp">` : icon('p:rule')}${esc(SC.RULES[st.rule].name)}</button></div>
+        <button class="sc-rule" data-sc="rules">${RULE_MED[st.rule] || RULE_ICON[st.rule] ? `<img class="sc-ricon" alt="" src="assets/icons/${RULE_MED[st.rule] || RULE_ICON[st.rule]}.webp">` : icon('p:rule')}${esc(SC.RULES[st.rule].name)}</button></div>
       <div class="sc-bwrap"><div class="sc-board ${intro ? 'intro' : ''} ${shake ? 'shake' : ''}"><div class="sc-plate">${st.board.map(cell).join('')}</div></div></div>
       <p class="sc-msg">${st.over || (busy && st.turn === 'p') ? '' : myTurn ? (ui.sel == null ? (st.rule !== 'classique' && st.board.filter(Boolean).length < 2 ? `Règle « ${esc(SC.RULES[st.rule].name)} » : touche sa pastille en haut à droite pour la voir en animation.` : 'Touche une de tes cartes, puis une case libre.') : 'Touche une case libre pour poser la carte.') : `${esc(R.name)} réfléchit…`}</p>
       <div class="sc-tray ${myTurn ? 'on' : ''}"><div class="sc-hand-row">${st.hands.p.map((id, k) => `<button class="sc-hc ${ui.sel === k ? 'sel' : ''}" data-sc="pick" data-k="${k}" ${myTurn ? '' : 'disabled'}>${ui.sel === k ? '<span class="sc-halo"></span>' : ''}${scCard(cat, id, { owner: 'p' })}</button>`).join('')}</div></div>

@@ -3262,3 +3262,10 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
   72% { transform: rotateX(var(--tilt, 8deg)) translateX(-2px); }
   100% { transform: rotateX(var(--tilt, 8deg)); }
 }
+/* v363 : médaillons peints des règles des Sceaux (plus grands, ronds) */
+.sc-rt-ic { width: 64px; height: 64px; background: none; }
+.sc-rt-ic img { width: 64px; height: 64px; border-radius: 50%; filter: drop-shadow(0 3px 8px rgba(0, 0, 0, .7)) drop-shadow(0 0 10px rgba(232, 195, 90, .35)); }
+.sc-rule .sc-ricon[src*="sc-rule-"] { border-radius: 50%; }
+/* v363 : 4 règles → grille 2 × 2 (la tuile « Les bases » ne prend plus toute la largeur) */
+.sc-rtile:first-child { grid-column: auto; min-height: 128px; flex-direction: column; text-align: center; gap: 4px; padding-right: 10px; }
+.sc-rtile:first-child small { flex: none; }
