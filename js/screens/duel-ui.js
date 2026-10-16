@@ -314,7 +314,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   }
 
   // ——— Effets ———
-  const shake = (big) => { if (reduced) return; const d = $('.dv'); d.classList.remove('shake', 'big'); void d.offsetWidth; d.classList.add('shake'); d.classList.toggle('big', !!big); };
+  const shake = (big, small = false) => { if (reduced) return; const d = $('.dv'); d.classList.remove('shake', 'big', 'small'); void d.offsetWidth; d.classList.add('shake'); d.classList.toggle('big', !!big); d.classList.toggle('small', !big && !!small); };
+  // v346 : éclair d'impact — une lumière blanche et dorée jaillit du point touché
+  const impactFlash = (uid, big) => { if (reduced) return; const t = el(uid), box = $('.dv'); if (!t || !box) return; const b = box.getBoundingClientRect(), r = t.getBoundingClientRect(); const f = document.createElement('span'); f.className = `dv-iflash ${big ? 'big' : ''} ${st.units[uid]?.side === 'ally' ? 'foe' : ''}`; f.style.cssText = `left:${r.left - b.left + r.width / 2}px;top:${r.top - b.top + r.height / 2}px`; box.appendChild(f); setTimeout(() => f.remove(), 420); };
   const sparks = (uid, cls = '') => {
     if (reduced) return;
     const t = el(uid); if (!t) return;
@@ -496,10 +498,12 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           await hitstop(crit ? 140 : heavy ? 80 : 45);
           const sU = e.src && st.units[e.src];
           // v343 : planches peintes (Gemini) — lame d'or pour tes coups, griffes corrompues pour les ennemis, croix runique pour les critiques
-          if (sU?.side === 'ally' && ROLE_FX[sU.role] && !aoeHit) { if (crit) fxSheet(e.u, 'crit-strike', { k: 2.5, d: 820 }); else fxSheet(e.u, ROLE_FX[sU.role], { k: heavy ? 2.2 : 1.9, d: 640 }); }
-          else if (!aoeHit) { if (crit) fxSheet(e.u, 'crit-strike', { k: 2.5, d: 820 }); else fxSheet(e.u, 'foe-strike', { k: heavy ? 2.2 : 1.9, d: 640 }); }
+          // v346 : effets plus grands et plus longs, éclair d'impact sur la cible, coup de caméra vers elle
+          if (sU?.side === 'ally' && ROLE_FX[sU.role] && !aoeHit) { if (crit) fxSheet(e.u, 'crit-strike', { k: 3.2, d: 900 }); else fxSheet(e.u, ROLE_FX[sU.role], { k: heavy ? 3 : 2.6, d: 760 }); }
+          else if (!aoeHit) { if (crit) fxSheet(e.u, 'crit-strike', { k: 3.2, d: 900 }); else fxSheet(e.u, 'foe-strike', { k: heavy ? 3 : 2.6, d: 760 }); }
+          if (!aoeHit) { impactFlash(e.u, heavy); cam(e.u, heavy ? 1.6 : 1.1); }
           if (crit) dio.flare();
-          float(e.u, crit ? `CRITIQUE −${e.d}` : `-${e.d}`, crit ? 'dmg big crit' : heavy ? 'dmg big' : 'dmg'); (heavy ? app.sfx.smash : app.sfx.slash)(); sparks(e.u, crit ? 'gold' : ''); if (heavy || e.hp <= 0) shake(crit || e.d >= 12);
+          float(e.u, crit ? `CRITIQUE −${e.d}` : `-${e.d}`, crit ? 'dmg big crit' : heavy ? 'dmg big' : 'dmg'); (heavy ? app.sfx.smash : app.sfx.slash)(); sparks(e.u, crit ? 'gold' : ''); if (!aoeHit) shake(crit || heavy || e.hp <= 0, !(crit || heavy || e.hp <= 0));
           await wait(T(heavy ? 300 : 220));
           break;
         }
