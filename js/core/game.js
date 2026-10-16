@@ -13,7 +13,7 @@ export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par c
 import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, SHOW_ORDER, SHADOW, SUBLIME_ASH, VARIANTS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
-import { rngOf, DESCENT, CHESTS, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, huntStage, HUNT_STAGES, foeTraits, CHECKPOINT_MIN, DEEP_MILESTONE, gouffreAt, GOUFFRE, OMENS, omenChoices } from './descent.js';
+import { rngOf, DESCENT, CHESTS, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, cardPower, powerFor, huntStage, HUNT_STAGES, foeTraits, CHECKPOINT_MIN, DEEP_MILESTONE, gouffreAt, GOUFFRE, OMENS, omenChoices } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative } from './duel.js';
 import { bossOf, BOSSES } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
@@ -580,6 +580,8 @@ export class Game {
   }
   // Règle du jour (celle de l'expédition en cours si elle a commencé la veille)
   rule(day = this.descent().run?.day || this.descent().day) { return dailyRule(day, Object.fromEntries(Object.entries(this.catalog.faction).map(([k, f]) => [k, f.name]))); }
+  cardPower(id) { const c = this.catalog.get(id); return c ? cardPower(c.rarity, this.cardLevel(id)) : 1; }
+  teamPower(ids = this.team()) { return ids.length ? ids.reduce((a, id) => a + this.cardPower(id), 0) / ids.length : 1; }
   torchesLeft() { return Math.max(0, DESCENT.torches - this.descent().used); }
   // Bonus contre une créature : posséder sa carte ou la maîtriser à la chasse
   knows(id) { return this.owns(id) || this.huntKills(id) >= HUNT_STAGES[2].k; }
@@ -765,8 +767,10 @@ export class Game {
     // équipe trop faible pour la suite, et assez de cendres pour la renforcer
     // v328 : dès la première expédition, Renforcer est mis sur le chemin (avant, le niveau demandé valait 1 jusqu'à l'étage 8,
     // et des joueurs finissaient le mois avec une équipe entière au niveau 1 et des cendres plein les poches)
-    const team = this.team(), need = Math.max(expectedLevel(Math.max(best + 1, 4)), best >= 1 ? 2 : 1);
-    const weak = team.map((id) => ({ id, lv: this.cardLevel(id) })).filter((x) => x.lv < Math.min(MAX_LEVEL, need)).sort((a, b) => a.lv - b.lv)[0];
+    // v345 : « trop faible » se juge sur la force (rareté × niveau), plus sur le niveau seul ; au tout début, niveau 2 au moins
+    const team = this.team(), tp = team.length ? team.reduce((a, id) => a + this.cardPower(id), 0) / team.length : 1;
+    const short = tp < powerFor(Math.max(best + 1, 4));
+    const weak = team.map((id) => ({ id, lv: this.cardLevel(id) })).filter((x) => x.lv < MAX_LEVEL && (short || x.lv < (best >= 1 ? 2 : 1))).sort((a, b) => a.lv - b.lv)[0];
     if (weak && this.s.ash >= this.upgradeCost(weak.id)) {
       const c = this.catalog.get(weak.id), cost = this.upgradeCost(weak.id);
       const forge = { kind: 'forge', title: `Renforce ${c.name}`, sub: `Niveau ${weak.lv} → ${weak.lv + 1} pour ${cost} cendres (tu en as ${this.s.ash}) : plus de PV et d’attaque`, href: '#/renfort', icon: 'level-up' };

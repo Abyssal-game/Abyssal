@@ -38,6 +38,14 @@ export const shiftChest = (c, n) => { const i = c ? CHEST_ORDER.indexOf(c) + n :
 export const FLOOR_MARGIN = 5;
 export const floorFloor = (avgLevel) => Math.max(1, Math.round(avgLevel / 0.75 + 6 - FLOOR_MARGIN));
 export const expectedLevel = (floor) => Math.max(1, Math.min(10, Math.round((floor - 6) * 0.75)));
+// v345 : force d'une carte, comme la compte le moteur (rareté × niveau : duelUnit, RARITY_MULT), et force d'équipe
+// conseillée pour un étage. Mesurée au simulateur (expéditions complètes, 16 équipes par rareté et par niveau) :
+// l'étage moyen atteint suit à peu près 6 + 22 × (force − 1). Le niveau seul trompait : des Rares au niveau 4 valent
+// des Communes au niveau 9.
+export const RARITY_POWER = { C: 1, PC: 1.15, R: 1.3, HR: 1.45, M: 1.6, S: 1.75 };
+export const cardPower = (rarity, level = 1) => (RARITY_POWER[rarity] || 1) * (1 + 0.08 * (level - 1));
+export const powerFor = (floor) => 1 + Math.max(0, floor - 6) / 22;
+export const powerPts = (p) => Math.round(p * 100);
 export const enemyScale = (floor) => 1 + 0.06 * Math.min(19, floor - 1) + 0.03 * Math.max(0, floor - 20);
 
 // v326 : les anciennes familles du Bestiaire (Brute, Lanceur, Essaim…) ont été retirées : le Bestiaire affiche

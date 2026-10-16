@@ -1,7 +1,7 @@
 // L'Aventure (la Descente) : ton équipe de cartes descend dans l'Abysse, étage par étage,
 // affronte les créatures corrompues en duel et rapporte un coffre (éclats ou booster).
 import { RARITY, BOOSTERS } from '../config.js';
-import { DESCENT, ROOMS, BLESSINGS, CHESTS, expectedLevel, floorFloor, CHECKPOINT_MIN, OMENS } from '../core/descent.js';
+import { DESCENT, ROOMS, BLESSINGS, CHESTS, floorFloor, CHECKPOINT_MIN, OMENS, powerFor, powerPts } from '../core/descent.js';
 import { TEAM, BUDGET } from '../core/army.js';
 import { BOSSES, bossOf } from '../core/bosses.js';
 import { PACTS } from '../core/pacts.js';
@@ -92,22 +92,23 @@ export default function descent(app, root) {
     return r?.n ? `perdues : ${r.lost} sur ${r.n}` : dflt;
   }
   function riskAdvice() {
-    const team = g.team(), d = g.descent(), avg = avgLevel(team), need = expectedLevel(Math.max((d.best || 0) + 1, 5));
-    if (avg + 0.5 < need) return ` <b>Ton équipe est sous le niveau conseillé</b> (${avg.toFixed(1).replace('.', ',')} pour ${need}) : le risque est élevé.`;
+    const team = g.team(), d = g.descent(), tp = g.teamPower(team), need = powerFor(Math.max((d.best || 0) + 1, 5));
+    if (tp < need * 0.95) return ` <b>Ton équipe est sous la force conseillée</b> (${powerPts(tp)} pour ${powerPts(need)}) : le risque est élevé.`;
     const r = [ui.cursed && d.risk?.cursed, ui.nightmare && d.risk?.night].filter((x) => x && x.n >= 3).sort((a, b) => b.lost / b.n - a.lost / a.n)[0];
     return r && r.lost / r.n >= 0.5 ? ` Tu as perdu ${r.lost} de tes ${r.n} dernières expéditions dans ce mode.` : '';
   }
   function levelHint(team, d) {
     if (team.length < 3) return '';
-    const avg = avgLevel(team), target = Math.max((d.best || 0) + 1, 5), need = expectedLevel(target), ok = avg + 0.5 >= need;
-    return `<p class="small center dc-lvl ${ok ? 'ok' : 'low'}">${icon('p:level-up')} Niveau moyen de ton équipe : <b>${avg.toFixed(1).replace('.', ',')}</b> · conseillé pour l’étage ${target} : <b>${need}</b>${ok ? '' : ' · <a href="#/renfort">la renforcer</a>'}</p>
-      <details class="dc-floorhelp small muted"><summary>Comment la difficulté s’adapte</summary><p>Les combats ordinaires et les élites ne sont jamais plus faciles que l’étage qui correspond au <b>niveau moyen</b> de ton équipe (actuellement l’étage ${floorFloor(avg)}). Monter une seule carte rend donc les combats plus durs pour toutes : fais monter l’équipe <b>ensemble</b>. Les gardiens, eux, gardent toujours la force de leur étage.</p></details>`;
+    // v345 : force de l'équipe (rareté × niveau) plutôt que niveau seul
+    const avg = avgLevel(team), tp = g.teamPower(team), target = Math.max((d.best || 0) + 1, 5), need = powerFor(target), ok = tp >= need * 0.95;
+    return `<p class="small center dc-lvl ${ok ? 'ok' : 'low'}">${icon('p:level-up')} Force de ton équipe : <b>${powerPts(tp)}</b> · conseillée pour l’étage ${target} : <b>${powerPts(need)}</b>${ok ? '' : ' · <a href="#/renfort">la renforcer</a>'}</p>
+      <details class="dc-floorhelp small muted"><summary>Comment la difficulté s’adapte</summary><p>La <b>force</b> d’une créature dépend de sa rareté et de son niveau : une Mythique au niveau 1 vaut une Commune au niveau 8. Monter de niveau ou aligner des créatures plus rares rend l’équipe plus forte.</p><p>Les combats ordinaires et les élites ne sont jamais plus faciles que l’étage qui correspond au <b>niveau moyen</b> de ton équipe (actuellement l’étage ${floorFloor(avg)}). Monter une seule carte rend donc les combats plus durs pour toutes : fais monter l’équipe <b>ensemble</b>. Les gardiens, eux, gardent toujours la force de leur étage.</p></details>`;
   }
   function weakHint(floor) {
-    const team = g.team(), avg = avgLevel(team), need = expectedLevel(floor), low = team.filter((id) => g.cardLevel(id) < need);
-    if (avg + 1 >= need && !low.length) return '';
+    const team = g.team(), tp = g.teamPower(team), need = powerFor(floor), low = team.filter((id) => g.cardPower(id) < need * 0.9);
+    if (tp >= need * 0.95) return '';
     const can = team.filter((id) => { const c = g.upgradeCost(id); return c && c <= g.s.ash; });
-    return `<div class="dc-why dc-weak"><b>${icon('p:level-up')} Ton équipe était trop faible pour cet étage</b><p class="small">Niveau moyen <strong>${avg.toFixed(1).replace('.', ',')}</strong>, alors que l’étage ${floor} attend le niveau <strong>${need}</strong>${low.length ? ` (${low.length} créature${low.length > 1 ? 's' : ''} en dessous)` : ''}.${can.length ? ` Tu as <strong>${fmt(g.s.ash)} cendres</strong> : de quoi en faire monter ${can.length > 1 ? 'plusieurs' : 'une'} tout de suite.` : ' Brûle tes doublons dans la Fournaise pour gagner des cendres.'}</p><a class="btn small gold" href="#/renfort">${icon('p:level-up')}Renforcer mon équipe</a></div>`;
+    return `<div class="dc-why dc-weak"><b>${icon('p:level-up')} Ton équipe était trop faible pour cet étage</b><p class="small">Force de l’équipe <strong>${powerPts(tp)}</strong>, alors que l’étage ${floor} en demande environ <strong>${powerPts(need)}</strong>${low.length ? ` (${low.length} créature${low.length > 1 ? 's' : ''} en dessous)` : ''}.${can.length ? ` Tu as <strong>${fmt(g.s.ash)} cendres</strong> : de quoi en faire monter ${can.length > 1 ? 'plusieurs' : 'une'} tout de suite.` : ' Brûle tes doublons dans la Fournaise pour gagner des cendres.'}</p><a class="btn small gold" href="#/renfort">${icon('p:level-up')}Renforcer mon équipe</a></div>`;
   }
 
   // Saison du mois : paliers de profondeur récompensés une fois
