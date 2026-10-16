@@ -2,12 +2,28 @@
 import * as cloud from '../cloud/cloud.js';
 import { sync, onSync, afterLogin, pushNow, restoreFromCloud, setPseudo, refreshProfile, resumeSync } from '../cloud/sync.js';
 import { icon } from '../ui/icons.js';
-import { esc, toast, confirmBox, bindActions } from '../ui/dom.js';
+import { esc, toast, confirmBox, bindActions, openSheet } from '../ui/dom.js';
 import { blockedIds, clearBlocked, isMaskedPseudo } from '../core/moderation.js';
 
 // v321 : règle des mots de passe réglée dans Supabase (Authentication → Password requirements)
 const PW_RULE = '8 caractères au moins, avec une majuscule, une minuscule, un chiffre et un symbole (! ? # …)';
 const pwOk = (p) => p.length >= 8 && /[a-z]/.test(p) && /[A-Z]/.test(p) && /[0-9]/.test(p) && /[^A-Za-z0-9]/.test(p);
+
+// v331 : le pseudo est demandé juste après l'inscription (sans lui : pas de classement ni de Tirage des Ombres)
+export function askPseudo(app) {
+  if (sync.profile?.pseudo || document.querySelector('.ps-sheet')) return;
+  const sh = openSheet(`<div class="ps-sheet stack"><h2 class="center">Choisis ton nom</h2>
+    <p class="small center muted">C’est le nom que les autres joueurs verront dans les classements. Tu pourras le changer dans Sanctuaire → Compte.</p>
+    <form class="stack" id="ps-form" novalidate><input class="input plain" name="pseudo" maxlength="16" minlength="3" placeholder="3 à 16 lettres ou chiffres" autocomplete="nickname" value="${esc(app.game.s.name || '')}">
+    <button class="btn primary block" type="submit">${icon('user')}Valider</button><button class="btn ghost small block" type="button" data-ps="later">Plus tard</button></form></div>`, { label: 'Ton nom', cls: 'sheet-small' });
+  sh.body.querySelector('[data-ps="later"]').addEventListener('click', () => sh.close());
+  sh.body.querySelector('#ps-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const v = String(new FormData(e.target).get('pseudo') || '').trim();
+    try { await setPseudo(v); if (!app.game.s.name) app.game.setName?.(v); toast(`Bienvenue, <b>${esc(v)}</b> !`, { kind: 'success', icon: 'user' }); sh.close(); app.refresh?.(); }
+    catch (err) { toast(esc(err.message), { kind: 'error', icon: 'info' }); }
+  });
+}
 
 const ago = (t) => {
   if (!t) return 'jamais';
@@ -80,6 +96,7 @@ export default function account(app, root) {
             const r = await cloud.signUp(lastEmail, String(f.get('password')));
             if (r.loggedIn) {
               const k = await afterLogin();
+              setTimeout(() => askPseudo(app), 900);
               toast(k === 'pulled' ? 'Compte créé et connecté : ta partie en ligne est chargée.' : 'Compte créé : ta partie est maintenant sauvegardée en ligne.', { kind: 'success', icon: 'user' });
             } else {
               mode = 'login';
@@ -88,6 +105,7 @@ export default function account(app, root) {
           } else {
             await cloud.signIn(lastEmail, String(f.get('password')));
             const r = await afterLogin();
+            if (!sync.profile?.pseudo) setTimeout(() => askPseudo(app), 900);
             toast(r === 'pulled' ? 'Connecté : ta partie en ligne est chargée.' : 'Connecté : ta partie est sauvegardée en ligne.', { kind: 'success', icon: 'user' });
           }
         } catch (err) { toast(esc(err.message), { kind: 'error', icon: 'info', ms: 6000 }); }

@@ -134,6 +134,7 @@ export function startSync(theApp) {
     if (!cloud.isLoggedIn() || !sync.profile?.pseudo) return;
     if (app.game.s.settings.dev) return; // pas de score au classement en Mode Créateur
     if (!sum.floor) return;
+    if (sum.start > 1) return; // v331 : départ avancé, hors classement du jour
     // chaque expédition envoie son propre score, pour le jour de son donjon (le serveur garde le meilleur)
     cloud.submitScore(sum.day || today(), sum.floor, !!sum.cursed).catch(() => {});
   });

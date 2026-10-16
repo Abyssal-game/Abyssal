@@ -1,7 +1,7 @@
 // L'Aventure (la Descente) : ton équipe de cartes descend dans l'Abysse, étage par étage,
 // affronte les créatures corrompues en duel et rapporte un coffre (éclats ou booster).
 import { RARITY, BOOSTERS } from '../config.js';
-import { DESCENT, ROOMS, BLESSINGS, CHESTS, chestForDepth, expectedLevel, floorFloor } from '../core/descent.js';
+import { DESCENT, ROOMS, BLESSINGS, CHESTS, expectedLevel, floorFloor, CHECKPOINT_MIN } from '../core/descent.js';
 import { TEAM, BUDGET } from '../core/army.js';
 import { BOSSES, bossOf } from '../core/bosses.js';
 import { PACTS } from '../core/pacts.js';
@@ -40,6 +40,16 @@ export default function descent(app, root) {
   const ruleHTML = (r) => `<section class="panel dc-rule bn-rule" style="--rf:${r.faction ? cat.faction[r.faction].colors.secondary : 'var(--gold)'}"><span class="dc-rule-ic">${r.faction ? sigil(r.faction) : picon('rule')}</span><span><span class="small muted">Règle du jour</span><b>${esc(r.name)}</b><span class="small">${esc(r.desc)}</span></span></section>`;
   const chestChip = (c) => (c ? `<span class="v2-chest-chip" style="--cc:${CHESTS[c].color}">${icon('p:chest')} ${esc(CHESTS[c].name)}</span>` : '<span class="v2-chest-chip none">aucun coffre</span>');
 
+  // v331 : départs avancés, ouverts par les gardiens déjà vaincus (étages 6, 11, 16…)
+  const startFloor = () => (g.startFloors().includes(ui.start) ? ui.start : 1);
+  function startsHTML() {
+    const fl = g.startFloors();
+    if (fl.length < 2) return '';
+    const s = startFloor();
+    return `<div class="dc-starts"><span class="small muted">Départ</span><div class="dc-starts-row">${fl.map((f) => `<button class="dc-st ${f === s ? 'on' : ''}" data-act="startat" data-f="${f}" aria-pressed="${f === s}">Étage ${f}</button>`).join('')}</div>
+      <p class="small muted">${s > 1 ? `Tu commences à l’étage ${s}, après le gardien de l’étage ${s - 1}. Le coffre de fin est <b>d’une qualité en dessous</b>, et il faut franchir au moins ${CHECKPOINT_MIN} étages pour en rapporter un. Ne compte pas pour le classement du jour.` : 'Chaque gardien vaincu ouvre un départ juste après lui : tu évites les premiers étages, mais le coffre est d’une qualité en dessous.'}</p></div>`;
+  }
+
   // ——— Accueil de l'Aventure ———————————————————————————————————————————
   function lobby() {
     const d = g.descent(), torches = g.torchesLeft(), last = ui.outcome, team = g.team(), chests = g.chestCount();
@@ -57,12 +67,14 @@ export default function descent(app, root) {
         ${levelHint(team, d)}
         <div class="dc-teambtns"><a class="btn small ghost dc-plq dc-plq-dark" href="#/equipe">${icon('p:team-ic')}Mon équipe</a><a class="btn small ghost dc-plq dc-plq-dark" href="#/renfort">${icon('p:level-up')}Renforcer</a></div>
         ${team.length < TEAM.active ? (g.welcomePending() ? `<a class="btn gold block" href="#/boutique">${icon('ticket')}Ouvre d’abord tes boosters de bienvenue</a>` : `<p class="small v2-warn center">${icon('info')} Ajoute au moins ${TEAM.active} créatures à ton équipe pour descendre.</p>`) : ''}
+        ${startsHTML()}
         <button class="btn ${ui.cursed && torches ? 'danger' : 'primary'} block big-cta dc-plq dc-plq-red" data-act="start" ${team.length >= TEAM.active ? '' : 'disabled'}>${icon('p:descend')}${torches ? 'Descendre' : 'Descendre (sans coffre)'}</button>
         <div class="dc-opts">
-          ${torches ? `<button class="dc-opt ${ui.cursed ? 'on' : ''}" data-act="curse" aria-pressed="${ui.cursed}">${icon('skull')}<b>Maudite</b><small>coffre +1, rien si l’équipe tombe</small></button>` : ''}
-          ${g.nightmareUnlocked() ? `<button class="dc-opt dc-opt-night ${ui.nightmare ? 'on' : ''}" data-act="night" aria-pressed="${ui.nightmare}">${icon('skull')}<b>Cauchemar</b><small>${d.bestNightmare ? `record : étage ${d.bestNightmare}` : 'ennemis plus forts, coffre +1'}</small></button>` : `<button class="dc-opt off" data-act="optinfo">${icon('lock')}<b>Cauchemar</b><small>dès l’étage ${NIGHTMARE_AT}</small></button>`}
+          ${torches ? `<button class="dc-opt ${ui.cursed ? 'on' : ''}" data-act="curse" aria-pressed="${ui.cursed}">${icon('skull')}<b>Maudite</b><small>${riskLine('cursed', 'coffre +1, rien si l’équipe tombe')}</small></button>` : ''}
+          ${g.nightmareUnlocked() ? `<button class="dc-opt dc-opt-night ${ui.nightmare ? 'on' : ''}" data-act="night" aria-pressed="${ui.nightmare}">${icon('skull')}<b>Cauchemar</b><small>${riskLine('night', d.bestNightmare ? `record : étage ${d.bestNightmare}` : 'ennemis +35 % PV, +25 % ATQ')}</small></button>` : `<button class="dc-opt off" data-act="optinfo">${icon('lock')}<b>Cauchemar</b><small>dès l’étage ${NIGHTMARE_AT}</small></button>`}
           <button class="dc-opt-info icon-btn" data-act="optinfo" aria-label="Explications des modes">${icon('info')}</button>
         </div>
+        ${ui.cursed || ui.nightmare ? `<p class="small dc-riskwarn">${icon('skull')} ${[ui.cursed ? 'Maudite : si l’équipe tombe, <b>tu perds tout</b> (éclats et coffres).' : '', ui.nightmare ? 'Cauchemar : ennemis bien plus forts et gardiens déchaînés dès le début.' : ''].filter(Boolean).join(' ')}${riskAdvice()}</p>` : ''}
       </section>
       ${ruleHTML(g.rule())}
       ${Object.values(g.s.items).some((n) => n > 0) ? bagHTML(g) : ''}
@@ -76,6 +88,17 @@ export default function descent(app, root) {
 
   // v328 : la difficulté suit le niveau moyen de l'équipe (plancher, core/descent.js) : on l'écrit enfin, avec le niveau conseillé
   const avgLevel = (ids) => (ids.length ? ids.reduce((a, id) => a + g.cardLevel(id), 0) / ids.length : 1);
+  // v331 : risque personnel des modes Maudite et Cauchemar (expéditions perdues sur jouées)
+  function riskLine(k, dflt) {
+    const r = g.descent().risk?.[k];
+    return r?.n ? `perdues : ${r.lost} sur ${r.n}` : dflt;
+  }
+  function riskAdvice() {
+    const team = g.team(), d = g.descent(), avg = avgLevel(team), need = expectedLevel(Math.max((d.best || 0) + 1, 5));
+    if (avg + 0.5 < need) return ` <b>Ton équipe est sous le niveau conseillé</b> (${avg.toFixed(1).replace('.', ',')} pour ${need}) : le risque est élevé.`;
+    const r = [ui.cursed && d.risk?.cursed, ui.nightmare && d.risk?.night].filter((x) => x && x.n >= 3).sort((a, b) => b.lost / b.n - a.lost / a.n)[0];
+    return r && r.lost / r.n >= 0.5 ? ` Tu as perdu ${r.lost} de tes ${r.n} dernières expéditions dans ce mode.` : '';
+  }
   function levelHint(team, d) {
     if (team.length < 3) return '';
     const avg = avgLevel(team), target = Math.max((d.best || 0) + 1, 5), need = expectedLevel(target), ok = avg + 0.5 >= need;
@@ -119,7 +142,7 @@ export default function descent(app, root) {
       ${s.nextChest ? `<p class="vx-week dc-next">${icon('p:chest')} Prochain palier : <b>${esc(CHESTS[s.nextChest.chest].name.toLowerCase())}</b> dès l’étage ${s.nextChest.floor}.</p>` : ''}
       ${s.shardsNow !== undefined ? boosterProgressHTML(s.shardsNow) : ''}
       ${s.wiped ? weakHint((s.floor || 0) + 1) : ''}
-      ${s.report?.length ? `<div class="dc-why"><b>${icon('info')} Ce qui s’est passé</b>${s.report.map((l) => `<p class="small">${esc(l)}</p>`).join('')}</div>` : ''}
+      ${s.report?.length ? `<div class="dc-why"><b>${icon('info')} Ce qui s’est passé</b>${s.report.map((l) => `<p class="small">${esc(l)}</p>`).join('')}${s.wiped && g.s.settings.defense === 'auto' ? '<p class="small">Ta défense est en <b>automatique</b> : elle n’esquive que 4 coups sur 10 et ne pare jamais. Essaie la défense <b>assistée</b> (Réglages → Jeu).</p>' : ''}</div>` : ''}
       <div class="dc-sum2-loot">${s.chests.map((c) => `<span class="dc-sum2-chest" style="--cc:${CHESTS[c].color}">${chestSVG(c)}<b>${esc(CHESTS[c].name)}</b></span>`).join('')}${s.shards ? `<span class="dc-sum2-shards">${icon('crystal')}<b>+${fmt(s.shards)}</b><small>éclats</small></span>` : ''}${!s.chests.length && !s.shards ? '<span class="dc-sum2-sub">Aucun butin cette fois.</span>' : ''}</div>
       <div class="dc-sum2-row"><button class="btn dc-plq dc-plq-dark" data-act="share">${icon('copy')}Partager</button><button class="btn dc-plq dc-plq-dark" data-act="dismiss">Continuer</button></div>
     </section>`;
@@ -153,18 +176,18 @@ export default function descent(app, root) {
     const doors = g.doors();
     root.innerHTML = `${runHead(run)}<p class="dc-prompt">${doors.includes('boss') ? 'Un gardien barre la route.' : doors.length > 1 ? 'Deux passages. Le plus dangereux rapporte plus.' : 'Des créatures barrent le passage.'}</p>
       <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r} has-art" data-act="door" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic ${DOOR_PIC[r] ? 'pic' : ''}">${DOOR_PIC[r] ? picon(DOOR_PIC[r]) : icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'boss' ? `<b class="dc-bad">${esc(BOSSES[bossOf(run.floor)].name)}${run.nightmare || run.floor >= AWAKEN_AT ? ' (déchaîné)' : ''}</b> : ${esc(BOSSES[bossOf(run.floor)].mechanic)}${run.nightmare || run.floor >= AWAKEN_AT ? ' <b class="dc-bad">Déchaîné : sa phase 2 commence dès le premier tour.</b>' : ''}${g.s.bossesBeaten[bossOf(run.floor)] ? ` <b class="dc-good">Contre : ${esc(BOSSES[bossOf(run.floor)].counter)}</b>` : ''}` : ROOMS[r].desc}</span></button>`).join('')}</div>
-      ${run.cleared ? `<button class="btn ghost block" data-act="leave">${icon('back')}Remonter</button>` : ''}
+      ${run.cleared >= (run.start || 1) ? `<button class="btn ghost block" data-act="leave">${icon('back')}Remonter</button>` : ''}
       <button class="btn ghost small block dc-abandon" data-act="abandon">${icon('p:abandon')}Abandonner l’expédition</button>`;
   }
   function clearedView(run, extra = '') {
-    const now = g.chestNow(run), next = run.free ? null : chestForDepth(run.floor + 1);
+    const now = g.chestNow(run), next = run.free ? null : g.runChest(run, (run.cursed ? 1 : 0) + (run.nightmare ? 1 : 0), run.floor + 1);
     const alive = run.team.some((m) => !m.fallen);
     root.innerHTML = `${runHead(run)}${extra}
       <section class="dc-risk2">
         <div class="dr-up"><span class="dr-k">Si tu remontes</span>${now ? `<span class="dr-chest">${chestSVG(now)}</span><b style="color:${CHESTS[now].color}">${esc(CHESTS[now].name)}</b><span class="dr-sub">${esc(CHESTS[now].desc)}</span>` : `<span class="dr-sub">${run.free ? 'Pas de coffre (descente libre)' : 'Pas encore de coffre : il arrive dès l’étage 3'}</span>`}<span class="dr-shards">${icon('crystal')}<b>${fmt(run.shards)}</b> éclats</span></div>
-        <div class="dr-down"><span class="dr-k">Étage ${run.floor + 1}${(run.floor + 1) % DESCENT.bossEvery === 0 ? ' · gardien' : ''}</span><img class="dr-stair" alt="" src="assets/icons/stairs-down.webp">${run.free ? '<b>Descente libre</b>' : !now && !next ? '<b>Pas encore de coffre</b><span class="dr-sub">Le premier arrive à l’étage 3</span>' : next !== chestForDepth(run.floor) ? `<b class="dc-good">${now ? 'Coffre amélioré' : 'Premier coffre'}</b><span class="dr-sub">${esc(CHESTS[next].name)}</span>` : '<b>Même coffre</b><span class="dr-sub">Il s’améliore aux étages 3, 8, 16 et 25</span>'}<span class="dr-risk">${icon('skull')}${run.cursed ? 'Si l’équipe tombe : tout est perdu' : now ? 'Si l’équipe tombe : coffre d’une qualité en dessous' : 'Si l’équipe tombe : la moitié des éclats'}</span></div>
+        <div class="dr-down"><span class="dr-k">Étage ${run.floor + 1}${(run.floor + 1) % DESCENT.bossEvery === 0 ? ' · gardien' : ''}</span><img class="dr-stair" alt="" src="assets/icons/stairs-down.webp">${run.free ? '<b>Descente libre</b>' : !now && !next ? `<b>Pas encore de coffre</b><span class="dr-sub">Le premier arrive à l’étage ${Math.max(3, (run.start || 1) + CHECKPOINT_MIN - 1)}</span>` : next !== now ? `<b class="dc-good">${now ? 'Coffre amélioré' : 'Premier coffre'}</b><span class="dr-sub">${esc(CHESTS[next].name)}</span>` : '<b>Même coffre</b><span class="dr-sub">Il s’améliore aux étages 3, 8, 16 et 25</span>'}<span class="dr-risk">${icon('skull')}${run.cursed ? 'Si l’équipe tombe : tout est perdu' : now ? 'Si l’équipe tombe : coffre d’une qualité en dessous' : 'Si l’équipe tombe : la moitié des éclats'}</span></div>
       </section>
-      <div class="dc-choice">${alive ? `<button class="dc-stair down" data-act="next">${picon('stairs-down')}<span><b>Descendre à l’étage ${run.floor + 1}</b><span class="small">${run.free ? 'Plus profond, plus dangereux' : next !== chestForDepth(run.floor) ? `Plus dangereux, mais ${esc(CHESTS[next].name.toLowerCase())} à la clé` : 'Plus profond, plus dangereux'}</span></span></button>` : ''}<button class="dc-stair up" data-act="leave">${picon('stairs-up')}<span><b>${now ? 'Remonter avec le coffre' : 'Remonter'}</b><span class="small">${run.free ? 'Fin de la descente libre' : now ? 'Tu gardes le coffre et tes éclats' : 'Tu gardes seulement tes éclats'}</span></span></button></div>
+      <div class="dc-choice">${alive ? `<button class="dc-stair down" data-act="next">${picon('stairs-down')}<span><b>Descendre à l’étage ${run.floor + 1}</b><span class="small">${run.free ? 'Plus profond, plus dangereux' : next !== now ? `Plus dangereux, mais ${esc(CHESTS[next].name.toLowerCase())} à la clé` : 'Plus profond, plus dangereux'}</span></span></button>` : ''}<button class="dc-stair up" data-act="leave">${picon('stairs-up')}<span><b>${now ? 'Remonter avec le coffre' : 'Remonter'}</b><span class="small">${run.free ? 'Fin de la descente libre' : now ? 'Tu gardes le coffre et tes éclats' : 'Tu gardes seulement tes éclats'}</span></span></button></div>
       <p class="small muted center dc-pause">${icon('hourglass')} Pas le temps ? Ferme simplement le jeu : l’expédition t’attendra ici, même demain, et ses étages comptent pour ton record.</p>`;
   }
   // Fin de combat : la victoire et son butin, l'état de l'équipe, puis un seul choix (le bonus)
@@ -275,7 +298,7 @@ export default function descent(app, root) {
     const b = BOSSES[key], seen = g.s.bossesBeaten[key];
     const el = document.createElement('div');
     el.className = 'bx-intro';
-    el.innerHTML = `<div class="bx-in"><span class="bx-k">Étage ${run.floor} · Gardien</span><h1>${esc(b.name)}</h1><p class="bx-t">${esc(b.title)}</p><p class="bx-p">${esc(b.intro)}</p><p class="bx-m"><b>Sa mécanique</b> ${esc(b.mechanic)}</p>${PHASE2[key] ? `<p class="bx-m"><img class="bx-ph" alt="" src="assets/ui/ph-${key}.webp"><b>À mi-vie : ${esc(PHASE2[key].name)}</b> ${esc(PHASE2[key].desc)}</p>` : ''}${seen ? `<p class="bx-m good"><b>Pour le contrer</b> ${esc(b.counter)}</p>` : ''}<span class="bx-tap">Touche pour combattre</span></div>`;
+    el.innerHTML = `<div class="bx-in"><span class="bx-k">Étage ${run.floor} · Gardien</span><h1>${esc(b.name)}</h1><p class="bx-t">${esc(b.title)}</p><p class="bx-p">${esc(b.intro)}</p><p class="bx-m"><b>Sa mécanique</b> ${esc(b.mechanic)}</p><p class="bx-m bx-loot"><b>Butin</b> Vaincu, il a 1 chance sur 4 de rejoindre ta collection${seen ? '' : ', et sa première défaite donne un coffre'}.</p>${PHASE2[key] ? `<p class="bx-m"><img class="bx-ph" alt="" src="assets/ui/ph-${key}.webp"><b>À mi-vie : ${esc(PHASE2[key].name)}</b> ${esc(PHASE2[key].desc)}</p>` : ''}${seen ? `<p class="bx-m good"><b>Pour le contrer</b> ${esc(b.counter)}</p>` : ''}<span class="bx-tap">Touche pour combattre</span></div>`;
     document.body.appendChild(el);
     app.sfx.boss?.();
     let done = false;
@@ -311,6 +334,7 @@ export default function descent(app, root) {
       ui.tsel = null; render();
     },
     curse() { ui.cursed = !ui.cursed; render(); },
+    startat(el) { ui.start = +el.dataset.f || 1; render(); },
     night() { ui.nightmare = !ui.nightmare; render(); },
     // v320 : saison, classement et aide s'ouvrent dans une fenêtre (la page ne les empile plus)
     open(el) {
@@ -329,7 +353,7 @@ export default function descent(app, root) {
     async start() {
       if (ui.cursed && g.torchesLeft() && !(await confirmBox('Descente maudite : si toute l’équipe tombe, <b>tu ne rapportes rien</b>. Tu es sûr ?', { ok: 'Je descends', danger: true }))) return;
       try {
-        g.startRun({ cursed: ui.cursed, nightmare: ui.nightmare && g.nightmareUnlocked() }); ui.outcome = null; ui.tsel = null; app.sfx.tear(); app.chrome(); render(); window.scrollTo(0, 0);
+        g.startRun({ cursed: ui.cursed, nightmare: ui.nightmare && g.nightmareUnlocked(), start: startFloor() }); ui.outcome = null; ui.tsel = null; app.sfx.tear(); app.chrome(); render(); window.scrollTo(0, 0);
         tuto(app, 'army-doors');
       } catch (e) { toast(esc(e.message), { kind: 'error' }); }
     },

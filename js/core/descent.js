@@ -129,12 +129,22 @@ export const TRAITS = {
   voleur:   { name: 'Voleur d’action', desc: 'Tant qu’il est debout, il vole 1 PA à ta créature qui en a le plus, à chaque tour à partir du 3e.' },
   egide:    { name: 'Lien d’égide', desc: 'Il subit 35 % de dégâts en moins tant qu’un autre ennemi est au combat.' },
   enrage:   { name: 'Enragé', desc: 'Sous la moitié de ses PV, il entre en rage : +2 en attaque.' },
+  // v331 : traits des profondeurs, seulement au-delà de l'étage 30
+  vampire:  { name: 'Vampire', desc: 'Il se soigne de la moitié des dégâts qu’il inflige.', deep: true, icon: 'prey' },
+  epineux:  { name: 'Épineux', desc: 'Chaque coup qui le blesse renvoie 2 dégâts à ta créature qui frappe.', deep: true, icon: 'breach' },
+  carapace: { name: 'Carapace', desc: 'Un bouclier bloque le premier coup qu’il reçoit, et revient un tour sur deux.', deep: true, icon: 'shield' },
 };
+export const DEEP_FROM = 31;
+export const DEEP_MILESTONE = 40; // v331 : premier passage aux étages 40, 50, 60… récompensé
+export const CHECKPOINT_MIN = 3; // v331 : étages à franchir depuis un départ avancé pour rapporter un coffre
+export const traitIcon = (k) => TRAITS[k]?.icon || k;
 export function foeTraits(day, floor, room, n) {
-  const rng = rngOf(`traits:${day}:${floor}:${room}`), keys = Object.keys(TRAITS), out = Array(n).fill(null);
+  const deep = floor >= DEEP_FROM;
+  const rng = rngOf(`traits:${day}:${floor}:${room}`), keys = Object.keys(TRAITS).filter((k) => deep || !TRAITS[k].deep), out = Array(n).fill(null);
   if (room === 'boss' || floor < 3) return out;
-  const chance = room === 'elite' ? (floor >= 8 ? 0.4 : 0) : Math.min(0.5, 0.2 + floor * 0.02);
-  for (let i = 0; i < n; i++) if (rng() < chance && out.filter(Boolean).length < (floor >= 15 ? 2 : 1)) out[i] = pick(rng, keys);
+  const chance = deep ? (room === 'elite' ? 0.55 : 0.6) : room === 'elite' ? (floor >= 8 ? 0.4 : 0) : Math.min(0.5, 0.2 + floor * 0.02);
+  const max = deep ? 3 : floor >= 15 ? 2 : 1;
+  for (let i = 0; i < n; i++) if (rng() < chance && out.filter(Boolean).length < max) out[i] = pick(rng, keys);
   return out;
 }
 // Ennemis nommés : de temps en temps, une créature corrompue porte un nom, plus coriace, avec un butin en plus

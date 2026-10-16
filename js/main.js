@@ -92,7 +92,7 @@ function applySettings() {
 
 // Explication des deux monnaies (toucher le compteur en haut à droite)
 const WALLET = {
-  shards: ['Éclats', 'La monnaie principale. Ils servent à acheter des boosters (onglet Boosters).', 'Tu en gagnes avec l’offrande du jour, les missions, les succès, les nouvelles créatures découvertes et surtout dans la Descente (combats, trésors, gardiens).', 'boutique', 'Aller aux Boosters'],
+  shards: ['Éclats', 'La monnaie principale. Ils servent à acheter des boosters (onglet Boosters).', 'Tu en gagnes avec l’offrande du jour, les missions, les succès, les nouvelles créatures découvertes et surtout dans la Descente : les coffres de fin d’expédition en rapportent bien plus que les combats eux-mêmes. Plus tu descends, plus le coffre est beau.', 'boutique', 'Aller aux Boosters'],
   ash: ['Cendres', 'Ce qui reste des cartes brûlées dans la Fournaise. Elles font monter le niveau de tes créatures et permettent de sublimer une carte vers une finition plus rare.', 'Chaque combat gagné dans la Descente en donne, les coffres aussi. Brûle tes doublons dans la Fournaise (onglet Collection) : plus la carte est rare, plus elle en donne, et les finitions rares encore plus.', 'fournaise', 'Aller à la Fournaise'],
 };
 // iPhone, app posée sur l'écran d'accueil : la hauteur annoncée par le navigateur peut être plus
@@ -226,6 +226,25 @@ function render() {
   scrollKey = key;
   // les images différées peuvent encore ajuster la hauteur : on recolle une fois la page posée
   if (keepY) requestAnimationFrame(() => { if (scrollKey === key && Math.abs(window.scrollY - keepY) > 2) window.scrollTo(0, keepY); });
+  setTimeout(autoClaim, 400);
+}
+
+// v331 : offrande du jour, missions terminées et coffre de la semaine versés automatiquement, avec une annonce
+// (l'étude joueurs montrait des récompenses restées en attente toute une séance faute d'aller les toucher sur l'Accueil)
+let claiming = false;
+function autoClaim() {
+  const g = app.game;
+  if (!g || claiming || document.body.classList.contains('gated') || document.getElementById('boot') || document.querySelector('.opening, .sheet-wrap')) return;
+  if (g.welcomePending() || app.route === 'descente' && g.s.descent.run?.phase === 'battle') return;
+  claiming = true;
+  try {
+    let any = false;
+    if (g.canDailyClaim()) { const r = g.claimDaily(); any = true; toast(`Offrande du jour : <b>+${fmt(r.amount)} éclats</b>${r.streak > 1 ? ` · série de ${r.streak} jours` : ''}${r.chest ? ' et <b>un coffre de fer</b>' : ''}.`, { kind: r.chest ? 'epic' : 'success', icon: 'crystal' }); }
+    g.missions().list.forEach((x, i) => { if (x.p >= x.n && !x.claimed) { const r = g.claimMission(i); any = true; toast(`Mission accomplie : ${esc(x.text)} · <b>+${fmt(r.shards)} éclats</b>`, { kind: 'success', icon: 'check' }); } });
+    if (g.weekChest().ready) { g.claimWeekChest(); any = true; toast('Coffre de la semaine : <b>un coffre d’or</b> rejoint tes coffres !', { kind: 'epic', icon: 'trophy' }); }
+    if (any) { app.sfx.coin?.(); renderChrome(); app.refreshView?.(); }
+  } catch (e) { /* une récompense déjà prise ailleurs : rien */ }
+  claiming = false;
 }
 
 // Notifications de progression (succès, ensembles, niveaux)

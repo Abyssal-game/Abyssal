@@ -1,4 +1,5 @@
 // Accueil : logo, deux accès principaux et ce qui est à faire aujourd'hui.
+import { isGuest } from '../ui/gate.js';
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { artUrl, hasRealArt } from '../art/assets.js';
 import { icon, EMBLEM, sigil, picon } from '../ui/icons.js';
@@ -59,6 +60,7 @@ export default function home(app, root) {
     </section>
 
     ${g.welcomePending() ? `<a class="panel ornate hw-welcome" href="#/boutique"><span class="hw-ic">${picon('ticket')}</span><span><b>${g.s.tickets.standard > 1 ? `Tes ${g.s.tickets.standard} boosters de bienvenue t’attendent` : 'Ton booster de bienvenue t’attend'}</b><span class="small">Ouvre-les pour découvrir tes premières créatures : elles formeront ton équipe.</span></span>${icon('next')}</a>` : ''}
+    ${isGuest() && !g.welcomePending() ? `<a class="panel hw-guest" href="#/compte"><span class="hw-ic">${icon('info')}</span><span><b>Mode invité : ta partie n’est pas sauvegardée en ligne</b><span class="small">Crée un compte gratuit pour ne jamais la perdre (changement de téléphone, appli supprimée).</span></span>${icon('next')}</a>` : ''}
     ${mainGoalHTML()}
 
     <a class="panel hw-event" href="#/boutique" style="--e1:${cat.faction[ev.factions[0]].colors.secondary};--e2:${cat.faction[ev.factions[1]].colors.secondary}">

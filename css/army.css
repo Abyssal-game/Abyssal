@@ -2921,3 +2921,24 @@ body.gated { overflow: hidden; }
 @keyframes sdDrop { from { transform: translateY(-30%) scale(1.15); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes sdFlip { 0% { transform: rotateY(0); } 50% { transform: rotateY(90deg); } 100% { transform: rotateY(0); } }
 @media (prefers-reduced-motion: reduce) { .sd-card.new, .sd-card.flip { animation: none; } }
+
+/* v331 : mode invité, risque des modes, vitesse ×2, Boosters (taux), note de défense */
+.gate-guest { margin-top: 14px; }
+.gate-guest-note { margin: 6px 4px 0; }
+.hw-guest { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; text-decoration: none; color: var(--ink); border-color: rgba(255, 140, 160, .45) !important; background: linear-gradient(100deg, rgba(90, 20, 36, .55), rgba(14, 10, 20, .9)) !important; }
+.hw-guest b { display: block; font-size: .9rem; margin-bottom: 2px; }
+.dc-riskwarn { margin: 8px 2px 0; padding: 8px 10px; border-radius: 10px; color: #FFD4DC; background: rgba(90, 14, 30, .45); border: 1px solid rgba(255, 90, 120, .35); }
+.cb-speed { min-width: 44px; font: 800 .85rem/1 var(--f-display); }
+.cb-speed.on { color: #FFE7A6 !important; text-shadow: 0 0 8px rgba(242, 193, 78, .7); }
+.sh-wallet p { margin: 0; }
+.sh-wallet p + p { margin-top: 6px; }
+.set-note { margin: 4px 0 0; }
+/* v331 : départs avancés (étages 6, 11, 16… après un gardien vaincu) */
+.dc-starts { display: grid; gap: 6px; margin: 4px 0 10px; }
+.dc-starts-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.dc-starts-row::-webkit-scrollbar { display: none; }
+.dc-st { flex: none; min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.04); color: var(--muted, #bbb); font: inherit; font-size: .85rem; }
+.dc-st.on { border-color: var(--gold); color: var(--gold); background: rgba(212,175,55,.12); }
+.dc-starts p { margin: 0; }
+/* v331 : les fenêtres (confirmation « Jouer sans compte »…) passent au-dessus de l'écran de compte */
+body.gated .sheet-wrap { z-index: 78; }

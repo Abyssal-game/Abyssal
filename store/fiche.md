@@ -94,7 +94,7 @@ UN MONDE À DÉCOUVRIR
 • Gratuit, sans publicité
 • Aucun achat : toutes les cartes se gagnent en jouant
 • Un booster gratuit chaque jour
-• Jouable hors ligne une fois ton compte créé
+• Jouable hors ligne, avec ou sans compte
 • Ta collection sauvegardée en ligne avec ton compte, et les classements du monde entier
 
 Le Bestiaire interdit t'attend. Jusqu'où oseras-tu descendre ?
@@ -199,7 +199,7 @@ Résultat attendu : PEGI 12 en Europe (au pire PEGI 7). Public cible (Contenu de
 
 | Type de données | Collectée | Facultative | Usage |
 |---|---|---|---|
-| Informations personnelles → Adresse e-mail | Oui | Oui (compte nécessaire pour jouer) | Gestion du compte |
+| Informations personnelles → Adresse e-mail | Oui | Oui (compte facultatif, proposé au premier lancement) | Gestion du compte |
 | Informations personnelles → ID utilisateur | Oui | Oui | Gestion du compte, fonctionnalités de l'appli |
 | Activité dans l'appli → Autre contenu généré par l'utilisateur (pseudo, sauvegarde, scores) | Oui | Oui | Fonctionnalités de l'appli |
 | Position, contacts, photos, audio, finances, santé, navigation | Non | — | — |
@@ -217,9 +217,9 @@ Résultat attendu : PEGI 12 en Europe (au pire PEGI 7). Public cible (Contenu de
 
 ## 7. Notes pour la vérification d'Apple (App Review Information → Notes)
 ```
-ABYSSAL demande un compte au premier lancement (e-mail et mot de passe ; utilisez le compte de démonstration ci-dessus, onglet « Se connecter »). Touchez l'écran d'ouverture, connectez-vous, puis ouvrez les 2 boosters de bienvenue (onglet Boosters) pour former votre équipe.
+Au premier lancement, ABYSSAL propose de créer un compte (e-mail et mot de passe) ou de « Jouer sans compte ». Vous pouvez utiliser le compte de démonstration ci-dessus (onglet « Se connecter ») ou jouer sans compte. Touchez l'écran d'ouverture, puis ouvrez les 2 boosters de bienvenue (onglet Boosters) pour former votre équipe.
 
-Pourquoi le compte est demandé : la collection de cartes (500 créatures, plusieurs semaines de jeu) est sauvegardée en ligne pour ne jamais être perdue (changement ou perte de téléphone, suppression de l'application) ; il sert aussi aux classements quotidiens, aux saisons, au Tirage des Ombres et au profil public. Seuls un e-mail et un pseudo sont demandés, et le compte se supprime dans le jeu. Suppression du compte dans le jeu : Sanctuaire → Compte → Supprimer mon compte.
+Pourquoi un compte est proposé : la collection de cartes (500 créatures, plusieurs semaines de jeu) est sauvegardée en ligne pour ne jamais être perdue (changement ou perte de téléphone, suppression de l'application) ; il sert aussi aux classements quotidiens, aux saisons, au Tirage des Ombres et au profil public. Seuls un e-mail et un pseudo sont demandés, et le compte se supprime dans le jeu. Suppression du compte dans le jeu : Sanctuaire → Compte → Supprimer mon compte.
 
 Modération des pseudos (seul contenu créé par les joueurs) : les pseudos insultants sont refusés. Dans un classement (Aventure → La Descente → Classement du jour), touchez le pseudo d'un autre joueur pour le signaler ou le masquer. Un pseudo signalé par plusieurs joueurs est remplacé automatiquement. Contact : abyssal.gamecards@gmail.com
 

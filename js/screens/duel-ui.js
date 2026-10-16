@@ -21,7 +21,7 @@ import { BOSSES, LAWS, ASPECTS } from '../core/bosses.js';
 // bulles de base s'affichent ; Marque/enchaînement, pouvoir d'équipe et dés attendent la suite (relisibles dans Réglages)
 const CB_ICON = new Set(['bastion', 'chain', 'chasse', 'glace']); // images présentes dans assets/icons/cb-*.webp
 import { PACTS } from '../core/pacts.js';
-import { TRAITS } from '../core/descent.js';
+import { TRAITS, traitIcon } from '../core/descent.js';
 import { RELICS } from '../core/relics.js';
 import { ULTS } from '../core/army.js';
 import { mountDiorama, roomFor } from '../ui/diorama.js';
@@ -53,10 +53,11 @@ const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${IN_P
 export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.' }) {
   const settling = () => { const d = app.game.s.descent; return (d.runs || 0) <= 1 && (d.run?.floor || 1) <= 2; }; // v328 : voir plus haut
   const g = app.game, cat = app.catalog, run = runOpt || g.descent().run, st = run.battle;
-  const ui = (app.state.duel ||= { fast: 0 }); // v255 : plus de bouton ×2, vitesse unique
+  const ui = (app.state.duel ||= { fast: 0 });
+  ui.fast = g.s.settings.combatFast ? 1 : 0; // v331 : bouton ×2 de retour (étude joueurs : un combat ≈ 1,2 min) ; la défense active garde son rythme
   const reduced = app.reduced();
   const T = (ms) => (reduced ? Math.min(ms, 80) : ui.fast === 3 ? ms * 0.25 : ui.fast ? ms * 0.45 : ms); // vitesse ×1, ×2 ou ×3
-  const defMode = g.s.settings?.defense === 'auto' ? 'auto' : 'on'; // v269 : défense active manuelle, ou automatique (réglages)
+  const defMode = ['auto', 'easy'].includes(g.s.settings?.defense) ? g.s.settings.defense : 'on'; // v269 : manuelle ou automatique ; v331 : « assistée » (zones 1,6 fois plus larges)
   let alive_ = true, busy = false, sel = null, mode = null; // mode : action en attente de cible
   let holdT = null, held = false; // appui long sur une action : sa description (v249, plus de fenêtre de confirmation)
   const ctl = new AbortController();
@@ -69,6 +70,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   const room = roomFor(floorBg(run.floor, run.room), st.bossKey);
   root.innerHTML = `<div class="dv cb ${run.room} has-bg" style="--bgimg:${room.paint ? `url(${abs(room.paint)})` : bgOf(run)}">
     <div class="dv-top"><b>${esc(title)}</b><span class="row gap">
+      <button class="btn small ghost cb-speed ${ui.fast ? 'on' : ''}" data-d="speed" aria-label="Vitesse des animations" aria-pressed="${!!ui.fast}">×${ui.fast ? 2 : 1}</button>
       <button class="btn small ghost" data-d="help" aria-label="Règles du combat">?</button>
       <button class="btn small ghost" data-d="quit" aria-label="Pause">${icon('close')}</button></span></div>
     <div class="cb-rules"></div>
@@ -109,7 +111,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     u.defend ? st_('defend', 'Défense : -50 % de dégâts') : '',
     u.guardBy ? st_('guard', 'Protégé par un Rempart') : '',
     u.exposed ? st_('exposed', 'Déséquilibrée : +25 % de dégâts subis') : '',
-    u.trait && TRAITS[u.trait] ? st_(u.trait, `${TRAITS[u.trait].name} : ${TRAITS[u.trait].desc}`) : '',
+    u.trait && TRAITS[u.trait] ? st_(traitIcon(u.trait), `${TRAITS[u.trait].name} : ${TRAITS[u.trait].desc}`) : '',
     u.breach ? st_('breach', 'Brèche : le prochain coup d’un autre allié perce son bouclier, +20 % de dégâts, +3 Brisure') : '',
     u.open ? st_('open', 'Exposé : la prochaine attaque d’un autre allié fait +50 % de dégâts et +1 Ferveur') : '',
     u.boost ? `<i class="bo" title="Attaque renforcée pour ce tour">+${u.boost} ATQ</i>` : '',
@@ -572,7 +574,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           else if (e.syn) app.sfx.skill();
           if (e.k === 'entrance') ring(e.u, 'enter');
           if (e.trait === 'explosif') { fxSheet(e.u, 'fx-explode', { k: 2.6, d: 760 }); app.sfx.explode?.(); shake(true); banner(`<img class="cb-trico" alt="" src="assets/icons/st-explosif.webp"> Explosion !`, 'danger', 800); }
-          else if (e.trait) { if (e.trait === 'enrage') fxSheet(e.u, 'fx-enrage', { k: 1.9, d: 820 }); (e.trait === 'enrage' ? app.sfx.enrage : app.sfx.boss)?.(); banner(`<img class="cb-trico" alt="" src="assets/icons/st-${e.trait}.webp"> ${esc(e.s)}`, 'danger', 800); }
+          else if (e.trait) { if (e.trait === 'enrage') fxSheet(e.u, 'fx-enrage', { k: 1.9, d: 820 }); (e.trait === 'enrage' ? app.sfx.enrage : app.sfx.boss)?.(); banner(`<img class="cb-trico" alt="" src="assets/icons/st-${traitIcon(e.trait)}.webp"> ${esc(e.s)}`, 'danger', 800); }
           if (e.combo && e.by && e.a && e.by !== e.a && st.units[e.by]?.side === 'ally') { synergy(e.by, e.a, e.s); await wait(T(380)); if (!g.s.tips?.['cb-combo'] && !settling()) tuto(app, 'cb-combo'); }
           if (e.combo) comboPop(e.u, e.combo);
           float(e.u, e.s, e.syn ? 'syn' : e.k === 'bad' ? 'dmg' : 'info');
@@ -808,6 +810,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         if (!g.s.tips?.['cb-defense']) await tuto(app, 'cb-defense');
         if (!alive_) return;
         res = await defenseQTE(s);
+        // v331 : après 3 défenses ratées dans l'expédition, on rappelle qu'il existe une défense assistée ou automatique (une seule fois)
+        if (res === 'none') { run.defMiss = (run.defMiss || 0) + 1; if (run.defMiss >= 3 && !g.s.tips?.['def-help']) { g.s.tips = { ...(g.s.tips || {}), 'def-help': Date.now() }; toast('Les défenses sont difficiles ? Dans <b>Réglages → Jeu</b>, choisis la défense <b>assistée</b> (zones plus larges) ou <b>automatique</b> (40 % d’esquives, sans parade).', { icon: 'info', ms: 8000 }); } }
       }
       if (!alive_) return;
       acting = s.a; drawTimeline();
@@ -925,7 +929,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (h) openSheet(`<div class="cb-rulesheet">${h}</div>`, { label: 'Règle en vigueur' });
   }
   // ——— Touchers ———
-  root.addEventListener('pointerdown', (e) => { if (defTap && !e.target.closest('[data-d="quit"],[data-d="help"]')) { e.preventDefault(); defTap(); } }, { signal: ctl.signal });
+  root.addEventListener('pointerdown', (e) => { if (defTap && !e.target.closest('[data-d="quit"],[data-d="help"],[data-d="speed"]')) { e.preventDefault(); defTap(); } }, { signal: ctl.signal });
   root.addEventListener('pointerdown', (e) => {
     const ab = e.target.closest('[data-a]'); clearTimeout(holdT); held = false;
     // v329 : appui long sur une carte (ennemie ou alliée) = sa fiche ; le toucher court garde l'attaque rapide
@@ -957,6 +961,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         return;
       }
       if (k === 'help') return help();
+      if (k === 'speed') { ui.fast = ui.fast ? 0 : 1; g.setSetting('combatFast', !!ui.fast); b.textContent = `×${ui.fast ? 2 : 1}`; b.classList.toggle('on', !!ui.fast); b.setAttribute('aria-pressed', String(!!ui.fast)); app.sfx.tap(); return; }
       if (k === 'rule') return ruleSheet(b.dataset.k);
       if (k === 'reserve') return reserveSheet();
       if (busy) return;
@@ -1031,7 +1036,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       <h3>${esc(c.name)}${u.side === 'enemy' ? ' corrompu' : ''}</h3>
       <dl class="facts"><div><dt>Attaque</dt><dd>${u.atk + (u.boost || 0)}</dd></div><div><dt>PV</dt><dd>${Math.max(0, u.hp)} / ${u.maxHp}</dd></div><div><dt>Niveau</dt><dd>${u.level || 1}</dd></div>${st.init ? `<div><dt>Vitesse</dt><dd>${speedOf(u)}</dd></div>` : ''}${st.init && u.side === 'ally' ? `<div><dt>PA</dt><dd>${u.pa || 0} / ${PA_MAX}</dd></div>` : ''}${u.brkMax ? `<div><dt>Brisure</dt><dd>${u.broken ? 'Brisé' : `${u.brk} / ${u.brkMax}`}</dd></div>` : ''}</dl>
       ${u.side === 'enemy' && (bigOf(u, false) || bigOf(u, true)) ? `<p class="small dc-bad"><b>Annonce</b> : ${esc(bigOf(u, false) ? (PREP_IT[bigOf(u, false)] ? `il prépare ${INTENTS[PREP_IT[bigOf(u, false)]].name} pour le tour suivant` : `${INTENTS[bigOf(u, false)].name} à son prochain tour`) : `${INTENTS[bigOf(u, true)].name} au tour suivant`)}. ${esc(INTENTS[PREP_IT[bigOf(u, false)] || bigOf(u, false) || bigOf(u, true)].desc)} Brise-le pour l’annuler.</p>` : ''}
-      ${u.trait && TRAITS[u.trait] ? `<p class="small dc-bad cb-trait"><img class="cb-trico" alt="" src="assets/icons/st-${u.trait}.webp"><b>${esc(TRAITS[u.trait].name)}</b> : ${esc(TRAITS[u.trait].desc)}</p>` : ''}
+      ${u.trait && TRAITS[u.trait] ? `<p class="small dc-bad cb-trait"><img class="cb-trico" alt="" src="assets/icons/st-${traitIcon(u.trait)}.webp"><b>${esc(TRAITS[u.trait].name)}</b> : ${esc(TRAITS[u.trait].desc)}</p>` : ''}
       ${fam ? `<p class="small"><b>${esc(fam.name)}</b> : ${esc(fam.desc)} <span class="dc-good">${esc(fam.counter)}</span></p>` : ''}
       ${u.boss && st.bossKey ? `<p class="small dc-bad"><b>${esc(BOSSES[st.bossKey].name)}</b> : ${esc(BOSSES[st.bossKey].mechanic)} Sous la moitié de ses PV, il entre en phase 2 et accélère.</p>${g.s.bossesBeaten[st.bossKey] ? `<p class="small dc-good"><b>Pour le contrer</b> : ${esc(BOSSES[st.bossKey].counter)}</p>` : ''}${u.aspect ? `<p class="small"><b>${esc(ASPECTS[u.aspect].name)}</b> : faible face à ${ASPECTS[u.aspect].weak.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}, résiste à ${ASPECTS[u.aspect].resist.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}.</p>` : ''}` : ''}
       ${u.boss && st.bossPower && !st.bossKey ? `<p class="small dc-bad"><b>${esc(BOSS_POWERS[st.bossPower].name)}</b> : ${esc(BOSS_POWERS[st.bossPower].desc)} Sous la moitié de ses PV, il entre en phase 2.</p><p class="small dc-good"><b>Point faible</b> : ${esc(BOSS_POWERS[st.bossPower].counter)}</p>` : ''}

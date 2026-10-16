@@ -118,7 +118,7 @@ export default function sceauxScreen(app, root) {
       <div class="sc-sub"><span class="sc-ohand" aria-label="${st.hands.o.length} cartes dans sa main">${'<i></i>'.repeat(st.hands.o.length)}</span>
         <button class="sc-rule" data-sc="rules">${RULE_ICON[st.rule] ? `<img class="sc-ricon" alt="" src="assets/icons/${RULE_ICON[st.rule]}.webp">` : icon('p:rule')}${esc(SC.RULES[st.rule].name)}</button></div>
       <div class="sc-bwrap"><div class="sc-board ${intro ? 'intro' : ''} ${shake ? 'shake' : ''}"><div class="sc-plate">${st.board.map(cell).join('')}</div></div></div>
-      <p class="sc-msg">${st.over || (busy && st.turn === 'p') ? '' : myTurn ? (ui.sel == null ? 'Touche une de tes cartes, puis une case libre.' : 'Touche une case libre pour poser la carte.') : `${esc(R.name)} réfléchit…`}</p>
+      <p class="sc-msg">${st.over || (busy && st.turn === 'p') ? '' : myTurn ? (ui.sel == null ? (st.rule !== 'classique' && st.board.filter(Boolean).length < 2 ? `Règle « ${esc(SC.RULES[st.rule].name)} » : touche sa pastille en haut à droite pour la voir en animation.` : 'Touche une de tes cartes, puis une case libre.') : 'Touche une case libre pour poser la carte.') : `${esc(R.name)} réfléchit…`}</p>
       <div class="sc-tray ${myTurn ? 'on' : ''}"><div class="sc-hand-row">${st.hands.p.map((id, k) => `<button class="sc-hc ${ui.sel === k ? 'sel' : ''}" data-sc="pick" data-k="${k}" ${myTurn ? '' : 'disabled'}>${ui.sel === k ? '<span class="sc-halo"></span>' : ''}${scCard(cat, id, { owner: 'p' })}</button>`).join('')}</div></div>
     </div>`;
   }

@@ -305,6 +305,14 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   u.hp -= d;
   if (d > 0) ev.push({ t: 'dmg', u: u.uid, d, hp: u.hp, src });
   if (d > 0 && u.side === 'enemy' && src && st.units[src]?.side === 'ally') st.stats.maxHit = Math.max(st.stats.maxHit || 0, d);
+  // v331 : traits des profondeurs (Vampire, Épineux)
+  if (d > 0 && src && st.units[src]?.trait === 'vampire' && st.units[src].side === 'enemy' && st.units[src].hp > 0) {
+    const v = st.units[src], h = Math.min(v.maxHp - v.hp, Math.ceil(d / 2));
+    if (h > 0) { v.hp += h; ev.push({ t: 'heal', u: v.uid, d: h }); }
+  }
+  if (d > 0 && u.trait === 'epineux' && u.side === 'enemy' && src && st.units[src]?.side === 'ally' && st.units[src].hp > 0) {
+    ev.push({ t: 'status', u: src, s: 'Épines −2', k: 'bad' }); hurt(st, st.units[src], 2, ev, null);
+  }
   if (d > 0 && u.trait === 'enrage' && !u.enraged && u.hp > 0 && u.hp <= u.maxHp / 2) { u.enraged = true; u.atk += 2; ev.push({ t: 'status', u: u.uid, s: 'Enragé : +2 ATQ', k: 'bad', trait: 'enrage' }); }
   // Marque consommée (v265) et coup de rupture sur une cible Fêlée (Fracture en deux temps)
   const s0 = src && st.units[src];
@@ -479,6 +487,7 @@ export function breakHit(st, t, n, ev, src = null) {
   // v265 : jauge vide → Fêlé. Le prochain coup de rupture (attaque d'un Protecteur, Coup d'estoc, Raz-de-marée,
   // ou un coup qui consomme une Marque) le brise. Sans rupture avant la fin du tour suivant, il se ressaisit.
   t.cracked = { seq: st.seq || 0, until: st.round + 1 };
+  if (st.stats) st.stats.cracks = (st.stats.cracks || 0) + 1; // v331 : pour le bilan (« Fêlé sans être Brisé »)
   ev.push({ t: 'cracked', u: t.uid });
   gainFervor(st, 1, ev, 'Fêlure');
 }
@@ -950,6 +959,8 @@ function startAllyTurn(st, ev) {
   st.ap = AP_MAX + (st.law === 'hate' ? 1 : 0) + (st.round === 1 ? (R_.includes('sablier') ? 1 : 0) - (R_.includes('miroir') ? 1 : 0) : 0);
   st.swapped = false; st.ombreUsed = false; st.hitBy = {}; st.curKind = null;
   const thief = st.round >= 3 && front(st, 'enemy').find((x) => x.trait === 'voleur' && x.hp > 0);
+  // v331 : Carapace, le bouclier revient un tour sur deux
+  if (st.round > 1 && st.round % 2 === 1) for (const x of front(st, 'enemy')) if (x.trait === 'carapace' && x.hp > 0 && !x.shield) { x.shield = 1; ev.push({ t: 'status', u: x.uid, s: 'Carapace', k: 'bad', trait: 'carapace' }); }
   if (st.init) {
     // Loi de la hâte : +1 PA à chacune ; Voleur : vole 1 PA à ta créature qui en a le plus
     if (st.law === 'hate') front(st, 'ally').forEach((u) => gainPA(u, 1));
@@ -1721,6 +1732,9 @@ export function battleReport(st, name) {
     const first = (st.fallenLog || [])[0];
     if (first) out.push(`${name(first.u)} a succombé${first.round ? ` au tour ${first.round}` : ''}${first.by ? `, sous ${KIND_TXT[first.kind] || 'une attaque'} de ${name(first.by)}` : ''}.`);
     if (s.missed) out.push(`${s.missed} attaque${s.missed > 1 ? 's' : ''} dangereuse${s.missed > 1 ? 's' : ''} n’${s.missed > 1 ? 'ont' : 'a'} pas été parée${s.missed > 1 ? 's' : ''}.`);
+    // v331 : la Fêlure ratée, mécanique clé contre élites et gardiens, souvent ignorée (étude joueurs)
+    const lost = (s.cracks || 0) - (s.breaks || 0);
+    if (lost > 0) out.push(`${lost > 1 ? `${lost} fois, un ennemi a été` : 'Un ennemi a été'} Fêlé sans être Brisé : pendant qu’il est Fêlé, frappe-le avec un Protecteur, un Coup d’estoc ou sur une Marque pour le Briser (il perd son coup annoncé).`);
     const tip = s.missed ? 'Contre les attaques annoncées « Danger », touche au bon moment pour esquiver ou parer.'
       : !s.breaks && Object.values(st.units).some((u) => u.side === 'enemy' && (u.boss || u.elite)) ? 'Concentre tes coups sur l’élite ou le gardien pour le briser : il perd son tour.'
       : 'Frappe la même cible avec plusieurs créatures : chaque coup suivant gagne un bonus d’Enchaînement.';
