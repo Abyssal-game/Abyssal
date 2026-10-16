@@ -643,7 +643,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const embers = Array.from({ length: again ? 8 : 16 }, () => `<i style="left:${(Math.random() * 100).toFixed(1)}%;--dl:${(Math.random() * 0.45).toFixed(2)};--sz:${(3 + Math.random() * 5).toFixed(1)}px;--dx:${(Math.random() * 60 - 30).toFixed(0)}px"></i>`).join('');
     ov.innerHTML = `<span class="as-art"><img alt="" src="${artUrl(c)}"></span><span class="as-lines"></span><span class="as-veil"></span>
       <span class="as-embers">${embers}</span><span class="as-slash"></span><span class="as-flash"></span>
-      <p class="as-lbl"><small class="as-who"><em>${esc(rar?.name || '')}</em> · ${esc(who)}</small><span class="as-k">${ic}<b>${esc(label)}</b></span><span class="as-rule"></span></p>`;
+      <p class="as-lbl" aria-label="${esc(who)}"><span class="as-k">${ic}<b>${esc(label)}</b></span><span class="as-rule"></span></p>`;
     let skip = false;
     ov.addEventListener('pointerdown', () => { skip = true; }, { once: true });
     const img = ov.querySelector('img');
