@@ -43,7 +43,9 @@ export function configureSound({ sound, volume: v, haptics: h, loud: l }) {
   haptics = h !== false; loud = !!l;
   if (master) master.gain.value = volume * 0.9;
   // iPhone (iOS 17+) : « playback » joue même quand le bouton silencieux est activé
-  try { if (navigator.audioSession) navigator.audioSession.type = loud ? 'playback' : 'ambient'; } catch (e) { /* rien */ }
+  // v369 : dans l'application iPhone, toujours « playback » (sinon « ambient » ici annulait le réglage de l'app : jeu muet)
+  const native = !!window.Capacitor?.isNativePlatform?.();
+  try { if (navigator.audioSession) navigator.audioSession.type = loud || native ? 'playback' : 'ambient'; } catch (e) { /* rien */ }
 }
 // Contexte audio partagé avec la musique (créé au premier toucher)
 export function audioCtx() { return ensure(); }
