@@ -15,7 +15,9 @@ for (const k of KEEP) fs.cpSync(path.join(ROOT, k), path.join(OUT, k), { recursi
 let n = 0, bytes = 0;
 (function walk(d) { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const f = path.join(d, e.name); if (e.isDirectory()) walk(f); else { n++; bytes += fs.statSync(f).size; } } })(OUT);
 console.log(`www/ : ${n} fichiers, ${(bytes / 1e6).toFixed(1)} Mo`);
-// iPhone : le numéro de build Xcode suit le numéro du jeu (v366 → 366), comme versionCode sur Android
+// iPhone : le numéro de build Xcode suit le numéro du jeu (v366 → 366), comme versionCode sur Android.
+// Seulement sur le Mac : ce fichier n'est jamais envoyé depuis la session, sinon il entre en conflit avec
+// le réglage de signature qu'Xcode y écrit sur le Mac (GitHub Desktop refuse alors de récupérer les mises à jour).
 const PBX = path.join(ROOT, 'ios/App/App.xcodeproj/project.pbxproj');
 const ver = (fs.readFileSync(path.join(ROOT, 'js/config.js'), 'utf8').match(/VERSION = 'v(\d+)'/) || [])[1];
-if (ver && fs.existsSync(PBX)) { fs.writeFileSync(PBX, fs.readFileSync(PBX, 'utf8').replace(/CURRENT_PROJECT_VERSION = \d+;/g, `CURRENT_PROJECT_VERSION = ${ver};`)); console.log(`iOS : build ${ver}`); }
+if (ver && fs.existsSync(PBX) && process.platform === 'darwin') { fs.writeFileSync(PBX, fs.readFileSync(PBX, 'utf8').replace(/CURRENT_PROJECT_VERSION = \d+;/g, `CURRENT_PROJECT_VERSION = ${ver};`)); console.log(`iOS : build ${ver}`); }
