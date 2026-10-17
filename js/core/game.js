@@ -835,7 +835,7 @@ export class Game {
     if (team.length && team.every((id) => this.cardLevel(id) >= MAX_LEVEL)) {
       const sub = Object.keys(this.s.collection).map((id) => ({ id, x: this.sublimeInfo(id) })).filter((o) => o.x && o.x.cost <= this.s.ash)
         .sort((a, b) => (this.isFav(b.id) - this.isFav(a.id)) || (b.x.cost - a.x.cost))[0];
-      if (sub) out.push({ kind: 'sublime', title: `Sublime ${this.catalog.get(sub.id).name}`, sub: `${VARIANTS[sub.x.to].name} pour ${sub.x.cost} cendres (tu en as ${this.s.ash}) · Fournaise → Sublimer`, href: '#/fournaise', icon: 'sparkle' });
+      if (sub) out.push({ kind: 'sublime', title: `Sublime ${this.catalog.get(sub.id).name}`, sub: `${VARIANTS[sub.x.to].name} pour ${sub.x.cost} cendres (tu en as ${this.s.ash}) · Fournaise → Sublimer`, href: '#/fournaise', icon: 'holo' });
     }
     if (bf && out.length < 3 && !out.some((x) => x.sub?.includes(BOSSES[bossOf(bf)].name))) { const B = BOSSES[bossOf(bf)]; out.push({ kind: 'boss', title: `Vaincs ${B.name}`, sub: `Gardien de l’étage ${bf} · son récit t’attend dans le Bestiaire`, href: '#/descente', icon: 'crest-boss' }); }
     else if (!bf && this.sceauxOpen()) {
