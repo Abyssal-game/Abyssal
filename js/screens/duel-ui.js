@@ -129,17 +129,18 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const statusList = (u) => [
     u.broken ? st_('broken', 'Brisé : +50 % de dégâts subis, +5 aux jets') : '',
     u.cracked ? st_('broken fele', 'Fêlé : un coup de rupture le brise (attaque d’un Protecteur, Coup d’estoc, Raz-de-marée, ou coup qui consomme une Marque)') : '',
+    u.condemned ? st_('exposed', 'Condamnée : le Bourreau l’exécutera à son prochain tour (permute-la en réserve pour l’épargner)') : '',
+    u.frozen || u.stunned ? st_('frost', 'Gelé : passe son tour') : '',
+    u.mark ? st_('mark', 'Marqué : le prochain coup d’une autre de tes créatures fait +50 % et +2 Brisure, puis la Marque part. +3 aux jets') : '',
+    u.prey ? st_('prey', 'Proie désignée : tous les ennemis la visent (+20 % de dégâts)') : '',
     u.riposte ? `<i class="bo cb-rip" title="Riposte chargée : sa prochaine attaque fait +${u.riposte} dégât(s) et +${u.riposte} Brisure">⚔${u.riposte}</i>` : '',
     u.shield ? st_('shield', 'Bouclier : bloque un coup') : '',
     u.ward ? st_('seal', `Barrière : absorbe encore ${u.ward} dégâts`, u.ward) : '',
     u.poison ? st_('poison', `Poison : ${u.poison} dégâts au début de son tour`, u.poison) : '',
-    u.frozen || u.stunned ? st_('frost', 'Gelé : passe son tour') : '',
     u.mirror ? st_('shield', 'Miroir : le prochain coup qu’elle reçoit se retourne contre l’attaquant (60 %). Le poison passe à travers.') : '',
     u.ashArmor ? st_('guard', `Armure de cendres : −${u.ashArmor * 6} % de dégâts reçus (une Brisure la fait tomber)`, u.ashArmor) : '',
     u.veiled ? st_('slow', u.mark ? 'Dans l’ombre, mais la Marque le révèle' : 'Dans l’ombre : −70 % de dégâts reçus (une Marque le révèle)') : '',
-    u.condemned ? st_('exposed', 'Condamnée : le Bourreau l’exécutera à son prochain tour (permute-la en réserve pour l’épargner)') : '',
     u.slow ? st_('slow', 'Ralenti : prochaine attaque -50 %') : '',
-    u.mark ? st_('mark', 'Marqué : le prochain coup d’une autre de tes créatures fait +50 % et +2 Brisure, puis la Marque part. +3 aux jets') : '',
     u.defend ? st_('defend', 'Défense : -50 % de dégâts') : '',
     u.guardBy ? st_('guard', 'Protégé par un Rempart') : '',
     u.exposed ? st_('exposed', 'Déséquilibrée : +25 % de dégâts subis') : '',
@@ -147,17 +148,14 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     u.breach ? st_('breach', 'Brèche : le prochain coup d’un autre allié perce son bouclier, +20 % de dégâts, +3 Brisure') : '',
     u.open ? st_('open', 'Exposé : la prochaine attaque d’un autre allié fait +50 % de dégâts et +1 Ferveur') : '',
     u.boost ? `<i class="bo" title="Attaque renforcée pour ce tour">+${u.boost} ATQ</i>` : '',
-    u.prey ? st_('prey', 'Proie désignée : tous les ennemis la visent (+20 % de dégâts)') : '',
     u.ice ? st_('ice', `Carapace de glace : absorbe ${u.ice} dégâts`, u.ice) : '',
     u.doom != null && !u.broken ? st_('doom', `Effondrement dans ${u.doom} tour(s) : brise-le pour le repousser`, u.doom) : '',
     u.mask ? st_('mask', `Il porte le visage ${cat.faction[u.mask]?.name || u.mask} : il résiste à cette faction (−50 %)`) : '',
     u.totality ? st_('totality', 'Totalité : seules ses faiblesses le blessent pleinement') : '',
-    ...passivesOf(u).map((p) => (passiveIconUrl(p) ? `<i class="sti ckp" title="Passif : ${esc(PASSIVES[p].name)} · ${esc(PASSIVES[p].desc)}"><img alt="" src="${passiveIconUrl(p)}"></i>` : '')),
-    u.talent && TALENTS[u.talent] ? `<i class="sti" title="Talent : ${esc(TALENTS[u.talent].name)} · ${esc(TALENTS[u.talent].desc)}"><img alt="" src="assets/icons/tal-${u.talent}.webp"></i>` : '',
-  ].filter(Boolean);
+  ].filter(Boolean); /* v400 : passifs et talent (permanents) ne sont plus sur la carte : ils sont dans sa fiche (appui long) */
   const statusHTML = (u) => statusList(u).join('');
   // v279 : bandeau d'états au-dessus de la carte, 3 pastilles au plus (2 si une attaque est annoncée) ; le reste en « +N », détaillé au toucher
-  const statusBand = (u, warn) => { const L = statusList(u), max = warn ? 2 : 3, more = L.length - max;
+  const statusBand = (u, warn) => { const L = statusList(u), max = warn ? 1 : 2, more = L.length - max; /* v400 : 2 pastilles au plus (1 si une attaque est annoncée) */
     return `<span class="dv-st">${(more > 0 ? L.slice(0, max) : L).join('')}${more > 0 ? `<i class="sti cb-more" title="${more} autre(s) effet(s) : touche la carte">+${more}</i>` : ''}</span>`; };
   // v348 : dès l'étage 5 de la Descente, les ennemis ordinaires annoncent aussi leur coup (dégâts → cible), en discret
   const ORD_INT_FROM = 5;
@@ -259,12 +257,12 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     lastGoal = gl ? gl.state : null;
     const rules = [gl ? `<span class="cb-law cb-goal s-${gl.state}" data-d="rule" data-k="goal"><img class="cb-gico" alt="" src="assets/icons/goal.webp">${gl.state === 'done' ? '✓ ' : gl.state === 'fail' ? '✗ ' : ''}<b>${esc(gl.name)}</b>${gl.p && gl.state === 'pending' ? ` <small>${gl.p}</small>` : ''}</span>` : '',
       st.pact && PACTS[st.pact] ? `<span class="cb-law" style="--pk:${PACTS[st.pact].color}" data-d="rule" data-k="pact">${icon('p:seal')}<b>${esc(PACTS[st.pact].name)}</b></span>` : '',
-      run?.day && g.rule(run.day) ? `<span class="cb-law cb-day" data-d="rule" data-k="day">${icon('p:rule')}<b>${esc(g.rule(run.day).name)}</b></span>` : '',
       st.law ? `<span class="cb-law" data-d="rule" data-k="law"><b>${esc(LAWS[st.law].name)}</b></span>` : '',
       st.forbid ? `<span class="cb-law cb-forbid" title="Verdict du Juge : interdit de ${esc(FORBID[st.forbid])} jusqu’à sa prochaine action"><b>Interdit : ${esc(FORBID_SHORT[st.forbid])}</b></span>` : '',
       st.aspect ? `<span class="cb-law" data-d="rule" data-k="aspect"><b>${esc(ASPECTS[st.aspect].name)}</b></span>` : '',
       st.runes ? `<span class="cb-law cb-runes" data-d="rule" data-k="runes" title="Runes du gardien">${st.runes.map((r) => `<img alt="" src="assets/ui/${r.broken ? 'rune-broken' : 'rune'}.webp" class="${r.broken ? 'off' : ''}">`).join('')}<b>${runesLeft(st) ? `−${runesLeft(st) * 10} %` : 'Rompues'}</b></span>` : '',
-      st.omen && OMENS[st.omen] ? `<span class="cb-law" data-d="rule" data-k="omen">${icon(OMENS[st.omen].icon)}<b>Présage</b></span>` : (st.relics || []).length ? `<span class="cb-law" data-d="rule" data-k="relics">${icon('p:crown')}<b>${st.relics.length} relique${st.relics.length > 1 ? 's' : ''}</b></span>` : ''].join('');
+      st.omen && OMENS[st.omen] ? `<span class="cb-law" data-d="rule" data-k="omen">${icon(OMENS[st.omen].icon)}<b>Présage</b></span>` : (st.relics || []).length ? `<span class="cb-law" data-d="rule" data-k="relics">${icon('p:crown')}<b>${st.relics.length} relique${st.relics.length > 1 ? 's' : ''}</b></span>` : '',
+      run?.day && g.rule(run.day) ? `<span class="cb-law cb-day" data-d="rule" data-k="day">${icon('p:rule')}<b>${esc(g.rule(run.day).name)}</b></span>` : ''].join(''); /* v400 : règle du jour en dernier */
     const rulesEl = $('.cb-rules'); if (rulesEl) { setHTML(rulesEl, rules); rulesEl.hidden = !rules; }
     const night = st.bossKey === 'abysse' && Object.values(st.units).some((u) => u.boss && u.night && u.hp > 0), dvEl = $('.dv'); /* v392 : la Nuit sans fin assombrit et fissure la salle */
     if (dvEl && dvEl.classList.contains('abyss-night') !== night) dvEl.classList.toggle('abyss-night', night);
@@ -1208,6 +1206,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       <p class="small"><b>${esc(kit.passive.name)}</b> : ${esc(kit.passive.desc)}</p>
       ${u.rarity === 'C' ? `<p class="small dc-good">${icon('star')} Instinct de meute : +${PACK_BONUS} dégât aux élites et aux gardiens.</p>` : ''}`}
       ${u.side === 'enemy' && g.owns(u.id) ? `<p class="small dc-good">${icon('book')} Tu possèdes sa carte : tes créatures lui font +1 dégât.</p>` : ''}
+      ${passivesOf(u).filter((p) => PASSIVES[p]).map((p) => `<p class="small"><b>${esc(PASSIVES[p].name)}</b> : ${esc(PASSIVES[p].desc)}</p>`).join('')}
+      ${u.talent && TALENTS[u.talent] ? `<p class="small"><b>Talent · ${esc(TALENTS[u.talent].name)}</b> : ${esc(TALENTS[u.talent].desc)}</p>` : ''}
       <p class="small muted">${statusLines(u)}</p></div>`, { label: uName(u) });
   }
   // v289 : la réserve au toucher — les cartes des créatures en attente, pour juger d'un remplacement

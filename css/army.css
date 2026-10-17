@@ -3515,3 +3515,6 @@ html.fx-light .dv-c .dv-hp.low .hpr::after { animation: none; }
 .sti.sti-fele img { filter: sepia(1) saturate(3) hue-rotate(5deg) brightness(1.15); }
 .cb-brk.is-fele b { letter-spacing: .02em; }
 .cb-law.cb-day .picon { width: 16px; height: 16px; }
+
+/* v400 : écran de combat allégé — l'icône de famille des ennemis quitte la carte (elle reste dans la fiche, appui long) */
+.dv.cb .dv-c.enemy .dv-kw.fam { display: none !important; }
