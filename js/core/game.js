@@ -152,7 +152,6 @@ export class Game {
 
   canBuy(type) {
     const def = BOOSTERS[type];
-    // le booster premium ne s'achète plus : il se gagne (gardiens de la Descente)
     return (this.s.tickets[type] || 0) > 0 || (type === 'standard' && this.freePack().stock > 0) || (!def.rewardOnly && this.s.shards >= def.price);
   }
 

@@ -120,7 +120,7 @@ export default function shop(app, root, params = []) {
         ${card('standard')}
         ${card('faction', '', `<div class="chips fac-pick fac-grid" role="radiogroup" aria-label="Faction du booster">${FACTION_ORDER.map((f) => `<button class="chip" role="radio" data-act="pickfac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}" aria-checked="${st.faction === f}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>`)}
         ${card('event', `<p class="event-line"><b>${esc(ev.name)}</b> · ${ev.factions.map((f) => esc(cat.faction[f].name)).join(' et ')}<br><span class="small muted">${esc(ev.desc)} Encore ${ev.daysLeft} jour${ev.daysLeft > 1 ? 's' : ''}.</span></p>`)}
-        ${g.s.tickets.premium ? card('premium') : ''}
+        ${card('premium')}
       </div>
     `;
   }
