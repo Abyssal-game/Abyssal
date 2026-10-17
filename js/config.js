@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v416'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v417'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -54,13 +54,13 @@ export const BOOSTERS = {
 // v394 : Booster de l'Abysse, la récompense du fond de la Descente (étage 100). Ne s'achète pas.
 BOOSTERS.abysse = {
   rewardOnly: true, name: 'Booster de l’Abysse', price: 0, slots: ['rPlus', 'rPlus', 'rPlus', 'hrPlus', 'mPlus'], pool: 'all', variantMult: 4, minVariant: 'holo',
-  desc: '5 cartes : trois Rares ou mieux, une Hyper rare ou mieux, une Mythique ou mieux. Toutes au moins holographiques. La première fois : une Secrète que tu n’as pas encore.',
+  desc: '5 cartes : trois Rares ou mieux, une Hyper rare ou mieux, une Mythique ou mieux. Toutes au moins argentées. La première fois : une Secrète que tu n’as pas encore.',
 };
 export const FINAL_FLOOR = 100; // v394 : le fond de la Descente (pour l'instant)
 
 // Chance (en %) qu'une carte tirée sorte dans chaque finition (×2 dans un booster premium).
 // v280 : plus fréquentes qu'avant (2,5 / 0,5 / 0,1) ; on peut aussi sublimer une carte avec des cendres (SUBLIME_ASH).
-// Par booster standard de 3 cartes : ~12 % d'une holographique, ~3,6 % d'une or, ~1,2 % d'une cosmique.
+// Par booster standard de 3 cartes : ~12 % d'une argentée, ~3,6 % d'une or, ~1,2 % d'une cosmique.
 export const VARIANT_RATES = { holo: 4, gold: 1.2, galaxy: 0.4 };
 // Sublimer : obtenir la finition suivante d'une carte qu'on possède déjà dans la finition précédente.
 // Coût = cendres de base de la rareté × ce facteur ; toujours plus que ce que la carte rapporte brûlée (burnFinish).
@@ -72,7 +72,7 @@ export const SHOW_ORDER = ['galaxy', 'gold', 'holo', 'normal'];
 
 export const VARIANTS = {
   normal:    { name: 'Normale',                  short: 'Normale' },
-  holo:      { name: 'Holographique',            short: 'Holo' },
+  holo:      { name: 'Argentée',                 short: 'Argentée' }, /* v417 : ex-Holographique (clé inchangée) */
   gold:      { name: 'Enluminée',                short: 'Enluminée' }, /* v415 : ex-Feuille d’or (clé inchangée) */
   galaxy:    { name: 'Abyssale',                 short: 'Abyssale' }, /* v415 : ex-Cosmique (clé inchangée) */
 };
@@ -147,7 +147,7 @@ export const MISSIONS = [
   { key: 'new5',     kind: 'new',      n: 5, shards: 40, text: 'Découvre 5 nouvelles créatures' },
   { key: 'faction',  kind: 'faction',  n: 3, shards: 30, text: 'Obtiens 3 cartes {faction}' },
   { key: 'rare',     kind: 'rare',     n: 2, shards: 35, text: 'Obtiens 2 cartes Rares ou mieux' },
-  { key: 'variant',  kind: 'variant',  n: 1, shards: 35, text: 'Obtiens une variante (holographique, or…)' },
+  { key: 'variant',  kind: 'variant',  n: 1, shards: 35, text: 'Obtiens une finition (argentée, enluminée…)' },
   { key: 'burn',     kind: 'burn',     n: 3, shards: 30, text: 'Brûle 3 cartes dans la Fournaise' },
   { key: 'trial2',   kind: 'trial',    n: 2, shards: 40, text: 'Gagne 2 Épreuves du jour' },
   { key: 'wins',     kind: 'win',      n: 5, shards: 35, text: 'Remporte 5 combats (Descente ou Épreuves)' },

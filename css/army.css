@@ -3618,3 +3618,7 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 /* v411 : Accueil réorganisé : sous-titre « Missions du jour » dans « Aujourd'hui » */
 .today .td-sub { margin: 14px 0 2px; padding-top: 12px; border-top: 1px solid var(--line-soft); font: 700 .72rem/1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
 .today a.td-row { color: inherit; text-decoration: none; }
+
+/* v417 : bannière d'ouverture d'une finition aux couleurs des nouvelles finitions (argent, or, Abysse) */
+.op-banner.op-variant.v-holo { background: linear-gradient(110deg, #FFFFFF, #AEB9CC, #EEF3FA); -webkit-background-clip: text; background-clip: text; }
+.op-banner.op-variant.v-galaxy { background: linear-gradient(110deg, #E6D2FF, #9A4CFF, #F2E6FF); -webkit-background-clip: text; background-clip: text; }

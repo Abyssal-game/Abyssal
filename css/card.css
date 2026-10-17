@@ -336,3 +336,25 @@ html.reduce-motion .tcg.apex::before { animation: none; }
 .tcg-mini.v-galaxy .tcg-vframe { animation: none; }
 .v-gold .tcg-vframe, .v-galaxy .tcg-vframe { background-size: 109% 105%; overflow: hidden; }
 .v-gold .tcg-vframe { filter: brightness(1.25) drop-shadow(0 0 2px rgba(0, 0, 0, .9)); }
+
+/* v417 : « Argentée » (ex-Holographique, clé « holo » inchangée) : la créature gravée à la pointe d'argent, reflet de clair de lune
+   qui suit l'inclinaison, cadre d'argent gravé peint par Gemini (assets/variants/argentee-frame.webp). Échelle : argent, or, Abysse. */
+.v-holo { --frame: linear-gradient(135deg, #F4F8FF, #9AA6B8 18%, #E6ECF5 34%, #5E6878 52%, #DCE4F0 68%, #7D8899 84%, #F4F8FF); box-shadow: 0 6px 18px rgba(0, 0, 0, .55), 0 0 18px rgba(190, 210, 240, .35); }
+.v-holo .tcg-art img { filter: saturate(.72) contrast(1.1) brightness(1.03); }
+.v-holo .tcg-art::after {
+  mix-blend-mode: soft-light; opacity: 1; animation: none;
+  background:
+    linear-gradient(180deg, rgba(200, 220, 255, .35), rgba(60, 80, 120, .35)),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, .07) 0 1px, transparent 1px 3px);
+}
+.v-holo .tcg-shine { background: linear-gradient(115deg, transparent 34%, rgba(210, 225, 255, .0) 40%, rgba(225, 235, 255, .55) 48%, rgba(255, 255, 255, .85) 50%, rgba(225, 235, 255, .55) 52%, transparent 60%); background-size: 280% 280%; background-position: var(--mx) var(--my); mix-blend-mode: soft-light; opacity: .8; animation: sweep 7s ease-in-out infinite; }
+.tiltable.v-holo .tcg-shine { opacity: calc(.6 + var(--tilt, 0) * .4); }
+.v-holo .tcg-vframe { background-image: url(../assets/variants/argentee-frame.webp); background-size: 109% 105%; }
+.v-holo::after { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .7), inset 0 0 0 2px rgba(210, 225, 250, .45), inset 0 0 24px rgba(170, 195, 235, .25); }
+.v-holo .tcg-nm { background: linear-gradient(180deg, #FFFFFF, #C9D4E4 45%, #8C98AC 70%, #EEF3FA); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .85)); }
+.v-holo .tcg-vbadge { background: linear-gradient(110deg, #F4F8FF, #A9B5C7 55%, #6E7A8E); color: #141A24; }
+.tcg-mini.v-holo .tcg-shine { opacity: .35; }
+.sh-c.v-holo { border-color: #C9D4E4; }
+@media (prefers-reduced-motion: reduce) { .v-holo .tcg-shine { animation: none; } }
+.v-holo .tcg-art img { filter: saturate(.6) contrast(1.12) brightness(1.04); }
+.v-holo .tcg-art::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, #B9CBEA, #5B6C8C); mix-blend-mode: color; opacity: .32; }
