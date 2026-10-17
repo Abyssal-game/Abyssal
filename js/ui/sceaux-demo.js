@@ -31,7 +31,7 @@ export const SCENES = {
   ] },
   sacre: { name: 'Cases sacrées', frames: [
     { cells: [null, null, null, null, m('+'), null, null, null, m('−')], cap: 'Deux cases spéciales : une bénie (+) et une maudite (−).' },
-    { cells: [null, null, null, null, c([5, 6, 4, 7], 'p', { new: 1, mark: '+', bonus: 1 }), null, null, null, m('−')], cap: 'Une carte posée sur la case bénie gagne +1 sur ses quatre valeurs (4 6 3 5 devient 5 7 4 6).' },
+    { cells: [null, null, null, null, c([5, 6, 4, 7], 'p', { new: 1, mark: '+', bonus: 1 }), null, null, null, m('−')], cap: 'Une carte posée sur la case bénie gagne +1 sur ses quatre valeurs (4 5 3 6 devient 5 6 4 7).' },
     { cells: [null, null, null, null, c([5, 6, 4, 7], 'p', { mark: '+', bonus: 1 }), null, null, null, c([5, 3, 4, 2], 'o', { new: 1, mark: '−', malus: 1 })], cap: 'Sur la case maudite, c’est −1 partout. Choisis bien où tu poses tes cartes faibles.' },
   ] },
   instable: { name: 'Plateau instable', frames: [

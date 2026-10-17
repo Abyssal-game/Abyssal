@@ -3518,3 +3518,15 @@ html.fx-light .dv-c .dv-hp.low .hpr::after { animation: none; }
 
 /* v400 : écran de combat allégé — l'icône de famille des ennemis quitte la carte (elle reste dans la fiche, appui long) */
 .dv.cb .dv-c.enemy .dv-kw.fam { display: none !important; }
+
+/* v402 (audit des Sceaux) : bouton « Revanche implacable » enfin habillé (rouge, comme le dit l'aide), sur une ligne ;
+   cœur du Sceau en haut à droite d'une carte posée (il chevauchait la pastille ±1 de la case sacrée) ; anneaux sacrés contenus */
+.sc-awake { display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 6px; padding: 8px 12px; min-height: 44px; border-radius: 12px; text-align: left; font: inherit; color: #FFD9DD; cursor: pointer;
+  background: linear-gradient(180deg, rgba(120, 14, 30, .92), rgba(60, 6, 16, .95)); border: 1px solid rgba(255, 90, 110, .6); box-shadow: 0 0 14px rgba(200, 30, 60, .3); }
+.sc-awake > span { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.sc-awake b { font: 700 .9rem/1.15 var(--f-display); color: #FFE2E6; }
+.sc-awake small { font-size: .7rem; color: #F5B8C2; }
+.sc-awake.won { opacity: .8; border-color: rgba(242, 193, 78, .55); }
+.sc-awake .ic, .sc-awake svg { width: 18px; height: 18px; flex: none; }
+.sc-cell.full.heart::before { inset: 4px 4px auto auto !important; }
+.sc-rs { inset: 0; }

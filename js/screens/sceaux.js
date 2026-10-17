@@ -14,8 +14,8 @@ const RULE_ICON = { identique: 'sc-same', somme: 'sc-sum', abime: 'sc-abyss', sa
 // « Comment ça marche » : même présentation que la Descente (icône, couleur, numéro)
 const HOW = [['cards', '#7FA8D8', 'Ta main', '5 cartes. Chacune a quatre valeurs, une par côté (de 1 à 10 ; 10 s’écrit A).'],
   ['seal', '#E8C35A', 'Le plateau', 'À tour de rôle, chacun pose une carte sur une case libre du plateau de 3 × 3.'],
-  ['swords', '#E0485E', 'Capturer', 'Si ta valeur est plus grande que celle d’en face d’une carte adverse voisine, tu la captures. À égalité, rien ne se passe.'],
-  ['crown', '#F2C14E', 'La victoire', 'Après les 9 poses, on compte les cartes de chaque couleur, plus celle restée en main. À 5 contre 5, celui qui tient la case centrale (le cœur du Sceau) gagne.'],
+  ['swords', '#E0485E', 'Capturer', 'Si ta valeur est plus grande que celle d’en face d’une carte adverse voisine, tu la captures. À égalité, rien ne se passe (sauf avec la Fureur ou la règle Identique).'],
+  ['crown', '#F2C14E', 'La victoire', 'Après les 9 poses, on compte les cartes de chaque couleur, plus celle restée en main (le score affiché pendant la partie compte déjà les cartes en main). À 5 contre 5, celui qui tient la case centrale (le cœur du Sceau) gagne.'],
   ['holo', '#FF8AD8', 'Pouvoirs de rareté', 'Les Hyper rares sont Inviolables (bouclier doré : elles résistent à la première capture). Les Mythiques ont la Fureur (épées en flammes : elles capturent aussi à égalité quand tu les poses). Les Secrètes ont les deux.'],
   ['rule', '#B48CFF', 'Règles spéciales', 'Certains adversaires jouent avec une règle en plus : Cases sacrées, Identique ou Somme (avec Combo en cascade).'],
   ['crystal', '#7FE0A0', 'Butin', 'Une fois par jour, après une victoire, tu gardes une carte adverse que tu contrôles sur le plateau (Hyper rare au plus).'],
@@ -28,7 +28,7 @@ const stars = (n) => `${'★'.repeat(n)}${'☆'.repeat(Math.max(0, 5 - n))}`;
 const PERK_IC = { rempart: '<img alt="" src="assets/icons/pk-rempart.webp">', fureur: '<img alt="" src="assets/icons/pk-fureur.webp">' };
 const themeOf = (r) => THEME[r] || 'salle';
 // v358 : les explications animées en tuiles (icône, nom, résumé, lecture), à la place de la liste de textes
-const RULE_SHORT = { classique: 'Plus fort que la carte d’en face : capturée. Et les pouvoirs de rareté.', sacre: 'Une case bénie (+1) et une case maudite (−1).', identique: 'Deux égalités d’un coup : les deux cartes sont prises.', somme: 'Deux fois la même somme : les deux cartes sont prises.', abime: 'Identique, Somme et cases sacrées à la fois.' };
+const RULE_SHORT = { classique: 'Plus fort que la carte d’en face : capturée. Et les pouvoirs de rareté.', sacre: 'Une case bénie (+1) et une case maudite (−1).', identique: 'Deux égalités d’un coup (tes cartes comptent aussi) : les cartes adverses parmi elles sont prises.', somme: 'Deux fois la même somme (tes cartes comptent aussi) : les cartes adverses parmi elles sont prises.', abime: 'Identique, Somme et cases sacrées à la fois.' };
 const ruleTiles = () => `<div class="sc-rgrid">${SC.RULE_LIST.map((k) => `<button class="sc-rtile k-${k}" data-sc="demo" data-k="${k}"><span class="sc-rt-ic">${RULE_MED[k] || RULE_ICON[k] ? `<img alt="" src="assets/icons/${RULE_MED[k] || RULE_ICON[k]}.webp">` : picon('swords')}</span><b>${k === 'classique' ? 'Les bases' : esc(SC.RULES[k].name)}</b><small>${esc(RULE_SHORT[k] || SC.RULES[k].desc)}</small><span class="sc-rt-play" aria-hidden="true">▶</span></button>`).join('')}</div>`;
 // Portrait peint de l'adversaire (assets/sceaux/rival-*.webp), avec l'ancienne image de créature en secours
 const rivalPic = (cat, R) => `<img alt="" src="assets/sceaux/rival-${R.key}.webp" onerror="this.onerror=null;this.src='${artUrl(cat.get(R.portrait), { lite: true })}'">`;
@@ -62,7 +62,7 @@ export default function sceauxScreen(app, root) {
     const dailyDone = sc.dailyDone === todayKey();
     const R = SC.RIVAL[d.rival];
     root.innerHTML = `<header class="screen-head ui-hero bn-sceaux"><h1>Duels des Sceaux</h1><p class="muted">Pose tes cartes sur le plateau et capture celles de l’adversaire.</p>
-        <span class="sc-rec">${sc.wins} victoire${sc.wins > 1 ? 's' : ''} · ${sc.losses} défaite${sc.losses > 1 ? 's' : ''} · ${sc.draws} égalité${sc.draws > 1 ? 's' : ''}</span></header>
+        <span class="sc-rec">${sc.wins} victoire${sc.wins > 1 ? 's' : ''} · ${sc.losses} défaite${sc.losses > 1 ? 's' : ''}${sc.draws ? ` · ${sc.draws} égalité${sc.draws > 1 ? 's' : ''}` : ''}</span></header>
       <button class="panel sc-daily ${dailyDone ? 'done' : ''}" data-sc="daily" ${dailyDone ? 'disabled' : ''}>
         <img alt="" src="assets/icons/hourglass.webp"><span><b>Défi du jour</b><span class="small">${esc(R.name)} · règle « ${esc(SC.RULES[d.rule].name)} »</span>
         <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : `+${SC.SCEAUX_REWARD.daily} éclats en plus en cas de victoire`}</span></span>${dailyDone ? icon('check') : icon('next')}</button>
@@ -256,10 +256,11 @@ export default function sceauxScreen(app, root) {
       ${out.trophy?.length ? `<div class="sc-trophy"><img class="sc-tico" alt="" src="assets/icons/sc-trophy.webp"><b>Butin du jour</b><span class="small">Garde une de ces cartes :</span><div class="sc-tro-row">${out.trophy.map((id) => `<button class="sc-tro" data-tro="${id}">${scCard(cat, id, { owner: 'p' })}</button>`).join('')}</div></div>` : ''}
       <p class="sc-say">${rivalPic(cat, R)}<span>« ${esc(st.over === 'won' ? R.win : st.over === 'lost' ? R.lose : 'Partie nulle. On recommence ?')} »</span></p>
       ${out.shards ? `<p class="sc-gain">${icon('crystal')} <b>+${fmt(out.shards)}</b> éclats${out.first ? ' (première victoire)' : ''}</p>` : ''}
+      ${out.xp && !out.capped ? `<p class="small muted center">+${out.xp} XP de profil</p>` : ''}
       ${out.capped ? `<p class="small muted">Tes ${SC.SCEAUX_REWARD.dailyPaid} victoires bien payées du jour sont faites : celle-ci rapporte ${SC.SCEAUX_REWARD.afterCap} éclats et ${SC.SCEAUX_REWARD.xp} XP.</p>` : ''}
       ${out.title ? `<p class="sc-gain">${icon('p:titles')} Nouveau titre : <b>${esc(out.title)}</b></p>` : ''}
       ${out.frame ? `<p class="sc-gain">${icon('p:titles')} Nouveau cadre de profil : <b>Cadre des Sceaux</b></p>` : ''}
-      <div class="sc-end-act">${st.daily ? '' : '<button class="btn primary dc-plq dc-plq-red" data-x="again">Revanche</button>'}<button class="btn dc-plq dc-plq-dark" data-x="back">Retour</button></div></div>`;
+      <div class="sc-end-act">${st.daily ? '' : '<button class="btn primary dc-plq dc-plq-red" data-x="again">Rejouer</button>'}<button class="btn dc-plq dc-plq-dark" data-x="back">Retour</button></div></div>`;
     document.body.appendChild(el);
     el.addEventListener('click', (e) => {
       const tb = e.target.closest('[data-tro]');
@@ -286,6 +287,7 @@ export default function sceauxScreen(app, root) {
     app.sfx.enter?.();
     dialog(R, R.hello, st.first === 'p' ? 'Tu commences.' : `${esc(R.name)} commence.`);
     tuto(app, 'sceaux-board').then(() => (SC.ruleHas(st, 'identique') || SC.ruleHas(st, 'somme') ? tuto(app, 'sceaux-combo') : null))
+      .then(() => (SC.ruleHas(st, 'sacre') ? tuto(app, 'sceaux-sacre') : null)) /* v402 : Cases sacrées avaient pas de bulle */
       .then(() => { if ([...st.hands.p, ...st.hands.o].some((id) => SC.perksOf(cat.get(id)).length)) tuto(app, 'sceaux-perks'); });
     aiTurn();
   }

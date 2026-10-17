@@ -22,7 +22,7 @@ export function unlockSources(cat) {
   const rival = (k) => RIVALS.find((r) => r.key === k)?.name || '';
   add(titles, SCEAUX_TITLES.initie, 'Gagne ton premier Duel des Sceaux (Aventure › Duels des Sceaux).');
   for (const k of ['maitre', 'echo', 'souverain']) add(titles, SCEAUX_TITLES[k], `Bats ${rival(k)} aux Duels des Sceaux.`);
-  add(titles, 'Éveilleur des Sceaux', 'Bats tous les adversaires éveillés des Duels des Sceaux.');
+  add(titles, 'Vainqueur des Implacables', 'Bats tous les adversaires en revanche implacable aux Duels des Sceaux.');
   add(frames, 'sceaux', `Bats ${rival('echo')} aux Duels des Sceaux.`);
   add(titles, 'Vainqueur de l’Abysse', 'Vaincs L’Abysse, le gardien de l’étage 100 de la Descente.');
   add(frames, 'oeil', 'Vaincs L’Abysse, le gardien de l’étage 100 de la Descente.');

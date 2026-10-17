@@ -775,7 +775,7 @@ export class Game {
       else if (!sc.beaten[R.key]) { sc.beaten[R.key] = Date.now(); out.first = true; out.shards += SC.SCEAUX_REWARD.firstWin; }
       if (st.daily && sc.dailyDone !== day) { sc.dailyDone = day; out.shards += SC.SCEAUX_REWARD.daily; }
       if (sc.paidToday < SC.SCEAUX_REWARD.dailyPaid) { sc.paidToday++; out.shards += R.reward; } else { out.capped = true; out.shards += SC.SCEAUX_REWARD.afterCap; } // v348 : un petit gain reste au-delà du plafond
-      const t = st.awake ? (Object.keys(sc.awake).length >= SC.RIVALS.length ? 'Éveilleur des Sceaux' : null) : SC.SCEAUX_TITLES[R.key] || (sc.wins === 1 ? SC.SCEAUX_TITLES.initie : null);
+      const t = st.awake ? (Object.keys(sc.awake).length >= SC.RIVALS.length ? 'Vainqueur des Implacables' : null) : SC.SCEAUX_TITLES[R.key] || (sc.wins === 1 ? SC.SCEAUX_TITLES.initie : null);
       if (t && !this.s.titles.includes(t)) { this.s.titles.push(t); out.title = t; }
       if (R.key === 'echo' && !this.s.frames.includes('sceaux')) { this.s.frames.push('sceaux'); out.frame = 'sceaux'; }
       // Trophée : une carte adverse capturée, une fois par jour
