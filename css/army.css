@@ -3462,3 +3462,8 @@ html.fx-light .dv-c .dv-hp.low .hpr::after { animation: none; }
 .dv-c.has-fig .dv-bfig { width: 130%; height: 96%; bottom: 16%; object-fit: contain; object-position: 50% 100%; }
 .dv-row.enemy .dv-c.has-fig { translate: 0 -5%; scale: 1.08; }
 .dv-row.enemy .dv-c.has-fig:nth-last-child(3) + .dv-c, .dv-row.enemy .dv-c.has-fig:nth-last-child(3) + .dv-c + .dv-c { scale: .94; }
+
+/* v387 : Mode Créateur, accès direct aux gardiens */
+.cr-bosses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
+.cr-bosses .btn { justify-content: flex-start; text-align: left; white-space: normal; line-height: 1.15; min-height: 44px; }
+.cr-bpow { display: flex; align-items: center; gap: 8px; margin-top: 6px; }

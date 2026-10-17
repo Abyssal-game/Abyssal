@@ -15,7 +15,7 @@ import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from 
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
 import { rngOf, DESCENT, CHESTS, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, cardPower, powerFor, huntStage, HUNT_STAGES, foeTraits, CHECKPOINT_MIN, DEEP_MILESTONE, gouffreAt, GOUFFRE, OMENS, omenChoices } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative } from './duel.js';
-import { bossOf, BOSSES } from './bosses.js';
+import { bossOf, BOSSES, BOSS_ORDER } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
 import { FORMS, formUnlocked } from './forms.js';
 import * as SC from './sceaux.js';
@@ -1485,6 +1485,16 @@ export class Game {
     }
     this.persist();
     return run.devLevel || null;
+  }
+  // v387 : Mode Créateur, aller tout de suite devant un gardien (lance une expédition si besoin, passe le présage)
+  devBoss(key, { power = false } = {}) {
+    const i = BOSS_ORDER.indexOf(key);
+    if (i < 0) throw new Error('Gardien inconnu.');
+    if (!this.s.descent.run) this.startRun();
+    const run = this.s.descent.run;
+    if (run.phase === 'omen') this.chooseOmen(run.omenOffer[0]);
+    run.battle = null; run.altar = null; run.rewards = null; run.talentOffer = null;
+    return { floor: (i + 1) * DESCENT.bossEvery, level: this.devFloor((i + 1) * DESCENT.bossEvery, { power }) };
   }
   devUnlockAll() {
     this.catalog.cards.forEach((c) => { if (!this.owns(c.id)) this.addCard(c.id, 'normal', 'reward'); });

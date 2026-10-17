@@ -17,7 +17,7 @@ const play = (st, intent) => { const b = boss(st); b.intent = intent; D.beginEne
 
 test('étages 30 à 50 : les nouveaux gardiens, puis le cycle des dix', () => {
   assert.deepEqual([30, 35, 40, 45, 50].map(bossOf), ['essaim', 'bourreau', 'choeur', 'chaines', 'horloge']);
-  assert.equal(bossOf(55), 'devoreur');
+  assert.deepEqual([55, 60, 65, 70, 75].map(bossOf), ['miroirs', 'golem', 'peste', 'chasseur', 'voeux']);
 });
 
 test('Reine des Essaims : l’Essaim frappe toute l’équipe et l’empoisonne', () => {
@@ -67,4 +67,62 @@ test('Horloger : le retour en arrière rend les PV perdus depuis l’annonce (un
   b.hp = Math.round(b.maxHp * 0.6);
   play(st, { kind: 'rewind' });
   assert.ok(b.hp >= Math.round(b.maxHp * 0.6) + Math.round(b.maxHp * 0.25) - 1 && b.hp <= b.maxHp);
+});
+
+// v387 : étages 55 à 75
+const hitBoss = (st, n) => { const b = boss(st), a = units(st, 'ally')[0]; b.intent = null; return D.act(st, a.uid, 'attack', b.uid); };
+
+test('Sorcière des Miroirs : le premier coup se retourne contre l’attaquant', () => {
+  const st = duel('miroirs');
+  const b = boss(st), a = units(st, 'ally')[0];
+  b.mirror = true;
+  const hp = b.hp, ahp = a.hp;
+  D.act(st, a.uid, 'attack', b.uid);
+  assert.equal(b.hp, hp, 'elle ne prend rien');
+  assert.ok(a.hp < ahp, 'l’attaquant est blessé');
+  assert.equal(b.mirror, false);
+});
+
+test('Golem de Cendres : la carapace durcit à chaque coup et tombe à la Brisure', () => {
+  const st = duel('golem');
+  const b = boss(st), a = units(st, 'ally')[0];
+  D.act(st, a.uid, 'attack', b.uid);
+  assert.equal(b.ashArmor, 1);
+  b.broken = true;
+  const hp = b.hp; a.pa = 3;
+  D.act(st, a.uid, 'attack', b.uid);
+  assert.equal(b.ashArmor || 0, 0);
+  assert.ok(b.hp < hp);
+});
+
+test('Peste Grise : le poison gagne les créatures saines', () => {
+  const st = duel('peste');
+  const [x, y] = units(st, 'ally');
+  x.poison = 3; y.poison = 0;
+  boss(st).intent = { kind: 'hit', t: x.uid };
+  const ev = D.endTurn(st);
+  // (le poison reçu peut s'écouler au début du tour suivant : on lit les événements)
+  assert.ok(ev.some((e) => e.t === 'status' && e.s === 'La contagion se répand'));
+  assert.ok(ev.some((e) => e.t === 'status' && e.u === y.uid && /^Poison \+/.test(e.s)));
+});
+
+test('Chasseur Sans Ombre : caché, il ne prend que 30 % des dégâts, sauf s’il est marqué', () => {
+  const st = duel('chasseur'), st2 = duel('chasseur');
+  const b = boss(st), b2 = boss(st2);
+  b.veiled = true; b2.veiled = false;
+  const h1 = b.hp, h2 = b2.hp;
+  D.act(st, units(st, 'ally')[0].uid, 'attack', b.uid);
+  D.act(st2, units(st2, 'ally')[0].uid, 'attack', b2.uid);
+  assert.ok(h1 - b.hp < h2 - b2.hp, 'moins de dégâts dans l’ombre');
+});
+
+test('Dame des Vœux : le Vœu donne de la Ferveur, le Prix la soigne', () => {
+  const st = duel('voeux');
+  st.fervor = 0; st.gauge = 0;
+  const b = play(st, { kind: 'wish' });
+  assert.ok(st.fervor >= 3); assert.equal(b.charged, 'price');
+  const st2 = duel('voeux');
+  const b2 = boss(st2); b2.hp = Math.round(b2.maxHp / 2); const hp = b2.hp;
+  play(st2, { kind: 'price' });
+  assert.ok(b2.hp > hp, 'le Prix la soigne');
 });

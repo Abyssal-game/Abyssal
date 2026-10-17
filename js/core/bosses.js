@@ -99,8 +99,49 @@ export const BOSSES = {
     story: 'Il a réglé l’horloge des Sceaux pour qu’elle ne sonne jamais la fin. Depuis, chaque seconde qui passe lui appartient un peu plus.',
     pattern: (phase, round) => (round % 3 === 1 ? 'wind' : phase === 2 ? 'tick2' : 'hit'),
   },
+  // v387 : étages 55 à 75
+  miroirs: {
+    name: 'La Sorcière des Miroirs', title: 'Elle te rend chaque coup',
+    intro: 'Des éclats de verre flottent dans l’air. Dans chacun, une femme sourit, et aucun reflet ne sourit de la même façon.',
+    mechanic: 'Elle dresse un Miroir : le prochain coup que tu lui portes se retourne contre ton attaquant (60 % des dégâts), puis le miroir se brise.',
+    counter: 'Brise le miroir avec un petit coup (une attaque faible, une créature robuste), puis frappe fort. Le poison passe à travers.',
+    story: 'Elle a passé sa vie à se regarder vieillir. Un jour, elle a refusé, et son reflet a pris sa place. Personne ne sait laquelle des deux est sortie du miroir.',
+    pattern: (phase, round) => (round % (phase === 2 ? 2 : 3) === 1 ? 'mirror' : 'hit'),
+  },
+  golem: {
+    name: 'Le Golem de Cendres', title: 'Plus on le frappe, plus il durcit',
+    intro: 'Un tas de cendres se soulève, se tasse, prend forme. Au cœur de la masse, une braise bat comme un cœur.',
+    mechanic: 'Chaque coup qu’il reçoit durcit sa Carapace de cendres (−6 % de dégâts par couche, 8 couches au plus). Une Brisure fait tomber toute la carapace.',
+    counter: 'Fêle-le puis brise-le avec un coup de rupture pour remettre sa carapace à zéro, et garde tes gros coups pour juste après.',
+    story: 'On l’a bâti avec les cendres des créatures brûlées à la Fournaise. Il se souvient de chacune, et il les venge une couche à la fois.',
+    pattern: (phase, round) => (round % (phase === 2 ? 2 : 3) === 2 ? 'charge' : 'hit'),
+  },
+  peste: {
+    name: 'La Peste Grise', title: 'Elle voyage de souffle en souffle',
+    intro: 'Une brume grise rampe sur le sol. Là où elle passe, la pierre se couvre de taches.',
+    mechanic: 'Elle empoisonne sans relâche, et à chaque tour le poison saute d’une créature empoisonnée à ses voisines saines (deux fois plus en phase 2). Tous les trois tours, elle prépare une vague sur toute ton équipe.',
+    counter: 'Purifie vite (Prière) avant que la contagion ne gagne toute l’équipe, et brise-la pendant qu’elle prépare sa vague.',
+    story: 'Elle n’a ni corps ni nom. Elle était une maladie, puis une prière murmurée par ceux qu’elle emportait, et l’Abysse a fini par lui donner un visage.',
+    pattern: (phase, round) => (round % 3 === 2 ? 'channel' : 'poison'),
+  },
+  chasseur: {
+    name: 'Le Chasseur Sans Ombre', title: 'Tu ne le vois qu’au dernier instant',
+    intro: 'Une flèche se plante à tes pieds. Tu cherches le tireur. Il n’y a personne, et pourtant quelque chose respire derrière toi.',
+    mechanic: 'Un tour sur deux, il disparaît dans l’ombre (−70 % de dégâts reçus) et prépare une Embuscade sur ta créature la plus affaiblie, au tour suivant.',
+    counter: 'Une Marque le révèle (plus de réduction). Pendant qu’il se cache, soigne et protège la créature visée, puis frappe quand il réapparaît.',
+    story: 'Il a vendu son ombre pour ne plus jamais manquer sa cible. Depuis, aucune lumière ne le touche, et aucune proie ne lui échappe.',
+    pattern: (phase, round) => (round % 2 === 0 ? 'ambush' : 'hit'),
+  },
+  voeux: {
+    name: 'La Dame des Vœux', title: 'Tout se paie, un jour',
+    intro: 'Une femme voilée t’attend, un plateau d’argent à la main. « Fais un vœu », dit-elle. « Je te l’accorde. Le prix viendra plus tard. »',
+    mechanic: 'Elle exauce un Vœu : tu gagnes 3 Ferveur et tes créatures 1 PA. Au tour suivant, elle réclame son Prix : un coup sur toute ton équipe, qui la soigne de la moitié des dégâts.',
+    counter: 'Profite du cadeau tout de suite (pouvoir d’équipe, compétences), puis esquive ou pare le Prix.',
+    story: 'Elle a exaucé tous les vœux des Scelleurs : la gloire, la puissance, l’oubli. Le prix, c’était l’Abysse. Elle attend encore qu’ils finissent de payer.',
+    pattern: (phase, round) => (round % 3 === 1 ? 'wish' : 'hit'),
+  },
 };
-// Étages 5 à 25 : les cinq premiers gardiens ; 30 à 50 : les cinq nouveaux ; puis le cycle des dix recommence
-export const BOSS_ORDER = ['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge'];
+// Étages 5 à 25 : les cinq premiers gardiens ; 30 à 50 : cinq autres ; 55 à 75 : cinq autres ; puis le cycle recommence
+export const BOSS_ORDER = ['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'golem', 'peste', 'chasseur', 'voeux'];
 // Gardien d'un étage (tous les 5 étages)
 export const bossOf = (floor) => BOSS_ORDER[(Math.max(1, Math.floor(floor / 5)) - 1) % BOSS_ORDER.length];

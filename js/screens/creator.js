@@ -3,6 +3,7 @@ import { RARITIES, VARIANTS, BOOSTERS } from '../config.js';
 import { icon } from '../ui/icons.js';
 import { openSheet, esc, toast, confirmBox, fmt } from '../ui/dom.js';
 import { migrate } from '../core/save.js';
+import { BOSSES, BOSS_ORDER } from '../core/bosses.js';
 
 const SNAP = 'abyssal.snapshot';
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -11,6 +12,7 @@ export function openCreator(app) {
   const g = app.game, cat = app.catalog;
   const sheet = openSheet('', { full: true, cls: 'creator', label: 'Mode Créateur', onClose: () => app.refresh() });
   let snap = null;
+  const ui = { bpow: false };
   try { snap = JSON.parse(localStorage.getItem(SNAP) || 'null'); } catch (e) { snap = null; }
 
   const B = (x, label, cls = '') => `<button class="btn small ${cls}" data-x="${x}">${label}</button>`;
@@ -51,6 +53,12 @@ export function openCreator(app) {
         <p class="small muted">${d.run ? `Expédition en cours : étage ${d.run.floor}.` : 'Lance une Descente pour pouvoir sauter d’étage.'}</p>
       </section>
 
+      <section class="cr-sec"><h3>Affronter un gardien</h3>
+        <p class="small muted">Te place devant la porte du gardien (une expédition est lancée si besoin, le présage est passé). Coche la case pour monter ton équipe au niveau attendu à cet étage.</p>
+        <label class="small cr-bpow"><input type="checkbox" id="bpow" ${ui.bpow ? 'checked' : ''}> Équipe à la puissance de l’étage</label>
+        <div class="cr-bosses">${BOSS_ORDER.map((k, i) => `<button class="btn small" data-boss="${k}"><b>${(i + 1) * 5}</b> · ${esc(BOSSES[k].name)}</button>`).join('')}</div>
+      </section>
+
       <section class="cr-sec"><button class="btn danger block" data-x="off">Désactiver le Mode Créateur</button></section>`);
   }
 
@@ -58,6 +66,16 @@ export function openCreator(app) {
     const fr = e.target.closest('[data-force]'), fv = e.target.closest('[data-fvar]'), b = e.target.closest('[data-x]');
     if (fr) { g.s.devForce = g.s.devForce?.rarity === fr.dataset.force ? null : { rarity: fr.dataset.force, variant: g.s.devForce?.variant || '' }; g.persist(); return draw(); }
     if (fv) { if (!g.s.devForce) g.s.devForce = { rarity: 'M', variant: '' }; g.s.devForce.variant = fv.dataset.fvar; g.persist(); return draw(); }
+    if (e.target.id === 'bpow') { ui.bpow = e.target.checked; return; }
+    const bb = e.target.closest('[data-boss]');
+    if (bb) {
+      try {
+        const r = g.devBoss(bb.dataset.boss, { power: ui.bpow });
+        sheet.close(); app.go('descente');
+        toast(`Étage ${r.floor} : ${esc(BOSSES[bb.dataset.boss].name)}${r.level ? `, équipe au niveau ${r.level}` : ''}.`, { icon: 'crown' });
+      } catch (err) { toast(esc(err.message), { kind: 'error' }); }
+      return;
+    }
     if (!b) return;
     const x = b.dataset.x;
     try {

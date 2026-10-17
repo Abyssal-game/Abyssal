@@ -49,6 +49,11 @@ export const BOSS_ROOMS = {
   choeur:     { paint: 'f-14', theme: 'abyssal', light: '#5AB8FF', monument: null },
   chaines:    { paint: 'g-7', theme: 'infernal', light: '#FF7A1A', monument: null },
   horloge:    { paint: 'f-13', theme: 'artificiel', light: '#FFD07A', monument: 'geometry' },
+  miroirs:    { paint: 'f-15', theme: 'celeste', light: '#C8B4FF', monument: null },
+  golem:      { paint: 'g-3', theme: 'infernal', light: '#FF8A3A', monument: null },
+  peste:      { paint: 'f-9', theme: 'necrotique', light: '#B8D89A', monument: null },
+  chasseur:   { paint: 'f-6', theme: 'sauvage', light: '#9AE0B0', monument: null },
+  voeux:      { paint: 'f-12', theme: 'abyssal', light: '#FF8AD8', monument: null },
 };
 
 // Décor d'un combat : d'après la peinture de l'étage (et la salle du gardien s'il y en a un)

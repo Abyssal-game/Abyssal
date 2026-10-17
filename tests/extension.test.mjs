@@ -35,7 +35,8 @@ test('gardiens : chaque fiche a un motif, et le moteur résout tous ses tours sa
   assert.equal(bossOf(10), 'matriarche');
   assert.equal(bossOf(30), 'essaim');
   assert.equal(bossOf(50), 'horloge');
-  assert.equal(bossOf(55), 'devoreur');
+  assert.equal(bossOf(55), 'miroirs');
+  assert.equal(bossOf(80), 'devoreur');
 });
 
 test('Dévoreur : le festin le nourrit et le renforce ; le gel l’interrompt', () => {

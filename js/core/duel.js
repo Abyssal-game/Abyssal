@@ -31,12 +31,12 @@ const RARITY_MULT = { C: 1, PC: 1.15, R: 1.3, HR: 1.45, M: 1.6, S: 1.75 };
 export const FROST_MASTERY = { R: 1, HR: 2, M: 3, S: 4 };
 // Attaque rythmée : bonus au jet selon la précision du toucher (bon / parfait)
 export const RHYTHM = { good: 1, perfect: 3 };
-const SINGLE = ['hit', 'heavy', 'poison', 'frost', 'gorge', 'execute', 'chain', 'tick2'];
+const SINGLE = ['hit', 'heavy', 'poison', 'frost', 'gorge', 'execute', 'chain', 'tick2', 'ambush'];
 // Intentions spéciales des gardiens (comptent comme « actions spéciales » pour le Pacte du Reflet)
-const SPECIAL = ['heavy', 'blast', 'shield', 'heal', 'rally', 'hunt', 'charge', 'channel', 'gorge', 'gather', 'blizzard', 'mimic', 'copy', 'decree', 'shift', 'brood', 'swarm', 'sentence', 'execute', 'chant', 'lament', 'chain', 'wind', 'rewind'];
+const SPECIAL = ['heavy', 'blast', 'shield', 'heal', 'rally', 'hunt', 'charge', 'channel', 'gorge', 'gather', 'blizzard', 'mimic', 'copy', 'decree', 'shift', 'brood', 'swarm', 'sentence', 'execute', 'chant', 'lament', 'chain', 'wind', 'rewind', 'mirror', 'ambush', 'wish', 'price'];
 // v383 : grosses attaques de zone des nouveaux gardiens (multiplicateur par créature) et actions préparées un tour à l'avance
-const AOE_M = { swarm: 0.6, lament: 0.7 };
-const PREP = ['charge', 'channel', 'gather', 'mimic', 'brood', 'sentence', 'chant', 'wind'];
+const AOE_M = { swarm: 0.6, lament: 0.7, price: 0.9 };
+const PREP = ['charge', 'channel', 'gather', 'mimic', 'brood', 'sentence', 'chant', 'wind', 'wish'];
 
 let seq = 0;
 // Une carte de combat. scale : force (niveau pour les alliés, profondeur pour les ennemis).
@@ -272,7 +272,7 @@ const bossCap = (u) => Math.max(1, Math.round(u.maxHp * BOSS_HIT_CAP));
 export const MULT_CAP = 3;
 // Tes créatures : un coup normal retire au plus 45 % de leurs PV max, un coup annoncé (chargé, déflagration…) 75 %
 export const ALLY_HIT_CAP = 0.45, ALLY_BIG_CAP = 0.75;
-const BIG = ['heavy', 'blast', 'gorge', 'blizzard', 'copy', 'swarm', 'execute', 'lament'];
+const BIG = ['heavy', 'blast', 'gorge', 'blizzard', 'copy', 'swarm', 'execute', 'lament', 'ambush', 'price'];
 export const allyCap = (u, kind) => Math.max(1, Math.round(u.maxHp * (BIG.includes(kind) ? ALLY_BIG_CAP : ALLY_HIT_CAP)));
 function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   if (u.hp <= 0 || n <= 0) return 0;
@@ -298,6 +298,19 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
     n = Math.max(0, Math.round(n) - Math.ceil(took / k));
     if (n <= 0) return 0;
   }
+  // v387 : Sorcière des Miroirs (le coup se retourne), Golem de Cendres (carapace), Chasseur Sans Ombre (caché)
+  const sA = src && st.units[src];
+  if (u.boss && u.side === 'enemy' && sA?.side === 'ally') {
+    if (u.mirror) {
+      u.mirror = false;
+      ev.push({ t: 'status', u: u.uid, s: 'Le miroir renvoie le coup !', k: 'bad' });
+      if (sA.hp > 0) hurt(st, sA, Math.min(allyCap(sA, 'hit'), Math.max(1, Math.round(n * 0.6))), ev, null);
+      return 0;
+    }
+    if (u.broken && u.ashArmor) { u.ashArmor = 0; ev.push({ t: 'status', u: u.uid, s: 'La carapace de cendres tombe', syn: true }); }
+    if (u.ashArmor) n *= 1 - 0.06 * u.ashArmor;
+    if (u.veiled && !u.mark && !u.broken) n *= 0.3;
+  }
   let d = Math.min(u.hp, Math.round(n));
   if (u.side === 'ally' && d >= u.hp && d > 0 && u.hp > 1 && hasP(u, 'inebranlable') && !u.ckSaved) {
     u.ckSaved = true; d = u.hp - 1; if (boosted(u, 'inebranlable')) u.shield = 1;
@@ -308,6 +321,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   u.hp -= d;
   if (d > 0) ev.push({ t: 'dmg', u: u.uid, d, hp: u.hp, src });
   if (d > 0 && u.side === 'enemy' && src && st.units[src]?.side === 'ally') st.stats.maxHit = Math.max(st.stats.maxHit || 0, d);
+  if (d > 0 && u.boss && st.bossKey === 'golem' && !u.broken && u.hp > 0 && (u.ashArmor || 0) < 8) { u.ashArmor = (u.ashArmor || 0) + 1; if (u.ashArmor % 2 === 0) ev.push({ t: 'status', u: u.uid, s: `Carapace de cendres −${u.ashArmor * 6} %`, k: 'guard' }); }
   // v331 : traits des profondeurs (Vampire, Épineux)
   if (d > 0 && src && st.units[src]?.trait === 'vampire' && st.units[src].side === 'enemy' && st.units[src].hp > 0) {
     const v = st.units[src], h = Math.min(v.maxHp - v.hp, Math.ceil(d / 2));
@@ -1052,6 +1066,11 @@ export const PHASE2 = {
   choeur:     { name: 'Marée montante', desc: 'À chaque tour, la marée ronge tes créatures au combat (4 % de leurs PV, jamais mortel). Une Brisure la retient pendant ce tour.' },
   chaines:    { name: 'Forge ardente', desc: 'Il gagne +1 ATQ à chaque tour où il n’est pas brisé. Brise-le souvent.' },
   horloge:    { name: 'Le temps s’emballe', desc: 'Entre deux retours en arrière, il frappe deux fois de suite.' },
+  miroirs:    { name: 'Galerie des glaces', desc: 'Elle dresse un Miroir un tour sur deux.' },
+  golem:      { name: 'Cœur de braise', desc: 'Il prépare un coup chargé un tour sur deux.' },
+  peste:      { name: 'Grande contagion', desc: 'Le poison saute deux fois plus vite d’une créature à l’autre.' },
+  chasseur:   { name: 'Traque', desc: 'Son Embuscade frappe encore plus fort (+20 %).' },
+  voeux:      { name: 'Vœux amers', desc: 'Le Prix frappe plus fort (+25 %).' },
 };
 export const DOOM_TURNS = 3;
 export const FATIGUE_AT = 15; // tour à partir duquel l'Épuisement commence
@@ -1103,6 +1122,11 @@ function bossTick(st, ev) {
   if (b && b.tide && !b.broken) {
     ev.push({ t: 'status', u: b.uid, s: 'La marée monte', k: 'bad' });
     for (const x of front(st, 'ally')) { if (x.hp > 1) hurt(st, x, Math.min(x.hp - 1, Math.max(1, Math.round(x.maxHp * 0.04))), ev, null, { pierce: true }); }
+  }
+  if (b && st.bossKey === 'peste') {
+    const fr = front(st, 'ally').filter((x) => x.hp > 0), sick = fr.filter((x) => x.poison > 0), k = b.phase2 ? 2 : 1;
+    const clean = fr.filter((x) => !x.poison);
+    if (sick.length && clean.length) { ev.push({ t: 'status', u: b.uid, s: 'La contagion se répand', k: 'bad' }); clean.forEach((x) => addPoison(st, x, k * sick.length, ev, b)); }
   }
   if (b && b.forge && !b.broken) { b.atk += 1; ev.push({ t: 'status', u: b.uid, s: `Forge ardente : ${b.atk} ATQ`, k: 'bad' }); }
   if (b && b.doom != null && !b.broken) {
@@ -1269,19 +1293,21 @@ export function enemyAct(st, aUid, defense = 'none') {
     const t = st.units[it.t];
     e.charged = 'execute'; e.execT = t?.uid || null; logBoss(st, 'Sentence');
     if (t) { t.condemned = true; ev.push({ t: 'status', u: t.uid, s: 'Condamnée', k: 'bad' }); }
-  } else if (kind === 'swarm' || kind === 'lament') {
+  } else if (kind === 'swarm' || kind === 'lament' || kind === 'price') {
     e.charged = null;
     ev.push({ t: 'aoe', u: aUid, side: 'enemy' });
     if (defense !== 'none') defended(st, e, null, ev, defense, 'blast');
     else {
       for (const x of front(st, 'ally')) {
         if (e.hp <= 0) break;
-        hurt(st, x, dmgOf(st, e, x, AOE_M[kind] * pow), ev, aUid);
+        hurt(st, x, dmgOf(st, e, x, AOE_M[kind] * pow * (kind === 'price' && e.phase2 ? 1.25 : 1)), ev, aUid);
         if (x.hp <= 0) continue;
         if (kind === 'swarm') addPoison(st, x, e.phase2 ? 5 : 3, ev, e);
+        else if (kind === 'price') continue;
         else { if (x.shield || x.boost) ev.push({ t: 'status', u: x.uid, s: 'Bonus emportés', k: 'bad' }); x.shield = 0; x.boost = 0; }
       }
-      if (kind === 'lament' && st.fervor > 0) { const n = Math.min(2, st.fervor); st.fervor -= n; ev.push({ t: 'status', u: aUid, s: `Complainte : −${n} Ferveur`, k: 'bad' }); }
+      if (kind === 'price') { const got = ev.slice(evStart).filter((x) => x.t === 'dmg' && st.units[x.u]?.side === 'ally').reduce((n, x) => n + x.d, 0); if (got > 0 && e.hp > 0) heal(e, Math.ceil(got / 2), ev); }
+      if (kind === 'lament' && st.fervor > 0) { const n = Math.min(2, st.fervor); gainFervor(st, -n, ev); ev.push({ t: 'status', u: aUid, s: `Complainte : −${n} Ferveur`, k: 'bad' }); }
     }
   } else if (kind === 'execute') {
     e.charged = null;
@@ -1301,6 +1327,13 @@ export function enemyAct(st, aUid, defense = 'none') {
     const back = Math.min(Math.max(0, (e.mark || 0) - e.hp), Math.round(e.maxHp * 0.25));
     e.mark = null;
     if (back > 0) { heal(e, back, ev); ev.push({ t: 'boss', u: aUid, s: `Retour en arrière : +${back} PV` }); } else ev.push({ t: 'boss', u: aUid, s: 'Le temps n’a rien à lui rendre' });
+  } else if (kind === 'mirror') { e.mirror = true; logBoss(st, 'Miroir'); ev.push({ t: 'status', u: aUid, s: 'Miroir dressé', k: 'guard' }); }
+  else if (kind === 'ambush') { e.veiled = false; ev.push({ t: 'boss', u: aUid, s: 'Embuscade !' }); strike(st.units[it.t], e.phase2 ? 2.64 : 2.2); }
+  else if (kind === 'wish') {
+    e.charged = 'price'; logBoss(st, 'Vœu exaucé');
+    gainFervor(st, 3, ev, 'Vœu exaucé');
+    if (st.init) front(st, 'ally').forEach((x) => { if (x.hp > 0) gainPA(x, 1, ev); });
+    ev.push({ t: 'boss', u: aUid, s: 'Vœu exaucé… le prix viendra' });
   } else if (kind === 'tick2') {
     const t = strike(st.units[it.t], 0.6);
     if (t && t.hp > 0 && e.hp > 0) strike(t, 0.6);
@@ -1520,6 +1553,7 @@ function pickTarget(st, e) {
 function planIntents(st) {
   for (const e of alive(st, 'enemy')) {
     e.intent = null;
+    if (e.boss) e.veiled = false;
     if (e.boss && e.charged !== 'execute') Object.values(st.units).forEach((x) => { if (x.condemned) x.condemned = false; }); /* v383 : Sentence interrompue */
     if (!inFront(st, e) || e.frozen || e.brokenSkip) continue;
     const kind = intentKind(st, e);
@@ -1543,11 +1577,12 @@ function planIntents(st) {
     if (kind === 'shift') extra.aspect = e.aspect === 'soleil' ? 'lune' : 'soleil';
     if (kind === 'sentence') t = front(st, 'ally').filter((x) => x.hp > 0).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp || x.hp - y.hp)[0]?.uid || null;
     if (kind === 'execute') { const c = e.execT && st.units[e.execT]; t = c && c.hp > 0 ? c.uid : null; }
+    if (kind === 'ambush') { t = front(st, 'ally').filter((x) => x.hp > 0).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp || x.hp - y.hp)[0]?.uid || null; e.veiled = true; }
     if (kind === 'chain') t = targetsFor(st, 'enemy', e).map((id) => st.units[id]).sort((x, y) => (y.atk + (y.boost || 0)) - (x.atk + (x.boost || 0)))[0]?.uid || null;
     e.intent = { kind, t, qte: qteFor(e, kind) || (kind === 'copy' && ['estoc', 'entrave', 'raz', 'contagion'].includes(extra.copy)), ...extra };
   }
 }
-const qteFor = (e, kind) => ['heavy', 'blast', 'frost', 'gorge', 'blizzard', 'swarm', 'execute', 'lament', 'chain'].includes(kind) || ((e.boss || e.elite) && ['hit', 'poison', 'tick2'].includes(kind));
+const qteFor = (e, kind) => ['heavy', 'blast', 'frost', 'gorge', 'blizzard', 'swarm', 'execute', 'lament', 'chain', 'ambush', 'price'].includes(kind) || ((e.boss || e.elite) && ['hit', 'poison', 'tick2'].includes(kind));
 function intentKind(st, e) {
   if (e.charged) return e.charged;
   if (e.boss && st.bossKey) return BOSSES[st.bossKey].pattern(e.phase2 ? 2 : 1, st.round);
@@ -1578,7 +1613,7 @@ export function intentInfo(st, e) {
   const eff = g && inFront(st, g) ? g : t;
   let dmg = 0;
   const copyM = it.kind === 'copy' ? { estoc: 2, entrave: 0.6, marque: 1.5 }[it.copy] : null;
-  const m = copyM || { hit: 1, heavy: e.boss ? 2.5 : 2.2, poison: 0.6, frost: 0.5, gorge: 1.6, chain: 0.8, tick2: 1.2, execute: t && t.hp <= t.maxHp / 2 ? 3 : 2 }[it.kind];
+  const m = copyM || { hit: 1, heavy: e.boss ? 2.5 : 2.2, poison: 0.6, frost: 0.5, gorge: 1.6, chain: 0.8, tick2: 1.2, ambush: 2.2, execute: t && t.hp <= t.maxHp / 2 ? 3 : 2 }[it.kind];
   const capd = (x, n) => Math.min(n, allyCap(x, it.kind));
   if (m && eff) dmg = capd(eff, dmgOf(st, e, eff, m * (eff !== t ? 0.6 : 1)));
   if (it.kind === 'blast') dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, e.boss ? 1 : 0.8))));
@@ -1587,7 +1622,7 @@ export function intentInfo(st, e) {
   if (it.kind === 'copy' && it.copy === 'raz') dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, 0.7))));
   const single = SINGLE.includes(it.kind) || !!(it.kind === 'copy' && it.t);
   const lethal = !!eff && single && dmg >= eff.hp;
-  const danger = BIG.includes(it.kind) || lethal ? 3 : ['frost', 'decree', 'shift', 'hunt', 'chain', 'rewind'].includes(it.kind) || PREP.includes(it.kind) || (e.boss && ['hit', 'tick2'].includes(it.kind)) ? 2 : dmg ? 1 : 0;
+  const danger = BIG.includes(it.kind) || lethal ? 3 : ['frost', 'decree', 'shift', 'hunt', 'chain', 'rewind', 'mirror'].includes(it.kind) || PREP.includes(it.kind) || (e.boss && ['hit', 'tick2'].includes(it.kind)) ? 2 : dmg ? 1 : 0;
   return { ...it, def: INTENTS[it.kind], dmg, target: single ? eff?.uid || null : it.t, lethal, danger, aoe: ['blast', 'blizzard'].includes(it.kind) || !!AOE_M[it.kind] || (it.kind === 'copy' && it.copy === 'raz') };
 }
 // Dégâts annoncés sur chacune de tes cartes (badges rouges)

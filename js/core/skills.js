@@ -155,6 +155,10 @@ export const INTENTS = {
   wind:     { name: 'Remonter le temps', icon: 'sparkle', desc: 'Au tour suivant, il retrouve les PV qu’il a maintenant (un quart de ses PV au plus). Gel ou Brisure l’interrompent.' },
   rewind:   { name: 'Retour en arrière', icon: 'heart', desc: 'Il retrouve les PV qu’il avait quand il a remonté le temps.' },
   tick2:    { name: 'Double tic',     icon: 'swords',  desc: 'Frappe deux fois de suite la cible annoncée.' },
+  mirror:   { name: 'Miroir',         icon: 'shield',  desc: 'Le prochain coup que tu lui portes se retourne contre ton attaquant (60 % des dégâts). Le poison passe à travers.' },
+  ambush:   { name: 'Embuscade',      icon: 'skull',   desc: 'Surgit de l’ombre et frappe ta créature la plus affaiblie avec plus de deux fois sa force.' },
+  wish:     { name: 'Vœu exaucé',     icon: 'heart',   desc: 'Te donne 3 Ferveur et 1 PA à tes créatures. Au tour suivant, elle réclame son Prix sur toute ton équipe.' },
+  price:    { name: 'Le Prix',        icon: 'flame',   desc: 'Frappe toute ton équipe et la soigne de la moitié des dégâts.' },
 };
 
 // Pouvoirs des gardiens. weak : la capacité qui les contre. Phase 2 sous 50 % des PV.
