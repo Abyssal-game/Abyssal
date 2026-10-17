@@ -8,11 +8,12 @@ import { drawBooster } from '../core/boosters.js';
 import { RARITIES, RARITY_ORDER, BOOSTERS } from '../config.js';
 import { sfx, audioInfo } from '../ui/sound.js';
 import { MUSIC_DEMO, musicPreview } from '../ui/music.js';
-import { sync, onSync, refreshProfile } from '../cloud/sync.js';
+import { sync, onSync, refreshProfile, eraseOnline } from '../cloud/sync.js';
 import { isLoggedIn } from '../cloud/cloud.js';
 import { openCreator } from './creator.js';
 import { showWelcome } from './welcome.js';
 import { shareFile } from '../native.js';
+const CREATOR_CODE = 'SCEAU-7713'; /* v412 : l'ancien code d'accès du jeu, connu du propriétaire */
 
 export default function settings(app, root) {
   const g = app.game;
@@ -77,13 +78,13 @@ export default function settings(app, root) {
       </div></details>`;
   }
   function tabAbout(s) {
-    return `${sync.profile?.badge === 'createur' ? `<section class="panel stack cr-entry"><h2>${icon('crown')} Mode Créateur</h2>
+    return `${sync.profile?.badge === 'createur' || s.dev ? `<section class="panel stack cr-entry"><h2>${icon('crown')} Mode Créateur</h2>
         <p class="small muted">Réservé au badge Créateur : ressources, cartes, variantes, boosters imposés et Descente à volonté.</p>
         <button class="btn gold block" data-act="creator">${s.dev ? 'Ouvrir les pouvoirs' : 'Activer le Mode Créateur'}</button></section>` : ''}
       <section class="panel stack about">
         <h2>À propos</h2>
         <p class="small">ABYSSAL — Le Bestiaire interdit.</p>
-        <p class="small muted">Version ${esc(app.version)} · ${app.catalog.cards.length} cartes</p>
+        <p class="small muted" data-act="vtap">Version ${esc(app.version)} · ${app.catalog.cards.length} cartes</p>
         ${s.dev ? `<p class="small muted set-audio">${(() => { const a = audioInfo(); return `Son : ${esc(a.state)} · ${a.samples}${a.expected != null ? `/${a.expected}` : ''} sons chargés · session ${esc(String(a.session))}${a.enabled ? '' : ' · coupé dans les réglages'}${a.diag.failGet || a.diag.failDecode || a.diag.err ? ` · échecs lecture ${a.diag.failGet}, décodage ${a.diag.failDecode}${a.diag.err ? ` · ${esc(a.diag.err)}` : ''}` : ''}`; })()}</p>
         <button class="btn ghost small" data-act="sndtest">${icon('dodge')} Tester le son</button>` : ''}
         <a class="btn ghost small" href="confidentialite.html" target="_blank" rel="noopener">${icon('book')} Politique de confidentialité</a>
@@ -149,7 +150,9 @@ export default function settings(app, root) {
       if (!(await confirmBox('Dernière confirmation : la collection, les éclats et les succès seront perdus. Pense à exporter d’abord.', { ok: 'Tout effacer', danger: true }))) return;
       g.reset();
       app.applySettings();
-      toast('Progression effacée.', { icon: 'trash' });
+      let online = null;
+      try { online = await eraseOnline(); } catch (e) { online = false; }
+      toast(online === false && isLoggedIn() ? 'Progression effacée sur ce téléphone, mais pas encore en ligne (réseau). Garde l’app ouverte quelques secondes.' : 'Progression effacée.', { icon: 'trash' });
       app.go('');
     },
     tab(el) { ui.tab = el.dataset.k; sfx.tap(); render(); },
@@ -157,6 +160,18 @@ export default function settings(app, root) {
     tuto(el) { tuto(app, el.dataset.k, { force: true }).then(() => render()); },
     welcome() { showWelcome(app, { force: true }); },
     guide() { resetTips(app); toast('Les bulles d’aide réapparaîtront au bon moment.', { icon: 'info' }); render(); },
+    // v412 : Mode Créateur sans badge en ligne (l'app iPhone n'a pas toujours le profil) : 7 touchers sur la version, puis le code
+    vtap() {
+      ui.vtaps = (ui.vtaps || 0) + 1;
+      if (ui.vtaps < 7 || g.s.settings.dev) return;
+      ui.vtaps = 0;
+      const sh = openSheet('<h2 class="center">Mode Créateur</h2><p class="small muted center">Entre le code du créateur.</p><input class="input" id="crcode" autocomplete="off" autocapitalize="characters" spellcheck="false"><button class="btn gold block" id="crok">Valider</button>', { cls: 'sheet-small', label: 'Code créateur' });
+      sh.body.querySelector('#crok').addEventListener('click', () => {
+        const v = String(sh.body.querySelector('#crcode').value || '').trim().toUpperCase();
+        if (v !== CREATOR_CODE) { toast('Code incorrect.', { kind: 'error' }); return; }
+        g.setSetting('dev', true); sh.close(); toast('Mode Créateur activé.', { icon: 'crown' }); render();
+      });
+    },
     creator() { if (!g.s.settings.dev) g.setSetting('dev', true); render(); openCreator(app); },
     dev(el) {
       const x = el.dataset.x;

@@ -47,7 +47,7 @@ function adopt(remote) {
   sync.lastPush = Date.now();
   lsSet(SYNCED_KEY, String(Math.max(Date.now(), new Date(remote.updated_at).getTime() || 0)));
 }
-const fresh = (s) => !s.stats.boosters && !Object.keys(s.collection).length;
+const fresh = (s) => !s.resetAt && !s.stats.boosters && !Object.keys(s.collection).length; /* v412 : une partie effacée exprès n'est pas « neuve » */
 const describe = (s, when) => `${Object.keys(s.collection || {}).length} créatures · ${s.stats?.boosters || 0} boosters ouverts${when ? ` · ${new Date(when).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}` : ''}`;
 
 function askChoice(remote, local, intro) {
@@ -94,6 +94,13 @@ export async function afterLogin() {
   return reconcile({ intro: 'Ce compte a déjà une partie en ligne.', auto: false });
 }
 // Reprise de la synchronisation (bouton « Reprendre » quand elle est en pause).
+// v412 : après « Effacer toute la progression », la partie vide part tout de suite en ligne (avant, l'ancienne revenait au lancement)
+export async function eraseOnline() {
+  if (!cloud.isLoggedIn()) return false;
+  lsSet(PAUSED_KEY, null); choosing = false; sync.status = 'ok';
+  await pushNow();
+  return sync.status === 'ok';
+}
 export function resumeSync() { return reconcile({ intro: 'La synchronisation était en pause.', auto: false }); }
 
 export async function restoreFromCloud() {

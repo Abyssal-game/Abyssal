@@ -1670,6 +1670,7 @@ export class Game {
     const settings = this.s.settings;
     this.s = defaultSave();
     this.s.settings = { ...this.s.settings, ...settings };
+    this.s.resetAt = Date.now(); /* v412 : partie effacée exprès : la partie en ligne ne doit pas revenir toute seule */
     this.persist();
   }
   replaceSave(save) { this.s = save; try { this.convertHeroes(); this.fixVariants(); } catch (e) { /* rien */ } this.persist(); }
