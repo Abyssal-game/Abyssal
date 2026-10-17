@@ -183,7 +183,7 @@ export default function descent(app, root) {
     root.innerHTML = `${runHead(run)}<p class="dc-prompt">${doors.includes('boss') ? 'Un gardien barre la route.' : doors.includes('gouffre') ? 'Deux passages… et un gouffre qui plonge plus bas.' : doors.length > 1 ? 'Deux passages. Le plus dangereux rapporte plus.' : 'Des créatures barrent le passage.'}</p>
       <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r} has-art" data-act="door" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic ${DOOR_PIC[r] ? 'pic' : ''}">${DOOR_PIC[r] ? picon(DOOR_PIC[r]) : icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'boss' ? bossDoor(run) : r === 'gouffre' ? `Tu arrives directement à l’étage ${run.floor + 2}${(run.floor + 2) % DESCENT.bossEvery === 0 ? ', <strong class="dc-bad">devant le gardien</strong>' : ''}, sans combat ni butin. La chute coûte <strong>20 % des PV</strong> à chaque créature.` : ROOMS[r].desc}</span></button>`).join('')}</div>
       ${run.cleared >= (run.start || 1) ? `<button class="btn ghost block" data-act="leave">${icon('back')}Remonter</button>` : ''}
-      <button class="btn ghost small block dc-abandon" data-act="abandon">${icon('p:abandon')}Abandonner l’expédition</button>`;
+      ${g.canCancelRun() ? `<button class="btn ghost block dc-cancel" data-act="cancelrun">${icon('back')}Annuler l’expédition</button><p class="small muted center">Rien n’a encore été joué : ta torche t’est rendue.</p>` : `<button class="btn ghost small block dc-abandon" data-act="abandon">${icon('p:abandon')}Abandonner l’expédition</button>`}`;
   }
   function clearedView(run, extra = '') {
     const now = g.chestNow(run), next = run.free ? null : g.runChest(run, (run.cursed ? 1 : 0) + (nightTier(run)?.chest || 0), run.floor + 1);
@@ -279,7 +279,7 @@ export default function descent(app, root) {
       <div class="pk-list">${offer.map((k) => { const o = OMENS[k]; return `<button class="pk-c om-c ${ui.omen === k ? 'on' : ''}" data-act="omenpick" data-k="${k}" aria-pressed="${ui.omen === k}">
         <b>${icon(o.icon)} ${esc(o.name)}</b><span class="pk-gain"><i>Gain</i>${esc(o.gain)}</span><span class="pk-cost"><i>Prix</i>${esc(o.cost)}</span></button>`; }).join('')}</div>
       <div class="pk-actions">${offer.includes(ui.omen) ? `<button class="btn primary block big-cta dc-plq dc-plq-red" data-act="omengo">Suivre le ${esc(OMENS[ui.omen].name)}</button>` : '<p class="small muted center">Touche un présage pour le choisir.</p>'}</div>
-      <button class="btn ghost small block dc-abandon" data-act="abandon">${icon('p:abandon')}Abandonner l’expédition</button>`;
+      ${g.canCancelRun() ? `<button class="btn ghost block dc-cancel" data-act="cancelrun">${icon('back')}Annuler l’expédition</button><p class="small muted center">Rien n’a encore été joué : ta torche t’est rendue.</p>` : `<button class="btn ghost small block dc-abandon" data-act="abandon">${icon('p:abandon')}Abandonner l’expédition</button>`}`;
   }
   function pactView(run) {
     const boss = run.pendingRoom === 'boss' ? BOSSES[bossOf(run.floor)] : null;
@@ -422,6 +422,7 @@ export default function descent(app, root) {
     unaltar() { try { g.cancelAltar(); app.sfx.tap(); render(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     next() { ui.winBar = ''; try { g.nextFloor(); app.sfx.swipe(); render(); window.scrollTo(0, 0); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     abandon() { abandon(); },
+    cancelrun() { try { g.cancelRun(); ui.omen = null; ui.outcome = null; ui.win = null; app.sfx.tap(); toast('Expédition annulée : ta torche t’est rendue.', { icon: 'back' }); app.chrome(); render(); window.scrollTo(0, 0); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     async leave() {
       if (!(await confirmBox('Remonter maintenant avec ton coffre ?', { ok: 'Remonter' }))) return;
       app.pendingProgress = [];

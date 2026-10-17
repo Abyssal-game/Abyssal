@@ -1214,6 +1214,24 @@ export class Game {
   // Fin d'expédition : coffre selon la profondeur (une qualité de moins si l'équipe tombe ;
   // en descente maudite, une de plus, mais rien si l'équipe tombe). Éclats : moitié perdue si l'équipe tombe.
   // Abandon : compte comme une défaite (moitié des éclats, coffre d'un rang plus bas, rien si maudite ; la torche reste utilisée)
+  // v377 : tant que rien n'a été joué (présage, ou premières portes sans combat), l'expédition s'annule sans conséquence :
+  // la torche est rendue et rien ne compte (ni défaite, ni abandon, ni présage choisi)
+  canCancelRun() {
+    const run = this.s.descent.run;
+    if (!run || run.battle) return false;
+    if (run.phase === 'omen') return true;
+    return run.phase === 'doors' && run.floor === (run.start || 1) && run.cleared === (run.start || 1) - 1 && !run.shards && !run.chests.length && !run.blessings.length && run.team.every((m) => !m.fallen && m.hp === m.maxHp);
+  }
+  cancelRun() {
+    const d = this.s.descent, run = d.run;
+    if (!this.canCancelRun()) throw new Error('L’expédition a commencé : il faut l’abandonner.');
+    if (!run.free && run.day === d.day) d.used = Math.max(0, d.used - 1);
+    d.runs = Math.max(0, (d.runs || 0) - 1);
+    const om = this.s.stats.omens;
+    if (run.omen && om?.[run.omen]) om[run.omen]--;
+    d.run = null;
+    this.persist();
+  }
   abandonPreview() {
     const run = this.s.descent.run;
     if (!run) return null;
