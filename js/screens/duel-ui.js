@@ -881,10 +881,12 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   function defenseQTE(s) {
     return new Promise((resolve) => {
       const e = st.units[s.a], moving = e?.boss || e?.elite;
-      const w = defenseWindow(st, s.a, s.t), ease = (x) => x ** 1.7, D = 900;
-      const width = (ms) => Math.max(0.03, ease(Math.min(1, 0.75 + ms / D)) - ease(0.75));
-      const zw = width(w.dodge), pw = Math.min(zw, width(w.parry));
-      const z0 = 0.35 + Math.random() * (0.6 - zw);
+      // v388 : zone réglée en TEMPS (avant : sa durée raccourcissait plus elle était loin sur la barre), toucher daté par
+      // l'événement lui-même, compensation du retard écran + toucher (LAG) et petite tolérance juste après l'impact (GRACE)
+      const w = defenseWindow(st, s.a, s.t), ease = (x) => Math.max(0, x) ** 1.7, D = 900, LAG = 40, GRACE = 50;
+      const tb = D * (0.55 + Math.random() * 0.35), ta = tb - w.dodge, tp = tb - w.parry; /* fin de zone = impact ; parade = son dernier instant */
+      const za = ease(ta / D), zb = ease(tb / D), pz0 = ease(tp / D);
+      const zw = zb - za, pw = zb - pz0, z0 = za;
       const tEls = s.kind === 'blast' ? front(st, 'ally').map((u) => el(u.uid)) : [el(s.t)];
       el(s.a)?.classList.add('aim'); tEls.forEach((x) => x?.classList.add('aimed'));
       const def = INTENTS[s.kind];
@@ -898,6 +900,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       const bw = bar.querySelector('.dv-dodge-bar').offsetWidth; /* une seule mesure : le curseur glisse ensuite en transform (sans recalcul de mise en page) */
       let t0 = 0, done = false, raf = 0, lit = '';
       const zoneAt = (x) => (moving ? Math.min(0.97 - zw, Math.max(0.3, z0 + Math.sin(x * 9) * 0.1)) : z0);
+      const g = ease((tb + GRACE) / D) - zb; /* tolérance après l'impact, en longueur de barre */
       const end = (res) => {
         if (done) return; done = true; cancelAnimationFrame(raf); defTap = null;
         bar.classList.remove('go', 'pp');
@@ -919,11 +922,12 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         if (now !== lit) { if (lit) bar.classList.remove(lit); if (now) bar.classList.add(now); lit = now; } /* la zone s'allume quand le curseur y entre */
         if (x >= 1) end('none'); else raf = requestAnimationFrame(step);
       };
-      defTap = () => {
+      defTap = (at) => {
         if (!t0) return end('none'); // trop tôt
-        const x = (performance.now() - t0) / D, pos = ease(Math.min(1, x)), zz = zoneAt(x);
-        const pz = zz + zw - pw; // la parade : le tout dernier instant de la zone, juste avant l'impact
-        end(pos >= pz && pos <= pz + pw ? 'parry' : pos >= zz && pos <= zz + zw ? 'dodge' : 'none');
+        const now = performance.now(), when = at && at <= now && now - at < 500 ? at : now;
+        const x = (when - t0 - LAG) / D, pos = ease(Math.min(1, x)), zz = zoneAt(x);
+        const pz = zz + zw - pw; // la parade : le tout dernier instant de la zone, juste avant l'impact (+ tolérance)
+        end(pos >= pz && pos <= zz + zw + g ? 'parry' : pos >= zz - g * 0.5 && pos < pz ? 'dodge' : 'none');
       };
       setTimeout(() => { if (!done && alive_) { t0 = performance.now(); raf = requestAnimationFrame(step); } }, (reduced ? 250 : 300) + Math.random() * 450);
     });
@@ -1098,7 +1102,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     if (h) openSheet(`<div class="cb-rulesheet">${h}</div>`, { label: 'Règle en vigueur' });
   }
   // ——— Touchers ———
-  root.addEventListener('pointerdown', (e) => { if (defTap && !e.target.closest('[data-d="quit"],[data-d="help"],[data-d="speed"]')) { e.preventDefault(); defTap(); } }, { signal: ctl.signal });
+  root.addEventListener('pointerdown', (e) => { if (defTap && !e.target.closest('[data-d="quit"],[data-d="help"],[data-d="speed"]')) { e.preventDefault(); defTap(e.timeStamp); } }, { signal: ctl.signal });
   root.addEventListener('pointerdown', (e) => {
     const ab = e.target.closest('[data-a]'); clearTimeout(holdT); held = false;
     // v329 : appui long sur une carte (ennemie ou alliée) = sa fiche ; le toucher court garde l'attaque rapide

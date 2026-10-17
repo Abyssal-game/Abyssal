@@ -1663,7 +1663,7 @@ export function defenseWindow(st, aUid, tUid) {
   if (e?.boss) w -= 30; else if (e?.elite) w -= 15;
   w = Math.max(floor, Math.min(320, Math.round(w)));
   // parade : fenêtre étroite (environ 1/5 de l'esquive), au tout dernier instant avant l'impact
-  return { dodge: w, parry: Math.max(32, Math.round(w * 0.2)) };
+  return { dodge: w, parry: Math.max(60, Math.round(w * 0.28)) }; /* v388 : parade un peu plus large (avant : 32 ms au plus juste) */
 }
 
 // ——— Pilote automatique (bouton Auto et simulations) ———
