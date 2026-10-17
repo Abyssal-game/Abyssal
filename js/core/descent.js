@@ -18,8 +18,9 @@ export const chapterStart = (ch) => (ch - 1) * CHAPTER + 1;
 // l'étage 30), et pour chaque gardien un coffre d'or (étages 5, 15, 25…) ou abyssal (étages 10, 20, 30…).
 export function floorFirstReward(floor) {
   if (floor % CHAPTER === 0) return { chests: { [(floor / CHAPTER) % 2 ? 'or' : 'abyssal']: 1 } };
-  const r = { shards: Math.round(8 + floor * 1.5), ash: 3 + Math.round(floor / 4) };
-  if (floor % CHAPTER === 3) r.chests = { [floor >= 30 ? 'fer' : 'bois']: 1 };
+  /* v420 : remesuré sur 30 jours (moteur réel) : la v406 rapportait trois fois moins que l'ancien système ; relevé */
+  const r = { shards: 20 + floor * 3, ash: 6 + Math.round(floor / 3) };
+  if (floor % CHAPTER === 3) r.chests = { [floor >= 50 ? 'or' : floor >= 15 ? 'fer' : 'bois']: 1 };
   return r;
 }
 
@@ -105,7 +106,6 @@ export const ROOMS = {
   altar:    { name: 'Autel ancien',   desc: 'Choisis une bénédiction pour tout le chapitre.' },
   rest:     { name: 'Source sacrée',  desc: 'Tes créatures récupèrent 30 % de leurs PV.' },
   treasure: { name: 'Trésor oublié',  desc: 'Une poignée d’éclats.' },
-  gouffre:  { name: 'Gouffre',        desc: 'Un raccourci : tu descends de 2 étages d’un coup, sans combat ni butin, mais la chute coûte 20 % des PV à chaque créature.' },
   boss:     { name: 'Gardien',        desc: 'Le gardien du chapitre. Première victoire : un coffre d’or ou abyssal, et le chapitre suivant s’ouvre.' },
 };
 
@@ -115,10 +115,6 @@ export function floorDoors(day, floor) {
   if (floor % DESCENT.bossEvery === 0) return ['boss'];
   return floor === 1 ? ['fight'] : ['fight', 'elite'];
 }
-// v334 : le Gouffre, une porte qui fait descendre de 2 étages d'un coup (sans combat ni butin, l'équipe y perd des PV).
-// Jamais par-dessus un gardien : seulement aux étages 1, 2 et 3 de chaque tranche de 5 (6, 7, 8, 11, 12, 13…), dès l'étage 3.
-export const GOUFFRE = { chance: 0.35, jump: 2, hurt: 0.2 };
-export const gouffreAt = (day, floor) => floor >= 3 && [1, 2, 3].includes(floor % DESCENT.bossEvery) && rngOf(`gouffre:${day}:${floor}`)() < GOUFFRE.chance;
 // Après une victoire : un bonus au choix (2 propositions, 3 après une élite)
 export const REWARD_ROOMS = ['rest', 'altar', 'treasure'];
 export function floorRewards(day, floor, room, owned = []) {
@@ -163,8 +159,6 @@ export const TRAITS = {
   carapace: { name: 'Cuirasse', desc: 'Un bouclier bloque le premier coup qu’il reçoit, et revient un tour sur deux.', deep: true },
 };
 export const DEEP_FROM = 31;
-export const DEEP_MILESTONE = 40; // v331 : premier passage aux étages 40, 50, 60… récompensé
-export const CHECKPOINT_MIN = 3; // v331 : étages à franchir depuis un départ avancé pour rapporter un coffre
 export const traitIcon = (k) => TRAITS[k]?.icon || k;
 export function foeTraits(day, floor, room, n) {
   const deep = floor >= DEEP_FROM;

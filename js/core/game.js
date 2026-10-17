@@ -13,7 +13,7 @@ export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par c
 import { FINAL_FLOOR, BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, SUBLIME_ASH, VARIANTS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
-import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, cardPower, powerFor, huntStage, HUNT_STAGES, foeTraits, CHECKPOINT_MIN, DEEP_MILESTONE, gouffreAt, GOUFFRE, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
+import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, cardPower, powerFor, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative } from './duel.js';
 import { bossOf, BOSSES, BOSS_ORDER } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
@@ -22,7 +22,6 @@ import * as SC from './sceaux.js';
 import { FERVOR_START, FERVOR_MAX, FERVOR_CARRY, TALENTS } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
 export const WEEKLY_FLOOR = 8;
-export const BOSS_RECRUIT = 0.25;
 export const FIGHT_ATK = 1; // force des ennemis ordinaires (réglée par simulation)
 export const DESCENT_SHARDS = 0.15; // éclats gagnés dans la Descente : 15 % des montants de base
 import { STARTER, COST, BUDGET, TEAM, ULTS, MAX_LEVEL, canUlt, ultOf, roleOf } from './army.js';
@@ -648,7 +647,6 @@ export class Game {
   }
   cardPower(id) { const c = this.catalog.get(id); return c ? cardPower(c.rarity, this.cardLevel(id)) : 1; }
   teamPower(ids = this.team()) { return ids.length ? ids.reduce((a, id) => a + this.cardPower(id), 0) / ids.length : 1; }
-  torchesLeft() { return Math.max(0, DESCENT.torches - this.descent().used); }
   // Bonus contre une créature : posséder sa carte ou la maîtriser à la chasse
   knows(id) { return this.owns(id) || this.huntKills(id) >= HUNT_STAGES[2].k; }
   huntKills(id) { return this.s.hunt[id] || 0; }
@@ -679,12 +677,6 @@ export class Game {
     if (r.chests) out.chests = Object.fromEntries(Object.entries(r.chests).map(([c, n]) => [shiftChest(c, nt.chest), n]));
     return out;
   }
-  // Coffre de fin d'expédition pour une profondeur donnée (mod : malédiction, Cauchemar, défaite)
-  runChest(run, mod = 0, cleared = run.cleared) {
-    const s = run.start || 1;
-    if (s > 1 && cleared - s + 1 < CHECKPOINT_MIN) return null;
-    return shiftChest(chestForDepth(cleared), mod - (s > 1 ? 1 : 0));
-  }
   // ——— Présages et Gouffre (v334) ———
   omensOpen() { return !!this.s.bossesBeaten?.devoreur; }
   chooseOmen(key) {
@@ -706,19 +698,6 @@ export class Game {
     return out;
   }
   restHeal(run = this.s.descent.run) { const k = this.rule(run?.day).key; return k === 'sources' ? 0.6 : k === 'disette' ? 0.15 : 0.3; }
-  // Gouffre : on saute deux étages d'un coup (jamais un gardien), sans butin, et la chute blesse toute l'équipe
-  takeGouffre() {
-    const run = this.s.descent.run;
-    run.team.forEach((m) => { if (!m.fallen) m.hp = Math.max(1, m.hp - Math.round(m.maxHp * GOUFFRE.hurt)); });
-    const from = run.floor;
-    run.floor = from + GOUFFRE.jump - 1;
-    this.clearFloor();
-    run.floor = from + GOUFFRE.jump;
-    run.phase = 'doors';
-    this.s.stats.gouffres = (this.s.stats.gouffres || 0) + 1;
-    this.persist();
-    return { room: 'gouffre', from, to: run.floor };
-  }
   startRun({ cursed = false, nightmare = false, start = 1 } = {}) {
     const tier = nightmare === true ? 1 : Math.max(0, Math.min(3, Number(nightmare) || 0));
     if (tier && !this.nightmareUnlocked()) throw new Error(`Le mode Cauchemar s’ouvre quand tu as atteint l’étage ${NIGHTMARE_AT}.`);
@@ -737,7 +716,7 @@ export class Game {
       v: 3, day: d.day, floor: start, cleared: start - 1, start, phase: 'doors', cursed: false, free, nightmare: !!tier, nightTier: tier || undefined, blessings: [], altar: null,
       gauge: this.rule(d.day).key === 'lune' ? FERVOR_MAX - 2 : this.rule(d.day).key === 'reserve' ? 0 : FERVOR_START, ult: { key: ult.key, power: ult.power, card: ult.card },
       team: team.map((id) => { const u = duelUnit(this.catalog.get(id), { level: this.cardLevel(id), form: this.formOf(id) }); return { id, hp: u.maxHp, maxHp: u.maxHp, fallen: false, form: this.formOf(id) }; }),
-      shards: 0, chests: [], kills: {}, bestBefore: d.best || 0, nightBefore: tier ? this.nightBest(tier) : undefined, minFloor: floorFloor(team.reduce((a, id) => a + this.cardLevel(id), 0) / team.length),
+      shards: 0, chests: [], kills: {}, bestBefore: d.best || 0, nightBefore: tier ? this.nightBest(tier) : undefined, minFloor: tier ? floorFloor(team.reduce((a, id) => a + this.cardLevel(id), 0) / team.length) : 1, /* v420 : campagne = force fixe par étage ; le plancher ne vaut plus qu'en Cauchemar */
     };
     // v334 : présage de départ, dès que le premier gardien est tombé
     if (this.omensOpen()) { d.run.phase = 'omen'; d.run.omenOffer = omenChoices(d.day); }
@@ -778,8 +757,9 @@ export class Game {
     return { ...TRIALS[i], room, floor: this.trialFloor(i), boss: room === 'boss' ? this.trialBoss() : null, reward: this.trialReward(i), state: this.trials().done[i] };
   }
   trialReward(i) {
-    const best = this.descent().best || 0, ti = best >= 50 ? 3 : best >= 25 ? 2 : best >= 10 ? 1 : 0;
-    return { chests: { [CHEST_ORDER[Math.max(0, ti - (i < 2 ? 1 : 0))]]: 1 }, shards: 20 + 10 * i };
+    /* v420 : relevé après la mesure sur 30 jours (bois avant l'étage 5, fer avant 15, or avant 30, abyssal ensuite) */
+    const best = this.descent().best || 0, ti = best >= 30 ? 3 : best >= 15 ? 2 : best >= 5 ? 1 : 0;
+    return { chests: { [CHEST_ORDER[Math.max(0, ti - (i < 2 ? 1 : 0))]]: 1 }, shards: 40 + 20 * i };
   }
   startTrial(i) {
     const t = this.trials();
@@ -1059,17 +1039,12 @@ export class Game {
     const k = room === 'boss' ? 3 : room === 'elite' ? 2 : 1, f = Math.min(run.floor, SHARD_FLOOR_CAP);
     return { rewards: this.rewardsFor(run, room), talent: room !== 'fight' && run.team.some((m) => !m.fallen && !m.talent), shards: (8 + 2 * f) * k, ash: run.free ? 0 : Math.round((2 + f / 2) * k) };
   }
-  // Coffre rapporté si l'on remonte maintenant
-  chestNow() {
-    return null; /* v406 : plus de coffre de fin d'expédition : chaque étage paie sa première victoire */
-  }
   chooseDoor(room) {
     const run = this.s.descent.run;
     if (!run || run.phase !== 'doors') throw new Error('Aucune porte à choisir.');
     if (!this.doors().includes(room)) throw new Error('Porte inconnue.');
     const rule = this.rule(run.day);
     const out = { room };
-    if (room === 'gouffre') return this.takeGouffre();
     // (v250 : les Pactes de l'Abîme ne sont plus proposés ; choosePact reste pour une expédition sauvegardée en plein choix)
     return this.startBattle(room, out);
   }
@@ -1636,7 +1611,13 @@ export class Game {
     this.persist();
   }
   devChests() { this.addChests({ bois: 5, fer: 5, or: 3, abyssal: 3 }); this.persist(); }
-  devTorches() { this.descent().used = 0; this.persist(); }
+  // v420 : revivre la campagne depuis le début (Mode Créateur) : record, gardiens et Cauchemar à zéro, collection gardée
+  devResetCampaign() {
+    const d = this.descent();
+    d.run = null; d.best = 0; d.bestToday = 0; d.bestNightmare = 0; d.nightBest = {}; d.last = null; d.risk = {};
+    this.s.bossesBeaten = {}; this.s.bossWins = {};
+    this.persist();
+  }
   devFreePacks() { this.s.freePack = { day: null }; this.persist(); }
   devMissions() { this.missions().list.forEach((x) => { x.p = x.n; }); this.persist(); }
   // power : l'équipe prend le niveau attendu à cet étage (pour essayer la difficulté réelle)

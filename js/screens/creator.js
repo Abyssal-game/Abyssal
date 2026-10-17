@@ -48,7 +48,8 @@ export function openCreator(app) {
       </section>
 
       <section class="cr-sec"><h3>Descente</h3>
-        <div class="row gap wrap">${B('missions', 'Accomplir les missions')}</div>
+        <div class="row gap wrap">${B('missions', 'Accomplir les missions')}${B('campaign', 'Remettre la campagne à zéro', 'danger')}</div>
+        <p class="small muted">Remettre à zéro : record, gardiens vaincus et Cauchemar repartent de rien, pour revivre la campagne et ses récompenses. Ta collection, tes niveaux et tes coffres ne bougent pas.</p>
         <form class="cr-give" id="floor"><input class="input plain" name="n" type="number" min="1" max="200" placeholder="Étage" ${d.run ? '' : 'disabled'}><button class="btn small" type="submit" ${d.run ? '' : 'disabled'}>Aller à l’étage</button><button class="btn small" type="submit" name="power" value="1" ${d.run ? '' : 'disabled'}>Avec la puissance attendue</button></form>
         <p class="small muted">${d.run ? `Chapitre en cours : étage ${d.run.floor}.` : 'Lance une Descente pour pouvoir sauter d’étage.'}</p>
       </section>
@@ -94,7 +95,7 @@ export function openCreator(app) {
       if (x === 'all') g.devUnlockAll();
       if (x === 'variants') g.devAllVariants();
       if (x === 'dups') g.devDuplicates(10);
-      if (x === 'torches') g.devTorches();
+      if (x === 'campaign') { if (!(await confirmBox('Remettre la campagne à zéro ? Le record, les gardiens vaincus et le Cauchemar repartent de rien (ta collection est gardée).', { ok: 'Remettre à zéro', danger: true }))) return; g.devResetCampaign(); }
       if (x === 'missions') g.devMissions();
       if (x === 'off') { g.setSetting('dev', false); sheet.close(); toast('Mode Créateur désactivé.', { icon: 'crown' }); return; }
       if (!['snap', 'restore'].includes(x)) toast('C’est fait.', { kind: 'success', icon: 'crown' });

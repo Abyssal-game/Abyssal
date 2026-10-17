@@ -19,14 +19,14 @@ import { WEEKLY_FLOOR, NIGHTMARE_AT, AWAKEN_AT, NIGHT_TIERS, NIGHT_TIER_OPEN, ni
 import { setScene, sceneUrl } from '../ui/scene.js';
 
 // Illustrations des portes et des bonus
-const DOOR_ART = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss', gouffre: 'door-gouffre', rest: 'rest', altar: 'altar', treasure: 'treasure' };
+const DOOR_ART = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss', rest: 'rest', altar: 'altar', treasure: 'treasure' };
 const HOW = [['cards', '#7FA8D8', 'Ton équipe', '5 de tes cartes : 3 au combat, 2 en réserve. Les cendres de la Fournaise les font monter de niveau.'], ['swords', '#E0485E', 'Le combat', 'Chacun son tour, dans l’ordre de la vitesse : chaque créature joue une fois par tour avec ses propres PA. L’attaque en rapporte, les compétences en coûtent. La Ferveur lance le pouvoir d’équipe ; tu en gardes 3 au plus d’un combat à l’autre.'], ['dodge', '#9FE0FF', 'Lire et parer', 'Les gardiens et les élites annoncent leurs grosses attaques. Contre les attaques dangereuses, touche au bon moment : esquive, ou parade parfaite. Brise les élites et les gardiens pour annuler leur coup.'], ['book', '#B48CFF', 'Connaître l’ennemi', 'Posséder la carte d’une créature corrompue donne +1 dégât contre elle.'], ['depth', '#F2C14E', 'Les chapitres', 'La Descente compte 20 chapitres de 5 étages : quatre étages (combat simple ou élite, puis un bonus au choix : source, autel ou trésor), puis le gardien. Tes PV se gardent d’un étage à l’autre. Si ton équipe tombe, tu recommences le chapitre, jamais depuis le début.'], ['omen', '#B48CFF', 'Le présage', 'Après ton premier gardien vaincu, chaque chapitre commence par un présage au choix parmi trois : un avantage et un prix pour tout le chapitre.'], ['chest', '#E8C35A', 'Les récompenses', 'La première victoire à chaque étage rapporte des éclats et des cendres, de plus en plus en descendant, et un coffre au 3e étage de chaque chapitre. Chaque gardien donne un coffre d’or (étages 5, 15, 25…) ou un coffre abyssal (étages 10, 20, 30…). Rejouer un chapitre ne rapporte que les petits gains des combats.'], ['crown', '#B04BFF', 'Le fond : étage 100', 'L’étage 100 est le dernier : L’Abysse y attend. Le vaincre donne le Booster de l’Abysse (5 cartes, une Mythique ou mieux, toutes en finition) avec une Secrète que tu n’as pas.']];
-const DOOR_PIC = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss', gouffre: 'stairs-down' };
-const ROOM_ICON = { gouffre: 'next', fight: 'swords', elite: 'skull', altar: 'star', rest: 'heart', treasure: 'crystal', boss: 'crown' };
+const DOOR_PIC = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss', };
+const ROOM_ICON = { fight: 'swords', elite: 'skull', altar: 'star', rest: 'heart', treasure: 'crystal', boss: 'crown' };
 
 export default function descent(app, root) {
   const g = app.game, cat = app.catalog;
-  const ui = (app.state.descent ||= { cursed: false, nightmare: false, outcome: null });
+  const ui = (app.state.descent ||= { nightmare: false, outcome: null });
   const nt = () => { const t = ui.ntier || 1; return g.nightTierOpen(t) ? t : 1; }; // v367 : palier de Cauchemar choisi
   let battle = null, playing = false;
 
@@ -98,7 +98,7 @@ export default function descent(app, root) {
   function riskAdvice() {
     const team = g.team(), d = g.descent(), tp = g.teamPower(team), need = powerFor(Math.max((d.best || 0) + 1, 5));
     if (tp < need * 0.95) return ` <b>Ton équipe est sous la force conseillée</b> (${powerPts(tp)} pour ${powerPts(need)}) : le risque est élevé.`;
-    const r = [ui.cursed && d.risk?.cursed, ui.nightmare && d.risk?.night].filter((x) => x && x.n >= 3).sort((a, b) => b.lost / b.n - a.lost / a.n)[0];
+    const r = [ui.nightmare && d.risk?.night].filter((x) => x && x.n >= 3).sort((a, b) => b.lost / b.n - a.lost / a.n)[0];
     return r && r.lost / r.n >= 0.5 ? ` Tu as perdu ${r.lost} de tes ${r.n} derniers chapitres dans ce mode.` : '';
   }
   function levelHint(team, d) {
@@ -106,7 +106,7 @@ export default function descent(app, root) {
     // v345 : force de l'équipe (rareté × niveau) plutôt que niveau seul
     const avg = avgLevel(team), tp = g.teamPower(team), target = Math.max((d.best || 0) + 1, 5), need = powerFor(target), ok = tp >= need * 0.95;
     return `<p class="small center dc-lvl ${ok ? 'ok' : 'low'}">${icon('p:level-up')} Force de ton équipe : <b>${powerPts(tp)}</b> · conseillée pour l’étage ${target} : <b>${powerPts(need)}</b>${ok ? '' : ' · <a href="#/renfort">la renforcer</a>'}</p>
-      <details class="dc-floorhelp small muted"><summary>Comment la difficulté s’adapte</summary><p>La <b>force</b> d’une créature dépend de sa rareté et de son niveau : une Mythique au niveau 1 vaut une Commune au niveau 8. Monter de niveau ou aligner des créatures plus rares rend l’équipe plus forte.</p><p>Les combats ordinaires et les élites ne sont jamais plus faciles que l’étage qui correspond au <b>niveau moyen</b> de ton équipe (actuellement l’étage ${floorFloor(avg)}). Monter une seule carte rend donc les combats plus durs pour toutes : fais monter l’équipe <b>ensemble</b>. Les gardiens, eux, gardent toujours la force de leur étage.</p></details>`;
+      <details class="dc-floorhelp small muted"><summary>Comment la difficulté marche</summary><p>La <b>force</b> d’une créature dépend de sa rareté et de son niveau : une Mythique au niveau 1 vaut une Commune au niveau 8. Monter de niveau ou aligner des créatures plus rares rend l’équipe plus forte.</p><p>Dans la Descente, chaque étage a <b>sa force fixe</b> : renforcer ton équipe rend donc les chapitres plus faciles. Les <b>Épreuves du jour</b> et le <b>Cauchemar</b>, eux, s’adaptent à ta force (dès l’étage 1 en Cauchemar, les ennemis valent ceux de l’étage ${floorFloor(avg)} au moins).</p></details>`;
   }
   function weakHint(floor) {
     const team = g.team(), tp = g.teamPower(team), need = powerFor(floor), low = team.filter((id) => g.cardPower(id) < need * 0.9);
@@ -170,8 +170,8 @@ export default function descent(app, root) {
     <p class="dc-rule-line small">${picon('rule')} <b>${esc(g.rule(run.day).name)}</b> · ${esc(g.rule(run.day).desc)}</p>`;
   function doorsView(run) {
     const doors = g.doors();
-    root.innerHTML = `${runHead(run)}<p class="dc-prompt">${doors.includes('boss') ? 'Un gardien barre la route.' : doors.includes('gouffre') ? 'Deux passages… et un gouffre qui plonge plus bas.' : doors.length > 1 ? 'Deux passages. Le plus dangereux rapporte plus.' : 'Des créatures barrent le passage.'}</p>
-      <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r} has-art" data-act="door" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic ${DOOR_PIC[r] ? 'pic' : ''}">${DOOR_PIC[r] ? picon(DOOR_PIC[r]) : icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'boss' ? bossDoor(run) : r === 'gouffre' ? `Tu arrives directement à l’étage ${run.floor + 2}${(run.floor + 2) % DESCENT.bossEvery === 0 ? ', <strong class="dc-bad">devant le gardien</strong>' : ''}, sans combat ni butin. La chute coûte <strong>20 % des PV</strong> à chaque créature.` : ROOMS[r].desc}</span></button>`).join('')}</div>
+    root.innerHTML = `${runHead(run)}<p class="dc-prompt">${doors.includes('boss') ? 'Un gardien barre la route.' : doors.length > 1 ? 'Deux passages. Le plus dangereux rapporte plus.' : 'Des créatures barrent le passage.'}</p>
+      <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r} has-art" data-act="door" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic ${DOOR_PIC[r] ? 'pic' : ''}">${DOOR_PIC[r] ? picon(DOOR_PIC[r]) : icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'boss' ? bossDoor(run) : ROOMS[r].desc}</span></button>`).join('')}</div>
       ${firstLine(run)}
       ${g.canCancelRun() ? `<button class="btn ghost block dc-cancel" data-act="cancelrun">${icon('back')}Annuler</button><p class="small muted center">Rien n’a encore été joué : tu peux revenir sans conséquence.</p>` : `<button class="btn ghost small block dc-abandon" data-act="abandon">${icon('p:abandon')}Abandonner le chapitre</button>`}`;
   }
@@ -396,7 +396,6 @@ export default function descent(app, root) {
       if (playing) return;
       let out;
       try { out = g.chooseDoor(el.dataset.r); } catch (e) { toast(esc(e.message), { kind: 'error' }); return; }
-      if (out.room === 'gouffre') { app.sfx.swipe(); app.sfx.rumble?.(0.8); render(); window.scrollTo(0, 0); toast(`Tu plonges dans le gouffre : te voilà à l’étage ${out.to}. La chute a blessé ton équipe.`, { icon: 'skull' }); return; }
       if (out.pact) { ui.pact = null; app.sfx.boss?.(); window.scrollTo(0, 0); return render(); }
       if (out.battle) return enterBattle();
       render();

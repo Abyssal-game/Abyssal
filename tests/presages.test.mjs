@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { loadCatalog, MemoryStorage, rngFrom, noWelcome } from './helpers.mjs';
 import { Game } from '../js/core/game.js';
-import { OMENS, omenChoices, dailyRule, DAILY_RULES, gouffreAt, RULES_V2_FROM } from '../js/core/descent.js';
+import { OMENS, omenChoices, dailyRule, DAILY_RULES, RULES_V2_FROM } from '../js/core/descent.js';
 
 const catalog = loadCatalog();
 const mk = (seed, d = 18) => noWelcome(new Game(catalog, new MemoryStorage(), { rng: rngFrom(seed), clock: () => new Date(2026, 9, d, 12) }));

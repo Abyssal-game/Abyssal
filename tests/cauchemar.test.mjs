@@ -22,7 +22,6 @@ test('paliers du Cauchemar : ouverture progressive, ennemis plus forts, meilleur
     g.chooseDoor(g.doors()[0] === 'fight' ? 'fight' : g.doors()[0]);
     const foes = Object.values(run.battle?.units || {}).filter((u) => u.side === 'enemy');
     hp[t] = foes.reduce((a, u) => a + u.maxHp, 0);
-    assert.ok(g.chestNow(run) !== undefined);
     g.endRun(false);
   }
   if (hp[1] && hp[2]) assert.ok(hp[2] > hp[1] * 0.9, 'les ennemis du palier II sont plus robustes');
