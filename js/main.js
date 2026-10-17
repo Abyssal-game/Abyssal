@@ -24,6 +24,7 @@ import descentScreen from './screens/descent.js';
 import accountScreen from './screens/account.js';
 import menuScreen from './screens/menu.js';
 import sceauxScreen from './screens/sceaux.js';
+import trialsScreen from './screens/trials.js';
 import shadowScreen, { claimShadowPrize } from './screens/shadow.js';
 import { forgeScreen, furnaceScreen } from './screens/forge.js';
 import { teamScreen, chestsScreen } from './screens/army.js';
@@ -39,7 +40,7 @@ import { initNative, isNative } from './native.js';
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,
   factions: factionsScreen, faction: factionsScreen, succes: achievementsScreen, profil: profileScreen,
-  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen, sceaux: sceauxScreen, epreuve: descentScreen, tirage: shadowScreen, renfort: forgeScreen, fournaise: furnaceScreen,
+  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen, sceaux: sceauxScreen, epreuves: trialsScreen, epreuve: descentScreen, tirage: shadowScreen, renfort: forgeScreen, fournaise: furnaceScreen,
 };
 const TABS = [
   ['antre', 'tab-home', 'Accueil'], ['collection', 'tab-collection', 'Collection'], ['boutique', 'tab-boosters', 'Boosters'],
@@ -47,7 +48,7 @@ const TABS = [
 ];
 // icônes peintes de la barre du bas (assets/icons)
 const tabIcon = (k) => `<img class="tab-pic" alt="" src="assets/icons/${k}.webp">`;
-const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', equipe: 'collection', renfort: 'collection', fournaise: 'collection', coffres: 'boutique', heros: 'descente', arsenal: 'boutique', marchand: 'descente', sceaux: 'descente', epreuve: 'descente', tirage: 'boutique' };
+const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', equipe: 'collection', renfort: 'collection', fournaise: 'collection', coffres: 'boutique', heros: 'descente', arsenal: 'boutique', marchand: 'descente', sceaux: 'descente', epreuves: 'descente', epreuve: 'descente', tirage: 'boutique' };
 // Fond illustré de chaque page (l'Accueil et la Descente posent le leur)
 const ROUTE_SCENE = { boutique: 'shop', tirage: 'shadow', renfort: 'collection', fournaise: 'collection', collection: 'collection', equipe: 'team', coffres: 'chests', bestiaire: 'bestiary', succes: 'trophies', profil: 'profile', menu: 'menu', parametres: 'menu', compte: 'menu', factions: 'factions', faction: 'factions' };
 // Page parente des sous-pages (bouton retour en haut)
@@ -56,7 +57,7 @@ const PARENT = { bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire',
 const SUBNAV = {
   collection: [['collection', 'cards', 'Cartes'], ['equipe', 'team-ic', 'Équipe'], ['renfort', 'level-up', 'Renforcer'], ['fournaise', 'furnace', 'Fournaise']],
   boutique: [['boutique', 'booster', 'Boosters'], ['coffres', 'chest', 'Coffres'], ['tirage', 'shadow', 'Tirage']],
-  descente: [['descente', 'descend', 'Descente'], ['sceaux', 'seal', 'Sceaux']],
+  descente: [['descente', 'descend', 'Descente'], ['epreuves', 'crest-elite', 'Épreuves'], ['sceaux', 'seal', 'Sceaux']],
 };
 
 function storageOrMemory() {
@@ -156,6 +157,7 @@ function renderChrome() {
     // v404 : pastilles plus calmes — plus de « 99+ » permanent sur la Fournaise ; Renforcer seulement si l'Accueil le conseille aussi
     if (r === 'renfort') return g.goals().some((x) => x.kind === 'forge' && /Renforce/.test(x.title)) ? '↑' : '';
     if (r === 'collection') return nNewSub || '';
+    if (r === 'epreuves') { const n = g.trials().done.filter((x) => !x).length; return g.team().length >= 3 && n ? n : ''; } /* v407 */
     return '';
   };
   const nNewSub = g.newCount() > 99 ? '99+' : g.newCount();
@@ -173,7 +175,7 @@ function renderChrome() {
     const badge = key === 'boutique' && ticketCount ? `<span class="badge">${ticketCount}</span>` /* v404 : les boosters à ouvrir seulement (les coffres ont leur chiffre sur leur sous-onglet) */
       : key === 'collection' && nNew ? dot
       : key === 'antre' && (g.canDailyClaim() || g.missionsToClaim()) ? dot
-      : key === 'descente' && (g.descent().run || (g.descent().used === 0 && g.team().length >= 3)) ? dot : '';
+      : key === 'descente' && g.team().length >= 3 && (g.descent().run || g.trials().done.some((x) => !x)) ? dot : ''; /* v407 : Épreuves du jour à jouer */
     if (key === 'boutique') return `<a class="tab tab-main" href="#/boutique"${cur}><span class="orb">${tabIcon(ic)}</span>${label}${badge}</a>`;
     return `<a class="tab" href="#/${key}"${cur}>${tabIcon(ic)}${label}${badge}</a>`;
   }).join('');
@@ -251,7 +253,7 @@ setTimeout(() => {
 function autoClaim() {
   const g = app.game;
   if (!g || claiming || document.body.classList.contains('gated') || document.getElementById('boot') || document.querySelector('.opening, .sheet-wrap')) return;
-  if (g.welcomePending() || app.route === 'descente' && g.s.descent.run?.phase === 'battle') return;
+  if (g.welcomePending() || app.route === 'descente' && g.s.descent.run?.phase === 'battle' || app.route === 'epreuves' && g.s.trials?.battle || document.body.classList.contains('battle-mode')) return;
   claiming = true;
   try {
     let any = false;

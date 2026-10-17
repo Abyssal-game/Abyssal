@@ -44,7 +44,8 @@ export function defaultSave(now = Date.now()) {
     cstats: {},           // défis de créature : id -> { w, k, b }
     cdone: {},            // défis récompensés : id -> { clé: date }
     fame: {},             // Renommée : id de créature -> points (victoires vécues)
-    season: { id: null, best: 0, claimed: [] }, // saison mensuelle de la Descente
+    season: { id: null, best: 0, claimed: [] }, // saison mensuelle (v407 : Épreuves du jour gagnées dans le mois)
+    trials: { day: null, done: [null, null, null], score: 0, cur: null, battle: null }, // v407 : Épreuves du jour
     hunt: {},             // Bestiaire de chasse : id de créature -> nombre de victoires
     // Arsenal : objets (id -> { b: modèle, r: rareté, f: forge, a: propriété }), équipement par héros,
     // coffres et clés (un cadeau de départ pour découvrir), fer runique, garantie de légendaire.
@@ -101,7 +102,7 @@ export function migrate(raw) {
   s.pity = { ...d.pity, ...s.pity };
   // objets imbriqués ajoutés au fil des versions : complétés sans écraser l'existant
   s.stats.pulls = { ...d.stats.pulls, ...(s.stats.pulls || {}) };
-  for (const k of ['descent', 'missions', 'freePack', 'daily', 'itemBuys', 'chests', 'sceaux', 'relics', 'war', 'season']) s[k] = { ...d[k], ...(s[k] && typeof s[k] === 'object' ? s[k] : {}) };
+  for (const k of ['descent', 'missions', 'freePack', 'daily', 'itemBuys', 'chests', 'sceaux', 'relics', 'war', 'season', 'trials']) s[k] = { ...d[k], ...(s[k] && typeof s[k] === 'object' ? s[k] : {}) };
   if (!Array.isArray(s.team)) s.team = [];
   if (!Array.isArray(s.teamPresets)) s.teamPresets = [];
   s.teamPresets = s.teamPresets.filter((p) => p && typeof p.name === 'string' && Array.isArray(p.ids)).slice(0, 4);

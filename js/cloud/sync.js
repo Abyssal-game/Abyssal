@@ -130,14 +130,14 @@ export async function refreshProfile(force = true) {
 export function startSync(theApp) {
   app = theApp;
   app.game.on('change', () => { if (cloud.isLoggedIn() && sync.status !== 'paused') schedule(); });
-  app.game.on('descentEnd', (sum) => {
+  // v407 : le classement du jour compte les points des Épreuves du jour (la Descente est devenue la campagne)
+  app.game.on('trialEnd', (out) => {
     if (!cloud.isLoggedIn() || !sync.profile?.pseudo) return;
     if (app.game.s.settings.dev) return; // pas de score au classement en Mode Créateur
-    if (!sum.floor) return;
-    if (sum.start > 1) return; // v331 : départ avancé, hors classement du jour
-    // chaque expédition envoie son propre score, pour le jour de son donjon (le serveur garde le meilleur)
-    cloud.submitScore(sum.day || today(), sum.floor, !!sum.cursed).catch(() => {});
+    if (!out.score) return;
+    cloud.submitScore(out.day || today(), out.score, false).catch(() => {});
   });
+
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && cloud.isLoggedIn()) { clearTimeout(timer); pushNow(); } });
   if (cloud.isLoggedIn()) {
     cloud.getProfile().then((p) => { sync.profile = p; emit(); }).catch(() => {});

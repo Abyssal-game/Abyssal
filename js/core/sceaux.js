@@ -97,6 +97,10 @@ export const rivalUnlocked = (s, i) => i === 0 || !!s.sceaux?.beaten?.[RIVALS[i 
 
 // Récompenses : plafonnées par jour pour qu'aucun mode ne devienne la seule source d'éclats
 export const SCEAUX_REWARD = { dailyPaid: 5, firstWin: 100, daily: 40, firstAwake: 150, afterCap: 5, xp: 10 };
+// v408 : coffres des Sceaux. Première victoire contre un adversaire : un coffre selon son rang (bois pour les deux premiers,
+// puis fer, or, abyssal) ; première victoire en revanche implacable : un rang au-dessus ; défi du jour gagné : un coffre de bois.
+export const SCEAUX_CHESTS = ['bois', 'bois', 'fer', 'fer', 'or', 'or', 'abyssal', 'abyssal'];
+export const sceauxChest = (key, awake = false) => { const i = RIVALS.findIndex((r) => r.key === key); if (i < 0) return null; const order = ['bois', 'fer', 'or', 'abyssal']; return order[Math.min(3, order.indexOf(SCEAUX_CHESTS[i]) + (awake ? 1 : 0))]; };
 // Trophée : après une victoire, une fois par jour, tu gardes une carte adverse que tu contrôles (rareté HR au plus)
 export const TROPHY_MAX = ['C', 'PC', 'R', 'HR'];
 export function trophyChoices(cat, st) {

@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v406'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v407'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -149,8 +149,8 @@ export const MISSIONS = [
   { key: 'rare',     kind: 'rare',     n: 2, shards: 35, text: 'Obtiens 2 cartes Rares ou mieux' },
   { key: 'variant',  kind: 'variant',  n: 1, shards: 35, text: 'Obtiens une variante (holographique, or…)' },
   { key: 'burn',     kind: 'burn',     n: 3, shards: 30, text: 'Brûle 3 cartes dans la Fournaise' },
-  { key: 'depth4',   kind: 'depth',    n: 4, shards: 40, text: 'Atteins l’étage 4 de la Descente' },
-  { key: 'wins',     kind: 'win',      n: 5, shards: 35, text: 'Remporte 5 combats dans la Descente' },
+  { key: 'trial2',   kind: 'trial',    n: 2, shards: 40, text: 'Gagne 2 Épreuves du jour' },
+  { key: 'wins',     kind: 'win',      n: 5, shards: 35, text: 'Remporte 5 combats (Descente ou Épreuves)' },
   { key: 'chest2',   kind: 'chest',    n: 2, shards: 30, text: 'Ouvre 2 coffres' },
 ];
 // (le bonus des 3 missions du jour a été retiré en v232, la mission « offrande du jour » en v234)

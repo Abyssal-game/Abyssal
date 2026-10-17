@@ -11,7 +11,7 @@ import { setScene } from '../ui/scene.js';
 import { onPresence } from '../cloud/presence.js';
 
 // Icône et couleur de chaque type de mission du jour
-const MISSION_LOOK = { booster: ['booster', '#E0485E'], new: ['book', '#B48CFF'], rare: ['crystal', '#6FB4FF'], variant: ['holo', '#FF8AD8'], burn: ['furnace', '#FF9A3A'], depth: ['depth', '#9C7BFF'], win: ['crown', '#F2C14E'], daily: ['crystal', '#7FD3FF'], chest: ['chest', '#E8C35A'] };
+const MISSION_LOOK = { booster: ['booster', '#E0485E'], new: ['book', '#B48CFF'], rare: ['crystal', '#6FB4FF'], variant: ['holo', '#FF8AD8'], burn: ['furnace', '#FF9A3A'], depth: ['depth', '#9C7BFF'], trial: ['crest-elite', '#E0485E'], win: ['crown', '#F2C14E'], daily: ['crystal', '#7FD3FF'], chest: ['chest', '#E8C35A'] };
 
 export default function home(app, root) {
   const g = app.game, cat = app.catalog, s = g.s;
@@ -43,7 +43,7 @@ export default function home(app, root) {
   // Objectifs : un proche, un de progression, un de collection ; chacun mène à son écran
   // Objectifs : le premier en grand en haut de l'accueil (« Ton prochain objectif »), les autres plus bas
   const goals = g.welcomePending() ? [] : g.goals();
-  const GCOL = { run: '#E0485E', depth: '#9C7BFF', boss: '#FF6B7F', sceaux: '#E8C35A', collection: '#7FA8D8', forge: '#F08A3C', sublime: '#C9A8FF', shop: '#F2C14E' };
+  const GCOL = { run: '#E0485E', depth: '#9C7BFF', boss: '#FF6B7F', sceaux: '#E8C35A', collection: '#7FA8D8', forge: '#F08A3C', sublime: '#C9A8FF', shop: '#F2C14E', trial: '#E0485E' };
   const goalRow = (x, cls = 'hg-row') => `<a class="${cls}" href="${x.href}" style="--mc:${x.faction ? cat.faction[x.faction].colors.secondary : GCOL[x.kind]}">
       <span class="td-ic mi">${x.faction ? sigil(x.faction) : picon(x.icon)}</span>
       <span class="td-t">${cls === 'hg-main' ? '<span class="hg-k">Ton prochain objectif</span>' : ''}<b>${esc(x.title)}</b><span class="small muted">${esc(x.sub)}</span>${x.n ? `<span class="progress"><i style="width:${(x.p / x.n) * 100}%"></i></span>` : ''}</span>${icon('next')}</a>`;

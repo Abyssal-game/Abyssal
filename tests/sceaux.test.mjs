@@ -360,3 +360,18 @@ test('v306 : une partie commencée avant la mise à jour (sans réglage) se term
   while (!st.over) { if (st.turn === 'o') assert.ok(g.sceauxAi()); else { const m = SC.aiMove(catalog, st, 2, r); g.sceauxPlay(m[0], m[1]); } }
   assert.ok(['won', 'lost', 'draw'].includes(st.over));
 });
+
+test('v408 : coffres des Sceaux à la première victoire (selon le rang) et au défi du jour', () => {
+  const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('sc-ch'), clock });
+  assert.equal(SC.sceauxChest('initie'), 'bois');
+  assert.equal(SC.sceauxChest(SC.RIVALS[7].key), 'abyssal');
+  assert.equal(SC.sceauxChest(SC.RIVALS[2].key, true), 'or', 'revanche implacable : un rang au-dessus');
+  const b0 = g.s.chests.bois || 0;
+  const out = forceWin(g, 'initie');
+  assert.deepEqual(out.chests, ['bois']);
+  assert.equal(g.s.chests.bois, b0 + 1);
+  g.sceauxQuit();
+  const again = forceWin(g, 'initie');
+  assert.deepEqual(again.chests, [], 'une seule fois');
+  g.sceauxQuit();
+});

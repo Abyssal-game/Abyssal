@@ -13,15 +13,10 @@ import { esc, fmt, toast, confirmBox, bindActions, openSheet } from '../ui/dom.j
 import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
 import { chestSVG } from '../ui/chest.js';
-import { rowAttrs, shownName, bindReport } from '../ui/report.js';
-import { isBlocked } from '../core/moderation.js';
 import { runDuel } from './duel-ui.js';
 import { PHASE2 } from '../core/duel.js';
-import { SEASON_STEPS, seasonName, seasonDaysLeft } from '../core/renown.js';
 import { WEEKLY_FLOOR, NIGHTMARE_AT, AWAKEN_AT, NIGHT_TIERS, NIGHT_TIER_OPEN, nightTier } from '../core/game.js';
 import { setScene, sceneUrl } from '../ui/scene.js';
-import * as cloud from '../cloud/cloud.js';
-import { sync } from '../cloud/sync.js';
 
 // Illustrations des portes et des bonus
 const DOOR_ART = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss', gouffre: 'door-gouffre', rest: 'rest', altar: 'altar', treasure: 'treasure' };
@@ -88,8 +83,7 @@ export default function descent(app, root) {
       ${summitHTML(d)}
       ${ruleHTML(g.rule())}
       <div class="dc-links">
-        ${seasonHTML() ? `<button class="dc-link" data-act="open" data-f="season">${picon('season')}<b>Saison</b><small>paliers du mois</small></button>` : ''}
-        <button class="dc-link" data-act="open" data-f="board">${picon('crown')}<b>Classement</b><small>du jour</small></button>
+        <a class="dc-link" href="#/epreuves">${picon('crest-elite')}<b>Épreuves du jour</b><small>${g.trials().done.filter((x) => !x).length} à jouer</small></a>
         <button class="dc-link" data-act="open" data-f="how">${picon('help')}<b>Comment ça marche</b><small>en ${HOW.length} étapes</small></button>
       </div>`;
     if (last?.record && !last.cheered) { last.cheered = true; setTimeout(() => app.sfx.achievement?.(), 250); root.querySelector('.dc-sum2')?.classList.add('cheer'); } // record battu : on fête
@@ -120,16 +114,6 @@ export default function descent(app, root) {
     if (tp >= need * 0.95) return '';
     const can = team.filter((id) => { const c = g.upgradeCost(id); return c && c <= g.s.ash; });
     return `<div class="dc-why dc-weak"><b>${icon('p:level-up')} Ton équipe était trop faible pour cet étage</b><p class="small">Force de l’équipe <strong>${powerPts(tp)}</strong>, alors que l’étage ${floor} en demande environ <strong>${powerPts(need)}</strong>${low.length ? ` (${low.length} créature${low.length > 1 ? 's' : ''} en dessous)` : ''}.${can.length ? ` Tu as <strong>${fmt(g.s.ash)} cendres</strong> : de quoi en faire monter ${can.length > 1 ? 'plusieurs' : 'une'} tout de suite.` : ' Brûle tes doublons dans la Fournaise pour gagner des cendres.'}</p><a class="btn small gold" href="#/renfort">${icon('p:level-up')}Renforcer mon équipe</a></div>`;
-  }
-
-  // Saison du mois : paliers de profondeur récompensés une fois
-  function seasonHTML() {
-    const se = g.season(), left = seasonDaysLeft(g.clock()), max = SEASON_STEPS[SEASON_STEPS.length - 1].floor;
-    const rw = (r) => (r.shards ? `${icon('crystal')}${fmt(r.shards)}` : Object.keys(r.chests).map((c) => chestSVG(c)).join(''));
-    return `<section class="panel dc-season"><div class="dc-season-h"><img class="dc-season-ic" alt="" src="assets/icons/season.webp" onerror="this.remove()"><span><b>${esc(seasonName(se.id))}</b><span class="small muted">Meilleur étage du mois : ${se.best || '—'} · fin dans ${left} jour${left > 1 ? 's' : ''}</span></span></div>
-      <div class="dc-season-track"><i style="width:${Math.min(100, (se.best / max) * 100)}%"></i></div>
-      <ol class="dc-season-steps">${SEASON_STEPS.map((st) => { const ok = se.claimed.includes(st.floor); return `<li class="${ok ? 'ok' : ''}"><span class="dc-season-rw">${ok ? icon('check') : rw(st.reward)}</span><small>Étage ${st.floor}</small></li>`; }).join('')}</ol>
-      <p class="small muted">Atteins ces étages ce mois-ci (expéditions avec coffre) : chaque palier se gagne une fois par saison. Tout repart à zéro le 1er du mois.</p></section>`;
   }
 
   // Éclats possédés et progression vers le prochain booster standard
@@ -174,25 +158,6 @@ export default function descent(app, root) {
       <div class="dc-sum2-loot">${s.chests.map((c) => `<span class="dc-sum2-chest" style="--cc:${CHESTS[c].color}">${chestSVG(c)}<b>${esc(CHESTS[c].name)}</b></span>`).join('')}${(fl?.shards || 0) + s.shards ? `<span class="dc-sum2-shards">${icon('crystal')}<b>+${fmt((fl?.shards || 0) + s.shards)}</b><small>éclats</small></span>` : ''}${fl?.ash ? `<span class="dc-sum2-shards">${icon('ash')}<b>+${fmt(fl.ash)}</b><small>cendres</small></span>` : ''}${!s.chests.length && !s.shards && !fl?.shards ? '<span class="dc-sum2-sub">Aucun butin cette fois.</span>' : ''}</div>
       <div class="dc-sum2-row"><button class="btn dc-plq dc-plq-dark" data-act="share">${icon('copy')}Partager</button><button class="btn dc-plq dc-plq-dark" data-act="dismiss">Continuer</button></div>
     </section>`;
-  }
-
-  async function loadBoard(box) {
-    if (!box) return;
-    if (!cloud.isLoggedIn()) { box.innerHTML = 'Connecte-toi pour comparer ton étage avec les joueurs du monde entier. <a href="#/compte">Se connecter</a>'; return; }
-    try {
-      const day = g.descent().day;
-      const rows = await cloud.leaderboard(day, 30);
-      if (!document.contains(box)) return;
-      const me = cloud.currentUser()?.id;
-      const mine = g.descent().bestToday;
-      box.classList.remove('muted');
-      box.innerHTML = (rows.length ? rows.map((r, i) => {
-        const hid = isBlocked(r.user_id), av = !hid && r.profiles?.avatar && cat.get(r.profiles.avatar);
-        return `<div class="lb-row ${r.user_id === me ? 'me' : ''}"${rowAttrs(r.user_id, r.profiles?.pseudo, me)}><span class="lb-rank">${i + 1}</span><span class="lb-av">${av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM}</span><span class="lb-name"><b>${esc(shownName(r.user_id, r.profiles?.pseudo))}${hid ? '' : cloud.badgeHTML(r.profiles?.badge)}${!hid && r.profiles?.title === 'Vainqueur de l’Abysse' ? '<span class="pbadge pb-abysse">Fond de l’Abysse</span>' : ''}</b><span class="small muted">${hid ? '' : esc(r.profiles?.title || '')}</span></span><span class="lb-floor">${r.cursed ? `${icon('skull')} ` : ''}Étage ${r.floor}</span></div>`;
-      }).join('') : '<p class="small muted">Personne n’est encore descendu aujourd’hui. À toi d’ouvrir la voie !</p>')
-        + (!sync.profile?.pseudo ? '<p class="small acc-warn"><a href="#/compte">Choisis un pseudo</a> pour apparaître au classement.</p>' : !rows.some((r) => r.user_id === me) && mine ? `<p class="small muted">Ton meilleur étage aujourd’hui : ${mine}.</p>` : '');
-      bindReport(box, () => loadBoard(box));
-    } catch (e) { if (document.contains(box)) box.textContent = e.message; }
   }
 
   // ——— Expédition ———————————————————————————————————————————————————
@@ -408,8 +373,6 @@ export default function descent(app, root) {
     open(el) {
       const f = el.dataset.f;
       if (f === 'summit') openSheet(summitHTML(g.descent(), true), { label: 'Le fond de l’Abysse', cls: 'dc-sheet' });
-      else if (f === 'season') openSheet(`<h2 class="center">Saison et paliers</h2>${seasonHTML()}`, { label: 'Saison', cls: 'dc-sheet' });
-      else if (f === 'board') { const sh = openSheet('<h2 class="center">Classement du jour</h2><div class="lb-body small muted">Chargement…</div>', { label: 'Classement', cls: 'dc-sheet' }); loadBoard(sh.body.querySelector('.lb-body')); }
       else openSheet(`<h2 class="center">Comment ça marche</h2><ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol><p class="small muted center">Joue autant que tu veux : la Descente n’a pas de limite par jour.</p>`, { label: 'Aide', cls: 'dc-sheet' });
     },
     optinfo() {

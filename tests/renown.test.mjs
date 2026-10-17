@@ -50,26 +50,24 @@ test('Saison : paliers récompensés une fois, remise à zéro au changement de 
   assert.equal(seasonId(now), '2026-10'); assert.equal(seasonName('2026-10'), 'Saison d’octobre 2026'); assert.equal(seasonName('2026-03'), 'Saison de mars 2026');
   assert.equal(seasonDaysLeft(now), 20);
   const shards = g.s.shards, fer = g.s.chests.fer;
-  const ev = g.seasonDepth(12);
-  assert.deepEqual(ev.map((e) => e.floor), [5, 10]);
+  let ev = [];
+  for (let k = 0; k < 12; k++) ev.push(...g.seasonWin());
+  assert.equal(ev.length, 2, 'v407 : paliers de 3 et 10 Épreuves gagnées');
   assert.equal(g.s.shards, shards + SEASON_STEPS[0].reward.shards);
   assert.equal(g.s.chests.fer, fer + 1);
-  assert.equal(g.seasonDepth(12).length, 0, 'déjà réclamé');
   assert.equal(g.season().best, 12);
   now = new Date(2026, 10, 2, 12);
   assert.equal(g.season().id, '2026-11'); assert.equal(g.season().best, 0);
-  assert.equal(g.seasonDepth(6).length, 1, 'nouvelle saison : les paliers reviennent');
+  g.seasonWin(); g.seasonWin();
+  assert.equal(g.seasonWin().length, 1, 'nouvelle saison : les paliers reviennent');
   now = new Date(2026, 9, 12, 12);
 });
 
-test('Saison : les expéditions sans coffre ne comptent pas', () => {
+test('v407 : la Descente ne compte plus pour la saison (ce sont les Épreuves du jour)', () => {
   const g = newGame('season2');
-  g.s.descent.run = { free: true, day: g.descent().day };
-  g.recordDepth(8);
-  assert.equal(g.season().best, 0);
   g.s.descent.run = { day: g.descent().day };
   g.recordDepth(8);
-  assert.equal(g.season().best, 8);
+  assert.equal(g.season().best, 0);
   g.s.descent.run = null;
 });
 

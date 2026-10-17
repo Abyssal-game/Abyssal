@@ -52,7 +52,7 @@ const IN_PIC = { gorge: 'heavy', gather: 'channel', blizzard: 'frost', mimic: 'c
 const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${IN_PIC[k] || k}.webp">`;
 
 export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = null, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.' }) {
-  const firstSteps = () => !!run?.day && !run.free && g.novice() && (run.floor || 0) <= 2; /* v398 : premiers pas */
+  const firstSteps = () => !!run?.day && !run.free && !run.trial && g.novice() && (run.floor || 0) <= 2; /* v398 : premiers pas */
   const settling = () => { const d = app.game.s.descent; return (d.runs || 0) <= 1 && (d.run?.floor || 1) <= 2; }; // v328 : voir plus haut
   const g = app.game, cat = app.catalog, run = runOpt || g.descent().run, st = run.battle;
   const ui = (app.state.duel ||= { fast: 0 });
@@ -1107,8 +1107,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       if (k === 'quit') {
         if (!onAbandon) { toast(pause, { icon: 'swords' }); app.go(''); return; }
         const sh = openSheet(`<div class="cb-pause"><h2>${icon('swords')} Pause</h2>
-          <button class="btn primary block" data-p="pause">Mettre en pause</button><p class="small muted">Le combat t’attend dans la Descente, exactement là où tu l’as laissé.</p>
-          <button class="btn ghost block cb-abandon" data-p="abandon">${icon('p:abandon')}Abandonner l’expédition</button><p class="small muted">Compte comme une défaite.</p>
+          <button class="btn primary block" data-p="pause">Mettre en pause</button><p class="small muted">Le combat t’attend ${run.trial ? 'dans les Épreuves' : 'dans la Descente'}, exactement là où tu l’as laissé.</p>
+          <button class="btn ghost block cb-abandon" data-p="abandon">${icon('p:abandon')}${run.trial ? 'Abandonner l’Épreuve' : 'Abandonner le chapitre'}</button><p class="small muted">${run.trial ? 'Elle comptera comme perdue pour aujourd’hui.' : 'Tu gardes ton butin ; le chapitre recommencera à son premier étage.'}</p>
           <button class="btn ghost block" data-p="back">Reprendre le combat</button></div>`, { label: 'Pause' });
         sh.body.addEventListener('click', (ev) => {
           const p = ev.target.closest('[data-p]')?.dataset.p;

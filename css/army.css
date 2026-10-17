@@ -3581,3 +3581,29 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 .dc-starts .dc-st { min-width: 44px; }
 .dc-first { margin: 8px 0; }
 .dc-first svg { width: 14px; height: 14px; vertical-align: -2px; }
+
+/* v407 : les Épreuves du jour (trois cartes de combat, récompenses, état du jour) */
+.ep-intro { margin: 4px 8px 10px; }
+.ep-list { display: grid; gap: 12px; margin-bottom: 12px; }
+.ep-c { position: relative; display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; padding: 12px; border-radius: 16px; border: 1px solid rgba(212,175,55,.28); background: linear-gradient(180deg, rgba(20,18,30,.92), rgba(10,9,16,.95)); overflow: hidden; }
+.ep-c.r-elite { border-color: rgba(176,75,255,.38); }
+.ep-c.r-boss { border-color: rgba(224,72,94,.45); }
+.ep-c.won { border-color: rgba(95,208,143,.5); }
+.ep-c.lost { opacity: .72; }
+.ep-art { position: relative; border-radius: 12px; background: var(--art) center / cover no-repeat, #111; min-height: 128px; overflow: visible; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+.ep-fig { position: absolute; left: 50%; bottom: 0; width: 130%; height: 115%; object-fit: contain; object-position: center bottom; translate: -50% 0; filter: drop-shadow(0 6px 10px rgba(0,0,0,.7)); }
+.ep-body { display: grid; gap: 5px; align-content: start; min-width: 0; }
+.ep-k { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
+.ep-body > b { font-family: var(--font-title, serif); font-size: 1.08rem; line-height: 1.2; }
+.ep-rws { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 4px; }
+.ep-rws.center { justify-content: center; }
+.ep-rw { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px 3px 4px; border-radius: 999px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); font-size: .8rem; }
+.ep-rw svg, .ep-rw img { width: 24px; height: 24px; object-fit: contain; border: 0; aspect-ratio: auto; }
+.ep-rw b { color: var(--cc, inherit); font-weight: 600; }
+.ep-st { justify-self: start; display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; font-size: .8rem; font-weight: 700; }
+.ep-st svg { width: 14px; height: 14px; }
+.ep-st.won { background: rgba(95,208,143,.14); color: #8fe3b1; }
+.ep-st.lost { background: rgba(224,72,94,.14); color: #f08a9a; }
+.ep-st.cur { background: rgba(212,175,55,.14); color: var(--gold); }
+.ep-team { margin-bottom: 12px; }
+.ep-res { margin-bottom: 14px; }

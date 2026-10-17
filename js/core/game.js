@@ -13,7 +13,7 @@ export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par c
 import { FINAL_FLOOR, BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, SUBLIME_ASH, VARIANTS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
-import { rngOf, DESCENT, CHESTS, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, cardPower, powerFor, huntStage, HUNT_STAGES, foeTraits, CHECKPOINT_MIN, DEEP_MILESTONE, gouffreAt, GOUFFRE, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
+import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, cardPower, powerFor, huntStage, HUNT_STAGES, foeTraits, CHECKPOINT_MIN, DEEP_MILESTONE, gouffreAt, GOUFFRE, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative } from './duel.js';
 import { bossOf, BOSSES, BOSS_ORDER } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
@@ -55,6 +55,16 @@ export const NIGHT_TIERS = [null,
   { name: 'Cauchemar III', hp: 1.9, atk: 1.6, chest: 2, shards: 2.5 }];
 export const NIGHT_TIER_OPEN = 10;
 export const nightTier = (run) => (run?.nightmare ? NIGHT_TIERS[run.nightTier || 1] : null);
+// v407 : Épreuves du jour
+export const TRIALS = [
+  { key: 'combat', room: 'fight', name: 'Épreuve du combat', short: 'Combat' },
+  { key: 'elite', room: 'elite', name: 'Épreuve de l’élite', short: 'Élite' },
+  { key: 'gardien', room: 'boss', name: 'Épreuve du gardien', short: 'Gardien' },
+];
+// Réglage mesuré (pilote automatique, défense moyenne : 40 % d'esquives, 15 % de parades ; 8 profils d'équipe × 30 jours) :
+// environ 55 % de victoires au combat, 61 % à l'élite, 57 % au gardien ; un joueur qui défend à la main fait mieux.
+export const TRIAL_OFFSET = [11, 11, 9]; // étages en plus (se resserre avec la force)
+export const TRIAL_MULT = [1.3, 1.8, 1.25]; // PV et attaque des ennemis
 export const AWAKEN_AT = 30;   // gardiens éveillés à partir de cet étage
 
 // v348 : nombre de jours entre deux dates « AAAA-MM-JJ » (heure locale)
@@ -320,7 +330,6 @@ export class Game {
         // v348 : missions à la mesure du joueur — l'étage visé suit le record (60 %, entre 4 et 20) ; « Ouvre 2 coffres »
         // devient « Ouvre un coffre » pour qui n'en a pas deux d'avance
         let n = def.n, shards = def.shards, text = def.text.replace('{faction}', fname);
-        if (def.kind === 'depth') { n = Math.max(4, Math.min(20, Math.round((this.s.descent.best || 0) * 0.6))); shards = def.shards + (n - 4) * 3; text = `Atteins l’étage ${n} de la Descente`; }
         if (def.kind === 'chest' && this.chestCount() < 2) { n = 1; shards = 20; text = 'Ouvre un coffre'; }
         list.push({ key: def.key, kind: def.kind, n, shards, faction, text, p: 0, claimed: false });
       }
@@ -735,6 +744,113 @@ export class Game {
     this.persist();
     return d.run;
   }
+  // ——— Épreuves du jour (v407) ———
+  // Trois combats par jour, réglés sur la force réelle du joueur (ses 5 meilleures cartes, pas l'équipe choisie : une équipe
+  // affaiblie exprès ne rend pas les Épreuves plus faciles). Chaque victoire rapporte sa récompense ; une défaite est définitive
+  // pour la journée. Les ennemis sont les mêmes pour tout le monde le même jour, à la force de chacun.
+  trials() {
+    const day = today(this.clock());
+    let t = this.s.trials;
+    if (!t || t.day !== day) t = this.s.trials = { day, done: [null, null, null], score: 0, cur: null, battle: null };
+    return t;
+  }
+  trialPower() {
+    const ids = Object.keys(this.s.collection).filter((id) => this.owns(id) && this.catalog.get(id));
+    /* force des Épreuves : la rareté y pèse moins que dans cardPower (mesuré : à force égale, des Rares au niveau 7 gagnaient bien plus que des Hyper rares au niveau 5) */
+    const pw = (id) => { const c = this.catalog.get(id); return Math.sqrt(cardPower(c.rarity, 1)) * (1 + 0.08 * (this.cardLevel(id) - 1)); };
+    const best = (list) => { const top = list.map(pw).sort((a, b) => b - a).slice(0, TEAM.active + TEAM.reserve); return top.length ? top.reduce((a, b) => a + b, 0) / top.length : 1; };
+    return Math.max(best(ids), best(this.team()));
+  }
+  // Étage « équivalent » de chaque Épreuve : celui que la force du joueur atteint en expédition (powerFor), plus un écart
+  // propre à l'Épreuve (combat, élite, gardien). Réglé par simulation pour viser environ 6 victoires sur 10.
+  trialFloor(i) {
+    const p = this.trialPower(), base = 6 + 22 * (p - 1);
+    const k = Math.max(0.2, Math.min(1, (45 - base) / 39)); /* l'écart se resserre avec la force (gros écarts mesurés en profondeur) */
+    return Math.max(2, Math.min(FINAL_FLOOR, Math.round(base + TRIAL_OFFSET[i] * k)));
+  }
+  trialBoss() {
+    const beaten = BOSS_ORDER.filter((k) => this.s.bossesBeaten?.[k]);
+    if (!beaten.length) return null;
+    return beaten[Math.floor(rngOf(`trial-boss:${this.trials().day}`)() * beaten.length)];
+  }
+  trialInfo(i) {
+    const room = TRIALS[i].room === 'boss' && !this.trialBoss() ? 'elite' : TRIALS[i].room;
+    return { ...TRIALS[i], room, floor: this.trialFloor(i), boss: room === 'boss' ? this.trialBoss() : null, reward: this.trialReward(i), state: this.trials().done[i] };
+  }
+  trialReward(i) {
+    const best = this.descent().best || 0, ti = best >= 50 ? 3 : best >= 25 ? 2 : best >= 10 ? 1 : 0;
+    return { chests: { [CHEST_ORDER[Math.max(0, ti - (i < 2 ? 1 : 0))]]: 1 }, shards: 20 + 10 * i };
+  }
+  startTrial(i) {
+    const t = this.trials();
+    if (!TRIALS[i]) throw new Error('Épreuve inconnue.');
+    if (t.done[i]) throw new Error('Cette Épreuve est déjà jouée aujourd’hui.');
+    if (t.battle && t.cur !== i) throw new Error('Termine d’abord l’Épreuve en cours.');
+    if (t.battle) return t;
+    const team = this.team();
+    if (team.length < TEAM.active) throw new Error(`Il faut au moins ${TEAM.active} créatures dans ton équipe.`);
+    const info = this.trialInfo(i), F = info.floor, room = info.room, rule = this.rule(t.day), seed = `trial:${t.day}:${i}`;
+    const sc = enemyScale(F), lvl = enemyLevel(F, room);
+    const enemies = floorEnemies(this.catalog, seed, F, room).map((e) => duelUnit(this.catalog.get(e.id), { side: 'enemy', scale: sc, level: e.boss || e.elite ? lvl : enemyLevel(F, 'fight'), boss: e.boss, elite: e.elite }));
+    for (const e of enemies) {
+      if (!e.boss && !e.elite) e.atk = Math.round(e.atk * FIGHT_ATK + 0.4);
+      const f = this.catalog.get(e.id)?.faction;
+      if (rule.key === 'furie' && f === rule.faction) e.atk = Math.round(e.atk * 1.25 + 0.4);
+      if (rule.key === 'sommeil' && f === rule.faction) { e.maxHp = Math.max(1, Math.round(e.maxHp * 0.75)); e.hp = e.maxHp; }
+      if (e.boss && F >= AWAKEN_AT) e.awakened = true;
+      const m = TRIAL_MULT[i]; e.maxHp = Math.round(e.maxHp * m); e.hp = e.maxHp; e.atk = Math.round(e.atk * m + 0.4);
+    }
+    if (F >= 4) foeTraits(seed, F, room, enemies.length).forEach((k, j) => { if (k && !enemies[j].boss) { enemies[j].trait = k; if (k === 'carapace') enemies[j].shield = 1; } });
+    if (rule.key === 'nuee') enemies.forEach((e) => { if (!e.boss && !e.elite && !e.trait) e.trait = 'explosif'; });
+    const ult = this.ultimate(team), known = {};
+    enemies.forEach((e) => { if (this.knows(e.id)) known[e.id] = true; });
+    const allies = team.map((id) => duelUnit(this.catalog.get(id), { level: this.cardLevel(id), form: this.formOf(id) }));
+    const st = createDuel(allies, enemies, { fervor: rule.key === 'lune' ? FERVOR_MAX - 2 : rule.key === 'reserve' ? 0 : FERVOR_START, ult: ult.key, power: ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, boss: info.boss, discovered: this.s.weakSeen || {}, seed: this.rng ? Math.floor(this.rng() * 2 ** 31) : null });
+    if (rule.key === 'marque') st.markMult = 2;
+    startInitiative(st);
+    t.cur = i; t.battle = st; t.room = room; t.floor = F; t.ult = { key: ult.key, power: ult.power, card: ult.card };
+    this.persist();
+    return t;
+  }
+  // Objet « expédition » attendu par l'écran de combat
+  trialRun() { const t = this.trials(); return t.battle ? { trial: true, battle: t.battle, floor: t.floor, room: t.room, day: t.day, ult: t.ult, team: [], free: false } : null; }
+  finishTrial() {
+    const t = this.trials(), st = t.battle, i = t.cur;
+    if (!st?.over) throw new Error('Aucune Épreuve terminée.');
+    const won = st.over === 'won' && Object.values(st.units).some((u) => u.side === 'ally' && u.hp > 0);
+    this.learnRelations(st);
+    this.s.weakSeen = { ...(this.s.weakSeen || {}), ...(st.discovered || {}) };
+    for (const id of st.kills) { const before = huntStage(this.s.hunt[id] || 0); this.s.hunt[id] = (this.s.hunt[id] || 0) + 1; if (huntStage(this.s.hunt[id]) === 3 && before < 3) this.s.shards += 100; }
+    const out = { i, won, report: battleReport(st, (uid) => (st.units[uid]?.boss && st.bossKey ? BOSSES[st.bossKey].name : this.catalog.get(st.units[uid]?.id)?.name) || 'Une créature'), boss: st.bossKey || null };
+    t.done[i] = won ? 'won' : 'lost'; t.battle = null; t.cur = null;
+    if (won) {
+      const r = this.trialReward(i), allies = Object.values(st.units).filter((u) => u.side === 'ally');
+      const hpPct = Math.round((allies.reduce((a, u) => a + Math.max(0, u.hp), 0) / Math.max(1, allies.reduce((a, u) => a + u.maxHp, 0))) * 100);
+      this.grant(r, 'trial');
+      out.reward = r; out.points = 100 + hpPct;
+      t.score = (t.score || 0) + out.points;
+      this.track('win', 1); this.track('trial', 1);
+      out.fame = this.gainFame(allies.filter((u) => u.hp > 0).map((u) => u.id), 1);
+      out.season = this.seasonWin();
+      if (!this.s.stats.firstWin) { this.s.stats.firstWin = Date.now(); this.s.shards += FIRST_WIN; out.firstWin = FIRST_WIN; }
+    }
+    this.s.stats.trials = (this.s.stats.trials || 0) + 1;
+    if (won) this.s.stats.trialWins = (this.s.stats.trialWins || 0) + 1;
+    out.score = t.score; out.day = t.day; out.allDone = t.done.every(Boolean);
+    this.emit('trialEnd', out);
+    this.checkProgress();
+    this.persist();
+    return out;
+  }
+  // Abandon d'une Épreuve en cours : elle compte comme perdue
+  abandonTrial() {
+    const t = this.trials();
+    if (!t.battle) throw new Error('Aucune Épreuve en cours.');
+    t.battle.over = 'lost';
+    return this.finishTrial();
+  }
+  autoTrial() { autoDuel(this.trials().battle); return this.finishTrial(); }
+
   // ——— Duels des Sceaux ———
   // Main du joueur : 5 cartes possédées (complétée par les cartes de départ prêtées s'il en manque)
   sceauxHand() {
@@ -801,9 +917,11 @@ export class Game {
     const out = { result: st.over, shards: 0, first: false, title: null, daily: st.daily, capped: false };
     if (st.over === 'won') {
       sc.wins++; sc.streak++; sc.best = Math.max(sc.best, sc.streak);
-      if (st.awake) { if (!sc.awake[R.key]) { sc.awake[R.key] = Date.now(); out.first = true; out.shards += SC.SCEAUX_REWARD.firstAwake; } }
-      else if (!sc.beaten[R.key]) { sc.beaten[R.key] = Date.now(); out.first = true; out.shards += SC.SCEAUX_REWARD.firstWin; }
-      if (st.daily && sc.dailyDone !== day) { sc.dailyDone = day; out.shards += SC.SCEAUX_REWARD.daily; }
+      out.chests = [];
+      if (st.awake) { if (!sc.awake[R.key]) { sc.awake[R.key] = Date.now(); out.first = true; out.shards += SC.SCEAUX_REWARD.firstAwake; out.chests.push(SC.sceauxChest(R.key, true)); } }
+      else if (!sc.beaten[R.key]) { sc.beaten[R.key] = Date.now(); out.first = true; out.shards += SC.SCEAUX_REWARD.firstWin; out.chests.push(SC.sceauxChest(R.key)); }
+      if (st.daily && sc.dailyDone !== day) { sc.dailyDone = day; out.shards += SC.SCEAUX_REWARD.daily; out.chests.push('bois'); }
+      out.chests = out.chests.filter(Boolean); out.chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; }); /* v408 */
       if (sc.paidToday < SC.SCEAUX_REWARD.dailyPaid) { sc.paidToday++; out.shards += R.reward; } else { out.capped = true; out.shards += SC.SCEAUX_REWARD.afterCap; } // v348 : un petit gain reste au-delà du plafond
       const t = st.awake ? (Object.keys(sc.awake).length >= SC.RIVALS.length ? 'Vainqueur des Implacables' : null) : SC.SCEAUX_TITLES[R.key] || (sc.wins === 1 ? SC.SCEAUX_TITLES.initie : null);
       if (t && !this.s.titles.includes(t)) { this.s.titles.push(t); out.title = t; }
@@ -885,6 +1003,9 @@ export class Game {
         out.push({ kind: 'collection', title: left === 1 ? `Plus qu’une créature pour compléter ${name}` : left <= 10 ? `Plus que ${left} créatures pour compléter ${name}` : `Complète le royaume ${name}`, sub: `${fac.owned} / ${fac.total} · une récompense t’attend au bout`, href: `#/faction/${fac.f}`, icon: 'book', faction: fac.f, p: fac.owned, n: fac.total });
       }
     }
+    // v407 : Épreuves du jour encore à jouer (une fois le premier chapitre commencé), s'il reste une place
+    const tl = this.trials().done.filter((x) => !x).length;
+    if (out.length < 3 && best >= 1 && tl && this.team().length >= TEAM.active) out.push({ kind: 'trial', title: tl === 3 ? 'Joue tes Épreuves du jour' : `Encore ${tl} Épreuve${tl > 1 ? 's' : ''} du jour`, sub: 'Trois combats à ta mesure · un coffre par victoire', href: '#/epreuves', icon: 'crest-elite' });
     return out.slice(0, 3);
   }
   // Forme choisie pour une carte (corrompue si débloquée et sélectionnée)
@@ -1201,7 +1322,6 @@ export class Game {
     // (v406 : les paliers des profondeurs 40, 50, 60… sont remplacés par les coffres abyssaux des gardiens)
     d.best = Math.max(d.best, floor);
     const adv = (run?.start || 1) > 1; // v331 : un départ avancé compte pour le record, pas pour les classements
-    if ((!run || !run.free) && !adv) this.seasonDepth(floor);
     // une expédition commencée la veille ne compte pas pour le classement du jour (le donjon change chaque jour) ;
     // v328 : elle compte en revanche pour le record personnel (d.best) et pour la mission du jour « atteins l'étage N »
     if ((!run || run.day === d.day) && !adv) d.bestToday = Math.max(d.bestToday, floor);
@@ -1239,17 +1359,18 @@ export class Game {
   // Saison du mois : remise à zéro au changement de mois, paliers de profondeur récompensés une fois
   season() {
     const id = seasonId(this.clock());
-    if (this.s.season.id !== id) this.s.season = { id, best: 0, claimed: [] };
+    if (this.s.season.id !== id || this.s.season.v !== 2) this.s.season = { id, best: 0, claimed: [], v: 2 }; /* v407 : saison des Épreuves (l'ancienne comptait des étages) */
     return this.s.season;
   }
-  seasonDepth(floor) {
+  // v407 : une victoire de plus aux Épreuves du jour ce mois-ci ; les paliers franchis se gagnent une fois
+  seasonWin() {
     const se = this.season(), ev = [];
-    se.best = Math.max(se.best, floor);
+    se.best = (se.best || 0) + 1;
     for (const st of SEASON_STEPS) {
-      if (se.best < st.floor || se.claimed.includes(st.floor)) continue;
-      se.claimed.push(st.floor);
+      if (se.best < st.wins || se.claimed.includes(st.wins)) continue;
+      se.claimed.push(st.wins);
       this.grant(st.reward);
-      ev.push({ kind: 'season', floor: st.floor, name: `Saison : étage ${st.floor} atteint`, reward: st.reward });
+      ev.push({ kind: 'season', name: `Saison : ${st.wins} Épreuves gagnées`, reward: st.reward });
     }
     if (ev.length) this.emit('progress', ev);
     return ev;

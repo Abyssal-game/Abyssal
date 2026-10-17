@@ -78,7 +78,8 @@ COLLECTIONNE
 COMBATS TACTIQUES
 • Une équipe de 5 créatures : 3 au combat, 2 en réserve
 • Chaque créature a son rôle, ses compétences et son passif
-• La Descente : 100 étages, 20 gardiens aux pouvoirs uniques, et L'Abysse qui t'attend tout au fond
+• La Descente, l'histoire du jeu : 20 chapitres, 100 étages, 20 gardiens aux pouvoirs uniques, et L'Abysse qui t'attend tout au fond
+• Les Épreuves du jour : trois combats à ta mesure chaque jour, un coffre par victoire
 • Esquive et pare les coups au bon moment, brise la garde des gardiens
 • Rapporte des coffres, et le légendaire Booster de l'Abysse
 • Une règle différente chaque jour pour changer ta stratégie
@@ -223,7 +224,7 @@ Au premier lancement, ABYSSAL propose de créer un compte (e-mail et mot de pass
 
 Pourquoi un compte est proposé : la collection de cartes (500 créatures, plusieurs semaines de jeu) est sauvegardée en ligne pour ne jamais être perdue (changement ou perte de téléphone, suppression de l'application) ; il sert aussi aux classements quotidiens, aux saisons, au Tirage des Ombres et au profil public. Seuls un e-mail et un pseudo sont demandés, et le compte se supprime dans le jeu. Suppression du compte dans le jeu : Sanctuaire → Compte → Supprimer mon compte.
 
-Modération des pseudos (seul contenu créé par les joueurs) : les pseudos insultants sont refusés. Dans un classement (Aventure → La Descente → Classement du jour), touchez le pseudo d'un autre joueur pour le signaler ou le masquer. Un pseudo signalé par plusieurs joueurs est remplacé automatiquement. Contact : abyssal.gamecards@gmail.com
+Modération des pseudos (seul contenu créé par les joueurs) : les pseudos insultants sont refusés. Dans un classement (Aventure → Épreuves → Classement du jour), touchez le pseudo d'un autre joueur pour le signaler ou le masquer. Un pseudo signalé par plusieurs joueurs est remplacé automatiquement. Contact : abyssal.gamecards@gmail.com
 
 Aucun achat intégré, aucune publicité, aucun pistage.
 ```

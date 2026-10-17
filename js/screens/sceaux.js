@@ -7,6 +7,8 @@ import { icon, sigil, picon, crestHTML } from '../ui/icons.js';
 import { openSheet, esc, fmt, toast, confirmBox } from '../ui/dom.js';
 import { setScene } from '../ui/scene.js';
 import { tuto } from '../ui/tutos.js';
+import { CHESTS } from '../core/descent.js';
+const SC_CHEST_NAME = Object.fromEntries(Object.entries(CHESTS).map(([k, c]) => [k, c.name])); /* v408 */
 
 const V = SC.showVal;
 const RULE_MED = { classique: 'sc-rule-classique', sacre: 'sc-rule-sacre', identique: 'sc-rule-identique', somme: 'sc-rule-somme' }; // v363 : médaillons Gemini des règles gardées
@@ -68,13 +70,13 @@ export default function sceauxScreen(app, root) {
         <span class="sc-rec">${sc.wins} victoire${sc.wins > 1 ? 's' : ''} · ${sc.losses} défaite${sc.losses > 1 ? 's' : ''}${sc.draws ? ` · ${sc.draws} égalité${sc.draws > 1 ? 's' : ''}` : ''}</span></header>
 ${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone ? 'done' : ''}" data-sc="daily" ${dailyDone ? 'disabled' : ''}>
         <img alt="" src="assets/icons/hourglass.webp"><span><b>Défi du jour</b><span class="small">${esc(R.name)} · règle « ${esc(SC.RULES[d.rule].name)} »</span>
-        <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : `+${SC.SCEAUX_REWARD.daily} éclats en plus en cas de victoire`}</span></span>${dailyDone ? icon('check') : icon('next')}</button>` : ''}
+        <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : `Victoire : +${SC.SCEAUX_REWARD.daily} éclats et un coffre de bois`}</span></span>${dailyDone ? icon('check') : icon('next')}</button>` : ''}
       <h2 class="section-title">Adversaires</h2>
       ${(() => { const items = SC.RIVALS.map((r, i) => { const open = SC.rivalUnlocked(g.s, i), won = sc.beaten[r.key]; return [open, `<button class="sc-rival ${open ? '' : 'locked'} ${won ? 'won' : ''}" data-sc="play" data-r="${r.key}" ${open ? '' : 'disabled'} style="background-image:linear-gradient(90deg, rgba(12, 13, 20, .97) 38%, rgba(12, 13, 20, .45) 72%, rgba(12, 13, 20, .15)), url(assets/sceaux/${themeOf(r.key)}.webp)">
         <span class="sc-por">${rivalPic(cat, r)}</span>
         <span class="sc-ri"><b>${esc(r.name)}</b><span class="small">${esc(r.title)} · ${stars(r.stars || r.level)}</span>
-        <span class="small muted">${open ? `Règle « ${esc(SC.RULES[r.rule].name)} » · +${r.reward} éclats${won ? '' : ` · 1re victoire +${SC.SCEAUX_REWARD.firstWin}`}` : `Bats ${esc(SC.RIVALS[i - 1].name)} pour l’affronter`}</span></span>
-        ${won ? `<span class="sc-won">${icon('check')}</span>` : open ? icon('next') : icon('p:mysteries')}</button>${won ? `<button class="sc-awake ${(sc.awake || {})[r.key] ? 'won' : ''}" data-sc="awake" data-r="${r.key}">${icon('skull')}<span><b>Revanche implacable</b><small>${stars(r.starsAwake || Math.min(5, r.level + 1))} · +${Math.round(r.reward * 1.5)} éclats${(sc.awake || {})[r.key] ? ' · battu' : ` · 1re victoire +${SC.SCEAUX_REWARD.firstAwake}`}</small></span>${(sc.awake || {})[r.key] ? icon('check') : icon('next')}</button>` : ''}`]; }); const o = items.filter((x) => x[0]).map((x) => x[1]).join(''), l = items.filter((x) => !x[0]); return `<div class="sc-rivals">${o}</div>${l.length ? `<details class="panel dc-fold"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/mysteries.webp"><span class="dc-sum-t">Adversaires à venir (${l.length})</span></summary><div class="sc-rivals">${l.map((x) => x[1]).join('')}</div></details>` : ''}`; })()}
+        <span class="small muted">${open ? `Règle « ${esc(SC.RULES[r.rule].name)} » · +${r.reward} éclats${won ? '' : ` · 1re victoire : +${SC.SCEAUX_REWARD.firstWin} et ${esc(SC_CHEST_NAME[SC.sceauxChest(r.key)].toLowerCase())}`}` : `Bats ${esc(SC.RIVALS[i - 1].name)} pour l’affronter`}</span></span>
+        ${won ? `<span class="sc-won">${icon('check')}</span>` : open ? icon('next') : icon('p:mysteries')}</button>${won ? `<button class="sc-awake ${(sc.awake || {})[r.key] ? 'won' : ''}" data-sc="awake" data-r="${r.key}">${icon('skull')}<span><b>Revanche implacable</b><small>${stars(r.starsAwake || Math.min(5, r.level + 1))} · +${Math.round(r.reward * 1.5)} éclats${(sc.awake || {})[r.key] ? ' · battu' : ` · 1re victoire : +${SC.SCEAUX_REWARD.firstAwake} et ${esc(SC_CHEST_NAME[SC.sceauxChest(r.key, true)].toLowerCase())}`}</small></span>${(sc.awake || {})[r.key] ? icon('check') : icon('next')}</button>` : ''}`]; }); const o = items.filter((x) => x[0]).map((x) => x[1]).join(''), l = items.filter((x) => !x[0]); return `<div class="sc-rivals">${o}</div>${l.length ? `<details class="panel dc-fold"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/mysteries.webp"><span class="dc-sum-t">Adversaires à venir (${l.length})</span></summary><div class="sc-rivals">${l.map((x) => x[1]).join('')}</div></details>` : ''}`; })()}
       <details class="panel dc-fold sc-handfold"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/cards.webp"><span class="dc-sum-t">Ta main</span></summary>
         <div class="sc-row">${hand.map((id) => scCard(cat, id, { owner: 'p' })).join('')}</div>
         ${hand.some((id) => !g.owns(id)) ? '<p class="small muted">Les cartes de départ qui te manquent sont prêtées pour la partie.</p>' : ''}
@@ -264,6 +266,7 @@ ${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone ? 'done
       ${out.trophy?.length ? `<div class="sc-trophy"><img class="sc-tico" alt="" src="assets/icons/sc-trophy.webp"><b>Butin du jour</b><span class="small">Garde une de ces cartes :</span><div class="sc-tro-row">${out.trophy.map((id) => `<button class="sc-tro" data-tro="${id}">${scCard(cat, id, { owner: 'p' })}</button>`).join('')}</div></div>` : ''}
       <p class="sc-say">${rivalPic(cat, R)}<span>« ${esc(st.over === 'won' ? R.win : st.over === 'lost' ? R.lose : 'Partie nulle. On recommence ?')} »</span></p>
       ${out.shards ? `<p class="sc-gain">${icon('crystal')} <b>+${fmt(out.shards)}</b> éclats${out.first ? ' (première victoire)' : ''}</p>` : ''}
+      ${out.chests?.length ? `<a class="sc-gain sc-chestwin" href="#/coffres">${icon('p:chest')} <b>${out.chests.map((c) => esc(SC_CHEST_NAME[c])).join(' et ')}</b> gagné${out.chests.length > 1 ? 's' : ''} !</a>` : ''}
       ${out.xp && !out.capped ? `<p class="small muted center">+${out.xp} XP de profil</p>` : ''}
       ${out.capped ? `<p class="small muted">Tes ${SC.SCEAUX_REWARD.dailyPaid} victoires bien payées du jour sont faites : celle-ci rapporte ${SC.SCEAUX_REWARD.afterCap} éclats et ${SC.SCEAUX_REWARD.xp} XP.</p>` : ''}
       ${out.title ? `<p class="sc-gain">${icon('p:titles')} Nouveau titre : <b>${esc(out.title)}</b></p>` : ''}
@@ -305,7 +308,7 @@ ${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone ? 'done
       ${howHTML()}
       <h3 class="sc-rg-h">Les règles en animation</h3>${ruleTiles()}
       ${Object.entries(SC.PERKS).map(([k, p]) => `<p class="small"><b><span class="sc-pkic">${PERK_IC[k]}</span>${esc(p.name)}</b> (${p.rar.join(', ')}) : ${esc(p.desc)}</p>`).join('')}
-      <p class="small muted">Victoires payées : ${SC.SCEAUX_REWARD.dailyPaid} par jour. Première victoire contre un adversaire : +${SC.SCEAUX_REWARD.firstWin} éclats. Défi du jour : +${SC.SCEAUX_REWARD.daily}.</p></div>`, { label: 'Règles des Sceaux' });
+      <p class="small muted">Victoires payées : ${SC.SCEAUX_REWARD.dailyPaid} par jour. Première victoire contre un adversaire : +${SC.SCEAUX_REWARD.firstWin} éclats et un coffre (bois, fer, or puis abyssal selon son rang ; un rang au-dessus en revanche implacable). Défi du jour : +${SC.SCEAUX_REWARD.daily} éclats et un coffre de bois.</p></div>`, { label: 'Règles des Sceaux' });
     // la fenêtre est hors de l'écran des Sceaux : ses boutons « Voir » ont leur propre écouteur
     sh.body.addEventListener('click', (e) => { const b = e.target.closest('[data-sc="demo"]'); if (b) openRuleHelp(app, b.dataset.k); });
   }
