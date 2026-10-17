@@ -90,20 +90,24 @@ export function enableTilt(el, { reduced = false } = {}) {
   // Rotation au doigt : on fait tourner la carte comme un objet tenu en main.
   // Le glissé est relatif (pas de saut au premier toucher) ; au lâcher, la carte revient doucement.
   const MAX = 32;
-  let cur = { x: 0, y: 0 }, tgt = { x: 0, y: 0 };
+  let cur = { x: 0, y: 0 }, tgt = { x: 0, y: 0 }, idle = { x: 0, y: 0 };
   let touching = false, raf = 0, alive = true, start = null, moved = false, t0 = performance.now();
   const apply = () => {
-    card.style.transform = reduced ? '' : `perspective(900px) rotateX(${cur.x.toFixed(2)}deg) rotateY(${cur.y.toFixed(2)}deg) scale(${touching ? 1.03 : 1})`;
-    card.style.setProperty('--mx', `${(50 + (cur.y / MAX) * 50).toFixed(1)}%`);
-    card.style.setProperty('--my', `${(50 - (cur.x / MAX) * 50).toFixed(1)}%`);
+    /* v419 : au repos, plus de rotation 3D (seulement les reflets qui bougent) : sur iPhone, la carte inclinée en 3D en permanence
+       laissait voir un fin trait noir horizontal (jointure entre les tuiles d'affichage de Safari). La 3D ne joue plus qu'au doigt. */
+    const rest = !touching && Math.abs(cur.x) < 0.6 && Math.abs(cur.y) < 0.6;
+    card.style.transform = reduced || rest ? '' : `perspective(900px) rotateX(${cur.x.toFixed(2)}deg) rotateY(${cur.y.toFixed(2)}deg) scale(${touching ? 1.03 : 1})`;
+    const ly = cur.y + (touching || reduced ? 0 : idle.y), lx = cur.x + (touching || reduced ? 0 : idle.x);
+    card.style.setProperty('--mx', `${(50 + (ly / MAX) * 50).toFixed(1)}%`);
+    card.style.setProperty('--my', `${(50 - (lx / MAX) * 50).toFixed(1)}%`);
     card.style.setProperty('--tilt', (Math.min(1, Math.hypot(cur.x, cur.y) / MAX)).toFixed(3));
   };
   let frame = 0;
   const loop = (now) => {
     if (!alive) return;
     if (!touching) {
-      if (!reduced) { const t = (now - t0) / 1000; tgt.x = Math.sin(t * 0.9) * 3; tgt.y = Math.cos(t * 0.7) * 4.5; } // léger balancement
-      else { tgt.x = 0; tgt.y = 0; }
+      tgt.x = 0; tgt.y = 0; /* v419 : plus de balancement 3D au repos (voir apply) */
+      const t = (now - t0) / 1000; idle.x = Math.sin(t * 0.9) * 3; idle.y = Math.cos(t * 0.7) * 4.5; /* les reflets, eux, se balancent encore */
     }
     const k = touching ? 0.45 : 0.07;
     cur.x += (tgt.x - cur.x) * k; cur.y += (tgt.y - cur.y) * k;

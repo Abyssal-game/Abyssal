@@ -358,3 +358,5 @@ html.reduce-motion .tcg.apex::before { animation: none; }
 @media (prefers-reduced-motion: reduce) { .v-holo .tcg-shine { animation: none; } }
 .v-holo .tcg-art img { filter: saturate(.6) contrast(1.12) brightness(1.04); }
 .v-holo .tcg-art::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, #B9CBEA, #5B6C8C); mix-blend-mode: color; opacity: .32; }
+/* v419 : carte inclinée au doigt : une seule couche lissée (évite les jointures fines entre tuiles sur Safari) */
+.tcg-full.tiltable.tilting { -webkit-backface-visibility: hidden; backface-visibility: hidden; }
