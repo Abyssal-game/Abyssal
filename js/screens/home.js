@@ -8,7 +8,6 @@ import { FACTION_ORDER } from '../config.js';
 import { seeded } from '../art/geometry.js';
 import { today } from '../core/save.js';
 import { setScene } from '../ui/scene.js';
-import { onPresence } from '../cloud/presence.js';
 
 // Icône et couleur de chaque type de mission du jour
 const MISSION_LOOK = { booster: ['booster', '#E0485E'], new: ['book', '#B48CFF'], rare: ['crystal', '#6FB4FF'], variant: ['holo', '#FF8AD8'], burn: ['furnace', '#FF9A3A'], depth: ['depth', '#9C7BFF'], trial: ['crest-elite', '#E0485E'], win: ['crown', '#F2C14E'], daily: ['crystal', '#7FD3FF'], chest: ['chest', '#E8C35A'] };
@@ -73,16 +72,9 @@ export default function home(app, root) {
       <span class="hw-ev-sig">${sigil(ev.factions[0])}${sigil(ev.factions[1])}</span>
       <span><span class="small muted">Événement de la semaine · encore ${ev.daysLeft} jour${ev.daysLeft > 1 ? 's' : ''}</span><b>${esc(ev.name)}</b><span class="small">${esc(ev.desc)}</span></span>${icon('next')}</a>
     <p class="home-col small muted center"><a href="#/collection">${owned} / ${total} créatures découvertes</a></p>
-    <div class="online-pill" role="status" aria-live="polite"><img class="on-ic" alt="" src="assets/icons/online.webp"><span class="on-dot"></span><span class="on-t">Connexion…</span></div>
   `;
-  // Joueurs connectés en ce moment (mis à jour en direct)
-  // la pastille reste dans le contenu de l'Accueil (v223) ; on retire une éventuelle ancienne copie posée sur la page
+  // (v413 : le nombre de joueurs en ligne n'est plus sur l'Accueil : Réglages → À propos, tout en bas)
   document.querySelectorAll('body > .online-pill').forEach((x) => x.remove());
-  const pill = root.querySelector('.online-pill');
-  const offP = onPresence((p) => {
-    pill.classList.toggle('live', p.status === 'on');
-    pill.querySelector('.on-t').innerHTML = p.status === 'on' ? `<b>${fmt(p.count)}</b> joueur${p.count > 1 ? 's' : ''} en ligne` : p.status === 'connecting' ? 'Connexion…' : 'Hors ligne';
-  });
   lazyArt(root);
   setScene('home');
   bindActions(root, {
@@ -104,5 +96,5 @@ export default function home(app, root) {
     },
   });
   app.refreshView = () => app.refresh();
-  return () => { app.refreshView = null; offP(); pill.remove(); };
+  return () => { app.refreshView = null; };
 }

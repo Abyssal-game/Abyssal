@@ -13,6 +13,7 @@ import { isLoggedIn } from '../cloud/cloud.js';
 import { openCreator } from './creator.js';
 import { showWelcome } from './welcome.js';
 import { shareFile } from '../native.js';
+import { onPresence, presence } from '../cloud/presence.js';
 const CREATOR_CODE = 'SCEAU-7713'; /* v412 : l'ancien code d'accès du jeu, connu du propriétaire */
 
 export default function settings(app, root) {
@@ -88,7 +89,13 @@ export default function settings(app, root) {
         ${s.dev ? `<p class="small muted set-audio">${(() => { const a = audioInfo(); return `Son : ${esc(a.state)} · ${a.samples}${a.expected != null ? `/${a.expected}` : ''} sons chargés · session ${esc(String(a.session))}${a.enabled ? '' : ' · coupé dans les réglages'}${a.diag.failGet || a.diag.failDecode || a.diag.err ? ` · échecs lecture ${a.diag.failGet}, décodage ${a.diag.failDecode}${a.diag.err ? ` · ${esc(a.diag.err)}` : ''}` : ''}`; })()}</p>
         <button class="btn ghost small" data-act="sndtest">${icon('dodge')} Tester le son</button>` : ''}
         <a class="btn ghost small" href="confidentialite.html" target="_blank" rel="noopener">${icon('book')} Politique de confidentialité</a>
-      </section>`;
+      </section>
+      <div class="online-pill" role="status" aria-live="polite"><img class="on-ic" alt="" src="assets/icons/online.webp"><span class="on-dot"></span><span class="on-t">Connexion…</span></div>`;
+  }
+  function paintPill(p = presence) {
+    const pill = root.querySelector('.online-pill'); if (!pill) return;
+    pill.classList.toggle('live', p.status === 'on');
+    pill.querySelector('.on-t').innerHTML = p.status === 'on' ? `<b>${fmt(p.count)}</b> joueur${p.count > 1 ? 's' : ''} en ligne` : p.status === 'connecting' ? 'Connexion…' : 'Hors ligne';
   }
   function render() {
     const s = g.s.settings;
@@ -97,6 +104,7 @@ export default function settings(app, root) {
       <header class="screen-head ui-hero bn-settings"><h1>Réglages</h1><p class="muted">Jeu, son, tutoriels.</p></header>
       <nav class="set-tabs" role="tablist">${TABS.map(([k, l, ic, fb]) => `<button class="set-tab" role="tab" aria-selected="${ui.tab === k}" data-act="tab" data-k="${k}">${tabIcon(ic, fb)}<span>${l}</span></button>`).join('')}</nav>
       <div class="set-body">${body(s)}</div>`;
+    paintPill();
     root.querySelectorAll('[data-mus]').forEach((b) => b.addEventListener('click', () => { musicPreview(MUSIC_DEMO[+b.dataset.mus][1]); root.querySelectorAll('[data-mus]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); }));
     root.querySelector('#mvol')?.addEventListener('input', (e) => { g.s.settings.musicVol = Number(e.target.value); app.applySettings(); });
     root.querySelector('#mvol')?.addEventListener('change', (e) => g.setSetting('musicVol', Number(e.target.value)));
@@ -191,7 +199,9 @@ export default function settings(app, root) {
   const before = sync.profile?.badge;
   const off = onSync(() => { if (sync.profile?.badge !== before) render(); });
   refreshProfile(false);
-  return () => off();
+  // v413 : joueurs en ligne, seulement ici (en bas de À propos), mis à jour en direct
+  const offP = onPresence(paintPill);
+  return () => { off(); offP(); };
 }
 
 function simulate(app) {
