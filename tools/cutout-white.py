@@ -1,4 +1,4 @@
-# Usage : python3 tools/cutout-white.py source.jpg sortie.webp [--holes]   (v385 : figures des gardiens sur fond blanc uni)
+# Usage : python3 tools/cutout-white.py source.jpg sortie.webp [--holes] [--soft]  (--soft : poussière et fumée pâles rendues semi-transparentes)   (v385 : figures des gardiens sur fond blanc uni)
 # Détourage d'une figure sur fond blanc uni : fond = pixels presque blancs reliés au bord (+ grands trous blancs),
 # bord adouci et couleur dé-mélangée du blanc ; recadrage serré puis hauteur 560.
 import sys
@@ -36,6 +36,10 @@ alpha = np.where(obj, 1.0, 0.0)
 alpha = np.where(fr, np.clip(dist * 3.2, 0, 1), alpha)
 alpha = np.asarray(Image.fromarray((alpha * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(0.6)), float) / 255
 alpha = np.where(bg & ~fr, 0, alpha)
+if '--soft' in sys.argv:  # poussière, fumée : pixels pâles et peu colorés → transparence selon leur écart au blanc
+    chroma = a.max(-1) - a.min(-1)
+    pale = (a.min(-1) > 140) & (chroma < 40)
+    alpha = np.where(pale, np.minimum(alpha, np.clip((255 - a.min(-1)) / 115, 0, 1)), alpha)
 with np.errstate(divide='ignore', invalid='ignore'):
     col = np.clip((a - (1 - alpha[..., None]) * 255) / np.maximum(alpha[..., None], 0.3), 0, 255)
 im = Image.fromarray(np.dstack([col, alpha * 255]).astype(np.uint8), 'RGBA')

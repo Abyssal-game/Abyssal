@@ -181,7 +181,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const cardWarn = (u) => { const now = bigOf(u, false), nx = now ? null : bigOf(u, true), k = now || nx; if (!k) return ''; const real = PREP_IT[k] || k; const help = u.boss ? Math.min(2, front(st, 'enemy').filter((x) => x !== u && x.hp > 0).length) : 0;
     return `<span class="cb-warn ${PREP_IT[k] || nx ? 'prep' : ''}" title="${esc(INTENTS[real].desc)}${help ? ` Renforcée par ses serviteurs : +${help * SERVANT_POWER * 100} %.` : ''}">${intentIcon(real)}<b>${esc(INTENTS[real].name)}${help ? ` +${help * SERVANT_POWER * 100} %` : ''}</b><small>${now && !PREP_IT[now] ? 'à son tour' : 'au tour suivant'}</small></span>`; };
   // v368 : les cinq gardiens ont leur figure peinte (Gemini, détourée) qui sort de leur carte par le haut
-  const BOSS_FIG = new Set(['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge']);
+  const BOSS_FIG = new Set(['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'golem', 'peste', 'chasseur', 'voeux']);
   // v375 : un gardien n'est pas une carte de la collection — son nom et sa figure peinte partout en combat
   const isFig = (u) => u?.boss && BOSS_FIG.has(st.bossKey);
   const uName = (u) => (u?.boss && st.bossKey && BOSSES[st.bossKey] ? BOSSES[st.bossKey].name : cat.get(u.id)?.name || '');
