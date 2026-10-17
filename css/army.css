@@ -3441,3 +3441,16 @@ html.fx-light .dv-ghost, html.fx-light .dv-cut, html.fx-light .dv-soul::before {
 .dv-c.dead .dv-hp .hpr { display: none; }
 html.fx-light .dv-c .dv-hp.low .hpr { animation: none; }
 @media (prefers-reduced-motion: reduce) { .dv-c .dv-hp.low .hpr { animation: none; } }
+
+/* v381 : jauge de vie peinte (Gemini, assets/icons/hp-ring.webp, source store/ui/hp-ring-source.jpg) — l'anneau de sang remplace
+   le tour doré du médaillon : la part des PV restants est pleine de sang lumineux (sens horaire depuis le haut), la part perdue est
+   le même anneau éteint. Rayon intérieur de l'anneau = 71 % de son rayon : posé à -6 %, il recouvre le bord filigrané du médaillon */
+.dv-c .dv-hp .hpr { inset: -6%; border-radius: 0; background: none; -webkit-mask: none; mask: none; filter: none; z-index: 0; }
+.dv-c .dv-hp .hpr::before, .dv-c .dv-hp .hpr::after { content: ''; position: absolute; inset: 0; background: url(../assets/icons/hp-ring.webp) center / 100% 100% no-repeat; }
+.dv-c .dv-hp .hpr::before { filter: grayscale(1) brightness(.55) sepia(.35); }
+.dv-c .dv-hp .hpr::after { -webkit-mask: conic-gradient(#000 calc(var(--hpp, 100) * 1%), transparent 0); mask: conic-gradient(#000 calc(var(--hpp, 100) * 1%), transparent 0); }
+.dv-c .dv-hp b { z-index: 1; }
+.dv-c .dv-hp.low .hpr { animation: none; }
+.dv-c .dv-hp.low .hpr::after { animation: hprLow 1.1s ease-in-out infinite alternate; }
+html.fx-light .dv-c .dv-hp.low .hpr::after { animation: none; }
+@media (prefers-reduced-motion: reduce) { .dv-c .dv-hp.low .hpr::after { animation: none; } }
