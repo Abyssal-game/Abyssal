@@ -832,7 +832,9 @@ export class Game {
       const chest = chestForDepth(target);
       const what = target === bf ? `le gardien ${BOSSES[bossOf(bf)].name} t’y attend` : `${CHESTS[chest].name.toLowerCase()} à la clé`;
       // v394 : dès l'étage 50, l'objectif devient le fond de l'Abysse (étage 100, Booster de l'Abysse)
-      if (best >= 50 && !this.s.bossesBeaten?.abysse) out.push({ kind: 'depth', title: `Atteins le fond de l’Abysse`, sub: `Étage ${FINAL_FLOOR}, le dernier · ton record : ${best} · le Booster de l’Abysse et une Secrète t’y attendent`, href: '#/descente', icon: 'depth', p: Math.min(best, FINAL_FLOOR), n: FINAL_FLOOR });
+      /* v405 : le fond atteint, plus d'objectif d'étage au-delà de 100 */
+      if (this.s.bossesBeaten?.abysse || best >= FINAL_FLOOR) out.push({ kind: 'depth', title: 'Retourne au fond de l’Abysse', sub: `Tu as atteint l’étage ${FINAL_FLOOR}, le dernier · chaque nouvelle victoire contre L’Abysse rapporte un Booster de l’Abysse`, href: '#/descente', icon: 'depth' });
+      else if (best >= 50) out.push({ kind: 'depth', title: `Atteins le fond de l’Abysse`, sub: `Étage ${FINAL_FLOOR}, le dernier · ton record : ${best} · le Booster de l’Abysse et une Secrète t’y attendent`, href: '#/descente', icon: 'depth', p: Math.min(best, FINAL_FLOOR), n: FINAL_FLOOR });
       else out.push({ kind: 'depth', title: best ? `Atteins l’étage ${target}` : 'Lance ta première expédition', sub: best ? `Ton record : étage ${best} · ${what}` : 'Descends dans l’Abysse : un coffre t’attend dès l’étage 3', href: '#/descente', icon: 'depth', p: Math.min(best, target), n: target });
     }
     // équipe trop faible pour la suite, et assez de cendres pour la renforcer

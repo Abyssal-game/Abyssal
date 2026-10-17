@@ -39,3 +39,15 @@ test('Booster de l’Abysse : 5 cartes en finition, une Secrète non possédée 
   assert.equal(r2.cards.length, 5);
   assert.equal(g.s.tickets.abysse, 0);
 });
+
+test('v405 : après le fond, l’objectif de l’Accueil ne vise jamais au-delà de l’étage 100', () => {
+  const g = mk('apres');
+  g.s.descent.best = FINAL_FLOOR;
+  g.s.bossesBeaten.abysse = 1;
+  const depth = () => g.goals().find((x) => x.kind === 'depth');
+  const goal = depth();
+  assert.doesNotMatch(goal.title, /\d/);
+  assert.match(goal.title, /fond de l’Abysse/);
+  g.s.descent.best = 103;
+  assert.ok(!/1\d\d/.test(depth().title));
+});
