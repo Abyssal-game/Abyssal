@@ -50,7 +50,7 @@ const DANGER = ['', '', 'Danger', 'Mortel'];
 const IN_PIC = { gorge: 'heavy', gather: 'channel', blizzard: 'frost', mimic: 'channel', copy: 'heavy', decree: 'rally', shift: 'charge' };
 const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${IN_PIC[k] || k}.webp">`;
 
-export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.' }) {
+export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = null, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.' }) {
   const settling = () => { const d = app.game.s.descent; return (d.runs || 0) <= 1 && (d.run?.floor || 1) <= 2; }; // v328 : voir plus haut
   const g = app.game, cat = app.catalog, run = runOpt || g.descent().run, st = run.battle;
   const ui = (app.state.duel ||= { fast: 0 });
@@ -1120,7 +1120,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
           const p = ev.target.closest('[data-p]')?.dataset.p;
           if (!p) return;
           sh.close();
-          if (p === 'pause') { toast(pause, { icon: 'swords' }); app.go(''); }
+          if (p === 'pause') { toast(pause, { icon: 'swords' }); if (onPause) onPause(); else app.go(''); } /* v378 : la Descente reste sur l'onglet Aventure */
           if (p === 'abandon') onAbandon();
         });
         return;

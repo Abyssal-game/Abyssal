@@ -229,11 +229,21 @@ export default function descent(app, root) {
       ${run.altar.includes(ui.bless) ? `<div class="panel dc-bl-pick"><b>${esc(BLESSINGS[ui.bless].name)}</b><p>${esc(BLESSINGS[ui.bless].desc)}</p><button class="btn primary block" data-act="bless" data-k="${ui.bless}">Recevoir cette bénédiction</button></div>` : '<p class="small muted center dc-bl-hint">Touche une stèle pour lire sa bénédiction.</p>'}
       ${run.rewardsBak ? `<button class="btn ghost block" data-act="unaltar">${icon('back')}Revenir aux bonus</button>` : ''}`;
   }
+  // v378 : combat mis en pause — on reste dans l'onglet Aventure, le combat attend d'être repris
+  function pausedView(run) {
+    root.innerHTML = `${runHead(run)}<section class="panel dc-paused"><h2>${icon('hourglass')} Combat en pause</h2>
+      <p class="small">${run.room === 'boss' ? 'Le gardien' : run.room === 'elite' ? 'L’élite' : 'Le combat'} de l’étage ${run.floor} t’attend, exactement là où tu l’as laissé.</p>
+      <button class="btn primary block big-cta dc-plq dc-plq-red" data-act="resume">${icon('swords')}Reprendre le combat</button></section>
+      <button class="btn ghost small block dc-abandon" data-act="abandon">${icon('p:abandon')}Abandonner l’expédition</button>`;
+  }
   function battleView(run) {
     if (battle) return;
     playing = true;
     const title = `Étage ${run.floor}${run.room === 'boss' ? ' · Gardien' : run.room === 'elite' ? ' · Élite' : ''}`;
-    battle = runDuel(app, root, { title, onAbandon: () => abandon(), onEnd: () => {
+    battle = runDuel(app, root, { title, onAbandon: () => abandon(), onPause: () => {
+      if (battle) { battle.stop(); battle = null; }
+      playing = false; ui.paused = true; app.chrome(); render(); window.scrollTo(0, 0);
+    }, onEnd: () => {
       battle = null; playing = false;
       const stats = run.battle?.stats || null;
       app.pendingProgress = [];
@@ -335,12 +345,13 @@ export default function descent(app, root) {
   }
   function render() {
     const run = g.descent().run;
-    setScene(run?.phase === 'battle' ? null : 'descent');
+    setScene(run?.phase === 'battle' && !ui.paused ? null : 'descent');
+    if (run?.phase !== 'battle') ui.paused = false;
     if (!run) return lobby();
     if (run.phase === 'doors') return doorsView(run);
     if (run.phase === 'altar') return altarView(run);
     if (run.phase === 'reward') return rewardView(run);
-    if (run.phase === 'battle') return battleView(run);
+    if (run.phase === 'battle') return ui.paused ? pausedView(run) : battleView(run);
     if (run.phase === 'pact') return pactView(run);
     if (run.phase === 'omen') return omenView(run);
     return clearedView(run);
@@ -422,6 +433,7 @@ export default function descent(app, root) {
     unaltar() { try { g.cancelAltar(); app.sfx.tap(); render(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     next() { ui.winBar = ''; try { g.nextFloor(); app.sfx.swipe(); render(); window.scrollTo(0, 0); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     abandon() { abandon(); },
+    resume() { ui.paused = false; app.sfx.tap(); render(); },
     cancelrun() { try { g.cancelRun(); ui.omen = null; ui.outcome = null; ui.win = null; app.sfx.tap(); toast('Expédition annulée : ta torche t’est rendue.', { icon: 'back' }); app.chrome(); render(); window.scrollTo(0, 0); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     async leave() {
       if (!(await confirmBox('Remonter maintenant avec ton coffre ?', { ok: 'Remonter' }))) return;
