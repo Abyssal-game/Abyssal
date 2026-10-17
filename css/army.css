@@ -3429,3 +3429,15 @@ html.fx-light .dv-ghost, html.fx-light .dv-cut, html.fx-light .dv-soul::before {
 .dv-row.enemy .dv-c.has-fig:nth-last-child(3) + .dv-c + .dv-c { order: 3; scale: .88; transform-origin: 100% 100%; }
 .dv-row.enemy .dv-c.has-fig { z-index: 4; translate: 0 -15%; scale: 1.16; }
 .dv-c.has-fig .dv-bfig { width: 150%; bottom: 14%; }
+
+/* v380 : jauge de vie sur le médaillon des PV — l'anneau doré se remplit de rubis selon les PV restants (sens horaire depuis
+   le haut), la part perdue s'assombrit ; sous 30 % la jauge rougit et pulse doucement (opacité seulement) */
+.dv-c .dv-hp .hpr { position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+  background: conic-gradient(from 0deg, var(--hpc, #FF5C70) calc(var(--hpp, 100) * 1%), rgba(20, 6, 10, .7) 0);
+  -webkit-mask: radial-gradient(closest-side, transparent 80%, #000 82%, #000 97%, transparent 100%); mask: radial-gradient(closest-side, transparent 80%, #000 82%, #000 97%, transparent 100%); }
+.dv-c .dv-hp.low { --hpc: #FF2236; }
+.dv-c .dv-hp.low .hpr { animation: hprLow 1.1s ease-in-out infinite alternate; }
+@keyframes hprLow { from { opacity: .65; } to { opacity: 1; } }
+.dv-c.dead .dv-hp .hpr { display: none; }
+html.fx-light .dv-c .dv-hp.low .hpr { animation: none; }
+@media (prefers-reduced-motion: reduce) { .dv-c .dv-hp.low .hpr { animation: none; } }

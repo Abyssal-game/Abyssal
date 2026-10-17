@@ -195,7 +195,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       <span class="dv-nm ${u.named || (u.boss && st.bossKey) ? 'named' : ''}">${esc(u.boss && st.bossKey && BOSSES[st.bossKey] ? BOSSES[st.bossKey].name : u.named ? u.title : c.name)}</span>
       ${u.brkMax ? `<span class="cb-brk ${u.broken || u.cracked ? 'is-broken' : ''} ${u.cracked ? 'is-fele' : ''}" title="Brisure">${u.broken ? '<img alt="" src="assets/icons/st-broken.webp"><b>BRISÉ</b>' : u.cracked ? '<b>FÊLÉ</b>' : `<i style="width:${(u.brk / u.brkMax) * 100}%"></i>`}</span>` : ''}
       <span class="dv-atk">${icon('swords')}<b>${u.atk + (u.boost || 0)}</b></span>
-      <span class="dv-hp ${u.hp < u.maxHp ? 'hurt' : ''}">${icon('heart')}<b>${Math.max(0, u.hp)}</b></span>
+      <span class="dv-hp ${u.hp < u.maxHp ? 'hurt' : ''} ${u.hp > 0 && u.hp <= u.maxHp * 0.3 ? 'low' : ''}" style="--hpp:${Math.max(0, Math.min(100, Math.round((Math.max(0, u.hp) / Math.max(1, u.maxHp)) * 100)))}">${icon('heart')}<i class="hpr" aria-hidden="true"></i><b>${Math.max(0, u.hp)}</b></span>
             ${tgt ? `<span class="cb-tgt">${tgt}</span>` : ''}
       ${(() => { const w = enemy && !dead ? cardWarn(u) || ordIntent(u) : ''; return `<span class="cb-above">${statusBand(u, !!w)}${w}</span>`; })()}
     </button>`;
