@@ -37,21 +37,11 @@ test('Présage de la Soif : plus de source, et les créatures se soignent en fra
   assert.equal(run.battle.soif, true);
 });
 
-test('Gouffre : saute 2 étages, jamais par-dessus un gardien, et blesse l’équipe', () => {
-  for (let f = 1; f < 60; f++) for (let d = 0; d < 30; d++) if (gouffreAt(`2026-11-${d}`, f)) { assert.ok(f >= 3); assert.notEqual((f + 1) % 5, 0); assert.notEqual(f % 5, 0); }
+test('v406 : plus de Gouffre dans la campagne (il sautait des étages et leurs récompenses)', () => {
   const g = mk('gf');
   g.team(); g.s.bossesBeaten.devoreur = 1;
   const run = g.startRun(); g.chooseOmen(run.omenOffer[0]);
-  let f = 3; while (!gouffreAt(run.day, f)) f++;
-  run.floor = f;
-  assert.ok(g.doors().includes('gouffre'));
-  const hp = run.team.map((m) => m.hp);
-  const out = g.chooseDoor('gouffre');
-  assert.equal(out.to, f + 2);
-  assert.equal(run.floor, f + 2);
-  assert.equal(run.cleared, f + 1);
-  assert.equal(run.phase, 'doors');
-  run.team.forEach((m, i) => assert.ok(m.hp < hp[i] && m.hp >= 1));
+  for (let f = 1; f < 60; f++) { run.floor = f; assert.ok(!g.doors().includes('gouffre')); }
 });
 
 test('règles du jour : les nouvelles n’apparaissent qu’à partir du 17 octobre 2026, les jours passés gardent la leur', () => {

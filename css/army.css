@@ -3558,3 +3558,26 @@ body:not(.battle-mode):not(:has(.opening)) #toasts { top: calc(var(--app-h, 100d
 body:not(.battle-mode) .btn.small { min-height: 44px; }
 .chip { position: relative; }
 .chip::after { content: ''; position: absolute; inset: -5px -2px; }
+
+/* v406 : la Descente en chapitres (carte du chapitre, étages, rejouer un chapitre) */
+.dc-chap { display: grid; gap: 10px; margin-bottom: 10px; }
+.dc-chap-h { display: flex; align-items: center; gap: 12px; }
+.dc-chap-fig { width: 64px; height: 64px; object-fit: contain; object-position: center bottom; flex: none; filter: drop-shadow(0 4px 10px rgba(0,0,0,.6)); }
+.dc-chap-h > span { display: grid; gap: 2px; min-width: 0; }
+.dc-chap-k { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
+.dc-chap-h b { font-family: var(--font-title, serif); font-size: 1.15rem; }
+.dc-chap-h small { color: var(--muted, #bbb); }
+.dc-chap-floors { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.dc-chap-floors li { display: grid; justify-items: center; gap: 3px; }
+.dc-chap-floors li > span { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.04); font-weight: 700; font-size: .85rem; }
+.dc-chap-floors li > span svg { width: 16px; height: 16px; }
+.dc-chap-floors li small { font-size: .62rem; color: var(--muted, #aaa); white-space: nowrap; }
+.dc-chap-floors li.ok > span { background: rgba(95,208,143,.16); border-color: rgba(95,208,143,.6); color: #8fe3b1; }
+.dc-chap-floors li.next > span { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 0 3px rgba(212,175,55,.15); }
+.dc-chap-floors li.boss > span { border-color: rgba(224,72,94,.55); color: #f08a9a; }
+.dc-chap-floors li.boss.ok > span { color: #8fe3b1; border-color: rgba(95,208,143,.6); }
+.dc-chap-rw { margin: 0; color: var(--muted, #bbb); }
+.dc-starts > summary { cursor: pointer; min-height: 32px; display: flex; align-items: center; }
+.dc-starts .dc-st { min-width: 44px; }
+.dc-first { margin: 8px 0; }
+.dc-first svg { width: 14px; height: 14px; vertical-align: -2px; }

@@ -209,9 +209,9 @@ export function chestsScreen(app, root) {
       <div class="ch-grid">${CHEST_ORDER.map((t) => { const n = g.s.chests[t] || 0; return `<button class="ch-c ${n ? '' : 'none'}" data-act="open" data-t="${t}" style="--cc:${CHESTS[t].color}" ${n ? '' : 'disabled'}>
         <span class="ch-art">${chestSVG(t)}</span>${n ? `<span class="ch-n">${n}</span>` : ''}<b>${esc(CHESTS[t].name)}</b><span class="small">${esc(CHESTS[t].desc)}</span></button>`; }).join('')}</div>
       <details class="panel dc-fold"><summary>${icon('info')} D’où viennent les coffres ?</summary><ul class="small">
-        <li>À la fin d’une expédition, la profondeur atteinte donne le coffre : rien avant l’étage 3, puis étages 3 à 7 bois, 8 à 15 fer, 16 à 24 or, 25 et plus abyssal.</li>
-        <li>La première victoire contre chaque gardien (tous les 5 étages) donne aussi un coffre.</li>
-        <li>Si toute l’équipe tombe, le coffre perd une qualité. En descente maudite, il en gagne une, mais tout est perdu si l’équipe tombe.</li></ul></details>`;
+        <li>Descente : la première victoire au 3e étage de chaque chapitre donne un coffre de bois (de fer dès l’étage 30).</li>
+        <li>Chaque gardien vaincu pour la première fois donne un coffre d’or (étages 5, 15, 25…) ou abyssal (étages 10, 20, 30…).</li>
+        <li>Le Cauchemar redonne ces coffres, d’une qualité au-dessus.</li></ul></details>`;
   };
   bindActions(root, {
     open(el) { openChestScene(app, el.dataset.t, { onDone: () => (app.refresh ? app.refresh() : draw()) }); },

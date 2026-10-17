@@ -21,7 +21,7 @@ export function openCreator(app) {
     sheet.setContent(`
       <h2>${icon('crown')} Mode Créateur</h2>
       <p class="small muted">Tous les pouvoirs sur ta partie. Tant que le mode est actif, tes scores de Descente ne sont pas envoyés au classement mondial, pour qu’il reste équitable.</p>
-      <div class="cr-state small">${fmt(g.s.shards)} éclats · ${fmt(g.s.ash)} cendres · ${g.uniqueCount()}/${g.total()} créatures · ${g.torchesLeft()} torche${g.torchesLeft() > 1 ? 's' : ''}</div>
+      <div class="cr-state small">${fmt(g.s.shards)} éclats · ${fmt(g.s.ash)} cendres · ${g.uniqueCount()}/${g.total()} créatures</div>
 
       <section class="cr-sec"><h3>Sauvegarde de sécurité</h3>
         <p class="small muted">${snap ? `Copie de ta vraie partie du ${new Date(snap.t).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })} (${Object.keys(snap.s.collection || {}).length} créatures).` : 'Fais une copie de ta vraie partie avant de jouer les dieux : tu pourras la retrouver d’un geste.'}</p>
@@ -48,7 +48,7 @@ export function openCreator(app) {
       </section>
 
       <section class="cr-sec"><h3>Descente</h3>
-        <div class="row gap wrap">${B('torches', 'Rendre les torches')}${B('missions', 'Accomplir les missions')}</div>
+        <div class="row gap wrap">${B('missions', 'Accomplir les missions')}</div>
         <form class="cr-give" id="floor"><input class="input plain" name="n" type="number" min="1" max="200" placeholder="Étage" ${d.run ? '' : 'disabled'}><button class="btn small" type="submit" ${d.run ? '' : 'disabled'}>Aller à l’étage</button><button class="btn small" type="submit" name="power" value="1" ${d.run ? '' : 'disabled'}>Avec la puissance attendue</button></form>
         <p class="small muted">${d.run ? `Expédition en cours : étage ${d.run.floor}.` : 'Lance une Descente pour pouvoir sauter d’étage.'}</p>
       </section>

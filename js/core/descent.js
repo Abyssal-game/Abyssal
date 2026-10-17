@@ -4,9 +4,24 @@ import { RARITY_ORDER } from '../config.js';
 import { COMBAT_BLESSINGS } from './skills.js';
 
 export const DESCENT = {
-  torches: 3,            // expéditions avec coffre par jour
+  torches: 3,            // (v406 : plus de limite par jour ; gardé pour les anciennes sauvegardes et le Mode Créateur)
   bossEvery: 5,
 };
+// v406 : la Descente devient la campagne du jeu, en chapitres de 5 étages (4 étages puis un gardien). Les PV se gardent
+// d'un étage à l'autre dans un chapitre ; si l'équipe tombe, on recommence le chapitre, jamais depuis l'étage 1.
+export const CHAPTER = DESCENT.bossEvery;
+export const CHAPTERS = 20;
+export const chapterOf = (floor) => Math.max(1, Math.ceil(floor / CHAPTER));
+export const chapterStart = (ch) => (ch - 1) * CHAPTER + 1;
+// Récompense de la première victoire à chaque étage (rien de plus en rejouant, hors petits gains des combats) :
+// éclats et cendres qui grandissent avec la profondeur, un coffre au 3e étage de chaque chapitre (bois, puis fer dès
+// l'étage 30), et pour chaque gardien un coffre d'or (étages 5, 15, 25…) ou abyssal (étages 10, 20, 30…).
+export function floorFirstReward(floor) {
+  if (floor % CHAPTER === 0) return { chests: { [(floor / CHAPTER) % 2 ? 'or' : 'abyssal']: 1 } };
+  const r = { shards: Math.round(8 + floor * 1.5), ash: 3 + Math.round(floor / 4) };
+  if (floor % CHAPTER === 3) r.chests = { [floor >= 30 ? 'fer' : 'bois']: 1 };
+  return r;
+}
 
 // Bénédictions de l'autel (pour toute l'expédition)
 export const BLESSINGS = {

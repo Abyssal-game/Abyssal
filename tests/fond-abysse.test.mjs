@@ -47,7 +47,7 @@ test('v405 : après le fond, l’objectif de l’Accueil ne vise jamais au-delà
   const depth = () => g.goals().find((x) => x.kind === 'depth');
   const goal = depth();
   assert.doesNotMatch(goal.title, /\d/);
-  assert.match(goal.title, /fond de l’Abysse/);
+  assert.match(goal.title, /Cauchemar/);
   g.s.descent.best = 103;
   assert.ok(!/1\d\d/.test(depth().title));
 });

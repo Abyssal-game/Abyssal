@@ -1,7 +1,7 @@
 // L'Aventure (la Descente) : ton équipe de cartes descend dans l'Abysse, étage par étage,
 // affronte les créatures corrompues en duel et rapporte un coffre (éclats ou booster).
 import { RARITY, BOOSTERS, FINAL_FLOOR } from '../config.js';
-import { DESCENT, ROOMS, BLESSINGS, CHESTS, floorFloor, CHECKPOINT_MIN, OMENS, powerFor, powerPts } from '../core/descent.js';
+import { DESCENT, ROOMS, BLESSINGS, CHESTS, floorFloor, OMENS, powerFor, powerPts, CHAPTER, CHAPTERS, chapterOf, chapterStart, floorFirstReward } from '../core/descent.js';
 import { TEAM, BUDGET } from '../core/army.js';
 import { BOSSES, bossOf } from '../core/bosses.js';
 import { PACTS } from '../core/pacts.js';
@@ -25,7 +25,7 @@ import { sync } from '../cloud/sync.js';
 
 // Illustrations des portes et des bonus
 const DOOR_ART = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss', gouffre: 'door-gouffre', rest: 'rest', altar: 'altar', treasure: 'treasure' };
-const HOW = [['cards', '#7FA8D8', 'Ton équipe', '5 de tes cartes : 3 au combat, 2 en réserve. Les cendres de la Fournaise les font monter de niveau.'], ['swords', '#E0485E', 'Le combat', 'Chacun son tour, dans l’ordre de la vitesse : chaque créature joue une fois par tour avec ses propres PA. L’attaque en rapporte, les compétences en coûtent. La Ferveur lance le pouvoir d’équipe ; tu en gardes 3 au plus d’un combat à l’autre.'], ['dodge', '#9FE0FF', 'Lire et parer', 'Les gardiens et les élites annoncent leurs grosses attaques. Contre les attaques dangereuses, touche au bon moment : esquive, ou parade parfaite. Brise les élites et les gardiens pour annuler leur coup.'], ['book', '#B48CFF', 'Connaître l’ennemi', 'Posséder la carte d’une créature corrompue donne +1 dégât contre elle.'], ['depth', '#F2C14E', 'Chaque étage', 'Combat simple ou élite, puis un bonus au choix : source, autel ou trésor. Gardien tous les 5 étages. Parfois, un gouffre permet de sauter 2 étages, au prix de 20 % des PV.'], ['omen', '#B48CFF', 'Le présage', 'Après ton premier gardien vaincu, chaque expédition commence par un présage au choix parmi trois : un avantage et un prix pour toute l’expédition.'], ['chest', '#E8C35A', 'Le coffre', 'Remonte quand tu veux : plus tu descends, plus le coffre est beau (bois, fer, or, abyssal).'], ['crown', '#B04BFF', 'Le fond : étage 100', 'L’étage 100 est le dernier : L’Abysse y attend. Le vaincre termine l’expédition et donne le Booster de l’Abysse (5 cartes, une Mythique ou mieux, toutes en finition), et la première fois une Secrète que tu n’as pas.']];
+const HOW = [['cards', '#7FA8D8', 'Ton équipe', '5 de tes cartes : 3 au combat, 2 en réserve. Les cendres de la Fournaise les font monter de niveau.'], ['swords', '#E0485E', 'Le combat', 'Chacun son tour, dans l’ordre de la vitesse : chaque créature joue une fois par tour avec ses propres PA. L’attaque en rapporte, les compétences en coûtent. La Ferveur lance le pouvoir d’équipe ; tu en gardes 3 au plus d’un combat à l’autre.'], ['dodge', '#9FE0FF', 'Lire et parer', 'Les gardiens et les élites annoncent leurs grosses attaques. Contre les attaques dangereuses, touche au bon moment : esquive, ou parade parfaite. Brise les élites et les gardiens pour annuler leur coup.'], ['book', '#B48CFF', 'Connaître l’ennemi', 'Posséder la carte d’une créature corrompue donne +1 dégât contre elle.'], ['depth', '#F2C14E', 'Les chapitres', 'La Descente compte 20 chapitres de 5 étages : quatre étages (combat simple ou élite, puis un bonus au choix : source, autel ou trésor), puis le gardien. Tes PV se gardent d’un étage à l’autre. Si ton équipe tombe, tu recommences le chapitre, jamais depuis le début.'], ['omen', '#B48CFF', 'Le présage', 'Après ton premier gardien vaincu, chaque expédition commence par un présage au choix parmi trois : un avantage et un prix pour toute l’expédition.'], ['chest', '#E8C35A', 'Les récompenses', 'La première victoire à chaque étage rapporte des éclats et des cendres, de plus en plus en descendant, et un coffre au 3e étage de chaque chapitre. Chaque gardien donne un coffre d’or (étages 5, 15, 25…) ou un coffre abyssal (étages 10, 20, 30…). Rejouer un chapitre ne rapporte que les petits gains des combats.'], ['crown', '#B04BFF', 'Le fond : étage 100', 'L’étage 100 est le dernier : L’Abysse y attend. Le vaincre donne le Booster de l’Abysse (5 cartes, une Mythique ou mieux, toutes en finition) avec une Secrète que tu n’as pas.']];
 const DOOR_PIC = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss', gouffre: 'stairs-down' };
 const ROOM_ICON = { gouffre: 'next', fight: 'swords', elite: 'skull', altar: 'star', rest: 'heart', treasure: 'crystal', boss: 'crown' };
 
@@ -40,43 +40,50 @@ export default function descent(app, root) {
   const ruleHTML = (r) => `<section class="panel dc-rule bn-rule" style="--rf:${r.faction ? cat.faction[r.faction].colors.secondary : 'var(--gold)'}"><span class="dc-rule-ic">${r.faction ? sigil(r.faction) : picon('rule')}</span><span><span class="small muted">Règle du jour</span><b>${esc(r.name)}</b><span class="small">${esc(r.desc)}</span></span></section>`;
   const chestChip = (c) => (c ? `<span class="v2-chest-chip" style="--cc:${CHESTS[c].color}">${icon('p:chest')} ${esc(CHESTS[c].name)}</span>` : '<span class="v2-chest-chip none">aucun coffre</span>');
 
-  // v331 : départs avancés, ouverts par les gardiens déjà vaincus (étages 6, 11, 16…)
-  const startFloor = () => (g.startFloors().includes(ui.start) ? ui.start : 1);
-  function startsHTML() {
+  // v406 : la campagne en chapitres de 5 étages ; le chapitre choisi (en cours par défaut, ou un chapitre à rejouer)
+  const chapNow = () => g.chapterNow();
+  const startFloor = () => (g.startFloors().includes(ui.start) ? ui.start : chapterStart(chapNow()));
+  const chapDone = (ch) => (g.descent().best || 0) >= ch * CHAPTER;
+  const bossChest = (ch) => ((ch % 2) ? 'or' : 'abyssal');
+  const rewardLine = (r) => [r.shards && `${icon('crystal')}+${fmt(r.shards)}`, r.ash && `${icon('ash')}+${fmt(r.ash)}`, ...Object.keys(r.chests || {}).map((c) => `<span style="color:${CHESTS[c].color}">${icon('p:chest')}${esc(CHESTS[c].name)}</span>`)].filter(Boolean).join(' ');
+  function chapterHTML() {
+    const d = g.descent(), best = d.best || 0, start = startFloor(), ch = chapterOf(start), done = chapDone(ch), bk = bossOf(ch * CHAPTER), B = BOSSES[bk];
+    const floors = Array.from({ length: CHAPTER }, (_, i) => start + i);
+    return `<div class="dc-chap ${done ? 'done' : ''}">
+      <div class="dc-chap-h">${BOSS_FIGS.has(bk) ? `<img class="dc-chap-fig" alt="" src="assets/bosses/${bk}.webp">` : ''}<span><span class="dc-chap-k">Chapitre ${ch} / ${CHAPTERS}${done ? ' · terminé' : ''}</span><b>${esc(B.name)}</b><small>${esc(B.title)}</small></span></div>
+      <ol class="dc-chap-floors">${floors.map((f) => `<li class="${f <= best ? 'ok' : ''} ${f === best + 1 ? 'next' : ''} ${f % CHAPTER === 0 ? 'boss' : ''}"><span>${f <= best ? icon('check') : f % CHAPTER === 0 ? icon('crown') : f}</span><small>${f % CHAPTER === 0 ? 'Gardien' : `Étage ${f}`}</small></li>`).join('')}</ol>
+      <p class="small dc-chap-rw">${done ? `Chapitre déjà terminé : le rejouer ne rapporte que les petits gains des combats${g.nightmareUnlocked() ? ', sauf en <b>Cauchemar</b>' : ''}.` : `Chaque étage gagné pour la première fois rapporte des éclats et des cendres. Gardien vaincu : <b style="color:${CHESTS[bossChest(ch)].color}">${esc(CHESTS[bossChest(ch)].name.toLowerCase())}</b>.`}</p>
+    </div>${chapsHTML()}`;
+  }
+  function chapsHTML() {
     const fl = g.startFloors();
     if (fl.length < 2) return '';
     const s = startFloor();
-    return `<div class="dc-starts"><span class="small muted">Départ</span><div class="dc-starts-row">${fl.map((f) => `<button class="dc-st ${f === s ? 'on' : ''}" data-act="startat" data-f="${f}" aria-pressed="${f === s}">Étage ${f}</button>`).join('')}</div>
-      <p class="small muted">${s > 1 ? `Tu commences à l’étage ${s}, après le gardien de l’étage ${s - 1}. Le coffre de fin est <b>d’une qualité en dessous</b>, et il faut franchir au moins ${CHECKPOINT_MIN} étages pour en rapporter un. Ne compte pas pour le classement du jour.` : 'Chaque gardien vaincu ouvre un départ juste après lui : tu évites les premiers étages, mais le coffre est d’une qualité en dessous.'}</p></div>`;
+    return `<details class="dc-starts" ${chapterOf(s) !== chapNow() ? 'open' : ''}><summary class="small muted">Rejouer un chapitre</summary><div class="dc-starts-row">${fl.map((f) => { const c = chapterOf(f); return `<button class="dc-st ${f === s ? 'on' : ''}" data-act="startat" data-f="${f}" aria-pressed="${f === s}">${c === chapNow() && !chapDone(c) ? `${c} · en cours` : c}</button>`; }).join('')}</div></details>`;
   }
 
   // ——— Accueil de l'Aventure ———————————————————————————————————————————
   function lobby() {
-    const d = g.descent(), torches = g.torchesLeft(), last = ui.outcome, team = g.team(), chests = g.chestCount();
+    const d = g.descent(), last = ui.outcome, team = g.team(), chests = g.chestCount();
     if (g.s.armyNews) { delete g.s.armyNews; g.persist(); } // ancien message de transition (héros → cartes) : retiré
-    const news = false;
-    root.innerHTML = `<header class="screen-head dc-head ui-hero bn-descente"><h1>La Descente</h1><p class="muted">${d.best ? `Ton record : étage ${d.best}${d.bestToday ? ` · aujourd’hui : ${d.bestToday}` : ''}` : 'Descends, survis, rapporte un coffre.'}</p></header>
-      ${news ? `<section class="panel ornate dc-news"><div class="dc-new-h"><span class="dc-new-ic">${icon('sparkle')}</span><span><b>Tes cartes combattent !</b><span class="small">Les héros ont quitté l’Abysse : ce sont maintenant tes créatures qui descendent. Chaque doublon fait monter une carte de niveau.</span>${news.shards ? `<span class="small">Ton ancien équipement et l’expérience de tes héros ont été changés en <b>${fmt(news.shards)} éclats</b>. Tes coffres sont gardés : ils contiennent maintenant des boosters.</span>` : ''}</span></div><button class="btn small ghost" data-act="news">OK</button></section>` : ''}
+    const start = startFloor(), ch = chapterOf(start), replay = chapDone(ch), night = ui.nightmare && replay && g.nightmareUnlocked();
+    root.innerHTML = `<header class="screen-head dc-head ui-hero bn-descente"><h1>La Descente</h1><p class="muted">${g.campaignDone() ? 'Tu as atteint le fond de l’Abysse' : d.best ? `Chapitre ${chapNow()} sur ${CHAPTERS} · étage ${d.best}` : 'Descends étage par étage jusqu’au fond de l’Abysse.'}</p></header>
       ${last ? summaryHTML(last) : ''}
       ${chests ? `<a class="panel dc-chests" href="#/coffres"><span class="dc-new-ic">${icon('p:chest')}</span><span><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Éclats et boosters</span></span>${icon('next')}</a>` : ''}
       <section class="panel dc-go">
-        <div class="dc-banner bn-expedition"><b>Expédition</b><span class="small">${d.best ? `Record : étage ${d.best}` : 'Ta première descente t’attend'}</span></div>
-        <div class="dc-go-top"><span class="dc-torches">${Array.from({ length: DESCENT.torches }, (_, i) => `<i class="${i < torches ? 'on' : ''}">${picon(i < torches ? 'torch-on' : 'torch-off')}</i>`).join('')}</span><span class="small muted">${torches ? `${torches} expédition${torches > 1 ? 's' : ''} avec coffre aujourd’hui` : 'Expéditions du jour faites : tu peux encore t’entraîner'}</span></div>
+        ${chapterHTML()}
         ${teamStrip(team)}
         <p class="small muted center">Pouvoir : <b>${esc(g.ultimate(team).name)}</b> · budget ${g.teamCost(team)} / ${BUDGET}</p>
         ${levelHint(team, d)}
         <div class="dc-teambtns"><a class="btn small ghost dc-plq dc-plq-dark" href="#/equipe">${icon('p:team-ic')}Mon équipe</a><a class="btn small ghost dc-plq dc-plq-dark" href="#/renfort">${icon('p:level-up')}Renforcer</a></div>
         ${team.length < TEAM.active ? (g.welcomePending() ? `<a class="btn gold block" href="#/boutique">${icon('ticket')}Ouvre d’abord tes boosters de bienvenue</a>` : `<p class="small v2-warn center">${icon('info')} Ajoute au moins ${TEAM.active} créatures à ton équipe pour descendre.</p>`) : ''}
-        ${startsHTML()}
-        <button class="btn ${!torches ? 'ghost' : ui.cursed ? 'danger' : 'primary'} block big-cta dc-plq ${torches ? 'dc-plq-red' : 'dc-plq-dark'}" data-act="start" ${team.length >= TEAM.active ? '' : 'disabled'}>${icon('p:descend')}${torches ? 'Descendre' : 'Entraînement'}</button>
-        ${torches ? '' : '<p class="small muted center dc-train">Entraînement : ni coffre, ni cendres, ni saison, éclats réduits de moitié. Les créatures vaincues comptent quand même pour ta Chasse. Tes torches reviennent à minuit.</p>'}
-        <div class="dc-opts">
-          ${torches && g.s.bossesBeaten?.devoreur ? `<button class="dc-opt ${ui.cursed ? 'on' : ''}" data-act="curse" aria-pressed="${ui.cursed}">${icon('skull')}<b>Maudite</b><small>${riskLine('cursed', 'coffre +1, rien si l’équipe tombe')}</small></button>` : ''}
-          ${g.nightmareUnlocked() ? `<button class="dc-opt dc-opt-night ${ui.nightmare ? 'on' : ''}" data-act="night" aria-pressed="${ui.nightmare}">${icon('skull')}<b>Cauchemar</b><small>${riskLine('night', g.nightBest(nt()) ? `record : étage ${g.nightBest(nt())}` : `ennemis +${Math.round((NIGHT_TIERS[nt()].hp - 1) * 100)} % PV, +${Math.round((NIGHT_TIERS[nt()].atk - 1) * 100)} % ATQ`)} · départ ≈ étage ${g.nightmareEquiv(startFloor(), nt())}</small></button>` : `<button class="dc-opt off" data-act="optinfo">${icon('lock')}<b>Cauchemar</b><small>dès l’étage ${NIGHTMARE_AT}</small></button>`}
-          <button class="dc-opt-info icon-btn" data-act="optinfo" aria-label="Explications des modes">${icon('info')}</button>
-        </div>
-        ${ui.nightmare && g.nightmareUnlocked() ? `<div class="dc-ntiers" role="radiogroup" aria-label="Palier du Cauchemar">${[1, 2, 3].map((t) => { const open = g.nightTierOpen(t); return `<button class="dc-nt ${nt() === t ? 'on' : ''} ${open ? '' : 'off'}" role="radio" aria-checked="${nt() === t}" data-act="ntier" data-t="${t}" ${open ? '' : 'disabled'}><b>${['', 'I', 'II', 'III'][t]}</b><small>${open ? `coffre +${NIGHT_TIERS[t].chest} · éclats ×${String(NIGHT_TIERS[t].shards).replace('.', ',')}` : `${icon('lock')} étage ${NIGHT_TIER_OPEN} en ${['', 'I', 'II'][t - 1]}`}</small></button>`; }).join('')}</div>` : ''}
-        ${ui.cursed || ui.nightmare ? `<p class="small dc-riskwarn">${icon('skull')} ${[ui.cursed ? 'Maudite : si l’équipe tombe, <b>tu perds tout</b> (éclats et coffres).' : '', ui.nightmare ? `${NIGHT_TIERS[nt()].name} : dès ton premier combat, les ennemis ont la force de l’<b>étage ${g.nightmareEquiv(startFloor(), nt())}</b> en mode normal, et les gardiens sont déchaînés.` : ''].filter(Boolean).join(' ')}${riskAdvice()}</p>` : ''}
+        <button class="btn primary block big-cta dc-plq dc-plq-red" data-act="start" ${team.length >= TEAM.active ? '' : 'disabled'}>${icon('p:descend')}${replay ? `Rejouer le chapitre ${ch}` : d.best ? `Commencer le chapitre ${ch}` : 'Commencer la Descente'}</button>
+        ${replay ? `<div class="dc-opts">
+          ${g.nightmareUnlocked() ? `<button class="dc-opt dc-opt-night ${ui.nightmare ? 'on' : ''}" data-act="night" aria-pressed="${!!ui.nightmare}">${icon('skull')}<b>Cauchemar</b><small>${g.nightBest(nt()) ? `record : étage ${g.nightBest(nt())}` : `ennemis +${Math.round((NIGHT_TIERS[nt()].hp - 1) * 100)} % PV, +${Math.round((NIGHT_TIERS[nt()].atk - 1) * 100)} % ATQ`} · récompenses ×${String(NIGHT_TIERS[nt()].shards).replace('.', ',')}</small></button>` : `<button class="dc-opt off" data-act="optinfo">${icon('lock')}<b>Cauchemar</b><small>dès l’étage ${NIGHTMARE_AT}</small></button>`}
+          <button class="dc-opt-info icon-btn" data-act="optinfo" aria-label="Explications du Cauchemar">${icon('info')}</button>
+        </div>` : ''}
+        ${night ? `<div class="dc-ntiers" role="radiogroup" aria-label="Palier du Cauchemar">${[1, 2, 3].map((t) => { const open = g.nightTierOpen(t); return `<button class="dc-nt ${nt() === t ? 'on' : ''} ${open ? '' : 'off'}" role="radio" aria-checked="${nt() === t}" data-act="ntier" data-t="${t}" ${open ? '' : 'disabled'}><b>${['', 'I', 'II', 'III'][t]}</b><small>${open ? `coffres +${NIGHT_TIERS[t].chest} · éclats ×${String(NIGHT_TIERS[t].shards).replace('.', ',')}` : `${icon('lock')} étage ${NIGHT_TIER_OPEN} en ${['', 'I', 'II'][t - 1]}`}</small></button>`; }).join('')}</div>
+        <p class="small dc-riskwarn">${icon('skull')} ${NIGHT_TIERS[nt()].name} : les ennemis ont la force de l’<b>étage ${g.nightmareEquiv(start, nt())}</b> en mode normal, et les gardiens sont déchaînés. Chaque étage gagné pour la première fois à ce palier redonne sa récompense, en plus généreux.${riskAdvice()}</p>` : ''}
       </section>
       ${summitHTML(d)}
       ${ruleHTML(g.rule())}
@@ -143,23 +150,28 @@ export default function descent(app, root) {
         <div class="dc-sm-bar"><span class="progress"><i style="width:${(best / FINAL_FLOOR) * 100}%"></i></span><small>Ton record : ${best} / ${FINAL_FLOOR}</small></div></div></section>`;
   }
   function summaryHTML(s) {
+    const ch = s.chapterDone || s.chapter || chapterOf(s.start || 1), next = s.chapterDone && !s.summit && s.chapterDone < CHAPTERS ? s.chapterDone + 1 : 0;
+    const title = s.summit ? 'Le fond de l’Abysse' : s.chapterDone ? `Chapitre ${ch} terminé` : s.abandoned ? 'Chapitre abandonné' : 'L’équipe est tombée';
+    const sub = s.summit ? 'L’Abysse est vaincue. Tu es descendu au plus profond de la Descente.' : s.chapterDone ? `${s.boss ? `${esc(BOSSES[s.boss.key]?.name || 'Le gardien')} est vaincu. ` : ''}${next ? `Le chapitre ${next} est ouvert.` : ''}` : `Tu gardes tout ce que tu as gagné. Le chapitre ${ch} reprendra à l’étage ${chapterStart(ch)}.`;
+    const fl = s.firstLoot;
     return `<section class="dc-sum2 ${s.wiped ? 'lost' : 'won'}">
-      ${crestHTML(!s.wiped, s.floor, s.floor > 1 ? 'Étages' : 'Étage', 'dc-sum2-crest')}
-      <h2>${s.summit ? 'Le fond de l’Abysse' : s.abandoned ? 'Expédition abandonnée' : s.wiped ? 'L’équipe est tombée' : 'Retour à la surface'}</h2>
-      <p class="dc-sum2-sub">${s.summit ? 'L’Abysse est vaincu. Tu remontes avec tout ton butin, du plus profond de la Descente.' : s.wiped ? (s.cursed ? 'Descente maudite : le butin est perdu.' : 'Tu gardes la moitié des éclats et un coffre plus modeste.') : 'Tu remontes avec tout ton butin.'}</p>
-      ${s.summit && !s.free ? `<a class="panel dc-summit-win" href="#/boutique"><img alt="" src="assets/packs/abysse.webp"><span><b>Booster de l’Abysse</b><span class="small">Il t’attend dans les Boosters.${s.abyss ? ' Avec, la première fois, une Secrète que tu n’as pas encore.' : ''}</span></span></a>` : ''}
+      ${crestHTML(!s.wiped, s.chapterDone ? ch : s.floor, s.chapterDone ? 'Chapitre' : (s.floor > 1 ? 'Étages' : 'Étage'), 'dc-sum2-crest')}
+      <h2>${title}</h2>
+      <p class="dc-sum2-sub">${sub}</p>
+      ${s.boss && s.chapterDone ? bossRecap(s.boss) : ''}
+      ${s.abyssPack ? `<a class="panel dc-summit-win" href="#/boutique"><img alt="" src="assets/packs/abysse.webp"><span><b>Booster de l’Abysse</b><span class="small">Il t’attend dans les Boosters.${s.abyss ? ' Avec une Secrète que tu n’as pas encore.' : ''}</span></span></a>` : ''}
       ${s.abyss ? `<p class="vx-week vx-first">${icon('crown')} Titre « Vainqueur de l’Abysse », Cadre de l’Œil de l’Abysse et <b>2 coffres abyssaux</b> !</p>` : ''}
-      ${s.chests.length ? `<a class="btn primary block dc-plq dc-plq-red dc-chestcta" href="#/coffres">${icon('p:chest')}Ouvrir ${s.chests.length > 1 ? 'mes coffres' : 'mon coffre'}</a>` : ''}
-      ${s.record ? `<p class="vx-week dc-record">${icon('crown')} <b>Nouveau record !</b> Jamais tu n’étais descendu aussi bas : étage ${s.floor}.</p>` : ''}
+      ${next ? `<button class="btn primary block big-cta dc-plq dc-plq-red" data-act="nextchap" data-c="${next}">${icon('p:descend')}Commencer le chapitre ${next}</button>` : ''}
+      ${s.chests.length ? `<a class="btn ${next ? 'gold' : 'primary'} block dc-plq ${next ? 'dc-plq-dark' : 'dc-plq-red'} dc-chestcta" href="#/coffres">${icon('p:chest')}Ouvrir ${s.chests.length > 1 ? 'mes coffres' : 'mon coffre'}</a>` : ''}
+      ${s.record && !s.chapterDone ? `<p class="vx-week dc-record">${icon('crown')} <b>Nouveau record !</b> Jamais tu n’étais descendu aussi bas : étage ${s.floor}.</p>` : ''}
       ${s.nightmareRecord ? `<p class="vx-week">${icon('skull')} Nouveau record en ${(NIGHT_TIERS[s.nightTier || 1] || NIGHT_TIERS[1]).name} : étage ${s.floor} !</p>` : ''}
       ${s.wiped && app.state.lastEnemyTurn ? `<details class="dc-why dc-last"><summary>${icon('eye')} Voir le dernier tour ennemi</summary><ul class="dc-last-ul">${app.state.lastEnemyTurn}</ul></details>` : ''}
       ${s.feats && s.feats.wins ? `<div class="dc-feats">${[[s.feats.hit, 'Plus gros coup', 'hit'], [s.feats.kills, 'Ennemis vaincus', 'kills'], [s.feats.syn, 'Synergies', 'syn'], [s.feats.breaks, 'Brisures', 'breaks'], [s.feats.perfect, 'Frappes parfaites', 'perfect'], [s.feats.parries, 'Parades', 'parries']].filter(([n]) => n > 0).map(([n, l, ic]) => `<span class="dc-feat"><img class="dc-feat-ic" alt="" src="assets/icons/ft-${ic}.webp"><b>${n}</b><small>${l}</small></span>`).join('')}</div>` : ''}
-      ${s.mvp && cat.get(s.mvp.id) ? `<p class="vx-week dc-mvp">${icon('star')} <b>${esc(cat.get(s.mvp.id).name)}</b> a achevé ${s.mvp.n} ennemis pendant l’expédition.</p>` : ''}
-      ${s.nextChest ? `<p class="vx-week dc-next">${icon('p:chest')} Prochain palier : <b>${esc(CHESTS[s.nextChest.chest].name.toLowerCase())}</b> dès l’étage ${s.nextChest.floor}.</p>` : ''}
+      ${s.mvp && cat.get(s.mvp.id) ? `<p class="vx-week dc-mvp">${icon('star')} <b>${esc(cat.get(s.mvp.id).name)}</b> a achevé ${s.mvp.n} ennemis pendant le chapitre.</p>` : ''}
       ${s.shardsNow !== undefined ? boosterProgressHTML(s.shardsNow) : ''}
       ${s.wiped ? weakHint((s.floor || 0) + 1) : ''}
-      ${s.report?.length ? `<div class="dc-why"><b>${icon('info')} Ce qui s’est passé</b>${s.report.map((l) => `<p class="small">${esc(l)}</p>`).join('')}${s.wiped && g.s.settings.defense === 'auto' ? '<p class="small">Ta défense est en <b>automatique</b> : elle n’esquive que 4 coups sur 10 et ne pare jamais. Essaie la défense <b>assistée</b> (Réglages → Jeu).</p>' : ''}</div>` : ''}
-      <div class="dc-sum2-loot">${s.chests.map((c) => `<span class="dc-sum2-chest" style="--cc:${CHESTS[c].color}">${chestSVG(c)}<b>${esc(CHESTS[c].name)}</b></span>`).join('')}${s.shards ? `<span class="dc-sum2-shards">${icon('crystal')}<b>+${fmt(s.shards)}</b><small>éclats</small></span>` : ''}${!s.chests.length && !s.shards ? '<span class="dc-sum2-sub">Aucun butin cette fois.</span>' : ''}</div>
+      ${s.report?.length ? `<div class="dc-why"><b>${icon('info')} Ce qui s’est passé</b>${s.report.map((l) => `<p class="small">${esc(l)}</p>`).join('')}${s.wiped && g.s.settings.defense === 'auto' ? '<p class="small">Ta défense est en <b>automatique</b> : elle n’esquive que 4 coups sur 10 et ne pare jamais. Essaie la défense <b>manuelle</b> (Réglages → Jeu).</p>' : ''}</div>` : ''}
+      <div class="dc-sum2-loot">${s.chests.map((c) => `<span class="dc-sum2-chest" style="--cc:${CHESTS[c].color}">${chestSVG(c)}<b>${esc(CHESTS[c].name)}</b></span>`).join('')}${(fl?.shards || 0) + s.shards ? `<span class="dc-sum2-shards">${icon('crystal')}<b>+${fmt((fl?.shards || 0) + s.shards)}</b><small>éclats</small></span>` : ''}${fl?.ash ? `<span class="dc-sum2-shards">${icon('ash')}<b>+${fmt(fl.ash)}</b><small>cendres</small></span>` : ''}${!s.chests.length && !s.shards && !fl?.shards ? '<span class="dc-sum2-sub">Aucun butin cette fois.</span>' : ''}</div>
       <div class="dc-sum2-row"><button class="btn dc-plq dc-plq-dark" data-act="share">${icon('copy')}Partager</button><button class="btn dc-plq dc-plq-dark" data-act="dismiss">Continuer</button></div>
     </section>`;
   }
@@ -188,7 +200,7 @@ export default function descent(app, root) {
   const BOSS_FIGS = new Set(['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'golem', 'peste', 'chasseur', 'voeux', 'titan', 'jumeaux', 'juge', 'bete', 'abysse']);
   const bossDoor = (run) => { const k = bossOf(run.floor), b = BOSSES[k], wild = run.nightmare || run.floor >= AWAKEN_AT;
     return `<span class="dc-bdoor">${BOSS_FIGS.has(k) ? `<img class="dc-bfig" alt="" src="assets/bosses/${k}.webp">` : ''}<b class="dc-bname">${esc(b.name)}</b><span class="dc-btitle">${esc(b.title)}</span>${wild ? '<span class="dc-bwild">Déchaîné · furie dès le 1er tour</span>' : ''}</span>`; };
-  const runHead = (run) => `<header class="dc-run-head"><div><span class="small muted">${run.nightmare ? `<span class="dc-bad">${icon('skull')} ${nightTier(run).name}</span> · ` : ''}${run.free ? 'Entraînement (ni coffre, ni cendres)' : run.cursed ? `<span class="dc-bad">${icon('skull')} Maudite</span>` : 'La Descente'}</span><h1>Étage ${run.floor}</h1>${run.omen && OMENS[run.omen] ? `<button class="dc-omen-pill" data-act="omeninfo">${icon(OMENS[run.omen].icon)} ${esc(OMENS[run.omen].name)}</button>` : ''}</div><div class="dc-loot"><span>${icon('crystal')}${fmt(run.shards)}</span>${run.chests.length ? `<span>${icon('p:chest')}${run.chests.length}</span>` : ''}</div></header>
+  const runHead = (run) => `<header class="dc-run-head"><div><span class="small muted">${run.nightmare ? `<span class="dc-bad">${icon('skull')} ${nightTier(run).name}</span> · ` : ''}Chapitre ${chapterOf(run.start || run.floor)}${g.firstClear(run) ? '' : ' · déjà franchi'}</span><h1>Étage ${run.floor}</h1>${run.omen && OMENS[run.omen] ? `<button class="dc-omen-pill" data-act="omeninfo">${icon(OMENS[run.omen].icon)} ${esc(OMENS[run.omen].name)}</button>` : ''}</div><div class="dc-loot"><span>${icon('crystal')}${fmt(run.shards)}</span>${run.chests.length ? `<span>${icon('p:chest')}${run.chests.length}</span>` : ''}</div></header>
     ${teamStrip(run.team.map((m) => m.id), run, run.phase !== 'battle')}
     ${run.phase !== 'battle' && run.team.filter((m) => !m.fallen).length > 1 ? `<p class="dc-swap-hint small muted">${ui.tsel != null ? 'Touche la créature avec qui échanger sa place.' : 'Touche deux créatures pour échanger leur place : les 3 premières combattent.'}</p>` : ''}
     <p class="dc-rule-line small">${picon('rule')} <b>${esc(g.rule(run.day).name)}</b> · ${esc(g.rule(run.day).desc)}</p>`;
@@ -196,19 +208,21 @@ export default function descent(app, root) {
     const doors = g.doors();
     root.innerHTML = `${runHead(run)}<p class="dc-prompt">${doors.includes('boss') ? 'Un gardien barre la route.' : doors.includes('gouffre') ? 'Deux passages… et un gouffre qui plonge plus bas.' : doors.length > 1 ? 'Deux passages. Le plus dangereux rapporte plus.' : 'Des créatures barrent le passage.'}</p>
       <div class="dc-doors">${doors.map((r) => `<button class="dc-door r-${r} has-art" data-act="door" data-r="${r}" style="--art:url(${sceneUrl(DOOR_ART[r])})"><span class="dc-door-art"></span><span class="dc-door-ic ${DOOR_PIC[r] ? 'pic' : ''}">${DOOR_PIC[r] ? picon(DOOR_PIC[r]) : icon(ROOM_ICON[r])}</span><b>${ROOMS[r].name}</b><span class="small">${r === 'boss' ? bossDoor(run) : r === 'gouffre' ? `Tu arrives directement à l’étage ${run.floor + 2}${(run.floor + 2) % DESCENT.bossEvery === 0 ? ', <strong class="dc-bad">devant le gardien</strong>' : ''}, sans combat ni butin. La chute coûte <strong>20 % des PV</strong> à chaque créature.` : ROOMS[r].desc}</span></button>`).join('')}</div>
-      ${run.cleared >= (run.start || 1) ? `<button class="btn ghost block" data-act="leave">${icon('back')}Remonter</button>` : ''}
-      ${g.canCancelRun() ? `<button class="btn ghost block dc-cancel" data-act="cancelrun">${icon('back')}Annuler l’expédition</button><p class="small muted center">Rien n’a encore été joué : ta torche t’est rendue.</p>` : `<button class="btn ghost small block dc-abandon" data-act="abandon">${icon('p:abandon')}Abandonner l’expédition</button>`}`;
+      ${firstLine(run)}
+      ${g.canCancelRun() ? `<button class="btn ghost block dc-cancel" data-act="cancelrun">${icon('back')}Annuler</button><p class="small muted center">Rien n’a encore été joué : tu peux revenir sans conséquence.</p>` : `<button class="btn ghost small block dc-abandon" data-act="abandon">${icon('p:abandon')}Abandonner le chapitre</button>`}`;
+  }
+  // v406 : ce que rapporte la première victoire à cet étage
+  function firstLine(run, floor = run.floor) {
+    if (!g.firstClear(run, floor)) return `<p class="small muted center dc-first">${icon('check')} Étage déjà franchi : seuls les petits gains des combats.</p>`;
+    return `<p class="small center dc-first">${icon('star')} Première victoire ici : ${rewardLine(g.floorReward(run, floor))}</p>`;
   }
   function clearedView(run, extra = '') {
-    const now = g.chestNow(run), next = run.free ? null : g.runChest(run, (run.cursed ? 1 : 0) + (nightTier(run)?.chest || 0), run.floor + 1);
-    const alive = run.team.some((m) => !m.fallen);
+    const alive = run.team.some((m) => !m.fallen), nf = run.floor + 1;
     root.innerHTML = `${runHead(run)}${extra}
-      <section class="dc-risk2">
-        <div class="dr-up"><span class="dr-k">Si tu remontes</span>${now ? `<span class="dr-chest">${chestSVG(now)}</span><b style="color:${CHESTS[now].color}">${esc(CHESTS[now].name)}</b><span class="dr-sub">${esc(CHESTS[now].desc)}</span>` : `<span class="dr-sub">${run.free ? 'Pas de coffre (entraînement)' : 'Pas encore de coffre : il arrive dès l’étage 3'}</span>`}<span class="dr-shards">${icon('crystal')}<b>${fmt(run.shards)}</b> éclats</span></div>
-        <div class="dr-down"><span class="dr-k">Étage ${run.floor + 1}${(run.floor + 1) % DESCENT.bossEvery === 0 ? ' · gardien' : ''}</span><img class="dr-stair" alt="" src="assets/icons/stairs-down.webp">${run.free ? '<b>Entraînement</b>' : !now && !next ? `<b>Pas encore de coffre</b><span class="dr-sub">Le premier arrive à l’étage ${Math.max(3, (run.start || 1) + CHECKPOINT_MIN - 1)}</span>` : next !== now ? `<b class="dc-good">${now ? 'Coffre amélioré' : 'Premier coffre'}</b><span class="dr-sub">${esc(CHESTS[next].name)}</span>` : '<b>Même coffre</b><span class="dr-sub">Il s’améliore aux étages 3, 8, 16 et 25</span>'}<span class="dr-risk">${icon('skull')}${run.cursed ? 'Si l’équipe tombe : tout est perdu' : now ? 'Si l’équipe tombe : coffre d’une qualité en dessous' : 'Si l’équipe tombe : la moitié des éclats'}</span></div>
-      </section>
-      <div class="dc-choice">${alive ? `<button class="dc-stair down" data-act="next">${picon('stairs-down')}<span><b>Descendre à l’étage ${run.floor + 1}</b><span class="small">${run.free ? 'Plus profond, plus dangereux' : next !== now ? `Plus dangereux, mais ${esc(CHESTS[next].name.toLowerCase())} à la clé` : 'Plus profond, plus dangereux'}</span></span></button>` : ''}<button class="dc-stair up" data-act="leave">${picon('stairs-up')}<span><b>${now ? 'Remonter avec le coffre' : 'Remonter'}</b><span class="small">${run.free ? 'Fin de l’entraînement' : now ? 'Tu gardes le coffre et tes éclats' : 'Tu gardes seulement tes éclats'}</span></span></button></div>
-      <p class="small muted center dc-pause">${icon('hourglass')} Pas le temps ? Ferme simplement le jeu : l’expédition t’attendra ici, même demain, et ses étages comptent pour ton record.</p>`;
+      <div class="dc-choice">${alive ? `<button class="dc-stair down" data-act="next">${picon('stairs-down')}<span><b>Descendre à l’étage ${nf}</b><span class="small">${nf % CHAPTER === 0 ? `Le gardien du chapitre : ${esc(BOSSES[bossOf(nf)].name)}` : 'Plus profond, plus dangereux'}</span></span></button>` : ''}</div>
+      ${alive ? firstLine(run, nf) : ''}
+      <p class="small muted center dc-pause">${icon('hourglass')} Pas le temps ? Ferme simplement le jeu : le chapitre t’attendra ici, même demain.</p>
+      <button class="btn ghost small block dc-abandon" data-act="abandon">${icon('p:abandon')}Abandonner le chapitre</button>`;
   }
   // Fin de combat : la victoire et son butin, l'état de l'équipe, puis un seul choix (le bonus)
   function rewardView(run) {
@@ -220,7 +234,7 @@ export default function descent(app, root) {
     const feats = w?.stats ? [w.stats.parries && `${w.stats.parries} parade${w.stats.parries > 1 ? 's' : ''}`, w.stats.breaks && `${w.stats.breaks} Brisure${w.stats.breaks > 1 ? 's' : ''}`, w.stats.crits && `${w.stats.crits} critique${w.stats.crits > 1 ? 's' : ''}`].filter(Boolean) : [];
     root.innerHTML = `<section class="vx ${w?.room || ''}">
       <div class="vx-hero">${crestHTML(true, run.floor, 'Étage', 'vx-crest')}<h1>Victoire</h1><span class="vx-k">${w?.room === 'boss' ? 'Gardien vaincu' : w?.room === 'elite' ? 'Élite vaincue' : `Étage ${run.floor} franchi`}</span>
-        ${w ? `<div class="vx-loot"><span class="vx-chip">${icon('crystal')}+${fmt(w.shards)}</span>${w.ash ? `<span class="vx-chip">${icon('ash')}+${fmt(w.ash)}</span>` : ''}${w.chest ? `<span class="vx-chip gold" style="--cc:${CHESTS[w.chest].color}">${icon('p:chest')}${esc(CHESTS[w.chest].name)}</span>` : ''}${feats.length ? `<span class="vx-chip feat">${icon('p:feats')}${feats.join(' · ')}</span>` : ''}</div>` : ''}
+        ${w ? `<div class="vx-loot"><span class="vx-chip">${icon('crystal')}+${fmt(w.shards + (w.first?.shards || 0))}</span>${w.ash + (w.first?.ash || 0) ? `<span class="vx-chip">${icon('ash')}+${fmt(w.ash + (w.first?.ash || 0))}</span>` : ''}${w.chest ? `<span class="vx-chip gold" style="--cc:${CHESTS[w.chest].color}">${icon('p:chest')}${esc(CHESTS[w.chest].name)}</span>` : ''}${feats.length ? `<span class="vx-chip feat">${icon('p:feats')}${feats.join(' · ')}</span>` : ''}</div>` : ''}
         ${w?.named ? `<p class="vx-week">${icon('skull')} <b>${esc(w.named.title)}</b> a succombé : butin de <b>+${fmt(w.named.shards)} éclats</b>.</p>` : ''}
         ${w?.firstWin ? `<p class="vx-week vx-first">${icon('star')} <b>Ta toute première victoire !</b> L’Abysse t’offre <b>+${fmt(w.firstWin)} éclats</b>.</p>` : ''}
         ${w?.abyss ? `<p class="vx-week vx-first">${icon('crown')} <b>Tu as vaincu L’Abysse.</b> Titre « Vainqueur de l’Abysse », Cadre de l’Œil de l’Abysse et <b>2 coffres abyssaux</b> !</p>` : ''}
@@ -249,7 +263,7 @@ export default function descent(app, root) {
     root.innerHTML = `${runHead(run)}<section class="panel dc-paused"><h2>${icon('hourglass')} Combat en pause</h2>
       <p class="small">${run.room === 'boss' ? 'Le gardien' : run.room === 'elite' ? 'L’élite' : 'Le combat'} de l’étage ${run.floor} t’attend, exactement là où tu l’as laissé.</p>
       <button class="btn primary block big-cta dc-plq dc-plq-red" data-act="resume">${icon('swords')}Reprendre le combat</button></section>
-      <button class="btn ghost small block dc-abandon" data-act="abandon">${icon('p:abandon')}Abandonner l’expédition</button>`;
+      <button class="btn ghost small block dc-abandon" data-act="abandon">${icon('p:abandon')}Abandonner le chapitre</button>`;
   }
   function battleView(run) {
     if (battle) return;
@@ -266,11 +280,12 @@ export default function descent(app, root) {
       try { out = g.finishBattle(); } catch (e) { app.flushProgress(); toast(esc(e.message), { kind: 'error' }); return render(); }
       app.chrome();
       if (out.lost) { app.sfx.error(); ui.outcome = out.summary; ui.win = null; render(); }
-      else if (out.summit) { app.sfx.reveal('S'); ui.outcome = out.summary; ui.win = null; render(); toast('<b>Tu as atteint le fond de l’Abysse !</b> Le Booster de l’Abysse t’attend dans les Boosters.', { kind: 'epic', icon: 'crown', ms: 7000 }); }
+      else if (out.summit) { app.sfx.reveal('S'); ui.outcome = out.summary; ui.win = null; ui.start = null; ui.nightmare = false; render(); toast(out.abyssPack ? '<b>Tu as atteint le fond de l’Abysse !</b> Le Booster de l’Abysse t’attend dans les Boosters.' : '<b>L’Abysse est vaincue, une fois de plus.</b>', { kind: 'epic', icon: 'crown', ms: 7000 }); }
+      else if (out.chapter) { app.sfx.reveal('M'); ui.outcome = out.summary; ui.win = null; ui.start = null; render(); if (out.first) toast(`<b>Chapitre ${out.chapter} terminé !</b> ${out.chest ? `${esc(CHESTS[out.chest].name)} gagné.` : ''}`, { kind: 'epic', icon: 'crown', ms: 5000 }); }
       else {
         app.sfx.reveal(out.room === 'boss' ? 'M' : 'R');
         const r = g.descent().run;
-        ui.win = { goal: out.goal || null, goalShards: out.goalShards || 0, floor: r.floor, room: out.room, shards: out.shards, ash: out.ash || 0, chest: out.chest || null, disc: out.discovered.filter((id) => cat.get(id)), weekly: out.weekly?.id || null, bossTicket: out.bossTicket || 0, abyss: !!out.abyss, stats, boss: out.boss || null, relNew: out.relNew || [], report: out.report || [], firstWin: out.firstWin || 0, named: out.named || null };
+        ui.win = { goal: out.goal || null, goalShards: out.goalShards || 0, floor: r.floor, room: out.room, shards: out.shards, ash: out.ash || 0, chest: out.chest || null, disc: out.discovered.filter((id) => cat.get(id)), weekly: out.weekly?.id || null, bossTicket: out.bossTicket || 0, abyss: !!out.abyss, stats, boss: out.boss || null, relNew: out.relNew || [], report: out.report || [], firstWin: out.firstWin || 0, named: out.named || null, first: out.first || null };
         rewardView(r);
         if (r.talentOffer?.length) tuto(app, 'cb-talent');
       }
@@ -284,10 +299,8 @@ export default function descent(app, root) {
   async function abandon() {
     const p = g.abandonPreview();
     if (!p) return;
-    const lines = p.cursed ? ['Descente maudite : <b>tu perds tout</b> (éclats et coffres).']
-      : [`Tu gardes <b>${fmt(p.shards)} éclats</b> (la moitié).`, p.free ? 'Entraînement : pas de coffre.' : p.chest ? `Coffre de fin : <b>${esc(CHESTS[p.chest].name.toLowerCase())}</b> (un rang plus bas).` : 'Pas de coffre de fin (pas encore assez profond).', p.kept ? `Les ${p.kept} coffre${p.kept > 1 ? 's' : ''} trouvé${p.kept > 1 ? 's' : ''} en route sont gardés.` : ''];
-    lines.push('Ta torche reste utilisée. L’expédition compte comme une défaite.');
-    if (!(await confirmBox(`<b>Abandonner l’expédition ?</b><br>${lines.filter(Boolean).map((l) => `• ${l}`).join('<br>')}`, { ok: 'Abandonner', danger: true }))) return;
+    const lines = ['Tu gardes tout ce que tu as gagné (éclats, cendres et coffres).', `Le chapitre ${p.chapter} reprendra à son premier étage, l’étage ${chapterStart(p.chapter)}.`];
+    if (!(await confirmBox(`<b>Abandonner le chapitre ?</b><br>${lines.filter(Boolean).map((l) => `• ${l}`).join('<br>')}`, { ok: 'Abandonner', danger: true }))) return;
     if (battle) { battle.stop(); battle = null; }
     playing = false;
     document.body.classList.remove('battle-mode');
@@ -301,11 +314,11 @@ export default function descent(app, root) {
   function omenView(run) {
     const offer = run.omenOffer || [];
     root.innerHTML = `${runHead(run)}
-      <section class="pk-head om-head"><img alt="" src="assets/icons/omen.webp"><div><h2>Présage</h2><p class="small">Avant de descendre, l’Abysse te montre trois présages. Choisis-en un : il dure <b>toute l’expédition</b>, avec un vrai avantage et un vrai prix. Les mêmes pour tout le monde aujourd’hui.</p></div></section>
+      <section class="pk-head om-head"><img alt="" src="assets/icons/omen.webp"><div><h2>Présage</h2><p class="small">Avant de descendre, l’Abysse te montre trois présages. Choisis-en un : il dure <b>tout le chapitre</b>, avec un vrai avantage et un vrai prix. Les mêmes pour tout le monde aujourd’hui.</p></div></section>
       <div class="pk-list">${offer.map((k) => { const o = OMENS[k]; return `<button class="pk-c om-c ${ui.omen === k ? 'on' : ''}" data-act="omenpick" data-k="${k}" aria-pressed="${ui.omen === k}">
         <b>${icon(o.icon)} ${esc(o.name)}</b><span class="pk-gain"><i>Gain</i>${esc(o.gain)}</span><span class="pk-cost"><i>Prix</i>${esc(o.cost)}</span></button>`; }).join('')}</div>
       <div class="pk-actions">${offer.includes(ui.omen) ? `<button class="btn primary block big-cta dc-plq dc-plq-red" data-act="omengo">Suivre le ${esc(OMENS[ui.omen].name)}</button>` : '<p class="small muted center">Touche un présage pour le choisir.</p>'}</div>
-      ${g.canCancelRun() ? `<button class="btn ghost block dc-cancel" data-act="cancelrun">${icon('back')}Annuler l’expédition</button><p class="small muted center">Rien n’a encore été joué : ta torche t’est rendue.</p>` : `<button class="btn ghost small block dc-abandon" data-act="abandon">${icon('p:abandon')}Abandonner l’expédition</button>`}`;
+      ${g.canCancelRun() ? `<button class="btn ghost block dc-cancel" data-act="cancelrun">${icon('back')}Annuler</button><p class="small muted center">Rien n’a encore été joué : tu peux revenir sans conséquence.</p>` : `<button class="btn ghost small block dc-abandon" data-act="abandon">${icon('p:abandon')}Abandonner le chapitre</button>`}`;
   }
   function pactView(run) {
     const boss = run.pendingRoom === 'boss' ? BOSSES[bossOf(run.floor)] : null;
@@ -376,7 +389,7 @@ export default function descent(app, root) {
   function share() {
     const s = ui.outcome || {};
     const d = g.descent();
-    const txt = `ABYSSAL · La Descente du ${new Date().toLocaleDateString('fr-FR')} : j’ai atteint l’étage ${s.floor ?? d.bestToday}${s.cursed ? ' en descente maudite' : ''} ! Tu fais mieux ? ${location.origin}${location.pathname}`;
+    const txt = `ABYSSAL · La Descente : ${s.summit ? 'j’ai atteint le fond de l’Abysse, étage 100' : s.chapterDone ? `j’ai terminé le chapitre ${s.chapterDone}` : `j’ai atteint l’étage ${s.floor ?? d.best}`} ! Tu fais mieux ? ${location.origin}${location.pathname}`;
     if (navigator.share) navigator.share({ text: txt }).catch(() => {});
     else navigator.clipboard?.writeText(txt).then(() => toast('Score copié : colle-le dans un message.', { icon: 'copy' }));
   }
@@ -388,7 +401,6 @@ export default function descent(app, root) {
       try { g.swapRunTeam(ui.tsel, i); app.sfx.sheet?.(); } catch (e) { toast(esc(e.message), { kind: 'error' }); }
       ui.tsel = null; render();
     },
-    curse() { ui.cursed = !ui.cursed; render(); },
     startat(el) { ui.start = +el.dataset.f || 1; render(); },
     ntier(el) { ui.ntier = +el.dataset.t || 1; app.sfx.tap?.(); render(); },
     night() { ui.nightmare = !ui.nightmare; render(); if (ui.nightmare) tuto(app, 'dc-nightmare', { force: false }); },
@@ -398,23 +410,22 @@ export default function descent(app, root) {
       if (f === 'summit') openSheet(summitHTML(g.descent(), true), { label: 'Le fond de l’Abysse', cls: 'dc-sheet' });
       else if (f === 'season') openSheet(`<h2 class="center">Saison et paliers</h2>${seasonHTML()}`, { label: 'Saison', cls: 'dc-sheet' });
       else if (f === 'board') { const sh = openSheet('<h2 class="center">Classement du jour</h2><div class="lb-body small muted">Chargement…</div>', { label: 'Classement', cls: 'dc-sheet' }); loadBoard(sh.body.querySelector('.lb-body')); }
-      else openSheet(`<h2 class="center">Comment ça marche</h2><ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol><p class="small muted center">${DESCENT.torches} expéditions avec coffre par jour, puis tu peux t’entraîner (ni coffre, ni cendres).</p>`, { label: 'Aide', cls: 'dc-sheet' });
+      else openSheet(`<h2 class="center">Comment ça marche</h2><ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol><p class="small muted center">Joue autant que tu veux : la Descente n’a pas de limite par jour.</p>`, { label: 'Aide', cls: 'dc-sheet' });
     },
     optinfo() {
-      openSheet(`<h2 class="center">Les modes de descente</h2>
-        <p><b>${icon('skull')} Descente maudite</b><br><span class="small">Le coffre rapporté est d’une qualité au-dessus, mais si l’équipe tombe, tu ne rapportes rien.</span></p>
-        <p><b>${icon('skull')} Mode Cauchemar</b><br><span class="small">${g.nightmareUnlocked() ? '' : `S’ouvre quand tu as atteint l’étage ${NIGHTMARE_AT}. `}Ennemis plus forts, gardiens déchaînés dès le début, coffre de meilleure qualité et plus d’éclats. Trois paliers : ${[1, 2, 3].map((t) => `<b>${NIGHT_TIERS[t].name}</b> (ennemis +${Math.round((NIGHT_TIERS[t].hp - 1) * 100)} % PV et +${Math.round((NIGHT_TIERS[t].atk - 1) * 100)} % ATQ, coffre +${NIGHT_TIERS[t].chest}, éclats ×${String(NIGHT_TIERS[t].shards).replace('.', ',')})`).join(', ')}. Chaque palier s’ouvre quand tu atteins l’étage ${NIGHT_TIER_OPEN} au palier précédent.</span></p>`, { label: 'Modes', cls: 'dc-sheet sheet-small' });
+      openSheet(`<h2 class="center">Le Cauchemar</h2>
+        <p><b>${icon('skull')} Mode Cauchemar</b><br><span class="small">${g.nightmareUnlocked() ? '' : `S’ouvre quand tu as atteint l’étage ${NIGHTMARE_AT}. `}On y rejoue un chapitre déjà terminé : ennemis plus forts, gardiens déchaînés dès le début, et chaque étage gagné pour la première fois à ce palier redonne sa récompense, avec plus d’éclats et des coffres meilleurs. Trois paliers : ${[1, 2, 3].map((t) => `<b>${NIGHT_TIERS[t].name}</b> (ennemis +${Math.round((NIGHT_TIERS[t].hp - 1) * 100)} % PV et +${Math.round((NIGHT_TIERS[t].atk - 1) * 100)} % ATQ, coffres +${NIGHT_TIERS[t].chest}, éclats ×${String(NIGHT_TIERS[t].shards).replace('.', ',')})`).join(', ')}. Chaque palier s’ouvre quand tu atteins l’étage ${NIGHT_TIER_OPEN} au palier précédent.</span></p>`, { label: 'Modes', cls: 'dc-sheet sheet-small' });
     },
     weekcard(el) { app.openCard(el.dataset.id); },
     news() { delete g.s.armyNews; g.persist(); render(); },
     async start() {
-      if (ui.cursed && g.torchesLeft() && !(await confirmBox('Descente maudite : si toute l’équipe tombe, <b>tu ne rapportes rien</b>. Tu es sûr ?', { ok: 'Je descends', danger: true }))) return;
+      const st = startFloor();
       try {
-        g.startRun({ cursed: ui.cursed, nightmare: ui.nightmare && g.nightmareUnlocked() ? nt() : 0, start: startFloor() }); ui.outcome = null; ui.tsel = null; app.sfx.tear(); app.chrome(); render(); window.scrollTo(0, 0);
+        g.startRun({ nightmare: ui.nightmare && g.nightmareUnlocked() && chapDone(chapterOf(st)) ? nt() : 0, start: st }); ui.outcome = null; ui.tsel = null; app.sfx.tear(); app.chrome(); render(); window.scrollTo(0, 0);
         if (g.descent().run?.phase === 'doors') tuto(app, 'army-doors');
       } catch (e) { toast(esc(e.message), { kind: 'error' }); }
     },
-    omeninfo() { const o = OMENS[g.descent().run?.omen]; if (o) openSheet(`<h2 class="center">${esc(o.name)}</h2><p><b class="dc-good">Gain</b> ${esc(o.gain)}</p><p><b class="dc-bad">Prix</b> ${esc(o.cost)}</p><p class="small muted">Il dure toute l’expédition.</p>`, { label: 'Présage', cls: 'dc-sheet sheet-small' }); },
+    omeninfo() { const o = OMENS[g.descent().run?.omen]; if (o) openSheet(`<h2 class="center">${esc(o.name)}</h2><p><b class="dc-good">Gain</b> ${esc(o.gain)}</p><p><b class="dc-bad">Prix</b> ${esc(o.cost)}</p><p class="small muted">Il dure tout le chapitre.</p>`, { label: 'Présage', cls: 'dc-sheet sheet-small' }); },
     omenpick(el) { ui.omen = el.dataset.k; app.sfx.tap(); render(); },
     omengo() {
       try { const o = g.chooseOmen(ui.omen); ui.omen = null; app.sfx.discover(); toast(`${esc(o.name)} : ${esc(o.gain)}`, { icon: 'star' }); render(); window.scrollTo(0, 0); tuto(app, 'army-doors'); } catch (e) { toast(esc(e.message), { kind: 'error' }); }
@@ -451,14 +462,8 @@ export default function descent(app, root) {
     next() { ui.winBar = ''; try { g.nextFloor(); app.sfx.swipe(); render(); window.scrollTo(0, 0); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     abandon() { abandon(); },
     resume() { ui.paused = false; app.sfx.tap(); render(); },
-    cancelrun() { try { g.cancelRun(); ui.omen = null; ui.outcome = null; ui.win = null; app.sfx.tap(); toast('Expédition annulée : ta torche t’est rendue.', { icon: 'back' }); app.chrome(); render(); window.scrollTo(0, 0); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
-    async leave() {
-      if (!(await confirmBox('Remonter maintenant avec ton coffre ?', { ok: 'Remonter' }))) return;
-      app.pendingProgress = [];
-      ui.outcome = g.endRun(false);
-      app.sfx.coin(); app.chrome(); render(); window.scrollTo(0, 0);
-      app.flushProgress();
-    },
+    cancelrun() { try { g.cancelRun(); ui.omen = null; ui.outcome = null; ui.win = null; app.sfx.tap(); toast('Chapitre annulé, sans conséquence.', { icon: 'back' }); app.chrome(); render(); window.scrollTo(0, 0); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
+    nextchap(el) { ui.start = chapterStart(+el.dataset.c); ui.nightmare = false; ui.outcome = null; render(); window.scrollTo(0, 0); },
     share() { share(); },
     dismiss() { ui.outcome = null; render(); },
   });

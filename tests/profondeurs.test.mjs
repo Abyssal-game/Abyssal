@@ -9,24 +9,25 @@ import * as D from '../js/core/duel.js';
 const catalog = loadCatalog();
 const mk = (seed) => noWelcome(new Game(catalog, new MemoryStorage(), { rng: rngFrom(seed), clock: () => new Date(2026, 9, 16, 12) }));
 
-test('départs avancés : ouverts par les gardiens vaincus, coffre plus bas et 3 étages minimum', () => {
+test('v406 : chapitres ouverts par les gardiens vaincus ; le Cauchemar se joue sur un chapitre terminé', () => {
   const g = mk('dep');
   g.team();
   assert.deepEqual(g.startFloors(), [1]);
   assert.throws(() => g.startRun({ start: 6 }), /pas encore ouvert/);
   g.s.descent.best = 17;
   assert.deepEqual(g.startFloors(), [1, 6, 11, 16]);
+  assert.equal(g.chapterNow(), 4);
   const run = g.startRun({ start: 11 });
   assert.equal(run.floor, 11);
   assert.equal(run.cleared, 10);
-  run.cleared = 12;
-  assert.equal(g.chestNow(run), null, 'deux étages franchis : pas de coffre');
-  run.cleared = 13;
-  assert.equal(g.chestNow(run), 'bois', 'fer à l’étage 13, un rang plus bas');
-  const sum = g.endRun(false);
-  assert.equal(sum.start, 11);
-  assert.deepEqual(sum.chests, ['bois']);
-  assert.equal(g.s.descent.bestToday, 0, 'hors classement du jour');
+  assert.equal(g.firstClear(run), false, 'étage 11 déjà franchi');
+  g.cancelRun();
+  g.s.descent.best = 25;
+  assert.throws(() => g.startRun({ start: 26, nightmare: 1 }), /déjà terminé/);
+  const nr = g.startRun({ start: 11, nightmare: 1 });
+  assert.equal(g.firstClear(nr), true, 'premier passage en Cauchemar I');
+  const r = g.floorReward(nr, 15);
+  assert.deepEqual(r.chests, { abyssal: 1 }, 'coffre d’or du gardien, un rang au-dessus en Cauchemar I');
 });
 
 test('traits des profondeurs : jamais avant l’étage 31, plus nombreux après', () => {
@@ -53,13 +54,19 @@ test('Épineux renvoie 2 dégâts, Vampire se soigne', () => {
   assert.ok(v.hp > before || v.hp === v.maxHp, 'il récupère des PV en frappant');
 });
 
-test('palier de l’étage 40 : récompensé une seule fois', () => {
+test('v406 : récompenses de première victoire des étages (coffre au 3e étage, or / abyssal aux gardiens)', async () => {
+  const { floorFirstReward } = await import('../js/core/descent.js');
+  assert.deepEqual(floorFirstReward(5).chests, { or: 1 });
+  assert.deepEqual(floorFirstReward(10).chests, { abyssal: 1 });
+  assert.deepEqual(floorFirstReward(15).chests, { or: 1 });
+  assert.deepEqual(floorFirstReward(40).chests, { abyssal: 1 });
+  assert.deepEqual(floorFirstReward(3).chests, { bois: 1 });
+  assert.deepEqual(floorFirstReward(33).chests, { fer: 1 });
+  assert.equal(floorFirstReward(4).chests, undefined);
+  assert.ok(floorFirstReward(44).shards > floorFirstReward(4).shards, 'plus généreux en profondeur');
   const g = mk('pal');
   g.s.descent.best = 39;
-  const t0 = g.s.tickets.premium || 0, s0 = g.s.shards;
+  const t0 = g.s.tickets.premium || 0;
   g.recordDepth(40);
-  assert.equal(g.s.tickets.premium, t0 + 1);
-  assert.ok(g.s.shards >= s0 + 200);
-  g.recordDepth(40);
-  assert.equal(g.s.tickets.premium, t0 + 1);
+  assert.equal(g.s.tickets.premium || 0, t0, 'plus de ticket de palier : le coffre abyssal du gardien le remplace');
 });

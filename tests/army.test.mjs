@@ -49,40 +49,48 @@ test('budget d’équipe et pouvoir ultime', () => {
   assert.equal(g.ultimate().key, 'sceau');
 });
 
-test('aventure : une expédition rapporte un coffre selon la profondeur ; bois/fer donnent des éclats, or/abyssal un booster', () => {
-  assert.equal(chestForDepth(2), null); assert.equal(chestForDepth(3), 'bois'); assert.equal(chestForDepth(7), 'bois'); assert.equal(chestForDepth(8), 'fer'); assert.equal(chestForDepth(16), 'or'); assert.equal(chestForDepth(25), 'abyssal');
+test('v406 : un chapitre se termine sur son gardien ; récompenses à la première victoire de chaque étage seulement', () => {
   const g = newGame('r');
-  g.startRun();
-  assert.equal(g.torchesLeft(), 2);
-  for (let k = 0; k < 300 && g.s.descent.run; k++) {
-    const r = g.s.descent.run;
-    if (r.phase === 'doors') { const o = g.chooseDoor(g.doors()[0]); if (o.battle) g.autoResolve(); }
-    else if (r.phase === 'reward') g.chooseReward(r.rewards[0]);
-    else if (r.phase === 'altar') g.chooseBlessing(r.altar[0]);
-    else if (r.cleared >= 3) g.endRun(false);
-    else g.nextFloor();
-  }
-  const last = g.s.descent.last;
-  assert.ok(last.floor >= 1);
-  assert.ok(g.chestCount() >= 1, 'au moins un coffre');
-  assert.ok(Object.keys(g.s.hunt).length > 0, 'les créatures vaincues entrent au Bestiaire de chasse');
-  const type = Object.keys(g.s.chests).find((k) => g.s.chests[k] > 0);
+  g.team();
   const sh0 = g.s.shards;
-  g.openChest(type);
-  assert.ok(g.s.shards > sh0 || type === 'or' || type === 'abyssal', 'un coffre de bois ou de fer donne des éclats');
+  const play = () => {
+    for (let k = 0; k < 300 && g.s.descent.run; k++) {
+      const r = g.s.descent.run;
+      if (r.phase === 'doors') { const o = g.chooseDoor(g.doors()[0]); if (o.battle) { r.battle.units && Object.values(r.battle.units).forEach((u) => { if (u.side === 'enemy') u.hp = 0; }); r.battle.over = 'won'; const out = g.finishBattle(); if (out.chapter) return out; } }
+      else if (r.phase === 'reward') { if (r.talentOffer?.length) g.chooseTalent(0); g.chooseReward(r.rewards[0]); }
+      else if (r.phase === 'altar') g.chooseBlessing(r.altar[0]);
+      else if (r.phase === 'omen') g.chooseOmen(r.omenOffer[0]);
+      else g.nextFloor();
+    }
+    return null;
+  };
+  g.startRun();
+  const out = play();
+  assert.equal(out.chapter, 1);
+  assert.equal(g.s.descent.run, null, 'le gardien termine le chapitre');
+  assert.equal(g.s.descent.best, 5);
+  assert.deepEqual(out.summary.chests.sort(), ['bois', 'or'], 'coffre de bois à l’étage 3, coffre d’or pour le gardien de l’étage 5');
+  assert.ok(g.s.shards > sh0);
+  assert.deepEqual(g.startFloors(), [1, 6], 'le chapitre 2 est ouvert');
+  // rejouer le chapitre 1 : plus de récompense de première victoire
+  const chests = g.chestCount();
+  g.startRun({ start: 1 });
+  const again = play();
+  assert.equal(again.chapter, 1);
+  assert.deepEqual(again.summary.chests, []);
+  assert.equal(g.chestCount(), chests);
+  // chapitre 2 : son gardien donne un coffre abyssal
+  g.startRun({ start: 6 });
+  assert.equal(g.descent().run.floor, 6);
+  const c2 = play();
+  assert.ok(c2.summary.chests.includes('abyssal'));
+  // les coffres s'ouvrent comme avant
   g.s.chests.or = (g.s.chests.or || 0) + 1; g.s.chests.abyssal = (g.s.chests.abyssal || 0) + 1;
   assert.deepEqual(g.openChest('abyssal'), ['premium']);
-  const tickets = { ...g.s.tickets };
-  const packs = g.openChest('or');
-  assert.deepEqual(packs, ['standard']);
-  assert.equal(g.s.tickets.standard, (tickets.standard || 0) + 1);
-  const res = g.openBooster(packs[0]);
-  assert.equal(res.opening.paidWith, 'ticket');
-  // après les 3 torches : on peut rejouer, sans coffre
-  g.s.descent.used = 3;
-  const run = g.startRun();
-  assert.equal(run.free, true);
-  g.endRun(false);
+  assert.deepEqual(g.openChest('or'), ['standard']);
+  // plus de limite par jour
+  for (let i = 0; i < 5; i++) { g.startRun({ start: 1 }); g.cancelRun(); }
+  assert.throws(() => g.startRun({ start: 16 }), /pas encore ouvert/);
 });
 
 test('passage au nouveau système : héros et équipement deviennent des éclats, les coffres sont gardés', () => {
@@ -163,29 +171,22 @@ test('changement de rareté : une variante devenue impossible passe en holograph
   assert.equal(g.s.collection[pc.id].v.holo, 2);
 });
 
-test('abandon de la Descente : compte comme une défaite, combat effacé', () => {
+test('v406 : abandonner un chapitre garde tout le butin, le combat est effacé', () => {
   const g = newGame('ab');
   g.team();
   g.startRun();
   const run = g.s.descent.run;
-  run.shards = 41; run.cleared = 9; run.floor = 10;
+  run.shards = 41; run.chests.push('bois');
   const p = g.abandonPreview();
-  assert.equal(p.shards, 20);
-  assert.equal(p.chest, 'bois', 'coffre d’un rang plus bas (fer → bois)');
+  assert.equal(p.shards, 41);
+  assert.equal(p.chapter, 1);
   g.chooseDoor(g.doors()[0]);
   const s = g.abandonRun();
   assert.equal(s.abandoned, true);
   assert.equal(s.wiped, true);
-  assert.equal(s.shards, 20);
+  assert.equal(s.shards, 41);
   assert.deepEqual(s.chests, ['bois']);
   assert.equal(g.s.descent.run, null);
-  // maudite : rien
-  g.s.descent.used = 0;
-  g.startRun({ cursed: true });
-  g.s.descent.run.shards = 50; g.s.descent.run.cleared = 4;
-  const s2 = g.abandonRun();
-  assert.equal(s2.shards, 0);
-  assert.deepEqual(s2.chests, []);
 });
 
 test('apparence affichée : choisie par le joueur, sinon la plus rare ; ancienne Édition des Sceaux convertie', async () => {
