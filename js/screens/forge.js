@@ -53,7 +53,7 @@ export function forgeScreen(app, root) {
   });
   app.refreshView = draw;
   draw();
-  tuto(app, 'renfort');
+  if (g.team().length) tuto(app, 'renfort'); /* v404 : pas de bulle sans équipe */
   return () => { app.refreshView = null; };
 }
 
@@ -84,13 +84,13 @@ export function furnaceScreen(app, root) {
     const owned = Object.keys(g.s.collection).map((id) => cat.get(id)).filter((c) => c && !g.isFav(c.id) && (!q || norm(c.name).includes(q)))
       .sort((a, b) => RI(a.rarity) - RI(b.rarity) || a.name.localeCompare(b.name, 'fr'));
     root.innerHTML = `<header class="screen-head ui-hero bn-furnace"><h1>La Fournaise</h1><p class="muted">Brûle des cartes pour des cendres. Les cendres font monter tes créatures de niveau (onglet Renforcer).</p>${ashLine(g)}</header>
+      ${sublimeHTML()}
       <section class="panel"><h2 class="section-title">Tes doublons</h2>
         ${sp.n ? `<button class="btn primary block" data-act="all">${icon('p:furnace')}Tout brûler (${sp.n}) · +${fmt(sp.ash)} ${icon('ash')}</button>
           <p class="small muted">Un exemplaire de chaque finition est toujours gardé.</p>
-          ${grid(spares, (c) => `<small>×${g.spare(c.id)} · ${icon('ash')}${fmt(g.spareAsh([c.id]).ash)}</small>`)}`
+          <details class="fg-spares" ${ui.spares ? 'open' : ''}><summary>Voir le détail (${spares.length} cartes)</summary>${grid(spares, (c) => `<small>×${g.spare(c.id)} · ${icon('ash')}${fmt(g.spareAsh([c.id]).ash)}</small>`)}</details>`
           : '<p class="small muted">Aucun doublon pour l’instant. Ceux que tu tires dans les boosters arrivent ici.</p>'}
       </section>
-      ${sublimeHTML()}
       <section class="panel"><h2 class="section-title">Cadres de cendres</h2><p class="small muted">Des cadres de profil forgés dans les cendres, rien qu’à toi : ils ne donnent aucune puissance.</p>
         <div class="fg-frames">${Object.entries(ASH_FRAMES).map(([k, n]) => { const has = g.s.frames.includes(k); return `<button class="fg-frame ${has ? 'own' : n <= g.s.ash ? '' : 'fg-dim'}" data-act="frame" data-k="${k}" ${has ? 'disabled' : ''}><span class="avatar-mini pf pf-${k}"></span><b>${esc(FRAMES[k])}</b><small>${has ? 'Obtenu' : `${icon('ash')}${fmt(n)}`}</small></button>`; }).join('')}</div></section>
       <details class="panel dc-fold fg-adv" ${ui.q || ui.adv ? 'open' : ''}><summary>${icon('p:furnace')} Avancé : brûler une autre carte</summary><div>
@@ -99,6 +99,7 @@ export function furnaceScreen(app, root) {
         ${owned.length ? grid(owned, (c) => `<small>${icon('ash')}${fmt(g.burnValue(c.id, 'normal'))}</small>`) : '<p class="small muted">Aucune créature trouvée.</p>'}
       </div></details>`;
     root.querySelector('.fg-adv')?.addEventListener('toggle', (e) => { ui.adv = e.target.open; });
+    root.querySelector('.fg-spares')?.addEventListener('toggle', (e) => { ui.spares = e.target.open; });
     const inp = root.querySelector('[data-q]');
     inp?.addEventListener('input', () => { ui.q = inp.value; clearTimeout(draw.t); draw.t = setTimeout(() => { const pos = inp.selectionStart; draw(); const n = root.querySelector('[data-q]'); n.focus(); n.setSelectionRange(pos, pos); }, 250); });
   }
@@ -139,6 +140,6 @@ export function furnaceScreen(app, root) {
   });
   app.refreshView = draw;
   draw();
-  tuto(app, 'fournaise');
+  if (g.spareAsh().n || Object.keys(g.s.collection).length >= 10) tuto(app, 'fournaise'); /* v404 : pas de bulle sans cartes */
   return () => { app.refreshView = null; clearTimeout(draw.t); };
 }

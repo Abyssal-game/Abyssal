@@ -1,9 +1,9 @@
 // L'équipe de cartes : fiche de combat d'une créature, écran Équipe et écran Coffres.
-import { RARITY } from '../config.js';
+import { RARITY, BOOSTERS } from '../config.js';
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
 import { icon, roleIcon, actIcon } from '../ui/icons.js';
-import { esc, toast, openSheet, bindActions, confirmBox } from '../ui/dom.js';
+import { esc, fmt, toast, openSheet, bindActions, confirmBox } from '../ui/dom.js';
 import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
 import { chestSVG } from '../ui/chest.js';
@@ -205,6 +205,7 @@ export function chestsScreen(app, root) {
   const g = app.game;
   const draw = () => {
     root.innerHTML = `<header class="screen-head ui-hero bn-chests"><h1>Coffres</h1><p class="muted">Gagnés dans l’Aventure : des cendres, et des éclats ou un booster (or, abyssal).</p></header>
+      ${g.chestCount() > 1 ? `<button class="btn primary block dc-plq dc-plq-red ch-all" data-act="all">${icon('p:chest')}Ouvrir les ${g.chestCount()} coffres d’un coup</button>` : ''}
       <div class="ch-grid">${CHEST_ORDER.map((t) => { const n = g.s.chests[t] || 0; return `<button class="ch-c ${n ? '' : 'none'}" data-act="open" data-t="${t}" style="--cc:${CHESTS[t].color}" ${n ? '' : 'disabled'}>
         <span class="ch-art">${chestSVG(t)}</span>${n ? `<span class="ch-n">${n}</span>` : ''}<b>${esc(CHESTS[t].name)}</b><span class="small">${esc(CHESTS[t].desc)}</span></button>`; }).join('')}</div>
       <details class="panel dc-fold"><summary>${icon('info')} D’où viennent les coffres ?</summary><ul class="small">
@@ -214,9 +215,15 @@ export function chestsScreen(app, root) {
   };
   bindActions(root, {
     open(el) { openChestScene(app, el.dataset.t, { onDone: () => (app.refresh ? app.refresh() : draw()) }); },
+    all() {
+      const r = g.openAllChests(); app.sfx.chest?.();
+      const packs = Object.entries(r.packs).map(([k, n]) => `${n} ${esc((BOOSTERS[k]?.name.toLowerCase() || k).replace(/^booster/, n > 1 ? 'boosters' : 'booster'))}`);
+      openSheet(`<h2 class="center">${r.n} coffres ouverts</h2><div class="ch-sum">${r.shards ? `<p>${icon('crystal')} <b>+${fmt(r.shards)}</b> éclats</p>` : ''}${r.ash ? `<p>${icon('ash')} <b>+${fmt(r.ash)}</b> cendres</p>` : ''}${packs.length ? `<p>${icon('ticket')} ${packs.join(', ')} : à ouvrir dans les Boosters</p>` : ''}</div>${packs.length ? '<a class="btn primary block" href="#/boutique">Ouvrir mes boosters</a>' : ''}`, { label: 'Coffres ouverts', cls: 'sheet-small' });
+      app.flushProgress?.(); app.chrome?.(); draw();
+    },
   });
   draw();
-  tuto(app, 'coffres');
+  if (g.chestCount()) tuto(app, 'coffres'); /* v404 : pas de bulle sans coffre */
   app.refreshView = draw;
   return () => { app.refreshView = null; };
 }

@@ -28,7 +28,7 @@ import shadowScreen, { claimShadowPrize } from './screens/shadow.js';
 import { forgeScreen, furnaceScreen } from './screens/forge.js';
 import { teamScreen, chestsScreen } from './screens/army.js';
 import { startSync } from './cloud/sync.js';
-import { consumeAuthHash } from './cloud/cloud.js';
+import { consumeAuthHash, isLoggedIn } from './cloud/cloud.js';
 import { startPresence } from './cloud/presence.js';
 import { showWelcome } from './screens/welcome.js';
 import { showGate } from './ui/gate.js';
@@ -153,25 +153,27 @@ function renderChrome() {
   const sub = SUBNAV[tab] && SUBNAV[tab].some(([r]) => r === app.route) ? SUBNAV[tab] : null;
   const subBadge = (r) => {
     if (r === 'coffres') return g.chestCount() || '';
-    if (r === 'fournaise') { const n = g.spareAsh().n; return n ? (n > 99 ? '99+' : n) : ''; }
-    if (r === 'renfort') return g.team().some((id) => { const c = g.upgradeCost(id); return c && c <= s.ash; }) ? '↑' : '';
+    // v404 : pastilles plus calmes — plus de « 99+ » permanent sur la Fournaise ; Renforcer seulement si l'Accueil le conseille aussi
+    if (r === 'renfort') return g.goals().some((x) => x.kind === 'forge' && /Renforce/.test(x.title)) ? '↑' : '';
     if (r === 'collection') return nNewSub || '';
     return '';
   };
   const nNewSub = g.newCount() > 99 ? '99+' : g.newCount();
   const sn = document.getElementById('subnav');
   document.body.classList.toggle('has-subnav', !!sub);
-  sn.innerHTML = sub ? sub.map(([r, ic, label]) => { const bd = subBadge(r); return `<a class="sn-tab" href="#/${r}"${r === app.route ? ' aria-current="page"' : ''}><img class="sn-ic" alt="" src="assets/icons/${ic}.webp"><span>${label}</span>${bd ? `<i class="sn-badge">${bd}</i>` : ''}</a>`; }).join('') : '';
+  // v404 : sous-onglets encore fermés cachés (Sceaux avant le premier gardien, Tirage sans compte)
+  const shown = sub && sub.filter(([r]) => (r !== 'sceaux' || g.sceauxOpen() || app.route === 'sceaux') && (r !== 'tirage' || isLoggedIn() || app.route === 'tirage'));
+  sn.innerHTML = shown ? shown.map(([r, ic, label]) => { const bd = subBadge(r); return `<a class="sn-tab" href="#/${r}"${r === app.route ? ' aria-current="page"' : ''}><img class="sn-ic" alt="" src="assets/icons/${ic}.webp"><span>${label}</span>${bd ? `<i class="sn-badge">${bd}</i>` : ''}</a>`; }).join('') : '';
   const nNew = g.newCount();
-  const ticketCount = Object.values(s.tickets).reduce((a, b) => a + b, 0) + g.freePack().stock;
+  const ticketCount = Object.values(s.tickets).reduce((a, b) => a + b, 0) + (g.welcomePending() ? 0 : g.freePack().stock); /* v404 : « 2 » comme l'annonce l'Accueil au tout début */
   document.getElementById('tabbar').innerHTML = TABS.map(([key, ic, label]) => {
     const cur = key === tab ? ' aria-current="page"' : '';
     // moins de pastilles : un chiffre seulement pour ce qui attend d'être ouvert (boosters, coffres), sinon un simple point
     const dot = '<span class="badge dot"></span>';
-    const badge = key === 'boutique' && (ticketCount + g.chestCount()) ? `<span class="badge">${ticketCount + g.chestCount()}</span>`
+    const badge = key === 'boutique' && ticketCount ? `<span class="badge">${ticketCount}</span>` /* v404 : les boosters à ouvrir seulement (les coffres ont leur chiffre sur leur sous-onglet) */
       : key === 'collection' && nNew ? dot
       : key === 'antre' && (g.canDailyClaim() || g.missionsToClaim()) ? dot
-      : key === 'descente' && (g.descent().run || g.descent().used === 0) ? dot : '';
+      : key === 'descente' && (g.descent().run || (g.descent().used === 0 && g.team().length >= 3)) ? dot : '';
     if (key === 'boutique') return `<a class="tab tab-main" href="#/boutique"${cur}><span class="orb">${tabIcon(ic)}</span>${label}${badge}</a>`;
     return `<a class="tab" href="#/${key}"${cur}>${tabIcon(ic)}${label}${badge}</a>`;
   }).join('');

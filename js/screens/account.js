@@ -3,6 +3,7 @@ import * as cloud from '../cloud/cloud.js';
 import { sync, onSync, afterLogin, pushNow, restoreFromCloud, setPseudo, refreshProfile, resumeSync } from '../cloud/sync.js';
 import { icon } from '../ui/icons.js';
 import { esc, toast, confirmBox, bindActions, openSheet } from '../ui/dom.js';
+import { isGuest } from '../ui/gate.js';
 import { blockedIds, clearBlocked, isMaskedPseudo } from '../core/moderation.js';
 
 // v321 : règle des mots de passe réglée dans Supabase (Authentication → Password requirements)
@@ -34,7 +35,7 @@ const ago = (t) => {
 };
 
 export default function account(app, root) {
-  let busy = false, lastEmail = '', mode = app.params?.[0] === 'motdepasse' ? 'newpass' : app.params?.[0] === 'inscription' ? 'signup' : 'login';
+  let busy = false, lastEmail = '', mode = app.params?.[0] === 'motdepasse' ? 'newpass' : app.params?.[0] === 'inscription' ? 'signup' : isGuest() ? 'signup' : 'login'; /* v404 : un invité arrive sur « Créer un compte » */
   function render() {
     const u = cloud.currentUser();
     // v318 : nouveau mot de passe après un lien de récupération (adresse #/compte/motdepasse), même connecté

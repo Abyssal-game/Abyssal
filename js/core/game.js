@@ -308,7 +308,9 @@ export class Game {
     const m = this.s.missions;
     if (m.day !== day) {
       const rnd = seededRng('missions:' + day);
-      const pool = [...MISSIONS];
+      // v404 : un débutant (moins de 10 cartes) n'a ni doublons à brûler ni chance raisonnable de variante
+      const few = Object.keys(this.s.collection).length < 10;
+      const pool = MISSIONS.filter((d) => !few || !['burn', 'variant'].includes(d.kind));
       const list = [];
       while (list.length < 3 && pool.length) {
         const def = pool.splice(Math.floor(rnd() * pool.length), 1)[0];
@@ -582,6 +584,16 @@ export class Game {
     return packs;
   }
 
+  // v404 : ouvrir tous les coffres d'un coup (16 coffres demandaient 48 touchers) : totaux des gains
+  openAllChests() {
+    const out = { n: 0, shards: 0, ash: 0, packs: {} };
+    const sh0 = this.s.shards, ash0 = this.s.ash;
+    for (const t of Object.keys(CHESTS)) {
+      while ((this.s.chests[t] || 0) > 0) { this.openChest(t).forEach((k) => { out.packs[k] = (out.packs[k] || 0) + 1; }); out.n++; }
+    }
+    out.shards = this.s.shards - sh0; out.ash = this.s.ash - ash0;
+    return out;
+  }
   // Créature de la semaine : la même pour tout le monde, elle apparaît comme élite redoutable (étage 8 et plus).
   // La vaincre donne sa carte, une fois par semaine.
   weekly() {

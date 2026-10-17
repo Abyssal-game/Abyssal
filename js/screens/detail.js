@@ -128,6 +128,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
           <span class="dt-chip">×${e.n} exemplaire${e.n > 1 ? 's' : ''}</span>
           <span class="dt-chip gold">Niv. ${li.level}${li.level >= li.max ? ' · Apogée' : ''}</span>
           <span class="dt-acts"><button class="dt-chip dt-chipb ${g.isFav(current) ? 'on' : ''}" data-act="fav" aria-pressed="${g.isFav(current)}">${icon('star')}Favori</button>
+          <button class="dt-chip dt-chipb ${g.s.showcase.includes(current) ? 'on' : ''}" data-act="showcase" aria-pressed="${g.s.showcase.includes(current)}">${picon('showcase')}Vitrine</button>
           <button class="dt-chip dt-chipb burn" data-act="burn">${picon('furnace')}Brûler</button></span>
         </div>
         <div class="dt-tabs" role="tablist">${tabs.map(([k, ic, l]) => `<button class="dt-tab" role="tab" data-act="tab" data-v="${k}" aria-selected="${dtab === k}">${picon(ic)}<span>${l}</span></button>`).join('')}</div>
@@ -161,6 +162,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     showv() { try { g.setShownVariant(current, shownVariant); app.sfx.tap(); toast(`Apparence <b>${esc(VARIANTS[shownVariant].name.toLowerCase())}</b> affichée partout.`, { icon: 'eye' }); draw(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } },
     fav() { const on = g.toggleFav(current); app.sfx?.tap?.(); toast(on ? 'Ajoutée à tes favoris : elle ne pourra pas être brûlée par erreur.' : 'Retirée de tes favoris.', { icon: 'star' }); draw(); },
     chal(el) { try { const x = g.claimChallenge(current, el.dataset.k); app.sfx?.levelup?.(); toast(`Défi « ${esc(x.name)} » réussi : <b>+${x.ash} cendres</b> et +${x.fame} Renommée`, { kind: 'success', icon: 'ash' }); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
+    showcase() { const was = g.s.showcase.includes(current); g.toggleShowcase(current); app.sfx?.tap?.(); toast(was ? 'Retirée de ta vitrine.' : 'Mise en vitrine sur ton profil (3 cartes au plus).', { icon: 'star' }); draw(); }, /* v404 */
     burn() { openBurn(app, current, { onClose: () => { shownVariant = null; draw(); } }); },
     lvup() { if (upgradeCard(app, current)) draw(); },
     tab(el) { dtab = el.dataset.v; try { localStorage.setItem('abyssal.dtab', dtab); } catch (e) { /* rien */ } draw(); },

@@ -9,6 +9,7 @@ import { RARITIES, RARITY_ORDER, BOOSTERS } from '../config.js';
 import { sfx, audioInfo } from '../ui/sound.js';
 import { MUSIC_DEMO, musicPreview } from '../ui/music.js';
 import { sync, onSync, refreshProfile } from '../cloud/sync.js';
+import { isLoggedIn } from '../cloud/cloud.js';
 import { openCreator } from './creator.js';
 import { showWelcome } from './welcome.js';
 import { shareFile } from '../native.js';
@@ -42,9 +43,9 @@ export default function settings(app, root) {
         ${seg('defense', 'Défense active en combat', [['on', 'Manuelle'], ['auto', 'Automatique']])}
         <p class="small muted set-note">Manuelle : touche dans la zone dorée pour esquiver, sur le trait blanc pour une parade parfaite. Automatique : rien à toucher, mais seulement 4 esquives sur 10 et jamais de parade parfaite (moins de Ferveur et de PA).</p>
         ${seg('decor', 'Décor des combats', [['riche', 'Riche'], ['sobre', 'Sobre']])}
-        ${seg('quality', 'Effets des combats', [['auto', 'Complets'], ['light', 'Allégés']])}
-        <p class="small muted">Allégés : moins de particules, ni secousses de caméra ni éclairs, décor sobre. À essayer si les combats saccadent.</p>
         <p class="small muted set-note">Sobre : la salle reste en place, sans particules ni flammes qui vacillent. Plus reposant, et un peu plus économe en batterie.</p>
+        ${seg('quality', 'Effets des combats', [['auto', 'Complets'], ['light', 'Allégés']])}
+        <p class="small muted set-note">Allégés : moins de particules, ni secousses de caméra ni éclairs, décor sobre. À essayer si les combats saccadent.</p>
         ${toggle('fastOpen', 'Ouverture rapide des boosters', 'Affiche directement le récapitulatif, sans révéler les cartes une par une.')}
       </section>
 `;
@@ -64,7 +65,7 @@ export default function settings(app, root) {
   // devient un bloc replié « Avancé » en bas de l'onglet Jeu (copie de secours et effacement)
   function tabSave() {
     return `<details class="panel dc-fold set-adv"><summary>${icon('seal')} Avancé : copie de secours, effacement</summary><div class="stack">
-        <p class="small">Ta partie est sauvegardée <b>automatiquement</b> sur ton compte en ligne : tu n’as rien à faire, et tu la retrouves sur n’importe quel appareil en te connectant. Une copie de secours reste possible ici.</p>
+        ${isLoggedIn() ? '<p class="small">Ta partie est sauvegardée <b>automatiquement</b> sur ton compte en ligne : tu n’as rien à faire, et tu la retrouves sur n’importe quel appareil en te connectant. Une copie de secours reste possible ici.</p>' : '<p class="small"><b>Sans compte</b>, ta partie n’est gardée que sur ce téléphone : elle serait perdue si tu supprimes l’application ou changes de téléphone. <a href="#/compte">Crée un compte</a> pour la sauvegarder en ligne, ou garde une copie de secours ici.</p>'}
         ${app.persistent ? '' : '<p class="small err">Le stockage local est indisponible : la progression sera perdue à la fermeture.</p>'}
         <div class="row gap wrap">
           <button class="btn small" data-act="export">${icon('copy')}Copier le code</button>

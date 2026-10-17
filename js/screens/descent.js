@@ -58,7 +58,6 @@ export default function descent(app, root) {
     root.innerHTML = `<header class="screen-head dc-head ui-hero bn-descente"><h1>La Descente</h1><p class="muted">${d.best ? `Ton record : étage ${d.best}${d.bestToday ? ` · aujourd’hui : ${d.bestToday}` : ''}` : 'Descends, survis, rapporte un coffre.'}</p></header>
       ${news ? `<section class="panel ornate dc-news"><div class="dc-new-h"><span class="dc-new-ic">${icon('sparkle')}</span><span><b>Tes cartes combattent !</b><span class="small">Les héros ont quitté l’Abysse : ce sont maintenant tes créatures qui descendent. Chaque doublon fait monter une carte de niveau.</span>${news.shards ? `<span class="small">Ton ancien équipement et l’expérience de tes héros ont été changés en <b>${fmt(news.shards)} éclats</b>. Tes coffres sont gardés : ils contiennent maintenant des boosters.</span>` : ''}</span></div><button class="btn small ghost" data-act="news">OK</button></section>` : ''}
       ${last ? summaryHTML(last) : ''}
-      ${summitHTML(d)}
       ${chests ? `<a class="panel dc-chests" href="#/coffres"><span class="dc-new-ic">${icon('p:chest')}</span><span><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Éclats et boosters</span></span>${icon('next')}</a>` : ''}
       <section class="panel dc-go">
         <div class="dc-banner bn-expedition"><b>Expédition</b><span class="small">${d.best ? `Record : étage ${d.best}` : 'Ta première descente t’attend'}</span></div>
@@ -72,13 +71,14 @@ export default function descent(app, root) {
         <button class="btn ${!torches ? 'ghost' : ui.cursed ? 'danger' : 'primary'} block big-cta dc-plq ${torches ? 'dc-plq-red' : 'dc-plq-dark'}" data-act="start" ${team.length >= TEAM.active ? '' : 'disabled'}>${icon('p:descend')}${torches ? 'Descendre' : 'Entraînement'}</button>
         ${torches ? '' : '<p class="small muted center dc-train">Entraînement : ni coffre, ni cendres, ni saison, éclats réduits de moitié. Les créatures vaincues comptent quand même pour ta Chasse. Tes torches reviennent à minuit.</p>'}
         <div class="dc-opts">
-          ${torches ? `<button class="dc-opt ${ui.cursed ? 'on' : ''}" data-act="curse" aria-pressed="${ui.cursed}">${icon('skull')}<b>Maudite</b><small>${riskLine('cursed', 'coffre +1, rien si l’équipe tombe')}</small></button>` : ''}
+          ${torches && g.s.bossesBeaten?.devoreur ? `<button class="dc-opt ${ui.cursed ? 'on' : ''}" data-act="curse" aria-pressed="${ui.cursed}">${icon('skull')}<b>Maudite</b><small>${riskLine('cursed', 'coffre +1, rien si l’équipe tombe')}</small></button>` : ''}
           ${g.nightmareUnlocked() ? `<button class="dc-opt dc-opt-night ${ui.nightmare ? 'on' : ''}" data-act="night" aria-pressed="${ui.nightmare}">${icon('skull')}<b>Cauchemar</b><small>${riskLine('night', g.nightBest(nt()) ? `record : étage ${g.nightBest(nt())}` : `ennemis +${Math.round((NIGHT_TIERS[nt()].hp - 1) * 100)} % PV, +${Math.round((NIGHT_TIERS[nt()].atk - 1) * 100)} % ATQ`)} · départ ≈ étage ${g.nightmareEquiv(startFloor(), nt())}</small></button>` : `<button class="dc-opt off" data-act="optinfo">${icon('lock')}<b>Cauchemar</b><small>dès l’étage ${NIGHTMARE_AT}</small></button>`}
           <button class="dc-opt-info icon-btn" data-act="optinfo" aria-label="Explications des modes">${icon('info')}</button>
         </div>
         ${ui.nightmare && g.nightmareUnlocked() ? `<div class="dc-ntiers" role="radiogroup" aria-label="Palier du Cauchemar">${[1, 2, 3].map((t) => { const open = g.nightTierOpen(t); return `<button class="dc-nt ${nt() === t ? 'on' : ''} ${open ? '' : 'off'}" role="radio" aria-checked="${nt() === t}" data-act="ntier" data-t="${t}" ${open ? '' : 'disabled'}><b>${['', 'I', 'II', 'III'][t]}</b><small>${open ? `coffre +${NIGHT_TIERS[t].chest} · éclats ×${String(NIGHT_TIERS[t].shards).replace('.', ',')}` : `${icon('lock')} étage ${NIGHT_TIER_OPEN} en ${['', 'I', 'II'][t - 1]}`}</small></button>`; }).join('')}</div>` : ''}
         ${ui.cursed || ui.nightmare ? `<p class="small dc-riskwarn">${icon('skull')} ${[ui.cursed ? 'Maudite : si l’équipe tombe, <b>tu perds tout</b> (éclats et coffres).' : '', ui.nightmare ? `${NIGHT_TIERS[nt()].name} : dès ton premier combat, les ennemis ont la force de l’<b>étage ${g.nightmareEquiv(startFloor(), nt())}</b> en mode normal, et les gardiens sont déchaînés.` : ''].filter(Boolean).join(' ')}${riskAdvice()}</p>` : ''}
       </section>
+      ${summitHTML(d)}
       ${ruleHTML(g.rule())}
       <div class="dc-links">
         ${seasonHTML() ? `<button class="dc-link" data-act="open" data-f="season">${picon('season')}<b>Saison</b><small>paliers du mois</small></button>` : ''}
@@ -132,8 +132,10 @@ export default function descent(app, root) {
     return `<p class="vx-week dc-bp"><span>${icon('crystal')} <b>${fmt(have)} / ${fmt(price)} éclats</b> pour ton prochain booster</span><span class="progress"><i style="width:${(have / price) * 100}%"></i></span></p>`;
   }
   // v394 : le fond de l'Abysse, étage 100 (le dernier) : ce qu'il rapporte, et où en est le joueur
-  function summitHTML(d) {
+  function summitHTML(d, full = false) {
     const best = Math.min(FINAL_FLOOR, d.best || 0), done = !!g.s.bossesBeaten?.abysse;
+    // v404 : une simple ligne tant que le record est loin du fond (le grand encart écrasait le premier écran)
+    if (!full && best < 50 && !done) return `<button class="panel dc-summit-line" data-act="open" data-f="summit"><img alt="" src="assets/packs/abysse.webp"><span><b>Objectif ultime : l’étage ${FINAL_FLOOR}</b><small>L’Abysse et son booster légendaire · ton record : ${best} / ${FINAL_FLOOR}</small></span>${icon('next')}</button>`;
     return `<section class="panel dc-summit ${done ? 'done' : ''}"><img class="dc-sm-pack" alt="" src="assets/packs/abysse.webp">
       <div class="dc-sm-body"><b class="dc-sm-k">${done ? 'Fond de l’Abysse atteint' : 'Le fond de l’Abysse'}</b><h2>Étage ${FINAL_FLOOR} · L’Abysse</h2>
         <p class="small">Le dernier étage de la Descente. Le vaincre termine l’expédition et donne le <b>Booster de l’Abysse</b> : 5 cartes, une Mythique ou mieux, toutes au moins holographiques${done ? '' : ', et la première fois <b>une Secrète que tu n’as pas</b>'}.</p>
@@ -393,7 +395,8 @@ export default function descent(app, root) {
     // v320 : saison, classement et aide s'ouvrent dans une fenêtre (la page ne les empile plus)
     open(el) {
       const f = el.dataset.f;
-      if (f === 'season') openSheet(`<h2 class="center">Saison et paliers</h2>${seasonHTML()}`, { label: 'Saison', cls: 'dc-sheet' });
+      if (f === 'summit') openSheet(summitHTML(g.descent(), true), { label: 'Le fond de l’Abysse', cls: 'dc-sheet' });
+      else if (f === 'season') openSheet(`<h2 class="center">Saison et paliers</h2>${seasonHTML()}`, { label: 'Saison', cls: 'dc-sheet' });
       else if (f === 'board') { const sh = openSheet('<h2 class="center">Classement du jour</h2><div class="lb-body small muted">Chargement…</div>', { label: 'Classement', cls: 'dc-sheet' }); loadBoard(sh.body.querySelector('.lb-body')); }
       else openSheet(`<h2 class="center">Comment ça marche</h2><ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol><p class="small muted center">${DESCENT.torches} expéditions avec coffre par jour, puis tu peux t’entraîner (ni coffre, ni cendres).</p>`, { label: 'Aide', cls: 'dc-sheet' });
     },
