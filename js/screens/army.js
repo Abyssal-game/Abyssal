@@ -141,8 +141,21 @@ export function teamScreen(app, root) {
         <div class="panel v2-skill ult" style="--uc:${ult.color}"><b>${icon('p:power')} Pouvoir : ${esc(ult.name)}</b><p class="small">${esc(ult.desc)}</p><p class="small muted">${ult.card ? `Porté par ${esc(cat.get(ult.card).name)}.` : 'Ajoute une Mythique ou une Secrète pour un pouvoir plus puissant.'}</p></div>
       </section>
       <h2 class="section-title">Ta collection <span class="more small"><button class="linkish" data-act="sort">${ui.sort === 'cost' ? 'Trier par niveau' : 'Trier par coût'}</button></span></h2>
-      <div class="grid-cards v2-grid">${owned.map((c) => `<div class="v2-pick ${team.includes(c.id) ? 'in' : ''}">${armyCard(g, c)}${run ? '' : `<button class="tm-add ${team.includes(c.id) ? 'in' : ''}" data-act="quick" data-id="${c.id}">${team.includes(c.id) ? '✓ Dans l’équipe' : `+ Ajouter · ${COST[c.rarity]}`}</button>`}</div>`).join('')}</div>`;
+      <div class="grid-cards v2-grid" id="tm-grid"></div>`;
     lazyArt(root);
+    // v391 : la grille de la collection par paquets (216 cartes d'un coup bloquaient l'écran plus d'une seconde, à chaque ajout)
+    const grid = root.querySelector('#tm-grid'), html = (c) => `<div class="v2-pick ${team.includes(c.id) ? 'in' : ''}">${armyCard(g, c)}${run ? '' : `<button class="tm-add ${team.includes(c.id) ? 'in' : ''}" data-act="quick" data-id="${c.id}">${team.includes(c.id) ? '✓ Dans l’équipe' : `+ Ajouter · ${COST[c.rarity]}`}</button>`}</div>`;
+    const turn = (draw.turn = (draw.turn || 0) + 1), FIRST = 12, STEP = 18;
+    grid.innerHTML = owned.slice(0, FIRST).map(html).join(''); lazyArt(grid);
+    const k0 = grid.children[0];
+    if (k0 && owned.length > FIRST) { const cols = [...grid.children].filter((x) => x.offsetTop === k0.offsetTop).length || 1; const gap = parseFloat(getComputedStyle(grid).rowGap) || 0; grid.style.minHeight = `${Math.ceil(owned.length / cols) * (k0.offsetHeight + gap)}px`; }
+    const more = (from) => {
+      if (turn !== draw.turn || !grid.isConnected) return;
+      if (from >= owned.length) { grid.style.minHeight = ''; return; }
+      grid.insertAdjacentHTML('beforeend', owned.slice(from, from + STEP).map(html).join('')); lazyArt(grid);
+      setTimeout(() => requestAnimationFrame(() => more(from + STEP)), 0);
+    };
+    requestAnimationFrame(() => more(FIRST));
   };
   root.addEventListener('click', (e) => { if (e.target.closest('[data-act]')) return; const t = e.target.closest('.tcg'); if (t) openCreature(app, t.dataset.id, { onChange: draw }); });
   bindActions(root, {
