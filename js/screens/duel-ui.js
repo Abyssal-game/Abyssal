@@ -939,16 +939,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     if (!rows.length) return;
     const html0 = rows.slice(-6).map((r) => `<li>${r.a ? `<b>${nm(r.a)}</b> <i>${esc(r.k)}</i>` : '<b>Fin du tour</b>'}${r.parts.length ? ` · ${r.parts.slice(0, 4).join(', ')}` : ''}</li>`).join('');
     app.state.lastEnemyTurn = html0; // gardé pour « Voir ce qui s'est passé » après une défaite
-    if (st.over || !alive_) return;
-    const html = rows.slice(-5).map((r) => `<li>${r.a ? `<b>${nm(r.a)}</b> <i>${esc(r.k)}</i>` : '<b>Fin du tour</b>'}${r.parts.length ? ` · ${r.parts.slice(0, 4).join(', ')}` : ''}</li>`).join('');
-    const box = document.createElement('button');
-    box.className = 'cb-recap';
-    box.setAttribute('aria-label', 'Résumé du tour ennemi, touche pour fermer');
-    box.innerHTML = `<span class="cb-recap-h">Tour ennemi <small>touche pour fermer</small></span><ul>${html}</ul>`;
-    box.addEventListener('click', (ev) => { ev.stopPropagation(); box.remove(); });
-    $('.dv').appendChild(box);
-    // le premier toucher n'importe où ferme le résumé (et agit normalement)
-    setTimeout(() => $('.dv')?.addEventListener('pointerdown', () => box.remove(), { once: true, capture: true }), 50);
+    /* v409 : plus de fenêtre « Tour ennemi » pendant le combat (jugée pénible) ; le résumé reste lisible après une défaite */
   }
   async function enemyTurn() {
     log ||= [];
