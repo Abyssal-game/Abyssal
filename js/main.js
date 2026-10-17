@@ -163,10 +163,10 @@ function renderChrome() {
   const nNewSub = g.newCount() > 99 ? '99+' : g.newCount();
   const sn = document.getElementById('subnav');
   // v404 : sous-onglets encore fermés cachés (Sceaux avant le premier gardien, Tirage sans compte)
-  const shown0 = sub && sub.filter(([r]) => (r !== 'sceaux' || g.sceauxOpen() || app.route === 'sceaux') && (r !== 'tirage' || isLoggedIn() || app.route === 'tirage'));
+  const shown0 = sub && sub.filter(([r]) => (r !== 'tirage' || isLoggedIn() || app.route === 'tirage'));
   const shown = shown0 && shown0.length > 1 ? shown0 : null; /* v422 : pas de barre pour un seul sous-onglet */
   document.body.classList.toggle('has-subnav', !!shown);
-  sn.innerHTML = shown ? shown.map(([r, ic, label]) => { const bd = subBadge(r); return `<a class="sn-tab" href="#/${r}"${r === app.route || (r === 'renfort' && app.route === 'fournaise') ? ' aria-current="page"' : ''}><img class="sn-ic" alt="" src="assets/icons/${ic}.webp"><span>${label}</span>${bd ? `<i class="sn-badge">${bd}</i>` : ''}</a>`; }).join('') : '';
+  sn.innerHTML = shown ? shown.map(([r, ic, label]) => { const bd = subBadge(r); return `<a class="sn-tab${r === 'sceaux' && !g.sceauxOpen() ? ' locked' : ''}" href="#/${r}"${r === app.route || (r === 'renfort' && app.route === 'fournaise') ? ' aria-current="page"' : ''}><img class="sn-ic" alt="" src="assets/icons/${ic}.webp"><span>${label}</span>${bd ? `<i class="sn-badge">${bd}</i>` : ''}</a>`; }).join('') : '';
   const nNew = g.newCount();
   const ticketCount = Object.values(s.tickets).reduce((a, b) => a + b, 0) + (g.welcomePending() ? 0 : g.freePack().stock); /* v404 : « 2 » comme l'annonce l'Accueil au tout début */
   document.getElementById('tabbar').innerHTML = TABS.map(([key, ic, label]) => {

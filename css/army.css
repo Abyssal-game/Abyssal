@@ -3698,3 +3698,8 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 .v2-slot.full { display: flex; flex-direction: column; aspect-ratio: auto; min-width: 0; }
 .v2-slot.full .tm-ctl { position: static !important; margin-top: 6px; bottom: auto !important; }
 .v2-slot.full .tm-b { min-height: 38px; min-width: 44px; }
+/* v424 : l'onglet Sceaux reste visible avant le premier gardien, grisé avec un cadenas (avant : caché, on le croyait disparu) */
+.sn-tab.locked { opacity: .55; }
+.sn-tab.locked .sn-ic { filter: grayscale(1); }
+.sn-tab.locked::after { content: '🔒'; position: absolute; top: 4px; right: 6px; font-size: .7rem; }
+.sn-tab { position: relative; }
