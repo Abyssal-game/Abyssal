@@ -82,7 +82,7 @@ test('objectifs : trois cibles concrètes, qui suivent la progression', async ()
   g.s.ash = 500;
   assert.ok(g.goals().some((x) => x.kind === 'forge' && /Renforce/.test(x.title)));
   g.s.ash = 0;
-  for (const k of ['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse']) g.s.bossesBeaten[k] = 1;
+  for (const k of (await import('../js/core/bosses.js')).BOSS_ORDER) g.s.bossesBeaten[k] = 1;
   assert.equal(g.goals()[1].kind, 'sceaux');
   // ensemble presque complet : il passe devant le royaume
   const set = catalog.sets[0];

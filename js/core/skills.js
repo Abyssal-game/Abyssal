@@ -145,6 +145,16 @@ export const INTENTS = {
   copy:     { name: 'Imitation',      icon: 'skull',   desc: 'Utilise contre toi la compétence copiée.' },
   decree:   { name: 'Décret',         icon: 'sparkle', desc: 'Impose une nouvelle Loi qui change les règles du combat à partir de ton prochain tour.' },
   shift:    { name: 'Bascule',        icon: 'sparkle', desc: 'Change d’aspect : ses faiblesses et résistances s’inversent à partir de ton prochain tour.' },
+  brood:    { name: 'La ruche s’éveille', icon: 'sparkle', desc: 'N’attaque pas ce tour-ci : Essaim au tour suivant. Gel ou Brisure l’interrompent.' },
+  swarm:    { name: 'Essaim',         icon: 'skull',   desc: 'Frappe toute ton équipe et empoisonne chaque créature (+3 poison, +5 en phase 2).' },
+  sentence: { name: 'Sentence',       icon: 'eye',     desc: 'Condamne ta créature la plus affaiblie : il l’exécutera au tour suivant. Permute-la en réserve, défends-la, ou brise-le.' },
+  execute:  { name: 'Exécution',      icon: 'skull',   desc: 'Frappe la condamnée avec deux fois sa force (trois fois si elle a perdu la moitié de ses PV). Si elle tombe, il gagne +3 ATQ.' },
+  chant:    { name: 'Chant des noyés', icon: 'sparkle', desc: 'N’attaque pas ce tour-ci : Complainte au tour suivant. Gel ou Brisure l’interrompent.' },
+  lament:   { name: 'Complainte',     icon: 'flame',   desc: 'Frappe toute ton équipe, retire ses boucliers et ses bonus d’attaque, et te fait perdre 2 Ferveur.' },
+  chain:    { name: 'Chaînes',        icon: 'eye',     desc: 'Frappe ta créature la plus forte et l’enchaîne : elle ne pourra pas agir à ton prochain tour.' },
+  wind:     { name: 'Remonter le temps', icon: 'sparkle', desc: 'Au tour suivant, il retrouve les PV qu’il a maintenant (un quart de ses PV au plus). Gel ou Brisure l’interrompent.' },
+  rewind:   { name: 'Retour en arrière', icon: 'heart', desc: 'Il retrouve les PV qu’il avait quand il a remonté le temps.' },
+  tick2:    { name: 'Double tic',     icon: 'swords',  desc: 'Frappe deux fois de suite la cible annoncée.' },
 };
 
 // Pouvoirs des gardiens. weak : la capacité qui les contre. Phase 2 sous 50 % des PV.

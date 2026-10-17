@@ -58,7 +58,49 @@ export const BOSSES = {
     story: 'Quand le jour et la nuit se sont disputé le ciel, l’Éclipse est née de leur collision. Elle n’appartient à aucun des deux, et les trahit tour à tour.',
     pattern: (phase, round) => (round % (phase === 2 ? 2 : 3) === 2 ? 'shift' : phase === 2 && round % 3 === 0 ? 'channel' : 'hit'),
   },
+  // v383 : cinq nouveaux gardiens pour les étages 30 à 50 (toujours déchaînés à ces profondeurs : leur phase 2 joue dès le début)
+  essaim: {
+    name: 'La Reine des Essaims', title: 'Mère de mille dards',
+    intro: 'Le sol vibre d’un bourdonnement sourd. Des alvéoles s’ouvrent dans les murs, et quelque chose d’immense s’y redresse.',
+    mechanic: 'Elle annonce « La ruche s’éveille », puis lâche son Essaim au tour suivant : toute ton équipe est frappée et empoisonnée. Plus tes créatures sont empoisonnées, plus elle se régénère.',
+    counter: 'Brise-la ou gèle-la pendant que la ruche s’éveille, esquive l’Essaim, et purifie le poison (Prière).',
+    story: 'Elle n’a jamais été seule : chacune de ses filles porte un morceau de sa mémoire. Quand les Scelleurs ont muré sa ruche, elle a simplement appris à pondre dans la pierre.',
+    pattern: (phase, round) => (round % (phase === 2 ? 2 : 3) === 1 ? 'brood' : 'hit'),
+  },
+  bourreau: {
+    name: 'Le Bourreau', title: 'La sentence ne se discute pas',
+    intro: 'Une cloche sonne une seule fois. Au fond de la salle, une hache plus grande qu’un homme racle lentement le sol.',
+    mechanic: 'Il prononce une Sentence contre ta créature la plus affaiblie, puis l’exécute au tour suivant : un coup terrible, encore plus fort si elle a perdu la moitié de ses PV. Chaque exécution mortelle le rend plus fort.',
+    counter: 'Permute la condamnée en réserve (la hache frappe dans le vide), défends-la, ou brise-le avant l’exécution.',
+    story: 'Il a exécuté tant de condamnés au nom des Sceaux qu’il ne se souvient plus d’un seul visage. L’Abysse lui a seulement demandé de continuer, et il n’a jamais su dire non.',
+    pattern: (phase, round) => (round % (phase === 2 ? 2 : 3) === 1 ? 'sentence' : 'hit'),
+  },
+  choeur: {
+    name: 'Le Chœur des Noyés', title: 'Ils chantent pour ne pas oublier',
+    intro: 'De l’eau noire monte entre les dalles. Des voix, des centaines, entonnent un chant que tu connais sans l’avoir jamais entendu.',
+    mechanic: 'Il entonne un Chant, puis lance sa Complainte au tour suivant : toute ton équipe est frappée, perd ses boucliers et ses bonus d’attaque, et tu perds 2 Ferveur. En phase 2, la marée monte et ronge tes créatures à chaque tour.',
+    counter: 'Brise-le pendant le Chant, esquive la Complainte et dépense ta Ferveur avant qu’elle ne tombe. Une Brisure retient la marée un tour.',
+    story: 'Ce sont les marins d’une flotte entière, engloutie en une nuit. Ils ont chanté jusqu’au fond, et l’Abysse a trouvé leur chant trop beau pour le laisser s’éteindre.',
+    pattern: (phase, round) => (round % (phase === 2 ? 2 : 3) === 2 ? 'chant' : 'hit'),
+  },
+  chaines: {
+    name: 'Le Seigneur des Chaînes', title: 'Nul ne quitte sa forge',
+    intro: 'Des chaînes chauffées à blanc pendent du plafond. Une enclume résonne, et chaque coup fait trembler tes os.',
+    mechanic: 'Il lance ses Chaînes sur ta créature la plus forte : elle est frappée et enchaînée (elle ne pourra pas agir à ton prochain tour). En phase 2, sa forge s’embrase : il gagne +1 ATQ à chaque tour où il n’est pas brisé.',
+    counter: 'Esquive les Chaînes, libère l’enchaînée avec une Prière, et brise-le souvent pour éteindre sa forge.',
+    story: 'Il a forgé les chaînes qui tiennent l’Abysse fermé. Puis il a compris qu’on ne lui ouvrirait jamais, et il s’est mis à forger pour l’autre camp.',
+    pattern: (phase, round) => (round % (phase === 2 ? 2 : 3) === 2 ? 'chain' : 'hit'),
+  },
+  horloge: {
+    name: 'L’Horloger', title: 'Le temps lui doit tout',
+    intro: 'Un tic-tac emplit la salle, trop lent, puis trop rapide. Au centre, des rouages dorés tournent autour d’une silhouette sans âge.',
+    mechanic: 'Il annonce « Remonter le temps » : au tour suivant, il retrouve les PV qu’il avait à l’annonce (un quart de ses PV au plus). En phase 2, le temps s’emballe et il frappe deux fois de suite.',
+    counter: 'Brise-le ou gèle-le pendant qu’il remonte le temps, ou garde tes plus gros coups pour juste après.',
+    story: 'Il a réglé l’horloge des Sceaux pour qu’elle ne sonne jamais la fin. Depuis, chaque seconde qui passe lui appartient un peu plus.',
+    pattern: (phase, round) => (round % 3 === 1 ? 'wind' : phase === 2 ? 'tick2' : 'hit'),
+  },
 };
-export const BOSS_ORDER = ['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse'];
+// Étages 5 à 25 : les cinq premiers gardiens ; 30 à 50 : les cinq nouveaux ; puis le cycle des dix recommence
+export const BOSS_ORDER = ['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge'];
 // Gardien d'un étage (tous les 5 étages)
 export const bossOf = (floor) => BOSS_ORDER[(Math.max(1, Math.floor(floor / 5)) - 1) % BOSS_ORDER.length];

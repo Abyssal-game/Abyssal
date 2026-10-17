@@ -44,6 +44,11 @@ export const BOSS_ROOMS = {
   roi:        { paint: 'g-5', theme: 'primordial', light: '#FFC65A', monument: 'masks' },
   architecte: { paint: 'bg-boss', theme: 'primordial', light: '#FFD36A', monument: 'geometry' },
   eclipse:    { paint: 'g-6', theme: 'celeste', light: '#FF9A3C', monument: 'eclipse' },
+  essaim:     { paint: 'g-4', theme: 'sauvage', light: '#B8FF5A', monument: null },
+  bourreau:   { paint: 'f-16', theme: 'infernal', light: '#FF3A2A', monument: null },
+  choeur:     { paint: 'f-14', theme: 'abyssal', light: '#5AB8FF', monument: null },
+  chaines:    { paint: 'g-7', theme: 'infernal', light: '#FF7A1A', monument: null },
+  horloge:    { paint: 'f-13', theme: 'artificiel', light: '#FFD07A', monument: 'geometry' },
 };
 
 // Décor d'un combat : d'après la peinture de l'étage (et la salle du gardien s'il y en a un)

@@ -47,7 +47,7 @@ const fxUrl = (n) => `assets/fx/${FX_FALLBACK[n] && !FX_NEW.has(n) ? FX_FALLBACK
 const DANGER = ['', '', 'Danger', 'Mortel'];
 // Icône peinte d'une intention ennemie
 // les intentions des gardiens réutilisent les icônes peintes les plus proches
-const IN_PIC = { gorge: 'heavy', gather: 'channel', blizzard: 'frost', mimic: 'channel', copy: 'heavy', decree: 'rally', shift: 'charge' };
+const IN_PIC = { gorge: 'heavy', gather: 'channel', blizzard: 'frost', mimic: 'channel', copy: 'heavy', decree: 'rally', shift: 'charge', brood: 'channel', swarm: 'poison', sentence: 'charge', execute: 'heavy', chant: 'channel', lament: 'blast', chain: 'frost', wind: 'charge', rewind: 'heal', tick2: 'hit' };
 const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${IN_PIC[k] || k}.webp">`;
 
 export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = null, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.' }) {
@@ -132,6 +132,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     u.ward ? st_('seal', `Sceau : absorbe encore ${u.ward} dégâts`, u.ward) : '',
     u.poison ? st_('poison', `Poison : ${u.poison} dégâts au début de son tour`, u.poison) : '',
     u.frozen || u.stunned ? st_('frost', 'Gelé : passe son tour') : '',
+    u.condemned ? st_('exposed', 'Condamnée : le Bourreau l’exécutera à son prochain tour (permute-la en réserve pour l’épargner)') : '',
     u.slow ? st_('slow', 'Ralenti : prochaine attaque -50 %') : '',
     u.mark ? st_('mark', 'Marqué : le prochain coup d’une autre de tes créatures fait +50 % et +2 Brisure, puis la Marque part. +3 aux jets') : '',
     u.defend ? st_('defend', 'Défense : -50 % de dégâts') : '',
@@ -156,11 +157,11 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const intentChip = (u) => {
     const i = intentInfo(st, u);
     if (!i || st.turn !== 'ally') return '';
-    const named = ['hunt', 'charge', 'channel', 'shield', 'heal', 'rally', 'frost', 'gather', 'mimic', 'decree', 'shift'].includes(i.kind);
+    const named = ['hunt', 'charge', 'channel', 'shield', 'heal', 'rally', 'frost', 'gather', 'mimic', 'decree', 'shift', 'brood', 'sentence', 'chant', 'wind', 'rewind', 'chain'].includes(i.kind);
     const label = i.kind === 'mimic' ? `Copie : ${esc(i.copyName)}` : i.kind === 'decree' ? esc(LAWS[i.law]?.name || 'Décret') : i.kind === 'shift' ? esc(ASPECTS[i.aspect]?.name || 'Bascule')
       : named ? esc(i.def.name) : i.kind === 'copy' ? `${esc(i.copyName)}${i.dmg ? ` ${i.dmg}` : ''}` : `${i.dmg}${i.aoe ? ' ×3' : ''}`;
     const brk = u.brkMax && !u.broken && i.danger >= 2 ? `<small class="cb-ibrk" title="Brise-le pour annuler cette action">◆ ${u.brk}</small>` : '';
-    const cd = ['charge', 'channel', 'gather', 'mimic'].includes(i.kind) ? '<em class="cb-icd" title="Frappe au prochain tour">⏳1</em>' : '';
+    const cd = ['charge', 'channel', 'gather', 'mimic', 'brood', 'sentence', 'chant', 'wind'].includes(i.kind) ? '<em class="cb-icd" title="Frappe au prochain tour">⏳1</em>' : '';
     return `<span class="cb-int d${i.danger} k-${i.kind}" title="${esc(i.def.name)} : ${esc(i.def.desc)}">${intentIcon(i.kind)}<b>${label}</b>${i.danger >= 2 ? `<em>${DANGER[i.danger]}</em>` : ''}${cd}${brk}</span>`;
   };
   // v348 : dès l'étage 5 de la Descente, les ennemis ordinaires annoncent aussi leur coup (dégâts → cible), en discret
@@ -297,7 +298,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   // Ordre des tours (v258) : frise horizontale de portraits en haut de l’écran (v270). Ton équipe joue ensemble, puis chaque ennemi à son tour.
   let tlSig = '', acting = null;
   // v265 : seules les grosses attaques des gardiens et des élites s'annoncent sur la frise (les coups ordinaires restent cachés)
-  const BIG_IT = ['heavy', 'blast', 'gorge', 'blizzard', 'copy'], PREP_IT = { charge: 'heavy', channel: 'blast', gather: 'blizzard', mimic: 'copy' };
+  const BIG_IT = ['heavy', 'blast', 'gorge', 'blizzard', 'copy', 'swarm', 'execute', 'lament'], PREP_IT = { charge: 'heavy', channel: 'blast', gather: 'blizzard', mimic: 'copy', brood: 'swarm', sentence: 'execute', chant: 'lament' };
   const bigOf = (u, next) => {
     if (!(u.boss || u.elite) || u.hp <= 0) return null;
     const it = u.intent && !u.intent.cancelled ? u.intent.kind : null;
@@ -715,7 +716,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   // nom du coup. Plus court quand la créature l'a déjà eu dans ce combat ; un toucher le passe ; absent si les
   // animations sont réduites ou en vitesse ×3.
   const shotSeen = new Set();
-  const BOSS_SHOT = new Set(['heavy', 'blast', 'charge', 'gorge', 'gather', 'blizzard', 'mimic', 'copy', 'decree', 'shift']);
+  const BOSS_SHOT = new Set(['heavy', 'blast', 'charge', 'gorge', 'gather', 'blizzard', 'mimic', 'copy', 'decree', 'shift', 'brood', 'swarm', 'sentence', 'execute', 'chant', 'lament', 'chain', 'wind', 'rewind']);
   // v357 : « la carte s'éveille » (remplace le plan en pleine illustration, jugé sans intérêt par le propriétaire) :
   // la carte se soulève et s'illumine à la couleur de sa faction, un cercle magique de la faction tourne sous elle,
   // le nom du coup s'affiche au-dessus. Ennemis : la carte gronde, rougit et tremble. Puis le sort part sur la cible.
@@ -787,7 +788,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   async function phaseCard(P) {
     const b = document.createElement('div');
     b.className = 'cb-phase';
-    b.innerHTML = `${st.bossKey ? `<img class="cb-phimg" alt="" src="assets/ui/ph-${st.bossKey}.webp">` : ''}<b>${esc(P.name)}</b><p>${esc(P.desc)}</p><small>Touche pour continuer</small>`;
+    b.innerHTML = `${st.bossKey ? `<img class="cb-phimg" alt="" src="assets/ui/ph-${st.bossKey}.webp" onerror="this.remove()">` : ''}<b>${esc(P.name)}</b><p>${esc(P.desc)}</p><small>Touche pour continuer</small>`;
     $('.dv').appendChild(b);
     await new Promise((res) => { const go = () => { b.remove(); res(); }; b.addEventListener('pointerdown', go, { once: true }); }); // v295 : attend le toucher, plus de fermeture automatique
   }
