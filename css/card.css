@@ -293,3 +293,40 @@
 html.reduce-motion .tcg.apex::before { animation: none; }
 /* favori (v227) */
 .tcg-fav { position: absolute; z-index: 6; right: 5%; top: 16%; font-size: 9cqw; line-height: 1; color: #F2C14E; text-shadow: 0 0 6px rgba(0, 0, 0, .9), 0 0 10px rgba(242, 193, 78, .6); pointer-events: none; }
+
+/* v415 : finitions refaites dans l'identité du jeu (clés « gold » et « galaxy » inchangées dans les sauvegardes).
+   « Enluminée » (ex-Feuille d'or) : une page du Bestiaire interdit, dorée à la main ; plus de paillettes sur l'illustration. */
+.v-gold .tcg-art img { filter: sepia(.18) saturate(1.12) contrast(1.06) brightness(1.02); }
+.v-gold .tcg-art::after {
+  mix-blend-mode: multiply; opacity: 1; animation: none;
+  background:
+    radial-gradient(ellipse 78% 70% at 50% 44%, transparent 55%, rgba(120, 72, 18, .55) 88%, rgba(70, 38, 8, .85) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .62 0 0 0 0 .46 0 0 0 0 .2 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.v-gold .tcg-shine { background: linear-gradient(118deg, transparent 40%, rgba(255, 226, 150, .0) 44%, rgba(255, 236, 180, .55) 49%, rgba(255, 250, 225, .8) 50%, rgba(255, 236, 180, .55) 51%, transparent 56%); background-size: 300% 300%; background-position: var(--mx) var(--my); mix-blend-mode: soft-light; opacity: .9; animation: sweep 6s ease-in-out infinite; }
+.v-gold::after { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .7), inset 0 0 0 2px rgba(255, 220, 140, .55), inset 0 0 26px rgba(255, 196, 90, .3); }
+.v-gold .tcg-nm { background: linear-gradient(180deg, #FFF4CC, #E8C064 45%, #B8862C 70%, #FFE59A); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .8)); }
+.v-gold .tcg-vbadge { background: linear-gradient(110deg, #FFF4CC, #D9AE52 55%, #9C6E24); color: #2A1A06; }
+
+/* « Abyssale » (ex-Cosmique) : l'encre de l'Abysse envahit la carte depuis ses bords, un cadre d'obsidienne qui palpite */
+.v-galaxy { --frame: linear-gradient(160deg, #1A0E2A, #4B1F7A 30%, #0E0818 50%, #6A2BB0 72%, #160A24); box-shadow: 0 6px 18px rgba(0, 0, 0, .7), 0 0 26px rgba(150, 70, 255, .45); }
+.v-galaxy .tcg-frame { animation: none; background-size: 100% 100%; }
+.v-galaxy .tcg-vframe { display: none; }
+.v-galaxy .tcg-art img { filter: saturate(.82) contrast(1.14) brightness(.94); }
+.v-galaxy .tcg-art::after {
+  mix-blend-mode: normal; opacity: 1;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.016 .028' numOctaves='4' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .62 0 0 0 0 .26 0 0 0 0 1 0 0 0 5 -2.2'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23s)'/%3E%3C/svg%3E") 0 0 / 260px 260px,
+    radial-gradient(ellipse 74% 66% at 50% 46%, transparent 48%, rgba(46, 12, 84, .6) 78%, rgba(6, 2, 14, .96) 100%);
+  -webkit-mask: radial-gradient(ellipse 72% 64% at 50% 46%, rgba(0, 0, 0, .15) 30%, #000 78%); mask: radial-gradient(ellipse 72% 64% at 50% 46%, rgba(0, 0, 0, .15) 30%, #000 78%);
+  animation: abyssInk 18s linear infinite;
+}
+.v-galaxy .tcg-art::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, rgba(90, 30, 160, .5), rgba(30, 8, 60, .35)); mix-blend-mode: color; opacity: .6; }
+@keyframes abyssInk { to { background-position: 260px -260px, 0 0; } }
+.v-galaxy .tcg-shine { background: radial-gradient(circle at var(--mx) var(--my), rgba(190, 120, 255, .4), transparent 48%); mix-blend-mode: screen; opacity: 1; animation: none; }
+.v-galaxy::after { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .7), inset 0 0 0 2px rgba(170, 90, 255, .6), inset 0 0 34px rgba(120, 40, 220, .5); animation: abyssPulse 3.6s ease-in-out infinite; }
+@keyframes abyssPulse { 50% { opacity: .55; } }
+.v-galaxy .tcg-nm { color: #F2E6FF; text-shadow: 0 0 10px rgba(170, 90, 255, .9), 0 1px 2px #000; }
+.v-galaxy .tcg-vbadge { background: linear-gradient(110deg, #2A0F45, #8A3CF0 55%, #2A0F45); color: #F2E6FF; }
+.tcg-mini.v-galaxy::after { animation: none; }
+@media (prefers-reduced-motion: reduce) { .v-gold .tcg-shine, .v-galaxy .tcg-art::after, .v-galaxy::after { animation: none; } }

@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v414'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v415'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -73,8 +73,8 @@ export const SHOW_ORDER = ['galaxy', 'gold', 'holo', 'normal'];
 export const VARIANTS = {
   normal:    { name: 'Normale',                  short: 'Normale' },
   holo:      { name: 'Holographique',            short: 'Holo' },
-  gold:      { name: 'Feuille d’or',             short: 'Or' },
-  galaxy:    { name: 'Cosmique',                 short: 'Cosmique' },
+  gold:      { name: 'Enluminée',                short: 'Enluminée' }, /* v415 : ex-Feuille d’or (clé inchangée) */
+  galaxy:    { name: 'Abyssale',                 short: 'Abyssale' }, /* v415 : ex-Cosmique (clé inchangée) */
 };
 
 // Événements hebdomadaires : rotation chaque lundi (heure locale).

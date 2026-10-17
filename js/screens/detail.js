@@ -117,9 +117,9 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
           ${line ? `<h3 class="section-title">${esc(line.name)}</h3><div class="strip">${line.cards.map((c) => cardHTML(c, { mystery: !g.owns(c.id), nameKnown: g.nameKnown(c.id) })).join('')}</div><p class="small muted">Stade ${card.evolution.stage} sur ${card.evolution.stages}.</p>` : ''}
           ${sets.length ? `<h3 class="section-title">Ensembles</h3><div class="stack">${sets.map((s) => { const p = g.setProgress(s.key); return `<a class="set-link panel" href="#/succes/ensembles"><b class="set-h">${setIcon(s.key)}<span>${esc(s.name)}</span></b><span class="small muted">${p.owned} / ${p.total}${p.done ? ' · complété' : ''}</span><span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span></a>`; }).join('')}</div>` : ''}`,
         rarity: `<p>${odds(card)}</p><p class="small muted">Chance de la trouver dans une version spéciale, par booster standard :</p><div class="var-odds">${variantOdds(card)}</div>
-          <p class="small muted">Toutes cartes confondues, environ un booster standard sur ${anyOdds('holo')} contient une holographique, un sur ${anyOdds('gold')} une feuille d’or et un sur ${anyOdds('galaxy')} une cosmique (deux fois plus souvent dans un premium).</p>
+          <p class="small muted">Toutes cartes confondues, environ un booster standard sur ${anyOdds('holo')} contient une holographique, un sur ${anyOdds('gold')} une enluminée et un sur ${anyOdds('galaxy')} une abyssale (deux fois plus souvent dans un premium).</p>
           ${sublimeHTML()}
-          <p class="small muted">Brûlée dans la Fournaise, une carte holographique vaut ×${ECONOMY.burnFinish.holo} cendres, or ×${ECONOMY.burnFinish.gold}, cosmique ×${ECONOMY.burnFinish.galaxy}.</p>`,
+          <p class="small muted">Brûlée dans la Fournaise, une carte holographique vaut ×${ECONOMY.burnFinish.holo} cendres, enluminée ×${ECONOMY.burnFinish.gold}, abyssale ×${ECONOMY.burnFinish.galaxy}.</p>`,
       };
       body = `
         <div class="dt-sum">

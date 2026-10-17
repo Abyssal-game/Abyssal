@@ -71,7 +71,7 @@ ABYSSAL est un jeu de cartes à collectionner dark fantasy. Ouvre des boosters, 
 COLLECTIONNE
 • 500 créatures illustrées : démons, anges déchus, dieux oubliés, dragons primordiaux, golems, spectres…
 • 7 factions : Infernal, Abyssal, Céleste, Sauvage, Nécrotique, Primordial et Artificiel
-• 6 raretés, de Commune à Secrète, et des finitions Holo, Or et Cosmique
+• 6 raretés, de Commune à Secrète, et des finitions Holographique, Enluminée et Abyssale
 • 17 ensembles à compléter : les Sept Péchés capitaux, la Goétie, les Dragons primordiaux…
 • Les probabilités de chaque booster sont affichées, avec des garanties réelles
 
