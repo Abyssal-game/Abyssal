@@ -3530,3 +3530,13 @@ html.fx-light .dv-c .dv-hp.low .hpr::after { animation: none; }
 .sc-awake .ic, .sc-awake svg { width: 18px; height: 18px; flex: none; }
 .sc-cell.full.heart::before { inset: 4px 4px auto auto !important; }
 .sc-rs { inset: 0; }
+
+/* v403 : la main de l'adversaire se joue à découvert (il voyait déjà la tienne) : petites cartes avec valeurs et pouvoirs */
+.sc-ohand.open { gap: 4px; flex: 1; min-width: 0; }
+.sc-ohand.open .sc-card.sc-mini { width: 42px; height: 58px; flex: none; font-size: .5rem; border-radius: 4px; }
+.sc-ohand.open .sc-mini .sc-v { font-size: .62rem; min-width: 12px; }
+.sc-ohand.open .sc-mini .sc-sig { display: none; }
+.sc-ohand.open .sc-mini .sc-perk { width: 13px; height: 13px; }
+.sc-pv { position: absolute; z-index: 6; left: 50%; top: 50%; translate: -50% -50%; padding: 3px 9px; border-radius: 99px; font: 800 .95rem/1 var(--f-display); font-style: normal; color: #1A1206; background: linear-gradient(#FFE7A0, #F2C14E); box-shadow: 0 0 12px rgba(242, 193, 78, .8); pointer-events: none; }
+.how-more { margin: 6px 0 4px; }
+.how-more > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; justify-content: center; font: 700 .85rem/1 var(--f-ui); color: var(--gold-hi); }

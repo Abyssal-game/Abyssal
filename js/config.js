@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v402'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v403'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -111,7 +111,7 @@ export const XP = {
 };
 
 export const LEVEL_TITLES = [
-  [1, 'Novice des Sceaux'], [3, 'Lecteur de grimoires'], [6, 'Chercheur de reliques'], [10, 'Occultiste'],
+  [1, 'Novice de l’Abysse'], [3, 'Lecteur de grimoires'], [6, 'Chercheur de reliques'], [10, 'Occultiste'],
   [15, 'Archiviste interdit'], [20, 'Gardien du Bestiaire'], [30, 'Briseur de sceaux'], [40, 'Voix du Néant'],
 ];
 

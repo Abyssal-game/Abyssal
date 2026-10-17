@@ -24,9 +24,9 @@ export function defaultSave(now = Date.now()) {
     achievements: {},     // clé -> date
     setsDone: {},         // clé -> date
     factionsDone: {},     // faction -> date
-    titles: ['Novice des Sceaux'],
+    titles: ['Novice de l’Abysse'],
     name: '',             // nom choisi par le joueur (profil)
-    title: 'Novice des Sceaux',
+    title: 'Novice de l’Abysse',
     frames: ['base'],
     frame: 'base',
     avatar: null,         // id de carte possédée
@@ -122,6 +122,9 @@ export function migrate(raw) {
   }
   for (const k of Object.keys(s.fervor)) if (OLD_VARIANTS[k.split(':')[1]]) delete s.fervor[k];
   for (const h of [...s.history, ...s.best]) for (const c of h?.cards || []) if (OLD_VARIANTS[c.v]) c.v = OLD_VARIANTS[c.v];
+  // v403 : le titre de départ « Novice des Sceaux » devient « Novice de l’Abysse » (les Sceaux sont un mini-jeu fermé au début)
+  if (Array.isArray(s.titles)) s.titles = [...new Set(s.titles.map((t) => (t === 'Novice des Sceaux' ? 'Novice de l’Abysse' : t)))];
+  if (s.title === 'Novice des Sceaux') s.title = 'Novice de l’Abysse';
   return s;
 }
 

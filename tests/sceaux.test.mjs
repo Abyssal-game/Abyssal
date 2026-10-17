@@ -133,8 +133,17 @@ test('récompenses : jamais payées deux fois, plafond quotidien, déblocage dan
   assert.ok(g.s.sceaux.history.length <= 20);
 });
 
+test('défi du jour (v403) : ouvert après Ilda, règles déjà rencontrées seulement', () => {
+  const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('dj2'), clock });
+  g.s.sceaux.beaten = { initie: Date.now() };
+  for (let i = 0; i < 20; i++) assert.ok(['classique', 'identique'].includes(SC.dailyChallenge(`2026-10-${10 + i}`, 2, ['identique']).rule));
+  assert.equal(SC.dailyChallenge('2026-10-10', 1, []).rule, 'classique');
+});
+
 test('défi du jour : une seule fois par jour, même adversaire pour la journée', () => {
   const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('dj'), clock });
+  assert.throws(() => g.sceauxStart({ daily: true }), /Ilda/, 'v403 : fermé avant une victoire contre Ilda');
+  g.s.sceaux.beaten = { initie: Date.now() };
   const d = g.sceauxDaily();
   assert.deepEqual(g.sceauxDaily(), d);
   const st = play(g);

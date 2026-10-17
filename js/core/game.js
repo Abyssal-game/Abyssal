@@ -724,11 +724,16 @@ export class Game {
   }
   sceauxOpen() { const sc = this.s.sceaux; return Object.keys(this.s.bossesBeaten || {}).length > 0 || (sc.wins + sc.losses + sc.draws) > 0 || !!sc.cur; }
   sceauxUnlocked() { return SC.RIVALS.filter((_, i) => SC.rivalUnlocked(this.s, i)).length; }
-  sceauxDaily() { return SC.dailyChallenge(today(this.clock()), this.sceauxUnlocked()); }
+  sceauxDaily() {
+    const n = this.sceauxUnlocked(), known = [...new Set(SC.RIVALS.slice(0, n).map((r) => r.rule))].filter((k) => k !== 'classique' && SC.RULE_LIST.includes(k));
+    return SC.dailyChallenge(today(this.clock()), n, known);
+  }
+  sceauxDailyOpen() { return !!this.s.sceaux.beaten?.initie; } /* v403 : le défi du jour s'ouvre après une victoire contre Ilda */
   sceauxStart({ rival, daily = false, awake = false } = {}) {
     const sc = this.s.sceaux;
     let R = SC.RIVAL[rival], seed = Math.floor(this.rng() * 2 ** 31);
     if (daily) {
+      if (!this.sceauxDailyOpen()) throw new Error('Le défi du jour s’ouvre après ta première victoire contre Ilda.');
       const d = this.sceauxDaily();
       if (sc.dailyDone === today(this.clock())) throw new Error('Défi du jour déjà relevé. Reviens demain !');
       R = { ...SC.RIVAL[d.rival], rule: d.rule }; seed = d.seed;

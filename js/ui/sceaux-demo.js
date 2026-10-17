@@ -49,7 +49,7 @@ export const SCENES = {
     { cells: [null, null, null, null, c([5, 4, 6, 3], 'o', { shield: 1 }), null, null, null, null], cap: 'Inviolable (Hyper rares et Secrètes) : un bouclier doré.' },
     { cells: [null, null, null, c([4, 7, 2, 5], 'p', { new: 1, hl: 'r' }), c([5, 4, 6, 3], 'o', { shield: 1, hl: 'l' }), null, null, null, null], cap: 'Ton 7 bat son 3 : normalement, elle serait capturée…' },
     { cells: [null, null, null, c([4, 7, 2, 5], 'p'), c([5, 4, 6, 3], 'o', { broke: 1 }), null, null, null, null], cap: '…mais le bouclier encaisse la première capture et tombe. La suivante passera.' },
-    { cells: [null, c([3, 5, 4, 6], 'o', { hl: 'b' }), null, null, c([4, 6, 2, 5], 'p', { new: 1, fire: 1, hl: 't' }), null, null, null, null], cap: 'Fureur (Mythiques et Secrètes) : quand tu la poses, elle capture aussi à égalité. 4 contre 4…' },
+    { cells: [null, c([3, 5, 4, 6], 'o', { hl: 'b' }), null, null, c([4, 6, 2, 5], 'p', { new: 1, fire: 1, hl: 't' }), null, null, null, null], cap: 'Ardeur (Mythiques et Secrètes) : quand tu la poses, elle capture aussi à égalité. 4 contre 4…' },
     { cells: [null, c([3, 5, 4, 6], 'p', { flip: 1, hl: 'b' }), null, null, c([4, 6, 2, 5], 'p', { fire: 1, hl: 't' }), null, null, null, null], cap: '…capturée. Les Secrètes ont les deux pouvoirs.' },
   ] },
 };

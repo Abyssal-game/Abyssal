@@ -59,7 +59,7 @@ export const RULE_LIST = Object.keys(RULES).filter((k) => !RULES[k].retired);
 // Rempart : la première capture qui la viserait échoue. Fureur : à sa pose, elle capture aussi à égalité.
 export const PERKS = {
   rempart: { name: 'Inviolable', desc: 'La première fois qu’on devrait la capturer, elle résiste.', rar: ['HR', 'S'] },
-  fureur:  { name: 'Fureur', desc: 'Quand tu la poses, elle capture aussi les cartes voisines à égalité.', rar: ['M', 'S'] },
+  fureur:  { name: 'Ardeur', desc: 'Quand tu la poses, elle capture aussi les cartes voisines à égalité.', rar: ['M', 'S'] },
 };
 export const perksOf = (card) => Object.keys(PERKS).filter((k) => PERKS[k].rar.includes(card?.rarity));
 // Une règle peut en combiner plusieurs
@@ -72,25 +72,26 @@ export const CENTER = 4;
 // ai / aiAwake : [force du jeu (voir aiMove), part de coups imparfaits], réglés par simulation (v306) pour qu'un
 // bon joueur gagne environ 90 % contre Ilda, puis de moins en moins, jusqu'à environ 1 partie sur 3 contre la Souveraine.
 export const RIVALS = [
-  { key: 'initie', ai: [3, 0.3], aiAwake: [4, 0.3], name: 'Ilda', title: 'l’Initiée', level: 1, faction: null, portrait: 'CEL-006', rule: 'classique', reward: 20,
+  { key: 'initie', stars: 1, starsAwake: 2, ai: [3, 0.3], aiAwake: [4, 0.3], name: 'Ilda', title: 'l’Initiée', level: 1, faction: null, portrait: 'CEL-006', rule: 'classique', reward: 20,
     hello: 'Tu connais les Sceaux ? Moi, j’apprends encore. On joue doucement ?', win: 'Oh ! Tu m’apprendras ce coup-là ?', lose: 'J’ai gagné ? J’ai gagné !' },
-  { key: 'collectionneur', ai: [4, 0.3], aiAwake: [4, 0.15], name: 'Maître Orvel', title: 'le Collectionneur', level: 2, faction: 'artificiel', portrait: 'ART-004', rule: 'identique', reward: 30,
+  { key: 'collectionneur', stars: 2, starsAwake: 3, ai: [4, 0.3], aiAwake: [4, 0.15], name: 'Maître Orvel', title: 'le Collectionneur', level: 2, faction: 'artificiel', portrait: 'ART-004', rule: 'identique', reward: 30,
     hello: 'Chaque carte que je pose vaut une fortune. Ne les abîme pas.', win: 'Ma collection pleure.', lose: 'Ma collection reste intacte. Reviens quand tu auras mieux.' },
-  { key: 'stratege', ai: [4, 0.15], aiAwake: [5, 0.6], name: 'Sœur Vesna', title: 'la Stratège', level: 3, faction: 'celeste', portrait: 'CEL-005', rule: 'sacre', reward: 40,
+  { key: 'stratege', stars: 2, starsAwake: 3, ai: [5, 0.5], handTier: 2, aiAwake: [5, 0.6], name: 'Sœur Vesna', title: 'la Stratège', level: 3, faction: 'celeste', portrait: 'CEL-005', rule: 'sacre', reward: 40,
     hello: 'Chaque case est une prière. Choisis bien où tu t’agenouilles.', win: 'La lumière t’a guidé, cette fois.', lose: 'Tu as joué au hasard. La lumière, jamais.' },
-  { key: 'maitre', ai: [3, 0.15], aiAwake: [4, 0.3], name: 'Le Maître des Sceaux', title: 'arbitre des règles', level: 4, faction: 'necrotique', portrait: 'NEC-001', rule: 'somme', reward: 55,
+  { key: 'maitre', stars: 3, starsAwake: 5, ai: [3, 0.15], aiAwake: [4, 0.3], name: 'Le Maître des Sceaux', title: 'arbitre des règles', level: 4, faction: 'necrotique', portrait: 'NEC-001', rule: 'somme', reward: 55,
     hello: 'J’ai scellé plus de créatures que tu n’en verras jamais.', win: 'Tu as brisé mon sceau. Ce n’est pas rien.', lose: 'Reviens quand tu sauras compter.' },
-  { key: 'echo', ai: [4, 0.45], aiAwake: [6, 0.75], name: 'L’Écho de l’Abîme', title: 'veilleur des profondeurs', level: 4, faction: 'abyssal', portrait: 'ABY-039', rule: 'sacre', reward: 70,
+  { key: 'echo', stars: 4, starsAwake: 4, ai: [4, 0.45], aiAwake: [6, 0.75], name: 'L’Écho de l’Abîme', title: 'veilleur des profondeurs', level: 4, faction: 'abyssal', portrait: 'ABY-039', rule: 'sacre', reward: 70,
     hello: 'Je joue tes coups avant toi. Je les ai déjà joués mille fois.', win: '… l’écho se tait.', lose: 'Tu m’entends ? C’est toi, en bas.' },
-  { key: 'banquier', ai: [4, 0.6], aiAwake: [5, 0.3], name: 'Mammon', title: 'le Banquier des Enfers', level: 5, faction: 'infernal', portrait: 'INF-040', rule: 'somme', reward: 80,
+  { key: 'banquier', stars: 4, starsAwake: 5, ai: [4, 0.6], aiAwake: [5, 0.3], name: 'Mammon', title: 'le Banquier des Enfers', level: 5, faction: 'infernal', portrait: 'INF-040', rule: 'somme', reward: 80,
     hello: 'Tout se paie, ici. Surtout les bonnes sommes.', win: 'Une perte… je la noterai dans mon grand livre.', lose: 'Intérêts encaissés. Merci de ta visite.' },
-  { key: 'archiviste', ai: [4, 0.45], aiAwake: [6, 0.6], name: 'L’Archiviste', title: 'mémoire d’engrenages', level: 5, faction: 'artificiel', portrait: 'ART-041', rule: 'identique', reward: 90,
+  { key: 'archiviste', stars: 4, starsAwake: 5, ai: [4, 0.45], aiAwake: [6, 0.6], name: 'L’Archiviste', title: 'mémoire d’engrenages', level: 5, faction: 'artificiel', portrait: 'ART-041', rule: 'identique', reward: 90,
     hello: 'J’ai catalogué chacune de tes parties. Elles se terminent toutes pareil.', win: 'Erreur… à… réindexer.', lose: 'Résultat conforme aux prévisions.' },
-  { key: 'souverain', ai: [5, 0.6], aiAwake: [6, 0.45], name: 'La Souveraine du Néant', title: 'avant le premier Sceau', level: 5, faction: 'primordial', portrait: 'PRI-053', rule: 'identique', reward: 100,
+  { key: 'souverain', stars: 5, starsAwake: 5, ai: [5, 0.6], aiAwake: [6, 0.45], name: 'La Souveraine du Néant', title: 'avant le premier Sceau', level: 5, faction: 'primordial', portrait: 'PRI-053', rule: 'identique', reward: 100,
     hello: 'Avant les Sceaux, il n’y avait que moi. Il n’y aura que moi après.', win: 'Alors… le Néant peut perdre.', lose: 'Retourne au silence, petite flamme.' },
 ];
 // Revanche « implacable » (anciennement éveillée) : après une victoire, l'adversaire revient plus fort (main plus rare, jeu plus fin)
-export const awakened = (R) => ({ ...R, awake: true, level: Math.min(5, R.level + 1), ai: R.aiAwake, reward: Math.round(R.reward * 1.5), name: R.name, title: `${R.title} · implacable` });
+// v403 : étoiles = difficulté mesurée (tools/sceaux-sim.mjs : ≥ 70 % de victoires 1★, 50-70 % 2★, 30-50 % 3★, 20-30 % 4★, < 20 % 5★)
+export const awakened = (R) => ({ ...R, stars: R.starsAwake, awake: true, level: Math.min(5, R.level + 1), ai: R.aiAwake, reward: Math.round(R.reward * 1.5), name: R.name, title: `${R.title} · implacable` });
 export const RIVAL = Object.fromEntries(RIVALS.map((r) => [r.key, r]));
 export const rivalUnlocked = (s, i) => i === 0 || !!s.sceaux?.beaten?.[RIVALS[i - 1].key];
 
@@ -110,7 +111,8 @@ export function rivalHand(cat, rival, salt = '') {
   const r = mulberry(hash(`rival:${rival.key}:${rival.awake ? 'eveil:' : ''}${salt}`));
   const pool = (rival.faction ? cat.byFaction[rival.faction] : cat.cards).filter((c) => c.rarity !== 'S' || rival.level >= 4);
   // v304 : mains moins chargées en pouvoirs (Rempart, Fureur) : la difficulté vient surtout du jeu de l'adversaire
-  const tiers = { 1: ['C', 'C', 'C', 'PC', 'PC'], 2: ['C', 'PC', 'PC', 'R', 'R'], 3: ['PC', 'PC', 'R', 'R', 'HR'], 4: ['PC', 'R', 'R', 'HR', 'HR'], 5: ['R', 'R', 'HR', 'HR', 'M'] }[rival.level];
+  // v403 : handTier allège une main (Vesna : une seule nouveauté, les cases sacrées, sans carte Inviolable) ; pas en implacable
+  const tiers = { 1: ['C', 'C', 'C', 'PC', 'PC'], 2: ['C', 'PC', 'PC', 'R', 'R'], 3: ['PC', 'PC', 'R', 'R', 'HR'], 4: ['PC', 'R', 'R', 'HR', 'HR'], 5: ['R', 'R', 'HR', 'HR', 'M'] }[rival.awake ? rival.level : rival.handTier || rival.level];
   const out = [];
   for (const t of tiers) {
     const cands = pool.filter((c) => c.rarity === t && !out.includes(c.id));
@@ -314,9 +316,11 @@ export function aiMove(cat, st, level = 2, rnd = Math.random, slip = 0) {
   return [scored[k][1], scored[k][2]];
 }
 // Défi du jour : un adversaire déjà débloqué et une règle spéciale, les mêmes pour toute la journée
-export function dailyChallenge(day, unlockedCount) {
+export function dailyChallenge(day, unlockedCount, known = ['sacre', 'identique', 'somme']) {
   const h = hash(`defi:${day}`);
   const rival = RIVALS[h % Math.max(1, unlockedCount)];
-  const rule = ['sacre', 'identique', 'somme'][(h >>> 8) % 3]; // v358-v359 : seulement les règles gardées
+  // v403 : seulement les règles spéciales déjà rencontrées (adversaires débloqués) ; la règle Classique s'il n'y en a aucune
+  const rules = known.length ? known : ['classique'];
+  const rule = rules[(h >>> 8) % rules.length];
   return { rival: rival.key, rule, seed: h };
 }
