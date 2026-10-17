@@ -3688,3 +3688,13 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 /* v422 : Boosters : « Ouvrir mes N boosters d'un coup » et son récapitulatif */
 .shop-all { margin: 0 0 12px; min-height: 52px; }
 .shop-allgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+
+/* v423 : la croix de fermeture des fenêtres ne cache plus le texte : un titre en tête garde de la place des deux côtés,
+   tout autre premier élément commence sous la croix */
+.sheet-body > h1:first-child, .sheet-body > h2:first-child, .sheet-body > .center:first-child { padding-left: 54px; padding-right: 54px; }
+.sheet-body > :first-child:not(h1):not(h2):not(.center):not(.wl-art):not(img) { margin-top: 50px; }
+.sheet-body > .st-sheet:first-child { margin-top: 0; padding-top: 50px; }
+/* v423 : Équipe : les boutons ▲▼ ✕ passent sous la carte (ils cachaient son nom) */
+.v2-slot.full { display: flex; flex-direction: column; aspect-ratio: auto; min-width: 0; }
+.v2-slot.full .tm-ctl { position: static !important; margin-top: 6px; bottom: auto !important; }
+.v2-slot.full .tm-b { min-height: 38px; min-width: 44px; }
