@@ -14,7 +14,9 @@ import { openCreator } from './creator.js';
 import { showWelcome } from './welcome.js';
 import { shareFile } from '../native.js';
 import { onPresence, presence } from '../cloud/presence.js';
-const CREATOR_CODE = 'SCEAU-7713'; /* v412 : l'ancien code d'accès du jeu, connu du propriétaire */
+/* v418 : code du Mode Créateur choisi par le propriétaire ; seule son empreinte SHA-256 (en majuscules) est dans le code */
+const CREATOR_HASH = '3274532b664a7813ce3cb1ed2bb1955a2f2638118a3d0b76cf8f58b050cfb3e0';
+async function sha256(t) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join(''); }
 
 export default function settings(app, root) {
   const g = app.game;
@@ -173,10 +175,12 @@ export default function settings(app, root) {
       ui.vtaps = (ui.vtaps || 0) + 1;
       if (ui.vtaps < 7 || g.s.settings.dev) return;
       ui.vtaps = 0;
-      const sh = openSheet('<h2 class="center">Mode Créateur</h2><p class="small muted center">Entre le code du créateur.</p><input class="input" id="crcode" autocomplete="off" autocapitalize="characters" spellcheck="false"><button class="btn gold block" id="crok">Valider</button>', { cls: 'sheet-small', label: 'Code créateur' });
-      sh.body.querySelector('#crok').addEventListener('click', () => {
+      const sh = openSheet('<h2 class="center">Mode Créateur</h2><p class="small muted center">Entre le code du créateur.</p><input class="input" id="crcode" autocomplete="off" autocapitalize="none" spellcheck="false"><button class="btn gold block" id="crok">Valider</button>', { cls: 'sheet-small', label: 'Code créateur' });
+      sh.body.querySelector('#crok').addEventListener('click', async () => {
         const v = String(sh.body.querySelector('#crcode').value || '').trim().toUpperCase();
-        if (v !== CREATOR_CODE) { toast('Code incorrect.', { kind: 'error' }); return; }
+        let ok = false;
+        try { ok = (await sha256(v)) === CREATOR_HASH; } catch (e) { ok = false; }
+        if (!ok) { toast('Code incorrect.', { kind: 'error' }); return; }
         g.setSetting('dev', true); sh.close(); toast('Mode Créateur activé.', { icon: 'crown' }); render();
       });
     },
