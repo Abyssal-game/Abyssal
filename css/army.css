@@ -3614,3 +3614,7 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 .dc-links-one .dc-link .picon { margin-bottom: 0; }
 .dc-links-one .dc-link b { font-size: .9rem; }
 .dc-links-one .dc-link small { font-size: .78rem; margin-left: auto; }
+
+/* v411 : Accueil réorganisé : sous-titre « Missions du jour » dans « Aujourd'hui » */
+.today .td-sub { margin: 14px 0 2px; padding-top: 12px; border-top: 1px solid var(--line-soft); font: 700 .72rem/1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+.today a.td-row { color: inherit; text-decoration: none; }
