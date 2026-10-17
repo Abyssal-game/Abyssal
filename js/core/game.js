@@ -10,7 +10,7 @@ export const CHALLENGES = [
 export const WEEK_DAYS = 5; // jours joués dans la semaine pour le coffre de la semaine
 export const FIRST_WIN = 50;
 export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par combat n'augmentent plus // éclats de la toute première victoire
-import { BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, SUBLIME_ASH, VARIANTS } from '../config.js';
+import { FINAL_FLOOR, BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, SUBLIME_ASH, VARIANTS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
 import { rngOf, DESCENT, CHESTS, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, cardPower, powerFor, huntStage, HUNT_STAGES, foeTraits, CHECKPOINT_MIN, DEEP_MILESTONE, gouffreAt, GOUFFRE, OMENS, omenChoices } from './descent.js';
@@ -169,6 +169,13 @@ export class Game {
     const ev = this.event();
     const res = drawBooster(type, this.catalog, { rng: this.rng, pity: this.s.pity, faction, event: ev });
     this.s.pity = res.pity;
+    // v394 : le premier Booster de l'Abysse garantit une Secrète pas encore possédée (la dernière carte)
+    if (type === 'abysse' && !this.s.stats.abyssSecret) {
+      const sec = (this.catalog.byRarity.S || []).filter((c) => !this.owns(c.id));
+      const pool = sec.length ? sec : this.catalog.byRarity.S || [];
+      if (pool.length) { const c = pool[Math.floor(this.rng() * pool.length)]; res.cards[res.cards.length - 1] = { id: c.id, rarity: 'S', variant: c.variants.includes('holo') ? 'holo' : 'normal', slot: 'mPlus' }; }
+      this.s.stats.abyssSecret = Date.now();
+    }
     // Mode Créateur : rareté (et variante) imposées pour la dernière carte du prochain booster
     if (this.s.settings.dev && this.s.devForce) {
       const pool = this.catalog.byRarity[this.s.devForce.rarity] || [];
@@ -636,7 +643,7 @@ export class Game {
   // Le coffre y est d'un rang plus bas, et il faut franchir au moins CHECKPOINT_MIN étages pour en rapporter un.
   startFloors() {
     const best = this.descent().best || 0, out = [1];
-    for (let f = DESCENT.bossEvery; f <= best; f += DESCENT.bossEvery) out.push(f + 1);
+    for (let f = DESCENT.bossEvery; f <= best && f < FINAL_FLOOR; f += DESCENT.bossEvery) out.push(f + 1); /* v394 : pas de départ après le fond */
     return out;
   }
   // Coffre de fin d'expédition pour une profondeur donnée (mod : malédiction, Cauchemar, défaite)
@@ -807,7 +814,9 @@ export class Game {
       const target = bf && bf > best && bf < nf ? bf : nf;
       const chest = chestForDepth(target);
       const what = target === bf ? `le gardien ${BOSSES[bossOf(bf)].name} t’y attend` : `${CHESTS[chest].name.toLowerCase()} à la clé`;
-      out.push({ kind: 'depth', title: best ? `Atteins l’étage ${target}` : 'Lance ta première expédition', sub: best ? `Ton record : étage ${best} · ${what}` : 'Descends dans l’Abysse : un coffre t’attend dès l’étage 3', href: '#/descente', icon: 'depth', p: Math.min(best, target), n: target });
+      // v394 : dès l'étage 50, l'objectif devient le fond de l'Abysse (étage 100, Booster de l'Abysse)
+      if (best >= 50 && !this.s.bossesBeaten?.abysse) out.push({ kind: 'depth', title: `Atteins le fond de l’Abysse`, sub: `Étage ${FINAL_FLOOR}, le dernier · ton record : ${best} · le Booster de l’Abysse et une Secrète t’y attendent`, href: '#/descente', icon: 'depth', p: Math.min(best, FINAL_FLOOR), n: FINAL_FLOOR });
+      else out.push({ kind: 'depth', title: best ? `Atteins l’étage ${target}` : 'Lance ta première expédition', sub: best ? `Ton record : étage ${best} · ${what}` : 'Descends dans l’Abysse : un coffre t’attend dès l’étage 3', href: '#/descente', icon: 'depth', p: Math.min(best, target), n: target });
     }
     // équipe trop faible pour la suite, et assez de cendres pour la renforcer
     // v328 : dès la première expédition, Renforcer est mis sur le chemin (avant, le niveau demandé valait 1 jusqu'à l'étage 8,
@@ -1107,6 +1116,16 @@ export class Game {
       for (const [id, n] of Object.entries(st.finishedBy || {})) { (cs[id] ||= {}).k = (cs[id].k || 0) + n; (run.fin ||= {})[id] = (run.fin[id] || 0) + n; }
       for (const id of Object.keys(st.bossBy || {})) (cs[id] ||= {}).b = (cs[id].b || 0) + 1;
       out.fame = this.gainFame(run.team.filter((m) => !m.fallen).map((m) => m.id), room === 'boss' || room === 'elite' ? 2 : 1);
+      // v394 : l'étage 100 est le fond de la Descente : la victoire contre L'Abysse termine l'expédition, avec le Booster de l'Abysse
+      if (room === 'boss' && run.floor >= FINAL_FLOOR) {
+        this.clearFloor();
+        if (!run.free) { this.grant({ tickets: { abysse: 1 } }, 'summit'); this.s.stats.summits = (this.s.stats.summits || 0) + 1; }
+        this.track('win', 1);
+        out.summit = true;
+        out.summary = this.endRun(false);
+        out.summary.summit = true; out.summary.report = out.report; out.summary.abyss = !!out.abyss; out.summary.free = !!run.free;
+        return out;
+      }
       run.phase = 'reward';
       run.rewards = this.rewardsFor(run, room);
       out.rewards = run.rewards;

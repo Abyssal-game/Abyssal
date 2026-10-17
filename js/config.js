@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v393'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v394'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -50,6 +50,13 @@ export const BOOSTERS = {
     desc: '3 cartes : la 2e Peu commune ou mieux, la 3e Rare ou mieux. Variantes deux fois plus fréquentes.',
   },
 };
+
+// v394 : Booster de l'Abysse, la récompense du fond de la Descente (étage 100). Ne s'achète pas.
+BOOSTERS.abysse = {
+  rewardOnly: true, name: 'Booster de l’Abysse', price: 0, slots: ['rPlus', 'rPlus', 'rPlus', 'hrPlus', 'mPlus'], pool: 'all', variantMult: 4, minVariant: 'holo',
+  desc: '5 cartes : trois Rares ou mieux, une Hyper rare ou mieux, une Mythique ou mieux. Toutes au moins holographiques. La première fois : une Secrète que tu n’as pas encore.',
+};
+export const FINAL_FLOOR = 100; // v394 : le fond de la Descente (pour l'instant)
 
 // Chance (en %) qu'une carte tirée sorte dans chaque finition (×2 dans un booster premium).
 // v280 : plus fréquentes qu'avant (2,5 / 0,5 / 0,1) ; on peut aussi sublimer une carte avec des cendres (SUBLIME_ASH).

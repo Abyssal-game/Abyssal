@@ -1,6 +1,6 @@
 // L'Aventure (la Descente) : ton équipe de cartes descend dans l'Abysse, étage par étage,
 // affronte les créatures corrompues en duel et rapporte un coffre (éclats ou booster).
-import { RARITY, BOOSTERS } from '../config.js';
+import { RARITY, BOOSTERS, FINAL_FLOOR } from '../config.js';
 import { DESCENT, ROOMS, BLESSINGS, CHESTS, floorFloor, CHECKPOINT_MIN, OMENS, powerFor, powerPts } from '../core/descent.js';
 import { TEAM, BUDGET } from '../core/army.js';
 import { BOSSES, bossOf } from '../core/bosses.js';
@@ -25,7 +25,7 @@ import { sync } from '../cloud/sync.js';
 
 // Illustrations des portes et des bonus
 const DOOR_ART = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss', gouffre: 'door-gouffre', rest: 'rest', altar: 'altar', treasure: 'treasure' };
-const HOW = [['cards', '#7FA8D8', 'Ton équipe', '5 de tes cartes : 3 au combat, 2 en réserve. Les cendres de la Fournaise les font monter de niveau.'], ['swords', '#E0485E', 'Le combat', 'Chacun son tour, dans l’ordre de la vitesse : chaque créature joue une fois par tour avec ses propres PA. L’attaque en rapporte, les compétences en coûtent. La Ferveur lance le pouvoir d’équipe ; tu en gardes 3 au plus d’un combat à l’autre.'], ['dodge', '#9FE0FF', 'Lire et parer', 'Les gardiens et les élites annoncent leurs grosses attaques. Contre les attaques dangereuses, touche au bon moment : esquive, ou parade parfaite. Brise les élites et les gardiens pour annuler leur coup.'], ['book', '#B48CFF', 'Connaître l’ennemi', 'Posséder la carte d’une créature corrompue donne +1 dégât contre elle.'], ['depth', '#F2C14E', 'Chaque étage', 'Combat simple ou élite, puis un bonus au choix : source, autel ou trésor. Gardien tous les 5 étages. Parfois, un gouffre permet de sauter 2 étages, au prix de 20 % des PV.'], ['omen', '#B48CFF', 'Le présage', 'Après ton premier gardien vaincu, chaque expédition commence par un présage au choix parmi trois : un avantage et un prix pour toute l’expédition.'], ['chest', '#E8C35A', 'Le coffre', 'Remonte quand tu veux : plus tu descends, plus le coffre est beau (bois, fer, or, abyssal).']];
+const HOW = [['cards', '#7FA8D8', 'Ton équipe', '5 de tes cartes : 3 au combat, 2 en réserve. Les cendres de la Fournaise les font monter de niveau.'], ['swords', '#E0485E', 'Le combat', 'Chacun son tour, dans l’ordre de la vitesse : chaque créature joue une fois par tour avec ses propres PA. L’attaque en rapporte, les compétences en coûtent. La Ferveur lance le pouvoir d’équipe ; tu en gardes 3 au plus d’un combat à l’autre.'], ['dodge', '#9FE0FF', 'Lire et parer', 'Les gardiens et les élites annoncent leurs grosses attaques. Contre les attaques dangereuses, touche au bon moment : esquive, ou parade parfaite. Brise les élites et les gardiens pour annuler leur coup.'], ['book', '#B48CFF', 'Connaître l’ennemi', 'Posséder la carte d’une créature corrompue donne +1 dégât contre elle.'], ['depth', '#F2C14E', 'Chaque étage', 'Combat simple ou élite, puis un bonus au choix : source, autel ou trésor. Gardien tous les 5 étages. Parfois, un gouffre permet de sauter 2 étages, au prix de 20 % des PV.'], ['omen', '#B48CFF', 'Le présage', 'Après ton premier gardien vaincu, chaque expédition commence par un présage au choix parmi trois : un avantage et un prix pour toute l’expédition.'], ['chest', '#E8C35A', 'Le coffre', 'Remonte quand tu veux : plus tu descends, plus le coffre est beau (bois, fer, or, abyssal).'], ['crown', '#B04BFF', 'Le fond : étage 100', 'L’étage 100 est le dernier : L’Abysse y attend. Le vaincre termine l’expédition et donne le Booster de l’Abysse (5 cartes, une Mythique ou mieux, toutes en finition), et la première fois une Secrète que tu n’as pas.']];
 const DOOR_PIC = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss', gouffre: 'stairs-down' };
 const ROOM_ICON = { gouffre: 'next', fight: 'swords', elite: 'skull', altar: 'star', rest: 'heart', treasure: 'crystal', boss: 'crown' };
 
@@ -58,6 +58,7 @@ export default function descent(app, root) {
     root.innerHTML = `<header class="screen-head dc-head ui-hero bn-descente"><h1>La Descente</h1><p class="muted">${d.best ? `Ton record : étage ${d.best}${d.bestToday ? ` · aujourd’hui : ${d.bestToday}` : ''}` : 'Descends, survis, rapporte un coffre.'}</p></header>
       ${news ? `<section class="panel ornate dc-news"><div class="dc-new-h"><span class="dc-new-ic">${icon('sparkle')}</span><span><b>Tes cartes combattent !</b><span class="small">Les héros ont quitté l’Abysse : ce sont maintenant tes créatures qui descendent. Chaque doublon fait monter une carte de niveau.</span>${news.shards ? `<span class="small">Ton ancien équipement et l’expérience de tes héros ont été changés en <b>${fmt(news.shards)} éclats</b>. Tes coffres sont gardés : ils contiennent maintenant des boosters.</span>` : ''}</span></div><button class="btn small ghost" data-act="news">OK</button></section>` : ''}
       ${last ? summaryHTML(last) : ''}
+      ${summitHTML(d)}
       ${chests ? `<a class="panel dc-chests" href="#/coffres"><span class="dc-new-ic">${icon('p:chest')}</span><span><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Éclats et boosters</span></span>${icon('next')}</a>` : ''}
       <section class="panel dc-go">
         <div class="dc-banner bn-expedition"><b>Expédition</b><span class="small">${d.best ? `Record : étage ${d.best}` : 'Ta première descente t’attend'}</span></div>
@@ -130,11 +131,22 @@ export default function descent(app, root) {
     if (have >= price) return `<p class="vx-week dc-bp"><span>${icon('crystal')} Tu as <b>${fmt(have)} éclats</b> : de quoi acheter un booster.</span></p>`;
     return `<p class="vx-week dc-bp"><span>${icon('crystal')} <b>${fmt(have)} / ${fmt(price)} éclats</b> pour ton prochain booster</span><span class="progress"><i style="width:${(have / price) * 100}%"></i></span></p>`;
   }
+  // v394 : le fond de l'Abysse, étage 100 (le dernier) : ce qu'il rapporte, et où en est le joueur
+  function summitHTML(d) {
+    const best = Math.min(FINAL_FLOOR, d.best || 0), done = !!g.s.bossesBeaten?.abysse;
+    return `<section class="panel dc-summit ${done ? 'done' : ''}"><img class="dc-sm-pack" alt="" src="assets/packs/abysse.webp">
+      <div class="dc-sm-body"><b class="dc-sm-k">${done ? 'Fond de l’Abysse atteint' : 'Le fond de l’Abysse'}</b><h2>Étage ${FINAL_FLOOR} · L’Abysse</h2>
+        <p class="small">Le dernier étage de la Descente. Le vaincre termine l’expédition et donne le <b>Booster de l’Abysse</b> : 5 cartes, une Mythique ou mieux, toutes au moins holographiques${done ? '' : ', et la première fois <b>une Secrète que tu n’as pas</b>'}.</p>
+        ${done ? '' : '<p class="small muted">Première victoire : titre « Vainqueur de l’Abysse », Cadre de l’Œil et 2 coffres abyssaux.</p>'}
+        <div class="dc-sm-bar"><span class="progress"><i style="width:${(best / FINAL_FLOOR) * 100}%"></i></span><small>Ton record : ${best} / ${FINAL_FLOOR}</small></div></div></section>`;
+  }
   function summaryHTML(s) {
     return `<section class="dc-sum2 ${s.wiped ? 'lost' : 'won'}">
       ${crestHTML(!s.wiped, s.floor, s.floor > 1 ? 'Étages' : 'Étage', 'dc-sum2-crest')}
-      <h2>${s.abandoned ? 'Expédition abandonnée' : s.wiped ? 'L’équipe est tombée' : 'Retour à la surface'}</h2>
-      <p class="dc-sum2-sub">${s.wiped ? (s.cursed ? 'Descente maudite : le butin est perdu.' : 'Tu gardes la moitié des éclats et un coffre plus modeste.') : 'Tu remontes avec tout ton butin.'}</p>
+      <h2>${s.summit ? 'Le fond de l’Abysse' : s.abandoned ? 'Expédition abandonnée' : s.wiped ? 'L’équipe est tombée' : 'Retour à la surface'}</h2>
+      <p class="dc-sum2-sub">${s.summit ? 'L’Abysse est vaincu. Tu remontes avec tout ton butin, du plus profond de la Descente.' : s.wiped ? (s.cursed ? 'Descente maudite : le butin est perdu.' : 'Tu gardes la moitié des éclats et un coffre plus modeste.') : 'Tu remontes avec tout ton butin.'}</p>
+      ${s.summit && !s.free ? `<a class="panel dc-summit-win" href="#/boutique"><img alt="" src="assets/packs/abysse.webp"><span><b>Booster de l’Abysse</b><span class="small">Il t’attend dans les Boosters.${s.abyss ? ' Avec, la première fois, une Secrète que tu n’as pas encore.' : ''}</span></span></a>` : ''}
+      ${s.abyss ? `<p class="vx-week vx-first">${icon('crown')} Titre « Vainqueur de l’Abysse », Cadre de l’Œil de l’Abysse et <b>2 coffres abyssaux</b> !</p>` : ''}
       ${s.chests.length ? `<a class="btn primary block dc-plq dc-plq-red dc-chestcta" href="#/coffres">${icon('p:chest')}Ouvrir ${s.chests.length > 1 ? 'mes coffres' : 'mon coffre'}</a>` : ''}
       ${s.record ? `<p class="vx-week dc-record">${icon('crown')} <b>Nouveau record !</b> Jamais tu n’étais descendu aussi bas : étage ${s.floor}.</p>` : ''}
       ${s.nightmareRecord ? `<p class="vx-week">${icon('skull')} Nouveau record en ${(NIGHT_TIERS[s.nightTier || 1] || NIGHT_TIERS[1]).name} : étage ${s.floor} !</p>` : ''}
@@ -162,7 +174,7 @@ export default function descent(app, root) {
       box.classList.remove('muted');
       box.innerHTML = (rows.length ? rows.map((r, i) => {
         const hid = isBlocked(r.user_id), av = !hid && r.profiles?.avatar && cat.get(r.profiles.avatar);
-        return `<div class="lb-row ${r.user_id === me ? 'me' : ''}"${rowAttrs(r.user_id, r.profiles?.pseudo, me)}><span class="lb-rank">${i + 1}</span><span class="lb-av">${av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM}</span><span class="lb-name"><b>${esc(shownName(r.user_id, r.profiles?.pseudo))}${hid ? '' : cloud.badgeHTML(r.profiles?.badge)}</b><span class="small muted">${hid ? '' : esc(r.profiles?.title || '')}</span></span><span class="lb-floor">${r.cursed ? `${icon('skull')} ` : ''}Étage ${r.floor}</span></div>`;
+        return `<div class="lb-row ${r.user_id === me ? 'me' : ''}"${rowAttrs(r.user_id, r.profiles?.pseudo, me)}><span class="lb-rank">${i + 1}</span><span class="lb-av">${av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM}</span><span class="lb-name"><b>${esc(shownName(r.user_id, r.profiles?.pseudo))}${hid ? '' : cloud.badgeHTML(r.profiles?.badge)}${!hid && r.profiles?.title === 'Vainqueur de l’Abysse' ? '<span class="pbadge pb-abysse">Fond de l’Abysse</span>' : ''}</b><span class="small muted">${hid ? '' : esc(r.profiles?.title || '')}</span></span><span class="lb-floor">${r.cursed ? `${icon('skull')} ` : ''}Étage ${r.floor}</span></div>`;
       }).join('') : '<p class="small muted">Personne n’est encore descendu aujourd’hui. À toi d’ouvrir la voie !</p>')
         + (!sync.profile?.pseudo ? '<p class="small acc-warn"><a href="#/compte">Choisis un pseudo</a> pour apparaître au classement.</p>' : !rows.some((r) => r.user_id === me) && mine ? `<p class="small muted">Ton meilleur étage aujourd’hui : ${mine}.</p>` : '');
       bindReport(box, () => loadBoard(box));
@@ -252,6 +264,7 @@ export default function descent(app, root) {
       try { out = g.finishBattle(); } catch (e) { app.flushProgress(); toast(esc(e.message), { kind: 'error' }); return render(); }
       app.chrome();
       if (out.lost) { app.sfx.error(); ui.outcome = out.summary; ui.win = null; render(); }
+      else if (out.summit) { app.sfx.reveal('S'); ui.outcome = out.summary; ui.win = null; render(); toast('<b>Tu as atteint le fond de l’Abysse !</b> Le Booster de l’Abysse t’attend dans les Boosters.', { kind: 'epic', icon: 'crown', ms: 7000 }); }
       else {
         app.sfx.reveal(out.room === 'boss' ? 'M' : 'R');
         const r = g.descent().run;

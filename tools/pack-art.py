@@ -9,7 +9,7 @@ from PIL import Image
 import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-KEYS = ['standard', 'event', 'infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel', 'premium', 'shadow']
+KEYS = ['standard', 'event', 'infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel', 'premium', 'shadow', 'abysse']
 if len(sys.argv) != 3 or sys.argv[1] not in KEYS:
     sys.exit(__doc__)
 key, src = sys.argv[1], sys.argv[2]

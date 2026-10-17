@@ -3491,3 +3491,20 @@ html.fx-light .dv-c .dv-hp.low .hpr::after { animation: none; }
 .dv.abyss-night .dio { filter: brightness(.42) saturate(1.5) hue-rotate(-12deg); transition: filter 1.2s; }
 /* cadre de l'Œil de l'Abysse */
 .pf-oeil { border-color: #B04BFF; box-shadow: 0 0 0 2px #000, 0 0 12px #7A2BFF, 0 0 26px rgba(242, 193, 78, .55); }
+
+/* v394 : le fond de l'Abysse (étage 100) — encart au vestibule, gain sur le bilan, badge au classement */
+.dc-summit { display: flex; gap: 14px; align-items: center; padding: 14px; background: radial-gradient(circle at 18% 50%, rgba(176, 75, 255, .28), transparent 60%), linear-gradient(180deg, rgba(26, 12, 40, .96), rgba(10, 6, 16, .96)); border: 1px solid rgba(176, 75, 255, .55); box-shadow: 0 0 22px rgba(176, 75, 255, .25); }
+.dc-summit.done { border-color: rgba(242, 193, 78, .6); }
+.dc-sm-pack { width: 74px; height: auto; flex: none; filter: drop-shadow(0 4px 12px rgba(176, 75, 255, .6)); }
+.dc-sm-body { flex: 1; min-width: 0; }
+.dc-sm-k { display: block; font: 700 .7rem/1.2 var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: #D7B4FF; }
+.dc-summit h2 { margin: 2px 0 4px; font: 700 1.15rem/1.15 var(--f-display); color: #FFE7A8; }
+.dc-summit p { margin: 0 0 6px; }
+.dc-sm-bar { display: flex; flex-direction: column; gap: 3px; }
+.dc-sm-bar .progress i { background: linear-gradient(90deg, #7A2BFF, #F2C14E); }
+.dc-summit-win { display: flex; gap: 12px; align-items: center; padding: 10px 12px; margin: 8px 0; border: 1px solid rgba(176, 75, 255, .6); box-shadow: 0 0 20px rgba(176, 75, 255, .35); }
+.dc-summit-win img { width: 56px; height: auto; flex: none; }
+.dc-summit-win b { display: block; color: #FFE7A8; }
+.pbadge.pb-abysse { background: linear-gradient(90deg, #4A1580, #B04BFF); color: #FFF0C8; }
+.bn-abysse { --bn: url(../assets/ui/bn-premium.webp); }
+.product-banner.bn-abysse { filter: hue-rotate(35deg) saturate(1.3); }

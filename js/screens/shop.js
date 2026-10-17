@@ -39,7 +39,7 @@ export function packHTML(type, cat, { faction, event } = {}) {
   let key = type;
   if (type === 'faction' && faction) { label = cat.faction[faction].name; key = faction; }
   if (type === 'event' && event) label = event.name;
-  const tag = type === 'premium' ? 'Rare garantie' : '3 cartes';
+  const tag = type === 'abysse' ? '5 cartes' : type === 'premium' ? 'Rare garantie' : '3 cartes';
   return `<div class="pack pack-${type}">
     <img class="pk-img" alt="" src="assets/packs/${key}.webp">
     <div class="pk-logo">ABYSSAL</div>
@@ -121,6 +121,7 @@ export default function shop(app, root, params = []) {
         ${card('faction', '', `<div class="chips fac-pick fac-grid" role="radiogroup" aria-label="Faction du booster">${FACTION_ORDER.map((f) => `<button class="chip" role="radio" data-act="pickfac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}" aria-checked="${st.faction === f}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>`)}
         ${card('event', `<p class="event-line"><b>${esc(ev.name)}</b> · ${ev.factions.map((f) => esc(cat.faction[f].name)).join(' et ')}<br><span class="small muted">${esc(ev.desc)} Encore ${ev.daysLeft} jour${ev.daysLeft > 1 ? 's' : ''}.</span></p>`)}
         ${card('premium')}
+        ${g.s.tickets.abysse ? card('abysse') : ''}
       </div>
     `;
   }

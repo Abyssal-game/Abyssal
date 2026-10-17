@@ -94,7 +94,9 @@ export function drawBooster(type, catalog, { rng = cryptoRandom, pity = { sinceH
   const cards = slots.map((slot) => {
     const rarity = rollRarity(TABLES[slot].weights, rng);
     const card = pickCard(groups, rarity, rng);
-    return { id: card.id, rarity: card.rarity, variant: rollVariant(card, def.variantMult, rng), slot };
+    let variant = rollVariant(card, def.variantMult, rng);
+    if (def.minVariant && variant === 'normal' && card.variants.includes(def.minVariant)) variant = def.minVariant; /* v394 : Booster de l'Abysse, finition garantie */
+    return { id: card.id, rarity: card.rarity, variant, slot };
   });
   const idx = (r) => RARITY_ORDER.indexOf(r);
   const gotHR = cards.some((c) => idx(c.rarity) >= idx('HR'));
