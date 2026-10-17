@@ -221,6 +221,8 @@ export class Game {
     const isNewVariant = !e.v[variant];
     e.n++;
     e.v[variant] = (e.v[variant] || 0) + 1;
+    // v373 : une finition (holo, or, cosmique) débloque aussi la version normale (décision du propriétaire)
+    if (variant !== 'normal' && !e.v.normal) { e.v.normal = 1; e.n++; }
     this.s.stats.cards++;
     const out = { isNewCard, isNewVariant, shards: 0, ash: 0, xp: 0 };
     if (isNewCard) {

@@ -3370,3 +3370,25 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 .dv-c.has-fig.dead .dv-bfig, .dv-c.has-fig.dying .dv-bfig { opacity: 0; transition: opacity .4s; }
 @keyframes bfigBreath { 50% { transform: scale(1.025) translateY(-2px); } }
 @media (prefers-reduced-motion: reduce) { .dv-c.has-fig .dv-bfig { animation: none; } }
+
+/* v373 : porte du gardien épurée — la figure peinte du gardien, son nom et son titre, une seule pastille */
+.dc-bdoor { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+.dc-bfig { width: min(150px, 46vw); height: auto; max-width: none; margin: -6px 0 2px; filter: drop-shadow(0 6px 12px rgba(0, 0, 0, .85)) drop-shadow(0 0 18px rgba(255, 60, 80, .35)); animation: bfigBreath 3.6s ease-in-out infinite; }
+.dc-bname { font: 700 1.25rem/1.15 var(--f-display); color: #FFC6CE; letter-spacing: .03em; text-shadow: 0 2px 6px #000; }
+.dc-btitle { font: italic 500 .9rem/1.2 var(--f-ui); color: #E8DCC0; text-shadow: 0 1px 4px #000; }
+.dc-bwild { margin-top: 4px; padding: 3px 12px; border-radius: 99px; background: rgba(120, 10, 30, .85); border: 1px solid rgba(255, 90, 110, .6); color: #FFD6DC; font: 700 .72rem/1.3 var(--f-ui); letter-spacing: .03em; text-transform: uppercase; }
+@media (prefers-reduced-motion: reduce) { .dc-bfig { animation: none; } }
+
+/* v373 : l'ouverture de booster pouvait se retrouver « défilée » (contenu décalé à gauche et vers le haut) quand un élément
+   plus large qu'elle (rayons) prenait le focus : overflow: clip interdit ce défilement ; récapitulatif centré */
+.opening { overflow: clip; }
+.opening .op-rays { pointer-events: none; }
+.opening.is-summary .op-stage { justify-content: center; }
+.opening.is-summary .op-top { justify-content: center; }
+.opening.is-summary .op-title { text-align: center; }
+
+/* v373 : la figure du gardien n'est plus cachée par les infos — l'icône de rôle et l'écusson « Gardien » sont retirés de sa
+   carte (la figure suffit), les infos de visée passent sous la figure, au-dessus de son nom */
+.dv-c.has-fig .dv-kw, .dv-c.has-fig .dv-boss { display: none; }
+.dv.cb .dv-c.has-fig .cb-tgt { top: auto !important; bottom: 3% !important; z-index: 6; }
+.dv-c.has-fig .dv-bfig { bottom: 36%; }

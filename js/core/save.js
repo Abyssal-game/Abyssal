@@ -117,6 +117,8 @@ export function migrate(raw) {
     for (const [o, to] of Object.entries(OLD_VARIANTS)) if (e.v[o]) { e.v[to] = (e.v[to] || 0) + e.v[o]; delete e.v[o]; }
     // Fournaise : le niveau ne vient plus des doublons, il est enregistré (ancien niveau conservé)
     if (!e.lv) e.lv = levelFromDups(Math.max(0, (e.n || 1) - 1)).level;
+    // v373 : une finition (holo, or, cosmique) débloque aussi la version normale de la carte
+    if (!e.v.normal && Object.values(e.v).some((k) => k > 0)) { e.v.normal = 1; e.n = (e.n || 0) + 1; }
   }
   for (const k of Object.keys(s.fervor)) if (OLD_VARIANTS[k.split(':')[1]]) delete s.fervor[k];
   for (const h of [...s.history, ...s.best]) for (const c of h?.cards || []) if (OLD_VARIANTS[c.v]) c.v = OLD_VARIANTS[c.v];

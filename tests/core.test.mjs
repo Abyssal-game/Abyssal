@@ -235,3 +235,16 @@ test('booster gratuit du jour : un par jour, sans réserve', () => {
   now = new Date(2026, 9, 21, 8);
   assert.equal(g.freePack().stock, 2);
 });
+
+test('v373 : une finition débloque aussi la version normale', async () => {
+  const { loadCatalog, MemoryStorage, rngFrom } = await import('./helpers.mjs');
+  const { Game } = await import('../js/core/game.js');
+  const cat = loadCatalog();
+  const g = new Game(cat, new MemoryStorage(), { rng: rngFrom('fin') });
+  const c = cat.cards.find((x) => x.variants.includes('galaxy') && !g.entry(x.id));
+  g.addCard(c.id, 'galaxy');
+  const e = g.entry(c.id);
+  assert.equal(e.v.galaxy, 1); assert.equal(e.v.normal, 1); assert.equal(e.n, 2);
+  g.addCard(c.id, 'holo');
+  assert.equal(g.entry(c.id).v.normal, 1, 'pas de deuxième normale');
+});

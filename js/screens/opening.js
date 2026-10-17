@@ -354,6 +354,7 @@ export function openPack(app, type, { faction, onDone, preset = null, title = nu
     // doublons de ce booster encore en trop dans la collection : à brûler d'un toucher
     const dupIds = [...new Set(opening.cards.filter((c) => !c.isNewCard && !c.isNewVariant).map((c) => c.id))];
     const dupAsh = !preset && dupIds.length ? g.spareAsh(dupIds).ash : 0;
+    el.scrollLeft = 0; el.scrollTop = 0; /* v373 : jamais de contenu décalé */
     stage.innerHTML = `<div class="op-summary">
       <h2 class="op-sum-title"><span>${preset ? `${fmt(preset.score)} points` : newCount ? `${newCount} nouvelle${newCount > 1 ? 's' : ''} créature${newCount > 1 ? 's' : ''}` : 'Booster ouvert'}</span></h2>
       ${opening.guaranteed ? `<p class="small guarantee">${icon('star')} Garantie appliquée : ${opening.guaranteed === 'm' ? 'Mythique ou mieux' : 'Hyper rare ou mieux'}.</p>` : ''}
