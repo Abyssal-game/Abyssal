@@ -330,3 +330,9 @@ html.reduce-motion .tcg.apex::before { animation: none; }
 .v-galaxy .tcg-vbadge { background: linear-gradient(110deg, #2A0F45, #8A3CF0 55%, #2A0F45); color: #F2E6FF; }
 .tcg-mini.v-galaxy::after { animation: none; }
 @media (prefers-reduced-motion: reduce) { .v-gold .tcg-shine, .v-galaxy .tcg-art::after, .v-galaxy::after { animation: none; } }
+/* v416 : cadres peints (Gemini) des finitions Enluminée et Abyssale (tools/variant-frame.py, sources store/variants/) */
+.v-gold .tcg-vframe { background-image: url(../assets/variants/enluminee-frame.webp); }
+.v-galaxy .tcg-vframe { display: block; background-image: url(../assets/variants/abyssale-frame.webp); animation: vPulse 4s ease-in-out infinite; }
+.tcg-mini.v-galaxy .tcg-vframe { animation: none; }
+.v-gold .tcg-vframe, .v-galaxy .tcg-vframe { background-size: 109% 105%; overflow: hidden; }
+.v-gold .tcg-vframe { filter: brightness(1.25) drop-shadow(0 0 2px rgba(0, 0, 0, .9)); }
