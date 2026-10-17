@@ -145,7 +145,7 @@ export const TRAITS = {
   // v331 : traits des profondeurs, seulement au-delà de l'étage 30
   vampire:  { name: 'Vampire', desc: 'Il se soigne de la moitié des dégâts qu’il inflige.', deep: true },
   epineux:  { name: 'Épineux', desc: 'Chaque coup qui le blesse renvoie 2 dégâts à ta créature qui frappe.', deep: true },
-  carapace: { name: 'Carapace', desc: 'Un bouclier bloque le premier coup qu’il reçoit, et revient un tour sur deux.', deep: true },
+  carapace: { name: 'Cuirasse', desc: 'Un bouclier bloque le premier coup qu’il reçoit, et revient un tour sur deux.', deep: true },
 };
 export const DEEP_FROM = 31;
 export const DEEP_MILESTONE = 40; // v331 : premier passage aux étages 40, 50, 60… récompensé

@@ -896,9 +896,13 @@ export class Game {
       return { ...u, maxHp: m.maxHp, hp: Math.min(m.hp, m.maxHp) };
     });
   }
+  // v398 : premiers pas (record < 3 étages) : les mécaniques arrivent par paliers. Élites dès l'étage 3, objectifs et
+  // traits des ennemis dès l'étage 4, dé lancé automatiquement et sans Assaut conjoint aux étages 1 et 2 (écran de combat)
+  novice() { return (this.descent().best || 0) < 3; }
   doors() {
     const run = this.s.descent.run; if (!run) return [];
-    const out = floorDoors(run.day, run.floor);
+    let out = floorDoors(run.day, run.floor);
+    if (this.novice() && run.floor < 3 && !run.free) out = out.filter((r) => r !== 'elite');
     if (this.omensOpen() && out.length > 1 && gouffreAt(run.day, run.floor)) out.push('gouffre');
     return out;
   }
@@ -956,7 +960,7 @@ export class Game {
         if (e.boss && (run.nightmare || run.floor >= AWAKEN_AT)) e.awakened = true;
       }
       // un ennemi nommé : plus coriace, il rapporte un butin en plus
-      foeTraits(run.day, run.floor, room, enemies.length).forEach((t, i) => { if (t && !enemies[i].boss && !enemies[i].weekly) { enemies[i].trait = t; if (t === 'carapace') enemies[i].shield = 1; } });
+      if (!(this.novice() && run.floor < 4)) foeTraits(run.day, run.floor, room, enemies.length).forEach((t, i) => { if (t && !enemies[i].boss && !enemies[i].weekly) { enemies[i].trait = t; if (t === 'carapace') enemies[i].shield = 1; } });
       if (rule.key === 'nuee') enemies.forEach((e) => { if (!e.boss && !e.elite && !e.weekly && !e.trait) e.trait = 'explosif'; });
       const nm = namedFoe(run.day, run.floor, room), nf = nm && enemies.find((e) => !e.boss && !e.weekly);
       if (nf) { nf.title = nm; nf.named = true; nf.maxHp = Math.round(nf.maxHp * 1.3); nf.hp = nf.maxHp; nf.atk = Math.round(nf.atk * 1.15 + 0.4); }
@@ -975,7 +979,7 @@ export class Game {
   }
   // Objectif bonus du combat : le même pour un étage donné du jour
   goalFor(run, room) {
-    if (run.floor < 3 && (this.descent().best || 0) < 5) return null; // dévoilés progressivement
+    if (run.floor < 4 && (this.descent().best || 0) < 5) return null; // dévoilés progressivement (v398 : dès l'étage 4)
     const keys = Object.keys(GOALS).filter((k) => GOALS[k].rooms.includes(room));
     return keys[Math.floor(rngOf(`goal:${run.day}:${run.floor}:${room}`)() * keys.length)];
   }

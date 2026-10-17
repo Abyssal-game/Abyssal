@@ -111,7 +111,7 @@ export const BOSSES = {
   golem: {
     name: 'Le Golem de Cendres', title: 'Plus on le frappe, plus il durcit',
     intro: 'Un tas de cendres se soulève, se tasse, prend forme. Au cœur de la masse, une braise bat comme un cœur.',
-    mechanic: 'Chaque coup qu’il reçoit durcit sa Carapace de cendres (−6 % de dégâts par couche, 8 couches au plus). Une Brisure fait tomber toute la carapace.',
+    mechanic: 'Chaque coup qu’il reçoit durcit son Armure de cendres (−6 % de dégâts par couche, 8 couches au plus). Une Brisure fait tomber toute la carapace.',
     counter: 'Fêle-le puis brise-le avec un coup de rupture pour remettre sa carapace à zéro, et garde tes gros coups pour juste après.',
     story: 'On l’a bâti avec les cendres des créatures brûlées à la Fournaise. Il se souvient de chacune, et il les venge une couche à la fois.',
     pattern: (phase, round) => (round % (phase === 2 ? 2 : 3) === 2 ? 'charge' : 'hit'),

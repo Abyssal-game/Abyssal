@@ -13,7 +13,7 @@ import { tuto } from '../ui/tutos.js';
 import { cardHTML } from '../ui/card.js';
 import {
   BOSS_POWERS, FORBID, INTENTS, SYNERGIES, PACK_BONUS, FERVOR_MAX, AP_MAX, PA_MAX, passTurn, speedOf, front, reserve, actionsFor, actionTargets, act, preview,
-  ENTRANCES, GOALS, goalState, RUNES, runesLeft, SERVANT_POWER, RHYTHM, PHASE2, beginEnemyTurn, nextEnemy, enemyAct, endEnemyTurn, takeSkips, defenseWindow, threats, intentInfo, useUlt, ultReady, autoActs, comboOf,
+  ENTRANCES, GOALS, goalState, RUNES, runesLeft, SERVANT_POWER, RHYTHM, PHASE2, beginEnemyTurn, nextEnemy, enemyAct, endEnemyTurn, takeSkips, defenseWindow, intentInfo, useUlt, ultReady, autoActs, comboOf,
 } from '../core/duel.js';
 import { KITS, AI_FAMILIES, DICE_TIERS, WEAK_TO, TALENTS } from '../core/skills.js';
 import { BOSSES, LAWS, ASPECTS } from '../core/bosses.js';
@@ -52,6 +52,7 @@ const IN_PIC = { gorge: 'heavy', gather: 'channel', blizzard: 'frost', mimic: 'c
 const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${IN_PIC[k] || k}.webp">`;
 
 export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = null, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.' }) {
+  const firstSteps = () => !!run?.day && !run.free && g.novice() && (run.floor || 0) <= 2; /* v398 : premiers pas */
   const settling = () => { const d = app.game.s.descent; return (d.runs || 0) <= 1 && (d.run?.floor || 1) <= 2; }; // v328 : voir plus haut
   const g = app.game, cat = app.catalog, run = runOpt || g.descent().run, st = run.battle;
   const ui = (app.state.duel ||= { fast: 0 });
@@ -122,19 +123,19 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   };
 
   // ——— Carte de combat ———
-  let th = {}, tgtInfo = {}, lastGoal = null;
+  let tgtInfo = {}, lastGoal = null;
   // États : icônes peintes (le chiffre du poison et du bonus d'attaque en pastille)
-  const st_ = (k, title, val = '') => `<i class="sti" title="${title}"><img alt="${title}" src="assets/icons/st-${k}.webp">${val !== '' ? `<b>${val}</b>` : ''}</i>`;
+  const st_ = (k, title, val = '') => { const [ic, mod] = k.split(' '); return `<i class="sti${mod ? ` sti-${mod}` : ''}" title="${title}"><img alt="${title}" src="assets/icons/st-${ic}.webp">${val !== '' ? `<b>${val}</b>` : ''}</i>`; };
   const statusList = (u) => [
     u.broken ? st_('broken', 'Brisé : +50 % de dégâts subis, +5 aux jets') : '',
-    u.cracked ? st_('broken', 'Fêlé : un coup de rupture le brise (attaque d’un Protecteur, Coup d’estoc, Raz-de-marée, ou coup qui consomme une Marque)') : '',
+    u.cracked ? st_('broken fele', 'Fêlé : un coup de rupture le brise (attaque d’un Protecteur, Coup d’estoc, Raz-de-marée, ou coup qui consomme une Marque)') : '',
     u.riposte ? `<i class="bo cb-rip" title="Riposte chargée : sa prochaine attaque fait +${u.riposte} dégât(s) et +${u.riposte} Brisure">⚔${u.riposte}</i>` : '',
     u.shield ? st_('shield', 'Bouclier : bloque un coup') : '',
-    u.ward ? st_('seal', `Sceau : absorbe encore ${u.ward} dégâts`, u.ward) : '',
+    u.ward ? st_('seal', `Barrière : absorbe encore ${u.ward} dégâts`, u.ward) : '',
     u.poison ? st_('poison', `Poison : ${u.poison} dégâts au début de son tour`, u.poison) : '',
     u.frozen || u.stunned ? st_('frost', 'Gelé : passe son tour') : '',
     u.mirror ? st_('shield', 'Miroir : le prochain coup qu’elle reçoit se retourne contre l’attaquant (60 %). Le poison passe à travers.') : '',
-    u.ashArmor ? st_('guard', `Carapace de cendres : −${u.ashArmor * 6} % de dégâts reçus (une Brisure la fait tomber)`, u.ashArmor) : '',
+    u.ashArmor ? st_('guard', `Armure de cendres : −${u.ashArmor * 6} % de dégâts reçus (une Brisure la fait tomber)`, u.ashArmor) : '',
     u.veiled ? st_('slow', u.mark ? 'Dans l’ombre, mais la Marque le révèle' : 'Dans l’ombre : −70 % de dégâts reçus (une Marque le révèle)') : '',
     u.condemned ? st_('exposed', 'Condamnée : le Bourreau l’exécutera à son prochain tour (permute-la en réserve pour l’épargner)') : '',
     u.slow ? st_('slow', 'Ralenti : prochaine attaque -50 %') : '',
@@ -158,16 +159,6 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   // v279 : bandeau d'états au-dessus de la carte, 3 pastilles au plus (2 si une attaque est annoncée) ; le reste en « +N », détaillé au toucher
   const statusBand = (u, warn) => { const L = statusList(u), max = warn ? 2 : 3, more = L.length - max;
     return `<span class="dv-st">${(more > 0 ? L.slice(0, max) : L).join('')}${more > 0 ? `<i class="sti cb-more" title="${more} autre(s) effet(s) : touche la carte">+${more}</i>` : ''}</span>`; };
-  const intentChip = (u) => {
-    const i = intentInfo(st, u);
-    if (!i || st.turn !== 'ally') return '';
-    const named = ['hunt', 'charge', 'channel', 'shield', 'heal', 'rally', 'frost', 'gather', 'mimic', 'decree', 'shift', 'brood', 'sentence', 'chant', 'wind', 'rewind', 'chain', 'mirror', 'wish', 'slumber', 'verdict'].includes(i.kind);
-    const label = i.kind === 'verdict' ? `Verdict : ${esc(FORBID_SHORT[i.forbid] || '')}` : i.kind === 'mimic' ? `Copie : ${esc(i.copyName)}` : i.kind === 'decree' ? esc(LAWS[i.law]?.name || 'Décret') : i.kind === 'shift' ? esc(ASPECTS[i.aspect]?.name || 'Bascule')
-      : named ? esc(i.def.name) : i.kind === 'copy' ? `${esc(i.copyName)}${i.dmg ? ` ${i.dmg}` : ''}` : `${i.dmg}${i.aoe ? ' ×3' : ''}`;
-    const brk = u.brkMax && !u.broken && i.danger >= 2 ? `<small class="cb-ibrk" title="Brise-le pour annuler cette action">◆ ${u.brk}</small>` : '';
-    const cd = ['charge', 'channel', 'gather', 'mimic', 'brood', 'sentence', 'chant', 'wind', 'wish'].includes(i.kind) ? '<em class="cb-icd" title="Frappe au prochain tour">⏳1</em>' : '';
-    return `<span class="cb-int d${i.danger} k-${i.kind}" title="${esc(i.def.name)} : ${esc(i.def.desc)}">${intentIcon(i.kind)}<b>${label}</b>${i.danger >= 2 ? `<em>${DANGER[i.danger]}</em>` : ''}${cd}${brk}</span>`;
-  };
   // v348 : dès l'étage 5 de la Descente, les ennemis ordinaires annoncent aussi leur coup (dégâts → cible), en discret
   const ORD_INT_FROM = 5;
   const ordIntent = (u) => {
@@ -200,7 +191,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       <span class="dv-kw ${enemy && u.fam ? 'fam' : ''}" title="${esc(enemy && u.fam ? AI_FAMILIES[u.fam].desc : kit.name)}">${roleIcon(kit.kw)}<em>${esc(enemy && u.fam ? AI_FAMILIES[u.fam].name : kit.name)}</em></span>
       ${u.boss ? `<span class="dv-boss"><img alt="" src="assets/icons/crest-boss.webp">${u.phase2 ? 'Furie' : 'Gardien'}</span>` : u.elite ? '<span class="dv-boss elite"><img alt="" src="assets/icons/crest-elite.webp">Élite</span>' : ''}
       <span class="dv-nm ${u.named || ((u.boss || u.twin) && st.bossKey) ? 'named' : ''}">${esc((u.boss || u.twin) && st.bossKey && BOSSES[st.bossKey] ? uName(u) : u.named ? u.title : c.name)}</span>
-      ${u.brkMax ? `<span class="cb-brk ${u.broken || u.cracked ? 'is-broken' : ''} ${u.cracked ? 'is-fele' : ''}" title="Brisure">${u.broken ? '<img alt="" src="assets/icons/st-broken.webp"><b>BRISÉ</b>' : u.cracked ? '<b>FÊLÉ</b>' : `<i style="width:${(u.brk / u.brkMax) * 100}%"></i>`}</span>` : ''}
+      ${u.brkMax ? `<span class="cb-brk ${u.broken || u.cracked ? 'is-broken' : ''} ${u.cracked ? 'is-fele' : ''}" title="Brisure">${u.broken ? '<img alt="" src="assets/icons/st-broken.webp"><b>BRISÉ</b>' : u.cracked ? '<b>À BRISER</b>' : `<i style="width:${(u.brk / u.brkMax) * 100}%"></i>`}</span>` : ''}
       <span class="dv-atk">${icon('swords')}<b>${u.atk + (u.boost || 0)}</b></span>
       <span class="dv-hp ${u.hp < u.maxHp ? 'hurt' : ''} ${u.hp > 0 && u.hp <= u.maxHp * 0.3 ? 'low' : ''}" style="--hpp:${Math.max(0, Math.min(100, Math.round((Math.max(0, u.hp) / Math.max(1, u.maxHp)) * 100)))}">${icon('heart')}<i class="hpr" aria-hidden="true"></i><b>${Math.max(0, u.hp)}</b></span>
             ${tgt ? `<span class="cb-tgt">${tgt}</span>` : ''}
@@ -219,7 +210,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const u = sel && st.units[sel];
     if (!u || st.turn !== 'ally' || busy) return '';
     const kit = KITS[u.role];
-    const list = actionsFor(st, u.uid).filter((a) => a.key !== 'duo' || a.ok); // l'Assaut conjoint n'apparaît que lorsqu'il est possible
+    const list = actionsFor(st, u.uid).filter((a) => a.key !== 'duo' || (a.ok && !firstSteps())); // l'Assaut conjoint n'apparaît que lorsqu'il est possible
     const c = cat.get(u.id), pa = u.pa || 0;
     // v262 : c'est son tour ; ses PA (points d'action personnels) s'affichent en losanges
     return `<div class="cb-head"><span class="cb-por" style="--rc:${RARITY[c.rarity].color}"><img alt="" src="${artUrl(c, { lite: true })}"></span>
@@ -247,14 +238,13 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     if (!alive_) return;
     // v262 : la créature dont c'est le tour est toujours celle qui est choisie
     if (st.init && st.turn === 'ally' && !st.over) sel = st.actor; else if (st.init) sel = null;
-    th = threats(st);
     tgtInfo = {};
     const pk = mode ? mode.key : sel && st.turn === 'ally' && actionsFor(st, sel)[0]?.ok ? 'attack' : null;
     if (pk && sel && st.turn === 'ally') {
       for (const id of actionTargets(st, sel, pk)) {
         const p = preview(st, sel, pk, id);
         const cb = p.dmg && st.units[id].side === 'enemy' ? comboOf(st, st.units[sel], st.units[id]) : 0, cbTxt = cb ? ` <i class="cmb">+${cb}</i>` : '';
-        const bk = p.breaks ? ' <i class="brk on">BRISE !</i>' : p.brk ? (p.cracks ? ' <i class="brk fl">FÊLE</i>' : ` <i class="brk">◆${p.brk}</i>`) : '';
+        const bk = p.breaks ? ' <i class="brk on">BRISE !</i>' : p.brk ? (p.cracks ? ' <i class="brk fl">FÊLURE</i>' : ` <i class="brk">◆${p.brk}</i>`) : '';
         const tu = st.units[id], synOk = tu.side === 'enemy' && p.dmg && ((tu.breach && tu.breach.by !== sel) || (tu.mark && tu.markBy !== sel) || (tu.frozen > 0 && pk === 'estoc'));
         // v270 : une valeur et une seule mention, la plus importante (K.O. > Brise > Fêle > Marque/Synergie > Enchaînement > Brisure)
         const ko = !p.roll && p.dmg && p.dmg >= tu.hp && tu.side === 'enemy';
@@ -269,6 +259,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     lastGoal = gl ? gl.state : null;
     const rules = [gl ? `<span class="cb-law cb-goal s-${gl.state}" data-d="rule" data-k="goal"><img class="cb-gico" alt="" src="assets/icons/goal.webp">${gl.state === 'done' ? '✓ ' : gl.state === 'fail' ? '✗ ' : ''}<b>${esc(gl.name)}</b>${gl.p && gl.state === 'pending' ? ` <small>${gl.p}</small>` : ''}</span>` : '',
       st.pact && PACTS[st.pact] ? `<span class="cb-law" style="--pk:${PACTS[st.pact].color}" data-d="rule" data-k="pact">${icon('p:seal')}<b>${esc(PACTS[st.pact].name)}</b></span>` : '',
+      run?.day && g.rule(run.day) ? `<span class="cb-law cb-day" data-d="rule" data-k="day">${icon('p:rule')}<b>${esc(g.rule(run.day).name)}</b></span>` : '',
       st.law ? `<span class="cb-law" data-d="rule" data-k="law"><b>${esc(LAWS[st.law].name)}</b></span>` : '',
       st.forbid ? `<span class="cb-law cb-forbid" title="Verdict du Juge : interdit de ${esc(FORBID[st.forbid])} jusqu’à sa prochaine action"><b>Interdit : ${esc(FORBID_SHORT[st.forbid])}</b></span>` : '',
       st.aspect ? `<span class="cb-law" data-d="rule" data-k="aspect"><b>${esc(ASPECTS[st.aspect].name)}</b></span>` : '',
@@ -309,7 +300,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   // v265 : seules les grosses attaques des gardiens et des élites s'annoncent sur la frise (les coups ordinaires restent cachés)
   const BIG_IT = ['heavy', 'blast', 'gorge', 'blizzard', 'copy', 'swarm', 'execute', 'lament', 'ambush', 'price', 'quake'], PREP_IT = { charge: 'heavy', channel: 'blast', gather: 'blizzard', mimic: 'copy', brood: 'swarm', sentence: 'execute', chant: 'lament', wish: 'price' };
   const bigOf = (u, next) => {
-    if (!(u.boss || u.elite) || u.hp <= 0) return null;
+    if (u.hp <= 0) return null; /* v398 : les ennemis ordinaires aussi (leur coup chargé déclenche la barre de défense) */
     const it = u.intent && !u.intent.cancelled ? u.intent.kind : null;
     if (!next) return it && (BIG_IT.includes(it) || PREP_IT[it]) ? it : null;
     return (u.charged && BIG_IT.includes(u.charged) ? u.charged : null) || (it && PREP_IT[it]) || null;
@@ -348,22 +339,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       : `<span class="cb-tlr foe ${i === 0 ? 'now' : ''} ${x.boss ? 'boss' : x.elite ? 'elite' : ''}" title="${esc(uName(x))}"><span class="cb-tlp">${pic(x)}</span></span>`)).join(''));
     if (moved && !reduced) { box.classList.remove('shift'); void box.offsetWidth; box.classList.add('shift'); }
   }
-  function drawAims() {
-    root.querySelectorAll('.cb-aim').forEach((x) => x.remove());
-    if (reduced || st.turn !== 'ally' || st.over || busy) return;
-    const box = $('.dv'); if (!box) return;
-    const r0 = box.getBoundingClientRect();
-    for (const e of front(st, 'enemy')) {
-      const i = intentInfo(st, e); if (!i || i.danger < 2 || !i.target) continue;
-      const a = el(e.uid), b = el(i.target); if (!a || !b) continue;
-      const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
-      const x1 = ra.left - r0.left + ra.width / 2, y1 = ra.bottom - r0.top - 8, x2 = rb.left - r0.left + rb.width / 2, y2 = rb.top - r0.top + 10;
-      const len = Math.hypot(x2 - x1, y2 - y1), ang = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
-      const s = document.createElement('span'); s.className = `cb-aim d${i.danger}`;
-      s.style.cssText = `left:${x1}px;top:${y1}px;width:${len}px;transform:rotate(${ang}deg)`;
-      box.appendChild(s);
-    }
-  }
+
 
   // ——— Effets ———
   // v365 : secousse et caméra en animations directes sur le plateau (avant : une classe ajoutée sur tout le plateau,
@@ -582,7 +558,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
           break;
         }
         case 'attack': break;
-        case 'counter': lunge(e.a, e.u); float(e.a, 'Riposte !', 'syn'); await wait(T(260)); break;
+        case 'counter': lunge(e.a, e.u); float(e.a, 'Contre-attaque !', 'syn'); await wait(T(260)); break;
         case 'dmg': {
           const t = el(e.u);
           if (t) { t.classList.remove('hit'); void t.offsetWidth; t.classList.add('hit'); const hp = t.querySelector('.dv-hp b'); if (hp) hp.textContent = Math.max(0, e.hp); t.querySelector('.dv-hp')?.classList.add('hurt'); }
@@ -633,7 +609,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
           break;
         }
         case 'cracked': {
-          app.sfx.shatter?.(); draw(); el(e.u)?.classList.add('cracking'); ring(e.u, 'break'); banner('FÊLÉ !', 'broken', 900); float(e.u, 'Coup de rupture pour le briser', 'syn'); shake(false);
+          app.sfx.shatter?.(); draw(); el(e.u)?.classList.add('cracking'); ring(e.u, 'break'); banner('À BRISER !', 'broken', 900); float(e.u, 'Protecteur, estoc ou Marque : brise-le !', 'syn'); shake(false);
           await wait(T(600)); if (!g.s.tips?.['cb-break']) await tuto(app, 'cb-break');
           break;
         }
@@ -1027,12 +1003,16 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   async function tips() {
     if (busy || st.over || guide) return;
     const foes = front(st, 'enemy');
-    if (st.goal) await tuto(app, 'cb-goal');
-    if (foes.some((e) => e.boss || e.elite) || (run?.floor || 0) >= ORD_INT_FROM) await tuto(app, 'cb-intent'); // v348 : la bulle n'était jamais montrée
-    if (foes.some((e) => e.trait)) await tuto(app, 'cb-traits');
-    if (foes.some((e) => e.brkMax)) await tuto(app, 'cb-break');
-    if (st.runes) await tuto(app, 'cb-runes');
-    if (st.fervor >= 1 && g.s.tips?.['cb-guide']) await tuto(app, 'cb-skill');
+    // v398 : deux bulles au plus à la fois (l'audit relevait des rafales de 3 à 5) ; les autres viendront à un combat suivant
+    const want = [
+      [!!st.goal, 'cb-goal'],
+      [foes.some((e) => e.boss || e.elite || bigOf(e, false) || bigOf(e, true)) || (run?.floor || 0) >= ORD_INT_FROM, 'cb-intent'],
+      [foes.some((e) => e.brkMax), 'cb-break'],
+      [!!st.runes, 'cb-runes'],
+      [foes.some((e) => e.trait), 'cb-traits'],
+      [st.fervor >= 1 && !!g.s.tips?.['cb-guide'], 'cb-skill'],
+    ].filter(([ok, k]) => ok && !g.s.tips?.[k]).slice(0, 2);
+    for (const [, k] of want) await tuto(app, k);
     draw();
   }
 
@@ -1084,7 +1064,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const u = sel; mode = null;
     if (a.dice) { // compétence à dé : la frappe rythmée part tout de suite, puis le jet
       busy = true; app.sfx.tap(); draw();
-      st.rhythm = await rhythmQTE(a.name, u);
+      st.rhythm = firstSteps() ? RHYTHM.perfect : await rhythmQTE(a.name, u); /* v398 : premiers pas, le dé part tout seul (réussite assurée) */
       if (!alive_) return;
     }
     return exec(() => act(st, u, key, uid));
@@ -1106,6 +1086,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     else if (k === 'aspect' && ASPECTS[st.aspect]) { const A = ASPECTS[st.aspect]; h = `<h2>${esc(A.name)}</h2><p>Faible face à <b>${A.weak.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}</b> (+60 %), résiste à <b>${A.resist.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}</b> (−50 %).</p>`; }
     else if (k === 'runes' && st.runes) h = `<h2>Les runes du gardien</h2><p class="small">Tant qu’elles tiennent, chaque rune retire <b>10 %</b> des dégâts que subit le gardien. Brise les trois : il est <b>Fêlé</b> sur-le-champ.</p>${st.runes.map((r) => `<p class="small cb-runeline ${r.broken ? 'off' : ''}"><img alt="" src="assets/ui/${r.broken ? 'rune-broken' : 'rune'}.webp"><span><b>${esc(RUNES[r.k].name)}</b>${r.broken ? ' · <span class="dc-good">brisée</span>' : ''}<br>${esc(RUNES[r.k].hint)}</span></p>`).join('')}`;
     else if (k === 'omen' && OMENS[st.omen]) h = `<h2>${esc(OMENS[st.omen].name)}</h2><p class="small"><b class="dc-good">Gain</b> ${esc(OMENS[st.omen].gain)}</p><p class="small"><b class="dc-bad">Prix</b> ${esc(OMENS[st.omen].cost)}</p>`;
+    else if (k === 'day' && run) { const R = g.rule(run.day); h = `<h2>Règle du jour : ${esc(R.name)}</h2><p>${esc(R.desc)}</p><p class="small muted">Elle vaut pour toutes les expéditions d’aujourd’hui.</p>`; }
     else if (k === 'relics') h = `<h2>Tes reliques</h2>${(st.relics || []).map((r) => `<p class="small"><b>${esc(RELICS[r].name)}</b> : ${esc(RELICS[r].gain)} <span class="dc-bad">${esc(RELICS[r].cost)}</span></p>`).join('')}`;
     if (h) openSheet(`<div class="cb-rulesheet">${h}</div>`, { label: 'Règle en vigueur' });
   }
@@ -1244,7 +1225,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   function statusLines(u) {
     const s = [];
     if (u.shield) s.push('Bouclier : bloque le prochain coup.');
-    if (u.ward) s.push(`Sceau du Serment : absorbe encore ${u.ward} dégâts.`);
+    if (u.ward) s.push(`Barrière : absorbe encore ${u.ward} dégâts.`);
     if (u.poison) s.push(`Poison ${u.poison} : perd ${u.poison} PV au début de son tour, puis le poison diminue de moitié.`);
     if (u.frozen || u.stunned) s.push('Gelé : passe son prochain tour.');
     if (u.slow) s.push('Ralenti : sa prochaine attaque fait moitié moins mal.');
@@ -1282,7 +1263,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       <h3>Les combinaisons</h3>${SYNERGIES.map((x) => `<p class="small"><b class="dv-syn-n">${esc(x.name)}</b> : ${esc(x.desc)}</p>`).join('')}
       <h3>Les ennemis</h3>${Object.values(AI_FAMILIES).map((f) => `<p class="small"><b>${esc(f.name)}</b> : ${esc(f.desc)} <span class="dc-good">${esc(f.counter)}</span></p>`).join('')}
       <h3>Les gardiens</h3>${Object.entries(BOSSES).map(([k, x]) => `<p class="small"><b>${esc(x.name)}</b> : ${esc(x.mechanic)}${g.s.bossesBeaten[k] ? ` <span class="dc-good">${esc(x.counter)}</span>` : ''}</p>`).join('')}
-      <p class="small muted">Sous la moitié de leurs PV, les gardiens entrent en phase 2 : plus forts, ils déclenchent leur mécanique de phase 2 (une fenêtre l’annonce), accélèrent leur grosse attaque et visent tes Soigneurs. Au-delà du 15e tour, l’Épuisement blesse les deux camps.</p>`, { label: 'Règles du combat' });
+      <p class="small muted">Sous la moitié de leurs PV, les gardiens entrent en <b>Furie</b> (leur phase 2, écusson « Furie ») : plus forts, ils déclenchent leur mécanique de Furie (une fenêtre l’annonce), accélèrent leur grosse attaque et visent tes Soigneurs. Un gardien <b>déchaîné</b> est en Furie dès le premier tour. Dès le 15e tour, l’Épuisement blesse les deux camps.</p>`, { label: 'Règles du combat' });
   }
 
   draw();

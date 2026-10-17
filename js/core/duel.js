@@ -316,7 +316,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
       if (sA.hp > 0) hurt(st, sA, Math.min(allyCap(sA, 'hit'), Math.max(1, Math.round(n * 0.6))), ev, null);
       return 0;
     }
-    if (u.broken && u.ashArmor) { u.ashArmor = 0; ev.push({ t: 'status', u: u.uid, s: 'La carapace de cendres tombe', syn: true }); }
+    if (u.broken && u.ashArmor) { u.ashArmor = 0; ev.push({ t: 'status', u: u.uid, s: 'L’armure de cendres tombe', syn: true }); }
     if (u.ashArmor) n *= 1 - 0.06 * u.ashArmor;
     if (u.veiled && !u.mark && !u.broken) n *= 0.3;
   }
@@ -335,7 +335,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
     if (o && !o.grief) { o.grief = true; o.atk = Math.round(o.atk * 1.35); heal(o, o.maxHp * 0.25, ev); ev.push({ t: 'boss', u: o.uid, s: 'Fou de chagrin !' }); }
   }
   if (d > 0 && u.side === 'enemy' && src && st.units[src]?.side === 'ally') st.stats.maxHit = Math.max(st.stats.maxHit || 0, d);
-  if (d > 0 && u.boss && st.bossKey === 'golem' && !u.broken && u.hp > 0 && (u.ashArmor || 0) < 8) { u.ashArmor = (u.ashArmor || 0) + 1; if (u.ashArmor % 2 === 0) ev.push({ t: 'status', u: u.uid, s: `Carapace de cendres −${u.ashArmor * 6} %`, k: 'guard' }); }
+  if (d > 0 && u.boss && st.bossKey === 'golem' && !u.broken && u.hp > 0 && (u.ashArmor || 0) < 8) { u.ashArmor = (u.ashArmor || 0) + 1; if (u.ashArmor % 2 === 0) ev.push({ t: 'status', u: u.uid, s: `Armure de cendres −${u.ashArmor * 6} %`, k: 'guard' }); }
   // v331 : traits des profondeurs (Vampire, Épineux)
   if (d > 0 && src && st.units[src]?.trait === 'vampire' && st.units[src].side === 'enemy' && st.units[src].hp > 0) {
     const v = st.units[src], h = Math.min(v.maxHp - v.hp, Math.ceil(d / 2));
@@ -1078,7 +1078,7 @@ export const PHASE2 = {
   eclipse:    { name: 'Totalité', desc: 'Seules ses faiblesses la blessent pleinement : toutes les autres factions font −40 %.' },
   essaim:     { name: 'Ruche vivante', desc: 'Son Essaim empoisonne plus fort (+5), et à chaque tour elle se régénère de 3 % de ses PV par créature empoisonnée de ton équipe.' },
   bourreau:   { name: 'Hache sanglante', desc: 'Il prononce une Sentence un tour sur deux.' },
-  choeur:     { name: 'Marée montante', desc: 'À chaque tour, la marée ronge tes créatures au combat (4 % de leurs PV, jamais mortel). Une Brisure la retient pendant ce tour.' },
+  choeur:     { name: 'Marée noire', desc: 'À chaque tour, la marée ronge tes créatures au combat (4 % de leurs PV, jamais mortel). Une Brisure la retient pendant ce tour.' },
   chaines:    { name: 'Forge ardente', desc: 'Il gagne +1 ATQ à chaque tour où il n’est pas brisé. Brise-le souvent.' },
   horloge:    { name: 'Le temps s’emballe', desc: 'Entre deux retours en arrière, il frappe deux fois de suite.' },
   miroirs:    { name: 'Galerie des glaces', desc: 'Elle dresse un Miroir un tour sur deux.' },
@@ -1552,7 +1552,7 @@ function runeHit(st, k, ev) {
   ev.push({ t: 'rune', u: b?.uid || null, k, left: runesLeft(st) });
   gainFervor(st, 1, ev, 'Rune brisée');
   if (!runesLeft(st) && b && b.hp > 0 && !b.broken && !b.cracked) {
-    ev.push({ t: 'status', u: b.uid, s: 'Les trois sceaux sont rompus !', syn: true, k: 'broken' });
+    ev.push({ t: 'status', u: b.uid, s: 'Les trois runes sont brisées !', syn: true, k: 'broken' });
     b.brk = 0; b.cracked = { seq: -1, until: st.round + 1 }; ev.push({ t: 'brk', u: b.uid, brk: 0, max: b.brkMax }); ev.push({ t: 'cracked', u: b.uid });
   }
 }

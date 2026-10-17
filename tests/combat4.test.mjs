@@ -153,7 +153,7 @@ test('mode Cauchemar : verrouillé avant l’étage 20, ennemis renforcés, gard
   assert.equal(b.phase2, true, 'phase 2 dès le premier tour ennemi');
 });
 
-test('objectifs : dévoilés à partir de l’étage 3 pour un nouveau joueur', () => {
+test('objectifs : dévoilés à partir de l’étage 4 pour un nouveau joueur (v398)', () => {
   const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('gl'), clock });
   const ids = catalog.cards.filter((c) => c.rarity === 'C').slice(0, 5).map((c) => c.id);
   ids.forEach((id) => g.addCard(id)); g.s.team = ids; g.s.teamSet = true;
@@ -161,7 +161,21 @@ test('objectifs : dévoilés à partir de l’étage 3 pour un nouveau joueur', 
   const run = g.s.descent.run;
   assert.equal(g.goalFor(run, 'fight'), null);
   run.floor = 3;
+  assert.equal(g.goalFor(run, 'fight'), null);
+  run.floor = 4;
   assert.ok(g.goalFor(run, 'fight'));
+});
+
+test('premiers pas (v398) : pas de porte Élite avant l’étage 3 tant que le record est sous 3', () => {
+  const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('nv'), clock });
+  const ids = catalog.cards.filter((c) => c.rarity === 'C').slice(0, 5).map((c) => c.id);
+  ids.forEach((id) => g.addCard(id)); g.s.team = ids; g.s.teamSet = true;
+  g.startRun();
+  const run = g.s.descent.run;
+  run.floor = 2;
+  assert.deepEqual(g.doors(), ['fight']);
+  g.s.descent.best = 5;
+  assert.ok(g.doors().includes('elite'));
 });
 
 test('v307 : la formation choisie en combat (permutation) est gardée aux étages suivants, et se change entre deux étages', () => {

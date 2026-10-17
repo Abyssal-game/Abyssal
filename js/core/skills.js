@@ -32,7 +32,7 @@ export const KITS = {
   degats: {
     kw: 'assaut', name: 'Attaquant', icon: 'swords',
     basic: { name: 'Frappe', desc: 'Dégâts normaux.' },
-    skill: { key: 'estoc', pa: 2, name: 'Coup d’estoc', icon: 'swords', ap: 2, fervor: 2, target: 'enemy', dice: { dc: DICE_DC.estoc.base }, desc: `Coup de rupture. Jet de D20 (${dcText('estoc')}). Réussite : dégâts ×2, +3 Brisure, et la cible est marquée. Critique : ×3 et +4 Brisure. Partielle : ×1,2. Échec critique : moitié des dégâts, et elle est exposée (+25 % de dégâts subis).` },
+    skill: { key: 'estoc', pa: 2, name: 'Coup d’estoc', icon: 'swords', ap: 2, fervor: 2, target: 'enemy', dice: { dc: DICE_DC.estoc.base }, desc: `Coup de rupture. Jet de D20 (${dcText('estoc')}). Réussite : dégâts ×2, +3 Brisure, et la cible est marquée. Critique : ×3 et +4 Brisure. Partielle : ×1,2. Échec critique : moitié des dégâts, et ta créature est déséquilibrée (+25 % de dégâts subis).` },
     passive: { name: 'Exécution', desc: '+50 % de dégâts sur une cible brisée ou sous 30 % de ses PV. Contre-attaque après une parade parfaite.' },
   },
   soin: {
@@ -148,7 +148,7 @@ export const INTENTS = {
   brood:    { name: 'La ruche s’éveille', icon: 'sparkle', desc: 'N’attaque pas ce tour-ci : Essaim au tour suivant. Gel ou Brisure l’interrompent.' },
   swarm:    { name: 'Essaim',         icon: 'skull',   desc: 'Frappe toute ton équipe et empoisonne chaque créature (+3 poison, +5 en phase 2).' },
   sentence: { name: 'Sentence',       icon: 'eye',     desc: 'Condamne ta créature la plus affaiblie : il l’exécutera au tour suivant. Permute-la en réserve, défends-la, ou brise-le.' },
-  execute:  { name: 'Exécution',      icon: 'skull',   desc: 'Frappe la condamnée avec deux fois sa force (trois fois si elle a perdu la moitié de ses PV). Si elle tombe, il gagne +3 ATQ.' },
+  execute:  { name: 'Coup de hache',  icon: 'skull',   desc: 'Frappe la condamnée avec deux fois sa force (trois fois si elle a perdu la moitié de ses PV). Si elle tombe, il gagne +3 ATQ.' },
   chant:    { name: 'Chant des noyés', icon: 'sparkle', desc: 'N’attaque pas ce tour-ci : Complainte au tour suivant. Gel ou Brisure l’interrompent.' },
   lament:   { name: 'Complainte',     icon: 'flame',   desc: 'Frappe toute ton équipe, retire ses boucliers et ses bonus d’attaque, et te fait perdre 2 Ferveur.' },
   chain:    { name: 'Chaînes',        icon: 'eye',     desc: 'Frappe ta créature la plus forte et l’enchaîne : elle ne pourra pas agir à ton prochain tour.' },

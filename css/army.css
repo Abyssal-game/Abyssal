@@ -3507,3 +3507,11 @@ html.fx-light .dv-c .dv-hp.low .hpr::after { animation: none; }
 .dc-summit-win b { display: block; color: #FFE7A8; }
 .pbadge.pb-abysse { background: linear-gradient(90deg, #4A1580, #B04BFF); color: #FFF0C8; }
 .bn-abysse { --bn: url(../assets/ui/bn-abysse.webp); } /* v395 : bannière Gemini du Booster de l'Abysse */
+
+/* v398 (audit des combats) : « Ferveur » écrit au-dessus de ses losanges (la bulle d'aide en parle) ; Fêlure avec sa propre
+   teinte (même icône que Brisé avant) ; règle du jour dans la bande des règles */
+.dv.cb .cb-res .cb-fv { flex-direction: column; align-items: flex-start; gap: 1px; }
+.dv.cb .cb-res .cb-fv small { display: block !important; font: 700 .55rem/1 var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: #C9A8FF; }
+.sti.sti-fele img { filter: sepia(1) saturate(3) hue-rotate(5deg) brightness(1.15); }
+.cb-brk.is-fele b { letter-spacing: .02em; }
+.cb-law.cb-day .picon { width: 16px; height: 16px; }
