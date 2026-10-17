@@ -3607,3 +3607,10 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 .ep-st.cur { background: rgba(212,175,55,.14); color: var(--gold); }
 .ep-team { margin-bottom: 12px; }
 .ep-res { margin-bottom: 14px; }
+
+/* v410 : Descente : « Comment ça marche » seul, sur toute la largeur (comme les encarts du dessus) */
+.dc-links.dc-links-one { grid-template-columns: 1fr; }
+.dc-links-one .dc-link { flex-direction: row; justify-content: flex-start; gap: 14px; min-height: 72px; padding: 12px 18px; text-align: left; }
+.dc-links-one .dc-link .picon { margin-bottom: 0; }
+.dc-links-one .dc-link b { font-size: .9rem; }
+.dc-links-one .dc-link small { font-size: .78rem; margin-left: auto; }

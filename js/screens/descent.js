@@ -82,8 +82,7 @@ export default function descent(app, root) {
       </section>
       ${summitHTML(d)}
       ${ruleHTML(g.rule())}
-      <div class="dc-links">
-        <a class="dc-link" href="#/epreuves">${picon('crest-elite')}<b>Épreuves du jour</b><small>${g.trials().done.filter((x) => !x).length} à jouer</small></a>
+      <div class="dc-links dc-links-one">
         <button class="dc-link" data-act="open" data-f="how">${picon('help')}<b>Comment ça marche</b><small>en ${HOW.length} étapes</small></button>
       </div>`;
     if (last?.record && !last.cheered) { last.cheered = true; setTimeout(() => app.sfx.achievement?.(), 250); root.querySelector('.dc-sum2')?.classList.add('cheer'); } // record battu : on fête
