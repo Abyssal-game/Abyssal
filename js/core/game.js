@@ -817,6 +817,7 @@ export class Game {
     this.s.stats.trials = (this.s.stats.trials || 0) + 1;
     if (won) this.s.stats.trialWins = (this.s.stats.trialWins || 0) + 1;
     out.score = t.score; out.day = t.day; out.allDone = t.done.every(Boolean);
+    if (out.allDone && t.done.every((x) => x === 'won')) { this.s.stats.trialPerfect = (this.s.stats.trialPerfect || 0) + 1; out.perfect = true; }
     this.emit('trialEnd', out);
     this.checkProgress();
     this.persist();
@@ -1537,6 +1538,9 @@ export class Game {
       case 'hunted': return this.huntCount();
       case 'mastered': return Object.values(this.s.hunt).filter((k) => k >= HUNT_STAGES[2].k).length;
       case 'trophies': return Object.values(this.s.hunt).filter((k) => k >= HUNT_STAGES[3].k).length;
+      case 'trialWins': return this.s.stats.trialWins || 0; /* v421 */
+      case 'trialPerfect': return this.s.stats.trialPerfect || 0;
+      case 'finish': return Object.values(this.s.collection).filter((e) => (e.v?.[c.v] || 0) > 0).length;
       case 'cardLevel': return Math.max(0, ...Object.keys(this.s.collection).filter((id) => this.catalog.get(id)).map((id) => this.cardLevel(id)));
       default: return 0;
     }
@@ -1615,7 +1619,7 @@ export class Game {
   devResetCampaign() {
     const d = this.descent();
     d.run = null; d.best = 0; d.bestToday = 0; d.bestNightmare = 0; d.nightBest = {}; d.last = null; d.risk = {};
-    this.s.bossesBeaten = {}; this.s.bossWins = {};
+    this.s.bossesBeaten = {}; this.s.bossWins = {}; this.s.storySeen = {};
     this.persist();
   }
   devFreePacks() { this.s.freePack = { day: null }; this.persist(); }

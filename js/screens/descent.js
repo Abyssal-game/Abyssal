@@ -17,6 +17,7 @@ import { runDuel } from './duel-ui.js';
 import { PHASE2 } from '../core/duel.js';
 import { WEEKLY_FLOOR, NIGHTMARE_AT, AWAKEN_AT, NIGHT_TIERS, NIGHT_TIER_OPEN, nightTier } from '../core/game.js';
 import { setScene, sceneUrl } from '../ui/scene.js';
+import { PROLOGUE, EPILOGUE, chapterStory } from '../core/story.js';
 
 // Illustrations des portes et des bonus
 const DOOR_ART = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss', rest: 'rest', altar: 'altar', treasure: 'treasure' };
@@ -45,7 +46,7 @@ export default function descent(app, root) {
     const d = g.descent(), best = d.best || 0, start = startFloor(), ch = chapterOf(start), done = chapDone(ch), bk = bossOf(ch * CHAPTER), B = BOSSES[bk];
     const floors = Array.from({ length: CHAPTER }, (_, i) => start + i);
     return `<div class="dc-chap ${done ? 'done' : ''}">
-      <div class="dc-chap-h">${BOSS_FIGS.has(bk) ? `<img class="dc-chap-fig" alt="" src="assets/bosses/${bk}.webp">` : ''}<span><span class="dc-chap-k">Chapitre ${ch} / ${CHAPTERS}${done ? ' · terminé' : ''}</span><b>${esc(B.name)}</b><small>${esc(B.title)}</small></span></div>
+      <div class="dc-chap-h">${BOSS_FIGS.has(bk) ? `<img class="dc-chap-fig" alt="" src="assets/bosses/${bk}.webp">` : ''}<span><span class="dc-chap-k">Chapitre ${ch} / ${CHAPTERS}${done ? ' · terminé' : ''}</span><b>${esc(chapterStory(ch)?.title || B.name)}</b><small>${esc(B.name)} · ${esc(B.title)}</small></span><button class="dc-chap-read icon-btn" data-act="story" data-c="${ch}" aria-label="Lire le récit du chapitre">${icon('book')}</button></div>
       <ol class="dc-chap-floors">${floors.map((f) => `<li class="${f <= best ? 'ok' : ''} ${f === best + 1 ? 'next' : ''} ${f % CHAPTER === 0 ? 'boss' : ''}"><span>${f <= best ? icon('check') : f % CHAPTER === 0 ? icon('crown') : f}</span><small>${f % CHAPTER === 0 ? 'Gardien' : `Étage ${f}`}</small></li>`).join('')}</ol>
       <p class="small dc-chap-rw">${done ? `Chapitre déjà terminé : le rejouer ne rapporte que les petits gains des combats${g.nightmareUnlocked() ? ', sauf en <b>Cauchemar</b>' : ''}.` : `Chaque étage gagné pour la première fois rapporte des éclats et des cendres. Gardien vaincu : <b style="color:${CHESTS[bossChest(ch)].color}">${esc(CHESTS[bossChest(ch)].name.toLowerCase())}</b>.`}</p>
     </div>${chapsHTML()}`;
@@ -137,13 +138,19 @@ export default function descent(app, root) {
     const title = s.summit ? 'Le fond de l’Abysse' : s.chapterDone ? `Chapitre ${ch} terminé` : s.abandoned ? 'Chapitre abandonné' : 'L’équipe est tombée';
     const sub = s.summit ? 'L’Abysse est vaincue. Tu es descendu au plus profond de la Descente.' : s.chapterDone ? `${s.boss ? `${esc(BOSSES[s.boss.key]?.name || 'Le gardien')} est vaincu. ` : ''}${next ? `Le chapitre ${next} est ouvert.` : ''}` : `Tu gardes tout ce que tu as gagné. Le chapitre ${ch} reprendra à l’étage ${chapterStart(ch)}.`;
     const fl = s.firstLoot;
-    return `<section class="dc-sum2 ${s.wiped ? 'lost' : 'won'}">
-      ${crestHTML(!s.wiped, s.chapterDone ? ch : s.floor, s.chapterDone ? 'Chapitre' : (s.floor > 1 ? 'Étages' : 'Étage'), 'dc-sum2-crest')}
+    const bk = s.boss?.key, nextB = next ? bossOf(next * CHAPTER) : null;
+    /* v421 : fin de chapitre marquante : le gardien vaincu s'efface, le coffre gagné en grand, le chapitre suivant se dévoile */
+    const chEnd = s.chapterDone && bk ? `<div class="dc-chend">${BOSS_FIGS.has(bk) ? `<img class="dc-chend-fig" alt="" src="assets/bosses/${bk}.webp">` : ''}<span class="dc-chend-seal">${icon('check')} Chapitre refermé</span></div>` : '';
+    const chChest = s.chapterDone && s.bossChest ? `<div class="dc-chend-chest" style="--cc:${CHESTS[s.bossChest].color}">${chestSVG(s.bossChest)}<b>${esc(CHESTS[s.bossChest].name)}</b></div>` : '';
+    const chNext = nextB ? `<div class="panel dc-chnext">${BOSS_FIGS.has(nextB) ? `<img alt="" src="assets/bosses/${nextB}.webp">` : ''}<span><span class="dc-chap-k">Chapitre ${next} · ouvert</span><b>${esc(chapterStory(next)?.title || '')}</b><small>${esc(BOSSES[nextB].name)} t’attend à l’étage ${next * CHAPTER}</small></span></div>` : '';
+    return `<section class="dc-sum2 ${s.wiped ? 'lost' : 'won'} ${s.chapterDone ? 'chapter' : ''}">
+      ${chEnd || crestHTML(!s.wiped, s.chapterDone ? ch : s.floor, s.chapterDone ? 'Chapitre' : (s.floor > 1 ? 'Étages' : 'Étage'), 'dc-sum2-crest')}
       <h2>${title}</h2>
       <p class="dc-sum2-sub">${sub}</p>
       ${s.boss && s.chapterDone ? bossRecap(s.boss) : ''}
       ${s.abyssPack ? `<a class="panel dc-summit-win" href="#/boutique"><img alt="" src="assets/packs/abysse.webp"><span><b>Booster de l’Abysse</b><span class="small">Il t’attend dans les Boosters.${s.abyss ? ' Avec une Secrète que tu n’as pas encore.' : ''}</span></span></a>` : ''}
-      ${s.abyss ? `<p class="vx-week vx-first">${icon('crown')} Titre « Vainqueur de l’Abysse », Cadre de l’Œil de l’Abysse et <b>2 coffres abyssaux</b> !</p>` : ''}
+      ${s.abyss ? `<div class="panel st-epi"><span class="bx-k">Épilogue</span><h3>${esc(EPILOGUE.title)}</h3><p>${esc(EPILOGUE.text)}</p></div><p class="vx-week vx-first">${icon('crown')} Titre « Vainqueur de l’Abysse », Cadre de l’Œil de l’Abysse et <b>2 coffres abyssaux</b> !</p>` : ''}
+      ${chChest}${chNext}
       ${next ? `<button class="btn primary block big-cta dc-plq dc-plq-red" data-act="nextchap" data-c="${next}">${icon('p:descend')}Commencer le chapitre ${next}</button>` : ''}
       ${s.chests.length ? `<a class="btn ${next ? 'gold' : 'primary'} block dc-plq ${next ? 'dc-plq-dark' : 'dc-plq-red'} dc-chestcta" href="#/coffres">${icon('p:chest')}Ouvrir ${s.chests.length > 1 ? 'mes coffres' : 'mon coffre'}</a>` : ''}
       ${s.record && !s.chapterDone ? `<p class="vx-week dc-record">${icon('crown')} <b>Nouveau record !</b> Jamais tu n’étais descendu aussi bas : étage ${s.floor}.</p>` : ''}
@@ -308,6 +315,21 @@ export default function descent(app, root) {
     if (key) app.sfx.discover();
     if (out.battle) enterBattle();
   }
+  // v421 : récit d'un chapitre (au premier départ, puis relisible depuis la carte du chapitre)
+  function storyHTML(ch) {
+    const t = chapterStory(ch);
+    return `${ch === 1 ? `<p class="st-pro">${esc(PROLOGUE)}</p>` : ''}<span class="bx-k">Chapitre ${ch} / ${CHAPTERS}</span><h1>${esc(t?.title || '')}</h1><p class="bx-p">${esc(t?.text || '')}</p>`;
+  }
+  function showStory(ch, then) {
+    if (app.reduced()) { then?.(); return; }
+    const el = document.createElement('div');
+    el.className = 'bx-intro st-intro';
+    el.innerHTML = `<div class="bx-in">${storyHTML(ch)}<span class="bx-tap">Touche pour descendre</span></div>`;
+    document.body.appendChild(el);
+    app.sfx.sheet?.();
+    let done = false;
+    el.addEventListener('click', () => { if (done) return; done = true; el.classList.add('out'); setTimeout(() => el.remove(), 300); then?.(); });
+  }
   // Entrée en combat ; un gardien a droit à une courte présentation (touche pour passer)
   function enterBattle() {
     window.scrollTo(0, 0);
@@ -384,9 +406,12 @@ export default function descent(app, root) {
       const st = startFloor();
       try {
         g.startRun({ nightmare: ui.nightmare && g.nightmareUnlocked() && chapDone(chapterOf(st)) ? nt() : 0, start: st }); ui.outcome = null; ui.tsel = null; app.sfx.tear(); app.chrome(); render(); window.scrollTo(0, 0);
-        if (g.descent().run?.phase === 'doors') tuto(app, 'army-doors');
+        const ch = chapterOf(st), seen = (g.s.storySeen ||= {});
+        const after = () => { if (g.descent().run?.phase === 'doors') tuto(app, 'army-doors'); };
+        if (!chapDone(ch) && !seen[ch]) { seen[ch] = Date.now(); g.persist(); showStory(ch, after); } else after();
       } catch (e) { toast(esc(e.message), { kind: 'error' }); }
     },
+    story(el) { const ch = +el.dataset.c; openSheet(`<div class="st-sheet">${storyHTML(ch)}</div>`, { label: 'Récit du chapitre', cls: 'dc-sheet' }); },
     omeninfo() { const o = OMENS[g.descent().run?.omen]; if (o) openSheet(`<h2 class="center">${esc(o.name)}</h2><p><b class="dc-good">Gain</b> ${esc(o.gain)}</p><p><b class="dc-bad">Prix</b> ${esc(o.cost)}</p><p class="small muted">Il dure tout le chapitre.</p>`, { label: 'Présage', cls: 'dc-sheet sheet-small' }); },
     omenpick(el) { ui.omen = el.dataset.k; app.sfx.tap(); render(); },
     omengo() {

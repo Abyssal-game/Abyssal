@@ -1,0 +1,32 @@
+// v421 : l'histoire de la Descente, chapitre par chapitre (un récit au début de chaque chapitre, et l'épilogue à l'étage 100).
+// Le fil : le Bestiaire interdit a été déchiré ; ses chapitres sont tombés dans l'Abysse, et chacun a réveillé son gardien.
+// Le joueur descend refermer les chapitres un à un, jusqu'à ce qui attend au fond.
+export const PROLOGUE = 'Le Bestiaire interdit a été écrit par les premiers Scelleurs pour enfermer ce qui ne devait plus marcher sous le ciel. Une nuit, quelqu’un l’a déchiré. Ses pages se sont envolées dans les boosters scellés, et ses vingt chapitres sont tombés dans l’Abysse. Tu es le dernier à savoir lire les sceaux : descends, et referme-les.';
+
+export const CHAPTER_STORY = [
+  null,
+  { title: 'La porte rassasiée', text: 'Le premier chapitre racontait comment les Scelleurs avaient nourri une gueule sans fond pour pouvoir fermer sa porte. La page est tombée, la porte s’est rouverte, et le Dévoreur a de nouveau faim. Tes créatures sont la seule chose que tu peux lui offrir sans y laisser la tienne.' },
+  { title: 'L’hiver qui ne finit pas', text: 'Plus bas, l’air gèle dans tes poumons. Une reine a offert son royaume à l’hiver pour qu’il ne change jamais, et le chapitre qui la tenait endormie est tombé à ses pieds. Elle ne veut pas te tuer : elle veut te garder.' },
+  { title: 'La cour des masques', text: 'Une salle de bal sans musiciens, où des courtisans sans visage dansent encore. Leur roi porte celui du dernier qui l’a regardé en face. Ne le fixe pas trop longtemps : il apprend vite.' },
+  { title: 'Les plans de l’abîme', text: 'Des lignes de lumière découpent les murs comme sur un parchemin d’architecte. Quelqu’un a redessiné les règles de cet étage, et il entend que tu les suives. Le chapitre déchiré parle d’un bâtisseur qui voulait reconstruire l’Abysse… à son idée.' },
+  { title: 'Le ciel avalé', text: 'Ici, sous la terre, il y a un ciel. Un soleil noir y dévore la lune, puis la recrache, sans fin. Les Scelleurs avaient enfermé l’Éclipse dans une page de nuit ; la page brûle encore au fond de l’arène.' },
+  { title: 'La ruche sous les ruines', text: 'Le cinquième sceau refermé, tu entends un bourdonnement monter des fondations. Une ville entière a été creusée en alvéoles. Leur reine pond sans relâche, et chaque œuf porte un mot arraché au Bestiaire.' },
+  { title: 'Le tribunal des cloches', text: 'Une cloche sonne à chaque marche que tu descends. On juge ici ceux qui sont tombés dans l’Abysse, et le verdict est toujours le même. Le Bourreau n’a jamais lu le chapitre qui le concerne : il ne sait pas qu’il en est le prisonnier.' },
+  { title: 'Les eaux qui chantent', text: 'L’eau noire monte jusqu’aux chevilles, puis jusqu’aux genoux. Elle chante avec les voix de tous les noyés de l’ancienne mer. Le chapitre qui les berçait s’est mouillé, et ils se sont réveillés en chœur.' },
+  { title: 'La forge des captifs', text: 'Chaque coup d’enclume fait trembler la page que tu tiens. Ici, un seigneur forge des chaînes pour tout ce qui a voulu fuir l’Abysse. Celles des premiers Scelleurs pendent encore au plafond.' },
+  { title: 'Le temps arrêté', text: 'Mi-chemin. Les aiguilles des horloges reculent quand tu avances. Le gardien de ce chapitre a volé du temps aux Scelleurs, assez pour les voir vieillir et mourir. Il en a encore en réserve, et il compte bien s’en servir.' },
+  { title: 'Le palais des reflets', text: 'Tu te vois partout, sauf là où tu es. Une sorcière a fait de chaque miroir une porte, et de chaque reflet un témoin. Frappe-la, et c’est toi qui sentiras le coup.' },
+  { title: 'Les cendres des premiers Scelleurs', text: 'Le sol est couvert de cendres tièdes. Ce sont celles des premiers Scelleurs, qui ont brûlé leurs propres corps pour sceller ce chapitre. Quelque chose s’est levé de leur bûcher, et il durcit à chaque coup qu’on lui porte.' },
+  { title: 'La ville qui tousse', text: 'Une cité entière dort sous la brume grise, et ses habitants toussent dans leur sommeil. La Peste ne tue pas : elle voyage. Le chapitre l’avait enfermée dans une seule page ; elle en a maintenant mille.' },
+  { title: 'Le bois sans lumière', text: 'Des arbres poussent à l’envers, racines vers le plafond. Un chasseur y traque tout ce qui descend trop bas, et il ne laisse aucune ombre derrière lui. Marque-le, et il ne pourra plus se cacher.' },
+  { title: 'Le marché des souhaits', text: 'Une femme voilée tient boutique au bord du vide. Elle vend tout ce que tu désires et ne réclame rien… pour l’instant. Les Scelleurs avaient écrit son prix dans le Bestiaire. La ligne a été effacée.' },
+  { title: 'Les épaules du monde', text: 'Tu marches sur une montagne qui respire. Le Titan dort depuis que les Scelleurs l’ont bercé avec la dernière berceuse du monde. Chaque coup que tu lui portes pendant son sommeil, il s’en souviendra au réveil.' },
+  { title: 'Le jour et la nuit', text: 'Deux silhouettes liées par une chaîne de lumière se partagent cet étage : l’une n’existe que quand l’autre dort. Le chapitre les avait séparées en deux pages. Elles se sont retrouvées en tombant.' },
+  { title: 'Le procès', text: 'Un tribunal de pierre t’attend, et le Juge connaît chaque sceau que tu as refermé. Il t’accuse d’avoir lu le Bestiaire interdit, ce qui est vrai. Il te reste à prouver que tu en es digne.' },
+  { title: 'Les sept couronnes', text: 'L’avant-dernier chapitre ne devait jamais être lu. Une bête aux sept têtes y grandit à chaque instant où on la laisse vivre. Les Scelleurs l’avaient fait taire en arrachant sa page eux-mêmes. Quelqu’un l’a recollée.' },
+  { title: 'Ce qui attend au fond', text: 'Il n’y a plus d’étage. Plus de mur. Seulement le noir, et un œil immense qui s’ouvre lentement. Tu comprends enfin qui a déchiré le Bestiaire : l’Abysse voulait être lu.' },
+];
+
+export const EPILOGUE = { title: 'La dernière page', text: 'L’œil se referme. Dans le silence, une page glisse jusqu’à toi : la toute première du Bestiaire interdit, celle que personne n’avait jamais vue. Sous les noms des premiers Scelleurs, une ligne d’encre fraîche s’écrit toute seule. C’est ton nom. Les vingt chapitres sont refermés… mais l’Abysse, lui, ne dort jamais vraiment.' };
+
+export const chapterStory = (ch) => CHAPTER_STORY[ch] || null;

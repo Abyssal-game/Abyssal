@@ -3622,3 +3622,34 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 /* v417 : bannière d'ouverture d'une finition aux couleurs des nouvelles finitions (argent, or, Abysse) */
 .op-banner.op-variant.v-holo { background: linear-gradient(110deg, #FFFFFF, #AEB9CC, #EEF3FA); -webkit-background-clip: text; background-clip: text; }
 .op-banner.op-variant.v-galaxy { background: linear-gradient(110deg, #E6D2FF, #9A4CFF, #F2E6FF); -webkit-background-clip: text; background-clip: text; }
+
+/* v421 : récits des chapitres (au premier départ et sur la carte du chapitre), épilogue de l'étage 100 */
+.st-intro { background: radial-gradient(80% 60% at 50% 40%, rgba(60, 30, 110, .55), rgba(0, 0, 0, .96)); }
+.st-intro .bx-in, .st-sheet { max-width: 420px; text-align: center; }
+.st-pro { font-style: italic; color: var(--mute, #bbb); font-size: .9rem; line-height: 1.5; margin: 0 0 18px; padding-bottom: 14px; border-bottom: 1px solid rgba(232, 195, 90, .25); }
+.st-sheet .bx-k { display: block; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+.st-sheet h1 { font-family: var(--f-display); font-size: 1.4rem; margin: 6px 0 10px; }
+.st-sheet .bx-p { line-height: 1.55; }
+.dc-chap-h { position: relative; }
+.dc-chap-read { margin-left: auto; flex: none; min-width: 44px; min-height: 44px; }
+.st-epi { text-align: center; margin: 12px 0; border-color: rgba(176, 75, 255, .45); background: linear-gradient(180deg, rgba(40, 14, 70, .6), rgba(10, 6, 18, .9)); }
+.st-epi .bx-k { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: #C9A8FF; }
+.st-epi h3 { font-family: var(--f-display); margin: 6px 0 8px; }
+.st-epi p { margin: 0; line-height: 1.55; font-style: italic; }
+
+/* v421 : écran de fin de chapitre (gardien vaincu qui s'efface, coffre en grand, chapitre suivant) */
+.dc-chend { position: relative; display: grid; justify-items: center; margin: 4px auto 6px; }
+.dc-chend-fig { width: 150px; height: 150px; object-fit: contain; object-position: center bottom; filter: grayscale(.85) brightness(.55) drop-shadow(0 6px 14px #000); animation: chFade 1.6s ease both; }
+.dc-chend-seal { margin-top: -18px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; background: linear-gradient(180deg, #F2D47A, #B8862C); color: #2A1A06; font: 700 .8rem/1 var(--f-display); letter-spacing: .08em; text-transform: uppercase; box-shadow: 0 4px 14px rgba(0,0,0,.6); animation: chSeal .5s .9s ease both; }
+.dc-chend-seal svg { width: 14px; height: 14px; }
+@keyframes chFade { from { filter: grayscale(0) brightness(1) drop-shadow(0 6px 14px #000); transform: scale(1.06); } }
+@keyframes chSeal { from { opacity: 0; transform: scale(1.6); } }
+.dc-chend-chest { display: grid; justify-items: center; gap: 4px; margin: 10px auto; }
+.dc-chend-chest svg, .dc-chend-chest img { width: 96px; height: 96px; object-fit: contain; filter: drop-shadow(0 0 18px var(--cc)); animation: chChest .6s 1.2s ease both; }
+.dc-chend-chest b { color: var(--cc); font-family: var(--f-display); }
+@keyframes chChest { from { opacity: 0; transform: translateY(14px) scale(.8); } }
+.dc-chnext { display: flex; align-items: center; gap: 12px; margin: 10px 0; text-align: left; border-color: rgba(232, 195, 90, .35); }
+.dc-chnext img { width: 56px; height: 56px; object-fit: contain; object-position: center bottom; flex: none; }
+.dc-chnext > span { display: grid; gap: 2px; min-width: 0; }
+.dc-chnext small { color: var(--mute); }
+@media (prefers-reduced-motion: reduce) { .dc-chend-fig, .dc-chend-seal, .dc-chend-chest svg, .dc-chend-chest img { animation: none; } }
