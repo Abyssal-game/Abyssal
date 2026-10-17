@@ -83,7 +83,7 @@ export default function trials(app, root) {
 
   function list() {
     const t = g.trials(), team = g.team(), wins = t.done.filter((x) => x === 'won').length, r = g.rule();
-    root.innerHTML = `<header class="screen-head dc-head ui-hero bn-descente"><h1>Les Épreuves du jour</h1><p class="muted">${wins} sur 3 gagnée${wins > 1 ? 's' : ''} · ${fmt(t.score || 0)} points</p></header>
+    root.innerHTML = `<header class="screen-head dc-head ui-hero bn-trial"><h1>Les Épreuves du jour</h1><p class="muted">${wins} sur 3 gagnée${wins > 1 ? 's' : ''} · ${fmt(t.score || 0)} points</p></header>
       ${ui.result ? resultHTML(ui.result) : ''}
       <p class="small muted center ep-intro">Les ennemis sont réglés sur tes <b>meilleures cartes</b> : ni trop faciles, ni impossibles. Une seule tentative par Épreuve ; elles reviennent à minuit.</p>
       <div class="ep-list">${TRIALS.map((_, i) => cardHTML(i)).join('')}</div>

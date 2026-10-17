@@ -28,7 +28,7 @@ export const BLESSINGS = {
   blades: { name: 'Lames affûtées', desc: '+1 en attaque pour toutes tes créatures.' },
   vigor:  { name: 'Vigueur', desc: '+20 % de PV maximum et soin complet.' },
   ward:   { name: 'Bouclier béni', desc: 'Chaque créature commence chaque combat avec un bouclier.' },
-  greed:  { name: 'Avidité', desc: '+30 % d’éclats pour le reste de l’expédition.' },
+  greed:  { name: 'Avidité', desc: '+30 % d’éclats pour le reste du chapitre.' },
   ...COMBAT_BLESSINGS, // bénédictions qui changent la façon de combattre
 };
 
@@ -101,12 +101,12 @@ const pick = (rng, list) => list[Math.floor(rng() * list.length)];
 // ——— Étages ———————————————————————————————————————————————————————
 export const ROOMS = {
   fight:    { name: 'Combat',         desc: 'Des créatures barrent le passage. Victoire : un bonus au choix.' },
-  elite:    { name: 'Élite',          desc: 'Plus dangereux : éclats doublés et 3 bonus au choix.' },
-  altar:    { name: 'Autel ancien',   desc: 'Choisis une bénédiction pour toute l’expédition.' },
+  elite:    { name: 'Élite',          desc: 'Plus dangereux : éclats doublés, 3 bonus au choix et un talent pour une de tes créatures.' },
+  altar:    { name: 'Autel ancien',   desc: 'Choisis une bénédiction pour tout le chapitre.' },
   rest:     { name: 'Source sacrée',  desc: 'Tes créatures récupèrent 30 % de leurs PV.' },
   treasure: { name: 'Trésor oublié',  desc: 'Une poignée d’éclats.' },
   gouffre:  { name: 'Gouffre',        desc: 'Un raccourci : tu descends de 2 étages d’un coup, sans combat ni butin, mais la chute coûte 20 % des PV à chaque créature.' },
-  boss:     { name: 'Gardien',        desc: 'Le gardien de l’étage. Première victoire contre lui : un coffre.' },
+  boss:     { name: 'Gardien',        desc: 'Le gardien du chapitre. Première victoire : un coffre d’or ou abyssal, et le chapitre suivant s’ouvre.' },
 };
 
 // Chaque étage se gagne au combat : combat simple ou élite (plus dur, mieux payé).
@@ -199,16 +199,16 @@ export function blessingChoices(day, floor, owned = []) {
 export const DAILY_RULES = {
   furie:    { name: 'Rage · {faction}',   desc: 'Les créatures de la faction {faction} frappent 25 % plus fort.', faction: true },
   sommeil:  { name: 'Sommeil · {faction}', desc: 'Les créatures de la faction {faction} ont 25 % de PV en moins.', faction: true },
-  sources:  { name: 'Sources bénies',      desc: 'Les sources sacrées soignent 60 % des PV au lieu de 30 %.' },
-  ruee:     { name: 'Ruée vers les éclats', desc: 'Les éclats trouvés sont augmentés de 50 %.' },
-  lune:     { name: 'Nuit du pouvoir', desc: 'La Ferveur commence l’expédition à 4 au lieu de 2.' },
-  chasse:   { name: 'Chasse aux élites',   desc: 'Chaque élite vaincue rapporte un coffre et deux fois plus d’éclats.' },
+  sources:  { name: 'Sources bénies',      desc: 'Dans la Descente, les sources sacrées soignent 60 % des PV au lieu de 30 %.' },
+  ruee:     { name: 'Ruée vers les éclats', desc: 'Les éclats trouvés dans la Descente sont augmentés de 50 %.' },
+  lune:     { name: 'Nuit du pouvoir', desc: 'La Ferveur commence chaque chapitre et chaque Épreuve à 4 au lieu de 2.' },
+  chasse:   { name: 'Chasse aux élites',   desc: 'Dans la Descente, chaque élite vaincue rapporte deux fois plus d’éclats.' },
   instable: { name: 'Abysse instable',     desc: 'Tout le monde frappe 25 % plus fort : tes créatures comme les corrompues.' },
   // v334 : règles qui changent la façon de jouer (tirées à partir du 17 octobre 2026)
   nuee:     { name: 'Nuée explosive',      desc: 'Toutes les créatures corrompues ordinaires explosent en mourant. En échange, +25 % d’éclats.', v2: true },
-  disette:  { name: 'Disette',             desc: 'Les sources sacrées ne soignent que 15 % des PV, mais les trésors rapportent deux fois plus.', v2: true },
+  disette:  { name: 'Disette',             desc: 'Dans la Descente, les sources sacrées ne soignent que 15 % des PV, mais les trésors rapportent deux fois plus.', v2: true },
   marque:   { name: 'Chasse à la Marque',  desc: 'Le coup qui consomme une Marque fait ×2 dégâts au lieu de ×1,5.', v2: true },
-  reserve:  { name: 'Réserve de Ferveur',  desc: 'L’expédition commence sans Ferveur, mais toute la Ferveur se garde d’un combat à l’autre (au lieu de 3).', v2: true },
+  reserve:  { name: 'Réserve de Ferveur',  desc: 'Chaque chapitre et chaque Épreuve commencent sans Ferveur, mais dans la Descente toute la Ferveur se garde d’un combat à l’autre (au lieu de 3).', v2: true },
 };
 export const RULES_V2_FROM = '2026-10-17';
 const RULE_KEYS_V1 = Object.keys(DAILY_RULES).filter((k) => !DAILY_RULES[k].v2), RULE_KEYS_V2 = Object.keys(DAILY_RULES);
@@ -234,7 +234,7 @@ export const OMENS = {
   sablier: { relic: 'sablier', name: 'Présage du Sablier', icon: 'hourglass', gain: 'Tes créatures commencent chaque combat avec 1 PA de plus.', cost: 'Tes créatures ont 5 % de PV en moins en combat.' },
   dent:    { relic: 'dent', name: 'Présage du Léviathan', icon: 'swords', gain: '+30 % de dégâts contre les élites et les gardiens.', cost: 'Chaque combat commence avec 1 Ferveur de moins.' },
   soif:    { name: 'Présage de la Soif', icon: 'heart', gain: 'Tes créatures récupèrent 10 % des dégâts qu’elles infligent.', cost: 'Les sources sacrées ne sont plus proposées.' },
-  avare:   { name: 'Présage de l’Avare', icon: 'crystal', gain: '+50 % d’éclats pendant toute l’expédition.', cost: 'Les créatures corrompues frappent 10 % plus fort.' },
+  avare:   { name: 'Présage de l’Avare', icon: 'crystal', gain: '+50 % d’éclats pendant tout le chapitre.', cost: 'Les créatures corrompues frappent 10 % plus fort.' },
 };
 export function omenChoices(day) {
   const rng = rngOf(`omen:${day}`), keys = Object.keys(OMENS), out = [];

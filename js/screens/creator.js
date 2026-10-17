@@ -50,11 +50,11 @@ export function openCreator(app) {
       <section class="cr-sec"><h3>Descente</h3>
         <div class="row gap wrap">${B('missions', 'Accomplir les missions')}</div>
         <form class="cr-give" id="floor"><input class="input plain" name="n" type="number" min="1" max="200" placeholder="Étage" ${d.run ? '' : 'disabled'}><button class="btn small" type="submit" ${d.run ? '' : 'disabled'}>Aller à l’étage</button><button class="btn small" type="submit" name="power" value="1" ${d.run ? '' : 'disabled'}>Avec la puissance attendue</button></form>
-        <p class="small muted">${d.run ? `Expédition en cours : étage ${d.run.floor}.` : 'Lance une Descente pour pouvoir sauter d’étage.'}</p>
+        <p class="small muted">${d.run ? `Chapitre en cours : étage ${d.run.floor}.` : 'Lance une Descente pour pouvoir sauter d’étage.'}</p>
       </section>
 
       <section class="cr-sec"><h3>Affronter un gardien</h3>
-        <p class="small muted">Te place devant la porte du gardien (une expédition est lancée si besoin, le présage est passé). Coche la case pour monter ton équipe au niveau attendu à cet étage.</p>
+        <p class="small muted">Te place devant la porte du gardien (un chapitre est lancé si besoin, le présage est passé). Coche la case pour monter ton équipe au niveau attendu à cet étage.</p>
         <label class="small cr-bpow"><input type="checkbox" id="bpow" ${ui.bpow ? 'checked' : ''}> Équipe à la puissance de l’étage</label>
         <div class="cr-bosses">${BOSS_ORDER.map((k, i) => `<button class="btn small" data-boss="${k}"><b>${(i + 1) * 5}</b> · ${esc(BOSSES[k].name)}</button>`).join('')}</div>
       </section>
@@ -112,7 +112,7 @@ export function openCreator(app) {
         g.devGive(c.id, String(f.get('v')));
         toast(`<b>${esc(c.name)}</b> ajoutée (${esc(VARIANTS[String(f.get('v'))].name)}).`, { kind: 'success', icon: 'crown' });
       }
-      if (e.target.id === 'floor') { const lv = g.devFloor(Number(f.get('n')), { power: e.submitter?.name === 'power' }); toast(`Expédition placée à l’étage ${Number(f.get('n'))}${lv ? `, équipe au niveau ${lv}` : ''}.`, { icon: 'crown' }); }
+      if (e.target.id === 'floor') { const lv = g.devFloor(Number(f.get('n')), { power: e.submitter?.name === 'power' }); toast(`Chapitre placé à l’étage ${Number(f.get('n'))}${lv ? `, équipe au niveau ${lv}` : ''}.`, { icon: 'crown' }); }
     } catch (err) { toast(esc(err.message), { kind: 'error' }); }
     draw();
   });

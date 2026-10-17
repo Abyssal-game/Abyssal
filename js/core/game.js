@@ -433,7 +433,7 @@ export class Game {
     if (last) {
       if (this.isFav(id)) throw new Error('Cette créature est dans tes favoris : retire-la des favoris pour pouvoir la brûler.');
       if (this.uniqueCount() <= TEAM.active) throw new Error(`Garde au moins ${TEAM.active} créatures pour pouvoir combattre.`);
-      if (this.s.descent.run?.team?.some((m) => m.id === id)) throw new Error('Cette créature est en pleine expédition.');
+      if (this.s.descent.run?.team?.some((m) => m.id === id)) throw new Error('Cette créature est en plein chapitre de la Descente.');
     }
     const ash = this.burnValue(id, variant) * n;
     e.v[variant] -= n; if (!e.v[variant]) delete e.v[variant];
@@ -542,7 +542,7 @@ export class Game {
   setTeam(ids) {
     const list = [...new Set(ids)].filter((id) => this.owns(id)).slice(0, TEAM.active + TEAM.reserve);
     if (this.teamCost(list) > BUDGET) throw new Error(`Ton équipe dépasse le budget de ${BUDGET} points.`);
-    if (this.s.descent.run) throw new Error('Termine d’abord ton expédition.');
+    if (this.s.descent.run) throw new Error('Termine d’abord ton chapitre de la Descente.');
     this.s.team = list;
     this.s.teamSet = true;
     this.persist();
@@ -727,7 +727,7 @@ export class Game {
     /* v406 : le Cauchemar se joue sur les chapitres déjà terminés */
     if (tier && start + CHAPTER - 1 > (this.descent().best || 0)) throw new Error('Le Cauchemar se joue sur un chapitre que tu as déjà terminé.');
     const d = this.descent();
-    if (d.run) throw new Error('Une expédition est déjà en cours.');
+    if (d.run) throw new Error('Un chapitre est déjà en cours.');
     const team = this.team();
     if (team.length < TEAM.active) throw new Error(`Il faut au moins ${TEAM.active} créatures dans ton équipe.`);
     const free = false; /* v406 : plus de torches, la campagne se joue librement */
@@ -1012,7 +1012,7 @@ export class Game {
   formOf(id) { return this.s.forms?.[id] === 'corrompue' && formUnlocked(this, id) ? 'corrompue' : null; }
   setForm(id, form) {
     if (form === 'corrompue' && !formUnlocked(this, id)) throw new Error('Cette forme n’est pas encore libérée.');
-    if (this.s.descent.run) throw new Error('Termine d’abord ton expédition.');
+    if (this.s.descent.run) throw new Error('Termine d’abord ton chapitre de la Descente.');
     if (form === 'corrompue') this.s.forms[id] = 'corrompue'; else delete this.s.forms[id];
     this.persist();
   }
@@ -1378,7 +1378,7 @@ export class Game {
   nextFloor() {
     const run = this.s.descent.run;
     if (!run || run.phase !== 'cleared') throw new Error('Termine d’abord cet étage.');
-    if (run.team.every((m) => m.fallen)) throw new Error('Toute ton équipe est tombée : remonte à la surface.');
+    if (run.team.every((m) => m.fallen)) throw new Error('Toute ton équipe est tombée : le chapitre est perdu.');
     run.floor++;
     run.phase = 'doors';
     this.persist();
@@ -1397,7 +1397,7 @@ export class Game {
   }
   cancelRun() {
     const d = this.s.descent, run = d.run;
-    if (!this.canCancelRun()) throw new Error('L’expédition a commencé : il faut l’abandonner.');
+    if (!this.canCancelRun()) throw new Error('Le chapitre a commencé : il faut l’abandonner.');
     d.runs = Math.max(0, (d.runs || 0) - 1);
     const om = this.s.stats.omens;
     if (run.omen && om?.[run.omen]) om[run.omen]--;
@@ -1411,7 +1411,7 @@ export class Game {
   }
   abandonRun() {
     const run = this.s.descent.run;
-    if (!run) throw new Error('Aucune expédition en cours.');
+    if (!run) throw new Error('Aucun chapitre en cours.');
     run.battle = null; run.phase = 'doors'; run.altar = null; run.rewards = null; run.talentOffer = null;
     this.s.stats.abandons = (this.s.stats.abandons || 0) + 1;
     const summary = this.endRun(true);
@@ -1421,7 +1421,7 @@ export class Game {
   }
   endRun(wiped = false) {
     const d = this.s.descent, run = d.run;
-    if (!run) throw new Error('Aucune expédition en cours.');
+    if (!run) throw new Error('Aucun chapitre en cours.');
     // v406 : plus de coffre de fin ni de perte : tout ce qui a été gagné est gardé ; une équipe tombée recommence le chapitre
     const shards = run.shards, chests = run.chests.slice();
     chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });

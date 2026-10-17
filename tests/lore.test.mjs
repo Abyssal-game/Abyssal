@@ -54,5 +54,5 @@ test('formes corrompues : verrouillées, éveillées, choisies, et appliquées a
   // pas de changement pendant une expédition en cours
   g.setForm(id, 'corrompue');
   g.s.descent.run = { phase: 'doors' };
-  assert.throws(() => g.setForm(id, null), /expédition/);
+  assert.throws(() => g.setForm(id, null), /chapitre/);
 });

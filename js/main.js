@@ -94,8 +94,8 @@ function applySettings() {
 
 // Explication des deux monnaies (toucher le compteur en haut à droite)
 const WALLET = {
-  shards: ['Éclats', 'La monnaie principale. Ils servent à acheter des boosters (onglet Boosters).', 'Tu en gagnes avec l’offrande du jour, les missions, les succès, les nouvelles créatures découvertes et surtout dans la Descente : les coffres de fin d’expédition en rapportent bien plus que les combats eux-mêmes. Plus tu descends, plus le coffre est beau.', 'boutique', 'Aller aux Boosters'],
-  ash: ['Cendres', 'Ce qui reste des cartes brûlées dans la Fournaise. Elles font monter le niveau de tes créatures et permettent de sublimer une carte vers une finition plus rare.', 'Chaque combat gagné dans la Descente en donne, les coffres aussi. Brûle tes doublons dans la Fournaise (onglet Collection) : plus la carte est rare, plus elle en donne, et les finitions rares encore plus.', 'fournaise', 'Aller à la Fournaise'],
+  shards: ['Éclats', 'La monnaie principale. Ils servent à acheter des boosters (onglet Boosters).', 'Tu en gagnes avec l’offrande du jour, les missions, les succès, les nouvelles créatures découvertes la première victoire à chaque étage de la Descente, les Épreuves du jour et les coffres (bois et fer en donnent ; or et abyssal donnent des boosters).', 'boutique', 'Aller aux Boosters'],
+  ash: ['Cendres', 'Ce qui reste des cartes brûlées dans la Fournaise. Elles font monter le niveau de tes créatures et permettent de sublimer une carte vers une finition plus rare.', 'Chaque combat gagné dans la Descente en donne, la première victoire à chaque étage encore plus, et les coffres aussi. Brûle tes doublons dans la Fournaise (onglet Collection) : plus la carte est rare, plus elle en donne, et les finitions rares encore plus.', 'fournaise', 'Aller à la Fournaise'],
 };
 // iPhone, app posée sur l'écran d'accueil : la hauteur annoncée par le navigateur peut être plus
 // courte que l'écran réel (une bande noire reste en bas). On mesure la vraie hauteur et on la donne
