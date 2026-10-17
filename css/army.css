@@ -3506,5 +3506,4 @@ html.fx-light .dv-c .dv-hp.low .hpr::after { animation: none; }
 .dc-summit-win img { width: 56px; height: auto; flex: none; }
 .dc-summit-win b { display: block; color: #FFE7A8; }
 .pbadge.pb-abysse { background: linear-gradient(90deg, #4A1580, #B04BFF); color: #FFF0C8; }
-.bn-abysse { --bn: url(../assets/ui/bn-premium.webp); }
-.product-banner.bn-abysse { filter: hue-rotate(35deg) saturate(1.3); }
+.bn-abysse { --bn: url(../assets/ui/bn-abysse.webp); } /* v395 : bannière Gemini du Booster de l'Abysse */
