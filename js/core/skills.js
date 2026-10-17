@@ -33,7 +33,7 @@ export const KITS = {
     kw: 'assaut', name: 'Attaquant', icon: 'swords',
     basic: { name: 'Frappe', desc: 'Dégâts normaux.' },
     skill: { key: 'estoc', pa: 2, name: 'Coup d’estoc', icon: 'swords', ap: 2, fervor: 2, target: 'enemy', dice: { dc: DICE_DC.estoc.base }, desc: `Coup de rupture. Jet de D20 (${dcText('estoc')}). Réussite : dégâts ×2, +3 Brisure, et la cible est marquée. Critique : ×3 et +4 Brisure. Partielle : ×1,2. Échec critique : moitié des dégâts, et ta créature est déséquilibrée (+25 % de dégâts subis).` },
-    passive: { name: 'Exécution', desc: '+50 % de dégâts sur une cible brisée ou sous 30 % de ses PV. Contre-attaque après une parade parfaite.' },
+    passive: { name: 'Achèvement', desc: '+50 % de dégâts sur une cible brisée ou sous 30 % de ses PV. Contre-attaque après une parade parfaite.' },
   },
   soin: {
     kw: 'soin', name: 'Soigneur', icon: 'heart',
@@ -51,7 +51,7 @@ export const KITS = {
     kw: 'gel', name: 'Entraveur', icon: 'eye',
     basic: { name: 'Morsure du froid', desc: 'Dégâts normaux, +2 Brisure sur une cible gelée.' },
     skill: { key: 'entrave', pa: 2, name: 'Entrave glaciale', icon: 'eye', ap: 1, fervor: 2, target: 'enemy', dice: { dc: DICE_DC.entrave.base }, desc: `Jet de D20 (${dcText('entrave')} ; bonus selon la rareté : Rare +1, Hyper rare +2, Mythique +3, Secrète +4). Réussite : la cible est gelée et perd sa prochaine action (sa charge est annulée). Critique : gelée et +3 Brisure ; une Mythique ou Secrète la gèle 2 tours (sauf élites et gardiens). Partielle : elle recule de 2 places dans l’ordre du tour (1 pour un gardien) ; si elle a déjà joué, elle est ralentie.` },
-    passive: { name: 'Bris de glace', desc: 'Tes coups sur une cible gelée font +2 Brisure.' },
+    passive: { name: 'Éclats de givre', desc: 'Tes coups sur une cible gelée font +2 Brisure.' },
   },
   soutien: {
     kw: 'cri', name: 'Soutien', icon: 'sparkle',
@@ -110,11 +110,11 @@ export const AI_FAMILIES = {
   predateur:  { name: 'Prédateur', desc: 'Attaque la créature la plus blessée.', counter: 'Soigne ou protège ta créature blessée, ou mets-la en réserve.' },
   assassin:   { name: 'Assassin', desc: 'Ignore les Protecteurs et vise la créature la plus fragile.', counter: 'Protège ta créature fragile avec un Rempart ou une Défense.' },
   berserker:  { name: 'Berserker', desc: 'Frappe plus fort quand il perd des PV (+50 % sous la moitié).', counter: 'Achève-le d’un coup, ou gèle-le.' },
-  protecteur: { name: 'Protecteur', desc: 'Couvre d’un bouclier l’allié qui prépare une attaque, sinon le plus blessé.', counter: 'Les Empoisonneurs traversent ses boucliers.' },
+  protecteur: { name: 'Garde du corps', desc: 'Couvre d’un bouclier l’allié qui prépare une attaque, sinon le plus blessé.', counter: 'Les Empoisonneurs traversent ses boucliers.' },
   mage:       { name: 'Mage', desc: 'Concentre son énergie, puis frappe toute ton équipe.', counter: 'Gèle-le pendant sa concentration, ou prépare une parade.' },
   parasite:   { name: 'Parasite', desc: 'Empoisonne ta créature la plus dangereuse.', counter: 'La Prière purge le poison.' },
   controleur: { name: 'Contrôleur', desc: 'Gèle régulièrement ta créature la plus forte.', counter: 'Esquive son sort, ou garde un Soigneur pour la libérer.' },
-  soutien:    { name: 'Soutien', desc: 'Soigne, renforce les autres ennemis, ou leur désigne une proie.', counter: 'Abats-le en premier, ou mets la proie désignée en réserve.' },
+  soutien:    { name: 'Instigateur', desc: 'Soigne, renforce les autres ennemis, ou leur désigne une proie.', counter: 'Abats-le en premier, ou mets la proie désignée en réserve.' },
   gardien:    { name: 'Gardien', desc: 'Prépare des attaques dévastatrices annoncées.', counter: 'Brise sa garde ou interromps sa charge.' },
 };
 export function aiFamily(card, { boss = false, uid = '' } = {}) {
@@ -182,7 +182,7 @@ export const SYNERGIES = [
   { roles: ['controle', 'poison'], name: 'Givre-venin', desc: 'Le poison appliqué sur une cible gelée est doublé.' },
   { roles: ['poison', 'poison'], name: 'Épidémie', desc: 'Accumule le poison, puis Contagion pour le propager.' },
   { roles: ['protecteur', 'soin'], name: 'Bastion', desc: 'Rempart sur l’allié menacé, puis Prière : il est soigné et reçoit un bouclier. Chaque coup encaissé par le Protecteur charge sa riposte.' },
-  { roles: ['soutien', 'zone'], name: 'Raz-de-marée', desc: 'Renforcée par un Cri de guerre, la Vague frappe les voisins à pleine puissance.' },
+  { roles: ['soutien', 'zone'], name: 'Grande marée', desc: 'Renforcée par un Cri de guerre, la Vague frappe les voisins à pleine puissance.' },
   { roles: ['degats', null], name: 'Hallali', desc: 'Une cible brisée subit +50 % de dégâts, et l’Attaquant l’exécute (+50 % encore).' },
   { roles: ['protecteur', null], name: 'Coup de rupture', desc: 'Jauge de Brisure vide : l’ennemi est Fêlé. L’attaque d’un Protecteur, un Coup d’estoc, un Raz-de-marée ou un coup qui consomme une Marque le brise : son attaque annoncée est annulée.' },
   { roles: ['protecteur', null], name: 'Parade et riposte', desc: 'Parade parfaite : aucun dégât, +1 PA, +2 Ferveur, Brisure de l’attaquant, et contre-attaque des Protecteurs et des Attaquants.' },
@@ -192,7 +192,7 @@ export const synergiesFor = (role) => SYNERGIES.filter((s) => s.roles.includes(r
 // ——— Bénédictions de combat (autel de la Descente) —————————————————————
 export const COMBAT_BLESSINGS = {
   parade:  { name: 'Lame-miroir', desc: 'Chaque parade parfaite donne +1 Ferveur de plus et +1 Brisure.' },
-  brise:   { name: 'Marteau du Sceau', desc: 'Toutes tes attaques font +1 Brisure.' },
+  brise:   { name: 'Marteau de rupture', desc: 'Toutes tes attaques font +1 Brisure.' },
   venin:   { name: 'Fiole noire', desc: 'Le poison que tu appliques est augmenté de 1, et Contagion gagne +3 au jet.' },
   relais:  { name: 'Relais d’ombre', desc: 'Ta première permutation de chaque combat donne +2 PA à la créature qui entre.' },
   curee:   { name: 'Curée', desc: 'Tes attaques de base font +50 % de dégâts aux ennemis brisés.' },
@@ -206,7 +206,7 @@ export const COMBAT_BLESSINGS = {
 // restent reconnus pour les expéditions en cours, mais ne sont plus proposés (legacy).
 export const TALENTS = {
   brise:     { name: 'Brise-garde', desc: 'Ses attaques font +1 Brisure.' },
-  garde:     { name: 'Sceau de garde', desc: 'Commence chaque combat avec un bouclier.' },
+  garde:     { name: 'Garde d’airain', desc: 'Commence chaque combat avec un bouclier.' },
   sangsue:   { name: 'Sangsue', desc: 'Récupère 30 % des dégâts qu’elle inflige.' },
   epines:    { name: 'Épines', desc: 'Renvoie 2 dégâts à chaque ennemi qui la blesse.' },
   faim:      { name: 'Faim abyssale', desc: 'Quand elle achève un ennemi : +1 Ferveur de plus (une fois par combat).' },

@@ -113,7 +113,7 @@ export const PASSIVES = {
   enfers: { name: 'Molosse des Enfers', desc: 'Un ennemi qui frappe une créature qu’il protège (Rempart), ou qui le frappe pendant son Hurlement, subit 3 dégâts.', awaken: '5 dégâts et +1 Brisure.' },
   profondeurs: { name: 'Profondeurs', desc: 'Ses coups font +30 % de dégâts aux ennemis gelés ou ralentis.', awaken: 'Étreinte se recharge en 2 tours au lieu de 3.' },
   faim: { name: 'Faim sans fin', desc: 'Chaque ennemi qu’il achève : +1 ATQ (pour le combat) et 20 % de PV rendus.', awaken: 'Et il peut agir une fois de plus ce tour-ci.' },
-  renaissance: { name: 'Renaissance', desc: 'Une fois par combat, se relève avec 40 % de ses PV.', awaken: 'En renaissant, soigne toute l’équipe de 15 %.' },
+  renaissance: { name: 'Second souffle', desc: 'Une fois par combat, se relève avec 40 % de ses PV.', awaken: 'En renaissant, soigne toute l’équipe de 15 %.' },
   // — un passif par capacité imprimée sur les cartes (les créatures générées) —
   ruee: { name: 'Ruée', desc: 'Sa première frappe de chaque combat fait +100 % de dégâts et +1 Brisure.', awaken: '+150 %.' },
   sentinelle: { name: 'Sentinelle', desc: 'Quand elle encaisse pour un allié (Rempart), elle prend 25 % de dégâts en moins.', awaken: '40 % de moins.' },
@@ -133,7 +133,7 @@ export const PASSIVES = {
   augure: { name: 'Augure', desc: 'Au début d’un combat, +1 Ferveur si ton équipe en a moins de 3.', awaken: 'Moins de 4.' },
   cataclysme: { name: 'Cataclysme', desc: 'Au début de chaque combat, frappe tous les ennemis à 30 % de son attaque.', awaken: '50 %.' },
   insaisissable: { name: 'Insaisissable', desc: 'Les ennemis visent une autre de tes créatures tant qu’elle n’a pas frappé dans le combat.', awaken: 'Elle redevient insaisissable à chaque tour où elle n’attaque pas.' },
-  devoreur: { name: 'Dévoreur', desc: 'Chaque ennemi qu’elle achève : +1 ATQ pour le combat (+3 au plus).', awaken: '+5 au plus, et 15 % de PV rendus.' },
+  devoreur: { name: 'Vorace', desc: 'Chaque ennemi qu’elle achève : +1 ATQ pour le combat (+3 au plus).', awaken: '+5 au plus, et 15 % de PV rendus.' },
   effroi: { name: 'Effroi', desc: 'Les ennemis ordinaires qui la frappent font 20 % de dégâts en moins (pas les élites ni les gardiens).', awaken: '30 % de moins.' },
 };
 // Textes et frappes des créatures générées (tools/gen-kits.mjs) : rangés ici pour que kits-data.js reste léger

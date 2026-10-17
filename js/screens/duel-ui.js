@@ -146,7 +146,6 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     u.exposed ? st_('exposed', 'Déséquilibrée : +25 % de dégâts subis') : '',
     u.trait && TRAITS[u.trait] ? st_(traitIcon(u.trait), `${TRAITS[u.trait].name} : ${TRAITS[u.trait].desc}`) : '',
     u.breach ? st_('breach', 'Brèche : le prochain coup d’un autre allié perce son bouclier, +20 % de dégâts, +3 Brisure') : '',
-    u.open ? st_('open', 'Exposé : la prochaine attaque d’un autre allié fait +50 % de dégâts et +1 Ferveur') : '',
     u.boost ? `<i class="bo" title="Attaque renforcée pour ce tour">+${u.boost} ATQ</i>` : '',
     u.ice ? st_('ice', `Carapace de glace : absorbe ${u.ice} dégâts`, u.ice) : '',
     u.doom != null && !u.broken ? st_('doom', `Effondrement dans ${u.doom} tour(s) : brise-le pour le repousser`, u.doom) : '',

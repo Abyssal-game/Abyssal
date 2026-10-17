@@ -12,7 +12,7 @@ export const DESCENT = {
 export const BLESSINGS = {
   blades: { name: 'Lames affûtées', desc: '+1 en attaque pour toutes tes créatures.' },
   vigor:  { name: 'Vigueur', desc: '+20 % de PV maximum et soin complet.' },
-  ward:   { name: 'Sceau protecteur', desc: 'Chaque créature commence chaque combat avec un bouclier.' },
+  ward:   { name: 'Bouclier béni', desc: 'Chaque créature commence chaque combat avec un bouclier.' },
   greed:  { name: 'Avidité', desc: '+30 % d’éclats pour le reste de l’expédition.' },
   ...COMBAT_BLESSINGS, // bénédictions qui changent la façon de combattre
 };
@@ -140,7 +140,7 @@ export function eventSwap(catalog, list, day, floor, factions) {
 export const TRAITS = {
   explosif: { name: 'Explosif', desc: 'À sa mort, il explose et blesse toutes tes créatures au combat.' },
   voleur:   { name: 'Voleur d’action', desc: 'Tant qu’il est debout, il vole 1 PA à ta créature qui en a le plus, à chaque tour à partir du 3e.' },
-  egide:    { name: 'Lien d’égide', desc: 'Il subit 35 % de dégâts en moins tant qu’un autre ennemi est au combat.' },
+  egide:    { name: 'Lien protecteur', desc: 'Il subit 35 % de dégâts en moins tant qu’un autre ennemi est au combat.' },
   enrage:   { name: 'Enragé', desc: 'Sous la moitié de ses PV, il entre en rage : +2 en attaque.' },
   // v331 : traits des profondeurs, seulement au-delà de l'étage 30
   vampire:  { name: 'Vampire', desc: 'Il se soigne de la moitié des dégâts qu’il inflige.', deep: true },
@@ -182,7 +182,7 @@ export function blessingChoices(day, floor, owned = []) {
 // Une règle différente chaque jour, la même pour tout le monde. {faction} est remplacé
 // par une faction tirée le même jour.
 export const DAILY_RULES = {
-  furie:    { name: 'Furie · {faction}',   desc: 'Les créatures de la faction {faction} frappent 25 % plus fort.', faction: true },
+  furie:    { name: 'Rage · {faction}',   desc: 'Les créatures de la faction {faction} frappent 25 % plus fort.', faction: true },
   sommeil:  { name: 'Sommeil · {faction}', desc: 'Les créatures de la faction {faction} ont 25 % de PV en moins.', faction: true },
   sources:  { name: 'Sources bénies',      desc: 'Les sources sacrées soignent 60 % des PV au lieu de 30 %.' },
   ruee:     { name: 'Ruée vers les éclats', desc: 'Les éclats trouvés sont augmentés de 50 %.' },

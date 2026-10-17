@@ -383,7 +383,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   if (a && d > 0 && u.boss && u.phase2 && st.bossKey === 'roi' && a.side === 'ally' && a.faction && u.mask !== a.faction) { u.mask = a.faction; ev.push({ t: 'status', u: u.uid, s: 'Nouveau visage', k: 'mask', syn: true }); }
   // Relations (prédation, rivalité) : annoncées la première fois qu'elles jouent
   const rel = a ? relationMult(a, u).rel : null;
-  if (rel && d > 0 && !(st.relSeen ||= {})[rel]) { st.relSeen[rel] = true; ev.push({ t: 'status', u: u.uid, s: rel.startsWith('r-') ? 'Rivaux !' : 'Proie !', syn: true, rel }); }
+  if (rel && d > 0 && !(st.relSeen ||= {})[rel]) { st.relSeen[rel] = true; ev.push({ t: 'status', u: u.uid, s: rel.startsWith('r-') ? 'Rivaux !' : 'Prédation !', syn: true, rel }); }
   // Loi de l'écho : frapper l'Architecte blesse en retour
   if (u.boss && st.law === 'echo' && a && a.side === 'ally' && d > 0 && a.hp > 0) { ev.push({ t: 'status', u: a.uid, s: 'Écho', k: 'bad' }); hurt(st, a, 2, ev); }
   // v310 : une mort déjà traitée (ex. Épines → explosion qui achève la cible dans un appel imbriqué) ne l'est pas deux fois
@@ -451,7 +451,7 @@ function onEnemyDeath(st, u, a, ev) {
   }
   if (a && a.side === 'ally' && a.hp > 0 && hasP(a, 'devoreur') && (a.devN || 0) < (boosted(a, 'devoreur') ? 5 : 3)) {
     a.devN = (a.devN || 0) + 1; a.atk += 1;
-    pfx(ev, a, 'devoreur'); ev.push({ t: 'status', u: a.uid, s: 'Dévoreur : +1 ATQ', syn: true });
+    pfx(ev, a, 'devoreur'); ev.push({ t: 'status', u: a.uid, s: 'Vorace : +1 ATQ', syn: true });
     if (boosted(a, 'devoreur')) heal(a, a.maxHp * 0.15, ev);
   }
   if (!(u.poison > 0)) return;
@@ -1522,7 +1522,7 @@ function advance(st, ev) {
 export const RUNES = {
   brisure:    { name: 'Rune de la Faille', hint: 'Elle cède quand le gardien est brisé.', icon: 'st-broken' },
   marque:     { name: 'Rune de l’Œil', hint: 'Elle cède quand une Marque est consommée sur lui.', icon: 'st-mark' },
-  parade:     { name: 'Rune du Miroir', hint: 'Elle cède sur une parade parfaite contre lui.', icon: 'st-defend' },
+  parade:     { name: 'Rune de la Parade', hint: 'Elle cède sur une parade parfaite contre lui.', icon: 'st-defend' },
   faiblesse:  { name: 'Rune du Sang', hint: 'Elle cède quand on exploite sa faiblesse de faction.', icon: 'st-open' },
   poison:     { name: 'Rune de la Rouille', hint: 'Elle cède quand il porte 6 poisons ou plus.', icon: 'st-poison' },
   conjoint:   { name: 'Rune des Jumeaux', hint: 'Elle cède sous un Assaut conjoint.', icon: 'st-breach' },
