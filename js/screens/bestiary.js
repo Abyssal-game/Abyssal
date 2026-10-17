@@ -120,7 +120,7 @@ export default function bestiary(app, root) {
   function render() {
     root.innerHTML = `
       <header class="screen-head ui-hero bn-bestiary"><h1>Bestiaire</h1><p class="muted">Le livre interdit, page après page.</p></header>
-      <div class="seg wide" role="tablist">${[['creatures', 'Créatures'], ['recits', 'Récits'], ['chasse', 'Chasse'], ['chroniques', 'Royaumes']].map(([k, l]) => `<button class="seg-b" role="tab" data-act="tab" data-v="${k}" aria-selected="${st.tab === k}" aria-pressed="${st.tab === k}">${l}${k === 'recits' && st.tab !== 'recits' && unreadLore(g, cat).length ? '<i class="lr-dot"></i>' : ''}</button>`).join('')}</div>
+      <div class="seg wide" role="tablist">${[['creatures', 'Créatures'], ['chroniques', 'Royaumes'], ['recits', 'Récits'], ['chasse', 'Chasse']] /* v422 : Royaumes plus haut */.map(([k, l]) => `<button class="seg-b" role="tab" data-act="tab" data-v="${k}" aria-selected="${st.tab === k}" aria-pressed="${st.tab === k}">${l}${k === 'recits' && st.tab !== 'recits' && unreadLore(g, cat).length ? '<i class="lr-dot"></i>' : ''}</button>`).join('')}</div>
       <div class="stack best-body">${st.tab === 'chroniques' ? chronicles() : st.tab === 'chasse' ? hunt() : st.tab === 'recits' ? recits() : creatures()}</div>`;
     const q = root.querySelector('#best-q');
     if (q) q.addEventListener('input', (e) => { st.q = e.target.value; const pos = e.target.selectionStart; render(); const n = root.querySelector('#best-q'); n.focus(); n.setSelectionRange(pos, pos); });

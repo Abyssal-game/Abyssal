@@ -7,6 +7,7 @@ import { esc, fmt, openSheet, bindActions, toast } from '../ui/dom.js';
 import { artUrl, hasRealArt } from '../art/assets.js';
 import { RARITY } from '../config.js';
 import { openPack } from './opening.js';
+import { cardHTML, lazyArt } from '../ui/card.js';
 import { parisDay, claimShadowPrize } from './shadow.js';
 import * as cloud from '../cloud/cloud.js';
 
@@ -116,6 +117,7 @@ export default function shop(app, root, params = []) {
     root.innerHTML = `
       <header class="screen-head ui-hero bn-boosters"><h1>Boosters</h1><p class="muted">Ouvre des boosters pour agrandir ton Bestiaire.</p></header>
       ${cloud.isLoggedIn() ? '' : '<!-- Tirage : réservé aux joueurs connectés -->'}<a class="panel sh-banner ${cloud.isLoggedIn() ? '' : 'off'}" href="#/tirage"><span class="sh-b-ic">${icon('p:shadow')}</span><span><b>Le Tirage des Ombres</b><span class="small muted">${g.shadowState().paid[parisDay()] ? 'Tirage du jour fait · voir le classement' : 'Ton booster gratuit du jour pour le classement de la semaine'}</span></span><span class="sh-b-go">${icon('next')}</span></a>
+      ${(() => { const n = ownedPacks(); return n >= 2 ? `<button class="btn gold block dc-plq dc-plq-dark shop-all" data-act="openall">${icon('ticket')}Ouvrir mes ${n} boosters d’un coup</button>` : ''; })()}
       <div class="products">
         ${card('standard')}
         ${card('faction', '', `<div class="chips fac-pick fac-grid" role="radiogroup" aria-label="Faction du booster">${FACTION_ORDER.map((f) => `<button class="chip" role="radio" data-act="pickfac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}" aria-checked="${st.faction === f}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>`)}
@@ -125,10 +127,33 @@ export default function shop(app, root, params = []) {
       </div>
     `;
   }
+  // v422 : boosters déjà à toi (tickets et boosters gratuits), ouverts d'un coup avec un récapitulatif
+  function ownedPacks() {
+    if (g.welcomePending()) return 0;
+    return Object.entries(g.s.tickets).filter(([k, n]) => n > 0 && BOOSTERS[k]).reduce((a, [, n]) => a + n, 0) + g.freePack().stock;
+  }
+  function openAll() {
+    const got = [];
+    app.pendingProgress = [];
+    try {
+      for (const type of Object.keys(BOOSTERS)) while ((g.s.tickets[type] || 0) > 0) got.push(...g.openBooster(type, { faction: type === 'faction' ? st.faction : undefined }).opening.cards);
+      while (g.freePack().stock > 0) got.push(...g.openBooster('standard').opening.cards);
+    } catch (e) { toast(esc(e.message), { kind: 'error' }); }
+    if (!got.length) { app.flushProgress(); return; }
+    const RI = (r) => ['C', 'PC', 'R', 'HR', 'M', 'S'].indexOf(r);
+    got.sort((a, b) => (b.isNewCard - a.isNewCard) || RI(cat.get(b.id).rarity) - RI(cat.get(a.id).rarity));
+    const nNew = got.filter((c) => c.isNewCard).length, nFin = got.filter((c) => c.variant !== 'normal').length;
+    const best = got.reduce((m, c) => (RI(cat.get(c.id).rarity) > RI(m) ? cat.get(c.id).rarity : m), 'C');
+    app.sfx.reveal?.(best);
+    const sh = openSheet(`<h2 class="center">${got.length} cartes ouvertes</h2><p class="small muted center">${nNew} nouvelle${nNew > 1 ? 's' : ''} créature${nNew > 1 ? 's' : ''}${nFin ? ` · ${nFin} finition${nFin > 1 ? 's' : ''}` : ''}</p><div class="grid-cards shop-allgrid">${got.map((c) => cardHTML(cat.get(c.id), { size: 'mini', variant: c.variant, isNew: c.isNewCard })).join('')}</div>`, { label: 'Boosters ouverts', onClose: () => { app.flushProgress(); render(); } });
+    lazyArt(sh.body);
+    app.chrome?.();
+  }
   // v331 : ce que tes éclats permettent, les taux réels par carte, et d'où viennent vraiment les Secrètes
   render();
   bindActions(root, {
     pickfac(el) { st.faction = el.dataset.v; render(); },
+    openall() { openAll(); },
     odds(el) { showOdds(app, el.dataset.type); },
     buy(el) {
       const type = el.dataset.type;

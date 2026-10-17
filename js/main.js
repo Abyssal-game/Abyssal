@@ -28,7 +28,7 @@ import trialsScreen from './screens/trials.js';
 import shadowScreen, { claimShadowPrize } from './screens/shadow.js';
 import { forgeScreen, furnaceScreen } from './screens/forge.js';
 import { teamScreen, chestsScreen } from './screens/army.js';
-import { startSync } from './cloud/sync.js';
+import { startSync, sync, onSync } from './cloud/sync.js';
 import { consumeAuthHash, isLoggedIn } from './cloud/cloud.js';
 import { startPresence } from './cloud/presence.js';
 import { showWelcome } from './screens/welcome.js';
@@ -48,16 +48,16 @@ const TABS = [
 ];
 // icônes peintes de la barre du bas (assets/icons)
 const tabIcon = (k) => `<img class="tab-pic" alt="" src="assets/icons/${k}.webp">`;
-const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', equipe: 'collection', renfort: 'collection', fournaise: 'collection', coffres: 'boutique', heros: 'descente', arsenal: 'boutique', marchand: 'descente', sceaux: 'descente', epreuves: 'descente', epreuve: 'descente', tirage: 'boutique' };
+const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', equipe: 'collection', renfort: 'collection', fournaise: 'collection', coffres: 'descente', heros: 'descente', arsenal: 'descente', marchand: 'descente', sceaux: 'descente', epreuves: 'descente', epreuve: 'descente', tirage: 'boutique' };
 // Fond illustré de chaque page (l'Accueil et la Descente posent le leur)
 const ROUTE_SCENE = { boutique: 'shop', tirage: 'shadow', renfort: 'collection', fournaise: 'collection', collection: 'collection', equipe: 'team', coffres: 'chests', bestiaire: 'bestiary', succes: 'trophies', profil: 'profile', menu: 'menu', parametres: 'menu', compte: 'menu', factions: 'factions', faction: 'factions' };
 // Page parente des sous-pages (bouton retour en haut)
 const PARENT = { bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente', arsenal: 'coffres', marchand: 'descente' };
 // Sous-onglets de chaque onglet principal (barre en haut de la page)
 const SUBNAV = {
-  collection: [['collection', 'cards', 'Cartes'], ['equipe', 'team-ic', 'Équipe'], ['renfort', 'level-up', 'Renforcer'], ['fournaise', 'furnace', 'Fournaise']],
-  boutique: [['boutique', 'booster', 'Boosters'], ['coffres', 'chest', 'Coffres'], ['tirage', 'shadow', 'Tirage']],
-  descente: [['descente', 'descend', 'Descente'], ['epreuves', 'crest-elite', 'Épreuves'], ['sceaux', 'seal', 'Sceaux']],
+  collection: [['collection', 'cards', 'Cartes'], ['equipe', 'team-ic', 'Équipe'], ['renfort', 'furnace', 'Forge']], /* v422 : Renforcer + Fournaise */
+  boutique: [['boutique', 'booster', 'Boosters'], ['tirage', 'shadow', 'Tirage']],
+  descente: [['descente', 'descend', 'Descente'], ['epreuves', 'crest-elite', 'Épreuves'], ['sceaux', 'seal', 'Sceaux'], ['coffres', 'chest', 'Coffres']], /* v422 : les coffres se gagnent dans l'Aventure */
 };
 
 function storageOrMemory() {
@@ -95,7 +95,7 @@ function applySettings() {
 // Explication des deux monnaies (toucher le compteur en haut à droite)
 const WALLET = {
   shards: ['Éclats', 'La monnaie principale. Ils servent à acheter des boosters (onglet Boosters).', 'Tu en gagnes avec l’offrande du jour, les missions, les succès, les nouvelles créatures découvertes la première victoire à chaque étage de la Descente, les Épreuves du jour et les coffres (bois et fer en donnent ; or et abyssal donnent des boosters).', 'boutique', 'Aller aux Boosters'],
-  ash: ['Cendres', 'Ce qui reste des cartes brûlées dans la Fournaise. Elles font monter le niveau de tes créatures et permettent de sublimer une carte vers une finition plus rare.', 'Chaque combat gagné dans la Descente en donne, la première victoire à chaque étage encore plus, et les coffres aussi. Brûle tes doublons dans la Fournaise (onglet Collection) : plus la carte est rare, plus elle en donne, et les finitions rares encore plus.', 'fournaise', 'Aller à la Fournaise'],
+  ash: ['Cendres', 'Ce qui reste des cartes brûlées dans la Fournaise. Elles font monter le niveau de tes créatures et permettent de sublimer une carte vers une finition plus rare.', 'Chaque combat gagné dans la Descente en donne, la première victoire à chaque étage encore plus, et les coffres aussi. Brûle tes doublons dans la Fournaise (Collection → Forge) : plus la carte est rare, plus elle en donne, et les finitions rares encore plus.', 'fournaise', 'Aller à la Fournaise'],
 };
 // iPhone, app posée sur l'écran d'accueil : la hauteur annoncée par le navigateur peut être plus
 // courte que l'écran réel (une bande noire reste en bas). On mesure la vraie hauteur et on la donne
@@ -135,7 +135,7 @@ function renderChrome() {
     ${parent !== undefined ? `<a class="top-back" href="#/${parent}" aria-label="Retour" data-parent="${parent}">${icon('back')}</a>` : ''}
     <a class="top-brand" href="#/profil" aria-label="Profil : niveau ${lv.level}, ${esc(s.title)}">
       <span class="top-avatar pf pf-${s.frame}">${avatarCard ? `<img alt="" src="${artUrl(avatarCard, { lite: true })}">` : EMBLEM}<span class="lv">${lv.level}</span></span>
-      <span class="top-meta"><b>${esc(s.name || s.title)}</b><span class="xpbar" aria-hidden="true"><i style="width:${(lv.into / lv.need) * 100}%"></i></span></span>
+      <span class="top-meta"><b>${esc(sync.profile?.pseudo || s.name || 'Toi')}</b><span class="xpbar" aria-hidden="true"><i style="width:${(lv.into / lv.need) * 100}%"></i></span></span>
     </a>
     <div class="wallet">
       <button class="pill shards" data-wallet="shards" title="Éclats" aria-label="${fmt(s.shards)} éclats : à quoi ça sert ?">${icon('crystal')}<span>${fmt(s.shards)}</span></button>
@@ -151,7 +151,7 @@ function renderChrome() {
   });
   const tab = TAB_OF[app.route] ?? 'antre';
   // sous-onglets : seulement sur les pages d'un groupe
-  const sub = SUBNAV[tab] && SUBNAV[tab].some(([r]) => r === app.route) ? SUBNAV[tab] : null;
+  const sub = SUBNAV[tab] && SUBNAV[tab].some(([r]) => r === app.route || (r === 'renfort' && app.route === 'fournaise')) ? SUBNAV[tab] : null;
   const subBadge = (r) => {
     if (r === 'coffres') return g.chestCount() || '';
     // v404 : pastilles plus calmes — plus de « 99+ » permanent sur la Fournaise ; Renforcer seulement si l'Accueil le conseille aussi
@@ -162,10 +162,11 @@ function renderChrome() {
   };
   const nNewSub = g.newCount() > 99 ? '99+' : g.newCount();
   const sn = document.getElementById('subnav');
-  document.body.classList.toggle('has-subnav', !!sub);
   // v404 : sous-onglets encore fermés cachés (Sceaux avant le premier gardien, Tirage sans compte)
-  const shown = sub && sub.filter(([r]) => (r !== 'sceaux' || g.sceauxOpen() || app.route === 'sceaux') && (r !== 'tirage' || isLoggedIn() || app.route === 'tirage'));
-  sn.innerHTML = shown ? shown.map(([r, ic, label]) => { const bd = subBadge(r); return `<a class="sn-tab" href="#/${r}"${r === app.route ? ' aria-current="page"' : ''}><img class="sn-ic" alt="" src="assets/icons/${ic}.webp"><span>${label}</span>${bd ? `<i class="sn-badge">${bd}</i>` : ''}</a>`; }).join('') : '';
+  const shown0 = sub && sub.filter(([r]) => (r !== 'sceaux' || g.sceauxOpen() || app.route === 'sceaux') && (r !== 'tirage' || isLoggedIn() || app.route === 'tirage'));
+  const shown = shown0 && shown0.length > 1 ? shown0 : null; /* v422 : pas de barre pour un seul sous-onglet */
+  document.body.classList.toggle('has-subnav', !!shown);
+  sn.innerHTML = shown ? shown.map(([r, ic, label]) => { const bd = subBadge(r); return `<a class="sn-tab" href="#/${r}"${r === app.route || (r === 'renfort' && app.route === 'fournaise') ? ' aria-current="page"' : ''}><img class="sn-ic" alt="" src="assets/icons/${ic}.webp"><span>${label}</span>${bd ? `<i class="sn-badge">${bd}</i>` : ''}</a>`; }).join('') : '';
   const nNew = g.newCount();
   const ticketCount = Object.values(s.tickets).reduce((a, b) => a + b, 0) + (g.welcomePending() ? 0 : g.freePack().stock); /* v404 : « 2 » comme l'annonce l'Accueil au tout début */
   document.getElementById('tabbar').innerHTML = TABS.map(([key, ic, label]) => {
@@ -320,7 +321,10 @@ async function boot() {
     // v318 : lien reçu par e-mail (confirmation d'inscription, mot de passe oublié) : ouvre la session avant tout
     const authLink = consumeAuthHash();
     startSync(app);
+    let shownPseudo = null;
+    onSync(() => { const ps = sync.profile?.pseudo || null; if (ps !== shownPseudo) { shownPseudo = ps; renderChrome(); } }); /* v422 : le pseudo en ligne s'affiche en haut dès qu'il arrive */
     startPresence();
+    setInterval(autoClaim, 5000); /* v422 : l'Accueil n'a plus de boutons « +50 » : on encaisse aussi sans changer de page */
     setTimeout(() => claimShadowPrize(app), 5000); // coffre du Tirage des Ombres de la semaine passée
     lastShards = app.game.s.shards;
     window.addEventListener('hashchange', render);

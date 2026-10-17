@@ -9,7 +9,7 @@ const GUIDE_V = 2;
 const PAGES = [
   { img: 1, t: 'Bienvenue dans l’Abysse', p: 'Le Bestiaire interdit a été déchiré. Ses créatures se cachent dans des boosters scellés. À toi de les retrouver, de les renforcer et de les mener au combat.' },
   { img: 2, t: 'Ouvre des boosters', p: 'Le gros bouton du milieu. Déchire le paquet du doigt, puis retourne les cartes. Un booster gratuit t’attend chaque jour. Certaines cartes sortent en finition rare : argentée, enluminée ou abyssale.' },
-  { bn: 'collection', t: 'Ta collection', p: 'L’onglet Collection a quatre pages, en haut : Cartes (tout le Bestiaire), Équipe (tes 5 combattants), Renforcer et Fournaise.' },
+  { bn: 'collection', t: 'Ta collection', p: 'L’onglet Collection a trois pages, en haut : Cartes (tout le Bestiaire), Équipe (tes 5 combattants) et Forge (Renforcer et Fournaise).' },
   { bn: 'furnace', t: 'Cendres et niveaux', p: 'Dans la Fournaise, brûle tes doublons : ils deviennent des cendres. Dans Renforcer, les cendres font monter tes créatures de niveau, pour plus d’attaque et de PV.' },
   { img: 3, t: 'La Descente', p: 'Dans l’onglet Aventure, ton équipe descend dans l’Abysse : 3 créatures au combat, 2 en réserve. 20 chapitres de 5 étages, un gardien à la fin de chacun, et une récompense à chaque étage gagné.' },
   { bn: 'trial', t: 'Les Épreuves du jour', p: 'Toujours dans Aventure : trois combats par jour, réglés sur la force de tes meilleures cartes. Chaque victoire rapporte un coffre, et fait avancer la saison du mois.' },

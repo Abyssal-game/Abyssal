@@ -13,6 +13,8 @@ const ashLine = (g) => `<span class="fg-ash">${icon('ash')}<b>${fmt(g.s.ash)}</b
 const mini = (c) => `<span class="fg-art" style="--rc:${RARITY[c.rarity].color}"><img alt="" loading="lazy" src="${artUrl(c, { lite: true })}"></span>`;
 
 // ——— Renforcer : monter le niveau des créatures avec des cendres ———
+// v422 : Renforcer et Fournaise réunis sous un seul sous-onglet « Forge » : deux pages, un sélecteur en haut
+const forgeSeg = (cur) => `<nav class="seg2 forge-seg" aria-label="Forge"><a href="#/renfort"${cur === 'renfort' ? ' aria-current="page"' : ''}><img alt="" src="assets/icons/level-up.webp">Renforcer</a><a href="#/fournaise"${cur === 'fournaise' ? ' aria-current="page"' : ''}><img alt="" src="assets/icons/furnace.webp">Fournaise</a></nav>`;
 export function forgeScreen(app, root) {
   const g = app.game, cat = app.catalog;
   const ui = (app.state.forge ||= { all: false });
@@ -21,7 +23,7 @@ export function forgeScreen(app, root) {
     const ids = ui.all ? Object.keys(g.s.collection) : team;
     const list = ids.map((id) => cat.get(id)).filter(Boolean)
       .sort((a, b) => (team.indexOf(b.id) >= 0) - (team.indexOf(a.id) >= 0) || RI(b.rarity) - RI(a.rarity) || g.cardLevel(b.id) - g.cardLevel(a.id) || a.name.localeCompare(b.name, 'fr'));
-    root.innerHTML = `<header class="screen-head ui-hero bn-renfort"><h1>Renforcer</h1><p class="muted">Chaque niveau rend une créature plus forte (attaque et PV), jusqu’au niveau ${MAX_LEVEL}. Ça se paie en cendres.</p>${ashLine(g)}</header>
+    root.innerHTML = `${forgeSeg('renfort')}<header class="screen-head ui-hero bn-renfort"><h1>Renforcer</h1><p class="muted">Chaque niveau rend une créature plus forte (attaque et PV), jusqu’au niveau ${MAX_LEVEL}. Ça se paie en cendres.</p>${ashLine(g)}</header>
       <div class="seg fg-seg" role="group" aria-label="Créatures affichées"><button class="seg-b" data-act="show" data-v="team" aria-pressed="${!ui.all}">Mon équipe</button><button class="seg-b" data-act="show" data-v="all" aria-pressed="${ui.all}">Toutes mes créatures</button></div>
       ${list.length ? `<div class="fg-list">${list.map((c) => {
         const li = g.cardLevelInfo(c.id), gain = nextLevelGain(g, c), ok = li.cost && li.cost <= g.s.ash;
@@ -83,7 +85,7 @@ export function furnaceScreen(app, root) {
     const q = norm(ui.q || '');
     const owned = Object.keys(g.s.collection).map((id) => cat.get(id)).filter((c) => c && !g.isFav(c.id) && (!q || norm(c.name).includes(q)))
       .sort((a, b) => RI(a.rarity) - RI(b.rarity) || a.name.localeCompare(b.name, 'fr'));
-    root.innerHTML = `<header class="screen-head ui-hero bn-furnace"><h1>La Fournaise</h1><p class="muted">Brûle des cartes pour des cendres. Les cendres font monter tes créatures de niveau (onglet Renforcer).</p>${ashLine(g)}</header>
+    root.innerHTML = `${forgeSeg('fournaise')}<header class="screen-head ui-hero bn-furnace"><h1>La Fournaise</h1><p class="muted">Brûle des cartes pour des cendres. Les cendres font monter tes créatures de niveau (Forge → Renforcer).</p>${ashLine(g)}</header>
       ${sublimeHTML()}
       <section class="panel"><h2 class="section-title">Tes doublons</h2>
         ${sp.n ? `<button class="btn primary block" data-act="all">${icon('p:furnace')}Tout brûler (${sp.n}) · +${fmt(sp.ash)} ${icon('ash')}</button>

@@ -25,10 +25,10 @@ export default function collection(app, root, params) {
       <h1>Collection</h1>
       <p class="muted" id="col-summary"></p>
       <span class="progress ui-prog"><i id="col-prog"></i></span>
-    </header>
-    <div class="col-head-row">
+    <div class="col-head-row col-view">
       <div class="seg" role="group" aria-label="Mode d’affichage">${[['grid', 'Grille'], ['album', 'Classeur']].map(([k, l]) => `<button class="seg-b" data-act="view" data-v="${k}" aria-pressed="${(st.view || 'grid') === k}">${l}</button>`).join('')}</div>
     </div>
+    </header>
     <div id="col-main">
     <div class="col-tools">
       <label class="input-wrap"><span class="sr">Rechercher une créature</span>${icon('search')}<input class="input" id="col-q" type="search" placeholder="Rechercher une créature…" value="${esc(st.q)}" autocomplete="off" enterkeyhint="search"></label>

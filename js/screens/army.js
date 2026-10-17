@@ -125,22 +125,28 @@ export function teamScreen(app, root) {
     const slot = (i) => { const c = team[i] && cat.get(team[i]); return c ? `<div class="v2-slot full">${armyCard(g, c)}${run ? '' : `<span class="tm-ctl"><button class="tm-b" data-act="move" data-id="${c.id}" aria-label="${i < TEAM.active ? 'Mettre en réserve' : 'Envoyer au combat'}">${i < TEAM.active ? '▼' : '▲'}</button><button class="tm-b x" data-act="drop" data-id="${c.id}" aria-label="Retirer de l’équipe">✕</button></span>`}</div>` : `<div class="v2-slot"><span>+</span><small>${i < TEAM.active ? 'Combat' : 'Réserve'}</small></div>`; };
     const owned = Object.keys(g.s.collection).map((id) => cat.get(id)).filter(Boolean);
     const RI = (r) => ['C', 'PC', 'R', 'HR', 'M', 'S'].indexOf(r);
+    if (ui.role) { const keep = owned.filter((c) => roleOf(c) === ui.role); owned.length = 0; owned.push(...keep); } /* v422 : filtre par rôle */
     owned.sort(ui.sort === 'cost' ? (a, b) => COST[a.rarity] - COST[b.rarity] || g.cardLevel(b.id) - g.cardLevel(a.id) : (a, b) => g.cardLevel(b.id) - g.cardLevel(a.id) || RI(b.rarity) - RI(a.rarity));
     root.innerHTML = `<header class="screen-head ui-hero bn-team"><h1>Mon équipe</h1><p class="muted">3 créatures au combat, 2 en réserve qui prennent la relève.</p></header>
       ${run ? `<p class="panel small center">${icon('info')} Un chapitre de la Descente est en cours : l’équipe ne peut pas changer avant la fin du chapitre (ou son abandon).</p>` : ''}
       <section class="panel v2-team">
         <div class="v2-budget"><span>Budget</span><span class="progress"><i style="width:${Math.min(100, (cost / BUDGET) * 100)}%;--bar:${cost > BUDGET ? '#FF5468' : 'var(--gold)'}"></i></span><b>${cost} / ${BUDGET}</b></div>
-        <p class="small muted">Coût : Commune 1, Peu commune 2, Rare 3, Hyper rare 4, Mythique 5, Secrète 6.</p>
-        ${team.length ? (() => { const fl = team.slice(0, TEAM.active), tp = g.teamPower(fl), reach = Math.max(1, Math.round(6 + (tp - 1) * 22)); return `<p class="small tm-power">${icon('p:level-up')} Force au combat : <b>${powerPts(tp)}</b> · de quoi viser l’étage <b>${reach}</b> environ. <span class="muted">La force d’une créature dépend de sa rareté et de son niveau : une Secrète au niveau 1 est plus faible qu’une Hyper rare au niveau 5.</span></p>`; })() : ''}
+        ${team.length ? (() => { const fl = team.slice(0, TEAM.active), tp = g.teamPower(fl), reach = Math.max(1, Math.round(6 + (tp - 1) * 22)); return `<p class="small tm-power">${icon('p:level-up')} Force au combat : <b>${powerPts(tp)}</b> · de quoi viser l’étage <b>${reach}</b> environ.</p>`; })() : ''}
         ${team.length < TEAM.active ? `<p class="small v2-warn">${icon('info')} Il faut au moins ${TEAM.active} créatures pour partir dans la Descente (encore ${TEAM.active - team.length}).</p>` : ''}
-        ${run ? '' : `<div class="tm-tools"><button class="btn small primary" data-act="auto">${icon('sparkle')}Suggérer une équipe</button>${team.length ? '<button class="btn small ghost" data-act="clear">Vider</button>' : ''}</div><p class="small muted tm-help">Touche <b>+</b> sous une créature pour l’ajouter, <b>▲▼</b> pour la passer du combat à la réserve, <b>✕</b> pour la retirer.</p>`}
-        ${run ? '' : presetsHTML()}
         <h3 class="section-title">Au combat</h3><div class="v2-slots">${[0, 1, 2].map(slot).join('')}</div>
         <h3 class="section-title">En réserve</h3><div class="v2-slots res">${[3, 4].map(slot).join('')}</div>
+        ${run ? '' : `<div class="tm-tools"><button class="btn small primary" data-act="auto">${icon('sparkle')}Suggérer une équipe</button>${team.length ? '<button class="btn small ghost" data-act="clear">Vider</button>' : ''}</div>`}
+        ${run ? '' : presetsHTML()}
+        <details class="dc-fold tm-more"><summary>${icon('info')} Comment composer ton équipe</summary>
+          <p class="small muted">Coût : Commune 1, Peu commune 2, Rare 3, Hyper rare 4, Mythique 5, Secrète 6. Le total ne doit pas dépasser ${BUDGET}.</p>
+          <p class="small muted">La force d’une créature dépend de sa rareté et de son niveau : une Secrète au niveau 1 est plus faible qu’une Hyper rare au niveau 5.</p>
+          <p class="small muted">Touche <b>+</b> sous une créature pour l’ajouter, <b>▲▼</b> pour la passer du combat à la réserve, <b>✕</b> pour la retirer.</p>
+        </details>
         ${synHTML(team)}
         <div class="panel v2-skill ult" style="--uc:${ult.color}"><b>${icon('p:power')} Pouvoir : ${esc(ult.name)}</b><p class="small">${esc(ult.desc)}</p><p class="small muted">${ult.card ? `Porté par ${esc(cat.get(ult.card).name)}.` : 'Ajoute une Mythique ou une Secrète pour un pouvoir plus puissant.'}</p></div>
       </section>
       <h2 class="section-title">Ta collection <span class="more small"><button class="linkish" data-act="sort">${ui.sort === 'cost' ? 'Trier par niveau' : 'Trier par coût'}</button></span></h2>
+      <div class="chips tm-roles" role="group" aria-label="Filtrer par rôle"><button class="chip" data-act="rolef" data-v="" aria-pressed="${!ui.role}">Tous</button>${Object.entries(ROLES).map(([k, r]) => `<button class="chip" data-act="rolef" data-v="${k}" style="--chip:${r.color}" aria-pressed="${ui.role === k}">${esc(r.name)}</button>`).join('')}</div>
       <div class="grid-cards v2-grid" id="tm-grid"></div>`;
     lazyArt(root);
     // v391 : la grille de la collection par paquets (216 cartes d'un coup bloquaient l'écran plus d'une seconde, à chaque ajout)
@@ -160,6 +166,7 @@ export function teamScreen(app, root) {
   root.addEventListener('click', (e) => { if (e.target.closest('[data-act]')) return; const t = e.target.closest('.tcg'); if (t) openCreature(app, t.dataset.id, { onChange: draw }); });
   bindActions(root, {
     sort() { ui.sort = ui.sort === 'cost' ? 'power' : 'cost'; draw(); },
+    rolef(el) { ui.role = el.dataset.v || null; draw(); },
     quick(el) { if (toggleTeam(app, el.dataset.id)) draw(); },
     drop(el) { if (toggleTeam(app, el.dataset.id)) draw(); },
     move(el) {

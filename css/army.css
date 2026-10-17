@@ -3653,3 +3653,38 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 .dc-chnext > span { display: grid; gap: 2px; min-width: 0; }
 .dc-chnext small { color: var(--mute); }
 @media (prefers-reduced-motion: reduce) { .dc-chend-fig, .dc-chend-seal, .dc-chend-chest svg, .dc-chend-chest img { animation: none; } }
+
+/* v422 : Accueil : plus de boutons « +50 » (tout s'encaisse seul) ; simple étiquette dorée */
+.td-auto { flex: none; padding: 4px 10px; border-radius: 999px; font: 700 .78rem/1 var(--f-ui); color: #2A1A06; background: linear-gradient(180deg, #F6DE96, #C99B3E); box-shadow: 0 2px 8px rgba(0,0,0,.4); }
+
+/* v422 : sélecteur de la Forge (Renforcer / Fournaise) */
+.seg2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 4px; margin: 0 0 12px; border-radius: 14px; background: rgba(10, 8, 18, .7); border: 1px solid rgba(232, 195, 90, .25); }
+.seg2 a { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; border-radius: 10px; color: var(--mute); text-decoration: none; font: 700 .85rem/1 var(--f-ui); }
+.seg2 a img { width: 26px; height: 26px; object-fit: contain; }
+.seg2 a[aria-current="page"] { color: var(--gold-hi, #F2D47A); background: linear-gradient(180deg, rgba(232, 195, 90, .18), rgba(232, 195, 90, .06)); box-shadow: inset 0 0 0 1px rgba(232, 195, 90, .45); }
+
+/* v422 : Collection plus compacte : bannière basse avec le choix Grille / Classeur dedans, filtres sur une seule rangée qui défile */
+.ui-hero.bn-collection { padding: 14px 16px 12px; }
+.ui-hero.bn-collection p { margin-bottom: 8px; font-size: .9rem; }
+.ui-hero.bn-collection .ui-prog { max-width: 55%; }
+.col-head-row.col-view { margin: 10px 0 0; justify-content: flex-start; }
+.col-view .seg { transform: scale(.88); transform-origin: left center; }
+.col-tools .seg.wide { display: flex !important; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; gap: 2px; padding-left: 14px !important; padding-right: 14px !important; }
+.col-tools .seg.wide::-webkit-scrollbar { display: none; }
+.col-tools .seg.wide .seg-b { flex: none; padding: 0 12px !important; font-size: .8rem; }
+/* v422 : Équipe plus légère : explications repliées, filtre par rôle au-dessus de la collection */
+.tm-roles { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 6px; margin: 0 0 10px; padding-bottom: 2px; scrollbar-width: none; }
+.tm-roles::-webkit-scrollbar { display: none; }
+.tm-roles .chip { flex: none; }
+.tm-more { margin: 10px 0; }
+.ui-hero.bn-team { padding: 14px 16px 12px; }
+/* v422 : Bestiaire plus compact : lignes basses (la citation reste dans la fiche), deux colonnes sur les grands écrans */
+.codex { gap: 6px; }
+.codex-row { padding: 6px 8px; gap: 10px; }
+.codex-thumb { width: 40px; height: 56px; }
+.codex-text .lore { display: none; }
+.codex-text b { font-size: .9rem; }
+@media (min-width: 560px) { .codex { grid-template-columns: 1fr 1fr; } }
+/* v422 : Boosters : « Ouvrir mes N boosters d'un coup » et son récapitulatif */
+.shop-all { margin: 0 0 12px; min-height: 52px; }
+.shop-allgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
