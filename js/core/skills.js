@@ -159,6 +159,9 @@ export const INTENTS = {
   ambush:   { name: 'Embuscade',      icon: 'skull',   desc: 'Surgit de l’ombre et frappe ta créature la plus affaiblie avec plus de deux fois sa force.' },
   wish:     { name: 'Vœu exaucé',     icon: 'heart',   desc: 'Te donne 3 Ferveur et 1 PA à tes créatures. Au tour suivant, elle réclame son Prix sur toute ton équipe.' },
   price:    { name: 'Le Prix',        icon: 'flame',   desc: 'Frappe toute ton équipe et la soigne de la moitié des dégâts.' },
+  slumber:  { name: 'Il dort',        icon: 'sparkle', desc: 'Le Titan dort et ne fait rien. Chaque dégât que tu lui fais rendra son réveil plus violent.' },
+  quake:    { name: 'Séisme',         icon: 'flame',   desc: 'Le Titan se réveille : frappe toute ton équipe, d’autant plus fort qu’il a été blessé pendant son sommeil.' },
+  verdict:  { name: 'Verdict',        icon: 'eye',     desc: 'Interdit une action (attaquer, compétence ou se défendre) à toute ton équipe jusqu’à sa prochaine action.' },
 };
 
 // Pouvoirs des gardiens. weak : la capacité qui les contre. Phase 2 sous 50 % des PV.

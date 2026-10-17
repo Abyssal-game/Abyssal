@@ -126,3 +126,56 @@ test('Dame des Vœux : le Vœu donne de la Ferveur, le Prix la soigne', () => {
   play(st2, { kind: 'price' });
   assert.ok(b2.hp > hp, 'le Prix la soigne');
 });
+
+// v392 : étages 80 à 100
+test('étages 80 à 100, puis le cycle des vingt', () => {
+  assert.deepEqual([80, 85, 90, 95, 100].map(bossOf), ['titan', 'jumeaux', 'juge', 'bete', 'abysse']);
+});
+
+test('Titan Endormi : il dort 3 tours, puis son Séisme est plus fort s’il a été blessé', () => {
+  const st = duel('titan');
+  assert.equal(boss(st).intent?.kind, 'slumber');
+  const a = duel('titan'), b2 = duel('titan');
+  boss(b2).sleepDmg = boss(b2).maxHp; // blessé pendant son sommeil
+  const hpA = units(a, 'ally').reduce((n, x) => n + x.hp, 0), hpB = units(b2, 'ally').reduce((n, x) => n + x.hp, 0);
+  play(a, { kind: 'quake' }); play(b2, { kind: 'quake' });
+  const lossA = hpA - units(a, 'ally').reduce((n, x) => n + Math.max(0, x.hp), 0), lossB = hpB - units(b2, 'ally').reduce((n, x) => n + Math.max(0, x.hp), 0);
+  assert.ok(lossB > lossA, `${lossB} > ${lossA}`);
+});
+
+test('Jumeaux du Crépuscule : un jumeau lié, et le survivant devient fou de chagrin', () => {
+  const st = D.createDuel(team(), [E('NEC-010', { boss: true, scale: 1.2 }), E('NEC-002', { scale: 1.2 })], { seed: 7, boss: 'jumeaux' });
+  const [b, t] = units(st, 'enemy');
+  assert.ok(t.twin);
+  const atk = b.atk;
+  t.hp = 1; D.act(st, units(st, 'ally')[0].uid, 'attack', t.uid);
+  if (t.hp <= 0) assert.ok(b.grief && b.atk > atk);
+});
+
+test('Juge des Sceaux : le Verdict interdit une action à toute l’équipe', () => {
+  const st = duel('juge');
+  const b = boss(st); b.intent = { kind: 'verdict', forbid: 'attack' };
+  D.beginEnemyTurn(st); const s = D.nextEnemy(st); D.enemyAct(st, s.a, 'none'); D.endEnemyTurn(st);
+  assert.equal(st.forbid, 'attack');
+  const u = st.init ? st.units[st.actor] : units(st, 'ally')[0];
+  if (u?.side === 'ally') assert.equal(D.actionsFor(st, u.uid).find((x) => x.key === 'attack').ok, false);
+});
+
+test('Bête de l’Apocalypse : en phase 2, elle grandit à chaque tour', () => {
+  const st = duel('bete');
+  const b = boss(st); b.phase2 = true; /* en phase 2 (toujours, à l'étage 95), à chaque tour */
+  const atk = b.atk, mx = b.maxHp;
+  b.intent = { kind: 'hit', t: units(st, 'ally')[0].uid };
+  D.endTurn(st);
+  assert.ok(b.atk > atk && b.maxHp > mx);
+});
+
+test('L’Abysse : trois phases selon ses PV', () => {
+  const st = duel('abysse');
+  const b = boss(st);
+  assert.ok(!b.phase2, 'jamais déchaîné d’emblée');
+  b.hp = Math.round(b.maxHp * 0.6); b.intent = { kind: 'hit', t: units(st, 'ally')[0].uid };
+  D.endTurn(st); assert.equal(b.ph, 2);
+  b.hp = Math.round(b.maxHp * 0.3); b.intent = { kind: 'hit', t: units(st, 'ally')[0].uid };
+  D.endTurn(st); assert.equal(b.ph, 3); assert.ok(b.night);
+});

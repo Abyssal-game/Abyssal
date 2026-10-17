@@ -1070,6 +1070,8 @@ export class Game {
     const out = { room, won, discovered, relNew, pact: pactUsed, report: battleReport(st, (uid) => (st.units[uid]?.boss && bossKey ? BOSSES[bossKey].name : this.catalog.get(st.units[uid]?.id)?.name) || 'Une créature') };
     if (bossKey) {
       out.boss = { key: bossKey, log: (st.bossLog || []).slice(), interrupts: st.stats?.interrupts || 0, feasts: st.stats?.feasts || 0, weak: Object.keys(st.discovered || {}), first: won && !this.s.bossesBeaten[bossKey] };
+      // v392 : première victoire contre L'Abysse (étage 100) : titre, cadre et deux coffres abyssaux
+      if (won && bossKey === 'abysse' && !this.s.bossesBeaten.abysse) { this.grant({ title: 'Vainqueur de l’Abysse', frame: 'oeil', chests: { abyssal: 2 } }, 'abysse'); out.abyss = true; }
       if (won) { this.s.bossesBeaten[bossKey] = this.s.bossesBeaten[bossKey] || Date.now(); const bw = (this.s.bossWins ||= {}); bw[bossKey] = (bw[bossKey] || 0) + 1; } // v348 : victoires par gardien (présentation courte après 3)
     }
     if (!won && pactUsed === 'gardien') run.shards = 0; // le prix du Pacte du Gardien

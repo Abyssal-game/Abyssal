@@ -24,6 +24,8 @@ export function unlockSources(cat) {
   for (const k of ['maitre', 'echo', 'souverain']) add(titles, SCEAUX_TITLES[k], `Bats ${rival(k)} aux Duels des Sceaux.`);
   add(titles, 'Éveilleur des Sceaux', 'Bats tous les adversaires éveillés des Duels des Sceaux.');
   add(frames, 'sceaux', `Bats ${rival('echo')} aux Duels des Sceaux.`);
+  add(titles, 'Vainqueur de l’Abysse', 'Vaincs L’Abysse, le gardien de l’étage 100 de la Descente.');
+  add(frames, 'oeil', 'Vaincs L’Abysse, le gardien de l’étage 100 de la Descente.');
   return {
     titles: [...titles].map(([name, how]) => ({ name, how: how.join(' Ou : ') })),
     frames: Object.keys(FRAMES).filter((k) => frames.has(k)).map((k) => ({ key: k, name: FRAMES[k], how: frames.get(k).join(' Ou : ') })),

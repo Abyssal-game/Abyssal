@@ -140,8 +140,51 @@ export const BOSSES = {
     story: 'Elle a exaucé tous les vœux des Scelleurs : la gloire, la puissance, l’oubli. Le prix, c’était l’Abysse. Elle attend encore qu’ils finissent de payer.',
     pattern: (phase, round) => (round % 3 === 1 ? 'wish' : 'hit'),
   },
+  // v392 : étages 80 à 100
+  titan: {
+    name: 'Le Titan Endormi', title: 'Ne le réveille pas',
+    intro: 'Une montagne respire. Des temples entiers se sont écroulés sur ses épaules sans qu’il ouvre les yeux.',
+    mechanic: 'Il dort pendant 3 tours et ne fait rien. Au 4e, il se réveille dans un Séisme qui frappe toute ton équipe, d’autant plus fort que tu l’as blessé pendant son sommeil. Ensuite, il frappe lourdement.',
+    counter: 'Profite de son sommeil pour l’affaiblir et charger ta Ferveur, mais garde tes créatures en forme pour le réveil : esquive ou pare le Séisme.',
+    story: 'Les premiers Scelleurs ont bâti leurs temples sur son dos, croyant qu’il était une montagne. L’Abysse, elle, savait. Elle attendait seulement que quelqu’un le dérange.',
+    pattern: (phase, round) => (round <= 3 ? 'slumber' : round === 4 ? 'quake' : round % 3 === 2 ? 'charge' : 'hit'),
+  },
+  jumeaux: {
+    name: 'Les Jumeaux du Crépuscule', title: 'Le jour et la nuit, enchaînés',
+    intro: 'Deux silhouettes se font face, liées au poignet par une chaîne de lumière. Elles se tournent vers toi en même temps.',
+    mechanic: 'Deux gardiens liés : le Jumeau du Jour et le Jumeau de la Nuit. Quand l’un tombe, l’autre devient fou de chagrin : il se soigne et frappe bien plus fort.',
+    counter: 'Affaiblis-les tous les deux avant d’en abattre un, puis achève le second très vite.',
+    story: 'Ils sont nés le même soir, l’un au coucher du soleil, l’autre au lever de la lune. L’Abysse les a enchaînés pour que l’un ne puisse jamais survivre à l’autre.',
+    pattern: (phase, round) => (round % 3 === 2 ? 'channel' : 'hit'),
+  },
+  juge: {
+    name: 'Le Juge des Sceaux', title: 'La loi, c’est lui',
+    intro: 'Un marteau frappe trois coups. « L’accusé se lèvera », dit une voix sans visage. Tu comprends que l’accusé, c’est toi.',
+    mechanic: 'Un tour sur deux, il rend un Verdict : à ton tour suivant, une action est interdite à toute ton équipe (attaquer, utiliser une compétence, ou se défendre).',
+    counter: 'Lis le Verdict et prépare ton tour : si l’attaque est interdite, garde des PA pour les compétences, et inversement.',
+    story: 'Il a écrit les lois des Sceaux, puis il a jugé ceux qui les avaient écrites avec lui. Personne n’a jamais gagné un procès contre lui. Personne n’a jamais su de quoi il était accusé.',
+    pattern: (phase, round) => (round % 2 === 1 ? 'verdict' : round % 4 === 0 ? 'charge' : 'hit'),
+  },
+  bete: {
+    name: 'La Bête de l’Apocalypse', title: 'Sept têtes, sept couronnes',
+    intro: 'La salle tremble sous une respiration de forge. Sept têtes se lèvent, et chacune te regarde.',
+    mechanic: 'Elle grandit : +1 ATQ et 2 % de ses PV max en plus, un tour sur deux (à chaque tour en phase 2). Plus le combat dure, plus elle est terrible. Une Brisure la fait rétrécir.',
+    counter: 'Frappe vite et fort : garde ta Ferveur pour un pouvoir d’équipe tôt, et brise-la dès que possible.',
+    story: 'On dit qu’elle sortira le jour où le dernier Sceau cédera. Elle ne sait pas compter les jours, alors elle grandit en attendant.',
+    pattern: (phase, round) => (round % 3 === 0 ? 'channel' : 'hit'),
+  },
+  abysse: {
+    name: 'L’Abysse', title: 'Ce qui attend au fond',
+    intro: 'Il n’y a plus de salle, plus de mur, plus de sol. Seulement un œil immense qui s’ouvre dans le noir, et qui te reconnaît.',
+    mechanic: 'Le combat final, en trois phases. Phase 1 : il frappe et lance des déflagrations. Sous 2/3 de ses PV, il rappelle les pouvoirs des gardiens vaincus. Sous 1/3, il se déchaîne : la nuit dévore tes créatures à chaque tour et ses coups redoublent.',
+    counter: 'Garde ta Ferveur et tes meilleures créatures pour la dernière phase, et brise-le pour retenir la nuit.',
+    story: 'Les Sceaux n’ont jamais enfermé des monstres. Ils enfermaient l’Abysse lui-même, et tous les gardiens n’étaient que ses rêves. Tu viens de le réveiller.',
+    pattern: (phase, round) => (round % 3 === 0 ? 'channel' : 'hit'),
+  },
 };
-// Étages 5 à 25 : les cinq premiers gardiens ; 30 à 50 : cinq autres ; 55 à 75 : cinq autres ; puis le cycle recommence
-export const BOSS_ORDER = ['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'golem', 'peste', 'chasseur', 'voeux'];
+// Un gardien tous les 5 étages, jusqu'à L'Abysse à l'étage 100 ; au-delà, le cycle des vingt recommence
+export const BOSS_ORDER = ['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'golem', 'peste', 'chasseur', 'voeux', 'titan', 'jumeaux', 'juge', 'bete', 'abysse'];
+// L'Abysse, phase 2 : il rappelle un pouvoir de gardien vaincu, à tour de rôle
+export const ABYSS_ECHOES = ['gorge', 'gather', 'brood', 'sentence', 'mirror', 'wish'];
 // Gardien d'un étage (tous les 5 étages)
 export const bossOf = (floor) => BOSS_ORDER[(Math.max(1, Math.floor(floor / 5)) - 1) % BOSS_ORDER.length];

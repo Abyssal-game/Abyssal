@@ -54,6 +54,11 @@ export const BOSS_ROOMS = {
   peste:      { paint: 'f-9', theme: 'necrotique', light: '#B8D89A', monument: null },
   chasseur:   { paint: 'f-6', theme: 'sauvage', light: '#9AE0B0', monument: null },
   voeux:      { paint: 'f-12', theme: 'abyssal', light: '#FF8AD8', monument: null },
+  titan:      { paint: 'g-1', theme: 'primordial', light: '#8AD8FF', monument: null },
+  jumeaux:    { paint: 'g-6', theme: 'celeste', light: '#FFB86A', monument: 'eclipse' },
+  juge:       { paint: 'bg-boss', theme: 'primordial', light: '#FFD36A', monument: 'geometry' },
+  bete:       { paint: 'f-7', theme: 'infernal', light: '#FF3A1A', monument: 'maw' },
+  abysse:     { paint: 'g-8', theme: 'abyssal', light: '#B04BFF', monument: 'eclipse' },
 };
 
 // Décor d'un combat : d'après la peinture de l'étage (et la salle du gardien s'il y en a un)

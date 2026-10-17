@@ -171,7 +171,7 @@ export default function descent(app, root) {
 
   // ——— Expédition ———————————————————————————————————————————————————
   // v373 : porte du gardien épurée (figure, nom, titre, pastille « déchaîné ») ; son mécanisme est expliqué sur sa présentation
-  const BOSS_FIGS = new Set(['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'golem', 'peste', 'chasseur', 'voeux']);
+  const BOSS_FIGS = new Set(['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'golem', 'peste', 'chasseur', 'voeux', 'titan', 'jumeaux', 'juge', 'bete', 'abysse']);
   const bossDoor = (run) => { const k = bossOf(run.floor), b = BOSSES[k], wild = run.nightmare || run.floor >= AWAKEN_AT;
     return `<span class="dc-bdoor">${BOSS_FIGS.has(k) ? `<img class="dc-bfig" alt="" src="assets/bosses/${k}.webp">` : ''}<b class="dc-bname">${esc(b.name)}</b><span class="dc-btitle">${esc(b.title)}</span>${wild ? '<span class="dc-bwild">Déchaîné · furie dès le 1er tour</span>' : ''}</span>`; };
   const runHead = (run) => `<header class="dc-run-head"><div><span class="small muted">${run.nightmare ? `<span class="dc-bad">${icon('skull')} ${nightTier(run).name}</span> · ` : ''}${run.free ? 'Entraînement (ni coffre, ni cendres)' : run.cursed ? `<span class="dc-bad">${icon('skull')} Maudite</span>` : 'La Descente'}</span><h1>Étage ${run.floor}</h1>${run.omen && OMENS[run.omen] ? `<button class="dc-omen-pill" data-act="omeninfo">${icon(OMENS[run.omen].icon)} ${esc(OMENS[run.omen].name)}</button>` : ''}</div><div class="dc-loot"><span>${icon('crystal')}${fmt(run.shards)}</span>${run.chests.length ? `<span>${icon('p:chest')}${run.chests.length}</span>` : ''}</div></header>
@@ -209,6 +209,7 @@ export default function descent(app, root) {
         ${w ? `<div class="vx-loot"><span class="vx-chip">${icon('crystal')}+${fmt(w.shards)}</span>${w.ash ? `<span class="vx-chip">${icon('ash')}+${fmt(w.ash)}</span>` : ''}${w.chest ? `<span class="vx-chip gold" style="--cc:${CHESTS[w.chest].color}">${icon('p:chest')}${esc(CHESTS[w.chest].name)}</span>` : ''}${feats.length ? `<span class="vx-chip feat">${icon('p:feats')}${feats.join(' · ')}</span>` : ''}</div>` : ''}
         ${w?.named ? `<p class="vx-week">${icon('skull')} <b>${esc(w.named.title)}</b> a succombé : butin de <b>+${fmt(w.named.shards)} éclats</b>.</p>` : ''}
         ${w?.firstWin ? `<p class="vx-week vx-first">${icon('star')} <b>Ta toute première victoire !</b> L’Abysse t’offre <b>+${fmt(w.firstWin)} éclats</b>.</p>` : ''}
+        ${w?.abyss ? `<p class="vx-week vx-first">${icon('crown')} <b>Tu as vaincu L’Abysse.</b> Titre « Vainqueur de l’Abysse », Cadre de l’Œil de l’Abysse et <b>2 coffres abyssaux</b> !</p>` : ''}
         ${w?.bossTicket ? `<p class="vx-week">${icon('crown')} Le gardien laisse un <b>ticket de booster premium</b> derrière lui !</p>` : ''}
         ${w?.weekly ? `<p class="vx-week">${icon('sparkle')} <b>${esc(cat.get(w.weekly).name)}</b> rejoint ta collection !</p>` : ''}
         ${w?.boss ? bossRecap(w.boss) : ''}
@@ -254,7 +255,7 @@ export default function descent(app, root) {
       else {
         app.sfx.reveal(out.room === 'boss' ? 'M' : 'R');
         const r = g.descent().run;
-        ui.win = { goal: out.goal || null, goalShards: out.goalShards || 0, floor: r.floor, room: out.room, shards: out.shards, ash: out.ash || 0, chest: out.chest || null, disc: out.discovered.filter((id) => cat.get(id)), weekly: out.weekly?.id || null, bossTicket: out.bossTicket || 0, stats, boss: out.boss || null, relNew: out.relNew || [], report: out.report || [], firstWin: out.firstWin || 0, named: out.named || null };
+        ui.win = { goal: out.goal || null, goalShards: out.goalShards || 0, floor: r.floor, room: out.room, shards: out.shards, ash: out.ash || 0, chest: out.chest || null, disc: out.discovered.filter((id) => cat.get(id)), weekly: out.weekly?.id || null, bossTicket: out.bossTicket || 0, abyss: !!out.abyss, stats, boss: out.boss || null, relNew: out.relNew || [], report: out.report || [], firstWin: out.firstWin || 0, named: out.named || null };
         rewardView(r);
         if (r.talentOffer?.length) tuto(app, 'cb-talent');
       }

@@ -12,7 +12,7 @@ import {
   AP_MAX, FERVOR_MAX, ACTS_PER_UNIT, ULT_COST, PA_START, PA_TURN, PA_MAX, PA_GAIN, KITS, COMMON_ACTS, WEAK_TO, WEAK_MULT, RESIST_MULT,
   aiFamily, INTENTS, DICE_DC, BOSS_POWERS, bossPowerOf, diceChance, KEYWORDS, keywordOf, SYNERGIES,
 } from './skills.js';
-import { BOSSES, LAWS, ASPECTS } from './bosses.js';
+import { BOSSES, LAWS, ASPECTS, ABYSS_ECHOES } from './bosses.js';
 import { familyOf, relationMult, activeLegends } from './relations.js';
 import { FORMS } from './forms.js';
 import { CREATURE_KITS, kitOf, moveOf, moveFor, hasP, boosted, awake, statShape, passiveMult, rechargeOf, ROLE_AWAKEN } from './kits.js';
@@ -33,7 +33,7 @@ export const FROST_MASTERY = { R: 1, HR: 2, M: 3, S: 4 };
 export const RHYTHM = { good: 1, perfect: 3 };
 const SINGLE = ['hit', 'heavy', 'poison', 'frost', 'gorge', 'execute', 'chain', 'tick2', 'ambush'];
 // Intentions spéciales des gardiens (comptent comme « actions spéciales » pour le Pacte du Reflet)
-const SPECIAL = ['heavy', 'blast', 'shield', 'heal', 'rally', 'hunt', 'charge', 'channel', 'gorge', 'gather', 'blizzard', 'mimic', 'copy', 'decree', 'shift', 'brood', 'swarm', 'sentence', 'execute', 'chant', 'lament', 'chain', 'wind', 'rewind', 'mirror', 'ambush', 'wish', 'price'];
+const SPECIAL = ['heavy', 'blast', 'shield', 'heal', 'rally', 'hunt', 'charge', 'channel', 'gorge', 'gather', 'blizzard', 'mimic', 'copy', 'decree', 'shift', 'brood', 'swarm', 'sentence', 'execute', 'chant', 'lament', 'chain', 'wind', 'rewind', 'mirror', 'ambush', 'wish', 'price', 'slumber', 'quake', 'verdict'];
 // v383 : grosses attaques de zone des nouveaux gardiens (multiplicateur par créature) et actions préparées un tour à l'avance
 const AOE_M = { swarm: 0.6, lament: 0.7, price: 0.9 };
 const PREP = ['charge', 'channel', 'gather', 'mimic', 'brood', 'sentence', 'chant', 'wind', 'wish'];
@@ -93,6 +93,13 @@ function setupExtras(st) {
   const allies = st.order.ally.map((id) => st.units[id]);
   const scaleHp = (u, k) => { u.maxHp = Math.max(1, Math.round(u.maxHp * k)); u.hp = Math.min(u.maxHp, Math.max(1, Math.round(u.hp * k))); };
   if (st.bossKey === 'eclipse') { st.aspect = 'soleil'; st.order.enemy.forEach((id) => { if (st.units[id].boss) st.units[id].aspect = 'soleil'; }); }
+  // v392 : L'Abysse, le combat final, dure plus longtemps (+80 % de PV) pour que ses trois phases se jouent
+  if (st.bossKey === 'abysse') st.order.enemy.forEach((id) => { if (st.units[id].boss) scaleHp(st.units[id], 1.8); });
+  // v392 : Jumeaux du Crépuscule, le premier compagnon du gardien devient son jumeau (même rang, un peu moins solide)
+  if (st.bossKey === 'jumeaux') {
+    const b = st.order.enemy.map((id) => st.units[id]).find((u) => u.boss), t = st.order.enemy.map((id) => st.units[id]).find((u) => !u.boss);
+    if (b && t) { t.twin = true; t.elite = true; t.maxHp = t.hp = Math.round(b.maxHp * 0.45); t.atk = Math.max(t.atk, Math.round(b.atk * 0.7)); t.brkMax = t.brk = 8; t.fam = 'gardien'; }
+  }
   // Légendes : plusieurs créatures d'un même mythe dans l'équipe
   st.legends = activeLegends(allies.map((u) => u.id));
   for (const L of st.legends) {
@@ -272,7 +279,9 @@ const bossCap = (u) => Math.max(1, Math.round(u.maxHp * BOSS_HIT_CAP));
 export const MULT_CAP = 3;
 // Tes créatures : un coup normal retire au plus 45 % de leurs PV max, un coup annoncé (chargé, déflagration…) 75 %
 export const ALLY_HIT_CAP = 0.45, ALLY_BIG_CAP = 0.75;
-const BIG = ['heavy', 'blast', 'gorge', 'blizzard', 'copy', 'swarm', 'execute', 'lament', 'ambush', 'price'];
+const BIG = ['heavy', 'blast', 'gorge', 'blizzard', 'copy', 'swarm', 'execute', 'lament', 'ambush', 'price', 'quake'];
+// v392 : Verdict du Juge des Sceaux (action interdite à toute ton équipe jusqu'à son action suivante)
+export const FORBID = { attack: 'attaquer', skill: 'utiliser une compétence', defend: 'se défendre' };
 export const allyCap = (u, kind) => Math.max(1, Math.round(u.maxHp * (BIG.includes(kind) ? ALLY_BIG_CAP : ALLY_HIT_CAP)));
 function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   if (u.hp <= 0 || n <= 0) return 0;
@@ -320,6 +329,11 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   if (u.side === 'ally' && d >= u.hp && st.sursis) { st.sursis = false; d = u.hp - 1; u.shield = 1; ev.push({ t: 'status', u: u.uid, s: 'Sursis !', syn: true }); }
   u.hp -= d;
   if (d > 0) ev.push({ t: 'dmg', u: u.uid, d, hp: u.hp, src });
+  if (d > 0 && u.boss && st.bossKey === 'titan' && u.asleep) u.sleepDmg = (u.sleepDmg || 0) + d;
+  if (d > 0 && u.hp <= 0 && st.bossKey === 'jumeaux' && (u.boss || u.twin)) {
+    const o = st.order.enemy.map((id) => st.units[id]).find((x) => x !== u && (x.boss || x.twin) && x.hp > 0);
+    if (o && !o.grief) { o.grief = true; o.atk = Math.round(o.atk * 1.35); heal(o, o.maxHp * 0.25, ev); ev.push({ t: 'boss', u: o.uid, s: 'Fou de chagrin !' }); }
+  }
   if (d > 0 && u.side === 'enemy' && src && st.units[src]?.side === 'ally') st.stats.maxHit = Math.max(st.stats.maxHit || 0, d);
   if (d > 0 && u.boss && st.bossKey === 'golem' && !u.broken && u.hp > 0 && (u.ashArmor || 0) < 8) { u.ashArmor = (u.ashArmor || 0) + 1; if (u.ashArmor % 2 === 0) ev.push({ t: 'status', u: u.uid, s: `Carapace de cendres −${u.ashArmor * 6} %`, k: 'guard' }); }
   // v331 : traits des profondeurs (Vampire, Épineux)
@@ -577,6 +591,7 @@ export function actionsFor(st, uid) {
     else if (st.init && (u.pa || 0) < ap) why = `Il faut ${ap} PA (elle en a ${u.pa || 0}). Attaque ou défends-toi pour en gagner.`;
     else if (!st.init && st.ap < ap) why = 'Plus assez de points d’action.';
     else if (st.fervor < fervor) why = `Il faut ${fervor} Ferveur.`;
+    else if (st.forbid && (st.forbid === key || (st.forbid === 'skill' && !common(key)))) why = `Verdict du Juge : interdit de ${FORBID[st.forbid]} ce tour-ci.`;
     const gain = st.init && (key === 'attack' || key === 'defend') ? PA_GAIN : 0;
     return { key, name: def.name, icon: def.icon, ap, fervor, gain, target: def.target, desc: def.desc, dice: !!def.dice, ok: !why, why };
   };
@@ -1071,11 +1086,25 @@ export const PHASE2 = {
   peste:      { name: 'Grande contagion', desc: 'Le poison saute deux fois plus vite d’une créature à l’autre.' },
   chasseur:   { name: 'Traque', desc: 'Son Embuscade frappe encore plus fort (+20 %).' },
   voeux:      { name: 'Vœux amers', desc: 'Le Prix frappe plus fort (+25 %).' },
+  titan:      { name: 'Colère tellurique', desc: 'Réveillé, il frappe plus fort et prépare un coup chargé tous les trois tours.' },
+  jumeaux:    { name: 'Lien de sang', desc: 'Les deux jumeaux frappent plus fort. Si l’un tombe, l’autre devient fou de chagrin.' },
+  juge:       { name: 'Sentence finale', desc: 'Ses Verdicts tombent toujours un tour sur deux, et ses coups chargés frappent plus fort.' },
+  bete:       { name: 'Apocalypse', desc: 'Elle grandit à chaque tour, et non plus un tour sur deux.' },
+  abysse:     { name: 'L’Écho des gardiens', desc: 'L’Abysse rappelle les pouvoirs des gardiens vaincus : festin, tempête de givre, essaim, sentence, miroir, vœu.' },
+  abysse3:    { name: 'La Nuit sans fin', desc: 'L’Abysse se déchaîne : la nuit ronge tes créatures à chaque tour (8 % de leurs PV, jamais mortel) et ses coups redoublent. Une Brisure retient la nuit un tour.' },
 };
 export const DOOM_TURNS = 3;
 export const FATIGUE_AT = 15; // tour à partir duquel l'Épuisement commence
 function bossPhase(st, ev) {
   const b = front(st, 'enemy').find((u) => u.boss && u.hp > 0);
+  if (b && st.bossKey === 'abysse') { // v392 : trois phases (2/3 et 1/3 de ses PV), jamais « déchaîné » d'emblée
+    const ph = b.hp <= b.maxHp / 3 ? 3 : b.hp <= (b.maxHp * 2) / 3 ? 2 : 1;
+    if (ph > (b.ph || 1)) {
+      if (ph >= 2 && (b.ph || 1) < 2) { b.ph = 2; b.phase2 = true; b.atk = Math.round(b.atk * 1.15 + 0.5); ev.push({ t: 'phase2', u: b.uid, s: 'L’Abysse : L’Écho des gardiens !', key: 'abysse' }); logBoss(st, 'L’Écho des gardiens'); }
+      if (ph === 3) { b.ph = 3; b.night = true; b.form = 2; b.charged = null; b.atk = Math.round(b.atk * 1.4 + 0.5); ev.push({ t: 'phase2', u: b.uid, s: 'L’Abysse : La Nuit sans fin !', key: 'abysse3' }); logBoss(st, 'La Nuit sans fin'); }
+    }
+    return;
+  }
   if (!b || b.phase2 || (b.hp > b.maxHp / 2 && !b.awakened)) return;
   b.phase2 = true; b.atk = Math.round(b.atk * 1.2 + 0.5);
   const P = PHASE2[st.bossKey];
@@ -1127,6 +1156,14 @@ function bossTick(st, ev) {
     const fr = front(st, 'ally').filter((x) => x.hp > 0), sick = fr.filter((x) => x.poison > 0), k = b.phase2 ? 2 : 1;
     const clean = fr.filter((x) => !x.poison);
     if (sick.length && clean.length) { ev.push({ t: 'status', u: b.uid, s: 'La contagion se répand', k: 'bad' }); clean.forEach((x) => addPoison(st, x, k * sick.length, ev, b)); }
+  }
+  if (b && st.bossKey === 'bete') {
+    if (b.broken && (b.grown || 0) > 0) { b.grown = Math.max(0, b.grown - 2); b.atk = Math.max(1, b.atk - 2); ev.push({ t: 'status', u: b.uid, s: 'Brisée, elle rétrécit', syn: true }); }
+    else if (!b.broken && (b.phase2 || st.round % 2 === 0)) { const g0 = Math.round(b.maxHp * 0.02); b.grown = (b.grown || 0) + 1; b.atk += 1; b.maxHp += g0; b.hp += g0; ev.push({ t: 'status', u: b.uid, s: `Elle grandit : ${b.atk} ATQ`, k: 'bad' }); }
+  }
+  if (b && b.night && !b.broken) {
+    ev.push({ t: 'status', u: b.uid, s: 'La nuit dévore', k: 'bad' });
+    for (const x of front(st, 'ally')) { if (x.hp > 1) hurt(st, x, Math.min(x.hp - 1, Math.max(1, Math.round(x.maxHp * 0.08))), ev, null, { pierce: true }); }
   }
   if (b && b.forge && !b.broken) { b.atk += 1; ev.push({ t: 'status', u: b.uid, s: `Forge ardente : ${b.atk} ATQ`, k: 'bad' }); }
   if (b && b.doom != null && !b.broken) {
@@ -1203,6 +1240,7 @@ export function enemyAct(st, aUid, defense = 'none') {
   if (!e || e.hp <= 0 || st.over || !e.intent) return ev;
   const it = e.intent, kind = it.kind;
   e.intent = null;
+  if (e.boss && st.bossKey === 'juge' && kind !== 'verdict' && st.forbid) { st.forbid = null; ev.push({ t: 'law', forbid: null }); }
   ev.push({ t: 'eact', a: aUid, kind, tgt: it.t });
   let dealt = 0;
   const big = BIG.includes(kind);
@@ -1334,6 +1372,16 @@ export function enemyAct(st, aUid, defense = 'none') {
     gainFervor(st, 3, ev, 'Vœu exaucé');
     if (st.init) front(st, 'ally').forEach((x) => { if (x.hp > 0) gainPA(x, 1, ev); });
     ev.push({ t: 'boss', u: aUid, s: 'Vœu exaucé… le prix viendra' });
+  } else if (kind === 'slumber') { ev.push({ t: 'status', u: aUid, s: `Il dort… (réveil dans ${Math.max(1, 4 - st.round)} tour${4 - st.round > 1 ? 's' : ''})`, k: 'charge' }); }
+  else if (kind === 'quake') {
+    e.asleep = false;
+    const m = 1 + Math.min(1, (e.sleepDmg || 0) / e.maxHp) * 1.5;
+    logBoss(st, 'Séisme'); ev.push({ t: 'boss', u: aUid, s: `Le Titan s’éveille : Séisme ×${m.toFixed(1)}` }); ev.push({ t: 'aoe', u: aUid, side: 'enemy' });
+    if (defense !== 'none') defended(st, e, null, ev, defense, 'blast');
+    else for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, 0.8 * m * pow), ev, aUid); }
+  } else if (kind === 'verdict') {
+    st.forbid = it.forbid; logBoss(st, 'Verdict');
+    ev.push({ t: 'boss', u: aUid, s: `Verdict : interdit de ${FORBID[it.forbid]}` }); ev.push({ t: 'law', forbid: it.forbid });
   } else if (kind === 'tick2') {
     const t = strike(st.units[it.t], 0.6);
     if (t && t.hp > 0 && e.hp > 0) strike(t, 0.6);
@@ -1577,14 +1625,22 @@ function planIntents(st) {
     if (kind === 'shift') extra.aspect = e.aspect === 'soleil' ? 'lune' : 'soleil';
     if (kind === 'sentence') t = front(st, 'ally').filter((x) => x.hp > 0).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp || x.hp - y.hp)[0]?.uid || null;
     if (kind === 'execute') { const c = e.execT && st.units[e.execT]; t = c && c.hp > 0 ? c.uid : null; }
+    if (kind === 'verdict') { const ks = Object.keys(FORBID).filter((k) => k !== st.forbid); extra.forbid = ks[Math.floor(rand(st) * ks.length)]; }
     if (kind === 'ambush') { t = front(st, 'ally').filter((x) => x.hp > 0).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp || x.hp - y.hp)[0]?.uid || null; e.veiled = true; }
+    if (kind === 'slumber') e.asleep = true;
     if (kind === 'chain') t = targetsFor(st, 'enemy', e).map((id) => st.units[id]).sort((x, y) => (y.atk + (y.boost || 0)) - (x.atk + (x.boost || 0)))[0]?.uid || null;
     e.intent = { kind, t, qte: qteFor(e, kind) || (kind === 'copy' && ['estoc', 'entrave', 'raz', 'contagion'].includes(extra.copy)), ...extra };
   }
 }
-const qteFor = (e, kind) => ['heavy', 'blast', 'frost', 'gorge', 'blizzard', 'swarm', 'execute', 'lament', 'chain', 'ambush', 'price'].includes(kind) || ((e.boss || e.elite) && ['hit', 'poison', 'tick2'].includes(kind));
+const qteFor = (e, kind) => ['heavy', 'blast', 'frost', 'gorge', 'blizzard', 'swarm', 'execute', 'lament', 'chain', 'ambush', 'price', 'quake'].includes(kind) || ((e.boss || e.elite) && ['hit', 'poison', 'tick2'].includes(kind));
 function intentKind(st, e) {
   if (e.charged) return e.charged;
+  if (e.boss && st.bossKey === 'abysse') {
+    const ph = e.ph || 1;
+    if (ph === 1) return st.round % 3 === 0 ? 'channel' : 'hit';
+    if (ph === 2) return st.round % 2 === 0 ? ABYSS_ECHOES[(e.echo = ((e.echo ?? -1) + 1)) % ABYSS_ECHOES.length] : 'hit';
+    return st.round % 2 === 0 ? 'channel' : 'heavy';
+  }
   if (e.boss && st.bossKey) return BOSSES[st.bossKey].pattern(e.phase2 ? 2 : 1, st.round);
   const r = rand(st);
   const others = front(st, 'enemy').length > 1;
@@ -1618,12 +1674,13 @@ export function intentInfo(st, e) {
   if (m && eff) dmg = capd(eff, dmgOf(st, e, eff, m * (eff !== t ? 0.6 : 1)));
   if (it.kind === 'blast') dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, e.boss ? 1 : 0.8))));
   if (it.kind === 'blizzard') dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, 0.9))));
+  if (it.kind === 'quake') dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, 0.8 * (1 + Math.min(1, (e.sleepDmg || 0) / e.maxHp) * 1.5)))));
   if (AOE_M[it.kind]) dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, AOE_M[it.kind]))));
   if (it.kind === 'copy' && it.copy === 'raz') dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, 0.7))));
   const single = SINGLE.includes(it.kind) || !!(it.kind === 'copy' && it.t);
   const lethal = !!eff && single && dmg >= eff.hp;
-  const danger = BIG.includes(it.kind) || lethal ? 3 : ['frost', 'decree', 'shift', 'hunt', 'chain', 'rewind', 'mirror'].includes(it.kind) || PREP.includes(it.kind) || (e.boss && ['hit', 'tick2'].includes(it.kind)) ? 2 : dmg ? 1 : 0;
-  return { ...it, def: INTENTS[it.kind], dmg, target: single ? eff?.uid || null : it.t, lethal, danger, aoe: ['blast', 'blizzard'].includes(it.kind) || !!AOE_M[it.kind] || (it.kind === 'copy' && it.copy === 'raz') };
+  const danger = BIG.includes(it.kind) || lethal ? 3 : ['frost', 'decree', 'shift', 'hunt', 'chain', 'rewind', 'mirror', 'verdict'].includes(it.kind) || PREP.includes(it.kind) || (e.boss && ['hit', 'tick2'].includes(it.kind)) ? 2 : dmg ? 1 : 0;
+  return { ...it, def: INTENTS[it.kind], dmg, target: single ? eff?.uid || null : it.t, lethal, danger, aoe: ['blast', 'blizzard', 'quake'].includes(it.kind) || !!AOE_M[it.kind] || (it.kind === 'copy' && it.copy === 'raz') };
 }
 // Dégâts annoncés sur chacune de tes cartes (badges rouges)
 export function threats(st) {
@@ -1801,7 +1858,7 @@ export function endTurn(st, defense = () => 'none') {
 // Bilan d'un combat terminé, en quelques phrases simples (noms fournis par l'appelant).
 // Défaite : qui a fait le plus de dégâts, quelle attaque a été décisive, défenses manquées, conseil.
 // Victoire : le fait marquant (Brisure, parades, enchaînements, coups de grâce).
-const KIND_TXT = { heavy: 'un coup chargé', blast: 'une déflagration', gorge: 'le festin du Dévoreur', blizzard: 'une tempête de givre', copy: 'une copie de ta créature', swarm: 'l’Essaim', execute: 'l’exécution du Bourreau', lament: 'la Complainte', chain: 'les Chaînes', tick2: 'un double tic', rewind: 'l’Horloger', hit: 'une attaque', poison: 'le poison', frost: 'le gel' };
+const KIND_TXT = { heavy: 'un coup chargé', blast: 'une déflagration', gorge: 'le festin du Dévoreur', blizzard: 'une tempête de givre', copy: 'une copie de ta créature', swarm: 'l’Essaim', execute: 'l’exécution du Bourreau', lament: 'la Complainte', chain: 'les Chaînes', tick2: 'un double tic', rewind: 'l’Horloger', quake: 'le Séisme du Titan', ambush: 'l’Embuscade', price: 'le Prix de la Dame', hit: 'une attaque', poison: 'le poison', frost: 'le gel' };
 // ——— Objectifs bonus : un par combat de la Descente ———
 // rooms : salles où l'objectif peut tomber. state : 'done' (réussi), 'fail' (raté), sinon en cours.
 export const GOALS = {

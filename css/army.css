@@ -3484,3 +3484,10 @@ html.fx-light .dv-c .dv-hp.low .hpr::after { animation: none; }
 /* v391 : les cartes des grilles hors de l'écran ne sont ni mises en page ni dessinées tant qu'on n'y défile pas
    (Équipe, Collection, Fournaise… : des centaines de cartes) ; la taille réservée garde la barre de défilement juste */
 .grid-cards > * { content-visibility: auto; contain-intrinsic-size: auto 240px; }
+
+/* v392 : les Jumeaux du Crépuscule, le jumeau de la Nuit aussi grand que celui du Jour ; L'Abysse, la Nuit sans fin assombrit la salle */
+.dv-row.enemy .dv-c.has-fig:nth-last-child(3) + .dv-c.twin, .dv-row.enemy .dv-c.twin { scale: 1.04; translate: 0 -4%; z-index: 3; }
+.dv-c.has-fig.twin .dv-bfig { filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .85)) drop-shadow(0 0 12px rgba(140, 110, 255, .55)); }
+.dv.abyss-night .dio { filter: brightness(.42) saturate(1.5) hue-rotate(-12deg); transition: filter 1.2s; }
+/* cadre de l'Œil de l'Abysse */
+.pf-oeil { border-color: #B04BFF; box-shadow: 0 0 0 2px #000, 0 0 12px #7A2BFF, 0 0 26px rgba(242, 193, 78, .55); }

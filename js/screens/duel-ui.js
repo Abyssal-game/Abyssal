@@ -12,7 +12,7 @@ import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
 import { cardHTML } from '../ui/card.js';
 import {
-  BOSS_POWERS, INTENTS, SYNERGIES, PACK_BONUS, FERVOR_MAX, AP_MAX, PA_MAX, passTurn, speedOf, front, reserve, actionsFor, actionTargets, act, preview,
+  BOSS_POWERS, FORBID, INTENTS, SYNERGIES, PACK_BONUS, FERVOR_MAX, AP_MAX, PA_MAX, passTurn, speedOf, front, reserve, actionsFor, actionTargets, act, preview,
   ENTRANCES, GOALS, goalState, RUNES, runesLeft, SERVANT_POWER, RHYTHM, PHASE2, beginEnemyTurn, nextEnemy, enemyAct, endEnemyTurn, takeSkips, defenseWindow, threats, intentInfo, useUlt, ultReady, autoActs, comboOf,
 } from '../core/duel.js';
 import { KITS, AI_FAMILIES, DICE_TIERS, WEAK_TO, TALENTS } from '../core/skills.js';
@@ -47,7 +47,8 @@ const fxUrl = (n) => `assets/fx/${FX_FALLBACK[n] && !FX_NEW.has(n) ? FX_FALLBACK
 const DANGER = ['', '', 'Danger', 'Mortel'];
 // Icône peinte d'une intention ennemie
 // les intentions des gardiens réutilisent les icônes peintes les plus proches
-const IN_PIC = { gorge: 'heavy', gather: 'channel', blizzard: 'frost', mimic: 'channel', copy: 'heavy', decree: 'rally', shift: 'charge', brood: 'channel', swarm: 'poison', sentence: 'charge', execute: 'heavy', chant: 'channel', lament: 'blast', chain: 'frost', wind: 'charge', rewind: 'heal', tick2: 'hit', mirror: 'shield', ambush: 'heavy', wish: 'heal', price: 'blast' };
+const FORBID_SHORT = { attack: 'attaque', skill: 'compétences', defend: 'défense' };
+const IN_PIC = { gorge: 'heavy', gather: 'channel', blizzard: 'frost', mimic: 'channel', copy: 'heavy', decree: 'rally', shift: 'charge', brood: 'channel', swarm: 'poison', sentence: 'charge', execute: 'heavy', chant: 'channel', lament: 'blast', chain: 'frost', wind: 'charge', rewind: 'heal', tick2: 'hit', mirror: 'shield', ambush: 'heavy', wish: 'heal', price: 'blast', slumber: 'shield', quake: 'blast', verdict: 'rally' };
 const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${IN_PIC[k] || k}.webp">`;
 
 export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = null, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.' }) {
@@ -160,8 +161,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const intentChip = (u) => {
     const i = intentInfo(st, u);
     if (!i || st.turn !== 'ally') return '';
-    const named = ['hunt', 'charge', 'channel', 'shield', 'heal', 'rally', 'frost', 'gather', 'mimic', 'decree', 'shift', 'brood', 'sentence', 'chant', 'wind', 'rewind', 'chain', 'mirror', 'wish'].includes(i.kind);
-    const label = i.kind === 'mimic' ? `Copie : ${esc(i.copyName)}` : i.kind === 'decree' ? esc(LAWS[i.law]?.name || 'Décret') : i.kind === 'shift' ? esc(ASPECTS[i.aspect]?.name || 'Bascule')
+    const named = ['hunt', 'charge', 'channel', 'shield', 'heal', 'rally', 'frost', 'gather', 'mimic', 'decree', 'shift', 'brood', 'sentence', 'chant', 'wind', 'rewind', 'chain', 'mirror', 'wish', 'slumber', 'verdict'].includes(i.kind);
+    const label = i.kind === 'verdict' ? `Verdict : ${esc(FORBID_SHORT[i.forbid] || '')}` : i.kind === 'mimic' ? `Copie : ${esc(i.copyName)}` : i.kind === 'decree' ? esc(LAWS[i.law]?.name || 'Décret') : i.kind === 'shift' ? esc(ASPECTS[i.aspect]?.name || 'Bascule')
       : named ? esc(i.def.name) : i.kind === 'copy' ? `${esc(i.copyName)}${i.dmg ? ` ${i.dmg}` : ''}` : `${i.dmg}${i.aoe ? ' ×3' : ''}`;
     const brk = u.brkMax && !u.broken && i.danger >= 2 ? `<small class="cb-ibrk" title="Brise-le pour annuler cette action">◆ ${u.brk}</small>` : '';
     const cd = ['charge', 'channel', 'gather', 'mimic', 'brood', 'sentence', 'chant', 'wind', 'wish'].includes(i.kind) ? '<em class="cb-icd" title="Frappe au prochain tour">⏳1</em>' : '';
@@ -181,22 +182,24 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const cardWarn = (u) => { const now = bigOf(u, false), nx = now ? null : bigOf(u, true), k = now || nx; if (!k) return ''; const real = PREP_IT[k] || k; const help = u.boss ? Math.min(2, front(st, 'enemy').filter((x) => x !== u && x.hp > 0).length) : 0;
     return `<span class="cb-warn ${PREP_IT[k] || nx ? 'prep' : ''}" title="${esc(INTENTS[real].desc)}${help ? ` Renforcée par ses serviteurs : +${help * SERVANT_POWER * 100} %.` : ''}">${intentIcon(real)}<b>${esc(INTENTS[real].name)}${help ? ` +${help * SERVANT_POWER * 100} %` : ''}</b><small>${now && !PREP_IT[now] ? 'à son tour' : 'au tour suivant'}</small></span>`; };
   // v368 : les cinq gardiens ont leur figure peinte (Gemini, détourée) qui sort de leur carte par le haut
-  const BOSS_FIG = new Set(['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'golem', 'peste', 'chasseur', 'voeux']);
+  const BOSS_FIG = new Set(['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'golem', 'peste', 'chasseur', 'voeux', 'titan', 'jumeaux', 'juge', 'bete', 'abysse']);
   // v375 : un gardien n'est pas une carte de la collection — son nom et sa figure peinte partout en combat
-  const isFig = (u) => u?.boss && BOSS_FIG.has(st.bossKey);
-  const uName = (u) => (u?.boss && st.bossKey && BOSSES[st.bossKey] ? BOSSES[st.bossKey].name : cat.get(u.id)?.name || '');
-  const uPic = (u) => (isFig(u) ? `assets/bosses/${st.bossKey}.webp` : artUrl(cat.get(u.id), { lite: true }));
+  // v392 : le jumeau de la Nuit a sa propre figure ; l'Abysse change de forme dans sa dernière phase
+  const isFig = (u) => (u?.boss || u?.twin) && BOSS_FIG.has(st.bossKey);
+  const figKey = (u) => (u.twin ? 'jumeaux-nuit' : st.bossKey === 'abysse' && u.form === 2 ? 'abysse-2' : st.bossKey);
+  const uName = (u) => (u?.twin ? 'Le Jumeau de la Nuit' : u?.boss && st.bossKey === 'jumeaux' ? 'Le Jumeau du Jour' : u?.boss && st.bossKey && BOSSES[st.bossKey] ? BOSSES[st.bossKey].name : cat.get(u.id)?.name || '');
+  const uPic = (u) => (isFig(u) ? `assets/bosses/${figKey(u)}.webp` : artUrl(cat.get(u.id), { lite: true }));
   const cardEl = (u) => {
     const c = cat.get(u.id), kit = KITS[u.role];
     const dead = u.hp <= 0, enemy = u.side === 'enemy';
     const ready = !enemy && st.turn === 'ally' && actionsFor(st, u.uid).some((a) => a.ok && a.key !== 'swap');
     const tgt = tgtInfo[u.uid];
-    return `<button class="dv-c ${u.side} ${u.boss && BOSS_FIG.has(st.bossKey) ? 'has-fig' : ''} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${!dead && u.hp <= u.maxHp * 0.3 ? 'hp3' : !dead && u.hp <= u.maxHp * 0.6 ? 'hp2' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.phase2 ? 'p2' : ''} ${u.defend ? 'def' : ''} ${!enemy && !dead && (u.frozen || u.stunned) ? 'unav' : ''} ${u.broken ? 'broken' : ''} ${u.cracked ? 'fele' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" data-rar="${u.rarity}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(uName(u))}, ${Math.max(0, u.hp)} PV">
+    return `<button class="dv-c ${u.side} ${isFig(u) ? 'has-fig' : ''} ${u.twin ? 'twin' : ''} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${!dead && u.hp <= u.maxHp * 0.3 ? 'hp3' : !dead && u.hp <= u.maxHp * 0.6 ? 'hp2' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.phase2 ? 'p2' : ''} ${u.defend ? 'def' : ''} ${!enemy && !dead && (u.frozen || u.stunned) ? 'unav' : ''} ${u.broken ? 'broken' : ''} ${u.cracked ? 'fele' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" data-rar="${u.rarity}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(uName(u))}, ${Math.max(0, u.hp)} PV">
       <span class="dv-base" aria-hidden="true"></span>
-      ${u.boss && BOSS_FIG.has(st.bossKey) ? `<span class="dv-art dv-bbg" aria-hidden="true"></span><img class="dv-bfig" alt="" src="assets/bosses/${st.bossKey}.webp">` /* v375 : le gardien n'a plus de carte derrière lui */ : `<span class="dv-art"><img alt="" decoding="async" src="${artUrl(c, { lite: true })}"><span class="dv-crk" aria-hidden="true"></span></span>`}
+      ${isFig(u) ? `<span class="dv-art dv-bbg" aria-hidden="true"></span><img class="dv-bfig" alt="" src="assets/bosses/${figKey(u)}.webp">` /* v375 : le gardien n'a plus de carte derrière lui */ : `<span class="dv-art"><img alt="" decoding="async" src="${artUrl(c, { lite: true })}"><span class="dv-crk" aria-hidden="true"></span></span>`}
       <span class="dv-kw ${enemy && u.fam ? 'fam' : ''}" title="${esc(enemy && u.fam ? AI_FAMILIES[u.fam].desc : kit.name)}">${roleIcon(kit.kw)}<em>${esc(enemy && u.fam ? AI_FAMILIES[u.fam].name : kit.name)}</em></span>
       ${u.boss ? `<span class="dv-boss"><img alt="" src="assets/icons/crest-boss.webp">${u.phase2 ? 'Furie' : 'Gardien'}</span>` : u.elite ? '<span class="dv-boss elite"><img alt="" src="assets/icons/crest-elite.webp">Élite</span>' : ''}
-      <span class="dv-nm ${u.named || (u.boss && st.bossKey) ? 'named' : ''}">${esc(u.boss && st.bossKey && BOSSES[st.bossKey] ? BOSSES[st.bossKey].name : u.named ? u.title : c.name)}</span>
+      <span class="dv-nm ${u.named || ((u.boss || u.twin) && st.bossKey) ? 'named' : ''}">${esc((u.boss || u.twin) && st.bossKey && BOSSES[st.bossKey] ? uName(u) : u.named ? u.title : c.name)}</span>
       ${u.brkMax ? `<span class="cb-brk ${u.broken || u.cracked ? 'is-broken' : ''} ${u.cracked ? 'is-fele' : ''}" title="Brisure">${u.broken ? '<img alt="" src="assets/icons/st-broken.webp"><b>BRISÉ</b>' : u.cracked ? '<b>FÊLÉ</b>' : `<i style="width:${(u.brk / u.brkMax) * 100}%"></i>`}</span>` : ''}
       <span class="dv-atk">${icon('swords')}<b>${u.atk + (u.boost || 0)}</b></span>
       <span class="dv-hp ${u.hp < u.maxHp ? 'hurt' : ''} ${u.hp > 0 && u.hp <= u.maxHp * 0.3 ? 'low' : ''}" style="--hpp:${Math.max(0, Math.min(100, Math.round((Math.max(0, u.hp) / Math.max(1, u.maxHp)) * 100)))}">${icon('heart')}<i class="hpr" aria-hidden="true"></i><b>${Math.max(0, u.hp)}</b></span>
@@ -267,10 +270,13 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const rules = [gl ? `<span class="cb-law cb-goal s-${gl.state}" data-d="rule" data-k="goal"><img class="cb-gico" alt="" src="assets/icons/goal.webp">${gl.state === 'done' ? '✓ ' : gl.state === 'fail' ? '✗ ' : ''}<b>${esc(gl.name)}</b>${gl.p && gl.state === 'pending' ? ` <small>${gl.p}</small>` : ''}</span>` : '',
       st.pact && PACTS[st.pact] ? `<span class="cb-law" style="--pk:${PACTS[st.pact].color}" data-d="rule" data-k="pact">${icon('p:seal')}<b>${esc(PACTS[st.pact].name)}</b></span>` : '',
       st.law ? `<span class="cb-law" data-d="rule" data-k="law"><b>${esc(LAWS[st.law].name)}</b></span>` : '',
+      st.forbid ? `<span class="cb-law cb-forbid" title="Verdict du Juge : interdit de ${esc(FORBID[st.forbid])} jusqu’à sa prochaine action"><b>Interdit : ${esc(FORBID_SHORT[st.forbid])}</b></span>` : '',
       st.aspect ? `<span class="cb-law" data-d="rule" data-k="aspect"><b>${esc(ASPECTS[st.aspect].name)}</b></span>` : '',
       st.runes ? `<span class="cb-law cb-runes" data-d="rule" data-k="runes" title="Runes du gardien">${st.runes.map((r) => `<img alt="" src="assets/ui/${r.broken ? 'rune-broken' : 'rune'}.webp" class="${r.broken ? 'off' : ''}">`).join('')}<b>${runesLeft(st) ? `−${runesLeft(st) * 10} %` : 'Rompues'}</b></span>` : '',
       st.omen && OMENS[st.omen] ? `<span class="cb-law" data-d="rule" data-k="omen">${icon(OMENS[st.omen].icon)}<b>Présage</b></span>` : (st.relics || []).length ? `<span class="cb-law" data-d="rule" data-k="relics">${icon('p:crown')}<b>${st.relics.length} relique${st.relics.length > 1 ? 's' : ''}</b></span>` : ''].join('');
     const rulesEl = $('.cb-rules'); if (rulesEl) { setHTML(rulesEl, rules); rulesEl.hidden = !rules; }
+    const night = st.bossKey === 'abysse' && Object.values(st.units).some((u) => u.boss && u.night && u.hp > 0), dvEl = $('.dv'); /* v392 : la Nuit sans fin assombrit et fissure la salle */
+    if (dvEl && dvEl.classList.contains('abyss-night') !== night) dvEl.classList.toggle('abyss-night', night);
     patchRow(alEl, front(st, 'ally').map((u) => ({ uid: u.uid, html: cardEl(u) })));
     const sw = st.swallowed && st.units[st.swallowed];
     setHTML($('.dv-resw'), resHTML('ally') + (sw?.swallowed ? `<span class="cb-swal" title="Engloutie : brise le Dévoreur pour la libérer"><img alt="" src="${artUrl(cat.get(sw.id), { lite: true })}"><small>Engloutie · ${sw.hp} PV</small></span>` : ''));
@@ -301,7 +307,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   // Ordre des tours (v258) : frise horizontale de portraits en haut de l’écran (v270). Ton équipe joue ensemble, puis chaque ennemi à son tour.
   let tlSig = '', acting = null;
   // v265 : seules les grosses attaques des gardiens et des élites s'annoncent sur la frise (les coups ordinaires restent cachés)
-  const BIG_IT = ['heavy', 'blast', 'gorge', 'blizzard', 'copy', 'swarm', 'execute', 'lament', 'ambush', 'price'], PREP_IT = { charge: 'heavy', channel: 'blast', gather: 'blizzard', mimic: 'copy', brood: 'swarm', sentence: 'execute', chant: 'lament', wish: 'price' };
+  const BIG_IT = ['heavy', 'blast', 'gorge', 'blizzard', 'copy', 'swarm', 'execute', 'lament', 'ambush', 'price', 'quake'], PREP_IT = { charge: 'heavy', channel: 'blast', gather: 'blizzard', mimic: 'copy', brood: 'swarm', sentence: 'execute', chant: 'lament', wish: 'price' };
   const bigOf = (u, next) => {
     if (!(u.boss || u.elite) || u.hp <= 0) return null;
     const it = u.intent && !u.intent.cancelled ? u.intent.kind : null;
@@ -708,7 +714,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         case 'pa': { const t = el(e.u); if (t && st.units[e.u]?.side === 'ally') { float(e.u, `+${e.d} PA`, 'pa'); app.sfx.pa?.(); } break; }
         case 'phase': draw(); say(e.side === 'enemy' ? '<b class="dc-bad">Tour des créatures corrompues</b>' : 'À toi !'); turnBanner(e.side); await wait(T(e.side === 'enemy' ? 520 : 420)); break;
         case 'ult': if (st.ult === 'sceau') dio.seal(); else dio.ult(); await ultFx(); break;
-        case 'law': if (e.aspect) dio.aspect(e.aspect); draw(); banner(e.fatigue ? `${icon('skull')} Épuisement : chaque tour blesse tout le monde` : e.law ? esc(LAWS[e.law].name) : esc(ASPECTS[e.aspect].name), e.fatigue ? 'danger' : 'skill', 1300); await wait(T(e.fatigue ? 900 : 700)); break;
+        case 'law':
+          if ('forbid' in e) { draw(); if (e.forbid) { banner(`${icon('skull')} Verdict : interdit de ${esc(FORBID[e.forbid])}`, 'danger', 1300); await wait(T(800)); } break; }
+          if (e.aspect) dio.aspect(e.aspect); draw(); banner(e.fatigue ? `${icon('skull')} Épuisement : chaque tour blesse tout le monde` : e.law ? esc(LAWS[e.law].name) : esc(ASPECTS[e.aspect].name), e.fatigue ? 'danger' : 'skill', 1300); await wait(T(e.fatigue ? 900 : 700)); break;
         default: break;
       }
     }
@@ -719,7 +727,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   // nom du coup. Plus court quand la créature l'a déjà eu dans ce combat ; un toucher le passe ; absent si les
   // animations sont réduites ou en vitesse ×3.
   const shotSeen = new Set();
-  const BOSS_SHOT = new Set(['heavy', 'blast', 'charge', 'gorge', 'gather', 'blizzard', 'mimic', 'copy', 'decree', 'shift', 'brood', 'swarm', 'sentence', 'execute', 'chant', 'lament', 'chain', 'wind', 'rewind', 'mirror', 'ambush', 'wish', 'price']);
+  const BOSS_SHOT = new Set(['heavy', 'blast', 'charge', 'gorge', 'gather', 'blizzard', 'mimic', 'copy', 'decree', 'shift', 'brood', 'swarm', 'sentence', 'execute', 'chant', 'lament', 'chain', 'wind', 'rewind', 'mirror', 'ambush', 'wish', 'price', 'quake', 'verdict']);
   // v357 : « la carte s'éveille » (remplace le plan en pleine illustration, jugé sans intérêt par le propriétaire) :
   // la carte se soulève et s'illumine à la couleur de sa faction, un cercle magique de la faction tourne sous elle,
   // le nom du coup s'affiche au-dessus. Ennemis : la carte gronde, rougit et tremble. Puis le sort part sur la cible.
