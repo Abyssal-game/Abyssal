@@ -86,6 +86,7 @@ window.__abyssal = app; // accès pour les tests automatisés
 function applySettings() {
   const s = app.game.s.settings;
   document.documentElement.classList.toggle('reduce-motion', s.motion === 'reduced');
+  document.documentElement.classList.toggle('fx-light', s.quality === 'light');
   configureSound(s);
   configureMusic(s);
 }

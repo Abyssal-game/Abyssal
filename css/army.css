@@ -3392,3 +3392,10 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 .dv-c.has-fig .dv-kw, .dv-c.has-fig .dv-boss { display: none; }
 .dv.cb .dv-c.has-fig .cb-tgt { top: auto !important; bottom: 3% !important; z-index: 6; }
 .dv-c.has-fig .dv-bfig { bottom: 36%; }
+
+/* v374 : effets des combats « Allégés » (Réglages) — plus d'animations en boucle sur le plateau */
+html.fx-light .dv-c.has-fig .dv-bfig, html.fx-light .dv-base, html.fx-light .dv-base::before, html.fx-light .dv-c.target .cb-tgt,
+html.fx-light .dv .cb-a.sig::after, html.fx-light .dv-int, html.fx-light .cb-int, html.fx-light .dv-threat, html.fx-light .cb-warn,
+html.fx-light .cast-circ, html.fx-light .dio * { animation: none !important; }
+html.fx-light .cast-circ { display: none; }
+html.fx-light .dv-ghost, html.fx-light .dv-cut, html.fx-light .dv-soul::before { display: none; }

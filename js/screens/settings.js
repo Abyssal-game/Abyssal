@@ -42,6 +42,8 @@ export default function settings(app, root) {
         ${seg('defense', 'Défense active en combat', [['on', 'Manuelle'], ['auto', 'Automatique']])}
         <p class="small muted set-note">Manuelle : touche dans la zone dorée pour esquiver, sur le trait blanc pour une parade parfaite. Automatique : rien à toucher, mais seulement 4 esquives sur 10 et jamais de parade parfaite (moins de Ferveur et de PA).</p>
         ${seg('decor', 'Décor des combats', [['riche', 'Riche'], ['sobre', 'Sobre']])}
+        ${seg('quality', 'Effets des combats', [['auto', 'Complets'], ['light', 'Allégés']])}
+        <p class="small muted">Allégés : moins de particules, ni secousses de caméra ni éclairs, décor sobre. À essayer si les combats saccadent.</p>
         <p class="small muted set-note">Sobre : la salle reste en place, sans particules ni flammes qui vacillent. Plus reposant, et un peu plus économe en batterie.</p>
         ${toggle('fastOpen', 'Ouverture rapide des boosters', 'Affiche directement le récapitulatif, sans révéler les cartes une par une.')}
       </section>

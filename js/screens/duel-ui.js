@@ -56,6 +56,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   const ui = (app.state.duel ||= { fast: 0 });
   ui.fast = g.s.settings.combatFast ? 1 : 0; // v331 : bouton ×2 de retour (étude joueurs : un combat ≈ 1,2 min) ; la défense active garde son rythme
   const reduced = app.reduced();
+  const light = g.s.settings?.quality === 'light'; // v374 : « Effets allégés » (Réglages) pour les téléphones qui peinent
   const T = (ms) => (reduced ? Math.min(ms, 80) : ui.fast === 3 ? ms * 0.25 : ui.fast ? ms * 0.45 : ms); // vitesse ×1, ×2 ou ×3
   const defMode = g.s.settings?.defense === 'auto' ? 'auto' : 'on'; // v269 : manuelle ou automatique (v333 : mode « assistée » retiré, il redevient manuel)
   let alive_ = true, busy = false, sel = null, mode = null; // mode : action en attente de cible
@@ -89,7 +90,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     </div>
   </div>`;
   const $ = (s) => root.querySelector(s);
-  const dio = mountDiorama($('.dv'), { room, decor: g.s.settings?.decor || 'riche', reduced, aspect: st.aspect });
+  const dio = mountDiorama($('.dv'), { room, decor: light ? 'sobre' : g.s.settings?.decor || 'riche', reduced, aspect: st.aspect });
   // v362 : les planches d'effets les plus jouées sont décodées dès l'entrée en combat (sinon le premier coup saccade)
   if (!reduced) {
     const keep = new Set(['strike', 'foe-strike', 'crit-strike', 'fx-dodge', 'fx-parry', 'def-clash', 'def-ring', 'dice-ring', 'dice-charge', 'dice-perfect', 'dice-land']);
@@ -184,7 +185,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const tgt = tgtInfo[u.uid];
     return `<button class="dv-c ${u.side} ${u.boss && BOSS_FIG.has(st.bossKey) ? 'has-fig' : ''} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${!dead && u.hp <= u.maxHp * 0.3 ? 'hp3' : !dead && u.hp <= u.maxHp * 0.6 ? 'hp2' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.phase2 ? 'p2' : ''} ${u.defend ? 'def' : ''} ${!enemy && !dead && (u.frozen || u.stunned) ? 'unav' : ''} ${u.broken ? 'broken' : ''} ${u.cracked ? 'fele' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" data-rar="${u.rarity}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(c.name)}, ${Math.max(0, u.hp)} PV">
       <span class="dv-base" aria-hidden="true"></span>
-      <span class="dv-art"><img alt="" src="${artUrl(c)}"><span class="dv-crk" aria-hidden="true"></span></span>${u.boss && BOSS_FIG.has(st.bossKey) ? `<img class="dv-bfig" alt="" src="assets/bosses/${st.bossKey}.webp">` : ''}
+      <span class="dv-art"><img alt="" decoding="async" src="${artUrl(c, { lite: true })}"><span class="dv-crk" aria-hidden="true"></span></span>${u.boss && BOSS_FIG.has(st.bossKey) ? `<img class="dv-bfig" alt="" src="assets/bosses/${st.bossKey}.webp">` : ''}
       <span class="dv-kw ${enemy && u.fam ? 'fam' : ''}" title="${esc(enemy && u.fam ? AI_FAMILIES[u.fam].desc : kit.name)}">${roleIcon(kit.kw)}<em>${esc(enemy && u.fam ? AI_FAMILIES[u.fam].name : kit.name)}</em></span>
       ${u.boss ? `<span class="dv-boss"><img alt="" src="assets/icons/crest-boss.webp">${u.phase2 ? 'Furie' : 'Gardien'}</span>` : u.elite ? '<span class="dv-boss elite"><img alt="" src="assets/icons/crest-elite.webp">Élite</span>' : ''}
       <span class="dv-nm ${u.named || (u.boss && st.bossKey) ? 'named' : ''}">${esc(u.boss && st.bossKey && BOSSES[st.bossKey] ? BOSSES[st.bossKey].name : u.named ? u.title : c.name)}</span>
@@ -362,9 +363,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     shakeA = d.animate([{ transform: 'none' }, ...pts.map(([x, y, r = 0]) => ({ transform: `translate(${x}px, ${y}px) rotate(${r}deg)` })), { transform: 'none' }], { duration: dur, easing: 'ease' });
   };
   // v346 : éclair d'impact — une lumière blanche et dorée jaillit du point touché
-  const impactFlash = (uid, big) => { if (reduced) return; const t = el(uid), box = $('.dv'); if (!t || !box) return; const b = box.getBoundingClientRect(), r = t.getBoundingClientRect(); const f = document.createElement('span'); f.className = `dv-iflash ${big ? 'big' : ''} ${st.units[uid]?.side === 'ally' ? 'foe' : ''}`; f.style.cssText = `left:${r.left - b.left + r.width / 2}px;top:${r.top - b.top + r.height / 2}px`; box.appendChild(f); setTimeout(() => f.remove(), 420); };
+  const impactFlash = (uid, big) => { if (reduced || light) return; const t = el(uid), box = $('.dv'); if (!t || !box) return; const b = box.getBoundingClientRect(), r = t.getBoundingClientRect(); const f = document.createElement('span'); f.className = `dv-iflash ${big ? 'big' : ''} ${st.units[uid]?.side === 'ally' ? 'foe' : ''}`; f.style.cssText = `left:${r.left - b.left + r.width / 2}px;top:${r.top - b.top + r.height / 2}px`; box.appendChild(f); setTimeout(() => f.remove(), 420); };
   const sparks = (uid, cls = '') => {
-    if (reduced) return;
+    if (reduced || light) return;
     const t = el(uid); if (!t) return;
     const b = document.createElement('span'); b.className = `dv-burst ${cls}`;
     b.innerHTML = Array.from({ length: 10 }, (_, i) => `<i style="--a:${i * 36 + Math.round(Math.random() * 20)}deg;--r:${30 + Math.round(Math.random() * 26)}px"></i>`).join('');
@@ -383,7 +384,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   };
   // Caméra simulée : léger glissement vers un point de l'écran (jamais sur les commandes)
   const cam = (uid, k = 1) => {
-    if (reduced) return;
+    if (reduced || light) return;
     const d = $('.dv'), t = el(uid); if (!d || !t) return;
     const b = d.getBoundingClientRect(), r = t.getBoundingClientRect();
     const cx = ((r.left + r.width / 2 - b.left) / b.width - 0.5) * -10 * k, cy = ((r.top + r.height / 2 - b.top) / b.height - 0.5) * -10 * k;
@@ -484,7 +485,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const f = cat.get(u.id)?.faction || 'infernal', b = box.getBoundingClientRect(), r = t.getBoundingClientRect();
     const n = document.createElement('span'); n.className = `dv-soul f-${f}`;
     n.style.cssText = `left:${r.left - b.left + r.width / 2}px;top:${r.top - b.top + r.height / 2}px;width:${r.width}px;height:${r.height}px`;
-    n.innerHTML = Array.from({ length: 16 }, () => `<i style="--x:${(Math.random() * 100 - 50).toFixed(0)}%;--y:${(Math.random() * 60 - 20).toFixed(0)}%;--dx:${(Math.random() * 80 - 40).toFixed(0)}px;--dl:${(Math.random() * 0.35).toFixed(2)}s;--sz:${(4 + Math.random() * 7).toFixed(1)}px;--rt:${Math.round(Math.random() * 360)}deg"></i>`).join('');
+    n.innerHTML = Array.from({ length: light ? 6 : 12 }, () => `<i style="--x:${(Math.random() * 100 - 50).toFixed(0)}%;--y:${(Math.random() * 60 - 20).toFixed(0)}%;--dx:${(Math.random() * 80 - 40).toFixed(0)}px;--dl:${(Math.random() * 0.35).toFixed(2)}s;--sz:${(4 + Math.random() * 7).toFixed(1)}px;--rt:${Math.round(Math.random() * 360)}deg"></i>`).join('');
     box.appendChild(n); setTimeout(() => n.remove(), 1500);
   };
   const ring = (uid, cls) => { if (reduced) return; const t = el(uid); if (!t) return; const r = document.createElement('span'); r.className = `cb-ring ${cls}`; t.appendChild(r); setTimeout(() => r.remove(), 750); };
