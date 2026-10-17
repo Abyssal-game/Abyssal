@@ -3421,3 +3421,11 @@ html.fx-light .dv-ghost, html.fx-light .dv-cut, html.fx-light .dv-soul::before {
 .tb-info-boss img { width: min(220px, 60vw); height: auto; filter: drop-shadow(0 8px 14px rgba(0, 0, 0, .85)) drop-shadow(0 0 18px rgba(255, 60, 80, .35)); }
 .tb-info-boss small { font: italic 500 .9rem/1.2 var(--f-ui); color: #E8DCC0; }
 .dv-c.has-fig .dv-nm { z-index: 5; }
+
+/* v379 : le gardien au centre de ses deux acolytes, un peu plus haut et plus grand — translate/scale à part (ne touchent ni la
+   mise en page ni les animations en transform), ordre d'affichage seulement (le DOM et la frise ne changent pas) */
+.dv-row.enemy .dv-c.has-fig:nth-last-child(3) { order: 2; }
+.dv-row.enemy .dv-c.has-fig:nth-last-child(3) + .dv-c { order: 1; scale: .88; transform-origin: 0 100%; }
+.dv-row.enemy .dv-c.has-fig:nth-last-child(3) + .dv-c + .dv-c { order: 3; scale: .88; transform-origin: 100% 100%; }
+.dv-row.enemy .dv-c.has-fig { z-index: 4; translate: 0 -15%; scale: 1.16; }
+.dv-c.has-fig .dv-bfig { width: 150%; bottom: 14%; }
