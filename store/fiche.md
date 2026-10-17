@@ -53,7 +53,7 @@ Ouvre des boosters, collectionne 500 créatures et descends dans l'Abysse.
 
 ### Texte promotionnel (App Store, 170 caractères au plus, modifiable à tout moment)
 ```
-500 créatures légendaires, des combats tactiques et les Duels des Sceaux. Gratuit, sans publicité et sans achat : toutes les cartes se gagnent en jouant.
+500 créatures, 20 gardiens et 100 étages jusqu'au fond de l'Abysse. Gratuit, sans publicité et sans achat : toutes les cartes se gagnent en jouant.
 ```
 
 ### Mots-clés (App Store, 100 caractères au plus, séparés par des virgules, sans espace)
@@ -78,7 +78,9 @@ COLLECTIONNE
 COMBATS TACTIQUES
 • Une équipe de 5 créatures : 3 au combat, 2 en réserve
 • Chaque créature a son rôle, ses compétences et son passif
-• La Descente : affronte des élites et des gardiens en deux phases, et rapporte des coffres
+• La Descente : 100 étages, 20 gardiens aux pouvoirs uniques, et L'Abysse qui t'attend tout au fond
+• Esquive et pare les coups au bon moment, brise la garde des gardiens
+• Rapporte des coffres, et le légendaire Booster de l'Abysse
 • Une règle différente chaque jour pour changer ta stratégie
 
 LES DUELS DES SCEAUX
@@ -222,8 +224,6 @@ Au premier lancement, ABYSSAL propose de créer un compte (e-mail et mot de pass
 Pourquoi un compte est proposé : la collection de cartes (500 créatures, plusieurs semaines de jeu) est sauvegardée en ligne pour ne jamais être perdue (changement ou perte de téléphone, suppression de l'application) ; il sert aussi aux classements quotidiens, aux saisons, au Tirage des Ombres et au profil public. Seuls un e-mail et un pseudo sont demandés, et le compte se supprime dans le jeu. Suppression du compte dans le jeu : Sanctuaire → Compte → Supprimer mon compte.
 
 Modération des pseudos (seul contenu créé par les joueurs) : les pseudos insultants sont refusés. Dans un classement (Aventure → La Descente → Classement du jour), touchez le pseudo d'un autre joueur pour le signaler ou le masquer. Un pseudo signalé par plusieurs joueurs est remplacé automatiquement. Contact : abyssal.gamecards@gmail.com
-
-Suppression du compte : Sanctuaire → Compte en ligne → Supprimer mon compte.
 
 Aucun achat intégré, aucune publicité, aucun pistage.
 ```

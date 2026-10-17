@@ -15,7 +15,7 @@ const url = (p) => pathToFileURL(path.join(ROOT, p)).href;
 export const SHOTS = [
   ['carte', '500 créatures légendaires', 'Démons, dieux oubliés, dragons primordiaux…'],
   ['ouverture', 'Ouvre tes boosters', 'Holo, Or, Cosmique : chaque carte peut surprendre'],
-  ['combat', 'Combats tactiques', 'Rôles, compétences, gardiens en deux phases'],
+  ['combat', 'Combats tactiques', '20 gardiens, esquive, parade et Brisure'],
   ['equipe', 'Forge ton équipe', '3 au combat, 2 en réserve, synergies de factions'],
   ['collection', 'Complète le Bestiaire', '7 factions, 6 raretés, 17 ensembles'],
   ['sceaux', 'Les Duels des Sceaux', 'Un second jeu de cartes, contre 8 rivaux'],
