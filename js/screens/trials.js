@@ -19,7 +19,6 @@ import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
 
 const DOOR = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss' };
-const BOSS_FIGS = new Set(['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'golem', 'peste', 'chasseur', 'voeux', 'titan', 'jumeaux', 'juge', 'bete', 'abysse']);
 
 export default function trials(app, root) {
   const g = app.game, cat = app.catalog;
@@ -33,7 +32,7 @@ export default function trials(app, root) {
     const x = g.trialInfo(i), t = g.trials(), cur = t.cur === i && t.battle, B = x.boss ? BOSSES[x.boss] : null;
     const state = x.state === 'won' ? `<span class="ep-st won">${icon('check')} Gagnée</span>` : x.state === 'lost' ? `<span class="ep-st lost">${icon('close')} Perdue</span>` : cur ? '<span class="ep-st cur">En cours</span>' : '';
     return `<article class="ep-c r-${x.room} ${x.state || ''}" style="--art:url(${sceneUrl(DOOR[x.room])})">
-      <span class="ep-art">${B && BOSS_FIGS.has(x.boss) ? `<img class="ep-fig" alt="" src="assets/bosses/${x.boss}.webp">` : ''}</span>
+      <span class="ep-art"></span>
       <div class="ep-body"><span class="ep-k">Épreuve ${['I', 'II', 'III'][i]} · ${esc(x.room === 'boss' ? 'Gardien' : x.room === 'elite' ? 'Élite' : 'Combat')}</span>
         <b>${esc(B ? B.name : TRIALS[i].room === 'boss' ? 'Une élite redoutable' : TRIALS[i].name)}</b>
         <span class="small muted">${B ? esc(B.title) : TRIALS[i].room === 'boss' ? 'Bats ton premier gardien dans la Descente : il viendra ici.' : x.room === 'elite' ? 'Une créature d’élite et sa garde' : 'Des créatures corrompues'} · force de l’étage ${x.floor}</span>

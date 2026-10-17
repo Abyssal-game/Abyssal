@@ -41,7 +41,7 @@ const THEMES = {
 export const MUSIC_DEMO = [['Accueil', 'antre'], ['Boosters', 'boutique'], ['Descente', 'descente'], ['Combat', 'combat'], ['Gardien', 'boss'], ['Sceaux', 'sceaux']];
 
 // Lieu → ambiance
-const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', arsenal: 'boutique', descente: 'descente', heros: 'descente', marchand: 'descente', sceaux: 'sceaux' };
+const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', arsenal: 'boutique', descente: 'descente', heros: 'descente', marchand: 'descente', sceaux: 'sceaux', epreuves: 'descente' }; /* v408 : Épreuves du jour = ambiance de la Descente, musique de combat en combat */
 
 function init() {
   if (ctx) return ctx;
