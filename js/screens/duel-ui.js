@@ -178,14 +178,18 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     return `<span class="cb-warn ${PREP_IT[k] || nx ? 'prep' : ''}" title="${esc(INTENTS[real].desc)}${help ? ` Renforcée par ses serviteurs : +${help * SERVANT_POWER * 100} %.` : ''}">${intentIcon(real)}<b>${esc(INTENTS[real].name)}${help ? ` +${help * SERVANT_POWER * 100} %` : ''}</b><small>${now && !PREP_IT[now] ? 'à son tour' : 'au tour suivant'}</small></span>`; };
   // v368 : les cinq gardiens ont leur figure peinte (Gemini, détourée) qui sort de leur carte par le haut
   const BOSS_FIG = new Set(['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse']);
+  // v375 : un gardien n'est pas une carte de la collection — son nom et sa figure peinte partout en combat
+  const isFig = (u) => u?.boss && BOSS_FIG.has(st.bossKey);
+  const uName = (u) => (u?.boss && st.bossKey && BOSSES[st.bossKey] ? BOSSES[st.bossKey].name : cat.get(u.id)?.name || '');
+  const uPic = (u) => (isFig(u) ? `assets/bosses/${st.bossKey}.webp` : artUrl(cat.get(u.id), { lite: true }));
   const cardEl = (u) => {
     const c = cat.get(u.id), kit = KITS[u.role];
     const dead = u.hp <= 0, enemy = u.side === 'enemy';
     const ready = !enemy && st.turn === 'ally' && actionsFor(st, u.uid).some((a) => a.ok && a.key !== 'swap');
     const tgt = tgtInfo[u.uid];
-    return `<button class="dv-c ${u.side} ${u.boss && BOSS_FIG.has(st.bossKey) ? 'has-fig' : ''} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${!dead && u.hp <= u.maxHp * 0.3 ? 'hp3' : !dead && u.hp <= u.maxHp * 0.6 ? 'hp2' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.phase2 ? 'p2' : ''} ${u.defend ? 'def' : ''} ${!enemy && !dead && (u.frozen || u.stunned) ? 'unav' : ''} ${u.broken ? 'broken' : ''} ${u.cracked ? 'fele' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" data-rar="${u.rarity}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(c.name)}, ${Math.max(0, u.hp)} PV">
+    return `<button class="dv-c ${u.side} ${u.boss && BOSS_FIG.has(st.bossKey) ? 'has-fig' : ''} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${!dead && u.hp <= u.maxHp * 0.3 ? 'hp3' : !dead && u.hp <= u.maxHp * 0.6 ? 'hp2' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.phase2 ? 'p2' : ''} ${u.defend ? 'def' : ''} ${!enemy && !dead && (u.frozen || u.stunned) ? 'unav' : ''} ${u.broken ? 'broken' : ''} ${u.cracked ? 'fele' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" data-rar="${u.rarity}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(uName(u))}, ${Math.max(0, u.hp)} PV">
       <span class="dv-base" aria-hidden="true"></span>
-      <span class="dv-art"><img alt="" decoding="async" src="${artUrl(c, { lite: true })}"><span class="dv-crk" aria-hidden="true"></span></span>${u.boss && BOSS_FIG.has(st.bossKey) ? `<img class="dv-bfig" alt="" src="assets/bosses/${st.bossKey}.webp">` : ''}
+      ${u.boss && BOSS_FIG.has(st.bossKey) ? `<span class="dv-art dv-bbg" aria-hidden="true"></span><img class="dv-bfig" alt="" src="assets/bosses/${st.bossKey}.webp">` /* v375 : le gardien n'a plus de carte derrière lui */ : `<span class="dv-art"><img alt="" decoding="async" src="${artUrl(c, { lite: true })}"><span class="dv-crk" aria-hidden="true"></span></span>`}
       <span class="dv-kw ${enemy && u.fam ? 'fam' : ''}" title="${esc(enemy && u.fam ? AI_FAMILIES[u.fam].desc : kit.name)}">${roleIcon(kit.kw)}<em>${esc(enemy && u.fam ? AI_FAMILIES[u.fam].name : kit.name)}</em></span>
       ${u.boss ? `<span class="dv-boss"><img alt="" src="assets/icons/crest-boss.webp">${u.phase2 ? 'Furie' : 'Gardien'}</span>` : u.elite ? '<span class="dv-boss elite"><img alt="" src="assets/icons/crest-elite.webp">Élite</span>' : ''}
       <span class="dv-nm ${u.named || (u.boss && st.bossKey) ? 'named' : ''}">${esc(u.boss && st.bossKey && BOSSES[st.bossKey] ? BOSSES[st.bossKey].name : u.named ? u.title : c.name)}</span>
@@ -310,12 +314,12 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       const cur = [...now, ...st.init.slice((st.ip ?? -1) + 1)].map((id) => st.units[id]).filter(ok);
       const nxt = st.init.map((id) => st.units[id]).filter(ok);
       const list = [...cur.map((u) => ({ u, w: bigOf(u, false) })), { sep: st.round + 1 }, ...nxt.map((u) => ({ u, w: bigOf(u, true) }))].slice(0, 9); // v270 : frise horizontale
-      const pic = (u) => `<img alt="" src="${artUrl(cat.get(u.id), { lite: true })}">`;
+      const pic = (u) => `<img alt="" src="${uPic(u)}">`;
       const sig = list.map((x) => x.sep ? `T${x.sep}` : x.u.uid).join(',');
       const moved = tlSig && tlSig.split(',')[0] !== sig.split(',')[0];
       tlSig = sig;
       setHTML(box, list.map((x, i) => (x.sep ? `<span class="cb-tlsep" title="Tour suivant">T${x.sep}</span>`
-        : `<span class="cb-tlr ${x.u.side === 'enemy' ? 'foe' : 'al'} ${i === 0 ? 'now' : ''} ${x.u.boss ? 'boss' : x.u.elite ? 'elite' : ''} ${x.w ? 'warn' : ''}" title="${esc(cat.get(x.u.id).name)}${x.w ? ` : ${esc(INTENTS[PREP_IT[x.w] || x.w].name)}` : ''}"><span class="cb-tlp">${pic(x.u)}</span>${x.w ? '<i class="cb-tlx">!</i>' : ''}</span>`)).join(''));
+        : `<span class="cb-tlr ${x.u.side === 'enemy' ? 'foe' : 'al'} ${i === 0 ? 'now' : ''} ${x.u.boss ? 'boss' : x.u.elite ? 'elite' : ''} ${x.w ? 'warn' : ''}" title="${esc(uName(x.u))}${x.w ? ` : ${esc(INTENTS[PREP_IT[x.w] || x.w].name)}` : ''}"><span class="cb-tlp">${pic(x.u)}</span>${x.w ? '<i class="cb-tlx">!</i>' : ''}</span>`)).join(''));
       if (moved && !reduced) { box.classList.remove('shift'); void box.offsetWidth; box.classList.add('shift'); }
       return;
     }
@@ -325,13 +329,13 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const enemyNow = st.turn === 'enemy' ? q.map((id) => st.units[id]).filter((u) => u && u.hp > 0 && foes.includes(u)) : [];
     const seq = st.turn === 'ally' ? [team, ...foes, { team: true, key: `T${st.round + 1}` }, ...foes] : [...enemyNow, { team: true, key: `T${st.round + 1}` }, ...foes, { team: true }];
     const list = seq.slice(0, 5);
-    const pic = (u) => `<img alt="" src="${artUrl(cat.get(u.id), { lite: true })}">`;
+    const pic = (u) => `<img alt="" src="${uPic(u)}">`;
     const sig = list.map((x) => (x.team ? x.key : x.uid)).join(',');
     const moved = tlSig && tlSig.split(',')[0] !== sig.split(',')[0];
     tlSig = sig;
     setHTML(box, list.map((x, i) => (x.team
       ? `<span class="cb-tlr team ${i === 0 ? 'now' : ''}" title="Ton équipe"><span class="cb-tlp">${allies.slice(0, 3).map(pic).join('')}</span></span>`
-      : `<span class="cb-tlr foe ${i === 0 ? 'now' : ''} ${x.boss ? 'boss' : x.elite ? 'elite' : ''}" title="${esc(cat.get(x.id).name)}"><span class="cb-tlp">${pic(x)}</span></span>`)).join(''));
+      : `<span class="cb-tlr foe ${i === 0 ? 'now' : ''} ${x.boss ? 'boss' : x.elite ? 'elite' : ''}" title="${esc(uName(x))}"><span class="cb-tlp">${pic(x)}</span></span>`)).join(''));
     if (moved && !reduced) { box.classList.remove('shift'); void box.offsetWidth; box.classList.add('shift'); }
   }
   function drawAims() {
@@ -683,7 +687,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
             dio.fallen();
             app.sfx.boss(); await hitstop(220); app.sfx.death();
             fxAt(e.u, 'death', { big: true }); sparks(e.u, 'big'); deathFx(e.u); el(e.u)?.classList.add('dying', 'ashes'); shake(true);
-            banner(`${esc(cat.get(u.id).name)} est vaincu`, 'finisher', 1300);
+            banner(`${esc(uName(u))} est vaincu`, 'finisher', 1300);
             await wait(T(1100)); d?.classList.remove('slowmo', 'bossfall'); draw(); break;
           }
           // coup fatal : le dernier ennemi tombe sous un coup allié → gros plan, une fois par combat
@@ -821,7 +825,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   let lastThrow = 0;
   function rhythmQTE(name, uid) {
     return new Promise((resolve) => {
-      const RISE = 1000, TGT = 0.82, PERF = 0.06, GOOD = 0.16, C = 2 * Math.PI * 44;
+      // v375 : plus exigeant — la cible change de place à chaque lancer, fenêtres resserrées, jauge plus rapide qui accélère en montant
+      const RISE = 820, TGT = 0.5 + Math.random() * 0.36, PERF = 0.035, GOOD = 0.11, C = 2 * Math.PI * 44;
       const cu = uid && st.units[uid] ? cat.get(st.units[uid].id) : null;
       const fc = (cu && cat.faction[cu.faction]?.colors?.secondary) || '#F2C14E';
       const arc = (a, b) => `stroke-dasharray="${((b - a) * C).toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="${(-a * C).toFixed(1)}"`;
@@ -831,12 +836,12 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       ov.innerHTML = `<div class="ry2-c"><span class="ry-glow"></span><img class="ry2-ring" alt="" src="assets/fx/dice-ring.webp"><span class="ry2-chg"></span>
           <svg class="ry2-g" viewBox="0 0 100 100" aria-hidden="true"><circle class="trk" cx="50" cy="50" r="44"/><circle class="zg" cx="50" cy="50" r="44" ${arc(TGT - GOOD, TGT + GOOD)}/><circle class="zp" cx="50" cy="50" r="44" ${arc(TGT - PERF, TGT + PERF)}/><circle class="fill" cx="50" cy="50" r="44" stroke-dasharray="0 ${C.toFixed(1)}"/></svg>
           <div class="ry2-die"><img alt="" src="assets/fx/d20.webp"></div><span class="ry2-flash"></span><b class="ry-res"></b></div>
-        <p class="ry-t"><b>${esc(name)}</b><small>Maintiens le doigt pour charger le dé, relâche dans l’or</small></p>`;
+        <p class="ry-t"><b>${esc(name)}</b><small>Maintiens le doigt pour charger le dé, relâche dans l’or, au centre pour un parfait</small></p>`;
       $('.dv').appendChild(ov);
       const chg = ov.querySelector('.ry2-chg'), fill = ov.querySelector('.fill'), die = ov.querySelector('.ry2-die'), res = ov.querySelector('.ry-res');
       let t0 = 0, x = 0, done = false, raf = 0, holding = false;
       const idle = setTimeout(() => { if (!holding) finish(null); }, 6000);
-      const level = (ms) => { const k = (ms / RISE) % 2; return k <= 1 ? k : 2 - k; }; // monte puis redescend
+      const level = (ms) => { const k = (ms / RISE) % 2; return (k <= 1 ? k : 2 - k) ** 1.5; }; /* monte puis redescend, de plus en plus vite vers le haut */
       const step = () => {
         x = level(performance.now() - t0);
         fill.setAttribute('stroke-dasharray', `${(x * C).toFixed(1)} ${C.toFixed(1)}`);
@@ -880,35 +885,18 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       el(s.a)?.classList.add('aim'); tEls.forEach((x) => x?.classList.add('aimed'));
       const def = INTENTS[s.kind];
       const bar = document.createElement('div');
-      bar.className = `dv-dodge cb-def${reduced ? '' : ' ring'}`;
-      bar.innerHTML = `<span class="dv-dodge-t">${intentIcon(s.kind)} ${esc(def.name)} ! <small>${reduced ? 'Zone dorée : esquive · trait blanc, au dernier instant : parade' : 'Touche quand l’anneau rouge arrive sur l’or'}</small></span><b class="df-go" aria-hidden="true">Maintenant !</b><b class="df-pp" aria-hidden="true">Parade !</b><span class="dv-dodge-bar"><i class="rail"></i><i class="z"><i class="p"></i></i><i class="c"></i></span>`;
+      bar.className = 'dv-dodge cb-def'; /* v375 : retour de la barre (l'anneau v357 retiré, demande du propriétaire) */
+      bar.innerHTML = `<span class="dv-dodge-t">${intentIcon(s.kind)} ${esc(def.name)} ! <small>Touche dans l’or : esquive · sur le trait blanc : parade</small></span><span class="dv-dodge-bar"><i class="rail"></i><i class="z"><i class="p"></i></i><i class="c"></i></span>`;
       $('.dv-mid').appendChild(bar); $('.dv-mid').classList.add('qte'); $('.dv')?.classList.add('qte-on');
       const cur = bar.querySelector('.c'), zEl = bar.querySelector('.z'), pEl = bar.querySelector('.p');
       zEl.style.cssText = `left:${z0 * 100}%;width:${zw * 100}%`;
       pEl.style.cssText = `left:${((zw - pw) / zw) * 100}%;width:${(pw / zw) * 100}%`;
-      let t0 = 0, done = false, raf = 0;
+      const bw = bar.querySelector('.dv-dodge-bar').offsetWidth; /* une seule mesure : le curseur glisse ensuite en transform (sans recalcul de mise en page) */
+      let t0 = 0, done = false, raf = 0, lit = '';
       const zoneAt = (x) => (moving ? Math.min(0.97 - zw, Math.max(0.3, z0 + Math.sin(x * 9) * 0.1)) : z0);
-      // v357 : « l'anneau qui se referme » — un anneau de visée se resserre sur ta créature visée (même minutage que la barre,
-      // qui reste en repli pour les animations réduites) : la bande d'or = esquive, le trait blanc juste avant l'impact = parade
-      const dr = reduced ? null : (() => {
-        const box = $('.dv'), bb = box?.getBoundingClientRect(), rs = tEls.filter(Boolean).map((x) => x.getBoundingClientRect());
-        if (!box || !rs.length) return null;
-        const L = Math.min(...rs.map((r) => r.left)), R = Math.max(...rs.map((r) => r.right)), T_ = Math.min(...rs.map((r) => r.top)), B = Math.max(...rs.map((r) => r.bottom));
-        const H = Math.max(B - T_, (R - L) * 0.75), D0 = H * 2.4, dOf = (p) => H * 1.04 + (1 - p) * (D0 - H * 1.04);
-        const rOf = (p) => (50 * dOf(p)) / D0 - 1.2;
-        const n = document.createElement('div'); n.className = 'cb-dring';
-        n.style.cssText = `left:${(L + R) / 2 - bb.left}px;top:${(T_ + B) / 2 - bb.top}px;width:${D0}px;height:${D0}px`;
-        n.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="zg" cx="50" cy="50"/><circle class="zp" cx="50" cy="50"/><circle class="cl" cx="50" cy="50"/><circle class="cl2" cx="50" cy="50"/></svg><img class="dr-img" alt="" src="assets/fx/def-ring.webp">`;
-        box.appendChild(n);
-        const [zg, zp, cl, cl2] = n.querySelectorAll('circle'), img = n.querySelector('.dr-img'); // v359 : anneau de visée peint (bord à 34 % de l'image)
-        const band = (c, a, b) => { const ra = rOf(a), rb = rOf(b); c.setAttribute('r', ((ra + rb) / 2).toFixed(2)); c.setAttribute('stroke-width', Math.max(0.8, ra - rb).toFixed(2)); };
-        const zone = (zz) => { band(zg, zz, zz + zw); band(zp, zz + zw - pw, zz + zw); };
-        zone(z0); cl.setAttribute('r', rOf(0).toFixed(2)); cl2.setAttribute('r', rOf(0).toFixed(2)); img.style.transform = `scale(${(rOf(0) / 34).toFixed(3)})`;
-        return { n, zone, at: (p) => { const r = rOf(p).toFixed(2); cl.setAttribute('r', r); cl2.setAttribute('r', r); img.style.transform = `scale(${(rOf(p) / 34).toFixed(3)}) rotate(${(p * 90).toFixed(1)}deg)`; }, end: (res) => { n.classList.add(`r-${res}`); setTimeout(() => n.remove(), 420); } };
-      })();
       const end = (res) => {
         if (done) return; done = true; cancelAnimationFrame(raf); defTap = null;
-        dr?.end(res);
+        bar.classList.remove('go', 'pp');
         bar.classList.add(res === 'none' ? 'ko' : 'ok', `r-${res}`);
         bar.querySelector('.dv-dodge-t').textContent = res === 'parry' ? 'Parade parfaite !' : res === 'dodge' ? 'Esquive !' : 'Raté…';
         $('.dv')?.classList.remove('qte-on');
@@ -920,15 +908,11 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
         setTimeout(() => { bar.remove(); $('.dv-mid')?.classList.remove('qte'); el(s.a)?.classList.remove('aim'); tEls.forEach((x) => x?.classList.remove('aimed')); resolve(res); }, res === 'none' ? 200 : 300);
       };
       const step = () => {
-        const x = (performance.now() - t0) / D, pos = ease(Math.min(1, x));
-        cur.style.left = `${pos * 100}%`;
-        if (moving) zEl.style.left = `${zoneAt(x) * 100}%`;
-        if (dr) {
-          dr.at(pos); const zz = moving ? zoneAt(x) : z0; if (moving) dr.zone(zz);
-          // v365 : la bande s'allume pile au bon moment (« Maintenant ! »), puis le trait blanc (« Parade ! »)
-          const pz = zz + zw - pw, inP = pos >= pz && pos <= pz + pw, inZ = !inP && pos >= zz && pos <= zz + zw;
-          if (inZ !== dr.n._z || inP !== dr.n._p) { dr.n._z = inZ; dr.n._p = inP; dr.n.classList.toggle('go', inZ); dr.n.classList.toggle('pp', inP); bar.classList.toggle('go', inZ); bar.classList.toggle('pp', inP); }
-        }
+        const x = (performance.now() - t0) / D, pos = ease(Math.min(1, x)), zz = moving ? zoneAt(x) : z0;
+        cur.style.transform = `translateX(${(pos * bw).toFixed(1)}px)`;
+        if (moving) zEl.style.transform = `translateX(${((zz - z0) * bw).toFixed(1)}px)`;
+        const pz = zz + zw - pw, now = pos >= pz && pos <= pz + pw ? 'pp' : pos >= zz && pos <= zz + zw ? 'go' : '';
+        if (now !== lit) { if (lit) bar.classList.remove(lit); if (now) bar.classList.add(now); lit = now; } /* la zone s'allume quand le curseur y entre */
         if (x >= 1) end('none'); else raf = requestAnimationFrame(step);
       };
       defTap = () => {
@@ -942,7 +926,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
   }
   // Résumé du tour ennemi : une ligne par ennemi, affichée au début de ton tour
   let log = null;
-  const nm = (uid) => { const u = st.units[uid]; return u ? esc(cat.get(u.id).name) : ''; };
+  const nm = (uid) => { const u = st.units[uid]; return u ? esc(uName(u)) : ''; };
   function logEvents(ev) {
     if (!log) return;
     for (const e of ev) {
@@ -986,7 +970,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       let res = 'none';
       if (s.qte && defMode === 'auto') res = Math.random() < 0.4 ? 'dodge' : 'none'; // automatique : 40 % d'esquives, jamais de parade
       else if (s.qte && defMode !== 'off') {
-        if (!g.s.tips?.['cb-defense2']) await tuto(app, 'cb-defense2'); // v365 : texte de l'anneau (l'ancien parlait de la barre), remontré une fois
+        if (!g.s.tips?.['cb-defense3']) await tuto(app, 'cb-defense3'); /* v375 : retour de la barre, texte remontré une fois */
         if (!alive_) return;
         res = await defenseQTE(s);
         // v331 : après 3 défenses ratées dans l'expédition, on rappelle qu'il existe une défense assistée ou automatique (une seule fois)
@@ -1059,7 +1043,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     if (a.target === 'none') { mode = null; return exec(() => act(st, u, key)); }
     const ts = actionTargets(st, u, key);
     if (key === 'swap') { if (ts.length === 1) { mode = null; return exec(() => act(st, u, 'swap', ts[0])); } return pickReserve(); }
-    if (a.dice && !g.s.tips?.['cb-dice2'] && !settling()) await tuto(app, 'cb-dice2');
+    if (a.dice && !g.s.tips?.['cb-dice3'] && !settling()) await tuto(app, 'cb-dice3');
     if (ts.length === 1 && (key === 'rempart' || key === 'priere')) { mode = null; return exec(() => act(st, u, key, ts[0])); }
     mode = { key, name: a.name, dice: !!a.dice, target: a.target };
     draw();
@@ -1213,8 +1197,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
     const fam = u.fam ? AI_FAMILIES[u.fam] : null;
     const weakF = u.side === 'enemy' && (st.discovered[u.faction] || u.mark) ? WEAK_TO[u.faction] : null;
     const tgtName = i?.target && st.units[i.target]?.side === 'ally' ? cat.get(st.units[i.target].id).name : '';
-    openSheet(`<div class="tb-info"><div class="tb-info-card ${u.side === 'enemy' ? 'corrupt' : ''}">${cardHTML(c, { size: 'full', nameKnown: true })}</div>
-      <h3>${esc(c.name)}${u.side === 'enemy' ? ' corrompu' : ''}</h3>
+    openSheet(`<div class="tb-info">${isFig(u) ? `<div class="tb-info-boss"><img alt="" src="${uPic(u)}"><small>${esc(BOSSES[st.bossKey].title || '')}</small></div>` : `<div class="tb-info-card ${u.side === 'enemy' ? 'corrupt' : ''}">${cardHTML(c, { size: 'full', nameKnown: true })}</div>`}
+      <h3>${isFig(u) ? esc(uName(u)) : `${esc(c.name)}${u.side === 'enemy' ? ' corrompu' : ''}`}</h3>
       <dl class="facts"><div><dt>Attaque</dt><dd>${u.atk + (u.boost || 0)}</dd></div><div><dt>PV</dt><dd>${Math.max(0, u.hp)} / ${u.maxHp}</dd></div><div><dt>Niveau</dt><dd>${u.level || 1}</dd></div>${st.init ? `<div><dt>Vitesse</dt><dd>${speedOf(u)}</dd></div>` : ''}${st.init && u.side === 'ally' ? `<div><dt>PA</dt><dd>${u.pa || 0} / ${PA_MAX}</dd></div>` : ''}${u.brkMax ? `<div><dt>Brisure</dt><dd>${u.broken ? 'Brisé' : `${u.brk} / ${u.brkMax}`}</dd></div>` : ''}</dl>
       ${u.side === 'enemy' && (bigOf(u, false) || bigOf(u, true)) ? `<p class="small dc-bad"><b>Annonce</b> : ${esc(bigOf(u, false) ? (PREP_IT[bigOf(u, false)] ? `il prépare ${INTENTS[PREP_IT[bigOf(u, false)]].name} pour le tour suivant` : `${INTENTS[bigOf(u, false)].name} à son prochain tour`) : `${INTENTS[bigOf(u, true)].name} au tour suivant`)}. ${esc(INTENTS[PREP_IT[bigOf(u, false)] || bigOf(u, false) || bigOf(u, true)].desc)} Brise-le pour l’annuler.</p>` : ''}
       ${u.trait && TRAITS[u.trait] ? `<p class="small dc-bad cb-trait"><img class="cb-trico" alt="" src="assets/icons/st-${traitIcon(u.trait)}.webp"><b>${esc(TRAITS[u.trait].name)}</b> : ${esc(TRAITS[u.trait].desc)}</p>` : ''}
@@ -1227,7 +1211,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, run: runOpt
       <p class="small"><b>${esc(kit.passive.name)}</b> : ${esc(kit.passive.desc)}</p>
       ${u.rarity === 'C' ? `<p class="small dc-good">${icon('star')} Instinct de meute : +${PACK_BONUS} dégât aux élites et aux gardiens.</p>` : ''}`}
       ${u.side === 'enemy' && g.owns(u.id) ? `<p class="small dc-good">${icon('book')} Tu possèdes sa carte : tes créatures lui font +1 dégât.</p>` : ''}
-      <p class="small muted">${statusLines(u)}</p></div>`, { label: c.name });
+      <p class="small muted">${statusLines(u)}</p></div>`, { label: uName(u) });
   }
   // v289 : la réserve au toucher — les cartes des créatures en attente, pour juger d'un remplacement
   function reserveSheet() {

@@ -1068,18 +1068,15 @@ export class Game {
     }
     run.battle = null;
     const won = st.over === 'won' && run.team.some((m) => !m.fallen);
-    const out = { room, won, discovered, relNew, pact: pactUsed, report: battleReport(st, (uid) => this.catalog.get(st.units[uid]?.id)?.name || 'Une créature') };
+    const out = { room, won, discovered, relNew, pact: pactUsed, report: battleReport(st, (uid) => (st.units[uid]?.boss && bossKey ? BOSSES[bossKey].name : this.catalog.get(st.units[uid]?.id)?.name) || 'Une créature') };
     if (bossKey) {
       out.boss = { key: bossKey, log: (st.bossLog || []).slice(), interrupts: st.stats?.interrupts || 0, feasts: st.stats?.feasts || 0, weak: Object.keys(st.discovered || {}), first: won && !this.s.bossesBeaten[bossKey] };
       if (won) { this.s.bossesBeaten[bossKey] = this.s.bossesBeaten[bossKey] || Date.now(); const bw = (this.s.bossWins ||= {}); bw[bossKey] = (bw[bossKey] || 0) + 1; } // v348 : victoires par gardien (présentation courte après 3)
     }
     if (!won && pactUsed === 'gardien') run.shards = 0; // le prix du Pacte du Gardien
     // (v271 : la créature de la semaine est retirée ; un combat commencé avant reste valable mais ne donne plus sa carte)
-    // gardien vaincu : une chance sur quatre qu'il rejoigne ta collection (la vraie voie vers les grandes créatures)
-    if (won && room === 'boss' && !run.free) {
-      const b = Object.values(st.units).find((u) => u.boss);
-      if (b && this.rng() < BOSS_RECRUIT) out.recruit = { id: b.id, ...this.addCard(b.id, 'normal', 'booster') };
-    }
+    // v375 : un gardien n'est plus une carte (il ne rejoint plus la collection) ; à la place, une chance sur quatre de laisser un ticket premium
+    if (won && room === 'boss' && !run.free && this.rng() < BOSS_RECRUIT) { this.grant({ tickets: { premium: 1 } }, 'boss'); out.bossTicket = 1; }
     const goal = goalState(st);
     if (goal) out.goal = goal;
     if (won) {

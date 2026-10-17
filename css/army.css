@@ -3399,3 +3399,25 @@ html.fx-light .dv .cb-a.sig::after, html.fx-light .dv-int, html.fx-light .cb-int
 html.fx-light .cast-circ, html.fx-light .dio * { animation: none !important; }
 html.fx-light .cast-circ { display: none; }
 html.fx-light .dv-ghost, html.fx-light .dv-cut, html.fx-light .dv-soul::before { display: none; }
+
+/* v375 : retour de la barre de défense, plus fluide — curseur et zone glissent en transform (calques à part), plus de reflet
+   animé sur la zone ni d'ombre filtrée sur tout le cartouche (repeints à chaque image) ; la zone s'allume quand le curseur y passe */
+.dv-dodge.cb-def { filter: none; }
+.cb-def .dv-dodge-bar .c { left: 0; will-change: transform; }
+.cb-def .dv-dodge-bar .z { animation: none; will-change: transform; background-position: 50% 0; transition: filter .06s; }
+.cb-def.go .dv-dodge-bar .z { filter: brightness(1.45); }
+.cb-def.pp .dv-dodge-bar .z .p { box-shadow: 0 0 14px #fff, 0 0 26px rgba(200, 230, 255, 1); }
+.cb-def .df-go, .cb-def .df-pp, .cb-dring { display: none; }
+.ry2-g .zg, .ry2-g .zp { stroke-linecap: butt; }
+.ry2-g .zp { stroke: #FFFFFF; filter: drop-shadow(0 0 4px #fff); }
+
+/* v375 : le gardien n'a plus de carte derrière lui — seulement sa figure, posée sur une ombre au sol, avec son nom et ses PV */
+.dv-c.has-fig { background: none !important; border-color: transparent !important; box-shadow: none !important; }
+.dv-c.has-fig::before, .dv-c.has-fig::after { display: none; }
+.dv-c.has-fig .dv-art.dv-bbg { background: radial-gradient(ellipse 60% 22% at 50% 78%, rgba(0, 0, 0, .75), transparent 70%), radial-gradient(ellipse 70% 40% at 50% 70%, rgba(150, 20, 40, .28), transparent 70%); border: 0; box-shadow: none; }
+.dv-c.has-fig .dv-art.dv-bbg::before, .dv-c.has-fig .dv-art.dv-bbg::after { display: none; }
+.dv-c.has-fig .dv-bfig { bottom: 16%; width: 132%; }
+.tb-info-boss { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.tb-info-boss img { width: min(220px, 60vw); height: auto; filter: drop-shadow(0 8px 14px rgba(0, 0, 0, .85)) drop-shadow(0 0 18px rgba(255, 60, 80, .35)); }
+.tb-info-boss small { font: italic 500 .9rem/1.2 var(--f-ui); color: #E8DCC0; }
+.dv-c.has-fig .dv-nm { z-index: 5; }
