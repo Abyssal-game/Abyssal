@@ -53,9 +53,18 @@ const stack = [];
 // alors la feuille au lieu de quitter la page. Quand on ferme la feuille autrement (croix, fond, Échap), on retire
 // cette entrée avec history.back(), et on ignore le popstate que cela provoque.
 let popPending = 0;
+let afterPop = [];
 export function handlePopstate() {
-  if (popPending > 0) { popPending--; return; }
+  if (popPending > 0) { popPending--; if (!popPending) flushAfterPop(); return; }
   closeTopSheet(true);
+}
+function flushAfterPop() { const q = afterPop; afterPop = []; q.forEach((fn) => fn()); }
+// v376 : changer de page juste après avoir fermé une feuille : le history.back() de la fermeture arrive plus tard et
+// ramenait sur la page quittée (« Mettre en pause » restait dans le combat) ; on attend donc qu'il soit passé
+export function afterHistory(fn) {
+  if (popPending <= 0) return fn();
+  afterPop.push(fn);
+  setTimeout(() => { if (afterPop.includes(fn)) { popPending = 0; flushAfterPop(); } }, 600); /* filet : popstate jamais reçu */
 }
 // changement de page pendant qu'une feuille est ouverte : on la ferme sans toucher à l'historique
 window.addEventListener('hashchange', () => { while (stack.length) stack[stack.length - 1].close(true); });

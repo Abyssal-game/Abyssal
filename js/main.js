@@ -6,7 +6,7 @@ import { setCardCatalog, setFameLookup, setApexLookup, setFavLookup } from './ui
 import { MAX_LEVEL } from './core/army.js';
 import { fameTier } from './core/renown.js';
 import { icon, EMBLEM } from './ui/icons.js';
-import { toast, esc, fmt, reducedMotion, closeTopSheet, openSheet, handlePopstate } from './ui/dom.js';
+import { toast, esc, fmt, reducedMotion, closeTopSheet, openSheet, handlePopstate, afterHistory } from './ui/dom.js';
 import { sfx, configureSound, audioCtx, audioCtxIfAny } from './ui/sound.js';
 import { musicRoute, configureMusic } from './ui/music.js';
 import { VERSION } from './config.js';
@@ -72,7 +72,7 @@ function storageOrMemory() {
 
 const app = {
   route: '', params: [], cleanup: null, state: {}, version: VERSION,
-  go(path) { location.hash = '#/' + path; },
+  go(path) { afterHistory(() => { location.hash = '#/' + path; }); },
   back() { history.length > 1 ? history.back() : app.go(''); },
   openCard(id, opts) { return openCardDetail(app, id, opts); },
   reduced() { return reducedMotion(app.game.s.settings); },
