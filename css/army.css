@@ -3467,3 +3467,8 @@ html.fx-light .dv-c .dv-hp.low .hpr::after { animation: none; }
 .cr-bosses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
 .cr-bosses .btn { justify-content: flex-start; text-align: left; white-space: normal; line-height: 1.15; min-height: 44px; }
 .cr-bpow { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+
+/* v389 : sur un gardien à figure, le bandeau d'états et d'annonce passe SOUS sa carte (au-dessus, il cachait sa tête) */
+.dv.cb .dv-c.has-fig .cb-above { bottom: auto; top: 100%; margin: 6px 0 0; z-index: 9; }
+/* l'écusson « Gardien » et l'icône de rôle restaient visibles sur la tête de la figure (règle v373 écrasée par une règle plus précise) */
+.dv.cb .dv-c.has-fig .dv-boss, .dv.cb .dv-c.has-fig .dv-kw { display: none !important; }
