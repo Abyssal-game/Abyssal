@@ -3868,3 +3868,7 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 
 /* v444 : Épreuves, explication quand l'équipe n'a pas encore 3 créatures */
 .ep-need { margin: 0 4px 10px; padding: 10px 12px; border-radius: 12px; background: rgba(224, 72, 94, .12); border: 1px solid rgba(224, 72, 94, .35); color: #F3D6DA; }
+
+/* v445 : texte des champs de saisie toujours à l'intérieur du cadre peint (bord de 24 px) : `.input.plain` ramenait la marge à 14 px */
+.input:not(select):not(textarea), .input.plain:not(select):not(textarea), .acc-form .input.plain:not(select):not(textarea) { padding-left: 32px !important; padding-right: 32px !important; }
+.input-wrap .input:not(select):not(textarea) { padding-left: 46px !important; }
