@@ -90,6 +90,7 @@ LA SALLE DES JEUX
 • Les Enchères de Mammon : des enchères à l'aveugle où miser pareil ne rapporte rien
 • Le Pacte : tire des cartes, encore une… et arrête-toi avant de briser le pacte
 • Les Cryptes : un jeu de mémoire où chaque paire réveille le pouvoir de sa faction
+• Les Trois Autels : un duel tactique en six tours, domine deux autels sur trois avec ton grimoire
 
 UN MONDE À DÉCOUVRIR
 • Un Bestiaire illustré, avec l'histoire de chaque créature

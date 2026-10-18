@@ -23,6 +23,7 @@ import * as MQ from './masques.js';
 import * as EN from './encheres.js';
 import * as PA from './pacte.js';
 import * as CR from './cryptes.js';
+import * as AU from './autels.js';
 import * as EG from './enigmes.js';
 import { FERVOR_START, FERVOR_MAX, FERVOR_CARRY, TALENTS } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
@@ -1151,6 +1152,75 @@ export class Game {
     return out;
   }
   cryptesQuit() { this.s.cryptes.cur = null; this.persist(); }
+  // ——— v451 : Les Trois Autels (duel tactique court), ouverts avec la Salle des jeux ———
+  autelsUnlocked() { return AU.TABLES.filter((_, i) => AU.tableUnlocked(this.s, i)).length; }
+  autelsDailyOpen() { return !!this.s.autels.beaten?.parvis; }
+  autelsDaily() { const day = today(this.clock()); return { table: AU.dailyTable(day, this.autelsUnlocked()), seed: [...`autels:${day}`].reduce((h, c) => (Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0), 2166136261) }; }
+  autelsStart({ table, daily = false } = {}) {
+    const au = this.s.autels;
+    if (!this.sceauxOpen()) throw new Error('Les Trois Autels s’ouvrent après ton premier gardien.');
+    let seed = Math.floor(this.rng() * 2 ** 31);
+    if (daily) {
+      if (!this.autelsDailyOpen()) throw new Error('Le défi du jour s’ouvre après ta première victoire au Parvis.');
+      if (au.dailyDone === today(this.clock())) throw new Error('Défi du jour déjà relevé. Reviens demain !');
+      const d = this.autelsDaily(); table = d.table; seed = d.seed;
+    } else {
+      const i = AU.TABLES.findIndex((x) => x.key === table);
+      if (i < 0) throw new Error('Table inconnue.');
+      if (!AU.tableUnlocked(this.s, i)) throw new Error('Gagne d’abord à l’autel précédent.');
+    }
+    au.cur = AU.newGame(this.catalog, { table, seed, daily, deck: this.autelsDeck() });
+    this.persist();
+    return au.cur;
+  }
+  // Ton grimoire : 12 cartes de ta collection (courbe Commune → Secrète), refait s'il manque une carte
+  autelsDeck(reroll = false) {
+    const au = this.s.autels, own = Object.keys(this.s.collection).filter((id) => this.catalog.get(id));
+    if (reroll || !Array.isArray(au.deck) || au.deck.length !== AU.DECK || au.deck.some((id) => !this.s.collection[id] && !au.lent?.includes(id))) {
+      const seed = Math.floor(this.rng() * 2 ** 31);
+      let a = seed >>> 0; const r = () => { a = (a + 0x6D2B79F5) >>> 0; let x = a; x = Math.imul(x ^ (x >>> 15), x | 1); x ^= x + Math.imul(x ^ (x >>> 7), x | 61); return ((x ^ (x >>> 14)) >>> 0) / 4294967296; };
+      au.deck = AU.buildDeck(this.catalog, own, r);
+      au.lent = au.deck.filter((id) => !this.s.collection[id]); // cartes prêtées si la collection est trop petite
+      this.persist();
+    }
+    return au.deck;
+  }
+  autelsPlay(plays) {
+    const st = this.s.autels.cur;
+    if (!st || st.over) throw new Error('Aucune partie en cours.');
+    const err = AU.checkPlays(st, 'p', plays); if (err) throw new Error(err);
+    const ai = AU.choosePlays(st, 'a', this.rng);
+    const ev = AU.playTurn(st, plays, ai);
+    this.persist();
+    return ev;
+  }
+  autelsFinish() {
+    const au = this.s.autels, st = au.cur;
+    if (!st || !st.over) throw new Error('La partie n’est pas terminée.');
+    if (st.rewarded) return st.result;
+    const day = today(this.clock());
+    if (au.day !== day) { au.day = day; au.paidToday = 0; }
+    const T = AU.TABLE[st.table], R = AU.AUTELS_REWARD;
+    const out = { result: st.over, shards: 0, first: false, title: null, daily: st.daily, capped: false, chests: [] };
+    if (st.over === 'won') {
+      au.wins++; au.streak++; au.best = Math.max(au.best, au.streak);
+      if (!au.beaten[T.key]) { au.beaten[T.key] = Date.now(); out.first = true; out.shards += R.firstWin; out.chests.push(T.chest); }
+      if (st.daily && au.dailyDone !== day) { au.dailyDone = day; out.shards += R.daily; out.chests.push('bois'); }
+      if (au.paidToday < R.dailyPaid) { au.paidToday++; out.shards += T.reward; } else { out.capped = true; out.shards += R.afterCap; }
+      out.chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });
+      if (T.key === AU.TABLES.at(-1).key && !this.s.titles.includes(AU.AUTELS_TITLE)) { this.s.titles.push(AU.AUTELS_TITLE); out.title = AU.AUTELS_TITLE; }
+    } else { au.losses++; au.streak = 0; }
+    this.s.shards += out.shards;
+    out.xp = R.xp; this.s.xp += out.xp;
+    au.history.unshift({ t: Date.now(), table: T.key, r: st.over, s: st.final?.scores });
+    au.history = au.history.slice(0, 20);
+    st.rewarded = true; st.result = out;
+    this.track('autels', 1);
+    this.checkProgress();
+    this.persist();
+    return out;
+  }
+  autelsQuit() { this.s.autels.cur = null; this.persist(); }
   // ——— v427 : les Énigmes des Sceaux (trois casse-têtes par jour) ———
   enigmes() {
     const e = this.s.enigmes, day = today(this.clock());

@@ -43,7 +43,7 @@ THEMES.masques = THEMES.sceaux; THEMES.abysse = THEMES.boss; THEMES.encheres = T
 export const MUSIC_DEMO = [['Accueil', 'antre'], ['Butin', 'boutique'], ['Descente', 'descente'], ['Combat', 'combat'], ['Gardien', 'boss'], ['Salle des jeux', 'sceaux'], ['Cour des Masques', 'masques'], ['Enchères', 'encheres'], ['Énigmes', 'enigmes'], ['L’Abysse', 'abysse']];
 
 // Lieu → ambiance
-const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', arsenal: 'boutique', descente: 'descente', heros: 'descente', marchand: 'descente', sceaux: 'sceaux', jeux: 'sceaux', masques: 'masques', encheres: 'encheres', enigmes: 'enigmes', pacte: 'sceaux', cryptes: 'sceaux', epreuves: 'descente' }; /* v434 : la Salle des jeux */ /* v408 : Épreuves du jour = ambiance de la Descente, musique de combat en combat */
+const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', arsenal: 'boutique', descente: 'descente', heros: 'descente', marchand: 'descente', sceaux: 'sceaux', jeux: 'sceaux', masques: 'masques', encheres: 'encheres', enigmes: 'enigmes', pacte: 'sceaux', cryptes: 'sceaux', autels: 'sceaux', epreuves: 'descente' }; /* v434 : la Salle des jeux */ /* v408 : Épreuves du jour = ambiance de la Descente, musique de combat en combat */
 
 function init() {
   if (ctx) return ctx;

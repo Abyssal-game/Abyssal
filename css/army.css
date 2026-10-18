@@ -3986,3 +3986,74 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 @keyframes crFlip { from { transform: rotateY(90deg); } to { transform: none; } }
 @keyframes crSwap { 0%, 100% { transform: none; } 50% { transform: scale(.85) rotate(4deg); } }
 .cr-game.rm .cr-c { animation: none !important; transition: none; }
+
+/* v451 : Les Trois Autels (duel tactique en 6 tours) */
+.bn-autels { --bn: url(../assets/sceaux/salle-celeste.webp); }
+.au-h { position: relative; display: block; width: 100%; aspect-ratio: 5 / 7; border-radius: 6px; overflow: hidden; border: 2px solid var(--rc); background: #0C0D14; box-shadow: 0 3px 8px rgba(0, 0, 0, .6); }
+.au-h img:first-child { width: 100%; height: 100%; object-fit: cover; display: block; }
+.au-h .au-cost { position: absolute; left: 2px; top: 2px; width: 19px; height: 19px; display: grid; place-items: center; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #C9A8FF, #5A2A9A); color: #FFF; font: 800 .72rem/1 var(--f-display); box-shadow: 0 0 0 1px rgba(0, 0, 0, .6); }
+.au-h .au-pw { position: absolute; left: 2px; bottom: 2px; min-width: 20px; height: 20px; display: grid; place-items: center; border-radius: 10px; padding: 0 4px; background: rgba(8, 9, 16, .9); border: 1px solid var(--fc); color: #FFE7A6; font: 800 .78rem/1 var(--f-display); }
+.au-h .au-ri { position: absolute; right: 2px; top: 2px; width: 18px; height: 18px; filter: drop-shadow(0 1px 2px #000); }
+.au-h.big { width: 96px; flex: none; }
+.au-cs { display: flex; gap: 12px; align-items: flex-start; text-align: left; }
+.au-cs p { margin: 0; }
+.au-deck { padding: 10px 12px; }
+.au-deck-h { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.au-deck-h b { font-family: var(--f-display); color: #F2D9A0; }
+.au-deck-l { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 5px; }
+.au-dk { padding: 0; border: 0; background: none; }
+.au-deck p { margin: 8px 0 0; }
+.au-game { gap: 6px; }
+.au-top { display: flex; align-items: center; gap: 8px; padding: 4px 10px; border-radius: 4px 14px 4px 14px; background: rgba(8, 9, 16, .86); border: 1px solid rgba(201, 164, 90, .35); }
+.au-top .sc-med { width: 34px; height: 34px; flex: none; }
+.au-tn { flex: 1; display: flex; flex-direction: column; line-height: 1.15; }
+.au-tn b { font-family: var(--f-display); color: #F2D9A0; font-size: .9rem; }
+.au-tn small { color: var(--muted); font-size: .72rem; }
+.au-turn { font-size: .8rem; color: var(--muted); }
+.au-turn b { color: #FFE7A6; font-size: 1.05rem; }
+.au-alts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+.au-alt { display: flex; flex-direction: column; gap: 4px; padding: 5px 4px; border-radius: 8px; background: rgba(8, 9, 16, .84); border: 1px solid rgba(201, 164, 90, .35); min-width: 0; transition: border-color .2s, box-shadow .2s; }
+.au-alt.can { border-color: #F2C14E; box-shadow: 0 0 12px rgba(242, 193, 78, .4); cursor: pointer; }
+.au-alt.win-p { border-color: #7FE0A0; box-shadow: 0 0 14px rgba(127, 224, 160, .45); }
+.au-alt.win-a { border-color: #E0485E; box-shadow: 0 0 14px rgba(224, 72, 94, .45); }
+.au-side { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px; min-height: 92px; align-content: start; }
+.au-side.a { align-content: end; }
+.au-b { position: relative; aspect-ratio: 5 / 7; border-radius: 4px; overflow: hidden; border: 1px solid var(--fc, #C9A45A); background: #0C0D14; }
+.au-b img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.au-b b { position: absolute; left: 1px; bottom: 1px; min-width: 17px; height: 17px; display: grid; place-items: center; padding: 0 3px; border-radius: 9px; background: rgba(8, 9, 16, .9); color: #FFE7A6; font: 800 .7rem/1 var(--f-display); }
+.au-b.up b { color: #9FF0B8; }
+.au-b.down b { color: #FF9AA8; }
+.au-b.hl { box-shadow: 0 0 0 2px #F2C14E, 0 0 14px rgba(242, 193, 78, .8); animation: paIn .3s ease-out both; }
+.au-b.ghost { opacity: .55; border-style: dashed; cursor: pointer; }
+.au-name { display: flex; align-items: center; justify-content: center; gap: 3px; min-height: 30px; padding: 2px; border: 0; border-radius: 6px; background: rgba(242, 193, 78, .1); color: #F2D9A0; font: 700 .64rem/1.1 var(--f-display); text-align: center; cursor: pointer; }
+.au-name svg, .au-name img { width: 14px; height: 14px; flex: none; }
+.au-score { display: flex; align-items: center; justify-content: space-between; padding: 0 6px; font: 800 1rem/1 var(--f-display); }
+.au-score .sa { color: #FF9AA8; }
+.au-score .sp { color: #9FF0B8; }
+.au-score i { font-style: normal; color: var(--muted); font-size: .8rem; }
+.au-alt.lead-p .au-score .sp, .au-alt.lead-a .au-score .sa { font-size: 1.2rem; }
+.au-hand { display: flex; gap: 5px; justify-content: center; flex-wrap: nowrap; overflow-x: auto; padding: 4px 2px; scrollbar-width: none; }
+.au-hand::-webkit-scrollbar { display: none; }
+.au-hb { flex: none; width: 54px; padding: 0; border: 0; background: none; transition: transform .15s; }
+.au-hb.sel { transform: translateY(-8px); }
+.au-hb.sel .au-h { box-shadow: 0 0 0 2px #F2C14E, 0 0 16px rgba(242, 193, 78, .7); }
+.au-hb.dear { opacity: .5; }
+.au-tip { margin: 0; text-align: center; min-height: 2.6em; }
+.au-foot { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 4px 14px 4px 14px; background: rgba(8, 9, 16, .9); border: 1px solid rgba(201, 164, 90, .4); }
+.au-foot .btn { flex: 1; min-height: 46px; }
+.au-fv { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; max-width: 46%; }
+.au-fv i { width: 11px; height: 11px; transform: rotate(45deg); border-radius: 2px; background: rgba(180, 140, 255, .2); border: 1px solid rgba(180, 140, 255, .5); }
+.au-fv i.on { background: linear-gradient(135deg, #D8B8FF, #7A3FD0); box-shadow: 0 0 6px rgba(180, 140, 255, .7); }
+.au-fv b { margin-left: 4px; color: #E6D2FF; font: 800 1.1rem/1 var(--f-display); }
+.au-fv small { color: var(--muted); font-size: .7rem; }
+.au-game.rm .au-b.hl { animation: none; }
+.au-side, .au-side.a { min-height: 0; align-content: stretch; }
+.au-b.slot { border: 1px dashed rgba(201, 164, 90, .28); background: rgba(255, 255, 255, .02); }
+.au-alt.can .au-side.p .au-b.slot { border-color: rgba(242, 193, 78, .7); background: rgba(242, 193, 78, .08); }
+.au-b.void { visibility: hidden; }
+.au-sum { align-self: center; min-width: 30px; padding: 1px 8px; border-radius: 10px; text-align: center; font: 800 .95rem/1.2 var(--f-display); }
+.au-sum.sa { color: #FFB3BE; background: rgba(224, 72, 94, .16); }
+.au-sum.sp { color: #B8F5CB; background: rgba(127, 224, 160, .14); }
+.au-alt.lead-a .au-sum.sa, .au-alt.lead-p .au-sum.sp { box-shadow: 0 0 0 1px currentColor; }
+.au-w { font-style: normal; font-size: .9rem; color: #F2C14E; }
+.au-alt.win-a .au-w { color: #FF8A9A; }
