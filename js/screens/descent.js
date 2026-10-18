@@ -41,7 +41,8 @@ export default function descent(app, root) {
   const startFloor = () => (g.startFloors().includes(ui.start) ? ui.start : chapterStart(chapNow()));
   const chapDone = (ch) => (g.descent().best || 0) >= ch * CHAPTER;
   const bossChest = (ch) => ((ch % 2) ? 'or' : 'abyssal');
-  const rewardLine = (r) => [r.shards && `${icon('crystal')}+${fmt(r.shards)}`, r.ash && `${icon('ash')}+${fmt(r.ash)}`, ...Object.keys(r.chests || {}).map((c) => `<span style="color:${CHESTS[c].color}">${icon('p:chest')}${esc(CHESTS[c].name)}</span>`)].filter(Boolean).join(' ');
+  /* v469 : chaque gain dans sa pastille, espacées (avant : icônes et chiffres collés) */
+  const rewardLine = (r) => `<span class="rw-line">${[r.shards && `<span class="rw-i">${icon('crystal')}+${fmt(r.shards)}</span>`, r.ash && `<span class="rw-i">${icon('ash')}+${fmt(r.ash)}</span>`, ...Object.keys(r.chests || {}).map((c) => `<span class="rw-i" style="color:${CHESTS[c].color}">${icon('p:chest')}${esc(CHESTS[c].name)}</span>`)].filter(Boolean).join('')}</span>`;
   function chapterHTML() {
     const d = g.descent(), best = d.best || 0, start = startFloor(), ch = chapterOf(start), done = chapDone(ch), bk = bossOf(ch * CHAPTER), B = BOSSES[bk];
     const floors = Array.from({ length: CHAPTER }, (_, i) => start + i);
@@ -183,7 +184,7 @@ export default function descent(app, root) {
   const runHead = (run) => `<header class="dc-run-head"><div><span class="small muted">${run.nightmare ? `<span class="dc-bad">${icon('skull')} ${nightTier(run).name}</span> · ` : ''}Chapitre ${chapterOf(run.start || run.floor)}${g.firstClear(run) ? '' : ' · déjà franchi'}</span><h1>Étage ${run.floor}</h1>${run.omen && OMENS[run.omen] ? `<button class="dc-omen-pill" data-act="omeninfo">${icon(OMENS[run.omen].icon)} ${esc(OMENS[run.omen].name)}</button>` : ''}</div><div class="dc-loot"><span>${icon('crystal')}${fmt(run.shards)}</span>${run.chests.length ? `<span>${icon('p:chest')}${run.chests.length}</span>` : ''}</div></header>
     ${teamStrip(run.team.map((m) => m.id), run, run.phase !== 'battle')}
     ${run.phase !== 'battle' && run.team.filter((m) => !m.fallen).length > 1 ? `<p class="dc-swap-hint small muted">${ui.tsel != null ? 'Touche la créature avec qui échanger sa place.' : 'Touche deux créatures pour échanger leur place : les 3 premières combattent.'}</p>` : ''}
-    <p class="dc-rule-line small">${picon('rule')} <b>${esc(g.rule(run.day).name)}</b> · ${esc(g.rule(run.day).desc)}</p>`;
+    ${g.rule(run.day).off ? '' : `<p class="dc-rule-line small">${picon('rule')} <b>${esc(g.rule(run.day).name)}</b> · ${esc(g.rule(run.day).desc)}</p>`}`; /* v469 : règles du jour retirées (v430) : plus de ligne vide */
   function doorsView(run) {
     const doors = g.doors();
     root.innerHTML = `${runHead(run)}<p class="dc-prompt">${doors.includes('boss') ? 'Un gardien barre la route.' : doors.length > 1 ? 'Deux passages. Le plus dangereux rapporte plus.' : 'Des créatures barrent le passage.'}</p>
@@ -447,7 +448,7 @@ export default function descent(app, root) {
       try { out = g.chooseReward(el.dataset.r); } catch (e) { toast(esc(e.message), { kind: 'error' }); return; }
       // v367 : écrans de fin d'étage rapprochés — la décision (remonter / descendre) garde en tête le résumé de la victoire
       const w = ui.win;
-      ui.winBar = w ? `<div class="dc-wonbar"><span class="dc-wb-ic">${icon('check')}</span><span class="dc-wb-t"><b>Victoire · étage ${w.floor}</b><span class="dc-wb-loot"><span>${icon('crystal')}+${fmt(w.shards)}</span>${w.ash ? `<span>${icon('ash')}+${fmt(w.ash)}</span>` : ''}${w.chest ? `<span style="color:${CHESTS[w.chest].color}">${icon('p:chest')}${esc(CHESTS[w.chest].name)}</span>` : ''}</span></span></div>` : '';
+      ui.winBar = w ? `<div class="dc-wonbar"><img class="dc-wb-crest" alt="" src="assets/ui/crest-victory.webp"><span class="dc-wb-t"><b>Victoire · étage ${w.floor}</b><span class="dc-wb-loot"><span>${icon('crystal')}+${fmt(w.shards)}</span>${w.ash ? `<span>${icon('ash')}+${fmt(w.ash)}</span>` : ''}${w.chest ? `<span style="color:${CHESTS[w.chest].color}">${icon('p:chest')}${esc(CHESTS[w.chest].name)}</span>` : ''}</span></span></div>` : '';
       ui.win = null;
       if (out.altar) return render();
       app.sfx.coin();

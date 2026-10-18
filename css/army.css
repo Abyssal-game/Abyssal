@@ -4090,3 +4090,11 @@ html.fx-light .en-onlot, html.fx-light .en-game .en-ob { filter: none; }
 .en-show-coins { display: flex; flex-direction: column-reverse; margin-left: -6px; translate: 0 26px; }
 .en-show-coins img { width: 46px; margin-top: -34px; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .6)); }
 html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; }
+
+/* v469 : gains de la Descente espacés (pastilles), écusson de victoire à la place de la coche jaune */
+.rw-line { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 14px; vertical-align: middle; }
+.rw-i { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; font-weight: 700; }
+.rw-i .ic, .rw-i img, .rw-i svg { width: 22px; height: 22px; }
+.dc-first { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 10px; }
+.dc-wb-crest { width: 62px; height: 44px; flex: none; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .6)); }
+.dc-wb-loot { gap: 14px; }
