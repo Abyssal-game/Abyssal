@@ -127,23 +127,23 @@ export default function cryptesScreen(app, root) {
       if (ev.power === 'sauvage') ev.i2.forEach((i) => ui.up.add(i));
       ev.i2.forEach((i) => (ev.power === 'abyssal' ? ui.swap : ui.glow).add(i));
     }
-    app.sfx[ev.blocked ? 'block' : ev.power === 'necrotique' && ev.stolen != null ? 'capture' : 'skill']?.();
+    app.sfx[ev.blocked ? 'block' : 'cr-power']?.(); /* v457 */
     view(); await wait(ev.power === 'sauvage' && !mine ? 1900 : 1500);
     ui.up.clear(); ui.glow.clear(); ui.swap.clear(); banner = null;
   }
   // Montre un geste (carte retournée, paire, erreur), pour toi comme pour l'adversaire
   async function show(st, ev) {
-    app.sfx.flip?.();
+    app.sfx['cr-flip']?.();
     if (ev.kind === 'first') { view(); await wait(st.turn === 'a' ? 650 : 0); return; }
     ev.i.forEach((i) => ui.up.add(i));
     if (ev.kind === 'match') {
-      ev.i.forEach((i) => ui.glow.add(i)); view(); app.sfx.capture?.();
+      ev.i.forEach((i) => ui.glow.add(i)); view(); app.sfx['cr-pair']?.();
       await wait(800); ui.up.clear(); ui.glow.clear();
       await powerSay(st, ev);
       return;
     }
     view(); await wait(1100);
-    ui.up.clear();
+    ui.up.clear(); app.sfx['cr-miss']?.();
     if (ev.graced) { banner = { cls: ev.who === 'p' ? 'ok' : 'ko', html: `${sigil('celeste')}<span><b>Grâce céleste</b><span class="small">${ev.who === 'p' ? 'Tu gardes la main.' : `${esc(CR.RIVALS[st.rival].name)} garde la main.`}</span></span>` }; app.sfx.shield?.(); view(); await wait(1100); banner = null; }
     view();
   }
@@ -228,7 +228,7 @@ export default function cryptesScreen(app, root) {
       try { ev = g.cryptesPower(ui.picks); } catch (err) { ui.picks = []; toast(esc(err.message), { kind: 'error' }); return view(); }
       ui.picks = []; busy = true;
       if (ev.power === 'infernal' || ev.power === 'sauvage') {
-        ui.up.add(ev.i[0]); ui.glow.add(ev.i[0]); app.sfx.flip?.();
+        ui.up.add(ev.i[0]); ui.glow.add(ev.i[0]); app.sfx['cr-flip']?.();
         banner = { cls: 'ok', html: `${sigil(ev.card.f)}<span><b>${esc(CR.POWERS[ev.power].name)} : ${esc(fname(ev.card.f))}</b><span class="small">${ev.power === 'infernal' ? 'Toi seul l’as vue. Retiens bien sa place !' : 'Tout le monde l’a vue, l’adversaire aussi.'}</span></span>` };
         view(); await wait(1700);
       } else { ev.i.forEach((x) => ui.swap.add(x)); app.sfx.swipe?.(); banner = { cls: 'ok', html: `${sigil('abyssal')}<span><b>Cartes échangées</b><span class="small">Ce que l’adversaire avait retenu ne vaut plus rien.</span></span>` }; view(); await wait(1100); }

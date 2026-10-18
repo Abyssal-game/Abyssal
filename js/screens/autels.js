@@ -132,7 +132,7 @@ export default function autelsScreen(app, root) {
       const nm = cat.get(e.id)?.name || '';
       const fx = e.silenced ? 'Silence : son rôle n’agit pas.' : e.role ? AU.ROLE_FX[e.role] : '';
       banner = { cls: e.x === 'p' ? 'ok' : 'ko', html: `<span class="sc-med">${e.x === 'p' ? me() : pic(st.rival)}</span><span><b>${esc(nm)}</b><span class="small">${esc(AU.ALTARS[st.altars[e.a]].name)}${e.notes.length ? ` (${esc(e.notes.join(', '))})` : ''}${fx ? ` · ${esc(ROLES[e.role]?.name || '')} : ${esc(fx)}` : ''}</span></span>` };
-      app.sfx[e.x === 'p' ? 'pose' : 'flip']?.();
+      app.sfx[e.x === 'p' ? 'au-place' : 'au-reveal']?.(); /* v457 */
       view(); await wait(1000);
     }
     ui.hl.clear(); banner = null;
@@ -205,7 +205,7 @@ export default function autelsScreen(app, root) {
       const a = +b.dataset.a, plays = [...ui.plays, { id: ui.sel, a }];
       const err = AU.checkPlays(st, 'p', plays);
       if (err) { app.sfx.error?.(); toast(esc(err), { kind: 'error' }); return; }
-      ui.plays = plays; ui.sel = null; app.sfx.pose?.(); return view();
+      ui.plays = plays; ui.sel = null; app.sfx['au-place']?.(); return view();
     }
     if (k === 'end') {
       let ev;
@@ -215,7 +215,7 @@ export default function autelsScreen(app, root) {
       busy = false;
       if (gone) return;
       view();
-      if (st.over) { await wait(500); end(); }
+      if (st.over) { const mine = st.final.winners.includes('p'); if (mine) app.sfx['au-win']?.(); /* v457 : tes autels s'embrasent */ await wait(mine ? 1400 : 500); end(); }
     }
   });
 

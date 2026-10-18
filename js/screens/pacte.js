@@ -124,7 +124,8 @@ export default function pacteScreen(app, root) {
       : ev.result === 'seven' ? [mine ? 'ok' : 'ko', 'Les sept factions !', `+${PA.SEVEN_BONUS} de bonus : ${mine ? 'tu encaisses' : `${nm} encaisse`} +${ev.gain}.`]
       : ev.result === 'stop' ? ['', mine ? 'Tu t’arrêtes' : `${nm} s’arrête`, `+${ev.gain} point${ev.gain > 1 ? 's' : ''}.`] : null;
     if (!H) return;
-    ({ bust: () => app.sfx.shatter?.(), saved: () => app.sfx.shield?.(), forced: () => app.sfx.block?.(), seven: () => app.sfx.fury?.(), stop: () => app.sfx.coin?.() })[ev.result]?.();
+    /* v457 : sons propres au Pacte (ElevenLabs) */
+    app.sfx[{ bust: 'pa-bust', saved: 'pa-seal', forced: 'pa-guard', seven: 'pa-seven', stop: 'pa-bank' }[ev.result]]?.();
     banner = { cls: H[0], html: `${ev.card ? cardHTML(ev.card, 'big') : `<span class="sc-med">${mine ? me() : pic(st.rival)}</span>`}<span class="mq-vd"><b>${H[1]}</b><span>${H[2]}</span></span>` };
     view(); await wait(ms); banner = null;
   }
@@ -145,7 +146,7 @@ export default function pacteScreen(app, root) {
           if (ev.card.sp === 'offrande') shown.offer = true;
           if (ev.card.f) { shown.row.push(ev.x2 ? { ...ev.card, x2: true } : ev.card); shown.offer = false; } else shown.row.push(ev.card);
         }
-        app.sfx.flip?.();
+        app.sfx[ev.card.sp === 'offrande' ? 'pa-offer' : 'pa-draw']?.();
       }
       if (ev.result === 'ok') { renderShown(shown); await wait(650); continue; }
       if (ev.result === 'saved') {
@@ -235,7 +236,7 @@ export default function pacteScreen(app, root) {
     try { ev = k === 'draw' ? g.pacteDraw() : k === 'stop' ? g.pacteStop() : null; } catch (err) { toast(esc(err.message), { kind: 'error' }); return; }
     if (!ev) return;
     busy = true;
-    if (ev.card) app.sfx.flip?.();
+    if (ev.card && ev.result === 'ok') app.sfx[ev.card.sp === 'offrande' ? 'pa-offer' : 'pa-draw']?.();
     if (ev.result === 'ok') { busy = false; view(); return; }
     if (ev.card && ev.result !== 'saved') {
       // la carte qui brise (ou arrête, ou complète les sept) se voit un instant dans la rangée avant l'annonce

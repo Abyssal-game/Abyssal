@@ -209,6 +209,8 @@ export const sfx = {
   // ——— Interface ———
   // v439 : sons enregistrés seulement (ElevenLabs), sans repli synthétisé
   gavel() {}, cancel() {}, truth() {}, lie() {}, page() {}, solved() {},
+  /* v457 : sons propres au Pacte (pa-), aux Cryptes (cr-) et aux Trois Autels (au-) */
+  'pa-draw'() {}, 'pa-bust'() {}, 'pa-seal'() {}, 'pa-guard'() {}, 'pa-offer'() {}, 'pa-seven'() {}, 'pa-bank'() {}, 'cr-flip'() {}, 'cr-pair'() {}, 'cr-miss'() {}, 'cr-power'() {}, 'au-place'() {}, 'au-reveal'() {}, 'au-win'() {},
   tap() { noise({ dur: 0.03, gain: 0.5, freq: vary(3200, 0.1), q: 1.2, wet: 0.05 }); osc(vary(1500, 0.05), { dur: 0.05, gain: 0.1, to: 900, wet: 0.05 }); },
   error() { osc(N.A3, { type: 'triangle', dur: 0.14, gain: 0.12, lp: 900, wet: 0.15 }); osc(N.F3, { type: 'triangle', dur: 0.22, gain: 0.12, lp: 700, delay: 0.1, wet: 0.2 }); },
   coin() { bell(vary(N.A6 * 0.75, 0.02), { dur: 0.35, gain: 0.14, ratio: 2.76, index: 1.2 }); bell(N.A6, { dur: 0.5, ratio: 2.76, index: 1.2, delay: 0.06, pan: 0.2, gain: 0.12 }); noise({ dur: 0.12, gain: 0.04, type: 'highpass', freq: 7000, delay: 0.04 }); },
@@ -390,7 +392,7 @@ const sampleKey = (k, a) => {
 };
 // v308 (audit audio mesuré à l'ffmpeg) : volume propre à certains fichiers, et aigus adoucis pour ceux qui sonnaient comme des bips
 const SAMPLE_GAIN = { 'reveal-c': 7, chest: 1.4, tear: 1.4, bossvictory: 1.26, 'reveal-s': 2.2, // v329 : la Secrète doit claquer (demande du propriétaire) ; le compresseur du bus évite la saturation
-  unlock: 1.6, lie: 0.6, truth: 1.4 }; /* v439 */
+  unlock: 1.6, lie: 0.6, truth: 1.4, 'pa-bank': 3, 'cr-miss': 2, 'cr-flip': 1.6, 'pa-guard': 1.3 }; /* v439 */
 const SAMPLE_LOWPASS = { yourturn: 1200, passive: 1200, mark: 1400 };
 const lastPlay = {}, playing = {};
 function playSample(key, gain = 1) {
