@@ -360,3 +360,6 @@ html.reduce-motion .tcg.apex::before { animation: none; }
 .v-holo .tcg-art::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, #B9CBEA, #5B6C8C); mix-blend-mode: color; opacity: .32; }
 /* v419 : carte inclinée au doigt : une seule couche lissée (évite les jointures fines entre tuiles sur Safari) */
 .tcg-full.tiltable.tilting { -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+
+/* v446 : cadre Enluminée refait (tools/variant-frame2.py) : barres extérieures calées à 12 px du bord de la carte, sans cassure au milieu */
+.v-gold .tcg-vframe { background-image: url(../assets/variants/enluminee-frame2.webp); background-size: 100% 100%; }
