@@ -208,7 +208,7 @@ const REVEAL = {
 export const sfx = {
   // ——— Interface ———
   // v439 : sons enregistrés seulement (ElevenLabs), sans repli synthétisé
-  gavel() {}, cancel() {}, page() {},
+  gavel() {}, cancel() {}, page() {}, 'en-coin'() {}, /* v465 : pièce posée aux Enchères */
   /* v457 : sons propres au Pacte (pa-) et aux Cryptes (cr-) ; v463 : ceux des Trois Autels retirés avec le jeu */
   'pa-draw'() {}, 'pa-bust'() {}, 'pa-seal'() {}, 'pa-guard'() {}, 'pa-offer'() {}, 'pa-seven'() {}, 'pa-bank'() {}, 'cr-flip'() {}, 'cr-pair'() {}, 'cr-miss'() {}, 'cr-power'() {},
   tap() { noise({ dur: 0.03, gain: 0.5, freq: vary(3200, 0.1), q: 1.2, wet: 0.05 }); osc(vary(1500, 0.05), { dur: 0.05, gain: 0.1, to: 900, wet: 0.05 }); },

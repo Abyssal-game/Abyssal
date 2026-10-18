@@ -135,8 +135,8 @@ export default function encheresScreen(app, root) {
       <span>${tk ? `${ev.value > 0 ? '+' : ''}${ev.value} point${Math.abs(ev.value) > 1 ? 's' : ''}` : 'Il s’ajoute au lot suivant.'}</span></span>` };
     view();
     /* v439 : offrandes annulées, puis coup de marteau du lot adjugé */
-    if (ev.cancelled.length) app.sfx.cancel?.();
-    if (ev.taker) setTimeout(() => app.sfx.gavel?.(), ev.cancelled.length ? 450 : 0);
+    if (ev.cancelled.length) setTimeout(() => app.sfx.cancel?.(), 350);
+    if (ev.taker) setTimeout(() => app.sfx.gavel?.(), ev.cancelled.length ? 800 : 350);
     await wait(2000);
     banner = null;
   }
@@ -198,7 +198,7 @@ export default function encheresScreen(app, root) {
     if (k === 'bid' && ui.sel) {
       let ev;
       try { ev = g.encheresBid(ui.sel); } catch (err) { toast(esc(err.message), { kind: 'error' }); return; }
-      ui.sel = null; busy = true;
+      ui.sel = null; busy = true; app.sfx['en-coin']?.(); /* v465 : la pièce posée */
       reveal(st, ev).then(async () => { busy = false; if (gone) return; view(); if (g.s.encheres.cur?.over) { await wait(300); end(); } });
     }
   });
