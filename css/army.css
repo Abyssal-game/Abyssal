@@ -3862,3 +3862,6 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 .tab-main .orb { width: 56px; height: 56px; margin-top: -30px; margin-bottom: 8px; }
 .tab-main .orb .tab-pic { width: 42px; height: 42px; }
 .tab-main .badge { top: -26px; left: calc(50% + 14px); z-index: 2; } /* v436 : pastille au bord du rond, sans cacher l'image */
+/* v438 : nouveaux sachets standard et Alliances (Gemini) : le nom s'écrit dans le cadre sombre du bas, « 3 cartes » juste dessous */
+.pack-standard .pk-label, .pack-event .pk-label { top: 74.6%; bottom: auto; left: 16%; right: 16%; gap: 3.2cqw; }
+.pack-standard .pk-name, .pack-event .pk-name { display: grid; place-items: center; height: 8.6cqw; font-size: 6.4cqw; letter-spacing: .08em; text-transform: uppercase; color: #F1DB9E; }

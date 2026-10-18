@@ -34,15 +34,17 @@ export function pityHTML(g) {
   return `<div class="pity-box" aria-label="Garanties">${row('HR', g.s.pity.sinceHR, PITY.hr, 'Hyper rare')}${row('M', g.s.pity.sinceM, PITY.m, 'Mythique')}</div>`;
 }
 
+// v438 : nouveaux sachets (nouveaux noms : le service worker garderait les anciens)
+const PACK_FILE = { abysse: 'abysse2', standard: 'standard2', event: 'event2' };
 export function packHTML(type, cat, { faction, event } = {}) {
   const def = BOOSTERS[type] || { name: type === 'shadow' ? 'Booster des Ombres' : 'Booster' };
   let label = type === 'shadow' ? 'Ombres' : def.name.replace('Booster ', '');
   let key = type;
   if (type === 'faction' && faction) { label = cat.faction[faction].name; key = faction; }
-  if (type === 'event' && event) label = event.name;
+  if (type === 'event') label = 'Alliances';
   const tag = type === 'abysse' ? '5 cartes' : type === 'premium' ? 'Rare garantie' : '3 cartes';
   return `<div class="pack pack-${type}">
-    <img class="pk-img" alt="" src="assets/packs/${key === 'abysse' ? 'abysse2' : key}.webp">
+    <img class="pk-img" alt="" src="assets/packs/${PACK_FILE[key] || key}.webp">
     <div class="pk-logo">ABYSSAL</div>
     <div class="pk-label"><span class="pk-name">${esc(label)}</span><span class="pk-tag">${tag}</span></div>
     <div class="pk-tearline"></div>
@@ -120,7 +122,7 @@ export default function shop(app, root, params = []) {
       <div class="products">
         ${card('standard')}
         ${card('faction', '', `<div class="chips fac-pick fac-grid" role="radiogroup" aria-label="Faction du booster">${FACTION_ORDER.map((f) => `<button class="chip" role="radio" data-act="pickfac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}" aria-checked="${st.faction === f}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>`)}
-        ${card('event', `<p class="event-line"><b>${esc(ev.name)}</b> · ${ev.factions.map((f) => esc(cat.faction[f].name)).join(' et ')}<br><span class="small muted">${esc(ev.desc)} Encore ${ev.daysLeft} jour${ev.daysLeft > 1 ? 's' : ''}.</span></p>`)}
+        ${card('event', `<p class="event-line"><b>Alliées cette semaine</b> : ${ev.factions.map((f) => esc(cat.faction[f].name)).join(' et ')}<br><span class="small muted">Nouvelle alliance dans ${ev.daysLeft} jour${ev.daysLeft > 1 ? 's' : ''}.</span></p>`)}
         ${card('premium')}
         ${g.s.tickets.abysse ? card('abysse') : ''}
       </div>
