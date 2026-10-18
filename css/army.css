@@ -4157,3 +4157,25 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .pf-cx-braise { border-color: #FF8A2A; box-shadow: 0 0 0 2px #3A1000, 0 0 12px #FF5A1A, 0 0 24px rgba(255, 140, 40, .55); }
 /* v471 : médaille de victoire Gemini (sceau de cire à l'œil, lauriers, lames) à la place de l'écusson provisoire */
 .dc-wb-crest { width: 48px; height: 48px; border-radius: 50%; filter: drop-shadow(0 0 8px rgba(242, 160, 60, .45)) drop-shadow(0 2px 4px rgba(0, 0, 0, .7)); }
+
+/* v472 : cadres de profil peints (Gemini) du Codex et de l'Échoppe : anneau transparent de 1,9 × l'avatar (tools/frame-art.py),
+   posé par-dessus ; l'avatar laisse dépasser le cadre et arrondit lui-même la photo */
+.pf[class*="pf-cx-"] { position: relative; overflow: visible; border-color: transparent; box-shadow: none; animation: none; }
+.pf[class*="pf-cx-"] > img { border-radius: 50%; }
+.pf[class*="pf-cx-"]::after { content: ''; position: absolute; inset: -45%; background: var(--fr) center / 100% 100% no-repeat; pointer-events: none; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .6)); }
+.pf-cx-encre { --fr: url(../assets/frames/cx-encre.webp); }
+.pf-cx-sang { --fr: url(../assets/frames/cx-sang.webp); }
+.pf-cx-or { --fr: url(../assets/frames/cx-or.webp); }
+.pf-cx-givre { --fr: url(../assets/frames/cx-givre.webp); }
+.pf-cx-braise { --fr: url(../assets/frames/cx-braise.webp); }
+.pf-cx-abime { --fr: url(../assets/frames/cx-abime.webp); }
+.pf-cx-fondateur { --fr: url(../assets/frames/cx-fondateur.webp); }
+.pf-cx-os { --fr: url(../assets/frames/cx-os.webp); }
+.pf-cx-serpents { --fr: url(../assets/frames/cx-serpents.webp); }
+.pf-cx-vitrail { --fr: url(../assets/frames/cx-vitrail.webp); }
+.pf-cx-rouages { --fr: url(../assets/frames/cx-rouages.webp); }
+.pf-cx-racines { --fr: url(../assets/frames/cx-racines.webp); }
+.pf-cx-yeux { --fr: url(../assets/frames/cx-yeux.webp); }
+.pf-cx-chaines { --fr: url(../assets/frames/cx-chaines.webp); }
+.pf-cx-ruche { --fr: url(../assets/frames/cx-ruche.webp); }
+.top-avatar.pf[class*="pf-cx-"] { margin: 0 9px; }

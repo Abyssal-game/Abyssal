@@ -29,10 +29,13 @@ export const CODEX_XP = {
 };
 export const CODEX_XP_LABEL = { floor: 'Étage franchi (1re fois)', boss: 'Gardien vaincu (1re fois)', win: 'Autre victoire dans la Descente', trial: 'Épreuve du jour gagnée', game: 'Partie gagnée dans la Salle des jeux', mission: 'Mission du jour' };
 
-// Cosmétiques propres au Codex et à l'Échoppe (cadres dessinés en CSS : .pf-<clé> en fin de css/army.css)
+// Cosmétiques propres au Codex et à l'Échoppe (v472 : cadres peints par Gemini, assets/frames/<clé>.webp, posés par .pf-<clé>)
 export const CODEX_FRAMES = {
   'cx-encre': 'Cadre d’encre', 'cx-sang': 'Cadre de sang séché', 'cx-or': 'Cadre enluminé', 'cx-abime': 'Cadre de l’Abîme',
   'cx-fondateur': 'Cadre du Fondateur', 'cx-givre': 'Cadre de givre', 'cx-braise': 'Cadre des braises éternelles',
+  /* v472 : réserve (saison II ou Échoppe), images prêtes dans assets/frames/ */
+  'cx-os': 'Couronne d’ossements', 'cx-serpents': 'Cadre des serpents d’obsidienne', 'cx-vitrail': 'Cadre du vitrail céleste', 'cx-rouages': 'Cadre des rouages',
+  'cx-racines': 'Cadre des racines anciennes', 'cx-yeux': 'Cadre aux mille yeux', 'cx-chaines': 'Cadre des chaînes forgées', 'cx-ruche': 'Cadre de la ruche d’ambre',
 };
 // Dos de cartes : images à faire par Gemini (assets/backs/<clé>.webp) ; dans l'ébauche, ils se gagnent mais ne s'affichent pas encore
 export const CODEX_BACKS = { 'dos-codex': 'Dos du Codex', 'dos-abime': 'Dos de l’Abîme', 'dos-fondateur': 'Dos du Fondateur' };
