@@ -38,12 +38,12 @@ const THEMES = {
     drone: 0.04, lp: 460, every: [8, 11], pad: 0.012, bells: [7, 12], bell: 0.016, choir: 0.012, wind: 0, pluck: [2.5, 5],
   },
 };
-THEMES.abysse = THEMES.boss; THEMES.encheres = THEMES.sceaux; THEMES.pacte = THEMES.sceaux; THEMES.cryptes = THEMES.sceaux; /* v458 : musiques du Pacte, des Cryptes et des Trois Autels */ /* v443 : Enchères et Énigmes */ /* v442 : combat contre L'Abysse (assets/music/abysse.mp3) */
+THEMES.abysse = THEMES.boss; THEMES.encheres = THEMES.sceaux; THEMES.pacte = THEMES.sceaux; THEMES.cryptes = THEMES.sceaux; THEMES.duels = THEMES.sceaux; /* v467 : musique des Duels des Sceaux */ /* v458 : musiques du Pacte, des Cryptes et des Trois Autels */ /* v443 : Enchères et Énigmes */ /* v442 : combat contre L'Abysse (assets/music/abysse.mp3) */
 /* v463 : Cour des Masques, Énigmes et Trois Autels retirés du jeu (et leurs musiques) */
-export const MUSIC_DEMO = [['Accueil', 'antre'], ['Butin', 'boutique'], ['Descente', 'descente'], ['Combat', 'combat'], ['Gardien', 'boss'], ['Salle des jeux', 'sceaux'], ['Enchères', 'encheres'], ['Le Pacte', 'pacte'], ['Les Cryptes', 'cryptes'], ['L’Abysse', 'abysse']];
+export const MUSIC_DEMO = [['Accueil', 'antre'], ['Butin', 'boutique'], ['Descente', 'descente'], ['Combat', 'combat'], ['Gardien', 'boss'], ['Salle des jeux', 'sceaux'], ['Duels des Sceaux', 'duels'], ['Enchères', 'encheres'], ['Le Pacte', 'pacte'], ['Les Cryptes', 'cryptes'], ['L’Abysse', 'abysse']];
 
 // Lieu → ambiance
-const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', arsenal: 'boutique', descente: 'descente', heros: 'descente', marchand: 'descente', sceaux: 'sceaux', jeux: 'sceaux', encheres: 'encheres', pacte: 'pacte', cryptes: 'cryptes', epreuves: 'descente' }; /* v434 : la Salle des jeux */ /* v408 : Épreuves du jour = ambiance de la Descente, musique de combat en combat */
+const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', arsenal: 'boutique', descente: 'descente', heros: 'descente', marchand: 'descente', sceaux: 'duels', jeux: 'sceaux', encheres: 'encheres', pacte: 'pacte', cryptes: 'cryptes', epreuves: 'descente' }; /* v434 : la Salle des jeux */ /* v408 : Épreuves du jour = ambiance de la Descente, musique de combat en combat */
 
 function init() {
   if (ctx) return ctx;
@@ -150,7 +150,7 @@ function brass(grp, f, t) {
 // Une musique livrée remplace l'ambiance calculée de son lieu ; elle tourne en boucle.
 const tracks = {}, trackGet = {}; let trackList = null, trackLoad = null, recent = [];
 // v308 : réglage de volume par musique (mesuré : le gardien était la plus basse alors qu'elle doit être la plus intense)
-const TRACK_GAIN = { boss: 1.26, boutique: 1.19, descente: 1.19, abysse: 1.26 };
+const TRACK_GAIN = { duels: 1.3, boss: 1.26, boutique: 1.19, descente: 1.19, abysse: 1.26 };
 // v442 : musique jouée une fois depuis le début, puis boucle sur un passage (secondes) ; le fichier est préparé pour que la fin du passage s'enchaîne sur son début
 const TRACK_LOOP = { abysse: [50, 142] };
 // Seule la liste est lue au démarrage ; chaque musique est téléchargée la première fois que son lieu est visité
