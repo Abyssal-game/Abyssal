@@ -71,7 +71,7 @@ export default function pacteScreen(app, root) {
     let el = document.querySelector('.sc-scene');
     if (!el) { el = document.createElement('div'); document.body.prepend(el); }
     el.className = 'sc-scene mq-scene';
-    el.style.backgroundImage = 'url(assets/sceaux/salle-necrotique.webp)';
+    el.style.backgroundImage = 'url(assets/sceaux/salle-pacte.webp)';
   }
   const cardHTML = (c, cls = '') => {
     if (c.sp) return `<span class="pa-card sp sp-${c.sp} ${cls}"><img alt="" src="${SP[c.sp].img}"><span class="pa-cn">${SP[c.sp].name}</span></span>`;

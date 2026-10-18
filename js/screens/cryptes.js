@@ -72,7 +72,7 @@ export default function cryptesScreen(app, root) {
     let el = document.querySelector('.sc-scene');
     if (!el) { el = document.createElement('div'); document.body.prepend(el); }
     el.className = 'sc-scene mq-scene';
-    el.style.backgroundImage = 'url(assets/sceaux/salle-necrotique.webp)';
+    el.style.backgroundImage = 'url(assets/sceaux/salle-cryptes.webp)';
   }
   const seat = (st, x) => {
     const R = CR.RIVALS[st.rival], n = CR.scoreOf(st, x);

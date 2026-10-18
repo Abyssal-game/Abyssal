@@ -4061,3 +4061,9 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 /* v453 : bannières de Renforcer et de la Descente : les images existaient, mais aucune règle ne les affichait */
 .bn-renfort { --bn: url(../assets/ui/bn-renfort.webp); }
 .bn-descente { --bn: url(../assets/ui/bn-descente.webp); }
+
+/* v456 : images Gemini des trois nouveaux jeux (bannières 900 × 297, décors verticaux) */
+.bn-pacte { --bn: url(../assets/ui/bn-pacte.webp); }
+.bn-cryptes { --bn: url(../assets/ui/bn-cryptes.webp); }
+.bn-autels { --bn: url(../assets/ui/bn-autels.webp); }
+.gm-pacte .gm-art, .gm-cryptes .gm-art, .gm-autels .gm-art { background-position: right center; }

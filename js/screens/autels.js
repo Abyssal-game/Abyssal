@@ -81,7 +81,7 @@ export default function autelsScreen(app, root) {
     let el = document.querySelector('.sc-scene');
     if (!el) { el = document.createElement('div'); document.body.prepend(el); }
     el.className = 'sc-scene mq-scene';
-    el.style.backgroundImage = 'url(assets/sceaux/salle-celeste.webp)';
+    el.style.backgroundImage = 'url(assets/sceaux/salle-autels.webp)';
   }
   const boardCard = (c, x, a, k) => `<span class="au-b ${ui.hl.has(`${x}${a}${k}`) ? 'hl' : ''} ${c.mod > 0 ? 'up' : c.mod < 0 ? 'down' : ''}" style="--fc:${cat.faction[c.f].colors.secondary}"><img alt="" src="${art(c.id)}"><b>${AU.powerOf(c)}</b></span>`;
   const ghost = (id, st) => `<span class="au-b ghost" data-au="unplay" data-id="${id}"><img alt="" src="${art(id)}"><b>${st.info[id].base}</b></span>`;
