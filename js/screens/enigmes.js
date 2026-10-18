@@ -120,7 +120,7 @@ export default function enigmesScreen(app, root) {
     busy = false;
     if (gone) return;
     app.chrome?.();
-    if (out.ok) { app.sfx.victory?.(); result(out); }
+    if (out.ok) { (out.chest ? app.sfx.victory : app.sfx.solved)?.(); result(out); } /* v441 : son « solved » ; la fanfare seulement pour les trois énigmes du jour */
     else if (out.failed) { app.sfx.defeat?.(); result(out); }
     else { app.sfx.error?.(); view({ msg: `Pas tout à fait : ${out.n} sur ${pz.goal}. Encore ${out.left} essai${out.left > 1 ? 's' : ''}.` }); }
   }
