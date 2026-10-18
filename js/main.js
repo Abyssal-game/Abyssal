@@ -47,12 +47,12 @@ const ROUTES = {
   parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen, sceaux: sceauxScreen, masques: masquesScreen, encheres: encheresScreen, enigmes: enigmesScreen, jeux: gamesScreen, epreuves: trialsScreen, epreuve: descentScreen, tirage: shadowScreen, renfort: forgeScreen, fournaise: furnaceScreen,
 };
 const TABS = [
-  ['antre', 'tab-home', 'Accueil'], ['collection', 'tab-collection', 'Collection'], ['boutique', 'tab-boosters', 'Boosters'],
+  ['antre', 'tab-home', 'Accueil'], ['collection', 'tab-collection', 'Collection'], ['boutique', 'tab-boosters', 'Trésors'], /* v428 : boosters, coffres et Tirage */
   ['descente', 'tab-adventure', 'Aventure'], ['menu', 'tab-more', 'Sanctuaire'],
 ];
 // icônes peintes de la barre du bas (assets/icons)
 const tabIcon = (k) => `<img class="tab-pic" alt="" src="assets/icons/${k}.webp">`;
-const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', equipe: 'collection', renfort: 'collection', fournaise: 'collection', coffres: 'descente', heros: 'descente', arsenal: 'descente', marchand: 'descente', sceaux: 'descente', masques: 'descente', encheres: 'descente', enigmes: 'descente', jeux: 'descente', epreuves: 'descente', epreuve: 'descente', tirage: 'boutique' };
+const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', equipe: 'collection', renfort: 'collection', fournaise: 'collection', coffres: 'boutique', heros: 'descente', arsenal: 'boutique', marchand: 'descente', sceaux: 'descente', masques: 'descente', encheres: 'descente', enigmes: 'descente', jeux: 'descente', epreuves: 'descente', epreuve: 'descente', tirage: 'boutique' };
 // Fond illustré de chaque page (l'Accueil et la Descente posent le leur)
 const ROUTE_SCENE = { boutique: 'shop', tirage: 'shadow', renfort: 'collection', fournaise: 'collection', collection: 'collection', equipe: 'team', coffres: 'chests', bestiaire: 'bestiary', succes: 'trophies', profil: 'profile', menu: 'menu', parametres: 'menu', compte: 'menu', factions: 'factions', faction: 'factions' };
 // Page parente des sous-pages (bouton retour en haut)
@@ -62,8 +62,8 @@ const PARENT = { bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire',
 const SUB_OF = { fournaise: 'renfort', sceaux: 'jeux', masques: 'jeux', encheres: 'jeux', enigmes: 'jeux' };
 const SUBNAV = {
   collection: [['collection', 'cards', 'Cartes'], ['equipe', 'team-ic', 'Équipe'], ['renfort', 'furnace', 'Forge']], /* v422 : Renforcer + Fournaise */
-  boutique: [['boutique', 'booster', 'Boosters'], ['tirage', 'shadow', 'Tirage']],
-  descente: [['descente', 'descend', 'Descente'], ['epreuves', 'crest-elite', 'Épreuves'], ['jeux', 'seal', 'Jeux'], ['coffres', 'chest', 'Coffres']], /* v422 : les coffres se gagnent dans l'Aventure */
+  boutique: [['boutique', 'booster', 'Boosters'], ['coffres', 'chest', 'Coffres'], ['tirage', 'shadow', 'Tirage']], /* v428 : les coffres rejoignent les Trésors */
+  descente: [['descente', 'descend', 'Descente'], ['epreuves', 'crest-elite', 'Épreuves'], ['jeux', 'seal', 'Jeux']],
 };
 
 function storageOrMemory() {
@@ -100,7 +100,7 @@ function applySettings() {
 
 // Explication des deux monnaies (toucher le compteur en haut à droite)
 const WALLET = {
-  shards: ['Éclats', 'La monnaie principale. Ils servent à acheter des boosters (onglet Boosters).', 'Tu en gagnes avec l’offrande du jour, les missions, les succès, les nouvelles créatures découvertes la première victoire à chaque étage de la Descente, les Épreuves du jour et les coffres (bois et fer en donnent ; or et abyssal donnent des boosters).', 'boutique', 'Aller aux Boosters'],
+  shards: ['Éclats', 'La monnaie principale. Ils servent à acheter des boosters (onglet Trésors).', 'Tu en gagnes avec l’offrande du jour, les missions, les succès, les nouvelles créatures découvertes la première victoire à chaque étage de la Descente, les Épreuves du jour et les coffres (bois et fer en donnent ; or et abyssal donnent des boosters).', 'boutique', 'Aller aux Trésors'],
   ash: ['Cendres', 'Ce qui reste des cartes brûlées dans la Fournaise. Elles font monter le niveau de tes créatures et permettent de sublimer une carte vers une finition plus rare.', 'Chaque combat gagné dans la Descente en donne, la première victoire à chaque étage encore plus, et les coffres aussi. Brûle tes doublons dans la Fournaise (Collection → Forge) : plus la carte est rare, plus elle en donne, et les finitions rares encore plus.', 'fournaise', 'Aller à la Fournaise'],
 };
 // iPhone, app posée sur l'écran d'accueil : la hauteur annoncée par le navigateur peut être plus
@@ -180,7 +180,7 @@ function renderChrome() {
     const cur = key === tab ? ' aria-current="page"' : '';
     // moins de pastilles : un chiffre seulement pour ce qui attend d'être ouvert (boosters, coffres), sinon un simple point
     const dot = '<span class="badge dot"></span>';
-    const badge = key === 'boutique' && ticketCount ? `<span class="badge">${ticketCount}</span>` /* v404 : les boosters à ouvrir seulement (les coffres ont leur chiffre sur leur sous-onglet) */
+    const badge = key === 'boutique' && ticketCount + g.chestCount() ? `<span class="badge">${ticketCount + g.chestCount()}</span>` /* v428 : boosters et coffres à ouvrir */
       : key === 'collection' && nNew ? dot
       : key === 'antre' && (g.canDailyClaim() || g.missionsToClaim()) ? dot
       : key === 'descente' && g.team().length >= 3 && (g.descent().run || g.trials().done.some((x) => !x)) ? dot : ''; /* v407 : Épreuves du jour à jouer */

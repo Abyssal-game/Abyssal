@@ -14,7 +14,7 @@ const PAGES = [
   { img: 3, t: 'La Descente', p: 'Dans l’onglet Aventure, ton équipe descend dans l’Abysse : 3 créatures au combat, 2 en réserve. 20 chapitres de 5 étages, un gardien à la fin de chacun, et une récompense à chaque étage gagné.' },
   { bn: 'trial', t: 'Les Épreuves du jour', p: 'Toujours dans Aventure : trois combats par jour, réglés sur la force de tes meilleures cartes. Chaque victoire rapporte un coffre, et fait avancer la saison du mois.' },
   { bn: 'sceaux', t: 'Une autre aventure', p: 'Toujours dans Aventure : les Duels des Sceaux, un jeu de cartes où l’on capture celles de l’adversaire. Ils s’ouvrent quand tu as vaincu ton premier gardien de la Descente.' },
-  { bn: 'shadow', t: 'Coffres et Tirage des Ombres', p: 'Dans l’onglet Boosters, ouvre les coffres gagnés en Aventure. Le Tirage des Ombres donne un booster par jour : sa valeur compte pour le classement de la semaine, et les 3 premiers gagnent un coffre.' },
+  { bn: 'shadow', t: 'Coffres et Tirage des Ombres', p: 'Dans l’onglet Trésors, ouvre tes boosters et les coffres gagnés en jouant. Le Tirage des Ombres donne un booster par jour : sa valeur compte pour le classement de la semaine, et les 3 premiers gagnent un coffre.' },
   { img: 4, t: 'Reviens chaque jour', p: 'L’Accueil rassemble ce qui t’attend : ton prochain objectif, l’offrande, les Épreuves, les missions et les coffres. Le Sanctuaire garde ton profil, tes succès, le bestiaire et les réglages (son, musique, vibrations, tutoriels).' },
 ];
 
