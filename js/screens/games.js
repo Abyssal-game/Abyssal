@@ -14,6 +14,6 @@ export default function gamesScreen(app, root) {
     ${g.sceauxOpen() ? '' : `<section class="panel tr-lock">${icon('lock')}<b>Encore scellée</b><p class="small">Vaincs ton <b>premier gardien</b> dans la Descente (étage 5) pour ouvrir la Salle des jeux.</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`}
     <div class="gm-list ${g.sceauxOpen() ? '' : 'locked'}">
       ${tile('#/sceaux', 'gm-sceaux', 'Duels des Sceaux', 'Pose tes cartes sur un plateau de 3 × 3 et capture celles de l’adversaire.', `${rec(sc.wins, sc.losses)} · ${Object.keys(sc.beaten || {}).length} / 8 adversaires battus`, 'assets/sceaux/salle.webp')}
-      ${tile('#/masques', 'gm-masques', 'La Cour des Masques', 'Bluff à trois : donne une carte, annonce sa faction… et mens si tu l’oses.', `${rec(mq.wins, mq.losses)} · ${Object.keys(mq.beaten || {}).length} / ${MQ.TABLES.length} tables gagnées`, 'assets/sceaux/salle-abyssal.webp')}
+      ${tile('#/masques', 'gm-masques', 'La Cour des Masques', 'Bluff à trois : donne une carte, annonce sa faction… et mens si tu l’oses.', `${rec(mq.wins, mq.losses)} · ${Object.keys(mq.beaten || {}).length} / ${MQ.TABLES.length} tables gagnées`, 'assets/ui/bn-masques.webp')}
     </div>`;
 }

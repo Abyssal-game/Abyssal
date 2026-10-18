@@ -40,7 +40,7 @@ export default function masquesScreen(app, root) {
     document.querySelector('.sc-scene')?.remove();
     setScene('menu');
     if (!g.masquesOpen()) {
-      root.innerHTML = `<header class="screen-head ui-hero bn-sceaux mq-hero"><h1>La Cour des Masques</h1><p class="muted">Un jeu de bluff à trois.</p></header>
+      root.innerHTML = `<header class="screen-head ui-hero bn-masques mq-hero"><h1>La Cour des Masques</h1><p class="muted">Un jeu de bluff à trois.</p></header>
         <section class="panel tr-lock">${icon('lock')}<b>Encore scellée</b><p class="small">Vaincs ton <b>premier gardien</b> dans la Descente (étage 5) pour ouvrir la Cour des Masques.</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`;
       return;
     }
@@ -54,7 +54,7 @@ export default function masquesScreen(app, root) {
         ${won ? `<span class="sc-won">${icon('check')}</span>` : open ? icon('next') : icon('p:mysteries')}</button>`];
     });
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
-    root.innerHTML = `<header class="screen-head ui-hero bn-sceaux mq-hero"><h1>La Cour des Masques</h1><p class="muted">Donne, annonce, bluffe. Celui qui garde 4 cartes d’une même faction perd.</p>
+    root.innerHTML = `<header class="screen-head ui-hero bn-masques mq-hero"><h1>La Cour des Masques</h1><p class="muted">Donne, annonce, bluffe. Celui qui garde 4 cartes d’une même faction perd.</p>
         <span class="sc-rec">${mq.wins} victoire${mq.wins > 1 ? 's' : ''} · ${mq.losses} défaite${mq.losses > 1 ? 's' : ''}</span></header>
       ${g.masquesDailyOpen() ? `<button class="panel sc-daily ${dailyDone ? 'done' : ''}" data-mq="daily" ${dailyDone ? 'disabled' : ''}>
         <img alt="" src="assets/icons/hourglass.webp"><span><b>Défi du jour</b><span class="small">${esc(DT.name)} · la même donne pour tous</span>
@@ -74,7 +74,7 @@ export default function masquesScreen(app, root) {
     let el = document.querySelector('.sc-scene');
     if (!el) { el = document.createElement('div'); document.body.prepend(el); }
     el.className = 'sc-scene mq-scene';
-    el.style.backgroundImage = `url(assets/sceaux/${MQ.TABLE[t].room}.webp)`;
+    el.style.backgroundImage = 'url(assets/sceaux/salle-masques.webp)'; /* v426 : salle de la Cour (Gemini) */
   }
   // Cartes posées devant un joueur : une pastille par faction (rouge à 3, il n'en faut plus qu'une)
   const frontHTML = (st, x) => {
