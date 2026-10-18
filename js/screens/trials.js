@@ -18,7 +18,7 @@ import { runDuel } from './duel-ui.js';
 import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
 
-const DOOR = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss' };
+const DOOR = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss' }; /* v454 : l'Épreuve III sans gardien (élite de repli) prend la porte du Gouffre : jamais deux portes pareilles */
 
 export default function trials(app, root) {
   const g = app.game, cat = app.catalog;
@@ -31,7 +31,7 @@ export default function trials(app, root) {
   function cardHTML(i) {
     const x = g.trialInfo(i), t = g.trials(), cur = t.cur === i && t.battle, B = x.boss ? BOSSES[x.boss] : null;
     const state = x.state === 'won' ? `<span class="ep-st won">${icon('check')} Gagnée</span>` : x.state === 'lost' ? `<span class="ep-st lost">${icon('close')} Perdue</span>` : cur ? '<span class="ep-st cur">En cours</span>' : '';
-    return `<article class="ep-c r-${x.room} ${x.state || ''}" style="--art:url(${sceneUrl(DOOR[x.room])})">
+    return `<article class="ep-c r-${x.room} ${x.state || ''}" style="--art:url(${sceneUrl(i === 2 && x.room !== 'boss' ? 'door-gouffre' : DOOR[x.room])})">
       <span class="ep-art"></span>
       <div class="ep-body"><span class="ep-k">Épreuve ${['I', 'II', 'III'][i]} · ${esc(x.room === 'boss' ? 'Gardien' : x.room === 'elite' ? 'Élite' : 'Combat')}</span>
         <b>${esc(B ? B.name : TRIALS[i].room === 'boss' ? 'Une élite redoutable' : TRIALS[i].name)}</b>
