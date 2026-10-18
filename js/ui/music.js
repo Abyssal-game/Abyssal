@@ -38,12 +38,12 @@ const THEMES = {
     drone: 0.04, lp: 460, every: [8, 11], pad: 0.012, bells: [7, 12], bell: 0.016, choir: 0.012, wind: 0, pluck: [2.5, 5],
   },
 };
-THEMES.masques = THEMES.sceaux; THEMES.abysse = THEMES.boss; THEMES.encheres = THEMES.sceaux; THEMES.enigmes = THEMES.sceaux; /* v443 : Enchères et Énigmes */ /* v442 : combat contre L'Abysse (assets/music/abysse.mp3) */
+THEMES.masques = THEMES.sceaux; THEMES.abysse = THEMES.boss; THEMES.encheres = THEMES.sceaux; THEMES.enigmes = THEMES.sceaux; THEMES.pacte = THEMES.sceaux; THEMES.cryptes = THEMES.sceaux; THEMES.autels = THEMES.sceaux; /* v458 : musiques du Pacte, des Cryptes et des Trois Autels */ /* v443 : Enchères et Énigmes */ /* v442 : combat contre L'Abysse (assets/music/abysse.mp3) */
 /* (réglages du repli inutilisés) */ /* v440 : la Cour des Masques a sa musique enregistrée (assets/music/masques.mp3) ; réglages du repli inutilisés */
-export const MUSIC_DEMO = [['Accueil', 'antre'], ['Butin', 'boutique'], ['Descente', 'descente'], ['Combat', 'combat'], ['Gardien', 'boss'], ['Salle des jeux', 'sceaux'], ['Cour des Masques', 'masques'], ['Enchères', 'encheres'], ['Énigmes', 'enigmes'], ['L’Abysse', 'abysse']];
+export const MUSIC_DEMO = [['Accueil', 'antre'], ['Butin', 'boutique'], ['Descente', 'descente'], ['Combat', 'combat'], ['Gardien', 'boss'], ['Salle des jeux', 'sceaux'], ['Cour des Masques', 'masques'], ['Enchères', 'encheres'], ['Énigmes', 'enigmes'], ['Le Pacte', 'pacte'], ['Les Cryptes', 'cryptes'], ['Les Trois Autels', 'autels'], ['L’Abysse', 'abysse']];
 
 // Lieu → ambiance
-const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', arsenal: 'boutique', descente: 'descente', heros: 'descente', marchand: 'descente', sceaux: 'sceaux', jeux: 'sceaux', masques: 'masques', encheres: 'encheres', enigmes: 'enigmes', pacte: 'sceaux', cryptes: 'sceaux', autels: 'sceaux', epreuves: 'descente' }; /* v434 : la Salle des jeux */ /* v408 : Épreuves du jour = ambiance de la Descente, musique de combat en combat */
+const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', arsenal: 'boutique', descente: 'descente', heros: 'descente', marchand: 'descente', sceaux: 'sceaux', jeux: 'sceaux', masques: 'masques', encheres: 'encheres', enigmes: 'enigmes', pacte: 'pacte', cryptes: 'cryptes', autels: 'autels', epreuves: 'descente' }; /* v434 : la Salle des jeux */ /* v408 : Épreuves du jour = ambiance de la Descente, musique de combat en combat */
 
 function init() {
   if (ctx) return ctx;
