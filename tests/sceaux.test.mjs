@@ -324,16 +324,26 @@ test('v358 : une carte Inviolable qui résiste ne tombe pas dans la même pose',
   assert.equal(st.board[3].owner, 'p');
 });
 
-test('v306 : chaque rival a sa force de jeu, et sa revanche éveillée joue au moins aussi fort', () => {
+test('v475 : chaque rival a sa force de jeu, et sa revanche implacable est notée au moins aussi dure', () => {
+  let prev = 0;
   for (const R of SC.RIVALS) {
-    assert.ok(Array.isArray(R.ai) && Array.isArray(R.aiAwake), R.key);
-    assert.ok(R.aiAwake[0] >= R.ai[0], `${R.key} éveillé`);
+    assert.ok(Array.isArray(R.ai) && Array.isArray(R.aiAwake) && R.ai.length === 3 && R.aiAwake.length === 3, R.key);
+    assert.ok(R.starsAwake >= R.stars && R.stars >= prev, `${R.key} étoiles`); prev = R.stars;
     const st = SC.newGame(catalog, { hand: SC.autoHand(catalog, []), rival: R, seed: 3 });
-    assert.deepEqual(st.ai, { level: R.ai[0], slip: R.ai[1] });
+    assert.deepEqual(st.ai, { level: R.ai[0], slip: R.ai[1], tol: R.ai[2] });
     const A = SC.awakened(R);
-    assert.deepEqual(SC.newGame(catalog, { hand: SC.autoHand(catalog, []), rival: A, seed: 3 }).ai, { level: R.aiAwake[0], slip: R.aiAwake[1] });
+    assert.deepEqual(SC.newGame(catalog, { hand: SC.autoHand(catalog, []), rival: A, seed: 3 }).ai, { level: R.aiAwake[0], slip: R.aiAwake[1], tol: R.aiAwake[2] });
   }
-  assert.deepEqual(SC.RIVALS.at(-1).aiAwake[0], 6, 'la Souveraine éveillée calcule la fin de partie');
+});
+
+test('v475 : un coup imparfait reste proche du meilleur (écart borné)', () => {
+  const st = SC.newGame(catalog, { hand: SC.autoHand(catalog, []), rival: SC.RIVALS[0], seed: 9 });
+  SC.place(catalog, st, 'p', 0, 0);
+  const best = SC.aiMove(catalog, st, 3, () => 0.99, 0);
+  /* toujours une erreur, mais tolérance nulle : il ne reste que le meilleur coup (ou un coup de même valeur) */
+  const m = SC.aiMove(catalog, st, 3, () => 0.01, 1, 0);
+  const val = (mv) => { const t = JSON.parse(JSON.stringify(st)); return SC.place(catalog, t, 'o', mv[0], mv[1]).filter((f) => !f.blocked).length; };
+  assert.equal(val(m), val(best));
 });
 
 test('v306 : le jeu le plus fort (fin de partie calculée) reste rapide et joue des coups valides', () => {

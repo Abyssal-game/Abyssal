@@ -69,24 +69,25 @@ export const ruleHas = (st, k) => st.rule === k || (PARTS[st.rule] || []).includ
 export const CENTER = 4;
 
 // Adversaires : du plus simple au plus redoutable. level : étoiles affichées et rareté de leur main.
-// ai / aiAwake : [force du jeu (voir aiMove), part de coups imparfaits], réglés par simulation (v306) pour qu'un
-// bon joueur gagne environ 90 % contre Ilda, puis de moins en moins, jusqu'à environ 1 partie sur 3 contre la Souveraine.
+// ai / aiAwake : [force du jeu (voir aiMove), part de coups imparfaits, écart maximal d'un coup imparfait en cartes]
+// v475 : réglés par simulation (tools/sceaux-sim.mjs) pour une échelle régulière : environ 80 % de victoires d'un bon joueur
+// contre Ilda jusqu'à environ 20 % contre la Souveraine, et chaque revanche implacable plus dure que l'adversaire normal.
 export const RIVALS = [
-  { key: 'initie', stars: 1, starsAwake: 2, ai: [3, 0.3], aiAwake: [4, 0.3], name: 'Ilda', title: 'l’Initiée', level: 1, faction: null, portrait: 'CEL-006', rule: 'classique', reward: 20,
+  { key: 'initie', stars: 1, starsAwake: 2, ai: [3, 0.5, 1], aiAwake: [4, 0.5, 0.5], name: 'Ilda', title: 'l’Initiée', level: 1, faction: null, portrait: 'CEL-006', rule: 'classique', reward: 20,
     hello: 'Tu connais les Sceaux ? Moi, j’apprends encore. On joue doucement ?', win: 'Oh ! Tu m’apprendras ce coup-là ?', lose: 'J’ai gagné ? J’ai gagné !' },
-  { key: 'collectionneur', stars: 2, starsAwake: 3, ai: [4, 0.3], aiAwake: [4, 0.15], name: 'Maître Orvel', title: 'le Collectionneur', level: 2, faction: 'artificiel', portrait: 'ART-004', rule: 'identique', reward: 30,
+  { key: 'collectionneur', stars: 2, starsAwake: 3, ai: [4, 0.25, 1], aiAwake: [3, 0.75, 0.5], name: 'Maître Orvel', title: 'le Collectionneur', level: 2, faction: 'artificiel', portrait: 'ART-004', rule: 'identique', reward: 30,
     hello: 'Chaque carte que je pose vaut une fortune. Ne les abîme pas.', win: 'Ma collection pleure.', lose: 'Ma collection reste intacte. Reviens quand tu auras mieux.' },
-  { key: 'stratege', stars: 2, starsAwake: 3, ai: [5, 0.5], handTier: 2, aiAwake: [5, 0.6], name: 'Sœur Vesna', title: 'la Stratège', level: 3, faction: 'celeste', portrait: 'CEL-005', rule: 'sacre', reward: 40,
+  { key: 'stratege', stars: 2, starsAwake: 3, ai: [5, 0.75, 2], handTier: 2, aiAwake: [4, 0.5, 2], name: 'Sœur Vesna', title: 'la Stratège', level: 3, faction: 'celeste', portrait: 'CEL-005', rule: 'sacre', reward: 40,
     hello: 'Chaque case est une prière. Choisis bien où tu t’agenouilles.', win: 'La lumière t’a guidé, cette fois.', lose: 'Tu as joué au hasard. La lumière, jamais.' },
-  { key: 'maitre', stars: 3, starsAwake: 5, ai: [3, 0.15], aiAwake: [4, 0.3], name: 'Le Maître des Sceaux', title: 'arbitre des règles', level: 4, faction: 'necrotique', portrait: 'NEC-001', rule: 'somme', reward: 55,
+  { key: 'maitre', stars: 3, starsAwake: 3, ai: [4, 0.75, 2], aiAwake: [4, 0.75, 1], name: 'Le Maître des Sceaux', title: 'arbitre des règles', level: 4, faction: 'necrotique', portrait: 'NEC-001', rule: 'somme', reward: 55,
     hello: 'J’ai scellé plus de créatures que tu n’en verras jamais.', win: 'Tu as brisé mon sceau. Ce n’est pas rien.', lose: 'Reviens quand tu sauras compter.' },
-  { key: 'echo', stars: 4, starsAwake: 4, ai: [4, 0.45], aiAwake: [6, 0.75], name: 'L’Écho de l’Abîme', title: 'veilleur des profondeurs', level: 4, faction: 'abyssal', portrait: 'ABY-039', rule: 'sacre', reward: 70,
+  { key: 'echo', stars: 3, starsAwake: 4, ai: [4, 0.5, 1], aiAwake: [4, 0.6, 1], name: 'L’Écho de l’Abîme', title: 'veilleur des profondeurs', level: 4, faction: 'abyssal', portrait: 'ABY-039', rule: 'sacre', reward: 70,
     hello: 'Je joue tes coups avant toi. Je les ai déjà joués mille fois.', win: '… l’écho se tait.', lose: 'Tu m’entends ? C’est toi, en bas.' },
-  { key: 'banquier', stars: 4, starsAwake: 5, ai: [4, 0.6], aiAwake: [5, 0.3], name: 'Mammon', title: 'le Banquier des Enfers', level: 5, faction: 'infernal', portrait: 'INF-040', rule: 'somme', reward: 80,
+  { key: 'banquier', stars: 4, starsAwake: 4, ai: [3, 0.75, 1], aiAwake: [3, 0.5, 0.5], name: 'Mammon', title: 'le Banquier des Enfers', level: 5, faction: 'infernal', portrait: 'INF-040', rule: 'somme', reward: 80,
     hello: 'Tout se paie, ici. Surtout les bonnes sommes.', win: 'Une perte… je la noterai dans mon grand livre.', lose: 'Intérêts encaissés. Merci de ta visite.' },
-  { key: 'archiviste', stars: 4, starsAwake: 5, ai: [4, 0.45], aiAwake: [6, 0.6], name: 'L’Archiviste', title: 'mémoire d’engrenages', level: 5, faction: 'artificiel', portrait: 'ART-041', rule: 'identique', reward: 90,
+  { key: 'archiviste', stars: 4, starsAwake: 5, ai: [4, 0.5, 2], aiAwake: [4, 0.25, 1], name: 'L’Archiviste', title: 'mémoire d’engrenages', level: 5, faction: 'artificiel', portrait: 'ART-041', rule: 'identique', reward: 90,
     hello: 'J’ai catalogué chacune de tes parties. Elles se terminent toutes pareil.', win: 'Erreur… à… réindexer.', lose: 'Résultat conforme aux prévisions.' },
-  { key: 'souverain', stars: 5, starsAwake: 5, ai: [5, 0.6], aiAwake: [6, 0.45], name: 'La Souveraine du Néant', title: 'avant le premier Sceau', level: 5, faction: 'primordial', portrait: 'PRI-053', rule: 'identique', reward: 100,
+  { key: 'souverain', stars: 5, starsAwake: 5, ai: [4, 0.25, 2], aiAwake: [5, 0.75, 1], name: 'La Souveraine du Néant', title: 'avant le premier Sceau', level: 5, faction: 'primordial', portrait: 'PRI-053', rule: 'identique', reward: 100,
     hello: 'Avant les Sceaux, il n’y avait que moi. Il n’y aura que moi après.', win: 'Alors… le Néant peut perdre.', lose: 'Retourne au silence, petite flamme.' },
 ];
 // Revanche « implacable » (anciennement éveillée) : après une victoire, l'adversaire revient plus fort (main plus rare, jeu plus fin)
@@ -153,7 +154,7 @@ export function newGame(cat, { hand, rival, seed = Date.now(), daily = false }) 
   const rnd = mulberry(seed);
   const opp = rivalHand(cat, R, daily ? `jour:${seed}` : '');
   const st = {
-    v: 1, rival: R.key, rule: R.rule, daily, seed, oppHand: opp.slice(), level: R.level, ai: R.ai ? { level: R.ai[0], slip: R.ai[1] } : null, awake: !!R.awake, rname: R.name,
+    v: 1, rival: R.key, rule: R.rule, daily, seed, oppHand: opp.slice(), level: R.level, ai: R.ai ? { level: R.ai[0], slip: R.ai[1], tol: R.ai[2] ?? Infinity } : null, awake: !!R.awake, rname: R.name,
     board: Array(9).fill(null), hands: { p: hand.slice(0, 5), o: opp }, turn: rnd() < 0.5 ? 'p' : 'o', placed: 0,
     cells: { blessed: null, cursed: null }, over: null, last: null, log: [],
     fac: { p: dominant(cat, hand), o: dominant(cat, opp) },
@@ -285,7 +286,7 @@ function search(cat, st, who, plies, alpha, beta) {
 //   1 : souvent au hasard ; 2 : prend le plus de cartes ; 3 : se méfie des côtés faibles exposés ;
 //   4 : prévoit ta meilleure réponse ; 5 : prévoit deux coups de plus ; 6 : calcule la fin de partie parfaitement.
 // slip : part de coups imparfaits (il choisit alors parmi ses 3 meilleurs coups) — rend un adversaire plus humain.
-export function aiMove(cat, st, level = 2, rnd = Math.random, slip = 0) {
+export function aiMove(cat, st, level = 2, rnd = Math.random, slip = 0, tol = Infinity) {
   const who = st.turn;
   const moves = legalMoves(st, who);
   if (!moves.length) return null;
@@ -316,7 +317,13 @@ export function aiMove(cat, st, level = 2, rnd = Math.random, slip = 0) {
     scored.push([v, h, c]);
   }
   scored.sort((a, b) => b[0] - a[0]);
-  const k = slip > 0 && rnd() < slip ? Math.floor(rnd() * Math.min(3, scored.length)) : 0;
+  // v475 : erreurs « humaines » : un coup imparfait reste proche du meilleur (écart ≤ tol cartes), jamais un cadeau énorme
+  let k = 0;
+  if (slip > 0 && rnd() < slip) {
+    const unit = level >= 5 ? 24 : level === 4 ? 44 : 10, floor = scored[0][0] - tol * unit;
+    const near = scored.slice(1, 4).filter((s) => s[0] >= floor).length;
+    if (near) k = 1 + Math.floor(rnd() * near);
+  }
   return [scored[k][1], scored[k][2]];
 }
 // Défi du jour : un adversaire déjà débloqué et une règle spéciale, les mêmes pour toute la journée

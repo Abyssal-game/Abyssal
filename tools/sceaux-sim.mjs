@@ -19,7 +19,7 @@ for (const base of SC.RIVALS) {
       const st = SC.newGame(cat, { hand: SC.autoHand(cat, pool), rival: R, seed: 1000 + i });
       while (!st.over) {
         const who = st.turn;
-        const m = who === 'p' ? SC.aiMove(cat, st, 3, rnd, 0) : SC.aiMove(cat, st, R.ai[0], rnd, R.ai[1]);
+        const m = who === 'p' ? SC.aiMove(cat, st, 3, rnd, 0) : SC.aiMove(cat, st, R.ai[0], rnd, R.ai[1], R.ai[2] ?? Infinity);
         SC.place(cat, st, who, m[0], m[1]);
       }
       if (st.over === 'won') won++;
