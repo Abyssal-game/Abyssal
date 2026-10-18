@@ -4155,3 +4155,5 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .pf-cx-fondateur { border-color: #FFE7A6; box-shadow: 0 0 0 2px #3A2408, 0 0 0 4px #8A5CFF, 0 0 18px rgba(255, 231, 166, .7); }
 .pf-cx-givre { border-color: #BFE8FF; box-shadow: 0 0 0 2px #0A2A40, 0 0 14px rgba(140, 210, 255, .7); }
 .pf-cx-braise { border-color: #FF8A2A; box-shadow: 0 0 0 2px #3A1000, 0 0 12px #FF5A1A, 0 0 24px rgba(255, 140, 40, .55); }
+/* v471 : médaille de victoire Gemini (sceau de cire à l'œil, lauriers, lames) à la place de l'écusson provisoire */
+.dc-wb-crest { width: 48px; height: 48px; border-radius: 50%; filter: drop-shadow(0 0 8px rgba(242, 160, 60, .45)) drop-shadow(0 2px 4px rgba(0, 0, 0, .7)); }
