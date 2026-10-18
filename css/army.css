@@ -4057,3 +4057,7 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 .au-alt.lead-a .au-sum.sa, .au-alt.lead-p .au-sum.sp { box-shadow: 0 0 0 1px currentColor; }
 .au-w { font-style: normal; font-size: .9rem; color: #F2C14E; }
 .au-alt.win-a .au-w { color: #FF8A9A; }
+
+/* v453 : bannières de Renforcer et de la Descente : les images existaient, mais aucune règle ne les affichait */
+.bn-renfort { --bn: url(../assets/ui/bn-renfort.webp); }
+.bn-descente { --bn: url(../assets/ui/bn-descente.webp); }
