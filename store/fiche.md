@@ -83,9 +83,11 @@ COMBATS TACTIQUES
 • Esquive et pare les coups au bon moment, brise la garde des gardiens
 • Rapporte des coffres, et le légendaire Booster de l'Abysse
 
-LES DUELS DES SCEAUX
-• Un second jeu de cartes : pose tes créatures sur le plateau et capture celles de l'adversaire
-• 8 rivaux à défier, chacun avec ses propres règles
+LA SALLE DES JEUX
+• Les Duels des Sceaux : pose tes créatures sur le plateau et capture celles de l'adversaire, contre 8 rivaux
+• Les Énigmes des Sceaux : trois casse-têtes chaque jour
+• La Cour des Masques : un jeu de bluff à trois, dis vrai… ou mens
+• Les Enchères de Mammon : des enchères à l'aveugle où miser pareil ne rapporte rien
 
 UN MONDE À DÉCOUVRIR
 • Un Bestiaire illustré, avec l'histoire de chaque créature

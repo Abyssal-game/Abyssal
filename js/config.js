@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v433'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v434'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -42,7 +42,7 @@ export const BOOSTERS = {
   },
   event: {
     name: 'Booster événement', price: 550, slots: ['event', 'event', 'pcPlus'], pool: 'event', variantMult: 1.5,
-    desc: '3 cartes des deux factions de l’événement de la semaine, avec des chances accrues de Rare et mieux.',
+    desc: '3 cartes de deux factions qui changent chaque semaine, avec des chances accrues de Rare et mieux.',
   },
   premium: {
     /* v384 : de nouveau en vente (1000 éclats), toujours affiché ; les tickets des gardiens et des niveaux l'ouvrent aussi */

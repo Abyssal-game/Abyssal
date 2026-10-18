@@ -13,7 +13,7 @@ export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par c
 import { FINAL_FLOOR, BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, SUBLIME_ASH, VARIANTS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
-import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, eventSwap, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, cardPower, powerFor, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
+import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, expectedLevel, cardPower, powerFor, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative } from './duel.js';
 import { bossOf, BOSSES, BOSS_ORDER } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
@@ -1121,7 +1121,7 @@ export class Game {
     }
     // v328 : les Duels des Sceaux s'ouvrent après le premier gardien ; la première partie devient un objectif
     const sc = this.s.sceaux;
-    if (this.sceauxOpen() && !(sc.wins + sc.losses + sc.draws) && !sc.cur && !out.some((x) => x.kind === 'sceaux')) out.push({ kind: 'sceaux', title: 'Joue ta première partie des Sceaux', sub: 'Un second jeu de cartes, en 2 minutes, contre 8 rivaux · Aventure → Jeux', href: '#/sceaux', icon: 'seal' });
+    if (this.sceauxOpen() && !(sc.wins + sc.losses + sc.draws) && !sc.cur && !out.some((x) => x.kind === 'sceaux')) out.push({ kind: 'sceaux', title: 'Joue ta première partie des Sceaux', sub: 'Un jeu de cartes à part, en 2 minutes, contre 8 rivaux · Aventure → Jeux', href: '#/sceaux', icon: 'seal' });
     /* v425 : la Cour des Masques, proposée une fois la première partie des Sceaux jouée */
     const mq = this.s.masques;
     if (this.masquesOpen() && (sc.wins + sc.losses + sc.draws) > 0 && !(mq.wins + mq.losses) && !mq.cur && !out.some((x) => x.kind === 'sceaux')) out.push({ kind: 'sceaux', title: 'Assieds-toi à la Cour des Masques', sub: 'Un jeu de bluff à trois, contre deux courtisans masqués · Aventure → Jeux', href: '#/masques', icon: 'seal' });
@@ -1223,7 +1223,7 @@ export class Game {
       const eff = room === 'boss' ? run.floor : Math.max(run.floor, run.minFloor || 1);
       const sc = enemyScale(eff);
       const lvl = enemyLevel(eff, room);
-      const list = eventSwap(this.catalog, floorEnemies(this.catalog, run.day, run.floor, room), run.day, run.floor, this.event().factions);
+      const list = floorEnemies(this.catalog, run.day, run.floor, room) /* v434 : plus d'événement de la semaine dans la Descente */;
       const enemies = list.map((e) => duelUnit(this.catalog.get(e.id), { side: 'enemy', scale: sc, level: e.boss || e.elite ? lvl : enemyLevel(eff, 'fight'), boss: e.boss, elite: e.elite }));
       for (const e of enemies) {
         // combats ordinaires : des ennemis qui frappent plus fort, pour que chaque combat ait un enjeu

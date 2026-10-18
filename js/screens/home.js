@@ -15,7 +15,6 @@ const MISSION_LOOK = { booster: ['booster', '#E0485E'], new: ['book', '#B48CFF']
 export default function home(app, root) {
   const g = app.game, cat = app.catalog, s = g.s;
   const total = g.total(), owned = g.uniqueCount();
-  const ev = g.event();
   const daily = g.dailyAmount();
   const recent = s.recent.map((id) => cat.get(id)).filter(Boolean).slice(0, 10);
 
@@ -68,9 +67,6 @@ export default function home(app, root) {
 
     ${todayHTML()}
     ${goalsHTML()}
-    <a class="panel hw-event" href="#/boutique" style="--e1:${cat.faction[ev.factions[0]].colors.secondary};--e2:${cat.faction[ev.factions[1]].colors.secondary}">
-      <span class="hw-ev-sig">${sigil(ev.factions[0])}${sigil(ev.factions[1])}</span>
-      <span><span class="small muted">Événement de la semaine · encore ${ev.daysLeft} jour${ev.daysLeft > 1 ? 's' : ''}</span><b>${esc(ev.name)}</b><span class="small">${esc(ev.desc)}</span></span>${icon('next')}</a>
     <p class="home-col small muted center"><a href="#/collection">${owned} / ${total} créatures découvertes</a></p>
   `;
   // (v413 : le nombre de joueurs en ligne n'est plus sur l'Accueil : Réglages → À propos, tout en bas)
