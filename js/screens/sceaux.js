@@ -38,7 +38,7 @@ const ruleTiles = () => `<div class="sc-rgrid">${SC.RULE_LIST.map((k) => `<butto
 // Portrait peint de l'adversaire (assets/sceaux/rival-*.webp), avec l'ancienne image de créature en secours
 const rivalPic = (cat, R) => `<img alt="" src="assets/sceaux/rival-${R.key}.webp" onerror="this.onerror=null;this.src='${artUrl(cat.get(R.portrait), { lite: true })}'">`;
 // Petite carte du jeu : illustration, nom, emblème de faction et quatre valeurs sur les bords
-function scCard(cat, id, { vals = null, owner = '', cls = '', back = false, guard = null } = {}) {
+export function scCard(cat, id, { vals = null, owner = '', cls = '', back = false, guard = null } = {}) {
   const c = cat.get(id);
   const v = vals || SC.sideValues(c);
   return `<span class="sc-card ${owner ? `sc-${owner}` : ''} ${cls} r-${c.rarity}" data-id="${id}">

@@ -26,6 +26,8 @@ import menuScreen from './screens/menu.js';
 import sceauxScreen from './screens/sceaux.js';
 import masquesScreen from './screens/masques.js';
 import gamesScreen from './screens/games.js';
+import encheresScreen from './screens/encheres.js';
+import enigmesScreen from './screens/enigmes.js';
 import trialsScreen from './screens/trials.js';
 import shadowScreen, { claimShadowPrize } from './screens/shadow.js';
 import { forgeScreen, furnaceScreen } from './screens/forge.js';
@@ -42,7 +44,7 @@ import { initNative, isNative } from './native.js';
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,
   factions: factionsScreen, faction: factionsScreen, succes: achievementsScreen, profil: profileScreen,
-  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen, sceaux: sceauxScreen, masques: masquesScreen, jeux: gamesScreen, epreuves: trialsScreen, epreuve: descentScreen, tirage: shadowScreen, renfort: forgeScreen, fournaise: furnaceScreen,
+  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen, sceaux: sceauxScreen, masques: masquesScreen, encheres: encheresScreen, enigmes: enigmesScreen, jeux: gamesScreen, epreuves: trialsScreen, epreuve: descentScreen, tirage: shadowScreen, renfort: forgeScreen, fournaise: furnaceScreen,
 };
 const TABS = [
   ['antre', 'tab-home', 'Accueil'], ['collection', 'tab-collection', 'Collection'], ['boutique', 'tab-boosters', 'Boosters'],
@@ -50,14 +52,14 @@ const TABS = [
 ];
 // icônes peintes de la barre du bas (assets/icons)
 const tabIcon = (k) => `<img class="tab-pic" alt="" src="assets/icons/${k}.webp">`;
-const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', equipe: 'collection', renfort: 'collection', fournaise: 'collection', coffres: 'descente', heros: 'descente', arsenal: 'descente', marchand: 'descente', sceaux: 'descente', masques: 'descente', jeux: 'descente', epreuves: 'descente', epreuve: 'descente', tirage: 'boutique' };
+const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', equipe: 'collection', renfort: 'collection', fournaise: 'collection', coffres: 'descente', heros: 'descente', arsenal: 'descente', marchand: 'descente', sceaux: 'descente', masques: 'descente', encheres: 'descente', enigmes: 'descente', jeux: 'descente', epreuves: 'descente', epreuve: 'descente', tirage: 'boutique' };
 // Fond illustré de chaque page (l'Accueil et la Descente posent le leur)
 const ROUTE_SCENE = { boutique: 'shop', tirage: 'shadow', renfort: 'collection', fournaise: 'collection', collection: 'collection', equipe: 'team', coffres: 'chests', bestiaire: 'bestiary', succes: 'trophies', profil: 'profile', menu: 'menu', parametres: 'menu', compte: 'menu', factions: 'factions', faction: 'factions' };
 // Page parente des sous-pages (bouton retour en haut)
-const PARENT = { bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente', arsenal: 'coffres', marchand: 'descente', sceaux: 'jeux', masques: 'jeux' };
+const PARENT = { bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente', arsenal: 'coffres', marchand: 'descente', sceaux: 'jeux', masques: 'jeux', encheres: 'jeux', enigmes: 'jeux' };
 // Sous-onglets de chaque onglet principal (barre en haut de la page)
 // v425 : pages rangées sous un autre sous-onglet (allumé sur elles)
-const SUB_OF = { fournaise: 'renfort', sceaux: 'jeux', masques: 'jeux' };
+const SUB_OF = { fournaise: 'renfort', sceaux: 'jeux', masques: 'jeux', encheres: 'jeux', enigmes: 'jeux' };
 const SUBNAV = {
   collection: [['collection', 'cards', 'Cartes'], ['equipe', 'team-ic', 'Équipe'], ['renfort', 'furnace', 'Forge']], /* v422 : Renforcer + Fournaise */
   boutique: [['boutique', 'booster', 'Boosters'], ['tirage', 'shadow', 'Tirage']],
@@ -161,6 +163,7 @@ function renderChrome() {
     // v404 : pastilles plus calmes — plus de « 99+ » permanent sur la Fournaise ; Renforcer seulement si l'Accueil le conseille aussi
     if (r === 'renfort') return g.goals().some((x) => x.kind === 'forge' && /Renforce/.test(x.title)) ? '↑' : '';
     if (r === 'collection') return nNewSub || '';
+    if (r === 'jeux') { if (!g.sceauxOpen()) return ''; const n = g.enigmes().done.filter((x) => !x).length; return n || ''; } /* v427 : énigmes du jour à résoudre */
     if (r === 'epreuves') { const n = g.trials().done.filter((x) => !x).length; return g.team().length >= 3 && n ? n : ''; } /* v407 */
     return '';
   };

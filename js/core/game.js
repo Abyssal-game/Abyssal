@@ -20,6 +20,8 @@ import { pactChoices, PACTS } from './pacts.js';
 import { FORMS, formUnlocked } from './forms.js';
 import * as SC from './sceaux.js';
 import * as MQ from './masques.js';
+import * as EN from './encheres.js';
+import * as EG from './enigmes.js';
 import { FERVOR_START, FERVOR_MAX, FERVOR_CARRY, TALENTS } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
 export const WEEKLY_FLOOR = 8;
@@ -988,6 +990,98 @@ export class Game {
     return out;
   }
   masquesQuit() { this.s.masques.cur = null; this.persist(); }
+  // ——— v427 : les Enchères de Mammon (enchères à l'aveugle à trois), ouvertes avec la Salle des jeux ———
+  encheresUnlocked() { return EN.TABLES.filter((_, i) => EN.tableUnlocked(this.s, i)).length; }
+  encheresDailyOpen() { return !!this.s.encheres.beaten?.etal; }
+  encheresDaily() { const day = today(this.clock()); return { table: EN.dailyTable(day, this.encheresUnlocked()), seed: [...`encheres:${day}`].reduce((h, c) => (Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0), 2166136261) }; }
+  encheresStart({ table, daily = false } = {}) {
+    const en = this.s.encheres;
+    if (!this.sceauxOpen()) throw new Error('Les Enchères de Mammon s’ouvrent après ton premier gardien.');
+    let seed = Math.floor(this.rng() * 2 ** 31);
+    if (daily) {
+      if (!this.encheresDailyOpen()) throw new Error('Le défi du jour s’ouvre après ta première victoire à l’Étal des curiosités.');
+      if (en.dailyDone === today(this.clock())) throw new Error('Défi du jour déjà relevé. Reviens demain !');
+      const d = this.encheresDaily(); table = d.table; seed = d.seed;
+    } else {
+      const i = EN.TABLES.findIndex((t) => t.key === table);
+      if (i < 0) throw new Error('Table inconnue.');
+      if (!EN.tableUnlocked(this.s, i)) throw new Error('Gagne d’abord à la table précédente.');
+    }
+    en.cur = EN.newGame(this.catalog, { table, seed, daily });
+    this.persist();
+    return en.cur;
+  }
+  // Une manche : ton offrande, celles des deux enchérisseurs, puis le lot part (ou reste sur la table)
+  encheresBid(offer) {
+    const st = this.s.encheres.cur;
+    if (!st || st.over) throw new Error('Aucune vente en cours.');
+    const ev = EN.resolve(st, { p: offer, ...EN.aiBids(st, this.rng) });
+    this.persist();
+    return ev;
+  }
+  encheresFinish() {
+    const en = this.s.encheres, st = en.cur;
+    if (!st || !st.over) throw new Error('La vente n’est pas terminée.');
+    if (st.rewarded) return st.result;
+    const day = today(this.clock());
+    if (en.day !== day) { en.day = day; en.paidToday = 0; }
+    const T = EN.TABLE[st.table], R = EN.ENCHERES_REWARD;
+    const out = { result: st.over, shards: 0, first: false, title: null, daily: st.daily, capped: false, chests: [] };
+    if (st.over === 'won') {
+      en.wins++; en.streak++; en.best = Math.max(en.best, en.streak);
+      if (!en.beaten[T.key]) { en.beaten[T.key] = Date.now(); out.first = true; out.shards += R.firstWin; out.chests.push(T.chest); }
+      if (st.daily && en.dailyDone !== day) { en.dailyDone = day; out.shards += R.daily; out.chests.push('bois'); }
+      if (en.paidToday < R.dailyPaid) { en.paidToday++; out.shards += T.reward; } else { out.capped = true; out.shards += R.afterCap; }
+      out.chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });
+      if (T.key === EN.TABLES.at(-1).key && !this.s.titles.includes(EN.ENCHERES_TITLE)) { this.s.titles.push(EN.ENCHERES_TITLE); out.title = EN.ENCHERES_TITLE; }
+    } else { en.losses++; en.streak = 0; }
+    this.s.shards += out.shards;
+    out.xp = R.xp; this.s.xp += out.xp;
+    en.history.unshift({ t: Date.now(), table: T.key, r: st.over, s: st.final?.scores });
+    en.history = en.history.slice(0, 20);
+    st.rewarded = true; st.result = out;
+    this.track('encheres', 1);
+    this.checkProgress();
+    this.persist();
+    return out;
+  }
+  encheresQuit() { this.s.encheres.cur = null; this.persist(); }
+  // ——— v427 : les Énigmes des Sceaux (trois casse-têtes par jour) ———
+  enigmes() {
+    const e = this.s.enigmes, day = today(this.clock());
+    if (e.day !== day) Object.assign(e, { day, tries: [0, 0, 0], stars: [0, 0, 0], done: [false, false, false], chest: null });
+    return e;
+  }
+  enigmePuzzles() {
+    const day = this.enigmes().day;
+    if (this._enig?.day !== day) this._enig = { day, list: EG.dayPuzzles(this.catalog, day) };
+    return this._enig.list;
+  }
+  // Un essai : la pose (carte h de la main, case cell) de l'énigme k
+  enigmeTry(k, h, cell) {
+    if (!this.sceauxOpen()) throw new Error('Les Énigmes s’ouvrent après ton premier gardien.');
+    const e = this.enigmes(), pz = this.enigmePuzzles()[k];
+    if (!pz) throw new Error('Énigme indisponible.');
+    if (e.done[k]) throw new Error('Énigme déjà terminée aujourd’hui.');
+    const { n, flips } = EG.tryMove(this.catalog, pz, h, cell);
+    e.tries[k]++;
+    const out = { ok: n >= pz.goal, n, flips, goal: pz.goal, tries: e.tries[k], left: EG.TRIES - e.tries[k], shards: 0, chest: null, xp: 0 };
+    if (out.ok) {
+      const stars = EG.starsFor(e.tries[k]);
+      e.done[k] = true; e.stars[k] = stars; e.solved++; e.starsTotal += stars;
+      out.stars = stars; out.shards = EG.ENIGME_REWARD.shards[k] + EG.ENIGME_REWARD.perStar * (stars - 1); out.xp = EG.ENIGME_REWARD.xp;
+      if (e.done.every(Boolean) && e.stars.every((x) => x > 0) && e.chest !== e.day) {
+        e.chest = e.day; out.chest = EG.ENIGME_REWARD.allChest; this.s.chests[out.chest] = (this.s.chests[out.chest] || 0) + 1;
+        const prev = new Date(this.clock()); prev.setDate(prev.getDate() - 1);
+        e.streak = e.lastFull === today(prev) ? e.streak + 1 : 1; e.lastFull = e.day; out.streak = e.streak;
+      }
+      this.s.shards += out.shards; this.s.xp += out.xp;
+      this.track('enigme', 1);
+    } else if (e.tries[k] >= EG.TRIES) { e.done[k] = true; e.stars[k] = 0; out.failed = true; out.solutions = pz.solutions; }
+    this.checkProgress();
+    this.persist();
+    return out;
+  }
   // Trois objectifs pour l'accueil : un proche (Descente), un de progression (gardien ou Sceaux),
   // un de collection (le royaume le plus proche d'être complet). Chacun mène à son écran.
   goals() {
