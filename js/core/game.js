@@ -22,6 +22,7 @@ import * as SC from './sceaux.js';
 import * as MQ from './masques.js';
 import * as EN from './encheres.js';
 import * as PA from './pacte.js';
+import * as CR from './cryptes.js';
 import * as EG from './enigmes.js';
 import { FERVOR_START, FERVOR_MAX, FERVOR_CARRY, TALENTS } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
@@ -1098,6 +1099,58 @@ export class Game {
     return out;
   }
   pacteQuit() { this.s.pacte.cur = null; this.persist(); }
+  // ——— v450 : Les Cryptes (mémoire à deux, pouvoirs des factions), ouvertes avec la Salle des jeux ———
+  cryptesUnlocked() { return CR.TABLES.filter((_, i) => CR.tableUnlocked(this.s, i)).length; }
+  cryptesDailyOpen() { return !!this.s.cryptes.beaten?.ossuaire; }
+  cryptesDaily() { const day = today(this.clock()); return { table: CR.dailyTable(day, this.cryptesUnlocked()), seed: [...`cryptes:${day}`].reduce((h, c) => (Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0), 2166136261) }; }
+  cryptesStart({ table, daily = false } = {}) {
+    const cr = this.s.cryptes;
+    if (!this.sceauxOpen()) throw new Error('Les Cryptes s’ouvrent après ton premier gardien.');
+    let seed = Math.floor(this.rng() * 2 ** 31);
+    if (daily) {
+      if (!this.cryptesDailyOpen()) throw new Error('Le défi du jour s’ouvre après ta première victoire à l’Ossuaire.');
+      if (cr.dailyDone === today(this.clock())) throw new Error('Défi du jour déjà relevé. Reviens demain !');
+      const d = this.cryptesDaily(); table = d.table; seed = d.seed;
+    } else {
+      const i = CR.TABLES.findIndex((x) => x.key === table);
+      if (i < 0) throw new Error('Table inconnue.');
+      if (!CR.tableUnlocked(this.s, i)) throw new Error('Gagne d’abord dans la crypte précédente.');
+    }
+    cr.cur = CR.newGame(this.catalog, { table, seed, daily });
+    this.persist();
+    return cr.cur;
+  }
+  cryptesFlip(i) { const st = this.s.cryptes.cur; if (!st || st.over || st.turn !== 'p') throw new Error('Ce n’est pas ton tour.'); const ev = CR.flip(st, i, this.rng); this.persist(); return ev; }
+  cryptesPower(picks) { const st = this.s.cryptes.cur; if (!st || st.over) throw new Error('Aucune partie en cours.'); const ev = CR.usePower(st, picks, this.rng); this.persist(); return ev; }
+  // un geste de l'adversaire (une carte retournée), pour que l'écran le montre pas à pas
+  cryptesAi() { const st = this.s.cryptes.cur; if (!st || st.over || st.turn !== 'a') return null; const ev = CR.flip(st, CR.aiPick(st, this.rng), this.rng); this.persist(); return ev; }
+  cryptesFinish() {
+    const cr = this.s.cryptes, st = cr.cur;
+    if (!st || !st.over) throw new Error('La partie n’est pas terminée.');
+    if (st.rewarded) return st.result;
+    const day = today(this.clock());
+    if (cr.day !== day) { cr.day = day; cr.paidToday = 0; }
+    const T = CR.TABLE[st.table], R = CR.CRYPTES_REWARD;
+    const out = { result: st.over, shards: 0, first: false, title: null, daily: st.daily, capped: false, chests: [] };
+    if (st.over === 'won') {
+      cr.wins++; cr.streak++; cr.best = Math.max(cr.best, cr.streak);
+      if (!cr.beaten[T.key]) { cr.beaten[T.key] = Date.now(); out.first = true; out.shards += R.firstWin; out.chests.push(T.chest); }
+      if (st.daily && cr.dailyDone !== day) { cr.dailyDone = day; out.shards += R.daily; out.chests.push('bois'); }
+      if (cr.paidToday < R.dailyPaid) { cr.paidToday++; out.shards += T.reward; } else { out.capped = true; out.shards += R.afterCap; }
+      out.chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });
+      if (T.key === CR.TABLES.at(-1).key && !this.s.titles.includes(CR.CRYPTES_TITLE)) { this.s.titles.push(CR.CRYPTES_TITLE); out.title = CR.CRYPTES_TITLE; }
+    } else { cr.losses++; cr.streak = 0; }
+    this.s.shards += out.shards;
+    out.xp = R.xp; this.s.xp += out.xp;
+    cr.history.unshift({ t: Date.now(), table: T.key, r: st.over, s: st.final?.scores });
+    cr.history = cr.history.slice(0, 20);
+    st.rewarded = true; st.result = out;
+    this.track('cryptes', 1);
+    this.checkProgress();
+    this.persist();
+    return out;
+  }
+  cryptesQuit() { this.s.cryptes.cur = null; this.persist(); }
   // ——— v427 : les Énigmes des Sceaux (trois casse-têtes par jour) ———
   enigmes() {
     const e = this.s.enigmes, day = today(this.clock());

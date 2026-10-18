@@ -68,6 +68,7 @@ export function defaultSave(now = Date.now()) {
     masques: { wins: 0, losses: 0, beaten: {}, day: null, paidToday: 0, dailyDone: null, streak: 0, best: 0, history: [], cur: null }, /* v425 : la Cour des Masques */
     encheres: { wins: 0, losses: 0, beaten: {}, day: null, paidToday: 0, dailyDone: null, streak: 0, best: 0, history: [], cur: null }, /* v427 : les Enchères de Mammon */
     pacte: { wins: 0, losses: 0, beaten: {}, day: null, paidToday: 0, dailyDone: null, streak: 0, best: 0, history: [], cur: null }, /* v449 : Le Pacte */
+    cryptes: { wins: 0, losses: 0, beaten: {}, day: null, paidToday: 0, dailyDone: null, streak: 0, best: 0, history: [], cur: null }, /* v450 : Les Cryptes */
     enigmes: { day: null, tries: [0, 0, 0], stars: [0, 0, 0], done: [false, false, false], chest: null, streak: 0, lastFull: null, solved: 0, starsTotal: 0 }, /* v427 : les Énigmes des Sceaux */
     relics: { best: 0, runs: 0, wins: 0, run: null, last: null, day: null, paidToday: 0 },
     war: { week: null, side: null, points: 0, used: {}, claimed: {}, history: [], report: null },
@@ -106,14 +107,14 @@ export function migrate(raw) {
   s.pity = { ...d.pity, ...s.pity };
   // objets imbriqués ajoutés au fil des versions : complétés sans écraser l'existant
   s.stats.pulls = { ...d.stats.pulls, ...(s.stats.pulls || {}) };
-  for (const k of ['descent', 'missions', 'freePack', 'daily', 'itemBuys', 'chests', 'sceaux', 'masques', 'encheres', 'pacte', 'enigmes', 'relics', 'war', 'season', 'trials']) s[k] = { ...d[k], ...(s[k] && typeof s[k] === 'object' ? s[k] : {}) };
+  for (const k of ['descent', 'missions', 'freePack', 'daily', 'itemBuys', 'chests', 'sceaux', 'masques', 'encheres', 'pacte', 'cryptes', 'enigmes', 'relics', 'war', 'season', 'trials']) s[k] = { ...d[k], ...(s[k] && typeof s[k] === 'object' ? s[k] : {}) };
   if (!Array.isArray(s.team)) s.team = [];
   if (!Array.isArray(s.teamPresets)) s.teamPresets = [];
   s.teamPresets = s.teamPresets.filter((p) => p && typeof p.name === 'string' && Array.isArray(p.ids)).slice(0, 4);
   for (const k of ['items', 'bossWins', 'fervor', 'collection', 'deciphered', 'achievements', 'setsDone', 'factionsDone', 'hunt', 'fame', 'favs', 'cstats', 'cdone', 'bossesBeaten', 'relations', 'forms', 'lore']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
   delete s.salles; // les Salles Oubliées ont été supprimées (v206)
-  for (const [k, sub] of [['sceaux', 'beaten'], ['masques', 'beaten'], ['encheres', 'beaten'], ['pacte', 'beaten'], ['war', 'used'], ['war', 'claimed']]) if (!s[k][sub] || typeof s[k][sub] !== 'object') s[k][sub] = {};
-  for (const [k, sub] of [['sceaux', 'history'], ['masques', 'history'], ['encheres', 'history'], ['pacte', 'history'], ['war', 'history']]) if (!Array.isArray(s[k][sub])) s[k][sub] = [];
+  for (const [k, sub] of [['sceaux', 'beaten'], ['masques', 'beaten'], ['encheres', 'beaten'], ['pacte', 'beaten'], ['cryptes', 'beaten'], ['war', 'used'], ['war', 'claimed']]) if (!s[k][sub] || typeof s[k][sub] !== 'object') s[k][sub] = {};
+  for (const [k, sub] of [['sceaux', 'history'], ['masques', 'history'], ['encheres', 'history'], ['pacte', 'history'], ['cryptes', 'history'], ['war', 'history']]) if (!Array.isArray(s[k][sub])) s[k][sub] = [];
   if (!Array.isArray(s.season.claimed)) s.season.claimed = [];
   for (const k of ['best', 'recent', 'history', 'showcase', 'titles', 'frames']) if (!Array.isArray(s[k])) s[k] = d[k];
   // Variantes retirées : les exemplaires deviennent holographiques ou or (rien n'est perdu)
