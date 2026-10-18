@@ -3872,3 +3872,9 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 /* v445 : texte des champs de saisie toujours à l'intérieur du cadre peint (bord de 24 px) : `.input.plain` ramenait la marge à 14 px */
 .input:not(select):not(textarea), .input.plain:not(select):not(textarea), .acc-form .input.plain:not(select):not(textarea) { padding-left: 32px !important; padding-right: 32px !important; }
 .input-wrap .input:not(select):not(textarea) { padding-left: 46px !important; }
+
+/* v447 : « Ranger : N° · A → Z · Rareté », visible dans la Grille et le Classeur */
+.col-order { display: flex; align-items: center; gap: 8px; margin: 2px 0 12px; }
+.col-order > .small { flex: none; }
+.col-order .seg { flex: 1; display: flex; padding-left: 14px !important; padding-right: 14px !important; }
+.col-order .seg-b { flex: 1; padding-left: 4px !important; padding-right: 4px !important; font-size: .82rem; white-space: nowrap; min-height: 40px; }
