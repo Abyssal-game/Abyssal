@@ -263,7 +263,7 @@ export default function descent(app, root) {
       window.scrollTo(0, 0);
       app.flushProgress();
       // v328 : le premier gardien vaincu ouvre les Duels des Sceaux ; on le dit (avant, seul le succès s'affichait)
-      if (out.boss?.first && Object.keys(g.s.bossesBeaten || {}).length === 1) toast('<b>Les Duels des Sceaux sont ouverts !</b> Un second jeu de cartes, en deux minutes : Aventure → Sceaux.', { kind: 'epic', icon: 'trophy', ms: 7000 });
+      if (out.boss?.first && Object.keys(g.s.bossesBeaten || {}).length === 1) toast('<b>La Salle des jeux est ouverte !</b> Duels des Sceaux et Cour des Masques : Aventure → Jeux.', { kind: 'epic', icon: 'trophy', ms: 7000 });
     } });
   }
   // Abandon : confirmation avec les conséquences exactes, puis bilan comme une défaite

@@ -3703,3 +3703,98 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 .sn-tab.locked .sn-ic { filter: grayscale(1); }
 .sn-tab.locked::after { content: '🔒'; position: absolute; top: 4px; right: 6px; font-size: .7rem; }
 .sn-tab { position: relative; }
+
+/* v425 : Salle des jeux (Aventure → Jeux) et Cour des Masques */
+.gm-list { display: flex; flex-direction: column; gap: 12px; }
+.gm-list.locked { opacity: .5; pointer-events: none; }
+.gm-tile { position: relative; display: flex; align-items: center; gap: 12px; min-height: 112px; padding: 14px; overflow: hidden; color: inherit; text-decoration: none; border: 1px solid rgba(201, 164, 90, .45); }
+.gm-art { position: absolute; inset: 0; background: center / cover no-repeat; opacity: .55; -webkit-mask: linear-gradient(90deg, transparent 20%, #000 85%); mask: linear-gradient(90deg, transparent 20%, #000 85%); }
+.gm-txt { position: relative; flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.gm-txt b { font: 800 1.12rem/1.2 var(--f-display); color: #F2D9A0; }
+.gm-tile > .ic { position: relative; flex: none; }
+.mq-pors { flex: none; display: flex; }
+.mq-pors .sc-por { width: 44px; height: 44px; }
+.mq-pors .sc-por + .sc-por { margin-left: -14px; }
+.mq-clist { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.mq-clist li { display: flex; align-items: center; gap: 10px; }
+.mq-clist .sc-por { width: 40px; height: 40px; }
+.mq-clist li > span:last-child { display: flex; flex-direction: column; gap: 2px; }
+.mq-scene::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(6, 6, 12, .55), rgba(6, 6, 12, .82)); }
+.mq-game { display: flex; flex-direction: column; gap: 8px; max-width: 480px; margin: 0 auto; padding-bottom: 12px; }
+.mq-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mq-bar b { font: 800 1rem/1.2 var(--f-display); color: #E8C987; text-align: center; }
+.mq-bar .btn { min-width: 44px; min-height: 44px; }
+.mq-seats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mq-seat { display: flex; flex-direction: column; gap: 6px; padding: 8px; border-radius: 4px 14px 4px 14px; background: rgba(10, 11, 18, .86); border: 1px solid rgba(201, 164, 90, .35); transition: border-color .25s, box-shadow .25s; min-width: 0; }
+.mq-seat.on { border-color: #E8C987; box-shadow: 0 0 14px rgba(232, 201, 135, .35); }
+.mq-seat.hot { background: linear-gradient(180deg, rgba(60, 12, 16, .7), rgba(10, 11, 18, .9)); }
+.mq-seat.took { animation: mqTook .7s ease-out; }
+@keyframes mqTook { 0% { transform: scale(1); } 30% { transform: scale(1.05); box-shadow: 0 0 22px rgba(255, 84, 104, .6); } 100% { transform: scale(1); } }
+.mq-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.mq-top .sc-med { width: 38px; height: 38px; }
+.mq-top .sc-med img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.mq-me { flex: none; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; background: rgba(232, 201, 135, .15); border: 1px solid #C9A45A; }
+.mq-me .ic { width: 26px; height: 26px; }
+.mq-nm { display: flex; flex-direction: column; min-width: 0; }
+.mq-nm b { font-size: .86rem; line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mq-nm small { display: flex; align-items: center; gap: 3px; font-size: .68rem; color: var(--muted); }
+.mq-nm small .ic { width: 14px; height: 14px; }
+.mq-front { display: flex; flex-wrap: wrap; gap: 4px; min-height: 30px; align-items: center; }
+.mq-fc { display: inline-flex; align-items: center; gap: 2px; padding: 2px 6px 2px 2px; border-radius: 999px; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .12); }
+.mq-fc .sigil-img { width: 22px; height: 22px; }
+.mq-fc b { font-size: .8rem; }
+.mq-fc.n2 { border-color: rgba(242, 193, 78, .6); }
+.mq-fc.n3 { border-color: #FF5468; background: rgba(255, 84, 104, .22); animation: mqHot 1.4s ease-in-out infinite; }
+@keyframes mqHot { 50% { background: rgba(255, 84, 104, .4); } }
+.mq-none { font-size: .7rem; color: var(--muted); font-style: italic; }
+.mq-seat.s-p .mq-front { min-height: 26px; }
+.mq-table { min-height: 132px; display: grid; place-items: center; }
+.mq-pend, .mq-banner { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 12px; border-radius: 4px 14px 4px 14px; background: rgba(8, 9, 16, .9); border: 1px solid rgba(201, 164, 90, .5); animation: scDlg .3s ease-out both; }
+.mq-banner.ok { border-color: rgba(127, 224, 160, .7); }
+.mq-banner.ko { border-color: rgba(255, 84, 104, .75); }
+.mq-cd { position: relative; flex: none; width: 76px; aspect-ratio: 5 / 7; border-radius: 8px; overflow: hidden; border: 2px solid #C9A45A; box-shadow: 0 6px 16px rgba(0, 0, 0, .7); background: #0C0D14; }
+.mq-cd > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mq-cd.flip { animation: mqFlip .5s ease-out; }
+@keyframes mqFlip { 0% { transform: perspective(500px) rotateY(90deg); } 100% { transform: none; } }
+.mq-cf { position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; gap: 2px; padding: 3px 2px; font-size: .6rem; font-weight: 800; background: linear-gradient(0deg, rgba(0, 0, 0, .9), rgba(0, 0, 0, .3)); }
+.mq-cf .sigil-img { width: 16px; height: 16px; }
+.mq-say, .mq-vd { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
+.mq-say small, .mq-vd small { color: var(--muted); font-size: .72rem; }
+.mq-say b, .mq-vd b { font: 700 1.02rem/1.25 var(--f-display); color: #F2D9A0; }
+.mq-say > .sigil-img { width: 34px; height: 34px; }
+.mq-tell { font-size: .78rem; color: #FF9AAA; }
+.mq-vd span { font-size: .86rem; }
+.mq-banner.intro .sc-med { width: 54px; height: 54px; }
+.mq-banner.intro .sc-med img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.mq-ctl { display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: 4px 14px 4px 14px; background: rgba(8, 9, 16, .9); border: 1px solid rgba(201, 164, 90, .4); }
+.mq-q { margin: 0; text-align: center; font-size: .92rem; }
+.mq-lb { font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; color: #C9A45A; }
+.mq-hand { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.mq-hf, .mq-cl, .mq-tob { position: relative; display: flex; align-items: center; justify-content: center; gap: 3px; min-height: 44px; padding: 4px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, .14); background: rgba(255, 255, 255, .05); color: inherit; font: inherit; cursor: pointer; min-width: 0; }
+.mq-hf { flex-direction: column; gap: 0; }
+.mq-hf .sigil-img { width: 26px; height: 26px; }
+.mq-hf b { font-size: .78rem; line-height: 1; }
+.mq-hf:disabled { opacity: .25; cursor: default; }
+.mq-hf.sel, .mq-cl.sel, .mq-tob.sel { border-color: #E8C987; background: rgba(232, 201, 135, .2); box-shadow: 0 0 10px rgba(232, 201, 135, .35); }
+.mq-to { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.mq-tob { justify-content: flex-start; gap: 6px; font-size: .84rem; font-weight: 700; text-align: left; }
+.mq-tob .sc-med { width: 32px; height: 32px; }
+.mq-tob .sc-med img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.mq-claims { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+.mq-cl { flex-direction: column; gap: 1px; font-size: .64rem; }
+.mq-cl .sigil-img { width: 22px; height: 22px; }
+.mq-cl span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mq-cl em { position: absolute; top: 1px; right: 3px; font-style: normal; font-size: .54rem; color: #7FE0A0; font-weight: 800; }
+.mq-ans { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mq-ans .btn { min-height: 52px; font-size: 1.02rem; }
+.mq-alt { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.mq-alt:empty { display: none; }
+.mq-seal { border-color: rgba(159, 224, 255, .6); }
+.mq-wait { margin: 0; padding: 14px; text-align: center; color: var(--muted); font-style: italic; }
+.mq-game.rm .mq-fc.n3 { animation: none; }
+.mq-seat.s-p { flex-direction: row; align-items: center; justify-content: space-between; }
+.mq-seat.s-p .mq-front { justify-content: flex-end; min-height: 0; }
+.mq-me { padding: 2px; }
+.mq-me img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.mq-seats .mq-seat { padding: 6px 8px; }
+.mq-front .mq-fc .sigil-img { width: 20px; height: 20px; }

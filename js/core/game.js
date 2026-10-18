@@ -19,6 +19,7 @@ import { bossOf, BOSSES, BOSS_ORDER } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
 import { FORMS, formUnlocked } from './forms.js';
 import * as SC from './sceaux.js';
+import * as MQ from './masques.js';
 import { FERVOR_START, FERVOR_MAX, FERVOR_CARRY, TALENTS } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
 export const WEEKLY_FLOOR = 8;
@@ -930,6 +931,63 @@ export class Game {
     return r;
   }
   sceauxQuit() { this.s.sceaux.cur = null; this.persist(); }
+  // ——— v425 : la Cour des Masques (bluff à trois), ouverte en même temps que les Sceaux ———
+  masquesOpen() { return this.sceauxOpen(); }
+  masquesUnlocked() { return MQ.TABLES.filter((_, i) => MQ.tableUnlocked(this.s, i)).length; }
+  masquesDailyOpen() { return !!this.s.masques.beaten?.antichambre; }
+  masquesDaily() { const day = today(this.clock()); return { table: MQ.dailyTable(day, this.masquesUnlocked()), seed: [...`masques:${day}`].reduce((h, c) => (Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0), 2166136261) }; }
+  masquesStart({ table, daily = false } = {}) {
+    const mq = this.s.masques;
+    if (!this.masquesOpen()) throw new Error('La Cour des Masques s’ouvre après ton premier gardien.');
+    let seed = Math.floor(this.rng() * 2 ** 31);
+    if (daily) {
+      if (!this.masquesDailyOpen()) throw new Error('Le défi du jour s’ouvre après ta première victoire à l’Antichambre.');
+      if (mq.dailyDone === today(this.clock())) throw new Error('Défi du jour déjà relevé. Reviens demain !');
+      const d = this.masquesDaily(); table = d.table; seed = d.seed;
+    } else {
+      const i = MQ.TABLES.findIndex((t) => t.key === table);
+      if (i < 0) throw new Error('Table inconnue.');
+      if (!MQ.tableUnlocked(this.s, i)) throw new Error('Gagne d’abord à la table précédente.');
+    }
+    mq.cur = MQ.newGame(this.catalog, { table, seed, daily });
+    this.persist();
+    return mq.cur;
+  }
+  masquesAct(fn) { const st = this.s.masques.cur; if (!st || st.over) throw new Error('Aucune partie en cours.'); const r = fn(st); this.persist(); return r; }
+  masquesGive(card, to, claim) { return this.masquesAct((st) => MQ.give(st, 'p', card, to, claim)); }
+  masquesPass(to, claim) { return this.masquesAct((st) => MQ.pass(st, 'p', to, claim)); }
+  masquesLook() { return this.masquesAct((st) => MQ.look(st, 'p')); }
+  masquesPeek() { return this.masquesAct((st) => MQ.peek(st)); }
+  masquesAnswer(sayTrue) { return this.masquesAct((st) => MQ.answer(st, 'p', sayTrue)); }
+  masquesAi() { const st = this.s.masques.cur; if (!st || st.over) return null; const r = MQ.aiStep(st, this.rng); if (r) this.persist(); return r; }
+  // Fin de partie : récompenses (une fois par partie, 5 victoires payées par jour), coffre de première victoire, titre
+  masquesFinish() {
+    const mq = this.s.masques, st = mq.cur;
+    if (!st || !st.over) throw new Error('La partie n’est pas terminée.');
+    if (st.rewarded) return st.result;
+    const day = today(this.clock());
+    if (mq.day !== day) { mq.day = day; mq.paidToday = 0; }
+    const T = MQ.TABLE[st.table], R = MQ.MASQUES_REWARD;
+    const out = { result: st.over, shards: 0, first: false, title: null, daily: st.daily, capped: false, chests: [] };
+    if (st.over === 'won') {
+      mq.wins++; mq.streak++; mq.best = Math.max(mq.best, mq.streak);
+      if (!mq.beaten[T.key]) { mq.beaten[T.key] = Date.now(); out.first = true; out.shards += R.firstWin; out.chests.push(T.chest); }
+      if (st.daily && mq.dailyDone !== day) { mq.dailyDone = day; out.shards += R.daily; out.chests.push('bois'); }
+      if (mq.paidToday < R.dailyPaid) { mq.paidToday++; out.shards += T.reward; } else { out.capped = true; out.shards += R.afterCap; }
+      out.chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });
+      if (T.key === MQ.TABLES.at(-1).key && !this.s.titles.includes(MQ.MASQUES_TITLE)) { this.s.titles.push(MQ.MASQUES_TITLE); out.title = MQ.MASQUES_TITLE; }
+    } else { mq.losses++; mq.streak = 0; }
+    this.s.shards += out.shards;
+    out.xp = R.xp; this.s.xp += out.xp;
+    mq.history.unshift({ t: Date.now(), table: T.key, r: st.over, loser: st.loser });
+    mq.history = mq.history.slice(0, 20);
+    st.rewarded = true; st.result = out;
+    this.track('masques', 1);
+    this.checkProgress();
+    this.persist();
+    return out;
+  }
+  masquesQuit() { this.s.masques.cur = null; this.persist(); }
   // Trois objectifs pour l'accueil : un proche (Descente), un de progression (gardien ou Sceaux),
   // un de collection (le royaume le plus proche d'être complet). Chacun mène à son écran.
   goals() {
@@ -969,7 +1027,10 @@ export class Game {
     }
     // v328 : les Duels des Sceaux s'ouvrent après le premier gardien ; la première partie devient un objectif
     const sc = this.s.sceaux;
-    if (this.sceauxOpen() && !(sc.wins + sc.losses + sc.draws) && !sc.cur && !out.some((x) => x.kind === 'sceaux')) out.push({ kind: 'sceaux', title: 'Joue ta première partie des Sceaux', sub: 'Un second jeu de cartes, en 2 minutes, contre 8 rivaux · Aventure → Sceaux', href: '#/sceaux', icon: 'seal' });
+    if (this.sceauxOpen() && !(sc.wins + sc.losses + sc.draws) && !sc.cur && !out.some((x) => x.kind === 'sceaux')) out.push({ kind: 'sceaux', title: 'Joue ta première partie des Sceaux', sub: 'Un second jeu de cartes, en 2 minutes, contre 8 rivaux · Aventure → Jeux', href: '#/sceaux', icon: 'seal' });
+    /* v425 : la Cour des Masques, proposée une fois la première partie des Sceaux jouée */
+    const mq = this.s.masques;
+    if (this.masquesOpen() && (sc.wins + sc.losses + sc.draws) > 0 && !(mq.wins + mq.losses) && !mq.cur && !out.some((x) => x.kind === 'sceaux')) out.push({ kind: 'sceaux', title: 'Assieds-toi à la Cour des Masques', sub: 'Un jeu de bluff à trois, contre deux courtisans masqués · Aventure → Jeux', href: '#/masques', icon: 'seal' });
     // v331 : des éclats qui dorment alors qu'aucun booster n'a jamais été acheté (étude joueurs : jusqu'à 4 000 éclats inutilisés)
     if (!this.s.stats.shardsSpent && this.s.shards >= BOOSTERS.standard.price) out.push({ kind: 'shop', title: 'Ouvre un booster avec tes éclats', sub: `Tu as ${this.s.shards} éclats : un booster standard coûte ${BOOSTERS.standard.price}`, href: '#/boutique', icon: 'ticket' });
     // collection : un ensemble presque complet, sinon le royaume le plus avancé

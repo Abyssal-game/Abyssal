@@ -24,6 +24,8 @@ import descentScreen from './screens/descent.js';
 import accountScreen from './screens/account.js';
 import menuScreen from './screens/menu.js';
 import sceauxScreen from './screens/sceaux.js';
+import masquesScreen from './screens/masques.js';
+import gamesScreen from './screens/games.js';
 import trialsScreen from './screens/trials.js';
 import shadowScreen, { claimShadowPrize } from './screens/shadow.js';
 import { forgeScreen, furnaceScreen } from './screens/forge.js';
@@ -40,7 +42,7 @@ import { initNative, isNative } from './native.js';
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,
   factions: factionsScreen, faction: factionsScreen, succes: achievementsScreen, profil: profileScreen,
-  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen, sceaux: sceauxScreen, epreuves: trialsScreen, epreuve: descentScreen, tirage: shadowScreen, renfort: forgeScreen, fournaise: furnaceScreen,
+  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen, sceaux: sceauxScreen, masques: masquesScreen, jeux: gamesScreen, epreuves: trialsScreen, epreuve: descentScreen, tirage: shadowScreen, renfort: forgeScreen, fournaise: furnaceScreen,
 };
 const TABS = [
   ['antre', 'tab-home', 'Accueil'], ['collection', 'tab-collection', 'Collection'], ['boutique', 'tab-boosters', 'Boosters'],
@@ -48,16 +50,18 @@ const TABS = [
 ];
 // icônes peintes de la barre du bas (assets/icons)
 const tabIcon = (k) => `<img class="tab-pic" alt="" src="assets/icons/${k}.webp">`;
-const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', equipe: 'collection', renfort: 'collection', fournaise: 'collection', coffres: 'descente', heros: 'descente', arsenal: 'descente', marchand: 'descente', sceaux: 'descente', epreuves: 'descente', epreuve: 'descente', tirage: 'boutique' };
+const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', equipe: 'collection', renfort: 'collection', fournaise: 'collection', coffres: 'descente', heros: 'descente', arsenal: 'descente', marchand: 'descente', sceaux: 'descente', masques: 'descente', jeux: 'descente', epreuves: 'descente', epreuve: 'descente', tirage: 'boutique' };
 // Fond illustré de chaque page (l'Accueil et la Descente posent le leur)
 const ROUTE_SCENE = { boutique: 'shop', tirage: 'shadow', renfort: 'collection', fournaise: 'collection', collection: 'collection', equipe: 'team', coffres: 'chests', bestiaire: 'bestiary', succes: 'trophies', profil: 'profile', menu: 'menu', parametres: 'menu', compte: 'menu', factions: 'factions', faction: 'factions' };
 // Page parente des sous-pages (bouton retour en haut)
-const PARENT = { bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente', arsenal: 'coffres', marchand: 'descente' };
+const PARENT = { bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente', arsenal: 'coffres', marchand: 'descente', sceaux: 'jeux', masques: 'jeux' };
 // Sous-onglets de chaque onglet principal (barre en haut de la page)
+// v425 : pages rangées sous un autre sous-onglet (allumé sur elles)
+const SUB_OF = { fournaise: 'renfort', sceaux: 'jeux', masques: 'jeux' };
 const SUBNAV = {
   collection: [['collection', 'cards', 'Cartes'], ['equipe', 'team-ic', 'Équipe'], ['renfort', 'furnace', 'Forge']], /* v422 : Renforcer + Fournaise */
   boutique: [['boutique', 'booster', 'Boosters'], ['tirage', 'shadow', 'Tirage']],
-  descente: [['descente', 'descend', 'Descente'], ['epreuves', 'crest-elite', 'Épreuves'], ['sceaux', 'seal', 'Sceaux'], ['coffres', 'chest', 'Coffres']], /* v422 : les coffres se gagnent dans l'Aventure */
+  descente: [['descente', 'descend', 'Descente'], ['epreuves', 'crest-elite', 'Épreuves'], ['jeux', 'seal', 'Jeux'], ['coffres', 'chest', 'Coffres']], /* v422 : les coffres se gagnent dans l'Aventure */
 };
 
 function storageOrMemory() {
@@ -151,7 +155,7 @@ function renderChrome() {
   });
   const tab = TAB_OF[app.route] ?? 'antre';
   // sous-onglets : seulement sur les pages d'un groupe
-  const sub = SUBNAV[tab] && SUBNAV[tab].some(([r]) => r === app.route || (r === 'renfort' && app.route === 'fournaise')) ? SUBNAV[tab] : null;
+  const sub = SUBNAV[tab] && SUBNAV[tab].some(([r]) => r === (SUB_OF[app.route] || app.route)) ? SUBNAV[tab] : null;
   const subBadge = (r) => {
     if (r === 'coffres') return g.chestCount() || '';
     // v404 : pastilles plus calmes — plus de « 99+ » permanent sur la Fournaise ; Renforcer seulement si l'Accueil le conseille aussi
@@ -166,7 +170,7 @@ function renderChrome() {
   const shown0 = sub && sub.filter(([r]) => (r !== 'tirage' || isLoggedIn() || app.route === 'tirage'));
   const shown = shown0 && shown0.length > 1 ? shown0 : null; /* v422 : pas de barre pour un seul sous-onglet */
   document.body.classList.toggle('has-subnav', !!shown);
-  sn.innerHTML = shown ? shown.map(([r, ic, label]) => { const bd = subBadge(r); return `<a class="sn-tab${r === 'sceaux' && !g.sceauxOpen() ? ' locked' : ''}" href="#/${r}"${r === app.route || (r === 'renfort' && app.route === 'fournaise') ? ' aria-current="page"' : ''}><img class="sn-ic" alt="" src="assets/icons/${ic}.webp"><span>${label}</span>${bd ? `<i class="sn-badge">${bd}</i>` : ''}</a>`; }).join('') : '';
+  sn.innerHTML = shown ? shown.map(([r, ic, label]) => { const bd = subBadge(r); return `<a class="sn-tab${r === 'jeux' && !g.sceauxOpen() ? ' locked' : ''}" href="#/${r}"${r === (SUB_OF[app.route] || app.route) ? ' aria-current="page"' : ''}><img class="sn-ic" alt="" src="assets/icons/${ic}.webp"><span>${label}</span>${bd ? `<i class="sn-badge">${bd}</i>` : ''}</a>`; }).join('') : '';
   const nNew = g.newCount();
   const ticketCount = Object.values(s.tickets).reduce((a, b) => a + b, 0) + (g.welcomePending() ? 0 : g.freePack().stock); /* v404 : « 2 » comme l'annonce l'Accueil au tout début */
   document.getElementById('tabbar').innerHTML = TABS.map(([key, ic, label]) => {
