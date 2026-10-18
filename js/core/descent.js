@@ -63,6 +63,11 @@ export const cardPower = (rarity, level = 1) => (RARITY_POWER[rarity] || 1) * (1
 export const powerFor = (floor) => 1 + Math.max(0, floor - 6) / 22;
 export const powerPts = (p) => Math.round(p * 100);
 export const enemyScale = (floor) => 1 + 0.06 * Math.min(19, floor - 1) + 0.03 * Math.max(0, floor - 20);
+// v460 : derniers chapitres adoucis (décision du propriétaire : l'étage 100 en ≈ 2 mois pour un joueur régulier).
+// Les ennemis qui ne sont pas des gardiens perdent une part de leurs PV et de leur attaque, de 0 à l'étage `from`
+// jusqu'à `at100` à l'étage 100 (mesuré au simulateur : avant, des murs aux étages 91-98 avec une équipe au maximum).
+export const LATE_SOFT = { from: 30, at100: 0.25 };
+export const lateSoft = (floor) => 1 - LATE_SOFT.at100 * Math.min(1, Math.max(0, floor - LATE_SOFT.from) / (100 - LATE_SOFT.from));
 
 // v326 : les anciennes familles du Bestiaire (Brute, Lanceur, Essaim…) ont été retirées : le Bestiaire affiche
 // désormais les familles réellement utilisées en combat (AI_FAMILIES et aiFamily, js/core/skills.js).
