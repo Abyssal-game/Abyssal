@@ -31,11 +31,11 @@ export const BIDDERS = {
     hello: 'Trois pièces de la même faction… et la collection est parfaite.', beaten: 'Il me manquait une pièce. Une seule.', gloat: 'Une collection complète. Inestimable.' },
   stratege: { name: 'Sœur Vesna', skill: 2, noise: 0.15, bias: 0, sets: 1, bluff: 0, hint: 'Garde ses grosses offrandes pour les plus gros lots qui restent.',
     hello: 'Chaque offrande est une prière. Je ne prie pas pour rien.', beaten: 'Mes prières ont été mal placées.', gloat: 'Patience et mesure.' },
-  maitre: { name: 'Le Maître des Sceaux', skill: 2, noise: 0.15, bias: 0.05, sets: 1, bluff: 0.05, hint: 'Compte les lots qui restent, et bluffe parfois.',
+  maitre: { name: 'Le Maître des Sceaux', skill: 2, noise: 0.15, bias: 0.05, sets: 1, bluff: 0.08, hint: 'Compte les lots qui restent, et bluffe parfois.',
     hello: 'Les règles d’une vente sont simples. Les acheteurs, jamais.', beaten: 'J’ai mal compté. Cela n’arrive pas.', gloat: 'Le compte était bon.' },
   echo: { name: 'L’Écho de l’Abîme', skill: 1, noise: 1, bias: 0, sets: 1, temp: 1.5, bluff: 0, hint: 'Imprévisible : il mise n’importe quoi, n’importe quand.',
     hello: 'Je mise ce que tu mises. Ou presque.', beaten: '… l’écho se tait.', gloat: 'Tu m’as entendu miser ? Moi, je t’ai entendu.' },
-  archiviste: { name: 'L’Archiviste', skill: 2, noise: 0.35, bias: 0, sets: 1, temp: 3, bluff: 0, hint: 'Compte les lots qui restent, avec des écarts difficiles à prévoir.',
+  archiviste: { name: 'L’Archiviste', skill: 3, read: true, noise: 0.35, bias: 0, sets: 1, temp: 3, bluff: 0.15, hint: 'Note tes offrandes passées et devine les prochaines : change de style en cours de vente.',
     hello: 'J’ai catalogué toutes les ventes de Mammon. Toutes.', beaten: 'Erreur… d’inventaire.', gloat: 'Valeur de ta collection : inférieure.' },
   banquier: { name: 'Mammon', skill: 1, noise: 0.15, bias: 0.25, sets: 2.5, temp: 0.6, bluff: 0, hint: 'Dépense sans compter, surtout pour une famille de trois.',
     hello: 'Bienvenue dans MA salle des ventes. Tout se paie, ici.', beaten: 'Vendu… à quelqu’un d’autre que moi ? Inadmissible.', gloat: 'La maison gagne toujours.' },
@@ -43,8 +43,8 @@ export const BIDDERS = {
     hello: 'Tout ce qui est vendu ici finira dans le Néant. Autant que ce soit le mien.', beaten: 'Alors… le Néant peut perdre une enchère.', gloat: 'Retourne au silence, les mains vides.' },
 };
 
-// Tables : deux enchérisseurs chacune. Mesure (simulation, 600 ventes par table) : joueur qui s'adapte 90 / 83 / 50 / 45 %,
-// joueur moyen 87 / 65 / 43 / 22 %, au hasard 68 % à l'Étal. Les enchères sont un jeu de pierre-feuille-ciseaux : un style « fort » perd contre
+// Tables : deux enchérisseurs chacune. Mesure v463 (simulation, 300 ventes par table) : joueur qui s'adapte 91 / 78 / 44 / 38 %,
+// joueur moyen 83 / 65 / 41 / 26 %, au hasard 70 % à l'Étal. Les enchères sont un jeu de pierre-feuille-ciseaux : un style « fort » perd contre
 // certains styles « faibles » ; la difficulté vient surtout de la lisibilité des enchérisseurs (prévisible → imprévisible).
 export const TABLES = [
   { key: 'etal', name: 'L’Étal des curiosités', stars: 1, seats: ['initie', 'collectionneur'], reward: 25, chest: 'bois' },
@@ -156,6 +156,16 @@ function instinct(st, who, prof, rnd, v = feltValue(st, who, prof)) {
   return mine[Math.round(q * (mine.length - 1))];
 }
 const NAIVE = { skill: 2, noise: 0.2, bias: 0, sets: 1, bluff: 0 };
+// v463 : les enchérisseurs habiles lisent les autres : à partir des ventes passées, ils estiment si un adversaire
+// mise plus (ou moins) que la valeur des lots, et à quel point il est imprévisible
+function readOf(st, x) {
+  const seen = st.log.filter((ev) => ev.bids && ev.bids[x] != null);
+  if (seen.length < 2) return NAIVE;
+  const d = seen.map((ev) => ev.bids[x] / 15 - Math.min(1, Math.abs(ev.value) / 10));
+  const m = d.reduce((a, b) => a + b, 0) / d.length;
+  const sd = Math.sqrt(d.reduce((a, b) => a + (b - m) ** 2, 0) / d.length);
+  return { skill: 1, noise: Math.min(0.6, 0.1 + sd), bias: Math.max(-0.4, Math.min(0.4, m)), sets: 1, bluff: 0 };
+}
 export function aiBid(st, who, prof = bidderOf(st, who), rnd = Math.random) {
   if (prof.skill <= 2) return instinct(st, who, prof, rnd);
   // 3-4 : on imagine les offrandes des deux autres (au feeling, sur leurs offrandes restantes, connues de tous)
@@ -164,7 +174,8 @@ export function aiBid(st, who, prof = bidderOf(st, who), rnd = Math.random) {
   const restAbs = st.lots.slice(st.i + 1).reduce((a, l) => a + Math.abs(l.v), 0);
   const myRest = mine.reduce((a, b) => a + b, 0) || 1;
   const N = prof.skill >= 4 ? 60 : 30;
-  const sims = Array.from({ length: N }, () => others.map((x) => instinct(st, x, NAIVE, rnd)));
+  const reads = others.map((x) => (prof.read ? readOf(st, x) : NAIVE));
+  const sims = Array.from({ length: N }, () => others.map((x, k) => instinct(st, x, reads[k], rnd)));
   const us = mine.map((c) => {
     let gain = 0;
     for (const [b1, b2] of sims) {

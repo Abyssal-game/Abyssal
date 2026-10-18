@@ -24,17 +24,17 @@ function mulberry(seed) {
 }
 const shuffle = (arr, r) => { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; };
 
-// Adversaires : les arbitres des Sceaux. style : 'prudent' (s'arrête tôt), 'seuil' (s'arrête à un total), 'calcul'
-// (compare le gain espéré au risque, en comptant les cartes vues) ; risk : goût du risque (+ téméraire, − prudent) ;
-// race : prend plus de risques quand il est mené ; noise : part d'erreurs.
+// Adversaires : les arbitres des Sceaux. Tous comparent le gain espéré au risque (cartes vues comptées) ;
+// caution : poids du risque ; max : nombre de cartes au-delà duquel ils s'arrêtent (prudents) ; risk : goût du risque ;
+// race : audace quand ils sont menés ; cool : prudence quand ils mènent ; noise : part de décisions au hasard.
 export const RIVALS = {
-  initie: { name: 'Ilda', style: 'prudent', stop: 1, risk: 0, race: 0, noise: 0.1, hint: 'Très prudente : elle s’arrête après une ou deux cartes.',
+  initie: { name: 'Ilda', caution: 2.5, max: 1.3, risk: 0, race: 0.1, cool: 0.6, noise: 0.15, hint: 'Très prudente : elle s’arrête presque toujours après une ou deux cartes.',
     hello: 'Un pacte ? Je signe… mais seulement un petit.', beaten: 'J’aurais dû tirer une carte de plus.', gloat: 'Petit à petit, j’ai gagné !' },
-  collectionneur: { name: 'Maître Orvel', style: 'seuil', stop: 6, risk: 0, race: 0, noise: 0.1, hint: 'S’arrête dès qu’il a 6 points devant lui, quoi qu’il arrive.',
-    hello: 'Six. Toujours six. C’est un nombre qui porte chance.', beaten: 'Six ne m’a pas porté chance.', gloat: 'Je te l’avais dit : six.' },
-  maitre: { name: 'Le Maître des Sceaux', style: 'calcul', risk: 0, race: 0.4, noise: 0.05, hint: 'Compte les cartes déjà tirées et pèse chaque risque.',
+  collectionneur: { name: 'Maître Orvel', caution: 1.8, max: 1.9, risk: 0, race: 0.2, cool: 0.4, noise: 0.1, hint: 'Frileux : rarement plus de deux cartes, sauf quand tu le distances.',
+    hello: 'Une carte de plus ? Ou une de trop… tout est là.', beaten: 'J’ai été trop sage, cette fois.', gloat: 'La sagesse paie toujours.' },
+  maitre: { name: 'Le Maître des Sceaux', caution: 1, risk: 0, race: 0.5, cool: 0.2, noise: 0.04, hint: 'Compte les cartes déjà tirées, pèse chaque risque, se presse quand tu approches du but.',
     hello: 'Chaque pacte a un prix. Je connais toujours le prix.', beaten: 'Le hasard… a mal compté.', gloat: 'Le compte était juste.' },
-  banquier: { name: 'Mammon', style: 'calcul', risk: 0.12, race: 0.8, noise: 0.03, head: 6, hint: 'Calcule tout, ose davantage quand il est mené, et commence avec 6 points : la part de la maison.',
+  banquier: { name: 'Mammon', caution: 0.9, risk: 0.12, race: 0.8, cool: 0.1, noise: 0.02, head: 6, hint: 'Calcule tout, ose davantage quand il est mené, et commence avec 6 points : la part de la maison.',
     hello: 'Signe ici, et ici. Les petites lignes ? Elles sont pour moi.', beaten: 'Un pacte rompu… à mes dépens ? Inadmissible.', gloat: 'La maison gagne toujours.' },
 };
 export const TABLES = [
@@ -183,14 +183,15 @@ export function aiWants(st, rng = Math.random) {
   if (who === 'a' && st.scores.p >= TARGET && me + v <= st.scores.p) return true;
   if (me + v >= TARGET && me + v > opp) return false;
   if (rng() < R.noise) return rng() < 0.5;
-  if (R.style === 'prudent') return nf < R.stop + (rng() < 0.4 ? 1 : 0);
-  if (R.style === 'seuil') return v < R.stop;
-  // calcul : gain espéré du tirage contre perte espérée ; mené → plus d'audace
+  if (R.max && nf >= Math.floor(R.max + rng()) + (opp - me > 15 ? 1 : 0)) return false; // les prudents ne dépassent pas leur nombre de cartes
+  // v463 : tous calculent (cartes déjà sorties comptées, Sceau, Offrande, sept factions) ; leur caractère change
+  // le poids du risque (`caution`), l'audace quand ils sont menés (`race`) et la prudence quand ils mènent (`cool`)
   const p = bustChance(st), protect = st.sceaux > 0 ? 0.15 : 1;
-  const behind = Math.max(0, opp - me) / TARGET;
+  const behind = Math.max(0, opp - me) / TARGET, ahead = Math.max(0, me - opp) / TARGET;
+  const oppNear = Math.max(0, opp - TARGET * 0.75) / (TARGET * 0.25); // l'autre approche du but : il faut se presser
   const gain = (1 - p) * meanSafe(st) * (st.offer ? 2 : 1) + (rowFactions(st).size === 6 ? (1 - p) * SEVEN_BONUS : 0);
   const loss = p * v * protect;
-  return gain * (1 + R.risk + R.race * behind) > loss;
+  return gain * (1 + R.risk + R.race * (behind + 0.5 * oppNear) - R.cool * ahead) > loss * R.caution;
 }
 // Tour complet de l'adversaire (liste des événements, pour l'écran)
 export function aiTurn(st, rng = Math.random) {

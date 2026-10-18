@@ -85,12 +85,9 @@ COMBATS TACTIQUES
 
 LA SALLE DES JEUX
 • Les Duels des Sceaux : pose tes créatures sur le plateau et capture celles de l'adversaire, contre 8 rivaux
-• Les Énigmes des Sceaux : trois casse-têtes chaque jour
-• La Cour des Masques : un jeu de bluff à trois, dis vrai… ou mens
 • Les Enchères de Mammon : des enchères à l'aveugle où miser pareil ne rapporte rien
 • Le Pacte : tire des cartes, encore une… et arrête-toi avant de briser le pacte
 • Les Cryptes : un jeu de mémoire où chaque paire réveille le pouvoir de sa faction
-• Les Trois Autels : un duel tactique en six tours, domine deux autels sur trois avec ton grimoire
 
 UN MONDE À DÉCOUVRIR
 • Un Bestiaire illustré, avec l'histoire de chaque créature

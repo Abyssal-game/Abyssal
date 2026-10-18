@@ -35,13 +35,13 @@ export const POWERS = {
 // Adversaires : les arbitres des Sceaux. mem : chance de retenir une carte vue ; fade : chance d'oublier, à chaque tour,
 // une carte retenue ; spite : utilise ses pouvoirs pour gêner (échange des cartes que tu as vues).
 export const RIVALS = {
-  initie: { name: 'Ilda', mem: 0.2, fade: 0.3, spite: 0, hint: 'Oublie vite ce qu’elle a vu.',
+  initie: { name: 'Ilda', mem: 0.2, fade: 0.3, spite: 0, confuse: 0.25, hint: 'Oublie vite ce qu’elle a vu.',
     hello: 'Des cryptes ? J’ai la mémoire d’un moineau… on y va ?', beaten: 'Je l’avais vue, celle-là ! Enfin… je crois.', gloat: 'Même un moineau trouve ses graines !' },
-  stratege: { name: 'Sœur Vesna', mem: 0.45, fade: 0.15, spite: 0.3, hint: 'Retient une carte sur deux, et brouille parfois les tiennes.',
+  stratege: { name: 'Sœur Vesna', mem: 0.5, fade: 0.15, spite: 0.4, confuse: 0.15, hint: 'Retient une carte sur deux, et brouille parfois les tiennes.',
     hello: 'Chaque tombe garde un nom. Je les récite tous les soirs.', beaten: 'Ma litanie avait un trou.', gloat: 'La prière garde la mémoire.' },
-  archiviste: { name: 'L’Archiviste', mem: 0.62, fade: 0.08, spite: 0.6, hint: 'Retient beaucoup, et échange les cartes que tu viens de voir.',
+  archiviste: { name: 'L’Archiviste', mem: 0.72, fade: 0.07, spite: 0.7, confuse: 0.08, hint: 'Retient beaucoup, et échange les cartes que tu viens de voir.',
     hello: 'J’ai catalogué chaque crypte. Chaque dalle. Chaque os.', beaten: 'Erreur… d’inventaire.', gloat: 'Tout est noté. Tout.' },
-  echo: { name: 'L’Écho de l’Abîme', mem: 0.8, fade: 0.04, spite: 0.9, hint: 'N’oublie presque rien, et brouille sans cesse tes souvenirs.',
+  echo: { name: 'L’Écho de l’Abîme', mem: 0.9, fade: 0.03, spite: 0.9, confuse: 0.03, hint: 'N’oublie presque rien, et brouille sans cesse tes souvenirs.',
     hello: 'Chaque carte retournée résonne en moi… à jamais.', beaten: '… l’écho se tait.', gloat: 'Tu m’as entendu ? Moi, je me souviens de tout.' },
 };
 export const TABLES = [
@@ -174,29 +174,39 @@ function aiPower(st, f, ev, rng) {
     // il brouille les cartes que tu as déjà vues (les plus récentes), ou en échange deux au hasard
     const seen = (st.shown || []).filter((i) => hid.includes(i));
     let a, b;
-    if (seen.length >= 2 && rng() < R.spite) { a = seen[seen.length - 1]; b = seen[seen.length - 2]; }
+    const pairSeen = seen.find((i) => seen.some((j) => j !== i && st.cards[j].k === st.cards[i].k));
+    if (pairSeen != null && rng() < R.spite) { a = pairSeen; b = shuffle(hid.filter((i) => i !== pairSeen), rng)[0]; }
+    else if (seen.length >= 2 && rng() < R.spite) { a = seen[seen.length - 1]; b = seen[seen.length - 2]; }
     else { const s = shuffle(hid.slice(), rng); a = s[0]; b = s[1]; }
     swap(st, a, b); ev.i2 = [a, b];
   }
 }
 
 // Ce que l'adversaire fait maintenant : retourner une carte (renvoie son indice)
+// v463 : adversaires plus humains : au lieu d'oublier d'un coup, ils se trompent parfois de place
+// (« elle était là… non, à côté » : `confuse`). (Essai écarté : une 2e carte déjà vue pour ne rien te révéler les affaiblissait.)
+const near = (i) => [i - 1, i + 1, i - COLS, i + COLS].filter((j) => j >= 0 && j < PAIRS * 2 && (Math.floor(j / COLS) === Math.floor(i / COLS) || j % COLS === i % COLS));
+function recall(st, i, rng) {
+  const R = RIVALS[st.rival];
+  if (rng() >= (R.confuse || 0)) return i;
+  const hid = hidden(st), alt = near(i).filter((j) => hid.includes(j));
+  return alt.length ? alt[Math.floor(rng() * alt.length)] : i;
+}
 export function aiPick(st, rng = Math.random) {
-  const hid = hidden(st), byK = {};
+  const R = RIVALS[st.rival], hid = hidden(st), byK = {};
   for (const i of hid) if (st.mem[i] != null) (byK[st.mem[i]] ||= []).push(i);
+  const pickOf = (l) => l[Math.floor(rng() * l.length)];
   if (st.open.length === 1) {
     const o = st.open[0], k = st.cards[o].k;
     const known = (byK[k] || []).find((i) => i !== o);
-    if (known != null) return known;
+    if (known != null) return recall(st, known, rng);
     const unknown = hid.filter((i) => st.mem[i] == null && i !== o);
-    const pool = unknown.length ? unknown : hid.filter((i) => i !== o);
-    return pool[Math.floor(rng() * pool.length)];
+        return pickOf(unknown.length ? unknown : hid.filter((i) => i !== o));
   }
   const pair = Object.values(byK).find((l) => l.length >= 2);
-  if (pair) return pair[0];
+  if (pair) return recall(st, pair[0], rng);
   const unknown = hid.filter((i) => st.mem[i] == null);
-  const pool = unknown.length ? unknown : hid;
-  return pool[Math.floor(rng() * pool.length)];
+  return pickOf(unknown.length ? unknown : hid);
 }
 // Pour l'écran : cartes vues par le joueur (l'adversaire s'en sert pour brouiller avec Abyssal)
 export function noteShown(st, idx) {

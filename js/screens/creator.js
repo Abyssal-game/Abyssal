@@ -55,7 +55,7 @@ export function openCreator(app) {
       </section>
 
       <section class="cr-sec"><h3>Salle des jeux</h3>
-        <p class="small muted">${g.s.devGames ? 'Ouverte : tu peux jouer aux sept jeux comme si le gardien de l’étage 5 était vaincu.' : 'Ouvre les sept jeux (Sceaux, Énigmes, Cour des Masques, Enchères, Pacte, Cryptes, Trois Autels) comme si le gardien de l’étage 5 était vaincu.'} Ta campagne ne change pas, et tout se referme si tu désactives le Mode Créateur.</p>
+        <p class="small muted">${g.s.devGames ? 'Ouverte : tu peux jouer aux jeux comme si le gardien de l’étage 5 était vaincu.' : 'Ouvre les jeux (Duels des Sceaux, Cryptes, Pacte, Enchères) comme si le gardien de l’étage 5 était vaincu.'} Ta campagne ne change pas, et tout se referme si tu désactives le Mode Créateur.</p>
         <div class="row gap wrap">${B('games', g.s.devGames ? 'Refermer la Salle des jeux' : 'Ouvrir la Salle des jeux', g.s.devGames ? '' : 'gold')}</div></section>
 
       <section class="cr-sec"><h3>Affronter un gardien</h3>

@@ -1,8 +1,6 @@
-import * as MQ from './masques.js';
 import * as EN from './encheres.js';
 import * as PA from './pacte.js';
 import * as CR from './cryptes.js';
-import * as AU from './autels.js';
 // Titres et cadres : d'où vient chacun (pour expliquer comment débloquer ceux qui manquent).
 import { LEVEL_TITLES, FRAMES, ASH_FRAMES } from '../config.js';
 import { SCEAUX_TITLES, RIVALS } from './sceaux.js';
@@ -30,7 +28,7 @@ export function unlockSources(cat) {
   add(titles, 'Vainqueur des Implacables', 'Bats tous les adversaires en revanche implacable aux Duels des Sceaux.');
   add(frames, 'sceaux', `Bats ${rival('echo')} aux Duels des Sceaux.`);
   /* v459 : titres des jeux de la Salle des jeux */
-  for (const [M, title, game, last] of [[MQ, MQ.MASQUES_TITLE, 'la Cour des Masques', 'la dernière table'], [EN, EN.ENCHERES_TITLE, 'les Enchères de Mammon', 'la dernière vente'], [PA, PA.PACTE_TITLE, 'le Pacte', 'le dernier pacte'], [CR, CR.CRYPTES_TITLE, 'les Cryptes', 'la dernière crypte'], [AU, AU.AUTELS_TITLE, 'les Trois Autels', 'le dernier autel']]) add(titles, title, `Gagne ${last}, « ${M.TABLES.at(-1).name} », dans ${game} (Aventure › Jeux).`);
+  for (const [M, title, game, last] of [[EN, EN.ENCHERES_TITLE, 'les Enchères de Mammon', 'la dernière vente'], [PA, PA.PACTE_TITLE, 'le Pacte', 'le dernier pacte'], [CR, CR.CRYPTES_TITLE, 'les Cryptes', 'la dernière crypte']]) add(titles, title, `Gagne ${last}, « ${M.TABLES.at(-1).name} », dans ${game} (Aventure › Jeux).`);
   add(titles, 'Vainqueur de l’Abysse', 'Vaincs L’Abysse, le gardien de l’étage 100 de la Descente.');
   add(frames, 'oeil', 'Vaincs L’Abysse, le gardien de l’étage 100 de la Descente.');
   return {
