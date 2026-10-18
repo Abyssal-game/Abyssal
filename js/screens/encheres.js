@@ -88,21 +88,29 @@ export default function encheresScreen(app, root) {
   };
   const lotCard = (l, cls = '') => (l.v > 0
     ? `<span class="en-lot ${cls}"><img alt="" src="${l.id ? artUrl(cat.get(l.id), { lite: true }) : 'assets/sceaux/dos.webp'}"><b class="en-v">+${l.v}</b><span class="mq-cf">${sigil(l.f)}${esc(fname(l.f))}</span></span>`
-    : `<span class="en-lot curse ${cls}"><img alt="" src="assets/icons/danger.webp"><b class="en-v">${l.v}</b><span class="mq-cf">Malédiction</span></span>`);
-  function table(st) {
-    if (banner) return `<div class="mq-banner ${banner.cls}">${banner.html}</div>`;
-    const lot = st.lots[st.i]; if (!lot) return '';
-    const v = EN.potValue(st);
-    return `<div class="mq-pend en-pend">${lotCard(lot)}<span class="mq-say"><small>Lot ${st.i + 1} / ${st.lots.length}</small>
-      <b>${lot.v > 0 ? `${esc(fname(lot.f))} · ${lot.v} point${lot.v > 1 ? 's' : ''}` : `Malédiction · ${lot.v}`}</b>
-      ${st.pot.length ? `<span class="en-pot">+ ${st.pot.length} lot${st.pot.length > 1 ? 's' : ''} resté${st.pot.length > 1 ? 's' : ''} sur la table (${st.pot.map((l) => (l.v > 0 ? `+${l.v}` : l.v)).join(', ')})</span>` : ''}
-      <span class="small">${v > 0 ? 'La <b>plus haute</b> offrande seule l’emporte.' : 'La <b>plus basse</b> offrande seule l’hérite !'}${st.pot.length ? ` En jeu : ${v > 0 ? '+' : ''}${v}.` : ''}</span></span></div>`;
+    : `<span class="en-lot curse ${cls}"><img alt="" src="assets/jeux/en-malediction.webp"><b class="en-v">${l.v}</b><span class="mq-cf">Malédiction</span></span>`);
+  /* v464 : la salle des ventes peinte : le lot sur le coussin du pupitre, la règle sur sa façade, les deux enchérisseurs
+     dans les fauteuils, l'annonce de la manche et le marteau par-dessus */
+  const chair = (st, x) => {
+    const W = who(st, x), sc = EN.scoreOf(st, x);
+    return `<div class="en-chair c-${x}" data-seat="${x}"><span class="sc-med">${pic(W.key)}</span><b>${esc(W.name)}</b>
+      <small>${sc.total} pt${Math.abs(sc.total) > 1 ? 's' : ''}${sc.sets ? ` · ${sc.sets} fam.` : ''}</small><span class="mq-front">${wonHTML(st, x)}</span>${offersHTML(st, x)}</div>`;
+  };
+  function stage(st) {
+    const lot = banner?.lot || st.lots[st.i], v = EN.potValue(st); /* pendant l'annonce : le lot qui vient d'être vendu */
+    const k = banner ? st.i - 1 : st.i, fresh = ui.shown !== k; ui.shown = k; /* le lot n'arrive en glissant qu'une fois */
+    const ban = banner ? `<div class="en-ban">${banner.gavel ? '<img class="en-gavel" alt="" src="assets/jeux/en-marteau.webp">' : ''}<div class="mq-banner ${banner.cls}">${banner.html}</div></div>` : '';
+    return `<div class="en-stage">${chair(st, 'a')}${chair(st, 'b')}
+      ${lot ? `<div class="en-onlot ${fresh ? 'fresh' : ''}">${lotCard(lot)}</div>
+      ${banner ? '' : `<div class="en-plaque"><small>Lot ${st.i + 1} / ${st.lots.length}</small><b>${lot.v > 0 ? `${esc(fname(lot.f))} · ${lot.v} pt${lot.v > 1 ? 's' : ''}` : `Malédiction · ${lot.v}`}</b>
+        ${st.pot.length ? `<span class="en-pot">+ ${st.pot.length} lot${st.pot.length > 1 ? 's' : ''} resté${st.pot.length > 1 ? 's' : ''} : en jeu ${v > 0 ? '+' : ''}${v}</span>` : ''}
+        <span>${v > 0 ? 'La <b>plus haute</b> offrande seule l’emporte' : 'La <b>plus basse</b> offrande seule l’hérite !'}</span></div>`}` : ''}${ban}</div>`;
   }
   function controls(st) {
     if (st.over || busy) return '';
-    return `<div class="mq-ctl"><p class="mq-q">Choisis ton offrande.</p>
-      <div class="en-grid">${Array.from({ length: EN.OFFERS }, (_, k) => k + 1).map((n) => `<button class="en-ob ${ui.sel === n ? 'sel' : ''}" data-en="o" data-n="${n}" ${st.offers.p.includes(n) ? '' : 'disabled'}>${n}</button>`).join('')}</div>
-      <button class="btn primary block dc-plq dc-plq-red" data-en="bid" ${ui.sel ? '' : 'disabled'}>${ui.sel ? `Offrir ${ui.sel}` : 'Offrir'}</button></div>`;
+    return `<div class="mq-ctl en-ctl">
+      <div class="en-grid">${Array.from({ length: EN.OFFERS }, (_, k) => k + 1).map((n) => `<button class="en-ob ${ui.sel === n ? 'sel' : ''}" data-en="o" data-n="${n}" ${st.offers.p.includes(n) ? '' : 'disabled'} aria-label="Offrande ${n}">${n}</button>`).join('')}</div>
+      <button class="btn primary block dc-plq dc-plq-red" data-en="bid" ${ui.sel ? '' : 'disabled'}>${ui.sel ? `Offrir ${ui.sel}` : 'Choisis une offrande'}</button></div>`;
   }
   function view() {
     const st = g.s.encheres.cur;
@@ -113,8 +121,7 @@ export default function encheresScreen(app, root) {
     if (ui.sel && !st.offers.p.includes(ui.sel)) ui.sel = null;
     root.innerHTML = `<div class="mq-game en-game ${app.reduced() ? 'rm' : ''}">
       <div class="mq-bar"><button class="btn small ghost" data-en="rules" aria-label="Règles">${icon('p:help')}</button><b>${esc(T.name)}</b><button class="btn small ghost" data-en="quit" aria-label="Quitter la vente">${icon('close')}</button></div>
-      <div class="mq-seats">${seat(st, 'a')}${seat(st, 'b')}</div>
-      <div class="mq-table">${table(st)}</div>
+      ${stage(st)}
       ${seat(st, 'p')}
       ${controls(st)}</div>`;
   }
@@ -122,7 +129,7 @@ export default function encheresScreen(app, root) {
   async function reveal(st, ev) {
     const tk = ev.taker ? who(st, ev.taker) : null;
     const offer = (x) => `<span class="en-rv ${ev.cancelled.includes(x) ? 'off' : ''} ${ev.taker === x ? 'win' : ''}"><span class="sc-med">${x === 'p' ? me() : pic(st.seats[x])}</span><b>${ev.bids[x]}</b><small>${esc(who(st, x).name)}</small></span>`;
-    banner = { cls: ev.taker === 'p' ? (ev.value > 0 ? 'ok' : 'ko') : ev.taker ? (ev.value > 0 ? 'ko' : 'ok') : '', html: `<span class="en-rvrow">${['p', 'a', 'b'].map(offer).join('')}</span>
+    banner = { cls: ev.taker === 'p' ? (ev.value > 0 ? 'ok' : 'ko') : ev.taker ? (ev.value > 0 ? 'ko' : 'ok') : '', gavel: !!ev.taker && !app.reduced(), lot: ev.lot, html: `<span class="en-rvrow">${['p', 'a', 'b'].map(offer).join('')}</span>
       <span class="mq-vd">${ev.cancelled.length ? `<small>${ev.cancelled.length === 3 ? 'Les trois offrandes s’annulent' : `${ev.cancelled.map((x) => esc(who(st, x).name)).join(' et ')} : offrandes annulées`}</small>` : ''}
       <b>${tk ? `${ev.taker === 'p' ? 'Tu remportes' : `${esc(tk.name)} remporte`} ${ev.pile.length > 1 ? `${ev.pile.length} lots` : ev.value > 0 ? 'le lot' : 'la malédiction'}` : 'Le lot reste sur la table'}</b>
       <span>${tk ? `${ev.value > 0 ? '+' : ''}${ev.value} point${Math.abs(ev.value) > 1 ? 's' : ''}` : 'Il s’ajoute au lot suivant.'}</span></span>` };

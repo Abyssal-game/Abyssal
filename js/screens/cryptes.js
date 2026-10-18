@@ -89,7 +89,7 @@ export default function cryptesScreen(app, root) {
       if (c.gone && !ui.up.has(i)) return `<span class="cr-c gone g-${c.gone}"></span>`;
       const up = st.open.includes(i) || ui.up.has(i);
       const cls = [up ? 'up' : '', ui.glow.has(i) ? 'glow' : '', ui.picks.includes(i) ? 'pick' : '', ui.swap.has(i) ? 'swap' : ''].join(' ');
-      return `<button class="cr-c ${cls}" data-cr="c" data-i="${i}" aria-label="${up ? esc(fname(c.f)) : `Carte ${i + 1}, face cachée`}">${up ? face(c) : '<img alt="" src="assets/sceaux/dos.webp">'}</button>`;
+      return `<button class="cr-c ${cls}" data-cr="c" data-i="${i}" aria-label="${up ? esc(fname(c.f)) : `Carte ${i + 1}, face cachée`}">${up ? face(c) : '<img alt="" src="assets/jeux/cr-dos.webp">'}</button>`;
     }).join('')}</div>`;
   }
   function info(st) {

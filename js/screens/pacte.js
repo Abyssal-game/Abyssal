@@ -10,9 +10,11 @@ import { CHESTS } from '../core/descent.js';
 const CHEST_NAME = Object.fromEntries(Object.entries(CHESTS).map(([k, c]) => [k, c.name]));
 const stars = (n) => `${'★'.repeat(n)}${'☆'.repeat(Math.max(0, 5 - n))}`;
 const pic = (key) => `<img alt="" src="assets/sceaux/rival-${key}.webp">`;
-const SP = { sceau: { name: 'Sceau', img: 'assets/icons/seal.webp', desc: 'Il te protège : la prochaine faction en double est jetée au lieu de briser le pacte.' },
-  gardien: { name: 'Gardien', img: 'assets/icons/crest-boss.webp', desc: 'Arrêt forcé : tu encaisses tout de suite ce que tu as devant toi.' },
-  offrande: { name: 'Offrande', img: 'assets/icons/ritual.webp', desc: 'La prochaine carte de faction compte double.' } };
+const SP = { sceau: { name: 'Sceau', img: 'assets/jeux/pa-sceau.webp', desc: 'Il te protège : la prochaine faction en double est jetée au lieu de briser le pacte.' },
+  gardien: { name: 'Gardien', img: 'assets/jeux/pa-gardien.webp', desc: 'Arrêt forcé : tu encaisses tout de suite ce que tu as devant toi.' },
+  offrande: { name: 'Offrande', img: 'assets/jeux/pa-offrande.webp', desc: 'La prochaine carte de faction compte double.' } };
+// v464 : les sept sceaux de cire du parchemin (assets/jeux/pa-table.webp, 450 × 330), position en % et faction de chacun
+const SEALS = [['infernal', 47, 170], ['artificiel', 100, 207], ['celeste', 160, 233], ['necrotique', 225, 245], ['sauvage', 292, 235], ['abyssal', 353, 207], ['primordial', 405, 170]];
 const HOW = [['cards', '#7FA8D8', 'Ton tour', 'Tire des cartes une à une et pose-les devant toi. Chaque carte de faction vaut de 1 à 7 points.'],
   ['crystal', '#E8C35A', 'T’arrêter', 'Quand tu veux, arrête-toi : tu gagnes la somme des cartes posées ce tour-ci.'],
   ['danger', '#E0485E', 'Le pacte se brise', 'Si tu tires une faction que tu as déjà posée ce tour-ci, le pacte se brise : tu perds tout ce que tu avais gagné ce tour-ci.'],
@@ -87,12 +89,16 @@ export default function pacteScreen(app, root) {
       <span class="pa-pts"><b>${sc}</b><small>/ ${PA.TARGET}</small></span></div>`;
   };
   function center(st) {
-    if (banner) return `<div class="mq-banner ${banner.cls}">${banner.html}</div>`;
-    const v = PA.rowValue(st), risk = Math.round(PA.bustChance(st) * 100), nf = PA.rowFactions(st).size;
-    return `<div class="pa-row">${st.row.length ? st.row.map((c) => cardHTML(c)).join('') : `<span class="pa-empty">${st.turn === 'p' ? 'Tire ta première carte.' : '…'}</span>`}</div>
-      <div class="pa-info"><span>Ce tour : <b>${v}</b> point${v > 1 ? 's' : ''}</span><span class="pa-fac">${nf} / 7 factions</span>
+    /* v464 : la table est un parchemin : la rangée dans le cadre rouge, un sceau de cire s'allume pour chaque faction posée */
+    const v = PA.rowValue(st), risk = Math.round(PA.bustChance(st) * 100), fs = PA.rowFactions(st), nf = fs.size;
+    const seals = SEALS.map(([f, x, y]) => `<i class="pa-seal ${fs.has(f) ? 'on' : ''}" style="left:${(x / 4.5).toFixed(1)}%;top:${(y / 3.3).toFixed(1)}%;--fc:${cat.faction[f]?.colors.secondary || '#C9A45A'}"></i>`).join('');
+    const ban = banner ? `<div class="pa-ban">${banner.bust ? '<img class="pa-burn" alt="" src="assets/jeux/pa-brisure.webp">' : ''}<div class="mq-banner ${banner.cls}">${banner.html}</div></div>` : '';
+    return `<div class="pa-parch">
+      <div class="pa-row" style="--n:${Math.max(1, st.row.length)}">${st.row.length ? st.row.map((c) => cardHTML(c)).join('') : `<span class="pa-empty">${st.turn === 'p' ? 'Tire ta première carte.' : '…'}</span>`}</div>
+      ${seals}
+      <div class="pa-info"><span>Ce tour : <b>${v}</b> point${v > 1 ? 's' : ''}</span><span class="pa-fac">${nf} / 7 sceaux</span>
         ${st.sceaux ? `<span class="pa-tag ok">${icon('shield')}Protégé ×${st.sceaux}</span>` : ''}${st.offer ? '<span class="pa-tag gold">Offrande : la suivante ×2</span>' : ''}
-        <span class="pa-risk ${risk >= 40 ? 'hi' : risk >= 20 ? 'mid' : ''}">Risque de briser : <b>${risk} %</b></span></div>`;
+        <span class="pa-risk ${risk >= 40 ? 'hi' : risk >= 20 ? 'mid' : ''}">Risque : <b>${risk} %</b></span></div>${ban}</div>`;
   }
   function controls(st) {
     if (st.over || busy || st.turn !== 'p') return `<div class="mq-ctl"><p class="mq-q">${st.over ? '' : `Tour de ${esc(PA.RIVALS[st.rival].name)}…`}</p></div>`;
@@ -126,7 +132,7 @@ export default function pacteScreen(app, root) {
     if (!H) return;
     /* v457 : sons propres au Pacte (ElevenLabs) */
     app.sfx[{ bust: 'pa-bust', saved: 'pa-seal', forced: 'pa-guard', seven: 'pa-seven', stop: 'pa-bank' }[ev.result]]?.();
-    banner = { cls: H[0], html: `${ev.card ? cardHTML(ev.card, 'big') : `<span class="sc-med">${mine ? me() : pic(st.rival)}</span>`}<span class="mq-vd"><b>${H[1]}</b><span>${H[2]}</span></span>` };
+    banner = { cls: H[0], bust: ev.result === 'bust' && !app.reduced(), html: `${ev.card ? cardHTML(ev.card, 'big') : `<span class="sc-med">${mine ? me() : pic(st.rival)}</span>`}<span class="mq-vd"><b>${H[1]}</b><span>${H[2]}</span></span>` };
     view(); await wait(ms); banner = null;
   }
   async function aiTurn() {

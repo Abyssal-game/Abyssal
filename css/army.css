@@ -4067,3 +4067,94 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 .bn-cryptes { --bn: url(../assets/ui/bn-cryptes.webp); }
 .bn-autels { --bn: url(../assets/ui/bn-autels.webp); }
 .gm-pacte .gm-art, .gm-cryptes .gm-art, .gm-autels .gm-art { background-position: right center; }
+
+/* v464 : Les Cryptes habillées (images Gemini) : sol de crypte au cadre de runes (border-image, tranches mesurées par
+   tools/jeux-art.py), cartes posées dans des niches, dos de pierre tombale, flammes violettes autour d'une paire trouvée */
+.cr-game .cr-grid { gap: 7px 6px; padding: 4px 2px; background: none; border-radius: 0; border-style: solid; border-width: 36px 26px 38px 27px; border-image: url(../assets/jeux/cr-plateau.webp) 94 66 98 70 fill / 36px 26px 38px 27px round; filter: drop-shadow(0 10px 18px rgba(0, 0, 0, .7)); }
+.cr-game .cr-c { overflow: visible; border: 0; border-radius: 4px; background: transparent; box-shadow: 0 0 0 1px rgba(150, 110, 60, .55), 0 0 0 3px rgba(10, 8, 12, .85), 0 6px 10px rgba(0, 0, 0, .7); }
+.cr-game .cr-c > img { border-radius: 4px; }
+.cr-game .cr-c.up { box-shadow: 0 0 0 2px #C9A45A, 0 6px 12px rgba(0, 0, 0, .7); }
+.cr-game .cr-c.gone { box-shadow: inset 0 0 0 1px rgba(150, 110, 60, .5), inset 0 6px 14px rgba(0, 0, 0, .85); background: rgba(5, 5, 9, .55); border: 0; }
+.cr-game .cr-c.gone.g-p { background: linear-gradient(rgba(242, 193, 78, .1), rgba(5, 5, 9, .55)); }
+.cr-game .cr-c.gone.g-a { background: linear-gradient(rgba(224, 72, 94, .12), rgba(5, 5, 9, .55)); }
+.cr-game .cr-c.glow { transform: scale(1.06); z-index: 2; box-shadow: 0 0 0 2px #F2C14E, 0 0 18px rgba(180, 120, 255, .7); }
+.cr-game .cr-c.glow::after { content: ''; position: absolute; inset: -15% -22.6%; background: url(../assets/jeux/cr-paire.webp) center / 100% 100% no-repeat; pointer-events: none; animation: crFlame 1s ease-out both; }
+@keyframes crFlame { 0% { opacity: 0; transform: scale(.82); } 35% { opacity: 1; } 100% { opacity: 1; transform: scale(1); } }
+.cr-game .cr-c.pick { box-shadow: 0 0 0 2px #F2C14E, 0 0 14px rgba(242, 193, 78, .6); }
+.cr-game .cr-grid.picking .cr-c:not(.gone):not(.up) { box-shadow: 0 0 0 2px rgba(242, 193, 78, .7), 0 6px 10px rgba(0, 0, 0, .7); }
+.cr-game .cr-c.swap { box-shadow: 0 0 0 2px #6FB7FF, 0 0 16px rgba(111, 183, 255, .75); }
+.cr-game .cr-c .cr-f { right: 3px; bottom: 3px; }
+.cr-game.rm .cr-c.glow::after { animation: none; }
+html.fx-light .cr-game .cr-grid { filter: none; }
+
+/* v464 : Le Pacte habillé : table de parchement (rangée dans le cadre rouge, 4,4 % / 5,5 % / 91,1 % / 33,3 %), sceaux de cire
+   allumés par faction posée, encre sombre, cartes spéciales peintes, parchemin qui se déchire à la brisure */
+.pa-game .pa-table { padding: 0; background: none; border: 0; min-height: 0; display: block; }
+.pa-parch { position: relative; width: 100%; aspect-ratio: 450 / 330; background: url(../assets/jeux/pa-table.webp) center / 100% 100% no-repeat; border-radius: 6px; box-shadow: 0 10px 24px rgba(0, 0, 0, .65); }
+.pa-parch .pa-row { position: absolute; left: 4.4%; top: 5.5%; width: 91.1%; height: 33.3%; min-height: 0; display: flex; flex-wrap: nowrap; align-items: center; justify-content: center; gap: 4px; padding: 0 6px; }
+.pa-parch .pa-card { width: min(56px, calc((100% - 4px * (var(--n) - 1)) / var(--n))); max-height: 90%; flex: none; border-width: 1.5px; }
+.pa-parch .pa-empty { color: #5A3A22; font: italic 600 .92rem/1.2 var(--f-display); }
+.pa-seal { position: absolute; width: 10.6%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; background: radial-gradient(circle, rgba(222, 204, 168, .5) 55%, rgba(222, 204, 168, 0) 72%); transition: background .3s, box-shadow .3s, scale .3s; pointer-events: none; }
+.pa-seal.on { background: none; box-shadow: 0 0 0 2px color-mix(in srgb, var(--fc) 80%, #fff), 0 0 14px 3px var(--fc); scale: 1.12; animation: paSeal .5s ease-out both; }
+@keyframes paSeal { 0% { scale: 1.6; opacity: 0; } 100% { scale: 1.12; opacity: 1; } }
+.pa-parch .pa-info { position: absolute; left: 5%; right: 5%; top: 90%; translate: 0 -50%; gap: 2px 10px; font-size: .8rem; color: #3A2414; font-weight: 600; }
+.pa-parch .pa-info b { color: #7A1414; }
+.pa-parch .pa-fac { color: #5A3A22; }
+.pa-parch .pa-risk { background: rgba(60, 120, 70, .16); color: #1E4A26; }
+.pa-parch .pa-risk.mid { background: rgba(170, 110, 20, .18); color: #6A4006; }
+.pa-parch .pa-risk.hi { background: rgba(160, 20, 30, .18); color: #7A1414; }
+.pa-parch .pa-tag.ok { background: rgba(30, 70, 120, .16); color: #1A3A66; }
+.pa-parch .pa-tag.gold { background: rgba(150, 100, 10, .18); color: #5A3A06; }
+.pa-ban { position: absolute; inset: 0; display: grid; place-items: center; padding: 8px; }
+.pa-ban .mq-banner { position: relative; z-index: 1; }
+.pa-burn { position: absolute; left: 50%; top: 50%; width: 92%; translate: -50% -50%; pointer-events: none; animation: paBurn 1.4s ease-out both; }
+@keyframes paBurn { 0% { opacity: 0; scale: .6; } 20% { opacity: 1; scale: 1.05; } 70% { opacity: 1; } 100% { opacity: 0; scale: 1.15; } }
+.pa-card.sp { padding: 0; background: #0C0D14; display: block; }
+.pa-card.sp img { width: 100%; height: 100%; object-fit: cover; }
+.pa-card.sp .pa-cn { position: absolute; left: 0; right: 0; bottom: 0; padding: 1px 0; text-align: center; background: rgba(8, 9, 16, .82); font-size: .55rem; color: #F2D9A0; }
+.pa-card.sp-sceau { border-color: #E8C987; }
+.pa-game.rm .pa-seal.on, .pa-game.rm .pa-burn { animation: none; }
+.pa-parch .pa-ban .pa-card.big { width: 66px; max-height: none; }
+.pa-parch .pa-ban .mq-banner { padding: 8px 10px; }
+
+/* v464 : Les Enchères habillées : la salle des ventes peinte (572 × 490) ; lot posé sur le coussin du pupitre, règle sur sa
+   façade, enchérisseurs dans les fauteuils, pièces d'offrande, malédiction peinte, marteau qui frappe à l'adjudication */
+.en-stage { position: relative; width: 100%; aspect-ratio: 572 / 490; background: url(../assets/jeux/en-salle.webp) center / 100% 100% no-repeat; border-radius: 6px; box-shadow: 0 10px 24px rgba(0, 0, 0, .65); overflow: hidden; }
+.en-onlot { position: absolute; left: 50%; bottom: 52%; width: 21%; translate: -50% 0; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .8)); }
+.en-onlot.fresh { animation: enLot .45s ease-out both; }
+@keyframes enLot { from { opacity: 0; translate: -50% -18px; } to { opacity: 1; translate: -50% 0; } }
+.en-onlot .en-lot { width: 100%; }
+.en-lot .mq-cf { position: absolute; left: 0; right: 0; bottom: 0; padding: 2px 3px; display: flex; align-items: center; justify-content: center; gap: 3px; background: rgba(8, 9, 16, .85); font-size: .58rem; color: #F2D9A0; white-space: nowrap; overflow: hidden; }
+.en-lot .mq-cf svg, .en-lot .mq-cf img { width: 11px; height: 11px; flex: none; }
+.en-lot.curse > img { object-fit: cover; padding: 0; }
+.en-plaque { position: absolute; left: 32%; right: 32%; top: 60%; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 5px; text-align: center; border-radius: 4px; background: rgba(10, 8, 6, .78); border: 1px solid rgba(201, 164, 90, .55); box-shadow: 0 4px 10px rgba(0, 0, 0, .6); font-size: .64rem; line-height: 1.2; color: #E9DCC0; }
+.en-plaque small { font-size: .58rem; color: #C9A45A; letter-spacing: .04em; text-transform: uppercase; }
+.en-plaque > b { font: 700 .8rem/1.15 var(--f-display); color: #FFE7A6; }
+.en-plaque span b { color: #FFE7A6; }
+.en-plaque .en-pot { font-size: .62rem; }
+.en-chair { position: absolute; top: 33%; width: 28%; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 3px 5px; text-align: center; border-radius: 6px; background: linear-gradient(180deg, rgba(10, 8, 12, .2), rgba(10, 8, 12, .82) 32%); }
+.en-chair.c-a { left: 1.5%; }
+.en-chair.c-b { right: 1.5%; }
+.en-chair .sc-med { width: 44px; height: 44px; }
+.en-chair .sc-med img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.en-chair > b { font: 700 .72rem/1.1 var(--f-display); color: #F2D9A0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.en-chair > small { font-size: .62rem; color: #E9DCC0; }
+.en-chair .mq-front { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px; min-height: 0; }
+.en-chair .mq-fc { padding: 0 4px; font-size: .6rem; }
+.en-chair .mq-fc svg, .en-chair .mq-fc img { width: 11px; height: 11px; }
+.en-chair .mq-none { font-size: .56rem; color: var(--muted); }
+.en-chair .en-offs { width: 100%; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.en-chair .en-offs i { font-size: .56rem; line-height: 1.35; }
+.en-chair.took { animation: mqTook .7s ease-out; }
+.en-ban { position: absolute; left: 3%; right: 3%; bottom: 3%; display: grid; }
+.en-ban .mq-banner { position: relative; z-index: 1; }
+.en-gavel { position: absolute; left: 50%; bottom: 100%; width: 62%; translate: -22% 12%; transform-origin: 85% 40%; pointer-events: none; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .7)); animation: enGavel .9s ease-out .15s both; }
+@keyframes enGavel { 0% { opacity: 0; transform: rotate(-28deg); } 35% { opacity: 1; transform: rotate(-30deg); } 55% { transform: rotate(4deg); } 70% { transform: rotate(-3deg); } 100% { opacity: 1; transform: none; } }
+.en-ctl { gap: 8px; }
+.en-game .en-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 3px; }
+.en-game .en-ob { aspect-ratio: 1; min-height: 0; padding: 0; border: 0; border-radius: 50%; background: url(../assets/jeux/en-jeton.webp) center / 100% 100% no-repeat; color: #2A1A06; font: 800 1.05rem/1 var(--f-display); text-shadow: 0 1px 0 rgba(255, 230, 160, .55); filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .6)); transition: transform .15s, filter .15s; }
+.en-game .en-ob.sel { background: url(../assets/jeux/en-jeton.webp) center / 100% 100% no-repeat; box-shadow: none; transform: translateY(-5px) scale(1.12); filter: drop-shadow(0 0 8px rgba(255, 210, 110, .95)) brightness(1.18); }
+.en-game .en-ob:disabled { opacity: .18; filter: grayscale(1); text-decoration: none; }
+.en-game.rm .en-onlot, .en-game.rm .en-gavel { animation: none; }
+html.fx-light .en-onlot, html.fx-light .en-game .en-ob { filter: none; }
+.en-onlot .en-lot { display: block; height: auto; }
