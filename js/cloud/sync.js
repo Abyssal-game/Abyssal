@@ -128,7 +128,7 @@ export async function refreshProfile(force = true) {
   lastRefresh = Date.now();
   try {
     sync.profile = await cloud.getProfile();
-    if (app && app.game.s.settings.dev && sync.profile && sync.profile.badge !== 'createur') app.game.setSetting('dev', false);
+    if (app && app.game.s.settings.dev && !app.game.s.settings.devCode && sync.profile && sync.profile.badge !== 'createur') app.game.setSetting('dev', false); /* v462 : sauf s'il a été ouvert par le code du créateur */
     emit();
   } catch (e) { /* réseau : on garde l'ancien */ }
   return sync.profile;

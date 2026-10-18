@@ -102,7 +102,7 @@ export function openCreator(app) {
       if (x === 'campaign') { if (!(await confirmBox('Remettre la campagne à zéro ? Le record, les gardiens vaincus et le Cauchemar repartent de rien (ta collection est gardée).', { ok: 'Remettre à zéro', danger: true }))) return; g.devResetCampaign(); }
       if (x === 'missions') g.devMissions();
       if (x === 'games') { g.s.devGames = !g.s.devGames; g.persist(); app.chrome?.(); }
-      if (x === 'off') { g.setSetting('dev', false); sheet.close(); toast('Mode Créateur désactivé.', { icon: 'crown' }); return; }
+      if (x === 'off') { g.s.settings.devCode = false; g.setSetting('dev', false); sheet.close(); toast('Mode Créateur désactivé.', { icon: 'crown' }); return; }
       if (!['snap', 'restore'].includes(x)) toast('C’est fait.', { kind: 'success', icon: 'crown' });
     } catch (err) { toast(esc(err.message), { kind: 'error' }); }
     draw();

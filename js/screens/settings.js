@@ -181,6 +181,7 @@ export default function settings(app, root) {
         let ok = false;
         try { ok = (await sha256(v)) === CREATOR_HASH; } catch (e) { ok = false; }
         if (!ok) { toast('Code incorrect.', { kind: 'error' }); return; }
+        g.s.settings.devCode = true; /* v462 : ouvert par le code : le profil en ligne sans badge ne le referme plus */
         g.setSetting('dev', true); sh.close(); toast('Mode Créateur activé.', { icon: 'crown' }); render();
       });
     },
@@ -193,7 +194,7 @@ export default function settings(app, root) {
       if (x === 'pity') { g.s.pity = { sinceHR: 0, sinceM: 0 }; g.persist(); }
       if (x === 'pityhr') { g.s.pity.sinceHR = 9; g.persist(); }
       if (x === 'all') g.devUnlockAll();
-      if (x === 'off') { g.setSetting('dev', false); render(); return; }
+      if (x === 'off') { g.s.settings.devCode = false; g.setSetting('dev', false); render(); return; }
       if (x === 'sim') return simulate(app);
       toast('Fait.', { icon: 'code' });
     },
