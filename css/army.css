@@ -4215,3 +4215,8 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .cx-bonus { font-size: .72rem; font-weight: 700; color: #BFF0CF; }
 .cx-item.obs .cx-it-h { align-items: center; }
 .cx-item.obs .cx-it-h .obs-n { font: 800 1.15rem/1 var(--f-display); }
+
+/* v475 : bouton « Débloquer le Codex enluminé » : prix à droite, sur une ligne */
+.cx-unlock { display: inline-flex; align-items: center; gap: 8px; }
+.cx-unlock span { text-align: left; }
+.cx-unlock .obs-n { margin-left: 4px; padding-left: 10px; border-left: 1px solid rgba(242, 193, 78, .35); }

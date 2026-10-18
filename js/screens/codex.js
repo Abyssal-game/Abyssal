@@ -47,7 +47,7 @@ export default function codexScreen(app, root) {
           <span class="small muted">${fmt(c.xp)} points de Codex · fin de saison le ${esc(CODEX.ends.split('-').reverse().join('/'))}</span></div>
       </section>
       <div class="cx-actions">${n ? `<button class="btn primary dc-plq dc-plq-red" data-cx="all">Tout récupérer (${n})</button>` : ''}
-        ${c.premium ? `<span class="cx-badge on">${icon('star')}${esc(CODEX.premiumName)} acquis</span>` : `<button class="btn dc-plq dc-plq-dark" data-cx="unlock">${icon('star')}Débloquer le ${esc(CODEX.premiumName)} · ${obsTxt(CODEX.cost)}</button>`}</div>
+        ${c.premium ? `<span class="cx-badge on">${icon('star')}${esc(CODEX.premiumName)} acquis</span>` : `<button class="btn dc-plq dc-plq-dark cx-unlock" data-cx="unlock">${icon('star')}<span>Débloquer le ${esc(CODEX.premiumName)}</span>${obsTxt(CODEX.cost)}</button>`}</div>
       <details class="panel dc-fold"><summary>${picon('help')}<span class="dc-sum-t">Gagner des points de Codex</span></summary>
         <ul class="cx-xp">${Object.entries(CODEX_XP).map(([k, v]) => `<li><span>${esc(CODEX_XP_LABEL[k])}</span><b>+${v}</b><small class="muted">${fmt(c.log[k] || 0)} gagnés</small></li>`).join('')}</ul>
         <p class="small muted">La voie de gauche se gagne en jouant. La voie enluminée (à droite) se débloque une fois par saison avec des obsidiennes : seulement des cadres peints, des titres et des dos de cartes, jamais de puissance. Les cadres et dos marqués « Échoppe » s'achètent aussi à l'unité.</p></details>

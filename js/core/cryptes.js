@@ -167,7 +167,10 @@ function aiPower(st, f, ev, rng) {
   const R = RIVALS[st.rival], hid = hidden(st);
   const unknown = hid.filter((i) => st.mem[i] == null);
   if (f === 'infernal' || f === 'sauvage') {
-    const i = (unknown.length ? unknown : hid)[Math.floor(rng() * (unknown.length ? unknown : hid).length)];
+    /* v475 : le Cri sauvage montre la carte à tous : il choisit d'abord une carte que tu as déjà vue (tu n'apprends rien) */
+    const shownU = f === 'sauvage' && rng() < R.spite ? unknown.filter((i) => (st.shown || []).includes(i)) : [];
+    const pool = shownU.length ? shownU : unknown.length ? unknown : hid;
+    const i = pool[Math.floor(rng() * pool.length)];
     st.mem[i] = st.cards[i].k; ev.i2 = [i];
     if (f === 'sauvage') ev.card = st.cards[i];
   } else if (f === 'abyssal') {
@@ -201,7 +204,7 @@ export function aiPick(st, rng = Math.random) {
     const known = (byK[k] || []).find((i) => i !== o);
     if (known != null) return recall(st, known, rng);
     const unknown = hid.filter((i) => st.mem[i] == null && i !== o);
-        return pickOf(unknown.length ? unknown : hid.filter((i) => i !== o));
+    return pickOf(unknown.length ? unknown : hid.filter((i) => i !== o));
   }
   const pair = Object.values(byK).find((l) => l.length >= 2);
   if (pair) return recall(st, pair[0], rng);

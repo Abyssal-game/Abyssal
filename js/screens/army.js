@@ -131,7 +131,7 @@ export function teamScreen(app, root) {
       ${run ? `<p class="panel small center">${icon('info')} Un chapitre de la Descente est en cours : l’équipe ne peut pas changer avant la fin du chapitre (ou son abandon).</p>` : ''}
       <section class="panel v2-team">
         <div class="v2-budget"><span>Budget</span><span class="progress"><i style="width:${Math.min(100, (cost / BUDGET) * 100)}%;--bar:${cost > BUDGET ? '#FF5468' : 'var(--gold)'}"></i></span><b>${cost} / ${BUDGET}</b></div>
-        ${team.length ? (() => { const fl = team.slice(0, TEAM.active), tp = g.teamPower(fl), reach = Math.max(1, Math.round(6 + (tp - 1) * 22)); return `<p class="small tm-power">${icon('p:level-up')} Force au combat : <b>${powerPts(tp)}</b> · de quoi viser l’étage <b>${reach}</b> environ.</p>`; })() : ''}
+        ${team.length ? (() => { const tp = g.teamPower(team), reach = Math.max(1, Math.round(6 + (tp - 1) * 22)); return `<p class="small tm-power">${icon('p:level-up')} Force de ton équipe : <b>${powerPts(tp)}</b> · de quoi viser l’étage <b>${reach}</b> environ.</p>`; })() : ''}
         ${team.length < TEAM.active ? `<p class="small v2-warn">${icon('info')} Il faut au moins ${TEAM.active} créatures pour partir dans la Descente (encore ${TEAM.active - team.length}).</p>` : ''}
         <h3 class="section-title">Au combat</h3><div class="v2-slots">${[0, 1, 2].map(slot).join('')}</div>
         <h3 class="section-title">En réserve</h3><div class="v2-slots res">${[3, 4].map(slot).join('')}</div>

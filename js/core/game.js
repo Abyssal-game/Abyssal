@@ -887,7 +887,7 @@ export class Game {
     const st = this.s.sceaux.cur;
     if (!st || st.over || st.turn !== 'o') return null;
     const ai = st.ai || { level: Math.min(4, st.level || SC.RIVAL[st.rival].level), slip: 0 }; // sans réglage : force d'avant v304 (le niveau 5 jouait comme le 4)
-    const m = SC.aiMove(this.catalog, st, ai.level, this.rng, ai.slip);
+    const m = SC.aiMove(this.catalog, st, ai.level, this.rng, ai.slip, ai.tol ?? Infinity);
     const flips = SC.place(this.catalog, st, 'o', m[0], m[1]);
     this.persist();
     return { cell: m[1], flips };
