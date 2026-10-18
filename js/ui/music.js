@@ -38,8 +38,9 @@ const THEMES = {
     drone: 0.04, lp: 460, every: [8, 11], pad: 0.012, bells: [7, 12], bell: 0.016, choir: 0.012, wind: 0, pluck: [2.5, 5],
   },
 };
-THEMES.masques = THEMES.sceaux; /* v440 : la Cour des Masques a sa musique enregistrée (assets/music/masques.mp3) ; réglages du repli inutilisés */
-export const MUSIC_DEMO = [['Accueil', 'antre'], ['Butin', 'boutique'], ['Descente', 'descente'], ['Combat', 'combat'], ['Gardien', 'boss'], ['Salle des jeux', 'sceaux'], ['Cour des Masques', 'masques']];
+THEMES.masques = THEMES.sceaux; THEMES.abysse = THEMES.boss; /* v442 : combat contre L'Abysse (assets/music/abysse.mp3) */
+/* (réglages du repli inutilisés) */ /* v440 : la Cour des Masques a sa musique enregistrée (assets/music/masques.mp3) ; réglages du repli inutilisés */
+export const MUSIC_DEMO = [['Accueil', 'antre'], ['Butin', 'boutique'], ['Descente', 'descente'], ['Combat', 'combat'], ['Gardien', 'boss'], ['Salle des jeux', 'sceaux'], ['Cour des Masques', 'masques'], ['L’Abysse', 'abysse']];
 
 // Lieu → ambiance
 const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', arsenal: 'boutique', descente: 'descente', heros: 'descente', marchand: 'descente', sceaux: 'sceaux', jeux: 'sceaux', masques: 'masques', encheres: 'sceaux', enigmes: 'sceaux', epreuves: 'descente' }; /* v434 : la Salle des jeux */ /* v408 : Épreuves du jour = ambiance de la Descente, musique de combat en combat */
@@ -149,7 +150,9 @@ function brass(grp, f, t) {
 // Une musique livrée remplace l'ambiance calculée de son lieu ; elle tourne en boucle.
 const tracks = {}, trackGet = {}; let trackList = null, trackLoad = null, recent = [];
 // v308 : réglage de volume par musique (mesuré : le gardien était la plus basse alors qu'elle doit être la plus intense)
-const TRACK_GAIN = { boss: 1.26, boutique: 1.19, descente: 1.19 };
+const TRACK_GAIN = { boss: 1.26, boutique: 1.19, descente: 1.19, abysse: 1.26 };
+// v442 : musique jouée une fois depuis le début, puis boucle sur un passage (secondes) ; le fichier est préparé pour que la fin du passage s'enchaîne sur son début
+const TRACK_LOOP = { abysse: [50, 142] };
 // Seule la liste est lue au démarrage ; chaque musique est téléchargée la première fois que son lieu est visité
 function loadTracks() {
   if (trackLoad) return;
@@ -171,6 +174,7 @@ function startTheme(key) {
   if (tracks[key]) {
     // v308 : boucle sur le fichier entier (il boucle déjà proprement : couper 50 ms à chaque bout faisait sauter le rythme)
     const s = ctx.createBufferSource(); s.buffer = tracks[key]; s.loop = true;
+    if (TRACK_LOOP[key]) { s.loopStart = TRACK_LOOP[key][0]; s.loopEnd = Math.min(TRACK_LOOP[key][1], s.buffer.duration); }
     const g = ctx.createGain(); g.gain.value = 1.6 * (TRACK_GAIN[key] || 1); // les fichiers sont mixés plus bas que les ambiances calculées
     s.connect(g).connect(grp.g); s.start(t); grp.stops.push(s); grp.file = true;
     // mémoire : on ne garde décodées que cette musique et la précédente (une musique décodée pèse ~45 Mo)
@@ -244,7 +248,7 @@ function tick() {
   if (!ctx || !on || document.hidden || ctx.state !== 'running') return;
   // en combat : l'ambiance suit l'écran (combat, gardien)
   let key = preview || want;
-  if (!preview && document.body.classList.contains('battle-mode') && (key === 'descente')) key = document.querySelector('.dv-c.boss:not(.dead)') ? 'boss' : 'combat';
+  if (!preview && document.body.classList.contains('battle-mode') && (key === 'descente')) key = document.querySelector('.dv-c.boss:not(.dead)') ? (document.querySelector('.dv-c.boss:not(.dead) .dv-bfig[src*="bosses/abysse"]') ? 'abysse' : 'boss') : 'combat'; /* v442 : L'Abysse a sa musique */
   if (!cur || cur.key !== key) { if (cur) stopTheme(cur); cur = startTheme(key); }
   schedule(cur);
 }
