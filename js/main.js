@@ -47,7 +47,7 @@ const ROUTES = {
   parametres: settingsScreen, descente: descentScreen, compte: accountScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen, sceaux: sceauxScreen, masques: masquesScreen, encheres: encheresScreen, enigmes: enigmesScreen, jeux: gamesScreen, epreuves: trialsScreen, epreuve: descentScreen, tirage: shadowScreen, renfort: forgeScreen, fournaise: furnaceScreen,
 };
 const TABS = [
-  ['antre', 'tab-home', 'Accueil'], ['collection', 'tab-collection', 'Collection'], ['boutique', 'tab-boosters', 'Butin'], /* v428 : boosters, coffres et Tirage (v432 : « Butin ») */
+  ['antre', 'tab-home', 'Accueil'], ['collection', 'tab-collection', 'Collection'], ['boutique', 'tab-butin', 'Butin'], /* v428 : boosters, coffres et Tirage (v432 : « Butin ») */
   ['descente', 'tab-adventure', 'Aventure'], ['menu', 'tab-more', 'Sanctuaire'],
 ];
 // icônes peintes de la barre du bas (assets/icons)

@@ -3852,3 +3852,6 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 .bn-encheres { --bn: url(../assets/ui/bn-encheres.webp); }
 .bn-enigmes { --bn: url(../assets/ui/bn-enigmes.webp); }
 .gm-encheres .gm-art, .gm-enigmes .gm-art { background-position: right center; }
+/* v433 : bannière Gemini de la Salle des jeux, nouvelle bannière des Énigmes (nouveau nom : pas d'ancienne copie servie) */
+.bn-jeux { --bn: url(../assets/ui/bn-jeux.webp); }
+.bn-enigmes { --bn: url(../assets/ui/bn-enigmes2.webp); }
