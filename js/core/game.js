@@ -13,6 +13,7 @@ export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par c
 import { FINAL_FLOOR, BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, SUBLIME_ASH, VARIANTS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
+import { CODEX, CODEX_XP, CODEX_TIERS, SHOP, codexState, codexTier } from './codex.js';
 import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, lateSoft, expectedLevel, cardPower, powerFor, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative } from './duel.js';
 import { bossOf, BOSSES, BOSS_ORDER } from './bosses.js';
@@ -355,7 +356,7 @@ export class Game {
     const m = this.missions();
     const x = m.list[i];
     if (!x || x.claimed || x.p < x.n) throw new Error('Mission pas encore accomplie.');
-    x.claimed = true;
+    x.claimed = true; this.codexXp(CODEX_XP.mission, 'mission');
     this.s.shards += x.shards;
     this.s.xp += 20;
     const progress = this.checkProgress();
@@ -809,7 +810,7 @@ export class Game {
     if (won) {
       const r = this.trialReward(i), allies = Object.values(st.units).filter((u) => u.side === 'ally');
       const hpPct = Math.round((allies.reduce((a, u) => a + Math.max(0, u.hp), 0) / Math.max(1, allies.reduce((a, u) => a + u.maxHp, 0))) * 100);
-      this.grant(r, 'trial');
+      this.grant(r, 'trial'); this.codexXp(CODEX_XP.trial, 'trial');
       out.reward = r; out.points = 100 + hpPct;
       t.score = (t.score || 0) + out.points;
       this.track('win', 1); this.track('trial', 1);
@@ -901,7 +902,7 @@ export class Game {
     const R = st.awake ? SC.awakened(SC.RIVAL[st.rival]) : SC.RIVAL[st.rival];
     sc.awake ||= {};
     const out = { result: st.over, shards: 0, first: false, title: null, daily: st.daily, capped: false };
-    if (st.over === 'won') {
+    if (st.over === 'won') { this.codexXp(CODEX_XP.game, 'game');
       sc.wins++; sc.streak++; sc.best = Math.max(sc.best, sc.streak);
       out.chests = [];
       if (st.awake) { if (!sc.awake[R.key]) { sc.awake[R.key] = Date.now(); out.first = true; out.shards += SC.SCEAUX_REWARD.firstAwake; out.chests.push(SC.sceauxChest(R.key, true)); } }
@@ -972,7 +973,7 @@ export class Game {
     if (en.day !== day) { en.day = day; en.paidToday = 0; }
     const T = EN.TABLE[st.table], R = EN.ENCHERES_REWARD;
     const out = { result: st.over, shards: 0, first: false, title: null, daily: st.daily, capped: false, chests: [] };
-    if (st.over === 'won') {
+    if (st.over === 'won') { this.codexXp(CODEX_XP.game, 'game');
       en.wins++; en.streak++; en.best = Math.max(en.best, en.streak);
       if (!en.beaten[T.key]) { en.beaten[T.key] = Date.now(); out.first = true; out.shards += R.firstWin; out.chests.push(T.chest); }
       if (st.daily && en.dailyDone !== day) { en.dailyDone = day; out.shards += R.daily; out.chests.push('bois'); }
@@ -1030,7 +1031,7 @@ export class Game {
     if (pa.day !== day) { pa.day = day; pa.paidToday = 0; }
     const T = PA.TABLE[st.table], R = PA.PACTE_REWARD;
     const out = { result: st.over, shards: 0, first: false, title: null, daily: st.daily, capped: false, chests: [] };
-    if (st.over === 'won') {
+    if (st.over === 'won') { this.codexXp(CODEX_XP.game, 'game');
       pa.wins++; pa.streak++; pa.best = Math.max(pa.best, pa.streak);
       if (!pa.beaten[T.key]) { pa.beaten[T.key] = Date.now(); out.first = true; out.shards += R.firstWin; out.chests.push(T.chest); }
       if (st.daily && pa.dailyDone !== day) { pa.dailyDone = day; out.shards += R.daily; out.chests.push('bois'); }
@@ -1082,7 +1083,7 @@ export class Game {
     if (cr.day !== day) { cr.day = day; cr.paidToday = 0; }
     const T = CR.TABLE[st.table], R = CR.CRYPTES_REWARD;
     const out = { result: st.over, shards: 0, first: false, title: null, daily: st.daily, capped: false, chests: [] };
-    if (st.over === 'won') {
+    if (st.over === 'won') { this.codexXp(CODEX_XP.game, 'game');
       cr.wins++; cr.streak++; cr.best = Math.max(cr.best, cr.streak);
       if (!cr.beaten[T.key]) { cr.beaten[T.key] = Date.now(); out.first = true; out.shards += R.firstWin; out.chests.push(T.chest); }
       if (st.daily && cr.dailyDone !== day) { cr.dailyDone = day; out.shards += R.daily; out.chests.push('bois'); }
@@ -1400,14 +1401,14 @@ export class Game {
       if (room === 'elite') { const t = this.talentOffers(run); if (t.length) { run.talentOffer = t; out.talents = t; } }
       // exploits de l'expédition (fêtés dans le résumé)
       const F = (run.feats ||= { hit: 0, syn: 0, breaks: 0, parries: 0, perfect: 0, crits: 0, kills: 0, wins: 0 }), S = st.stats || {};
-      F.hit = Math.max(F.hit, S.maxHit || 0); F.syn += (S.named || 0) + (S.combos || 0); F.breaks += S.breaks || 0; F.parries += S.parries || 0; F.perfect += S.perfect || 0; F.crits += S.crits || 0; F.kills += st.kills.length; F.wins++;
+      F.hit = Math.max(F.hit, S.maxHit || 0); F.syn += (S.named || 0) + (S.combos || 0); F.breaks += S.breaks || 0; F.parries += S.parries || 0; F.perfect += S.perfect || 0; F.crits += S.crits || 0; F.kills += st.kills.length; F.wins++; if (run.free || !this.firstClear(run)) this.codexXp(CODEX_XP.win, 'win');
       // v406 : première victoire à cet étage : sa récompense (éclats, cendres, coffre ; coffre d'or ou abyssal pour un gardien)
       if (!run.free && this.firstClear(run)) {
         const r = this.floorReward(run);
         if (r.shards) { this.s.shards += r.shards; this.s.stats.shardsEarned = (this.s.stats.shardsEarned || 0) + r.shards; }
         if (r.ash) { this.s.ash += r.ash; this.s.stats.ashEarned += r.ash; }
         for (const [c, n] of Object.entries(r.chests || {})) for (let i = 0; i < n; i++) { run.chests.push(c); out.chest = c; }
-        out.first = r;
+        out.first = r; this.codexXp(run.floor % 5 === 0 ? CODEX_XP.boss : CODEX_XP.floor, run.floor % 5 === 0 ? 'boss' : 'floor');
         const fl = (run.firstLoot ||= { shards: 0, ash: 0 }); fl.shards += r.shards || 0; fl.ash += r.ash || 0;
       }
       // toute première victoire : un vrai cadeau (une seule fois)
@@ -1690,8 +1691,48 @@ export class Game {
     for (const [k, n] of Object.entries(reward.tickets || {})) this.s.tickets[k] = (this.s.tickets[k] || 0) + n;
     if (reward.title && !this.s.titles.includes(reward.title)) this.s.titles.push(reward.title);
     if (reward.frame && !this.s.frames.includes(reward.frame)) this.s.frames.push(reward.frame);
+    if (reward.back && !(this.s.backs ||= []).includes(reward.back)) this.s.backs.push(reward.back);
     if (reward.chests) this.addChests(reward.chests);
   }
+
+  // ——— v470 : ÉBAUCHE du pass de saison (Codex) et de la boutique en argent réel (Échoppe), cachés hors Mode Créateur ———
+  codexOn() { return !!(this.s.settings?.dev && this.s.devCodex); }
+  codex() { return codexState(this.s); }
+  codexXp(n, why) {
+    if (!n) return;
+    const c = this.codex(), max = CODEX.tiers * CODEX.xpPerTier;
+    const add = Math.max(0, Math.min(n, max - c.xp));
+    c.xp += add; c.log[why] = (c.log[why] || 0) + add;
+  }
+  codexClaim(track, tier) {
+    const c = this.codex(), t = CODEX_TIERS[tier - 1];
+    if (!t || tier > codexTier(c)) throw new Error('Palier pas encore atteint.');
+    if (track === 'prem' && !c.premium) throw new Error(`La voie enluminée demande le ${CODEX.premiumName}.`);
+    const r = t[track];
+    if (!r || c[track].includes(tier)) throw new Error('Rien à récupérer ici.');
+    c[track].push(tier); this.grant(r, 'codex'); this.persist();
+    return r;
+  }
+  codexClaimAll() {
+    const c = this.codex(), got = [];
+    for (const t of CODEX_TIERS) {
+      if (t.tier > codexTier(c)) break;
+      for (const tr of ['free', 'prem']) if (t[tr] && !c[tr].includes(t.tier) && (tr === 'free' || c.premium)) { c[tr].push(t.tier); this.grant(t[tr], 'codex'); got.push(t[tr]); }
+    }
+    this.persist();
+    return got;
+  }
+  /* Achat SIMULÉ (aperçu Créateur) : le vrai paiement passera par l'App Store (identifiant `store` de chaque article) */
+  shopBuy(id) {
+    if (!this.codexOn()) throw new Error('L’Échoppe n’est pas encore ouverte.');
+    const it = SHOP.find((x) => x.id === id), bought = (this.s.purchases ||= []);
+    if (!it) throw new Error('Article inconnu.');
+    if (it.kind === 'codex') { if (this.codex().premium) throw new Error('Déjà acheté pour cette saison.'); this.codex().premium = true; }
+    else { if (it.once && bought.includes(id)) throw new Error('Déjà acheté.'); this.grant(it.give, 'shop'); }
+    bought.push(id); this.persist();
+    return it;
+  }
+  shopOwned(id) { const it = SHOP.find((x) => x.id === id); return it?.kind === 'codex' ? this.codex().premium : !!(this.s.purchases || []).includes(id); }
 
   achievementValue(a) {
     const c = a.cond;

@@ -5,6 +5,7 @@ import { icon, sigil, EMBLEM, picon, setIcon } from '../ui/icons.js';
 import { esc, fmt, pct, bindActions, toast, openSheet } from '../ui/dom.js';
 import { unlockSources } from '../core/unlocks.js';
 import { RARITIES, FRAMES, BOOSTERS, FACTION_ORDER, VARIANTS, RARITY, RARITY_ORDER } from '../config.js';
+import { CODEX_FRAMES } from '../core/codex.js';
 
 export default function profile(app, root) {
   const g = app.game, cat = app.catalog;
@@ -66,7 +67,7 @@ export default function profile(app, root) {
       ${(() => {
         // v326 : titres et cadres possédés d'abord ; ceux à gagner sont repliés (la liste complète faisait plusieurs écrans)
         const lockedT = U.titles.filter((t) => !s.titles.includes(t.name));
-        const allF = Object.entries(FRAMES).filter(([k]) => s.frames.includes(k) || U.frames.some((f) => f.key === k));
+        const allF = Object.entries({ ...FRAMES, ...CODEX_FRAMES }).filter(([k]) => s.frames.includes(k) || U.frames.some((f) => f.key === k));
         const frameBtn = ([k, name]) => { const has = s.frames.includes(k), how = U.frames.find((f) => f.key === k)?.how || ''; return `<button class="frame-pick ${has ? '' : 'pf-lock'}" data-act="${has ? 'frame' : 'how'}" data-v="${has ? k : esc(name)}" data-how="${esc(how)}" aria-pressed="${s.frame === k}"><span class="avatar-mini pf pf-${k}">${has ? '' : icon('lock')}</span><span class="small">${esc(name)}</span></button>`; };
         const ownF = allF.filter(([k]) => s.frames.includes(k)), lockedF = allF.filter(([k]) => !s.frames.includes(k));
         return `<details class="panel dc-fold pf-tf"><summary>${picon('titles')} Titres et cadres <span class="small muted pf-tf-n">${s.titles.length} titre${s.titles.length > 1 ? "s" : ""} · ${ownF.length} cadre${ownF.length > 1 ? "s" : ""}</span></summary><div>

@@ -58,6 +58,10 @@ export function openCreator(app) {
         <p class="small muted">${g.s.devGames ? 'Ouverte : tu peux jouer aux jeux comme si le gardien de l’étage 5 était vaincu.' : 'Ouvre les jeux (Duels des Sceaux, Cryptes, Pacte, Enchères) comme si le gardien de l’étage 5 était vaincu.'} Ta campagne ne change pas, et tout se referme si tu désactives le Mode Créateur.</p>
         <div class="row gap wrap">${B('games', g.s.devGames ? 'Refermer la Salle des jeux' : 'Ouvrir la Salle des jeux', g.s.devGames ? '' : 'gold')}</div></section>
 
+      <section class="cr-sec"><h3>Codex et Échoppe (ébauche)</h3>
+        <p class="small muted">${g.s.devCodex ? 'Affichés : onglet Butin → Codex. Toi seul les vois (Mode Créateur).' : 'Le futur pass de saison et la boutique en argent réel, encore cachés aux joueurs. Les achats y sont simulés.'}</p>
+        <div class="row gap wrap">${B('codex', g.s.devCodex ? 'Cacher le Codex et l’Échoppe' : 'Afficher le Codex et l’Échoppe', g.s.devCodex ? '' : 'gold')}${g.s.devCodex ? B('codexgo', 'Ouvrir le Codex', '') : ''}</div></section>
+
       <section class="cr-sec"><h3>Affronter un gardien</h3>
         <p class="small muted">Te place devant la porte du gardien (un chapitre est lancé si besoin, le présage est passé). Coche la case pour monter ton équipe au niveau attendu à cet étage.</p>
         <label class="small cr-bpow"><input type="checkbox" id="bpow" ${ui.bpow ? 'checked' : ''}> Équipe à la puissance de l’étage</label>
@@ -102,6 +106,8 @@ export function openCreator(app) {
       if (x === 'campaign') { if (!(await confirmBox('Remettre la campagne à zéro ? Le record, les gardiens vaincus et le Cauchemar repartent de rien (ta collection est gardée).', { ok: 'Remettre à zéro', danger: true }))) return; g.devResetCampaign(); }
       if (x === 'missions') g.devMissions();
       if (x === 'games') { g.s.devGames = !g.s.devGames; g.persist(); app.chrome?.(); }
+      if (x === 'codex') { g.s.devCodex = !g.s.devCodex; g.persist(); app.chrome?.(); } /* v470 */
+      if (x === 'codexgo') { sheet.close(); app.go('codex'); return; }
       if (x === 'off') { g.s.settings.devCode = false; g.setSetting('dev', false); sheet.close(); toast('Mode Créateur désactivé.', { icon: 'crown' }); return; }
       if (!['snap', 'restore'].includes(x)) toast('C’est fait.', { kind: 'success', icon: 'crown' });
     } catch (err) { toast(esc(err.message), { kind: 'error' }); }

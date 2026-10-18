@@ -4098,3 +4098,60 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .dc-first { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 10px; }
 .dc-wb-crest { width: 62px; height: 44px; flex: none; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .6)); }
 .dc-wb-loot { gap: 14px; }
+
+/* v470 : ÉBAUCHE du Codex de l'Abîme (pass de saison) et de l'Échoppe (boutique en argent réel), Mode Créateur seulement */
+.cx-seg { margin: 0 0 12px; }
+.cx-head { display: flex; align-items: center; gap: 14px; padding: 14px; }
+.cx-lvl { flex: none; width: 72px; height: 72px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #4A2E10, #140C06 70%); border: 2px solid #C9A45A; box-shadow: 0 0 16px rgba(242, 193, 78, .35); }
+.cx-lvl b { font: 800 1.7rem/1 var(--f-display); color: #FFE7A6; }
+.cx-lvl small { color: #C9A45A; font-size: .72rem; }
+.cx-prog { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.cx-bar { display: block; height: 10px; border-radius: 6px; background: rgba(255, 255, 255, .08); overflow: hidden; }
+.cx-bar i { display: block; height: 100%; background: linear-gradient(90deg, #7A4A12, #F2C14E); transition: width .4s; }
+.cx-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; margin: 10px 0; }
+.cx-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; font-weight: 700; font-size: .82rem; background: rgba(242, 193, 78, .14); border: 1px solid rgba(242, 193, 78, .5); color: #FFE7A6; }
+.cx-badge svg { width: 15px; height: 15px; }
+.cx-xp { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.cx-xp li { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: baseline; font-size: .86rem; }
+.cx-xp b { color: #FFE7A6; }
+.cx-cols { display: grid; grid-template-columns: 38px 1fr 1fr; gap: 6px; padding: 0 4px 6px; font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.cx-cols span:last-child { color: #F2C14E; }
+.cx-track { list-style: none; margin: 0 0 14px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.cx-row { display: grid; grid-template-columns: 38px 1fr 1fr; gap: 6px; align-items: stretch; }
+.cx-n { display: grid; place-items: center; border-radius: 10px; font: 800 1rem/1 var(--f-display); color: var(--muted); background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .08); }
+.cx-row.reached .cx-n { color: #1A1206; background: linear-gradient(180deg, #F2D58A, #C9A45A); border-color: #F2C14E; }
+.cx-row.next .cx-n { border-color: #F2C14E; color: #FFE7A6; box-shadow: 0 0 10px rgba(242, 193, 78, .35); }
+.cx-cell { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 8px; min-height: 58px; border-radius: 4px 12px 4px 12px; background: rgba(10, 11, 18, .82); border: 1px solid rgba(201, 164, 90, .25); font-size: .8rem; }
+.cx-cell.prem { background: linear-gradient(160deg, rgba(70, 48, 12, .55), rgba(10, 11, 18, .88)); border-color: rgba(242, 193, 78, .4); }
+.cx-cell.far, .cx-cell.lock { opacity: .62; }
+.cx-cell.ready { border-color: #F2C14E; box-shadow: 0 0 12px rgba(242, 193, 78, .35); opacity: 1; }
+.cx-cell.got { opacity: .55; }
+.cx-cell.empty { background: transparent; border-style: dashed; border-color: rgba(255, 255, 255, .06); }
+.cx-cell .btn.small { min-height: 34px; padding: 4px 12px; }
+.cx-ok, .cx-lk { position: absolute; top: 6px; right: 6px; width: 20px; height: 20px; display: grid; place-items: center; border-radius: 50%; }
+.cx-ok { background: rgba(127, 224, 160, .2); color: #BFF0CF; }
+.cx-lk { color: #C9A45A; }
+.cx-ok svg, .cx-lk svg { width: 13px; height: 13px; }
+.cx-r { display: inline-flex; align-items: center; gap: 5px; line-height: 1.25; font-weight: 600; }
+.cx-r svg, .cx-r img { width: 18px; height: 18px; flex: none; }
+.cx-r .avatar-mini { width: 22px; height: 22px; flex: none; border-radius: 50%; display: inline-block; background: #1A1420; }
+.cx-none { color: rgba(255, 255, 255, .2); }
+.cx-note { margin: 0 0 10px; }
+.cx-shop { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+.cx-item { display: flex; flex-direction: column; gap: 8px; padding: 14px; }
+.cx-item.own { border-color: rgba(127, 224, 160, .4); }
+.cx-it-h { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.cx-it-h b { font: 800 1.05rem/1.2 var(--f-display); color: #F2D9A0; }
+.cx-price { flex: none; font: 800 1rem/1 var(--f-display); color: #FFE7A6; }
+.cx-it-r { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .82rem; }
+.cx-it-f { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.cx-it-f small { font-size: .62rem; }
+.cx-dev code { font-size: .78rem; }
+/* Cadres de profil du Codex et de l'Échoppe (dessinés en CSS en attendant mieux) */
+.pf-cx-encre { border-color: #2A2A3A; box-shadow: 0 0 0 2px #0A0A12, 0 0 10px rgba(80, 80, 140, .6); }
+.pf-cx-sang { border-color: #7A1020; box-shadow: 0 0 0 2px #2A0408, 0 0 12px rgba(200, 30, 50, .55); }
+.pf-cx-or { border-color: #F2C14E; box-shadow: 0 0 0 2px #4A2E08, 0 0 0 4px #C9A45A, 0 0 16px rgba(242, 193, 78, .6); }
+.pf-cx-abime { border-color: #8A5CFF; box-shadow: 0 0 0 2px #1A0A30, 0 0 14px #6A3CE0, 0 0 30px rgba(140, 90, 255, .55); }
+.pf-cx-fondateur { border-color: #FFE7A6; box-shadow: 0 0 0 2px #3A2408, 0 0 0 4px #8A5CFF, 0 0 18px rgba(255, 231, 166, .7); }
+.pf-cx-givre { border-color: #BFE8FF; box-shadow: 0 0 0 2px #0A2A40, 0 0 14px rgba(140, 210, 255, .7); }
+.pf-cx-braise { border-color: #FF8A2A; box-shadow: 0 0 0 2px #3A1000, 0 0 12px #FF5A1A, 0 0 24px rgba(255, 140, 40, .55); }
