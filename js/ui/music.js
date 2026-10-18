@@ -38,10 +38,11 @@ const THEMES = {
     drone: 0.04, lp: 460, every: [8, 11], pad: 0.012, bells: [7, 12], bell: 0.016, choir: 0.012, wind: 0, pluck: [2.5, 5],
   },
 };
-export const MUSIC_DEMO = [['Accueil', 'antre'], ['Butin', 'boutique'], ['Descente', 'descente'], ['Combat', 'combat'], ['Gardien', 'boss'], ['Salle des jeux', 'sceaux']];
+THEMES.masques = THEMES.sceaux; /* v440 : la Cour des Masques a sa musique enregistrée (assets/music/masques.mp3) ; réglages du repli inutilisés */
+export const MUSIC_DEMO = [['Accueil', 'antre'], ['Butin', 'boutique'], ['Descente', 'descente'], ['Combat', 'combat'], ['Gardien', 'boss'], ['Salle des jeux', 'sceaux'], ['Cour des Masques', 'masques']];
 
 // Lieu → ambiance
-const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', arsenal: 'boutique', descente: 'descente', heros: 'descente', marchand: 'descente', sceaux: 'sceaux', jeux: 'sceaux', masques: 'sceaux', encheres: 'sceaux', enigmes: 'sceaux', epreuves: 'descente' }; /* v434 : la Salle des jeux */ /* v408 : Épreuves du jour = ambiance de la Descente, musique de combat en combat */
+const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', arsenal: 'boutique', descente: 'descente', heros: 'descente', marchand: 'descente', sceaux: 'sceaux', jeux: 'sceaux', masques: 'masques', encheres: 'sceaux', enigmes: 'sceaux', epreuves: 'descente' }; /* v434 : la Salle des jeux */ /* v408 : Épreuves du jour = ambiance de la Descente, musique de combat en combat */
 
 function init() {
   if (ctx) return ctx;
