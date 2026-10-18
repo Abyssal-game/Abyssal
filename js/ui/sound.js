@@ -1,3 +1,4 @@
+import { VERSION } from '../config.js';
 // Effets sonores : fichiers enregistrés (assets/sfx, ElevenLabs) joués par Web Audio. Les sons synthétisés ci-dessous ne
 // servent plus que pour « rip » et « rumble » (sans fichier) : depuis la v308, rien de synthétisé pendant le chargement.
 // Chaîne : chaque son → (sec + réverbération de salle) → compresseur → volume général.
@@ -355,6 +356,8 @@ export const sfx = {
 };
 
 // ——— Sons enregistrés (assets/sfx/<clé>.mp3) ———
+/* v468 : sur le site, la liste porte le numéro de version (jamais une ancienne copie du navigateur) ; pas dans l'app */
+export const listV = () => (/^https?:/.test(location.protocol) ? `?v=${VERSION}` : '');
 // La liste des fichiers livrés est dans assets/sfx/manifest.json. Un son enregistré remplace son équivalent
 // synthétisé ; sans fichier (ou sans réseau), le son synthétisé reste joué. Clés de l'ouverture de carte :
 // reveal-c, reveal-pc, reveal-r, reveal-hr, reveal-m, reveal-s (une par rareté).
@@ -375,7 +378,7 @@ export function decodeBytes(b) {
 }
 function loadSamples() {
   if (sampleLoad || !ctx) return;
-  sampleLoad = getBytes('assets/sfx/manifest.json').then((b) => JSON.parse(new TextDecoder().decode(b))).catch((e) => { audioDiag.err = `liste : ${e.message}`; return []; }).then((list) => {
+  sampleLoad = getBytes(`assets/sfx/manifest.json${listV()}`).then((b) => JSON.parse(new TextDecoder().decode(b))).catch((e) => { audioDiag.err = `liste : ${e.message}`; return []; }).then((list) => {
     sampleList = new Set(list);
     list.forEach((k) => getBytes(`assets/sfx/${k}.mp3`).then(decodeBytes).then((buf) => { if (buf) samples[k] = buf; }).catch(() => {}));
   });

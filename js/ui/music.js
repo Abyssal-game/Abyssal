@@ -2,7 +2,7 @@
 // Chaque lieu a son ambiance (nappe grave, accords lents, cloches, chœur, vent, gouttes, pulsation),
 // tirée au hasard dans une gamme : elle ne se répète jamais exactement.
 // Passage d'une ambiance à l'autre en fondu. Volume séparé des effets sonores.
-import { audioCtx, hooks, getBytes, decodeBytes } from './sound.js';
+import { audioCtx, hooks, getBytes, decodeBytes, listV } from './sound.js';
 
 let ctx = null, out = null, verb = null, duckG = null, on = true, vol = 0.5;
 let cur = null, want = 'antre', preview = null, timer = null, brown = null;
@@ -156,7 +156,7 @@ const TRACK_LOOP = { abysse: [50, 142] };
 // Seule la liste est lue au démarrage ; chaque musique est téléchargée la première fois que son lieu est visité
 function loadTracks() {
   if (trackLoad) return;
-  trackLoad = getBytes('assets/music/manifest.json').then((b) => JSON.parse(new TextDecoder().decode(b))).catch(() => []).then((list) => { trackList = new Set(list); if (cur?.pending) needTrack(cur.key); }); // v308 : la musique du premier écran n'attendait pas la liste
+  trackLoad = getBytes(`assets/music/manifest.json${listV()}`).then((b) => JSON.parse(new TextDecoder().decode(b))).catch(() => []).then((list) => { trackList = new Set(list); if (cur?.pending) needTrack(cur.key); }); // v308 : la musique du premier écran n'attendait pas la liste
 }
 function needTrack(key) {
   if (!trackList?.has(key) || trackGet[key]) return;
