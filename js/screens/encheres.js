@@ -52,6 +52,7 @@ export default function encheresScreen(app, root) {
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
     root.innerHTML = `<header class="screen-head ui-hero bn-encheres"><h1>Les Enchères de Mammon</h1><p class="muted">Offre plus que les autres… sans jamais offrir pareil.</p>
         <span class="sc-rec">${en.wins} victoire${en.wins > 1 ? 's' : ''} · ${en.losses} défaite${en.losses > 1 ? 's' : ''}</span></header>
+      <div class="gm-show en-show" aria-hidden="true"><img class="en-show-lot" alt="" src="assets/jeux/en-malediction.webp"><img class="en-show-gavel" alt="" src="assets/jeux/en-marteau.webp"><span class="en-show-coins"><img alt="" src="assets/jeux/en-jeton.webp"><img alt="" src="assets/jeux/en-jeton.webp"><img alt="" src="assets/jeux/en-jeton.webp"></span></div>
       ${g.encheresDailyOpen() ? `<button class="panel sc-daily ${dailyDone ? 'done' : ''}" data-en="daily" ${dailyDone ? 'disabled' : ''}>
         <img alt="" src="assets/icons/hourglass.webp"><span><b>Défi du jour</b><span class="small">${esc(DT.name)} · la même vente pour tous</span>
         <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : `Victoire : +${EN.ENCHERES_REWARD.daily} éclats et un coffre de bois`}</span></span>${dailyDone ? icon('check') : icon('next')}</button>` : ''}

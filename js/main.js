@@ -163,7 +163,7 @@ function renderChrome() {
     // v404 : pastilles plus calmes — plus de « 99+ » permanent sur la Fournaise ; Renforcer seulement si l'Accueil le conseille aussi
     if (r === 'renfort') return g.goals().some((x) => x.kind === 'forge' && /Renforce/.test(x.title)) ? '↑' : '';
     if (r === 'collection') return nNewSub || '';
-    if (r === 'jeux') return ''; /* v463 : plus d'énigmes du jour à compter */ /* v427 : énigmes du jour à résoudre */
+    if (r === 'jeux') return g.gamesDailyLeft().length || ''; /* v466 : défis du jour à relever */
     if (r === 'epreuves') { const n = g.trials().done.filter((x) => !x).length; return g.team().length >= 3 && n ? n : ''; } /* v407 */
     return '';
   };

@@ -55,6 +55,7 @@ export default function pacteScreen(app, root) {
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
     root.innerHTML = `<header class="screen-head ui-hero bn-pacte"><h1>Le Pacte</h1><p class="muted">Tire, encore une… et ne brise pas le pacte.</p>
         <span class="sc-rec">${pa.wins} victoire${pa.wins > 1 ? 's' : ''} · ${pa.losses} défaite${pa.losses > 1 ? 's' : ''}</span></header>
+      <div class="gm-show pa-show" aria-hidden="true"><img alt="" src="assets/jeux/pa-sceau.webp"><img alt="" src="assets/jeux/pa-gardien.webp"><img alt="" src="assets/jeux/pa-offrande.webp"></div>
       ${g.pacteDailyOpen() ? `<button class="panel sc-daily ${dailyDone ? 'done' : ''}" data-pa="daily" ${dailyDone ? 'disabled' : ''}>
         <img alt="" src="assets/icons/hourglass.webp"><span><b>Défi du jour</b><span class="small">${esc(DT.name)} · le même paquet pour tous</span>
         <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : `Victoire : +${PA.PACTE_REWARD.daily} éclats et un coffre de bois`}</span></span>${dailyDone ? icon('check') : icon('next')}</button>` : ''}

@@ -994,6 +994,13 @@ export class Game {
   // ——— v449 : Le Pacte (tenter sa chance à deux), ouvert avec la Salle des jeux ———
   pacteUnlocked() { return PA.TABLES.filter((_, i) => PA.tableUnlocked(this.s, i)).length; }
   pacteDailyOpen() { return !!this.s.pacte.beaten?.novice; }
+  /* v466 : défis du jour de la Salle des jeux encore à relever (pastille de l'onglet Jeux, tuiles, Accueil) */
+  gamesDailyLeft() {
+    if (!this.sceauxOpen()) return [];
+    const day = today(this.clock());
+    return [['sceaux', this.sceauxDailyOpen(), this.s.sceaux], ['pacte', this.pacteDailyOpen(), this.s.pacte], ['cryptes', this.cryptesDailyOpen(), this.s.cryptes], ['encheres', this.encheresDailyOpen(), this.s.encheres]]
+      .filter(([, open, sv]) => open && sv?.dailyDone !== day).map(([k]) => k);
+  }
   pacteDaily() { const day = today(this.clock()); return { table: PA.dailyTable(day, this.pacteUnlocked()), seed: [...`pacte:${day}`].reduce((h, c) => (Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0), 2166136261) }; }
   pacteStart({ table, daily = false } = {}) {
     const pa = this.s.pacte;

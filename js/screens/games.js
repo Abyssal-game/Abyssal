@@ -10,8 +10,11 @@ export default function gamesScreen(app, root) {
   setScene('menu');
   const sc = g.s.sceaux, en = g.s.encheres, pa = g.s.pacte, cr = g.s.cryptes;
   const rec = (w, l) => (w + l ? `${w} victoire${w > 1 ? 's' : ''} · ${l} défaite${l > 1 ? 's' : ''}` : 'Pas encore joué');
+  /* v466 : chaque tuile dit si son défi du jour reste à relever */
+  const left = g.gamesDailyLeft(), opened = { sceaux: g.sceauxDailyOpen(), pacte: g.pacteDailyOpen(), cryptes: g.cryptesDailyOpen(), encheres: g.encheresDailyOpen() };
+  const daily = (k) => (!g.sceauxOpen() || !opened[k] ? '' : left.includes(k) ? `<span class="gm-daily">${icon('p:hourglass')}Défi du jour à relever</span>` : `<span class="gm-daily done">${icon('check')}Défi du jour relevé</span>`);
   const tile = (href, cls, title, sub, info, img) => `<a class="panel gm-tile ${cls}" href="${href}"><span class="gm-art" style="background-image:url(${img})"></span>
-    <span class="gm-txt"><b>${title}</b><span class="small">${sub}</span><span class="small muted">${info}</span></span>${icon('next')}</a>`;
+    <span class="gm-txt"><b>${title}</b><span class="small">${sub}</span><span class="small muted">${info}</span>${daily(href.slice(2))}</span>${icon('next')}</a>`;
   root.innerHTML = `<header class="screen-head ui-hero bn-jeux"><h1>Salle des jeux</h1><p class="muted">Des jeux de cartes à part, contre les arbitres de l’Abysse.</p></header>
     ${g.sceauxOpen() ? '' : `<section class="panel tr-lock">${icon('lock')}<b>Encore scellée</b><p class="small">Vaincs ton <b>premier gardien</b> dans la Descente (étage 5) pour ouvrir la Salle des jeux.</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`}
     <div class="gm-list ${g.sceauxOpen() ? '' : 'locked'}">

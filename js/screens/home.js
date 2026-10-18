@@ -31,6 +31,8 @@ export default function home(app, root) {
     // v411 : ce qui se joue aujourd'hui, puis les missions, puis le coffre de la semaine (avant : tout mélangé)
     const tl = g.trials().done.filter((x) => !x).length, tw = g.trials().done.filter((x) => x === 'won').length;
     if (g.team().length >= 3) rows.push(`<a class="td-row ${tl ? '' : 'done'}" href="#/epreuves"><span class="td-ic mi" style="--mc:#E0485E">${picon('crest-elite')}</span><span class="td-t"><b>Épreuves du jour</b><span class="small muted">${tl ? `${tl} combat${tl > 1 ? 's' : ''} à jouer · un coffre par victoire` : `Faites : ${tw} victoire${tw > 1 ? 's' : ''} sur 3 · retour demain`}</span></span>${tl ? icon('next') : '<span class="small muted">Demain</span>'}</a>`);
+    /* v466 : défis du jour de la Salle des jeux encore à relever */
+    { const gl = g.gamesDailyLeft(); if (gl.length) rows.push(`<a class="td-row" href="#/jeux"><span class="td-ic mi" style="--mc:#C9A45A">${picon('seal')}</span><span class="td-t"><b>Jeux du jour</b><span class="small muted">${gl.length} défi${gl.length > 1 ? 's' : ''} à relever · un coffre de bois par victoire</span></span>${icon('next')}</a>`); }
     if (chests) rows.push(`<a class="td-row" href="#/coffres"><span class="td-ic mi" style="--mc:#E8C35A">${picon('chest')}</span><span class="td-t"><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Éclats et boosters</span></span>${icon('next')}</a>`);
     rows.push('<h3 class="td-sub">Missions du jour</h3>');
     m.list.forEach((x, i) => {
