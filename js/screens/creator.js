@@ -54,6 +54,10 @@ export function openCreator(app) {
         <p class="small muted">${d.run ? `Chapitre en cours : étage ${d.run.floor}.` : 'Lance une Descente pour pouvoir sauter d’étage.'}</p>
       </section>
 
+      <section class="cr-sec"><h3>Salle des jeux</h3>
+        <p class="small muted">${g.s.devGames ? 'Ouverte : tu peux jouer aux sept jeux comme si le gardien de l’étage 5 était vaincu.' : 'Ouvre les sept jeux (Sceaux, Énigmes, Cour des Masques, Enchères, Pacte, Cryptes, Trois Autels) comme si le gardien de l’étage 5 était vaincu.'} Ta campagne ne change pas, et tout se referme si tu désactives le Mode Créateur.</p>
+        <div class="row gap wrap">${B('games', g.s.devGames ? 'Refermer la Salle des jeux' : 'Ouvrir la Salle des jeux', g.s.devGames ? '' : 'gold')}</div></section>
+
       <section class="cr-sec"><h3>Affronter un gardien</h3>
         <p class="small muted">Te place devant la porte du gardien (un chapitre est lancé si besoin, le présage est passé). Coche la case pour monter ton équipe au niveau attendu à cet étage.</p>
         <label class="small cr-bpow"><input type="checkbox" id="bpow" ${ui.bpow ? 'checked' : ''}> Équipe à la puissance de l’étage</label>
@@ -97,6 +101,7 @@ export function openCreator(app) {
       if (x === 'dups') g.devDuplicates(10);
       if (x === 'campaign') { if (!(await confirmBox('Remettre la campagne à zéro ? Le record, les gardiens vaincus et le Cauchemar repartent de rien (ta collection est gardée).', { ok: 'Remettre à zéro', danger: true }))) return; g.devResetCampaign(); }
       if (x === 'missions') g.devMissions();
+      if (x === 'games') { g.s.devGames = !g.s.devGames; g.persist(); app.chrome?.(); }
       if (x === 'off') { g.setSetting('dev', false); sheet.close(); toast('Mode Créateur désactivé.', { icon: 'crown' }); return; }
       if (!['snap', 'restore'].includes(x)) toast('C’est fait.', { kind: 'success', icon: 'crown' });
     } catch (err) { toast(esc(err.message), { kind: 'error' }); }

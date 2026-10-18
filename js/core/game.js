@@ -850,7 +850,9 @@ export class Game {
     if (list.length !== 5) throw new Error('Choisis exactement 5 cartes.');
     this.s.sceaux.hand = list; this.persist(); return list;
   }
-  sceauxOpen() { const sc = this.s.sceaux; return Object.keys(this.s.bossesBeaten || {}).length > 0 || (sc.wins + sc.losses + sc.draws) > 0 || !!sc.cur; }
+  sceauxOpen() { const sc = this.s.sceaux; return Object.keys(this.s.bossesBeaten || {}).length > 0 || (sc.wins + sc.losses + sc.draws) > 0 || !!sc.cur || this.devGames(); }
+  /* v455 : Mode Créateur, Salle des jeux ouverte comme si le premier gardien était vaincu (sans toucher à la campagne) */
+  devGames() { return !!(this.s.settings?.dev && this.s.devGames); }
   sceauxUnlocked() { return SC.RIVALS.filter((_, i) => SC.rivalUnlocked(this.s, i)).length; }
   sceauxDaily() {
     const n = this.sceauxUnlocked(), known = [...new Set(SC.RIVALS.slice(0, n).map((r) => r.rule))].filter((k) => k !== 'classique' && SC.RULE_LIST.includes(k));
