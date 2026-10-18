@@ -15,7 +15,7 @@ import { showWelcome } from './welcome.js';
 import { shareFile } from '../native.js';
 import { onPresence, presence } from '../cloud/presence.js';
 /* v418 : code du Mode Créateur choisi par le propriétaire ; seule son empreinte SHA-256 (en majuscules) est dans le code */
-const CREATOR_HASH = '3274532b664a7813ce3cb1ed2bb1955a2f2638118a3d0b76cf8f58b050cfb3e0';
+const CREATOR_HASH = 'a0f19d9e26a8d1b7c87d32cc8bbfb9f61d58de4b518cf9e145d36c787a37ac37';
 async function sha256(t) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join(''); }
 
 export default function settings(app, root) {
