@@ -37,8 +37,11 @@ export const CODEX_FRAMES = {
   'cx-os': 'Couronne d’ossements', 'cx-serpents': 'Cadre des serpents d’obsidienne', 'cx-vitrail': 'Cadre du vitrail céleste', 'cx-rouages': 'Cadre des rouages',
   'cx-racines': 'Cadre des racines anciennes', 'cx-yeux': 'Cadre aux mille yeux', 'cx-chaines': 'Cadre des chaînes forgées', 'cx-ruche': 'Cadre de la ruche d’ambre',
 };
-// Dos de cartes : images à faire par Gemini (assets/backs/<clé>.webp) ; dans l'ébauche, ils se gagnent mais ne s'affichent pas encore
-export const CODEX_BACKS = { 'dos-codex': 'Dos du Codex', 'dos-abime': 'Dos de l’Abîme', 'dos-fondateur': 'Dos du Fondateur' };
+// Dos de cartes (v473 : images Gemini, assets/backs/<clé>.webp, tools/back-art.py ; choisis au Profil)
+export const CODEX_BACKS = { 'dos-codex': 'Dos du Codex', 'dos-abime': 'Dos de l’Abîme', 'dos-fondateur': 'Dos du Fondateur',
+  /* réserve : collection « Les sept royaumes » (Échoppe ou saison II) */
+  'dos-infernal': 'Dos du royaume Infernal', 'dos-abyssal': 'Dos du royaume Abyssal', 'dos-celeste': 'Dos du royaume Céleste', 'dos-sauvage': 'Dos du royaume Sauvage',
+  'dos-necrotique': 'Dos du royaume Nécrotique', 'dos-primordial': 'Dos du royaume Primordial', 'dos-artificiel': 'Dos du royaume Artificiel' };
 
 // Paliers : voie gratuite (en jouant) et voie enluminée (achetée, cosmétique seulement). null = rien à ce palier.
 const FREE = (t) => (t === CODEX.tiers ? { chests: { abyssal: 1 }, title: 'Lecteur assidu' }
@@ -62,7 +65,7 @@ export const SHOP = [
     desc: 'Vendu une seule fois. Le cadre et le dos de cartes du Fondateur, et le titre « Fondateur » (badge au classement).' },
   { id: 'cadre-givre', name: 'Cadre de givre', price: '1,99 €', store: 'com.abyssalgame.abyssal.cadre.givre', give: { frame: 'cx-givre' }, desc: 'Un cadre de profil gelé, aux reflets bleutés.' },
   { id: 'cadre-braise', name: 'Cadre des braises éternelles', price: '1,99 €', store: 'com.abyssalgame.abyssal.cadre.braise', give: { frame: 'cx-braise' }, desc: 'Un cadre de profil qui couve comme une forge.' },
-  { id: 'dos-abime', name: 'Dos de l’Abîme', price: '2,99 €', store: 'com.abyssalgame.abyssal.dos.abime', give: { back: 'dos-abime' }, desc: 'Un dos de cartes pour toute ta collection (image à venir).' },
+  { id: 'dos-abime', name: 'Dos de l’Abîme', price: '2,99 €', store: 'com.abyssalgame.abyssal.dos.abime', give: { back: 'dos-abime' }, desc: 'Un dos de cartes pour toute ta collection : un puits sans fond et son œil violet.' },
 ];
 
 // ——— État ———

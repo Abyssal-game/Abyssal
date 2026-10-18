@@ -5,7 +5,7 @@ import { icon, sigil, EMBLEM, picon, setIcon } from '../ui/icons.js';
 import { esc, fmt, pct, bindActions, toast, openSheet } from '../ui/dom.js';
 import { unlockSources } from '../core/unlocks.js';
 import { RARITIES, FRAMES, BOOSTERS, FACTION_ORDER, VARIANTS, RARITY, RARITY_ORDER } from '../config.js';
-import { CODEX_FRAMES } from '../core/codex.js';
+import { CODEX_FRAMES, CODEX_BACKS } from '../core/codex.js';
 
 export default function profile(app, root) {
   const g = app.game, cat = app.catalog;
@@ -77,6 +77,8 @@ export default function profile(app, root) {
         <h3 class="pf-tf-h">Tes cadres</h3>
         <div class="frames">${ownF.map(frameBtn).join('')}</div>
         ${lockedF.length ? `<details class="pf-more"><summary>${icon('lock')} ${lockedF.length} cadre${lockedF.length > 1 ? 's' : ''} à gagner</summary><p class="small muted">Touche un cadre pour savoir comment l’obtenir.</p><div class="frames">${lockedF.map(frameBtn).join('')}</div></details>` : ''}
+        ${(s.backs || []).length ? `<h3 class="pf-tf-h">Tes dos de cartes</h3><p class="small muted">Le dos de toutes les cartes face cachée du jeu.</p>
+        <div class="pf-backs">${[[null, 'Dos de l’Abysse', 'assets/backs/back.webp'], ...s.backs.map((k) => [k, CODEX_BACKS[k] || k, `assets/backs/${k}.webp`])].map(([k, n, u]) => `<button class="pf-back" data-act="cardback" data-v="${k || ''}" aria-pressed="${(s.back || null) === k}"><img alt="" src="${u}"><span class="small">${esc(n)}</span></button>`).join('')}</div>` : ''}
       </div></details>`;
       })()}
 
@@ -104,6 +106,7 @@ export default function profile(app, root) {
   bindActions(root, {
     title(el) { g.setTitle(el.dataset.v); render(); },
     frame(el) { g.setFrame(el.dataset.v); render(); },
+    cardback(el) { g.setBack(el.dataset.v || null); app.applySettings?.(); app.sfx.tap?.(); render(); }, /* v473 : dos de cartes */
     pickav() {
       const ids = Object.keys(g.s.collection).filter((id) => cat.get(id));
       if (!ids.length) { toast('Obtiens d’abord une créature dans un booster.', { icon: 'info' }); return; }

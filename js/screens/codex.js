@@ -25,7 +25,7 @@ export default function codexScreen(app, root) {
     for (const [k, n] of Object.entries(r.tickets || {})) parts.push(`<span class="cx-r">${icon('p:booster')}${n} ${esc(PACK_NAME[k] || k)}${n > 1 ? 's' : ''}</span>`);
     if (r.frame) parts.push(`<span class="cx-r"><i class="avatar-mini pf pf-${r.frame}"></i>${esc(ALL_FRAMES[r.frame] || r.frame)}</span>`);
     if (r.title) parts.push(`<span class="cx-r">${picon('titles')}Titre « ${esc(r.title)} »</span>`);
-    if (r.back) parts.push(`<span class="cx-r">${icon('cards')}${esc(CODEX_BACKS[r.back] || r.back)} <small class="muted">(image à venir)</small></span>`);
+    if (r.back) parts.push(`<span class="cx-r"><img class="cx-back" alt="" src="assets/backs/${r.back}.webp">${esc(CODEX_BACKS[r.back] || r.back)}</span>`);
     return parts.join('');
   };
 

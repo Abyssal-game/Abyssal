@@ -4179,3 +4179,11 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .pf-cx-chaines { --fr: url(../assets/frames/cx-chaines.webp); }
 .pf-cx-ruche { --fr: url(../assets/frames/cx-ruche.webp); }
 .top-avatar.pf[class*="pf-cx-"] { margin: 0 9px; }
+
+/* v473 : dos de cartes au choix (Profil → Titres et cadres) et vignettes dans le Codex et l'Échoppe */
+.pf-backs { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 10px; }
+.pf-back { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 6px; border-radius: 10px; background: rgba(255, 255, 255, .03); border: 1px solid rgba(255, 255, 255, .08); color: inherit; font: inherit; cursor: pointer; text-align: center; }
+.pf-back img { width: 64px; aspect-ratio: 5 / 7; object-fit: cover; border-radius: 6px; box-shadow: 0 4px 10px rgba(0, 0, 0, .6); }
+.pf-back[aria-pressed="true"] { border-color: #F2C14E; background: rgba(242, 193, 78, .1); box-shadow: 0 0 12px rgba(242, 193, 78, .3); }
+.cx-r .cx-back { width: 22px; height: 31px; object-fit: cover; border-radius: 3px; flex: none; }
+.cx-it-r .cx-back { width: 34px; height: 48px; }

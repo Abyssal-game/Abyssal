@@ -1,7 +1,7 @@
 // Point d'entrée : chargement des données, état du joueur, navigation.
 import { loadCatalogData, createCatalog } from './core/catalog.js';
 import { Game } from './core/game.js';
-import { loadArtManifest, artUrl, hasRealArt } from './art/assets.js';
+import { loadArtManifest, artUrl, hasRealArt, setCardBack } from './art/assets.js';
 import { setCardCatalog, setFameLookup, setApexLookup, setFavLookup } from './ui/card.js';
 import { MAX_LEVEL } from './core/army.js';
 import { fameTier } from './core/renown.js';
@@ -94,6 +94,7 @@ window.__abyssal = app; // accès pour les tests automatisés
 
 function applySettings() {
   const s = app.game.s.settings;
+  setCardBack(app.game.s.back); /* v473 : dos de cartes choisi au Profil */
   document.documentElement.classList.toggle('reduce-motion', s.motion === 'reduced');
   document.documentElement.classList.toggle('fx-light', s.quality === 'light');
   configureSound(s);

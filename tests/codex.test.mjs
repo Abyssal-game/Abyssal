@@ -48,3 +48,14 @@ test('échoppe : fermée hors Mode Créateur, achat simulé ensuite (une seule f
   g.shopBuy('codex');
   assert.ok(g.codex().premium && g.shopOwned('codex'));
 });
+
+test('dos de cartes : seulement un dos possédé, retour au dos par défaut possible', () => {
+  const g = mk();
+  g.setBack('dos-abime');
+  assert.equal(g.s.back ?? null, null, 'pas possédé : rien ne change');
+  g.grant({ back: 'dos-abime' });
+  g.setBack('dos-abime');
+  assert.equal(g.s.back, 'dos-abime');
+  g.setBack(null);
+  assert.equal(g.s.back, null);
+});

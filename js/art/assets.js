@@ -8,6 +8,15 @@ let heroArt = new Set();
 let chestArt = new Set();
 let factionArt = new Set();
 const cache = new Map();
+// v473 : dos de cartes au choix du joueur (assets/backs/<clé>.webp), sinon le dos par défaut du manifeste
+let defaultBack = null, chosenBack = null;
+function paintBack() {
+  const u = chosenBack ? `assets/backs/${chosenBack}.webp` : defaultBack;
+  if (!u || typeof document === 'undefined') return;
+  document.documentElement.style.setProperty('--card-back', `url("${new URL(u, document.baseURI).href}")`);
+  document.documentElement.classList.add('has-back');
+}
+export function setCardBack(key) { chosenBack = key || null; paintBack(); }
 
 export async function loadArtManifest(base = './') {
   try {
@@ -19,10 +28,7 @@ export async function loadArtManifest(base = './') {
       chestArt = new Set(m.chests || []);
       factionArt = new Set(m.factions || []);
       // Dos de carte illustré (facultatif) : assets/backs/back.webp
-      if (m.cardBack && typeof document !== 'undefined') {
-        document.documentElement.style.setProperty('--card-back', `url("${new URL(m.cardBack, document.baseURI).href}")`);
-        document.documentElement.classList.add('has-back');
-      }
+      if (m.cardBack) { defaultBack = m.cardBack; paintBack(); }
     }
   } catch (e) {
     available = new Set();

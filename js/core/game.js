@@ -1673,6 +1673,7 @@ export class Game {
 
   setTitle(t) { if (this.s.titles.includes(t)) { this.s.title = t; this.persist(); } }
   setFrame(f) { if (this.s.frames.includes(f)) { this.s.frame = f; this.persist(); } }
+  setBack(k) { if (!k || (this.s.backs || []).includes(k)) { this.s.back = k || null; this.persist(); } } /* v473 : null = dos par défaut */
   setName(n) { this.s.name = String(n || '').replace(/[<>]/g, '').trim().slice(0, 16); this.persist(); }
   setAvatar(id) { if (this.owns(id)) { this.s.avatar = id; this.persist(); } }
   toggleShowcase(id) {
