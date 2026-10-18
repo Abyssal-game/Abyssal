@@ -63,7 +63,7 @@ export default function descent(app, root) {
     const d = g.descent(), last = ui.outcome, team = g.team(), chests = g.chestCount();
     if (g.s.armyNews) { delete g.s.armyNews; g.persist(); } // ancien message de transition (héros → cartes) : retiré
     const start = startFloor(), ch = chapterOf(start), replay = chapDone(ch), night = ui.nightmare && replay && g.nightmareUnlocked();
-    root.innerHTML = `<header class="screen-head dc-head ui-hero bn-descente"><h1>La Descente</h1><p class="muted">${g.campaignDone() ? 'Tu as atteint le fond de l’Abysse' : d.best ? `Chapitre ${chapNow()} sur ${CHAPTERS} · étage ${d.best}` : 'Descends étage par étage jusqu’au fond de l’Abysse.'}</p></header>
+    root.innerHTML = `<header class="screen-head dc-head ui-hero bn-descente"><h1>La Descente</h1><p class="muted">${g.campaignDone() ? 'Tu as atteint le fond de l’Abysse' : d.best ? `Chapitre ${chapNow()} sur ${CHAPTERS} · record : étage ${d.best}` : 'Descends étage par étage jusqu’au fond de l’Abysse.'}</p></header>
       ${last ? summaryHTML(last) : ''}
       ${chests ? `<a class="panel dc-chests" href="#/coffres"><span class="dc-new-ic">${icon('p:chest')}</span><span><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Éclats et boosters</span></span>${icon('next')}</a>` : ''}
       <section class="panel dc-go">
@@ -321,7 +321,7 @@ export default function descent(app, root) {
     return `${ch === 1 ? `<p class="st-pro">${esc(PROLOGUE)}</p>` : ''}<span class="bx-k">Chapitre ${ch} / ${CHAPTERS}</span><h1>${esc(t?.title || '')}</h1><p class="bx-p">${esc(t?.text || '')}</p>`;
   }
   function showStory(ch, then) {
-    if (app.reduced()) { then?.(); return; }
+    /* v444 : le récit s’affiche aussi en animations réduites (c’est du contenu, pas un effet) */
     const el = document.createElement('div');
     el.className = 'bx-intro st-intro';
     el.innerHTML = `<div class="bx-in">${storyHTML(ch)}<span class="bx-tap">Touche pour descendre</span></div>`;

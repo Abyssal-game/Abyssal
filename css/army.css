@@ -3865,3 +3865,6 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 /* v438 : nouveaux sachets standard et Alliances (Gemini) : le nom s'écrit dans le cadre sombre du bas, « 3 cartes » juste dessous */
 .pack-standard .pk-label, .pack-event .pk-label { top: 74.6%; bottom: auto; left: 16%; right: 16%; gap: 3.2cqw; }
 .pack-standard .pk-name, .pack-event .pk-name { display: grid; place-items: center; height: 8.6cqw; font-size: 6.4cqw; letter-spacing: .08em; text-transform: uppercase; color: #F1DB9E; }
+
+/* v444 : Épreuves, explication quand l'équipe n'a pas encore 3 créatures */
+.ep-need { margin: 0 4px 10px; padding: 10px 12px; border-radius: 12px; background: rgba(224, 72, 94, .12); border: 1px solid rgba(224, 72, 94, .35); color: #F3D6DA; }

@@ -1139,6 +1139,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     }
     // ennemi touché avec une créature choisie : attaque directe (raccourci)
     if (sel && actionsFor(st, sel)[0].ok && actionTargets(st, sel, 'attack').includes(u.uid)) { const a = sel; return exec(() => act(st, a, 'attack', u.uid)); }
+    /* v444 : ennemi hors d'atteinte (couvert par un Protecteur…) : on dit qui viser au lieu d'ouvrir sa fiche (appui long) */
+    if (sel && actionsFor(st, sel)[0].ok && !u.dead) { const ok = actionTargets(st, sel, 'attack'); if (ok.length) { app.sfx.tap?.(); toast(`${esc(uName(u))} est protégé : vise d’abord ${ok.map((x) => `<b>${esc(uName(st.units[x]))}</b>`).join(' ou ')}.`, { icon: 'shield' }); return; } }
     info(u);
   }, { signal: ctl.signal });
 

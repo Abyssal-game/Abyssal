@@ -86,6 +86,7 @@ export default function trials(app, root) {
     root.innerHTML = `<header class="screen-head dc-head ui-hero bn-trial"><h1>Les Épreuves du jour</h1><p class="muted">${wins} sur 3 gagnée${wins > 1 ? 's' : ''} · ${fmt(t.score || 0)} points</p></header>
       ${ui.result ? resultHTML(ui.result) : ''}
       <p class="small muted center ep-intro">Les ennemis sont réglés sur tes <b>meilleures cartes</b> : ni trop faciles, ni impossibles. Une seule tentative par Épreuve ; elles reviennent à minuit.</p>
+      ${team.length < TEAM.active ? `<p class="small center ep-need">Il te faut au moins ${TEAM.active} créatures dans ton équipe pour combattre : ouvre tes boosters (onglet Butin), puis compose ton équipe.</p>` : ''}
       <div class="ep-list">${TRIALS.map((_, i) => cardHTML(i)).join('')}</div>
       <section class="panel ep-team">${teamStrip(team)}<div class="dc-teambtns"><a class="btn small ghost dc-plq dc-plq-dark" href="#/equipe">${icon('p:team-ic')}Mon équipe</a><a class="btn small ghost dc-plq dc-plq-dark" href="#/renfort">${icon('p:level-up')}Renforcer</a></div></section>
       ${r.off ? '' : `<section class="panel dc-rule bn-rule" style="--rf:${r.faction ? cat.faction[r.faction].colors.secondary : 'var(--gold)'}"><span class="dc-rule-ic">${r.faction ? sigil(r.faction) : picon('rule')}</span><span><span class="small muted">Règle du jour</span><b>${esc(r.name)}</b><span class="small">${esc(r.desc)}</span></span></section>`}
