@@ -96,22 +96,25 @@ export default function descent(app, root) {
     const r = g.descent().risk?.[k];
     return r?.n ? `perdues : ${r.lost} sur ${r.n}` : dflt;
   }
+  /* v459 : au-delà de l'étage 33 environ, la force conseillée dépasse ce qu'une équipe peut atteindre (budget de 15) :
+     une équipe toute au niveau 10 n'est plus jamais dite « trop faible », la suite se joue sur la façon de combattre */
+  const maxed = (team) => team.length && team.every((id) => g.cardLevel(id) >= 10) && g.teamPower(team) >= 2.15; /* tout au niveau 10 et des raretés qui remplissent le budget (plafond ≈ 2,24) */
   function riskAdvice() {
     const team = g.team(), d = g.descent(), tp = g.teamPower(team), need = powerFor(Math.max((d.best || 0) + 1, 5));
-    if (tp < need * 0.95) return ` <b>Ton équipe est sous la force conseillée</b> (${powerPts(tp)} pour ${powerPts(need)}) : le risque est élevé.`;
+    if (tp < need * 0.95 && !maxed(team)) return ` <b>Ton équipe est sous la force conseillée</b> (${powerPts(tp)} pour ${powerPts(need)}) : le risque est élevé.`;
     const r = [ui.nightmare && d.risk?.night].filter((x) => x && x.n >= 3).sort((a, b) => b.lost / b.n - a.lost / a.n)[0];
     return r && r.lost / r.n >= 0.5 ? ` Tu as perdu ${r.lost} de tes ${r.n} derniers chapitres dans ce mode.` : '';
   }
   function levelHint(team, d) {
     if (team.length < 3) return '';
     // v345 : force de l'équipe (rareté × niveau) plutôt que niveau seul
-    const avg = avgLevel(team), tp = g.teamPower(team), target = Math.max((d.best || 0) + 1, 5), need = powerFor(target), ok = tp >= need * 0.95;
-    return `<p class="small center dc-lvl ${ok ? 'ok' : 'low'}">${icon('p:level-up')} Force de ton équipe : <b>${powerPts(tp)}</b> · conseillée pour l’étage ${target} : <b>${powerPts(need)}</b>${ok ? '' : ' · <a href="#/renfort">la renforcer</a>'}</p>
+    const avg = avgLevel(team), tp = g.teamPower(team), target = Math.max((d.best || 0) + 1, 5), need = powerFor(target), top = maxed(team) && tp < need * 0.95, ok = tp >= need * 0.95 || top;
+    return `<p class="small center dc-lvl ${ok ? 'ok' : 'low'}">${icon('p:level-up')} Force de ton équipe : <b>${powerPts(tp)}</b>${top ? ' · <b>au maximum</b> : à cette profondeur, tout se joue sur ta défense, la Brisure, les talents et les présages' : ` · conseillée pour l’étage ${target} : <b>${powerPts(need)}</b>${ok ? '' : ' · <a href="#/renfort">la renforcer</a>'}`}</p>
       <details class="dc-floorhelp small muted"><summary>Comment la difficulté marche</summary><p>La <b>force</b> d’une créature dépend de sa rareté et de son niveau : une Mythique au niveau 1 vaut une Commune au niveau 8. Monter de niveau ou aligner des créatures plus rares rend l’équipe plus forte.</p><p>Dans la Descente, chaque étage a <b>sa force fixe</b> : renforcer ton équipe rend donc les chapitres plus faciles. Les <b>Épreuves du jour</b> et le <b>Cauchemar</b>, eux, s’adaptent à ta force (dès l’étage 1 en Cauchemar, les ennemis valent ceux de l’étage ${floorFloor(avg)} au moins).</p></details>`;
   }
   function weakHint(floor) {
     const team = g.team(), tp = g.teamPower(team), need = powerFor(floor), low = team.filter((id) => g.cardPower(id) < need * 0.9);
-    if (tp >= need * 0.95) return '';
+    if (tp >= need * 0.95 || maxed(team)) return '';
     const can = team.filter((id) => { const c = g.upgradeCost(id); return c && c <= g.s.ash; });
     return `<div class="dc-why dc-weak"><b>${icon('p:level-up')} Ton équipe était trop faible pour cet étage</b><p class="small">Force de l’équipe <strong>${powerPts(tp)}</strong>, alors que l’étage ${floor} en demande environ <strong>${powerPts(need)}</strong>${low.length ? ` (${low.length} créature${low.length > 1 ? 's' : ''} en dessous)` : ''}.${can.length ? ` Tu as <strong>${fmt(g.s.ash)} cendres</strong> : de quoi en faire monter ${can.length > 1 ? 'plusieurs' : 'une'} tout de suite.` : ' Brûle tes doublons dans la Fournaise pour gagner des cendres.'}</p><a class="btn small gold" href="#/renfort">${icon('p:level-up')}Renforcer mon équipe</a></div>`;
   }
