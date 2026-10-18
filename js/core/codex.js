@@ -14,9 +14,20 @@ export const CODEX = {
   ends: '2026-12-31',                    // affiché seulement (aucune fermeture automatique dans l'ébauche)
   tiers: 30,                             // nombre de paliers
   xpPerTier: 100,                        // points de Codex par palier
-  price: '4,99 €',
+  cost: 500,                             // v474 : prix en obsidiennes (≈ 4,99 €)
   store: 'com.abyssalgame.abyssal.codex1',
 };
+
+// ——— v474 : la monnaie payante, les Obsidiennes (achetées en euros, dépensées seulement en cosmétiques) ———
+// Règle : les joueurs gratuits gardent les cosmétiques simples (cadres dessinés en CSS, titres, dos de l'Abysse) gagnés
+// en jouant ; les cosmétiques peints (cadres et dos Gemini) viennent du Codex enluminé ou de l'Échoppe, en obsidiennes.
+export const OBS = { name: 'Obsidiennes', one: 'obsidienne' };
+export const OBS_PACKS = [
+  { id: 'obs-100', n: 100, bonus: 0, price: '0,99 €', store: 'com.abyssalgame.abyssal.obsidiennes.100' },
+  { id: 'obs-500', n: 500, bonus: 50, price: '4,99 €', store: 'com.abyssalgame.abyssal.obsidiennes.500' },
+  { id: 'obs-1000', n: 1000, bonus: 150, price: '9,99 €', store: 'com.abyssalgame.abyssal.obsidiennes.1000' },
+  { id: 'obs-2000', n: 2000, bonus: 400, price: '19,99 €', store: 'com.abyssalgame.abyssal.obsidiennes.2000' },
+];
 
 // Points de Codex gagnés en jouant
 export const CODEX_XP = {
@@ -43,6 +54,19 @@ export const CODEX_BACKS = { 'dos-codex': 'Dos du Codex', 'dos-abime': 'Dos de l
   'dos-infernal': 'Dos du royaume Infernal', 'dos-abyssal': 'Dos du royaume Abyssal', 'dos-celeste': 'Dos du royaume Céleste', 'dos-sauvage': 'Dos du royaume Sauvage',
   'dos-necrotique': 'Dos du royaume Nécrotique', 'dos-primordial': 'Dos du royaume Primordial', 'dos-artificiel': 'Dos du royaume Artificiel' };
 
+// Catalogue de l'Échoppe, en obsidiennes (le Codex enluminé donne aussi givre, braises et dos de l'Abîme)
+const F = (k, cost) => ({ id: k, kind: 'frame', give: { frame: k }, cost });
+const B = (k, cost) => ({ id: k, kind: 'back', give: { back: k }, cost });
+export const ROYAUMES = ['dos-infernal', 'dos-abyssal', 'dos-celeste', 'dos-sauvage', 'dos-necrotique', 'dos-primordial', 'dos-artificiel'];
+export const CATALOG = [
+  F('cx-givre', 250), F('cx-braise', 250), F('cx-os', 300), F('cx-serpents', 300), F('cx-vitrail', 300), F('cx-rouages', 300),
+  F('cx-racines', 300), F('cx-chaines', 300), F('cx-yeux', 350), F('cx-ruche', 350),
+  B('dos-abime', 350), ...ROYAUMES.map((k) => B(k, 300)),
+  { id: 'royaumes', kind: 'bundle', name: 'Les sept royaumes', give: { backs: ROYAUMES }, cost: 1500, desc: 'Les sept dos des royaumes d’un coup (2 100 à l’unité).' },
+];
+// Exclusifs du Codex enluminé (jamais en vente) : cadres d'encre, de sang, enluminé, de l'Abîme, dos du Codex, titres.
+export const CODEX_ONLY = ['cx-encre', 'cx-sang', 'cx-or', 'cx-abime', 'dos-codex'];
+
 // Paliers : voie gratuite (en jouant) et voie enluminée (achetée, cosmétique seulement). null = rien à ce palier.
 const FREE = (t) => (t === CODEX.tiers ? { chests: { abyssal: 1 }, title: 'Lecteur assidu' }
   : t % 10 === 0 ? { tickets: { standard: 2 } }
@@ -56,16 +80,12 @@ const PREM = {
 };
 export const CODEX_TIERS = Array.from({ length: CODEX.tiers }, (_, i) => ({ tier: i + 1, free: FREE(i + 1), prem: PREM[i + 1] || null }));
 
-// ——— L'Échoppe : ce qui se vendra en argent réel (prix affichés seulement) ———
+// ——— L'Échoppe en euros : les obsidiennes et le Pack du Fondateur (prix affichés seulement) ———
 export const SHOP = [
-  { id: 'codex', name: CODEX.premiumName, price: CODEX.price, store: CODEX.store, kind: 'codex',
-    desc: `Débloque la voie enluminée de la saison : ${Object.keys(PREM).length} récompenses cosmétiques (cadres, titres, dos de cartes).` },
+  ...OBS_PACKS.map((p) => ({ id: p.id, kind: 'obs', name: `${p.n + p.bonus} obsidiennes`, price: p.price, store: p.store, give: { obs: p.n + p.bonus }, bonus: p.bonus })),
   { id: 'fondateur', name: 'Pack du Fondateur', price: '9,99 €', store: 'com.abyssalgame.abyssal.fondateur', once: true,
-    give: { frame: 'cx-fondateur', title: 'Fondateur', back: 'dos-fondateur' },
-    desc: 'Vendu une seule fois. Le cadre et le dos de cartes du Fondateur, et le titre « Fondateur » (badge au classement).' },
-  { id: 'cadre-givre', name: 'Cadre de givre', price: '1,99 €', store: 'com.abyssalgame.abyssal.cadre.givre', give: { frame: 'cx-givre' }, desc: 'Un cadre de profil gelé, aux reflets bleutés.' },
-  { id: 'cadre-braise', name: 'Cadre des braises éternelles', price: '1,99 €', store: 'com.abyssalgame.abyssal.cadre.braise', give: { frame: 'cx-braise' }, desc: 'Un cadre de profil qui couve comme une forge.' },
-  { id: 'dos-abime', name: 'Dos de l’Abîme', price: '2,99 €', store: 'com.abyssalgame.abyssal.dos.abime', give: { back: 'dos-abime' }, desc: 'Un dos de cartes pour toute ta collection : un puits sans fond et son œil violet.' },
+    give: { frame: 'cx-fondateur', title: 'Fondateur', back: 'dos-fondateur', obs: 500 },
+    desc: 'Vendu une seule fois. Le cadre et le dos de cartes du Fondateur, le titre « Fondateur » (badge au classement) et 500 obsidiennes.' },
 ];
 
 // ——— État ———

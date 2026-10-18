@@ -13,7 +13,7 @@ export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par c
 import { FINAL_FLOOR, BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, SUBLIME_ASH, VARIANTS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
-import { CODEX, CODEX_XP, CODEX_TIERS, SHOP, codexState, codexTier } from './codex.js';
+import { CODEX, CODEX_XP, CODEX_TIERS, SHOP, CATALOG, codexState, codexTier } from './codex.js';
 import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, lateSoft, expectedLevel, cardPower, powerFor, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative } from './duel.js';
 import { bossOf, BOSSES, BOSS_ORDER } from './bosses.js';
@@ -1693,6 +1693,8 @@ export class Game {
     if (reward.title && !this.s.titles.includes(reward.title)) this.s.titles.push(reward.title);
     if (reward.frame && !this.s.frames.includes(reward.frame)) this.s.frames.push(reward.frame);
     if (reward.back && !(this.s.backs ||= []).includes(reward.back)) this.s.backs.push(reward.back);
+    for (const b of reward.backs || []) if (!(this.s.backs ||= []).includes(b)) this.s.backs.push(b);
+    if (reward.obs) this.s.obs = (this.s.obs || 0) + reward.obs; /* v474 : obsidiennes (achetées en euros) */
     if (reward.chests) this.addChests(reward.chests);
   }
 
@@ -1723,17 +1725,48 @@ export class Game {
     this.persist();
     return got;
   }
-  /* Achat SIMULÉ (aperçu Créateur) : le vrai paiement passera par l'App Store (identifiant `store` de chaque article) */
+  /* Achat SIMULÉ en euros (aperçu Créateur) : le vrai paiement passera par l'App Store (identifiant `store` de chaque article) */
   shopBuy(id) {
     if (!this.codexOn()) throw new Error('L’Échoppe n’est pas encore ouverte.');
     const it = SHOP.find((x) => x.id === id), bought = (this.s.purchases ||= []);
     if (!it) throw new Error('Article inconnu.');
-    if (it.kind === 'codex') { if (this.codex().premium) throw new Error('Déjà acheté pour cette saison.'); this.codex().premium = true; }
-    else { if (it.once && bought.includes(id)) throw new Error('Déjà acheté.'); this.grant(it.give, 'shop'); }
+    if (it.once && bought.includes(id)) throw new Error('Déjà acheté.');
+    this.grant(it.give, 'shop');
     bought.push(id); this.persist();
     return it;
   }
-  shopOwned(id) { const it = SHOP.find((x) => x.id === id); return it?.kind === 'codex' ? this.codex().premium : !!(this.s.purchases || []).includes(id); }
+  shopOwned(id) { return !!(this.s.purchases || []).includes(id); }
+  // v474 : dépenses en obsidiennes (cosmétiques seulement)
+  obs() { return this.s.obs || 0; }
+  spendObs(n) {
+    if (!this.codexOn()) throw new Error('L’Échoppe n’est pas encore ouverte.');
+    if (this.obs() < n) throw new Error(`Il te manque ${n - this.obs()} obsidiennes.`);
+    this.s.obs -= n;
+  }
+  catalogOwned(id) {
+    const it = CATALOG.find((x) => x.id === id); if (!it) return false;
+    const g = it.give;
+    return (!g.frame || this.s.frames.includes(g.frame)) && (!g.back || (this.s.backs || []).includes(g.back)) && (g.backs || []).every((b) => (this.s.backs || []).includes(b));
+  }
+  catalogCost(id) { /* un lot ne fait pas payer ce qu'on a déjà : on retire le prix des dos déjà possédés, jamais sous 0 */
+    const it = CATALOG.find((x) => x.id === id); if (!it) return 0;
+    if (it.kind !== 'bundle') return it.cost;
+    const have = (it.give.backs || []).filter((b) => (this.s.backs || []).includes(b)).length;
+    return Math.max(0, Math.round(it.cost * (1 - have / it.give.backs.length)));
+  }
+  catalogBuy(id) {
+    const it = CATALOG.find((x) => x.id === id);
+    if (!it) throw new Error('Article inconnu.');
+    if (this.catalogOwned(id)) throw new Error('Tu l’as déjà.');
+    const cost = this.catalogCost(id);
+    this.spendObs(cost); this.grant(it.give, 'shop');
+    (this.s.purchases ||= []).push(id); this.persist();
+    return it;
+  }
+  codexUnlock() {
+    if (this.codex().premium) throw new Error('Déjà débloqué pour cette saison.');
+    this.spendObs(CODEX.cost); this.codex().premium = true; this.persist();
+  }
 
   achievementValue(a) {
     const c = a.cond;

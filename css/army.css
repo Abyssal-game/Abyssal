@@ -4187,3 +4187,31 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .pf-back[aria-pressed="true"] { border-color: #F2C14E; background: rgba(242, 193, 78, .1); box-shadow: 0 0 12px rgba(242, 193, 78, .3); }
 .cx-r .cx-back { width: 22px; height: 31px; object-fit: cover; border-radius: 3px; flex: none; }
 .cx-it-r .cx-back { width: 34px; height: 48px; }
+
+/* v474 : Échoppe en obsidiennes (catalogue des cosmétiques peints) */
+.obs-i { width: 18px; height: 18px; flex: none; filter: drop-shadow(0 0 4px rgba(180, 140, 255, .55)); }
+.obs-n { display: inline-flex; align-items: center; gap: 4px; font-weight: 800; color: #E4D4FF; white-space: nowrap; }
+.cx-wallet { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; align-items: center; padding: 12px 14px; margin-bottom: 10px; border-color: rgba(180, 140, 255, .45); background: linear-gradient(160deg, rgba(48, 28, 84, .6), rgba(10, 11, 18, .9)); }
+.cx-wallet .cx-w-n .obs-n { font: 800 1.5rem/1 var(--f-display); }
+.cx-wallet .cx-w-n .obs-i { width: 28px; height: 28px; }
+.cx-wallet .btn { grid-column: 1 / -1; }
+.cx-h { margin: 16px 2px 8px; font: 800 1rem/1.2 var(--f-display); color: #F2D9A0; }
+.cx-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.cx-grid.bundle { grid-template-columns: 1fr; }
+.cx-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 6px; border-radius: 4px 12px 4px 12px; background: rgba(10, 11, 18, .82); border: 1px solid rgba(180, 140, 255, .3); text-align: center; min-width: 0; }
+.cx-tile b { font-size: .74rem; line-height: 1.2; }
+.cx-tile .btn.small { min-height: 36px; padding: 4px 10px; width: 100%; justify-content: center; }
+.cx-tile.own { border-color: rgba(127, 224, 160, .4); }
+.cx-tile .cx-badge { padding: 4px 8px; font-size: .72rem; }
+.cx-av { display: grid; place-items: center; width: 100%; height: 76px; }
+.cx-av .avatar-mini { width: 46px; height: 46px; background: radial-gradient(circle, #2A2340, #0B0C12); }
+.cx-bk { width: 58px; aspect-ratio: 5 / 7; border-radius: 6px; object-fit: cover; box-shadow: 0 4px 10px rgba(0, 0, 0, .6); }
+.cx-fan { display: flex; justify-content: center; height: 84px; }
+.cx-fan img { width: 54px; aspect-ratio: 5 / 7; border-radius: 6px; object-fit: cover; margin: 0 -10px; box-shadow: 0 4px 10px rgba(0, 0, 0, .6); }
+.cx-fan img:nth-child(odd) { transform: rotate(-6deg); }
+.cx-fan img:nth-child(even) { transform: rotate(6deg) translateY(4px); }
+.cx-grid.bundle .cx-tile { padding: 12px; }
+.cx-grid.bundle .cx-tile .btn.small { width: auto; min-width: 140px; }
+.cx-bonus { font-size: .72rem; font-weight: 700; color: #BFF0CF; }
+.cx-item.obs .cx-it-h { align-items: center; }
+.cx-item.obs .cx-it-h .obs-n { font: 800 1.15rem/1 var(--f-display); }
