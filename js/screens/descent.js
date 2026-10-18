@@ -326,7 +326,7 @@ export default function descent(app, root) {
     el.className = 'bx-intro st-intro';
     el.innerHTML = `<div class="bx-in">${storyHTML(ch)}<span class="bx-tap">Touche pour descendre</span></div>`;
     document.body.appendChild(el);
-    app.sfx.sheet?.();
+    app.sfx.page?.(); /* v439 : page du Bestiaire (ElevenLabs) */
     let done = false;
     el.addEventListener('click', () => { if (done) return; done = true; el.classList.add('out'); setTimeout(() => el.remove(), 300); then?.(); });
   }
@@ -411,7 +411,7 @@ export default function descent(app, root) {
         if (!chapDone(ch) && !seen[ch]) { seen[ch] = Date.now(); g.persist(); showStory(ch, after); } else after();
       } catch (e) { toast(esc(e.message), { kind: 'error' }); }
     },
-    story(el) { const ch = +el.dataset.c; openSheet(`<div class="st-sheet">${storyHTML(ch)}</div>`, { label: 'Récit du chapitre', cls: 'dc-sheet' }); },
+    story(el) { const ch = +el.dataset.c; app.sfx.page?.(); openSheet(`<div class="st-sheet">${storyHTML(ch)}</div>`, { label: 'Récit du chapitre', cls: 'dc-sheet' }); },
     omeninfo() { const o = OMENS[g.descent().run?.omen]; if (o) openSheet(`<h2 class="center">${esc(o.name)}</h2><p><b class="dc-good">Gain</b> ${esc(o.gain)}</p><p><b class="dc-bad">Prix</b> ${esc(o.cost)}</p><p class="small muted">Il dure tout le chapitre.</p>`, { label: 'Présage', cls: 'dc-sheet sheet-small' }); },
     omenpick(el) { ui.omen = el.dataset.k; app.sfx.tap(); render(); },
     omengo() {

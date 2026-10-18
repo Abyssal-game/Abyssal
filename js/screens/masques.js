@@ -143,7 +143,7 @@ export default function masquesScreen(app, root) {
     banner = { cls: ev.correct ? 'ok' : 'ko', html: `<span class="mq-cd flip"><img alt="" src="${artUrl(cat.get(c.id), { lite: true })}"><span class="mq-cf">${sigil(c.f)}${esc(fname(c.f))}</span></span>
       <span class="mq-vd"><small>${esc(by.name)} : « ${ev.sayTrue ? 'Vrai' : 'Mensonge'} ! »</small><b>${ev.truth ? 'C’était vrai' : 'C’était un mensonge'}</b><span>${ev.correct ? 'Bien vu' : 'Raté'} : ${ev.taker === 'p' ? 'tu la gardes' : `${esc(tk.name)} la garde`}.</span></span>` };
     view();
-    (ev.taker === 'p' ? app.sfx.hit : app.sfx.capture)?.();
+    (ev.truth ? app.sfx.truth : app.sfx.lie)?.(); /* v439 : la carte retournée dit vrai… ou trahit le menteur */
     await wait(1700);
     banner = null;
     if (gone) return;

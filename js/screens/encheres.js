@@ -127,7 +127,9 @@ export default function encheresScreen(app, root) {
       <b>${tk ? `${ev.taker === 'p' ? 'Tu remportes' : `${esc(tk.name)} remporte`} ${ev.pile.length > 1 ? `${ev.pile.length} lots` : ev.value > 0 ? 'le lot' : 'la malédiction'}` : 'Le lot reste sur la table'}</b>
       <span>${tk ? `${ev.value > 0 ? '+' : ''}${ev.value} point${Math.abs(ev.value) > 1 ? 's' : ''}` : 'Il s’ajoute au lot suivant.'}</span></span>` };
     view();
-    (ev.taker === 'p' ? (ev.value > 0 ? app.sfx.coin : app.sfx.hit) : app.sfx.capture)?.();
+    /* v439 : offrandes annulées, puis coup de marteau du lot adjugé */
+    if (ev.cancelled.length) app.sfx.cancel?.();
+    if (ev.taker) setTimeout(() => app.sfx.gavel?.(), ev.cancelled.length ? 450 : 0);
     await wait(2000);
     banner = null;
   }
