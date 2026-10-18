@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """v446 : cadre de finition peint (fond noir) -> cadre transparent 600 x 844 calé sur le BORD de la carte.
-Usage : python3 tools/variant-frame2.py source.jpg sortie.webp [gain] [marge]
+Usage : python3 tools/variant-frame2.py source.jpg sortie.webp [gain] [marge] [seuil]  (seuil de luminosité des barres, 60 ; 25 pour un cadre sombre)
 Différence avec variant-frame.py : le cadre est recadré sur ses barres droites extérieures (pas sur ses ornements),
 posées à `marge` px du bord (ornements qui dépassent coupés), et la hauteur en trop est retirée au milieu
 à l'endroit où les deux bords se raccordent le mieux (pas de cassure visible)."""
@@ -11,9 +11,10 @@ from PIL import Image
 src, out = sys.argv[1], sys.argv[2]
 gain = float(sys.argv[3]) if len(sys.argv) > 3 else 1.8
 M = int(sys.argv[4]) if len(sys.argv) > 4 else 12
+TH = int(sys.argv[5]) if len(sys.argv) > 5 else 60
 W, H = 600, 844
 im = np.asarray(Image.open(src).convert('RGB')).astype(np.float32)
-b = im.max(axis=2) > 60
+b = im.max(axis=2) > TH
 col, row = b.mean(axis=0), b.mean(axis=1)
 xs, ys = np.where(col > 0.5)[0], np.where(row > 0.5)[0]
 x0, x1, y0, y1 = xs.min(), xs.max(), ys.min(), ys.max()

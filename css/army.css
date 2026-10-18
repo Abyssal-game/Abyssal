@@ -3878,3 +3878,20 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 .col-order > .small { flex: none; }
 .col-order .seg { flex: 1; display: flex; padding-left: 14px !important; padding-right: 14px !important; }
 .col-order .seg-b { flex: 1; padding-left: 4px !important; padding-right: 4px !important; font-size: .82rem; white-space: nowrap; min-height: 40px; }
+
+/* v448 : fenêtres « Récit du chapitre » et « Le fond de l'Abysse » : titre en tête à côté de la croix, plus d'encadré dans le cadre */
+.st-head .bx-k { display: block; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); margin-top: 4px; }
+.st-head h2 { margin: 4px 0 0; font: 700 1.4rem/1.15 var(--f-display); }
+.sheet-body > .st-sheet2 { margin: 14px auto 4px !important; padding-top: 0 !important; }
+.st-prok { display: block; font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; color: var(--mute, #aaa); margin-bottom: 6px; }
+.dc-smh .dc-sm-k { display: block; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: #CBA6F7; margin-top: 4px; }
+.dc-smh h2 { margin: 4px 0 0; font: 700 1.3rem/1.15 var(--f-display); color: #FFE7A8; }
+.sheet-body > .dc-sms { margin-top: 12px !important; text-align: center; }
+.dc-sms-pack { display: block; width: 120px; height: auto; margin: 0 auto 14px; filter: drop-shadow(0 0 18px rgba(176, 75, 255, .55)); }
+.dc-sms p { margin: 0 0 10px; line-height: 1.5; }
+.dc-sms .dc-sm-bar { margin-top: 6px; text-align: left; }
+/* v448 : fenêtres dont le titre est dans un bloc (règles des jeux…) : pas de grand vide sous la croix, le titre garde sa place à côté d'elle */
+.sheet-body > :first-child:has(> h1:first-child, > h2:first-child) { margin-top: 0 !important; }
+.sheet-body > :first-child > h1:first-child, .sheet-body > :first-child > h2:first-child { padding-left: 54px; padding-right: 54px; text-align: center; }
+/* v448 : un seul encadré qui remplit une fenêtre (Saison…) perd son cadre : plus de cadre dans le cadre */
+.sheet-body > .panel:first-of-type:last-of-type, .sheet-body > h2:first-child + .panel:last-child { background: none !important; border: 0 !important; border-image: none !important; box-shadow: none !important; padding-left: 0; padding-right: 0; }

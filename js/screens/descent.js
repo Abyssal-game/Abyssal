@@ -127,6 +127,12 @@ export default function descent(app, root) {
     const best = Math.min(FINAL_FLOOR, d.best || 0), done = !!g.s.bossesBeaten?.abysse;
     // v404 : une simple ligne tant que le record est loin du fond (le grand encart écrasait le premier écran)
     if (!full && best < 50 && !done) return `<button class="panel dc-summit-line" data-act="open" data-f="summit"><img alt="" src="assets/packs/abysse2.webp"><span><b>Objectif ultime : l’étage ${FINAL_FLOOR}</b><small>L’Abysse et son booster légendaire · ton record : ${best} / ${FINAL_FLOOR}</small></span>${icon('next')}</button>`;
+    /* v448 : dans une fenêtre, plus d'encadré dans le cadre : titre en tête (à côté de la croix), sachet au centre */
+    if (full) return `<div class="center dc-smh"><b class="dc-sm-k">${done ? 'Fond de l’Abysse atteint' : 'Le fond de l’Abysse'}</b><h2>Étage ${FINAL_FLOOR} · L’Abysse</h2></div>
+      <div class="dc-sms"><img class="dc-sms-pack" alt="" src="assets/packs/abysse2.webp">
+        <p>Le dernier étage de la Descente. La première victoire contre L’Abysse donne le <b>Booster de l’Abysse</b> : 5 cartes, une Mythique ou mieux, toutes au moins argentées, avec <b>une Secrète que tu n’as pas</b>.</p>
+        ${done ? '' : '<p class="small muted">Première victoire : titre « Vainqueur de l’Abysse », Cadre de l’Œil et 2 coffres abyssaux.</p>'}
+        <div class="dc-sm-bar"><span class="progress"><i style="width:${(best / FINAL_FLOOR) * 100}%"></i></span><small>Ton record : ${best} / ${FINAL_FLOOR}</small></div></div>`;
     return `<section class="panel dc-summit ${done ? 'done' : ''}"><img class="dc-sm-pack" alt="" src="assets/packs/abysse2.webp">
       <div class="dc-sm-body"><b class="dc-sm-k">${done ? 'Fond de l’Abysse atteint' : 'Le fond de l’Abysse'}</b><h2>Étage ${FINAL_FLOOR} · L’Abysse</h2>
         <p class="small">Le dernier étage de la Descente. La première victoire contre L’Abysse donne le <b>Booster de l’Abysse</b> : 5 cartes, une Mythique ou mieux, toutes au moins argentées, avec <b>une Secrète que tu n’as pas</b>.</p>
@@ -411,7 +417,9 @@ export default function descent(app, root) {
         if (!chapDone(ch) && !seen[ch]) { seen[ch] = Date.now(); g.persist(); showStory(ch, after); } else after();
       } catch (e) { toast(esc(e.message), { kind: 'error' }); }
     },
-    story(el) { const ch = +el.dataset.c; app.sfx.page?.(); openSheet(`<div class="st-sheet">${storyHTML(ch)}</div>`, { label: 'Récit du chapitre', cls: 'dc-sheet' }); },
+    story(el) { /* v448 : titre du chapitre en tête de la fenêtre (plus de grand vide sous la croix), prologue ensuite */
+      const ch = +el.dataset.c, s = chapterStory(ch); app.sfx.page?.();
+      openSheet(`<div class="center st-head"><span class="bx-k">Chapitre ${ch} / ${CHAPTERS}</span><h2>${esc(s?.title || '')}</h2></div><div class="st-sheet st-sheet2">${ch === 1 ? `<span class="st-prok">Prologue</span><p class="st-pro">${esc(PROLOGUE)}</p>` : ''}<p class="bx-p">${esc(s?.text || '')}</p></div>`, { label: 'Récit du chapitre', cls: 'dc-sheet' }); },
     omeninfo() { const o = OMENS[g.descent().run?.omen]; if (o) openSheet(`<h2 class="center">${esc(o.name)}</h2><p><b class="dc-good">Gain</b> ${esc(o.gain)}</p><p><b class="dc-bad">Prix</b> ${esc(o.cost)}</p><p class="small muted">Il dure tout le chapitre.</p>`, { label: 'Présage', cls: 'dc-sheet sheet-small' }); },
     omenpick(el) { ui.omen = el.dataset.k; app.sfx.tap(); render(); },
     omengo() {

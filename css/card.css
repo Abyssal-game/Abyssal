@@ -363,3 +363,5 @@ html.reduce-motion .tcg.apex::before { animation: none; }
 
 /* v446 : cadre Enluminée refait (tools/variant-frame2.py) : barres extérieures calées à 12 px du bord de la carte, sans cassure au milieu */
 .v-gold .tcg-vframe { background-image: url(../assets/variants/enluminee-frame2.webp); background-size: 100% 100%; }
+/* v448 : cadre Argentée refait de la même façon (calé sur le bord) ; l'Abyssale, déjà calée, garde son cadre */
+.v-holo .tcg-vframe { background-image: url(../assets/variants/argentee-frame2.webp); background-size: 100% 100%; }
