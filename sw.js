@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v436';
+const VERSION = 'abyssal-v437';
 const ART_CACHE = 'abyssal-media';  // images du jeu : gardées entre les versions
 const FONT_CACHE = 'abyssal-fonts';
 const CORE = [
@@ -19,7 +19,7 @@ const CORE = [
   'data/cards/infernal.json', 'data/cards/abyssal.json', 'data/cards/celeste.json', 'data/cards/sauvage.json',
   'data/cards/necrotique.json', 'data/cards/primordial.json', 'data/cards/artificiel.json',
   'assets/art/manifest.json',
-  ...['standard', 'premium', 'event', 'infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel', 'abysse'].map((k) => `assets/packs/${k}.webp`),
+  ...['standard', 'premium', 'event', 'infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel', 'abysse', 'abysse2'].map((k) => `assets/packs/${k}.webp`),
   'assets/backs/back.webp', 'assets/brand/emblem.webp', 'assets/brand/title.webp', 'assets/brand/loading.webp',
   ...['bg-1', 'bg-2', 'bg-3', 'bg-4', 'bg-boss', 'f-1', 'f-2', 'f-3', 'f-4', 'f-5', 'f-6', 'f-7', 'f-8', 'f-9', 'f-10', 'f-11', 'f-12', 'f-13', 'f-14', 'f-15', 'f-16', 'g-1', 'g-2', 'g-3', 'g-4', 'g-5', 'g-6', 'g-7', 'g-8'].map((k) => `assets/battle/${k}.webp`),
   ...['home', 'descent', 'shop', 'collection', 'team', 'chests', 'bestiary', 'trophies', 'profile', 'menu', 'factions', 'door-fight', 'door-elite', 'door-boss', 'door-gouffre', 'rest', 'altar', 'treasure'].map((k) => `assets/scenes/${k}.webp`),
