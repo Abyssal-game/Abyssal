@@ -3858,3 +3858,7 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 /* v435 : bannière des Énigmes refaite au bon format (16:9 recadré en 3:1) */
 .bn-enigmes { --bn: url(../assets/ui/bn-enigmes3.webp); }
 .gm-enigmes .gm-art { background-position: center; }
+/* v436 : onglet Butin : le rond ne touche plus le mot (son anneau sombre le recouvrait) et le mot est sur la même ligne que les autres */
+.tab-main .orb { width: 56px; height: 56px; margin-top: -30px; margin-bottom: 8px; }
+.tab-main .orb .tab-pic { width: 42px; height: 42px; }
+.tab-main .badge { top: -26px; left: calc(50% + 14px); z-index: 2; } /* v436 : pastille au bord du rond, sans cacher l'image */
