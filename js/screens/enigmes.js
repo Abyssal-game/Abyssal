@@ -24,12 +24,12 @@ export default function enigmesScreen(app, root) {
     document.querySelector('.sc-scene')?.remove();
     setScene('menu');
     if (!g.sceauxOpen()) {
-      root.innerHTML = `<header class="screen-head ui-hero bn-sceaux"><h1>Les Énigmes des Sceaux</h1><p class="muted">Trois casse-têtes par jour.</p></header>
+      root.innerHTML = `<header class="screen-head ui-hero bn-enigmes"><h1>Les Énigmes des Sceaux</h1><p class="muted">Trois casse-têtes par jour.</p></header>
         <section class="panel tr-lock">${icon('lock')}<b>Encore scellées</b><p class="small">Vaincs ton <b>premier gardien</b> dans la Descente (étage 5) pour ouvrir les Énigmes.</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`;
       return;
     }
     const e = g.enigmes(), list = g.enigmePuzzles(), R = EG.ENIGME_REWARD;
-    root.innerHTML = `<header class="screen-head ui-hero bn-sceaux"><h1>Les Énigmes des Sceaux</h1><p class="muted">Trouve la pose qui capture le plus de cartes. Trois énigmes par jour, les mêmes pour tous.</p>
+    root.innerHTML = `<header class="screen-head ui-hero bn-enigmes"><h1>Les Énigmes des Sceaux</h1><p class="muted">Trouve la pose qui capture le plus de cartes. Trois énigmes par jour, les mêmes pour tous.</p>
         <span class="sc-rec">${e.solved} énigme${e.solved > 1 ? 's' : ''} résolue${e.solved > 1 ? 's' : ''} · ${e.starsTotal} ★${e.streak ? ` · série de ${e.streak} jour${e.streak > 1 ? 's' : ''}` : ''}</span></header>
       <div class="eg-list">${list.map((pz, k) => {
         const done = e.done[k], st = e.stars[k], left = EG.TRIES - e.tries[k];

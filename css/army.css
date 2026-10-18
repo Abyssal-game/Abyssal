@@ -3848,3 +3848,7 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 .eg-took .sc-card { animation: egTook .5s ease-out; }
 @keyframes egTook { 0% { transform: rotateY(90deg) scale(1.1); } 100% { transform: none; } }
 .eg-game .sc-msg .eg-stars { font-size: 1rem; }
+/* v431 : bannières Gemini des Enchères et des Énigmes */
+.bn-encheres { --bn: url(../assets/ui/bn-encheres.webp); }
+.bn-enigmes { --bn: url(../assets/ui/bn-enigmes.webp); }
+.gm-encheres .gm-art, .gm-enigmes .gm-art { background-position: right center; }

@@ -36,21 +36,21 @@ export default function encheresScreen(app, root) {
     document.querySelector('.sc-scene')?.remove();
     setScene('menu');
     if (!g.sceauxOpen()) {
-      root.innerHTML = `<header class="screen-head ui-hero bn-sceaux"><h1>Les Enchères de Mammon</h1><p class="muted">Des enchères à l’aveugle, à trois.</p></header>
+      root.innerHTML = `<header class="screen-head ui-hero bn-encheres"><h1>Les Enchères de Mammon</h1><p class="muted">Des enchères à l’aveugle, à trois.</p></header>
         <section class="panel tr-lock">${icon('lock')}<b>Encore scellées</b><p class="small">Vaincs ton <b>premier gardien</b> dans la Descente (étage 5) pour ouvrir la salle des ventes.</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`;
       return;
     }
     const en = g.s.encheres, dailyDone = en.dailyDone === todayKey(), d = g.encheresDaily(), DT = EN.TABLE[d.table];
     const tables = EN.TABLES.map((t, i) => {
       const open = EN.tableUnlocked(g.s, i), won = en.beaten[t.key], [A, B] = t.seats.map((k) => EN.BIDDERS[k]);
-      return [open, `<button class="sc-rival mq-tbl ${open ? '' : 'locked'} ${won ? 'won' : ''}" data-en="play" data-t="${t.key}" ${open ? '' : 'disabled'} style="background-image:linear-gradient(90deg, rgba(12, 13, 20, .97) 42%, rgba(12, 13, 20, .45) 76%, rgba(12, 13, 20, .15)), url(assets/sceaux/salle-necrotique.webp)">
+      return [open, `<button class="sc-rival mq-tbl ${open ? '' : 'locked'} ${won ? 'won' : ''}" data-en="play" data-t="${t.key}" ${open ? '' : 'disabled'} style="background-image:linear-gradient(90deg, rgba(12, 13, 20, .97) 42%, rgba(12, 13, 20, .45) 76%, rgba(12, 13, 20, .15)), url(assets/sceaux/salle-encheres.webp)">
         <span class="mq-pors"><span class="sc-por">${pic(t.seats[0])}</span><span class="sc-por">${pic(t.seats[1])}</span></span>
         <span class="sc-ri"><b>${esc(t.name)}</b><span class="small">${esc(A.name)} et ${esc(B.name)} · ${stars(t.stars)}</span>
         <span class="small muted">${open ? `+${t.reward} éclats${won ? '' : ` · 1re victoire : +${EN.ENCHERES_REWARD.firstWin} et ${esc(CHEST_NAME[t.chest].toLowerCase())}`}` : `Gagne à ${esc(EN.TABLES[i - 1].name)} pour y entrer`}</span></span>
         ${won ? `<span class="sc-won">${icon('check')}</span>` : open ? icon('next') : icon('p:mysteries')}</button>`];
     });
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
-    root.innerHTML = `<header class="screen-head ui-hero bn-sceaux"><h1>Les Enchères de Mammon</h1><p class="muted">Offre plus que les autres… sans jamais offrir pareil.</p>
+    root.innerHTML = `<header class="screen-head ui-hero bn-encheres"><h1>Les Enchères de Mammon</h1><p class="muted">Offre plus que les autres… sans jamais offrir pareil.</p>
         <span class="sc-rec">${en.wins} victoire${en.wins > 1 ? 's' : ''} · ${en.losses} défaite${en.losses > 1 ? 's' : ''}</span></header>
       ${g.encheresDailyOpen() ? `<button class="panel sc-daily ${dailyDone ? 'done' : ''}" data-en="daily" ${dailyDone ? 'disabled' : ''}>
         <img alt="" src="assets/icons/hourglass.webp"><span><b>Défi du jour</b><span class="small">${esc(DT.name)} · la même vente pour tous</span>
@@ -70,7 +70,7 @@ export default function encheresScreen(app, root) {
     let el = document.querySelector('.sc-scene');
     if (!el) { el = document.createElement('div'); document.body.prepend(el); }
     el.className = 'sc-scene mq-scene';
-    el.style.backgroundImage = 'url(assets/sceaux/salle-necrotique.webp)';
+    el.style.backgroundImage = 'url(assets/sceaux/salle-encheres.webp)';
   }
   // Lots gagnés : une pastille par faction (doré à 3 : famille complète), et le total des malédictions
   const wonHTML = (st, x) => {
