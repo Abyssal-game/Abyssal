@@ -88,7 +88,7 @@ export default function trials(app, root) {
       <p class="small muted center ep-intro">Les ennemis sont réglés sur tes <b>meilleures cartes</b> : ni trop faciles, ni impossibles. Une seule tentative par Épreuve ; elles reviennent à minuit.</p>
       <div class="ep-list">${TRIALS.map((_, i) => cardHTML(i)).join('')}</div>
       <section class="panel ep-team">${teamStrip(team)}<div class="dc-teambtns"><a class="btn small ghost dc-plq dc-plq-dark" href="#/equipe">${icon('p:team-ic')}Mon équipe</a><a class="btn small ghost dc-plq dc-plq-dark" href="#/renfort">${icon('p:level-up')}Renforcer</a></div></section>
-      <section class="panel dc-rule bn-rule" style="--rf:${r.faction ? cat.faction[r.faction].colors.secondary : 'var(--gold)'}"><span class="dc-rule-ic">${r.faction ? sigil(r.faction) : picon('rule')}</span><span><span class="small muted">Règle du jour</span><b>${esc(r.name)}</b><span class="small">${esc(r.desc)}</span></span></section>
+      ${r.off ? '' : `<section class="panel dc-rule bn-rule" style="--rf:${r.faction ? cat.faction[r.faction].colors.secondary : 'var(--gold)'}"><span class="dc-rule-ic">${r.faction ? sigil(r.faction) : picon('rule')}</span><span><span class="small muted">Règle du jour</span><b>${esc(r.name)}</b><span class="small">${esc(r.desc)}</span></span></section>`}
       <div class="dc-links">
         <button class="dc-link" data-act="open" data-f="season">${picon('season')}<b>Saison</b><small>paliers du mois</small></button>
         <button class="dc-link" data-act="open" data-f="board">${picon('crown')}<b>Classement</b><small>du jour</small></button>

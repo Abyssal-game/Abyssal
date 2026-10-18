@@ -82,7 +82,7 @@ export default function descent(app, root) {
         <p class="small dc-riskwarn">${icon('skull')} ${NIGHT_TIERS[nt()].name} : les ennemis ont la force de l’<b>étage ${g.nightmareEquiv(start, nt())}</b> en mode normal, et les gardiens sont déchaînés. Chaque étage gagné pour la première fois à ce palier redonne sa récompense, en plus généreux.${riskAdvice()}</p>` : ''}
       </section>
       ${summitHTML(d)}
-      ${ruleHTML(g.rule())}
+      ${g.rule().off ? '' : ruleHTML(g.rule())}
       <div class="dc-links dc-links-one">
         <button class="dc-link" data-act="open" data-f="how">${picon('help')}<b>Comment ça marche</b><small>en ${HOW.length} étapes</small></button>
       </div>`;

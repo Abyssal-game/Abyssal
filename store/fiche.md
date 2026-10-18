@@ -82,7 +82,6 @@ COMBATS TACTIQUES
 • Les Épreuves du jour : trois combats à ta mesure chaque jour, un coffre par victoire
 • Esquive et pare les coups au bon moment, brise la garde des gardiens
 • Rapporte des coffres, et le légendaire Booster de l'Abysse
-• Une règle différente chaque jour pour changer ta stratégie
 
 LES DUELS DES SCEAUX
 • Un second jeu de cartes : pose tes créatures sur le plateau et capture celles de l'adversaire

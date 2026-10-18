@@ -261,7 +261,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       st.aspect ? `<span class="cb-law" data-d="rule" data-k="aspect"><b>${esc(ASPECTS[st.aspect].name)}</b></span>` : '',
       st.runes ? `<span class="cb-law cb-runes" data-d="rule" data-k="runes" title="Runes du gardien">${st.runes.map((r) => `<img alt="" src="assets/ui/${r.broken ? 'rune-broken' : 'rune'}.webp" class="${r.broken ? 'off' : ''}">`).join('')}<b>${runesLeft(st) ? `−${runesLeft(st) * 10} %` : 'Rompues'}</b></span>` : '',
       st.omen && OMENS[st.omen] ? `<span class="cb-law" data-d="rule" data-k="omen">${icon(OMENS[st.omen].icon)}<b>Présage</b></span>` : (st.relics || []).length ? `<span class="cb-law" data-d="rule" data-k="relics">${icon('p:crown')}<b>${st.relics.length} relique${st.relics.length > 1 ? 's' : ''}</b></span>` : '',
-      run?.day && g.rule(run.day) ? `<span class="cb-law cb-day" data-d="rule" data-k="day">${icon('p:rule')}<b>${esc(g.rule(run.day).name)}</b></span>` : ''].join(''); /* v400 : règle du jour en dernier */
+      run?.day && g.rule(run.day) && !g.rule(run.day).off ? `<span class="cb-law cb-day" data-d="rule" data-k="day">${icon('p:rule')}<b>${esc(g.rule(run.day).name)}</b></span>` : ''].join(''); /* v400 : règle du jour en dernier */
     const rulesEl = $('.cb-rules'); if (rulesEl) { setHTML(rulesEl, rules); rulesEl.hidden = !rules; }
     const night = st.bossKey === 'abysse' && Object.values(st.units).some((u) => u.boss && u.night && u.hp > 0), dvEl = $('.dv'); /* v392 : la Nuit sans fin assombrit et fissure la salle */
     if (dvEl && dvEl.classList.contains('abyss-night') !== night) dvEl.classList.toggle('abyss-night', night);

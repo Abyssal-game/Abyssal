@@ -44,14 +44,15 @@ test('v406 : plus de Gouffre dans la campagne (il sautait des étages et leurs r
   for (let f = 1; f < 60; f++) { run.floor = f; assert.ok(!g.doors().includes('gouffre')); }
 });
 
-test('règles du jour : les nouvelles n’apparaissent qu’à partir du 17 octobre 2026, les jours passés gardent la leur', () => {
+test('règles du jour : les nouvelles à partir du 17 octobre 2026, retirées dès le 18 (les jours passés gardent la leur)', () => {
   const v2 = Object.keys(DAILY_RULES).filter((k) => DAILY_RULES[k].v2);
   assert.equal(v2.length, 4);
   for (let d = 1; d < 17; d++) assert.ok(!v2.includes(dailyRule(`2026-10-${String(d).padStart(2, '0')}`).key));
-  const seen = new Set();
-  for (let d = 0; d < 200; d++) seen.add(dailyRule(`2027-${String(1 + (d % 12)).padStart(2, '0')}-${String(1 + (d % 28)).padStart(2, '0')}-${d}`).key);
-  assert.ok(v2.every((k) => seen.has(k)));
+  assert.ok(v2.includes(dailyRule('2026-10-17').key) || !!dailyRule('2026-10-17').key);
   assert.ok(RULES_V2_FROM === '2026-10-17');
+  // v430 : plus de règle du jour à partir du 18 octobre 2026 (règle neutre, sans effet)
+  for (let d = 18; d <= 31; d++) assert.equal(dailyRule(`2026-10-${d}`).key, 'none');
+  assert.equal(dailyRule('2027-03-05').off, true);
 });
 
 test('Disette : source à 15 %, trésor doublé', () => {

@@ -207,7 +207,10 @@ export const DAILY_RULES = {
 export const RULES_V2_FROM = '2026-10-17';
 const RULE_KEYS_V1 = Object.keys(DAILY_RULES).filter((k) => !DAILY_RULES[k].v2), RULE_KEYS_V2 = Object.keys(DAILY_RULES);
 const RULE_FACTIONS = ['infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel'];
+// v430 : règles du jour retirées à la demande du propriétaire (à partir du 18 octobre 2026) : règle neutre, sans effet ni affichage
+export const RULES_OFF_FROM = '2026-10-18';
 export function dailyRule(day, factionNames = {}) {
+  if (String(day) >= RULES_OFF_FROM) return { key: 'none', faction: null, name: '', desc: '', off: true };
   const rng = rngOf(`rule:${day}`);
   const keys = String(day) >= RULES_V2_FROM ? RULE_KEYS_V2 : RULE_KEYS_V1; // les jours passés gardent leur règle
   const key = keys[Math.floor(rng() * keys.length)];
