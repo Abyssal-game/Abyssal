@@ -1,0 +1,204 @@
+// v449 : Le Pacte — jeu de « tenter sa chance » à deux (toi contre un arbitre de l'Abysse).
+// Le paquet : 49 cartes (7 factions × valeurs 1 à 7) et 9 cartes spéciales (3 Sceaux, 3 Gardiens, 3 Offrandes).
+// À ton tour, tu tires des cartes une à une et tu les poses devant toi. Tu t'arrêtes quand tu veux : tu gagnes la somme
+// des cartes posées. Mais si tu tires une faction déjà posée ce tour-ci, le pacte se brise : tu perds tout le tour.
+// Sceau : protège d'une brisure (la carte en double est jetée). Gardien : arrêt forcé (tu encaisses tout de suite).
+// Offrande : double la carte de faction suivante. Les 7 factions dans le même tour : +15 et le tour s'arrête.
+// Le premier à 60 points gagne (tour complet : l'adversaire joue toujours le même nombre de tours que toi).
+// Moteur pur (aucun DOM) : l'état est un objet simple, sauvegardé tel quel dans s.pacte.cur.
+import { FACTION_ORDER } from '../config.js';
+
+export const TARGET = 60;
+export const SEVEN_BONUS = 15;
+export const VALUES = 7;
+export const SPECIALS = { sceau: 3, gardien: 3, offrande: 3 };
+
+function hash(str) {
+  let h = 2166136261;
+  for (const ch of str) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
+  return h;
+}
+function mulberry(seed) {
+  let a = seed >>> 0;
+  return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+const shuffle = (arr, r) => { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; };
+
+// Adversaires : les arbitres des Sceaux. style : 'prudent' (s'arrête tôt), 'seuil' (s'arrête à un total), 'calcul'
+// (compare le gain espéré au risque, en comptant les cartes vues) ; risk : goût du risque (+ téméraire, − prudent) ;
+// race : prend plus de risques quand il est mené ; noise : part d'erreurs.
+export const RIVALS = {
+  initie: { name: 'Ilda', style: 'prudent', stop: 1, risk: 0, race: 0, noise: 0.1, hint: 'Très prudente : elle s’arrête après une ou deux cartes.',
+    hello: 'Un pacte ? Je signe… mais seulement un petit.', beaten: 'J’aurais dû tirer une carte de plus.', gloat: 'Petit à petit, j’ai gagné !' },
+  collectionneur: { name: 'Maître Orvel', style: 'seuil', stop: 6, risk: 0, race: 0, noise: 0.1, hint: 'S’arrête dès qu’il a 6 points devant lui, quoi qu’il arrive.',
+    hello: 'Six. Toujours six. C’est un nombre qui porte chance.', beaten: 'Six ne m’a pas porté chance.', gloat: 'Je te l’avais dit : six.' },
+  maitre: { name: 'Le Maître des Sceaux', style: 'calcul', risk: 0, race: 0.4, noise: 0.05, hint: 'Compte les cartes déjà tirées et pèse chaque risque.',
+    hello: 'Chaque pacte a un prix. Je connais toujours le prix.', beaten: 'Le hasard… a mal compté.', gloat: 'Le compte était juste.' },
+  banquier: { name: 'Mammon', style: 'calcul', risk: 0.12, race: 0.8, noise: 0.03, head: 6, hint: 'Calcule tout, ose davantage quand il est mené, et commence avec 6 points : la part de la maison.',
+    hello: 'Signe ici, et ici. Les petites lignes ? Elles sont pour moi.', beaten: 'Un pacte rompu… à mes dépens ? Inadmissible.', gloat: 'La maison gagne toujours.' },
+};
+export const TABLES = [
+  { key: 'novice', name: 'Le Pacte du novice', stars: 1, rival: 'initie', reward: 25, chest: 'bois' },
+  { key: 'six', name: 'Le Pacte des six', stars: 2, rival: 'collectionneur', reward: 35, chest: 'fer' },
+  { key: 'sceaux', name: 'Le Pacte des Sceaux', stars: 3, rival: 'maitre', reward: 50, chest: 'or' },
+  { key: 'mammon', name: 'Le Pacte de Mammon', stars: 4, rival: 'banquier', reward: 70, chest: 'abyssal' },
+];
+export const TABLE = Object.fromEntries(TABLES.map((t) => [t.key, t]));
+export const tableUnlocked = (s, i) => i === 0 || !!s.pacte?.beaten?.[TABLES[i - 1].key];
+export const PACTE_REWARD = { firstWin: 100, daily: 40, dailyPaid: 5, afterCap: 5, xp: 10 };
+export const PACTE_TITLE = 'Signataire de l’Abîme';
+export const dailyTable = (day, unlocked) => TABLES[hash(`pacte:${day}`) % Math.max(1, Math.min(unlocked, TABLES.length))].key;
+
+// Rareté de l'illustration selon la valeur (pour l'écran seulement)
+const RAR_OF = (v) => (v <= 2 ? 'C' : v === 3 ? 'PC' : v === 4 ? 'R' : v === 5 ? 'HR' : v === 6 ? 'M' : 'S');
+
+function buildDeck(cat, r) {
+  const deck = [];
+  for (const f of FACTION_ORDER) {
+    const pool = cat?.byFaction?.[f] || [];
+    const used = new Set();
+    for (let v = 1; v <= VALUES; v++) {
+      const fit = pool.filter((c) => c.rarity === RAR_OF(v) && !used.has(c.id));
+      const list = fit.length ? fit : pool.filter((c) => !used.has(c.id));
+      const id = list.length ? list[Math.floor(r() * list.length)].id : null;
+      if (id) used.add(id);
+      deck.push({ f, v, id });
+    }
+  }
+  for (const [k, n] of Object.entries(SPECIALS)) for (let i = 0; i < n; i++) deck.push({ sp: k });
+  return shuffle(deck, r);
+}
+
+export function newGame(cat, { table, seed = Date.now(), daily = false }) {
+  const T = TABLE[table];
+  if (!T) throw new Error('Table inconnue.');
+  const r = mulberry(seed);
+  return { table, daily, seed, shuf: 0, rival: T.rival, deck: buildDeck(cat, r), discard: [], scores: { p: 0, a: RIVALS[T.rival].head || 0 },
+    turn: 'p', row: [], sceaux: 0, offer: false, round: 1, turns: { p: 0, a: 0 }, last: null, over: null, final: null, stats: { busts: { p: 0, a: 0 }, best: { p: 0, a: 0 }, sevens: { p: 0, a: 0 } } };
+}
+
+// Valeur du tour en cours (cartes de faction posées, Offrandes comprises)
+export const rowValue = (st) => st.row.reduce((n, c) => n + (c.f ? c.v * (c.x2 ? 2 : 1) : 0), 0);
+export const rowFactions = (st) => new Set(st.row.filter((c) => c.f).map((c) => c.f));
+
+function takeCard(st) {
+  if (!st.deck.length) {
+    // paquet vide : la défausse est mélangée (même graine pour tous : le défi du jour reste le même)
+    st.shuf++;
+    st.deck = shuffle(st.discard.splice(0), mulberry(st.seed + st.shuf * 7919));
+  }
+  return st.deck.pop();
+}
+
+// Chance que la prochaine carte brise le pacte (le Sceau n'est pas compté ici : il protège, la carte reste brisante)
+export function bustChance(st) {
+  const fs = rowFactions(st);
+  if (!fs.size) return 0;
+  const src = st.deck.length ? st.deck : st.discard;
+  if (!src.length) return 0;
+  return src.filter((c) => c.f && fs.has(c.f)).length / src.length;
+}
+
+function bank(st, who, why) {
+  const v = rowValue(st) + (why === 'seven' ? SEVEN_BONUS : 0);
+  st.scores[who] += v;
+  st.stats.best[who] = Math.max(st.stats.best[who], v);
+  if (why === 'seven') st.stats.sevens[who]++;
+  return v;
+}
+function endTurn(st, who) {
+  st.discard.push(...st.row.map(({ x2, ...c }) => c));
+  st.row = []; st.sceaux = 0; st.offer = false; st.turns[who]++;
+  if (who === 'a') {
+    // fin du tour complet : quelqu'un a atteint le but ?
+    if (st.scores.p >= TARGET || st.scores.a >= TARGET) {
+      if (st.scores.p !== st.scores.a) {
+        st.over = st.scores.p > st.scores.a ? 'won' : 'lost';
+        st.final = { scores: { ...st.scores } };
+        return;
+      }
+    }
+    st.round++;
+  }
+  st.turn = who === 'p' ? 'a' : 'p';
+}
+
+// Tire une carte pour le joueur dont c'est le tour. Renvoie l'événement pour l'écran.
+export function draw(st) {
+  if (st.over) throw new Error('La partie est terminée.');
+  const who = st.turn;
+  const c = takeCard(st);
+  const ev = { who, card: c, result: 'ok', gain: 0 };
+  if (c.sp === 'sceau') { st.sceaux++; st.row.push(c); }
+  else if (c.sp === 'offrande') { st.offer = true; st.row.push(c); }
+  else if (c.sp === 'gardien') { st.row.push(c); ev.result = 'forced'; ev.gain = bank(st, who, 'forced'); endTurn(st, who); }
+  else {
+    const fs = rowFactions(st);
+    if (fs.has(c.f)) {
+      if (st.sceaux > 0) {
+        st.sceaux--; ev.result = 'saved';
+        const s = st.row.findIndex((x) => x.sp === 'sceau');
+        if (s >= 0) st.discard.push(st.row.splice(s, 1)[0]);
+        st.discard.push(c);
+        if (st.offer) st.offer = false;
+      } else {
+        st.row.push(c); ev.result = 'bust'; ev.lost = rowValue(st) - c.v * (st.offer ? 2 : 1);
+        st.stats.busts[who]++; endTurn(st, who);
+      }
+    } else {
+      const x2 = st.offer; st.offer = false;
+      st.row.push(x2 ? { ...c, x2: true } : c);
+      ev.x2 = x2;
+      if (rowFactions(st).size === FACTION_ORDER.length) { ev.result = 'seven'; ev.gain = bank(st, who, 'seven'); endTurn(st, who); }
+    }
+  }
+  st.last = ev;
+  return ev;
+}
+
+// S'arrêter : on encaisse le tour
+export function stop(st) {
+  if (st.over) throw new Error('La partie est terminée.');
+  const who = st.turn;
+  if (!st.row.some((c) => c.f)) throw new Error('Tire au moins une carte de faction avant de t’arrêter.');
+  const gain = bank(st, who, 'stop');
+  endTurn(st, who);
+  const ev = { who, result: 'stop', gain };
+  st.last = ev;
+  return ev;
+}
+
+// Valeur moyenne d'une carte de faction non brisante encore dans le paquet
+function meanSafe(st) {
+  const fs = rowFactions(st), src = st.deck.length ? st.deck : st.discard;
+  const ok = src.filter((c) => c.f && !fs.has(c.f));
+  return ok.length ? ok.reduce((n, c) => n + c.v, 0) / ok.length : 3;
+}
+// L'adversaire continue-t-il ? (décision avant chaque tirage)
+export function aiWants(st, rng = Math.random) {
+  const R = RIVALS[st.rival], who = st.turn, me = st.scores[who], opp = st.scores[who === 'p' ? 'a' : 'p'];
+  const v = rowValue(st), nf = st.row.filter((c) => c.f).length;
+  if (!nf) return true;
+  // dernier tour : s'il faut rattraper, on tire tant qu'on n'a pas dépassé
+  if (who === 'a' && st.scores.p >= TARGET && me + v <= st.scores.p) return true;
+  if (me + v >= TARGET && me + v > opp) return false;
+  if (rng() < R.noise) return rng() < 0.5;
+  if (R.style === 'prudent') return nf < R.stop + (rng() < 0.4 ? 1 : 0);
+  if (R.style === 'seuil') return v < R.stop;
+  // calcul : gain espéré du tirage contre perte espérée ; mené → plus d'audace
+  const p = bustChance(st), protect = st.sceaux > 0 ? 0.15 : 1;
+  const behind = Math.max(0, opp - me) / TARGET;
+  const gain = (1 - p) * meanSafe(st) * (st.offer ? 2 : 1) + (rowFactions(st).size === 6 ? (1 - p) * SEVEN_BONUS : 0);
+  const loss = p * v * protect;
+  return gain * (1 + R.risk + R.race * behind) > loss;
+}
+// Tour complet de l'adversaire (liste des événements, pour l'écran)
+export function aiTurn(st, rng = Math.random) {
+  const evs = [];
+  let guard = 0;
+  while (!st.over && st.turn === 'a' && guard++ < 60) {
+    if (aiWants(st, rng)) evs.push(draw(st));
+    else evs.push(stop(st));
+  }
+  return evs;
+}

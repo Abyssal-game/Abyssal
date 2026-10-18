@@ -21,6 +21,7 @@ import { FORMS, formUnlocked } from './forms.js';
 import * as SC from './sceaux.js';
 import * as MQ from './masques.js';
 import * as EN from './encheres.js';
+import * as PA from './pacte.js';
 import * as EG from './enigmes.js';
 import { FERVOR_START, FERVOR_MAX, FERVOR_CARRY, TALENTS } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
@@ -1046,6 +1047,57 @@ export class Game {
     return out;
   }
   encheresQuit() { this.s.encheres.cur = null; this.persist(); }
+  // ——— v449 : Le Pacte (tenter sa chance à deux), ouvert avec la Salle des jeux ———
+  pacteUnlocked() { return PA.TABLES.filter((_, i) => PA.tableUnlocked(this.s, i)).length; }
+  pacteDailyOpen() { return !!this.s.pacte.beaten?.novice; }
+  pacteDaily() { const day = today(this.clock()); return { table: PA.dailyTable(day, this.pacteUnlocked()), seed: [...`pacte:${day}`].reduce((h, c) => (Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0), 2166136261) }; }
+  pacteStart({ table, daily = false } = {}) {
+    const pa = this.s.pacte;
+    if (!this.sceauxOpen()) throw new Error('Le Pacte s’ouvre après ton premier gardien.');
+    let seed = Math.floor(this.rng() * 2 ** 31);
+    if (daily) {
+      if (!this.pacteDailyOpen()) throw new Error('Le défi du jour s’ouvre après ta première victoire au Pacte du novice.');
+      if (pa.dailyDone === today(this.clock())) throw new Error('Défi du jour déjà relevé. Reviens demain !');
+      const d = this.pacteDaily(); table = d.table; seed = d.seed;
+    } else {
+      const i = PA.TABLES.findIndex((x) => x.key === table);
+      if (i < 0) throw new Error('Table inconnue.');
+      if (!PA.tableUnlocked(this.s, i)) throw new Error('Gagne d’abord le pacte précédent.');
+    }
+    pa.cur = PA.newGame(this.catalog, { table, seed, daily });
+    this.persist();
+    return pa.cur;
+  }
+  pacteDraw() { const st = this.s.pacte.cur; if (!st || st.over || st.turn !== 'p') throw new Error('Ce n’est pas ton tour.'); const ev = PA.draw(st); this.persist(); return ev; }
+  pacteStop() { const st = this.s.pacte.cur; if (!st || st.over || st.turn !== 'p') throw new Error('Ce n’est pas ton tour.'); const ev = PA.stop(st); this.persist(); return ev; }
+  pacteAi() { const st = this.s.pacte.cur; if (!st || st.over || st.turn !== 'a') return []; const evs = PA.aiTurn(st, this.rng); this.persist(); return evs; }
+  pacteFinish() {
+    const pa = this.s.pacte, st = pa.cur;
+    if (!st || !st.over) throw new Error('La partie n’est pas terminée.');
+    if (st.rewarded) return st.result;
+    const day = today(this.clock());
+    if (pa.day !== day) { pa.day = day; pa.paidToday = 0; }
+    const T = PA.TABLE[st.table], R = PA.PACTE_REWARD;
+    const out = { result: st.over, shards: 0, first: false, title: null, daily: st.daily, capped: false, chests: [] };
+    if (st.over === 'won') {
+      pa.wins++; pa.streak++; pa.best = Math.max(pa.best, pa.streak);
+      if (!pa.beaten[T.key]) { pa.beaten[T.key] = Date.now(); out.first = true; out.shards += R.firstWin; out.chests.push(T.chest); }
+      if (st.daily && pa.dailyDone !== day) { pa.dailyDone = day; out.shards += R.daily; out.chests.push('bois'); }
+      if (pa.paidToday < R.dailyPaid) { pa.paidToday++; out.shards += T.reward; } else { out.capped = true; out.shards += R.afterCap; }
+      out.chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });
+      if (T.key === PA.TABLES.at(-1).key && !this.s.titles.includes(PA.PACTE_TITLE)) { this.s.titles.push(PA.PACTE_TITLE); out.title = PA.PACTE_TITLE; }
+    } else { pa.losses++; pa.streak = 0; }
+    this.s.shards += out.shards;
+    out.xp = R.xp; this.s.xp += out.xp;
+    pa.history.unshift({ t: Date.now(), table: T.key, r: st.over, s: st.final?.scores });
+    pa.history = pa.history.slice(0, 20);
+    st.rewarded = true; st.result = out;
+    this.track('pacte', 1);
+    this.checkProgress();
+    this.persist();
+    return out;
+  }
+  pacteQuit() { this.s.pacte.cur = null; this.persist(); }
   // ——— v427 : les Énigmes des Sceaux (trois casse-têtes par jour) ———
   enigmes() {
     const e = this.s.enigmes, day = today(this.clock());
