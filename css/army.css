@@ -4270,3 +4270,44 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .cx-fin { position: relative; display: block; width: 58px; aspect-ratio: 5 / 7; border-radius: 6px; overflow: hidden; box-shadow: 0 4px 10px rgba(0, 0, 0, .6); }
 .cx-fin img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .cx-fin img + img { object-fit: fill; }
+
+/* v483 : Profil sans bouton « Personnaliser » (portrait plus grand, toucher l'en-tête ouvre le menu) et menu Personnaliser */
+.profile-head { cursor: pointer; }
+.profile-head .avatar-big { width: 132px; height: 132px; }
+.profile-head .ph-text { min-width: 0; }
+.ph-hint { display: inline-block; margin-top: 4px; color: #E8C987; font-size: .78rem; }
+.pf-custom-row { display: grid; grid-template-columns: 52px 1fr auto; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; margin: 0 0 12px; text-align: left; color: inherit; font: inherit; cursor: pointer; }
+.pf-cr-ic { width: 46px; height: 46px; object-fit: contain; }
+.pf-cr-t { display: grid; gap: 3px; min-width: 0; }
+.pf-cr-t b { font: 700 1.05rem/1.2 var(--f-display); color: #F2D9A0; }
+.pf-cr-go svg { width: 18px; height: 18px; opacity: .7; }
+.cs-hero { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; padding: 14px; margin: 6px 0 14px; border-radius: 4px 14px 4px 14px; border: 1px solid rgba(201, 164, 90, .35); background: radial-gradient(ellipse at 20% 50%, rgba(120, 80, 200, .25), transparent 60%), rgba(10, 11, 18, .85); }
+.cs-hero .avatar-big { width: 84px; height: 84px; }
+.cs-hero > div { display: grid; gap: 4px; min-width: 0; }
+.cs-name { font: 800 1.15rem/1.15 var(--f-display); color: #F2D9A0; }
+.cs-title { font-size: .85rem; color: #E8C987; }
+.cs-backnow { width: 46px; aspect-ratio: 5 / 7; border-radius: 5px; object-fit: cover; box-shadow: 0 4px 10px rgba(0, 0, 0, .6); transform: rotate(6deg); }
+.cs-menu { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.cs-tile { position: relative; display: grid; justify-items: center; align-content: start; gap: 6px; padding: 14px 8px 12px; min-height: 150px; border-radius: 4px 14px 4px 14px; border: 1px solid rgba(201, 164, 90, .35); background: linear-gradient(180deg, rgba(40, 30, 60, .55), rgba(10, 11, 18, .9)); color: inherit; font: inherit; text-align: center; cursor: pointer; }
+.cs-tile b { font: 700 .95rem/1.15 var(--f-display); color: #F2D9A0; }
+.cs-tile small { font-size: .74rem; color: var(--muted); line-height: 1.25; overflow-wrap: anywhere; }
+.cs-tile em { position: absolute; top: 8px; right: 10px; font-style: normal; font: 800 .78rem/1 var(--f-ui); color: #1A1206; background: #E8C987; border-radius: 999px; padding: 3px 7px; }
+.cs-tile.soon { opacity: .55; cursor: default; }
+.cs-pic { display: grid; place-items: center; height: 76px; }
+.cs-pic img { max-height: 76px; max-width: 70px; border-radius: 6px; object-fit: cover; }
+.cs-pic .avatar-mini { width: 56px; height: 56px; background: radial-gradient(circle, #2A2340, #0B0C12); }
+.cs-tile[data-v="avatar"] .cs-pic img { width: 64px; height: 64px; border-radius: 50%; }
+.cs-pic .ic, .cs-pic svg { width: 56px; height: 56px; }
+.cs-pic .cx-fin { width: 54px; }
+.cs-sec-h { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; }
+.cs-sec-h h3 { margin: 0; font: 800 1.05rem/1.2 var(--f-display); color: #F2D9A0; }
+.cs-back { display: inline-flex; align-items: center; gap: 4px; }
+.cs-fins { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 10px 0 14px; }
+.cs-fin { display: grid; justify-items: center; gap: 4px; padding: 6px; border-radius: 10px; border: 1px solid rgba(201, 164, 90, .3); background: rgba(10, 11, 18, .8); color: inherit; font: inherit; cursor: pointer; }
+.cs-fin[aria-pressed="true"] { border-color: #F2C14E; box-shadow: 0 0 12px rgba(242, 193, 78, .45); }
+.cs-dress .av-pick { position: relative; }
+.cs-dtag { position: absolute; top: 4px; left: 4px; right: 4px; font-style: normal; font-size: .6rem; font-weight: 700; color: #1A1206; background: rgba(232, 201, 135, .92); border-radius: 6px; padding: 2px 3px; }
+.profile-head { gap: 34px; padding-left: 34px; }
+.profile-head .avatar-big { width: 116px; height: 116px; }
+.profile-head .av-col { margin: 26px 0; }
+@media (max-width: 380px) { .profile-head { gap: 30px; padding-left: 30px; } .profile-head .avatar-big { width: 100px; height: 100px; } }

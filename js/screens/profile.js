@@ -5,7 +5,7 @@ import { icon, sigil, EMBLEM, picon, setIcon } from '../ui/icons.js';
 import { esc, fmt, pct, bindActions, toast, openSheet } from '../ui/dom.js';
 import { unlockSources } from '../core/unlocks.js';
 import { RARITIES, FRAMES, BOOSTERS, FACTION_ORDER, VARIANTS, RARITY, RARITY_ORDER } from '../config.js';
-import { CODEX_FRAMES, CODEX_BACKS } from '../core/codex.js';
+import { CODEX_FRAMES, CODEX_BACKS, FINISHES } from '../core/codex.js';
 
 export default function profile(app, root) {
   const g = app.game, cat = app.catalog;
@@ -37,21 +37,84 @@ export default function profile(app, root) {
   }
 
   const U = unlockSources(cat);
+
+  /* v483 : menu « Personnaliser » (remplace « Titres et cadres » et le bouton Personnaliser) : avatar, titres, cadres,
+     dos de cartes, finitions de prestige, et plus tard sachets de booster et arènes */
+  let cs = null, csTab = null;
+  function customHTML() {
+    const s = g.s, av = s.avatar && cat.get(s.avatar);
+    const allF = Object.entries({ ...FRAMES, ...CODEX_FRAMES }).filter(([k]) => s.frames.includes(k) || U.frames.some((f) => f.key === k));
+    const ownF = allF.filter(([k]) => s.frames.includes(k)), lockedF = allF.filter(([k]) => !s.frames.includes(k));
+    const lockedT = U.titles.filter((t) => !s.titles.includes(t.name));
+    const backs = [[null, 'Dos de l’Abysse', 'assets/backs/back.webp'], ...(s.backs || []).map((k) => [k, CODEX_BACKS[k] || k, `assets/backs/${k}.webp`])];
+    const backNow = backs.find(([k]) => (s.back || null) === k) || backs[0];
+    const fins = (s.finishes || []).filter((k) => FINISHES[k]);
+    const dressed = Object.keys(s.dress || {}).length;
+    const frameBtn = ([k, name]) => { const has = s.frames.includes(k), how = U.frames.find((f) => f.key === k)?.how || ''; return `<button class="frame-pick ${has ? '' : 'pf-lock'}" data-cs="${has ? 'frame' : 'how'}" data-v="${has ? k : esc(name)}" data-how="${esc(how)}" aria-pressed="${s.frame === k}"><span class="avatar-mini pf pf-${k}">${has ? '' : icon('lock')}</span><span class="small">${esc(name)}</span></button>`; };
+    const head = `<div class="cs-hero"><span class="avatar-big pf pf-${s.frame}">${av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM}</span><div><b class="cs-name">${esc(s.name || 'Ton nom')}</b><span class="cs-title">${esc(s.title)}</span></div><img class="cs-backnow" alt="" src="${backNow[2]}"></div>`;
+    const SECTIONS = [
+      ['avatar', 'Avatar', av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM, av ? esc(av.name) : 'Une de tes créatures', Object.keys(s.collection).length],
+      ['titles', 'Titres', picon('titles'), esc(s.title), `${s.titles.length}`],
+      ['frames', 'Cadres de profil', `<span class="avatar-mini pf pf-${s.frame}"></span>`, esc(({ ...FRAMES, ...CODEX_FRAMES })[s.frame] || ''), `${ownF.length}`],
+      ['backs', 'Dos de cartes', `<img alt="" src="${backNow[2]}">`, esc(backNow[1]), `${backs.length}`],
+      ['finishes', 'Finitions de cartes', fins.length ? `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"><img alt="" src="assets/variants/${fins[0]}-frame.webp"></span>` : `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"></span>`, fins.length ? `${dressed} carte${dressed > 1 ? 's' : ''} habillée${dressed > 1 ? 's' : ''}` : 'Contours peints des cartes', `${fins.length}`],
+      ['packs', 'Sachets de booster', '<img alt="" src="assets/packs/standard2.webp">', 'Bientôt', null],
+    ];
+    if (!csTab) return `${head}<div class="cs-menu">${SECTIONS.map(([k, n, pic, sub, cnt]) => `<button class="cs-tile ${cnt === null ? 'soon' : ''}" data-cs="tab" data-v="${k}" ${cnt === null ? 'disabled' : ''}><span class="cs-pic">${pic}</span><b>${n}</b><small>${sub}</small>${cnt !== null ? `<em>${cnt}</em>` : ''}</button>`).join('')}</div>`;
+    const back = `<button class="btn ghost small cs-back" data-cs="tab" data-v="">${icon('prev')}Personnaliser</button>`;
+    const title = SECTIONS.find(([k]) => k === csTab)?.[1] || '';
+    let body = '';
+    if (csTab === 'avatar') {
+      const ids = Object.keys(s.collection).filter((id) => cat.get(id));
+      body = ids.length ? `<div class="av-grid">${ids.map((id) => { const c = cat.get(id); return `<button class="av-pick ${s.avatar === id ? 'on' : ''}" data-cs="avatar" data-v="${id}" style="--rc:${RARITY[c.rarity].color}"><img alt="" loading="lazy" src="${artUrl(c, { lite: true })}"><small>${esc(c.name)}</small></button>`; }).join('')}</div>` : '<p class="muted center">Obtiens d’abord une créature dans un booster.</p>';
+    } else if (csTab === 'titles') {
+      body = `<div class="chips pf-titles">${s.titles.map((x) => `<button class="chip" data-cs="title" data-v="${esc(x)}" aria-pressed="${x === s.title}">${esc(x)}</button>`).join('')}</div>
+        ${lockedT.length ? `<h3 class="pf-tf-h">${icon('lock')} ${lockedT.length} titre${lockedT.length > 1 ? 's' : ''} à gagner</h3><p class="small muted">Touche un titre pour savoir comment l’obtenir.</p><div class="chips pf-titles">${lockedT.map((x) => `<button class="chip pf-lock" data-cs="how" data-how="${esc(x.how)}" data-v="${esc(x.name)}">${icon('lock')}${esc(x.name)}</button>`).join('')}</div>` : ''}`;
+    } else if (csTab === 'frames') {
+      body = `<div class="frames">${ownF.map(frameBtn).join('')}</div>
+        ${lockedF.length ? `<h3 class="pf-tf-h">${icon('lock')} ${lockedF.length} cadre${lockedF.length > 1 ? 's' : ''} à gagner</h3><p class="small muted">Touche un cadre pour savoir comment l’obtenir.</p><div class="frames">${lockedF.map(frameBtn).join('')}</div>` : ''}`;
+    } else if (csTab === 'backs') {
+      body = `<p class="small muted">Le dos de toutes les cartes face cachée du jeu.</p><div class="pf-backs">${backs.map(([k, n, u]) => `<button class="pf-back" data-cs="cardback" data-v="${k || ''}" aria-pressed="${(s.back || null) === k}"><img alt="" src="${u}"><span class="small">${esc(n)}</span></button>`).join('')}</div>`;
+    } else if (csTab === 'finishes') {
+      body = fins.length ? `<p class="small muted">Un contour peint posé sur une carte que tu possèdes. Choisis une finition, puis touche les cartes à habiller (touche encore pour retirer).</p>
+        <div class="cs-fins">${fins.map((k) => `<button class="cs-fin" data-cs="fin" data-v="${k}" aria-pressed="${cs?.fin === k}"><span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"><img alt="" src="assets/variants/${k}-frame.webp"></span><small>${esc(FINISHES[k].name)}</small></button>`).join('')}</div>
+        ${cs?.fin ? `<div class="av-grid cs-dress">${Object.keys(s.collection).filter((id) => cat.get(id)).map((id) => { const c = cat.get(id), on = s.dress?.[id] === cs.fin; return `<button class="av-pick ${on ? 'on' : ''}" data-cs="dress" data-v="${id}" style="--rc:${RARITY[c.rarity].color}"><img alt="" loading="lazy" src="${artUrl(c, { lite: true })}">${s.dress?.[id] ? `<i class="cs-dtag">${esc(FINISHES[s.dress[id]]?.name || '')}</i>` : ''}<small>${esc(c.name)}</small></button>`; }).join('')}</div>` : ''}` : '<p class="muted center">Pas encore de finition de prestige. Les contours peints des cartes arrivent bientôt.</p>';
+    }
+    return `${head}<div class="cs-sec-h">${back}<h3>${title}</h3></div>${body}`;
+  }
+  function openCustom(tab = null) {
+    csTab = tab; cs = openSheet('', { label: 'Personnaliser', full: true });
+    const paint = () => { cs.setContent(`<h2 class="center">Personnaliser</h2>${customHTML()}`); };
+    paint();
+    cs.body.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-cs]'); if (!b) return;
+      const k = b.dataset.cs, v = b.dataset.v;
+      if (k === 'tab') { csTab = v || null; cs.fin = null; app.sfx.tap?.(); paint(); cs.body.scrollTop = 0; return; }
+      if (k === 'how') { toast(`${icon('lock')} <b>${esc(v)}</b><br><span class="small">${esc(b.dataset.how || 'Pas encore disponible.')}</span>`, { ms: 6000 }); return; }
+      if (k === 'avatar') g.setAvatar(v);
+      if (k === 'title') g.setTitle(v);
+      if (k === 'frame') g.setFrame(v);
+      if (k === 'cardback') { g.setBack(v || null); app.applySettings?.(); }
+      if (k === 'fin') cs.fin = cs.fin === v ? null : v;
+      if (k === 'dress') { try { g.setDress(v, g.s.dress?.[v] === cs.fin ? null : cs.fin); } catch (err) { toast(esc(err.message), { kind: 'error' }); } }
+      app.sfx.tap?.(); const y = cs.body.scrollTop; paint(); cs.body.scrollTop = y; render(); app.chrome?.();
+    });
+  }
+
   function render() {
     const s = g.s, lv = g.levelInfo();
     const owned = g.uniqueCount(), total = g.total();
     const av = s.avatar && cat.get(s.avatar);
     const show = (s.showcase.length ? s.showcase.map((id) => cat.get(id)) : g.bestCards(3)).filter(Boolean);
     root.innerHTML = `
-      <section class="panel ornate profile-head bn-profile">
-        <div class="av-col"><button class="avatar-big pf pf-${s.frame}" data-act="pickav" aria-label="Changer d’avatar">${av ? `<img alt="" src="${artUrl(av)}">` : EMBLEM}</button>
-          <button class="av-custom" data-act="pickav"><img class="av-custom-ic" alt="" src="assets/icons/customize.webp" onerror="this.remove()">Personnaliser</button></div>
+      <section class="panel ornate profile-head bn-profile" data-act="custom">
+        <div class="av-col"><button class="avatar-big pf pf-${s.frame}" data-act="custom" aria-label="Personnaliser ton profil">${av ? `<img alt="" src="${artUrl(av)}">` : EMBLEM}</button></div>
         <div class="ph-text">
           <h1><button class="ph-name" data-act="rename">${esc(s.name || 'Ton nom')} <span class="small muted">${icon('edit')}</span></button></h1>
           <p class="ph-title">${esc(s.title)}</p>
           <p class="muted small">Niveau ${lv.level} · ${fmt(lv.into)} / ${fmt(lv.need)} XP</p>
           <span class="xpbar"><i style="width:${(lv.into / lv.need) * 100}%"></i></span>
-          <p class="small muted">${av ? `Avatar : ${esc(av.name)}` : 'Touche le sceau pour choisir un avatar parmi tes créatures.'}</p>
+          <p class="small muted">${av ? `Avatar : ${esc(av.name)}<br>` : ''}<span class="ph-hint">Touche ton portrait pour te personnaliser</span></p>
         </div>
       </section>
 
@@ -64,23 +127,7 @@ export default function profile(app, root) {
         <div class="panel stat"><b>${g.descent().best || 0}</b><span>étage record</span></div>
       </div>
 
-      ${(() => {
-        // v326 : titres et cadres possédés d'abord ; ceux à gagner sont repliés (la liste complète faisait plusieurs écrans)
-        const lockedT = U.titles.filter((t) => !s.titles.includes(t.name));
-        const allF = Object.entries({ ...FRAMES, ...CODEX_FRAMES }).filter(([k]) => s.frames.includes(k) || U.frames.some((f) => f.key === k));
-        const frameBtn = ([k, name]) => { const has = s.frames.includes(k), how = U.frames.find((f) => f.key === k)?.how || ''; return `<button class="frame-pick ${has ? '' : 'pf-lock'}" data-act="${has ? 'frame' : 'how'}" data-v="${has ? k : esc(name)}" data-how="${esc(how)}" aria-pressed="${s.frame === k}"><span class="avatar-mini pf pf-${k}">${has ? '' : icon('lock')}</span><span class="small">${esc(name)}</span></button>`; };
-        const ownF = allF.filter(([k]) => s.frames.includes(k)), lockedF = allF.filter(([k]) => !s.frames.includes(k));
-        return `<details class="panel dc-fold pf-tf"><summary>${picon('titles')} Titres et cadres <span class="small muted pf-tf-n">${s.titles.length} titre${s.titles.length > 1 ? "s" : ""} · ${ownF.length} cadre${ownF.length > 1 ? "s" : ""}</span></summary><div>
-        <h3 class="pf-tf-h">Tes titres</h3>
-        <div class="chips pf-titles">${s.titles.map((t) => `<button class="chip" data-act="title" data-v="${esc(t)}" aria-pressed="${t === s.title}">${esc(t)}</button>`).join('')}</div>
-        ${lockedT.length ? `<details class="pf-more"><summary>${icon('lock')} ${lockedT.length} titre${lockedT.length > 1 ? 's' : ''} à gagner</summary><p class="small muted">Touche un titre pour savoir comment l’obtenir.</p><div class="chips pf-titles">${lockedT.map((t) => `<button class="chip pf-lock" data-act="how" data-how="${esc(t.how)}" data-v="${esc(t.name)}">${icon('lock')}${esc(t.name)}</button>`).join('')}</div></details>` : ''}
-        <h3 class="pf-tf-h">Tes cadres</h3>
-        <div class="frames">${ownF.map(frameBtn).join('')}</div>
-        ${lockedF.length ? `<details class="pf-more"><summary>${icon('lock')} ${lockedF.length} cadre${lockedF.length > 1 ? 's' : ''} à gagner</summary><p class="small muted">Touche un cadre pour savoir comment l’obtenir.</p><div class="frames">${lockedF.map(frameBtn).join('')}</div></details>` : ''}
-        ${(s.backs || []).length ? `<h3 class="pf-tf-h">Tes dos de cartes</h3><p class="small muted">Le dos de toutes les cartes face cachée du jeu.</p>
-        <div class="pf-backs">${[[null, 'Dos de l’Abysse', 'assets/backs/back.webp'], ...s.backs.map((k) => [k, CODEX_BACKS[k] || k, `assets/backs/${k}.webp`])].map(([k, n, u]) => `<button class="pf-back" data-act="cardback" data-v="${k || ''}" aria-pressed="${(s.back || null) === k}"><img alt="" src="${u}"><span class="small">${esc(n)}</span></button>`).join('')}</div>` : ''}
-      </div></details>`;
-      })()}
+      <button class="panel pf-custom-row" data-act="custom"><img class="pf-cr-ic" alt="" src="assets/icons/customize.webp" onerror="this.remove()"><span class="pf-cr-t"><b>Personnaliser</b><span class="small muted">Avatar, titres, cadres, dos de cartes, finitions</span></span><span class="pf-cr-go">${icon('next')}</span></button>
 
       ${luckHTML()}
 
@@ -104,6 +151,7 @@ export default function profile(app, root) {
     lazyArt(root);
   }
   bindActions(root, {
+    custom(el) { openCustom(el.dataset.v || null); },
     title(el) { g.setTitle(el.dataset.v); render(); },
     frame(el) { g.setFrame(el.dataset.v); render(); },
     cardback(el) { g.setBack(el.dataset.v || null); app.applySettings?.(); app.sfx.tap?.(); render(); }, /* v473 : dos de cartes */
