@@ -4245,3 +4245,12 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .pf.pf-cx-seraphin::after, .pf.pf-cx-horloger::after, .pf.pf-cx-prince::after, .pf.pf-cx-meute::after { inset: -65%; }
 /* v479 : plus d'espace autour des cadres peints dans le choix du Profil (les plus larges mordaient sur leur nom) */
 .frame-pick .avatar-mini.pf[class*="pf-cx-"] { margin: 12px 0 16px; }
+
+/* v480 : 6 derniers cadres peints du catalogue (corbeaux, géode et Souverain recentrés avec plus de marge : K 2,3) */
+.pf-cx-constellation { --fr: url(../assets/frames/cx-constellation.webp); }
+.pf-cx-geode { --fr: url(../assets/frames/cx-geode.webp); }
+.pf-cx-sablier { --fr: url(../assets/frames/cx-sablier.webp); }
+.pf-cx-pages { --fr: url(../assets/frames/cx-pages.webp); }
+.pf-cx-corbeau { --fr: url(../assets/frames/cx-corbeau.webp); }
+.pf-cx-souverain { --fr: url(../assets/frames/cx-souverain.webp); }
+.pf.pf-cx-corbeau::after, .pf.pf-cx-geode::after, .pf.pf-cx-souverain::after { inset: -65%; }

@@ -53,12 +53,14 @@ export const CODEX_FRAMES = {
   'cx-roses': 'Cadre des roses noires', 'cx-prince': 'Couronne du Prince des Enfers', 'cx-leviathan': 'Cadre du Léviathan', 'cx-seraphin': 'Cadre du Séraphin',
   'cx-meute': 'Cadre de la meute', 'cx-liche': 'Cadre de la Liche', 'cx-ouroboros': 'Cadre de l’Ouroboros', 'cx-automate': 'Cadre de l’Automate',
   'cx-gueule': 'Cadre de la Gueule du Dévoreur', 'cx-eclipse': 'Cadre de l’Éclipse', 'cx-horloger': 'Cadre de l’Horloger', 'cx-balance': 'Cadre du Juge des Sceaux',
+  /* v480 */ 'cx-constellation': 'Cadre des constellations', 'cx-geode': 'Cadre de la géode d’améthyste', 'cx-sablier': 'Cadre du sablier éternel', 'cx-pages': 'Cadre du grimoire déchiré', 'cx-corbeau': 'Cadre des corbeaux', 'cx-souverain': 'Couronne du Souverain de l’Abysse',
 };
 // Dos de cartes (v473 : images Gemini, assets/backs/<clé>.webp, tools/back-art.py ; choisis au Profil)
 export const CODEX_BACKS = { 'dos-codex': 'Dos du Codex', 'dos-abime': 'Dos de l’Abîme', 'dos-fondateur': 'Dos du Fondateur',
   /* réserve : collection « Les sept royaumes » (Échoppe ou saison II) */
   'dos-infernal': 'Dos du royaume Infernal', 'dos-abyssal': 'Dos du royaume Abyssal', 'dos-celeste': 'Dos du royaume Céleste', 'dos-sauvage': 'Dos du royaume Sauvage',
-  'dos-necrotique': 'Dos du royaume Nécrotique', 'dos-primordial': 'Dos du royaume Primordial', 'dos-artificiel': 'Dos du royaume Artificiel' };
+  'dos-necrotique': 'Dos du royaume Nécrotique', 'dos-primordial': 'Dos du royaume Primordial', 'dos-artificiel': 'Dos du royaume Artificiel',
+  /* v480 : catalogue de l'Échoppe */ 'dos-ames': 'Dos de la Nuit des Âmes', 'dos-solstice': 'Dos du solstice noir', 'dos-roses': 'Dos des cœurs maudits', 'dos-lune-sang': 'Dos de la Lune de sang', 'dos-devoreur': 'Dos du Dévoreur', 'dos-eclipse': 'Dos de l’Éclipse', 'dos-horloger': 'Dos de l’Horloger', 'dos-miroirs': 'Dos de la Sorcière des Miroirs', 'dos-jumeaux': 'Dos des Jumeaux du Crépuscule', 'dos-titan': 'Dos du Titan Endormi' };
 
 // Catalogue de l'Échoppe, en obsidiennes (le Codex enluminé donne aussi givre, braises et dos de l'Abîme)
 const F = (k, cost) => ({ id: k, kind: 'frame', give: { frame: k }, cost });
@@ -68,7 +70,8 @@ export const CATALOG = [
   F('cx-givre', 250), F('cx-braise', 250), F('cx-os', 300), F('cx-serpents', 300), F('cx-vitrail', 300), F('cx-rouages', 300),
   F('cx-racines', 300), F('cx-chaines', 300), F('cx-yeux', 350), F('cx-ruche', 350),
   F('cx-lanternes', 450), F('cx-voile', 700), F('cx-houx', 450), F('cx-aurore', 700), F('cx-roses', 450), F('cx-prince', 700), F('cx-leviathan', 700), F('cx-seraphin', 700), F('cx-meute', 700), F('cx-liche', 700), F('cx-ouroboros', 700), F('cx-automate', 700), F('cx-gueule', 500), F('cx-eclipse', 500), F('cx-horloger', 500), F('cx-balance', 500),
-  B('dos-abime', 350), ...ROYAUMES.map((k) => B(k, 300)),
+  F('cx-constellation', 750), F('cx-geode', 450), F('cx-sablier', 450), F('cx-pages', 450), F('cx-corbeau', 450), F('cx-souverain', 1200),
+  B('dos-abime', 350), B('dos-ames', 500), B('dos-solstice', 500), B('dos-roses', 500), B('dos-lune-sang', 500), B('dos-devoreur', 500), B('dos-eclipse', 500), B('dos-horloger', 500), B('dos-miroirs', 500), B('dos-jumeaux', 500), B('dos-titan', 500), ...ROYAUMES.map((k) => B(k, 300)),
   { id: 'royaumes', kind: 'bundle', name: 'Les sept royaumes', give: { backs: ROYAUMES }, cost: 1500, desc: 'Les sept dos des royaumes d’un coup (2 100 à l’unité).' },
 ];
 // Exclusifs du Codex enluminé (jamais en vente) : cadres d'encre, de sang, enluminé, de l'Abîme, dos du Codex, titres.
