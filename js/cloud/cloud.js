@@ -39,7 +39,7 @@ function frError(status, body) {
   if (m.includes('check constraint') || m.includes('violates check')) return 'Pseudo invalide : 3 à 16 lettres, chiffres, espaces, - ou _.';
   if (status === 401 || status === 403) return 'Session expirée : reconnecte-toi.';
   if (status >= 500) return 'Le serveur ne répond pas correctement. Réessaie dans un instant.';
-  return body?.msg || body?.message || `Erreur ${status}`;
+  return body?.msg || body?.message || 'Une erreur est survenue. Réessaie dans un instant.';
 }
 
 async function call(path, { method = 'GET', body, auth = true, headers = {} } = {}) {

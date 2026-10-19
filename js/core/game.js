@@ -14,7 +14,7 @@ import { FINAL_FLOOR, BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORD
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
 import { CODEX, CODEX_XP, CODEX_TIERS, SHOP, CATALOG, codexState, codexTier } from './codex.js';
-import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, lateSoft, bossEase, expectedLevel, cardPower, powerFor, advisedPower, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
+import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, lateSoft, bossEase, expectedLevel, cardPower, powerFor, advisedPower, floorForPower, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative } from './duel.js';
 import { bossOf, BOSSES, BOSS_ORDER } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
@@ -75,7 +75,8 @@ export const TRIALS = [
 // Réglage mesuré (pilote automatique, défense moyenne : 40 % d'esquives, 15 % de parades ; 8 profils d'équipe × 30 jours) :
 // environ 55 % de victoires au combat, 61 % à l'élite, 57 % au gardien ; un joueur qui défend à la main fait mieux.
 export const TRIAL_OFFSET = [11, 11, 9]; // étages en plus (se resserre avec la force)
-export const TRIAL_MULT = [1.3, 1.8, 1.25]; // PV et attaque des ennemis
+export const TRIAL_MULT = [1.4, 1.95, 1.35];
+export const TRIAL_RAR = 1; // PV et attaque des ennemis
 export const AWAKEN_AT = 30;   // gardiens éveillés à partir de cet étage
 
 // v348 : nombre de jours entre deux dates « AAAA-MM-JJ » (heure locale)
@@ -747,14 +748,14 @@ export class Game {
   trialPower() {
     const ids = Object.keys(this.s.collection).filter((id) => this.owns(id) && this.catalog.get(id));
     /* force des Épreuves : la rareté y pèse moins que dans cardPower (mesuré : à force égale, des Rares au niveau 7 gagnaient bien plus que des Hyper rares au niveau 5) */
-    const pw = (id) => { const c = this.catalog.get(id); return Math.sqrt(cardPower(c.rarity, 1)) * (1 + 0.08 * (this.cardLevel(id) - 1)); };
+    const pw = (id) => { const c = this.catalog.get(id); return cardPower(c.rarity, 1) ** TRIAL_RAR * (1 + 0.08 * (this.cardLevel(id) - 1)); };
     const best = (list) => { const top = list.map(pw).sort((a, b) => b - a).slice(0, TEAM.active + TEAM.reserve); return top.length ? top.reduce((a, b) => a + b, 0) / top.length : 1; };
     return Math.max(best(ids), best(this.team()));
   }
   // Étage « équivalent » de chaque Épreuve : celui que la force du joueur atteint en expédition (powerFor), plus un écart
   // propre à l'Épreuve (combat, élite, gardien). Réglé par simulation pour viser environ 6 victoires sur 10.
   trialFloor(i) {
-    const p = this.trialPower(), base = 6 + 22 * (p - 1);
+    const p = this.trialPower(), base = floorForPower(p); /* v499 : même courbe que la force conseillée de la Descente */
     const k = Math.max(0.2, Math.min(1, (45 - base) / 39)); /* l'écart se resserre avec la force (gros écarts mesurés en profondeur) */
     return Math.max(2, Math.min(FINAL_FLOOR, Math.round(base + TRIAL_OFFSET[i] * k)));
   }

@@ -1,4 +1,5 @@
 // Profil : titre, cadre, niveau, statistiques, vitrine, historique.
+import { sync } from '../cloud/sync.js';
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, EMBLEM, picon, setIcon } from '../ui/icons.js';
@@ -58,8 +59,7 @@ export default function profile(app, root) {
       ['frames', 'Cadres de profil', `<span class="avatar-mini pf pf-${s.frame}"></span>`, esc(({ ...FRAMES, ...CODEX_FRAMES })[s.frame] || ''), `${ownF.length}`],
       ['backs', 'Dos de cartes', `<img alt="" src="${backNow[2]}">`, esc(backNow[1]), `${backs.length}`],
       ['finishes', 'Finitions de cartes', fins.length ? `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"><img alt="" src="assets/variants/${fins[0]}-frame.webp"></span>` : `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"></span>`, fins.length ? `${dressed} carte${dressed > 1 ? 's' : ''} habillée${dressed > 1 ? 's' : ''}` : 'Contours peints des cartes', `${fins.length}`],
-      ['packs', 'Sachets de booster', '<img alt="" src="assets/packs/standard2.webp">', 'Bientôt', null],
-    ];
+    ].filter(([k]) => k !== 'finishes' || fins.length || g.codexOn()); /* v499 : plus de tuiles « Bientôt » : finitions seulement si on en possède */
     if (!csTab) return `${head}<div class="cs-menu">${SECTIONS.map(([k, n, pic, sub, cnt]) => `<button class="cs-tile ${cnt === null ? 'soon' : ''}" data-cs="tab" data-v="${k}" ${cnt === null ? 'disabled' : ''}><span class="cs-pic">${pic}</span><b>${n}</b><small>${sub}</small>${cnt !== null ? `<em>${cnt}</em>` : ''}</button>`).join('')}</div>`;
     const back = `<button class="btn ghost small cs-back" data-cs="tab" data-v="">${icon('prev')}Personnaliser</button>`;
     const title = SECTIONS.find(([k]) => k === csTab)?.[1] || '';
@@ -110,7 +110,7 @@ export default function profile(app, root) {
       <section class="panel ornate profile-head bn-profile" data-act="custom">
         <div class="av-col"><button class="avatar-big pf pf-${s.frame}" data-act="custom" aria-label="Personnaliser ton profil">${av ? `<img alt="" src="${artUrl(av)}">` : EMBLEM}</button></div>
         <div class="ph-text">
-          <h1><button class="ph-name" data-act="rename">${esc(s.name || 'Ton nom')} <span class="small muted">${icon('edit')}</span></button></h1>
+          <h1>${sync.profile?.pseudo ? `<span class="ph-name">${esc(sync.profile.pseudo)}</span>` /* v499 : connecté, le nom affiché est le pseudo en ligne (un seul nom) */ : `<button class="ph-name" data-act="rename">${esc(s.name || 'Ton nom')} <span class="small muted">${icon('edit')}</span></button>`}</h1>
           <p class="ph-title">${esc(s.title)}</p>
           <p class="muted small">Niveau ${lv.level} · ${fmt(lv.into)} / ${fmt(lv.need)} XP</p>
           <span class="xpbar"><i style="width:${(lv.into / lv.need) * 100}%"></i></span>

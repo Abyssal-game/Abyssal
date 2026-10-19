@@ -1,11 +1,9 @@
-// Réglages : son, animations, accessibilité, sauvegarde, outils de développement.
+// Réglages : son, animations, accessibilité, sauvegarde (le Mode Créateur est dans creator.js).
 import { resetTips } from '../ui/coach.js';
 import { TUTOS, tuto } from '../ui/tutos.js';
 import { icon } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, openSheet, bindActions } from '../ui/dom.js';
 import { exportCode, importCode } from '../core/save.js';
-import { drawBooster } from '../core/boosters.js';
-import { RARITIES, RARITY_ORDER, BOOSTERS } from '../config.js';
 import { sfx, audioInfo } from '../ui/sound.js';
 import { MUSIC_DEMO, musicPreview } from '../ui/music.js';
 import { sync, onSync, refreshProfile, eraseOnline } from '../cloud/sync.js';
@@ -126,7 +124,7 @@ export default function settings(app, root) {
     },
     async download() {
       const name = `abyssal-sauvegarde-${new Date().toISOString().slice(0, 10)}.json`, text = JSON.stringify(g.s, null, 1);
-      try { if (await shareFile(name, text)) return; } catch (e) { toast(esc(`Partage impossible : ${e.message || e}`), { kind: 'error', icon: 'info' }); return; }
+      try { if (await shareFile(name, text)) return; } catch (e) { toast('Partage impossible. Réessaie, ou utilise « Copier le code ».', { kind: 'error', icon: 'info' }); return; }
       const blob = new Blob([text], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -186,18 +184,6 @@ export default function settings(app, root) {
       });
     },
     creator() { if (!g.s.settings.dev) g.setSetting('dev', true); render(); openCreator(app); },
-    dev(el) {
-      const x = el.dataset.x;
-      if (x === 'shards') g.devGrant({ shards: 1000 });
-      if (x === 'ash') g.devGrant({ ash: 1000 });
-      if (x === 'tickets') g.devGrant({ tickets: Object.fromEntries(Object.keys(BOOSTERS).map((k) => [k, 5])) });
-      if (x === 'pity') { g.s.pity = { sinceHR: 0, sinceM: 0 }; g.persist(); }
-      if (x === 'pityhr') { g.s.pity.sinceHR = 9; g.persist(); }
-      if (x === 'all') g.devUnlockAll();
-      if (x === 'off') { g.s.settings.devCode = false; g.setSetting('dev', false); render(); return; }
-      if (x === 'sim') return simulate(app);
-      toast('Fait.', { icon: 'code' });
-    },
   });
   render();
   // le badge peut arriver du serveur après l'affichage
@@ -209,17 +195,3 @@ export default function settings(app, root) {
   return () => { off(); offP(); };
 }
 
-function simulate(app) {
-  const N = 10000;
-  const rows = Object.keys(BOOSTERS).map((type) => {
-    const count = {}; let cards = 0; let pity = { sinceHR: 0, sinceM: 0 }, guar = 0;
-    for (let i = 0; i < N; i++) {
-      const r = drawBooster(type, app.catalog, { pity, faction: 'infernal' });
-      pity = r.pity; if (r.guaranteed) guar++;
-      r.cards.forEach((c) => { count[c.rarity] = (count[c.rarity] || 0) + 1; cards++; });
-    }
-    return `<tr><th scope="row">${esc(BOOSTERS[type].name)}</th>${RARITY_ORDER.map((k) => `<td>${(((count[k] || 0) / cards) * 100).toFixed(2).replace('.', ',')} %</td>`).join('')}<td>${guar}</td></tr>`;
-  }).join('');
-  openSheet(`<h2>Simulation : ${fmt(N)} boosters par type</h2><p class="small muted">Tirages réels du jeu, sans rien enregistrer. Pourcentages par carte obtenue ; la dernière colonne compte les garanties déclenchées.</p>
-    <div class="table-wrap"><table class="odds"><thead><tr><th></th>${RARITIES.map((r) => `<th style="color:${r.color}">${r.short}</th>`).join('')}<th>Gar.</th></tr></thead><tbody>${rows}</tbody></table></div>`, { label: 'Simulation' });
-}

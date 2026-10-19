@@ -350,7 +350,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     if (reduced) return; const d = $('.dv'); if (!d?.animate) return;
     const [dur, pts] = SHAKE[big ? 'big' : small ? 'small' : 'norm'];
     shakeA?.cancel();
-    shakeA = d.animate([{ transform: 'none' }, ...pts.map(([x, y, r = 0]) => ({ transform: `translate(${x}px, ${y}px) rotate(${r}deg)` })), { transform: 'none' }], { duration: dur, easing: 'ease' });
+    shakeA = d.animate([{ transform: 'none' }, ...pts.map(([x, y, r = 0]) => ({ transform: `translate(${x}px, ${y}px) rotate(${r}deg)` })), { transform: 'none' }], { duration: T(dur), easing: 'ease' });
   };
   // v346 : éclair d'impact — une lumière blanche et dorée jaillit du point touché
   const impactFlash = (uid, big) => { if (reduced || light) return; const t = el(uid), box = $('.dv'); if (!t || !box) return; const b = box.getBoundingClientRect(), r = t.getBoundingClientRect(); const f = document.createElement('span'); f.className = `dv-iflash ${big ? 'big' : ''} ${st.units[uid]?.side === 'ally' ? 'foe' : ''}`; f.style.cssText = `left:${r.left - b.left + r.width / 2}px;top:${r.top - b.top + r.height / 2}px`; box.appendChild(f); setTimeout(() => f.remove(), 420); };
@@ -380,7 +380,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const cx = ((r.left + r.width / 2 - b.left) / b.width - 0.5) * -10 * k, cy = ((r.top + r.height / 2 - b.top) / b.height - 0.5) * -10 * k;
     if (!d.animate) return;
     camA?.cancel();
-    camA = d.animate([{ translate: '0 0' }, { translate: `${cx.toFixed(1)}px ${cy.toFixed(1)}px`, offset: 0.3 }, { translate: '0 0' }], { duration: 450, easing: 'ease-out' });
+    camA = d.animate([{ translate: '0 0' }, { translate: `${cx.toFixed(1)}px ${cy.toFixed(1)}px`, offset: 0.3 }, { translate: '0 0' }], { duration: T(450), easing: 'ease-out' });
   };
   // Arrêt sur image : le coup « pèse » un instant
   const hitstop = async (ms) => {
@@ -526,21 +526,28 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   let lastTier = null; // résultat du dernier jet de dé : le coup qui suit le montre
   let lastDef = 'none'; // résultat de la dernière défense active
   let pendingLunge = null; // élan d'une compétence à dé, joué après le jet (pas avant)
+  let pendingSkill = null, skillHit = null; // v499 : planche d'une compétence à dé jouée après le jet, à la place de la lame du coup
+  let burstSrc = null, burstN = 0; // v499 : coups enchaînés d'une même créature (triple morsure, ruée…) : compteur ×2, ×3
+  /* prochain coup de la même action (on saute les événements de jauge) : sert à enchaîner les coups sans arrêt sur image */
+  const nextHit = (ev, i) => { for (let j = i + 1; j < ev.length; j++) { const x = ev[j]; if (x.t === 'dmg') return x; if (!['brk', 'fervor', 'pa', 'combo', 'status'].includes(x.t)) return null; } return null; };
   let lastAtk = null, fatalDone = false; // dernière créature alliée à avoir agi : gros plan du coup fatal sur le dernier ennemi
   const DICE_KEYS = ['estoc', 'contagion', 'entrave'];
   async function play(ev) {
-    for (const e of ev) {
+    for (let ei = 0; ei < ev.length; ei++) {
+      const e = ev[ei];
       if (!alive_) return;
       switch (e.t) {
         case 'act':
-          lastAtk = st.units[e.u]?.side === 'ally' ? e.u : null;
+          lastAtk = st.units[e.u]?.side === 'ally' ? e.u : null; lastTier = null; pendingSkill = null; skillHit = null; burstSrc = null;
           if (e.skill) {
             const own = moveFor(st.units[e.u], e.key);
             const ic = own ? `<img class="aicon" alt="" src="${moveIconUrl(own.icon)}">` : actIcon(KITS[st.units[e.u].role].skill.key, KITS[st.units[e.u].role].skill.icon);
             app.sfx.skill();
             // v357 : la carte s'éveille sur place (repli : le bandeau), puis la planche de la compétence part sur la cible
             if (!(await castFx(e.u, e.name, { ic }))) { banner(`${ic} ${esc(e.name)}`, own ? 'skill own' : 'skill', 700); await wait(T(360)); }
-            if (skillFx(KITS[st.units[e.u].role].skill.key, e.u, e.tgt)) await wait(T(240));
+            /* v499 : compétence à dé (estoc, contagion, entrave) : sa planche part après le jet, comme le vrai coup (avant : un premier « coup » avant le dé, puis un second après) */
+            if (DICE_KEYS.includes(e.key)) pendingSkill = { key: KITS[st.units[e.u].role].skill.key, u: e.u, tgt: e.tgt };
+            else if (skillFx(KITS[st.units[e.u].role].skill.key, e.u, e.tgt)) await wait(T(240));
           }
           if (e.tgt && st.units[e.tgt]?.side === 'enemy' && DICE_KEYS.includes(e.key)) pendingLunge = { u: e.u, tgt: e.tgt };
           else if (e.tgt && st.units[e.tgt]?.side === 'enemy' && e.key !== 'marque' && e.key !== 'entrave') { lunge(e.u, e.tgt); cam(e.tgt, 0.6); await wait(T(LUNGE_HIT)); }
@@ -548,7 +555,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
           break;
         case 'eact': {
           const def = INTENTS[e.kind];
-          lastAtk = null;
+          lastAtk = null; lastTier = null; burstSrc = null;
           // v338 : la grosse attaque d'une élite, et chaque coup spécial d'un gardien, s'annoncent sur son illustration en plein écran
           const ua = st.units[e.a], bigK = ua?.boss ? BOSS_SHOT.has(e.kind) : ua?.elite && (e.kind === 'heavy' || e.kind === 'blast');
           const shot = bigK && def && (await castFx(e.a, `${def.name} !`, { ic: intentIcon(e.kind), foe: true }));
@@ -560,26 +567,37 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         case 'attack': break;
         case 'counter': lunge(e.a, e.u); float(e.a, 'Contre-attaque !', 'syn'); await wait(T(260)); break;
         case 'dmg': {
+          /* v499 : dégâts sans attaquant (poison, épuisement, marée, pacte…) : une simple marque, sans lame ni secousse */
+          if (!e.src) {
+            const tt = el(e.u);
+            if (tt) { const hp = tt.querySelector('.dv-hp b'); if (hp) hp.textContent = Math.max(0, e.hp); tt.querySelector('.dv-hp')?.classList.add('hurt'); }
+            float(e.u, `-${e.d}`, `dmg tick ${st.units[e.u]?.poison ? 'venom' : ''}`); app.sfx.tap?.();
+            await wait(T(170)); break;
+          }
+          const nx = nextHit(ev, ei), chain = burstSrc === e.src, more = !!(nx && nx.src === e.src);
+          burstN = chain ? burstN + 1 : 1; burstSrc = more ? e.src : null;
           const t = el(e.u);
           if (t) { t.classList.remove('hit'); void t.offsetWidth; t.classList.add('hit'); const hp = t.querySelector('.dv-hp b'); if (hp) hp.textContent = Math.max(0, e.hp); t.querySelector('.dv-hp')?.classList.add('hurt'); }
           const crit = lastTier === 'crit', heavy = crit || e.d >= 8;
           lastTier = null;
+          const viaSkill = skillHit && skillHit === e.u; skillHit = null;
           // v341 : chaque coup marque l'impact — entaille lumineuse sur la carte touchée et court arrêt sur image
           if (t && !reduced && !aoeHit) { const k = document.createElement('span'); k.className = `dv-cut ${st.units[e.u]?.side === 'ally' ? 'foe' : ''} ${heavy ? 'big' : ''}`; k.style.setProperty('--ca', `${-38 + Math.round(Math.random() * 30)}deg`); t.appendChild(k); setTimeout(() => k.remove(), 520); }
-          await hitstop(crit ? 140 : heavy ? 80 : 45);
+          if (!more) await hitstop(crit ? 140 : heavy ? 80 : 45); /* v499 : coups enchaînés sans arrêt sur image, seul le dernier pèse */
           const sU = e.src && st.units[e.src];
           // v343 : planches peintes (Gemini) — lame d'or pour tes coups, griffes corrompues pour les ennemis, croix runique pour les critiques
           // v346 : effets plus grands et plus longs, éclair d'impact sur la cible, coup de caméra vers elle
-          if (sU?.side === 'ally' && ROLE_FX[sU.role] && !aoeHit) { if (crit) fxSheet(e.u, 'crit-strike', { k: 3.2, d: 900 }); else fxSheet(e.u, ROLE_FX[sU.role], { k: heavy ? 3 : 2.6, d: 760 }); }
+          if (viaSkill) { /* la planche de la compétence a déjà marqué l'impact */ }
+          else if (sU?.side === 'ally' && ROLE_FX[sU.role] && !aoeHit) { if (crit) fxSheet(e.u, 'crit-strike', { k: 3.2, d: 900 }); else fxSheet(e.u, ROLE_FX[sU.role], { k: heavy ? 3 : 2.6, d: 760 }); }
           else if (!aoeHit) { if (crit) fxSheet(e.u, 'crit-strike', { k: 3.2, d: 900 }); else fxSheet(e.u, 'foe-strike', { k: heavy ? 3 : 2.6, d: 760 }); }
-          if (!aoeHit) { impactFlash(e.u, heavy); cam(e.u, heavy ? 1.6 : 1.1); }
+          if (!aoeHit) { if (!viaSkill) impactFlash(e.u, heavy); if (!chain) cam(e.u, heavy ? 1.6 : 1.1); }
           if (crit) dio.flare();
-          float(e.u, crit ? `CRITIQUE −${e.d}` : `-${e.d}`, crit ? 'dmg big crit' : heavy ? 'dmg big' : 'dmg'); (heavy ? app.sfx.smash : app.sfx.slash)(); sparks(e.u, crit ? 'gold' : ''); if (!aoeHit) shake(crit || heavy || e.hp <= 0, !(crit || heavy || e.hp <= 0));
-          await wait(T(heavy ? 300 : 220));
+          float(e.u, `${crit ? 'CRITIQUE ' : ''}−${e.d}${burstN > 1 ? ` ×${burstN}` : ''}`, crit ? 'dmg big crit' : heavy ? 'dmg big' : 'dmg'); (heavy ? app.sfx.smash : app.sfx.slash)(); sparks(e.u, crit ? 'gold' : ''); if (!aoeHit) shake(!more && (crit || heavy || e.hp <= 0), more || !(crit || heavy || e.hp <= 0));
+          await wait(T(more ? 170 : heavy ? 300 : 220));
           break;
         }
         case 'heal': { app.sfx.heal(); fxSheet(e.u, 'role-heal', { k: 2.3, d: 850 }); float(e.u, `+${e.d}`, 'heal'); const hp = el(e.u)?.querySelector('.dv-hp b'); if (hp) hp.textContent = st.units[e.u].hp; await wait(T(200)); break; }
-        case 'block': app.sfx.block(); ring(e.u, 'guard'); float(e.u, 'Bloqué', 'info'); sparks(e.u, 'blue'); await wait(T(240)); break;
+        case 'block': lastTier = null; skillHit = null; app.sfx.block(); ring(e.u, 'guard'); float(e.u, 'Bloqué', 'info'); sparks(e.u, 'blue'); await wait(T(240)); break;
         case 'dodge': {
           app.sfx.dodge();
           if (e.u) { ghost(e.u); fxSheet(e.u, 'fx-dodge', { k: 2.3, d: 720 }); cam(e.u, 0.6); shake(false, true); const t = el(e.u); if (t) { t.classList.remove('dodge'); void t.offsetWidth; t.classList.add('dodge'); } float(e.u, 'Esquive !', 'dodge'); }
@@ -618,6 +636,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
           await rollFx(e); lastTier = e.tier;
           const P = pendingLunge; pendingLunge = null;
           if (P && e.tier !== 'fumble') { lunge(P.u, P.tgt); cam(P.tgt, 0.6); await wait(T(LUNGE_HIT)); }
+          const S = pendingSkill; pendingSkill = null;
+          if (S && e.tier !== 'fumble' && skillFx(S.key, S.u, S.tgt)) skillHit = S.tgt; /* la planche de la compétence est l'impact du coup qui suit */
           break;
         }
         case 'boss': { if (e.s === 'Effondrement !') fxSheet(null, 'fx-collapse', { center: true, d: 1100 }); app.sfx.boss(); dio.roar(); const t = el(e.u); if (t) { t.classList.remove('roar'); void t.offsetWidth; t.classList.add('roar'); } float(e.u, e.s, 'boss'); shake(true); await wait(T(650)); break; }
@@ -725,7 +745,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const lbl = document.createElement('span'); lbl.className = `cast-lbl ${foe ? 'foe' : ''}`; lbl.innerHTML = `${ic}<b>${esc(label)}</b>`;
     lbl.style.cssText = foe ? `left:${cx}px;top:${r.bottom - bb.top + 10}px;--fc:#FF3B4E` : `left:${cx}px;top:${r.top - bb.top - 10}px;translate:-50% -100%;--fc:${t.style.getPropertyValue('--fc')}`;
     box.append(circ, lbl);
-    if (foe) { shake(true); dio.roar?.(); } else impactFlash(uid, false);
+    if (foe) { shake(true); dio.roar?.(); } /* v499 : plus d'éclair d'impact sur ta propre carte (il ressemblait à un coup) */
     await wait(d);
     t.classList.remove('cast', 'cast-foe'); circ.classList.add('out'); lbl.classList.add('out');
     setTimeout(() => { circ.remove(); lbl.remove(); }, 260);

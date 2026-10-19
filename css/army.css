@@ -4478,3 +4478,7 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 /* v497 : Persévérance (ennemis du chapitre affaiblis après des défaites) */
 .dc-grit { margin: 6px 0 0; padding: 6px 10px; border-radius: 10px; background: rgba(111, 211, 160, .1); border: 1px solid rgba(111, 211, 160, .35); color: #CFEFDD; }
 .dc-grit b { color: #8FE3B8; }
+
+/* v499 : dégâts sans attaquant (poison, épuisement, marée…) : petits chiffres discrets, verts pour le poison */
+.dv-float.dmg.tick { font-size: .9em; opacity: .92; text-shadow: 0 1px 3px #000; }
+.dv-float.dmg.tick.venom { color: #A6E05A; }

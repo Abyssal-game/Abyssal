@@ -90,7 +90,7 @@ const app = {
   refresh() { render(); },
   chrome() { renderChrome(); },
 };
-window.__abyssal = app; // accès pour les tests automatisés
+if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__abyssal = app; /* accès pour les tests automatisés (v499 : seulement en local) */
 
 function applySettings() {
   const s = app.game.s.settings;

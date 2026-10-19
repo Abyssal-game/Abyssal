@@ -16,7 +16,7 @@ export default function menu(app, root) {
   const A = (act, ic, title, sub) => `<button class="mn-tile" data-mn="${act}"><span class="mn-tile-ic">${picon(ic)}</span><b>${title}</b><span>${sub}</span></button>`;
   // v316 : le Profil est une grande tuile en largeur (avatar, nom, niveau), les quatre autres forment un carré ;
   // la tuile du Créateur, rare, prend aussi toute la largeur en bas.
-  const profile = `<a class="mn-tile mn-wide" href="#/profil"><span class="mn-tile-ic avatar-big pf pf-${s.frame}">${av ? `<img alt="" src="${artUrl(av)}">` : EMBLEM}</span><b>${esc(s.name || 'Ton profil')}</b><span>Niveau ${lv.level} · ${esc(s.title)}</span><em>Vitrine, titres, statistiques</em></a>`;
+  const profile = `<a class="mn-tile mn-wide" href="#/profil"><span class="mn-tile-ic avatar-big pf pf-${s.frame}">${av ? `<img alt="" src="${artUrl(av)}">` : EMBLEM}</span><b>${esc(sync.profile?.pseudo || s.name || 'Ton profil')}</b><span>Niveau ${lv.level} · ${esc(s.title)}</span><em>Vitrine, titres, statistiques</em></a>`;
   root.innerHTML = `
     <header class="screen-head mn-head ui-hero bn-sanctuary"><h1>Le Sanctuaire</h1><p class="muted">Ton profil, tes succès, tes titres et les réglages du jeu.</p></header>
     <nav class="mn-grid">

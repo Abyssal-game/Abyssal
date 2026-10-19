@@ -189,9 +189,15 @@ export function exportCode(save) {
   return `${EXPORT_PREFIX}${checksum(json)}:${toB64(json)}`;
 }
 
+// v499 : une sauvegarde importée ne peut pas ouvrir le Mode Créateur ni les ébauches cachées (Codex, Salle des jeux)
+function noDev(s) {
+  if (s.settings) { s.settings.dev = false; s.settings.devCode = false; }
+  s.devCodex = false; s.devGames = false;
+  return s;
+}
 export function importCode(code) {
   const txt = String(code || '').trim();
-  if (txt.startsWith('{')) return migrate(JSON.parse(txt)); // fichier JSON brut
+  if (txt.startsWith('{')) return noDev(migrate(JSON.parse(txt))); // fichier JSON brut
   if (!txt.startsWith(EXPORT_PREFIX)) throw new Error('Ce texte n’est pas un code de sauvegarde ABYSSAL.');
   const rest = txt.slice(EXPORT_PREFIX.length);
   const i = rest.indexOf(':');
@@ -199,5 +205,5 @@ export function importCode(code) {
   let json;
   try { json = fromB64(b64); } catch { throw new Error('Code de sauvegarde incomplet ou abîmé.'); }
   if (checksum(json) !== sum) throw new Error('Le code a été modifié ou tronqué (somme de contrôle invalide).');
-  return migrate(JSON.parse(json));
+  return noDev(migrate(JSON.parse(json)));
 }

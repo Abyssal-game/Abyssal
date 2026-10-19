@@ -136,6 +136,12 @@ export default function account(app, root) {
         ${sync.status === 'paused' ? `<button class="btn primary small" data-act="resume">${icon('refresh')}Reprendre la synchronisation</button>` : ''}<div class="row gap wrap"><button class="btn small" data-act="push">${icon('upload')}Sauvegarder maintenant</button><button class="btn small" data-act="pull">${icon('download')}Récupérer la partie en ligne</button></div>
       </section>
       <section class="panel stack">
+        <h2>Sécurité et aide</h2>
+        <a class="btn small" href="#/compte/motdepasse">${icon('lock')}Changer mon mot de passe</a>
+        <a class="btn small" href="mailto:abyssal.gamecards@gmail.com?subject=ABYSSAL%20%E2%80%94%20aide">${icon('info')}Nous écrire (aide, bug)</a>
+        <a class="btn ghost small" href="confidentialite.html" target="_blank" rel="noopener">${icon('book')}Politique de confidentialité</a>
+      </section>
+      <section class="panel stack">
         <button class="btn block" data-act="logout">Se déconnecter</button>
         <button class="btn danger small" data-act="delete">${icon('trash')}Supprimer mon compte</button>
         <p class="small muted">La suppression efface ton profil, ta sauvegarde en ligne et tes scores. Ta partie reste sur cet appareil.</p>
