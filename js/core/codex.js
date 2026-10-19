@@ -10,8 +10,9 @@ export const CODEX = {
   name: 'Le Codex de l’Abîme',
   premiumName: 'Codex enluminé',
   season: 'saison-1',                    // changer cette clé = nouvelle saison (points et récompenses remis à zéro)
-  title: 'Saison I · Les Cendres du Dévoreur',
-  ends: '2026-12-31',                    // affiché seulement (aucune fermeture automatique dans l'ébauche)
+  title: 'Saison I · L’Hiver éternel',   // v477 : première saison prévue en décembre 2026 (après la sortie sur l'App Store)
+  starts: '2026-12-01',
+  ends: '2027-01-31',                    // affiché seulement (aucune ouverture ni fermeture automatique dans l'ébauche)
   tiers: 30,                             // nombre de paliers
   xpPerTier: 100,                        // points de Codex par palier
   cost: 500,                             // v474 : prix en obsidiennes (≈ 4,99 €)

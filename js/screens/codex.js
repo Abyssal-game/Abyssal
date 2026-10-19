@@ -44,7 +44,7 @@ export default function codexScreen(app, root) {
     return `<section class="panel cx-head">
         <div class="cx-lvl"><b>${t}</b><small>/ ${CODEX.tiers}</small></div>
         <div class="cx-prog"><span class="small">${max ? 'Codex terminé pour cette saison !' : `Palier ${t + 1} : ${c.xp % CODEX.xpPerTier} / ${CODEX.xpPerTier} points`}</span><span class="cx-bar"><i style="width:${Math.round(tierProgress(c) * 100)}%"></i></span>
-          <span class="small muted">${fmt(c.xp)} points de Codex · fin de saison le ${esc(CODEX.ends.split('-').reverse().join('/'))}</span></div>
+          <span class="small muted">${fmt(c.xp)} points de Codex · saison du ${esc(CODEX.starts.split('-').reverse().join('/'))} au ${esc(CODEX.ends.split('-').reverse().join('/'))}</span></div>
       </section>
       <div class="cx-actions">${n ? `<button class="btn primary dc-plq dc-plq-red" data-cx="all">Tout récupérer (${n})</button>` : ''}
         ${c.premium ? `<span class="cx-badge on">${icon('star')}${esc(CODEX.premiumName)} acquis</span>` : `<button class="btn dc-plq dc-plq-dark cx-unlock" data-cx="unlock">${icon('star')}<span>Débloquer le ${esc(CODEX.premiumName)}</span>${obsTxt(CODEX.cost)}</button>`}</div>

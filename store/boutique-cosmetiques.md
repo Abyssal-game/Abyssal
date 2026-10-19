@@ -15,8 +15,10 @@ Les clés (`cx-…`, `dos-…`, `fin-…`…) sont définitives : elles serviron
 | Légendaire | 700-750 | 750 | 1 000 | 900 | 500-800 |
 | Mythique | 1 200 | — | 1 400 | — | — |
 
-## Collections et calendrier
-- **Nuit des Âmes** (fin octobre), **Hiver éternel** (décembre), **Cœurs maudits** (février) : objets limités dans le temps, qui reviennent l'année suivante (ou pas : c'est ce qui crée l'envie).
+## Collections et calendrier (décision du 19 octobre 2026)
+- **Aucun objet limité dans le temps** : tous les cosmétiques ajoutés au jeu restent en vente à l'Échoppe, contre des obsidiennes.
+- **Saison I du Codex : décembre 2026** (le jeu doit d'abord être sur l'App Store). Thème proposé : **Hiver éternel** (ses objets en vedette pendant la saison).
+- **Nuit des Âmes**, **Cœurs maudits** : thèmes à mettre en vedette à leur période (fin octobre, février) les années suivantes, sans jamais les retirer de la vente.
 - **Les sept trônes** : un cadre légendaire par faction, à mettre en vente en lot (−20 %).
 - **Trophées des gardiens** : cadres et dos aux couleurs des gardiens ; idée : réservés aux joueurs qui ont vaincu le gardien, puis achetables.
 - **Arts interdits**, **Merveilles** : fond de catalogue permanent ; la **Couronne du Souverain de l'Abysse** et les finitions **Impériale** et **Néant** sont les pièces maîtresses (vitrine de l'Échoppe).
@@ -28,31 +30,31 @@ Les clés (`cx-…`, `dos-…`, `fin-…`…) sont définitives : elles serviron
 Intégration : python3 tools/frame-art.py <clé> store/frames/<clé>-source.jpg 1.9 → assets/frames/<clé>.webp, puis ajouter la clé à CODEX_FRAMES et au CATALOG (js/core/codex.js) et une ligne .pf-<clé> { --fr: … } en fin de css/army.css.
 
 ### 1. `cx-lanternes` — Cadre des lanternes d’âmes
-Épique · 450 obsidiennes · collection Nuit des Âmes · Limité à la fin octobre (fête des morts).
+Épique · 450 obsidiennes · collection Nuit des Âmes
 ```
 Cadre de portrait circulaire pour l'avatar d'un joueur dans un jeu de cartes dark fantasy haut de gamme, vu parfaitement de face, centré, format carré 1:1, sur fond blanc pur uni. Un anneau épais (environ 15 % du diamètre) de vrilles de vigne noire desséchée qui s'enroulent en spirale, auxquelles pendent cinq petites lanternes de fer forgé ; dans chacune flotte une âme en forme de flamme vert pâle au visage à peine esquissé. Petites chauves-souris de fer découpé posées sur les vrilles, bougies de cire noire fondue en bas, gouttes de cire figées. Couleurs : noir charbon, vert spectral lumineux, touches d'orange citrouille sur la cire. L'intérieur du cercle est entièrement vide et blanc pur (il recevra le portrait du joueur). Peinture numérique très détaillée, qualité d'illustration de jeu de cartes premium, matières réalistes, éclairage dramatique venant du haut, symétrique, lisible même en très petit (48 pixels). Pas de halo diffus sur le fond, pas d'ombre portée, rien qui flotte détaché de l'anneau. Aucun texte, aucune lettre, aucun chiffre, aucun logo, rien au centre.
 ```
 
 ### 2. `cx-voile` — Cadre du voile des trépassés
-Légendaire · 700 obsidiennes · collection Nuit des Âmes · Limité à la fin octobre.
+Légendaire · 700 obsidiennes · collection Nuit des Âmes
 ```
 Cadre de portrait circulaire pour l'avatar d'un joueur dans un jeu de cartes dark fantasy haut de gamme, vu parfaitement de face, centré, format carré 1:1, sur fond blanc pur uni. Un anneau épais (environ 16 % du diamètre) fait d'un voile de soie spectrale bleu pâle, translucide, qui ondule autour du cercle ; dans ses plis se devinent des visages d'esprits sereins aux yeux clos, comme sculptés dans la brume solide. Le voile est retenu par un fin cercle d'argent ancien gravé de feuilles d'if, avec en haut une petite clé de crypte en argent et en bas un lys blanc fané. Couleurs : bleu glacé lumineux, blanc nacré, argent terni. L'intérieur du cercle est entièrement vide et blanc pur (il recevra le portrait du joueur). Peinture numérique très détaillée, qualité d'illustration de jeu de cartes premium, matières réalistes, éclairage dramatique venant du haut, symétrique, lisible même en très petit (48 pixels). Pas de halo diffus sur le fond, pas d'ombre portée, rien qui flotte détaché de l'anneau. Aucun texte, aucune lettre, aucun chiffre, aucun logo, rien au centre.
 ```
 
 ### 3. `cx-houx` — Couronne du solstice noir
-Épique · 450 obsidiennes · collection Hiver éternel · Limité à décembre.
+Épique · 450 obsidiennes · collection Hiver éternel
 ```
 Cadre de portrait circulaire pour l'avatar d'un joueur dans un jeu de cartes dark fantasy haut de gamme, vu parfaitement de face, centré, format carré 1:1, sur fond blanc pur uni. Une couronne épaisse (environ 15 % du diamètre) de houx aux feuilles vert très sombre presque noires, bordées de givre blanc, parsemée de baies rouge sang brillantes, entrelacée d'un ruban de velours bordeaux ; quatre petites bougies blanches allumées aux points cardinaux, flammes nettes et dorées, et de fines aiguilles de glace qui pendent vers l'extérieur. Couleurs : vert noir, rouge sang, blanc givre, or chaud des flammes. L'intérieur du cercle est entièrement vide et blanc pur (il recevra le portrait du joueur). Peinture numérique très détaillée, qualité d'illustration de jeu de cartes premium, matières réalistes, éclairage dramatique venant du haut, symétrique, lisible même en très petit (48 pixels). Pas de halo diffus sur le fond, pas d'ombre portée, rien qui flotte détaché de l'anneau. Aucun texte, aucune lettre, aucun chiffre, aucun logo, rien au centre.
 ```
 
 ### 4. `cx-aurore` — Cadre de l’aurore boréale
-Légendaire · 700 obsidiennes · collection Hiver éternel · Limité à décembre et janvier.
+Légendaire · 700 obsidiennes · collection Hiver éternel
 ```
 Cadre de portrait circulaire pour l'avatar d'un joueur dans un jeu de cartes dark fantasy haut de gamme, vu parfaitement de face, centré, format carré 1:1, sur fond blanc pur uni. Un anneau épais (environ 15 % du diamètre) de glace polie et transparente cerclée d'argent, dans lequel ondulent des voiles d'aurore boréale vert émeraude, turquoise et violet, comme une lumière prisonnière de la glace ; de petites étoiles scintillantes piquées dans la glace, et en haut un cristal de neige à six branches finement taillé dans le cristal. Couleurs : vert et violet lumineux sur bleu nuit, argent froid. L'intérieur du cercle est entièrement vide et blanc pur (il recevra le portrait du joueur). Peinture numérique très détaillée, qualité d'illustration de jeu de cartes premium, matières réalistes, éclairage dramatique venant du haut, symétrique, lisible même en très petit (48 pixels). Pas de halo diffus sur le fond, pas d'ombre portée, rien qui flotte détaché de l'anneau. Aucun texte, aucune lettre, aucun chiffre, aucun logo, rien au centre.
 ```
 
 ### 5. `cx-roses` — Cadre des roses noires
-Épique · 450 obsidiennes · collection Cœurs maudits · Limité à février (Saint-Valentin).
+Épique · 450 obsidiennes · collection Cœurs maudits
 ```
 Cadre de portrait circulaire pour l'avatar d'un joueur dans un jeu de cartes dark fantasy haut de gamme, vu parfaitement de face, centré, format carré 1:1, sur fond blanc pur uni. Un anneau épais (environ 15 % du diamètre) de tiges de rosier noir aux épines acérées, tressées serrées, avec sept roses noires veloutées aux pétales bordés de rouge profond ; en haut, un cœur de rubis taillé, transpercé d'une fine dague d'argent, d'où perle une goutte rouge figée. Couleurs : noir velours, rouge rubis lumineux, argent. L'intérieur du cercle est entièrement vide et blanc pur (il recevra le portrait du joueur). Peinture numérique très détaillée, qualité d'illustration de jeu de cartes premium, matières réalistes, éclairage dramatique venant du haut, symétrique, lisible même en très petit (48 pixels). Pas de halo diffus sur le fond, pas d'ombre portée, rien qui flotte détaché de l'anneau. Aucun texte, aucune lettre, aucun chiffre, aucun logo, rien au centre.
 ```
@@ -165,19 +167,19 @@ Cadre de portrait circulaire pour l'avatar d'un joueur dans un jeu de cartes dar
 Intégration : python3 tools/back-art.py <clé> store/backs/<clé>-source.jpg (--opaque si le dos est clair) → assets/backs/<clé>.webp, puis CODEX_BACKS et CATALOG.
 
 ### 23. `dos-ames` — Dos de la Nuit des Âmes
-Épique · 500 obsidiennes · collection Nuit des Âmes · Limité à la fin octobre.
+Épique · 500 obsidiennes · collection Nuit des Âmes
 ```
 Dos de carte à jouer pour un jeu de cartes dark fantasy haut de gamme, format vertical 5:7, cadré bord à bord (l'illustration remplit toute l'image, sans marge ni fond autour), peinture numérique très détaillée, qualité d'illustration de jeu de cartes premium. Une grille de cimetière en fer forgé vue de face, ses volutes formant un cadre ; au centre, une grande lanterne de fer suspendue où tournoient des âmes vert pâle en spirale, autour d'elle des chauves-souris en silhouette et des branches d'if mort ; fond de brume nocturne bleu violet, pleine lune pâle derrière la lanterne. Couleurs : noir, vert spectral lumineux, bleu nuit, touches d'orange citrouille. Une fine bordure régulière court sur les quatre côtés à égale distance du bord. Motif parfaitement symétrique gauche-droite, emblème central net, contrasté et lisible même quand la carte est toute petite. Aucun texte, aucune lettre, aucun chiffre, aucun logo.
 ```
 
 ### 24. `dos-solstice` — Dos du solstice noir
-Épique · 500 obsidiennes · collection Hiver éternel · Limité à décembre.
+Épique · 500 obsidiennes · collection Hiver éternel
 ```
 Dos de carte à jouer pour un jeu de cartes dark fantasy haut de gamme, format vertical 5:7, cadré bord à bord (l'illustration remplit toute l'image, sans marge ni fond autour), peinture numérique très détaillée, qualité d'illustration de jeu de cartes premium. Une rosace de vitrail glacé : un grand flocon de neige à six branches au centre, en cristal blanc lumineux, entouré de couronnes de houx noir aux baies rouges et de rameaux de sapin givrés, le tout serti dans un réseau de plomb argenté ; fond bleu nuit profond semé d'étoiles. Couleurs : bleu nuit, blanc glacier, argent, rouge baie. Une fine bordure régulière court sur les quatre côtés à égale distance du bord. Motif parfaitement symétrique gauche-droite, emblème central net, contrasté et lisible même quand la carte est toute petite. Aucun texte, aucune lettre, aucun chiffre, aucun logo.
 ```
 
 ### 25. `dos-roses` — Dos des cœurs maudits
-Épique · 500 obsidiennes · collection Cœurs maudits · Limité à février.
+Épique · 500 obsidiennes · collection Cœurs maudits
 ```
 Dos de carte à jouer pour un jeu de cartes dark fantasy haut de gamme, format vertical 5:7, cadré bord à bord (l'illustration remplit toute l'image, sans marge ni fond autour), peinture numérique très détaillée, qualité d'illustration de jeu de cartes premium. Velours noir orné d'un motif de damas de roses bordeaux à peine visible ; au centre, un cœur anatomique stylisé en rubis taillé, transpercé de deux dagues d'argent croisées, entouré d'une couronne de roses noires et d'épines ; quatre petites roses aux coins. Couleurs : noir, bordeaux, rouge rubis lumineux, argent. Une fine bordure régulière court sur les quatre côtés à égale distance du bord. Motif parfaitement symétrique gauche-droite, emblème central net, contrasté et lisible même quand la carte est toute petite. Aucun texte, aucune lettre, aucun chiffre, aucun logo.
 ```
@@ -439,13 +441,13 @@ Décor de fond pour l'écran de combat d'un jeu de cartes dark fantasy sur tél�
 ```
 
 ### 67. `ar-cimetiere` — Le Cimetière de la Nuit des Âmes
-Épique · 700 obsidiennes · collection Arènes · Limité à la fin octobre.
+Épique · 700 obsidiennes · collection Arènes
 ```
 Décor de fond pour l'écran de combat d'un jeu de cartes dark fantasy sur téléphone, format vertical 9:16, vue frontale légèrement plongeante, peinture numérique cinématographique très détaillée, profondeur atmosphérique. Un cimetière la nuit des morts : tombes penchées, grilles de fer forgé, lanternes vertes, citrouilles taillées aux bougies, if noir, âmes lumineuses qui flottent, pleine lune orange énorme en haut ; sol de terre et de feuilles mortes. Couleurs : noir, orange, vert spectral. Composition : le tiers haut porte les éléments les plus spectaculaires ; toute la bande centrale (de 20 % à 85 % de la hauteur) reste calme, plus sombre et peu détaillée, car deux rangées de cartes seront posées par-dessus ; le sol en bas, simple et lisible. Lumière d'ambiance cohérente, contraste doux au centre. Aucun personnage, aucune créature, aucune arme posée, aucun texte, aucune lettre, aucun logo.
 ```
 
 ### 68. `ar-palais` — Le Palais de glace
-Épique · 700 obsidiennes · collection Arènes · Limité à décembre.
+Épique · 700 obsidiennes · collection Arènes
 ```
 Décor de fond pour l'écran de combat d'un jeu de cartes dark fantasy sur téléphone, format vertical 9:16, vue frontale légèrement plongeante, peinture numérique cinématographique très détaillée, profondeur atmosphérique. La salle du trône d'un palais de glace : colonnes de glace translucide, lustres de cristal, aurore boréale visible par une immense verrière en haut, flocons qui tombent doucement ; sol de glace polie qui reflète la lumière. Couleurs : bleu glacier, blanc, vert et violet de l'aurore. Composition : le tiers haut porte les éléments les plus spectaculaires ; toute la bande centrale (de 20 % à 85 % de la hauteur) reste calme, plus sombre et peu détaillée, car deux rangées de cartes seront posées par-dessus ; le sol en bas, simple et lisible. Lumière d'ambiance cohérente, contraste doux au centre. Aucun personnage, aucune créature, aucune arme posée, aucun texte, aucune lettre, aucun logo.
 ```
@@ -486,19 +488,19 @@ Sachet de booster de cartes à collectionner pour un jeu de cartes dark fantasy 
 ```
 
 ### 74. `pk-ames` — Sachet de la Nuit des Âmes
-Épique · 400 obsidiennes · collection Habillages de booster · Limité à la fin octobre.
+Épique · 400 obsidiennes · collection Habillages de booster
 ```
 Sachet de booster de cartes à collectionner pour un jeu de cartes dark fantasy haut de gamme, vu parfaitement de face, vertical (rapport 7:12), le sachet entier visible et centré, sur fond noir pur uni. Bords haut et bas sertis et dentelés comme un vrai sachet scellé à chaud, léger relief de l'emballage, reflets réalistes sur la matière. Le sachet est orange citrouille et noir, décoré de toiles d'araignée argentées, avec au centre une lanterne de fer d'où s'échappent des âmes vert pâle, et des chauves-souris en silhouette. Dans le quart inférieur, un cartouche horizontal sombre et lisse, vide, bien visible (le jeu y écrira le nom du booster). Peinture numérique très détaillée, produit qu'on a envie d'ouvrir, symétrique. Aucun texte, aucune lettre, aucun chiffre, aucun logo.
 ```
 
 ### 75. `pk-solstice` — Sachet du solstice
-Épique · 400 obsidiennes · collection Habillages de booster · Limité à décembre.
+Épique · 400 obsidiennes · collection Habillages de booster
 ```
 Sachet de booster de cartes à collectionner pour un jeu de cartes dark fantasy haut de gamme, vu parfaitement de face, vertical (rapport 7:12), le sachet entier visible et centré, sur fond noir pur uni. Bords haut et bas sertis et dentelés comme un vrai sachet scellé à chaud, léger relief de l'emballage, reflets réalistes sur la matière. Le sachet est bleu nuit givré, orné de houx noir aux baies rouges et d'un grand flocon de cristal au centre, avec des fils d'argent et un petit ruban de velours rouge. Dans le quart inférieur, un cartouche horizontal sombre et lisse, vide, bien visible (le jeu y écrira le nom du booster). Peinture numérique très détaillée, produit qu'on a envie d'ouvrir, symétrique. Aucun texte, aucune lettre, aucun chiffre, aucun logo.
 ```
 
 ### 76. `pk-roses` — Sachet des roses noires
-Épique · 400 obsidiennes · collection Habillages de booster · Limité à février.
+Épique · 400 obsidiennes · collection Habillages de booster
 ```
 Sachet de booster de cartes à collectionner pour un jeu de cartes dark fantasy haut de gamme, vu parfaitement de face, vertical (rapport 7:12), le sachet entier visible et centré, sur fond noir pur uni. Bords haut et bas sertis et dentelés comme un vrai sachet scellé à chaud, léger relief de l'emballage, reflets réalistes sur la matière. Le sachet est en velours noir brodé de roses bordeaux, avec au centre un cœur de rubis transpercé d'une dague d'argent, et des épines argentées sur les bords. Dans le quart inférieur, un cartouche horizontal sombre et lisse, vide, bien visible (le jeu y écrira le nom du booster). Peinture numérique très détaillée, produit qu'on a envie d'ouvrir, symétrique. Aucun texte, aucune lettre, aucun chiffre, aucun logo.
 ```
@@ -580,7 +582,7 @@ Plateau de jeu pour un duel de cartes dans un jeu dark fantasy haut de gamme, vu
 ```
 
 ### 88. `sc-glace` — Plateau de glace
-Épique · 500 obsidiennes · collection Plateaux des Sceaux · Limité à décembre.
+Épique · 500 obsidiennes · collection Plateaux des Sceaux
 ```
 Plateau de jeu pour un duel de cartes dans un jeu dark fantasy haut de gamme, vu parfaitement de dessus, format vertical 3:4, peinture numérique très détaillée. Au centre, une grille de 3 × 3 cases carrées identiques, alignées, bien séparées par de fins rebords, chaque case assez grande pour recevoir une carte et légèrement creusée, la surface des cases unie et calme. Autour de la grille, un large cadre ornemental qui remplit toute l'image jusqu'aux bords. Le plateau est une plaque de glace épaisse et translucide où l'on devine des bulles et des fissures, les cases bordées d'argent, le cadre fait de cristaux de glace taillés et de flocons sertis aux coins. Lumière douce venant du haut, les neuf cases également éclairées, aucun objet posé sur les cases. Parfaitement symétrique. Aucun texte, aucune lettre, aucun chiffre, aucun logo.
 ```
