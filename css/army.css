@@ -4355,3 +4355,13 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .cx-pv-foot { position: sticky; bottom: 0; display: grid; justify-items: center; gap: 6px; padding: 14px 0 6px; margin-top: 14px; background: linear-gradient(transparent, rgba(8, 9, 13, .96) 30%); }
 .cx-pv-buy { min-width: 220px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
 @media (prefers-reduced-motion: reduce) { .cx-pv-back img { animation: none; } }
+
+/* v485 : cadres peints moins massifs : l'anneau mord sur le bord du portrait (comme les cadres de base) au lieu de l'entourer
+   de toute son épaisseur ; débord ramené de 45 % à 25 % de chaque côté (42 % pour les cadres aux grands ornements) */
+.pf.pf[class*="pf-cx-"]::after { inset: -25%; }
+.pf.pf.pf-cx-seraphin::after, .pf.pf.pf-cx-horloger::after, .pf.pf.pf-cx-prince::after, .pf.pf.pf-cx-meute::after,
+.pf.pf.pf-cx-corbeau::after, .pf.pf.pf-cx-geode::after, .pf.pf.pf-cx-souverain::after { inset: -40%; }
+.cs-hero { grid-template-columns: 96px 1fr auto; gap: 18px; padding-left: 20px; }
+.cs-hero .avatar-big { width: 78px; height: 78px; margin: 8px; }
+.frame-pick .avatar-mini.pf[class*="pf-cx-"] { margin: 6px 0 10px; }
+.top-avatar.pf[class*="pf-cx-"] { margin: 0 5px; }
