@@ -134,16 +134,17 @@ test('défense active : parade parfaite, esquive, parade ratée', () => {
   [st, g, e] = mk();
   hp = g.hp;
   D.enemyAct(st, e.uid, 'dodge');
-  assert.equal(g.hp, hp); assert.equal(st.fervor, 1);
+  const grazed = hp - g.hp;
+  assert.ok(grazed > 0, 'esquive : éraflure (v502)'); assert.equal(st.fervor, 1);
   [st, g, e] = mk();
   hp = g.hp;
   D.enemyAct(st, e.uid, 'none');
-  assert.ok(g.hp < hp, 'parade ratée : dégâts normaux');
+  assert.ok(hp - g.hp > grazed, 'parade ratée : dégâts normaux, plus forts que l’éraflure');
   assert.equal(st.fervor, 0, 'pas de punition supplémentaire');
-  // les attaques ordinaires des ennemis simples ne demandent pas de timing
+  // v502 : les attaques ordinaires des ennemis simples se défendent aussi
   const s2 = D.createDuel([A(GARDE)], [E(FOE)], { seed: 6 });
   const i = D.intentInfo(s2, units(s2, 'enemy')[0]);
-  if (i.kind === 'hit') assert.equal(i.qte, false);
+  if (i.kind === 'hit') assert.equal(i.qte, true);
 });
 
 test('Brisure : interrompt, fait passer le tour, rend vulnérable, puis l’ennemi se relève plus solide', () => {

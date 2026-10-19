@@ -4506,3 +4506,19 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .mn-fr-n { color: var(--gold, #E8C35A); }
 .acc-pseudo-fixed { font-size: 1.05rem; }
 .fr-add .btn { flex: 0 0 auto; padding-inline: 16px; }
+
+/* v502 : défense en trois gestes : toucher (coup simple), maintenir puis relâcher (coup chargé), glisser (attaque de zone) */
+.dv.qte-on, .dv.qte-on * { touch-action: none; }
+.cb-def.cb-hold.held .dv-dodge-bar { box-shadow: inset 0 0 8px rgba(0, 0, 0, .9), 0 0 18px rgba(255, 200, 120, .75); }
+.cb-def.cb-hold.held .dv-dodge-t small { color: #FFE7A8; }
+.cb-swipe { min-width: 240px; }
+.cb-sw-arrow { display: grid; place-items: center; width: 70px; height: 70px; border-radius: 50%; font: 900 3.2rem/1 var(--f-ui); color: #FFE7A8; background: radial-gradient(circle, rgba(242, 193, 78, .28), rgba(20, 12, 4, .2) 70%); text-shadow: 0 0 18px rgba(242, 193, 78, .9); opacity: .35; transition: opacity .12s; }
+.cb-swipe.go .cb-sw-arrow { opacity: 1; animation: swNudge .5s ease-in-out infinite alternate; }
+.cb-sw-arrow.d-l { --nx: -10px; --ny: 0; } .cb-sw-arrow.d-r { --nx: 10px; --ny: 0; } .cb-sw-arrow.d-u { --nx: 0; --ny: -10px; }
+@keyframes swNudge { from { transform: translate(0, 0); } to { transform: translate(var(--nx), var(--ny)); } }
+.cb-sw-time { position: relative; width: 70%; height: 6px; border-radius: 99px; background: rgba(255, 255, 255, .1); overflow: hidden; }
+.cb-sw-time i { position: absolute; inset: 0; transform-origin: left; background: linear-gradient(90deg, #F2C14E 0 55%, #FFFFFF 55%); transform: scaleX(1); }
+.cb-swipe.go .cb-sw-time i { animation-name: swTime; animation-timing-function: linear; animation-fill-mode: forwards; }
+@keyframes swTime { to { transform: scaleX(0); } }
+.cb-swipe.ok .cb-sw-arrow, .cb-swipe.ko .cb-sw-arrow { animation: none; }
+@media (prefers-reduced-motion: reduce) { .cb-swipe.go .cb-sw-arrow { animation: none; } }

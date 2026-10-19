@@ -76,8 +76,10 @@ export const enemyScale = (floor) => 1 + 0.06 * Math.min(19, floor - 1) + 0.03 *
 // jusqu'à `at100` à l'étage 100 (mesuré au simulateur : avant, des murs aux étages 91-98 avec une équipe au maximum).
 // v495 : force des ennemis réglée étage par étage (points reliés en ligne droite), calée au simulateur de chapitres :
 // FOE_EASE pour les combats ordinaires et les élites, BOSS_EASE pour les gardiens (multiplie PV et attaque).
-export const FOE_EASE = [[1, 1], [8, 1], [12, 0.88], [20, 0.85], [30, 0.88], [60, 0.9], [85, 0.88], [100, 0.84]];
-export const BOSS_EASE = [[1, 1], [5, 1], [10, 0.85], [15, 1], [25, 1], [30, 0.9], [40, 1], [80, 1], [100, 0.82]];
+// v502 : premiers étages relevés (« zéro difficulté jusqu'à l'étage 6 » : 3 % de PV perdus par combat), la force
+// effective (enemyScale × FOE_EASE) monte doucement de 1,3 à l'étage 1 jusqu'au réglage précédent vers l'étage 12.
+export const FOE_EASE = [[1, 1.45], [2, 1.37], [3, 1.304], [4, 1.254], [6, 1.169], [8, 1.099], [9, 1.068], [12, 0.976], [20, 0.85], [30, 0.88], [60, 0.9], [85, 0.88], [100, 0.84]];
+export const BOSS_EASE = [[1, 1.15], [5, 1.15], [10, 0.85], [15, 1], [25, 1], [30, 0.9], [40, 1], [80, 1], [100, 0.82]];
 const ease = (pts, f) => {
   if (f <= pts[0][0]) return pts[0][1];
   for (let i = 1; i < pts.length; i++) if (f <= pts[i][0]) { const [a, x] = pts[i - 1], [b, y] = pts[i]; return x + (y - x) * (f - a) / (b - a); }
@@ -157,7 +159,7 @@ export function floorEnemies(catalog, day, floor, room) {
   const out = [];
   if (room === 'boss') out.push({ id: pick(rng, bossPool(catalog, floor)).id, boss: true });
   if (room === 'elite') out.push({ id: pick(rng, pool.filter((c) => c.rarity !== 'C')).id, elite: true });
-  const n = room === 'boss' ? (floor >= 10 ? 2 : 1) : room === 'elite' ? 1 + (floor >= 6 ? 1 : 0) : 2 + (floor >= 3 ? 1 : 0) + (floor >= 9 ? 1 : 0);
+  const n = room === 'boss' ? (floor >= 10 ? 2 : 1) : room === 'elite' ? 1 + (floor >= 6 ? 1 : 0) : 2 + (floor >= 2 ? 1 : 0) + (floor >= 12 ? 1 : 0); /* v502 : 3 ennemis dès l'étage 2, le 4e à l'étage 12 (avant : 3 et 9, un mur à l'étage 9) */
   for (let i = 0; i < n; i++) out.push({ id: pick(rng, pool).id });
   return out;
 }

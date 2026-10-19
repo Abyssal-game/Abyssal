@@ -35,7 +35,7 @@ export const POWERS = {
 // Adversaires : les arbitres des Sceaux. mem : chance de retenir une carte vue ; fade : chance d'oublier, à chaque tour,
 // une carte retenue ; spite : utilise ses pouvoirs pour gêner (échange des cartes que tu as vues).
 export const RIVALS = {
-  initie: { name: 'Ilda', mem: 0.2, fade: 0.3, spite: 0, confuse: 0.25, hint: 'Oublie vite ce qu’elle a vu.',
+  initie: { name: 'Ilda', mem: 0.35, fade: 0.2, spite: 0, confuse: 0.2, hint: 'Oublie vite ce qu’elle a vu.',
     hello: 'Des cryptes ? J’ai la mémoire d’un moineau… on y va ?', beaten: 'Je l’avais vue, celle-là ! Enfin… je crois.', gloat: 'Même un moineau trouve ses graines !' },
   stratege: { name: 'Sœur Vesna', mem: 0.5, fade: 0.15, spite: 0.4, confuse: 0.15, hint: 'Retient une carte sur deux, et brouille parfois les tiennes.',
     hello: 'Chaque tombe garde un nom. Je les récite tous les soirs.', beaten: 'Ma litanie avait un trou.', gloat: 'La prière garde la mémoire.' },
@@ -116,7 +116,16 @@ export const left = (st) => st.cards.filter((c) => !c.gone).length / 2;
 // Mémoire de l'adversaire : il retient (ou non) chaque carte qu'il voit
 function see(st, i, rng, sure = false) {
   const R = RIVALS[st.rival];
+  (st.seenAt ||= {})[i] = st.turns;
   if (sure || rng() < R.mem) st.mem[i] = st.cards[i].k;
+}
+/* v502 : comme un humain, même un adversaire distrait se souvient presque toujours des cartes retournées
+   pendant ce tour et le précédent (`recent`) ; `mem` et `fade` ne règlent plus que la mémoire plus ancienne. */
+export const RECENT = { initie: 0.8, stratege: 0.88, archiviste: 0.94, echo: 0.97, collectionneur: 0.96, banquier: 0.96, maitre: 0.98, souverain: 0.99 };
+function knownOf(st, i, rng) {
+  if (st.mem[i] != null) return st.mem[i];
+  const t = st.seenAt?.[i];
+  return t != null && t >= st.turns - 1 && rng() < (RECENT[st.rival] ?? 0.9) ? st.cards[i].k : null;
 }
 function fadeMem(st, rng) {
   const R = RIVALS[st.rival];
@@ -204,6 +213,7 @@ function swap(st, i, j) {
   delete st.mem[i]; delete st.mem[j];
   if (mj != null) st.mem[i] = mj;
   if (mi != null) st.mem[j] = mi;
+  if (st.seenAt) { const si = st.seenAt[i], sj = st.seenAt[j]; delete st.seenAt[i]; delete st.seenAt[j]; if (sj != null) st.seenAt[i] = sj; if (si != null) st.seenAt[j] = si; }
 }
 
 // Pouvoirs de l'adversaire : il les choisit lui-même
@@ -240,22 +250,22 @@ function recall(st, i, rng) {
   return alt.length ? alt[Math.floor(rng() * alt.length)] : i;
 }
 export function aiPick(st, rng = Math.random) {
-  const R = RIVALS[st.rival], hid = hidden(st), byK = {};
-  for (const i of hid) if (st.mem[i] != null) (byK[st.mem[i]] ||= []).push(i);
+  const R = RIVALS[st.rival], hid = hidden(st), byK = {}, kn = {};
+  for (const i of hid) { const k = knownOf(st, i, rng); if (k != null) { kn[i] = k; (byK[k] ||= []).push(i); } }
   const pickOf = (l) => l[Math.floor(rng() * l.length)];
   const cursed = (k) => (st.curse || []).includes(k);
   if (st.open.length === 1) {
     const o = st.open[0], k = st.cards[o].k;
     const known = (byK[k] || []).find((i) => i !== o);
-    const unknown = hid.filter((i) => st.mem[i] == null && i !== o);
+    const unknown = hid.filter((i) => kn[i] == null && i !== o);
     // v492 : une paire maudite, il ne la prend que s'il n'a rien d'autre à retourner
-    if (known != null && cursed(k)) { const safe = unknown.length ? unknown : hid.filter((i) => i !== o && st.mem[i] != null && st.mem[i] !== k); if (safe.length) return pickOf(safe); }
+    if (known != null && cursed(k)) { const safe = unknown.length ? unknown : hid.filter((i) => i !== o && kn[i] != null && kn[i] !== k); if (safe.length) return pickOf(safe); }
     if (known != null) return recall(st, known, rng);
     return pickOf(unknown.length ? unknown : hid.filter((i) => i !== o));
   }
   const pair = Object.entries(byK).find(([k, l]) => l.length >= 2 && !cursed(+k))?.[1];
   if (pair) return recall(st, pair[0], rng);
-  const unknown = hid.filter((i) => st.mem[i] == null);
+  const unknown = hid.filter((i) => kn[i] == null);
   return pickOf(unknown.length ? unknown : hid);
 }
 // Pour l'écran : cartes vues par le joueur (l'adversaire s'en sert pour brouiller avec Abyssal)
