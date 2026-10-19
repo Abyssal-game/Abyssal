@@ -18,7 +18,7 @@ const HOW = [['cards', '#7FA8D8', 'Les cryptes', '20 cartes face cachée, en 10 
   ['book', '#B48CFF', 'Les pouvoirs', 'Chaque faction a son pouvoir : regarder une carte, échanger deux cartes, voler une paire… Touche « Pouvoirs » en partie pour les revoir.'],
   ['eye', '#C9A45A', 'Tes adversaires', 'Ils ont plus ou moins de mémoire. Les plus forts se servent de leurs pouvoirs pour brouiller ce que tu as vu.']];
 const howLi = ([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic === 'eye' ? 'ui-eye' : ic === 'crystal' ? 'cur-shard' : ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`;
-const howHTML = () => `<ol class="how-steps">${HOW.slice(0, 4).map(howLi).join('')}</ol><details class="how-more"><summary>Pour aller plus loin (${HOW.length - 4})</summary><ol class="how-steps" start="5">${HOW.slice(4).map((x, i) => howLi(x, i + 4)).join('')}</ol></details>`;
+const howHTML = () => `<ol class="how-steps">${HOW.map(howLi).join('')}</ol>`; /* v491 : tutoriel entier, sans « Pour aller plus loin » */
 
 export default function cryptesScreen(app, root) {
   const g = app.game, cat = app.catalog;

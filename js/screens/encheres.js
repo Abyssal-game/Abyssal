@@ -18,7 +18,7 @@ const HOW = [['cards', '#7FA8D8', 'La vente', 'Mammon met en vente 15 lots, un p
   ['book', '#7FE0A0', 'Les familles', 'Trois créatures d’une même faction rapportent +5 points.'],
   ['eye', '#C9A45A', 'Lire les enchérisseurs', 'Les offrandes qui restent à chacun sont visibles. Chaque enchérisseur a son style : certains se lisent facilement, d’autres misent n’importe quoi.']];
 const howLi = ([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic === 'eye' ? 'ui-eye' : ic === 'crystal' ? 'cur-shard' : ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`;
-const howHTML = () => `<ol class="how-steps">${HOW.slice(0, 4).map(howLi).join('')}</ol><details class="how-more"><summary>Pour aller plus loin (${HOW.length - 4})</summary><ol class="how-steps" start="5">${HOW.slice(4).map((x, i) => howLi(x, i + 4)).join('')}</ol></details>`;
+const howHTML = () => `<ol class="how-steps">${HOW.map(howLi).join('')}</ol>`; /* v491 : tutoriel entier, sans « Pour aller plus loin » */
 
 export default function encheresScreen(app, root) {
   const g = app.game, cat = app.catalog;
@@ -52,7 +52,6 @@ export default function encheresScreen(app, root) {
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
     root.innerHTML = `<header class="screen-head ui-hero bn-encheres"><h1>Les Enchères de Mammon</h1><p class="muted">Offre plus que les autres… sans jamais offrir pareil.</p>
         <span class="sc-rec">${en.wins} victoire${en.wins > 1 ? 's' : ''} · ${en.losses} défaite${en.losses > 1 ? 's' : ''}</span></header>
-      <div class="gm-show en-show" aria-hidden="true"><img class="en-show-lot" alt="" src="assets/jeux/en-malediction.webp"><img class="en-show-gavel" alt="" src="assets/jeux/en-marteau.webp"><span class="en-show-coins"><img alt="" src="assets/jeux/en-jeton.webp"><img alt="" src="assets/jeux/en-jeton.webp"><img alt="" src="assets/jeux/en-jeton.webp"></span></div>
       ${g.encheresDailyOpen() ? `<button class="panel sc-daily ${dailyDone ? 'done' : ''}" data-en="daily" ${dailyDone ? 'disabled' : ''}>
         <img alt="" src="assets/icons/hourglass.webp"><span><b>Défi du jour</b><span class="small">${esc(DT.name)} · la même vente pour tous</span>
         <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : `Victoire : +${EN.ENCHERES_REWARD.daily} éclats et un coffre de bois`}</span></span>${dailyDone ? icon('check') : icon('next')}</button>` : ''}
