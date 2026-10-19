@@ -31,7 +31,7 @@ export function cardHTML(card, opts = {}) {
   const r = RARITY[card.rarity];
   const fc = catalogRef?.faction[card.faction]?.colors.secondary || '#888';
   const fame = mystery ? 0 : fameRef(card.id);
-  const dress = mystery ? null : dressRef(card.id);
+  const dress = mystery ? null : opts.dress !== undefined ? opts.dress : dressRef(card.id); /* v484 : opts.dress pour les aperçus de l'Échoppe */
   const cls = ['tcg', `tcg-${size}`, `r-${card.rarity}`, `f-${card.faction}`, mystery ? 'is-mystery' : `v-${variant}`, hasRealArt(card.id) ? 'real' : '', fame ? `fm${fame}` : '', !mystery && apexRef(card.id) ? 'apex' : '', dress ? `dr dr-${dress}` : ''].join(' ');
   const fameB = fame ? `<span class="tcg-fame" title="${FAME_NAMES[fame]}" aria-label="Renommée : ${FAME_NAMES[fame]}"><img alt="" src="assets/icons/fame-${fame}.webp" onerror="this.remove()"></span>` : '';
   const style = `--rc:${r.color};--fc:${fc};--hue:${hueFor(card.id)}deg`;
