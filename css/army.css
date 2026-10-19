@@ -4412,3 +4412,26 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .pf-cx-voile { --fr: url(../assets/frames/cx-voile-2.webp); }
 .pf-cx-yeux { --fr: url(../assets/frames/cx-yeux-2.webp); }
 .pf.pf.pf[class*="pf-cx-"]::after { inset: -24.2%; }
+
+/* v488 : aperçu des finitions refait (grande carte inclinable sur une scène, avant / après, choix de la carte), pied collé en bas sans couper le texte */
+.cx-pv .cx-pv-title { margin: 4px 54px 2px; font: 800 1.35rem/1.15 var(--f-display); letter-spacing: .04em; color: #F2D9A0; text-shadow: 0 2px 10px rgba(0, 0, 0, .7); }
+.cx-pvf-stage { position: relative; margin: 14px -16px 0; padding: 22px 16px 10px; background: radial-gradient(ellipse 70% 55% at 50% 45%, rgba(201, 164, 90, .16), transparent 70%), radial-gradient(ellipse 60% 10% at 50% 96%, rgba(0, 0, 0, .7), transparent 75%); }
+.cx-pvf-stage .detail-card { width: min(100%, 320px, calc((var(--app-h, 100dvh) - 330px) * .714)); margin: 0 auto; }
+.cx-pvf-stage .detail-card .tcg { box-shadow: 0 18px 40px rgba(0, 0, 0, .75), 0 0 34px rgba(201, 164, 90, .18); }
+.cx-pvf-hint { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 14px 0 0; font-size: .78rem; color: var(--muted); text-align: center; }
+.cx-pvf-hint svg { width: 15px; height: 15px; flex: none; opacity: .8; }
+.cx-pvf-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; max-width: 320px; margin: 14px auto 0; padding: 4px; border-radius: 12px; background: rgba(10, 11, 18, .85); border: 1px solid rgba(201, 164, 90, .3); }
+.cx-pvf-seg button { min-height: 44px; border: 0; border-radius: 9px; background: transparent; color: var(--muted); font: 700 .88rem/1.1 var(--f-ui); }
+.cx-pvf-seg button.on { background: linear-gradient(180deg, rgba(201, 164, 90, .35), rgba(120, 90, 40, .3)); color: #F2D9A0; box-shadow: inset 0 0 0 1px rgba(242, 193, 78, .5); }
+.cx-pvf-pick { display: flex; gap: 10px; overflow-x: auto; margin: 0 -16px; padding: 4px 16px 10px; scroll-snap-type: x proximity; scrollbar-width: none; }
+.cx-pvf-pick::-webkit-scrollbar { display: none; }
+.cx-pvf-pick button { flex: 0 0 92px; padding: 0; border: 0; background: none; border-radius: 10px; scroll-snap-align: center; opacity: .62; transition: opacity .2s, transform .2s; }
+.cx-pvf-pick button.on { opacity: 1; transform: translateY(-3px); box-shadow: 0 0 0 2px #F2C14E, 0 6px 16px rgba(242, 193, 78, .3); }
+.cx-pvf-pick .tcg { pointer-events: none; }
+.cx-pvf-note { margin: 12px 8px 0; font-size: .8rem; line-height: 1.4; color: var(--muted); text-align: center; }
+.cx-pv .cx-pv-foot { margin: 16px -16px 0; padding: 22px 16px calc(12px + var(--safe-b, 0px)); background: linear-gradient(transparent, rgba(8, 9, 13, .97) 34%); }
+/* v488 : carte habillée : le cadre de finition va jusqu'au bord (les images ont 2 % de marge vide), plus de liseré de rareté autour */
+.tcg.dr .tcg-frame, .tcg.dr::after { display: none; }
+.tcg.dr .tcg-dress { inset: -1.45% -2.05%; }
+.tcg.dr-fin-spectrale .tcg-dress { inset: -1.35% -1%; }
+.cx-pv .cx-pv-foot { background: rgba(8, 9, 13, .97); border-top: 1px solid rgba(201, 164, 90, .25); box-shadow: 0 -10px 24px rgba(0, 0, 0, .6); padding-top: 14px; }

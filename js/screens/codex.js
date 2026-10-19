@@ -5,7 +5,7 @@ import { FRAMES } from '../config.js';
 import { CHESTS } from '../core/descent.js';
 import { icon, picon } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, openSheet } from '../ui/dom.js';
-import { cardHTML } from '../ui/card.js';
+import { cardHTML, enableTilt } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
 import { EMBLEM } from '../ui/icons.js';
 import { setScene } from '../ui/scene.js';
@@ -123,7 +123,7 @@ export default function codexScreen(app, root) {
     const s = g.s, av = s.avatar && cat.get(s.avatar);
     const avImg = av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM;
     const mine = g.bestCards(6).filter(Boolean);
-    let pick = 0;
+    let pick = 0, plain = false, bare = false, stopTilt = null;
     const nm = it.name || ALL_FRAMES[it.id] || CODEX_BACKS[it.id] || (FINISHES[it.id] && `Finition ${FINISHES[it.id].name}`);
     const body = () => {
       if (it.kind === 'frame') return `<p class="cx-pv-cap">Sur ton profil</p>
@@ -138,25 +138,45 @@ export default function codexScreen(app, root) {
         <div class="cx-pv-fan">${[0, 1, 2].map(() => `<img alt="" src="assets/backs/${it.id}.webp">`).join('')}</div>
         <p class="cx-pv-cap">À côté de ton dos actuel</p>
         <div class="cx-pv-vs"><div><img class="cx-pv-sm" alt="" src="${s.back ? `assets/backs/${s.back}.webp` : 'assets/backs/back.webp'}"><small>Actuel</small></div><div><img class="cx-pv-sm" alt="" src="assets/backs/${it.id}.webp"><small>${esc(nm)}</small></div></div>`;
-      if (it.kind === 'finish') {
-        const c = mine[pick] || cat.get('ABY-039');
-        return `<p class="cx-pv-cap">Sur une de tes cartes</p>
-          <div class="cx-pv-card">${cardHTML(c, { size: 'full', variant: 'normal', dress: it.id })}</div>
-          ${mine.length > 1 ? `<button class="btn small ghost cx-pv-next" data-pv="next">${icon('refresh')}Essayer sur une autre carte</button>` : ''}
-          <p class="cx-pv-cap">Dans ta collection</p>
-          <div class="cx-pv-minis">${(mine.length ? mine.slice(0, 3) : [c]).map((x) => cardHTML(x, { dress: it.id })).join('')}</div>
-          <p class="small muted center">Achetée une fois, la finition se pose sur autant de cartes que tu veux. Elle ne change rien à leurs valeurs.</p>`;
+      if (it.kind === 'finish') { /* v488 : aperçu refait : grande carte inclinable, avant / après, choix de la carte, texte masqué au toucher */
+        const list = mine.length ? mine : [cat.get('ABY-039')], c = list[pick % list.length];
+        return `<div class="cx-pvf-stage">
+            <div class="detail-card cx-pvf-card">${cardHTML(c, { size: 'full', variant: 'normal', dress: plain ? null : it.id })}</div>
+            <p class="cx-pvf-hint">${icon('eye')}Touche la carte pour ${bare ? 'remettre le texte' : 'voir l’illustration seule'} · fais-la pivoter du doigt</p>
+          </div>
+          <div class="cx-pvf-seg" role="group" aria-label="Comparer">
+            <button class="${plain ? 'on' : ''}" data-pv="plain">Sans finition</button><button class="${plain ? '' : 'on'}" data-pv="dress">${esc(FINISHES[it.id]?.name || 'Finition')}</button>
+          </div>
+          ${list.length > 1 ? `<p class="cx-pv-cap">Choisis la carte</p>
+          <div class="cx-pvf-pick">${list.map((x, i) => `<button class="${i === pick % list.length ? 'on' : ''}" data-pv="pick" data-i="${i}" aria-label="${esc(x.name)}">${cardHTML(x, { dress: it.id })}</button>`).join('')}</div>` : ''}
+          <p class="cx-pvf-note">Achetée une fois, la finition se pose sur autant de cartes que tu veux, depuis la fiche de chaque carte. Elle ne change rien à leurs valeurs.</p>`;
       }
       return `<p class="cx-pv-cap">Les sept dos du lot</p><div class="cx-pv-grid">${it.give.backs.map((b) => `<figure><img alt="" src="assets/backs/${b}.webp"><figcaption>${esc((CODEX_BACKS[b] || b).replace('Dos du royaume ', ''))}</figcaption></figure>`).join('')}</div>`;
     };
     const foot = () => { const own = g.catalogOwned(it.id), cost = g.catalogCost(it.id);
       return `<div class="cx-pv-foot">${own ? `<span class="cx-badge on">${icon('check')}Déjà à toi</span>` : `<button class="btn primary cx-pv-buy" data-pv="buy">Acheter · ${obsTxt(cost)}</button><small class="muted">Tu as ${obsTxt(g.obs())}</small>`}</div>`; };
-    const sh = openSheet('', { label: 'Aperçu', full: true });
-    const paint = () => sh.setContent(`<h2 class="center">${esc(nm)}</h2>${it.desc ? `<p class="small muted center">${esc(it.desc)}</p>` : ''}${body()}${foot()}`);
+    const sh = openSheet('', { label: 'Aperçu', full: true, cls: 'cx-pv', onClose: () => stopTilt?.() });
+    const paint = () => {
+      stopTilt?.();
+      sh.setContent(`<h2 class="center cx-pv-title">${esc(nm)}</h2>${it.desc ? `<p class="small muted center">${esc(it.desc)}</p>` : ''}${body()}${foot()}`);
+      const dc = sh.body.querySelector('.cx-pvf-card'); stopTilt = dc ? enableTilt(dc, { reduced: app.reduced?.() }) : null;
+      if (bare) dc?.querySelector('.tcg')?.classList.add('art-only');
+    };
     paint();
+    /* toucher la carte sans la faire pivoter : texte masqué ou remis (comme la fiche d'une carte) */
+    let dp = null;
+    sh.body.addEventListener('pointerdown', (ev) => { dp = ev.target.closest('.cx-pvf-card .tcg') ? { x: ev.clientX, y: ev.clientY, t: Date.now() } : null; }, { passive: true });
     sh.body.addEventListener('click', async (e) => {
+      const tc = e.target.closest('.cx-pvf-card .tcg');
+      if (tc) {
+        if (!dp || Math.hypot(e.clientX - dp.x, e.clientY - dp.y) > 10 || Date.now() - dp.t > 600) return;
+        bare = !bare; tc.classList.toggle('art-only', bare); app.sfx.tap?.();
+        const h = sh.body.querySelector('.cx-pvf-hint'); if (h) h.innerHTML = `${icon('eye')}Touche la carte pour ${bare ? 'remettre le texte' : 'voir l’illustration seule'} · fais-la pivoter du doigt`;
+        return;
+      }
       const b = e.target.closest('[data-pv]'); if (!b) return;
-      if (b.dataset.pv === 'next') { pick = (pick + 1) % mine.length; app.sfx.tap?.(); paint(); }
+      if (b.dataset.pv === 'pick') { pick = +b.dataset.i; app.sfx.tap?.(); paint(); sh.el.scrollTo?.({ top: 0, behavior: 'smooth' }); }
+      if (b.dataset.pv === 'plain' || b.dataset.pv === 'dress') { plain = b.dataset.pv === 'plain'; app.sfx.tap?.(); paint(); }
       if (b.dataset.pv === 'buy') { try { if (await buy(it.id)) { paint(); app.chrome?.(); draw(); } } catch (err) { toast(esc(err.message), { kind: 'error' }); } }
     });
   }
