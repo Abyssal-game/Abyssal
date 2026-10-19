@@ -54,10 +54,10 @@ export const RIVALS = {
     hello: 'Le Tombeau bouge, le Tombeau maudit. Et moi, je n’oublie jamais.', beaten: 'Le Néant… a oublié une carte ?', gloat: 'Ton souvenir s’efface déjà.' },
 };
 export const TABLES = [
-  { key: 'ossuaire', name: 'L’Ossuaire', stars: 1, rival: 'initie', reward: 25, chest: 'bois' },
-  { key: 'chapelle', name: 'La Chapelle des noms', stars: 2, rival: 'stratege', reward: 35, chest: 'fer' },
-  { key: 'archives', name: 'Les Archives scellées', stars: 3, rival: 'archiviste', reward: 50, chest: 'or' },
-  { key: 'puits', name: 'Le Puits de l’Écho', stars: 4, rival: 'echo', reward: 70, chest: 'abyssal' },
+  { key: 'ossuaire', name: 'L’Ossuaire', stars: 1, rival: 'initie', reward: 25, chest: 'bois', bg: 'salle-cryptes-ossuaire' },
+  { key: 'chapelle', name: 'La Chapelle des noms', stars: 2, rival: 'stratege', reward: 35, chest: 'fer', bg: 'salle-cryptes-chapelle' },
+  { key: 'archives', name: 'Les Archives scellées', stars: 3, rival: 'archiviste', reward: 50, chest: 'or', bg: 'salle-cryptes-archives' },
+  { key: 'puits', name: 'Le Puits de l’Écho', stars: 4, rival: 'echo', reward: 70, chest: 'abyssal', bg: 'salle-cryptes-puits' },
   // v492 : cryptes 5 à 8, chacune avec sa règle : mouvante (à chaque fois que la main passe, deux cartes face cachée
   // échangent leur place, sous tes yeux), maudite (deux paires maudites : −1 point et pas de pouvoir), silence (aucun pouvoir)
   { key: 'cimetiere', name: 'Le Cimetière des rois', stars: 4, rival: 'collectionneur', reward: 80, chest: 'or', bg: 'salle-cryptes-cimetiere', rule: 'Crypte mouvante : chaque fois que la main passe, deux cartes face cachée échangent leur place, sous tes yeux.', rules: { drift: true } },

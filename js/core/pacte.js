@@ -47,10 +47,10 @@ export const RIVALS = {
     hello: 'Signe. Ton nom finira dans le Néant, comme les autres.', beaten: 'Le Néant… a perdu un pacte ?', gloat: 'Retourne au silence.' },
 };
 export const TABLES = [
-  { key: 'novice', name: 'Le Pacte du novice', stars: 1, rival: 'initie', reward: 25, chest: 'bois' },
-  { key: 'six', name: 'Le Pacte des six', stars: 2, rival: 'collectionneur', reward: 35, chest: 'fer' },
-  { key: 'sceaux', name: 'Le Pacte des Sceaux', stars: 3, rival: 'maitre', reward: 50, chest: 'or' },
-  { key: 'mammon', name: 'Le Pacte de Mammon', stars: 4, rival: 'banquier', reward: 70, chest: 'abyssal' },
+  { key: 'novice', name: 'Le Pacte du novice', stars: 1, rival: 'initie', reward: 25, chest: 'bois', bg: 'salle-pacte-novice' },
+  { key: 'six', name: 'Le Pacte des six', stars: 2, rival: 'collectionneur', reward: 35, chest: 'fer', bg: 'salle-pacte-six' },
+  { key: 'sceaux', name: 'Le Pacte des Sceaux', stars: 3, rival: 'maitre', reward: 50, chest: 'or', bg: 'salle-pacte-sceaux' },
+  { key: 'mammon', name: 'Le Pacte de Mammon', stars: 4, rival: 'banquier', reward: 70, chest: 'abyssal', bg: 'salle-pacte-mammon' },
   // v492 : salles 5 à 8, chacune avec sa règle (rules : target, seven, sp = cartes spéciales du paquet)
   { key: 'cendres', name: 'Le Pacte des cendres', stars: 4, rival: 'stratege', reward: 80, chest: 'or', bg: 'salle-pacte-cendres', rule: 'Aucun Sceau dans le paquet : rien ne te protège d’une brisure.', rules: { sp: { sceau: 0, gardien: 3, offrande: 3 } } },
   { key: 'minuit', name: 'Le Pacte de minuit', stars: 5, rival: 'echo', reward: 90, chest: 'or', bg: 'salle-pacte-minuit', rule: 'Partie longue : 80 points. Les sept factions rapportent +25.', rules: { target: 80, seven: 25 } },

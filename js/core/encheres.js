@@ -47,10 +47,10 @@ export const BIDDERS = {
 // joueur moyen 75 / 62 / 46 / 22 %, joueur faible 55 / 41 / 35 / 22 %, au hasard 62 % à l'Étal (70 % avant). Les enchères sont un jeu de pierre-feuille-ciseaux : un style « fort » perd contre
 // certains styles « faibles » ; la difficulté vient surtout de la lisibilité des enchérisseurs (prévisible → imprévisible).
 export const TABLES = [
-  { key: 'etal', name: 'L’Étal des curiosités', stars: 1, seats: ['initie', 'collectionneur'], reward: 25, chest: 'bois' },
-  { key: 'reliques', name: 'La Vente des reliques', stars: 2, seats: ['stratege', 'maitre'], reward: 35, chest: 'fer' },
-  { key: 'nuit', name: 'La Vente de minuit', stars: 3, seats: ['echo', 'archiviste'], reward: 50, chest: 'or' },
-  { key: 'grande', name: 'La Grande Vente', stars: 4, seats: ['banquier', 'souverain'], reward: 70, chest: 'abyssal' },
+  { key: 'etal', name: 'L’Étal des curiosités', stars: 1, seats: ['initie', 'collectionneur'], reward: 25, chest: 'bois', bg: 'salle-encheres-etal' },
+  { key: 'reliques', name: 'La Vente des reliques', stars: 2, seats: ['stratege', 'maitre'], reward: 35, chest: 'fer', bg: 'salle-encheres-reliques' },
+  { key: 'nuit', name: 'La Vente de minuit', stars: 3, seats: ['echo', 'archiviste'], reward: 50, chest: 'or', bg: 'salle-encheres-nuit' },
+  { key: 'grande', name: 'La Grande Vente', stars: 4, seats: ['banquier', 'souverain'], reward: 70, chest: 'abyssal', bg: 'salle-encheres-grande' },
   // v492 : ventes 5 à 8, chacune avec ses lots (rules : creatures = valeurs des créatures, curses = valeurs des malédictions,
   // facs = nombre de factions parmi les créatures, set = bonus d'une famille de trois)
   { key: 'maudite', name: 'La Vente maudite', stars: 4, seats: ['stratege', 'archiviste'], reward: 80, chest: 'or', bg: 'salle-encheres-maudite', rule: 'Sept malédictions (jusqu’à −7) pour huit créatures.', rules: { creatures: [3, 4, 5, 6, 7, 8, 9, 10], curses: [1, 2, 3, 4, 5, 6, 7], boost: { a: { skill: 3, lam: 0.35, temp: 1.5, noise: 0.1 }, b: { skill: 2, noise: 0.15, bias: 0.1 } } } },
