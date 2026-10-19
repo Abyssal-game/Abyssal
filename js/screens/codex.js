@@ -9,8 +9,8 @@ import { setScene } from '../ui/scene.js';
 
 const ALL_FRAMES = { ...FRAMES, ...CODEX_FRAMES };
 const PACK_NAME = { standard: 'booster standard', premium: 'booster premium' };
-/* v474 : pierre d'obsidienne (icône provisoire, en attendant une image Gemini) */
-export const OBS_I = '<svg class="obs-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 20 8.5 16.5 21h-9L4 8.5Z" fill="#1A0F2E" stroke="#B48CFF" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 2 9.5 9h5Zm-8 6.5h16M9.5 9 7.5 21m7-12 2 12" fill="none" stroke="#7A5CC0" stroke-width=".9"/><path d="M12 3.6 10.4 8.2h3.2Z" fill="#D9C4FF" opacity=".7"/></svg>';
+/* v478 : pierre d'obsidienne peinte (Gemini, store/icons/obsidienne-source.jpg) */
+export const OBS_I = '<img class="obs-i" src="assets/icons/obsidienne.webp" alt="" aria-hidden="true">';
 const obsTxt = (n) => `<span class="obs-n">${OBS_I}${fmt(n)}</span>`;
 
 export default function codexScreen(app, root) {

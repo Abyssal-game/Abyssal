@@ -4220,3 +4220,6 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .cx-unlock { display: inline-flex; align-items: center; gap: 8px; }
 .cx-unlock span { text-align: left; }
 .cx-unlock .obs-n { margin-left: 4px; padding-left: 10px; border-left: 1px solid rgba(242, 193, 78, .35); }
+
+/* v478 : icône peinte des obsidiennes (plus de dessin SVG) */
+.obs-i { object-fit: contain; filter: drop-shadow(0 0 3px rgba(190, 150, 255, .7)) brightness(1.25); }
