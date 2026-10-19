@@ -4365,3 +4365,10 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .cs-hero .avatar-big { width: 78px; height: 78px; margin: 8px; }
 .frame-pick .avatar-mini.pf[class*="pf-cx-"] { margin: 6px 0 10px; }
 .top-avatar.pf[class*="pf-cx-"] { margin: 0 5px; }
+
+/* v486 : niveau sorti du portrait de la barre du haut (il cachait le cadre) : petite pastille « Niv. N » sous le pseudo, à côté de la barre d'expérience */
+.top-lv { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.top-lv .lv { min-width: 0; height: 16px; padding: 0 6px; font-size: .6rem; letter-spacing: .03em; flex: none; }
+.top-lv .xpbar { flex: 1; min-width: 28px; }
+.top-meta .top-lv { margin-top: 4px; }
+.top-meta .top-lv .xpbar { margin-top: 0; width: auto; max-width: 70px; }

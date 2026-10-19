@@ -143,8 +143,8 @@ function renderChrome() {
   top.innerHTML = `
     ${parent !== undefined ? `<a class="top-back" href="#/${parent}" aria-label="Retour" data-parent="${parent}">${icon('back')}</a>` : ''}
     <a class="top-brand" href="#/profil" aria-label="Profil : niveau ${lv.level}, ${esc(s.title)}">
-      <span class="top-avatar pf pf-${s.frame}">${avatarCard ? `<img alt="" src="${artUrl(avatarCard, { lite: true })}">` : EMBLEM}<span class="lv">${lv.level}</span></span>
-      <span class="top-meta"><b>${esc(sync.profile?.pseudo || s.name || 'Toi')}</b><span class="xpbar" aria-hidden="true"><i style="width:${(lv.into / lv.need) * 100}%"></i></span></span>
+      <span class="top-avatar pf pf-${s.frame}">${avatarCard ? `<img alt="" src="${artUrl(avatarCard, { lite: true })}">` : EMBLEM}</span>
+      <span class="top-meta"><b>${esc(sync.profile?.pseudo || s.name || 'Toi')}</b><span class="top-lv"><span class="lv">Niv. ${lv.level}</span><span class="xpbar" aria-hidden="true"><i style="width:${(lv.into / lv.need) * 100}%"></i></span></span></span>
     </a>
     <div class="wallet">
       <button class="pill shards" data-wallet="shards" title="Éclats" aria-label="${fmt(s.shards)} éclats : à quoi ça sert ?">${icon('crystal')}<span>${fmt(s.shards)}</span></button>
