@@ -2,7 +2,7 @@
 import { loadCatalogData, createCatalog } from './core/catalog.js';
 import { Game } from './core/game.js';
 import { loadArtManifest, artUrl, hasRealArt, setCardBack } from './art/assets.js';
-import { setCardCatalog, setFameLookup, setApexLookup, setFavLookup } from './ui/card.js';
+import { setCardCatalog, setFameLookup, setApexLookup, setFavLookup, setDressLookup } from './ui/card.js';
 import { MAX_LEVEL } from './core/army.js';
 import { fameTier } from './core/renown.js';
 import { icon, EMBLEM } from './ui/icons.js';
@@ -321,6 +321,7 @@ async function boot() {
     app.game = new Game(catalog, storage);
     app.persistent = persistent;
     setFavLookup((id) => app.game.isFav(id));
+    setDressLookup((id) => app.game.s.dress?.[id] || null); /* v482 */
     setApexLookup((id) => !!app.game.s.collection[id] && app.game.cardLevel(id) >= MAX_LEVEL);
     setFameLookup((id) => (app.game.s.collection[id] ? fameTier(app.game.s.fame[id]) : 0));
     app.game.on('change', () => { renderChrome(); pulseWallet(); });

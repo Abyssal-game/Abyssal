@@ -36,7 +36,7 @@ test('codex : voie gratuite récupérable, voie enluminée fermée sans achat', 
 test('codex : la voie enluminée ne donne jamais de puissance (ni éclats, cendres, coffres ou tickets)', () => {
   for (const t of CODEX_TIERS) if (t.prem) for (const k of ['shards', 'ash', 'chests', 'tickets']) assert.equal(t.prem[k], undefined, `palier ${t.tier}`);
   for (const it of [...SHOP, ...CATALOG]) if (it.give) for (const k of ['shards', 'ash', 'chests', 'tickets']) assert.equal(it.give[k], undefined, it.id);
-  for (const it of CATALOG) assert.ok(['frame', 'back', 'bundle'].includes(it.kind) && !it.give.obs && !it.give.title, it.id);
+  for (const it of CATALOG) assert.ok(['frame', 'back', 'bundle', 'finish'].includes(it.kind) && !it.give.obs && !it.give.title, it.id);
   for (const k of CODEX_ONLY) assert.ok(!CATALOG.some((it) => it.id === k), `${k} reste exclusif au Codex`);
 });
 
@@ -78,4 +78,20 @@ test('dos de cartes : seulement un dos possédé, retour au dos par défaut poss
   assert.equal(g.s.back, 'dos-abime');
   g.setBack(null);
   assert.equal(g.s.back, null);
+});
+
+test('v482 : finitions de prestige, achetées une fois, posées seulement sur une carte possédée', () => {
+  const g = mk();
+  g.s.settings.dev = true; g.s.devCodex = true; g.s.obs = 2000;
+  const id = Object.keys(g.s.collection)[0] || catalog.cards[0].id;
+  if (!g.owns(id)) g.addCard?.(id);
+  assert.throws(() => g.setDress(id, 'fin-spectrale'), /pas encore/);
+  g.catalogBuy('fin-spectrale');
+  assert.ok(g.s.finishes.includes('fin-spectrale') && g.catalogOwned('fin-spectrale'));
+  g.setDress(id, 'fin-spectrale');
+  assert.equal(g.s.dress[id], 'fin-spectrale');
+  g.setDress(id, null);
+  assert.equal(g.s.dress[id], undefined);
+  const other = catalog.cards.find((c) => !g.owns(c.id)).id;
+  assert.throws(() => g.setDress(other, 'fin-spectrale'), /possèdes pas/);
 });

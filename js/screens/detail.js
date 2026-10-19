@@ -6,6 +6,7 @@ import { openBurn, upgradeCard } from './furnace.js';
 import { cardHTML, enableTilt } from '../ui/card.js';
 import { boosterOdds } from '../core/boosters.js';
 import { openSheet, esc, toast, confirmBox, fmt, bindActions } from '../ui/dom.js';
+import { FINISHES } from '../core/codex.js';
 import { icon, sigil, picon, setIcon } from '../ui/icons.js';
 import { FORMS, formUnlocked } from '../core/forms.js';
 import { relationsOf } from '../core/relations.js';
@@ -102,6 +103,11 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
       ? `<p class="small muted center dt-showv">${icon('check')} Apparence affichée partout</p>`
       : `<button class="btn small gold dt-showv" data-act="showv">${icon('eye')}Afficher cette apparence partout</button>`) : ''}` : '';
 
+    /* v482 : habillage (finition de prestige achetée à l'Échoppe) */
+    const fins = owned ? (g.s.finishes || []).filter((k) => FINISHES[k]) : [];
+    const cur = g.s.dress?.[current] || null;
+    const dressRow = fins.length ? `<div class="dt-dress"><span class="small muted">Finition de prestige</span><div class="chips">${[[null, 'Aucune'], ...fins.map((k) => [k, FINISHES[k].name])].map(([k, n]) => `<button class="chip" data-act="dress" data-v="${k || ''}" aria-pressed="${cur === k}">${esc(n)}</button>`).join('')}</div></div>` : '';
+
     let body;
     if (owned) {
       const line = card.evolution ? cat.lines[card.evolution.line] : null;
@@ -149,6 +155,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
       <div class="detail-card ${owned && g.formOf(current) ? 'fm-on' : ''}">${cardHTML(card, { size: 'full', variant: shownVariant, mystery: !owned, nameKnown: known })}${owned && g.formOf(current) ? `<span class="fm-badge">${esc(FORMS[current].name)}</span>` : ''}</div>
       ${owned ? `<p class="tilt-hint small muted">${icon('refresh')} Touche la carte pour masquer ou remettre son texte · fais-la glisser pour la faire pivoter.</p>` : ''}
       ${variantsRow}
+      ${dressRow}
       <div class="detail-info">${body}</div>
     </div>`);
     stopTilt = enableTilt(sheet.body.querySelector('.detail-card'), { reduced: app.reduced() });
@@ -158,6 +165,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     prev() { const i = list.indexOf(current); if (i > 0) { current = list[i - 1]; shownVariant = null; draw(); } },
     next() { const i = list.indexOf(current); if (i < list.length - 1) { current = list[i + 1]; shownVariant = null; draw(); } },
     variant(el) { shownVariant = el.dataset.v; draw(); },
+    dress(el) { try { const k = el.dataset.v || null; g.setDress(current, k); app.sfx?.tap?.(); toast(k ? `Finition <b>${esc(FINISHES[k].name)}</b> posée sur cette carte.` : 'Finition retirée.', { icon: 'sparkle' }); draw(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } },
     sub() { try { const x = g.sublime(current); shownVariant = x.to; app.sfx?.levelup?.(); toast(`Carte sublimée : la voici en <b>${esc(VARIANTS[x.to].name.toLowerCase())}</b> (−${x.cost.toLocaleString('fr-FR')} cendres).`, { kind: 'success', icon: 'sparkle' }); draw(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } },
     showv() { try { g.setShownVariant(current, shownVariant); app.sfx.tap(); toast(`Apparence <b>${esc(VARIANTS[shownVariant].name.toLowerCase())}</b> affichée partout.`, { icon: 'eye' }); draw(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } },
     fav() { const on = g.toggleFav(current); app.sfx?.tap?.(); toast(on ? 'Ajoutée à tes favoris : elle ne pourra pas être brûlée par erreur.' : 'Retirée de tes favoris.', { icon: 'star' }); draw(); },

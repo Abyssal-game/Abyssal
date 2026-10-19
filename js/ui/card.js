@@ -15,6 +15,9 @@ let apexRef = () => false;
 let favRef = () => false;
 export function setFavLookup(f) { favRef = f; }
 export function setApexLookup(f) { apexRef = f; }
+// v482 : finition de prestige posée sur la carte (habillage)
+let dressRef = () => null;
+export function setDressLookup(f) { dressRef = f; }
 const FAME_NAMES = ['', 'Vétéran', 'Héros', 'Légende'];
 
 function hueFor(id) { return Math.floor(seeded('hue:' + id)() * 300) + 30; }
@@ -28,7 +31,8 @@ export function cardHTML(card, opts = {}) {
   const r = RARITY[card.rarity];
   const fc = catalogRef?.faction[card.faction]?.colors.secondary || '#888';
   const fame = mystery ? 0 : fameRef(card.id);
-  const cls = ['tcg', `tcg-${size}`, `r-${card.rarity}`, `f-${card.faction}`, mystery ? 'is-mystery' : `v-${variant}`, hasRealArt(card.id) ? 'real' : '', fame ? `fm${fame}` : '', !mystery && apexRef(card.id) ? 'apex' : ''].join(' ');
+  const dress = mystery ? null : dressRef(card.id);
+  const cls = ['tcg', `tcg-${size}`, `r-${card.rarity}`, `f-${card.faction}`, mystery ? 'is-mystery' : `v-${variant}`, hasRealArt(card.id) ? 'real' : '', fame ? `fm${fame}` : '', !mystery && apexRef(card.id) ? 'apex' : '', dress ? `dr dr-${dress}` : ''].join(' ');
   const fameB = fame ? `<span class="tcg-fame" title="${FAME_NAMES[fame]}" aria-label="Renommée : ${FAME_NAMES[fame]}"><img alt="" src="assets/icons/fame-${fame}.webp" onerror="this.remove()"></span>` : '';
   const style = `--rc:${r.color};--fc:${fc};--hue:${hueFor(card.id)}deg`;
   const lite = size === 'mini';
@@ -37,7 +41,7 @@ export function cardHTML(card, opts = {}) {
     : `<img alt="" decoding="async" src="${artUrl(card, { variant, lite, mystery })}" data-card="${card.id}" data-variant="${variant}">`;
   const name = mystery ? (nameKnown ? esc(card.name) : 'Inconnue') : esc(card.name);
   // Cadre illustré des variantes Or et Cosmique (posé au-dessus de la carte)
-  const vframe = !mystery && ['holo', 'gold', 'galaxy'].includes(variant) ? '<div class="tcg-vframe"></div>' : '';
+  const vframe = dress ? '<div class="tcg-dress"></div>' : !mystery && ['holo', 'gold', 'galaxy'].includes(variant) ? '<div class="tcg-vframe"></div>' : '';
   const label = mystery ? `Carte non découverte ${card.id}${nameKnown ? ', ' + card.name : ''}` : `${card.name}, ${r.name}${variant !== 'normal' ? ', ' + VARIANTS[variant].name : ''}`;
 
   if (size === 'mini') {

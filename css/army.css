@@ -4254,3 +4254,19 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .pf-cx-corbeau { --fr: url(../assets/frames/cx-corbeau.webp); }
 .pf-cx-souverain { --fr: url(../assets/frames/cx-souverain.webp); }
 .pf.pf-cx-corbeau::after, .pf.pf-cx-geode::after, .pf.pf-cx-souverain::after { inset: -65%; }
+
+/* v482 : finitions de prestige (habillages) */
+.tcg-dress { position: absolute; inset: 0; z-index: 4; pointer-events: none; border-radius: inherit; background: center / 100% 100% no-repeat; }
+.dr-fin-ecarlate .tcg-dress { background-image: url(../assets/variants/fin-ecarlate-frame.webp); }
+.dr-fin-givree .tcg-dress { background-image: url(../assets/variants/fin-givree-frame.webp); }
+.dr-fin-spectrale .tcg-dress { background-image: url(../assets/variants/fin-spectrale-frame.webp); }
+.dr-fin-vitrail .tcg-dress { background-image: url(../assets/variants/fin-vitrail-frame.webp); }
+.tcg.dr .tcg-frame { opacity: .35; }
+.dr-fin-spectrale .tcg-art img { filter: saturate(.75) brightness(1.06) hue-rotate(-8deg); }
+.dr-fin-givree .tcg-art img { filter: saturate(.85) brightness(1.04); }
+.dr-fin-ecarlate .tcg-art img { filter: contrast(1.06) saturate(1.1); }
+.dr-fin-vitrail .tcg-art img { filter: saturate(1.2); }
+.dt-dress { display: grid; gap: 6px; justify-items: center; margin: 8px 0 4px; }
+.cx-fin { position: relative; display: block; width: 58px; aspect-ratio: 5 / 7; border-radius: 6px; overflow: hidden; box-shadow: 0 4px 10px rgba(0, 0, 0, .6); }
+.cx-fin img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.cx-fin img + img { object-fit: fill; }

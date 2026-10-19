@@ -1,6 +1,6 @@
 // v470 : ÉBAUCHE du pass de saison (« Le Codex de l'Abîme ») et de la boutique en argent réel (« L'Échoppe »).
 // Visible seulement en Mode Créateur (option « Codex et Échoppe ») ; les achats sont simulés (aucun paiement).
-import { CODEX, CODEX_XP, CODEX_XP_LABEL, CODEX_TIERS, CODEX_FRAMES, CODEX_BACKS, SHOP, CATALOG, OBS, codexTier, tierProgress, claimable, freshCodex } from '../core/codex.js';
+import { CODEX, CODEX_XP, CODEX_XP_LABEL, CODEX_TIERS, CODEX_FRAMES, CODEX_BACKS, FINISHES, SHOP, CATALOG, OBS, codexTier, tierProgress, claimable, freshCodex } from '../core/codex.js';
 import { FRAMES } from '../config.js';
 import { CHESTS } from '../core/descent.js';
 import { icon, picon } from '../ui/icons.js';
@@ -57,9 +57,10 @@ export default function codexScreen(app, root) {
 
   function shopTab() {
     const have = g.obs();
-    const name = (it) => it.name || (it.kind === 'frame' ? ALL_FRAMES[it.id] : CODEX_BACKS[it.id]) || it.id;
+    const name = (it) => it.name || (it.kind === 'frame' ? ALL_FRAMES[it.id] : it.kind === 'finish' ? `Finition ${FINISHES[it.id].name}` : CODEX_BACKS[it.id]) || it.id;
     const pic = (it) => it.kind === 'frame' ? `<span class="cx-av"><span class="avatar-mini pf pf-${it.id}"></span></span>`
       : it.kind === 'back' ? `<img class="cx-bk" alt="" src="assets/backs/${it.id}.webp">`
+      : it.kind === 'finish' ? `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"><img alt="" src="assets/variants/${it.id}-frame.webp"></span>`
       : `<span class="cx-fan">${it.give.backs.slice(0, 4).map((b) => `<img alt="" src="assets/backs/${b}.webp">`).join('')}</span>`;
     const tile = (it) => { const own = g.catalogOwned(it.id), cost = g.catalogCost(it.id); return `<article class="cx-tile ${it.kind} ${own ? 'own' : ''}">${pic(it)}<b>${esc(name(it))}</b>${it.desc ? `<small class="muted">${esc(it.desc)}</small>` : ''}
       ${own ? `<span class="cx-badge on">${icon('check')}Acquis</span>` : `<button class="btn small ${cost <= have ? 'primary' : ''}" data-cx="get" data-id="${it.id}">${obsTxt(cost)}</button>`}</article>`; };
@@ -73,6 +74,8 @@ export default function codexScreen(app, root) {
       <p class="small muted cx-note">Les cadres simples, les titres et le dos de l'Abysse se gagnent toujours en jouant. Ici : les cosmétiques <b>peints</b>, seulement décoratifs. Pendant l'aperçu, tout achat en euros est simulé : aucun paiement.</p>
       ${sec('Cadres de profil', 'frame')}
       ${sec('Dos de cartes', 'back')}
+      ${sec('Finitions de prestige', 'finish')}
+      <p class="small muted cx-note">Une finition achetée se pose sur autant de cartes que tu veux, une par carte, depuis la fiche de la carte. Elle ne change rien à ses valeurs.</p>
       ${sec('Lots', 'bundle')}
       <h3 class="cx-h" id="cx-euro">${esc(OBS.name)} et Pack du Fondateur</h3>
       <div class="cx-shop">${SHOP.map(euro).join('')}</div>
@@ -111,14 +114,14 @@ export default function codexScreen(app, root) {
       if (k === 'jump') { document.getElementById('cx-euro')?.scrollIntoView({ behavior: 'smooth' }); return; }
       if (k === 'get' || k === 'unlock') { /* v474 : dépense d'obsidiennes */
         const it = CATALOG.find((x) => x.id === b.dataset.id), cost = it ? g.catalogCost(it.id) : CODEX.cost;
-        const label = it ? (it.name || ALL_FRAMES[it.id] || CODEX_BACKS[it.id]) : CODEX.premiumName;
+        const label = it ? (it.name || ALL_FRAMES[it.id] || CODEX_BACKS[it.id] || (FINISHES[it.id] && `Finition ${FINISHES[it.id].name}`)) : CODEX.premiumName;
         if (g.obs() < cost) {
           if (await confirmBox(`Il te manque <b>${fmt(cost - g.obs())} obsidiennes</b> pour ${esc(label)}.`, { ok: 'Obtenir des obsidiennes' })) { ui.tab = 'shop'; draw(); document.getElementById('cx-euro')?.scrollIntoView({ behavior: 'smooth' }); }
           return;
         }
         if (!(await confirmBox(`Échanger <b>${fmt(cost)} obsidiennes</b> contre ${esc(label)} ?`, { ok: 'Confirmer' }))) return;
         if (it) g.catalogBuy(it.id); else g.codexUnlock();
-        app.sfx.levelup?.(); toast(`${esc(label)} : acquis.${it?.kind === 'frame' ? ' Choisis-le dans ton Profil.' : it ? ' Choisis-le dans ton Profil (dos de cartes).' : ''}`, { kind: 'success', icon: 'star' });
+        app.sfx.levelup?.(); toast(`${esc(label)} : acquis.${it?.kind === 'finish' ? ' Pose-la sur une carte depuis sa fiche.' : it?.kind === 'frame' ? ' Choisis-le dans ton Profil.' : it ? ' Choisis-le dans ton Profil (dos de cartes).' : ''}`, { kind: 'success', icon: 'star' });
       }
       if (k === 'obs') { g.s.obs = g.obs() + 1000; g.persist(); }
       if (k === 'obs0') { g.s.obs = 0; g.persist(); }

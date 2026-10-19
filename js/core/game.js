@@ -1673,6 +1673,14 @@ export class Game {
 
   setTitle(t) { if (this.s.titles.includes(t)) { this.s.title = t; this.persist(); } }
   setFrame(f) { if (this.s.frames.includes(f)) { this.s.frame = f; this.persist(); } }
+  /* v482 : habillage (finition de prestige) d'une carte possédée ; null = aucun */
+  setDress(id, k) {
+    if (!this.owns(id)) throw new Error('Tu ne possèdes pas cette carte.');
+    if (k && !(this.s.finishes || []).includes(k)) throw new Error('Finition pas encore acquise.');
+    const d = (this.s.dress ||= {});
+    if (k) d[id] = k; else delete d[id];
+    this.persist();
+  }
   setBack(k) { if (!k || (this.s.backs || []).includes(k)) { this.s.back = k || null; this.persist(); } } /* v473 : null = dos par défaut */
   setName(n) { this.s.name = String(n || '').replace(/[<>]/g, '').trim().slice(0, 16); this.persist(); }
   setAvatar(id) { if (this.owns(id)) { this.s.avatar = id; this.persist(); } }
@@ -1694,6 +1702,7 @@ export class Game {
     if (reward.frame && !this.s.frames.includes(reward.frame)) this.s.frames.push(reward.frame);
     if (reward.back && !(this.s.backs ||= []).includes(reward.back)) this.s.backs.push(reward.back);
     for (const b of reward.backs || []) if (!(this.s.backs ||= []).includes(b)) this.s.backs.push(b);
+    if (reward.finish && !(this.s.finishes ||= []).includes(reward.finish)) this.s.finishes.push(reward.finish); /* v482 */
     if (reward.obs) this.s.obs = (this.s.obs || 0) + reward.obs; /* v474 : obsidiennes (achetées en euros) */
     if (reward.chests) this.addChests(reward.chests);
   }
@@ -1746,7 +1755,7 @@ export class Game {
   catalogOwned(id) {
     const it = CATALOG.find((x) => x.id === id); if (!it) return false;
     const g = it.give;
-    return (!g.frame || this.s.frames.includes(g.frame)) && (!g.back || (this.s.backs || []).includes(g.back)) && (g.backs || []).every((b) => (this.s.backs || []).includes(b));
+    return (!g.frame || this.s.frames.includes(g.frame)) && (!g.finish || (this.s.finishes || []).includes(g.finish)) && (!g.back || (this.s.backs || []).includes(g.back)) && (g.backs || []).every((b) => (this.s.backs || []).includes(b));
   }
   catalogCost(id) { /* un lot ne fait pas payer ce qu'on a déjà : on retire le prix des dos déjà possédés, jamais sous 0 */
     const it = CATALOG.find((x) => x.id === id); if (!it) return 0;
