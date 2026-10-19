@@ -4223,3 +4223,25 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 
 /* v478 : icône peinte des obsidiennes (plus de dessin SVG) */
 .obs-i { object-fit: contain; filter: drop-shadow(0 0 3px rgba(190, 150, 255, .7)) brightness(1.25); }
+
+/* v479 : 16 cadres peints du catalogue de l'Échoppe */
+.pf-cx-lanternes { --fr: url(../assets/frames/cx-lanternes.webp); }
+.pf-cx-voile { --fr: url(../assets/frames/cx-voile.webp); }
+.pf-cx-houx { --fr: url(../assets/frames/cx-houx.webp); }
+.pf-cx-aurore { --fr: url(../assets/frames/cx-aurore.webp); }
+.pf-cx-roses { --fr: url(../assets/frames/cx-roses.webp); }
+.pf-cx-prince { --fr: url(../assets/frames/cx-prince.webp); }
+.pf-cx-leviathan { --fr: url(../assets/frames/cx-leviathan.webp); }
+.pf-cx-seraphin { --fr: url(../assets/frames/cx-seraphin.webp); }
+.pf-cx-meute { --fr: url(../assets/frames/cx-meute.webp); }
+.pf-cx-liche { --fr: url(../assets/frames/cx-liche.webp); }
+.pf-cx-ouroboros { --fr: url(../assets/frames/cx-ouroboros.webp); }
+.pf-cx-automate { --fr: url(../assets/frames/cx-automate.webp); }
+.pf-cx-gueule { --fr: url(../assets/frames/cx-gueule.webp); }
+.pf-cx-eclipse { --fr: url(../assets/frames/cx-eclipse.webp); }
+.pf-cx-horloger { --fr: url(../assets/frames/cx-horloger.webp); }
+.pf-cx-balance { --fr: url(../assets/frames/cx-balance.webp); }
+/* v479 : cadres aux ornements hauts, recentrés avec plus de marge (frame-art.py K 2,3 → débord de 65 %) */
+.pf.pf-cx-seraphin::after, .pf.pf-cx-horloger::after, .pf.pf-cx-prince::after, .pf.pf-cx-meute::after { inset: -65%; }
+/* v479 : plus d'espace autour des cadres peints dans le choix du Profil (les plus larges mordaient sur leur nom) */
+.frame-pick .avatar-mini.pf[class*="pf-cx-"] { margin: 12px 0 16px; }

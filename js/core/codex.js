@@ -48,6 +48,11 @@ export const CODEX_FRAMES = {
   /* v472 : réserve (saison II ou Échoppe), images prêtes dans assets/frames/ */
   'cx-os': 'Couronne d’ossements', 'cx-serpents': 'Cadre des serpents d’obsidienne', 'cx-vitrail': 'Cadre du vitrail céleste', 'cx-rouages': 'Cadre des rouages',
   'cx-racines': 'Cadre des racines anciennes', 'cx-yeux': 'Cadre aux mille yeux', 'cx-chaines': 'Cadre des chaînes forgées', 'cx-ruche': 'Cadre de la ruche d’ambre',
+  /* v479 : catalogue de l'Échoppe (store/boutique-cosmetiques.md) : Nuit des Âmes, Hiver éternel, Cœurs maudits, les sept trônes, trophées des gardiens */
+  'cx-lanternes': 'Cadre des lanternes d’âmes', 'cx-voile': 'Cadre du voile des trépassés', 'cx-houx': 'Couronne du solstice noir', 'cx-aurore': 'Cadre de l’aurore boréale',
+  'cx-roses': 'Cadre des roses noires', 'cx-prince': 'Couronne du Prince des Enfers', 'cx-leviathan': 'Cadre du Léviathan', 'cx-seraphin': 'Cadre du Séraphin',
+  'cx-meute': 'Cadre de la meute', 'cx-liche': 'Cadre de la Liche', 'cx-ouroboros': 'Cadre de l’Ouroboros', 'cx-automate': 'Cadre de l’Automate',
+  'cx-gueule': 'Cadre de la Gueule du Dévoreur', 'cx-eclipse': 'Cadre de l’Éclipse', 'cx-horloger': 'Cadre de l’Horloger', 'cx-balance': 'Cadre du Juge des Sceaux',
 };
 // Dos de cartes (v473 : images Gemini, assets/backs/<clé>.webp, tools/back-art.py ; choisis au Profil)
 export const CODEX_BACKS = { 'dos-codex': 'Dos du Codex', 'dos-abime': 'Dos de l’Abîme', 'dos-fondateur': 'Dos du Fondateur',
@@ -62,6 +67,7 @@ export const ROYAUMES = ['dos-infernal', 'dos-abyssal', 'dos-celeste', 'dos-sauv
 export const CATALOG = [
   F('cx-givre', 250), F('cx-braise', 250), F('cx-os', 300), F('cx-serpents', 300), F('cx-vitrail', 300), F('cx-rouages', 300),
   F('cx-racines', 300), F('cx-chaines', 300), F('cx-yeux', 350), F('cx-ruche', 350),
+  F('cx-lanternes', 450), F('cx-voile', 700), F('cx-houx', 450), F('cx-aurore', 700), F('cx-roses', 450), F('cx-prince', 700), F('cx-leviathan', 700), F('cx-seraphin', 700), F('cx-meute', 700), F('cx-liche', 700), F('cx-ouroboros', 700), F('cx-automate', 700), F('cx-gueule', 500), F('cx-eclipse', 500), F('cx-horloger', 500), F('cx-balance', 500),
   B('dos-abime', 350), ...ROYAUMES.map((k) => B(k, 300)),
   { id: 'royaumes', kind: 'bundle', name: 'Les sept royaumes', give: { backs: ROYAUMES }, cost: 1500, desc: 'Les sept dos des royaumes d’un coup (2 100 à l’unité).' },
 ];
