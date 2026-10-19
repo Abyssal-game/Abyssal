@@ -140,7 +140,7 @@ export default function account(app, root) {
       <section class="panel stack">
         <h2>Sécurité et aide</h2>
         <a class="btn small" href="#/compte/motdepasse">${icon('lock')}Changer mon mot de passe</a>
-        <a class="btn small" href="mailto:abyssal.gamecards@gmail.com?subject=ABYSSAL%20%E2%80%94%20aide">${icon('info')}Nous écrire (aide, bug)</a>
+        <a class="btn small" href="mailto:contact@abyssal-game.fr?subject=ABYSSAL%20%E2%80%94%20aide">${icon('info')}Nous écrire (aide, bug)</a>
         <a class="btn ghost small" href="confidentialite.html" target="_blank" rel="noopener">${icon('book')}Politique de confidentialité</a>
       </section>
       <section class="panel stack">
