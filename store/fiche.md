@@ -13,19 +13,19 @@ Les images sont prêtes dans `store/google/` et `store/apple/`. Pour les refaire
 
 Site web / URL marketing :
 ```
-https://abyssal-game.github.io/Abyssal/
+https://abyssal-game.fr/
 ```
 Politique de confidentialité :
 ```
-https://abyssal-game.github.io/Abyssal/confidentialite.html
+https://abyssal-game.fr/confidentialite.html
 ```
 Assistance (Support URL chez Apple) :
 ```
-https://abyssal-game.github.io/Abyssal/confidentialite.html#contact
+https://abyssal-game.fr/aide.html
 ```
 Suppression de compte (demandée par Google) :
 ```
-https://abyssal-game.github.io/Abyssal/confidentialite.html#suppression
+https://abyssal-game.fr/confidentialite.html#suppression
 ```
 E-mail de contact :
 ```
