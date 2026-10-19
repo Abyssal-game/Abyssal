@@ -61,11 +61,14 @@ export const expectedLevel = (floor) => Math.max(1, Math.min(10, Math.round((flo
 export const RARITY_POWER = { C: 1, PC: 1.15, R: 1.3, HR: 1.45, M: 1.6, S: 1.75 };
 export const cardPower = (rarity, level = 1) => (RARITY_POWER[rarity] || 1) * (1 + 0.08 * (level - 1));
 // v495 : sans budget d'équipe, une équipe peut dépasser 2,2 : la force conseillée continue de monter, plus lentement,
-// après l'étage 28 (2,0) jusqu'à 2,8 à l'étage 100 (Mythiques et Secrètes hauts niveaux).
-export const POWER_BEND = 28, POWER_END = 2.8;
+// après l'étage 28 (2,0) jusqu'à 2,55 à l'étage 100 (v497 : des Hyper rares au niveau 10 suffisent, les Mythiques aident).
+export const POWER_BEND = 28, POWER_END = 2.55;
 export const powerFor = (floor) => floor <= POWER_BEND ? 1 + Math.max(0, floor - 6) / 22 : 2 + (POWER_END - 2) * Math.min(1, (floor - POWER_BEND) / (100 - POWER_BEND));
-// étage qu'une force d'équipe permet de viser (inverse de powerFor)
-export const floorForPower = (p) => Math.max(1, Math.min(100, Math.round(p <= 2 ? 6 + (p - 1) * 22 : POWER_BEND + (p - 2) / (POWER_END - 2) * (100 - POWER_BEND))));
+// v497 : force conseillée affichée (vestibule, Équipe, objectifs) : 10 % au-dessus de powerFor à partir de l'étage 70,
+// mesuré au simulateur (à la force exacte de powerFor, un chapitre tardif ne se gagne qu'environ 1 fois sur 10)
+export const advisedPower = (floor) => powerFor(floor) * (1 + 0.1 * Math.min(1, Math.max(0, (floor - 50) / 20)));
+// étage qu'une force d'équipe permet de viser
+export const floorForPower = (p) => { let f = 1; while (f < 100 && advisedPower(f + 1) <= p) f++; return f; };
 export const powerPts = (p) => Math.round(p * 100);
 export const enemyScale = (floor) => 1 + 0.06 * Math.min(19, floor - 1) + 0.03 * Math.max(0, floor - 20);
 // v460 : derniers chapitres adoucis (décision du propriétaire : l'étage 100 en ≈ 2 mois pour un joueur régulier).
@@ -73,8 +76,8 @@ export const enemyScale = (floor) => 1 + 0.06 * Math.min(19, floor - 1) + 0.03 *
 // jusqu'à `at100` à l'étage 100 (mesuré au simulateur : avant, des murs aux étages 91-98 avec une équipe au maximum).
 // v495 : force des ennemis réglée étage par étage (points reliés en ligne droite), calée au simulateur de chapitres :
 // FOE_EASE pour les combats ordinaires et les élites, BOSS_EASE pour les gardiens (multiplie PV et attaque).
-export const FOE_EASE = [[1, 1], [8, 1], [12, 0.88], [20, 0.85], [30, 0.88], [60, 0.9], [85, 0.76], [100, 0.7]];
-export const BOSS_EASE = [[1, 1], [5, 1], [10, 0.85], [15, 1], [25, 1], [30, 0.9], [40, 1], [80, 1], [100, 0.75]];
+export const FOE_EASE = [[1, 1], [8, 1], [12, 0.88], [20, 0.85], [30, 0.88], [60, 0.9], [85, 0.88], [100, 0.84]];
+export const BOSS_EASE = [[1, 1], [5, 1], [10, 0.85], [15, 1], [25, 1], [30, 0.9], [40, 1], [80, 1], [100, 0.82]];
 const ease = (pts, f) => {
   if (f <= pts[0][0]) return pts[0][1];
   for (let i = 1; i < pts.length; i++) if (f <= pts[i][0]) { const [a, x] = pts[i - 1], [b, y] = pts[i]; return x + (y - x) * (f - a) / (b - a); }

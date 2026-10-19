@@ -286,7 +286,7 @@ const BIG = ['heavy', 'blast', 'gorge', 'blizzard', 'copy', 'swarm', 'execute', 
 export const FORBID = { attack: 'attaquer', skill: 'utiliser une compétence', defend: 'se défendre' };
 // v493 : la protection se calcule sur la force attendue à l'étage (st.refPow), pas sur la créature : une créature trop faible
 // pour l'étage n'est plus protégée (avant, des communes niveau 1 ne prenaient que 3 dégâts d'un gardien de l'étage 70)
-export const GAP_POW = 3, GAP_ATK = 2;
+export const GAP_POW = 4, GAP_ATK = 3;
 // v495 : un coup que tu peux parer ou esquiver frappe plus fort s'il passe ; un coup sans défense possible, moins fort
 export const QTE_HIT = 1.6, PLAIN_HIT = 0.6;
 export const allyCap = (u, kind, st = null) => {

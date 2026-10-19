@@ -14,7 +14,7 @@ import { FINAL_FLOOR, BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORD
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
 import { CODEX, CODEX_XP, CODEX_TIERS, SHOP, CATALOG, codexState, codexTier } from './codex.js';
-import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, lateSoft, bossEase, expectedLevel, cardPower, powerFor, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
+import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, lateSoft, bossEase, expectedLevel, cardPower, powerFor, advisedPower, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative } from './duel.js';
 import { bossOf, BOSSES, BOSS_ORDER } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
@@ -27,8 +27,12 @@ import { FERVOR_START, FERVOR_MAX, FERVOR_CARRY, TALENTS } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
 export const WEEKLY_FLOOR = 8;
 /* v493 : force attendue d'une équipe à un étage (powerFor), plafonnée à ce qu'une équipe au maximum peut avoir */
-export const REF_POW_MAX = 2.8; /* v495 : plus de budget d'équipe, le plafond suit la force conseillée de l'étage 100 */
-export const REF_TOL = 1.15; // marge : une équipe jusqu'à 15 % sous la force conseillée n'est pas pénalisée
+export const REF_POW_MAX = 2.55; /* v495 puis v497 : le plafond suit la force conseillée de l'étage 100 */
+export const REF_TOL = 1.0; /* v497 : plus de marge : sous la force conseillée de l'étage, l'équipe est pénalisée (passage obligé par la force) */
+export const LEVEL_STEEP = 0.8; /* v497 : les hauts niveaux coûtent plus de cendres (au-delà du niveau 4 : +80 % par niveau) */
+/* v497 : Persévérance : chaque défaite sur un même chapitre (hors Cauchemar) affaiblit ses ennemis de 3 %, jusqu'à 18 %,
+   jusqu'à ce qu'il soit gagné (filet de sécurité contre les murs mesurés au simulateur) */
+export const GRIT = { step: 0.02, max: 6 }; // marge : une équipe jusqu'à 15 % sous la force conseillée n'est pas pénalisée
 export const refPowFor = (floor) => Math.min(REF_POW_MAX, powerFor(floor)) / REF_TOL;
 export const FIGHT_ATK = 1; // force des ennemis ordinaires (réglée par simulation)
 export const DESCENT_SHARDS = 0.15; // éclats gagnés dans la Descente : 15 % des montants de base
@@ -487,7 +491,7 @@ export class Game {
   // Niveau d'une créature : acheté avec des cendres (coût = base de la rareté × niveau actuel)
   upgradeCost(id) {
     const e = this.entry(id), lv = e?.lv || 1, c = this.catalog.get(id);
-    return !c || lv >= MAX_LEVEL ? 0 : ECONOMY.levelAsh[c.rarity] * lv; // v310 : carte inconnue (version plus récente) ignorée
+    return !c || lv >= MAX_LEVEL ? 0 : Math.round(ECONOMY.levelAsh[c.rarity] * lv * (1 + LEVEL_STEEP * Math.max(0, lv - 4))); // v310 : carte inconnue (version plus récente) ignorée
   }
   upgrade(id) {
     const e = this.entry(id);
@@ -670,6 +674,9 @@ export class Game {
   }
   // v406 : chapitre en cours de la campagne (le premier qui n'est pas terminé)
   chapterNow() { return Math.min(Math.floor((this.descent().best || 0) / CHAPTER) + 1, Math.ceil(FINAL_FLOOR / CHAPTER)); }
+  // Persévérance du chapitre (0 à GRIT.max défaites retenues) et ennemis affaiblis d'autant
+  grit(ch) { const x = this.descent().grit; return x && x.ch === ch ? Math.min(GRIT.max, x.n || 0) : 0; }
+  gritMult(ch) { return 1 - GRIT.step * this.grit(ch); }
   campaignDone() { return (this.descent().best || 0) >= FINAL_FLOOR; }
   // Première victoire à cet étage (campagne : record ; Cauchemar : record du palier)
   firstClear(run, floor = run.floor) { return floor > (run.nightmare ? this.nightBest(run.nightTier || 1) : this.descent().best || 0); }
@@ -1141,7 +1148,7 @@ export class Game {
     // et des joueurs finissaient le mois avec une équipe entière au niveau 1 et des cendres plein les poches)
     // v345 : « trop faible » se juge sur la force (rareté × niveau), plus sur le niveau seul ; au tout début, niveau 2 au moins
     const team = this.team(), tp = team.length ? team.reduce((a, id) => a + this.cardPower(id), 0) / team.length : 1;
-    const short = tp < powerFor(Math.max(best + 1, 4));
+    const short = tp < advisedPower(Math.max(best + 1, 4));
     const weak = team.map((id) => ({ id, lv: this.cardLevel(id) })).filter((x) => x.lv < MAX_LEVEL && (short || x.lv < (best >= 1 ? 2 : 1))).sort((a, b) => a.lv - b.lv)[0];
     if (weak && this.s.ash >= this.upgradeCost(weak.id)) {
       const c = this.catalog.get(weak.id), cost = this.upgradeCost(weak.id);
@@ -1271,7 +1278,7 @@ export class Game {
         if (rule.key === 'sommeil' && f === rule.faction) { e.maxHp = Math.max(1, Math.round(e.maxHp * 0.75)); e.hp = e.maxHp; }
         const nt = nightTier(run); if (nt) { e.maxHp = Math.round(e.maxHp * nt.hp); e.hp = e.maxHp; e.atk = Math.round(e.atk * nt.atk + 0.4); }
         if (run.omen === 'avare') e.atk = Math.round(e.atk * 1.1 + 0.4);
-        { const k = e.boss ? bossEase(run.floor) : lateSoft(run.floor); if (k !== 1) { e.maxHp = Math.max(1, Math.round(e.maxHp * k)); e.hp = e.maxHp; e.atk = Math.max(1, Math.round(e.atk * k)); } } /* v460 */
+        { const k = (e.boss ? bossEase(run.floor) : lateSoft(run.floor)) * (run.nightmare ? 1 : this.gritMult(chapterOf(run.start || 1))); if (k !== 1) { e.maxHp = Math.max(1, Math.round(e.maxHp * k)); e.hp = e.maxHp; e.atk = Math.max(1, Math.round(e.atk * k)); } } /* v460 */
         // Gardien éveillé (Cauchemar, ou à partir de l'étage 30) : sa phase 2 commence dès le premier tour
         if (e.boss && (run.nightmare || run.floor >= AWAKEN_AT)) e.awakened = true;
       }
@@ -1451,6 +1458,7 @@ export class Game {
         out.chapter = chapterOf(run.floor);
         if (summit) out.summit = true;
         out.summary = this.endRun(false);
+        if (this.s.descent.grit?.ch === out.chapter) delete this.s.descent.grit;
         Object.assign(out.summary, { chapterDone: out.chapter, summit: !!summit, report: out.report, abyss: !!out.abyss, abyssPack: !!out.abyssPack, free: !!run.free, boss: out.boss, bossChest: out.first ? out.chest : null });
         return out;
       }
@@ -1584,7 +1592,9 @@ export class Game {
     if (!run) throw new Error('Aucun chapitre en cours.');
     run.battle = null; run.phase = 'doors'; run.altar = null; run.rewards = null; run.talentOffer = null;
     this.s.stats.abandons = (this.s.stats.abandons || 0) + 1;
+    const grit = this.s.descent.grit; /* v497 : un abandon ne compte pas pour la Persévérance */
     const summary = this.endRun(true);
+    if (grit) this.s.descent.grit = grit; else delete this.s.descent.grit;
     summary.abandoned = true;
     this.persist();
     return summary;
@@ -1592,6 +1602,7 @@ export class Game {
   endRun(wiped = false) {
     const d = this.s.descent, run = d.run;
     if (!run) throw new Error('Aucun chapitre en cours.');
+    if (wiped && !run.nightmare) { const c = chapterOf(run.start || 1); d.grit = { ch: c, n: d.grit?.ch === c ? Math.min(GRIT.max, (d.grit.n || 0) + 1) : 1 }; }
     // v406 : plus de coffre de fin ni de perte : tout ce qui a été gagné est gardé ; une équipe tombée recommence le chapitre
     const shards = run.shards, chests = run.chests.slice();
     chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });

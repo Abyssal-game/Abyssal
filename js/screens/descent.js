@@ -1,7 +1,7 @@
 // L'Aventure (la Descente) : ton équipe de cartes descend dans l'Abysse, étage par étage,
 // affronte les créatures corrompues en duel et rapporte un coffre (éclats ou booster).
 import { RARITY, BOOSTERS, FINAL_FLOOR } from '../config.js';
-import { DESCENT, ROOMS, BLESSINGS, CHESTS, floorFloor, OMENS, powerFor, powerPts, CHAPTER, CHAPTERS, chapterOf, chapterStart, floorFirstReward } from '../core/descent.js';
+import { DESCENT, ROOMS, BLESSINGS, CHESTS, floorFloor, OMENS, advisedPower as powerFor, powerPts, CHAPTER, CHAPTERS, chapterOf, chapterStart, floorFirstReward } from '../core/descent.js';
 import { TEAM } from '../core/army.js';
 import { BOSSES, bossOf } from '../core/bosses.js';
 import { PACTS } from '../core/pacts.js';
@@ -50,6 +50,7 @@ export default function descent(app, root) {
       <div class="dc-chap-h">${BOSS_FIGS.has(bk) ? `<img class="dc-chap-fig" alt="" src="assets/bosses/${bk}.webp">` : ''}<span><span class="dc-chap-k">Chapitre ${ch} / ${CHAPTERS}${done ? ' · terminé' : ''}</span><b>${esc(chapterStory(ch)?.title || B.name)}</b><small>${esc(B.name)} · ${esc(B.title)}</small></span><button class="dc-chap-read icon-btn" data-act="story" data-c="${ch}" aria-label="Lire le récit du chapitre">${icon('book')}</button></div>
       <ol class="dc-chap-floors">${floors.map((f) => `<li class="${f <= best ? 'ok' : ''} ${f === best + 1 ? 'next' : ''} ${f % CHAPTER === 0 ? 'boss' : ''}"><span>${f <= best ? icon('check') : f % CHAPTER === 0 ? icon('crown') : f}</span><small>${f % CHAPTER === 0 ? 'Gardien' : `Étage ${f}`}</small></li>`).join('')}</ol>
       <p class="small dc-chap-rw">${done ? `Chapitre déjà terminé : le rejouer ne rapporte que les petits gains des combats${g.nightmareUnlocked() ? ', sauf en <b>Cauchemar</b>' : ''}.` : `Chaque étage gagné pour la première fois rapporte des éclats et des cendres. Gardien vaincu : <b style="color:${CHESTS[bossChest(ch)].color}">${esc(CHESTS[bossChest(ch)].name.toLowerCase())}</b>.`}</p>
+      ${!done && g.grit(ch) ? `<p class="small dc-grit">${icon('p:level-up')} <b>Persévérance</b> : après ${g.grit(ch)} défaite${g.grit(ch) > 1 ? 's' : ''} sur ce chapitre, ses ennemis sont affaiblis de ${Math.round(100 * (1 - g.gritMult(ch)))} % jusqu’à ta victoire.</p>` : ''}
     </div>${chapsHTML()}`;
   }
   function chapsHTML() {
@@ -97,9 +98,9 @@ export default function descent(app, root) {
     const r = g.descent().risk?.[k];
     return r?.n ? `perdues : ${r.lost} sur ${r.n}` : dflt;
   }
-  /* v459 puis v495 (plus de budget d'équipe) : une équipe toute au niveau 10 et presque à la force du fond (2,8) n'est plus
+  /* v459 puis v495 (plus de budget d'équipe) : une équipe toute au niveau 10 et à la force du fond (2,55) n'est plus
      dite « trop faible » : la suite se joue sur la façon de combattre */
-  const maxed = (team) => team.length && team.every((id) => g.cardLevel(id) >= 10) && g.teamPower(team) >= 2.6;
+  const maxed = (team) => team.length && team.every((id) => g.cardLevel(id) >= 10) && g.teamPower(team) >= 2.5;
   function riskAdvice() {
     const team = g.team(), d = g.descent(), tp = g.teamPower(team), need = powerFor(Math.max((d.best || 0) + 1, 5));
     if (tp < need * 0.95 && !maxed(team)) return ` <b>Ton équipe est sous la force conseillée</b> (${powerPts(tp)} pour ${powerPts(need)}) : le risque est élevé.`;
