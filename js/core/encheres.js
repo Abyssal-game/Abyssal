@@ -53,10 +53,10 @@ export const TABLES = [
   { key: 'grande', name: 'La Grande Vente', stars: 4, seats: ['banquier', 'souverain'], reward: 70, chest: 'abyssal' },
   // v492 : ventes 5 à 8, chacune avec ses lots (rules : creatures = valeurs des créatures, curses = valeurs des malédictions,
   // facs = nombre de factions parmi les créatures, set = bonus d'une famille de trois)
-  { key: 'maudite', name: 'La Vente maudite', stars: 4, seats: ['stratege', 'archiviste'], reward: 80, chest: 'or', rule: 'Sept malédictions (jusqu’à −7) pour huit créatures.', rules: { creatures: [3, 4, 5, 6, 7, 8, 9, 10], curses: [1, 2, 3, 4, 5, 6, 7], boost: { a: { skill: 3, lam: 0.35, temp: 1.5, noise: 0.1 }, b: { skill: 2, noise: 0.15, bias: 0.1 } } } },
-  { key: 'tresors', name: 'La Vente des trésors', stars: 5, seats: ['collectionneur', 'banquier'], reward: 90, chest: 'or', rule: 'Douze créatures, jusqu’à 12 points, et seulement trois malédictions.', rules: { creatures: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], curses: [2, 4, 6], boost: { a: { skill: 3, read: true, lam: 0.75, temp: 3, noise: 0.1 }, b: { skill: 2, noise: 0.15, bias: 0.1 } } } },
-  { key: 'lignees', name: 'La Vente des lignées', stars: 5, seats: ['maitre', 'echo'], reward: 100, chest: 'abyssal', rule: 'Trois factions seulement, et une famille de trois rapporte +10.', rules: { facs: 3, set: 10, boost: { a: { skill: 2, noise: 0.15, bias: 0.1 }, b: { skill: 3, read: true, lam: 0.45, temp: 2, noise: 0.1 } } } },
-  { key: 'neant', name: 'La Vente du Néant', stars: 5, seats: ['souverain', 'archiviste'], reward: 120, chest: 'abyssal', rule: 'Malédictions doublées : de −2 à −10.', rules: { curses: [2, 4, 6, 8, 10], boost: { a: { skill: 3, lam: 0.35, temp: 1.5, noise: 0.1 }, b: { skill: 2, noise: 0.15, bias: 0.1 } } } },
+  { key: 'maudite', name: 'La Vente maudite', stars: 4, seats: ['stratege', 'archiviste'], reward: 80, chest: 'or', bg: 'salle-encheres-maudite', rule: 'Sept malédictions (jusqu’à −7) pour huit créatures.', rules: { creatures: [3, 4, 5, 6, 7, 8, 9, 10], curses: [1, 2, 3, 4, 5, 6, 7], boost: { a: { skill: 3, lam: 0.35, temp: 1.5, noise: 0.1 }, b: { skill: 2, noise: 0.15, bias: 0.1 } } } },
+  { key: 'tresors', name: 'La Vente des trésors', stars: 5, seats: ['collectionneur', 'banquier'], reward: 90, chest: 'or', bg: 'salle-encheres-tresors', rule: 'Douze créatures, jusqu’à 12 points, et seulement trois malédictions.', rules: { creatures: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], curses: [2, 4, 6], boost: { a: { skill: 3, read: true, lam: 0.75, temp: 3, noise: 0.1 }, b: { skill: 2, noise: 0.15, bias: 0.1 } } } },
+  { key: 'lignees', name: 'La Vente des lignées', stars: 5, seats: ['maitre', 'echo'], reward: 100, chest: 'abyssal', bg: 'salle-encheres-lignees', rule: 'Trois factions seulement, et une famille de trois rapporte +10.', rules: { facs: 3, set: 10, boost: { a: { skill: 2, noise: 0.15, bias: 0.1 }, b: { skill: 3, read: true, lam: 0.45, temp: 2, noise: 0.1 } } } },
+  { key: 'neant', name: 'La Vente du Néant', stars: 5, seats: ['souverain', 'archiviste'], reward: 120, chest: 'abyssal', bg: 'salle-encheres-neant', rule: 'Malédictions doublées : de −2 à −10.', rules: { curses: [2, 4, 6, 8, 10], boost: { a: { skill: 3, lam: 0.35, temp: 1.5, noise: 0.1 }, b: { skill: 2, noise: 0.15, bias: 0.1 } } } },
 ];
 // v492 : un haut fait par vente (payé une fois, en plus de la victoire)
 const curses = (st) => st.won.p.filter((l) => l.v < 0).length;
@@ -76,6 +76,7 @@ export const FEAT_SHARDS = 60;
 export const FEATS_TITLE = 'Commissaire de l’Abîme';
 export const LAST_TITLE = 'Acquéreur du Néant';
 export const TABLE = Object.fromEntries(TABLES.map((t) => [t.key, t]));
+export const tableBg = (key) => `assets/sceaux/${TABLE[key]?.bg || 'salle-encheres'}.webp`; /* v494 : décor peint propre à la salle */
 export const tableUnlocked = (s, i) => i === 0 || !!s.encheres?.beaten?.[TABLES[i - 1].key];
 export const ENCHERES_REWARD = { firstWin: 100, daily: 40, dailyPaid: 5, afterCap: 5, xp: 10 };
 export const ENCHERES_TITLE = 'Favori de Mammon';

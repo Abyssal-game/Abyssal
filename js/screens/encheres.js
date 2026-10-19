@@ -43,10 +43,10 @@ export default function encheresScreen(app, root) {
     const en = g.s.encheres, dailyDone = en.dailyDone === todayKey(), d = g.encheresDaily(), DT = EN.TABLE[d.table];
     const tables = EN.TABLES.map((t, i) => {
       const open = EN.tableUnlocked(g.s, i), won = en.beaten[t.key], [A, B] = t.seats.map((k) => EN.BIDDERS[k]);
-      return [open, `<button class="sc-rival mq-tbl ${open ? '' : 'locked'} ${won ? 'won' : ''}" data-en="play" data-t="${t.key}" ${open ? '' : 'disabled'} style="background-image:linear-gradient(90deg, rgba(12, 13, 20, .97) 42%, rgba(12, 13, 20, .45) 76%, rgba(12, 13, 20, .15)), url(assets/sceaux/salle-encheres.webp)">
+      return [open, `<button class="sc-rival mq-tbl ${open ? '' : 'locked'} ${won ? 'won' : ''}" data-en="play" data-t="${t.key}" ${open ? '' : 'disabled'} style="background-image:linear-gradient(90deg, rgba(12, 13, 20, .97) 42%, rgba(12, 13, 20, .45) 76%, rgba(12, 13, 20, .15)), url(${EN.tableBg(t.key)})">
         <span class="mq-pors"><span class="sc-por">${pic(t.seats[0])}</span><span class="sc-por">${pic(t.seats[1])}</span></span>
         <span class="sc-ri"><b>${esc(t.name)}</b><span class="small">${esc(A.name)} et ${esc(B.name)} · ${stars(t.stars)}</span>
-        <span class="small muted">${open ? `+${t.reward} éclats${won ? '' : ` · 1re victoire : +${EN.ENCHERES_REWARD.firstWin} et ${esc(CHEST_NAME[t.chest].toLowerCase())}`}` : `Gagne à ${esc(EN.TABLES[i - 1].name)} pour y entrer`}</span>${t.rule ? `<span class="small gm-rule">${icon('p:rule')}${esc(t.rule)}</span>` : ''}${open && EN.FEATS[t.key] ? `<span class="small gm-feat ${en.feats?.[t.key] ? 'done' : ''}">${en.feats?.[t.key] ? icon('check') : '★'} Haut fait : ${esc(EN.FEATS[t.key].text)}${en.feats?.[t.key] ? '' : ` (+${EN.FEAT_SHARDS})`}</span>` : ''}</span>
+        <span class="small muted">${open ? `+${t.reward} éclats${won ? '' : ` · 1re victoire : +${EN.ENCHERES_REWARD.firstWin} et ${esc(CHEST_NAME[t.chest].toLowerCase())}`}` : `Gagne à ${esc(EN.TABLES[i - 1].name)} pour y entrer`}</span>${t.rule ? `<span class="small gm-rule">${icon('p:rule')}${esc(t.rule)}</span>` : ''}${open && EN.FEATS[t.key] ? `<span class="small gm-feat ${en.feats?.[t.key] ? 'done' : ''}">${en.feats?.[t.key] ? icon('check') : '<img class="gm-hf" alt="" src="assets/icons/haut-fait.webp">'} Haut fait : ${esc(EN.FEATS[t.key].text)}${en.feats?.[t.key] ? '' : ` (+${EN.FEAT_SHARDS})`}</span>` : ''}</span>
         ${won ? `<span class="sc-won">${icon('check')}</span>` : open ? icon('next') : icon('p:mysteries')}</button>`];
     });
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
@@ -70,7 +70,7 @@ export default function encheresScreen(app, root) {
     let el = document.querySelector('.sc-scene');
     if (!el) { el = document.createElement('div'); document.body.prepend(el); }
     el.className = 'sc-scene mq-scene';
-    el.style.backgroundImage = 'url(assets/sceaux/salle-encheres.webp)';
+    el.style.backgroundImage = `url(${EN.tableBg(g.s.encheres.cur?.table)})`;
   }
   // Lots gagnés : une pastille par faction (doré à 3 : famille complète), et le total des malédictions
   const wonHTML = (st, x) => {
@@ -158,7 +158,7 @@ export default function encheresScreen(app, root) {
       ${out.chests?.length ? `<a class="sc-gain sc-chestwin" href="#/coffres">${icon('p:chest')} <b>${out.chests.map((c) => esc(CHEST_NAME[c])).join(' et ')}</b> gagné${out.chests.length > 1 ? 's' : ''} !</a>` : ''}
       ${out.xp && !out.capped ? `<p class="small muted center">+${out.xp} XP de profil</p>` : ''}
       ${out.capped ? `<p class="small muted">Tes ${EN.ENCHERES_REWARD.dailyPaid} victoires bien payées du jour sont faites : celle-ci rapporte ${EN.ENCHERES_REWARD.afterCap} éclats et ${EN.ENCHERES_REWARD.xp} XP.</p>` : ''}
-      ${out.feat ? `<p class="sc-gain gm-featwin">★ Haut fait réussi : <b>${esc(out.feat)}</b></p>` : ''}
+      ${out.feat ? `<p class="sc-gain gm-featwin"><img class="gm-hf big" alt="" src="assets/icons/haut-fait.webp"> Haut fait réussi : <b>${esc(out.feat)}</b></p>` : ''}
       ${out.title ? `<p class="sc-gain">${icon('p:titles')} Nouveau titre : <b>${esc(out.title)}</b></p>` : ''}
       <div class="sc-end-act">${st.daily ? '' : '<button class="btn primary dc-plq dc-plq-red" data-x="again">Rejouer</button>'}<button class="btn dc-plq dc-plq-dark" data-x="back">Retour</button></div></div>`;
     document.body.appendChild(el);

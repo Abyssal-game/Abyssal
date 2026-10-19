@@ -4464,3 +4464,13 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 /* v493 : pastille « Ennemis trop forts » (écart de niveau) */
 .cb-law.cb-gap { border-color: rgba(224, 72, 94, .75); background: rgba(80, 10, 22, .85); color: #FFB3BE; }
 .cb-law.cb-gap .picon, .cb-law.cb-gap img { filter: drop-shadow(0 0 4px rgba(224, 72, 94, .8)); }
+
+/* v494 : décors peints des salles (bandeau des salles dans l'accueil des jeux) et médaillon des hauts faits */
+.sc-rival.gm-tbl, .sc-rival.mq-tbl { background-size: cover; background-position: 70% 42%; background-repeat: no-repeat; }
+.sc-ri .gm-feat .gm-hf { width: 17px; height: 17px; vertical-align: -3px; margin-right: 2px; filter: drop-shadow(0 0 3px rgba(242, 193, 78, .5)); }
+.sc-end .gm-hf.big { width: 30px; height: 30px; vertical-align: -9px; margin-right: 4px; filter: drop-shadow(0 0 6px rgba(242, 193, 78, .6)); }
+.cr-c .cr-curse { background: none; box-shadow: none; width: 34%; }
+.cr-c .cr-curse img { width: 100%; height: 100%; filter: drop-shadow(0 0 6px rgba(224, 72, 94, .9)); }
+.cr-msg .cr-curse-big, .mq-banner .cr-curse-big { width: 40px; height: 40px; }
+.sc-ri .gm-feat .gm-hf, .sc-end .gm-hf { display: inline-block; }
+.mq-scene::after { background: linear-gradient(180deg, rgba(6, 6, 12, .25), rgba(6, 6, 12, .5) 60%, rgba(6, 6, 12, .3)); }

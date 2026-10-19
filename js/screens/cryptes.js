@@ -44,10 +44,10 @@ export default function cryptesScreen(app, root) {
     const cr = g.s.cryptes, dailyDone = cr.dailyDone === todayKey(), d = g.cryptesDaily(), DT = CR.TABLE[d.table];
     const tables = CR.TABLES.map((t, i) => {
       const open = CR.tableUnlocked(g.s, i), won = cr.beaten[t.key], R = CR.RIVALS[t.rival];
-      return [open, `<button class="sc-rival ${open ? '' : 'locked'} ${won ? 'won' : ''}" data-cr="play" data-t="${t.key}" ${open ? '' : 'disabled'}>
+      return [open, `<button class="sc-rival gm-tbl ${open ? '' : 'locked'} ${won ? 'won' : ''}" data-cr="play" data-t="${t.key}" ${open ? '' : 'disabled'} style="background-image:linear-gradient(90deg, rgba(12, 13, 20, .97) 42%, rgba(12, 13, 20, .5) 78%, rgba(12, 13, 20, .2)), url(${CR.tableBg(t.key)})">
         <span class="sc-por">${pic(t.rival)}</span>
         <span class="sc-ri"><b>${esc(t.name)}</b><span class="small">contre ${esc(R.name)} · ${stars(t.stars)}</span>
-        <span class="small muted">${open ? `+${t.reward} éclats${won ? '' : ` · 1re victoire : +${CR.CRYPTES_REWARD.firstWin} et ${esc(CHEST_NAME[t.chest].toLowerCase())}`}` : `Gagne dans ${esc(CR.TABLES[i - 1].name)} pour y entrer`}</span>${t.rule ? `<span class="small gm-rule">${icon('p:rule')}${esc(t.rule)}</span>` : ''}${open && CR.FEATS[t.key] ? `<span class="small gm-feat ${cr.feats?.[t.key] ? 'done' : ''}">${cr.feats?.[t.key] ? icon('check') : '★'} Haut fait : ${esc(CR.FEATS[t.key].text)}${cr.feats?.[t.key] ? '' : ` (+${CR.FEAT_SHARDS})`}</span>` : ''}</span>
+        <span class="small muted">${open ? `+${t.reward} éclats${won ? '' : ` · 1re victoire : +${CR.CRYPTES_REWARD.firstWin} et ${esc(CHEST_NAME[t.chest].toLowerCase())}`}` : `Gagne dans ${esc(CR.TABLES[i - 1].name)} pour y entrer`}</span>${t.rule ? `<span class="small gm-rule">${icon('p:rule')}${esc(t.rule)}</span>` : ''}${open && CR.FEATS[t.key] ? `<span class="small gm-feat ${cr.feats?.[t.key] ? 'done' : ''}">${cr.feats?.[t.key] ? icon('check') : '<img class="gm-hf" alt="" src="assets/icons/haut-fait.webp">'} Haut fait : ${esc(CR.FEATS[t.key].text)}${cr.feats?.[t.key] ? '' : ` (+${CR.FEAT_SHARDS})`}</span>` : ''}</span>
         ${won ? `<span class="sc-won">${icon('check')}</span>` : open ? icon('next') : icon('p:mysteries')}</button>`];
     });
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
@@ -73,7 +73,7 @@ export default function cryptesScreen(app, root) {
     let el = document.querySelector('.sc-scene');
     if (!el) { el = document.createElement('div'); document.body.prepend(el); }
     el.className = 'sc-scene mq-scene';
-    el.style.backgroundImage = 'url(assets/sceaux/salle-cryptes.webp)';
+    el.style.backgroundImage = `url(${CR.tableBg(g.s.cryptes.cur?.table)})`;
   }
   const seat = (st, x) => {
     const R = CR.RIVALS[st.rival], n = CR.scoreOf(st, x);
@@ -83,7 +83,7 @@ export default function cryptesScreen(app, root) {
       <span class="pa-sc"><b>${x === 'p' ? 'Toi' : esc(R.name)}</b><span class="cr-won">${st.pairs[x].map((k) => { const c = st.cards.find((y) => y.k === k); return `<i style="--fc:${cat.faction[c.f].colors.secondary}">${sigil(c.f)}</i>`; }).join('') || '<small class="muted">aucune paire</small>'}${tags}</span></span>
       <span class="pa-pts"><b>${n}</b><small>point${n > 1 ? 's' : ''}</small></span></div>`;
   };
-  const face = (c) => { const card = c.id && cat.get(c.id), cursed = (g.s.cryptes.cur?.curse || []).includes(c.k); return `<img alt="" src="${card ? artUrl(card, { lite: true }) : 'assets/sceaux/dos.webp'}"><span class="cr-f" style="--fc:${cat.faction[c.f].colors.secondary}">${sigil(c.f)}</span>${cursed ? '<span class="cr-curse" title="Paire maudite"><img alt="" src="assets/icons/danger.webp"></span>' : ''}`; }; /* v492 : marque des paires maudites */
+  const face = (c) => { const card = c.id && cat.get(c.id), cursed = (g.s.cryptes.cur?.curse || []).includes(c.k); return `<img alt="" src="${card ? artUrl(card, { lite: true }) : 'assets/sceaux/dos.webp'}"><span class="cr-f" style="--fc:${cat.faction[c.f].colors.secondary}">${sigil(c.f)}</span>${cursed ? '<span class="cr-curse" title="Paire maudite"><img alt="" src="assets/icons/maudite.webp"></span>' : ''}`; }; /* v492 : marque des paires maudites */
   function grid(st) {
     const pick = st.pending && st.turn === 'p';
     return `<div class="cr-grid ${pick ? 'picking' : ''}">${st.cards.map((c, i) => {
@@ -116,7 +116,7 @@ export default function cryptesScreen(app, root) {
     const P = CR.POWERS[ev.power], mine = ev.who === 'p', nm = mine ? 'Tu' : esc(CR.RIVALS[st.rival].name);
     let txt = esc(P.short);
     if (ev.cursed || ev.silent) { /* v492 : paire maudite, crypte silencieuse */
-      banner = { cls: ev.cursed ? (mine ? 'ko' : 'ok') : '', html: ev.cursed ? `<img class="cr-curse-big" alt="" src="assets/icons/danger.webp"><span><b>Paire maudite !</b><span class="small">${mine ? 'Tu perds' : `${nm} perd`} 1 point, et aucun pouvoir ne se déclenche.</span></span>` : `${sigil(ev.f)}<span><b>Paire ${esc(fname(ev.f))}</b><span class="small">Silence : aucun pouvoir ici.</span></span>` };
+      banner = { cls: ev.cursed ? (mine ? 'ko' : 'ok') : '', html: ev.cursed ? `<img class="cr-curse-big" alt="" src="assets/icons/maudite.webp"><span><b>Paire maudite !</b><span class="small">${mine ? 'Tu perds' : `${nm} perd`} 1 point, et aucun pouvoir ne se déclenche.</span></span>` : `${sigil(ev.f)}<span><b>Paire ${esc(fname(ev.f))}</b><span class="small">Silence : aucun pouvoir ici.</span></span>` };
       app.sfx[ev.cursed ? 'cr-miss' : 'cr-power']?.(); view(); await wait(1300); banner = null; return;
     }
     if (ev.blocked) txt = 'Bloqué par le Verrou artificiel : rien ne se passe.';
@@ -185,7 +185,7 @@ export default function cryptesScreen(app, root) {
       ${out.chests?.length ? `<a class="sc-gain sc-chestwin" href="#/coffres">${icon('p:chest')} <b>${out.chests.map((c) => esc(CHEST_NAME[c])).join(' et ')}</b> gagné${out.chests.length > 1 ? 's' : ''} !</a>` : ''}
       ${out.xp && !out.capped ? `<p class="small muted center">+${out.xp} XP de profil</p>` : ''}
       ${out.capped ? `<p class="small muted">Tes ${CR.CRYPTES_REWARD.dailyPaid} victoires bien payées du jour sont faites : celle-ci rapporte ${CR.CRYPTES_REWARD.afterCap} éclats et ${CR.CRYPTES_REWARD.xp} XP.</p>` : ''}
-      ${out.feat ? `<p class="sc-gain gm-featwin">★ Haut fait réussi : <b>${esc(out.feat)}</b></p>` : ''}
+      ${out.feat ? `<p class="sc-gain gm-featwin"><img class="gm-hf big" alt="" src="assets/icons/haut-fait.webp"> Haut fait réussi : <b>${esc(out.feat)}</b></p>` : ''}
       ${out.title ? `<p class="sc-gain">${icon('p:titles')} Nouveau titre : <b>${esc(out.title)}</b></p>` : ''}
       <div class="sc-end-act">${st.daily ? '' : '<button class="btn primary dc-plq dc-plq-red" data-x="again">Rejouer</button>'}<button class="btn dc-plq dc-plq-dark" data-x="back">Retour</button></div></div>`;
     document.body.appendChild(el);

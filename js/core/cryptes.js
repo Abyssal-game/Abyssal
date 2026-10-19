@@ -60,10 +60,10 @@ export const TABLES = [
   { key: 'puits', name: 'Le Puits de l’Écho', stars: 4, rival: 'echo', reward: 70, chest: 'abyssal' },
   // v492 : cryptes 5 à 8, chacune avec sa règle : mouvante (à chaque fois que la main passe, deux cartes face cachée
   // échangent leur place, sous tes yeux), maudite (deux paires maudites : −1 point et pas de pouvoir), silence (aucun pouvoir)
-  { key: 'cimetiere', name: 'Le Cimetière des rois', stars: 4, rival: 'collectionneur', reward: 80, chest: 'or', rule: 'Crypte mouvante : chaque fois que la main passe, deux cartes face cachée échangent leur place, sous tes yeux.', rules: { drift: true } },
-  { key: 'maudite', name: 'La Crypte maudite', stars: 5, rival: 'banquier', reward: 90, chest: 'or', rule: 'Deux paires maudites : les prendre coûte 1 point, sans pouvoir.', rules: { curse: 2 } },
-  { key: 'nef', name: 'La Nef silencieuse', stars: 5, rival: 'maitre', reward: 100, chest: 'abyssal', rule: 'Silence : aucune paire ne déclenche de pouvoir. Seule la mémoire compte.', rules: { silence: true } },
-  { key: 'tombeau', name: 'Le Tombeau du Néant', stars: 5, rival: 'souverain', reward: 120, chest: 'abyssal', rule: 'Crypte mouvante et deux paires maudites.', rules: { drift: true, curse: 2 } },
+  { key: 'cimetiere', name: 'Le Cimetière des rois', stars: 4, rival: 'collectionneur', reward: 80, chest: 'or', bg: 'salle-cryptes-cimetiere', rule: 'Crypte mouvante : chaque fois que la main passe, deux cartes face cachée échangent leur place, sous tes yeux.', rules: { drift: true } },
+  { key: 'maudite', name: 'La Crypte maudite', stars: 5, rival: 'banquier', reward: 90, chest: 'or', bg: 'salle-cryptes-maudite', rule: 'Deux paires maudites : les prendre coûte 1 point, sans pouvoir.', rules: { curse: 2 } },
+  { key: 'nef', name: 'La Nef silencieuse', stars: 5, rival: 'maitre', reward: 100, chest: 'abyssal', bg: 'salle-cryptes-nef', rule: 'Silence : aucune paire ne déclenche de pouvoir. Seule la mémoire compte.', rules: { silence: true } },
+  { key: 'tombeau', name: 'Le Tombeau du Néant', stars: 5, rival: 'souverain', reward: 120, chest: 'abyssal', bg: 'salle-cryptes-tombeau', rule: 'Crypte mouvante et deux paires maudites.', rules: { drift: true, curse: 2 } },
 ];
 // v492 : un haut fait par crypte (payé une fois, en plus de la victoire)
 export const FEATS = {
@@ -81,6 +81,7 @@ export const FEAT_SHARDS = 60;
 export const FEATS_TITLE = 'Mémoire des Cryptes';
 export const LAST_TITLE = 'Gardien du Tombeau';
 export const TABLE = Object.fromEntries(TABLES.map((t) => [t.key, t]));
+export const tableBg = (key) => `assets/sceaux/${TABLE[key]?.bg || 'salle-cryptes'}.webp`; /* v494 : décor peint propre à la salle */
 export const tableUnlocked = (s, i) => i === 0 || !!s.cryptes?.beaten?.[TABLES[i - 1].key];
 export const CRYPTES_REWARD = { firstWin: 100, daily: 40, dailyPaid: 5, afterCap: 5, xp: 10 };
 export const CRYPTES_TITLE = 'Gardien des Cryptes';

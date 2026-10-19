@@ -52,10 +52,10 @@ export const TABLES = [
   { key: 'sceaux', name: 'Le Pacte des Sceaux', stars: 3, rival: 'maitre', reward: 50, chest: 'or' },
   { key: 'mammon', name: 'Le Pacte de Mammon', stars: 4, rival: 'banquier', reward: 70, chest: 'abyssal' },
   // v492 : salles 5 à 8, chacune avec sa règle (rules : target, seven, sp = cartes spéciales du paquet)
-  { key: 'cendres', name: 'Le Pacte des cendres', stars: 4, rival: 'stratege', reward: 80, chest: 'or', rule: 'Aucun Sceau dans le paquet : rien ne te protège d’une brisure.', rules: { sp: { sceau: 0, gardien: 3, offrande: 3 } } },
-  { key: 'minuit', name: 'Le Pacte de minuit', stars: 5, rival: 'echo', reward: 90, chest: 'or', rule: 'Partie longue : 80 points. Les sept factions rapportent +25.', rules: { target: 80, seven: 25 } },
-  { key: 'registre', name: 'Le Pacte du registre', stars: 5, rival: 'archiviste', reward: 100, chest: 'abyssal', rule: 'Six Offrandes et un seul Gardien : les gros tours sont possibles… pour les deux.', rules: { sp: { sceau: 2, gardien: 1, offrande: 6 } } },
-  { key: 'neant', name: 'Le Pacte du Néant', stars: 5, rival: 'souverain', reward: 120, chest: 'abyssal', rule: '70 points, aucun Sceau, cinq Gardiens. La Souveraine commence à 12.', rules: { target: 70, sp: { sceau: 0, gardien: 5, offrande: 3 } } },
+  { key: 'cendres', name: 'Le Pacte des cendres', stars: 4, rival: 'stratege', reward: 80, chest: 'or', bg: 'salle-pacte-cendres', rule: 'Aucun Sceau dans le paquet : rien ne te protège d’une brisure.', rules: { sp: { sceau: 0, gardien: 3, offrande: 3 } } },
+  { key: 'minuit', name: 'Le Pacte de minuit', stars: 5, rival: 'echo', reward: 90, chest: 'or', bg: 'salle-pacte-minuit', rule: 'Partie longue : 80 points. Les sept factions rapportent +25.', rules: { target: 80, seven: 25 } },
+  { key: 'registre', name: 'Le Pacte du registre', stars: 5, rival: 'archiviste', reward: 100, chest: 'abyssal', bg: 'salle-pacte-registre', rule: 'Six Offrandes et un seul Gardien : les gros tours sont possibles… pour les deux.', rules: { sp: { sceau: 2, gardien: 1, offrande: 6 } } },
+  { key: 'neant', name: 'Le Pacte du Néant', stars: 5, rival: 'souverain', reward: 120, chest: 'abyssal', bg: 'salle-pacte-neant', rule: '70 points, aucun Sceau, cinq Gardiens. La Souveraine commence à 12.', rules: { target: 70, sp: { sceau: 0, gardien: 5, offrande: 3 } } },
 ];
 // v492 : un haut fait par salle (payé une fois, en plus de la victoire)
 export const FEATS = {
@@ -75,6 +75,7 @@ export const LAST_TITLE = 'Signataire du Néant';
 export const TABLE = Object.fromEntries(TABLES.map((t) => [t.key, t]));
 export const tgt = (st) => st.target || TARGET;
 export const sevenOf = (st) => st.seven || SEVEN_BONUS;
+export const tableBg = (key) => `assets/sceaux/${TABLE[key]?.bg || 'salle-pacte'}.webp`; /* v494 : décor peint propre à la salle */
 export const tableUnlocked = (s, i) => i === 0 || !!s.pacte?.beaten?.[TABLES[i - 1].key];
 export const PACTE_REWARD = { firstWin: 100, daily: 40, dailyPaid: 5, afterCap: 5, xp: 10 };
 export const PACTE_TITLE = 'Signataire de l’Abîme';

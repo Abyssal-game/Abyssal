@@ -46,10 +46,10 @@ export default function pacteScreen(app, root) {
     const pa = g.s.pacte, dailyDone = pa.dailyDone === todayKey(), d = g.pacteDaily(), DT = PA.TABLE[d.table];
     const tables = PA.TABLES.map((t, i) => {
       const open = PA.tableUnlocked(g.s, i), won = pa.beaten[t.key], R = PA.RIVALS[t.rival];
-      return [open, `<button class="sc-rival ${open ? '' : 'locked'} ${won ? 'won' : ''}" data-pa="play" data-t="${t.key}" ${open ? '' : 'disabled'}>
+      return [open, `<button class="sc-rival gm-tbl ${open ? '' : 'locked'} ${won ? 'won' : ''}" data-pa="play" data-t="${t.key}" ${open ? '' : 'disabled'} style="background-image:linear-gradient(90deg, rgba(12, 13, 20, .97) 42%, rgba(12, 13, 20, .5) 78%, rgba(12, 13, 20, .2)), url(${PA.tableBg(t.key)})">
         <span class="sc-por">${pic(t.rival)}</span>
         <span class="sc-ri"><b>${esc(t.name)}</b><span class="small">contre ${esc(R.name)} · ${stars(t.stars)}</span>
-        <span class="small muted">${open ? `+${t.reward} éclats${won ? '' : ` · 1re victoire : +${PA.PACTE_REWARD.firstWin} et ${esc(CHEST_NAME[t.chest].toLowerCase())}`}` : `Gagne ${esc(PA.TABLES[i - 1].name)} pour y entrer`}</span>${t.rule ? `<span class="small gm-rule">${icon('p:rule')}${esc(t.rule)}</span>` : ''}${open && PA.FEATS[t.key] ? `<span class="small gm-feat ${pa.feats?.[t.key] ? 'done' : ''}">${pa.feats?.[t.key] ? icon('check') : '★'} Haut fait : ${esc(PA.FEATS[t.key].text)}${pa.feats?.[t.key] ? '' : ` (+${PA.FEAT_SHARDS})`}</span>` : ''}</span>
+        <span class="small muted">${open ? `+${t.reward} éclats${won ? '' : ` · 1re victoire : +${PA.PACTE_REWARD.firstWin} et ${esc(CHEST_NAME[t.chest].toLowerCase())}`}` : `Gagne ${esc(PA.TABLES[i - 1].name)} pour y entrer`}</span>${t.rule ? `<span class="small gm-rule">${icon('p:rule')}${esc(t.rule)}</span>` : ''}${open && PA.FEATS[t.key] ? `<span class="small gm-feat ${pa.feats?.[t.key] ? 'done' : ''}">${pa.feats?.[t.key] ? icon('check') : '<img class="gm-hf" alt="" src="assets/icons/haut-fait.webp">'} Haut fait : ${esc(PA.FEATS[t.key].text)}${pa.feats?.[t.key] ? '' : ` (+${PA.FEAT_SHARDS})`}</span>` : ''}</span>
         ${won ? `<span class="sc-won">${icon('check')}</span>` : open ? icon('next') : icon('p:mysteries')}</button>`];
     });
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
@@ -74,7 +74,7 @@ export default function pacteScreen(app, root) {
     let el = document.querySelector('.sc-scene');
     if (!el) { el = document.createElement('div'); document.body.prepend(el); }
     el.className = 'sc-scene mq-scene';
-    el.style.backgroundImage = 'url(assets/sceaux/salle-pacte.webp)';
+    el.style.backgroundImage = `url(${PA.tableBg(g.s.pacte.cur?.table)})`;
   }
   const cardHTML = (c, cls = '') => {
     if (c.sp) return `<span class="pa-card sp sp-${c.sp} ${cls}"><img alt="" src="${SP[c.sp].img}"><span class="pa-cn">${SP[c.sp].name}</span></span>`;
@@ -195,7 +195,7 @@ export default function pacteScreen(app, root) {
       ${out.chests?.length ? `<a class="sc-gain sc-chestwin" href="#/coffres">${icon('p:chest')} <b>${out.chests.map((c) => esc(CHEST_NAME[c])).join(' et ')}</b> gagné${out.chests.length > 1 ? 's' : ''} !</a>` : ''}
       ${out.xp && !out.capped ? `<p class="small muted center">+${out.xp} XP de profil</p>` : ''}
       ${out.capped ? `<p class="small muted">Tes ${PA.PACTE_REWARD.dailyPaid} victoires bien payées du jour sont faites : celle-ci rapporte ${PA.PACTE_REWARD.afterCap} éclats et ${PA.PACTE_REWARD.xp} XP.</p>` : ''}
-      ${out.feat ? `<p class="sc-gain gm-featwin">★ Haut fait réussi : <b>${esc(out.feat)}</b></p>` : ''}
+      ${out.feat ? `<p class="sc-gain gm-featwin"><img class="gm-hf big" alt="" src="assets/icons/haut-fait.webp"> Haut fait réussi : <b>${esc(out.feat)}</b></p>` : ''}
       ${out.title ? `<p class="sc-gain">${icon('p:titles')} Nouveau titre : <b>${esc(out.title)}</b></p>` : ''}
       <div class="sc-end-act">${st.daily ? '' : '<button class="btn primary dc-plq dc-plq-red" data-x="again">Rejouer</button>'}<button class="btn dc-plq dc-plq-dark" data-x="back">Retour</button></div></div>`;
     document.body.appendChild(el);
