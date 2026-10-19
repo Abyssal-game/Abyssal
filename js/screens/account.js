@@ -14,13 +14,14 @@ const pwOk = (p) => p.length >= 8 && /[a-z]/.test(p) && /[A-Z]/.test(p) && /[0-9
 export function askPseudo(app) {
   if (sync.profile?.pseudo || document.querySelector('.ps-sheet')) return;
   const sh = openSheet(`<div class="ps-sheet stack"><h2 class="center">Choisis ton nom</h2>
-    <p class="small center muted">C’est le nom que les autres joueurs verront dans les classements. Tu pourras le changer dans Sanctuaire → Compte.</p>
+    <p class="small center muted">C’est le nom que les autres joueurs verront dans les classements, et grâce auquel tes amis te trouveront. <b>Choisis bien : il est définitif.</b></p>
     <form class="stack" id="ps-form" novalidate><input class="input plain" name="pseudo" maxlength="16" minlength="3" placeholder="3 à 16 lettres ou chiffres" autocomplete="nickname" value="${esc(app.game.s.name || '')}">
     <button class="btn primary block" type="submit">${icon('user')}Valider</button><button class="btn ghost small block" type="button" data-ps="later">Plus tard</button></form></div>`, { label: 'Ton nom', cls: 'sheet-small' });
   sh.body.querySelector('[data-ps="later"]').addEventListener('click', () => sh.close());
   sh.body.querySelector('#ps-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const v = String(new FormData(e.target).get('pseudo') || '').trim();
+    if (v && !(await confirmBox(`Ton pseudo sera <b>${esc(v)}</b>, pour toujours. C’est bon ?`, { ok: 'Oui, c’est mon pseudo' }))) return;
     try { await setPseudo(v); if (!app.game.s.name) app.game.setName?.(v); toast(`Bienvenue, <b>${esc(v)}</b> !`, { kind: 'success', icon: 'user' }); sh.close(); app.refresh?.(); }
     catch (err) { toast(esc(err.message), { kind: 'error', icon: 'info' }); }
   });
@@ -123,7 +124,8 @@ export default function account(app, root) {
         <p class="small muted">C’est le nom que les autres joueurs voient dans les classements.</p>
         ${p?.badge ? `<p class="small">Ton badge : ${cloud.badgeHTML(p.badge)}</p>` : ''}
         ${p?.badge === 'createur' ? '<a class="btn gold small" href="#/parametres">Mode Créateur (dans Réglages)</a>' : ''}
-        <form class="row gap acc-pseudo" id="pseudo"><input class="input plain" name="pseudo" maxlength="16" minlength="3" placeholder="Ton pseudo" value="${esc(p?.pseudo || '')}" required><button class="btn primary" type="submit">OK</button></form>
+        ${p?.pseudo && p.pseudo_locked ? `<p class="acc-pseudo-fixed">${icon('lock')} <b>${esc(p.pseudo)}</b> <span class="small muted">· définitif</span></p>` /* v500 : le pseudo ne se change plus */
+          : `<form class="row gap acc-pseudo" id="pseudo"><input class="input plain" name="pseudo" maxlength="16" minlength="3" placeholder="Ton pseudo" value="${esc(isMaskedPseudo(p?.pseudo) ? '' : p?.pseudo || '')}" required><button class="btn primary" type="submit">OK</button></form><p class="small muted">Attention : une fois choisi, ton pseudo est définitif.</p>`}
         ${p?.pseudo ? '' : '<p class="small acc-warn">Choisis un pseudo pour apparaître au classement de la Descente.</p>'}
         ${isMaskedPseudo(p?.pseudo) ? '<p class="small acc-warn">Ton pseudo a été signalé par plusieurs joueurs et a été masqué. Choisis-en un autre.</p>' : ''}
         <p class="small muted">Dans un classement, touche le pseudo d’un joueur pour le signaler ou le masquer.${blockedIds().length ? ` Joueurs masqués sur cet appareil : <b>${blockedIds().length}</b>.` : ''}</p>
@@ -146,8 +148,10 @@ export default function account(app, root) {
         <button class="btn danger small" data-act="delete">${icon('trash')}Supprimer mon compte</button>
         <p class="small muted">La suppression efface ton profil, ta sauvegarde en ligne et tes scores. Ta partie reste sur cet appareil.</p>
       </section>`;
-    root.querySelector('#pseudo').addEventListener('submit', async (e) => {
+    root.querySelector('#pseudo')?.addEventListener('submit', async (e) => {
       e.preventDefault();
+      const v = String(new FormData(e.target).get('pseudo') || '').trim();
+      if (v && !(await confirmBox(`Ton pseudo sera <b>${esc(v)}</b>, pour toujours. C’est bon ?`, { ok: 'Oui, c’est mon pseudo' }))) return;
       try { await setPseudo(String(new FormData(e.target).get('pseudo'))); toast('Pseudo enregistré.', { kind: 'success', icon: 'user' }); render(); }
       catch (err) { toast(esc(err.message), { kind: 'error', icon: 'info' }); }
     });

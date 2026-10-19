@@ -3,7 +3,7 @@ import { icon, EMBLEM, picon } from '../ui/icons.js';
 import { artUrl } from '../art/assets.js';
 import { esc, fmt } from '../ui/dom.js';
 import { sync } from '../cloud/sync.js';
-import { isLoggedIn } from '../cloud/cloud.js';
+import { isLoggedIn, friendList } from '../cloud/cloud.js';
 import { openCreator } from './creator.js';
 
 export default function menu(app, root) {
@@ -21,6 +21,7 @@ export default function menu(app, root) {
     <header class="screen-head mn-head ui-hero bn-sanctuary"><h1>Le Sanctuaire</h1><p class="muted">Ton profil, tes succès, tes titres et les réglages du jeu.</p></header>
     <nav class="mn-grid">
       ${profile}
+      ${T('#/amis', 'team-ic', 'Amis', isLoggedIn() ? '<span class="mn-fr">Collections et succès de tes amis</span>' : 'Avec un compte').replace('class="mn-tile"', 'class="mn-tile mn-wide mn-friends"')}
       ${T('#/succes', 'crown', 'Succès', `${achDone} / ${cat.achievements.length} débloqués`)}
       ${T('#/bestiaire', 'book', 'Bestiaire', 'Créatures, royaumes, histoire')}
       ${T('#/compte', 'account', 'Compte', isLoggedIn() ? `Connecté${sync.profile?.pseudo ? ` · ${esc(sync.profile.pseudo)}` : ''}` : 'Sauvegarde, classement')}
@@ -32,6 +33,8 @@ export default function menu(app, root) {
     if (!b) return;
     if (b.dataset.mn === 'creator') { if (!g.s.settings.dev) g.setSetting('dev', true); openCreator(app); }
   });
+  /* v500 : demandes d'ami reçues, sur la tuile Amis */
+  if (isLoggedIn()) friendList().then((rows) => { const n = rows.filter((r) => r.status === 'pending' && r.incoming).length; const t = root.querySelector('.mn-fr'); if (t && n) t.innerHTML = `<b class="mn-fr-n">${n} demande${n > 1 ? 's' : ''} d’ami</b>`; }).catch(() => {});
   app.refreshView = () => app.refresh();
   return () => { app.refreshView = null; };
 }

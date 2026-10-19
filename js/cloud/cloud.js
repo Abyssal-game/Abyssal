@@ -37,6 +37,7 @@ function frError(status, body) {
   if (m.includes('otp_expired') || m.includes('expired') || m.includes('invalid or has expired')) return 'Ce lien a expiré : demande-en un nouveau.';
   if (m.includes('duplicate') || m.includes('profiles_pseudo_key') || status === 409) return 'Ce pseudo est déjà pris.';
   if (m.includes('check constraint') || m.includes('violates check')) return 'Pseudo invalide : 3 à 16 lettres, chiffres, espaces, - ou _.';
+  if (m.includes('friend_') || m.includes('player_cards')) return 'Les amis ne sont pas encore ouverts sur le serveur.';
   if (status === 401 || status === 403) return 'Session expirée : reconnecte-toi.';
   if (status >= 500) return 'Le serveur ne répond pas correctement. Réessaie dans un instant.';
   return body?.msg || body?.message || 'Une erreur est survenue. Réessaie dans un instant.';
@@ -160,6 +161,26 @@ export async function saveProfile(p) {
     body: { id: currentUser().id, ...p, updated_at: new Date().toISOString() },
   });
 }
+// v500 : mise à jour du profil sans toucher au pseudo (définitif : seul setPseudo l'envoie)
+export async function updateProfile(p) {
+  await authed(`/rest/v1/profiles?id=eq.${currentUser().id}`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: { ...p, updated_at: new Date().toISOString() } });
+}
+
+// ——— Amis (v500, supabase/07-amis.sql) ——————————————————————————————————
+// 'sent' | 'accepted' | 'pending' | 'already'
+export async function friendRequest(pseudo) { return authed('/rest/v1/rpc/friend_request', { method: 'POST', body: { p_pseudo: pseudo } }); }
+export async function friendRespond(id, accept) { return authed('/rest/v1/rpc/friend_respond', { method: 'POST', body: { p_other: id, p_accept: !!accept } }); }
+export async function friendRemove(id) { return authed('/rest/v1/rpc/friend_remove', { method: 'POST', body: { p_other: id } }); }
+export async function friendList() { return (await authed('/rest/v1/rpc/friend_list', { method: 'POST', body: {} })) || []; }
+// Fiche d'un ami (ou la sienne) : null si elle n'existe pas ou si on n'est pas amis
+export async function playerCard(id) {
+  const rows = await authed(`/rest/v1/player_cards?id=eq.${id}&select=data,updated_at`);
+  return rows && rows[0] ? rows[0] : null;
+}
+export async function publishCard(data) {
+  await authed('/rest/v1/player_cards?on_conflict=id', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: { id: currentUser().id, data, updated_at: new Date().toISOString() } });
+}
+
 // Signaler le pseudo d'un autre joueur : renvoie 'ok', ou 'masqué' si le pseudo vient d'être masqué.
 export async function reportPseudo(target, reason) {
   return authed('/rest/v1/rpc/report_pseudo', { method: 'POST', body: { p_target: target, p_reason: reason } });

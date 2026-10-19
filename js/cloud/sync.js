@@ -2,6 +2,7 @@
 // le profil public suit, et les scores de la Descente sont envoyés au classement.
 import * as cloud from './cloud.js';
 import { pseudoProblem } from '../core/moderation.js';
+import { friendCard } from '../core/friends.js';
 import { migrate, today } from '../core/save.js';
 import { openSheet, esc, toast } from '../ui/dom.js';
 
@@ -30,11 +31,21 @@ export async function pushNow() {
   try {
     sync.lastPush = await cloud.pushSave(app.game.s);
     lsSet(SYNCED_KEY, String(sync.lastPush));
-    if (sync.profile?.pseudo) await cloud.saveProfile({ pseudo: sync.profile.pseudo, ...profilePayload() });
+    if (sync.profile?.pseudo) await cloud.updateProfile(profilePayload()); /* v500 : le pseudo (définitif) ne repart plus à chaque sauvegarde */
+    if (sync.profile?.pseudo) await publishCard();
     sync.status = 'ok'; sync.error = null;
   } catch (e) { sync.status = 'error'; sync.error = e.message; }
   busy = false; emit();
   if (pending) { pending = false; schedule(); }
+}
+// v500 : fiche lue par les amis (envoyée seulement quand elle change ; une erreur ici ne bloque pas la sauvegarde)
+let lastCard = '';
+async function publishCard() {
+  try {
+    const card = friendCard(app.game), txt = JSON.stringify(card);
+    if (txt === lastCard) return;
+    await cloud.publishCard(card); lastCard = txt;
+  } catch (e) { /* serveur sans la table des amis (07-amis.sql pas encore collé) : rien */ }
 }
 function schedule() { clearTimeout(timer); timer = setTimeout(pushNow, 4000); }
 

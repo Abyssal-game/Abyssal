@@ -30,9 +30,10 @@ export function cardHTML(card, opts = {}) {
   const { size = 'mini', variant = 'normal', lazy = false, count = 0, isNew = false, mystery = false, nameKnown = false, tag = '' } = opts;
   const r = RARITY[card.rarity];
   const fc = catalogRef?.faction[card.faction]?.colors.secondary || '#888';
-  const fame = mystery ? 0 : fameRef(card.id);
-  const dress = mystery ? null : opts.dress !== undefined ? opts.dress : dressRef(card.id); /* v484 : opts.dress pour les aperçus de l'Échoppe */
-  const cls = ['tcg', `tcg-${size}`, `r-${card.rarity}`, `f-${card.faction}`, mystery ? 'is-mystery' : `v-${variant}`, hasRealArt(card.id) ? 'real' : '', fame ? `fm${fame}` : '', !mystery && apexRef(card.id) ? 'apex' : '', dress ? `dr dr-${dress}` : ''].join(' ');
+  const foreign = !!opts.foreign; /* v500 : carte d'un ami : ni tes favoris, ni ta renommée, ni tes finitions de prestige */
+  const fame = mystery || foreign ? 0 : fameRef(card.id);
+  const dress = mystery || foreign ? null : opts.dress !== undefined ? opts.dress : dressRef(card.id); /* v484 : opts.dress pour les aperçus de l'Échoppe */
+  const cls = ['tcg', `tcg-${size}`, `r-${card.rarity}`, `f-${card.faction}`, mystery ? 'is-mystery' : `v-${variant}`, hasRealArt(card.id) ? 'real' : '', fame ? `fm${fame}` : '', !mystery && !foreign && apexRef(card.id) ? 'apex' : '', dress ? `dr dr-${dress}` : ''].join(' ');
   const fameB = fame ? `<span class="tcg-fame" title="${FAME_NAMES[fame]}" aria-label="Renommée : ${FAME_NAMES[fame]}"><img alt="" src="assets/icons/fame-${fame}.webp" onerror="this.remove()"></span>` : '';
   const style = `--rc:${r.color};--fc:${fc};--hue:${hueFor(card.id)}deg`;
   const lite = size === 'mini';
@@ -50,7 +51,7 @@ export function cardHTML(card, opts = {}) {
       ${mystery ? `<div class="tcg-lock">${icon('lock')}</div>` : variant !== 'normal' ? `<span class="tcg-vbadge">${VARIANTS[variant].short}</span>` : ''}
       <span class="tcg-sig">${sigil(card.faction)}</span>
       <div class="tcg-plate"><span class="tcg-gem">${r.short}</span><span class="tcg-nm">${name}</span></div>
-      ${vframe}${fameB}${!mystery && favRef(card.id) ? '<span class="tcg-fav" aria-label="Favori">★</span>' : ''}${count > 1 ? `<span class="tcg-count">×${count}</span>` : ''}${isNew ? '<span class="tcg-new">Nouveau</span>' : ''}${tag}
+      ${vframe}${fameB}${!mystery && !foreign && favRef(card.id) ? '<span class="tcg-fav" aria-label="Favori">★</span>' : ''}${count > 1 ? `<span class="tcg-count">×${count}</span>` : ''}${isNew ? '<span class="tcg-new">Nouveau</span>' : ''}${tag}
     </div>`;
   }
   // Grand format : l'illustration d'abord, un bandeau de nom et un court texte.

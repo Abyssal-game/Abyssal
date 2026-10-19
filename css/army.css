@@ -4482,3 +4482,27 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 /* v499 : dégâts sans attaquant (poison, épuisement, marée…) : petits chiffres discrets, verts pour le poison */
 .dv-float.dmg.tick { font-size: .9em; opacity: .92; text-shadow: 0 1px 3px #000; }
 .dv-float.dmg.tick.venom { color: #A6E05A; }
+
+/* v500 : Amis (liste, demandes, fiche d'un ami) */
+.fr-add .input { flex: 1; min-width: 0; }
+.fr-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin: 0 0 8px; min-height: 64px; }
+.fr-row[data-open] { cursor: pointer; }
+.fr-av { flex: 0 0 48px; width: 48px; height: 48px; border-radius: 50%; overflow: hidden; border: 2px solid rgba(232, 195, 90, .55); background: #0E0F14; }
+.fr-av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fr-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.fr-t b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fr-t small { color: var(--muted, #A9A3B8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fr-acts { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.fr-go { opacity: .7; }
+.pill-n { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--gold, #E8C35A); color: #120C06; font: 800 .72rem/1 var(--f-ui); vertical-align: middle; }
+.fr-cmp { text-align: center; }
+.fr-flt { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+.fr-grid .tcg { position: relative; }
+.fr-lv { position: absolute; left: 4px; top: 4px; z-index: 6; padding: 2px 6px; border-radius: 8px; background: rgba(8, 9, 13, .82); color: #F2D98A; font: 700 .6rem/1.2 var(--f-ui); }
+.fr-newc { position: absolute; left: 50%; bottom: 30%; translate: -50% 0; z-index: 6; padding: 2px 6px; border-radius: 8px; background: rgba(176, 75, 255, .9); color: #fff; font: 700 .56rem/1.2 var(--f-ui); white-space: nowrap; }
+.fr-ach { display: grid; gap: 8px; }
+.fr-ach-i { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: 10px; background: rgba(255, 255, 255, .04); }
+.fr-remove { margin-top: 18px; }
+.mn-fr-n { color: var(--gold, #E8C35A); }
+.acc-pseudo-fixed { font-size: 1.05rem; }
+.fr-add .btn { flex: 0 0 auto; padding-inline: 16px; }
