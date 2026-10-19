@@ -52,7 +52,7 @@ export function duelUnit(card, { side = 'ally', level = 1, scale = null, boss = 
   return {
     uid: `${side[0]}${++seq}`, id: card.id, name: card.name, side, rarity: card.rarity, faction: card.faction, role, kw: KW_BY_ROLE[role],
     fam: side === 'enemy' ? aiFamily(card, { boss }) : null,
-    atk, hp, maxHp: hp, level, boss, elite, poison: 0, frozen: 0, frostCD: 0, boost: 0, shield: 0, acts: 0, intent: null,
+    atk, hp, maxHp: hp, level, boss, elite, pow: k, /* v493 : force de la créature (rareté × niveau, ou échelle de l'étage) */ poison: 0, frozen: 0, frostCD: 0, boost: 0, shield: 0, acts: 0, intent: null,
     brk: brkMax, brkMax, broken: false, mark: 0, family: familyOf(card),
     ...(ck ? { ck, ckLv: level } : {}),
     ...(fm ? { form: fm.passive, name: fm.name, atk: Math.max(1, atk + fm.atk), hp: Math.max(1, Math.round(hp * fm.hp)), maxHp: Math.max(1, Math.round(hp * fm.hp)) } : {}),
@@ -70,7 +70,7 @@ export function rand(st) {
 const d20 = (st) => 1 + Math.floor(rand(st) * 20);
 
 // ——— État ———
-export function createDuel(allies, enemies, { gauge = 0, fervor = gauge, ult = 'sceau', power = 1, known = {}, ruleMult = 1, bossPower = null, boss = null, pact = null, relics = [], blessings = [], seed = null, discovered = {}, goal = null } = {}) {
+export function createDuel(allies, enemies, { gauge = 0, fervor = gauge, ult = 'sceau', power = 1, known = {}, ruleMult = 1, bossPower = null, boss = null, pact = null, relics = [], blessings = [], seed = null, discovered = {}, goal = null, refPow = null } = {}) {
   const st = {
     ver: 2, units: {}, order: { ally: [], enemy: [] }, turn: 'ally', round: 1, ap: AP_MAX,
     fervor: Math.min(FERVOR_MAX, fervor + (blessings.includes('ferveur') ? 1 : 0)), gauge: 0,
@@ -78,7 +78,7 @@ export function createDuel(allies, enemies, { gauge = 0, fervor = gauge, ult = '
     freeSwap: blessings.includes('relais'), sursis: blessings.includes('sursis'), queue: [], skipEv: [], discovered: { ...discovered },
     seed: seed ?? Math.floor(Math.random() * 2 ** 31), stats: { parries: 0, dodges: 0, breaks: 0, crits: 0, fumbles: 0, interrupts: 0, feasts: 0 },
     bossKey: boss && BOSSES[boss] ? boss : null, law: null, aspect: null, pact: pact || null, relics: relics.slice(), relSeen: {}, bossLog: [], legends: [],
-    goal: goal && GOALS[goal] ? goal : null,
+    goal: goal && GOALS[goal] ? goal : null, refPow,
   };
   for (const u of [...allies, ...enemies]) { st.units[u.uid] = { ...u }; st.order[u.side].push(u.uid); }
   setupExtras(st);
@@ -206,6 +206,8 @@ export function dmgOf(st, a, t, mult = 1, { basic = false } = {}) {
   }
   // les bonus situationnels se cumulent, mais jamais au-delà de ×3 la force de base du coup
   n = Math.min(n, flat * MULT_CAP);
+  // v493 : écart de niveau : une créature trop faible pour l'étage blesse moins (comme dans un RPG)
+  if (a.side === 'ally' && t.side === 'enemy' && st.refPow && a.pow && a.pow < st.refPow) n *= (a.pow / st.refPow) ** GAP_ATK;
   if (t.boss && st.law === 'fer' && !t.broken) n *= 0.6;
   if (t.boss && t.side === 'enemy' && a.side === 'ally' && st.runes) n *= 1 - RUNE_GUARD * runesLeft(st);
   if (a.side === 'ally' && t.side === 'enemy' && mult > 0) n += comboOf(st, a, t);
@@ -282,11 +284,17 @@ export const ALLY_HIT_CAP = 0.45, ALLY_BIG_CAP = 0.75;
 const BIG = ['heavy', 'blast', 'gorge', 'blizzard', 'copy', 'swarm', 'execute', 'lament', 'ambush', 'price', 'quake'];
 // v392 : Verdict du Juge des Sceaux (action interdite à toute ton équipe jusqu'à son action suivante)
 export const FORBID = { attack: 'attaquer', skill: 'utiliser une compétence', defend: 'se défendre' };
-export const allyCap = (u, kind) => Math.max(1, Math.round(u.maxHp * (BIG.includes(kind) ? ALLY_BIG_CAP : ALLY_HIT_CAP)));
+// v493 : la protection se calcule sur la force attendue à l'étage (st.refPow), pas sur la créature : une créature trop faible
+// pour l'étage n'est plus protégée (avant, des communes niveau 1 ne prenaient que 3 dégâts d'un gardien de l'étage 70)
+export const GAP_POW = 3, GAP_ATK = 2;
+export const allyCap = (u, kind, st = null) => {
+  const gap = st?.refPow && u.pow ? Math.max(1, st.refPow / u.pow) : 1;
+  return Math.max(1, Math.round(u.maxHp * gap ** GAP_POW * (BIG.includes(kind) ? ALLY_BIG_CAP : ALLY_HIT_CAP)));
+};
 function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   if (u.hp <= 0 || n <= 0) return 0;
   if (u.boss && u.side === 'enemy') n = Math.min(n, bossCap(u));
-  if (u.side === 'ally' && src && st.units[src]?.side === 'enemy') n = Math.min(n, allyCap(u, st.curKind));
+  if (u.side === 'ally' && src && st.units[src]?.side === 'enemy') n = Math.min(n, allyCap(u, st.curKind, st));
   // Brèche (v250) : posée par un allié, exploitée par un autre → le coup perce le bouclier, +20 %, +3 Brisure
   let breached = null;
   if (src && u.side === 'enemy' && u.breach && st.units[src]?.side === 'ally' && u.breach.by !== src) { breached = u.breach; u.breach = null; pierce = true; n *= 1.2; }
@@ -313,7 +321,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
     if (u.mirror) {
       u.mirror = false;
       ev.push({ t: 'status', u: u.uid, s: 'Le miroir renvoie le coup !', k: 'bad' });
-      if (sA.hp > 0) hurt(st, sA, Math.min(allyCap(sA, 'hit'), Math.max(1, Math.round(n * 0.6))), ev, null);
+      if (sA.hp > 0) hurt(st, sA, Math.min(allyCap(sA, 'hit', st), Math.max(1, Math.round(n * 0.6))), ev, null);
       return 0;
     }
     if (u.broken && u.ashArmor) { u.ashArmor = 0; ev.push({ t: 'status', u: u.uid, s: 'L’armure de cendres tombe', syn: true }); }
@@ -1670,7 +1678,7 @@ export function intentInfo(st, e) {
   let dmg = 0;
   const copyM = it.kind === 'copy' ? { estoc: 2, entrave: 0.6, marque: 1.5 }[it.copy] : null;
   const m = copyM || { hit: 1, heavy: e.boss ? 2.5 : 2.2, poison: 0.6, frost: 0.5, gorge: 1.6, chain: 0.8, tick2: 1.2, ambush: 2.2, execute: t && t.hp <= t.maxHp / 2 ? 3 : 2 }[it.kind];
-  const capd = (x, n) => Math.min(n, allyCap(x, it.kind));
+  const capd = (x, n) => Math.min(n, allyCap(x, it.kind, st));
   if (m && eff) dmg = capd(eff, dmgOf(st, e, eff, m * (eff !== t ? 0.6 : 1)));
   if (it.kind === 'blast') dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, e.boss ? 1 : 0.8))));
   if (it.kind === 'blizzard') dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, 0.9))));

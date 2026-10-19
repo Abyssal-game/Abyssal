@@ -52,6 +52,8 @@ const IN_PIC = { gorge: 'heavy', gather: 'channel', blizzard: 'frost', mimic: 'c
 const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${IN_PIC[k] || k}.webp">`;
 
 export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = null, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.' }) {
+  // v493 : force attendue à l'étage ÷ force moyenne de l'équipe (1 = à niveau)
+  const gapOf = (st) => { if (!st.refPow) return 1; const al = st.order.ally.map((id) => st.units[id]).filter((u) => u.pow); return al.length ? st.refPow / (al.reduce((a, u) => a + u.pow, 0) / al.length) : 1; };
   const firstSteps = () => !!run?.day && !run.free && !run.trial && g.novice() && (run.floor || 0) <= 2; /* v398 : premiers pas */
   const settling = () => { const d = app.game.s.descent; return (d.runs || 0) <= 1 && (d.run?.floor || 1) <= 2; }; // v328 : voir plus haut
   const g = app.game, cat = app.catalog, run = runOpt || g.descent().run, st = run.battle;
@@ -254,7 +256,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     if (gl && gl.state === 'done' && lastGoal !== 'done' && lastGoal !== null) { app.sfx.achievement?.(); banner(`${icon('star')} Objectif réussi !`, 'good', 1100); }
     if (gl && gl.state === 'fail' && lastGoal === 'pending') toast(`Objectif « ${esc(gl.name)} » manqué.`, { icon: 'info' });
     lastGoal = gl ? gl.state : null;
-    const rules = [gl ? `<span class="cb-law cb-goal s-${gl.state}" data-d="rule" data-k="goal"><img class="cb-gico" alt="" src="assets/icons/goal.webp">${gl.state === 'done' ? '✓ ' : gl.state === 'fail' ? '✗ ' : ''}<b>${esc(gl.name)}</b>${gl.p && gl.state === 'pending' ? ` <small>${gl.p}</small>` : ''}</span>` : '',
+    const gap = gapOf(st); /* v493 : écart de niveau : ennemis trop forts pour l'équipe */
+    const rules = [gap >= 1.1 ? `<span class="cb-law cb-gap" data-d="rule" data-k="gap">${icon('p:danger')}<b>Ennemis trop forts</b></span>` : '', gl ? `<span class="cb-law cb-goal s-${gl.state}" data-d="rule" data-k="goal"><img class="cb-gico" alt="" src="assets/icons/goal.webp">${gl.state === 'done' ? '✓ ' : gl.state === 'fail' ? '✗ ' : ''}<b>${esc(gl.name)}</b>${gl.p && gl.state === 'pending' ? ` <small>${gl.p}</small>` : ''}</span>` : '',
       st.pact && PACTS[st.pact] ? `<span class="cb-law" style="--pk:${PACTS[st.pact].color}" data-d="rule" data-k="pact">${icon('p:seal')}<b>${esc(PACTS[st.pact].name)}</b></span>` : '',
       st.law ? `<span class="cb-law" data-d="rule" data-k="law"><b>${esc(LAWS[st.law].name)}</b></span>` : '',
       st.forbid ? `<span class="cb-law cb-forbid" title="Verdict du Juge : interdit de ${esc(FORBID[st.forbid])} jusqu’à sa prochaine action"><b>Interdit : ${esc(FORBID_SHORT[st.forbid])}</b></span>` : '',
@@ -1068,7 +1071,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   // Règles en vigueur : pacte, loi de l'Architecte, aspect de l'Éclipse, reliques
   function ruleSheet(k) {
     let h = '';
-    if (k === 'goal') { const gl = goalState(st); if (gl) h = `<h2>Objectif : ${esc(gl.name)}</h2><p>${esc(gl.desc)}</p><p class="small muted">Facultatif. Réussi et combat gagné : des éclats en plus et 1 Ferveur pour la suite du chapitre.</p><p><b>${gl.state === 'done' ? 'Réussi !' : gl.state === 'fail' ? 'Manqué pour ce combat.' : `En cours${gl.p ? ` (${gl.p})` : ''}.`}</b></p>`; }
+    if (k === 'gap') { const gp = gapOf(st), d = Math.round((1 - 1 / gp ** 2) * 100); h = `<h2>Ennemis trop forts</h2><p>Ces ennemis sont bien plus forts que ton équipe (environ ×${gp.toFixed(1)}).</p><p>Tes créatures leur font <b>${d} % de dégâts en moins</b>, et leurs coups ne sont plus retenus : ils peuvent abattre une créature d’un seul coup.</p><p class="small muted">Renforce ton équipe (Collection › Forge) ou choisis des créatures plus rares avant de descendre aussi bas.</p>`; }
+    else if (k === 'goal') { const gl = goalState(st); if (gl) h = `<h2>Objectif : ${esc(gl.name)}</h2><p>${esc(gl.desc)}</p><p class="small muted">Facultatif. Réussi et combat gagné : des éclats en plus et 1 Ferveur pour la suite du chapitre.</p><p><b>${gl.state === 'done' ? 'Réussi !' : gl.state === 'fail' ? 'Manqué pour ce combat.' : `En cours${gl.p ? ` (${gl.p})` : ''}.`}</b></p>`; }
     else if (k === 'pact' && PACTS[st.pact]) h = `<h2>${esc(PACTS[st.pact].name)}</h2><p><b class="dc-good">Gain</b> : ${esc(PACTS[st.pact].gain)}</p><p><b class="dc-bad">Prix</b> : ${esc(PACTS[st.pact].cost)}</p>`;
     else if (k === 'law' && LAWS[st.law]) h = `<h2>${esc(LAWS[st.law].name)}</h2><p>${esc(LAWS[st.law].desc)}</p><p class="small muted">L’Architecte change de Loi tous les deux tours ; la prochaine est annoncée sur sa carte.</p>`;
     else if (k === 'aspect' && ASPECTS[st.aspect]) { const A = ASPECTS[st.aspect]; h = `<h2>${esc(A.name)}</h2><p>Faible face à <b>${A.weak.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}</b> (+60 %), résiste à <b>${A.resist.map((f) => esc(cat.faction[f]?.name || f)).join(' et ')}</b> (−50 %).</p>`; }

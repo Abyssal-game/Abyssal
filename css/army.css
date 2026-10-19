@@ -4460,3 +4460,7 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .cr-c .cr-curse img { width: 74%; height: 74%; object-fit: contain; }
 .cr-msg .cr-curse-big, .mq-banner .cr-curse-big { width: 34px; height: 34px; object-fit: contain; flex: none; }
 .gm-ruleline { display: block; margin-top: 6px; font: italic 600 .86rem/1.35 var(--f-ui); color: #C9B6F2; letter-spacing: 0; text-transform: none; }
+
+/* v493 : pastille « Ennemis trop forts » (écart de niveau) */
+.cb-law.cb-gap { border-color: rgba(224, 72, 94, .75); background: rgba(80, 10, 22, .85); color: #FFB3BE; }
+.cb-law.cb-gap .picon, .cb-law.cb-gap img { filter: drop-shadow(0 0 4px rgba(224, 72, 94, .8)); }

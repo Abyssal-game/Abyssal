@@ -26,6 +26,10 @@ import * as CR from './cryptes.js';
 import { FERVOR_START, FERVOR_MAX, FERVOR_CARRY, TALENTS } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
 export const WEEKLY_FLOOR = 8;
+/* v493 : force attendue d'une équipe à un étage (powerFor), plafonnée à ce qu'une équipe au maximum peut avoir */
+export const REF_POW_MAX = 2.2;
+export const REF_TOL = 1.15; // marge : une équipe jusqu'à 15 % sous la force conseillée n'est pas pénalisée
+export const refPowFor = (floor) => Math.min(REF_POW_MAX, powerFor(floor)) / REF_TOL;
 export const FIGHT_ATK = 1; // force des ennemis ordinaires (réglée par simulation)
 export const DESCENT_SHARDS = 0.15; // éclats gagnés dans la Descente : 15 % des montants de base
 import { STARTER, COST, BUDGET, TEAM, ULTS, MAX_LEVEL, canUlt, ultOf, roleOf } from './army.js';
@@ -1282,7 +1286,7 @@ export class Game {
       if (nf) { nf.title = nm; nf.named = true; nf.maxHp = Math.round(nf.maxHp * 1.3); nf.hp = nf.maxHp; nf.atk = Math.round(nf.atk * 1.15 + 0.4); }
       const known = {};
       enemies.forEach((e) => { if (this.knows(e.id)) known[e.id] = true; });
-      run.battle = createDuel(this.runUnits(), enemies, { fervor: run.gauge || 0, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, boss: room === 'boss' ? bossOf(run.floor) : null, pact: room === 'fight' ? null : run.pact || null, relics: OMENS[run.omen]?.relic ? [OMENS[run.omen].relic] : [], blessings: run.blessings, discovered: this.s.weakSeen || {}, seed: this.rng ? Math.floor(this.rng() * 2 ** 31) : null, goal: this.goalFor(run, room) });
+      run.battle = createDuel(this.runUnits(), enemies, { fervor: run.gauge || 0, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, boss: room === 'boss' ? bossOf(run.floor) : null, pact: room === 'fight' ? null : run.pact || null, relics: OMENS[run.omen]?.relic ? [OMENS[run.omen].relic] : [], blessings: run.blessings, discovered: this.s.weakSeen || {}, seed: this.rng ? Math.floor(this.rng() * 2 ** 31) : null, goal: this.goalFor(run, room), refPow: refPowFor(Math.max(run.floor, run.minFloor || 1)) });
       if (rule.key === 'marque') run.battle.markMult = 2;
       if (run.omen === 'soif') run.battle.soif = true;
       if (run.omen) run.battle.omen = run.omen;
