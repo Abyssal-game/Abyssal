@@ -979,7 +979,14 @@ export class Game {
       if (st.daily && en.dailyDone !== day) { en.dailyDone = day; out.shards += R.daily; out.chests.push('bois'); }
       if (en.paidToday < R.dailyPaid) { en.paidToday++; out.shards += T.reward; } else { out.capped = true; out.shards += R.afterCap; }
       out.chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });
-      if (T.key === EN.TABLES.at(-1).key && !this.s.titles.includes(EN.ENCHERES_TITLE)) { this.s.titles.push(EN.ENCHERES_TITLE); out.title = EN.ENCHERES_TITLE; }
+      /* v492 : le titre d'origine reste attaché à la 4e salle ; la 8e et les hauts faits ont le leur */
+      const titles = [];
+      if (T.key === 'grande') titles.push(EN.ENCHERES_TITLE);
+      if (T.key === EN.TABLES.at(-1).key) titles.push(EN.LAST_TITLE);
+      en.feats ||= {};
+      if (EN.featOk(st) && !en.feats[T.key]) { en.feats[T.key] = Date.now(); out.feat = EN.FEATS[T.key].text; out.shards += EN.FEAT_SHARDS; }
+      if (EN.TABLES.every((t) => en.feats[t.key])) titles.push(EN.FEATS_TITLE);
+      for (const t of titles) if (!this.s.titles.includes(t)) { this.s.titles.push(t); out.title = out.title ? `${out.title}, ${t}` : t; }
     } else { en.losses++; en.streak = 0; }
     this.s.shards += out.shards;
     out.xp = R.xp; this.s.xp += out.xp;
@@ -1037,7 +1044,14 @@ export class Game {
       if (st.daily && pa.dailyDone !== day) { pa.dailyDone = day; out.shards += R.daily; out.chests.push('bois'); }
       if (pa.paidToday < R.dailyPaid) { pa.paidToday++; out.shards += T.reward; } else { out.capped = true; out.shards += R.afterCap; }
       out.chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });
-      if (T.key === PA.TABLES.at(-1).key && !this.s.titles.includes(PA.PACTE_TITLE)) { this.s.titles.push(PA.PACTE_TITLE); out.title = PA.PACTE_TITLE; }
+      /* v492 : le titre d'origine reste attaché à la 4e salle ; la 8e et les hauts faits ont le leur */
+      const titles = [];
+      if (T.key === 'mammon') titles.push(PA.PACTE_TITLE);
+      if (T.key === PA.TABLES.at(-1).key) titles.push(PA.LAST_TITLE);
+      pa.feats ||= {};
+      if (PA.featOk(st) && !pa.feats[T.key]) { pa.feats[T.key] = Date.now(); out.feat = PA.FEATS[T.key].text; out.shards += PA.FEAT_SHARDS; }
+      if (PA.TABLES.every((t) => pa.feats[t.key])) titles.push(PA.FEATS_TITLE);
+      for (const t of titles) if (!this.s.titles.includes(t)) { this.s.titles.push(t); out.title = out.title ? `${out.title}, ${t}` : t; }
     } else { pa.losses++; pa.streak = 0; }
     this.s.shards += out.shards;
     out.xp = R.xp; this.s.xp += out.xp;
@@ -1089,7 +1103,14 @@ export class Game {
       if (st.daily && cr.dailyDone !== day) { cr.dailyDone = day; out.shards += R.daily; out.chests.push('bois'); }
       if (cr.paidToday < R.dailyPaid) { cr.paidToday++; out.shards += T.reward; } else { out.capped = true; out.shards += R.afterCap; }
       out.chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });
-      if (T.key === CR.TABLES.at(-1).key && !this.s.titles.includes(CR.CRYPTES_TITLE)) { this.s.titles.push(CR.CRYPTES_TITLE); out.title = CR.CRYPTES_TITLE; }
+      /* v492 : le titre d'origine reste attaché à la 4e salle ; la 8e et les hauts faits ont le leur */
+      const titles = [];
+      if (T.key === 'puits') titles.push(CR.CRYPTES_TITLE);
+      if (T.key === CR.TABLES.at(-1).key) titles.push(CR.LAST_TITLE);
+      cr.feats ||= {};
+      if (CR.featOk(st) && !cr.feats[T.key]) { cr.feats[T.key] = Date.now(); out.feat = CR.FEATS[T.key].text; out.shards += CR.FEAT_SHARDS; }
+      if (CR.TABLES.every((t) => cr.feats[t.key])) titles.push(CR.FEATS_TITLE);
+      for (const t of titles) if (!this.s.titles.includes(t)) { this.s.titles.push(t); out.title = out.title ? `${out.title}, ${t}` : t; }
     } else { cr.losses++; cr.streak = 0; }
     this.s.shards += out.shards;
     out.xp = R.xp; this.s.xp += out.xp;

@@ -4448,3 +4448,15 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .pack-standard .pk-foil { -webkit-mask: url(../assets/packs/standard2.webp) center / 100% 100% no-repeat; mask: url(../assets/packs/standard2.webp) center / 100% 100% no-repeat; }
 .pack-event .pk-foil { -webkit-mask: url(../assets/packs/event2.webp) center / 100% 100% no-repeat; mask: url(../assets/packs/event2.webp) center / 100% 100% no-repeat; }
 .pack-abysse .pk-foil { -webkit-mask: url(../assets/packs/abysse2.webp) center / 100% 100% no-repeat; mask: url(../assets/packs/abysse2.webp) center / 100% 100% no-repeat; }
+
+/* v492 : salles 5 à 8 des trois jeux (règle de la salle) et hauts faits */
+.sc-ri .gm-rule { display: flex; gap: 6px; align-items: flex-start; margin-top: 3px; color: #C9B6F2; line-height: 1.3; }
+.sc-ri .gm-rule .picon, .sc-ri .gm-rule img { width: 16px; height: 16px; flex: none; margin-top: 1px; }
+.sc-ri .gm-feat { display: block; margin-top: 3px; color: #E8C35A; line-height: 1.3; }
+.sc-ri .gm-feat.done { color: #7FE0A0; }
+.sc-ri .gm-feat .ic, .sc-ri .gm-feat svg { width: 13px; height: 13px; vertical-align: -2px; }
+.sc-end .gm-featwin { color: #F2D9A0; }
+.cr-c .cr-curse { position: absolute; left: 4%; top: 4%; z-index: 3; width: 30%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(60, 0, 20, .9), rgba(20, 0, 8, .85)); box-shadow: 0 0 10px rgba(224, 72, 94, .9); display: grid; place-items: center; }
+.cr-c .cr-curse img { width: 74%; height: 74%; object-fit: contain; }
+.cr-msg .cr-curse-big, .mq-banner .cr-curse-big { width: 34px; height: 34px; object-fit: contain; flex: none; }
+.gm-ruleline { display: block; margin-top: 6px; font: italic 600 .86rem/1.35 var(--f-ui); color: #C9B6F2; letter-spacing: 0; text-transform: none; }

@@ -59,7 +59,7 @@ test('enchères : récompenses une fois, déblocage dans l’ordre, défi du jou
   g.encheresStart({ table: 'etal' }); g.s.encheres.cur.over = 'won'; g.s.encheres.cur.final = { scores: { p: 30, a: 10, b: 5 }, order: ['p', 'a', 'b'] };
   const o = g.encheresFinish();
   assert.equal(o.first, true); assert.deepEqual(o.chests, ['bois']);
-  assert.equal(g.s.shards - before, EN.ENCHERES_REWARD.firstWin + EN.TABLE.etal.reward);
+  assert.equal(g.s.shards - before, EN.ENCHERES_REWARD.firstWin + EN.TABLE.etal.reward + (o.feat ? EN.FEAT_SHARDS : 0));
   assert.equal(g.encheresFinish(), o);
   g.encheresQuit();
   assert.doesNotThrow(() => { g.encheresStart({ table: 'reliques' }); g.encheresQuit(); });

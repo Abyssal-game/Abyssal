@@ -36,14 +36,45 @@ export const RIVALS = {
     hello: 'Chaque pacte a un prix. Je connais toujours le prix.', beaten: 'Le hasard… a mal compté.', gloat: 'Le compte était juste.' },
   banquier: { name: 'Mammon', caution: 0.9, risk: 0.12, race: 0.8, cool: 0.1, noise: 0.02, head: 6, hint: 'Calcule tout, ose davantage quand il est mené, et commence avec 6 points : la part de la maison.',
     hello: 'Signe ici, et ici. Les petites lignes ? Elles sont pour moi.', beaten: 'Un pacte rompu… à mes dépens ? Inadmissible.', gloat: 'La maison gagne toujours.' },
+  // v492 : quatre nouveaux adversaires pour les salles 5 à 8
+  stratege: { name: 'Sœur Vesna', caution: 1.1, risk: 0, race: 0.4, cool: 0.3, noise: 0.03, head: 5, hint: 'Calcule chaque risque et ne se laisse jamais distancer.',
+    hello: 'Sans Sceau, chaque carte est une prière. Prie bien.', beaten: 'J’ai prié… une carte trop tard.', gloat: 'La patience est une arme.' },
+  echo: { name: 'L’Écho de l’Abîme', caution: 0.75, risk: 0.3, race: 0.6, cool: 0, noise: 0.08, head: 12, hint: 'Audacieux : il tire plus que de raison, et ça lui réussit souvent.',
+    hello: 'Encore une. Et encore une. Tu entends l’écho ?', beaten: '… l’écho se brise.', gloat: 'Tu as eu peur de tirer. Moi, jamais.' },
+  archiviste: { name: 'L’Archiviste', caution: 0.95, risk: 0.05, race: 0.7, cool: 0.15, noise: 0.01, head: 8, hint: 'Compte chaque carte sortie, sans jamais se tromper.',
+    hello: 'J’ai noté chaque carte de ce paquet. Toutes.', beaten: 'Erreur… de calcul ? Impossible.', gloat: 'Le registre ne ment pas.' },
+  souverain: { name: 'La Souveraine du Néant', caution: 0.85, risk: 0.1, race: 0.9, cool: 0.1, noise: 0, head: 12, hint: 'Calcule tout, ose quand elle est menée, et commence avec 12 points.',
+    hello: 'Signe. Ton nom finira dans le Néant, comme les autres.', beaten: 'Le Néant… a perdu un pacte ?', gloat: 'Retourne au silence.' },
 };
 export const TABLES = [
   { key: 'novice', name: 'Le Pacte du novice', stars: 1, rival: 'initie', reward: 25, chest: 'bois' },
   { key: 'six', name: 'Le Pacte des six', stars: 2, rival: 'collectionneur', reward: 35, chest: 'fer' },
   { key: 'sceaux', name: 'Le Pacte des Sceaux', stars: 3, rival: 'maitre', reward: 50, chest: 'or' },
   { key: 'mammon', name: 'Le Pacte de Mammon', stars: 4, rival: 'banquier', reward: 70, chest: 'abyssal' },
+  // v492 : salles 5 à 8, chacune avec sa règle (rules : target, seven, sp = cartes spéciales du paquet)
+  { key: 'cendres', name: 'Le Pacte des cendres', stars: 4, rival: 'stratege', reward: 80, chest: 'or', rule: 'Aucun Sceau dans le paquet : rien ne te protège d’une brisure.', rules: { sp: { sceau: 0, gardien: 3, offrande: 3 } } },
+  { key: 'minuit', name: 'Le Pacte de minuit', stars: 5, rival: 'echo', reward: 90, chest: 'or', rule: 'Partie longue : 80 points. Les sept factions rapportent +25.', rules: { target: 80, seven: 25 } },
+  { key: 'registre', name: 'Le Pacte du registre', stars: 5, rival: 'archiviste', reward: 100, chest: 'abyssal', rule: 'Six Offrandes et un seul Gardien : les gros tours sont possibles… pour les deux.', rules: { sp: { sceau: 2, gardien: 1, offrande: 6 } } },
+  { key: 'neant', name: 'Le Pacte du Néant', stars: 5, rival: 'souverain', reward: 120, chest: 'abyssal', rule: '70 points, aucun Sceau, cinq Gardiens. La Souveraine commence à 12.', rules: { target: 70, sp: { sceau: 0, gardien: 5, offrande: 3 } } },
 ];
+// v492 : un haut fait par salle (payé une fois, en plus de la victoire)
+export const FEATS = {
+  novice: { text: 'Gagne en 6 tours ou moins.', ok: (st) => st.turns.p <= 6 },
+  six: { text: 'Gagne sans jamais briser le pacte.', ok: (st) => !st.stats.busts.p },
+  sceaux: { text: 'Encaisse 20 points en un seul tour.', ok: (st) => st.stats.best.p >= 20 },
+  mammon: { text: 'Gagne avec 15 points d’avance.', ok: (st) => st.final.scores.p - st.final.scores.a >= 15 },
+  cendres: { text: 'Gagne en brisant le pacte une fois au plus.', ok: (st) => st.stats.busts.p <= 1 },
+  minuit: { text: 'Encaisse 20 points en un seul tour.', ok: (st) => st.stats.best.p >= 20 },
+  registre: { text: 'Encaisse 22 points en un seul tour.', ok: (st) => st.stats.best.p >= 22 },
+  neant: { text: 'Gagne avec 10 points d’avance.', ok: (st) => st.final.scores.p - st.final.scores.a >= 10 },
+};
+export const featOk = (st) => st.over === 'won' && !!FEATS[st.table]?.ok(st);
+export const FEAT_SHARDS = 60;
+export const FEATS_TITLE = 'Maître du Pacte';
+export const LAST_TITLE = 'Signataire du Néant';
 export const TABLE = Object.fromEntries(TABLES.map((t) => [t.key, t]));
+export const tgt = (st) => st.target || TARGET;
+export const sevenOf = (st) => st.seven || SEVEN_BONUS;
 export const tableUnlocked = (s, i) => i === 0 || !!s.pacte?.beaten?.[TABLES[i - 1].key];
 export const PACTE_REWARD = { firstWin: 100, daily: 40, dailyPaid: 5, afterCap: 5, xp: 10 };
 export const PACTE_TITLE = 'Signataire de l’Abîme';
@@ -52,7 +83,7 @@ export const dailyTable = (day, unlocked) => TABLES[hash(`pacte:${day}`) % Math.
 // Rareté de l'illustration selon la valeur (pour l'écran seulement)
 const RAR_OF = (v) => (v <= 2 ? 'C' : v === 3 ? 'PC' : v === 4 ? 'R' : v === 5 ? 'HR' : v === 6 ? 'M' : 'S');
 
-function buildDeck(cat, r) {
+function buildDeck(cat, r, sp = SPECIALS) {
   const deck = [];
   for (const f of FACTION_ORDER) {
     const pool = cat?.byFaction?.[f] || [];
@@ -65,15 +96,15 @@ function buildDeck(cat, r) {
       deck.push({ f, v, id });
     }
   }
-  for (const [k, n] of Object.entries(SPECIALS)) for (let i = 0; i < n; i++) deck.push({ sp: k });
+  for (const [k, n] of Object.entries(sp)) for (let i = 0; i < n; i++) deck.push({ sp: k });
   return shuffle(deck, r);
 }
 
 export function newGame(cat, { table, seed = Date.now(), daily = false }) {
   const T = TABLE[table];
   if (!T) throw new Error('Table inconnue.');
-  const r = mulberry(seed);
-  return { table, daily, seed, shuf: 0, rival: T.rival, deck: buildDeck(cat, r), discard: [], scores: { p: 0, a: RIVALS[T.rival].head || 0 },
+  const r = mulberry(seed), RU = T.rules || {};
+  return { table, daily, seed, shuf: 0, rival: T.rival, target: RU.target || TARGET, seven: RU.seven || SEVEN_BONUS, deck: buildDeck(cat, r, RU.sp || SPECIALS), discard: [], scores: { p: 0, a: RIVALS[T.rival].head || 0 },
     turn: 'p', row: [], sceaux: 0, offer: false, round: 1, turns: { p: 0, a: 0 }, last: null, over: null, final: null, stats: { busts: { p: 0, a: 0 }, best: { p: 0, a: 0 }, sevens: { p: 0, a: 0 } } };
 }
 
@@ -100,7 +131,7 @@ export function bustChance(st) {
 }
 
 function bank(st, who, why) {
-  const v = rowValue(st) + (why === 'seven' ? SEVEN_BONUS : 0);
+  const v = rowValue(st) + (why === 'seven' ? sevenOf(st) : 0);
   st.scores[who] += v;
   st.stats.best[who] = Math.max(st.stats.best[who], v);
   if (why === 'seven') st.stats.sevens[who]++;
@@ -111,7 +142,7 @@ function endTurn(st, who) {
   st.row = []; st.sceaux = 0; st.offer = false; st.turns[who]++;
   if (who === 'a') {
     // fin du tour complet : quelqu'un a atteint le but ?
-    if (st.scores.p >= TARGET || st.scores.a >= TARGET) {
+    if (st.scores.p >= tgt(st) || st.scores.a >= tgt(st)) {
       if (st.scores.p !== st.scores.a) {
         st.over = st.scores.p > st.scores.a ? 'won' : 'lost';
         st.final = { scores: { ...st.scores } };
@@ -176,7 +207,7 @@ function meanSafe(st) {
 }
 // L'adversaire continue-t-il ? (décision avant chaque tirage)
 export function aiWants(st, rng = Math.random) {
-  const R = RIVALS[st.rival], who = st.turn, me = st.scores[who], opp = st.scores[who === 'p' ? 'a' : 'p'];
+  const R = RIVALS[st.rival], who = st.turn, me = st.scores[who], opp = st.scores[who === 'p' ? 'a' : 'p'], TARGET = tgt(st), SEVEN_BONUS = sevenOf(st);
   const v = rowValue(st), nf = st.row.filter((c) => c.f).length;
   if (!nf) return true;
   // dernier tour : s'il faut rattraper, on tire tant qu'on n'a pas dépassé

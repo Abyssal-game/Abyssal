@@ -10,12 +10,12 @@ import { CHESTS } from '../core/descent.js';
 const CHEST_NAME = Object.fromEntries(Object.entries(CHESTS).map(([k, c]) => [k, c.name]));
 const stars = (n) => `${'★'.repeat(n)}${'☆'.repeat(Math.max(0, 5 - n))}`;
 const pic = (key) => `<img alt="" src="assets/sceaux/rival-${key}.webp">`;
-const HOW = [['cards', '#7FA8D8', 'La vente', 'Mammon met en vente 15 lots, un par manche : 10 créatures (de 1 à 10 points) et 5 malédictions (de −1 à −5).'],
+const HOW = [['cards', '#7FA8D8', 'La vente', 'Mammon met en vente 15 lots, un par manche : en général 10 créatures (de 1 à 10 points) et 5 malédictions (de −1 à −5). Certaines salles changent les lots.'],
   ['crystal', '#E8C35A', 'Tes offrandes', 'Tu as 15 offrandes, numérotées de 1 à 15. À chaque manche, chacun en pose une en secret. Une offrande jouée est perdue.'],
   ['rule', '#B48CFF', 'Qui remporte le lot', 'On révèle les offrandes. Celles qui sont jouées par deux joueurs ou plus s’annulent. Parmi les autres, la plus haute prend une créature… et la plus basse prend une malédiction.'],
   ['crown', '#F2C14E', 'La victoire', 'Après le 15e lot, on compte les points. Le plus de points gagne.'],
   ['hourglass', '#9FE0FF', 'Tout s’annule ?', 'Si toutes les offrandes s’annulent, le lot reste sur la table et s’ajoute au suivant : on se dispute les deux à la fois.'],
-  ['book', '#7FE0A0', 'Les familles', 'Trois créatures d’une même faction rapportent +5 points.'],
+  ['book', '#7FE0A0', 'Les familles', 'Trois créatures d’une même faction rapportent +5 points (+10 à la Vente des lignées).'],
   ['eye', '#C9A45A', 'Lire les enchérisseurs', 'Les offrandes qui restent à chacun sont visibles. Chaque enchérisseur a son style : certains se lisent facilement, d’autres misent n’importe quoi.']];
 const howLi = ([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic === 'eye' ? 'ui-eye' : ic === 'crystal' ? 'cur-shard' : ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`;
 const howHTML = () => `<ol class="how-steps">${HOW.map(howLi).join('')}</ol>`; /* v491 : tutoriel entier, sans « Pour aller plus loin » */
@@ -46,7 +46,7 @@ export default function encheresScreen(app, root) {
       return [open, `<button class="sc-rival mq-tbl ${open ? '' : 'locked'} ${won ? 'won' : ''}" data-en="play" data-t="${t.key}" ${open ? '' : 'disabled'} style="background-image:linear-gradient(90deg, rgba(12, 13, 20, .97) 42%, rgba(12, 13, 20, .45) 76%, rgba(12, 13, 20, .15)), url(assets/sceaux/salle-encheres.webp)">
         <span class="mq-pors"><span class="sc-por">${pic(t.seats[0])}</span><span class="sc-por">${pic(t.seats[1])}</span></span>
         <span class="sc-ri"><b>${esc(t.name)}</b><span class="small">${esc(A.name)} et ${esc(B.name)} · ${stars(t.stars)}</span>
-        <span class="small muted">${open ? `+${t.reward} éclats${won ? '' : ` · 1re victoire : +${EN.ENCHERES_REWARD.firstWin} et ${esc(CHEST_NAME[t.chest].toLowerCase())}`}` : `Gagne à ${esc(EN.TABLES[i - 1].name)} pour y entrer`}</span></span>
+        <span class="small muted">${open ? `+${t.reward} éclats${won ? '' : ` · 1re victoire : +${EN.ENCHERES_REWARD.firstWin} et ${esc(CHEST_NAME[t.chest].toLowerCase())}`}` : `Gagne à ${esc(EN.TABLES[i - 1].name)} pour y entrer`}</span>${t.rule ? `<span class="small gm-rule">${icon('p:rule')}${esc(t.rule)}</span>` : ''}${open && EN.FEATS[t.key] ? `<span class="small gm-feat ${en.feats?.[t.key] ? 'done' : ''}">${en.feats?.[t.key] ? icon('check') : '★'} Haut fait : ${esc(EN.FEATS[t.key].text)}${en.feats?.[t.key] ? '' : ` (+${EN.FEAT_SHARDS})`}</span>` : ''}</span>
         ${won ? `<span class="sc-won">${icon('check')}</span>` : open ? icon('next') : icon('p:mysteries')}</button>`];
     });
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
@@ -158,6 +158,7 @@ export default function encheresScreen(app, root) {
       ${out.chests?.length ? `<a class="sc-gain sc-chestwin" href="#/coffres">${icon('p:chest')} <b>${out.chests.map((c) => esc(CHEST_NAME[c])).join(' et ')}</b> gagné${out.chests.length > 1 ? 's' : ''} !</a>` : ''}
       ${out.xp && !out.capped ? `<p class="small muted center">+${out.xp} XP de profil</p>` : ''}
       ${out.capped ? `<p class="small muted">Tes ${EN.ENCHERES_REWARD.dailyPaid} victoires bien payées du jour sont faites : celle-ci rapporte ${EN.ENCHERES_REWARD.afterCap} éclats et ${EN.ENCHERES_REWARD.xp} XP.</p>` : ''}
+      ${out.feat ? `<p class="sc-gain gm-featwin">★ Haut fait réussi : <b>${esc(out.feat)}</b></p>` : ''}
       ${out.title ? `<p class="sc-gain">${icon('p:titles')} Nouveau titre : <b>${esc(out.title)}</b></p>` : ''}
       <div class="sc-end-act">${st.daily ? '' : '<button class="btn primary dc-plq dc-plq-red" data-x="again">Rejouer</button>'}<button class="btn dc-plq dc-plq-dark" data-x="back">Retour</button></div></div>`;
     document.body.appendChild(el);
@@ -173,7 +174,8 @@ export default function encheresScreen(app, root) {
     ui.sel = null;
     const st = g.s.encheres.cur, M = EN.BIDDERS.banquier, A = who(st, 'a');
     app.sfx.enter?.();
-    banner = { cls: 'intro', html: `<span class="sc-med">${pic('banquier')}</span><span class="mq-vd"><small>${esc(M.name)}, maître des ventes</small><b>« ${esc(st.table === 'grande' ? M.hello : `${A.hello}`)} »</b><span>15 lots, 15 offrandes. Que la vente commence.</span></span>` };
+    const H = st.table === 'grande' ? { ...M, key: 'banquier' } : A; /* v492 : la réplique sous le bon portrait */
+    banner = { cls: 'intro', html: `<span class="sc-med">${pic(H.key)}</span><span class="mq-vd"><small>${esc(H.name)}${H.key === 'banquier' ? ', maître des ventes' : ''}</small><b>« ${esc(H.hello)} »</b><span>15 lots, 15 offrandes. Que la vente commence.${EN.TABLE[st.table].rule ? `<em class="gm-ruleline">${esc(EN.TABLE[st.table].rule)}</em>` : ''}</span></span>` };
     busy = true; view();
     tuto(app, 'encheres-play').then(() => wait(1400)).then(() => { banner = null; busy = false; if (!gone) view(); });
   }

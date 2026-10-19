@@ -47,7 +47,7 @@ export default function cryptesScreen(app, root) {
       return [open, `<button class="sc-rival ${open ? '' : 'locked'} ${won ? 'won' : ''}" data-cr="play" data-t="${t.key}" ${open ? '' : 'disabled'}>
         <span class="sc-por">${pic(t.rival)}</span>
         <span class="sc-ri"><b>${esc(t.name)}</b><span class="small">contre ${esc(R.name)} · ${stars(t.stars)}</span>
-        <span class="small muted">${open ? `+${t.reward} éclats${won ? '' : ` · 1re victoire : +${CR.CRYPTES_REWARD.firstWin} et ${esc(CHEST_NAME[t.chest].toLowerCase())}`}` : `Gagne dans ${esc(CR.TABLES[i - 1].name)} pour y entrer`}</span></span>
+        <span class="small muted">${open ? `+${t.reward} éclats${won ? '' : ` · 1re victoire : +${CR.CRYPTES_REWARD.firstWin} et ${esc(CHEST_NAME[t.chest].toLowerCase())}`}` : `Gagne dans ${esc(CR.TABLES[i - 1].name)} pour y entrer`}</span>${t.rule ? `<span class="small gm-rule">${icon('p:rule')}${esc(t.rule)}</span>` : ''}${open && CR.FEATS[t.key] ? `<span class="small gm-feat ${cr.feats?.[t.key] ? 'done' : ''}">${cr.feats?.[t.key] ? icon('check') : '★'} Haut fait : ${esc(CR.FEATS[t.key].text)}${cr.feats?.[t.key] ? '' : ` (+${CR.FEAT_SHARDS})`}</span>` : ''}</span>
         ${won ? `<span class="sc-won">${icon('check')}</span>` : open ? icon('next') : icon('p:mysteries')}</button>`];
     });
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
@@ -83,7 +83,7 @@ export default function cryptesScreen(app, root) {
       <span class="pa-sc"><b>${x === 'p' ? 'Toi' : esc(R.name)}</b><span class="cr-won">${st.pairs[x].map((k) => { const c = st.cards.find((y) => y.k === k); return `<i style="--fc:${cat.faction[c.f].colors.secondary}">${sigil(c.f)}</i>`; }).join('') || '<small class="muted">aucune paire</small>'}${tags}</span></span>
       <span class="pa-pts"><b>${n}</b><small>point${n > 1 ? 's' : ''}</small></span></div>`;
   };
-  const face = (c) => { const card = c.id && cat.get(c.id); return `<img alt="" src="${card ? artUrl(card, { lite: true }) : 'assets/sceaux/dos.webp'}"><span class="cr-f" style="--fc:${cat.faction[c.f].colors.secondary}">${sigil(c.f)}</span>`; };
+  const face = (c) => { const card = c.id && cat.get(c.id), cursed = (g.s.cryptes.cur?.curse || []).includes(c.k); return `<img alt="" src="${card ? artUrl(card, { lite: true }) : 'assets/sceaux/dos.webp'}"><span class="cr-f" style="--fc:${cat.faction[c.f].colors.secondary}">${sigil(c.f)}</span>${cursed ? '<span class="cr-curse" title="Paire maudite"><img alt="" src="assets/icons/danger.webp"></span>' : ''}`; }; /* v492 : marque des paires maudites */
   function grid(st) {
     const pick = st.pending && st.turn === 'p';
     return `<div class="cr-grid ${pick ? 'picking' : ''}">${st.cards.map((c, i) => {
@@ -115,6 +115,10 @@ export default function cryptesScreen(app, root) {
   async function powerSay(st, ev) {
     const P = CR.POWERS[ev.power], mine = ev.who === 'p', nm = mine ? 'Tu' : esc(CR.RIVALS[st.rival].name);
     let txt = esc(P.short);
+    if (ev.cursed || ev.silent) { /* v492 : paire maudite, crypte silencieuse */
+      banner = { cls: ev.cursed ? (mine ? 'ko' : 'ok') : '', html: ev.cursed ? `<img class="cr-curse-big" alt="" src="assets/icons/danger.webp"><span><b>Paire maudite !</b><span class="small">${mine ? 'Tu perds' : `${nm} perd`} 1 point, et aucun pouvoir ne se déclenche.</span></span>` : `${sigil(ev.f)}<span><b>Paire ${esc(fname(ev.f))}</b><span class="small">Silence : aucun pouvoir ici.</span></span>` };
+      app.sfx[ev.cursed ? 'cr-miss' : 'cr-power']?.(); view(); await wait(1300); banner = null; return;
+    }
     if (ev.blocked) txt = 'Bloqué par le Verrou artificiel : rien ne se passe.';
     else if (ev.power === 'necrotique') txt = ev.stolen != null ? `${mine ? 'Tu voles' : `${nm} te vole`} une paire !` : 'Aucune paire à voler.';
     else if (ev.empty) txt = 'Plus assez de cartes : rien ne se passe.';
@@ -145,6 +149,8 @@ export default function cryptesScreen(app, root) {
     view(); await wait(1100);
     ui.up.clear(); app.sfx['cr-miss']?.();
     if (ev.graced) { banner = { cls: ev.who === 'p' ? 'ok' : 'ko', html: `${sigil('celeste')}<span><b>Grâce céleste</b><span class="small">${ev.who === 'p' ? 'Tu gardes la main.' : `${esc(CR.RIVALS[st.rival].name)} garde la main.`}</span></span>` }; app.sfx.shield?.(); view(); await wait(1100); banner = null; }
+    /* v492 : crypte mouvante : deux cartes échangent leur place, sous les yeux du joueur */
+    if (ev.drift) { ev.drift.forEach((i) => ui.swap.add(i)); banner = { cls: '', html: `<img class="cr-curse-big" alt="" src="assets/icons/hourglass.webp"><span><b>La crypte bouge</b><span class="small">Les deux cartes en lumière ont échangé leur place.</span></span>` }; app.sfx.swipe?.(); view(); await wait(1300); ui.swap.clear(); banner = null; }
     view();
   }
   async function aiTurn() {
@@ -179,6 +185,7 @@ export default function cryptesScreen(app, root) {
       ${out.chests?.length ? `<a class="sc-gain sc-chestwin" href="#/coffres">${icon('p:chest')} <b>${out.chests.map((c) => esc(CHEST_NAME[c])).join(' et ')}</b> gagné${out.chests.length > 1 ? 's' : ''} !</a>` : ''}
       ${out.xp && !out.capped ? `<p class="small muted center">+${out.xp} XP de profil</p>` : ''}
       ${out.capped ? `<p class="small muted">Tes ${CR.CRYPTES_REWARD.dailyPaid} victoires bien payées du jour sont faites : celle-ci rapporte ${CR.CRYPTES_REWARD.afterCap} éclats et ${CR.CRYPTES_REWARD.xp} XP.</p>` : ''}
+      ${out.feat ? `<p class="sc-gain gm-featwin">★ Haut fait réussi : <b>${esc(out.feat)}</b></p>` : ''}
       ${out.title ? `<p class="sc-gain">${icon('p:titles')} Nouveau titre : <b>${esc(out.title)}</b></p>` : ''}
       <div class="sc-end-act">${st.daily ? '' : '<button class="btn primary dc-plq dc-plq-red" data-x="again">Rejouer</button>'}<button class="btn dc-plq dc-plq-dark" data-x="back">Retour</button></div></div>`;
     document.body.appendChild(el);
@@ -194,7 +201,7 @@ export default function cryptesScreen(app, root) {
     const st = g.s.cryptes.cur, R = CR.RIVALS[st.rival];
     ui.up.clear(); ui.glow.clear(); ui.picks = []; ui.swap.clear();
     app.sfx.enter?.();
-    banner = { cls: 'intro', html: `<span class="sc-med">${pic(st.rival)}</span><span><b>« ${esc(R.hello)} »</b><span class="small">10 paires à trouver. Tu commences.</span></span>` };
+    banner = { cls: 'intro', html: `<span class="sc-med">${pic(st.rival)}</span><span><b>« ${esc(R.hello)} »</b><span class="small">10 paires à trouver. Tu commences.${CR.TABLE[st.table].rule ? `<em class="gm-ruleline">${esc(CR.TABLE[st.table].rule)}</em>` : ''}</span></span>` };
     busy = true; view();
     tuto(app, 'cryptes-play').then(() => wait(1400)).then(() => { banner = null; busy = false; if (!gone) view(); });
   }

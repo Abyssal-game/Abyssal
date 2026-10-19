@@ -78,7 +78,7 @@ test('pacte : récompenses (1re victoire, coffre, pacte suivant ouvert) et Salle
   st.over = 'won'; st.final = { scores: { p: 61, a: 40 } };
   const before = g.s.shards, chests = g.s.chests.bois || 0;
   const out = g.pacteFinish();
-  assert.ok(out.first); assert.equal(g.s.shards - before, PA.PACTE_REWARD.firstWin + PA.TABLE.novice.reward);
+  assert.ok(out.first); assert.equal(g.s.shards - before, PA.PACTE_REWARD.firstWin + PA.TABLE.novice.reward + (out.feat ? PA.FEAT_SHARDS : 0));
   assert.equal(g.s.chests.bois, chests + 1);
   assert.ok(PA.tableUnlocked(g.s, 1)); assert.ok(g.pacteDailyOpen());
   assert.equal(g.pacteFinish(), out, 'pas de double récompense');

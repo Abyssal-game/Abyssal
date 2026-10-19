@@ -28,7 +28,12 @@ export function unlockSources(cat) {
   add(titles, 'Vainqueur des Implacables', 'Bats tous les adversaires en revanche implacable aux Duels des Sceaux.');
   add(frames, 'sceaux', `Bats ${rival('echo')} aux Duels des Sceaux.`);
   /* v459 : titres des jeux de la Salle des jeux */
-  for (const [M, title, game, last] of [[EN, EN.ENCHERES_TITLE, 'les Enchères de Mammon', 'la dernière vente'], [PA, PA.PACTE_TITLE, 'le Pacte', 'le dernier pacte'], [CR, CR.CRYPTES_TITLE, 'les Cryptes', 'la dernière crypte']]) add(titles, title, `Gagne ${last}, « ${M.TABLES.at(-1).name} », dans ${game} (Aventure › Jeux).`);
+  /* v492 : titre d'origine à la 4e salle, un titre pour la 8e, un pour tous les hauts faits */
+  for (const [M, title, game, k4] of [[EN, EN.ENCHERES_TITLE, 'les Enchères de Mammon', 'grande'], [PA, PA.PACTE_TITLE, 'le Pacte', 'mammon'], [CR, CR.CRYPTES_TITLE, 'les Cryptes', 'puits']]) {
+    add(titles, title, `Gagne « ${M.TABLE[k4].name} » dans ${game} (Aventure › Jeux).`);
+    add(titles, M.LAST_TITLE, `Gagne « ${M.TABLES.at(-1).name} » dans ${game} (Aventure › Jeux).`);
+    add(titles, M.FEATS_TITLE, `Réussis les ${M.TABLES.length} hauts faits dans ${game} (Aventure › Jeux).`);
+  }
   add(titles, 'Vainqueur de l’Abysse', 'Vaincs L’Abysse, le gardien de l’étage 100 de la Descente.');
   add(frames, 'oeil', 'Vaincs L’Abysse, le gardien de l’étage 100 de la Descente.');
   return {

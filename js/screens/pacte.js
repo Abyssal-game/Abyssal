@@ -18,7 +18,7 @@ const SEALS = [['infernal', 47, 170], ['artificiel', 100, 207], ['celeste', 160,
 const HOW = [['cards', '#7FA8D8', 'Ton tour', 'Tire des cartes une à une et pose-les devant toi. Chaque carte de faction vaut de 1 à 7 points.'],
   ['crystal', '#E8C35A', 'T’arrêter', 'Quand tu veux, arrête-toi : tu gagnes la somme des cartes posées ce tour-ci.'],
   ['danger', '#E0485E', 'Le pacte se brise', 'Si tu tires une faction que tu as déjà posée ce tour-ci, le pacte se brise : tu perds tout ce que tu avais gagné ce tour-ci.'],
-  ['crown', '#F2C14E', 'La victoire', `Le premier à ${PA.TARGET} points gagne. Ton adversaire joue toujours autant de tours que toi.`],
+  ['crown', '#F2C14E', 'La victoire', `Le premier à ${PA.TARGET} points gagne (certaines salles changent ce but). Ton adversaire joue toujours autant de tours que toi.`],
   ['seal', '#9FE0FF', 'Les cartes spéciales', 'Sceau : il protège d’une brisure. Gardien : arrêt forcé, tu encaisses tout de suite. Offrande : la prochaine carte compte double.'],
   ['book', '#7FE0A0', 'Les sept factions', `Pose les 7 factions dans le même tour : +${PA.SEVEN_BONUS} points, et ton tour s’arrête.`],
   ['eye', '#C9A45A', 'Le risque', 'Le jeu t’affiche la chance que la prochaine carte brise ton pacte : elle compte les cartes déjà sorties.']];
@@ -49,7 +49,7 @@ export default function pacteScreen(app, root) {
       return [open, `<button class="sc-rival ${open ? '' : 'locked'} ${won ? 'won' : ''}" data-pa="play" data-t="${t.key}" ${open ? '' : 'disabled'}>
         <span class="sc-por">${pic(t.rival)}</span>
         <span class="sc-ri"><b>${esc(t.name)}</b><span class="small">contre ${esc(R.name)} · ${stars(t.stars)}</span>
-        <span class="small muted">${open ? `+${t.reward} éclats${won ? '' : ` · 1re victoire : +${PA.PACTE_REWARD.firstWin} et ${esc(CHEST_NAME[t.chest].toLowerCase())}`}` : `Gagne ${esc(PA.TABLES[i - 1].name)} pour y entrer`}</span></span>
+        <span class="small muted">${open ? `+${t.reward} éclats${won ? '' : ` · 1re victoire : +${PA.PACTE_REWARD.firstWin} et ${esc(CHEST_NAME[t.chest].toLowerCase())}`}` : `Gagne ${esc(PA.TABLES[i - 1].name)} pour y entrer`}</span>${t.rule ? `<span class="small gm-rule">${icon('p:rule')}${esc(t.rule)}</span>` : ''}${open && PA.FEATS[t.key] ? `<span class="small gm-feat ${pa.feats?.[t.key] ? 'done' : ''}">${pa.feats?.[t.key] ? icon('check') : '★'} Haut fait : ${esc(PA.FEATS[t.key].text)}${pa.feats?.[t.key] ? '' : ` (+${PA.FEAT_SHARDS})`}</span>` : ''}</span>
         ${won ? `<span class="sc-won">${icon('check')}</span>` : open ? icon('next') : icon('p:mysteries')}</button>`];
     });
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
@@ -86,8 +86,8 @@ export default function pacteScreen(app, root) {
     const sc = st.scores[x], R = PA.RIVALS[st.rival];
     return `<div class="pa-seat s-${x} ${st.turn === x && !st.over ? 'on' : ''}">
       <span class="sc-med ${x === 'p' ? 'mq-me' : ''}">${x === 'p' ? me() : pic(st.rival)}</span>
-      <span class="pa-sc"><b>${x === 'p' ? 'Toi' : esc(R.name)}</b><span class="pa-bar"><i style="width:${Math.min(100, (sc / PA.TARGET) * 100)}%"></i></span></span>
-      <span class="pa-pts"><b>${sc}</b><small>/ ${PA.TARGET}</small></span></div>`;
+      <span class="pa-sc"><b>${x === 'p' ? 'Toi' : esc(R.name)}</b><span class="pa-bar"><i style="width:${Math.min(100, (sc / PA.tgt(st)) * 100)}%"></i></span></span>
+      <span class="pa-pts"><b>${sc}</b><small>/ ${PA.tgt(st)}</small></span></div>`;
   };
   function center(st) {
     /* v464 : la table est un parchemin : la rangée dans le cadre rouge, un sceau de cire s'allume pour chaque faction posée */
@@ -128,7 +128,7 @@ export default function pacteScreen(app, root) {
     const H = ev.result === 'bust' ? [mine ? 'ko' : 'ok', 'Le pacte se brise !', `${fn} en double : ${mine ? 'tu perds' : `${nm} perd`} ${ev.lost} point${ev.lost > 1 ? 's' : ''}.`]
       : ev.result === 'saved' ? ['', 'Le Sceau protège !', `${fn} en double, jeté sans briser le pacte.`]
       : ev.result === 'forced' ? ['', 'Le Gardien arrête le tour', `${mine ? 'Tu encaisses' : `${nm} encaisse`} +${ev.gain}.`]
-      : ev.result === 'seven' ? [mine ? 'ok' : 'ko', 'Les sept factions !', `+${PA.SEVEN_BONUS} de bonus : ${mine ? 'tu encaisses' : `${nm} encaisse`} +${ev.gain}.`]
+      : ev.result === 'seven' ? [mine ? 'ok' : 'ko', 'Les sept factions !', `+${PA.sevenOf(st)} de bonus : ${mine ? 'tu encaisses' : `${nm} encaisse`} +${ev.gain}.`]
       : ev.result === 'stop' ? ['', mine ? 'Tu t’arrêtes' : `${nm} s’arrête`, `+${ev.gain} point${ev.gain > 1 ? 's' : ''}.`] : null;
     if (!H) return;
     /* v457 : sons propres au Pacte (ElevenLabs) */
@@ -195,6 +195,7 @@ export default function pacteScreen(app, root) {
       ${out.chests?.length ? `<a class="sc-gain sc-chestwin" href="#/coffres">${icon('p:chest')} <b>${out.chests.map((c) => esc(CHEST_NAME[c])).join(' et ')}</b> gagné${out.chests.length > 1 ? 's' : ''} !</a>` : ''}
       ${out.xp && !out.capped ? `<p class="small muted center">+${out.xp} XP de profil</p>` : ''}
       ${out.capped ? `<p class="small muted">Tes ${PA.PACTE_REWARD.dailyPaid} victoires bien payées du jour sont faites : celle-ci rapporte ${PA.PACTE_REWARD.afterCap} éclats et ${PA.PACTE_REWARD.xp} XP.</p>` : ''}
+      ${out.feat ? `<p class="sc-gain gm-featwin">★ Haut fait réussi : <b>${esc(out.feat)}</b></p>` : ''}
       ${out.title ? `<p class="sc-gain">${icon('p:titles')} Nouveau titre : <b>${esc(out.title)}</b></p>` : ''}
       <div class="sc-end-act">${st.daily ? '' : '<button class="btn primary dc-plq dc-plq-red" data-x="again">Rejouer</button>'}<button class="btn dc-plq dc-plq-dark" data-x="back">Retour</button></div></div>`;
     document.body.appendChild(el);
@@ -209,7 +210,7 @@ export default function pacteScreen(app, root) {
     try { g.pacteStart(opts); } catch (e) { toast(esc(e.message), { kind: 'error' }); return; }
     const st = g.s.pacte.cur, R = PA.RIVALS[st.rival];
     app.sfx.enter?.();
-    banner = { cls: 'intro', html: `<span class="sc-med">${pic(st.rival)}</span><span class="mq-vd"><small>${esc(R.name)}</small><b>« ${esc(R.hello)} »</b><span>Le premier à ${PA.TARGET} points gagne.${st.scores.a ? ` ${esc(R.name)} commence avec ${st.scores.a} points.` : ''}</span></span>` };
+    banner = { cls: 'intro', html: `<span class="sc-med">${pic(st.rival)}</span><span class="mq-vd"><small>${esc(R.name)}</small><b>« ${esc(R.hello)} »</b><span>Le premier à ${PA.tgt(st)} points gagne.${st.scores.a ? ` ${esc(R.name)} commence avec ${st.scores.a} points.` : ''}${PA.TABLE[st.table].rule ? `<em class="gm-ruleline">${esc(PA.TABLE[st.table].rule)}</em>` : ''}</span></span>` };
     busy = true; view();
     tuto(app, 'pacte-play').then(() => wait(1400)).then(() => { banner = null; busy = false; if (!gone) view(); });
   }

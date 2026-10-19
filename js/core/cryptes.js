@@ -43,13 +43,43 @@ export const RIVALS = {
     hello: 'J’ai catalogué chaque crypte. Chaque dalle. Chaque os.', beaten: 'Erreur… d’inventaire.', gloat: 'Tout est noté. Tout.' },
   echo: { name: 'L’Écho de l’Abîme', mem: 0.9, fade: 0.03, spite: 0.9, confuse: 0.03, hint: 'N’oublie presque rien, et brouille sans cesse tes souvenirs.',
     hello: 'Chaque carte retournée résonne en moi… à jamais.', beaten: '… l’écho se tait.', gloat: 'Tu m’as entendu ? Moi, je me souviens de tout.' },
+  // v492 : quatre nouveaux adversaires pour les cryptes 5 à 8
+  collectionneur: { name: 'Maître Orvel', mem: 0.85, fade: 0.04, spite: 0.5, confuse: 0.06, hint: 'Bonne mémoire, et il suit les cartes qui bougent.',
+    hello: 'Les rois bougent dans leurs tombes. Moi, je les suis du regard.', beaten: 'Une tombe m’a échappé.', gloat: 'Rien ne bouge sans que je le voie.' },
+  banquier: { name: 'Mammon', mem: 0.88, fade: 0.04, spite: 0.6, confuse: 0.05, hint: 'Retient presque tout, et ne touche jamais une paire maudite… s’il peut l’éviter.',
+    hello: 'Des paires maudites ? Elles seront pour toi. Je ne prends que l’or.', beaten: 'Une malédiction… sur MOI ?', gloat: 'L’or pour moi, la malédiction pour toi.' },
+  maitre: { name: 'Le Maître des Sceaux', mem: 0.92, fade: 0.02, spite: 0.8, confuse: 0.03, hint: 'Une mémoire presque parfaite. Ici, pas de pouvoir pour le gêner.',
+    hello: 'Dans la Nef, les pouvoirs se taisent. Il ne reste que la mémoire.', beaten: 'Ma mémoire… a failli.', gloat: 'Le silence révèle les meilleurs.' },
+  souverain: { name: 'La Souveraine du Néant', mem: 0.95, fade: 0.015, spite: 1, confuse: 0.015, hint: 'N’oublie rien, évite les malédictions et brouille tout ce que tu vois.',
+    hello: 'Le Tombeau bouge, le Tombeau maudit. Et moi, je n’oublie jamais.', beaten: 'Le Néant… a oublié une carte ?', gloat: 'Ton souvenir s’efface déjà.' },
 };
 export const TABLES = [
   { key: 'ossuaire', name: 'L’Ossuaire', stars: 1, rival: 'initie', reward: 25, chest: 'bois' },
   { key: 'chapelle', name: 'La Chapelle des noms', stars: 2, rival: 'stratege', reward: 35, chest: 'fer' },
   { key: 'archives', name: 'Les Archives scellées', stars: 3, rival: 'archiviste', reward: 50, chest: 'or' },
   { key: 'puits', name: 'Le Puits de l’Écho', stars: 4, rival: 'echo', reward: 70, chest: 'abyssal' },
+  // v492 : cryptes 5 à 8, chacune avec sa règle : mouvante (à chaque fois que la main passe, deux cartes face cachée
+  // échangent leur place, sous tes yeux), maudite (deux paires maudites : −1 point et pas de pouvoir), silence (aucun pouvoir)
+  { key: 'cimetiere', name: 'Le Cimetière des rois', stars: 4, rival: 'collectionneur', reward: 80, chest: 'or', rule: 'Crypte mouvante : chaque fois que la main passe, deux cartes face cachée échangent leur place, sous tes yeux.', rules: { drift: true } },
+  { key: 'maudite', name: 'La Crypte maudite', stars: 5, rival: 'banquier', reward: 90, chest: 'or', rule: 'Deux paires maudites : les prendre coûte 1 point, sans pouvoir.', rules: { curse: 2 } },
+  { key: 'nef', name: 'La Nef silencieuse', stars: 5, rival: 'maitre', reward: 100, chest: 'abyssal', rule: 'Silence : aucune paire ne déclenche de pouvoir. Seule la mémoire compte.', rules: { silence: true } },
+  { key: 'tombeau', name: 'Le Tombeau du Néant', stars: 5, rival: 'souverain', reward: 120, chest: 'abyssal', rule: 'Crypte mouvante et deux paires maudites.', rules: { drift: true, curse: 2 } },
 ];
+// v492 : un haut fait par crypte (payé une fois, en plus de la victoire)
+export const FEATS = {
+  ossuaire: { text: 'Trouve 5 paires d’affilée.', ok: (st) => (st.stats?.run.p || 0) >= 5 },
+  chapelle: { text: 'Gagne avec 8 points ou plus.', ok: (st) => st.final.scores.p >= 8 },
+  archives: { text: 'Gagne avec 4 points d’avance.', ok: (st) => st.final.scores.p - st.final.scores.a >= 4 },
+  puits: { text: 'Gagne avec 8 points ou plus.', ok: (st) => st.final.scores.p >= 8 },
+  cimetiere: { text: 'Trouve 5 paires d’affilée.', ok: (st) => (st.stats?.run.p || 0) >= 5 },
+  maudite: { text: 'Gagne avec 6 points ou plus, malédictions comprises.', ok: (st) => st.final.scores.p >= 6 },
+  nef: { text: 'Trouve 5 paires d’affilée.', ok: (st) => (st.stats?.run.p || 0) >= 5 },
+  tombeau: { text: 'Gagne avec 7 points ou plus.', ok: (st) => st.final.scores.p >= 7 },
+};
+export const featOk = (st) => st.over === 'won' && !!FEATS[st.table]?.ok(st);
+export const FEAT_SHARDS = 60;
+export const FEATS_TITLE = 'Mémoire des Cryptes';
+export const LAST_TITLE = 'Gardien du Tombeau';
 export const TABLE = Object.fromEntries(TABLES.map((t) => [t.key, t]));
 export const tableUnlocked = (s, i) => i === 0 || !!s.cryptes?.beaten?.[TABLES[i - 1].key];
 export const CRYPTES_REWARD = { firstWin: 100, daily: 40, dailyPaid: 5, afterCap: 5, xp: 10 };
@@ -70,8 +100,11 @@ export function newGame(cat, { table, seed = Date.now(), daily = false }) {
     return { k, f, id: c?.id || null };
   });
   const cards = shuffle(pairs.flatMap((p) => [{ k: p.k, f: p.f, id: p.id }, { k: p.k, f: p.f, id: p.id }]), r).map((c) => ({ ...c, gone: null }));
+  const RU = T.rules || {};
+  const curse = RU.curse ? shuffle(pairs.map((p) => p.k), r).slice(0, RU.curse) : [];
   return { table, daily, seed, rival: T.rival, cards, turn: 'p', open: [], pairs: { p: [], a: [] }, bonus: { p: 0, a: 0 },
-    grace: { p: 0, a: 0 }, block: { p: false, a: false }, pending: null, shown: [], mem: {}, turns: 0, last: null, over: null, final: null };
+    grace: { p: 0, a: 0 }, block: { p: false, a: false }, pending: null, shown: [], mem: {}, turns: 0, last: null, over: null, final: null,
+    drift: !!RU.drift, silence: !!RU.silence, curse, stats: { run: { p: 0, a: 0 }, cur: 0, stolen: { p: 0, a: 0 }, cursed: { p: 0, a: 0 } } };
 }
 
 const other = (x) => (x === 'p' ? 'a' : 'p');
@@ -115,14 +148,24 @@ export function flip(st, i, rng = Math.random) {
     st.pairs[who].push(c.k); st.lastPair = who;
     delete st.mem[x]; delete st.mem[y];
     const ev = { who, kind: 'match', i: [x, y], f: c.f, k: c.k, power: c.f, blocked: false };
-    if (st.block[who]) { st.block[who] = false; ev.blocked = true; }
+    const S = st.stats;
+    if (S) { S.cur++; S.run[who] = Math.max(S.run[who], S.cur); }
+    if (st.curse?.includes(c.k)) { ev.cursed = true; st.bonus[who]--; if (S) S.cursed[who]++; }
+    else if (st.silence) ev.silent = true;
+    else if (st.block[who]) { st.block[who] = false; ev.blocked = true; }
     else applyPower(st, who, c.f, ev, rng);
     finish(st);
     st.last = ev;
     return ev;
   }
   const ev = { who, kind: 'miss', i: [x, y], graced: false };
-  if (st.grace[who] > 0) { st.grace[who]--; ev.graced = true; } else { st.turn = other(who); st.turns++; fadeMem(st, rng); }
+  if (st.stats) st.stats.cur = 0;
+  if (st.grace[who] > 0) { st.grace[who]--; ev.graced = true; }
+  else {
+    st.turn = other(who); st.turns++; fadeMem(st, rng);
+    // crypte mouvante : deux cartes face cachée échangent leur place (sous les yeux des deux joueurs)
+    if (st.drift) { const hid = hidden(st); if (hid.length >= 2) { const s2 = shuffle(hid.slice(), rng); swap(st, s2[0], s2[1]); ev.drift = [s2[0], s2[1]]; } }
+  }
   st.last = ev;
   return ev;
 }
@@ -132,7 +175,7 @@ function applyPower(st, who, f, ev, rng) {
   if (f === 'celeste') st.grace[who]++;
   else if (f === 'primordial') st.bonus[who]++;
   else if (f === 'artificiel') st.block[opp] = true;
-  else if (f === 'necrotique') { const k = st.pairs[opp].pop(); if (k != null) { st.pairs[who].push(k); ev.stolen = k; } else ev.empty = true; }
+  else if (f === 'necrotique') { const k = st.pairs[opp].pop(); if (k != null) { st.pairs[who].push(k); ev.stolen = k; if (st.stats) st.stats.stolen[opp]++; } else ev.empty = true; }
   else if (POWERS[f]?.pick) {
     if (hidden(st).length < POWERS[f].pick) { ev.empty = true; return; }
     if (who === 'p') st.pending = { power: f, pick: POWERS[f].pick };
@@ -199,14 +242,17 @@ export function aiPick(st, rng = Math.random) {
   const R = RIVALS[st.rival], hid = hidden(st), byK = {};
   for (const i of hid) if (st.mem[i] != null) (byK[st.mem[i]] ||= []).push(i);
   const pickOf = (l) => l[Math.floor(rng() * l.length)];
+  const cursed = (k) => (st.curse || []).includes(k);
   if (st.open.length === 1) {
     const o = st.open[0], k = st.cards[o].k;
     const known = (byK[k] || []).find((i) => i !== o);
-    if (known != null) return recall(st, known, rng);
     const unknown = hid.filter((i) => st.mem[i] == null && i !== o);
+    // v492 : une paire maudite, il ne la prend que s'il n'a rien d'autre à retourner
+    if (known != null && cursed(k)) { const safe = unknown.length ? unknown : hid.filter((i) => i !== o && st.mem[i] != null && st.mem[i] !== k); if (safe.length) return pickOf(safe); }
+    if (known != null) return recall(st, known, rng);
     return pickOf(unknown.length ? unknown : hid.filter((i) => i !== o));
   }
-  const pair = Object.values(byK).find((l) => l.length >= 2);
+  const pair = Object.entries(byK).find(([k, l]) => l.length >= 2 && !cursed(+k))?.[1];
   if (pair) return recall(st, pair[0], rng);
   const unknown = hid.filter((i) => st.mem[i] == null);
   return pickOf(unknown.length ? unknown : hid);

@@ -51,7 +51,30 @@ export const TABLES = [
   { key: 'reliques', name: 'La Vente des reliques', stars: 2, seats: ['stratege', 'maitre'], reward: 35, chest: 'fer' },
   { key: 'nuit', name: 'La Vente de minuit', stars: 3, seats: ['echo', 'archiviste'], reward: 50, chest: 'or' },
   { key: 'grande', name: 'La Grande Vente', stars: 4, seats: ['banquier', 'souverain'], reward: 70, chest: 'abyssal' },
+  // v492 : ventes 5 à 8, chacune avec ses lots (rules : creatures = valeurs des créatures, curses = valeurs des malédictions,
+  // facs = nombre de factions parmi les créatures, set = bonus d'une famille de trois)
+  { key: 'maudite', name: 'La Vente maudite', stars: 4, seats: ['stratege', 'archiviste'], reward: 80, chest: 'or', rule: 'Sept malédictions (jusqu’à −7) pour huit créatures.', rules: { creatures: [3, 4, 5, 6, 7, 8, 9, 10], curses: [1, 2, 3, 4, 5, 6, 7], boost: { a: { skill: 3, lam: 0.35, temp: 1.5, noise: 0.1 }, b: { skill: 2, noise: 0.15, bias: 0.1 } } } },
+  { key: 'tresors', name: 'La Vente des trésors', stars: 5, seats: ['collectionneur', 'banquier'], reward: 90, chest: 'or', rule: 'Douze créatures, jusqu’à 12 points, et seulement trois malédictions.', rules: { creatures: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], curses: [2, 4, 6], boost: { a: { skill: 3, read: true, lam: 0.75, temp: 3, noise: 0.1 }, b: { skill: 2, noise: 0.15, bias: 0.1 } } } },
+  { key: 'lignees', name: 'La Vente des lignées', stars: 5, seats: ['maitre', 'echo'], reward: 100, chest: 'abyssal', rule: 'Trois factions seulement, et une famille de trois rapporte +10.', rules: { facs: 3, set: 10, boost: { a: { skill: 2, noise: 0.15, bias: 0.1 }, b: { skill: 3, read: true, lam: 0.45, temp: 2, noise: 0.1 } } } },
+  { key: 'neant', name: 'La Vente du Néant', stars: 5, seats: ['souverain', 'archiviste'], reward: 120, chest: 'abyssal', rule: 'Malédictions doublées : de −2 à −10.', rules: { curses: [2, 4, 6, 8, 10], boost: { a: { skill: 3, lam: 0.35, temp: 1.5, noise: 0.1 }, b: { skill: 2, noise: 0.15, bias: 0.1 } } } },
 ];
+// v492 : un haut fait par vente (payé une fois, en plus de la victoire)
+const curses = (st) => st.won.p.filter((l) => l.v < 0).length;
+const setsOf = (st) => scoreOf(st, 'p').sets;
+export const FEATS = {
+  etal: { text: 'Gagne sans prendre de malédiction.', ok: (st) => !curses(st) },
+  reliques: { text: 'Gagne avec une famille de trois.', ok: (st) => setsOf(st) >= 1 },
+  nuit: { text: 'Gagne avec 25 points ou plus.', ok: (st) => st.final.scores.p >= 25 },
+  grande: { text: 'Gagne sans prendre de malédiction.', ok: (st) => !curses(st) },
+  maudite: { text: 'Gagne en prenant une malédiction au plus.', ok: (st) => curses(st) <= 1 },
+  tresors: { text: 'Gagne avec 35 points ou plus.', ok: (st) => st.final.scores.p >= 35 },
+  lignees: { text: 'Gagne avec 30 points ou plus.', ok: (st) => st.final.scores.p >= 30 },
+  neant: { text: 'Gagne sans prendre de malédiction.', ok: (st) => !curses(st) },
+};
+export const featOk = (st) => st.over === 'won' && !!FEATS[st.table]?.ok(st);
+export const FEAT_SHARDS = 60;
+export const FEATS_TITLE = 'Commissaire de l’Abîme';
+export const LAST_TITLE = 'Acquéreur du Néant';
 export const TABLE = Object.fromEntries(TABLES.map((t) => [t.key, t]));
 export const tableUnlocked = (s, i) => i === 0 || !!s.encheres?.beaten?.[TABLES[i - 1].key];
 export const ENCHERES_REWARD = { firstWin: 100, daily: 40, dailyPaid: 5, afterCap: 5, xp: 10 };
@@ -60,19 +83,23 @@ export const dailyTable = (day, unlocked) => TABLES[hash(`encheres:${day}`) % Ma
 
 // Rareté de l'illustration selon la valeur du lot (pour l'écran seulement)
 const RAR_OF = (v) => (v <= 2 ? 'C' : v <= 4 ? 'PC' : v <= 6 ? 'R' : v <= 8 ? 'HR' : v === 9 ? 'M' : 'S');
+export const setBonus = (st) => st.setBonus || SET_BONUS;
 
 export function newGame(cat, { table, seed = Date.now(), daily = false }) {
   const T = TABLE[table];
   if (!T) throw new Error('Table inconnue.');
-  const r = mulberry(seed);
+  const r = mulberry(seed), RU = T.rules || {};
+  const CV = RU.creatures || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], KV = RU.curses || [1, 2, 3, 4, 5];
   const facs = FACTION_ORDER.slice();
   for (let i = facs.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [facs[i], facs[j]] = [facs[j], facs[i]]; }
-  const fpat = [0, 0, 0, 1, 1, 1, 2, 2, 3, 3].map((k) => facs[k]);
+  // répartition des créatures entre les factions (par défaut 3, 3, 2, 2 pour 10 : deux familles de trois possibles)
+  const nf = RU.facs || 4, per = Array.from({ length: nf }, (_, k) => Math.floor(CV.length / nf) + (k < CV.length % nf ? 1 : 0));
+  const fpat = per.flatMap((n, k) => Array(n).fill(facs[k]));
   for (let i = fpat.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [fpat[i], fpat[j]] = [fpat[j], fpat[i]]; }
   const used = new Set();
   const lots = [];
-  for (let v = 1; v <= 10; v++) {
-    const f = fpat[v - 1];
+  for (const [n, v] of CV.entries()) {
+    const f = fpat[n];
     let id = null;
     const pool = (cat?.byFaction?.[f] || []).filter((c) => !used.has(c.id));
     const fit = pool.filter((c) => c.rarity === RAR_OF(v));
@@ -80,17 +107,18 @@ export function newGame(cat, { table, seed = Date.now(), daily = false }) {
     if (list.length) { id = list[Math.floor(r() * list.length)].id; used.add(id); }
     lots.push({ v, f, id });
   }
-  for (let v = 1; v <= 5; v++) lots.push({ v: -v, f: null, id: null });
+  for (const v of KV) lots.push({ v: -v, f: null, id: null });
   for (let i = lots.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [lots[i], lots[j]] = [lots[j], lots[i]]; }
   const all = () => Array.from({ length: OFFERS }, (_, k) => k + 1);
   return {
-    v: 1, table, seed, daily, seats: { a: T.seats[0], b: T.seats[1] },
+    v: 1, table, seed, daily, seats: { a: T.seats[0], b: T.seats[1] }, setBonus: RU.set || SET_BONUS,
     lots, i: 0, pot: [], offers: { p: all(), a: all(), b: all() }, won: { p: [], a: [], b: [] },
     log: [], over: null, final: null,
   };
 }
 
-export const bidderOf = (st, who) => (who === 'p' ? null : BIDDERS[st.seats[who]]);
+// v492 : dans les ventes 5 à 8, les enchérisseurs jouent plus fin (rules.boost : réglages ajoutés à leur profil)
+export const bidderOf = (st, who) => (who === 'p' ? null : { ...BIDDERS[st.seats[who]], ...(TABLE[st.table]?.rules?.boost?.[who] || {}) });
 export const potValue = (st) => [...st.pot, st.lots[st.i]].filter(Boolean).reduce((a, l) => a + l.v, 0);
 // Score : valeurs des lots + 5 par famille de trois créatures d'une même faction
 export function scoreOf(st, who) {
@@ -98,7 +126,7 @@ export function scoreOf(st, who) {
   const n = {};
   lots.forEach((l) => { if (l.f) n[l.f] = (n[l.f] || 0) + 1; });
   const sets = Object.values(n).reduce((a, k) => a + Math.floor(k / 3), 0);
-  return { lots: lots.reduce((a, l) => a + l.v, 0), sets, total: lots.reduce((a, l) => a + l.v, 0) + sets * SET_BONUS };
+  return { lots: lots.reduce((a, l) => a + l.v, 0), sets, total: lots.reduce((a, l) => a + l.v, 0) + sets * setBonus(st) };
 }
 
 // Une manche : bids = { p, a, b } (offrandes). Renvoie le détail pour l'écran.
@@ -137,7 +165,7 @@ function feltValue(st, who, prof) {
   let v = pile.reduce((a, l) => a + l.v, 0);
   if (v > 0) pile.filter((l) => l.f).forEach((l) => {
     const mine = st.won[who].filter((x) => x.f === l.f).length % 3;
-    if (mine === 2) v += SET_BONUS * prof.sets; else if (mine === 1) v += 1.2 * prof.sets;
+    if (mine === 2) v += setBonus(st) * prof.sets; else if (mine === 1) v += 1.2 * prof.sets * setBonus(st) / SET_BONUS;
     if (prof.skill >= 2) SEATS.filter((x) => x !== who).forEach((x) => { if (st.won[x].filter((y) => y.f === l.f).length % 3 === 2) v += 2; });
   });
   return v;
