@@ -7,8 +7,12 @@ import sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
-key, src = sys.argv[1], sys.argv[2]
-K = float(sys.argv[3]) if len(sys.argv) > 3 else 1.6
+# v487 : --fit = cadre ramené à une taille commune (trou à 64 % de la demi-image, bord extérieur à 97 % au plus :
+# l'anneau trop épais est tassé vers le trou, la photo reste visible) → assets/frames/<clé>-2.webp ; en CSS inset −24,2 %.
+args = [x for x in sys.argv[1:] if not x.startswith('--')]
+FIT = '--fit' in sys.argv
+key, src = args[0], args[1]
+K = float(args[2]) if len(args) > 2 else 1.6
 im = Image.open(src).convert('RGB')
 a = np.asarray(im, float)
 H, W, _ = a.shape
@@ -40,6 +44,32 @@ alpha = np.where(bg & ~fr, 0, alpha)
 with np.errstate(divide='ignore', invalid='ignore'):
     col = np.clip((a - (1 - alpha[..., None]) * 255) / np.maximum(alpha[..., None], 0.3), 0, 255)
 rgba = Image.fromarray(np.dstack([col, alpha * 255]).astype(np.uint8), 'RGBA')
+if FIT:
+    N, HOLE, OUT = 1024, 0.64, 0.97
+    hc = N / 2
+    d = np.hypot(*np.meshgrid(np.arange(W) - cx, np.arange(H) - cy))
+    r_out = np.percentile(d[alpha > 0.25], 99.7)                  # bord extérieur (sans les poussières isolées)
+    s0 = HOLE * hc / r_in
+    k = min(s0, (OUT * hc - HOLE * hc) / max(r_out - r_in, 1))
+    yy, xx = np.mgrid[0:N, 0:N] + 0.5 - hc
+    rr = np.hypot(xx, yy)
+    src_r = np.where(rr < HOLE * hc, rr / s0, r_in + (rr - HOLE * hc) / k)
+    f = src_r / np.maximum(rr, 1e-6)
+    sx, sy = cx + xx * f - 0.5, cy + yy * f - 0.5
+    pm = np.dstack([col * alpha[..., None], alpha * 255])        # couleur prémultipliée pour l'interpolation
+    x0, y0 = np.floor(sx).astype(int), np.floor(sy).astype(int)
+    fx, fy = (sx - x0)[..., None], (sy - y0)[..., None]
+    def at(x, y):
+        ok = (x >= 0) & (x < W) & (y >= 0) & (y < H)
+        v = pm[np.clip(y, 0, H - 1), np.clip(x, 0, W - 1)]
+        return np.where(ok[..., None], v, 0)
+    v = (at(x0, y0) * (1 - fx) * (1 - fy) + at(x0 + 1, y0) * fx * (1 - fy) + at(x0, y0 + 1) * (1 - fx) * fy + at(x0 + 1, y0 + 1) * fx * fy)
+    al = v[..., 3:4]
+    rgb = np.clip(v[..., :3] / np.maximum(al / 255, 1e-3), 0, 255)
+    out = Image.fromarray(np.dstack([rgb, al]).astype(np.uint8), 'RGBA')
+    out.resize((256, 256), Image.LANCZOS).save(f'assets/frames/{key}-2.webp', quality=88, method=6)
+    print(f'{key}: anneau {r_out / r_in:.2f} × le trou → {"tassé ×" + format(k / s0, ".2f") if k < s0 else "gardé"}')
+    sys.exit()
 half = r_in * K
 oy, ox = np.where(alpha > 0.1)
 reach = max(np.hypot(ox - cx, oy - cy).max() / r_in, 0)
