@@ -53,7 +53,6 @@ export default function cryptesScreen(app, root) {
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
     root.innerHTML = `<header class="screen-head ui-hero bn-cryptes"><h1>Les Cryptes</h1><p class="muted">Retrouve les paires… et réveille leurs pouvoirs.</p>
         <span class="sc-rec">${cr.wins} victoire${cr.wins > 1 ? 's' : ''} · ${cr.losses} défaite${cr.losses > 1 ? 's' : ''}</span></header>
-      <div class="gm-show cr-show" aria-hidden="true"><img alt="" src="assets/jeux/cr-dos.webp"><span class="cr-show-pair"><img alt="" src="assets/jeux/cr-dos.webp"></span><img alt="" src="assets/jeux/cr-dos.webp"></div>
       ${g.cryptesDailyOpen() ? `<button class="panel sc-daily ${dailyDone ? 'done' : ''}" data-cr="daily" ${dailyDone ? 'disabled' : ''}>
         <img alt="" src="assets/icons/hourglass.webp"><span><b>Défi du jour</b><span class="small">${esc(DT.name)} · les mêmes cartes pour tous</span>
         <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : `Victoire : +${CR.CRYPTES_REWARD.daily} éclats et un coffre de bois`}</span></span>${dailyDone ? icon('check') : icon('next')}</button>` : ''}
