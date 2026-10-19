@@ -127,6 +127,7 @@ addEventListener('resize', fitHeight);
 addEventListener('orientationchange', () => setTimeout(fitHeight, 300));
 
 document.addEventListener('click', (e) => {
+  if (e.target.closest('[data-obs]')) { (app.state.codex ||= { tab: 'codex' }).tab = 'shop'; app.sfx?.tap?.(); app.go('codex'); return; }
   const b = e.target.closest('[data-wallet]');
   if (!b) return;
   const [name, what, how, route, go] = WALLET[b.dataset.wallet];
@@ -149,7 +150,9 @@ function renderChrome() {
     <div class="wallet">
       <button class="pill shards" data-wallet="shards" title="Éclats" aria-label="${fmt(s.shards)} éclats : à quoi ça sert ?">${icon('crystal')}<span>${fmt(s.shards)}</span></button>
       <button class="pill ash" data-wallet="ash" title="Cendres" aria-label="${fmt(s.ash)} cendres : à quoi ça sert ?">${icon('ash')}<span>${fmt(s.ash)}</span></button>
+      ${g.codexOn() ? `<button class="pill obs" data-obs title="Obsidiennes" aria-label="${fmt(g.obs())} obsidiennes : ouvrir l’Échoppe"><img class="obs-i" alt="" src="assets/icons/obsidienne.webp"><span>${fmt(g.obs())}</span></button>` : ''}
     </div>`;
+  top.classList.toggle('has-obs', g.codexOn()); /* v489 : obsidiennes à côté des cendres (tant que l'Échoppe est cachée, seulement en Mode Créateur) */
   // v319 : le bouton retour du haut revient en arrière dans l'historique quand la page précédente est bien le parent,
   // sinon il remplace la page courante : jamais d'entrée d'historique en plus
   top.querySelector('.top-back')?.addEventListener('click', (e) => {

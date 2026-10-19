@@ -4435,3 +4435,16 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .tcg.dr .tcg-dress { inset: -1.45% -2.05%; }
 .tcg.dr-fin-spectrale .tcg-dress { inset: -1.35% -1%; }
 .cx-pv .cx-pv-foot { background: rgba(8, 9, 13, .97); border-top: 1px solid rgba(201, 164, 90, .25); box-shadow: 0 -10px 24px rgba(0, 0, 0, .6); padding-top: 14px; }
+
+/* v489 : obsidiennes dans la barre du haut (troisième compteur, plus serré) */
+.wallet .pill.obs .obs-i { width: 17px; height: 17px; }
+#topbar.has-obs .wallet { gap: 4px; }
+#topbar.has-obs .wallet .pill { padding-left: 7px; padding-right: 9px; gap: 4px; }
+@media (max-width: 380px) { #topbar.has-obs .wallet .pill span { font-size: .82rem; } #topbar.has-obs .top-meta b { max-width: 70px; overflow: hidden; text-overflow: ellipsis; } }
+/* v489 : ouverture de booster : le fond du sachet ne dépasse plus au-dessus de la déchirure (on voyait un rectangle noir) */
+.pk-inside { top: 9%; left: 6%; right: 6%; height: 25%; border-radius: 0 0 45% 45% / 0 0 30% 30%; box-shadow: none;
+  background: radial-gradient(ellipse 62% 90% at 50% 0, rgba(5, 5, 7, .95) 35%, rgba(5, 5, 7, .55) 65%, transparent 100%); }
+/* v489 : sachets à marges transparentes : le reflet ne déborde plus de la forme du sachet (rectangle grisé autour) */
+.pack-standard .pk-foil { -webkit-mask: url(../assets/packs/standard2.webp) center / 100% 100% no-repeat; mask: url(../assets/packs/standard2.webp) center / 100% 100% no-repeat; }
+.pack-event .pk-foil { -webkit-mask: url(../assets/packs/event2.webp) center / 100% 100% no-repeat; mask: url(../assets/packs/event2.webp) center / 100% 100% no-repeat; }
+.pack-abysse .pk-foil { -webkit-mask: url(../assets/packs/abysse2.webp) center / 100% 100% no-repeat; mask: url(../assets/packs/abysse2.webp) center / 100% 100% no-repeat; }
