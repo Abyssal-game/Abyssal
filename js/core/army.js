@@ -28,7 +28,8 @@ export function roleOf(card) {
 
 // ——— Rareté : coût d'équipe et puissance (écart volontairement modéré) ———————
 export const COST = { C: 1, PC: 2, R: 3, HR: 4, M: 5, S: 6 };
-export const BUDGET = 15;
+// v495 : plus de budget de rareté (demande du propriétaire) : n'importe quelles 5 créatures. COST reste pour teamCost (affichage).
+export const BUDGET = Infinity;
 export const TEAM = { active: 3, reserve: 2 };
 
 // ——— Niveaux : chaque doublon fait progresser la créature (niveau 10 au maximum) ———

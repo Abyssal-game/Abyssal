@@ -14,7 +14,7 @@ import { FINAL_FLOOR, BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORD
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
 import { CODEX, CODEX_XP, CODEX_TIERS, SHOP, CATALOG, codexState, codexTier } from './codex.js';
-import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, lateSoft, expectedLevel, cardPower, powerFor, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
+import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, lateSoft, bossEase, expectedLevel, cardPower, powerFor, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative } from './duel.js';
 import { bossOf, BOSSES, BOSS_ORDER } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
@@ -27,12 +27,12 @@ import { FERVOR_START, FERVOR_MAX, FERVOR_CARRY, TALENTS } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
 export const WEEKLY_FLOOR = 8;
 /* v493 : force attendue d'une équipe à un étage (powerFor), plafonnée à ce qu'une équipe au maximum peut avoir */
-export const REF_POW_MAX = 2.2;
+export const REF_POW_MAX = 2.8; /* v495 : plus de budget d'équipe, le plafond suit la force conseillée de l'étage 100 */
 export const REF_TOL = 1.15; // marge : une équipe jusqu'à 15 % sous la force conseillée n'est pas pénalisée
 export const refPowFor = (floor) => Math.min(REF_POW_MAX, powerFor(floor)) / REF_TOL;
 export const FIGHT_ATK = 1; // force des ennemis ordinaires (réglée par simulation)
 export const DESCENT_SHARDS = 0.15; // éclats gagnés dans la Descente : 15 % des montants de base
-import { STARTER, COST, BUDGET, TEAM, ULTS, MAX_LEVEL, canUlt, ultOf, roleOf } from './army.js';
+import { STARTER, COST, TEAM, ULTS, MAX_LEVEL, canUlt, ultOf, roleOf } from './army.js';
 
 const RI = (r) => RARITY_ORDER.indexOf(r);
 const ITEM_REFUND = { baume: 80, elixir: 260, parchemin: 120 };
@@ -509,12 +509,10 @@ export class Game {
   cardLevelInfo(id) { const e = this.entry(id), level = Math.min(MAX_LEVEL, e?.lv || 1); return { level, cost: e ? this.upgradeCost(id) : 0, max: MAX_LEVEL }; }
   cardLevel(id) { return this.cardLevelInfo(id).level; }
   teamCost(ids = this.s.team) { return ids.reduce((a, id) => a + (COST[this.catalog.get(id)?.rarity] || 0), 0); }
-  // Équipe valable : cartes possédées, budget respecté. Complétée automatiquement si besoin
+  // Équipe valable : cartes possédées (v495 : plus de budget de rareté). Complétée automatiquement si besoin
   // (et 5 Communes offertes à qui n'a pas encore 3 créatures).
   team() {
     let t = (this.s.team || []).filter((id) => this.owns(id));
-    // budget dépassé (par exemple après un changement de rareté) : on retire les dernières cartes
-    while (t.length && this.teamCost(t) > BUDGET) t = t.slice(0, -1);
     // remplissage automatique seulement tant que le joueur n'a jamais composé son équipe lui-même
     if (t.length < TEAM.active && !this.s.teamSet) {
       if (this.welcomePending()) t = []; // nouveau joueur : il ouvre d'abord ses boosters de bienvenue
@@ -534,21 +532,19 @@ export class Game {
     return suggestTeam(owned, (id) => this.cardLevel(id));
   }
   teamSynergies(ids = this.team()) { return teamSynergies(ids.map((id) => this.catalog.get(id)).filter(Boolean), (id) => this.cardLevel(id)); }
-  // Complète l'équipe avec les meilleures cartes possédées, sans dépasser le budget
+  // Complète l'équipe avec les meilleures cartes possédées
   autoTeam(keep = []) {
     const t = keep.slice(), size = TEAM.active + TEAM.reserve;
     const cards = Object.keys(this.s.collection).map((id) => this.catalog.get(id)).filter((c) => c && !t.includes(c.id))
-      .sort((a, b) => RI(b.rarity) - RI(a.rarity) || this.cardLevel(b.id) - this.cardLevel(a.id) || b.power - a.power);
+      .sort((a, b) => this.cardPower(b.id) - this.cardPower(a.id) || RI(b.rarity) - RI(a.rarity) || b.power - a.power); /* v495 : plus de budget, les plus fortes d'abord (rareté × niveau) */
     for (const c of cards) {
       if (t.length >= size) break;
-      const left = size - t.length - 1; // place gardée pour compléter avec des Communes
-      if (this.teamCost(t) + COST[c.rarity] + left <= BUDGET) t.push(c.id);
+      t.push(c.id);
     }
     return t;
   }
   setTeam(ids) {
     const list = [...new Set(ids)].filter((id) => this.owns(id)).slice(0, TEAM.active + TEAM.reserve);
-    if (this.teamCost(list) > BUDGET) throw new Error(`Ton équipe dépasse le budget de ${BUDGET} points.`);
     if (this.s.descent.run) throw new Error('Termine d’abord ton chapitre de la Descente.');
     this.s.team = list;
     this.s.teamSet = true;
@@ -1275,7 +1271,7 @@ export class Game {
         if (rule.key === 'sommeil' && f === rule.faction) { e.maxHp = Math.max(1, Math.round(e.maxHp * 0.75)); e.hp = e.maxHp; }
         const nt = nightTier(run); if (nt) { e.maxHp = Math.round(e.maxHp * nt.hp); e.hp = e.maxHp; e.atk = Math.round(e.atk * nt.atk + 0.4); }
         if (run.omen === 'avare') e.atk = Math.round(e.atk * 1.1 + 0.4);
-        if (!e.boss) { const k = lateSoft(run.floor); if (k < 1) { e.maxHp = Math.max(1, Math.round(e.maxHp * k)); e.hp = e.maxHp; e.atk = Math.max(1, Math.round(e.atk * k)); } } /* v460 */
+        { const k = e.boss ? bossEase(run.floor) : lateSoft(run.floor); if (k !== 1) { e.maxHp = Math.max(1, Math.round(e.maxHp * k)); e.hp = e.maxHp; e.atk = Math.max(1, Math.round(e.atk * k)); } } /* v460 */
         // Gardien éveillé (Cauchemar, ou à partir de l'étage 30) : sa phase 2 commence dès le premier tour
         if (e.boss && (run.nightmare || run.floor >= AWAKEN_AT)) e.awakened = true;
       }

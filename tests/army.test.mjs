@@ -39,10 +39,10 @@ test('niveaux : achetés avec des cendres, plafonnés', () => {
   assert.ok(duelUnit(catalog.get(id), { level: 10 }).maxHp > duelUnit(catalog.get(id), { level: 1 }).maxHp);
 });
 
-test('budget d’équipe et pouvoir ultime', () => {
+test('v495 : plus de budget d’équipe ; pouvoir ultime', () => {
   const g = newGame('u');
   ['ART-039', 'NEC-044', 'ABY-043', ...STARTER].forEach((id) => g.addCard(id));
-  assert.throws(() => g.setTeam(['ART-039', 'NEC-044', 'ABY-043', 'NEC-001', 'INF-001']), /budget/);
+  assert.deepEqual(g.setTeam(['ART-039', 'NEC-044', 'ABY-043', 'NEC-001', 'INF-001']), ['ART-039', 'NEC-044', 'ABY-043', 'NEC-001', 'INF-001']);
   g.setTeam(['ART-039', 'NEC-001', 'INF-001', 'CEL-001', 'SAU-014']);
   assert.equal(g.ultimate().key, 'aegis');
   g.setTeam(['NEC-001', 'INF-001', 'CEL-001']);

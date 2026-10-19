@@ -60,14 +60,28 @@ export const expectedLevel = (floor) => Math.max(1, Math.min(10, Math.round((flo
 // des Communes au niveau 9.
 export const RARITY_POWER = { C: 1, PC: 1.15, R: 1.3, HR: 1.45, M: 1.6, S: 1.75 };
 export const cardPower = (rarity, level = 1) => (RARITY_POWER[rarity] || 1) * (1 + 0.08 * (level - 1));
-export const powerFor = (floor) => 1 + Math.max(0, floor - 6) / 22;
+// v495 : sans budget d'équipe, une équipe peut dépasser 2,2 : la force conseillée continue de monter, plus lentement,
+// après l'étage 28 (2,0) jusqu'à 2,8 à l'étage 100 (Mythiques et Secrètes hauts niveaux).
+export const POWER_BEND = 28, POWER_END = 2.8;
+export const powerFor = (floor) => floor <= POWER_BEND ? 1 + Math.max(0, floor - 6) / 22 : 2 + (POWER_END - 2) * Math.min(1, (floor - POWER_BEND) / (100 - POWER_BEND));
+// étage qu'une force d'équipe permet de viser (inverse de powerFor)
+export const floorForPower = (p) => Math.max(1, Math.min(100, Math.round(p <= 2 ? 6 + (p - 1) * 22 : POWER_BEND + (p - 2) / (POWER_END - 2) * (100 - POWER_BEND))));
 export const powerPts = (p) => Math.round(p * 100);
 export const enemyScale = (floor) => 1 + 0.06 * Math.min(19, floor - 1) + 0.03 * Math.max(0, floor - 20);
 // v460 : derniers chapitres adoucis (décision du propriétaire : l'étage 100 en ≈ 2 mois pour un joueur régulier).
 // Les ennemis qui ne sont pas des gardiens perdent une part de leurs PV et de leur attaque, de 0 à l'étage `from`
 // jusqu'à `at100` à l'étage 100 (mesuré au simulateur : avant, des murs aux étages 91-98 avec une équipe au maximum).
-export const LATE_SOFT = { from: 30, at100: 0.25 };
-export const lateSoft = (floor) => 1 - LATE_SOFT.at100 * Math.min(1, Math.max(0, floor - LATE_SOFT.from) / (100 - LATE_SOFT.from));
+// v495 : force des ennemis réglée étage par étage (points reliés en ligne droite), calée au simulateur de chapitres :
+// FOE_EASE pour les combats ordinaires et les élites, BOSS_EASE pour les gardiens (multiplie PV et attaque).
+export const FOE_EASE = [[1, 1], [8, 1], [12, 0.88], [20, 0.85], [30, 0.88], [60, 0.9], [85, 0.76], [100, 0.7]];
+export const BOSS_EASE = [[1, 1], [5, 1], [10, 0.85], [15, 1], [25, 1], [30, 0.9], [40, 1], [80, 1], [100, 0.75]];
+const ease = (pts, f) => {
+  if (f <= pts[0][0]) return pts[0][1];
+  for (let i = 1; i < pts.length; i++) if (f <= pts[i][0]) { const [a, x] = pts[i - 1], [b, y] = pts[i]; return x + (y - x) * (f - a) / (b - a); }
+  return pts[pts.length - 1][1];
+};
+export const lateSoft = (floor) => ease(FOE_EASE, floor);
+export const bossEase = (floor) => ease(BOSS_EASE, floor);
 
 // v326 : les anciennes familles du Bestiaire (Brute, Lanceur, Essaim…) ont été retirées : le Bestiaire affiche
 // désormais les familles réellement utilisées en combat (AI_FAMILIES et aiFamily, js/core/skills.js).

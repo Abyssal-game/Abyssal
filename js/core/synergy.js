@@ -1,7 +1,7 @@
 // Synergies d'équipe : ce que chaque créature apporte à l'équipe et ce dont elle profite,
 // d'après son rôle, ses passifs et sa compétence propre (kits.js). Sert à suggérer une équipe,
 // à montrer les synergies de l'équipe et à filtrer la collection.
-import { roleOf, COST, BUDGET, TEAM } from './army.js';
+import { roleOf, TEAM } from './army.js';
 import { CREATURE_KITS, KIT_LEVELS, moveDefOf } from './kits.js';
 
 // Ce qu'une créature peut apporter (provides) ou rechercher (wants)
@@ -57,20 +57,19 @@ export function teamScore(cards, levelOf) {
 }
 
 // Suggestion : on part des meilleures créatures et on ajoute, une à une, celle qui améliore le plus la note,
-// sans dépasser le budget (en gardant de quoi compléter avec des Communes)
+// (v495 : plus de budget de rareté)
 export function suggestTeam(owned, levelOf) {
-  const size = TEAM.active + TEAM.reserve, cost = (l) => l.reduce((x, c) => x + COST[c.rarity], 0);
+  const size = TEAM.active + TEAM.reserve;
   const byPow = owned.slice().sort((a, b) => unitPower(b, levelOf(b.id)) - unitPower(a, levelOf(a.id)));
-  // les plus fortes, plus les meilleures petites raretés (pour compléter sans dépasser le budget)
+  // les plus fortes, plus les meilleures de chaque petite rareté (rôles qui manquent)
   const pool = [...new Set([...byPow.slice(0, 30), ...['C', 'PC', 'R'].flatMap((r) => byPow.filter((c) => c.rarity === r).slice(0, 10))])];
   let best = null;
   for (const start of pool.slice(0, 6)) {
     const t = [start];
     while (t.length < size) {
-      const left = size - t.length - 1;
       let pick = null, ps = -Infinity;
       for (const c of pool) {
-        if (t.includes(c) || cost(t) + COST[c.rarity] + left > BUDGET) continue;
+        if (t.includes(c)) continue;
         const s = teamScore([...t, c], levelOf);
         if (s > ps) { ps = s; pick = c; }
       }

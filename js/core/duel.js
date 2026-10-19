@@ -287,6 +287,8 @@ export const FORBID = { attack: 'attaquer', skill: 'utiliser une compétence', d
 // v493 : la protection se calcule sur la force attendue à l'étage (st.refPow), pas sur la créature : une créature trop faible
 // pour l'étage n'est plus protégée (avant, des communes niveau 1 ne prenaient que 3 dégâts d'un gardien de l'étage 70)
 export const GAP_POW = 3, GAP_ATK = 2;
+// v495 : un coup que tu peux parer ou esquiver frappe plus fort s'il passe ; un coup sans défense possible, moins fort
+export const QTE_HIT = 1.6, PLAIN_HIT = 0.6;
 export const allyCap = (u, kind, st = null) => {
   const gap = st?.refPow && u.pow ? Math.max(1, st.refPow / u.pow) : 1;
   return Math.max(1, Math.round(u.maxHp * gap ** GAP_POW * (BIG.includes(kind) ? ALLY_BIG_CAP : ALLY_HIT_CAP)));
@@ -1255,7 +1257,7 @@ export function enemyAct(st, aUid, defense = 'none') {
   st.curKind = kind;
   // v271 : chaque serviteur encore debout renforce la grosse attaque du gardien (+20 %, +40 % au plus)
   const helpers = big && e.boss ? Math.min(2, front(st, 'enemy').filter((x) => x !== e && x.hp > 0).length) : 0;
-  const pow = 1 + SERVANT_POWER * helpers;
+  const pow = (1 + SERVANT_POWER * helpers) * (it.qte ? QTE_HIT : PLAIN_HIT); /* v495 : coups parables plus forts, petits coups plus faibles (le talent en défense compte davantage) */
   if (helpers) ev.push({ t: 'status', u: aUid, s: `Renforcé par ${helpers > 1 ? 'ses serviteurs' : 'son serviteur'} : +${Math.round(SERVANT_POWER * helpers * 100)} %`, k: 'bad' });
   if (big && defense === 'none') st.stats.missed = (st.stats.missed || 0) + 1;
   const evStart = ev.length;

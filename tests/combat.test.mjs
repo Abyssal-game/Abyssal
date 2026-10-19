@@ -204,7 +204,7 @@ test('combats complets : victoire sans perte, victoire avec une créature tombé
   assert.equal(st.over, 'won');
   assert.ok(units(st, 'ally').every((u) => u.hp > 0));
   // victoire avec une perte
-  st = D.createDuel([A(ASSAUT, { level: 10 }), A(GARDE, { level: 10 }), A(SOIN)], [E(FOE, { scale: 2 }), E(FOE2)], { seed: 11 });
+  st = D.createDuel([A(ASSAUT, { level: 10 }), A(GARDE, { level: 10 }), A(SOIN)], [E(FOE, { scale: 2 }), E(FOE2, { scale: 2 })], { seed: 11 }); // v495 : petits coups moins forts (PLAIN_HIT)
   units(st, 'ally')[2].hp = 1;
   units(st, 'enemy').forEach((e) => { e.intent = { kind: 'hit', t: units(st, 'ally')[2].uid, qte: false }; });
   D.act(st, units(st, 'ally')[0].uid, 'attack', units(st, 'enemy')[0].uid);

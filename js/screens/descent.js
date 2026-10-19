@@ -2,7 +2,7 @@
 // affronte les créatures corrompues en duel et rapporte un coffre (éclats ou booster).
 import { RARITY, BOOSTERS, FINAL_FLOOR } from '../config.js';
 import { DESCENT, ROOMS, BLESSINGS, CHESTS, floorFloor, OMENS, powerFor, powerPts, CHAPTER, CHAPTERS, chapterOf, chapterStart, floorFirstReward } from '../core/descent.js';
-import { TEAM, BUDGET } from '../core/army.js';
+import { TEAM } from '../core/army.js';
 import { BOSSES, bossOf } from '../core/bosses.js';
 import { PACTS } from '../core/pacts.js';
 import { TALENTS } from '../core/skills.js';
@@ -70,7 +70,7 @@ export default function descent(app, root) {
       <section class="panel dc-go">
         ${chapterHTML()}
         ${teamStrip(team)}
-        <p class="small muted center">Pouvoir : <b>${esc(g.ultimate(team).name)}</b> · budget ${g.teamCost(team)} / ${BUDGET}</p>
+        <p class="small muted center">Pouvoir : <b>${esc(g.ultimate(team).name)}</b></p>
         ${levelHint(team, d)}
         <div class="dc-teambtns"><a class="btn small ghost dc-plq dc-plq-dark" href="#/equipe">${icon('p:team-ic')}Mon équipe</a><a class="btn small ghost dc-plq dc-plq-dark" href="#/renfort">${icon('p:level-up')}Renforcer</a></div>
         ${team.length < TEAM.active ? (g.welcomePending() ? `<a class="btn gold block" href="#/boutique">${icon('ticket')}Ouvre d’abord tes boosters de bienvenue</a>` : `<p class="small v2-warn center">${icon('info')} Ajoute au moins ${TEAM.active} créatures à ton équipe pour descendre.</p>`) : ''}
@@ -97,9 +97,9 @@ export default function descent(app, root) {
     const r = g.descent().risk?.[k];
     return r?.n ? `perdues : ${r.lost} sur ${r.n}` : dflt;
   }
-  /* v459 : au-delà de l'étage 33 environ, la force conseillée dépasse ce qu'une équipe peut atteindre (budget de 15) :
-     une équipe toute au niveau 10 n'est plus jamais dite « trop faible », la suite se joue sur la façon de combattre */
-  const maxed = (team) => team.length && team.every((id) => g.cardLevel(id) >= 10) && g.teamPower(team) >= 2.15; /* tout au niveau 10 et des raretés qui remplissent le budget (plafond ≈ 2,24) */
+  /* v459 puis v495 (plus de budget d'équipe) : une équipe toute au niveau 10 et presque à la force du fond (2,8) n'est plus
+     dite « trop faible » : la suite se joue sur la façon de combattre */
+  const maxed = (team) => team.length && team.every((id) => g.cardLevel(id) >= 10) && g.teamPower(team) >= 2.6;
   function riskAdvice() {
     const team = g.team(), d = g.descent(), tp = g.teamPower(team), need = powerFor(Math.max((d.best || 0) + 1, 5));
     if (tp < need * 0.95 && !maxed(team)) return ` <b>Ton équipe est sous la force conseillée</b> (${powerPts(tp)} pour ${powerPts(need)}) : le risque est élevé.`;
@@ -111,7 +111,7 @@ export default function descent(app, root) {
     // v345 : force de l'équipe (rareté × niveau) plutôt que niveau seul
     const avg = avgLevel(team), tp = g.teamPower(team), target = Math.max((d.best || 0) + 1, 5), need = powerFor(target), top = maxed(team) && tp < need * 0.95, ok = tp >= need * 0.95 || top;
     return `<p class="small center dc-lvl ${ok ? 'ok' : 'low'}">${icon('p:level-up')} Force de ton équipe : <b>${powerPts(tp)}</b>${top ? ' · <b>au maximum</b> : à cette profondeur, tout se joue sur ta défense, la Brisure, les talents et les présages' : ` · conseillée pour l’étage ${target} : <b>${powerPts(need)}</b>${ok ? '' : ' · <a href="#/renfort">la renforcer</a>'}`}</p>
-      <details class="dc-floorhelp small muted"><summary>Comment la difficulté marche</summary><p>La <b>force</b> d’une créature dépend de sa rareté et de son niveau : une Mythique au niveau 1 vaut une Commune au niveau 8. Monter de niveau ou aligner des créatures plus rares rend l’équipe plus forte.</p><p>Dans la Descente, chaque étage a <b>sa force fixe</b> : renforcer ton équipe rend donc les chapitres plus faciles. Les <b>Épreuves du jour</b> et le <b>Cauchemar</b>, eux, s’adaptent à ta force (dès l’étage 1 en Cauchemar, les ennemis valent ceux de l’étage ${floorFloor(avg)} au moins).</p></details>`;
+      <details class="dc-floorhelp small muted"><summary>Comment la difficulté marche</summary><p>La <b>force</b> d’une créature dépend de sa rareté et de son niveau : une Mythique au niveau 1 vaut une Commune au niveau 8. Monter de niveau ou aligner des créatures plus rares rend l’équipe plus forte.</p><p>Dans la Descente, chaque étage a <b>sa force fixe</b> : renforcer ton équipe rend donc les chapitres plus faciles. Les <b>Épreuves du jour</b> et le <b>Cauchemar</b>, eux, s’adaptent à ta force (dès l’étage 1 en Cauchemar, les ennemis valent ceux de l’étage ${floorFloor(avg)} au moins).</p><p>Ton équipe n’a plus de limite de rareté. Une équipe très en dessous de la force de l’étage se fait vite abattre ; à force égale, ce sont <b>tes esquives, tes parades et la Brisure</b> qui décident : les attaques annoncées frappent fort si elles passent.</p></details>`;
   }
   function weakHint(floor) {
     const team = g.team(), tp = g.teamPower(team), need = powerFor(floor), low = team.filter((id) => g.cardPower(id) < need * 0.9);
