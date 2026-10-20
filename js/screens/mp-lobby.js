@@ -80,7 +80,7 @@ export function createMpLobby(app, root, spec) {
     app.chrome?.();
   }
   // recherche rapide, deux vitesses, défi à un ami et récompense (pas pour les jeux entre amis seulement)
-  const quickHTML = (waiting, paidLeft) => `        ${ui.searching ? `<div class="mp-search"><span class="mp-spin"></span><span><b>${ui.searchingV?.public === false ? t('En attente de {name}…', { name: esc(foeName(ui.searchingV)) }) : 'Recherche d’un adversaire…'}</b><small>Partie rapide · reste sur cet écran, la partie démarre dès qu’un joueur arrive.</small></span><button class="btn small ghost" data-mp="leave" data-id="${esc(ui.searching)}">Annuler</button></div>` : ''}
+  const quickHTML = (waiting, paidLeft) => `        ${ui.searching ? `<div class="mp-search"><span class="mp-spin"></span><span><b>${ui.searchingV?.public === false ? t('En attente de {name}…', { name: esc(foeName(ui.searchingV)) }) : 'Recherche d’un adversaire…'}</b><small>Partie rapide · reste sur cet écran, la partie démarre dès qu’un joueur arrive.</small></span><button class="btn small ghost" data-mp="leave" data-own="1" data-id="${esc(ui.searching)}">Annuler</button></div>` : ''}
         <div class="mp-paces">
           <button class="mp-pace fast" data-mp="quick" data-pace="fast" ${busy || ui.searching ? 'disabled' : ''}><img class="mp-pace-ic" alt="" src="assets/icons/mp-rapide.webp"><b>Partie rapide</b><span class="mp-pace-t">${MP_FAST_SECS} s par coup</span><small>Les deux joueurs connectés en même temps. Une partie dure quelques minutes.</small></button>
           <button class="mp-pace slow" data-mp="quick" data-pace="slow" ${busy || waiting.some((v) => v.public && v.pace !== 'fast') ? 'disabled' : ''}><img class="mp-pace-ic" alt="" src="assets/icons/mp-lente.webp"><b>Partie lente</b><span class="mp-pace-t">${MP_HOURS} h par coup</span><small>${waiting.some((v) => v.public && v.pace !== 'fast') ? 'Recherche en cours : la partie commence dès qu’un joueur arrive.' : 'Chacun joue quand il veut. Tu es prévenu quand c’est ton tour.'}</small></button>
@@ -106,7 +106,7 @@ export function createMpLobby(app, root, spec) {
         <p class="small muted center">Entre amis seulement : pas de récompense, juste ton bilan contre chacun.</p>` : quickHTML(waiting, paidLeft)}
       </section>
       ${theirs.length ? `<section class="panel mp-sec"><h2 class="section-title">Au tour de l’adversaire</h2>${theirs.map((v) => row(v, `${spec.sub(v)} · il lui reste ${left(v)}`)).join('')}</section>` : ''}
-      ${waiting.some((v) => !(v.public && v.pace === 'fast')) ? `<section class="panel mp-sec"><h2 class="section-title">En attente</h2>${waiting.filter((v) => !(v.public && v.pace === 'fast')).map((v) => row(v, v.public ? 'Recherche d’un adversaire (jusqu’à 24 h)' : t('Défi envoyé à {name}', { name: esc(foeName(v)) }), `<button class="btn small ghost" data-mp="leave" data-id="${esc(v.id)}">Annuler</button>`)).join('')}</section>` : ''}
+      ${waiting.some((v) => !(v.public && v.pace === 'fast')) ? `<section class="panel mp-sec"><h2 class="section-title">En attente</h2>${waiting.filter((v) => !(v.public && v.pace === 'fast')).map((v) => row(v, v.public ? 'Recherche d’un adversaire (jusqu’à 24 h)' : t('Défi envoyé à {name}', { name: esc(foeName(v)) }), `<button class="btn small ghost" data-mp="leave" data-own="1" data-id="${esc(v.id)}">Annuler</button>`)).join('')}</section>` : ''}
       ${done.length ? `<details class="panel dc-fold mp-sec"><summary><span class="dc-sum-t">Parties terminées</span></summary>${done.map((v) => { const r = resOf(v); const sc = spec.score(v); return row(v, `<b class="vs-res ${r}">${MP_RES[r]}</b>${sc ? ` · ${sc}` : ''}${v.reason === 'timeout' ? ' · temps écoulé' : v.reason === 'resign' ? ' · abandon' : ''}`); }).join('')}</details>` : ''}
       ${spec.friendsOnly ? '<section class="panel mp-sec" id="mp-rec"><h2 class="section-title">Ton bilan contre tes amis</h2><div class="lb-body small muted">Chargement…</div></section>'
         : `<details class="panel dc-fold mp-sec" id="mp-rank"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/crown.webp"><span class="dc-sum-t">Classement du mois</span></summary><div class="lb-body small muted">Chargement…</div></details>
@@ -265,6 +265,15 @@ export function createMpLobby(app, root, spec) {
     if (k === 'join') { if (busy) return; busy = true; try { await spec.join(b.dataset.id); busy = false; return open(b.dataset.id); } catch (err2) { busy = false; toast(esc(errMsg(err2)), { kind: 'error' }); return lobby(); } }
     if (k === 'leave') {
       if (!(await confirmBox('Annuler cette partie ?', { ok: 'Oui', cancel: 'Non' }))) return;
+      /* v536 : « Annuler » sa propre partie n'abandonne jamais une partie qui vient de commencer (mp_cancel) ; « Refuser » un défi garde mp_leave */
+      if (b.dataset.own) {
+        try {
+          const r = await cloud.mpCancel(b.dataset.id);
+          if (r === 'none') { if (ui.searching === b.dataset.id) { ui.searching = null; ui.searchingV = null; } const m = await cloud.mpGet(b.dataset.id).catch(() => null); if (m?.status === 'playing') { toast('Un adversaire vient d’arriver : la partie commence !', { kind: 'success' }); return open(b.dataset.id); } }
+          if (ui.searching === b.dataset.id) { ui.searching = null; ui.searchingV = null; }
+        } catch (err2) { toast(esc(errMsg(err2)), { kind: 'error' }); }
+        return lobby();
+      }
       try { await cloud.mpLeave(b.dataset.id); } catch (err2) { toast(esc(errMsg(err2)), { kind: 'error' }); }
       return lobby();
     }
@@ -276,10 +285,15 @@ export function createMpLobby(app, root, spec) {
     spec.click?.(k, b, ctx);
   });
 
+  /* v536 : téléphone en arrière-plan pendant une recherche rapide : on l'annule (sinon partie trouvée sans toi, perdue au temps) */
+  const onVis = () => {
+    if (document.visibilityState === 'hidden' && alive && ui.searching) { cloud.mpCancel(ui.searching).catch(() => {}); ui.searching = null; ui.searchingV = null; }
+    else if (document.visibilityState === 'visible' && alive && !ui.open) lobby();
+  };
   return {
-    show() { alive = true; return ui.open ? open(ui.open) : lobby(); },
+    show() { alive = true; document.addEventListener('visibilitychange', onVis); return ui.open ? open(ui.open) : lobby(); },
     stop() {
-      alive = false; stopPoll();
+      alive = false; stopPoll(); document.removeEventListener('visibilitychange', onVis);
       /* v527 : une recherche rapide s'annule quand on quitte l'écran (sinon la partie démarrerait sans toi et serait perdue au temps) */
       if (ui.searching) { cloud.mpCancel(ui.searching).catch(() => {}); ui.searching = null; ui.searchingV = null; }
       spec.onStop?.();

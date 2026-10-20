@@ -143,12 +143,18 @@ export async function pullSave() {
   return rows && rows[0] ? rows[0] : null;
 }
 export async function pushSave(data) {
+  const iso = new Date().toISOString();
   await authed('/rest/v1/saves?on_conflict=user_id', {
     method: 'POST',
     headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
-    body: { user_id: currentUser().id, data, updated_at: new Date().toISOString() },
+    body: { user_id: currentUser().id, data, updated_at: iso },
   });
-  return Date.now();
+  return { at: Date.now(), iso }; /* v536 : la marque écrite sert à reconnaître une écriture venue d'un autre appareil */
+}
+// v536 : seulement la marque de la sauvegarde en ligne (léger, avant chaque envoi)
+export async function pullSaveStamp() {
+  const rows = await authed(`/rest/v1/saves?user_id=eq.${currentUser().id}&select=updated_at`);
+  return rows && rows[0] ? rows[0].updated_at : null;
 }
 
 // ——— Profil ————————————————————————————————————————————————————————

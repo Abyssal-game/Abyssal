@@ -151,7 +151,7 @@ document.addEventListener('click', (e) => {
   const [name, what, how, route, go] = WALLET[b.dataset.wallet];
   const n = b.dataset.wallet === 'shards' ? app.game.s.shards : app.game.s.ash;
   const sh = openSheet(`<div class="wal-sheet"><span class="wal-big">${icon(b.dataset.wallet === 'shards' ? 'crystal' : 'ash')}</span><h2>${name}</h2><p class="wal-n">${fmt(n)}</p><p>${what}</p><p class="small muted">${how}</p><a class="btn primary block" href="#/${route}">${go}</a></div>`, { label: name });
-  sh.body.querySelector('a').addEventListener('click', () => sh.close());
+  sh.body.querySelector('a').addEventListener('click', (ev) => { ev.preventDefault(); sh.close(); app.go(route); }); /* v536 : sh.close() annulait le lien (history.back) */
 });
 
 function renderChrome() {
@@ -405,7 +405,9 @@ initNative({ suspendAudio: () => audioCtxIfAny()?.suspend?.().catch(() => {}), r
 
 // Service worker et mises à jour (version web seulement : l'application des stores se met à jour par le store)
 if ('serviceWorker' in navigator && location.protocol !== 'file:' && !isNative()) {
-  window.addEventListener('load', () => {
+  /* v536 : en anglais, main.js arrive après l'événement load (dictionnaire chargé d'abord) : on enregistre tout de suite si la page est déjà chargée */
+  const hadCtrl = !!navigator.serviceWorker.controller; /* première visite : pas de rechargement quand le service worker prend la main */
+  const regSW = () => {
     navigator.serviceWorker.register('./sw.js').then((reg) => {
       const notify = (w) => {
         toast('Une nouvelle version d’ABYSSAL est prête. <b>Touche ici pour l’installer.</b>', { icon: 'refresh', ms: 15000, onClick: () => w.postMessage('skipWaiting') });
@@ -419,8 +421,9 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:' && !isNative()
       });
     }).catch(() => {});
     let reloaded = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => { if (!reloaded) { reloaded = true; location.reload(); } });
-  });
+    navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadCtrl && !reloaded) { reloaded = true; location.reload(); } });
+  };
+  if (document.readyState === 'complete') regSW(); else window.addEventListener('load', regSW);
 }
 
 window.addEventListener('popstate', handlePopstate);

@@ -121,7 +121,10 @@ export default function collection(app, root, params) {
       setTimeout(() => requestAnimationFrame(() => more(from + STEP)), 0);
     };
     requestAnimationFrame(() => more(FIRST));
-    root.querySelector('#col-empty').hidden = list.length > 0;
+    const empty = root.querySelector('#col-empty');
+    empty.hidden = list.length > 0;
+    /* v536 : nouveau joueur sans créature : on l'envoie ouvrir son premier booster (avant : « aucune carte ne correspond à ces filtres ») */
+    if (!list.length) empty.innerHTML = g.uniqueCount() ? 'Aucune carte ne correspond à ces filtres.' : 'Tu n’as encore aucune créature.<br><a class="btn primary dc-plq dc-plq-red" href="#/boutique" style="margin-top:12px">Ouvrir mon premier booster</a>';
     const owned = g.uniqueCount();
     root.querySelector('#col-summary').textContent = `${owned} créatures découvertes sur ${total} (${pct(owned / total)}) · ${g.newCount()} nouvelle${g.newCount() > 1 ? 's' : ''}`;
     root.querySelector('#col-prog').style.width = `${(owned / total) * 100}%`;

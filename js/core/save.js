@@ -102,6 +102,8 @@ export function migrate(raw) {
     s = m(s);
   }
   const hadGift = typeof s.welcomeGift === 'number';
+  /* v536 : une entrée de collection abîmée (null, sans compte) faisait planter les compteurs */
+  if (s.collection && typeof s.collection === 'object') for (const [id, c] of Object.entries(s.collection)) if (!c || typeof c !== 'object') delete s.collection[id];
   // Complète les champs ajoutés depuis (valeurs par défaut), sans écraser l'existant.
   const d = defaultSave(s.createdAt || Date.now());
   for (const k of Object.keys(d)) if (s[k] === undefined) s[k] = d[k];

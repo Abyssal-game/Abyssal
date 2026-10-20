@@ -19,18 +19,29 @@ function profilePayload() {
 
 // Date (côté serveur) de la dernière sauvegarde en ligne connue de cet appareil.
 const SYNCED_KEY = 'abyssal.syncedAt', PAUSED_KEY = 'abyssal.syncPaused';
+/* v536 : marque exacte (updated_at) de la dernière sauvegarde en ligne écrite ou lue par cet appareil : si elle a changé, un autre appareil a écrit */
+const STAMP_KEY = 'abyssal.syncedStamp';
+const ms = (x) => new Date(x).getTime() || 0;
 const lsGet = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
 const lsSet = (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) { /* rien */ } };
 let choosing = false; // tant qu'on compare les deux parties, rien ne part en ligne
 
-export async function pushNow() {
+export async function pushNow(force = false) {
   if (!cloud.isLoggedIn() || !app) return;
   if (choosing || sync.status === 'paused') return;
   if (busy) { pending = true; return; }
   busy = true; sync.status = 'saving'; emit();
+  /* v536 : un autre appareil a écrit depuis notre dernière synchronisation : on compare d'abord (avant, l'ancienne partie écrasait la nouvelle) */
+  if (!force) {
+    const stamp = lsGet(STAMP_KEY);
+    let other = false;
+    if (stamp) { try { const r = await cloud.pullSaveStamp(); other = !!r && ms(r) !== ms(stamp); } catch (e) { /* réseau : on tente l'envoi comme avant */ } }
+    if (other) { busy = false; pending = false; reconcile({ intro: 'Ta partie a avancé sur un autre appareil.', auto: true }).catch(() => {}); return; }
+  }
   try {
-    sync.lastPush = await cloud.pushSave(app.game.s);
-    lsSet(SYNCED_KEY, String(sync.lastPush));
+    const w = await cloud.pushSave(app.game.s);
+    sync.lastPush = w.at;
+    lsSet(SYNCED_KEY, String(sync.lastPush)); lsSet(STAMP_KEY, w.iso);
     if (sync.profile?.pseudo) await cloud.updateProfile(profilePayload()); /* v500 : le pseudo (définitif) ne repart plus à chaque sauvegarde */
     if (sync.profile?.pseudo) await publishCard();
     sync.status = 'ok'; sync.error = null;
@@ -57,6 +68,7 @@ function adopt(remote) {
   app.refresh();
   sync.lastPush = Date.now();
   lsSet(SYNCED_KEY, String(Math.max(Date.now(), new Date(remote.updated_at).getTime() || 0)));
+  lsSet(STAMP_KEY, remote.updated_at);
 }
 const fresh = (s) => !s.resetAt && !s.stats.boosters && !Object.keys(s.collection).length; /* v412 : une partie effacée exprès n'est pas « neuve » */
 const describe = (s, when) => `${Object.keys(s.collection || {}).length} créatures · ${s.stats?.boosters || 0} boosters ouverts${when ? ` · ${new Date(when).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}` : ''}`;
@@ -77,11 +89,12 @@ async function reconcile({ intro, auto }) {
   try {
     const remote = await cloud.pullSave();
     const local = app.game.s;
-    if (!remote) { choosing = false; lsSet(PAUSED_KEY, null); sync.status = 'ok'; await pushNow(); return 'pushed'; }
+    if (!remote) { choosing = false; lsSet(PAUSED_KEY, null); sync.status = 'ok'; await pushNow(true); return 'pushed'; }
     const synced = Number(lsGet(SYNCED_KEY) || 0);
     const remoteT = new Date(remote.updated_at).getTime() || 0;
     const localChanged = (local.updatedAt || 0) > synced + 2000;
-    const remoteChanged = remoteT > synced + 2000;
+    const stamp = lsGet(STAMP_KEY);
+    const remoteChanged = stamp ? ms(remote.updated_at) !== ms(stamp) : remoteT > synced + 2000; /* v536 : sans dépendre des horloges des appareils */
     let choice;
     if (fresh(local)) choice = 'remote';
     else if (auto && !remoteChanged) choice = 'local';            // rien de neuf en ligne
@@ -89,7 +102,7 @@ async function reconcile({ intro, auto }) {
     else choice = await askChoice(remote, local, intro);
     choosing = false;
     if (choice === 'remote') { adopt(remote); lsSet(PAUSED_KEY, null); sync.status = 'ok'; emit(); return 'pulled'; }
-    if (choice === 'local') { lsSet(PAUSED_KEY, null); sync.status = 'ok'; await pushNow(); return 'pushed'; }
+    if (choice === 'local') { lsSet(PAUSED_KEY, null); sync.status = 'ok'; await pushNow(true); return 'pushed'; }
     lsSet(PAUSED_KEY, '1'); sync.status = 'paused'; emit();
     return 'cancelled';
   } catch (e) {
@@ -103,7 +116,7 @@ export function afterLogin() {
   /* v527 : promesse gardée : la porte du compte attend la fin du choix de partie avant le guide et le cadeau */
   sync.pending = (async () => {
     try { sync.profile = await cloud.getProfile(); } catch (e) { sync.profile = null; }
-    lsSet(SYNCED_KEY, null);
+    lsSet(SYNCED_KEY, null); lsSet(STAMP_KEY, null);
     return reconcile({ intro: 'Ce compte a déjà une partie en ligne.', auto: false });
   })();
   return sync.pending;
@@ -113,7 +126,7 @@ export function afterLogin() {
 export async function eraseOnline() {
   if (!cloud.isLoggedIn()) return false;
   lsSet(PAUSED_KEY, null); choosing = false; sync.status = 'ok';
-  await pushNow();
+  await pushNow(true);
   return sync.status === 'ok';
 }
 export function resumeSync() { return reconcile({ intro: 'La synchronisation était en pause.', auto: false }); }
@@ -149,6 +162,7 @@ export async function refreshProfile(force = true) {
   return sync.profile;
 }
 
+let lastBack = 0;
 export function startSync(theApp) {
   app = theApp;
   app.game.on('change', () => { if (cloud.isLoggedIn() && sync.status !== 'paused') schedule(); });
@@ -160,7 +174,12 @@ export function startSync(theApp) {
     cloud.submitScore(out.day || today(), out.score, false).catch(() => {});
   });
 
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && cloud.isLoggedIn()) { clearTimeout(timer); pushNow(); } });
+  document.addEventListener('visibilitychange', () => {
+    if (!cloud.isLoggedIn()) return;
+    if (document.visibilityState === 'hidden') { clearTimeout(timer); pushNow(); return; }
+    /* v536 : de retour dans l'app, on regarde si la partie a avancé sur un autre appareil (avant : seulement au lancement) */
+    if (!choosing && sync.status !== 'paused' && Date.now() - lastBack > 10000) { lastBack = Date.now(); reconcile({ intro: 'Ta partie a avancé sur un autre appareil.', auto: true }).catch(() => {}); }
+  });
   if (cloud.isLoggedIn()) {
     cloud.getProfile().then((p) => { sync.profile = p; emit(); }).catch(() => {});
     if (lsGet(PAUSED_KEY)) { sync.status = 'paused'; emit(); }

@@ -168,7 +168,9 @@ export class Game {
   // (un jour sans jouer n'est plus perdu). s.freePack.day : le jour de la dernière ouverture ; left : ce qui restait.
   freePack(now = this.clock().getTime()) {
     const d = new Date(now), fp = this.s.freePack, day = today(d);
-    const stock = !fp.day ? FREE_PACK.perDay : fp.day === day ? (fp.left || 0) : Math.min(FREE_PACK.max, (fp.left || 0) + dayGap(fp.day, day) * FREE_PACK.perDay);
+    /* v536 : sans ouverture encore, la réserve se remplit depuis la création de la partie (avant : bloquée à 1) */
+    const start = this.s.createdAt ? today(new Date(this.s.createdAt)) : day;
+    const stock = !fp.day ? Math.min(FREE_PACK.max, FREE_PACK.perDay * (1 + Math.max(0, dayGap(start, day)))) : fp.day === day ? (fp.left || 0) : Math.min(FREE_PACK.max, (fp.left || 0) + dayGap(fp.day, day) * FREE_PACK.perDay);
     const midnight = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1).getTime();
     return { stock, nextAt: stock ? null : midnight };
   }
@@ -717,7 +719,13 @@ export class Game {
   nightmareUnlocked() { return (this.descent().best || 0) >= NIGHTMARE_AT; }
   // v367 : record par palier de Cauchemar (l'ancien record unique compte pour le palier I)
   nightBest(t) { const d = this.descent(); return Math.max(d.nightBest?.[t] || 0, t === 1 ? d.bestNightmare || 0 : 0); }
-  nightTierOpen(t) { return t <= 1 ? this.nightmareUnlocked() : this.nightmareUnlocked() && this.nightBest(t - 1) >= NIGHT_TIER_OPEN; }
+  /* v536 : étages gagnés en Cauchemar, par palier (avant : un seul record par palier, qui privait de récompense les chapitres plus anciens) */
+  nightFloors(t) { const d = this.descent(); return (d.nightFloors ||= {})[t] ||= []; }
+  nightTierOpen(t) {
+    if (t <= 1) return this.nightmareUnlocked();
+    const f = this.descent().nightFloors?.[t - 1];
+    return this.nightmareUnlocked() && (f && f.length ? f.length >= NIGHT_TIER_OPEN : this.nightBest(t - 1) >= NIGHT_TIER_OPEN);
+  }
   nightTiersOpen() { return [1, 2, 3].filter((t) => this.nightTierOpen(t)); }
   // v406 : premiers étages des chapitres ouverts (chaque gardien vaincu ouvre le chapitre suivant)
   startFloors() {
@@ -732,7 +740,7 @@ export class Game {
   gritMult(ch) { return 1 - GRIT.step * this.grit(ch); }
   campaignDone() { return (this.descent().best || 0) >= FINAL_FLOOR; }
   // Première victoire à cet étage (campagne : record ; Cauchemar : record du palier)
-  firstClear(run, floor = run.floor) { return floor > (run.nightmare ? this.nightBest(run.nightTier || 1) : this.descent().best || 0); }
+  firstClear(run, floor = run.floor) { return run.nightmare ? !this.nightFloors(run.nightTier || 1).includes(floor) : floor > (this.descent().best || 0); }
   floorReward(run, floor = run.floor) {
     const r = floorFirstReward(floor), nt = nightTier(run);
     if (!nt) return r;
@@ -794,7 +802,7 @@ export class Game {
   trials() {
     const day = today(this.clock());
     let t = this.s.trials;
-    if (!t || t.day !== day) t = this.s.trials = { day, done: [null, null, null], score: 0, cur: null, battle: null };
+    if (!t || (t.day !== day && !t.battle)) t = this.s.trials = { day, done: [null, null, null], score: 0, cur: null, battle: null }; /* v536 : une Épreuve commencée avant minuit se termine */
     return t;
   }
   trialPower() {
@@ -932,6 +940,7 @@ export class Game {
       if (awake) { if (!sc.beaten[rival]) throw new Error('Bats-le d’abord une fois.'); R = SC.awakened(R); }
     }
     sc.cur = SC.newGame(this.catalog, { hand: this.sceauxHand(), rival: R, seed, daily });
+    if (daily) sc.cur.dailyDay = today(this.clock()); /* v536 : un défi commencé avant minuit compte pour son jour */
     sc.cur.ruleKey = R.rule; sc.cur.rule = R.rule;
     this.persist();
     return sc.cur;
@@ -967,7 +976,7 @@ export class Game {
       out.chests = [];
       if (st.awake) { if (!sc.awake[R.key]) { sc.awake[R.key] = Date.now(); out.first = true; out.shards += SC.SCEAUX_REWARD.firstAwake; out.chests.push(SC.sceauxChest(R.key, true)); } }
       else if (!sc.beaten[R.key]) { sc.beaten[R.key] = Date.now(); out.first = true; out.shards += SC.SCEAUX_REWARD.firstWin; out.chests.push(SC.sceauxChest(R.key)); }
-      if (st.daily && sc.dailyDone !== day) { sc.dailyDone = day; out.shards += SC.SCEAUX_REWARD.daily; out.chests.push('bois'); }
+      if (st.daily && sc.dailyDone !== (st.dailyDay || day)) { sc.dailyDone = st.dailyDay || day; out.shards += SC.SCEAUX_REWARD.daily; out.chests.push('bois'); }
       out.chests = out.chests.filter(Boolean); out.chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; }); /* v408 */
       if (sc.paidToday < SC.SCEAUX_REWARD.dailyPaid) { sc.paidToday++; out.shards += R.reward; } else { out.capped = true; out.shards += SC.SCEAUX_REWARD.afterCap; } // v348 : un petit gain reste au-delà du plafond
       const t = st.awake ? (Object.keys(sc.awake).length >= SC.RIVALS.length ? 'Vainqueur des Implacables' : null) : SC.SCEAUX_TITLES[R.key] || (sc.wins === 1 ? SC.SCEAUX_TITLES.initie : null);
@@ -975,7 +984,7 @@ export class Game {
       if (R.key === 'echo' && !this.s.frames.includes('sceaux')) { this.s.frames.push('sceaux'); out.frame = 'sceaux'; }
       // Trophée : une carte adverse capturée, une fois par jour
       if (sc.trophyDay !== day) { const ch = SC.trophyChoices(this.catalog, st); if (ch.length) { st.trophy = ch; out.trophy = ch; } }
-    } else if (st.over === 'lost') { sc.losses++; sc.streak = 0; } else { sc.draws++; if (st.daily && sc.dailyDone !== day) { sc.dailyDone = day; out.shards += 10; } }
+    } else if (st.over === 'lost') { sc.losses++; sc.streak = 0; } else { sc.draws++; if (st.daily && sc.dailyDone !== (st.dailyDay || day)) { sc.dailyDone = st.dailyDay || day; out.shards += 10; } }
     this.s.shards += out.shards;
     out.xp = SC.SCEAUX_REWARD.xp; this.s.xp += out.xp; // v348 : chaque partie terminée donne un peu d'expérience
     sc.history.unshift({ t: Date.now(), rival: R.key, r: st.over, s: st.final });
@@ -992,6 +1001,7 @@ export class Game {
     if (!st?.trophy?.includes(id) || sc.trophyDay === day) throw new Error('Butin indisponible.');
     sc.trophyDay = day; st.trophy = null;
     const r = this.addCard(id, 'normal', 'reward');
+    this.checkProgress(); /* v536 : un ensemble ou un succès complété par le butin compte tout de suite */
     this.persist();
     return r;
   }
@@ -1014,6 +1024,7 @@ export class Game {
       if (!EN.tableUnlocked(this.s, i)) throw new Error('Gagne d’abord à la table précédente.');
     }
     en.cur = EN.newGame(this.catalog, { table, seed, daily });
+    if (daily) en.cur.dailyDay = today(this.clock()); /* v536 : un défi commencé avant minuit compte pour son jour */
     this.persist();
     return en.cur;
   }
@@ -1036,7 +1047,7 @@ export class Game {
     if (st.over === 'won') { this.codexXp(CODEX_XP.game, 'game');
       en.wins++; en.streak++; en.best = Math.max(en.best, en.streak);
       if (!en.beaten[T.key]) { en.beaten[T.key] = Date.now(); out.first = true; out.shards += R.firstWin; out.chests.push(T.chest); }
-      if (st.daily && en.dailyDone !== day) { en.dailyDone = day; out.shards += R.daily; out.chests.push('bois'); }
+      if (st.daily && en.dailyDone !== (st.dailyDay || day)) { en.dailyDone = st.dailyDay || day; out.shards += R.daily; out.chests.push('bois'); }
       if (en.paidToday < R.dailyPaid) { en.paidToday++; out.shards += T.reward; } else { out.capped = true; out.shards += R.afterCap; }
       out.chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });
       /* v492 : le titre d'origine reste attaché à la 4e salle ; la 8e et les hauts faits ont le leur */
@@ -1084,6 +1095,7 @@ export class Game {
       if (!PA.tableUnlocked(this.s, i)) throw new Error('Gagne d’abord le pacte précédent.');
     }
     pa.cur = PA.newGame(this.catalog, { table, seed, daily });
+    if (daily) pa.cur.dailyDay = today(this.clock()); /* v536 : un défi commencé avant minuit compte pour son jour */
     this.persist();
     return pa.cur;
   }
@@ -1101,7 +1113,7 @@ export class Game {
     if (st.over === 'won') { this.codexXp(CODEX_XP.game, 'game');
       pa.wins++; pa.streak++; pa.best = Math.max(pa.best, pa.streak);
       if (!pa.beaten[T.key]) { pa.beaten[T.key] = Date.now(); out.first = true; out.shards += R.firstWin; out.chests.push(T.chest); }
-      if (st.daily && pa.dailyDone !== day) { pa.dailyDone = day; out.shards += R.daily; out.chests.push('bois'); }
+      if (st.daily && pa.dailyDone !== (st.dailyDay || day)) { pa.dailyDone = st.dailyDay || day; out.shards += R.daily; out.chests.push('bois'); }
       if (pa.paidToday < R.dailyPaid) { pa.paidToday++; out.shards += T.reward; } else { out.capped = true; out.shards += R.afterCap; }
       out.chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });
       /* v492 : le titre d'origine reste attaché à la 4e salle ; la 8e et les hauts faits ont le leur */
@@ -1142,6 +1154,7 @@ export class Game {
       if (!CR.tableUnlocked(this.s, i)) throw new Error('Gagne d’abord dans la crypte précédente.');
     }
     cr.cur = CR.newGame(this.catalog, { table, seed, daily });
+    if (daily) cr.cur.dailyDay = today(this.clock()); /* v536 : un défi commencé avant minuit compte pour son jour */
     this.persist();
     return cr.cur;
   }
@@ -1160,7 +1173,7 @@ export class Game {
     if (st.over === 'won') { this.codexXp(CODEX_XP.game, 'game');
       cr.wins++; cr.streak++; cr.best = Math.max(cr.best, cr.streak);
       if (!cr.beaten[T.key]) { cr.beaten[T.key] = Date.now(); out.first = true; out.shards += R.firstWin; out.chests.push(T.chest); }
-      if (st.daily && cr.dailyDone !== day) { cr.dailyDone = day; out.shards += R.daily; out.chests.push('bois'); }
+      if (st.daily && cr.dailyDone !== (st.dailyDay || day)) { cr.dailyDone = st.dailyDay || day; out.shards += R.daily; out.chests.push('bois'); }
       if (cr.paidToday < R.dailyPaid) { cr.paidToday++; out.shards += T.reward; } else { out.capped = true; out.shards += R.afterCap; }
       out.chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });
       /* v492 : le titre d'origine reste attaché à la 4e salle ; la 8e et les hauts faits ont le leur */
@@ -1420,7 +1433,7 @@ export class Game {
     const run = this.s.descent.run;
     run.cleared = run.floor;
     /* v406 : en Cauchemar, le record du palier avance étage par étage (il décide des premières victoires) */
-    if (run.nightmare) { const d = this.s.descent, t = run.nightTier || 1; if (run.floor > this.nightBest(t)) (d.nightBest ||= {})[t] = run.floor; if (t === 1 && run.floor > (d.bestNightmare || 0)) d.bestNightmare = run.floor; }
+    if (run.nightmare) { const d = this.s.descent, t = run.nightTier || 1; const nf = this.nightFloors(t); if (!nf.includes(run.floor)) nf.push(run.floor); if (run.floor > this.nightBest(t)) (d.nightBest ||= {})[t] = run.floor; if (t === 1 && run.floor > (d.bestNightmare || 0)) d.bestNightmare = run.floor; }
     this.recordDepth(run.floor);
   }
   // Fin du combat : PV, chutes, Bestiaire de chasse, éclats et coffres, ou défaite.
@@ -1968,7 +1981,7 @@ export class Game {
   // v420 : revivre la campagne depuis le début (Mode Créateur) : record, gardiens et Cauchemar à zéro, collection gardée
   devResetCampaign() {
     const d = this.descent();
-    d.run = null; d.best = 0; d.bestToday = 0; d.bestNightmare = 0; d.nightBest = {}; d.last = null; d.risk = {};
+    d.run = null; d.best = 0; d.bestToday = 0; d.bestNightmare = 0; d.nightBest = {}; d.nightFloors = {}; d.last = null; d.risk = {};
     this.s.bossesBeaten = {}; this.s.bossWins = {}; this.s.storySeen = {};
     this.persist();
   }

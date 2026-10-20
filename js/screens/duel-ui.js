@@ -1275,6 +1275,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     toast(`<b>${esc(ult.name)}</b> : ${parts.join(' · ') || 'aucun effet'}`, { icon: 'sparkle', kind: 'success' });
     busy = false; draw();
     if (st.over) finish();
+    else if (st.turn === 'enemy') await foesPlay(); /* v536 : le pouvoir peut faire passer la main aux ennemis (créature qui agissait tombée) */
   }
 
   // ——— Fiches ———

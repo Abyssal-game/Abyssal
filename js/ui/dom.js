@@ -8,7 +8,7 @@ export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&a
 export const $ = (sel, root = document) => root.querySelector(sel);
 export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 export const fmt = (n) => new Intl.NumberFormat('fr-FR').format(Math.round(n));
-export const pct = (x, d = 0) => `${(x * 100).toFixed(d).replace('.', ',')} %`;
+export const pct = (x, d = 0) => `${(x * 100).toFixed(d).replace('.', ',')}\u00a0%`; /* v536 : espace insécable (« (0 » / « %) » sur deux lignes) */
 
 export function reducedMotion(settings) {
   if (settings?.motion === 'reduced') return true;
@@ -56,6 +56,8 @@ let popPending = 0;
 let afterPop = [];
 export function handlePopstate() {
   if (popPending > 0) { popPending--; if (!popPending) flushAfterPop(); return; }
+  /* v536 : entrée d'une feuille fermée par un changement de page : on la saute (sinon le retour suivant ne faisait rien) */
+  if (!stack.length) { if (history.state?.sheet) history.back(); return; }
   closeTopSheet(true);
 }
 function flushAfterPop() { const q = afterPop; afterPop = []; q.forEach((fn) => fn()); }

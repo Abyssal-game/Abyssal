@@ -421,6 +421,8 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
     u.down = true;
     ev.push({ t: 'die', u: u.uid });
     if (u.boss) release(st, ev);
+    /* v536 : le Verdict du Juge et la Loi de l'Architecte tombent avec le dernier gardien */
+    if (u.boss && (st.forbid || st.law) && !Object.values(st.units).some((x) => x.boss && x.hp > 0 && x !== u)) { st.forbid = null; st.law = null; ev.push({ t: 'law', forbid: null }); }
     if (u.side === 'enemy') st.kills.push(u.id);
     // Coup de grâce : achever un ennemi donne 1 Ferveur
     if (u.side === 'enemy' && a && a.side === 'ally') { (st.finishedBy ||= {})[a.id] = (st.finishedBy[a.id] || 0) + 1; if (u.boss) (st.bossBy ||= {})[a.id] = 1; }
@@ -944,7 +946,7 @@ function doSwap(st, out, inn, ev) {
   st.freeSwap = false;
   st.swapped = true;
   // les intentions qui visaient la créature sortie frappent celle qui entre (elle prend sa place)
-  const aimed = front(st, 'enemy').filter((e) => e.intent?.t === out.uid);
+  const aimed = front(st, 'enemy').filter((e) => e.intent?.t === out.uid && e.intent.kind !== 'execute'); /* v536 : la hache vise la condamnée, pas sa remplaçante */
   aimed.forEach((e) => { e.intent = { ...e.intent, t: inn.uid }; });
   ev.push({ t: 'swap', u: inn.uid, out: out.uid });
   entrance(st, inn, aimed, ev);
@@ -1236,6 +1238,7 @@ export function takeSkips(st) { const e = st.skipEv || []; st.skipEv = []; retur
 // La cible annoncée tient-elle encore ? Sinon l'ennemi en choisit une autre selon sa famille.
 function refreshIntent(st, e) {
   const it = e.intent;
+  if (it.kind === 'execute') return it; /* v536 : la condamnée mise en réserve fait frapper la hache dans le vide */
   if (SINGLE.includes(it.kind) || (it.kind === 'copy' && it.t)) {
     const ts = targetsFor(st, 'enemy', e);
     if (!ts.includes(it.t)) it.t = pickTarget(st, e);
@@ -1341,7 +1344,7 @@ export function enemyAct(st, aUid, defense = 'none') {
   // ——— v383 : nouveaux gardiens ———
   else if (kind === 'brood') { e.charged = 'swarm'; logBoss(st, 'Essaim'); ev.push({ t: 'status', u: aUid, s: 'La ruche s’éveille…', k: 'charge' }); }
   else if (kind === 'chant') { e.charged = 'lament'; logBoss(st, 'Complainte'); ev.push({ t: 'status', u: aUid, s: 'Le chant monte…', k: 'charge' }); }
-  else if (kind === 'wind') { e.charged = 'rewind'; e.mark = e.hp; logBoss(st, 'Remonter le temps'); ev.push({ t: 'status', u: aUid, s: `Remonte le temps (${e.hp} PV)`, k: 'charge' }); }
+  else if (kind === 'wind') { e.charged = 'rewind'; e.windHp = e.hp; /* v536 : champ propre (avant : e.mark, qui marquait le gardien) */ logBoss(st, 'Remonter le temps'); ev.push({ t: 'status', u: aUid, s: `Remonte le temps (${e.hp} PV)`, k: 'charge' }); }
   else if (kind === 'sentence') {
     const t = st.units[it.t];
     e.charged = 'execute'; e.execT = t?.uid || null; logBoss(st, 'Sentence');
@@ -1377,8 +1380,8 @@ export function enemyAct(st, aUid, defense = 'none') {
     if (t && t.hp > 0) { t.frozen = 1; ev.push({ t: 'status', u: t.uid, s: 'Enchaînée', k: 'frost' }); }
   } else if (kind === 'rewind') {
     e.charged = null;
-    const back = Math.min(Math.max(0, (e.mark || 0) - e.hp), Math.round(e.maxHp * 0.25));
-    e.mark = null;
+    const back = Math.min(Math.max(0, (e.windHp || 0) - e.hp), Math.round(e.maxHp * 0.25));
+    e.windHp = null;
     if (back > 0) { heal(e, back, ev); ev.push({ t: 'boss', u: aUid, s: `Retour en arrière : +${back} PV` }); } else ev.push({ t: 'boss', u: aUid, s: 'Le temps n’a rien à lui rendre' });
   } else if (kind === 'mirror') { e.mirror = true; logBoss(st, 'Miroir'); ev.push({ t: 'status', u: aUid, s: 'Miroir dressé', k: 'guard' }); }
   else if (kind === 'ambush') { e.veiled = false; ev.push({ t: 'boss', u: aUid, s: 'Embuscade !' }); strike(st.units[it.t], e.phase2 ? 2.64 : 2.2); }
@@ -1690,8 +1693,8 @@ export function intentInfo(st, e) {
   if (m && eff) dmg = capd(eff, dmgOf(st, e, eff, m * pw * (eff !== t ? 0.6 : 1)));
   if (it.kind === 'blast') dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, (e.boss ? 1 : 0.8) * pw))));
   if (it.kind === 'blizzard') dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, 0.9 * pw))));
-  if (it.kind === 'quake') dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, 0.8 * (1 + Math.min(1, (e.sleepDmg || 0) / e.maxHp) * 1.5)))));
-  if (AOE_M[it.kind]) dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, AOE_M[it.kind]))));
+  if (it.kind === 'quake') dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, 0.8 * pw * (1 + Math.min(1, (e.sleepDmg || 0) / e.maxHp) * 1.5)))));
+  if (AOE_M[it.kind]) dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, AOE_M[it.kind] * pw * (it.kind === 'price' && e.phase2 ? 1.25 : 1)))));
   if (it.kind === 'copy' && it.copy === 'raz') dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, 0.7))));
   const single = SINGLE.includes(it.kind) || !!(it.kind === 'copy' && it.t);
   const lethal = !!eff && single && dmg >= eff.hp;

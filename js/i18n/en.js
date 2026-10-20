@@ -6249,6 +6249,14 @@ export default {
   "Tu as {e0}": "You have {e0}",
   "Acheter · {e0}": "Buy · {e0}",
   "<b>Ton nom</b>{e0}": "<b>Your name</b>{e0}",
+  // v536
+  "Un adversaire vient d’arriver : la partie commence !": "An opponent just arrived: the game begins!",
+  "Tu n’as encore aucune créature.<br>{e0}": "You don’t have any creatures yet.<br>{e0}",
+  "Ouvrir mon premier booster": "Open my first booster",
+  "Tu n’as encore aucune créature.": "You don’t have any creatures yet.",
+  "Conflits": "Conflicts",
+  "{e0} Connecte-toi d’abord.": "{e0} Log in first.",
+  "{e0}Connecte-toi d’abord.": "{e0}Log in first.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

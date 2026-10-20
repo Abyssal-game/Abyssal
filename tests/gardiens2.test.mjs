@@ -30,15 +30,16 @@ test('Reine des Essaims : l’Essaim frappe toute l’équipe et l’empoisonne'
 });
 
 test('Bourreau : la Sentence condamne, l’exécution frappe dans le vide si la condamnée est en réserve', () => {
-  const st = duel('bourreau');
-  const t = units(st, 'ally')[2];
+  /* v536 : vraie réserve (4 créatures) ; la remplaçante n'est pas frappée à la place de la condamnée */
+  const st = D.createDuel([...team(), A('INF-002', { level: 5 })], [E('NEC-010', { boss: true, scale: 1.2 })], { seed: 7, boss: 'bourreau' });
+  const t = units(st, 'ally')[2], sub = units(st, 'ally')[3];
   const b = play(st, { kind: 'sentence', t: t.uid });
   assert.ok(t.condemned); assert.equal(b.charged, 'execute');
-  const hp = t.hp;
-  t.inPlay = false; // permutée en réserve
-  st.order.ally = st.order.ally.filter((id) => id !== t.uid).concat(t.uid);
+  const hp = t.hp, subHp = sub.hp;
+  const o = st.order.ally; [o[2], o[3]] = [o[3], o[2]]; t.inPlay = false; sub.inPlay = true; // permutée en réserve
   play(st, { kind: 'execute', t: t.uid });
   assert.equal(t.hp, hp);
+  assert.equal(sub.hp, subHp);
   assert.ok(!t.condemned);
 });
 
@@ -63,7 +64,7 @@ test('Seigneur des Chaînes : la créature la plus forte est enchaînée', () =>
 test('Horloger : le retour en arrière rend les PV perdus depuis l’annonce (un quart au plus)', () => {
   const st = duel('horloge');
   const b = boss(st);
-  b.hp = b.maxHp; b.mark = b.maxHp; b.charged = 'rewind';
+  b.hp = b.maxHp; b.windHp = b.maxHp; b.charged = 'rewind';
   b.hp = Math.round(b.maxHp * 0.6);
   play(st, { kind: 'rewind' });
   assert.ok(b.hp >= Math.round(b.maxHp * 0.6) + Math.round(b.maxHp * 0.25) - 1 && b.hp <= b.maxHp);
@@ -178,4 +179,24 @@ test('L’Abysse : trois phases selon ses PV', () => {
   D.endTurn(st); assert.equal(b.ph, 2);
   b.hp = Math.round(b.maxHp * 0.3); b.intent = { kind: 'hit', t: units(st, 'ally')[0].uid };
   D.endTurn(st); assert.equal(b.ph, 3); assert.ok(b.night);
+});
+
+// v536 : corrections de l'audit
+test('Horloger : remonter le temps ne marque pas le gardien', () => {
+  const st = duel('horloge');
+  const b = play(st, { kind: 'wind' });
+  assert.equal(b.charged, 'rewind');
+  assert.ok(!b.mark);
+  assert.equal(b.windHp, b.hp);
+});
+
+test('Juge : le Verdict tombe avec le gardien', () => {
+  const st = duel('juge');
+  play(st, { kind: 'verdict', forbid: 'attack' });
+  assert.equal(st.forbid, 'attack');
+  const b = boss(st), a = units(st, 'ally')[0];
+  b.hp = 1; b.intent = null; st.forbid = 'skill';
+  D.act(st, a.uid, 'attack', b.uid);
+  assert.ok(b.hp <= 0);
+  assert.equal(st.forbid, null);
 });

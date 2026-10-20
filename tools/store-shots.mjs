@@ -34,7 +34,7 @@ async function open(mode = '') {
   p = await ctx.newPage();
   p.on('pageerror', (e) => errs.push(e.message));
   await p.goto(URL0 + 'robots.txt');
-  await p.evaluate(([k, v]) => { localStorage.clear(); localStorage.setItem(k, v); localStorage.setItem('abyssal.nogate', '1'); }, [SAVE_KEY, saveFor(mode)]);
+  await p.evaluate(([k, v, l]) => { localStorage.clear(); localStorage.setItem(k, v); localStorage.setItem('abyssal.nogate', '1'); localStorage.setItem('abyssal.lang', l); }, [SAVE_KEY, saveFor(mode), process.env.LANG_SHOTS || 'fr']);  /* v536 : langue forcée (sinon celle du navigateur) */
   await p.goto(URL0); await p.waitForTimeout(3000);
   await p.mouse.click(220, 478); await p.waitForTimeout(2500);
 }
