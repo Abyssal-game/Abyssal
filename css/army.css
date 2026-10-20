@@ -4623,7 +4623,7 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .pa-seal.on .sigil { opacity: 1; filter: drop-shadow(0 0 4px var(--fc)) brightness(1.15); }
 
 /* v512 : Versus Booster (js/screens/versus.js) */
-.bn-versus { --bn: url(../assets/ui/bn-premium.webp); }
+.bn-versus { --bn: url(../assets/ui/bn-premium.webp); } /* remplacé en v514 */
 .gm-versus .gm-art { background-position: right center; }
 .vs-sec { margin: 0 0 12px; }
 .vs-hot { border-color: rgba(242, 193, 78, .8); box-shadow: 0 0 18px rgba(242, 193, 78, .25); }
@@ -4701,3 +4701,5 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
   .vs-mid span { font-size: 1.2rem; }
 }
 .vs-row .fr-t small { white-space: normal; overflow: visible; text-overflow: clip; }
+/* v514 : bannière Gemini du Versus Booster (symboles des sachets remplacés par l'œil du jeu) */
+.bn-versus { --bn: url(../assets/ui/bn-versus.webp); }
