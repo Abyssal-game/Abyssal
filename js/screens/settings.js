@@ -34,7 +34,7 @@ export default function settings(app, root) {
   function tabJeu(s) {
     return `<section class="panel stack">
         <h2>Langue</h2>
-        <div class="seg" role="radiogroup" aria-label="Langue" translate="no">${Object.entries(LANGS).map(([k, l]) => `<button class="seg-b" role="radio" data-act="lang" data-v="${k}" aria-checked="${LANG === k}" aria-pressed="${LANG === k}">${l}</button>`).join('')}</div>
+        <div class="seg lang-grid" role="radiogroup" aria-label="Langue" translate="no">${Object.entries(LANGS).map(([k, l]) => `<button class="seg-b" role="radio" data-act="lang" data-v="${k}" aria-checked="${LANG === k}" aria-pressed="${LANG === k}">${l}</button>`).join('')}</div>
       </section>
       <section class="panel stack">
         <h2>Son et animations</h2>
