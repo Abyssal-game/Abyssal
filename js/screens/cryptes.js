@@ -7,6 +7,8 @@ import { esc, fmt, toast, confirmBox, openSheet } from '../ui/dom.js';
 import { setScene } from '../ui/scene.js';
 import { tuto } from '../ui/tutos.js';
 import { CHESTS } from '../core/descent.js';
+import { MP_HOURS, MP_FAST_SECS, MP_REWARD } from '../core/mp.js';
+import { createCryptesMp } from './cryptes-mp.js';
 
 const CHEST_NAME = Object.fromEntries(Object.entries(CHESTS).map(([k, c]) => [k, c.name]));
 const stars = (n) => `${'★'.repeat(n)}${'☆'.repeat(Math.max(0, 5 - n))}`;
@@ -16,15 +18,16 @@ const HOW = [['cards', '#7FA8D8', 'Les cryptes', '20 cartes face cachée, en 10 
   ['danger', '#E0485E', 'Pas de paire', 'Les deux cartes se referment et la main passe. Retiens bien où elles sont !'],
   ['crown', '#F2C14E', 'La victoire', 'Quand tout est pris, le plus de points gagne : 1 point par paire, plus les bonus. À égalité, celui qui a pris la dernière paire gagne.'],
   ['book', '#B48CFF', 'Les pouvoirs', 'Chaque faction a son pouvoir : regarder une carte, échanger deux cartes, voler une paire… Touche « Pouvoirs » en partie pour les revoir.'],
-  ['eye', '#C9A45A', 'Tes adversaires', 'Ils ont plus ou moins de mémoire. Les plus forts se servent de leurs pouvoirs pour brouiller ce que tu as vu.']];
+  ['eye', '#C9A45A', 'Tes adversaires', 'Ils ont plus ou moins de mémoire. Les plus forts se servent de leurs pouvoirs pour brouiller ce que tu as vu.'],
+  ['amis', '#9FE0FF', 'Contre un ami', `En haut, « Contre un ami » : défie un de tes amis. Pas de récompense ici, seulement ton bilan de victoires et de défaites contre chacun. Partie rapide : ${MP_FAST_SECS} s par carte ; partie lente : ${MP_HOURS} h. Coup pas joué à temps : partie perdue.`]];
 const howLi = ([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic === 'eye' ? 'ui-eye' : ic === 'crystal' ? 'cur-shard' : ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`;
-const howHTML = () => `<ol class="how-steps">${HOW.map(howLi).join('')}</ol>`; /* v491 : tutoriel entier, sans « Pour aller plus loin » */
+export const howHTML = () => `<ol class="how-steps">${HOW.map(howLi).join('')}</ol>`; /* v491 : tutoriel entier, sans « Pour aller plus loin » */
 
 /* v510 : pouvoirs plus lisibles : nom court sur chaque carte retournée, grande fenêtre à chaque paire (pourquoi, quoi, et « tu rejoues ») */
-const PW_LABEL = { infernal: 'Regard', abyssal: 'Remous', celeste: 'Grâce', necrotique: 'Pillage', sauvage: 'Cri', primordial: 'Souffle', artificiel: 'Verrou' };
-const PW_MINE = { infernal: 'Touche une carte face cachée : toi seul la verras.', abyssal: 'Touche deux cartes face cachée : elles échangent leur place. Ce que l’adversaire avait retenu ne vaut plus rien.', celeste: 'Ta prochaine erreur ne te fera pas perdre la main.', necrotique: '', sauvage: 'Touche une carte face cachée : elle sera montrée à tout le monde.', primordial: '+1 point de bonus pour toi.', artificiel: 'Le prochain pouvoir de ton adversaire ne marchera pas.' };
-const PW_FOE = { infernal: '{nm} regarde une carte en secret (celle qui brille).', abyssal: '{nm} échange deux cartes de place (celles qui brillent en bleu).', celeste: 'Sa prochaine erreur ne lui fera pas perdre la main.', necrotique: '', sauvage: '{nm} retourne une carte à la vue de tous.', primordial: '+1 point de bonus pour {nm}.', artificiel: 'Ton prochain pouvoir ne marchera pas.' };
-const pwMed = (f) => `<span class="cr-pw-med">${sigil(f)}<img alt="" src="assets/jeux/cr-pw-${f}.webp" onerror="this.remove()"></span>`;
+export const PW_LABEL = { infernal: 'Regard', abyssal: 'Remous', celeste: 'Grâce', necrotique: 'Pillage', sauvage: 'Cri', primordial: 'Souffle', artificiel: 'Verrou' };
+export const PW_MINE = { infernal: 'Touche une carte face cachée : toi seul la verras.', abyssal: 'Touche deux cartes face cachée : elles échangent leur place. Ce que l’adversaire avait retenu ne vaut plus rien.', celeste: 'Ta prochaine erreur ne te fera pas perdre la main.', necrotique: '', sauvage: 'Touche une carte face cachée : elle sera montrée à tout le monde.', primordial: '+1 point de bonus pour toi.', artificiel: 'Le prochain pouvoir de ton adversaire ne marchera pas.' };
+export const PW_FOE = { infernal: '{nm} regarde une carte en secret (celle qui brille).', abyssal: '{nm} échange deux cartes de place (celles qui brillent en bleu).', celeste: 'Sa prochaine erreur ne lui fera pas perdre la main.', necrotique: '', sauvage: '{nm} retourne une carte à la vue de tous.', primordial: '+1 point de bonus pour {nm}.', artificiel: 'Ton prochain pouvoir ne marchera pas.' };
+export const pwMed = (f) => `<span class="cr-pw-med">${sigil(f)}<img alt="" src="assets/jeux/cr-pw-${f}.webp" onerror="this.remove()"></span>`;
 
 export default function cryptesScreen(app, root) {
   const g = app.game, cat = app.catalog;
@@ -37,6 +40,11 @@ export default function cryptesScreen(app, root) {
   const fname = (f) => cat.faction[f]?.name || f;
   const todayKey = () => { const d = g.clock(), p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; };
   const me = () => { const c = g.s.avatar && cat.get(g.s.avatar); return `<img alt="" src="${c ? artUrl(c, { lite: true }) : 'assets/brand/emblem.webp'}">`; };
+  // v525 : « Contre l'Abysse » (arbitres) ou « Contre un ami » (parties en ligne)
+  const mui = (app.state.cryptesMode ||= { mode: 'solo' });
+  const modeBar = (rec = '') => `<header class="screen-head ui-hero bn-cryptes"><h1>Les Cryptes</h1><p class="muted">${mui.mode === 'mp' ? 'Entre amis : pour le plaisir, et pour ton bilan contre chacun.' : 'Retrouve les paires… et réveille leurs pouvoirs.'}</p>${rec}</header>
+    <div class="seg wide gm-mode" role="tablist"><button class="seg-b" role="tab" data-cr="mode" data-v="solo" aria-selected="${mui.mode !== 'mp'}" aria-pressed="${mui.mode !== 'mp'}">Contre l’Abysse</button><button class="seg-b" role="tab" data-cr="mode" data-v="mp" aria-selected="${mui.mode === 'mp'}" aria-pressed="${mui.mode === 'mp'}">Contre un ami</button></div>`;
+  const mp = createCryptesMp(app, root, { modeBar: () => modeBar() });
   const powersHTML = () => `<ul class="cr-plist">${FACTION_ORDER.map((f) => `<li style="--fc:${cat.faction[f].colors.secondary}">${sigil(f)}<span><b>${esc(fname(f))} · ${esc(CR.POWERS[f].name)}</b><span class="small muted">${esc(CR.POWERS[f].short)}</span></span></li>`).join('')}</ul>`;
 
   // ——— Accueil ———
@@ -49,6 +57,8 @@ export default function cryptesScreen(app, root) {
         <section class="panel tr-lock">${icon('lock')}<b>Encore scellées</b><p class="small">Vaincs ton <b>premier gardien</b> dans la Descente (étage 5) pour ouvrir la Salle des jeux.</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`;
       return;
     }
+    if (mui.mode === 'mp') return mp.show();
+    mp.stop();
     const cr = g.s.cryptes, dailyDone = cr.dailyDone === todayKey(), d = g.cryptesDaily(), DT = CR.TABLE[d.table];
     const tables = CR.TABLES.map((t, i) => {
       const open = CR.tableUnlocked(g.s, i), won = cr.beaten[t.key], R = CR.RIVALS[t.rival];
@@ -59,8 +69,7 @@ export default function cryptesScreen(app, root) {
         ${won ? `<span class="sc-won">${icon('check')}</span>` : open ? icon('next') : icon('p:mysteries')}</button>`];
     });
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
-    root.innerHTML = `<header class="screen-head ui-hero bn-cryptes"><h1>Les Cryptes</h1><p class="muted">Retrouve les paires… et réveille leurs pouvoirs.</p>
-        <span class="sc-rec">${cr.wins} victoire${cr.wins > 1 ? 's' : ''} · ${cr.losses} défaite${cr.losses > 1 ? 's' : ''}</span></header>
+    root.innerHTML = `${modeBar(`<span class="sc-rec">${cr.wins} victoire${cr.wins > 1 ? 's' : ''} · ${cr.losses} défaite${cr.losses > 1 ? 's' : ''}</span>`)}
       ${g.cryptesDailyOpen() ? `<button class="panel sc-daily ${dailyDone ? 'done' : ''}" data-cr="daily" ${dailyDone ? 'disabled' : ''}>
         <img alt="" src="assets/icons/hourglass.webp"><span><b>Défi du jour</b><span class="small">${esc(DT.name)} · les mêmes cartes pour tous</span>
         <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : `Victoire : +${CR.CRYPTES_REWARD.daily} éclats et un coffre de bois`}</span></span>${dailyDone ? icon('check') : icon('next')}</button>` : ''}
@@ -250,6 +259,7 @@ export default function cryptesScreen(app, root) {
     const b = e.target.closest('[data-cr]');
     if (!b || b.disabled) return;
     const k = b.dataset.cr;
+    if (k === 'mode') { mui.mode = b.dataset.v; app.sfx.tap(); return lobby(); }
     if (k === 'play') return start({ table: b.dataset.t });
     if (k === 'daily') return start({ daily: true });
     if (k === 'rules') return rules();
@@ -296,5 +306,5 @@ export default function cryptesScreen(app, root) {
   const cur = g.s.cryptes.cur;
   if (cur && !cur.rewarded) { cur.open = []; view(); if (cur.over) end(); else if (cur.turn === 'a') aiTurn(); }
   else { if (cur) g.cryptesQuit(); lobby(); }
-  return () => { gone = true; clearTimeout(timer); document.body.classList.remove('battle-mode', 'sc-lost'); ['.sc-end', '.sc-scene'].forEach((q) => document.querySelector(q)?.remove()); };
+  return () => { gone = true; mp.stop(); clearTimeout(timer); document.body.classList.remove('battle-mode', 'sc-lost'); ['.sc-end', '.sc-scene'].forEach((q) => document.querySelector(q)?.remove()); };
 }

@@ -2,4 +2,4 @@
 export const MP_HOURS = 12; // partie lente : délai pour jouer chaque coup ; passé ce délai, la partie est perdue
 export const MP_FAST_SECS = 30; // v522 : partie rapide : secondes pour jouer chaque coup (les deux joueurs connectés)
 export const MP_REWARD = { win: 40, paidPerDay: 5, xp: 10 }; // éclats par victoire (5 victoires payées par jour)
-export const MP_GAMES = ['sceaux', 'pacte']; // v523 : le Pacte aussi
+export const MP_GAMES = ['sceaux', 'pacte', 'encheres', 'cryptes']; // v523 : le Pacte ; v525 : les Enchères, et les Cryptes entre amis seulement (sans récompense)

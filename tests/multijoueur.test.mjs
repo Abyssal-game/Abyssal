@@ -33,9 +33,19 @@ test('en ligne : le Pacte a son moteur côté serveur (v523)', async () => {
   const fs = await import('node:fs');
   const sql = fs.readFileSync(new URL('../supabase/09-multijoueur.sql', import.meta.url), 'utf8');
   for (const fn of ['pacte_deck', 'pacte_apply', 'pacte_start', 'pacte_mp_new', 'pacte_mp_join', 'pacte_mp_act']) assert.ok(sql.includes(`function public.${fn}(`), fn);
-  assert.ok(sql.includes("check (game in ('sceaux', 'pacte'))"));
+  assert.ok(sql.includes("check (game in ('sceaux', 'pacte', 'encheres', 'cryptes'))"));
   assert.ok(sql.includes('grant execute on function public.pacte_mp_act(uuid, text) to authenticated'));
   assert.ok(!/grant execute on function public\.pacte_apply/.test(sql), 'le moteur reste interne');
   const { MP_GAMES } = await import('../js/core/mp.js');
-  assert.deepEqual(MP_GAMES, ['sceaux', 'pacte']);
+  assert.deepEqual(MP_GAMES, ['sceaux', 'pacte', 'encheres', 'cryptes']);
+});
+
+test('en ligne : Enchères à deux et Cryptes entre amis seulement, informations cachées (v525)', async () => {
+  const fs = await import('node:fs');
+  const sql = fs.readFileSync(new URL('../supabase/09-multijoueur.sql', import.meta.url), 'utf8');
+  for (const fn of ['encheres_apply', 'cryptes_apply', 'mp_new', 'mp_join', 'mp_act', 'mp_state_for', 'mp_friend_record']) assert.ok(sql.includes(`function public.${fn}(`), fn);
+  assert.ok(sql.includes("Les Cryptes se jouent seulement entre amis."));
+  assert.ok(sql.includes("check (turn in ('a', 'b', 'ab'))"));
+  assert.ok(sql.includes("'state', public.mp_state_for(m,"), 'la vue passe toujours par le masque');
+  for (const fn of ['encheres_apply', 'cryptes_apply', 'mp_state_for']) assert.ok(!new RegExp(`grant execute on function public\\.${fn}`).test(sql), `${fn} reste interne`);
 });

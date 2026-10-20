@@ -208,6 +208,11 @@ export const sceauxMpPlay = (id, idx, cell) => rpc('sceaux_mp_play', { p_id: id,
 export const pacteMpNew = (to = null, pace = 'slow') => rpc('pacte_mp_new', { p_to: to, p_pace: pace });
 export const pacteMpJoin = (id) => rpc('pacte_mp_join', { p_id: id });
 export const pacteMpAct = (id, action) => rpc('pacte_mp_act', { p_id: id, p_action: action });
+// v525 : Enchères en ligne et Cryptes entre amis (move : { offer } ou { flip } / { picks })
+export const mpNew = (game, to = null, pace = 'slow') => rpc('mp_new', { p_game: game, p_to: to, p_pace: pace });
+export const mpJoin = (id) => rpc('mp_join', { p_id: id });
+export const mpAct = (id, move) => rpc('mp_act', { p_id: id, p_move: move });
+export const mpFriendRecord = async (game) => (await rpc('mp_friend_record', { p_game: game })) || [];
 
 // Signaler le pseudo d'un autre joueur : renvoie 'ok', ou 'masqué' si le pseudo vient d'être masqué.
 export async function reportPseudo(target, reason) {

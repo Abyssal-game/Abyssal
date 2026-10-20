@@ -6,6 +6,8 @@ import { esc, fmt, toast, confirmBox, openSheet } from '../ui/dom.js';
 import { setScene } from '../ui/scene.js';
 import { tuto } from '../ui/tutos.js';
 import { CHESTS } from '../core/descent.js';
+import { MP_HOURS, MP_FAST_SECS, MP_REWARD } from '../core/mp.js';
+import { createEncheresMp } from './encheres-mp.js';
 
 const CHEST_NAME = Object.fromEntries(Object.entries(CHESTS).map(([k, c]) => [k, c.name]));
 const stars = (n) => `${'★'.repeat(n)}${'☆'.repeat(Math.max(0, 5 - n))}`;
@@ -16,9 +18,10 @@ const HOW = [['cards', '#7FA8D8', 'La vente', 'Mammon met en vente 15 lots, un p
   ['crown', '#F2C14E', 'La victoire', 'Après le 15e lot, on compte les points. Le plus de points gagne.'],
   ['hourglass', '#9FE0FF', 'Tout s’annule ?', 'Si toutes les offrandes s’annulent, le lot reste sur la table et s’ajoute au suivant : on se dispute les deux à la fois.'],
   ['book', '#7FE0A0', 'Les familles', 'Trois créatures d’une même faction rapportent +5 points (+10 à la Vente des lignées).'],
-  ['eye', '#C9A45A', 'Lire les enchérisseurs', 'Les offrandes qui restent à chacun sont visibles. Chaque enchérisseur a son style : certains se lisent facilement, d’autres misent n’importe quoi.']];
+  ['eye', '#C9A45A', 'Lire les enchérisseurs', 'Les offrandes qui restent à chacun sont visibles. Chaque enchérisseur a son style : certains se lisent facilement, d’autres misent n’importe quoi.'],
+  ['amis', '#9FE0FF', 'Contre un joueur', `En haut, « Contre un joueur » : une vente à deux contre un autre joueur (au hasard ou un ami), les mêmes lots pour les deux. Vous misez en même temps, en secret. Partie rapide : ${MP_FAST_SECS} s par mise ; partie lente : ${MP_HOURS} h. Mise pas posée à temps : vente perdue. Victoire : +${MP_REWARD.win} éclats et le classement du mois.`]];
 const howLi = ([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic === 'eye' ? 'ui-eye' : ic === 'crystal' ? 'cur-shard' : ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`;
-const howHTML = () => `<ol class="how-steps">${HOW.map(howLi).join('')}</ol>`; /* v491 : tutoriel entier, sans « Pour aller plus loin » */
+export const howHTML = () => `<ol class="how-steps">${HOW.map(howLi).join('')}</ol>`; /* v491 : tutoriel entier, sans « Pour aller plus loin » */
 
 export default function encheresScreen(app, root) {
   const g = app.game, cat = app.catalog;
@@ -29,6 +32,11 @@ export default function encheresScreen(app, root) {
   const todayKey = () => { const d = g.clock(), p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; };
   const who = (st, x) => (x === 'p' ? { name: 'Toi', key: null } : { ...EN.BIDDERS[st.seats[x]], key: st.seats[x] });
   const me = () => { const c = g.s.avatar && cat.get(g.s.avatar); return `<img alt="" src="${c ? artUrl(c, { lite: true }) : 'assets/brand/emblem.webp'}">`; };
+  // v525 : « Contre l'Abysse » (arbitres) ou « Contre un joueur » (parties en ligne)
+  const mui = (app.state.encheresMode ||= { mode: 'solo' });
+  const modeBar = (rec = '') => `<header class="screen-head ui-hero bn-encheres"><h1>Les Enchères de Mammon</h1><p class="muted">${mui.mode === 'mp' ? 'Affronte d’autres joueurs : une vente à deux, en même temps.' : 'Offre plus que les autres… sans jamais offrir pareil.'}</p>${rec}</header>
+    <div class="seg wide gm-mode" role="tablist"><button class="seg-b" role="tab" data-en="mode" data-v="solo" aria-selected="${mui.mode !== 'mp'}" aria-pressed="${mui.mode !== 'mp'}">Contre l’Abysse</button><button class="seg-b" role="tab" data-en="mode" data-v="mp" aria-selected="${mui.mode === 'mp'}" aria-pressed="${mui.mode === 'mp'}">Contre un joueur</button></div>`;
+  const mp = createEncheresMp(app, root, { modeBar: () => modeBar() });
 
   // ——— Accueil ———
   function lobby() {
@@ -40,6 +48,8 @@ export default function encheresScreen(app, root) {
         <section class="panel tr-lock">${icon('lock')}<b>Encore scellées</b><p class="small">Vaincs ton <b>premier gardien</b> dans la Descente (étage 5) pour ouvrir la salle des ventes.</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`;
       return;
     }
+    if (mui.mode === 'mp') return mp.show();
+    mp.stop();
     const en = g.s.encheres, dailyDone = en.dailyDone === todayKey(), d = g.encheresDaily(), DT = EN.TABLE[d.table];
     const tables = EN.TABLES.map((t, i) => {
       const open = EN.tableUnlocked(g.s, i), won = en.beaten[t.key], [A, B] = t.seats.map((k) => EN.BIDDERS[k]);
@@ -50,8 +60,7 @@ export default function encheresScreen(app, root) {
         ${won ? `<span class="sc-won">${icon('check')}</span>` : open ? icon('next') : icon('p:mysteries')}</button>`];
     });
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
-    root.innerHTML = `<header class="screen-head ui-hero bn-encheres"><h1>Les Enchères de Mammon</h1><p class="muted">Offre plus que les autres… sans jamais offrir pareil.</p>
-        <span class="sc-rec">${en.wins} victoire${en.wins > 1 ? 's' : ''} · ${en.losses} défaite${en.losses > 1 ? 's' : ''}</span></header>
+    root.innerHTML = `${modeBar(`<span class="sc-rec">${en.wins} victoire${en.wins > 1 ? 's' : ''} · ${en.losses} défaite${en.losses > 1 ? 's' : ''}</span>`)}
       ${g.encheresDailyOpen() ? `<button class="panel sc-daily ${dailyDone ? 'done' : ''}" data-en="daily" ${dailyDone ? 'disabled' : ''}>
         <img alt="" src="assets/icons/hourglass.webp"><span><b>Défi du jour</b><span class="small">${esc(DT.name)} · la même vente pour tous</span>
         <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : `Victoire : +${EN.ENCHERES_REWARD.daily} éclats et un coffre de bois`}</span></span>${dailyDone ? icon('check') : icon('next')}</button>` : ''}
@@ -185,6 +194,7 @@ export default function encheresScreen(app, root) {
     const b = e.target.closest('[data-en]');
     if (!b || b.disabled) return;
     const k = b.dataset.en;
+    if (k === 'mode') { mui.mode = b.dataset.v; app.sfx.tap(); return lobby(); }
     if (k === 'play') return start({ table: b.dataset.t });
     if (k === 'daily') return start({ daily: true });
     if (k === 'rules') return rules();
@@ -208,5 +218,5 @@ export default function encheresScreen(app, root) {
   const cur = g.s.encheres.cur;
   if (cur && !cur.rewarded) { view(); if (cur.over) end(); }
   else { if (cur) g.encheresQuit(); lobby(); }
-  return () => { gone = true; clearTimeout(timer); document.body.classList.remove('battle-mode', 'sc-lost'); ['.sc-end', '.sc-scene'].forEach((q) => document.querySelector(q)?.remove()); };
+  return () => { gone = true; mp.stop(); clearTimeout(timer); document.body.classList.remove('battle-mode', 'sc-lost'); ['.sc-end', '.sc-scene'].forEach((q) => document.querySelector(q)?.remove()); };
 }

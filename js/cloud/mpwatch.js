@@ -18,6 +18,13 @@ const GAMES = [
   { game: 'pacte', route: 'pacte', key: (v) => (v.state?.turns?.a || 0) + (v.state?.turns?.b || 0), started: (v) => v.state?.n,
     turn: 'À toi de jouer au Pacte contre {name} !', go: 'Ta partie du Pacte contre {name} a commencé !', inv: '{name} te défie au Pacte !',
     turn1: 'À toi de jouer au Pacte', turnsN: 'À toi de jouer dans {n} parties du Pacte', inv1: 'Un défi reçu au Pacte', invN: '{n} défis reçus au Pacte' },
+  /* v525 : Enchères (les deux joueurs misent en même temps) et Cryptes entre amis */
+  { game: 'encheres', route: 'encheres', key: (v) => v.state?.i, started: (v) => v.state?.n,
+    turn: 'À toi de miser aux Enchères contre {name} !', go: 'Ta vente des Enchères contre {name} a commencé !', inv: '{name} te défie aux Enchères !',
+    turn1: 'À toi de miser aux Enchères', turnsN: 'À toi de miser dans {n} ventes des Enchères', inv1: 'Un défi reçu aux Enchères', invN: '{n} défis reçus aux Enchères' },
+  { game: 'cryptes', route: 'cryptes', key: (v) => v.state?.turns, started: (v) => v.state?.n,
+    turn: 'À toi de jouer aux Cryptes contre {name} !', go: 'Ta partie des Cryptes contre {name} a commencé !', inv: '{name} te défie aux Cryptes !',
+    turn1: 'À toi de jouer aux Cryptes', turnsN: 'À toi de jouer dans {n} parties des Cryptes', inv1: 'Un défi reçu aux Cryptes', invN: '{n} défis reçus aux Cryptes' },
 ];
 let last = 0, busy = false;
 
@@ -36,7 +43,7 @@ export async function checkTurns(app, { force = false } = {}) {
   for (const G of GAMES) {
     try {
       const L = await cloud.mpList(G.game);
-      const mine = L.filter((v) => v.status === 'playing' && v.turn === v.me);
+      const mine = L.filter((v) => v.status === 'playing' && (v.turn === v.me || v.turn === 'ab'));
       turns.push(...mine);
       for (const v of mine) say(`${v.id}:${G.key(v)}`, t(G.turn, { name: who(v.foe?.pseudo) }), 'hourglass', G.route);
       for (const v of L.filter((x) => x.status === 'playing' && x.me === 'a' && !G.started(x))) say(`go:${v.id}`, t(G.go, { name: who(v.foe?.pseudo) }), 'user', G.route);

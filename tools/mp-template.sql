@@ -1,4 +1,4 @@
--- ABYSSAL · étape 9 : mini-jeux contre d'autres joueurs (Duels des Sceaux et Pacte en ligne).
+-- ABYSSAL · étape 9 : mini-jeux contre d'autres joueurs (Duels des Sceaux, Pacte, Enchères en ligne ; Cryptes entre amis).
 -- À coller dans Supabase : SQL Editor → New query → Run. Peut être relancé sans risque.
 -- Fichier généré par `node tools/mp-sql.mjs` (valeurs des cartes lues dans le jeu) : à relancer quand des cartes
 -- sont ajoutées, puis recoller le fichier dans Supabase.
@@ -44,7 +44,10 @@ alter table public.mp_matches enable row level security;
 revoke all on public.mp_matches from anon, authenticated;
 -- v523 : le Pacte se joue aussi en ligne
 alter table public.mp_matches drop constraint if exists mp_matches_game_check;
-alter table public.mp_matches add constraint mp_matches_game_check check (game in ('sceaux', 'pacte'));
+alter table public.mp_matches add constraint mp_matches_game_check check (game in ('sceaux', 'pacte', 'encheres', 'cryptes'));
+-- v525 : aux Enchères, les deux joueurs misent en même temps : turn = 'ab' tant qu'aucun n'a misé
+alter table public.mp_matches drop constraint if exists mp_matches_turn_check;
+alter table public.mp_matches add constraint mp_matches_turn_check check (turn in ('a', 'b', 'ab'));
 
 create or replace function public.mp_hours() returns int language sql immutable as $$ select --HEURES-- $$;
 -- v522 : deux vitesses. Lente : --HEURES-- h par coup ; rapide : --SECONDES-- s par coup (les deux joueurs connectés),
@@ -60,7 +63,7 @@ $$;
 create or replace function public.mp_expire()
 returns void language sql volatile security definer set search_path = public as $$
   update public.mp_matches set status = 'cancelled', updated_at = now() where status = 'waiting' and created_at < now() - case when pace = 'fast' then interval '5 minutes' else interval '24 hours' end;
-  update public.mp_matches set status = 'done', winner = case when turn = 'a' then 'b' else 'a' end, reason = 'timeout', updated_at = now()
+  update public.mp_matches set status = 'done', winner = case when turn = 'a' then 'b' when turn = 'b' then 'a' else 'draw' end, reason = 'timeout', updated_at = now()
     where status = 'playing' and deadline < now();
 $$;
 revoke execute on function public.mp_expire() from public, anon, authenticated;
@@ -437,6 +440,291 @@ begin
   return public.mp_view(p_id);
 end $$;
 
+-- ——— v525 : Les Enchères en ligne (à deux, même moteur que js/core/encheres.js) ——————————————————
+-- 15 lots : 10 créatures (1 à 10, quatre factions : 3, 3, 2, 2) et 5 malédictions (−1 à −5), dans un ordre caché.
+-- Les deux joueurs posent une offrande (1 à 15) en secret ; deux offrandes égales s'annulent et le lot reste sur la table.
+-- Sinon la plus haute prend une créature (lot positif), la plus basse prend une malédiction. Famille de trois : +5.
+create or replace function public.encheres_lots() returns jsonb language sql volatile as $$
+  with f as (select x, row_number() over (order by random()) r from unnest(array['infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel']) x),
+  pat as (select x, row_number() over (order by random()) n from f, generate_series(1, case when r <= 2 then 3 else 2 end) where r <= 4)
+  select jsonb_agg(l order by random()) from (
+    select jsonb_build_object('v', n, 'f', x) l from pat
+    union all select jsonb_build_object('v', -k, 'f', null) from generate_series(1, 5) k
+  ) z
+$$;
+revoke execute on function public.encheres_lots() from public, anon, authenticated;
+create or replace function public.encheres_score(won jsonb, bonus int) returns int language sql immutable as $$
+  select coalesce((select sum((x ->> 'v')::int) from jsonb_array_elements(won) x), 0)::int
+    + bonus * coalesce((select sum(n / 3) from (select count(*)::int n from jsonb_array_elements(won) x where x ->> 'f' is not null group by x ->> 'f') c), 0)::int
+$$;
+create or replace function public.encheres_apply(st jsonb, who text, offer int)
+returns jsonb language plpgsql volatile set search_path = public as $$
+declare ba int; bb int; lot jsonb; pile jsonb; val int; taker text; ev jsonb; n int; sa int; sb int; ka int[]; kb int[];
+begin
+  if (st ->> 'over') is not null then raise exception 'Cette vente est terminée.'; end if;
+  if offer is null or not ((st -> 'offers' -> who) @> to_jsonb(offer)) then raise exception 'Offrande déjà jouée.'; end if;
+  if (st -> 'bids' ->> who) is not null then raise exception 'Tu as déjà posé ton offrande.'; end if;
+  st := jsonb_set(st, array['bids', who], to_jsonb(offer));
+  if (st -> 'bids' ->> 'a') is null or (st -> 'bids' ->> 'b') is null then
+    return st || jsonb_build_object('turn', case when who = 'a' then 'b' else 'a' end);
+  end if;
+  -- les deux offrandes sont posées : on révèle
+  ba := (st -> 'bids' ->> 'a')::int; bb := (st -> 'bids' ->> 'b')::int;
+  lot := st -> 'lots' -> ((st ->> 'i')::int);
+  pile := (st -> 'pot') || jsonb_build_array(lot);
+  select coalesce(sum((x ->> 'v')::int), 0) into val from jsonb_array_elements(pile) x;
+  st := jsonb_set(st, '{offers,a}', coalesce((select jsonb_agg(x) from jsonb_array_elements(st -> 'offers' -> 'a') x where x::int <> ba), '[]'));
+  st := jsonb_set(st, '{offers,b}', coalesce((select jsonb_agg(x) from jsonb_array_elements(st -> 'offers' -> 'b') x where x::int <> bb), '[]'));
+  if ba = bb then taker := null;
+  elsif val > 0 then taker := case when ba > bb then 'a' else 'b' end;
+  else taker := case when ba < bb then 'a' else 'b' end;
+  end if;
+  if taker is not null then
+    st := jsonb_set(st, array['won', taker], (st -> 'won' -> taker) || pile);
+    st := jsonb_set(st, '{pot}', '[]');
+  else
+    st := jsonb_set(st, '{pot}', pile);
+  end if;
+  n := coalesce((st ->> 'n')::int, 0) + 1;
+  ev := jsonb_build_object('n', n, 'i', (st ->> 'i')::int, 'lot', lot, 'pile', pile, 'value', val, 'bids', jsonb_build_object('a', ba, 'b', bb), 'taker', taker, 'cancelled', ba = bb);
+  st := st || jsonb_build_object('n', n, 'last', ev, 'i', (st ->> 'i')::int + 1, 'bids', jsonb_build_object('a', null, 'b', null), 'turn', 'ab');
+  st := jsonb_set(st, '{log}', (select coalesce(jsonb_agg(x order by o), '[]') from (select x, o from jsonb_array_elements(coalesce(st -> 'log', '[]') || jsonb_build_array(ev)) with ordinality e(x, o) order by o desc limit 15) z));
+  if (st ->> 'i')::int >= jsonb_array_length(st -> 'lots') then
+    sa := public.encheres_score(st -> 'won' -> 'a', (st ->> 'setBonus')::int); sb := public.encheres_score(st -> 'won' -> 'b', (st ->> 'setBonus')::int);
+    -- départage : le plus de points, puis le plus de créatures, puis la plus belle créature
+    ka := array[sa, (select count(*)::int from jsonb_array_elements(st -> 'won' -> 'a') x where (x ->> 'v')::int > 0), coalesce((select max((x ->> 'v')::int) from jsonb_array_elements(st -> 'won' -> 'a') x), 0)];
+    kb := array[sb, (select count(*)::int from jsonb_array_elements(st -> 'won' -> 'b') x where (x ->> 'v')::int > 0), coalesce((select max((x ->> 'v')::int) from jsonb_array_elements(st -> 'won' -> 'b') x), 0)];
+    return st || jsonb_build_object('over', true, 'turn', null, 'winner', case when ka > kb then 'a' when kb > ka then 'b' else 'draw' end, 'final', jsonb_build_object('a', sa, 'b', sb));
+  end if;
+  return st;
+end $$;
+revoke execute on function public.encheres_apply(jsonb, text, int) from public, anon, authenticated;
+create or replace function public.encheres_init() returns jsonb language sql volatile as $$
+  select jsonb_build_object('lots', public.encheres_lots(), 'i', 0, 'pot', '[]'::jsonb, 'setBonus', 5, 'n', 0, 'log', '[]'::jsonb, 'turn', 'ab',
+    'offers', jsonb_build_object('a', (select jsonb_agg(k) from generate_series(1, 15) k), 'b', (select jsonb_agg(k) from generate_series(1, 15) k)),
+    'won', jsonb_build_object('a', '[]'::jsonb, 'b', '[]'::jsonb), 'bids', jsonb_build_object('a', null, 'b', null))
+$$;
+revoke execute on function public.encheres_init() from public, anon, authenticated;
+
+-- ——— v525 : Les Cryptes entre amis (même moteur que js/core/cryptes.js, sans règle de salle) ——————————————
+-- 20 cartes en 10 paires (les 7 factions, trois en double), face cachée : le serveur ne montre à chacun que les cartes
+-- retournées, prises ou révélées ; le Regard infernal ne montre la carte qu'à celui qui l'a utilisé.
+create or replace function public.cryptes_init(first text) returns jsonb language sql volatile as $$
+  with base as (select unnest(array['infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel']) f),
+  extra as (select f from base order by random() limit 3),
+  pf as (select f, row_number() over () - 1 k from (select f from base union all select f from extra) z),
+  cards as (select jsonb_build_object('k', k, 'f', f, 'gone', null) c from pf, generate_series(1, 2))
+  select jsonb_build_object('cards', (select jsonb_agg(c order by random()) from cards), 'open', '[]'::jsonb, 'turn', first, 'first', first,
+    'pairs', jsonb_build_object('a', '[]'::jsonb, 'b', '[]'::jsonb), 'bonus', jsonb_build_object('a', 0, 'b', 0), 'grace', jsonb_build_object('a', 0, 'b', 0),
+    'block', jsonb_build_object('a', false, 'b', false), 'pending', null, 'lastPair', null, 'n', 0, 'turns', 0, 'log', '[]'::jsonb)
+$$;
+revoke execute on function public.cryptes_init(text) from public, anon, authenticated;
+create or replace function public.cryptes_hidden(st jsonb) returns int[] language sql immutable as $$
+  select coalesce(array_agg(o - 1 order by o), '{}') from jsonb_array_elements(st -> 'cards') with ordinality e(c, o)
+  where c ->> 'gone' is null and not ((st -> 'open') @> to_jsonb(o - 1))
+$$;
+create or replace function public.cryptes_apply(st jsonb, who text, mv jsonb)
+returns jsonb language plpgsql volatile set search_path = public as $$
+declare opp text := case when who = 'a' then 'b' else 'a' end; ev jsonb; n int; i int; x int; y int; cx jsonb; cy jsonb; f text; pick int;
+  picks int[]; hid int[]; k jsonb; tmp jsonb; sa int; sb int;
+begin
+  if (st ->> 'over') is not null then raise exception 'Cette partie est terminée.'; end if;
+  if st ->> 'turn' <> who then raise exception 'Ce n’est pas ton tour.'; end if;
+  hid := public.cryptes_hidden(st);
+  if mv ? 'picks' then
+    if jsonb_typeof(st -> 'pending') <> 'object' then raise exception 'Aucun pouvoir en attente.'; end if;
+    if jsonb_typeof(mv -> 'picks') <> 'array' then raise exception 'Choisis une carte face cachée.'; end if;
+    select array_agg(v::int) into picks from jsonb_array_elements_text(mv -> 'picks') v;
+    if coalesce(array_length(picks, 1), 0) <> (st #>> '{pending,pick}')::int or (select count(distinct v) from unnest(picks) v) <> array_length(picks, 1)
+      or not (picks <@ hid) then raise exception 'Choisis une carte face cachée.'; end if;
+    f := st #>> '{pending,power}';
+    ev := jsonb_build_object('who', who, 'kind', 'power', 'power', f, 'i', to_jsonb(picks));
+    if f in ('infernal', 'sauvage') then ev := ev || jsonb_build_object('card', (st -> 'cards' -> picks[1]) - 'gone'); end if;
+    if f = 'abyssal' then
+      tmp := st -> 'cards' -> picks[1];
+      st := jsonb_set(st, array['cards', picks[1]::text], st -> 'cards' -> picks[2]);
+      st := jsonb_set(st, array['cards', picks[2]::text], tmp);
+    end if;
+    st := jsonb_set(st, '{pending}', 'null');
+  elsif mv ? 'flip' then
+    if jsonb_typeof(st -> 'pending') = 'object' then raise exception 'Choisis d’abord la cible du pouvoir.'; end if;
+    i := (mv ->> 'flip')::int;
+    if i is null or not (i = any(hid)) then raise exception 'Cette carte ne peut pas être retournée.'; end if;
+    st := jsonb_set(st, '{open}', (st -> 'open') || to_jsonb(i));
+    if jsonb_array_length(st -> 'open') = 1 then
+      ev := jsonb_build_object('who', who, 'kind', 'first', 'i', i, 'card', (st -> 'cards' -> i) - 'gone');
+    else
+      x := (st -> 'open' ->> 0)::int; y := (st -> 'open' ->> 1)::int;
+      st := jsonb_set(st, '{open}', '[]');
+      cx := st -> 'cards' -> x; cy := st -> 'cards' -> y;
+      if (cx ->> 'k') = (cy ->> 'k') then
+        st := jsonb_set(st, array['cards', x::text, 'gone'], to_jsonb(who));
+        st := jsonb_set(st, array['cards', y::text, 'gone'], to_jsonb(who));
+        st := jsonb_set(st, array['pairs', who], (st -> 'pairs' -> who) || (cx -> 'k'));
+        st := jsonb_set(st, '{lastPair}', to_jsonb(who));
+        f := cx ->> 'f';
+        ev := jsonb_build_object('who', who, 'kind', 'match', 'i', jsonb_build_array(x, y), 'f', f, 'k', cx -> 'k', 'card', cx - 'gone', 'power', f);
+        if (st -> 'block' ->> who)::boolean then
+          st := jsonb_set(st, array['block', who], 'false'); ev := ev || '{"blocked": true}';
+        elsif f = 'celeste' then st := jsonb_set(st, array['grace', who], to_jsonb((st -> 'grace' ->> who)::int + 1));
+        elsif f = 'primordial' then st := jsonb_set(st, array['bonus', who], to_jsonb((st -> 'bonus' ->> who)::int + 1));
+        elsif f = 'artificiel' then st := jsonb_set(st, array['block', opp], 'true');
+        elsif f = 'necrotique' then
+          if jsonb_array_length(st -> 'pairs' -> opp) > 0 then
+            k := st -> 'pairs' -> opp -> -1;
+            st := jsonb_set(st, array['pairs', opp], (st -> 'pairs' -> opp) - (-1));
+            st := jsonb_set(st, array['pairs', who], (st -> 'pairs' -> who) || k);
+            ev := ev || jsonb_build_object('stolen', k);
+          else ev := ev || '{"empty": true}'; end if;
+        else
+          pick := case when f = 'abyssal' then 2 else 1 end;
+          if coalesce(array_length(public.cryptes_hidden(st), 1), 0) >= pick then st := jsonb_set(st, '{pending}', jsonb_build_object('power', f, 'pick', pick));
+          else ev := ev || '{"empty": true}'; end if;
+        end if;
+        -- tout est pris : le plus de points gagne ; à égalité, celui qui a pris la dernière paire
+        if coalesce(array_length(public.cryptes_hidden(st), 1), 0) = 0 then
+          sa := jsonb_array_length(st -> 'pairs' -> 'a') + (st -> 'bonus' ->> 'a')::int;
+          sb := jsonb_array_length(st -> 'pairs' -> 'b') + (st -> 'bonus' ->> 'b')::int;
+          st := st || jsonb_build_object('over', true, 'winner', case when sa > sb then 'a' when sb > sa then 'b' else st ->> 'lastPair' end, 'final', jsonb_build_object('a', sa, 'b', sb), 'pending', null);
+        end if;
+      else
+        ev := jsonb_build_object('who', who, 'kind', 'miss', 'i', jsonb_build_array(x, y), 'cards', jsonb_build_array(cx - 'gone', cy - 'gone'));
+        if (st -> 'grace' ->> who)::int > 0 then
+          st := jsonb_set(st, array['grace', who], to_jsonb((st -> 'grace' ->> who)::int - 1)); ev := ev || '{"graced": true}';
+        else
+          st := st || jsonb_build_object('turn', opp, 'turns', (st ->> 'turns')::int + 1);
+        end if;
+      end if;
+    end if;
+  else
+    raise exception 'Action inconnue.';
+  end if;
+  n := coalesce((st ->> 'n')::int, 0) + 1;
+  ev := ev || jsonb_build_object('n', n);
+  st := st || jsonb_build_object('n', n, 'last', ev);
+  st := jsonb_set(st, '{log}', (select coalesce(jsonb_agg(z.x order by z.o), '[]') from (select e.x, e.o from jsonb_array_elements(coalesce(st -> 'log', '[]') || jsonb_build_array(ev)) with ordinality e(x, o) order by e.o desc limit 20) z));
+  if (st ->> 'over') is not null then st := st || jsonb_build_object('turn', null); end if;
+  return st;
+end $$;
+revoke execute on function public.cryptes_apply(jsonb, text, jsonb) from public, anon, authenticated;
+
+-- ——— Parties des Enchères et des Cryptes : créer, accepter, jouer ————————————————————————————
+create or replace function public.mp_start(p_id uuid)
+returns void language plpgsql volatile security definer set search_path = public as $$
+declare d public.mp_matches; first text := case when random() < 0.5 then 'a' else 'b' end; st jsonb;
+begin
+  select * into d from public.mp_matches where id = p_id for update;
+  st := case d.game when 'encheres' then public.encheres_init() when 'cryptes' then public.cryptes_init(first) end;
+  update public.mp_matches set status = 'playing', turn = st ->> 'turn', deadline = now() + public.mp_delay(d.pace, true), updated_at = now(), state = st where id = p_id;
+end $$;
+revoke execute on function public.mp_start(uuid) from public, anon, authenticated;
+
+-- Nouvelle partie : au hasard (Enchères) ou défi à un ami (Enchères, Cryptes : entre amis seulement)
+create or replace function public.mp_new(p_game text, p_to uuid default null, p_pace text default 'slow')
+returns uuid language plpgsql volatile security definer set search_path = public as $$
+declare me uuid := auth.uid(); m public.mp_matches; id uuid; n int;
+begin
+  if me is null then raise exception 'Connecte-toi d’abord.'; end if;
+  if p_game is null or p_game not in ('encheres', 'cryptes') then raise exception 'Jeu inconnu.'; end if;
+  if not exists (select 1 from public.profiles where profiles.id = me) then raise exception 'Choisis d’abord ton pseudo (Sanctuaire → Compte).'; end if;
+  if p_pace is null or p_pace not in ('fast', 'slow') then raise exception 'Vitesse inconnue.'; end if;
+  if p_game = 'cryptes' and p_to is null then raise exception 'Les Cryptes se jouent seulement entre amis.'; end if;
+  perform public.mp_expire();
+  select count(*) into n from public.mp_matches where me in (a, b) and status in ('waiting', 'playing');
+  if n >= 10 then raise exception 'Tu as déjà 10 parties en cours : termine-en une d’abord.'; end if;
+  if p_to is null then
+    select * into m from public.mp_matches where game = p_game and status = 'waiting' and public and b is null and a <> me and pace = p_pace
+      order by created_at limit 1 for update skip locked;
+    if found then
+      update public.mp_matches set b = me where mp_matches.id = m.id;
+      perform public.mp_start(m.id);
+      return m.id;
+    end if;
+    if exists (select 1 from public.mp_matches where game = p_game and status = 'waiting' and public and a = me and pace = p_pace) then
+      raise exception 'Tu cherches déjà un adversaire : ta partie commencera dès qu’un joueur arrive.';
+    end if;
+  else
+    if p_to = me then raise exception 'Tu ne peux pas te défier toi-même.'; end if;
+    if not public.are_friends(me, p_to) then raise exception 'Ce joueur n’est pas ton ami.'; end if;
+  end if;
+  insert into public.mp_matches (game, a, b, public, pace, state) values (p_game, me, p_to, p_to is null, p_pace, '{}'::jsonb)
+  returning mp_matches.id into id;
+  return id;
+end $$;
+
+create or replace function public.mp_join(p_id uuid)
+returns uuid language plpgsql volatile security definer set search_path = public as $$
+declare me uuid := auth.uid(); m public.mp_matches;
+begin
+  if me is null then raise exception 'Connecte-toi d’abord.'; end if;
+  perform public.mp_expire();
+  select * into m from public.mp_matches where id = p_id and game in ('encheres', 'cryptes') for update;
+  if not found or m.status <> 'waiting' or m.b is distinct from me or m.public then raise exception 'Cette partie n’est plus disponible.'; end if;
+  perform public.mp_start(p_id);
+  return p_id;
+end $$;
+
+-- Jouer : Enchères {"offer": 7} ; Cryptes {"flip": 12} ou {"picks": [3, 8]}
+create or replace function public.mp_act(p_id uuid, p_move jsonb)
+returns jsonb language plpgsql volatile security definer set search_path = public as $$
+declare me uuid := auth.uid(); m public.mp_matches; who text; st jsonb;
+begin
+  if me is null then raise exception 'Connecte-toi d’abord.'; end if;
+  perform public.mp_expire();
+  select * into m from public.mp_matches where id = p_id and game in ('encheres', 'cryptes') and me in (a, b) for update;
+  if not found then raise exception 'Partie introuvable.'; end if;
+  if m.status <> 'playing' then raise exception 'Cette partie est terminée.'; end if;
+  who := case when m.a = me then 'a' else 'b' end;
+  if m.turn <> who and m.turn <> 'ab' then raise exception '%', case when m.game = 'encheres' then 'Ton offrande est déjà posée : on attend ton adversaire.' else 'Ce n’est pas ton tour.' end; end if;
+  if m.game = 'encheres' then st := public.encheres_apply(m.state, who, (p_move ->> 'offer')::int);
+  else st := public.cryptes_apply(m.state, who, p_move); end if;
+  if (st ->> 'over')::boolean then
+    update public.mp_matches set state = st, status = 'done', winner = st ->> 'winner', reason = 'score', turn = null, deadline = null, updated_at = now() where id = p_id;
+  else
+    update public.mp_matches set state = st, turn = st ->> 'turn', deadline = now() + public.mp_delay(m.pace), updated_at = now() where id = p_id;
+  end if;
+  return public.mp_view(p_id);
+end $$;
+
+-- Ce que chaque joueur voit de la partie (cartes cachées, offrande adverse secrète, paquet sans son ordre)
+create or replace function public.mp_state_for(m public.mp_matches, me text)
+returns jsonb language plpgsql stable set search_path = public as $$
+declare st jsonb := m.state; foe text := case when me = 'a' then 'b' else 'a' end; i int;
+begin
+  if m.game = 'sceaux' then return st - 'handA'; end if;
+  if m.game = 'pacte' then
+    if st ? 'deck' then st := jsonb_set(st, '{deck}', coalesce((select jsonb_agg(x order by x::text) from jsonb_array_elements(st -> 'deck') x), '[]')); end if;
+    return st;
+  end if;
+  if m.game = 'encheres' and st ? 'lots' then
+    i := coalesce((st ->> 'i')::int, 0);
+    return (st - 'lots' - 'bids') || jsonb_build_object('total', jsonb_array_length(st -> 'lots'), 'lot', st -> 'lots' -> i,
+      'rest', coalesce((select jsonb_agg(x order by (x ->> 'v')::int desc) from jsonb_array_elements(st -> 'lots') with ordinality e(x, o) where o - 1 > i), '[]'),
+      'bids', jsonb_build_object(me, st -> 'bids' -> me, foe, (st -> 'bids' ->> foe) is not null));
+  end if;
+  if m.game = 'cryptes' and st ? 'cards' then
+    return st || jsonb_build_object(
+      'cards', (select jsonb_agg(case when c ->> 'gone' is not null or (st -> 'open') @> to_jsonb(o - 1) then c else jsonb_build_object('gone', null) end order by o) from jsonb_array_elements(st -> 'cards') with ordinality e(c, o)),
+      'log', coalesce((select jsonb_agg(case when x ->> 'power' = 'infernal' and x ->> 'kind' = 'power' and x ->> 'who' <> me then x - 'card' else x end order by o) from jsonb_array_elements(st -> 'log') with ordinality e(x, o)), '[]'),
+      'last', case when st #>> '{last,power}' = 'infernal' and st #>> '{last,kind}' = 'power' and st #>> '{last,who}' <> me then (st -> 'last') - 'card' else st -> 'last' end);
+  end if;
+  return st;
+end $$;
+revoke execute on function public.mp_state_for(public.mp_matches, text) from public, anon, authenticated;
+
+-- Victoires et défaites contre chaque ami (Cryptes : pas de récompense, seulement ce compte)
+create or replace function public.mp_friend_record(p_game text)
+returns table (foe uuid, pseudo text, avatar text, wins int, losses int, draws int)
+language sql stable security definer set search_path = public as $$
+  with r as (
+    select case when a = auth.uid() then b else a end as foe,
+      case when winner = 'draw' then 'd' when (winner = 'a') = (a = auth.uid()) then 'w' else 'l' end as res
+    from public.mp_matches where game = p_game and status = 'done' and auth.uid() in (a, b) and b is not null
+  )
+  select r.foe, p.pseudo, p.avatar, count(*) filter (where res = 'w')::int, count(*) filter (where res = 'l')::int, count(*) filter (where res = 'd')::int
+  from r join public.profiles p on p.id = r.foe group by r.foe, p.pseudo, p.avatar order by count(*) desc limit 50
+$$;
+
 -- Abandonner (partie en cours), annuler (en attente) ou refuser un défi d'ami
 create or replace function public.mp_leave(p_id uuid)
 returns text language plpgsql volatile security definer set search_path = public as $$
@@ -457,7 +745,7 @@ end $$;
 create or replace function public.mp_view(p_id uuid)
 returns jsonb language sql stable security definer set search_path = public as $$
   select jsonb_build_object('id', m.id, 'game', m.game, 'status', m.status, 'public', m.public, 'turn', m.turn, 'deadline', m.deadline,
-    'me', case when m.a = auth.uid() then 'a' else 'b' end, 'state', case when m.game = 'pacte' and m.state ? 'deck' then jsonb_set(m.state, '{deck}', coalesce((select jsonb_agg(x order by x::text) from jsonb_array_elements(m.state -> 'deck') x), '[]')) else m.state - 'handA' end, 'winner', m.winner, 'reason', m.reason,
+    'me', case when m.a = auth.uid() then 'a' else 'b' end, 'state', public.mp_state_for(m, case when m.a = auth.uid() then 'a' else 'b' end), 'winner', m.winner, 'reason', m.reason,
     'claimed', case when m.a = auth.uid() then m.a_claimed else m.b_claimed end, 'created_at', m.created_at, 'updated_at', m.updated_at,
     'now', now(), 'hours', public.mp_hours(), 'pace', m.pace,
     'foe', (select jsonb_build_object('id', p.id, 'pseudo', p.pseudo, 'avatar', p.avatar, 'badge', p.badge) from public.profiles p where p.id = case when m.a = auth.uid() then m.b else m.a end))
@@ -535,6 +823,14 @@ revoke execute on function public.pacte_mp_act(uuid, text) from public, anon;
 grant execute on function public.pacte_mp_new(uuid, text) to authenticated;
 grant execute on function public.pacte_mp_join(uuid) to authenticated;
 grant execute on function public.pacte_mp_act(uuid, text) to authenticated;
+revoke execute on function public.mp_new(text, uuid, text) from public, anon;
+revoke execute on function public.mp_join(uuid) from public, anon;
+revoke execute on function public.mp_act(uuid, jsonb) from public, anon;
+revoke execute on function public.mp_friend_record(text) from public, anon;
+grant execute on function public.mp_new(text, uuid, text) to authenticated;
+grant execute on function public.mp_join(uuid) to authenticated;
+grant execute on function public.mp_act(uuid, jsonb) to authenticated;
+grant execute on function public.mp_friend_record(text) to authenticated;
 grant execute on function public.mp_get(uuid) to authenticated;
 grant execute on function public.mp_list(text) to authenticated;
 grant execute on function public.mp_claim(uuid) to authenticated;

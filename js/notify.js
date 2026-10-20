@@ -47,7 +47,7 @@ export async function syncReminders(g, turns) {
   const list = turns.map((v) => ({ v, at: new Date(new Date(v.deadline).getTime() - REMIND_HOURS * 3600000) })).filter((x) => x.at.getTime() > Date.now() + 60000);
   if (!list.length) return;
   try {
-    await L.schedule({ notifications: list.map(({ v, at }) => ({ id: idOf(v.id), title: v.game === 'pacte' ? 'Le Pacte' : 'Duels des Sceaux', body: `Plus que ${REMIND_HOURS} h pour jouer ton coup contre ${v.foe?.pseudo || 'ton adversaire'}, sinon la partie est perdue !`, schedule: { at, allowWhileIdle: true } })) });
+    await L.schedule({ notifications: list.map(({ v, at }) => ({ id: idOf(v.id), title: { pacte: 'Le Pacte', encheres: 'Les Enchères de Mammon', cryptes: 'Les Cryptes' }[v.game] || 'Duels des Sceaux', body: `Plus que ${REMIND_HOURS} h pour jouer ton coup contre ${v.foe?.pseudo || 'ton adversaire'}, sinon la partie est perdue !`, schedule: { at, allowWhileIdle: true } })) });
   } catch (e) { /* rien */ }
 }
 

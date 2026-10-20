@@ -26,8 +26,8 @@ export default function gamesScreen(app, root) {
       ${tile('#/encheres', 'gm-encheres', 'Les Enchères de Mammon', 'Enchères à l’aveugle à trois : offre plus que les autres… sans jamais offrir pareil.', `${rec(en.wins, en.losses)} · ${Object.keys(en.beaten || {}).length} / ${EN.TABLES.length} ventes gagnées`, 'assets/ui/bn-encheres.webp')}
     </div>`;
   /* v519 : parties en ligne qui attendent ton coup (v523 : Sceaux et Pacte) */
-  if (cloud.isLoggedIn()) for (const gm of ['sceaux', 'pacte']) cloud.mpList(gm).then((L) => {
-    const n = L.filter((v) => v.status === 'playing' && v.turn === v.me).length;
+  if (cloud.isLoggedIn()) for (const gm of ['sceaux', 'pacte', 'encheres', 'cryptes']) cloud.mpList(gm).then((L) => {
+    const n = L.filter((v) => v.status === 'playing' && (v.turn === v.me || v.turn === 'ab')).length;
     const t = root.querySelector(`.gm-${gm} .gm-txt`);
     if (n && t) t.insertAdjacentHTML('beforeend', `<span class="gm-daily">${icon('p:hourglass')}À toi de jouer en ligne (${n})</span>`);
   }).catch(() => {});

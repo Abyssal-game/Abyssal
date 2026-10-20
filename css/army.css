@@ -4918,3 +4918,12 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .vd-emb.lose { filter: drop-shadow(0 0 22px rgba(255, 60, 80, .5)); }
 @keyframes vdEmb { from { transform: scale(.4) rotate(-8deg); opacity: 0; } }
 .vd { bottom: auto; height: var(--app-h, 100dvh); }
+
+/* v525 : Enchères en ligne (toi dans le fauteuil de droite) et Cryptes entre amis (bilan par ami) */
+.mp-en .en-chair .pa-tag { margin: 1px 0; font-size: .58rem; padding: 1px 6px; }
+.mp-en .en-chair.c-b .sc-med { box-shadow: 0 0 0 2px #E8C35A; border-radius: 50%; }
+.mp-en .mp-clock, .mp-cr .mp-clock { margin: 4px 0 2px; }
+.mp-en .mp-resign, .mp-cr .mp-resign { display: block; margin: 4px auto 0; min-height: 36px; padding: 4px 14px; }
+.mp-en .sc-msg { margin: 4px 0; text-align: center; }
+.mp-wl { display: inline-flex; align-items: baseline; gap: 4px; font: 700 1.2rem/1 var(--f-display); }
+.mp-wl .w { color: #7FE0A0; } .mp-wl .l { color: #FF8A8A; } .mp-wl i { color: var(--muted); font-style: normal; }
