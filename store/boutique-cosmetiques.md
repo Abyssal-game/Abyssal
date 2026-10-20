@@ -668,3 +668,42 @@ Portrait de joueur pour un jeu de cartes dark fantasy haut de gamme, buste vu de
 ```
 Portrait de joueur pour un jeu de cartes dark fantasy haut de gamme, buste vu de trois quarts face, cadrage serré tête et épaules, format carré 1:1, peinture numérique très détaillée façon illustration de carte premium, éclairage dramatique en clair-obscur, fond sombre et flou qui rappelle le lieu du personnage. Le visage est au centre de l'image, à égale distance des bords, car le portrait sera découpé en cercle. Une chasseuse de reliques au regard vif, capuche de cuir, cheveux roux tressés, foulard, une boucle d'oreille en dent de bête, une carte enroulée sur l'épaule ; derrière elle, l'entrée d'une ruine éclairée par une torche. Regard fort et expression marquée, matières riches, palette cohérente. Aucun texte, aucune lettre, aucun logo, pas de cadre ni de bordure.
 ```
+
+## Ajouts du 20 octobre 2026 (nouvelles idées, intégrables tout de suite)
+*cadres et dos : mêmes outils que plus haut (`frame-art.py --fit`, `back-art.py`).*
+
+### 101. `cx-carnaval` — Cadre du carnaval des ombres
+Légendaire · 700 obsidiennes · collection Carnaval des ombres
+```
+Cadre de portrait circulaire pour l'avatar d'un joueur dans un jeu de cartes dark fantasy haut de gamme, vu parfaitement de face, centré, format carré 1:1, sur fond blanc pur uni. Un anneau épais (environ 15 % du diamètre) fait de masques vénitiens de carnaval noirs et or qui se chevauchent tout autour du cercle, certains souriants, d'autres tristes, aux yeux vides ; rubans de satin pourpre qui s'enroulent entre eux, plumes noires irisées et petits grelots d'or ; un grand masque doré à longues plumes au sommet. Couleurs : noir laqué, or, pourpre profond, touches de vert émeraude dans les plumes. L'intérieur du cercle est entièrement vide et blanc pur (il recevra le portrait du joueur). Peinture numérique très détaillée, qualité d'illustration de jeu de cartes premium, matières réalistes, éclairage dramatique venant du haut, symétrique, lisible même en très petit (48 pixels). Pas de halo diffus sur le fond, pas d'ombre portée, rien qui flotte détaché de l'anneau. Aucun texte, aucune lettre, aucun chiffre, aucun logo, rien au centre.
+```
+
+### 102. `cx-phalenes` — Cadre des phalènes
+Épique · 450 obsidiennes · collection Arts interdits
+```
+Cadre de portrait circulaire pour l'avatar d'un joueur dans un jeu de cartes dark fantasy haut de gamme, vu parfaitement de face, centré, format carré 1:1, sur fond blanc pur uni. Un anneau épais (environ 15 % du diamètre) de branches d'argent noirci finement gravées, sur lesquelles sont posés sept grands papillons de nuit aux ailes de velours brun, gris et violet, dont les ailes portent des ocelles ronds qui ressemblent à des yeux dorés ; poussière d'ailes scintillante posée sur l'anneau, petite lune d'argent en croissant au sommet. Couleurs : argent noirci, brun velours, violet, or pâle. L'intérieur du cercle est entièrement vide et blanc pur (il recevra le portrait du joueur). Peinture numérique très détaillée, qualité d'illustration de jeu de cartes premium, matières réalistes, éclairage dramatique venant du haut, symétrique, lisible même en très petit (48 pixels). Pas de halo diffus sur le fond, pas d'ombre portée, rien qui flotte détaché de l'anneau. Aucun texte, aucune lettre, aucun chiffre, aucun logo, rien au centre.
+```
+
+### 103. `cx-cristaux-sang` — Cadre des cristaux de sang
+Légendaire · 750 obsidiennes · collection Merveilles
+```
+Cadre de portrait circulaire pour l'avatar d'un joueur dans un jeu de cartes dark fantasy haut de gamme, vu parfaitement de face, centré, format carré 1:1, sur fond blanc pur uni. Un anneau épais (environ 15 % du diamètre) de roche noire brute d'où jaillissent des cristaux rouge rubis translucides et taillés en pointes, qui poussent tous vers l'extérieur du cercle ; une lumière rouge vive brille au cœur des cristaux, fines veines d'or dans la roche, quelques éclats de cristal plus petits entre les grands. Couleurs : noir, rouge rubis lumineux, or. L'intérieur du cercle est entièrement vide et blanc pur (il recevra le portrait du joueur). Peinture numérique très détaillée, qualité d'illustration de jeu de cartes premium, matières réalistes, éclairage dramatique venant du haut, symétrique, lisible même en très petit (48 pixels). Pas de halo diffus sur le fond, pas d'ombre portée, rien qui flotte détaché de l'anneau. Aucun texte, aucune lettre, aucun chiffre, aucun logo, rien au centre.
+```
+
+### 104. `dos-carnaval` — Dos du carnaval des ombres
+Légendaire · 750 obsidiennes · collection Carnaval des ombres
+```
+Dos de carte à jouer pour un jeu de cartes dark fantasy haut de gamme, format vertical 5:7, cadré bord à bord (l'illustration remplit toute l'image, sans marge ni fond autour), peinture numérique très détaillée, qualité d'illustration de jeu de cartes premium. Au centre, un grand masque vénitien de carnaval en porcelaine noire et or, aux yeux vides d'où s'échappe une lueur violette, couronné de longues plumes noires et pourpres ; autour de lui, des rubans de satin et des losanges d'arlequin noirs, pourpres et or qui forment un motif régulier jusqu'aux bords ; confettis d'or figés dans l'air. Couleurs : noir laqué, pourpre profond, or, éclats violets. Une fine bordure régulière court sur les quatre côtés à égale distance du bord. Motif parfaitement symétrique gauche-droite, emblème central net, contrasté et lisible même quand la carte est toute petite. Aucun texte, aucune lettre, aucun chiffre, aucun logo.
+```
+
+### 105. `dos-phalene` — Dos de la grande phalène
+Épique · 500 obsidiennes · collection Arts interdits
+```
+Dos de carte à jouer pour un jeu de cartes dark fantasy haut de gamme, format vertical 5:7, cadré bord à bord (l'illustration remplit toute l'image, sans marge ni fond autour), peinture numérique très détaillée, qualité d'illustration de jeu de cartes premium. Au centre, un immense papillon de nuit vu de face, ailes grandes ouvertes qui remplissent presque toute la largeur de la carte ; ses ailes de velours brun et violet portent deux grands ocelles dorés qui ressemblent à des yeux, et des motifs fins comme de la dentelle ; derrière lui, un croissant de lune d'argent et un fond bleu nuit semé de poussière d'or. Couleurs : brun velours, violet, or, bleu nuit, argent. Une fine bordure régulière court sur les quatre côtés à égale distance du bord. Motif parfaitement symétrique gauche-droite, emblème central net, contrasté et lisible même quand la carte est toute petite. Aucun texte, aucune lettre, aucun chiffre, aucun logo.
+```
+
+### 106. `dos-coeur-mecanique` — Dos du cœur mécanique
+Légendaire · 750 obsidiennes · collection Cœurs maudits
+```
+Dos de carte à jouer pour un jeu de cartes dark fantasy haut de gamme, format vertical 5:7, cadré bord à bord (l'illustration remplit toute l'image, sans marge ni fond autour), peinture numérique très détaillée, qualité d'illustration de jeu de cartes premium. Au centre, un cœur anatomique fait de laiton, de cuivre et de verre, dont on voit les engrenages et les petits pistons à travers des vitres ; une lumière rouge pulse en son centre ; des tuyaux de cuivre en partent comme des artères et se ramifient en volutes régulières jusqu'aux bords de la carte, sur un fond de velours bordeaux sombre. Couleurs : laiton, cuivre, rouge lumineux, bordeaux, noir. Une fine bordure régulière court sur les quatre côtés à égale distance du bord. Motif parfaitement symétrique gauche-droite, emblème central net, contrasté et lisible même quand la carte est toute petite. Aucun texte, aucune lettre, aucun chiffre, aucun logo.
+```
