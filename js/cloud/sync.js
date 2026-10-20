@@ -14,7 +14,7 @@ const emit = () => listeners.forEach((f) => f(sync));
 
 function profilePayload() {
   const g = app.game, s = g.s;
-  return { avatar: s.avatar, title: s.title, level: g.levelInfo().level, owned: g.uniqueCount() };
+  return { avatar: g.shownAvatar(), title: s.title, level: g.levelInfo().level, owned: g.uniqueCount() };
 }
 
 // Date (côté serveur) de la dernière sauvegarde en ligne connue de cet appareil.

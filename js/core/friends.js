@@ -16,7 +16,7 @@ export function friendCard(g) {
   const game = (k) => ({ w: s[k]?.wins || 0, b: Object.keys(s[k]?.beaten || {}).length });
   return {
     v: CARD_VERSION,
-    lv: g.levelInfo().level, title: s.title || '', frame: s.frame || null, avatar: s.avatar || null,
+    lv: g.levelInfo().level, title: s.title || '', frame: s.frame || null, avatar: (g.shownAvatar ? g.shownAvatar() : s.avatar) || null,
     show: (s.showcase || []).filter((id) => col[id] !== undefined).slice(0, 3),
     titles: (s.titles || []).length,
     col,

@@ -698,6 +698,14 @@ revoke execute on function public.sceaux_start(uuid, text[]) from public, anon, 
 
 -- ——— Partie rapide (contre un joueur au hasard) ou défi à un ami ————————————————————————
 drop function if exists public.sceaux_mp_new(text[], uuid);
+-- v528 : revanche : on peut défier un joueur (même pas ami) contre qui on vient de finir une partie (30 min)
+create or replace function public.mp_recent_foe(x uuid, y uuid)
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.mp_matches where status = 'done' and updated_at > now() - interval '30 minutes'
+    and ((a = x and b = y) or (a = y and b = x)))
+$$;
+revoke execute on function public.mp_recent_foe(uuid, uuid) from public, anon, authenticated;
+
 create or replace function public.sceaux_mp_new(p_hand text[], p_to uuid default null, p_pace text default 'slow')
 returns uuid language plpgsql volatile security definer set search_path = public as $$
 declare me uuid := auth.uid(); m public.mp_matches; id uuid; n int;
@@ -723,7 +731,7 @@ begin
     end if;
   else
     if p_to = me then raise exception 'Tu ne peux pas te défier toi-même.'; end if;
-    if not public.are_friends(me, p_to) then raise exception 'Ce joueur n’est pas ton ami.'; end if;
+    if not public.are_friends(me, p_to) and not public.mp_recent_foe(me, p_to) then raise exception 'Ce joueur n’est pas ton ami.'; end if; -- v528 : ou revanche juste après une partie
   end if;
   insert into public.mp_matches (game, a, b, public, pace, state) values ('sceaux', me, p_to, p_to is null, p_pace, jsonb_build_object('handA', to_jsonb(p_hand)))
   returning mp_matches.id into id;
@@ -899,7 +907,7 @@ begin
     end if;
   else
     if p_to = me then raise exception 'Tu ne peux pas te défier toi-même.'; end if;
-    if not public.are_friends(me, p_to) then raise exception 'Ce joueur n’est pas ton ami.'; end if;
+    if not public.are_friends(me, p_to) and not public.mp_recent_foe(me, p_to) then raise exception 'Ce joueur n’est pas ton ami.'; end if; -- v528 : ou revanche juste après une partie
   end if;
   insert into public.mp_matches (game, a, b, public, pace, state) values ('pacte', me, p_to, p_to is null, p_pace, '{}'::jsonb)
   returning mp_matches.id into id;
@@ -1127,7 +1135,7 @@ begin
   if p_game is null or p_game not in ('encheres', 'cryptes') then raise exception 'Jeu inconnu.'; end if;
   if not exists (select 1 from public.profiles where profiles.id = me) then raise exception 'Choisis d’abord ton pseudo (Sanctuaire → Compte).'; end if;
   if p_pace is null or p_pace not in ('fast', 'slow') then raise exception 'Vitesse inconnue.'; end if;
-  if p_game = 'cryptes' and p_to is null then raise exception 'Les Cryptes se jouent seulement entre amis.'; end if;
+  if p_game = 'cryptes' and (p_to is null or not public.are_friends(me, p_to)) then raise exception 'Les Cryptes se jouent seulement entre amis.'; end if;
   perform public.mp_expire();
   select count(*) into n from public.mp_matches where me in (a, b) and status in ('waiting', 'playing');
   if n >= 10 then raise exception 'Tu as déjà 10 parties en cours : termine-en une d’abord.'; end if;
@@ -1144,7 +1152,7 @@ begin
     end if;
   else
     if p_to = me then raise exception 'Tu ne peux pas te défier toi-même.'; end if;
-    if not public.are_friends(me, p_to) then raise exception 'Ce joueur n’est pas ton ami.'; end if;
+    if not public.are_friends(me, p_to) and not public.mp_recent_foe(me, p_to) then raise exception 'Ce joueur n’est pas ton ami.'; end if; -- v528 : ou revanche juste après une partie
   end if;
   insert into public.mp_matches (game, a, b, public, pace, state) values (p_game, me, p_to, p_to is null, p_pace, '{}'::jsonb)
   returning mp_matches.id into id;

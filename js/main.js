@@ -132,6 +132,18 @@ fitHeight();
 addEventListener('resize', fitHeight);
 addEventListener('orientationchange', () => setTimeout(fitHeight, 300));
 
+// v528 : toucher le pseudo ou le portrait d'un joueur ouvre son profil (ami ou non), même depuis une fenêtre
+function openProfile(e) {
+  const p = e.target.closest('[data-profile]');
+  if (!p || (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ')) return;
+  e.preventDefault(); e.stopPropagation();
+  app.sfx?.tap?.();
+  while (closeTopSheet()) { /* ferme les fenêtres ouvertes */ }
+  app.go(`amis/${p.dataset.profile}`);
+}
+document.addEventListener('click', openProfile, true);
+document.addEventListener('keydown', openProfile, true);
+
 document.addEventListener('click', (e) => {
   if (e.target.closest('[data-obs]')) { (app.state.codex ||= { tab: 'codex' }).tab = 'shop'; app.sfx?.tap?.(); app.go('codex'); return; }
   const b = e.target.closest('[data-wallet]');

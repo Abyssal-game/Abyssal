@@ -9,6 +9,7 @@ import { VERSUS_TYPES, VERSUS_MAX, VERSUS_HOURS, scoreOf, lineupStake, lineupOf,
 import { isBlocked } from '../core/moderation.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, EMBLEM, picon } from '../ui/icons.js';
+import { profileAttrs } from '../ui/report.js';
 import { esc, fmt, toast, confirmBox, openSheet, bindActions } from '../ui/dom.js';
 import { packHTML } from './shop.js';
 import { playDuel } from './versus-duel.js';
@@ -57,11 +58,8 @@ export default function versusScreen(app, root) {
 
   function draw() {
     if (!alive) return;
-    if (!cloud.isLoggedIn()) {
-      root.innerHTML = `${head()}${rulesHTML()}<section class="panel stack center"><p>Le Pari des Boosters se joue contre d’autres joueurs : crée ton compte en un instant, ta partie est gardée.</p><a class="btn primary block" href="#/compte">${icon('user')}Créer un compte ou se connecter</a></section>`;
-      return;
-    }
-    if (!sync.profile?.pseudo) {
+    /* v528 : le compte est obligatoire (porte du compte au lancement) : seul le pseudo peut manquer */
+    if (!cloud.isLoggedIn() || !sync.profile?.pseudo) {
       root.innerHTML = `${head()}${rulesHTML()}<section class="panel stack center"><p>Choisis d’abord ton pseudo : c’est lui que verront tes adversaires.</p><a class="btn primary block" href="#/compte">Choisir mon pseudo</a></section>`;
       return;
     }
@@ -94,7 +92,8 @@ export default function versusScreen(app, root) {
   function row(r, acts, sub, self = false) {
     const who = self ? (r.public ? 'Ouvert à tous' : name({ a: r.b, pseudo: r.pseudo })) : name(r);
     const av = self && r.public ? EMBLEM : pic(isBlocked(r.a) ? null : r.avatar);
-    return `<div class="vs-row"><span class="fr-av">${av}</span><span class="fr-t"><b>${esc(who)}</b>${!self && r.badge ? ` ${cloud.badgeHTML(r.badge)}` : ''}<small>${sub}</small></span>${acts}</div>`;
+    const foe = self ? (r.public ? null : r.b) : (r.mine ? r.b : r.a);
+    return `<div class="vs-row"><span class="fr-av"${profileAttrs(foe)}>${av}</span><span class="fr-t"><b>${esc(who)}</b>${!self && r.badge ? ` ${cloud.badgeHTML(r.badge)}` : ''}<small>${sub}</small></span>${acts}</div>`;
   }
 
   function createHTML() {
@@ -238,7 +237,7 @@ export default function versusScreen(app, root) {
 
   // ——— Le face-à-face (v521 : plein écran, js/screens/versus-duel.js) ———
   function duel(r, out) {
-    playDuel(app, r, out, { foeName: name({ a: r.mine ? r.b : r.a, pseudo: r.pseudo }), myAvatar: g.s.avatar || sync.profile?.avatar,
+    playDuel(app, r, out, { foeName: name({ a: r.mine ? r.b : r.a, pseudo: r.pseudo }), myAvatar: g.shownAvatar() || sync.profile?.avatar,
       onClose: () => { if (out?.progress?.length) { app.pendingProgress = out.progress; app.flushProgress?.(); out.progress = null; } draw(); } });
   }
 

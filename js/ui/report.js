@@ -17,18 +17,20 @@ export const MASKED_NAME = 'Joueur masqué';
 export const FRIEND_MSG = { sent: 'Demande d’ami envoyée.', accepted: 'Vous êtes maintenant amis !', pending: 'Demande déjà envoyée : il doit l’accepter.', already: 'Vous êtes déjà amis.' };
 
 // Attributs à poser sur une ligne de classement (rien pour sa propre ligne).
+// v528 : toucher un joueur ouvre son profil (où l'on peut l'ajouter en ami, le signaler ou le masquer)
 export function rowAttrs(uid, pseudo, me) {
   if (!uid || uid === me) return '';
-  return ` data-uid="${esc(uid)}" data-pseudo="${esc(pseudo || '')}" role="button" tabindex="0"`;
+  return profileAttrs(uid);
 }
+export const profileAttrs = (uid) => (uid ? ` data-profile="${esc(uid)}" role="button" tabindex="0"` : '');
 // Nom affiché : « Joueur masqué » pour un joueur masqué sur cet appareil.
 export const shownName = (uid, pseudo) => (isBlocked(uid) ? MASKED_NAME : pseudo || '?');
 
-function openReport(uid, pseudo, onChange) {
+export function openReport(uid, pseudo, onChange, { noFriend = false } = {}) {
   const blocked = isBlocked(uid);
   const s = openSheet(`<div class="rep stack">
       <h2>${esc(blocked ? MASKED_NAME : pseudo)}</h2>
-      ${blocked ? '' : `<button class="btn primary block" data-f="1">${icon('user')}Ajouter en ami</button>`}
+      ${blocked || noFriend ? '' : `<button class="btn primary block" data-f="1">${icon('user')}Ajouter en ami</button>`}
       <p class="small muted">Ce pseudo te semble choquant, haineux ou trompeur ? Signale-le : au bout de plusieurs signalements, il est masqué pour tout le monde. Ton signalement est anonyme pour ce joueur.</p>
       <div class="rep-reasons">${REASONS.map(([k, t]) => `<button class="btn small block" data-r="${k}">${esc(t)}</button>`).join('')}</div>
       <button class="btn ghost block" data-b="1">${blocked ? icon('eye') : ''}${blocked ? 'Réafficher ce joueur' : 'Masquer ce joueur pour moi'}</button>
@@ -63,17 +65,5 @@ function openReport(uid, pseudo, onChange) {
   });
 }
 
-// Branche le toucher sur toutes les lignes d'un classement (à appeler une fois par boîte).
-export function bindReport(box, onChange) {
-  if (!box || box.dataset.rep) return;
-  box.dataset.rep = '1';
-  const go = (e) => {
-    const row = e.target.closest('.lb-row[data-uid]');
-    if (!row || !box.contains(row)) return;
-    if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
-    e.preventDefault();
-    openReport(row.dataset.uid, row.dataset.pseudo, onChange);
-  };
-  box.addEventListener('click', go);
-  box.addEventListener('keydown', go);
-}
+// v528 : les lignes de classement ouvrent le profil du joueur (gestion commune de [data-profile] dans main.js)
+export function bindReport() {}

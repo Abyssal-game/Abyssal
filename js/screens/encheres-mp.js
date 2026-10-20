@@ -26,7 +26,7 @@ export function createEncheresMp(app, root, { modeBar }) {
   const wait = (ms) => (cur && !cur.ctx.alive ? Promise.reject(STOP) : new Promise((r, j) => { wake = j; timer = setTimeout(r, (app.reduced() ? Math.min(ms, 150) : ms) * spd()); }));
   const fname = (f) => tw(cat.faction[f]?.name || f); /* nom de faction traduit (les blocs contiennent un pseudo ou un nombre) */
   const foeOf = (v) => (v.me === 'a' ? 'b' : 'a');
-  const myPic = () => { const c = g.s.avatar && cat.get(g.s.avatar); return `<img alt="" src="${c ? artUrl(c, { lite: true }) : 'assets/brand/emblem.webp'}">`; };
+  const myPic = () => { const c = cat.get(g.shownAvatar()); return `<img alt="" src="${c ? artUrl(c, { lite: true }) : 'assets/brand/emblem.webp'}">`; };
   // illustration d'un lot : une créature de sa faction, à la rareté de sa valeur (la même pour toute la vente)
   const artOf = (v, l) => {
     const pool = cat.byFaction?.[l.f] || [], fit = pool.filter((x) => x.rarity === RAR_OF(l.v)), list = fit.length ? fit : pool;

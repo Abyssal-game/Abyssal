@@ -4927,3 +4927,15 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .mp-en .sc-msg { margin: 4px 0; text-align: center; }
 .mp-wl { display: inline-flex; align-items: baseline; gap: 4px; font: 700 1.2rem/1 var(--f-display); }
 .mp-wl .w { color: #7FE0A0; } .mp-wl .l { color: #FF8A8A; } .mp-wl i { color: var(--muted); font-style: normal; }
+
+/* v528 : accueil en ligne : bannière des deux joueurs à la table, médaillons des deux vitesses, profil d'un joueur */
+.bn-enligne { --bn: url(../assets/ui/bn-enligne.webp); }
+.mp-pace-ic { width: 64px; height: 64px; object-fit: contain; margin-bottom: 2px; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .6)); }
+.mp-pace.fast .mp-pace-ic { filter: drop-shadow(0 0 12px rgba(242, 193, 78, .45)) drop-shadow(0 4px 10px rgba(0, 0, 0, .6)); }
+.mp-pace:disabled .mp-pace-ic { filter: grayscale(.6); }
+[data-profile] { cursor: pointer; }
+.fr-av[data-profile] { position: relative; }
+.fr-av[data-profile]:active, .lb-row[data-profile]:active { transform: scale(.96); }
+.fr-pacts { margin-top: 14px; gap: 10px; }
+.fr-locked p { margin: 0; display: inline-flex; align-items: center; gap: 6px; justify-content: center; }
+.mp-end .dc-plq-red { margin-bottom: 8px; }

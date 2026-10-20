@@ -44,10 +44,10 @@ export default function pacteScreen(app, root) {
   const wait = (ms) => new Promise((r) => { timer = setTimeout(r, app.reduced() ? Math.min(ms, 150) : ms); });
   const fname = (f) => cat.faction[f]?.name || f;
   const todayKey = () => { const d = g.clock(), p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; };
-  const me = () => { const c = g.s.avatar && cat.get(g.s.avatar); return `<img alt="" src="${c ? artUrl(c, { lite: true }) : 'assets/brand/emblem.webp'}">`; };
+  const me = () => { const c = cat.get(g.shownAvatar()); return `<img alt="" src="${c ? artUrl(c, { lite: true }) : 'assets/brand/emblem.webp'}">`; };
   // v523 : « Contre l'Abysse » (arbitres) ou « Contre un joueur » (parties en ligne, pacte-mp.js)
   const ui = (app.state.pacte ||= { mode: 'solo' });
-  const modeBar = (rec = '') => `<header class="screen-head ui-hero bn-pacte"><h1>Le Pacte</h1><p class="muted">${ui.mode === 'mp' ? 'Affronte d’autres joueurs : premier à 60 points.' : 'Tire, encore une… et ne brise pas le pacte.'}</p>${rec}</header>
+  const modeBar = (rec = '') => `<header class="screen-head ui-hero ${ui.mode === 'mp' ? 'bn-enligne' : 'bn-pacte'}"><h1>Le Pacte</h1><p class="muted">${ui.mode === 'mp' ? 'Affronte d’autres joueurs : premier à 60 points.' : 'Tire, encore une… et ne brise pas le pacte.'}</p>${rec}</header>
     <div class="seg wide gm-mode" role="tablist"><button class="seg-b" role="tab" data-pa="mode" data-v="solo" aria-selected="${ui.mode !== 'mp'}" aria-pressed="${ui.mode !== 'mp'}">Contre l’Abysse</button><button class="seg-b" role="tab" data-pa="mode" data-v="mp" aria-selected="${ui.mode === 'mp'}" aria-pressed="${ui.mode === 'mp'}">Contre un joueur</button></div>`;
   const mp = createPacteMp(app, root, { modeBar: () => modeBar() });
 

@@ -31,10 +31,10 @@ export default function encheresScreen(app, root) {
   const fname = (f) => cat.faction[f]?.name || f;
   const todayKey = () => { const d = g.clock(), p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; };
   const who = (st, x) => (x === 'p' ? { name: 'Toi', key: null } : { ...EN.BIDDERS[st.seats[x]], key: st.seats[x] });
-  const me = () => { const c = g.s.avatar && cat.get(g.s.avatar); return `<img alt="" src="${c ? artUrl(c, { lite: true }) : 'assets/brand/emblem.webp'}">`; };
+  const me = () => { const c = cat.get(g.shownAvatar()); return `<img alt="" src="${c ? artUrl(c, { lite: true }) : 'assets/brand/emblem.webp'}">`; };
   // v525 : « Contre l'Abysse » (arbitres) ou « Contre un joueur » (parties en ligne)
   const mui = (app.state.encheresMode ||= { mode: 'solo' });
-  const modeBar = (rec = '') => `<header class="screen-head ui-hero bn-encheres"><h1>Les Enchères de Mammon</h1><p class="muted">${mui.mode === 'mp' ? 'Affronte d’autres joueurs : une vente à deux, en même temps.' : 'Offre plus que les autres… sans jamais offrir pareil.'}</p>${rec}</header>
+  const modeBar = (rec = '') => `<header class="screen-head ui-hero ${mui.mode === 'mp' ? 'bn-enligne' : 'bn-encheres'}"><h1>Les Enchères de Mammon</h1><p class="muted">${mui.mode === 'mp' ? 'Affronte d’autres joueurs : une vente à deux, en même temps.' : 'Offre plus que les autres… sans jamais offrir pareil.'}</p>${rec}</header>
     <div class="seg wide gm-mode" role="tablist"><button class="seg-b" role="tab" data-en="mode" data-v="solo" aria-selected="${mui.mode !== 'mp'}" aria-pressed="${mui.mode !== 'mp'}">Contre l’Abysse</button><button class="seg-b" role="tab" data-en="mode" data-v="mp" aria-selected="${mui.mode === 'mp'}" aria-pressed="${mui.mode === 'mp'}">Contre un joueur</button></div>`;
   const mp = createEncheresMp(app, root, { modeBar: () => modeBar() });
 

@@ -1571,6 +1571,15 @@ export class Game {
     return ups;
   }
   // Favoris : une étoile sur la carte, et sa dernière copie ne peut pas être brûlée
+  // v528 : portrait montré aux autres joueurs : celui choisi, sinon la 1re carte de la vitrine, sinon le favori le plus rare, sinon la créature la plus rare
+  shownAvatar() {
+    const s = this.s, has = (id) => id && s.collection?.[id] && this.catalog.get(id);
+    if (has(s.avatar)) return s.avatar;
+    const sc = (s.showcase || []).find(has); if (sc) return sc;
+    const rank = (id) => RARITY_ORDER.indexOf(this.catalog.get(id).rarity);
+    const pick = (ids) => ids.filter(has).sort((a, b) => rank(b) - rank(a) || a.localeCompare(b))[0] || null;
+    return pick(Object.keys(s.favs || {})) || pick(Object.keys(s.collection || {}));
+  }
   isFav(id) { return !!this.s.favs?.[id]; }
   toggleFav(id) { const f = (this.s.favs ||= {}); if (f[id]) delete f[id]; else f[id] = Date.now(); this.persist(); return !!f[id]; }
   // Défis de créature : trois par créature, récompensés en cendres une fois chacun

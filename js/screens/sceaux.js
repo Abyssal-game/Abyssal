@@ -54,7 +54,7 @@ export default function sceauxScreen(app, root) {
   const g = app.game, cat = app.catalog;
   const ui = (app.state.sceaux ||= { sel: null, mode: 'solo' });
   // v519 : « Contre l'Abysse » (arbitres) ou « Contre un joueur » (parties en ligne, sceaux-mp.js)
-  const modeBar = () => `<header class="screen-head ui-hero bn-sceaux"><h1>Duels des Sceaux</h1><p class="muted">${ui.mode === 'mp' ? 'Affronte d’autres joueurs, chacun à son rythme.' : 'Pose tes cartes sur le plateau et capture celles de l’adversaire.'}</p></header>
+  const modeBar = () => `<header class="screen-head ui-hero ${ui.mode === 'mp' ? 'bn-enligne' : 'bn-sceaux'}"><h1>Duels des Sceaux</h1><p class="muted">${ui.mode === 'mp' ? 'Affronte d’autres joueurs, chacun à son rythme.' : 'Pose tes cartes sur le plateau et capture celles de l’adversaire.'}</p></header>
     <div class="seg wide gm-mode" role="tablist"><button class="seg-b" role="tab" data-sc="mode" data-v="solo" aria-selected="${ui.mode !== 'mp'}" aria-pressed="${ui.mode !== 'mp'}">Contre l’Abysse</button><button class="seg-b" role="tab" data-sc="mode" data-v="mp" aria-selected="${ui.mode === 'mp'}" aria-pressed="${ui.mode === 'mp'}">Contre un joueur</button></div>`;
   const mp = createSceauxMp(app, root, { scCard, modeBar });
   let busy = false, timer = 0;

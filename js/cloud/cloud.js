@@ -179,6 +179,8 @@ export async function playerCard(id) {
   const rows = await authed(`/rest/v1/player_cards?id=eq.${id}&select=data,updated_at`);
   return rows && rows[0] ? rows[0] : null;
 }
+// v528 : profil d'un joueur, ami ou non (supabase/10-profils.sql) : sans sa collection si on n'est pas amis
+export async function publicProfile(id) { return authed('/rest/v1/rpc/public_profile', { method: 'POST', body: { p_id: id } }); }
 export async function publishCard(data) {
   await authed('/rest/v1/player_cards?on_conflict=id', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: { id: currentUser().id, data, updated_at: new Date().toISOString() } });
 }

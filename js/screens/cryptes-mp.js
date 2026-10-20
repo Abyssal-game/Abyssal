@@ -29,7 +29,7 @@ export function createCryptesMp(app, root, { modeBar }) {
   const popWait = (ms) => (cur && !cur.ctx.alive ? Promise.reject(STOP) : new Promise((r, j) => { popDone = r; wake = j; timer = setTimeout(r, (app.reduced() ? Math.min(ms, 1600) : ms) * spd()); }));
   const fname = (f) => cat.faction[f]?.name || f;
   const foeOf = (v) => (v.me === 'a' ? 'b' : 'a');
-  const myPic = () => { const c = g.s.avatar && cat.get(g.s.avatar); return `<img alt="" src="${c ? artUrl(c, { lite: true }) : 'assets/brand/emblem.webp'}">`; };
+  const myPic = () => { const c = cat.get(g.shownAvatar()); return `<img alt="" src="${c ? artUrl(c, { lite: true }) : 'assets/brand/emblem.webp'}">`; };
   // illustration d'une paire : une créature de sa faction (la même pour toute la partie)
   const artOf = (v, c) => {
     const pool = (cat.byFaction?.[c.f] || []).filter((x) => x.rarity !== 'S');

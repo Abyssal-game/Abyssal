@@ -16,6 +16,7 @@ import { icon, EMBLEM } from '../ui/icons.js';
 import { esc, toast, confirmBox, openSheet } from '../ui/dom.js';
 import { setScene } from '../ui/scene.js';
 import { checkTurns } from '../cloud/mpwatch.js';
+import { profileAttrs } from '../ui/report.js';
 import { t } from '../i18n.js';
 
 export const MP_OFF = 'Les parties contre d’autres joueurs ne sont pas encore ouvertes sur le serveur.';
@@ -48,7 +49,7 @@ export function createMpLobby(app, root, spec) {
     document.querySelector('.sc-scene')?.remove();
     setScene('menu');
     if (!cloud.isLoggedIn() || !sync.profile?.pseudo) {
-      root.innerHTML = `${spec.modeBar()}<section class="panel stack center"><p>${!cloud.isLoggedIn() ? 'Connecte-toi pour jouer contre d’autres joueurs.' : 'Choisis d’abord ton pseudo : c’est lui que verront tes adversaires.'}</p><a class="btn primary block" href="#/compte">${icon('user')}${!cloud.isLoggedIn() ? 'Se connecter' : 'Choisir mon pseudo'}</a></section>`;
+      root.innerHTML = `${spec.modeBar()}<section class="panel stack center"><p>Choisis d’abord ton pseudo : c’est lui que verront tes adversaires.</p><a class="btn primary block" href="#/compte">${icon('user')}Choisir mon pseudo</a></section>`; /* v528 : compte obligatoire, seul le pseudo peut manquer */
       return;
     }
     drawLobby();
@@ -81,8 +82,8 @@ export function createMpLobby(app, root, spec) {
   // recherche rapide, deux vitesses, défi à un ami et récompense (pas pour les jeux entre amis seulement)
   const quickHTML = (waiting, paidLeft) => `        ${ui.searching ? `<div class="mp-search"><span class="mp-spin"></span><span><b>${ui.searchingV?.public === false ? t('En attente de {name}…', { name: esc(foeName(ui.searchingV)) }) : 'Recherche d’un adversaire…'}</b><small>Partie rapide · reste sur cet écran, la partie démarre dès qu’un joueur arrive.</small></span><button class="btn small ghost" data-mp="leave" data-id="${esc(ui.searching)}">Annuler</button></div>` : ''}
         <div class="mp-paces">
-          <button class="mp-pace fast" data-mp="quick" data-pace="fast" ${busy || ui.searching ? 'disabled' : ''}><b>${icon('p:hourglass')}Partie rapide</b><span class="mp-pace-t">${MP_FAST_SECS} s par coup</span><small>Les deux joueurs connectés en même temps. Une partie dure quelques minutes.</small></button>
-          <button class="mp-pace slow" data-mp="quick" data-pace="slow" ${busy || waiting.some((v) => v.public && v.pace !== 'fast') ? 'disabled' : ''}><b>${icon('p:book')}Partie lente</b><span class="mp-pace-t">${MP_HOURS} h par coup</span><small>${waiting.some((v) => v.public && v.pace !== 'fast') ? 'Recherche en cours : la partie commence dès qu’un joueur arrive.' : 'Chacun joue quand il veut. Tu es prévenu quand c’est ton tour.'}</small></button>
+          <button class="mp-pace fast" data-mp="quick" data-pace="fast" ${busy || ui.searching ? 'disabled' : ''}><img class="mp-pace-ic" alt="" src="assets/icons/mp-rapide.webp"><b>Partie rapide</b><span class="mp-pace-t">${MP_FAST_SECS} s par coup</span><small>Les deux joueurs connectés en même temps. Une partie dure quelques minutes.</small></button>
+          <button class="mp-pace slow" data-mp="quick" data-pace="slow" ${busy || waiting.some((v) => v.public && v.pace !== 'fast') ? 'disabled' : ''}><img class="mp-pace-ic" alt="" src="assets/icons/mp-lente.webp"><b>Partie lente</b><span class="mp-pace-t">${MP_HOURS} h par coup</span><small>${waiting.some((v) => v.public && v.pace !== 'fast') ? 'Recherche en cours : la partie commence dès qu’un joueur arrive.' : 'Chacun joue quand il veut. Tu es prévenu quand c’est ton tour.'}</small></button>
         </div>
         <button class="btn block dc-plq dc-plq-dark" data-mp="friend" ${busy ? 'disabled' : ''}>${icon('user')}Défier un ami</button>
         <p class="small muted center">Victoire : +${MP_REWARD.win} éclats (${Math.max(0, paidLeft)} victoire${paidLeft > 1 ? 's' : ''} payée${paidLeft > 1 ? 's' : ''} restante${paidLeft > 1 ? 's' : ''} aujourd’hui) et une place au classement du mois.</p>`;
@@ -93,7 +94,7 @@ export function createMpLobby(app, root, spec) {
     const done = L.filter((v) => v.status === 'done').slice(0, 8);
     const st = g.s.mp[spec.game] || { wins: 0, losses: 0, draws: 0 };
     const paidLeft = MP_REWARD.paidPerDay - (g.s.mp.day === dayKey() ? g.s.mp.paid : 0);
-    const row = (v, sub, acts) => `<div class="mp-row ${myTurn(v) ? 'hot' : ''}" ${v.status !== 'waiting' ? `data-mp="open" data-id="${esc(v.id)}" role="button" tabindex="0"` : ''}><span class="fr-av">${v.foe ? avatar(v.foe.avatar) : EMBLEM}</span><span class="fr-t"><b>${esc(v.foe ? foeName(v) : 'Un joueur au hasard')}<i class="mp-tag ${v.pace === 'fast' ? 'fast' : ''}">${v.pace === 'fast' ? 'Rapide' : 'Lente'}</i></b><small>${sub}</small></span>${acts || icon('next')}</div>`;
+    const row = (v, sub, acts) => `<div class="mp-row ${myTurn(v) ? 'hot' : ''}" ${v.status !== 'waiting' ? `data-mp="open" data-id="${esc(v.id)}" role="button" tabindex="0"` : ''}><span class="fr-av"${v.foe ? profileAttrs(v.foe.id) : ''}>${v.foe ? avatar(v.foe.avatar) : EMBLEM}</span><span class="fr-t"><b>${esc(v.foe ? foeName(v) : 'Un joueur au hasard')}<i class="mp-tag ${v.pace === 'fast' ? 'fast' : ''}">${v.pace === 'fast' ? 'Rapide' : 'Lente'}</i></b><small>${sub}</small></span>${acts || icon('next')}</div>`;
     root.innerHTML = `${spec.modeBar()}
       ${err ? `<p class="panel small center">${icon('info')} ${esc(err)}</p>` : ''}
       ${mine.length ? `<section class="panel mp-sec hot"><h2 class="section-title">À toi de jouer <span class="pill-n">${mine.length}</span></h2>${mine.map((v) => row(v, `${spec.sub(v)} · il te reste <b>${left(v)}</b>`)).join('')}</section>` : ''}
@@ -121,7 +122,7 @@ export function createMpLobby(app, root, spec) {
       const rows = await cloud.mpFriendRecord(spec.game);
       if (!root.contains(box)) return;
       box.classList.remove('muted');
-      box.innerHTML = rows.length ? rows.map((r) => `<div class="lb-row"><span class="lb-av">${avatar(r.avatar)}</span><span class="lb-name"><b>${esc(isBlocked(r.foe) ? 'Joueur masqué' : r.pseudo || 'Joueur')}</b><span class="small muted">${t(r.wins + r.losses + r.draws > 1 ? '{n} parties' : '{n} partie', { n: r.wins + r.losses + r.draws })}${r.draws ? ` · ${t(r.draws > 1 ? '{n} égalités' : '{n} égalité', { n: r.draws })}` : ''}</span></span><span class="mp-wl"><b class="w">${r.wins}</b><i>–</i><b class="l">${r.losses}</b></span></div>`).join('') : '<p class="small muted">Pas encore de partie terminée contre un ami.</p>';
+      box.innerHTML = rows.length ? rows.map((r) => `<div class="lb-row"${profileAttrs(r.foe)}><span class="lb-av">${avatar(r.avatar)}</span><span class="lb-name"><b>${esc(isBlocked(r.foe) ? 'Joueur masqué' : r.pseudo || 'Joueur')}</b><span class="small muted">${t(r.wins + r.losses + r.draws > 1 ? '{n} parties' : '{n} partie', { n: r.wins + r.losses + r.draws })}${r.draws ? ` · ${t(r.draws > 1 ? '{n} égalités' : '{n} égalité', { n: r.draws })}` : ''}</span></span><span class="mp-wl"><b class="w">${r.wins}</b><i>–</i><b class="l">${r.losses}</b></span></div>`).join('') : '<p class="small muted">Pas encore de partie terminée contre un ami.</p>';
     } catch (e) { box.textContent = errMsg(e); }
   }
   async function ranking() {
@@ -130,7 +131,7 @@ export function createMpLobby(app, root, spec) {
       const rows = await cloud.mpRanking(spec.game, 20);
       const me = cloud.currentUser()?.id;
       box.classList.remove('muted');
-      box.innerHTML = rows.length ? rows.map((r, i) => `<div class="lb-row ${r.user_id === me ? 'me' : ''}"><span class="lb-rank">${i + 1}</span><span class="lb-av">${avatar(r.avatar)}</span><span class="lb-name"><b>${esc(isBlocked(r.user_id) ? 'Joueur masqué' : r.pseudo || 'Joueur')}</b><span class="small muted">${r.games} partie${r.games > 1 ? 's' : ''}</span></span><span class="lb-floor">${r.wins}</span></div>`).join('') : '<p class="small muted">Pas encore de victoire ce mois-ci. À toi !</p>';
+      box.innerHTML = rows.length ? rows.map((r, i) => `<div class="lb-row ${r.user_id === me ? 'me' : ''}"${r.user_id === me ? '' : profileAttrs(r.user_id)}><span class="lb-rank">${i + 1}</span><span class="lb-av">${avatar(r.avatar)}</span><span class="lb-name"><b>${esc(isBlocked(r.user_id) ? 'Joueur masqué' : r.pseudo || 'Joueur')}</b><span class="small muted">${r.games} partie${r.games > 1 ? 's' : ''}</span></span><span class="lb-floor">${r.wins}</span></div>`).join('') : '<p class="small muted">Pas encore de victoire ce mois-ci. À toi !</p>';
     } catch (e) { box.textContent = errMsg(e); }
   }
 
@@ -210,6 +211,18 @@ export function createMpLobby(app, root, spec) {
     } catch (e) { busy = false; app.sfx.error(); toast(esc(errMsg(e)), { kind: 'error', ms: 6000 }); }
     lobby();
   }
+  // v528 : revanche : défi au même joueur (même pas ami : le serveur l'accepte 30 min après la partie), même vitesse
+  async function rematch() {
+    const v = view; if (!v?.foe || busy) return;
+    busy = true;
+    try {
+      await spec.create(v.pace || 'slow', v.foe.id);
+      app.sfx.achievement?.();
+      toast(t('Revanche proposée à <b>{name}</b> : la partie commence dès qu’il accepte.', { name: esc(foeName(v)) }), { kind: 'success', icon: 'user', ms: 5000 });
+    } catch (e) { app.sfx.error(); toast(esc(errMsg(e)), { kind: 'error' }); }
+    busy = false;
+    stopPoll(); lobby();
+  }
   async function friend() {
     if (!friends) { try { friends = (await cloud.friendList()).filter((f) => f.status === 'accepted'); } catch (e) { friends = []; } }
     let pace = 'slow';
@@ -235,7 +248,7 @@ export function createMpLobby(app, root, spec) {
     // barre de compte à rebours d'une partie rapide
     clockHTML: (v) => (v.status === 'playing' && v.pace === 'fast' ? `<div class="mp-clock ${myTurn(v) ? 'mine' : ''}"><span class="mp-clock-bar"></span><span class="mp-clock-t">${myTurn(v) ? 'À toi' : `<span translate="no">${esc(foeName(v))}</span>`} · <b>${left(v)}</b></span></div>` : ''),
     // encadré de fin de partie
-    endHTML: (v, detail = '') => { const r = resOf(v); return `<div class="panel mp-end ${r}"><h2 class="vs-title ${r}">${MP_RES[r]}</h2><p>${detail}${v.reason === 'timeout' ? (r === 'win' ? ' Ton adversaire n’a pas joué à temps.' : ' Tu n’as pas joué à temps.') : v.reason === 'resign' ? (r === 'win' ? ' Ton adversaire a abandonné.' : ' Tu as abandonné.') : ''}</p><button class="btn primary block" data-mp="back">Revenir aux parties</button></div>`; },
+    endHTML: (v, detail = '') => { const r = resOf(v); return `<div class="panel mp-end ${r}"><h2 class="vs-title ${r}">${MP_RES[r]}</h2><p>${detail}${v.reason === 'timeout' ? (r === 'win' ? ' Ton adversaire n’a pas joué à temps.' : ' Tu n’as pas joué à temps.') : v.reason === 'resign' ? (r === 'win' ? ' Ton adversaire a abandonné.' : ' Tu as abandonné.') : ''}</p>${v.foe && !isBlocked(v.foe.id) ? `<button class="btn block dc-plq dc-plq-red" data-mp="rematch">${icon('swords')}${t('Revanche contre {name}', { name: `<span translate="no">${esc(foeName(v))}</span>` })}</button>` : ''}<button class="btn primary block" data-mp="back">Revenir aux parties</button></div>`; },
     // message sous la partie quand ce n'est pas ton tour
     waitMsg: (v) => (v.pace === 'fast' ? t('Au tour de <b>{name}</b>…', { name: esc(foeName(v)) }) : t('Au tour de <b>{name}</b> (il lui reste {time}). Tu peux fermer le jeu : la partie t’attendra.', { name: esc(foeName(v)), time: left(v) })),
   };
@@ -248,6 +261,7 @@ export function createMpLobby(app, root, spec) {
     if (k === 'back') { stopPoll(); return lobby(); }
     if (k === 'quick') return quick(b.dataset.pace || 'slow');
     if (k === 'friend') return friend();
+    if (k === 'rematch') return rematch();
     if (k === 'join') { if (busy) return; busy = true; try { await spec.join(b.dataset.id); busy = false; return open(b.dataset.id); } catch (err2) { busy = false; toast(esc(errMsg(err2)), { kind: 'error' }); return lobby(); } }
     if (k === 'leave') {
       if (!(await confirmBox('Annuler cette partie ?', { ok: 'Oui', cancel: 'Non' }))) return;

@@ -39,10 +39,10 @@ export default function cryptesScreen(app, root) {
   const wait = (ms) => new Promise((r) => { timer = setTimeout(r, app.reduced() ? Math.min(ms, 200) : ms); });
   const fname = (f) => cat.faction[f]?.name || f;
   const todayKey = () => { const d = g.clock(), p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; };
-  const me = () => { const c = g.s.avatar && cat.get(g.s.avatar); return `<img alt="" src="${c ? artUrl(c, { lite: true }) : 'assets/brand/emblem.webp'}">`; };
+  const me = () => { const c = cat.get(g.shownAvatar()); return `<img alt="" src="${c ? artUrl(c, { lite: true }) : 'assets/brand/emblem.webp'}">`; };
   // v525 : « Contre l'Abysse » (arbitres) ou « Contre un ami » (parties en ligne)
   const mui = (app.state.cryptesMode ||= { mode: 'solo' });
-  const modeBar = (rec = '') => `<header class="screen-head ui-hero bn-cryptes"><h1>Les Cryptes</h1><p class="muted">${mui.mode === 'mp' ? 'Entre amis : pour le plaisir, et pour ton bilan contre chacun.' : 'Retrouve les paires… et réveille leurs pouvoirs.'}</p>${rec}</header>
+  const modeBar = (rec = '') => `<header class="screen-head ui-hero ${mui.mode === 'mp' ? 'bn-enligne' : 'bn-cryptes'}"><h1>Les Cryptes</h1><p class="muted">${mui.mode === 'mp' ? 'Entre amis : pour le plaisir, et pour ton bilan contre chacun.' : 'Retrouve les paires… et réveille leurs pouvoirs.'}</p>${rec}</header>
     <div class="seg wide gm-mode" role="tablist"><button class="seg-b" role="tab" data-cr="mode" data-v="solo" aria-selected="${mui.mode !== 'mp'}" aria-pressed="${mui.mode !== 'mp'}">Contre l’Abysse</button><button class="seg-b" role="tab" data-cr="mode" data-v="mp" aria-selected="${mui.mode === 'mp'}" aria-pressed="${mui.mode === 'mp'}">Contre un ami</button></div>`;
   const mp = createCryptesMp(app, root, { modeBar: () => modeBar() });
   const powersHTML = () => `<ul class="cr-plist">${FACTION_ORDER.map((f) => `<li style="--fc:${cat.faction[f].colors.secondary}">${sigil(f)}<span><b>${esc(fname(f))} · ${esc(CR.POWERS[f].name)}</b><span class="small muted">${esc(CR.POWERS[f].short)}</span></span></li>`).join('')}</ul>`;
