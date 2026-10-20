@@ -18,7 +18,7 @@ export default function friends(app, root, params = []) {
   const g = app.game, cat = app.catalog;
   let alive = true, busy = false, filter = 'all';
   const pic = (id) => { const c = id && cat.get(id); return c ? `<img alt="" src="${artUrl(c, { lite: true })}">` : EMBLEM; };
-  const head = (sub) => `<header class="screen-head ui-hero bn-account"><h1>Amis</h1><p class="muted">${sub}</p></header>`;
+  const head = (sub) => `<header class="screen-head ui-hero bn-amis"><h1>Amis</h1><p class="muted">${sub}</p></header>`;
 
   // ——— Liste : ajouter, demandes reçues, amis, demandes envoyées ———
   async function list() {

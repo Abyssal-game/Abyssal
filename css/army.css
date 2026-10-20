@@ -4522,3 +4522,12 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 @keyframes swTime { to { transform: scaleX(0); } }
 .cb-swipe.ok .cb-sw-arrow, .cb-swipe.ko .cb-sw-arrow { animation: none; }
 @media (prefers-reduced-motion: reduce) { .cb-swipe.go .cb-sw-arrow { animation: none; } }
+
+/* v503 : images Gemini : bannières Amis, Codex, Échoppe ; flèche runique du geste « glisser » */
+.bn-amis { --bn: url(../assets/ui/bn-amis.webp); }
+.bn-codex { --bn: url(../assets/ui/bn-codex.webp); }
+.bn-echoppe { --bn: url(../assets/ui/bn-echoppe.webp); }
+.cb-sw-arrow { background: none; font-size: 0; width: 78px; height: 78px; margin: -6px 0 10px; }
+.cb-sw-arrow img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 10px rgba(242, 193, 78, .7)); }
+.cb-sw-arrow.d-l img { transform: rotate(180deg); }
+.cb-sw-arrow.d-u img { transform: rotate(-90deg); }

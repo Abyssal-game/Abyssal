@@ -96,7 +96,7 @@ export default function codexScreen(app, root) {
 
   function draw() {
     if (!g.codexOn()) { location.replace('#/boutique'); return; } /* caché : rien ne doit trahir le pass hors Mode Créateur */
-    root.innerHTML = `<header class="screen-head ui-hero bn-premium"><h1>${esc(CODEX.name)}</h1><p class="muted">${esc(CODEX.title)}</p><span class="sc-rec">Aperçu Créateur · invisible pour les joueurs</span></header>
+    root.innerHTML = `<header class="screen-head ui-hero ${ui.tab === 'shop' ? 'bn-echoppe' : 'bn-codex'}"><h1>${esc(CODEX.name)}</h1><p class="muted">${esc(CODEX.title)}</p><span class="sc-rec">Aperçu Créateur · invisible pour les joueurs</span></header>
       <div class="seg cx-seg" role="group">${[['codex', 'Le Codex'], ['shop', 'L’Échoppe']].map(([k, l]) => `<button class="seg-b" data-cx="tab" data-v="${k}" aria-pressed="${ui.tab === k}">${l}</button>`).join('')}</div>
       ${ui.tab === 'shop' ? shopTab() : codexTab()}
       ${devTab()}`;

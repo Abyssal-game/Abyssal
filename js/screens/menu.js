@@ -21,7 +21,7 @@ export default function menu(app, root) {
     <header class="screen-head mn-head ui-hero bn-sanctuary"><h1>Le Sanctuaire</h1><p class="muted">Ton profil, tes succès, tes titres et les réglages du jeu.</p></header>
     <nav class="mn-grid">
       ${profile}
-      ${T('#/amis', 'team-ic', 'Amis', isLoggedIn() ? '<span class="mn-fr">Collections et succès de tes amis</span>' : 'Avec un compte').replace('class="mn-tile"', 'class="mn-tile mn-wide mn-friends"')}
+      ${T('#/amis', 'amis', 'Amis', isLoggedIn() ? '<span class="mn-fr">Collections et succès de tes amis</span>' : 'Avec un compte').replace('class="mn-tile"', 'class="mn-tile mn-wide mn-friends"')}
       ${T('#/succes', 'crown', 'Succès', `${achDone} / ${cat.achievements.length} débloqués`)}
       ${T('#/bestiaire', 'book', 'Bestiaire', 'Créatures, royaumes, histoire')}
       ${T('#/compte', 'account', 'Compte', isLoggedIn() ? `Connecté${sync.profile?.pseudo ? ` · ${esc(sync.profile.pseudo)}` : ''}` : 'Sauvegarde, classement')}
