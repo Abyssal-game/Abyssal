@@ -184,7 +184,10 @@ export default function versusScreen(app, root) {
     try { g.versusPay(r.stake); }
     catch (e) { busy = false; app.sfx.error(); toast(esc(e.message), { kind: 'error', icon: 'crystal' }); return; }
     try { await cloud.versusAccept(id); }
-    catch (e) { g.versusRefund(r.stake); busy = false; app.sfx.error(); toast(esc(e.status === 404 ? OFF : e.message), { kind: 'error', icon: 'info' }); app.chrome?.(); return load(); }
+    catch (e) {
+      /* v527 : réponse perdue (réseau) : le duel a peut-être eu lieu ; on regarde avant de rendre la mise */
+      if (!e.status) { try { const d = await cloud.versusList(); if ((d?.mine || []).some((x) => x.id === id && x.status === 'done')) { data = d; busy = false; app.chrome?.(); return see(id); } } catch (e2) { /* on rend la mise */ } }
+      g.versusRefund(r.stake); busy = false; app.sfx.error(); toast(esc(e.status === 404 ? OFF : e.message), { kind: 'error', icon: 'info' }); app.chrome?.(); return load(); }
     app.chrome?.();
     try { data = await cloud.versusList(); } catch (e) { /* on retentera */ }
     busy = false;
@@ -210,7 +213,10 @@ export default function versusScreen(app, root) {
       await cloud.versusCreateMix(lineup, to);
       app.sfx.achievement?.();
       toast(to ? 'Défi envoyé ! Il apparaîtra chez ton ami.' : 'Défi lancé ! Reviens voir quand un joueur l’aura relevé.', { kind: 'success', icon: 'crystal' });
-    } catch (er) { g.versusRefund(stake); app.sfx.error(); toast(esc(er.status === 404 ? OFF : er.message), { kind: 'error', icon: 'info', ms: 6000 }); }
+    } catch (er) {
+      /* v527 : réponse perdue (réseau) : le défi a peut-être été créé ; on regarde avant de rendre la mise */
+      if (!er.status) { try { const d = await cloud.versusList(); if ((d?.mine || []).some((r) => r.mine && r.status === 'open' && Date.now() - new Date(r.created_at).getTime() < 120000 && r.stake === stake)) { busy = false; app.chrome?.(); toast('Défi lancé !', { kind: 'success', icon: 'crystal' }); return load(); } } catch (e2) { /* on rend la mise */ } }
+      g.versusRefund(stake); app.sfx.error(); toast(esc(er.status === 404 ? OFF : er.message), { kind: 'error', icon: 'info', ms: 6000 }); }
     busy = false;
     app.chrome?.();
     load();

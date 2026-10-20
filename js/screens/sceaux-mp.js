@@ -22,6 +22,7 @@ export function createSceauxMp(app, root, { scCard, modeBar }) {
       turn: 'p', placed: s.placed, cells: s.cells || {}, over: null, last: null, log: [], fac: {} };
   }
   function drawGame(v, ctx, last) {
+    if (!ctx.alive) return;
     const { ui, foeName, avatar, left, myTurn } = ctx;
     const s = v.state, me = v.me, foe = me === 'a' ? 'b' : 'a';
     document.body.classList.add('battle-mode');

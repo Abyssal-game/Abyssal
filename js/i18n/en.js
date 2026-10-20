@@ -6041,7 +6041,7 @@ export default {
   /* v523 : Pacte en ligne */
   "Choisis ta vitesse. Premier à {0} points. Chaque fois que c’est à toi (tirer ou t’arrêter), tu as un temps limité : passé ce délai, <b>la partie est perdue</b>.": "Choose your speed. First to {0} points. Each time it’s your turn (draw or stop), you have limited time: after that, <b>the match is lost</b>.",
   "Le Pacte · contre un joueur": "The Pact · against a player",
-  "Toi {a} points, {name} {b}.": "You {a} points, {name} {b}.",
+  "Score final : toi {a}, {name} {b}.": "Final score: you {a}, {name} {b}.",
   "{0} – {1} points": "{0} – {1} points",
   "Affronte d’autres joueurs : premier à {0} points.": "Face other players: first to {0} points.",
   "Affronte d’autres joueurs : premier à 60 points.": "Face other players: first to 60 points.",
@@ -6160,6 +6160,8 @@ export default {
   "À toi de jouer dans {n} parties des Cryptes": "Your turn in {n} Crypts matches",
   "Un défi reçu aux Cryptes": "A Crypts challenge received",
   "{n} défis reçus aux Cryptes": "{n} Crypts challenges received",
+  "Ton équipe : <b>{0} créatures au combat</b> et <b>{1} en réserve</b>. Chaque carte a un <b>rôle</b> (icône en haut à gauche), son <b>attaque</b> et ses <b>PV</b>. Mets au combat tes créatures les plus fortes : il n’y a pas de limite. Les <b>cendres</b> font monter une créature de niveau : brûle tes doublons dans la <b>Fournaise</b> pour en gagner.": "Your team: <b>{0} creatures in combat</b> and <b>{1} in reserve</b>. Each card has a <b>role</b> (icon top left), its <b>attack</b> and its <b>HP</b>. Put your strongest creatures in combat: there is no limit. <b>Ashes</b> level up a creature: burn your duplicates in the <b>Furnace</b> to earn them.",
+  "Un jeu de cartes à part, sans PV ni attaque : chaque carte a <b>quatre valeurs</b>, une par côté. Bats les adversaires dans l’ordre pour débloquer les suivants : la <b>première victoire</b> contre chacun donne un coffre (bois, fer, or puis abyssal selon son rang). Après Ilda, relève aussi le <b>défi du jour</b>. Compose ta main de {0} cartes avec <b>Composer ma main</b>.<br><br>Une fois par jour, une victoire te laisse garder une carte adverse : le <b>Butin</b>.": "A card game apart, with no HP or attack: each card has <b>four values</b>, one per side. Beat the opponents in order to unlock the next ones: the <b>first victory</b> against each gives a chest (wooden, iron, golden then abyssal depending on their rank). After Ilda, also take on the <b>daily challenge</b>. Build your hand of {0} cards with <b>Build my hand</b>.<br><br>Once a day, a victory lets you keep one of the opponent's cards: the <b>Loot</b>.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

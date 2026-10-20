@@ -9,6 +9,8 @@ import { t } from '../i18n.js';
 import { syncReminders } from '../notify.js';
 
 export const mpw = { turns: 0, games: 0, friends: 0, items: [] };
+// v527 : nouvelles de l'ancien compte oubliées à la déconnexion
+export function resetWatch() { Object.assign(mpw, { turns: 0, games: 0, friends: 0, items: [] }); last = 0; try { localStorage.removeItem(SEEN); } catch (e) { /* rien */ } }
 const SEEN = 'abyssal.mpSeen';
 // Jeux en ligne surveillés : textes des annonces, page du jeu, clé qui change à chaque tour
 const GAMES = [
@@ -32,6 +34,10 @@ export async function checkTurns(app, { force = false } = {}) {
   if (busy || !cloud.isLoggedIn() || !sync.profile?.pseudo) return;
   if (!force && Date.now() - last < 110000) return;
   busy = true; last = Date.now();
+  try { await check(app); } finally { busy = false; } /* v527 : jamais bloqué par une erreur */
+}
+
+async function check(app) {
   let seen = {};
   try { seen = JSON.parse(localStorage.getItem(SEEN) || '{}'); } catch (e) { /* rien */ }
   const items = [];
@@ -79,6 +85,5 @@ export async function checkTurns(app, { force = false } = {}) {
   const changed = JSON.stringify(items) !== JSON.stringify(mpw.items);
   mpw.items = items;
   if (changed) { app.chrome?.(); if (app.route === '' && !document.querySelector('.sheet-wrap, .opening, .vd')) app.refresh?.(); }
-  syncReminders(app.game, turns.filter((v) => v.pace !== 'fast')); /* v522 : pas de rappel pour les parties rapides */
-  busy = false;
+  if (cloud.isLoggedIn()) syncReminders(app.game, turns.filter((v) => v.pace !== 'fast')); /* v522 : pas de rappel pour les parties rapides */
 }

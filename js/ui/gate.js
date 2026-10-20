@@ -4,6 +4,7 @@
 // La partie déjà présente sur l'appareil n'est jamais effacée : à la connexion, elle part en ligne
 // (ou le joueur choisit quelle partie garder si le compte en a déjà une). Une fois connecté, le jeu
 // reste jouable hors ligne ; l'écran revient seulement après une déconnexion ou une suppression du compte.
+import { sync } from '../cloud/sync.js';
 import * as cloud from '../cloud/cloud.js';
 import accountScreen from '../screens/account.js';
 
@@ -50,6 +51,8 @@ export function showGate(app, then = () => {}) {
     el.classList.remove('on');
     setTimeout(() => el.remove(), 400);
     app.refresh();
-    then();
+    /* v527 : guide et cadeau seulement après le choix de la partie (compte qui a déjà une partie en ligne) et sans fenêtre ouverte (pseudo) */
+    const go = () => (document.querySelector('.sheet-wrap') ? setTimeout(go, 800) : then());
+    Promise.resolve(sync.pending).catch(() => {}).finally(() => setTimeout(go, 1500));
   }
 }

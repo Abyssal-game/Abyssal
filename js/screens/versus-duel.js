@@ -102,6 +102,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
     const n = q(`.vd-c[data-side="${side}"][data-p="${p}"][data-i="${i}"]`);
     const big = RI(c.rarity) >= RI('HR') || c.variant !== 'normal';
     if (big && speed === 1) { n.classList.add('tease'); app.sfx.suspensebig?.(); await wait(900); n.classList.remove('tease'); }
+    if (done) return; /* v527 : « Tout révéler » a déjà posé les totaux */
     n.classList.add('on');
     if (big) { n.classList.add('big'); app.sfx.reveal?.(c.rarity); } else app.sfx.flip?.();
     burst(n, big ? 3.2 : 1.7);

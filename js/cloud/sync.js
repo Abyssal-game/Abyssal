@@ -99,10 +99,14 @@ async function reconcile({ intro, auto }) {
 }
 
 // Après connexion : choisir quelle partie garder si les deux existent.
-export async function afterLogin() {
-  try { sync.profile = await cloud.getProfile(); } catch (e) { sync.profile = null; }
-  lsSet(SYNCED_KEY, null);
-  return reconcile({ intro: 'Ce compte a déjà une partie en ligne.', auto: false });
+export function afterLogin() {
+  /* v527 : promesse gardée : la porte du compte attend la fin du choix de partie avant le guide et le cadeau */
+  sync.pending = (async () => {
+    try { sync.profile = await cloud.getProfile(); } catch (e) { sync.profile = null; }
+    lsSet(SYNCED_KEY, null);
+    return reconcile({ intro: 'Ce compte a déjà une partie en ligne.', auto: false });
+  })();
+  return sync.pending;
 }
 // Reprise de la synchronisation (bouton « Reprendre » quand elle est en pause).
 // v412 : après « Effacer toute la progression », la partie vide part tout de suite en ligne (avant, l'ancienne revenait au lancement)

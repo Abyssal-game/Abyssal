@@ -21,8 +21,12 @@ export function createCryptesMp(app, root, { modeBar }) {
   let anim = false, timer = 0, banner = null, pop = null, popDone = null;
   // affichage temporaire : cartes montrées (indice → carte), en lumière, échangées, choisies pour un pouvoir
   const ui = { face: new Map(), glow: new Set(), swap: new Set(), picks: [] };
-  const wait = (ms) => new Promise((r) => { timer = setTimeout(r, app.reduced() ? Math.min(ms, 200) : ms); });
-  const popWait = (ms) => new Promise((r) => { popDone = r; timer = setTimeout(r, app.reduced() ? Math.min(ms, 1600) : ms); });
+  /* v527 : partie rapide : animations accélérées (presque sautées sous 15 s) pour ne pas manger ton temps ; réveil quand on quitte l'écran */
+  let cur = null, wake = null;
+  const STOP = { stop: true }; /* l'écran est quitté : l'animation en cours s'arrête là */
+  const spd = () => { const v = cur?.v; if (v?.pace !== 'fast') return 1; return cur.ctx.myTurn(v) && cur.ctx.msLeft(v) < 15000 ? 0.15 : 0.5; };
+  const wait = (ms) => (cur && !cur.ctx.alive ? Promise.reject(STOP) : new Promise((r, j) => { wake = j; timer = setTimeout(r, (app.reduced() ? Math.min(ms, 200) : ms) * spd()); }));
+  const popWait = (ms) => (cur && !cur.ctx.alive ? Promise.reject(STOP) : new Promise((r, j) => { popDone = r; wake = j; timer = setTimeout(r, (app.reduced() ? Math.min(ms, 1600) : ms) * spd()); }));
   const fname = (f) => cat.faction[f]?.name || f;
   const foeOf = (v) => (v.me === 'a' ? 'b' : 'a');
   const myPic = () => { const c = g.s.avatar && cat.get(g.s.avatar); return `<img alt="" src="${c ? artUrl(c, { lite: true }) : 'assets/brand/emblem.webp'}">`; };
@@ -58,7 +62,7 @@ export function createCryptesMp(app, root, { modeBar }) {
     const left = (s.cards || []).filter((c) => !c.gone).length / 2;
     if (v.status !== 'playing') return '';
     if (s.pending && ctx.myTurn(v)) { const P = CR.POWERS[s.pending.power]; return `<div class="cr-msg gold">${sigil(s.pending.power)}<span><b>${esc(P.name)}</b> · ${s.pending.power === 'abyssal' ? `touche deux cartes face cachée à échanger${ui.picks.length ? ' (encore une)' : ''}` : s.pending.power === 'infernal' ? 'touche une carte face cachée pour la regarder en secret' : 'touche une carte face cachée : elle sera montrée à tous'}.</span></div>`; }
-    return `<div class="cr-msg">${ctx.myTurn(v) ? `<span>${(s.open || []).length ? 'Retourne une deuxième carte.' : 'À toi : retourne deux cartes.'}</span>` : `<span>${ctx.waitMsg(v)}</span>`}<span class="muted">${t(left > 1 ? '{n} paires à trouver' : '{n} paire à trouver', { n: left })}</span></div>`;
+    return `<div class="cr-msg">${ctx.myTurn(v) ? `<span>${(s.open || []).length ? 'Retourne une deuxième carte.' : 'À toi : retourne deux cartes.'}</span>` : `<span><span>${ctx.waitMsg(v)}</span></span>`}<span class="muted">${t(left > 1 ? '{n} paires à trouver' : '{n} paire à trouver', { n: left })}</span></div>`;
   }
   function popHTML(v, o) {
     const fc = cat.faction[o.f]?.colors.secondary || '#C9A45A';
@@ -69,6 +73,9 @@ export function createCryptesMp(app, root, { modeBar }) {
       <small class="cr-pop-tap">Touche pour continuer</small></div></div>`;
   }
   function drawGame(v, ctx) {
+    if (!ctx.alive) return;
+    cur = { v, ctx };
+    if (!v.state?.pending) ui.picks = [];
     const s = v.state, foe = foeOf(v), over = v.status === 'done';
     document.body.classList.add('battle-mode');
     setScene(null);
@@ -77,12 +84,12 @@ export function createCryptesMp(app, root, { modeBar }) {
     sc.className = 'sc-scene mq-scene'; sc.style.backgroundImage = 'url(assets/sceaux/salle-cryptes.webp)';
     const fin = s.final;
     root.innerHTML = `<div class="mq-game cr-game mp-cr ${app.reduced() ? 'rm' : ''}">
-      <div class="mq-bar"><span class="cr-btns"><button class="btn small ghost" data-mp="rules" aria-label="Règles">${icon('p:help')}</button><button class="btn small ghost" data-mp="powers" aria-label="Pouvoirs des factions">${icon('p:power')}</button></span><b>Cryptes · entre amis</b><button class="btn small ghost" data-mp="back" aria-label="Revenir à la liste">${icon('close')}</button></div>
+      <div class="mq-bar"><span class="cr-btns"><button class="btn small ghost" data-mp="rules" aria-label="Règles">${icon('p:help')}</button><button class="btn small ghost" data-mp="powers" aria-label="Pouvoirs des factions">${icon('p:power')}</button></span><b>Les Cryptes</b><button class="btn small ghost" data-mp="back" aria-label="Revenir à la liste">${icon('close')}</button></div>
       ${seat(v, s, foe, ctx)}
       ${info(v, s, ctx)}
       ${grid(v, s, ctx)}
       ${seat(v, s, v.me, ctx)}
-      ${over ? ctx.endHTML(v, fin ? `${t('Toi {a} points, {name} {b}.', { a: fin[v.me], b: fin[foe], name: esc(ctx.foeName(v)) })}${fin.a === fin.b ? ` ${t('Égalité de points : la dernière paire décide.')}` : ''}` : '')
+      ${over ? ctx.endHTML(v, fin ? `${t('Score final : toi {a}, {name} {b}.', { a: fin[v.me], b: fin[foe], name: esc(ctx.foeName(v)) })}${fin.a === fin.b ? ` ${t('Égalité de points : la dernière paire décide.')}` : ''}` : '')
         : `${ctx.clockHTML(v)}<button class="btn small ghost mp-resign" data-mp="resign">${icon('p:danger')}Abandonner</button>`}
       ${pop ? popHTML(v, pop) : ''}</div>`;
   }
@@ -127,11 +134,11 @@ export function createCryptesMp(app, root, { modeBar }) {
     if (anim || ctx.busy) return;
     const prev = ctx.view;
     const v = await ctx.act(() => cloud.mpAct(ctx.ui.open, move));
-    if (!v) return;
-    ui.picks = [];
+    ui.picks = []; /* v527 : vidé aussi après un échec (sinon un 3e choix était refusé sans fin) */
+    if (!v) return ctx.draw();
     const evs = (v.state?.log || []).filter((e) => e.n > (prev.state?.n || 0));
     anim = true;
-    try { for (const ev of evs) await show(v, ev, ctx); } finally { anim = false; ui.face.clear(); }
+    try { for (const ev of evs) await show(v, ev, ctx); } catch (e) { if (e !== STOP) throw e; } finally { anim = false; ui.face.clear(); }
     ctx.draw(); ctx.watch();
   }
   const powersHTML = () => `<ul class="cr-plist">${FACTION_ORDER.map((f) => `<li style="--fc:${cat.faction[f].colors.secondary}">${sigil(f)}<span><b>${esc(fname(f))} · ${esc(CR.POWERS[f].name)}</b><span class="small muted">${esc(CR.POWERS[f].short)}</span></span></li>`).join('')}</ul>`;
@@ -139,6 +146,7 @@ export function createCryptesMp(app, root, { modeBar }) {
   root.addEventListener('click', (e) => { if (pop && popDone) { const r = popDone; popDone = null; clearTimeout(timer); r(); e.stopPropagation(); } }, true); /* un toucher ferme la fenêtre du pouvoir */
 
   return createMpLobby(app, root, {
+    onStop: () => { clearTimeout(timer); const w = wake; wake = null; w?.(STOP); },
     game: 'cryptes', modeBar, friendsOnly: true,
     note: 'Défie un ami. Chaque fois que c’est à toi, tu as un temps limité pour retourner tes cartes : passé ce délai, <b>la partie est perdue</b>.',
     create: (pace, to) => cloud.mpNew('cryptes', to, pace),
@@ -152,7 +160,7 @@ export function createCryptesMp(app, root, { modeBar }) {
       const evs = (v.state?.log || []).filter((e) => e.n > (prev.state?.n || 0) && e.who !== v.me);
       if (!evs.length) return;
       anim = true;
-      try { for (const ev of evs) await show(v, ev, ctx); } finally { anim = false; ui.face.clear(); }
+      try { for (const ev of evs) await show(v, ev, ctx); } catch (e) { if (e !== STOP) throw e; } finally { anim = false; ui.face.clear(); }
     },
     click: (k, b, ctx) => {
       if (k === 'rules') return openSheet(`<div class="sc-rules"><h2>Les Cryptes</h2>${howHTML()}</div>`, { label: 'Règles des Cryptes' });

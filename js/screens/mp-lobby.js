@@ -24,7 +24,7 @@ export const MP_RES = { win: 'Victoire', lose: 'Défaite', draw: 'Égalité' };
 export function createMpLobby(app, root, spec) {
   const g = app.game, cat = app.catalog;
   const ui = (app.state[`mp_${spec.game}`] ||= { open: null, sel: null });
-  let clock = 0, list = null, err = null, busy = false, poll = 0, view = null, skew = 0, alive = true, friends = null;
+  let clock = 0, list = null, err = null, busy = false, poll = 0, view = null, skew = 0, alive = true, friends = null, gen = 0;
   const avatar = (id) => { const c = id && cat.get(id); return c ? `<img alt="" src="${artUrl(c, { lite: true })}">` : EMBLEM; };
   const foeName = (v) => (!v.foe ? '…' : isBlocked(v.foe.id) ? 'Joueur masqué' : v.foe.pseudo || 'Joueur');
   const msLeft = (v) => new Date(v.deadline).getTime() - (Date.now() + skew) - (v.pace === 'fast' ? 3000 : 0); /* 3 s de marge réseau côté serveur */
@@ -61,6 +61,7 @@ export function createMpLobby(app, root, spec) {
     const searching = list.find((v) => v.pace === 'fast' && v.status === 'waiting' && v.me === 'a');
     ui.searching = searching?.id || null; ui.searchingV = searching || null;
     await claimAll();
+    if (!alive || ui.open) return; /* v527 : une partie ouverte pendant l'encaissement reste ouverte */
     checkTurns(app, { force: true });
     drawLobby();
     schedule(lobby, ui.searching ? 3000 : 20000);
@@ -146,6 +147,7 @@ export function createMpLobby(app, root, spec) {
   // l'adversaire joue : on regarde toutes les 8 s tant que la partie est ouverte et que ce n'est pas notre tour
   function watch() {
     clearInterval(clock); clock = 0;
+    if (!alive) return;
     if (view?.status === 'playing' && view.pace === 'fast') {
       // v522 : partie rapide : compte à rebours à l'écran, l'adversaire regardé toutes les 1,5 s
       clock = setInterval(tick, 250); tick();
@@ -165,8 +167,10 @@ export function createMpLobby(app, root, spec) {
   }
   async function refresh() {
     if (!ui.open || busy) return watch();
+    const g0 = gen;
     let v; try { v = await cloud.mpGet(ui.open); } catch (e) { return watch(); }
     if (!alive || !v || v.id !== ui.open) return;
+    if (g0 !== gen) return watch(); /* v527 : un coup joué pendant la relecture : sa vue est plus récente */
     const prev = view;
     view = v;
     if (prev && spec.moveKey(prev) !== spec.moveKey(v) && spec.updated) { busy = true; try { await spec.updated(prev, v, ctx); } finally { busy = false; } if (!alive || ui.open !== v.id) return; }
@@ -174,6 +178,7 @@ export function createMpLobby(app, root, spec) {
     watch();
   }
   function draw(last = null) {
+    if (!alive) return;
     if (!view) return lobby();
     spec.drawGame(view, ctx, last);
     if (view.status === 'done' && !view.claimed) claimOne(view);
@@ -184,10 +189,11 @@ export function createMpLobby(app, root, spec) {
   // Coup joué au serveur : la nouvelle vue remplace l'ancienne ; en cas d'erreur, la partie est relue
   async function act(fn) {
     if (busy) return null;
-    busy = true;
+    busy = true; gen++;
     let v;
     try { v = await fn(); } catch (e) { app.sfx.error(); toast(esc(errMsg(e)), { kind: 'error' }); busy = false; refresh(); return null; }
     busy = false;
+    if (!alive) return null; /* v527 : l'écran a été quitté pendant l'envoi */
     if (v) view = v;
     return v;
   }
@@ -224,6 +230,7 @@ export function createMpLobby(app, root, spec) {
     ui, cat, foeName, avatar, left, myTurn, resOf, msLeft,
     get view() { return view; }, set view(v) { view = v; },
     get busy() { return busy; },
+    get alive() { return alive; },
     draw, watch, refresh, act, lobby,
     // barre de compte à rebours d'une partie rapide
     clockHTML: (v) => (v.status === 'playing' && v.pace === 'fast' ? `<div class="mp-clock ${myTurn(v) ? 'mine' : ''}"><span class="mp-clock-bar"></span><span class="mp-clock-t">${myTurn(v) ? 'À toi' : `<span translate="no">${esc(foeName(v))}</span>`} · <b>${left(v)}</b></span></div>` : ''),
@@ -241,7 +248,7 @@ export function createMpLobby(app, root, spec) {
     if (k === 'back') { stopPoll(); return lobby(); }
     if (k === 'quick') return quick(b.dataset.pace || 'slow');
     if (k === 'friend') return friend();
-    if (k === 'join') { busy = true; try { await spec.join(b.dataset.id); busy = false; return open(b.dataset.id); } catch (err2) { busy = false; toast(esc(errMsg(err2)), { kind: 'error' }); return lobby(); } }
+    if (k === 'join') { if (busy) return; busy = true; try { await spec.join(b.dataset.id); busy = false; return open(b.dataset.id); } catch (err2) { busy = false; toast(esc(errMsg(err2)), { kind: 'error' }); return lobby(); } }
     if (k === 'leave') {
       if (!(await confirmBox('Annuler cette partie ?', { ok: 'Oui', cancel: 'Non' }))) return;
       try { await cloud.mpLeave(b.dataset.id); } catch (err2) { toast(esc(errMsg(err2)), { kind: 'error' }); }
@@ -257,6 +264,11 @@ export function createMpLobby(app, root, spec) {
 
   return {
     show() { alive = true; return ui.open ? open(ui.open) : lobby(); },
-    stop() { alive = false; stopPoll(); },
+    stop() {
+      alive = false; stopPoll();
+      /* v527 : une recherche rapide s'annule quand on quitte l'écran (sinon la partie démarrerait sans toi et serait perdue au temps) */
+      if (ui.searching) { cloud.mpCancel(ui.searching).catch(() => {}); ui.searching = null; ui.searchingV = null; }
+      spec.onStop?.();
+    },
   };
 }

@@ -5,6 +5,8 @@ import { sync, onSync, afterLogin, pushNow, restoreFromCloud, setPseudo, refresh
 import { icon } from '../ui/icons.js';
 import { esc, toast, confirmBox, bindActions, openSheet } from '../ui/dom.js';
 import { blockedIds, clearBlocked, isMaskedPseudo } from '../core/moderation.js';
+import { clearAll } from '../notify.js';
+import { resetWatch } from '../cloud/mpwatch.js';
 
 // v321 : règle des mots de passe réglée dans Supabase (Authentication → Password requirements)
 const PW_RULE = '8 caractères au moins, avec une majuscule, une minuscule, un chiffre et un symbole (! ? # …)';
@@ -162,6 +164,9 @@ export default function account(app, root) {
     const fresh = migrate(defaultSave());
     fresh.settings = { ...fresh.settings, ...keep };
     app.game.replaceSave(fresh);
+    /* v527 : rien de l'ancien compte ne reste (rappels du téléphone, nouvelles en ligne, parties ouvertes) */
+    clearAll().catch(() => {}); resetWatch();
+    Object.keys(app.state || {}).filter((k) => k.startsWith('mp_') || k === 'versus').forEach((k) => delete app.state[k]);
     app.applySettings?.();
     app.refresh?.();
   }

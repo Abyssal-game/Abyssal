@@ -738,7 +738,7 @@ begin
   if me is null then raise exception 'Connecte-toi d’abord.'; end if;
   if not public.sceaux_hand_ok(p_hand) then raise exception 'Ta main doit compter 5 cartes différentes.'; end if;
   perform public.mp_expire();
-  select * into m from public.mp_matches where id = p_id for update;
+  select * into m from public.mp_matches where id = p_id and game = 'sceaux' for update; -- v527 : seulement une partie des Sceaux
   if not found or m.status <> 'waiting' or m.b is distinct from me or m.public then raise exception 'Cette partie n’est plus disponible.'; end if;
   perform public.sceaux_start(p_id, p_hand);
   return p_id;
@@ -751,7 +751,7 @@ declare me uuid := auth.uid(); m public.mp_matches; who text; st jsonb;
 begin
   if me is null then raise exception 'Connecte-toi d’abord.'; end if;
   perform public.mp_expire();
-  select * into m from public.mp_matches where id = p_id and me in (a, b) for update;
+  select * into m from public.mp_matches where id = p_id and game = 'sceaux' and me in (a, b) for update;
   if not found then raise exception 'Partie introuvable.'; end if;
   if m.status <> 'playing' then raise exception 'Cette partie est terminée.'; end if;
   who := case when m.a = me then 'a' else 'b' end;
@@ -1174,7 +1174,7 @@ begin
   if not found then raise exception 'Partie introuvable.'; end if;
   if m.status <> 'playing' then raise exception 'Cette partie est terminée.'; end if;
   who := case when m.a = me then 'a' else 'b' end;
-  if m.turn <> who and m.turn <> 'ab' then raise exception 'Ce n’est pas ton tour.'; end if;
+  if m.turn <> who and m.turn <> 'ab' then raise exception '%', case when m.game = 'encheres' then 'Ton offrande est déjà posée : on attend ton adversaire.' else 'Ce n’est pas ton tour.' end; end if;
   if m.game = 'encheres' then st := public.encheres_apply(m.state, who, (p_move ->> 'offer')::int);
   else st := public.cryptes_apply(m.state, who, p_move); end if;
   if (st ->> 'over')::boolean then
@@ -1230,6 +1230,7 @@ returns text language plpgsql volatile security definer set search_path = public
 declare me uuid := auth.uid(); m public.mp_matches;
 begin
   if me is null then raise exception 'Connecte-toi d’abord.'; end if;
+  perform public.mp_expire(); -- v527 : un adversaire déjà hors délai a perdu avant ton abandon
   select * into m from public.mp_matches where id = p_id and me in (a, b) for update;
   if not found then raise exception 'Partie introuvable.'; end if;
   if m.status = 'waiting' then update public.mp_matches set status = 'cancelled', updated_at = now() where id = p_id; return 'cancelled'; end if;
@@ -1238,6 +1239,16 @@ begin
     return 'resigned';
   end if;
   return 'over';
+end $$;
+
+-- v527 : annuler une recherche ou un défi encore en attente (jamais un abandon : sans effet si la partie a commencé)
+create or replace function public.mp_cancel(p_id uuid)
+returns text language plpgsql volatile security definer set search_path = public as $$
+declare me uuid := auth.uid();
+begin
+  if me is null then raise exception 'Connecte-toi d’abord.'; end if;
+  update public.mp_matches set status = 'cancelled', updated_at = now() where id = p_id and a = me and status = 'waiting';
+  return case when found then 'cancelled' else 'none' end;
 end $$;
 
 -- Vue d'une partie pour un de ses joueurs (me = 'a' ou 'b')
@@ -1292,9 +1303,14 @@ end $$;
 create or replace function public.mp_ranking(p_game text, p_limit int default 30)
 returns table (user_id uuid, wins int, games int, pseudo text, avatar text, badge text)
 language sql stable security definer set search_path = public as $$
-  with r as (
-    select case when winner = 'a' then a else b end as w, a, b from public.mp_matches
+  with r0 as (
+    select case when winner = 'a' then a else b end as w, case when winner = 'a' then b else a end as l, a, b,
+      row_number() over (partition by case when winner = 'a' then a else b end, case when winner = 'a' then b else a end order by updated_at) as k
+    from public.mp_matches
     where game = p_game and status = 'done' and winner in ('a', 'b') and updated_at >= date_trunc('month', now())
+  ), r as (
+    -- v527 : 3 victoires au plus contre un même adversaire dans le mois (contre les comptes de complaisance)
+    select w, a, b from r0 where k <= 3
   ), s as (
     select u as user_id, count(*) filter (where u = w)::int as wins, count(*)::int as games
     from r, lateral (values (r.a), (r.b)) v(u) group by u
@@ -1307,6 +1323,7 @@ revoke execute on function public.sceaux_mp_new(text[], uuid, text) from public,
 revoke execute on function public.sceaux_mp_join(uuid, text[]) from public, anon;
 revoke execute on function public.sceaux_mp_play(uuid, int, int) from public, anon;
 revoke execute on function public.mp_leave(uuid) from public, anon;
+revoke execute on function public.mp_cancel(uuid) from public, anon;
 revoke execute on function public.mp_view(uuid) from public, anon, authenticated;
 revoke execute on function public.mp_get(uuid) from public, anon;
 revoke execute on function public.mp_list(text) from public, anon;
@@ -1316,6 +1333,7 @@ grant execute on function public.sceaux_mp_new(text[], uuid, text) to authentica
 grant execute on function public.sceaux_mp_join(uuid, text[]) to authenticated;
 grant execute on function public.sceaux_mp_play(uuid, int, int) to authenticated;
 grant execute on function public.mp_leave(uuid) to authenticated;
+grant execute on function public.mp_cancel(uuid) to authenticated;
 revoke execute on function public.pacte_mp_new(uuid, text) from public, anon;
 revoke execute on function public.pacte_mp_join(uuid) from public, anon;
 revoke execute on function public.pacte_mp_act(uuid, text) from public, anon;

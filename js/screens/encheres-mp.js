@@ -19,7 +19,11 @@ const hash = (s) => { let h = 2166136261; for (const ch of s) h = Math.imul(h ^ 
 export function createEncheresMp(app, root, { modeBar }) {
   const g = app.game, cat = app.catalog;
   let sel = null, banner = null, anim = false, timer = 0, shownLot = null;
-  const wait = (ms) => new Promise((r) => { timer = setTimeout(r, app.reduced() ? Math.min(ms, 150) : ms); });
+  /* v527 : partie rapide : animations accélérées (presque sautées sous 15 s) pour ne pas manger ton temps ; réveil quand on quitte l'écran */
+  let cur = null, wake = null;
+  const STOP = { stop: true }; /* l'écran est quitté : l'animation en cours s'arrête là */
+  const spd = () => { const v = cur?.v; if (v?.pace !== 'fast') return 1; return cur.ctx.myTurn(v) && cur.ctx.msLeft(v) < 15000 ? 0.15 : 0.5; };
+  const wait = (ms) => (cur && !cur.ctx.alive ? Promise.reject(STOP) : new Promise((r, j) => { wake = j; timer = setTimeout(r, (app.reduced() ? Math.min(ms, 150) : ms) * spd()); }));
   const fname = (f) => tw(cat.faction[f]?.name || f); /* nom de faction traduit (les blocs contiennent un pseudo ou un nombre) */
   const foeOf = (v) => (v.me === 'a' ? 'b' : 'a');
   const myPic = () => { const c = g.s.avatar && cat.get(g.s.avatar); return `<img alt="" src="${c ? artUrl(c, { lite: true }) : 'assets/brand/emblem.webp'}">`; };
@@ -58,6 +62,8 @@ export function createEncheresMp(app, root, { modeBar }) {
         <span>${pv > 0 ? 'La <b>plus haute</b> offrande seule l’emporte' : 'La <b>plus basse</b> offrande seule l’hérite !'}</span></div>`}` : ''}${ban}</div>`;
   }
   function drawGame(v, ctx) {
+    if (!ctx.alive) return;
+    cur = { v, ctx };
     const s = v.state, me = v.me, foe = foeOf(v);
     document.body.classList.add('battle-mode');
     setScene(null);
@@ -72,7 +78,7 @@ export function createEncheresMp(app, root, { modeBar }) {
     root.innerHTML = `<div class="mq-game en-game mp-en ${app.reduced() ? 'rm' : ''}">
       <div class="mq-bar"><button class="btn small ghost" data-mp="rules" aria-label="Règles">${icon('p:help')}</button><b>Les Enchères · en ligne</b><button class="btn small ghost" data-mp="back" aria-label="Revenir à la liste">${icon('close')}</button></div>
       ${stage(v, ctx)}
-      ${over ? ctx.endHTML(v, fin ? t('Toi {a} points, {name} {b}.', { a: fin[me], b: fin[foe], name: esc(ctx.foeName(v)) }) : '')
+      ${over ? ctx.endHTML(v, fin ? t('Score final : toi {a}, {name} {b}.', { a: fin[me], b: fin[foe], name: esc(ctx.foeName(v)) }) : '')
         : `${ctx.clockHTML(v)}${msg ? `<p class="sc-msg">${msg}</p>` : ''}
         ${can ? `<div class="mq-ctl en-ctl">
           <div class="en-grid">${Array.from({ length: EN.OFFERS }, (_, k) => k + 1).map((n) => `<button class="en-ob ${sel === n ? 'sel' : ''}" data-mp="o" data-n="${n}" ${(s.offers?.[me] || []).includes(n) ? '' : 'disabled'} aria-label="Offrande ${n}">${n}</button>`).join('')}</div>
@@ -103,11 +109,12 @@ export function createEncheresMp(app, root, { modeBar }) {
     if (!v) return;
     sel = null;
     const ev = v.state?.last;
-    if (ev && ev.n > (prev.state?.n || 0)) { anim = true; try { await reveal(v, ev, ctx); } finally { anim = false; } }
+    if (ev && ev.n > (prev.state?.n || 0)) { anim = true; try { await reveal(v, ev, ctx); } catch (e) { if (e !== STOP) throw e; } finally { anim = false; } }
     ctx.draw(); ctx.watch();
   }
 
   return createMpLobby(app, root, {
+    onStop: () => { clearTimeout(timer); const w = wake; wake = null; w?.(STOP); },
     game: 'encheres', modeBar,
     note: 'Choisis ta vitesse. À chaque lot, vous misez en même temps et en secret ; si tu ne poses pas ton offrande à temps, <b>la vente est perdue</b>.',
     create: (pace, to) => cloud.mpNew('encheres', to, pace),
@@ -121,7 +128,7 @@ export function createEncheresMp(app, root, { modeBar }) {
       const ev = v.state?.last;
       if (!ev || ev.n <= (prev.state?.n || 0)) return;
       anim = true;
-      try { await reveal(v, ev, ctx); } finally { anim = false; }
+      try { await reveal(v, ev, ctx); } catch (e) { if (e !== STOP) throw e; } finally { anim = false; }
     },
     click: (k, b, ctx) => {
       if (k === 'rules') return openSheet(`<div class="sc-rules"><h2>Les Enchères de Mammon</h2>${howHTML()}</div>`, { label: 'Règles des Enchères' });

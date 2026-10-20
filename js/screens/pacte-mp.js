@@ -20,7 +20,11 @@ const SND = { bust: 'pa-bust', saved: 'pa-seal', forced: 'pa-guard', seven: 'pa-
 export function createPacteMp(app, root, { modeBar }) {
   const g = app.game, cat = app.catalog;
   let anim = false, banner = null, timer = 0;
-  const wait = (ms) => new Promise((r) => { timer = setTimeout(r, app.reduced() ? Math.min(ms, 150) : ms); });
+  /* v527 : partie rapide : animations accélérées (presque sautées sous 15 s) pour ne pas manger ton temps ; réveil quand on quitte l'écran */
+  let cur = null, wake = null;
+  const STOP = { stop: true }; /* l'écran est quitté : l'animation en cours s'arrête là */
+  const spd = () => { const v = cur?.v; if (v?.pace !== 'fast') return 1; return cur.ctx.myTurn(v) && cur.ctx.msLeft(v) < 15000 ? 0.15 : 0.5; };
+  const wait = (ms) => (cur && !cur.ctx.alive ? Promise.reject(STOP) : new Promise((r, j) => { wake = j; timer = setTimeout(r, (app.reduced() ? Math.min(ms, 150) : ms) * spd()); }));
   const fname = (f) => cat.faction[f]?.name || f;
   const myPic = () => { const c = g.s.avatar && cat.get(g.s.avatar); return `<img alt="" src="${c ? artUrl(c, { lite: true }) : 'assets/brand/emblem.webp'}">`; };
   // illustration d'une carte : une créature de sa faction, à la rareté de sa valeur (la même pour toute la partie)
@@ -57,6 +61,8 @@ export function createPacteMp(app, root, { modeBar }) {
         <span class="pa-risk ${risk >= 40 ? 'hi' : risk >= 20 ? 'mid' : ''}">Risque : <b>${risk} %</b></span></div>${ban}</div>`;
   }
   function drawGame(v, ctx, _last, shown = null) {
+    if (!ctx.alive) return;
+    cur = { v, ctx };
     const s = shown || v.state, me = v.me, foe = foeOf(v);
     document.body.classList.add('battle-mode');
     setScene(null);
@@ -73,7 +79,7 @@ export function createPacteMp(app, root, { modeBar }) {
       <div class="pa-deck"><span class="pa-pile"><img alt="" src="assets/sceaux/dos.webp"><b>${(s.deck || []).length}</b></span><span class="small muted">${over ? t('Tour {n}', { n: s.round || 1 }) : s.turn === me ? t('Tour {n} · à toi', { n: s.round || 1 }) : t('Tour {n} · à {name}', { n: s.round || 1, name: esc(ctx.foeName(v)) })}</span></div>
       <div class="mq-table pa-table">${center(v, s)}</div>
       ${seat(v, s, me, ctx)}
-      ${over ? ctx.endHTML(v, fin ? t('Toi {a} points, {name} {b}.', { a: fin[me], b: fin[foe], name: esc(ctx.foeName(v)) }) : '')
+      ${over ? ctx.endHTML(v, fin ? t('Score final : toi {a}, {name} {b}.', { a: fin[me], b: fin[foe], name: esc(ctx.foeName(v)) }) : '')
         : `${ctx.clockHTML(v)}${msg ? `<p class="sc-msg">${msg}</p>` : ''}
         ${mt ? `<div class="mq-ctl pa-ctl"><button class="btn primary dc-plq dc-plq-red" data-mp="draw">${icon('cards')}Tirer une carte</button>
           <button class="btn dc-plq dc-plq-dark" data-mp="stop" ${canStop ? '' : 'disabled'}>${canStop ? `S’arrêter (+${val})` : 'S’arrêter'}</button></div>` : ''}
@@ -126,12 +132,13 @@ export function createPacteMp(app, root, { modeBar }) {
     try {
       if (ev?.result === 'ok') { app.sfx[ev.card?.sp === 'offrande' ? 'pa-offer' : 'pa-draw']?.(); }
       else if (ev) await replay(v, [ev], prev.state, ctx);
-    } finally { anim = false; }
+    } catch (e) { if (e !== STOP) throw e; } finally { anim = false; }
     ctx.draw();
     ctx.watch();
   }
 
   return createMpLobby(app, root, {
+    onStop: () => { clearTimeout(timer); const w = wake; wake = null; w?.(STOP); },
     game: 'pacte', modeBar,
     note: `Choisis ta vitesse. Premier à ${PA.TARGET} points. Chaque fois que c’est à toi (tirer ou t’arrêter), tu as un temps limité : passé ce délai, <b>la partie est perdue</b>.`,
     create: (pace, to) => cloud.pacteMpNew(to, pace),
@@ -146,7 +153,7 @@ export function createPacteMp(app, root, { modeBar }) {
       const evs = (v.state?.log || []).filter((e) => e.n > seen && e.who !== v.me);
       if (!evs.length || evs[0].n !== seen + 1) return;
       anim = true;
-      try { await replay(v, evs, prev.state, ctx); } finally { anim = false; }
+      try { await replay(v, evs, prev.state, ctx); } catch (e) { if (e !== STOP) throw e; } finally { anim = false; }
     },
     click: (k, b, ctx) => {
       if (k === 'rules') return openSheet(`<div class="sc-rules"><h2>Le Pacte</h2>${howHTML()}</div>`, { label: 'Règles du Pacte' });

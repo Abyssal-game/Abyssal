@@ -54,7 +54,9 @@ export const langChosen = () => { try { return !!localStorage.getItem(KEY); } ca
 // ——— Clés ———————————————————————————————————————————————————————————————
 const NUM = /\d+(?:[  .,]\d{3})*(?:[.,]\d+)?/g;
 const space = (s) => s.replace(/\s+/g, ' ').trim();
-const fill = (tr, nums) => tr.replace(/\{(\d+)\}/g, (m, i) => (nums[+i] ?? m));
+/* v527 : « {0}th » → 1st, 2nd, 3rd, 11th… selon le nombre remis */
+const ord = (n) => { const x = +n % 100; return (x > 10 && x < 14) ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' })[x % 10] || 'th'; };
+const fill = (tr, nums) => tr.replace(/\{(\d+)\}(th\b)?/g, (m, i, th) => (nums[+i] == null ? m : nums[+i] + (th && /^\d+$/.test(nums[+i]) ? ord(nums[+i]) : th || '')));
 
 // Traduction d'une phrase depuis le code : t('Bonjour {name}', { name }) ; sans dictionnaire, le français.
 export function t(fr, vars) {
