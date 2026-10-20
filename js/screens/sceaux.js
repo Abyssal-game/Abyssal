@@ -8,6 +8,8 @@ import { openSheet, esc, fmt, toast, confirmBox } from '../ui/dom.js';
 import { setScene } from '../ui/scene.js';
 import { tuto } from '../ui/tutos.js';
 import { CHESTS } from '../core/descent.js';
+import { createSceauxMp } from './sceaux-mp.js';
+import { MP_HOURS, MP_REWARD } from '../core/mp.js';
 const SC_CHEST_NAME = Object.fromEntries(Object.entries(CHESTS).map(([k, c]) => [k, c.name])); /* v408 */
 
 const V = SC.showVal;
@@ -25,6 +27,7 @@ const HOW = [['cards', '#7FA8D8', 'Ta main', '5 cartes. Chacune a quatre valeurs
   ['rule', '#B48CFF', 'Règles spéciales', 'Certains adversaires jouent avec une règle en plus : Cases sacrées, Identique ou Somme (avec Combo en cascade).'],
   ['crystal', '#7FE0A0', 'Butin', 'Une fois par jour, après une victoire, tu gardes une carte adverse que tu contrôles sur le plateau (Hyper rare au plus).'],
   ['hourglass', '#9FE0FF', 'Adversaires et défi', 'Bats chaque adversaire pour débloquer le suivant. Un défi du jour t’attend aussi.'],
+  ['amis', '#9FE0FF', 'Contre un joueur', `En haut, « Contre un joueur » : affronte d’autres joueurs (au hasard ou un ami), chacun à son rythme. Tu as ${MP_HOURS} h pour jouer chaque coup : passé ce délai, la partie est perdue. Victoire : +${MP_REWARD.win} éclats et le classement du mois.`],
   ['danger', '#FF5468', 'Revanches implacables', 'Une fois un adversaire battu, tu peux l’affronter implacable : main plus rare, jeu plus fin, récompense ×1,5 et +150 éclats la première fois.']];
 // Salle de chaque adversaire (assets/sceaux) : le plateau reste le même, le décor change
 const THEME = { initie: 'salle', collectionneur: 'salle-artificiel', stratege: 'salle-celeste', maitre: 'salle-necrotique', echo: 'salle-abyssal', banquier: 'salle-necrotique', archiviste: 'salle-artificiel', souverain: 'salle-abyssal' };
@@ -49,7 +52,11 @@ export function scCard(cat, id, { vals = null, owner = '', cls = '', back = fals
 
 export default function sceauxScreen(app, root) {
   const g = app.game, cat = app.catalog;
-  const ui = (app.state.sceaux ||= { sel: null });
+  const ui = (app.state.sceaux ||= { sel: null, mode: 'solo' });
+  // v519 : « Contre l'Abysse » (arbitres) ou « Contre un joueur » (parties en ligne, sceaux-mp.js)
+  const modeBar = () => `<header class="screen-head ui-hero bn-sceaux"><h1>Duels des Sceaux</h1><p class="muted">${ui.mode === 'mp' ? 'Affronte d’autres joueurs, chacun à son rythme.' : 'Pose tes cartes sur le plateau et capture celles de l’adversaire.'}</p></header>
+    <div class="seg wide gm-mode" role="tablist"><button class="seg-b" role="tab" data-sc="mode" data-v="solo" aria-selected="${ui.mode !== 'mp'}" aria-pressed="${ui.mode !== 'mp'}">Contre l’Abysse</button><button class="seg-b" role="tab" data-sc="mode" data-v="mp" aria-selected="${ui.mode === 'mp'}" aria-pressed="${ui.mode === 'mp'}">Contre un joueur</button></div>`;
+  const mp = createSceauxMp(app, root, { scCard, modeBar });
   let busy = false, timer = 0;
   const wait = (ms) => new Promise((r) => { timer = setTimeout(r, app.reduced() ? Math.min(ms, 60) : ms); });
 
@@ -63,11 +70,13 @@ export default function sceauxScreen(app, root) {
         <section class="panel tr-lock">${icon('lock')}<b>Encore scellés</b><p class="small">Vaincs ton <b>premier gardien</b> dans la Descente (étage 5) pour ouvrir les Duels des Sceaux.</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`;
       return;
     }
+    if (ui.mode === 'mp') return mp.show();
+    mp.stop();
     const sc = g.s.sceaux, hand = g.sceauxHand(), d = g.sceauxDaily();
     const dailyDone = sc.dailyDone === todayKey();
     const R = SC.RIVAL[d.rival];
-    root.innerHTML = `<header class="screen-head ui-hero bn-sceaux"><h1>Duels des Sceaux</h1><p class="muted">Pose tes cartes sur le plateau et capture celles de l’adversaire.</p>
-        <span class="sc-rec">${sc.wins} victoire${sc.wins > 1 ? 's' : ''} · ${sc.losses} défaite${sc.losses > 1 ? 's' : ''}${sc.draws ? ` · ${sc.draws} égalité${sc.draws > 1 ? 's' : ''}` : ''}</span></header>
+    root.innerHTML = `${modeBar()}<p class="sc-rec-line">
+        <span class="sc-rec">${sc.wins} victoire${sc.wins > 1 ? 's' : ''} · ${sc.losses} défaite${sc.losses > 1 ? 's' : ''}${sc.draws ? ` · ${sc.draws} égalité${sc.draws > 1 ? 's' : ''}` : ''}</span></p>
 ${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone ? 'done' : ''}" data-sc="daily" ${dailyDone ? 'disabled' : ''}>
         <img alt="" src="assets/icons/hourglass.webp"><span><b>Défi du jour</b><span class="small">${esc(R.name)} · règle « ${esc(SC.RULES[d.rule].name)} »</span>
         <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : `Victoire : +${SC.SCEAUX_REWARD.daily} éclats et un coffre de bois`}</span></span>${dailyDone ? icon('check') : icon('next')}</button>` : ''}
@@ -337,6 +346,7 @@ ${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone ? 'done
     const b = e.target.closest('[data-sc]');
     if (!b || b.disabled) return;
     const k = b.dataset.sc;
+    if (k === 'mode') { ui.mode = b.dataset.v; app.sfx.tap(); return lobby(); }
     if (k === 'rules') { const cur = g.s.sceaux.cur; return cur && !cur.over ? openRuleHelp(app, cur.rule, { onAll: rules }) : rules(); } // v329 : la pastille de règle ouvre son animation
     if (k === 'demo') return openRuleHelp(app, b.dataset.k);
     if (k === 'hand') return handSheet();
@@ -368,5 +378,5 @@ ${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone ? 'done
 
   if (g.s.sceaux.cur && !g.s.sceaux.cur.rewarded) { boardView(); if (g.s.sceaux.cur.over) end(); else aiTurn(); }
   else { if (g.s.sceaux.cur) g.sceauxQuit(); lobby(); }
-  return () => { clearTimeout(timer); document.body.classList.remove('battle-mode', 'sc-lost'); ['.sc-end', '.sc-scene', '.sc-dlg'].forEach((q) => document.querySelector(q)?.remove()); };
+  return () => { mp.stop(); clearTimeout(timer); document.body.classList.remove('battle-mode', 'sc-lost'); ['.sc-end', '.sc-scene', '.sc-dlg'].forEach((q) => document.querySelector(q)?.remove()); };
 }

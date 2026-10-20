@@ -72,6 +72,7 @@ export function defaultSave(now = Date.now()) {
     cryptes: { wins: 0, losses: 0, beaten: {}, feats: {}, day: null, paidToday: 0, dailyDone: null, streak: 0, best: 0, history: [], cur: null }, /* v450 : Les Cryptes */
     autels: { wins: 0, losses: 0, beaten: {}, day: null, paidToday: 0, dailyDone: null, streak: 0, best: 0, history: [], cur: null, deck: null, lent: [] }, /* v451 : Les Trois Autels */
     enigmes: { day: null, tries: [0, 0, 0], stars: [0, 0, 0], done: [false, false, false], chest: null, streak: 0, lastFull: null, solved: 0, starsTotal: 0 }, /* v427 : les Énigmes des Sceaux */
+    mp: { day: null, paid: 0, done: {} }, /* v519 : mini-jeux contre d'autres joueurs (récompenses du jour, parties déjà encaissées) */
     versus: { played: 0, wins: 0, losses: 0, ties: 0, won: 0, spent: 0, done: {} }, /* v512 : Versus Booster (défis de boosters entre joueurs) */
     relics: { best: 0, runs: 0, wins: 0, run: null, last: null, day: null, paidToday: 0 },
     war: { week: null, side: null, points: 0, used: {}, claimed: {}, history: [], report: null },
@@ -111,7 +112,7 @@ export function migrate(raw) {
   s.pity = { ...d.pity, ...s.pity };
   // objets imbriqués ajoutés au fil des versions : complétés sans écraser l'existant
   s.stats.pulls = { ...d.stats.pulls, ...(s.stats.pulls || {}) };
-  for (const k of ['descent', 'missions', 'freePack', 'daily', 'itemBuys', 'chests', 'sceaux', 'masques', 'encheres', 'pacte', 'cryptes', 'autels', 'enigmes', 'versus', 'relics', 'war', 'season', 'trials']) s[k] = { ...d[k], ...(s[k] && typeof s[k] === 'object' ? s[k] : {}) };
+  for (const k of ['descent', 'missions', 'freePack', 'daily', 'itemBuys', 'chests', 'sceaux', 'masques', 'encheres', 'pacte', 'cryptes', 'autels', 'enigmes', 'versus', 'mp', 'relics', 'war', 'season', 'trials']) s[k] = { ...d[k], ...(s[k] && typeof s[k] === 'object' ? s[k] : {}) };
   if (!Array.isArray(s.team)) s.team = [];
   if (!Array.isArray(s.teamPresets)) s.teamPresets = [];
   s.teamPresets = s.teamPresets.filter((p) => p && typeof p.name === 'string' && Array.isArray(p.ids)).slice(0, 4);

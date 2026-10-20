@@ -23,6 +23,7 @@ import * as SC from './sceaux.js';
 import * as EN from './encheres.js';
 import * as PA from './pacte.js';
 import * as CR from './cryptes.js';
+import { MP_REWARD } from './mp.js';
 import { FERVOR_START, FERVOR_MAX, FERVOR_CARRY, TALENTS } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
 export const WEEKLY_FLOOR = 8;
@@ -445,6 +446,23 @@ export class Game {
     out.progress = this.checkProgress();
     this.persist();
     return out;
+  }
+  // v519 : partie terminée contre un autre joueur (résultat donné par le serveur, encaissé une seule fois)
+  mpReward(game, id, result) {
+    const m = this.s.mp;
+    if (!['win', 'lose', 'draw'].includes(result) || m.done[id]) return null;
+    m.done[id] = result;
+    const keys = Object.keys(m.done); if (keys.length > 200) for (const k of keys.slice(0, keys.length - 200)) delete m.done[k];
+    const day = today(this.clock());
+    if (m.day !== day) { m.day = day; m.paid = 0; }
+    const st = (m[game] ||= { wins: 0, losses: 0, draws: 0 });
+    let shards = 0;
+    if (result === 'win') { st.wins++; if (m.paid < MP_REWARD.paidPerDay) { m.paid++; shards = MP_REWARD.win; this.grant({ shards }, 'mp'); } }
+    else if (result === 'lose') st.losses++; else st.draws++;
+    this.s.xp += MP_REWARD.xp;
+    const progress = this.checkProgress();
+    this.persist();
+    return { shards, progress };
   }
   // Doublons et Fournaise -------------------------------------------------
   // Un doublon = un exemplaire en plus du premier, dans la même finition (chaque finition gardée une fois).

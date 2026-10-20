@@ -25,6 +25,12 @@ export default function gamesScreen(app, root) {
       ${tile('#/versus', 'gm-versus', 'Le Pari des Boosters', 'Contre un autre joueur : ouvrez vos boosters face à face, le meilleur total remporte toutes les cartes.', vs.played ? `${vs.played} duel${vs.played > 1 ? 's' : ''} · ${vs.wins} victoire${vs.wins > 1 ? 's' : ''} · ${vs.won} cartes gagnées` : 'Joue en ligne contre d’autres joueurs', 'assets/ui/bn-versus.webp')}
       ${tile('#/encheres', 'gm-encheres', 'Les Enchères de Mammon', 'Enchères à l’aveugle à trois : offre plus que les autres… sans jamais offrir pareil.', `${rec(en.wins, en.losses)} · ${Object.keys(en.beaten || {}).length} / ${EN.TABLES.length} ventes gagnées`, 'assets/ui/bn-encheres.webp')}
     </div>`;
+  /* v519 : parties en ligne des Sceaux qui attendent ton coup */
+  if (cloud.isLoggedIn()) cloud.mpList('sceaux').then((L) => {
+    const n = L.filter((v) => v.status === 'playing' && v.turn === v.me).length;
+    const t = root.querySelector('.gm-sceaux .gm-txt');
+    if (n && t) t.insertAdjacentHTML('beforeend', `<span class="gm-daily">${icon('p:hourglass')}À toi de jouer en ligne (${n})</span>`);
+  }).catch(() => {});
   /* v512 : duels du Versus relevés pendant ton absence */
   if (g.sceauxOpen() && cloud.isLoggedIn()) cloud.versusList().then((d) => {
     const n = (d?.mine || []).filter((r) => r.status === 'done' && !r.claimed).length;

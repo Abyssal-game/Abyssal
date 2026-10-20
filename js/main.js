@@ -42,6 +42,7 @@ import { consumeAuthHash, isLoggedIn } from './cloud/cloud.js';
 import { startPresence } from './cloud/presence.js';
 import { showWelcome } from './screens/welcome.js';
 import { showGate } from './ui/gate.js';
+import { mpw, checkTurns } from './cloud/mpwatch.js';
 import { onAuth } from './cloud/cloud.js';
 import { setScene } from './ui/scene.js';
 import { initNative, isNative } from './native.js';
@@ -174,7 +175,7 @@ function renderChrome() {
     // v404 : pastilles plus calmes — plus de « 99+ » permanent sur la Fournaise ; Renforcer seulement si l'Accueil le conseille aussi
     if (r === 'renfort') return g.goals().some((x) => x.kind === 'forge' && /Renforce/.test(x.title)) ? '↑' : '';
     if (r === 'collection') return nNewSub || '';
-    if (r === 'jeux') return g.gamesDailyLeft().length || ''; /* v466 : défis du jour à relever */
+    if (r === 'jeux') return (g.gamesDailyLeft().length + mpw.turns) || ''; /* v466 : défis du jour à relever ; v519 : coups à jouer en ligne */
     if (r === 'epreuves') { const n = g.trials().done.filter((x) => !x).length; return g.team().length >= 3 && n ? n : ''; } /* v407 */
     return '';
   };
@@ -343,7 +344,9 @@ async function boot() {
     let shownPseudo = null;
     onSync(() => { const ps = sync.profile?.pseudo || null; if (ps !== shownPseudo) { shownPseudo = ps; renderChrome(); } }); /* v422 : le pseudo en ligne s'affiche en haut dès qu'il arrive */
     startPresence();
-    setInterval(autoClaim, 5000); /* v422 : l'Accueil n'a plus de boutons « +50 » : on encaisse aussi sans changer de page */
+    setInterval(autoClaim, 5000);
+    setTimeout(() => checkTurns(app, { force: true }), 6000); setInterval(() => checkTurns(app), 120000); /* v519 : « À toi de jouer » en ligne */
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkTurns(app); }); /* v422 : l'Accueil n'a plus de boutons « +50 » : on encaisse aussi sans changer de page */
     setTimeout(() => claimShadowPrize(app), 5000); // coffre du Tirage des Ombres de la semaine passée
     lastShards = app.game.s.shards;
     window.addEventListener('hashchange', render);

@@ -4744,3 +4744,26 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .gift-ok { inset: auto 0 38% 0; display: block; margin: 0 auto; width: max-content; padding: 3px 10px; border-radius: 10px; background: rgba(10, 30, 14, .92); border: 1px solid #8FE39A; color: #8FE39A; font: 700 .72rem/1.2 var(--f-ui); font-style: normal; text-transform: uppercase; letter-spacing: .06em; }
 .gift-pk.done { filter: none; }
 .gift-pk.done .pack { filter: grayscale(.85) brightness(.5); }
+/* v519 : Duels des Sceaux contre d'autres joueurs (js/screens/sceaux-mp.js) */
+.gm-mode { margin: 0 0 12px; }
+.sc-rec-line { margin: -4px 0 10px; text-align: center; }
+.mp-sec { margin: 0 0 12px; }
+.mp-sec.hot { border-color: rgba(242, 193, 78, .85); box-shadow: 0 0 18px rgba(242, 193, 78, .25); }
+.mp-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid rgba(255, 255, 255, .06); min-height: 52px; cursor: pointer; }
+.mp-row:first-of-type { border-top: 0; }
+.mp-row .fr-av { flex-basis: 42px; width: 42px; height: 42px; }
+.mp-row .fr-t small { white-space: normal; }
+.mp-row.hot .fr-t b { color: #F2C14E; }
+.mp-row > .ic { flex: none; width: 18px; height: 18px; opacity: .7; }
+.mp-new .big-cta { margin: 10px 0 8px; }
+.mp-hand { justify-content: center; margin: 8px 0 2px; }
+.mp-friends { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 8px 0; }
+.mp-game .sc-tray { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.mp-resign { opacity: .8; }
+.mp-end { margin: 8px 12px 12px; text-align: center; padding: 14px; }
+.mp-end p { margin: 4px 0 12px; }
+.sc-cell.mp-flip .sc-card { animation: mpFlip .6s ease both; }
+@keyframes mpFlip { 0% { transform: rotateY(90deg) scale(.9); filter: brightness(2); } 100% { transform: none; filter: none; } }
+@media (prefers-reduced-motion: reduce) { .sc-cell.mp-flip .sc-card { animation: none; } }
+.mp-game .sc-tray .sc-hand-row { align-self: stretch; width: 100%; }
+.mp-game .mp-resign { min-height: 36px; padding: 4px 14px; font-size: .78rem; }

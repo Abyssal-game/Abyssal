@@ -37,6 +37,7 @@ function frError(status, body) {
   if (m.includes('otp_expired') || m.includes('expired') || m.includes('invalid or has expired')) return 'Ce lien a expiré : demande-en un nouveau.';
   if (m.includes('duplicate') || m.includes('profiles_pseudo_key') || status === 409) return 'Ce pseudo est déjà pris.';
   if (m.includes('check constraint') || m.includes('violates check')) return 'Pseudo invalide : 3 à 16 lettres, chiffres, espaces, - ou _.';
+  if (m.includes('mp_') || m.includes('sceaux_mp')) return 'Les parties contre d’autres joueurs ne sont pas encore ouvertes sur le serveur.'; /* v519 : supabase/09-multijoueur.sql pas encore collé */
   if (m.includes('versus_')) return 'Le Pari des Boosters n’est pas encore ouvert sur le serveur.'; /* v512 : supabase/08-versus.sql pas encore collé */
   if (m.includes('friend_') || m.includes('player_cards')) return 'Les amis ne sont pas encore ouverts sur le serveur.';
   if (status === 401 || status === 403) return 'Session expirée : reconnecte-toi.';
@@ -192,6 +193,17 @@ export async function versusCreateMix(lineup, to = null) { return authed('/rest/
 export async function versusAccept(id) { return authed('/rest/v1/rpc/versus_accept', { method: 'POST', body: { p_id: id } }); }
 export async function versusCancel(id) { return authed('/rest/v1/rpc/versus_cancel', { method: 'POST', body: { p_id: id } }); }
 export async function versusClaim(id) { return authed('/rest/v1/rpc/versus_claim', { method: 'POST', body: { p_id: id } }); }
+
+// ——— Mini-jeux contre d'autres joueurs (v519, supabase/09-multijoueur.sql) ——————————————
+const rpc = (fn, body = {}) => authed(`/rest/v1/rpc/${fn}`, { method: 'POST', body });
+export const mpList = async (game) => (await rpc('mp_list', { p_game: game })) || [];
+export const mpGet = (id) => rpc('mp_get', { p_id: id });
+export const mpLeave = (id) => rpc('mp_leave', { p_id: id });
+export const mpClaim = (id) => rpc('mp_claim', { p_id: id });
+export const mpRanking = async (game, limit = 30) => (await rpc('mp_ranking', { p_game: game, p_limit: limit })) || [];
+export const sceauxMpNew = (hand, to = null) => rpc('sceaux_mp_new', { p_hand: hand, p_to: to });
+export const sceauxMpJoin = (id, hand) => rpc('sceaux_mp_join', { p_id: id, p_hand: hand });
+export const sceauxMpPlay = (id, idx, cell) => rpc('sceaux_mp_play', { p_id: id, p_idx: idx, p_cell: cell });
 
 // Signaler le pseudo d'un autre joueur : renvoie 'ok', ou 'masqué' si le pseudo vient d'être masqué.
 export async function reportPseudo(target, reason) {
