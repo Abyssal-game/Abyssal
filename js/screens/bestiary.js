@@ -1,5 +1,6 @@
 // Bestiaire : encyclopédie des créatures connues et chroniques débloquées
 // au fil des découvertes.
+import { tw } from '../i18n.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, EMBLEM, picon } from '../ui/icons.js';
 import { esc, bindActions } from '../ui/dom.js';
@@ -45,7 +46,7 @@ export default function bestiary(app, root) {
 
   function creatures() {
     const q = norm(st.q.trim());
-    const list = cat.byFaction[st.faction].filter((c) => !q || (g.nameKnown(c.id) && norm(c.name + ' ' + c.category).includes(q)));
+    const list = cat.byFaction[st.faction].filter((c) => !q || (g.nameKnown(c.id) && norm(`${c.name} ${c.category} ${tw(c.name)} ${tw(c.category)}`).includes(q)));
     const fp = g.factionProgress(st.faction);
     const groups = {};
     // les pages encore scellées ne sont pas listées une par une : un simple compteur suffit

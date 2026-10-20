@@ -15,10 +15,33 @@ function pick() {
   return 'fr';
 }
 export const LANG = browser ? pick() : 'fr';
-let dict = null;
+let dict = null, names = null, nameRe = null;
 if (browser && LANG !== 'fr') {
-  try { dict = (await import(`./i18n/${LANG}.js`)).default; } catch (e) { dict = null; }
+  try { const mod = await import(`./i18n/${LANG}.js`); dict = mod.default; names = mod.names || null; } catch (e) { dict = null; }
 }
+// v507 : noms propres (créatures, gardiens, personnages) : dans une phrase, chaque nom connu devient {n0}, {n1}…
+// et la phrase se cherche sous cette forme (« Voir {n0} ») ; le nom est remis traduit
+export function nameIndex(map) {
+  const all = { ...map };
+  for (const [k, v] of Object.entries(map)) { const m = k.match(/^(?:Le |La |Les |L’|L')(.+)$/); if (m && !(m[1] in all)) all[m[1]] = v; }
+  const re = new RegExp(`(?<![\\p{L}])(${Object.keys(all).sort((a, b) => b.length - a.length).map((x) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})(?![\\p{L}])`, 'gu');
+  return { all, re };
+}
+if (names) { const ix = nameIndex(names); names = ix.all; nameRe = ix.re; }
+// Un mot ou un nom tel qu'affiché (pour les recherches : on cherche aussi dans la langue choisie)
+export const tw = (s) => (s && (names?.[s] ?? dict?.[s])) || s;
+export function nameKey(key, re) { const nm = []; return { key: key.replace(re, (m) => `{n${nm.push(m) - 1}}`), nm }; }
+function look(key) {
+  const tr = dict?.[key];
+  if (tr != null) return { tr, nm: [] };
+  if (!nameRe) return null;
+  const nk = nameKey(key, nameRe);
+  if (!nk.nm.length) return null;
+  if (nk.key === '{n0}') return { tr: '{n0}', nm: nk.nm };
+  const t2 = dict[nk.key];
+  return t2 != null ? { tr: t2, nm: nk.nm } : null;
+}
+const fillNames = (tr, nm) => (nm.length ? tr.replace(/\{n(\d+)\}/g, (m, i) => (nm[+i] != null ? (names[nm[+i]] ?? nm[+i]) : m)) : tr);
 const collecting = browser && (() => { try { return localStorage.getItem('abyssal.i18n.collect') === '1'; } catch (e) { return false; } })();
 
 export function setLang(k) {
@@ -44,10 +67,16 @@ export function tx(text) {
   if (!dict && !collecting) return text;
   const nums = [];
   const key = space(text).replace(NUM, (m) => `{${nums.push(m) - 1}}`);
-  const tr = dict?.[key];
-  if (tr == null) { miss(key); return text; }
+  const hit = look(key);
   const lead = text.match(/^\s*/)[0], tail = text.match(/\s*$/)[0];
-  return lead + fill(tr, nums) + tail;
+  if (hit) return lead + fillNames(fill(hit.tr, nums), hit.nm) + tail;
+  if (dict) {
+    // citation entre guillemets, ou morceaux séparés par « · » : chacun traduit à part
+    const q = text.match(/^(\s*)«\s*([\s\S]+?)\s*»(\s*)$/);
+    if (q) { const v = tx(q[2]); if (v !== q[2]) return `${q[1]}“${v}”${q[3]}`; }
+    if (text.includes(' · ')) { const parts = text.split(' · '), v = parts.map((x) => tx(x)); if (v.some((x, i) => x !== parts[i])) return v.join(' · '); }
+  }
+  miss(key); return text;
 }
 
 // ——— Traducteur du DOM ————————————————————————————————————————————————————
@@ -59,6 +88,7 @@ const LETTERS = /[A-Za-zÀ-ÿŒœ]{2}/;
 const missing = new Map();
 function miss(key) {
   if (!collecting || !LETTERS.test(key)) return;
+  if (nameRe) key = nameKey(key, nameRe).key;
   missing.set(key, (missing.get(key) || 0) + 1);
 }
 if (collecting) {
@@ -115,7 +145,11 @@ function render(el, tr, nums, els) {
 function attrs(el) {
   for (const a of ATTRS) {
     const v = el.getAttribute(a);
-    if (v && LETTERS.test(v)) { const tr = tx(v); if (tr !== v) el.setAttribute(a, tr); }
+    if (v && LETTERS.test(v)) {
+      let tr = tx(v);
+      if (tr === v && v.includes(', ')) tr = v.split(', ').map((x) => tx(x)).join(', '); /* « Nom, Rare, Argentée » */
+      if (tr !== v) el.setAttribute(a, tr);
+    }
   }
 }
 function translateTree(root) {
@@ -124,8 +158,8 @@ function translateTree(root) {
   attrs(root);
   if (isBlock(root)) {
     const { key, nums, els } = keyOf(root);
-    const tr = dict?.[key];
-    if (tr != null) render(root, tr, nums, els);
+    const hit = look(key);
+    if (hit) render(root, fillNames(hit.tr, hit.nm), nums, els);
     else {
       miss(key);
       // repli : chaque morceau de texte du bloc (hors éléments enfants) traduit à part

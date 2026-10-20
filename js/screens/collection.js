@@ -1,4 +1,5 @@
 // Collection : recherche, filtres (faction, rareté, possession), tri, grille.
+import { tw, LANG } from '../i18n.js';
 import { tuto } from '../ui/tutos.js';
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { icon, sigil } from '../ui/icons.js';
@@ -68,7 +69,7 @@ export default function collection(app, root, params) {
       if (st.show === 'var' && !(e && ['holo', 'gold', 'galaxy'].some((v) => e.v?.[v] > 0))) return false; // v348 : finitions possédées
       if (q) {
         const known = g.nameKnown(c.id);
-        const hay = norm(`${c.id} ${known ? c.name + ' ' + c.title : ''} ${e ? c.category : ''}`);
+        const hay = norm(`${c.id} ${known ? `${c.name} ${c.title} ${tw(c.name)} ${tw(c.title)}` : ''} ${e ? `${c.category} ${tw(c.category)}` : ''}`);
         if (!hay.includes(q)) return false;
       }
       return true;
@@ -77,7 +78,7 @@ export default function collection(app, root, params) {
     const ri = (c) => RARITY_ORDER.indexOf(c.rarity);
     const sorters = {
       num: (a, b) => fo(a) - fo(b),
-      name: (a, b) => (g.nameKnown(b.id) - g.nameKnown(a.id)) || a.name.localeCompare(b.name, 'fr'),
+      name: (a, b) => (g.nameKnown(b.id) - g.nameKnown(a.id)) || tw(a.name).localeCompare(tw(b.name), LANG),
       rarity: (a, b) => ri(b) - ri(a) || (g.owns(b.id) - g.owns(a.id)) || fo(a) - fo(b), /* v447 : possédées d'abord dans une rareté */
       power: (a, b) => (g.owns(b.id) - g.owns(a.id)) || b.power - a.power || fo(a) - fo(b),
       date: (a, b) => (g.entry(b.id)?.first || 0) - (g.entry(a.id)?.first || 0) || fo(a) - fo(b),
@@ -133,7 +134,7 @@ export default function collection(app, root, params) {
     const fac = cat.faction[f];
     const ri = (c) => RARITY_ORDER.indexOf(c.rarity), o = ord();
     /* v447 : A → Z = noms connus d'abord (les autres gardent leur numéro, pour ne rien dévoiler) ; Rareté = la plus rare d'abord */
-    const cards = [...cat.byFaction[f]].sort(o === 'name' ? (a, b) => (g.nameKnown(b.id) - g.nameKnown(a.id)) || (g.nameKnown(a.id) ? a.name.localeCompare(b.name, 'fr') : a.number - b.number)
+    const cards = [...cat.byFaction[f]].sort(o === 'name' ? (a, b) => (g.nameKnown(b.id) - g.nameKnown(a.id)) || (g.nameKnown(a.id) ? tw(a.name).localeCompare(tw(b.name), LANG) : a.number - b.number)
       : o === 'rarity' ? (a, b) => ri(b) - ri(a) || (!!g.entry(b.id) - !!g.entry(a.id)) || a.number - b.number : (a, b) => a.number - b.number);
     const pages = [];
     for (let i = 0; i < cards.length; i += 9) pages.push(cards.slice(i, i + 9));
