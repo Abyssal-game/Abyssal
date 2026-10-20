@@ -20,8 +20,21 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // Clé d'envoi du Play Store : fournie seulement par GitHub Actions (secrets), jamais dans le dépôt
+    def ks = System.getenv('ABYSSAL_KEYSTORE')
+    if (ks) {
+        signingConfigs {
+            release {
+                storeFile file(ks)
+                storePassword System.getenv('ABYSSAL_KEY_PASSWORD')
+                keyAlias 'abyssal'
+                keyPassword System.getenv('ABYSSAL_KEY_PASSWORD')
+            }
+        }
+    }
     buildTypes {
         release {
+            if (ks) signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

@@ -20,6 +20,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      HAS_KEY: ${{ secrets.ANDROID_KEYSTORE != '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -42,6 +44,21 @@ jobs:
       - name: Construction (version d'essai)
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon
+      - name: Version du Play Store (signée avec la clé d'envoi, si les secrets sont posés)
+        if: env.HAS_KEY == 'true'
+        working-directory: android
+        env:
+          ABYSSAL_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 -d > "$RUNNER_TEMP/upload.jks"
+          ABYSSAL_KEYSTORE="$RUNNER_TEMP/upload.jks" ./gradlew bundleRelease --no-daemon
+          rm -f "$RUNNER_TEMP/upload.jks"
+      - uses: actions/upload-artifact@v4
+        if: env.HAS_KEY == 'true'
+        with:
+          name: abyssal-play-store
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 30
       - uses: actions/upload-artifact@v4
         with:
           name: abyssal-android-essai
