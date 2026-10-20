@@ -5116,3 +5116,10 @@ html.fx-light .cxk-c.ready { animation: none; }
 :is(.cxs-hero, .cxs-t, .cxk, .cx-pitch, .cxr, .cx-season) :is(.avatar-big, .avatar-mini) > img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 :is(.cxs-hero, .cxs-t, .cxk, .cx-pitch, .cxr, .cx-season) :is(.avatar-big, .avatar-mini) > svg { width: 100%; height: 100%; }
 .cxs-euro { align-content: start; grid-auto-rows: auto; height: auto; min-height: 0; }
+/* v534 : images Gemini du Codex et de l'Échoppe : l'image de saison reste en haut (sol sombre sous le texte), textes lisibles sur le grimoire */
+.cx-season-art { inset: 0 0 auto 0; height: auto; aspect-ratio: 1024 / 572; object-position: center top; }
+.cx-season::after { background: linear-gradient(180deg, rgba(8, 9, 13, 0) 30%, rgba(8, 9, 13, .55) 52%, rgba(8, 9, 13, .95) 80%); }
+.cx-season-in { padding-top: 104px; }
+.cx-season .cx-kick, .cx-pitch .cx-kick, .cx-pitch h2, .cx-pitch p { text-shadow: 0 1px 3px #000, 0 0 10px rgba(0, 0, 0, .9); }
+.cx-pitch p { max-width: 64%; }
+.cxs-e.founder .cxs-e-art { width: 88%; aspect-ratio: 1024 / 637; }
