@@ -4536,3 +4536,10 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .bn-trophies { --bn: url(../assets/ui/bn-trophies2.webp); }
 .bn-bestiary { --bn: url(../assets/ui/bn-bestiary2.webp); }
 .bn-settings { --bn: url(../assets/ui/bn-settings2.webp); }
+
+/* v505 : filtres de faction de la collection d'un ami : emblème visible (il n'avait pas de taille) et nom */
+.fr-flt .chip { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; flex: none; }
+.fr-flt .chip .sigil-img { width: 22px; height: 22px; flex: none; display: block; }
+/* v505 : demande d'ami : le titre du joueur passe sur deux lignes au lieu d'être coupé (iPhone SE) */
+.fr-row .fr-t small { white-space: normal; overflow: visible; text-overflow: clip; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.2; }
+.fr-row .fr-t { min-width: 0; }

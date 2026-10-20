@@ -52,7 +52,7 @@ export default function friends(app, root, params = []) {
     const inc = rows.filter((r) => r.status === 'pending' && r.incoming), out = rows.filter((r) => r.status === 'pending' && !r.incoming), ok = rows.filter((r) => r.status === 'accepted');
     const row = (r, acts) => `<div class="panel fr-row" ${r.status === 'accepted' ? `data-open="${esc(r.id)}" role="button" tabindex="0"` : ''}>
         <span class="fr-av">${pic(r.avatar)}</span>
-        <span class="fr-t"><b>${esc(r.pseudo)}</b>${r.badge ? ` ${cloud.badgeHTML(r.badge)}` : ''}<small>${esc(r.title || '')}${r.level ? ` · niveau ${r.level}` : ''}${r.owned ? ` · ${r.owned} créatures` : ''}</small></span>
+        <span class="fr-t"><b>${esc(r.pseudo)}</b>${r.badge ? ` ${cloud.badgeHTML(r.badge)}` : ''}<small>${esc(r.title || '')}${r.status === 'accepted' && r.level ? ` · niveau ${r.level}` : ''}${r.status === 'accepted' && r.owned ? ` · ${r.owned} créatures` : ''}</small></span>
         ${acts}</div>`;
     box.innerHTML = `
       ${inc.length ? `<h2 class="section-title">Demandes reçues <span class="pill-n">${inc.length}</span></h2>${inc.map((r) => row(r, `<span class="fr-acts"><button class="btn small primary" data-yes="${esc(r.id)}">Accepter</button><button class="btn small ghost" data-no="${esc(r.id)}">Refuser</button></span>`)).join('')}` : ''}
@@ -117,7 +117,7 @@ export default function friends(app, root, params = []) {
         ${achOk.length ? cat.achievements.filter((a) => achOk.includes(a.key)).map((a) => `<div class="fr-ach-i"><b>${esc(a.name)}</b><span class="small muted">${esc(a.desc)}</span></div>`).join('') : '<p class="small muted">Aucun succès pour l’instant.</p>'}
       </div></details>
       <h2 class="section-title">Sa collection</h2>
-      <div class="chips fr-flt" role="group" aria-label="Filtrer sa collection"><button class="chip" data-flt="all">Toutes</button><button class="chip" data-flt="new">Que tu n’as pas</button>${FACTION_ORDER.map((k) => `<button class="chip" data-flt="${k}" style="--chip:${cat.faction[k].colors.secondary}" aria-label="${esc(cat.faction[k].name)}">${sigil(k)}</button>`).join('')}</div>
+      <div class="chips fr-flt" role="group" aria-label="Filtrer sa collection"><button class="chip" data-flt="all">Toutes</button><button class="chip" data-flt="new">Que tu n’as pas</button>${FACTION_ORDER.map((k) => `<button class="chip" data-flt="${k}" style="--chip:${cat.faction[k].colors.secondary}" >${sigil(k)}<span>${esc(cat.faction[k].name)}</span></button>`).join('')}</div>
       <div class="grid-cards fr-grid" id="fr-grid"></div>
       ${removeBtn(f)}`;
     draw();
