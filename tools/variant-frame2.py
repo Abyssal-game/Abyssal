@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """v446 : cadre de finition peint (fond noir) -> cadre transparent 600 x 844 calé sur le BORD de la carte.
-Usage : python3 tools/variant-frame2.py source.jpg sortie.webp [gain] [marge] [seuil]  (seuil de luminosité des barres, 60 ; 25 pour un cadre sombre)
+Usage : python3 tools/variant-frame2.py source.jpg sortie.webp [gain] [marge] [seuil] [--opaque]  (seuil de luminosité des barres, 60 ; 25 pour un cadre sombre)
 Différence avec variant-frame.py : le cadre est recadré sur ses barres droites extérieures (pas sur ses ornements),
 posées à `marge` px du bord (ornements qui dépassent coupés), et la hauteur en trop est retirée au milieu
 à l'endroit où les deux bords se raccordent le mieux (pas de cassure visible)."""
@@ -44,8 +44,14 @@ if cut > 0:
     print('coupe', cut, 'à', best, 'écart', round(bs, 2))
 elif cut < 0:
     raise SystemExit('source trop basse pour ce format')
-a = np.clip(fr.max(axis=2) / 255 * gain, 0, 1)
-rgb = np.clip(fr / np.maximum(a[..., None], 1e-3), 0, 255)
+OPAQUE = '--opaque' in sys.argv   # v532 : matières sombres (chaînes, pierre) : opaques au-dessus d'un seuil, au lieu d'une transparence qui suit la luminosité
+if OPAQUE:
+    lum = fr.max(axis=2)
+    a = np.clip((lum - 15) / 25, 0, 1)
+    rgb = fr
+else:
+    a = np.clip(fr.max(axis=2) / 255 * gain, 0, 1)
+    rgb = np.clip(fr / np.maximum(a[..., None], 1e-3), 0, 255)
 rgba = np.dstack([rgb, a * 255]).astype(np.uint8)
 Image.fromarray(rgba, 'RGBA').save(out, 'WEBP', quality=85, alpha_quality=85, method=6)
 print(out, Image.open(out).size)

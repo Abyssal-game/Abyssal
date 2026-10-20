@@ -36,7 +36,7 @@ for sx, dx in [(0, 0), (bw - c, iw - c)]:
     strip = box.crop((sx, c, sx + c, bh - c)).resize((c, ih - 2 * c), Image.LANCZOS)
     out_im.paste(strip, (M + dx, M + c))
 fr = np.asarray(out_im).astype(np.float32)
-al = np.clip(fr.max(axis=2) / 255 * gain, 0, 1)
-rgb = np.clip(fr / np.maximum(al[..., None], 1e-3), 0, 255)
+al = np.clip((fr.max(axis=2) - 15) / 25, 0, 1) if '--opaque' in sys.argv else np.clip(fr.max(axis=2) / 255 * gain, 0, 1)  # v532 : --opaque pour les matières sombres
+rgb = fr if '--opaque' in sys.argv else np.clip(fr / np.maximum(al[..., None], 1e-3), 0, 255)
 Image.fromarray(np.dstack([rgb, al * 255]).astype(np.uint8), 'RGBA').save(out, 'WEBP', quality=85, alpha_quality=85, method=6)
 print(out, f'cadre {xs.max() - xs.min() + 1}×{ys.max() - ys.min() + 1}, échelle {s:.2f}, coin {c}px, bords {"étirés" if ih - 2 * c > bh - 2 * c else "tassés"}')

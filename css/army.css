@@ -4943,3 +4943,28 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 /* v529 : boutons d'ouverture de la boutique : toute la largeur de la colonne, contenu dans le cadre (texte réduit par fitBuy) */
 .dc-plq.shop-buy { width: 100%; min-width: 0; max-width: 100%; padding: 0 26px !important; }
 .shop-buy .ic { flex: none; }
+
+/* v532 : 10 finitions de prestige, 3 cadres et 3 dos de l'Échoppe (images Gemini, store/variants|frames|backs) */
+.dr-fin-estampe .tcg-dress { background-image: url(../assets/variants/fin-estampe-frame.webp); }
+.dr-fin-incandescente .tcg-dress { background-image: url(../assets/variants/fin-incandescente-frame.webp); }
+.dr-fin-constellee .tcg-dress { background-image: url(../assets/variants/fin-constellee-frame.webp); }
+.dr-fin-ossuaire .tcg-dress { background-image: url(../assets/variants/fin-ossuaire-frame.webp); }
+.dr-fin-nacree .tcg-dress { background-image: url(../assets/variants/fin-nacree-frame.webp); }
+.dr-fin-runique .tcg-dress { background-image: url(../assets/variants/fin-runique-frame.webp); }
+.dr-fin-scellee .tcg-dress { background-image: url(../assets/variants/fin-scellee-frame.webp); }
+.dr-fin-draconique .tcg-dress { background-image: url(../assets/variants/fin-draconique-frame.webp); }
+.dr-fin-imperiale .tcg-dress { background-image: url(../assets/variants/fin-imperiale-frame.webp); }
+.dr-fin-neant .tcg-dress { background-image: url(../assets/variants/fin-neant-frame.webp); }
+.dr-fin-estampe .tcg-art img { filter: grayscale(.8) sepia(.2) contrast(1.12); }
+.dr-fin-incandescente .tcg-art img { filter: sepia(.15) saturate(1.2) hue-rotate(-8deg) brightness(1.03); }
+.dr-fin-constellee .tcg-art img { filter: saturate(1.05) hue-rotate(8deg) brightness(.98); }
+.dr-fin-ossuaire .tcg-art img { filter: sepia(.4) saturate(.75) brightness(1.02); }
+.dr-fin-nacree .tcg-art img { filter: saturate(1.1) brightness(1.05); }
+.dr-fin-runique .tcg-art img { filter: saturate(.9) hue-rotate(-10deg) contrast(1.05); }
+.dr-fin-scellee .tcg-art img { filter: contrast(1.06) saturate(.9); }
+.dr-fin-draconique .tcg-art img { filter: sepia(.18) saturate(1.15); }
+.dr-fin-imperiale .tcg-art img { filter: saturate(1.1) contrast(1.04) brightness(1.04); }
+.dr-fin-neant .tcg-art img { filter: saturate(.9) hue-rotate(15deg) contrast(1.08); }
+.pf-cx-carnaval { --fr: url(../assets/frames/cx-carnaval-2.webp); }
+.pf-cx-phalenes { --fr: url(../assets/frames/cx-phalenes-2.webp); }
+.pf-cx-cristaux-sang { --fr: url(../assets/frames/cx-cristaux-sang-2.webp); }

@@ -54,6 +54,7 @@ export const CODEX_FRAMES = {
   'cx-meute': 'Cadre de la meute', 'cx-liche': 'Cadre de la Liche', 'cx-ouroboros': 'Cadre de l’Ouroboros', 'cx-automate': 'Cadre de l’Automate',
   'cx-gueule': 'Cadre de la Gueule du Dévoreur', 'cx-eclipse': 'Cadre de l’Éclipse', 'cx-horloger': 'Cadre de l’Horloger', 'cx-balance': 'Cadre du Juge des Sceaux',
   /* v480 */ 'cx-constellation': 'Cadre des constellations', 'cx-geode': 'Cadre de la géode d’améthyste', 'cx-sablier': 'Cadre du sablier éternel', 'cx-pages': 'Cadre du grimoire déchiré', 'cx-corbeau': 'Cadre des corbeaux', 'cx-souverain': 'Couronne du Souverain de l’Abysse',
+  /* v532 */ 'cx-carnaval': 'Cadre du carnaval des ombres', 'cx-phalenes': 'Cadre des phalènes', 'cx-cristaux-sang': 'Cadre des cristaux de sang',
 };
 // Dos de cartes (v473 : images Gemini, assets/backs/<clé>.webp, tools/back-art.py ; choisis au Profil)
 export const CODEX_BACKS = { 'dos-codex': 'Dos du Codex', 'dos-abime': 'Dos de l’Abîme', 'dos-fondateur': 'Dos du Fondateur',
@@ -61,7 +62,8 @@ export const CODEX_BACKS = { 'dos-codex': 'Dos du Codex', 'dos-abime': 'Dos de l
   'dos-infernal': 'Dos du royaume Infernal', 'dos-abyssal': 'Dos du royaume Abyssal', 'dos-celeste': 'Dos du royaume Céleste', 'dos-sauvage': 'Dos du royaume Sauvage',
   'dos-necrotique': 'Dos du royaume Nécrotique', 'dos-primordial': 'Dos du royaume Primordial', 'dos-artificiel': 'Dos du royaume Artificiel',
   /* v480 : catalogue de l'Échoppe */ 'dos-ames': 'Dos de la Nuit des Âmes', 'dos-solstice': 'Dos du solstice noir', 'dos-roses': 'Dos des cœurs maudits', 'dos-lune-sang': 'Dos de la Lune de sang', 'dos-devoreur': 'Dos du Dévoreur', 'dos-eclipse': 'Dos de l’Éclipse', 'dos-horloger': 'Dos de l’Horloger', 'dos-miroirs': 'Dos de la Sorcière des Miroirs', 'dos-jumeaux': 'Dos des Jumeaux du Crépuscule', 'dos-titan': 'Dos du Titan Endormi',
-  /* v481 */ 'dos-abysse': 'Dos de L’Abysse', 'dos-tarot': 'Dos du tarot interdit', 'dos-mosaique': 'Dos de la mosaïque d’or', 'dos-encre': 'Dos de l’encre et du dragon', 'dos-alchimie': 'Dos de l’alchimiste', 'dos-carte-abysse': 'Dos de la carte de l’Abysse', 'dos-reliquaire': 'Dos du reliquaire', 'dos-tapisserie': 'Dos de la chasse maudite', 'dos-art-deco': 'Dos d’or noir', 'dos-vivant': 'Dos de chair vivante', 'dos-nebuleuse': 'Dos de la nébuleuse', 'dos-vitrail': 'Dos du vitrail de cathédrale' };
+  /* v481 */ 'dos-abysse': 'Dos de L’Abysse', 'dos-tarot': 'Dos du tarot interdit', 'dos-mosaique': 'Dos de la mosaïque d’or', 'dos-encre': 'Dos de l’encre et du dragon', 'dos-alchimie': 'Dos de l’alchimiste', 'dos-carte-abysse': 'Dos de la carte de l’Abysse', 'dos-reliquaire': 'Dos du reliquaire', 'dos-tapisserie': 'Dos de la chasse maudite', 'dos-art-deco': 'Dos d’or noir', 'dos-vivant': 'Dos de chair vivante', 'dos-nebuleuse': 'Dos de la nébuleuse', 'dos-vitrail': 'Dos du vitrail de cathédrale',
+  /* v532 */ 'dos-carnaval': 'Dos du carnaval des ombres', 'dos-phalene': 'Dos de la grande phalène', 'dos-coeur-mecanique': 'Dos du cœur mécanique' };
 
 // v482 : finitions de prestige (« habillages ») : un cadre peint posé sur une carte qu'on possède, sans rien changer à
 // ses valeurs. Achetée une fois, une finition s'applique à autant de cartes qu'on veut (une par carte), au choix dans sa fiche.
@@ -70,6 +72,17 @@ export const FINISHES = {
   'fin-givree': { name: 'Givrée', desc: 'Glace bleutée sur une âme d’argent.' },
   'fin-spectrale': { name: 'Spectrale', desc: 'Brume spectrale et visages d’esprits.' },
   'fin-vitrail': { name: 'Vitrail', desc: 'Verre de cathédrale serti de plomb.' },
+  /* v532 */
+  'fin-estampe': { name: 'Estampe', desc: 'Encre au pinceau et sceau vermillon.' },
+  'fin-incandescente': { name: 'Incandescente', desc: 'Roche volcanique et lave qui rougeoie.' },
+  'fin-constellee': { name: 'Constellée', desc: 'Astrolabe d’or et constellations de diamants.' },
+  'fin-ossuaire': { name: 'Ossuaire', desc: 'Os, crânes et fils d’argent noirci.' },
+  'fin-nacree': { name: 'Nacrée', desc: 'Nacre irisée, perles et or blanc.' },
+  'fin-runique': { name: 'Runique', desc: 'Pierre ancienne aux gravures bleues.' },
+  'fin-scellee': { name: 'Scellée', desc: 'Chaînes de fer et sceaux de cire.' },
+  'fin-draconique': { name: 'Draconique', desc: 'Écailles de bronze et griffes de dragon.' },
+  'fin-imperiale': { name: 'Impériale', desc: 'Or massif, velours violet et améthystes.' },
+  'fin-neant': { name: 'Néant', desc: 'Une déchirure dans la réalité.' },
 };
 // Catalogue de l'Échoppe, en obsidiennes (le Codex enluminé donne aussi givre, braises et dos de l'Abîme)
 const F = (k, cost) => ({ id: k, kind: 'frame', give: { frame: k }, cost });
@@ -84,6 +97,8 @@ export const CATALOG = [
   B('dos-abime', 350), B('dos-ames', 500), B('dos-solstice', 500), B('dos-roses', 500), B('dos-lune-sang', 500), B('dos-devoreur', 500), B('dos-eclipse', 500), B('dos-horloger', 500), B('dos-miroirs', 500), B('dos-jumeaux', 500), B('dos-titan', 500),
   B('dos-abysse', 750), B('dos-tarot', 500), B('dos-mosaique', 500), B('dos-encre', 500), B('dos-alchimie', 500), B('dos-carte-abysse', 500), B('dos-reliquaire', 750), B('dos-tapisserie', 500), B('dos-art-deco', 750), B('dos-vivant', 750), B('dos-nebuleuse', 750), B('dos-vitrail', 500), ...ROYAUMES.map((k) => B(k, 300)),
   FN('fin-ecarlate', 800), FN('fin-givree', 800), FN('fin-spectrale', 1000), FN('fin-vitrail', 1000),
+  FN('fin-estampe', 800), FN('fin-incandescente', 1000), FN('fin-constellee', 1000), FN('fin-ossuaire', 800), FN('fin-nacree', 800), FN('fin-runique', 800), FN('fin-scellee', 800), FN('fin-draconique', 1000), FN('fin-imperiale', 1400), FN('fin-neant', 1400),
+  F('cx-carnaval', 700), F('cx-phalenes', 450), F('cx-cristaux-sang', 750), B('dos-carnaval', 750), B('dos-phalene', 500), B('dos-coeur-mecanique', 750),
   { id: 'royaumes', kind: 'bundle', name: 'Les sept royaumes', give: { backs: ROYAUMES }, cost: 1500, desc: 'Les sept dos des royaumes d’un coup (2 100 à l’unité).' },
 ];
 // Exclusifs du Codex enluminé (jamais en vente) : cadres d'encre, de sang, enluminé, de l'Abîme, dos du Codex, titres.
