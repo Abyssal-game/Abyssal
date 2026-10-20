@@ -1,4 +1,4 @@
--- ABYSSAL · étape 8 : Versus Booster (défis de boosters entre joueurs).
+-- ABYSSAL · étape 8 : Versus Booster (défis de boosters entre joueurs). v516 : composition libre des boosters.
 -- À coller dans Supabase : SQL Editor → New query → Run. Peut être relancé sans risque.
 -- Fichier généré par `node tools/versus-sql.mjs` (cartes et probabilités lues dans le jeu) : à relancer
 -- quand des cartes sont ajoutées, puis recoller le fichier dans Supabase.
@@ -541,6 +541,10 @@ create table if not exists public.versus_duels (
   created_at timestamptz not null default now(),
   done_at timestamptz
 );
+-- v516 : composition libre (jusqu'à 3 boosters de types différents, les mêmes pour les deux joueurs)
+alter table public.versus_duels add column if not exists lineup jsonb;
+alter table public.versus_duels drop constraint if exists versus_duels_type_check;
+alter table public.versus_duels add constraint versus_duels_type_check check (type in ('standard', 'faction', 'event', 'premium', 'mix'));
 create index if not exists versus_open on public.versus_duels (status, created_at desc);
 create index if not exists versus_a on public.versus_duels (a, created_at desc);
 create index if not exists versus_b on public.versus_duels (b, created_at desc);
@@ -629,7 +633,7 @@ begin
   if p_packs is null or p_packs < 1 or p_packs > 3 then raise exception 'De 1 à 3 boosters par défi.'; end if;
   price := case p_type when 'standard' then 400 when 'faction' then 500 when 'event' then 550 when 'premium' then 1000 else null end;
   if price is null then raise exception 'Booster inconnu.'; end if;
-  if p_type = 'faction' and not (p_faction = any(facs)) then raise exception 'Choisis une faction.'; end if;
+  if p_type = 'faction' and (p_faction is null or not (p_faction = any(facs))) then raise exception 'Choisis une faction.'; end if;
   if p_type = 'event' and (coalesce(array_length(p_factions, 1), 0) <> 2 or not (p_factions <@ facs) or p_factions[1] = p_factions[2]) then raise exception 'Alliance inconnue.'; end if;
   if p_to is not null then
     if p_to = me then raise exception 'Tu ne peux pas te défier toi-même.'; end if;
@@ -644,10 +648,49 @@ begin
   return id;
 end $$;
 
+-- ——— v516 : lancer un défi à composition libre : p_lineup = [{type, faction?, factions?}, …] (1 à 3 boosters) ——————
+create or replace function public.versus_create_mix(p_lineup jsonb, p_to uuid default null)
+returns uuid language plpgsql volatile security definer set search_path = public as $$
+declare me uuid := auth.uid(); n int; price int := 0; p int; id uuid; it record; ty text; fa text; fs text[]; clean jsonb := '[]'::jsonb; types text[] := '{}';
+  facs text[] := array['infernal','abyssal','celeste','sauvage','necrotique','primordial','artificiel'];
+begin
+  if me is null then raise exception 'Connecte-toi d’abord.'; end if;
+  if not exists (select 1 from public.profiles where profiles.id = me) then raise exception 'Choisis d’abord ton pseudo (Sanctuaire → Compte).'; end if;
+  if jsonb_typeof(p_lineup) <> 'array' or jsonb_array_length(p_lineup) < 1 or jsonb_array_length(p_lineup) > 3 then raise exception 'De 1 à 3 boosters par défi.'; end if;
+  for it in select * from jsonb_array_elements(p_lineup) loop
+    ty := it.value ->> 'type'; fa := null; fs := null;
+    p := case ty when 'standard' then 400 when 'faction' then 500 when 'event' then 550 when 'premium' then 1000 else null end;
+    if p is null then raise exception 'Booster inconnu.'; end if;
+    if ty = 'faction' then
+      fa := it.value ->> 'faction';
+      if fa is null or not (fa = any(facs)) then raise exception 'Choisis une faction.'; end if;
+    end if;
+    if ty = 'event' then
+      fs := array(select jsonb_array_elements_text(coalesce(it.value -> 'factions', '[]'::jsonb)));
+      if coalesce(array_length(fs, 1), 0) <> 2 or not (fs <@ facs) or fs[1] = fs[2] then raise exception 'Alliance inconnue.'; end if;
+    end if;
+    price := price + p; types := types || ty;
+    clean := clean || jsonb_strip_nulls(jsonb_build_object('type', ty, 'faction', fa, 'factions', to_jsonb(fs)));
+  end loop;
+  if p_to is not null then
+    if p_to = me then raise exception 'Tu ne peux pas te défier toi-même.'; end if;
+    if not public.are_friends(me, p_to) then raise exception 'Ce joueur n’est pas ton ami.'; end if;
+  end if;
+  perform public.versus_expire();
+  select count(*) into n from public.versus_duels where a = me and status = 'open';
+  if n >= 5 then raise exception 'Tu as déjà 5 défis en attente : attends qu’on les relève ou annule-en un.'; end if;
+  insert into public.versus_duels (a, b, public, type, packs, stake, lineup)
+  values (me, p_to, p_to is null, case when (select count(distinct x) from unnest(types) x) = 1 then types[1] else 'mix' end, jsonb_array_length(clean), price, clean)
+  returning versus_duels.id into id;
+  return id;
+end $$;
+revoke execute on function public.versus_create_mix(jsonb, uuid) from public, anon;
+grant execute on function public.versus_create_mix(jsonb, uuid) to authenticated;
+
 -- ——— Relever un défi : le serveur ouvre les boosters des deux joueurs ——————————————
 create or replace function public.versus_accept(p_id uuid)
 returns jsonb language plpgsql volatile security definer set search_path = public as $$
-declare me uuid := auth.uid(); d public.versus_duels; ca jsonb := '[]'::jsonb; cb jsonb := '[]'::jsonb; k int;
+declare me uuid := auth.uid(); d public.versus_duels; ca jsonb := '[]'::jsonb; cb jsonb := '[]'::jsonb; k int; it record;
 begin
   if me is null then raise exception 'Connecte-toi d’abord.'; end if;
   if not exists (select 1 from public.profiles where profiles.id = me) then raise exception 'Choisis d’abord ton pseudo (Sanctuaire → Compte).'; end if;
@@ -656,10 +699,17 @@ begin
   if not found or d.status <> 'open' then raise exception 'Ce défi n’est plus disponible.'; end if;
   if d.a = me then raise exception 'C’est ton propre défi.'; end if;
   if d.b is not null and d.b <> me then raise exception 'Ce défi est réservé à un autre joueur.'; end if;
-  for k in 1..d.packs loop
-    ca := ca || public.versus_pack(d.type, d.faction, d.factions);
-    cb := cb || public.versus_pack(d.type, d.faction, d.factions);
-  end loop;
+  if d.lineup is not null then
+    for it in select * from jsonb_array_elements(d.lineup) loop
+      ca := ca || public.versus_pack(it.value ->> 'type', it.value ->> 'faction', array(select jsonb_array_elements_text(coalesce(it.value -> 'factions', '[]'::jsonb))));
+      cb := cb || public.versus_pack(it.value ->> 'type', it.value ->> 'faction', array(select jsonb_array_elements_text(coalesce(it.value -> 'factions', '[]'::jsonb))));
+    end loop;
+  else
+    for k in 1..d.packs loop
+      ca := ca || public.versus_pack(d.type, d.faction, d.factions);
+      cb := cb || public.versus_pack(d.type, d.faction, d.factions);
+    end loop;
+  end if;
   update public.versus_duels set b = me, status = 'done', a_cards = ca, b_cards = cb,
     a_score = public.versus_score(ca), b_score = public.versus_score(cb), done_at = now()
   where id = p_id;
@@ -717,12 +767,12 @@ begin
   perform public.versus_expire();
   return jsonb_build_object(
     'open', coalesce((select jsonb_agg(x order by x.created_at desc) from (
-      select d.id, d.a, d.type, d.faction, d.factions, d.packs, d.stake, d.created_at, p.pseudo, p.avatar, p.badge, p.title, p.level
+      select d.id, d.a, d.type, d.faction, d.factions, d.lineup, d.packs, d.stake, d.created_at, p.pseudo, p.avatar, p.badge, p.title, p.level
       from public.versus_duels d join public.profiles p on p.id = d.a
       where d.status = 'open' and d.public and d.a <> me
       order by d.created_at desc limit 40) x), '[]'::jsonb),
     'mine', coalesce((select jsonb_agg(x order by x.created_at desc) from (
-      select d.id, d.a, d.b, d.public, d.type, d.faction, d.factions, d.packs, d.stake, d.status, d.created_at, d.done_at,
+      select d.id, d.a, d.b, d.public, d.type, d.faction, d.factions, d.lineup, d.packs, d.stake, d.status, d.created_at, d.done_at,
              (d.a = me) as mine,
              case when d.a = me then d.a_cards else d.b_cards end as my_cards,
              case when d.a = me then d.b_cards else d.a_cards end as their_cards,

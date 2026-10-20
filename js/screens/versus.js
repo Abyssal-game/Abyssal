@@ -1,34 +1,51 @@
-// v512 : Versus Booster (Salle des jeux). Un joueur lance un défi (type de booster, 1 à 3 boosters), ouvert à tous
+// v512 : Versus Booster (Salle des jeux). Un joueur lance un défi (1 à 3 boosters, de types au choix depuis v516), ouvert à tous
 // ou envoyé à un ami ; celui qui le relève paie la même mise en éclats. Le serveur ouvre les boosters des deux
 // joueurs (supabase/08-versus.sql) : le meilleur total de points remporte toutes les cartes ; égalité, chacun
 // garde les siennes. Le face-à-face révèle les cartes une à une, chez les deux joueurs.
 import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
 import { BOOSTERS, LUCK_POINTS, RARITY, FACTION_ORDER, VARIANTS } from '../config.js';
-import { VERSUS_TYPES, VERSUS_MAX, VERSUS_HOURS, stakeOf, scoreOf } from '../core/versus.js';
+import { VERSUS_TYPES, VERSUS_MAX, VERSUS_HOURS, scoreOf, lineupStake, lineupOf, lineupOk } from '../core/versus.js';
 import { isBlocked } from '../core/moderation.js';
 import { artUrl } from '../art/assets.js';
-import { icon, sigil, EMBLEM } from '../ui/icons.js';
+import { icon, sigil, EMBLEM, picon } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, openSheet, bindActions } from '../ui/dom.js';
 import { packHTML } from './shop.js';
 import { t, tx } from '../i18n.js';
 
 const OFF = 'Le Versus Booster n’est pas encore ouvert sur le serveur.';
 const RES = { win: 'Victoire', tie: 'Égalité', lose: 'Défaite' };
+// v516 : « Comment ça marche » dans le style des autres jeux (étapes illustrées)
+const HOW = [['booster', '#E8C35A', 'Compose ton défi', `Choisis jusqu’à ${VERSUS_MAX} boosters, de types différents si tu veux (par exemple un standard et un de faction Céleste). Les deux joueurs ouvrent les mêmes.`],
+  ['cur-shard', '#7FA8D8', 'La mise', 'Chaque joueur paie le prix des boosters en éclats.'],
+  ['amis', '#9FE0FF', 'Ton adversaire', `Ton défi est ouvert à tous, ou envoyé à un ami. Il reste ${VERSUS_HOURS} h ; sinon ta mise t’est rendue.`],
+  ['cards', '#C9A45A', 'Les points', `Quand un joueur relève le défi, les boosters des deux joueurs s’ouvrent. Commune ${LUCK_POINTS.C}, Peu commune ${LUCK_POINTS.PC}, Rare ${LUCK_POINTS.R}, Hyper rare ${LUCK_POINTS.HR}, Mythique ${LUCK_POINTS.M}, Secrète ${LUCK_POINTS.S}, +${LUCK_POINTS.variant} par finition.`],
+  ['crown', '#F2C14E', 'La victoire', 'Le meilleur total remporte toutes les cartes : les siennes et celles de l’adversaire. Le perdant ne garde rien.'],
+  ['seal', '#7FE0A0', 'Égalité', 'Chacun repart avec les cartes de ses propres boosters.'],
+  ['ui-eye', '#E0485E', 'Aucune triche', 'Les boosters sont ouverts par le serveur : personne ne peut truquer les tirages.']];
+const TYPE_NAME = { standard: 'Standard', faction: 'Faction', event: 'Alliances', premium: 'Premium' };
+const howLi = ([ic, c, ti, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${ti}</b><span class="small">${d}</span></span></li>`;
 
 export default function versusScreen(app, root) {
   const g = app.game, cat = app.catalog;
-  const ui = (app.state.versus ||= { type: 'standard', packs: 1, faction: null, to: null });
+  const ui = (app.state.versus ||= { to: null });
+  if (!Array.isArray(ui.lineup) || !ui.lineup.length) ui.lineup = [{ type: 'standard' }];
+  ui.sel = Math.min(ui.sel || 0, ui.lineup.length - 1);
   let data = null, friends = [], err = null, busy = false, alive = true;
   const ev = () => g.event();
   const name = (r) => (isBlocked(r.a) ? 'Joueur masqué' : r.pseudo || 'Joueur');
   const pic = (id) => { const c = id && cat.get(id); return c ? `<img alt="" src="${artUrl(c, { lite: true })}">` : EMBLEM; };
   const facName = (f) => cat.faction[f]?.name || f;
+  // v516 : nom court d'un booster de la composition, déjà traduit (affiché dans un bloc translate="no")
+  const itemName = (it) => it.type === 'faction' ? t('Faction {f}', { f: tx(facName(it.faction || '')) })
+    : it.type === 'event' ? (it.factions?.length === 2 ? t('Alliances {a} et {b}', { a: tx(facName(it.factions[0])), b: tx(facName(it.factions[1])) }) : t('Alliances'))
+    : t(it.type === 'premium' ? 'Premium' : 'Standard');
   const packLabel = (r) => {
-    const n = r.packs, base = BOOSTERS[r.type]?.name || 'Booster';
-    const extra = r.type === 'faction' && r.faction ? ` · ${facName(r.faction)}` : r.type === 'event' && r.factions ? ` · ${r.factions.map(facName).join(' et ')}` : '';
-    return `${n} × ${base}${extra}`;
+    const groups = [];
+    for (const it of lineupOf(r)) { const n = itemName(it), last = groups[groups.length - 1]; if (last && last.n === n) last.k++; else groups.push({ n, k: 1 }); }
+    return groups.map((x) => (x.k > 1 ? `${x.k} × ${x.n}` : x.n)).join(' + ');
   };
+  const lbl = (r) => `<span translate="no">${esc(packLabel(r))}</span>`;
   const ago = (t) => { const h = Math.floor((Date.now() - new Date(t)) / 3600000); return h < 1 ? 'à l’instant' : h < 24 ? `il y a ${h} h` : `il y a ${Math.floor(h / 24)} j`; };
   const left = (t) => Math.max(0, VERSUS_HOURS - Math.floor((Date.now() - new Date(t)) / 3600000));
 
@@ -56,18 +73,18 @@ export default function versusScreen(app, root) {
     root.innerHTML = `${head()}
       ${err ? `<p class="panel small center">${icon('info')} ${esc(err)}</p>` : ''}
       ${toSee.length ? `<section class="panel vs-sec vs-hot"><h2 class="section-title">Duels à voir <span class="pill-n">${toSee.length}</span></h2>
-        ${toSee.map((r) => row(r, `<button class="btn small primary" data-act="see" data-id="${esc(r.id)}">Voir le duel</button>`, `${esc(packLabel(r))} · ton défi a été relevé`)).join('')}</section>` : ''}
+        ${toSee.map((r) => row(r, `<button class="btn small primary" data-act="see" data-id="${esc(r.id)}">Voir le duel</button>`, `${lbl(r)} · ton défi a été relevé`)).join('')}</section>` : ''}
       ${incoming.length ? `<section class="panel vs-sec"><h2 class="section-title">Défis reçus</h2>
-        ${incoming.map((r) => row(r, `<span class="vs-acts"><button class="btn small primary" data-act="accept" data-id="${esc(r.id)}">Relever · ${fmt(r.stake)} ${icon('crystal')}</button><button class="btn small ghost" data-act="decline" data-id="${esc(r.id)}">Refuser</button></span>`, esc(packLabel(r)))).join('')}</section>` : ''}
+        ${incoming.map((r) => row(r, `<span class="vs-acts"><button class="btn small primary" data-act="accept" data-id="${esc(r.id)}">Relever · ${fmt(r.stake)} ${icon('crystal')}</button><button class="btn small ghost" data-act="decline" data-id="${esc(r.id)}">Refuser</button></span>`, lbl(r))).join('')}</section>` : ''}
       ${createHTML()}
       <section class="panel vs-sec"><h2 class="section-title">Défis ouverts</h2>
-        ${data ? (open.length ? open.map((r) => row(r, `<button class="btn small primary" data-act="accept" data-id="${esc(r.id)}" ${g.s.shards >= r.stake ? '' : 'disabled'}>Relever · ${fmt(r.stake)} ${icon('crystal')}</button>`, `${esc(packLabel(r))} · ${ago(r.created_at)}`)).join('') : '<p class="small muted center">Aucun défi ouvert pour l’instant. Lance le tien : un joueur pourra le relever.</p>') : '<p class="small muted center">Chargement…</p>'}
+        ${data ? (open.length ? open.map((r) => row(r, `<button class="btn small primary" data-act="accept" data-id="${esc(r.id)}" ${g.s.shards >= r.stake ? '' : 'disabled'}>Relever · ${fmt(r.stake)} ${icon('crystal')}</button>`, `${lbl(r)} · ${ago(r.created_at)}`)).join('') : '<p class="small muted center">Aucun défi ouvert pour l’instant. Lance le tien : un joueur pourra le relever.</p>') : '<p class="small muted center">Chargement…</p>'}
       </section>
       ${waiting.length ? `<section class="panel vs-sec"><h2 class="section-title">Tes défis en attente</h2>
-        ${waiting.map((r) => row(r, `<button class="btn small ghost" data-act="cancel" data-id="${esc(r.id)}">Annuler</button>`, `${esc(packLabel(r))} · ${r.public ? 'ouvert à tous' : 'pour ton ami'} · encore ${left(r.created_at)} h`, true)).join('')}
+        ${waiting.map((r) => row(r, `<button class="btn small ghost" data-act="cancel" data-id="${esc(r.id)}">Annuler</button>`, `${lbl(r)} · ${r.public ? 'ouvert à tous' : 'pour ton ami'} · encore ${left(r.created_at)} h`, true)).join('')}
         <p class="small muted">Ta mise est rendue si personne ne relève ton défi en ${VERSUS_HOURS} h, ou si tu l’annules.</p></section>` : ''}
       ${past.length ? `<details class="panel dc-fold vs-sec"><summary><span class="dc-sum-t">Derniers duels</span></summary>
-        ${past.map((r) => { const res = r.my_score > r.their_score ? 'win' : r.my_score === r.their_score ? 'tie' : 'lose'; return row(r, `<button class="btn small ghost" data-act="replay" data-id="${esc(r.id)}"><b class="vs-res ${res}">${RES[res]}</b> ${fmt(r.my_score)} – ${fmt(r.their_score)}</button>`, esc(packLabel(r))); }).join('')}</details>` : ''}
+        ${past.map((r) => { const res = r.my_score > r.their_score ? 'win' : r.my_score === r.their_score ? 'tie' : 'lose'; return row(r, `<button class="btn small ghost" data-act="replay" data-id="${esc(r.id)}"><b class="vs-res ${res}">${RES[res]}</b> ${fmt(r.my_score)} – ${fmt(r.their_score)}</button>`, lbl(r)); }).join('')}</details>` : ''}
       ${rulesHTML()}
       ${statsHTML()}`;
   }
@@ -79,18 +96,23 @@ export default function versusScreen(app, root) {
   }
 
   function createHTML() {
-    const t = ui.type, stake = stakeOf(t, ui.packs), e = ev();
-    const okFac = t !== 'faction' || ui.faction;
+    const L = ui.lineup, sel = ui.sel, cur = L[sel], stake = lineupStake(L), e = ev();
+    const okFac = L.every((it) => it.type !== 'faction' || it.faction);
     const okFriend = ui.to !== 'friend' || ui.friend;
     const can = okFac && okFriend && g.s.shards >= stake && !busy;
     const ok = friends.filter((f) => f.status === 'accepted');
+    const pk = (it) => `<span class="vs-pk">${packHTML(it.type, cat, { faction: it.type === 'faction' ? (it.faction || 'infernal') : null, event: e })}</span>`;
     return `<section class="panel vs-sec vs-new"><h2 class="section-title">Lancer un défi</h2>
-      <div class="vs-types">${VERSUS_TYPES.map((k) => `<button class="vs-type ${t === k ? 'on' : ''}" data-act="type" data-v="${k}" aria-pressed="${t === k}">
-        <span class="vs-pk">${packHTML(k, cat, { faction: k === 'faction' ? (ui.faction || 'infernal') : null, event: e })}</span>
-        <b>${esc(BOOSTERS[k].name.replace('Booster ', ''))}</b><small>${fmt(BOOSTERS[k].price)} ${icon('crystal')}</small></button>`).join('')}</div>
-      ${t === 'faction' ? `<div class="chips fac-grid vs-fac" role="radiogroup" aria-label="Faction du booster">${FACTION_ORDER.map((f) => `<button class="chip" role="radio" data-act="fac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${ui.faction === f}" aria-checked="${ui.faction === f}">${sigil(f)}<span class="fg-n">${esc(facName(f))}</span></button>`).join('')}</div>` : ''}
-      ${t === 'event' ? `<p class="small muted">Alliées cette semaine : <b>${e.factions.map(facName).join(' et ')}</b>.</p>` : ''}
-      <div class="vs-line"><span class="small">Boosters chacun</span><div class="seg vs-n" role="group" aria-label="Boosters chacun">${[1, 2, 3].slice(0, VERSUS_MAX).map((n) => `<button data-act="packs" data-v="${n}" aria-pressed="${ui.packs === n}" class="seg-b">${n}</button>`).join('')}</div></div>
+      <p class="small muted">Compose les boosters du duel, jusqu’à ${VERSUS_MAX} : les deux joueurs ouvrent les mêmes.</p>
+      <div class="vs-slots">${L.map((it, i) => `<div class="vs-slot ${i === sel ? 'on' : ''}" role="button" tabindex="0" data-act="sel" data-i="${i}" aria-pressed="${i === sel}">
+          ${pk(it)}<b translate="no">${esc(itemName(it))}</b><small>${fmt(BOOSTERS[it.type].price)} ${icon('crystal')}</small>
+          ${L.length > 1 ? `<button class="vs-x" data-act="rm" data-i="${i}" aria-label="Retirer ce booster">${icon('close')}</button>` : ''}</div>`).join('')}
+        ${L.length < VERSUS_MAX ? `<button class="vs-slot vs-add" data-act="add"><span class="vs-plus">+</span><b>Ajouter un booster</b></button>` : ''}</div>
+      <p class="small vs-edit">${L.length > 1 ? `Booster ${sel + 1} : choisis son type` : 'Choisis le type de booster'}</p>
+      <div class="vs-types">${VERSUS_TYPES.map((k) => `<button class="vs-type ${cur.type === k ? 'on' : ''}" data-act="type" data-v="${k}" aria-pressed="${cur.type === k}">
+        ${pk({ type: k, faction: cur.faction })}<b>${TYPE_NAME[k]}</b><small>${fmt(BOOSTERS[k].price)} ${icon('crystal')}</small></button>`).join('')}</div>
+      ${cur.type === 'faction' ? `<div class="chips fac-grid vs-fac" role="radiogroup" aria-label="Faction du booster">${FACTION_ORDER.map((f) => `<button class="chip" role="radio" data-act="fac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${cur.faction === f}" aria-checked="${cur.faction === f}">${sigil(f)}<span class="fg-n">${esc(facName(f))}</span></button>`).join('')}</div>` : ''}
+      ${cur.type === 'event' ? `<p class="small muted">Alliées cette semaine : <b>${e.factions.map(facName).join(' et ')}</b>.</p>` : ''}
       <div class="vs-line"><span class="small">Adversaire</span><div class="seg vs-to" role="group" aria-label="Adversaire"><button class="seg-b" data-act="to" data-v="all" aria-pressed="${ui.to !== 'friend'}">Ouvert à tous</button><button class="seg-b" data-act="to" data-v="friend" aria-pressed="${ui.to === 'friend'}">Un ami</button></div></div>
       ${ui.to === 'friend' ? (ok.length ? `<div class="vs-friends">${ok.map((f) => `<button class="vs-fr ${ui.friend === f.id ? 'on' : ''}" data-act="friend" data-v="${esc(f.id)}" aria-pressed="${ui.friend === f.id}"><span class="fr-av">${pic(f.avatar)}</span><b>${esc(f.pseudo)}</b></button>`).join('')}</div>` : `<p class="small muted">Pas encore d’ami. <a href="#/amis">Ajouter un ami</a></p>`) : ''}
       <p class="vs-stake">Mise : <b>${fmt(stake)}</b> ${icon('crystal')} <span class="small muted">chacun · tu as ${fmt(g.s.shards)} éclats</span></p>
@@ -99,15 +121,7 @@ export default function versusScreen(app, root) {
   }
 
   function rulesHTML() {
-    return `<details class="panel dc-fold vs-rules"><summary><span class="dc-sum-t">Comment ça marche</span></summary>
-      <ol class="small vs-steps">
-        <li>Choisis le booster et combien en ouvrir (1 à 3). Chaque joueur paie la même mise en éclats.</li>
-        <li>Ton défi est ouvert à tous, ou envoyé à un ami. Il reste ${VERSUS_HOURS} h ; sinon ta mise t’est rendue.</li>
-        <li>Quand un joueur le relève, les boosters des deux joueurs s’ouvrent. Points par carte : Commune ${LUCK_POINTS.C}, Peu commune ${LUCK_POINTS.PC}, Rare ${LUCK_POINTS.R}, Hyper rare ${LUCK_POINTS.HR}, Mythique ${LUCK_POINTS.M}, Secrète ${LUCK_POINTS.S}, +${LUCK_POINTS.variant} par finition.</li>
-        <li>Le meilleur total remporte <b>toutes les cartes</b> : les siennes et celles de l’adversaire. Le perdant ne garde rien.</li>
-        <li>Égalité : chacun repart avec les cartes de ses boosters.</li>
-      </ol>
-      <p class="small muted">Les boosters sont ouverts par le serveur : personne ne peut tricher sur les tirages.</p></details>`;
+    return `<details class="panel dc-fold dc-how vs-rules"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/help.webp"><span class="dc-sum-t">Comment ça marche</span></summary><ol class="how-steps">${HOW.map(howLi).join('')}</ol></details>`;
   }
 
   function statsHTML() {
@@ -161,7 +175,7 @@ export default function versusScreen(app, root) {
     const r = [...(data?.open || []), ...(data?.mine || [])].find((x) => x.id === id);
     if (!r || busy) return;
     if (g.s.shards < r.stake) { app.sfx.error(); toast(`Il te manque ${fmt(r.stake - g.s.shards)} éclats.`, { kind: 'error', icon: 'crystal' }); return; }
-    const ok = await confirmBox(t('Relever le défi de <b>{name}</b> : {pack}.<br>Mise : <b>{stake} éclats</b>. Le meilleur total remporte toutes les cartes ; le perdant ne garde rien.', { name: esc(name(r)), pack: esc(tx(packLabel(r))), stake: fmt(r.stake) }), { ok: 'Relever le défi' });
+    const ok = await confirmBox(t('Relever le défi de <b>{name}</b> : {pack}.<br>Mise : <b>{stake} éclats</b>. Le meilleur total remporte toutes les cartes ; le perdant ne garde rien.', { name: esc(name(r)), pack: lbl(r), stake: fmt(r.stake) }), { ok: 'Relever le défi' });
     if (!ok) return;
     busy = true;
     try { g.versusPay(r.stake); }
@@ -176,10 +190,13 @@ export default function versusScreen(app, root) {
 
   async function create() {
     if (busy) return;
-    const ty = ui.type, stake = stakeOf(ty, ui.packs), e = ev();
+    const e = ev();
+    const lineup = ui.lineup.map((it) => (it.type === 'faction' ? { type: 'faction', faction: it.faction } : it.type === 'event' ? { type: 'event', factions: e.factions } : { type: it.type }));
+    if (!lineupOk(lineup)) return;
+    const stake = lineupStake(lineup);
     const to = ui.to === 'friend' ? ui.friend : null;
     const fr = to && friends.find((f) => f.id === to);
-    const pk = esc(tx(packLabel({ type: ty, packs: ui.packs, faction: ui.faction, factions: e.factions })));
+    const pk = lbl({ lineup });
     const ok = await confirmBox(to ? t('Défier <b>{name}</b> : {pack}.<br>Mise : <b>{stake} éclats</b>, rendue s’il refuse ou ne relève pas le défi en {h} h.', { name: esc(fr?.pseudo || ''), pack: pk, stake: fmt(stake), h: VERSUS_HOURS })
       : t('Lancer un défi ouvert à tous : {pack}.<br>Mise : <b>{stake} éclats</b>, rendue si personne ne le relève en {h} h.', { pack: pk, stake: fmt(stake), h: VERSUS_HOURS }), { ok: 'Lancer le défi' });
     if (!ok) return;
@@ -187,7 +204,7 @@ export default function versusScreen(app, root) {
     try { g.versusPay(stake); }
     catch (er) { busy = false; app.sfx.error(); toast(esc(er.message), { kind: 'error', icon: 'crystal' }); return; }
     try {
-      await cloud.versusCreate(ty, ty === 'faction' ? ui.faction : null, ty === 'event' ? e.factions : null, ui.packs, to);
+      await cloud.versusCreateMix(lineup, to);
       app.sfx.achievement?.();
       toast(to ? 'Défi envoyé ! Il apparaîtra chez ton ami.' : 'Défi lancé ! Reviens voir quand un joueur l’aura relevé.', { kind: 'success', icon: 'crystal' });
     } catch (er) { g.versusRefund(stake); app.sfx.error(); toast(esc(er.status === 404 ? OFF : er.message), { kind: 'error', icon: 'info', ms: 6000 }); }
@@ -272,9 +289,11 @@ export default function versusScreen(app, root) {
   }
 
   bindActions(root, {
-    type(el) { ui.type = el.dataset.v; app.sfx.tap(); draw(); },
-    fac(el) { ui.faction = el.dataset.v; app.sfx.tap(); draw(); },
-    packs(el) { ui.packs = +el.dataset.v; app.sfx.tap(); draw(); },
+    type(el) { const it = ui.lineup[ui.sel]; it.type = el.dataset.v; if (it.type !== 'faction') delete it.faction; app.sfx.tap(); draw(); },
+    fac(el) { ui.lineup[ui.sel].faction = el.dataset.v; app.sfx.tap(); draw(); },
+    sel(el) { ui.sel = +el.dataset.i; app.sfx.tap(); draw(); },
+    add() { if (ui.lineup.length < VERSUS_MAX) { ui.lineup.push({ ...ui.lineup[ui.lineup.length - 1] }); ui.sel = ui.lineup.length - 1; app.sfx.tap(); draw(); } },
+    rm(el) { if (ui.lineup.length > 1) { ui.lineup.splice(+el.dataset.i, 1); ui.sel = Math.min(ui.sel, ui.lineup.length - 1); app.sfx.tap(); draw(); } },
     to(el) { ui.to = el.dataset.v; app.sfx.tap(); draw(); },
     friend(el) { ui.friend = el.dataset.v; app.sfx.tap(); draw(); },
     create() { create(); },

@@ -187,6 +187,8 @@ export async function versusList() { return (await authed('/rest/v1/rpc/versus_l
 export async function versusCreate(type, faction, factions, packs, to = null) {
   return authed('/rest/v1/rpc/versus_create', { method: 'POST', body: { p_type: type, p_faction: faction || null, p_factions: factions || null, p_packs: packs, p_to: to } });
 }
+// v516 : composition libre [{ type, faction?, factions? }, …]
+export async function versusCreateMix(lineup, to = null) { return authed('/rest/v1/rpc/versus_create_mix', { method: 'POST', body: { p_lineup: lineup, p_to: to } }); }
 export async function versusAccept(id) { return authed('/rest/v1/rpc/versus_accept', { method: 'POST', body: { p_id: id } }); }
 export async function versusCancel(id) { return authed('/rest/v1/rpc/versus_cancel', { method: 'POST', body: { p_id: id } }); }
 export async function versusClaim(id) { return authed('/rest/v1/rpc/versus_claim', { method: 'POST', body: { p_id: id } }); }

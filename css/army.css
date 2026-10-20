@@ -4703,3 +4703,20 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .vs-row .fr-t small { white-space: normal; overflow: visible; text-overflow: clip; }
 /* v514 : bannière Gemini du Versus Booster (symboles des sachets remplacés par l'œil du jeu) */
 .bn-versus { --bn: url(../assets/ui/bn-versus.webp); }
+/* v516 : Versus, composition libre (jusqu'à 3 boosters de types différents) et « Comment ça marche » illustré */
+.vs-slots { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 6px 0 4px; }
+.vs-slot { position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 4px 10px; border-radius: 14px; border: 1px solid rgba(201, 164, 90, .35); background: rgba(10, 8, 16, .75); color: inherit; font: inherit; min-height: 44px; cursor: pointer; }
+.vs-slot.on { border-color: #F2C14E; background: radial-gradient(90% 70% at 50% 30%, rgba(242, 193, 78, .25), rgba(10, 8, 16, .85)); box-shadow: 0 0 14px rgba(242, 193, 78, .25); }
+.vs-slot .vs-pk { width: 62%; }
+.vs-slot b { font-size: .8rem; line-height: 1.15; text-align: center; }
+.vs-slot small { font-size: .72rem; color: #E8C35A; display: inline-flex; align-items: center; gap: 2px; }
+.vs-slot small .ic { width: 12px; height: 12px; }
+.vs-x { position: absolute; top: -8px; right: -8px; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; padding: 0; border: 1px solid rgba(255, 138, 138, .6); background: #1A0E12; color: #FF9A9A; }
+.vs-x .ic { width: 14px; height: 14px; }
+.vs-x::after { content: ''; position: absolute; inset: -7px; }
+.vs-add { justify-content: center; border-style: dashed; border-color: rgba(201, 164, 90, .45); background: rgba(10, 8, 16, .4); color: #C9A45A; }
+.vs-plus { font: 300 2.4rem/1 var(--f-display); color: #E8C35A; }
+.vs-add b { color: #D9D3C4; font-weight: 600; }
+.vs-edit { margin: 10px 0 2px; color: #E8C35A; }
+.vs-type .vs-pk { width: 60%; }
+.vs-rules .how-steps { margin-top: 10px; }

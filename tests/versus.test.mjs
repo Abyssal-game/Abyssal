@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import { loadCatalog, MemoryStorage, rngFrom } from './helpers.mjs';
 import { Game } from '../js/core/game.js';
 import { BOOSTERS, TABLES, LUCK_POINTS } from '../js/config.js';
-import { VERSUS_TYPES, stakeOf, scoreOf, cardPts } from '../js/core/versus.js';
+import { VERSUS_TYPES, stakeOf, scoreOf, cardPts, lineupStake, lineupOf, lineupOk } from '../js/core/versus.js';
 
 const catalog = loadCatalog();
 const mk = () => new Game(catalog, new MemoryStorage(), { rng: rngFrom('vs'), clock: () => new Date(2026, 9, 20, 12) });
@@ -45,4 +45,18 @@ test('versus : le SQL du serveur reprend les cartes, prix et probabilités du je
     assert.ok(sql.includes(`when '${t}' then ${BOOSTERS[t].price}`), `prix ${t}`);
     for (const s of BOOSTERS[t].slots) assert.ok(sql.includes(JSON.stringify(TABLES[s].weights)), `poids ${s}`);
   }
+});
+
+test('versus : composition libre (v516)', () => {
+  const L = [{ type: 'standard' }, { type: 'faction', faction: 'celeste' }, { type: 'premium' }];
+  assert.equal(lineupStake(L), BOOSTERS.standard.price + BOOSTERS.faction.price + BOOSTERS.premium.price);
+  assert.ok(lineupOk(L));
+  assert.ok(!lineupOk([{ type: 'faction' }]));
+  assert.ok(!lineupOk([...L, { type: 'standard' }]));
+  assert.ok(!lineupOk([{ type: 'abysse' }]));
+  assert.deepEqual(lineupOf({ lineup: L }), L);
+  assert.equal(lineupOf({ type: 'premium', packs: 2 }).length, 2); // ancien format
+  const sql = fs.readFileSync(new URL('../supabase/08-versus.sql', import.meta.url), 'utf8');
+  assert.ok(sql.includes('function public.versus_create_mix(p_lineup jsonb'));
+  assert.ok(!sql.includes('--PRIX--'));
 });
