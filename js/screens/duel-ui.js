@@ -27,6 +27,7 @@ import { RELICS } from '../core/relics.js';
 import { ULTS } from '../core/army.js';
 import { mountDiorama, roomFor } from '../ui/diorama.js';
 import { moveIconUrl, passivesOf, passiveIconUrl, moveFor, PASSIVES } from '../core/kits.js';
+import { hap } from '../ui/sound.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 // Décor selon la profondeur (salle du Gardien à part) et effets illustrés (fond noir fondu en mode « écran »)
@@ -1183,7 +1184,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const ab = e.target.closest('[data-a]'); clearTimeout(holdT); held = false;
     // v329 : appui long sur une carte (ennemie ou alliée) = sa fiche ; le toucher court garde l'attaque rapide
     const cd = !ab && e.target.closest('.dv-c');
-    if (cd) { const u = st.units[cd.dataset.uid]; if (u) holdT = setTimeout(() => { held = true; app.sfx.tap?.(); navigator.vibrate?.(12); info(u); }, 420); return; }
+    if (cd) { const u = st.units[cd.dataset.uid]; if (u) holdT = setTimeout(() => { held = true; app.sfx.tap?.(); hap(1); info(u); }, 420); return; }
     if (!ab || busy || !sel) return; holdT = setTimeout(() => { held = true; actInfo(ab.dataset.a); }, 420);
   }, { signal: ctl.signal });
   for (const t of ['pointerup', 'pointercancel']) root.addEventListener(t, () => clearTimeout(holdT), { signal: ctl.signal });

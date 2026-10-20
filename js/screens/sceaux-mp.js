@@ -11,7 +11,7 @@ import { artUrl } from '../art/assets.js';
 import { icon, picon, EMBLEM } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, openSheet } from '../ui/dom.js';
 import { setScene } from '../ui/scene.js';
-import { mpw } from '../cloud/mpwatch.js';
+import { checkTurns } from '../cloud/mpwatch.js';
 import { t } from '../i18n.js';
 
 const OFF = 'Les parties contre d’autres joueurs ne sont pas encore ouvertes sur le serveur.';
@@ -51,8 +51,7 @@ export function createSceauxMp(app, root, { scCard, modeBar }) {
     if (!alive || ui.open) return;
     if (list[0]?.now) skew = new Date(list[0].now).getTime() - Date.now();
     await claimAll();
-    const turns = list.filter((v) => myTurn(v)).length;
-    if (mpw.turns !== turns) { mpw.turns = turns; app.chrome?.(); }
+    checkTurns(app, { force: true });
     drawLobby();
     schedule(lobby, 20000);
   }

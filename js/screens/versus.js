@@ -11,6 +11,8 @@ import { artUrl } from '../art/assets.js';
 import { icon, sigil, EMBLEM, picon } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, openSheet, bindActions } from '../ui/dom.js';
 import { packHTML } from './shop.js';
+import { playDuel } from './versus-duel.js';
+import { checkTurns } from '../cloud/mpwatch.js';
 import { t, tx } from '../i18n.js';
 
 const OFF = 'Le Pari des Boosters n’est pas encore ouvert sur le serveur.';
@@ -138,6 +140,7 @@ export default function versusScreen(app, root) {
     } catch (e) { err = e.status === 404 ? OFF : e.message; data = data || { open: [], mine: [] }; }
     if (!alive) return;
     await refunds();
+    checkTurns(app, { force: true }); /* v521 : pastilles et « Aujourd'hui » à jour */
     draw();
   }
 
@@ -227,65 +230,10 @@ export default function versusScreen(app, root) {
     load();
   }
 
-  // ——— Le face-à-face ———
+  // ——— Le face-à-face (v521 : plein écran, js/screens/versus-duel.js) ———
   function duel(r, out) {
-    const mine = r.my_cards || [], theirs = r.their_cards || [];
-    const res = out?.result && RES[out.result] ? out.result : r.my_score > r.their_score ? 'win' : r.my_score === r.their_score ? 'tie' : 'lose';
-    const foe = name({ a: r.mine ? r.b : r.a, pseudo: r.pseudo });
-    const cell = (c, i, side) => { const k = cat.get(c.id); return `<span class="vs-c v-${c.variant}" data-side="${side}" data-i="${i}" style="--rc:${RARITY[c.rarity]?.color || '#888'}"><span class="vs-back"></span>${k ? `<img alt="" src="${artUrl(k, { lite: true })}">` : ''}<small>+${c.pts}</small></span>`; };
-    const progress = () => { if (out?.progress?.length) { app.pendingProgress = out.progress; app.flushProgress?.(); out.progress = null; } };
-    const s = openSheet(`<div class="vs-duel">
-      <div class="vs-side foe"><div class="vs-who"><span class="fr-av">${pic(r.avatar)}</span><b>${esc(foe)}</b><span class="vs-sc" data-sc="foe">0</span></div><div class="vs-grid n${theirs.length}">${theirs.map((c, i) => cell(c, i, 'foe')).join('')}</div></div>
-      <div class="vs-mid"><span>VS</span></div>
-      <div class="vs-side me"><div class="vs-grid n${mine.length}">${mine.map((c, i) => cell(c, i, 'me')).join('')}</div><div class="vs-who"><span class="fr-av">${pic(g.s.avatar || sync.profile?.avatar)}</span><b>Toi</b><span class="vs-sc" data-sc="me">0</span></div></div>
-      <div class="vs-end" hidden></div>
-      <p class="small muted center vs-skip">Touche pour tout révéler</p>
-    </div>`, { full: true, cls: 'vs-sheet', label: 'Le Pari des Boosters', onClose: () => { clearTimeout(timer); progress(); } });
-    const box = s.body.querySelector('.vs-duel');
-    const order = [];
-    for (let i = 0; i < Math.max(mine.length, theirs.length); i++) { if (i < theirs.length) order.push(['foe', i]); if (i < mine.length) order.push(['me', i]); }
-    const sc = { me: 0, foe: 0 };
-    let k = 0, timer = null, done = false;
-    const fast = app.reduced() || g.s.settings.fastOpen;
-    const flip = ([side, i]) => {
-      const c = (side === 'me' ? mine : theirs)[i];
-      const el = box.querySelector(`.vs-c[data-side="${side}"][data-i="${i}"]`);
-      el?.classList.add('on', `r-${c.rarity}`);
-      sc[side] += c.pts;
-      box.querySelector(`[data-sc="${side}"]`).textContent = fmt(sc[side]);
-      return c;
-    };
-    const finish = () => {
-      if (done) return; done = true;
-      clearTimeout(timer);
-      while (k < order.length) flip(order[k++]);
-      box.querySelector('[data-sc="me"]').textContent = fmt(scoreOf(mine));
-      box.querySelector('[data-sc="foe"]').textContent = fmt(scoreOf(theirs));
-      box.querySelector('.vs-skip')?.remove();
-      box.classList.add('end', res);
-      const n = out?.cards?.length || (res === 'win' ? mine.length + theirs.length : res === 'tie' ? mine.length : 0);
-      const fresh = (out?.cards || []).filter((c) => c.isNewCard).length;
-      const end = box.querySelector('.vs-end');
-      end.hidden = false;
-      end.innerHTML = `<h2 class="vs-title ${res}">${RES[res]}</h2>
-        <p>${res === 'win' ? `Tu remportes <b>les ${n} cartes</b> du duel${fresh ? `, dont <b>${fresh} nouvelle${fresh > 1 ? 's' : ''}</b>` : ''} !` : res === 'tie' ? `Même total : tu gardes <b>les ${n} cartes</b> de tes boosters.` : t('{name} remporte toutes les cartes.', { name: esc(foe) })}</p>
-        <button class="btn primary block" data-x="close">Fermer</button>`;
-      if (res === 'win') app.sfx.victory?.(); else if (res === 'lose') app.sfx.defeat?.(); else app.sfx.reveal?.();
-    };
-    const step = () => {
-      if (done) return;
-      if (k >= order.length) return finish();
-      const c = flip(order[k++]);
-      const big = ['HR', 'M', 'S'].includes(c.rarity) || c.variant !== 'normal';
-      (big ? app.sfx.reveal : app.sfx.flip)?.call(app.sfx);
-      timer = setTimeout(step, fast ? 140 : big ? 900 : 480);
-    };
-    box.addEventListener('click', (e) => {
-      if (e.target.closest('[data-x="close"]')) { s.close(); return; }
-      if (!done) finish();
-    });
-    app.sfx.suspense?.();
-    timer = setTimeout(step, fast ? 200 : 700);
+    playDuel(app, r, out, { foeName: name({ a: r.mine ? r.b : r.a, pseudo: r.pseudo }), myAvatar: g.s.avatar || sync.profile?.avatar,
+      onClose: () => { if (out?.progress?.length) { app.pendingProgress = out.progress; app.flushProgress?.(); out.progress = null; } draw(); } });
   }
 
   bindActions(root, {

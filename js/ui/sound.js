@@ -81,9 +81,22 @@ function hapOnce() {
   }
   hapEl.click();
 }
+// v521 : dans l'app (iPhone et Android), le vrai moteur de vibrations du téléphone (Capacitor Haptics) :
+// 1 = léger, 2 = moyen, 3 = fort. Sur le site, repli ci-dessus (Android : navigator.vibrate).
+const nativeHaptics = () => (typeof window !== 'undefined' ? window.Capacitor?.Plugins?.Haptics : null);
 export function hap(n = 1) {
-  if (!haptics || !enabled) return;
+  if (!haptics) return;
+  const H = nativeHaptics();
+  if (H) { try { H.impact({ style: n >= 3 ? 'HEAVY' : n === 2 ? 'MEDIUM' : 'LIGHT' }); if (n >= 3) setTimeout(() => H.impact({ style: 'HEAVY' }), 140); } catch (e) { /* rien */ } return; }
+  if (!enabled) return;
   for (let i = 0; i < n; i++) setTimeout(hapOnce, i * 90);
+}
+// Rythme de vibrations (motif en ms : vibration, pause, vibration…), comme navigator.vibrate
+export function hapPattern(pattern) {
+  if (!haptics) return;
+  const H = nativeHaptics();
+  if (H) { let t = 0; pattern.forEach((ms, i) => { if (i % 2 === 0) setTimeout(() => { try { H.impact({ style: ms >= 60 ? 'HEAVY' : ms >= 35 ? 'MEDIUM' : 'LIGHT' }); } catch (e) { /* rien */ } }, t); t += ms; }); return; }
+  try { navigator.vibrate?.(pattern); } catch (e) { /* rien */ }
 }
 
 function impulse(sec, decay) {

@@ -13,6 +13,7 @@ function onBack() {
   if (closeTopSheet()) return;
   // ouverture d'un coffre, présentation d'un gardien : on attend le toucher du joueur
   if (document.querySelector('.chx, .bx-intro')) return;
+  if (document.querySelector('.vd')) { document.querySelector('.vd [data-v="close"], .vd [data-v="all"]')?.click(); return; } /* v521 : face-à-face du Pari */
   if (document.querySelector('.opening')) { document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })); return; }
   const tip = document.querySelector('.coach button');
   if (tip) { tip.click(); return; }

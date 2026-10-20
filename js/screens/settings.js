@@ -1,4 +1,5 @@
 // Réglages : son, animations, accessibilité, sauvegarde (le Mode Créateur est dans creator.js).
+import { notifSupported, enable as notifEnable } from '../notify.js';
 import { resetTips } from '../ui/coach.js';
 import { TUTOS, tuto } from '../ui/tutos.js';
 import { icon } from '../ui/icons.js';
@@ -43,7 +44,8 @@ export default function settings(app, root) {
         <div class="set-row col"><label for="mvol"><b>Volume de la musique</b></label><input id="mvol" type="range" min="0" max="1" step="0.05" value="${s.musicVol ?? 0.55}" ${s.sound && s.music !== false ? '' : 'disabled'}></div>
         ${s.sound && s.music !== false ? `<div class="set-row col"><b>Écouter les ambiances</b><div class="set-sfx">${MUSIC_DEMO.map(([n], i) => `<button class="chip" data-mus="${i}">${n}</button>`).join('')}</div></div>` : ''}
         ${window.Capacitor?.isNativePlatform?.() ? '' : toggle('loud', 'Son même en mode silencieux', 'Le jeu reste audible quand le bouton silencieux de l’iPhone est activé (iOS 17 ou plus). Peut couper la musique d’une autre app.')}
-        ${toggle('haptics', 'Vibrations', 'Petites vibrations sur les coups, les victoires et les cartes rares. Sur iPhone, il faut iOS 18 ou plus.')}
+        ${toggle('haptics', 'Vibrations', 'Petites vibrations sur les coups, les victoires et les cartes rares. Dans l’app, le téléphone vibre vraiment ; sur le site web, l’iPhone ne vibre presque pas.')}
+        ${notifSupported() ? `<div class="set-row"><div><b>Notifications</b><p class="small muted">Booster gratuit du jour (10 h) et rappel 2 h avant la fin du délai quand c’est à toi de jouer en ligne.</p></div><button class="switch" role="switch" aria-checked="${!!s.notif}" data-act="notif" aria-label="Notifications"><i></i></button></div>` : ''}
         ${seg('motion', 'Animations', [['auto', 'Selon l’appareil'], ['reduced', 'Réduites'], ['full', 'Complètes']])}
         ${seg('defense', 'Défense active en combat', [['on', 'Manuelle'], ['auto', 'Automatique']])}
         <p class="small muted set-note">Manuelle : touche dans la zone dorée pour esquiver, sur le trait blanc pour une parade parfaite. Automatique : rien à toucher, mais seulement 4 esquives sur 10 et jamais de parade parfaite (moins de Ferveur et de PA).</p>
@@ -112,6 +114,7 @@ export default function settings(app, root) {
   bindActions(root, {
     toggle(el) { g.setSetting(el.dataset.k, !g.s.settings[el.dataset.k]); app.applySettings(); render(); },
     seg(el) { g.setSetting(el.dataset.k, el.dataset.v); app.applySettings(); render(); },
+    async notif() { await notifEnable(app, !g.s.settings.notif); render(); },
     lang(el) { if (el.dataset.v !== LANG) setLang(el.dataset.v); },
     async reset() {
       if (!(await confirmBox('Effacer définitivement toute ta progression, sur cet appareil <b>et sur ton compte en ligne</b> ?', { ok: 'Effacer', danger: true }))) return;

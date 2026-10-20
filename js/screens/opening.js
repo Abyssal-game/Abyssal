@@ -9,6 +9,7 @@ import { esc, fmt, toast } from '../ui/dom.js';
 import { packHTML, payLabel, GIFT_N } from './shop.js';
 import { roleOf, ROLES } from '../core/army.js';
 import { keywordOf, KEYWORDS } from '../core/duel.js';
+import { hapPattern } from '../ui/sound.js';
 
 const RI = (r) => ['C', 'PC', 'R', 'HR', 'M', 'S'].indexOf(r);
 
@@ -264,7 +265,7 @@ export function openPack(app, type, { faction, onDone, preset = null, title = nu
       el.classList.add('hush');
       if (big) el.classList.add('hush-big');
       (big ? app.sfx.suspensebig : app.sfx.suspense)();
-      try { navigator.vibrate?.(big ? [40, 60, 40, 60, 60, 40, 120] : [30, 50, 40]); } catch (e) { /* rien */ }
+      hapPattern(big ? [40, 60, 40, 60, 60, 40, 120] : [30, 50, 40]); /* v521 : vraies vibrations dans l'app */
       await wait(big ? 1300 : 600);
       if (phase === 'summary') { busy = false; return; }
       btn.classList.remove('charging');

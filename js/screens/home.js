@@ -1,4 +1,5 @@
 // Accueil : logo, deux accès principaux et ce qui est à faire aujourd'hui.
+import { mpw } from '../cloud/mpwatch.js';
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { artUrl, hasRealArt } from '../art/assets.js';
 import { icon, EMBLEM, sigil, picon } from '../ui/icons.js';
@@ -33,6 +34,8 @@ export default function home(app, root) {
     /* v466 : défis du jour de la Salle des jeux encore à relever */
     { const gl = g.gamesDailyLeft(); if (gl.length) rows.push(`<a class="td-row" href="#/jeux"><span class="td-ic mi" style="--mc:#C9A45A">${picon('seal')}</span><span class="td-t"><b>Jeux du jour</b><span class="small muted">${gl.length} défi${gl.length > 1 ? 's' : ''} à relever · un coffre de bois par victoire</span></span>${icon('next')}</a>`); }
     if (chests) rows.push(`<a class="td-row" href="#/coffres"><span class="td-ic mi" style="--mc:#E8C35A">${picon('chest')}</span><span class="td-t"><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Éclats et boosters</span></span>${icon('next')}</a>`);
+    // v521 : ce qui t'attend en ligne (à toi de jouer, défis, duels à voir, demandes d'ami), en tête
+    for (const it of mpw.items) rows.unshift(`<a class="td-row td-live" href="${it.href}"><span class="td-ic mi" style="--mc:#F2C14E">${picon(it.icon)}</span><span class="td-t"><b>${it.title}</b><span class="small muted">${it.sub}</span></span><span class="td-new">!</span>${icon('next')}</a>`);
     rows.push('<h3 class="td-sub">Missions du jour</h3>');
     m.list.forEach((x, i) => {
       const done = x.p >= x.n;

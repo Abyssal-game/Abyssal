@@ -43,6 +43,7 @@ import { startPresence } from './cloud/presence.js';
 import { showWelcome } from './screens/welcome.js';
 import { showGate } from './ui/gate.js';
 import { mpw, checkTurns } from './cloud/mpwatch.js';
+import { syncDaily, maybeAsk } from './notify.js';
 import { onAuth } from './cloud/cloud.js';
 import { setScene } from './ui/scene.js';
 import { initNative, isNative } from './native.js';
@@ -175,7 +176,7 @@ function renderChrome() {
     // v404 : pastilles plus calmes — plus de « 99+ » permanent sur la Fournaise ; Renforcer seulement si l'Accueil le conseille aussi
     if (r === 'renfort') return g.goals().some((x) => x.kind === 'forge' && /Renforce/.test(x.title)) ? '↑' : '';
     if (r === 'collection') return nNewSub || '';
-    if (r === 'jeux') return (g.gamesDailyLeft().length + mpw.turns) || ''; /* v466 : défis du jour à relever ; v519 : coups à jouer en ligne */
+    if (r === 'jeux') return (g.gamesDailyLeft().length + mpw.turns + mpw.games) || ''; /* v466 : défis du jour à relever ; v519 : coups à jouer en ligne */
     if (r === 'epreuves') { const n = g.trials().done.filter((x) => !x).length; return g.team().length >= 3 && n ? n : ''; } /* v407 */
     return '';
   };
@@ -195,6 +196,8 @@ function renderChrome() {
     const badge = key === 'boutique' && ticketCount + g.chestCount() ? `<span class="badge">${ticketCount + g.chestCount()}</span>` /* v428 : boosters et coffres à ouvrir */
       : key === 'collection' && nNew ? dot
       : key === 'antre' && (g.canDailyClaim() || g.missionsToClaim()) ? dot
+      : key === 'descente' && (mpw.turns + mpw.games) ? `<span class="badge">${mpw.turns + mpw.games}</span>` /* v521 : en ligne, à toi de jouer ou défi à voir */
+      : key === 'menu' && mpw.friends ? `<span class="badge">${mpw.friends}</span>` /* v521 : demandes d'ami */
       : key === 'descente' && g.team().length >= 3 && (g.descent().run || g.trials().done.some((x) => !x)) ? dot : ''; /* v407 : Épreuves du jour à jouer */
     if (key === 'boutique') return `<a class="tab tab-main" href="#/boutique"${cur}><span class="orb">${tabIcon(ic)}</span>${label}${badge}</a>`;
     return `<a class="tab" href="#/${key}"${cur}>${tabIcon(ic)}${label}${badge}</a>`;
@@ -346,7 +349,8 @@ async function boot() {
     startPresence();
     setInterval(autoClaim, 5000);
     setTimeout(() => checkTurns(app, { force: true }), 6000); setInterval(() => checkTurns(app), 120000); /* v519 : « À toi de jouer » en ligne */
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkTurns(app); }); /* v422 : l'Accueil n'a plus de boutons « +50 » : on encaisse aussi sans changer de page */
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkTurns(app); else syncDaily(g); }); /* v521 : notification du booster du jour reprogrammée en quittant l'app */
+    setTimeout(() => syncDaily(g), 8000); setInterval(() => maybeAsk(app), 30000); /* v422 : l'Accueil n'a plus de boutons « +50 » : on encaisse aussi sans changer de page */
     setTimeout(() => claimShadowPrize(app), 5000); // coffre du Tirage des Ombres de la semaine passée
     lastShards = app.game.s.shards;
     window.addEventListener('hashchange', render);

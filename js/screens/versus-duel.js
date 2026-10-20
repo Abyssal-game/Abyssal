@@ -1,0 +1,147 @@
+// v521 : le face-à-face du Pari des Boosters, en plein écran (demande du propriétaire : « que ça prenne l'écran entier,
+// un beau décor, les boosters déchirés en même temps, les 3 cartes qui sortent, puis on enchaîne… et du suspense »).
+// Pour chaque booster de la composition : les deux sachets apparaissent face à face, tremblent, se déchirent ensemble,
+// les cartes jaillissent face cachée vers leur place, puis se retournent une à une, en alternance, avec leurs points.
+// Un toucher accélère (×4) ; « Tout révéler » termine d'un coup.
+import { BOOSTERS, RARITY } from '../config.js';
+import { lineupOf, scoreOf } from '../core/versus.js';
+import { artUrl } from '../art/assets.js';
+import { icon, EMBLEM } from '../ui/icons.js';
+import { esc, fmt } from '../ui/dom.js';
+import { packHTML } from './shop.js';
+import { t } from '../i18n.js';
+
+const RES = { win: 'Victoire', tie: 'Égalité', lose: 'Défaite' };
+const RI = (r) => ['C', 'PC', 'R', 'HR', 'M', 'S'].indexOf(r);
+
+export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
+  const g = app.game, cat = app.catalog;
+  const mine = r.my_cards || [], theirs = r.their_cards || [];
+  const res = out?.result && RES[out.result] ? out.result : r.my_score > r.their_score ? 'win' : r.my_score === r.their_score ? 'tie' : 'lose';
+  const lineup = lineupOf(r);
+  // découpe des cartes par booster (3 par booster, ou le nombre d'emplacements du type)
+  const sizes = lineup.map((it) => BOOSTERS[it.type]?.slots.length || 3);
+  const chunk = (arr) => { const o = []; let k = 0; for (const n of sizes) { o.push(arr.slice(k, k + n)); k += n; } return o; };
+  const myPacks = chunk(mine), foePacks = chunk(theirs);
+  const ev = g.event();
+  const pic = (id) => { const c = id && cat.get(id); return c ? `<img alt="" src="${artUrl(c, { lite: true })}">` : EMBLEM; };
+  const cardEl = (c, side, p, i) => { const k = cat.get(c.id); return `<span class="vd-c v-${c.variant} r-${c.rarity}" data-side="${side}" data-p="${p}" data-i="${i}" style="--rc:${RARITY[c.rarity]?.color || '#888'}">
+      <span class="vd-in"><span class="vd-back"></span><span class="vd-face">${k ? `<img alt="" src="${artUrl(k, { lite: true })}">` : ''}<small>+${c.pts}</small></span></span></span>`; };
+  const rows = (packs, side) => packs.map((cs, p) => `<div class="vd-row" data-side="${side}" data-p="${p}">${cs.map((c, i) => cardEl(c, side, p, i)).join('')}</div>`).join('');
+  const el = document.createElement('div');
+  el.className = `vd ${app.reduced() ? 'rm' : ''} n${lineup.length}`;
+  el.setAttribute('role', 'dialog');
+  el.setAttribute('aria-modal', 'true');
+  el.setAttribute('aria-label', t('Le Pari des Boosters'));
+  el.innerHTML = `<div class="vd-bg"></div><div class="vd-veil"></div><div class="vd-embers"></div>
+    <header class="vd-top"><span class="vd-step"></span><button class="vd-skip" data-v="all">${icon('skip')}Tout révéler</button></header>
+    <section class="vd-side foe"><div class="vd-who"><span class="fr-av">${pic(r.avatar)}</span><b>${esc(foeName)}</b><span class="vd-sc" data-sc="foe">0</span></div><div class="vd-grid">${rows(foePacks, 'foe')}</div></section>
+    <div class="vd-mid"><div class="vd-pack foe"></div><span class="vd-vs">VS</span><div class="vd-pack me"></div></div>
+    <section class="vd-side me"><div class="vd-grid">${rows(myPacks, 'me')}</div><div class="vd-who"><span class="fr-av">${pic(myAvatar)}</span><b>${t('Toi')}</b><span class="vd-sc" data-sc="me">0</span></div></section>
+    <div class="vd-end" hidden></div>
+    <p class="vd-hint">${t('Touche l’écran pour accélérer')}</p>`;
+  document.body.appendChild(el);
+  document.body.classList.add('has-sheet');
+  requestAnimationFrame(() => el.classList.add('on'));
+
+  let speed = app.reduced() || g.s.settings.fastOpen ? 4 : 1, done = false, closed = false;
+  const sc = { me: 0, foe: 0 };
+  const wait = (ms) => new Promise((ok) => setTimeout(ok, ms / speed));
+  const q = (s) => el.querySelector(s);
+  const setScore = (side) => { const n = q(`[data-sc="${side}"]`); n.textContent = fmt(sc[side]); n.classList.remove('bump'); void n.offsetWidth; n.classList.add('bump'); };
+  const lead = () => { q('.vd-side.me').classList.toggle('lead', sc.me > sc.foe); q('.vd-side.foe').classList.toggle('lead', sc.foe > sc.me); };
+
+  // un booster de chaque côté : apparition, tremblement, déchirure simultanée, cartes qui jaillissent
+  async function tear(p) {
+    const it = lineup[p];
+    const pk = packHTML(it.type, cat, { faction: it.faction, event: it.factions ? { factions: it.factions } : ev });
+    const fp = q('.vd-pack.foe'), mp = q('.vd-pack.me');
+    fp.innerHTML = pk; mp.innerHTML = pk;
+    q('.vd-step').textContent = lineup.length > 1 ? `${t('Booster')} ${p + 1} / ${lineup.length}` : '';
+    [fp, mp].forEach((x) => { x.className = `vd-pack ${x === fp ? 'foe' : 'me'} in`; });
+    q('.vd-mid').classList.add('show');
+    await wait(550);
+    [fp, mp].forEach((x) => x.classList.add('shake'));
+    app.sfx.suspense?.();
+    await wait(1000);
+    [fp, mp].forEach((x) => { x.classList.remove('shake'); x.classList.add('torn'); });
+    app.sfx.tear?.(); app.sfx.rip?.(1);
+    await wait(320);
+    // les cartes sortent face cachée du sachet et filent vers leur place
+    for (const side of ['foe', 'me']) {
+      const from = q(`.vd-pack.${side}`).getBoundingClientRect();
+      q(`.vd-row[data-side="${side}"][data-p="${p}"]`).querySelectorAll('.vd-c').forEach((c, i) => {
+        c.classList.add('out');
+        if (app.reduced() || speed > 1) return;
+        const to = c.getBoundingClientRect();
+        c.animate([{ transform: `translate(${from.left + from.width / 2 - to.left - to.width / 2}px, ${from.top + from.height / 2 - to.top - to.height / 2}px) scale(.3) rotate(${(i - 1) * 25}deg)`, opacity: 0 },
+          { opacity: 1, offset: 0.3 }, { transform: 'none', opacity: 1 }], { duration: 520, delay: i * 90, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'backwards' });
+      });
+    }
+    app.sfx.flip?.();
+    await wait(760);
+    q('.vd-mid').classList.remove('show');
+  }
+  // une carte se retourne : couleur de rareté, points qui montent au score
+  async function reveal(side, p, i) {
+    const c = (side === 'me' ? myPacks : foePacks)[p][i];
+    const n = q(`.vd-c[data-side="${side}"][data-p="${p}"][data-i="${i}"]`);
+    const big = RI(c.rarity) >= RI('HR') || c.variant !== 'normal';
+    if (big && speed === 1) { n.classList.add('tease'); app.sfx.suspensebig?.(); await wait(900); n.classList.remove('tease'); }
+    n.classList.add('on');
+    if (big) { n.classList.add('big'); app.sfx.reveal?.(c.rarity); } else app.sfx.flip?.();
+    sc[side] += c.pts;
+    setScore(side); lead();
+    await wait(big ? 900 : 560);
+  }
+  async function run() {
+    await wait(500);
+    for (let p = 0; p < lineup.length && !done; p++) {
+      await tear(p);
+      const n = Math.max(myPacks[p].length, foePacks[p].length);
+      for (let i = 0; i < n && !done; i++) {
+        if (i < foePacks[p].length) await reveal('foe', p, i);
+        if (done) break;
+        if (i < myPacks[p].length) await reveal('me', p, i);
+      }
+      if (!done && p < lineup.length - 1) await wait(700);
+    }
+    finish();
+  }
+  function finish() {
+    if (done) return;
+    done = true;
+    el.querySelectorAll('.vd-c').forEach((c) => c.classList.add('out', 'on'));
+    sc.me = scoreOf(mine); sc.foe = scoreOf(theirs);
+    setScore('me'); setScore('foe'); lead();
+    q('.vd-mid').classList.remove('show');
+    q('.vd-skip').hidden = true; q('.vd-hint').hidden = true; q('.vd-step').textContent = '';
+    const nWon = out?.cards?.length || (res === 'win' ? mine.length + theirs.length : res === 'tie' ? mine.length : 0);
+    const fresh = (out?.cards || []).filter((c) => c.isNewCard).length;
+    el.classList.add('end', res);
+    const end = q('.vd-end');
+    end.hidden = false;
+    end.innerHTML = `<div class="vd-burst"></div><h2 class="vd-title ${res}">${t(RES[res])}</h2>
+      <p class="vd-tally"><b>${fmt(sc.me)}</b> <span>${t('contre')}</span> <b>${fmt(sc.foe)}</b></p>
+      <p>${res === 'win' ? t(fresh ? 'Tu remportes <b>les {n} cartes</b> du duel, dont <b>{f} nouvelles</b> !' : 'Tu remportes <b>les {n} cartes</b> du duel !', { n: nWon, f: fresh })
+        : res === 'tie' ? t('Même total : tu gardes <b>les {n} cartes</b> de tes boosters.', { n: nWon }) : t('{name} remporte toutes les cartes.', { name: esc(foeName) })}</p>
+      <button class="btn primary block big-cta dc-plq dc-plq-red" data-v="close">${t('Fermer')}</button>`;
+    if (res === 'win') app.sfx.victory?.(); else if (res === 'lose') app.sfx.defeat?.(); else app.sfx.reveal?.('R');
+  }
+  function close() {
+    if (closed) return;
+    closed = true; done = true;
+    el.classList.remove('on');
+    document.body.classList.remove('has-sheet');
+    setTimeout(() => el.remove(), 300);
+    onClose?.();
+  }
+  el.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-v]');
+    if (b?.dataset.v === 'close') return close();
+    if (b?.dataset.v === 'all') return finish();
+    if (!done) speed = 4;
+  });
+  run();
+  return { close };
+}
