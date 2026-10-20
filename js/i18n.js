@@ -4,7 +4,7 @@
 // Clés : texte d'un bloc (paragraphe, bouton, titre…) avec ses balises de mise en forme simples (<b>, <i>, <small>…),
 // espaces resserrés ; chaque nombre devient {0}, {1}… et chaque élément enfant (icône, image, pastille) {e0}, {e1}…
 // Une phrase qui contient un nom ou une valeur non numérique passe par t() dans le code.
-export const LANGS = { fr: 'Français', en: 'English' };
+export const LANGS = { fr: 'Français', en: 'English', es: 'Español', de: 'Deutsch', it: 'Italiano', pt: 'Português (Brasil)' }; /* v537 : étape 3 des langues (es, de, it, pt) */
 const KEY = 'abyssal.lang';
 const browser = typeof window !== 'undefined' && typeof document !== 'undefined';
 
