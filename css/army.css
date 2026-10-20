@@ -4868,3 +4868,13 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 @keyframes mpLow { to { box-shadow: 0 0 16px rgba(224, 72, 94, .8); } }
 .mp-fpace { margin: 6px 0 10px; }
 @media (prefers-reduced-motion: reduce) { .mp-spin, .mp-clock.low.mine { animation: none; } }
+
+/* v523 : Pacte en ligne : tout tient sur iPhone SE (compte à rebours et « Abandonner » resserrés) */
+.mp-pa .mp-clock { margin: 4px 0 2px; }
+.mp-pa .mp-resign { display: block; margin: 4px auto 0; min-height: 36px; padding: 4px 14px; }
+.mp-pa .sc-msg { margin: 4px 0; }
+@media (max-height: 700px) {
+  .mp-pa .pa-seat { padding-top: 4px; padding-bottom: 4px; }
+  .mp-pa .pa-deck { margin: 2px 0; }
+  .mp-pa .pa-ctl .btn { min-height: 52px; }
+}

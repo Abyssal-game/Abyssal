@@ -1,0 +1,246 @@
+// v523 : accueil « Contre un joueur » commun aux mini-jeux en ligne (Duels des Sceaux, Pacte…), tiré de sceaux-mp.js (v519-v522).
+// Le serveur tient les parties (supabase/09-multijoueur.sql). Ce module gère la liste des parties, la recherche rapide,
+// les défis aux amis, les résultats encaissés une fois, le classement du mois et la relecture de la partie ouverte ;
+// chaque jeu fournit son écran de partie (spec.drawGame) et ses actions (spec.click).
+//
+// spec : { game, modeBar(), intro() (HTML sous « Nouvelle partie »), note (texte d'explication), create(pace, to) → id,
+//   join(id), sub(v) (ligne d'une partie en cours), score(v) (score final), moveKey(v) (change à chaque coup),
+//   drawGame(v, ctx, last), updated?(prev, v, ctx) (l'adversaire a joué), click?(k, b, ctx) }
+import * as cloud from '../cloud/cloud.js';
+import { sync } from '../cloud/sync.js';
+import { MP_HOURS, MP_FAST_SECS, MP_REWARD } from '../core/mp.js';
+import { isBlocked } from '../core/moderation.js';
+import { artUrl } from '../art/assets.js';
+import { icon, EMBLEM } from '../ui/icons.js';
+import { esc, toast, confirmBox, openSheet } from '../ui/dom.js';
+import { setScene } from '../ui/scene.js';
+import { checkTurns } from '../cloud/mpwatch.js';
+import { t } from '../i18n.js';
+
+export const MP_OFF = 'Les parties contre d’autres joueurs ne sont pas encore ouvertes sur le serveur.';
+export const MP_RES = { win: 'Victoire', lose: 'Défaite', draw: 'Égalité' };
+
+export function createMpLobby(app, root, spec) {
+  const g = app.game, cat = app.catalog;
+  const ui = (app.state[`mp_${spec.game}`] ||= { open: null, sel: null });
+  let clock = 0, list = null, err = null, busy = false, poll = 0, view = null, skew = 0, alive = true, friends = null;
+  const avatar = (id) => { const c = id && cat.get(id); return c ? `<img alt="" src="${artUrl(c, { lite: true })}">` : EMBLEM; };
+  const foeName = (v) => (!v.foe ? '…' : isBlocked(v.foe.id) ? 'Joueur masqué' : v.foe.pseudo || 'Joueur');
+  const msLeft = (v) => new Date(v.deadline).getTime() - (Date.now() + skew) - (v.pace === 'fast' ? 3000 : 0); /* 3 s de marge réseau côté serveur */
+  const left = (v) => {
+    const ms = msLeft(v);
+    if (ms <= 0) return 'temps écoulé';
+    if (v.pace === 'fast') return `${Math.ceil(ms / 1000)} s`;
+    const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000);
+    return h ? `${h} h ${String(m).padStart(2, '0')}` : `${m} min`;
+  };
+  const myTurn = (v) => v.status === 'playing' && v.turn === v.me;
+  const resOf = (v) => (v.winner === 'draw' ? 'draw' : v.winner === v.me ? 'win' : 'lose');
+  const errMsg = (e) => (e.status === 404 ? MP_OFF : e.message);
+  function stopPoll() { clearTimeout(poll); poll = 0; clearInterval(clock); clock = 0; }
+  function schedule(fn, ms) { stopPoll(); poll = setTimeout(() => { if (alive && document.visibilityState === 'visible') fn(); else schedule(fn, ms); }, ms); }
+
+  // ——— Accueil « Contre un joueur » ———
+  async function lobby() {
+    ui.open = null; view = null;
+    document.body.classList.remove('battle-mode');
+    document.querySelector('.sc-scene')?.remove();
+    setScene('menu');
+    if (!cloud.isLoggedIn() || !sync.profile?.pseudo) {
+      root.innerHTML = `${spec.modeBar()}<section class="panel stack center"><p>${!cloud.isLoggedIn() ? 'Connecte-toi pour jouer contre d’autres joueurs.' : 'Choisis d’abord ton pseudo : c’est lui que verront tes adversaires.'}</p><a class="btn primary block" href="#/compte">${icon('user')}${!cloud.isLoggedIn() ? 'Se connecter' : 'Choisir mon pseudo'}</a></section>`;
+      return;
+    }
+    drawLobby();
+    try { list = await cloud.mpList(spec.game); err = null; } catch (e) { err = errMsg(e); list = list || []; }
+    if (!alive || ui.open) return;
+    if (list[0]?.now) skew = new Date(list[0].now).getTime() - Date.now();
+    // v522 : partie rapide trouvée pendant la recherche : on y va tout de suite
+    const found = list.find((v) => v.pace === 'fast' && v.status === 'playing' && ui.searching === v.id);
+    if (found) { ui.searching = null; toast(t('Adversaire trouvé : <b>{name}</b> !', { name: esc(foeName(found)) }), { icon: 'user' }); app.sfx.achievement?.(); return open(found.id); }
+    const searching = list.find((v) => v.pace === 'fast' && v.status === 'waiting' && v.me === 'a');
+    ui.searching = searching?.id || null; ui.searchingV = searching || null;
+    await claimAll();
+    checkTurns(app, { force: true });
+    drawLobby();
+    schedule(lobby, ui.searching ? 3000 : 20000);
+  }
+  // résultats des parties terminées : récompense encaissée une seule fois
+  async function claimAll() {
+    for (const v of (list || []).filter((x) => x.status === 'done' && !x.claimed)) {
+      try {
+        const r = await cloud.mpClaim(v.id);
+        v.claimed = true;
+        const out = g.mpReward(spec.game, v.id, r);
+        if (out) toast(`${t(r === 'win' ? 'Victoire contre <b>{name}</b>' : r === 'lose' ? 'Défaite contre <b>{name}</b>' : 'Égalité contre <b>{name}</b>', { name: esc(foeName(v)) })}${v.reason === 'timeout' ? ` (${t('temps écoulé')})` : v.reason === 'resign' ? ` (${t('abandon')})` : ''}${out.shards ? ` · +${out.shards} ${t('éclats')}` : ''}`, { icon: r === 'win' ? 'crown' : 'info' });
+      } catch (e) { /* on réessaiera */ }
+    }
+    app.chrome?.();
+  }
+  function drawLobby() {
+    const L = list || [];
+    const mine = L.filter((v) => myTurn(v)), theirs = L.filter((v) => v.status === 'playing' && !myTurn(v));
+    const invites = L.filter((v) => v.status === 'waiting' && v.me === 'b'), waiting = L.filter((v) => v.status === 'waiting' && v.me === 'a');
+    const done = L.filter((v) => v.status === 'done').slice(0, 8);
+    const st = g.s.mp[spec.game] || { wins: 0, losses: 0, draws: 0 };
+    const paidLeft = MP_REWARD.paidPerDay - (g.s.mp.day === dayKey() ? g.s.mp.paid : 0);
+    const row = (v, sub, acts) => `<div class="mp-row ${myTurn(v) ? 'hot' : ''}" ${v.status !== 'waiting' ? `data-mp="open" data-id="${esc(v.id)}" role="button" tabindex="0"` : ''}><span class="fr-av">${v.foe ? avatar(v.foe.avatar) : EMBLEM}</span><span class="fr-t"><b>${esc(v.foe ? foeName(v) : 'Un joueur au hasard')}<i class="mp-tag ${v.pace === 'fast' ? 'fast' : ''}">${v.pace === 'fast' ? 'Rapide' : 'Lente'}</i></b><small>${sub}</small></span>${acts || icon('next')}</div>`;
+    root.innerHTML = `${spec.modeBar()}
+      ${err ? `<p class="panel small center">${icon('info')} ${esc(err)}</p>` : ''}
+      ${mine.length ? `<section class="panel mp-sec hot"><h2 class="section-title">À toi de jouer <span class="pill-n">${mine.length}</span></h2>${mine.map((v) => row(v, `${spec.sub(v)} · il te reste <b>${left(v)}</b>`)).join('')}</section>` : ''}
+      ${invites.length ? `<section class="panel mp-sec"><h2 class="section-title">Défis reçus</h2>${invites.map((v) => row(v, 'Ton ami te défie', `<span class="vs-acts"><button class="btn small primary" data-mp="join" data-id="${esc(v.id)}">Accepter</button><button class="btn small ghost" data-mp="leave" data-id="${esc(v.id)}">Refuser</button></span>`)).join('')}</section>` : ''}
+      <section class="panel mp-sec mp-new"><h2 class="section-title">Nouvelle partie</h2>
+        <p class="small">${spec.note}</p>
+        ${spec.intro?.() || ''}
+        ${ui.searching ? `<div class="mp-search"><span class="mp-spin"></span><span><b>${ui.searchingV?.public === false ? t('En attente de {name}…', { name: esc(foeName(ui.searchingV)) }) : 'Recherche d’un adversaire…'}</b><small>Partie rapide · reste sur cet écran, la partie démarre dès qu’un joueur arrive.</small></span><button class="btn small ghost" data-mp="leave" data-id="${esc(ui.searching)}">Annuler</button></div>` : ''}
+        <div class="mp-paces">
+          <button class="mp-pace fast" data-mp="quick" data-pace="fast" ${busy || ui.searching ? 'disabled' : ''}><b>${icon('p:hourglass')}Partie rapide</b><span class="mp-pace-t">${MP_FAST_SECS} s par coup</span><small>Les deux joueurs connectés en même temps. Une partie dure quelques minutes.</small></button>
+          <button class="mp-pace slow" data-mp="quick" data-pace="slow" ${busy || waiting.some((v) => v.public && v.pace !== 'fast') ? 'disabled' : ''}><b>${icon('p:book')}Partie lente</b><span class="mp-pace-t">${MP_HOURS} h par coup</span><small>${waiting.some((v) => v.public && v.pace !== 'fast') ? 'Recherche en cours : la partie commence dès qu’un joueur arrive.' : 'Chacun joue quand il veut. Tu es prévenu quand c’est ton tour.'}</small></button>
+        </div>
+        <button class="btn block dc-plq dc-plq-dark" data-mp="friend" ${busy ? 'disabled' : ''}>${icon('user')}Défier un ami</button>
+        <p class="small muted center">Victoire : +${MP_REWARD.win} éclats (${Math.max(0, paidLeft)} victoire${paidLeft > 1 ? 's' : ''} payée${paidLeft > 1 ? 's' : ''} restante${paidLeft > 1 ? 's' : ''} aujourd’hui) et une place au classement du mois.</p>
+      </section>
+      ${theirs.length ? `<section class="panel mp-sec"><h2 class="section-title">Au tour de l’adversaire</h2>${theirs.map((v) => row(v, `${spec.sub(v)} · il lui reste ${left(v)}`)).join('')}</section>` : ''}
+      ${waiting.some((v) => !(v.public && v.pace === 'fast')) ? `<section class="panel mp-sec"><h2 class="section-title">En attente</h2>${waiting.filter((v) => !(v.public && v.pace === 'fast')).map((v) => row(v, v.public ? 'Recherche d’un adversaire (jusqu’à 24 h)' : t('Défi envoyé à {name}', { name: esc(foeName(v)) }), `<button class="btn small ghost" data-mp="leave" data-id="${esc(v.id)}">Annuler</button>`)).join('')}</section>` : ''}
+      ${done.length ? `<details class="panel dc-fold mp-sec"><summary><span class="dc-sum-t">Parties terminées</span></summary>${done.map((v) => { const r = resOf(v); const sc = spec.score(v); return row(v, `<b class="vs-res ${r}">${MP_RES[r]}</b>${sc ? ` · ${sc}` : ''}${v.reason === 'timeout' ? ' · temps écoulé' : v.reason === 'resign' ? ' · abandon' : ''}`); }).join('')}</details>` : ''}
+      <details class="panel dc-fold mp-sec" id="mp-rank"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/crown.webp"><span class="dc-sum-t">Classement du mois</span></summary><div class="lb-body small muted">Chargement…</div></details>
+      <p class="small muted center">Contre les joueurs : ${st.wins} victoire${st.wins > 1 ? 's' : ''} · ${st.losses} défaite${st.losses > 1 ? 's' : ''}</p>`;
+    root.querySelector('#mp-rank')?.addEventListener('toggle', (e) => { if (e.target.open) ranking(); }, { once: true });
+  }
+  const dayKey = () => { const d = g.clock(), p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; };
+  async function ranking() {
+    const box = root.querySelector('#mp-rank .lb-body'); if (!box) return;
+    try {
+      const rows = await cloud.mpRanking(spec.game, 20);
+      const me = cloud.currentUser()?.id;
+      box.classList.remove('muted');
+      box.innerHTML = rows.length ? rows.map((r, i) => `<div class="lb-row ${r.user_id === me ? 'me' : ''}"><span class="lb-rank">${i + 1}</span><span class="lb-av">${avatar(r.avatar)}</span><span class="lb-name"><b>${esc(isBlocked(r.user_id) ? 'Joueur masqué' : r.pseudo || 'Joueur')}</b><span class="small muted">${r.games} partie${r.games > 1 ? 's' : ''}</span></span><span class="lb-floor">${r.wins}</span></div>`).join('') : '<p class="small muted">Pas encore de victoire ce mois-ci. À toi !</p>';
+    } catch (e) { box.textContent = errMsg(e); }
+  }
+
+  // ——— Partie ———
+  async function open(id) {
+    ui.open = id; ui.sel = null;
+    try { view = await cloud.mpGet(id); } catch (e) { toast(esc(errMsg(e)), { kind: 'error' }); return lobby(); }
+    if (!alive || ui.open !== id) return;
+    if (!view) return lobby();
+    if (view.now) skew = new Date(view.now).getTime() - Date.now();
+    draw();
+    watch();
+  }
+  // l'adversaire joue : on regarde toutes les 8 s tant que la partie est ouverte et que ce n'est pas notre tour
+  function watch() {
+    clearInterval(clock); clock = 0;
+    if (view?.status === 'playing' && view.pace === 'fast') {
+      // v522 : partie rapide : compte à rebours à l'écran, l'adversaire regardé toutes les 1,5 s
+      clock = setInterval(tick, 250); tick();
+      if (myTurn(view)) return schedule(() => refresh(), Math.max(1500, msLeft(view) + 3500));
+      return schedule(() => refresh(), 1500);
+    }
+    if (!view || view.status !== 'playing' || myTurn(view)) { stopPoll(); if (view?.status === 'playing') schedule(() => refresh(), 30000); return; }
+    schedule(() => refresh(), 8000);
+  }
+  function tick() {
+    const el = root.querySelector('.mp-clock'); if (!el || !view) return;
+    const ms = Math.max(0, msLeft(view)), secs = Math.ceil(ms / 1000);
+    el.querySelector('b').textContent = `${secs} s`;
+    el.style.setProperty('--p', `${Math.min(1, ms / (MP_FAST_SECS * 1000)) * 100}%`);
+    el.classList.toggle('low', secs <= 10);
+    if (secs <= 5 && secs > 0 && myTurn(view) && el.dataset.s !== String(secs)) { el.dataset.s = String(secs); app.sfx.tap?.(); }
+  }
+  async function refresh() {
+    if (!ui.open || busy) return watch();
+    let v; try { v = await cloud.mpGet(ui.open); } catch (e) { return watch(); }
+    if (!alive || !v || v.id !== ui.open) return;
+    const prev = view;
+    view = v;
+    if (prev && spec.moveKey(prev) !== spec.moveKey(v) && spec.updated) { busy = true; try { await spec.updated(prev, v, ctx); } finally { busy = false; } if (!alive || ui.open !== v.id) return; }
+    draw(prev && spec.moveKey(prev) !== spec.moveKey(v) ? v.state?.last : null);
+    watch();
+  }
+  function draw(last = null) {
+    if (!view) return lobby();
+    spec.drawGame(view, ctx, last);
+    if (view.status === 'done' && !view.claimed) claimOne(view);
+  }
+  async function claimOne(v) {
+    try { const r = await cloud.mpClaim(v.id); v.claimed = true; const out = g.mpReward(spec.game, v.id, r); if (out) { if (r === 'win') app.sfx.victory?.(); else app.sfx.defeat?.(); if (out.shards) toast(`+${out.shards} éclats`, { icon: 'crystal' }); app.chrome?.(); } } catch (e) { /* plus tard */ }
+  }
+  // Coup joué au serveur : la nouvelle vue remplace l'ancienne ; en cas d'erreur, la partie est relue
+  async function act(fn) {
+    if (busy) return null;
+    busy = true;
+    let v;
+    try { v = await fn(); } catch (e) { app.sfx.error(); toast(esc(errMsg(e)), { kind: 'error' }); busy = false; refresh(); return null; }
+    busy = false;
+    if (v) view = v;
+    return v;
+  }
+  async function quick(pace = 'slow') {
+    if (busy) return;
+    busy = true;
+    try {
+      const id = await spec.create(pace, null);
+      const v = await cloud.mpGet(id);
+      busy = false;
+      if (v?.status === 'playing') { toast(t('Adversaire trouvé : <b>{name}</b> !', { name: esc(foeName(v)) }), { icon: 'user' }); return open(id); }
+      if (pace === 'fast') ui.searching = id;
+      else toast('Recherche d’un adversaire : ta partie commencera dès qu’un joueur arrive. Reviens plus tard !', { icon: 'hourglass', ms: 5000 });
+    } catch (e) { busy = false; app.sfx.error(); toast(esc(errMsg(e)), { kind: 'error', ms: 6000 }); }
+    lobby();
+  }
+  async function friend() {
+    if (!friends) { try { friends = (await cloud.friendList()).filter((f) => f.status === 'accepted'); } catch (e) { friends = []; } }
+    let pace = 'slow';
+    const sh = openSheet(`<h2>Défier un ami</h2>${friends.length ? `<div class="seg wide mp-fpace" role="group" aria-label="Vitesse"><button class="seg-b" data-pace="slow" aria-pressed="true">Lente · ${MP_HOURS} h par coup</button><button class="seg-b" data-pace="fast" aria-pressed="false">Rapide · ${MP_FAST_SECS} s</button></div><div class="mp-friends">${friends.map((f) => `<button class="vs-fr" data-f="${esc(f.id)}"><span class="fr-av">${avatar(f.avatar)}</span><b>${esc(f.pseudo)}</b></button>`).join('')}</div><p class="small muted mp-fnote">Il a 24 h pour accepter.</p>` : '<p>Pas encore d’ami.</p><a class="btn block" href="#/amis">Ajouter un ami</a>'}`, { cls: 'sheet-small', label: 'Défier un ami' });
+    sh.body.addEventListener('click', async (e) => {
+      const pb = e.target.closest('[data-pace]');
+      if (pb) { pace = pb.dataset.pace; sh.body.querySelectorAll('[data-pace]').forEach((x) => x.setAttribute('aria-pressed', String(x === pb))); sh.body.querySelector('.mp-fnote').textContent = pace === 'fast' ? t('Partie rapide : ton ami a 5 minutes pour accepter, soyez connectés tous les deux.') : t('Il a 24 h pour accepter.'); return; }
+      const b = e.target.closest('[data-f]'); if (!b || busy) return;
+      busy = true;
+      try { await spec.create(pace, b.dataset.f); sh.close(); if (pace === 'fast') ui.searching = null; toast('Défi envoyé ! La partie commence dès que ton ami accepte.', { kind: 'success', icon: 'user' }); }
+      catch (err2) { app.sfx.error(); toast(esc(errMsg(err2)), { kind: 'error' }); }
+      busy = false; lobby();
+    });
+  }
+
+  // Outils prêtés à l'écran de partie du jeu
+  const ctx = {
+    ui, cat, foeName, avatar, left, myTurn, resOf, msLeft,
+    get view() { return view; }, set view(v) { view = v; },
+    get busy() { return busy; },
+    draw, watch, refresh, act, lobby,
+    // barre de compte à rebours d'une partie rapide
+    clockHTML: (v) => (v.status === 'playing' && v.pace === 'fast' ? `<div class="mp-clock ${myTurn(v) ? 'mine' : ''}"><span class="mp-clock-bar"></span><span class="mp-clock-t">${myTurn(v) ? 'À toi' : `<span translate="no">${esc(foeName(v))}</span>`} · <b>${left(v)}</b></span></div>` : ''),
+    // encadré de fin de partie
+    endHTML: (v, detail = '') => { const r = resOf(v); return `<div class="panel mp-end ${r}"><h2 class="vs-title ${r}">${MP_RES[r]}</h2><p>${detail}${v.reason === 'timeout' ? (r === 'win' ? ' Ton adversaire n’a pas joué à temps.' : ' Tu n’as pas joué à temps.') : v.reason === 'resign' ? (r === 'win' ? ' Ton adversaire a abandonné.' : ' Tu as abandonné.') : ''}</p><button class="btn primary block" data-mp="back">Revenir aux parties</button></div>`; },
+    // message sous la partie quand ce n'est pas ton tour
+    waitMsg: (v) => (v.pace === 'fast' ? t('Au tour de <b>{name}</b>…', { name: esc(foeName(v)) }) : t('Au tour de <b>{name}</b> (il lui reste {time}). Tu peux fermer le jeu : la partie t’attendra.', { name: esc(foeName(v)), time: left(v) })),
+  };
+
+  root.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-mp]');
+    if (!b || b.disabled) return;
+    const k = b.dataset.mp;
+    if (k === 'open') return open(b.dataset.id);
+    if (k === 'back') { stopPoll(); return lobby(); }
+    if (k === 'quick') return quick(b.dataset.pace || 'slow');
+    if (k === 'friend') return friend();
+    if (k === 'join') { busy = true; try { await spec.join(b.dataset.id); busy = false; return open(b.dataset.id); } catch (err2) { busy = false; toast(esc(errMsg(err2)), { kind: 'error' }); return lobby(); } }
+    if (k === 'leave') {
+      if (!(await confirmBox('Annuler cette partie ?', { ok: 'Oui', cancel: 'Non' }))) return;
+      try { await cloud.mpLeave(b.dataset.id); } catch (err2) { toast(esc(errMsg(err2)), { kind: 'error' }); }
+      return lobby();
+    }
+    if (k === 'resign') {
+      if (!(await confirmBox('Abandonner la partie ? Elle sera comptée comme une défaite.', { ok: 'Abandonner', cancel: 'Continuer', danger: true }))) return;
+      try { await cloud.mpLeave(ui.open); } catch (err2) { toast(esc(errMsg(err2)), { kind: 'error' }); }
+      return refresh();
+    }
+    spec.click?.(k, b, ctx);
+  });
+
+  return {
+    show() { alive = true; return ui.open ? open(ui.open) : lobby(); },
+    stop() { alive = false; stopPoll(); },
+  };
+}

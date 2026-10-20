@@ -6,24 +6,37 @@ import { esc, fmt, toast, confirmBox, openSheet } from '../ui/dom.js';
 import { setScene } from '../ui/scene.js';
 import { tuto } from '../ui/tutos.js';
 import { CHESTS } from '../core/descent.js';
+import { MP_HOURS, MP_FAST_SECS, MP_REWARD } from '../core/mp.js';
+import { t, tw } from '../i18n.js';
+import { createPacteMp } from './pacte-mp.js';
 
 const CHEST_NAME = Object.fromEntries(Object.entries(CHESTS).map(([k, c]) => [k, c.name]));
 const stars = (n) => `${'★'.repeat(n)}${'☆'.repeat(Math.max(0, 5 - n))}`;
 const pic = (key) => `<img alt="" src="assets/sceaux/rival-${key}.webp">`;
-const SP = { sceau: { name: 'Sceau', img: 'assets/jeux/pa-sceau.webp', desc: 'Il te protège : la prochaine faction en double est jetée au lieu de briser le pacte.' },
+export const SP = { sceau: { name: 'Sceau', img: 'assets/jeux/pa-sceau.webp', desc: 'Il te protège : la prochaine faction en double est jetée au lieu de briser le pacte.' },
   gardien: { name: 'Gardien', img: 'assets/jeux/pa-gardien.webp', desc: 'Arrêt forcé : tu encaisses tout de suite ce que tu as devant toi.' },
   offrande: { name: 'Offrande', img: 'assets/jeux/pa-offrande.webp', desc: 'La prochaine carte de faction compte double.' } };
 // v464 : les sept sceaux de cire du parchemin (assets/jeux/pa-table2.webp, 450 × 330), position en % et faction de chacun
-const SEALS = [['infernal', 47, 170], ['artificiel', 100, 207], ['celeste', 160, 233], ['necrotique', 225, 245], ['sauvage', 292, 235], ['abyssal', 353, 207], ['primordial', 405, 170]];
+export const SEALS = [['infernal', 47, 170], ['artificiel', 100, 207], ['celeste', 160, 233], ['necrotique', 225, 245], ['sauvage', 292, 235], ['abyssal', 353, 207], ['primordial', 405, 170]];
 const HOW = [['cards', '#7FA8D8', 'Ton tour', 'Tire des cartes une à une et pose-les devant toi. Chaque carte de faction vaut de 1 à 7 points.'],
   ['crystal', '#E8C35A', 'T’arrêter', 'Quand tu veux, arrête-toi : tu gagnes la somme des cartes posées ce tour-ci.'],
   ['danger', '#E0485E', 'Le pacte se brise', 'Si tu tires une faction que tu as déjà posée ce tour-ci, le pacte se brise : tu perds tout ce que tu avais gagné ce tour-ci.'],
   ['crown', '#F2C14E', 'La victoire', `Le premier à ${PA.TARGET} points gagne (certaines salles changent ce but). Ton adversaire joue toujours autant de tours que toi.`],
   ['seal', '#9FE0FF', 'Les cartes spéciales', 'Sceau : il protège d’une brisure. Gardien : arrêt forcé, tu encaisses tout de suite. Offrande : la prochaine carte compte double.'],
   ['book', '#7FE0A0', 'Les sept factions', `Pose les 7 factions dans le même tour : +${PA.SEVEN_BONUS} points, et ton tour s’arrête.`],
-  ['eye', '#C9A45A', 'Le risque', 'Le jeu t’affiche la chance que la prochaine carte brise ton pacte : elle compte les cartes déjà sorties.']];
+  ['eye', '#C9A45A', 'Le risque', 'Le jeu t’affiche la chance que la prochaine carte brise ton pacte : elle compte les cartes déjà sorties.'],
+  ['amis', '#9FE0FF', 'Contre un joueur', `En haut, « Contre un joueur » : affronte d’autres joueurs (au hasard ou un ami), premier à ${PA.TARGET} points. Partie rapide : ${MP_FAST_SECS} s par action, les deux joueurs connectés. Partie lente : ${MP_HOURS} h par action, chacun à son rythme. Action pas jouée à temps : partie perdue. Victoire : +${MP_REWARD.win} éclats et le classement du mois.`]];
 const howLi = ([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic === 'eye' ? 'ui-eye' : ic === 'crystal' ? 'cur-shard' : ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`;
-const howHTML = () => `<ol class="how-steps">${HOW.map(howLi).join('')}</ol>`; /* v491 : tutoriel entier, sans « Pour aller plus loin » */
+// v523 : textes des annonces (brisure, Sceau, Gardien, sept factions, arrêt), traduisibles ; commun au jeu en ligne
+export function sayText(ev, { mine, nm, fn, seven }) {
+  const f = tw(fn), n = ev.result === 'bust' ? ev.lost : ev.gain;
+  return ev.result === 'bust' ? [mine ? 'ko' : 'ok', t('Le pacte se brise !'), mine ? t(n > 1 ? '{f} en double : tu perds {n} points.' : '{f} en double : tu perds {n} point.', { f, n }) : t('{f} en double : {name} perd {n} points.', { f, name: nm, n })]
+    : ev.result === 'saved' ? ['', t('Le Sceau protège !'), t('{f} en double, jeté sans briser le pacte.', { f })]
+    : ev.result === 'forced' ? ['', t('Le Gardien arrête le tour'), mine ? t('Tu encaisses +{n}.', { n }) : t('{name} encaisse +{n}.', { name: nm, n })]
+    : ev.result === 'seven' ? [mine ? 'ok' : 'ko', t('Les sept factions !'), mine ? t('+{b} de bonus : tu encaisses +{n}.', { b: seven, n }) : t('+{b} de bonus : {name} encaisse +{n}.', { b: seven, name: nm, n })]
+    : ev.result === 'stop' ? ['', mine ? t('Tu t’arrêtes') : t('{name} s’arrête', { name: nm }), t(n > 1 ? '+{n} points.' : '+{n} point.', { n })] : null;
+}
+export const howHTML = () => `<ol class="how-steps">${HOW.map(howLi).join('')}</ol>`; /* v491 : tutoriel entier, sans « Pour aller plus loin » */
 
 export default function pacteScreen(app, root) {
   const g = app.game, cat = app.catalog;
@@ -32,6 +45,11 @@ export default function pacteScreen(app, root) {
   const fname = (f) => cat.faction[f]?.name || f;
   const todayKey = () => { const d = g.clock(), p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; };
   const me = () => { const c = g.s.avatar && cat.get(g.s.avatar); return `<img alt="" src="${c ? artUrl(c, { lite: true }) : 'assets/brand/emblem.webp'}">`; };
+  // v523 : « Contre l'Abysse » (arbitres) ou « Contre un joueur » (parties en ligne, pacte-mp.js)
+  const ui = (app.state.pacte ||= { mode: 'solo' });
+  const modeBar = (rec = '') => `<header class="screen-head ui-hero bn-pacte"><h1>Le Pacte</h1><p class="muted">${ui.mode === 'mp' ? 'Affronte d’autres joueurs : premier à 60 points.' : 'Tire, encore une… et ne brise pas le pacte.'}</p>${rec}</header>
+    <div class="seg wide gm-mode" role="tablist"><button class="seg-b" role="tab" data-pa="mode" data-v="solo" aria-selected="${ui.mode !== 'mp'}" aria-pressed="${ui.mode !== 'mp'}">Contre l’Abysse</button><button class="seg-b" role="tab" data-pa="mode" data-v="mp" aria-selected="${ui.mode === 'mp'}" aria-pressed="${ui.mode === 'mp'}">Contre un joueur</button></div>`;
+  const mp = createPacteMp(app, root, { modeBar: () => modeBar() });
 
   // ——— Accueil ———
   function lobby() {
@@ -43,6 +61,8 @@ export default function pacteScreen(app, root) {
         <section class="panel tr-lock">${icon('lock')}<b>Encore scellé</b><p class="small">Vaincs ton <b>premier gardien</b> dans la Descente (étage 5) pour ouvrir la Salle des jeux.</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`;
       return;
     }
+    if (ui.mode === 'mp') return mp.show();
+    mp.stop();
     const pa = g.s.pacte, dailyDone = pa.dailyDone === todayKey(), d = g.pacteDaily(), DT = PA.TABLE[d.table];
     const tables = PA.TABLES.map((t, i) => {
       const open = PA.tableUnlocked(g.s, i), won = pa.beaten[t.key], R = PA.RIVALS[t.rival];
@@ -53,8 +73,7 @@ export default function pacteScreen(app, root) {
         ${won ? `<span class="sc-won">${icon('check')}</span>` : open ? icon('next') : icon('p:mysteries')}</button>`];
     });
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
-    root.innerHTML = `<header class="screen-head ui-hero bn-pacte"><h1>Le Pacte</h1><p class="muted">Tire, encore une… et ne brise pas le pacte.</p>
-        <span class="sc-rec">${pa.wins} victoire${pa.wins > 1 ? 's' : ''} · ${pa.losses} défaite${pa.losses > 1 ? 's' : ''}</span></header>
+    root.innerHTML = `${modeBar(`<span class="sc-rec">${pa.wins} victoire${pa.wins > 1 ? 's' : ''} · ${pa.losses} défaite${pa.losses > 1 ? 's' : ''}</span>`)}
       ${g.pacteDailyOpen() ? `<button class="panel sc-daily ${dailyDone ? 'done' : ''}" data-pa="daily" ${dailyDone ? 'disabled' : ''}>
         <img alt="" src="assets/icons/hourglass.webp"><span><b>Défi du jour</b><span class="small">${esc(DT.name)} · le même paquet pour tous</span>
         <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : `Victoire : +${PA.PACTE_REWARD.daily} éclats et un coffre de bois`}</span></span>${dailyDone ? icon('check') : icon('next')}</button>` : ''}
@@ -123,13 +142,9 @@ export default function pacteScreen(app, root) {
   }
   // Annonce d'un événement (brisure, protection, arrêt…)
   async function say(st, ev, ms = 1500) {
-    const R = PA.RIVALS[st.rival], mine = ev.who === 'p', nm = mine ? 'Tu' : esc(R.name);
+    const R = PA.RIVALS[st.rival], mine = ev.who === 'p', nm = mine ? 'Tu' : esc(tw(R.name));
     const fn = ev.card?.f ? fname(ev.card.f) : '';
-    const H = ev.result === 'bust' ? [mine ? 'ko' : 'ok', 'Le pacte se brise !', `${fn} en double : ${mine ? 'tu perds' : `${nm} perd`} ${ev.lost} point${ev.lost > 1 ? 's' : ''}.`]
-      : ev.result === 'saved' ? ['', 'Le Sceau protège !', `${fn} en double, jeté sans briser le pacte.`]
-      : ev.result === 'forced' ? ['', 'Le Gardien arrête le tour', `${mine ? 'Tu encaisses' : `${nm} encaisse`} +${ev.gain}.`]
-      : ev.result === 'seven' ? [mine ? 'ok' : 'ko', 'Les sept factions !', `+${PA.sevenOf(st)} de bonus : ${mine ? 'tu encaisses' : `${nm} encaisse`} +${ev.gain}.`]
-      : ev.result === 'stop' ? ['', mine ? 'Tu t’arrêtes' : `${nm} s’arrête`, `+${ev.gain} point${ev.gain > 1 ? 's' : ''}.`] : null;
+    const H = sayText(ev, { mine, nm, fn, seven: PA.sevenOf(st) });
     if (!H) return;
     /* v457 : sons propres au Pacte (ElevenLabs) */
     app.sfx[{ bust: 'pa-bust', saved: 'pa-seal', forced: 'pa-guard', seven: 'pa-seven', stop: 'pa-bank' }[ev.result]]?.();
@@ -228,6 +243,7 @@ export default function pacteScreen(app, root) {
     const b = e.target.closest('[data-pa]');
     if (!b || b.disabled) return;
     const k = b.dataset.pa;
+    if (k === 'mode') { ui.mode = b.dataset.v; app.sfx.tap(); return lobby(); }
     if (k === 'play') return start({ table: b.dataset.t });
     if (k === 'daily') return start({ daily: true });
     if (k === 'rules') return rules();
@@ -261,5 +277,5 @@ export default function pacteScreen(app, root) {
   const cur = g.s.pacte.cur;
   if (cur && !cur.rewarded) { view(); if (cur.over) end(); else if (cur.turn === 'a') aiTurn(); }
   else { if (cur) g.pacteQuit(); lobby(); }
-  return () => { gone = true; clearTimeout(timer); document.body.classList.remove('battle-mode', 'sc-lost'); ['.sc-end', '.sc-scene'].forEach((q) => document.querySelector(q)?.remove()); };
+  return () => { gone = true; mp.stop(); clearTimeout(timer); document.body.classList.remove('battle-mode', 'sc-lost'); ['.sc-end', '.sc-scene'].forEach((q) => document.querySelector(q)?.remove()); };
 }

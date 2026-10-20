@@ -37,7 +37,7 @@ function frError(status, body) {
   if (m.includes('otp_expired') || m.includes('expired') || m.includes('invalid or has expired')) return 'Ce lien a expiré : demande-en un nouveau.';
   if (m.includes('duplicate') || m.includes('profiles_pseudo_key') || status === 409) return 'Ce pseudo est déjà pris.';
   if (m.includes('check constraint') || m.includes('violates check')) return 'Pseudo invalide : 3 à 16 lettres, chiffres, espaces, - ou _.';
-  if (m.includes('mp_') || m.includes('sceaux_mp')) return 'Les parties contre d’autres joueurs ne sont pas encore ouvertes sur le serveur.'; /* v519 : supabase/09-multijoueur.sql pas encore collé */
+  if (m.includes('mp_') || m.includes('sceaux_mp') || m.includes('pacte_mp')) return 'Les parties contre d’autres joueurs ne sont pas encore ouvertes sur le serveur.'; /* v519 : supabase/09-multijoueur.sql pas encore collé */
   if (m.includes('versus_')) return 'Le Pari des Boosters n’est pas encore ouvert sur le serveur.'; /* v512 : supabase/08-versus.sql pas encore collé */
   if (m.includes('friend_') || m.includes('player_cards')) return 'Les amis ne sont pas encore ouverts sur le serveur.';
   if (status === 401 || status === 403) return 'Session expirée : reconnecte-toi.';
@@ -204,6 +204,10 @@ export const mpRanking = async (game, limit = 30) => (await rpc('mp_ranking', { 
 export const sceauxMpNew = (hand, to = null, pace = 'slow') => rpc('sceaux_mp_new', { p_hand: hand, p_to: to, p_pace: pace });
 export const sceauxMpJoin = (id, hand) => rpc('sceaux_mp_join', { p_id: id, p_hand: hand });
 export const sceauxMpPlay = (id, idx, cell) => rpc('sceaux_mp_play', { p_id: id, p_idx: idx, p_cell: cell });
+// v523 : le Pacte en ligne (action : 'draw' tirer une carte, 'stop' s'arrêter)
+export const pacteMpNew = (to = null, pace = 'slow') => rpc('pacte_mp_new', { p_to: to, p_pace: pace });
+export const pacteMpJoin = (id) => rpc('pacte_mp_join', { p_id: id });
+export const pacteMpAct = (id, action) => rpc('pacte_mp_act', { p_id: id, p_action: action });
 
 // Signaler le pseudo d'un autre joueur : renvoie 'ok', ou 'masqué' si le pseudo vient d'être masqué.
 export async function reportPseudo(target, reason) {

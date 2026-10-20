@@ -1,4 +1,4 @@
--- ABYSSAL · étape 9 : mini-jeux contre d'autres joueurs (Duels des Sceaux en ligne).
+-- ABYSSAL · étape 9 : mini-jeux contre d'autres joueurs (Duels des Sceaux et Pacte en ligne).
 -- À coller dans Supabase : SQL Editor → New query → Run. Peut être relancé sans risque.
 -- Fichier généré par `node tools/mp-sql.mjs` (valeurs des cartes lues dans le jeu) : à relancer quand des cartes
 -- sont ajoutées, puis recoller le fichier dans Supabase.
@@ -42,6 +42,9 @@ create index if not exists mp_matches_a on public.mp_matches (a, updated_at desc
 create index if not exists mp_matches_b on public.mp_matches (b, updated_at desc);
 alter table public.mp_matches enable row level security;
 revoke all on public.mp_matches from anon, authenticated;
+-- v523 : le Pacte se joue aussi en ligne
+alter table public.mp_matches drop constraint if exists mp_matches_game_check;
+alter table public.mp_matches add constraint mp_matches_game_check check (game in ('sceaux', 'pacte'));
 
 create or replace function public.mp_hours() returns int language sql immutable as $$ select --HEURES-- $$;
 -- v522 : deux vitesses. Lente : --HEURES-- h par coup ; rapide : --SECONDES-- s par coup (les deux joueurs connectés),
@@ -260,6 +263,180 @@ begin
   return public.mp_view(p_id);
 end $$;
 
+-- ——— Le Pacte en ligne (même moteur que js/core/pacte.js) ————————————————————————————
+-- Paquet : 7 factions × valeurs 1 à 7, 3 Sceaux, 3 Gardiens, 3 Offrandes, mélangé par le serveur.
+-- Le paquet reste caché : la vue d'une partie le renvoie trié (on peut compter les cartes restantes, pas leur ordre).
+create or replace function public.pacte_deck() returns jsonb language sql volatile as $$
+  select jsonb_agg(x order by random()) from (
+    select jsonb_build_object('f', f, 'v', v) as x from unnest(array['infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel']) f, generate_series(1, 7) v
+    union all select jsonb_build_object('sp', k) from unnest(array['sceau', 'gardien', 'offrande']) k, generate_series(1, 3)
+  ) d
+$$;
+revoke execute on function public.pacte_deck() from public, anon, authenticated;
+create or replace function public.pacte_row_value(r jsonb) returns int language sql immutable as $$
+  select coalesce(sum((x ->> 'v')::int * case when (x ->> 'x2')::boolean then 2 else 1 end), 0)::int from jsonb_array_elements(r) x where x ? 'f'
+$$;
+
+-- Applique une action ('draw' ou 'stop') du joueur who ('a' ou 'b') ; renvoie le nouvel état (last = l'événement, over = fin)
+create or replace function public.pacte_apply(st jsonb, who text, act text)
+returns jsonb language plpgsql volatile set search_path = public as $$
+declare c jsonb; r jsonb; ev jsonb; res text := 'ok'; gain int := 0; lost int := 0; x2 boolean := false; ending boolean := false; bonus boolean := false;
+  fs text[]; i int; other text := case when who = 'a' then 'b' else 'a' end; sa int; sb int; tg int; n int;
+begin
+  if (st ->> 'over') is not null then raise exception 'Cette partie est terminée.'; end if;
+  if st ->> 'turn' <> who then raise exception 'Ce n’est pas ton tour.'; end if;
+  r := st -> 'row';
+  select coalesce(array_agg(x ->> 'f'), '{}') into fs from jsonb_array_elements(r) x where x ? 'f';
+  if act = 'stop' then
+    if coalesce(array_length(fs, 1), 0) = 0 then raise exception 'Tire au moins une carte de faction avant de t’arrêter.'; end if;
+    res := 'stop'; ending := true;
+  elsif act = 'draw' then
+    if jsonb_array_length(st -> 'deck') = 0 then
+      -- paquet vide : la défausse est mélangée
+      st := jsonb_set(jsonb_set(st, '{deck}', coalesce((select jsonb_agg(x order by random()) from jsonb_array_elements(st -> 'discard') x), '[]')), '{discard}', '[]');
+      st := jsonb_set(st, '{shuf}', to_jsonb(coalesce((st ->> 'shuf')::int, 0) + 1));
+    end if;
+    c := st -> 'deck' -> -1;
+    st := jsonb_set(st, '{deck}', (st -> 'deck') - (-1));
+    if c ->> 'sp' = 'sceau' then
+      st := jsonb_set(st, '{sceaux}', to_jsonb((st ->> 'sceaux')::int + 1)); r := r || jsonb_build_array(c);
+    elsif c ->> 'sp' = 'offrande' then
+      st := jsonb_set(st, '{offer}', 'true'); r := r || jsonb_build_array(c);
+    elsif c ->> 'sp' = 'gardien' then
+      r := r || jsonb_build_array(c); res := 'forced'; ending := true;
+    elsif (c ->> 'f') = any(fs) then
+      if (st ->> 'sceaux')::int > 0 then
+        res := 'saved';
+        st := jsonb_set(st, '{sceaux}', to_jsonb((st ->> 'sceaux')::int - 1));
+        select min(o) - 1 into i from jsonb_array_elements(r) with ordinality e(x, o) where x ->> 'sp' = 'sceau';
+        if i is not null then st := jsonb_set(st, '{discard}', (st -> 'discard') || jsonb_build_array(r -> i)); r := r - i; end if;
+        st := jsonb_set(st, '{discard}', (st -> 'discard') || jsonb_build_array(c));
+        st := jsonb_set(st, '{offer}', 'false');
+      else
+        lost := public.pacte_row_value(r);
+        r := r || jsonb_build_array(c); res := 'bust'; ending := true;
+        st := jsonb_set(st, array['stats', 'busts', who], to_jsonb((st #>> array['stats', 'busts', who])::int + 1));
+      end if;
+    else
+      x2 := (st ->> 'offer')::boolean;
+      st := jsonb_set(st, '{offer}', 'false');
+      r := r || jsonb_build_array(case when x2 then c || '{"x2": true}' else c end);
+      if coalesce(array_length(fs, 1), 0) + 1 = 7 then res := 'seven'; ending := true; bonus := true; end if;
+    end if;
+  else
+    raise exception 'Action inconnue.';
+  end if;
+  st := jsonb_set(st, '{row}', r);
+  -- encaisser (arrêt, Gardien, sept factions)
+  if res in ('stop', 'forced', 'seven') then
+    gain := public.pacte_row_value(r) + case when bonus then (st ->> 'seven')::int else 0 end;
+    st := jsonb_set(st, array['scores', who], to_jsonb((st #>> array['scores', who])::int + gain));
+    st := jsonb_set(st, array['stats', 'best', who], to_jsonb(greatest((st #>> array['stats', 'best', who])::int, gain)));
+    if bonus then st := jsonb_set(st, array['stats', 'sevens', who], to_jsonb((st #>> array['stats', 'sevens', who])::int + 1)); end if;
+  end if;
+  n := coalesce((st ->> 'n')::int, 0) + 1;
+  ev := jsonb_build_object('n', n, 'who', who, 'result', res, 'gain', gain);
+  if c is not null then ev := ev || jsonb_build_object('card', c); end if;
+  if x2 then ev := ev || '{"x2": true}'; end if;
+  if res = 'bust' then ev := ev || jsonb_build_object('lost', lost); end if;
+  st := st || jsonb_build_object('n', n, 'last', ev);
+  st := jsonb_set(st, '{log}', (select coalesce(jsonb_agg(x order by o), '[]') from (select x, o from jsonb_array_elements(coalesce(st -> 'log', '[]') || jsonb_build_array(ev)) with ordinality e(x, o) order by o desc limit 16) z));
+  -- fin du tour : la rangée part à la défausse, et le tour complet se termine quand le second joueur a joué
+  if ending then
+    st := jsonb_set(st, '{discard}', (st -> 'discard') || coalesce((select jsonb_agg(x - 'x2' order by o) from jsonb_array_elements(r) with ordinality e(x, o)), '[]'));
+    st := st || jsonb_build_object('row', '[]'::jsonb, 'sceaux', 0, 'offer', false);
+    st := jsonb_set(st, array['turns', who], to_jsonb((st #>> array['turns', who])::int + 1));
+    if who <> st ->> 'first' then
+      sa := (st #>> '{scores,a}')::int; sb := (st #>> '{scores,b}')::int; tg := (st ->> 'target')::int;
+      if (sa >= tg or sb >= tg) and sa <> sb then
+        return st || jsonb_build_object('over', true, 'winner', case when sa > sb then 'a' else 'b' end, 'final', jsonb_build_object('a', sa, 'b', sb), 'turn', null);
+      end if;
+      st := jsonb_set(st, '{round}', to_jsonb((st ->> 'round')::int + 1));
+    end if;
+    st := jsonb_set(st, '{turn}', to_jsonb(other));
+  end if;
+  return st;
+end $$;
+revoke execute on function public.pacte_apply(jsonb, text, text) from public, anon, authenticated;
+
+create or replace function public.pacte_start(p_id uuid)
+returns void language plpgsql volatile security definer set search_path = public as $$
+declare d public.mp_matches; first text := case when random() < 0.5 then 'a' else 'b' end;
+begin
+  select * into d from public.mp_matches where id = p_id for update;
+  update public.mp_matches set status = 'playing', turn = first, deadline = now() + public.mp_delay(d.pace, true), updated_at = now(),
+    state = jsonb_build_object('deck', public.pacte_deck(), 'discard', '[]'::jsonb, 'shuf', 0, 'scores', jsonb_build_object('a', 0, 'b', 0),
+      'row', '[]'::jsonb, 'sceaux', 0, 'offer', false, 'turns', jsonb_build_object('a', 0, 'b', 0), 'first', first, 'turn', first, 'round', 1,
+      'target', 60, 'seven', 15, 'n', 0, 'log', '[]'::jsonb,
+      'stats', jsonb_build_object('busts', jsonb_build_object('a', 0, 'b', 0), 'best', jsonb_build_object('a', 0, 'b', 0), 'sevens', jsonb_build_object('a', 0, 'b', 0)))
+  where id = p_id;
+end $$;
+revoke execute on function public.pacte_start(uuid) from public, anon, authenticated;
+
+-- Partie rapide (contre un joueur au hasard de la même vitesse) ou défi à un ami
+create or replace function public.pacte_mp_new(p_to uuid default null, p_pace text default 'slow')
+returns uuid language plpgsql volatile security definer set search_path = public as $$
+declare me uuid := auth.uid(); m public.mp_matches; id uuid; n int;
+begin
+  if me is null then raise exception 'Connecte-toi d’abord.'; end if;
+  if not exists (select 1 from public.profiles where profiles.id = me) then raise exception 'Choisis d’abord ton pseudo (Sanctuaire → Compte).'; end if;
+  if p_pace is null or p_pace not in ('fast', 'slow') then raise exception 'Vitesse inconnue.'; end if;
+  perform public.mp_expire();
+  select count(*) into n from public.mp_matches where me in (a, b) and status in ('waiting', 'playing');
+  if n >= 10 then raise exception 'Tu as déjà 10 parties en cours : termine-en une d’abord.'; end if;
+  if p_to is null then
+    select * into m from public.mp_matches where game = 'pacte' and status = 'waiting' and public and b is null and a <> me and pace = p_pace
+      order by created_at limit 1 for update skip locked;
+    if found then
+      update public.mp_matches set b = me where mp_matches.id = m.id;
+      perform public.pacte_start(m.id);
+      return m.id;
+    end if;
+    if exists (select 1 from public.mp_matches where game = 'pacte' and status = 'waiting' and public and a = me and pace = p_pace) then
+      raise exception 'Tu cherches déjà un adversaire : ta partie commencera dès qu’un joueur arrive.';
+    end if;
+  else
+    if p_to = me then raise exception 'Tu ne peux pas te défier toi-même.'; end if;
+    if not public.are_friends(me, p_to) then raise exception 'Ce joueur n’est pas ton ami.'; end if;
+  end if;
+  insert into public.mp_matches (game, a, b, public, pace, state) values ('pacte', me, p_to, p_to is null, p_pace, '{}'::jsonb)
+  returning mp_matches.id into id;
+  return id;
+end $$;
+
+create or replace function public.pacte_mp_join(p_id uuid)
+returns uuid language plpgsql volatile security definer set search_path = public as $$
+declare me uuid := auth.uid(); m public.mp_matches;
+begin
+  if me is null then raise exception 'Connecte-toi d’abord.'; end if;
+  perform public.mp_expire();
+  select * into m from public.mp_matches where id = p_id and game = 'pacte' for update;
+  if not found or m.status <> 'waiting' or m.b is distinct from me or m.public then raise exception 'Cette partie n’est plus disponible.'; end if;
+  perform public.pacte_start(p_id);
+  return p_id;
+end $$;
+
+-- Tirer une carte ('draw') ou s'arrêter ('stop')
+create or replace function public.pacte_mp_act(p_id uuid, p_action text)
+returns jsonb language plpgsql volatile security definer set search_path = public as $$
+declare me uuid := auth.uid(); m public.mp_matches; who text; st jsonb;
+begin
+  if me is null then raise exception 'Connecte-toi d’abord.'; end if;
+  perform public.mp_expire();
+  select * into m from public.mp_matches where id = p_id and game = 'pacte' and me in (a, b) for update;
+  if not found then raise exception 'Partie introuvable.'; end if;
+  if m.status <> 'playing' then raise exception 'Cette partie est terminée.'; end if;
+  who := case when m.a = me then 'a' else 'b' end;
+  if m.turn <> who then raise exception 'Ce n’est pas ton tour.'; end if;
+  st := public.pacte_apply(m.state, who, p_action);
+  if (st ->> 'over')::boolean then
+    update public.mp_matches set state = st, status = 'done', winner = st ->> 'winner', reason = 'score', turn = null, deadline = null, updated_at = now() where id = p_id;
+  else
+    update public.mp_matches set state = st, turn = st ->> 'turn', deadline = now() + public.mp_delay(m.pace), updated_at = now() where id = p_id;
+  end if;
+  return public.mp_view(p_id);
+end $$;
+
 -- Abandonner (partie en cours), annuler (en attente) ou refuser un défi d'ami
 create or replace function public.mp_leave(p_id uuid)
 returns text language plpgsql volatile security definer set search_path = public as $$
@@ -280,7 +457,7 @@ end $$;
 create or replace function public.mp_view(p_id uuid)
 returns jsonb language sql stable security definer set search_path = public as $$
   select jsonb_build_object('id', m.id, 'game', m.game, 'status', m.status, 'public', m.public, 'turn', m.turn, 'deadline', m.deadline,
-    'me', case when m.a = auth.uid() then 'a' else 'b' end, 'state', m.state - 'handA', 'winner', m.winner, 'reason', m.reason,
+    'me', case when m.a = auth.uid() then 'a' else 'b' end, 'state', case when m.game = 'pacte' and m.state ? 'deck' then jsonb_set(m.state, '{deck}', coalesce((select jsonb_agg(x order by x::text) from jsonb_array_elements(m.state -> 'deck') x), '[]')) else m.state - 'handA' end, 'winner', m.winner, 'reason', m.reason,
     'claimed', case when m.a = auth.uid() then m.a_claimed else m.b_claimed end, 'created_at', m.created_at, 'updated_at', m.updated_at,
     'now', now(), 'hours', public.mp_hours(), 'pace', m.pace,
     'foe', (select jsonb_build_object('id', p.id, 'pseudo', p.pseudo, 'avatar', p.avatar, 'badge', p.badge) from public.profiles p where p.id = case when m.a = auth.uid() then m.b else m.a end))
@@ -352,6 +529,12 @@ grant execute on function public.sceaux_mp_new(text[], uuid, text) to authentica
 grant execute on function public.sceaux_mp_join(uuid, text[]) to authenticated;
 grant execute on function public.sceaux_mp_play(uuid, int, int) to authenticated;
 grant execute on function public.mp_leave(uuid) to authenticated;
+revoke execute on function public.pacte_mp_new(uuid, text) from public, anon;
+revoke execute on function public.pacte_mp_join(uuid) from public, anon;
+revoke execute on function public.pacte_mp_act(uuid, text) from public, anon;
+grant execute on function public.pacte_mp_new(uuid, text) to authenticated;
+grant execute on function public.pacte_mp_join(uuid) to authenticated;
+grant execute on function public.pacte_mp_act(uuid, text) to authenticated;
 grant execute on function public.mp_get(uuid) to authenticated;
 grant execute on function public.mp_list(text) to authenticated;
 grant execute on function public.mp_claim(uuid) to authenticated;

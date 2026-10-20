@@ -10,6 +10,15 @@ import { syncReminders } from '../notify.js';
 
 export const mpw = { turns: 0, games: 0, friends: 0, items: [] };
 const SEEN = 'abyssal.mpSeen';
+// Jeux en ligne surveillés : textes des annonces, page du jeu, clé qui change à chaque tour
+const GAMES = [
+  { game: 'sceaux', route: 'sceaux', key: (v) => v.state?.placed, started: (v) => v.state?.placed,
+    turn: 'À toi de jouer aux Duels des Sceaux contre {name} !', go: 'Ta partie des Duels des Sceaux contre {name} a commencé !', inv: '{name} te défie aux Duels des Sceaux !',
+    turn1: 'À toi de jouer aux Duels des Sceaux', turnsN: 'À toi de jouer dans {n} parties des Sceaux', inv1: 'Un défi reçu aux Duels des Sceaux', invN: '{n} défis reçus aux Duels des Sceaux' },
+  { game: 'pacte', route: 'pacte', key: (v) => (v.state?.turns?.a || 0) + (v.state?.turns?.b || 0), started: (v) => v.state?.n,
+    turn: 'À toi de jouer au Pacte contre {name} !', go: 'Ta partie du Pacte contre {name} a commencé !', inv: '{name} te défie au Pacte !',
+    turn1: 'À toi de jouer au Pacte', turnsN: 'À toi de jouer dans {n} parties du Pacte', inv1: 'Un défi reçu au Pacte', invN: '{n} défis reçus au Pacte' },
+];
 let last = 0, busy = false;
 
 export async function checkTurns(app, { force = false } = {}) {
@@ -22,18 +31,23 @@ export async function checkTurns(app, { force = false } = {}) {
   const say = (key, msg, icon = 'hourglass', where = null) => { if (seen[key]) return; seen[key] = 1; if (app.route !== where) toast(msg, { icon, ms: 5500 }); };
   const who = (p) => `<b>${esc(p || t('un joueur'))}</b>`;
   let turns = [];
-  // Duels des Sceaux en ligne
-  try {
-    const L = await cloud.mpList('sceaux');
-    turns = L.filter((v) => v.status === 'playing' && v.turn === v.me);
-    for (const v of turns) say(`${v.id}:${v.state?.placed}`, t('À toi de jouer aux Duels des Sceaux contre {name} !', { name: who(v.foe?.pseudo) }), 'hourglass', 'sceaux');
-    for (const v of L.filter((x) => x.status === 'playing' && x.me === 'a' && !x.state?.placed)) say(`go:${v.id}`, t('Ta partie des Duels des Sceaux contre {name} a commencé !', { name: who(v.foe?.pseudo) }), 'user', 'sceaux');
-    const inv = L.filter((v) => v.status === 'waiting' && v.me === 'b');
-    for (const v of inv) say(`inv:${v.id}`, t('{name} te défie aux Duels des Sceaux !', { name: who(v.foe?.pseudo) }), 'user', 'sceaux');
-    if (turns.length) items.push({ href: '#/sceaux', icon: 'hourglass', title: t(turns.length > 1 ? 'À toi de jouer dans {n} parties des Sceaux' : 'À toi de jouer aux Duels des Sceaux', { n: turns.length }), sub: turns.map((v) => esc(v.foe?.pseudo || '')).join(', ') });
-    if (inv.length) items.push({ href: '#/sceaux', icon: 'seal', title: t(inv.length > 1 ? '{n} défis reçus aux Duels des Sceaux' : 'Un défi reçu aux Duels des Sceaux', { n: inv.length }), sub: inv.map((v) => esc(v.foe?.pseudo || '')).join(', ') });
-    mpw.turns = turns.length + inv.length;
-  } catch (e) { /* serveur sans les parties en ligne : rien */ }
+  // Duels des Sceaux et Pacte en ligne (v523 : le Pacte aussi)
+  let nTurns = 0;
+  for (const G of GAMES) {
+    try {
+      const L = await cloud.mpList(G.game);
+      const mine = L.filter((v) => v.status === 'playing' && v.turn === v.me);
+      turns.push(...mine);
+      for (const v of mine) say(`${v.id}:${G.key(v)}`, t(G.turn, { name: who(v.foe?.pseudo) }), 'hourglass', G.route);
+      for (const v of L.filter((x) => x.status === 'playing' && x.me === 'a' && !G.started(x))) say(`go:${v.id}`, t(G.go, { name: who(v.foe?.pseudo) }), 'user', G.route);
+      const inv = L.filter((v) => v.status === 'waiting' && v.me === 'b');
+      for (const v of inv) say(`inv:${v.id}`, t(G.inv, { name: who(v.foe?.pseudo) }), 'user', G.route);
+      if (mine.length) items.push({ href: `#/${G.route}`, icon: 'hourglass', title: t(mine.length > 1 ? G.turnsN : G.turn1, { n: mine.length }), sub: mine.map((v) => esc(v.foe?.pseudo || '')).join(', ') });
+      if (inv.length) items.push({ href: `#/${G.route}`, icon: 'seal', title: t(inv.length > 1 ? G.invN : G.inv1, { n: inv.length }), sub: inv.map((v) => esc(v.foe?.pseudo || '')).join(', ') });
+      nTurns += mine.length + inv.length;
+    } catch (e) { /* serveur sans les parties en ligne : rien */ }
+  }
+  mpw.turns = nTurns;
   // Pari des Boosters
   try {
     const d = await cloud.versusList();
