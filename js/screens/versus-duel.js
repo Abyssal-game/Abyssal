@@ -12,6 +12,7 @@ import { packHTML } from './shop.js';
 import { t } from '../i18n.js';
 
 const RES = { win: 'Victoire', tie: 'Égalité', lose: 'Défaite' };
+const EMB = { win: 'vd-win', lose: 'vd-lose', tie: 'vd-vs' }; /* v524 : emblèmes Gemini de fin (égalité : le médaillon, en attendant son image) */
 const RI = (r) => ['C', 'PC', 'R', 'HR', 'M', 'S'].indexOf(r);
 
 export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
@@ -27,19 +28,24 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
   const pic = (id) => { const c = id && cat.get(id); return c ? `<img alt="" src="${artUrl(c, { lite: true })}">` : EMBLEM; };
   const cardEl = (c, side, p, i) => { const k = cat.get(c.id); return `<span class="vd-c v-${c.variant} r-${c.rarity}" data-side="${side}" data-p="${p}" data-i="${i}" style="--rc:${RARITY[c.rarity]?.color || '#888'}">
       <span class="vd-in"><span class="vd-back"></span><span class="vd-face">${k ? `<img alt="" src="${artUrl(k, { lite: true })}">` : ''}<small>+${c.pts}</small></span></span></span>`; };
-  const rows = (packs, side) => packs.map((cs, p) => `<div class="vd-row" data-side="${side}" data-p="${p}">${cs.map((c, i) => cardEl(c, side, p, i)).join('')}</div>`).join('');
+  // v524 : chaque booster est posé dans un plateau de la table (assets/versus/vd-table.webp) ; le premier booster de
+  // chaque joueur dans le plateau le plus proche du centre, les suivants vers l'extérieur
+  const rows = (packs, side) => packs.map((cs, p) => `<div class="vd-row t${side === 'foe' ? 2 - p : 3 + p}" data-side="${side}" data-p="${p}">${cs.map((c, i) => cardEl(c, side, p, i)).join('')}</div>`).join('');
+  const plate = (side, name, av) => `<div class="vd-plate ${side}"><span class="vd-pav">${pic(av)}</span><b class="vd-pname">${name}</b><span class="vd-sc" data-sc="${side}">0</span></div>`;
   const el = document.createElement('div');
   el.className = `vd ${app.reduced() ? 'rm' : ''} n${lineup.length}`;
   el.setAttribute('role', 'dialog');
   el.setAttribute('aria-modal', 'true');
   el.setAttribute('aria-label', t('Le Pari des Boosters'));
-  el.innerHTML = `<div class="vd-bg"></div><div class="vd-veil"></div><div class="vd-embers"></div>
-    <header class="vd-top"><span class="vd-step"></span><button class="vd-skip" data-v="all">${icon('skip')}Tout révéler</button></header>
-    <section class="vd-side foe"><div class="vd-who"><span class="fr-av">${pic(r.avatar)}</span><b>${esc(foeName)}</b><span class="vd-sc" data-sc="foe">0</span></div><div class="vd-grid">${rows(foePacks, 'foe')}</div></section>
-    <div class="vd-mid"><div class="vd-pack foe"></div><span class="vd-vs">VS</span><div class="vd-pack me"></div></div>
-    <section class="vd-side me"><div class="vd-grid">${rows(myPacks, 'me')}</div><div class="vd-who"><span class="fr-av">${pic(myAvatar)}</span><b>${t('Toi')}</b><span class="vd-sc" data-sc="me">0</span></div></section>
-    <div class="vd-end" hidden></div>
-    <p class="vd-hint">${t('Touche l’écran pour accélérer')}</p>`;
+  el.innerHTML = `<div class="vd-board"><span class="vd-embers"></span>
+      ${plate('foe', esc(foeName), r.avatar)}
+      ${rows(foePacks, 'foe')}
+      <div class="vd-center"><span class="vd-step"></span><img class="vd-medal" alt="" src="assets/versus/vd-vs.webp"><button class="vd-skip" data-v="all">${icon('skip')}Tout révéler</button></div>
+      ${rows(myPacks, 'me')}
+      ${plate('me', t('Toi'), myAvatar)}
+    </div>
+    <div class="vd-mid"><div class="vd-pack foe"></div><span class="vd-vs"></span><div class="vd-pack me"></div></div>
+    <div class="vd-end" hidden></div>`;
   document.body.appendChild(el);
   document.body.classList.add('has-sheet');
   requestAnimationFrame(() => el.classList.add('on'));
@@ -49,7 +55,15 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
   const wait = (ms) => new Promise((ok) => setTimeout(ok, ms / speed));
   const q = (s) => el.querySelector(s);
   const setScore = (side) => { const n = q(`[data-sc="${side}"]`); n.textContent = fmt(sc[side]); n.classList.remove('bump'); void n.offsetWidth; n.classList.add('bump'); };
-  const lead = () => { q('.vd-side.me').classList.toggle('lead', sc.me > sc.foe); q('.vd-side.foe').classList.toggle('lead', sc.foe > sc.me); };
+  const lead = () => { q('.vd-plate.me').classList.toggle('lead', sc.me > sc.foe); q('.vd-plate.foe').classList.toggle('lead', sc.foe > sc.me); };
+  // v524 : éclat peint (assets/fx/vd-reveal.webp) quand une carte se retourne, plus grand pour une grosse carte
+  const burst = (n, k) => {
+    if (app.reduced()) return;
+    const b = el.getBoundingClientRect(), c = n.getBoundingClientRect(), w = c.width * k;
+    const f = document.createElement('span'); f.className = 'kx-sprite vd-fxb';
+    f.style.cssText = `left:${c.left - b.left + c.width / 2}px;top:${c.top - b.top + c.height / 2}px;width:${w}px;height:${w}px;--d:${Math.round((k > 2 ? 900 : 650) / speed)}ms;background-image:url(assets/fx/vd-reveal.webp)`;
+    el.appendChild(f); setTimeout(() => f.remove(), 1000);
+  };
 
   // un booster de chaque côté : apparition, tremblement, déchirure simultanée, cartes qui jaillissent
   async function tear(p) {
@@ -90,6 +104,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
     if (big && speed === 1) { n.classList.add('tease'); app.sfx.suspensebig?.(); await wait(900); n.classList.remove('tease'); }
     n.classList.add('on');
     if (big) { n.classList.add('big'); app.sfx.reveal?.(c.rarity); } else app.sfx.flip?.();
+    burst(n, big ? 3.2 : 1.7);
     sc[side] += c.pts;
     setScore(side); lead();
     await wait(big ? 900 : 560);
@@ -115,13 +130,13 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
     sc.me = scoreOf(mine); sc.foe = scoreOf(theirs);
     setScore('me'); setScore('foe'); lead();
     q('.vd-mid').classList.remove('show');
-    q('.vd-skip').hidden = true; q('.vd-hint').hidden = true; q('.vd-step').textContent = '';
+    q('.vd-skip').hidden = true; q('.vd-step').textContent = '';
     const nWon = out?.cards?.length || (res === 'win' ? mine.length + theirs.length : res === 'tie' ? mine.length : 0);
     const fresh = (out?.cards || []).filter((c) => c.isNewCard).length;
     el.classList.add('end', res);
     const end = q('.vd-end');
     end.hidden = false;
-    end.innerHTML = `<div class="vd-burst"></div><h2 class="vd-title ${res}">${t(RES[res])}</h2>
+    end.innerHTML = `<div class="vd-burst"></div><img class="vd-emb ${res}" alt="" src="assets/versus/${EMB[res]}.webp"><h2 class="vd-title ${res}">${t(RES[res])}</h2>
       <p class="vd-tally"><b>${fmt(sc.me)}</b> <span>${t('contre')}</span> <b>${fmt(sc.foe)}</b></p>
       <p>${res === 'win' ? t(fresh ? 'Tu remportes <b>les {n} cartes</b> du duel, dont <b>{f} nouvelles</b> !' : 'Tu remportes <b>les {n} cartes</b> du duel !', { n: nWon, f: fresh })
         : res === 'tie' ? t('Même total : tu gardes <b>les {n} cartes</b> de tes boosters.', { n: nWon }) : t('{name} remporte toutes les cartes.', { name: esc(foeName) })}</p>
