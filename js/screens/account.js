@@ -1,9 +1,9 @@
 // Compte : connexion, pseudo public, sauvegarde en ligne, déconnexion, suppression du compte.
 import * as cloud from '../cloud/cloud.js';
+import { defaultSave, migrate } from '../core/save.js';
 import { sync, onSync, afterLogin, pushNow, restoreFromCloud, setPseudo, refreshProfile, resumeSync } from '../cloud/sync.js';
 import { icon } from '../ui/icons.js';
 import { esc, toast, confirmBox, bindActions, openSheet } from '../ui/dom.js';
-import { isGuest } from '../ui/gate.js';
 import { blockedIds, clearBlocked, isMaskedPseudo } from '../core/moderation.js';
 
 // v321 : règle des mots de passe réglée dans Supabase (Authentication → Password requirements)
@@ -36,7 +36,7 @@ const ago = (t) => {
 };
 
 export default function account(app, root) {
-  let busy = false, lastEmail = '', mode = app.params?.[0] === 'motdepasse' ? 'newpass' : app.params?.[0] === 'inscription' ? 'signup' : isGuest() ? 'signup' : 'login'; /* v404 : un invité arrive sur « Créer un compte » */
+  let busy = false, lastEmail = '', mode = app.params?.[0] === 'motdepasse' ? 'newpass' : app.params?.[0] === 'inscription' ? 'signup' : 'login';
   function render() {
     const u = cloud.currentUser();
     // v318 : nouveau mot de passe après un lien de récupération (adresse #/compte/motdepasse), même connecté
@@ -146,7 +146,7 @@ export default function account(app, root) {
       <section class="panel stack">
         <button class="btn block" data-act="logout">Se déconnecter</button>
         <button class="btn danger small" data-act="delete">${icon('trash')}Supprimer mon compte</button>
-        <p class="small muted">La suppression efface ton profil, ta sauvegarde en ligne et tes scores. Ta partie reste sur cet appareil.</p>
+        <p class="small muted">La suppression efface ton profil, ta sauvegarde en ligne et tes scores, et la partie de cet appareil.</p>
       </section>`;
     root.querySelector('#pseudo')?.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -156,6 +156,15 @@ export default function account(app, root) {
       catch (err) { toast(esc(err.message), { kind: 'error', icon: 'info' }); }
     });
   }
+  // v515 : partie de l'appareil remise à neuf (réglages gardés) après une déconnexion ou une suppression du compte
+  function wipeLocal() {
+    const keep = { ...app.game.s.settings, dev: false, devCode: false };
+    const fresh = migrate(defaultSave());
+    fresh.settings = { ...fresh.settings, ...keep };
+    app.game.replaceSave(fresh);
+    app.applySettings?.();
+    app.refresh?.();
+  }
   bindActions(root, {
     unblock() { clearBlocked(); toast('Tous les joueurs sont de nouveau affichés.', { icon: 'user' }); render(); },
     async resume() { try { await resumeSync(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } render(); },
@@ -164,11 +173,19 @@ export default function account(app, root) {
       if (!(await confirmBox('Remplacer la partie de cet appareil par la partie en ligne ?', { ok: 'Remplacer' }))) return;
       try { await restoreFromCloud(); toast('Partie en ligne chargée.', { kind: 'success', icon: 'download' }); } catch (err) { toast(esc(err.message), { kind: 'error' }); }
     },
-    async logout() { await pushNow(); await cloud.signOut(); toast('Déconnecté. Ta partie reste sur cet appareil.', { icon: 'user' }); render(); },
+    async logout() {
+      /* v515 : la partie est liée au compte : elle part en ligne, puis quitte cet appareil (le suivant qui se connecte ne la récupère pas) */
+      await pushNow();
+      if (sync.status !== 'ok' && !(await confirmBox('Ta dernière progression n’a pas pu être envoyée sur ton compte (pas de réseau ?). Si tu te déconnectes maintenant, <b>elle sera perdue</b>.', { ok: 'Me déconnecter quand même', cancel: 'Rester connecté', danger: true }))) return;
+      await cloud.signOut();
+      wipeLocal();
+      toast('Déconnecté. Ta partie t’attend sur ton compte.', { icon: 'user' });
+      render();
+    },
     async delete() {
       if (!(await confirmBox('Supprimer définitivement ton compte, ton profil, ta sauvegarde en ligne et tes scores ?', { ok: 'Supprimer', danger: true }))) return;
       if (!(await confirmBox('Dernière confirmation : cette action est irréversible.', { ok: 'Oui, supprimer', danger: true }))) return;
-      try { await cloud.deleteAccount(); toast('Compte supprimé.', { icon: 'trash' }); } catch (err) { toast(esc(err.message), { kind: 'error' }); }
+      try { await cloud.deleteAccount(); wipeLocal(); toast('Compte supprimé.', { icon: 'trash' }); } catch (err) { toast(esc(err.message), { kind: 'error' }); }
       render();
     },
   });

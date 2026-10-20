@@ -98,7 +98,7 @@ UN MONDE À DÉCOUVRIR
 • Gratuit, sans publicité
 • Aucun achat : toutes les cartes se gagnent en jouant
 • Un booster gratuit chaque jour
-• Jouable hors ligne, avec ou sans compte
+• Partie sauvegardée en ligne sur ton compte, jouable aussi hors ligne
 • Ta collection sauvegardée en ligne avec ton compte, et les classements du monde entier
 
 Le Bestiaire interdit t'attend. Jusqu'où oseras-tu descendre ?
@@ -221,7 +221,7 @@ Résultat attendu : PEGI 12 en Europe (au pire PEGI 7). Public cible (Contenu de
 
 ## 7. Notes pour la vérification d'Apple (App Review Information → Notes)
 ```
-Au premier lancement, ABYSSAL propose de créer un compte (e-mail et mot de passe) ou de « Jouer sans compte ». Vous pouvez utiliser le compte de démonstration ci-dessus (onglet « Se connecter ») ou jouer sans compte. Touchez l'écran d'ouverture, puis ouvrez les 2 boosters de bienvenue (onglet Butin) pour former votre équipe.
+Au premier lancement, ABYSSAL demande de créer un compte (e-mail et mot de passe) : la progression est liée au compte (sauvegarde en ligne, amis, classements, défis entre joueurs). Vous pouvez utiliser le compte de démonstration ci-dessus (onglet « Se connecter »). Touchez l'écran d'ouverture, puis ouvrez les 2 boosters de bienvenue (onglet Butin) pour former votre équipe.
 
 Pourquoi un compte est proposé : la collection de cartes (500 créatures, plusieurs semaines de jeu) est sauvegardée en ligne pour ne jamais être perdue (changement ou perte de téléphone, suppression de l'application) ; il sert aussi aux classements quotidiens, aux saisons, au Tirage des Ombres et au profil public. Seuls un e-mail et un pseudo sont demandés, et le compte se supprime dans le jeu. Suppression du compte dans le jeu : Sanctuaire → Compte → Supprimer mon compte.
 

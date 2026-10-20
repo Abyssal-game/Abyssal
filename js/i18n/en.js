@@ -5825,6 +5825,17 @@ export default {
   "Défi introuvable.": "Challenge not found.",
   "Aucune carte à tirer.": "No card to draw.",
   "Tu ne peux pas te défier toi-même.": "You can't challenge yourself.",
+  /* v515 : compte obligatoire, plus de copie de sauvegarde */
+  "La suppression efface ton profil, ta sauvegarde en ligne et tes scores, et la partie de cet appareil.": "Deleting erases your profile, your online save and your scores, and the game on this device.",
+  "Ta progression est liée à ton compte : si tu as déjà joué sur ce téléphone, ta partie y est envoyée dès que tu crées ton compte.": "Your progress is tied to your account: if you've already played on this phone, your game is sent to it as soon as you create your account.",
+  "Avancé : effacement": "Advanced: erase",
+  "{e0} Avancé : effacement": "{e0} Advanced: erase",
+  "Ta partie est liée à <b>ton compte</b> et sauvegardée en ligne automatiquement : tu n’as rien à faire, et tu la retrouves sur n’importe quel appareil en te connectant avec ton e-mail.": "Your game is tied to <b>your account</b> and saved online automatically: there's nothing to do, and you'll find it on any device by signing in with your email.",
+  "Ta dernière progression n’a pas pu être envoyée sur ton compte (pas de réseau ?). Si tu te déconnectes maintenant, <b>elle sera perdue</b>.": "Your latest progress couldn't be sent to your account (no network?). If you sign out now, <b>it will be lost</b>.",
+  "Me déconnecter quand même": "Sign out anyway",
+  "Rester connecté": "Stay signed in",
+  "Déconnecté. Ta partie t’attend sur ton compte.": "Signed out. Your game is waiting on your account.",
+  "Dernière confirmation : la collection, les éclats et les succès seront perdus.": "Last confirmation: your collection, shards and achievements will be lost.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

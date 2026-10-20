@@ -3,14 +3,12 @@ import { resetTips } from '../ui/coach.js';
 import { TUTOS, tuto } from '../ui/tutos.js';
 import { icon } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, openSheet, bindActions } from '../ui/dom.js';
-import { exportCode, importCode } from '../core/save.js';
 import { sfx, audioInfo } from '../ui/sound.js';
 import { MUSIC_DEMO, musicPreview } from '../ui/music.js';
 import { sync, onSync, refreshProfile, eraseOnline } from '../cloud/sync.js';
 import { isLoggedIn } from '../cloud/cloud.js';
 import { openCreator } from './creator.js';
 import { showWelcome } from './welcome.js';
-import { shareFile } from '../native.js';
 import { onPresence, presence } from '../cloud/presence.js';
 import { LANGS, LANG, setLang } from '../i18n.js';
 /* v418 : code du Mode Créateur choisi par le propriétaire ; seule son empreinte SHA-256 (en majuscules) est dans le code */
@@ -69,16 +67,11 @@ export default function settings(app, root) {
       </section>`;
   }
   // v329 : depuis le compte obligatoire, la sauvegarde est automatique (compte en ligne) ; l'ancien onglet Sauvegarde
-  // devient un bloc replié « Avancé » en bas de l'onglet Jeu (copie de secours et effacement)
+  // devient un bloc replié « Avancé » en bas de l'onglet Jeu. v515 : plus de copie de secours (code ou fichier) : la partie vit sur le compte
   function tabSave() {
-    return `<details class="panel dc-fold set-adv"><summary>${icon('seal')} Avancé : copie de secours, effacement</summary><div class="stack">
-        ${isLoggedIn() ? '<p class="small">Ta partie est sauvegardée <b>automatiquement</b> sur ton compte en ligne : tu n’as rien à faire, et tu la retrouves sur n’importe quel appareil en te connectant. Une copie de secours reste possible ici.</p>' : '<p class="small"><b>Sans compte</b>, ta partie n’est gardée que sur ce téléphone : elle serait perdue si tu supprimes l’application ou changes de téléphone. <a href="#/compte">Crée un compte</a> pour la sauvegarder en ligne, ou garde une copie de secours ici.</p>'}
+    return `<details class="panel dc-fold set-adv"><summary>${icon('seal')} Avancé : effacement</summary><div class="stack">
+        <p class="small">Ta partie est liée à <b>ton compte</b> et sauvegardée en ligne automatiquement : tu n’as rien à faire, et tu la retrouves sur n’importe quel appareil en te connectant avec ton e-mail.</p>
         ${app.persistent ? '' : '<p class="small err">Le stockage local est indisponible : la progression sera perdue à la fermeture.</p>'}
-        <div class="row gap wrap">
-          <button class="btn small" data-act="export">${icon('copy')}Copier le code</button>
-          <button class="btn small" data-act="download">${icon('download')}Fichier de sauvegarde</button>
-          <button class="btn small" data-act="import">${icon('upload')}Importer</button>
-        </div>
         <p class="small muted">Dernier enregistrement : ${new Date(g.s.updatedAt).toLocaleString('fr-FR')}.</p>
         <button class="btn danger small" data-act="reset">${icon('trash')}Effacer toute la progression</button>
       </div></details>`;
@@ -120,48 +113,9 @@ export default function settings(app, root) {
     toggle(el) { g.setSetting(el.dataset.k, !g.s.settings[el.dataset.k]); app.applySettings(); render(); },
     seg(el) { g.setSetting(el.dataset.k, el.dataset.v); app.applySettings(); render(); },
     lang(el) { if (el.dataset.v !== LANG) setLang(el.dataset.v); },
-    async export() {
-      const code = exportCode(g.s);
-      try { await navigator.clipboard.writeText(code); toast('Code de sauvegarde copié. Garde-le dans tes notes.', { kind: 'success', icon: 'copy' }); }
-      catch (e) {
-        const sh = openSheet(`<h2>Code de sauvegarde</h2><p class="small">Copie ce texte et garde-le précieusement.</p><textarea class="input" readonly>${esc(code)}</textarea>`, { label: 'Code de sauvegarde' });
-        sh.body.querySelector('textarea').select();
-      }
-    },
-    async download() {
-      const name = `abyssal-sauvegarde-${new Date().toISOString().slice(0, 10)}.json`, text = JSON.stringify(g.s, null, 1);
-      try { if (await shareFile(name, text)) return; } catch (e) { toast('Partage impossible. Réessaie, ou utilise « Copier le code ».', { kind: 'error', icon: 'info' }); return; }
-      const blob = new Blob([text], { type: 'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = name;
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-      toast('Fichier de sauvegarde créé.', { kind: 'success', icon: 'download' });
-    },
-    import() {
-      const sh = openSheet(`<h2>Importer une sauvegarde</h2>
-        <p class="small">Colle un code de sauvegarde ABYSSAL ou choisis un fichier. <b>La progression actuelle de cet appareil sera remplacée.</b></p>
-        <textarea class="input" id="imp-code" placeholder="ABYSSAL1:…"></textarea>
-        <div class="row gap wrap"><label class="btn small">${icon('upload')}Choisir un fichier<input type="file" id="imp-file" accept=".json,application/json,text/plain" hidden></label><button class="btn primary small" id="imp-go">Importer</button></div>
-        <p class="small err" id="imp-err" role="alert"></p>`, { label: 'Importer' });
-      const ta = sh.body.querySelector('#imp-code');
-      sh.body.querySelector('#imp-file').addEventListener('change', async (e) => { const f = e.target.files[0]; if (f) ta.value = await f.text(); });
-      sh.body.querySelector('#imp-go').addEventListener('click', async () => {
-        let save;
-        try { save = importCode(ta.value); } catch (err) { sh.body.querySelector('#imp-err').textContent = err.message; return; }
-        const n = Object.keys(save.collection || {}).length;
-        if (!(await confirmBox(`Remplacer ta progression par cette sauvegarde (${n} créatures, ${fmt(save.shards)} éclats) ?`, { ok: 'Remplacer', danger: true }))) return;
-        g.replaceSave(save);
-        app.applySettings();
-        sh.close();
-        toast('Sauvegarde importée.', { kind: 'success', icon: 'upload' });
-        app.refresh();
-      });
-    },
     async reset() {
       if (!(await confirmBox('Effacer définitivement toute ta progression, sur cet appareil <b>et sur ton compte en ligne</b> ?', { ok: 'Effacer', danger: true }))) return;
-      if (!(await confirmBox('Dernière confirmation : la collection, les éclats et les succès seront perdus. Pense à exporter d’abord.', { ok: 'Tout effacer', danger: true }))) return;
+      if (!(await confirmBox('Dernière confirmation : la collection, les éclats et les succès seront perdus.', { ok: 'Tout effacer', danger: true }))) return;
       g.reset();
       app.applySettings();
       let online = null;
