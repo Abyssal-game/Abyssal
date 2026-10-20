@@ -147,14 +147,18 @@ function attrs(el) {
     const v = el.getAttribute(a);
     if (v && LETTERS.test(v)) {
       let tr = tx(v);
-      if (tr === v && v.includes(', ')) tr = v.split(', ').map((x) => tx(x)).join(', '); /* « Nom, Rare, Argentée » */
+      if (tr === v && v.includes(', ')) { /* « Nom, Rare, Argentée » : les noms d'abord (ils peuvent contenir une virgule), puis chaque morceau */
+        const nk = nameRe ? nameKey(v, nameRe) : { key: v, nm: [] };
+        tr = fillNames(nk.key.split(', ').map((x) => (/^\{n\d+\}$/.test(x) ? x : tx(x))).join(', '), nk.nm);
+      }
       if (tr !== v) el.setAttribute(a, tr);
     }
   }
 }
 function translateTree(root) {
   if (root.nodeType === 3) { const p = root.parentElement; if (p) translateTree(p); return; }
-  if (root.nodeType !== 1 || SKIP.has(root.tagName) || root.closest?.('[translate="no"],.notranslate')) return;
+  if (root.nodeType !== 1 || root.closest?.('[translate="no"],.notranslate')) return;
+  if (SKIP.has(root.tagName)) { if (root.tagName === 'INPUT' || root.tagName === 'TEXTAREA') attrs(root); return; } /* v507 : texte d'aide des champs */
   attrs(root);
   if (isBlock(root)) {
     const { key, nums, els } = keyOf(root);

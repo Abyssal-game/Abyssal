@@ -8,7 +8,7 @@ import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM, sigil, roleIcon, actIcon, crestHTML } from '../ui/icons.js';
 import { esc, openSheet, toast, frSpaces } from '../ui/dom.js';
 import { deName } from '../core/synergy.js';
-import { LANG, t as tr, tx } from '../i18n.js';
+import { LANG, t as tr, tx, tw } from '../i18n.js';
 import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
 import { cardHTML } from '../ui/card.js';
@@ -165,7 +165,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     if (u.boss || u.elite || st.turn !== 'ally' || !run || (run.floor || 0) < ORD_INT_FROM) return '';
     const i = intentInfo(st, u); if (!i) return '';
     const t = u.intent?.t && st.units[u.intent.t];
-    const who = i.aoe ? 'tous' : t ? esc(cat.get(t.id)?.name.split(/[\s,’']/)[0] || '') : '';
+    const who = i.aoe ? 'tous' : t ? esc((tw(cat.get(t.id)?.name || '').split(/[\s,’']/).find((w) => w && !/^(the|le|la|les|l)$/i.test(w))) || '') /* v507 : nom affiché, sans l'article */ : '';
     const val = i.dmg ? `${i.dmg}` : esc(i.def.name);
     return `<span class="cb-oint d${i.danger}" title="${esc(i.def.name)} : ${esc(i.def.desc)}">${intentIcon(i.kind)}<b>${val}</b>${who ? `<small>→ ${who}</small>` : ''}</span>`;
   };
@@ -227,7 +227,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     if (!guide || busy || st.turn !== 'ally' || st.over) return;
     let t = null, txt = '';
     if (mode?.key === 'attack') { t = el(actionTargets(st, sel, 'attack')[0]); txt = 'Touche un ennemi pour l’attaquer'; }
-    else if (sel && actionsFor(st, sel)[0].ok) { t = actsEl.querySelector('[data-a="attack"]'); txt = LANG === 'fr' ? `C’est au tour ${esc(deName(cat.get(st.units[sel].id).name))} : « ${esc(actionsFor(st, sel)[0].name)} » attaque et rapporte 1 PA` : tr('C’est au tour de {name} : « {move} » attaque et rapporte 1 PA', { name: esc(cat.get(st.units[sel].id).name), move: esc(tx(actionsFor(st, sel)[0].name)) }); }
+    else if (sel && actionsFor(st, sel)[0].ok) { t = actsEl.querySelector('[data-a="attack"]'); txt = LANG === 'fr' ? `C’est au tour ${esc(deName(cat.get(st.units[sel].id).name))} : « ${esc(actionsFor(st, sel)[0].name)} » attaque et rapporte 1 PA` : tr('C’est au tour de {name} : « {move} » attaque et rapporte 1 PA', { name: esc(tw(cat.get(st.units[sel].id).name)), move: esc(tw(actionsFor(st, sel)[0].name)) }); }
     else { t = $('.dv-end'); txt = 'Rien à faire : touche « Passer »'; }
     if (t) { t.classList.add('guide'); say(`<b class="dc-good">${txt}</b>`); }
   }
@@ -1221,7 +1221,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     // ennemi touché avec une créature choisie : attaque directe (raccourci)
     if (sel && actionsFor(st, sel)[0].ok && actionTargets(st, sel, 'attack').includes(u.uid)) { const a = sel; return exec(() => act(st, a, 'attack', u.uid)); }
     /* v444 : ennemi hors d'atteinte (couvert par un Protecteur…) : on dit qui viser au lieu d'ouvrir sa fiche (appui long) */
-    if (sel && actionsFor(st, sel)[0].ok && !u.dead) { const ok = actionTargets(st, sel, 'attack'); if (ok.length) { app.sfx.tap?.(); toast(tr('{name} est protégé : vise d’abord {list}.', { name: esc(uName(u)), list: ok.map((x) => `<b>${esc(uName(st.units[x]))}</b>`).join(tr(' ou ')) }), { icon: 'shield' }); return; } }
+    if (sel && actionsFor(st, sel)[0].ok && !u.dead) { const ok = actionTargets(st, sel, 'attack'); if (ok.length) { app.sfx.tap?.(); toast(tr('{name} est protégé : vise d’abord {list}.', { name: esc(tw(uName(u))), list: ok.map((x) => `<b>${esc(tw(uName(st.units[x])))}</b>`).join(tr(' ou ')) }), { icon: 'shield' }); return; } }
     info(u);
   }, { signal: ctl.signal });
 
