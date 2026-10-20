@@ -12,7 +12,7 @@ import { packHTML } from './shop.js';
 import { t } from '../i18n.js';
 
 const RES = { win: 'Victoire', tie: 'Égalité', lose: 'Défaite' };
-const EMB = { win: 'vd-win', lose: 'vd-lose', tie: 'vd-vs' }; /* v524 : emblèmes Gemini de fin (égalité : le médaillon, en attendant son image) */
+const EMB = { win: 'vd-win', lose: 'vd-lose', tie: 'vd-tie' }; /* v524 : emblèmes Gemini de fin (v526 : égalité) */
 const RI = (r) => ['C', 'PC', 'R', 'HR', 'M', 'S'].indexOf(r);
 
 export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
