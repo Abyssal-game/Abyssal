@@ -62,7 +62,7 @@ export default function home(app, root) {
       <h1 class="hb-title"><img src="assets/brand/title.webp" alt="ABYSSAL — Le Bestiaire interdit"></h1>
     </section>
 
-    ${g.welcomePending() ? `<a class="panel ornate hw-welcome" href="#/boutique"><span class="hw-ic">${picon('ticket')}</span><span><b>${g.s.tickets.standard > 1 ? `Tes ${g.s.tickets.standard} boosters de bienvenue t’attendent` : 'Ton booster de bienvenue t’attend'}</b><span class="small">Ouvre-les pour découvrir tes premières créatures : elles formeront ton équipe.</span></span>${icon('next')}</a>` : ''}
+    ${g.welcomePending() ? `<a class="panel ornate hw-welcome" href="#/boutique"><span class="hw-ic">${picon('ticket')}</span><span><b>${g.s.welcomeGift > 0 ? `Cadeau de bienvenue : ${g.s.welcomeGift > 1 ? `${g.s.welcomeGift} boosters offerts` : '1 booster offert'} !` : g.s.tickets.standard > 1 ? `Tes ${g.s.tickets.standard} boosters de bienvenue t’attendent` : 'Ton booster de bienvenue t’attend'}</b><span class="small">${g.s.welcomeGift > 0 && g.freePack().stock ? 'Plus ton booster gratuit du jour. ' : ''}Ouvre-les pour découvrir tes premières créatures : elles formeront ton équipe.</span></span>${icon('next')}</a>` : ''}
     ${mainGoalHTML()}
 
     ${todayHTML()}

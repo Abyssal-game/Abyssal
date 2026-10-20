@@ -16,6 +16,7 @@ export function defaultSave(now = Date.now()) {
     shards: ECONOMY.start.shards,
     ash: ECONOMY.start.ash,
     tickets: { standard: 0, premium: 0, ...ECONOMY.start.tickets },
+    welcomeGift: ECONOMY.start.tickets.standard || 0, /* v518 : boosters offerts à l'arrivée (parmi les tickets standard), montrés comme un cadeau */
     collection: {},       // id -> { n, v: {variante: nombre}, first, isNew }
     deciphered: {},       // id -> true : nom révélé sans posséder la carte
     pity: { sinceHR: 0, sinceM: 0 },
@@ -99,6 +100,7 @@ export function migrate(raw) {
     if (!m) throw new Error(`Migration manquante depuis la version ${s.version}`);
     s = m(s);
   }
+  const hadGift = typeof s.welcomeGift === 'number';
   // Complète les champs ajoutés depuis (valeurs par défaut), sans écraser l'existant.
   const d = defaultSave(s.createdAt || Date.now());
   for (const k of Object.keys(d)) if (s[k] === undefined) s[k] = d[k];
@@ -133,6 +135,8 @@ export function migrate(raw) {
   // v403 : le titre de départ « Novice des Sceaux » devient « Novice de l’Abysse » (les Sceaux sont un mini-jeu fermé au début)
   if (Array.isArray(s.titles)) s.titles = [...new Set(s.titles.map((t) => (t === 'Novice des Sceaux' ? 'Novice de l’Abysse' : t)))];
   if (s.title === 'Novice des Sceaux') s.title = 'Novice de l’Abysse';
+  // v518 : partie d'avant le cadeau de bienvenue : ses tickets standard restent un cadeau seulement si aucun booster n'a été ouvert
+  if (!hadGift) s.welcomeGift = !s.stats?.boosters ? Math.min(ECONOMY.start.tickets.standard || 0, s.tickets?.standard || 0) : 0;
   return s;
 }
 

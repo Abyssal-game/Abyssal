@@ -6,7 +6,7 @@ import { cardHTML } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM, roleIcon, picon } from '../ui/icons.js';
 import { esc, fmt, toast } from '../ui/dom.js';
-import { packHTML, payLabel } from './shop.js';
+import { packHTML, payLabel, GIFT_N } from './shop.js';
 import { roleOf, ROLES } from '../core/army.js';
 import { keywordOf, KEYWORDS } from '../core/duel.js';
 
@@ -26,6 +26,9 @@ export function openPack(app, type, { faction, onDone, preset = null, title = nu
     return;
   }
   const { opening } = result;
+  /* v518 : le joueur voit ce qu'il ouvre : cadeau de bienvenue, booster gratuit du jour */
+  if (!title && opening.gift) title = `Cadeau de bienvenue · ${opening.gift} / ${GIFT_N}`;
+  else if (!title && opening.paidWith === 'free') title = 'Booster gratuit du jour';
   // illustrations chargées dès maintenant : la carte se retourne sans passer par un fond noir
   const pre = opening.cards.map((c) => { const im = new Image(); im.decoding = 'async'; im.src = artUrl(cat.get(c.id), { variant: c.variant }); return im; });
   const ready = (i) => Promise.race([pre[i]?.decode ? pre[i].decode().catch(() => {}) : Promise.resolve(), new Promise((r) => setTimeout(r, 900))]);
@@ -357,6 +360,7 @@ export function openPack(app, type, { faction, onDone, preset = null, title = nu
     el.scrollLeft = 0; el.scrollTop = 0; /* v373 : jamais de contenu décalé */
     stage.innerHTML = `<div class="op-summary">
       <h2 class="op-sum-title"><span>${preset ? `${fmt(preset.score)} points` : newCount ? `${newCount} nouvelle${newCount > 1 ? 's' : ''} créature${newCount > 1 ? 's' : ''}` : 'Booster ouvert'}</span></h2>
+      ${opening.gift ? `<p class="small op-gift">${icon('ticket')} ${opening.gift < GIFT_N ? `Cadeau de bienvenue : encore ${GIFT_N - opening.gift} booster${GIFT_N - opening.gift > 1 ? 's' : ''} offert${GIFT_N - opening.gift > 1 ? 's' : ''} à ouvrir.` : g.freePack().stock ? 'Ton cadeau de bienvenue est ouvert ! Il te reste ton booster gratuit du jour.' : 'Ton cadeau de bienvenue est ouvert !'}</p>` : ''}
       ${opening.guaranteed ? `<p class="small guarantee">${icon('star')} Garantie appliquée : ${opening.guaranteed === 'm' ? 'Mythique ou mieux' : 'Hyper rare ou mieux'}.</p>` : ''}
       <div class="op-grid">${opening.cards.map((c, i) => `<div class="op-cell" style="--i:${i}">${cardHTML(cat.get(c.id), { variant: c.variant, isNew: c.isNewCard || c.isNewVariant, lazy: false })}<span class="op-tag">${preset ? `+${c.pts} pts${c.double ? ' ×2' : ''}` : c.isNewCard ? 'Nouvelle recrue' : c.isNewVariant ? VARIANTS[c.variant].short : `Doublon · ${c.burn} ${icon('ash')}`}</span></div>`).join('')}</div>
       <div class="op-loot">

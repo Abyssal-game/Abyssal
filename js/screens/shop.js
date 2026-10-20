@@ -19,8 +19,10 @@ export function waitText(ms) {
 // Libellé du bouton d'ouverture : ticket, gratuit ou prix en éclats.
 export function payLabel(g, type, again = false) {
   const t = g.s.tickets[type] || 0;
+  /* v518 : les boosters offerts à l'arrivée se disent « cadeau », le booster du jour « du jour » */
+  if (type === 'standard' && t > 0 && g.s.welcomeGift > 0) return again ? `${icon('ticket')}Cadeau suivant` : `${icon('ticket')}Ouvrir · cadeau (${g.s.welcomeGift})`;
   if (t > 0) return `${icon('ticket')}${again ? 'Encore un' : 'Ouvrir'} · ticket (${t})`;
-  if (type === 'standard') { const f = g.freePack(); if (f.stock > 0) return `${icon('p:free-pack')}${again ? 'Encore un' : 'Ouvrir'} · gratuit (${f.stock})`; }
+  if (type === 'standard') { const f = g.freePack(); if (f.stock > 0) return `${icon('p:free-pack')}${again ? 'Ouvrir le booster du jour' : `Ouvrir · booster du jour (${f.stock})`}`; }
   return `${again ? 'Encore un' : 'Acheter'} <span class="price">${icon('crystal')}${fmt(BOOSTERS[type].price)}</span>`;
 }
 
@@ -68,6 +70,21 @@ export function showOdds(app, type) {
     <p class="small">Un doublon se brûle dans la Fournaise pour des cendres (${RARITIES.map((r) => `${r.short} ${ECONOMY.burnAsh[r.key]}`).join(', ')} ; ×${ECONOMY.burnFinish.holo} argentée, ×${ECONOMY.burnFinish.gold} enluminée, ×${ECONOMY.burnFinish.galaxy} abyssale). Les cendres font monter le niveau de tes créatures et servent à sublimer une carte.</p>`, { label: 'Probabilités' });
 }
 
+
+// v518 : cadeau de bienvenue bien visible : les boosters offerts à l'arrivée, en plus du booster gratuit du jour
+export const GIFT_N = ECONOMY.start.tickets.standard || 2;
+export function giftHTML(g, cat) {
+  const n = Math.min(g.s.welcomeGift || 0, g.s.tickets.standard || 0);
+  if (!n) return '';
+  const daily = g.freePack().stock, total = n + daily;
+  return `<section class="panel ornate gift-box">
+      <span class="gift-ribbon">Cadeau de bienvenue</span>
+      <div class="gift-packs">${Array.from({ length: GIFT_N }, (_, i) => `<span class="gift-pk ${i < GIFT_N - n ? 'done' : ''}">${packHTML('standard', cat)}${i < GIFT_N - n ? '<i class="gift-ok">Ouvert</i>' : ''}</span>`).join('')}</div>
+      <p class="gift-t">L’Abysse t’offre <b>${GIFT_N} boosters</b> pour ton arrivée.${n < GIFT_N ? ` Encore <b>${n}</b> à ouvrir !` : ''}</p>
+      ${daily ? `<p class="small muted gift-s">En plus, ton <b>booster gratuit du jour</b> t’attend : ${total} boosters à ouvrir aujourd’hui.</p>` : ''}
+      <button class="btn primary block big-cta dc-plq dc-plq-red" data-act="buy" data-type="standard">${icon('ticket')}Ouvrir ${n < GIFT_N ? 'mon dernier' : 'un'} booster offert</button>
+    </section>`;
+}
 
 export default function shop(app, root, params = []) {
   claimShadowPrize(app);
@@ -117,6 +134,7 @@ export default function shop(app, root, params = []) {
       </article>`;
     };
     root.innerHTML = `
+      ${giftHTML(g, cat)}
       <!-- v428 : plus de bannière ni d'encart du Tirage (il a son sous-onglet) : les boosters directement -->
       ${(() => { const n = ownedPacks(); return n >= 2 ? `<button class="btn gold block dc-plq dc-plq-dark shop-all" data-act="openall">${icon('ticket')}Ouvrir mes ${n} boosters d’un coup</button>` : ''; })()}
       <div class="products">
@@ -130,7 +148,7 @@ export default function shop(app, root, params = []) {
   }
   // v422 : boosters déjà à toi (tickets et boosters gratuits), ouverts d'un coup avec un récapitulatif
   function ownedPacks() {
-    if (g.welcomePending()) return 0;
+    if (g.welcomePending() || g.s.welcomeGift > 0) return 0; /* v518 : pendant le cadeau de bienvenue, un booster à la fois */
     return Object.entries(g.s.tickets).filter(([k, n]) => n > 0 && BOOSTERS[k]).reduce((a, [, n]) => a + n, 0) + g.freePack().stock;
   }
   function openAll() {

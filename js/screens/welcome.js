@@ -2,6 +2,8 @@
 // rejouable depuis les Réglages.
 import { icon, EMBLEM } from '../ui/icons.js';
 import { openSheet } from '../ui/dom.js';
+import { packHTML, GIFT_N } from './shop.js';
+import { openPack } from './opening.js';
 
 // Version du guide : l'augmenter le remontre une fois à tout le monde
 const GUIDE_V = 2;
@@ -20,9 +22,9 @@ const PAGES = [
 
 export function showWelcome(app, { force = false } = {}) {
   const g = app.game;
-  if ((g.s.seenIntro || 0) >= GUIDE_V && !force) return;
+  if ((g.s.seenIntro || 0) >= GUIDE_V && !force) { showGift(app); return; }
   let i = 0;
-  const sheet = openSheet('', { cls: 'welcome', label: 'Bienvenue', onClose: () => { g.s.seenIntro = GUIDE_V; g.persist(); } });
+  const sheet = openSheet('', { cls: 'welcome', label: 'Bienvenue', onClose: () => { g.s.seenIntro = GUIDE_V; g.persist(); if (!force) setTimeout(() => showGift(app), 350); } });
   PAGES.forEach((pg) => { new Image().src = pg.img ? `assets/ui/tuto-${pg.img}.webp` : `assets/ui/bn-${pg.bn}.webp`; });
   const draw = () => {
     const pg = PAGES[i];
@@ -42,4 +44,28 @@ export function showWelcome(app, { force = false } = {}) {
     if (b.dataset.w === 'skip') sheet.close();
   });
   draw();
+}
+
+// v518 : le cadeau de bienvenue, montré une fois après le guide : les boosters offerts, en plus du booster gratuit du jour
+export function showGift(app) {
+  const g = app.game, cat = app.catalog;
+  const n = Math.min(g.s.welcomeGift || 0, g.s.tickets.standard || 0);
+  if (!n || g.s.giftShown) return;
+  const daily = g.freePack().stock;
+  const sheet = openSheet(`<div class="gift-sheet">
+      <span class="gift-ribbon">Cadeau de bienvenue</span>
+      <div class="gift-packs big">${Array.from({ length: n }, () => `<span class="gift-pk">${packHTML('standard', cat)}</span>`).join('')}</div>
+      <h2>${n > 1 ? `${n} boosters offerts` : '1 booster offert'}</h2>
+      <p>Pour ton arrivée dans l’Abysse, voici ${n > 1 ? `<b>${n} boosters</b>` : '<b>un booster</b>'} en cadeau. Ouvre-les pour découvrir tes premières créatures : elles formeront ton équipe.</p>
+      ${daily ? `<p class="small gift-daily">${icon('p:free-pack')}<span>Et ce n’est pas tout : un <b>booster gratuit</b> t’attend <b>chaque jour</b>. Aujourd’hui, tu as donc <b>${n + daily} boosters</b> à ouvrir !</span></p>` : ''}
+      <button class="btn primary block big-cta dc-plq dc-plq-red" data-g="open">${icon('ticket')}Ouvrir mon cadeau</button>
+    </div>`, { cls: 'sheet-small', label: 'Cadeau de bienvenue' });
+  g.s.giftShown = true; g.persist();
+  app.sfx.achievement?.();
+  sheet.body.addEventListener('click', (e) => {
+    if (!e.target.closest('[data-g="open"]')) return;
+    sheet.close();
+    app.go('boutique');
+    setTimeout(() => openPack(app, 'standard', { onDone: () => app.refreshView?.() }), 600);
+  });
 }

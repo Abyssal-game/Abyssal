@@ -4720,3 +4720,27 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .vs-edit { margin: 10px 0 2px; color: #E8C35A; }
 .vs-type .vs-pk { width: 60%; }
 .vs-rules .how-steps { margin-top: 10px; }
+/* v518 : cadeau de bienvenue (boutique, fenêtre d'arrivée, ouverture) */
+.gift-box, .gift-sheet { position: relative; text-align: center; }
+.gift-box { margin: 4px 0 14px; padding: 30px 14px 16px; border-color: rgba(242, 193, 78, .8); background: radial-gradient(90% 60% at 50% 35%, rgba(242, 193, 78, .18), transparent 70%), rgba(14, 10, 18, .92); box-shadow: 0 0 22px rgba(242, 193, 78, .22); }
+.gift-ribbon { position: absolute; top: -1px; left: 50%; transform: translateX(-50%); padding: 5px 18px 6px; border-radius: 0 0 12px 12px; background: linear-gradient(180deg, #F2C14E, #B8862C); color: #1A1206; font: 700 .78rem/1 var(--f-display); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; box-shadow: 0 4px 12px rgba(0, 0, 0, .5); }
+.gift-packs { display: flex; justify-content: center; gap: 14px; margin: 6px 0 10px; }
+.gift-pk { position: relative; width: 92px; aspect-ratio: 464 / 800; container-type: inline-size; animation: giftBob 2.6s ease-in-out infinite; filter: drop-shadow(0 0 14px rgba(242, 193, 78, .45)); }
+.gift-pk:nth-child(2) { animation-delay: -1.3s; }
+.gift-pk .pack { width: 100%; height: 100%; }
+.gift-pk.done { animation: none; filter: grayscale(.8) brightness(.55); }
+.gift-ok { position: absolute; inset: 0; display: grid; place-items: center; color: #8FE39A; }
+.gift-ok .ic { width: 40%; height: auto; filter: drop-shadow(0 0 6px #000); }
+.gift-packs.big .gift-pk { width: 108px; }
+.gift-t { margin: 0 0 4px; font-size: 1.02rem; }
+.gift-s { margin: 0 0 12px; }
+.gift-sheet { padding-top: 34px; }
+.gift-sheet h2 { margin: 4px 0 6px; font-family: var(--f-display); color: #F2C14E; font-size: 1.6rem; }
+.gift-daily { display: flex; gap: 10px; align-items: center; text-align: left; margin: 10px 0 14px; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(127, 168, 216, .4); background: rgba(127, 168, 216, .08); }
+.gift-daily .picon, .gift-daily .ic { flex: none; width: 34px; height: 34px; }
+.op-gift { margin: 2px 0 6px; padding: 6px 10px; border-radius: 10px; background: rgba(242, 193, 78, .14); color: #F2C14E; text-align: center; }
+@keyframes giftBob { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-6px) rotate(2deg); } }
+@media (prefers-reduced-motion: reduce) { .gift-pk { animation: none; } }
+.gift-ok { inset: auto 0 38% 0; display: block; margin: 0 auto; width: max-content; padding: 3px 10px; border-radius: 10px; background: rgba(10, 30, 14, .92); border: 1px solid #8FE39A; color: #8FE39A; font: 700 .72rem/1.2 var(--f-ui); font-style: normal; text-transform: uppercase; letter-spacing: .06em; }
+.gift-pk.done { filter: none; }
+.gift-pk.done .pack { filter: grayscale(.85) brightness(.5); }

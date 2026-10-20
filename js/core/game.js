@@ -183,7 +183,8 @@ export class Game {
     if (type === 'faction' && !FACTION_ORDER.includes(faction)) throw new Error('Choisis une faction.');
     let paidWith;
     const free = type === 'standard' ? this.freePack() : null;
-    if ((this.s.tickets[type] || 0) > 0) { this.s.tickets[type]--; paidWith = 'ticket'; }
+    let gift = 0;
+    if ((this.s.tickets[type] || 0) > 0) { this.s.tickets[type]--; paidWith = 'ticket'; if (type === 'standard' && this.s.welcomeGift > 0) { gift = (ECONOMY.start.tickets.standard || 2) - this.s.welcomeGift + 1; this.s.welcomeGift--; } }
     else if (free && free.stock > 0) { this.s.freePack = { day: today(this.clock()), left: free.stock - 1 }; paidWith = 'free'; }
     else if (this.s.shards >= def.price) { this.s.shards -= def.price; this.s.stats.shardsSpent += def.price; paidWith = 'shards'; }
     else throw new Error(`Il te manque ${def.price - this.s.shards} éclats (tu en as ${this.s.shards}). La Descente et les Duels des Sceaux en rapportent.`);
@@ -216,7 +217,7 @@ export class Game {
       return { ...d, ...r };
     });
     this.s.xp += XP.booster;
-    const opening = { t: Date.now(), type, faction: faction || null, event: type === 'event' ? ev.key : null, paidWith, guaranteed: res.guaranteed, cards, rewards };
+    const opening = { t: Date.now(), type, faction: faction || null, event: type === 'event' ? ev.key : null, paidWith, gift, guaranteed: res.guaranteed, cards, rewards };
     this.s.history.unshift({ t: opening.t, type, faction: opening.faction, cards: cards.map((c) => ({ id: c.id, v: c.variant, n: c.isNewCard })) });
     this.s.history = this.s.history.slice(0, 30);
     // Statistiques de chance
