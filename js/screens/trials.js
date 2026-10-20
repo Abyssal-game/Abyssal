@@ -60,7 +60,7 @@ export default function trials(app, root) {
     return `<section class="panel dc-season"><div class="dc-season-h"><img class="dc-season-ic" alt="" src="assets/icons/season.webp" onerror="this.remove()"><span><b>${esc(seasonName(se.id))}</b><span class="small muted">Épreuves gagnées ce mois : ${se.best || 0} · fin dans ${left} jour${left > 1 ? 's' : ''}</span></span></div>
       <div class="dc-season-track"><i style="width:${Math.min(100, ((se.best || 0) / max) * 100)}%"></i></div>
       <ol class="dc-season-steps">${SEASON_STEPS.map((st) => { const ok = se.claimed.includes(st.wins); return `<li class="${ok ? 'ok' : ''}"><span class="dc-season-rw">${ok ? icon('check') : rw(st.reward)}</span><small>${st.wins} victoires</small></li>`; }).join('')}</ol>
-      <p class="small muted">Chaque Épreuve gagnée ce mois-ci compte. Chaque palier se gagne une fois par saison ; tout repart à zéro le 1er du mois.</p></section>`;
+      <p class="small muted">Chaque Épreuve gagnée ce mois-ci compte.<br>Chaque palier se gagne une fois par saison ; tout repart à zéro le 1er du mois.</p></section>`;
   }
 
   async function loadBoard(box) {
@@ -75,7 +75,7 @@ export default function trials(app, root) {
       box.innerHTML = (rows.length ? rows.map((r, i) => {
         const hid = isBlocked(r.user_id), av = !hid && r.profiles?.avatar && cat.get(r.profiles.avatar);
         return `<div class="lb-row ${r.user_id === me ? 'me' : ''}"${rowAttrs(r.user_id, r.profiles?.pseudo, me)}><span class="lb-rank">${i + 1}</span><span class="lb-av">${av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM}</span><span class="lb-name"><b>${esc(shownName(r.user_id, r.profiles?.pseudo))}${hid ? '' : cloud.badgeHTML(r.profiles?.badge)}${!hid && r.profiles?.title === 'Vainqueur de l’Abysse' ? '<span class="pbadge pb-abysse">Fond de l’Abysse</span>' : ''}</b><span class="small muted">${hid ? '' : esc(r.profiles?.title || '')}</span></span><span class="lb-floor">${fmt(r.floor)} pts</span></div>`;
-      }).join('') : '<p class="small muted">Personne n’a encore joué aujourd’hui. À toi d’ouvrir la voie !</p>')
+      }).join('') : '<p class="small muted center">Personne n’a encore joué aujourd’hui. À toi d’ouvrir la voie !</p>')
         + (!sync.profile?.pseudo ? '<p class="small acc-warn"><a href="#/compte">Choisis un pseudo</a> pour apparaître au classement.</p>' : !rows.some((r) => r.user_id === me) && mine ? `<p class="small muted">Ton score aujourd’hui : ${mine} points.</p>` : '');
       bindReport(box, () => loadBoard(box));
     } catch (e) { if (document.contains(box)) box.textContent = e.message; }

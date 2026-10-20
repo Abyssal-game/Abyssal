@@ -877,7 +877,7 @@ export default {
   "Chaque signature est recopiée deux fois : une pour l’Enfer, une pour l’éternité.": "Every signature is copied twice: once for Hell, once for eternity.",
   "Chaque tombe est une porte vers le Pays sans Retour. La plupart sont bien scellées. Les autres grincent les soirs de brume, et quelque chose les pousse doucement de l’autre côté.": "Every grave is a door to the Land of No Return. Most are firmly sealed. The others creak on misty nights, and something gently pushes them from the other side.",
   "Chaque tombe garde un nom. Je les récite tous les soirs.": "Every tomb keeps a name. I recite them all every night.",
-  "Chaque Épreuve gagnée ce mois-ci compte. Chaque palier se gagne une fois par saison ; tout repart à zéro le {0}er du mois.": "Every Trial won this month counts. Each tier can be earned once per Season; everything resets on the {0}st of the month.",
+  "Chaque Épreuve gagnée ce mois-ci compte.<br>Chaque palier se gagne une fois par saison ; tout repart à zéro le {0}er du mois.": "Every Trial won this month counts.<br>Each tier can be earned once per Season; everything resets on the {0}st of the month.",
   "Chaque Épreuve gagnée rapporte {0} points, plus {1} point par pour cent de PV qui restent à ton équipe.": "Each Trial won earns {0} points, plus {1} point per percent of HP your team has left.",
   "Chaque étage gagné pour la première fois rapporte des éclats et des cendres. Gardien vaincu : {e0}.": "Each floor won for the first time earns shards and ashes. Guardian defeated: {e0}.",
   "Chaque étoile qui disparaît du ciel, c’est lui. Le ciel est déjà moins peuplé qu’avant.": "Every star that vanishes from the sky is him. The sky is already emptier than it used to be.",
