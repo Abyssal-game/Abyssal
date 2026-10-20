@@ -22,7 +22,7 @@ export function payLabel(g, type, again = false) {
   /* v518 : les boosters offerts à l'arrivée se disent « cadeau », le booster du jour « du jour » */
   if (type === 'standard' && t > 0 && g.s.welcomeGift > 0) return again ? `${icon('ticket')}Cadeau suivant` : `${icon('ticket')}Ouvrir · cadeau (${g.s.welcomeGift})`;
   if (t > 0) return `${icon('ticket')}${again ? 'Encore un' : 'Ouvrir'} · ticket (${t})`;
-  if (type === 'standard') { const f = g.freePack(); if (f.stock > 0) return `${icon('p:free-pack')}${again ? 'Ouvrir le booster du jour' : `Ouvrir · booster du jour (${f.stock})`}`; }
+  if (type === 'standard') { const f = g.freePack(); if (f.stock > 0) return `${icon('p:free-pack')}${again ? 'Booster du jour' : `Ouvrir · booster du jour (${f.stock})`}`; }
   return `${again ? 'Encore un' : 'Acheter'} <span class="price">${icon('crystal')}${fmt(BOOSTERS[type].price)}</span>`;
 }
 

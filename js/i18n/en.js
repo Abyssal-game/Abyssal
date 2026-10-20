@@ -5898,6 +5898,7 @@ export default {
   "Cadeau de bienvenue : 1 booster offert !": "Welcome gift: 1 free booster!",
   "Plus ton booster gratuit du jour. Ouvre-les pour découvrir tes premières créatures : elles formeront ton équipe.": "Plus your free daily booster. Open them to discover your first creatures: they'll form your team.",
   /* v519 : Duels des Sceaux contre un joueur */
+  "{e0}Booster du jour": "{e0}Daily booster",
   "{e0}Classique": "{e0}Classic",
   "{e0}Cases sacrées": "{e0}Sacred squares",
   "{e0}Identique": "{e0}Same",

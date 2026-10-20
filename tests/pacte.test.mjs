@@ -68,9 +68,9 @@ test('pacte : la partie se termine à tours égaux, toujours, contre chaque adve
   }
 });
 
-test('pacte : récompenses (1re victoire, coffre, pacte suivant ouvert) et Salle des jeux fermée avant le premier gardien', () => {
+test('pacte : récompenses (1re victoire, coffre, pacte suivant ouvert)', () => {
   const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('pa'), clock });
-  assert.throws(() => g.pacteStart({ table: 'novice' }), /premier gardien/);
+  /* v520 : la Salle des jeux est ouverte dès le départ */
   g.s.bossesBeaten.devoreur = 1;
   assert.throws(() => g.pacteStart({ table: 'six' }), /précédent/);
   g.pacteStart({ table: 'novice' });

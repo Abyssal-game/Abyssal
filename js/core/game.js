@@ -908,7 +908,7 @@ export class Game {
     if (list.length !== 5) throw new Error('Choisis exactement 5 cartes.');
     this.s.sceaux.hand = list; this.persist(); return list;
   }
-  sceauxOpen() { const sc = this.s.sceaux; return Object.keys(this.s.bossesBeaten || {}).length > 0 || (sc.wins + sc.losses + sc.draws) > 0 || !!sc.cur || this.devGames(); }
+  sceauxOpen() { return true; } /* v520 : la Salle des jeux est ouverte dès le départ (décision du propriétaire du 20 octobre 2026 ; avant : après le premier gardien) */
   /* v455 : Mode Créateur, Salle des jeux ouverte comme si le premier gardien était vaincu (sans toucher à la campagne) */
   devGames() { return !!(this.s.settings?.dev && this.s.devGames); }
   sceauxUnlocked() { return SC.RIVALS.filter((_, i) => SC.rivalUnlocked(this.s, i)).length; }

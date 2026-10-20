@@ -52,7 +52,7 @@ test('enchères : trois créatures d’une faction = +5 ; la vente se termine ap
 
 test('enchères : récompenses une fois, déblocage dans l’ordre, défi du jour', () => {
   const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('en2'), clock });
-  assert.throws(() => g.encheresStart({ table: 'etal' }), /gardien/);
+  /* v520 : la Salle des jeux est ouverte dès le départ */
   g.s.bossesBeaten.devoreur = 1;
   assert.throws(() => g.encheresStart({ table: 'reliques' }), /précédente/);
   const before = g.s.shards;

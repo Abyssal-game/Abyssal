@@ -62,15 +62,15 @@ test('objectifs : trois cibles concrètes, qui suivent la progression', async ()
   const { MemoryStorage, rngFrom } = await import('./helpers.mjs');
   const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('obj'), clock: () => new Date(2026, 9, 12, 12) });
   g.s.ash = 0; // pas de cendres : pas d'objectif « Renforce »
-  assert.equal(g.sceauxOpen(), false, 'Sceaux scellés avant le premier gardien');
+  assert.equal(g.sceauxOpen(), true, 'v520 : Salle des jeux ouverte dès le départ');
   let gl = g.goals();
   assert.equal(gl.length, 3);
   assert.match(gl[0].title, /Commence la Descente/);
-  assert.deepEqual(gl.map((x) => x.kind), ['depth', 'boss', 'collection']);
+  assert.deepEqual(gl.map((x) => x.kind), ['depth', 'boss', 'sceaux']); /* v520 : première partie des Sceaux proposée dès le départ */
   assert.ok(gl.every((x) => x.href && x.title));
   assert.match(gl[1].title, /Dévoreur/);
   g.s.bossesBeaten.devoreur = 1;
-  assert.equal(g.sceauxOpen(), true, 'Sceaux ouverts après le premier gardien');
+  assert.equal(g.sceauxOpen(), true);
   assert.match(g.goals()[1].title, /Matriarche/);
   g.s.descent.best = 7;
   assert.match(g.goals()[0].title, /chapitre 2/, 'v406 : le chapitre en cours');

@@ -76,7 +76,7 @@ test('cryptes : la partie se termine toujours, et l’adversaire joue seul contr
 
 test('cryptes : récompenses et ouverture de la crypte suivante', () => {
   const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('cr'), clock });
-  assert.throws(() => g.cryptesStart({ table: 'ossuaire' }), /premier gardien/);
+  /* v520 : la Salle des jeux est ouverte dès le départ */
   g.s.bossesBeaten.devoreur = 1;
   assert.throws(() => g.cryptesStart({ table: 'chapelle' }), /précédente/);
   g.cryptesStart({ table: 'ossuaire' });
