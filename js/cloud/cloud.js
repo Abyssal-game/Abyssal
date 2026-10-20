@@ -37,6 +37,7 @@ function frError(status, body) {
   if (m.includes('otp_expired') || m.includes('expired') || m.includes('invalid or has expired')) return 'Ce lien a expiré : demande-en un nouveau.';
   if (m.includes('duplicate') || m.includes('profiles_pseudo_key') || status === 409) return 'Ce pseudo est déjà pris.';
   if (m.includes('check constraint') || m.includes('violates check')) return 'Pseudo invalide : 3 à 16 lettres, chiffres, espaces, - ou _.';
+  if (m.includes('versus_')) return 'Le Versus Booster n’est pas encore ouvert sur le serveur.'; /* v512 : supabase/08-versus.sql pas encore collé */
   if (m.includes('friend_') || m.includes('player_cards')) return 'Les amis ne sont pas encore ouverts sur le serveur.';
   if (status === 401 || status === 403) return 'Session expirée : reconnecte-toi.';
   if (status >= 500) return 'Le serveur ne répond pas correctement. Réessaie dans un instant.';
@@ -180,6 +181,15 @@ export async function playerCard(id) {
 export async function publishCard(data) {
   await authed('/rest/v1/player_cards?on_conflict=id', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: { id: currentUser().id, data, updated_at: new Date().toISOString() } });
 }
+
+// ——— Versus Booster (v512, supabase/08-versus.sql) ————————————————————————————
+export async function versusList() { return (await authed('/rest/v1/rpc/versus_list', { method: 'POST', body: {} })) || { open: [], mine: [] }; }
+export async function versusCreate(type, faction, factions, packs, to = null) {
+  return authed('/rest/v1/rpc/versus_create', { method: 'POST', body: { p_type: type, p_faction: faction || null, p_factions: factions || null, p_packs: packs, p_to: to } });
+}
+export async function versusAccept(id) { return authed('/rest/v1/rpc/versus_accept', { method: 'POST', body: { p_id: id } }); }
+export async function versusCancel(id) { return authed('/rest/v1/rpc/versus_cancel', { method: 'POST', body: { p_id: id } }); }
+export async function versusClaim(id) { return authed('/rest/v1/rpc/versus_claim', { method: 'POST', body: { p_id: id } }); }
 
 // Signaler le pseudo d'un autre joueur : renvoie 'ok', ou 'masqué' si le pseudo vient d'être masqué.
 export async function reportPseudo(target, reason) {

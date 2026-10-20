@@ -30,6 +30,7 @@ import gamesScreen from './screens/games.js';
 import codexScreen from './screens/codex.js';
 import { claimable } from './core/codex.js';
 import encheresScreen from './screens/encheres.js';
+import versusScreen from './screens/versus.js';
 import pacteScreen from './screens/pacte.js';
 import cryptesScreen from './screens/cryptes.js';
 import trialsScreen from './screens/trials.js';
@@ -49,7 +50,7 @@ startTranslator();
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,
   factions: factionsScreen, faction: factionsScreen, succes: achievementsScreen, profil: profileScreen,
-  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, amis: friendsScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen, sceaux: sceauxScreen, encheres: encheresScreen, pacte: pacteScreen, cryptes: cryptesScreen, jeux: gamesScreen, codex: codexScreen, epreuves: trialsScreen, epreuve: descentScreen, tirage: shadowScreen, renfort: forgeScreen, fournaise: furnaceScreen,
+  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, amis: friendsScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen, sceaux: sceauxScreen, encheres: encheresScreen, versus: versusScreen, pacte: pacteScreen, cryptes: cryptesScreen, jeux: gamesScreen, codex: codexScreen, epreuves: trialsScreen, epreuve: descentScreen, tirage: shadowScreen, renfort: forgeScreen, fournaise: furnaceScreen,
 };
 const TABS = [
   ['antre', 'tab-home', 'Accueil'], ['collection', 'tab-collection', 'Collection'], ['boutique', 'tab-butin', 'Butin'], /* v428 : boosters, coffres et Tirage (v432 : « Butin ») */
@@ -57,14 +58,14 @@ const TABS = [
 ];
 // icônes peintes de la barre du bas (assets/icons)
 const tabIcon = (k) => `<img class="tab-pic" alt="" src="assets/icons/${k}.webp">`;
-const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', codex: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', amis: 'menu', equipe: 'collection', renfort: 'collection', fournaise: 'collection', coffres: 'boutique', heros: 'descente', arsenal: 'boutique', marchand: 'descente', sceaux: 'descente', encheres: 'descente', pacte: 'descente', cryptes: 'descente', jeux: 'descente', epreuves: 'descente', epreuve: 'descente', tirage: 'boutique' };
+const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', codex: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', amis: 'menu', equipe: 'collection', renfort: 'collection', fournaise: 'collection', coffres: 'boutique', heros: 'descente', arsenal: 'boutique', marchand: 'descente', sceaux: 'descente', encheres: 'descente', versus: 'descente', pacte: 'descente', cryptes: 'descente', jeux: 'descente', epreuves: 'descente', epreuve: 'descente', tirage: 'boutique' };
 // Fond illustré de chaque page (l'Accueil et la Descente posent le leur)
 const ROUTE_SCENE = { boutique: 'shop', codex: 'shop', tirage: 'shadow', renfort: 'collection', fournaise: 'collection', collection: 'collection', equipe: 'team', coffres: 'chests', bestiaire: 'bestiary', succes: 'trophies', profil: 'profile', menu: 'menu', parametres: 'menu', compte: 'menu', amis: 'menu', factions: 'factions', faction: 'factions' };
 // Page parente des sous-pages (bouton retour en haut)
-const PARENT = { amis: 'menu', bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente', arsenal: 'coffres', marchand: 'descente', sceaux: 'jeux', encheres: 'jeux', pacte: 'jeux', cryptes: 'jeux' };
+const PARENT = { amis: 'menu', bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente', arsenal: 'coffres', marchand: 'descente', sceaux: 'jeux', encheres: 'jeux', versus: 'jeux', pacte: 'jeux', cryptes: 'jeux' };
 // Sous-onglets de chaque onglet principal (barre en haut de la page)
 // v425 : pages rangées sous un autre sous-onglet (allumé sur elles)
-const SUB_OF = { fournaise: 'renfort', sceaux: 'jeux', encheres: 'jeux', pacte: 'jeux', cryptes: 'jeux' };
+const SUB_OF = { fournaise: 'renfort', sceaux: 'jeux', encheres: 'jeux', versus: 'jeux', pacte: 'jeux', cryptes: 'jeux' };
 const SUBNAV = {
   collection: [['collection', 'cards', 'Cartes'], ['equipe', 'team-ic', 'Équipe'], ['renfort', 'furnace', 'Forge']], /* v422 : Renforcer + Fournaise */
   boutique: [['boutique', 'booster', 'Boosters'], ['coffres', 'chest', 'Coffres'], ['tirage', 'shadow', 'Tirage'], ['codex', 'book', 'Codex']], /* v470 : Codex et Échoppe, en Mode Créateur seulement */ /* v428 : les coffres rejoignent le Butin */

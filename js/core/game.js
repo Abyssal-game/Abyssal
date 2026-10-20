@@ -412,6 +412,39 @@ export class Game {
     this.persist();
     return chest;
   }
+  // v512 : Versus Booster. La mise est payée par le jeu (éclats de la sauvegarde) ; le serveur ouvre les boosters
+  // et dit ce que chaque joueur encaisse (supabase/08-versus.sql). Chaque défi n'est encaissé qu'une fois.
+  versusPay(stake) {
+    if (!(stake > 0)) throw new Error('Mise invalide.');
+    if (this.s.shards < stake) throw new Error(`Il te manque ${stake - this.s.shards} éclats pour cette mise.`);
+    this.s.shards -= stake;
+    this.s.stats.shardsSpent += stake;
+    this.s.versus.spent += stake;
+    this.persist();
+  }
+  versusRefund(stake) { if (stake > 0) { this.s.shards += stake; this.s.stats.shardsSpent = Math.max(0, this.s.stats.shardsSpent - stake); this.s.versus.spent = Math.max(0, this.s.versus.spent - stake); this.persist(); } }
+  // res = réponse de versus_claim : { result: win|tie|lose|refund|already|wait, cards, stake }
+  versusApply(id, res) {
+    const v = this.s.versus;
+    if (!res || v.done[id] || !['win', 'tie', 'lose', 'refund'].includes(res.result)) return null;
+    v.done[id] = res.result;
+    const keys = Object.keys(v.done);
+    if (keys.length > 200) for (const k of keys.slice(0, keys.length - 200)) delete v.done[k];
+    const out = { result: res.result, cards: [], shards: 0 };
+    if (res.result === 'refund') { this.versusRefund(res.stake); out.shards = res.stake; return out; }
+    v.played++;
+    if (res.result === 'win') v.wins++; else if (res.result === 'tie') v.ties++; else v.losses++;
+    for (const c of res.cards || []) {
+      if (!this.catalog.get(c.id)) continue; // carte d'une version plus récente du jeu
+      const r = this.addCard(c.id, c.variant || 'normal', 'booster');
+      out.cards.push({ ...c, ...r });
+    }
+    v.won += out.cards.length;
+    this.s.xp += 10;
+    out.progress = this.checkProgress();
+    this.persist();
+    return out;
+  }
   // Doublons et Fournaise -------------------------------------------------
   // Un doublon = un exemplaire en plus du premier, dans la même finition (chaque finition gardée une fois).
   spare(id) { const e = this.s.collection[id]; return e ? Object.values(e.v).reduce((a, k) => a + Math.max(0, (k || 0) - 1), 0) : 0; }
