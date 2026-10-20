@@ -13,7 +13,7 @@ import { esc, fmt, toast, confirmBox, openSheet, bindActions } from '../ui/dom.j
 import { packHTML } from './shop.js';
 import { t, tx } from '../i18n.js';
 
-const OFF = 'Le Versus Booster n’est pas encore ouvert sur le serveur.';
+const OFF = 'Le Pari des Boosters n’est pas encore ouvert sur le serveur.';
 const RES = { win: 'Victoire', tie: 'Égalité', lose: 'Défaite' };
 // v516 : « Comment ça marche » dans le style des autres jeux (étapes illustrées)
 const HOW = [['booster', '#E8C35A', 'Compose ton défi', `Choisis jusqu’à ${VERSUS_MAX} boosters, de types différents si tu veux (par exemple un standard et un de faction Céleste). Les deux joueurs ouvrent les mêmes.`],
@@ -50,13 +50,13 @@ export default function versusScreen(app, root) {
   const left = (t) => Math.max(0, VERSUS_HOURS - Math.floor((Date.now() - new Date(t)) / 3600000));
 
   function head() {
-    return `<header class="screen-head ui-hero bn-versus"><h1>Versus Booster</h1><p class="muted">Ouvrez vos boosters face à face : le meilleur total remporte <b>toutes</b> les cartes.</p></header>`;
+    return `<header class="screen-head ui-hero bn-versus"><h1>Le Pari des Boosters</h1><p class="muted">Ouvrez vos boosters face à face : le meilleur total remporte <b>toutes</b> les cartes.</p></header>`;
   }
 
   function draw() {
     if (!alive) return;
     if (!cloud.isLoggedIn()) {
-      root.innerHTML = `${head()}${rulesHTML()}<section class="panel stack center"><p>Le Versus se joue contre d’autres joueurs : crée ton compte en un instant, ta partie est gardée.</p><a class="btn primary block" href="#/compte">${icon('user')}Créer un compte ou se connecter</a></section>`;
+      root.innerHTML = `${head()}${rulesHTML()}<section class="panel stack center"><p>Le Pari des Boosters se joue contre d’autres joueurs : crée ton compte en un instant, ta partie est gardée.</p><a class="btn primary block" href="#/compte">${icon('user')}Créer un compte ou se connecter</a></section>`;
       return;
     }
     if (!sync.profile?.pseudo) {
@@ -240,7 +240,7 @@ export default function versusScreen(app, root) {
       <div class="vs-side me"><div class="vs-grid n${mine.length}">${mine.map((c, i) => cell(c, i, 'me')).join('')}</div><div class="vs-who"><span class="fr-av">${pic(g.s.avatar || sync.profile?.avatar)}</span><b>Toi</b><span class="vs-sc" data-sc="me">0</span></div></div>
       <div class="vs-end" hidden></div>
       <p class="small muted center vs-skip">Touche pour tout révéler</p>
-    </div>`, { full: true, cls: 'vs-sheet', label: 'Versus Booster', onClose: () => { clearTimeout(timer); progress(); } });
+    </div>`, { full: true, cls: 'vs-sheet', label: 'Le Pari des Boosters', onClose: () => { clearTimeout(timer); progress(); } });
     const box = s.body.querySelector('.vs-duel');
     const order = [];
     for (let i = 0; i < Math.max(mine.length, theirs.length); i++) { if (i < theirs.length) order.push(['foe', i]); if (i < mine.length) order.push(['me', i]); }
