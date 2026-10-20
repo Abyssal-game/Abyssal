@@ -89,11 +89,12 @@ const F = (k, cost) => ({ id: k, kind: 'frame', give: { frame: k }, cost });
 const B = (k, cost) => ({ id: k, kind: 'back', give: { back: k }, cost });
 const FN = (k, cost) => ({ id: k, kind: 'finish', give: { finish: k }, cost });
 export const ROYAUMES = ['dos-infernal', 'dos-abyssal', 'dos-celeste', 'dos-sauvage', 'dos-necrotique', 'dos-primordial', 'dos-artificiel'];
+/* v535 : cadres de la meute, des corbeaux, des chaînes et des roses noires retirés de la vente (leur ornement cachait le visage de la créature) */
 export const CATALOG = [
   F('cx-givre', 250), F('cx-braise', 250), F('cx-os', 300), F('cx-serpents', 300), F('cx-vitrail', 300), F('cx-rouages', 300),
-  F('cx-racines', 300), F('cx-chaines', 300), F('cx-yeux', 350), F('cx-ruche', 350),
-  F('cx-lanternes', 450), F('cx-voile', 700), F('cx-houx', 450), F('cx-aurore', 700), F('cx-roses', 450), F('cx-prince', 700), F('cx-leviathan', 700), F('cx-seraphin', 700), F('cx-meute', 700), F('cx-liche', 700), F('cx-ouroboros', 700), F('cx-automate', 700), F('cx-gueule', 500), F('cx-eclipse', 500), F('cx-horloger', 500), F('cx-balance', 500),
-  F('cx-constellation', 750), F('cx-geode', 450), F('cx-sablier', 450), F('cx-pages', 450), F('cx-corbeau', 450), F('cx-souverain', 1200),
+  F('cx-racines', 300), F('cx-yeux', 350), F('cx-ruche', 350),
+  F('cx-lanternes', 450), F('cx-voile', 700), F('cx-houx', 450), F('cx-aurore', 700), F('cx-prince', 700), F('cx-leviathan', 700), F('cx-seraphin', 700), F('cx-liche', 700), F('cx-ouroboros', 700), F('cx-automate', 700), F('cx-gueule', 500), F('cx-eclipse', 500), F('cx-horloger', 500), F('cx-balance', 500),
+  F('cx-constellation', 750), F('cx-geode', 450), F('cx-sablier', 450), F('cx-pages', 450), F('cx-souverain', 1200),
   B('dos-abime', 350), B('dos-ames', 500), B('dos-solstice', 500), B('dos-roses', 500), B('dos-lune-sang', 500), B('dos-devoreur', 500), B('dos-eclipse', 500), B('dos-horloger', 500), B('dos-miroirs', 500), B('dos-jumeaux', 500), B('dos-titan', 500),
   B('dos-abysse', 750), B('dos-tarot', 500), B('dos-mosaique', 500), B('dos-encre', 500), B('dos-alchimie', 500), B('dos-carte-abysse', 500), B('dos-reliquaire', 750), B('dos-tapisserie', 500), B('dos-art-deco', 750), B('dos-vivant', 750), B('dos-nebuleuse', 750), B('dos-vitrail', 500), ...ROYAUMES.map((k) => B(k, 300)),
   FN('fin-ecarlate', 800), FN('fin-givree', 800), FN('fin-spectrale', 1000), FN('fin-vitrail', 1000),

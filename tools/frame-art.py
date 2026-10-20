@@ -67,6 +67,8 @@ if FIT:
     v = (at(x0, y0) * (1 - fx) * (1 - fy) + at(x0 + 1, y0) * fx * (1 - fy) + at(x0, y0 + 1) * (1 - fx) * fy + at(x0 + 1, y0 + 1) * fx * fy)
     al = v[..., 3:4]
     rgb = np.clip(v[..., :3] / np.maximum(al / 255, 1e-3), 0, 255)
+    if '--clip' in sys.argv:                                       # v535 : rien ne dépasse dans le cercle de la photo (ornements coupés au bord intérieur)
+        al = al * np.clip((rr / hc - (HOLE - 0.005)) / 0.02, 0, 1)[..., None]
     out = Image.fromarray(np.dstack([rgb, al]).astype(np.uint8), 'RGBA')
     out.resize((256, 256), Image.LANCZOS).save(f'assets/frames/{key}-{SUF}.webp', quality=88, method=6)
     print(f'{key}: anneau {r_out / r_in:.2f} × le trou → {"tassé ×" + format(k / s0, ".2f") if k < s0 else "gardé"}')
