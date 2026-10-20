@@ -384,6 +384,14 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     camA = d.animate([{ translate: '0 0' }, { translate: `${cx.toFixed(1)}px ${cy.toFixed(1)}px`, offset: 0.3 }, { translate: '0 0' }], { duration: T(450), easing: 'ease-out' });
   };
   // Arrêt sur image : le coup « pèse » un instant
+  /* v509 : PV d'une carte mis à jour au moment du coup (chiffre ET anneau de vie ; avant, l'anneau attendait le dessin suivant) */
+  const setHp = (c, uid, hp) => {
+    const box = c.querySelector('.dv-hp'); if (!box) return;
+    const u = st.units[uid], v = Math.max(0, hp ?? u?.hp ?? 0), mx = Math.max(1, u?.maxHp || 1);
+    const b = box.querySelector('b'); if (b) b.textContent = v;
+    box.style.setProperty('--hpp', Math.max(0, Math.min(100, Math.round((v / mx) * 100))));
+    box.classList.toggle('hurt', v < mx); box.classList.toggle('low', v > 0 && v <= mx * 0.3);
+  };
   const hitstop = async (ms) => {
     if (reduced) return;
     // v365 : on fige seulement les animations des cartes, sans changer de classe (plus de recalcul de tout le plateau)
@@ -571,20 +579,22 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
           /* v499 : dégâts sans attaquant (poison, épuisement, marée, pacte…) : une simple marque, sans lame ni secousse */
           if (!e.src) {
             const tt = el(e.u);
-            if (tt) { const hp = tt.querySelector('.dv-hp b'); if (hp) hp.textContent = Math.max(0, e.hp); tt.querySelector('.dv-hp')?.classList.add('hurt'); }
+            if (tt) setHp(tt, e.u, e.hp);
             float(e.u, `-${e.d}`, `dmg tick ${st.units[e.u]?.poison ? 'venom' : ''}`); app.sfx.tap?.();
             await wait(T(170)); break;
           }
           const nx = nextHit(ev, ei), chain = burstSrc === e.src, more = !!(nx && nx.src === e.src);
           burstN = chain ? burstN + 1 : 1; burstSrc = more ? e.src : null;
           const t = el(e.u);
-          if (t) { t.classList.remove('hit'); void t.offsetWidth; t.classList.add('hit'); const hp = t.querySelector('.dv-hp b'); if (hp) hp.textContent = Math.max(0, e.hp); t.querySelector('.dv-hp')?.classList.add('hurt'); }
           const crit = lastTier === 'crit', heavy = crit || e.d >= 8;
           lastTier = null;
           const viaSkill = skillHit && skillHit === e.u; skillHit = null;
+          /* v509 : tout part au même instant, l'impact : son, PV (chiffre et anneau), chiffre de dégâts, effets ; l'arrêt sur image vient après */
+          (heavy ? app.sfx.smash : app.sfx.slash)();
+          if (t) { t.classList.remove('hit'); void t.offsetWidth; t.classList.add('hit'); setHp(t, e.u, e.hp); }
+          float(e.u, `${crit ? 'CRITIQUE ' : ''}−${e.d}${burstN > 1 ? ` ×${burstN}` : ''}`, crit ? 'dmg big crit' : heavy ? 'dmg big' : 'dmg');
           // v341 : chaque coup marque l'impact — entaille lumineuse sur la carte touchée et court arrêt sur image
           if (t && !reduced && !aoeHit) { const k = document.createElement('span'); k.className = `dv-cut ${st.units[e.u]?.side === 'ally' ? 'foe' : ''} ${heavy ? 'big' : ''}`; k.style.setProperty('--ca', `${-38 + Math.round(Math.random() * 30)}deg`); t.appendChild(k); setTimeout(() => k.remove(), 520); }
-          if (!more) await hitstop(crit ? 140 : heavy ? 80 : 45); /* v499 : coups enchaînés sans arrêt sur image, seul le dernier pèse */
           const sU = e.src && st.units[e.src];
           // v343 : planches peintes (Gemini) — lame d'or pour tes coups, griffes corrompues pour les ennemis, croix runique pour les critiques
           // v346 : effets plus grands et plus longs, éclair d'impact sur la cible, coup de caméra vers elle
@@ -593,11 +603,12 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
           else if (!aoeHit) { if (crit) fxSheet(e.u, 'crit-strike', { k: 3.2, d: 900 }); else fxSheet(e.u, 'foe-strike', { k: heavy ? 3 : 2.6, d: 760 }); }
           if (!aoeHit) { if (!viaSkill) impactFlash(e.u, heavy); if (!chain) cam(e.u, heavy ? 1.6 : 1.1); }
           if (crit) dio.flare();
-          float(e.u, `${crit ? 'CRITIQUE ' : ''}−${e.d}${burstN > 1 ? ` ×${burstN}` : ''}`, crit ? 'dmg big crit' : heavy ? 'dmg big' : 'dmg'); (heavy ? app.sfx.smash : app.sfx.slash)(); sparks(e.u, crit ? 'gold' : ''); if (!aoeHit) shake(!more && (crit || heavy || e.hp <= 0), more || !(crit || heavy || e.hp <= 0));
-          await wait(T(more ? 170 : heavy ? 300 : 220));
+          sparks(e.u, crit ? 'gold' : ''); if (!aoeHit) shake(!more && (crit || heavy || e.hp <= 0), more || !(crit || heavy || e.hp <= 0));
+          if (!more) await hitstop(crit ? 140 : heavy ? 80 : 45); /* v499 : coups enchaînés sans arrêt sur image, seul le dernier pèse */
+          await wait(T(more ? 170 : heavy ? 260 : 190));
           break;
         }
-        case 'heal': { app.sfx.heal(); fxSheet(e.u, 'role-heal', { k: 2.3, d: 850 }); float(e.u, `+${e.d}`, 'heal'); const hp = el(e.u)?.querySelector('.dv-hp b'); if (hp) hp.textContent = st.units[e.u].hp; await wait(T(200)); break; }
+        case 'heal': { app.sfx.heal(); fxSheet(e.u, 'role-heal', { k: 2.3, d: 850 }); float(e.u, `+${e.d}`, 'heal'); const hc = el(e.u); if (hc) setHp(hc, e.u, e.hp ?? st.units[e.u].hp); await wait(T(200)); break; }
         case 'block': lastTier = null; skillHit = null; app.sfx.block(); ring(e.u, 'guard'); float(e.u, 'Bloqué', 'info'); sparks(e.u, 'blue'); await wait(T(240)); break;
         case 'dodge': {
           app.sfx.dodge();
@@ -934,8 +945,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     return new Promise((resolve) => {
       const e = st.units[s.a], moving = e?.boss || e?.elite;
       // v388 : zone réglée en TEMPS (avant : sa durée raccourcissait plus elle était loin sur la barre), toucher daté par
-      // l'événement lui-même, compensation du retard écran + toucher (LAG) et petite tolérance juste après l'impact (GRACE)
-      const w = defenseWindow(st, s.a, s.t), ease = (x) => Math.max(0, x) ** 1.7, D = 900, LAG = 40, GRACE = 50;
+      // l'événement lui-même ; v509 : jugé sur l'image affichée à cet instant (sans compensation ni marge après la zone)
+      const w = defenseWindow(st, s.a, s.t), ease = (x) => Math.max(0, x) ** 1.7, D = 900; /* v509 : plus de LAG ni de marge de 50 ms après l’impact : on juge ce que le joueur voyait */
       const tb = D * (0.55 + Math.random() * 0.35), ta = tb - w.dodge, tp = tb - w.parry; /* fin de zone = impact ; parade = son dernier instant */
       const za = ease(ta / D), zb = ease(tb / D), pz0 = ease(tp / D);
       const zw = zb - za, pw = zb - pz0, z0 = za;
@@ -953,7 +964,6 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       const bw = bar.querySelector('.dv-dodge-bar').offsetWidth; /* une seule mesure : le curseur glisse ensuite en transform (sans recalcul de mise en page) */
       let t0 = 0, done = false, raf = 0, lit = '';
       const zoneAt = (x) => (moving ? Math.min(0.97 - zw, Math.max(0.3, z0 + Math.sin(x * 9) * 0.1)) : z0);
-      const g = ease((tb + GRACE) / D) - zb; /* tolérance après l'impact, en longueur de barre */
       let held = false;
       const end = (res) => {
         if (done) return; done = true; cancelAnimationFrame(raf); defTap = null; removeEventListener('pointerup', letGo, true); removeEventListener('pointercancel', letGo, true);
@@ -968,9 +978,11 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         if (res === 'none') app.sfx.miss();
         setTimeout(() => { bar.remove(); $('.dv-mid')?.classList.remove('qte'); el(s.a)?.classList.remove('aim'); tEls.forEach((x) => x?.classList.remove('aimed')); resolve(res); }, res === 'none' ? 200 : 300);
       };
+      const shown = []; /* v509 : images affichées (instant, position du curseur, zone) : le toucher est jugé sur ce que le joueur voyait */
       const step = () => {
-        const x = (performance.now() - t0) / D, pos = ease(Math.min(1, x)), zz = moving ? zoneAt(x) : z0;
+        const now0 = performance.now(), x = (now0 - t0) / D, pos = ease(Math.min(1, x)), zz = moving ? zoneAt(x) : z0;
         cur.style.transform = `translateX(${(pos * bw).toFixed(1)}px)`;
+        shown.push([now0, pos, zz]); if (shown.length > 12) shown.shift();
         if (moving) zEl.style.transform = `translateX(${((zz - z0) * bw).toFixed(1)}px)`;
         const pz = zz + zw - pw, now = pos >= pz && pos <= pz + pw ? 'pp' : pos >= zz && pos <= zz + zw ? 'go' : '';
         if (now !== lit) { if (lit) bar.classList.remove(lit); if (now) bar.classList.add(now); lit = now; } /* la zone s'allume quand le curseur y entre */
@@ -978,9 +990,15 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       };
       const judgeAt = (at) => {
         const now = performance.now(), when = at && at <= now && now - at < 500 ? at : now;
-        const x = (when - t0 - LAG) / D, pos = ease(Math.min(1, x)), zz = zoneAt(x);
-        const pz = zz + zw - pw; // la parade : le tout dernier instant de la zone, juste avant l'impact (+ tolérance)
-        end(pos >= pz && pos <= zz + zw + g ? 'parry' : pos >= zz - g * 0.5 && pos < pz ? 'dodge' : 'none');
+        // v509 : position du curseur sur l'image affichée au moment du toucher (avant : calculée avec un retard de 40 ms retiré,
+        // « je touche pile le blanc et j'ai une esquive, trop tard et j'ai une parade »)
+        const seen = shown.filter((r) => r[0] <= when).slice(-2); /* l'image en cours et la précédente (encore à l'écran) : la meilleure compte */
+        if (!seen.length) { const x = (when - t0) / D; seen.push([when, ease(Math.min(1, x)), zoneAt(x)]); }
+        const tol = 5 / Math.max(80, bw); /* demi-largeur du trait du curseur */
+        const rank = { parry: 2, dodge: 1, none: 0 };
+        const res = seen.map(([, pos, zz]) => { const pz = zz + zw - pw; /* la parade : le trait blanc, tout au bout de la zone (+ tolérance juste après) */
+          return pos >= pz - tol && pos <= zz + zw + tol ? 'parry' : pos >= zz - tol && pos < pz - tol ? 'dodge' : 'none'; }); /* v509 : après le trait blanc, plus de marge (avant : ~15 px de « parade » en retard) */
+        end(res.sort((a, b) => rank[b] - rank[a])[0]);
       };
       /* coup chargé : on appuie quand on veut, c'est le moment où l'on relâche qui compte */
       function letGo(ev) { if (!held || done) return; held = false; bar.classList.remove('held'); if (!t0) return end('none'); judgeAt(ev.timeStamp); }
@@ -1132,7 +1150,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const u = sel; mode = null;
     if (a.dice) { // compétence à dé : la frappe rythmée part tout de suite, puis le jet
       busy = true; app.sfx.tap(); draw();
-      st.rhythm = firstSteps() ? RHYTHM.perfect : await rhythmQTE(a.name, u); /* v398 : premiers pas, le dé part tout seul (réussite assurée) */
+      st.rhythm = await rhythmQTE(a.name, u); /* v509 : lancer chargé dès le premier combat (avant v509 : automatique aux étages 1-2) */
       if (!alive_) return;
     }
     return exec(() => act(st, u, key, uid));

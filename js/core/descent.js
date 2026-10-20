@@ -86,6 +86,11 @@ const ease = (pts, f) => {
   return pts[pts.length - 1][1];
 };
 export const lateSoft = (floor) => ease(FOE_EASE, floor);
+// v509 : premiers chapitres encore trop faciles (« jusqu'à l'étage 5, on s'ennuie ») : les ennemis y tenaient 2 à 5 tours.
+// PV seulement (l'attaque reste celle de FOE_EASE), en plus, puis plus rien vers l'étage 14
+export const EARLY_HP = [[1, 1.7], [4, 1.55], [8, 1.35], [14, 1]];
+export const EARLY_BOSS_HP = [[5, 1.3], [10, 1.15], [15, 1]];
+export const earlyHp = (floor, boss) => (floor >= 15 ? 1 : ease(boss ? EARLY_BOSS_HP : EARLY_HP, floor));
 export const bossEase = (floor) => ease(BOSS_EASE, floor);
 
 // v326 : les anciennes familles du Bestiaire (Brute, Lanceur, Essaim…) ont été retirées : le Bestiaire affiche

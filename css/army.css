@@ -4543,3 +4543,18 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 /* v505 : demande d'ami : le titre du joueur passe sur deux lignes au lieu d'être coupé (iPhone SE) */
 .fr-row .fr-t small { white-space: normal; overflow: visible; text-overflow: clip; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.2; }
 .fr-row .fr-t { min-width: 0; }
+
+/* v509 : récapitulatif d'ouverture de booster centré verticalement (capture du propriétaire : cartes collées en haut, grand vide dessous) */
+.opening.is-summary .op-stage { justify-content: center !important; }
+.opening.is-summary .op-summary { height: auto; margin-block: auto; justify-content: center; }
+
+/* v509 : aperçu des cadres à l'Échoppe (capture du propriétaire : portrait ovale et cadre actuel décalé) : les petits portraits
+   étaient des <span> en ligne, sans taille réelle ; ils deviennent des pastilles rondes de taille fixe */
+.cx-pv-vs .avatar-mini, .cx-pv-rank .avatar-mini { display: inline-block; position: relative; flex: none; border-radius: 50%; aspect-ratio: 1; }
+.cx-pv-vs .avatar-mini > img, .cx-pv-rank .avatar-mini > img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.cx-pv-vs .avatar-mini > svg, .cx-pv-rank .avatar-mini > svg { width: 100%; height: 100%; }
+/* v509 : booster de 3 cartes : cartes plus grandes (2 colonnes au lieu de 3), tant que la hauteur de l'écran le permet */
+.opening.is-summary .op-grid:has(> .op-cell:nth-child(3):last-child) { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; width: min(100%, calc((var(--app-h, 100dvh) - var(--safe-t) - var(--safe-b) - 340px) / 1.42)) !important; gap: 8px 10px !important; }
+.opening.is-summary .op-grid:has(> .op-cell:nth-child(3):last-child) .op-cell:nth-child(1) { grid-column: 1 / span 2; }
+.opening.is-summary .op-grid:has(> .op-cell:nth-child(3):last-child) .op-cell:nth-child(2) { grid-column: 3 / span 2; }
+.opening.is-summary .op-grid:has(> .op-cell:nth-child(3):last-child) .op-cell:nth-child(3) { grid-column: 2 / span 2; }

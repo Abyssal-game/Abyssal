@@ -14,7 +14,7 @@ import { FINAL_FLOOR, BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORD
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
 import { CODEX, CODEX_XP, CODEX_TIERS, SHOP, CATALOG, codexState, codexTier } from './codex.js';
-import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, lateSoft, bossEase, expectedLevel, cardPower, powerFor, advisedPower, floorForPower, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
+import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, lateSoft, bossEase, earlyHp, expectedLevel, cardPower, powerFor, advisedPower, floorForPower, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative } from './duel.js';
 import { bossOf, BOSSES, BOSS_ORDER } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
@@ -1279,7 +1279,7 @@ export class Game {
         if (rule.key === 'sommeil' && f === rule.faction) { e.maxHp = Math.max(1, Math.round(e.maxHp * 0.75)); e.hp = e.maxHp; }
         const nt = nightTier(run); if (nt) { e.maxHp = Math.round(e.maxHp * nt.hp); e.hp = e.maxHp; e.atk = Math.round(e.atk * nt.atk + 0.4); }
         if (run.omen === 'avare') e.atk = Math.round(e.atk * 1.1 + 0.4);
-        { const k = (e.boss ? bossEase(run.floor) : lateSoft(run.floor)) * (run.nightmare ? 1 : this.gritMult(chapterOf(run.start || 1))); if (k !== 1) { e.maxHp = Math.max(1, Math.round(e.maxHp * k)); e.hp = e.maxHp; e.atk = Math.max(1, Math.round(e.atk * k)); } } /* v460 */
+        { const k = (e.boss ? bossEase(run.floor) : lateSoft(run.floor)) * (run.nightmare ? 1 : this.gritMult(chapterOf(run.start || 1))); if (k !== 1) { e.maxHp = Math.max(1, Math.round(e.maxHp * k)); e.hp = e.maxHp; e.atk = Math.max(1, Math.round(e.atk * k)); } if (!run.nightmare) { const h = earlyHp(run.floor, e.boss); if (h !== 1) { e.maxHp = Math.max(1, Math.round(e.maxHp * h)); e.hp = e.maxHp; } } } /* v460, v509 */
         // Gardien éveillé (Cauchemar, ou à partir de l'étage 30) : sa phase 2 commence dès le premier tour
         if (e.boss && (run.nightmare || run.floor >= AWAKEN_AT)) e.awakened = true;
       }
