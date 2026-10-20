@@ -20,9 +20,17 @@ const HOW = [['cards', '#7FA8D8', 'Les cryptes', '20 cartes face cachée, en 10 
 const howLi = ([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic === 'eye' ? 'ui-eye' : ic === 'crystal' ? 'cur-shard' : ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`;
 const howHTML = () => `<ol class="how-steps">${HOW.map(howLi).join('')}</ol>`; /* v491 : tutoriel entier, sans « Pour aller plus loin » */
 
+/* v510 : pouvoirs plus lisibles : nom court sur chaque carte retournée, grande fenêtre à chaque paire (pourquoi, quoi, et « tu rejoues ») */
+const PW_LABEL = { infernal: 'Regard', abyssal: 'Remous', celeste: 'Grâce', necrotique: 'Pillage', sauvage: 'Cri', primordial: 'Souffle', artificiel: 'Verrou' };
+const PW_MINE = { infernal: 'Touche une carte face cachée : toi seul la verras.', abyssal: 'Touche deux cartes face cachée : elles échangent leur place. Ce que l’adversaire avait retenu ne vaut plus rien.', celeste: 'Ta prochaine erreur ne te fera pas perdre la main.', necrotique: '', sauvage: 'Touche une carte face cachée : elle sera montrée à tout le monde.', primordial: '+1 point de bonus pour toi.', artificiel: 'Le prochain pouvoir de ton adversaire ne marchera pas.' };
+const PW_FOE = { infernal: '{nm} regarde une carte en secret (celle qui brille).', abyssal: '{nm} échange deux cartes de place (celles qui brillent en bleu).', celeste: 'Sa prochaine erreur ne lui fera pas perdre la main.', necrotique: '', sauvage: '{nm} retourne une carte à la vue de tous.', primordial: '+1 point de bonus pour {nm}.', artificiel: 'Ton prochain pouvoir ne marchera pas.' };
+const pwMed = (f) => `<span class="cr-pw-med">${sigil(f)}<img alt="" src="assets/jeux/cr-pw-${f}.webp" onerror="this.remove()"></span>`;
+
 export default function cryptesScreen(app, root) {
   const g = app.game, cat = app.catalog;
-  let busy = false, timer = 0, gone = false, banner = null;
+  let busy = false, timer = 0, gone = false, banner = null, pop = null, popDone = null;
+  /* fenêtre d'un pouvoir : se ferme d'un toucher, ou toute seule */
+  const popWait = (ms) => new Promise((r) => { popDone = r; timer = setTimeout(r, app.reduced() ? Math.min(ms, 1600) : ms); });
   // affichage temporaire : cartes montrées face visible (en plus de st.open), cartes en lumière, cartes choisies pour un pouvoir
   const ui = { up: new Set(), glow: new Set(), picks: [], swap: new Set() };
   const wait = (ms) => new Promise((r) => { timer = setTimeout(r, app.reduced() ? Math.min(ms, 200) : ms); });
@@ -76,13 +84,13 @@ export default function cryptesScreen(app, root) {
   }
   const seat = (st, x) => {
     const R = CR.RIVALS[st.rival], n = CR.scoreOf(st, x);
-    const tags = [st.grace[x] ? `<span class="pa-tag ok">${icon('shield')}Grâce ×${st.grace[x]}</span>` : '', st.block[x] ? '<span class="pa-tag bad">Pouvoir bloqué</span>' : '', st.bonus[x] ? `<span class="pa-tag gold">+${st.bonus[x]} bonus</span>` : ''].join('');
+    const tags = [st.grace[x] ? `<span class="pa-tag ok">${icon('shield')}Grâce : ${st.grace[x] > 1 ? `${st.grace[x]} erreurs pardonnées` : 'prochaine erreur pardonnée'}</span>` : '', st.block[x] ? '<span class="pa-tag bad">Prochain pouvoir bloqué</span>' : '', st.bonus[x] ? `<span class="pa-tag gold">+${st.bonus[x]} bonus</span>` : ''].join('');
     return `<div class="pa-seat cr-seat s-${x} ${st.turn === x && !st.over ? 'on' : ''}">
       <span class="sc-med ${x === 'p' ? 'mq-me' : ''}">${x === 'p' ? me() : pic(st.rival)}</span>
       <span class="pa-sc"><b>${x === 'p' ? 'Toi' : esc(R.name)}</b><span class="cr-won">${st.pairs[x].map((k) => { const c = st.cards.find((y) => y.k === k); return `<i style="--fc:${cat.faction[c.f].colors.secondary}">${sigil(c.f)}</i>`; }).join('') || '<small class="muted">aucune paire</small>'}${tags}</span></span>
       <span class="pa-pts"><b>${n}</b><small>point${n > 1 ? 's' : ''}</small></span></div>`;
   };
-  const face = (c) => { const card = c.id && cat.get(c.id), cursed = (g.s.cryptes.cur?.curse || []).includes(c.k); return `<img alt="" src="${card ? artUrl(card, { lite: true }) : 'assets/sceaux/dos.webp'}"><span class="cr-f" style="--fc:${cat.faction[c.f].colors.secondary}">${sigil(c.f)}</span>${cursed ? '<span class="cr-curse" title="Paire maudite"><img alt="" src="assets/icons/maudite.webp"></span>' : ''}`; }; /* v492 : marque des paires maudites */
+  const face = (c) => { const card = c.id && cat.get(c.id), cursed = (g.s.cryptes.cur?.curse || []).includes(c.k); return `<img alt="" src="${card ? artUrl(card, { lite: true }) : 'assets/sceaux/dos.webp'}"><span class="cr-f" style="--fc:${cat.faction[c.f].colors.secondary}">${sigil(c.f)}</span><span class="cr-pwl" style="--fc:${cat.faction[c.f].colors.secondary}">${PW_LABEL[c.f] || ''}</span>${cursed ? '<span class="cr-curse" title="Paire maudite"><img alt="" src="assets/icons/maudite.webp"></span>' : ''}`; }; /* v492 : marque des paires maudites */
   function grid(st) {
     const pick = st.pending && st.turn === 'p';
     return `<div class="cr-grid ${pick ? 'picking' : ''}">${st.cards.map((c, i) => {
@@ -108,7 +116,18 @@ export default function cryptesScreen(app, root) {
       ${seat(st, 'a')}
       ${info(st)}
       ${grid(st)}
-      ${seat(st, 'p')}</div>`; /* v466 : le bouton des pouvoirs passe dans la barre du haut (il sortait de l'écran sur iPhone SE) */
+      ${seat(st, 'p')}${pop ? popHTML(pop) : ''}</div>`; /* v466 : le bouton des pouvoirs passe dans la barre du haut (il sortait de l'écran sur iPhone SE) */
+  }
+  function popHTML(o) {
+    const fc = cat.faction[o.f]?.colors.secondary || '#C9A45A';
+    return `<div class="cr-pop ${o.cls || ''}" style="--fc:${fc}" role="dialog" aria-live="polite"><div class="cr-pop-in">
+      ${o.cards ? `<span class="cr-pop-pair">${o.cards.map((c) => `<span class="cr-pop-c">${face(c)}</span>`).join('')}</span>` : ''}
+      <span class="cr-pop-k">${esc(o.kicker)}</span>
+      <span class="cr-pop-h">${pwMed(o.f)}<b>${esc(o.title)}</b></span>
+      <p class="cr-pop-t">${o.text}</p>
+      ${o.why ? `<p class="cr-pop-why">${o.why}</p>` : ''}
+      ${o.chips ? `<span class="cr-pop-chips">${o.chips.map((c) => `<span>${c}</span>`).join('')}</span>` : ''}
+      <small class="cr-pop-tap">Touche pour continuer</small></div></div>`;
   }
   // Après une paire : annonce du pouvoir (et ses effets visibles)
   async function powerSay(st, ev) {
@@ -125,13 +144,26 @@ export default function cryptesScreen(app, root) {
     else if (!mine && ev.power === 'abyssal') txt = `${nm} échange deux cartes de place.`;
     else if (!mine && ev.power === 'sauvage') txt = `${nm} retourne une carte à la vue de tous.`;
     else if (mine && P.pick) txt = `${esc(P.short)}`;
-    banner = { cls: ev.blocked ? '' : mine ? 'ok' : 'ko', html: `${sigil(ev.power)}<span><b>Paire ${esc(fname(ev.f))} · ${esc(P.name)}</b><span class="small">${txt}</span></span>` };
+    /* v510 : grande fenêtre : quelle paire, quel pouvoir et pourquoi, ce qui se passe, et qui rejoue */
+    const pairCard = st.cards.find((c) => c.k === ev.k) || { f: ev.f };
+    const foeName = esc(CR.RIVALS[st.rival].name);
+    let what = ev.blocked ? (mine ? `Ton adversaire avait trouvé une paire <b>Artificielle</b> : son <b>Verrou</b> bloque ce pouvoir-ci.` : `Ta paire <b>Artificielle</b> l’avait verrouillé : son pouvoir ne marche pas.`)
+      : ev.power === 'necrotique' ? (ev.stolen != null ? (mine ? `Tu voles la dernière paire de ${foeName} : elle passe de ton côté.` : `${foeName} te vole ta dernière paire.`) : 'Aucune paire à voler pour l’instant.')
+      : ev.empty ? 'Plus assez de cartes cachées : rien ne se passe.'
+      : (mine ? PW_MINE[ev.power] : PW_FOE[ev.power].replace(/\{nm\}/g, foeName));
+    pop = { f: ev.power, cls: ev.blocked ? 'blocked' : mine ? 'mine' : 'foe', cards: [pairCard, pairCard],
+      kicker: `${mine ? 'Tu trouves' : `${foeName} trouve`} une paire · faction ${fname(ev.f)}`,
+      title: ev.blocked ? `${P.name} bloqué` : P.name, text: what,
+      why: `Pourquoi ? Chaque paire déclenche le pouvoir de sa faction. La faction ${esc(fname(ev.f))} donne <b>${esc(P.name)}</b>.`,
+      chips: [`+1 point`, mine ? 'Tu rejoues (paire trouvée)' : `${foeName} rejoue`] };
     if (!ev.blocked && !mine && ev.i2) {
       if (ev.power === 'sauvage') ev.i2.forEach((i) => ui.up.add(i));
       ev.i2.forEach((i) => (ev.power === 'abyssal' ? ui.swap : ui.glow).add(i));
     }
     app.sfx[ev.blocked ? 'block' : 'cr-power']?.(); /* v457 */
-    view(); await wait(ev.power === 'sauvage' && !mine ? 1900 : 1500);
+    view(); await popWait(mine ? 4200 : 3400);
+    pop = null;
+    if (!ev.blocked && !mine && ev.i2) { view(); await wait(ev.power === 'sauvage' ? 1400 : 900); } /* l'effet adverse reste visible un instant, fenêtre fermée */
     ui.up.clear(); ui.glow.clear(); ui.swap.clear(); banner = null;
   }
   // Montre un geste (carte retournée, paire, erreur), pour toi comme pour l'adversaire
@@ -147,7 +179,13 @@ export default function cryptesScreen(app, root) {
     }
     view(); await wait(1100);
     ui.up.clear(); app.sfx['cr-miss']?.();
-    if (ev.graced) { banner = { cls: ev.who === 'p' ? 'ok' : 'ko', html: `${sigil('celeste')}<span><b>Grâce céleste</b><span class="small">${ev.who === 'p' ? 'Tu gardes la main.' : `${esc(CR.RIVALS[st.rival].name)} garde la main.`}</span></span>` }; app.sfx.shield?.(); view(); await wait(1100); banner = null; }
+    if (ev.graced) { /* v510 : on explique pourquoi on rejoue malgré l'erreur */
+      const mine = ev.who === 'p', foeName = esc(CR.RIVALS[st.rival].name);
+      pop = { f: 'celeste', cls: mine ? 'mine' : 'foe', kicker: mine ? 'Pas de paire… mais' : `${foeName} se trompe… mais`, title: 'Grâce céleste',
+        text: mine ? 'Ta paire <b>Céleste</b> te protégeait : cette erreur est pardonnée, <b>tu gardes la main</b>.' : `Sa paire <b>Céleste</b> le protégeait : ${foeName} <b>garde la main</b>.`,
+        chips: [mine ? 'Tu rejoues' : `${foeName} rejoue`] };
+      app.sfx.shield?.(); view(); await popWait(3000); pop = null;
+    }
     /* v492 : crypte mouvante : deux cartes échangent leur place, sous les yeux du joueur */
     if (ev.drift) { ev.drift.forEach((i) => ui.swap.add(i)); banner = { cls: '', html: `<img class="cr-curse-big" alt="" src="assets/icons/hourglass.webp"><span><b>La crypte bouge</b><span class="small">Les deux cartes en lumière ont échangé leur place.</span></span>` }; app.sfx.swipe?.(); view(); await wait(1300); ui.swap.clear(); banner = null; }
     view();
@@ -208,6 +246,7 @@ export default function cryptesScreen(app, root) {
   function powers() { openSheet(`<div class="sc-rules"><h2>Pouvoirs des factions</h2><p class="small muted">Chaque paire déclenche le pouvoir de sa faction.</p>${powersHTML()}</div>`, { label: 'Pouvoirs des factions' }); }
 
   root.addEventListener('click', async (e) => {
+    if (pop && popDone) { const r = popDone; popDone = null; clearTimeout(timer); r(); return; } /* v510 : un toucher ferme la fenêtre du pouvoir */
     const b = e.target.closest('[data-cr]');
     if (!b || b.disabled) return;
     const k = b.dataset.cr;
