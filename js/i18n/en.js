@@ -5886,7 +5886,7 @@ export default {
   "Ouvert": "Opened",
   "{e0}Cadeau suivant": "{e0}Next gift",
   "{e0}Ouvrir · cadeau ({0})": "{e0}Open · gift ({0})",
-  "{e0}Ouvrir · booster du jour ({0})": "{e0}Open · daily booster ({0})",
+  "{e0}Ouvrir · gratuit ({0})": "{e0}Open · free ({0})",
   "{e0}Ouvrir le booster du jour": "{e0}Open the daily booster",
   "Cadeau de bienvenue · {0} / {1}": "Welcome gift · {0} / {1}",
   "Booster gratuit du jour": "Free daily booster",

@@ -22,7 +22,7 @@ export function payLabel(g, type, again = false) {
   /* v518 : les boosters offerts à l'arrivée se disent « cadeau », le booster du jour « du jour » */
   if (type === 'standard' && t > 0 && g.s.welcomeGift > 0) return again ? `${icon('ticket')}Cadeau suivant` : `${icon('ticket')}Ouvrir · cadeau (${g.s.welcomeGift})`;
   if (t > 0) return `${icon('ticket')}${again ? 'Encore un' : 'Ouvrir'} · ticket (${t})`;
-  if (type === 'standard') { const f = g.freePack(); if (f.stock > 0) return `${icon('p:free-pack')}${again ? 'Booster du jour' : `Ouvrir · booster du jour (${f.stock})`}`; }
+  if (type === 'standard') { const f = g.freePack(); if (f.stock > 0) return `${icon('p:free-pack')}${again ? 'Booster du jour' : `Ouvrir · gratuit (${f.stock})`}`; }
   return `${again ? 'Encore un' : 'Acheter'} <span class="price">${icon('crystal')}${fmt(BOOSTERS[type].price)}</span>`;
 }
 
@@ -145,6 +145,17 @@ export default function shop(app, root, params = []) {
         ${g.s.tickets.abysse ? card('abysse') : ''}
       </div>
     `;
+    fitBuy(); requestAnimationFrame(fitBuy); setTimeout(fitBuy, 120); setTimeout(fitBuy, 600); document.fonts?.ready.then(fitBuy); /* après la traduction et la police */
+  }
+  // v529 : le texte d'un bouton d'ouverture se réduit juste assez pour rester dans son cadre (il débordait sur le bord doré)
+  function fitBuy() {
+    root.querySelectorAll('.shop-buy').forEach((b) => {
+      b.style.removeProperty('font-size');
+      const cs = getComputedStyle(b), avail = b.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      const r = document.createRange(); r.selectNodeContents(b);
+      let fs = parseFloat(cs.fontSize), k = 0;
+      while (avail > 0 && r.getBoundingClientRect().width > avail && fs > 9 && k++ < 16) { fs -= 0.5; b.style.setProperty('font-size', `${fs}px`, 'important'); }
+    });
   }
   // v422 : boosters déjà à toi (tickets et boosters gratuits), ouverts d'un coup avec un récapitulatif
   function ownedPacks() {

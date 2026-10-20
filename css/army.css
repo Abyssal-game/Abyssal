@@ -4939,3 +4939,7 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .fr-pacts { margin-top: 14px; gap: 10px; }
 .fr-locked p { margin: 0; display: inline-flex; align-items: center; gap: 6px; justify-content: center; }
 .mp-end .dc-plq-red { margin-bottom: 8px; }
+
+/* v529 : boutons d'ouverture de la boutique : toute la largeur de la colonne, contenu dans le cadre (texte réduit par fitBuy) */
+.dc-plq.shop-buy { width: 100%; min-width: 0; max-width: 100%; padding: 0 26px !important; }
+.shop-buy .ic { flex: none; }
