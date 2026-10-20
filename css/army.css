@@ -4968,3 +4968,151 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .pf-cx-carnaval { --fr: url(../assets/frames/cx-carnaval-2.webp); }
 .pf-cx-phalenes { --fr: url(../assets/frames/cx-phalenes-2.webp); }
 .pf-cx-cristaux-sang { --fr: url(../assets/frames/cx-cristaux-sang-2.webp); }
+
+/* v533 : refonte du Codex (carte de saison, chemin des paliers) et de l'Échoppe (à la une, catégories, tuiles par rang).
+   Images Gemini attendues : assets/ui/cx-saison1.webp, cx-enlumine.webp, ech-vitrine.webp, obs-1..4.webp, ech-fondateur.webp (repli : dégradés) */
+.cx-top { min-height: 0; padding-block: 14px; }
+.cx-kick { font: 700 .68rem/1.2 var(--f-display); letter-spacing: .14em; text-transform: uppercase; color: #C9A45A; }
+.cx-season { position: relative; overflow: hidden; border-radius: 18px; min-height: 200px; margin: 0 0 12px; border: 1px solid rgba(201, 164, 90, .5); background: radial-gradient(120% 90% at 85% 0%, #3B5A8A 0%, #141A33 45%, #0B0C12 100%); box-shadow: 0 8px 24px rgba(0, 0, 0, .5); }
+.cx-season-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.cx-season::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8, 9, 13, 0) 20%, rgba(8, 9, 13, .9) 78%); }
+.cx-season-in { position: relative; z-index: 1; display: grid; gap: 8px; padding: 70px 16px 16px; }
+.cx-season h2 { margin: 0; font: 800 1.45rem/1.1 var(--f-display); color: #F2E3BF; text-shadow: 0 2px 8px #000; }
+.cx-season-row { display: flex; align-items: center; gap: 12px; }
+.cx-medal { flex: none; width: 62px; height: 62px; border-radius: 50%; display: grid; place-content: center; text-align: center; color: #1A1006; background: radial-gradient(circle at 35% 30%, #F7D98B, #A8772E 62%, #4A3210); box-shadow: 0 0 0 3px rgba(0, 0, 0, .55), 0 0 18px rgba(242, 193, 78, .45); }
+.cx-medal b { font: 800 1.45rem/1 var(--f-display); }
+.cx-medal small { font-size: .62rem; font-weight: 700; }
+.cx-season-p { flex: 1; display: grid; gap: 6px; font-size: .85rem; color: #EDE6D6; }
+.cx-bar2 { height: 10px; border-radius: 6px; overflow: hidden; background: rgba(0, 0, 0, .6); border: 1px solid rgba(201, 164, 90, .45); }
+.cx-bar2 i { display: block; height: 100%; background: linear-gradient(90deg, #8A5A1C, #F2C14E, #FFF0B8); box-shadow: 0 0 10px rgba(242, 193, 78, .6); }
+.cx-all { margin: 0 0 12px; }
+.cx-pitch { position: relative; overflow: hidden; border-radius: 18px; min-height: 196px; margin: 0 0 14px; border: 1px solid rgba(242, 193, 78, .7); background: radial-gradient(120% 100% at 100% 0%, #4A2A6B 0%, #1A0F24 55%, #0B0C12 100%); box-shadow: 0 0 24px rgba(176, 75, 255, .25); }
+.cx-pitch-art { position: absolute; right: 0; top: 0; height: 100%; width: 62%; object-fit: cover; -webkit-mask-image: linear-gradient(90deg, transparent, #000 45%); mask-image: linear-gradient(90deg, transparent, #000 45%); }
+.cx-pitch-in { position: relative; z-index: 1; display: grid; gap: 8px; padding: 16px; max-width: 70%; }
+.cx-pitch h2 { margin: 0; font: 800 1.2rem/1.1 var(--f-display); color: #F7D98B; text-shadow: 0 2px 8px #000; }
+.cx-pitch p { margin: 0; font-size: .84rem; color: #E6DCC6; text-shadow: 0 1px 4px #000; }
+.cx-pitch-show { display: flex; gap: 12px; align-items: center; padding: 4px 0; }
+.cx-pitch-show .avatar-mini { width: 42px; height: 42px; }
+.cxr-back { width: 32px; aspect-ratio: 5 / 7; border-radius: 4px; object-fit: cover; box-shadow: 0 2px 6px #000; flex: none; }
+.cx-unlock2 { justify-self: start; gap: 8px; }
+.cxk-head { display: grid; grid-template-columns: 1fr 40px 1fr; gap: 8px; margin: 4px 0 8px; text-align: center; font: 700 .82rem/1.15 var(--f-display); color: #D8CFBC; }
+.cxk-head small { display: block; font-size: .64rem; font-weight: 500; opacity: .7; }
+.cxk-head .prem { color: #F2C14E; }
+.cxk { list-style: none; margin: 0 0 14px; padding: 0; position: relative; }
+.cxk::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; transform: translateX(-50%); border-radius: 2px; background: linear-gradient(#6A5530, #2A2318); }
+.cxk-r { position: relative; display: grid; grid-template-columns: 1fr 40px 1fr; gap: 8px; align-items: center; margin: 8px 0; }
+.cxk-n { z-index: 1; justify-self: center; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font: 800 .92rem var(--f-display); background: #16131C; border: 2px solid #4A3D24; color: #8D826E; }
+.cxk-r.reached .cxk-n { background: radial-gradient(circle at 35% 30%, #F7D98B, #A8772E); color: #1A1006; border-color: #F2C14E; }
+.cxk-r.next .cxk-n { color: #F2C14E; border-color: #F2C14E; box-shadow: 0 0 0 4px rgba(242, 193, 78, .2), 0 0 16px rgba(242, 193, 78, .6); }
+.cxk-c { position: relative; min-height: 60px; padding: 8px 6px; border-radius: 12px; display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; justify-content: center; background: rgba(22, 19, 30, .92); border: 1px solid rgba(255, 255, 255, .08); }
+.cxk-c.prem { background: linear-gradient(160deg, rgba(74, 42, 107, .6), rgba(26, 15, 36, .95)); border-color: rgba(242, 193, 78, .35); }
+.cxk-c.void { background: none; border: 0; min-height: 0; }
+.cxk-c.far { opacity: .55; }
+.cxk-c.lock { filter: saturate(.55) brightness(.85); }
+.cxk-c.got { opacity: .45; }
+.cxk-c.ready { cursor: pointer; border-color: #F2C14E; box-shadow: 0 0 14px rgba(242, 193, 78, .45); animation: cxkPulse 1.8s ease-in-out infinite; }
+@keyframes cxkPulse { 50% { box-shadow: 0 0 22px rgba(242, 193, 78, .8); } }
+html.fx-light .cxk-c.ready { animation: none; }
+.cxk-go { position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); padding: 2px 8px; border-radius: 8px; white-space: nowrap; background: #F2C14E; color: #1A1006; font: 800 .6rem var(--f-display); letter-spacing: .06em; text-transform: uppercase; }
+.cxk-ok, .cxk-lk { position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; display: grid; place-items: center; border-radius: 50%; background: rgba(0, 0, 0, .65); }
+.cxk-ok .ic, .cxk-lk .ic { width: 11px; height: 11px; }
+.cxr { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.cxr-ic { display: grid; place-items: center; flex: none; }
+.cxr-ic .ic, .cxr-ic img { width: 26px; height: 26px; }
+.cxr-chest { width: 36px; height: 30px; object-fit: contain; flex: none; }
+.cxr-pack { width: 22px; height: 34px; object-fit: contain; flex: none; }
+.cxk-c .avatar-mini { width: 34px; height: 34px; flex: none; }
+.cxr-t { display: grid; line-height: 1.1; text-align: left; min-width: 0; }
+.cxr-t b { font: 800 .92rem var(--f-display); color: #F2E3BF; }
+.cxr-t small { font-size: .64rem; color: #B9AF9C; overflow-wrap: anywhere; }
+/* Échoppe */
+.r-rare { --rk: #7FA7D9; } .r-epic { --rk: #B04BFF; } .r-leg { --rk: #F2C14E; } .r-myth { --rk: #FF4D6A; }
+.cxs-rk { font: 700 .6rem var(--f-display); letter-spacing: .12em; text-transform: uppercase; color: var(--rk); }
+.cxs-wallet { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; padding: 10px 12px; border-radius: 14px; background: linear-gradient(90deg, rgba(74, 42, 107, .65), rgba(20, 18, 28, .92)); border: 1px solid rgba(176, 75, 255, .45); }
+.cxs-w-n { font: 800 1.35rem var(--f-display); color: #E8D6FF; white-space: nowrap; }
+.cxs-w-n .obs-i { width: 26px; height: 26px; }
+.cxs-wallet .small { flex: 1; color: #C9C0D8; line-height: 1.25; }
+.cxs-hero { position: relative; overflow: hidden; display: grid; justify-items: center; gap: 6px; margin: 0 0 12px; padding: 14px 14px 14px; border-radius: 18px; text-align: center; border: 1px solid var(--rk); background: radial-gradient(60% 50% at 50% 46%, color-mix(in srgb, var(--rk) 30%, transparent), transparent 70%), radial-gradient(130% 100% at 50% 0%, #2A1D38, #0B0C12 70%); box-shadow: 0 0 26px color-mix(in srgb, var(--rk) 30%, transparent); }
+.cxs-hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.cxs-hero > :not(.cxs-hero-bg) { position: relative; }
+.cxs-hero-pic { background: none; border: 0; padding: 14px; margin: 2px 0; color: inherit; }
+.cxs-hero-pic .avatar-big { width: 118px; height: 118px; }
+.cxs-hero.back .cx-bk { width: 116px; border-radius: 8px; box-shadow: 0 8px 22px #000; }
+.cxs-hero.finish .tcg { width: 150px; }
+.cxs-hero-n { font: 800 1.15rem/1.15 var(--f-display); color: #F7E8C4; text-shadow: 0 2px 8px #000; }
+.cxs-hero-f { display: flex; gap: 8px; margin-top: 4px; }
+.cxs-cats { display: flex; gap: 6px; overflow-x: auto; margin: 0 0 12px; padding-bottom: 4px; scrollbar-width: none; }
+.cxs-cats::-webkit-scrollbar { display: none; }
+.cxs-cat { flex: none; min-height: 40px; padding: 8px 14px; border-radius: 20px; border: 1px solid rgba(201, 164, 90, .35); background: rgba(20, 18, 28, .9); color: #C9C0AE; font: 700 .82rem var(--f-display); }
+.cxs-cat.on { background: linear-gradient(180deg, #F2C14E, #A8772E); color: #1A1006; border-color: #F7D98B; }
+.cxs-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+.cxs-grid.bundle { grid-template-columns: 1fr; }
+.cxs-t { position: relative; display: grid; justify-items: center; align-content: start; gap: 4px; padding: 12px 6px 10px; border-radius: 14px; color: inherit; font: inherit; text-align: center; border: 1px solid color-mix(in srgb, var(--rk) 55%, transparent); background: radial-gradient(90% 60% at 50% 32%, color-mix(in srgb, var(--rk) 24%, transparent), transparent 70%), linear-gradient(180deg, #1A1622, #0E0D14); box-shadow: 0 4px 12px rgba(0, 0, 0, .5); }
+.cxs-t b { font: 700 .72rem/1.15 var(--f-display); color: #EDE3CC; min-height: 2.3em; }
+.cxs-pic { display: grid; place-items: center; height: 86px; }
+.cxs-t .avatar-mini { width: 56px; height: 56px; }
+.cxs-t .cx-bk { width: auto; height: 82px; border-radius: 6px; box-shadow: 0 4px 10px #000; }
+.cxs-t .cx-fin { width: 58px; }
+.cxs-pr { display: inline-flex; align-items: center; gap: 3px; padding: 3px 9px; border-radius: 12px; background: rgba(0, 0, 0, .55); border: 1px solid rgba(176, 75, 255, .5); font: 800 .8rem var(--f-display); color: #E8D6FF; }
+.cxs-pr.short { opacity: .6; }
+.cxs-pr .obs-i { width: 15px; height: 15px; }
+.cxs-own { display: inline-flex; align-items: center; gap: 3px; font: 700 .7rem var(--f-display); color: #7FE0A0; }
+.cxs-own .ic { width: 12px; height: 12px; }
+.cxs-t.own { opacity: .6; }
+.cxs-euro { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
+.cxs-e { position: relative; overflow: hidden; display: grid; justify-items: center; align-content: start; gap: 6px; padding: 12px 8px; border-radius: 14px; text-align: center; border: 1px solid rgba(176, 75, 255, .45); background: radial-gradient(80% 55% at 50% 28%, rgba(176, 75, 255, .28), transparent 70%), linear-gradient(180deg, #1B1424, #0D0B12); }
+.cxs-e.founder { grid-column: 1 / -1; border-color: rgba(242, 193, 78, .7); background: radial-gradient(80% 60% at 50% 25%, rgba(242, 193, 78, .22), transparent 70%), linear-gradient(180deg, #221A12, #0D0B12); }
+.cxs-e-art { width: 78%; aspect-ratio: 1; object-fit: contain; }
+.cxs-e.founder .cxs-e-art { width: 60%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 10px; }
+.cxs-e-in { display: grid; gap: 3px; justify-items: center; }
+.cxs-e-in b { font: 800 1rem var(--f-display); color: #EDE3CC; }
+.cxs-e-in small { font-size: .72rem; color: #C9C0AE; line-height: 1.3; }
+
+/* v533 : cadres peints affinés (retour du propriétaire : « trop gros, ça cache la créature ») : tools/frame-art.py --fit --hole=0.78 --suffix=3 ; le trou laisse voir toute la photo, l'anneau ne dépasse que de 12,8 % de chaque côté */
+.pf-cx-abime { --fr: url(../assets/frames/cx-abime-3.webp); }
+.pf-cx-aurore { --fr: url(../assets/frames/cx-aurore-3.webp); }
+.pf-cx-automate { --fr: url(../assets/frames/cx-automate-3.webp); }
+.pf-cx-balance { --fr: url(../assets/frames/cx-balance-3.webp); }
+.pf-cx-braise { --fr: url(../assets/frames/cx-braise-3.webp); }
+.pf-cx-carnaval { --fr: url(../assets/frames/cx-carnaval-3.webp); }
+.pf-cx-chaines { --fr: url(../assets/frames/cx-chaines-3.webp); }
+.pf-cx-constellation { --fr: url(../assets/frames/cx-constellation-3.webp); }
+.pf-cx-corbeau { --fr: url(../assets/frames/cx-corbeau-3.webp); }
+.pf-cx-cristaux-sang { --fr: url(../assets/frames/cx-cristaux-sang-3.webp); }
+.pf-cx-eclipse { --fr: url(../assets/frames/cx-eclipse-3.webp); }
+.pf-cx-encre { --fr: url(../assets/frames/cx-encre-3.webp); }
+.pf-cx-fondateur { --fr: url(../assets/frames/cx-fondateur-3.webp); }
+.pf-cx-geode { --fr: url(../assets/frames/cx-geode-3.webp); }
+.pf-cx-givre { --fr: url(../assets/frames/cx-givre-3.webp); }
+.pf-cx-gueule { --fr: url(../assets/frames/cx-gueule-3.webp); }
+.pf-cx-horloger { --fr: url(../assets/frames/cx-horloger-3.webp); }
+.pf-cx-houx { --fr: url(../assets/frames/cx-houx-3.webp); }
+.pf-cx-lanternes { --fr: url(../assets/frames/cx-lanternes-3.webp); }
+.pf-cx-leviathan { --fr: url(../assets/frames/cx-leviathan-3.webp); }
+.pf-cx-liche { --fr: url(../assets/frames/cx-liche-3.webp); }
+.pf-cx-meute { --fr: url(../assets/frames/cx-meute-3.webp); }
+.pf-cx-or { --fr: url(../assets/frames/cx-or-3.webp); }
+.pf-cx-os { --fr: url(../assets/frames/cx-os-3.webp); }
+.pf-cx-ouroboros { --fr: url(../assets/frames/cx-ouroboros-3.webp); }
+.pf-cx-pages { --fr: url(../assets/frames/cx-pages-3.webp); }
+.pf-cx-phalenes { --fr: url(../assets/frames/cx-phalenes-3.webp); }
+.pf-cx-prince { --fr: url(../assets/frames/cx-prince-3.webp); }
+.pf-cx-racines { --fr: url(../assets/frames/cx-racines-3.webp); }
+.pf-cx-roses { --fr: url(../assets/frames/cx-roses-3.webp); }
+.pf-cx-rouages { --fr: url(../assets/frames/cx-rouages-3.webp); }
+.pf-cx-ruche { --fr: url(../assets/frames/cx-ruche-3.webp); }
+.pf-cx-sablier { --fr: url(../assets/frames/cx-sablier-3.webp); }
+.pf-cx-sang { --fr: url(../assets/frames/cx-sang-3.webp); }
+.pf-cx-seraphin { --fr: url(../assets/frames/cx-seraphin-3.webp); }
+.pf-cx-serpents { --fr: url(../assets/frames/cx-serpents-3.webp); }
+.pf-cx-souverain { --fr: url(../assets/frames/cx-souverain-3.webp); }
+.pf-cx-vitrail { --fr: url(../assets/frames/cx-vitrail-3.webp); }
+.pf-cx-voile { --fr: url(../assets/frames/cx-voile-3.webp); }
+.pf-cx-yeux { --fr: url(../assets/frames/cx-yeux-3.webp); }
+.pf.pf.pf.pf[class*="pf-cx-"]::after { inset: -12.8%; }
+.top-avatar.pf[class*="pf-cx-"] { margin: 0 3px; }
+/* v533 : portraits des tuiles du Codex et de l'Échoppe : vraies pastilles rondes (un <span> en ligne ignorait la taille) */
+:is(.cxs-hero, .cxs-t, .cxk, .cx-pitch, .cxr, .cx-season) :is(.avatar-big, .avatar-mini) { display: inline-block; position: relative; flex: none; border-radius: 50%; aspect-ratio: 1; background: radial-gradient(circle, #2A2340, #0B0C12); vertical-align: middle; }
+:is(.cxs-hero, .cxs-t, .cxk, .cx-pitch, .cxr, .cx-season) :is(.avatar-big, .avatar-mini) > img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+:is(.cxs-hero, .cxs-t, .cxk, .cx-pitch, .cxr, .cx-season) :is(.avatar-big, .avatar-mini) > svg { width: 100%; height: 100%; }
+.cxs-euro { align-content: start; grid-auto-rows: auto; height: auto; min-height: 0; }

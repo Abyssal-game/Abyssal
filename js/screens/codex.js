@@ -36,54 +36,97 @@ export default function codexScreen(app, root) {
     return parts.join('');
   };
 
+  /* v533 : refonte visuelle du Codex et de l'Échoppe (demande du propriétaire : « ça ne donne pas envie »).
+     Images Gemini attendues dans assets/ui/ (cx-saison1, cx-enlumine, ech-vitrine, obs-1..4, ech-fondateur) : sans elles, repli sur un dégradé. */
+  const myAv = () => { const c = cat.get(g.shownAvatar()); return c ? `<img alt="" src="${artUrl(c, { lite: true })}">` : EMBLEM; };
+  const opt = (src, cls = '') => `<img class="${cls}" alt="" src="${src}" onerror="this.remove()">`;
+  /* rang d'un objet selon son prix (couleur de la tuile) */
+  const rank = (it) => { const c = it.cost || 0; return it.kind === 'bundle' ? 'leg' : c >= 1200 ? 'myth' : c >= 700 ? 'leg' : c >= 450 ? 'epic' : 'rare'; };
+  const RANK = { rare: 'Rare', epic: 'Épique', leg: 'Légendaire', myth: 'Mythique' };
+  // Une récompense du Codex en grand (visuel + libellé)
+  const rwBig = (r) => {
+    if (!r) return '';
+    const items = [];
+    if (r.shards) items.push([`<span class="cxr-ic">${icon('crystal')}</span>`, `+${fmt(r.shards)}`, 'éclats']);
+    if (r.ash) items.push([`<span class="cxr-ic">${icon('ash')}</span>`, `+${fmt(r.ash)}`, 'cendres']);
+    for (const [k, n] of Object.entries(r.chests || {})) items.push([`<img class="cxr-chest" alt="" src="assets/chests/${k}.webp">`, n > 1 ? `${n} ×` : '', esc(CHESTS[k]?.name || k)]);
+    for (const [k, n] of Object.entries(r.tickets || {})) items.push([`<img class="cxr-pack" alt="" src="assets/packs/${k === 'standard' ? 'standard2' : k}.webp">`, `${n} ×`, esc(PACK_NAME[k] || k)]);
+    if (r.frame) items.push([`<span class="avatar-mini pf pf-${r.frame}">${myAv()}</span>`, '', esc(ALL_FRAMES[r.frame] || r.frame)]);
+    if (r.back) items.push([`<img class="cxr-back" alt="" src="assets/backs/${r.back}.webp">`, '', esc(CODEX_BACKS[r.back] || r.back)]);
+    if (r.title) items.push([`<span class="cxr-ic">${picon('titles')}</span>`, 'Titre', `« ${esc(r.title)} »`]);
+    if (r.obs) items.push([`<span class="cxr-ic">${OBS_I}</span>`, `+${fmt(r.obs)}`, esc(OBS.name.toLowerCase())]);
+    return items.map(([v, n, l]) => `<span class="cxr">${v}<span class="cxr-t">${n ? `<b>${n}</b>` : ''}<small>${l}</small></span></span>`).join('');
+  };
+
   function codexTab() {
     const c = g.codex(), t = codexTier(c), n = claimable(c), max = t >= CODEX.tiers;
     const cell = (tier, tr, r) => {
-      if (!r) return `<div class="cx-cell empty">${rw(null)}</div>`;
+      if (!r) return `<div class="cxk-c ${tr} void"></div>`;
       const got = c[tr].includes(tier), lockedPrem = tr === 'prem' && !c.premium, reached = tier <= t;
       const state = got ? 'got' : !reached ? 'far' : lockedPrem ? 'lock' : 'ready';
-      return `<div class="cx-cell ${tr} ${state}">${rw(r)}${state === 'ready' ? `<button class="btn small primary" data-cx="claim" data-tr="${tr}" data-t="${tier}">Récupérer</button>` : state === 'got' ? `<span class="cx-ok">${icon('check')}</span>` : state === 'lock' ? `<span class="cx-lk">${icon('lock')}</span>` : ''}</div>`;
+      return `<div class="cxk-c ${tr} ${state}" ${state === 'ready' ? `data-cx="claim" data-tr="${tr}" data-t="${tier}" role="button" tabindex="0"` : ''}>${rwBig(r)}
+        ${state === 'ready' ? '<span class="cxk-go">Récupérer</span>' : state === 'got' ? `<span class="cxk-ok">${icon('check')}</span>` : state === 'lock' ? `<span class="cxk-lk">${icon('lock')}</span>` : ''}</div>`;
     };
-    return `<section class="panel cx-head">
-        <div class="cx-lvl"><b>${t}</b><small>/ ${CODEX.tiers}</small></div>
-        <div class="cx-prog"><span class="small">${max ? 'Codex terminé pour cette saison !' : `Palier ${t + 1} : ${c.xp % CODEX.xpPerTier} / ${CODEX.xpPerTier} points`}</span><span class="cx-bar"><i style="width:${Math.round(tierProgress(c) * 100)}%"></i></span>
-          <span class="small muted">${fmt(c.xp)} points de Codex · saison du ${esc(CODEX.starts.split('-').reverse().join('/'))} au ${esc(CODEX.ends.split('-').reverse().join('/'))}</span></div>
-      </section>
-      <div class="cx-actions">${n ? `<button class="btn primary dc-plq dc-plq-red" data-cx="all">Tout récupérer (${n})</button>` : ''}
-        ${c.premium ? `<span class="cx-badge on">${icon('star')}${esc(CODEX.premiumName)} acquis</span>` : `<button class="btn dc-plq dc-plq-dark cx-unlock" data-cx="unlock">${icon('star')}<span>Débloquer le ${esc(CODEX.premiumName)}</span>${obsTxt(CODEX.cost)}</button>`}</div>
+    const best = ['cx-abime', 'cx-or', 'dos-codex'];
+    const pitch = c.premium ? '' : `<section class="cx-pitch">
+        ${opt('assets/ui/cx-enlumine.webp', 'cx-pitch-art')}
+        <div class="cx-pitch-in"><small class="cx-kick">Voie enluminée</small><h2>${esc(CODEX.premiumName)}</h2>
+          <p>Débloque la colonne de droite : cadres peints, dos de cartes et titres exclusifs à cette saison.</p>
+          <div class="cx-pitch-show">${best.map((k) => k.startsWith('dos') ? `<img class="cxr-back" alt="" src="assets/backs/${k}.webp">` : `<span class="avatar-mini pf pf-${k}">${myAv()}</span>`).join('')}</div>
+          <button class="btn dc-plq dc-plq-red cx-unlock2" data-cx="unlock">${icon('star')}<span>Débloquer</span>${obsTxt(CODEX.cost)}</button></div></section>`;
+    return `<section class="cx-season">
+        ${opt('assets/ui/cx-saison1.webp', 'cx-season-art')}
+        <div class="cx-season-in"><small class="cx-kick">Saison I · du ${esc(CODEX.starts.split('-').reverse().join('/'))} au ${esc(CODEX.ends.split('-').reverse().join('/'))}</small>
+          <h2>${esc(CODEX.title)}</h2>
+          <div class="cx-season-row"><span class="cx-medal"><b>${t}</b><small>/ ${CODEX.tiers}</small></span>
+            <span class="cx-season-p"><span>${max ? 'Codex terminé pour cette saison !' : `Palier ${t + 1} · ${c.xp % CODEX.xpPerTier} / ${CODEX.xpPerTier} points`}</span><span class="cx-bar2"><i style="width:${Math.round(tierProgress(c) * 100)}%"></i></span></span></div>
+          ${c.premium ? `<span class="cx-badge on">${icon('star')}${esc(CODEX.premiumName)} acquis</span>` : ''}</div></section>
+      ${n ? `<button class="btn primary block dc-plq dc-plq-red cx-all" data-cx="all">${icon('chest')}Tout récupérer (${n})</button>` : ''}
+      ${pitch}
+      <div class="cxk-head"><span>Voie de l'Abîme<small>gratuite</small></span><span></span><span class="prem">Voie enluminée<small>${c.premium ? 'à toi' : 'à débloquer'}</small></span></div>
+      <ol class="cxk">${CODEX_TIERS.map((x) => `<li class="cxk-r ${x.tier <= t ? 'reached' : ''} ${x.tier === t + 1 ? 'next' : ''}" ${x.tier === Math.min(CODEX.tiers, t + 1) ? 'id="cx-now"' : ''}>${cell(x.tier, 'free', x.free)}<span class="cxk-n">${x.tier}</span>${cell(x.tier, 'prem', x.prem)}</li>`).join('')}</ol>
       <details class="panel dc-fold"><summary>${picon('help')}<span class="dc-sum-t">Gagner des points de Codex</span></summary>
         <ul class="cx-xp">${Object.entries(CODEX_XP).map(([k, v]) => `<li><span>${esc(CODEX_XP_LABEL[k])}</span><b>+${v}</b><small class="muted">${fmt(c.log[k] || 0)} gagnés</small></li>`).join('')}</ul>
-        <p class="small muted">La voie de gauche se gagne en jouant. La voie enluminée (à droite) se débloque une fois par saison avec des obsidiennes : seulement des cadres peints, des titres et des dos de cartes, jamais de puissance. Les cadres et dos marqués « Échoppe » s'achètent aussi à l'unité.</p></details>
-      <div class="cx-cols"><span>Palier</span><span>Voie de l'Abîme (gratuite)</span><span>${esc(CODEX.premiumName)}</span></div>
-      <ol class="cx-track">${CODEX_TIERS.map((x) => `<li class="cx-row ${x.tier <= t ? 'reached' : ''} ${x.tier === t + 1 ? 'next' : ''}"><span class="cx-n">${x.tier}</span>${cell(x.tier, 'free', x.free)}${cell(x.tier, 'prem', x.prem)}</li>`).join('')}</ol>`;
+        <p class="small muted">La voie de gauche se gagne en jouant. La voie enluminée se débloque une fois par saison avec des obsidiennes : seulement des cadres peints, des titres et des dos de cartes, jamais de puissance.</p></details>`;
   }
 
   function shopTab() {
     const have = g.obs();
     const name = (it) => it.name || (it.kind === 'frame' ? ALL_FRAMES[it.id] : it.kind === 'finish' ? `Finition ${FINISHES[it.id].name}` : CODEX_BACKS[it.id]) || it.id;
-    const pic = (it) => it.kind === 'frame' ? `<span class="cx-av"><span class="avatar-mini pf pf-${it.id}"></span></span>`
+    const pic = (it, big = false) => it.kind === 'frame' ? `<span class="${big ? 'avatar-big' : 'avatar-mini'} pf pf-${it.id}">${myAv()}</span>`
       : it.kind === 'back' ? `<img class="cx-bk" alt="" src="assets/backs/${it.id}.webp">`
-      : it.kind === 'finish' ? `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"><img alt="" src="assets/variants/${it.id}-frame.webp"></span>`
+      : it.kind === 'finish' ? (big ? cardHTML(g.bestCards(1)[0] || cat.get('ABY-039'), { dress: it.id }) : `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"><img alt="" src="assets/variants/${it.id}-frame.webp"></span>`)
       : `<span class="cx-fan">${it.give.backs.slice(0, 4).map((b) => `<img alt="" src="assets/backs/${b}.webp">`).join('')}</span>`;
-    const tile = (it) => { const own = g.catalogOwned(it.id), cost = g.catalogCost(it.id); return `<article class="cx-tile ${it.kind} ${own ? 'own' : ''}"><button class="cx-see" data-cx="see" data-id="${it.id}" aria-label="Voir l’aperçu">${pic(it)}<span class="cx-eye">${icon('eye')}Aperçu</span></button><b>${esc(name(it))}</b>${it.desc ? `<small class="muted">${esc(it.desc)}</small>` : ''}
-      ${own ? `<span class="cx-badge on">${icon('check')}Acquis</span>` : `<button class="btn small ${cost <= have ? 'primary' : ''}" data-cx="get" data-id="${it.id}">${obsTxt(cost)}</button>`}</article>`; };
-    const sec = (title, kind) => `<h3 class="cx-h">${title}</h3><div class="cx-grid ${kind}">${CATALOG.filter((x) => x.kind === kind).map(tile).join('')}</div>`;
-    const euro = (it) => { const own = it.once && g.shopOwned(it.id); return `<article class="panel cx-item ${it.kind || ''} ${own ? 'own' : ''}">
-        <div class="cx-it-h"><b>${it.kind === 'obs' ? obsTxt(it.give.obs) : esc(it.name)}</b>${it.bonus ? `<span class="cx-bonus">+${it.bonus} offertes</span>` : ''}<span class="cx-price">${esc(it.price)}</span></div>
-        ${it.desc ? `<p class="small">${esc(it.desc)}</p><div class="cx-it-r">${rw(it.give)}</div>` : ''}
-        <div class="cx-it-f">${own ? `<span class="cx-badge on">${icon('check')}Acquis</span>` : `<button class="btn primary small" data-cx="buy" data-id="${it.id}">Acheter · ${esc(it.price)}</button>`}<small class="muted">${esc(it.store)}</small></div></article>`; };
-    return `<section class="panel cx-wallet"><span class="cx-w-n">${obsTxt(have)}</span><span class="small">${esc(OBS.name)} : la monnaie de l'Échoppe, achetée en euros, dépensée seulement en cosmétiques.</span>
-        <button class="btn small" data-cx="jump">Obtenir des ${esc(OBS.name.toLowerCase())}</button></section>
-      <p class="small muted cx-note">Les cadres simples, les titres et le dos de l'Abysse se gagnent toujours en jouant. Ici : les cosmétiques <b>peints</b>, seulement décoratifs. Pendant l'aperçu, tout achat en euros est simulé : aucun paiement.</p>
-      ${sec('Cadres de profil', 'frame')}
-      ${sec('Dos de cartes', 'back')}
-      ${sec('Finitions de prestige', 'finish')}
-      <p class="small muted cx-note">Une finition achetée se pose sur autant de cartes que tu veux, une par carte, depuis la fiche de la carte. Elle ne change rien à ses valeurs.</p>
-      ${sec('Lots', 'bundle')}
-      <h3 class="cx-h" id="cx-euro">${esc(OBS.name)} et Pack du Fondateur</h3>
-      <div class="cx-shop">${SHOP.map(euro).join('')}</div>
-      <button class="btn ghost block" data-cx="restore">Restaurer mes achats</button>
-      <p class="small muted center">Paiement par l'App Store, remboursements selon les règles d'Apple. Rien ici ne rend tes créatures plus fortes.</p>`;
+    const tile = (it) => { const own = g.catalogOwned(it.id), cost = g.catalogCost(it.id), r = rank(it);
+      return `<button class="cxs-t r-${r} ${it.kind} ${own ? 'own' : ''}" data-cx="see" data-id="${it.id}"><span class="cxs-pic">${pic(it)}</span><span class="cxs-rk">${RANK[r]}</span><b>${esc(name(it))}</b>
+        ${own ? `<span class="cxs-own">${icon('check')}Possédé</span>` : `<span class="cxs-pr ${cost <= have ? '' : 'short'}">${obsTxt(cost)}</span>`}</button>`; };
+    const CATS = [['frame', 'Cadres'], ['back', 'Dos'], ['finish', 'Finitions'], ['bundle', 'Lots'], ['obs', OBS.name]];
+    const cur = ui.cat || 'frame';
+    const list = CATALOG.filter((x) => x.kind === cur).slice().sort((a, b) => (g.catalogOwned(a.id) - g.catalogOwned(b.id)) || (b.cost - a.cost));
+    /* à la une : un bel objet par semaine (le même pour tous), pas encore possédé */
+    const week = Math.floor(g.clock().getTime() / 864e5 / 7);
+    const stars = CATALOG.filter((x) => x.kind !== 'bundle' && x.cost >= 700 && !g.catalogOwned(x.id));
+    const hero = stars.length ? stars[week % stars.length] : null;
+    const heroHTML = hero ? `<section class="cxs-hero r-${rank(hero)} ${hero.kind}">${opt('assets/ui/ech-vitrine.webp', 'cxs-hero-bg')}
+        <small class="cx-kick">À la une cette semaine</small>
+        <button class="cxs-hero-pic" data-cx="see" data-id="${hero.id}">${pic(hero, true)}</button>
+        <b class="cxs-hero-n">${esc(name(hero))}</b><span class="cxs-rk">${RANK[rank(hero)]}</span>
+        <div class="cxs-hero-f"><button class="btn small ghost" data-cx="see" data-id="${hero.id}">${icon('eye')}Aperçu</button><button class="btn small primary" data-cx="get" data-id="${hero.id}">${obsTxt(g.catalogCost(hero.id))}</button></div></section>` : '';
+    const euro = (it, i) => { const own = it.once && g.shopOwned(it.id); const art = it.kind === 'obs' ? `assets/ui/obs-${Math.min(4, i + 1)}.webp` : 'assets/ui/ech-fondateur.webp';
+      return `<article class="cxs-e ${it.kind === 'obs' ? 'obs' : 'founder'} ${own ? 'own' : ''}">${opt(art, 'cxs-e-art')}
+        <div class="cxs-e-in"><b>${it.kind === 'obs' ? obsTxt(it.give.obs) : esc(it.name)}</b>${it.bonus ? `<span class="cx-bonus">+${it.bonus} offertes</span>` : ''}
+        ${it.desc ? `<small>${esc(it.desc)}</small>` : ''}</div>
+        ${own ? `<span class="cxs-own">${icon('check')}Possédé</span>` : `<button class="btn primary small" data-cx="buy" data-id="${it.id}">${esc(it.price)}</button>`}</article>`; };
+    let obsI = 0;
+    return `<section class="cxs-wallet"><span class="cxs-w-n">${obsTxt(have)}</span><span class="small">${esc(OBS.name)} · seulement pour des cosmétiques</span>
+        <button class="btn small primary" data-cx="cat" data-v="obs">Obtenir</button></section>
+      ${cur !== 'obs' ? heroHTML : ''}
+      <div class="cxs-cats" role="tablist">${CATS.map(([k, l]) => `<button class="cxs-cat ${k === cur ? 'on' : ''}" data-cx="cat" data-v="${k}" role="tab" aria-selected="${k === cur}">${l}</button>`).join('')}</div>
+      ${cur === 'obs' ? `<div class="cxs-euro" id="cx-euro">${SHOP.map((it) => euro(it, it.kind === 'obs' ? obsI++ : 0)).join('')}</div>
+        <button class="btn ghost block" data-cx="restore">Restaurer mes achats</button>
+        <p class="small muted center">Pendant l'aperçu, tout achat en euros est simulé : aucun paiement. Rien ici ne rend tes créatures plus fortes.</p>`
+      : `<div class="cxs-grid ${cur}">${list.map(tile).join('')}</div>
+        ${cur === 'finish' ? '<p class="small muted center">Une finition achetée se pose sur autant de cartes que tu veux, une par carte. Elle ne change rien à leurs valeurs.</p>' : ''}`}`;
   }
 
   function devTab() {
@@ -96,10 +139,11 @@ export default function codexScreen(app, root) {
 
   function draw() {
     if (!g.codexOn()) { location.replace('#/boutique'); return; } /* caché : rien ne doit trahir le pass hors Mode Créateur */
-    root.innerHTML = `<header class="screen-head ui-hero ${ui.tab === 'shop' ? 'bn-echoppe' : 'bn-codex'}"><h1>${esc(CODEX.name)}</h1><p class="muted">${esc(CODEX.title)}</p><span class="sc-rec">Aperçu Créateur · invisible pour les joueurs</span></header>
+    root.innerHTML = `<header class="screen-head ui-hero ${ui.tab === 'shop' ? 'bn-echoppe' : 'bn-codex'} cx-top"><h1>${ui.tab === 'shop' ? 'L’Échoppe' : esc(CODEX.name)}</h1><span class="sc-rec">Aperçu Créateur · invisible pour les joueurs</span></header>
       <div class="seg cx-seg" role="group">${[['codex', 'Le Codex'], ['shop', 'L’Échoppe']].map(([k, l]) => `<button class="seg-b" data-cx="tab" data-v="${k}" aria-pressed="${ui.tab === k}">${l}</button>`).join('')}</div>
       ${ui.tab === 'shop' ? shopTab() : codexTab()}
       ${devTab()}`;
+    if (ui.tab !== 'shop' && !ui.scrolled) { ui.scrolled = true; requestAnimationFrame(() => document.getElementById('cx-now')?.scrollIntoView({ block: 'center' })); }
   }
 
 
@@ -108,7 +152,7 @@ export default function codexScreen(app, root) {
     const it = CATALOG.find((x) => x.id === id), cost = it ? g.catalogCost(it.id) : CODEX.cost;
     const label = it ? (it.name || ALL_FRAMES[it.id] || CODEX_BACKS[it.id] || (FINISHES[it.id] && `Finition ${FINISHES[it.id].name}`)) : CODEX.premiumName;
     if (g.obs() < cost) {
-      if (await confirmBox(`Il te manque <b>${fmt(cost - g.obs())} obsidiennes</b> pour ${esc(label)}.`, { ok: 'Obtenir des obsidiennes' })) { ui.tab = 'shop'; draw(); document.getElementById('cx-euro')?.scrollIntoView({ behavior: 'smooth' }); }
+      if (await confirmBox(`Il te manque <b>${fmt(cost - g.obs())} obsidiennes</b> pour ${esc(label)}.`, { ok: 'Obtenir des obsidiennes' })) { ui.tab = 'shop'; ui.cat = 'obs'; draw(); }
       return false;
     }
     if (!(await confirmBox(`Échanger <b>${fmt(cost)} obsidiennes</b> contre ${esc(label)} ?`, { ok: 'Confirmer' }))) return false;
@@ -193,7 +237,8 @@ export default function codexScreen(app, root) {
         if (!(await confirmBox(`<b>Achat simulé</b> : ${esc(it.name)} (${esc(it.price)}).<br>Aperçu Créateur : aucun paiement, l'achat est simplement ajouté à ton profil.`, { ok: 'Simuler l’achat' }))) return;
         g.shopBuy(it.id); app.sfx.levelup?.(); toast(`${esc(it.name)} : acquis (achat simulé).`, { kind: 'success', icon: 'star' });
       }
-      if (k === 'jump') { document.getElementById('cx-euro')?.scrollIntoView({ behavior: 'smooth' }); return; }
+      if (k === 'jump') { ui.cat = 'obs'; draw(); return; }
+      if (k === 'cat') { ui.cat = b.dataset.v; app.sfx.tap?.(); return draw(); }
       if (k === 'see') { preview(b.dataset.id); return; } /* v484 */
       if (k === 'get' || k === 'unlock') { if (!(await buy(b.dataset.id))) return; }
       if (k === 'obs') { g.s.obs = g.obs() + 1000; g.persist(); }

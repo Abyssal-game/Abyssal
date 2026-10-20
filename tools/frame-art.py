@@ -45,7 +45,8 @@ with np.errstate(divide='ignore', invalid='ignore'):
     col = np.clip((a - (1 - alpha[..., None]) * 255) / np.maximum(alpha[..., None], 0.3), 0, 255)
 rgba = Image.fromarray(np.dstack([col, alpha * 255]).astype(np.uint8), 'RGBA')
 if FIT:
-    N, HOLE, OUT = 1024, 0.64, 0.97
+    N, HOLE, OUT = 1024, float(next((x.split('=')[1] for x in sys.argv if x.startswith('--hole=')), 0.64)), 0.97
+    SUF = next((x.split('=')[1] for x in sys.argv if x.startswith('--suffix=')), '2')
     hc = N / 2
     d = np.hypot(*np.meshgrid(np.arange(W) - cx, np.arange(H) - cy))
     r_out = np.percentile(d[alpha > 0.25], 99.7)                  # bord extérieur (sans les poussières isolées)
@@ -67,7 +68,7 @@ if FIT:
     al = v[..., 3:4]
     rgb = np.clip(v[..., :3] / np.maximum(al / 255, 1e-3), 0, 255)
     out = Image.fromarray(np.dstack([rgb, al]).astype(np.uint8), 'RGBA')
-    out.resize((256, 256), Image.LANCZOS).save(f'assets/frames/{key}-2.webp', quality=88, method=6)
+    out.resize((256, 256), Image.LANCZOS).save(f'assets/frames/{key}-{SUF}.webp', quality=88, method=6)
     print(f'{key}: anneau {r_out / r_in:.2f} × le trou → {"tassé ×" + format(k / s0, ".2f") if k < s0 else "gardé"}')
     sys.exit()
 half = r_in * K
