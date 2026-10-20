@@ -1,4 +1,5 @@
 // Point d'entrée : chargement des données, état du joueur, navigation.
+import { startTranslator } from './i18n.js'; /* v506 : langues (en premier : le dictionnaire est chargé avant le reste) */
 import { loadCatalogData, createCatalog } from './core/catalog.js';
 import { Game } from './core/game.js';
 import { loadArtManifest, artUrl, hasRealArt, setCardBack } from './art/assets.js';
@@ -43,6 +44,7 @@ import { showGate } from './ui/gate.js';
 import { onAuth } from './cloud/cloud.js';
 import { setScene } from './ui/scene.js';
 import { initNative, isNative } from './native.js';
+startTranslator();
 
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,

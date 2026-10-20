@@ -12,6 +12,7 @@ import { openCreator } from './creator.js';
 import { showWelcome } from './welcome.js';
 import { shareFile } from '../native.js';
 import { onPresence, presence } from '../cloud/presence.js';
+import { LANGS, LANG, setLang } from '../i18n.js';
 /* v418 : code du Mode Créateur choisi par le propriétaire ; seule son empreinte SHA-256 (en majuscules) est dans le code */
 const CREATOR_HASH = 'a0f19d9e26a8d1b7c87d32cc8bbfb9f61d58de4b518cf9e145d36c787a37ac37';
 async function sha256(t) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join(''); }
@@ -33,6 +34,10 @@ export default function settings(app, root) {
 
   function tabJeu(s) {
     return `<section class="panel stack">
+        <h2>Langue</h2>
+        <div class="seg" role="radiogroup" aria-label="Langue" translate="no">${Object.entries(LANGS).map(([k, l]) => `<button class="seg-b" role="radio" data-act="lang" data-v="${k}" aria-checked="${LANG === k}" aria-pressed="${LANG === k}">${l}</button>`).join('')}</div>
+      </section>
+      <section class="panel stack">
         <h2>Son et animations</h2>
         ${toggle('sound', 'Effets sonores', 'Ouverture, révélation, combat. Le mode silencieux de l’iPhone peut les couper.')}
         <div class="set-row col"><label for="vol"><b>Volume</b></label><input id="vol" type="range" min="0" max="1" step="0.05" value="${s.volume}" ${s.sound ? '' : 'disabled'}></div>
@@ -114,6 +119,7 @@ export default function settings(app, root) {
   bindActions(root, {
     toggle(el) { g.setSetting(el.dataset.k, !g.s.settings[el.dataset.k]); app.applySettings(); render(); },
     seg(el) { g.setSetting(el.dataset.k, el.dataset.v); app.applySettings(); render(); },
+    lang(el) { if (el.dataset.v !== LANG) setLang(el.dataset.v); },
     async export() {
       const code = exportCode(g.s);
       try { await navigator.clipboard.writeText(code); toast('Code de sauvegarde copié. Garde-le dans tes notes.', { kind: 'success', icon: 'copy' }); }
