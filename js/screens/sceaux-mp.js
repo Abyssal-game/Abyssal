@@ -4,7 +4,7 @@
 import * as SC from '../core/sceaux.js';
 import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
-import { MP_HOURS, MP_REWARD } from '../core/mp.js';
+import { MP_HOURS, MP_FAST_SECS, MP_REWARD } from '../core/mp.js';
 import { isBlocked } from '../core/moderation.js';
 import { openRuleHelp } from '../ui/sceaux-demo.js';
 import { artUrl } from '../art/assets.js';
@@ -21,19 +21,21 @@ const RES = { win: 'Victoire', lose: 'Défaite', draw: 'Égalité' };
 export function createSceauxMp(app, root, { scCard, modeBar }) {
   const g = app.game, cat = app.catalog;
   const ui = (app.state.sceauxMp ||= { open: null, sel: null });
-  let list = null, err = null, busy = false, poll = 0, view = null, skew = 0, alive = true, friends = null;
+  let clock = 0, list = null, err = null, busy = false, poll = 0, view = null, skew = 0, alive = true, friends = null;
   const avatar = (id) => { const c = id && cat.get(id); return c ? `<img alt="" src="${artUrl(c, { lite: true })}">` : EMBLEM; };
   const foeName = (v) => (!v.foe ? '…' : isBlocked(v.foe.id) ? 'Joueur masqué' : v.foe.pseudo || 'Joueur');
+  const msLeft = (v) => new Date(v.deadline).getTime() - (Date.now() + skew) - (v.pace === 'fast' ? 3000 : 0); /* 3 s de marge réseau côté serveur */
   const left = (v) => {
-    const ms = new Date(v.deadline).getTime() - (Date.now() + skew);
+    const ms = msLeft(v);
     if (ms <= 0) return 'temps écoulé';
+    if (v.pace === 'fast') return `${Math.ceil(ms / 1000)} s`;
     const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000);
     return h ? `${h} h ${String(m).padStart(2, '0')}` : `${m} min`;
   };
   const myTurn = (v) => v.status === 'playing' && v.turn === v.me;
   const resOf = (v) => (v.winner === 'draw' ? 'draw' : v.winner === v.me ? 'win' : 'lose');
   const errMsg = (e) => (e.status === 404 ? OFF : e.message);
-  function stopPoll() { clearTimeout(poll); poll = 0; }
+  function stopPoll() { clearTimeout(poll); poll = 0; clearInterval(clock); clock = 0; }
   function schedule(fn, ms) { stopPoll(); poll = setTimeout(() => { if (alive && document.visibilityState === 'visible') fn(); else schedule(fn, ms); }, ms); }
 
   // ——— Accueil « Contre un joueur » ———
@@ -50,10 +52,15 @@ export function createSceauxMp(app, root, { scCard, modeBar }) {
     try { list = await cloud.mpList('sceaux'); err = null; } catch (e) { err = errMsg(e); list = list || []; }
     if (!alive || ui.open) return;
     if (list[0]?.now) skew = new Date(list[0].now).getTime() - Date.now();
+    // v522 : partie rapide trouvée pendant la recherche : on y va tout de suite
+    const found = list.find((v) => v.pace === 'fast' && v.status === 'playing' && ui.searching === v.id);
+    if (found) { ui.searching = null; toast(t('Adversaire trouvé : <b>{name}</b> !', { name: esc(foeName(found)) }), { icon: 'user' }); app.sfx.achievement?.(); return open(found.id); }
+    const searching = list.find((v) => v.pace === 'fast' && v.status === 'waiting' && v.me === 'a');
+    ui.searching = searching?.id || null; ui.searchingV = searching || null;
     await claimAll();
     checkTurns(app, { force: true });
     drawLobby();
-    schedule(lobby, 20000);
+    schedule(lobby, ui.searching ? 3000 : 20000);
   }
   // résultats des parties terminées : récompense encaissée une seule fois
   async function claimAll() {
@@ -75,22 +82,26 @@ export function createSceauxMp(app, root, { scCard, modeBar }) {
     const done = L.filter((v) => v.status === 'done').slice(0, 8);
     const st = g.s.mp.sceaux || { wins: 0, losses: 0, draws: 0 };
     const paidLeft = MP_REWARD.paidPerDay - (g.s.mp.day === dayKey() ? g.s.mp.paid : 0);
-    const row = (v, sub, acts) => `<div class="mp-row ${myTurn(v) ? 'hot' : ''}" ${v.status !== 'waiting' ? `data-mp="open" data-id="${esc(v.id)}" role="button" tabindex="0"` : ''}><span class="fr-av">${v.foe ? avatar(v.foe.avatar) : EMBLEM}</span><span class="fr-t"><b>${esc(v.foe ? foeName(v) : 'Un joueur au hasard')}</b><small>${sub}</small></span>${acts || icon('next')}</div>`;
+    const row = (v, sub, acts) => `<div class="mp-row ${myTurn(v) ? 'hot' : ''}" ${v.status !== 'waiting' ? `data-mp="open" data-id="${esc(v.id)}" role="button" tabindex="0"` : ''}><span class="fr-av">${v.foe ? avatar(v.foe.avatar) : EMBLEM}</span><span class="fr-t"><b>${esc(v.foe ? foeName(v) : 'Un joueur au hasard')}<i class="mp-tag ${v.pace === 'fast' ? 'fast' : ''}">${v.pace === 'fast' ? 'Rapide' : 'Lente'}</i></b><small>${sub}</small></span>${acts || icon('next')}</div>`;
     const rule = (v) => (v.state?.rule ? `Règle « ${esc(SC.RULES[v.state.rule]?.name || '')} »` : '');
     root.innerHTML = `${modeBar()}
       ${err ? `<p class="panel small center">${icon('info')} ${esc(err)}</p>` : ''}
       ${mine.length ? `<section class="panel mp-sec hot"><h2 class="section-title">À toi de jouer <span class="pill-n">${mine.length}</span></h2>${mine.map((v) => row(v, `${rule(v)} · il te reste <b>${left(v)}</b>`)).join('')}</section>` : ''}
       ${invites.length ? `<section class="panel mp-sec"><h2 class="section-title">Défis reçus</h2>${invites.map((v) => row(v, 'Ton ami te défie', `<span class="vs-acts"><button class="btn small primary" data-mp="join" data-id="${esc(v.id)}">Accepter</button><button class="btn small ghost" data-mp="leave" data-id="${esc(v.id)}">Refuser</button></span>`)).join('')}</section>` : ''}
       <section class="panel mp-sec mp-new"><h2 class="section-title">Nouvelle partie</h2>
-        <p class="small">Chacun joue son coup quand il veut, mais tu as <b>${MP_HOURS} h</b> pour jouer chaque coup : passé ce délai, <b>la partie est perdue</b>. La règle est tirée au hasard.</p>
+        <p class="small">Choisis ta vitesse. Si tu ne joues pas ton coup à temps, <b>la partie est perdue</b>. La règle est tirée au hasard.</p>
         <div class="sc-row mp-hand">${hand.map((id) => scCard(cat, id, { owner: 'p', cls: 'sc-mini' })).join('')}</div>
         <p class="small muted center">Ta main (elle se compose dans « Contre l’Abysse »).</p>
-        <button class="btn primary block big-cta dc-plq dc-plq-red" data-mp="quick" ${busy || waiting.some((v) => v.public) ? 'disabled' : ''}>${icon('p:swords')}${waiting.some((v) => v.public) ? 'Recherche d’un adversaire…' : 'Partie rapide · un joueur au hasard'}</button>
+        ${ui.searching ? `<div class="mp-search"><span class="mp-spin"></span><span><b>${ui.searchingV?.public === false ? t('En attente de {name}…', { name: esc(foeName(ui.searchingV)) }) : 'Recherche d’un adversaire…'}</b><small>Partie rapide · reste sur cet écran, la partie démarre dès qu’un joueur arrive.</small></span><button class="btn small ghost" data-mp="leave" data-id="${esc(ui.searching)}">Annuler</button></div>` : ''}
+        <div class="mp-paces">
+          <button class="mp-pace fast" data-mp="quick" data-pace="fast" ${busy || ui.searching ? 'disabled' : ''}><b>${icon('p:hourglass')}Partie rapide</b><span class="mp-pace-t">${MP_FAST_SECS} s par coup</span><small>Les deux joueurs connectés en même temps. Une partie dure quelques minutes.</small></button>
+          <button class="mp-pace slow" data-mp="quick" data-pace="slow" ${busy || waiting.some((v) => v.public && v.pace !== 'fast') ? 'disabled' : ''}><b>${icon('p:book')}Partie lente</b><span class="mp-pace-t">${MP_HOURS} h par coup</span><small>${waiting.some((v) => v.public && v.pace !== 'fast') ? 'Recherche en cours : la partie commence dès qu’un joueur arrive.' : 'Chacun joue quand il veut. Tu es prévenu quand c’est ton tour.'}</small></button>
+        </div>
         <button class="btn block dc-plq dc-plq-dark" data-mp="friend" ${busy ? 'disabled' : ''}>${icon('user')}Défier un ami</button>
         <p class="small muted center">Victoire : +${MP_REWARD.win} éclats (${Math.max(0, paidLeft)} victoire${paidLeft > 1 ? 's' : ''} payée${paidLeft > 1 ? 's' : ''} restante${paidLeft > 1 ? 's' : ''} aujourd’hui) et une place au classement du mois.</p>
       </section>
       ${theirs.length ? `<section class="panel mp-sec"><h2 class="section-title">Au tour de l’adversaire</h2>${theirs.map((v) => row(v, `${rule(v)} · il lui reste ${left(v)}`)).join('')}</section>` : ''}
-      ${waiting.length ? `<section class="panel mp-sec"><h2 class="section-title">En attente</h2>${waiting.map((v) => row(v, v.public ? 'Recherche d’un adversaire (jusqu’à 24 h)' : t('Défi envoyé à {name}', { name: esc(foeName(v)) }), `<button class="btn small ghost" data-mp="leave" data-id="${esc(v.id)}">Annuler</button>`)).join('')}</section>` : ''}
+      ${waiting.some((v) => !(v.public && v.pace === 'fast')) ? `<section class="panel mp-sec"><h2 class="section-title">En attente</h2>${waiting.filter((v) => !(v.public && v.pace === 'fast')).map((v) => row(v, v.public ? 'Recherche d’un adversaire (jusqu’à 24 h)' : t('Défi envoyé à {name}', { name: esc(foeName(v)) }), `<button class="btn small ghost" data-mp="leave" data-id="${esc(v.id)}">Annuler</button>`)).join('')}</section>` : ''}
       ${done.length ? `<details class="panel dc-fold mp-sec"><summary><span class="dc-sum-t">Parties terminées</span></summary>${done.map((v) => { const r = resOf(v); return row(v, `<b class="vs-res ${r}">${RES[r]}</b>${v.state?.final ? ` · ${v.state.final[v.me]} – ${v.state.final[v.me === 'a' ? 'b' : 'a']}` : ''}${v.reason === 'timeout' ? ' · temps écoulé' : v.reason === 'resign' ? ' · abandon' : ''}`); }).join('')}</details>` : ''}
       <details class="panel dc-fold mp-sec" id="mp-rank"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/crown.webp"><span class="dc-sum-t">Classement du mois</span></summary><div class="lb-body small muted">Chargement…</div></details>
       <p class="small muted center">Contre les joueurs : ${st.wins} victoire${st.wins > 1 ? 's' : ''} · ${st.losses} défaite${st.losses > 1 ? 's' : ''}</p>`;
@@ -119,8 +130,23 @@ export function createSceauxMp(app, root, { scCard, modeBar }) {
   }
   // l'adversaire joue : on regarde toutes les 8 s tant que la partie est ouverte et que ce n'est pas notre tour
   function watch() {
+    clearInterval(clock); clock = 0;
+    if (view?.status === 'playing' && view.pace === 'fast') {
+      // v522 : partie rapide : compte à rebours à l'écran, l'adversaire regardé toutes les 1,5 s
+      clock = setInterval(tick, 250); tick();
+      if (myTurn(view)) return schedule(() => refresh(), Math.max(1500, msLeft(view) + 3500));
+      return schedule(() => refresh(), 1500);
+    }
     if (!view || view.status !== 'playing' || myTurn(view)) { stopPoll(); if (view?.status === 'playing') schedule(() => refresh(), 30000); return; }
     schedule(() => refresh(), 8000);
+  }
+  function tick() {
+    const el = root.querySelector('.mp-clock'); if (!el || !view) return;
+    const ms = Math.max(0, msLeft(view)), secs = Math.ceil(ms / 1000);
+    el.querySelector('b').textContent = `${secs} s`;
+    el.style.setProperty('--p', `${Math.min(1, ms / (MP_FAST_SECS * 1000)) * 100}%`);
+    el.classList.toggle('low', secs <= 10);
+    if (secs <= 5 && secs > 0 && myTurn(view) && el.dataset.s !== String(secs)) { el.dataset.s = String(secs); app.sfx.tap?.(); }
   }
   async function refresh() {
     if (!ui.open || busy) return watch();
@@ -160,8 +186,8 @@ export function createSceauxMp(app, root, { scCard, modeBar }) {
       ? `<button class="sc-cell ${i === SC.CENTER ? 'heart' : ''} ${ui.sel != null && mt ? 'can' : ''}" data-mp="cell" data-i="${i}" aria-label="Case ${i + 1}">${rs(i)}${preview(i)}</button>`
       : `<div class="sc-cell full ${i === SC.CENTER ? 'heart' : ''} ${last?.cell === i ? 'drop' : ''} ${flipped.has(i) ? 'mp-flip' : ''}" data-i="${i}">${scCard(cat, c.id, { vals: c.v, owner: c.o === me ? 'p' : 'o', back: true, guard: c.g })}${rs(i)}</div>`);
     const over = v.status === 'done', r = over ? resOf(v) : null;
-    const msg = over ? '' : mt ? (ui.sel == null ? `À toi de jouer : touche une de tes cartes, puis une case libre. Il te reste <b>${left(v)}</b>.` : 'Touche une case libre pour poser la carte.')
-      : t('Au tour de <b>{name}</b> (il lui reste {time}). Tu peux fermer le jeu : la partie t’attendra.', { name: esc(foeName(v)), time: left(v) });
+    const msg = over ? '' : mt ? (ui.sel == null ? (v.pace === 'fast' ? 'À toi de jouer : touche une de tes cartes, puis une case libre.' : `À toi de jouer : touche une de tes cartes, puis une case libre. Il te reste <b>${left(v)}</b>.`) : 'Touche une case libre pour poser la carte.')
+      : v.pace === 'fast' ? t('Au tour de <b>{name}</b>…', { name: esc(foeName(v)) }) : t('Au tour de <b>{name}</b> (il lui reste {time}). Tu peux fermer le jeu : la partie t’attendra.', { name: esc(foeName(v)), time: left(v) });
     root.innerHTML = `<div class="sc-game mp-game ${app.reduced() ? 'rm' : ''}">
       <div class="sc-bar"><span class="sc-who ${!over && !myTurn(v) ? 'on' : ''}"><span class="sc-med">${avatar(v.foe?.avatar)}</span><span><b>${esc(foeName(v))}</b><small>Contre un joueur</small></span></span>
         <span class="sc-score" aria-label="Score : toi ${score.p}, adversaire ${score.o}"><b class="p">${score.p}</b><i>·</i><b class="o">${score.o}</b></span>
@@ -169,6 +195,7 @@ export function createSceauxMp(app, root, { scCard, modeBar }) {
       <div class="sc-sub"><span class="sc-ohand open">${s.hands[foe].map((id) => scCard(cat, id, { owner: 'o', cls: 'sc-mini' })).join('')}</span>
         <button class="sc-rule" data-mp="rule">${RULE_MED[s.rule] ? `<img class="sc-ricon" alt="" src="assets/icons/${RULE_MED[s.rule]}.webp">` : icon('p:rule')}${esc(SC.RULES[s.rule]?.name || '')}</button></div>
       <div class="sc-bwrap"><div class="sc-board"><div class="sc-plate">${s.board.map(cell).join('')}</div></div></div>
+      ${!over && v.pace === 'fast' ? `<div class="mp-clock ${mt ? 'mine' : ''}"><span class="mp-clock-bar"></span><span class="mp-clock-t">${mt ? 'À toi' : esc(foeName(v))} · <b>${left(v)}</b></span></div>` : ''}
       <p class="sc-msg">${msg}</p>
       ${over ? `<div class="panel mp-end ${r}"><h2 class="vs-title ${r}">${RES[r]}</h2><p>${s.final ? `${s.final[me]} cartes contre ${s.final[foe]}.` : ''}${v.reason === 'timeout' ? (r === 'win' ? ' Ton adversaire n’a pas joué à temps.' : ' Tu n’as pas joué à temps.') : v.reason === 'resign' ? (r === 'win' ? ' Ton adversaire a abandonné.' : ' Tu as abandonné.') : ''}</p><button class="btn primary block" data-mp="back">Revenir aux parties</button></div>`
         : `<div class="sc-tray ${mt ? 'on' : ''}"><div class="sc-hand-row">${s.hands[me].map((id, k) => `<button class="sc-hc ${ui.sel === k ? 'sel' : ''}" data-mp="pick" data-k="${k}" ${mt ? '' : 'disabled'}>${ui.sel === k ? '<span class="sc-halo"></span>' : ''}${scCard(cat, id, { owner: 'p' })}</button>`).join('')}</div>
@@ -189,25 +216,29 @@ export function createSceauxMp(app, root, { scCard, modeBar }) {
     drawGame(view.state.last);
     watch();
   }
-  async function quick() {
+  async function quick(pace = 'slow') {
     if (busy) return;
     busy = true;
     try {
-      const id = await cloud.sceauxMpNew(g.sceauxHand());
+      const id = await cloud.sceauxMpNew(g.sceauxHand(), null, pace);
       const v = await cloud.mpGet(id);
       busy = false;
       if (v?.status === 'playing') { toast(t('Adversaire trouvé : <b>{name}</b> !', { name: esc(foeName(v)) }), { icon: 'user' }); return open(id); }
-      toast('Recherche d’un adversaire : ta partie commencera dès qu’un joueur arrive. Reviens plus tard !', { icon: 'hourglass', ms: 5000 });
+      if (pace === 'fast') ui.searching = id;
+      else toast('Recherche d’un adversaire : ta partie commencera dès qu’un joueur arrive. Reviens plus tard !', { icon: 'hourglass', ms: 5000 });
     } catch (e) { busy = false; app.sfx.error(); toast(esc(errMsg(e)), { kind: 'error', ms: 6000 }); }
     lobby();
   }
   async function friend() {
     if (!friends) { try { friends = (await cloud.friendList()).filter((f) => f.status === 'accepted'); } catch (e) { friends = []; } }
-    const sh = openSheet(`<h2>Défier un ami</h2>${friends.length ? `<div class="mp-friends">${friends.map((f) => `<button class="vs-fr" data-f="${esc(f.id)}"><span class="fr-av">${avatar(f.avatar)}</span><b>${esc(f.pseudo)}</b></button>`).join('')}</div><p class="small muted">Il a 24 h pour accepter. Ensuite, ${MP_HOURS} h par coup.</p>` : '<p>Pas encore d’ami.</p><a class="btn block" href="#/amis">Ajouter un ami</a>'}`, { cls: 'sheet-small', label: 'Défier un ami' });
+    let pace = 'slow';
+    const sh = openSheet(`<h2>Défier un ami</h2>${friends.length ? `<div class="seg wide mp-fpace" role="group" aria-label="Vitesse"><button class="seg-b" data-pace="slow" aria-pressed="true">Lente · ${MP_HOURS} h par coup</button><button class="seg-b" data-pace="fast" aria-pressed="false">Rapide · ${MP_FAST_SECS} s</button></div><div class="mp-friends">${friends.map((f) => `<button class="vs-fr" data-f="${esc(f.id)}"><span class="fr-av">${avatar(f.avatar)}</span><b>${esc(f.pseudo)}</b></button>`).join('')}</div><p class="small muted mp-fnote">Il a 24 h pour accepter.</p>` : '<p>Pas encore d’ami.</p><a class="btn block" href="#/amis">Ajouter un ami</a>'}`, { cls: 'sheet-small', label: 'Défier un ami' });
     sh.body.addEventListener('click', async (e) => {
+      const pb = e.target.closest('[data-pace]');
+      if (pb) { pace = pb.dataset.pace; sh.body.querySelectorAll('[data-pace]').forEach((x) => x.setAttribute('aria-pressed', String(x === pb))); sh.body.querySelector('.mp-fnote').textContent = pace === 'fast' ? t('Partie rapide : ton ami a 5 minutes pour accepter, soyez connectés tous les deux.') : t('Il a 24 h pour accepter.'); return; }
       const b = e.target.closest('[data-f]'); if (!b || busy) return;
       busy = true;
-      try { await cloud.sceauxMpNew(g.sceauxHand(), b.dataset.f); sh.close(); toast('Défi envoyé ! La partie commence dès que ton ami accepte.', { kind: 'success', icon: 'user' }); }
+      try { const id = await cloud.sceauxMpNew(g.sceauxHand(), b.dataset.f, pace); sh.close(); if (pace === 'fast') ui.searching = null; toast('Défi envoyé ! La partie commence dès que ton ami accepte.', { kind: 'success', icon: 'user' }); }
       catch (err2) { app.sfx.error(); toast(esc(errMsg(err2)), { kind: 'error' }); }
       busy = false; lobby();
     });
@@ -219,7 +250,7 @@ export function createSceauxMp(app, root, { scCard, modeBar }) {
     const k = b.dataset.mp;
     if (k === 'open') return open(b.dataset.id);
     if (k === 'back') { stopPoll(); return lobby(); }
-    if (k === 'quick') return quick();
+    if (k === 'quick') return quick(b.dataset.pace || 'slow');
     if (k === 'friend') return friend();
     if (k === 'rule') return openRuleHelp(app, view?.state?.rule || 'classique');
     if (k === 'join') { busy = true; try { await cloud.sceauxMpJoin(b.dataset.id, g.sceauxHand()); busy = false; return open(b.dataset.id); } catch (err2) { busy = false; toast(esc(errMsg(err2)), { kind: 'error' }); return lobby(); } }

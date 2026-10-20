@@ -2,7 +2,7 @@
 // À relancer si des cartes sont ajoutées, puis recoller le fichier dans Supabase.
 import fs from 'node:fs';
 import { sideValues } from '../js/core/sceaux.js';
-import { MP_HOURS } from '../js/core/mp.js';
+import { MP_HOURS, MP_FAST_SECS } from '../js/core/mp.js';
 
 const root = new URL('..', import.meta.url);
 const cards = [];
@@ -11,6 +11,6 @@ for (const f of fs.readdirSync(new URL('data/cards/', root)).filter((x) => x.end
 }
 const q = (s) => `'${String(s).replace(/'/g, "''")}'`;
 const rows = cards.map((c) => `(${q(c.id)},${q(c.rarity)},'{${sideValues(c).join(',')}}')`).join(',\n');
-const sql = fs.readFileSync(new URL('tools/mp-template.sql', root), 'utf8').replace('--CARTES--', rows).replaceAll('--HEURES--', String(MP_HOURS));
+const sql = fs.readFileSync(new URL('tools/mp-template.sql', root), 'utf8').replace('--CARTES--', rows).replaceAll('--HEURES--', String(MP_HOURS)).replaceAll('--SECONDES--', String(MP_FAST_SECS));
 fs.writeFileSync(new URL('supabase/09-multijoueur.sql', root), sql);
 console.log(cards.length, 'cartes');

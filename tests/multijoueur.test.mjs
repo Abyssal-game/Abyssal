@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { loadCatalog, MemoryStorage, rngFrom } from './helpers.mjs';
 import { Game } from '../js/core/game.js';
-import { MP_REWARD, MP_HOURS } from '../js/core/mp.js';
+import { MP_REWARD, MP_HOURS, MP_FAST_SECS } from '../js/core/mp.js';
 import { sideValues } from '../js/core/sceaux.js';
 
 const catalog = loadCatalog();
@@ -26,4 +26,5 @@ test('en ligne : le SQL du serveur reprend les valeurs des cartes et le délai',
   const sql = fs.readFileSync(new URL('../supabase/09-multijoueur.sql', import.meta.url), 'utf8');
   for (const c of catalog.cards) assert.ok(sql.includes(`('${c.id}','${c.rarity}','{${sideValues(c).join(',')}}')`), `carte ${c.id} : relancer node tools/mp-sql.mjs`);
   assert.ok(sql.includes(`select ${MP_HOURS} $$`));
+  assert.ok(sql.includes(`make_interval(secs => ${MP_FAST_SECS} + 3`), 'v522 : délai de la partie rapide');
 });

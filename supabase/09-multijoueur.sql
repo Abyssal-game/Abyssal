@@ -3,7 +3,7 @@
 -- Fichier généré par `node tools/mp-sql.mjs` (valeurs des cartes lues dans le jeu) : à relancer quand des cartes
 -- sont ajoutées, puis recoller le fichier dans Supabase.
 --
--- Parties à son rythme : chacun joue son coup quand il veut, mais dans un délai (12 h par coup).
+-- Deux vitesses : partie lente (chacun joue quand il veut, 12 h par coup) ou rapide (30 s par coup).
 -- Un coup pas joué à temps : la partie est perdue. C'est le serveur qui tient la partie et applique les règles :
 -- personne ne peut tricher sur un coup. Partie rapide contre un joueur au hasard, ou défi envoyé à un ami.
 
@@ -543,11 +543,19 @@ alter table public.mp_matches enable row level security;
 revoke all on public.mp_matches from anon, authenticated;
 
 create or replace function public.mp_hours() returns int language sql immutable as $$ select 12 $$;
+-- v522 : deux vitesses. Lente : 12 h par coup ; rapide : 30 s par coup (les deux joueurs connectés),
+-- plus 3 s de marge pour le réseau, et 15 s de plus pour le tout premier coup (le temps d'arriver sur la partie).
+alter table public.mp_matches add column if not exists pace text not null default 'slow';
+alter table public.mp_matches drop constraint if exists mp_matches_pace_check;
+alter table public.mp_matches add constraint mp_matches_pace_check check (pace in ('fast', 'slow'));
+create or replace function public.mp_delay(p_pace text, p_first boolean default false) returns interval language sql immutable as $$
+  select case when p_pace = 'fast' then make_interval(secs => 30 + 3 + case when p_first then 15 else 0 end) else make_interval(hours => 12) end
+$$;
 
 -- Parties en attente depuis plus de 24 h : annulées ; coup pas joué dans le délai : perdue pour celui qui devait jouer
 create or replace function public.mp_expire()
 returns void language sql volatile security definer set search_path = public as $$
-  update public.mp_matches set status = 'cancelled', updated_at = now() where status = 'waiting' and created_at < now() - interval '24 hours';
+  update public.mp_matches set status = 'cancelled', updated_at = now() where status = 'waiting' and created_at < now() - case when pace = 'fast' then interval '5 minutes' else interval '24 hours' end;
   update public.mp_matches set status = 'done', winner = case when turn = 'a' then 'b' else 'a' end, reason = 'timeout', updated_at = now()
     where status = 'playing' and deadline < now();
 $$;
@@ -674,7 +682,7 @@ begin
   c1 := null; c2 := null;
   if rule = 'sacre' then c1 := floor(random() * 9)::int; c2 := floor(random() * 8)::int; if c2 >= c1 then c2 := c2 + 1; end if; end if;
   first := case when random() < 0.5 then 'a' else 'b' end;
-  update public.mp_matches set status = 'playing', turn = first, deadline = now() + make_interval(hours => public.mp_hours()), updated_at = now(),
+  update public.mp_matches set status = 'playing', turn = first, deadline = now() + public.mp_delay(d.pace, true), updated_at = now(),
     state = jsonb_build_object('rule', rule, 'board', jsonb_build_array(null, null, null, null, null, null, null, null, null),
       'hands', jsonb_build_object('a', d.state -> 'handA', 'b', to_jsonb(hb)), 'cells', jsonb_build_object('blessed', c1, 'cursed', c2),
       'placed', 0, 'turn', first, 'first', first, 'log', '[]'::jsonb)
@@ -683,33 +691,35 @@ end $$;
 revoke execute on function public.sceaux_start(uuid, text[]) from public, anon, authenticated;
 
 -- ——— Partie rapide (contre un joueur au hasard) ou défi à un ami ————————————————————————
-create or replace function public.sceaux_mp_new(p_hand text[], p_to uuid default null)
+drop function if exists public.sceaux_mp_new(text[], uuid);
+create or replace function public.sceaux_mp_new(p_hand text[], p_to uuid default null, p_pace text default 'slow')
 returns uuid language plpgsql volatile security definer set search_path = public as $$
 declare me uuid := auth.uid(); m public.mp_matches; id uuid; n int;
 begin
   if me is null then raise exception 'Connecte-toi d’abord.'; end if;
   if not exists (select 1 from public.profiles where profiles.id = me) then raise exception 'Choisis d’abord ton pseudo (Sanctuaire → Compte).'; end if;
   if not public.sceaux_hand_ok(p_hand) then raise exception 'Ta main doit compter 5 cartes différentes.'; end if;
+  if p_pace is null or p_pace not in ('fast', 'slow') then raise exception 'Vitesse inconnue.'; end if;
   perform public.mp_expire();
   select count(*) into n from public.mp_matches where me in (a, b) and status in ('waiting', 'playing');
   if n >= 10 then raise exception 'Tu as déjà 10 parties en cours : termine-en une d’abord.'; end if;
   if p_to is null then
     -- un joueur attend déjà ? on le rejoint
-    select * into m from public.mp_matches where game = 'sceaux' and status = 'waiting' and public and b is null and a <> me
+    select * into m from public.mp_matches where game = 'sceaux' and status = 'waiting' and public and b is null and a <> me and pace = p_pace
       order by created_at limit 1 for update skip locked;
     if found then
       update public.mp_matches set b = me where mp_matches.id = m.id;
       perform public.sceaux_start(m.id, p_hand);
       return m.id;
     end if;
-    if exists (select 1 from public.mp_matches where game = 'sceaux' and status = 'waiting' and public and a = me) then
+    if exists (select 1 from public.mp_matches where game = 'sceaux' and status = 'waiting' and public and a = me and pace = p_pace) then
       raise exception 'Tu cherches déjà un adversaire : ta partie commencera dès qu’un joueur arrive.';
     end if;
   else
     if p_to = me then raise exception 'Tu ne peux pas te défier toi-même.'; end if;
     if not public.are_friends(me, p_to) then raise exception 'Ce joueur n’est pas ton ami.'; end if;
   end if;
-  insert into public.mp_matches (game, a, b, public, state) values ('sceaux', me, p_to, p_to is null, jsonb_build_object('handA', to_jsonb(p_hand)))
+  insert into public.mp_matches (game, a, b, public, pace, state) values ('sceaux', me, p_to, p_to is null, p_pace, jsonb_build_object('handA', to_jsonb(p_hand)))
   returning mp_matches.id into id;
   return id;
 end $$;
@@ -744,7 +754,7 @@ begin
   if (st ->> 'over')::boolean then
     update public.mp_matches set state = st, status = 'done', winner = st ->> 'winner', reason = 'score', turn = null, deadline = null, updated_at = now() where id = p_id;
   else
-    update public.mp_matches set state = st, turn = st ->> 'turn', deadline = now() + make_interval(hours => public.mp_hours()), updated_at = now() where id = p_id;
+    update public.mp_matches set state = st, turn = st ->> 'turn', deadline = now() + public.mp_delay(m.pace), updated_at = now() where id = p_id;
   end if;
   return public.mp_view(p_id);
 end $$;
@@ -771,7 +781,7 @@ returns jsonb language sql stable security definer set search_path = public as $
   select jsonb_build_object('id', m.id, 'game', m.game, 'status', m.status, 'public', m.public, 'turn', m.turn, 'deadline', m.deadline,
     'me', case when m.a = auth.uid() then 'a' else 'b' end, 'state', m.state - 'handA', 'winner', m.winner, 'reason', m.reason,
     'claimed', case when m.a = auth.uid() then m.a_claimed else m.b_claimed end, 'created_at', m.created_at, 'updated_at', m.updated_at,
-    'now', now(), 'hours', public.mp_hours(),
+    'now', now(), 'hours', public.mp_hours(), 'pace', m.pace,
     'foe', (select jsonb_build_object('id', p.id, 'pseudo', p.pseudo, 'avatar', p.avatar, 'badge', p.badge) from public.profiles p where p.id = case when m.a = auth.uid() then m.b else m.a end))
   from public.mp_matches m where m.id = p_id and auth.uid() in (m.a, m.b)
 $$;
@@ -828,7 +838,7 @@ language sql stable security definer set search_path = public as $$
   where s.wins > 0 order by s.wins desc, s.games asc limit greatest(1, least(p_limit, 100))
 $$;
 
-revoke execute on function public.sceaux_mp_new(text[], uuid) from public, anon;
+revoke execute on function public.sceaux_mp_new(text[], uuid, text) from public, anon;
 revoke execute on function public.sceaux_mp_join(uuid, text[]) from public, anon;
 revoke execute on function public.sceaux_mp_play(uuid, int, int) from public, anon;
 revoke execute on function public.mp_leave(uuid) from public, anon;
@@ -837,7 +847,7 @@ revoke execute on function public.mp_get(uuid) from public, anon;
 revoke execute on function public.mp_list(text) from public, anon;
 revoke execute on function public.mp_claim(uuid) from public, anon;
 revoke execute on function public.mp_ranking(text, int) from public, anon;
-grant execute on function public.sceaux_mp_new(text[], uuid) to authenticated;
+grant execute on function public.sceaux_mp_new(text[], uuid, text) to authenticated;
 grant execute on function public.sceaux_mp_join(uuid, text[]) to authenticated;
 grant execute on function public.sceaux_mp_play(uuid, int, int) to authenticated;
 grant execute on function public.mp_leave(uuid) to authenticated;

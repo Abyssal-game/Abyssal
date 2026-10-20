@@ -9,7 +9,7 @@ import { setScene } from '../ui/scene.js';
 import { tuto } from '../ui/tutos.js';
 import { CHESTS } from '../core/descent.js';
 import { createSceauxMp } from './sceaux-mp.js';
-import { MP_HOURS, MP_REWARD } from '../core/mp.js';
+import { MP_HOURS, MP_FAST_SECS, MP_REWARD } from '../core/mp.js';
 const SC_CHEST_NAME = Object.fromEntries(Object.entries(CHESTS).map(([k, c]) => [k, c.name])); /* v408 */
 
 const V = SC.showVal;
@@ -27,7 +27,7 @@ const HOW = [['cards', '#7FA8D8', 'Ta main', '5 cartes. Chacune a quatre valeurs
   ['rule', '#B48CFF', 'Règles spéciales', 'Certains adversaires jouent avec une règle en plus : Cases sacrées, Identique ou Somme (avec Combo en cascade).'],
   ['crystal', '#7FE0A0', 'Butin', 'Une fois par jour, après une victoire, tu gardes une carte adverse que tu contrôles sur le plateau (Hyper rare au plus).'],
   ['hourglass', '#9FE0FF', 'Adversaires et défi', 'Bats chaque adversaire pour débloquer le suivant. Un défi du jour t’attend aussi.'],
-  ['amis', '#9FE0FF', 'Contre un joueur', `En haut, « Contre un joueur » : affronte d’autres joueurs (au hasard ou un ami), chacun à son rythme. Tu as ${MP_HOURS} h pour jouer chaque coup : passé ce délai, la partie est perdue. Victoire : +${MP_REWARD.win} éclats et le classement du mois.`],
+  ['amis', '#9FE0FF', 'Contre un joueur', `En haut, « Contre un joueur » : affronte d’autres joueurs (au hasard ou un ami). Partie rapide : ${MP_FAST_SECS} s par coup, les deux joueurs connectés. Partie lente : ${MP_HOURS} h par coup, chacun à son rythme. Coup pas joué à temps : partie perdue. Victoire : +${MP_REWARD.win} éclats et le classement du mois.`],
   ['danger', '#FF5468', 'Revanches implacables', 'Une fois un adversaire battu, tu peux l’affronter implacable : main plus rare, jeu plus fin, récompense ×1,5 et +150 éclats la première fois.']];
 // Salle de chaque adversaire (assets/sceaux) : le plateau reste le même, le décor change
 const THEME = { initie: 'salle', collectionneur: 'salle-artificiel', stratege: 'salle-celeste', maitre: 'salle-necrotique', echo: 'salle-abyssal', banquier: 'salle-necrotique', archiviste: 'salle-artificiel', souverain: 'salle-abyssal' };

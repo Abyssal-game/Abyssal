@@ -201,7 +201,7 @@ export const mpGet = (id) => rpc('mp_get', { p_id: id });
 export const mpLeave = (id) => rpc('mp_leave', { p_id: id });
 export const mpClaim = (id) => rpc('mp_claim', { p_id: id });
 export const mpRanking = async (game, limit = 30) => (await rpc('mp_ranking', { p_game: game, p_limit: limit })) || [];
-export const sceauxMpNew = (hand, to = null) => rpc('sceaux_mp_new', { p_hand: hand, p_to: to });
+export const sceauxMpNew = (hand, to = null, pace = 'slow') => rpc('sceaux_mp_new', { p_hand: hand, p_to: to, p_pace: pace });
 export const sceauxMpJoin = (id, hand) => rpc('sceaux_mp_join', { p_id: id, p_hand: hand });
 export const sceauxMpPlay = (id, idx, cell) => rpc('sceaux_mp_play', { p_id: id, p_idx: idx, p_cell: cell });
 

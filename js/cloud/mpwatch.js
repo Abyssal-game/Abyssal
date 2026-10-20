@@ -58,6 +58,6 @@ export async function checkTurns(app, { force = false } = {}) {
   const changed = JSON.stringify(items) !== JSON.stringify(mpw.items);
   mpw.items = items;
   if (changed) { app.chrome?.(); if (app.route === '' && !document.querySelector('.sheet-wrap, .opening, .vd')) app.refresh?.(); }
-  syncReminders(app.game, turns);
+  syncReminders(app.game, turns.filter((v) => v.pace !== 'fast')); /* v522 : pas de rappel pour les parties rapides */
   busy = false;
 }

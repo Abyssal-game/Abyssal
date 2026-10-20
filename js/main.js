@@ -349,8 +349,8 @@ async function boot() {
     startPresence();
     setInterval(autoClaim, 5000);
     setTimeout(() => checkTurns(app, { force: true }), 6000); setInterval(() => checkTurns(app), 120000); /* v519 : « À toi de jouer » en ligne */
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkTurns(app); else syncDaily(g); }); /* v521 : notification du booster du jour reprogrammée en quittant l'app */
-    setTimeout(() => syncDaily(g), 8000); setInterval(() => maybeAsk(app), 30000); /* v422 : l'Accueil n'a plus de boutons « +50 » : on encaisse aussi sans changer de page */
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkTurns(app); else syncDaily(app.game); }); /* v521 : notification du booster du jour reprogrammée en quittant l'app */
+    setTimeout(() => syncDaily(app.game), 8000); setInterval(() => maybeAsk(app), 30000); /* v422 : l'Accueil n'a plus de boutons « +50 » : on encaisse aussi sans changer de page */
     setTimeout(() => claimShadowPrize(app), 5000); // coffre du Tirage des Ombres de la semaine passée
     lastShards = app.game.s.shards;
     window.addEventListener('hashchange', render);
