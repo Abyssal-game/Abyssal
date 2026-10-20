@@ -4614,3 +4614,10 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
   .en-game .en-ob { width: 100%; height: auto; aspect-ratio: 1; font-size: 1.35rem; }
   .en-game .en-ctl .btn { min-height: 60px; }
 }
+
+/* v511 : sceaux du Pacte : gravure d'origine effacée (des étoiles à six branches rappelaient l'étoile de David, capture du propriétaire) ;
+   chaque sceau porte l'emblème de sa faction, gravé dans la cire, qui s'allume quand la faction est posée */
+.pa-parch { background-image: url(../assets/jeux/pa-table2.webp); }
+.pa-seal { display: grid; place-items: center; }
+.pa-seal .sigil { width: 62%; height: 62%; object-fit: contain; opacity: 0; transition: opacity .3s, filter .3s; }
+.pa-seal.on .sigil { opacity: 1; filter: drop-shadow(0 0 4px var(--fc)) brightness(1.15); }

@@ -40,7 +40,20 @@ save(on_black(src('cryptes-paire').crop((190, 74, 833, 941))).resize((322, 434),
 
 # ——— Pacte ———
 # Table : le parchemin autour du cadre rouge (rangée de cartes) et des sept sceaux de cire
-save(src('pacte-table').crop((60, 395, 510, 725)), 'pa-table', 86)
+def blank_seals(im):  # v511 : gravure des sept sceaux effacée (étoiles à six branches) ; l'emblème de la faction est posé par le jeu
+    from PIL import ImageFilter
+    import math
+    out = im.copy()
+    for (x, y) in [(47, 170), (100, 207), (160, 233), (225, 245), (292, 235), (353, 207), (405, 170)]:
+        R = 26; box = (x - R, y - R, x + R, y + R); patch = im.crop(box)
+        sm = patch.filter(ImageFilter.MedianFilter(7)).filter(ImageFilter.GaussianBlur(5))
+        m = Image.new('L', patch.size, 0); px = m.load()
+        for j in range(patch.size[1]):
+            for i in range(patch.size[0]):
+                d = math.hypot(i - R, j - R); px[i, j] = int(255 * (1.0 if d <= 15 else max(0.0, 1 - (d - 15) / 5)))
+        out.paste(Image.composite(sm, patch, m), box[:2])
+    return out
+save(blank_seals(src('pacte-table').crop((60, 395, 510, 725))), 'pa-table2', 88)
 s = src('pacte-sceau'); w = 1024 * 5 // 7; card(s.crop(((s.width - w) // 2, 0, (s.width - w) // 2 + w, 1024)), 'pa-sceau')
 card(src('pacte-gardien'), 'pa-gardien')
 # Offrande (9:16) : une bande retirée là où les deux bords se raccordent le mieux, pour du 5:7
