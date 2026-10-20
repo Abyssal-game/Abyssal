@@ -4531,3 +4531,8 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .cb-sw-arrow img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 10px rgba(242, 193, 78, .7)); }
 .cb-sw-arrow.d-l img { transform: rotate(180deg); }
 .cb-sw-arrow.d-u img { transform: rotate(-90deg); }
+
+/* v504 : en-têtes peints par Gemini pour Succès, Bestiaire et Réglages (remplacent les images provisoires ; nouveaux noms de fichiers) */
+.bn-trophies { --bn: url(../assets/ui/bn-trophies2.webp); }
+.bn-bestiary { --bn: url(../assets/ui/bn-bestiary2.webp); }
+.bn-settings { --bn: url(../assets/ui/bn-settings2.webp); }
