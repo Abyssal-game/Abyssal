@@ -6,6 +6,7 @@
 // Trois créatures d'une même faction : +5. Après le dernier lot, le plus de points gagne.
 // Moteur pur (aucun DOM) : l'état est un objet simple, sauvegardé tel quel dans s.encheres.cur.
 import { FACTION_ORDER } from '../config.js';
+import { dexp } from './detmath.js';
 
 export const SEATS = ['p', 'a', 'b'];
 export const OFFERS = 15;
@@ -192,7 +193,7 @@ function readOf(st, x) {
   if (seen.length < 2) return NAIVE;
   const d = seen.map((ev) => ev.bids[x] / 15 - Math.min(1, Math.abs(ev.value) / 10));
   const m = d.reduce((a, b) => a + b, 0) / d.length;
-  const sd = Math.sqrt(d.reduce((a, b) => a + (b - m) ** 2, 0) / d.length);
+  const sd = Math.sqrt(d.reduce((a, b) => a + (b - m) * (b - m), 0) / d.length);
   return { skill: 1, noise: Math.min(0.6, 0.1 + sd), bias: Math.max(-0.4, Math.min(0.4, m)), sets: 1, bluff: 0 };
 }
 export function aiBid(st, who, prof = bidderOf(st, who), rnd = Math.random) {
@@ -217,7 +218,7 @@ export function aiBid(st, who, prof = bidderOf(st, who), rnd = Math.random) {
     return gain / N - (prof.lam ?? 0.35) * c * (restAbs / myRest);
   });
   // choix tiré parmi les meilleures (température) : deux enchérisseurs qui pensent pareil ne s'annulent pas toujours
-  const T = prof.temp ?? 0.8, m = Math.max(...us), w = us.map((u) => Math.exp((u - m) / T));
+  const T = prof.temp ?? 0.8, m = Math.max(...us), w = us.map((u) => dexp((u - m) / T)); /* v540 : même résultat partout (le serveur de partie rejoue la vente) */
   let r = rnd() * w.reduce((a, b) => a + b, 0), best = mine[mine.length - 1];
   for (let k = 0; k < mine.length; k++) { r -= w[k]; if (r <= 0) { best = mine[k]; break; } }
   if (prof.bluff && rnd() < prof.bluff) return instinct(st, who, prof, rnd);

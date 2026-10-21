@@ -6478,6 +6478,7 @@ export default {
   "Erreur du serveur ({0}).": "Errore del server ({0}).",
   "Mise invalide.": "Puntata non valida.",
   "Requête illisible.": "Richiesta illeggibile.",
+  "Aucun combat en cours.": "Nessun combattimento in corso.",
 };
 
 export const names = {

@@ -6478,6 +6478,7 @@ export default {
   "Erreur du serveur ({0}).": "Error del servidor ({0}).",
   "Mise invalide.": "Apuesta no válida.",
   "Requête illisible.": "Solicitud ilegible.",
+  "Aucun combat en cours.": "Ningún combate en curso.",
 };
 
 export const names = {

@@ -200,7 +200,7 @@ export default function encheresScreen(app, root) {
     if (k === 'rules') return rules();
     if (k === 'quit') {
       if (busy) return;
-      const leave = () => { const st = g.s.encheres.cur; if (st && !st.over) { st.over = 'lost'; st.final = { scores: { p: 0, a: 0, b: 0 }, order: ['a', 'b', 'p'] }; g.encheresFinish(); } g.encheresQuit(); lobby(); };
+      const leave = () => { g.gameForfeit('encheres'); g.encheresQuit(); lobby(); }; /* v540 : l'abandon passe par le jeu (rejoué par le serveur de partie) */
       if (!g.s.encheres.cur?.over) { confirmBox('Quitter la vente ? Elle sera comptée comme une défaite.', { ok: 'Quitter', cancel: 'Reprendre la vente', danger: true }).then((yes) => { if (yes) leave(); }); return; }
       return leave();
     }

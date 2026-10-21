@@ -6489,6 +6489,7 @@ export default {
   "Erreur du serveur ({0}).": "Server error ({0}).",
   "Mise invalide.": "Invalid stake.",
   "Requête illisible.": "Unreadable request.",
+  "Aucun combat en cours.": "No battle in progress.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

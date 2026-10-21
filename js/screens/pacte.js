@@ -249,7 +249,7 @@ export default function pacteScreen(app, root) {
     if (k === 'rules') return rules();
     if (k === 'quit') {
       if (busy) return;
-      const leave = () => { const st = g.s.pacte.cur; if (st && !st.over) { st.over = 'lost'; st.final = { scores: { ...st.scores } }; g.pacteFinish(); } g.pacteQuit(); lobby(); };
+      const leave = () => { g.gameForfeit('pacte'); g.pacteQuit(); lobby(); }; /* v540 : l'abandon passe par le jeu (rejoué par le serveur de partie) */
       if (!g.s.pacte.cur?.over) { confirmBox('Quitter la partie ? Elle sera comptée comme une défaite.', { ok: 'Quitter', cancel: 'Reprendre la partie', danger: true }).then((yes) => { if (yes) leave(); }); return; }
       return leave();
     }

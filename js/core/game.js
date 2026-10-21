@@ -15,7 +15,7 @@ import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from 
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
 import { CODEX, CODEX_XP, CODEX_TIERS, SHOP, CATALOG, codexState, codexTier } from './codex.js';
 import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, lateSoft, bossEase, earlyHp, expectedLevel, cardPower, powerFor, advisedPower, floorForPower, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
-import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative } from './duel.js';
+import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative, act as duelActRaw, useUlt, beginEnemyTurn, nextEnemy, takeSkips, enemyAct, endEnemyTurn, RHYTHM } from './duel.js';
 import { bossOf, BOSSES, BOSS_ORDER } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
 import { FORMS, formUnlocked } from './forms.js';
@@ -83,6 +83,12 @@ export const AWAKEN_AT = 30;   // gardiens éveillés à partir de cet étage
 // v348 : nombre de jours entre deux dates « AAAA-MM-JJ » (heure locale)
 const dayGap = (a, b) => { const p = (x) => { const [y, m, d] = x.split('-').map(Number); return new Date(y, m - 1, d).getTime(); }; return Math.round((p(b) - p(a)) / 864e5); };
 
+// v540 : hasard d'une partie de mini-jeu, gardé dans la partie elle-même (le serveur de partie retrouve exactement les mêmes coups)
+function sessRng(st) {
+  return () => { st.rs = ((st.rs ?? 1) + 0x6D2B79F5) | 0; let t = st.rs; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+const sessSeed = (seed) => (Number(seed) ^ 0x2545F491) | 0;
+
 export class Game {
   constructor(catalog, storage, { rng = cryptoRandom, clock = () => new Date() } = {}) {
     this.catalog = catalog;
@@ -98,6 +104,17 @@ export class Game {
     try { this.convertHeroes(); } catch (e) { /* rien */ }
     try { this.fixVariants(); } catch (e) { /* rien */ }
     try { this.dropRemoved(); } catch (e) { /* rien */ }
+  }
+
+  // v540 : graine d'un combat ou d'une partie, tirée de la partie (graine de base donnée par le serveur, compteur) :
+  // le téléphone et le serveur de partie obtiennent la même. À n'appeler qu'après les vérifications (une action refusée ne doit rien changer).
+  seed(tag = '') {
+    const s = this.s;
+    if (!Number.isInteger(s.seedBase)) s.seedBase = Math.floor(this.rng() * 2 ** 31);
+    s.seedN = (s.seedN || 0) + 1;
+    let h = (2166136261 ^ s.seedBase) >>> 0;
+    for (const ch of `${s.seedN}:${tag}`) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
+    return h % 2147483647;
   }
 
   // Événements -------------------------------------------------------------
@@ -808,7 +825,7 @@ export class Game {
   trialPower() {
     const ids = Object.keys(this.s.collection).filter((id) => this.owns(id) && this.catalog.get(id));
     /* force des Épreuves : la rareté y pèse moins que dans cardPower (mesuré : à force égale, des Rares au niveau 7 gagnaient bien plus que des Hyper rares au niveau 5) */
-    const pw = (id) => { const c = this.catalog.get(id); return cardPower(c.rarity, 1) ** TRIAL_RAR * (1 + 0.08 * (this.cardLevel(id) - 1)); };
+    const pw = (id) => { const c = this.catalog.get(id); return (TRIAL_RAR === 1 ? cardPower(c.rarity, 1) : Math.sqrt(cardPower(c.rarity, 1))) * (1 + 0.08 * (this.cardLevel(id) - 1)); };
     const best = (list) => { const top = list.map(pw).sort((a, b) => b - a).slice(0, TEAM.active + TEAM.reserve); return top.length ? top.reduce((a, b) => a + b, 0) / top.length : 1; };
     return Math.max(best(ids), best(this.team()));
   }
@@ -857,7 +874,7 @@ export class Game {
     const ult = this.ultimate(team), known = {};
     enemies.forEach((e) => { if (this.knows(e.id)) known[e.id] = true; });
     const allies = team.map((id) => duelUnit(this.catalog.get(id), { level: this.cardLevel(id), form: this.formOf(id) }));
-    const st = createDuel(allies, enemies, { fervor: rule.key === 'lune' ? FERVOR_MAX - 2 : rule.key === 'reserve' ? 0 : FERVOR_START, ult: ult.key, power: ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, boss: info.boss, discovered: this.s.weakSeen || {}, seed: this.rng ? Math.floor(this.rng() * 2 ** 31) : null });
+    const st = createDuel(allies, enemies, { fervor: rule.key === 'lune' ? FERVOR_MAX - 2 : rule.key === 'reserve' ? 0 : FERVOR_START, ult: ult.key, power: ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, boss: info.boss, discovered: this.s.weakSeen || {}, seed: this.seed('trial') });
     if (rule.key === 'marque') st.markMult = 2;
     startInitiative(st);
     t.cur = i; t.battle = st; t.room = room; t.floor = F; t.ult = { key: ult.key, power: ult.power, card: ult.card };
@@ -904,6 +921,39 @@ export class Game {
   }
   autoTrial() { autoDuel(this.trials().battle); return this.finishTrial(); }
 
+  // ——— v540 : les coups d'un combat (Descente : 'run', Épreuve : 'trial') passent par le jeu : le serveur de partie les rejoue
+  // un par un depuis le même départ (même graine) et c'est son combat qui compte. Seuls les résultats de défense (esquive,
+  // parade) et du lancer chargé viennent du joueur.
+  duelState(where) {
+    const st = where === 'trial' ? this.trials().battle : where === 'run' ? this.s.descent.run?.battle : null;
+    if (!st) throw new Error('Aucun combat en cours.');
+    return st;
+  }
+  duelAct(where, uid, key, t = null, rhythm = 0) {
+    const st = this.duelState(where);
+    st.rhythm = [RHYTHM.good, RHYTHM.perfect].includes(rhythm) ? rhythm : 0;
+    const ev = duelActRaw(st, uid, key, t);
+    this.persist();
+    return ev;
+  }
+  duelUlt(where) { const ev = useUlt(this.duelState(where)); this.persist(); return ev; }
+  duelPass(where) { const ev = beginEnemyTurn(this.duelState(where)); this.persist(); return ev; }
+  // ennemi suivant (avec les tours passés : gel, Brisure) ; son coup se joue ensuite avec duelEnemy
+  duelNext(where) {
+    const st = this.duelState(where), s = nextEnemy(st);
+    st.nextQte = s ? { a: s.a, qte: !!s.qte } : null;
+    return s ? { s, skips: takeSkips(st) } : null;
+  }
+  duelEnemy(where, a, res = 'none') {
+    const st = this.duelState(where), q = st.nextQte;
+    const d = q && q.a === a && q.qte && (res === 'dodge' || res === 'parry') ? res : 'none'; // une défense seulement sur un coup qui se défend
+    st.nextQte = null;
+    const ev = enemyAct(st, a, d);
+    this.persist();
+    return ev;
+  }
+  duelEndEnemy(where) { const ev = endEnemyTurn(this.duelState(where)); this.persist(); return ev; }
+
   // ——— Duels des Sceaux ———
   // Main du joueur : 5 cartes possédées (complétée par les cartes de départ prêtées s'il en manque)
   sceauxHand() {
@@ -927,7 +977,7 @@ export class Game {
   sceauxDailyOpen() { return !!this.s.sceaux.beaten?.initie; } /* v403 : le défi du jour s'ouvre après une victoire contre Ilda */
   sceauxStart({ rival, daily = false, awake = false } = {}) {
     const sc = this.s.sceaux;
-    let R = SC.RIVAL[rival], seed = Math.floor(this.rng() * 2 ** 31);
+    let R = SC.RIVAL[rival], seed = null;
     if (daily) {
       if (!this.sceauxDailyOpen()) throw new Error('Le défi du jour s’ouvre après ta première victoire contre Ilda.');
       const d = this.sceauxDaily();
@@ -940,7 +990,9 @@ export class Game {
       if (!SC.rivalUnlocked(this.s, i)) throw new Error('Bats d’abord l’adversaire précédent.');
       if (awake) { if (!sc.beaten[rival]) throw new Error('Bats-le d’abord une fois.'); R = SC.awakened(R); }
     }
+    if (seed == null) seed = this.seed('sceaux');
     sc.cur = SC.newGame(this.catalog, { hand: this.sceauxHand(), rival: R, seed, daily });
+    sc.cur.rs = sessSeed(seed);
     if (daily) { sc.cur.dailyDay = today(this.clock()); sc.dailyTried = sc.cur.dailyDay; } /* v536 : un défi commencé avant minuit compte pour son jour ; v538 : essai noté dès le départ */
     sc.cur.ruleKey = R.rule; sc.cur.rule = R.rule;
     this.persist();
@@ -957,7 +1009,7 @@ export class Game {
     const st = this.s.sceaux.cur;
     if (!st || st.over || st.turn !== 'o') return null;
     const ai = st.ai || { level: Math.min(4, st.level || SC.RIVAL[st.rival].level), slip: 0 }; // sans réglage : force d'avant v304 (le niveau 5 jouait comme le 4)
-    const m = SC.aiMove(this.catalog, st, ai.level, this.rng, ai.slip, ai.tol ?? Infinity);
+    const m = SC.aiMove(this.catalog, st, ai.level, sessRng(st), ai.slip, ai.tol ?? Infinity);
     const flips = SC.place(this.catalog, st, 'o', m[0], m[1]);
     this.persist();
     return { cell: m[1], flips };
@@ -1014,7 +1066,7 @@ export class Game {
   encheresStart({ table, daily = false } = {}) {
     const en = this.s.encheres;
     if (!this.sceauxOpen()) throw new Error('Les Enchères de Mammon s’ouvrent après ton premier gardien.');
-    let seed = Math.floor(this.rng() * 2 ** 31);
+    let seed = null;
     if (daily) {
       if (!this.encheresDailyOpen()) throw new Error('Le défi du jour s’ouvre après ta première victoire à l’Étal des curiosités.');
       if (en.dailyDone === today(this.clock())) throw new Error('Défi du jour déjà relevé. Reviens demain !');
@@ -1025,7 +1077,9 @@ export class Game {
       if (i < 0) throw new Error('Table inconnue.');
       if (!EN.tableUnlocked(this.s, i)) throw new Error('Gagne d’abord à la table précédente.');
     }
+    if (seed == null) seed = this.seed('encheres');
     en.cur = EN.newGame(this.catalog, { table, seed, daily });
+    en.cur.rs = sessSeed(seed);
     if (daily) { en.cur.dailyDay = today(this.clock()); en.dailyTried = en.cur.dailyDay; } /* v536 : un défi commencé avant minuit compte pour son jour ; v538 : essai noté dès le départ */
     this.persist();
     return en.cur;
@@ -1034,7 +1088,7 @@ export class Game {
   encheresBid(offer) {
     const st = this.s.encheres.cur;
     if (!st || st.over) throw new Error('Aucune vente en cours.');
-    const ev = EN.resolve(st, { p: offer, ...EN.aiBids(st, this.rng) });
+    const ev = EN.resolve(st, { p: offer, ...EN.aiBids(st, sessRng(st)) });
     this.persist();
     return ev;
   }
@@ -1088,7 +1142,7 @@ export class Game {
   pacteStart({ table, daily = false } = {}) {
     const pa = this.s.pacte;
     if (!this.sceauxOpen()) throw new Error('Le Pacte s’ouvre après ton premier gardien.');
-    let seed = Math.floor(this.rng() * 2 ** 31);
+    let seed = null;
     if (daily) {
       if (!this.pacteDailyOpen()) throw new Error('Le défi du jour s’ouvre après ta première victoire au Pacte du novice.');
       if (pa.dailyDone === today(this.clock())) throw new Error('Défi du jour déjà relevé. Reviens demain !');
@@ -1099,14 +1153,16 @@ export class Game {
       if (i < 0) throw new Error('Table inconnue.');
       if (!PA.tableUnlocked(this.s, i)) throw new Error('Gagne d’abord le pacte précédent.');
     }
+    if (seed == null) seed = this.seed('pacte');
     pa.cur = PA.newGame(this.catalog, { table, seed, daily });
+    pa.cur.rs = sessSeed(seed);
     if (daily) { pa.cur.dailyDay = today(this.clock()); pa.dailyTried = pa.cur.dailyDay; } /* v536 : un défi commencé avant minuit compte pour son jour ; v538 : essai noté dès le départ */
     this.persist();
     return pa.cur;
   }
   pacteDraw() { const st = this.s.pacte.cur; if (!st || st.over || st.turn !== 'p') throw new Error('Ce n’est pas ton tour.'); const ev = PA.draw(st); this.persist(); return ev; }
   pacteStop() { const st = this.s.pacte.cur; if (!st || st.over || st.turn !== 'p') throw new Error('Ce n’est pas ton tour.'); const ev = PA.stop(st); this.persist(); return ev; }
-  pacteAi() { const st = this.s.pacte.cur; if (!st || st.over || st.turn !== 'a') return []; const evs = PA.aiTurn(st, this.rng); this.persist(); return evs; }
+  pacteAi() { const st = this.s.pacte.cur; if (!st || st.over || st.turn !== 'a') return []; const evs = PA.aiTurn(st, sessRng(st)); this.persist(); return evs; }
   pacteFinish() {
     const pa = this.s.pacte, st = pa.cur;
     if (!st || !st.over) throw new Error('La partie n’est pas terminée.');
@@ -1141,6 +1197,18 @@ export class Game {
     return out;
   }
   pacteQuit() { this.s.pacte.cur = null; this.persist(); }
+  // v540 : quitter une partie de mini-jeu en cours : elle compte comme perdue (avant : l'écran modifiait la partie lui-même)
+  gameForfeit(k) {
+    const st = this.s[k]?.cur;
+    if (!st || st.over) return null;
+    if (k === 'sceaux') { st.over = 'lost'; st.final = SC.score(st); return this.sceauxFinish(); }
+    if (k === 'pacte') { st.over = 'lost'; st.final = { scores: { ...st.scores } }; return this.pacteFinish(); }
+    if (k === 'cryptes') { st.over = 'lost'; st.final = { scores: { p: CR.scoreOf(st, 'p'), a: CR.scoreOf(st, 'a') } }; return this.cryptesFinish(); }
+    if (k === 'encheres') { st.over = 'lost'; st.final = { scores: { p: 0, a: 0, b: 0 }, order: ['a', 'b', 'p'] }; return this.encheresFinish(); }
+    return null;
+  }
+  // reprise d'une partie des Cryptes : les cartes retournées se referment
+  cryptesResume() { const st = this.s.cryptes.cur; if (st && !st.over) { st.open = []; this.persist(); } }
   // ——— v450 : Les Cryptes (mémoire à deux, pouvoirs des factions), ouvertes avec la Salle des jeux ———
   cryptesUnlocked() { return CR.TABLES.filter((_, i) => CR.tableUnlocked(this.s, i)).length; }
   cryptesDailyOpen() { return !!this.s.cryptes.beaten?.ossuaire; }
@@ -1148,7 +1216,7 @@ export class Game {
   cryptesStart({ table, daily = false } = {}) {
     const cr = this.s.cryptes;
     if (!this.sceauxOpen()) throw new Error('Les Cryptes s’ouvrent après ton premier gardien.');
-    let seed = Math.floor(this.rng() * 2 ** 31);
+    let seed = null;
     if (daily) {
       if (!this.cryptesDailyOpen()) throw new Error('Le défi du jour s’ouvre après ta première victoire à l’Ossuaire.');
       if (cr.dailyDone === today(this.clock())) throw new Error('Défi du jour déjà relevé. Reviens demain !');
@@ -1159,15 +1227,17 @@ export class Game {
       if (i < 0) throw new Error('Table inconnue.');
       if (!CR.tableUnlocked(this.s, i)) throw new Error('Gagne d’abord dans la crypte précédente.');
     }
+    if (seed == null) seed = this.seed('cryptes');
     cr.cur = CR.newGame(this.catalog, { table, seed, daily });
+    cr.cur.rs = sessSeed(seed);
     if (daily) { cr.cur.dailyDay = today(this.clock()); cr.dailyTried = cr.cur.dailyDay; } /* v536 : un défi commencé avant minuit compte pour son jour ; v538 : essai noté dès le départ */
     this.persist();
     return cr.cur;
   }
-  cryptesFlip(i) { const st = this.s.cryptes.cur; if (!st || st.over || st.turn !== 'p') throw new Error('Ce n’est pas ton tour.'); const ev = CR.flip(st, i, this.rng); this.persist(); return ev; }
-  cryptesPower(picks) { const st = this.s.cryptes.cur; if (!st || st.over) throw new Error('Aucune partie en cours.'); const ev = CR.usePower(st, picks, this.rng); this.persist(); return ev; }
+  cryptesFlip(i) { const st = this.s.cryptes.cur; if (!st || st.over || st.turn !== 'p') throw new Error('Ce n’est pas ton tour.'); const ev = CR.flip(st, i, sessRng(st)); this.persist(); return ev; }
+  cryptesPower(picks) { const st = this.s.cryptes.cur; if (!st || st.over) throw new Error('Aucune partie en cours.'); const ev = CR.usePower(st, picks, sessRng(st)); this.persist(); return ev; }
   // un geste de l'adversaire (une carte retournée), pour que l'écran le montre pas à pas
-  cryptesAi() { const st = this.s.cryptes.cur; if (!st || st.over || st.turn !== 'a') return null; const ev = CR.flip(st, CR.aiPick(st, this.rng), this.rng); this.persist(); return ev; }
+  cryptesAi() { const st = this.s.cryptes.cur; if (!st || st.over || st.turn !== 'a') return null; const r = sessRng(st), ev = CR.flip(st, CR.aiPick(st, r), r); this.persist(); return ev; }
   cryptesFinish() {
     const cr = this.s.cryptes, st = cr.cur;
     if (!st || !st.over) throw new Error('La partie n’est pas terminée.');
@@ -1361,7 +1431,7 @@ export class Game {
       if (nf) { nf.title = nm; nf.named = true; nf.maxHp = Math.round(nf.maxHp * 1.3); nf.hp = nf.maxHp; nf.atk = Math.round(nf.atk * 1.15 + 0.4); }
       const known = {};
       enemies.forEach((e) => { if (this.knows(e.id)) known[e.id] = true; });
-      run.battle = createDuel(this.runUnits(), enemies, { fervor: run.gauge || 0, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, boss: room === 'boss' ? bossOf(run.floor) : null, pact: room === 'fight' ? null : run.pact || null, relics: OMENS[run.omen]?.relic ? [OMENS[run.omen].relic] : [], blessings: run.blessings, discovered: this.s.weakSeen || {}, seed: this.rng ? Math.floor(this.rng() * 2 ** 31) : null, goal: this.goalFor(run, room), refPow: refPowFor(Math.max(run.floor, run.minFloor || 1)) });
+      run.battle = createDuel(this.runUnits(), enemies, { fervor: run.gauge || 0, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, boss: room === 'boss' ? bossOf(run.floor) : null, pact: room === 'fight' ? null : run.pact || null, relics: OMENS[run.omen]?.relic ? [OMENS[run.omen].relic] : [], blessings: run.blessings, discovered: this.s.weakSeen || {}, seed: this.seed('duel'), goal: this.goalFor(run, room), refPow: refPowFor(Math.max(run.floor, run.minFloor || 1)) });
       if (rule.key === 'marque') run.battle.markMult = 2;
       if (run.omen === 'soif') run.battle.soif = true;
       if (run.omen) run.battle.omen = run.omen;
@@ -1382,7 +1452,8 @@ export class Game {
   talentOffers(run) {
     const r = rngOf(`talent:${run.day}:${run.floor}`);
     const team = run.team.filter((m) => !m.fallen && !m.talent).map((m) => m.id);
-    const tal = Object.keys(TALENTS).filter((k) => !TALENTS[k].legacy).sort(() => r() - 0.5);
+    const tal = Object.keys(TALENTS).filter((k) => !TALENTS[k].legacy);
+    for (let i = tal.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [tal[i], tal[j]] = [tal[j], tal[i]]; } /* v540 : mélange identique partout (un tri au hasard dépend du navigateur) */
     const out = [];
     for (let i = 0; i < 3 && team.length; i++) out.push({ id: team[Math.floor(r() * team.length)], talent: tal[i] });
     return out;

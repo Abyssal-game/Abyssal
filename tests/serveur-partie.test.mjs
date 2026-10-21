@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { loadCatalog, MemoryStorage, rngFrom } from './helpers.mjs';
 import { Game } from '../js/core/game.js';
-import { autoDuel } from '../js/core/duel.js';
+import { playDuelOps } from './duel-bot.mjs';
 import { digest } from '../js/core/ops.js';
 import { recordOps } from '../js/core/oprec.js';
 import { handle } from '../serveur/partie.mjs';
@@ -84,7 +84,7 @@ test('serveur de partie : boosters ouverts par le serveur, chapitre joué sur le
   for (let i = 0; i < 3 && g.s.descent.run; i++) {
     const run = g.s.descent.run;
     if (run.phase === 'doors') g.startBattle('fight');
-    if (run.phase === 'battle') { autoDuel(run.battle); g.finishBattle(); }
+    if (run.phase === 'battle') { playDuelOps(g, 'run', rngFrom(`b${i}`)); g.finishBattle(); }
     if (g.s.descent.run?.phase === 'reward') g.chooseReward(g.s.descent.run.rewards[0]);
     if (g.s.descent.run?.phase === 'altar') g.chooseBlessing(g.s.descent.run.altar[0]);
     if (g.s.descent.run?.phase === 'cleared') g.nextFloor();
@@ -126,7 +126,7 @@ test('serveur de partie : une opération renvoyée deux fois ne compte qu’une 
 test('serveur de partie : opérations refusées (coups de jeu, Mode Créateur sans badge)', async () => {
   const db = memDb(), p = phone(db);
   await p.send({ want: true });
-  const ops = [{ q: 1, m: 'devGrant', a: [{ shards: 99999 }] }, { q: 2, m: 'sceauxPlay', a: [0, 4] }, { q: 3, m: 'toString', a: [] }];
+  const ops = [{ q: 1, m: 'devGrant', a: [{ shards: 99999 }] }, { q: 2, m: 'duelState', a: ['run'] }, { q: 3, m: 'toString', a: [] }];
   const out = await handle({ uid: 'u1', token: 't', body: { ops, dev: 'x1' } }, { db, now: () => NOW });
   assert.match(out.body.errs[1], /Créateur/);
   assert.match(out.body.errs[2], /refusée/);
@@ -136,18 +136,41 @@ test('serveur de partie : opérations refusées (coups de jeu, Mode Créateur sa
   assert.ok(db2.rows.get('u1').data.shards >= 99999);
 });
 
-test('serveur de partie : une partie des Sceaux truquée garde son vrai adversaire', async () => {
+test('serveur de partie : une partie des Sceaux truquée ne compte pas (le serveur rejoue les vrais coups)', async () => {
   const db = memDb(), p = phone(db);
   p.adopt((await p.send({ want: true })).body.data);
   const g = p.g;
   g.sceauxStart({ rival: 'initie' });
   const cur = g.s.sceaux.cur;
-  cur.over = 'won'; cur.final = { p: 9, o: 1 }; cur.rival = 'souverain'; // gagnée d'avance, contre la Souveraine
+  cur.over = 'won'; cur.final = { p: 9, o: 1 }; cur.rival = 'souverain'; // gagnée d'avance, sans jouer, contre la Souveraine
   g.sceauxFinish();
   const out = await p.send();
   const data = out.body.data || db.rows.get('u1').data;
-  assert.ok(data.sceaux.beaten.initie, 'compte comme une victoire contre Ilda');
-  assert.equal(data.sceaux.beaten.souverain, undefined, 'pas contre la Souveraine');
+  assert.ok(Object.values(out.body.errs).some((e) => /terminée/.test(e)), 'la fin est refusée : sur le serveur, la partie n’est pas jouée');
+  assert.equal(data.sceaux.beaten.initie, undefined);
+  assert.equal(data.sceaux.beaten.souverain, undefined);
+  assert.equal(data.sceaux.wins, 0);
+});
+
+test('serveur de partie : un combat truqué ne compte pas', async () => {
+  const db = memDb(), p = phone(db);
+  p.adopt((await p.send({ want: true })).body.data);
+  const g = p.g;
+  g.claimDaily(); // de quoi avoir une partie normale
+  for (const t of ['standard', 'standard']) p.first('openBooster', [t]);
+  p.adopt((await p.send()).body.data);
+  g.startRun();
+  if (g.s.descent.run.phase === 'omen') g.chooseOmen(g.s.descent.run.omenOffer[0]);
+  g.startBattle('fight');
+  const st = g.s.descent.run.battle;
+  Object.values(st.units).forEach((u) => { if (u.side === 'enemy') u.hp = 0; }); st.over = 'won'; // victoire inventée
+  g.finishBattle();
+  const out = await p.send();
+  const data = out.body.data;
+  assert.ok(data, 'le téléphone reprend la partie du serveur');
+  assert.ok(Object.values(out.body.errs).length > 0);
+  assert.equal(data.descent.run.cleared, 0, 'l’étage n’est pas gagné sur le serveur');
+  assert.equal(data.descent.run.phase, 'battle', 'le combat continue sur le serveur');
 });
 
 test('serveur de partie : réglages libres, mais pas le Mode Créateur sans badge', async () => {

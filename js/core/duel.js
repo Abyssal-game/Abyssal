@@ -16,6 +16,7 @@ import { BOSSES, LAWS, ASPECTS, ABYSS_ECHOES } from './bosses.js';
 import { familyOf, relationMult, activeLegends } from './relations.js';
 import { FORMS } from './forms.js';
 import { CREATURE_KITS, kitOf, moveOf, moveFor, hasP, boosted, awake, statShape, passiveMult, rechargeOf, ROLE_AWAKEN } from './kits.js';
+import { ipow } from './detmath.js'; // v540 : puissances par multiplications (le serveur de partie rejoue les combats au bit près)
 
 export { KEYWORDS, keywordOf, INTENTS, BOSS_POWERS, bossPowerOf, SYNERGIES, FERVOR_MAX, AP_MAX, PA_MAX, BOSSES, LAWS, ASPECTS };
 export const FRONT = 3;
@@ -80,7 +81,9 @@ export function createDuel(allies, enemies, { gauge = 0, fervor = gauge, ult = '
     bossKey: boss && BOSSES[boss] ? boss : null, law: null, aspect: null, pact: pact || null, relics: relics.slice(), relSeen: {}, bossLog: [], legends: [],
     goal: goal && GOALS[goal] ? goal : null, refPow,
   };
-  for (const u of [...allies, ...enemies]) { st.units[u.uid] = { ...u }; st.order[u.side].push(u.uid); }
+  /* v540 : identifiants propres au combat (a1, a2… e1, e2…) : le serveur de partie, qui rejoue le combat, retrouve les mêmes */
+  const n = { ally: 0, enemy: 0 };
+  for (const u0 of [...allies, ...enemies]) { const u = { ...u0, uid: `${u0.side[0]}${++n[u0.side]}` }; st.units[u.uid] = u; st.order[u.side].push(u.uid); }
   setupExtras(st);
   ['ally', 'enemy'].forEach((side) => front(st, side).forEach((u) => { u.inPlay = true; }));
   openingPassives(st);
@@ -207,7 +210,7 @@ export function dmgOf(st, a, t, mult = 1, { basic = false } = {}) {
   // les bonus situationnels se cumulent, mais jamais au-delà de ×3 la force de base du coup
   n = Math.min(n, flat * MULT_CAP);
   // v493 : écart de niveau : une créature trop faible pour l'étage blesse moins (comme dans un RPG)
-  if (a.side === 'ally' && t.side === 'enemy' && st.refPow && a.pow && a.pow < st.refPow) n *= (a.pow / st.refPow) ** GAP_ATK;
+  if (a.side === 'ally' && t.side === 'enemy' && st.refPow && a.pow && a.pow < st.refPow) n *= ipow(a.pow / st.refPow, GAP_ATK);
   if (t.boss && st.law === 'fer' && !t.broken) n *= 0.6;
   if (t.boss && t.side === 'enemy' && a.side === 'ally' && st.runes) n *= 1 - RUNE_GUARD * runesLeft(st);
   if (a.side === 'ally' && t.side === 'enemy' && mult > 0) n += comboOf(st, a, t);
@@ -294,7 +297,7 @@ export const QTE_HIT = 1.6, PLAIN_HIT = 0.6;
 export const GRAZE = 0.35;
 export const allyCap = (u, kind, st = null) => {
   const gap = st?.refPow && u.pow ? Math.max(1, st.refPow / u.pow) : 1;
-  return Math.max(1, Math.round(u.maxHp * gap ** GAP_POW * (BIG.includes(kind) ? ALLY_BIG_CAP : ALLY_HIT_CAP)));
+  return Math.max(1, Math.round(u.maxHp * ipow(gap, GAP_POW) * (BIG.includes(kind) ? ALLY_BIG_CAP : ALLY_HIT_CAP)));
 };
 function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
   if (u.hp <= 0 || n <= 0) return 0;

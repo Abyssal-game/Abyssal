@@ -355,7 +355,7 @@ ${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone || dail
     if (k === 'awake') return start({ rival: b.dataset.r, awake: true });
     if (k === 'quit') {
       if (busy) return;
-      const leave = () => { const st = g.s.sceaux.cur; if (st && !st.over) { st.over = 'lost'; st.final = SC.score(st); g.sceauxFinish(); } g.sceauxQuit(); lobby(); };
+      const leave = () => { g.gameForfeit('sceaux'); g.sceauxQuit(); lobby(); }; /* v540 : l'abandon passe par le jeu (rejoué par le serveur de partie) */
       if (!g.s.sceaux.cur?.over) { confirmBox('Abandonner la partie ? Elle sera comptée comme une défaite.', { ok: 'Abandonner', cancel: 'Reprendre la partie', danger: true }).then((yes) => { if (yes) leave(); }); return; }
       return leave();
     }

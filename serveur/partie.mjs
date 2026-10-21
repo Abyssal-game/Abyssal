@@ -1,4 +1,4 @@
-// v539 : le serveur de partie (étape 1 de l'anti-triche). Il tient la progression de chaque compte : il rejoue chaque
+// v539 : le serveur de partie (étape 1 de l'anti-triche ; v540, étape 2 : combats et mini-jeux rejoués coup par coup). Il tient la progression de chaque compte : il rejoue chaque
 // opération envoyée par le téléphone avec le même moteur (js/core/game.js), tire lui-même au hasard (boosters), vérifie les
 // récompenses en ligne, et c'est son résultat qui est gardé. Indépendant de l'hébergement : la fonction Supabase
 // (supabase/functions/partie/index.ts) lui fournit la base (`db`) ; les tests lui donnent une base en mémoire.
@@ -7,11 +7,11 @@ import { migrate, defaultSave } from '../js/core/save.js';
 import { SAVE_KEY } from '../js/config.js';
 import { lineupStake } from '../js/core/versus.js';
 import { friendCard } from '../js/core/friends.js';
-import { OPS, SESS_ID, FREE, FREE_DEV, getPath, setPath, clone, digest } from '../js/core/ops.js';
+import { OPS, FREE, FREE_DEV, setPath, clone, digest } from '../js/core/ops.js';
 import { catalogue } from './catalogue.mjs';
 
 export const PARTIE_VERSION = 1;
-const MAX_OPS = 400, MAX_SESS = 400000, TZ_LOCK_DAYS = 7;
+const MAX_OPS = 2000, TZ_LOCK_DAYS = 7; // un combat compte souvent plus de cent coups
 
 class Mem {
   constructor(txt) { this.m = new Map(); if (txt) this.m.set(SAVE_KEY, txt); }
@@ -77,21 +77,6 @@ const DEV = {
   devSnapshot(g, save) { g.replaceSave(migrate(save)); },
 };
 
-function inject(g, op) {
-  for (const p of (Object.hasOwn(OPS, op.m) && OPS[op.m].sess) || []) {
-    const v = op.s ? op.s[p] : undefined;
-    if (v === undefined) continue;
-    if (v !== null && (typeof v !== 'object' || Array.isArray(v) || JSON.stringify(v).length > MAX_SESS)) throw new Error('Partie en cours illisible.');
-    const mine = getPath(g.s, p), ids = SESS_ID[p];
-    let val = clone(v);
-    if (ids) {
-      if (!mine) throw new Error('Aucune partie en cours.');
-      for (const k of ids) { if (mine[k] === undefined) delete val[k]; else val[k] = mine[k]; } // l'identité de la partie reste celle du serveur
-    }
-    setPath(g.s, p, val);
-  }
-}
-
 // Une requête : { ops: [{ q, m, a, s }], dev, free, tz, digest, want }
 export async function handle({ uid, token, body }, { db, now = () => Date.now(), rng = cryptoRng }) {
   if (!uid) return { status: 401, body: { error: 'Connecte-toi d’abord.' } };
@@ -109,6 +94,7 @@ export async function handle({ uid, token, body }, { db, now = () => Date.now(),
     if (okTz(b.tz) && b.tz !== tz && (!row.tz_at || now() - tzAt > TZ_LOCK_DAYS * 864e5 || row.tz == null)) { tz = b.tz; tzAt = now(); }
     const creator = await db.isCreator(uid);
     const g = gameFor(data, { tz, rng, now });
+    if (!Number.isInteger(g.s.seedBase)) g.s.seedBase = Math.floor(rng() * 2 ** 31); // v540 : graine des combats et mini-jeux (le téléphone la reçoit)
     const seqs = { ...(row.seqs || {}) };
     let last = Number(seqs['d:' + dev]) || 0;
     const rets = {}, errs = {}, prog = {};
@@ -124,7 +110,6 @@ export async function handle({ uid, token, body }, { db, now = () => Date.now(),
         if (!def || def.kind === 'local') throw new Error('Opération refusée.');
         if (def.kind === 'dev' && !creator) throw new Error('Réservé au Mode Créateur.');
         const args = Array.isArray(op.a) ? clone(op.a) : [];
-        inject(g, op);
         let r;
         if (NET[op.m]) r = await NET[op.m](c, g, ...args);
         else if (DEV[op.m]) r = DEV[op.m](g, ...args);

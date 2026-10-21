@@ -266,7 +266,7 @@ export default function cryptesScreen(app, root) {
     if (k === 'powers') return powers();
     if (k === 'quit') {
       if (busy) return;
-      const leave = () => { const st = g.s.cryptes.cur; if (st && !st.over) { st.over = 'lost'; st.final = { scores: { p: CR.scoreOf(st, 'p'), a: CR.scoreOf(st, 'a') } }; g.cryptesFinish(); } g.cryptesQuit(); lobby(); };
+      const leave = () => { g.gameForfeit('cryptes'); g.cryptesQuit(); lobby(); }; /* v540 : l'abandon passe par le jeu (rejoué par le serveur de partie) */
       if (!g.s.cryptes.cur?.over) { confirmBox('Quitter la partie ? Elle sera comptée comme une défaite.', { ok: 'Quitter', cancel: 'Reprendre la partie', danger: true }).then((yes) => { if (yes) leave(); }); return; }
       return leave();
     }
@@ -304,7 +304,7 @@ export default function cryptesScreen(app, root) {
   });
 
   const cur = g.s.cryptes.cur;
-  if (cur && !cur.rewarded) { cur.open = []; view(); if (cur.over) end(); else if (cur.turn === 'a') aiTurn(); }
+  if (cur && !cur.rewarded) { g.cryptesResume(); view(); if (cur.over) end(); else if (cur.turn === 'a') aiTurn(); }
   else { if (cur) g.cryptesQuit(); lobby(); }
   return () => { gone = true; mp.stop(); clearTimeout(timer); document.body.classList.remove('battle-mode', 'sc-lost'); ['.sc-end', '.sc-scene'].forEach((q) => document.querySelector(q)?.remove()); };
 }

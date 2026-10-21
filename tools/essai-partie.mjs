@@ -52,6 +52,23 @@ await p.evaluate(async () => { const g = window.__abyssal.game; g.s.shards += 99
 await p.waitForTimeout(3500);
 await p.evaluate(async () => { try { await window.__abyssal.partie.flush(); } catch (e) { /* rien */ } }); await p.waitForTimeout(500);
 console.log('après la triche · téléphone', (await st()).shards, mode === 'server' ? `· serveur ${srv().shards}` : '');
+// v540 : un vrai combat joué par l'écran de combat (toucher les ennemis), défense automatique, puis comparaison avec le serveur
+await p.evaluate(() => { const g = window.__abyssal.game; g.setSetting('defense', 'auto'); g.setSetting('motion', 'reduce'); g.setSetting('combatFast', true); g.setTeam(g.autoTeam()); g.startRun(); const run = g.s.descent.run; if (run.phase === 'omen') g.chooseOmen(run.omenOffer[0]); g.startBattle('fight'); location.hash = '#/aventure'; });
+await p.waitForTimeout(400);
+await p.evaluate(() => { location.hash = '#/descente'; }); await p.waitForTimeout(1500);
+let fought = 0;
+for (let i = 0; i < 240; i++) {
+  const over = await p.evaluate(() => !window.__abyssal.game.s.descent.run?.battle || !!window.__abyssal.game.s.descent.run.battle.over);
+  if (over) break;
+  await p.evaluate(() => { document.querySelectorAll('.coach button, .sheet-close').forEach((x) => x.click()); const e = document.querySelector('.dv-c.enemy:not(.dead)'); if (e) e.click(); });
+  fought++; await p.waitForTimeout(500);
+}
+await p.waitForTimeout(2500); await tidy();
+await p.evaluate(async () => { for (let i = 0; i < 4; i++) { try { await window.__abyssal.partie.flush(); } catch (e) { /* rien */ } } });
+await p.waitForTimeout(800);
+const fin = await p.evaluate(async () => { const { digest } = await import('./js/core/ops.js'); const g = window.__abyssal.game; return { d: digest(g.s), floor: g.s.descent.run?.cleared ?? g.s.descent.last?.floor, best: g.s.descent.best, shards: g.s.shards, ops: (await import('./js/cloud/partie.js')).pendingOps() }; });
+if (mode === 'server') { const { digest } = await import('../js/core/ops.js'); console.log('combat joué par l’écran (', fought, 'touchers) · téléphone', JSON.stringify(fin), '· serveur', JSON.stringify({ d: digest(srv()), floor: srv().descent.run?.cleared ?? srv().descent.last?.floor, best: srv().descent.best, shards: srv().shards }), fin.d === digest(srv()) ? '· IDENTIQUES' : '· DIFFÉRENTS'); }
+else console.log('combat joué par l’écran (', fought, 'touchers) ·', JSON.stringify(fin));
 // tour des écrans
 for (const r of ['', 'collection', 'boutique', 'coffres', 'descente', 'epreuves', 'jeux', 'sceaux', 'pacte', 'cryptes', 'encheres', 'menu', 'bestiaire', 'succes', 'profil', 'parametres', 'compte', 'amis', 'equipe', 'renfort', 'fournaise']) {
   await p.evaluate((r) => { location.hash = '#/' + r; }, r); await p.waitForTimeout(700); await tidy();
