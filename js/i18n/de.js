@@ -1,5 +1,6 @@
 // Dictionnaire allemand (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Ce nom est réservé. Choisis-en un autre.": "Dieser Name ist reserviert. Wähle einen anderen.",
   "{e0} Fin de la Saison I · La Nuit des Âmes : {0} récompenses oubliées t’ont été données.": "{e0} Ende der Saison I · Die Nacht der Seelen: {0} vergessene Belohnungen wurden dir gegeben.",
   "{e0} Fin de la Saison II · La Veillée de Noël : {0} récompenses oubliées t’ont été données.": "{e0} Ende der Saison II · Heiligabend: {0} vergessene Belohnungen wurden dir gegeben.",
   "Cadre des citrouilles sculptées": "Rahmen der geschnitzten Kürbisse",

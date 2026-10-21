@@ -1,5 +1,6 @@
 // Dictionnaire italien (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Ce nom est réservé. Choisis-en un autre.": "Questo nome è riservato. Scegline un altro.",
   "{e0} Fin de la Saison I · La Nuit des Âmes : {0} récompenses oubliées t’ont été données.": "{e0} Fine della Stagione I · La Notte delle Anime: ti sono state date {0} ricompense dimenticate.",
   "{e0} Fin de la Saison II · La Veillée de Noël : {0} récompenses oubliées t’ont été données.": "{e0} Fine della Stagione II · La Vigilia di Natale: ti sono state date {0} ricompense dimenticate.",
   "Cadre des citrouilles sculptées": "Cornice delle zucche intagliate",

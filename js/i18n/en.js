@@ -1,5 +1,6 @@
 // Anglais (v506-v507) : texte français → traduction. Généré à partir des lots de traduction ; on peut corriger à la main.
 export default {
+  "Ce nom est réservé. Choisis-en un autre.": "This name is reserved. Choose another one.",
   "{e0} Fin de la Saison I · La Nuit des Âmes : {0} récompenses oubliées t’ont été données.": "{e0} End of Season I · The Night of Souls: {0} forgotten rewards were given to you.",
   "{e0} Fin de la Saison II · La Veillée de Noël : {0} récompenses oubliées t’ont été données.": "{e0} End of Season II · Christmas Eve: {0} forgotten rewards were given to you.",
   "Cadre des citrouilles sculptées": "Carved Pumpkin Frame",

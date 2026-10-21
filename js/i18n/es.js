@@ -1,5 +1,6 @@
 // Dictionnaire espagnol (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Ce nom est réservé. Choisis-en un autre.": "Este nombre está reservado. Elige otro.",
   "{e0} Fin de la Saison I · La Nuit des Âmes : {0} récompenses oubliées t’ont été données.": "{e0} Fin de la Temporada I · La Noche de las Almas: se te dieron {0} recompensas olvidadas.",
   "{e0} Fin de la Saison II · La Veillée de Noël : {0} récompenses oubliées t’ont été données.": "{e0} Fin de la Temporada II · La Nochebuena: se te dieron {0} recompensas olvidadas.",
   "Cadre des citrouilles sculptées": "Marco de calabazas talladas",
