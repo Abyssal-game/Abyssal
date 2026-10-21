@@ -5631,3 +5631,15 @@ body.battle-mode .prog-chip { top: calc(var(--safe-t, env(safe-area-inset-top, 0
 .re-barbox { display: inline-flex; align-items: center; justify-content: flex-end; gap: 2px; }
 .re-btn.in-bar { position: static; width: 40px; height: 40px; min-height: 40px; padding: 0; border-radius: 50%; box-shadow: none; background: radial-gradient(circle at 40% 35%, #3a2552, #160c22 70%); border: 1px solid rgba(242, 193, 78, .5); }
 .re-btn.in-bar svg { width: 22px; height: 22px; }
+
+/* v565 : habillages de booster (sachets) : le nom s'écrit dans la plaque sombre de l'image */
+.pack-skin .pk-label { top: var(--lt, 70%); bottom: auto; left: 14%; right: 14%; gap: 3cqw; }
+.pack-skin .pk-name { display: grid; place-items: center; height: 8.6cqw; font-size: 6.2cqw; letter-spacing: .08em; text-transform: uppercase; color: #F1DB9E; }
+.pack-skin .pk-foil, .pack-skin .pk-logo { display: none; }
+.cs-sachets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.cs-sachet { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px; border-radius: 10px; background: rgba(255, 255, 255, .03); border: 1px solid rgba(201, 164, 90, .25); color: inherit; }
+.cs-sachet img { width: 100%; aspect-ratio: 464 / 800; object-fit: contain; }
+.cs-sachet[aria-pressed="true"] { border-color: var(--gold-hi, #F2C14E); box-shadow: 0 0 0 1px var(--gold-hi, #F2C14E) inset; }
+.pf-cx-veilleuses { --fr: url(../assets/frames/cx-veilleuses-4.webp); }
+.pf-cx-reliquaire-ames { --fr: url(../assets/frames/cx-reliquaire-ames-4.webp); }
+.pf.pf-cx-loups-neige { --fr: url(../assets/frames/cx-loups-neige-5.webp); }

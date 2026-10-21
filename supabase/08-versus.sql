@@ -759,6 +759,10 @@ begin
 end $$;
 
 -- ——— Listes : défis ouverts des autres, et mes défis (30 derniers) ————————————————————
+-- v565 : apparence de l'adversaire (sachet de booster, cadre, plaque : colonnes aussi créées par 15-vitrine.sql)
+alter table public.profiles add column if not exists frame text;
+alter table public.profiles add column if not exists plate text;
+alter table public.profiles add column if not exists sachet text;
 create or replace function public.versus_list()
 returns jsonb language plpgsql volatile security definer set search_path = public as $$
 declare me uuid := auth.uid();
@@ -779,7 +783,7 @@ begin
              case when d.a = me then d.a_score else d.b_score end as my_score,
              case when d.a = me then d.b_score else d.a_score end as their_score,
              case when d.a = me then d.a_claimed else d.b_claimed end as claimed,
-             o.pseudo, o.avatar, o.badge
+             o.pseudo, o.avatar, o.badge, o.sachet, o.frame, o.plate
       from public.versus_duels d left join public.profiles o on o.id = case when d.a = me then d.b else d.a end
       where me in (d.a, d.b)
       order by d.created_at desc limit 30) x), '[]'::jsonb));

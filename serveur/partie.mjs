@@ -130,7 +130,7 @@ export async function handle({ uid, token, body }, { db, now = () => Date.now(),
     g.persist(); // note aussi le jour joué (coffre de la semaine)
     const out = g.s, dg = digest(out);
     // profil public et fiche d'ami : republiés seulement s'ils ont changé (ou s'il y a des Épreuves à compter)
-    const profile = { avatar: g.shownAvatar(), title: out.title, frame: out.frame || null, plate: out.plate || null, /* v564 : vus par les autres */ level: g.levelInfo().level, owned: g.uniqueCount() }, card = friendCard(g);
+    const profile = { avatar: g.shownAvatar(), title: out.title, frame: out.frame || null, plate: out.plate || null, sachet: out.sachet || null, /* v564 : vus par les autres */ level: g.levelInfo().level, owned: g.uniqueCount() }, card = friendCard(g);
     let h = 2166136261; for (const ch of JSON.stringify([profile, card])) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
     const pub = h.toString(36), mustPub = pub !== seqs._pub || fx.trials.length > 0 || !!b.pub;
     seqs._pub = pub;

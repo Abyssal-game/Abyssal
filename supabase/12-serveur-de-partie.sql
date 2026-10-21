@@ -92,6 +92,9 @@ begin
   -- v564 : cadre et plaque de pseudo (colonnes ajoutées par 15-vitrine.sql)
   if exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'profiles' and column_name = 'plate') then
     execute 'update public.profiles set frame = $2, plate = $3 where id = $1' using p_uid, p_profile ->> 'frame', p_profile ->> 'plate';
+    if exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'profiles' and column_name = 'sachet') then
+      execute 'update public.profiles set sachet = $2 where id = $1' using p_uid, p_profile ->> 'sachet'; -- v565
+    end if;
   end if;
   if p_card is not null and to_regclass('public.player_cards') is not null and octet_length(p_card::text) < 100000 then
     execute 'insert into public.player_cards (id, data, updated_at) values ($1, $2, now())

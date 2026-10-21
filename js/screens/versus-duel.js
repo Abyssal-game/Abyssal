@@ -11,6 +11,7 @@ import { esc, fmt } from '../ui/dom.js';
 import { packHTML } from './shop.js';
 import { t } from '../i18n.js';
 import { musicCue, musicSeek, musicRelease } from '../ui/music.js';
+import { skinOk } from '../ui/vitrine.js';
 
 const RES = { win: 'Victoire', tie: 'Égalité', lose: 'Défaite' };
 const EMB = { win: 'vd-win', lose: 'vd-lose', tie: 'vd-tie' }; /* v524 : emblèmes Gemini de fin (v526 : égalité) */
@@ -98,7 +99,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
     const it = lineup[p];
     const pk = packHTML(it.type, cat, { faction: it.faction, event: it.factions ? { factions: it.factions } : ev });
     const fp = q('.vd-pack.foe'), mp = q('.vd-pack.me');
-    fp.innerHTML = pk; mp.innerHTML = pk;
+    fp.innerHTML = packHTML(it.type, cat, { faction: it.faction, event: it.factions ? { factions: it.factions } : ev, skin: skinOk(r.sachet) }); mp.innerHTML = pk; /* v565 : chacun son sachet */
     q('.vd-step').textContent = lineup.length > 1 ? `${t('Booster')} ${p + 1} / ${lineup.length}` : '';
     [fp, mp].forEach((x) => { x.className = `vd-pack ${x === fp ? 'foe' : 'me'} in`; });
     q('.vd-mid').classList.add('show');

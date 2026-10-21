@@ -1,16 +1,18 @@
 -- ABYSSAL v564 : ce que les autres joueurs voient de ton apparence (demande du propriétaire du 21 octobre 2026 :
--- « que ça apparaisse sur les classements et pendant les jeux en ligne »). Cadre de profil et plaque de pseudo.
+-- « que ça apparaisse sur les classements et pendant les jeux en ligne »). Cadre de profil, plaque de pseudo (v565 : et sachet de booster).
 -- À coller dans Supabase → SQL Editor → New query → Run, PUIS recoller 09-multijoueur.sql (réactions en ligne).
 -- Se recolle sans danger.
 
 alter table public.profiles add column if not exists frame text;
 alter table public.profiles add column if not exists plate text;
+alter table public.profiles add column if not exists sachet text; -- v565 : sachet de booster, vu par l'adversaire au Pari
 
 -- garde-fou : une clé simple (lettres minuscules, chiffres, tirets), sinon rien (aucun texte ni code glissé par une app modifiée)
 create or replace function public.profiles_cosm_check() returns trigger language plpgsql as $$
 begin
   if new.frame is not null and new.frame !~ '^[a-z0-9-]{1,40}$' then new.frame := null; end if;
   if new.plate is not null and new.plate !~ '^pl-[a-z0-9-]{1,40}$' then new.plate := null; end if;
+  if new.sachet is not null and new.sachet !~ '^sachet-[a-z0-9-]{1,40}$' then new.sachet := null; end if;
   return new;
 end $$;
 drop trigger if exists profiles_cosm_check on public.profiles;
@@ -28,6 +30,9 @@ begin
   -- v564 : cadre et plaque de pseudo (colonnes ajoutées par 15-vitrine.sql)
   if exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'profiles' and column_name = 'plate') then
     execute 'update public.profiles set frame = $2, plate = $3 where id = $1' using p_uid, p_profile ->> 'frame', p_profile ->> 'plate';
+    if exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'profiles' and column_name = 'sachet') then
+      execute 'update public.profiles set sachet = $2 where id = $1' using p_uid, p_profile ->> 'sachet'; -- v565
+    end if;
   end if;
   if p_card is not null and to_regclass('public.player_cards') is not null and octet_length(p_card::text) < 100000 then
     execute 'insert into public.player_cards (id, data, updated_at) values ($1, $2, now())

@@ -1,6 +1,6 @@
 // v470 : ÉBAUCHE du pass de saison (« Le Codex de l'Abîme ») et de la boutique en argent réel (« L'Échoppe »).
 // Visible seulement en Mode Créateur (option « Codex et Échoppe ») ; les achats sont simulés (aucun paiement).
-import { CODEX, CODEX_XP, CODEX_XP_LABEL, tiersOf, seasonByKey, CODEX_FRAMES, CODEX_BACKS, FINISHES, PLATES, EMOTES, SHOP, CATALOG, OBS, codexTier, tierProgress, claimable, freshCodex } from '../core/codex.js';
+import { CODEX, CODEX_XP, CODEX_XP_LABEL, tiersOf, seasonByKey, CODEX_FRAMES, CODEX_BACKS, FINISHES, PLATES, EMOTES, SACHETS, SHOP, CATALOG, OBS, codexTier, tierProgress, claimable, freshCodex } from '../core/codex.js';
 import { FRAMES } from '../config.js';
 import { CHESTS } from '../core/descent.js';
 import { icon, picon } from '../ui/icons.js';
@@ -34,6 +34,7 @@ export default function codexScreen(app, root) {
     if (r.frame) parts.push(`<span class="cx-r"><i class="avatar-mini pf pf-${r.frame}"></i>${esc(ALL_FRAMES[r.frame] || r.frame)}</span>`);
     if (r.title) parts.push(`<span class="cx-r">${picon('titles')}Titre « ${esc(r.title)} »</span>`);
     if (r.back) parts.push(`<span class="cx-r"><img class="cx-back" alt="" src="assets/backs/${r.back}.webp">${esc(CODEX_BACKS[r.back] || r.back)}</span>`);
+    if (r.sachet) parts.push(`<span class="cx-r"><img class="cx-back" alt="" src="assets/packs/${r.sachet}.webp">${esc(SACHETS[r.sachet] || r.sachet)}</span>`); /* v565 */
     if (r.finish) parts.push(`<span class="cx-r">${picon('holo')}Finition ${esc(FINISHES[r.finish]?.name || r.finish)}</span>`);
     if (r.obs) parts.push(`<span class="cx-r">${obsTxt(r.obs)}&nbsp;${esc(OBS.name.toLowerCase())}</span>`);
     return parts.join('');
@@ -57,6 +58,7 @@ export default function codexScreen(app, root) {
     for (const [k, n] of Object.entries(r.tickets || {})) items.push([`<img class="cxr-pack" alt="" src="assets/packs/${k === 'standard' ? 'standard2' : k}.webp">`, `${n} ×`, esc(PACK_NAME[k] || k)]);
     if (r.frame) items.push([`<span class="avatar-mini pf pf-${r.frame}">${myAv()}</span>`, '', esc(ALL_FRAMES[r.frame] || r.frame)]);
     if (r.back) items.push([`<img class="cxr-back" alt="" src="assets/backs/${r.back}.webp">`, '', esc(CODEX_BACKS[r.back] || r.back)]);
+    if (r.sachet) items.push([`<img class="cxr-pack" alt="" src="assets/packs/${r.sachet}.webp">`, '', esc(SACHETS[r.sachet] || r.sachet)]); /* v565 */
     if (r.finish) items.push([`<span class="cx-fin cxr-fin"><img alt="" src="assets/art/lite/${esc(g.bestCards(1)[0]?.id || 'ABY-039')}.webp"><img alt="" src="assets/variants/${r.finish}-frame.webp" onerror="this.remove()"></span>`, '', `Finition ${esc(FINISHES[r.finish]?.name || r.finish)}`]);
     if (r.title) items.push([`<span class="cxr-ic">${picon('titles')}</span>`, 'Titre', `« ${esc(r.title)} »`]);
     if (r.obs) items.push([`<span class="cxr-ic">${OBS_I}</span>`, `+${fmt(r.obs)}`, esc(OBS.name.toLowerCase())]);

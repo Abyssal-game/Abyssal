@@ -1866,6 +1866,7 @@ export class Game {
     if (k) d[id] = k; else delete d[id];
     this.persist();
   }
+  setSachet(k) { if (!k || (this.s.sachets || []).includes(k)) { this.s.sachet = k || null; this.persist(); } } /* v565 : habillage des boosters, null = d'origine */
   setPlate(k) { if (!k || (this.s.plates || []).includes(k)) { this.s.plate = k || null; this.persist(); } } /* v564 : plaque de pseudo, null = aucune */
   emotesOwned() { return [...FREE_EMOTES, ...(this.s.emotes || [])]; } /* v564 : réactions en ligne (les 4 premières sont à tous) */
   setBack(k) { if (!k || (this.s.backs || []).includes(k)) { this.s.back = k || null; this.persist(); } } /* v473 : null = dos par défaut */
@@ -1891,6 +1892,7 @@ export class Game {
     for (const b of reward.backs || []) if (!(this.s.backs ||= []).includes(b)) this.s.backs.push(b);
     if (reward.finish && !(this.s.finishes ||= []).includes(reward.finish)) this.s.finishes.push(reward.finish); /* v482 */
     if (reward.plate && !(this.s.plates ||= []).includes(reward.plate)) this.s.plates.push(reward.plate); /* v564 */
+    if (reward.sachet && !(this.s.sachets ||= []).includes(reward.sachet)) this.s.sachets.push(reward.sachet); /* v565 */
     for (const e of [reward.emote, ...(reward.emotes || [])]) if (e && !(this.s.emotes ||= []).includes(e)) this.s.emotes.push(e);
     if (reward.codexPremium) this.codex().premium = true; /* v548 : Codex enluminé acheté (4,99 €) */
     if (reward.obs) this.s.obs = (this.s.obs || 0) + reward.obs; /* v474 : obsidiennes (achetées en euros) */

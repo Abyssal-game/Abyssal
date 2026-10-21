@@ -10,6 +10,7 @@ import { icon, EMBLEM } from './ui/icons.js';
 import { toast, esc, fmt, reducedMotion, closeTopSheet, openSheet, handlePopstate, afterHistory } from './ui/dom.js';
 import { sfx, configureSound, audioCtx, audioCtxIfAny } from './ui/sound.js';
 import { musicRoute, configureMusic } from './ui/music.js';
+import { setPackSkin } from './ui/vitrine.js'; /* v565 : sachet de booster */
 import { VERSION } from './config.js';
 import { openCardDetail } from './screens/detail.js';
 
@@ -103,6 +104,7 @@ if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__abyssalProg =
 function applySettings() {
   const s = app.game.s.settings;
   setCardBack(app.game.s.back); /* v473 : dos de cartes choisi au Profil */
+  setPackSkin(app.game.s.sachet);
   document.documentElement.classList.toggle('reduce-motion', s.motion === 'reduced');
   document.documentElement.classList.toggle('fx-light', s.quality === 'light');
   configureSound(s);

@@ -10,6 +10,7 @@ import { openPack } from './opening.js';
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { parisDay, claimShadowPrize } from './shadow.js';
 import * as cloud from '../cloud/cloud.js';
+import { getPackSkin } from '../ui/vitrine.js'; /* v565 */
 
 export function waitText(ms) {
   const m = Math.max(1, Math.ceil(ms / 60000));
@@ -38,15 +39,19 @@ export function pityHTML(g) {
 
 // v438 : nouveaux sachets (nouveaux noms : le service worker garderait les anciens)
 const PACK_FILE = { abysse: 'abysse2', standard: 'standard2', event: 'event2' };
-export function packHTML(type, cat, { faction, event } = {}) {
+/* v565 : sachet choisi au Profil : remplace le visuel des boosters standard, Alliances et premium (pas ceux des factions) ;
+   SKIN_TOP = haut de la plaque sombre où s'écrit le nom (mesuré sur chaque image) ; skin: null = visuel d'origine (l'adversaire au Pari) */
+const SKINNED = ['standard', 'event', 'premium'], SKIN_TOP = { 'sachet-ames': 66, 'sachet-veillee': 70.5, 'sachet-fondateur': 69 };
+export function packHTML(type, cat, { faction, event, skin = getPackSkin() } = {}) {
   const def = BOOSTERS[type] || { name: type === 'shadow' ? 'Booster des Ombres' : 'Booster' };
   let label = type === 'shadow' ? 'Ombres' : def.name.replace('Booster ', '');
   let key = type;
   if (type === 'faction' && faction) { label = cat.faction[faction].name; key = faction; }
   if (type === 'event') label = 'Alliances';
   const tag = type === 'abysse' ? '5 cartes' : type === 'premium' ? 'Rare garantie' : '3 cartes';
-  return `<div class="pack pack-${type}">
-    <img class="pk-img" alt="" src="assets/packs/${PACK_FILE[key] || key}.webp">
+  const sk = skin && SKINNED.includes(type) ? skin : null;
+  return `<div class="pack pack-${type} ${sk ? 'pack-skin' : ''}"${sk ? ` style="--lt:${SKIN_TOP[sk] || 70}%"` : ''}>
+    <img class="pk-img" alt="" src="assets/packs/${sk || PACK_FILE[key] || key}.webp">
     <div class="pk-logo">ABYSSAL</div>
     <div class="pk-label"><span class="pk-name">${esc(label)}</span><span class="pk-tag">${tag}</span></div>
     <div class="pk-tearline"></div>

@@ -17,7 +17,7 @@ function profilePayload() {
   const g = app.game, s = g.s;
   const p = { avatar: g.shownAvatar(), title: s.title, level: g.levelInfo().level, owned: g.uniqueCount() };
   /* v564 : cadre et plaque vus par les autres, seulement quand le serveur les connaît (supabase/15-vitrine.sql collé) */
-  if (sync.profile && 'plate' in sync.profile) Object.assign(p, { frame: s.frame || null, plate: s.plate || null });
+  if (sync.profile && 'plate' in sync.profile) Object.assign(p, { frame: s.frame || null, plate: s.plate || null, ...('sachet' in sync.profile ? { sachet: s.sachet || null } : {}) });
   return p;
 }
 
