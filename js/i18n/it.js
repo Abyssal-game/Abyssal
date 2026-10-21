@@ -1,5 +1,13 @@
 // Dictionnaire italien (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Sachets": "Bustine",
+  "Sachet d’obsidienne": "Bustina d’ossidiana",
+  "Sachet du grimoire": "Bustina del grimorio",
+  "Sachet de braise": "Bustina di brace",
+  "Sachet de la Lune de sang": "Bustina della Luna di sangue",
+  "Sachet du Souverain": "Bustina del Sovrano",
+  "Tes boosters standard, des Alliances et premium (ceux des factions gardent le leur)": "Le tue buste standard, delle Alleanze e premium (quelle di fazione tengono la loro)",
+  "Au Pari des Boosters, ton adversaire voit ton sachet.": "Nella Scommessa delle Buste, il tuo avversario vede la tua bustina.",
   "Dos vivants": "Dorsi viventi",
   "Vivant": "Vivente",
   "Des dos de cartes animés : ils s’animent partout où tes cartes se montrent face cachée (boosters, coffres, jeux).": "Dorsi animati: prendono vita ovunque le tue carte appaiano coperte (buste, forzieri, giochi).",

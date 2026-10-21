@@ -5739,3 +5739,7 @@ body:has(.cb-assault.run) .qx-head { top: calc(var(--safe-t, 0px) + 196px); }
 .cxs-live { position: absolute; top: 6px; left: 6px; z-index: 2; padding: 2px 7px; border-radius: 999px; font: 800 .58rem/1.4 var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: #1a0f04; background: linear-gradient(90deg, #f6d27a, #fff2c4, #f6d27a); background-size: 200% 100%; animation: cxsLive 2.4s linear infinite; box-shadow: 0 0 10px rgba(246, 210, 122, .55); }
 @keyframes cxsLive { to { background-position: -200% 0; } }
 @media (prefers-reduced-motion: reduce) { .cxs-live { animation: none; } }
+/* v570 : sachets de booster à l'Échoppe (tuile et aperçu) */
+.cxs-t .cx-sa { height: 84px; display: block; margin: 0 auto; width: auto; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .6)); }
+.cx-pv-packs { display: flex; justify-content: center; gap: 14px; margin: 6px 0 12px; }
+.cx-pv-packs .pack { width: 132px; }

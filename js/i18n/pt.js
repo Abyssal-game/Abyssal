@@ -1,5 +1,13 @@
 // Dictionnaire portugais du Brésil (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Sachets": "Pacotes",
+  "Sachet d’obsidienne": "Pacote de obsidiana",
+  "Sachet du grimoire": "Pacote do grimório",
+  "Sachet de braise": "Pacote de brasa",
+  "Sachet de la Lune de sang": "Pacote da Lua de sangue",
+  "Sachet du Souverain": "Pacote do Soberano",
+  "Tes boosters standard, des Alliances et premium (ceux des factions gardent le leur)": "Seus boosters padrão, das Alianças e premium (os de facção mantêm o seu)",
+  "Au Pari des Boosters, ton adversaire voit ton sachet.": "Na Aposta de Boosters, seu adversário vê seu pacote.",
   "Dos vivants": "Versos vivos",
   "Vivant": "Vivo",
   "Des dos de cartes animés : ils s’animent partout où tes cartes se montrent face cachée (boosters, coffres, jeux).": "Versos animados: ganham vida onde quer que suas cartas apareçam viradas para baixo (pacotes, baús, jogos).",

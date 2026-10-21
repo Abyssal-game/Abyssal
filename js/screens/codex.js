@@ -11,6 +11,7 @@ import { EMBLEM } from '../ui/icons.js';
 import { setScene } from '../ui/scene.js';
 import { emoteHTML, emotePic } from '../ui/vitrine.js'; /* v564 : plaques de pseudo et réactions en ligne */
 import { sync } from '../cloud/sync.js';
+import { packHTML } from './shop.js'; /* v570 : aperçu des sachets */
 
 const ALL_FRAMES = { ...FRAMES, ...CODEX_FRAMES };
 const PACK_NAME = { standard: 'booster standard', premium: 'booster premium' };
@@ -100,10 +101,11 @@ export default function codexScreen(app, root) {
 
   function shopTab() {
     const have = g.obs();
-    const name = (it) => it.name || (it.kind === 'frame' ? ALL_FRAMES[it.id] : it.kind === 'finish' ? `Finition ${FINISHES[it.id].name}` : it.kind === 'plate' ? PLATES[it.id] : it.kind === 'emote' ? EMOTES[it.id].name : CODEX_BACKS[it.id]) || it.id;
+    const name = (it) => it.name || (it.kind === 'frame' ? ALL_FRAMES[it.id] : it.kind === 'finish' ? `Finition ${FINISHES[it.id].name}` : it.kind === 'plate' ? PLATES[it.id] : it.kind === 'sachet' ? SACHETS[it.id] : it.kind === 'emote' ? EMOTES[it.id].name : CODEX_BACKS[it.id]) || it.id;
     const pic = (it, big = false) => it.kind === 'frame' ? `<span class="${big ? 'avatar-big' : 'avatar-mini'} pf pf-${it.id}">${myAv()}</span>`
       : it.kind === 'back' ? `<img class="cx-bk" alt="" src="assets/backs/${it.id}.webp">`
       : it.kind === 'finish' ? (big ? cardHTML(g.bestCards(1)[0] || cat.get('ABY-039'), { dress: it.id }) : `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"><img alt="" src="assets/variants/${it.id}-frame.webp"></span>`)
+      : it.kind === 'sachet' ? `<img class="cx-sa" alt="" src="assets/packs/${it.id}.webp">`
       : it.kind === 'plate' ? `<span class="np np-${it.id} np-demo">${esc(myName())}</span>`
       : it.kind === 'emote' ? `<span class="re-tile">${emoteHTML(it.id)}</span>`
       : it.give.emotes ? `<span class="re-fan">${it.give.emotes.slice(0, 4).map((k) => `<span class="re-pic">${emotePic(k)}</span>`).join('')}</span>`
@@ -111,7 +113,7 @@ export default function codexScreen(app, root) {
     const tile = (it) => { const own = g.catalogOwned(it.id), cost = g.catalogCost(it.id), r = rank(it);
       return `<button class="cxs-t r-${r} ${it.kind} ${own ? 'own' : ''}" data-cx="see" data-id="${it.id}"><span class="cxs-pic">${pic(it)}</span><span class="cxs-rk">${RANK[r]}</span>${it.live ? '<span class="cxs-live">Vivant</span>' : ''}<b>${esc(name(it))}</b>
         ${own ? `<span class="cxs-own">${icon('check')}Possédé</span>` : `<span class="cxs-pr ${cost <= have ? '' : 'short'}">${obsTxt(cost)}</span>`}</button>`; };
-    const CATS = [['frame', 'Cadres'], ['plate', 'Plaques'], ['live', 'Dos vivants'], ['back', 'Dos'], ['emote', 'Réactions'], ['bundle', 'Lots'], ['obs', OBS.name]]; /* v569 : finitions retirées, dos vivants */
+    const CATS = [['frame', 'Cadres'], ['plate', 'Plaques'], ['live', 'Dos vivants'], ['back', 'Dos'], ['sachet', 'Sachets'], ['emote', 'Réactions'], ['bundle', 'Lots'], ['obs', OBS.name]]; /* v569 : finitions retirées, dos vivants */
     const cur = CATS.some(([k]) => k === ui.cat) ? ui.cat : 'frame';
     const inCat = (x) => (cur === 'live' ? x.kind === 'back' && x.live : cur === 'back' ? x.kind === 'back' && !x.live : x.kind === cur);
     const list = CATALOG.filter(inCat).slice().sort((a, b) => (g.catalogOwned(a.id) - g.catalogOwned(b.id)) || (b.cost - a.cost));
@@ -180,7 +182,7 @@ export default function codexScreen(app, root) {
     const avImg = av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM;
     const mine = g.bestCards(6).filter(Boolean);
     let pick = 0, plain = false, bare = false, stopTilt = null;
-    const nm = it.name || ALL_FRAMES[it.id] || CODEX_BACKS[it.id] || PLATES[it.id] || (EMOTES[it.id] && `${EMOTES[it.id].name} · « ${EMOTES[it.id].text} »`) || (FINISHES[it.id] && `Finition ${FINISHES[it.id].name}`);
+    const nm = it.name || ALL_FRAMES[it.id] || CODEX_BACKS[it.id] || PLATES[it.id] || SACHETS[it.id] || (EMOTES[it.id] && `${EMOTES[it.id].name} · « ${EMOTES[it.id].text} »`) || (FINISHES[it.id] && `Finition ${FINISHES[it.id].name}`);
     const body = () => {
       if (it.kind === 'frame') return `<p class="cx-pv-cap">Sur ton profil</p>
         <div class="cx-pv-prof"><span class="avatar-big pf pf-${it.id}">${avImg}</span><div><b>${esc(s.name || 'Ton nom')}</b><span>${esc(s.title)}</span></div></div>
@@ -207,6 +209,9 @@ export default function codexScreen(app, root) {
           <div class="cx-pvf-pick">${list.map((x, i) => `<button class="${i === pick % list.length ? 'on' : ''}" data-pv="pick" data-i="${i}" aria-label="${esc(x.name)}">${cardHTML(x, { dress: it.id })}</button>`).join('')}</div>` : ''}
           <p class="cx-pvf-note">Achetée une fois, la finition se pose sur autant de cartes que tu veux, depuis la fiche de chaque carte. Elle ne change rien à leurs valeurs.</p>`;
       }
+      if (it.kind === 'sachet') return `<p class="cx-pv-cap">Tes boosters standard, des Alliances et premium (ceux des factions gardent le leur)</p>
+        <div class="cx-pv-packs">${['standard', 'premium'].map((t) => packHTML(t, null, { skin: it.id })).join('')}</div>
+        <p class="cx-pv-cap">Au Pari des Boosters, ton adversaire voit ton sachet.</p>`;
       if (it.kind === 'plate') return `<p class="cx-pv-cap">Sur ton profil</p>
         <div class="cx-pv-prof"><span class="avatar-big pf pf-${s.frame}">${avImg}</span><div><b><span class="np np-${it.id}">${esc(myName())}</span></b><span>${esc(s.title)}</span></div></div>
         <p class="cx-pv-cap">Au classement, vu par tous les joueurs</p>

@@ -1,5 +1,13 @@
 // Dictionnaire espagnol (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Sachets": "Sobres",
+  "Sachet d’obsidienne": "Sobre de obsidiana",
+  "Sachet du grimoire": "Sobre del grimorio",
+  "Sachet de braise": "Sobre de brasa",
+  "Sachet de la Lune de sang": "Sobre de la Luna de sangre",
+  "Sachet du Souverain": "Sobre del Soberano",
+  "Tes boosters standard, des Alliances et premium (ceux des factions gardent le leur)": "Tus sobres estándar, de las Alianzas y premium (los de facción conservan el suyo)",
+  "Au Pari des Boosters, ton adversaire voit ton sachet.": "En la Apuesta de Sobres, tu rival ve tu sobre.",
   "Dos vivants": "Reversos vivos",
   "Vivant": "Vivo",
   "Des dos de cartes animés : ils s’animent partout où tes cartes se montrent face cachée (boosters, coffres, jeux).": "Reversos animados: cobran vida dondequiera que tus cartas aparezcan boca abajo (sobres, cofres, juegos).",

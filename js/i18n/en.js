@@ -1,5 +1,13 @@
 // Anglais (v506-v507) : texte français → traduction. Généré à partir des lots de traduction ; on peut corriger à la main.
 export default {
+  "Sachets": "Pack skins",
+  "Sachet d’obsidienne": "Obsidian Pack",
+  "Sachet du grimoire": "Grimoire Pack",
+  "Sachet de braise": "Ember Pack",
+  "Sachet de la Lune de sang": "Blood Moon Pack",
+  "Sachet du Souverain": "Sovereign’s Pack",
+  "Tes boosters standard, des Alliances et premium (ceux des factions gardent le leur)": "Your standard, Alliance and premium boosters (faction boosters keep their own)",
+  "Au Pari des Boosters, ton adversaire voit ton sachet.": "In the Booster Wager, your opponent sees your pack skin.",
   "Dos vivants": "Living backs",
   "Vivant": "Living",
   "Des dos de cartes animés : ils s’animent partout où tes cartes se montrent face cachée (boosters, coffres, jeux).": "Animated card backs: they come alive wherever your cards are shown face down (boosters, chests, games).",

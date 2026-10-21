@@ -1,5 +1,13 @@
 // Dictionnaire allemand (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Sachets": "Hüllen",
+  "Sachet d’obsidienne": "Obsidianhülle",
+  "Sachet du grimoire": "Grimoirehülle",
+  "Sachet de braise": "Glutenhülle",
+  "Sachet de la Lune de sang": "Blutmondhülle",
+  "Sachet du Souverain": "Hülle des Herrschers",
+  "Tes boosters standard, des Alliances et premium (ceux des factions gardent le leur)": "Deine Standard-, Allianz- und Premium-Booster (Fraktionsbooster behalten ihr eigenes)",
+  "Au Pari des Boosters, ton adversaire voit ton sachet.": "Bei der Booster-Wette sieht dein Gegner deine Hülle.",
   "Dos vivants": "Lebendige Rücken",
   "Vivant": "Lebendig",
   "Des dos de cartes animés : ils s’animent partout où tes cartes se montrent face cachée (boosters, coffres, jeux).": "Animierte Kartenrücken: Sie erwachen überall dort zum Leben, wo deine Karten verdeckt erscheinen (Booster, Truhen, Spiele).",

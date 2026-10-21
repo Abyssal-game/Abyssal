@@ -1967,7 +1967,7 @@ export class Game {
     const it = CATALOG.find((x) => x.id === id); if (!it) return false;
     const g = it.give;
     return (!g.frame || this.s.frames.includes(g.frame)) && (!g.plate || (this.s.plates || []).includes(g.plate)) && (!g.emote || (this.s.emotes || []).includes(g.emote))
-      && (g.emotes || []).every((e) => (this.s.emotes || []).includes(e)) && (!g.finish || (this.s.finishes || []).includes(g.finish)) && (!g.back || (this.s.backs || []).includes(g.back)) && (g.backs || []).every((b) => (this.s.backs || []).includes(b));
+      && (g.emotes || []).every((e) => (this.s.emotes || []).includes(e)) && (!g.finish || (this.s.finishes || []).includes(g.finish)) && (!g.back || (this.s.backs || []).includes(g.back)) && (!g.sachet || (this.s.sachets || []).includes(g.sachet)) && (g.backs || []).every((b) => (this.s.backs || []).includes(b));
   }
   catalogCost(id) { /* un lot ne fait pas payer ce qu'on a déjà : on retire le prix des dos déjà possédés, jamais sous 0 */
     const it = CATALOG.find((x) => x.id === id); if (!it) return 0;
