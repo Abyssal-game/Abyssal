@@ -9,6 +9,7 @@ import { cardHTML, enableTilt } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
 import { EMBLEM } from '../ui/icons.js';
 import { setScene } from '../ui/scene.js';
+import { t, tx } from '../i18n.js'; /* v574 */
 import { emoteHTML, emotePic } from '../ui/vitrine.js'; /* v564 : plaques de pseudo et réactions en ligne */
 import { sync } from '../cloud/sync.js';
 import { packHTML } from './shop.js'; /* v570 : aperçu des sachets */
@@ -120,7 +121,7 @@ export default function codexScreen(app, root) {
     const list = CATALOG.filter(inCat).slice().sort((a, b) => (g.catalogOwned(a.id) - g.catalogOwned(b.id)) || (b.cost - a.cost));
     /* à la une : un bel objet par semaine (le même pour tous), pas encore possédé */
     const week = Math.floor(g.clock().getTime() / 864e5 / 7);
-    const stars = CATALOG.filter((x) => x.kind !== 'bundle' && x.cost >= 700 && !g.catalogOwned(x.id));
+    const stars = CATALOG.filter((x) => x.kind !== 'bundle' && x.cost >= 250 && !g.catalogOwned(x.id) /* v574 : 700 depuis la baisse des prix, plus rien n'était à la une */);
     const hero = stars.length ? stars[week % stars.length] : null;
     const heroHTML = hero ? `<section class="cxs-hero r-${rank(hero)} ${hero.kind}">${opt('assets/ui/ech-vitrine.webp', 'cxs-hero-bg')}
         <small class="cx-kick">À la une cette semaine</small>
@@ -165,14 +166,14 @@ export default function codexScreen(app, root) {
   /* v474 : dépense d'obsidiennes (catalogue ou Codex enluminé) ; renvoie vrai si l'achat est fait */
   async function buy(id) {
     const it = CATALOG.find((x) => x.id === id), cost = g.catalogCost(it.id);
-    const label = it.name || ALL_FRAMES[it.id] || CODEX_BACKS[it.id] || (FINISHES[it.id] && `Finition ${FINISHES[it.id].name}`);
+    const label = it.name || ALL_FRAMES[it.id] || CODEX_BACKS[it.id] || PLATES[it.id] || SACHETS[it.id] || (EMOTES[it.id] && `${EMOTES[it.id].name} · « ${EMOTES[it.id].text} »`) || (FINISHES[it.id] && `Finition ${FINISHES[it.id].name}`); /* v574 : nom des plaques, sachets et réactions */
     if (g.obs() < cost) {
-      if (await confirmBox(`Il te manque <b>${fmt(cost - g.obs())} obsidiennes</b> pour ${esc(label)}.`, { ok: 'Obtenir des obsidiennes' })) { ui.tab = 'shop'; ui.cat = 'obs'; draw(); }
+      if (await confirmBox(t('Il te manque <b>{n} obsidiennes</b> pour {name}.', { n: fmt(cost - g.obs()), name: esc(tx(label)) }), { ok: 'Obtenir des obsidiennes' }) /* v574 : phrase traduite (le nom change à chaque objet) */) { ui.tab = 'shop'; ui.cat = 'obs'; draw(); }
       return false;
     }
-    if (!(await confirmBox(`Échanger <b>${fmt(cost)} obsidiennes</b> contre ${esc(label)} ?`, { ok: 'Confirmer' }))) return false;
+    if (!(await confirmBox(t('Échanger <b>{n} obsidiennes</b> contre {name} ?', { n: fmt(cost), name: esc(tx(label)) }), { ok: 'Confirmer' }))) return false;
     g.catalogBuy(it.id);
-    app.sfx.levelup?.(); toast(`${esc(label)} : acquis.${it?.kind === 'finish' ? ' Pose-la sur tes cartes dans Profil › Personnaliser.' : it?.kind === 'emote' || it?.give?.emotes ? ' Envoie-la pendant tes parties en ligne.' : it?.kind === 'plate' ? ' Choisis-la dans Profil › Personnaliser.' : it ? ' Choisis-le dans Profil › Personnaliser.' : ''}`, { kind: 'success', icon: 'star' });
+    app.sfx.levelup?.(); toast(`${t('{name} : acquis.', { name: esc(tx(label)) })}${it?.kind === 'finish' ? ' Pose-la sur tes cartes dans Profil › Personnaliser.' : it?.kind === 'emote' || it?.give?.emotes ? ' Envoie-la pendant tes parties en ligne.' : it?.kind === 'plate' ? ' Choisis-la dans Profil › Personnaliser.' : it ? ' Choisis-le dans Profil › Personnaliser.' : ''}`, { kind: 'success', icon: 'star' });
     return true;
   }
 

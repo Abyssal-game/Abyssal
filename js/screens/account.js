@@ -128,7 +128,7 @@ export default function account(app, root) {
         ${p?.badge ? `<p class="small">Ton badge : ${cloud.badgeHTML(p.badge)}</p>` : ''}
         ${p?.pseudo && p.pseudo_locked ? `<p class="acc-pseudo-fixed">${icon('lock')} <b>${esc(p.pseudo)}</b> <span class="small muted">· définitif</span></p>` /* v500 : le pseudo ne se change plus */
           : `<form class="row gap acc-pseudo" id="pseudo"><input class="input plain" name="pseudo" maxlength="16" minlength="3" placeholder="Ton pseudo" value="${esc(isMaskedPseudo(p?.pseudo) ? '' : p?.pseudo || '')}" required><button class="btn primary" type="submit">OK</button></form><p class="small muted">Attention : une fois choisi, ton pseudo est définitif.</p>`}
-        ${p?.pseudo ? '' : '<p class="small acc-warn">Choisis un pseudo pour apparaître au classement de la Descente.</p>'}
+        ${p?.pseudo ? '' : '<p class="small acc-warn">Choisis un pseudo pour apparaître aux classements.</p>'}
         ${isMaskedPseudo(p?.pseudo) ? '<p class="small acc-warn">Ton pseudo a été signalé par plusieurs joueurs et a été masqué. Choisis-en un autre.</p>' : ''}
         <p class="small muted">Dans un classement, touche le pseudo d’un joueur pour le signaler ou le masquer.${blockedIds().length ? ` Joueurs masqués sur cet appareil : <b>${blockedIds().length}</b>.` : ''}</p>
         ${blockedIds().length ? `<button class="btn small" data-act="unblock">${icon('eye')}Réafficher les joueurs masqués</button>` : ''}

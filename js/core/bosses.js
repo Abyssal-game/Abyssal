@@ -146,7 +146,7 @@ export const BOSSES = {
     intro: 'Une montagne respire. Des temples entiers se sont écroulés sur ses épaules sans qu’il ouvre les yeux.',
     mechanic: 'Il dort pendant 3 tours et ne fait rien. Au 4e, il se réveille dans un Séisme qui frappe toute ton équipe, d’autant plus fort que tu l’as blessé pendant son sommeil. Ensuite, il frappe lourdement.',
     counter: 'Profite de son sommeil pour l’affaiblir et charger ta Ferveur, mais garde tes créatures en forme pour le réveil : esquive ou pare le Séisme.',
-    story: 'Les premiers Scelleurs ont bâti leurs temples sur son dos, croyant qu’il était une montagne. L’Abysse, elle, savait. Elle attendait seulement que quelqu’un le dérange.',
+    story: 'Les premiers Scelleurs ont bâti leurs temples sur son dos, croyant qu’il était une montagne. L’Abysse, lui, savait. Il attendait seulement que quelqu’un le dérange.',
     pattern: (phase, round) => (round <= 3 ? 'slumber' : round === 4 ? 'quake' : round % 3 === 2 ? 'charge' : 'hit'),
   },
   jumeaux: {

@@ -53,7 +53,7 @@ export default function settings(app, root) {
       <section class="panel stack">
         <h2>Combat</h2>
         ${seg('defense', 'Défense active en combat', [['on', 'Manuelle'], ['auto', 'Automatique']])}
-        <p class="small muted set-note">Manuelle : à chaque attaque ennemie, un geste (toucher la zone dorée, garder le doigt appuyé ou glisser dans le sens de la flèche) ; sur le trait blanc, parade parfaite. Automatique : rien à toucher, mais seulement 4 esquives sur 10 et jamais de parade parfaite (moins de Ferveur et de PA).</p>
+        <p class="small muted set-note">Manuelle : à chaque attaque ennemie, un geste selon l’attaque (toucher au bon moment, maintenir puis relâcher, glisser, toucher quand les cercles se referment, marteler ou toucher les points faibles) ; réussi vite ou pile au bon moment, c’est une parade parfaite. Automatique : rien à toucher, mais seulement 4 esquives sur 10 et jamais de parade parfaite (moins de Ferveur et de PA).</p>
         ${seg('decor', 'Décor des combats', [['riche', 'Riche'], ['sobre', 'Sobre']])}
         <p class="small muted set-note">Sobre : la salle reste en place, sans particules ni flammes qui vacillent. Plus reposant, et un peu plus économe en batterie.</p>
         ${seg('quality', 'Effets des combats', [['auto', 'Complets'], ['light', 'Allégés']])}

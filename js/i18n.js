@@ -160,6 +160,10 @@ function attrs(el) {
 function translateTree(root) {
   if (root.nodeType === 3) { const p = root.parentElement; if (p) translateTree(p); return; }
   if (root.nodeType !== 1 || root.closest?.('[translate="no"],.notranslate')) return;
+  if (root.tagName === 'SELECT' || root.tagName === 'OPTION') { /* v574 : les menus déroulants restaient en français */
+    for (const o of root.tagName === 'SELECT' ? root.options : [root]) { const v = tx(o.text); if (v !== o.text) o.text = v; }
+    return;
+  }
   if (SKIP.has(root.tagName)) { if (root.tagName === 'INPUT' || root.tagName === 'TEXTAREA') attrs(root); return; } /* v507 : texte d'aide des champs */
   attrs(root);
   if (isBlock(root)) {

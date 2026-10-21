@@ -5751,3 +5751,6 @@ body:has(.cb-assault.run) .qx-head { top: calc(var(--safe-t, 0px) + 196px); }
 .np-pl-nacre { --npb: rgba(200, 230, 220, .7); background-image: url(../assets/plates/pl-nacre.webp), linear-gradient(90deg, #101414, #3a4644 50%, #101414); color: #EEF7F4; }
 .np-pl-dragon { --npb: rgba(205, 160, 100, .75); background-image: url(../assets/plates/pl-dragon.webp), linear-gradient(90deg, #1c1208, #4a3420 50%, #1c1208); color: #FBE3BC; }
 .np-pl-eclipse { --npb: rgba(255, 210, 130, .85); background-image: url(../assets/plates/pl-eclipse.webp), linear-gradient(90deg, #0c0a06, #3a2e14 50%, #0c0a06); color: #FFEBC0; }
+
+/* v574 : en « animations réduites », la barre de temps des gestes se vidait d'un coup (règle générale de base.css) : elle garde sa vraie durée */
+html .qx-time i, html.reduce-motion .qx-time i { animation-duration: var(--qxd, 2s) !important; }

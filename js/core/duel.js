@@ -418,7 +418,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
     }
     if (u.side === 'ally' && st.guardianPact) {
       st.guardianPact = false; u.hp = Math.max(1, Math.round(u.maxHp * 0.35)); u.poison = 0;
-      ev.push({ t: 'revive', u: u.uid }); ev.push({ t: 'status', u: u.uid, s: 'Pacte du Gardien', syn: true });
+      ev.push({ t: 'revive', u: u.uid }); ev.push({ t: 'status', u: u.uid, s: 'Pacte du Serment', syn: true });
       return d;
     }
     u.down = true;
@@ -1903,7 +1903,7 @@ export const GOALS = {
   swift:  { name: 'Éclair', desc: 'Gagne en 3 tours au plus.', rooms: ['fight'], limit: 3 },
   swift5: { name: 'Assaut rapide', desc: 'Gagne en 5 tours au plus.', rooms: ['elite', 'boss'], limit: 5 },
   weak:   { name: 'Points faibles', desc: 'Exploite 2 faiblesses de faction.', rooms: ['fight', 'elite', 'boss'], n: 2 },
-  combo:  { name: 'Coordination', desc: 'Réussis une combinaison : Chasse, Bris de glace, Bastion ou un Enchaînement.', rooms: ['fight', 'elite', 'boss'] },
+  combo:  { name: 'Coordination', desc: 'Réussis une combinaison : Chasse, Bris de glace, Bastion ou une Chaîne.', rooms: ['fight', 'elite', 'boss'] },
   parry:  { name: 'Lame-miroir', desc: 'Réussis une parade parfaite.', rooms: ['elite', 'boss'] },
   brk:    { name: 'Briseur', desc: 'Brise l’ennemi au moins une fois.', rooms: ['elite', 'boss'] },
   ferveur:{ name: 'Brasier', desc: 'Lance le pouvoir d’équipe.', rooms: ['fight', 'elite', 'boss'] },
@@ -1934,9 +1934,9 @@ export function battleReport(st, name) {
     // v331 : la Fêlure ratée, mécanique clé contre élites et gardiens, souvent ignorée (étude joueurs)
     const lost = (s.cracks || 0) - (s.breaks || 0);
     if (lost > 0) out.push(`${lost > 1 ? `${lost} fois, un ennemi a été` : 'Un ennemi a été'} Fêlé sans être Brisé : pendant qu’il est Fêlé, frappe-le avec un Protecteur, un Coup d’estoc ou sur une Marque pour le Briser (il perd son coup annoncé).`);
-    const tip = s.missed ? 'Contre les attaques annoncées « Danger », touche au bon moment pour esquiver ou parer.'
+    const tip = s.missed ? 'Chaque attaque ennemie se défend : réussis le geste demandé pour esquiver ou parer.'
       : !s.breaks && Object.values(st.units).some((u) => u.side === 'enemy' && (u.boss || u.elite)) ? 'Concentre tes coups sur l’élite ou le gardien pour le briser : il perd son tour.'
-      : 'Frappe la même cible avec plusieurs créatures : chaque coup suivant gagne un bonus d’Enchaînement.';
+      : 'Frappe la même cible avec plusieurs créatures : chaque coup suivant gagne un bonus de Chaîne.';
     out.push(tip);
   } else if (st.over === 'won') {
     const best = [[s.parries, (n) => `${n} parade${n > 1 ? 's' : ''} parfaite${n > 1 ? 's' : ''}`], [s.breaks, (n) => `${n} Brisure${n > 1 ? 's' : ''}`], [s.combos, (n) => `${n} enchaînement${n > 1 ? 's' : ''}`], [s.finishers, (n) => `${n} coup${n > 1 ? 's' : ''} de grâce`], [s.crits, (n) => `${n} critique${n > 1 ? 's' : ''} au dé`]]

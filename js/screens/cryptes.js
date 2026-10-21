@@ -18,7 +18,7 @@ const HOW = [['cards', '#7FA8D8', 'Les cryptes', '20 cartes face cachée, en 10 
   ['crystal', '#E8C35A', 'Une paire', 'Deux fois la même créature : tu la gardes, son pouvoir se déclenche, et tu rejoues.'],
   ['danger', '#E0485E', 'Pas de paire', 'Les deux cartes se referment et la main passe. Retiens bien où elles sont !'],
   ['crown', '#F2C14E', 'La victoire', 'Quand tout est pris, le plus de points gagne : 1 point par paire, plus les bonus. À égalité, celui qui a pris la dernière paire gagne.'],
-  ['book', '#B48CFF', 'Les pouvoirs', 'Chaque faction a son pouvoir : regarder une carte, échanger deux cartes, voler une paire… Touche « Pouvoirs » en partie pour les revoir.'],
+  ['book', '#B48CFF', 'Les pouvoirs', 'Chaque faction a son pouvoir : regarder une carte, échanger deux cartes, voler une paire… Touche l’icône des pouvoirs, en haut pendant la partie, pour les revoir.'],
   ['eye', '#C9A45A', 'Tes adversaires', 'Ils ont plus ou moins de mémoire. Les plus forts se servent de leurs pouvoirs pour brouiller ce que tu as vu.'],
   ['amis', '#9FE0FF', 'Contre un ami', `En haut, « Contre un ami » : défie un de tes amis. Pas de récompense ici, seulement ton bilan de victoires et de défaites contre chacun. Partie rapide : ${MP_FAST_SECS} s par carte ; partie lente : ${MP_HOURS} h. Coup pas joué à temps : partie perdue.`]];
 const howLi = ([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic === 'eye' ? 'ui-eye' : ic === 'crystal' ? 'cur-shard' : ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`;

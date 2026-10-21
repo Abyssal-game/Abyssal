@@ -96,6 +96,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
 
   // un booster de chaque côté : apparition, tremblement, déchirure simultanée, cartes qui jaillissent
   async function tear(p) {
+    if (done) return; /* v574 : « Tout révéler » touché pendant l'attente : plus de sachets par-dessus la fin */
     const it = lineup[p];
     const pk = packHTML(it.type, cat, { faction: it.faction, event: it.factions ? { factions: it.factions } : ev });
     const fp = q('.vd-pack.foe'), mp = q('.vd-pack.me');
@@ -104,9 +105,11 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
     [fp, mp].forEach((x) => { x.className = `vd-pack ${x === fp ? 'foe' : 'me'} in`; });
     q('.vd-mid').classList.add('show');
     await until(plan.tears[p] - 1, 550);
+    if (done) return;
     [fp, mp].forEach((x) => x.classList.add('shake'));
     app.sfx.suspense?.();
     await until(plan.tears[p], 1000);
+    if (done) return;
     [fp, mp].forEach((x) => { x.classList.remove('shake'); x.classList.add('torn'); });
     app.sfx['vd-tear']?.();
     await wait(320);
@@ -142,6 +145,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
   async function run() {
     for (let p = 0; p < lineup.length && !done; p++) {
       await until(plan.tears[p] - APPEAR, p ? 0 : 500);
+      if (done) break;
       await tear(p);
       const n = Math.max(myPacks[p].length, foePacks[p].length);
       for (let i = 0; i < n && !done; i++) {

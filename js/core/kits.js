@@ -76,7 +76,7 @@ const HAND_KITS = {
   },
   'SAU-043': {
     style: 'Trois têtes, un portail', stat: { atk: 0.97, hp: 1.04 },
-    strike: { name: 'Triple morsure', desc: 'Trois morsures à 45 % : chacune profite de l’Enchaînement, et chaque morsure en plus ajoute 1 Brisure.', hits: 3, mult: 0.45 },
+    strike: { name: 'Triple morsure', desc: 'Trois morsures à 45 % : chacune profite de la Chaîne, et chaque morsure en plus ajoute 1 Brisure.', hits: 3, mult: 0.45 },
     passive: 'enfers', move: 'hurlement',
     plus: 'Punit les ennemis qui frappent ses protégés.', moins: 'Chaque morsure est faible contre les boucliers.', synergy: 'Rempart, Défense, équipes fragiles.',
   },

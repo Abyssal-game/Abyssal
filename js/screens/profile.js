@@ -6,7 +6,7 @@ import { icon, sigil, EMBLEM, picon, setIcon } from '../ui/icons.js';
 import { esc, fmt, pct, bindActions, toast, openSheet } from '../ui/dom.js';
 import { unlockSources } from '../core/unlocks.js';
 import { RARITIES, FRAMES, BOOSTERS, FACTION_ORDER, VARIANTS, RARITY, RARITY_ORDER } from '../config.js';
-import { CODEX_FRAMES, CODEX_BACKS, FINISHES, PLATES, SACHETS, LIVE_BACKS } from '../core/codex.js';
+import { CODEX_FRAMES, CODEX_BACKS, FINISHES, PLATES, SACHETS, LIVE_BACKS, CATALOG, SEASONS, SHOP } from '../core/codex.js';
 import { withPlate } from '../ui/vitrine.js'; /* v564 : plaque de pseudo */
 
 export default function profile(app, root) {
@@ -67,7 +67,7 @@ export default function profile(app, root) {
       ['sachets', 'Sachets de booster', `<img alt="" src="assets/packs/${s.sachet || 'standard2'}.webp">`, esc(SACHETS[s.sachet] || 'Sachets d’origine'), `${(s.sachets || []).length}`], /* v565 */
       ['finishes', 'Finitions de cartes', fins.length ? `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"><img alt="" src="assets/variants/${fins[0]}-frame.webp"></span>` : `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"></span>`, fins.length ? `${dressed} carte${dressed > 1 ? 's' : ''} habillée${dressed > 1 ? 's' : ''}` : 'Contours peints des cartes', `${fins.length}`],
     ].filter(([k]) => (k !== 'finishes' || false) /* v569 : finitions de cartes retirées (« ça ne rend pas bien ») */ && (k !== 'plates' || (s.plates || []).length || g.codexOn()) && (k !== 'sachets' || (s.sachets || []).length || g.codexOn())); /* v499 : plus de tuiles « Bientôt » : finitions seulement si on en possède */
-    const TOT = { avatar: g.total(), titles: s.titles.length + lockedT.length, frames: allF.length, backs: 1 + Object.keys(CODEX_BACKS).length, plates: Object.keys(PLATES).length, sachets: Object.keys(SACHETS).length, finishes: Object.keys(FINISHES).length };
+    const TOT = { avatar: g.total(), titles: s.titles.length + lockedT.length, frames: allF.length, backs: 1 + new Set([...(s.backs || []), ...CATALOG.flatMap((it) => [it.give.back, ...(it.give.backs || [])]), ...SEASONS.flatMap((se) => se.tiers.map((t) => t.prem?.back)), ...SHOP.map((it) => it.give?.back)].filter(Boolean)).size, /* v574 : seulement les dos qui existent encore (74 avant, objets retirés compris) */ plates: Object.keys(PLATES).length, sachets: Object.keys(SACHETS).length, finishes: Object.keys(FINISHES).length };
     if (!csTab) return `${head}<div class="cs-list">${SECTIONS.map(([k, n, pic, sub, cnt]) => { const tot = TOT[k] || 0, has = Math.min(+cnt || 0, tot || 0); return `<button class="cs-row k-${k}" data-cs="tab" data-v="${k}"><span class="cs-pic">${pic}</span><span class="cs-txt"><b>${n}</b><small>${sub}</small><span class="cs-bar"><i style="width:${tot ? (has / tot) * 100 : 0}%"></i></span></span><span class="cs-cnt"><b>${has}</b><small>/ ${tot}</small></span><span class="cs-go">${icon('next')}</span></button>`; }).join('')}</div>`;
     const back = `<button class="btn ghost small cs-back" data-cs="tab" data-v="">${icon('prev')}Personnaliser</button>`;
     const title = SECTIONS.find(([k]) => k === csTab)?.[1] || '';
@@ -143,7 +143,7 @@ export default function profile(app, root) {
         <div class="panel stat"><b>${g.descent().best || 0}</b><span>étage record</span></div>
       </div>
 
-      <button class="panel pf-custom-row" data-act="custom"><img class="pf-cr-ic" alt="" src="assets/icons/customize.webp" onerror="this.remove()"><span class="pf-cr-t"><b>Personnaliser</b><span class="small muted">Avatar, titres, cadres, dos de cartes, finitions</span></span><span class="pf-cr-go">${icon('next')}</span></button>
+      <button class="panel pf-custom-row" data-act="custom"><img class="pf-cr-ic" alt="" src="assets/icons/customize.webp" onerror="this.remove()"><span class="pf-cr-t"><b>Personnaliser</b><span class="small muted">Avatar, titres, cadres, plaques, dos, sachets</span></span><span class="pf-cr-go">${icon('next')}</span></button>
 
       ${luckHTML()}
 

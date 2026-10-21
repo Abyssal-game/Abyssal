@@ -35,7 +35,7 @@ function layer(kind, { title, icon = '', hint }) {
   const api = {
     ov, area: ov.querySelector('.qx-area'),
     hint(h) { ov.querySelector('.qx-hint').innerHTML = h; },
-    timer(ms) { const i = ov.querySelector('.qx-time i'); i.style.animation = 'none'; void i.offsetWidth; i.style.animation = `qxTime ${ms}ms linear forwards`; ov.classList.add('timing'); },
+    timer(ms) { const i = ov.querySelector('.qx-time i'); i.style.animation = 'none'; void i.offsetWidth; i.style.animation = `qxTime ${ms}ms linear forwards`; i.style.setProperty('--qxd', `${ms}ms`); ov.classList.add('timing'); },
     stopTimer() { ov.classList.remove('timing'); ov.querySelector('.qx-time i').style.animationPlayState = 'paused'; },
     // petit mot au point touché (Parfait, Bien, Raté…)
     pop(x, y, txt, cls) {

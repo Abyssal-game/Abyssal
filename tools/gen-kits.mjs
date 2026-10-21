@@ -61,7 +61,7 @@ const MOVE_TEMPLATES = {
     T([{ op: 'heal', on: 'ally', p: 0.22 }, { op: 'cleanse', on: 'ally' }, { op: 'shield', on: 'ally' }], 1, 3, 'sanctuaire', [['Sanctuaire', 'm'], ['Refuge', 'm'], ['Onction', 'f']]),
   ],
   poison: [
-    T([{ op: 'hit', on: 't', m: 1.0 }, { op: 'poison', on: 't', n: 3 }], 1, 2, 'venin', [['Épines', 'f'], ['Aiguillon', 'm'], ['Crachat', 'm']]),
+    T([{ op: 'hit', on: 't', m: 1.0 }, { op: 'poison', on: 't', n: 3 }], 1, 2, 'venin', [['Épines', 'fp'], ['Aiguillon', 'm'], ['Crachat', 'm']]),
     T([{ op: 'poison', on: 'foes', n: 2 }], 1, 3, 'nuee', [['Miasme', 'm'], ['Nuée', 'f'], ['Brume', 'f']]),
     T([{ op: 'hit', on: 't', m: 0.6 }, { op: 'slow', on: 't' }, { op: 'poison', on: 't', n: 2 }], 1, 2, 'linceul', [['Linceul', 'm'], ['Voile', 'm'], ['Encre', 'f']]),
   ],
@@ -114,7 +114,7 @@ function ofName(name) {
   if (/^La /.test(n)) return `de la ${n.slice(3)}`;
   if (/^Les /.test(n)) return `des ${n.slice(4)}`;
   if (/^L[’']/.test(n)) return `de l’${n.slice(2)}`;
-  return /^[AEIOUYÉÈÊÂÎÔÛŒaeiouyéèh]/.test(n) ? `d’${n}` : `de ${n}`;
+  return /^([AEIOUYÉÈÊÂÎÔÛŒaeiouyéèh]|Héph|Hadès|Hermès|Hécate)/.test(n) ? `d’${n}` : `de ${n}`; /* v574 : d’Héphaïstos, d’Hadès */
 }
 
 const out = {};
@@ -163,7 +163,7 @@ for (const c of cards.sort((a, b) => a.id.localeCompare(b.id))) {
     if (!ops.some((o) => o.op === alt.op && o.on === alt.on)) ops = fit([...ops, alt], budget);
   }
   const [mn, mg] = pick(tpl.names, c.id, 'mv');
-  const mname = ['M', 'S'].includes(c.rarity) ? `${mn} ${ofName(c.name)}` : mn.includes(' ') ? mn : `${mn} ${FAC_ADJ[c.faction][mg === 'f' ? 1 : 0]}`;
+  const mname = ['M', 'S'].includes(c.rarity) ? `${mn} ${ofName(c.name)}` : mn.includes(' ') ? mn : `${mn} ${FAC_ADJ[c.faction][mg === 'm' ? 0 : 1]}${mg === 'fp' && !/s$/.test(FAC_ADJ[c.faction][1]) ? 's' : ''}`;
   const move = { name: mname, icon: tpl.icon, ap: tpl.ap, cd: tpl.cd, ops, ...(tpl.reach ? { reach: true } : {}) };
   // entrée compacte (kits.js la complète : textes de la fiche, effets de la frappe)
   out[c.id] = { s: `${ROLE_NOUN[role]} ${ABILITY_ADJ[abil[0]]}`, r: role, f: c.faction, a: stat.atk, k: strikeName, p: passive, ...(passive2 && passive2 !== passive ? { p2: passive2 } : {}), m: move };

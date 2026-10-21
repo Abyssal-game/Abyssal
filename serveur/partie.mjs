@@ -101,6 +101,13 @@ export async function handle({ uid, token, body }, { db, now = () => Date.now(),
     let curQ = 0;
     g.on('progress', (ev) => { if (curQ) (prog[curQ] ||= []).push(...ev); }); // annonces (succès, niveaux…) rendues au téléphone
     const c = { uid, token, db, g };
+    // réglages et marques de l'interface (libres), outils du Mode Créateur (créateur seulement)
+    // v574 : appliqués AVANT de rejouer les actions (un achat à l'Échoppe juste après l'ouverture de l'aperçu était refusé)
+    if (b.free && typeof b.free === 'object') {
+      for (const p of FREE) { const v = b.free[p]; if (v !== undefined && JSON.stringify(v).length < 20000) setPath(g.s, p, clone(v)); }
+      if (creator) for (const p of FREE_DEV) { if (b.free[p] !== undefined) setPath(g.s, p, clone(b.free[p])); }
+      if (!creator && g.s.settings) g.s.settings.dev = false;
+    }
     for (const op of ops) {
       const q = Number(op?.q);
       if (!Number.isInteger(q) || q <= last) continue; // déjà rejouée (réponse perdue puis renvoyée)
@@ -121,12 +128,6 @@ export async function handle({ uid, token, body }, { db, now = () => Date.now(),
     }
     curQ = 0;
     seqs['d:' + dev] = last;
-    // réglages et marques de l'interface (libres), outils du Mode Créateur (créateur seulement)
-    if (b.free && typeof b.free === 'object') {
-      for (const p of FREE) { const v = b.free[p]; if (v !== undefined && JSON.stringify(v).length < 20000) setPath(g.s, p, clone(v)); }
-      if (creator) for (const p of FREE_DEV) { if (b.free[p] !== undefined) setPath(g.s, p, clone(b.free[p])); }
-      if (!creator && g.s.settings) g.s.settings.dev = false;
-    }
     g.persist(); // note aussi le jour joué (coffre de la semaine)
     const out = g.s, dg = digest(out);
     // profil public et fiche d'ami : republiés seulement s'ils ont changé (ou s'il y a des Épreuves à compter)

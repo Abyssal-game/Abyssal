@@ -42,11 +42,11 @@ export function createMpLobby(app, root, spec) {
   const resOf = (v) => (v.winner === 'draw' ? 'draw' : v.winner === v.me ? 'win' : 'lose');
   const errMsg = (e) => (e.status === 404 ? MP_OFF : e.message);
   function stopPoll() { clearTimeout(poll); poll = 0; clearInterval(clock); clock = 0; }
-  function schedule(fn, ms) { stopPoll(); poll = setTimeout(() => { if (alive && document.visibilityState === 'visible') fn(); else schedule(fn, ms); }, ms); }
+  function schedule(fn, ms) { clearTimeout(poll); poll = setTimeout(() => { if (alive && document.visibilityState === 'visible') fn(); else schedule(fn, ms); }, ms); } /* v574 : ne coupe plus le compte à rebours (il restait figé) */
 
   // ——— Accueil « Contre un joueur » ———
   async function lobby() {
-    ui.open = null; view = null;
+    ui.open = null; view = null; clearInterval(clock); clock = 0; /* v574 */
     document.body.classList.remove('battle-mode');
     document.querySelector('.sc-scene')?.remove();
     setScene('menu');
