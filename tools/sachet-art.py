@@ -23,7 +23,7 @@ for x, y in [(x, 0) for x in range(0, W, 8)] + [(x, H - 1) for x in range(0, W, 
 bg = np.all(np.asarray(soft) == MARK, axis=2)
 if '--rangees' in sys.argv:  # v570 : sachet très sombre sur fond noir pur : le sachet = ce qui est entre le premier et le dernier
     # pixel non noir de chaque rangée ET de chaque colonne (les zones presque noires DANS le sachet restent pleines)
-    lum = np.asarray(im).max(axis=2) > 14
+    lum = np.asarray(im).max(axis=2) > next((int(a[8:]) for a in sys.argv if a.startswith('--seuil=')), 14)  # --seuil=N : noir du fond
     rs, cs = np.zeros_like(lum), np.zeros_like(lum)
     for y in range(H):
         xs_ = np.where(lum[y])[0]
