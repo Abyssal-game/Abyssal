@@ -38,7 +38,7 @@ test('codex : voie gratuite récupérable, voie enluminée fermée sans achat', 
 test('codex : la voie enluminée ne donne jamais de puissance (ni éclats, cendres, coffres ou tickets)', () => {
   for (const t of CODEX_TIERS) if (t.prem) for (const k of ['shards', 'ash', 'chests', 'tickets']) assert.equal(t.prem[k], undefined, `palier ${t.tier}`);
   for (const it of [...SHOP, ...CATALOG]) if (it.give) for (const k of ['shards', 'ash', 'chests', 'tickets']) assert.equal(it.give[k], undefined, it.id);
-  for (const it of CATALOG) assert.ok(['frame', 'back', 'bundle', 'finish', 'plate', 'emote'].includes(it.kind) && !it.give.obs && !it.give.title, it.id);
+  for (const it of CATALOG) assert.ok(['frame', 'back', 'bundle', 'finish', 'plate', 'emote', 'sachet'].includes(it.kind) && !it.give.obs && !it.give.title, it.id);
   for (const k of CODEX_ONLY) assert.ok(!CATALOG.some((it) => it.id === k), `${k} reste exclusif au Codex`);
 });
 
