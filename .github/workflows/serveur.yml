@@ -20,7 +20,8 @@ jobs:
         run: node --test tests/serveur-partie.test.mjs tests/serveur-rejeu.test.mjs
       - name: Jeton absent
         if: env.SUPABASE_ACCESS_TOKEN == ''
-        run: echo "::warning::Secret SUPABASE_ACCESS_TOKEN absent : la fonction n'est pas publiée."
+        run: |
+          echo "::warning::Secret SUPABASE_ACCESS_TOKEN absent, la fonction n'est pas publiée."
       - uses: supabase/setup-cli@v1
         if: env.SUPABASE_ACCESS_TOKEN != ''
         with:
