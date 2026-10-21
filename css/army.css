@@ -5182,3 +5182,8 @@ html.reduce-motion #view.view-in { animation: none !important; }
 .bx-intro > .bx-in { animation: bxIn .45s ease both; }
 @media (prefers-reduced-motion: reduce) { .bx-intro > .bx-in { animation: none; } }
 html.reduce-motion .bx-intro > .bx-in { animation: none; }
+
+/* v543 : choix de la langue : plus de cadre étiré sur trois rangées (capture du propriétaire) ; chaque langue a son propre bouton */
+.seg.lang-grid { border-image: none !important; padding: 0 !important; gap: 8px; overflow: visible; }
+.seg.lang-grid .seg-b { position: relative; min-height: 48px; padding: 0 14px; border-image: url(../assets/ui/tab-track.webp) 0 72 fill / 0 18px stretch; color: #C9C2D6; }
+.seg.lang-grid .seg-b[aria-pressed="true"], .seg.lang-grid .seg-b[aria-checked="true"] { border-image: url(../assets/ui/tab-on.webp) 0 64 fill / 0 15px stretch; }
