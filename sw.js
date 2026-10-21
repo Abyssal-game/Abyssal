@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v559';
+const VERSION = 'abyssal-v560';
 const ART_CACHE = 'abyssal-media';  // images du jeu : gardées entre les versions
 const FONT_CACHE = 'abyssal-fonts';
 const CORE = [
@@ -32,8 +32,8 @@ const CORE = [
   // tous les effets de combat (v305 : crit.webp du « Coup fatal » manquait hors ligne → carré « ? » sur iPhone)
   ...['boost', 'break', 'burst', 'collapse', 'crit', 'curse', 'd20', 'd20-crit', 'd20-fumble', 'death', 'dodge', 'fervor', 'frost', 'fx-duo', 'fx-enrage', 'fx-explode', 'fx-rune', 'heal', 'iceshatter', 'impact', 'kill-crack', 'kill-embers', 'kill-shatter', 'parry', 'prey', 'role-claw', 'strike', 'foe-strike', 'crit-strike', 'role-frost', 'role-heal', 'role-mark', 'role-shock', 'role-venom', 'role-wave', 'seal', 'shield', 'slash', 'swallow', 'syn-beam', 'taunt', 'ult-seal', 'venom', 'fx-parry', 'fx-break', 'fx-dodge', 'fx-venom', 'fx-shield', 'fx-taunt', 'fx-boost', 'fx-curse', 'fx-iceshatter', 'fx-prey', 'fx-collapse', 'fx-swallow', 'ult-sceau', 'ult-revive', 'ult-nova', 'ult-smite', 'ult-aegis', 'dice-ring', 'dice-charge', 'dice-perfect', 'dice-land', 'circle-infernal', 'circle-abyssal', 'circle-celeste', 'circle-sauvage', 'circle-necrotique', 'circle-primordial', 'circle-artificiel', 'sk-estoc', 'sk-contagion', 'sk-entrave', 'sk-marque', 'sk-raz', 'sk-rempart', 'sk-priere', 'def-ring', 'def-clash'].map((k) => `assets/fx/${k}.webp`),
   ...['salle', 'salle-artificiel', 'salle-celeste', 'salle-necrotique', 'salle-abyssal', 'plateau', 'case', 'dos', 'benie', 'maudite', 'rival-initie', 'rival-collectionneur', 'rival-stratege', 'rival-maitre', 'rival-echo', 'rival-banquier', 'rival-archiviste', 'rival-souverain', 'salle-pacte', 'salle-cryptes', 'salle-encheres'].map((k) => `assets/sceaux/${k}.webp`),
-  ...['cr-plateau', 'cr-dos', 'cr-paire', 'pa-table2', 'pa-sceau', 'pa-gardien', 'pa-offrande', 'pa-brisure', 'en-salle', 'en-jeton', 'en-malediction', 'en-marteau'].map((k) => `assets/jeux/${k}.webp`),
-  ...['infernal', 'abyssal-2', 'celeste-2', 'sauvage-2', 'necrotique-2', 'primordial-2', 'artificiel-2'].map((k) => `assets/realms/${k}.webp`),
+  ...['cr-plateau', 'cr-dos', 'cr-paire', 'pa-table2', 'pa-sceau', 'pa-gardien', 'pa-offrande', 'pa-presage', 'pa-brisure', 'en-salle', 'en-jeton', 'en-malediction', 'en-marteau'].map((k) => `assets/jeux/${k}.webp`),
+  ...['infernal', 'abyssal-3', 'celeste-3', 'sauvage-3', 'necrotique-3', 'primordial-3', 'artificiel-3'].map((k) => `assets/realms/${k}.webp`),
   ...['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'golem', 'peste', 'chasseur', 'voeux', 'titan', 'jumeaux', 'juge', 'bete', 'abysse', 'jumeaux-nuit', 'abysse-2'].map((k) => `assets/bosses/${k}.webp`),
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/favicon.png',
   'css/fonts.css', ...['Alegreya-0f8ee632.woff2', 'Alegreya-2e945cf5.woff2', 'Alegreya-88cee5eb.woff2', 'Alegreya-db6a5c78.woff2', 'AlegreyaSans-0c0c571a.woff2', 'AlegreyaSans-2a89a09d.woff2', 'AlegreyaSans-3e467a04.woff2', 'AlegreyaSans-8a53b32d.woff2', 'AlegreyaSans-8bed4c5f.woff2', 'AlegreyaSans-a73a507d.woff2', 'AlegreyaSans-b9a4a97d.woff2', 'AlegreyaSans-f03ce63a.woff2', 'Cinzel-1bec9af0.woff2', 'Cinzel-c0fe750f.woff2'].map((k) => `assets/fonts/${k}`),
