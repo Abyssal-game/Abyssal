@@ -75,6 +75,7 @@ export const CODEX_BACKS = { 'dos-codex': 'Dos du Codex', 'dos-abime': 'Dos de l
   /* v569 : dos vivants de l'Échoppe (dos fixes animés par tools/back-anim.py, mode lueur) et palier 30 de la Saison I */
   'dos-vif-nebuleuse': 'Dos vivant de la nébuleuse', 'dos-vif-abysse': 'Dos vivant de L’Abysse', 'dos-vif-devoreur': 'Dos vivant du Dévoreur', 'dos-vif-eclipse': 'Dos vivant de l’Éclipse',
   'dos-vif-lune-sang': 'Dos vivant de la Lune de sang', 'dos-vif-coeur-mecanique': 'Dos vivant du cœur mécanique', 'dos-vif-passeur': 'Dos vivant du Passeur',
+  /* v572 */ 'dos-vif-forge': 'Dos vivant de la forge', 'dos-vif-chandelles': 'Dos vivant des chandelles', 'dos-vif-orage': 'Dos vivant de l’orage', 'dos-vif-ame': 'Dos vivant de l’âme captive', 'dos-vif-oeil-or': 'Dos vivant de l’œil d’or',
   /* v532 */ 'dos-carnaval': 'Dos du carnaval des ombres', 'dos-phalene': 'Dos de la grande phalène', 'dos-coeur-mecanique': 'Dos du cœur mécanique' };
 
 // v482 : finitions de prestige (« habillages ») : un cadre peint posé sur une carte qu'on possède, sans rien changer à
@@ -130,13 +131,15 @@ const FN = (k, cost) => ({ id: k, kind: 'finish', give: { finish: k }, cost });
    décor CSS en attendant) et réactions en ligne (pendant une partie contre un joueur ; portraits des arbitres des jeux) */
 // v565 : « dos vivants » (WebP animés, tools/back-anim.py) et habillages de booster (« sachets » : remplacent le visuel des boosters
 // standard, Alliances et premium ; les boosters de faction gardent le leur ; assets/packs/<clé>.webp, tools/sachet-art.py)
-export const LIVE_BACKS = ['dos-vif-veillee', 'dos-vif-hiver', 'dos-vif-coeur', 'dos-vif-passeur', 'dos-vif-nebuleuse', 'dos-vif-abysse', 'dos-vif-devoreur', 'dos-vif-eclipse', 'dos-vif-lune-sang', 'dos-vif-coeur-mecanique'];
+export const LIVE_BACKS = ['dos-vif-veillee', 'dos-vif-hiver', 'dos-vif-coeur', 'dos-vif-passeur', 'dos-vif-nebuleuse', 'dos-vif-abysse', 'dos-vif-devoreur', 'dos-vif-eclipse', 'dos-vif-lune-sang', 'dos-vif-coeur-mecanique', 'dos-vif-forge', 'dos-vif-chandelles', 'dos-vif-orage', 'dos-vif-ame', 'dos-vif-oeil-or'];
 const BV = (k, cost) => ({ id: k, kind: 'back', live: true, give: { back: k }, cost }); /* v569 : dos vivant vendu à l'Échoppe */
 export const SACHETS = { 'sachet-ames': 'Sachet de la Nuit des Âmes', 'sachet-veillee': 'Sachet de la Veillée', 'sachet-fondateur': 'Sachet du Fondateur',
-  /* v570 : sachets vendus à l'Échoppe */ 'sachet-obsidienne': 'Sachet d’obsidienne', 'sachet-grimoire': 'Sachet du grimoire', 'sachet-braise': 'Sachet de braise', 'sachet-givre': 'Sachet de givre', 'sachet-lune-sang': 'Sachet de la Lune de sang', 'sachet-souverain': 'Sachet du Souverain' };
+  /* v570 : sachets vendus à l'Échoppe */ 'sachet-obsidienne': 'Sachet d’obsidienne', 'sachet-grimoire': 'Sachet du grimoire', 'sachet-braise': 'Sachet de braise', 'sachet-givre': 'Sachet de givre', 'sachet-lune-sang': 'Sachet de la Lune de sang', 'sachet-souverain': 'Sachet du Souverain',
+  /* v572 : sachets vivants */ 'sachet-vif-abysse': 'Sachet vivant de l’œil de l’Abysse', 'sachet-vif-spectre': 'Sachet vivant du spectre', 'sachet-vif-eclipse': 'Sachet vivant de l’éclipse' };
 const SA = (k, cost) => ({ id: k, kind: 'sachet', give: { sachet: k }, cost });
 export const PLATES = { 'pl-obsidienne': 'Plaque d’obsidienne', 'pl-grimoire': 'Plaque du grimoire', 'pl-braise': 'Plaque de braise',
-  'pl-givre': 'Plaque de givre', 'pl-or-noir': 'Plaque d’or noir', 'pl-abysse': 'Plaque de l’Abysse', 'pl-souverain': 'Plaque du Souverain' };
+  'pl-givre': 'Plaque de givre', 'pl-or-noir': 'Plaque d’or noir', 'pl-abysse': 'Plaque de l’Abysse', 'pl-souverain': 'Plaque du Souverain',
+  /* v572 */ 'pl-ossuaire': 'Plaque de l’ossuaire', 'pl-sang': 'Plaque de sang', 'pl-pierre': 'Plaque des gargouilles', 'pl-nacre': 'Plaque de nacre noire', 'pl-dragon': 'Plaque du dragon', 'pl-eclipse': 'Plaque de l’éclipse' };
 export const EMOTES = {
   're-salut': { text: 'Salutations.', free: true }, 're-bien': { text: 'Bien joué.', free: true },
   're-merci': { text: 'Merci.', free: true }, 're-aie': { text: 'Aïe…', free: true },
@@ -162,8 +165,11 @@ export const CATALOG = [ F('cx-serpents', 120), F('cx-vitrail', 120), F('cx-roua
   B('dos-abysse', 280), B('dos-tarot', 200), B('dos-mosaique', 200), B('dos-encre', 200), B('dos-alchimie', 200), B('dos-carte-abysse', 200), B('dos-reliquaire', 280), B('dos-tapisserie', 200), B('dos-art-deco', 280), B('dos-vivant', 280), B('dos-nebuleuse', 280), B('dos-vitrail', 200), ...ROYAUMES.map((k) => B(k, 120)),
   /* v569 : finitions de cartes retirées de la vente (« pas beau, ça ne rend pas bien ») */ F('cx-cristaux-sang', 280), B('dos-phalene', 200), B('dos-coeur-mecanique', 280),
   BV('dos-vif-nebuleuse', 450), BV('dos-vif-abysse', 480), BV('dos-vif-devoreur', 450), BV('dos-vif-eclipse', 450), BV('dos-vif-lune-sang', 450), BV('dos-vif-coeur-mecanique', 480),
+  BV('dos-vif-forge', 450), BV('dos-vif-chandelles', 450), BV('dos-vif-orage', 480), BV('dos-vif-ame', 450), BV('dos-vif-oeil-or', 480), /* v572 */
   SA('sachet-obsidienne', 150), SA('sachet-grimoire', 200), SA('sachet-braise', 220), SA('sachet-givre', 220), SA('sachet-lune-sang', 300), SA('sachet-souverain', 480),
+  { ...SA('sachet-vif-abysse', 380), live: true }, { ...SA('sachet-vif-spectre', 350), live: true }, { ...SA('sachet-vif-eclipse', 380), live: true }, /* v572 : sachets vivants */
   PL('pl-obsidienne', 120), PL('pl-grimoire', 180), PL('pl-braise', 200), PL('pl-givre', 200), PL('pl-or-noir', 250), PL('pl-abysse', 280), PL('pl-souverain', 450),
+  PL('pl-pierre', 180), PL('pl-ossuaire', 200), PL('pl-nacre', 220), PL('pl-sang', 250), PL('pl-dragon', 250), PL('pl-eclipse', 250), /* v572 */
   ...PAID_EMOTES.map((k) => RE(k, 100)),
   { id: 'arbitres', kind: 'bundle', name: 'Le Cercle des arbitres', give: { emotes: PAID_EMOTES }, cost: 600, desc: 'Les huit réactions des arbitres d’un coup (800 à l’unité).' },
   { id: 'royaumes', kind: 'bundle', name: 'Les sept royaumes', give: { backs: ROYAUMES }, cost: 600, desc: 'Les sept dos des royaumes d’un coup (840 à l’unité).' },

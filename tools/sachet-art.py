@@ -39,7 +39,8 @@ if '--rangees' in sys.argv:  # v570 : sachet très sombre sur fond noir pur : le
         xs_ = np.where(m[y])[0]
         if len(xs_): m[y, xs_[0]:xs_[-1] + 1] = True
     bg = ~m
-o = np.asarray(im).astype(int); bg |= (o[..., 0] > 170) & (o[..., 1] < 90) & (o[..., 2] > 170)  # fond magenta posé à la main (recadrage manuel)
+o = np.asarray(im).astype(int)
+if '--rangees' not in sys.argv: bg |= (o[..., 0] > 170) & (o[..., 1] < 90) & (o[..., 2] > 170)  # fond magenta posé à la main (recadrage manuel ; v572 : pas avec --rangees, l'œil violet d'un sachet était troué)
 alpha = Image.fromarray(np.where(bg, 0, 255).astype(np.uint8)).filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(0.8))
 rgb = np.asarray(im).copy(); rgb[bg] = 0  # couleur du fond mise au noir : pas de liseré coloré au redimensionnement
 rgba = Image.fromarray(rgb); rgba.putalpha(alpha)

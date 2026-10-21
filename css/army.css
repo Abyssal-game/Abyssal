@@ -5743,3 +5743,11 @@ body:has(.cb-assault.run) .qx-head { top: calc(var(--safe-t, 0px) + 196px); }
 .cxs-t .cx-sa { height: 84px; display: block; margin: 0 auto; width: auto; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .6)); }
 .cx-pv-packs { display: flex; justify-content: center; gap: 14px; margin: 6px 0 12px; }
 .cx-pv-packs .pack { width: 132px; }
+
+/* v572 : six plaques de pseudo de plus */
+.np-pl-ossuaire { --npb: rgba(230, 215, 180, .7); background-image: url(../assets/plates/pl-ossuaire.webp), linear-gradient(90deg, #2a2418, #5a4e38 50%, #2a2418); color: #F5EBD2; }
+.np-pl-sang { --npb: rgba(220, 40, 60, .8); background-image: url(../assets/plates/pl-sang.webp), linear-gradient(90deg, #1a0306, #4a0a12 50%, #1a0306); color: #FFD9DD; }
+.np-pl-pierre { --npb: rgba(150, 200, 170, .6); background-image: url(../assets/plates/pl-pierre.webp), linear-gradient(90deg, #2a2e2c, #4c5450 50%, #2a2e2c); }
+.np-pl-nacre { --npb: rgba(200, 230, 220, .7); background-image: url(../assets/plates/pl-nacre.webp), linear-gradient(90deg, #101414, #3a4644 50%, #101414); color: #EEF7F4; }
+.np-pl-dragon { --npb: rgba(205, 160, 100, .75); background-image: url(../assets/plates/pl-dragon.webp), linear-gradient(90deg, #1c1208, #4a3420 50%, #1c1208); color: #FBE3BC; }
+.np-pl-eclipse { --npb: rgba(255, 210, 130, .85); background-image: url(../assets/plates/pl-eclipse.webp), linear-gradient(90deg, #0c0a06, #3a2e14 50%, #0c0a06); color: #FFEBC0; }

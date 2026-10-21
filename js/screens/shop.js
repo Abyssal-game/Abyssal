@@ -42,7 +42,8 @@ const PACK_FILE = { abysse: 'abysse2', standard: 'standard2', event: 'event2' };
 /* v565 : sachet choisi au Profil : remplace le visuel des boosters standard, Alliances et premium (pas ceux des factions) ;
    SKIN_TOP = haut de la plaque sombre où s'écrit le nom (mesuré sur chaque image) ; skin: null = visuel d'origine (l'adversaire au Pari) */
 const SKINNED = ['standard', 'event', 'premium'], SKIN_TOP = { 'sachet-ames': 66, 'sachet-veillee': 70.5, 'sachet-fondateur': 69,
-  'sachet-obsidienne': 72, 'sachet-grimoire': 71, 'sachet-braise': 71.5, 'sachet-givre': 69, 'sachet-lune-sang': 71, 'sachet-souverain': 75.5 }; /* v570 */
+  'sachet-obsidienne': 72, 'sachet-grimoire': 71, 'sachet-braise': 71.5, 'sachet-givre': 69, 'sachet-lune-sang': 71, 'sachet-souverain': 75.5,
+  'sachet-vif-abysse': 70.5, 'sachet-vif-spectre': 71, 'sachet-vif-eclipse': 71 }; /* v570 */
 export function packHTML(type, cat, { faction, event, skin = getPackSkin() } = {}) {
   const def = BOOSTERS[type] || { name: type === 'shadow' ? 'Booster des Ombres' : 'Booster' };
   let label = type === 'shadow' ? 'Ombres' : def.name.replace('Booster ', '');

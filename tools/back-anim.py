@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """v565 : « dos vivant » : anime un dos de carte fixe (assets/backs/<clé>.webp, fait par back-art.py) en WebP animé qui boucle.
-Usage : python3 tools/back-anim.py <clé> <mode>     modes : bougies (flammes qui vacillent + rubis qui pulse),
+Usage : python3 tools/back-anim.py <clé> <mode> [--sachet]     modes : bougies (flammes qui vacillent + rubis qui pulse),
         aurore (aurore qui ondule + étoile de givre qui scintille), coeur (lumière rouge qui bat, deux coups),
         lueur:<teinte>[:<source>] (v569 : les couleurs vives proches de la teinte, en degrés, s'allument et s'éteignent
         doucement, les points les plus clairs scintillent ; <source> = dos fixe de départ s'il diffère de <clé>).
@@ -13,11 +13,12 @@ from PIL import Image, ImageFilter
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 key, mode = sys.argv[1], sys.argv[2]
-src = os.path.join(ROOT, 'assets/backs', f'{key}.webp')
-fixe = os.path.join(ROOT, 'store/backs', f'{key}-fixe.webp')
+DIR = 'packs' if '--sachet' in sys.argv else 'backs'  # v572 : --sachet anime un sachet de booster (assets/packs/<clé>.webp)
+src = os.path.join(ROOT, f'assets/{DIR}', f'{key}.webp')
+fixe = os.path.join(ROOT, f'store/{DIR}', f'{key}-fixe.webp')
 parts = mode.split(':')
 if parts[0] == 'lueur' and len(parts) > 2 and not os.path.exists(fixe):  # dos vivant tiré d'un dos fixe existant
-    shutil.copy(os.path.join(ROOT, 'assets/backs', f'{parts[2]}.webp'), fixe)
+    shutil.copy(os.path.join(ROOT, f'assets/{DIR}', f'{parts[2]}.webp'), fixe)
 if not os.path.exists(fixe): shutil.copy(src, fixe)
 im = Image.open(fixe).convert('RGBA')
 a = np.asarray(im).astype(np.float32)
