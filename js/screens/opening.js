@@ -62,11 +62,11 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
     <div class="op-stage" aria-live="polite"></div>
     <footer class="op-bottom"><div class="op-dots">${(opening?.cards || BOOSTERS[type].slots).map(() => '<i></i>').join('')}</div><p class="op-hint small muted"></p></footer>`;
   document.body.appendChild(el);
-  document.body.classList.add('has-sheet');
+  document.body.classList.add('has-sheet', 'lock-scroll');
   const stage = el.querySelector('.op-stage');
   const hint = el.querySelector('.op-hint');
   const dots = el.querySelectorAll('.op-dots i');
-  let index = 0, phase = 'pack', busy = false;
+  let index = 0, phase = 'pack', busy = false, tapQueued = false;
 
   const wait = (ms) => new Promise((r) => setTimeout(r, reduced ? Math.min(ms, 30) : ms));
 
@@ -226,7 +226,7 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
   function bindCard(card) {
     let s = null;
     card.addEventListener('pointerdown', (e) => {
-      if (busy) return;
+      if (busy) { tapQueued = true; return; } /* v576 : un toucher pendant une animation n'est plus perdu : il est joué juste après */
       s = { x: e.clientX, y: e.clientY, t: performance.now(), moved: false };
       card.setPointerCapture(e.pointerId);
     });
@@ -260,6 +260,7 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
     });
   }
 
+
   async function flip() {
     if (busy) return;
     busy = true;
@@ -291,11 +292,11 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
       el.classList.add('flash');
       setTimeout(() => el.classList.remove('flash'), 700);
     }
-    await ready(index);
-    if (phase === 'summary') { busy = false; return; }
+    /* v576 : la carte commence à se retourner tout de suite ; le décodage de son illustration se fait pendant le mouvement
+       (avant : on l'attendait d'abord, jusqu'à 0,9 s sans aucune réaction au toucher) */
     app.sfx.flip();
     inner.classList.add('half');
-    await wait(lvl >= 4 ? 320 : 170);
+    await Promise.all([wait(lvl >= 4 ? 320 : 170), ready(index)]);
     if (phase === 'summary') { busy = false; return; }
     inner.innerHTML = cardHTML(card, { size: 'full', variant: c.variant });
     inner.classList.remove('half');
@@ -309,6 +310,7 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
     if (c.isNewCard) { /* v272 : plus de carillon ici, il couvrait le son de la rareté (le badge « Nouvelle » suffit) */ if (!reduced) { const cc = stage.querySelector('.op-card, .tcg'); cc?.classList.add('op-first'); setTimeout(() => cc?.classList.remove('op-first'), 1300); } }
     await wait(RI(c.rarity) >= 4 ? 900 : 250);
     busy = false;
+    if (tapQueued && phase !== 'summary') { tapQueued = false; return nextCard(-1); }
     hint.textContent = index < opening.cards.length - 1 ? 'Glisse la carte sur le côté, ou touche-la pour la suivante.' : 'Glisse ou touche pour voir le récapitulatif.';
     btn.setAttribute('aria-label', 'Carte suivante');
   }
@@ -359,7 +361,7 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
     if (phase === 'summary') return;
     index++;
     if (index >= opening.cards.length) summary();
-    else showBack();
+    else { showBack(); if (tapQueued) { tapQueued = false; flip(); } }
   }
 
   function summary() {
@@ -408,7 +410,7 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
     if (closed) return;
     closed = true;
     el.classList.add('out');
-    document.body.classList.remove('has-sheet');
+    document.body.classList.remove('has-sheet', 'lock-scroll');
     // Un second toucher (ou un toucher fantôme d'iOS) ne doit pas atteindre la page dessous,
     // où se trouve souvent un bouton « Ouvrir » : on avale les touchers pendant un court instant.
     const swallow = (e) => { e.stopPropagation(); e.preventDefault(); };

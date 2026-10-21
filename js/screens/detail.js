@@ -20,7 +20,8 @@ function oddsFor(cat, card) {
   return Math.round(1 / p);
 }
 
-const dateFr = (t) => new Date(t).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+const DATE_FR = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }); /* v576 : un seul formateur (en créer un à chaque date coûtait ~20 ms) */
+const dateFr = (t) => DATE_FR.format(new Date(t));
 
 // Renommée : palier, points et prochain palier
 function fameHTML(pts) {

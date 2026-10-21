@@ -29,7 +29,7 @@ export function openChestScene(app, type, { onDone } = {}) {
       <div class="chx-actions" hidden></div>
     </div>`;
   document.body.appendChild(el);
-  document.body.classList.add('has-sheet');
+  document.body.classList.add('has-sheet', 'lock-scroll');
   if (el.querySelector('.ch-img')) new Image().src = `assets/chests/${type}-open.webp`;
   const chest = el.querySelector('.chx-chest'), msg = el.querySelector('.chx-msg'), row = el.querySelector('.chx-packs'), acts = el.querySelector('.chx-actions');
   let packs = null, busy = false, closed = false;
@@ -42,7 +42,7 @@ export function openChestScene(app, type, { onDone } = {}) {
     if (closed) return; closed = true;
     document.removeEventListener('keydown', onKey); window.removeEventListener('hashchange', onRoute);
     el.classList.add('out');
-    setTimeout(() => { el.remove(); document.body.classList.remove('has-sheet'); then ? then() : onDone && onDone(); }, 250);
+    setTimeout(() => { el.remove(); document.body.classList.remove('has-sheet', 'lock-scroll'); then ? then() : onDone && onDone(); }, 250);
   }
   async function open() {
     if (busy || packs) return;

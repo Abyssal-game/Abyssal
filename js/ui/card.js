@@ -83,10 +83,58 @@ export function lazyArt(root) {
   const imgs = root.querySelectorAll('img[data-lazy]');
   if (!('IntersectionObserver' in window)) { imgs.forEach(load); return; }
   if (!io) io = new IntersectionObserver((entries) => {
-    entries.forEach((e) => { if (e.isIntersecting) { load(e.target); io.unobserve(e.target); } });
+    entries.forEach((e) => { if (e.isIntersecting) { load(e.target); io.unobserve(e.target); watched.delete(e.target); } });
   }, { rootMargin: '400px 0px' });
-  imgs.forEach((i) => io.observe(i));
+  /* v576 : les images des écrans quittés restaient surveillées (des centaines de plus à chaque visite de la Collection) :
+     le navigateur les recalculait à chaque image affichée. On retire celles qui ne sont plus dans la page. */
+  for (const i of watched) if (!i.isConnected) { io.unobserve(i); watched.delete(i); }
+  imgs.forEach((i) => { if (!watched.has(i)) { watched.add(i); if (!paused) io.observe(i); } });
 }
+/* v576 : pendant qu'une fenêtre couvre l'écran, la surveillance des images de la page du dessous est suspendue
+   (le navigateur la recalculait à chaque image de l'animation d'ouverture : ~170 ms sur la Collection) */
+let paused = false;
+const onCover = () => {
+  const on = document.body.classList.contains('has-sheet');
+  if (!io || on === paused) return;
+  paused = on;
+  for (const i of watched) { if (!i.isConnected) { watched.delete(i); io.unobserve(i); continue; } if (on) io.unobserve(i); else io.observe(i); }
+};
+if (typeof MutationObserver !== 'undefined' && typeof document !== 'undefined' && document.body) new MutationObserver(onCover).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+const watched = new Set();
+/* v576 : grille de cartes remplie au fil du défilement : les premières cartes tout de suite, les suivantes seulement quand
+   on approche du bas (avant : tout était dessiné par paquets à chaque image, l'écran restait saccadé 1 à 2 s après l'ouverture).
+   La hauteur finale est réservée : le retour sur la page retrouve sa position, la grille se complète jusqu'à elle. */
+export function fillGrid(grid, list, html, { first = 24, step = 24, ahead = 1400 } = {}) {
+  const run = (grid.fillRun = (grid.fillRun || 0) + 1);
+  let n = Math.min(first, list.length);
+  grid.innerHTML = list.slice(0, n).map(html).join('');
+  lazyArt(grid);
+  grid.style.minHeight = ''; grid.style.alignContent = 'start'; /* sinon la grille étire ses rangées sur la hauteur réservée */
+  const k0 = grid.children[0];
+  if (k0 && list.length > n) {
+    const cols = [...grid.children].filter((x) => x.offsetTop === k0.offsetTop).length || 1;
+    const gap = parseFloat(getComputedStyle(grid).rowGap) || 0;
+    grid.style.minHeight = `${Math.ceil(list.length / cols) * (k0.offsetHeight + gap)}px`;
+  }
+  let queued = false;
+  const stop = () => { removeEventListener('scroll', queue); removeEventListener('resize', queue); };
+  function tick() {
+    queued = false;
+    if (run !== grid.fillRun || !grid.isConnected) return stop();
+    if (n >= list.length) { grid.style.minHeight = ''; return stop(); }
+    const last = grid.lastElementChild;
+    if (last && last.getBoundingClientRect().top > innerHeight + ahead) return; /* rien à dessiner tant qu'on ne s'approche pas */
+    grid.insertAdjacentHTML('beforeend', list.slice(n, n + step).map(html).join(''));
+    n += step;
+    lazyArt(grid);
+    queue();
+  }
+  function queue() { if (!queued) { queued = true; requestAnimationFrame(() => setTimeout(tick, 0)); } }
+  addEventListener('scroll', queue, { passive: true }); addEventListener('resize', queue);
+  queue();
+  return { count: () => n };
+}
+export function pruneLazy() { if (io) for (const i of watched) if (!i.isConnected) { io.unobserve(i); watched.delete(i); } }
 
 // Inclinaison 3D de la carte entière (cadre compris), au doigt ou à la souris.
 export function enableTilt(el, { reduced = false } = {}) {
@@ -119,6 +167,9 @@ export function enableTilt(el, { reduced = false } = {}) {
     // v364 : au repos, la carte se balance à 30 images par seconde (la lueur suit), et plus du tout si l'app est en arrière-plan
     frame++;
     if (touching || frame % 2 === 0) { if (!document.hidden) apply(); }
+    /* v576 : au repos, les reflets se balancent 2,5 s puis la boucle s'endort (avant : 30 dessins par seconde tant que la fiche
+       restait ouverte, ce qui ralentissait tout le reste) ; elle repart au premier toucher */
+    if (!touching && now - t0 > 2500 && Math.abs(cur.x) < 0.3 && Math.abs(cur.y) < 0.3) { raf = 0; return; }
     raf = requestAnimationFrame(loop);
   };
   const clamp = (v) => Math.max(-MAX, Math.min(MAX, v));
@@ -127,6 +178,7 @@ export function enableTilt(el, { reduced = false } = {}) {
     start = { x: e.clientX, y: e.clientY, rx: cur.x, ry: cur.y, w: card.getBoundingClientRect().width };
     card.classList.add('tilting');
     try { card.setPointerCapture(e.pointerId); } catch (err) { /* rien */ }
+    if (!raf && alive) raf = requestAnimationFrame(loop);
   };
   const move = (e) => {
     if (!touching || !start) return;
@@ -136,7 +188,7 @@ export function enableTilt(el, { reduced = false } = {}) {
     tgt.y = clamp(start.ry + dx * k); tgt.x = clamp(start.rx - dy * k);
     e.preventDefault();
   };
-  const up = () => { if (!touching) return; touching = false; start = null; card.classList.remove('tilting'); tgt.x = 0; tgt.y = 0; t0 = performance.now(); };
+  const up = () => { if (!touching) return; touching = false; start = null; card.classList.remove('tilting'); tgt.x = 0; tgt.y = 0; t0 = performance.now(); if (!raf && alive) raf = requestAnimationFrame(loop); };
   const click = (e) => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } };
   card.addEventListener('pointerdown', down);
   card.addEventListener('pointermove', move, { passive: false });

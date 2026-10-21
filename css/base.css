@@ -40,7 +40,11 @@ body {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
-body.has-sheet { overflow: hidden; }
+/* v576 : plus d'overflow: hidden sur le corps pendant une fenêtre : avec html { overflow-x: clip }, il ramenait la page
+   tout en haut (on perdait sa place dans la Collection à chaque fiche fermée) et forçait une remise en page complète.
+   Le fond ne défile pas : le voile et les calques plein écran ne laissent pas passer le geste. */
+.sheet-backdrop { touch-action: none; }
+.sheet-wrap, .opening { overscroll-behavior: contain; }
 /* Fond fixe sur un calque à part : le défilement ne force pas à repeindre le décor */
 body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background-image:
@@ -254,3 +258,4 @@ body:has(.opening) #toasts { top: calc(var(--safe-t) + 6px); bottom: auto; }
 @keyframes viewSlide { from { opacity: 0; transform: translateX(var(--vdx, 0px)) translateY(6px); } }
 @media (prefers-reduced-motion: reduce) { #view.view-in { animation: none !important; } }
 html.reduce-motion #view.view-in { animation: none !important; }
+body.lock-scroll { overflow: hidden; } /* v576 : ouverture de booster, coffre, Pari : le défilement reste bloqué comme avant */

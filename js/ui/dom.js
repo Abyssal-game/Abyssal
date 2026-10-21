@@ -47,6 +47,19 @@ function nextToast() {
   setTimeout(close, toastQueue.length ? Math.min(ms, 3400) : ms);
 }
 
+/* v576 : attente d'une réponse du serveur : un petit sceau qui tourne apparaît après 180 ms (rien ne clignote si la réponse
+   est rapide), pour qu'un toucher ne semble jamais ignoré. pending() renvoie la fonction qui le retire. */
+export function pending(text = '') {
+  let el = null;
+  const t = setTimeout(() => {
+    el = document.createElement('div'); el.className = 'pend'; el.setAttribute('role', 'status');
+    el.innerHTML = `<span class="pend-ring"></span>${text ? `<b>${text}</b>` : ''}`;
+    document.body.appendChild(el); requestAnimationFrame(() => el?.classList.add('on'));
+  }, 180);
+  return () => { clearTimeout(t); if (el) { const x = el; el = null; x.classList.remove('on'); setTimeout(() => x.remove(), 160); } };
+}
+export async function withPending(promise, text) { const done = pending(text); try { return await promise; } finally { done(); } }
+
 // Fenêtres superposées (feuilles) ----------------------------------------------
 const stack = [];
 // v319 : chaque feuille ouverte ajoute une entrée d'historique. Le bouton retour (navigateur, Android, geste) ferme
@@ -90,7 +103,7 @@ export function openSheet(html, { cls = '', onClose, label = 'Fenêtre', full = 
       if (pushed && fromHistory !== true) { popPending++; history.back(); }
       wrap.classList.remove('in');
       const i = stack.indexOf(api); if (i >= 0) stack.splice(i, 1);
-      if (!stack.length && !document.querySelector('.opening')) document.body.classList.remove('has-sheet');
+      if (!stack.length && !document.querySelector('.opening')) { document.body.classList.remove('has-sheet'); }
       setTimeout(() => wrap.remove(), 260);
       onClose && onClose();
       prevFocus && prevFocus.focus && prevFocus.focus({ preventScroll: true });

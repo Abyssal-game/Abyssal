@@ -13,7 +13,7 @@ import { MP_HOURS, MP_FAST_SECS, MP_REWARD } from '../core/mp.js';
 import { isBlocked } from '../core/moderation.js';
 import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM } from '../ui/icons.js';
-import { esc, toast, confirmBox, openSheet } from '../ui/dom.js';
+import { esc, toast, confirmBox, openSheet, withPending } from '../ui/dom.js';
 import { setScene } from '../ui/scene.js';
 import { checkTurns } from '../cloud/mpwatch.js';
 import { profileAttrs } from '../ui/report.js';
@@ -139,7 +139,7 @@ export function createMpLobby(app, root, spec) {
   // ——— Partie ———
   async function open(id) {
     ui.open = id; ui.sel = null;
-    try { view = await cloud.mpGet(id); } catch (e) { toast(esc(errMsg(e)), { kind: 'error' }); return lobby(); }
+    try { view = await withPending(cloud.mpGet(id)); } catch (e) { toast(esc(errMsg(e)), { kind: 'error' }); return lobby(); }
     if (!alive || ui.open !== id) return;
     if (!view) return lobby();
     if (view.now) skew = new Date(view.now).getTime() - Date.now();
@@ -147,7 +147,7 @@ export function createMpLobby(app, root, spec) {
     draw();
     watch();
   }
-  // l'adversaire joue : on regarde toutes les 8 s tant que la partie est ouverte et que ce n'est pas notre tour
+  // l'adversaire joue : on le relit (1 s en partie rapide, 2 s en lente jouée en direct, sinon 8 s) tant que ce n'est pas notre tour
   function watch() {
     clearInterval(clock); clock = 0;
     if (!alive) return;
@@ -155,11 +155,14 @@ export function createMpLobby(app, root, spec) {
       // v522 : partie rapide : compte à rebours à l'écran, l'adversaire regardé toutes les 1,5 s
       clock = setInterval(tick, 250); tick();
       if (myTurn(view) && view.turn !== 'ab' && !(ui.talk > Date.now())) return schedule(() => refresh(), Math.max(1500, msLeft(view) + 3500)); /* 'ab' : on suit aussi la mise de l'adversaire */
-      return schedule(() => refresh(), 1500);
+      return schedule(() => refresh(), 1000); /* v576 : 1,5 s → 1 s */
     }
     const talk = ui.talk > Date.now(); /* v564 : pendant un échange de réactions, on regarde toutes les 3 s */
     if (!view || view.status !== 'playing' || myTurn(view)) { stopPoll(); if (view?.status === 'playing' || (talk && view)) schedule(() => refresh(), talk ? 3000 : 30000); return; }
-    schedule(() => refresh(), talk ? 3000 : 8000);
+    /* v576 : partie lente jouée en direct (dernier coup il y a moins de 3 min) : l'adversaire est relu toutes les 2 s
+       au lieu de 8 ; il revient à 8 s quand la partie s'endort */
+    const live = view.updated_at && Date.now() + skew - new Date(view.updated_at).getTime() < 180000;
+    schedule(() => refresh(), talk ? 3000 : live ? 2000 : 8000);
   }
   function tick() {
     const el = root.querySelector('.mp-clock'); if (!el || !view) return;
@@ -193,11 +196,11 @@ export function createMpLobby(app, root, spec) {
     try { const { r, out } = await app.partie.first('mpClaim', spec.game, v.id, !!spec.friendsOnly); v.claimed = true; if (out) { if (r === 'win') app.sfx.victory?.(); else app.sfx.defeat?.(); if (out.shards) toast(`+${out.shards} éclats`, { icon: 'crystal' }); app.chrome?.(); } } catch (e) { /* plus tard */ }
   }
   // Coup joué au serveur : la nouvelle vue remplace l'ancienne ; en cas d'erreur, la partie est relue
-  async function act(fn) {
+  async function act(fn, quiet = false) {
     if (busy) return null;
     busy = true; gen++;
     let v;
-    try { v = await fn(); } catch (e) { app.sfx.error(); toast(esc(errMsg(e)), { kind: 'error' }); busy = false; refresh(); return null; }
+    try { v = await (quiet ? fn() : withPending(fn())); } catch (e) { app.sfx.error(); toast(esc(errMsg(e)), { kind: 'error' }); busy = false; refresh(); return null; }
     busy = false;
     if (!alive) return null; /* v527 : l'écran a été quitté pendant l'envoi */
     if (v) { view = v; seeEmote(v); }

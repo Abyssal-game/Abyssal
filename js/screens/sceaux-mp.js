@@ -64,10 +64,22 @@ export function createSceauxMp(app, root, { scCard, modeBar }) {
   async function play(ctx, cell) {
     if (ctx.busy || ctx.ui.sel == null) return;
     const idx = ctx.ui.sel;
-    const v = await ctx.act(() => cloud.sceauxMpPlay(ctx.ui.open, idx, cell));
+    /* v576 : le coup s'affiche tout de suite (même moteur que le serveur), le serveur confirme ensuite ;
+       avant, la carte n'apparaissait qu'après l'aller-retour réseau. En cas de refus, la partie est relue. */
+    const v0 = ctx.view;
+    try {
+      const me = v0.me, foe = me === 'a' ? 'b' : 'a', t = local(v0);
+      SC.place(cat, t, 'p', idx, cell);
+      const flips = t.log.at(-1)?.flips || [];
+      const guess = { ...v0, turn: foe, state: { ...v0.state, board: t.board.map((c) => (c ? { id: c.id, o: c.owner === 'p' ? me : foe, v: c.vals, g: c.guard } : null)),
+        hands: { [me]: t.hands.p, [foe]: v0.state.hands[foe] }, placed: (v0.state.placed || 0) + 1, last: { who: me, cell, flips } } };
+      ctx.ui.sel = null; app.sfx.pose?.();
+      drawGame(guess, ctx, guess.state.last);
+    } catch (e) { /* aperçu impossible : on attend le serveur */ }
+    const v = await ctx.act(() => cloud.sceauxMpPlay(ctx.ui.open, idx, cell), true); /* coup déjà montré : pas d'attente affichée */
     if (!v) return;
-    ctx.ui.sel = null; app.sfx.pose?.();
-    ctx.draw(v.state.last);
+    ctx.ui.sel = null;
+    ctx.draw(null); /* le coup est déjà montré : pas de seconde animation */
     ctx.watch();
   }
 

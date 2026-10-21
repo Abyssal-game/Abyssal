@@ -5676,3 +5676,20 @@ body.battle-mode .prog-chip { top: calc(var(--safe-t, env(safe-area-inset-top, 0
 .dv-stamp.small b { font-size: 1.3rem; }
 .dv-stamp.as { top: 30%; }
 .cb-assault.out { opacity: 0; transition: opacity .25s; }
+/* v576 : retour immédiat au toucher (onglets, sous-onglets, puces, choix) : le doigt voit l'appui avant que l'écran change */
+.tab:active .tab-pic, .tab:active .orb { transform: scale(.9); transition-duration: .05s; }
+.tab:active { color: #E8DCC0; }
+.sn-tab:active { transform: scale(.95); filter: brightness(1.25); transition: transform .05s, filter .05s; }
+.chip:active, .seg-b:active, [role="tab"]:active, .icon-btn:active, summary:active { transform: scale(.95); transition: transform .05s; }
+/* v576 : reflet des sachets animé en déplacement (transform, géré par la carte graphique) : avant, l'animation de
+   background-position redessinait le sachet et redécodait ses images à chaque image (≈ 1 000 décodages en 1,5 s au Butin) */
+.pk-foil { background: none !important; animation: none !important; overflow: hidden; }
+.pk-foil::before { content: ''; position: absolute; left: 0; top: 0; width: 300%; height: 300%; background: linear-gradient(115deg, transparent 25%, rgba(255, 120, 200, .45) 38%, rgba(120, 230, 255, .5) 46%, rgba(255, 245, 160, .45) 54%, transparent 66%); animation: foil2 4.5s ease-in-out infinite; will-change: transform; }
+@keyframes foil2 { 0%, 100% { transform: translate(-66.667%, 0); } 50% { transform: translate(0, -66.667%); } }
+@media (prefers-reduced-motion: reduce) { .pk-foil::before { animation: none; } }
+/* v576 : attente du serveur (pending) : sceau qui tourne, au centre, au-dessus de tout, sans bloquer l'écran */
+.pend { position: fixed; left: 50%; top: 46%; z-index: 1200; transform: translate(-50%, -50%) scale(.9); display: grid; justify-items: center; gap: 10px; padding: 16px 20px; border-radius: 16px; background: rgba(10, 8, 14, .82); border: 1px solid rgba(201, 158, 74, .45); box-shadow: 0 10px 30px rgba(0, 0, 0, .6); opacity: 0; transition: opacity .15s, transform .15s; pointer-events: none; }
+.pend.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.pend-ring { width: 34px; height: 34px; border-radius: 50%; border: 3px solid rgba(242, 193, 78, .22); border-top-color: #F2C14E; animation: pendSpin .8s linear infinite; }
+.pend b { font: 700 .82rem/1.2 var(--f-ui); color: #E8DCC0; max-width: 220px; text-align: center; }
+@keyframes pendSpin { to { transform: rotate(360deg); } }

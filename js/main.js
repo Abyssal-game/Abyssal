@@ -3,7 +3,7 @@ import { startTranslator } from './i18n.js'; /* v506 : langues (en premier : le 
 import { loadCatalogData, createCatalog } from './core/catalog.js';
 import { Game } from './core/game.js';
 import { loadArtManifest, artUrl, hasRealArt, setCardBack } from './art/assets.js';
-import { setCardCatalog, setFameLookup, setApexLookup, setFavLookup, setDressLookup } from './ui/card.js';
+import { setCardCatalog, setFameLookup, setApexLookup, setFavLookup, setDressLookup, pruneLazy } from './ui/card.js';
 import { MAX_LEVEL } from './core/army.js';
 import { fameTier } from './core/renown.js';
 import { icon, EMBLEM } from './ui/icons.js';
@@ -146,6 +146,9 @@ function openProfile(e) {
   app.go(`amis/${p.dataset.profile}`);
 }
 document.addEventListener('click', openProfile, true);
+/* v576 : sur iPhone, Safari n'affiche l'état « appuyé » (:active) d'un bouton que si la page écoute les touchers :
+   sans cet écouteur vide, aucun bouton ne réagissait avant que l'écran suivant soit prêt */
+document.addEventListener('touchstart', () => {}, { passive: true });
 document.addEventListener('keydown', openProfile, true);
 
 document.addEventListener('click', (e) => {
@@ -275,6 +278,7 @@ function render() {
   }
   view.innerHTML = '';
   app.cleanup = screen(app, view, app.params) || null;
+  pruneLazy(); /* v576 : plus d'images de l'écran quitté sous surveillance */
   window.scrollTo(0, keepY);
   scrollKey = key;
   // les images différées peuvent encore ajuster la hauteur : on recolle une fois la page posée

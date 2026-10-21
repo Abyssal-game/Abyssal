@@ -66,7 +66,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
     <div class="vd-mid"><div class="vd-pack foe"></div><span class="vd-vs"></span><div class="vd-pack me"></div></div>
     <div class="vd-end" hidden></div>`;
   document.body.appendChild(el);
-  document.body.classList.add('has-sheet');
+  document.body.classList.add('has-sheet', 'lock-scroll');
   requestAnimationFrame(() => el.classList.add('on'));
 
   let speed = app.reduced() || g.s.settings.fastOpen ? 4 : 1, done = false, closed = false;
@@ -184,7 +184,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
     closed = true; done = true; sync = false;
     musicRelease();
     el.classList.remove('on');
-    document.body.classList.remove('has-sheet');
+    document.body.classList.remove('has-sheet', 'lock-scroll');
     setTimeout(() => el.remove(), 300);
     onClose?.();
   }

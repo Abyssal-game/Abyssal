@@ -1,6 +1,6 @@
 // L'équipe de cartes : fiche de combat d'une créature, écran Équipe et écran Coffres.
 import { RARITY, BOOSTERS } from '../config.js';
-import { cardHTML, lazyArt } from '../ui/card.js';
+import { cardHTML, lazyArt, fillGrid } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
 import { icon, roleIcon, actIcon } from '../ui/icons.js';
 import { esc, fmt, toast, openSheet, bindActions, confirmBox } from '../ui/dom.js';
@@ -150,17 +150,7 @@ export function teamScreen(app, root) {
     lazyArt(root);
     // v391 : la grille de la collection par paquets (216 cartes d'un coup bloquaient l'écran plus d'une seconde, à chaque ajout)
     const grid = root.querySelector('#tm-grid'), html = (c) => `<div class="v2-pick ${team.includes(c.id) ? 'in' : ''}">${armyCard(g, c)}${run ? '' : `<button class="tm-add ${team.includes(c.id) ? 'in' : ''}" data-act="quick" data-id="${c.id}">${team.includes(c.id) ? '✓ Dans l’équipe' : '+ Ajouter'}</button>`}</div>`;
-    const turn = (draw.turn = (draw.turn || 0) + 1), FIRST = 12, STEP = 18;
-    grid.innerHTML = owned.slice(0, FIRST).map(html).join(''); lazyArt(grid);
-    const k0 = grid.children[0];
-    if (k0 && owned.length > FIRST) { const cols = [...grid.children].filter((x) => x.offsetTop === k0.offsetTop).length || 1; const gap = parseFloat(getComputedStyle(grid).rowGap) || 0; grid.style.minHeight = `${Math.ceil(owned.length / cols) * (k0.offsetHeight + gap)}px`; }
-    const more = (from) => {
-      if (turn !== draw.turn || !grid.isConnected) return;
-      if (from >= owned.length) { grid.style.minHeight = ''; return; }
-      grid.insertAdjacentHTML('beforeend', owned.slice(from, from + STEP).map(html).join('')); lazyArt(grid);
-      setTimeout(() => requestAnimationFrame(() => more(from + STEP)), 0);
-    };
-    requestAnimationFrame(() => more(FIRST));
+    fillGrid(grid, owned, html, { first: 12, step: 12 }); /* v576 : complétée au fil du défilement */
   };
   root.addEventListener('click', (e) => { if (e.target.closest('[data-act]')) return; const t = e.target.closest('.tcg'); if (t) openCreature(app, t.dataset.id, { onChange: draw }); });
   bindActions(root, {

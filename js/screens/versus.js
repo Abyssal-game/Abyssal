@@ -10,7 +10,7 @@ import { isBlocked } from '../core/moderation.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, EMBLEM, picon } from '../ui/icons.js';
 import { profileAttrs } from '../ui/report.js';
-import { esc, fmt, toast, confirmBox, openSheet, bindActions } from '../ui/dom.js';
+import { esc, fmt, toast, confirmBox, openSheet, bindActions, pending, withPending } from '../ui/dom.js';
 import { packHTML } from './shop.js';
 import { playDuel } from './versus-duel.js';
 import { checkTurns } from '../cloud/mpwatch.js';
@@ -180,11 +180,12 @@ export default function versusScreen(app, root) {
     if (!ok) return;
     busy = true;
     /* v539 : la mise est prise par le serveur de partie, au moment où le duel a lieu (rendue s'il échoue) */
+    const done = pending(t('Ouverture des boosters…'));
     try { await app.partie.first('versusAccept', id, r.stake); }
-    catch (e) { busy = false; app.sfx.error(); toast(esc(e.status === 404 ? OFF : e.message), { kind: 'error', icon: 'info' }); app.chrome?.(); return load(); }
+    catch (e) { done(); busy = false; app.sfx.error(); toast(esc(e.status === 404 ? OFF : e.message), { kind: 'error', icon: 'info' }); app.chrome?.(); return load(); }
     app.chrome?.();
     try { data = await cloud.versusList(); } catch (e) { /* on retentera */ }
-    busy = false;
+    done(); busy = false;
     await see(id);
   }
 
@@ -203,7 +204,7 @@ export default function versusScreen(app, root) {
     busy = true;
     /* v539 : la mise est prise par le serveur de partie quand le défi est créé */
     try {
-      await app.partie.first('versusCreate', lineup, to, stake);
+      await withPending(app.partie.first('versusCreate', lineup, to, stake));
       app.sfx.achievement?.();
       toast(to ? 'Défi envoyé ! Il apparaîtra chez ton ami.' : 'Défi lancé ! Reviens voir quand un joueur l’aura relevé.', { kind: 'success', icon: 'crystal' });
     } catch (er) { app.sfx.error(); toast(esc(er.status === 404 ? OFF : er.message), { kind: 'error', icon: 'info', ms: 6000 }); }

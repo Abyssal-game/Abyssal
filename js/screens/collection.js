@@ -1,7 +1,7 @@
 // Collection : recherche, filtres (faction, rareté, possession), tri, grille.
 import { tw, LANG } from '../i18n.js';
 import { tuto } from '../ui/tutos.js';
-import { cardHTML, lazyArt } from '../ui/card.js';
+import { cardHTML, lazyArt, fillGrid } from '../ui/card.js';
 import { icon, sigil } from '../ui/icons.js';
 import { esc, bindActions, pct } from '../ui/dom.js';
 import { RARITIES, FACTION_ORDER, RARITY_ORDER, RARITY } from '../config.js';
@@ -92,42 +92,43 @@ export default function collection(app, root, params) {
     return 'normal';
   }
 
+  const html = (c) => {
+    const e = g.entry(c.id);
+    return e ? cardHTML(c, { lazy: true, count: e.n, isNew: e.isNew, variant: bestVariant(e), tag: g.formOf(c.id) ? '<span class="fm-tag">Corrompue</span>' : '' })
+      : cardHTML(c, { lazy: true, mystery: true, nameKnown: g.nameKnown(c.id) });
+  };
+  let drawnHtml = new Map(); /* v576 : ce que montre chaque carte de la grille, pour ne redessiner que celles qui ont changé */
+  /* au retour d'une fiche : seules les cartes modifiées sont remplacées (avant : toute la grille, 500 cartes, reconstruite) */
+  function drawSummary() {
+    const owned = g.uniqueCount();
+    root.querySelector('#col-summary').textContent = `${owned} créatures découvertes sur ${total} (${pct(owned / total)}) · ${g.newCount()} nouvelle${g.newCount() > 1 ? 's' : ''}`;
+    root.querySelector('#col-prog').style.width = `${(owned / total) * 100}%`;
+  }
+  function patchGrid() {
+    const list = filtered(), grid = root.querySelector('#col-grid');
+    if (list.length !== ids.length || list.some((c, i) => c.id !== ids[i]) || grid.children.length > list.length) return drawGrid();
+    list.slice(0, grid.children.length).forEach((c, i) => {
+      const h = html(c);
+      if (drawnHtml.get(c.id) === h) return;
+      drawnHtml.set(c.id, h);
+      const old = grid.children[i], t = document.createElement('template'); t.innerHTML = h;
+      old.replaceWith(t.content.firstElementChild);
+    });
+    lazyArt(grid);
+    drawSummary();
+  }
   function drawGrid() {
     const list = filtered();
     ids = list.map((c) => c.id);
     const grid = root.querySelector('#col-grid');
-    const html = (c) => {
-      const e = g.entry(c.id);
-      return e ? cardHTML(c, { lazy: true, count: e.n, isNew: e.isNew, variant: bestVariant(e), tag: g.formOf(c.id) ? '<span class="fm-tag">Corrompue</span>' : '' })
-        : cardHTML(c, { lazy: true, mystery: true, nameKnown: g.nameKnown(c.id) });
-    };
-    // v364 : les premières cartes tout de suite, le reste par paquets entre deux images (l'écran s'ouvre sans à-coup)
-    const run = (drawGrid.run = (drawGrid.run || 0) + 1), FIRST = 24, STEP = 30;
-    grid.innerHTML = list.slice(0, FIRST).map(html).join('');
-    lazyArt(grid);
-    // hauteur finale réservée tout de suite : le retour depuis une fiche retrouve sa position de défilement
-    grid.style.minHeight = '';
-    const k0 = grid.children[0];
-    if (k0 && list.length > FIRST) {
-      const cols = [...grid.children].filter((x) => x.offsetTop === k0.offsetTop).length || 1;
-      const gap = parseFloat(getComputedStyle(grid).rowGap) || 0;
-      grid.style.minHeight = `${Math.ceil(list.length / cols) * (k0.offsetHeight + gap)}px`;
-    }
-    const more = (from) => {
-      if (run !== drawGrid.run || !grid.isConnected) return;
-      if (from >= list.length) { grid.style.minHeight = ''; return; }
-      grid.insertAdjacentHTML('beforeend', list.slice(from, from + STEP).map(html).join(''));
-      lazyArt(grid);
-      setTimeout(() => requestAnimationFrame(() => more(from + STEP)), 0);
-    };
-    requestAnimationFrame(() => more(FIRST));
+    drawnHtml = new Map();
+    const html1 = (c) => { const h = html(c); drawnHtml.set(c.id, h); return h; };
+    fillGrid(grid, list, html1, { first: 24, step: 15 }); /* v576 : complétée au fil du défilement */
     const empty = root.querySelector('#col-empty');
     empty.hidden = list.length > 0;
     /* v536 : nouveau joueur sans créature : on l'envoie ouvrir son premier booster (avant : « aucune carte ne correspond à ces filtres ») */
     if (!list.length) empty.innerHTML = g.uniqueCount() ? 'Aucune carte ne correspond à ces filtres.' : 'Tu n’as encore aucune créature.<br><a class="btn primary dc-plq dc-plq-red" href="#/boutique" style="margin-top:12px">Ouvrir mon premier booster</a>';
-    const owned = g.uniqueCount();
-    root.querySelector('#col-summary').textContent = `${owned} créatures découvertes sur ${total} (${pct(owned / total)}) · ${g.newCount()} nouvelle${g.newCount() > 1 ? 's' : ''}`;
-    root.querySelector('#col-prog').style.width = `${(owned / total) * 100}%`;
+    drawSummary();
     root.querySelector('#col-count').textContent = `${list.length} carte${list.length > 1 ? 's' : ''} affichée${list.length > 1 ? 's' : ''}`;
     root.querySelector('#col-seen').hidden = g.newCount() === 0;
   }
@@ -214,6 +215,6 @@ export default function collection(app, root, params) {
     box.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.tcg, .slot-empty')) { e.preventDefault(); open(e.target); } });
   }
   drawView();
-  app.refreshView = () => { const y = window.scrollY; drawView(); window.scrollTo(0, y); };
+  app.refreshView = () => { const y = window.scrollY; if (st.view === 'album') drawView(); else patchGrid(); window.scrollTo(0, y); };
   return () => { app.refreshView = null; };
 }
