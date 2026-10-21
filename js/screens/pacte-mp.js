@@ -46,7 +46,7 @@ export function createPacteMp(app, root, { modeBar }) {
     const sc = s.scores?.[x] || 0, mine = x === v.me, tg = s.target || PA.TARGET;
     return `<div class="pa-seat s-${mine ? 'p' : 'a'} ${s.turn === x && v.status === 'playing' ? 'on' : ''}">
       <span class="sc-med ${mine ? 'mq-me' : ''}">${mine ? myPic() : ctx.avatar(v.foe?.avatar)}</span>
-      <span class="pa-sc"><b>${mine ? 'Toi' : esc(ctx.foeName(v))}</b><span class="pa-bar"><i style="width:${Math.min(100, (sc / tg) * 100)}%"></i></span></span>
+      <span class="pa-sc"><b>${ctx.plate(v, mine, mine ? 'Toi' : esc(ctx.foeName(v)))}</b><span class="pa-bar"><i style="width:${Math.min(100, (sc / tg) * 100)}%"></i></span></span>
       <span class="pa-pts"><b>${sc}</b><small>/ ${tg}</small></span></div>`;
   }
   function center(v, s) {

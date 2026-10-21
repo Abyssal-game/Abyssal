@@ -1260,14 +1260,43 @@ begin
   return case when found then 'cancelled' else 'none' end;
 end $$;
 
+-- v564 : réactions en ligne (une par joueur à la fois, numérotée pour que l'adversaire la voie une seule fois)
+-- et apparence de l'adversaire (cadre, plaque : colonnes aussi créées par 15-vitrine.sql)
+alter table public.mp_matches add column if not exists emotes jsonb not null default '{}'::jsonb;
+alter table public.profiles add column if not exists frame text;
+alter table public.profiles add column if not exists plate text;
+create or replace function public.mp_emote(p_id uuid, p_key text)
+returns jsonb language plpgsql volatile security definer set search_path = public as $$
+declare m public.mp_matches; me text; e jsonb; owned jsonb; n int;
+begin
+  if auth.uid() is null then raise exception 'Connecte-toi d’abord.'; end if;
+  if p_key is null or not (p_key = any (array['re-salut', 're-bien', 're-merci', 're-aie', 're-mammon', 're-souveraine', 're-archiviste', 're-ilda', 're-orvel', 're-vesna', 're-maitre', 're-echo'])) then raise exception 'Réaction inconnue.'; end if;
+  select * into m from public.mp_matches where id = p_id and auth.uid() in (a, b) for update;
+  if not found then raise exception 'Partie introuvable.'; end if;
+  if m.status <> 'playing' and not (m.status = 'done' and m.updated_at > now() - interval '10 minutes') then raise exception 'La partie n’est pas en cours.'; end if;
+  -- réaction payante : vérifiée dans la partie tenue par le serveur (sans serveur de partie, on fait confiance au jeu)
+  if not (p_key = any (array['re-salut', 're-bien', 're-merci', 're-aie'])) and to_regclass('public.parties') is not null then
+    execute 'select coalesce(data -> ''emotes'', ''[]''::jsonb) from public.parties where user_id = $1' into owned using auth.uid();
+    if owned is not null and not (owned ? p_key) then raise exception 'Tu n’as pas encore cette réaction.'; end if;
+  end if;
+  me := case when m.a = auth.uid() then 'a' else 'b' end;
+  e := coalesce(m.emotes -> me, '{}'::jsonb);
+  if (e ->> 'at') is not null and (e ->> 'at')::timestamptz > now() - interval '3 seconds' then raise exception 'Doucement : une réaction toutes les 3 secondes.'; end if;
+  n := coalesce((e ->> 'n')::int, 0) + 1;
+  update public.mp_matches set emotes = coalesce(emotes, '{}'::jsonb) || jsonb_build_object(me, jsonb_build_object('k', p_key, 'n', n, 'at', now())) where id = p_id;
+  return jsonb_build_object('k', p_key, 'n', n);
+end $$;
+revoke execute on function public.mp_emote(uuid, text) from public, anon;
+grant execute on function public.mp_emote(uuid, text) to authenticated;
+
 -- Vue d'une partie pour un de ses joueurs (me = 'a' ou 'b')
 create or replace function public.mp_view(p_id uuid)
 returns jsonb language sql stable security definer set search_path = public as $$
   select jsonb_build_object('id', m.id, 'game', m.game, 'status', m.status, 'public', m.public, 'turn', m.turn, 'deadline', m.deadline,
     'me', case when m.a = auth.uid() then 'a' else 'b' end, 'state', public.mp_state_for(m, case when m.a = auth.uid() then 'a' else 'b' end), 'winner', m.winner, 'reason', m.reason,
     'claimed', case when m.a = auth.uid() then m.a_claimed else m.b_claimed end, 'created_at', m.created_at, 'updated_at', m.updated_at,
-    'now', now(), 'hours', public.mp_hours(), 'pace', m.pace,
-    'foe', (select jsonb_build_object('id', p.id, 'pseudo', p.pseudo, 'avatar', p.avatar, 'badge', p.badge) from public.profiles p where p.id = case when m.a = auth.uid() then m.b else m.a end))
+    'now', now(), 'hours', public.mp_hours(), 'pace', m.pace, 'emotes', m.emotes,
+    'foe', (select jsonb_build_object('id', p.id, 'pseudo', p.pseudo, 'avatar', p.avatar, 'badge', p.badge, 'frame', p.frame, 'plate', p.plate) from public.profiles p where p.id = case when m.a = auth.uid() then m.b else m.a end))
   from public.mp_matches m where m.id = p_id and auth.uid() in (m.a, m.b)
 $$;
 
@@ -1309,8 +1338,9 @@ begin
 end $$;
 
 -- Classement du mois : victoires contre d'autres joueurs
+drop function if exists public.mp_ranking(text, int); -- v564 : le classement montre aussi le cadre et la plaque
 create or replace function public.mp_ranking(p_game text, p_limit int default 30)
-returns table (user_id uuid, wins int, games int, pseudo text, avatar text, badge text)
+returns table (user_id uuid, wins int, games int, pseudo text, avatar text, badge text, frame text, plate text)
 language sql stable security definer set search_path = public as $$
   with r0 as (
     select case when winner = 'a' then a else b end as w, case when winner = 'a' then b else a end as l, a, b,
@@ -1324,7 +1354,7 @@ language sql stable security definer set search_path = public as $$
     select u as user_id, count(*) filter (where u = w)::int as wins, count(*)::int as games
     from r, lateral (values (r.a), (r.b)) v(u) group by u
   )
-  select s.user_id, s.wins, s.games, p.pseudo, p.avatar, p.badge from s join public.profiles p on p.id = s.user_id
+  select s.user_id, s.wins, s.games, p.pseudo, p.avatar, p.badge, p.frame, p.plate from s join public.profiles p on p.id = s.user_id
   where s.wins > 0 order by s.wins desc, s.games asc limit greatest(1, least(p_limit, 100))
 $$;
 

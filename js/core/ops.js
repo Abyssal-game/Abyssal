@@ -20,7 +20,7 @@ export const OPS = {
   team: { kind: 'sync', lazy: (s) => Object.keys(s.collection || {}).length }, // lecture qui peut prêter les cartes de départ
   // équipe, profil, personnalisation
   setTeam: { kind: 'sync' }, saveTeamPreset: { kind: 'sync' }, deleteTeamPreset: { kind: 'sync' }, setForm: { kind: 'sync' }, toggleFav: { kind: 'sync' },
-  claimChallenge: { kind: 'sync' }, setTitle: { kind: 'sync' }, setFrame: { kind: 'sync' }, setDress: { kind: 'sync' }, setBack: { kind: 'sync' },
+  claimChallenge: { kind: 'sync' }, setTitle: { kind: 'sync' }, setFrame: { kind: 'sync' }, setDress: { kind: 'sync' }, setBack: { kind: 'sync' }, setPlate: { kind: 'sync' },
   setName: { kind: 'sync' }, setAvatar: { kind: 'sync' }, toggleShowcase: { kind: 'sync' }, reset: { kind: 'sync' },
   // Descente
   chooseOmen: { kind: 'sync' }, startRun: { kind: 'sync' }, startBattle: { kind: 'sync' }, choosePact: { kind: 'sync' }, chooseTalent: { kind: 'sync' },

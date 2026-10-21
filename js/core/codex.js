@@ -120,6 +120,22 @@ export const FINISHES = {
 const F = (k, cost) => ({ id: k, kind: 'frame', give: { frame: k }, cost });
 const B = (k, cost) => ({ id: k, kind: 'back', give: { back: k }, cost });
 const FN = (k, cost) => ({ id: k, kind: 'finish', give: { finish: k }, cost });
+/* v564 : plaques de pseudo (bannière peinte derrière le pseudo : profil, classements, parties en ligne ; images assets/plates/<clé>.webp,
+   décor CSS en attendant) et réactions en ligne (pendant une partie contre un joueur ; portraits des arbitres des jeux) */
+export const PLATES = { 'pl-obsidienne': 'Plaque d’obsidienne', 'pl-grimoire': 'Plaque du grimoire', 'pl-braise': 'Plaque de braise',
+  'pl-givre': 'Plaque de givre', 'pl-or-noir': 'Plaque d’or noir', 'pl-abysse': 'Plaque de l’Abysse', 'pl-souverain': 'Plaque du Souverain' };
+export const EMOTES = {
+  're-salut': { text: 'Salutations.', free: true }, 're-bien': { text: 'Bien joué.', free: true },
+  're-merci': { text: 'Merci.', free: true }, 're-aie': { text: 'Aïe…', free: true },
+  're-mammon': { text: 'Hé hé hé…', who: 'banquier', name: 'Mammon' }, 're-souveraine': { text: 'À genoux.', who: 'souverain', name: 'La Souveraine du Néant' },
+  're-archiviste': { text: 'Prévisible.', who: 'archiviste', name: 'L’Archiviste' }, 're-ilda': { text: 'Oh non… !', who: 'initie', name: 'Ilda' },
+  're-orvel': { text: 'Quel coup !', who: 'collectionneur', name: 'Maître Orvel' }, 're-vesna': { text: 'Patience.', who: 'stratege', name: 'Sœur Vesna' },
+  're-maitre': { text: 'Les règles sont les règles.', who: 'maitre', name: 'Le Maître des Sceaux' }, 're-echo': { text: 'L’Abîme t’attend.', who: 'echo', name: 'L’Écho de l’Abîme' },
+};
+export const FREE_EMOTES = Object.keys(EMOTES).filter((k) => EMOTES[k].free);
+export const PAID_EMOTES = Object.keys(EMOTES).filter((k) => !EMOTES[k].free);
+const PL = (k, cost) => ({ id: k, kind: 'plate', give: { plate: k }, cost });
+const RE = (k, cost) => ({ id: k, kind: 'emote', give: { emote: k }, cost });
 export const ROYAUMES = ['dos-infernal', 'dos-abyssal', 'dos-celeste', 'dos-sauvage', 'dos-necrotique', 'dos-primordial', 'dos-artificiel'];
 /* v535 : cadres de la meute, des corbeaux, des chaînes et des roses noires retirés de la vente (leur ornement cachait le visage de la créature) */
 /* v562 : tri du propriétaire (Atelier des cosmétiques, 21 octobre 2026) : 25 objets retirés (RETIRED_COSM). Ils restent
@@ -132,6 +148,9 @@ export const CATALOG = [ F('cx-serpents', 120), F('cx-vitrail', 120), F('cx-roua
   B('dos-abime', 140), B('dos-lune-sang', 200), B('dos-devoreur', 200), B('dos-eclipse', 200), B('dos-horloger', 200), B('dos-miroirs', 200), B('dos-jumeaux', 200), B('dos-titan', 200),
   B('dos-abysse', 280), B('dos-tarot', 200), B('dos-mosaique', 200), B('dos-encre', 200), B('dos-alchimie', 200), B('dos-carte-abysse', 200), B('dos-reliquaire', 280), B('dos-tapisserie', 200), B('dos-art-deco', 280), B('dos-vivant', 280), B('dos-nebuleuse', 280), B('dos-vitrail', 200), ...ROYAUMES.map((k) => B(k, 120)),
   FN('fin-estampe', 300), FN('fin-imperiale', 450), FN('fin-neant', 450), F('cx-cristaux-sang', 280), B('dos-phalene', 200), B('dos-coeur-mecanique', 280),
+  PL('pl-obsidienne', 120), PL('pl-grimoire', 180), PL('pl-braise', 200), PL('pl-givre', 200), PL('pl-or-noir', 250), PL('pl-abysse', 280), PL('pl-souverain', 450),
+  ...PAID_EMOTES.map((k) => RE(k, 100)),
+  { id: 'arbitres', kind: 'bundle', name: 'Le Cercle des arbitres', give: { emotes: PAID_EMOTES }, cost: 600, desc: 'Les huit réactions des arbitres d’un coup (800 à l’unité).' },
   { id: 'royaumes', kind: 'bundle', name: 'Les sept royaumes', give: { backs: ROYAUMES }, cost: 600, desc: 'Les sept dos des royaumes d’un coup (840 à l’unité).' },
 ];
 // Exclusifs du Codex enluminé (jamais en vente). v547 : tous les cosmétiques de la voie enluminée (Saison I : l'hiver),

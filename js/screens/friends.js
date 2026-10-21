@@ -11,6 +11,7 @@ import { FRIEND_MSG, MASKED_NAME, openReport } from '../ui/report.js';
 import { isBlocked } from '../core/moderation.js';
 import { t } from '../i18n.js';
 import { RARITY_ORDER, FACTION_ORDER } from '../config.js';
+import { withPlate } from '../ui/vitrine.js'; /* v564 */
 
 let cache = null; // dernière liste reçue (pour afficher la fiche sans attendre)
 const VBEST = ['galaxy', 'gold', 'holo', 'normal'];
@@ -114,7 +115,7 @@ export default function friends(app, root, params = []) {
     root.innerHTML = `
       <section class="panel ornate profile-head bn-profile fr-head">
         <div class="av-col"><span class="avatar-big pf pf-${esc(d.frame || 'fer')}">${pic(d.avatar || f.avatar)}</span></div>
-        <div class="ph-text"><h1><span class="ph-name">${esc(name)}</span></h1>${f.badge ? cloud.badgeHTML(f.badge) : ''}<p class="ph-title">${esc(d.title || f.title || '')}</p><p class="muted small">Niveau ${d.lv || f.level || 1}${f.friend === 'accepted' ? ' · ton ami' : ''}</p></div>
+        <div class="ph-text"><h1><span class="ph-name">${withPlate(d.plate, esc(name))}</span></h1>${f.badge ? cloud.badgeHTML(f.badge) : ''}<p class="ph-title">${esc(d.title || f.title || '')}</p><p class="muted small">Niveau ${d.lv || f.level || 1}${f.friend === 'accepted' ? ' · ton ami' : ''}</p></div>
       </section>
       ${(d.show || []).filter((x) => cat.get(x)).length ? `<h2 class="section-title">Sa vitrine</h2><div class="showcase">${d.show.filter((x) => cat.get(x)).map((x) => cardHTML(cat.get(x), { variant: best(x), foreign: true })).join('')}</div>` : ''}
       <div class="stats-grid pf-3">

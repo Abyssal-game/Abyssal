@@ -47,7 +47,7 @@ export function createEncheresMp(app, root, { modeBar }) {
   const chair = (v, s, x, ctx) => {
     const mine = x === v.me, sc = scoreOf(s, x), bid = s.bids?.[x];
     const tag = v.status !== 'playing' || banner ? '' : mine ? (bid ? `<span class="pa-tag gold">${t('Offrande : {n}', { n: bid })}</span>` : '') : bid ? '<span class="pa-tag ok">A misé</span>' : '<span class="pa-tag">Réfléchit…</span>';
-    return `<div class="en-chair c-${mine ? 'b' : 'a'}" data-seat="${x}"><span class="sc-med ${mine ? 'mq-me' : ''}">${mine ? myPic() : ctx.avatar(v.foe?.avatar)}</span><b>${mine ? 'Toi' : esc(ctx.foeName(v))}</b>
+    return `<div class="en-chair c-${mine ? 'b' : 'a'}" data-seat="${x}"><span class="sc-med ${mine ? 'mq-me' : ''}">${mine ? myPic() : ctx.avatar(v.foe?.avatar)}</span><b>${ctx.plate(v, mine, mine ? 'Toi' : esc(ctx.foeName(v)))}</b>
       <small>${sc.total} pt${Math.abs(sc.total) > 1 ? 's' : ''}${sc.sets ? ` · ${sc.sets} fam.` : ''}</small>${tag}<span class="mq-front">${wonHTML(s, x)}</span>${offersHTML(s, x)}</div>`;
   };
   function stage(v, ctx) {

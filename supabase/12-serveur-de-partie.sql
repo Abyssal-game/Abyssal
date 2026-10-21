@@ -89,6 +89,10 @@ begin
   update public.profiles set avatar = p_profile ->> 'avatar', title = p_profile ->> 'title',
     level = coalesce((p_profile ->> 'level')::int, 1), owned = coalesce((p_profile ->> 'owned')::int, 0), updated_at = now()
     where id = p_uid;
+  -- v564 : cadre et plaque de pseudo (colonnes ajoutées par 15-vitrine.sql)
+  if exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'profiles' and column_name = 'plate') then
+    execute 'update public.profiles set frame = $2, plate = $3 where id = $1' using p_uid, p_profile ->> 'frame', p_profile ->> 'plate';
+  end if;
   if p_card is not null and to_regclass('public.player_cards') is not null and octet_length(p_card::text) < 100000 then
     execute 'insert into public.player_cards (id, data, updated_at) values ($1, $2, now())
              on conflict (id) do update set data = excluded.data, updated_at = now()' using p_uid, p_card;

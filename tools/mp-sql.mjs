@@ -3,6 +3,7 @@
 import fs from 'node:fs';
 import { sideValues } from '../js/core/sceaux.js';
 import { MP_HOURS, MP_FAST_SECS } from '../js/core/mp.js';
+import { EMOTES, FREE_EMOTES } from '../js/core/codex.js';
 
 const root = new URL('..', import.meta.url);
 const cards = [];
@@ -11,6 +12,7 @@ for (const f of fs.readdirSync(new URL('data/cards/', root)).filter((x) => x.end
 }
 const q = (s) => `'${String(s).replace(/'/g, "''")}'`;
 const rows = cards.map((c) => `(${q(c.id)},${q(c.rarity)},'{${sideValues(c).join(',')}}')`).join(',\n');
-const sql = fs.readFileSync(new URL('tools/mp-template.sql', root), 'utf8').replace('--CARTES--', rows).replaceAll('--HEURES--', String(MP_HOURS)).replaceAll('--SECONDES--', String(MP_FAST_SECS));
+const sql = fs.readFileSync(new URL('tools/mp-template.sql', root), 'utf8').replace('--CARTES--', rows).replaceAll('--HEURES--', String(MP_HOURS)).replaceAll('--SECONDES--', String(MP_FAST_SECS))
+  .replace('--REACTIONS--', Object.keys(EMOTES).map(q).join(', ')).replace('--REACTIONS_LIBRES--', FREE_EMOTES.map(q).join(', ')); // v564
 fs.writeFileSync(new URL('supabase/09-multijoueur.sql', root), sql);
 console.log(cards.length, 'cartes');

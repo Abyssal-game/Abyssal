@@ -48,7 +48,7 @@ export function createSceauxMp(app, root, { scCard, modeBar }) {
     const msg = over ? '' : mt ? (ui.sel == null ? (v.pace === 'fast' ? 'À toi de jouer : touche une de tes cartes, puis une case libre.' : `À toi de jouer : touche une de tes cartes, puis une case libre. Il te reste <b>${left(v)}</b>.`) : 'Touche une case libre pour poser la carte.')
       : ctx.waitMsg(v);
     root.innerHTML = `<div class="sc-game mp-game ${app.reduced() ? 'rm' : ''}">
-      <div class="sc-bar"><span class="sc-who ${!over && !myTurn(v) ? 'on' : ''}"><span class="sc-med">${avatar(v.foe?.avatar)}</span><span><b>${esc(foeName(v))}</b><small>Contre un joueur</small></span></span>
+      <div class="sc-bar"><span class="sc-who ${!over && !myTurn(v) ? 'on' : ''}"><span class="sc-med">${avatar(v.foe?.avatar)}</span><span><b>${ctx.plate(v, false, esc(foeName(v)))}</b><small>Contre un joueur</small></span></span>
         <span class="sc-score" aria-label="Score : toi ${score.p}, adversaire ${score.o}"><b class="p">${score.p}</b><i>·</i><b class="o">${score.o}</b></span>
         <button class="btn small ghost" data-mp="back" aria-label="Revenir à la liste">${icon('close')}</button></div>
       <div class="sc-sub"><span class="sc-ohand open">${s.hands[foe].map((id) => scCard(cat, id, { owner: 'o', cls: 'sc-mini', perks: pk })).join('')}</span>

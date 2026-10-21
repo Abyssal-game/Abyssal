@@ -2,16 +2,17 @@
 // les essayer en grand et les trier (garder, retirer, à revoir). Le tri reste sur l'appareil (localStorage) ;
 // « Copier mon tri » donne un texte à coller dans la conversation pour appliquer les choix dans le jeu.
 // Outil du propriétaire, en français seulement (translate="no").
-import { CODEX_FRAMES, CODEX_BACKS, FINISHES, CATALOG, SEASONS, SHOP, CODEX_ONLY, RETIRED_COSM } from '../core/codex.js';
+import { CODEX_FRAMES, CODEX_BACKS, FINISHES, CATALOG, SEASONS, SHOP, CODEX_ONLY, RETIRED_COSM, PLATES, EMOTES } from '../core/codex.js';
 import { FRAMES } from '../config.js';
 import { icon, EMBLEM } from '../ui/icons.js';
 import { esc, toast, openSheet, confirmBox } from '../ui/dom.js';
 import { cardHTML, enableTilt } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
+import { emoteHTML } from '../ui/vitrine.js'; /* v564 */
 
 const KEY = 'abyssal.cosmTri';
 const ST = { keep: 'Garder', drop: 'Retirer', maybe: 'À revoir' };
-const KINDS = { frame: 'Cadres', back: 'Dos', finish: 'Finitions' };
+const KINDS = { frame: 'Cadres', back: 'Dos', finish: 'Finitions', plate: 'Plaques', emote: 'Réactions' };
 const readTri = () => { try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { return {}; } };
 const writeTri = (t) => { try { localStorage.setItem(KEY, JSON.stringify(t)); } catch (e) { /* rien */ } };
 
@@ -23,7 +24,7 @@ function origins() {
     const r = t.prem; if (!r) continue;
     for (const k of [r.frame, r.back, r.finish]) add(k, `Saison ${se.num} · ${se.name} · palier ${t.tier}${t.tier === 30 ? ' (ultime)' : ''}`, `s:${se.key}`);
   }
-  for (const it of CATALOG) for (const k of [it.give.frame, it.give.back, it.give.finish, ...(it.give.backs || [])]) add(k, it.kind === 'bundle' ? `Échoppe · lot « ${it.name} »` : `Échoppe · ${it.cost} obsidiennes`, 'shop');
+  for (const it of CATALOG) for (const k of [it.give.frame, it.give.back, it.give.finish, it.give.plate, it.give.emote, ...(it.give.backs || [])]) add(k, it.kind === 'bundle' ? `Échoppe · lot « ${it.name} »` : `Échoppe · ${it.cost} obsidiennes`, 'shop');
   for (const it of SHOP) for (const k of [it.give?.frame, it.give?.back]) add(k, `Échoppe · ${it.name}`, 'shop');
   for (const k of RETIRED_COSM) add(k, 'Retiré · ton tri du 21 octobre 2026', 'none'); /* v562 */
   for (const k of CODEX_ONLY) add(k, 'Codex · aucune saison pour l’instant', 'none');
@@ -36,6 +37,8 @@ function allItems() {
   for (const [k, n] of Object.entries(CODEX_FRAMES)) out.push({ id: k, kind: 'frame', name: n, from: o[k] || { txt: 'Réserve · nulle part', grp: 'none' } });
   out.push({ id: 'back', kind: 'back', name: 'Dos de l’Abysse (de base)', from: { txt: 'Gratuit · dos de départ', grp: 'free' } });
   for (const [k, n] of Object.entries(CODEX_BACKS)) out.push({ id: k, kind: 'back', name: n, from: o[k] || { txt: 'Réserve · nulle part', grp: 'none' } });
+  for (const [k, n] of Object.entries(PLATES)) out.push({ id: k, kind: 'plate', name: n, from: o[k] || { txt: 'Réserve · nulle part', grp: 'none' } }); /* v564 */
+  for (const [k, e] of Object.entries(EMOTES)) out.push({ id: k, kind: 'emote', name: `${e.name || 'Réaction offerte'} · « ${e.text} »`, from: e.free ? { txt: 'Gratuit · offerte à tous', grp: 'free' } : o[k] || { txt: 'Réserve · nulle part', grp: 'none' } });
   for (const [k, f] of Object.entries(FINISHES)) out.push({ id: k, kind: 'finish', name: `Finition ${f.name}`, desc: f.desc, from: o[k] || { txt: 'Réserve · nulle part', grp: 'none' } });
   return out;
 }
@@ -62,6 +65,8 @@ export function openCosmeticsLab(app) {
 
   const thumb = (it) => it.kind === 'frame' ? `<span class="avatar-big pf pf-${esc(it.id)}">${avImg}</span>`
     : it.kind === 'back' ? `<img class="cl-back" alt="" src="${backSrc(it.id)}" onerror="this.replaceWith(Object.assign(document.createElement('i'),{className:'cl-miss',textContent:'image manquante'}))">`
+    : it.kind === 'plate' ? `<span class="np np-${esc(it.id)} np-demo">Pseudo</span>`
+    : it.kind === 'emote' ? `<span class="re-tile">${emoteHTML(it.id)}</span>`
     : `<span class="cl-fin">${cardHTML(cards[0], { dress: it.id })}</span>`;
   const badge = (id) => tri[id] ? `<em class="cl-st ${tri[id]}">${ST[tri[id]]}</em>` : '';
 
@@ -94,6 +99,9 @@ export function openCosmeticsLab(app) {
         <div class="cx-pv-vs"><div><span class="top-avatar pf pf-${esc(it.id)}">${avImg}</span><small>Barre du haut</small></div><div><span class="avatar-mini pf pf-${esc(it.id)}">${avImg}</span><small>Classement</small></div><div><span class="avatar-mini pf pf-${esc(g.s.frame)}">${avImg}</span><small>Ton cadre actuel</small></div></div>`;
       if (it.kind === 'back') return `<div class="cx-pv-back"><img alt="" src="${backSrc(it.id)}"></div>
         <p class="cx-pv-cap">À l'ouverture d'un booster</p><div class="cx-pv-fan">${[0, 1, 2].map(() => `<img alt="" src="${backSrc(it.id)}">`).join('')}</div>`;
+      if (it.kind === 'plate') return `<div class="cx-pv-prof"><span class="avatar-big pf pf-${esc(g.s.frame)}">${avImg}</span><div><b><span class="np np-${esc(it.id)}">${esc(g.s.name || 'Ton pseudo')}</span></b><span>${esc(g.s.title || '')}</span></div></div>
+        <p class="cx-pv-cap">Au classement</p><div class="lb-row cx-pv-lb"><span class="lb-rank">1</span><span class="lb-av">${avImg}</span><span class="lb-name"><b><span class="np np-${esc(it.id)}">${esc(g.s.name || 'Ton pseudo')}</span></b><span class="small muted">${esc(g.s.title || '')}</span></span><span class="lb-floor">412 pts</span></div>`;
+      if (it.kind === 'emote') return `<p class="cx-pv-cap">Ce que voit l'adversaire</p><div class="re-bubble demo on">${emoteHTML(it.id)}<small>${esc(g.s.name || 'Pseudo')}</small></div>`;
       const c = cards[pick % cards.length];
       return `<div class="cx-pvf-stage"><div class="detail-card cx-pvf-card">${cardHTML(c, { size: 'full', variant: 'normal', dress: plain ? null : it.id })}</div></div>
         <div class="cx-pvf-seg"><button class="${plain ? 'on' : ''}" data-pv="plain">Sans finition</button><button class="${plain ? '' : 'on'}" data-pv="dress">Avec</button></div>

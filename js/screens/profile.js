@@ -6,7 +6,8 @@ import { icon, sigil, EMBLEM, picon, setIcon } from '../ui/icons.js';
 import { esc, fmt, pct, bindActions, toast, openSheet } from '../ui/dom.js';
 import { unlockSources } from '../core/unlocks.js';
 import { RARITIES, FRAMES, BOOSTERS, FACTION_ORDER, VARIANTS, RARITY, RARITY_ORDER } from '../config.js';
-import { CODEX_FRAMES, CODEX_BACKS, FINISHES } from '../core/codex.js';
+import { CODEX_FRAMES, CODEX_BACKS, FINISHES, PLATES } from '../core/codex.js';
+import { withPlate } from '../ui/vitrine.js'; /* v564 : plaque de pseudo */
 
 export default function profile(app, root) {
   const g = app.game, cat = app.catalog;
@@ -56,15 +57,16 @@ export default function profile(app, root) {
     const shownName = sync.profile?.pseudo || s.name || 'Toi';
     const avImg = av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM;
     const fan = backs.slice(0, 3).map(([, , u], i) => `<img class="cs-fan f${i}" alt="" src="${u}">`).join('');
-    const head = `<div class="cs-hero bn-profile"><span class="avatar-big pf pf-${s.frame}">${avImg}</span><div><b class="cs-name">${esc(shownName)}</b><span class="cs-title">${esc(s.title)}</span><span class="cs-lv">Niveau ${g.levelInfo().level}</span></div><span class="cs-fanbox">${fan}</span></div>`;
+    const head = `<div class="cs-hero bn-profile"><span class="avatar-big pf pf-${s.frame}">${avImg}</span><div><b class="cs-name">${withPlate(s.plate, esc(shownName))}</b><span class="cs-title">${esc(s.title)}</span><span class="cs-lv">Niveau ${g.levelInfo().level}</span></div><span class="cs-fanbox">${fan}</span></div>`;
     const SECTIONS = [
       ['avatar', 'Avatar', av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM, av ? esc(av.name) : 'Une de tes créatures', Object.keys(s.collection).length],
       ['titles', 'Titres', picon('titles'), esc(s.title), `${s.titles.length}`],
       ['frames', 'Cadres de profil', `<span class="avatar-mini pf pf-${s.frame}">${avImg}</span>`, esc(({ ...FRAMES, ...CODEX_FRAMES })[s.frame] || ''), `${ownF.length}`],
+      ['plates', 'Plaque de pseudo', `<span class="np ${s.plate ? `np-${s.plate}` : 'np-none'} np-demo">${esc(shownName.slice(0, 8))}</span>`, esc(PLATES[s.plate] || 'Aucune plaque'), `${(s.plates || []).length}`], /* v564 */
       ['backs', 'Dos de cartes', `<img alt="" src="${backNow[2]}">`, esc(backNow[1]), `${backs.length}`],
       ['finishes', 'Finitions de cartes', fins.length ? `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"><img alt="" src="assets/variants/${fins[0]}-frame.webp"></span>` : `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"></span>`, fins.length ? `${dressed} carte${dressed > 1 ? 's' : ''} habillée${dressed > 1 ? 's' : ''}` : 'Contours peints des cartes', `${fins.length}`],
-    ].filter(([k]) => k !== 'finishes' || fins.length || g.codexOn()); /* v499 : plus de tuiles « Bientôt » : finitions seulement si on en possède */
-    const TOT = { avatar: g.total(), titles: s.titles.length + lockedT.length, frames: allF.length, backs: 1 + Object.keys(CODEX_BACKS).length, finishes: Object.keys(FINISHES).length };
+    ].filter(([k]) => (k !== 'finishes' || fins.length || g.codexOn()) && (k !== 'plates' || (s.plates || []).length || g.codexOn())); /* v499 : plus de tuiles « Bientôt » : finitions seulement si on en possède */
+    const TOT = { avatar: g.total(), titles: s.titles.length + lockedT.length, frames: allF.length, backs: 1 + Object.keys(CODEX_BACKS).length, plates: Object.keys(PLATES).length, finishes: Object.keys(FINISHES).length };
     if (!csTab) return `${head}<div class="cs-list">${SECTIONS.map(([k, n, pic, sub, cnt]) => { const tot = TOT[k] || 0, has = Math.min(+cnt || 0, tot || 0); return `<button class="cs-row k-${k}" data-cs="tab" data-v="${k}"><span class="cs-pic">${pic}</span><span class="cs-txt"><b>${n}</b><small>${sub}</small><span class="cs-bar"><i style="width:${tot ? (has / tot) * 100 : 0}%"></i></span></span><span class="cs-cnt"><b>${has}</b><small>/ ${tot}</small></span><span class="cs-go">${icon('next')}</span></button>`; }).join('')}</div>`;
     const back = `<button class="btn ghost small cs-back" data-cs="tab" data-v="">${icon('prev')}Personnaliser</button>`;
     const title = SECTIONS.find(([k]) => k === csTab)?.[1] || '';
@@ -78,6 +80,9 @@ export default function profile(app, root) {
     } else if (csTab === 'frames') {
       body = `<div class="frames">${ownF.map(frameBtn).join('')}</div>
         ${lockedF.length ? `<h3 class="pf-tf-h">${icon('lock')} ${lockedF.length} cadre${lockedF.length > 1 ? 's' : ''} à gagner</h3><p class="small muted">Touche un cadre pour savoir comment l’obtenir.</p><div class="frames">${lockedF.map(frameBtn).join('')}</div>` : ''}`;
+    } else if (csTab === 'plates') {
+      const pl = [[null, 'Aucune plaque'], ...(s.plates || []).map((k) => [k, PLATES[k] || k])];
+      body = `<p class="small muted">La bannière derrière ton pseudo : sur ton profil, aux classements et chez tes adversaires en ligne.</p><div class="cs-plates">${pl.map(([k, n]) => `<button class="cs-plate" data-cs="plate" data-v="${k || ''}" aria-pressed="${(s.plate || null) === k}"><span class="np ${k ? `np-${k}` : 'np-none'}">${esc(shownName)}</span><small>${esc(n)}</small></button>`).join('')}</div>${g.codexOn() ? '<p class="small muted">D’autres plaques à l’Échoppe.</p>' : ''}`;
     } else if (csTab === 'backs') {
       body = `<p class="small muted">Le dos de toutes les cartes face cachée du jeu.</p><div class="pf-backs">${backs.map(([k, n, u]) => `<button class="pf-back" data-cs="cardback" data-v="${k || ''}" aria-pressed="${(s.back || null) === k}"><img alt="" src="${u}"><span class="small">${esc(n)}</span></button>`).join('')}</div>`;
     } else if (csTab === 'finishes') {
@@ -99,6 +104,7 @@ export default function profile(app, root) {
       if (k === 'avatar') g.setAvatar(v);
       if (k === 'title') g.setTitle(v);
       if (k === 'frame') g.setFrame(v);
+      if (k === 'plate') g.setPlate(v || null);
       if (k === 'cardback') { g.setBack(v || null); app.applySettings?.(); }
       if (k === 'fin') cs.fin = cs.fin === v ? null : v;
       if (k === 'dress') { try { g.setDress(v, g.s.dress?.[v] === cs.fin ? null : cs.fin); } catch (err) { toast(esc(err.message), { kind: 'error' }); } }
@@ -115,7 +121,7 @@ export default function profile(app, root) {
       <section class="panel ornate profile-head bn-profile" data-act="custom">
         <div class="av-col"><button class="avatar-big pf pf-${s.frame}" data-act="custom" aria-label="Personnaliser ton profil">${av ? `<img alt="" src="${artUrl(av)}">` : EMBLEM}</button></div>
         <div class="ph-text">
-          <h1>${sync.profile?.pseudo ? `<span class="ph-name">${esc(sync.profile.pseudo)}</span>` /* v499 : connecté, le nom affiché est le pseudo en ligne (un seul nom) */ : `<button class="ph-name" data-act="rename">${esc(s.name || 'Ton nom')} <span class="small muted">${icon('edit')}</span></button>`}</h1>
+          <h1>${sync.profile?.pseudo ? `<span class="ph-name">${withPlate(s.plate, esc(sync.profile.pseudo))}</span>` /* v499 : connecté, le nom affiché est le pseudo en ligne (un seul nom) */ : `<button class="ph-name" data-act="rename">${withPlate(s.plate, esc(s.name || 'Ton nom'))} <span class="small muted">${icon('edit')}</span></button>`}</h1>
           <p class="ph-title">${esc(s.title)}</p>
           <p class="muted small">Niveau ${lv.level} · ${fmt(lv.into)} / ${fmt(lv.need)} XP</p>
           <span class="xpbar"><i style="width:${(lv.into / lv.need) * 100}%"></i></span>

@@ -1,6 +1,6 @@
 // v470 : ÉBAUCHE du pass de saison (« Le Codex de l'Abîme ») et de la boutique en argent réel (« L'Échoppe »).
 // Visible seulement en Mode Créateur (option « Codex et Échoppe ») ; les achats sont simulés (aucun paiement).
-import { CODEX, CODEX_XP, CODEX_XP_LABEL, tiersOf, seasonByKey, CODEX_FRAMES, CODEX_BACKS, FINISHES, SHOP, CATALOG, OBS, codexTier, tierProgress, claimable, freshCodex } from '../core/codex.js';
+import { CODEX, CODEX_XP, CODEX_XP_LABEL, tiersOf, seasonByKey, CODEX_FRAMES, CODEX_BACKS, FINISHES, PLATES, EMOTES, SHOP, CATALOG, OBS, codexTier, tierProgress, claimable, freshCodex } from '../core/codex.js';
 import { FRAMES } from '../config.js';
 import { CHESTS } from '../core/descent.js';
 import { icon, picon } from '../ui/icons.js';
@@ -9,6 +9,8 @@ import { cardHTML, enableTilt } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
 import { EMBLEM } from '../ui/icons.js';
 import { setScene } from '../ui/scene.js';
+import { emoteHTML, emotePic } from '../ui/vitrine.js'; /* v564 : plaques de pseudo et réactions en ligne */
+import { sync } from '../cloud/sync.js';
 
 const ALL_FRAMES = { ...FRAMES, ...CODEX_FRAMES };
 const PACK_NAME = { standard: 'booster standard', premium: 'booster premium' };
@@ -39,6 +41,7 @@ export default function codexScreen(app, root) {
 
   /* v533 : refonte visuelle du Codex et de l'Échoppe (demande du propriétaire : « ça ne donne pas envie »).
      Images Gemini attendues dans assets/ui/ (cx-saison1, cx-enlumine, ech-vitrine, obs-1..4, ech-fondateur) : sans elles, repli sur un dégradé. */
+  const myName = () => sync.profile?.pseudo || g.s.name || 'Toi'; /* v564 */
   const myAv = () => { const c = cat.get(g.shownAvatar()); return c ? `<img alt="" src="${artUrl(c, { lite: true })}">` : EMBLEM; };
   const opt = (src, cls = '') => `<img class="${cls}" alt="" src="${src}" onerror="this.remove()">`;
   /* rang d'un objet selon son prix (couleur de la tuile) */
@@ -95,15 +98,18 @@ export default function codexScreen(app, root) {
 
   function shopTab() {
     const have = g.obs();
-    const name = (it) => it.name || (it.kind === 'frame' ? ALL_FRAMES[it.id] : it.kind === 'finish' ? `Finition ${FINISHES[it.id].name}` : CODEX_BACKS[it.id]) || it.id;
+    const name = (it) => it.name || (it.kind === 'frame' ? ALL_FRAMES[it.id] : it.kind === 'finish' ? `Finition ${FINISHES[it.id].name}` : it.kind === 'plate' ? PLATES[it.id] : it.kind === 'emote' ? EMOTES[it.id].name : CODEX_BACKS[it.id]) || it.id;
     const pic = (it, big = false) => it.kind === 'frame' ? `<span class="${big ? 'avatar-big' : 'avatar-mini'} pf pf-${it.id}">${myAv()}</span>`
       : it.kind === 'back' ? `<img class="cx-bk" alt="" src="assets/backs/${it.id}.webp">`
       : it.kind === 'finish' ? (big ? cardHTML(g.bestCards(1)[0] || cat.get('ABY-039'), { dress: it.id }) : `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"><img alt="" src="assets/variants/${it.id}-frame.webp"></span>`)
+      : it.kind === 'plate' ? `<span class="np np-${it.id} np-demo">${esc(myName())}</span>`
+      : it.kind === 'emote' ? `<span class="re-tile">${emoteHTML(it.id)}</span>`
+      : it.give.emotes ? `<span class="re-fan">${it.give.emotes.slice(0, 4).map((k) => `<span class="re-pic">${emotePic(k)}</span>`).join('')}</span>`
       : `<span class="cx-fan">${it.give.backs.slice(0, 4).map((b) => `<img alt="" src="assets/backs/${b}.webp">`).join('')}</span>`;
     const tile = (it) => { const own = g.catalogOwned(it.id), cost = g.catalogCost(it.id), r = rank(it);
       return `<button class="cxs-t r-${r} ${it.kind} ${own ? 'own' : ''}" data-cx="see" data-id="${it.id}"><span class="cxs-pic">${pic(it)}</span><span class="cxs-rk">${RANK[r]}</span><b>${esc(name(it))}</b>
         ${own ? `<span class="cxs-own">${icon('check')}Possédé</span>` : `<span class="cxs-pr ${cost <= have ? '' : 'short'}">${obsTxt(cost)}</span>`}</button>`; };
-    const CATS = [['frame', 'Cadres'], ['back', 'Dos'], ['finish', 'Finitions'], ['bundle', 'Lots'], ['obs', OBS.name]];
+    const CATS = [['frame', 'Cadres'], ['plate', 'Plaques'], ['back', 'Dos'], ['finish', 'Finitions'], ['emote', 'Réactions'], ['bundle', 'Lots'], ['obs', OBS.name]];
     const cur = ui.cat || 'frame';
     const list = CATALOG.filter((x) => x.kind === cur).slice().sort((a, b) => (g.catalogOwned(a.id) - g.catalogOwned(b.id)) || (b.cost - a.cost));
     /* à la une : un bel objet par semaine (le même pour tous), pas encore possédé */
@@ -160,7 +166,7 @@ export default function codexScreen(app, root) {
     }
     if (!(await confirmBox(`Échanger <b>${fmt(cost)} obsidiennes</b> contre ${esc(label)} ?`, { ok: 'Confirmer' }))) return false;
     g.catalogBuy(it.id);
-    app.sfx.levelup?.(); toast(`${esc(label)} : acquis.${it?.kind === 'finish' ? ' Pose-la sur tes cartes dans Profil › Personnaliser.' : it ? ' Choisis-le dans Profil › Personnaliser.' : ''}`, { kind: 'success', icon: 'star' });
+    app.sfx.levelup?.(); toast(`${esc(label)} : acquis.${it?.kind === 'finish' ? ' Pose-la sur tes cartes dans Profil › Personnaliser.' : it?.kind === 'emote' || it?.give?.emotes ? ' Envoie-la pendant tes parties en ligne.' : it?.kind === 'plate' ? ' Choisis-la dans Profil › Personnaliser.' : it ? ' Choisis-le dans Profil › Personnaliser.' : ''}`, { kind: 'success', icon: 'star' });
     return true;
   }
 
@@ -171,7 +177,7 @@ export default function codexScreen(app, root) {
     const avImg = av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM;
     const mine = g.bestCards(6).filter(Boolean);
     let pick = 0, plain = false, bare = false, stopTilt = null;
-    const nm = it.name || ALL_FRAMES[it.id] || CODEX_BACKS[it.id] || (FINISHES[it.id] && `Finition ${FINISHES[it.id].name}`);
+    const nm = it.name || ALL_FRAMES[it.id] || CODEX_BACKS[it.id] || PLATES[it.id] || (EMOTES[it.id] && `${EMOTES[it.id].name} · « ${EMOTES[it.id].text} »`) || (FINISHES[it.id] && `Finition ${FINISHES[it.id].name}`);
     const body = () => {
       if (it.kind === 'frame') return `<p class="cx-pv-cap">Sur ton profil</p>
         <div class="cx-pv-prof"><span class="avatar-big pf pf-${it.id}">${avImg}</span><div><b>${esc(s.name || 'Ton nom')}</b><span>${esc(s.title)}</span></div></div>
@@ -198,6 +204,16 @@ export default function codexScreen(app, root) {
           <div class="cx-pvf-pick">${list.map((x, i) => `<button class="${i === pick % list.length ? 'on' : ''}" data-pv="pick" data-i="${i}" aria-label="${esc(x.name)}">${cardHTML(x, { dress: it.id })}</button>`).join('')}</div>` : ''}
           <p class="cx-pvf-note">Achetée une fois, la finition se pose sur autant de cartes que tu veux, depuis la fiche de chaque carte. Elle ne change rien à leurs valeurs.</p>`;
       }
+      if (it.kind === 'plate') return `<p class="cx-pv-cap">Sur ton profil</p>
+        <div class="cx-pv-prof"><span class="avatar-big pf pf-${s.frame}">${avImg}</span><div><b><span class="np np-${it.id}">${esc(myName())}</span></b><span>${esc(s.title)}</span></div></div>
+        <p class="cx-pv-cap">Au classement, vu par tous les joueurs</p>
+        <div class="lb-row cx-pv-lb"><span class="lb-rank">1</span><span class="lb-av pf pf-${s.frame}">${avImg}</span><span class="lb-name"><b><span class="np np-${it.id}">${esc(myName())}</span></b><span class="small muted">${esc(s.title)}</span></span><span class="lb-floor">412 pts</span></div>
+        <p class="cx-pv-cap">Pendant une partie en ligne, chez ton adversaire</p>
+        <div class="cx-pv-seat"><span class="sc-med">${avImg}</span><b><span class="np np-${it.id}">${esc(myName())}</span></b></div>`;
+      if (it.kind === 'emote') return `<p class="cx-pv-cap">Pendant une partie en ligne, ton adversaire voit</p>
+        <div class="re-bubble demo on">${emoteHTML(it.id)}<small>${esc(myName())}</small></div>
+        <p class="cx-pv-cap">Les réactions s'envoient avec la bulle à droite de l'écran de jeu, une toutes les 3 secondes. Ton adversaire peut les masquer.</p>`;
+      if (it.give?.emotes) return `<p class="cx-pv-cap">Les huit réactions du lot</p><div class="re-grid">${it.give.emotes.map((k) => `<span class="re-pick">${emoteHTML(k)}</span>`).join('')}</div>`;
       return `<p class="cx-pv-cap">Les sept dos du lot</p><div class="cx-pv-grid">${it.give.backs.map((b) => `<figure><img alt="" src="assets/backs/${b}.webp"><figcaption>${esc((CODEX_BACKS[b] || b).replace('Dos du royaume ', ''))}</figcaption></figure>`).join('')}</div>`;
     };
     const foot = () => { const own = g.catalogOwned(it.id), cost = g.catalogCost(it.id);

@@ -15,7 +15,10 @@ const emit = () => listeners.forEach((f) => f(sync));
 
 function profilePayload() {
   const g = app.game, s = g.s;
-  return { avatar: g.shownAvatar(), title: s.title, level: g.levelInfo().level, owned: g.uniqueCount() };
+  const p = { avatar: g.shownAvatar(), title: s.title, level: g.levelInfo().level, owned: g.uniqueCount() };
+  /* v564 : cadre et plaque vus par les autres, seulement quand le serveur les connaît (supabase/15-vitrine.sql collé) */
+  if (sync.profile && 'plate' in sync.profile) Object.assign(p, { frame: s.frame || null, plate: s.plate || null });
+  return p;
 }
 
 // Date (côté serveur) de la dernière sauvegarde en ligne connue de cet appareil.

@@ -17,6 +17,7 @@ import { tuto } from '../ui/tutos.js';
 import { runDuel } from './duel-ui.js';
 import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
+import { withPlate, frameCls } from '../ui/vitrine.js'; /* v564 */
 
 const DOOR = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss' }; /* v454 : l'Épreuve III sans gardien (élite de repli) prend sa propre porte (v456 : sablier, `door-epreuve`) : jamais deux portes pareilles */
 
@@ -74,7 +75,7 @@ export default function trials(app, root) {
       box.classList.remove('muted');
       box.innerHTML = (rows.length ? rows.map((r, i) => {
         const hid = isBlocked(r.user_id), av = !hid && r.profiles?.avatar && cat.get(r.profiles.avatar);
-        return `<div class="lb-row ${r.user_id === me ? 'me' : ''}"${rowAttrs(r.user_id, r.profiles?.pseudo, me)}><span class="lb-rank">${i + 1}</span><span class="lb-av">${av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM}</span><span class="lb-name"><b>${esc(shownName(r.user_id, r.profiles?.pseudo))}${hid ? '' : cloud.badgeHTML(r.profiles?.badge)}${!hid && r.profiles?.title === 'Vainqueur de l’Abysse' ? '<span class="pbadge pb-abysse">Fond de l’Abysse</span>' : ''}</b><span class="small muted">${hid ? '' : esc(r.profiles?.title || '')}</span></span><span class="lb-floor">${fmt(r.floor)} pts</span></div>`;
+        return `<div class="lb-row ${r.user_id === me ? 'me' : ''}"${rowAttrs(r.user_id, r.profiles?.pseudo, me)}><span class="lb-rank">${i + 1}</span><span class="lb-av ${hid ? '' : frameCls(r.profiles?.frame)}">${av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM}</span><span class="lb-name"><b>${withPlate(hid ? null : r.profiles?.plate, esc(shownName(r.user_id, r.profiles?.pseudo)))}${hid ? '' : cloud.badgeHTML(r.profiles?.badge)}${!hid && r.profiles?.title === 'Vainqueur de l’Abysse' ? '<span class="pbadge pb-abysse">Fond de l’Abysse</span>' : ''}</b><span class="small muted">${hid ? '' : esc(r.profiles?.title || '')}</span></span><span class="lb-floor">${fmt(r.floor)} pts</span></div>`;
       }).join('') : '<p class="small muted center">Personne n’a encore joué aujourd’hui. À toi d’ouvrir la voie !</p>')
         + (!sync.profile?.pseudo ? '<p class="small acc-warn"><a href="#/compte">Choisis un pseudo</a> pour apparaître au classement.</p>' : !rows.some((r) => r.user_id === me) && mine ? `<p class="small muted">Ton score aujourd’hui : ${mine} points.</p>` : '');
       bindReport(box, () => loadBoard(box));

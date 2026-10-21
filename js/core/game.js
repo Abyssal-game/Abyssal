@@ -13,7 +13,7 @@ export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par c
 import { FINAL_FLOOR, BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, SUBLIME_ASH, VARIANTS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
-import { CODEX, CODEX_XP, SHOP, CATALOG, codexTier, seasonFor, tiersOf, freshCodex, pendingOf } from './codex.js';
+import { CODEX, CODEX_XP, SHOP, CATALOG, FREE_EMOTES, codexTier, seasonFor, tiersOf, freshCodex, pendingOf } from './codex.js';
 import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, lateSoft, bossEase, earlyHp, expectedLevel, cardPower, powerFor, advisedPower, floorForPower, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative, act as duelActRaw, useUlt, beginEnemyTurn, nextEnemy, takeSkips, enemyAct, endEnemyTurn, RHYTHM } from './duel.js';
 import { bossOf, BOSSES, BOSS_ORDER } from './bosses.js';
@@ -1866,6 +1866,8 @@ export class Game {
     if (k) d[id] = k; else delete d[id];
     this.persist();
   }
+  setPlate(k) { if (!k || (this.s.plates || []).includes(k)) { this.s.plate = k || null; this.persist(); } } /* v564 : plaque de pseudo, null = aucune */
+  emotesOwned() { return [...FREE_EMOTES, ...(this.s.emotes || [])]; } /* v564 : réactions en ligne (les 4 premières sont à tous) */
   setBack(k) { if (!k || (this.s.backs || []).includes(k)) { this.s.back = k || null; this.persist(); } } /* v473 : null = dos par défaut */
   setName(n) { this.s.name = String(n || '').replace(/[<>]/g, '').trim().slice(0, 16); this.persist(); }
   setAvatar(id) { if (this.owns(id)) { this.s.avatar = id; this.persist(); } }
@@ -1888,6 +1890,8 @@ export class Game {
     if (reward.back && !(this.s.backs ||= []).includes(reward.back)) this.s.backs.push(reward.back);
     for (const b of reward.backs || []) if (!(this.s.backs ||= []).includes(b)) this.s.backs.push(b);
     if (reward.finish && !(this.s.finishes ||= []).includes(reward.finish)) this.s.finishes.push(reward.finish); /* v482 */
+    if (reward.plate && !(this.s.plates ||= []).includes(reward.plate)) this.s.plates.push(reward.plate); /* v564 */
+    for (const e of [reward.emote, ...(reward.emotes || [])]) if (e && !(this.s.emotes ||= []).includes(e)) this.s.emotes.push(e);
     if (reward.codexPremium) this.codex().premium = true; /* v548 : Codex enluminé acheté (4,99 €) */
     if (reward.obs) this.s.obs = (this.s.obs || 0) + reward.obs; /* v474 : obsidiennes (achetées en euros) */
     if (reward.chests) this.addChests(reward.chests);
@@ -1960,13 +1964,15 @@ export class Game {
   catalogOwned(id) {
     const it = CATALOG.find((x) => x.id === id); if (!it) return false;
     const g = it.give;
-    return (!g.frame || this.s.frames.includes(g.frame)) && (!g.finish || (this.s.finishes || []).includes(g.finish)) && (!g.back || (this.s.backs || []).includes(g.back)) && (g.backs || []).every((b) => (this.s.backs || []).includes(b));
+    return (!g.frame || this.s.frames.includes(g.frame)) && (!g.plate || (this.s.plates || []).includes(g.plate)) && (!g.emote || (this.s.emotes || []).includes(g.emote))
+      && (g.emotes || []).every((e) => (this.s.emotes || []).includes(e)) && (!g.finish || (this.s.finishes || []).includes(g.finish)) && (!g.back || (this.s.backs || []).includes(g.back)) && (g.backs || []).every((b) => (this.s.backs || []).includes(b));
   }
   catalogCost(id) { /* un lot ne fait pas payer ce qu'on a déjà : on retire le prix des dos déjà possédés, jamais sous 0 */
     const it = CATALOG.find((x) => x.id === id); if (!it) return 0;
     if (it.kind !== 'bundle') return it.cost;
-    const have = (it.give.backs || []).filter((b) => (this.s.backs || []).includes(b)).length;
-    return Math.max(0, Math.round(it.cost * (1 - have / it.give.backs.length)));
+    const list = it.give.backs || it.give.emotes || [], mine = it.give.backs ? this.s.backs || [] : this.s.emotes || []; /* v564 : lot de réactions */
+    const have = list.filter((b) => mine.includes(b)).length;
+    return Math.max(0, Math.round(it.cost * (1 - have / list.length)));
   }
   catalogBuy(id) {
     const it = CATALOG.find((x) => x.id === id);

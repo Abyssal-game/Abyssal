@@ -209,6 +209,7 @@ export async function versusClaim(id) { return authed('/rest/v1/rpc/versus_claim
 const rpc = (fn, body = {}) => authed(`/rest/v1/rpc/${fn}`, { method: 'POST', body });
 export const mpList = async (game) => (await rpc('mp_list', { p_game: game })) || [];
 export const mpGet = (id) => rpc('mp_get', { p_id: id });
+export const mpEmote = (id, key) => rpc('mp_emote', { p_id: id, p_key: key }); /* v564 : réaction en ligne */
 export const mpLeave = (id) => rpc('mp_leave', { p_id: id });
 export const mpCancel = (id) => rpc('mp_cancel', { p_id: id }); /* v527 : annule seulement une partie encore en attente */
 export const mpClaim = (id) => rpc('mp_claim', { p_id: id });
@@ -243,8 +244,14 @@ export async function trialWin(day, idx, hp) {
 export async function submitScore(day, floor, cursed) {
   await authed('/rest/v1/rpc/submit_score', { method: 'POST', body: { p_day: day, p_floor: floor, p_cursed: !!cursed } });
 }
+/* v564 : cadre et plaque des autres joueurs (colonnes de 15-vitrine.sql) ; sans elles, la lecture reprend sans */
+let cosmCols = true;
+async function withCosm(url) {
+  if (cosmCols) { try { return await authed(url(',frame,plate')); } catch (e) { if (!/frame|plate|column|42703/i.test(String(e?.message || e))) throw e; cosmCols = false; } }
+  return authed(url(''));
+}
 export async function leaderboard(day, limit = 20) {
-  return authed(`/rest/v1/descent_scores?day=eq.${day}&select=floor,cursed,user_id,profiles(pseudo,avatar,title,badge)&order=floor.desc,updated_at.asc&limit=${limit}`);
+  return withCosm((x) => `/rest/v1/descent_scores?day=eq.${day}&select=floor,cursed,user_id,profiles(pseudo,avatar,title,badge${x})&order=floor.desc,updated_at.asc&limit=${limit}`);
 }
 
 // Tirage des Ombres : le serveur tire le booster du jour et tient le classement de la semaine
@@ -255,7 +262,7 @@ export async function shadowMine(day) {
   return rows?.[0] || null;
 }
 export async function shadowDay(day, limit = 10) {
-  return authed(`/rest/v1/shadow_draws?day=eq.${day}&select=score,faction,user_id,created_at,profiles(pseudo,avatar,badge)&order=score.desc,created_at.asc&limit=${limit}`);
+  return withCosm((x) => `/rest/v1/shadow_draws?day=eq.${day}&select=score,faction,user_id,created_at,profiles(pseudo,avatar,badge${x})&order=score.desc,created_at.asc&limit=${limit}`);
 }
 export async function shadowWeek(week, limit = 10) { return authed('/rest/v1/rpc/shadow_week', { method: 'POST', body: { p_week: week, p_limit: limit } }); }
 export async function shadowClaim(week) { return authed('/rest/v1/rpc/shadow_claim', { method: 'POST', body: { p_week: week } }); }

@@ -44,7 +44,7 @@ export function createCryptesMp(app, root, { modeBar }) {
     const tags = [s.grace?.[x] ? `<span class="pa-tag ok">${icon('shield')}Grâce : ${s.grace[x] > 1 ? `${s.grace[x]} erreurs pardonnées` : 'prochaine erreur pardonnée'}</span>` : '', s.block?.[x] ? '<span class="pa-tag bad">Prochain pouvoir bloqué</span>' : '', s.bonus?.[x] ? `<span class="pa-tag gold">+${s.bonus[x]} bonus</span>` : ''].join('');
     return `<div class="pa-seat cr-seat s-${mine ? 'p' : 'a'} ${s.turn === x && v.status === 'playing' ? 'on' : ''}">
       <span class="sc-med ${mine ? 'mq-me' : ''}">${mine ? myPic() : ctx.avatar(v.foe?.avatar)}</span>
-      <span class="pa-sc"><b>${mine ? 'Toi' : esc(ctx.foeName(v))}</b><span class="cr-won">${(s.pairs?.[x] || []).map((k) => { const f = fOfK(s, k); return f ? `<i style="--fc:${cat.faction[f].colors.secondary}">${sigil(f)}</i>` : ''; }).join('') || '<small class="muted">aucune paire</small>'}${tags}</span></span>
+      <span class="pa-sc"><b>${ctx.plate(v, mine, mine ? 'Toi' : esc(ctx.foeName(v)))}</b><span class="cr-won">${(s.pairs?.[x] || []).map((k) => { const f = fOfK(s, k); return f ? `<i style="--fc:${cat.faction[f].colors.secondary}">${sigil(f)}</i>` : ''; }).join('') || '<small class="muted">aucune paire</small>'}${tags}</span></span>
       <span class="pa-pts"><b>${n}</b><small>point${n > 1 ? 's' : ''}</small></span></div>`;
   }
   function grid(v, s, ctx) {

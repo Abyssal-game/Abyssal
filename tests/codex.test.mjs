@@ -38,7 +38,7 @@ test('codex : voie gratuite récupérable, voie enluminée fermée sans achat', 
 test('codex : la voie enluminée ne donne jamais de puissance (ni éclats, cendres, coffres ou tickets)', () => {
   for (const t of CODEX_TIERS) if (t.prem) for (const k of ['shards', 'ash', 'chests', 'tickets']) assert.equal(t.prem[k], undefined, `palier ${t.tier}`);
   for (const it of [...SHOP, ...CATALOG]) if (it.give) for (const k of ['shards', 'ash', 'chests', 'tickets']) assert.equal(it.give[k], undefined, it.id);
-  for (const it of CATALOG) assert.ok(['frame', 'back', 'bundle', 'finish'].includes(it.kind) && !it.give.obs && !it.give.title, it.id);
+  for (const it of CATALOG) assert.ok(['frame', 'back', 'bundle', 'finish', 'plate', 'emote'].includes(it.kind) && !it.give.obs && !it.give.title, it.id);
   for (const k of CODEX_ONLY) assert.ok(!CATALOG.some((it) => it.id === k), `${k} reste exclusif au Codex`);
 });
 
@@ -144,4 +144,15 @@ test('codex v550 : trois saisons d’un mois, les récompenses oubliées sont do
   assert.equal(c.season, 's2-noel'); assert.equal(c.xp, 0); assert.ok(!c.premium, 'le Codex enluminé se rachète à chaque saison');
   assert.ok(g.s.shards > shards, 'éclats des paliers gratuits donnés'); assert.ok((g.s.backs || []).length > frames, 'dos du palier 6 donné');
   assert.equal(g.s.codexPast.season, 's1-ames');
+});
+
+test('v564 : plaques de pseudo et réactions en ligne (achat, choix, lot qui ne fait pas payer ce qu’on a)', () => {
+  const g = mk(); g.s.settings.dev = true; g.s.devCodex = true; g.s.obs = 5000;
+  assert.equal(g.emotesOwned().length, 4, 'quatre réactions offertes à tous');
+  g.setPlate('pl-braise'); assert.equal(g.s.plate || null, null, 'pas de plaque sans l’avoir achetée');
+  g.catalogBuy('pl-braise'); g.setPlate('pl-braise'); assert.equal(g.s.plate, 'pl-braise');
+  g.catalogBuy('re-mammon'); assert.ok(g.emotesOwned().includes('re-mammon'));
+  assert.equal(g.catalogCost('arbitres'), 525, 'le lot retire la réaction déjà achetée');
+  g.catalogBuy('arbitres'); assert.equal(g.emotesOwned().length, 12);
+  g.setPlate(null); assert.equal(g.s.plate, null);
 });

@@ -18,6 +18,8 @@ import { setScene } from '../ui/scene.js';
 import { checkTurns } from '../cloud/mpwatch.js';
 import { profileAttrs } from '../ui/report.js';
 import { t } from '../i18n.js';
+import { withPlate, frameCls, emoteHTML, showEmote } from '../ui/vitrine.js'; /* v564 */
+const BUBBLE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H10l-4 3.5V16H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="8.5" cy="10.5" r="1.2" fill="currentColor"/><circle cx="12" cy="10.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="10.5" r="1.2" fill="currentColor"/></svg>';
 
 export const MP_OFF = 'Les parties contre d’autres joueurs ne sont pas encore ouvertes sur le serveur.';
 export const MP_RES = { win: 'Victoire', lose: 'Défaite', draw: 'Égalité' };
@@ -130,7 +132,7 @@ export function createMpLobby(app, root, spec) {
       const rows = (await cloud.mpRanking(spec.game, 20)) || [];
       const me = cloud.currentUser()?.id;
       box.classList.remove('muted');
-      box.innerHTML = rows.length ? rows.map((r, i) => `<div class="lb-row ${r.user_id === me ? 'me' : ''}"${r.user_id === me ? '' : profileAttrs(r.user_id)}><span class="lb-rank">${i + 1}</span><span class="lb-av">${avatar(r.avatar)}</span><span class="lb-name"><b>${esc(isBlocked(r.user_id) ? 'Joueur masqué' : r.pseudo || 'Joueur')}</b><span class="small muted">${r.games} partie${r.games > 1 ? 's' : ''}</span></span><span class="lb-floor">${r.wins}</span></div>`).join('') : '<p class="small muted">Pas encore de victoire ce mois-ci. À toi !</p>';
+      box.innerHTML = rows.length ? rows.map((r, i) => `<div class="lb-row ${r.user_id === me ? 'me' : ''}"${r.user_id === me ? '' : profileAttrs(r.user_id)}><span class="lb-rank">${i + 1}</span><span class="lb-av ${isBlocked(r.user_id) ? '' : frameCls(r.frame)}">${avatar(r.avatar)}</span><span class="lb-name"><b>${isBlocked(r.user_id) ? 'Joueur masqué' : withPlate(r.plate, esc(r.pseudo || 'Joueur'))}</b><span class="small muted">${r.games} partie${r.games > 1 ? 's' : ''}</span></span><span class="lb-floor">${r.wins}</span></div>`).join('') : '<p class="small muted">Pas encore de victoire ce mois-ci. À toi !</p>';
     } catch (e) { box.textContent = errMsg(e); }
   }
 
@@ -141,6 +143,7 @@ export function createMpLobby(app, root, spec) {
     if (!alive || ui.open !== id) return;
     if (!view) return lobby();
     if (view.now) skew = new Date(view.now).getTime() - Date.now();
+    ui.foeEmote = view.emotes?.[view.me === 'a' ? 'b' : 'a']?.at || null; /* v564 : une réaction déjà passée ne se rejoue pas */
     draw();
     watch();
   }
@@ -151,11 +154,12 @@ export function createMpLobby(app, root, spec) {
     if (view?.status === 'playing' && view.pace === 'fast') {
       // v522 : partie rapide : compte à rebours à l'écran, l'adversaire regardé toutes les 1,5 s
       clock = setInterval(tick, 250); tick();
-      if (myTurn(view) && view.turn !== 'ab') return schedule(() => refresh(), Math.max(1500, msLeft(view) + 3500)); /* 'ab' : on suit aussi la mise de l'adversaire */
+      if (myTurn(view) && view.turn !== 'ab' && !(ui.talk > Date.now())) return schedule(() => refresh(), Math.max(1500, msLeft(view) + 3500)); /* 'ab' : on suit aussi la mise de l'adversaire */
       return schedule(() => refresh(), 1500);
     }
-    if (!view || view.status !== 'playing' || myTurn(view)) { stopPoll(); if (view?.status === 'playing') schedule(() => refresh(), 30000); return; }
-    schedule(() => refresh(), 8000);
+    const talk = ui.talk > Date.now(); /* v564 : pendant un échange de réactions, on regarde toutes les 3 s */
+    if (!view || view.status !== 'playing' || myTurn(view)) { stopPoll(); if (view?.status === 'playing' || (talk && view)) schedule(() => refresh(), talk ? 3000 : 30000); return; }
+    schedule(() => refresh(), talk ? 3000 : 8000);
   }
   function tick() {
     const el = root.querySelector('.mp-clock'); if (!el || !view) return;
@@ -173,6 +177,7 @@ export function createMpLobby(app, root, spec) {
     if (g0 !== gen) return watch(); /* v527 : un coup joué pendant la relecture : sa vue est plus récente */
     const prev = view;
     view = v;
+    seeEmote(v);
     if (prev && spec.moveKey(prev) !== spec.moveKey(v) && spec.updated) { busy = true; try { await spec.updated(prev, v, ctx); } finally { busy = false; } if (!alive || ui.open !== v.id) return; }
     draw(prev && spec.moveKey(prev) !== spec.moveKey(v) ? v.state?.last : null);
     watch();
@@ -181,6 +186,7 @@ export function createMpLobby(app, root, spec) {
     if (!alive) return;
     if (!view) return lobby();
     spec.drawGame(view, ctx, last);
+    emoteBtn();
     if (view.status === 'done' && !view.claimed) claimOne(view);
   }
   async function claimOne(v) {
@@ -194,8 +200,41 @@ export function createMpLobby(app, root, spec) {
     try { v = await fn(); } catch (e) { app.sfx.error(); toast(esc(errMsg(e)), { kind: 'error' }); busy = false; refresh(); return null; }
     busy = false;
     if (!alive) return null; /* v527 : l'écran a été quitté pendant l'envoi */
-    if (v) view = v;
+    if (v) { view = v; seeEmote(v); }
     return v;
+  }
+  // v564 : réactions en ligne
+  function seeEmote(v) {
+    const e = v?.emotes?.[v.me === 'a' ? 'b' : 'a'];
+    if (!e?.at || e.at === ui.foeEmote) return;
+    const fresh = ui.foeEmote !== undefined;
+    ui.foeEmote = e.at;
+    if (fresh && !g.s.settings.reMute && !isBlocked(v.foe?.id)) { showEmote(e.k, 'foe', foeName(v), app.sfx.sheet); ui.talk = Date.now() + 30000; }
+  }
+  const emoteOpen = (v) => v && (v.status === 'playing' || (v.status === 'done' && Date.now() + skew - new Date(v.updated_at).getTime() < 9 * 60000));
+  function emoteBtn() {
+    if (!emoteOpen(view) || root.querySelector('.re-btn')) return;
+    const bar = root.querySelector('.mq-bar'), back = bar?.lastElementChild;
+    if (back) { /* Pacte, Cryptes, Enchères : dans la barre du haut, à côté du retour (au milieu, il cacherait des cartes) */
+      const box = document.createElement('span'); box.className = 're-barbox';
+      back.replaceWith(box); box.insertAdjacentHTML('beforeend', `<button class="btn small ghost re-btn in-bar" data-mp="emote" aria-label="Réactions">${BUBBLE}</button>`); box.append(back);
+      return;
+    }
+    root.insertAdjacentHTML('beforeend', `<button class="re-btn" data-mp="emote" aria-label="Réactions">${BUBBLE}</button>`);
+  }
+  function pickEmote() {
+    const id = ui.open, mute = !!g.s.settings.reMute;
+    const sh = openSheet(`<h2>Réactions</h2><p class="small muted">Ton adversaire la voit tout de suite.</p>
+      <div class="re-grid">${g.emotesOwned().map((k) => `<button class="re-pick" data-re="${k}">${emoteHTML(k)}</button>`).join('')}</div>
+      ${g.codexOn() ? '<p class="small muted">D’autres réactions t’attendent à l’Échoppe.</p>' : ''}
+      <button class="btn ghost block small" data-re-mute>${mute ? 'Montrer les réactions de l’adversaire' : 'Masquer les réactions de l’adversaire'}</button>`, { cls: 'sheet-small', label: 'Réactions' });
+    sh.body.addEventListener('click', async (e) => {
+      if (e.target.closest('[data-re-mute]')) { g.setSetting('reMute', !mute); sh.close(); toast(mute ? 'Réactions de l’adversaire visibles.' : 'Réactions de l’adversaire masquées.'); return; }
+      const b = e.target.closest('[data-re]'); if (!b) return;
+      sh.close();
+      try { await cloud.mpEmote(id, b.dataset.re); showEmote(b.dataset.re, 'me', null, app.sfx.sheet); ui.talk = Date.now() + 30000; if (ui.open === id) watch(); }
+      catch (err) { app.sfx.error?.(); toast(esc(err.status === 404 ? 'Les réactions ne sont pas encore ouvertes sur le serveur.' : errMsg(err)), { kind: 'error' }); }
+    });
   }
   async function quick(pace = 'slow') {
     if (busy) return;
@@ -243,6 +282,7 @@ export function createMpLobby(app, root, spec) {
     get view() { return view; }, set view(v) { view = v; },
     get busy() { return busy; },
     get alive() { return alive; },
+    plate: (v, mine, html) => withPlate(mine ? g.s.plate : v.foe?.plate, html), /* v564 : nom posé sur sa plaque */
     draw, watch, refresh, act, lobby,
     // barre de compte à rebours d'une partie rapide
     clockHTML: (v) => (v.status === 'playing' && v.pace === 'fast' ? `<div class="mp-clock ${myTurn(v) ? 'mine' : ''}"><span class="mp-clock-bar"></span><span class="mp-clock-t">${myTurn(v) ? 'À toi' : `<span translate="no">${esc(foeName(v))}</span>`} · <b>${left(v)}</b></span></div>` : ''),
@@ -258,6 +298,7 @@ export function createMpLobby(app, root, spec) {
     const k = b.dataset.mp;
     if (k === 'open') return open(b.dataset.id);
     if (k === 'back') { stopPoll(); return lobby(); }
+    if (k === 'emote') return pickEmote();
     if (k === 'quick') return quick(b.dataset.pace || 'slow');
     if (k === 'friend') return friend();
     if (k === 'rematch') return rematch();
