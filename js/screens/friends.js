@@ -2,7 +2,7 @@
 // (collection, succès, statistiques). Serveur : supabase/07-amis.sql. Fiche publiée par sync.js (js/core/friends.js).
 import * as cloud from '../cloud/cloud.js';
 import { sync, refreshProfile } from '../cloud/sync.js';
-import { cardEntry } from '../core/friends.js';
+import { cardEntry, cleanCard } from '../core/friends.js';
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, EMBLEM } from '../ui/icons.js';
@@ -86,7 +86,7 @@ export default function friends(app, root, params = []) {
     if (!alive) return;
     if (!f) { root.innerHTML = `${head('Profil d’un joueur')}<p class="panel small center">Ce joueur est introuvable.</p>`; return; }
     const masked = isBlocked(id), name = masked ? MASKED_NAME : f.pseudo || 'Joueur';
-    const d = f.data, partial = !!d?.partial;
+    const d = cleanCard(f.data), partial = !!d?.partial;
     if (!d) {
       root.innerHTML = `<section class="panel ornate profile-head bn-profile fr-head"><div class="av-col"><span class="avatar-big pf pf-fer">${pic(f.avatar)}</span></div>
         <div class="ph-text"><h1><span class="ph-name">${esc(name)}</span></h1><p class="ph-title">${esc(f.title || '')}</p><p class="muted small">Niveau ${f.level || 1}</p></div></section>

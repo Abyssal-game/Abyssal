@@ -19,7 +19,7 @@ export function createSceauxMp(app, root, { scCard, modeBar }) {
   function local(v) {
     const me = v.me, s = v.state, mine = (o) => (o === me ? 'p' : 'o');
     return { rule: s.rule, board: s.board.map((c) => (c ? { id: c.id, owner: mine(c.o), vals: c.v, guard: c.g } : null)), hands: { p: s.hands[me].slice(), o: s.hands[me === 'a' ? 'b' : 'a'].slice() },
-      turn: 'p', placed: s.placed, cells: s.cells || {}, over: null, last: null, log: [], fac: {} };
+      turn: 'p', placed: s.placed, cells: s.cells || {}, over: null, last: null, log: [], fac: {}, noPerks: s.perks === false };
   }
   function drawGame(v, ctx, last) {
     if (!ctx.alive) return;
@@ -35,6 +35,7 @@ export function createSceauxMp(app, root, { scCard, modeBar }) {
     const mt = myTurn(v) && !ctx.busy;
     const loc = local(v);
     const flipped = new Set(last?.flips || []);
+    const pk = s.perks !== false; /* v538 : en ligne, plus de pouvoirs de rareté (les parties plus anciennes les gardent) */
     const preview = (i) => {
       if (ui.sel == null || !mt || s.board[i]) return '';
       try { const t = JSON.parse(JSON.stringify(loc)); SC.place(cat, t, 'p', ui.sel, i); const n = t.log.at(-1)?.flips.length || 0; return n ? `<i class="sc-pv">+${n}</i>` : ''; } catch (e) { return ''; }
@@ -42,7 +43,7 @@ export function createSceauxMp(app, root, { scCard, modeBar }) {
     const rs = (i) => `${i === s.cells?.blessed ? '<span class="sc-rs bless"></span><span class="sc-tag bless">+1</span>' : ''}${i === s.cells?.cursed ? '<span class="sc-rs curse"></span><span class="sc-tag curse">−1</span>' : ''}`;
     const cell = (c, i) => (!c
       ? `<button class="sc-cell ${i === SC.CENTER ? 'heart' : ''} ${ui.sel != null && mt ? 'can' : ''}" data-mp="cell" data-i="${i}" aria-label="Case ${i + 1}">${rs(i)}${preview(i)}</button>`
-      : `<div class="sc-cell full ${i === SC.CENTER ? 'heart' : ''} ${last?.cell === i ? 'drop' : ''} ${flipped.has(i) ? 'mp-flip' : ''}" data-i="${i}">${scCard(cat, c.id, { vals: c.v, owner: c.o === me ? 'p' : 'o', back: true, guard: c.g })}${rs(i)}</div>`);
+      : `<div class="sc-cell full ${i === SC.CENTER ? 'heart' : ''} ${last?.cell === i ? 'drop' : ''} ${flipped.has(i) ? 'mp-flip' : ''}" data-i="${i}">${scCard(cat, c.id, { vals: c.v, owner: c.o === me ? 'p' : 'o', back: true, guard: c.g, perks: pk })}${rs(i)}</div>`);
     const over = v.status === 'done';
     const msg = over ? '' : mt ? (ui.sel == null ? (v.pace === 'fast' ? 'À toi de jouer : touche une de tes cartes, puis une case libre.' : `À toi de jouer : touche une de tes cartes, puis une case libre. Il te reste <b>${left(v)}</b>.`) : 'Touche une case libre pour poser la carte.')
       : ctx.waitMsg(v);
@@ -50,13 +51,13 @@ export function createSceauxMp(app, root, { scCard, modeBar }) {
       <div class="sc-bar"><span class="sc-who ${!over && !myTurn(v) ? 'on' : ''}"><span class="sc-med">${avatar(v.foe?.avatar)}</span><span><b>${esc(foeName(v))}</b><small>Contre un joueur</small></span></span>
         <span class="sc-score" aria-label="Score : toi ${score.p}, adversaire ${score.o}"><b class="p">${score.p}</b><i>·</i><b class="o">${score.o}</b></span>
         <button class="btn small ghost" data-mp="back" aria-label="Revenir à la liste">${icon('close')}</button></div>
-      <div class="sc-sub"><span class="sc-ohand open">${s.hands[foe].map((id) => scCard(cat, id, { owner: 'o', cls: 'sc-mini' })).join('')}</span>
+      <div class="sc-sub"><span class="sc-ohand open">${s.hands[foe].map((id) => scCard(cat, id, { owner: 'o', cls: 'sc-mini', perks: pk })).join('')}</span>
         <button class="sc-rule" data-mp="rule">${RULE_MED[s.rule] ? `<img class="sc-ricon" alt="" src="assets/icons/${RULE_MED[s.rule]}.webp">` : icon('p:rule')}${esc(SC.RULES[s.rule]?.name || '')}</button></div>
       <div class="sc-bwrap"><div class="sc-board"><div class="sc-plate">${s.board.map(cell).join('')}</div></div></div>
       ${!over ? ctx.clockHTML(v) : ''}
       <p class="sc-msg">${msg}</p>
       ${over ? ctx.endHTML(v, s.final ? `${s.final[me]} cartes contre ${s.final[foe]}.` : '')
-        : `<div class="sc-tray ${mt ? 'on' : ''}"><div class="sc-hand-row">${s.hands[me].map((id, k) => `<button class="sc-hc ${ui.sel === k ? 'sel' : ''}" data-mp="pick" data-k="${k}" ${mt ? '' : 'disabled'}>${ui.sel === k ? '<span class="sc-halo"></span>' : ''}${scCard(cat, id, { owner: 'p' })}</button>`).join('')}</div>
+        : `<div class="sc-tray ${mt ? 'on' : ''}"><div class="sc-hand-row">${s.hands[me].map((id, k) => `<button class="sc-hc ${ui.sel === k ? 'sel' : ''}" data-mp="pick" data-k="${k}" ${mt ? '' : 'disabled'}>${ui.sel === k ? '<span class="sc-halo"></span>' : ''}${scCard(cat, id, { owner: 'p', perks: pk })}</button>`).join('')}</div>
         <button class="btn small ghost mp-resign" data-mp="resign">${icon('p:danger')}Abandonner</button></div>`}
     </div>`;
   }
@@ -73,8 +74,9 @@ export function createSceauxMp(app, root, { scCard, modeBar }) {
   return createMpLobby(app, root, {
     game: 'sceaux', modeBar,
     note: 'Choisis ta vitesse. Si tu ne joues pas ton coup à temps, <b>la partie est perdue</b>. La règle est tirée au hasard.',
-    intro: () => `<div class="sc-row mp-hand">${g.sceauxHand().map((id) => scCard(cat, id, { owner: 'p', cls: 'sc-mini' })).join('')}</div>
-        <p class="small muted center">Ta main (elle se compose dans « Contre l’Abysse »).</p>`,
+    intro: () => `<div class="sc-row mp-hand">${g.sceauxHand().map((id) => scCard(cat, id, { owner: 'p', cls: 'sc-mini', perks: false })).join('')}</div>
+        <p class="small muted center">Ta main (elle se compose dans « Contre l’Abysse »).</p>
+        <p class="small muted center">En ligne, les pouvoirs de rareté (Inviolable, Ardeur) ne jouent pas : toutes les cartes se valent, seul ton jeu compte.</p>`,
     create: (pace, to) => cloud.sceauxMpNew(g.sceauxHand(), to, pace),
     join: (id) => cloud.sceauxMpJoin(id, g.sceauxHand()),
     sub: (v) => (v.state?.rule ? `Règle « ${esc(SC.RULES[v.state.rule]?.name || '')} »` : ''),

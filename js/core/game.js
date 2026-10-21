@@ -932,6 +932,7 @@ export class Game {
       if (!this.sceauxDailyOpen()) throw new Error('Le défi du jour s’ouvre après ta première victoire contre Ilda.');
       const d = this.sceauxDaily();
       if (sc.dailyDone === today(this.clock())) throw new Error('Défi du jour déjà relevé. Reviens demain !');
+      if (sc.dailyTried === today(this.clock())) throw new Error('Tu as déjà tenté le défi du jour. Nouveau défi demain !'); /* v538 : un seul essai (le défi est le même toute la journée : le rejouer, c'est le connaître par cœur) */
       R = { ...SC.RIVAL[d.rival], rule: d.rule }; seed = d.seed;
     } else {
       const i = SC.RIVALS.findIndex((r) => r.key === rival);
@@ -940,7 +941,7 @@ export class Game {
       if (awake) { if (!sc.beaten[rival]) throw new Error('Bats-le d’abord une fois.'); R = SC.awakened(R); }
     }
     sc.cur = SC.newGame(this.catalog, { hand: this.sceauxHand(), rival: R, seed, daily });
-    if (daily) sc.cur.dailyDay = today(this.clock()); /* v536 : un défi commencé avant minuit compte pour son jour */
+    if (daily) { sc.cur.dailyDay = today(this.clock()); sc.dailyTried = sc.cur.dailyDay; } /* v536 : un défi commencé avant minuit compte pour son jour ; v538 : essai noté dès le départ */
     sc.cur.ruleKey = R.rule; sc.cur.rule = R.rule;
     this.persist();
     return sc.cur;
@@ -1017,6 +1018,7 @@ export class Game {
     if (daily) {
       if (!this.encheresDailyOpen()) throw new Error('Le défi du jour s’ouvre après ta première victoire à l’Étal des curiosités.');
       if (en.dailyDone === today(this.clock())) throw new Error('Défi du jour déjà relevé. Reviens demain !');
+      if (en.dailyTried === today(this.clock())) throw new Error('Tu as déjà tenté le défi du jour. Nouveau défi demain !'); /* v538 : un seul essai (le défi est le même toute la journée : le rejouer, c'est le connaître par cœur) */
       const d = this.encheresDaily(); table = d.table; seed = d.seed;
     } else {
       const i = EN.TABLES.findIndex((t) => t.key === table);
@@ -1024,7 +1026,7 @@ export class Game {
       if (!EN.tableUnlocked(this.s, i)) throw new Error('Gagne d’abord à la table précédente.');
     }
     en.cur = EN.newGame(this.catalog, { table, seed, daily });
-    if (daily) en.cur.dailyDay = today(this.clock()); /* v536 : un défi commencé avant minuit compte pour son jour */
+    if (daily) { en.cur.dailyDay = today(this.clock()); en.dailyTried = en.cur.dailyDay; } /* v536 : un défi commencé avant minuit compte pour son jour ; v538 : essai noté dès le départ */
     this.persist();
     return en.cur;
   }
@@ -1078,8 +1080,10 @@ export class Game {
     if (!this.sceauxOpen()) return [];
     const day = today(this.clock());
     return [['sceaux', this.sceauxDailyOpen(), this.s.sceaux], ['pacte', this.pacteDailyOpen(), this.s.pacte], ['cryptes', this.cryptesDailyOpen(), this.s.cryptes], ['encheres', this.encheresDailyOpen(), this.s.encheres]]
-      .filter(([, open, sv]) => open && sv?.dailyDone !== day).map(([k]) => k);
+      .filter(([, open, sv]) => open && sv?.dailyDone !== day && sv?.dailyTried !== day).map(([k]) => k);
   }
+  /* v538 : état du défi du jour d'un jeu : 'won' (gagné), 'tried' (essai utilisé), 'open' (à relever) */
+  dailyState(k) { const sv = this.s[k], day = today(this.clock()); return sv?.dailyDone === day ? 'won' : sv?.dailyTried === day ? 'tried' : 'open'; }
   pacteDaily() { const day = today(this.clock()); return { table: PA.dailyTable(day, this.pacteUnlocked()), seed: [...`pacte:${day}`].reduce((h, c) => (Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0), 2166136261) }; }
   pacteStart({ table, daily = false } = {}) {
     const pa = this.s.pacte;
@@ -1088,6 +1092,7 @@ export class Game {
     if (daily) {
       if (!this.pacteDailyOpen()) throw new Error('Le défi du jour s’ouvre après ta première victoire au Pacte du novice.');
       if (pa.dailyDone === today(this.clock())) throw new Error('Défi du jour déjà relevé. Reviens demain !');
+      if (pa.dailyTried === today(this.clock())) throw new Error('Tu as déjà tenté le défi du jour. Nouveau défi demain !'); /* v538 : un seul essai (le défi est le même toute la journée : le rejouer, c'est le connaître par cœur) */
       const d = this.pacteDaily(); table = d.table; seed = d.seed;
     } else {
       const i = PA.TABLES.findIndex((x) => x.key === table);
@@ -1095,7 +1100,7 @@ export class Game {
       if (!PA.tableUnlocked(this.s, i)) throw new Error('Gagne d’abord le pacte précédent.');
     }
     pa.cur = PA.newGame(this.catalog, { table, seed, daily });
-    if (daily) pa.cur.dailyDay = today(this.clock()); /* v536 : un défi commencé avant minuit compte pour son jour */
+    if (daily) { pa.cur.dailyDay = today(this.clock()); pa.dailyTried = pa.cur.dailyDay; } /* v536 : un défi commencé avant minuit compte pour son jour ; v538 : essai noté dès le départ */
     this.persist();
     return pa.cur;
   }
@@ -1147,6 +1152,7 @@ export class Game {
     if (daily) {
       if (!this.cryptesDailyOpen()) throw new Error('Le défi du jour s’ouvre après ta première victoire à l’Ossuaire.');
       if (cr.dailyDone === today(this.clock())) throw new Error('Défi du jour déjà relevé. Reviens demain !');
+      if (cr.dailyTried === today(this.clock())) throw new Error('Tu as déjà tenté le défi du jour. Nouveau défi demain !'); /* v538 : un seul essai (le défi est le même toute la journée : le rejouer, c'est le connaître par cœur) */
       const d = this.cryptesDaily(); table = d.table; seed = d.seed;
     } else {
       const i = CR.TABLES.findIndex((x) => x.key === table);
@@ -1154,7 +1160,7 @@ export class Game {
       if (!CR.tableUnlocked(this.s, i)) throw new Error('Gagne d’abord dans la crypte précédente.');
     }
     cr.cur = CR.newGame(this.catalog, { table, seed, daily });
-    if (daily) cr.cur.dailyDay = today(this.clock()); /* v536 : un défi commencé avant minuit compte pour son jour */
+    if (daily) { cr.cur.dailyDay = today(this.clock()); cr.dailyTried = cr.cur.dailyDay; } /* v536 : un défi commencé avant minuit compte pour son jour ; v538 : essai noté dès le départ */
     this.persist();
     return cr.cur;
   }
@@ -1816,9 +1822,17 @@ export class Game {
 
   // ——— v470 : ÉBAUCHE du pass de saison (Codex) et de la boutique en argent réel (Échoppe), cachés hors Mode Créateur ———
   codexOn() { return !!(this.s.settings?.dev && this.s.devCodex); }
-  codex() { return codexState(this.s); }
+  /* v538 : la saison commence le CODEX.starts. Les points gagnés avant (anciennes versions, essais du Mode Créateur) sont remis à zéro
+     au premier passage après cette date ; la voie enluminée déjà débloquée reste. */
+  codexLive() { return today(this.clock()) >= CODEX.starts; }
+  codex() {
+    const c = codexState(this.s);
+    if (!c.live && this.codexLive()) { Object.assign(c, { xp: 0, free: [], prem: [], log: {} }); c.live = true; }
+    return c;
+  }
   codexXp(n, why) {
     if (!n) return;
+    if (!this.codexLive() && !this.codexOn()) return; /* v538 : avant la saison, rien ne se gagne (sauf essais du Mode Créateur) */
     const c = this.codex(), max = CODEX.tiers * CODEX.xpPerTier;
     const add = Math.max(0, Math.min(n, max - c.xp));
     c.xp += add; c.log[why] = (c.log[why] || 0) + add;

@@ -196,7 +196,7 @@ export function place(cat, st, who, handIdx, cell) {
   if (!id) throw new Error('Carte introuvable.');
   const vals = valuesOn(cat, st, id, cell, who);
   st.hands[who] = st.hands[who].filter((_, k) => k !== handIdx);
-  const perks = perksOf(cat.get(id));
+  const perks = st.noPerks ? [] : perksOf(cat.get(id)); /* v538 : parties en ligne sans pouvoirs de rareté */
   st.board[cell] = { id, owner: who, from: who, vals, guard: perks.includes('rempart') }; // from : qui l'a posée (trophée)
   const fury = perks.includes('fureur');
   // Rempart : la carte visée résiste une fois (le rempart tombe)

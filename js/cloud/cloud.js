@@ -233,6 +233,10 @@ export async function deleteAccount() {
 }
 
 // ——— Classement de la Descente ——————————————————————————————————————
+// v538 : une Épreuve gagnée (le serveur fait le total du jour, supabase/11-anti-triche.sql)
+export async function trialWin(day, idx, hp) {
+  return authed('/rest/v1/rpc/trial_win', { method: 'POST', body: { p_day: day, p_idx: idx, p_hp: Math.max(0, Math.min(100, Math.round(hp))) } });
+}
 export async function submitScore(day, floor, cursed) {
   await authed('/rest/v1/rpc/submit_score', { method: 'POST', body: { p_day: day, p_floor: floor, p_cursed: !!cursed } });
 }

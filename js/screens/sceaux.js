@@ -41,13 +41,13 @@ const ruleTiles = () => `<div class="sc-rgrid">${SC.RULE_LIST.map((k) => `<butto
 // Portrait peint de l'adversaire (assets/sceaux/rival-*.webp), avec l'ancienne image de créature en secours
 const rivalPic = (cat, R) => `<img alt="" src="assets/sceaux/rival-${R.key}.webp" onerror="this.onerror=null;this.src='${artUrl(cat.get(R.portrait), { lite: true })}'">`;
 // Petite carte du jeu : illustration, nom, emblème de faction et quatre valeurs sur les bords
-export function scCard(cat, id, { vals = null, owner = '', cls = '', back = false, guard = null } = {}) {
+export function scCard(cat, id, { vals = null, owner = '', cls = '', back = false, guard = null, perks = true } = {}) {
   const c = cat.get(id);
   const v = vals || SC.sideValues(c);
   return `<span class="sc-card ${owner ? `sc-${owner}` : ''} ${cls} r-${c.rarity}" data-id="${id}">
     <img alt="" src="${artUrl(c, { lite: true })}"><span class="sc-veil"></span>${back ? '<img class="sc-back" alt="" src="assets/sceaux/dos.webp">' : ''}
     <i class="sc-v t">${V(v[0])}</i><i class="sc-v r">${V(v[1])}</i><i class="sc-v b">${V(v[2])}</i><i class="sc-v l">${V(v[3])}</i>
-    <span class="sc-sig">${sigil(c.faction)}</span><span class="sc-nm">${esc(c.name)}</span>${SC.perksOf(c).map((k) => `<i class="sc-perk ${k}" title="${SC.PERKS[k].name}">${PERK_IC[k]}</i>`).join('')}${guard === false && SC.perksOf(c).includes('rempart') ? '<i class="sc-perk broken"></i>' : ''}</span>`;
+    <span class="sc-sig">${sigil(c.faction)}</span><span class="sc-nm">${esc(c.name)}</span>${(perks ? SC.perksOf(c) : []).map((k) => `<i class="sc-perk ${k}" title="${SC.PERKS[k].name}">${PERK_IC[k]}</i>`).join('')}${perks && guard === false && SC.perksOf(c).includes('rempart') ? '<i class="sc-perk broken"></i>' : ''}</span>`;
 }
 
 export default function sceauxScreen(app, root) {
@@ -73,13 +73,13 @@ export default function sceauxScreen(app, root) {
     if (ui.mode === 'mp') return mp.show();
     mp.stop();
     const sc = g.s.sceaux, hand = g.sceauxHand(), d = g.sceauxDaily();
-    const dailyDone = sc.dailyDone === todayKey();
+    const dailyDone = sc.dailyDone === todayKey(); const dailyTried = !dailyDone && sc.dailyTried === todayKey(); /* v538 : un seul essai */
     const R = SC.RIVAL[d.rival];
     root.innerHTML = `${modeBar()}<p class="sc-rec-line">
         <span class="sc-rec">${sc.wins} victoire${sc.wins > 1 ? 's' : ''} · ${sc.losses} défaite${sc.losses > 1 ? 's' : ''}${sc.draws ? ` · ${sc.draws} égalité${sc.draws > 1 ? 's' : ''}` : ''}</span></p>
-${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone ? 'done' : ''}" data-sc="daily" ${dailyDone ? 'disabled' : ''}>
+${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone || dailyTried ? 'done' : ''}" data-sc="daily" ${dailyDone || dailyTried ? 'disabled' : ''}>
         <img alt="" src="assets/icons/hourglass.webp"><span><b>Défi du jour</b><span class="small">${esc(R.name)} · règle « ${esc(SC.RULES[d.rule].name)} »</span>
-        <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : `Victoire : +${SC.SCEAUX_REWARD.daily} éclats et un coffre de bois`}</span></span>${dailyDone ? icon('check') : icon('next')}</button>` : ''}
+        <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : dailyTried ? 'Tenté aujourd’hui. Nouveau défi demain.' : `Un seul essai · victoire : +${SC.SCEAUX_REWARD.daily} éclats et un coffre de bois`}</span></span>${dailyDone ? icon('check') : dailyTried ? icon('p:hourglass') : icon('next')}</button>` : ''}
       <h2 class="section-title">Adversaires</h2>
       ${(() => { const items = SC.RIVALS.map((r, i) => { const open = SC.rivalUnlocked(g.s, i), won = sc.beaten[r.key]; return [open, `<button class="sc-rival ${open ? '' : 'locked'} ${won ? 'won' : ''}" data-sc="play" data-r="${r.key}" ${open ? '' : 'disabled'} style="background-image:linear-gradient(90deg, rgba(12, 13, 20, .97) 38%, rgba(12, 13, 20, .45) 72%, rgba(12, 13, 20, .15)), url(assets/sceaux/${themeOf(r.key)}.webp)">
         <span class="sc-por">${rivalPic(cat, r)}</span>

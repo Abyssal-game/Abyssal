@@ -6,8 +6,8 @@ import { Game } from '../js/core/game.js';
 import { CODEX, CODEX_TIERS, SHOP, CATALOG, CODEX_ONLY, codexTier, claimable } from '../js/core/codex.js';
 
 const catalog = loadCatalog();
-const clock = () => new Date(2026, 9, 18, 12);
-const mk = () => new Game(catalog, new MemoryStorage(), { rng: rngFrom('cx'), clock });
+const clock = () => new Date(2026, 11, 5, 12); // pendant la Saison I
+const mk = (c = clock) => new Game(catalog, new MemoryStorage(), { rng: rngFrom('cx'), clock: c });
 
 test('codex : points plafonnés au dernier palier, paliers atteints', () => {
   const g = mk();
@@ -94,4 +94,23 @@ test('v482 : finitions de prestige, achetées une fois, posées seulement sur un
   assert.equal(g.s.dress[id], undefined);
   const other = catalog.cards.find((c) => !g.owns(c.id)).id;
   assert.throws(() => g.setDress(other, 'fin-spectrale'), /possèdes pas/);
+});
+
+// v538 : la saison commence le 1er décembre ; les points d'avant ne comptent pas
+test('codex : rien ne se gagne avant la saison, et les points d’avant sont remis à zéro à son ouverture', () => {
+  let now = new Date(2026, 10, 20, 12);
+  const st = new MemoryStorage(), g = new Game(catalog, st, { rng: rngFrom('cx2'), clock: () => now });
+  g.codexXp(300, 'win');
+  assert.equal(g.codex().xp, 0, 'avant la saison');
+  g.s.settings.dev = true; g.s.devCodex = true;
+  g.codexXp(300, 'dev');
+  assert.equal(g.codex().xp, 300, 'essai du Mode Créateur');
+  g.codex().premium = true;
+  now = new Date(2026, 11, 1, 9);
+  assert.equal(g.codex().xp, 0, 'remis à zéro le 1er décembre');
+  assert.ok(g.codex().premium, 'la voie enluminée reste');
+  g.s.settings.dev = false;
+  g.codexXp(150, 'win');
+  assert.equal(g.codex().xp, 150);
+  assert.equal(g.codex().xp, 150, 'une seule remise à zéro');
 });

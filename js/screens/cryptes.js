@@ -59,7 +59,7 @@ export default function cryptesScreen(app, root) {
     }
     if (mui.mode === 'mp') return mp.show();
     mp.stop();
-    const cr = g.s.cryptes, dailyDone = cr.dailyDone === todayKey(), d = g.cryptesDaily(), DT = CR.TABLE[d.table];
+    const cr = g.s.cryptes, dailyDone = cr.dailyDone === todayKey(), dailyTried = !dailyDone && cr.dailyTried === todayKey(), d = g.cryptesDaily(), DT = CR.TABLE[d.table];
     const tables = CR.TABLES.map((t, i) => {
       const open = CR.tableUnlocked(g.s, i), won = cr.beaten[t.key], R = CR.RIVALS[t.rival];
       return [open, `<button class="sc-rival gm-tbl ${open ? '' : 'locked'} ${won ? 'won' : ''}" data-cr="play" data-t="${t.key}" ${open ? '' : 'disabled'} style="background-image:linear-gradient(90deg, rgba(12, 13, 20, .97) 42%, rgba(12, 13, 20, .5) 78%, rgba(12, 13, 20, .2)), url(${CR.tableBg(t.key)})">
@@ -70,9 +70,9 @@ export default function cryptesScreen(app, root) {
     });
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
     root.innerHTML = `${modeBar(`<span class="sc-rec">${cr.wins} victoire${cr.wins > 1 ? 's' : ''} · ${cr.losses} défaite${cr.losses > 1 ? 's' : ''}</span>`)}
-      ${g.cryptesDailyOpen() ? `<button class="panel sc-daily ${dailyDone ? 'done' : ''}" data-cr="daily" ${dailyDone ? 'disabled' : ''}>
+      ${g.cryptesDailyOpen() ? `<button class="panel sc-daily ${dailyDone || dailyTried ? 'done' : ''}" data-cr="daily" ${dailyDone || dailyTried ? 'disabled' : ''}>
         <img alt="" src="assets/icons/hourglass.webp"><span><b>Défi du jour</b><span class="small">${esc(DT.name)} · les mêmes cartes pour tous</span>
-        <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : `Victoire : +${CR.CRYPTES_REWARD.daily} éclats et un coffre de bois`}</span></span>${dailyDone ? icon('check') : icon('next')}</button>` : ''}
+        <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : dailyTried ? 'Tenté aujourd’hui. Nouveau défi demain.' : `Un seul essai · victoire : +${CR.CRYPTES_REWARD.daily} éclats et un coffre de bois`}</span></span>${dailyDone ? icon('check') : dailyTried ? icon('p:hourglass') : icon('next')}</button>` : ''}
       <h2 class="section-title">Les cryptes</h2>
       <div class="sc-rivals">${o}</div>
       ${l.length ? `<details class="panel dc-fold"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/mysteries.webp"><span class="dc-sum-t">Cryptes à venir (${l.length})</span></summary><div class="sc-rivals">${l.map((x) => x[1]).join('')}</div></details>` : ''}

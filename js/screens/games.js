@@ -13,7 +13,7 @@ export default function gamesScreen(app, root) {
   const rec = (w, l) => (w + l ? `${w} victoire${w > 1 ? 's' : ''} · ${l} défaite${l > 1 ? 's' : ''}` : 'Pas encore joué');
   /* v466 : chaque tuile dit si son défi du jour reste à relever */
   const left = g.gamesDailyLeft(), opened = { sceaux: g.sceauxDailyOpen(), pacte: g.pacteDailyOpen(), cryptes: g.cryptesDailyOpen(), encheres: g.encheresDailyOpen() };
-  const daily = (k) => (!g.sceauxOpen() || !opened[k] ? '' : left.includes(k) ? `<span class="gm-daily">${icon('p:hourglass')}Défi du jour à relever</span>` : `<span class="gm-daily done">${icon('check')}Défi du jour relevé</span>`);
+  const daily = (k) => (!g.sceauxOpen() || !opened[k] ? '' : left.includes(k) ? `<span class="gm-daily">${icon('p:hourglass')}Défi du jour à relever</span>` : g.dailyState(k) === 'tried' ? `<span class="gm-daily done">${icon('p:hourglass')}Défi du jour tenté</span>` : `<span class="gm-daily done">${icon('check')}Défi du jour relevé</span>`); /* v538 : un seul essai */
   const tile = (href, cls, title, sub, info, img) => `<a class="panel gm-tile ${cls}" href="${href}"><span class="gm-art" style="background-image:url(${img})"></span>
     <span class="gm-txt"><b>${title}</b><span class="small">${sub}</span><span class="small muted">${info}</span>${daily(href.slice(2))}</span>${icon('next')}</a>`;
   root.innerHTML = `<header class="screen-head ui-hero bn-jeux"><h1>Salle des jeux</h1><p class="muted">Des jeux de cartes à part, contre les arbitres de l’Abysse.</p></header>

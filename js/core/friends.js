@@ -37,3 +37,26 @@ export function cardEntry(card, id) {
   const [b, lv] = Array.isArray(x) ? x : [x, 1];
   return { bits: b, lv: lv || 1, variants: Object.entries(VARIANT_BITS).filter(([, bit]) => b & bit).map(([k]) => k) };
 }
+
+// v538 : une fiche vient d'un autre joueur (peut-être d'une app modifiée) : on ne garde que des valeurs du bon type,
+// jamais de texte qui pourrait finir dans la page sans être échappé (clés, nombres bornés).
+const int = (x, max = 1e7) => { const n = Math.floor(Number(x)); return Number.isFinite(n) ? Math.max(0, Math.min(max, n)) : 0; };
+const key = (x) => (typeof x === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(x) ? x : null);
+const keys = (a, n) => (Array.isArray(a) ? a.map(key).filter(Boolean).slice(0, n) : []);
+export function cleanCard(d) {
+  if (!d || typeof d !== 'object' || Array.isArray(d)) return null;
+  const col = {};
+  if (d.col && typeof d.col === 'object') for (const [id, x] of Object.entries(d.col).slice(0, 3000)) {
+    if (!key(id)) continue;
+    col[id] = Array.isArray(x) ? [int(x[0], 15), Math.max(1, int(x[1], 99))] : int(x, 15);
+  }
+  const st = d.st && typeof d.st === 'object' ? d.st : {}, gm = st.games && typeof st.games === 'object' ? st.games : {};
+  const games = {};
+  for (const k of ['sceaux', 'pacte', 'cryptes', 'encheres']) games[k] = { w: int(gm[k]?.w), b: int(gm[k]?.b, 99) };
+  return {
+    v: int(d.v, 99), lv: Math.max(1, int(d.lv, 9999)), title: typeof d.title === 'string' ? d.title.slice(0, 60) : '', frame: key(d.frame), avatar: key(d.avatar),
+    show: keys(d.show, 3), titles: int(d.titles, 999), col, ach: keys(d.ach, 1000), sets: keys(d.sets, 500),
+    st: { boosters: int(st.boosters), best: int(st.best, 9999), bosses: int(st.bosses, 999), trials: int(st.trials), night: int(st.night, 9999), games },
+    ...(d.n != null ? { n: int(d.n, 9999) } : {}), partial: !!d.partial,
+  };
+}

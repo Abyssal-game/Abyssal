@@ -50,7 +50,7 @@ export default function encheresScreen(app, root) {
     }
     if (mui.mode === 'mp') return mp.show();
     mp.stop();
-    const en = g.s.encheres, dailyDone = en.dailyDone === todayKey(), d = g.encheresDaily(), DT = EN.TABLE[d.table];
+    const en = g.s.encheres, dailyDone = en.dailyDone === todayKey(), dailyTried = !dailyDone && en.dailyTried === todayKey(), d = g.encheresDaily(), DT = EN.TABLE[d.table];
     const tables = EN.TABLES.map((t, i) => {
       const open = EN.tableUnlocked(g.s, i), won = en.beaten[t.key], [A, B] = t.seats.map((k) => EN.BIDDERS[k]);
       return [open, `<button class="sc-rival mq-tbl ${open ? '' : 'locked'} ${won ? 'won' : ''}" data-en="play" data-t="${t.key}" ${open ? '' : 'disabled'} style="background-image:linear-gradient(90deg, rgba(12, 13, 20, .97) 42%, rgba(12, 13, 20, .45) 76%, rgba(12, 13, 20, .15)), url(${EN.tableBg(t.key)})">
@@ -61,9 +61,9 @@ export default function encheresScreen(app, root) {
     });
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
     root.innerHTML = `${modeBar(`<span class="sc-rec">${en.wins} victoire${en.wins > 1 ? 's' : ''} · ${en.losses} défaite${en.losses > 1 ? 's' : ''}</span>`)}
-      ${g.encheresDailyOpen() ? `<button class="panel sc-daily ${dailyDone ? 'done' : ''}" data-en="daily" ${dailyDone ? 'disabled' : ''}>
+      ${g.encheresDailyOpen() ? `<button class="panel sc-daily ${dailyDone || dailyTried ? 'done' : ''}" data-en="daily" ${dailyDone || dailyTried ? 'disabled' : ''}>
         <img alt="" src="assets/icons/hourglass.webp"><span><b>Défi du jour</b><span class="small">${esc(DT.name)} · la même vente pour tous</span>
-        <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : `Victoire : +${EN.ENCHERES_REWARD.daily} éclats et un coffre de bois`}</span></span>${dailyDone ? icon('check') : icon('next')}</button>` : ''}
+        <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : dailyTried ? 'Tenté aujourd’hui. Nouveau défi demain.' : `Un seul essai · victoire : +${EN.ENCHERES_REWARD.daily} éclats et un coffre de bois`}</span></span>${dailyDone ? icon('check') : dailyTried ? icon('p:hourglass') : icon('next')}</button>` : ''}
       <h2 class="section-title">Les salles de vente</h2>
       <div class="sc-rivals">${o}</div>
       ${l.length ? `<details class="panel dc-fold"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/mysteries.webp"><span class="dc-sum-t">Ventes à venir (${l.length})</span></summary><div class="sc-rivals">${l.map((x) => x[1]).join('')}</div></details>` : ''}

@@ -170,8 +170,11 @@ export function startSync(theApp) {
   app.game.on('trialEnd', (out) => {
     if (!cloud.isLoggedIn() || !sync.profile?.pseudo) return;
     if (app.game.s.settings.dev) return; // pas de score au classement en Mode Créateur
-    if (!out.score) return;
-    cloud.submitScore(out.day || today(), out.score, false).catch(() => {});
+    if (!out.won || !out.score) return;
+    /* v538 : chaque Épreuve gagnée part seule et le serveur fait le total ; sans 11-anti-triche.sql, l'ancien envoi du total */
+    cloud.trialWin(out.day || today(), out.i, (out.points || 100) - 100)
+      .catch((err) => { if (err?.status === 404) return cloud.submitScore(out.day || today(), out.score, false); })
+      .catch(() => {});
   });
 
   document.addEventListener('visibilitychange', () => {

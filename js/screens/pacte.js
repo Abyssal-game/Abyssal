@@ -63,7 +63,7 @@ export default function pacteScreen(app, root) {
     }
     if (ui.mode === 'mp') return mp.show();
     mp.stop();
-    const pa = g.s.pacte, dailyDone = pa.dailyDone === todayKey(), d = g.pacteDaily(), DT = PA.TABLE[d.table];
+    const pa = g.s.pacte, dailyDone = pa.dailyDone === todayKey(), dailyTried = !dailyDone && pa.dailyTried === todayKey(), d = g.pacteDaily(), DT = PA.TABLE[d.table];
     const tables = PA.TABLES.map((t, i) => {
       const open = PA.tableUnlocked(g.s, i), won = pa.beaten[t.key], R = PA.RIVALS[t.rival];
       return [open, `<button class="sc-rival gm-tbl ${open ? '' : 'locked'} ${won ? 'won' : ''}" data-pa="play" data-t="${t.key}" ${open ? '' : 'disabled'} style="background-image:linear-gradient(90deg, rgba(12, 13, 20, .97) 42%, rgba(12, 13, 20, .5) 78%, rgba(12, 13, 20, .2)), url(${PA.tableBg(t.key)})">
@@ -74,9 +74,9 @@ export default function pacteScreen(app, root) {
     });
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
     root.innerHTML = `${modeBar(`<span class="sc-rec">${pa.wins} victoire${pa.wins > 1 ? 's' : ''} · ${pa.losses} défaite${pa.losses > 1 ? 's' : ''}</span>`)}
-      ${g.pacteDailyOpen() ? `<button class="panel sc-daily ${dailyDone ? 'done' : ''}" data-pa="daily" ${dailyDone ? 'disabled' : ''}>
+      ${g.pacteDailyOpen() ? `<button class="panel sc-daily ${dailyDone || dailyTried ? 'done' : ''}" data-pa="daily" ${dailyDone || dailyTried ? 'disabled' : ''}>
         <img alt="" src="assets/icons/hourglass.webp"><span><b>Défi du jour</b><span class="small">${esc(DT.name)} · le même paquet pour tous</span>
-        <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : `Victoire : +${PA.PACTE_REWARD.daily} éclats et un coffre de bois`}</span></span>${dailyDone ? icon('check') : icon('next')}</button>` : ''}
+        <span class="small muted">${dailyDone ? 'Relevé aujourd’hui. Nouveau défi demain.' : dailyTried ? 'Tenté aujourd’hui. Nouveau défi demain.' : `Un seul essai · victoire : +${PA.PACTE_REWARD.daily} éclats et un coffre de bois`}</span></span>${dailyDone ? icon('check') : dailyTried ? icon('p:hourglass') : icon('next')}</button>` : ''}
       <h2 class="section-title">Les pactes</h2>
       <div class="sc-rivals">${o}</div>
       ${l.length ? `<details class="panel dc-fold"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/mysteries.webp"><span class="dc-sum-t">Pactes à venir (${l.length})</span></summary><div class="sc-rivals">${l.map((x) => x[1]).join('')}</div></details>` : ''}

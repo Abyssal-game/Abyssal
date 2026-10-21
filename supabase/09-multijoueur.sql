@@ -594,8 +594,9 @@ begin
   if not found then raise exception 'Carte inconnue : %', cid; end if;
   m := case when cell = (st -> 'cells' ->> 'blessed')::int then 1 when cell = (st -> 'cells' ->> 'cursed')::int then -1 else 0 end;
   vals := array[greatest(1, least(10, card.v[1] + m)), greatest(1, least(10, card.v[2] + m)), greatest(1, least(10, card.v[3] + m)), greatest(1, least(10, card.v[4] + m))];
-  guard := card.rarity in ('HR', 'S');
-  fury := card.rarity in ('M', 'S');
+  -- v538 : en ligne, plus de pouvoirs de rareté (perks = false) : la main choisie ne donne aucun avantage ; une partie plus ancienne les garde
+  guard := coalesce((st ->> 'perks')::boolean, true) and card.rarity in ('HR', 'S');
+  fury := coalesce((st ->> 'perks')::boolean, true) and card.rarity in ('M', 'S');
   hand := hand - idx;
   board := jsonb_set(board, array[cell::text], jsonb_build_object('id', cid, 'o', who, 'v', to_jsonb(vals), 'g', guard));
   -- voisines occupées, dans l'ordre haut, droite, bas, gauche
@@ -691,7 +692,7 @@ begin
   update public.mp_matches set status = 'playing', turn = first, deadline = now() + public.mp_delay(d.pace, true), updated_at = now(),
     state = jsonb_build_object('rule', rule, 'board', jsonb_build_array(null, null, null, null, null, null, null, null, null),
       'hands', jsonb_build_object('a', d.state -> 'handA', 'b', to_jsonb(hb)), 'cells', jsonb_build_object('blessed', c1, 'cursed', c2),
-      'placed', 0, 'turn', first, 'first', first, 'log', '[]'::jsonb)
+      'placed', 0, 'turn', first, 'first', first, 'log', '[]'::jsonb, 'perks', false)
   where id = p_id;
 end $$;
 revoke execute on function public.sceaux_start(uuid, text[]) from public, anon, authenticated;
