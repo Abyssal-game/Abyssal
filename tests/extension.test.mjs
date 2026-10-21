@@ -237,9 +237,9 @@ test('difficulté : plafond par coup sur tes créatures, cumul de bonus plafonn�
   Object.assign(foe, { mark: 2, broken: true, exposed: true });
   st.ruleMult = 1.25;
   assert.ok(D.dmgOf(st, a, foe) <= (a.atk + (a.boost || 0) + 2) * D.MULT_CAP + D.COMBO_MAX);
-  // esquive : jamais sous 160 ms, même contre un gardien bien plus fort
+  // esquive : jamais sous 130 ms (v558 : plancher des gardiens), même contre un gardien bien plus fort
   const b = D.createDuel(team(), [E(FOE, { boss: true, scale: 5, level: 40 })], { seed: 5 });
-  assert.ok(D.defenseWindow(b, units(b, 'enemy')[0].uid, units(b, 'ally')[0].uid).dodge >= 160);
+  assert.ok(D.defenseWindow(b, units(b, 'enemy')[0].uid, units(b, 'ally')[0].uid).dodge >= 130);
 });
 
 test('Sceau du Gardien : une fois par combat, bouclier qui absorbe la moitié des PV', () => {

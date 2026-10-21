@@ -32,7 +32,7 @@ const RARITY_MULT = { C: 1, PC: 1.15, R: 1.3, HR: 1.45, M: 1.6, S: 1.75 };
 export const FROST_MASTERY = { R: 1, HR: 2, M: 3, S: 4 };
 // Attaque rythmée : bonus au jet selon la précision du toucher (bon / parfait)
 export const RHYTHM = { good: 1, perfect: 3 };
-const SINGLE = ['hit', 'heavy', 'poison', 'frost', 'gorge', 'execute', 'chain', 'tick2', 'ambush'];
+const SINGLE = ['hit', 'heavy', 'poison', 'frost', 'gorge', 'execute', 'chain', 'tick2', 'ambush', 'flurry', 'grab']; /* v558 : Rafale et Étreinte des ennemis ordinaires */
 // Intentions spéciales des gardiens (comptent comme « actions spéciales » pour le Pacte du Reflet)
 const SPECIAL = ['heavy', 'blast', 'shield', 'heal', 'rally', 'hunt', 'charge', 'channel', 'gorge', 'gather', 'blizzard', 'mimic', 'copy', 'decree', 'shift', 'brood', 'swarm', 'sentence', 'execute', 'chant', 'lament', 'chain', 'wind', 'rewind', 'mirror', 'ambush', 'wish', 'price', 'slumber', 'quake', 'verdict'];
 // v383 : grosses attaques de zone des nouveaux gardiens (multiplicateur par créature) et actions préparées un tour à l'avance
@@ -1403,6 +1403,15 @@ export function enemyAct(st, aUid, defense = 'none') {
   } else if (kind === 'verdict') {
     st.forbid = it.forbid; logBoss(st, 'Verdict');
     ev.push({ t: 'boss', u: aUid, s: `Verdict : interdit de ${FORBID[it.forbid]}` }); ev.push({ t: 'law', forbid: it.forbid });
+  } else if (kind === 'flurry') {
+    /* v558 : Rafale, trois coups ; une défense réussie compte une fois pour toute la rafale */
+    const t0 = st.units[it.t];
+    if (defense !== 'none') strike(t0, 1.35);
+    else { const t = strike(t0, 0.45); for (let i = 0; i < 2 && t && t.hp > 0 && e.hp > 0; i++) strike(t, 0.45); }
+  } else if (kind === 'grab') {
+    /* v558 : Étreinte, un coup puis la cible est agrippée (elle perd son prochain tour) si elle ne s'est pas libérée */
+    const t = strike(st.units[it.t], 0.7);
+    if (t && t.hp > 0 && defense === 'none') { t.frozen = 1; ev.push({ t: 'status', u: t.uid, s: 'Agrippée', k: 'frost' }); }
   } else if (kind === 'tick2') {
     const t = strike(st.units[it.t], 0.6);
     if (t && t.hp > 0 && e.hp > 0) strike(t, 0.6);
@@ -1653,7 +1662,7 @@ function planIntents(st) {
     e.intent = { kind, t, qte: qteFor(e, kind) || (kind === 'copy' && ['estoc', 'entrave', 'raz', 'contagion'].includes(extra.copy)), ...extra };
   }
 }
-const qteFor = (e, kind) => ['hit', 'poison', 'tick2', 'heavy', 'blast', 'frost', 'gorge', 'blizzard', 'swarm', 'execute', 'lament', 'chain', 'ambush', 'price', 'quake'].includes(kind);
+const qteFor = (e, kind) => ['hit', 'poison', 'tick2', 'flurry', 'grab', 'heavy', 'blast', 'frost', 'gorge', 'blizzard', 'swarm', 'execute', 'lament', 'chain', 'ambush', 'price', 'quake'].includes(kind);
 function intentKind(st, e) {
   if (e.charged) return e.charged;
   if (e.boss && st.bossKey === 'abysse') {
@@ -1678,7 +1687,12 @@ function intentKind(st, e) {
       if (e.role === 'soutien' && others && st.round % 4 === 1 && !front(st, 'ally').some((x) => x.prey > 0)) return 'hunt';
       if (e.role === 'soutien' && others && st.round % 2 === 1) return 'rally';
       return 'hit';
-    default: return st.round >= 2 && r < (e.elite ? 0.3 : 0.15) ? 'charge' : 'hit';
+    /* v558 : les ennemis ordinaires varient leurs attaques dès le premier tour (avant : coup chargé 15 % à partir du 2e tour,
+       on ne voyait presque jamais la défense « maintenir puis relâcher ») ; chaque famille a sa signature */
+    case 'predateur': return r < (e.elite ? 0.3 : 0.22) ? 'grab' : r < (e.elite ? 0.5 : 0.38) ? 'charge' : 'hit';
+    case 'assassin': return r < (e.elite ? 0.34 : 0.25) ? 'flurry' : r < (e.elite ? 0.5 : 0.38) ? 'charge' : 'hit';
+    case 'berserker': return r < (e.elite ? 0.4 : 0.3) ? 'charge' : r < (e.elite ? 0.5 : 0.4) ? 'flurry' : 'hit';
+    default: return r < (e.elite ? 0.3 : 0.22) ? 'charge' : 'hit';
   }
 }
 // Ce qu'affiche l'intention d'un ennemi : dégâts estimés, cible réelle, danger (0 à 3)
@@ -1690,7 +1704,7 @@ export function intentInfo(st, e) {
   const eff = g && inFront(st, g) ? g : t;
   let dmg = 0;
   const copyM = it.kind === 'copy' ? { estoc: 2, entrave: 0.6, marque: 1.5 }[it.copy] : null;
-  const m = copyM || { hit: 1, heavy: e.boss ? 2.5 : 2.2, poison: 0.6, frost: 0.5, gorge: 1.6, chain: 0.8, tick2: 1.2, ambush: 2.2, execute: t && t.hp <= t.maxHp / 2 ? 3 : 2 }[it.kind];
+  const m = copyM || { hit: 1, heavy: e.boss ? 2.5 : 2.2, poison: 0.6, frost: 0.5, flurry: 1.35, grab: 0.7, gorge: 1.6, chain: 0.8, tick2: 1.2, ambush: 2.2, execute: t && t.hp <= t.maxHp / 2 ? 3 : 2 }[it.kind];
   const capd = (x, n) => Math.min(n, allyCap(x, it.kind, st));
   const pw = it.qte ? QTE_HIT : PLAIN_HIT; /* v502 : les dégâts annoncés sont ceux d'un coup non défendu */
   if (m && eff) dmg = capd(eff, dmgOf(st, e, eff, m * pw * (eff !== t ? 0.6 : 1)));
@@ -1701,7 +1715,7 @@ export function intentInfo(st, e) {
   if (it.kind === 'copy' && it.copy === 'raz') dmg = Math.max(0, ...front(st, 'ally').map((x) => capd(x, dmgOf(st, e, x, 0.7))));
   const single = SINGLE.includes(it.kind) || !!(it.kind === 'copy' && it.t);
   const lethal = !!eff && single && dmg >= eff.hp;
-  const danger = BIG.includes(it.kind) || lethal ? 3 : ['frost', 'decree', 'shift', 'hunt', 'chain', 'rewind', 'mirror', 'verdict'].includes(it.kind) || PREP.includes(it.kind) || (e.boss && ['hit', 'tick2'].includes(it.kind)) ? 2 : dmg ? 1 : 0;
+  const danger = BIG.includes(it.kind) || lethal ? 3 : ['frost', 'grab', 'decree', 'shift', 'hunt', 'chain', 'rewind', 'mirror', 'verdict'].includes(it.kind) || PREP.includes(it.kind) || (e.boss && ['hit', 'tick2'].includes(it.kind)) ? 2 : dmg ? 1 : 0;
   return { ...it, def: INTENTS[it.kind], dmg, target: single ? eff?.uid || null : it.t, lethal, danger, aoe: ['blast', 'blizzard', 'quake'].includes(it.kind) || !!AOE_M[it.kind] || (it.kind === 'copy' && it.copy === 'raz') };
 }
 // Dégâts annoncés sur chacune de tes cartes (badges rouges)
@@ -1734,15 +1748,16 @@ const API = {
 export function defenseWindow(st, aUid, tUid) {
   const e = st.units[aUid], u = st.units[tUid] || front(st, 'ally')[0];
   const kind = e?.intent?.kind || 'hit';
-  let w = { hit: 230, poison: 230, frost: 210, heavy: 190, blast: 200 }[kind] || 220;
+  /* v558 : fenêtres resserrées (« je réussis les parades à chaque fois ») : esquive ≈ 15 % plus courte, parade ≈ 2/3 de l'ancienne */
+  let w = { hit: 200, poison: 200, frost: 185, flurry: 190, grab: 190, heavy: 165, blast: 175 }[kind] || 190;
   // écart de niveau : il aide (ou gêne) un peu, sans jamais rendre l'esquive impossible
-  w += Math.max(-30, Math.min(45, 10 * ((u?.level || 1) - (e?.level || 1))));
-  // plancher selon la catégorie de l'ennemi : 200 ms (normal), 180 ms (élite), 160 ms (gardien)
-  const floor = e?.boss ? 160 : e?.elite ? 180 : 200;
+  w += Math.max(-25, Math.min(35, 8 * ((u?.level || 1) - (e?.level || 1))));
+  // plancher selon la catégorie de l'ennemi : 170 ms (normal), 150 ms (élite), 130 ms (gardien)
+  const floor = e?.boss ? 130 : e?.elite ? 150 : 170;
   if (e?.boss) w -= 30; else if (e?.elite) w -= 15;
-  w = Math.max(floor, Math.min(320, Math.round(w)));
-  // parade : fenêtre étroite (environ 1/5 de l'esquive), au tout dernier instant avant l'impact
-  return { dodge: w, parry: Math.max(60, Math.round(w * 0.28)) }; /* v388 : parade un peu plus large (avant : 32 ms au plus juste) */
+  w = Math.max(floor, Math.min(270, Math.round(w)));
+  // parade : le tout dernier instant avant l'impact (environ 1/5 de l'esquive)
+  return { dodge: w, parry: Math.max(e?.boss ? 36 : e?.elite ? 40 : 45, Math.round(w * 0.2)) };
 }
 
 // ——— Pilote automatique (bouton Auto et simulations) ———

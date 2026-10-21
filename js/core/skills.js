@@ -161,6 +161,8 @@ export const INTENTS = {
   price:    { name: 'Le Prix',        icon: 'flame',   desc: 'Frappe toute ton équipe et la soigne de la moitié des dégâts.' },
   slumber:  { name: 'Il dort',        icon: 'sparkle', desc: 'Le Titan dort et ne fait rien. Chaque dégât que tu lui fais rendra son réveil plus violent.' },
   quake:    { name: 'Séisme',         icon: 'flame',   desc: 'Le Titan se réveille : frappe toute ton équipe, d’autant plus fort qu’il a été blessé pendant son sommeil.' },
+  flurry:   { name: 'Rafale',         icon: 'swords',  desc: 'Frappe trois fois de suite la cible annoncée.' },
+  grab:     { name: 'Étreinte',       icon: 'eye',     desc: 'Agrippe la cible : un coup, puis elle ne pourra pas agir à ton prochain tour si elle ne se libère pas.' },
   verdict:  { name: 'Verdict',        icon: 'eye',     desc: 'Interdit une action (attaquer, compétence ou se défendre) à toute ton équipe jusqu’à sa prochaine action.' },
 };
 

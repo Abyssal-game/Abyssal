@@ -50,7 +50,7 @@ const DANGER = ['', '', 'Danger', 'Mortel'];
 // Icône peinte d'une intention ennemie
 // les intentions des gardiens réutilisent les icônes peintes les plus proches
 const FORBID_SHORT = { attack: 'attaque', skill: 'compétences', defend: 'défense' };
-const IN_PIC = { gorge: 'heavy', gather: 'channel', blizzard: 'frost', mimic: 'channel', copy: 'heavy', decree: 'rally', shift: 'charge', brood: 'channel', swarm: 'poison', sentence: 'charge', execute: 'heavy', chant: 'channel', lament: 'blast', chain: 'frost', wind: 'charge', rewind: 'heal', tick2: 'hit', mirror: 'shield', ambush: 'heavy', wish: 'heal', price: 'blast', slumber: 'shield', quake: 'blast', verdict: 'rally' };
+const IN_PIC = { flurry: 'hit', grab: 'frost', gorge: 'heavy', gather: 'channel', blizzard: 'frost', mimic: 'channel', copy: 'heavy', decree: 'rally', shift: 'charge', brood: 'channel', swarm: 'poison', sentence: 'charge', execute: 'heavy', chant: 'channel', lament: 'blast', chain: 'frost', wind: 'charge', rewind: 'heal', tick2: 'hit', mirror: 'shield', ambush: 'heavy', wish: 'heal', price: 'blast', slumber: 'shield', quake: 'blast', verdict: 'rally' };
 const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${IN_PIC[k] || k}.webp">`;
 
 export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = null, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.' }) {
@@ -896,25 +896,186 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       app.sfx.swipe?.();
     });
   }
-  /* v502 : trois gestes de défense selon l'attaque : toucher (coup simple), maintenir puis relâcher (coup chargé),
-     glisser dans le sens indiqué (attaque de zone) */
-  const HOLD_K = ['heavy', 'gorge', 'execute', 'ambush', 'chain'];
-  function defenseQTE(s) {
+  /* v502 : trois gestes de défense selon l'attaque ; v558 : six gestes, et un Assaut propre à chaque gardien
+     (sa grosse attaque se défend en trois gestes enchaînés) */
+  const HOLD_K = ['heavy', 'gorge', 'execute'];
+  const RING_N = { tick2: 2, poison: 2, flurry: 3 };
+  const MASH_K = ['grab', 'chain', 'frost'];
+  const ASSAULT_K = ['heavy', 'blast', 'gorge', 'blizzard', 'copy', 'swarm', 'execute', 'lament', 'ambush', 'price', 'quake', 'chain', 'tick2'];
+  /* chaque gardien : nom de son Assaut et suite de gestes (tap, hold, swipe, ringsN, mash, target) */
+  const BOSS_ASSAULT = {
+    devoreur: { name: 'La Faim sans fond', steps: ['mash', 'swipe', 'hold'] },
+    matriarche: { name: 'L’Hiver mordant', steps: ['rings3', 'mash', 'swipe'] },
+    roi: { name: 'Le Reflet volé', steps: ['target', 'tap', 'swipe'] },
+    architecte: { name: 'L’Effondrement', steps: ['swipe', 'swipe', 'hold'] },
+    eclipse: { name: 'Éclipse totale', steps: ['rings3', 'hold', 'swipe'] },
+    essaim: { name: 'La Nuée', steps: ['rings4', 'swipe'] },
+    bourreau: { name: 'La Hache du Bourreau', steps: ['hold', 'target', 'hold'] },
+    choeur: { name: 'Le Chant des Noyés', steps: ['rings4', 'swipe'] },
+    chaines: { name: 'Les Mille Chaînes', steps: ['mash', 'swipe', 'mash'] },
+    horloge: { name: 'L’Heure exacte', steps: ['rings3', 'tap', 'rings3'] },
+    miroirs: { name: 'Le Palais des Miroirs', steps: ['target', 'target', 'tap'] },
+    golem: { name: 'Avalanche de cendres', steps: ['swipe', 'swipe', 'swipe'] },
+    peste: { name: 'Le Souffle gris', steps: ['rings3', 'swipe', 'mash'] },
+    chasseur: { name: 'La Traque', steps: ['target', 'target', 'hold'] },
+    voeux: { name: 'Le Prix à payer', steps: ['tap', 'rings3', 'swipe'] },
+    titan: { name: 'Le Réveil du Titan', steps: ['hold', 'swipe', 'mash'] },
+    jumeaux: { name: 'Crépuscule double', steps: ['swipe', 'swipe', 'rings4'] },
+    juge: { name: 'Le Jugement', steps: ['hold', 'tap', 'target'] },
+    bete: { name: 'L’Apocalypse', steps: ['mash', 'swipe', 'hold', 'rings3'] },
+    abysse: { name: 'La Nuit sans fin', steps: ['swipe', 'rings4', 'target', 'hold'] },
+  };
+  const TIP = { tap: 'cb-def-tap', hold: 'cb-def-hold', swipe: 'cb-def-swipe', rings: 'cb-def-rings', mash: 'cb-def-mash', target: 'cb-def-target' };
+  async function tipFor(type) { const k = TIP[type.replace(/\d+$/, '')]; if (k && !g.s.tips?.[k]) await tuto(app, k); }
+  function stepQTE(type, s) {
+    if (type === 'swipe') return swipeQTE(s);
+    if (type === 'hold') return barQTE(s, true);
+    if (type === 'mash') return mashQTE(s);
+    if (type === 'target') return targetQTE(s);
+    if (type.startsWith('rings')) return ringsQTE(s, +type.slice(5) || 3);
+    return barQTE(s, false);
+  }
+  async function defenseQTE(s) {
     const e0 = st.units[s.a];
-    if (intentInfo(st, e0)?.aoe || s.kind === 'blast') return swipeQTE(s);
-    return barQTE(s, HOLD_K.includes(s.kind));
+    const A = e0?.boss && ASSAULT_K.includes(s.kind) && BOSS_ASSAULT[st.bossKey];
+    if (A) return assaultQTE(s, A);
+    const type = intentInfo(st, e0)?.aoe || s.kind === 'blast' ? 'swipe' : HOLD_K.includes(s.kind) ? 'hold' : s.kind === 'ambush' ? 'target'
+      : MASH_K.includes(s.kind) ? 'mash' : RING_N[s.kind] ? `rings${RING_N[s.kind]}` : 'tap';
+    await tipFor(type);
+    if (!alive_) return 'none';
+    return stepQTE(type, s);
+  }
+  // Fin commune des nouveaux gestes : tampon au centre, son, nettoyage
+  function qteStamp(res, words) {
+    const stamp = document.createElement('div'); stamp.className = `dv-stamp s-${res}`;
+    stamp.innerHTML = `<b>${words[res]}</b>`;
+    $('.dv')?.appendChild(stamp); setTimeout(() => stamp.remove(), 900);
+    if (res === 'none') app.sfx.miss(); else if (res === 'parry') app.sfx.perfect?.(); else app.sfx.swipe?.();
+  }
+  const scoreOf = (list) => { const n = list.reduce((a, r) => a + (r === 'parry' ? 2 : r === 'dodge' ? 1 : 0), 0) / (2 * list.length); return n >= 0.84 ? 'parry' : n >= 0.5 ? 'dodge' : 'none'; };
+  function qteBox(cls, s, title, hint) {
+    const def = INTENTS[s.kind] || INTENTS.hit;
+    const box = document.createElement('div');
+    box.className = `dv-dodge cb-def ${cls}`;
+    box.innerHTML = `<span class="dv-dodge-t">${intentIcon(s.kind)} ${esc(title || def.name)} ! <small>${hint}</small></span>`;
+    $('.dv-mid').appendChild(box); $('.dv-mid').classList.add('qte'); $('.dv')?.classList.add('qte-on');
+    return box;
+  }
+  function qteClose(box, s, tEls) {
+    $('.dv')?.classList.remove('qte-on');
+    box.remove(); $('.dv-mid')?.classList.remove('qte'); el(s.a)?.classList.remove('aim'); tEls.forEach((x) => x?.classList.remove('aimed'));
+  }
+  const capture = (fn) => { const h = (ev) => { if (ev.target.closest?.('[data-d="quit"],[data-d="help"],[data-d="speed"]')) return; ev.preventDefault(); ev.stopPropagation(); fn(ev); }; addEventListener('pointerdown', h, true); return () => removeEventListener('pointerdown', h, true); };
+  /* v558 : cercles qui se referment (attaques en plusieurs coups) : touche quand le cercle extérieur rejoint le cœur */
+  function ringsQTE(s, n) {
+    return new Promise((resolve) => {
+      const e = st.units[s.a], T = e?.boss ? 560 : e?.elite ? 620 : 700, P = e?.boss ? 45 : 55, OK = 150;
+      const tEl = el(s.t) || front(st, 'ally').map((u) => el(u.uid)).find(Boolean), tEls = [tEl];
+      el(s.a)?.classList.add('aim'); tEl?.classList.add('aimed');
+      const box = qteBox('cb-ringsq', s, null, `Touche quand le cercle se referme sur le cœur · ${n} coups`);
+      const dv = $('.dv'), R = dv.getBoundingClientRect(), tr = tEl?.getBoundingClientRect() || { left: R.left + R.width / 2 - 40, top: R.top + R.height * 0.6, width: 80, height: 100 };
+      const res = []; let cur = null, off = null, gone = false;
+      const pips = document.createElement('span'); pips.className = 'cb-pips'; pips.innerHTML = Array.from({ length: n }, () => '<i></i>').join(''); box.appendChild(pips);
+      const judge = (r) => { if (!cur || cur.done) return; cur.done = true; clearTimeout(cur.to); res.push(r); cur.node.classList.add(`r-${r}`); pips.children[res.length - 1]?.classList.add(`r-${r}`);
+        if (r === 'none') app.sfx.miss(); else app.sfx.hit?.();
+        const node = cur.node; setTimeout(() => node.remove(), 380); setTimeout(next, 260); };
+      const next = () => {
+        if (gone || !alive_) return;
+        if (res.length >= n) { gone = true; off?.(); const r = scoreOf(res); qteStamp(r, { parry: 'Tout paré !', dodge: 'Encaissé…', none: 'Touché…' }); setTimeout(() => { qteClose(box, s, tEls); resolve(r); }, 300); return; }
+        const node = document.createElement('div'); node.className = 'cb-ring';
+        const jx = (Math.random() - 0.5) * Math.min(90, tr.width * 0.8), jy = (Math.random() - 0.5) * Math.min(80, tr.height * 0.5);
+        node.style.cssText = `left:${tr.left - R.left + tr.width / 2 + jx}px;top:${tr.top - R.top + tr.height / 2 + jy}px;--t:${T}ms`;
+        node.innerHTML = '<i class="o"></i><i class="c"></i>';
+        dv.appendChild(node);
+        cur = { node, t0: performance.now(), done: false };
+        cur.to = setTimeout(() => judge('none'), T + OK);
+      };
+      off = capture((ev) => { if (!cur || cur.done) return; const d = Math.abs((ev.timeStamp && ev.timeStamp <= performance.now() ? ev.timeStamp : performance.now()) - cur.t0 - T); judge(d <= P ? 'parry' : d <= OK ? 'dodge' : 'none'); });
+      setTimeout(next, (reduced ? 200 : 350) + Math.random() * 250);
+    });
+  }
+  /* v558 : martèlement (prises, chaînes, gel) : touche le plus vite possible pour remplir la jauge avant la fin */
+  function mashQTE(s) {
+    return new Promise((resolve) => {
+      const e = st.units[s.a], N = e?.boss ? 13 : e?.elite ? 11 : 9, L = e?.boss ? 1700 : 1850, DECAY = 0.32;
+      const tEl = el(s.t), tEls = [tEl];
+      el(s.a)?.classList.add('aim'); tEl?.classList.add('aimed');
+      const box = qteBox('cb-mash', s, null, 'Martèle l’écran pour te libérer !');
+      const g0 = document.createElement('span'); g0.className = 'cb-mash-g'; g0.innerHTML = '<i class="f"></i><i class="tm"></i>'; box.appendChild(g0);
+      const f = g0.querySelector('.f'), tm = g0.querySelector('.tm');
+      let v = 0, t0 = 0, last = 0, done = false, raf = 0, off = null;
+      const end = (r) => { if (done) return; done = true; cancelAnimationFrame(raf); off?.(); box.classList.add(r === 'none' ? 'ko' : 'ok', `r-${r}`);
+        qteStamp(r, { parry: 'Libéré !', dodge: 'De justesse !', none: 'Pris…' }); setTimeout(() => { qteClose(box, s, tEls); resolve(r); }, 300); };
+      const step = () => { const now = performance.now(), dt = (now - last) / 1000; last = now; v = Math.max(0, v - DECAY * dt); f.style.transform = `scaleX(${v.toFixed(3)})`;
+        const x = (now - t0) / L; tm.style.transform = `scaleX(${Math.max(0, 1 - x).toFixed(3)})`;
+        if (x >= 1) return end('none'); raf = requestAnimationFrame(step); };
+      off = capture(() => { if (!t0 || done) return; v = Math.min(1, v + 1 / N); box.classList.remove('bump'); void box.offsetWidth; box.classList.add('bump'); app.sfx.tap?.();
+        if (v >= 1) end((performance.now() - t0) / L <= 0.55 ? 'parry' : 'dodge'); });
+      setTimeout(() => { if (done || !alive_) return; t0 = last = performance.now(); box.classList.add('go'); raf = requestAnimationFrame(step); }, (reduced ? 200 : 350) + Math.random() * 200);
+    });
+  }
+  /* v558 : point faible mobile (embuscades, reflets) : touche l'œil qui se déplace, le plus tôt possible */
+  function targetQTE(s) {
+    return new Promise((resolve) => {
+      const e = st.units[s.a], L = e?.boss ? 1150 : 1350;
+      const tEl = el(s.t), tEls = [tEl];
+      el(s.a)?.classList.add('aim'); tEl?.classList.add('aimed');
+      const box = qteBox('cb-targetq', s, null, 'Touche le point faible avant qu’il ne frappe');
+      const dv = $('.dv'), R = dv.getBoundingClientRect();
+      const orb = document.createElement('div'); orb.className = 'cb-weak'; orb.innerHTML = '<i></i>'; dv.appendChild(orb);
+      const tmb = document.createElement('span'); tmb.className = 'cb-sw-time'; tmb.innerHTML = `<i style="animation-duration:${L}ms"></i>`; box.appendChild(tmb);
+      const ax = R.width * 0.32, ay = R.height * 0.16, cx = R.width / 2, cy = R.height * 0.46, ph = Math.random() * 6.28, sp = (e?.boss ? 6.2 : 5) + Math.random();
+      let t0 = 0, done = false, raf = 0, miss = 0, off = null, px = cx, py = cy;
+      const end = (r) => { if (done) return; done = true; cancelAnimationFrame(raf); off?.(); orb.classList.add(`r-${r}`); setTimeout(() => orb.remove(), 400);
+        qteStamp(r, { parry: 'Débusqué !', dodge: 'Touché à temps', none: 'Surpris…' }); setTimeout(() => { qteClose(box, s, tEls); resolve(r); }, 300); };
+      const step = () => { const x = (performance.now() - t0) / 1000; px = cx + Math.sin(x * sp + ph) * ax; py = cy + Math.sin(x * sp * 1.7 + ph * 2) * ay;
+        orb.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px)`; if (x * 1000 >= L) return end('none'); raf = requestAnimationFrame(step); };
+      off = capture((ev) => { if (!t0 || done) return; const d = Math.hypot(ev.clientX - R.left - px, ev.clientY - R.top - py);
+        if (d <= 46) end((performance.now() - t0) / L <= 0.5 ? 'parry' : 'dodge'); else if (++miss >= 2) end('none'); else { orb.classList.remove('dodge'); void orb.offsetWidth; orb.classList.add('dodge'); app.sfx.miss(); } });
+      orb.style.transform = `translate(${cx}px, ${cy}px)`;
+      setTimeout(() => { if (done || !alive_) return; t0 = performance.now(); box.classList.add('go'); orb.classList.add('go'); raf = requestAnimationFrame(step); }, (reduced ? 200 : 450) + Math.random() * 200);
+    });
+  }
+  /* v558 : Assaut d'un gardien : sa grosse attaque se défend en plusieurs gestes enchaînés, avec sa mise en scène */
+  async function assaultQTE(s, A) {
+    const e = st.units[s.a];
+    if (!g.s.tips?.['cb-assault']) await tuto(app, 'cb-assault');
+    if (!alive_) return 'none';
+    const ov = document.createElement('div'); ov.className = 'cb-assault';
+    ov.innerHTML = `<div class="cb-as-in"><small>Assaut · ${esc(uName(e))}</small><b>${esc(A.name)}</b><span class="cb-as-pips">${A.steps.map(() => '<i></i>').join('')}</span></div>`;
+    $('.dv')?.appendChild(ov); app.sfx.boss?.();
+    if (!reduced) { const d = $('.dv'); d.classList.remove('ry-shake'); void d.offsetWidth; d.classList.add('ry-shake'); }
+    await new Promise((r) => setTimeout(r, reduced ? 500 : 1300));
+    ov.classList.add('run');
+    const res = [];
+    for (const [i, type] of A.steps.entries()) {
+      if (!alive_) break;
+      await tipFor(type);
+      const r = await stepQTE(type, s);
+      res.push(r); ov.querySelectorAll('.cb-as-pips i')[i]?.classList.add(`r-${r}`);
+      await new Promise((ok) => setTimeout(ok, 260));
+    }
+    const r = scoreOf(res.length ? res : ['none']);
+    $('.dv')?.querySelectorAll('.dv-stamp').forEach((x) => x.remove());
+    ov.classList.add('done', `r-${r}`);
+    ov.querySelector('.cb-as-in b').textContent = r === 'parry' ? 'Assaut brisé !' : r === 'dodge' ? 'Assaut amorti' : 'Assaut subi…';
+    if (r === 'parry') app.sfx.perfect?.(); else if (r === 'none') app.sfx.miss();
+    await new Promise((ok) => setTimeout(ok, reduced ? 300 : 900));
+    ov.remove();
+    return r;
   }
   function swipeQTE(s) {
     return new Promise((resolve) => {
-      const e = st.units[s.a], W = e?.boss ? 820 : e?.elite ? 900 : 1000, PERF = 0.45;
-      const DIRS = { l: ['←', 'à gauche', -1, 0], r: ['→', 'à droite', 1, 0], u: ['↑', 'vers le haut', 0, -1] };
+      const e = st.units[s.a], W = e?.boss ? 900 : e?.elite ? 1000 : 1100, PERF = 0.4;
+      const DIRS = { l: ['←', 'vers la gauche', -1, 0], r: ['→', 'vers la droite', 1, 0], u: ['↑', 'vers le haut', 0, -1] };
       const dk = Object.keys(DIRS)[Math.floor(Math.random() * 3)], [arrow, words, dx, dy] = DIRS[dk];
       const tEls = front(st, 'ally').map((u) => el(u.uid));
       el(s.a)?.classList.add('aim'); tEls.forEach((x) => x?.classList.add('aimed'));
       const def = INTENTS[s.kind] || INTENTS.blast;
       const box = document.createElement('div');
-      box.className = 'dv-dodge cb-def cb-swipe';
-      box.innerHTML = `<span class="dv-dodge-t">${intentIcon(s.kind)} ${esc(def.name)} ! <small>Glisse ton doigt ${words} pour mettre ton équipe à l’abri</small></span><span class="cb-sw-time"><i style="animation-duration:${W}ms"></i></span><span class="cb-sw-arrow d-${dk}"><img alt="${arrow}" src="assets/icons/sw-arrow.webp"></span>`;
+      box.className = 'dv-dodge cb-def cb-swipe prep';
+      /* v558 : une préparation montre le geste (grande flèche, doigt qui glisse) avant que le minuteur ne parte */
+      box.innerHTML = `<span class="dv-dodge-t">${intentIcon(s.kind)} ${esc(def.name)} ! <small>Prépare-toi : glisse ton doigt ${words} pour mettre ton équipe à l’abri</small></span><span class="cb-sw-arrow d-${dk}"><img alt="${arrow}" src="assets/icons/sw-arrow.webp"><i class="cb-sw-hand d-${dk}"></i></span><b class="cb-sw-go">Glisse ${arrow}</b><span class="cb-sw-time"><i style="animation-duration:${W}ms"></i></span>`;
       $('.dv-mid').appendChild(box); $('.dv-mid').classList.add('qte'); $('.dv')?.classList.add('qte-on');
       let t0 = 0, sx = null, sy = null, done = false, timer = 0;
       const end = (res) => {
@@ -936,11 +1097,12 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         if (!ok) return end('none');
         end((performance.now() - t0) / W <= PERF ? 'parry' : 'dodge');
       };
-      const down = (ev) => { if (!t0) return; if (ev.target.closest?.('[data-d="quit"],[data-d="help"],[data-d="speed"]')) return; ev.preventDefault(); ev.stopPropagation(); sx = ev.clientX; sy = ev.clientY; };
+      const down = (ev) => { if (ev.target.closest?.('[data-d="quit"],[data-d="help"],[data-d="speed"]')) return; ev.preventDefault(); ev.stopPropagation(); if (!t0) return; sx = ev.clientX; sy = ev.clientY; };
       const move = (ev) => { if (sx == null || done) return; judge(ev.clientX - sx, ev.clientY - sy); };
       const up = (ev) => { if (sx != null && !done) judge(ev.clientX - sx, ev.clientY - sy); sx = sy = null; };
       addEventListener('pointerdown', down, true); addEventListener('pointermove', move, true); addEventListener('pointerup', up, true);
-      setTimeout(() => { if (done || !alive_) return; t0 = performance.now(); box.classList.add('go'); timer = setTimeout(() => end('none'), W); }, (reduced ? 250 : 350) + Math.random() * 350);
+      const prep = (reduced ? 400 : 900) + Math.random() * 300;
+      setTimeout(() => { if (done || !alive_) return; t0 = performance.now(); box.classList.remove('prep'); box.classList.add('go'); box.querySelector('.dv-dodge-t small').textContent = `Maintenant ! Glisse ${words}`; app.sfx.swipe?.(); timer = setTimeout(() => end('none'), W); }, prep);
     });
   }
   function barQTE(s, hold = false) {
@@ -948,7 +1110,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       const e = st.units[s.a], moving = e?.boss || e?.elite;
       // v388 : zone réglée en TEMPS (avant : sa durée raccourcissait plus elle était loin sur la barre), toucher daté par
       // l'événement lui-même ; v509 : jugé sur l'image affichée à cet instant (sans compensation ni marge après la zone)
-      const w = defenseWindow(st, s.a, s.t), ease = (x) => Math.max(0, x) ** 1.7, D = 900; /* v509 : plus de LAG ni de marge de 50 ms après l’impact : on juge ce que le joueur voyait */
+      const w = defenseWindow(st, s.a, s.t), K = moving ? 1.3 + Math.random() * 1.0 : 1.7, ease = (x) => Math.max(0, x) ** K, D = e?.boss ? 780 : e?.elite ? 840 : 900; /* v558 : élites et gardiens : vitesse du curseur imprévisible (feinte), barre plus courte */ /* v509 : plus de LAG ni de marge de 50 ms après l’impact : on juge ce que le joueur voyait */
       const tb = D * (0.55 + Math.random() * 0.35), ta = tb - w.dodge, tp = tb - w.parry; /* fin de zone = impact ; parade = son dernier instant */
       const za = ease(ta / D), zb = ease(tb / D), pz0 = ease(tp / D);
       const zw = zb - za, pw = zb - pz0, z0 = za;
@@ -1050,7 +1212,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       let res = 'none';
       if (s.qte && defMode === 'auto') res = Math.random() < 0.4 ? 'dodge' : 'none'; // automatique : 40 % d'esquives, jamais de parade
       else if (s.qte && defMode !== 'off') {
-        if (!g.s.tips?.['cb-defense4']) await tuto(app, 'cb-defense4'); /* v502 : trois gestes, texte remontré une fois */
+        /* v558 : un conseil court à la première rencontre de chaque geste (tipFor), à la place du long texte cb-defense4 */
         if (!alive_) return;
         res = await defenseQTE(s);
         // v331 : après 3 défenses ratées dans l'expédition, on rappelle qu'il existe une défense assistée ou automatique (une seule fois)
