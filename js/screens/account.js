@@ -7,6 +7,7 @@ import { esc, toast, confirmBox, bindActions, openSheet } from '../ui/dom.js';
 import { blockedIds, clearBlocked, isMaskedPseudo } from '../core/moderation.js';
 import { clearAll } from '../notify.js';
 import { resetWatch } from '../cloud/mpwatch.js';
+import { serverMode } from '../cloud/partie.js';
 
 // v321 : règle des mots de passe réglée dans Supabase (Authentication → Password requirements)
 const PW_RULE = '8 caractères au moins, avec une majuscule, une minuscule, un chiffre et un symbole (! ? # …)';
@@ -133,12 +134,12 @@ export default function account(app, root) {
         <p class="small muted">Dans un classement, touche le pseudo d’un joueur pour le signaler ou le masquer.${blockedIds().length ? ` Joueurs masqués sur cet appareil : <b>${blockedIds().length}</b>.` : ''}</p>
         ${blockedIds().length ? `<button class="btn small" data-act="unblock">${icon('eye')}Réafficher les joueurs masqués</button>` : ''}
       </section>
-      <section class="panel stack">
+      ${serverMode() ? '' /* v544 : la partie est tenue par le serveur : plus rien à sauvegarder ni à récupérer à la main */ : `<section class="panel stack">
         <h2>Sauvegarde en ligne</h2>
         <p class="small acc-sync ${sync.status}">${st}</p>
         <p class="small muted">Ta partie est envoyée automatiquement quelques secondes après chaque action, et quand tu quittes l’app.</p>
         ${sync.status === 'paused' ? `<button class="btn primary small" data-act="resume">${icon('refresh')}Reprendre la synchronisation</button>` : ''}<div class="row gap wrap"><button class="btn small" data-act="push">${icon('upload')}Sauvegarder maintenant</button><button class="btn small" data-act="pull">${icon('download')}Récupérer la partie en ligne</button></div>
-      </section>
+      </section>`}
       <section class="panel stack">
         <h2>Sécurité et aide</h2>
         <a class="btn small" href="#/compte/motdepasse">${icon('lock')}Changer mon mot de passe</a>
