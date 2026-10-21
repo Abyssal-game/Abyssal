@@ -4,7 +4,8 @@ import { unlockSources } from '../js/core/unlocks.js';
 import { CODEX_TIERS, SHOP } from '../js/core/codex.js';
 
 // titres retirés du jeu mais encore dans des sauvegardes (jeux retirés, anciens noms)
-const RETIRED = ['Novice des Sceaux', 'Éveilleur des Sceaux', 'Maître des Masques', 'Prêtre des Trois Autels'];
+const RETIRED = ['Novice des Sceaux', 'Éveilleur des Sceaux', 'Maître des Masques', 'Prêtre des Trois Autels',
+  /* v547 : titres de l'ancienne ébauche du Codex */ 'Scribe de l’Abîme', 'Enlumineur', 'Gardien des pages', 'Maître du Codex', 'Lecteur assidu'];
 
 export function allTitles() {
   const cat = loadCatalog(), out = new Set(unlockSources(cat).titles.map((t) => t.name));

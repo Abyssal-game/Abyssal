@@ -32,6 +32,7 @@ export default function codexScreen(app, root) {
     if (r.frame) parts.push(`<span class="cx-r"><i class="avatar-mini pf pf-${r.frame}"></i>${esc(ALL_FRAMES[r.frame] || r.frame)}</span>`);
     if (r.title) parts.push(`<span class="cx-r">${picon('titles')}Titre « ${esc(r.title)} »</span>`);
     if (r.back) parts.push(`<span class="cx-r"><img class="cx-back" alt="" src="assets/backs/${r.back}.webp">${esc(CODEX_BACKS[r.back] || r.back)}</span>`);
+    if (r.finish) parts.push(`<span class="cx-r">${picon('holo')}Finition ${esc(FINISHES[r.finish]?.name || r.finish)}</span>`);
     if (r.obs) parts.push(`<span class="cx-r">${obsTxt(r.obs)}&nbsp;${esc(OBS.name.toLowerCase())}</span>`);
     return parts.join('');
   };
@@ -53,6 +54,7 @@ export default function codexScreen(app, root) {
     for (const [k, n] of Object.entries(r.tickets || {})) items.push([`<img class="cxr-pack" alt="" src="assets/packs/${k === 'standard' ? 'standard2' : k}.webp">`, `${n} ×`, esc(PACK_NAME[k] || k)]);
     if (r.frame) items.push([`<span class="avatar-mini pf pf-${r.frame}">${myAv()}</span>`, '', esc(ALL_FRAMES[r.frame] || r.frame)]);
     if (r.back) items.push([`<img class="cxr-back" alt="" src="assets/backs/${r.back}.webp">`, '', esc(CODEX_BACKS[r.back] || r.back)]);
+    if (r.finish) items.push([`<span class="cx-fin cxr-fin"><img alt="" src="assets/art/lite/${esc(g.bestCards(1)[0]?.id || 'ABY-039')}.webp"><img alt="" src="assets/variants/${r.finish}-frame.webp" onerror="this.remove()"></span>`, '', `Finition ${esc(FINISHES[r.finish]?.name || r.finish)}`]);
     if (r.title) items.push([`<span class="cxr-ic">${picon('titles')}</span>`, 'Titre', `« ${esc(r.title)} »`]);
     if (r.obs) items.push([`<span class="cxr-ic">${OBS_I}</span>`, `+${fmt(r.obs)}`, esc(OBS.name.toLowerCase())]);
     return items.map(([v, n, l]) => `<span class="cxr">${v}<span class="cxr-t">${n ? `<b>${n}</b>` : ''}<small>${l}</small></span></span>`).join('');
@@ -67,12 +69,12 @@ export default function codexScreen(app, root) {
       return `<div class="cxk-c ${tr} ${state}" ${state === 'ready' ? `data-cx="claim" data-tr="${tr}" data-t="${tier}" role="button" tabindex="0"` : ''}>${rwBig(r)}
         ${state === 'ready' ? '<span class="cxk-go">Récupérer</span>' : state === 'got' ? `<span class="cxk-ok">${icon('check')}</span>` : state === 'lock' ? `<span class="cxk-lk">${icon('lock')}</span>` : ''}</div>`;
     };
-    const best = ['cx-abime', 'cx-or', 'dos-codex'];
+    const best = ['cx-hiver', 'dos-hiver', 'cx-aurore']; /* v547 : les plus belles pièces de l'Hiver éternel */
     const pitch = c.premium ? '' : `<section class="cx-pitch">
         ${opt('assets/ui/cx-enlumine.webp', 'cx-pitch-art')}
         <div class="cx-pitch-in"><small class="cx-kick">Voie enluminée</small><h2>${esc(CODEX.premiumName)}</h2>
-          <p>Débloque la colonne de droite : cadres peints, dos de cartes et titres exclusifs à cette saison.</p>
-          <div class="cx-pitch-show">${best.map((k) => k.startsWith('dos') ? `<img class="cxr-back" alt="" src="assets/backs/${k}.webp">` : `<span class="avatar-mini pf pf-${k}">${myAv()}</span>`).join('')}</div>
+          <p>Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier 30, la Couronne de la Reine de l’Hiver et la finition Hiver éternel.</p>
+          <div class="cx-pitch-show">${best.map((k) => k.startsWith('dos') ? `<img class="cxr-back" alt="" src="assets/backs/${k}.webp" onerror="this.remove()">` : `<span class="avatar-mini pf pf-${k}">${myAv()}</span>`).join('')}</div>
           <button class="btn dc-plq dc-plq-red cx-unlock2" data-cx="unlock">${icon('star')}<span>Débloquer</span>${obsTxt(CODEX.cost)}</button></div></section>`;
     return `<section class="cx-season">
         ${opt('assets/ui/cx-saison1.webp', 'cx-season-art')}
@@ -84,10 +86,10 @@ export default function codexScreen(app, root) {
       ${n ? `<button class="btn primary block dc-plq dc-plq-red cx-all" data-cx="all">${icon('chest')}Tout récupérer (${n})</button>` : ''}
       ${pitch}
       <div class="cxk-head"><span>Voie de l'Abîme<small>gratuite</small></span><span></span><span class="prem">Voie enluminée<small>${c.premium ? 'à toi' : 'à débloquer'}</small></span></div>
-      <ol class="cxk">${CODEX_TIERS.map((x) => `<li class="cxk-r ${x.tier <= t ? 'reached' : ''} ${x.tier === t + 1 ? 'next' : ''}" ${x.tier === Math.min(CODEX.tiers, t + 1) ? 'id="cx-now"' : ''}>${cell(x.tier, 'free', x.free)}<span class="cxk-n">${x.tier}</span>${cell(x.tier, 'prem', x.prem)}</li>`).join('')}</ol>
+      <ol class="cxk">${CODEX_TIERS.map((x) => `<li class="cxk-r ${x.tier <= t ? 'reached' : ''} ${x.tier === t + 1 ? 'next' : ''} ${x.tier === CODEX.tiers ? 'ult' : ''}" ${x.tier === Math.min(CODEX.tiers, t + 1) ? 'id="cx-now"' : ''}>${cell(x.tier, 'free', x.free)}<span class="cxk-n">${x.tier}</span>${cell(x.tier, 'prem', x.prem)}</li>`).join('')}</ol>
       <details class="panel dc-fold"><summary>${picon('help')}<span class="dc-sum-t">Gagner des points de Codex</span></summary>
         <ul class="cx-xp">${Object.entries(CODEX_XP).map(([k, v]) => `<li><span>${esc(CODEX_XP_LABEL[k])}</span><b>+${v}</b><small class="muted">${fmt(c.log[k] || 0)} gagnés</small></li>`).join('')}</ul>
-        <p class="small muted">La voie de gauche se gagne en jouant. La voie enluminée se débloque une fois par saison avec des obsidiennes : seulement des cadres peints, des titres et des dos de cartes, jamais de puissance.</p></details>`;
+        <p class="small muted">La voie de gauche se gagne en jouant. La voie enluminée se débloque une fois par saison avec des obsidiennes : une récompense à chaque palier, sur le thème de la saison, jamais en vente à l’Échoppe et jamais de puissance.</p></details>`;
   }
 
   function shopTab() {

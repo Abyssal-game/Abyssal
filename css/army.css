@@ -5199,3 +5199,29 @@ html.reduce-motion .bx-intro > .bx-in { animation: none; }
 /* v545 : Réglages, les choix (Défense, Décor, Effets, Animations) se partagent toute la largeur : plus de texte qui déborde de la case dorée */
 .set-row .seg:not(.lang-grid) { display: flex; width: 100%; }
 .set-row .seg:not(.lang-grid) .seg-b { flex: 1 1 0; min-width: 0; padding: 0 6px; white-space: normal; line-height: 1.1; text-align: center; }
+
+/* v547 : Saison I « L'Hiver éternel » : objets exclusifs de la voie enluminée (images Gemini à intégrer par
+   tools/frame-art.py --fit --hole=0.78 --suffix=4 --clip et tools/variant-frame2.py) */
+.pf-cx-glace-noire { --fr: url(../assets/frames/cx-glace-noire-4.webp); }
+.pf-cx-loups-neige { --fr: url(../assets/frames/cx-loups-neige-4.webp); }
+.pf-cx-hiver { --fr: url(../assets/frames/cx-hiver-4.webp); }
+.dr-fin-aurore .tcg-dress { background-image: url(../assets/variants/fin-aurore-frame.webp); }
+.dr-fin-hiver .tcg-dress { background-image: url(../assets/variants/fin-hiver-frame.webp); }
+.dr-fin-aurore .tcg-art img { filter: saturate(1.1) hue-rotate(-8deg) brightness(1.04); }
+.dr-fin-hiver .tcg-art img { filter: saturate(.8) brightness(1.06) contrast(1.04); }
+/* récompense ultime : la couronne de l'Hiver brille et la neige tombe autour du portrait */
+.pf.pf-cx-hiver { box-shadow: 0 0 0 2px rgba(190, 230, 255, .55), 0 0 22px rgba(150, 210, 255, .75); }
+.pf.pf-cx-hiver::before { content: ''; position: absolute; inset: -28%; z-index: 3; pointer-events: none; border-radius: 50%;
+  background: radial-gradient(1.6px 1.6px at 20% 10%, #fff, transparent 70%), radial-gradient(1.2px 1.2px at 70% 0%, #fff, transparent 70%),
+    radial-gradient(2px 2px at 45% 30%, #E6F6FF, transparent 70%), radial-gradient(1.4px 1.4px at 85% 40%, #fff, transparent 70%),
+    radial-gradient(1.8px 1.8px at 10% 60%, #E6F6FF, transparent 70%), radial-gradient(1.2px 1.2px at 60% 70%, #fff, transparent 70%);
+  background-size: 100% 50%; animation: cxSnow 4.5s linear infinite; opacity: .9; }
+@keyframes cxSnow { from { background-position: 0 -50%, 0 -50%, 0 -50%, 0 -50%, 0 -50%, 0 -50%; } to { background-position: 4% 150%, -3% 150%, 2% 150%, -4% 150%, 3% 150%, -2% 150%; } }
+.dr-fin-hiver .tcg-dress::after { content: ''; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(115deg, transparent 35%, rgba(220, 240, 255, .35) 50%, transparent 65%) 0 0 / 250% 100%; animation: cxFrost 3.6s ease-in-out infinite; }
+@keyframes cxFrost { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+html.reduce-motion .pf.pf-cx-hiver::before, html.reduce-motion .dr-fin-hiver .tcg-dress::after, html.fx-light .pf.pf-cx-hiver::before { animation: none; }
+/* Codex : vignette d'une finition et palier 30 mis en avant */
+.cxr-fin { width: 42px; aspect-ratio: 5 / 7; }
+.cxk-r.ult .cxk-c.prem { border-color: #CDEBFF !important; box-shadow: 0 0 0 1px rgba(205, 235, 255, .6), 0 0 22px rgba(150, 210, 255, .55); background: radial-gradient(120% 90% at 50% 0%, rgba(170, 220, 255, .22), transparent 65%), rgba(14, 18, 34, .92); }
+.cxk-r.ult .cxk-n { background: radial-gradient(circle at 35% 30%, #F2FAFF, #7FB8E6); color: #0B1A2A; border-color: #CDEBFF; }

@@ -54,6 +54,8 @@ export const CODEX_FRAMES = {
   'cx-meute': 'Cadre de la meute', 'cx-liche': 'Cadre de la Liche', 'cx-ouroboros': 'Cadre de l’Ouroboros', 'cx-automate': 'Cadre de l’Automate',
   'cx-gueule': 'Cadre de la Gueule du Dévoreur', 'cx-eclipse': 'Cadre de l’Éclipse', 'cx-horloger': 'Cadre de l’Horloger', 'cx-balance': 'Cadre du Juge des Sceaux',
   /* v480 */ 'cx-constellation': 'Cadre des constellations', 'cx-geode': 'Cadre de la géode d’améthyste', 'cx-sablier': 'Cadre du sablier éternel', 'cx-pages': 'Cadre du grimoire déchiré', 'cx-corbeau': 'Cadre des corbeaux', 'cx-souverain': 'Couronne du Souverain de l’Abysse',
+  /* v547 : Saison I « L'Hiver éternel », exclusifs de la voie enluminée (images Gemini attendues) */
+  'cx-glace-noire': 'Cadre de glace noire', 'cx-loups-neige': 'Cadre de la meute des neiges', 'cx-hiver': 'Couronne de la Reine de l’Hiver',
   /* v532 */ 'cx-carnaval': 'Cadre du carnaval des ombres', 'cx-phalenes': 'Cadre des phalènes', 'cx-cristaux-sang': 'Cadre des cristaux de sang',
 };
 // Dos de cartes (v473 : images Gemini, assets/backs/<clé>.webp, tools/back-art.py ; choisis au Profil)
@@ -63,6 +65,7 @@ export const CODEX_BACKS = { 'dos-codex': 'Dos du Codex', 'dos-abime': 'Dos de l
   'dos-necrotique': 'Dos du royaume Nécrotique', 'dos-primordial': 'Dos du royaume Primordial', 'dos-artificiel': 'Dos du royaume Artificiel',
   /* v480 : catalogue de l'Échoppe */ 'dos-ames': 'Dos de la Nuit des Âmes', 'dos-solstice': 'Dos du solstice noir', 'dos-roses': 'Dos des cœurs maudits', 'dos-lune-sang': 'Dos de la Lune de sang', 'dos-devoreur': 'Dos du Dévoreur', 'dos-eclipse': 'Dos de l’Éclipse', 'dos-horloger': 'Dos de l’Horloger', 'dos-miroirs': 'Dos de la Sorcière des Miroirs', 'dos-jumeaux': 'Dos des Jumeaux du Crépuscule', 'dos-titan': 'Dos du Titan Endormi',
   /* v481 */ 'dos-abysse': 'Dos de L’Abysse', 'dos-tarot': 'Dos du tarot interdit', 'dos-mosaique': 'Dos de la mosaïque d’or', 'dos-encre': 'Dos de l’encre et du dragon', 'dos-alchimie': 'Dos de l’alchimiste', 'dos-carte-abysse': 'Dos de la carte de l’Abysse', 'dos-reliquaire': 'Dos du reliquaire', 'dos-tapisserie': 'Dos de la chasse maudite', 'dos-art-deco': 'Dos d’or noir', 'dos-vivant': 'Dos de chair vivante', 'dos-nebuleuse': 'Dos de la nébuleuse', 'dos-vitrail': 'Dos du vitrail de cathédrale',
+  /* v547 */ 'dos-blizzard': 'Dos du blizzard', 'dos-hiver': 'Dos de l’Hiver éternel',
   /* v532 */ 'dos-carnaval': 'Dos du carnaval des ombres', 'dos-phalene': 'Dos de la grande phalène', 'dos-coeur-mecanique': 'Dos du cœur mécanique' };
 
 // v482 : finitions de prestige (« habillages ») : un cadre peint posé sur une carte qu'on possède, sans rien changer à
@@ -83,6 +86,9 @@ export const FINISHES = {
   'fin-draconique': { name: 'Draconique', desc: 'Écailles de bronze et griffes de dragon.' },
   'fin-imperiale': { name: 'Impériale', desc: 'Or massif, velours violet et améthystes.' },
   'fin-neant': { name: 'Néant', desc: 'Une déchirure dans la réalité.' },
+  /* v547 : exclusives de la Saison I (voie enluminée) */
+  'fin-aurore': { name: 'Aurore boréale', desc: 'Voiles d’aurore verts et violets dans la glace.' },
+  'fin-hiver': { name: 'Hiver éternel', desc: 'Couronne de glace, neige qui tombe sans fin. Récompense ultime de la Saison I.' },
 };
 // Catalogue de l'Échoppe, en obsidiennes (le Codex enluminé donne aussi givre, braises et dos de l'Abîme)
 const F = (k, cost) => ({ id: k, kind: 'frame', give: { frame: k }, cost });
@@ -91,30 +97,39 @@ const FN = (k, cost) => ({ id: k, kind: 'finish', give: { finish: k }, cost });
 export const ROYAUMES = ['dos-infernal', 'dos-abyssal', 'dos-celeste', 'dos-sauvage', 'dos-necrotique', 'dos-primordial', 'dos-artificiel'];
 /* v535 : cadres de la meute, des corbeaux, des chaînes et des roses noires retirés de la vente (leur ornement cachait le visage de la créature) */
 export const CATALOG = [
-  F('cx-givre', 100), F('cx-braise', 100), F('cx-os', 120), F('cx-serpents', 120), F('cx-vitrail', 120), F('cx-rouages', 120),
+  F('cx-braise', 100), F('cx-os', 120), F('cx-serpents', 120), F('cx-vitrail', 120), F('cx-rouages', 120),
   F('cx-racines', 120), F('cx-yeux', 140), F('cx-ruche', 140),
-  F('cx-lanternes', 180), F('cx-voile', 250), F('cx-houx', 180), F('cx-aurore', 250), F('cx-prince', 250), F('cx-leviathan', 250), F('cx-seraphin', 250), F('cx-liche', 250), F('cx-ouroboros', 250), F('cx-automate', 250), F('cx-gueule', 200), F('cx-eclipse', 200), F('cx-horloger', 200), F('cx-balance', 200),
+  F('cx-lanternes', 180), F('cx-voile', 250), F('cx-prince', 250), F('cx-leviathan', 250), F('cx-seraphin', 250), F('cx-liche', 250), F('cx-ouroboros', 250), F('cx-automate', 250), F('cx-gueule', 200), F('cx-eclipse', 200), F('cx-horloger', 200), F('cx-balance', 200),
   F('cx-constellation', 280), F('cx-geode', 180), F('cx-sablier', 180), F('cx-pages', 180), F('cx-souverain', 450),
-  B('dos-abime', 140), B('dos-ames', 200), B('dos-solstice', 200), B('dos-roses', 200), B('dos-lune-sang', 200), B('dos-devoreur', 200), B('dos-eclipse', 200), B('dos-horloger', 200), B('dos-miroirs', 200), B('dos-jumeaux', 200), B('dos-titan', 200),
+  B('dos-abime', 140), B('dos-ames', 200), B('dos-roses', 200), B('dos-lune-sang', 200), B('dos-devoreur', 200), B('dos-eclipse', 200), B('dos-horloger', 200), B('dos-miroirs', 200), B('dos-jumeaux', 200), B('dos-titan', 200),
   B('dos-abysse', 280), B('dos-tarot', 200), B('dos-mosaique', 200), B('dos-encre', 200), B('dos-alchimie', 200), B('dos-carte-abysse', 200), B('dos-reliquaire', 280), B('dos-tapisserie', 200), B('dos-art-deco', 280), B('dos-vivant', 280), B('dos-nebuleuse', 280), B('dos-vitrail', 200), ...ROYAUMES.map((k) => B(k, 120)),
-  FN('fin-ecarlate', 300), FN('fin-givree', 300), FN('fin-spectrale', 350), FN('fin-vitrail', 350),
+  FN('fin-ecarlate', 300), FN('fin-spectrale', 350), FN('fin-vitrail', 350),
   FN('fin-estampe', 300), FN('fin-incandescente', 350), FN('fin-constellee', 350), FN('fin-ossuaire', 300), FN('fin-nacree', 300), FN('fin-runique', 300), FN('fin-scellee', 300), FN('fin-draconique', 350), FN('fin-imperiale', 450), FN('fin-neant', 450),
   F('cx-carnaval', 250), F('cx-phalenes', 180), F('cx-cristaux-sang', 280), B('dos-carnaval', 280), B('dos-phalene', 200), B('dos-coeur-mecanique', 280),
   { id: 'royaumes', kind: 'bundle', name: 'Les sept royaumes', give: { backs: ROYAUMES }, cost: 600, desc: 'Les sept dos des royaumes d’un coup (840 à l’unité).' },
 ];
-// Exclusifs du Codex enluminé (jamais en vente) : cadres d'encre, de sang, enluminé, de l'Abîme, dos du Codex, titres.
-export const CODEX_ONLY = ['cx-encre', 'cx-sang', 'cx-or', 'cx-abime', 'dos-codex'];
+// Exclusifs du Codex enluminé (jamais en vente). v547 : tous les cosmétiques de la voie enluminée (Saison I : l'hiver),
+// plus les anciens objets du Codex gardés pour une saison future (encre, sang, enluminé, Abîme, dos du Codex).
+export const CODEX_ONLY = ['cx-encre', 'cx-sang', 'cx-or', 'cx-abime', 'dos-codex',
+  'cx-givre', 'cx-houx', 'cx-aurore', 'cx-glace-noire', 'cx-loups-neige', 'cx-hiver', 'dos-solstice', 'dos-blizzard', 'dos-hiver', 'fin-givree', 'fin-aurore', 'fin-hiver'];
 
-// Paliers : voie gratuite (en jouant) et voie enluminée (achetée, cosmétique seulement). null = rien à ce palier.
-const FREE = (t) => (t === CODEX.tiers ? { chests: { abyssal: 1 }, title: 'Lecteur assidu' }
-  : t % 10 === 0 ? { tickets: { standard: 2 } }
-  : t % 5 === 0 ? { chests: { [t < 15 ? 'fer' : 'or']: 1 } }
-  : t % 2 === 0 ? { ash: 20 + 5 * t }
-  : { shards: 40 + 10 * t });
+// Paliers. v547 (retour du propriétaire : « on gagne énormément en gratuit et peu en payant ») : la voie gratuite donne un
+// palier sur deux (éclats, cendres, coffres, tickets) ; la voie enluminée donne quelque chose à CHAQUE palier, tout sur le
+// thème de la saison (l'Hiver éternel), cosmétique seulement et jamais en vente à l'Échoppe (CODEX_ONLY).
+// Palier 30 : la récompense ultime (couronne animée, finition, titre). null = rien à ce palier.
+const FREE = (t) => (t === CODEX.tiers ? { chests: { abyssal: 1 } }
+  : t % 10 === 0 ? { chests: { [t < 15 ? 'fer' : 'or']: 1 } }
+  : t === 5 || t === 15 || t === 25 ? { tickets: { standard: 1 } }
+  : t % 2 === 0 ? (t % 4 === 0 ? { ash: 15 + 3 * t } : { shards: 30 + 6 * t })
+  : null);
 const PREM = {
-  1: { title: 'Scribe de l’Abîme' }, 3: { frame: 'cx-encre' }, 6: { back: 'dos-codex' }, 9: { frame: 'cx-sang' },
-  12: { title: 'Enlumineur' }, 15: { frame: 'cx-or' }, 18: { back: 'dos-abime' }, 21: { frame: 'cx-givre' },
-  24: { title: 'Gardien des pages' }, 27: { frame: 'cx-braise' }, 30: { frame: 'cx-abime', title: 'Maître du Codex' },
+  1: { title: 'Veilleur du long hiver' }, 2: { obs: 20 }, 3: { frame: 'cx-givre' }, 4: { obs: 20 }, 5: { title: 'Marcheur des neiges' },
+  6: { back: 'dos-solstice' }, 7: { obs: 20 }, 8: { finish: 'fin-givree' }, 9: { obs: 20 }, 10: { frame: 'cx-houx' },
+  11: { obs: 20 }, 12: { title: 'Chasseur d’aurores' }, 13: { obs: 20 }, 14: { frame: 'cx-aurore' }, 15: { back: 'dos-blizzard' },
+  16: { obs: 20 }, 17: { title: 'Cœur de givre' }, 18: { frame: 'cx-glace-noire' }, 19: { obs: 20 }, 20: { finish: 'fin-aurore' },
+  21: { obs: 20 }, 22: { title: 'Voix du blizzard' }, 23: { obs: 30 }, 24: { back: 'dos-hiver' }, 25: { frame: 'cx-loups-neige' },
+  26: { obs: 30 }, 27: { title: 'Gardien du solstice' }, 28: { obs: 30 }, 29: { obs: 50 },
+  30: { frame: 'cx-hiver', finish: 'fin-hiver', title: 'Souverain de l’Hiver éternel' },
 };
 export const CODEX_TIERS = Array.from({ length: CODEX.tiers }, (_, i) => ({ tier: i + 1, free: FREE(i + 1), prem: PREM[i + 1] || null }));
 

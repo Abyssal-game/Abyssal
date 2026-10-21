@@ -22,15 +22,16 @@ test('codex : voie gratuite récupérable, voie enluminée fermée sans achat', 
   const g = mk();
   g.codexXp(CODEX.xpPerTier * 3, 'dev');
   const before = g.s.shards;
-  const r = g.codexClaim('free', 1);
+  const r = g.codexClaim('free', 2); /* v547 : la voie gratuite donne un palier sur deux */
   assert.equal(g.s.shards, before + (r.shards || 0));
+  assert.throws(() => g.codexClaim('free', 2), /Rien/);
   assert.throws(() => g.codexClaim('free', 1), /Rien/);
   assert.throws(() => g.codexClaim('free', 5), /pas encore/);
   assert.throws(() => g.codexClaim('prem', 1), /voie enluminée/);
   g.codex().premium = true;
   g.codexClaim('prem', 3);
   assert.ok(g.s.frames.includes(CODEX_TIERS[2].prem.frame));
-  assert.equal(claimable(g.codex()), 3); // paliers avec quelque chose à prendre : 1 (titre enluminé), 2 et 3 (gratuits)
+  assert.equal(claimable(g.codex()), 2); // paliers 1 et 2 de la voie enluminée (titre, obsidiennes)
 });
 
 test('codex : la voie enluminée ne donne jamais de puissance (ni éclats, cendres, coffres ou tickets)', () => {
@@ -38,6 +39,17 @@ test('codex : la voie enluminée ne donne jamais de puissance (ni éclats, cendr
   for (const it of [...SHOP, ...CATALOG]) if (it.give) for (const k of ['shards', 'ash', 'chests', 'tickets']) assert.equal(it.give[k], undefined, it.id);
   for (const it of CATALOG) assert.ok(['frame', 'back', 'bundle', 'finish'].includes(it.kind) && !it.give.obs && !it.give.title, it.id);
   for (const k of CODEX_ONLY) assert.ok(!CATALOG.some((it) => it.id === k), `${k} reste exclusif au Codex`);
+});
+
+test('codex v547 : une récompense enluminée à chaque palier, aucune n’est à vendre, le palier 30 est exceptionnel', () => {
+  for (const t of CODEX_TIERS) {
+    assert.ok(t.prem, `palier ${t.tier} : voie enluminée vide`);
+    for (const k of [t.prem.frame, t.prem.back, t.prem.finish].filter(Boolean)) assert.ok(CODEX_ONLY.includes(k) && !CATALOG.some((it) => it.id === k), `${k} ne doit pas être en vente`);
+  }
+  const last = CODEX_TIERS[CODEX.tiers - 1].prem;
+  assert.ok(last.frame && last.finish && last.title);
+  const obs = CODEX_TIERS.reduce((n, t) => n + (t.prem.obs || 0), 0);
+  assert.ok(obs < CODEX.cost, 'les obsidiennes rendues ne paient pas le Codex suivant');
 });
 
 test('échoppe : fermée hors Mode Créateur, achat simulé ensuite (une seule fois pour le Fondateur)', () => {
