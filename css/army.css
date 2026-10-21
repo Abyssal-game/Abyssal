@@ -5225,3 +5225,13 @@ html.reduce-motion .pf.pf-cx-hiver::before, html.reduce-motion .dr-fin-hiver .tc
 .cxr-fin { width: 42px; aspect-ratio: 5 / 7; }
 .cxk-r.ult .cxk-c.prem { border-color: #CDEBFF !important; box-shadow: 0 0 0 1px rgba(205, 235, 255, .6), 0 0 22px rgba(150, 210, 255, .55); background: radial-gradient(120% 90% at 50% 0%, rgba(170, 220, 255, .22), transparent 65%), rgba(14, 18, 34, .92); }
 .cxk-r.ult .cxk-n { background: radial-gradient(circle at 35% 30%, #F2FAFF, #7FB8E6); color: #0B1A2A; border-color: #CDEBFF; }
+
+/* v548 : prix en euros du Codex enluminé sur le bouton Débloquer */
+.cx-unlock2 .cx-eur { font: 800 1rem/1 var(--f-ui); color: #FFE7A6; margin-left: 6px; }
+
+/* v548 : rangement de l'app (même logique que le Sanctuaire et les Réglages) */
+/* Collection : « Ranger » tient dans la largeur (la case Rareté sortait de l'écran) */
+.col-order .seg { min-width: 0; }
+.col-order .seg-b { min-width: 0; }
+/* toute rangée de choix en deux ou trois cases : chaque case prend sa part de la largeur, le texte ne déborde plus de l'or */
+.seg:not(.wide):not(.lang-grid):not(.set-tabs) { max-width: 100%; }

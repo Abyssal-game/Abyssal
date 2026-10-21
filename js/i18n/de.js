@@ -1,5 +1,7 @@
 // Dictionnaire allemand (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Classement indisponible pour l’instant. Réessaie dans un moment.": "Rangliste gerade nicht verfügbar. Versuche es gleich noch einmal.",
+  "Codex enluminé : débloqué (achat simulé).": "Illuminierter Kodex: freigeschaltet (simulierter Kauf).",
   "Cadre de glace noire": "Rahmen aus schwarzem Eis",
   "Cadre de la meute des neiges": "Rahmen des Schneerudels",
   "Couronne de la Reine de l’Hiver": "Krone der Winterkönigin",
@@ -19,7 +21,7 @@ export default {
   "Gardien du solstice": "Hüter der Sonnenwende",
   "Souverain de l’Hiver éternel": "Herrscher des ewigen Winters",
   "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Reine de l’Hiver et la finition Hiver éternel.": "Eine Belohnung auf jeder Stufe: Rahmen, Kartenrücken, Veredelungen und Titel des ewigen Winters, die es im Laden nicht gibt. Auf Stufe {0} die Krone der Winterkönigin und die Veredelung Ewiger Winter.",
-  "La voie de gauche se gagne en jouant. La voie enluminée se débloque une fois par saison avec des obsidiennes : une récompense à chaque palier, sur le thème de la saison, jamais en vente à l’Échoppe et jamais de puissance.": "Die linke Bahn verdienst du durch Spielen. Die illuminierte Bahn wird einmal pro Saison mit Obsidianen freigeschaltet: eine Belohnung auf jeder Stufe, im Thema der Saison, nie im Laden erhältlich und nie Stärke.",
+  "La voie de gauche se gagne en jouant. La voie enluminée s’achète une fois par saison : une récompense à chaque palier, sur le thème de la saison, jamais en vente à l’Échoppe et jamais de puissance.": "Die linke Bahn verdienst du durch Spielen. Die illuminierte Bahn wird einmal pro Saison gekauft: eine Belohnung auf jeder Stufe, im Thema der Saison, nie im Laden erhältlich und nie Stärke.",
   "<b>Titre</b><small>« Veilleur du long hiver »</small>": "<b>Titel</b><small>„Wächter des langen Winters“</small>",
   "{e0}Titre « Veilleur du long hiver »": "{e0}Titel „Wächter des langen Winters“",
   "<b>Titre</b><small>« Marcheur des neiges »</small>": "<b>Titel</b><small>„Schneewanderer“</small>",

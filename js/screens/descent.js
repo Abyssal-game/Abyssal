@@ -67,7 +67,7 @@ export default function descent(app, root) {
     const start = startFloor(), ch = chapterOf(start), replay = chapDone(ch), night = ui.nightmare && replay && g.nightmareUnlocked();
     root.innerHTML = `<header class="screen-head dc-head ui-hero bn-descente"><h1>La Descente</h1><p class="muted">${g.campaignDone() ? 'Tu as atteint le fond de l’Abysse' : d.best ? `Chapitre ${chapNow()} sur ${CHAPTERS} · record : étage ${d.best}` : 'Descends étage par étage jusqu’au fond de l’Abysse.'}</p></header>
       ${last ? summaryHTML(last) : ''}
-      ${chests ? `<a class="panel dc-chests" href="#/coffres"><span class="dc-new-ic">${icon('p:chest')}</span><span><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Éclats et boosters</span></span>${icon('next')}</a>` : ''}
+      ${'' /* v548 : rappel des coffres retiré de la Descente (déjà sur l'Accueil et sur l'onglet Butin) */}
       <section class="panel dc-go">
         ${chapterHTML()}
         ${teamStrip(team)}

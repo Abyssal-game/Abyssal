@@ -1,5 +1,7 @@
 // Anglais (v506-v507) : texte français → traduction. Généré à partir des lots de traduction ; on peut corriger à la main.
 export default {
+  "Classement indisponible pour l’instant. Réessaie dans un moment.": "Leaderboard unavailable right now. Try again in a moment.",
+  "Codex enluminé : débloqué (achat simulé).": "Illuminated Codex: unlocked (simulated purchase).",
   "Cadre de glace noire": "Black Ice Frame",
   "Cadre de la meute des neiges": "Snow Pack Frame",
   "Couronne de la Reine de l’Hiver": "Crown of the Winter Queen",
@@ -19,7 +21,7 @@ export default {
   "Gardien du solstice": "Keeper of the Solstice",
   "Souverain de l’Hiver éternel": "Sovereign of the Eternal Winter",
   "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Reine de l’Hiver et la finition Hiver éternel.": "A reward at every tier: Eternal Winter frames, card backs, finishes and titles, never sold in the Emporium. At tier {0}, the Crown of the Winter Queen and the Eternal Winter finish.",
-  "La voie de gauche se gagne en jouant. La voie enluminée se débloque une fois par saison avec des obsidiennes : une récompense à chaque palier, sur le thème de la saison, jamais en vente à l’Échoppe et jamais de puissance.": "The left track is earned by playing. The illuminated track is unlocked once per season with obsidians: a reward at every tier, on the season’s theme, never sold in the Emporium and never any power.",
+  "La voie de gauche se gagne en jouant. La voie enluminée s’achète une fois par saison : une récompense à chaque palier, sur le thème de la saison, jamais en vente à l’Échoppe et jamais de puissance.": "The left track is earned by playing. The illuminated track is bought once per season: a reward at every tier, on the season’s theme, never sold in the Emporium and never any power.",
   "<b>Titre</b><small>« Veilleur du long hiver »</small>": "<b>Title</b><small>“Watcher of the Long Winter”</small>",
   "{e0}Titre « Veilleur du long hiver »": "{e0}Title “Watcher of the Long Winter”",
   "<b>Titre</b><small>« Marcheur des neiges »</small>": "<b>Title</b><small>“Snow Walker”</small>",

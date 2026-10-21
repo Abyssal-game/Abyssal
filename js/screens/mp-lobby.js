@@ -118,7 +118,7 @@ export function createMpLobby(app, root, spec) {
   async function record() {
     const box = root.querySelector('#mp-rec .lb-body'); if (!box) return;
     try {
-      const rows = await cloud.mpFriendRecord(spec.game);
+      const rows = (await cloud.mpFriendRecord(spec.game)) || [];
       if (!root.contains(box)) return;
       box.classList.remove('muted');
       box.innerHTML = rows.length ? rows.map((r) => `<div class="lb-row"${profileAttrs(r.foe)}><span class="lb-av">${avatar(r.avatar)}</span><span class="lb-name"><b>${esc(isBlocked(r.foe) ? 'Joueur masqué' : r.pseudo || 'Joueur')}</b><span class="small muted">${t(r.wins + r.losses + r.draws > 1 ? '{n} parties' : '{n} partie', { n: r.wins + r.losses + r.draws })}${r.draws ? ` · ${t(r.draws > 1 ? '{n} égalités' : '{n} égalité', { n: r.draws })}` : ''}</span></span><span class="mp-wl"><b class="w">${r.wins}</b><i>–</i><b class="l">${r.losses}</b></span></div>`).join('') : '<p class="small muted">Pas encore de partie terminée contre un ami.</p>';
@@ -127,7 +127,7 @@ export function createMpLobby(app, root, spec) {
   async function ranking() {
     const box = root.querySelector('#mp-rank .lb-body'); if (!box) return;
     try {
-      const rows = await cloud.mpRanking(spec.game, 20);
+      const rows = (await cloud.mpRanking(spec.game, 20)) || [];
       const me = cloud.currentUser()?.id;
       box.classList.remove('muted');
       box.innerHTML = rows.length ? rows.map((r, i) => `<div class="lb-row ${r.user_id === me ? 'me' : ''}"${r.user_id === me ? '' : profileAttrs(r.user_id)}><span class="lb-rank">${i + 1}</span><span class="lb-av">${avatar(r.avatar)}</span><span class="lb-name"><b>${esc(isBlocked(r.user_id) ? 'Joueur masqué' : r.pseudo || 'Joueur')}</b><span class="small muted">${r.games} partie${r.games > 1 ? 's' : ''}</span></span><span class="lb-floor">${r.wins}</span></div>`).join('') : '<p class="small muted">Pas encore de victoire ce mois-ci. À toi !</p>';

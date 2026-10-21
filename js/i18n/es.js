@@ -1,5 +1,7 @@
 // Dictionnaire espagnol (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Classement indisponible pour l’instant. Réessaie dans un moment.": "Clasificación no disponible por ahora. Vuelve a intentarlo en un momento.",
+  "Codex enluminé : débloqué (achat simulé).": "Códice iluminado: desbloqueado (compra simulada).",
   "Cadre de glace noire": "Marco de hielo negro",
   "Cadre de la meute des neiges": "Marco de la manada de las nieves",
   "Couronne de la Reine de l’Hiver": "Corona de la Reina del Invierno",
@@ -19,7 +21,7 @@ export default {
   "Gardien du solstice": "Guardián del solsticio",
   "Souverain de l’Hiver éternel": "Soberano del Invierno eterno",
   "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Reine de l’Hiver et la finition Hiver éternel.": "Una recompensa en cada nivel: marcos, reversos, acabados y títulos del Invierno eterno, imposibles de encontrar en el Bazar. En el nivel {0}, la Corona de la Reina del Invierno y el acabado Invierno eterno.",
-  "La voie de gauche se gagne en jouant. La voie enluminée se débloque une fois par saison avec des obsidiennes : une récompense à chaque palier, sur le thème de la saison, jamais en vente à l’Échoppe et jamais de puissance.": "La vía de la izquierda se gana jugando. La vía iluminada se desbloquea una vez por temporada con obsidianas: una recompensa en cada nivel, con el tema de la temporada, nunca a la venta en el Bazar y nunca poder.",
+  "La voie de gauche se gagne en jouant. La voie enluminée s’achète une fois par saison : une récompense à chaque palier, sur le thème de la saison, jamais en vente à l’Échoppe et jamais de puissance.": "La vía de la izquierda se gana jugando. La vía iluminada se compra una vez por temporada: una recompensa en cada nivel, con el tema de la temporada, nunca a la venta en el Bazar y nunca poder.",
   "<b>Titre</b><small>« Veilleur du long hiver »</small>": "<b>Título</b><small>«Vigía del largo invierno»</small>",
   "{e0}Titre « Veilleur du long hiver »": "{e0}Título «Vigía del largo invierno»",
   "<b>Titre</b><small>« Marcheur des neiges »</small>": "<b>Título</b><small>«Caminante de las nieves»</small>",

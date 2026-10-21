@@ -1,5 +1,7 @@
 // Dictionnaire portugais du Brésil (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Classement indisponible pour l’instant. Réessaie dans un moment.": "Classificação indisponível no momento. Tente de novo daqui a pouco.",
+  "Codex enluminé : débloqué (achat simulé).": "Códice iluminado: desbloqueado (compra simulada).",
   "Cadre de glace noire": "Moldura de gelo negro",
   "Cadre de la meute des neiges": "Moldura da matilha das neves",
   "Couronne de la Reine de l’Hiver": "Coroa da Rainha do Inverno",
@@ -19,7 +21,7 @@ export default {
   "Gardien du solstice": "Guardião do solstício",
   "Souverain de l’Hiver éternel": "Soberano do Inverno eterno",
   "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Reine de l’Hiver et la finition Hiver éternel.": "Uma recompensa em cada nível: molduras, versos, acabamentos e títulos do Inverno eterno, impossíveis de achar na Loja. No nível {0}, a Coroa da Rainha do Inverno e o acabamento Inverno eterno.",
-  "La voie de gauche se gagne en jouant. La voie enluminée se débloque une fois par saison avec des obsidiennes : une récompense à chaque palier, sur le thème de la saison, jamais en vente à l’Échoppe et jamais de puissance.": "A trilha da esquerda se ganha jogando. A trilha iluminada é desbloqueada uma vez por temporada com obsidianas: uma recompensa em cada nível, no tema da temporada, nunca à venda na Loja e nunca poder.",
+  "La voie de gauche se gagne en jouant. La voie enluminée s’achète une fois par saison : une récompense à chaque palier, sur le thème de la saison, jamais en vente à l’Échoppe et jamais de puissance.": "A trilha da esquerda se ganha jogando. A trilha iluminada é comprada uma vez por temporada: uma recompensa em cada nível, no tema da temporada, nunca à venda na Loja e nunca poder.",
   "<b>Titre</b><small>« Veilleur du long hiver »</small>": "<b>Título</b><small>“Vigia do longo inverno”</small>",
   "{e0}Titre « Veilleur du long hiver »": "{e0}Título “Vigia do longo inverno”",
   "<b>Titre</b><small>« Marcheur des neiges »</small>": "<b>Título</b><small>“Andarilho das neves”</small>",

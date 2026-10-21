@@ -57,7 +57,7 @@ export default function shadowScreen(app, root) {
         : mine ? mineHTML() : pickHTML()}
       ${logged ? `<details class="panel dc-fold" id="shw" open><summary><span class="dc-sum-t">Classement de la semaine</span></summary><div class="lb-body small muted">Chargement…</div></details>
       <details class="panel dc-fold" id="shd"><summary><span class="dc-sum-t">Meilleurs tirages du jour</span></summary><div class="lb-body small muted">Chargement…</div></details>` : ''}
-      <a class="btn ghost block" href="#/boutique">${icon('back')}Retour aux boosters</a>`;
+`; /* v548 : plus de « Retour aux boosters » (le sous-onglet Boosters est juste au-dessus) */
     if (logged && !loading) { loadWeek(); root.querySelector('#shd')?.addEventListener('toggle', (e) => { if (e.target.open) loadDay(); }, { once: true }); }
   }
   function pickHTML() {
@@ -78,7 +78,7 @@ export default function shadowScreen(app, root) {
     const box = root.querySelector('#shw .lb-body');
     if (!box) return;
     try {
-      const rows = await cloud.shadowWeek(weekOf(day), 10);
+      const rows = (await cloud.shadowWeek(weekOf(day), 10)) || []; /* v548 : réponse vide = personne encore */
       if (!root.contains(box)) return;
       const n = rows[0]?.participants || 0;
       box.classList.remove('muted');
@@ -86,18 +86,18 @@ export default function shadowScreen(app, root) {
         + `<p class="small muted">${n} participant${n > 1 ? 's' : ''} cette semaine${n < SHADOW.minPlayers ? ` : il en faut ${SHADOW.minPlayers} pour que les coffres soient donnés.` : '.'}</p>`
         + (!sync.profile?.pseudo ? '<p class="small acc-warn"><a href="#/compte">Choisis un pseudo</a> pour apparaître au classement.</p>' : '');
       bindReport(box, loadWeek);
-    } catch (e) { if (root.contains(box)) box.textContent = e.status === 404 ? 'Le Tirage des Ombres n’est pas encore activé sur le serveur.' : e.message; }
+    } catch (e) { if (root.contains(box)) box.textContent = e.status === 404 ? 'Le Tirage des Ombres n’est pas encore activé sur le serveur.' : 'Classement indisponible pour l’instant. Réessaie dans un moment.'; }
   }
   async function loadDay() {
     const box = root.querySelector('#shd .lb-body');
     if (!box) return;
     try {
-      const rows = await cloud.shadowDay(day, 10);
+      const rows = (await cloud.shadowDay(day, 10)) || [];
       if (!root.contains(box)) return;
       box.classList.remove('muted');
       box.innerHTML = rows.length ? rows.map((r, i) => row(r, i, r.score, `faction ${esc(cat.faction[r.faction]?.name || '')}`)).join('') : '<p class="small muted">Aucun tirage aujourd’hui pour l’instant.</p>';
       bindReport(box, loadDay);
-    } catch (e) { if (root.contains(box)) box.textContent = e.message; }
+    } catch (e) { if (root.contains(box)) box.textContent = 'Classement indisponible pour l’instant. Réessaie dans un moment.'; }
   }
   async function load() {
     day = parisDay();

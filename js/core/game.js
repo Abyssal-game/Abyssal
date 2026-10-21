@@ -1887,6 +1887,7 @@ export class Game {
     if (reward.back && !(this.s.backs ||= []).includes(reward.back)) this.s.backs.push(reward.back);
     for (const b of reward.backs || []) if (!(this.s.backs ||= []).includes(b)) this.s.backs.push(b);
     if (reward.finish && !(this.s.finishes ||= []).includes(reward.finish)) this.s.finishes.push(reward.finish); /* v482 */
+    if (reward.codexPremium) this.codex().premium = true; /* v548 : Codex enluminé acheté (4,99 €) */
     if (reward.obs) this.s.obs = (this.s.obs || 0) + reward.obs; /* v474 : obsidiennes (achetées en euros) */
     if (reward.chests) this.addChests(reward.chests);
   }
@@ -1932,6 +1933,7 @@ export class Game {
     const it = SHOP.find((x) => x.id === id), bought = (this.s.purchases ||= []);
     if (!it) throw new Error('Article inconnu.');
     if (it.once && bought.includes(id)) throw new Error('Déjà acheté.');
+    if (it.kind === 'codex' && this.codex().premium) throw new Error('Déjà débloqué pour cette saison.');
     this.grant(it.give, 'shop');
     bought.push(id); this.persist();
     return it;
@@ -1964,10 +1966,7 @@ export class Game {
     (this.s.purchases ||= []).push(id); this.persist();
     return it;
   }
-  codexUnlock() {
-    if (this.codex().premium) throw new Error('Déjà débloqué pour cette saison.');
-    this.spendObs(CODEX.cost); this.codex().premium = true; this.persist();
-  }
+  codexUnlock() { return this.shopBuy('codex'); } /* v548 : plus d'achat en obsidiennes : même chemin que l'achat en euros */
 
   achievementValue(a) {
     const c = a.cond;

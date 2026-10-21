@@ -49,7 +49,7 @@ test('codex v547 : une récompense enluminée à chaque palier, aucune n’est �
   const last = CODEX_TIERS[CODEX.tiers - 1].prem;
   assert.ok(last.frame && last.finish && last.title);
   const obs = CODEX_TIERS.reduce((n, t) => n + (t.prem.obs || 0), 0);
-  assert.ok(obs < CODEX.cost, 'les obsidiennes rendues ne paient pas le Codex suivant');
+  assert.ok(obs <= 400, 'les obsidiennes de la voie enluminée restent modestes');
 });
 
 test('échoppe : fermée hors Mode Créateur, achat simulé ensuite (une seule fois pour le Fondateur)', () => {
@@ -63,7 +63,7 @@ test('échoppe : fermée hors Mode Créateur, achat simulé ensuite (une seule f
   g.shopBuy('obs-100'); g.shopBuy('obs-100');
   assert.equal(g.obs(), 800, 'les paquets d’obsidiennes se rachètent');
   g.codexUnlock();
-  assert.ok(g.codex().premium); assert.equal(g.obs(), 800 - CODEX.cost);
+  assert.ok(g.codex().premium); assert.equal(g.obs(), 800, 'le Codex enluminé se paie en euros, pas en obsidiennes');
   assert.throws(() => g.codexUnlock(), /Déjà/);
 });
 

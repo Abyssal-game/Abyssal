@@ -75,7 +75,7 @@ export default function codexScreen(app, root) {
         <div class="cx-pitch-in"><small class="cx-kick">Voie enluminée</small><h2>${esc(CODEX.premiumName)}</h2>
           <p>Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier 30, la Couronne de la Reine de l’Hiver et la finition Hiver éternel.</p>
           <div class="cx-pitch-show">${best.map((k) => k.startsWith('dos') ? `<img class="cxr-back" alt="" src="assets/backs/${k}.webp" onerror="this.remove()">` : `<span class="avatar-mini pf pf-${k}">${myAv()}</span>`).join('')}</div>
-          <button class="btn dc-plq dc-plq-red cx-unlock2" data-cx="unlock">${icon('star')}<span>Débloquer</span>${obsTxt(CODEX.cost)}</button></div></section>`;
+          <button class="btn dc-plq dc-plq-red cx-unlock2" data-cx="unlock">${icon('star')}<span>Débloquer</span><b class="cx-eur">${esc(CODEX.price)}</b></button></div></section>`;
     return `<section class="cx-season">
         ${opt('assets/ui/cx-saison1.webp', 'cx-season-art')}
         <div class="cx-season-in"><small class="cx-kick">Saison I · du ${esc(CODEX.starts.split('-').reverse().join('/'))} au ${esc(CODEX.ends.split('-').reverse().join('/'))}</small>
@@ -89,7 +89,7 @@ export default function codexScreen(app, root) {
       <ol class="cxk">${CODEX_TIERS.map((x) => `<li class="cxk-r ${x.tier <= t ? 'reached' : ''} ${x.tier === t + 1 ? 'next' : ''} ${x.tier === CODEX.tiers ? 'ult' : ''}" ${x.tier === Math.min(CODEX.tiers, t + 1) ? 'id="cx-now"' : ''}>${cell(x.tier, 'free', x.free)}<span class="cxk-n">${x.tier}</span>${cell(x.tier, 'prem', x.prem)}</li>`).join('')}</ol>
       <details class="panel dc-fold"><summary>${picon('help')}<span class="dc-sum-t">Gagner des points de Codex</span></summary>
         <ul class="cx-xp">${Object.entries(CODEX_XP).map(([k, v]) => `<li><span>${esc(CODEX_XP_LABEL[k])}</span><b>+${v}</b><small class="muted">${fmt(c.log[k] || 0)} gagnés</small></li>`).join('')}</ul>
-        <p class="small muted">La voie de gauche se gagne en jouant. La voie enluminée se débloque une fois par saison avec des obsidiennes : une récompense à chaque palier, sur le thème de la saison, jamais en vente à l’Échoppe et jamais de puissance.</p></details>`;
+        <p class="small muted">La voie de gauche se gagne en jouant. La voie enluminée s’achète une fois par saison : une récompense à chaque palier, sur le thème de la saison, jamais en vente à l’Échoppe et jamais de puissance.</p></details>`;
   }
 
   function shopTab() {
@@ -124,7 +124,7 @@ export default function codexScreen(app, root) {
         <button class="btn small primary" data-cx="cat" data-v="obs">Obtenir</button></section>
       ${cur !== 'obs' ? heroHTML : ''}
       <div class="cxs-cats" role="tablist">${CATS.map(([k, l]) => `<button class="cxs-cat ${k === cur ? 'on' : ''}" data-cx="cat" data-v="${k}" role="tab" aria-selected="${k === cur}">${l}</button>`).join('')}</div>
-      ${cur === 'obs' ? `<div class="cxs-euro" id="cx-euro">${SHOP.map((it) => euro(it, it.kind === 'obs' ? obsI++ : 0)).join('')}</div>
+      ${cur === 'obs' ? `<div class="cxs-euro" id="cx-euro">${SHOP.filter((it) => it.kind !== 'codex').map((it) => euro(it, it.kind === 'obs' ? obsI++ : 0)).join('')}</div>
         <button class="btn ghost block" data-cx="restore">Restaurer mes achats</button>
         <p class="small muted center">Pendant l'aperçu, tout achat en euros est simulé : aucun paiement. Rien ici ne rend tes créatures plus fortes.</p>`
       : `<div class="cxs-grid ${cur}">${list.map(tile).join('')}</div>
@@ -151,14 +151,14 @@ export default function codexScreen(app, root) {
 
   /* v474 : dépense d'obsidiennes (catalogue ou Codex enluminé) ; renvoie vrai si l'achat est fait */
   async function buy(id) {
-    const it = CATALOG.find((x) => x.id === id), cost = it ? g.catalogCost(it.id) : CODEX.cost;
-    const label = it ? (it.name || ALL_FRAMES[it.id] || CODEX_BACKS[it.id] || (FINISHES[it.id] && `Finition ${FINISHES[it.id].name}`)) : CODEX.premiumName;
+    const it = CATALOG.find((x) => x.id === id), cost = g.catalogCost(it.id);
+    const label = it.name || ALL_FRAMES[it.id] || CODEX_BACKS[it.id] || (FINISHES[it.id] && `Finition ${FINISHES[it.id].name}`);
     if (g.obs() < cost) {
       if (await confirmBox(`Il te manque <b>${fmt(cost - g.obs())} obsidiennes</b> pour ${esc(label)}.`, { ok: 'Obtenir des obsidiennes' })) { ui.tab = 'shop'; ui.cat = 'obs'; draw(); }
       return false;
     }
     if (!(await confirmBox(`Échanger <b>${fmt(cost)} obsidiennes</b> contre ${esc(label)} ?`, { ok: 'Confirmer' }))) return false;
-    if (it) g.catalogBuy(it.id); else g.codexUnlock();
+    g.catalogBuy(it.id);
     app.sfx.levelup?.(); toast(`${esc(label)} : acquis.${it?.kind === 'finish' ? ' Pose-la sur tes cartes dans Profil › Personnaliser.' : it ? ' Choisis-le dans Profil › Personnaliser.' : ''}`, { kind: 'success', icon: 'star' });
     return true;
   }
@@ -242,7 +242,11 @@ export default function codexScreen(app, root) {
       if (k === 'jump') { ui.cat = 'obs'; draw(); return; }
       if (k === 'cat') { ui.cat = b.dataset.v; app.sfx.tap?.(); return draw(); }
       if (k === 'see') { preview(b.dataset.id); return; } /* v484 */
-      if (k === 'get' || k === 'unlock') { if (!(await buy(b.dataset.id))) return; }
+      if (k === 'unlock') { /* v548 : 4,99 € (achat simulé tant que l'App Store n'est pas branché) */
+        if (!(await confirmBox(`<b>Achat simulé</b> : ${esc(CODEX.premiumName)} (${esc(CODEX.price)}).<br>Aperçu Créateur : aucun paiement, la voie enluminée est simplement débloquée.`, { ok: 'Simuler l’achat' }))) return;
+        g.shopBuy('codex'); app.sfx.levelup?.(); toast(`${esc(CODEX.premiumName)} : débloqué (achat simulé).`, { kind: 'success', icon: 'star' });
+      }
+      if (k === 'get') { if (!(await buy(b.dataset.id))) return; }
       /* v539 : outils d'essai passés par le serveur de partie (refusés sans le badge Créateur) */
       if (k === 'obs') await app.partie.first('devObs', 1000);
       if (k === 'obs0') await app.partie.first('devObs', null);

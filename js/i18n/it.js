@@ -1,5 +1,7 @@
 // Dictionnaire italien (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Classement indisponible pour l’instant. Réessaie dans un moment.": "Classifica non disponibile al momento. Riprova tra poco.",
+  "Codex enluminé : débloqué (achat simulé).": "Codice miniato: sbloccato (acquisto simulato).",
   "Cadre de glace noire": "Cornice di ghiaccio nero",
   "Cadre de la meute des neiges": "Cornice del branco delle nevi",
   "Couronne de la Reine de l’Hiver": "Corona della Regina dell’Inverno",
@@ -19,7 +21,7 @@ export default {
   "Gardien du solstice": "Custode del solstizio",
   "Souverain de l’Hiver éternel": "Sovrano dell’Inverno eterno",
   "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Reine de l’Hiver et la finition Hiver éternel.": "Una ricompensa a ogni livello: cornici, dorsi, finiture e titoli dell’Inverno eterno, introvabili nella Bottega. Al livello {0}, la Corona della Regina dell’Inverno e la finitura Inverno eterno.",
-  "La voie de gauche se gagne en jouant. La voie enluminée se débloque une fois par saison avec des obsidiennes : une récompense à chaque palier, sur le thème de la saison, jamais en vente à l’Échoppe et jamais de puissance.": "La via di sinistra si guadagna giocando. La via miniata si sblocca una volta per stagione con le ossidiane: una ricompensa a ogni livello, a tema con la stagione, mai in vendita nella Bottega e mai potenza.",
+  "La voie de gauche se gagne en jouant. La voie enluminée s’achète une fois par saison : une récompense à chaque palier, sur le thème de la saison, jamais en vente à l’Échoppe et jamais de puissance.": "La via di sinistra si guadagna giocando. La via miniata si acquista una volta per stagione: una ricompensa a ogni livello, a tema con la stagione, mai in vendita nella Bottega e mai potenza.",
   "<b>Titre</b><small>« Veilleur du long hiver »</small>": "<b>Titolo</b><small>«Vegliante del lungo inverno»</small>",
   "{e0}Titre « Veilleur du long hiver »": "{e0}Titolo «Vegliante del lungo inverno»",
   "<b>Titre</b><small>« Marcheur des neiges »</small>": "<b>Titolo</b><small>«Viandante delle nevi»</small>",

@@ -15,7 +15,7 @@ export const CODEX = {
   ends: '2027-01-31',                    // affiché seulement (aucune ouverture ni fermeture automatique dans l'ébauche)
   tiers: 30,                             // nombre de paliers
   xpPerTier: 100,                        // points de Codex par palier
-  cost: 400,                             // v546 : prix en obsidiennes (≈ 3,50 €, avant 500)
+  price: '4,99 €',                       // v548 : le Codex enluminé se paie en euros (décision du propriétaire), plus en obsidiennes
   store: 'com.abyssalgame.abyssal.codex1',
 };
 
@@ -136,6 +136,7 @@ export const CODEX_TIERS = Array.from({ length: CODEX.tiers }, (_, i) => ({ tier
 // ——— L'Échoppe en euros : les obsidiennes et le Pack du Fondateur (prix affichés seulement) ———
 export const SHOP = [
   ...OBS_PACKS.map((p) => ({ id: p.id, kind: 'obs', name: `${p.n + p.bonus} obsidiennes`, price: p.price, store: p.store, give: { obs: p.n + p.bonus }, bonus: p.bonus })),
+  { id: 'codex', kind: 'codex', name: 'Codex enluminé', price: CODEX.price, store: CODEX.store, give: { codexPremium: true } }, /* v548 : vendu dans l'onglet du Codex, une fois par saison */
   { id: 'fondateur', name: 'Pack du Fondateur', price: '4,99 €', store: 'com.abyssalgame.abyssal.fondateur', once: true,
     give: { frame: 'cx-fondateur', title: 'Fondateur', back: 'dos-fondateur', obs: 600 },
     desc: 'Vendu une seule fois. Le cadre et le dos de cartes du Fondateur, le titre « Fondateur » (badge au classement) et 600 obsidiennes.' },

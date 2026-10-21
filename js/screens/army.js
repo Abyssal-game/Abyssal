@@ -134,6 +134,8 @@ export function teamScreen(app, root) {
         ${team.length < TEAM.active ? `<p class="small v2-warn">${icon('info')} Il faut au moins ${TEAM.active} créatures pour partir dans la Descente (encore ${TEAM.active - team.length}).</p>` : ''}
         <h3 class="section-title">Au combat</h3><div class="v2-slots">${[0, 1, 2].map(slot).join('')}</div>
         <h3 class="section-title">En réserve</h3><div class="v2-slots res">${[3, 4].map(slot).join('')}</div>
+        ${synHTML(team)}
+        <div class="panel v2-skill ult" style="--uc:${ult.color}"><b>${icon('p:power')} Pouvoir : ${esc(ult.name)}</b><p class="small">${esc(ult.desc)}</p><p class="small muted">${ult.card ? `Porté par ${esc(cat.get(ult.card).name)}.` : 'Ajoute une Mythique ou une Secrète pour un pouvoir plus puissant.'}</p></div>
         ${run ? '' : `<div class="tm-tools"><button class="btn small primary" data-act="auto">${icon('sparkle')}Suggérer une équipe</button>${team.length ? '<button class="btn small ghost" data-act="clear">Vider</button>' : ''}</div>`}
         ${run ? '' : presetsHTML()}
         <details class="dc-fold tm-more"><summary>${icon('info')} Comment composer ton équipe</summary>
@@ -141,8 +143,6 @@ export function teamScreen(app, root) {
           <p class="small muted">La force d’une créature dépend de sa rareté et de son niveau : une Secrète au niveau 1 est plus faible qu’une Hyper rare au niveau 5.</p>
           <p class="small muted">Touche <b>+</b> sous une créature pour l’ajouter, <b>▲▼</b> pour la passer du combat à la réserve, <b>✕</b> pour la retirer.</p>
         </details>
-        ${synHTML(team)}
-        <div class="panel v2-skill ult" style="--uc:${ult.color}"><b>${icon('p:power')} Pouvoir : ${esc(ult.name)}</b><p class="small">${esc(ult.desc)}</p><p class="small muted">${ult.card ? `Porté par ${esc(cat.get(ult.card).name)}.` : 'Ajoute une Mythique ou une Secrète pour un pouvoir plus puissant.'}</p></div>
       </section>
       <h2 class="section-title">Ta collection <span class="more small"><button class="linkish" data-act="sort">${ui.sort === 'cost' ? 'Trier par niveau' : 'Trier par rareté'}</button></span></h2>
       <div class="chips tm-roles" role="group" aria-label="Filtrer par rôle"><button class="chip" data-act="rolef" data-v="" aria-pressed="${!ui.role}">Tous</button>${Object.entries(ROLES).map(([k, r]) => `<button class="chip" data-act="rolef" data-v="${k}" style="--chip:${r.color}" aria-pressed="${ui.role === k}">${esc(r.name)}</button>`).join('')}</div>

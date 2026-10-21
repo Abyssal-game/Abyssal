@@ -68,7 +68,7 @@ export default function trials(app, root) {
     if (!cloud.isLoggedIn()) { box.innerHTML = 'Connecte-toi pour comparer ton score avec les joueurs du monde entier. <a href="#/compte">Se connecter</a>'; return; }
     try {
       const day = g.trials().day;
-      const rows = await cloud.leaderboard(day, 30);
+      const rows = (await cloud.leaderboard(day, 30)) || [];
       if (!document.contains(box)) return;
       const me = cloud.currentUser()?.id, mine = g.trials().score || 0;
       box.classList.remove('muted');
@@ -78,7 +78,7 @@ export default function trials(app, root) {
       }).join('') : '<p class="small muted center">Personne n’a encore joué aujourd’hui. À toi d’ouvrir la voie !</p>')
         + (!sync.profile?.pseudo ? '<p class="small acc-warn"><a href="#/compte">Choisis un pseudo</a> pour apparaître au classement.</p>' : !rows.some((r) => r.user_id === me) && mine ? `<p class="small muted">Ton score aujourd’hui : ${mine} points.</p>` : '');
       bindReport(box, () => loadBoard(box));
-    } catch (e) { if (document.contains(box)) box.textContent = e.message; }
+    } catch (e) { if (document.contains(box)) box.textContent = 'Classement indisponible pour l’instant. Réessaie dans un moment.'; }
   }
 
   function list() {
