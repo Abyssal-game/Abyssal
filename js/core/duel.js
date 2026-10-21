@@ -291,18 +291,18 @@ export const FORBID = { attack: 'attaquer', skill: 'utiliser une compétence', d
 // pour l'étage n'est plus protégée (avant, des communes niveau 1 ne prenaient que 3 dégâts d'un gardien de l'étage 70)
 export const GAP_POW = 4, GAP_ATK = 3;
 // v495 : un coup que tu peux parer ou esquiver frappe plus fort s'il passe ; un coup sans défense possible, moins fort
-export const QTE_HIT = 1.6, PLAIN_HIT = 0.6;
+export const QTE_HIT = 1.8, PLAIN_HIT = 0.6; /* v575 : 1,6 → 1,8 (« même avec une équipe au minimum, ce n'est pas si compliqué ») */
 // v502 : chaque attaque qui blesse se défend (avant, les petits coups des ennemis ordinaires passaient sans rien faire) ;
 // une esquive n'évite plus tout : la créature est éraflée (GRAZE des dégâts) ; seule la parade parfaite annule le coup
-export const GRAZE = 0.35;
+export const GRAZE = 0.5; /* v575 : 0,35 → 0,5 : l'esquive protège moins, la parade compte */
 export const allyCap = (u, kind, st = null) => {
   const gap = st?.refPow && u.pow ? Math.max(1, st.refPow / u.pow) : 1;
   return Math.max(1, Math.round(u.maxHp * ipow(gap, GAP_POW) * (BIG.includes(kind) ? ALLY_BIG_CAP : ALLY_HIT_CAP)));
 };
-function hurt(st, u, n, ev, src = null, { pierce = false } = {}) {
+function hurt(st, u, n, ev, src = null, { pierce = false, graze = false } = {}) {
   if (u.hp <= 0 || n <= 0) return 0;
   if (u.boss && u.side === 'enemy') n = Math.min(n, bossCap(u));
-  if (u.side === 'ally' && src && st.units[src]?.side === 'enemy') n = Math.min(n, allyCap(u, st.curKind, st));
+  if (u.side === 'ally' && src && st.units[src]?.side === 'enemy') n = Math.min(n, Math.max(1, Math.round(allyCap(u, st.curKind, st) * (graze ? GRAZE : 1)))); /* v575 : l'éraflure reste une fraction du coup même quand le coup plein est plafonné */
   // Brèche (v250) : posée par un allié, exploitée par un autre → le coup perce le bouclier, +20 %, +3 Brisure
   let breached = null;
   if (src && u.side === 'enemy' && u.breach && st.units[src]?.side === 'ally' && u.breach.by !== src) { breached = u.breach; u.breach = null; pierce = true; n *= 1.2; }
@@ -1279,7 +1279,7 @@ export function enemyAct(st, aUid, defense = 'none') {
     if (target.role === 'protecteur') chargeRiposte(target, ev); // elle encaisse pour l'équipe : sa riposte se charge
     ev.push({ t: 'attack', a: aUid, u: target.uid, kind });
     if (defense === 'parry') { defended(st, e, target, ev, defense, kind); return null; }
-    if (defense === 'dodge') { defended(st, e, target, ev, defense, kind); hurt(st, target, dmgOf(st, e, target, m * GRAZE), ev, aUid); return null; } /* v502 : éraflure */
+    if (defense === 'dodge') { defended(st, e, target, ev, defense, kind); hurt(st, target, dmgOf(st, e, target, m * GRAZE), ev, aUid, { graze: true }); return null; } /* v502 : éraflure */
     const d = hurt(st, target, dmgOf(st, e, target, m), ev, aUid);
     if (target !== t && d > 0 && hasP(target, 'colere')) {
       const cap = boosted(target, 'colere') ? 5 : 3;
@@ -1301,7 +1301,7 @@ export function enemyAct(st, aUid, defense = 'none') {
     e.charged = null;
     ev.push({ t: 'aoe', u: aUid, side: 'enemy' });
     if (defense !== 'none') defended(st, e, null, ev, defense, kind);
-    if (defense !== 'parry') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, (e.boss ? 1 : 0.8) * pow * (defense === 'dodge' ? GRAZE : 1)), ev, aUid); } // v344 : un ennemi tué en plein coup de zone (riposte, épines) s'arrête
+    if (defense !== 'parry') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, (e.boss ? 1 : 0.8) * pow * (defense === 'dodge' ? GRAZE : 1)), ev, aUid, { graze: defense === 'dodge' }); } // v344 : un ennemi tué en plein coup de zone (riposte, épines) s'arrête
   } else if (kind === 'charge') { e.charged = 'heavy'; ev.push({ t: 'status', u: aUid, s: 'Se charge…', k: 'charge' }); }
   else if (kind === 'channel') { e.charged = 'blast'; ev.push({ t: 'status', u: aUid, s: 'Concentration…', k: 'charge' }); }
   else if (kind === 'shield') { const t = st.units[it.t]; if (t && t.hp > 0) { t.shield = 1; ev.push({ t: 'status', u: t.uid, s: 'Bouclier', k: 'guard' }); } }
@@ -1319,7 +1319,7 @@ export function enemyAct(st, aUid, defense = 'none') {
     e.charged = null;
     ev.push({ t: 'aoe', u: aUid, side: 'enemy' });
     if (defense !== 'none') defended(st, e, null, ev, defense, 'blast');
-    if (defense === 'dodge') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, 0.9 * pow * GRAZE), ev, aUid); }
+    if (defense === 'dodge') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, 0.9 * pow * GRAZE), ev, aUid, { graze: true }); }
     if (defense === 'none') {
       for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, 0.9 * pow), ev, aUid); }
       if (e.hp > 0) front(st, 'ally').filter((x) => x.hp > 0 && !x.frozen).sort((x, y) => y.atk - x.atk).slice(0, e.phase2 ? 2 : 1).forEach((x) => { x.frozen = 1; ev.push({ t: 'status', u: x.uid, s: 'Gelée', k: 'frost' }); });

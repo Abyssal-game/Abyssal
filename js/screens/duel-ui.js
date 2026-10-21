@@ -28,7 +28,6 @@ import { ULTS } from '../core/army.js';
 import { mountDiorama, roomFor } from '../ui/diorama.js';
 import { moveIconUrl, passivesOf, passiveIconUrl, moveFor, PASSIVES } from '../core/kits.js';
 import { hap } from '../ui/sound.js';
-import * as QX from './defense-qte.js'; /* v566 : défense refaite */
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 // Décor selon la profondeur (salle du Gardien à part) et effets illustrés (fond noir fondu en mode « écran »)
@@ -897,163 +896,174 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       app.sfx.swipe?.();
     });
   }
-  /* v502 : trois gestes de défense selon l'attaque ; v558 : six gestes, et un Assaut propre à chaque gardien
-     (sa grosse attaque se défend en trois gestes enchaînés) */
-  const HOLD_K = ['heavy', 'gorge', 'execute'];
-  const RING_N = { tick2: 2, poison: 2, flurry: 3 };
-  const MASH_K = ['grab', 'chain', 'frost'];
+  /* v575 : toute la défense se joue sur la barre (le glisser, les cercles, le martèlement et les points faibles sont retirés,
+     « seule la barre fonctionne bien »). Comme dans Clair Obscur, une attaque est une SÉQUENCE de coups : le curseur repasse
+     pour chaque coup, et chaque ennemi a son rythme, qu'on apprend en jouant. Lettres d'une séquence :
+     n coup simple · f rapide · l lent · x feinte (le curseur s'arrête, puis fonce) · m zone mobile · h coup chargé (maintenir,
+     relâcher dans l'or) · H coup chargé avec feinte. Parade parfaite de toute la séquence = contre-attaque (moteur). */
+  const FAM_RHYTHM = { predateur: 'nf', assassin: 'ff', berserker: 'x', protecteur: 'n', mage: 'l', parasite: 'nf', controleur: 'm', soutien: 'n', gardien: 'nx' };
+  const KIND_RHYTHM = { tick2: 'ff', poison: 'nf', flurry: 'fff', grab: 'nx', chain: 'nnf', frost: 'm', heavy: 'h', gorge: 'h', execute: 'H', ambush: 'xf', blast: 'lx' };
   const ASSAULT_K = ['heavy', 'blast', 'gorge', 'blizzard', 'copy', 'swarm', 'execute', 'lament', 'ambush', 'price', 'quake', 'chain', 'tick2'];
-  /* chaque gardien : nom de son Assaut et suite de gestes (tap, hold, swipe, ringsN, mash, target) */
+  /* chaque gardien : nom de son Assaut et sa séquence (de 3 à 5 coups, rythme propre ; l'Horloger frappe en mesure) */
   const BOSS_ASSAULT = {
-    devoreur: { name: 'La Faim sans fond', steps: ['mash', 'swipe', 'hold'] },
-    matriarche: { name: 'L’Hiver mordant', steps: ['rings3', 'mash', 'swipe'] },
-    roi: { name: 'Le Reflet volé', steps: ['target', 'tap', 'swipe'] },
-    architecte: { name: 'L’Effondrement', steps: ['swipe', 'swipe', 'hold'] },
-    eclipse: { name: 'Éclipse totale', steps: ['rings3', 'hold', 'swipe'] },
-    essaim: { name: 'La Nuée', steps: ['rings4', 'swipe'] },
-    bourreau: { name: 'La Hache du Bourreau', steps: ['hold', 'target', 'hold'] },
-    choeur: { name: 'Le Chant des Noyés', steps: ['rings4', 'swipe'] },
-    chaines: { name: 'Les Mille Chaînes', steps: ['mash', 'swipe', 'mash'] },
-    horloge: { name: 'L’Heure exacte', steps: ['rings3', 'tap', 'rings3'] },
-    miroirs: { name: 'Le Palais des Miroirs', steps: ['target', 'target', 'tap'] },
-    golem: { name: 'Avalanche de cendres', steps: ['swipe', 'swipe', 'swipe'] },
-    peste: { name: 'Le Souffle gris', steps: ['rings3', 'swipe', 'mash'] },
-    chasseur: { name: 'La Traque', steps: ['target', 'target', 'hold'] },
-    voeux: { name: 'Le Prix à payer', steps: ['tap', 'rings3', 'swipe'] },
-    titan: { name: 'Le Réveil du Titan', steps: ['hold', 'swipe', 'mash'] },
-    jumeaux: { name: 'Crépuscule double', steps: ['swipe', 'swipe', 'rings4'] },
-    juge: { name: 'Le Jugement', steps: ['hold', 'tap', 'target'] },
-    bete: { name: 'L’Apocalypse', steps: ['mash', 'swipe', 'hold', 'rings3'] },
-    abysse: { name: 'La Nuit sans fin', steps: ['swipe', 'rings4', 'target', 'hold'] },
+    devoreur: { name: 'La Faim sans fond', seq: 'fxh' },
+    matriarche: { name: 'L’Hiver mordant', seq: 'mmx' },
+    roi: { name: 'Le Reflet volé', seq: 'xnx' },
+    architecte: { name: 'L’Effondrement', seq: 'lxH' },
+    eclipse: { name: 'Éclipse totale', seq: 'mhx' },
+    essaim: { name: 'La Nuée', seq: 'ffff' },
+    bourreau: { name: 'La Hache du Bourreau', seq: 'hxH' },
+    choeur: { name: 'Le Chant des Noyés', seq: 'lmx' },
+    chaines: { name: 'Les Mille Chaînes', seq: 'nnnf' },
+    horloge: { name: 'L’Heure exacte', seq: 'nnnn', beat: 320 },
+    miroirs: { name: 'Le Palais des Miroirs', seq: 'xxn' },
+    golem: { name: 'Avalanche de cendres', seq: 'llH' },
+    peste: { name: 'Le Souffle gris', seq: 'mfx' },
+    chasseur: { name: 'La Traque', seq: 'fxf' },
+    voeux: { name: 'Le Prix à payer', seq: 'nmh' },
+    titan: { name: 'Le Réveil du Titan', seq: 'Hxf' },
+    jumeaux: { name: 'Crépuscule double', seq: 'ffxx' },
+    juge: { name: 'Le Jugement', seq: 'hnx' },
+    bete: { name: 'L’Apocalypse', seq: 'fxmH' },
+    abysse: { name: 'La Nuit sans fin', seq: 'xfmxH' },
   };
-  const TIP = { tap: 'cb-def-tap', hold: 'cb-def-hold', swipe: 'cb-def-swipe', rings: 'cb-def-rings', mash: 'cb-def-mash', target: 'cb-def-target' };
-  async function tipFor(type) { const k = TIP[type.replace(/\d+$/, '')]; if (k && !g.s.tips?.[k]) await tuto(app, k); }
-  function stepQTE(type, s) {
-    if (type === 'swipe') return gesture(QX.swipeQTE, s);
-    if (type === 'hold') return gesture(QX.holdQTE, s);
-    if (type === 'mash') return gesture(QX.mashQTE, s);
-    if (type === 'target') return gesture(QX.targetQTE, s);
-    if (type.startsWith('rings')) return gesture(QX.ringsQTE, s, +type.slice(5) || 3);
-    return barQTE(s, false);
+  /* séquence d'une attaque : propre au coup, sinon au rythme de la famille ; une élite ajoute un coup rapide */
+  function seqFor(s) {
+    const e = st.units[s.a];
+    let q = KIND_RHYTHM[s.kind] || (intentInfo(st, e)?.aoe ? 'lx' : FAM_RHYTHM[e?.fam] || 'n');
+    if (e?.elite && !e.boss && q.length < 3 && !/[hH]/.test(q)) q += 'f';
+    return q;
+  }
+  /* bilan d'une séquence pour le moteur : tout paré = parade ; un raté sur trois coups ou plus = esquive ; sinon touché */
+  const verdict = (res) => res.every((r) => r === 'parry') ? 'parry' : res.filter((r) => r === 'none').length * 3 > res.length ? 'none' : 'dodge';
+  async function tipFor(q) {
+    for (const k of ['cb-def-tap', /[hH]/.test(q) && 'cb-def-hold', q.length > 1 && 'cb-def-combo', /[xH]/.test(q) && 'cb-def-feint'].filter(Boolean)) {
+      if (!g.s.tips?.[k]) await tuto(app, k);
+      if (!alive_) return;
+    }
   }
   async function defenseQTE(s) {
     const e0 = st.units[s.a];
     const A = e0?.boss && ASSAULT_K.includes(s.kind) && BOSS_ASSAULT[st.bossKey];
     if (A) return assaultQTE(s, A);
-    const type = intentInfo(st, e0)?.aoe || s.kind === 'blast' ? 'swipe' : HOLD_K.includes(s.kind) ? 'hold' : s.kind === 'ambush' ? 'target'
-      : MASH_K.includes(s.kind) ? 'mash' : RING_N[s.kind] ? `rings${RING_N[s.kind]}` : 'tap';
-    await tipFor(type);
+    const q = seqFor(s);
+    await tipFor(q);
     if (!alive_) return 'none';
-    return stepQTE(type, s);
+    return verdict(await barQTE(s, q));
   }
-  /* v566 : les gestes (sauf la barre) sont dans defense-qte.js : calque à eux, touchers reçus directement (iPhone) */
-  function qxOpts(s) {
-    const e = st.units[s.a], def = INTENTS[s.kind] || INTENTS.hit, t = el(s.t)?.getBoundingClientRect();
-    return { tier: e?.boss ? 'boss' : e?.elite ? 'elite' : 'normal', title: `${def.name} !`, icon: intentIcon(s.kind), sfx: app.sfx, reduced,
-      anchor: t && t.width ? { x: t.left + t.width / 2, y: t.top + t.height / 2 } : null };
-  }
-  async function gesture(fn, s, ...args) {
-    const tEls = s.kind === 'blast' || intentInfo(st, st.units[s.a])?.aoe ? front(st, 'ally').map((u) => el(u.uid)) : [el(s.t)];
-    el(s.a)?.classList.add('aim'); tEls.forEach((x) => x?.classList.add('aimed')); $('.dv')?.classList.add('qte-on');
-    try { return await fn(qxOpts(s), ...args); }
-    finally { $('.dv')?.classList.remove('qte-on'); el(s.a)?.classList.remove('aim'); tEls.forEach((x) => x?.classList.remove('aimed')); }
-  }
-  /* v558 : Assaut d'un gardien : sa grosse attaque se défend en plusieurs gestes enchaînés, avec sa mise en scène */
+  /* v558 : Assaut d'un gardien : sa grosse attaque, une séquence plus longue, avec sa mise en scène */
   async function assaultQTE(s, A) {
     const e = st.units[s.a];
     if (!g.s.tips?.['cb-assault']) await tuto(app, 'cb-assault');
+    await tipFor(A.seq);
     if (!alive_) return 'none';
     const ov = document.createElement('div'); ov.className = 'cb-assault';
-    ov.innerHTML = `<div class="cb-as-in"><small>Assaut · ${esc(uName(e))}</small><b>${esc(A.name)}</b><span class="cb-as-pips">${A.steps.map(() => '<i></i>').join('')}</span></div>`;
+    ov.innerHTML = `<div class="cb-as-in"><small>Assaut · ${esc(uName(e))}</small><b>${esc(A.name)}</b></div>`;
     $('.dv')?.appendChild(ov); app.sfx.boss?.();
     if (!reduced) { const d = $('.dv'); d.classList.remove('ry-shake'); void d.offsetWidth; d.classList.add('ry-shake'); }
-    await new Promise((r) => setTimeout(r, reduced ? 500 : 1300));
-    ov.classList.add('run');
-    const res = [];
-    for (const [i, type] of A.steps.entries()) {
-      if (!alive_) break;
-      await tipFor(type);
-      const r = await stepQTE(type, s);
-      res.push(r); ov.querySelectorAll('.cb-as-pips i')[i]?.classList.add(`r-${r}`);
-      await new Promise((ok) => setTimeout(ok, 260));
-    }
-    const r = QX.scoreOf(res.length ? res : ['none']);
-    $('.dv')?.querySelectorAll('.dv-stamp').forEach((x) => x.remove());
-    ov.classList.add('done', `r-${r}`);
-    ov.querySelector('.cb-as-in b').textContent = r === 'parry' ? 'Assaut brisé !' : r === 'dodge' ? 'Assaut amorti' : 'Assaut subi…';
-    if (r === 'parry') app.sfx.perfect?.(); else if (r === 'none') app.sfx.miss();
-    await new Promise((ok) => setTimeout(ok, reduced ? 300 : 900));
-    ov.remove();
+    await wait(reduced ? 500 : 1100);
+    ov.classList.add('out'); setTimeout(() => ov.remove(), 250);
+    const res = await barQTE(s, A.seq, { beat: A.beat, title: A.name });
+    const r = verdict(res.length ? res : ['none']);
+    const end = document.createElement('div'); end.className = `dv-stamp s-${r} as`;
+    end.innerHTML = `<b>${r === 'parry' ? 'Assaut brisé !' : r === 'dodge' ? 'Assaut amorti' : 'Assaut subi…'}</b>`;
+    $('.dv')?.appendChild(end); setTimeout(() => end.remove(), 1000);
+    if (r === 'parry') app.sfx.perfect?.();
+    await wait(reduced ? 250 : 650);
     return r;
   }
-  function barQTE(s, hold = false) {
+  /* La barre : un passage du curseur par lettre de la séquence. Zone réglée en TEMPS (v388), toucher jugé sur l'image
+     affichée à cet instant (v509). Retourne la liste des résultats ('parry' | 'dodge' | 'none'), un par coup. */
+  function barQTE(s, q = 'n', { beat = 0, title = '' } = {}) {
     return new Promise((resolve) => {
-      const e = st.units[s.a], moving = e?.boss || e?.elite;
-      // v388 : zone réglée en TEMPS (avant : sa durée raccourcissait plus elle était loin sur la barre), toucher daté par
-      // l'événement lui-même ; v509 : jugé sur l'image affichée à cet instant (sans compensation ni marge après la zone)
-      const w = defenseWindow(st, s.a, s.t), K = moving ? 1.3 + Math.random() * 1.0 : 1.7, ease = (x) => Math.max(0, x) ** K, D = e?.boss ? 780 : e?.elite ? 840 : 900; /* v558 : élites et gardiens : vitesse du curseur imprévisible (feinte), barre plus courte */ /* v509 : plus de LAG ni de marge de 50 ms après l’impact : on juge ce que le joueur voyait */
-      const tb = D * (0.55 + Math.random() * 0.35), ta = tb - w.dodge, tp = tb - w.parry; /* fin de zone = impact ; parade = son dernier instant */
-      const za = ease(ta / D), zb = ease(tb / D), pz0 = ease(tp / D);
-      const zw = zb - za, pw = zb - pz0, z0 = za;
-      const tEls = s.kind === 'blast' ? front(st, 'ally').map((u) => el(u.uid)) : [el(s.t)];
+      const e = st.units[s.a], letters = [...q], n = letters.length;
+      const tEls = s.kind === 'blast' || intentInfo(st, e)?.aoe ? front(st, 'ally').map((u) => el(u.uid)) : [el(s.t)];
       el(s.a)?.classList.add('aim'); tEls.forEach((x) => x?.classList.add('aimed'));
-      const def = INTENTS[s.kind];
+      const def = INTENTS[s.kind] || INTENTS.hit;
       const bar = document.createElement('div');
-      bar.className = 'dv-dodge cb-def'; /* v375 : retour de la barre (l'anneau v357 retiré, demande du propriétaire) */
-      if (hold) bar.classList.add('cb-hold');
-      bar.innerHTML = `<span class="dv-dodge-t">${intentIcon(s.kind)} ${esc(def.name)} ! <small>${hold ? 'Maintiens le doigt, relâche dans l’or · sur le trait blanc : parade' : 'Touche dans l’or : esquive · sur le trait blanc : parade'}</small></span><span class="dv-dodge-bar"><i class="rail"></i><i class="z"><i class="p"></i></i><i class="c"></i></span>`;
+      bar.className = 'dv-dodge cb-def';
+      bar.innerHTML = `<span class="dv-dodge-t">${intentIcon(s.kind)} ${esc(title || `${def.name} !`)} <small></small></span>${n > 1 ? `<span class="cb-hits">${letters.map(() => '<i></i>').join('')}</span>` : ''}<span class="dv-dodge-bar"><i class="rail"></i><i class="z"><i class="p"></i></i><i class="c"></i></span>`;
       $('.dv-mid').appendChild(bar); $('.dv-mid').classList.add('qte'); $('.dv')?.classList.add('qte-on');
-      const cur = bar.querySelector('.c'), zEl = bar.querySelector('.z'), pEl = bar.querySelector('.p');
-      zEl.style.cssText = `left:${z0 * 100}%;width:${zw * 100}%`;
-      pEl.style.cssText = `left:${((zw - pw) / zw) * 100}%;width:${(pw / zw) * 100}%`;
-      const bw = bar.querySelector('.dv-dodge-bar').offsetWidth; /* une seule mesure : le curseur glisse ensuite en transform (sans recalcul de mise en page) */
-      let t0 = 0, done = false, raf = 0, lit = '';
-      const zoneAt = (x) => (moving ? Math.min(0.97 - zw, Math.max(0.3, z0 + Math.sin(x * 9) * 0.1)) : z0);
-      let held = false;
-      const end = (res) => {
-        if (done) return; done = true; cancelAnimationFrame(raf); defTap = null; removeEventListener('pointerup', letGo, true); removeEventListener('pointercancel', letGo, true);
-        bar.classList.remove('go', 'pp');
-        bar.classList.add(res === 'none' ? 'ko' : 'ok', `r-${res}`);
-        bar.querySelector('.dv-dodge-t').textContent = res === 'parry' ? 'Parade parfaite !' : res === 'dodge' ? 'Esquive !' : 'Raté…';
-        $('.dv')?.classList.remove('qte-on');
-        // tampon du résultat, au centre de l'écran
-        const stamp = document.createElement('div'); stamp.className = `dv-stamp s-${res}`;
-        stamp.innerHTML = `<b>${res === 'parry' ? 'Parade parfaite !' : res === 'dodge' ? 'Esquive !' : 'Touché…'}</b>`;
-        $('.dv')?.appendChild(stamp); setTimeout(() => stamp.remove(), 900);
-        if (res === 'none') app.sfx.miss();
-        setTimeout(() => { bar.remove(); $('.dv-mid')?.classList.remove('qte'); el(s.a)?.classList.remove('aim'); tEls.forEach((x) => x?.classList.remove('aimed')); resolve(res); }, res === 'none' ? 200 : 300);
+      const cur = bar.querySelector('.c'), zEl = bar.querySelector('.z'), pEl = bar.querySelector('.p'), hint = bar.querySelector('small'), pips = bar.querySelectorAll('.cb-hits i');
+      const bw = bar.querySelector('.dv-dodge-bar').offsetWidth; /* une seule mesure : le curseur glisse ensuite en transform */
+      const D0 = e?.boss ? 780 : e?.elite ? 840 : 900;
+      const out = [];
+      let held = false, letGo = null;
+      const upH = (ev) => letGo?.(ev);
+      addEventListener('pointerup', upH, true); addEventListener('pointercancel', upH, true);
+      const close = () => {
+        defTap = null; removeEventListener('pointerup', upH, true); removeEventListener('pointercancel', upH, true);
+        setTimeout(() => { bar.remove(); $('.dv-mid')?.classList.remove('qte'); $('.dv')?.classList.remove('qte-on'); el(s.a)?.classList.remove('aim'); tEls.forEach((x) => x?.classList.remove('aimed')); resolve(out); }, 260);
       };
-      const shown = []; /* v509 : images affichées (instant, position du curseur, zone) : le toucher est jugé sur ce que le joueur voyait */
-      const step = () => {
-        const now0 = performance.now(), x = (now0 - t0) / D, pos = ease(Math.min(1, x)), zz = moving ? zoneAt(x) : z0;
-        cur.style.transform = `translateX(${(pos * bw).toFixed(1)}px)`;
-        shown.push([now0, pos, zz]); if (shown.length > 12) shown.shift();
-        if (moving) zEl.style.transform = `translateX(${((zz - z0) * bw).toFixed(1)}px)`;
-        const pz = zz + zw - pw, now = pos >= pz && pos <= pz + pw ? 'pp' : pos >= zz && pos <= zz + zw ? 'go' : '';
-        if (now !== lit) { if (lit) bar.classList.remove(lit); if (now) bar.classList.add(now); lit = now; } /* la zone s'allume quand le curseur y entre */
-        if (x >= 1) end('none'); else raf = requestAnimationFrame(step);
-      };
-      const judgeAt = (at) => {
-        const now = performance.now(), when = at && at <= now && now - at < 500 ? at : now;
-        // v509 : position du curseur sur l'image affichée au moment du toucher (avant : calculée avec un retard de 40 ms retiré,
-        // « je touche pile le blanc et j'ai une esquive, trop tard et j'ai une parade »)
-        const seen = shown.filter((r) => r[0] <= when).slice(-2); /* l'image en cours et la précédente (encore à l'écran) : la meilleure compte */
-        if (!seen.length) { const x = (when - t0) / D; seen.push([when, ease(Math.min(1, x)), zoneAt(x)]); }
-        const tol = 5 / Math.max(80, bw); /* demi-largeur du trait du curseur */
-        const rank = { parry: 2, dodge: 1, none: 0 };
-        const res = seen.map(([, pos, zz]) => { const pz = zz + zw - pw; /* la parade : le trait blanc, tout au bout de la zone (+ tolérance juste après) */
-          return pos >= pz - tol && pos <= zz + zw + tol ? 'parry' : pos >= zz - tol && pos < pz - tol ? 'dodge' : 'none'; }); /* v509 : après le trait blanc, plus de marge (avant : ~15 px de « parade » en retard) */
-        end(res.sort((a, b) => rank[b] - rank[a])[0]);
-      };
-      /* coup chargé : on appuie quand on veut, c'est le moment où l'on relâche qui compte */
-      function letGo(ev) { if (!held || done) return; held = false; bar.classList.remove('held'); if (!t0) return end('none'); judgeAt(ev.timeStamp); }
-      if (hold) { addEventListener('pointerup', letGo, true); addEventListener('pointercancel', letGo, true); }
-      defTap = (at) => {
-        if (hold) { held = true; bar.classList.add('held'); return; }
-        if (!t0) return end('none'); // trop tôt
-        judgeAt(at);
-      };
-      setTimeout(() => { if (!done && alive_) { t0 = performance.now(); raf = requestAnimationFrame(step); } }, (reduced ? 250 : 300) + Math.random() * 450);
+      const pass = (i) => new Promise((done1) => {
+        const L = letters[i], hold = L === 'h' || L === 'H', feint = L === 'x' || L === 'H', moving = L === 'm' || ((e?.boss || e?.elite) && L === 'n' && i % 2 === 1);
+        const w = defenseWindow(st, s.a, s.t);
+        const D = D0 * (L === 'f' ? 0.72 : L === 'l' ? 1.3 : 1) * (feint ? 1.45 : 1) * (beat ? 0.85 : 1);
+        /* trajet du curseur : accéléré (puissance K) ; feinte : il avance, s'arrête presque, puis fonce */
+        const K = e?.boss || e?.elite ? 1.3 + Math.random() * 1.0 : 1.7;
+        const fa = 0.25 + Math.random() * 0.1, fb = fa + 0.22 + Math.random() * 0.12, fp = 0.28 + Math.random() * 0.12;
+        const ease = feint
+          ? (x) => x <= 0 ? 0 : x < fa ? fp * (x / fa) ** 0.8 : x < fb ? fp + 0.035 * (x - fa) / (fb - fa) : fp + 0.035 + (1 - fp - 0.035) * ((x - fb) / (1 - fb)) ** 1.6
+          : (x) => Math.max(0, x) ** K;
+        const tb = feint ? D * (fb + (1 - fb) * (0.55 + Math.random() * 0.3)) : D * (0.55 + Math.random() * 0.35);
+        const ta = tb - w.dodge, tp = tb - w.parry; /* fin de zone = impact ; parade = son dernier instant */
+        const za = ease(ta / D), zb = ease(tb / D), pz0 = ease(tp / D);
+        const zw = zb - za, pw = zb - pz0, z0 = za;
+        zEl.style.cssText = `left:${z0 * 100}%;width:${zw * 100}%`; zEl.style.transform = '';
+        pEl.style.cssText = `left:${((zw - pw) / zw) * 100}%;width:${(pw / zw) * 100}%`;
+        cur.style.transform = 'translateX(0px)';
+        bar.classList.remove('ok', 'ko', 'r-parry', 'r-dodge', 'r-none', 'go', 'pp', 'held', 'cb-hold');
+        if (hold) bar.classList.add('cb-hold');
+        pips[i]?.classList.add('now');
+        hint.textContent = (hold ? 'Maintiens le doigt, relâche dans l’or · trait blanc : parade' : 'Touche dans l’or : esquive · trait blanc : parade') + (n > 1 ? ` · coup ${i + 1}/${n}` : '');
+        let t0 = 0, fin = false, raf = 0, lit = '';
+        const zoneAt = (x) => (moving ? Math.min(0.97 - zw, Math.max(0.3, z0 + Math.sin(x * 9) * 0.1)) : z0);
+        const end = (res) => {
+          if (fin) return; fin = true; cancelAnimationFrame(raf); defTap = null; letGo = null; held = false;
+          bar.classList.remove('go', 'pp', 'held'); bar.classList.add(res === 'none' ? 'ko' : 'ok', `r-${res}`);
+          pips[i]?.classList.remove('now'); pips[i]?.classList.add(`r-${res}`);
+          {
+            const stamp = document.createElement('div'); stamp.className = `dv-stamp s-${res}${n > 1 ? ' small' : ''}`;
+            stamp.innerHTML = `<b>${res === 'parry' ? 'Parade parfaite !' : res === 'dodge' ? 'Esquive !' : 'Touché…'}</b>`;
+            $('.dv')?.appendChild(stamp); setTimeout(() => stamp.remove(), n > 1 ? 520 : 900);
+          }
+          if (res === 'none') { app.sfx.miss(); hap(2); } else if (i < n - 1) { (res === 'parry' ? app.sfx.parry : app.sfx.hit)?.(); hap(1); } /* le dernier coup sonne avec son impact */
+          out.push(res); done1();
+        };
+        const shown = [];
+        const step = () => {
+          const now0 = performance.now(), x = (now0 - t0) / D, pos = ease(Math.min(1, x)), zz = moving ? zoneAt(x) : z0;
+          cur.style.transform = `translateX(${(pos * bw).toFixed(1)}px)`;
+          shown.push([now0, pos, zz]); if (shown.length > 12) shown.shift();
+          if (moving) zEl.style.transform = `translateX(${((zz - z0) * bw).toFixed(1)}px)`;
+          const pz = zz + zw - pw, now = pos >= pz && pos <= pz + pw ? 'pp' : pos >= zz && pos <= zz + zw ? 'go' : '';
+          if (now !== lit) { if (lit) bar.classList.remove(lit); if (now) bar.classList.add(now); lit = now; }
+          if (x >= 1) end('none'); else raf = requestAnimationFrame(step);
+        };
+        const judgeAt = (at) => {
+          const now = performance.now(), when = at && at <= now && now - at < 500 ? at : now;
+          const seen = shown.filter((r) => r[0] <= when).slice(-2);
+          if (!seen.length) { const x = (when - t0) / D; seen.push([when, ease(Math.min(1, x)), zoneAt(x)]); }
+          const tol = 5 / Math.max(80, bw), rank = { parry: 2, dodge: 1, none: 0 };
+          const res = seen.map(([, pos, zz]) => { const pz = zz + zw - pw;
+            return pos >= pz - tol && pos <= zz + zw + tol ? 'parry' : pos >= zz - tol && pos < pz - tol ? 'dodge' : 'none'; });
+          end(res.sort((a, b) => rank[b] - rank[a])[0]);
+        };
+        /* coup chargé : on appuie quand on veut, c'est le moment où l'on relâche qui compte */
+        letGo = (ev) => { if (!hold || !held || fin) return; held = false; bar.classList.remove('held'); if (!t0) return end('none'); judgeAt(ev.timeStamp); };
+        defTap = (at) => {
+          if (hold) { held = true; bar.classList.add('held'); return; }
+          if (!t0) return; /* v575 : un toucher avant le départ du curseur ne compte pas (avant : raté) — on ne peut pas « deviner » le rythme */
+          judgeAt(at);
+        };
+        const gap = i === 0 ? (reduced ? 250 : 300) + Math.random() * 450 : beat || 140 + Math.random() * 360; /* rythme irrégulier entre les coups (sauf l'Horloger) */
+        setTimeout(() => { if (!fin && alive_) { t0 = performance.now(); raf = requestAnimationFrame(step); } else if (!alive_) end('none'); }, gap);
+      });
+      (async () => {
+        for (let i = 0; i < n && alive_; i++) { await pass(i); if (i < n - 1) await wait(180); }
+        bar.classList.add('fin');
+        close();
+      })();
     });
   }
   // Résumé du tour ennemi : une ligne par ennemi, affichée au début de ton tour
@@ -1381,7 +1391,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       <li><b>Brisure</b> : en visant une élite ou un gardien, la cible affiche la Brisure que ton coup va infliger (◆), et « BRISE ! » quand il va le briser. Un seul coup ne retire jamais plus de 40 % des PV d’un gardien.</li>
       <li><b>Ferveur</b> (${FERVOR_MAX} au plus, commune à l’équipe ; tu en gardes 3 au plus d’un combat à l’autre) : attaques, faiblesses, esquives (+1), parades parfaites (+2) et Brisures (+2) la remplissent. Pleine, elle lance le <b>pouvoir d’équipe</b> (${esc(ult.name)} : ${esc(ult.desc)}), pendant le tour d’une de tes créatures, sans le terminer.</li>
       <li><b>Voir une carte</b> : garde le doigt appuyé sur une carte (ennemie ou alliée) pour ouvrir sa fiche : PV, attaque, intention, passifs. Un toucher court sur un ennemi attaque toujours directement.</li>
-      <li><b>Défense active</b> (toutes les attaques ennemies) : coup simple, touche dans l’or pour esquiver (ta créature est éraflée, +1 Ferveur), sur le trait blanc, au tout dernier instant, pour parer (aucun dégât, +1 PA, +2 Ferveur, Brisure, contre-attaque des Protecteurs et des Attaquants) ; coup chargé, garde le doigt appuyé et relâche au bon moment ; attaque de zone, glisse ton doigt dans le sens de la flèche ; rafale, touche quand les cercles se referment ; étreinte, chaînes ou gel, martèle l’écran pour te libérer ; embuscade, touche les points faibles. La grosse attaque de chaque gardien est un <b>Assaut</b> : plusieurs gestes à la suite.</li>
+      <li><b>Défense active</b> (toutes les attaques ennemies) : coup simple, touche dans l’or pour esquiver (ta créature est éraflée, +1 Ferveur), sur le trait blanc, au tout dernier instant, pour parer (aucun dégât, +1 PA, +2 Ferveur, Brisure, contre-attaque des Protecteurs et des Attaquants) ; coup chargé, garde le doigt appuyé et relâche au bon moment ; enchaînement, le curseur repasse pour chaque coup (tout parer pour une parade parfaite, un raté sur trois coups = éraflé) ; feinte, le curseur s’arrête puis fonce. Chaque famille d’ennemis a son rythme. La grosse attaque de chaque gardien est un <b>Assaut</b> : une longue séquence, toujours la même pour lui.</li>
       <li><b>Dés</b> : Coup d’estoc, Contagion et Entrave lancent un D20 contre une difficulté (DD). 1 : échec critique ; sous le DD : réussite partielle ; DD atteint : réussite ; 20 : critique. Marque, gel, Brisure et faiblesse donnent des bonus.</li>
       <li><b>Chaîne</b> : chaque créature qui frappe un ennemi déjà touché ce tour-ci par une autre de tes créatures gagne +1 dégât (+2 au plus). Le « +1 » doré sur la cible l’annonce.</li>
       <li><b>Coup de grâce</b> : achever un ennemi donne +1 Ferveur.</li>
