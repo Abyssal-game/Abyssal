@@ -1,5 +1,6 @@
 // Dictionnaire portugais du Brésil (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Les sept dos vivants des royaumes d’un coup, moins cher qu’à l’unité.": "Os sete versos vivos dos reinos de uma vez, mais barato do que avulsos.",
   "Dos vivant de la forge": "Verso vivo da forja",
   "Dos vivant des chandelles": "Verso vivo das velas",
   "Dos vivant de l’orage": "Verso vivo da tempestade",

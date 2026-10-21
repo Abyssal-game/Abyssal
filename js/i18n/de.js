@@ -1,5 +1,6 @@
 // Dictionnaire allemand (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Les sept dos vivants des royaumes d’un coup, moins cher qu’à l’unité.": "Alle sieben lebendigen Reichs-Rückseiten auf einmal, günstiger als einzeln.",
   "Dos vivant de la forge": "Lebendige Rückseite der Schmiede",
   "Dos vivant des chandelles": "Lebendige Rückseite der Kerzen",
   "Dos vivant de l’orage": "Lebendige Rückseite des Gewitters",

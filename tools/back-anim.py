@@ -2,6 +2,7 @@
 """v565 : « dos vivant » : anime un dos de carte fixe (assets/backs/<clé>.webp, fait par back-art.py) en WebP animé qui boucle.
 Usage : python3 tools/back-anim.py <clé> <mode> [--sachet]     modes : bougies (flammes qui vacillent + rubis qui pulse),
         aurore (aurore qui ondule + étoile de givre qui scintille), coeur (lumière rouge qui bat, deux coups),
+        reflet:<teinte> (v573 : reflet en biais + cœur qui s'allume, pour tout dos),
         lueur:<teinte>[:<source>] (v569 : les couleurs vives proches de la teinte, en degrés, s'allument et s'éteignent
         doucement, les points les plus clairs scintillent ; <source> = dos fixe de départ s'il diffère de <clé>).
 L'image fixe est gardée dans store/backs/<clé>-fixe.webp ; le jeu affiche le fichier animé partout où il montre le dos
@@ -88,9 +89,43 @@ elif parts[0] == 'lueur':
         out = rgb * (1 + (1.0 * beat * mg + .7 * tw * ms)[..., None])
         out += hg[..., None] * col * (.05 + .6 * beat)
         return out
+elif parts[0] == 'reflet':  # v573 : pour tout dos : un reflet passe en biais sur les ornements, le cœur de la carte
+    # (couleurs vives proches de la teinte, surtout au centre) s'allume, les points clairs scintillent. 24 images de 100 ms.
+    N, DUR = 24, 100
+    hue0 = float(parts[1])
+    mx, mn = rgb.max(axis=2), rgb.min(axis=2)
+    sat = (mx - mn) / np.maximum(mx, 1)
+    d = np.maximum(mx - mn, 1e-3)
+    hue = np.where(mx == R, ((G - B) / d) % 6, np.where(mx == G, (B - R) / d + 2, (R - G) / d + 4)) * 60
+    dh = np.abs((hue - hue0 + 180) % 360 - 180)
+    rr = np.hypot((xx / W - .5) / .5, (yy / H - .5) / .5)
+    centre = np.exp(-(rr / .55) ** 2)
+    glow = ((sat > .3) & (mx > 60) & (dh < 30)).astype(np.float32) * np.clip(mx / 255, 0, 1) * (.25 + .75 * centre)
+    mg, hg = blur(glow, 2), blur(glow, 18)
+    col = (rgb * glow[..., None]).sum(axis=(0, 1)) / max(glow.sum(), 1)
+    col = col / max(col.max(), 1) * 255 if glow.sum() > 50 else np.array([255, 220, 160])
+    clair = mx[al[..., 0] > 128].mean() > 120  # dos à fond clair (marbre, papier) : ni reflet ni scintillement sur le fond
+    metal = np.clip((mx - 70) / 140, 0, 1) * (al[..., 0] > 128) * (np.clip((sat - .12) / .2, 0, 1) if clair else 1)
+    u = (xx / W) * .55 + (yy / H) * .45
+    loc = np.asarray(Image.fromarray(mx.astype(np.uint8)).filter(ImageFilter.GaussianBlur(6))).astype(np.float32)
+    spark = ((mx > 205) & (sat < .55) & (mx - loc > 35)).astype(np.float32)
+    ms = blur(spark, 1.2)
+    noise = [blur(rng.random((H, W)).astype(np.float32), 3) for _ in range(6)]
+    tint = (np.array([255, 245, 225]) * .6 + col * .4)
+    def frame(t):
+        p = t / N
+        beat = .5 - .5 * math.cos(2 * math.pi * p)
+        c = -.25 + 1.5 * min(p / .55, 1.2)  # le reflet traverse en 55 % de la boucle, puis repos
+        band = np.exp(-((u - c) / .06) ** 2) * (p < .66)
+        k = t * 6 / N; i = int(k) % 6; f = k - int(k)
+        tw = np.clip((noise[i] * (1 - f) + noise[(i + 1) % 6] * f - .5) * 8, -1, 1)
+        out = rgb * (1 + (.9 * beat * mg + .7 * tw * ms)[..., None])
+        out += hg[..., None] * col * (.04 + .5 * beat)
+        out += (band * metal * .55)[..., None] * tint
+        return out
 else:
     sys.exit(__doc__)
 
 frames = [Image.fromarray(np.dstack([np.clip(frame(t), 0, 255), al]).astype(np.uint8), 'RGBA') for t in range(N)]
-frames[0].save(src, 'WEBP', save_all=True, append_images=frames[1:], duration=DUR, loop=0, quality=66, method=5)
+frames[0].save(src, 'WEBP', save_all=True, append_images=frames[1:], duration=DUR, loop=0, quality=62, method=5)
 print(src, os.path.getsize(src) // 1024, 'Ko', N, 'images')

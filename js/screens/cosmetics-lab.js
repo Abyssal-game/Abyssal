@@ -2,7 +2,7 @@
 // les essayer en grand et les trier (garder, retirer, à revoir). Le tri reste sur l'appareil (localStorage) ;
 // « Copier mon tri » donne un texte à coller dans la conversation pour appliquer les choix dans le jeu.
 // Outil du propriétaire, en français seulement (translate="no").
-import { CODEX_FRAMES, CODEX_BACKS, FINISHES, CATALOG, SEASONS, SHOP, CODEX_ONLY, RETIRED_COSM, PLATES, EMOTES, SACHETS } from '../core/codex.js';
+import { CODEX_FRAMES, CODEX_BACKS, FINISHES, CATALOG, SEASONS, SHOP, CODEX_ONLY, RETIRED_COSM, PLATES, EMOTES, SACHETS, LIVE_BACKS } from '../core/codex.js';
 import { FRAMES } from '../config.js';
 import { icon, EMBLEM } from '../ui/icons.js';
 import { esc, toast, openSheet, confirmBox } from '../ui/dom.js';
@@ -12,7 +12,7 @@ import { emoteHTML } from '../ui/vitrine.js'; /* v564 */
 
 const KEY = 'abyssal.cosmTri';
 const ST = { keep: 'Garder', drop: 'Retirer', maybe: 'À revoir' };
-const KINDS = { frame: 'Cadres', back: 'Dos', finish: 'Finitions', plate: 'Plaques', emote: 'Réactions', sachet: 'Sachets' };
+const KINDS = { frame: 'Cadres', back: 'Dos', sachet: 'Sachets', plate: 'Plaques', emote: 'Réactions' }; /* v573 : finitions retirées du jeu */
 const readTri = () => { try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { return {}; } };
 const writeTri = (t) => { try { localStorage.setItem(KEY, JSON.stringify(t)); } catch (e) { /* rien */ } };
 
@@ -24,7 +24,7 @@ function origins() {
     const r = t.prem; if (!r) continue;
     for (const k of [r.frame, r.back, r.finish, r.sachet]) add(k, `Saison ${se.num} · ${se.name} · palier ${t.tier}${t.tier === 30 ? ' (ultime)' : ''}`, `s:${se.key}`);
   }
-  for (const it of CATALOG) for (const k of [it.give.frame, it.give.back, it.give.finish, it.give.plate, it.give.emote, ...(it.give.backs || [])]) add(k, it.kind === 'bundle' ? `Échoppe · lot « ${it.name} »` : `Échoppe · ${it.cost} obsidiennes`, 'shop');
+  for (const it of CATALOG) for (const k of [it.give.frame, it.give.back, it.give.finish, it.give.plate, it.give.emote, it.give.sachet, ...(it.give.backs || [])]) add(k, it.kind === 'bundle' ? `Échoppe · lot « ${it.name} »` : `Échoppe · ${it.cost} obsidiennes`, 'shop');
   for (const it of SHOP) for (const k of [it.give?.frame, it.give?.back, it.give?.sachet]) add(k, `Échoppe · ${it.name}`, 'shop');
   for (const k of RETIRED_COSM) add(k, 'Retiré · ton tri du 21 octobre 2026', 'none'); /* v562 */
   for (const k of CODEX_ONLY) add(k, 'Codex · aucune saison pour l’instant', 'none');
@@ -36,12 +36,14 @@ function allItems() {
   for (const [k, n] of Object.entries(FRAMES)) out.push({ id: k, kind: 'frame', name: n, from: { txt: 'Gratuit · gagné en jouant', grp: 'free' } });
   for (const [k, n] of Object.entries(CODEX_FRAMES)) out.push({ id: k, kind: 'frame', name: n, from: o[k] || { txt: 'Réserve · nulle part', grp: 'none' } });
   out.push({ id: 'back', kind: 'back', name: 'Dos de l’Abysse (de base)', from: { txt: 'Gratuit · dos de départ', grp: 'free' } });
-  for (const [k, n] of Object.entries(CODEX_BACKS)) out.push({ id: k, kind: 'back', name: n, from: o[k] || { txt: 'Réserve · nulle part', grp: 'none' } });
+  for (const [k, n] of Object.entries(CODEX_BACKS)) out.push({ id: k, kind: 'back', name: LIVE_BACKS.includes(k) && !/vivant/i.test(n) ? `${n} (vivant)` : n, from: o[k] || { txt: 'Réserve · nulle part', grp: 'none' } });
   for (const [k, n] of Object.entries(SACHETS)) out.push({ id: k, kind: 'sachet', name: n, from: o[k] || { txt: 'Réserve · nulle part', grp: 'none' } }); /* v565 */
   for (const [k, n] of Object.entries(PLATES)) out.push({ id: k, kind: 'plate', name: n, from: o[k] || { txt: 'Réserve · nulle part', grp: 'none' } }); /* v564 */
   for (const [k, e] of Object.entries(EMOTES)) out.push({ id: k, kind: 'emote', name: `${e.name || 'Réaction offerte'} · « ${e.text} »`, from: e.free ? { txt: 'Gratuit · offerte à tous', grp: 'free' } : o[k] || { txt: 'Réserve · nulle part', grp: 'none' } });
   for (const [k, f] of Object.entries(FINISHES)) out.push({ id: k, kind: 'finish', name: `Finition ${f.name}`, desc: f.desc, from: o[k] || { txt: 'Réserve · nulle part', grp: 'none' } });
-  return out;
+  /* v573 : seulement ce qui existe encore dans le jeu (gratuit, Échoppe, Pack du Fondateur, saisons du Codex) :
+     ni objets retirés, ni réserve sans place, ni finitions */
+  return out.filter((it) => it.kind !== 'finish' && it.from.grp !== 'none');
 }
 
 export function openCosmeticsLab(app) {
@@ -65,7 +67,7 @@ export function openCosmeticsLab(app) {
     && (ui.st === 'all' || (ui.st === 'todo' ? !tri[it.id] : tri[it.id] === ui.st)));
 
   const thumb = (it) => it.kind === 'frame' ? `<span class="avatar-big pf pf-${esc(it.id)}">${avImg}</span>`
-    : it.kind === 'back' ? `<img class="cl-back" alt="" src="${backSrc(it.id)}" onerror="this.replaceWith(Object.assign(document.createElement('i'),{className:'cl-miss',textContent:'image manquante'}))">`
+    : it.kind === 'back' ? `<img class="cl-back" loading="lazy" alt="" src="${backSrc(it.id)}" onerror="this.replaceWith(Object.assign(document.createElement('i'),{className:'cl-miss',textContent:'image manquante'}))">`
     : it.kind === 'sachet' ? `<img class="cl-back" alt="" src="assets/packs/${esc(it.id)}.webp">`
     : it.kind === 'plate' ? `<span class="np np-${esc(it.id)} np-demo">Pseudo</span>`
     : it.kind === 'emote' ? `<span class="re-tile">${emoteHTML(it.id)}</span>`
@@ -79,10 +81,10 @@ export function openCosmeticsLab(app) {
     const n = (s) => all.filter((it) => (s === 'todo' ? !tri[it.id] : tri[it.id] === s)).length;
     sheet.setContent(`
       <h2>${icon('crown')} Atelier des cosmétiques</h2>
-      <p class="small muted">Tous les cadres, dos et finitions du jeu. Touche un objet pour le voir en grand, puis choisis <b>Garder</b>, <b>Retirer</b> ou <b>À revoir</b>. Ton tri reste sur ce téléphone ; « Copier mon tri » te donne un texte à me coller pour que je l'applique.</p>
+      <p class="small muted">Tous les cosmétiques qui existent encore dans le jeu (gratuits, Échoppe, Pack du Fondateur, saisons du Codex) : <b>${items.length} objets</b>. Les objets déjà retirés n'apparaissent plus. Touche un objet pour le voir en grand, puis choisis <b>Garder</b>, <b>Retirer</b> ou <b>À revoir</b>. Ton tri reste sur ce téléphone ; « Copier mon tri » te donne un texte à me coller pour que je l'applique.</p>
       <div class="seg wide cl-seg">${Object.entries(KINDS).map(([k, v]) => `<button class="seg-b ${ui.kind === k ? 'on' : ''}" data-cl="kind" data-v="${k}">${v} (${items.filter((it) => it.kind === k).length})</button>`).join('')}</div>
       <div class="cl-chips">${[['all', `Tous (${all.length})`], ['todo', `À trier (${n('todo')})`], ['keep', `Gardés (${n('keep')})`], ['drop', `À retirer (${n('drop')})`], ['maybe', `À revoir (${n('maybe')})`]].map(([k, v]) => `<button class="chip" aria-pressed="${ui.st === k}" data-cl="st" data-v="${k}">${v}</button>`).join('')}</div>
-      <div class="cl-chips">${groups().map(([k, v]) => `<button class="chip" aria-pressed="${ui.from === k}" data-cl="from" data-v="${k}">${esc(v)}</button>`).join('')}</div>
+      <div class="cl-chips">${groups().filter(([k]) => k !== 'none').map(([k, v]) => `<button class="chip" aria-pressed="${ui.from === k}" data-cl="from" data-v="${k}">${esc(v)}</button>`).join('')}</div>
       ${list.length ? `<div class="cl-grid">${list.map((it) => `<button class="cl-tile ${tri[it.id] || ''}" data-cl="see" data-id="${esc(it.id)}">
           <span class="cl-th">${thumb(it)}</span><b>${esc(it.name)}</b><small>${esc(it.from.txt)}</small>${badge(it.id)}</button>`).join('')}</div>`
         : '<p class="small muted center">Rien dans ce filtre.</p>'}

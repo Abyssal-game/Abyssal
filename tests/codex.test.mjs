@@ -74,12 +74,12 @@ test('obsidiennes : achats du catalogue, manque signalé, lot au prix réduit', 
   g.catalogBuy('cx-yeux');
   assert.ok(g.s.frames.includes('cx-yeux')); assert.equal(g.obs(), 60);
   assert.throws(() => g.catalogBuy('cx-yeux'), /déjà/);
-  assert.throws(() => g.catalogBuy('dos-infernal'), /manque 60/);
+  assert.throws(() => g.catalogBuy('dos-infernal'), /manque 140/); /* v573 : dos vivant à 200 */
   g.s.obs = 300; g.catalogBuy('dos-infernal');
-  assert.equal(g.catalogCost('royaumes'), Math.round(600 * 6 / 7));
+  assert.equal(g.catalogCost('royaumes'), Math.round(1000 * 6 / 7));
   g.s.obs = 5000; g.catalogBuy('royaumes');
   assert.ok(g.catalogOwned('royaumes') && g.s.backs.length === 7);
-  assert.equal(g.obs(), 5000 - Math.round(600 * 6 / 7));
+  assert.equal(g.obs(), 5000 - Math.round(1000 * 6 / 7));
 });
 
 test('dos de cartes : seulement un dos possédé, retour au dos par défaut possible', () => {

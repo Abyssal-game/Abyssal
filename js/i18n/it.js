@@ -1,5 +1,6 @@
 // Dictionnaire italien (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Les sept dos vivants des royaumes d’un coup, moins cher qu’à l’unité.": "I sette dorsi viventi dei regni in un colpo solo, a meno che singolarmente.",
   "Dos vivant de la forge": "Dorso vivente della forgia",
   "Dos vivant des chandelles": "Dorso vivente delle candele",
   "Dos vivant de l’orage": "Dorso vivente della tempesta",

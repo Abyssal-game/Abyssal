@@ -1,5 +1,6 @@
 // Anglais (v506-v507) : texte français → traduction. Généré à partir des lots de traduction ; on peut corriger à la main.
 export default {
+  "Les sept dos vivants des royaumes d’un coup, moins cher qu’à l’unité.": "All seven living realm backs at once, cheaper than buying them one by one.",
   "Dos vivant de la forge": "Living Forge Back",
   "Dos vivant des chandelles": "Living Candles Back",
   "Dos vivant de l’orage": "Living Storm Back",

@@ -114,7 +114,8 @@ export default function codexScreen(app, root) {
       return `<button class="cxs-t r-${r} ${it.kind} ${own ? 'own' : ''}" data-cx="see" data-id="${it.id}"><span class="cxs-pic">${pic(it)}</span><span class="cxs-rk">${RANK[r]}</span>${it.live ? '<span class="cxs-live">Vivant</span>' : ''}<b>${esc(name(it))}</b>
         ${own ? `<span class="cxs-own">${icon('check')}Possédé</span>` : `<span class="cxs-pr ${cost <= have ? '' : 'short'}">${obsTxt(cost)}</span>`}</button>`; };
     const CATS = [['frame', 'Cadres'], ['plate', 'Plaques'], ['live', 'Dos vivants'], ['back', 'Dos'], ['sachet', 'Sachets'], ['emote', 'Réactions'], ['bundle', 'Lots'], ['obs', OBS.name]]; /* v569 : finitions retirées, dos vivants */
-    const cur = CATS.some(([k]) => k === ui.cat) ? ui.cat : 'frame';
+    const CATS2 = CATS.filter(([k]) => k !== 'back' || CATALOG.some((x) => x.kind === 'back' && !x.live)); /* v573 : plus de dos fixes à vendre */
+    const cur = CATS2.some(([k]) => k === ui.cat) ? ui.cat : 'frame';
     const inCat = (x) => (cur === 'live' ? x.kind === 'back' && x.live : cur === 'back' ? x.kind === 'back' && !x.live : x.kind === cur);
     const list = CATALOG.filter(inCat).slice().sort((a, b) => (g.catalogOwned(a.id) - g.catalogOwned(b.id)) || (b.cost - a.cost));
     /* à la une : un bel objet par semaine (le même pour tous), pas encore possédé */
@@ -135,7 +136,7 @@ export default function codexScreen(app, root) {
     return `<section class="cxs-wallet"><span class="cxs-w-n">${obsTxt(have)}</span><span class="small">${esc(OBS.name)} · seulement pour des cosmétiques</span>
         <button class="btn small primary" data-cx="cat" data-v="obs">Obtenir</button></section>
       ${cur !== 'obs' ? heroHTML : ''}
-      <div class="cxs-cats" role="tablist">${CATS.map(([k, l]) => `<button class="cxs-cat ${k === cur ? 'on' : ''}" data-cx="cat" data-v="${k}" role="tab" aria-selected="${k === cur}">${l}</button>`).join('')}</div>
+      <div class="cxs-cats" role="tablist">${CATS2.map(([k, l]) => `<button class="cxs-cat ${k === cur ? 'on' : ''}" data-cx="cat" data-v="${k}" role="tab" aria-selected="${k === cur}">${l}</button>`).join('')}</div>
       ${cur === 'obs' ? `<div class="cxs-euro" id="cx-euro">${SHOP.filter((it) => it.kind !== 'codex').map((it) => euro(it, it.kind === 'obs' ? obsI++ : 0)).join('')}</div>
         <button class="btn ghost block" data-cx="restore">Restaurer mes achats</button>
         <p class="small muted center">Pendant l'aperçu, tout achat en euros est simulé : aucun paiement. Rien ici ne rend tes créatures plus fortes.</p>`

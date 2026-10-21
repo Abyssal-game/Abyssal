@@ -1,5 +1,6 @@
 // Dictionnaire espagnol (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Les sept dos vivants des royaumes d’un coup, moins cher qu’à l’unité.": "Los siete dorsos vivos de los reinos de una vez, más barato que por separado.",
   "Dos vivant de la forge": "Dorso vivo de la forja",
   "Dos vivant des chandelles": "Dorso vivo de las velas",
   "Dos vivant de l’orage": "Dorso vivo de la tormenta",
