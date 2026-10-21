@@ -48,7 +48,7 @@ test('codex v547 : une récompense enluminée à chaque palier, aucune n’est �
     for (const k of [t.prem.frame, t.prem.back, t.prem.finish].filter(Boolean)) assert.ok(CODEX_ONLY.includes(k) && !CATALOG.some((it) => it.id === k), `${k} ne doit pas être en vente`);
   }
   const last = CODEX_TIERS[CODEX.tiers - 1].prem;
-  assert.ok(last.frame && last.finish && last.title);
+  assert.ok(last.frame && last.back && last.title); /* v569 : couronne + dos vivant (plus de finition) */
   const obs = CODEX_TIERS.reduce((n, t) => n + (t.prem.obs || 0), 0);
   assert.ok(obs <= 450, 'les obsidiennes de la voie enluminée restent modestes');
 });
@@ -93,14 +93,14 @@ test('dos de cartes : seulement un dos possédé, retour au dos par défaut poss
   assert.equal(g.s.back, null);
 });
 
-test('v482 : finitions de prestige, achetées une fois, posées seulement sur une carte possédée', () => {
+test('v482 / v569 : finitions de prestige retirées de la vente, encore posées seulement sur une carte possédée', () => {
   const g = mk();
   g.s.settings.dev = true; g.s.devCodex = true; g.s.obs = 2000;
   const id = Object.keys(g.s.collection)[0] || catalog.cards[0].id;
   if (!g.owns(id)) g.addCard?.(id);
   assert.throws(() => g.setDress(id, 'fin-neant'), /pas encore/);
-  g.catalogBuy('fin-neant');
-  assert.ok(g.s.finishes.includes('fin-neant') && g.catalogOwned('fin-neant'));
+  assert.ok(!CATALOG.some((it) => it.kind === 'finish'), 'plus aucune finition à l’Échoppe (v569)');
+  g.s.finishes = ['fin-neant']; /* une partie qui l'aurait achetée avant */
   g.setDress(id, 'fin-neant');
   assert.equal(g.s.dress[id], 'fin-neant');
   g.setDress(id, null);

@@ -5733,3 +5733,9 @@ body.battle-mode .prog-chip { top: calc(var(--safe-t, env(safe-area-inset-top, 0
 body:has(.cb-assault.run) .qx-head { top: calc(var(--safe-t, 0px) + 196px); }
 @media (max-height: 700px) { body:has(.cb-assault.run) .qx-head { top: calc(var(--safe-t, 0px) + 184px); padding: 8px 12px 10px; } }
 .qx-head .qx-hint b { display: inline; font: 800 .82rem/1.3 var(--f-ui); letter-spacing: 0; text-transform: none; color: #FFD27A; } /* v566 : la règle du titre (.qx-head b) passait les mots en gras à la ligne */
+/* v569 : bannière du Sanctuaire peinte à nouveau (Gemini, sol nu ; l'ancienne avait un symbole effacé au sol, d'où le flou) */
+.bn-sanctuary { --bn: url(../assets/ui/bn-sanctuary3.webp); }
+/* v569 : pastille « Vivant » des dos animés de l'Échoppe */
+.cxs-live { position: absolute; top: 6px; left: 6px; z-index: 2; padding: 2px 7px; border-radius: 999px; font: 800 .58rem/1.4 var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: #1a0f04; background: linear-gradient(90deg, #f6d27a, #fff2c4, #f6d27a); background-size: 200% 100%; animation: cxsLive 2.4s linear infinite; box-shadow: 0 0 10px rgba(246, 210, 122, .55); }
+@keyframes cxsLive { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .cxs-live { animation: none; } }

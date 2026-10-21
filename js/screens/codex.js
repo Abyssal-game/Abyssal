@@ -109,11 +109,12 @@ export default function codexScreen(app, root) {
       : it.give.emotes ? `<span class="re-fan">${it.give.emotes.slice(0, 4).map((k) => `<span class="re-pic">${emotePic(k)}</span>`).join('')}</span>`
       : `<span class="cx-fan">${it.give.backs.slice(0, 4).map((b) => `<img alt="" src="assets/backs/${b}.webp">`).join('')}</span>`;
     const tile = (it) => { const own = g.catalogOwned(it.id), cost = g.catalogCost(it.id), r = rank(it);
-      return `<button class="cxs-t r-${r} ${it.kind} ${own ? 'own' : ''}" data-cx="see" data-id="${it.id}"><span class="cxs-pic">${pic(it)}</span><span class="cxs-rk">${RANK[r]}</span><b>${esc(name(it))}</b>
+      return `<button class="cxs-t r-${r} ${it.kind} ${own ? 'own' : ''}" data-cx="see" data-id="${it.id}"><span class="cxs-pic">${pic(it)}</span><span class="cxs-rk">${RANK[r]}</span>${it.live ? '<span class="cxs-live">Vivant</span>' : ''}<b>${esc(name(it))}</b>
         ${own ? `<span class="cxs-own">${icon('check')}Possédé</span>` : `<span class="cxs-pr ${cost <= have ? '' : 'short'}">${obsTxt(cost)}</span>`}</button>`; };
-    const CATS = [['frame', 'Cadres'], ['plate', 'Plaques'], ['back', 'Dos'], ['finish', 'Finitions'], ['emote', 'Réactions'], ['bundle', 'Lots'], ['obs', OBS.name]];
-    const cur = ui.cat || 'frame';
-    const list = CATALOG.filter((x) => x.kind === cur).slice().sort((a, b) => (g.catalogOwned(a.id) - g.catalogOwned(b.id)) || (b.cost - a.cost));
+    const CATS = [['frame', 'Cadres'], ['plate', 'Plaques'], ['live', 'Dos vivants'], ['back', 'Dos'], ['emote', 'Réactions'], ['bundle', 'Lots'], ['obs', OBS.name]]; /* v569 : finitions retirées, dos vivants */
+    const cur = CATS.some(([k]) => k === ui.cat) ? ui.cat : 'frame';
+    const inCat = (x) => (cur === 'live' ? x.kind === 'back' && x.live : cur === 'back' ? x.kind === 'back' && !x.live : x.kind === cur);
+    const list = CATALOG.filter(inCat).slice().sort((a, b) => (g.catalogOwned(a.id) - g.catalogOwned(b.id)) || (b.cost - a.cost));
     /* à la une : un bel objet par semaine (le même pour tous), pas encore possédé */
     const week = Math.floor(g.clock().getTime() / 864e5 / 7);
     const stars = CATALOG.filter((x) => x.kind !== 'bundle' && x.cost >= 700 && !g.catalogOwned(x.id));
@@ -136,8 +137,8 @@ export default function codexScreen(app, root) {
       ${cur === 'obs' ? `<div class="cxs-euro" id="cx-euro">${SHOP.filter((it) => it.kind !== 'codex').map((it) => euro(it, it.kind === 'obs' ? obsI++ : 0)).join('')}</div>
         <button class="btn ghost block" data-cx="restore">Restaurer mes achats</button>
         <p class="small muted center">Pendant l'aperçu, tout achat en euros est simulé : aucun paiement. Rien ici ne rend tes créatures plus fortes.</p>`
-      : `<div class="cxs-grid ${cur}">${list.map(tile).join('')}</div>
-        ${cur === 'finish' ? '<p class="small muted center">Une finition achetée se pose sur autant de cartes que tu veux, une par carte. Elle ne change rien à leurs valeurs.</p>' : ''}`}`;
+      : `<div class="cxs-grid ${cur === 'live' ? 'back' : cur}">${list.map(tile).join('')}</div>
+        ${cur === 'live' ? '<p class="small muted center">Des dos de cartes animés : ils s’animent partout où tes cartes se montrent face cachée (boosters, coffres, jeux).</p>' : ''}`}`;
   }
 
   function devTab() {

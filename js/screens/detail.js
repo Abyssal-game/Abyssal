@@ -106,7 +106,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     /* v482 : habillage (finition de prestige achetée à l'Échoppe) */
     const fins = owned ? (g.s.finishes || []).filter((k) => FINISHES[k]) : [];
     const cur = g.s.dress?.[current] || null;
-    const dressRow = fins.length ? `<div class="dt-dress"><span class="small muted">Finition de prestige</span><div class="chips">${[[null, 'Aucune'], ...fins.map((k) => [k, FINISHES[k].name])].map(([k, n]) => `<button class="chip" data-act="dress" data-v="${k || ''}" aria-pressed="${cur === k}">${esc(n)}</button>`).join('')}</div></div>` : '';
+    const dressRow = false && fins.length ? /* v569 : finitions retirées */ `<div class="dt-dress"><span class="small muted">Finition de prestige</span><div class="chips">${[[null, 'Aucune'], ...fins.map((k) => [k, FINISHES[k].name])].map(([k, n]) => `<button class="chip" data-act="dress" data-v="${k || ''}" aria-pressed="${cur === k}">${esc(n)}</button>`).join('')}</div></div>` : '';
 
     let body;
     if (owned) {

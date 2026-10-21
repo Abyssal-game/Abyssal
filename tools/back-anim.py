@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """v565 : « dos vivant » : anime un dos de carte fixe (assets/backs/<clé>.webp, fait par back-art.py) en WebP animé qui boucle.
 Usage : python3 tools/back-anim.py <clé> <mode>     modes : bougies (flammes qui vacillent + rubis qui pulse),
-        aurore (aurore qui ondule + étoile de givre qui scintille), coeur (lumière rouge qui bat, deux coups).
+        aurore (aurore qui ondule + étoile de givre qui scintille), coeur (lumière rouge qui bat, deux coups),
+        lueur:<teinte>[:<source>] (v569 : les couleurs vives proches de la teinte, en degrés, s'allument et s'éteignent
+        doucement, les points les plus clairs scintillent ; <source> = dos fixe de départ s'il diffère de <clé>).
 L'image fixe est gardée dans store/backs/<clé>-fixe.webp ; le jeu affiche le fichier animé partout où il montre le dos
 (fond CSS : aucun code à ajouter, Safari lit les WebP animés).
 """
@@ -13,6 +15,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 key, mode = sys.argv[1], sys.argv[2]
 src = os.path.join(ROOT, 'assets/backs', f'{key}.webp')
 fixe = os.path.join(ROOT, 'store/backs', f'{key}-fixe.webp')
+parts = mode.split(':')
+if parts[0] == 'lueur' and len(parts) > 2 and not os.path.exists(fixe):  # dos vivant tiré d'un dos fixe existant
+    shutil.copy(os.path.join(ROOT, 'assets/backs', f'{parts[2]}.webp'), fixe)
 if not os.path.exists(fixe): shutil.copy(src, fixe)
 im = Image.open(fixe).convert('RGBA')
 a = np.asarray(im).astype(np.float32)
@@ -59,6 +64,28 @@ elif mode == 'coeur':
         b = math.exp(-((p - .12) / .05) ** 2) + .75 * math.exp(-((p - .3) / .05) ** 2)
         out = rgb * (1 + .55 * b * mr[..., None])
         out += hr[..., None] * np.array([255, 30, 40]) * (.08 + .4 * b)
+        return out
+elif parts[0] == 'lueur':
+    hue0 = float(parts[1])
+    mx, mn = rgb.max(axis=2), rgb.min(axis=2)
+    sat = (mx - mn) / np.maximum(mx, 1)
+    hue = np.zeros_like(mx); d = np.maximum(mx - mn, 1e-3)
+    hue = np.where(mx == R, ((G - B) / d) % 6, np.where(mx == G, (B - R) / d + 2, (R - G) / d + 4)) * 60
+    dh = np.abs((hue - hue0 + 180) % 360 - 180)
+    glow = ((sat > .35) & (mx > 70) & (dh < 28)).astype(np.float32) * np.clip(mx / 255, 0, 1)
+    mg, hg = blur(glow, 2), blur(glow, 16)
+    col = (rgb * glow[..., None]).sum(axis=(0, 1)) / max(glow.sum(), 1)
+    col = col / max(col.max(), 1) * 255
+    spark = ((mx > 225) & (sat < .5)).astype(np.float32)
+    ms = blur(spark, 1.2)
+    noise = [blur(rng.random((H, W)).astype(np.float32), 3) for _ in range(6)]
+    def frame(t):
+        ph = 2 * math.pi * t / N
+        beat = .5 - .5 * math.cos(ph)
+        k = t * 6 / N; i = int(k) % 6; f = k - int(k)
+        tw = np.clip((noise[i] * (1 - f) + noise[(i + 1) % 6] * f - .5) * 8, -1, 1)
+        out = rgb * (1 + (1.0 * beat * mg + .7 * tw * ms)[..., None])
+        out += hg[..., None] * col * (.05 + .6 * beat)
         return out
 else:
     sys.exit(__doc__)

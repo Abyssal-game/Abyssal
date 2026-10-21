@@ -369,7 +369,7 @@ async function boot() {
     app.game = new Game(catalog, storage);
     app.persistent = persistent;
     setFavLookup((id) => app.game.isFav(id));
-    setDressLookup((id) => app.game.s.dress?.[id] || null); /* v482 */
+    setDressLookup(() => null); /* v569 : finitions de cartes retirées pour l'instant (v482 : app.game.s.dress) */
     setApexLookup((id) => !!app.game.s.collection[id] && app.game.cardLevel(id) >= MAX_LEVEL);
     setFameLookup((id) => (app.game.s.collection[id] ? fameTier(app.game.s.fame[id]) : 0));
     app.game.on('change', () => { renderChrome(); pulseWallet(); });
