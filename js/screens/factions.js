@@ -29,6 +29,7 @@ export default function factions(app, root, params) {
     }).join('')}</div>`;
 }
 
+/* v559 : images des royaumes republiées sous un nouveau nom (-2), une copie abîmée pouvait rester sur le téléphone */
 function factionPage(app, root, key) {
   const g = app.game, cat = app.catalog, f = cat.faction[key];
   const p = g.factionProgress(key);
@@ -38,7 +39,7 @@ function factionPage(app, root, key) {
   const conflicts = cat.lore.conflicts.filter((c) => c.sides.includes(key));
   root.innerHTML = `
     <section class="fac-hero" style="--fc:${f.colors.secondary};--fp:${f.colors.primary}">
-      <img alt="" class="fac-realm" src="assets/realms/${key}.webp" onerror="this.remove()">
+      <img alt="" class="fac-realm" src="assets/realms/${key === 'infernal' ? key : `${key}-2`}.webp" onerror="this.remove()">
       <div class="fac-hero-veil"></div>
       <div class="fac-hero-text"><span class="fac-sig big">${sigil(key)}</span><h1>${esc(f.name)}</h1><p class="lore">${esc(f.realm)} · «&nbsp;${esc(f.motto)}&nbsp;»</p></div>
     </section>
