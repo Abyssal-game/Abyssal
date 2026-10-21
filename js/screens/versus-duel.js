@@ -79,7 +79,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
     app.sfx.suspense?.();
     await wait(1000);
     [fp, mp].forEach((x) => { x.classList.remove('shake'); x.classList.add('torn'); });
-    app.sfx.tear?.(); app.sfx.rip?.(1);
+    app.sfx['vd-tear']?.();
     await wait(320);
     // les cartes sortent face cachée du sachet et filent vers leur place
     for (const side of ['foe', 'me']) {
@@ -104,7 +104,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
     if (big && speed === 1) { n.classList.add('tease'); app.sfx.suspensebig?.(); await wait(900); n.classList.remove('tease'); }
     if (done) return; /* v527 : « Tout révéler » a déjà posé les totaux */
     n.classList.add('on');
-    if (big) { n.classList.add('big'); app.sfx.reveal?.(c.rarity); } else app.sfx.flip?.();
+    if (big) { n.classList.add('big'); app.sfx['vd-rare']?.(); } else app.sfx['vd-flip']?.();
     burst(n, big ? 3.2 : 1.7);
     sc[side] += c.pts;
     setScore(side); lead();
@@ -142,7 +142,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
       <p>${res === 'win' ? t(fresh ? 'Tu remportes <b>les {n} cartes</b> du duel, dont <b>{f} nouvelles</b> !' : 'Tu remportes <b>les {n} cartes</b> du duel !', { n: nWon, f: fresh })
         : res === 'tie' ? t('Même total : tu gardes <b>les {n} cartes</b> de tes boosters.', { n: nWon }) : t('{name} remporte toutes les cartes.', { name: esc(foeName) })}</p>
       <button class="btn primary block big-cta dc-plq dc-plq-red" data-v="close">${t('Fermer')}</button>`;
-    if (res === 'win') app.sfx.victory?.(); else if (res === 'lose') app.sfx.defeat?.(); else app.sfx.reveal?.('R');
+    if (res === 'win') app.sfx['vd-win']?.(); else if (res === 'lose') app.sfx['vd-lose']?.(); else app.sfx['vd-flip']?.();
   }
   function close() {
     if (closed) return;

@@ -1162,6 +1162,7 @@ export class Game {
   }
   pacteDraw() { const st = this.s.pacte.cur; if (!st || st.over || st.turn !== 'p') throw new Error('Ce n’est pas ton tour.'); const ev = PA.draw(st); this.persist(); return ev; }
   pacteStop() { const st = this.s.pacte.cur; if (!st || st.over || st.turn !== 'p') throw new Error('Ce n’est pas ton tour.'); const ev = PA.stop(st); this.persist(); return ev; }
+  pacteDouble() { const st = this.s.pacte.cur; if (!st || st.over || st.turn !== 'p') throw new Error('Ce n’est pas ton tour.'); const ev = PA.double(st); this.persist(); return ev; } /* v561 : Double ou rien */
   pacteAi() { const st = this.s.pacte.cur; if (!st || st.over || st.turn !== 'a') return []; const evs = PA.aiTurn(st, sessRng(st)); this.persist(); return evs; }
   pacteFinish() {
     const pa = this.s.pacte, st = pa.cur;

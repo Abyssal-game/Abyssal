@@ -9,9 +9,10 @@ const catalog = loadCatalog();
 const clock = () => new Date(2026, 9, 18, 12);
 const F = (f, v) => ({ f, v, id: null });
 
-test('pacte : 60 cartes (7 factions × 1 à 7, 3 Sceaux, 3 Gardiens, 3 Offrandes, 2 Présages), illustrations de la bonne faction', () => {
+test('pacte : 62 cartes (7 factions × 1 à 7, 3 Sceaux, 3 Gardiens, 3 Offrandes, 2 Présages, 2 Malédictions), illustrations de la bonne faction', () => {
   const st = PA.newGame(catalog, { table: 'novice', seed: 5 });
-  assert.equal(st.deck.length, 60);
+  assert.equal(st.deck.length, 62);
+  assert.equal(st.deck.filter((c) => c.sp === 'curse').length, 2);
   assert.equal(st.deck.filter((c) => c.sp === 'oracle').length, 2);
   assert.equal(st.deck.filter((c) => c.f).length, 49);
   for (const k of ['sceau', 'gardien', 'offrande']) assert.equal(st.deck.filter((c) => c.sp === k).length, 3);
@@ -61,7 +62,7 @@ test('pacte : la partie se termine à tours égaux, toujours, contre chaque adve
   for (const T of PA.TABLES) for (let i = 0; i < 60; i++) {
     const st = PA.newGame(catalog, { table: T.key, seed: i });
     let n = 0;
-    while (!st.over && n++ < 3000) { if (st.turn === 'p') { if (!st.row.some((c) => c.f) || PA.bustChance(st) < 0.3) PA.draw(st); else PA.stop(st); } else PA.aiTurn(st, rng); }
+    while (!st.over && n++ < 3000) { if (st.turn === 'p') { if (!st.row.some((c) => c.f) || st.must > 0 || PA.bustChance(st) < 0.3) PA.draw(st); else PA.stop(st); } else PA.aiTurn(st, rng); }
     assert.ok(st.over, 'partie finie');
     assert.equal(st.turns.p, st.turns.a, 'autant de tours pour chacun');
     assert.ok(Math.max(st.scores.p, st.scores.a) >= PA.TARGET);
@@ -99,4 +100,33 @@ test('v557 : le Présage montre la carte suivante, et l’adversaire s’en sert
   assert.equal(PA.aiWants(st, () => 0.99), false);
   PA.stop(st);
   assert.equal(st.peek, false, 'le Présage ne dure que le tour');
+});
+
+test('v561 : la Malédiction oblige l’adversaire à tirer une carte de plus', () => {
+  const st = PA.newGame(null, { table: 'novice', seed: 4 });
+  st.deck.push(F('infernal', 3), { sp: 'curse' }, F('celeste', 2));
+  PA.draw(st); PA.draw(st); PA.draw(st);
+  assert.equal(st.curse.a, 1);
+  PA.stop(st);
+  assert.equal(st.turn, 'a'); assert.equal(st.must, 2, 'sa carte habituelle, plus une');
+  st.deck.push(F('sauvage', 1), F('abyssal', 2));
+  PA.draw(st);
+  assert.throws(() => PA.stop(st), /Malédiction/);
+  PA.draw(st);
+  assert.equal(PA.stop(st).gain, 3);
+});
+
+test('v561 : Double ou rien, une fois par partie : tour doublé si le pacte tient, perdu sinon', () => {
+  const st = PA.newGame(null, { table: 'novice', seed: 6 });
+  st.deck.push(F('infernal', 5), F('celeste', 4));
+  PA.draw(st);
+  assert.ok(PA.canDouble(st));
+  const ev = PA.double(st);
+  assert.equal(ev.dbl, true); assert.equal(ev.gain, 18, '(5 + 4) × 2');
+  assert.equal(st.scores.p, 18); assert.equal(st.turn, 'a');
+  assert.equal(st.dbl.p, false);
+  const b = PA.newGame(null, { table: 'novice', seed: 7 });
+  b.deck.push(F('infernal', 2), F('infernal', 6));
+  PA.draw(b);
+  assert.equal(PA.double(b).result, 'bust'); assert.equal(b.scores.p, 0);
 });

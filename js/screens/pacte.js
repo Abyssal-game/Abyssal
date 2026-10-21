@@ -17,14 +17,16 @@ const pic = (key) => `<img alt="" src="assets/sceaux/rival-${key}.webp">`;
 export const SP = { sceau: { name: 'Sceau', img: 'assets/jeux/pa-sceau.webp', desc: 'Il te protège : la prochaine faction en double est jetée au lieu de briser le pacte.' },
   gardien: { name: 'Gardien', img: 'assets/jeux/pa-gardien.webp', desc: 'Arrêt forcé : tu encaisses tout de suite ce que tu as devant toi.' },
   offrande: { name: 'Offrande', img: 'assets/jeux/pa-offrande.webp', desc: 'La prochaine carte de faction compte double.' },
-  oracle: { name: 'Présage', img: 'assets/jeux/pa-presage.webp', desc: 'Tu vois la carte suivante avant de choisir : tirer ou t’arrêter.' } }; /* v557 */
+  oracle: { name: 'Présage', img: 'assets/jeux/pa-presage.webp', desc: 'Tu vois la carte suivante avant de choisir : tirer ou t’arrêter.' }, /* v557 */
+  curse: { name: 'Malédiction', img: 'assets/jeux/pa-malediction.webp', desc: 'Ton adversaire devra tirer une carte de plus à son prochain tour avant de pouvoir s’arrêter.' } }; /* v561 */
 // v464 : les sept sceaux de cire du parchemin (assets/jeux/pa-table2.webp, 450 × 330), position en % et faction de chacun
 export const SEALS = [['infernal', 47, 170], ['artificiel', 100, 207], ['celeste', 160, 233], ['necrotique', 225, 245], ['sauvage', 292, 235], ['abyssal', 353, 207], ['primordial', 405, 170]];
 const HOW = [['cards', '#7FA8D8', 'Ton tour', 'Tire des cartes une à une et pose-les devant toi. Chaque carte de faction vaut de 1 à 7 points.'],
   ['crystal', '#E8C35A', 'T’arrêter', 'Quand tu veux, arrête-toi : tu gagnes la somme des cartes posées ce tour-ci.'],
   ['danger', '#E0485E', 'Le pacte se brise', 'Si tu tires une faction que tu as déjà posée ce tour-ci, le pacte se brise : tu perds tout ce que tu avais gagné ce tour-ci.'],
   ['crown', '#F2C14E', 'La victoire', `Le premier à ${PA.TARGET} points gagne (certaines salles changent ce but). Ton adversaire joue toujours autant de tours que toi.`],
-  ['seal', '#9FE0FF', 'Les cartes spéciales', 'Sceau : il protège d’une brisure. Gardien : arrêt forcé, tu encaisses tout de suite. Offrande : la prochaine carte compte double. Présage (contre l’Abysse) : tu vois la carte suivante avant de choisir.'],
+  ['seal', '#9FE0FF', 'Les cartes spéciales', 'Sceau : il protège d’une brisure. Gardien : arrêt forcé, tu encaisses tout de suite. Offrande : la prochaine carte compte double. Présage (contre l’Abysse) : tu vois la carte suivante avant de choisir. Malédiction (contre l’Abysse) : ton adversaire devra tirer une carte de plus à son prochain tour.'],
+  ['crystal', '#E0485E', 'Double ou rien', 'Une fois par partie (contre l’Abysse), au lieu de t’arrêter : tu tires une dernière carte. Si le pacte tient, tout le tour compte double. S’il se brise, tu perds tout.'],
   ['cards', '#C9A0FF', 'La pioche', 'En haut de la table, la pioche montre combien il reste de cartes de chaque faction et de chaque carte spéciale. Une faction déjà posée ce tour-ci est entourée de rouge : la tirer briserait le pacte.'],
   ['book', '#7FE0A0', 'Les sept factions', `Pose les 7 factions dans le même tour : +${PA.SEVEN_BONUS} points, et ton tour s’arrête.`],
   ['eye', '#C9A45A', 'Le risque', 'Le jeu t’affiche la chance que la prochaine carte brise ton pacte : elle compte les cartes déjà sorties.'],
@@ -98,7 +100,7 @@ export default function pacteScreen(app, root) {
     el.style.backgroundImage = `url(${PA.tableBg(g.s.pacte.cur?.table)})`;
   }
   const cardHTML = (c, cls = '') => {
-    if (c.sp) return `<span class="pa-card sp sp-${c.sp} ${cls}">${c.sp === 'oracle' ? `<i class="pa-sp-ic">${icon('eye')}</i>` : ''}<img alt="" src="${SP[c.sp].img}" onerror="this.remove()"><span class="pa-cn">${SP[c.sp].name}</span></span>`;
+    if (c.sp) return `<span class="pa-card sp sp-${c.sp} ${cls}">${c.sp === 'oracle' ? `<i class="pa-sp-ic">${icon('eye')}</i>` : c.sp === 'curse' ? `<i class="pa-sp-ic">${icon('p:danger')}</i>` : ''}<img alt="" src="${SP[c.sp].img}" onerror="this.remove()"><span class="pa-cn">${SP[c.sp].name}</span></span>`;
     const card = c.id && cat.get(c.id);
     return `<span class="pa-card f-${c.f} ${c.x2 ? 'x2' : ''} ${cls}" style="--fc:${cat.faction[c.f]?.colors.secondary || '#888'}"><img alt="" src="${card ? artUrl(card, { lite: true }) : 'assets/sceaux/dos.webp'}">
       <b class="pa-v">${c.v}${c.x2 ? '<small>×2</small>' : ''}</b><span class="pa-cf">${sigil(c.f)}</span></span>`;
@@ -120,7 +122,7 @@ export default function pacteScreen(app, root) {
       <div class="pa-row" style="--n:${Math.max(1, st.row.length)}">${st.row.length ? st.row.map((c) => cardHTML(c)).join('') : `<span class="pa-empty">${st.turn === 'p' ? 'Tire ta première carte.' : '…'}</span>`}</div>
       ${seals}
       <div class="pa-info"><span>Ce tour : <b>${v}</b> point${v > 1 ? 's' : ''}</span><span class="pa-fac">${nf} / 7 sceaux</span>
-        ${st.sceaux ? `<span class="pa-tag ok">${icon('shield')}Protégé ×${st.sceaux}</span>` : ''}${st.offer ? '<span class="pa-tag gold">Offrande : la suivante ×2</span>' : ''}
+        ${st.sceaux ? `<span class="pa-tag ok">${icon('shield')}Protégé ×${st.sceaux}</span>` : ''}${st.offer ? '<span class="pa-tag gold">Offrande : la suivante ×2</span>' : ''}${st.must > 0 ? `<span class="pa-tag bad">Malédiction : encore ${st.must} carte${st.must > 1 ? 's' : ''}</span>` : ''}${st.curse?.[st.turn === 'p' ? 'a' : 'p'] ? `<span class="pa-tag bad">${st.turn === 'p' ? esc(PA.RIVALS[st.rival].name) : 'Toi'} : maudit au prochain tour</span>` : ''}
         <span class="pa-risk ${risk >= 40 ? 'hi' : risk >= 20 ? 'mid' : ''}">Risque : <b>${risk} %</b></span></div>${ban}</div>`;
   }
   /* v557 (demande du propriétaire : jouer moins à l'aveugle) : la pioche montre ce qu'il reste, faction par faction */
@@ -134,9 +136,11 @@ export default function pacteScreen(app, root) {
   }
   function controls(st) {
     if (st.over || busy || st.turn !== 'p') return `<div class="mq-ctl"><p class="mq-q">${st.over ? '' : `Tour de ${esc(PA.RIVALS[st.rival].name)}…`}</p></div>`;
-    const v = PA.rowValue(st), canStop = st.row.some((c) => c.f);
+    const v = PA.rowValue(st), must = st.must > 0, canStop = st.row.some((c) => c.f) && !must;
+    /* v561 : Malédiction (tirer encore) et Double ou rien (une fois par partie) */
     return `<div class="mq-ctl pa-ctl"><button class="btn primary dc-plq dc-plq-red" data-pa="draw">${icon('cards')}Tirer</button>
-      <button class="btn dc-plq dc-plq-dark" data-pa="stop" ${canStop ? '' : 'disabled'}>${canStop ? `S’arrêter (+${v})` : 'S’arrêter'}</button></div>`;
+      <button class="btn dc-plq dc-plq-dark" data-pa="stop" ${canStop ? '' : 'disabled'}>${must && st.row.some((c) => c.f) ? 'Tire encore' : canStop ? `S’arrêter (+${v})` : 'S’arrêter'}</button>
+      ${st.dbl ? `<button class="btn pa-dbl" data-pa="double" ${PA.canDouble(st) ? '' : 'disabled'}>${st.dbl.p ? `<span>Double ou rien${PA.canDouble(st) ? ` (+${v * 2} ou 0)` : ''}</span><small>1 fois par partie</small>` : 'Double ou rien déjà utilisé'}</button>` : ''}</div>`;
   }
   function view() {
     const st = g.s.pacte.cur;
@@ -157,7 +161,9 @@ export default function pacteScreen(app, root) {
   async function say(st, ev, ms = 1500) {
     const R = PA.RIVALS[st.rival], mine = ev.who === 'p', nm = mine ? 'Tu' : esc(tw(R.name));
     const fn = ev.card?.f ? fname(ev.card.f) : '';
-    const H = sayText(ev, { mine, nm, fn, seven: PA.sevenOf(st) });
+    let H = sayText(ev, { mine, nm, fn, seven: PA.sevenOf(st) });
+    if (ev.curse && ev.result === 'ok') H = [mine ? 'ok' : 'ko', t('Malédiction !'), mine ? t('{name} devra tirer une carte de plus à son prochain tour.', { name: esc(tw(R.name)) }) : t('Tu devras tirer une carte de plus à ton prochain tour.')];
+    if (H && ev.dbl) H = ev.result === 'bust' ? [H[0], t('Double ou rien… perdu !'), H[2]] : [mine ? 'ok' : 'ko', t('Double ou rien réussi !'), mine ? t('Le tour compte double : +{n}.', { n: ev.gain }) : t('{name} double son tour : +{n}.', { name: nm, n: ev.gain })];
     if (!H) return;
     /* v457 : sons propres au Pacte (ElevenLabs) */
     app.sfx[{ bust: 'pa-bust', saved: 'pa-seal', forced: 'pa-guard', seven: 'pa-seven', stop: 'pa-bank' }[ev.result]]?.();
@@ -185,7 +191,7 @@ export default function pacteScreen(app, root) {
         }
         app.sfx[ev.card.sp === 'offrande' ? 'pa-offer' : 'pa-draw']?.();
       }
-      if (ev.result === 'ok') { renderShown(shown); await wait(650); continue; }
+      if (ev.result === 'ok') { renderShown(shown); await wait(650); if (ev.curse) await say(g.s.pacte.cur, ev, 1500); continue; }
       if (ev.result === 'saved') {
         const i = shown.row.findIndex((c) => c.sp === 'sceau'); if (i >= 0) shown.row.splice(i, 1);
         shown.sceaux = Math.max(0, shown.sceaux - 1); shown.offer = false;
@@ -272,10 +278,11 @@ export default function pacteScreen(app, root) {
     if (!st || st.over || busy || st.turn !== 'p') return;
     const before = { row: st.row.slice(), sceaux: st.sceaux, offer: st.offer };
     let ev;
-    try { ev = k === 'draw' ? g.pacteDraw() : k === 'stop' ? g.pacteStop() : null; } catch (err) { toast(esc(err.message), { kind: 'error' }); return; }
+    try { ev = k === 'draw' ? g.pacteDraw() : k === 'stop' ? g.pacteStop() : k === 'double' ? g.pacteDouble() : null; } catch (err) { toast(esc(err.message), { kind: 'error' }); return; }
     if (!ev) return;
     busy = true;
     if (ev.card && ev.result === 'ok') app.sfx[ev.card.sp === 'offrande' ? 'pa-offer' : 'pa-draw']?.();
+    if (ev.result === 'ok' && ev.curse) { await say(st, ev, 1500); busy = false; if (!gone) view(); return; }
     if (ev.result === 'ok') { busy = false; view(); return; }
     if (ev.card && ev.result !== 'saved') {
       // la carte qui brise (ou arrête, ou complète les sept) se voit un instant dans la rangée avant l'annonce

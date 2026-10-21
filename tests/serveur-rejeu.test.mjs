@@ -109,7 +109,7 @@ test('serveur de partie : 6 jours de jeu, le serveur suit le téléphone à l’
     if (tryDo(() => g.pacteStart({ table: 'novice' }))) {
       for (let k = 0; k < 200 && !g.s.pacte.cur.over; k++) {
         const st = g.s.pacte.cur;
-        if (st.turn === 'p') { if (r() < 0.6 || !tryDo(() => g.pacteStop() || true)) g.pacteDraw(); } else g.pacteAi();
+        if (st.turn === 'p') { if (r() < 0.08 && tryDo(() => g.pacteDouble() || true)) {} else if (r() < 0.6 || !tryDo(() => g.pacteStop() || true)) g.pacteDraw(); } else g.pacteAi();
       }
       g.pacteFinish();
     }

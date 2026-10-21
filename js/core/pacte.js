@@ -14,6 +14,9 @@ export const VALUES = 7;
 export const SPECIALS = { sceau: 3, gardien: 3, offrande: 3 };
 /* v557 : nouvelle carte du Pacte contre l'Abysse : le Présage (on voit la carte suivante avant de choisir). Les parties en ligne gardent le paquet d'origine (moteur SQL). */
 export const ORACLES = 2;
+/* v561 (idées choisies par le propriétaire) : la Malédiction (l'adversaire devra tirer une carte de plus à son prochain tour)
+   et le Double ou rien (une fois par partie : une dernière carte, puis le tour compte double… ou tout est perdu). Contre l'Abysse seulement. */
+export const CURSES = 2;
 
 function hash(str) {
   let h = 2166136261;
@@ -107,8 +110,8 @@ export function newGame(cat, { table, seed = Date.now(), daily = false }) {
   const T = TABLE[table];
   if (!T) throw new Error('Table inconnue.');
   const r = mulberry(seed), RU = T.rules || {};
-  return { table, daily, seed, shuf: 0, rival: T.rival, target: RU.target || TARGET, seven: RU.seven || SEVEN_BONUS, deck: buildDeck(cat, r, { ...(RU.sp || SPECIALS), oracle: ORACLES }), discard: [], scores: { p: 0, a: RIVALS[T.rival].head || 0 },
-    turn: 'p', row: [], sceaux: 0, offer: false, round: 1, turns: { p: 0, a: 0 }, last: null, over: null, final: null, stats: { busts: { p: 0, a: 0 }, best: { p: 0, a: 0 }, sevens: { p: 0, a: 0 } } };
+  return { table, daily, seed, shuf: 0, rival: T.rival, target: RU.target || TARGET, seven: RU.seven || SEVEN_BONUS, deck: buildDeck(cat, r, { ...(RU.sp || SPECIALS), oracle: ORACLES, curse: CURSES }), discard: [], scores: { p: 0, a: RIVALS[T.rival].head || 0 },
+    turn: 'p', row: [], sceaux: 0, offer: false, must: 0, curse: { p: 0, a: 0 }, dbl: { p: true, a: true }, dblOn: false, round: 1, turns: { p: 0, a: 0 }, last: null, over: null, final: null, stats: { busts: { p: 0, a: 0 }, best: { p: 0, a: 0 }, sevens: { p: 0, a: 0 } } };
 }
 
 // Valeur du tour en cours (cartes de faction posées, Offrandes comprises)
@@ -135,7 +138,7 @@ export function bustChance(st) {
 }
 
 function bank(st, who, why) {
-  const v = rowValue(st) + (why === 'seven' ? sevenOf(st) : 0);
+  const v = (rowValue(st) + (why === 'seven' ? sevenOf(st) : 0)) * (st.dblOn ? 2 : 1);
   st.scores[who] += v;
   st.stats.best[who] = Math.max(st.stats.best[who], v);
   if (why === 'seven') st.stats.sevens[who]++;
@@ -143,7 +146,7 @@ function bank(st, who, why) {
 }
 function endTurn(st, who) {
   st.discard.push(...st.row.map(({ x2, ...c }) => c));
-  st.row = []; st.sceaux = 0; st.offer = false; st.peek = false; st.turns[who]++;
+  st.row = []; st.sceaux = 0; st.offer = false; st.peek = false; st.dblOn = false; st.turns[who]++;
   if (who === 'a') {
     // fin du tour complet : quelqu'un a atteint le but ?
     if (st.scores.p >= tgt(st) || st.scores.a >= tgt(st)) {
@@ -156,6 +159,9 @@ function endTurn(st, who) {
     st.round++;
   }
   st.turn = who === 'p' ? 'a' : 'p';
+  /* v561 : Malédiction reçue : la carte habituelle, plus une par Malédiction, avant de pouvoir s'arrêter */
+  const nx = st.turn;
+  if (st.curse?.[nx]) { st.must = 1 + st.curse[nx]; st.curse[nx] = 0; } else st.must = 0;
 }
 
 // Tire une carte pour le joueur dont c'est le tour. Renvoie l'événement pour l'écran.
@@ -164,10 +170,12 @@ export function draw(st) {
   const who = st.turn;
   const c = takeCard(st);
   st.peek = false;
+  if (st.must > 0) st.must--;
   const ev = { who, card: c, result: 'ok', gain: 0 };
   if (c.sp === 'sceau') { st.sceaux++; st.row.push(c); }
   else if (c.sp === 'oracle') { st.row.push(c); st.peek = st.deck.length > 0; }
   else if (c.sp === 'offrande') { st.offer = true; st.row.push(c); }
+  else if (c.sp === 'curse') { st.row.push(c); const o = who === 'p' ? 'a' : 'p'; st.curse = st.curse || { p: 0, a: 0 }; st.curse[o] = (st.curse[o] || 0) + 1; ev.curse = o; }
   else if (c.sp === 'gardien') { st.row.push(c); ev.result = 'forced'; ev.gain = bank(st, who, 'forced'); endTurn(st, who); }
   else {
     const fs = rowFactions(st);
@@ -198,9 +206,24 @@ export function stop(st) {
   if (st.over) throw new Error('La partie est terminée.');
   const who = st.turn;
   if (!st.row.some((c) => c.f)) throw new Error('Tire au moins une carte de faction avant de t’arrêter.');
+  if (st.must > 0) throw new Error('La Malédiction t’oblige à tirer encore une carte.');
   const gain = bank(st, who, 'stop');
   endTurn(st, who);
   const ev = { who, result: 'stop', gain };
+  st.last = ev;
+  return ev;
+}
+
+// v561 : Double ou rien : une dernière carte ; si le pacte tient, le tour compte double (une fois par partie)
+export const canDouble = (st) => !st.over && !!st.dbl?.[st.turn] && st.row.some((c) => c.f) && !st.peek && (st.must || 0) <= 1;
+export function double(st) {
+  if (!canDouble(st)) throw new Error('Le Double ou rien n’est pas possible maintenant.');
+  const who = st.turn;
+  st.dbl[who] = false; st.dblOn = true;
+  const ev = draw(st);
+  ev.dbl = true;
+  if (st.turn === who && !st.over && ev.result !== 'bust') { const s2 = stop(st); ev.result = 'stop'; ev.gain = s2.gain; }
+  st.dblOn = false;
   st.last = ev;
   return ev;
 }
@@ -216,6 +239,7 @@ export function aiWants(st, rng = Math.random) {
   const R = RIVALS[st.rival], who = st.turn, me = st.scores[who], opp = st.scores[who === 'p' ? 'a' : 'p'], TARGET = tgt(st), SEVEN_BONUS = sevenOf(st);
   const v = rowValue(st), nf = st.row.filter((c) => c.f).length;
   if (!nf) return true;
+  if (st.must > 0) return true; /* v561 : Malédiction : il doit tirer */
   /* v557 : Présage : la carte suivante est connue */
   const nx = st.peek && st.deck.length ? st.deck[st.deck.length - 1] : null;
   if (nx) return !(nx.f && rowFactions(st).has(nx.f) && !st.sceaux);
@@ -233,12 +257,22 @@ export function aiWants(st, rng = Math.random) {
   const loss = p * v * protect;
   return gain * (1 + R.risk + R.race * (behind + 0.5 * oppNear) - R.cool * ahead) > loss * R.caution;
 }
+// v561 : l'adversaire tente le Double ou rien quand le risque est faible et le tour assez gros
+function aiDoubles(st, rng) {
+  if (!canDouble(st)) return false;
+  const R = RIVALS[st.rival];
+  if (R.caution > 1.2) return false; /* les prudents (Ilda, Orvel) ne tentent jamais le Double ou rien */
+  const v = rowValue(st), p = bustChance(st) * (st.sceaux ? 0.15 : 1);
+  if (st.scores[st.turn] + v >= tgt(st)) return false;
+  return v >= 8 && p < 0.12 + (R.risk || 0) * 0.6 && rng() > R.noise;
+}
 // Tour complet de l'adversaire (liste des événements, pour l'écran)
 export function aiTurn(st, rng = Math.random) {
   const evs = [];
   let guard = 0;
   while (!st.over && st.turn === 'a' && guard++ < 60) {
     if (aiWants(st, rng)) evs.push(draw(st));
+    else if (aiDoubles(st, rng)) evs.push(double(st));
     else evs.push(stop(st));
   }
   return evs;

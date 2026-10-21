@@ -36,7 +36,7 @@ export const OPS = {
   pacteStart: { kind: 'sync' }, pacteFinish: { kind: 'sync' }, pacteQuit: { kind: 'sync' },
   cryptesStart: { kind: 'sync' }, cryptesFinish: { kind: 'sync' }, cryptesQuit: { kind: 'sync' }, cryptesResume: { kind: 'sync' },
   encheresStart: { kind: 'sync' }, encheresFinish: { kind: 'sync' }, encheresQuit: { kind: 'sync' }, gameForfeit: { kind: 'sync' },
-  sceauxPlay: { kind: 'sync' }, sceauxAi: { kind: 'sync' }, pacteDraw: { kind: 'sync' }, pacteStop: { kind: 'sync' }, pacteAi: { kind: 'sync' },
+  sceauxPlay: { kind: 'sync' }, sceauxAi: { kind: 'sync' }, pacteDraw: { kind: 'sync' }, pacteStop: { kind: 'sync' }, pacteDouble: { kind: 'sync' }, pacteAi: { kind: 'sync' },
   cryptesFlip: { kind: 'sync' }, cryptesPower: { kind: 'sync' }, cryptesAi: { kind: 'sync' }, encheresBid: { kind: 'sync' },
   // Codex et Échoppe (obsidiennes)
   codex: { kind: 'sync', lazy: (s) => `${s.codex?.season}:${s.codex?.live ? 1 : 0}` }, /* v550 : changement de saison (et récompenses oubliées données) */
