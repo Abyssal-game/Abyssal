@@ -15,7 +15,7 @@ export const CODEX = {
   ends: '2027-01-31',                    // affiché seulement (aucune ouverture ni fermeture automatique dans l'ébauche)
   tiers: 30,                             // nombre de paliers
   xpPerTier: 100,                        // points de Codex par palier
-  cost: 500,                             // v474 : prix en obsidiennes (≈ 4,99 €)
+  cost: 400,                             // v546 : prix en obsidiennes (≈ 3,50 €, avant 500)
   store: 'com.abyssalgame.abyssal.codex1',
 };
 
@@ -25,9 +25,9 @@ export const CODEX = {
 export const OBS = { name: 'Obsidiennes', one: 'obsidienne' };
 export const OBS_PACKS = [
   { id: 'obs-100', n: 100, bonus: 0, price: '0,99 €', store: 'com.abyssalgame.abyssal.obsidiennes.100' },
-  { id: 'obs-500', n: 500, bonus: 50, price: '4,99 €', store: 'com.abyssalgame.abyssal.obsidiennes.500' },
-  { id: 'obs-1000', n: 1000, bonus: 150, price: '9,99 €', store: 'com.abyssalgame.abyssal.obsidiennes.1000' },
-  { id: 'obs-2000', n: 2000, bonus: 400, price: '19,99 €', store: 'com.abyssalgame.abyssal.obsidiennes.2000' },
+  { id: 'obs-500', n: 500, bonus: 100, price: '4,99 €', store: 'com.abyssalgame.abyssal.obsidiennes.500' },
+  { id: 'obs-1000', n: 1000, bonus: 300, price: '9,99 €', store: 'com.abyssalgame.abyssal.obsidiennes.1000' },
+  { id: 'obs-2000', n: 2000, bonus: 800, price: '19,99 €', store: 'com.abyssalgame.abyssal.obsidiennes.2000' },
 ];
 
 // Points de Codex gagnés en jouant
@@ -91,16 +91,16 @@ const FN = (k, cost) => ({ id: k, kind: 'finish', give: { finish: k }, cost });
 export const ROYAUMES = ['dos-infernal', 'dos-abyssal', 'dos-celeste', 'dos-sauvage', 'dos-necrotique', 'dos-primordial', 'dos-artificiel'];
 /* v535 : cadres de la meute, des corbeaux, des chaînes et des roses noires retirés de la vente (leur ornement cachait le visage de la créature) */
 export const CATALOG = [
-  F('cx-givre', 250), F('cx-braise', 250), F('cx-os', 300), F('cx-serpents', 300), F('cx-vitrail', 300), F('cx-rouages', 300),
-  F('cx-racines', 300), F('cx-yeux', 350), F('cx-ruche', 350),
-  F('cx-lanternes', 450), F('cx-voile', 700), F('cx-houx', 450), F('cx-aurore', 700), F('cx-prince', 700), F('cx-leviathan', 700), F('cx-seraphin', 700), F('cx-liche', 700), F('cx-ouroboros', 700), F('cx-automate', 700), F('cx-gueule', 500), F('cx-eclipse', 500), F('cx-horloger', 500), F('cx-balance', 500),
-  F('cx-constellation', 750), F('cx-geode', 450), F('cx-sablier', 450), F('cx-pages', 450), F('cx-souverain', 1200),
-  B('dos-abime', 350), B('dos-ames', 500), B('dos-solstice', 500), B('dos-roses', 500), B('dos-lune-sang', 500), B('dos-devoreur', 500), B('dos-eclipse', 500), B('dos-horloger', 500), B('dos-miroirs', 500), B('dos-jumeaux', 500), B('dos-titan', 500),
-  B('dos-abysse', 750), B('dos-tarot', 500), B('dos-mosaique', 500), B('dos-encre', 500), B('dos-alchimie', 500), B('dos-carte-abysse', 500), B('dos-reliquaire', 750), B('dos-tapisserie', 500), B('dos-art-deco', 750), B('dos-vivant', 750), B('dos-nebuleuse', 750), B('dos-vitrail', 500), ...ROYAUMES.map((k) => B(k, 300)),
-  FN('fin-ecarlate', 800), FN('fin-givree', 800), FN('fin-spectrale', 1000), FN('fin-vitrail', 1000),
-  FN('fin-estampe', 800), FN('fin-incandescente', 1000), FN('fin-constellee', 1000), FN('fin-ossuaire', 800), FN('fin-nacree', 800), FN('fin-runique', 800), FN('fin-scellee', 800), FN('fin-draconique', 1000), FN('fin-imperiale', 1400), FN('fin-neant', 1400),
-  F('cx-carnaval', 700), F('cx-phalenes', 450), F('cx-cristaux-sang', 750), B('dos-carnaval', 750), B('dos-phalene', 500), B('dos-coeur-mecanique', 750),
-  { id: 'royaumes', kind: 'bundle', name: 'Les sept royaumes', give: { backs: ROYAUMES }, cost: 1500, desc: 'Les sept dos des royaumes d’un coup (2 100 à l’unité).' },
+  F('cx-givre', 100), F('cx-braise', 100), F('cx-os', 120), F('cx-serpents', 120), F('cx-vitrail', 120), F('cx-rouages', 120),
+  F('cx-racines', 120), F('cx-yeux', 140), F('cx-ruche', 140),
+  F('cx-lanternes', 180), F('cx-voile', 250), F('cx-houx', 180), F('cx-aurore', 250), F('cx-prince', 250), F('cx-leviathan', 250), F('cx-seraphin', 250), F('cx-liche', 250), F('cx-ouroboros', 250), F('cx-automate', 250), F('cx-gueule', 200), F('cx-eclipse', 200), F('cx-horloger', 200), F('cx-balance', 200),
+  F('cx-constellation', 280), F('cx-geode', 180), F('cx-sablier', 180), F('cx-pages', 180), F('cx-souverain', 450),
+  B('dos-abime', 140), B('dos-ames', 200), B('dos-solstice', 200), B('dos-roses', 200), B('dos-lune-sang', 200), B('dos-devoreur', 200), B('dos-eclipse', 200), B('dos-horloger', 200), B('dos-miroirs', 200), B('dos-jumeaux', 200), B('dos-titan', 200),
+  B('dos-abysse', 280), B('dos-tarot', 200), B('dos-mosaique', 200), B('dos-encre', 200), B('dos-alchimie', 200), B('dos-carte-abysse', 200), B('dos-reliquaire', 280), B('dos-tapisserie', 200), B('dos-art-deco', 280), B('dos-vivant', 280), B('dos-nebuleuse', 280), B('dos-vitrail', 200), ...ROYAUMES.map((k) => B(k, 120)),
+  FN('fin-ecarlate', 300), FN('fin-givree', 300), FN('fin-spectrale', 350), FN('fin-vitrail', 350),
+  FN('fin-estampe', 300), FN('fin-incandescente', 350), FN('fin-constellee', 350), FN('fin-ossuaire', 300), FN('fin-nacree', 300), FN('fin-runique', 300), FN('fin-scellee', 300), FN('fin-draconique', 350), FN('fin-imperiale', 450), FN('fin-neant', 450),
+  F('cx-carnaval', 250), F('cx-phalenes', 180), F('cx-cristaux-sang', 280), B('dos-carnaval', 280), B('dos-phalene', 200), B('dos-coeur-mecanique', 280),
+  { id: 'royaumes', kind: 'bundle', name: 'Les sept royaumes', give: { backs: ROYAUMES }, cost: 600, desc: 'Les sept dos des royaumes d’un coup (840 à l’unité).' },
 ];
 // Exclusifs du Codex enluminé (jamais en vente) : cadres d'encre, de sang, enluminé, de l'Abîme, dos du Codex, titres.
 export const CODEX_ONLY = ['cx-encre', 'cx-sang', 'cx-or', 'cx-abime', 'dos-codex'];
@@ -121,9 +121,9 @@ export const CODEX_TIERS = Array.from({ length: CODEX.tiers }, (_, i) => ({ tier
 // ——— L'Échoppe en euros : les obsidiennes et le Pack du Fondateur (prix affichés seulement) ———
 export const SHOP = [
   ...OBS_PACKS.map((p) => ({ id: p.id, kind: 'obs', name: `${p.n + p.bonus} obsidiennes`, price: p.price, store: p.store, give: { obs: p.n + p.bonus }, bonus: p.bonus })),
-  { id: 'fondateur', name: 'Pack du Fondateur', price: '9,99 €', store: 'com.abyssalgame.abyssal.fondateur', once: true,
-    give: { frame: 'cx-fondateur', title: 'Fondateur', back: 'dos-fondateur', obs: 500 },
-    desc: 'Vendu une seule fois. Le cadre et le dos de cartes du Fondateur, le titre « Fondateur » (badge au classement) et 500 obsidiennes.' },
+  { id: 'fondateur', name: 'Pack du Fondateur', price: '4,99 €', store: 'com.abyssalgame.abyssal.fondateur', once: true,
+    give: { frame: 'cx-fondateur', title: 'Fondateur', back: 'dos-fondateur', obs: 600 },
+    desc: 'Vendu une seule fois. Le cadre et le dos de cartes du Fondateur, le titre « Fondateur » (badge au classement) et 600 obsidiennes.' },
 ];
 
 // ——— État ———
