@@ -28,6 +28,7 @@ import { ULTS } from '../core/army.js';
 import { mountDiorama, roomFor } from '../ui/diorama.js';
 import { moveIconUrl, passivesOf, passiveIconUrl, moveFor, PASSIVES } from '../core/kits.js';
 import { hap } from '../ui/sound.js';
+import * as QX from './defense-qte.js'; /* v566 : défense refaite */
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 // Décor selon la profondeur (salle du Gardien à part) et effets illustrés (fond noir fondu en mode « écran »)
@@ -928,11 +929,11 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const TIP = { tap: 'cb-def-tap', hold: 'cb-def-hold', swipe: 'cb-def-swipe', rings: 'cb-def-rings', mash: 'cb-def-mash', target: 'cb-def-target' };
   async function tipFor(type) { const k = TIP[type.replace(/\d+$/, '')]; if (k && !g.s.tips?.[k]) await tuto(app, k); }
   function stepQTE(type, s) {
-    if (type === 'swipe') return swipeQTE(s);
-    if (type === 'hold') return barQTE(s, true);
-    if (type === 'mash') return mashQTE(s);
-    if (type === 'target') return targetQTE(s);
-    if (type.startsWith('rings')) return ringsQTE(s, +type.slice(5) || 3);
+    if (type === 'swipe') return gesture(QX.swipeQTE, s);
+    if (type === 'hold') return gesture(QX.holdQTE, s);
+    if (type === 'mash') return gesture(QX.mashQTE, s);
+    if (type === 'target') return gesture(QX.targetQTE, s);
+    if (type.startsWith('rings')) return gesture(QX.ringsQTE, s, +type.slice(5) || 3);
     return barQTE(s, false);
   }
   async function defenseQTE(s) {
@@ -945,96 +946,17 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     if (!alive_) return 'none';
     return stepQTE(type, s);
   }
-  // Fin commune des nouveaux gestes : tampon au centre, son, nettoyage
-  function qteStamp(res, words) {
-    const stamp = document.createElement('div'); stamp.className = `dv-stamp s-${res}`;
-    stamp.innerHTML = `<b>${words[res]}</b>`;
-    $('.dv')?.appendChild(stamp); setTimeout(() => stamp.remove(), 900);
-    if (res === 'none') app.sfx.miss(); else if (res === 'parry') app.sfx.perfect?.(); else app.sfx.swipe?.();
+  /* v566 : les gestes (sauf la barre) sont dans defense-qte.js : calque à eux, touchers reçus directement (iPhone) */
+  function qxOpts(s) {
+    const e = st.units[s.a], def = INTENTS[s.kind] || INTENTS.hit, t = el(s.t)?.getBoundingClientRect();
+    return { tier: e?.boss ? 'boss' : e?.elite ? 'elite' : 'normal', title: `${def.name} !`, icon: intentIcon(s.kind), sfx: app.sfx, reduced,
+      anchor: t && t.width ? { x: t.left + t.width / 2, y: t.top + t.height / 2 } : null };
   }
-  const scoreOf = (list) => { const n = list.reduce((a, r) => a + (r === 'parry' ? 2 : r === 'dodge' ? 1 : 0), 0) / (2 * list.length); return n >= 0.84 ? 'parry' : n >= 0.5 ? 'dodge' : 'none'; };
-  function qteBox(cls, s, title, hint) {
-    const def = INTENTS[s.kind] || INTENTS.hit;
-    const box = document.createElement('div');
-    box.className = `dv-dodge cb-def ${cls}`;
-    box.innerHTML = `<span class="dv-dodge-t">${intentIcon(s.kind)} ${esc(title || def.name)} ! <small>${hint}</small></span>`;
-    $('.dv-mid').appendChild(box); $('.dv-mid').classList.add('qte'); $('.dv')?.classList.add('qte-on');
-    return box;
-  }
-  function qteClose(box, s, tEls) {
-    $('.dv')?.classList.remove('qte-on');
-    box.remove(); $('.dv-mid')?.classList.remove('qte'); el(s.a)?.classList.remove('aim'); tEls.forEach((x) => x?.classList.remove('aimed'));
-  }
-  const capture = (fn) => { const h = (ev) => { if (ev.target.closest?.('[data-d="quit"],[data-d="help"],[data-d="speed"]')) return; ev.preventDefault(); ev.stopPropagation(); fn(ev); }; addEventListener('pointerdown', h, true); return () => removeEventListener('pointerdown', h, true); };
-  /* v558 : cercles qui se referment (attaques en plusieurs coups) : touche quand le cercle extérieur rejoint le cœur */
-  function ringsQTE(s, n) {
-    return new Promise((resolve) => {
-      const e = st.units[s.a], T = e?.boss ? 560 : e?.elite ? 620 : 700, P = e?.boss ? 45 : 55, OK = 150;
-      const tEl = el(s.t) || front(st, 'ally').map((u) => el(u.uid)).find(Boolean), tEls = [tEl];
-      el(s.a)?.classList.add('aim'); tEl?.classList.add('aimed');
-      const box = qteBox('cb-ringsq', s, null, `Touche quand le cercle se referme sur le cœur · ${n} coups`);
-      const dv = $('.dv'), R = dv.getBoundingClientRect(), tr = tEl?.getBoundingClientRect() || { left: R.left + R.width / 2 - 40, top: R.top + R.height * 0.6, width: 80, height: 100 };
-      const res = []; let cur = null, off = null, gone = false;
-      const pips = document.createElement('span'); pips.className = 'cb-pips'; pips.innerHTML = Array.from({ length: n }, () => '<i></i>').join(''); box.appendChild(pips);
-      const judge = (r) => { if (!cur || cur.done) return; cur.done = true; clearTimeout(cur.to); res.push(r); cur.node.classList.add(`r-${r}`); pips.children[res.length - 1]?.classList.add(`r-${r}`);
-        if (r === 'none') app.sfx.miss(); else app.sfx.hit?.();
-        const node = cur.node; setTimeout(() => node.remove(), 380); setTimeout(next, 260); };
-      const next = () => {
-        if (gone || !alive_) return;
-        if (res.length >= n) { gone = true; off?.(); const r = scoreOf(res); qteStamp(r, { parry: 'Tout paré !', dodge: 'Encaissé…', none: 'Touché…' }); setTimeout(() => { qteClose(box, s, tEls); resolve(r); }, 300); return; }
-        const node = document.createElement('div'); node.className = 'cb-ring';
-        const jx = (Math.random() - 0.5) * Math.min(90, tr.width * 0.8), jy = (Math.random() - 0.5) * Math.min(80, tr.height * 0.5);
-        node.style.cssText = `left:${tr.left - R.left + tr.width / 2 + jx}px;top:${tr.top - R.top + tr.height / 2 + jy}px;--t:${T}ms`;
-        node.innerHTML = '<i class="o"></i><i class="c"></i>';
-        dv.appendChild(node);
-        cur = { node, t0: performance.now(), done: false };
-        cur.to = setTimeout(() => judge('none'), T + OK);
-      };
-      off = capture((ev) => { if (!cur || cur.done) return; const d = Math.abs((ev.timeStamp && ev.timeStamp <= performance.now() ? ev.timeStamp : performance.now()) - cur.t0 - T); judge(d <= P ? 'parry' : d <= OK ? 'dodge' : 'none'); });
-      setTimeout(next, (reduced ? 200 : 350) + Math.random() * 250);
-    });
-  }
-  /* v558 : martèlement (prises, chaînes, gel) : touche le plus vite possible pour remplir la jauge avant la fin */
-  function mashQTE(s) {
-    return new Promise((resolve) => {
-      const e = st.units[s.a], N = e?.boss ? 13 : e?.elite ? 11 : 9, L = e?.boss ? 1700 : 1850, DECAY = 0.32;
-      const tEl = el(s.t), tEls = [tEl];
-      el(s.a)?.classList.add('aim'); tEl?.classList.add('aimed');
-      const box = qteBox('cb-mash', s, null, 'Martèle l’écran pour te libérer !');
-      const g0 = document.createElement('span'); g0.className = 'cb-mash-g'; g0.innerHTML = '<i class="f"></i><i class="tm"></i>'; box.appendChild(g0);
-      const f = g0.querySelector('.f'), tm = g0.querySelector('.tm');
-      let v = 0, t0 = 0, last = 0, done = false, raf = 0, off = null;
-      const end = (r) => { if (done) return; done = true; cancelAnimationFrame(raf); off?.(); box.classList.add(r === 'none' ? 'ko' : 'ok', `r-${r}`);
-        qteStamp(r, { parry: 'Libéré !', dodge: 'De justesse !', none: 'Pris…' }); setTimeout(() => { qteClose(box, s, tEls); resolve(r); }, 300); };
-      const step = () => { const now = performance.now(), dt = (now - last) / 1000; last = now; v = Math.max(0, v - DECAY * dt); f.style.transform = `scaleX(${v.toFixed(3)})`;
-        const x = (now - t0) / L; tm.style.transform = `scaleX(${Math.max(0, 1 - x).toFixed(3)})`;
-        if (x >= 1) return end('none'); raf = requestAnimationFrame(step); };
-      off = capture(() => { if (!t0 || done) return; v = Math.min(1, v + 1 / N); box.classList.remove('bump'); void box.offsetWidth; box.classList.add('bump'); app.sfx.tap?.();
-        if (v >= 1) end((performance.now() - t0) / L <= 0.55 ? 'parry' : 'dodge'); });
-      setTimeout(() => { if (done || !alive_) return; t0 = last = performance.now(); box.classList.add('go'); raf = requestAnimationFrame(step); }, (reduced ? 200 : 350) + Math.random() * 200);
-    });
-  }
-  /* v558 : point faible mobile (embuscades, reflets) : touche l'œil qui se déplace, le plus tôt possible */
-  function targetQTE(s) {
-    return new Promise((resolve) => {
-      const e = st.units[s.a], L = e?.boss ? 1150 : 1350;
-      const tEl = el(s.t), tEls = [tEl];
-      el(s.a)?.classList.add('aim'); tEl?.classList.add('aimed');
-      const box = qteBox('cb-targetq', s, null, 'Touche le point faible avant qu’il ne frappe');
-      const dv = $('.dv'), R = dv.getBoundingClientRect();
-      const orb = document.createElement('div'); orb.className = 'cb-weak'; orb.innerHTML = '<i></i>'; dv.appendChild(orb);
-      const tmb = document.createElement('span'); tmb.className = 'cb-sw-time'; tmb.innerHTML = `<i style="animation-duration:${L}ms"></i>`; box.appendChild(tmb);
-      const ax = R.width * 0.32, ay = R.height * 0.16, cx = R.width / 2, cy = R.height * 0.46, ph = Math.random() * 6.28, sp = (e?.boss ? 6.2 : 5) + Math.random();
-      let t0 = 0, done = false, raf = 0, miss = 0, off = null, px = cx, py = cy;
-      const end = (r) => { if (done) return; done = true; cancelAnimationFrame(raf); off?.(); orb.classList.add(`r-${r}`); setTimeout(() => orb.remove(), 400);
-        qteStamp(r, { parry: 'Débusqué !', dodge: 'Touché à temps', none: 'Surpris…' }); setTimeout(() => { qteClose(box, s, tEls); resolve(r); }, 300); };
-      const step = () => { const x = (performance.now() - t0) / 1000; px = cx + Math.sin(x * sp + ph) * ax; py = cy + Math.sin(x * sp * 1.7 + ph * 2) * ay;
-        orb.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px)`; if (x * 1000 >= L) return end('none'); raf = requestAnimationFrame(step); };
-      off = capture((ev) => { if (!t0 || done) return; const d = Math.hypot(ev.clientX - R.left - px, ev.clientY - R.top - py);
-        if (d <= 46) end((performance.now() - t0) / L <= 0.5 ? 'parry' : 'dodge'); else if (++miss >= 2) end('none'); else { orb.classList.remove('dodge'); void orb.offsetWidth; orb.classList.add('dodge'); app.sfx.miss(); } });
-      orb.style.transform = `translate(${cx}px, ${cy}px)`;
-      setTimeout(() => { if (done || !alive_) return; t0 = performance.now(); box.classList.add('go'); orb.classList.add('go'); raf = requestAnimationFrame(step); }, (reduced ? 200 : 450) + Math.random() * 200);
-    });
+  async function gesture(fn, s, ...args) {
+    const tEls = s.kind === 'blast' || intentInfo(st, st.units[s.a])?.aoe ? front(st, 'ally').map((u) => el(u.uid)) : [el(s.t)];
+    el(s.a)?.classList.add('aim'); tEls.forEach((x) => x?.classList.add('aimed')); $('.dv')?.classList.add('qte-on');
+    try { return await fn(qxOpts(s), ...args); }
+    finally { $('.dv')?.classList.remove('qte-on'); el(s.a)?.classList.remove('aim'); tEls.forEach((x) => x?.classList.remove('aimed')); }
   }
   /* v558 : Assaut d'un gardien : sa grosse attaque se défend en plusieurs gestes enchaînés, avec sa mise en scène */
   async function assaultQTE(s, A) {
@@ -1055,7 +977,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       res.push(r); ov.querySelectorAll('.cb-as-pips i')[i]?.classList.add(`r-${r}`);
       await new Promise((ok) => setTimeout(ok, 260));
     }
-    const r = scoreOf(res.length ? res : ['none']);
+    const r = QX.scoreOf(res.length ? res : ['none']);
     $('.dv')?.querySelectorAll('.dv-stamp').forEach((x) => x.remove());
     ov.classList.add('done', `r-${r}`);
     ov.querySelector('.cb-as-in b').textContent = r === 'parry' ? 'Assaut brisé !' : r === 'dodge' ? 'Assaut amorti' : 'Assaut subi…';
@@ -1063,47 +985,6 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     await new Promise((ok) => setTimeout(ok, reduced ? 300 : 900));
     ov.remove();
     return r;
-  }
-  function swipeQTE(s) {
-    return new Promise((resolve) => {
-      const e = st.units[s.a], W = e?.boss ? 900 : e?.elite ? 1000 : 1100, PERF = 0.4;
-      const DIRS = { l: ['←', 'vers la gauche', -1, 0], r: ['→', 'vers la droite', 1, 0], u: ['↑', 'vers le haut', 0, -1] };
-      const dk = Object.keys(DIRS)[Math.floor(Math.random() * 3)], [arrow, words, dx, dy] = DIRS[dk];
-      const tEls = front(st, 'ally').map((u) => el(u.uid));
-      el(s.a)?.classList.add('aim'); tEls.forEach((x) => x?.classList.add('aimed'));
-      const def = INTENTS[s.kind] || INTENTS.blast;
-      const box = document.createElement('div');
-      box.className = 'dv-dodge cb-def cb-swipe prep';
-      /* v558 : une préparation montre le geste (grande flèche, doigt qui glisse) avant que le minuteur ne parte */
-      box.innerHTML = `<span class="dv-dodge-t">${intentIcon(s.kind)} ${esc(def.name)} ! <small>Prépare-toi : glisse ton doigt ${words} pour mettre ton équipe à l’abri</small></span><span class="cb-sw-arrow d-${dk}"><img alt="${arrow}" src="assets/icons/sw-arrow.webp"><i class="cb-sw-hand d-${dk}"></i></span><b class="cb-sw-go">Glisse ${arrow}</b><span class="cb-sw-time"><i style="animation-duration:${W}ms"></i></span>`;
-      $('.dv-mid').appendChild(box); $('.dv-mid').classList.add('qte'); $('.dv')?.classList.add('qte-on');
-      let t0 = 0, sx = null, sy = null, done = false, timer = 0;
-      const end = (res) => {
-        if (done) return; done = true; clearTimeout(timer);
-        removeEventListener('pointerdown', down, true); removeEventListener('pointermove', move, true); removeEventListener('pointerup', up, true);
-        box.classList.add(res === 'none' ? 'ko' : 'ok', `r-${res}`);
-        box.querySelector('.dv-dodge-t').textContent = res === 'parry' ? 'À l’abri !' : res === 'dodge' ? 'De justesse !' : 'Raté…';
-        $('.dv')?.classList.remove('qte-on');
-        const stamp = document.createElement('div'); stamp.className = `dv-stamp s-${res}`;
-        stamp.innerHTML = `<b>${res === 'parry' ? 'À l’abri !' : res === 'dodge' ? 'Éraflés…' : 'Touchés…'}</b>`;
-        $('.dv')?.appendChild(stamp); setTimeout(() => stamp.remove(), 900);
-        if (res === 'none') app.sfx.miss(); else app.sfx.swipe?.();
-        setTimeout(() => { box.remove(); $('.dv-mid')?.classList.remove('qte'); el(s.a)?.classList.remove('aim'); tEls.forEach((x) => x?.classList.remove('aimed')); resolve(res); }, res === 'none' ? 200 : 300);
-      };
-      const judge = (mx, my) => {
-        const ax = Math.abs(mx), ay = Math.abs(my);
-        if (Math.max(ax, ay) < 36) return;
-        const ok = dx ? ax > ay && Math.sign(mx) === dx : ay > ax && Math.sign(my) === dy;
-        if (!ok) return end('none');
-        end((performance.now() - t0) / W <= PERF ? 'parry' : 'dodge');
-      };
-      const down = (ev) => { if (ev.target.closest?.('[data-d="quit"],[data-d="help"],[data-d="speed"]')) return; ev.preventDefault(); ev.stopPropagation(); if (!t0) return; sx = ev.clientX; sy = ev.clientY; };
-      const move = (ev) => { if (sx == null || done) return; judge(ev.clientX - sx, ev.clientY - sy); };
-      const up = (ev) => { if (sx != null && !done) judge(ev.clientX - sx, ev.clientY - sy); sx = sy = null; };
-      addEventListener('pointerdown', down, true); addEventListener('pointermove', move, true); addEventListener('pointerup', up, true);
-      const prep = (reduced ? 400 : 900) + Math.random() * 300;
-      setTimeout(() => { if (done || !alive_) return; t0 = performance.now(); box.classList.remove('prep'); box.classList.add('go'); box.querySelector('.dv-dodge-t small').textContent = `Maintenant ! Glisse ${words}`; app.sfx.swipe?.(); timer = setTimeout(() => end('none'), W); }, prep);
-    });
   }
   function barQTE(s, hold = false) {
     return new Promise((resolve) => {
