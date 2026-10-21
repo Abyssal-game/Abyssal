@@ -97,15 +97,15 @@ test('v482 : finitions de prestige, achetées une fois, posées seulement sur un
   g.s.settings.dev = true; g.s.devCodex = true; g.s.obs = 2000;
   const id = Object.keys(g.s.collection)[0] || catalog.cards[0].id;
   if (!g.owns(id)) g.addCard?.(id);
-  assert.throws(() => g.setDress(id, 'fin-ecarlate'), /pas encore/);
-  g.catalogBuy('fin-ecarlate');
-  assert.ok(g.s.finishes.includes('fin-ecarlate') && g.catalogOwned('fin-ecarlate'));
-  g.setDress(id, 'fin-ecarlate');
-  assert.equal(g.s.dress[id], 'fin-ecarlate');
+  assert.throws(() => g.setDress(id, 'fin-vitrail'), /pas encore/);
+  g.catalogBuy('fin-vitrail');
+  assert.ok(g.s.finishes.includes('fin-vitrail') && g.catalogOwned('fin-vitrail'));
+  g.setDress(id, 'fin-vitrail');
+  assert.equal(g.s.dress[id], 'fin-vitrail');
   g.setDress(id, null);
   assert.equal(g.s.dress[id], undefined);
   const other = catalog.cards.find((c) => !g.owns(c.id)).id;
-  assert.throws(() => g.setDress(other, 'fin-ecarlate'), /possèdes pas/);
+  assert.throws(() => g.setDress(other, 'fin-vitrail'), /possèdes pas/);
 });
 
 // v538 : la saison commence le 1er décembre ; les points d'avant ne comptent pas

@@ -55,6 +55,8 @@ export const CODEX_FRAMES = {
   'cx-guirlandes': 'Cadre des guirlandes d’or', 'cx-noel': 'Couronne de la Veillée',
   /* v547 : Saison III « L'Hiver éternel », exclusifs de la voie enluminée (images Gemini attendues) */
   'cx-glace-noire': 'Cadre de glace noire', 'cx-loups-neige': 'Cadre de la meute des neiges', 'cx-hiver': 'Couronne de la Reine de l’Hiver',
+  /* v552 : Saisons IV à XII (février à octobre 2027, images Gemini attendues) */
+  'cx-coeurs': 'Cadre des cœurs liés', 'cx-epines': 'Cadre des épines', 'cx-coeur-maudit': 'Couronne du Cœur maudit', 'cx-mandragore': 'Couronne de mandragore', 'cx-arbre-monde': 'Couronne de l’Arbre-Monde', 'cx-masques': 'Cadre des masques de velours', 'cx-arlequin': 'Couronne de l’Arlequin noir', 'cx-lune-pale': 'Cadre de la lune pâle', 'cx-jardin-lune': 'Cadre des fleurs de lune', 'cx-lune-reine': 'Couronne de la Reine de la Lune', 'cx-flammes': 'Cadre des flammes dansantes', 'cx-solstice-feu': 'Couronne du Solstice de feu', 'cx-marees': 'Cadre des marées noires', 'cx-corail': 'Cadre de corail noir', 'cx-profondeurs': 'Couronne des Profondeurs', 'cx-forge-titans': 'Cadre de la forge des Titans', 'cx-enclume': 'Cadre de l’enclume', 'cx-titan': 'Couronne du Titan forgeron', 'cx-plumes': 'Cadre des plumes noires', 'cx-epis': 'Cadre des épis d’or', 'cx-faucheur': 'Couronne du Faucheur', 'cx-anniversaire': 'Couronne de la Première Année',
   /* v532 */ 'cx-carnaval': 'Cadre du carnaval des ombres', 'cx-phalenes': 'Cadre des phalènes', 'cx-cristaux-sang': 'Cadre des cristaux de sang',
 };
 // Dos de cartes (v473 : images Gemini, assets/backs/<clé>.webp, tools/back-art.py ; choisis au Profil)
@@ -66,6 +68,7 @@ export const CODEX_BACKS = { 'dos-codex': 'Dos du Codex', 'dos-abime': 'Dos de l
   /* v481 */ 'dos-abysse': 'Dos de L’Abysse', 'dos-tarot': 'Dos du tarot interdit', 'dos-mosaique': 'Dos de la mosaïque d’or', 'dos-encre': 'Dos de l’encre et du dragon', 'dos-alchimie': 'Dos de l’alchimiste', 'dos-carte-abysse': 'Dos de la carte de l’Abysse', 'dos-reliquaire': 'Dos du reliquaire', 'dos-tapisserie': 'Dos de la chasse maudite', 'dos-art-deco': 'Dos d’or noir', 'dos-vivant': 'Dos de chair vivante', 'dos-nebuleuse': 'Dos de la nébuleuse', 'dos-vitrail': 'Dos du vitrail de cathédrale',
   /* v550 */ 'dos-cimetiere': 'Dos du cimetière des âmes', 'dos-presents': 'Dos des présents',
   /* v547 */ 'dos-blizzard': 'Dos du blizzard', 'dos-hiver': 'Dos de l’Hiver éternel',
+  /* v552 */ 'dos-coeurs': 'Dos du cœur enchaîné', 'dos-mandragore': 'Dos de la mandragore', 'dos-racines': 'Dos des racines éveillées', 'dos-bal': 'Dos du bal masqué', 'dos-lune-pale': 'Dos de la lune pâle', 'dos-jardin': 'Dos du jardin nocturne', 'dos-phenix': 'Dos du phénix', 'dos-brasier': 'Dos du grand brasier', 'dos-marees': 'Dos des marées noires', 'dos-leviathan': 'Dos du Léviathan', 'dos-forge-titans': 'Dos de la forge des Titans', 'dos-marteau': 'Dos du marteau runique', 'dos-moissons': 'Dos des moissons d’ombre', 'dos-epouvantail': 'Dos de l’épouvantail', 'dos-anniversaire': 'Dos de l’anniversaire',
   /* v532 */ 'dos-carnaval': 'Dos du carnaval des ombres', 'dos-phalene': 'Dos de la grande phalène', 'dos-coeur-mecanique': 'Dos du cœur mécanique' };
 
 // v482 : finitions de prestige (« habillages ») : un cadre peint posé sur une carte qu'on possède, sans rien changer à
@@ -91,6 +94,24 @@ export const FINISHES = {
   'fin-ames': { name: 'Nuit des Âmes', desc: 'Lanternes et âmes en spirale. Récompense ultime de la Saison I.' },
   'fin-houx': { name: 'Houx et rubans', desc: 'Branches de houx, baies rouges et ruban de velours.' },
   'fin-noel': { name: 'Veillée de Noël', desc: 'Or chaud, bougies et neige qui scintille. Récompense ultime de la Saison II.' },
+  /* v552 : exclusives des Saisons IV à XII */
+  'fin-roses': { name: 'Roses noires', desc: 'Tiges d’épines et roses noires au bord de la carte.' },
+  'fin-coeurs': { name: 'Cœurs maudits', desc: 'Rubis, roses noires et chaînes d’or rose. Récompense ultime de la Saison IV.' },
+  'fin-seve': { name: 'Sève', desc: 'Lianes vertes et gouttes de sève dorée au bord de la carte.' },
+  'fin-racines': { name: 'Réveil des Racines', desc: 'Bois vivant, bourgeons et lumière de printemps. Récompense ultime de la Saison V.' },
+  'fin-masques': { name: 'Masques', desc: 'Petits masques dorés et rubans de soie au bord de la carte.' },
+  'fin-carnaval': { name: 'Carnaval des Ombres', desc: 'Velours, plumes et confettis d’or. Récompense ultime de la Saison VI.' },
+  'fin-lune': { name: 'Lune pâle', desc: 'Argent lunaire et fines étoiles au bord de la carte.' },
+  'fin-jardins': { name: 'Jardins de la Lune', desc: 'Argent, fleurs blanches et clair de lune. Récompense ultime de la Saison VII.' },
+  'fin-solstice': { name: 'Solstice de feu', desc: 'Or en fusion, flammes et plumes de phénix. Récompense ultime de la Saison VIII.' },
+  'fin-marees': { name: 'Marées noires', desc: 'Vague d’encre et écume d’argent au bord de la carte.' },
+  'fin-profondeurs': { name: 'Profondeurs', desc: 'Nacre noire, perles et écume d’argent. Récompense ultime de la Saison IX.' },
+  'fin-forge': { name: 'Forge des Titans', desc: 'Fer noirci et lueur de métal en fusion au bord de la carte.' },
+  'fin-titans': { name: 'Acier des Titans', desc: 'Acier noir, rivets d’or et métal en fusion. Récompense ultime de la Saison X.' },
+  'fin-ble-noir': { name: 'Blé noir', desc: 'Épis de blé dorés et noirs au bord de la carte.' },
+  'fin-moissons': { name: 'Moissons d’ombre', desc: 'Blé d’or noir, plumes de corbeau et lune de récolte. Récompense ultime de la Saison XI.' },
+  'fin-premiere-page': { name: 'Première page', desc: 'Parchemin ancien et enluminures au bord de la carte.' },
+  'fin-anniversaire': { name: 'Anniversaire de l’Abysse', desc: 'Or, obsidienne et l’œil de l’Abysse en majesté. Récompense ultime de la Saison XII.' },
   /* v547 : exclusives de la Saison III (voie enluminée) */
   'fin-aurore': { name: 'Aurore boréale', desc: 'Voiles d’aurore verts et violets dans la glace.' },
   'fin-hiver': { name: 'Hiver éternel', desc: 'Couronne de glace, neige qui tombe sans fin. Récompense ultime de la Saison I.' },
@@ -101,16 +122,12 @@ const B = (k, cost) => ({ id: k, kind: 'back', give: { back: k }, cost });
 const FN = (k, cost) => ({ id: k, kind: 'finish', give: { finish: k }, cost });
 export const ROYAUMES = ['dos-infernal', 'dos-abyssal', 'dos-celeste', 'dos-sauvage', 'dos-necrotique', 'dos-primordial', 'dos-artificiel'];
 /* v535 : cadres de la meute, des corbeaux, des chaînes et des roses noires retirés de la vente (leur ornement cachait le visage de la créature) */
-export const CATALOG = [
-  F('cx-braise', 100), F('cx-os', 120), F('cx-serpents', 120), F('cx-vitrail', 120), F('cx-rouages', 120),
-  F('cx-racines', 120), F('cx-yeux', 140), F('cx-ruche', 140),
+export const CATALOG = [ F('cx-os', 120), F('cx-serpents', 120), F('cx-vitrail', 120), F('cx-rouages', 120), F('cx-yeux', 140), F('cx-ruche', 140),
   F('cx-prince', 250), F('cx-leviathan', 250), F('cx-seraphin', 250), F('cx-liche', 250), F('cx-ouroboros', 250), F('cx-automate', 250), F('cx-gueule', 200), F('cx-eclipse', 200), F('cx-horloger', 200), F('cx-balance', 200),
   F('cx-constellation', 280), F('cx-geode', 180), F('cx-sablier', 180), F('cx-pages', 180), F('cx-souverain', 450),
-  B('dos-abime', 140), B('dos-roses', 200), B('dos-lune-sang', 200), B('dos-devoreur', 200), B('dos-eclipse', 200), B('dos-horloger', 200), B('dos-miroirs', 200), B('dos-jumeaux', 200), B('dos-titan', 200),
-  B('dos-abysse', 280), B('dos-tarot', 200), B('dos-mosaique', 200), B('dos-encre', 200), B('dos-alchimie', 200), B('dos-carte-abysse', 200), B('dos-reliquaire', 280), B('dos-tapisserie', 200), B('dos-art-deco', 280), B('dos-vivant', 280), B('dos-nebuleuse', 280), B('dos-vitrail', 200), ...ROYAUMES.map((k) => B(k, 120)),
-  FN('fin-ecarlate', 300), FN('fin-vitrail', 350),
-  FN('fin-estampe', 300), FN('fin-incandescente', 350), FN('fin-constellee', 350), FN('fin-ossuaire', 300), FN('fin-nacree', 300), FN('fin-runique', 300), FN('fin-scellee', 300), FN('fin-draconique', 350), FN('fin-imperiale', 450), FN('fin-neant', 450),
-  F('cx-carnaval', 250), F('cx-phalenes', 180), F('cx-cristaux-sang', 280), B('dos-carnaval', 280), B('dos-phalene', 200), B('dos-coeur-mecanique', 280),
+  B('dos-abime', 140), B('dos-lune-sang', 200), B('dos-devoreur', 200), B('dos-eclipse', 200), B('dos-horloger', 200), B('dos-miroirs', 200), B('dos-jumeaux', 200), B('dos-titan', 200),
+  B('dos-abysse', 280), B('dos-tarot', 200), B('dos-mosaique', 200), B('dos-encre', 200), B('dos-alchimie', 200), B('dos-carte-abysse', 200), B('dos-reliquaire', 280), B('dos-tapisserie', 200), B('dos-art-deco', 280), B('dos-vivant', 280), B('dos-nebuleuse', 280), B('dos-vitrail', 200), ...ROYAUMES.map((k) => B(k, 120)), FN('fin-vitrail', 350),
+  FN('fin-estampe', 300), FN('fin-constellee', 350), FN('fin-ossuaire', 300), FN('fin-nacree', 300), FN('fin-runique', 300), FN('fin-scellee', 300), FN('fin-draconique', 350), FN('fin-imperiale', 450), FN('fin-neant', 450), F('cx-phalenes', 180), F('cx-cristaux-sang', 280), B('dos-phalene', 200), B('dos-coeur-mecanique', 280),
   { id: 'royaumes', kind: 'bundle', name: 'Les sept royaumes', give: { backs: ROYAUMES }, cost: 600, desc: 'Les sept dos des royaumes d’un coup (840 à l’unité).' },
 ];
 // Exclusifs du Codex enluminé (jamais en vente). v547 : tous les cosmétiques de la voie enluminée (Saison I : l'hiver),
@@ -158,8 +175,56 @@ export const SEASONS = [
     titles: ['Veilleur du long hiver', 'Marcheur des neiges', 'Chasseur d’aurores', 'Cœur de givre', 'Voix du blizzard', 'Gardien du solstice'],
     items: [{ frame: 'cx-givre' }, { back: 'dos-blizzard' }, { finish: 'fin-givree' }, { frame: 'cx-aurore' }, { frame: 'cx-glace-noire' }, null, { frame: 'cx-loups-neige' }, { finish: 'fin-aurore' }, { back: 'dos-hiver' }],
     ultimate: { frame: 'cx-hiver', finish: 'fin-hiver', title: 'Souverain de l’Hiver éternel' } },
+  /* v552 : une saison par mois toute l'année (calendrier validé par le propriétaire le 21 octobre 2026) */
+  { key: 's4-coeurs', num: 'IV', name: 'Les Cœurs maudits', starts: '2027-02-01', ends: '2027-02-28', art: 'assets/ui/cx-saison-coeurs.webp',
+    best: ['cx-coeur-maudit', 'dos-coeurs', 'cx-coeurs'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres des Cœurs maudits, introuvables à l’Échoppe. Au palier 30, la Couronne du Cœur maudit et la finition Cœurs maudits.',
+    titles: ['Amant des ombres', 'Porteur de roses noires', 'Cœur épineux', 'Âme liée', 'Briseur de serments', 'Soupir de l’Abysse'],
+    items: [{ frame: 'cx-coeurs' }, { back: 'dos-roses' }, { finish: 'fin-ecarlate' }, { frame: 'cx-epines' }, null, { back: 'dos-coeurs' }, null, { finish: 'fin-roses' }],
+    ultimate: { frame: 'cx-coeur-maudit', finish: 'fin-coeurs', title: 'Souverain des Cœurs maudits' } },
+  { key: 's5-racines', num: 'V', name: 'Le Réveil des Racines', starts: '2027-03-01', ends: '2027-03-31', art: 'assets/ui/cx-saison-racines.webp',
+    best: ['cx-arbre-monde', 'dos-racines', 'cx-mandragore'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres du Réveil des Racines, introuvables à l’Échoppe. Au palier 30, la Couronne de l’Arbre-Monde et la finition Réveil des Racines.',
+    titles: ['Graine de l’Abysse', 'Éveilleur de sève', 'Ami des mandragores', 'Voix de la forêt', 'Cœur de chêne', 'Racine profonde'],
+    items: [{ frame: 'cx-racines' }, { back: 'dos-mandragore' }, { finish: 'fin-seve' }, { frame: 'cx-mandragore' }, null, { back: 'dos-racines' }],
+    ultimate: { frame: 'cx-arbre-monde', finish: 'fin-racines', title: 'Gardien des Racines' } },
+  { key: 's6-carnaval', num: 'VI', name: 'Le Carnaval des Ombres', starts: '2027-04-01', ends: '2027-04-30', art: 'assets/ui/cx-saison-carnaval.webp',
+    best: ['cx-arlequin', 'dos-bal', 'cx-masques'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres du Carnaval des Ombres, introuvables à l’Échoppe. Au palier 30, la Couronne de l’Arlequin noir et la finition Carnaval des Ombres.',
+    titles: ['Danseur masqué', 'Visage de velours', 'Rire dans l’ombre', 'Maître des confettis', 'Invité du bal', 'Celui qui change de visage'],
+    items: [{ frame: 'cx-carnaval' }, { back: 'dos-carnaval' }, { finish: 'fin-masques' }, { frame: 'cx-masques' }, null, { back: 'dos-bal' }],
+    ultimate: { frame: 'cx-arlequin', finish: 'fin-carnaval', title: 'Maître du Carnaval' } },
+  { key: 's7-lune', num: 'VII', name: 'Les Jardins de la Lune pâle', starts: '2027-05-01', ends: '2027-05-31', art: 'assets/ui/cx-saison-lune.webp',
+    best: ['cx-lune-reine', 'dos-jardin', 'cx-lune-pale'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres des Jardins de la Lune pâle, introuvables à l’Échoppe. Au palier 30, la Couronne de la Reine de la Lune et la finition Jardins de la Lune.',
+    titles: ['Cueilleur de rosée', 'Ami des phalènes', 'Promeneur nocturne', 'Fleur de minuit', 'Enfant de la lune', 'Gardien des jardins'],
+    items: [{ frame: 'cx-lune-pale' }, { back: 'dos-lune-pale' }, { finish: 'fin-lune' }, { frame: 'cx-jardin-lune' }, null, { back: 'dos-jardin' }],
+    ultimate: { frame: 'cx-lune-reine', finish: 'fin-jardins', title: 'Jardinier de la Lune pâle' } },
+  { key: 's8-solstice', num: 'VIII', name: 'Le Solstice de feu', starts: '2027-06-01', ends: '2027-06-30', art: 'assets/ui/cx-saison-solstice.webp',
+    best: ['cx-solstice-feu', 'dos-phenix', 'cx-flammes'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres du Solstice de feu, introuvables à l’Échoppe. Au palier 30, la Couronne du Solstice de feu et la finition Solstice de feu.',
+    titles: ['Porteur de torche', 'Danseur des braises', 'Enfant du brasier', 'Cœur ardent', 'Flamme qui ne s’éteint pas', 'Ami du phénix'],
+    items: [{ frame: 'cx-braise' }, { back: 'dos-phenix' }, { finish: 'fin-incandescente' }, { frame: 'cx-flammes' }, null, { back: 'dos-brasier' }],
+    ultimate: { frame: 'cx-solstice-feu', finish: 'fin-solstice', title: 'Enfant du Solstice' } },
+  { key: 's9-marees', num: 'IX', name: 'Les Marées noires', starts: '2027-07-01', ends: '2027-07-31', art: 'assets/ui/cx-saison-marees.webp',
+    best: ['cx-profondeurs', 'dos-leviathan', 'cx-marees'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres des Marées noires, introuvables à l’Échoppe. Au palier 30, la Couronne des Profondeurs et la finition Profondeurs.',
+    titles: ['Écume noire', 'Chanteur des profondeurs', 'Pêcheur de perles', 'Marcheur des abysses', 'Voix de la marée', 'Cœur de corail'],
+    items: [{ frame: 'cx-marees' }, { back: 'dos-marees' }, { finish: 'fin-marees' }, { frame: 'cx-corail' }, null, { back: 'dos-leviathan' }],
+    ultimate: { frame: 'cx-profondeurs', finish: 'fin-profondeurs', title: 'Seigneur des Marées' } },
+  { key: 's10-forge', num: 'X', name: 'La Forge des Titans', starts: '2027-08-01', ends: '2027-08-31', art: 'assets/ui/cx-saison-forge.webp',
+    best: ['cx-titan', 'dos-forge-titans', 'cx-enclume'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de la Forge des Titans, introuvables à l’Échoppe. Au palier 30, la Couronne du Titan forgeron et la finition Acier des Titans.',
+    titles: ['Apprenti forgeron', 'Frappeur d’enclume', 'Main de fer', 'Souffle de la forge', 'Cœur d’acier', 'Marteau des Titans'],
+    items: [{ frame: 'cx-forge-titans' }, { back: 'dos-forge-titans' }, { finish: 'fin-forge' }, { frame: 'cx-enclume' }, null, { back: 'dos-marteau' }],
+    ultimate: { frame: 'cx-titan', finish: 'fin-titans', title: 'Forgeron des Titans' } },
+  { key: 's11-moissons', num: 'XI', name: 'Les Moissons d’ombre', starts: '2027-09-01', ends: '2027-09-30', art: 'assets/ui/cx-saison-moissons.webp',
+    best: ['cx-faucheur', 'dos-moissons', 'cx-plumes'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres des Moissons d’ombre, introuvables à l’Échoppe. Au palier 30, la Couronne du Faucheur et la finition Moissons d’ombre.',
+    titles: ['Glaneur d’ombres', 'Ami des corbeaux', 'Gardien des champs', 'Lame de la récolte', 'Veilleur des granges', 'Épouvantail vivant'],
+    items: [{ frame: 'cx-plumes' }, { back: 'dos-moissons' }, { finish: 'fin-ble-noir' }, { frame: 'cx-epis' }, null, { back: 'dos-epouvantail' }],
+    ultimate: { frame: 'cx-faucheur', finish: 'fin-moissons', title: 'Faucheur des Ombres' } },
+  { key: 's12-anniv', num: 'XII', name: 'L’Anniversaire de l’Abysse', starts: '2027-10-01', ends: '2027-10-31', art: 'assets/ui/cx-saison-anniv.webp',
+    best: ['cx-anniversaire', 'dos-anniversaire', 'cx-abime'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de l’Anniversaire de l’Abysse, introuvables à l’Échoppe. Au palier 30, la Couronne de la Première Année et la finition Anniversaire de l’Abysse.',
+    titles: ['Lecteur du Bestiaire', 'Témoin de l’Abysse', 'Fidèle de la première heure', 'Gardien des pages', 'Plume de l’Abysse', 'Mémoire du Bestiaire'],
+    items: [{ frame: 'cx-encre' }, { back: 'dos-codex' }, { finish: 'fin-premiere-page' }, { frame: 'cx-sang' }, { frame: 'cx-or' }, { back: 'dos-anniversaire' }, null, { frame: 'cx-abime' }],
+    ultimate: { frame: 'cx-anniversaire', finish: 'fin-anniversaire', title: 'Témoin de la première année' } },
 ];
-for (const se of SEASONS) { se.title = `Saison ${se.num} · ${se.name}`; se.prem = premOf(se); se.tiers = Array.from({ length: CODEX.tiers }, (_, i) => ({ tier: i + 1, free: FREE(i + 1), prem: se.prem[i + 1] || null })); }
+for (const se of SEASONS) { /* v552 : tout objet d'une voie enluminée est exclusif au Codex */
+  for (const r of [...se.items, se.ultimate]) for (const k of [r?.frame, r?.back, r?.finish]) if (k && !CODEX_ONLY.includes(k)) CODEX_ONLY.push(k);
+  se.title = `Saison ${se.num} · ${se.name}`; se.prem = premOf(se); se.tiers = Array.from({ length: CODEX.tiers }, (_, i) => ({ tier: i + 1, free: FREE(i + 1), prem: se.prem[i + 1] || null })); }
 // la saison d'un jour (date du joueur) : celle qui le contient, sinon la prochaine, sinon la dernière
 export function seasonFor(day) { return SEASONS.find((se) => day <= se.ends) || SEASONS[SEASONS.length - 1]; }
 export const seasonByKey = (k) => SEASONS.find((se) => se.key === k) || null;

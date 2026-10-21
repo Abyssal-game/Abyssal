@@ -5261,3 +5261,57 @@ html.reduce-motion .pf.pf-cx-hiver::before, html.reduce-motion .dr-fin-hiver .tc
 html.reduce-motion .pf.pf-cx-ames::before, html.reduce-motion .pf.pf-cx-noel, html.reduce-motion .dr-fin-ames .tcg-dress::after, html.reduce-motion .dr-fin-noel .tcg-dress::after, html.fx-light .pf.pf-cx-ames::before { animation: none; }
 .cx-past { color: #BFE8C8; margin: 6px 0 0; }
 .cx-unlock2 .cx-eur { white-space: nowrap; }
+
+/* v552 : Saisons IV à XII (février à octobre 2027) : objets des voies enluminées (images Gemini attendues) */
+.pf-cx-coeurs { --fr: url(../assets/frames/cx-coeurs-4.webp); }
+.pf-cx-epines { --fr: url(../assets/frames/cx-epines-4.webp); }
+.pf-cx-coeur-maudit { --fr: url(../assets/frames/cx-coeur-maudit-4.webp); }
+.dr-fin-roses .tcg-dress { background-image: url(../assets/variants/fin-roses-frame.webp); }
+.dr-fin-coeurs .tcg-dress { background-image: url(../assets/variants/fin-coeurs-frame.webp); }
+.pf.pf-cx-coeur-maudit { box-shadow: 0 0 0 2px rgba(255, 90, 120, .55), 0 0 22px rgba(255, 90, 120, .7); animation: cxUlt 3s ease-in-out infinite; --g: 255, 90, 120; }
+.pf-cx-mandragore { --fr: url(../assets/frames/cx-mandragore-4.webp); }
+.pf-cx-arbre-monde { --fr: url(../assets/frames/cx-arbre-monde-4.webp); }
+.dr-fin-seve .tcg-dress { background-image: url(../assets/variants/fin-seve-frame.webp); }
+.dr-fin-racines .tcg-dress { background-image: url(../assets/variants/fin-racines-frame.webp); }
+.pf.pf-cx-arbre-monde { box-shadow: 0 0 0 2px rgba(140, 230, 120, .55), 0 0 22px rgba(140, 230, 120, .7); animation: cxUlt 3s ease-in-out infinite; --g: 140, 230, 120; }
+.pf-cx-masques { --fr: url(../assets/frames/cx-masques-4.webp); }
+.pf-cx-arlequin { --fr: url(../assets/frames/cx-arlequin-4.webp); }
+.dr-fin-masques .tcg-dress { background-image: url(../assets/variants/fin-masques-frame.webp); }
+.dr-fin-carnaval .tcg-dress { background-image: url(../assets/variants/fin-carnaval-frame.webp); }
+.pf.pf-cx-arlequin { box-shadow: 0 0 0 2px rgba(220, 120, 255, .55), 0 0 22px rgba(220, 120, 255, .7); animation: cxUlt 3s ease-in-out infinite; --g: 220, 120, 255; }
+.pf-cx-lune-pale { --fr: url(../assets/frames/cx-lune-pale-4.webp); }
+.pf-cx-jardin-lune { --fr: url(../assets/frames/cx-jardin-lune-4.webp); }
+.pf-cx-lune-reine { --fr: url(../assets/frames/cx-lune-reine-4.webp); }
+.dr-fin-lune .tcg-dress { background-image: url(../assets/variants/fin-lune-frame.webp); }
+.dr-fin-jardins .tcg-dress { background-image: url(../assets/variants/fin-jardins-frame.webp); }
+.pf.pf-cx-lune-reine { box-shadow: 0 0 0 2px rgba(210, 225, 255, .55), 0 0 22px rgba(210, 225, 255, .7); animation: cxUlt 3s ease-in-out infinite; --g: 210, 225, 255; }
+.pf-cx-flammes { --fr: url(../assets/frames/cx-flammes-4.webp); }
+.pf-cx-solstice-feu { --fr: url(../assets/frames/cx-solstice-feu-4.webp); }
+.dr-fin-solstice .tcg-dress { background-image: url(../assets/variants/fin-solstice-frame.webp); }
+.pf.pf-cx-solstice-feu { box-shadow: 0 0 0 2px rgba(255, 150, 60, .55), 0 0 22px rgba(255, 150, 60, .7); animation: cxUlt 3s ease-in-out infinite; --g: 255, 150, 60; }
+.pf-cx-marees { --fr: url(../assets/frames/cx-marees-4.webp); }
+.pf-cx-corail { --fr: url(../assets/frames/cx-corail-4.webp); }
+.pf-cx-profondeurs { --fr: url(../assets/frames/cx-profondeurs-4.webp); }
+.dr-fin-marees .tcg-dress { background-image: url(../assets/variants/fin-marees-frame.webp); }
+.dr-fin-profondeurs .tcg-dress { background-image: url(../assets/variants/fin-profondeurs-frame.webp); }
+.pf.pf-cx-profondeurs { box-shadow: 0 0 0 2px rgba(90, 210, 220, .55), 0 0 22px rgba(90, 210, 220, .7); animation: cxUlt 3s ease-in-out infinite; --g: 90, 210, 220; }
+.pf-cx-forge-titans { --fr: url(../assets/frames/cx-forge-titans-4.webp); }
+.pf-cx-enclume { --fr: url(../assets/frames/cx-enclume-4.webp); }
+.pf-cx-titan { --fr: url(../assets/frames/cx-titan-4.webp); }
+.dr-fin-forge .tcg-dress { background-image: url(../assets/variants/fin-forge-frame.webp); }
+.dr-fin-titans .tcg-dress { background-image: url(../assets/variants/fin-titans-frame.webp); }
+.pf.pf-cx-titan { box-shadow: 0 0 0 2px rgba(255, 120, 40, .55), 0 0 22px rgba(255, 120, 40, .7); animation: cxUlt 3s ease-in-out infinite; --g: 255, 120, 40; }
+.pf-cx-plumes { --fr: url(../assets/frames/cx-plumes-4.webp); }
+.pf-cx-epis { --fr: url(../assets/frames/cx-epis-4.webp); }
+.pf-cx-faucheur { --fr: url(../assets/frames/cx-faucheur-4.webp); }
+.dr-fin-ble-noir .tcg-dress { background-image: url(../assets/variants/fin-ble-noir-frame.webp); }
+.dr-fin-moissons .tcg-dress { background-image: url(../assets/variants/fin-moissons-frame.webp); }
+.pf.pf-cx-faucheur { box-shadow: 0 0 0 2px rgba(230, 190, 90, .55), 0 0 22px rgba(230, 190, 90, .7); animation: cxUlt 3s ease-in-out infinite; --g: 230, 190, 90; }
+.pf-cx-anniversaire { --fr: url(../assets/frames/cx-anniversaire-4.webp); }
+.dr-fin-premiere-page .tcg-dress { background-image: url(../assets/variants/fin-premiere-page-frame.webp); }
+.dr-fin-anniversaire .tcg-dress { background-image: url(../assets/variants/fin-anniversaire-frame.webp); }
+.pf.pf-cx-anniversaire { box-shadow: 0 0 0 2px rgba(200, 140, 255, .55), 0 0 22px rgba(200, 140, 255, .7); animation: cxUlt 3s ease-in-out infinite; --g: 200, 140, 255; }
+@keyframes cxUlt { 50% { box-shadow: 0 0 0 2px rgba(var(--g), .75), 0 0 32px rgba(var(--g), .9); } }
+.dr-fin-coeurs .tcg-dress::after, .dr-fin-racines .tcg-dress::after, .dr-fin-carnaval .tcg-dress::after, .dr-fin-jardins .tcg-dress::after, .dr-fin-solstice .tcg-dress::after, .dr-fin-profondeurs .tcg-dress::after, .dr-fin-titans .tcg-dress::after, .dr-fin-moissons .tcg-dress::after, .dr-fin-anniversaire .tcg-dress::after { content: ''; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, .28) 50%, transparent 65%) 0 0 / 250% 100%; animation: cxFrost 3.8s ease-in-out infinite; }
+html.reduce-motion .pf.pf-cx-coeur-maudit, html.reduce-motion .pf.pf-cx-arbre-monde, html.reduce-motion .pf.pf-cx-arlequin, html.reduce-motion .pf.pf-cx-lune-reine, html.reduce-motion .pf.pf-cx-solstice-feu, html.reduce-motion .pf.pf-cx-profondeurs, html.reduce-motion .pf.pf-cx-titan, html.reduce-motion .pf.pf-cx-faucheur, html.reduce-motion .pf.pf-cx-anniversaire, html.reduce-motion .dr-fin-coeurs .tcg-dress::after, html.reduce-motion .dr-fin-racines .tcg-dress::after, html.reduce-motion .dr-fin-carnaval .tcg-dress::after, html.reduce-motion .dr-fin-jardins .tcg-dress::after, html.reduce-motion .dr-fin-solstice .tcg-dress::after, html.reduce-motion .dr-fin-profondeurs .tcg-dress::after, html.reduce-motion .dr-fin-titans .tcg-dress::after, html.reduce-motion .dr-fin-moissons .tcg-dress::after, html.reduce-motion .dr-fin-anniversaire .tcg-dress::after { animation: none; }
