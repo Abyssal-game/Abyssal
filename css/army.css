@@ -5315,3 +5315,36 @@ html.reduce-motion .pf.pf-cx-ames::before, html.reduce-motion .pf.pf-cx-noel, ht
 .dr-fin-coeurs .tcg-dress::after, .dr-fin-racines .tcg-dress::after, .dr-fin-carnaval .tcg-dress::after, .dr-fin-jardins .tcg-dress::after, .dr-fin-solstice .tcg-dress::after, .dr-fin-profondeurs .tcg-dress::after, .dr-fin-titans .tcg-dress::after, .dr-fin-moissons .tcg-dress::after, .dr-fin-anniversaire .tcg-dress::after { content: ''; position: absolute; inset: 0; border-radius: inherit;
   background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, .28) 50%, transparent 65%) 0 0 / 250% 100%; animation: cxFrost 3.8s ease-in-out infinite; }
 html.reduce-motion .pf.pf-cx-coeur-maudit, html.reduce-motion .pf.pf-cx-arbre-monde, html.reduce-motion .pf.pf-cx-arlequin, html.reduce-motion .pf.pf-cx-lune-reine, html.reduce-motion .pf.pf-cx-solstice-feu, html.reduce-motion .pf.pf-cx-profondeurs, html.reduce-motion .pf.pf-cx-titan, html.reduce-motion .pf.pf-cx-faucheur, html.reduce-motion .pf.pf-cx-anniversaire, html.reduce-motion .dr-fin-coeurs .tcg-dress::after, html.reduce-motion .dr-fin-racines .tcg-dress::after, html.reduce-motion .dr-fin-carnaval .tcg-dress::after, html.reduce-motion .dr-fin-jardins .tcg-dress::after, html.reduce-motion .dr-fin-solstice .tcg-dress::after, html.reduce-motion .dr-fin-profondeurs .tcg-dress::after, html.reduce-motion .dr-fin-titans .tcg-dress::after, html.reduce-motion .dr-fin-moissons .tcg-dress::after, html.reduce-motion .dr-fin-anniversaire .tcg-dress::after { animation: none; }
+
+/* v556 : Atelier des cosmétiques (Mode Créateur) : galerie, aperçu, tri garder / retirer / à revoir */
+.cl-lab h2 { margin-bottom: 6px; }
+.cl-seg { margin: 12px 0 8px; }
+.cl-chips { display: flex; gap: 6px; overflow-x: auto; padding: 4px 0 6px; scrollbar-width: none; }
+.cl-chips .chip { flex: none; }
+.cl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; margin-top: 8px; }
+.cl-tile { position: relative; display: grid; justify-items: center; align-content: start; gap: 4px; padding: 12px 6px 10px; border-radius: 4px 12px 4px 12px; border: 1px solid rgba(201, 164, 90, .25); background: rgba(12, 12, 20, .85); color: inherit; text-align: center; min-width: 0; }
+.cl-tile b { font: 700 .74rem/1.15 var(--f-ui); color: #EBD9B0; overflow-wrap: anywhere; }
+.cl-tile small { font-size: .62rem; line-height: 1.15; color: #9C93A8; overflow-wrap: anywhere; }
+.cl-th { display: grid; place-items: center; width: 100%; height: 108px; }
+.cl-th .avatar-big { width: 70px; height: 70px; }
+.cl-back { width: 66px; aspect-ratio: 5 / 7; object-fit: cover; border-radius: 6px; }
+.cl-fin { width: 72px; }
+.cl-fin .tcg { width: 100%; }
+.cl-miss { font-size: .62rem; color: #E08A8A; }
+.cl-st { position: absolute; top: 4px; right: 4px; font: 800 .58rem/1 var(--f-ui); font-style: normal; padding: 3px 6px; border-radius: 8px; }
+.cl-st.keep, .cl-v.keep.on { background: #2E7D4F; color: #fff; }
+.cl-st.drop, .cl-v.drop.on { background: #A33636; color: #fff; }
+.cl-st.maybe, .cl-v.maybe.on { background: #B8892E; color: #1A1206; }
+.cl-tile.keep { border-color: rgba(80, 200, 130, .6); }
+.cl-tile.drop { border-color: rgba(220, 80, 80, .7); opacity: .72; }
+.cl-tile.maybe { border-color: rgba(230, 180, 80, .7); }
+.cl-foot { display: grid; gap: 8px; margin: 18px 0 8px; }
+.cl-pos { margin: 0; }
+.cl-from { color: #C9A45A; margin: 2px 0 6px; }
+.cl-vote { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 18px 0 10px; }
+.cl-vote .btn { min-height: 48px; padding: 0 6px; }
+.cl-nav { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.cl-txt { width: 100%; min-height: 50vh; font: .78rem/1.35 ui-monospace, monospace; }
+.cl-dock { position: sticky; bottom: calc(-1 * var(--sheet-pad, 16px)); z-index: 5; margin: 14px -16px 0; padding: 10px 16px calc(10px + var(--safe-b, 0px)); background: linear-gradient(rgba(10, 11, 18, .86), rgba(10, 11, 18, .98)); border-top: 1px solid rgba(201, 164, 90, .3); }
+.cl-dock .cl-vote { margin: 0 0 8px; }
+.cl-dock .cl-nav { margin: 0; }

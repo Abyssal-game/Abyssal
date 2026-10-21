@@ -4,6 +4,7 @@ import { icon } from '../ui/icons.js';
 import { openSheet, esc, toast, confirmBox, fmt } from '../ui/dom.js';
 import { migrate } from '../core/save.js';
 import { BOSSES, BOSS_ORDER } from '../core/bosses.js';
+import { openCosmeticsLab } from './cosmetics-lab.js';
 
 const SNAP = 'abyssal.snapshot';
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -62,6 +63,10 @@ export function openCreator(app) {
         <p class="small muted">${g.s.devCodex ? 'Affichés : onglet Butin → Codex. Toi seul les vois (Mode Créateur).' : 'Le futur pass de saison et la boutique en argent réel, encore cachés aux joueurs. Les achats y sont simulés.'}</p>
         <div class="row gap wrap">${B('codex', g.s.devCodex ? 'Cacher le Codex et l’Échoppe' : 'Afficher le Codex et l’Échoppe', g.s.devCodex ? '' : 'gold')}${g.s.devCodex ? B('codexgo', 'Ouvrir le Codex', '') : ''}</div></section>
 
+      <section class="cr-sec"><h3>Atelier des cosmétiques</h3>
+        <p class="small muted">Tous les cadres, dos et finitions en aperçu, pour trier ceux à garder, à retirer ou à revoir.</p>
+        <div class="row gap wrap">${B('lab', 'Ouvrir l’Atelier', 'gold')}</div></section>
+
       <section class="cr-sec"><h3>Affronter un gardien</h3>
         <p class="small muted">Te place devant la porte du gardien (un chapitre est lancé si besoin, le présage est passé). Coche la case pour monter ton équipe au niveau attendu à cet étage.</p>
         <label class="small cr-bpow"><input type="checkbox" id="bpow" ${ui.bpow ? 'checked' : ''}> Équipe à la puissance de l’étage</label>
@@ -107,6 +112,7 @@ export function openCreator(app) {
       if (x === 'missions') g.devMissions();
       if (x === 'games') { g.s.devGames = !g.s.devGames; g.persist(); app.chrome?.(); }
       if (x === 'codex') { g.s.devCodex = !g.s.devCodex; g.persist(); app.chrome?.(); } /* v470 */
+      if (x === 'lab') { openCosmeticsLab(app); return; } /* v556 */
       if (x === 'codexgo') { sheet.close(); app.go('codex'); return; }
       if (x === 'off') { g.s.settings.devCode = false; g.setSetting('dev', false); sheet.close(); toast('Mode Créateur désactivé.', { icon: 'crown' }); return; }
       if (!['snap', 'restore'].includes(x)) toast('C’est fait.', { kind: 'success', icon: 'crown' });
