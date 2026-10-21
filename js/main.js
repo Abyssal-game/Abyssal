@@ -155,12 +155,15 @@ document.addEventListener('click', (e) => {
   sh.body.querySelector('a').addEventListener('click', (ev) => { ev.preventDefault(); sh.close(); app.go(route); }); /* v536 : sh.close() annulait le lien (history.back) */
 });
 
+// v541 : la barre du haut et celle du bas ne sont redessinées que si elles changent (images gardées, moins de travail à chaque toucher)
+const htmlOf = new WeakMap();
+function setIf(el, html) { if (htmlOf.get(el) !== html) { htmlOf.set(el, html); el.innerHTML = html; } }
 function renderChrome() {
   const g = app.game, s = g.s, lv = g.levelInfo();
   const avatarCard = s.avatar && g.catalog.get(s.avatar);
   const top = document.getElementById('topbar');
   const parent = PARENT[app.route];
-  top.innerHTML = `
+  setIf(top, `
     ${parent !== undefined ? `<a class="top-back" href="#/${parent}" aria-label="Retour" data-parent="${parent}">${icon('back')}</a>` : ''}
     <a class="top-brand" href="#/profil" aria-label="Profil : niveau ${lv.level}, ${esc(s.title)}">
       <span class="top-avatar pf pf-${s.frame}">${avatarCard ? `<img alt="" src="${artUrl(avatarCard, { lite: true })}">` : EMBLEM}</span>
@@ -170,11 +173,12 @@ function renderChrome() {
       <button class="pill shards" data-wallet="shards" title="Éclats" aria-label="${fmt(s.shards)} éclats : à quoi ça sert ?">${icon('crystal')}<span>${fmt(s.shards)}</span></button>
       <button class="pill ash" data-wallet="ash" title="Cendres" aria-label="${fmt(s.ash)} cendres : à quoi ça sert ?">${icon('ash')}<span>${fmt(s.ash)}</span></button>
       ${g.codexOn() ? `<button class="pill obs" data-obs title="Obsidiennes" aria-label="${fmt(g.obs())} obsidiennes : ouvrir l’Échoppe"><img class="obs-i" alt="" src="assets/icons/obsidienne.webp"><span>${fmt(g.obs())}</span></button>` : ''}
-    </div>`;
+    </div>`);
   top.classList.toggle('has-obs', g.codexOn()); /* v489 : obsidiennes à côté des cendres (tant que l'Échoppe est cachée, seulement en Mode Créateur) */
   // v319 : le bouton retour du haut revient en arrière dans l'historique quand la page précédente est bien le parent,
   // sinon il remplace la page courante : jamais d'entrée d'historique en plus
-  top.querySelector('.top-back')?.addEventListener('click', (e) => {
+  const tb = top.querySelector('.top-back');
+  if (tb && !tb.dataset.on) tb.dataset.on = '1', tb.addEventListener('click', (e) => {
     e.preventDefault();
     const parent = e.currentTarget.dataset.parent;
     if (app.prevHash === `#/${parent}` || (parent === '' && (app.prevHash === '#/' || app.prevHash === ''))) history.back();
@@ -199,10 +203,10 @@ function renderChrome() {
   const shown0 = sub && sub.filter(([r]) => (r !== 'tirage' || isLoggedIn() || app.route === 'tirage') && (r !== 'codex' || g.codexOn()));
   const shown = shown0 && shown0.length > 1 ? shown0 : null; /* v422 : pas de barre pour un seul sous-onglet */
   document.body.classList.toggle('has-subnav', !!shown);
-  sn.innerHTML = shown ? shown.map(([r, ic, label]) => { const bd = subBadge(r); return `<a class="sn-tab${r === 'jeux' && !g.sceauxOpen() ? ' locked' : ''}" href="#/${r}"${r === (SUB_OF[app.route] || app.route) ? ' aria-current="page"' : ''}><img class="sn-ic" alt="" src="assets/icons/${ic}.webp"><span>${label}</span>${bd ? `<i class="sn-badge">${bd}</i>` : ''}</a>`; }).join('') : '';
+  setIf(sn, shown ? shown.map(([r, ic, label]) => { const bd = subBadge(r); return `<a class="sn-tab${r === 'jeux' && !g.sceauxOpen() ? ' locked' : ''}" href="#/${r}"${r === (SUB_OF[app.route] || app.route) ? ' aria-current="page"' : ''}><img class="sn-ic" alt="" src="assets/icons/${ic}.webp"><span>${label}</span>${bd ? `<i class="sn-badge">${bd}</i>` : ''}</a>`; }).join('') : '');
   const nNew = g.newCount();
   const ticketCount = Object.values(s.tickets).reduce((a, b) => a + b, 0) + (g.welcomePending() ? 0 : g.freePack().stock); /* v404 : « 2 » comme l'annonce l'Accueil au tout début */
-  document.getElementById('tabbar').innerHTML = TABS.map(([key, ic, label]) => {
+  setIf(document.getElementById('tabbar'), TABS.map(([key, ic, label]) => {
     const cur = key === tab ? ' aria-current="page"' : '';
     // moins de pastilles : un chiffre seulement pour ce qui attend d'être ouvert (boosters, coffres), sinon un simple point
     const dot = '<span class="badge dot"></span>';
@@ -214,7 +218,7 @@ function renderChrome() {
       : key === 'descente' && g.team().length >= 3 && (g.descent().run || g.trials().done.some((x) => !x)) ? dot : ''; /* v407 : Épreuves du jour à jouer */
     if (key === 'boutique') return `<a class="tab tab-main" href="#/boutique"${cur}><span class="orb">${tabIcon(ic)}</span>${label}${badge}</a>`;
     return `<a class="tab" href="#/${key}"${cur}>${tabIcon(ic)}${label}${badge}</a>`;
-  }).join('');
+  }).join(''));
 }
 
 let lastShards = null;

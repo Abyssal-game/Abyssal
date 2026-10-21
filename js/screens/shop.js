@@ -145,17 +145,20 @@ export default function shop(app, root, params = []) {
         ${g.s.tickets.abysse ? card('abysse') : ''}
       </div>
     `;
-    fitBuy(); requestAnimationFrame(fitBuy); setTimeout(fitBuy, 120); setTimeout(fitBuy, 600); document.fonts?.ready.then(fitBuy); /* après la traduction et la police */
+    requestAnimationFrame(fitBuy); setTimeout(fitBuy, 600); document.fonts?.ready.then(fitBuy); /* après la traduction et la police */
   }
   // v529 : le texte d'un bouton d'ouverture se réduit juste assez pour rester dans son cadre (il débordait sur le bord doré)
   function fitBuy() {
-    root.querySelectorAll('.shop-buy').forEach((b) => {
-      b.style.removeProperty('font-size');
+    /* v541 : mesures d'abord, puis écritures (avant : un recalcul de la page entière par bouton et par demi-pixel) */
+    const bs = [...root.querySelectorAll('.shop-buy')];
+    bs.forEach((b) => b.style.removeProperty('font-size'));
+    const sizes = bs.map((b) => {
       const cs = getComputedStyle(b), avail = b.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
       const r = document.createRange(); r.selectNodeContents(b);
-      let fs = parseFloat(cs.fontSize), k = 0;
-      while (avail > 0 && r.getBoundingClientRect().width > avail && fs > 9 && k++ < 16) { fs -= 0.5; b.style.setProperty('font-size', `${fs}px`, 'important'); }
+      const w = r.getBoundingClientRect().width, fs = parseFloat(cs.fontSize);
+      return avail > 0 && w > avail ? Math.max(9, Math.floor((fs * avail / w) * 2) / 2) : 0;
     });
+    bs.forEach((b, i) => { if (sizes[i]) b.style.setProperty('font-size', `${sizes[i]}px`, 'important'); });
   }
   // v422 : boosters déjà à toi (tickets et boosters gratuits), ouverts d'un coup avec un récapitulatif
   function ownedPacks() {

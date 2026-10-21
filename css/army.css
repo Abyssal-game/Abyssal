@@ -5169,3 +5169,9 @@ html.fx-light .cxk-c.ready { animation: none; }
 /* v537 : six langues : boutons sur deux colonnes */
 .seg.lang-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; height: auto; }
 .seg.lang-grid .seg-b { min-height: 44px; white-space: normal; line-height: 1.15; }
+
+/* v541 : changement d'écran plus vif : le texte apparaît en même temps que le son du toucher (avant : fondu depuis l'invisible en 0,32 s) */
+#view.view-in { animation: viewSlide541 .18s ease-out both !important; }
+@keyframes viewSlide541 { from { opacity: .55; transform: translateX(calc(var(--vdx, 0px) * .5)); } }
+@media (prefers-reduced-motion: reduce) { #view.view-in { animation: none !important; } }
+html.reduce-motion #view.view-in { animation: none !important; }

@@ -16,28 +16,36 @@ const RI = (r) => ['C', 'PC', 'R', 'HR', 'M', 'S'].indexOf(r);
 // preset : ouverture déjà tirée ailleurs (Tirage des Ombres) : rien n'est ajouté à la collection
 // v539 : le booster est tiré par le serveur de partie (anti-triche) : on attend sa réponse avant l'ouverture
 let asking = false;
+// v541 : titre connu avant la réponse du serveur (même ordre de paiement que game.openBooster : ticket, gratuit, éclats)
+function guessTitle(g, type) {
+  if ((g.s.tickets[type] || 0) > 0) return type === 'standard' && g.s.welcomeGift > 0 ? `Cadeau de bienvenue · ${GIFT_N - g.s.welcomeGift + 1} / ${GIFT_N}` : null;
+  if (type === 'standard' && g.freePack().stock > 0) return 'Booster gratuit du jour';
+  return null;
+}
+function canPay(g, type) {
+  const def = BOOSTERS[type];
+  if ((g.s.tickets[type] || 0) > 0 || (type === 'standard' && g.freePack().stock > 0)) return true;
+  if (g.s.shards >= def.price) return true;
+  throw new Error(`Il te manque ${def.price - g.s.shards} éclats (tu en as ${g.s.shards}). La Descente et les Duels des Sceaux en rapportent.`);
+}
 export async function openPack(app, type, { faction, onDone, preset = null, title = null, packKey = null } = {}) {
   const g = app.game, cat = app.catalog;
-  let result;
   if (asking) return;
+  const fail = (e) => { asking = false; app.pendingProgress = null; app.sfx.error(); toast(esc(e.message), { kind: 'error', icon: 'info' }); };
+  const viaServer = !preset && !!app.partie;
+  if (!title && !preset) title = guessTitle(g, type);
+  try { if (!preset) canPay(g, type); } catch (e) { fail(e); return; }
   if (!preset) app.pendingProgress = [];
-  try {
-    asking = true;
-    result = preset ? { opening: preset } : app.partie ? await app.partie.first('openBooster', type, { faction }) : g.openBooster(type, { faction });
-  } catch (e) {
-    asking = false;
-    app.pendingProgress = null;
-    app.sfx.error();
-    toast(esc(e.message), { kind: 'error', icon: 'info' });
-    return;
-  }
-  asking = false;
-  const { opening } = result;
-  /* v518 : le joueur voit ce qu'il ouvre : cadeau de bienvenue, booster gratuit du jour */
-  if (!title && opening.gift) title = `Cadeau de bienvenue · ${opening.gift} / ${GIFT_N}`;
-  else if (!title && opening.paidWith === 'free') title = 'Booster gratuit du jour';
-  // illustrations chargées dès maintenant : la carte se retourne sans passer par un fond noir
-  const pre = opening.cards.map((c) => { const im = new Image(); im.decoding = 'async'; im.src = artUrl(cat.get(c.id), { variant: c.variant }); return im; });
+  asking = true;
+  // v541 : le booster s'affiche tout de suite ; le serveur tire les cartes pendant qu'on le déchire
+  let opening = null;
+  const got = (async () => (preset ? { opening: preset } : viaServer ? app.partie.first('openBooster', type, { faction }) : g.openBooster(type, { faction })))()
+    .then((r) => { opening = r.opening; asking = false; return opening; }, (e) => { fail(e); throw e; });
+  got.catch(() => {});
+  if (!viaServer || g.s.settings.fastOpen) { try { await got; } catch (e) { return; } }
+  // illustrations chargées dès que les cartes sont connues : la carte se retourne sans passer par un fond noir
+  let pre = [];
+  got.then((op) => { pre = op.cards.map((c) => { const im = new Image(); im.decoding = 'async'; im.src = artUrl(cat.get(c.id), { variant: c.variant }); return im; }); }, () => {});
   const ready = (i) => Promise.race([pre[i]?.decode ? pre[i].decode().catch(() => {}) : Promise.resolve(), new Promise((r) => setTimeout(r, 900))]);
   const reduced = app.reduced();
   const fast = g.s.settings.fastOpen;
@@ -52,7 +60,7 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
   el.innerHTML = `<div class="op-bg"></div><div class="op-rays"></div>
     <header class="op-top"><span class="op-title">${esc(title || def.name)}</span><button class="btn small dc-plq dc-plq-dark op-all" data-op="all">${icon('skip')}Tout révéler</button></header>
     <div class="op-stage" aria-live="polite"></div>
-    <footer class="op-bottom"><div class="op-dots">${opening.cards.map(() => '<i></i>').join('')}</div><p class="op-hint small muted"></p></footer>`;
+    <footer class="op-bottom"><div class="op-dots">${(opening?.cards || BOOSTERS[type].slots).map(() => '<i></i>').join('')}</div><p class="op-hint small muted"></p></footer>`;
   document.body.appendChild(el);
   document.body.classList.add('has-sheet');
   const stage = el.querySelector('.op-stage');
@@ -107,8 +115,10 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
     </div>`;
     hint.innerHTML = `${icon('sparkle')} Glisse le doigt le long de la ligne pour déchirer, ou touche le booster.`;
     const pack = stage.querySelector('.op-pack');
-    const top = opening.cards.reduce((m, c) => (RI(c.rarity) > RI(m) ? c.rarity : m), 'C');
-    if (RI(top) >= 3) { pack.classList.add('pk-aura', `pk-aura-${top}`); pack.style.setProperty('--aura', RARITY[top].color); }
+    got.then((op) => { /* v541 : l'aura vient quand le serveur a tiré les cartes */
+      const top = op.cards.reduce((m, c) => (RI(c.rarity) > RI(m) ? c.rarity : m), 'C');
+      if (RI(top) >= 3) { pack.classList.add('pk-aura', `pk-aura-${top}`); pack.style.setProperty('--aura', RARITY[top].color); }
+    }, () => {});
     const sl = [...pack.querySelectorAll('.pk-slice')];
     const edge = pack.querySelector('.pk-edge path');
     let start = null, p = 0, dir = 1, lastTick = 0, done = false;
@@ -186,6 +196,8 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
     await wait(380);
     pack.classList.add('open');
     await wait(560);
+    if (!opening) { try { await got; } catch (e) { close(); return; } } // v541 : réseau lent : le booster reste ouvert jusqu'aux cartes
+    if (closed) return;
     el.classList.add('flash');
     pack.classList.add('out');
     await wait(420);
@@ -352,6 +364,7 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
 
   function summary() {
     if (phase === 'summary') return;
+    if (!opening) { got.then(() => summary(), () => close()); return; }
     phase = 'summary';
     el.querySelector('.op-all')?.setAttribute('hidden', ''); // v311 : tout est révélé, le bouton n'a plus de sens
     busy = false;
@@ -433,4 +446,5 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
 
   if (fast) summary();
   else showPack();
+  got.catch(() => { if (phase === 'pack' && !busy) close(); }); // v541 : refusé par le serveur avant la déchirure
 }
