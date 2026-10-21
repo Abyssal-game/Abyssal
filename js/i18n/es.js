@@ -1,5 +1,9 @@
 // Dictionnaire espagnol (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres des Cœurs maudits, introuvables à l’Échoppe. Au palier {0}, la Couronne du Cœur maudit et le titre Souverain des Cœurs maudits.": "Una recompensa en cada nivel: marcos, reversos, acabados y títulos de los Corazones malditos, imposibles de encontrar en el Bazar. En el nivel {0}, la Corona del Corazón maldito y el título Soberano de los Corazones malditos.",
+  "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de la Veillée de Noël, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Veillée et le titre Gardien de la Veillée.": "Una recompensa en cada nivel: marcos, reversos, acabados y títulos de la Nochebuena, imposibles de encontrar en el Bazar. En el nivel {0}, la Corona de la Velada y el título Guardián de la Velada.",
+  "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Reine de l’Hiver et le titre Souverain de l’Hiver éternel.": "Una recompensa en cada nivel: marcos, reversos, acabados y títulos del Invierno eterno, imposibles de encontrar en el Bazar. En el nivel {0}, la Corona de la Reina del Invierno y el título Soberano del Invierno eterno.",
+  "Vendu une seule fois. Le dos de cartes du Fondateur, le titre « Fondateur » (badge au classement) et {0} obsidiennes.": "Se vende una sola vez. El reverso de cartas del Fundador, el título «Fundador» (insignia en la clasificación) y {0} obsidianas.",
   "Tire encore": "Roba otra",
   "Double ou rien (+{0} ou {1})": "Doble o nada (+{0} o {1})",
   "{0} fois par partie": "{0} vez por partida",

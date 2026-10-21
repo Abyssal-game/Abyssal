@@ -29,8 +29,9 @@ test('codex : voie gratuite récupérable, voie enluminée fermée sans achat', 
   assert.throws(() => g.codexClaim('free', 5), /pas encore/);
   assert.throws(() => g.codexClaim('prem', 1), /voie enluminée/);
   g.codex().premium = true;
+  const r3 = CODEX_TIERS[2].prem, obs3 = g.s.obs || 0; /* v562 : le palier 3 de la saison I donne des obsidiennes (cadre retiré) */
   g.codexClaim('prem', 3);
-  assert.ok(g.s.frames.includes(CODEX_TIERS[2].prem.frame));
+  assert.ok(r3.frame ? g.s.frames.includes(r3.frame) : (g.s.obs || 0) === obs3 + r3.obs);
   assert.equal(claimable(g.codex()), 2); // paliers 1 et 2 de la voie enluminée (titre, obsidiennes)
 });
 
@@ -49,7 +50,7 @@ test('codex v547 : une récompense enluminée à chaque palier, aucune n’est �
   const last = CODEX_TIERS[CODEX.tiers - 1].prem;
   assert.ok(last.frame && last.finish && last.title);
   const obs = CODEX_TIERS.reduce((n, t) => n + (t.prem.obs || 0), 0);
-  assert.ok(obs <= 400, 'les obsidiennes de la voie enluminée restent modestes');
+  assert.ok(obs <= 450, 'les obsidiennes de la voie enluminée restent modestes');
 });
 
 test('échoppe : fermée hors Mode Créateur, achat simulé ensuite (une seule fois pour le Fondateur)', () => {
@@ -57,7 +58,7 @@ test('échoppe : fermée hors Mode Créateur, achat simulé ensuite (une seule f
   assert.throws(() => g.shopBuy('fondateur'), /pas encore ouverte/);
   g.s.settings.dev = true; g.s.devCodex = true;
   g.shopBuy('fondateur');
-  assert.ok(g.s.titles.includes('Fondateur') && g.s.frames.includes('cx-fondateur') && g.s.backs.includes('dos-fondateur'));
+  assert.ok(g.s.titles.includes('Fondateur') && g.s.backs.includes('dos-fondateur'));
   assert.throws(() => g.shopBuy('fondateur'), /Déjà/);
   assert.equal(g.obs(), 600);
   g.shopBuy('obs-100'); g.shopBuy('obs-100');
@@ -97,15 +98,15 @@ test('v482 : finitions de prestige, achetées une fois, posées seulement sur un
   g.s.settings.dev = true; g.s.devCodex = true; g.s.obs = 2000;
   const id = Object.keys(g.s.collection)[0] || catalog.cards[0].id;
   if (!g.owns(id)) g.addCard?.(id);
-  assert.throws(() => g.setDress(id, 'fin-vitrail'), /pas encore/);
-  g.catalogBuy('fin-vitrail');
-  assert.ok(g.s.finishes.includes('fin-vitrail') && g.catalogOwned('fin-vitrail'));
-  g.setDress(id, 'fin-vitrail');
-  assert.equal(g.s.dress[id], 'fin-vitrail');
+  assert.throws(() => g.setDress(id, 'fin-neant'), /pas encore/);
+  g.catalogBuy('fin-neant');
+  assert.ok(g.s.finishes.includes('fin-neant') && g.catalogOwned('fin-neant'));
+  g.setDress(id, 'fin-neant');
+  assert.equal(g.s.dress[id], 'fin-neant');
   g.setDress(id, null);
   assert.equal(g.s.dress[id], undefined);
   const other = catalog.cards.find((c) => !g.owns(c.id)).id;
-  assert.throws(() => g.setDress(other, 'fin-vitrail'), /possèdes pas/);
+  assert.throws(() => g.setDress(other, 'fin-neant'), /possèdes pas/);
 });
 
 // v538 : la saison commence le 1er décembre ; les points d'avant ne comptent pas
@@ -136,11 +137,11 @@ test('codex v550 : trois saisons d’un mois, les récompenses oubliées sont do
   now = day(12, 1); assert.equal(g.codexSeason().key, 's2-noel');
   now = day(13, 31); assert.equal(g.codexSeason().key, 's3-hiver');
   now = day(11, 10);
-  g.codex(); g.codexXp(CODEX.xpPerTier * 4, 'win'); g.codex().premium = true;
-  const shards = g.s.shards, frames = g.s.frames.length;
+  g.codex(); g.codexXp(CODEX.xpPerTier * 6, 'win'); g.codex().premium = true;
+  const shards = g.s.shards, frames = (g.s.backs || []).length; /* v562 : palier 6 = dos de la Nuit des Âmes */
   now = day(12, 1);
   const c = g.codex();
   assert.equal(c.season, 's2-noel'); assert.equal(c.xp, 0); assert.ok(!c.premium, 'le Codex enluminé se rachète à chaque saison');
-  assert.ok(g.s.shards > shards, 'éclats des paliers gratuits donnés'); assert.ok(g.s.frames.length > frames, 'cadre du palier 3 donné');
+  assert.ok(g.s.shards > shards, 'éclats des paliers gratuits donnés'); assert.ok((g.s.backs || []).length > frames, 'dos du palier 6 donné');
   assert.equal(g.s.codexPast.season, 's1-ames');
 });

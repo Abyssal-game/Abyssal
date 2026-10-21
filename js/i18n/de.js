@@ -1,5 +1,9 @@
 // Dictionnaire allemand (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres des Cœurs maudits, introuvables à l’Échoppe. Au palier {0}, la Couronne du Cœur maudit et le titre Souverain des Cœurs maudits.": "Eine Belohnung auf jeder Stufe: Rahmen, Kartenrücken, Veredelungen und Titel der verfluchten Herzen, die es im Laden nicht gibt. Auf Stufe {0} die Krone des verfluchten Herzens und der Titel Herrscher der verfluchten Herzen.",
+  "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de la Veillée de Noël, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Veillée et le titre Gardien de la Veillée.": "Eine Belohnung auf jeder Stufe: Rahmen, Kartenrücken, Veredelungen und Titel zu Heiligabend, die es im Laden nicht gibt. Auf Stufe {0} die Krone der Heiligen Nacht und der Titel Hüter der Heiligen Nacht.",
+  "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Reine de l’Hiver et le titre Souverain de l’Hiver éternel.": "Eine Belohnung auf jeder Stufe: Rahmen, Kartenrücken, Veredelungen und Titel des ewigen Winters, die es im Laden nicht gibt. Auf Stufe {0} die Krone der Winterkönigin und der Titel Herrscher des ewigen Winters.",
+  "Vendu une seule fois. Le dos de cartes du Fondateur, le titre « Fondateur » (badge au classement) et {0} obsidiennes.": "Nur einmal erhältlich. Der Kartenrücken des Gründers, der Titel „Gründer“ (Abzeichen in der Rangliste) und {0} Obsidiane.",
   "Tire encore": "Zieh weiter",
   "Double ou rien (+{0} ou {1})": "Doppelt oder nichts (+{0} oder {1})",
   "{0} fois par partie": "{0}× pro Partie",

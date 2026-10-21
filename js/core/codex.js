@@ -122,12 +122,16 @@ const B = (k, cost) => ({ id: k, kind: 'back', give: { back: k }, cost });
 const FN = (k, cost) => ({ id: k, kind: 'finish', give: { finish: k }, cost });
 export const ROYAUMES = ['dos-infernal', 'dos-abyssal', 'dos-celeste', 'dos-sauvage', 'dos-necrotique', 'dos-primordial', 'dos-artificiel'];
 /* v535 : cadres de la meute, des corbeaux, des chaînes et des roses noires retirés de la vente (leur ornement cachait le visage de la créature) */
-export const CATALOG = [ F('cx-os', 120), F('cx-serpents', 120), F('cx-vitrail', 120), F('cx-rouages', 120), F('cx-yeux', 140), F('cx-ruche', 140),
-  F('cx-prince', 250), F('cx-leviathan', 250), F('cx-seraphin', 250), F('cx-liche', 250), F('cx-ouroboros', 250), F('cx-automate', 250), F('cx-gueule', 200), F('cx-eclipse', 200), F('cx-horloger', 200), F('cx-balance', 200),
-  F('cx-constellation', 280), F('cx-geode', 180), F('cx-sablier', 180), F('cx-pages', 180), F('cx-souverain', 450),
+/* v562 : tri du propriétaire (Atelier des cosmétiques, 21 octobre 2026) : 25 objets retirés (RETIRED_COSM). Ils restent
+   connus (CODEX_FRAMES, FINISHES, CSS) pour les parties qui les auraient, mais ne se gagnent ni ne s'achètent plus. */
+export const RETIRED_COSM = ['cx-fondateur', 'cx-os', 'cx-ruche', 'cx-lanternes', 'cx-voile', 'cx-eclipse', 'cx-balance', 'cx-geode', 'cx-pages', 'cx-corbeau', 'cx-carnaval', 'cx-phalenes',
+  'fin-vitrail', 'fin-constellee', 'fin-ossuaire', 'fin-nacree', 'fin-runique', 'fin-scellee', 'fin-draconique', 'fin-feux-follets', 'fin-houx', 'fin-noel', 'fin-roses', 'fin-coeurs', 'fin-hiver'];
+export const CATALOG = [ F('cx-serpents', 120), F('cx-vitrail', 120), F('cx-rouages', 120), F('cx-yeux', 140), 
+  F('cx-prince', 250), F('cx-leviathan', 250), F('cx-seraphin', 250), F('cx-liche', 250), F('cx-ouroboros', 250), F('cx-automate', 250), F('cx-gueule', 200), F('cx-horloger', 200), 
+  F('cx-constellation', 280), F('cx-sablier', 180), F('cx-souverain', 450),
   B('dos-abime', 140), B('dos-lune-sang', 200), B('dos-devoreur', 200), B('dos-eclipse', 200), B('dos-horloger', 200), B('dos-miroirs', 200), B('dos-jumeaux', 200), B('dos-titan', 200),
-  B('dos-abysse', 280), B('dos-tarot', 200), B('dos-mosaique', 200), B('dos-encre', 200), B('dos-alchimie', 200), B('dos-carte-abysse', 200), B('dos-reliquaire', 280), B('dos-tapisserie', 200), B('dos-art-deco', 280), B('dos-vivant', 280), B('dos-nebuleuse', 280), B('dos-vitrail', 200), ...ROYAUMES.map((k) => B(k, 120)), FN('fin-vitrail', 350),
-  FN('fin-estampe', 300), FN('fin-constellee', 350), FN('fin-ossuaire', 300), FN('fin-nacree', 300), FN('fin-runique', 300), FN('fin-scellee', 300), FN('fin-draconique', 350), FN('fin-imperiale', 450), FN('fin-neant', 450), F('cx-phalenes', 180), F('cx-cristaux-sang', 280), B('dos-phalene', 200), B('dos-coeur-mecanique', 280),
+  B('dos-abysse', 280), B('dos-tarot', 200), B('dos-mosaique', 200), B('dos-encre', 200), B('dos-alchimie', 200), B('dos-carte-abysse', 200), B('dos-reliquaire', 280), B('dos-tapisserie', 200), B('dos-art-deco', 280), B('dos-vivant', 280), B('dos-nebuleuse', 280), B('dos-vitrail', 200), ...ROYAUMES.map((k) => B(k, 120)),
+  FN('fin-estampe', 300), FN('fin-imperiale', 450), FN('fin-neant', 450), F('cx-cristaux-sang', 280), B('dos-phalene', 200), B('dos-coeur-mecanique', 280),
   { id: 'royaumes', kind: 'bundle', name: 'Les sept royaumes', give: { backs: ROYAUMES }, cost: 600, desc: 'Les sept dos des royaumes d’un coup (840 à l’unité).' },
 ];
 // Exclusifs du Codex enluminé (jamais en vente). v547 : tous les cosmétiques de la voie enluminée (Saison I : l'hiver),
@@ -161,26 +165,26 @@ function premOf({ titles, items, ultimate }) {
 }
 export const SEASONS = [
   { key: 's1-ames', num: 'I', name: 'La Nuit des Âmes', starts: '2026-11-01', ends: '2026-11-30', art: 'assets/ui/cx-saison-ames.webp',
-    best: ['cx-ames', 'dos-cimetiere', 'cx-lanternes'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de la Nuit des Âmes, introuvables à l’Échoppe. Au palier 30, la Couronne du Passeur des Âmes et la finition Nuit des Âmes.',
+    best: ['cx-ames', 'dos-cimetiere', 'dos-ames'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de la Nuit des Âmes, introuvables à l’Échoppe. Au palier 30, la Couronne du Passeur des Âmes et la finition Nuit des Âmes.',
     titles: ['Veilleur des tombes', 'Porteur de lanterne', 'Ami des feux follets', 'Voix des trépassés', 'Gardien des âmes perdues', 'Celui qui ne dort pas'],
-    items: [{ frame: 'cx-lanternes' }, { back: 'dos-ames' }, { finish: 'fin-spectrale' }, { frame: 'cx-citrouilles' }, { frame: 'cx-voile' }, { back: 'dos-cimetiere' }, null, { finish: 'fin-feux-follets' }],
+    items: [null, { back: 'dos-ames' }, { finish: 'fin-spectrale' }, { frame: 'cx-citrouilles' }, null, { back: 'dos-cimetiere' }],
     ultimate: { frame: 'cx-ames', finish: 'fin-ames', title: 'Passeur des Âmes' } },
   { key: 's2-noel', num: 'II', name: 'La Veillée de Noël', starts: '2026-12-01', ends: '2026-12-31', art: 'assets/ui/cx-saison-noel.webp',
-    best: ['cx-noel', 'dos-presents', 'cx-houx'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de la Veillée de Noël, introuvables à l’Échoppe. Au palier 30, la Couronne de la Veillée et la finition Veillée de Noël.',
+    best: ['cx-noel', 'dos-presents', 'cx-houx'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de la Veillée de Noël, introuvables à l’Échoppe. Au palier 30, la Couronne de la Veillée et le titre Gardien de la Veillée.',
     titles: ['Porteur de chandelles', 'Chanteur de minuit', 'Gardien du houx', 'Hôte de la Veillée', 'Messager des présents', 'Cœur de braise'],
-    items: [{ frame: 'cx-houx' }, { back: 'dos-solstice' }, { finish: 'fin-houx' }, { frame: 'cx-guirlandes' }, null, { back: 'dos-presents' }],
-    ultimate: { frame: 'cx-noel', finish: 'fin-noel', title: 'Gardien de la Veillée' } },
+    items: [{ frame: 'cx-houx' }, { back: 'dos-solstice' }, null, { frame: 'cx-guirlandes' }, null, { back: 'dos-presents' }],
+    ultimate: { frame: 'cx-noel', title: 'Gardien de la Veillée' } },
   { key: 's3-hiver', num: 'III', name: 'L’Hiver éternel', starts: '2027-01-01', ends: '2027-01-31', art: 'assets/ui/cx-saison1.webp',
-    best: ['cx-hiver', 'dos-hiver', 'cx-aurore'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier 30, la Couronne de la Reine de l’Hiver et la finition Hiver éternel.',
+    best: ['cx-hiver', 'dos-hiver', 'cx-aurore'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier 30, la Couronne de la Reine de l’Hiver et le titre Souverain de l’Hiver éternel.',
     titles: ['Veilleur du long hiver', 'Marcheur des neiges', 'Chasseur d’aurores', 'Cœur de givre', 'Voix du blizzard', 'Gardien du solstice'],
     items: [{ frame: 'cx-givre' }, { back: 'dos-blizzard' }, { finish: 'fin-givree' }, { frame: 'cx-aurore' }, { frame: 'cx-glace-noire' }, null, { frame: 'cx-loups-neige' }, { finish: 'fin-aurore' }, { back: 'dos-hiver' }],
-    ultimate: { frame: 'cx-hiver', finish: 'fin-hiver', title: 'Souverain de l’Hiver éternel' } },
+    ultimate: { frame: 'cx-hiver', title: 'Souverain de l’Hiver éternel' } },
   /* v552 : une saison par mois toute l'année (calendrier validé par le propriétaire le 21 octobre 2026) */
   { key: 's4-coeurs', num: 'IV', name: 'Les Cœurs maudits', starts: '2027-02-01', ends: '2027-02-28', art: 'assets/ui/cx-saison-coeurs.webp',
-    best: ['cx-coeur-maudit', 'dos-coeurs', 'cx-coeurs'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres des Cœurs maudits, introuvables à l’Échoppe. Au palier 30, la Couronne du Cœur maudit et la finition Cœurs maudits.',
+    best: ['cx-coeur-maudit', 'dos-coeurs', 'cx-coeurs'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres des Cœurs maudits, introuvables à l’Échoppe. Au palier 30, la Couronne du Cœur maudit et le titre Souverain des Cœurs maudits.',
     titles: ['Amant des ombres', 'Porteur de roses noires', 'Cœur épineux', 'Âme liée', 'Briseur de serments', 'Soupir de l’Abysse'],
-    items: [{ frame: 'cx-coeurs' }, { back: 'dos-roses' }, { finish: 'fin-ecarlate' }, { frame: 'cx-epines' }, null, { back: 'dos-coeurs' }, null, { finish: 'fin-roses' }],
-    ultimate: { frame: 'cx-coeur-maudit', finish: 'fin-coeurs', title: 'Souverain des Cœurs maudits' } },
+    items: [{ frame: 'cx-coeurs' }, { back: 'dos-roses' }, { finish: 'fin-ecarlate' }, { frame: 'cx-epines' }, null, { back: 'dos-coeurs' }, null, { frame: 'cx-roses' }],
+    ultimate: { frame: 'cx-coeur-maudit', title: 'Souverain des Cœurs maudits' } },
   { key: 's5-racines', num: 'V', name: 'Le Réveil des Racines', starts: '2027-03-01', ends: '2027-03-31', art: 'assets/ui/cx-saison-racines.webp',
     best: ['cx-arbre-monde', 'dos-racines', 'cx-mandragore'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres du Réveil des Racines, introuvables à l’Échoppe. Au palier 30, la Couronne de l’Arbre-Monde et la finition Réveil des Racines.',
     titles: ['Graine de l’Abysse', 'Éveilleur de sève', 'Ami des mandragores', 'Voix de la forêt', 'Cœur de chêne', 'Racine profonde'],
@@ -189,7 +193,7 @@ export const SEASONS = [
   { key: 's6-carnaval', num: 'VI', name: 'Le Carnaval des Ombres', starts: '2027-04-01', ends: '2027-04-30', art: 'assets/ui/cx-saison-carnaval.webp',
     best: ['cx-arlequin', 'dos-bal', 'cx-masques'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres du Carnaval des Ombres, introuvables à l’Échoppe. Au palier 30, la Couronne de l’Arlequin noir et la finition Carnaval des Ombres.',
     titles: ['Danseur masqué', 'Visage de velours', 'Rire dans l’ombre', 'Maître des confettis', 'Invité du bal', 'Celui qui change de visage'],
-    items: [{ frame: 'cx-carnaval' }, { back: 'dos-carnaval' }, { finish: 'fin-masques' }, { frame: 'cx-masques' }, null, { back: 'dos-bal' }],
+    items: [null, { back: 'dos-carnaval' }, { finish: 'fin-masques' }, { frame: 'cx-masques' }, null, { back: 'dos-bal' }],
     ultimate: { frame: 'cx-arlequin', finish: 'fin-carnaval', title: 'Maître du Carnaval' } },
   { key: 's7-lune', num: 'VII', name: 'Les Jardins de la Lune pâle', starts: '2027-05-01', ends: '2027-05-31', art: 'assets/ui/cx-saison-lune.webp',
     best: ['cx-lune-reine', 'dos-jardin', 'cx-lune-pale'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes, finitions et titres des Jardins de la Lune pâle, introuvables à l’Échoppe. Au palier 30, la Couronne de la Reine de la Lune et la finition Jardins de la Lune.',
@@ -236,8 +240,8 @@ export const SHOP = [
   ...OBS_PACKS.map((p) => ({ id: p.id, kind: 'obs', name: `${p.n + p.bonus} obsidiennes`, price: p.price, store: p.store, give: { obs: p.n + p.bonus }, bonus: p.bonus })),
   { id: 'codex', kind: 'codex', name: 'Codex enluminé', price: CODEX.price, store: CODEX.store, give: { codexPremium: true } }, /* v548 : vendu dans l'onglet du Codex, une fois par saison */
   { id: 'fondateur', name: 'Pack du Fondateur', price: '4,99 €', store: 'com.abyssalgame.abyssal.fondateur', once: true,
-    give: { frame: 'cx-fondateur', title: 'Fondateur', back: 'dos-fondateur', obs: 600 },
-    desc: 'Vendu une seule fois. Le cadre et le dos de cartes du Fondateur, le titre « Fondateur » (badge au classement) et 600 obsidiennes.' },
+    give: { title: 'Fondateur', back: 'dos-fondateur', obs: 600 }, /* v562 : cadre du Fondateur retiré (tri du propriétaire) */
+    desc: 'Vendu une seule fois. Le dos de cartes du Fondateur, le titre « Fondateur » (badge au classement) et 600 obsidiennes.' },
 ];
 
 // ——— État ———

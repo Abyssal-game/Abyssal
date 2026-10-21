@@ -1,5 +1,9 @@
 // Dictionnaire italien (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres des Cœurs maudits, introuvables à l’Échoppe. Au palier {0}, la Couronne du Cœur maudit et le titre Souverain des Cœurs maudits.": "Una ricompensa a ogni livello: cornici, dorsi, finiture e titoli dei Cuori maledetti, introvabili nella Bottega. Al livello {0}, la Corona del Cuore maledetto e il titolo Sovrano dei Cuori maledetti.",
+  "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de la Veillée de Noël, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Veillée et le titre Gardien de la Veillée.": "Una ricompensa a ogni livello: cornici, dorsi, finiture e titoli della Vigilia di Natale, introvabili nella Bottega. Al livello {0}, la Corona della Vigilia e il titolo Custode della Vigilia.",
+  "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Reine de l’Hiver et le titre Souverain de l’Hiver éternel.": "Una ricompensa a ogni livello: cornici, dorsi, finiture e titoli dell’Inverno eterno, introvabili nella Bottega. Al livello {0}, la Corona della Regina dell’Inverno e il titolo Sovrano dell’Inverno eterno.",
+  "Vendu une seule fois. Le dos de cartes du Fondateur, le titre « Fondateur » (badge au classement) et {0} obsidiennes.": "Venduto una sola volta. Il dorso del Fondatore, il titolo «Fondatore» (distintivo in classifica) e {0} ossidiane.",
   "Tire encore": "Pesca ancora",
   "Double ou rien (+{0} ou {1})": "Raddoppia o niente (+{0} o {1})",
   "{0} fois par partie": "{0} volta per partita",

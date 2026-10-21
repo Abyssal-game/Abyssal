@@ -1,5 +1,9 @@
 // Anglais (v506-v507) : texte français → traduction. Généré à partir des lots de traduction ; on peut corriger à la main.
 export default {
+  "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres des Cœurs maudits, introuvables à l’Échoppe. Au palier {0}, la Couronne du Cœur maudit et le titre Souverain des Cœurs maudits.": "A reward at every tier: Cursed Hearts frames, card backs, finishes and titles, never sold in the Emporium. At tier {0}, the Crown of the Cursed Heart and the Sovereign of Cursed Hearts title.",
+  "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de la Veillée de Noël, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Veillée et le titre Gardien de la Veillée.": "A reward at every tier: Christmas Eve frames, card backs, finishes and titles, never sold in the Emporium. At tier {0}, the Crown of the Vigil and the Keeper of the Vigil title.",
+  "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Reine de l’Hiver et le titre Souverain de l’Hiver éternel.": "A reward at every tier: Eternal Winter frames, card backs, finishes and titles, never sold in the Emporium. At tier {0}, the Crown of the Winter Queen and the Sovereign of Eternal Winter title.",
+  "Vendu une seule fois. Le dos de cartes du Fondateur, le titre « Fondateur » (badge au classement) et {0} obsidiennes.": "Sold only once. The Founder's card back, the “Founder” title (Leaderboard badge) and {0} Obsidians.",
   "Tire encore": "Draw again",
   "Double ou rien (+{0} ou {1})": "Double or Nothing (+{0} or {1})",
   "{0} fois par partie": "{0} time per game",

@@ -1,5 +1,9 @@
 // Dictionnaire portugais du Brésil (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres des Cœurs maudits, introuvables à l’Échoppe. Au palier {0}, la Couronne du Cœur maudit et le titre Souverain des Cœurs maudits.": "Uma recompensa em cada nível: molduras, versos, acabamentos e títulos dos Corações Malditos, impossíveis de achar na Loja. No nível {0}, a Coroa do Coração Maldito e o título Soberano dos Corações Malditos.",
+  "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de la Veillée de Noël, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Veillée et le titre Gardien de la Veillée.": "Uma recompensa em cada nível: molduras, versos, acabamentos e títulos da Véspera de Natal, impossíveis de achar na Loja. No nível {0}, a Coroa da Véspera e o título Guardião da Véspera.",
+  "Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Reine de l’Hiver et le titre Souverain de l’Hiver éternel.": "Uma recompensa em cada nível: molduras, versos, acabamentos e títulos do Inverno eterno, impossíveis de achar na Loja. No nível {0}, a Coroa da Rainha do Inverno e o título Soberano do Inverno eterno.",
+  "Vendu une seule fois. Le dos de cartes du Fondateur, le titre « Fondateur » (badge au classement) et {0} obsidiennes.": "Vendido uma única vez. O verso de carta do Fundador, o título “Fundador” (selo no ranking) e {0} obsidianas.",
   "Tire encore": "Tire de novo",
   "Double ou rien (+{0} ou {1})": "Dobro ou nada (+{0} ou {1})",
   "{0} fois par partie": "{0} vez por partida",
