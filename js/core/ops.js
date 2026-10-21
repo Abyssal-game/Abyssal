@@ -39,6 +39,7 @@ export const OPS = {
   sceauxPlay: { kind: 'sync' }, sceauxAi: { kind: 'sync' }, pacteDraw: { kind: 'sync' }, pacteStop: { kind: 'sync' }, pacteAi: { kind: 'sync' },
   cryptesFlip: { kind: 'sync' }, cryptesPower: { kind: 'sync' }, cryptesAi: { kind: 'sync' }, encheresBid: { kind: 'sync' },
   // Codex et Échoppe (obsidiennes)
+  codex: { kind: 'sync', lazy: (s) => `${s.codex?.season}:${s.codex?.live ? 1 : 0}` }, /* v550 : changement de saison (et récompenses oubliées données) */
   codexClaim: { kind: 'sync' }, codexClaimAll: { kind: 'sync' }, catalogBuy: { kind: 'sync' }, codexUnlock: { kind: 'sync' },
   // en ligne : le serveur vérifie lui-même le résultat (Pari des Boosters, parties en ligne, Tirage des Ombres)
   versusCreate: { kind: 'first', net: true }, versusAccept: { kind: 'first', net: true }, versusClaim: { kind: 'first', net: true },

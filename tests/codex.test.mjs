@@ -3,15 +3,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { loadCatalog, MemoryStorage, rngFrom } from './helpers.mjs';
 import { Game } from '../js/core/game.js';
-import { CODEX, CODEX_TIERS, SHOP, CATALOG, CODEX_ONLY, codexTier, claimable } from '../js/core/codex.js';
+import { CODEX, CODEX_TIERS, SEASONS, SHOP, CATALOG, CODEX_ONLY, codexTier, claimable } from '../js/core/codex.js';
 
 const catalog = loadCatalog();
-const clock = () => new Date(2026, 11, 5, 12); // pendant la Saison I
+const clock = () => new Date(2026, 10, 5, 12); // pendant la Saison I (Nuit des Âmes)
 const mk = (c = clock) => new Game(catalog, new MemoryStorage(), { rng: rngFrom('cx'), clock: c });
 
 test('codex : points plafonnés au dernier palier, paliers atteints', () => {
   const g = mk();
-  g.codexXp(250, 'dev');
+  g.codexXp(CODEX.xpPerTier * 2.5, 'dev');
   assert.equal(codexTier(g.codex()), 2);
   g.codexXp(1e6, 'dev');
   assert.equal(g.codex().xp, CODEX.tiers * CODEX.xpPerTier);
@@ -42,7 +42,7 @@ test('codex : la voie enluminée ne donne jamais de puissance (ni éclats, cendr
 });
 
 test('codex v547 : une récompense enluminée à chaque palier, aucune n’est à vendre, le palier 30 est exceptionnel', () => {
-  for (const t of CODEX_TIERS) {
+  for (const se of SEASONS) for (const t of se.tiers) {
     assert.ok(t.prem, `palier ${t.tier} : voie enluminée vide`);
     for (const k of [t.prem.frame, t.prem.back, t.prem.finish].filter(Boolean)) assert.ok(CODEX_ONLY.includes(k) && !CATALOG.some((it) => it.id === k), `${k} ne doit pas être en vente`);
   }
@@ -97,20 +97,20 @@ test('v482 : finitions de prestige, achetées une fois, posées seulement sur un
   g.s.settings.dev = true; g.s.devCodex = true; g.s.obs = 2000;
   const id = Object.keys(g.s.collection)[0] || catalog.cards[0].id;
   if (!g.owns(id)) g.addCard?.(id);
-  assert.throws(() => g.setDress(id, 'fin-spectrale'), /pas encore/);
-  g.catalogBuy('fin-spectrale');
-  assert.ok(g.s.finishes.includes('fin-spectrale') && g.catalogOwned('fin-spectrale'));
-  g.setDress(id, 'fin-spectrale');
-  assert.equal(g.s.dress[id], 'fin-spectrale');
+  assert.throws(() => g.setDress(id, 'fin-ecarlate'), /pas encore/);
+  g.catalogBuy('fin-ecarlate');
+  assert.ok(g.s.finishes.includes('fin-ecarlate') && g.catalogOwned('fin-ecarlate'));
+  g.setDress(id, 'fin-ecarlate');
+  assert.equal(g.s.dress[id], 'fin-ecarlate');
   g.setDress(id, null);
   assert.equal(g.s.dress[id], undefined);
   const other = catalog.cards.find((c) => !g.owns(c.id)).id;
-  assert.throws(() => g.setDress(other, 'fin-spectrale'), /possèdes pas/);
+  assert.throws(() => g.setDress(other, 'fin-ecarlate'), /possèdes pas/);
 });
 
 // v538 : la saison commence le 1er décembre ; les points d'avant ne comptent pas
 test('codex : rien ne se gagne avant la saison, et les points d’avant sont remis à zéro à son ouverture', () => {
-  let now = new Date(2026, 10, 20, 12);
+  let now = new Date(2026, 9, 20, 12);
   const st = new MemoryStorage(), g = new Game(catalog, st, { rng: rngFrom('cx2'), clock: () => now });
   g.codexXp(300, 'win');
   assert.equal(g.codex().xp, 0, 'avant la saison');
@@ -118,11 +118,29 @@ test('codex : rien ne se gagne avant la saison, et les points d’avant sont rem
   g.codexXp(300, 'dev');
   assert.equal(g.codex().xp, 300, 'essai du Mode Créateur');
   g.codex().premium = true;
-  now = new Date(2026, 11, 1, 9);
-  assert.equal(g.codex().xp, 0, 'remis à zéro le 1er décembre');
+  now = new Date(2026, 10, 1, 0, 5);
+  assert.equal(g.codex().xp, 0, 'remis à zéro le 1er novembre à minuit');
   assert.ok(g.codex().premium, 'la voie enluminée reste');
   g.s.settings.dev = false;
   g.codexXp(150, 'win');
   assert.equal(g.codex().xp, 150);
   assert.equal(g.codex().xp, 150, 'une seule remise à zéro');
+});
+
+test('codex v550 : trois saisons d’un mois, les récompenses oubliées sont données au changement de saison', () => {
+  const day = (m, d) => new Date(m <= 12 ? 2026 : 2027, (m - 1) % 12, d, 12);
+  let now = day(11, 10);
+  const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('cx3'), clock: () => now });
+  assert.equal(g.codexSeason().key, 's1-ames');
+  now = day(11, 30); assert.equal(g.codexSeason().key, 's1-ames');
+  now = day(12, 1); assert.equal(g.codexSeason().key, 's2-noel');
+  now = day(13, 31); assert.equal(g.codexSeason().key, 's3-hiver');
+  now = day(11, 10);
+  g.codex(); g.codexXp(CODEX.xpPerTier * 4, 'win'); g.codex().premium = true;
+  const shards = g.s.shards, frames = g.s.frames.length;
+  now = day(12, 1);
+  const c = g.codex();
+  assert.equal(c.season, 's2-noel'); assert.equal(c.xp, 0); assert.ok(!c.premium, 'le Codex enluminé se rachète à chaque saison');
+  assert.ok(g.s.shards > shards, 'éclats des paliers gratuits donnés'); assert.ok(g.s.frames.length > frames, 'cadre du palier 3 donné');
+  assert.equal(g.s.codexPast.season, 's1-ames');
 });

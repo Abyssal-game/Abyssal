@@ -1,6 +1,6 @@
 // v470 : ÉBAUCHE du pass de saison (« Le Codex de l'Abîme ») et de la boutique en argent réel (« L'Échoppe »).
 // Visible seulement en Mode Créateur (option « Codex et Échoppe ») ; les achats sont simulés (aucun paiement).
-import { CODEX, CODEX_XP, CODEX_XP_LABEL, CODEX_TIERS, CODEX_FRAMES, CODEX_BACKS, FINISHES, SHOP, CATALOG, OBS, codexTier, tierProgress, claimable, freshCodex } from '../core/codex.js';
+import { CODEX, CODEX_XP, CODEX_XP_LABEL, tiersOf, seasonByKey, CODEX_FRAMES, CODEX_BACKS, FINISHES, SHOP, CATALOG, OBS, codexTier, tierProgress, claimable, freshCodex } from '../core/codex.js';
 import { FRAMES } from '../config.js';
 import { CHESTS } from '../core/descent.js';
 import { icon, picon } from '../ui/icons.js';
@@ -69,24 +69,25 @@ export default function codexScreen(app, root) {
       return `<div class="cxk-c ${tr} ${state}" ${state === 'ready' ? `data-cx="claim" data-tr="${tr}" data-t="${tier}" role="button" tabindex="0"` : ''}>${rwBig(r)}
         ${state === 'ready' ? '<span class="cxk-go">Récupérer</span>' : state === 'got' ? `<span class="cxk-ok">${icon('check')}</span>` : state === 'lock' ? `<span class="cxk-lk">${icon('lock')}</span>` : ''}</div>`;
     };
-    const best = ['cx-hiver', 'dos-hiver', 'cx-aurore']; /* v547 : les plus belles pièces de l'Hiver éternel */
+    const se = g.codexSeason(), best = se.best; /* v550 : les plus belles pièces de la saison */
     const pitch = c.premium ? '' : `<section class="cx-pitch">
         ${opt('assets/ui/cx-enlumine.webp', 'cx-pitch-art')}
         <div class="cx-pitch-in"><small class="cx-kick">Voie enluminée</small><h2>${esc(CODEX.premiumName)}</h2>
-          <p>Une récompense à chaque palier : cadres, dos de cartes, finitions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier 30, la Couronne de la Reine de l’Hiver et la finition Hiver éternel.</p>
+          <p>${esc(se.pitch)}</p>
           <div class="cx-pitch-show">${best.map((k) => k.startsWith('dos') ? `<img class="cxr-back" alt="" src="assets/backs/${k}.webp" onerror="this.remove()">` : `<span class="avatar-mini pf pf-${k}">${myAv()}</span>`).join('')}</div>
           <button class="btn dc-plq dc-plq-red cx-unlock2" data-cx="unlock">${icon('star')}<span>Débloquer</span><b class="cx-eur">${esc(CODEX.price)}</b></button></div></section>`;
     return `<section class="cx-season">
-        ${opt('assets/ui/cx-saison1.webp', 'cx-season-art')}
-        <div class="cx-season-in"><small class="cx-kick">Saison I · du ${esc(CODEX.starts.split('-').reverse().join('/'))} au ${esc(CODEX.ends.split('-').reverse().join('/'))}</small>
-          <h2>${esc(CODEX.title)}</h2>
+        ${opt(se.art, 'cx-season-art')}
+        <div class="cx-season-in"><small class="cx-kick">Du ${esc(se.starts.split('-').reverse().join('/'))} au ${esc(se.ends.split('-').reverse().join('/'))}${g.codexLive() ? '' : ' · bientôt'}</small>
+          <h2>${esc(se.title)}</h2>
+          ${(() => { const p = g.s.codexPast, old = p && seasonByKey(p.season); return old && p.day >= se.starts ? `<p class="small cx-past">${icon('check')} Fin de la ${esc(old.title)} : ${p.n} récompense${p.n > 1 ? 's' : ''} oubliée${p.n > 1 ? 's' : ''} t’${p.n > 1 ? 'ont' : 'a'} été donnée${p.n > 1 ? 's' : ''}.</p>` : ''; })()}
           <div class="cx-season-row"><span class="cx-medal"><b>${t}</b><small>/ ${CODEX.tiers}</small></span>
             <span class="cx-season-p"><span>${max ? 'Codex terminé pour cette saison !' : `Palier ${t + 1} · ${c.xp % CODEX.xpPerTier} / ${CODEX.xpPerTier} points`}</span><span class="cx-bar2"><i style="width:${Math.round(tierProgress(c) * 100)}%"></i></span></span></div>
           ${c.premium ? `<span class="cx-badge on">${icon('star')}${esc(CODEX.premiumName)} acquis</span>` : ''}</div></section>
       ${n ? `<button class="btn primary block dc-plq dc-plq-red cx-all" data-cx="all">${icon('chest')}Tout récupérer (${n})</button>` : ''}
       ${pitch}
       <div class="cxk-head"><span>Voie de l'Abîme<small>gratuite</small></span><span></span><span class="prem">Voie enluminée<small>${c.premium ? 'à toi' : 'à débloquer'}</small></span></div>
-      <ol class="cxk">${CODEX_TIERS.map((x) => `<li class="cxk-r ${x.tier <= t ? 'reached' : ''} ${x.tier === t + 1 ? 'next' : ''} ${x.tier === CODEX.tiers ? 'ult' : ''}" ${x.tier === Math.min(CODEX.tiers, t + 1) ? 'id="cx-now"' : ''}>${cell(x.tier, 'free', x.free)}<span class="cxk-n">${x.tier}</span>${cell(x.tier, 'prem', x.prem)}</li>`).join('')}</ol>
+      <ol class="cxk">${tiersOf(c.season).map((x) => `<li class="cxk-r ${x.tier <= t ? 'reached' : ''} ${x.tier === t + 1 ? 'next' : ''} ${x.tier === CODEX.tiers ? 'ult' : ''}" ${x.tier === Math.min(CODEX.tiers, t + 1) ? 'id="cx-now"' : ''}>${cell(x.tier, 'free', x.free)}<span class="cxk-n">${x.tier}</span>${cell(x.tier, 'prem', x.prem)}</li>`).join('')}</ol>
       <details class="panel dc-fold"><summary>${picon('help')}<span class="dc-sum-t">Gagner des points de Codex</span></summary>
         <ul class="cx-xp">${Object.entries(CODEX_XP).map(([k, v]) => `<li><span>${esc(CODEX_XP_LABEL[k])}</span><b>+${v}</b><small class="muted">${fmt(c.log[k] || 0)} gagnés</small></li>`).join('')}</ul>
         <p class="small muted">La voie de gauche se gagne en jouant. La voie enluminée s’achète une fois par saison : une récompense à chaque palier, sur le thème de la saison, jamais en vente à l’Échoppe et jamais de puissance.</p></details>`;

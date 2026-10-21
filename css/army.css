@@ -5235,3 +5235,29 @@ html.reduce-motion .pf.pf-cx-hiver::before, html.reduce-motion .dr-fin-hiver .tc
 .col-order .seg-b { min-width: 0; }
 /* toute rangée de choix en deux ou trois cases : chaque case prend sa part de la largeur, le texte ne déborde plus de l'or */
 .seg:not(.wide):not(.lang-grid):not(.set-tabs) { max-width: 100%; }
+
+/* v550 : Saisons I (Nuit des Âmes) et II (Veillée de Noël) : objets exclusifs de la voie enluminée (images Gemini attendues) */
+.pf-cx-citrouilles { --fr: url(../assets/frames/cx-citrouilles-4.webp); }
+.pf-cx-ames { --fr: url(../assets/frames/cx-ames-4.webp); }
+.pf-cx-guirlandes { --fr: url(../assets/frames/cx-guirlandes-4.webp); }
+.pf-cx-noel { --fr: url(../assets/frames/cx-noel-4.webp); }
+.dr-fin-feux-follets .tcg-dress { background-image: url(../assets/variants/fin-feux-follets-frame.webp); }
+.dr-fin-ames .tcg-dress { background-image: url(../assets/variants/fin-ames-frame.webp); }
+.dr-fin-houx .tcg-dress { background-image: url(../assets/variants/fin-houx-frame.webp); }
+.dr-fin-noel .tcg-dress { background-image: url(../assets/variants/fin-noel-frame.webp); }
+.dr-fin-ames .tcg-art img { filter: saturate(.85) hue-rotate(-12deg) brightness(.98); }
+.dr-fin-noel .tcg-art img { filter: saturate(1.08) sepia(.08) brightness(1.04); }
+/* récompenses ultimes : âmes qui tournent autour du portrait (Nuit des Âmes), lueur de bougie (Veillée) */
+.pf.pf-cx-ames { box-shadow: 0 0 0 2px rgba(150, 230, 210, .5), 0 0 22px rgba(120, 220, 200, .65); }
+.pf.pf-cx-ames::before { content: ''; position: absolute; inset: -26%; z-index: 3; pointer-events: none; border-radius: 50%;
+  background: radial-gradient(3px 3px at 50% 2%, #CFFFF4, transparent 70%), radial-gradient(2.4px 2.4px at 98% 50%, #BFF5E8, transparent 70%),
+    radial-gradient(3px 3px at 50% 98%, #CFFFF4, transparent 70%), radial-gradient(2.4px 2.4px at 2% 50%, #BFF5E8, transparent 70%);
+  animation: cxSouls 7s linear infinite; opacity: .9; }
+@keyframes cxSouls { to { transform: rotate(360deg); } }
+.pf.pf-cx-noel { box-shadow: 0 0 0 2px rgba(255, 210, 120, .55), 0 0 22px rgba(255, 180, 80, .7); animation: cxCandle 2.6s ease-in-out infinite; }
+@keyframes cxCandle { 50% { box-shadow: 0 0 0 2px rgba(255, 220, 140, .7), 0 0 30px rgba(255, 190, 90, .85); } }
+.dr-fin-ames .tcg-dress::after, .dr-fin-noel .tcg-dress::after { content: ''; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, .28) 50%, transparent 65%) 0 0 / 250% 100%; animation: cxFrost 3.8s ease-in-out infinite; }
+html.reduce-motion .pf.pf-cx-ames::before, html.reduce-motion .pf.pf-cx-noel, html.reduce-motion .dr-fin-ames .tcg-dress::after, html.reduce-motion .dr-fin-noel .tcg-dress::after, html.fx-light .pf.pf-cx-ames::before { animation: none; }
+.cx-past { color: #BFE8C8; margin: 6px 0 0; }
+.cx-unlock2 .cx-eur { white-space: nowrap; }

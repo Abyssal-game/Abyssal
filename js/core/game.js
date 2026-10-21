@@ -13,7 +13,7 @@ export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par c
 import { FINAL_FLOOR, BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, SUBLIME_ASH, VARIANTS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
-import { CODEX, CODEX_XP, CODEX_TIERS, SHOP, CATALOG, codexState, codexTier } from './codex.js';
+import { CODEX, CODEX_XP, SHOP, CATALOG, codexTier, seasonFor, tiersOf, freshCodex, pendingOf } from './codex.js';
 import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, lateSoft, bossEase, earlyHp, expectedLevel, cardPower, powerFor, advisedPower, floorForPower, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative, act as duelActRaw, useUlt, beginEnemyTurn, nextEnemy, takeSkips, enemyAct, endEnemyTurn, RHYTHM } from './duel.js';
 import { bossOf, BOSSES, BOSS_ORDER } from './bosses.js';
@@ -1896,9 +1896,19 @@ export class Game {
   codexOn() { return !!(this.s.settings?.dev && this.s.devCodex); }
   /* v538 : la saison commence le CODEX.starts. Les points gagnés avant (anciennes versions, essais du Mode Créateur) sont remis à zéro
      au premier passage après cette date ; la voie enluminée déjà débloquée reste. */
-  codexLive() { return today(this.clock()) >= CODEX.starts; }
+  /* v550 : trois saisons d'un mois (SEASONS), à l'heure du joueur ; un Codex par saison */
+  codexSeason() { return seasonFor(today(this.clock())); }
+  codexLive() { const d = today(this.clock()), se = this.codexSeason(); return d >= se.starts && d <= se.ends; }
   codex() {
-    const c = codexState(this.s);
+    const se = this.codexSeason();
+    if (!this.s.codex || this.s.codex.season !== se.key) {
+      /* fin de saison : ce qui était atteint mais pas récupéré est donné, rien ne se perd */
+      const left = pendingOf(this.s.codex);
+      left.forEach((r) => this.grant(r, 'codex'));
+      if (left.length) this.s.codexPast = { season: this.s.codex.season, n: left.length, day: today(this.clock()) };
+      this.s.codex = freshCodex(se.key);
+    }
+    const c = this.s.codex;
     if (!c.live && this.codexLive()) { Object.assign(c, { xp: 0, free: [], prem: [], log: {} }); c.live = true; }
     return c;
   }
@@ -1910,7 +1920,7 @@ export class Game {
     c.xp += add; c.log[why] = (c.log[why] || 0) + add;
   }
   codexClaim(track, tier) {
-    const c = this.codex(), t = CODEX_TIERS[tier - 1];
+    const c = this.codex(), t = tiersOf(c.season)[tier - 1];
     if (!t || tier > codexTier(c)) throw new Error('Palier pas encore atteint.');
     if (track === 'prem' && !c.premium) throw new Error(`La voie enluminée demande le ${CODEX.premiumName}.`);
     const r = t[track];
@@ -1920,7 +1930,7 @@ export class Game {
   }
   codexClaimAll() {
     const c = this.codex(), got = [];
-    for (const t of CODEX_TIERS) {
+    for (const t of tiersOf(c.season)) {
       if (t.tier > codexTier(c)) break;
       for (const tr of ['free', 'prem']) if (t[tr] && !c[tr].includes(t.tier) && (tr === 'free' || c.premium)) { c[tr].push(t.tier); this.grant(t[tr], 'codex'); got.push(t[tr]); }
     }
