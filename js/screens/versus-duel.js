@@ -10,10 +10,28 @@ import { icon, EMBLEM } from '../ui/icons.js';
 import { esc, fmt } from '../ui/dom.js';
 import { packHTML } from './shop.js';
 import { t } from '../i18n.js';
+import { musicCue, musicSeek, musicRelease } from '../ui/music.js';
 
 const RES = { win: 'Victoire', tie: 'Égalité', lose: 'Défaite' };
 const EMB = { win: 'vd-win', lose: 'vd-lose', tie: 'vd-tie' }; /* v524 : emblèmes Gemini de fin (v526 : égalité) */
 const RI = (r) => ['C', 'PC', 'R', 'HR', 'M', 'S'].indexOf(r);
+const isBig = (c) => RI(c.rarity) >= RI('HR') || c.variant !== 'normal';
+/* v563 : la musique du Pari (assets/music/pari.mp3 : 150 battements par minute, phrases de 6,4 s, temps forts à 0,05 + 6,4 × k,
+   silence de 42 à 44,5 s puis l'explosion à 44,85 s) mène le duel, qu'il y ait 1, 2 ou 3 boosters : chaque déchirure tombe sur
+   un temps fort, le rythme des cartes s'étire ou se resserre pour remplir sa phrase, et le résultat tombe sur l'explosion. */
+const PH = 6.4, BEAT0 = 0.05, DROP = BEAT0 + 7 * PH;
+const APPEAR = 1.55, AFTER = 1.08, NEXT = 0.3, LAST = 0.6; // sachets visibles avant la déchirure ; déchirure → 1re carte ; marges
+const revDur = (c) => (isBig(c) ? 1.8 : 0.56);
+function musicPlan(packs) {
+  const N = packs.length, R = packs.map((cs) => cs.reduce((n, c) => n + revDur(c), 0));
+  const fixed = (p) => AFTER + (p < N - 1 ? NEXT + APPEAR : LAST);
+  const slots = R.map((r, p) => Math.max(1, Math.ceil((fixed(p) + 0.75 * r) / PH))); // une phrase peut aller jusqu'à 25 % plus vite
+  while (slots.reduce((a, b) => a + b, 0) > 6) { const i = slots.indexOf(Math.max(...slots)); if (slots[i] <= 1) break; slots[i]--; }
+  const tears = []; let x = DROP;
+  for (let p = N - 1; p >= 0; p--) { x -= PH * slots[p]; tears[p] = x; }
+  const scale = R.map((r, p) => (r ? Math.min(1.5, Math.max(0.6, (PH * slots[p] - fixed(p)) / r)) : 1));
+  return { tears, scale, start: Math.max(0, tears[0] - APPEAR - 0.5) };
+}
 
 export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
   const g = app.game, cat = app.catalog;
@@ -53,6 +71,16 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
   let speed = app.reduced() || g.s.settings.fastOpen ? 4 : 1, done = false, closed = false;
   const sc = { me: 0, foe: 0 };
   const wait = (ms) => new Promise((ok) => setTimeout(ok, ms / speed));
+  /* v563 : horloge de la musique (voir musicPlan) ; un toucher (×4) ou « Tout révéler » quitte le calage */
+  const plan = musicPlan(lineup.map((_, p) => [...myPacks[p], ...foePacks[p]]));
+  let sync = speed === 1;
+  const t0 = performance.now(), pos = () => plan.start + (performance.now() - t0) / 1000;
+  const until = (x, ms) => (!sync ? wait(ms) : new Promise((ok) => {
+    const f = () => { if (!sync || done) return ok(); const d = (x - pos()) * 1000; if (d <= 8) return ok(); setTimeout(f, Math.min(d, 250)); };
+    f();
+  }));
+  const pace = (p) => (sync ? plan.scale[p] : 1);
+  musicCue('pari', plan.start);
   const q = (s) => el.querySelector(s);
   const setScore = (side) => { const n = q(`[data-sc="${side}"]`); n.textContent = fmt(sc[side]); n.classList.remove('bump'); void n.offsetWidth; n.classList.add('bump'); };
   const lead = () => { q('.vd-plate.me').classList.toggle('lead', sc.me > sc.foe); q('.vd-plate.foe').classList.toggle('lead', sc.foe > sc.me); };
@@ -74,10 +102,10 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
     q('.vd-step').textContent = lineup.length > 1 ? `${t('Booster')} ${p + 1} / ${lineup.length}` : '';
     [fp, mp].forEach((x) => { x.className = `vd-pack ${x === fp ? 'foe' : 'me'} in`; });
     q('.vd-mid').classList.add('show');
-    await wait(550);
+    await until(plan.tears[p] - 1, 550);
     [fp, mp].forEach((x) => x.classList.add('shake'));
     app.sfx.suspense?.();
-    await wait(1000);
+    await until(plan.tears[p], 1000);
     [fp, mp].forEach((x) => { x.classList.remove('shake'); x.classList.add('torn'); });
     app.sfx['vd-tear']?.();
     await wait(320);
@@ -100,19 +128,19 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
   async function reveal(side, p, i) {
     const c = (side === 'me' ? myPacks : foePacks)[p][i];
     const n = q(`.vd-c[data-side="${side}"][data-p="${p}"][data-i="${i}"]`);
-    const big = RI(c.rarity) >= RI('HR') || c.variant !== 'normal';
-    if (big && speed === 1) { n.classList.add('tease'); app.sfx.suspensebig?.(); await wait(900); n.classList.remove('tease'); }
+    const big = isBig(c);
+    if (big && speed === 1) { n.classList.add('tease'); app.sfx.suspensebig?.(); await wait(900 * pace(p)); n.classList.remove('tease'); }
     if (done) return; /* v527 : « Tout révéler » a déjà posé les totaux */
     n.classList.add('on');
     if (big) { n.classList.add('big'); app.sfx['vd-rare']?.(); } else app.sfx['vd-flip']?.();
     burst(n, big ? 3.2 : 1.7);
     sc[side] += c.pts;
     setScore(side); lead();
-    await wait(big ? 900 : 560);
+    await wait((big ? 900 : 560) * pace(p));
   }
   async function run() {
-    await wait(500);
     for (let p = 0; p < lineup.length && !done; p++) {
+      await until(plan.tears[p] - APPEAR, p ? 0 : 500);
       await tear(p);
       const n = Math.max(myPacks[p].length, foePacks[p].length);
       for (let i = 0; i < n && !done; i++) {
@@ -120,13 +148,15 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
         if (done) break;
         if (i < myPacks[p].length) await reveal('me', p, i);
       }
-      if (!done && p < lineup.length - 1) await wait(700);
+      if (!done && p < lineup.length - 1 && !sync) await wait(700);
     }
+    if (!done) await until(DROP, 0); /* le silence de la musique, puis le résultat sur l'explosion */
     finish();
   }
   function finish() {
     if (done) return;
-    done = true;
+    if (!sync || Math.abs(pos() - DROP) > 0.35) musicSeek(DROP - 0.05);
+    done = true; sync = false;
     el.querySelectorAll('.vd-c').forEach((c) => c.classList.add('out', 'on'));
     sc.me = scoreOf(mine); sc.foe = scoreOf(theirs);
     setScore('me'); setScore('foe'); lead();
@@ -146,7 +176,8 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
   }
   function close() {
     if (closed) return;
-    closed = true; done = true;
+    closed = true; done = true; sync = false;
+    musicRelease();
     el.classList.remove('on');
     document.body.classList.remove('has-sheet');
     setTimeout(() => el.remove(), 300);
@@ -156,7 +187,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
     const b = e.target.closest('[data-v]');
     if (b?.dataset.v === 'close') return close();
     if (b?.dataset.v === 'all') return finish();
-    if (!done) speed = 4;
+    if (!done) { speed = 4; sync = false; }
   });
   run();
   return { close };

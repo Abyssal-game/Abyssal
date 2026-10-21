@@ -6,6 +6,7 @@ import { audioCtx, hooks, getBytes, decodeBytes, listV } from './sound.js';
 
 let ctx = null, out = null, verb = null, duckG = null, on = true, vol = 0.5;
 let cur = null, want = 'antre', preview = null, timer = null, brown = null;
+let hold = null; /* v563 : musique calée sur un écran ({ key, off, at }) : position = off + temps écoulé depuis at */
 
 const midi = (m) => 440 * Math.pow(2, (m - 69) / 12);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -165,18 +166,24 @@ function needTrack(key) {
     .then((buf) => { if (!buf) return; tracks[key] = buf; if (cur && cur.key === key && cur.pending) { stopTheme(cur); cur = startTheme(key); } }) // le silence d'attente cède la place au fichier
     .catch(() => { delete trackGet[key]; }); // nouvel essai à la prochaine visite
 }
+// v563 : position voulue d'une musique calée (en tenant compte du retard de la sortie audio)
+const heldPos = (key, dur) => (hold && hold.key === key ? ((hold.off + (performance.now() - hold.at) / 1000 + (ctx.outputLatency || ctx.baseLatency || 0)) % dur + dur) % dur : 0);
+function fileSource(grp, key, fade) {
+  const t = ctx.currentTime, s = ctx.createBufferSource(); s.buffer = tracks[key]; s.loop = true;
+  if (TRACK_LOOP[key]) { s.loopStart = TRACK_LOOP[key][0]; s.loopEnd = Math.min(TRACK_LOOP[key][1], s.buffer.duration); }
+  const g = ctx.createGain(), lvl = 1.6 * (TRACK_GAIN[key] || 1); // les fichiers sont mixés plus bas que les ambiances calculées
+  if (fade) { g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(lvl, t + fade); } else g.gain.value = lvl;
+  s.connect(g).connect(grp.g); s.start(t, heldPos(key, s.buffer.duration)); grp.stops.push(s); grp.src = { s, g }; grp.file = true;
+}
 function startTheme(key) {
-  const th = THEMES[key], t = ctx.currentTime;
+  const th = THEMES[key], t = ctx.currentTime, held = hold?.key === key;
   const grp = { key, th, g: ctx.createGain(), stops: [], next: {}, chord: th.chords[0] };
-  grp.g.gain.setValueAtTime(0.0001, t); grp.g.gain.linearRampToValueAtTime(1, t + 3);
+  grp.g.gain.setValueAtTime(0.0001, t); grp.g.gain.linearRampToValueAtTime(1, t + (held ? 0.25 : 3));
   grp.g.connect(duckG);
   needTrack(key);
   if (tracks[key]) {
     // v308 : boucle sur le fichier entier (il boucle déjà proprement : couper 50 ms à chaque bout faisait sauter le rythme)
-    const s = ctx.createBufferSource(); s.buffer = tracks[key]; s.loop = true;
-    if (TRACK_LOOP[key]) { s.loopStart = TRACK_LOOP[key][0]; s.loopEnd = Math.min(TRACK_LOOP[key][1], s.buffer.duration); }
-    const g = ctx.createGain(); g.gain.value = 1.6 * (TRACK_GAIN[key] || 1); // les fichiers sont mixés plus bas que les ambiances calculées
-    s.connect(g).connect(grp.g); s.start(t); grp.stops.push(s); grp.file = true;
+    fileSource(grp, key, 0);
     // mémoire : on ne garde décodées que cette musique et la précédente (une musique décodée pèse ~45 Mo)
     recent = [key, ...recent.filter((k) => k !== key)].slice(0, 2);
     for (const k of Object.keys(tracks)) if (!recent.includes(k)) { delete tracks[k]; delete trackGet[k]; }
@@ -205,9 +212,9 @@ function startTheme(key) {
   grp.next = { pad: t + 0.2, bell: t + rnd(2, 4), choir: t + rnd(4, 8), pluck: t + rnd(1, 3), drip: t + rnd(1, 3), pulse: t + 1.5, brass: t + 3, step: 0 };
   return grp;
 }
-function stopTheme(grp) {
+function stopTheme(grp, fade = 2.5) {
   const t = ctx.currentTime;
-  grp.g.gain.cancelScheduledValues(t); grp.g.gain.setValueAtTime(grp.g.gain.value, t); grp.g.gain.linearRampToValueAtTime(0.0001, t + 2.5);
+  grp.g.gain.cancelScheduledValues(t); grp.g.gain.setValueAtTime(grp.g.gain.value, t); grp.g.gain.linearRampToValueAtTime(0.0001, t + fade);
   grp.dead = true;
   setTimeout(() => { grp.stops.forEach((o) => { try { o.stop(); } catch (e) { /* rien */ } }); try { grp.g.disconnect(); } catch (e) { /* rien */ } }, 2800);
 }
@@ -247,7 +254,7 @@ function schedule(grp) {
 function tick() {
   if (!ctx || !on || document.hidden || ctx.state !== 'running') return;
   // en combat : l'ambiance suit l'écran (combat, gardien)
-  let key = preview || want;
+  let key = preview || hold?.key || want;
   if (!preview && document.body.classList.contains('battle-mode') && (key === 'descente')) key = document.querySelector('.dv-c.boss:not(.dead)') ? (document.querySelector('.dv-c.boss:not(.dead) .dv-bfig[src*="bosses/abysse"]') ? 'abysse' : 'boss') : 'combat'; /* v442 : L'Abysse a sa musique */
   if (!cur || cur.key !== key) { if (cur) stopTheme(cur); cur = startTheme(key); }
   schedule(cur);
@@ -256,8 +263,29 @@ function tick() {
 // Appelé à chaque changement de page
 export function musicRoute(route) {
   want = ROUTE_THEME[route] || 'antre';
-  preview = null;
+  preview = null; hold = null; /* v563 : un changement de page libère toujours la musique calée */
 }
+// v563 : musique calée sur un écran (Pari des Boosters : chaque déchirure sur un temps fort, le résultat sur l'explosion).
+// L'écran garde son horloge (performance.now) ; la musique se place dessus, même si son fichier arrive en retard.
+export function musicCue(key, off) {
+  hold = { key, off, at: performance.now() };
+  if (!on || !init() || ctx.state !== 'running') return;
+  if (cur && cur.key === key && cur.file && !cur.pending && tracks[key]) return musicSeek(off);
+  if (cur) stopTheme(cur, 0.4);
+  cur = startTheme(key);
+}
+// sauter à une position (le passage en cours s'efface en 0,25 s)
+export function musicSeek(off) {
+  if (!hold) return;
+  hold.off = off; hold.at = performance.now();
+  if (!ctx || !cur || cur.key !== hold.key || !cur.src || !tracks[hold.key]) return;
+  const t = ctx.currentTime, old = cur.src;
+  old.g.gain.cancelScheduledValues(t); old.g.gain.setValueAtTime(old.g.gain.value, t); old.g.gain.linearRampToValueAtTime(0.0001, t + 0.25);
+  setTimeout(() => { try { old.s.stop(); } catch (e) { /* rien */ } }, 400);
+  fileSource(cur, hold.key, 0.12);
+}
+// la musique redevient celle du lieu (si c'est la même, elle continue sans coupure)
+export function musicRelease() { hold = null; }
 // Écoute d'une ambiance depuis les Réglages (jusqu'au prochain changement de page)
 export function musicPreview(key) { preview = THEMES[key] ? key : null; if (!init()) return; tick(); }
 
