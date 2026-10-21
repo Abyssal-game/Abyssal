@@ -5175,3 +5175,10 @@ html.fx-light .cxk-c.ready { animation: none; }
 @keyframes viewSlide541 { from { opacity: .55; transform: translateX(calc(var(--vdx, 0px) * .5)); } }
 @media (prefers-reduced-motion: reduce) { #view.view-in { animation: none !important; } }
 html.reduce-motion #view.view-in { animation: none !important; }
+
+/* v542 : récit du chapitre et présentation du gardien : le fond couvre l'écran tout de suite (avant, l'écran des portes
+   se lisait à travers pendant le fondu de 0,5 s, comme un autre texte) ; seul le texte apparaît en fondu */
+.bx-intro:not(.out) { animation: none; }
+.bx-intro > .bx-in { animation: bxIn .45s ease both; }
+@media (prefers-reduced-motion: reduce) { .bx-intro > .bx-in { animation: none; } }
+html.reduce-motion .bx-intro > .bx-in { animation: none; }
