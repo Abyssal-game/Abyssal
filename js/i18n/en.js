@@ -1,5 +1,12 @@
 // Anglais (v506-v507) : texte français → traduction. Généré à partir des lots de traduction ; on peut corriger à la main.
 export default {
+  "Ton profil, tes amis, tes succès et les réglages du jeu.": "Your profile, friends, achievements and game settings.",
+  "Pseudo, mot de passe, déconnexion": "Username, password, sign out",
+  "Langue, son, combat, tutoriels": "Language, sound, combat, tutorials",
+  "Langue, son, combat, tutoriels.": "Language, sound, combat, tutorials.",
+  "Son et musique": "Sound and music",
+  "Affichage": "Display",
+  "Manuelle : à chaque attaque ennemie, un geste (toucher la zone dorée, garder le doigt appuyé ou glisser dans le sens de la flèche) ; sur le trait blanc, parade parfaite. Automatique : rien à toucher, mais seulement {0} esquives sur {1} et jamais de parade parfaite (moins de Ferveur et de PA).": "Manual: each enemy attack asks for a gesture (tap the golden zone, hold your finger down, or swipe in the arrow’s direction); on the white line, a perfect parry. Automatic: nothing to tap, but only {0} dodges out of {1} and never a perfect parry (less Fervor and AP).",
   " ou ": " or ",
   "(Relais d’ombre : +{0} PA)": "(Shadow Relay: +{0} AP)",
   "(dernière paire décisive)": "(last pair decides)",

@@ -1,5 +1,12 @@
 // Dictionnaire allemand (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Ton profil, tes amis, tes succès et les réglages du jeu.": "Dein Profil, deine Freunde, deine Erfolge und die Spieleinstellungen.",
+  "Pseudo, mot de passe, déconnexion": "Spielername, Passwort, Abmelden",
+  "Langue, son, combat, tutoriels": "Sprache, Ton, Kampf, Tutorials",
+  "Langue, son, combat, tutoriels.": "Sprache, Ton, Kampf, Tutorials.",
+  "Son et musique": "Ton und Musik",
+  "Affichage": "Anzeige",
+  "Manuelle : à chaque attaque ennemie, un geste (toucher la zone dorée, garder le doigt appuyé ou glisser dans le sens de la flèche) ; sur le trait blanc, parade parfaite. Automatique : rien à toucher, mais seulement {0} esquives sur {1} et jamais de parade parfaite (moins de Ferveur et de PA).": "Manuell: Jeder feindliche Angriff verlangt eine Geste (die goldene Zone antippen, den Finger gedrückt halten oder in Pfeilrichtung wischen); auf dem weißen Strich: perfekte Parade. Automatisch: nichts zu tippen, aber nur {0} Ausweichen von {1} und nie eine perfekte Parade (weniger Inbrunst und AP).",
   " ou ": " oder ",
   "(Relais d’ombre : +{0} PA)": "(Schattenstaffel: +{0} AP)",
   "(dernière paire décisive)": "(letztes Paar entscheidet)",

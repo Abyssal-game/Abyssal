@@ -1,5 +1,12 @@
 // Dictionnaire espagnol (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Ton profil, tes amis, tes succès et les réglages du jeu.": "Tu perfil, tus amigos, tus logros y los ajustes del juego.",
+  "Pseudo, mot de passe, déconnexion": "Seudónimo, contraseña, cerrar sesión",
+  "Langue, son, combat, tutoriels": "Idioma, sonido, combate, tutoriales",
+  "Langue, son, combat, tutoriels.": "Idioma, sonido, combate, tutoriales.",
+  "Son et musique": "Sonido y música",
+  "Affichage": "Pantalla",
+  "Manuelle : à chaque attaque ennemie, un geste (toucher la zone dorée, garder le doigt appuyé ou glisser dans le sens de la flèche) ; sur le trait blanc, parade parfaite. Automatique : rien à toucher, mais seulement {0} esquives sur {1} et jamais de parade parfaite (moins de Ferveur et de PA).": "Manual: cada ataque enemigo pide un gesto (tocar la zona dorada, mantener el dedo pulsado o deslizar en el sentido de la flecha); en la línea blanca, parada perfecta. Automática: nada que tocar, pero solo {0} esquivas de cada {1} y nunca parada perfecta (menos Fervor y PA).",
   " ou ": " o ",
   "(Relais d’ombre : +{0} PA)": "(Relevo de sombra: +{0} PA)",
   "(dernière paire décisive)": "(la última pareja decide)",

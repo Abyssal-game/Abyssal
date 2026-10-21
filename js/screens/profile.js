@@ -43,7 +43,7 @@ export default function profile(app, root) {
      dos de cartes, finitions de prestige, et plus tard sachets de booster et arènes */
   let cs = null, csTab = null;
   function customHTML() {
-    const s = g.s, av = s.avatar && cat.get(s.avatar);
+    const s = g.s, av = g.shownAvatar() && cat.get(g.shownAvatar()); /* v545 : le portrait que voient les autres joueurs */
     const allF = Object.entries({ ...FRAMES, ...CODEX_FRAMES }).filter(([k]) => s.frames.includes(k) || U.frames.some((f) => f.key === k));
     const ownF = allF.filter(([k]) => s.frames.includes(k)), lockedF = allF.filter(([k]) => !s.frames.includes(k));
     const lockedT = U.titles.filter((t) => !s.titles.includes(t.name));
@@ -104,7 +104,7 @@ export default function profile(app, root) {
   function render() {
     const s = g.s, lv = g.levelInfo();
     const owned = g.uniqueCount(), total = g.total();
-    const av = s.avatar && cat.get(s.avatar);
+    const av = g.shownAvatar() && cat.get(g.shownAvatar());
     const show = (s.showcase.length ? s.showcase.map((id) => cat.get(id)) : g.bestCards(3)).filter(Boolean);
     root.innerHTML = `
       <section class="panel ornate profile-head bn-profile" data-act="custom">

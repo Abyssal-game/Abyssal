@@ -40,7 +40,7 @@ export default function settings(app, root) {
         <div class="seg lang-grid" role="radiogroup" aria-label="Langue" translate="no">${Object.entries(LANGS).map(([k, l]) => `<button class="seg-b" role="radio" data-act="lang" data-v="${k}" aria-checked="${LANG === k}" aria-pressed="${LANG === k}">${l}</button>`).join('')}</div>
       </section>
       <section class="panel stack">
-        <h2>Son et animations</h2>
+        <h2>Son et musique</h2>
         ${toggle('sound', 'Effets sonores', 'Ouverture, révélation, combat. Le mode silencieux de l’iPhone peut les couper.')}
         <div class="set-row col"><label for="vol"><b>Volume</b></label><input id="vol" type="range" min="0" max="1" step="0.05" value="${s.volume}" ${s.sound ? '' : 'disabled'}></div>
         ${toggle('music', 'Musique d’ambiance', 'Une ambiance différente selon le lieu : Accueil, Butin, Descente, combat, gardien, et chaque jeu de la Salle des jeux.')}
@@ -49,25 +49,38 @@ export default function settings(app, root) {
         ${window.Capacitor?.isNativePlatform?.() ? '' : toggle('loud', 'Son même en mode silencieux', 'Le jeu reste audible quand le bouton silencieux de l’iPhone est activé (iOS 17 ou plus). Peut couper la musique d’une autre app.')}
         ${toggle('haptics', 'Vibrations', 'Petites vibrations sur les coups, les victoires et les cartes rares. Dans l’app, le téléphone vibre vraiment ; sur le site web, l’iPhone ne vibre presque pas.')}
         ${notifSupported() ? `<div class="set-row"><div><b>Notifications</b><p class="small muted">Booster gratuit du jour (10 h) et rappel 2 h avant la fin du délai quand c’est à toi de jouer en ligne.</p></div><button class="switch" role="switch" aria-checked="${!!s.notif}" data-act="notif" aria-label="Notifications"><i></i></button></div>` : ''}
-        ${seg('motion', 'Animations', [['auto', 'Selon l’appareil'], ['reduced', 'Réduites'], ['full', 'Complètes']])}
+      </section>
+      <section class="panel stack">
+        <h2>Combat</h2>
         ${seg('defense', 'Défense active en combat', [['on', 'Manuelle'], ['auto', 'Automatique']])}
-        <p class="small muted set-note">Manuelle : touche dans la zone dorée pour esquiver, sur le trait blanc pour une parade parfaite. Automatique : rien à toucher, mais seulement 4 esquives sur 10 et jamais de parade parfaite (moins de Ferveur et de PA).</p>
+        <p class="small muted set-note">Manuelle : à chaque attaque ennemie, un geste (toucher la zone dorée, garder le doigt appuyé ou glisser dans le sens de la flèche) ; sur le trait blanc, parade parfaite. Automatique : rien à toucher, mais seulement 4 esquives sur 10 et jamais de parade parfaite (moins de Ferveur et de PA).</p>
         ${seg('decor', 'Décor des combats', [['riche', 'Riche'], ['sobre', 'Sobre']])}
         <p class="small muted set-note">Sobre : la salle reste en place, sans particules ni flammes qui vacillent. Plus reposant, et un peu plus économe en batterie.</p>
         ${seg('quality', 'Effets des combats', [['auto', 'Complets'], ['light', 'Allégés']])}
         <p class="small muted set-note">Allégés : moins de particules, ni secousses de caméra ni éclairs, décor sobre. À essayer si les combats saccadent.</p>
+      </section>
+      <section class="panel stack">
+        <h2>Affichage</h2>
+        ${seg('motion', 'Animations', [['auto', 'Selon l’appareil'], ['reduced', 'Réduites'], ['full', 'Complètes']])}
         ${toggle('fastOpen', 'Ouverture rapide des boosters', 'Affiche directement le récapitulatif, sans révéler les cartes une par une.')}
       </section>
 `;
   }
   function tabTutos() {
     const seen = g.s.tips || {};
-    const groups = [...new Set(TUTOS.map((t) => t.group))];
+    /* v545 : l'ancien groupe « Aventure » séparé en Descente et Salle des jeux (jeux regroupés) */
+    const DESC = ['army-doors', 'trials', 'cb-talent', 'dc-nightmare'];
+    const GAMES = ['sceaux', 'sceaux-board', 'sceaux-sacre', 'sceaux-combo', 'sceaux-perks', 'sceaux-awake', 'pacte', 'pacte-play', 'cryptes', 'cryptes-play', 'encheres', 'encheres-play'];
+    const grp = (t) => (DESC.includes(t.key) ? 'Descente' : GAMES.includes(t.key) ? 'Salle des jeux' : t.group);
+    const ord = (t) => { const k = [DESC, GAMES].map((l) => l.indexOf(t.key)).find((x) => x >= 0); return k ?? TUTOS.indexOf(t); };
+    const ORDER = ['Combat', 'Descente', 'Salle des jeux', 'Cartes', 'Réglages'];
+    const groups = [...new Set(TUTOS.map(grp))].sort((a, b) => (ORDER.indexOf(a) + 99) % 99 - (ORDER.indexOf(b) + 99) % 99);
+    const inGroup = (gr) => TUTOS.filter((t) => grp(t) === gr).sort((a, b) => ord(a) - ord(b));
     return `<section class="panel stack">
         <h2>Revoir les tutoriels</h2>
         <p class="small muted">Touche un tutoriel pour le relire. Ceux que tu n’as pas encore rencontrés apparaîtront d’eux-mêmes au bon moment, ou touche-les pour les lire dès maintenant.</p>
         <button class="set-tuto big" data-act="welcome"><span class="set-tuto-ic">${icon('sparkle')}</span><span><b>Le guide de départ</b><span class="small muted">Les bases d’ABYSSAL en quelques pages</span></span>${icon('next')}</button>
-        ${groups.map((gr) => `<h3 class="set-tuto-g">${esc(gr)}</h3>${TUTOS.filter((t) => t.group === gr).map((t) => `<button class="set-tuto ${seen[t.key] ? '' : 'new'}" data-act="tuto" data-k="${t.key}"><span class="set-tuto-ic">${icon('info')}</span><span><b>${esc(t.title)}</b><span class="small muted">${seen[t.key] ? 'Déjà vu' : 'Pas encore rencontré'}</span></span>${icon('next')}</button>`).join('')}`).join('')}
+        ${groups.map((gr) => `<h3 class="set-tuto-g">${esc(gr)}</h3>${inGroup(gr).map((t) => `<button class="set-tuto ${seen[t.key] ? '' : 'new'}" data-act="tuto" data-k="${t.key}"><span class="set-tuto-ic">${icon('info')}</span><span><b>${esc(t.title)}</b><span class="small muted">${seen[t.key] ? 'Déjà vu' : 'Pas encore rencontré'}</span></span>${icon('next')}</button>`).join('')}`).join('')}
         <button class="btn small ghost" data-act="guide">${icon('back')}Réactiver toutes les bulles d’aide</button>
       </section>`;
   }
@@ -82,10 +95,8 @@ export default function settings(app, root) {
       </div></details>`;
   }
   function tabAbout(s) {
-    return `${sync.profile?.badge === 'createur' || s.dev ? `<section class="panel stack cr-entry"><h2>${icon('crown')} Mode Créateur</h2>
-        <p class="small muted">Réservé au badge Créateur : ressources, cartes, variantes, boosters imposés et Descente à volonté.</p>
-        <button class="btn gold block" data-act="creator">${s.dev ? 'Ouvrir les pouvoirs' : 'Activer le Mode Créateur'}</button></section>` : ''}
-      <section class="panel stack about">
+    /* v545 : À propos d'abord, le Mode Créateur ensuite */
+    return `      <section class="panel stack about">
         <h2>À propos</h2>
         <p class="small">ABYSSAL — Le Bestiaire interdit.</p>
         <p class="small muted" data-act="vtap">Version ${esc(app.version)} · ${app.catalog.cards.length} cartes</p>
@@ -94,6 +105,9 @@ export default function settings(app, root) {
         <button class="btn ghost small" data-act="sndtest">${icon('dodge')} Tester le son</button>` : ''}
         <a class="btn ghost small" href="confidentialite.html" target="_blank" rel="noopener">${icon('book')} Politique de confidentialité</a>
       </section>
+      ${sync.profile?.badge === 'createur' || s.dev ? `<section class="panel stack cr-entry"><h2>${icon('crown')} Mode Créateur</h2>
+        <p class="small muted">Réservé au badge Créateur : ressources, cartes, variantes, boosters imposés et Descente à volonté.</p>
+        <button class="btn gold block" data-act="creator">${s.dev ? 'Ouvrir les pouvoirs' : 'Activer le Mode Créateur'}</button></section>` : ''}
       <div class="online-pill" role="status" aria-live="polite"><img class="on-ic" alt="" src="assets/icons/online.webp"><span class="on-dot"></span><span class="on-t">Connexion…</span></div>`;
   }
   function paintPill(p = presence) {
@@ -105,7 +119,7 @@ export default function settings(app, root) {
     const s = g.s.settings;
     const body = { jeu: (x) => tabJeu(x) + tabSave(), tutos: tabTutos, about: tabAbout }[ui.tab] || ((x) => tabJeu(x) + tabSave());
     root.innerHTML = `
-      <header class="screen-head ui-hero bn-settings"><h1>Réglages</h1><p class="muted">Jeu, son, tutoriels.</p></header>
+      <header class="screen-head ui-hero bn-settings"><h1>Réglages</h1><p class="muted">Langue, son, combat, tutoriels.</p></header>
       <nav class="set-tabs" role="tablist">${TABS.map(([k, l, ic, fb]) => `<button class="set-tab" role="tab" aria-selected="${ui.tab === k}" data-act="tab" data-k="${k}">${tabIcon(ic, fb)}<span>${l}</span></button>`).join('')}</nav>
       <div class="set-body">${body(s)}</div>`;
     paintPill();

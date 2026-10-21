@@ -1,5 +1,12 @@
 // Dictionnaire italien (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Ton profil, tes amis, tes succès et les réglages du jeu.": "Il tuo profilo, i tuoi amici, i tuoi successi e le impostazioni del gioco.",
+  "Pseudo, mot de passe, déconnexion": "Nickname, password, disconnessione",
+  "Langue, son, combat, tutoriels": "Lingua, suono, combattimento, tutorial",
+  "Langue, son, combat, tutoriels.": "Lingua, suono, combattimento, tutorial.",
+  "Son et musique": "Suono e musica",
+  "Affichage": "Visualizzazione",
+  "Manuelle : à chaque attaque ennemie, un geste (toucher la zone dorée, garder le doigt appuyé ou glisser dans le sens de la flèche) ; sur le trait blanc, parade parfaite. Automatique : rien à toucher, mais seulement {0} esquives sur {1} et jamais de parade parfaite (moins de Ferveur et de PA).": "Manuale: ogni attacco nemico chiede un gesto (toccare la zona dorata, tenere il dito premuto o scorrere nel verso della freccia); sulla linea bianca, parata perfetta. Automatica: niente da toccare, ma solo {0} schivate su {1} e mai una parata perfetta (meno Fervore e PA).",
   " ou ": " o ",
   "(Relais d’ombre : +{0} PA)": "(Staffetta d’ombra: +{0} PA)",
   "(dernière paire décisive)": "(l’ultima coppia decide)",

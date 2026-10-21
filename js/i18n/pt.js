@@ -1,5 +1,12 @@
 // Dictionnaire portugais du Brésil (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Ton profil, tes amis, tes succès et les réglages du jeu.": "Seu perfil, seus amigos, suas conquistas e as configurações do jogo.",
+  "Pseudo, mot de passe, déconnexion": "Apelido, senha, sair",
+  "Langue, son, combat, tutoriels": "Idioma, som, combate, tutoriais",
+  "Langue, son, combat, tutoriels.": "Idioma, som, combate, tutoriais.",
+  "Son et musique": "Som e música",
+  "Affichage": "Exibição",
+  "Manuelle : à chaque attaque ennemie, un geste (toucher la zone dorée, garder le doigt appuyé ou glisser dans le sens de la flèche) ; sur le trait blanc, parade parfaite. Automatique : rien à toucher, mais seulement {0} esquives sur {1} et jamais de parade parfaite (moins de Ferveur et de PA).": "Manual: cada ataque inimigo pede um gesto (tocar a zona dourada, manter o dedo pressionado ou deslizar no sentido da seta); na linha branca, aparada perfeita. Automática: nada para tocar, mas apenas {0} esquivas em {1} e nunca aparada perfeita (menos Fervor e PA).",
   " ou ": " ou ",
   "(Relais d’ombre : +{0} PA)": "(Elo sombrio: +{0} PA)",
   "(dernière paire décisive)": "(o último par decide)",

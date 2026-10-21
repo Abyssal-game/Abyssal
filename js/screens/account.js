@@ -126,7 +126,6 @@ export default function account(app, root) {
         <h2>Pseudo</h2>
         <p class="small muted">C’est le nom que les autres joueurs voient dans les classements.</p>
         ${p?.badge ? `<p class="small">Ton badge : ${cloud.badgeHTML(p.badge)}</p>` : ''}
-        ${p?.badge === 'createur' ? '<a class="btn gold small" href="#/parametres">Mode Créateur (dans Réglages)</a>' : ''}
         ${p?.pseudo && p.pseudo_locked ? `<p class="acc-pseudo-fixed">${icon('lock')} <b>${esc(p.pseudo)}</b> <span class="small muted">· définitif</span></p>` /* v500 : le pseudo ne se change plus */
           : `<form class="row gap acc-pseudo" id="pseudo"><input class="input plain" name="pseudo" maxlength="16" minlength="3" placeholder="Ton pseudo" value="${esc(isMaskedPseudo(p?.pseudo) ? '' : p?.pseudo || '')}" required><button class="btn primary" type="submit">OK</button></form><p class="small muted">Attention : une fois choisi, ton pseudo est définitif.</p>`}
         ${p?.pseudo ? '' : '<p class="small acc-warn">Choisis un pseudo pour apparaître au classement de la Descente.</p>'}

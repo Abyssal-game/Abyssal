@@ -160,7 +160,7 @@ const htmlOf = new WeakMap();
 function setIf(el, html) { if (htmlOf.get(el) !== html) { htmlOf.set(el, html); el.innerHTML = html; } }
 function renderChrome() {
   const g = app.game, s = g.s, lv = g.levelInfo();
-  const avatarCard = s.avatar && g.catalog.get(s.avatar);
+  const avatarCard = g.shownAvatar() && g.catalog.get(g.shownAvatar()); /* v545 : même portrait que celui montré aux autres */
   const top = document.getElementById('topbar');
   const parent = PARENT[app.route];
   setIf(top, `
