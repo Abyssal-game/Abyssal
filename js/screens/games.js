@@ -1,4 +1,4 @@
-// v425 : la Salle des jeux (Aventure → Jeux) : les jeux de cartes à part (Duels des Sceaux, Enchères, Pacte, Cryptes).
+// v425 : le Cercle de l’Abysse (Aventure → Jeux) : les jeux de cartes à part (Duels des Sceaux, Enchères, Pacte, Cryptes).
 import { icon } from '../ui/icons.js';
 import { setScene } from '../ui/scene.js';
 import * as EN from '../core/encheres.js';
@@ -16,8 +16,8 @@ export default function gamesScreen(app, root) {
   const daily = (k) => (!g.sceauxOpen() || !opened[k] ? '' : left.includes(k) ? `<span class="gm-daily">${icon('p:hourglass')}Défi du jour à relever</span>` : g.dailyState(k) === 'tried' ? `<span class="gm-daily done">${icon('p:hourglass')}Défi du jour tenté</span>` : `<span class="gm-daily done">${icon('check')}Défi du jour relevé</span>`); /* v538 : un seul essai */
   const tile = (href, cls, title, sub, info, img) => `<a class="panel gm-tile ${cls}" href="${href}"><span class="gm-art" style="background-image:url(${img})"></span>
     <span class="gm-txt"><b>${title}</b><span class="small">${sub}</span><span class="small muted">${info}</span>${daily(href.slice(2))}</span>${icon('next')}</a>`;
-  root.innerHTML = `<header class="screen-head ui-hero bn-jeux"><h1>Salle des jeux</h1><p class="muted">Des jeux de cartes à part, contre les arbitres de l’Abysse.</p></header>
-    ${g.sceauxOpen() ? '' : `<section class="panel tr-lock">${icon('lock')}<b>Encore scellée</b><p class="small">Vaincs ton <b>premier gardien</b> dans la Descente (étage 5) pour ouvrir la Salle des jeux.</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`}
+  root.innerHTML = `<header class="screen-head ui-hero bn-jeux"><h1>Le Cercle de l’Abysse</h1><p class="muted">Des jeux de cartes contre les arbitres de l’Abysse, ou contre d’autres joueurs.</p></header>
+    ${g.sceauxOpen() ? '' : `<section class="panel tr-lock">${icon('lock')}<b>Encore scellée</b><p class="small">Vaincs ton <b>premier gardien</b> dans la Descente (étage 5) pour ouvrir le Cercle de l’Abysse.</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`}
     <div class="gm-list ${g.sceauxOpen() ? '' : 'locked'}">
       ${tile('#/sceaux', 'gm-sceaux', 'Duels des Sceaux', 'Pose tes cartes sur un plateau de 3 × 3 et capture celles de l’adversaire.', `${rec(sc.wins, sc.losses)} · ${Object.keys(sc.beaten || {}).length} / 8 adversaires battus`, 'assets/ui/bn-sceaux.webp')}
       ${tile('#/cryptes', 'gm-cryptes', 'Les Cryptes', 'Un jeu de mémoire : retrouve les paires et réveille les pouvoirs des factions.', `${rec(cr.wins, cr.losses)} · ${Object.keys(cr.beaten || {}).length} / ${CR.TABLES.length} cryptes gagnées`, 'assets/ui/bn-cryptes.webp')}

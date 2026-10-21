@@ -22,7 +22,7 @@ export default function menu(app, root) {
     <nav class="mn-grid">
       ${profile}
       ${T('#/amis', 'amis', 'Amis', '<span class="mn-fr">Collections et succès de tes amis</span>').replace('class="mn-tile"', 'class="mn-tile mn-wide mn-friends"')}
-      ${T('#/succes', 'crown', 'Succès', `${achDone} / ${cat.achievements.length} débloqués`)}
+      ${T('#/succes', 'crown2', 'Succès', `${achDone} / ${cat.achievements.length} débloqués`)}
       ${T('#/bestiaire', 'book', 'Bestiaire', 'Créatures, royaumes, histoire')}
       ${T('#/compte', 'account', 'Compte', 'Pseudo, mot de passe, déconnexion')}
       ${T('#/parametres', 'settings', 'Réglages', 'Langue, son, combat, tutoriels')}

@@ -51,16 +51,21 @@ export default function profile(app, root) {
     const backNow = backs.find(([k]) => (s.back || null) === k) || backs[0];
     const fins = (s.finishes || []).filter((k) => FINISHES[k]);
     const dressed = Object.keys(s.dress || {}).length;
-    const frameBtn = ([k, name]) => { const has = s.frames.includes(k), how = U.frames.find((f) => f.key === k)?.how || ''; return `<button class="frame-pick ${has ? '' : 'pf-lock'}" data-cs="${has ? 'frame' : 'how'}" data-v="${has ? k : esc(name)}" data-how="${esc(how)}" aria-pressed="${s.frame === k}"><span class="avatar-mini pf pf-${k}">${has ? '' : icon('lock')}</span><span class="small">${esc(name)}</span></button>`; };
-    const head = `<div class="cs-hero"><span class="avatar-big pf pf-${s.frame}">${av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM}</span><div><b class="cs-name">${esc(s.name || 'Ton nom')}</b><span class="cs-title">${esc(s.title)}</span></div><img class="cs-backnow" alt="" src="${backNow[2]}"></div>`;
+    const frameBtn = ([k, name]) => { const has = s.frames.includes(k), how = U.frames.find((f) => f.key === k)?.how || ''; return `<button class="frame-pick ${has ? '' : 'pf-lock'}" data-cs="${has ? 'frame' : 'how'}" data-v="${has ? k : esc(name)}" data-how="${esc(how)}" aria-pressed="${s.frame === k}"><span class="avatar-mini pf pf-${k}">${has ? avImg : icon('lock')}</span><span class="small">${esc(name)}</span></button>`; };
+    /* v557 : menu Personnaliser refait (scène illustrée, rangées avec aperçu, nombre possédé sur le total, barre) */
+    const shownName = sync.profile?.pseudo || s.name || 'Toi';
+    const avImg = av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM;
+    const fan = backs.slice(0, 3).map(([, , u], i) => `<img class="cs-fan f${i}" alt="" src="${u}">`).join('');
+    const head = `<div class="cs-hero bn-profile"><span class="avatar-big pf pf-${s.frame}">${avImg}</span><div><b class="cs-name">${esc(shownName)}</b><span class="cs-title">${esc(s.title)}</span><span class="cs-lv">Niveau ${g.levelInfo().level}</span></div><span class="cs-fanbox">${fan}</span></div>`;
     const SECTIONS = [
       ['avatar', 'Avatar', av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM, av ? esc(av.name) : 'Une de tes créatures', Object.keys(s.collection).length],
       ['titles', 'Titres', picon('titles'), esc(s.title), `${s.titles.length}`],
-      ['frames', 'Cadres de profil', `<span class="avatar-mini pf pf-${s.frame}"></span>`, esc(({ ...FRAMES, ...CODEX_FRAMES })[s.frame] || ''), `${ownF.length}`],
+      ['frames', 'Cadres de profil', `<span class="avatar-mini pf pf-${s.frame}">${avImg}</span>`, esc(({ ...FRAMES, ...CODEX_FRAMES })[s.frame] || ''), `${ownF.length}`],
       ['backs', 'Dos de cartes', `<img alt="" src="${backNow[2]}">`, esc(backNow[1]), `${backs.length}`],
       ['finishes', 'Finitions de cartes', fins.length ? `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"><img alt="" src="assets/variants/${fins[0]}-frame.webp"></span>` : `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"></span>`, fins.length ? `${dressed} carte${dressed > 1 ? 's' : ''} habillée${dressed > 1 ? 's' : ''}` : 'Contours peints des cartes', `${fins.length}`],
     ].filter(([k]) => k !== 'finishes' || fins.length || g.codexOn()); /* v499 : plus de tuiles « Bientôt » : finitions seulement si on en possède */
-    if (!csTab) return `${head}<div class="cs-menu">${SECTIONS.map(([k, n, pic, sub, cnt]) => `<button class="cs-tile ${cnt === null ? 'soon' : ''}" data-cs="tab" data-v="${k}" ${cnt === null ? 'disabled' : ''}><span class="cs-pic">${pic}</span><b>${n}</b><small>${sub}</small>${cnt !== null ? `<em>${cnt}</em>` : ''}</button>`).join('')}</div>`;
+    const TOT = { avatar: g.total(), titles: s.titles.length + lockedT.length, frames: allF.length, backs: 1 + Object.keys(CODEX_BACKS).length, finishes: Object.keys(FINISHES).length };
+    if (!csTab) return `${head}<div class="cs-list">${SECTIONS.map(([k, n, pic, sub, cnt]) => { const tot = TOT[k] || 0, has = Math.min(+cnt || 0, tot || 0); return `<button class="cs-row k-${k}" data-cs="tab" data-v="${k}"><span class="cs-pic">${pic}</span><span class="cs-txt"><b>${n}</b><small>${sub}</small><span class="cs-bar"><i style="width:${tot ? (has / tot) * 100 : 0}%"></i></span></span><span class="cs-cnt"><b>${has}</b><small>/ ${tot}</small></span><span class="cs-go">${icon('next')}</span></button>`; }).join('')}</div>`;
     const back = `<button class="btn ghost small cs-back" data-cs="tab" data-v="">${icon('prev')}Personnaliser</button>`;
     const title = SECTIONS.find(([k]) => k === csTab)?.[1] || '';
     let body = '';

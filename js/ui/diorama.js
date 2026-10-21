@@ -204,7 +204,7 @@ function monument(kind, c) {
   if (kind === 'eclipse') return '<div class="dio-mon dio-eclipse"><i class="dio-corona"></i><i class="dio-disc"></i></div>';
   if (kind === 'maw') return '<div class="dio-mon dio-maw"><i class="dio-gullet"></i></div>';
   if (kind === 'frostcrown') return `<div class="dio-mon dio-frostcrown">${P.crystal({ glow: '#CFF6FF' })}</div>`;
-  if (kind === 'masks') return '<div class="dio-mon dio-crown"><img alt="" src="assets/icons/crown.webp"></div>';
+  if (kind === 'masks') return '<div class="dio-mon dio-crown"><img alt="" src="assets/icons/crown2.webp"></div>';
   if (kind === 'geometry') return '<div class="dio-mon dio-geo"><img alt="" src="assets/fx/seal.webp"></div>';
   return '';
 }

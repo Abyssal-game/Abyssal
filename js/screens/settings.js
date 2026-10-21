@@ -43,7 +43,7 @@ export default function settings(app, root) {
         <h2>Son et musique</h2>
         ${toggle('sound', 'Effets sonores', 'Ouverture, révélation, combat. Le mode silencieux de l’iPhone peut les couper.')}
         <div class="set-row col"><label for="vol"><b>Volume</b></label><input id="vol" type="range" min="0" max="1" step="0.05" value="${s.volume}" ${s.sound ? '' : 'disabled'}></div>
-        ${toggle('music', 'Musique d’ambiance', 'Une ambiance différente selon le lieu : Accueil, Butin, Descente, combat, gardien, et chaque jeu de la Salle des jeux.')}
+        ${toggle('music', 'Musique d’ambiance', 'Une ambiance différente selon le lieu : Accueil, Butin, Descente, combat, gardien, et chaque jeu du Cercle de l’Abysse.')}
         <div class="set-row col"><label for="mvol"><b>Volume de la musique</b></label><input id="mvol" type="range" min="0" max="1" step="0.05" value="${s.musicVol ?? 0.55}" ${s.sound && s.music !== false ? '' : 'disabled'}></div>
         ${s.sound && s.music !== false ? `<div class="set-row col"><b>Écouter les ambiances</b><div class="set-sfx">${MUSIC_DEMO.map(([n], i) => `<button class="chip" data-mus="${i}">${n}</button>`).join('')}</div></div>` : ''}
         ${window.Capacitor?.isNativePlatform?.() ? '' : toggle('loud', 'Son même en mode silencieux', 'Le jeu reste audible quand le bouton silencieux de l’iPhone est activé (iOS 17 ou plus). Peut couper la musique d’une autre app.')}
@@ -68,12 +68,12 @@ export default function settings(app, root) {
   }
   function tabTutos() {
     const seen = g.s.tips || {};
-    /* v545 : l'ancien groupe « Aventure » séparé en Descente et Salle des jeux (jeux regroupés) */
+    /* v545 : l'ancien groupe « Aventure » séparé en Descente et Cercle de l’Abysse (jeux regroupés) */
     const DESC = ['army-doors', 'trials', 'cb-talent', 'dc-nightmare'];
     const GAMES = ['sceaux', 'sceaux-board', 'sceaux-sacre', 'sceaux-combo', 'sceaux-perks', 'sceaux-awake', 'pacte', 'pacte-play', 'cryptes', 'cryptes-play', 'encheres', 'encheres-play'];
-    const grp = (t) => (DESC.includes(t.key) ? 'Descente' : GAMES.includes(t.key) ? 'Salle des jeux' : t.group);
+    const grp = (t) => (DESC.includes(t.key) ? 'Descente' : GAMES.includes(t.key) ? 'Cercle de l’Abysse' : t.group);
     const ord = (t) => { const k = [DESC, GAMES].map((l) => l.indexOf(t.key)).find((x) => x >= 0); return k ?? TUTOS.indexOf(t); };
-    const ORDER = ['Combat', 'Descente', 'Salle des jeux', 'Cartes', 'Réglages'];
+    const ORDER = ['Combat', 'Descente', 'Cercle de l’Abysse', 'Cartes', 'Réglages'];
     const groups = [...new Set(TUTOS.map(grp))].sort((a, b) => (ORDER.indexOf(a) + 99) % 99 - (ORDER.indexOf(b) + 99) % 99);
     const inGroup = (gr) => TUTOS.filter((t) => grp(t) === gr).sort((a, b) => ord(a) - ord(b));
     return `<section class="panel stack">

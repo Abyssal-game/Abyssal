@@ -55,9 +55,9 @@ export function openCreator(app) {
         <p class="small muted">${d.run ? `Chapitre en cours : étage ${d.run.floor}.` : 'Lance une Descente pour pouvoir sauter d’étage.'}</p>
       </section>
 
-      <section class="cr-sec"><h3>Salle des jeux</h3>
+      <section class="cr-sec"><h3>Cercle de l’Abysse</h3>
         <p class="small muted">${g.s.devGames ? 'Ouverte : tu peux jouer aux jeux comme si le gardien de l’étage 5 était vaincu.' : 'Ouvre les jeux (Duels des Sceaux, Cryptes, Pacte, Enchères) comme si le gardien de l’étage 5 était vaincu.'} Ta campagne ne change pas, et tout se referme si tu désactives le Mode Créateur.</p>
-        <div class="row gap wrap">${B('games', g.s.devGames ? 'Refermer la Salle des jeux' : 'Ouvrir la Salle des jeux', g.s.devGames ? '' : 'gold')}</div></section>
+        <div class="row gap wrap">${B('games', g.s.devGames ? 'Refermer le Cercle de l’Abysse' : 'Ouvrir le Cercle de l’Abysse', g.s.devGames ? '' : 'gold')}</div></section>
 
       <section class="cr-sec"><h3>Codex et Échoppe (ébauche)</h3>
         <p class="small muted">${g.s.devCodex ? 'Affichés : onglet Butin → Codex. Toi seul les vois (Mode Créateur).' : 'Le futur pass de saison et la boutique en argent réel, encore cachés aux joueurs. Les achats y sont simulés.'}</p>

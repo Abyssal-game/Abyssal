@@ -15,7 +15,7 @@ const PAGES = [
   { bn: 'furnace', t: 'Cendres et niveaux', p: 'Dans la Fournaise, brûle tes doublons : ils deviennent des cendres. Dans Renforcer, les cendres font monter tes créatures de niveau, pour plus d’attaque et de PV.' },
   { img: 3, t: 'La Descente', p: 'Dans l’onglet Aventure, ton équipe descend dans l’Abysse : 3 créatures au combat, 2 en réserve. 20 chapitres de 5 étages, un gardien à la fin de chacun, et une récompense à chaque étage gagné.' },
   { bn: 'trial', t: 'Les Épreuves du jour', p: 'Toujours dans Aventure : trois combats par jour, réglés sur la force de tes meilleures cartes. Chaque victoire rapporte un coffre, et fait avancer la saison du mois.' },
-  { bn: 'sceaux', t: 'Une autre aventure', p: 'Toujours dans Aventure, la Salle des jeux : quatre jeux de cartes à part : les Duels des Sceaux, Les Cryptes (un jeu de mémoire), Le Pacte (tenter sa chance) et les Enchères de Mammon.' },
+  { bn: 'sceaux', t: 'Une autre aventure', p: 'Toujours dans Aventure, le Cercle de l’Abysse : quatre jeux de cartes à part : les Duels des Sceaux, Les Cryptes (un jeu de mémoire), Le Pacte (tenter sa chance) et les Enchères de Mammon.' },
   { bn: 'shadow', t: 'Coffres et Tirage des Ombres', p: 'Dans l’onglet Butin, ouvre tes boosters et les coffres gagnés en jouant. Le Tirage des Ombres donne un booster par jour : sa valeur compte pour le classement de la semaine, et les 3 premiers gagnent un coffre.' },
   { img: 4, t: 'Reviens chaque jour', p: 'L’Accueil rassemble ce qui t’attend : ton prochain objectif, l’offrande, les Épreuves, les missions et les coffres. Le Sanctuaire garde ton profil, tes succès, le bestiaire et les réglages (son, musique, vibrations, tutoriels).' },
 ];

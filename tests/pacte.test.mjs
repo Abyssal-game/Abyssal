@@ -9,9 +9,10 @@ const catalog = loadCatalog();
 const clock = () => new Date(2026, 9, 18, 12);
 const F = (f, v) => ({ f, v, id: null });
 
-test('pacte : 58 cartes (7 factions × 1 à 7, 3 Sceaux, 3 Gardiens, 3 Offrandes), illustrations de la bonne faction', () => {
+test('pacte : 60 cartes (7 factions × 1 à 7, 3 Sceaux, 3 Gardiens, 3 Offrandes, 2 Présages), illustrations de la bonne faction', () => {
   const st = PA.newGame(catalog, { table: 'novice', seed: 5 });
-  assert.equal(st.deck.length, 58);
+  assert.equal(st.deck.length, 60);
+  assert.equal(st.deck.filter((c) => c.sp === 'oracle').length, 2);
   assert.equal(st.deck.filter((c) => c.f).length, 49);
   for (const k of ['sceau', 'gardien', 'offrande']) assert.equal(st.deck.filter((c) => c.sp === k).length, 3);
   assert.ok(st.deck.filter((c) => c.f).every((c) => catalog.get(c.id)?.faction === c.f));
@@ -82,4 +83,20 @@ test('pacte : récompenses (1re victoire, coffre, pacte suivant ouvert)', () => 
   assert.equal(g.s.chests.bois, chests + 1);
   assert.ok(PA.tableUnlocked(g.s, 1)); assert.ok(g.pacteDailyOpen());
   assert.equal(g.pacteFinish(), out, 'pas de double récompense');
+});
+
+test('v557 : le Présage montre la carte suivante, et l’adversaire s’en sert', () => {
+  const st = PA.newGame(catalog, { table: 'novice', seed: 9 });
+  // une rangée avec une faction, puis un Présage, puis une carte de la même faction : l'adversaire s'arrête
+  const f = st.deck.find((c) => c.f);
+  const same = st.deck.find((c) => c.f === f.f && c !== f);
+  st.deck = st.deck.filter((c) => c !== f && c !== same && c.sp !== 'oracle');
+  st.deck.push(same, { sp: 'oracle' }, f);
+  st.turn = 'a';
+  PA.draw(st); PA.draw(st);
+  assert.equal(st.peek, true);
+  assert.equal(PA.bustChance(st), 1);
+  assert.equal(PA.aiWants(st, () => 0.99), false);
+  PA.stop(st);
+  assert.equal(st.peek, false, 'le Présage ne dure que le tour');
 });

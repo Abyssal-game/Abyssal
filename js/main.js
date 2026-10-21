@@ -98,6 +98,7 @@ const app = {
   chrome() { renderChrome(); },
 };
 if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__abyssal = app; /* accès pour les tests automatisés (v499 : seulement en local) */
+if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__abyssalProg = (ev) => onProgress(ev);
 
 function applySettings() {
   const s = app.game.s.settings;
@@ -317,25 +318,42 @@ function rewardText(r = {}) {
   return parts.join(', ');
 }
 app.rewardText = rewardText;
+/* v557 (demande du propriétaire : les succès et niveaux couvraient l'écran) : une petite pastille en haut de l'écran
+   (« Succès · nom », « Niveau 12 », « 3 récompenses ») ; un toucher ouvre le détail. Les annonces suivantes s'y ajoutent. */
+const KIND_LABEL = { achievement: 'Succès', set: 'Ensemble complété', faction: 'Faction complétée', fame: 'Renommée', season: 'Saison', level: 'Niveau' };
+const KIND_ICON = { achievement: 'trophy', set: 'star', faction: 'shield', fame: 'star', season: 'trophy', level: 'up' };
+let progList = [], progEl = null, progTimer = 0;
+function progLine(e) { return e.kind === 'level' ? `Niveau ${e.level}` : esc(e.name); }
+function paintProgress() {
+  if (!progEl) {
+    progEl = document.createElement('button'); progEl.className = 'prog-chip'; progEl.type = 'button';
+    progEl.addEventListener('click', () => { const list = progList; hideProgress(); openProgress(list); });
+    document.body.appendChild(progEl);
+  }
+  const one = progList.length === 1 ? progList[0] : null;
+  progEl.innerHTML = `<span class="pc-ic">${one?.kind === 'level' ? '<img class="picon" alt="" src="assets/icons/xp.webp">' : icon(one ? KIND_ICON[one.kind] || 'trophy' : 'trophy')}</span>
+    <span class="pc-t">${one ? `<small>${KIND_LABEL[one.kind] || ''}</small><b>${one.kind === 'level' ? one.level : esc(one.name)}</b>` : `<b>${progList.length} récompenses</b>`}</span><span class="pc-go">Voir</span>`;
+  requestAnimationFrame(() => progEl.classList.add('in'));
+  clearTimeout(progTimer); progTimer = setTimeout(hideProgress, 7000);
+}
+function hideProgress() { clearTimeout(progTimer); progList = []; progEl?.classList.remove('in'); }
+function openProgress(list) {
+  if (!list.length) return;
+  const total = list.reduce((t, e) => t + (e.reward?.shards || 0), 0);
+  const sh = openSheet(`<h2 class="center">${list.length > 1 ? `${list.length} récompenses` : esc(KIND_LABEL[list[0].kind] || 'Récompense')}</h2>
+    <div class="prog-list">${list.map((e) => `<div class="prog-row"><span class="pc-ic">${e.kind === 'level' ? '<img class="picon" alt="" src="assets/icons/xp.webp">' : icon(KIND_ICON[e.kind] || 'trophy')}</span><span><small>${KIND_LABEL[e.kind] || ''}</small><b>${progLine(e)}</b>${rewardText(e.reward) ? `<em>${rewardText(e.reward)}</em>` : ''}</span></div>`).join('')}</div>
+    ${total ? `<p class="small muted center">+${fmt(total)} éclats au total.</p>` : ''}
+    <button class="btn block" data-prog="succes">Voir mes succès</button>`, { label: 'Récompenses' });
+  sh.el.querySelector('[data-prog]')?.addEventListener('click', () => { sh.close(); app.go('succes'); });
+}
 function onProgress(events) {
   const lv = events.filter((e) => e.kind === 'level');
   if (lv.length > 1) events = [...events.filter((e) => e.kind !== 'level'), { kind: 'level', level: lv[lv.length - 1].level, reward: lv.reduce((r, e) => ({ shards: (r.shards || 0) + (e.reward?.shards || 0), tickets: { ...r.tickets, ...e.reward?.tickets }, title: e.reward?.title || r.title }), {}) }];
-  if (events.length > 2) {
-    const names = events.map((e) => (e.kind === 'level' ? `niveau ${e.level}` : esc(e.name)));
-    const total = events.reduce((t, e) => t + (e.reward?.shards || 0), 0);
-    toast(`<b>${events.length} récompenses</b> : ${names.join(', ')}<br><span class="small muted">+${fmt(total)} éclats au total. Détails dans Succès.</span>`, { kind: 'epic', icon: 'trophy', ms: 6000 });
-    sfx.achievement();
-    return;
-  }
-  events.forEach((e) => { // v292 : les annonces passent l'une après l'autre (file de toast), le son joue à l'affichage
-    const snd = { onShow: () => (e.kind === 'fame' ? sfx.fame : e.kind === 'season' ? sfx.season : sfx.achievement)() };
-    if (e.kind === 'achievement') toast(`Succès débloqué : <b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'ach', ms: 4200 , ...snd });
-    if (e.kind === 'set') toast(`Ensemble complété : <b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'epic', icon: 'star', ms: 5000 , ...snd });
-    if (e.kind === 'faction') toast(`Faction complétée : <b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'epic', icon: 'shield', ms: 5000 , ...snd });
-    if (e.kind === 'fame') toast(`Renommée : <b>${esc(e.name)}</b>`, { kind: 'epic', icon: 'star', ms: 4200 , ...snd });
-    if (e.kind === 'season') toast(`<b>${esc(e.name)}</b><br><span class="small muted">${rewardText(e.reward)}</span>`, { kind: 'epic', icon: 'trophy', ms: 4600 , ...snd });
-    if (e.kind === 'level') toast(`<img class="picon toast-xp" alt="" src="assets/icons/xp.webp"><span>Niveau <b>${e.level}</b> atteint !<br><span class="small">${rewardText(e.reward)}</span></span>`, { kind: 'level', ms: 3800 , ...snd });
-  });
+  if (!events.length) return;
+  const k = events[events.length - 1].kind;
+  try { (k === 'fame' ? sfx.fame : k === 'season' ? sfx.season : sfx.achievement)(); } catch (e) { /* le son ne bloque rien */ }
+  progList = [...progList.filter((e) => !(e.kind === 'level' && events.some((x) => x.kind === 'level'))), ...events];
+  paintProgress();
 }
 
 async function boot() {

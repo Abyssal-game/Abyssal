@@ -18,7 +18,7 @@ const hash = (s) => { let h = 2166136261; for (const ch of s) h = Math.imul(h ^ 
 
 export function createCryptesMp(app, root, { modeBar }) {
   const g = app.game, cat = app.catalog;
-  let anim = false, timer = 0, banner = null, pop = null, popDone = null;
+  let anim = false, timer = 0, banner = null, pop = null, popDone = null, last = null; /* v557 : dernier pouvoir en bandeau (plus de fenêtre qui coupe le rythme) */
   // affichage temporaire : cartes montrées (indice → carte), en lumière, échangées, choisies pour un pouvoir
   const ui = { face: new Map(), glow: new Set(), swap: new Set(), picks: [] };
   /* v527 : partie rapide : animations accélérées (presque sautées sous 15 s) pour ne pas manger ton temps ; réveil quand on quitte l'écran */
@@ -35,7 +35,7 @@ export function createCryptesMp(app, root, { modeBar }) {
     const pool = (cat.byFaction?.[c.f] || []).filter((x) => x.rarity !== 'S');
     return pool.length ? pool[hash(`${v.id}:${c.k}`) % pool.length] : null;
   };
-  const face = (v, c) => { const card = artOf(v, c), fc = cat.faction[c.f]?.colors.secondary || '#C9A45A'; return `<img alt="" src="${card ? artUrl(card, { lite: true }) : 'assets/sceaux/dos.webp'}"><span class="cr-f" style="--fc:${fc}">${sigil(c.f)}</span><span class="cr-pwl" style="--fc:${fc}">${PW_LABEL[c.f] || ''}</span>`; };
+  const face = (v, c) => { const card = artOf(v, c), fc = cat.faction[c.f]?.colors.secondary || '#C9A45A'; return `<img alt="" src="${card ? artUrl(card, { lite: true }) : 'assets/sceaux/dos.webp'}"><span class="cr-f" style="--fc:${fc}">${sigil(c.f)}</span>`; };
   const score = (s, x) => (s.pairs?.[x]?.length || 0) + (s.bonus?.[x] || 0);
   const fOfK = (s, k) => (s.cards || []).find((c) => c.k === k && c.f)?.f || (s.log || []).find((e) => e.k === k)?.f;
 
@@ -61,6 +61,7 @@ export function createCryptesMp(app, root, { modeBar }) {
     if (banner) return `<div class="cr-msg ${banner.cls || ''}">${banner.html}</div>`;
     const left = (s.cards || []).filter((c) => !c.gone).length / 2;
     if (v.status !== 'playing') return '';
+    if (last && !(s.pending && ctx.myTurn(v))) return `<div class="cr-msg cr-last ${last.cls}" style="--fc:${cat.faction[last.f]?.colors.secondary || '#C9A45A'}">${pwMed(last.f)}<span><b>${last.title}</b><span class="small">${last.text}</span></span></div>`;
     if (s.pending && ctx.myTurn(v)) { const P = CR.POWERS[s.pending.power]; return `<div class="cr-msg gold">${sigil(s.pending.power)}<span><b>${esc(P.name)}</b> · ${s.pending.power === 'abyssal' ? `touche deux cartes face cachée à échanger${ui.picks.length ? ' (encore une)' : ''}` : s.pending.power === 'infernal' ? 'touche une carte face cachée pour la regarder en secret' : 'touche une carte face cachée : elle sera montrée à tous'}.</span></div>`; }
     return `<div class="cr-msg">${ctx.myTurn(v) ? `<span>${(s.open || []).length ? 'Retourne une deuxième carte.' : 'À toi : retourne deux cartes.'}</span>` : `<span><span>${ctx.waitMsg(v)}</span></span>`}<span class="muted">${t(left > 1 ? '{n} paires à trouver' : '{n} paire à trouver', { n: left })}</span></div>`;
   }
@@ -100,25 +101,23 @@ export function createCryptesMp(app, root, { modeBar }) {
       : ev.power === 'necrotique' ? (ev.stolen != null ? (mine ? t('Tu voles la dernière paire de {name} : elle passe de ton côté.', { name: nm }) : t('{name} te vole ta dernière paire.', { name: nm })) : 'Aucune paire à voler pour l’instant.')
       : ev.empty ? 'Plus assez de cartes cachées : rien ne se passe.'
       : (mine ? PW_MINE[ev.power] : t(PW_FOE[ev.power].replace(/\{nm\}/g, '{name}'), { name: nm }));
-    pop = { f: ev.power, cls: ev.blocked ? 'blocked' : mine ? 'mine' : 'foe', cards: [ev.card, ev.card],
-      kicker: mine ? `Tu trouves une paire · faction ${esc(fname(ev.f))}` : t('{name} trouve une paire · faction {f}', { name: nm, f: esc(tw(fname(ev.f))) }),
-      title: ev.blocked ? `${P.name} bloqué` : P.name, text: what, chips: ['+1 point', mine ? 'Tu rejoues (paire trouvée)' : t('{name} rejoue', { name: nm })] };
+    last = { f: ev.power, cls: ev.blocked ? 'blocked' : mine ? 'mine' : 'foe', title: `${mine ? t('Toi') : nm} · ${esc(ev.blocked ? t('{p} bloqué', { p: tw(P.name) }) : tw(P.name))} <em>${t('+1 point')}</em>`, text: what };
     app.sfx[ev.blocked ? 'block' : 'cr-power']?.();
-    drawGame(v, ctx); await popWait(mine ? 3800 : 3200); pop = null;
+    drawGame(v, ctx); await wait(mine ? 500 : 1200);
   }
   // Rejoue un geste : carte retournée, paire, erreur, pouvoir
   async function show(v, ev, ctx) {
     const mine = ev.who === v.me, nm = esc(ctx.foeName(v));
-    if (ev.kind === 'first') { ui.face.set(ev.i, ev.card); app.sfx['cr-flip']?.(); drawGame(v, ctx); await wait(mine ? 250 : 700); return; }
+    if (ev.kind === 'first') { last = null; ui.face.set(ev.i, ev.card); app.sfx['cr-flip']?.(); drawGame(v, ctx); await wait(mine ? 250 : 700); return; }
     if (ev.kind === 'match' || ev.kind === 'miss') {
       app.sfx['cr-flip']?.();
       ev.i.forEach((i, k) => ui.face.set(i, ev.kind === 'match' ? ev.card : ev.cards[k]));
       if (ev.kind === 'match') { ev.i.forEach((i) => ui.glow.add(i)); drawGame(v, ctx); app.sfx['cr-pair']?.(); await wait(800); ui.face.clear(); ui.glow.clear(); await powerSay(v, ev, ctx); return; }
       drawGame(v, ctx); await wait(1200); ui.face.clear(); app.sfx['cr-miss']?.();
       if (ev.graced) {
-        pop = { f: 'celeste', cls: mine ? 'mine' : 'foe', kicker: mine ? 'Pas de paire… mais' : t('{name} se trompe… mais', { name: nm }), title: 'Grâce céleste',
-          text: mine ? 'Ta paire <b>Céleste</b> te protégeait : cette erreur est pardonnée, <b>tu gardes la main</b>.' : t('Sa paire <b>Céleste</b> le protégeait : {name} <b>garde la main</b>.', { name: nm }), chips: [mine ? 'Tu rejoues' : t('{name} rejoue', { name: nm })] };
-        app.sfx.shield?.(); drawGame(v, ctx); await popWait(2800); pop = null;
+        last = { f: 'celeste', cls: mine ? 'mine' : 'foe', title: `${mine ? t('Toi') : nm} · ${tw('Grâce céleste')}`,
+          text: mine ? 'Ta paire <b>Céleste</b> te protégeait : cette erreur est pardonnée, <b>tu gardes la main</b>.' : t('Sa paire <b>Céleste</b> le protégeait : {name} <b>garde la main</b>.', { name: nm }) };
+        app.sfx.shield?.(); drawGame(v, ctx); await wait(mine ? 500 : 1000);
       }
       return;
     }

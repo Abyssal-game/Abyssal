@@ -32,10 +32,10 @@ export const CODEX_XP = {
   boss: 60,       // première victoire contre un gardien (fin de chapitre)
   win: 5,         // toute autre victoire dans la Descente
   trial: 30,      // Épreuve du jour gagnée
-  game: 15,       // partie gagnée dans la Salle des jeux
+  game: 15,       // partie gagnée dans le Cercle de l’Abysse
   mission: 15,    // mission du jour encaissée
 };
-export const CODEX_XP_LABEL = { floor: 'Étage franchi (1re fois)', boss: 'Gardien vaincu (1re fois)', win: 'Autre victoire dans la Descente', trial: 'Épreuve du jour gagnée', game: 'Partie gagnée dans la Salle des jeux', mission: 'Mission du jour' };
+export const CODEX_XP_LABEL = { floor: 'Étage franchi (1re fois)', boss: 'Gardien vaincu (1re fois)', win: 'Autre victoire dans la Descente', trial: 'Épreuve du jour gagnée', game: 'Partie gagnée dans le Cercle de l’Abysse', mission: 'Mission du jour' };
 
 // Cosmétiques propres au Codex et à l'Échoppe (v472 : cadres peints par Gemini, assets/frames/<clé>.webp, posés par .pf-<clé>)
 export const CODEX_FRAMES = {

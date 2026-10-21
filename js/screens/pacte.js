@@ -1,5 +1,6 @@
 // v449 : Le Pacte — accueil (pactes, défi du jour), partie à deux et fin de partie.
 import * as PA from '../core/pacte.js';
+import { FACTION_ORDER } from '../config.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, picon, crestHTML } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, openSheet } from '../ui/dom.js';
@@ -15,14 +16,16 @@ const stars = (n) => `${'★'.repeat(n)}${'☆'.repeat(Math.max(0, 5 - n))}`;
 const pic = (key) => `<img alt="" src="assets/sceaux/rival-${key}.webp">`;
 export const SP = { sceau: { name: 'Sceau', img: 'assets/jeux/pa-sceau.webp', desc: 'Il te protège : la prochaine faction en double est jetée au lieu de briser le pacte.' },
   gardien: { name: 'Gardien', img: 'assets/jeux/pa-gardien.webp', desc: 'Arrêt forcé : tu encaisses tout de suite ce que tu as devant toi.' },
-  offrande: { name: 'Offrande', img: 'assets/jeux/pa-offrande.webp', desc: 'La prochaine carte de faction compte double.' } };
+  offrande: { name: 'Offrande', img: 'assets/jeux/pa-offrande.webp', desc: 'La prochaine carte de faction compte double.' },
+  oracle: { name: 'Présage', img: 'assets/jeux/pa-presage.webp', desc: 'Tu vois la carte suivante avant de choisir : tirer ou t’arrêter.' } }; /* v557 */
 // v464 : les sept sceaux de cire du parchemin (assets/jeux/pa-table2.webp, 450 × 330), position en % et faction de chacun
 export const SEALS = [['infernal', 47, 170], ['artificiel', 100, 207], ['celeste', 160, 233], ['necrotique', 225, 245], ['sauvage', 292, 235], ['abyssal', 353, 207], ['primordial', 405, 170]];
 const HOW = [['cards', '#7FA8D8', 'Ton tour', 'Tire des cartes une à une et pose-les devant toi. Chaque carte de faction vaut de 1 à 7 points.'],
   ['crystal', '#E8C35A', 'T’arrêter', 'Quand tu veux, arrête-toi : tu gagnes la somme des cartes posées ce tour-ci.'],
   ['danger', '#E0485E', 'Le pacte se brise', 'Si tu tires une faction que tu as déjà posée ce tour-ci, le pacte se brise : tu perds tout ce que tu avais gagné ce tour-ci.'],
   ['crown', '#F2C14E', 'La victoire', `Le premier à ${PA.TARGET} points gagne (certaines salles changent ce but). Ton adversaire joue toujours autant de tours que toi.`],
-  ['seal', '#9FE0FF', 'Les cartes spéciales', 'Sceau : il protège d’une brisure. Gardien : arrêt forcé, tu encaisses tout de suite. Offrande : la prochaine carte compte double.'],
+  ['seal', '#9FE0FF', 'Les cartes spéciales', 'Sceau : il protège d’une brisure. Gardien : arrêt forcé, tu encaisses tout de suite. Offrande : la prochaine carte compte double. Présage (contre l’Abysse) : tu vois la carte suivante avant de choisir.'],
+  ['cards', '#C9A0FF', 'La pioche', 'En haut de la table, la pioche montre combien il reste de cartes de chaque faction et de chaque carte spéciale. Une faction déjà posée ce tour-ci est entourée de rouge : la tirer briserait le pacte.'],
   ['book', '#7FE0A0', 'Les sept factions', `Pose les 7 factions dans le même tour : +${PA.SEVEN_BONUS} points, et ton tour s’arrête.`],
   ['eye', '#C9A45A', 'Le risque', 'Le jeu t’affiche la chance que la prochaine carte brise ton pacte : elle compte les cartes déjà sorties.'],
   ['amis', '#9FE0FF', 'Contre un joueur', `En haut, « Contre un joueur » : affronte d’autres joueurs (au hasard ou un ami), premier à ${PA.TARGET} points. Partie rapide : ${MP_FAST_SECS} s par action, les deux joueurs connectés. Partie lente : ${MP_HOURS} h par action, chacun à son rythme. Action pas jouée à temps : partie perdue. Victoire : +${MP_REWARD.win} éclats et le classement du mois.`]];
@@ -58,7 +61,7 @@ export default function pacteScreen(app, root) {
     setScene('menu');
     if (!g.sceauxOpen()) {
       root.innerHTML = `<header class="screen-head ui-hero bn-pacte"><h1>Le Pacte</h1><p class="muted">Tente ta chance… sans briser le pacte.</p></header>
-        <section class="panel tr-lock">${icon('lock')}<b>Encore scellé</b><p class="small">Vaincs ton <b>premier gardien</b> dans la Descente (étage 5) pour ouvrir la Salle des jeux.</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`;
+        <section class="panel tr-lock">${icon('lock')}<b>Encore scellé</b><p class="small">Vaincs ton <b>premier gardien</b> dans la Descente (étage 5) pour ouvrir le Cercle de l’Abysse.</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`;
       return;
     }
     if (ui.mode === 'mp') return mp.show();
@@ -95,7 +98,7 @@ export default function pacteScreen(app, root) {
     el.style.backgroundImage = `url(${PA.tableBg(g.s.pacte.cur?.table)})`;
   }
   const cardHTML = (c, cls = '') => {
-    if (c.sp) return `<span class="pa-card sp sp-${c.sp} ${cls}"><img alt="" src="${SP[c.sp].img}"><span class="pa-cn">${SP[c.sp].name}</span></span>`;
+    if (c.sp) return `<span class="pa-card sp sp-${c.sp} ${cls}">${c.sp === 'oracle' ? `<i class="pa-sp-ic">${icon('eye')}</i>` : ''}<img alt="" src="${SP[c.sp].img}" onerror="this.remove()"><span class="pa-cn">${SP[c.sp].name}</span></span>`;
     const card = c.id && cat.get(c.id);
     return `<span class="pa-card f-${c.f} ${c.x2 ? 'x2' : ''} ${cls}" style="--fc:${cat.faction[c.f]?.colors.secondary || '#888'}"><img alt="" src="${card ? artUrl(card, { lite: true }) : 'assets/sceaux/dos.webp'}">
       <b class="pa-v">${c.v}${c.x2 ? '<small>×2</small>' : ''}</b><span class="pa-cf">${sigil(c.f)}</span></span>`;
@@ -120,10 +123,19 @@ export default function pacteScreen(app, root) {
         ${st.sceaux ? `<span class="pa-tag ok">${icon('shield')}Protégé ×${st.sceaux}</span>` : ''}${st.offer ? '<span class="pa-tag gold">Offrande : la suivante ×2</span>' : ''}
         <span class="pa-risk ${risk >= 40 ? 'hi' : risk >= 20 ? 'mid' : ''}">Risque : <b>${risk} %</b></span></div>${ban}</div>`;
   }
+  /* v557 (demande du propriétaire : jouer moins à l'aveugle) : la pioche montre ce qu'il reste, faction par faction */
+  function pioche(st) {
+    const src = ui.deckView || (st.deck.length ? st.deck : st.discard), fs = PA.rowFactions(st);
+    const n = (pred) => src.filter(pred).length;
+    const facs = FACTION_ORDER.map((f) => { const k = n((c) => c.f === f); return `<span class="pa-pf ${fs.has(f) ? 'danger' : ''} ${k ? '' : 'none'}" style="--fc:${cat.faction[f]?.colors.secondary || '#888'}" title="${esc(fname(f))}">${sigil(f)}<b>${k}</b></span>`; }).join('');
+    const sps = Object.keys(SP).map((k) => { const m = n((c) => c.sp === k); return m ? `<span class="pa-ps sp-${k}" title="${esc(SP[k].name)}">${esc(SP[k].name)} <b>${m}</b></span>` : ''; }).join('');
+    return `<div class="pa-pioche"><div class="pa-ph"><span class="pa-pile"><img alt="" src="assets/sceaux/dos.webp"><b>${src.length}</b></span><span><b>Pioche</b><span class="small muted">Tour ${st.round}${st.turn === 'p' ? ' · à toi' : ` · à ${esc(PA.RIVALS[st.rival].name)}`}</span></span></div>
+      <div class="pa-pfs">${facs}</div>${sps ? `<div class="pa-pss">${sps}</div>` : ''}</div>`;
+  }
   function controls(st) {
     if (st.over || busy || st.turn !== 'p') return `<div class="mq-ctl"><p class="mq-q">${st.over ? '' : `Tour de ${esc(PA.RIVALS[st.rival].name)}…`}</p></div>`;
     const v = PA.rowValue(st), canStop = st.row.some((c) => c.f);
-    return `<div class="mq-ctl pa-ctl"><button class="btn primary dc-plq dc-plq-red" data-pa="draw">${icon('cards')}Tirer une carte</button>
+    return `<div class="mq-ctl pa-ctl"><button class="btn primary dc-plq dc-plq-red" data-pa="draw">${icon('cards')}Tirer</button>
       <button class="btn dc-plq dc-plq-dark" data-pa="stop" ${canStop ? '' : 'disabled'}>${canStop ? `S’arrêter (+${v})` : 'S’arrêter'}</button></div>`;
   }
   function view() {
@@ -135,8 +147,9 @@ export default function pacteScreen(app, root) {
     root.innerHTML = `<div class="mq-game pa-game ${app.reduced() ? 'rm' : ''}">
       <div class="mq-bar"><button class="btn small ghost" data-pa="rules" aria-label="Règles">${icon('p:help')}</button><b>${esc(T.name)}</b><button class="btn small ghost" data-pa="quit" aria-label="Quitter la partie">${icon('close')}</button></div>
       ${seat(st, 'a')}
-      <div class="pa-deck"><span class="pa-pile"><img alt="" src="assets/sceaux/dos.webp"><b>${st.deck.length}</b></span><span class="small muted">Tour ${st.round}${st.turn === 'p' ? ' · à toi' : ` · à ${esc(PA.RIVALS[st.rival].name)}`}</span></div>
+      ${pioche(st)}
       <div class="mq-table pa-table">${center(st)}</div>
+      ${st.peek && st.turn === 'p' && st.deck.length && !busy ? `<div class="pa-peek">${cardHTML(st.deck[st.deck.length - 1])}<span><b>Présage</b><span class="small">La prochaine carte sera celle-ci. Tire-la ou arrête-toi.</span></span></div>` : ''}
       ${seat(st, 'p')}
       ${controls(st)}</div>`;
   }
@@ -160,8 +173,10 @@ export default function pacteScreen(app, root) {
     const snap = JSON.parse(JSON.stringify(st));
     const evs = g.pacteAi();
     const shown = { ...snap, row: [], sceaux: 0, offer: false };
+    let drawn = 0;
     for (const ev of evs) {
       if (gone) return;
+      if (ev.card) { drawn++; ui.deckView = snap.deck.length >= drawn ? snap.deck.slice(0, snap.deck.length - drawn) : null; }
       if (ev.card) {
         if (ev.result === 'ok') {
           if (ev.card.sp === 'sceau') shown.sceaux++;
@@ -181,7 +196,7 @@ export default function pacteScreen(app, root) {
       shown.row = []; shown.sceaux = 0; shown.offer = false;
       await say(g.s.pacte.cur, ev, 1500);
     }
-    busy = false;
+    busy = false; ui.deckView = null;
     if (gone) return;
     view();
     if (g.s.pacte.cur?.over) { await wait(300); end(); }

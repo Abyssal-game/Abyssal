@@ -5348,3 +5348,139 @@ html.reduce-motion .pf.pf-cx-coeur-maudit, html.reduce-motion .pf.pf-cx-arbre-mo
 .cl-dock { position: sticky; bottom: calc(-1 * var(--sheet-pad, 16px)); z-index: 5; margin: 14px -16px 0; padding: 10px 16px calc(10px + var(--safe-b, 0px)); background: linear-gradient(rgba(10, 11, 18, .86), rgba(10, 11, 18, .98)); border-top: 1px solid rgba(201, 164, 90, .3); }
 .cl-dock .cl-vote { margin: 0 0 8px; }
 .cl-dock .cl-nav { margin: 0; }
+
+/* v557 : bandeaux du combat (« La Patriarche du Givre est vaincue »…) : ils passent à la ligne au lieu de sortir de l'écran */
+.cb-banner, .sc-combo { white-space: normal; width: max-content; max-width: calc(100% - 28px); text-align: center; justify-content: center; text-wrap: balance; }
+.cb-banner.finisher, .cb-banner.broken { font-size: clamp(1rem, 5.6vw, 1.45rem); line-height: 1.15; }
+/* v557 : Victoire / Défaite au centre de l'écran, sur un voile sombre (avant : posé sur le plateau, entre les cartes et les actions) */
+.dv .cb-end { position: fixed; left: 0; right: 0; top: 0; height: var(--app-h, 100vh); background: radial-gradient(closest-side, rgba(0, 0, 0, .72), rgba(0, 0, 0, .45)); }
+.dv .cb-end .crest { width: min(80%, 360px); }
+/* v557 : « Les Épreuves du jour » : le titre reste à gauche du sablier (le « jour » se perdait dans sa lumière) */
+.ui-hero.bn-trial h1 { max-width: 54%; font-size: clamp(1.25rem, 6vw, 1.6rem); line-height: 1.12; text-shadow: 0 2px 0 #000, 0 0 14px #000, 0 0 26px rgba(0, 0, 0, .9); }
+.ui-hero.bn-trial p { text-shadow: 0 1px 0 #000, 0 0 10px #000; }
+/* v557 : pastille des succès et niveaux (en haut, un toucher ouvre le détail) au lieu d'une grande annonce */
+.prog-chip { position: fixed; z-index: 120; left: 50%; top: calc(var(--safe-t, env(safe-area-inset-top, 0px)) + 64px); transform: translate(-50%, -14px); opacity: 0; pointer-events: none;
+  display: flex; align-items: center; gap: 8px; max-width: calc(100% - 32px); min-height: 34px; padding: 4px 6px 4px 6px; border-radius: 999px;
+  border: 1px solid rgba(242, 193, 78, .7); background: linear-gradient(180deg, rgba(40, 28, 10, .96), rgba(16, 12, 6, .96)); box-shadow: 0 6px 18px rgba(0, 0, 0, .6), 0 0 14px rgba(242, 193, 78, .3);
+  color: #F5E2B0; font: 600 .78rem/1.1 var(--f-ui); transition: transform .3s cubic-bezier(.2, 1.4, .4, 1), opacity .25s; }
+.prog-chip.in { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+body.battle-mode .prog-chip { top: calc(var(--safe-t, env(safe-area-inset-top, 0px)) + 6px); }
+.prog-chip .pc-ic { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: rgba(242, 193, 78, .18); color: #F2C14E; flex: none; }
+.prog-chip .pc-ic .ic, .prog-chip .pc-ic .picon { width: 16px; height: 16px; }
+.prog-chip .pc-t { display: flex; align-items: baseline; gap: 5px; min-width: 0; }
+.prog-chip .pc-t small { font: 700 .62rem/1 var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: #C9A45A; flex: none; }
+.prog-chip .pc-t b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.prog-chip .pc-go { flex: none; padding: 4px 9px; border-radius: 999px; background: #F2C14E; color: #241703; font: 800 .66rem/1 var(--f-ui); letter-spacing: .04em; }
+.prog-list { display: grid; gap: 8px; margin: 12px 0; }
+.prog-row { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 4px 12px 4px 12px; border: 1px solid rgba(201, 164, 90, .3); background: rgba(14, 12, 20, .8); }
+.prog-row .pc-ic { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: rgba(242, 193, 78, .15); color: #F2C14E; flex: none; }
+.prog-row .pc-ic .ic, .prog-row .pc-ic .picon { width: 20px; height: 20px; }
+.prog-row > span:last-child { display: grid; gap: 2px; min-width: 0; }
+.prog-row small { font: 700 .62rem/1 var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: #C9A45A; }
+.prog-row b { color: #F5E2B0; }
+.prog-row em { font-style: normal; font-size: .76rem; color: #B8AE9A; }
+/* v557 : bannière du Sanctuaire sans l'étoile rituelle au sol (symbole occulte effacé, original dans store/ui/) */
+.bn-sanctuary { --bn: url(../assets/ui/bn-sanctuary2.webp); }
+/* v557 : Cryptes : pouvoir annoncé dans le bandeau au-dessus de la grille (sans fenêtre), carte regardée par l'adversaire */
+.cr-msg.cr-last { border-color: var(--fc) !important; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fc) 40%, transparent), 0 0 14px color-mix(in srgb, var(--fc) 30%, transparent); animation: crLastIn .35s ease-out; }
+.cr-msg.cr-last .cr-pw-med { position: relative; width: 36px; height: 36px; flex: none; display: grid; place-items: center; }
+.cr-msg.cr-last .cr-pw-med > * { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; }
+.cr-msg.cr-last b em { font-style: normal; margin-left: 6px; padding: 1px 6px; border-radius: 8px; font-size: .68rem; background: rgba(242, 193, 78, .18); color: #F2C14E; }
+.cr-msg.cr-last.foe { border-color: rgba(255, 110, 110, .7) !important; }
+@keyframes crLastIn { from { opacity: 0; transform: translateY(-4px); } }
+.cr-c { position: relative; }
+.cr-peek { position: absolute; z-index: 3; right: 4%; top: 4%; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: rgba(120, 10, 20, .88); border: 1px solid #FF8A8A; color: #FFD2D2; box-shadow: 0 0 8px rgba(255, 80, 80, .7); }
+.cr-peek .ic { width: 13px; height: 13px; }
+.cr-c .cr-pwl { display: none; }
+/* v557 : portraits ronds des jeux : l'illustration ne sort plus jamais du cercle (Pacte, Enchères, Cryptes, Sceaux) */
+.sc-med, .mq-me, .sc-por { overflow: hidden; }
+.sc-med > img, .mq-me > img, .sc-por > img { width: 100% !important; height: 100% !important; aspect-ratio: 1; object-fit: cover; border-radius: 50%; display: block; }
+.mq-me.sc-med { padding: 2px; background: conic-gradient(#8C6A2E, #E8C987, #8C6A2E, #E8C987, #8C6A2E); border: 0; }
+
+/* v557 : Pacte refait : pioche visible (factions et cartes spéciales restantes), Présage, boutons qui tiennent */
+.pa-game { gap: 8px; }
+.pa-pioche { display: grid; gap: 6px; padding: 8px 10px; border-radius: 4px 14px 4px 14px; border: 1px solid rgba(201, 164, 90, .35);
+  background: linear-gradient(180deg, rgba(24, 16, 10, .92), rgba(10, 8, 12, .92)); box-shadow: inset 0 1px 0 rgba(255, 220, 150, .08), 0 6px 16px rgba(0, 0, 0, .45); }
+.pa-ph { display: flex; align-items: center; gap: 10px; }
+.pa-ph > span:last-child { display: grid; gap: 1px; }
+.pa-ph b { font: 700 .9rem/1 var(--f-display); color: #F2D9A0; letter-spacing: .04em; }
+.pa-pioche .pa-pile { position: relative; width: 30px; flex: none; }
+.pa-pioche .pa-pile img { width: 30px; aspect-ratio: 5 / 7; border-radius: 4px; display: block; box-shadow: 2px 2px 0 #2a1e10, 4px 4px 0 #1a120a; }
+.pa-pioche .pa-pile b { position: absolute; right: -8px; bottom: -6px; min-width: 22px; padding: 2px 4px; border-radius: 10px; background: #F2C14E; color: #241703; font: 800 .68rem/1 var(--f-ui); text-align: center; }
+.pa-pfs { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.pa-pf { position: relative; display: grid; justify-items: center; gap: 2px; padding: 5px 0 4px; border-radius: 8px; border: 1px solid color-mix(in srgb, var(--fc) 55%, transparent); background: color-mix(in srgb, var(--fc) 14%, rgba(8, 8, 14, .9)); color: var(--fc); }
+.pa-pf .sigil, .pa-pf svg { width: 18px; height: 18px; }
+.pa-pf b { font: 800 .82rem/1 var(--f-ui); color: #F5E8C8; }
+.pa-pf.none { opacity: .32; }
+.pa-pf.danger { border-color: #FF4A5E; box-shadow: 0 0 0 1px #FF4A5E, 0 0 10px rgba(255, 74, 94, .55); background: color-mix(in srgb, #FF4A5E 18%, rgba(8, 8, 14, .92)); }
+.pa-pf.danger b { color: #FFB3BD; }
+.pa-pss { display: flex; flex-wrap: wrap; gap: 5px; }
+.pa-ps { padding: 3px 8px; border-radius: 999px; font: 600 .7rem/1.2 var(--f-ui); color: #E4D6B8; background: rgba(242, 193, 78, .1); border: 1px solid rgba(242, 193, 78, .3); }
+.pa-ps b { color: #F2C14E; }
+.pa-ps.sp-oracle { background: rgba(160, 120, 255, .14); border-color: rgba(180, 150, 255, .45); }
+.pa-peek { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 4px 14px 4px 14px; border: 1px solid rgba(180, 150, 255, .6); background: rgba(30, 18, 50, .92); box-shadow: 0 0 18px rgba(150, 110, 255, .35); animation: crLastIn .35s ease-out; }
+.pa-peek .pa-card { width: 46px; flex: none; }
+.pa-peek > span { display: grid; gap: 2px; }
+.pa-peek b { color: #E2D4FF; font-family: var(--f-display); }
+.pa-card.sp-oracle { background: radial-gradient(circle at 50% 40%, #5C3FA8, #1A1030 70%); }
+.pa-card.sp-oracle .pa-sp-ic { position: absolute; inset: 0; display: grid; place-items: center; color: #E2D4FF; }
+.pa-card.sp-oracle .pa-sp-ic .ic { width: 40%; height: auto; filter: drop-shadow(0 0 6px rgba(190, 160, 255, .9)); }
+.pa-ctl { display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pa-ctl .btn { width: 100%; min-width: 0; white-space: nowrap; font-size: clamp(.8rem, 3.8vw, 1rem); padding-left: 10px; padding-right: 10px; }
+
+/* v557 : Duels des Sceaux, cartes de l'adversaire refaites (cadre de braise, valeurs sur cire rouge) ;
+   la main adverse à découvert n'est plus abîmée par l'ancienne règle des dos (.sc-ohand i, qui s'appliquait aux valeurs) */
+.sc-card.sc-o { border: 2px solid #8E1E1A; box-shadow: inset 0 0 0 1px rgba(255, 150, 110, .5), inset 0 0 14px rgba(190, 40, 25, .55), 0 0 0 1px rgba(30, 4, 4, .9), 0 0 12px rgba(220, 60, 40, .45), 0 3px 8px rgba(0, 0, 0, .7); }
+.sc-card.sc-o .sc-veil { background: radial-gradient(120% 80% at 50% 50%, transparent 55%, rgba(70, 6, 6, .55)), linear-gradient(180deg, rgba(90, 10, 10, .35), transparent 26%, transparent 70%, rgba(90, 10, 10, .5)); }
+.sc-card.sc-o::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; border-radius: inherit; background: linear-gradient(125deg, transparent 38%, rgba(255, 170, 120, .14) 48%, transparent 58%); }
+.sc-card.sc-o .sc-v { background: radial-gradient(circle at 50% 35%, #5A1410, #26060A 80%); border-color: rgba(255, 120, 90, .7); color: #FFE6D6; text-shadow: 0 0 4px rgba(255, 90, 60, .55); }
+.sc-card.sc-p .sc-v { background: radial-gradient(circle at 50% 35%, #142C4A, #070C18 80%); border-color: rgba(140, 195, 240, .65); }
+.sc-ohand.open .sc-card.sc-mini { width: 44px; height: 61px; border-radius: 5px; }
+.sc-ohand.open .sc-mini .sc-v { width: auto; height: auto; box-shadow: none; border-radius: 3px; font-size: .56rem; min-width: 11px; padding: 1px 2px 0; line-height: 1.05; }
+.sc-ohand.open .sc-mini .sc-v.l { left: 1px; } .sc-ohand.open .sc-mini .sc-v.r { right: 1px; }
+.sc-ohand.open .sc-mini .sc-v.t { top: 1px; } .sc-ohand.open .sc-mini .sc-v.b { bottom: 1px; }
+.sc-ohand.open .sc-mini .sc-nm { display: none; }
+
+/* v557 : aucune lueur sur une carte non découverte (les Mythiques et Secrètes laissaient passer un reflet doré qui éclairait l'illustration) */
+.tcg.is-mystery .tcg-shine, .tcg.is-mystery .tcg-vframe, .tcg.is-mystery .tcg-dress { display: none !important; }
+.tcg.is-mystery .tcg-art { background: #000; }
+.tcg.is-mystery.real .tcg-art img { filter: brightness(0) !important; }
+
+/* v557 : menu Personnaliser refait (« le design fait pauvre ») : scène illustrée, rangées avec grand aperçu, nombre possédé / total et barre */
+.cs-hero.bn-profile { position: relative; overflow: hidden; grid-template-columns: auto 1fr auto; padding: 18px 14px 18px 18px; border-radius: 6px 18px 6px 18px; border: 1px solid rgba(201, 164, 90, .55);
+  background: linear-gradient(90deg, rgba(10, 8, 18, .92) 30%, rgba(10, 8, 18, .35) 80%), url(../assets/ui/bn-profile.webp) right center / cover no-repeat, #0B0C12;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .6), inset 0 0 30px rgba(120, 70, 200, .18), 0 8px 22px rgba(0, 0, 0, .55); }
+.cs-hero.bn-profile .avatar-big { width: 84px; height: 84px; margin: 6px; }
+.cs-hero .cs-name { font-size: 1.25rem; text-shadow: 0 2px 6px rgba(0, 0, 0, .8); overflow-wrap: anywhere; }
+.cs-hero .cs-title { justify-self: start; padding: 2px 9px; border-radius: 999px; border: 1px solid rgba(232, 201, 135, .5); background: rgba(40, 26, 8, .7); font-size: .78rem; }
+.cs-lv { font: 700 .72rem/1 var(--f-ui); color: var(--muted); letter-spacing: .04em; }
+.cs-fanbox { position: relative; width: 62px; height: 78px; }
+.cs-fan { position: absolute; bottom: 0; left: 10px; width: 44px; aspect-ratio: 5 / 7; border-radius: 4px; object-fit: cover; box-shadow: 0 4px 10px rgba(0, 0, 0, .7), 0 0 0 1px rgba(201, 164, 90, .4); transform-origin: 50% 100%; }
+.cs-fan.f0 { transform: rotate(10deg) translateX(8px); z-index: 3; } .cs-fan.f1 { transform: rotate(-4deg); z-index: 2; } .cs-fan.f2 { transform: rotate(-16deg) translateX(-8px); z-index: 1; }
+.cs-list { display: grid; gap: 10px; }
+.cs-row { --ac: #C9A45A; position: relative; display: grid; grid-template-columns: 76px 1fr auto 18px; align-items: center; gap: 12px; width: 100%; padding: 10px 12px 10px 10px; text-align: left; color: inherit; font: inherit; cursor: pointer;
+  border-radius: 4px 14px 4px 14px; border: 1px solid color-mix(in srgb, var(--ac) 45%, transparent);
+  background: radial-gradient(120% 140% at 0% 50%, color-mix(in srgb, var(--ac) 22%, transparent), transparent 55%), linear-gradient(180deg, #17131F, #0C0B12);
+  box-shadow: inset 0 1px 0 rgba(255, 240, 200, .06), 0 4px 12px rgba(0, 0, 0, .45); }
+.cs-row:active { transform: scale(.985); }
+.cs-row.k-avatar { --ac: #7FB8E8; } .cs-row.k-titles { --ac: #E8C987; } .cs-row.k-frames { --ac: #C46BE0; } .cs-row.k-backs { --ac: #D8413A; } .cs-row.k-finishes { --ac: #6FD6B0; }
+.cs-row .cs-pic { height: 76px; width: 76px; border-radius: 12px; background: radial-gradient(circle, color-mix(in srgb, var(--ac) 25%, #120F1A), #07070B 75%); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ac) 40%, transparent); }
+.cs-row .cs-pic img { max-height: 66px; max-width: 60px; }
+.cs-row.k-avatar .cs-pic img { width: 60px; height: 60px; border-radius: 50%; box-shadow: 0 0 0 2px var(--ac); }
+.cs-row .cs-pic .avatar-mini { width: 50px; height: 50px; overflow: visible; }
+.cs-row .cs-pic .avatar-mini img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.cs-row .cs-pic .ic, .cs-row .cs-pic svg { width: 48px; height: 48px; }
+.cs-txt { display: grid; gap: 3px; min-width: 0; }
+.cs-txt b { font: 700 1rem/1.15 var(--f-display); color: #F2D9A0; }
+.cs-txt small { font-size: .76rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cs-bar { height: 4px; border-radius: 3px; background: rgba(255, 255, 255, .08); overflow: hidden; margin-top: 3px; }
+.cs-bar i { display: block; height: 100%; background: linear-gradient(90deg, color-mix(in srgb, var(--ac) 60%, #000), var(--ac)); }
+.cs-cnt { display: grid; justify-items: end; line-height: 1; }
+.cs-cnt b { font: 800 1.2rem/1 var(--f-display); color: var(--ac); }
+.cs-cnt small { font-size: .7rem; color: var(--muted); }
+.cs-go { color: var(--muted); display: grid; place-items: center; }
+.cs-go .ic, .cs-go svg { width: 16px; height: 16px; }
+.frame-pick .avatar-mini img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+@media (max-width: 380px) { .cs-row { grid-template-columns: 64px 1fr auto 14px; gap: 10px; } .cs-row .cs-pic { width: 64px; height: 64px; } .cs-hero.bn-profile .avatar-big { width: 70px; height: 70px; } }
+.frame-pick .avatar-mini, .cs-row .cs-pic .avatar-mini { position: relative; border-radius: 50%; aspect-ratio: 1; }
+.frame-pick .avatar-mini > img, .cs-row .cs-pic .avatar-mini > img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; border-radius: 50%; object-fit: cover; clip-path: circle(50%); }

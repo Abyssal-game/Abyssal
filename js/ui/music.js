@@ -40,10 +40,10 @@ const THEMES = {
 };
 THEMES.abysse = THEMES.boss; THEMES.encheres = THEMES.sceaux; THEMES.pacte = THEMES.sceaux; THEMES.cryptes = THEMES.sceaux; THEMES.duels = THEMES.sceaux; /* v467 : musique des Duels des Sceaux */ /* v458 : musiques du Pacte, des Cryptes et des Trois Autels */ /* v443 : Enchères et Énigmes */ /* v442 : combat contre L'Abysse (assets/music/abysse.mp3) */
 /* v463 : Cour des Masques, Énigmes et Trois Autels retirés du jeu (et leurs musiques) */
-export const MUSIC_DEMO = [['Accueil', 'antre'], ['Butin', 'boutique'], ['Descente', 'descente'], ['Combat', 'combat'], ['Gardien', 'boss'], ['Salle des jeux', 'sceaux'], ['Duels des Sceaux', 'duels'], ['Enchères', 'encheres'], ['Le Pacte', 'pacte'], ['Les Cryptes', 'cryptes'], ['L’Abysse', 'abysse']];
+export const MUSIC_DEMO = [['Accueil', 'antre'], ['Butin', 'boutique'], ['Descente', 'descente'], ['Combat', 'combat'], ['Gardien', 'boss'], ['Cercle de l’Abysse', 'sceaux'], ['Duels des Sceaux', 'duels'], ['Enchères', 'encheres'], ['Le Pacte', 'pacte'], ['Les Cryptes', 'cryptes'], ['L’Abysse', 'abysse']];
 
 // Lieu → ambiance
-const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', arsenal: 'boutique', descente: 'descente', heros: 'descente', marchand: 'descente', sceaux: 'duels', jeux: 'sceaux', encheres: 'encheres', pacte: 'pacte', cryptes: 'cryptes', epreuves: 'descente' }; /* v434 : la Salle des jeux */ /* v408 : Épreuves du jour = ambiance de la Descente, musique de combat en combat */
+const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', arsenal: 'boutique', descente: 'descente', heros: 'descente', marchand: 'descente', sceaux: 'duels', jeux: 'sceaux', encheres: 'encheres', pacte: 'pacte', cryptes: 'cryptes', epreuves: 'descente' }; /* v434 : le Cercle de l’Abysse */ /* v408 : Épreuves du jour = ambiance de la Descente, musique de combat en combat */
 
 function init() {
   if (ctx) return ctx;

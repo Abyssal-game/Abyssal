@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v556'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v557'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -64,7 +64,7 @@ export const FINAL_FLOOR = 100; // v394 : le fond de la Descente (pour l'instant
 export const VARIANT_RATES = { holo: 4, gold: 1.2, galaxy: 0.4 };
 // Sublimer : obtenir la finition suivante d'une carte qu'on possède déjà dans la finition précédente.
 // Coût = cendres de base de la rareté × ce facteur ; toujours plus que ce que la carte rapporte brûlée (burnFinish).
-export const SUBLIME_ASH = { holo: 4, gold: 10, galaxy: 24 };
+export const SUBLIME_ASH = { holo: 10, gold: 25, galaxy: 60 }; /* v557 : ×2,5 (avant 4, 10, 24 : « ça ne coûte pas assez cher ») */
 // Anciennes variantes retirées : les exemplaires possédés deviennent la variante indiquée.
 export const OLD_VARIANTS = { chroma: 'holo', corrupt: 'holo', alt: 'holo', ancestral: 'gold', special: 'normal' };
 // Ordre d'affichage par défaut : la finition la plus rare possédée

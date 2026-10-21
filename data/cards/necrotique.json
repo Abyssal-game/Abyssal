@@ -459,7 +459,7 @@
  {
   "id": "NEC-012",
   "number": 12,
-  "name": "Zombi des Marais",
+  "name": "Zombie des Marais",
   "title": "Remonté de la vase",
   "faction": "necrotique",
   "rarity": "C",
@@ -497,7 +497,7 @@
    "scene": "swamp"
   },
   "image": "assets/art/NEC-012.webp",
-  "artPrompt": "Zombi des Marais — Cadavre gonflé couvert de vase et de lentilles d’eau, mâchoire pendante, démarche lente et obstinée. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+  "artPrompt": "Zombie des Marais — Cadavre gonflé couvert de vase et de lentilles d’eau, mâchoire pendante, démarche lente et obstinée. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, cadrage moyen, créature seule, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  },
  {
   "id": "NEC-013",

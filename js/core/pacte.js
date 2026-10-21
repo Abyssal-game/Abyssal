@@ -12,6 +12,8 @@ export const TARGET = 60;
 export const SEVEN_BONUS = 15;
 export const VALUES = 7;
 export const SPECIALS = { sceau: 3, gardien: 3, offrande: 3 };
+/* v557 : nouvelle carte du Pacte contre l'Abysse : le Présage (on voit la carte suivante avant de choisir). Les parties en ligne gardent le paquet d'origine (moteur SQL). */
+export const ORACLES = 2;
 
 function hash(str) {
   let h = 2166136261;
@@ -105,7 +107,7 @@ export function newGame(cat, { table, seed = Date.now(), daily = false }) {
   const T = TABLE[table];
   if (!T) throw new Error('Table inconnue.');
   const r = mulberry(seed), RU = T.rules || {};
-  return { table, daily, seed, shuf: 0, rival: T.rival, target: RU.target || TARGET, seven: RU.seven || SEVEN_BONUS, deck: buildDeck(cat, r, RU.sp || SPECIALS), discard: [], scores: { p: 0, a: RIVALS[T.rival].head || 0 },
+  return { table, daily, seed, shuf: 0, rival: T.rival, target: RU.target || TARGET, seven: RU.seven || SEVEN_BONUS, deck: buildDeck(cat, r, { ...(RU.sp || SPECIALS), oracle: ORACLES }), discard: [], scores: { p: 0, a: RIVALS[T.rival].head || 0 },
     turn: 'p', row: [], sceaux: 0, offer: false, round: 1, turns: { p: 0, a: 0 }, last: null, over: null, final: null, stats: { busts: { p: 0, a: 0 }, best: { p: 0, a: 0 }, sevens: { p: 0, a: 0 } } };
 }
 
@@ -126,6 +128,7 @@ function takeCard(st) {
 export function bustChance(st) {
   const fs = rowFactions(st);
   if (!fs.size) return 0;
+  if (st.peek && st.deck.length) { const nx = st.deck[st.deck.length - 1]; return nx.f && fs.has(nx.f) ? 1 : 0; } /* v557 : Présage */
   const src = st.deck.length ? st.deck : st.discard;
   if (!src.length) return 0;
   return src.filter((c) => c.f && fs.has(c.f)).length / src.length;
@@ -140,7 +143,7 @@ function bank(st, who, why) {
 }
 function endTurn(st, who) {
   st.discard.push(...st.row.map(({ x2, ...c }) => c));
-  st.row = []; st.sceaux = 0; st.offer = false; st.turns[who]++;
+  st.row = []; st.sceaux = 0; st.offer = false; st.peek = false; st.turns[who]++;
   if (who === 'a') {
     // fin du tour complet : quelqu'un a atteint le but ?
     if (st.scores.p >= tgt(st) || st.scores.a >= tgt(st)) {
@@ -160,8 +163,10 @@ export function draw(st) {
   if (st.over) throw new Error('La partie est terminée.');
   const who = st.turn;
   const c = takeCard(st);
+  st.peek = false;
   const ev = { who, card: c, result: 'ok', gain: 0 };
   if (c.sp === 'sceau') { st.sceaux++; st.row.push(c); }
+  else if (c.sp === 'oracle') { st.row.push(c); st.peek = st.deck.length > 0; }
   else if (c.sp === 'offrande') { st.offer = true; st.row.push(c); }
   else if (c.sp === 'gardien') { st.row.push(c); ev.result = 'forced'; ev.gain = bank(st, who, 'forced'); endTurn(st, who); }
   else {
@@ -211,6 +216,9 @@ export function aiWants(st, rng = Math.random) {
   const R = RIVALS[st.rival], who = st.turn, me = st.scores[who], opp = st.scores[who === 'p' ? 'a' : 'p'], TARGET = tgt(st), SEVEN_BONUS = sevenOf(st);
   const v = rowValue(st), nf = st.row.filter((c) => c.f).length;
   if (!nf) return true;
+  /* v557 : Présage : la carte suivante est connue */
+  const nx = st.peek && st.deck.length ? st.deck[st.deck.length - 1] : null;
+  if (nx) return !(nx.f && rowFactions(st).has(nx.f) && !st.sceaux);
   // dernier tour : s'il faut rattraper, on tire tant qu'on n'a pas dépassé
   if (who === 'a' && st.scores.p >= TARGET && me + v <= st.scores.p) return true;
   if (me + v >= TARGET && me + v > opp) return false;

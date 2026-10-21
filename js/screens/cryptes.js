@@ -6,6 +6,7 @@ import { icon, sigil, picon, crestHTML } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, openSheet } from '../ui/dom.js';
 import { setScene } from '../ui/scene.js';
 import { tuto } from '../ui/tutos.js';
+import { t, tw } from '../i18n.js';
 import { CHESTS } from '../core/descent.js';
 import { MP_HOURS, MP_FAST_SECS, MP_REWARD } from '../core/mp.js';
 import { createCryptesMp } from './cryptes-mp.js';
@@ -35,7 +36,7 @@ export default function cryptesScreen(app, root) {
   /* fenêtre d'un pouvoir : se ferme d'un toucher, ou toute seule */
   const popWait = (ms) => new Promise((r) => { popDone = r; timer = setTimeout(r, app.reduced() ? Math.min(ms, 1600) : ms); });
   // affichage temporaire : cartes montrées face visible (en plus de st.open), cartes en lumière, cartes choisies pour un pouvoir
-  const ui = { up: new Set(), glow: new Set(), picks: [], swap: new Set() };
+  const ui = { up: new Set(), glow: new Set(), picks: [], swap: new Set(), last: null, peek: new Set() };
   const wait = (ms) => new Promise((r) => { timer = setTimeout(r, app.reduced() ? Math.min(ms, 200) : ms); });
   const fname = (f) => cat.faction[f]?.name || f;
   const todayKey = () => { const d = g.clock(), p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; };
@@ -54,7 +55,7 @@ export default function cryptesScreen(app, root) {
     setScene('menu');
     if (!g.sceauxOpen()) {
       root.innerHTML = `<header class="screen-head ui-hero bn-cryptes"><h1>Les Cryptes</h1><p class="muted">Un jeu de mémoire, avec les pouvoirs des factions.</p></header>
-        <section class="panel tr-lock">${icon('lock')}<b>Encore scellées</b><p class="small">Vaincs ton <b>premier gardien</b> dans la Descente (étage 5) pour ouvrir la Salle des jeux.</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`;
+        <section class="panel tr-lock">${icon('lock')}<b>Encore scellées</b><p class="small">Vaincs ton <b>premier gardien</b> dans la Descente (étage 5) pour ouvrir le Cercle de l’Abysse.</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`;
       return;
     }
     if (mui.mode === 'mp') return mp.show();
@@ -99,19 +100,21 @@ export default function cryptesScreen(app, root) {
       <span class="pa-sc"><b>${x === 'p' ? 'Toi' : esc(R.name)}</b><span class="cr-won">${st.pairs[x].map((k) => { const c = st.cards.find((y) => y.k === k); return `<i style="--fc:${cat.faction[c.f].colors.secondary}">${sigil(c.f)}</i>`; }).join('') || '<small class="muted">aucune paire</small>'}${tags}</span></span>
       <span class="pa-pts"><b>${n}</b><small>point${n > 1 ? 's' : ''}</small></span></div>`;
   };
-  const face = (c) => { const card = c.id && cat.get(c.id), cursed = (g.s.cryptes.cur?.curse || []).includes(c.k); return `<img alt="" src="${card ? artUrl(card, { lite: true }) : 'assets/sceaux/dos.webp'}"><span class="cr-f" style="--fc:${cat.faction[c.f].colors.secondary}">${sigil(c.f)}</span><span class="cr-pwl" style="--fc:${cat.faction[c.f].colors.secondary}">${PW_LABEL[c.f] || ''}</span>${cursed ? '<span class="cr-curse" title="Paire maudite"><img alt="" src="assets/icons/maudite.webp"></span>' : ''}`; }; /* v492 : marque des paires maudites */
+  const face = (c) => { const card = c.id && cat.get(c.id), cursed = (g.s.cryptes.cur?.curse || []).includes(c.k); return `<img alt="" src="${card ? artUrl(card, { lite: true }) : 'assets/sceaux/dos.webp'}"><span class="cr-f" style="--fc:${cat.faction[c.f].colors.secondary}">${sigil(c.f)}</span>${cursed ? '<span class="cr-curse" title="Paire maudite"><img alt="" src="assets/icons/maudite.webp"></span>' : ''}`; }; /* v492 : marque des paires maudites */
   function grid(st) {
     const pick = st.pending && st.turn === 'p';
     return `<div class="cr-grid ${pick ? 'picking' : ''}">${st.cards.map((c, i) => {
       if (c.gone && !ui.up.has(i)) return `<span class="cr-c gone g-${c.gone}"></span>`;
       const up = st.open.includes(i) || ui.up.has(i);
       const cls = [up ? 'up' : '', ui.glow.has(i) ? 'glow' : '', ui.picks.includes(i) ? 'pick' : '', ui.swap.has(i) ? 'swap' : ''].join(' ');
-      return `<button class="cr-c ${cls}" data-cr="c" data-i="${i}" aria-label="${up ? esc(fname(c.f)) : `Carte ${i + 1}, face cachée`}">${up ? face(c) : '<img alt="" src="assets/jeux/cr-dos.webp">'}</button>`;
+      const peek = !up && ui.peek.has(i) ? `<span class="cr-peek" title="${esc(CR.RIVALS[st.rival].name)} connaît cette carte">${icon('eye')}</span>` : ''; /* v557 : carte regardée en secret par l'adversaire (Regard infernal) */
+      return `<button class="cr-c ${cls}" data-cr="c" data-i="${i}" aria-label="${up ? esc(fname(c.f)) : `Carte ${i + 1}, face cachée`}">${up ? face(c) : '<img alt="" src="assets/jeux/cr-dos.webp">'}${peek}</button>`;
     }).join('')}</div>`;
   }
   function info(st) {
     if (banner) return `<div class="cr-msg ${banner.cls || ''}">${banner.html}</div>`;
     if (st.pending && st.turn === 'p') { const P = CR.POWERS[st.pending.power]; return `<div class="cr-msg gold">${sigil(st.pending.power)}<span><b>${esc(P.name)}</b> · ${st.pending.power === 'abyssal' ? `touche deux cartes face cachée à échanger${ui.picks.length ? ' (encore une)' : ''}` : st.pending.power === 'infernal' ? 'touche une carte face cachée pour la regarder en secret' : 'touche une carte face cachée : elle sera montrée à tous'}.</span></div>`; }
+    if (ui.last) { const L = ui.last; return `<div class="cr-msg cr-last ${L.cls}" style="--fc:${cat.faction[L.f]?.colors.secondary || '#C9A45A'}">${pwMed(L.f)}<span><b>${L.title}</b><span class="small">${L.text}</span></span></div>`; }
     return `<div class="cr-msg">${st.turn === 'p' ? `<span>${st.open.length ? 'Retourne une deuxième carte.' : 'À toi : retourne deux cartes.'}</span>` : `<span>${esc(CR.RIVALS[st.rival].name)} réfléchit…</span>`}<span class="muted">${CR.left(st)} paire${CR.left(st) > 1 ? 's' : ''} à trouver</span></div>`;
   }
   function view() {
@@ -160,25 +163,23 @@ export default function cryptesScreen(app, root) {
       : ev.power === 'necrotique' ? (ev.stolen != null ? (mine ? `Tu voles la dernière paire de ${foeName} : elle passe de ton côté.` : `${foeName} te vole ta dernière paire.`) : 'Aucune paire à voler pour l’instant.')
       : ev.empty ? 'Plus assez de cartes cachées : rien ne se passe.'
       : (mine ? PW_MINE[ev.power] : PW_FOE[ev.power].replace(/\{nm\}/g, foeName));
-    pop = { f: ev.power, cls: ev.blocked ? 'blocked' : mine ? 'mine' : 'foe', cards: [pairCard, pairCard],
-      kicker: `${mine ? 'Tu trouves' : `${foeName} trouve`} une paire · faction ${fname(ev.f)}`,
-      title: ev.blocked ? `${P.name} bloqué` : P.name, text: what,
-      why: `Pourquoi ? Chaque paire déclenche le pouvoir de sa faction. La faction ${esc(fname(ev.f))} donne <b>${esc(P.name)}</b>.`,
-      chips: [`+1 point`, mine ? 'Tu rejoues (paire trouvée)' : `${foeName} rejoue`] };
+    /* v557 (retour du propriétaire : la fenêtre partait trop vite et cassait le rythme) : le pouvoir s'affiche dans le bandeau
+       au-dessus de la grille et y reste jusqu'au prochain geste ; plus de fenêtre ni d'attente */
+    ui.last = { f: ev.power, cls: ev.blocked ? 'blocked' : mine ? 'mine' : 'foe', title: `${mine ? t('Toi') : foeName} · ${esc(ev.blocked ? t('{p} bloqué', { p: tw(P.name) }) : tw(P.name))} <em>${t('+1 point')}</em>`, text: what };
     if (!ev.blocked && !mine && ev.i2) {
       if (ev.power === 'sauvage') ev.i2.forEach((i) => ui.up.add(i));
+      if (ev.power === 'infernal') ev.i2.forEach((i) => ui.peek.add(i));
       ev.i2.forEach((i) => (ev.power === 'abyssal' ? ui.swap : ui.glow).add(i));
     }
     app.sfx[ev.blocked ? 'block' : 'cr-power']?.(); /* v457 */
-    view(); await popWait(mine ? 4200 : 3400);
-    pop = null;
-    if (!ev.blocked && !mine && ev.i2) { view(); await wait(ev.power === 'sauvage' ? 1400 : 900); } /* l'effet adverse reste visible un instant, fenêtre fermée */
+    view();
+    if (!ev.blocked && !mine && ev.i2) { await wait(ev.power === 'sauvage' ? 1400 : 900); } /* l'effet adverse reste visible un instant */
     ui.up.clear(); ui.glow.clear(); ui.swap.clear(); banner = null;
   }
   // Montre un geste (carte retournée, paire, erreur), pour toi comme pour l'adversaire
   async function show(st, ev) {
     app.sfx['cr-flip']?.();
-    if (ev.kind === 'first') { view(); await wait(st.turn === 'a' ? 650 : 0); return; }
+    if (ev.kind === 'first') { ui.last = null; ui.peek.forEach((i) => { if (st.cards[i]?.gone) ui.peek.delete(i); }); view(); await wait(st.turn === 'a' ? 650 : 0); return; }
     ev.i.forEach((i) => ui.up.add(i));
     if (ev.kind === 'match') {
       ev.i.forEach((i) => ui.glow.add(i)); view(); app.sfx['cr-pair']?.();
@@ -190,10 +191,9 @@ export default function cryptesScreen(app, root) {
     ui.up.clear(); app.sfx['cr-miss']?.();
     if (ev.graced) { /* v510 : on explique pourquoi on rejoue malgré l'erreur */
       const mine = ev.who === 'p', foeName = esc(CR.RIVALS[st.rival].name);
-      pop = { f: 'celeste', cls: mine ? 'mine' : 'foe', kicker: mine ? 'Pas de paire… mais' : `${foeName} se trompe… mais`, title: 'Grâce céleste',
-        text: mine ? 'Ta paire <b>Céleste</b> te protégeait : cette erreur est pardonnée, <b>tu gardes la main</b>.' : `Sa paire <b>Céleste</b> le protégeait : ${foeName} <b>garde la main</b>.`,
-        chips: [mine ? 'Tu rejoues' : `${foeName} rejoue`] };
-      app.sfx.shield?.(); view(); await popWait(3000); pop = null;
+      ui.last = { f: 'celeste', cls: mine ? 'mine' : 'foe', title: `${mine ? t('Toi') : foeName} · ${tw('Grâce céleste')}`,
+        text: mine ? 'Erreur pardonnée : <b>tu gardes la main</b>.' : t('Erreur pardonnée : {name} <b>garde la main</b>.', { name: foeName }) };
+      app.sfx.shield?.(); view();
     }
     /* v492 : crypte mouvante : deux cartes échangent leur place, sous les yeux du joueur */
     if (ev.drift) { ev.drift.forEach((i) => ui.swap.add(i)); banner = { cls: '', html: `<img class="cr-curse-big" alt="" src="assets/icons/hourglass.webp"><span><b>La crypte bouge</b><span class="small">Les deux cartes en lumière ont échangé leur place.</span></span>` }; app.sfx.swipe?.(); view(); await wait(1300); ui.swap.clear(); banner = null; }
