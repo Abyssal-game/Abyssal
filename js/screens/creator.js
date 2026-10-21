@@ -92,7 +92,7 @@ export function openCreator(app) {
       if (x === 'restore') {
         if (!(await confirmBox('Remplacer la partie actuelle par la copie de sécurité ?', { ok: 'Revenir à la copie' }))) return;
         const dev = g.s.settings.dev;
-        g.replaceSave(migrate(snap.s)); g.s.settings.dev = dev; g.persist(); app.applySettings();
+        await app.partie.first('devSnapshot', snap.s); g.s.settings.dev = dev; g.persist(); app.applySettings(); /* v539 : par le serveur de partie */
         toast('Partie restaurée.', { kind: 'success', icon: 'upload' });
       }
       if (x === 'shards') g.devGrant({ shards: 10000 });

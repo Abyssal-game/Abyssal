@@ -1,0 +1,30 @@
+# v539 : publie la fonction serveur « partie » (serveur de partie, anti-triche) sur Supabase à chaque changement du moteur.
+# Il faut le secret GitHub SUPABASE_ACCESS_TOKEN (jeton personnel Supabase : Account → Access Tokens). Sans lui, rien n'est publié.
+name: Serveur de partie
+on:
+  push:
+    branches: [main]
+    paths: ['serveur/**', 'js/core/**', 'js/config.js', 'data/**', 'supabase/functions/**', 'supabase/config.toml', '.github/workflows/serveur.yml']
+  workflow_dispatch:
+jobs:
+  publier:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Essais du serveur de partie
+        run: node --test tests/serveur-partie.test.mjs tests/serveur-rejeu.test.mjs
+      - name: Jeton absent
+        if: env.SUPABASE_ACCESS_TOKEN == ''
+        run: echo "::warning::Secret SUPABASE_ACCESS_TOKEN absent : la fonction n'est pas publiée."
+      - uses: supabase/setup-cli@v1
+        if: env.SUPABASE_ACCESS_TOKEN != ''
+        with:
+          version: latest
+      - name: Publier la fonction « partie »
+        if: env.SUPABASE_ACCESS_TOKEN != ''
+        run: supabase functions deploy partie --project-ref zwyxnrvvctanzsssyirm --use-api --no-verify-jwt

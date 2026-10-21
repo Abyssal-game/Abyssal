@@ -6462,6 +6462,22 @@ export default {
   "{e0} Haut fait : Gagne en prenant une malédiction au plus.": "{e0} Impresa: Vinci prendendo al massimo una maledizione.",
   "Haut fait : Gagne en prenant une malédiction au plus. (+{0})": "Impresa: Vinci prendendo al massimo una maledizione. (+{0})",
   "{e0} Haut fait : Gagne en prenant une malédiction au plus. (+{0})": "{e0} Impresa: Vinci prendendo al massimo una maledizione. (+{0})",
+  "Progression gardée par le serveur": "Progressi custoditi dal server",
+  "Progression gardée par le serveur · {0} action à envoyer": "Progressi custoditi dal server · {0} azione da inviare",
+  "Progression gardée par le serveur · {0} actions à envoyer": "Progressi custoditi dal server · {0} azioni da inviare",
+  "Progression : ancienne sauvegarde en ligne": "Progressi: vecchio salvataggio online",
+  "Progression : serveur pas encore joint": "Progressi: server non ancora raggiunto",
+  "Connexion au serveur impossible : vérifie ton réseau et réessaie.": "Impossibile raggiungere il server: controlla la connessione e riprova.",
+  "Réservé au Mode Créateur.": "Riservato alla Modalità Creatore.",
+  "Opération refusée.": "Azione rifiutata.",
+  "Opération inconnue.": "Azione sconosciuta.",
+  "Partie en cours illisible.": "La partita in corso è illeggibile.",
+  "Aucun tirage ce jour-là.": "Nessuna estrazione quel giorno.",
+  "Ta partie est occupée sur un autre appareil. Réessaie dans un instant.": "La tua partita è occupata su un altro dispositivo. Riprova tra un attimo.",
+  "Ta partie a changé ailleurs : réessaie.": "La tua partita è cambiata altrove: riprova.",
+  "Erreur du serveur ({0}).": "Errore del server ({0}).",
+  "Mise invalide.": "Puntata non valida.",
+  "Requête illisible.": "Richiesta illeggibile.",
 };
 
 export const names = {

@@ -5,6 +5,7 @@ import { pseudoProblem } from '../core/moderation.js';
 import { friendCard } from '../core/friends.js';
 import { migrate, today } from '../core/save.js';
 import { openSheet, esc, toast } from '../ui/dom.js';
+import { serverMode, probe, flush } from './partie.js';
 
 export const sync = { status: 'off', lastPush: 0, error: null, profile: null };
 let app = null, timer = 0, busy = false, pending = false;
@@ -28,6 +29,13 @@ let choosing = false; // tant qu'on compare les deux parties, rien ne part en li
 
 export async function pushNow(force = false) {
   if (!cloud.isLoggedIn() || !app) return;
+  /* v539 : serveur de partie : la partie, le profil et la fiche d'ami sont tenus par le serveur ; on envoie seulement les actions */
+  if (serverMode()) {
+    sync.status = 'saving'; emit();
+    try { await flush(); sync.status = 'ok'; sync.error = null; sync.lastPush = Date.now(); } catch (e) { sync.status = 'error'; sync.error = e.message; }
+    emit();
+    return;
+  }
   if (choosing || sync.status === 'paused') return;
   if (busy) { pending = true; return; }
   busy = true; sync.status = 'saving'; emit();
@@ -117,7 +125,11 @@ export function afterLogin() {
   sync.pending = (async () => {
     try { sync.profile = await cloud.getProfile(); } catch (e) { sync.profile = null; }
     lsSet(SYNCED_KEY, null); lsSet(STAMP_KEY, null);
-    return reconcile({ intro: 'Ce compte a déjà une partie en ligne.', auto: false });
+    /* v539 : une partie déjà jouée sur cet appareil (ancien invité) part d'abord sur le compte, comme avant ; puis le serveur de partie la reprend */
+    let k = null;
+    if (!serverMode() && !fresh(app.game.s)) k = await reconcile({ intro: 'Ce compte a déjà une partie en ligne.', auto: false });
+    if ((await probe()) === 'server') { sync.status = 'ok'; emit(); return 'pulled'; }
+    return k || reconcile({ intro: 'Ce compte a déjà une partie en ligne.', auto: false });
   })();
   return sync.pending;
 }
@@ -125,13 +137,15 @@ export function afterLogin() {
 // v412 : après « Effacer toute la progression », la partie vide part tout de suite en ligne (avant, l'ancienne revenait au lancement)
 export async function eraseOnline() {
   if (!cloud.isLoggedIn()) return false;
+  if (serverMode()) { try { await flush(); return true; } catch (e) { return false; } }
   lsSet(PAUSED_KEY, null); choosing = false; sync.status = 'ok';
   await pushNow(true);
   return sync.status === 'ok';
 }
-export function resumeSync() { return reconcile({ intro: 'La synchronisation était en pause.', auto: false }); }
+export function resumeSync() { if (serverMode()) return flush({ want: true }); return reconcile({ intro: 'La synchronisation était en pause.', auto: false }); }
 
 export async function restoreFromCloud() {
+  if (serverMode()) { await flush({ want: true }); return; }
   const remote = await cloud.pullSave();
   if (!remote) throw new Error('Aucune sauvegarde en ligne pour ce compte.');
   adopt(remote);
@@ -143,7 +157,8 @@ export async function setPseudo(pseudo) {
   const p = pseudo.trim();
   const bad = pseudoProblem(p);
   if (bad) throw new Error(bad);
-  await cloud.saveProfile({ pseudo: p, ...profilePayload() });
+  await cloud.saveProfile(serverMode() ? { pseudo: p } : { pseudo: p, ...profilePayload() }); /* v539 : le reste du profil est écrit par le serveur de partie */
+  if (serverMode()) cloud.partieCall({ ops: [], pub: true }).catch(() => {}); // le serveur remplit tout de suite portrait, titre et niveau
   sync.profile = { ...(sync.profile || {}), pseudo: p };
   await refreshProfile();
 }
@@ -165,11 +180,12 @@ export async function refreshProfile(force = true) {
 let lastBack = 0;
 export function startSync(theApp) {
   app = theApp;
-  app.game.on('change', () => { if (cloud.isLoggedIn() && sync.status !== 'paused') schedule(); });
+  app.game.on('change', () => { if (cloud.isLoggedIn() && sync.status !== 'paused' && !serverMode()) schedule(); });
   // v407 : le classement du jour compte les points des Épreuves du jour (la Descente est devenue la campagne)
   app.game.on('trialEnd', (out) => {
     if (!cloud.isLoggedIn() || !sync.profile?.pseudo) return;
     if (app.game.s.settings.dev) return; // pas de score au classement en Mode Créateur
+    if (serverMode()) return; /* v539 : le serveur de partie envoie lui-même les Épreuves gagnées */
     if (!out.won || !out.score) return;
     /* v538 : chaque Épreuve gagnée part seule et le serveur fait le total ; sans 11-anti-triche.sql, l'ancien envoi du total */
     cloud.trialWin(out.day || today(), out.i, (out.points || 100) - 100)
@@ -181,12 +197,20 @@ export function startSync(theApp) {
     if (!cloud.isLoggedIn()) return;
     if (document.visibilityState === 'hidden') { clearTimeout(timer); pushNow(); return; }
     /* v536 : de retour dans l'app, on regarde si la partie a avancé sur un autre appareil (avant : seulement au lancement) */
-    if (!choosing && sync.status !== 'paused' && Date.now() - lastBack > 10000) { lastBack = Date.now(); reconcile({ intro: 'Ta partie a avancé sur un autre appareil.', auto: true }).catch(() => {}); }
+    if (!serverMode() && !choosing && sync.status !== 'paused' && Date.now() - lastBack > 10000) { lastBack = Date.now(); reconcile({ intro: 'Ta partie a avancé sur un autre appareil.', auto: true }).catch(() => {}); }
   });
   if (cloud.isLoggedIn()) {
     cloud.getProfile().then((p) => { sync.profile = p; emit(); }).catch(() => {});
-    if (lsGet(PAUSED_KEY)) { sync.status = 'paused'; emit(); }
-    // au démarrage : si la partie en ligne a avancé ailleurs (autre appareil), on la récupère ou on demande
-    else reconcile({ intro: 'Ta partie a avancé sur un autre appareil.', auto: true }).catch(() => {});
+    // v539 : d'abord le serveur de partie ; sans lui (pas encore en place), l'ancien système
+    (async () => {
+      if (!serverMode()) {
+        /* passage au serveur de partie : la dernière progression de l'appareil part d'abord en ligne (elle sert de point de départ, une seule fois) */
+        if (lsGet(STAMP_KEY) && (app.game.s.updatedAt || 0) > Number(lsGet(SYNCED_KEY) || 0) + 2000 && !lsGet(PAUSED_KEY)) await pushNow(true).catch(() => {});
+      }
+      if ((await probe()) === 'server') { sync.status = 'ok'; emit(); return; }
+      if (lsGet(PAUSED_KEY)) { sync.status = 'paused'; emit(); }
+      // au démarrage : si la partie en ligne a avancé ailleurs (autre appareil), on la récupère ou on demande
+      else reconcile({ intro: 'Ta partie a avancé sur un autre appareil.', auto: true }).catch(() => {});
+    })();
   }
 }

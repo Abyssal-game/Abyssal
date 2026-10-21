@@ -147,8 +147,7 @@ export default function versusScreen(app, root) {
   async function refunds() {
     for (const r of (data?.mine || []).filter((x) => x.mine && !x.claimed && ['cancelled', 'declined', 'expired'].includes(x.status))) {
       try {
-        const res = await cloud.versusClaim(r.id);
-        const out = g.versusApply(r.id, res);
+        const { out } = await app.partie.first('versusClaim', r.id); /* v539 : encaissé par le serveur de partie */
         r.claimed = true;
         if (out?.shards) toast(`${r.status === 'declined' ? 'Défi refusé' : r.status === 'expired' ? 'Défi expiré' : 'Défi annulé'} : <b>${fmt(out.shards)} éclats</b> rendus.`, { icon: 'crystal' });
       } catch (e) { /* on réessaiera à la prochaine visite */ }
@@ -163,8 +162,8 @@ export default function versusScreen(app, root) {
       if (!data?.mine?.some((r) => r.id === id)) data = await cloud.versusList();
       const r = data.mine.find((x) => x.id === id);
       if (!r || r.status !== 'done') throw new Error('Ce duel n’est pas encore joué.');
-      const res = await cloud.versusClaim(id);
-      const out = g.versusApply(id, res) || { result: res.result, cards: [] };
+      const { res, out: o } = await app.partie.first('versusClaim', id);
+      const out = o || { result: res.result, cards: [] };
       r.claimed = true;
       app.chrome?.();
       duel(r, out);
@@ -180,13 +179,9 @@ export default function versusScreen(app, root) {
     const ok = await confirmBox(t('Relever le défi de <b>{name}</b> : {pack}.<br>Mise : <b>{stake} éclats</b>. Le meilleur total remporte toutes les cartes ; le perdant ne garde rien.', { name: esc(name(r)), pack: lbl(r), stake: fmt(r.stake) }), { ok: 'Relever le défi' });
     if (!ok) return;
     busy = true;
-    try { g.versusPay(r.stake); }
-    catch (e) { busy = false; app.sfx.error(); toast(esc(e.message), { kind: 'error', icon: 'crystal' }); return; }
-    try { await cloud.versusAccept(id); }
-    catch (e) {
-      /* v527 : réponse perdue (réseau) : le duel a peut-être eu lieu ; on regarde avant de rendre la mise */
-      if (!e.status) { try { const d = await cloud.versusList(); if ((d?.mine || []).some((x) => x.id === id && x.status === 'done')) { data = d; busy = false; app.chrome?.(); return see(id); } } catch (e2) { /* on rend la mise */ } }
-      g.versusRefund(r.stake); busy = false; app.sfx.error(); toast(esc(e.status === 404 ? OFF : e.message), { kind: 'error', icon: 'info' }); app.chrome?.(); return load(); }
+    /* v539 : la mise est prise par le serveur de partie, au moment où le duel a lieu (rendue s'il échoue) */
+    try { await app.partie.first('versusAccept', id, r.stake); }
+    catch (e) { busy = false; app.sfx.error(); toast(esc(e.status === 404 ? OFF : e.message), { kind: 'error', icon: 'info' }); app.chrome?.(); return load(); }
     app.chrome?.();
     try { data = await cloud.versusList(); } catch (e) { /* on retentera */ }
     busy = false;
@@ -206,16 +201,12 @@ export default function versusScreen(app, root) {
       : t('Lancer un défi ouvert à tous : {pack}.<br>Mise : <b>{stake} éclats</b>, rendue si personne ne le relève en {h} h.', { pack: pk, stake: fmt(stake), h: VERSUS_HOURS }), { ok: 'Lancer le défi' });
     if (!ok) return;
     busy = true;
-    try { g.versusPay(stake); }
-    catch (er) { busy = false; app.sfx.error(); toast(esc(er.message), { kind: 'error', icon: 'crystal' }); return; }
+    /* v539 : la mise est prise par le serveur de partie quand le défi est créé */
     try {
-      await cloud.versusCreateMix(lineup, to);
+      await app.partie.first('versusCreate', lineup, to, stake);
       app.sfx.achievement?.();
       toast(to ? 'Défi envoyé ! Il apparaîtra chez ton ami.' : 'Défi lancé ! Reviens voir quand un joueur l’aura relevé.', { kind: 'success', icon: 'crystal' });
-    } catch (er) {
-      /* v527 : réponse perdue (réseau) : le défi a peut-être été créé ; on regarde avant de rendre la mise */
-      if (!er.status) { try { const d = await cloud.versusList(); if ((d?.mine || []).some((r) => r.mine && r.status === 'open' && Date.now() - new Date(r.created_at).getTime() < 120000 && r.stake === stake)) { busy = false; app.chrome?.(); toast('Défi lancé !', { kind: 'success', icon: 'crystal' }); return load(); } } catch (e2) { /* on rend la mise */ } }
-      g.versusRefund(stake); app.sfx.error(); toast(esc(er.status === 404 ? OFF : er.message), { kind: 'error', icon: 'info', ms: 6000 }); }
+    } catch (er) { app.sfx.error(); toast(esc(er.status === 404 ? OFF : er.message), { kind: 'error', icon: 'info', ms: 6000 }); }
     busy = false;
     app.chrome?.();
     load();
@@ -228,7 +219,7 @@ export default function versusScreen(app, root) {
     busy = true;
     try {
       await cloud.versusCancel(id);
-      if (!decline) { const res = await cloud.versusClaim(id); const out = g.versusApply(id, res); if (out?.shards) toast(`<b>${fmt(out.shards)} éclats</b> rendus.`, { icon: 'crystal' }); }
+      if (!decline) { const { out } = await app.partie.first('versusClaim', id); if (out?.shards) toast(`<b>${fmt(out.shards)} éclats</b> rendus.`, { icon: 'crystal' }); }
     } catch (e) { app.sfx.error(); toast(esc(e.status === 404 ? OFF : e.message), { kind: 'error', icon: 'info' }); }
     busy = false;
     app.chrome?.();

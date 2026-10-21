@@ -14,18 +14,24 @@ import { hapPattern } from '../ui/sound.js';
 const RI = (r) => ['C', 'PC', 'R', 'HR', 'M', 'S'].indexOf(r);
 
 // preset : ouverture déjà tirée ailleurs (Tirage des Ombres) : rien n'est ajouté à la collection
-export function openPack(app, type, { faction, onDone, preset = null, title = null, packKey = null } = {}) {
+// v539 : le booster est tiré par le serveur de partie (anti-triche) : on attend sa réponse avant l'ouverture
+let asking = false;
+export async function openPack(app, type, { faction, onDone, preset = null, title = null, packKey = null } = {}) {
   const g = app.game, cat = app.catalog;
   let result;
+  if (asking) return;
   if (!preset) app.pendingProgress = [];
   try {
-    result = preset ? { opening: preset } : g.openBooster(type, { faction });
+    asking = true;
+    result = preset ? { opening: preset } : app.partie ? await app.partie.first('openBooster', type, { faction }) : g.openBooster(type, { faction });
   } catch (e) {
+    asking = false;
     app.pendingProgress = null;
     app.sfx.error();
     toast(esc(e.message), { kind: 'error', icon: 'info' });
     return;
   }
+  asking = false;
   const { opening } = result;
   /* v518 : le joueur voit ce qu'il ouvre : cadeau de bienvenue, booster gratuit du jour */
   if (!title && opening.gift) title = `Cadeau de bienvenue · ${opening.gift} / ${GIFT_N}`;

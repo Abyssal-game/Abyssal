@@ -241,12 +241,13 @@ export default function codexScreen(app, root) {
       if (k === 'cat') { ui.cat = b.dataset.v; app.sfx.tap?.(); return draw(); }
       if (k === 'see') { preview(b.dataset.id); return; } /* v484 */
       if (k === 'get' || k === 'unlock') { if (!(await buy(b.dataset.id))) return; }
-      if (k === 'obs') { g.s.obs = g.obs() + 1000; g.persist(); }
-      if (k === 'obs0') { g.s.obs = 0; g.persist(); }
+      /* v539 : outils d'essai passés par le serveur de partie (refusés sans le badge Créateur) */
+      if (k === 'obs') await app.partie.first('devObs', 1000);
+      if (k === 'obs0') await app.partie.first('devObs', null);
       if (k === 'restore') toast('« Restaurer mes achats » marchera avec l’App Store, quand les achats seront ouverts.', { icon: 'info' });
-      if (k === 'xp') { g.codexXp(+b.dataset.v, 'dev'); g.persist(); }
-      if (k === 'prem') { const c = g.codex(); c.premium = !c.premium; g.persist(); }
-      if (k === 'reset') { if (!(await confirmBox('Remettre le Codex à zéro (points, récompenses récupérées, voie enluminée) ? Les objets déjà gagnés restent.', { ok: 'Remettre à zéro' }))) return; g.s.codex = freshCodex(); g.persist(); }
+      if (k === 'xp') await app.partie.first('devCodexXp', +b.dataset.v);
+      if (k === 'prem') await app.partie.first('devCodexPrem');
+      if (k === 'reset') { if (!(await confirmBox('Remettre le Codex à zéro (points, récompenses récupérées, voie enluminée) ? Les objets déjà gagnés restent.', { ok: 'Remettre à zéro' }))) return; await app.partie.first('devCodexReset'); }
     } catch (err) { toast(esc(err.message), { kind: 'error' }); return; }
     app.chrome?.(); draw();
   });

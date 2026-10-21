@@ -6462,6 +6462,22 @@ export default {
   "{e0} Haut fait : Gagne en prenant une malédiction au plus.": "{e0} Glanztat: Gewinne mit höchstens einem Fluch.",
   "Haut fait : Gagne en prenant une malédiction au plus. (+{0})": "Glanztat: Gewinne mit höchstens einem Fluch. (+{0})",
   "{e0} Haut fait : Gagne en prenant une malédiction au plus. (+{0})": "{e0} Glanztat: Gewinne mit höchstens einem Fluch. (+{0})",
+  "Progression gardée par le serveur": "Fortschritt vom Server gespeichert",
+  "Progression gardée par le serveur · {0} action à envoyer": "Fortschritt vom Server gespeichert · {0} Aktion zu senden",
+  "Progression gardée par le serveur · {0} actions à envoyer": "Fortschritt vom Server gespeichert · {0} Aktionen zu senden",
+  "Progression : ancienne sauvegarde en ligne": "Fortschritt: alte Online-Sicherung",
+  "Progression : serveur pas encore joint": "Fortschritt: Server noch nicht erreicht",
+  "Connexion au serveur impossible : vérifie ton réseau et réessaie.": "Keine Verbindung zum Server: Prüfe dein Netzwerk und versuche es erneut.",
+  "Réservé au Mode Créateur.": "Nur im Schöpfermodus.",
+  "Opération refusée.": "Aktion abgelehnt.",
+  "Opération inconnue.": "Unbekannte Aktion.",
+  "Partie en cours illisible.": "Die laufende Partie ist unlesbar.",
+  "Aucun tirage ce jour-là.": "An diesem Tag keine Ziehung.",
+  "Ta partie est occupée sur un autre appareil. Réessaie dans un instant.": "Deine Partie ist auf einem anderen Gerät beschäftigt. Versuche es gleich noch einmal.",
+  "Ta partie a changé ailleurs : réessaie.": "Deine Partie hat sich anderswo geändert: Versuche es erneut.",
+  "Erreur du serveur ({0}).": "Serverfehler ({0}).",
+  "Mise invalide.": "Ungültiger Einsatz.",
+  "Requête illisible.": "Unlesbare Anfrage.",
 };
 
 export const names = {

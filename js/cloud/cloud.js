@@ -157,6 +157,9 @@ export async function pullSaveStamp() {
   return rows && rows[0] ? rows[0].updated_at : null;
 }
 
+// v539 : serveur de partie (supabase/functions/partie) : il rejoue les actions du joueur et tient sa progression
+export async function partieCall(body) { return authed('/functions/v1/partie', { method: 'POST', body }); }
+
 // ——— Profil ————————————————————————————————————————————————————————
 export async function getProfile() {
   const rows = await authed(`/rest/v1/profiles?id=eq.${currentUser().id}&select=*`);

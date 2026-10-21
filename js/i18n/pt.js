@@ -6462,6 +6462,22 @@ export default {
   "{e0} Haut fait : Gagne en prenant une malédiction au plus.": "{e0} Façanha: Vença pegando no máximo uma maldição.",
   "Haut fait : Gagne en prenant une malédiction au plus. (+{0})": "Façanha: Vença pegando no máximo uma maldição. (+{0})",
   "{e0} Haut fait : Gagne en prenant une malédiction au plus. (+{0})": "{e0} Façanha: Vença pegando no máximo uma maldição. (+{0})",
+  "Progression gardée par le serveur": "Progresso guardado pelo servidor",
+  "Progression gardée par le serveur · {0} action à envoyer": "Progresso guardado pelo servidor · {0} ação a enviar",
+  "Progression gardée par le serveur · {0} actions à envoyer": "Progresso guardado pelo servidor · {0} ações a enviar",
+  "Progression : ancienne sauvegarde en ligne": "Progresso: salvamento on-line antigo",
+  "Progression : serveur pas encore joint": "Progresso: servidor ainda não alcançado",
+  "Connexion au serveur impossible : vérifie ton réseau et réessaie.": "Não foi possível conectar ao servidor: verifique sua conexão e tente de novo.",
+  "Réservé au Mode Créateur.": "Só no Modo Criador.",
+  "Opération refusée.": "Ação recusada.",
+  "Opération inconnue.": "Ação desconhecida.",
+  "Partie en cours illisible.": "A partida em andamento está ilegível.",
+  "Aucun tirage ce jour-là.": "Nenhuma tiragem nesse dia.",
+  "Ta partie est occupée sur un autre appareil. Réessaie dans un instant.": "Sua partida está ocupada em outro aparelho. Tente de novo daqui a pouco.",
+  "Ta partie a changé ailleurs : réessaie.": "Sua partida mudou em outro lugar: tente de novo.",
+  "Erreur du serveur ({0}).": "Erro do servidor ({0}).",
+  "Mise invalide.": "Aposta inválida.",
+  "Requête illisible.": "Pedido ilegível.",
 };
 
 export const names = {

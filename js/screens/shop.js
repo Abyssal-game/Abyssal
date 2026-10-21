@@ -162,13 +162,21 @@ export default function shop(app, root, params = []) {
     if (g.welcomePending() || g.s.welcomeGift > 0) return 0; /* v518 : pendant le cadeau de bienvenue, un booster à la fois */
     return Object.entries(g.s.tickets).filter(([k, n]) => n > 0 && BOOSTERS[k]).reduce((a, [, n]) => a + n, 0) + g.freePack().stock;
   }
-  function openAll() {
+  let allBusy = false;
+  async function openAll() {
+    if (allBusy) return;
     const got = [];
     app.pendingProgress = [];
+    /* v539 : tous les boosters partent ensemble au serveur de partie, qui les tire */
+    const list = [];
+    for (const type of Object.keys(BOOSTERS)) for (let i = 0; i < (g.s.tickets[type] || 0); i++) list.push(['openBooster', [type, { faction: type === 'faction' ? st.faction : undefined }]]);
+    for (let i = 0; i < g.freePack().stock; i++) list.push(['openBooster', ['standard']]);
+    allBusy = true;
     try {
-      for (const type of Object.keys(BOOSTERS)) while ((g.s.tickets[type] || 0) > 0) got.push(...g.openBooster(type, { faction: type === 'faction' ? st.faction : undefined }).opening.cards);
-      while (g.freePack().stock > 0) got.push(...g.openBooster('standard').opening.cards);
+      const res = app.partie ? await app.partie.firstMany(list) : list.map(([, a]) => ({ ret: g.openBooster(...a) }));
+      for (const r of res) { if (r.err) throw new Error(r.err); got.push(...r.ret.opening.cards); }
     } catch (e) { toast(esc(e.message), { kind: 'error' }); }
+    allBusy = false;
     if (!got.length) { app.flushProgress(); return; }
     const RI = (r) => ['C', 'PC', 'R', 'HR', 'M', 'S'].indexOf(r);
     got.sort((a, b) => (b.isNewCard - a.isNewCard) || RI(cat.get(b.id).rarity) - RI(cat.get(a.id).rarity));

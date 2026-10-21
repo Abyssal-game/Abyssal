@@ -38,6 +38,7 @@ import shadowScreen, { claimShadowPrize } from './screens/shadow.js';
 import { forgeScreen, furnaceScreen } from './screens/forge.js';
 import { teamScreen, chestsScreen } from './screens/army.js';
 import { startSync, sync, onSync } from './cloud/sync.js';
+import { startPartie, first, firstMany, flush as flushPartie } from './cloud/partie.js';
 import { consumeAuthHash, isLoggedIn } from './cloud/cloud.js';
 import { startPresence } from './cloud/presence.js';
 import { showWelcome } from './screens/welcome.js';
@@ -355,6 +356,8 @@ async function boot() {
     applySettings();
     // v318 : lien reçu par e-mail (confirmation d'inscription, mot de passe oublié) : ouvre la session avant tout
     const authLink = consumeAuthHash();
+    startPartie(app); /* v539 : serveur de partie (anti-triche) */
+    app.partie = { first, firstMany, flush: flushPartie };
     startSync(app);
     let shownPseudo = null;
     onSync(() => { const ps = sync.profile?.pseudo || null; if (ps !== shownPseudo) { shownPseudo = ps; renderChrome(); } }); /* v422 : le pseudo en ligne s'affiche en haut dès qu'il arrive */

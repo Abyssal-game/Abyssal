@@ -1,0 +1,170 @@
+// v539 : le téléphone et le serveur de partie (anti-triche, étape 1).
+// Le jeu applique chaque action tout de suite (même moteur) et la note (js/core/oprec.js) ; ces actions partent au serveur
+// (supabase/functions/partie) qui les rejoue : c'est sa partie qui fait foi. Les boosters et les récompenses en ligne
+// sont faits d'abord par le serveur (on attend sa réponse). Si l'état du téléphone diffère de celui du serveur
+// (partie modifiée, autre appareil), le téléphone reprend celui du serveur, sans toucher aux réglages ni à la partie en cours.
+// Tant que le serveur de partie n'est pas en place (fonction pas publiée, SQL pas collé), l'ancien système reste (« legacy »).
+import * as cloud from './cloud.js';
+import { recordOps } from '../core/oprec.js';
+import { FREE, FREE_DEV, SESS, getPath, setPath, clone, digest } from '../core/ops.js';
+import { migrate } from '../core/save.js';
+
+export const partie = { mode: 'unknown', error: null, last: 0 };
+const K = { queue: 'abyssal.ops', seq: 'abyssal.opseq', dev: 'abyssal.device', mode: 'abyssal.partieMode' };
+const lsGet = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+const lsSet = (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) { /* rien */ } };
+let app = null, g = null, timer = 0, inflight = null, waiting = null, lastFree = '', seq = Number(lsGet(K.seq)) || 0;
+let queue = [];
+const firstQs = new Set();
+const listeners = new Set();
+export const onPartie = (fn) => { listeners.add(fn); return () => listeners.delete(fn); };
+const emit = () => listeners.forEach((f) => f(partie));
+const uid = () => cloud.currentUser()?.id || null;
+const device = () => { let d = lsGet(K.dev); if (!d) { d = `d${Date.now().toString(36)}${Math.floor(Math.random() * 1e9).toString(36)}`; lsSet(K.dev, d); } return d; };
+const saveQueue = () => lsSet(K.queue, JSON.stringify({ uid: uid(), ops: queue }));
+export const serverMode = () => partie.mode === 'server';
+export const pendingOps = () => queue.length;
+
+function loadState() {
+  try { const o = JSON.parse(lsGet(K.queue) || 'null'); queue = o && o.uid === uid() && Array.isArray(o.ops) ? o.ops : []; } catch (e) { queue = []; }
+  const m = lsGet(K.mode);
+  partie.mode = uid() && m === `server:${uid()}` ? 'server' : 'unknown';
+}
+function enqueue(op) {
+  op.q = ++seq; lsSet(K.seq, String(seq));
+  queue.push(op); saveQueue();
+  clearTimeout(timer); timer = setTimeout(() => flush().catch(() => {}), 2500);
+  return op.q;
+}
+
+// ce que le téléphone garde quand il reprend la partie du serveur : réglages, marques de l'interface, partie en cours
+function freeSnap() {
+  const o = {};
+  for (const p of [...FREE, ...FREE_DEV]) { const v = getPath(g.s, p); if (v !== undefined) o[p] = v; }
+  return o;
+}
+const safe = () => !queue.length && !document.body.classList.contains('battle-mode') && !document.querySelector('.opening');
+export function adopt(data) {
+  if (digest(data) === digest(g.s)) { waiting = null; return; } // rien qui compte n'a changé : on ne redessine pas
+  const m = clone(data);
+  for (const p of [...FREE, ...FREE_DEV]) { const v = getPath(g.s, p); if (v !== undefined) setPath(m, p, clone(v)); }
+  for (const p of SESS) { const v = getPath(g.s, p); if (v !== undefined && getPath(m, p.split('.').slice(0, -1).join('.'))) setPath(m, p, v); }
+  waiting = null;
+  g.replaceSave(migrate(m));
+  app.applySettings?.();
+  app.refresh?.();
+  app.chrome?.();
+}
+
+// Envoie les actions en attente ; reçoit la partie du serveur si elle diffère de celle du téléphone
+export function flush({ want = false } = {}) {
+  if (!cloud.isLoggedIn() || partie.mode === 'legacy') return Promise.resolve(null);
+  if (inflight) return inflight.then(() => flush({ want }), () => flush({ want }));
+  const ops = queue.slice(), sent = ops.length ? ops[ops.length - 1].q : 0;
+  const fr = freeSnap(), frTxt = JSON.stringify(fr);
+  const body = { ops, dev: device(), tz: -new Date().getTimezoneOffset(), digest: digest(g.s), want: want || partie.mode !== 'server', ...(frTxt !== lastFree ? { free: fr } : {}) };
+  const who = uid();
+  inflight = cloud.partieCall(body).then((res) => {
+    inflight = null;
+    if (uid() !== who) return null; // compte changé entre-temps
+    if (partie.mode !== 'server') { partie.mode = 'server'; lsSet(K.mode, `server:${who}`); }
+    queue = queue.filter((o) => o.q > sent); saveQueue();
+    lastFree = frTxt; partie.error = null; partie.last = Date.now();
+    for (const [q, ev] of Object.entries(res?.prog || {})) if (firstQs.has(Number(q)) && ev?.length) g.emit('progress', ev); // annonces des actions faites par le serveur
+    if (res?.data) { if (safe()) adopt(res.data); else waiting = res.data; } else waiting = null; // la partie du serveur est celle du téléphone
+    emit();
+    return res;
+  }, (err) => {
+    inflight = null;
+    // fonction absente (404) ou base sans 12-serveur-de-partie.sql : l'ancien système reste
+    if (partie.mode !== 'server' && (err.status === 404 || err.status === 503 || /partie_lock|function.*not.*find|Could not find/i.test(err.message || ''))) { partie.mode = 'legacy'; queue = []; saveQueue(); emit(); return null; }
+    partie.error = err.message; emit();
+    throw err;
+  });
+  return inflight;
+}
+
+// Premier contact avec le serveur (au lancement, après une connexion) : 'server', 'legacy' ou 'offline'
+export async function probe() {
+  if (!cloud.isLoggedIn()) return 'offline';
+  try { const r = await flush({ want: true }); return r ? 'server' : partie.mode === 'legacy' ? 'legacy' : 'offline'; }
+  catch (e) { return 'offline'; }
+}
+
+// Action faite d'abord par le serveur (boosters, récompenses en ligne) : on attend sa réponse
+async function viaServer(list) {
+  if (partie.mode !== 'server') { const m = await probe(); if (m !== 'server') return null; }
+  const qs = list.map(([m, a]) => { const q = enqueue({ m, a: clone(a) }); firstQs.add(q); return q; });
+  clearTimeout(timer);
+  let res;
+  try { res = await flush(); }
+  catch (e) { queue = queue.filter((o) => !qs.includes(o.q)); saveQueue(); throw new Error('Connexion au serveur impossible : vérifie ton réseau et réessaie.'); }
+  if (res?.data) adopt(res.data);
+  return qs.map((q) => (res.errs?.[q] ? { err: res.errs[q] } : { ret: res.rets?.[q] }));
+}
+export async function first(m, ...args) {
+  if (partie.mode !== 'legacy' && cloud.isLoggedIn()) {
+    const r = await viaServer([[m, args]]);
+    if (r) { if (r[0].err) throw new Error(r[0].err); return r[0].ret; }
+  }
+  return LEGACY[m](...args);
+}
+export async function firstMany(list) {
+  if (partie.mode !== 'legacy' && cloud.isLoggedIn()) { const r = await viaServer(list); if (r) return r; }
+  return list.map(([m, a]) => { try { return { ret: LEGACY[m](...a) }; } catch (e) { return { err: e.message }; } });
+}
+
+// L'ancien système (sans serveur de partie) : ce que faisait le jeu avant v539
+const LEGACY = {
+  openBooster: (type, opts) => g.openBooster(type, opts),
+  async versusCreate(lineup, to, stake) {
+    g.versusPay(stake);
+    try { const id = await cloud.versusCreateMix(lineup, to); return { id, stake }; }
+    catch (er) {
+      /* v527 : réponse perdue (réseau) : le défi a peut-être été créé ; on regarde avant de rendre la mise */
+      if (!er.status) { try { const d = await cloud.versusList(); if ((d?.mine || []).some((r) => r.mine && r.status === 'open' && Date.now() - new Date(r.created_at).getTime() < 120000 && r.stake === stake)) return { stake }; } catch (e2) { /* on rend la mise */ } }
+      g.versusRefund(stake); throw er;
+    }
+  },
+  async versusAccept(id, stake) {
+    g.versusPay(stake);
+    try { return { ok: true, r: await cloud.versusAccept(id) }; }
+    catch (e) {
+      if (!e.status) { try { const d = await cloud.versusList(); if ((d?.mine || []).some((x) => x.id === id && x.status === 'done')) return { ok: true }; } catch (e2) { /* on rend la mise */ } }
+      g.versusRefund(stake); throw e;
+    }
+  },
+  async versusClaim(id) { const res = await cloud.versusClaim(id); return { res, out: g.versusApply(id, res) }; },
+  async mpClaim(game, id, friendsOnly = false) { const r = await cloud.mpClaim(id); return { r, out: friendsOnly ? { shards: 0 } : g.mpReward(game, id, r) }; },
+  shadowPay: (day) => g.shadowPay(day),
+  async shadowClaim(week) {
+    const rank = await cloud.shadowClaim(week);
+    const sh = g.shadowState(); sh.asked = week; g.persist();
+    return { rank, chest: rank ? g.shadowPrize(week, rank) : null };
+  },
+  devObs(n) { g.s.obs = n == null ? 0 : g.obs() + n; g.persist(); },
+  devCodexXp(n) { g.codexXp(+n || 0, 'dev'); g.persist(); },
+  devCodexPrem() { const c = g.codex(); c.premium = !c.premium; g.persist(); },
+  devCodexReset() { g.s.codex = null; g.codex(); g.persist(); },
+  devSnapshot(save) { g.replaceSave(migrate(save)); },
+};
+
+export function startPartie(theApp) {
+  app = theApp; g = app.game;
+  loadState();
+  recordOps(g, enqueue, () => partie.mode === 'server' && cloud.isLoggedIn());
+  cloud.onAuth((s) => {
+    if (!s) { queue = []; saveQueue(); partie.mode = 'unknown'; firstQs.clear(); lastFree = ''; emit(); return; }
+    loadState();
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (!cloud.isLoggedIn() || partie.mode !== 'server') return;
+    flush({ want: document.visibilityState === 'visible' }).catch(() => {});
+  });
+  // à intervalles : envoie ce qui attend, reprend la partie du serveur quand c'est le bon moment
+  setInterval(() => {
+    if (partie.mode !== 'server') return;
+    if (waiting && safe()) adopt(waiting);
+    if (queue.length) flush().catch(() => {});
+  }, 15000);
+}

@@ -6473,6 +6473,22 @@ export default {
   "{e0} Haut fait : Gagne en prenant une malédiction au plus.": "{e0} Feat: Win taking one curse at most.",
   "Haut fait : Gagne en prenant une malédiction au plus. (+{0})": "Feat: Win taking one curse at most. (+{0})",
   "{e0} Haut fait : Gagne en prenant une malédiction au plus. (+{0})": "{e0} Feat: Win taking one curse at most. (+{0})",
+  "Progression gardée par le serveur": "Progress kept by the server",
+  "Progression gardée par le serveur · {0} action à envoyer": "Progress kept by the server · {0} action to send",
+  "Progression gardée par le serveur · {0} actions à envoyer": "Progress kept by the server · {0} actions to send",
+  "Progression : ancienne sauvegarde en ligne": "Progress: former online save",
+  "Progression : serveur pas encore joint": "Progress: server not reached yet",
+  "Connexion au serveur impossible : vérifie ton réseau et réessaie.": "Can’t reach the server: check your connection and try again.",
+  "Réservé au Mode Créateur.": "Creator Mode only.",
+  "Opération refusée.": "Action refused.",
+  "Opération inconnue.": "Unknown action.",
+  "Partie en cours illisible.": "The game in progress can’t be read.",
+  "Aucun tirage ce jour-là.": "No draw that day.",
+  "Ta partie est occupée sur un autre appareil. Réessaie dans un instant.": "Your game is busy on another device. Try again in a moment.",
+  "Ta partie a changé ailleurs : réessaie.": "Your game changed elsewhere: try again.",
+  "Erreur du serveur ({0}).": "Server error ({0}).",
+  "Mise invalide.": "Invalid stake.",
+  "Requête illisible.": "Unreadable request.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

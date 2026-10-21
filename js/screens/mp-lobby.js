@@ -71,9 +71,8 @@ export function createMpLobby(app, root, spec) {
   async function claimAll() {
     for (const v of (list || []).filter((x) => x.status === 'done' && !x.claimed)) {
       try {
-        const r = await cloud.mpClaim(v.id);
+        const { r, out } = await app.partie.first('mpClaim', spec.game, v.id, !!spec.friendsOnly); /* v539 : encaissé par le serveur de partie */
         v.claimed = true;
-        const out = spec.friendsOnly ? { shards: 0 } : g.mpReward(spec.game, v.id, r);
         if (out) toast(`${t(r === 'win' ? 'Victoire contre <b>{name}</b>' : r === 'lose' ? 'Défaite contre <b>{name}</b>' : 'Égalité contre <b>{name}</b>', { name: esc(foeName(v)) })}${v.reason === 'timeout' ? ` (${t('temps écoulé')})` : v.reason === 'resign' ? ` (${t('abandon')})` : ''}${out.shards ? ` · +${out.shards} ${t('éclats')}` : ''}`, { icon: r === 'win' ? 'crown' : 'info' });
       } catch (e) { /* on réessaiera */ }
     }
@@ -185,7 +184,7 @@ export function createMpLobby(app, root, spec) {
     if (view.status === 'done' && !view.claimed) claimOne(view);
   }
   async function claimOne(v) {
-    try { const r = await cloud.mpClaim(v.id); v.claimed = true; const out = spec.friendsOnly ? { shards: 0 } : g.mpReward(spec.game, v.id, r); if (out) { if (r === 'win') app.sfx.victory?.(); else app.sfx.defeat?.(); if (out.shards) toast(`+${out.shards} éclats`, { icon: 'crystal' }); app.chrome?.(); } } catch (e) { /* plus tard */ }
+    try { const { r, out } = await app.partie.first('mpClaim', spec.game, v.id, !!spec.friendsOnly); v.claimed = true; if (out) { if (r === 'win') app.sfx.victory?.(); else app.sfx.defeat?.(); if (out.shards) toast(`+${out.shards} éclats`, { icon: 'crystal' }); app.chrome?.(); } } catch (e) { /* plus tard */ }
   }
   // Coup joué au serveur : la nouvelle vue remplace l'ancienne ; en cas d'erreur, la partie est relue
   async function act(fn) {

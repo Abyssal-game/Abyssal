@@ -27,10 +27,8 @@ export async function claimShadowPrize(app) {
   const sh = g.shadowState();
   if (sh.prizes[last] !== undefined || sh.asked === last) return null;
   try {
-    const rank = await cloud.shadowClaim(last);
-    sh.asked = last; g.persist();
+    const { rank, chest } = await app.partie.first('shadowClaim', last); /* v539 : vérifié par le serveur de partie */
     if (!rank) return null;
-    const chest = g.shadowPrize(last, rank);
     if (chest) { app.sfx.achievement?.(); toast(`Tirage des Ombres : tu as fini <b>${rank === 1 ? '1er' : `${rank}e`}</b> la semaine dernière ! <b>${esc(CHESTS[chest].name)}</b> ajouté à tes coffres.`, { kind: 'epic', icon: 'crown', ms: 5000 }); app.chrome?.(); }
     return chest;
   } catch (e) { return null; }
@@ -119,7 +117,8 @@ export default function shadowScreen(app, root) {
     busy = false;
     const cards = (res.cards || []).filter((c) => cat.get(c.id));
     mine = { cards, score: res.score, faction: ui.faction, day: res.day };
-    const shards = g.shadowPay(res.day);
+    let shards = 0;
+    try { shards = await app.partie.first('shadowPay', res.day) || 0; } catch (e) { /* participation encaissée plus tard */ }
     app.chrome?.();
     openPack(app, 'standard', { title: 'Booster des Ombres', packKey: 'shadow', preset: { cards, score: res.score, rewards: { shards, xp: 0 } }, onDone: () => draw() });
     draw();

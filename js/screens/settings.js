@@ -5,6 +5,9 @@ import { TUTOS, tuto } from '../ui/tutos.js';
 import { icon } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, openSheet, bindActions } from '../ui/dom.js';
 import { sfx, audioInfo } from '../ui/sound.js';
+import { partie, pendingOps } from '../cloud/partie.js';
+/* v539 : où vit la progression (serveur de partie, ou ancienne sauvegarde tant qu'il n'est pas en place) */
+const partieLine = () => (partie.mode === 'server' ? `Progression gardée par le serveur${pendingOps() ? ` · ${pendingOps()} action${pendingOps() > 1 ? 's' : ''} à envoyer` : ''}` : partie.mode === 'legacy' ? 'Progression : ancienne sauvegarde en ligne' : 'Progression : serveur pas encore joint');
 import { MUSIC_DEMO, musicPreview } from '../ui/music.js';
 import { sync, onSync, refreshProfile, eraseOnline } from '../cloud/sync.js';
 import { isLoggedIn } from '../cloud/cloud.js';
@@ -86,6 +89,7 @@ export default function settings(app, root) {
         <h2>À propos</h2>
         <p class="small">ABYSSAL — Le Bestiaire interdit.</p>
         <p class="small muted" data-act="vtap">Version ${esc(app.version)} · ${app.catalog.cards.length} cartes</p>
+        <p class="small muted set-partie">${partieLine()}</p>
         ${s.dev ? `<p class="small muted set-audio">${(() => { const a = audioInfo(); return `Son : ${esc(a.state)} · ${a.samples}${a.expected != null ? `/${a.expected}` : ''} sons chargés · session ${esc(String(a.session))}${a.enabled ? '' : ' · coupé dans les réglages'}${a.diag.failGet || a.diag.failDecode || a.diag.err ? ` · échecs lecture ${a.diag.failGet}, décodage ${a.diag.failDecode}${a.diag.err ? ` · ${esc(a.diag.err)}` : ''}` : ''}`; })()}</p>
         <button class="btn ghost small" data-act="sndtest">${icon('dodge')} Tester le son</button>` : ''}
         <a class="btn ghost small" href="confidentialite.html" target="_blank" rel="noopener">${icon('book')} Politique de confidentialité</a>
