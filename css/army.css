@@ -5796,3 +5796,10 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .on-list .lb-name { display: flex; flex-direction: column; min-width: 0; flex: 1; }
 .on-list .lb-name b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .on-list .lb-name > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* v610 : fermeture de l'app à l'ouverture d'un booster (iPhone) : le reflet du sachet (.pk-foil, v576) était un calque
+   animé de 300 % × 300 % du sachet, en mélange color-dodge, copié dans chacun des 13 morceaux de la déchirure : près de
+   500 Mo de mémoire graphique sur un écran Retina. Plus de reflet pendant la déchirure, et un reflet 3 fois plus petit ailleurs. */
+.op-pack .pk-foil { display: none !important; }
+.pk-foil::before { width: 300%; height: 100%; animation-name: foil3; }
+@keyframes foil3 { 0%, 100% { transform: translateX(-66.667%); } 50% { transform: translateX(0); } }
