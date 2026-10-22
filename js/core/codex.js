@@ -141,9 +141,32 @@ export const EMOTES = {
   're-archiviste': { text: 'Prévisible.', who: 'archiviste', name: 'L’Archiviste' }, 're-ilda': { text: 'Oh non… !', who: 'initie', name: 'Ilda' },
   're-orvel': { text: 'Quel coup !', who: 'collectionneur', name: 'Maître Orvel' }, 're-vesna': { text: 'Patience.', who: 'stratege', name: 'Sœur Vesna' },
   're-maitre': { text: 'Les règles sont les règles.', who: 'maitre', name: 'Le Maître des Sceaux' }, 're-echo': { text: 'L’Abîme t’attend.', who: 'echo', name: 'L’Écho de l’Abîme' },
+  /* v586 : réactions des 20 gardiens (portrait = leur figure peinte, assets/bosses) */
+  're-g-devoreur': { text: 'J’ai encore faim.', boss: 'devoreur', name: 'Le Dévoreur' },
+  're-g-matriarche': { text: 'Que tout gèle.', boss: 'matriarche', name: 'La Matriarche du Givre' },
+  're-g-roi': { text: 'Lequel de mes visages ?', boss: 'roi', name: 'Le Roi sans Visage' },
+  're-g-architecte': { text: 'Nouvelles règles.', boss: 'architecte', name: 'L’Architecte' },
+  're-g-eclipse': { text: 'La lumière s’éteint.', boss: 'eclipse', name: 'L’Éclipse' },
+  're-g-essaim': { text: 'Mille dards pour toi.', boss: 'essaim', name: 'La Reine des Essaims' },
+  're-g-bourreau': { text: 'La sentence tombe.', boss: 'bourreau', name: 'Le Bourreau' },
+  're-g-choeur': { text: 'Rejoins notre chant.', boss: 'choeur', name: 'Le Chœur des Noyés' },
+  're-g-chaines': { text: 'Nul ne m’échappe.', boss: 'chaines', name: 'Le Seigneur des Chaînes' },
+  're-g-horloge': { text: 'Ton temps est compté.', boss: 'horloge', name: 'L’Horloger' },
+  're-g-miroirs': { text: 'Regarde-toi bien.', boss: 'miroirs', name: 'La Sorcière des Miroirs' },
+  're-g-golem': { text: 'Frappe encore.', boss: 'golem', name: 'Le Golem de Cendres' },
+  're-g-peste': { text: 'Respire profondément…', boss: 'peste', name: 'La Peste Grise' },
+  're-g-chasseur': { text: 'Trop tard.', boss: 'chasseur', name: 'Le Chasseur Sans Ombre' },
+  're-g-voeux': { text: 'Fais un vœu…', boss: 'voeux', name: 'La Dame des Vœux' },
+  're-g-titan': { text: 'Silence. Je dors.', boss: 'titan', name: 'Le Titan Endormi' },
+  're-g-jumeaux': { text: 'Nous sommes deux.', boss: 'jumeaux', name: 'Les Jumeaux du Crépuscule' },
+  're-g-juge': { text: 'Coupable.', boss: 'juge', name: 'Le Juge des Sceaux' },
+  're-g-bete': { text: 'Tout finira.', boss: 'bete', name: 'La Bête de l’Apocalypse' },
+  're-g-abysse': { text: 'L’Abysse te regarde.', boss: 'abysse', name: 'L’Abysse' },
 };
 export const FREE_EMOTES = Object.keys(EMOTES).filter((k) => EMOTES[k].free);
 export const PAID_EMOTES = Object.keys(EMOTES).filter((k) => !EMOTES[k].free);
+export const ARBITRE_EMOTES = PAID_EMOTES.filter((k) => EMOTES[k].who);
+export const BOSS_EMOTES = PAID_EMOTES.filter((k) => EMOTES[k].boss);
 const PL = (k, cost) => ({ id: k, kind: 'plate', give: { plate: k }, cost });
 const RE = (k, cost) => ({ id: k, kind: 'emote', give: { emote: k }, cost });
 export const ROYAUMES = ['dos-infernal', 'dos-abyssal', 'dos-celeste', 'dos-sauvage', 'dos-necrotique', 'dos-primordial', 'dos-artificiel'];
@@ -181,21 +204,22 @@ export const COSM_RARITY = {
   'pl-eclipse': 'rare', 'pl-or-noir': 'rare', 'pl-ossuaire': 'rare', 'pl-abysse': 'rare', 'pl-foudre': 'rare', 'pl-grimoire': 'rare', 'pl-obsidienne': 'rare', 'pl-pierre': 'rare',
 };
 const SHOP_FRAMES = ['cx-vif-dragon', 'cx-vif-phenix', 'cx-vif-soleil-noir', 'cx-vif-amethyste', 'cx-vif-sang', 'cx-vif-brasier', 'cx-vif-givre', 'cx-vif-kraken', 'cx-vif-nacre', 'cx-vif-foret', 'cx-vif-ames', 'cx-vif-abysse', 'cx-vif-maree', 'cx-vif-foudre', 'cx-vif-etoiles', 'cx-vif-rouages'];
-const SHOP_BACKS = ['dos-vif-phenix', 'dos-vif-ailes', 'dos-vif-couronne', 'dos-vif-nebuleuse', 'dos-vitrail', 'dos-vif-lune-sang', 'dos-vif-trone',
-  'dos-vif-astrolabe', 'dos-vif-orchidee', 'dos-vif-sablier', 'dos-vif-hydre', 'dos-abyssal', 'dos-infernal',
-  'dos-sauvage', 'dos-necrotique', 'dos-primordial', 'dos-artificiel', 'dos-celeste', 'dos-phalene', 'dos-art-deco'];
-const SHOP_SACHETS = ['sachet-vif-dragon', 'sachet-vif-eclipse', 'sachet-vif-tresor', 'sachet-vif-phenix', 'sachet-vif-abysse', 'sachet-vif-empereur', 'sachet-vif-ecrin',
-  'sachet-vif-sang', 'sachet-vif-kraken', 'sachet-vif-astrolabe', 'sachet-vif-infernal', 'sachet-vif-spectre', 'sachet-souverain',
-  'sachet-vif-celeste', 'sachet-vif-givre-noir', 'sachet-braise', 'sachet-vif-orage', 'sachet-lune-sang', 'sachet-vif-necro', 'sachet-vif-automate'];
-const SHOP_PLATES = ['pl-empereur', 'pl-tresor', 'pl-phenix', 'pl-sang', 'pl-kraken', 'pl-cristal', 'pl-automate', 'pl-braise', 'pl-givre', 'pl-souverain', 'pl-nacre', 'pl-dragon', 'pl-foret',
-  'pl-eclipse', 'pl-or-noir', 'pl-ossuaire', 'pl-abysse', 'pl-foudre', 'pl-grimoire', 'pl-obsidienne'];
+/* v586 (« je veux tout ») : tous les dos, sachets et plaques sont en vente, rangés par rareté ; seul le dos de l'alchimiste
+   reste de côté (triangle lumineux proche de l'œil dans le triangle) */
+const OFF_SALE = ['dos-alchimie'];
+const ORDER = ['myth', 'leg', 'epic', 'rare'];
+const shopOf = (re) => Object.keys(COSM_RARITY).filter((k) => re.test(k) && !OFF_SALE.includes(k)).sort((a, b) => ORDER.indexOf(COSM_RARITY[a]) - ORDER.indexOf(COSM_RARITY[b]));
+const SHOP_BACKS = shopOf(/^dos-/);
+const SHOP_SACHETS = shopOf(/^sachet-/);
+const SHOP_PLATES = shopOf(/^pl-/);
 /* gardés pour les saisons du Codex (plus en vente ; ceux qui les ont les gardent) */
 export const PASS_RESERVE = [...Object.keys(COSM_RARITY).filter((k) => /^(dos|sachet|pl)-/.test(k) && ![...SHOP_BACKS, ...SHOP_SACHETS, ...SHOP_PLATES].includes(k))];
 const RZ = (mk, k, extra) => ({ ...mk(k, COSM_PRICE[COSM_RARITY[k]]), r: COSM_RARITY[k], live: true, ...extra });
 export const CATALOG = [
   ...SHOP_FRAMES.map((k) => RZ(F, k)), ...SHOP_BACKS.map((k) => RZ(B, k)), ...SHOP_SACHETS.map((k) => RZ(SA, k)), ...SHOP_PLATES.map((k) => RZ(PL, k)),
   ...PAID_EMOTES.map((k) => ({ ...RE(k, 100), r: 'rare' })),
-  { id: 'arbitres', kind: 'bundle', name: 'Le Cercle des arbitres', give: { emotes: PAID_EMOTES }, cost: 600, desc: 'Les huit réactions des arbitres d’un coup (800 à l’unité).' },
+  { id: 'arbitres', kind: 'bundle', name: 'Le Cercle des arbitres', give: { emotes: ARBITRE_EMOTES }, cost: 600, desc: 'Les huit réactions des arbitres d’un coup (800 à l’unité).' },
+  { id: 'gardiens', kind: 'bundle', name: 'Les vingt gardiens', give: { emotes: BOSS_EMOTES }, cost: 1500, desc: 'Les vingt réactions des gardiens d’un coup (2 000 à l’unité).' },
   { id: 'royaumes', kind: 'bundle', name: 'Les sept royaumes', give: { backs: ROYAUMES }, cost: Math.round(ROYAUMES.reduce((n, k) => n + COSM_PRICE[COSM_RARITY[k]], 0) * 0.8 / 10) * 10, desc: 'Les sept dos vivants des royaumes d’un coup, moins cher qu’à l’unité.' },
 ];
 // Exclusifs du Codex enluminé (jamais en vente). v547 : tous les cosmétiques de la voie enluminée (Saison I : l'hiver),

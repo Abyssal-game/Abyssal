@@ -223,7 +223,7 @@ export default function codexScreen(app, root) {
       if (it.kind === 'emote') return `<p class="cx-pv-cap">Pendant une partie en ligne, ton adversaire voit</p>
         <div class="re-bubble demo on">${emoteHTML(it.id)}<small>${esc(myName())}</small></div>
         <p class="cx-pv-cap">Les réactions s'envoient avec la bulle à droite de l'écran de jeu, une toutes les 3 secondes. Ton adversaire peut les masquer.</p>`;
-      if (it.give?.emotes) return `<p class="cx-pv-cap">Les huit réactions du lot</p><div class="re-grid">${it.give.emotes.map((k) => `<span class="re-pick">${emoteHTML(k)}</span>`).join('')}</div>`;
+      if (it.give?.emotes) return `<p class="cx-pv-cap">Les réactions du lot</p><div class="re-grid">${it.give.emotes.map((k) => `<span class="re-pick">${emoteHTML(k)}</span>`).join('')}</div>`;
       return `<p class="cx-pv-cap">Les sept dos du lot</p><div class="cx-pv-grid">${it.give.backs.map((b) => `<figure><img alt="" src="assets/backs/${b}.webp"><figcaption>${esc((CODEX_BACKS[b] || b).replace('Dos du royaume ', ''))}</figcaption></figure>`).join('')}</div>`;
     };
     const foot = () => { const own = g.catalogOwned(it.id), cost = g.catalogCost(it.id);

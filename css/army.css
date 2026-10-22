@@ -5594,3 +5594,5 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .pf-cx-vif-kraken { --fr: url(../assets/frames/cx-vif-kraken-4.webp); }
 .pf-cx-vif-foret { --fr: url(../assets/frames/cx-vif-foret-4.webp); }
 .pf-cx-vif-nacre { --fr: url(../assets/frames/cx-vif-nacre-4.webp); }
+/* v586 : réactions des gardiens : figure peinte cadrée sur la tête */
+.re-pic img.re-boss { object-fit: cover; object-position: 50% 6%; transform: scale(1.35); transform-origin: 50% 12%; }

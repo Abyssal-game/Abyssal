@@ -1270,7 +1270,7 @@ returns jsonb language plpgsql volatile security definer set search_path = publi
 declare m public.mp_matches; me text; e jsonb; owned jsonb; n int;
 begin
   if auth.uid() is null then raise exception 'Connecte-toi d’abord.'; end if;
-  if p_key is null or not (p_key = any (array['re-salut', 're-bien', 're-merci', 're-aie', 're-mammon', 're-souveraine', 're-archiviste', 're-ilda', 're-orvel', 're-vesna', 're-maitre', 're-echo'])) then raise exception 'Réaction inconnue.'; end if;
+  if p_key is null or not (p_key = any (array['re-salut', 're-bien', 're-merci', 're-aie', 're-mammon', 're-souveraine', 're-archiviste', 're-ilda', 're-orvel', 're-vesna', 're-maitre', 're-echo', 're-g-devoreur', 're-g-matriarche', 're-g-roi', 're-g-architecte', 're-g-eclipse', 're-g-essaim', 're-g-bourreau', 're-g-choeur', 're-g-chaines', 're-g-horloge', 're-g-miroirs', 're-g-golem', 're-g-peste', 're-g-chasseur', 're-g-voeux', 're-g-titan', 're-g-jumeaux', 're-g-juge', 're-g-bete', 're-g-abysse'])) then raise exception 'Réaction inconnue.'; end if;
   select * into m from public.mp_matches where id = p_id and auth.uid() in (a, b) for update;
   if not found then raise exception 'Partie introuvable.'; end if;
   if m.status <> 'playing' and not (m.status = 'done' and m.updated_at > now() - interval '10 minutes') then raise exception 'La partie n’est pas en cours.'; end if;
