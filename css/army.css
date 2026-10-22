@@ -5892,3 +5892,8 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .re-pic.cxr-re { width: 40px; height: 40px; flex: none; }
 .cx-r .re-pic.cxr-re { width: 24px; height: 24px; margin-right: 6px; vertical-align: middle; display: inline-block; }
 .cxr .cxr-np { min-width: 120px; max-width: 140px; padding: .35em 1.1em; font-size: .72rem; }
+
+/* v631 : récompense « plaque de pseudo » dans la piste du Codex : plaque en haut, nom dessous (le nom était écrasé à côté, un mot par ligne), pseudo centré sur la plaque */
+.cxr:has(.cxr-np) { flex-direction: column; gap: 4px; width: 100%; }
+.cxr:has(.cxr-np) .cxr-t { text-align: center; }
+.cxr .cxr-np { display: flex; justify-content: center; width: 100%; min-width: 0; max-width: 170px; box-sizing: border-box; }
