@@ -10,7 +10,8 @@ import { icon, EMBLEM } from './ui/icons.js';
 import { toast, esc, fmt, reducedMotion, closeTopSheet, openSheet, handlePopstate, afterHistory } from './ui/dom.js';
 import { sfx, configureSound, audioCtx, audioCtxIfAny } from './ui/sound.js';
 import { musicRoute, configureMusic } from './ui/music.js';
-import { setPackSkin } from './ui/vitrine.js'; /* v565 : sachet de booster */
+import { setPackSkin, getPackSkin } from './ui/vitrine.js'; /* v565 : sachet de booster */
+import { stillOf, backUrl } from './ui/still.js';
 import { VERSION } from './config.js';
 import { openCardDetail } from './screens/detail.js';
 
@@ -102,10 +103,17 @@ const app = {
 if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__abyssal = app; /* accès pour les tests automatisés (v499 : seulement en local) */
 if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__abyssalProg = (ev) => onProgress(ev);
 
+function warmStills() {
+  setTimeout(() => {
+    stillOf(backUrl());
+    for (const t of ['standard', 'premium']) { const k = getPackSkin(t); if (k) stillOf(`assets/packs/${k}.webp`); }
+  }, 1500);
+}
 function applySettings() {
   const s = app.game.s.settings;
   setCardBack(app.game.s.back); /* v473 : dos de cartes choisi au Profil */
   setPackSkin(app.game.s.sachet, app.game.s.sachetPrem);
+  warmStills(); /* v609 : copies fixes du dos et des sachets, prêtes avant une ouverture de booster */
   document.documentElement.classList.toggle('reduce-motion', s.motion === 'reduced');
   document.documentElement.classList.toggle('fx-light', s.quality === 'light');
   configureSound(s);

@@ -7,6 +7,7 @@ import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM, roleIcon, picon } from '../ui/icons.js';
 import { esc, fmt, toast } from '../ui/dom.js';
 import { packHTML, payLabel, GIFT_N } from './shop.js';
+import { stillOf, stillNow, backUrl } from '../ui/still.js';
 import { roleOf, ROLES } from '../core/army.js';
 import { keywordOf, KEYWORDS } from '../core/duel.js';
 import { hapPattern } from '../ui/sound.js';
@@ -63,6 +64,10 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
     <footer class="op-bottom"><div class="op-dots">${(opening?.cards || BOOSTERS[type].slots).map(() => '<i></i>').join('')}</div><p class="op-hint small muted"></p></footer>`;
   document.body.appendChild(el);
   document.body.classList.add('has-sheet', 'lock-scroll');
+  /* v609 : dos de carte fixe pendant l'ouverture (un dos animé répété jusqu'à 6 fois pesait trop sur l'iPhone) */
+  const bk = backUrl();
+  const setBack = (u) => { if (u) el.style.setProperty('--card-back', `url("${u}")`); };
+  if (bk) { const u = stillNow(bk); if (u) setBack(u); else stillOf(bk).then(setBack); }
   const stage = el.querySelector('.op-stage');
   const hint = el.querySelector('.op-hint');
   const dots = el.querySelectorAll('.op-dots i');
@@ -104,7 +109,12 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
   };
 
   function showPack() {
-    const pk = packHTML(packKey || type, cat, { faction, event: ev });
+    let pk = packHTML(packKey || type, cat, { faction, event: ev });
+    /* v609 : le sachet est copié 14 fois (lanières de la déchirure) : toujours en image fixe, sinon un sachet animé
+       redessiné 14 fois à chaque image épuisait la mémoire de l'iPhone et fermait l'app */
+    const pkSrc = (/src="([^"]+)"/.exec(pk) || [])[1];
+    const pkStill = stillNow(pkSrc);
+    if (pkStill) pk = pk.replace(`src="${pkSrc}"`, `src="${pkStill}"`);
     const slices = Array.from({ length: SLICES }, (_, i) => `<div class="pk-slice" style="clip-path:${sliceClip(i / SLICES, (i + 1) / SLICES)};transform-origin:${(((i + 0.5) / SLICES) * 100).toFixed(1)}% 10.5%">${pk}</div>`).join('');
     stage.innerHTML = `<div class="op-pack" role="button" tabindex="0" aria-label="Ouvrir le booster : glisse le doigt le long de la ligne pointillée, ou touche-le">
       <div class="pk-inside"><div class="pk-cards"><div class="tcg-back">${EMBLEM}</div></div></div>
@@ -115,6 +125,7 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
     </div>`;
     hint.innerHTML = `${icon('sparkle')} Glisse le doigt le long de la ligne pour déchirer, ou touche le booster.`;
     const pack = stage.querySelector('.op-pack');
+    if (pkSrc && !pkStill) stillOf(pkSrc).then((u) => { if (u) pack.querySelectorAll('.pk-img').forEach((im) => { im.src = u; }); });
     got.then((op) => { /* v541 : l'aura vient quand le serveur a tiré les cartes */
       const top = op.cards.reduce((m, c) => (RI(c.rarity) > RI(m) ? c.rarity : m), 'C');
       if (RI(top) >= 3) { pack.classList.add('pk-aura', `pk-aura-${top}`); pack.style.setProperty('--aura', RARITY[top].color); }

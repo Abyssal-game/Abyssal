@@ -12,6 +12,7 @@ import { packHTML } from './shop.js';
 import { t } from '../i18n.js';
 import { musicCue, musicSeek, musicRelease } from '../ui/music.js';
 import { skinOk } from '../ui/vitrine.js';
+import { stillOf, backUrl } from '../ui/still.js';
 
 const RES = { win: 'Victoire', tie: 'Égalité', lose: 'Défaite' };
 const EMB = { win: 'vd-win', lose: 'vd-lose', tie: 'vd-tie' }; /* v524 : emblèmes Gemini de fin (v526 : égalité) */
@@ -66,6 +67,8 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
     <div class="vd-mid"><div class="vd-pack foe"></div><span class="vd-vs"></span><div class="vd-pack me"></div></div>
     <div class="vd-end" hidden></div>`;
   document.body.appendChild(el);
+  /* v609 : dos de carte fixe pendant le face-à-face (jusqu'à 18 dos animés à la fois sinon) */
+  stillOf(backUrl()).then((u) => { if (u) el.style.setProperty('--card-back', `url("${u}")`); });
   document.body.classList.add('has-sheet', 'lock-scroll');
   requestAnimationFrame(() => el.classList.add('on'));
 
