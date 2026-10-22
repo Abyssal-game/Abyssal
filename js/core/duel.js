@@ -1829,7 +1829,7 @@ const API = {
 // Défense active : durée (ms) de la zone d'esquive ; la parade parfaite en est le dernier instant
 export function defenseWindow(st, aUid, tUid, T = null) {
   /* v594 : T = réglages du Labo des défenses (js/ui/def-tune.js) ; sans T, les valeurs du jeu */
-  T ||= { dodgeMul: 1, floorNormal: 170, floorElite: 150, floorBoss: 130, dodgeMax: 270, eliteMinus: 50, bossMinus: 100, parryRatio: 0.05, parryMinNormal: 30, parryMinElite: 20, parryMinBoss: 12 }; /* v599 : réglages du Labo des défenses */
+  T ||= { dodgeMul: 1, floorNormal: 170, floorElite: 150, floorBoss: 130, dodgeMax: 270, eliteMinus: 50, bossMinus: 100, parryRatio: 0.05, parryMinNormal: 30, parryMinElite: 20, parryMinBoss: 17 }; /* v599-v600 : réglages du Labo des défenses */
   const e = st.units[aUid], u = st.units[tUid] || front(st, 'ally')[0];
   const kind = e?.intent?.kind || 'hit';
   /* v558 : fenêtres resserrées (« je réussis les parades à chaque fois ») : esquive ≈ 15 % plus courte, parade ≈ 2/3 de l'ancienne */

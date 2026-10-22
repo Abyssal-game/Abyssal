@@ -10,7 +10,7 @@ export const DEF_DEFAULTS = {
   accelNormal: 1.7, accelElite: 1.3, accelEliteRand: 1.0,
   impactMin: 0.55, impactRand: 0.35,
   dodgeMul: 1, floorNormal: 170, floorElite: 150, floorBoss: 130, dodgeMax: 270, eliteMinus: 50, bossMinus: 100,
-  parryRatio: 0.05, parryMinNormal: 30, parryMinElite: 20, parryMinBoss: 12,
+  parryRatio: 0.05, parryMinNormal: 30, parryMinElite: 20, parryMinBoss: 17,
   gapFirst: 650, gapFirstRand: 450, gapMin: 140, gapRand: 360, pause: 180,
   moveAmp: 0.1, tolPx: 2, missShare: 0.33,
 };
