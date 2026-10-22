@@ -1,5 +1,13 @@
 // Dictionnaire italien (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Plaque du Phénix": "Targa della Fenice",
+  "Plaque du Kraken": "Targa del Kraken",
+  "Plaque du Trésor": "Targa del Tesoro",
+  "Plaque d’améthyste": "Targa d’ametista",
+  "Plaque de la Foudre": "Targa del Fulmine",
+  "Plaque de la Forêt ancienne": "Targa della Foresta antica",
+  "Plaque de l’Automate": "Targa dell’Automa",
+  "Plaque de l’Empereur": "Targa dell’Imperatore",
   "Sachet vivant du Spectre vert": "Bustina vivente dello Spettro verde",
   "Sachet vivant de l’Automate": "Bustina vivente dell’Automa",
   "Sachet vivant des Ailes d’or": "Bustina vivente delle Ali d’oro",

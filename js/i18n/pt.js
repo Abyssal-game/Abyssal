@@ -1,5 +1,13 @@
 // Dictionnaire portugais du Brésil (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Plaque du Phénix": "Placa da Fênix",
+  "Plaque du Kraken": "Placa do Kraken",
+  "Plaque du Trésor": "Placa do Tesouro",
+  "Plaque d’améthyste": "Placa de Ametista",
+  "Plaque de la Foudre": "Placa do Relâmpago",
+  "Plaque de la Forêt ancienne": "Placa da Floresta Antiga",
+  "Plaque de l’Automate": "Placa do Autômato",
+  "Plaque de l’Empereur": "Placa do Imperador",
   "Sachet vivant du Spectre vert": "Pacote vivo do Espectro Verde",
   "Sachet vivant de l’Automate": "Pacote vivo do Autômato",
   "Sachet vivant des Ailes d’or": "Pacote vivo das Asas de Ouro",

@@ -144,7 +144,8 @@ export const SACHETS = { 'sachet-ames': 'Sachet de la Nuit des Âmes', 'sachet-v
 const SA = (k, cost) => ({ id: k, kind: 'sachet', give: { sachet: k }, cost });
 export const PLATES = { 'pl-obsidienne': 'Plaque d’obsidienne', 'pl-grimoire': 'Plaque du grimoire', 'pl-braise': 'Plaque de braise',
   'pl-givre': 'Plaque de givre', 'pl-or-noir': 'Plaque d’or noir', 'pl-abysse': 'Plaque de l’Abysse', 'pl-souverain': 'Plaque du Souverain',
-  /* v572 */ 'pl-ossuaire': 'Plaque de l’ossuaire', 'pl-sang': 'Plaque de sang', 'pl-pierre': 'Plaque des gargouilles', 'pl-nacre': 'Plaque de nacre noire', 'pl-dragon': 'Plaque du dragon', 'pl-eclipse': 'Plaque de l’éclipse' };
+  /* v572 */ 'pl-ossuaire': 'Plaque de l’ossuaire', 'pl-sang': 'Plaque de sang', 'pl-pierre': 'Plaque des gargouilles', 'pl-nacre': 'Plaque de nacre noire', 'pl-dragon': 'Plaque du dragon', 'pl-eclipse': 'Plaque de l’éclipse',
+  /* v580 */ 'pl-phenix': 'Plaque du Phénix', 'pl-kraken': 'Plaque du Kraken', 'pl-tresor': 'Plaque du Trésor', 'pl-cristal': 'Plaque d’améthyste', 'pl-foudre': 'Plaque de la Foudre', 'pl-foret': 'Plaque de la Forêt ancienne', 'pl-automate': 'Plaque de l’Automate', 'pl-empereur': 'Plaque de l’Empereur' };
 export const EMOTES = {
   're-salut': { text: 'Salutations.', free: true }, 're-bien': { text: 'Bien joué.', free: true },
   're-merci': { text: 'Merci.', free: true }, 're-aie': { text: 'Aïe…', free: true },
@@ -180,6 +181,7 @@ export const CATALOG = [ F('cx-serpents', 120), F('cx-vitrail', 120), F('cx-roua
   { ...SA('sachet-vif-necro', 400), live: true }, { ...SA('sachet-vif-automate', 380), live: true }, { ...SA('sachet-vif-celeste', 420), live: true }, { ...SA('sachet-vif-infernal', 400), live: true }, { ...SA('sachet-vif-empereur', 580), live: true }, /* v579 */
   PL('pl-obsidienne', 120), PL('pl-grimoire', 180), PL('pl-braise', 200), PL('pl-givre', 200), PL('pl-or-noir', 250), PL('pl-abysse', 280), PL('pl-souverain', 450),
   PL('pl-pierre', 180), PL('pl-ossuaire', 200), PL('pl-nacre', 220), PL('pl-sang', 250), PL('pl-dragon', 250), PL('pl-eclipse', 250), /* v572 */
+  PL('pl-phenix', 260), PL('pl-kraken', 260), PL('pl-tresor', 420), PL('pl-cristal', 200), PL('pl-foudre', 220), PL('pl-foret', 200), PL('pl-automate', 220), PL('pl-empereur', 480), /* v580 */
   ...PAID_EMOTES.map((k) => RE(k, 100)),
   { id: 'arbitres', kind: 'bundle', name: 'Le Cercle des arbitres', give: { emotes: PAID_EMOTES }, cost: 600, desc: 'Les huit réactions des arbitres d’un coup (800 à l’unité).' },
   { id: 'royaumes', kind: 'bundle', name: 'Les sept royaumes', give: { backs: ROYAUMES }, cost: 1000, desc: 'Les sept dos vivants des royaumes d’un coup, moins cher qu’à l’unité.' },

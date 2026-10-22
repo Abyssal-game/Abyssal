@@ -1,5 +1,13 @@
 // Dictionnaire espagnol (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Plaque du Phénix": "Placa del Fénix",
+  "Plaque du Kraken": "Placa del Kraken",
+  "Plaque du Trésor": "Placa del Tesoro",
+  "Plaque d’améthyste": "Placa de amatista",
+  "Plaque de la Foudre": "Placa del Rayo",
+  "Plaque de la Forêt ancienne": "Placa del Bosque antiguo",
+  "Plaque de l’Automate": "Placa del Autómata",
+  "Plaque de l’Empereur": "Placa del Emperador",
   "Sachet vivant du Spectre vert": "Sobre vivo del Espectro verde",
   "Sachet vivant de l’Automate": "Sobre vivo del Autómata",
   "Sachet vivant des Ailes d’or": "Sobre vivo de las Alas de oro",

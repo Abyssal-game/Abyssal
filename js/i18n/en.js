@@ -1,5 +1,13 @@
 // Anglais (v506-v507) : texte français → traduction. Généré à partir des lots de traduction ; on peut corriger à la main.
 export default {
+  "Plaque du Phénix": "Phoenix Plate",
+  "Plaque du Kraken": "Kraken Plate",
+  "Plaque du Trésor": "Treasure Plate",
+  "Plaque d’améthyste": "Amethyst Plate",
+  "Plaque de la Foudre": "Lightning Plate",
+  "Plaque de la Forêt ancienne": "Ancient Forest Plate",
+  "Plaque de l’Automate": "Automaton Plate",
+  "Plaque de l’Empereur": "Emperor Plate",
   "Sachet vivant du Spectre vert": "Living Green Specter Pack",
   "Sachet vivant de l’Automate": "Living Automaton Pack",
   "Sachet vivant des Ailes d’or": "Living Golden Wings Pack",

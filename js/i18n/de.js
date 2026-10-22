@@ -1,5 +1,13 @@
 // Dictionnaire allemand (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Plaque du Phénix": "Phönix-Plakette",
+  "Plaque du Kraken": "Kraken-Plakette",
+  "Plaque du Trésor": "Schatz-Plakette",
+  "Plaque d’améthyste": "Amethyst-Plakette",
+  "Plaque de la Foudre": "Blitz-Plakette",
+  "Plaque de la Forêt ancienne": "Plakette des Uralten Waldes",
+  "Plaque de l’Automate": "Automaten-Plakette",
+  "Plaque de l’Empereur": "Kaiser-Plakette",
   "Sachet vivant du Spectre vert": "Lebendiges Päckchen des Grünen Gespensts",
   "Sachet vivant de l’Automate": "Lebendiges Päckchen des Automaten",
   "Sachet vivant des Ailes d’or": "Lebendiges Päckchen der Goldenen Schwingen",
