@@ -5807,3 +5807,46 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 /* v611 (rapport du moniteur de fluidité, saccades au moment des coups) : étincelles sans ombre floue (chaque étincelle
    animée était un calque dont l'ombre devait être dessinée à part) : même éclat avec un dégradé */
 .dv-burst i { width: 12px; height: 12px; margin: -6px; box-shadow: none !important; background: radial-gradient(circle, #fff 0 18%, #FFE6A0 32%, rgba(255, 179, 71, .55) 52%, rgba(255, 179, 71, 0) 72%); }
+
+/* v613 (le propriétaire : « revoir le design des cartes des boss en combat, ce n'est vraiment pas beau ») :
+   la carte v605 était un fond flou presque noir, un simple filet doré, une figure trop petite et le nom posé sur son ventre.
+   Désormais : double cadre d'or ciselé avec coins ornés, fond de la scène plus lisible et éclairé par une aura rouge derrière
+   le gardien, figure qui remplit la carte et déborde franchement par le haut, nom sur une plaque gravée en bas.
+   Tout est fixe (aucune animation ni filtre) pour rester fluide sur iPhone. */
+.dv-c.has-fig { border: 0 !important; border-radius: 12px; background: #07050A !important;
+  box-shadow: 0 0 0 1px #1A0A0C, 0 0 0 2.5px #C9A052, 0 0 0 4px #3B1A12, 0 0 0 5px rgba(201, 160, 82, .55), 0 10px 20px rgba(0, 0, 0, .8) !important; }
+.dv-c.has-fig .dv-art.dv-bart { inset: 0; border-radius: 12px; }
+.dv-c.has-fig .dv-art.dv-bart > img { filter: brightness(1.35) saturate(1.15) contrast(1.05) !important; transform: scale(1.08); }
+.dv-c.has-fig .dv-art.dv-bart::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(ellipse 70% 52% at 50% 46%, rgba(220, 40, 50, .42), rgba(120, 10, 25, .18) 55%, transparent 75%); }
+.dv-c.has-fig .dv-art.dv-bart::after { z-index: 1; border-radius: 12px;
+  background: radial-gradient(ellipse 95% 80% at 50% 42%, transparent 45%, rgba(0, 0, 0, .75) 100%), linear-gradient(180deg, rgba(0, 0, 0, .35) 0, transparent 22%, transparent 62%, rgba(0, 0, 0, .9) 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 214, 140, .35), inset 0 0 0 4px rgba(0, 0, 0, .55), inset 0 0 0 5px rgba(201, 160, 82, .35); }
+.dv-c.has-fig .dv-art.dv-bart .dv-crk { z-index: 2; }
+/* coins d'or ciselés */
+.dv-c.has-fig::before { display: block !important; content: ''; position: absolute; inset: 3px; z-index: 4; pointer-events: none; border-radius: 9px; translate: none; width: auto; height: auto;
+  --c: #E6C47A; --l: 14px; --w: 2px;
+  background:
+    linear-gradient(var(--c), var(--c)) 0 0 / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 0 0 / var(--w) var(--l),
+    linear-gradient(var(--c), var(--c)) 100% 0 / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 100% 0 / var(--w) var(--l),
+    linear-gradient(var(--c), var(--c)) 0 100% / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 0 100% / var(--w) var(--l),
+    linear-gradient(var(--c), var(--c)) 100% 100% / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 100% 100% / var(--w) var(--l),
+    radial-gradient(circle, #FFE7A8 0 2px, #B8893A 2.5px 3.5px, transparent 4px) 50% 0 / 10px 10px;
+  background-repeat: no-repeat; }
+/* figure : remplit la carte et déborde par le haut */
+.dv-c.has-fig .dv-bfig { width: 128% !important; height: 90% !important; bottom: 22% !important; object-fit: contain; object-position: 50% 100%; }
+/* plaque du nom */
+.dv.cb .dv-c.has-fig .dv-nm, .dv-c.has-fig .dv-nm { z-index: 5; left: 5%; right: 5%; bottom: 22% !important; translate: 0 50%; padding: 3px 4px 2px;
+  background: linear-gradient(180deg, #2A1410, #120807 55%, #1E0D0B); border: 1px solid #B8893A; border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .8), inset 0 1px 0 rgba(255, 220, 150, .25);
+  color: #F2C97A !important; text-shadow: 0 1px 2px #000 !important; text-transform: uppercase; letter-spacing: .04em !important;
+  font-size: clamp(.46rem, 7.5cqw, .66rem) !important; -webkit-line-clamp: 2; }
+.dv-c.has-fig.p2 { box-shadow: 0 0 0 1px #1A0A0C, 0 0 0 2.5px #E0483F, 0 0 0 4px #3B0E10, 0 0 0 5px rgba(255, 70, 70, .6), 0 0 18px rgba(255, 40, 60, .45), 0 10px 20px rgba(0, 0, 0, .8) !important; }
+.dv-c.has-fig.p2::before { --c: #FF8A70; }
+.dv-c.has-fig.p2 .dv-nm { border-color: #E0483F; color: #FFB59A !important; }
+.dv-c.has-fig.twin { box-shadow: 0 0 0 1px #0E0A1A, 0 0 0 2.5px #A69CF0, 0 0 0 4px #1C1438, 0 0 0 5px rgba(166, 156, 240, .55), 0 10px 20px rgba(0, 0, 0, .8) !important; }
+.dv-c.has-fig.twin::before { --c: #C9C2FF; }
+.dv-c.has-fig.twin .dv-art.dv-bart::before { background: radial-gradient(ellipse 70% 52% at 50% 46%, rgba(130, 100, 255, .4), rgba(40, 20, 120, .18) 55%, transparent 75%); }
+.dv-c.has-fig.twin .dv-nm { border-color: #A69CF0; color: #DCD6FF !important; }
+.dv-row.enemy .dv-c.has-fig { translate: 0 -2%; scale: 1.06; }
+.dv.cb .dv-c.has-fig .cb-tgt { bottom: 1% !important; }
