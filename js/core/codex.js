@@ -173,6 +173,12 @@ export const PAID_EMOTES = Object.keys(EMOTES).filter((k) => !EMOTES[k].free);
 export const ARBITRE_EMOTES = PAID_EMOTES.filter((k) => EMOTES[k].who);
 export const BOSS_EMOTES = PAID_EMOTES.filter((k) => EMOTES[k].boss);
 const PL = (k, cost) => ({ id: k, kind: 'plate', give: { plate: k }, cost });
+/* v632 : tapis de jeu (plateau des Duels des Sceaux, assets/tapis/<clé>.webp, 896 × 1200) et fonds de profil (en-tête du profil,
+   vu aussi par les autres joueurs : assets/fonds/<clé>.webp, 1024 × 572) */
+export const TAPIS = { 'tp-mammon': 'Tapis du Banquier Mammon', 'tp-abysse': 'Tapis de l’Autel de l’Abysse', 'tp-obsidienne': 'Tapis d’obsidienne et d’or', 'tp-givre': 'Tapis de la Glace noire' };
+export const FONDS = { 'fp-trone': 'Fond du Trône de braise', 'fp-cathedrale': 'Fond de la Cathédrale engloutie', 'fp-bibliotheque': 'Fond de la Bibliothèque interdite', 'fp-foret': 'Fond de la Forêt sous la lune' };
+const TP = (k, cost) => ({ id: k, kind: 'mat', give: { mat: k }, cost });
+const FP = (k, cost) => ({ id: k, kind: 'fond', give: { fond: k }, cost });
 const RE = (k, cost) => ({ id: k, kind: 'emote', give: { emote: k }, cost });
 export const ROYAUMES = ['dos-infernal', 'dos-abyssal', 'dos-celeste', 'dos-sauvage', 'dos-necrotique', 'dos-primordial', 'dos-artificiel'];
 /* v535 : cadres de la meute, des corbeaux, des chaînes et des roses noires retirés de la vente (leur ornement cachait le visage de la créature) */
@@ -210,6 +216,7 @@ export const COSM_RARITY = {
   'pl-empereur': 'myth', 'pl-tresor': 'myth', 'pl-phenix': 'myth',
   'pl-sang': 'leg', 'pl-kraken': 'leg', 'pl-cristal': 'leg', 'pl-automate': 'leg',
   'pl-braise': 'epic', 'pl-givre': 'epic', 'pl-souverain': 'epic', 'pl-nacre': 'epic', 'pl-dragon': 'epic', 'pl-foret': 'epic', 'pl-or-noir': 'rare', 'pl-foudre': 'rare',
+  /* v632 : tapis et fonds de profil */ 'tp-mammon': 'leg', 'tp-abysse': 'leg', 'tp-obsidienne': 'epic', 'tp-givre': 'epic', 'fp-trone': 'leg', 'fp-cathedrale': 'leg', 'fp-bibliotheque': 'epic', 'fp-foret': 'epic',
   /* v589 */ 'pl-corbeau': 'leg', 'pl-loup': 'leg', 'pl-araignee': 'epic', 'pl-sablier': 'epic', 'pl-ambre': 'epic', 'pl-orchidee': 'epic', 'pl-meduse': 'rare', 'pl-serpent': 'rare', 'pl-lune': 'rare', 'pl-astrolabe': 'rare',
 };
 const SHOP_FRAMES = ['cx-vif-dragon', 'cx-vif-phenix', 'cx-vif-soleil-noir', 'cx-vif-amethyste', 'cx-vif-sablier', 'cx-vif-sang', 'cx-vif-brasier', 'cx-vif-givre', 'cx-vif-kraken', 'cx-vif-nacre', 'cx-vif-ames', 'cx-vif-abysse', 'cx-vif-maree', 'cx-vif-meduse', 'cx-vif-serpent', 'cx-vif-lune', 'cx-vif-loup', 'cx-vif-foudre', 'cx-vif-etoiles', 'cx-vif-rouages', 'cx-vif-venin', 'cx-vif-chandelles', 'cx-vif-ambre', 'cx-vif-obsidienne', 'cx-vif-araignee', 'cx-vif-orchidee'];
@@ -221,11 +228,12 @@ const shopOf = (re) => Object.keys(COSM_RARITY).filter((k) => re.test(k) && !OFF
 const SHOP_BACKS = shopOf(/^dos-/);
 const SHOP_SACHETS = shopOf(/^sachet-/);
 const SHOP_PLATES = shopOf(/^pl-/);
+const SHOP_MATS = shopOf(/^tp-/), SHOP_FONDS = shopOf(/^fp-/); /* v632 */
 /* gardés pour les saisons du Codex (plus en vente ; ceux qui les ont les gardent) */
 export const PASS_RESERVE = [...Object.keys(COSM_RARITY).filter((k) => /^(dos|sachet|pl)-/.test(k) && ![...SHOP_BACKS, ...SHOP_SACHETS, ...SHOP_PLATES].includes(k))];
 const RZ = (mk, k, extra) => ({ ...mk(k, COSM_PRICE[COSM_RARITY[k]]), r: COSM_RARITY[k], live: true, ...extra });
 export const CATALOG = [
-  ...SHOP_FRAMES.map((k) => RZ(F, k)), ...SHOP_BACKS.map((k) => RZ(B, k)), ...SHOP_SACHETS.map((k) => RZ(SA, k)), ...SHOP_PLATES.map((k) => RZ(PL, k)),
+  ...SHOP_FRAMES.map((k) => RZ(F, k)), ...SHOP_BACKS.map((k) => RZ(B, k)), ...SHOP_SACHETS.map((k) => RZ(SA, k)), ...SHOP_PLATES.map((k) => RZ(PL, k)), ...SHOP_MATS.map((k) => RZ(TP, k, { live: false })), ...SHOP_FONDS.map((k) => RZ(FP, k, { live: false })),
   ...PAID_EMOTES.filter((k) => !EMOTES[k].codex).map((k) => ({ ...RE(k, 100), r: 'rare' })), /* v630 : sans les réactions du Codex */
   { id: 'arbitres', kind: 'bundle', name: 'Le Cercle des arbitres', give: { emotes: ARBITRE_EMOTES }, cost: 600, desc: 'Les huit réactions des arbitres d’un coup (800 à l’unité).' },
   { id: 'gardiens', kind: 'bundle', name: 'Les vingt gardiens', give: { emotes: BOSS_EMOTES }, cost: 1500, desc: 'Les vingt réactions des gardiens d’un coup (2 000 à l’unité).' },

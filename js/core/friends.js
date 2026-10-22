@@ -16,7 +16,7 @@ export function friendCard(g) {
   const game = (k) => ({ w: s[k]?.wins || 0, b: Object.keys(s[k]?.beaten || {}).length });
   return {
     v: CARD_VERSION,
-    lv: g.levelInfo().level, title: s.title || '', frame: s.frame || null, plate: s.plate || null, avatar: (g.shownAvatar ? g.shownAvatar() : s.avatar) || null,
+    lv: g.levelInfo().level, title: s.title || '', frame: s.frame || null, plate: s.plate || null, fond: s.fond || null, avatar: (g.shownAvatar ? g.shownAvatar() : s.avatar) || null,
     show: (s.showcase || []).filter((id) => col[id] !== undefined).slice(0, 3),
     titles: (s.titles || []).length,
     col,
@@ -54,7 +54,7 @@ export function cleanCard(d) {
   const games = {};
   for (const k of ['sceaux', 'pacte', 'cryptes', 'encheres']) games[k] = { w: int(gm[k]?.w), b: int(gm[k]?.b, 99) };
   return {
-    v: int(d.v, 99), lv: Math.max(1, int(d.lv, 9999)), title: typeof d.title === 'string' ? d.title.slice(0, 60) : '', frame: key(d.frame), plate: key(d.plate), avatar: key(d.avatar),
+    v: int(d.v, 99), lv: Math.max(1, int(d.lv, 9999)), title: typeof d.title === 'string' ? d.title.slice(0, 60) : '', frame: key(d.frame), plate: key(d.plate), fond: key(d.fond), avatar: key(d.avatar),
     show: keys(d.show, 3), titles: int(d.titles, 999), col, ach: keys(d.ach, 1000), sets: keys(d.sets, 500),
     st: { boosters: int(st.boosters), best: int(st.best, 9999), bosses: int(st.bosses, 999), trials: int(st.trials), night: int(st.night, 9999), games },
     ...(d.n != null ? { n: int(d.n, 9999) } : {}), partial: !!d.partial,

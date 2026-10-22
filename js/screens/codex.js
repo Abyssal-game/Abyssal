@@ -1,6 +1,6 @@
 // v470 : ÉBAUCHE du pass de saison (« Le Codex de l'Abîme ») et de la boutique en argent réel (« L'Échoppe »).
 // Visible seulement en Mode Créateur (option « Codex et Échoppe ») ; les achats sont simulés (aucun paiement).
-import { CODEX, CODEX_XP, CODEX_XP_LABEL, tiersOf, seasonByKey, CODEX_FRAMES, CODEX_BACKS, FINISHES, PLATES, EMOTES, SACHETS, SHOP, CATALOG, OBS, codexTier, tierProgress, claimable, freshCodex } from '../core/codex.js';
+import { CODEX, CODEX_XP, CODEX_XP_LABEL, tiersOf, seasonByKey, CODEX_FRAMES, CODEX_BACKS, FINISHES, PLATES, EMOTES, SACHETS, TAPIS, FONDS, SHOP, CATALOG, OBS, codexTier, tierProgress, claimable, freshCodex } from '../core/codex.js';
 import { FRAMES } from '../config.js';
 import { CHESTS } from '../core/descent.js';
 import { icon, picon } from '../ui/icons.js';
@@ -10,7 +10,7 @@ import { artUrl } from '../art/assets.js';
 import { EMBLEM } from '../ui/icons.js';
 import { setScene } from '../ui/scene.js';
 import { t, tx } from '../i18n.js'; /* v574 */
-import { emoteHTML, emotePic, emoteLabel } from '../ui/vitrine.js'; /* v564 : plaques de pseudo et réactions en ligne */
+import { emoteHTML, emotePic, emoteLabel, fondStyle } from '../ui/vitrine.js'; /* v564 : plaques de pseudo et réactions en ligne */
 import { sync } from '../cloud/sync.js';
 import { packHTML } from './shop.js'; /* v570 : aperçu des sachets */
 
@@ -106,19 +106,21 @@ export default function codexScreen(app, root) {
 
   function shopTab() {
     const have = g.obs();
-    const name = (it) => it.name || (it.kind === 'frame' ? ALL_FRAMES[it.id] : it.kind === 'finish' ? `Finition ${FINISHES[it.id].name}` : it.kind === 'plate' ? PLATES[it.id] : it.kind === 'sachet' ? SACHETS[it.id] : it.kind === 'emote' ? EMOTES[it.id].name : CODEX_BACKS[it.id]) || it.id;
+    const name = (it) => it.name || (it.kind === 'frame' ? ALL_FRAMES[it.id] : it.kind === 'finish' ? `Finition ${FINISHES[it.id].name}` : it.kind === 'plate' ? PLATES[it.id] : it.kind === 'sachet' ? SACHETS[it.id] : it.kind === 'mat' ? TAPIS[it.id] : it.kind === 'fond' ? FONDS[it.id] : it.kind === 'emote' ? EMOTES[it.id].name : CODEX_BACKS[it.id]) || it.id;
     const pic = (it, big = false) => it.kind === 'frame' ? `<span class="${big ? 'avatar-big' : 'avatar-mini'} pf pf-${it.id}">${myAv()}</span>`
       : it.kind === 'back' ? `<img class="cx-bk" alt="" src="assets/backs/${it.id}.webp">`
       : it.kind === 'finish' ? (big ? cardHTML(g.bestCards(1)[0] || cat.get('ABY-039'), { dress: it.id }) : `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"><img alt="" src="assets/variants/${it.id}-frame.webp"></span>`)
       : it.kind === 'sachet' ? `<img class="cx-sa" alt="" src="assets/packs/${it.id}.webp">`
       : it.kind === 'plate' ? `<span class="np np-${it.id} np-demo">${esc(myName())}</span>`
+      : it.kind === 'mat' ? `<img class="cx-mat" alt="" src="assets/tapis/${it.id}.webp">` /* v632 */
+      : it.kind === 'fond' ? `<img class="cx-fond" alt="" src="assets/fonds/${it.id}.webp">` /* v632 */
       : it.kind === 'emote' ? `<span class="re-tile">${emoteHTML(it.id)}</span>`
       : it.give.emotes ? `<span class="re-fan">${it.give.emotes.slice(0, 4).map((k) => `<span class="re-pic">${emotePic(k)}</span>`).join('')}</span>`
       : `<span class="cx-fan">${it.give.backs.slice(0, 4).map((b) => `<img alt="" src="assets/backs/${b}.webp">`).join('')}</span>`;
     const tile = (it) => { const own = g.catalogOwned(it.id), cost = g.catalogCost(it.id), r = rank(it);
       return `<button class="cxs-t r-${r} ${it.kind} ${own ? 'own' : ''}" data-cx="see" data-id="${it.id}"><span class="cxs-pic">${pic(it)}</span><span class="cxs-rk">${RANK[r]}</span><b>${esc(name(it))}</b>
         ${own ? `<span class="cxs-own">${icon('check')}Possédé</span>` : `<span class="cxs-pr ${cost <= have ? '' : 'short'}">${obsTxt(cost)}</span>`}</button>`; };
-    const CATS = [['frame', 'Cadres'], ['plate', 'Plaques'], ['live', 'Dos vivants'], ['back', 'Dos'], ['sachet', 'Sachets'], ['emote', 'Réactions'], ['bundle', 'Lots'], ['obs', OBS.name]]; /* v569 : finitions retirées, dos vivants */
+    const CATS = [['frame', 'Cadres'], ['plate', 'Plaques'], ['live', 'Dos vivants'], ['back', 'Dos'], ['sachet', 'Sachets'], ['mat', 'Tapis'], ['fond', 'Fonds de profil'], ['emote', 'Réactions'], ['bundle', 'Lots'], ['obs', OBS.name]]; /* v569 : finitions retirées, dos vivants */
     const CATS2 = CATS.filter(([k]) => k !== 'back' || CATALOG.some((x) => x.kind === 'back' && !x.live)); /* v573 : plus de dos fixes à vendre */
     const cur = CATS2.some(([k]) => k === ui.cat) ? ui.cat : 'frame';
     const inCat = (x) => (cur === 'live' ? x.kind === 'back' && x.live : cur === 'back' ? x.kind === 'back' && !x.live : x.kind === cur);
@@ -170,7 +172,7 @@ export default function codexScreen(app, root) {
   /* v474 : dépense d'obsidiennes (catalogue ou Codex enluminé) ; renvoie vrai si l'achat est fait */
   async function buy(id) {
     const it = CATALOG.find((x) => x.id === id), cost = g.catalogCost(it.id);
-    const label = it.name || ALL_FRAMES[it.id] || CODEX_BACKS[it.id] || PLATES[it.id] || SACHETS[it.id] || (EMOTES[it.id] && `${EMOTES[it.id].name} · « ${EMOTES[it.id].text} »`) || (FINISHES[it.id] && `Finition ${FINISHES[it.id].name}`); /* v574 : nom des plaques, sachets et réactions */
+    const label = it.name || ALL_FRAMES[it.id] || CODEX_BACKS[it.id] || PLATES[it.id] || SACHETS[it.id] || TAPIS[it.id] || FONDS[it.id] || (EMOTES[it.id] && `${EMOTES[it.id].name} · « ${EMOTES[it.id].text} »`) || (FINISHES[it.id] && `Finition ${FINISHES[it.id].name}`); /* v574 : nom des plaques, sachets et réactions */
     if (g.obs() < cost) {
       if (await confirmBox(t('Il te manque <b>{n} obsidiennes</b> pour {name}.', { n: fmt(cost - g.obs()), name: esc(tx(label)) }), { ok: 'Obtenir des obsidiennes' }) /* v574 : phrase traduite (le nom change à chaque objet) */) { ui.tab = 'shop'; ui.cat = 'obs'; draw(); }
       return false;
@@ -188,7 +190,7 @@ export default function codexScreen(app, root) {
     const avImg = av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM;
     const mine = g.bestCards(6).filter(Boolean);
     let pick = 0, plain = false, bare = false, stopTilt = null;
-    const nm = it.name || ALL_FRAMES[it.id] || CODEX_BACKS[it.id] || PLATES[it.id] || SACHETS[it.id] || (EMOTES[it.id] && `${EMOTES[it.id].name} · « ${EMOTES[it.id].text} »`) || (FINISHES[it.id] && `Finition ${FINISHES[it.id].name}`);
+    const nm = it.name || ALL_FRAMES[it.id] || CODEX_BACKS[it.id] || PLATES[it.id] || SACHETS[it.id] || TAPIS[it.id] || FONDS[it.id] || (EMOTES[it.id] && `${EMOTES[it.id].name} · « ${EMOTES[it.id].text} »`) || (FINISHES[it.id] && `Finition ${FINISHES[it.id].name}`);
     const body = () => {
       if (it.kind === 'frame') return `<p class="cx-pv-cap">Sur ton profil</p>
         <div class="cx-pv-prof"><span class="avatar-big pf pf-${it.id}">${avImg}</span><div><b>${esc(s.name || 'Ton nom')}</b><span>${esc(s.title)}</span></div></div>
@@ -218,6 +220,10 @@ export default function codexScreen(app, root) {
       if (it.kind === 'sachet') return `<p class="cx-pv-cap">Sur ton booster standard ou ton booster premium, au choix dans Profil › Personnaliser (les boosters de faction et des Alliances gardent le leur)</p>
         <div class="cx-pv-packs">${['standard', 'premium'].map((t) => packHTML(t, null, { skin: it.id })).join('')}</div>
         <p class="cx-pv-cap">Au Pari des Boosters, ton adversaire voit le sachet de ton booster standard.</p>`;
+      if (it.kind === 'mat') return `<p class="cx-pv-cap">Le plateau de tes Duels des Sceaux, contre l’Abysse et en ligne</p>
+        <img class="cx-pv-mat" alt="" src="assets/tapis/${it.id}.webp">`; /* v632 */
+      if (it.kind === 'fond') return `<p class="cx-pv-cap">Sur ton profil, et chez les autres joueurs quand ils ouvrent ta fiche</p>
+        <div class="cx-pv-prof cx-pv-fond has-fond" ${fondStyle(it.id)}><span class="avatar-big pf pf-${s.frame}">${avImg}</span><div><b>${esc(myName())}</b><span>${esc(s.title)}</span></div></div>`; /* v632 */
       if (it.kind === 'plate') return `<p class="cx-pv-cap">Sur ton profil</p>
         <div class="cx-pv-prof"><span class="avatar-big pf pf-${s.frame}">${avImg}</span><div><b><span class="np np-${it.id}">${esc(myName())}</span></b><span>${esc(s.title)}</span></div></div>
         <p class="cx-pv-cap">Au classement, vu par tous les joueurs</p>

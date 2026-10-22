@@ -114,6 +114,7 @@ function applySettings() {
   const s = app.game.s.settings;
   setCardBack(app.game.s.back); /* v473 : dos de cartes choisi au Profil */
   setPackSkin(app.game.s.sachet, app.game.s.sachetPrem);
+  document.documentElement.dataset.mat = /^tp-[a-z-]+$/.test(app.game.s.mat || '') ? app.game.s.mat : ''; /* v632 : tapis de jeu des Duels des Sceaux */
   warmStills(); /* v609 : copies fixes du dos et des sachets, prêtes avant une ouverture de booster */
   document.documentElement.classList.toggle('reduce-motion', s.motion === 'reduced');
   document.documentElement.classList.toggle('fx-light', s.quality === 'light');

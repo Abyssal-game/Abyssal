@@ -38,7 +38,7 @@ test('codex : voie gratuite récupérable, voie enluminée fermée sans achat', 
 test('codex : la voie enluminée ne donne jamais de puissance (ni éclats, cendres, coffres ou tickets)', () => {
   for (const t of CODEX_TIERS) if (t.prem) for (const k of ['shards', 'ash', 'chests', 'tickets']) assert.equal(t.prem[k], undefined, `palier ${t.tier}`);
   for (const it of [...SHOP, ...CATALOG]) if (it.give) for (const k of ['shards', 'ash', 'chests', 'tickets']) assert.equal(it.give[k], undefined, it.id);
-  for (const it of CATALOG) assert.ok(['frame', 'back', 'bundle', 'finish', 'plate', 'emote', 'sachet'].includes(it.kind) && !it.give.obs && !it.give.title, it.id);
+  for (const it of CATALOG) assert.ok(['frame', 'back', 'bundle', 'finish', 'plate', 'emote', 'sachet', 'mat', 'fond'].includes(it.kind) && !it.give.obs && !it.give.title, it.id);
   for (const k of CODEX_ONLY) assert.ok(!CATALOG.some((it) => it.id === k), `${k} reste exclusif au Codex`);
 });
 
@@ -169,4 +169,18 @@ test('v630 : la Saison I a un objet à chaque palier, chacun avec son image et a
     assert.ok(fs.existsSync(new URL(`../${file(r)}`, import.meta.url)), k);
     assert.ok(!CATALOG.some((it) => it.id === k), `${k} ne doit pas être vendu`);
   }
+});
+
+test('v632 : tapis de jeu et fonds de profil : achat, choix, fiche vue par les autres', async () => {
+  const { TAPIS, FONDS, CATALOG } = await import('../js/core/codex.js');
+  const { friendCard, cleanCard } = await import('../js/core/friends.js');
+  const g = mk(); g.s.obs = 5000; g.s.settings.dev = true; g.s.devCodex = true; /* l'Échoppe n'est ouverte qu'en Mode Créateur */
+  for (const k of [...Object.keys(TAPIS), ...Object.keys(FONDS)]) assert.ok(CATALOG.some((it) => it.id === k), `${k} en vente`);
+  g.setMat('tp-mammon'); assert.equal(g.s.mat ?? null, null, 'pas de tapis sans l’avoir acheté');
+  g.catalogBuy('tp-mammon'); g.setMat('tp-mammon'); assert.equal(g.s.mat, 'tp-mammon');
+  g.catalogBuy('fp-trone'); g.setFond('fp-trone'); assert.equal(g.s.fond, 'fp-trone');
+  assert.ok(g.catalogOwned('tp-mammon') && g.catalogOwned('fp-trone'));
+  const card = cleanCard(friendCard(g));
+  assert.equal(card.fond, 'fp-trone');
+  assert.equal(cleanCard({ ...friendCard(g), fond: '<img onerror=x>' }).fond, null);
 });

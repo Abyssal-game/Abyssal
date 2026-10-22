@@ -9,6 +9,11 @@ const okKey = (k) => typeof k === 'string' && /^[a-z0-9-]{1,40}$/.test(k);
 
 // le nom posé sur sa plaque (rien si pas de plaque ou clé douteuse venue d'ailleurs)
 export const withPlate = (k, html) => (okKey(k) && k.startsWith('pl-') ? `<span class="np np-${k}">${html}</span>` : html);
+/* v632 : fond de profil (le sien ou celui d'un autre joueur) : classe et image à poser sur l'en-tête du profil */
+const fondOk = (k) => okKey(k) && k.startsWith('fp-');
+export const fondCls = (k) => (fondOk(k) ? 'has-fond' : '');
+export const fondUrl = (k) => new URL(`assets/fonds/${k}.webp`, document.baseURI).href; /* adresse complète : une url() relative dans une variable CSS serait lue depuis le dossier css/ */
+export const fondStyle = (k) => (fondOk(k) ? ` style="--pf-bg:url('${fondUrl(k)}')"` : '');
 // classes d'un cadre de portrait venu d'un autre joueur
 export const frameCls = (k) => (okKey(k) ? `pf pf-${k}` : '');
 

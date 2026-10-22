@@ -1871,6 +1871,8 @@ export class Game {
     this.persist();
   }
   setSachet(k, slot = 'standard') { if (!k || (this.s.sachets || []).includes(k)) { this.s[slot === 'premium' ? 'sachetPrem' : 'sachet'] = k || null; this.persist(); } } /* v565 : habillage des boosters, null = d'origine ; v587 : un sachet pour le standard (s.sachet), un pour le premium (s.sachetPrem) */
+  setMat(k) { if (!k || (this.s.mats || []).includes(k)) { this.s.mat = k || null; this.persist(); } } /* v632 : tapis de jeu, null = plateau d'origine */
+  setFond(k) { if (!k || (this.s.fonds || []).includes(k)) { this.s.fond = k || null; this.persist(); } } /* v632 : fond de profil, null = fond d'origine */
   setPlate(k) { if (!k || (this.s.plates || []).includes(k)) { this.s.plate = k || null; this.persist(); } } /* v564 : plaque de pseudo, null = aucune */
   emotesOwned() { return [...FREE_EMOTES, ...(this.s.emotes || [])]; } /* v564 : réactions en ligne (les 4 premières sont à tous) */
   setBack(k) { if (!k || (this.s.backs || []).includes(k)) { this.s.back = k || null; this.persist(); } } /* v473 : null = dos par défaut */
@@ -1896,6 +1898,8 @@ export class Game {
     for (const b of reward.backs || []) if (!(this.s.backs ||= []).includes(b)) this.s.backs.push(b);
     if (reward.finish && !(this.s.finishes ||= []).includes(reward.finish)) this.s.finishes.push(reward.finish); /* v482 */
     if (reward.plate && !(this.s.plates ||= []).includes(reward.plate)) this.s.plates.push(reward.plate); /* v564 */
+    if (reward.mat && !(this.s.mats ||= []).includes(reward.mat)) this.s.mats.push(reward.mat); /* v632 */
+    if (reward.fond && !(this.s.fonds ||= []).includes(reward.fond)) this.s.fonds.push(reward.fond); /* v632 */
     if (reward.sachet && !(this.s.sachets ||= []).includes(reward.sachet)) this.s.sachets.push(reward.sachet); /* v565 */
     for (const e of [reward.emote, ...(reward.emotes || [])]) if (e && !(this.s.emotes ||= []).includes(e)) this.s.emotes.push(e);
     if (reward.codexPremium) this.codex().premium = true; /* v548 : Codex enluminé acheté (4,99 €) */
@@ -1970,7 +1974,7 @@ export class Game {
   catalogOwned(id) {
     const it = CATALOG.find((x) => x.id === id); if (!it) return false;
     const g = it.give;
-    return (!g.frame || this.s.frames.includes(g.frame)) && (!g.plate || (this.s.plates || []).includes(g.plate)) && (!g.emote || (this.s.emotes || []).includes(g.emote))
+    return (!g.frame || this.s.frames.includes(g.frame)) && (!g.plate || (this.s.plates || []).includes(g.plate)) && (!g.mat || (this.s.mats || []).includes(g.mat)) && (!g.fond || (this.s.fonds || []).includes(g.fond)) && (!g.emote || (this.s.emotes || []).includes(g.emote))
       && (g.emotes || []).every((e) => (this.s.emotes || []).includes(e)) && (!g.finish || (this.s.finishes || []).includes(g.finish)) && (!g.back || (this.s.backs || []).includes(g.back)) && (!g.sachet || (this.s.sachets || []).includes(g.sachet)) && (g.backs || []).every((b) => (this.s.backs || []).includes(b));
   }
   catalogCost(id) { /* un lot ne fait pas payer ce qu'on a déjà : on retire le prix des dos déjà possédés, jamais sous 0 */

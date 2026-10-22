@@ -1715,7 +1715,7 @@ i.cmb { font-style: normal; color: #FFC266; font-weight: 800; }
 
 /* Sceaux : icônes des règles, cœur du Sceau, combinaisons, trophée */
 .sc-ricon { width: 22px; height: 22px; object-fit: contain; margin-right: 4px; vertical-align: -5px; }
-.sc-cell.heart::before { inset: 14% !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important; background: url(../assets/icons/sc-heart.webp) center / contain no-repeat; opacity: .55; }
+.sc-cell.heart::before { inset: 14% !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important; background: url(../assets/icons/sc-heart2.webp) center / contain no-repeat; opacity: .55; }
 .sc-cell.full.heart::before { inset: auto 4px 4px auto !important; width: 26%; height: 26%; opacity: .95; z-index: 4; filter: drop-shadow(0 1px 3px #000); }
 .sc-combo { display: flex; align-items: center; gap: 8px; overflow: visible; }
 .sc-combo .sc-cburst { position: absolute; left: 50%; top: 50%; width: 240px; height: 240px; transform: translate(-50%, -50%); mix-blend-mode: screen; z-index: -1; pointer-events: none; animation: scBurst 1s ease-out forwards; }
@@ -5897,3 +5897,36 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .cxr:has(.cxr-np) { flex-direction: column; gap: 4px; width: 100%; }
 .cxr:has(.cxr-np) .cxr-t { text-align: center; }
 .cxr .cxr-np { display: flex; justify-content: center; width: 100%; min-width: 0; max-width: 170px; box-sizing: border-box; }
+
+/* v632 : tapis de jeu (plateau des Duels des Sceaux) : image du tapis, grille posée dans son intérieur (mesuré sur chaque image),
+   cases translucides pour laisser voir la matière du tapis */
+html[data-mat^="tp-"] .sc-board { background-image: var(--mat-img), linear-gradient(#141018, #07080c); }
+html[data-mat="tp-obsidienne"] .sc-board { --mat-img: url(../assets/tapis/tp-obsidienne.webp); }
+html[data-mat="tp-abysse"] .sc-board { --mat-img: url(../assets/tapis/tp-abysse.webp); }
+html[data-mat="tp-mammon"] .sc-board { --mat-img: url(../assets/tapis/tp-mammon.webp); }
+html[data-mat="tp-givre"] .sc-board { --mat-img: url(../assets/tapis/tp-givre.webp); }
+html[data-mat="tp-obsidienne"] .sc-plate { top: 11.5%; bottom: 11.5%; left: 16%; right: 16%; }
+html[data-mat="tp-abysse"] .sc-plate { top: 8.5%; bottom: 8.5%; left: 10.5%; right: 10.5%; }
+html[data-mat="tp-mammon"] .sc-plate { top: 13%; bottom: 13%; left: 17.5%; right: 17.5%; }
+html[data-mat="tp-givre"] .sc-plate { top: 11%; bottom: 11%; left: 13%; right: 13%; }
+html[data-mat^="tp-"] .sc-cell { background: rgba(0, 0, 0, .26); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14), inset 0 4px 12px rgba(0, 0, 0, .55); }
+html[data-mat="tp-mammon"] .sc-cell { background: rgba(40, 0, 0, .3); box-shadow: inset 0 0 0 1px rgba(242, 193, 78, .32), inset 0 4px 12px rgba(0, 0, 0, .5); }
+/* v632 : fond de profil choisi (Profil, Personnaliser, profil vu par les autres) : sujet à droite, voile sombre à gauche pour le portrait et le pseudo */
+.profile-head.has-fond, .cs-hero.has-fond { background: linear-gradient(90deg, rgba(10, 9, 16, .82) 28%, rgba(10, 9, 16, .35) 58%, rgba(10, 9, 16, 0) 80%), var(--pf-bg) right center / cover no-repeat, #0B0C12 !important; }
+/* v632 : Personnaliser : tapis de jeu et fonds de profil */
+.cs-mats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.cs-fonds { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.cs-matb, .cs-fondb { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px; border-radius: 10px; background: rgba(255, 255, 255, .03); border: 1px solid rgba(201, 164, 90, .25); color: inherit; font: inherit; }
+.cs-matb img { width: 100%; aspect-ratio: 896 / 1200; object-fit: cover; border-radius: 6px; }
+.cs-fondb img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: right center; border-radius: 6px; }
+.cs-matb small, .cs-fondb small { text-align: center; line-height: 1.15; }
+.cs-matb[aria-pressed="true"], .cs-fondb[aria-pressed="true"] { border-color: var(--gold-hi, #F2C14E); box-shadow: 0 0 0 1px var(--gold-hi, #F2C14E) inset; }
+.cs-row .cs-pic img.cs-mat { width: 44px; height: 59px; max-width: none; object-fit: cover; }
+.cs-row .cs-pic img.cs-fond { width: 60px; height: 40px; max-width: none; object-fit: cover; object-position: right center; }
+/* v632 : Échoppe : tuiles et aperçus des tapis et des fonds de profil */
+.cxs-t .cx-mat { height: 92px; aspect-ratio: 896 / 1200; object-fit: cover; border-radius: 6px; box-shadow: 0 6px 14px rgba(0, 0, 0, .55); }
+.cxs-t .cx-fond { width: 100%; max-width: 150px; aspect-ratio: 16 / 9; object-fit: cover; object-position: right center; border-radius: 6px; box-shadow: 0 6px 14px rgba(0, 0, 0, .55); }
+.cx-pv-mat { display: block; width: min(78%, 300px); margin: 6px auto 0; border-radius: 10px; box-shadow: 0 18px 40px rgba(0, 0, 0, .7); }
+.cx-pv-prof.has-fond { background: linear-gradient(90deg, rgba(10, 9, 16, .82) 28%, rgba(10, 9, 16, .35) 58%, rgba(10, 9, 16, 0) 80%), var(--pf-bg) right center / cover no-repeat, #0B0C12 !important; min-height: 150px; padding: 16px; border-radius: 12px; }
+.profile-head.has-fond { background: linear-gradient(90deg, rgba(10, 9, 16, .7), rgba(10, 9, 16, .55) 55%, rgba(10, 9, 16, .25)), var(--pf-bg) right center / cover no-repeat, #0B0C12 !important; }
+.profile-head.has-fond .ph-text { text-shadow: 0 1px 2px #000, 0 0 10px rgba(0, 0, 0, .9); }

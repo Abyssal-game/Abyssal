@@ -143,7 +143,7 @@ export function migrate(raw) {
   if (!hadGift) s.welcomeGift = !s.stats?.boosters ? Math.min(ECONOMY.start.tickets.standard || 0, s.tickets?.standard || 0) : 0;
   // v583 : cosmétiques définitivement supprimés (tri du 22 octobre 2026) : retirés de la partie, le choix revient au défaut
   const gone = new Set(REMOVED_COSM);
-  for (const k of ['frames', 'backs', 'sachets', 'plates']) if (Array.isArray(s[k])) s[k] = s[k].filter((x) => !gone.has(x));
+  for (const k of ['frames', 'backs', 'sachets', 'plates', 'mats', 'fonds']) if (Array.isArray(s[k])) s[k] = s[k].filter((x) => !gone.has(x));
   if (gone.has(s.frame)) s.frame = 'base';
   if (gone.has(s.back)) s.back = null;
   if (gone.has(s.sachet)) s.sachet = null;

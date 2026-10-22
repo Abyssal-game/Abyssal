@@ -6,8 +6,8 @@ import { icon, sigil, EMBLEM, picon, setIcon } from '../ui/icons.js';
 import { esc, fmt, pct, bindActions, toast, openSheet } from '../ui/dom.js';
 import { unlockSources } from '../core/unlocks.js';
 import { RARITIES, FRAMES, BOOSTERS, FACTION_ORDER, VARIANTS, RARITY, RARITY_ORDER } from '../config.js';
-import { CODEX_FRAMES, CODEX_BACKS, FINISHES, PLATES, SACHETS, LIVE_BACKS, CATALOG, SEASONS, SHOP } from '../core/codex.js';
-import { withPlate } from '../ui/vitrine.js'; /* v564 : plaque de pseudo */
+import { CODEX_FRAMES, CODEX_BACKS, FINISHES, PLATES, SACHETS, TAPIS, FONDS, LIVE_BACKS, CATALOG, SEASONS, SHOP } from '../core/codex.js';
+import { withPlate, fondCls, fondStyle } from '../ui/vitrine.js'; /* v564 : plaque de pseudo */
 
 export default function profile(app, root) {
   const g = app.game, cat = app.catalog;
@@ -57,7 +57,7 @@ export default function profile(app, root) {
     const shownName = sync.profile?.pseudo || s.name || 'Toi';
     const avImg = av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM;
     const fan = backs.slice(0, 3).map(([, , u], i) => `<img class="cs-fan f${i}" alt="" src="${u}">`).join('');
-    const head = `<div class="cs-hero bn-profile"><span class="avatar-big pf pf-${s.frame}">${avImg}</span><div><b class="cs-name">${withPlate(s.plate, esc(shownName))}</b><span class="cs-title">${esc(s.title)}</span><span class="cs-lv">Niveau ${g.levelInfo().level}</span></div><span class="cs-fanbox">${fan}</span></div>`;
+    const head = `<div class="cs-hero bn-profile ${fondCls(s.fond)}"${fondStyle(s.fond)}><span class="avatar-big pf pf-${s.frame}">${avImg}</span><div><b class="cs-name">${withPlate(s.plate, esc(shownName))}</b><span class="cs-title">${esc(s.title)}</span><span class="cs-lv">Niveau ${g.levelInfo().level}</span></div><span class="cs-fanbox">${fan}</span></div>`;
     const SECTIONS = [
       ['avatar', 'Avatar', av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM, av ? esc(av.name) : 'Une de tes créatures', Object.keys(s.collection).length],
       ['titles', 'Titres', picon('titles'), esc(s.title), `${s.titles.length}`],
@@ -65,9 +65,11 @@ export default function profile(app, root) {
       ['plates', 'Plaque de pseudo', `<span class="np ${s.plate ? `np-${s.plate}` : 'np-none'} np-demo">${esc(shownName.slice(0, 8))}</span>`, esc(PLATES[s.plate] || 'Aucune plaque'), `${(s.plates || []).length}`], /* v564 */
       ['backs', 'Dos de cartes', `<img alt="" src="${backNow[2]}">`, esc(backNow[1]), `${backs.length}`],
       ['sachets', 'Sachets de booster', `<img alt="" src="assets/packs/${s.sachet || 'standard2'}.webp">`, esc(SACHETS[s.sachet] || 'Sachets d’origine'), `${(s.sachets || []).length}`], /* v565 */
+      ['mats', 'Tapis de jeu', `<img class="cs-mat" alt="" src="assets/${s.mat ? `tapis/${s.mat}` : 'sceaux/plateau'}.webp">`, esc(TAPIS[s.mat] || 'Plateau d’origine'), `${(s.mats || []).length}`], /* v632 */
+      ['fonds', 'Fond de profil', `<img class="cs-fond" alt="" src="assets/${s.fond ? `fonds/${s.fond}` : 'ui/bn-profile'}.webp">`, esc(FONDS[s.fond] || 'Fond d’origine'), `${(s.fonds || []).length}`], /* v632 */
       ['finishes', 'Finitions de cartes', fins.length ? `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"><img alt="" src="assets/variants/${fins[0]}-frame.webp"></span>` : `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"></span>`, fins.length ? `${dressed} carte${dressed > 1 ? 's' : ''} habillée${dressed > 1 ? 's' : ''}` : 'Contours peints des cartes', `${fins.length}`],
-    ].filter(([k]) => (k !== 'finishes' || false) /* v569 : finitions de cartes retirées (« ça ne rend pas bien ») */ && (k !== 'plates' || (s.plates || []).length || g.codexOn()) && (k !== 'sachets' || (s.sachets || []).length || g.codexOn())); /* v499 : plus de tuiles « Bientôt » : finitions seulement si on en possède */
-    const TOT = { avatar: g.total(), titles: s.titles.length + lockedT.length, frames: allF.length, backs: 1 + new Set([...(s.backs || []), ...CATALOG.flatMap((it) => [it.give.back, ...(it.give.backs || [])]), ...SEASONS.flatMap((se) => se.tiers.map((t) => t.prem?.back)), ...SHOP.map((it) => it.give?.back)].filter(Boolean)).size, /* v574 : seulement les dos qui existent encore (74 avant, objets retirés compris) */ plates: Object.keys(PLATES).length, sachets: Object.keys(SACHETS).length, finishes: Object.keys(FINISHES).length };
+    ].filter(([k]) => (k !== 'finishes' || false) /* v569 : finitions de cartes retirées (« ça ne rend pas bien ») */ && (k !== 'plates' || (s.plates || []).length || g.codexOn()) && (k !== 'sachets' || (s.sachets || []).length || g.codexOn()) && (k !== 'mats' || (s.mats || []).length || g.codexOn()) && (k !== 'fonds' || (s.fonds || []).length || g.codexOn())); /* v499 : plus de tuiles « Bientôt » : finitions seulement si on en possède */
+    const TOT = { avatar: g.total(), titles: s.titles.length + lockedT.length, frames: allF.length, backs: 1 + new Set([...(s.backs || []), ...CATALOG.flatMap((it) => [it.give.back, ...(it.give.backs || [])]), ...SEASONS.flatMap((se) => se.tiers.map((t) => t.prem?.back)), ...SHOP.map((it) => it.give?.back)].filter(Boolean)).size, /* v574 : seulement les dos qui existent encore (74 avant, objets retirés compris) */ plates: Object.keys(PLATES).length, sachets: Object.keys(SACHETS).length, mats: Object.keys(TAPIS).length, fonds: Object.keys(FONDS).length, finishes: Object.keys(FINISHES).length };
     if (!csTab) return `${head}<div class="cs-list">${SECTIONS.map(([k, n, pic, sub, cnt]) => { const tot = TOT[k] || 0, has = Math.min(+cnt || 0, tot || 0); return `<button class="cs-row k-${k}" data-cs="tab" data-v="${k}"><span class="cs-pic">${pic}</span><span class="cs-txt"><b>${n}</b><small>${sub}</small><span class="cs-bar"><i style="width:${tot ? (has / tot) * 100 : 0}%"></i></span></span><span class="cs-cnt"><b>${has}</b><small>/ ${tot}</small></span><span class="cs-go">${icon('next')}</span></button>`; }).join('')}</div>`;
     const back = `<button class="btn ghost small cs-back" data-cs="tab" data-v="">${icon('prev')}Personnaliser</button>`;
     const title = SECTIONS.find(([k]) => k === csTab)?.[1] || '';
@@ -89,6 +91,12 @@ export default function profile(app, root) {
       const sa = [[null, 'Sachet d’origine', prem ? 'premium' : 'standard2'], ...(s.sachets || []).map((k) => [k, SACHETS[k] || k, k])];
       body = `<div class="seg cs-slot" role="radiogroup" aria-label="Booster à habiller">${[['standard', 'Booster standard'], ['premium', 'Booster premium']].map(([k, n]) => `<button class="seg-b" role="radio" aria-checked="${csSlot === k}" aria-pressed="${csSlot === k}" data-cs="slot" data-v="${k}">${n}</button>`).join('')}</div>
         <p class="small muted">${prem ? 'L’habillage de ton booster premium.' : 'L’habillage de ton booster standard. Ton adversaire le voit au Pari des Boosters.'} Les boosters de faction et des Alliances gardent leur sachet d’origine.</p><div class="cs-sachets">${sa.map(([k, n, f]) => `<button class="cs-sachet" data-cs="sachet" data-v="${k || ''}" aria-pressed="${cur === k}"><img alt="" src="assets/packs/${f}.webp"><small>${esc(n)}</small></button>`).join('')}</div>`;
+    } else if (csTab === 'mats') { /* v632 */
+      const ms = [[null, 'Plateau d’origine', 'sceaux/plateau'], ...(s.mats || []).map((k) => [k, TAPIS[k] || k, `tapis/${k}`])];
+      body = `<p class="small muted">Le plateau de tes Duels des Sceaux, contre l’Abysse et en ligne.</p><div class="cs-mats">${ms.map(([k, n, f]) => `<button class="cs-matb" data-cs="mat" data-v="${k || ''}" aria-pressed="${(s.mat || null) === k}"><img alt="" src="assets/${f}.webp"><small>${esc(n)}</small></button>`).join('')}</div>`;
+    } else if (csTab === 'fonds') { /* v632 */
+      const fs = [[null, 'Fond d’origine', 'ui/bn-profile'], ...(s.fonds || []).map((k) => [k, FONDS[k] || k, `fonds/${k}`])];
+      body = `<p class="small muted">La scène derrière ton portrait : sur ton profil, et chez les autres joueurs quand ils ouvrent ta fiche.</p><div class="cs-fonds">${fs.map(([k, n, f]) => `<button class="cs-fondb" data-cs="fond" data-v="${k || ''}" aria-pressed="${(s.fond || null) === k}"><img alt="" src="assets/${f}.webp"><small>${esc(n)}</small></button>`).join('')}</div>`;
     } else if (csTab === 'backs') {
       body = `<p class="small muted">Le dos de toutes les cartes face cachée du jeu.</p><div class="pf-backs">${backs.map(([k, n, u]) => `<button class="pf-back" data-cs="cardback" data-v="${k || ''}" aria-pressed="${(s.back || null) === k}"><img alt="" src="${u}"><span class="small">${esc(n)}</span></button>`).join('')}</div>`;
     } else if (csTab === 'finishes') {
@@ -111,6 +119,8 @@ export default function profile(app, root) {
       if (k === 'title') g.setTitle(v);
       if (k === 'frame') g.setFrame(v);
       if (k === 'plate') g.setPlate(v || null);
+      if (k === 'mat') { g.setMat(v || null); app.applySettings?.(); } /* v632 */
+      if (k === 'fond') g.setFond(v || null); /* v632 */
       if (k === 'slot') { csSlot = v === 'premium' ? 'premium' : 'standard'; app.sfx.tap?.(); paint(); return; }
       if (k === 'sachet') { g.setSachet(v || null, csSlot); app.applySettings?.(); }
       if (k === 'cardback') { g.setBack(v || null); app.applySettings?.(); }
@@ -126,7 +136,7 @@ export default function profile(app, root) {
     const av = g.shownAvatar() && cat.get(g.shownAvatar());
     const show = (s.showcase.length ? s.showcase.map((id) => cat.get(id)) : g.bestCards(3)).filter(Boolean);
     root.innerHTML = `
-      <section class="panel ornate profile-head bn-profile" data-act="custom">
+      <section class="panel ornate profile-head bn-profile ${fondCls(s.fond)}"${fondStyle(s.fond)} data-act="custom">
         <div class="av-col"><button class="avatar-big pf pf-${s.frame}" data-act="custom" aria-label="Personnaliser ton profil">${av ? `<img alt="" src="${artUrl(av)}">` : EMBLEM}</button></div>
         <div class="ph-text">
           <h1>${sync.profile?.pseudo ? `<span class="ph-name">${withPlate(s.plate, esc(sync.profile.pseudo))}</span>` /* v499 : connecté, le nom affiché est le pseudo en ligne (un seul nom) */ : `<button class="ph-name" data-act="rename">${withPlate(s.plate, esc(s.name || 'Ton nom'))} <span class="small muted">${icon('edit')}</span></button>`}</h1>
@@ -146,7 +156,7 @@ export default function profile(app, root) {
         <div class="panel stat"><b>${g.descent().best || 0}</b><span>étage record</span></div>
       </div>
 
-      <button class="panel pf-custom-row" data-act="custom"><img class="pf-cr-ic" alt="" src="assets/icons/customize.webp" onerror="this.remove()"><span class="pf-cr-t"><b>Personnaliser</b><span class="small muted">Avatar, titres, cadres, plaques, dos, sachets</span></span><span class="pf-cr-go">${icon('next')}</span></button>
+      <button class="panel pf-custom-row" data-act="custom"><img class="pf-cr-ic" alt="" src="assets/icons/customize.webp" onerror="this.remove()"><span class="pf-cr-t"><b>Personnaliser</b><span class="small muted">Avatar, titres, cadres, plaques, dos, sachets, tapis, fonds</span></span><span class="pf-cr-go">${icon('next')}</span></button>
 
       ${luckHTML()}
 

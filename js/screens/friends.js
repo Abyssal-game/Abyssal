@@ -11,7 +11,7 @@ import { FRIEND_MSG, MASKED_NAME, openReport } from '../ui/report.js';
 import { isBlocked } from '../core/moderation.js';
 import { t } from '../i18n.js';
 import { RARITY_ORDER, FACTION_ORDER } from '../config.js';
-import { withPlate } from '../ui/vitrine.js'; /* v564 */
+import { withPlate, fondCls, fondStyle } from '../ui/vitrine.js'; /* v564 */
 
 let cache = null; // dernière liste reçue (pour afficher la fiche sans attendre)
 const VBEST = ['prism', 'crystal', 'galaxy', 'gold', 'holo', 'normal'];
@@ -113,7 +113,7 @@ export default function friends(app, root, params = []) {
       root.querySelectorAll('[data-flt]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.flt === filter)));
     };
     root.innerHTML = `
-      <section class="panel ornate profile-head bn-profile fr-head">
+      <section class="panel ornate profile-head bn-profile fr-head ${fondCls(d.fond)}"${fondStyle(d.fond)}>
         <div class="av-col"><span class="avatar-big pf pf-${esc(d.frame || 'fer')}">${pic(d.avatar || f.avatar)}</span></div>
         <div class="ph-text"><h1><span class="ph-name">${withPlate(d.plate, esc(name))}</span></h1>${f.badge ? cloud.badgeHTML(f.badge) : ''}<p class="ph-title">${esc(d.title || f.title || '')}</p><p class="muted small">Niveau ${d.lv || f.level || 1}${f.friend === 'accepted' ? ' · ton ami' : ''}</p></div>
       </section>
