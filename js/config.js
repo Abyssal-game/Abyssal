@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v618'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v619'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -62,7 +62,7 @@ export const LIVE_BASES = ['https://abyssal-game.github.io/Abyssal/'];
 export const LIVE_NATIVE = 618;
 // Clé PUBLIQUE de signature des mises à jour (ECDSA P-256, coordonnées x et y). La clé secrète n'est jamais dans le dépôt :
 // elle est gardée par le propriétaire et dans le secret GitHub LIVE_SIGN_KEY. Tant qu'elle vaut null, aucune mise à jour n'est prise.
-export const LIVE_KEY = null;
+export const LIVE_KEY = { x: 'o0UvHUxr62DiBrjrD6a-CyZiQfbXwx0UIdnVeOuWIyY', y: '4ekFbtWuvGMmUg3_23Kyf67F-F2AAdT2-gdjpJoR0vU' }; /* v619 : clé créée par le propriétaire sur son Mac le 22 octobre 2026 */
 export const FINAL_FLOOR = 100; // v394 : le fond de la Descente (pour l'instant)
 
 // Chance (en %) qu'une carte tirée sorte dans chaque finition (×2 dans un booster premium).
