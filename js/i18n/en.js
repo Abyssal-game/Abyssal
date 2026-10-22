@@ -1,5 +1,15 @@
 // Anglais (v506-v507) : texte français → traduction. Généré à partir des lots de traduction ; on peut corriger à la main.
 export default {
+  "Cadre vivant du Brasier": "Living Blaze Frame",
+  "Cadre vivant du Givre éternel": "Living Eternal Frost Frame",
+  "Cadre vivant de l’Abysse": "Living Abyss Frame",
+  "Cadre vivant du Sang royal": "Living Royal Blood Frame",
+  "Cadre vivant de la Foudre": "Living Lightning Frame",
+  "Cadre vivant des Âmes errantes": "Living Wandering Souls Frame",
+  "Cadre vivant de la Voûte céleste": "Living Celestial Vault Frame",
+  "Cadre vivant du Soleil noir": "Living Black Sun Frame",
+  "Cadre vivant de la Marée luminescente": "Living Glowing Tide Frame",
+  "Cadre vivant des Rouages": "Living Gears Frame",
   "Plaque du Phénix": "Phoenix Plate",
   "Plaque du Kraken": "Kraken Plate",
   "Plaque du Trésor": "Treasure Plate",

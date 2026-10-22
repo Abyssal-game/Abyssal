@@ -1,5 +1,15 @@
 // Dictionnaire portugais du Brésil (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Cadre vivant du Brasier": "Moldura viva da Fornalha",
+  "Cadre vivant du Givre éternel": "Moldura viva da Geada Eterna",
+  "Cadre vivant de l’Abysse": "Moldura viva do Abismo",
+  "Cadre vivant du Sang royal": "Moldura viva do Sangue Real",
+  "Cadre vivant de la Foudre": "Moldura viva do Relâmpago",
+  "Cadre vivant des Âmes errantes": "Moldura viva das Almas Errantes",
+  "Cadre vivant de la Voûte céleste": "Moldura viva da Abóbada Celeste",
+  "Cadre vivant du Soleil noir": "Moldura viva do Sol Negro",
+  "Cadre vivant de la Marée luminescente": "Moldura viva da Maré Luminescente",
+  "Cadre vivant des Rouages": "Moldura viva das Engrenagens",
   "Plaque du Phénix": "Placa da Fênix",
   "Plaque du Kraken": "Placa do Kraken",
   "Plaque du Trésor": "Placa do Tesouro",

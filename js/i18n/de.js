@@ -1,5 +1,15 @@
 // Dictionnaire allemand (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Cadre vivant du Brasier": "Lebendiger Rahmen der Glut",
+  "Cadre vivant du Givre éternel": "Lebendiger Rahmen des Ewigen Frosts",
+  "Cadre vivant de l’Abysse": "Lebendiger Rahmen des Abgrunds",
+  "Cadre vivant du Sang royal": "Lebendiger Rahmen des Königsbluts",
+  "Cadre vivant de la Foudre": "Lebendiger Rahmen des Blitzes",
+  "Cadre vivant des Âmes errantes": "Lebendiger Rahmen der Irrenden Seelen",
+  "Cadre vivant de la Voûte céleste": "Lebendiger Rahmen des Himmelsgewölbes",
+  "Cadre vivant du Soleil noir": "Lebendiger Rahmen der Schwarzen Sonne",
+  "Cadre vivant de la Marée luminescente": "Lebendiger Rahmen der Leuchtenden Flut",
+  "Cadre vivant des Rouages": "Lebendiger Rahmen der Zahnräder",
   "Plaque du Phénix": "Phönix-Plakette",
   "Plaque du Kraken": "Kraken-Plakette",
   "Plaque du Trésor": "Schatz-Plakette",

@@ -5707,3 +5707,15 @@ body.battle-mode .prog-chip { top: calc(var(--safe-t, env(safe-area-inset-top, 0
 /* v581 : cadres de profil peints entièrement hors de la photo : le bord intérieur de l'anneau (38,9 % de l'image)
    tombe juste au-delà du cercle de la créature (≈ 51 % du portrait) ; l'anneau couvre seulement le liseré du portrait */
 .pf.pf.pf.pf.pf[class*="pf-cx-"]::after { inset: -15.5%; }
+
+/* v582 : cadres de profil vivants (WebP animés : back-anim.py … --cadre) */
+.pf-cx-vif-brasier { --fr: url(../assets/frames/cx-vif-brasier-4.webp); }
+.pf-cx-vif-givre { --fr: url(../assets/frames/cx-vif-givre-4.webp); }
+.pf-cx-vif-abysse { --fr: url(../assets/frames/cx-vif-abysse-4.webp); }
+.pf-cx-vif-sang { --fr: url(../assets/frames/cx-vif-sang-4.webp); }
+.pf-cx-vif-foudre { --fr: url(../assets/frames/cx-vif-foudre-4.webp); }
+.pf-cx-vif-ames { --fr: url(../assets/frames/cx-vif-ames-4.webp); }
+.pf-cx-vif-etoiles { --fr: url(../assets/frames/cx-vif-etoiles-4.webp); }
+.pf-cx-vif-soleil-noir { --fr: url(../assets/frames/cx-vif-soleil-noir-4.webp); }
+.pf-cx-vif-maree { --fr: url(../assets/frames/cx-vif-maree-4.webp); }
+.pf-cx-vif-rouages { --fr: url(../assets/frames/cx-vif-rouages-4.webp); }

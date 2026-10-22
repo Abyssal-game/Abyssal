@@ -1,5 +1,15 @@
 // Dictionnaire italien (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Cadre vivant du Brasier": "Cornice vivente del Braciere",
+  "Cadre vivant du Givre éternel": "Cornice vivente del Gelo eterno",
+  "Cadre vivant de l’Abysse": "Cornice vivente dell’Abisso",
+  "Cadre vivant du Sang royal": "Cornice vivente del Sangue reale",
+  "Cadre vivant de la Foudre": "Cornice vivente del Fulmine",
+  "Cadre vivant des Âmes errantes": "Cornice vivente delle Anime erranti",
+  "Cadre vivant de la Voûte céleste": "Cornice vivente della Volta celeste",
+  "Cadre vivant du Soleil noir": "Cornice vivente del Sole nero",
+  "Cadre vivant de la Marée luminescente": "Cornice vivente della Marea luminescente",
+  "Cadre vivant des Rouages": "Cornice vivente degli Ingranaggi",
   "Plaque du Phénix": "Targa della Fenice",
   "Plaque du Kraken": "Targa del Kraken",
   "Plaque du Trésor": "Targa del Tesoro",

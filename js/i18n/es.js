@@ -1,5 +1,15 @@
 // Dictionnaire espagnol (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Cadre vivant du Brasier": "Marco vivo de la Hoguera",
+  "Cadre vivant du Givre éternel": "Marco vivo de la Escarcha eterna",
+  "Cadre vivant de l’Abysse": "Marco vivo del Abismo",
+  "Cadre vivant du Sang royal": "Marco vivo de la Sangre real",
+  "Cadre vivant de la Foudre": "Marco vivo del Rayo",
+  "Cadre vivant des Âmes errantes": "Marco vivo de las Almas errantes",
+  "Cadre vivant de la Voûte céleste": "Marco vivo de la Bóveda celeste",
+  "Cadre vivant du Soleil noir": "Marco vivo del Sol negro",
+  "Cadre vivant de la Marée luminescente": "Marco vivo de la Marea luminiscente",
+  "Cadre vivant des Rouages": "Marco vivo de los Engranajes",
   "Plaque du Phénix": "Placa del Fénix",
   "Plaque du Kraken": "Placa del Kraken",
   "Plaque du Trésor": "Placa del Tesoro",
