@@ -4203,6 +4203,7 @@ export default {
   "Missions du jour": "Tagesmissionen",
   "Mode Créateur": "Schöpfermodus",
   "Mode Créateur (dans Réglages)": "Schöpfermodus (in den Einstellungen)",
+  "Mode Créateur activé : il est dans le Sanctuaire.": "Schöpfermodus aktiviert: Du findest ihn im Heiligtum.",
   "Mode Créateur activé.": "Schöpfermodus aktiviert.",
   "Mode Créateur désactivé.": "Schöpfermodus deaktiviert.",
   "Mode d’affichage": "Anzeigemodus",

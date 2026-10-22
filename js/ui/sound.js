@@ -4,7 +4,7 @@ import { VERSION } from '../config.js';
 // Chaîne : chaque son → (sec + réverbération de salle) → compresseur → volume général.
 // Les sons sont faits de couches : transitoire (le « clic » du contact), corps (le grave), queue (la résonance).
 // Petites variations aléatoires de hauteur pour que les sons répétés ne sonnent pas mécaniques.
-let ctx = null, master = null, bus = null, verb = null, enabled = true, volume = 0.7, haptics = true, loud = false;
+let ctx = null, endG = null, master = null, bus = null, verb = null, enabled = true, volume = 0.7, haptics = true, loud = false;
 // Branchements de la musique (js/ui/music.js) : baisse de la musique pendant les grands moments
 export const hooks = { duck: null };
 let noiseBuf = null, brownBuf = null, voices = 0;
@@ -20,7 +20,8 @@ function ensure() {
     master.gain.value = volume * 0.9;
     const comp = ctx.createDynamicsCompressor();
     comp.threshold.value = -16; comp.knee.value = 12; comp.ratio.value = 4; comp.attack.value = 0.004; comp.release.value = 0.2;
-    comp.connect(master).connect(ctx.destination);
+    endG = ctx.createGain(); endG.connect(ctx.destination); /* v622 : sortie commune (sons et musique), coupée en fondu */
+    comp.connect(master).connect(endG);
     bus = ctx.createGain(); bus.connect(comp);
     // Réverbération : réponse impulsionnelle générée (bruit stéréo qui décroît), comme une crypte
     verb = ctx.createConvolver();
@@ -31,13 +32,33 @@ function ensure() {
     noiseBuf = makeNoise(false); brownBuf = makeNoise(true);
     // iPhone : l'audio peut être suspendu en revenant dans l'app
     // app en arrière-plan : tout est suspendu (batterie)
-    document.addEventListener('visibilitychange', () => { if (document.hidden) ctx.suspend().catch(() => {}); else if (ctx.state !== 'running') ctx.resume().catch(() => {}); });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) audioQuiet(); else audioWake(); });
+    /* v622 : app quittée depuis les applications récentes : le son est coupé en fondu dès que l'app passe en retrait */
+    window.addEventListener('pagehide', audioQuiet);
+    window.addEventListener('blur', () => { if (window.Capacitor?.isNativePlatform?.()) audioQuiet(); });
+    window.addEventListener('focus', () => { if (!document.hidden) audioWake(); });
     loadSamples(); // v308 : tous les sons sont chargés dès le premier toucher
   }
-  if (ctx.state !== 'running') ctx.resume().catch(() => {});
+  if (ctx.state !== 'running' || (endG.gain.value < 1 && !document.hidden)) audioWake();
   return ctx;
 }
 
+/* v622 (le propriétaire : « quand je quitte l'app en la retirant des applications récentes, ça fait une sorte de bip ») :
+   le son était suspendu d'un coup, en pleine onde, puis l'iPhone fermait l'app : coupure sèche = petit « bip » / claquement.
+   Désormais le volume général descend à zéro en 40 ms, puis le son est suspendu ; au retour, il remonte en douceur. */
+let quietT = 0;
+export function audioQuiet() {
+  if (!ctx || !endG) return;
+  clearTimeout(quietT);
+  try { const t = ctx.currentTime; endG.gain.cancelScheduledValues(t); endG.gain.setValueAtTime(endG.gain.value, t); endG.gain.linearRampToValueAtTime(0, t + 0.04); } catch (e) { /* rien */ }
+  quietT = setTimeout(() => { if (ctx.state === 'running') ctx.suspend().catch(() => {}); }, 70);
+}
+export function audioWake() {
+  if (!ctx || !endG) return;
+  clearTimeout(quietT);
+  const up = () => { try { const t = ctx.currentTime; endG.gain.cancelScheduledValues(t); endG.gain.setValueAtTime(endG.gain.value, t); endG.gain.linearRampToValueAtTime(1, t + 0.12); } catch (e) { /* rien */ } };
+  if (ctx.state !== 'running') ctx.resume().then(up).catch(() => {}); else up();
+}
 export function configureSound({ sound, volume: v, haptics: h, loud: l }) {
   enabled = sound !== false;
   if (typeof v === 'number') volume = v;
@@ -51,6 +72,7 @@ export function configureSound({ sound, volume: v, haptics: h, loud: l }) {
 // Contexte audio partagé avec la musique (créé au premier toucher)
 export function audioCtx() { return ensure(); }
 export const audioCtxIfAny = () => ctx;
+export const audioOut = () => endG || ctx?.destination; /* v622 : la musique passe aussi par la sortie commune */
 // v370 : déblocage robuste (iPhone, surtout dans l'application) : à chaque fin de toucher, si le son est suspendu
 // ou interrompu, on le relance et on joue un échantillon muet (geste accepté par WebKit)
 let unlocking = false;
@@ -58,7 +80,7 @@ const kick = () => {
   if (!ctx || ctx.state === 'running' || unlocking) return;
   unlocking = true;
   try { const b = ctx.createBuffer(1, 1, 22050), src = ctx.createBufferSource(); src.buffer = b; src.connect(ctx.destination); src.start(0); } catch (e) { /* rien */ }
-  ctx.resume().catch(() => {}).finally(() => { unlocking = false; });
+  ctx.resume().catch(() => {}).finally(() => { unlocking = false; if (!document.hidden) audioWake(); });
 };
 if (typeof document !== 'undefined') ['touchend', 'click', 'keydown'].forEach((t) => document.addEventListener(t, kick, { capture: true, passive: true }));
 // v370 : état du son, affiché dans Réglages → À propos (diagnostic sur téléphone)

@@ -4,7 +4,7 @@ import { resetTips } from '../ui/coach.js';
 import { TUTOS, tuto } from '../ui/tutos.js';
 import { icon, EMBLEM } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, openSheet, bindActions } from '../ui/dom.js';
-import { sfx, audioInfo } from '../ui/sound.js';
+import { sfx } from '../ui/sound.js';
 import { partie, pendingOps } from '../cloud/partie.js';
 /* v539 : où vit la progression (serveur de partie, ou ancienne sauvegarde tant qu'il n'est pas en place) */
 const partieLine = () => (partie.mode === 'server' ? `Progression gardée par le serveur${pendingOps() ? ` · ${pendingOps()} action${pendingOps() > 1 ? 's' : ''} à envoyer` : ''}` : partie.mode === 'legacy' ? 'Progression : ancienne sauvegarde en ligne' : 'Progression : serveur pas encore joint');
@@ -117,20 +117,15 @@ export default function settings(app, root) {
       </div></details>`;
   }
   function tabAbout(s) {
-    /* v545 : À propos d'abord, le Mode Créateur ensuite */
+    /* v622 : le Mode Créateur et le test du son ne sont plus ici (tuile du Sanctuaire, pouvoirs du créateur) */
     return `      <section class="panel stack about">
         <h2>À propos</h2>
         <p class="small">ABYSSAL — Le Bestiaire interdit.</p>
         <p class="small muted" data-act="vtap">Version ${esc(app.version)} · ${app.catalog.cards.length} cartes</p>
         <p class="small muted set-partie">${partieLine()}</p>
         ${liveOn() ? `<p class="small muted set-live">${liveLine()}</p><p class="small muted set-live-why" translate="no">${liveWhy()}</p><button class="btn ghost small" data-act="livecheck">${icon('eye')} Chercher une mise à jour</button>` : ''}
-        ${s.dev ? `<p class="small muted set-audio">${(() => { const a = audioInfo(); return `Son : ${esc(a.state)} · ${a.samples}${a.expected != null ? `/${a.expected}` : ''} sons chargés · session ${esc(String(a.session))}${a.enabled ? '' : ' · coupé dans les réglages'}${a.diag.failGet || a.diag.failDecode || a.diag.err ? ` · échecs lecture ${a.diag.failGet}, décodage ${a.diag.failDecode}${a.diag.err ? ` · ${esc(a.diag.err)}` : ''}` : ''}`; })()}</p>
-        <button class="btn ghost small" data-act="sndtest">${icon('dodge')} Tester le son</button>` : ''}
         <a class="btn ghost small" href="confidentialite.html" target="_blank" rel="noopener">${icon('book')} Politique de confidentialité</a>
       </section>
-      ${sync.profile?.badge === 'createur' || s.dev ? `<section class="panel stack cr-entry"><h2>${icon('crown')} Mode Créateur</h2>
-        <p class="small muted">Réservé au badge Créateur : ressources, cartes, variantes, boosters imposés et Descente à volonté.</p>
-        <button class="btn gold block" data-act="creator">${s.dev ? 'Ouvrir les pouvoirs' : 'Activer le Mode Créateur'}</button></section>` : ''}
       ${isGardien() ? `<button class="online-pill gardien" data-act="online" aria-live="polite"><img class="on-ic" alt="" src="assets/icons/online.webp"><span class="on-dot"></span><span class="on-t">Connexion…</span><span class="on-see">Voir</span></button>` : ''}`;
   }
   function paintPill(p = presence) {
@@ -190,7 +185,6 @@ export default function settings(app, root) {
     },
     tab(el) { ui.tab = el.dataset.k; sfx.tap(); render(); },
     online() { openOnline(); },
-    sndtest() { app.applySettings(); sfx.victory?.(); setTimeout(render, 900); },
     livecheck() { liveCheck({ force: true }); },
     tuto(el) { tuto(app, el.dataset.k, { force: true }).then(() => render()); },
     welcome() { showWelcome(app, { force: true }); },
@@ -207,7 +201,7 @@ export default function settings(app, root) {
         try { ok = (await sha256(v)) === CREATOR_HASH; } catch (e) { ok = false; }
         if (!ok) { toast('Code incorrect.', { kind: 'error' }); return; }
         g.s.settings.devCode = true; /* v462 : ouvert par le code : le profil en ligne sans badge ne le referme plus */
-        g.setSetting('dev', true); sh.close(); toast('Mode Créateur activé.', { icon: 'crown' }); render();
+        g.setSetting('dev', true); sh.close(); toast('Mode Créateur activé : il est dans le Sanctuaire.', { icon: 'crown' }); render();
       });
     },
     creator() { if (!g.s.settings.dev) g.setSetting('dev', true); render(); openCreator(app); },

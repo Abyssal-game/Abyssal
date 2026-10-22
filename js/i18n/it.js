@@ -4203,6 +4203,7 @@ export default {
   "Missions du jour": "Missioni del giorno",
   "Mode Créateur": "Modalità Creatore",
   "Mode Créateur (dans Réglages)": "Modalità Creatore (nelle Impostazioni)",
+  "Mode Créateur activé : il est dans le Sanctuaire.": "Modalità Creatore attivata: la trovi nel Santuario.",
   "Mode Créateur activé.": "Modalità Creatore attivata.",
   "Mode Créateur désactivé.": "Modalità Creatore disattivata.",
   "Mode d’affichage": "Modalità di visualizzazione",

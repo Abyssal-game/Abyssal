@@ -7,6 +7,7 @@ import { BOSSES, BOSS_ORDER } from '../core/bosses.js';
 import { openCosmeticsLab } from './cosmetics-lab.js';
 import { openCosmeticsReview } from './cosmetics-review.js'; /* v592 */
 import { openDefenseLab } from './defense-lab.js'; /* v594 */
+import { sfx, audioInfo } from '../ui/sound.js'; /* v622 */
 import { perfOn, setPerf, perfLog, perfClear, perfReport } from '../ui/perf.js'; /* v601 */
 
 const SNAP = 'abyssal.snapshot';
@@ -79,6 +80,10 @@ export function openCreator(app) {
         <p class="small">${perfOn() ? '<b class="dc-good">Allumé</b>' : 'Éteint'} · ${perfLog().length} combat(s) relevé(s)${perfLog()[0] ? ` · dernier : ${perfLog()[0].fps} i/s, ${perfLog()[0].nHitch} saccade(s)` : ''}</p>
         <div class="row gap wrap">${B('perf', perfOn() ? 'Éteindre le moniteur' : 'Allumer le moniteur', perfOn() ? '' : 'gold')}${B('perfcopy', 'Copier le rapport', '')}${perfLog().length ? B('perfclear', 'Effacer les relevés', '') : ''}</div></section>
 
+      <section class="cr-sec" translate="no"><h3>Son (diagnostic)</h3>
+        <p class="small muted">${(() => { const a = audioInfo(); return `Son : ${esc(a.state)} · ${a.samples}${a.expected != null ? `/${a.expected}` : ''} sons chargés · session ${esc(String(a.session))}${a.enabled ? '' : ' · coupé dans les réglages'}${a.diag.failGet || a.diag.failDecode || a.diag.err ? ` · échecs lecture ${a.diag.failGet}, décodage ${a.diag.failDecode}${a.diag.err ? ` · ${esc(a.diag.err)}` : ''}` : ''}`; })()}</p>
+        <div class="row gap wrap">${B('sndtest', 'Tester le son', '')}</div></section>
+
       <section class="cr-sec"><h3>Affronter un gardien</h3>
         <p class="small muted">Te place devant la porte du gardien (un chapitre est lancé si besoin, le présage est passé). Coche la case pour monter ton équipe au niveau attendu à cet étage.</p>
         <label class="small cr-bpow"><input type="checkbox" id="bpow" ${ui.bpow ? 'checked' : ''}> Équipe à la puissance de l’étage</label>
@@ -128,6 +133,7 @@ export function openCreator(app) {
       if (x === 'revue') { openCosmeticsReview(app); return; } /* v592 */
       if (x === 'deflab') { openDefenseLab(app); return; } /* v594 */
       if (x === 'labo') { sheet.close(); app.go('labo'); return; } /* v595 */
+      if (x === 'sndtest') { app.applySettings(); sfx.victory?.(); setTimeout(draw, 900); return; } /* v622 */
       if (x === 'perf') { setPerf(!perfOn()); toast(perfOn() ? 'Moniteur allumé : lance un combat.' : 'Moniteur éteint.', { icon: 'check' }); return draw(); } /* v601 */
       if (x === 'perfclear') { perfClear(); return draw(); }
       if (x === 'perfcopy') {

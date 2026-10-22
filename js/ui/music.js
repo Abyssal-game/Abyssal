@@ -2,7 +2,7 @@
 // Chaque lieu a son ambiance (nappe grave, accords lents, cloches, chœur, vent, gouttes, pulsation),
 // tirée au hasard dans une gamme : elle ne se répète jamais exactement.
 // Passage d'une ambiance à l'autre en fondu. Volume séparé des effets sonores.
-import { audioCtx, hooks, getBytes, decodeBytes, listV } from './sound.js';
+import { audioCtx, audioOut, hooks, getBytes, decodeBytes, listV } from './sound.js';
 import { perfMark } from './perf.js'; /* v603 : le moniteur de fluidité note le décodage des musiques */
 
 let ctx = null, out = null, verb = null, duckG = null, on = true, vol = 0.5;
@@ -54,7 +54,7 @@ function init() {
   out = ctx.createGain(); out.gain.value = vol * 0.55;
   duckG = ctx.createGain(); duckG.gain.value = 1;
   const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -20; comp.ratio.value = 3;
-  duckG.connect(out).connect(comp).connect(ctx.destination);
+  duckG.connect(out).connect(comp).connect(audioOut()); /* v622 : fondu commun en quittant l'app */
   // réverbération longue, comme une cathédrale souterraine
   verb = ctx.createConvolver();
   const n = Math.floor(ctx.sampleRate * 4.5), b = ctx.createBuffer(2, n, ctx.sampleRate);

@@ -8,7 +8,7 @@ import { MAX_LEVEL } from './core/army.js';
 import { fameTier } from './core/renown.js';
 import { icon, EMBLEM } from './ui/icons.js';
 import { toast, esc, fmt, reducedMotion, closeTopSheet, openSheet, handlePopstate, afterHistory } from './ui/dom.js';
-import { sfx, configureSound, audioCtx, audioCtxIfAny } from './ui/sound.js';
+import { sfx, configureSound, audioCtx, audioCtxIfAny, audioQuiet, audioWake } from './ui/sound.js';
 import { musicRoute, configureMusic } from './ui/music.js';
 import { setPackSkin, getPackSkin } from './ui/vitrine.js'; /* v565 : sachet de booster */
 import { stillOf, backUrl } from './ui/still.js';
@@ -444,7 +444,7 @@ document.addEventListener('error', (e) => { const t = e.target; if (t && t.tagNa
 document.addEventListener('load', (e) => { const t = e.target; if (t && t.tagName === 'IMG' && t.dataset.broken) { t.style.visibility = ''; delete t.dataset.broken; } }, true);
 
 // Application des stores : bouton retour, son coupé en arrière-plan (rien dans un navigateur)
-initNative({ suspendAudio: () => audioCtxIfAny()?.suspend?.().catch(() => {}), resumeAudio: () => audioCtxIfAny()?.resume?.().catch(() => {}) }); // v370 : ne crée plus le son hors d'un toucher
+initNative({ suspendAudio: audioQuiet, resumeAudio: audioWake }); /* v622 : fondu au lieu d'une coupure sèche (« bip » en quittant l'app) */ // v370 : ne crée plus le son hors d'un toucher
 /* v618 : mises à jour à distance (application iPhone) : jamais pendant un combat, une ouverture ou une fenêtre */
 initLive({ idle: () => !document.querySelector('.dv, .opening, .vd, .chx, .bx-intro, .mq-game') && !document.body.classList.contains('has-sheet') });
 

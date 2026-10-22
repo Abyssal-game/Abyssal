@@ -10,7 +10,7 @@ export default function menu(app, root) {
   const g = app.game, cat = app.catalog, s = g.s, lv = g.levelInfo();
   const av = g.shownAvatar() && cat.get(g.shownAvatar());
   const achDone = Object.keys(s.achievements).length;
-  const creator = sync.profile?.badge === 'createur';
+  const creator = sync.profile?.badge === 'createur' || !!s.settings.dev; /* v622 : la tuile est le seul accès au Mode Créateur */
   // Grandes tuiles illustrées, réparties sur tout l'écran
   const T = (href, ic, title, sub) => `<a class="mn-tile" href="${href}"><span class="mn-tile-ic">${picon(ic)}</span><b>${title}</b><span>${sub}</span></a>`;
   const A = (act, ic, title, sub) => `<button class="mn-tile" data-mn="${act}"><span class="mn-tile-ic">${picon(ic)}</span><b>${title}</b><span>${sub}</span></button>`;

@@ -4203,6 +4203,7 @@ export default {
   "Missions du jour": "Daily Missions",
   "Mode Créateur": "Creator Mode",
   "Mode Créateur (dans Réglages)": "Creator Mode (in Settings)",
+  "Mode Créateur activé : il est dans le Sanctuaire.": "Creator Mode enabled: you’ll find it in the Sanctuary.",
   "Mode Créateur activé.": "Creator Mode enabled.",
   "Mode Créateur désactivé.": "Creator Mode turned off.",
   "Mode d’affichage": "Display mode",
