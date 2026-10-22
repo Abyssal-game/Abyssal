@@ -5765,3 +5765,16 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .dv-c.dying.ashes { filter: none !important; }
 .kx-shatter { filter: none !important; }
 @media (prefers-reduced-motion: reduce) { .dv-c.dying:not(.ashes) { animation: none !important; opacity: 0; } }
+
+/* v605 : le gardien retrouve une carte à lui (demande du propriétaire : « plus logique et plus esthétique avec le reste du jeu ») :
+   fond = sa scène de Furie recadrée et assombrie (assets/bosses/carte-<clé>.webp), cadre sombre et or liseré de rouge,
+   sa figure peinte posée sur la carte et qui en déborde un peu par le haut. Pas de filtre animé (fluidité sur iPhone). */
+.dv-c.has-fig { background: #0B0709 !important; border: 2px solid #B8893A !important; box-shadow: 0 0 0 1px rgba(150, 20, 40, .9), 0 6px 16px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(255, 210, 140, .25) !important; }
+.dv-c.has-fig .dv-art.dv-bart { inset: 0; border-radius: 10px; overflow: hidden; background: #120A0C; }
+.dv-c.has-fig .dv-art.dv-bart > img { width: 100%; height: 100%; object-fit: cover; display: block; filter: none !important; }
+.dv-c.has-fig .dv-art.dv-bart::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(0, 0, 0, .1) 40%, rgba(0, 0, 0, .7) 100%); }
+.dv-c.has-fig.p2 { border-color: #D8403C !important; box-shadow: 0 0 0 1px rgba(255, 60, 70, .9), 0 0 14px rgba(255, 40, 60, .45), 0 6px 16px rgba(0, 0, 0, .7) !important; }
+.dv-c.has-fig.twin { border-color: #8F86D8 !important; box-shadow: 0 0 0 1px rgba(110, 90, 220, .9), 0 6px 16px rgba(0, 0, 0, .7) !important; }
+.dv-c.has-fig::before { display: none !important; }
+.dv-c.has-fig .dv-bfig { width: 118%; height: 116%; bottom: 6%; object-fit: contain; object-position: 50% 100%; }
+.dv-row.enemy .dv-c.has-fig { translate: 0 -2%; scale: 1.1; }

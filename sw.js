@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v604';
+const VERSION = 'abyssal-v605';
 const ART_CACHE = 'abyssal-media';  // images du jeu : gardées entre les versions
 const FONT_CACHE = 'abyssal-fonts';
 const CORE = [
@@ -35,6 +35,7 @@ const CORE = [
   ...['cr-plateau', 'cr-dos', 'cr-paire', 'pa-table2', 'pa-sceau', 'pa-gardien', 'pa-offrande', 'pa-presage', 'pa-brisure', 'en-salle', 'en-jeton', 'en-malediction', 'en-marteau'].map((k) => `assets/jeux/${k}.webp`),
   ...['infernal', 'abyssal-3', 'celeste-3', 'sauvage-3', 'necrotique-3', 'primordial-3', 'artificiel-3'].map((k) => `assets/realms/${k}.webp`),
   ...['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'golem', 'peste', 'chasseur', 'voeux', 'titan', 'jumeaux', 'juge', 'bete', 'abysse', 'jumeaux-nuit', 'abysse-2'].map((k) => `assets/bosses/${k}.webp`),
+  ...['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'golem', 'peste', 'chasseur', 'voeux', 'titan', 'jumeaux', 'juge', 'bete', 'abysse'].map((k) => `assets/bosses/carte-${k}.webp`), // v605 : fonds des cartes de gardien
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/favicon.png',
   'css/fonts.css', ...['Alegreya-0f8ee632.woff2', 'Alegreya-2e945cf5.woff2', 'Alegreya-88cee5eb.woff2', 'Alegreya-db6a5c78.woff2', 'AlegreyaSans-0c0c571a.woff2', 'AlegreyaSans-2a89a09d.woff2', 'AlegreyaSans-3e467a04.woff2', 'AlegreyaSans-8a53b32d.woff2', 'AlegreyaSans-8bed4c5f.woff2', 'AlegreyaSans-a73a507d.woff2', 'AlegreyaSans-b9a4a97d.woff2', 'AlegreyaSans-f03ce63a.woff2', 'Cinzel-1bec9af0.woff2', 'Cinzel-c0fe750f.woff2'].map((k) => `assets/fonts/${k}`),
 ];
