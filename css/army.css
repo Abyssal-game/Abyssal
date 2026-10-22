@@ -5703,3 +5703,7 @@ body.battle-mode .prog-chip { top: calc(var(--safe-t, env(safe-area-inset-top, 0
 .np-pl-foret { --npb: rgba(220, 180, 110, .8); background-image: url(../assets/plates/pl-foret.webp), linear-gradient(90deg, #0e0a06, #2e2416 50%, #0e0a06); color: #F6E2BC; }
 .np-pl-automate { --npb: rgba(230, 160, 110, .8); background-image: url(../assets/plates/pl-automate.webp), linear-gradient(90deg, #140c06, #3c2614 50%, #140c06); color: #FBE0C6; }
 .np-pl-empereur { --npb: rgba(255, 215, 140, .8); background-image: url(../assets/plates/pl-empereur.webp), linear-gradient(90deg, #0a0806, #2e2616 50%, #0a0806); color: #FFEFC6; }
+
+/* v581 : cadres de profil peints entièrement hors de la photo : le bord intérieur de l'anneau (38,9 % de l'image)
+   tombe juste au-delà du cercle de la créature (≈ 51 % du portrait) ; l'anneau couvre seulement le liseré du portrait */
+.pf.pf.pf.pf.pf[class*="pf-cx-"]::after { inset: -15.5%; }
