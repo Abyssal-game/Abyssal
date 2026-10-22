@@ -1,5 +1,5 @@
 // Mode Créateur : tous les pouvoirs sur sa propre partie (réservé au badge « Créateur »).
-import { RARITIES, VARIANTS, BOOSTERS } from '../config.js';
+import { RARITIES, VARIANTS, BOOSTERS, VERSION } from '../config.js';
 import { icon } from '../ui/icons.js';
 import { openSheet, esc, toast, confirmBox, fmt } from '../ui/dom.js';
 import { migrate } from '../core/save.js';
@@ -7,6 +7,7 @@ import { BOSSES, BOSS_ORDER } from '../core/bosses.js';
 import { openCosmeticsLab } from './cosmetics-lab.js';
 import { openCosmeticsReview } from './cosmetics-review.js'; /* v592 */
 import { openDefenseLab } from './defense-lab.js'; /* v594 */
+import { perfOn, setPerf, perfLog, perfClear, perfReport } from '../ui/perf.js'; /* v601 */
 
 const SNAP = 'abyssal.snapshot';
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -73,6 +74,11 @@ export function openCreator(app) {
         <p class="small muted">Essaie des combats de la Descente à n’importe quel étage, règle la force des ennemis, note chaque étage : une courbe règle les autres. Et la barre de défense, réglable en direct. Copie ensuite ton rapport pour me l’envoyer.</p>
         <div class="row gap wrap">${B('labo', 'Ouvrir le Labo des combats', 'gold')}${B('deflab', 'Labo des défenses', '')}</div></section>
 
+      <section class="cr-sec" translate="no"><h3>Moniteur de fluidité</h3>
+        <p class="small muted">Allumé, chaque combat est suivi image par image : un compteur d’images par seconde s’affiche en haut à gauche, et chaque saccade est notée avec ce que le combat faisait à ce moment-là (coup, effet, barre de défense…), ainsi que le délai entre tes touchers et l’écran. Joue quelques combats, puis copie le rapport et colle-le dans la conversation.</p>
+        <p class="small">${perfOn() ? '<b class="dc-good">Allumé</b>' : 'Éteint'} · ${perfLog().length} combat(s) relevé(s)${perfLog()[0] ? ` · dernier : ${perfLog()[0].fps} i/s, ${perfLog()[0].nHitch} saccade(s)` : ''}</p>
+        <div class="row gap wrap">${B('perf', perfOn() ? 'Éteindre le moniteur' : 'Allumer le moniteur', perfOn() ? '' : 'gold')}${B('perfcopy', 'Copier le rapport', '')}${perfLog().length ? B('perfclear', 'Effacer les relevés', '') : ''}</div></section>
+
       <section class="cr-sec"><h3>Affronter un gardien</h3>
         <p class="small muted">Te place devant la porte du gardien (un chapitre est lancé si besoin, le présage est passé). Coche la case pour monter ton équipe au niveau attendu à cet étage.</p>
         <label class="small cr-bpow"><input type="checkbox" id="bpow" ${ui.bpow ? 'checked' : ''}> Équipe à la puissance de l’étage</label>
@@ -122,6 +128,14 @@ export function openCreator(app) {
       if (x === 'revue') { openCosmeticsReview(app); return; } /* v592 */
       if (x === 'deflab') { openDefenseLab(app); return; } /* v594 */
       if (x === 'labo') { sheet.close(); app.go('labo'); return; } /* v595 */
+      if (x === 'perf') { setPerf(!perfOn()); toast(perfOn() ? 'Moniteur allumé : lance un combat.' : 'Moniteur éteint.', { icon: 'check' }); return draw(); } /* v601 */
+      if (x === 'perfclear') { perfClear(); return draw(); }
+      if (x === 'perfcopy') {
+        const st = g.s.settings || {}, txt = perfReport({ version: VERSION, extra: `effets ${st.quality === 'light' ? 'allégés' : 'complets'} · vitesse ${st.combatFast || 1} · animations réduites ${matchMedia('(prefers-reduced-motion: reduce)').matches ? 'oui' : 'non'}${document.documentElement.classList.contains('standalone') ? ' · app de l’écran d’accueil' : ''}` });
+        try { await navigator.clipboard.writeText(txt); toast('Rapport copié : colle-le dans la conversation avec Claude.', { kind: 'success', icon: 'check' }); }
+        catch (e) { openSheet(`<h3>Rapport de fluidité</h3><p class="small muted">Copie ce texte à la main :</p><textarea class="input plain" style="width:100%;height:50vh" readonly>${esc(txt)}</textarea>`); }
+        return;
+      }
       if (x === 'codexgo') { sheet.close(); app.go('codex'); return; }
       if (x === 'off') { g.s.settings.devCode = false; g.setSetting('dev', false); sheet.close(); toast('Mode Créateur désactivé.', { icon: 'crown' }); return; }
       if (!['snap', 'restore'].includes(x)) toast('C’est fait.', { kind: 'success', icon: 'crown' });

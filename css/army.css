@@ -5745,3 +5745,8 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .lf-try { display: flex; justify-content: flex-end; margin: -2px 0 8px; }
 /* v597 : grand rectangle noir sur l'iPhone après une grosse secousse (Assaut d'un gardien) : le plateau entier tourné d'un
    demi-degré n'était pas redessiné à temps par Safari. Plus de rotation dans les secousses (js/screens/duel-ui.js, dvShakeBig). */
+
+/* v601 : moniteur de fluidité (Mode Créateur) : compteur d'images par seconde pendant les combats */
+.perf-pill { position: fixed; top: calc(var(--safe-t, 0px) + 4px); left: 6px; z-index: 99999; pointer-events: none; font: 600 11px/1 system-ui, sans-serif; padding: 4px 7px; border-radius: 8px; background: rgba(10, 30, 15, .82); color: #8ff0a4; border: 1px solid rgba(143, 240, 164, .4); }
+.perf-pill.mid { background: rgba(40, 32, 6, .85); color: #ffd56b; border-color: rgba(255, 213, 107, .45); }
+.perf-pill.bad { background: rgba(50, 8, 8, .88); color: #ff8a8a; border-color: rgba(255, 138, 138, .5); }

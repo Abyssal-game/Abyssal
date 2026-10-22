@@ -30,6 +30,7 @@ import { moveIconUrl, passivesOf, passiveIconUrl, moveFor, PASSIVES } from '../c
 import { hap } from '../ui/sound.js';
 import { playBar, defVerdict, FAM_RHYTHM, KIND_RHYTHM, BOSS_ASSAULT } from '../ui/def-bar.js'; /* v594 */
 import { getTune } from '../ui/def-tune.js';
+import { perfStart, perfStop, perfMark } from '../ui/perf.js'; /* v601 : moniteur de fluidité */
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 // Décor selon la profondeur (salle du Gardien à part) et effets illustrés (fond noir fondu en mode « écran »)
@@ -62,6 +63,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const settling = () => { const d = app.game.s.descent; return (d.runs || 0) <= 1 && (d.run?.floor || 1) <= 2; }; // v328 : voir plus haut
   const g = app.game, cat = app.catalog, run = runOpt || g.descent().run, st = run.battle;
   const where = run.lab ? 'lab' : run.trial ? 'trial' : 'run';
+  perfStart(`${where === 'lab' ? 'Labo' : where === 'trial' ? 'Épreuve' : 'Descente'} · étage ${run.floor || '?'}${run.room === 'boss' || st.bossKey ? ` · gardien ${st.bossKey || ''}` : run.room === 'elite' ? ' · élite' : ''}`);
   const E = engine || g; /* v595 : le banc d'essai du Labo joue sur son propre combat (js/core/lab.js), hors sauvegarde et serveur */ /* v540 : chaque coup passe par le jeu (g.duel…) : le serveur de partie rejoue le combat */
   const ui = (app.state.duel ||= { fast: 0 });
   ui.fast = g.s.settings.combatFast ? 1 : 0; // v331 : bouton ×2 de retour (étude joueurs : un combat ≈ 1,2 min) ; la défense active garde son rythme
@@ -241,6 +243,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   // ——— Affichage ———
   function draw() {
     if (!alive_) return;
+    perfMark('dessin');
     // v262 : la créature dont c'est le tour est toujours celle qui est choisie
     if (st.init && st.turn === 'ally' && !st.over) sel = st.actor; else if (st.init) sel = null;
     tgtInfo = {};
@@ -353,6 +356,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const SHAKE = { small: [220, [[-3, 1], [3, -1], [-1, 0]]], norm: [300, [[-5, 2], [5, -2], [-3, 1], [2, 0]]], big: [500, [[-9, 4], [8, -4], [-6, 3], [5, -2], [-3, 1]]] }; /* v597 : plus de rotation (Safari laissait un grand rectangle noir sur l'écran : tout le plateau était redessiné de travers) */
   let shakeA = null, camA = null;
   const shake = (big, small = false) => {
+    perfMark(big ? 'grosse secousse' : 'secousse');
     if (reduced) return; const d = $('.dv'); if (!d?.animate) return;
     const [dur, pts] = SHAKE[big ? 'big' : small ? 'small' : 'norm'];
     shakeA?.cancel();
@@ -380,6 +384,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   };
   // Caméra simulée : léger glissement vers un point de l'écran (jamais sur les commandes)
   const cam = (uid, k = 1) => {
+    perfMark('caméra');
     if (reduced || light) return;
     const d = $('.dv'), t = el(uid); if (!d || !t) return;
     const b = d.getBoundingClientRect(), r = t.getBoundingClientRect();
@@ -550,6 +555,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     for (let ei = 0; ei < ev.length; ei++) {
       const e = ev[ei];
       if (!alive_) return;
+      perfMark(e.kind ? `${e.t}:${e.kind}` : e.t);
       switch (e.t) {
         case 'act':
           lastAtk = st.units[e.u]?.side === 'ally' ? e.u : null; lastTier = null; pendingSkill = null; skillHit = null; burstSrc = null;
@@ -748,6 +754,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   async function castFx(uid, label, { ic = '', foe = false } = {}) {
     const u = st.units[uid], t = el(uid);
     if (!u || !t || reduced || ui.fast === 3) return false;
+    perfMark('lancement de compétence');
     const c = cat.get(u.id); if (!c) return false;
     const again = shotSeen.has(uid); shotSeen.add(uid);
     const d = T(again ? 520 : 760);
@@ -837,7 +844,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     (st.over === 'won' ? (st.bossKey ? app.sfx.bossvictory : app.sfx.victory) : app.sfx.defeat)();
     $('.dv').insertAdjacentHTML('beforeend', `<div class="cb-end">${crestHTML(st.over === 'won', st.over === 'won' ? 'Victoire' : 'Défaite')}</div>`);
     await wait(T(st.over === 'won' ? 850 : 1200));
-    if (alive_) { alive_ = false; ctl.abort(); dio.destroy(); document.body.classList.remove('battle-mode'); onEnd(); }
+    if (alive_) { alive_ = false; perfStop(); ctl.abort(); dio.destroy(); document.body.classList.remove('battle-mode'); onEnd(); }
   }
 
   // ——— Défense active ———
@@ -954,6 +961,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   /* La barre : v594, code commun avec le Labo des défenses (js/ui/def-bar.js) ; réglages du Labo si le Créateur l'a demandé */
   async function barQTE(s, q = 'n', { beat = 0, title = '' } = {}) {
     const e = st.units[s.a], T = getTune();
+    perfMark(title ? 'Assaut de gardien' : 'barre de défense');
     const tEls = s.kind === 'blast' || intentInfo(st, e)?.aoe ? front(st, 'ally').map((u) => el(u.uid)) : [el(s.t)];
     el(s.a)?.classList.add('aim'); tEls.forEach((x) => x?.classList.add('aimed'));
     const def = INTENTS[s.kind] || INTENTS.hit;
@@ -1333,5 +1341,5 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       draw(); if (!guide) tips();
     });
   }
-  return { stop() { alive_ = false; ctl.abort(); dio.destroy(); document.body.classList.remove('battle-mode'); } };
+  return { stop() { alive_ = false; perfStop(); ctl.abort(); dio.destroy(); document.body.classList.remove('battle-mode'); } };
 }

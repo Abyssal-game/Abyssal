@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v600';
+const VERSION = 'abyssal-v601';
 const ART_CACHE = 'abyssal-media';  // images du jeu : gardées entre les versions
 const FONT_CACHE = 'abyssal-fonts';
 const CORE = [
@@ -13,7 +13,7 @@ const CORE = [
   'js/ui/dom.js', 'js/ui/icons.js', 'js/ui/vitrine.js', 'js/ui/card.js', 'js/ui/sound.js', 'js/ui/music.js', 'js/ui/diorama.js',
   'js/screens/home.js', 'js/screens/collection.js', 'js/screens/shop.js', 'js/screens/opening.js', 'js/screens/detail.js',
   'js/screens/bestiary.js', 'js/screens/factions.js', 'js/screens/achievements.js', 'js/screens/profile.js',
-  'js/screens/settings.js', 'js/screens/furnace.js', 'js/screens/shadow.js', 'js/screens/forge.js', 'js/screens/chest-open.js', 'js/screens/descent.js', 'js/screens/trials.js', 'js/screens/account.js', 'js/screens/creator.js', 'js/screens/cosmetics-lab.js', 'js/screens/cosmetics-review.js', 'js/screens/defense-lab.js', 'js/screens/lab.js', 'js/core/lab.js', 'js/screens/lab-forge.js', 'js/ui/def-bar.js', 'js/ui/def-tune.js', 'js/screens/menu.js', 'js/screens/welcome.js', 'js/cloud/cloud.js', 'js/cloud/sync.js', 'js/cloud/partie.js', 'js/core/ops.js', 'js/core/oprec.js', 'js/core/detmath.js', 'js/cloud/presence.js', 'js/ui/tutos.js', 'js/ui/report.js', 'js/ui/gate.js', 'js/ui/sceaux-demo.js', 'js/core/moderation.js', 'js/core/descent.js', 'js/core/story.js', 'js/core/skills.js', 'js/ui/coach.js',
+  'js/screens/settings.js', 'js/screens/furnace.js', 'js/screens/shadow.js', 'js/screens/forge.js', 'js/screens/chest-open.js', 'js/screens/descent.js', 'js/screens/trials.js', 'js/screens/account.js', 'js/screens/creator.js', 'js/screens/cosmetics-lab.js', 'js/screens/cosmetics-review.js', 'js/screens/defense-lab.js', 'js/screens/lab.js', 'js/core/lab.js', 'js/screens/lab-forge.js', 'js/ui/def-bar.js', 'js/ui/def-tune.js', 'js/ui/perf.js', 'js/screens/menu.js', 'js/screens/welcome.js', 'js/cloud/cloud.js', 'js/cloud/sync.js', 'js/cloud/partie.js', 'js/core/ops.js', 'js/core/oprec.js', 'js/core/detmath.js', 'js/cloud/presence.js', 'js/ui/tutos.js', 'js/ui/report.js', 'js/ui/gate.js', 'js/ui/sceaux-demo.js', 'js/core/moderation.js', 'js/core/descent.js', 'js/core/story.js', 'js/core/skills.js', 'js/ui/coach.js',
   /* v536 : modules qui manquaient (hors ligne après une mise à jour, l'app ne démarrait pas ; un test vérifie maintenant la liste) */
   'js/cloud/mpwatch.js', 'js/core/codex.js', 'js/core/friends.js', 'js/core/mp.js', 'js/core/versus.js', 'js/i18n/en.js', 'js/notify.js', 'js/screens/codex.js', 'js/screens/cryptes-mp.js', 'js/screens/encheres-mp.js', 'js/screens/friends.js', 'js/screens/mp-lobby.js', 'js/screens/pacte-mp.js', 'js/screens/sceaux-mp.js', 'js/screens/versus-duel.js', 'js/screens/versus.js',
   'js/core/army.js', 'js/core/duel.js', 'js/core/kits.js', 'js/core/kits-data.js', 'js/core/synergy.js', 'js/core/renown.js', 'js/core/unlocks.js', 'js/screens/army.js', 'js/screens/duel-ui.js', 'js/ui/chest.js', 'js/ui/scene.js',
