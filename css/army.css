@@ -5787,3 +5787,12 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .dio .dio-mist { filter: none !important; background: radial-gradient(closest-side, rgba(170, 230, 210, .13), rgba(170, 230, 210, .05) 60%, transparent) !important; }
 .dio .dio-tglow { opacity: .8; }
 .dv-burst i { box-shadow: 0 0 8px #FFB347; }
+
+/* v608 : pastille des joueurs en ligne, visible par le seul compte « Le Gardien », touchable : liste des pseudos */
+.online-pill.gardien { pointer-events: auto; cursor: pointer; border: 0; font: inherit; color: inherit; min-height: 44px; }
+.online-pill.gardien .on-see { margin-left: 6px; padding: 2px 8px; border-radius: 999px; background: rgba(224, 186, 110, .16); color: var(--gold, #e0ba6e); font-size: 12px; }
+.on-list { display: flex; flex-direction: column; gap: 6px; margin: 10px 0 12px; }
+.on-list .lb-row { cursor: pointer; }
+.on-list .lb-name { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.on-list .lb-name b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.on-list .lb-name > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

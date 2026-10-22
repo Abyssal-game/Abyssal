@@ -8381,4 +8381,12 @@ export const names = {
   "Étreinte funèbre": "Stretta funebre",
   "Ōmukade": "Ōmukade",
   "Œil Veilleur": "Occhio Vigile",
+  "Joueurs en ligne": "Giocatori online",
+  "Actualiser": "Aggiorna",
+  "Comptes connectés : <b>{0}</b>": "Account connessi: <b>{0}</b>",
+  "Comptes connectés : <b>{0}</b> · appareils ouverts : <b>{1}</b>": "Account connessi: <b>{0}</b> · dispositivi aperti: <b>{1}</b>",
+  "Touche un joueur pour voir son profil.": "Tocca un giocatore per vedere il suo profilo.",
+  "La liste n’est pas encore ouverte sur le serveur : colle <b>supabase/16-en-ligne.sql</b> dans Supabase.": "La lista non è ancora aperta sul server: incolla <b>supabase/16-en-ligne.sql</b> in Supabase.",
+  "Liste indisponible pour l’instant. Réessaie dans un moment.": "Lista non disponibile al momento. Riprova tra poco.",
+  "Aucun compte connecté pour l’instant.": "Nessun account connesso al momento.",
 };

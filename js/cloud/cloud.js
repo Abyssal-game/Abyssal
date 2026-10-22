@@ -207,6 +207,10 @@ export async function versusClaim(id) { return authed('/rest/v1/rpc/versus_claim
 
 // ——— Mini-jeux contre d'autres joueurs (v519, supabase/09-multijoueur.sql) ——————————————
 const rpc = (fn, body = {}) => authed(`/rest/v1/rpc/${fn}`, { method: 'POST', body });
+/* v608 : joueurs en ligne (liste lisible par le seul compte « Le Gardien », supabase/16-en-ligne.sql) */
+export const onlinePing = () => rpc('online_ping');
+export const onlineLeave = () => rpc('online_leave');
+export const onlineList = async () => (await rpc('online_list')) || [];
 export const mpList = async (game) => (await rpc('mp_list', { p_game: game })) || [];
 export const mpGet = (id) => rpc('mp_get', { p_id: id });
 export const mpEmote = (id, key) => rpc('mp_emote', { p_id: id, p_key: key }); /* v564 : réaction en ligne */

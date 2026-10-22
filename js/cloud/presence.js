@@ -2,7 +2,10 @@
 // sans bibliothèque ni table : chaque appareil qui a le jeu ouvert rejoint le canal
 // « abyssal-en-ligne » et s'y signale ; le serveur tient la liste à jour.
 // Aucune donnée personnelle : une clé d'appareil anonyme et tirée au hasard.
-import { CLOUD } from './cloud.js';
+import { CLOUD, isLoggedIn, onlinePing, onlineLeave } from './cloud.js';
+/* v608 : un compte connecté signale aussi « je suis là » au serveur toutes les minutes (liste du créateur) */
+let ping = 0;
+const pingNow = () => { if (isLoggedIn() && !document.hidden) onlinePing().catch(() => {}); };
 
 const TOPIC = 'realtime:abyssal-en-ligne';
 const KEY = 'abyssal.presence';
@@ -25,6 +28,7 @@ const send = (topic, event, payload) => { if (ws?.readyState === 1) ws.send(JSON
 export function startPresence() {
   if (ws || typeof WebSocket === 'undefined') return;
   presence.status = 'connecting'; emit();
+  clearInterval(ping); pingNow(); ping = setInterval(pingNow, 60000);
   const url = `${CLOUD.url.replace(/^http/, 'ws')}/realtime/v1/websocket?apikey=${encodeURIComponent(CLOUD.key)}&vsn=1.0.0`;
   try { ws = new WebSocket(url); } catch (e) { return fail(); }
   ws.onopen = () => {
@@ -64,7 +68,7 @@ function fail() {
 // L'application passe en arrière-plan : on se retire de la liste ; elle revient : on se reconnecte
 if (typeof document !== 'undefined') {
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { clearTimeout(timer); clearInterval(beat); if (ws) { ws.onclose = null; try { ws.close(); } catch (e) { /* rien */ } ws = null; } presence.status = 'off'; }
+    if (document.hidden) { clearInterval(ping); if (isLoggedIn()) onlineLeave().catch(() => {}); clearTimeout(timer); clearInterval(beat); if (ws) { ws.onclose = null; try { ws.close(); } catch (e) { /* rien */ } ws = null; } presence.status = 'off'; }
     else { retry = 0; startPresence(); }
   });
 }

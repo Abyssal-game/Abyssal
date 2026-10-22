@@ -2,7 +2,7 @@
 import { notifSupported, enable as notifEnable } from '../notify.js';
 import { resetTips } from '../ui/coach.js';
 import { TUTOS, tuto } from '../ui/tutos.js';
-import { icon } from '../ui/icons.js';
+import { icon, EMBLEM } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, openSheet, bindActions } from '../ui/dom.js';
 import { sfx, audioInfo } from '../ui/sound.js';
 import { partie, pendingOps } from '../cloud/partie.js';
@@ -10,7 +10,11 @@ import { partie, pendingOps } from '../cloud/partie.js';
 const partieLine = () => (partie.mode === 'server' ? `Progression gardée par le serveur${pendingOps() ? ` · ${pendingOps()} action${pendingOps() > 1 ? 's' : ''} à envoyer` : ''}` : partie.mode === 'legacy' ? 'Progression : ancienne sauvegarde en ligne' : 'Progression : serveur pas encore joint');
 import { MUSIC_DEMO, musicPreview } from '../ui/music.js';
 import { sync, onSync, refreshProfile, eraseOnline } from '../cloud/sync.js';
-import { isLoggedIn } from '../cloud/cloud.js';
+import { isLoggedIn, onlineList } from '../cloud/cloud.js';
+import { artUrl } from '../art/assets.js';
+import { profileAttrs } from '../ui/report.js';
+/* v608 : le nombre de joueurs en ligne et leur liste ne sont montrés qu'au compte du créateur, « Le Gardien » */
+const isGardien = () => (sync.profile?.pseudo || '').trim().toLowerCase() === 'le gardien';
 import { openCreator } from './creator.js';
 import { showWelcome } from './welcome.js';
 import { onPresence, presence } from '../cloud/presence.js';
@@ -108,12 +112,33 @@ export default function settings(app, root) {
       ${sync.profile?.badge === 'createur' || s.dev ? `<section class="panel stack cr-entry"><h2>${icon('crown')} Mode Créateur</h2>
         <p class="small muted">Réservé au badge Créateur : ressources, cartes, variantes, boosters imposés et Descente à volonté.</p>
         <button class="btn gold block" data-act="creator">${s.dev ? 'Ouvrir les pouvoirs' : 'Activer le Mode Créateur'}</button></section>` : ''}
-      <div class="online-pill" role="status" aria-live="polite"><img class="on-ic" alt="" src="assets/icons/online.webp"><span class="on-dot"></span><span class="on-t">Connexion…</span></div>`;
+      ${isGardien() ? `<button class="online-pill gardien" data-act="online" aria-live="polite"><img class="on-ic" alt="" src="assets/icons/online.webp"><span class="on-dot"></span><span class="on-t">Connexion…</span><span class="on-see">Voir</span></button>` : ''}`;
   }
   function paintPill(p = presence) {
     const pill = root.querySelector('.online-pill'); if (!pill) return;
     pill.classList.toggle('live', p.status === 'on');
     pill.querySelector('.on-t').innerHTML = p.status === 'on' ? `<b>${fmt(p.count)}</b> joueur${p.count > 1 ? 's' : ''} en ligne` : p.status === 'connecting' ? 'Connexion…' : 'Hors ligne';
+  }
+  /* v608 : liste des joueurs connectés (comptes vus depuis moins de 2 min 30) */
+  function openOnline() {
+    const sh = openSheet('<h2>Joueurs en ligne</h2><p class="small muted">Chargement…</p>', { label: 'Joueurs en ligne' });
+    const load = async () => {
+      let rows;
+      try { rows = await onlineList(); } catch (e) {
+        if (!sh.closed) sh.setContent(`<h2>Joueurs en ligne</h2><p class="small muted">${/404|PGRST202|function/i.test(String(e?.message || e)) ? 'La liste n’est pas encore ouverte sur le serveur : colle <b>supabase/16-en-ligne.sql</b> dans Supabase.' : 'Liste indisponible pour l’instant. Réessaie dans un moment.'}</p>`);
+        return;
+      }
+      if (sh.closed) return;
+      const ago = (t) => { const n = Math.max(0, Math.round((Date.now() - new Date(t).getTime()) / 1000)); return n < 60 ? 'à l’instant' : `il y a ${Math.floor(n / 60)} min`; };
+      sh.setContent(`<h2>Joueurs en ligne</h2>
+        <p class="small muted">Comptes connectés : <b>${fmt(rows.length)}</b>${presence.count != null ? ` · appareils ouverts : <b>${fmt(presence.count)}</b>` : ''}</p>
+        <p class="small muted">Touche un joueur pour voir son profil.</p>
+        <div class="on-list">${rows.length ? rows.map((r) => { const av = r.avatar && app.catalog.get(r.avatar); return `<div class="lb-row"${profileAttrs(r.id)}><span class="lb-av">${av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM}</span><span class="lb-name"><b translate="no">${esc(r.pseudo)}</b>${r.title ? `<span class="small muted">${esc(r.title)}</span>` : ''}<span class="small muted on-ago">Niv. ${fmt(r.level || 1)} · ${ago(r.seen_at)}</span></span></div>`; }).join('') : '<p class="small muted center">Aucun compte connecté pour l’instant.</p>'}</div>
+        <button class="btn ghost small block" data-on-refresh>Actualiser</button>`);
+      sh.body.querySelector('[data-on-refresh]')?.addEventListener('click', load);
+      sh.body.querySelectorAll('[data-profile]').forEach((x) => x.addEventListener('click', () => sh.close()));
+    };
+    load();
   }
   function render() {
     const s = g.s.settings;
@@ -145,6 +170,7 @@ export default function settings(app, root) {
       app.go('');
     },
     tab(el) { ui.tab = el.dataset.k; sfx.tap(); render(); },
+    online() { openOnline(); },
     sndtest() { app.applySettings(); sfx.victory?.(); setTimeout(render, 900); },
     tuto(el) { tuto(app, el.dataset.k, { force: true }).then(() => render()); },
     welcome() { showWelcome(app, { force: true }); },

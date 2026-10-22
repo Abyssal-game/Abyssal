@@ -8381,4 +8381,12 @@ export const names = {
   "Étreinte funèbre": "Trauerumklammerung",
   "Ōmukade": "Ōmukade",
   "Œil Veilleur": "Wachendes Auge",
+  "Joueurs en ligne": "Spieler online",
+  "Actualiser": "Aktualisieren",
+  "Comptes connectés : <b>{0}</b>": "Angemeldete Konten: <b>{0}</b>",
+  "Comptes connectés : <b>{0}</b> · appareils ouverts : <b>{1}</b>": "Angemeldete Konten: <b>{0}</b> · offene Geräte: <b>{1}</b>",
+  "Touche un joueur pour voir son profil.": "Tippe auf einen Spieler, um sein Profil zu sehen.",
+  "La liste n’est pas encore ouverte sur le serveur : colle <b>supabase/16-en-ligne.sql</b> dans Supabase.": "Die Liste ist auf dem Server noch nicht freigeschaltet: Füge <b>supabase/16-en-ligne.sql</b> in Supabase ein.",
+  "Liste indisponible pour l’instant. Réessaie dans un moment.": "Liste gerade nicht verfügbar. Versuche es gleich noch einmal.",
+  "Aucun compte connecté pour l’instant.": "Gerade ist kein Konto angemeldet.",
 };
