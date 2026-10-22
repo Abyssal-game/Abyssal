@@ -325,7 +325,7 @@ export function mountDiorama(dv, { room, decor = 'riche', reduced = false, bossK
     const [pk, pn] = T.parts;
     let parts = '';
     if (pk === 'mist') parts = '<i class="dio-mist m1"></i><i class="dio-mist m2"></i>';
-    else for (let i = 0; i < pn; i++) parts += `<i class="dio-pt pt-${pk}" style="--px:${(i * 37 + 11) % 100}%;--py:${30 + ((i * 53) % 60)}%;--pd:${6 + ((i * 7) % 7)}s;--pl:${-((i * 1.7) % 6).toFixed(1)}s"></i>`;
+    else for (let i = 0; i < Math.min(pn, 6); i++) parts += `<i class="dio-pt pt-${pk}" style="--px:${(i * 37 + 11) % 100}%;--py:${30 + ((i * 53) % 60)}%;--pd:${6 + ((i * 7) % 7)}s;--pl:${-((i * 1.7) % 6).toFixed(1)}s"></i>`;
     // Mélange : la peinture de l'étage remplit le fond ; le sol de la maquette apparaît en fondu par-dessus
     el.innerHTML = `<div class="dio-far" style="${room.paint ? `background-image:url(${abs(room.paint)})` : ''}"></div>
       <div class="dio-3d" style="perspective:${G.P}px;perspective-origin:50% ${oy}px">${floor}</div>

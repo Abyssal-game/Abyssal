@@ -371,7 +371,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     if (reduced || light) return;
     const t = el(uid); if (!t) return;
     const b = document.createElement('span'); b.className = `dv-burst ${cls}`;
-    b.innerHTML = Array.from({ length: 10 }, (_, i) => `<i style="--a:${i * 36 + Math.round(Math.random() * 20)}deg;--r:${30 + Math.round(Math.random() * 26)}px"></i>`).join('');
+    b.innerHTML = Array.from({ length: 6 }, (_, i) => `<i style="--a:${i * 60 + Math.round(Math.random() * 20)}deg;--r:${30 + Math.round(Math.random() * 26)}px"></i>`).join('');
     t.appendChild(b); setTimeout(() => b.remove(), cls === 'ember' ? 1000 : 650);
   };
   const fxAt = (uid, name, { big = false, center = false } = {}) => {
@@ -898,7 +898,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         die.style.translate = '';
         res.textContent = bonus === RHYTHM.perfect ? `Parfait ! +${bonus}` : bonus ? `Bien ! +${bonus}` : v === null ? 'Lancé au hasard' : 'Raté';
         if (bonus && !reduced) { const n = document.createElement('span'); n.className = `kx-sprite fxs ry2-burst${bonus === RHYTHM.perfect ? '' : ' small'}`; n.style.cssText = `--d:${bonus === RHYTHM.perfect ? 760 : 600}ms;background-image:url(assets/fx/dice-perfect.webp)`; ov.querySelector('.ry2-c').appendChild(n); } // v356 : éclat d'or au lâcher réussi
-        if (bonus === RHYTHM.perfect) { app.sfx.perfect(); if (!reduced) { const d = $('.dv'); d.classList.remove('ry-shake'); void d.offsetWidth; d.classList.add('ry-shake'); } }
+        if (bonus === RHYTHM.perfect) { app.sfx.perfect(); if (!reduced) { const d = $('.dv'); d.classList.remove('ry-shake'); void d.offsetWidth; d.classList.add('ry-shake'); d.addEventListener('animationend', () => d.classList.remove('ry-shake'), { once: true }); /* v607 : la secousse ne reste plus posée sur le plateau */ } }
         else if (bonus) app.sfx.hit(); else app.sfx.miss();
         app.sfx.swipe?.();
         lastThrow = 1;
@@ -949,7 +949,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const ov = document.createElement('div'); ov.className = 'cb-assault';
     ov.innerHTML = `<div class="cb-as-in"><small>Assaut · ${esc(uName(e))}</small><b>${esc(A.name)}</b></div>`;
     $('.dv')?.appendChild(ov); app.sfx.boss?.();
-    if (!reduced) { const d = $('.dv'); d.classList.remove('ry-shake'); void d.offsetWidth; d.classList.add('ry-shake'); }
+    if (!reduced) { const d = $('.dv'); d.classList.remove('ry-shake'); void d.offsetWidth; d.classList.add('ry-shake'); d.addEventListener('animationend', () => d.classList.remove('ry-shake'), { once: true }); /* v607 : la secousse ne reste plus posée sur le plateau */ }
     await wait(reduced ? 500 : 1100);
     ov.classList.add('out'); setTimeout(() => ov.remove(), 250);
     const res = await barQTE(s, A.seq, { beat: A.beat, title: A.name });

@@ -5778,3 +5778,12 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .dv-c.has-fig::before { display: none !important; }
 .dv-c.has-fig .dv-bfig { width: 118%; height: 116%; bottom: 6%; object-fit: contain; object-position: 50% 100%; }
 .dv-row.enemy .dv-c.has-fig { translate: 0 -2%; scale: 1.1; }
+
+/* v607 : rapport du moniteur de fluidité (iPhone, 11 combats du Labo : 57-59 images par seconde, saccades de 60 à 385 ms
+   surtout quand rien ne se passe, décor animé en continu) : plus aucun mélange « screen » ni flou sur les éléments du décor
+   qui bougent sans arrêt (lueurs des torches, flammes, brume, gueule, géode) : Safari les recalculait à chaque image. */
+.dio .dio-fire { filter: none !important; mix-blend-mode: normal !important; }
+.dio .dio-flame, .dio .dio-tglow, .dio-maw .dio-gullet, .dio .dio-geo { mix-blend-mode: normal !important; }
+.dio .dio-mist { filter: none !important; background: radial-gradient(closest-side, rgba(170, 230, 210, .13), rgba(170, 230, 210, .05) 60%, transparent) !important; }
+.dio .dio-tglow { opacity: .8; }
+.dv-burst i { box-shadow: 0 0 8px #FFB347; }
