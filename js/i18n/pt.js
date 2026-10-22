@@ -1,5 +1,13 @@
 // Dictionnaire portugais du Brésil (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Une récompense à chaque palier : cadres, dos de cartes et titres du Réveil des Racines, introuvables à l’Échoppe.": "Uma recompensa em cada nível: molduras, versos e títulos do Despertar das Raízes, impossíveis de achar na Loja.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres du Carnaval des Ombres, introuvables à l’Échoppe.": "Uma recompensa em cada nível: molduras, versos e títulos do Carnaval das Sombras, impossíveis de achar na Loja.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres des Jardins de la Lune pâle, introuvables à l’Échoppe.": "Uma recompensa em cada nível: molduras, versos e títulos dos Jardins da Lua Pálida, impossíveis de achar na Loja.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres du Solstice de feu, introuvables à l’Échoppe.": "Uma recompensa em cada nível: molduras, versos e títulos do Solstício de Fogo, impossíveis de achar na Loja.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres des Marées noires, introuvables à l’Échoppe.": "Uma recompensa em cada nível: molduras, versos e títulos das Marés Negras, impossíveis de achar na Loja.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres de la Forge des Titans, introuvables à l’Échoppe.": "Uma recompensa em cada nível: molduras, versos e títulos da Forja dos Titãs, impossíveis de achar na Loja.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres des Moissons d’ombre, introuvables à l’Échoppe.": "Uma recompensa em cada nível: molduras, versos e títulos da Colheita das Sombras, impossíveis de achar na Loja.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres de l’Anniversaire de l’Abysse, introuvables à l’Échoppe.": "Uma recompensa em cada nível: molduras, versos e títulos do Aniversário do Abismo, impossíveis de achar na Loja.",
   "Cadre vivant du Brasier": "Moldura viva da Fornalha",
   "Cadre vivant du Givre éternel": "Moldura viva da Geada Eterna",
   "Cadre vivant de l’Abysse": "Moldura viva do Abismo",

@@ -1,5 +1,13 @@
 // Dictionnaire italien (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Une récompense à chaque palier : cadres, dos de cartes et titres du Réveil des Racines, introuvables à l’Échoppe.": "Una ricompensa a ogni livello: cornici, dorsi e titoli del Risveglio delle Radici, introvabili nella Bottega.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres du Carnaval des Ombres, introuvables à l’Échoppe.": "Una ricompensa a ogni livello: cornici, dorsi e titoli del Carnevale delle Ombre, introvabili nella Bottega.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres des Jardins de la Lune pâle, introuvables à l’Échoppe.": "Una ricompensa a ogni livello: cornici, dorsi e titoli dei Giardini della Luna pallida, introvabili nella Bottega.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres du Solstice de feu, introuvables à l’Échoppe.": "Una ricompensa a ogni livello: cornici, dorsi e titoli del Solstizio di fuoco, introvabili nella Bottega.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres des Marées noires, introuvables à l’Échoppe.": "Una ricompensa a ogni livello: cornici, dorsi e titoli delle Maree nere, introvabili nella Bottega.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres de la Forge des Titans, introuvables à l’Échoppe.": "Una ricompensa a ogni livello: cornici, dorsi e titoli della Forgia dei Titani, introvabili nella Bottega.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres des Moissons d’ombre, introuvables à l’Échoppe.": "Una ricompensa a ogni livello: cornici, dorsi e titoli del Raccolto d’ombra, introvabili nella Bottega.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres de l’Anniversaire de l’Abysse, introuvables à l’Échoppe.": "Una ricompensa a ogni livello: cornici, dorsi e titoli dell’Anniversario dell’Abisso, introvabili nella Bottega.",
   "Cadre vivant du Brasier": "Cornice vivente del Braciere",
   "Cadre vivant du Givre éternel": "Cornice vivente del Gelo eterno",
   "Cadre vivant de l’Abysse": "Cornice vivente dell’Abisso",

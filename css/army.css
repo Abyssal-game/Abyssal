@@ -4148,13 +4148,7 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .cx-it-f small { font-size: .62rem; }
 .cx-dev code { font-size: .78rem; }
 /* Cadres de profil du Codex et de l'Échoppe (dessinés en CSS en attendant mieux) */
-.pf-cx-encre { border-color: #2A2A3A; box-shadow: 0 0 0 2px #0A0A12, 0 0 10px rgba(80, 80, 140, .6); }
-.pf-cx-sang { border-color: #7A1020; box-shadow: 0 0 0 2px #2A0408, 0 0 12px rgba(200, 30, 50, .55); }
-.pf-cx-or { border-color: #F2C14E; box-shadow: 0 0 0 2px #4A2E08, 0 0 0 4px #C9A45A, 0 0 16px rgba(242, 193, 78, .6); }
-.pf-cx-abime { border-color: #8A5CFF; box-shadow: 0 0 0 2px #1A0A30, 0 0 14px #6A3CE0, 0 0 30px rgba(140, 90, 255, .55); }
 .pf-cx-fondateur { border-color: #FFE7A6; box-shadow: 0 0 0 2px #3A2408, 0 0 0 4px #8A5CFF, 0 0 18px rgba(255, 231, 166, .7); }
-.pf-cx-givre { border-color: #BFE8FF; box-shadow: 0 0 0 2px #0A2A40, 0 0 14px rgba(140, 210, 255, .7); }
-.pf-cx-braise { border-color: #FF8A2A; box-shadow: 0 0 0 2px #3A1000, 0 0 12px #FF5A1A, 0 0 24px rgba(255, 140, 40, .55); }
 /* v471 : médaille de victoire Gemini (sceau de cire à l'œil, lauriers, lames) à la place de l'écusson provisoire */
 .dc-wb-crest { width: 48px; height: 48px; border-radius: 50%; filter: drop-shadow(0 0 8px rgba(242, 160, 60, .45)) drop-shadow(0 2px 4px rgba(0, 0, 0, .7)); }
 
@@ -4163,19 +4157,8 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .pf[class*="pf-cx-"] { position: relative; overflow: visible; border-color: transparent; box-shadow: none; animation: none; }
 .pf[class*="pf-cx-"] > img { border-radius: 50%; }
 .pf[class*="pf-cx-"]::after { content: ''; position: absolute; inset: -45%; background: var(--fr) center / 100% 100% no-repeat; pointer-events: none; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .6)); }
-.pf-cx-encre { --fr: url(../assets/frames/cx-encre.webp); }
-.pf-cx-sang { --fr: url(../assets/frames/cx-sang.webp); }
-.pf-cx-or { --fr: url(../assets/frames/cx-or.webp); }
-.pf-cx-givre { --fr: url(../assets/frames/cx-givre.webp); }
-.pf-cx-braise { --fr: url(../assets/frames/cx-braise.webp); }
-.pf-cx-abime { --fr: url(../assets/frames/cx-abime.webp); }
 .pf-cx-fondateur { --fr: url(../assets/frames/cx-fondateur.webp); }
 .pf-cx-os { --fr: url(../assets/frames/cx-os.webp); }
-.pf-cx-serpents { --fr: url(../assets/frames/cx-serpents.webp); }
-.pf-cx-vitrail { --fr: url(../assets/frames/cx-vitrail.webp); }
-.pf-cx-rouages { --fr: url(../assets/frames/cx-rouages.webp); }
-.pf-cx-racines { --fr: url(../assets/frames/cx-racines.webp); }
-.pf-cx-yeux { --fr: url(../assets/frames/cx-yeux.webp); }
 .pf-cx-chaines { --fr: url(../assets/frames/cx-chaines.webp); }
 .pf-cx-ruche { --fr: url(../assets/frames/cx-ruche.webp); }
 .top-avatar.pf[class*="pf-cx-"] { margin: 0 9px; }
@@ -4227,19 +4210,8 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 /* v479 : 16 cadres peints du catalogue de l'Échoppe */
 .pf-cx-lanternes { --fr: url(../assets/frames/cx-lanternes.webp); }
 .pf-cx-voile { --fr: url(../assets/frames/cx-voile.webp); }
-.pf-cx-houx { --fr: url(../assets/frames/cx-houx.webp); }
-.pf-cx-aurore { --fr: url(../assets/frames/cx-aurore.webp); }
-.pf-cx-roses { --fr: url(../assets/frames/cx-roses.webp); }
-.pf-cx-prince { --fr: url(../assets/frames/cx-prince.webp); }
-.pf-cx-leviathan { --fr: url(../assets/frames/cx-leviathan.webp); }
-.pf-cx-seraphin { --fr: url(../assets/frames/cx-seraphin.webp); }
 .pf-cx-meute { --fr: url(../assets/frames/cx-meute.webp); }
-.pf-cx-liche { --fr: url(../assets/frames/cx-liche.webp); }
-.pf-cx-ouroboros { --fr: url(../assets/frames/cx-ouroboros.webp); }
-.pf-cx-automate { --fr: url(../assets/frames/cx-automate.webp); }
-.pf-cx-gueule { --fr: url(../assets/frames/cx-gueule.webp); }
 .pf-cx-eclipse { --fr: url(../assets/frames/cx-eclipse.webp); }
-.pf-cx-horloger { --fr: url(../assets/frames/cx-horloger.webp); }
 .pf-cx-balance { --fr: url(../assets/frames/cx-balance.webp); }
 /* v479 : cadres aux ornements hauts, recentrés avec plus de marge (frame-art.py K 2,3 → débord de 65 %) */
 .pf.pf-cx-seraphin::after, .pf.pf-cx-horloger::after, .pf.pf-cx-prince::after, .pf.pf-cx-meute::after { inset: -65%; }
@@ -4247,12 +4219,9 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .frame-pick .avatar-mini.pf[class*="pf-cx-"] { margin: 12px 0 16px; }
 
 /* v480 : 6 derniers cadres peints du catalogue (corbeaux, géode et Souverain recentrés avec plus de marge : K 2,3) */
-.pf-cx-constellation { --fr: url(../assets/frames/cx-constellation.webp); }
 .pf-cx-geode { --fr: url(../assets/frames/cx-geode.webp); }
-.pf-cx-sablier { --fr: url(../assets/frames/cx-sablier.webp); }
 .pf-cx-pages { --fr: url(../assets/frames/cx-pages.webp); }
 .pf-cx-corbeau { --fr: url(../assets/frames/cx-corbeau.webp); }
-.pf-cx-souverain { --fr: url(../assets/frames/cx-souverain.webp); }
 .pf.pf-cx-corbeau::after, .pf.pf-cx-geode::after, .pf.pf-cx-souverain::after { inset: -65%; }
 
 /* v482 : finitions de prestige (habillages) */
@@ -4374,43 +4343,18 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .top-meta .top-lv .xpbar { margin-top: 0; width: auto; max-width: 70px; }
 
 /* v487 : cadres peints ramenés à une taille commune (tools/frame-art.py --fit) : le trou laisse voir 95 % de la photo, l'anneau ne dépasse pas 1,44 × le rayon de l'avatar */
-.pf-cx-abime { --fr: url(../assets/frames/cx-abime-2.webp); }
-.pf-cx-aurore { --fr: url(../assets/frames/cx-aurore-2.webp); }
-.pf-cx-automate { --fr: url(../assets/frames/cx-automate-2.webp); }
 .pf-cx-balance { --fr: url(../assets/frames/cx-balance-2.webp); }
-.pf-cx-braise { --fr: url(../assets/frames/cx-braise-2.webp); }
 .pf-cx-chaines { --fr: url(../assets/frames/cx-chaines-2.webp); }
-.pf-cx-constellation { --fr: url(../assets/frames/cx-constellation-2.webp); }
 .pf-cx-corbeau { --fr: url(../assets/frames/cx-corbeau-2.webp); }
 .pf-cx-eclipse { --fr: url(../assets/frames/cx-eclipse-2.webp); }
-.pf-cx-encre { --fr: url(../assets/frames/cx-encre-2.webp); }
 .pf-cx-fondateur { --fr: url(../assets/frames/cx-fondateur-2.webp); }
 .pf-cx-geode { --fr: url(../assets/frames/cx-geode-2.webp); }
-.pf-cx-givre { --fr: url(../assets/frames/cx-givre-2.webp); }
-.pf-cx-gueule { --fr: url(../assets/frames/cx-gueule-2.webp); }
-.pf-cx-horloger { --fr: url(../assets/frames/cx-horloger-2.webp); }
-.pf-cx-houx { --fr: url(../assets/frames/cx-houx-2.webp); }
 .pf-cx-lanternes { --fr: url(../assets/frames/cx-lanternes-2.webp); }
-.pf-cx-leviathan { --fr: url(../assets/frames/cx-leviathan-2.webp); }
-.pf-cx-liche { --fr: url(../assets/frames/cx-liche-2.webp); }
 .pf-cx-meute { --fr: url(../assets/frames/cx-meute-2.webp); }
-.pf-cx-or { --fr: url(../assets/frames/cx-or-2.webp); }
 .pf-cx-os { --fr: url(../assets/frames/cx-os-2.webp); }
-.pf-cx-ouroboros { --fr: url(../assets/frames/cx-ouroboros-2.webp); }
 .pf-cx-pages { --fr: url(../assets/frames/cx-pages-2.webp); }
-.pf-cx-prince { --fr: url(../assets/frames/cx-prince-2.webp); }
-.pf-cx-racines { --fr: url(../assets/frames/cx-racines-2.webp); }
-.pf-cx-roses { --fr: url(../assets/frames/cx-roses-2.webp); }
-.pf-cx-rouages { --fr: url(../assets/frames/cx-rouages-2.webp); }
 .pf-cx-ruche { --fr: url(../assets/frames/cx-ruche-2.webp); }
-.pf-cx-sablier { --fr: url(../assets/frames/cx-sablier-2.webp); }
-.pf-cx-sang { --fr: url(../assets/frames/cx-sang-2.webp); }
-.pf-cx-seraphin { --fr: url(../assets/frames/cx-seraphin-2.webp); }
-.pf-cx-serpents { --fr: url(../assets/frames/cx-serpents-2.webp); }
-.pf-cx-souverain { --fr: url(../assets/frames/cx-souverain-2.webp); }
-.pf-cx-vitrail { --fr: url(../assets/frames/cx-vitrail-2.webp); }
 .pf-cx-voile { --fr: url(../assets/frames/cx-voile-2.webp); }
-.pf-cx-yeux { --fr: url(../assets/frames/cx-yeux-2.webp); }
 .pf.pf.pf[class*="pf-cx-"]::after { inset: -24.2%; }
 
 /* v488 : aperçu des finitions refait (grande carte inclinable sur une scène, avant / après, choix de la carte), pied collé en bas sans couper le texte */
@@ -4967,7 +4911,6 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .dr-fin-neant .tcg-art img { filter: saturate(.9) hue-rotate(15deg) contrast(1.08); }
 .pf-cx-carnaval { --fr: url(../assets/frames/cx-carnaval-2.webp); }
 .pf-cx-phalenes { --fr: url(../assets/frames/cx-phalenes-2.webp); }
-.pf-cx-cristaux-sang { --fr: url(../assets/frames/cx-cristaux-sang-2.webp); }
 
 /* v533 : refonte du Codex (carte de saison, chemin des paliers) et de l'Échoppe (à la une, catégories, tuiles par rang).
    Images Gemini attendues : assets/ui/cx-saison1.webp, cx-enlumine.webp, ech-vitrine.webp, obs-1..4.webp, ech-fondateur.webp (repli : dégradés) */
@@ -5069,46 +5012,20 @@ html.fx-light .cxk-c.ready { animation: none; }
 .cxs-e-in small { font-size: .72rem; color: #C9C0AE; line-height: 1.3; }
 
 /* v533 : cadres peints affinés (retour du propriétaire : « trop gros, ça cache la créature ») : tools/frame-art.py --fit --hole=0.78 --suffix=3 ; le trou laisse voir toute la photo, l'anneau ne dépasse que de 12,8 % de chaque côté */
-.pf-cx-abime { --fr: url(../assets/frames/cx-abime-3.webp); }
-.pf-cx-aurore { --fr: url(../assets/frames/cx-aurore-3.webp); }
-.pf-cx-automate { --fr: url(../assets/frames/cx-automate-3.webp); }
 .pf-cx-balance { --fr: url(../assets/frames/cx-balance-3.webp); }
-.pf-cx-braise { --fr: url(../assets/frames/cx-braise-3.webp); }
 .pf-cx-carnaval { --fr: url(../assets/frames/cx-carnaval-3.webp); }
 .pf-cx-chaines { --fr: url(../assets/frames/cx-chaines-3.webp); }
-.pf-cx-constellation { --fr: url(../assets/frames/cx-constellation-3.webp); }
 .pf-cx-corbeau { --fr: url(../assets/frames/cx-corbeau-3.webp); }
-.pf-cx-cristaux-sang { --fr: url(../assets/frames/cx-cristaux-sang-3.webp); }
 .pf-cx-eclipse { --fr: url(../assets/frames/cx-eclipse-3.webp); }
-.pf-cx-encre { --fr: url(../assets/frames/cx-encre-3.webp); }
 .pf-cx-fondateur { --fr: url(../assets/frames/cx-fondateur-3.webp); }
 .pf-cx-geode { --fr: url(../assets/frames/cx-geode-3.webp); }
-.pf-cx-givre { --fr: url(../assets/frames/cx-givre-3.webp); }
-.pf-cx-gueule { --fr: url(../assets/frames/cx-gueule-3.webp); }
-.pf-cx-horloger { --fr: url(../assets/frames/cx-horloger-3.webp); }
-.pf-cx-houx { --fr: url(../assets/frames/cx-houx-3.webp); }
 .pf-cx-lanternes { --fr: url(../assets/frames/cx-lanternes-3.webp); }
-.pf-cx-leviathan { --fr: url(../assets/frames/cx-leviathan-3.webp); }
-.pf-cx-liche { --fr: url(../assets/frames/cx-liche-3.webp); }
 .pf-cx-meute { --fr: url(../assets/frames/cx-meute-3.webp); }
-.pf-cx-or { --fr: url(../assets/frames/cx-or-3.webp); }
 .pf-cx-os { --fr: url(../assets/frames/cx-os-3.webp); }
-.pf-cx-ouroboros { --fr: url(../assets/frames/cx-ouroboros-3.webp); }
 .pf-cx-pages { --fr: url(../assets/frames/cx-pages-3.webp); }
 .pf-cx-phalenes { --fr: url(../assets/frames/cx-phalenes-3.webp); }
-.pf-cx-prince { --fr: url(../assets/frames/cx-prince-3.webp); }
-.pf-cx-racines { --fr: url(../assets/frames/cx-racines-3.webp); }
-.pf-cx-roses { --fr: url(../assets/frames/cx-roses-3.webp); }
-.pf-cx-rouages { --fr: url(../assets/frames/cx-rouages-3.webp); }
 .pf-cx-ruche { --fr: url(../assets/frames/cx-ruche-3.webp); }
-.pf-cx-sablier { --fr: url(../assets/frames/cx-sablier-3.webp); }
-.pf-cx-sang { --fr: url(../assets/frames/cx-sang-3.webp); }
-.pf-cx-seraphin { --fr: url(../assets/frames/cx-seraphin-3.webp); }
-.pf-cx-serpents { --fr: url(../assets/frames/cx-serpents-3.webp); }
-.pf-cx-souverain { --fr: url(../assets/frames/cx-souverain-3.webp); }
-.pf-cx-vitrail { --fr: url(../assets/frames/cx-vitrail-3.webp); }
 .pf-cx-voile { --fr: url(../assets/frames/cx-voile-3.webp); }
-.pf-cx-yeux { --fr: url(../assets/frames/cx-yeux-3.webp); }
 .pf.pf.pf.pf[class*="pf-cx-"]::after { inset: -12.8%; }
 .top-avatar.pf[class*="pf-cx-"] { margin: 0 3px; }
 /* v533 : portraits des tuiles du Codex et de l'Échoppe : vraies pastilles rondes (un <span> en ligne ignorait la taille) */
@@ -5125,46 +5042,20 @@ html.fx-light .cxk-c.ready { animation: none; }
 .cxs-e.founder .cxs-e-art { width: 88%; aspect-ratio: 1024 / 637; }
 
 /* v535 : cadres coupés au bord du cercle (tools/frame-art.py … --suffix=4 --clip) : aucun ornement ne passe sur la photo */
-.pf-cx-abime { --fr: url(../assets/frames/cx-abime-4.webp); }
-.pf-cx-aurore { --fr: url(../assets/frames/cx-aurore-4.webp); }
-.pf-cx-automate { --fr: url(../assets/frames/cx-automate-4.webp); }
 .pf-cx-balance { --fr: url(../assets/frames/cx-balance-4.webp); }
-.pf-cx-braise { --fr: url(../assets/frames/cx-braise-4.webp); }
 .pf-cx-carnaval { --fr: url(../assets/frames/cx-carnaval-4.webp); }
 .pf-cx-chaines { --fr: url(../assets/frames/cx-chaines-4.webp); }
-.pf-cx-constellation { --fr: url(../assets/frames/cx-constellation-4.webp); }
 .pf-cx-corbeau { --fr: url(../assets/frames/cx-corbeau-4.webp); }
-.pf-cx-cristaux-sang { --fr: url(../assets/frames/cx-cristaux-sang-4.webp); }
 .pf-cx-eclipse { --fr: url(../assets/frames/cx-eclipse-4.webp); }
-.pf-cx-encre { --fr: url(../assets/frames/cx-encre-4.webp); }
 .pf-cx-fondateur { --fr: url(../assets/frames/cx-fondateur-4.webp); }
 .pf-cx-geode { --fr: url(../assets/frames/cx-geode-4.webp); }
-.pf-cx-givre { --fr: url(../assets/frames/cx-givre-4.webp); }
-.pf-cx-gueule { --fr: url(../assets/frames/cx-gueule-4.webp); }
-.pf-cx-horloger { --fr: url(../assets/frames/cx-horloger-4.webp); }
-.pf-cx-houx { --fr: url(../assets/frames/cx-houx-4.webp); }
 .pf-cx-lanternes { --fr: url(../assets/frames/cx-lanternes-4.webp); }
-.pf-cx-leviathan { --fr: url(../assets/frames/cx-leviathan-4.webp); }
-.pf-cx-liche { --fr: url(../assets/frames/cx-liche-4.webp); }
 .pf-cx-meute { --fr: url(../assets/frames/cx-meute-4.webp); }
-.pf-cx-or { --fr: url(../assets/frames/cx-or-4.webp); }
 .pf-cx-os { --fr: url(../assets/frames/cx-os-4.webp); }
-.pf-cx-ouroboros { --fr: url(../assets/frames/cx-ouroboros-4.webp); }
 .pf-cx-pages { --fr: url(../assets/frames/cx-pages-4.webp); }
 .pf-cx-phalenes { --fr: url(../assets/frames/cx-phalenes-4.webp); }
-.pf-cx-prince { --fr: url(../assets/frames/cx-prince-4.webp); }
-.pf-cx-racines { --fr: url(../assets/frames/cx-racines-4.webp); }
-.pf-cx-roses { --fr: url(../assets/frames/cx-roses-4.webp); }
-.pf-cx-rouages { --fr: url(../assets/frames/cx-rouages-4.webp); }
 .pf-cx-ruche { --fr: url(../assets/frames/cx-ruche-4.webp); }
-.pf-cx-sablier { --fr: url(../assets/frames/cx-sablier-4.webp); }
-.pf-cx-sang { --fr: url(../assets/frames/cx-sang-4.webp); }
-.pf-cx-seraphin { --fr: url(../assets/frames/cx-seraphin-4.webp); }
-.pf-cx-serpents { --fr: url(../assets/frames/cx-serpents-4.webp); }
-.pf-cx-souverain { --fr: url(../assets/frames/cx-souverain-4.webp); }
-.pf-cx-vitrail { --fr: url(../assets/frames/cx-vitrail-4.webp); }
 .pf-cx-voile { --fr: url(../assets/frames/cx-voile-4.webp); }
-.pf-cx-yeux { --fr: url(../assets/frames/cx-yeux-4.webp); }
 
 /* v537 : six langues : boutons sur deux colonnes */
 .seg.lang-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; height: auto; }
@@ -5202,8 +5093,6 @@ html.reduce-motion .bx-intro > .bx-in { animation: none; }
 
 /* v547 : Saison I « L'Hiver éternel » : objets exclusifs de la voie enluminée (images Gemini à intégrer par
    tools/frame-art.py --fit --hole=0.78 --suffix=4 --clip et tools/variant-frame2.py) */
-.pf-cx-glace-noire { --fr: url(../assets/frames/cx-glace-noire-4.webp); }
-.pf-cx-loups-neige { --fr: url(../assets/frames/cx-loups-neige-4.webp); }
 .pf-cx-hiver { --fr: url(../assets/frames/cx-hiver-4.webp); }
 .dr-fin-aurore .tcg-dress { background-image: url(../assets/variants/fin-aurore-frame.webp); }
 .dr-fin-hiver .tcg-dress { background-image: url(../assets/variants/fin-hiver-frame.webp); }
@@ -5239,7 +5128,6 @@ html.reduce-motion .pf.pf-cx-hiver::before, html.reduce-motion .dr-fin-hiver .tc
 /* v550 : Saisons I (Nuit des Âmes) et II (Veillée de Noël) : objets exclusifs de la voie enluminée (images Gemini attendues) */
 .pf-cx-citrouilles { --fr: url(../assets/frames/cx-citrouilles-4.webp); }
 .pf-cx-ames { --fr: url(../assets/frames/cx-ames-4.webp); }
-.pf-cx-guirlandes { --fr: url(../assets/frames/cx-guirlandes-4.webp); }
 .pf-cx-noel { --fr: url(../assets/frames/cx-noel-4.webp); }
 .dr-fin-feux-follets .tcg-dress { background-image: url(../assets/variants/fin-feux-follets-frame.webp); }
 .dr-fin-ames .tcg-dress { background-image: url(../assets/variants/fin-ames-frame.webp); }
@@ -5263,54 +5151,25 @@ html.reduce-motion .pf.pf-cx-ames::before, html.reduce-motion .pf.pf-cx-noel, ht
 .cx-unlock2 .cx-eur { white-space: nowrap; }
 
 /* v552 : Saisons IV à XII (février à octobre 2027) : objets des voies enluminées (images Gemini attendues) */
-.pf-cx-coeurs { --fr: url(../assets/frames/cx-coeurs-4.webp); }
-.pf-cx-epines { --fr: url(../assets/frames/cx-epines-4.webp); }
 .pf-cx-coeur-maudit { --fr: url(../assets/frames/cx-coeur-maudit-4.webp); }
 .dr-fin-roses .tcg-dress { background-image: url(../assets/variants/fin-roses-frame.webp); }
 .dr-fin-coeurs .tcg-dress { background-image: url(../assets/variants/fin-coeurs-frame.webp); }
 .pf.pf-cx-coeur-maudit { box-shadow: 0 0 0 2px rgba(255, 90, 120, .55), 0 0 22px rgba(255, 90, 120, .7); animation: cxUlt 3s ease-in-out infinite; --g: 255, 90, 120; }
-.pf-cx-mandragore { --fr: url(../assets/frames/cx-mandragore-4.webp); }
-.pf-cx-arbre-monde { --fr: url(../assets/frames/cx-arbre-monde-4.webp); }
 .dr-fin-seve .tcg-dress { background-image: url(../assets/variants/fin-seve-frame.webp); }
 .dr-fin-racines .tcg-dress { background-image: url(../assets/variants/fin-racines-frame.webp); }
-.pf.pf-cx-arbre-monde { box-shadow: 0 0 0 2px rgba(140, 230, 120, .55), 0 0 22px rgba(140, 230, 120, .7); animation: cxUlt 3s ease-in-out infinite; --g: 140, 230, 120; }
-.pf-cx-masques { --fr: url(../assets/frames/cx-masques-4.webp); }
-.pf-cx-arlequin { --fr: url(../assets/frames/cx-arlequin-4.webp); }
 .dr-fin-masques .tcg-dress { background-image: url(../assets/variants/fin-masques-frame.webp); }
 .dr-fin-carnaval .tcg-dress { background-image: url(../assets/variants/fin-carnaval-frame.webp); }
-.pf.pf-cx-arlequin { box-shadow: 0 0 0 2px rgba(220, 120, 255, .55), 0 0 22px rgba(220, 120, 255, .7); animation: cxUlt 3s ease-in-out infinite; --g: 220, 120, 255; }
-.pf-cx-lune-pale { --fr: url(../assets/frames/cx-lune-pale-4.webp); }
-.pf-cx-jardin-lune { --fr: url(../assets/frames/cx-jardin-lune-4.webp); }
-.pf-cx-lune-reine { --fr: url(../assets/frames/cx-lune-reine-4.webp); }
 .dr-fin-lune .tcg-dress { background-image: url(../assets/variants/fin-lune-frame.webp); }
 .dr-fin-jardins .tcg-dress { background-image: url(../assets/variants/fin-jardins-frame.webp); }
-.pf.pf-cx-lune-reine { box-shadow: 0 0 0 2px rgba(210, 225, 255, .55), 0 0 22px rgba(210, 225, 255, .7); animation: cxUlt 3s ease-in-out infinite; --g: 210, 225, 255; }
-.pf-cx-flammes { --fr: url(../assets/frames/cx-flammes-4.webp); }
-.pf-cx-solstice-feu { --fr: url(../assets/frames/cx-solstice-feu-4.webp); }
 .dr-fin-solstice .tcg-dress { background-image: url(../assets/variants/fin-solstice-frame.webp); }
-.pf.pf-cx-solstice-feu { box-shadow: 0 0 0 2px rgba(255, 150, 60, .55), 0 0 22px rgba(255, 150, 60, .7); animation: cxUlt 3s ease-in-out infinite; --g: 255, 150, 60; }
-.pf-cx-marees { --fr: url(../assets/frames/cx-marees-4.webp); }
-.pf-cx-corail { --fr: url(../assets/frames/cx-corail-4.webp); }
-.pf-cx-profondeurs { --fr: url(../assets/frames/cx-profondeurs-4.webp); }
 .dr-fin-marees .tcg-dress { background-image: url(../assets/variants/fin-marees-frame.webp); }
 .dr-fin-profondeurs .tcg-dress { background-image: url(../assets/variants/fin-profondeurs-frame.webp); }
-.pf.pf-cx-profondeurs { box-shadow: 0 0 0 2px rgba(90, 210, 220, .55), 0 0 22px rgba(90, 210, 220, .7); animation: cxUlt 3s ease-in-out infinite; --g: 90, 210, 220; }
-.pf-cx-forge-titans { --fr: url(../assets/frames/cx-forge-titans-4.webp); }
-.pf-cx-enclume { --fr: url(../assets/frames/cx-enclume-4.webp); }
-.pf-cx-titan { --fr: url(../assets/frames/cx-titan-4.webp); }
 .dr-fin-forge .tcg-dress { background-image: url(../assets/variants/fin-forge-frame.webp); }
 .dr-fin-titans .tcg-dress { background-image: url(../assets/variants/fin-titans-frame.webp); }
-.pf.pf-cx-titan { box-shadow: 0 0 0 2px rgba(255, 120, 40, .55), 0 0 22px rgba(255, 120, 40, .7); animation: cxUlt 3s ease-in-out infinite; --g: 255, 120, 40; }
-.pf-cx-plumes { --fr: url(../assets/frames/cx-plumes-4.webp); }
-.pf-cx-epis { --fr: url(../assets/frames/cx-epis-4.webp); }
-.pf-cx-faucheur { --fr: url(../assets/frames/cx-faucheur-4.webp); }
 .dr-fin-ble-noir .tcg-dress { background-image: url(../assets/variants/fin-ble-noir-frame.webp); }
 .dr-fin-moissons .tcg-dress { background-image: url(../assets/variants/fin-moissons-frame.webp); }
-.pf.pf-cx-faucheur { box-shadow: 0 0 0 2px rgba(230, 190, 90, .55), 0 0 22px rgba(230, 190, 90, .7); animation: cxUlt 3s ease-in-out infinite; --g: 230, 190, 90; }
-.pf-cx-anniversaire { --fr: url(../assets/frames/cx-anniversaire-4.webp); }
 .dr-fin-premiere-page .tcg-dress { background-image: url(../assets/variants/fin-premiere-page-frame.webp); }
 .dr-fin-anniversaire .tcg-dress { background-image: url(../assets/variants/fin-anniversaire-frame.webp); }
-.pf.pf-cx-anniversaire { box-shadow: 0 0 0 2px rgba(200, 140, 255, .55), 0 0 22px rgba(200, 140, 255, .7); animation: cxUlt 3s ease-in-out infinite; --g: 200, 140, 255; }
 @keyframes cxUlt { 50% { box-shadow: 0 0 0 2px rgba(var(--g), .75), 0 0 32px rgba(var(--g), .9); } }
 .dr-fin-coeurs .tcg-dress::after, .dr-fin-racines .tcg-dress::after, .dr-fin-carnaval .tcg-dress::after, .dr-fin-jardins .tcg-dress::after, .dr-fin-solstice .tcg-dress::after, .dr-fin-profondeurs .tcg-dress::after, .dr-fin-titans .tcg-dress::after, .dr-fin-moissons .tcg-dress::after, .dr-fin-anniversaire .tcg-dress::after { content: ''; position: absolute; inset: 0; border-radius: inherit;
   background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, .28) 50%, transparent 65%) 0 0 / 250% 100%; animation: cxFrost 3.8s ease-in-out infinite; }
@@ -5640,9 +5499,6 @@ body.battle-mode .prog-chip { top: calc(var(--safe-t, env(safe-area-inset-top, 0
 .cs-sachet { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px; border-radius: 10px; background: rgba(255, 255, 255, .03); border: 1px solid rgba(201, 164, 90, .25); color: inherit; }
 .cs-sachet img { width: 100%; aspect-ratio: 464 / 800; object-fit: contain; }
 .cs-sachet[aria-pressed="true"] { border-color: var(--gold-hi, #F2C14E); box-shadow: 0 0 0 1px var(--gold-hi, #F2C14E) inset; }
-.pf-cx-veilleuses { --fr: url(../assets/frames/cx-veilleuses-4.webp); }
-.pf-cx-reliquaire-ames { --fr: url(../assets/frames/cx-reliquaire-ames-4.webp); }
-.pf.pf-cx-loups-neige { --fr: url(../assets/frames/cx-loups-neige-5.webp); }
 
 /* v569 : bannière du Sanctuaire peinte à nouveau (Gemini, sol nu ; l'ancienne avait un symbole effacé au sol, d'où le flou) */
 .bn-sanctuary { --bn: url(../assets/ui/bn-sanctuary3.webp); }

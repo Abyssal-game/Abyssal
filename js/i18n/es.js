@@ -1,5 +1,13 @@
 // Dictionnaire espagnol (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Une récompense à chaque palier : cadres, dos de cartes et titres du Réveil des Racines, introuvables à l’Échoppe.": "Una recompensa en cada nivel: marcos, reversos y títulos del Despertar de las Raíces, imposibles de encontrar en el Bazar.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres du Carnaval des Ombres, introuvables à l’Échoppe.": "Una recompensa en cada nivel: marcos, reversos y títulos del Carnaval de las Sombras, imposibles de encontrar en el Bazar.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres des Jardins de la Lune pâle, introuvables à l’Échoppe.": "Una recompensa en cada nivel: marcos, reversos y títulos de los Jardines de la Luna pálida, imposibles de encontrar en el Bazar.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres du Solstice de feu, introuvables à l’Échoppe.": "Una recompensa en cada nivel: marcos, reversos y títulos del Solsticio de fuego, imposibles de encontrar en el Bazar.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres des Marées noires, introuvables à l’Échoppe.": "Una recompensa en cada nivel: marcos, reversos y títulos de las Mareas negras, imposibles de encontrar en el Bazar.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres de la Forge des Titans, introuvables à l’Échoppe.": "Una recompensa en cada nivel: marcos, reversos y títulos de la Forja de los Titanes, imposibles de encontrar en el Bazar.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres des Moissons d’ombre, introuvables à l’Échoppe.": "Una recompensa en cada nivel: marcos, reversos y títulos de la Cosecha de sombras, imposibles de encontrar en el Bazar.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres de l’Anniversaire de l’Abysse, introuvables à l’Échoppe.": "Una recompensa en cada nivel: marcos, reversos y títulos del Aniversario del Abismo, imposibles de encontrar en el Bazar.",
   "Cadre vivant du Brasier": "Marco vivo de la Hoguera",
   "Cadre vivant du Givre éternel": "Marco vivo de la Escarcha eterna",
   "Cadre vivant de l’Abysse": "Marco vivo del Abismo",

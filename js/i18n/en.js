@@ -1,5 +1,13 @@
 // Anglais (v506-v507) : texte français → traduction. Généré à partir des lots de traduction ; on peut corriger à la main.
 export default {
+  "Une récompense à chaque palier : cadres, dos de cartes et titres du Réveil des Racines, introuvables à l’Échoppe.": "A reward at every tier: Awakening of the Roots frames, card backs and titles, never sold in the Emporium.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres du Carnaval des Ombres, introuvables à l’Échoppe.": "A reward at every tier: Carnival of Shadows frames, card backs and titles, never sold in the Emporium.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres des Jardins de la Lune pâle, introuvables à l’Échoppe.": "A reward at every tier: Pale Moon Gardens frames, card backs and titles, never sold in the Emporium.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres du Solstice de feu, introuvables à l’Échoppe.": "A reward at every tier: Fire Solstice frames, card backs and titles, never sold in the Emporium.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres des Marées noires, introuvables à l’Échoppe.": "A reward at every tier: Black Tides frames, card backs and titles, never sold in the Emporium.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres de la Forge des Titans, introuvables à l’Échoppe.": "A reward at every tier: Titan Forge frames, card backs and titles, never sold in the Emporium.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres des Moissons d’ombre, introuvables à l’Échoppe.": "A reward at every tier: Shadow Harvest frames, card backs and titles, never sold in the Emporium.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres de l’Anniversaire de l’Abysse, introuvables à l’Échoppe.": "A reward at every tier: Abyss Anniversary frames, card backs and titles, never sold in the Emporium.",
   "Cadre vivant du Brasier": "Living Blaze Frame",
   "Cadre vivant du Givre éternel": "Living Eternal Frost Frame",
   "Cadre vivant de l’Abysse": "Living Abyss Frame",

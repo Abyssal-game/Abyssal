@@ -1,5 +1,13 @@
 // Dictionnaire allemand (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Une récompense à chaque palier : cadres, dos de cartes et titres du Réveil des Racines, introuvables à l’Échoppe.": "Eine Belohnung auf jeder Stufe: Rahmen, Kartenrücken und Titel zum Erwachen der Wurzeln, die es im Laden nicht gibt.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres du Carnaval des Ombres, introuvables à l’Échoppe.": "Eine Belohnung auf jeder Stufe: Rahmen, Kartenrücken und Titel zum Karneval der Schatten, die es im Laden nicht gibt.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres des Jardins de la Lune pâle, introuvables à l’Échoppe.": "Eine Belohnung auf jeder Stufe: Rahmen, Kartenrücken und Titel der Gärten des bleichen Mondes, die es im Laden nicht gibt.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres du Solstice de feu, introuvables à l’Échoppe.": "Eine Belohnung auf jeder Stufe: Rahmen, Kartenrücken und Titel zur Feuersonnenwende, die es im Laden nicht gibt.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres des Marées noires, introuvables à l’Échoppe.": "Eine Belohnung auf jeder Stufe: Rahmen, Kartenrücken und Titel der schwarzen Gezeiten, die es im Laden nicht gibt.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres de la Forge des Titans, introuvables à l’Échoppe.": "Eine Belohnung auf jeder Stufe: Rahmen, Kartenrücken und Titel der Schmiede der Titanen, die es im Laden nicht gibt.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres des Moissons d’ombre, introuvables à l’Échoppe.": "Eine Belohnung auf jeder Stufe: Rahmen, Kartenrücken und Titel der Schattenernte, die es im Laden nicht gibt.",
+  "Une récompense à chaque palier : cadres, dos de cartes et titres de l’Anniversaire de l’Abysse, introuvables à l’Échoppe.": "Eine Belohnung auf jeder Stufe: Rahmen, Kartenrücken und Titel zum Jahrestag des Abgrunds, die es im Laden nicht gibt.",
   "Cadre vivant du Brasier": "Lebendiger Rahmen der Glut",
   "Cadre vivant du Givre éternel": "Lebendiger Rahmen des Ewigen Frosts",
   "Cadre vivant de l’Abysse": "Lebendiger Rahmen des Abgrunds",

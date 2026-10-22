@@ -70,10 +70,10 @@ test('échoppe : fermée hors Mode Créateur, achat simulé ensuite (une seule f
 
 test('obsidiennes : achats du catalogue, manque signalé, lot au prix réduit', () => {
   const g = mk();
-  g.s.settings.dev = true; g.s.devCodex = true; g.s.obs = 200;
-  g.catalogBuy('cx-yeux');
-  assert.ok(g.s.frames.includes('cx-yeux')); assert.equal(g.obs(), 60);
-  assert.throws(() => g.catalogBuy('cx-yeux'), /déjà/);
+  g.s.settings.dev = true; g.s.devCodex = true; g.s.obs = 480; /* v583 : cx-yeux supprimé, cadre vivant à 420 */
+  g.catalogBuy('cx-vif-ames');
+  assert.ok(g.s.frames.includes('cx-vif-ames')); assert.equal(g.obs(), 60);
+  assert.throws(() => g.catalogBuy('cx-vif-ames'), /déjà/);
   assert.throws(() => g.catalogBuy('dos-infernal'), /manque 140/); /* v573 : dos vivant à 200 */
   g.s.obs = 300; g.catalogBuy('dos-infernal');
   assert.equal(g.catalogCost('royaumes'), Math.round(1000 * 6 / 7));
