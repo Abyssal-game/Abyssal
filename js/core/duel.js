@@ -688,7 +688,7 @@ export function actionsFor(st, uid) {
   }
   (st.labSkills || []).forEach((L, i) => { /* v598 : compétences inventées au Labo */
     if (!L || (L.who && L.who !== 'all' && L.who !== u.role)) return;
-    const b = base(`lsk${i}`, { name: L.name || `Pouvoir ${i + 1}`, icon: 'p:sparkle', ap: L.ap ?? 1, pa: L.ap ?? 1, fervor: L.fervor || 0, target: LSK_TARGET[L.target] || 'enemy', desc: L.desc || 'Pouvoir inventé dans le Labo.' });
+    const b = base(`lsk${i}`, { name: L.name || `Pouvoir ${i + 1}`, icon: 'p:holo', ap: L.ap ?? 1, pa: L.ap ?? 1, fervor: L.fervor || 0, target: LSK_TARGET[L.target] || 'enemy', desc: L.desc || 'Pouvoir inventé dans le Labo.' });
     if (b.ok && b.target !== 'none' && !actionTargets(st, uid, b.key).length) { b.ok = false; b.why = 'Aucune cible possible.'; }
     if (b.ok && L.once && (u.lskUsed || {})[i]) { b.ok = false; b.why = 'Une fois par combat.'; }
     b.lab = true; out.push(b);
