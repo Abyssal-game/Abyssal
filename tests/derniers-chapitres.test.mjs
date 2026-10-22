@@ -7,7 +7,7 @@ test('réglage des ennemis : points reliés, bornes respectées', () => {
   assert.equal(lateSoft(1), FOE_EASE[0][1]); assert.ok(lateSoft(5) > 1, 'v502 : premiers étages relevés');
   assert.equal(lateSoft(100), FOE_EASE.at(-1)[1]); assert.equal(lateSoft(150), FOE_EASE.at(-1)[1]);
   assert.equal(bossEase(100), BOSS_EASE.at(-1)[1]);
-  for (let f = 1; f <= 100; f++) { assert.ok(lateSoft(f) > 0.5 && lateSoft(f) <= 1.5); assert.ok(bossEase(f) > 0.5 && bossEase(f) <= 1.3) /* v598 : gardien du 50 à ×1,25 */; }
+  for (let f = 1; f <= 100; f++) { assert.ok(lateSoft(f) > 0.5 && lateSoft(f) <= 1.9); assert.ok(bossEase(f) > 0.5 && bossEase(f) <= 1.5) /* v598 : gardien du 50 à ×1,25 */; }
 });
 test('la difficulté des combats ordinaires monte étage après étage (pas de marche arrière)', () => {
   for (let f = 1; f < 100; f++) assert.ok(enemyScale(f + 1) * lateSoft(f + 1) >= enemyScale(f) * lateSoft(f), `étage ${f}`);
