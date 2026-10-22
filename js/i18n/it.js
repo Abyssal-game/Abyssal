@@ -1,5 +1,15 @@
 // Dictionnaire italien (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Plaque de la Méduse": "Placca della Medusa",
+  "Plaque du Corbeau": "Placca del Corvo",
+  "Plaque du Serpent": "Placca del Serpente",
+  "Plaque du Sablier": "Placca della Clessidra",
+  "Plaque de la Veuve noire": "Placca della Vedova Nera",
+  "Plaque du Loup de givre": "Placca del Lupo di Brina",
+  "Plaque de la Lune d’argent": "Placca della Luna d’Argento",
+  "Plaque de l’Ambre": "Placca d’Ambra",
+  "Plaque de l’Astrolabe": "Placca dell’Astrolabio",
+  "Plaque de l’Orchidée": "Placca dell’Orchidea",
   "Sachet vivant de la Méduse": "Bustina vivente della Medusa",
   "Sachet vivant du Corbeau": "Bustina vivente del Corvo",
   "Sachet vivant du Sablier": "Bustina vivente della Clessidra",

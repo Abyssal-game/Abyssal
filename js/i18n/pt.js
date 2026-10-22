@@ -1,5 +1,15 @@
 // Dictionnaire portugais du Brésil (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Plaque de la Méduse": "Placa da Medusa",
+  "Plaque du Corbeau": "Placa do Corvo",
+  "Plaque du Serpent": "Placa da Serpente",
+  "Plaque du Sablier": "Placa da Ampulheta",
+  "Plaque de la Veuve noire": "Placa da Viúva-Negra",
+  "Plaque du Loup de givre": "Placa do Lobo de Gelo",
+  "Plaque de la Lune d’argent": "Placa da Lua de Prata",
+  "Plaque de l’Ambre": "Placa de Âmbar",
+  "Plaque de l’Astrolabe": "Placa do Astrolábio",
+  "Plaque de l’Orchidée": "Placa da Orquídea",
   "Sachet vivant de la Méduse": "Pacote vivo da Água-viva",
   "Sachet vivant du Corbeau": "Pacote vivo do Corvo",
   "Sachet vivant du Sablier": "Pacote vivo da Ampulheta",

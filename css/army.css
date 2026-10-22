@@ -5602,3 +5602,15 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .pf-cx-vif-chandelles { --fr: url(../assets/frames/cx-vif-chandelles-4.webp); }
 .pf-cx-vif-ambre { --fr: url(../assets/frames/cx-vif-ambre-4.webp); }
 .pf-cx-vif-obsidienne { --fr: url(../assets/frames/cx-vif-obsidienne-4.webp); }
+
+/* v589 : 10 plaques de pseudo vivantes (images Gemini) */
+.np-pl-meduse { --npb: rgba(120, 190, 255, .8); background-image: url(../assets/plates/pl-meduse.webp), linear-gradient(90deg, #06101c, #16324a 50%, #06101c); color: #D4ECFF; }
+.np-pl-corbeau { --npb: rgba(200, 60, 70, .8); background-image: url(../assets/plates/pl-corbeau.webp), linear-gradient(90deg, #0a0606, #2a1214 50%, #0a0606); color: #FFD6D6; }
+.np-pl-serpent { --npb: rgba(110, 220, 160, .8); background-image: url(../assets/plates/pl-serpent.webp), linear-gradient(90deg, #060c08, #163022 50%, #060c08); color: #D2F5E0; }
+.np-pl-sablier { --npb: rgba(255, 200, 120, .8); background-image: url(../assets/plates/pl-sablier.webp), linear-gradient(90deg, #0c0906, #33261a 50%, #0c0906); color: #FFE9C6; }
+.np-pl-araignee { --npb: rgba(230, 50, 70, .8); background-image: url(../assets/plates/pl-araignee.webp), linear-gradient(90deg, #0c0507, #2e0e14 50%, #0c0507); color: #FFD0D6; }
+.np-pl-loup { --npb: rgba(170, 215, 255, .8); background-image: url(../assets/plates/pl-loup.webp), linear-gradient(90deg, #070b10, #1c2a3a 50%, #070b10); color: #E2F1FF; }
+.np-pl-lune { --npb: rgba(210, 220, 240, .8); background-image: url(../assets/plates/pl-lune.webp), linear-gradient(90deg, #08090c, #24283a 50%, #08090c); color: #EEF2FF; }
+.np-pl-ambre { --npb: rgba(255, 170, 60, .8); background-image: url(../assets/plates/pl-ambre.webp), linear-gradient(90deg, #0e0904, #3a2610 50%, #0e0904); color: #FFE2B8; }
+.np-pl-astrolabe { --npb: rgba(235, 200, 120, .8); background-image: url(../assets/plates/pl-astrolabe.webp), linear-gradient(90deg, #0a0906, #2c2616 50%, #0a0906); color: #FFF0CC; }
+.np-pl-orchidee { --npb: rgba(220, 120, 255, .8); background-image: url(../assets/plates/pl-orchidee.webp), linear-gradient(90deg, #0b0610, #2a1438 50%, #0b0610); color: #F4DDFF; }

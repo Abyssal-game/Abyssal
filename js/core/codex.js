@@ -133,7 +133,8 @@ const SA = (k, cost) => ({ id: k, kind: 'sachet', give: { sachet: k }, cost });
 export const PLATES = { 'pl-obsidienne': 'Plaque d’obsidienne', 'pl-grimoire': 'Plaque du grimoire', 'pl-braise': 'Plaque de braise',
   'pl-givre': 'Plaque de givre', 'pl-or-noir': 'Plaque d’or noir', 'pl-abysse': 'Plaque de l’Abysse', 'pl-souverain': 'Plaque du Souverain',
   /* v572 */ 'pl-ossuaire': 'Plaque de l’ossuaire', 'pl-sang': 'Plaque de sang', 'pl-pierre': 'Plaque des gargouilles', 'pl-nacre': 'Plaque de nacre noire', 'pl-dragon': 'Plaque du dragon', 'pl-eclipse': 'Plaque de l’éclipse',
-  /* v580 */ 'pl-phenix': 'Plaque du Phénix', 'pl-kraken': 'Plaque du Kraken', 'pl-tresor': 'Plaque du Trésor', 'pl-cristal': 'Plaque d’améthyste', 'pl-foudre': 'Plaque de la Foudre', 'pl-foret': 'Plaque de la Forêt ancienne', 'pl-automate': 'Plaque de l’Automate', 'pl-empereur': 'Plaque de l’Empereur' };
+  /* v580 */ 'pl-phenix': 'Plaque du Phénix', 'pl-kraken': 'Plaque du Kraken', 'pl-tresor': 'Plaque du Trésor', 'pl-cristal': 'Plaque d’améthyste', 'pl-foudre': 'Plaque de la Foudre', 'pl-foret': 'Plaque de la Forêt ancienne', 'pl-automate': 'Plaque de l’Automate', 'pl-empereur': 'Plaque de l’Empereur',
+  /* v589 */ 'pl-meduse': 'Plaque de la Méduse', 'pl-corbeau': 'Plaque du Corbeau', 'pl-serpent': 'Plaque du Serpent', 'pl-sablier': 'Plaque du Sablier', 'pl-araignee': 'Plaque de la Veuve noire', 'pl-loup': 'Plaque du Loup de givre', 'pl-lune': 'Plaque de la Lune d’argent', 'pl-ambre': 'Plaque de l’Ambre', 'pl-astrolabe': 'Plaque de l’Astrolabe', 'pl-orchidee': 'Plaque de l’Orchidée' };
 export const EMOTES = {
   're-salut': { text: 'Salutations.', free: true }, 're-bien': { text: 'Bien joué.', free: true },
   're-merci': { text: 'Merci.', free: true }, 're-aie': { text: 'Aïe…', free: true },
@@ -203,6 +204,7 @@ export const COSM_RARITY = {
   'pl-sang': 'leg', 'pl-kraken': 'leg', 'pl-cristal': 'leg', 'pl-automate': 'leg',
   'pl-braise': 'epic', 'pl-givre': 'epic', 'pl-souverain': 'epic', 'pl-nacre': 'epic', 'pl-dragon': 'epic', 'pl-foret': 'epic',
   'pl-eclipse': 'rare', 'pl-or-noir': 'rare', 'pl-ossuaire': 'rare', 'pl-abysse': 'rare', 'pl-foudre': 'rare', 'pl-grimoire': 'rare', 'pl-obsidienne': 'rare', 'pl-pierre': 'rare',
+  /* v589 */ 'pl-corbeau': 'leg', 'pl-loup': 'leg', 'pl-araignee': 'epic', 'pl-sablier': 'epic', 'pl-ambre': 'epic', 'pl-orchidee': 'epic', 'pl-meduse': 'rare', 'pl-serpent': 'rare', 'pl-lune': 'rare', 'pl-astrolabe': 'rare',
 };
 const SHOP_FRAMES = ['cx-vif-dragon', 'cx-vif-phenix', 'cx-vif-soleil-noir', 'cx-vif-amethyste', 'cx-vif-sang', 'cx-vif-brasier', 'cx-vif-givre', 'cx-vif-kraken', 'cx-vif-nacre', 'cx-vif-foret', 'cx-vif-ames', 'cx-vif-abysse', 'cx-vif-maree', 'cx-vif-foudre', 'cx-vif-etoiles', 'cx-vif-rouages', 'cx-vif-venin', 'cx-vif-chandelles', 'cx-vif-ambre', 'cx-vif-obsidienne'];
 /* v586 (« je veux tout ») : tous les dos, sachets et plaques sont en vente, rangés par rareté ; seul le dos de l'alchimiste

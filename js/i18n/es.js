@@ -1,5 +1,15 @@
 // Dictionnaire espagnol (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Plaque de la Méduse": "Placa de la Medusa",
+  "Plaque du Corbeau": "Placa del Cuervo",
+  "Plaque du Serpent": "Placa de la Serpiente",
+  "Plaque du Sablier": "Placa del Reloj de Arena",
+  "Plaque de la Veuve noire": "Placa de la Viuda Negra",
+  "Plaque du Loup de givre": "Placa del Lobo de Escarcha",
+  "Plaque de la Lune d’argent": "Placa de la Luna de Plata",
+  "Plaque de l’Ambre": "Placa de Ámbar",
+  "Plaque de l’Astrolabe": "Placa del Astrolabio",
+  "Plaque de l’Orchidée": "Placa de la Orquídea",
   "Sachet vivant de la Méduse": "Sobre viviente de la Medusa",
   "Sachet vivant du Corbeau": "Sobre viviente del Cuervo",
   "Sachet vivant du Sablier": "Sobre viviente del Reloj de arena",

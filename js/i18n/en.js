@@ -1,5 +1,15 @@
 // Anglais (v506-v507) : texte français → traduction. Généré à partir des lots de traduction ; on peut corriger à la main.
 export default {
+  "Plaque de la Méduse": "Medusa Plate",
+  "Plaque du Corbeau": "Raven Plate",
+  "Plaque du Serpent": "Serpent Plate",
+  "Plaque du Sablier": "Hourglass Plate",
+  "Plaque de la Veuve noire": "Black Widow Plate",
+  "Plaque du Loup de givre": "Frost Wolf Plate",
+  "Plaque de la Lune d’argent": "Silver Moon Plate",
+  "Plaque de l’Ambre": "Amber Plate",
+  "Plaque de l’Astrolabe": "Astrolabe Plate",
+  "Plaque de l’Orchidée": "Orchid Plate",
   "Sachet vivant de la Méduse": "Living Jellyfish Pack",
   "Sachet vivant du Corbeau": "Living Raven Pack",
   "Sachet vivant du Sablier": "Living Hourglass Pack",

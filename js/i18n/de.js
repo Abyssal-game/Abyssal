@@ -1,5 +1,15 @@
 // Dictionnaire allemand (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Plaque de la Méduse": "Medusa-Plakette",
+  "Plaque du Corbeau": "Raben-Plakette",
+  "Plaque du Serpent": "Schlangen-Plakette",
+  "Plaque du Sablier": "Stundenglas-Plakette",
+  "Plaque de la Veuve noire": "Schwarze-Witwe-Plakette",
+  "Plaque du Loup de givre": "Frostwolf-Plakette",
+  "Plaque de la Lune d’argent": "Silbermond-Plakette",
+  "Plaque de l’Ambre": "Bernstein-Plakette",
+  "Plaque de l’Astrolabe": "Astrolabium-Plakette",
+  "Plaque de l’Orchidée": "Orchideen-Plakette",
   "Sachet vivant de la Méduse": "Lebende Quallen-Tüte",
   "Sachet vivant du Corbeau": "Lebende Raben-Tüte",
   "Sachet vivant du Sablier": "Lebende Sanduhr-Tüte",
