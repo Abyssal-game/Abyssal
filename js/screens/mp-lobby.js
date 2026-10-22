@@ -137,6 +137,19 @@ export function createMpLobby(app, root, spec) {
   }
 
   // ——— Partie ———
+  /* v612 : dernier état vu de chaque partie, gardé sur l'appareil : en rouvrant une partie où l'adversaire a joué
+     pendant ton absence (partie lente, 12 h par coup), son coup est rejoué comme si tu l'avais regardé en direct */
+  const SEEN_KEY = () => `abyssal.mpSeen.${cloud.currentUser()?.id || 'x'}`;
+  const seenAll = () => { try { return JSON.parse(localStorage.getItem(SEEN_KEY()) || '{}') || {}; } catch (e) { return {}; } };
+  function seenSave(v) {
+    if (!v?.id || !v.state) return;
+    try {
+      const all = seenAll();
+      if (v.status === 'playing') all[v.id] = { t: Date.now(), v }; else delete all[v.id];
+      const keep = Object.entries(all).sort((a, b) => b[1].t - a[1].t).slice(0, 12);
+      localStorage.setItem(SEEN_KEY(), JSON.stringify(Object.fromEntries(keep)));
+    } catch (e) { /* stockage plein ou bloqué : pas de rejeu, rien de grave */ }
+  }
   async function open(id) {
     ui.open = id; ui.sel = null;
     try { view = await withPending(cloud.mpGet(id)); } catch (e) { toast(esc(errMsg(e)), { kind: 'error' }); return lobby(); }
@@ -144,7 +157,19 @@ export function createMpLobby(app, root, spec) {
     if (!view) return lobby();
     if (view.now) skew = new Date(view.now).getTime() - Date.now();
     ui.foeEmote = view.emotes?.[view.me === 'a' ? 'b' : 'a']?.at || null; /* v564 : une réaction déjà passée ne se rejoue pas */
-    draw();
+    const old = seenAll()[id]?.v;
+    if (old && old.state && old.me === view.me && spec.moveKey(old) !== spec.moveKey(view) && spec.updated) {
+      /* v612 : l'adversaire a joué depuis ta dernière visite : on repart de ce que tu avais vu, puis son coup est rejoué */
+      const now = view;
+      view = { ...old, status: 'playing', updated_at: now.updated_at, deadline: now.deadline, now: now.now };
+      spec.drawGame(view, ctx, null);
+      await new Promise((r) => setTimeout(r, 450));
+      if (!alive || ui.open !== id) return;
+      view = now;
+      busy = true; try { await spec.updated(old, now, ctx); } catch (e) { /* rejeu impossible : on montre l'état final */ } finally { busy = false; }
+      if (!alive || ui.open !== id) return;
+      draw(now.state?.last);
+    } else draw(view.state?.last?.who && view.state.last.who !== view.me ? view.state.last : null);
     watch();
   }
   // l'adversaire joue : on le relit (1 s en partie rapide, 2 s en lente jouée en direct, sinon 8 s) tant que ce n'est pas notre tour
@@ -189,6 +214,7 @@ export function createMpLobby(app, root, spec) {
     if (!alive) return;
     if (!view) return lobby();
     spec.drawGame(view, ctx, last);
+    seenSave(view);
     emoteBtn();
     if (view.status === 'done' && !view.claimed) claimOne(view);
   }
@@ -203,7 +229,7 @@ export function createMpLobby(app, root, spec) {
     try { v = await (quiet ? fn() : withPending(fn())); } catch (e) { app.sfx.error(); toast(esc(errMsg(e)), { kind: 'error' }); busy = false; refresh(); return null; }
     busy = false;
     if (!alive) return null; /* v527 : l'écran a été quitté pendant l'envoi */
-    if (v) { view = v; seeEmote(v); }
+    if (v) { view = v; seeEmote(v); seenSave(v); }
     return v;
   }
   // v564 : réactions en ligne
