@@ -5850,3 +5850,11 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .dv-c.has-fig.twin .dv-nm { border-color: #A69CF0; color: #DCD6FF !important; }
 .dv-row.enemy .dv-c.has-fig { translate: 0 -2%; scale: 1.06; }
 .dv.cb .dv-c.has-fig .cb-tgt { bottom: 1% !important; }
+/* v616 (capture du propriétaire, L'Éclipse) : plus de petit rond doré au milieu du haut de la carte du gardien (posé en v613 dans les coins ciselés, il tombait sur la tête) */
+.dv-c.has-fig::before {
+  background:
+    linear-gradient(var(--c), var(--c)) 0 0 / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 0 0 / var(--w) var(--l),
+    linear-gradient(var(--c), var(--c)) 100% 0 / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 100% 0 / var(--w) var(--l),
+    linear-gradient(var(--c), var(--c)) 0 100% / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 0 100% / var(--w) var(--l),
+    linear-gradient(var(--c), var(--c)) 100% 100% / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 100% 100% / var(--w) var(--l);
+  background-repeat: no-repeat; }
