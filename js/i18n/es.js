@@ -1,5 +1,12 @@
 // Dictionnaire espagnol (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Booster à habiller": "Booster a personalizar",
+  "Sachet d’origine": "Sobre original",
+  "L’habillage de ton booster premium.": "El aspecto de tu booster prémium.",
+  "L’habillage de ton booster standard. Ton adversaire le voit au Pari des Boosters.": "El aspecto de tu booster estándar. Tu rival lo ve en la Apuesta de Boosters.",
+  "Les boosters de faction et des Alliances gardent leur sachet d’origine.": "Los boosters de facción y de las Alianzas conservan su sobre original.",
+  "Sur ton booster standard ou ton booster premium, au choix dans Profil › Personnaliser (les boosters de faction et des Alliances gardent le leur)": "En tu booster estándar o prémium, a elegir en Perfil › Personalizar (los boosters de facción y de las Alianzas conservan el suyo)",
+  "Au Pari des Boosters, ton adversaire voit le sachet de ton booster standard.": "En la Apuesta de Boosters, tu rival ve el sobre de tu booster estándar.",
   "J’ai encore faim.": "Todavía tengo hambre.",
   "Que tout gèle.": "Que todo se congele.",
   "Lequel de mes visages ?": "¿Cuál de mis rostros?",
@@ -1376,8 +1383,8 @@ export default {
   "Booster des Ombres": "Sobre de las Sombras",
   "Booster inconnu": "Sobre desconocido",
   "Booster ouvert": "Sobre abierto",
-  "Booster premium": "Sobre prémium",
-  "Booster standard": "Sobre estándar",
+  "Booster premium": "Booster prémium",
+  "Booster standard": "Booster estándar",
   "Boosters ouverts": "Sobres abiertos",
   "Bouclier": "Escudo",
   "Bouclier : bloque le prochain coup.": "Escudo: bloquea el próximo golpe.",

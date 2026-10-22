@@ -42,7 +42,7 @@ export default function profile(app, root) {
 
   /* v483 : menu « Personnaliser » (remplace « Titres et cadres » et le bouton Personnaliser) : avatar, titres, cadres,
      dos de cartes, finitions de prestige, et plus tard sachets de booster et arènes */
-  let cs = null, csTab = null;
+  let cs = null, csTab = null, csSlot = 'standard'; /* v587 : booster habillé (standard ou premium) */
   function customHTML() {
     const s = g.s, av = g.shownAvatar() && cat.get(g.shownAvatar()); /* v545 : le portrait que voient les autres joueurs */
     const allF = Object.entries({ ...FRAMES, ...CODEX_FRAMES }).filter(([k]) => s.frames.includes(k) || U.frames.some((f) => f.key === k));
@@ -85,8 +85,10 @@ export default function profile(app, root) {
       const pl = [[null, 'Aucune plaque'], ...(s.plates || []).map((k) => [k, PLATES[k] || k])];
       body = `<p class="small muted">La bannière derrière ton pseudo : sur ton profil, aux classements et chez tes adversaires en ligne.</p><div class="cs-plates">${pl.map(([k, n]) => `<button class="cs-plate" data-cs="plate" data-v="${k || ''}" aria-pressed="${(s.plate || null) === k}"><span class="np ${k ? `np-${k}` : 'np-none'}">${esc(shownName)}</span><small>${esc(n)}</small></button>`).join('')}</div>${g.codexOn() ? '<p class="small muted">D’autres plaques à l’Échoppe.</p>' : ''}`;
     } else if (csTab === 'sachets') {
-      const sa = [[null, 'Sachets d’origine', 'standard2'], ...(s.sachets || []).map((k) => [k, SACHETS[k] || k, k])];
-      body = `<p class="small muted">L’habillage de tes boosters standard, Alliances et premium (les boosters de faction gardent le leur). Ton adversaire le voit au Pari des Boosters.</p><div class="cs-sachets">${sa.map(([k, n, f]) => `<button class="cs-sachet" data-cs="sachet" data-v="${k || ''}" aria-pressed="${(s.sachet || null) === k}"><img alt="" src="assets/packs/${f}.webp"><small>${esc(n)}</small></button>`).join('')}</div>`;
+      const prem = csSlot === 'premium', cur = (prem ? s.sachetPrem : s.sachet) || null;
+      const sa = [[null, 'Sachet d’origine', prem ? 'premium' : 'standard2'], ...(s.sachets || []).map((k) => [k, SACHETS[k] || k, k])];
+      body = `<div class="seg cs-slot" role="radiogroup" aria-label="Booster à habiller">${[['standard', 'Booster standard'], ['premium', 'Booster premium']].map(([k, n]) => `<button class="seg-b" role="radio" aria-checked="${csSlot === k}" aria-pressed="${csSlot === k}" data-cs="slot" data-v="${k}">${n}</button>`).join('')}</div>
+        <p class="small muted">${prem ? 'L’habillage de ton booster premium.' : 'L’habillage de ton booster standard. Ton adversaire le voit au Pari des Boosters.'} Les boosters de faction et des Alliances gardent leur sachet d’origine.</p><div class="cs-sachets">${sa.map(([k, n, f]) => `<button class="cs-sachet" data-cs="sachet" data-v="${k || ''}" aria-pressed="${cur === k}"><img alt="" src="assets/packs/${f}.webp"><small>${esc(n)}</small></button>`).join('')}</div>`;
     } else if (csTab === 'backs') {
       body = `<p class="small muted">Le dos de toutes les cartes face cachée du jeu.</p><div class="pf-backs">${backs.map(([k, n, u]) => `<button class="pf-back" data-cs="cardback" data-v="${k || ''}" aria-pressed="${(s.back || null) === k}"><img alt="" src="${u}"><span class="small">${esc(n)}</span></button>`).join('')}</div>`;
     } else if (csTab === 'finishes') {
@@ -109,7 +111,8 @@ export default function profile(app, root) {
       if (k === 'title') g.setTitle(v);
       if (k === 'frame') g.setFrame(v);
       if (k === 'plate') g.setPlate(v || null);
-      if (k === 'sachet') { g.setSachet(v || null); app.applySettings?.(); }
+      if (k === 'slot') { csSlot = v === 'premium' ? 'premium' : 'standard'; app.sfx.tap?.(); paint(); return; }
+      if (k === 'sachet') { g.setSachet(v || null, csSlot); app.applySettings?.(); }
       if (k === 'cardback') { g.setBack(v || null); app.applySettings?.(); }
       if (k === 'fin') cs.fin = cs.fin === v ? null : v;
       if (k === 'dress') { try { g.setDress(v, g.s.dress?.[v] === cs.fin ? null : cs.fin); } catch (err) { toast(esc(err.message), { kind: 'error' }); } }

@@ -100,7 +100,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
     const it = lineup[p];
     const pk = packHTML(it.type, cat, { faction: it.faction, event: it.factions ? { factions: it.factions } : ev });
     const fp = q('.vd-pack.foe'), mp = q('.vd-pack.me');
-    fp.innerHTML = packHTML(it.type, cat, { faction: it.faction, event: it.factions ? { factions: it.factions } : ev, skin: skinOk(r.sachet) }); mp.innerHTML = pk; /* v565 : chacun son sachet */
+    fp.innerHTML = packHTML(it.type, cat, { faction: it.faction, event: it.factions ? { factions: it.factions } : ev, skin: it.type === 'standard' ? skinOk(r.sachet) : null }); mp.innerHTML = pk; /* v565 : chacun son sachet */
     q('.vd-step').textContent = lineup.length > 1 ? `${t('Booster')} ${p + 1} / ${lineup.length}` : '';
     [fp, mp].forEach((x) => { x.className = `vd-pack ${x === fp ? 'foe' : 'me'} in`; });
     q('.vd-mid').classList.add('show');

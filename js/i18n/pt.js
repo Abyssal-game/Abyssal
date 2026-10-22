@@ -1,5 +1,12 @@
 // Dictionnaire portugais du Brésil (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Booster à habiller": "Booster a personalizar",
+  "Sachet d’origine": "Pacote original",
+  "L’habillage de ton booster premium.": "A aparência do seu booster premium.",
+  "L’habillage de ton booster standard. Ton adversaire le voit au Pari des Boosters.": "A aparência do seu booster padrão. Seu adversário a vê na Aposta de Boosters.",
+  "Les boosters de faction et des Alliances gardent leur sachet d’origine.": "Os boosters de facção e das Alianças mantêm o pacote original.",
+  "Sur ton booster standard ou ton booster premium, au choix dans Profil › Personnaliser (les boosters de faction et des Alliances gardent le leur)": "No seu booster padrão ou premium, à escolha em Perfil › Personalizar (os boosters de facção e das Alianças mantêm o seu)",
+  "Au Pari des Boosters, ton adversaire voit le sachet de ton booster standard.": "Na Aposta de Boosters, seu adversário vê o pacote do seu booster padrão.",
   "J’ai encore faim.": "Ainda tenho fome.",
   "Que tout gèle.": "Que tudo congele.",
   "Lequel de mes visages ?": "Qual dos meus rostos?",
@@ -1376,8 +1383,8 @@ export default {
   "Booster des Ombres": "Pacote das Sombras",
   "Booster inconnu": "Pacote desconhecido",
   "Booster ouvert": "Pacote aberto",
-  "Booster premium": "Pacote premium",
-  "Booster standard": "Pacote padrão",
+  "Booster premium": "Booster premium",
+  "Booster standard": "Booster padrão",
   "Boosters ouverts": "Pacotes abertos",
   "Bouclier": "Escudo",
   "Bouclier : bloque le prochain coup.": "Escudo: bloqueia o próximo golpe.",

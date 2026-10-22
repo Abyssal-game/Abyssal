@@ -1,5 +1,12 @@
 // Dictionnaire allemand (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Booster à habiller": "Zu gestaltender Booster",
+  "Sachet d’origine": "Original-Tüte",
+  "L’habillage de ton booster premium.": "Das Aussehen deines Premium-Boosters.",
+  "L’habillage de ton booster standard. Ton adversaire le voit au Pari des Boosters.": "Das Aussehen deines Standard-Boosters. Dein Gegner sieht es bei der Booster-Wette.",
+  "Les boosters de faction et des Alliances gardent leur sachet d’origine.": "Fraktions- und Allianz-Booster behalten ihre Original-Tüte.",
+  "Sur ton booster standard ou ton booster premium, au choix dans Profil › Personnaliser (les boosters de faction et des Alliances gardent le leur)": "Auf deinem Standard- oder Premium-Booster, wählbar unter Profil › Anpassen (Fraktions- und Allianz-Booster behalten ihren)",
+  "Au Pari des Boosters, ton adversaire voit le sachet de ton booster standard.": "Bei der Booster-Wette sieht dein Gegner die Tüte deines Standard-Boosters.",
   "J’ai encore faim.": "Ich habe noch Hunger.",
   "Que tout gèle.": "Alles soll gefrieren.",
   "Lequel de mes visages ?": "Welches meiner Gesichter?",

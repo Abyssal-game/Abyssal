@@ -35,8 +35,10 @@ export function showEmote(k, side, name, sfx) {
   setTimeout(() => { el.classList.remove('on'); setTimeout(() => { el.remove(); if (live[side] === el) delete live[side]; }, 300); }, 2800);
 }
 // v565 : habillage des boosters choisi au Profil (posé par applySettings dans main.js, lu par packHTML)
-let packSkin = null;
-export const setPackSkin = (k) => { packSkin = okKey(k) && k.startsWith('sachet-') ? k : null; };
-export const getPackSkin = () => packSkin;
+/* v587 : un habillage par booster (standard ou premium) ; les boosters de faction, des Alliances et de l'Abysse gardent le leur */
+const packSkin = { standard: null, premium: null };
+const skinKey = (k) => (okKey(k) && k.startsWith('sachet-') ? k : null);
+export const setPackSkin = (std, prem) => { packSkin.standard = skinKey(std); packSkin.premium = skinKey(prem); };
+export const getPackSkin = (type) => packSkin[type] || null;
 export const skinOk = (k) => (okKey(k) && k.startsWith('sachet-') ? k : null); // sachet venu d'un autre joueur
 export const emoteLabel = (k) => t(EMOTES[k]?.text || '');

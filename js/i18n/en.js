@@ -1,5 +1,12 @@
 // Anglais (v506-v507) : texte français → traduction. Généré à partir des lots de traduction ; on peut corriger à la main.
 export default {
+  "Booster à habiller": "Booster to dress",
+  "Sachet d’origine": "Original pack",
+  "L’habillage de ton booster premium.": "The look of your premium booster.",
+  "L’habillage de ton booster standard. Ton adversaire le voit au Pari des Boosters.": "The look of your standard booster. Your opponent sees it in the Booster Wager.",
+  "Les boosters de faction et des Alliances gardent leur sachet d’origine.": "Faction and Alliance boosters keep their original pack.",
+  "Sur ton booster standard ou ton booster premium, au choix dans Profil › Personnaliser (les boosters de faction et des Alliances gardent le leur)": "On your standard or premium booster, your choice in Profile › Customize (faction and Alliance boosters keep their own)",
+  "Au Pari des Boosters, ton adversaire voit le sachet de ton booster standard.": "In the Booster Wager, your opponent sees your standard booster’s pack.",
   "J’ai encore faim.": "I’m still hungry.",
   "Que tout gèle.": "Let everything freeze.",
   "Lequel de mes visages ?": "Which of my faces?",
@@ -1376,7 +1383,7 @@ export default {
   "Booster des Ombres": "Shadow Booster",
   "Booster inconnu": "Unknown booster",
   "Booster ouvert": "Booster opened",
-  "Booster premium": "Premium Booster",
+  "Booster premium": "Premium booster",
   "Booster standard": "Standard booster",
   "Boosters ouverts": "Boosters opened",
   "Bouclier": "Shield",

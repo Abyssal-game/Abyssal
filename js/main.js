@@ -104,7 +104,7 @@ if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__abyssalProg =
 function applySettings() {
   const s = app.game.s.settings;
   setCardBack(app.game.s.back); /* v473 : dos de cartes choisi au Profil */
-  setPackSkin(app.game.s.sachet);
+  setPackSkin(app.game.s.sachet, app.game.s.sachetPrem);
   document.documentElement.classList.toggle('reduce-motion', s.motion === 'reduced');
   document.documentElement.classList.toggle('fx-light', s.quality === 'light');
   configureSound(s);

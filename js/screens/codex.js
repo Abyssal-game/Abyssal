@@ -211,9 +211,9 @@ export default function codexScreen(app, root) {
           <div class="cx-pvf-pick">${list.map((x, i) => `<button class="${i === pick % list.length ? 'on' : ''}" data-pv="pick" data-i="${i}" aria-label="${esc(x.name)}">${cardHTML(x, { dress: it.id })}</button>`).join('')}</div>` : ''}
           <p class="cx-pvf-note">Achetée une fois, la finition se pose sur autant de cartes que tu veux, depuis la fiche de chaque carte. Elle ne change rien à leurs valeurs.</p>`;
       }
-      if (it.kind === 'sachet') return `<p class="cx-pv-cap">Tes boosters standard, des Alliances et premium (ceux des factions gardent le leur)</p>
+      if (it.kind === 'sachet') return `<p class="cx-pv-cap">Sur ton booster standard ou ton booster premium, au choix dans Profil › Personnaliser (les boosters de faction et des Alliances gardent le leur)</p>
         <div class="cx-pv-packs">${['standard', 'premium'].map((t) => packHTML(t, null, { skin: it.id })).join('')}</div>
-        <p class="cx-pv-cap">Au Pari des Boosters, ton adversaire voit ton sachet.</p>`;
+        <p class="cx-pv-cap">Au Pari des Boosters, ton adversaire voit le sachet de ton booster standard.</p>`;
       if (it.kind === 'plate') return `<p class="cx-pv-cap">Sur ton profil</p>
         <div class="cx-pv-prof"><span class="avatar-big pf pf-${s.frame}">${avImg}</span><div><b><span class="np np-${it.id}">${esc(myName())}</span></b><span>${esc(s.title)}</span></div></div>
         <p class="cx-pv-cap">Au classement, vu par tous les joueurs</p>

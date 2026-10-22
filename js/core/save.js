@@ -147,6 +147,7 @@ export function migrate(raw) {
   if (gone.has(s.frame)) s.frame = 'base';
   if (gone.has(s.back)) s.back = null;
   if (gone.has(s.sachet)) s.sachet = null;
+  if (gone.has(s.sachetPrem)) s.sachetPrem = null;
   return s;
 }
 

@@ -1866,7 +1866,7 @@ export class Game {
     if (k) d[id] = k; else delete d[id];
     this.persist();
   }
-  setSachet(k) { if (!k || (this.s.sachets || []).includes(k)) { this.s.sachet = k || null; this.persist(); } } /* v565 : habillage des boosters, null = d'origine */
+  setSachet(k, slot = 'standard') { if (!k || (this.s.sachets || []).includes(k)) { this.s[slot === 'premium' ? 'sachetPrem' : 'sachet'] = k || null; this.persist(); } } /* v565 : habillage des boosters, null = d'origine ; v587 : un sachet pour le standard (s.sachet), un pour le premium (s.sachetPrem) */
   setPlate(k) { if (!k || (this.s.plates || []).includes(k)) { this.s.plate = k || null; this.persist(); } } /* v564 : plaque de pseudo, null = aucune */
   emotesOwned() { return [...FREE_EMOTES, ...(this.s.emotes || [])]; } /* v564 : réactions en ligne (les 4 premières sont à tous) */
   setBack(k) { if (!k || (this.s.backs || []).includes(k)) { this.s.back = k || null; this.persist(); } } /* v473 : null = dos par défaut */

@@ -1,5 +1,12 @@
 // Dictionnaire italien (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Booster à habiller": "Booster da personalizzare",
+  "Sachet d’origine": "Bustina originale",
+  "L’habillage de ton booster premium.": "L’aspetto del tuo booster premium.",
+  "L’habillage de ton booster standard. Ton adversaire le voit au Pari des Boosters.": "L’aspetto del tuo booster standard. Il tuo avversario lo vede nella Scommessa dei Booster.",
+  "Les boosters de faction et des Alliances gardent leur sachet d’origine.": "I booster di fazione e delle Alleanze mantengono la loro bustina originale.",
+  "Sur ton booster standard ou ton booster premium, au choix dans Profil › Personnaliser (les boosters de faction et des Alliances gardent le leur)": "Sul tuo booster standard o premium, a scelta in Profilo › Personalizza (i booster di fazione e delle Alleanze mantengono il loro)",
+  "Au Pari des Boosters, ton adversaire voit le sachet de ton booster standard.": "Nella Scommessa dei Booster, il tuo avversario vede la bustina del tuo booster standard.",
   "J’ai encore faim.": "Ho ancora fame.",
   "Que tout gèle.": "Che tutto geli.",
   "Lequel de mes visages ?": "Quale dei miei volti?",
@@ -1376,8 +1383,8 @@ export default {
   "Booster des Ombres": "Busta delle Ombre",
   "Booster inconnu": "Busta sconosciuta",
   "Booster ouvert": "Busta aperta",
-  "Booster premium": "Busta premium",
-  "Booster standard": "Busta standard",
+  "Booster premium": "Booster premium",
+  "Booster standard": "Booster standard",
   "Boosters ouverts": "Buste aperte",
   "Bouclier": "Scudo",
   "Bouclier : bloque le prochain coup.": "Scudo: blocca il prossimo colpo.",
