@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v616'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v617'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -61,24 +61,28 @@ export const FINAL_FLOOR = 100; // v394 : le fond de la Descente (pour l'instant
 // Chance (en %) qu'une carte tirée sorte dans chaque finition (×2 dans un booster premium).
 // v280 : plus fréquentes qu'avant (2,5 / 0,5 / 0,1) ; on peut aussi sublimer une carte avec des cendres (SUBLIME_ASH).
 // Par booster standard de 3 cartes : ~12 % d'une argentée, ~3,6 % d'une or, ~1,2 % d'une cosmique.
-export const VARIANT_RATES = { holo: 4, gold: 1.2, galaxy: 0.4 };
+export const VARIANT_RATES = { holo: 4, gold: 1.2, galaxy: 0.4, crystal: 0.15, prism: 0.05 }; /* v617 : Cristalline et Prismatique, les plus rares */
 // Sublimer : obtenir la finition suivante d'une carte qu'on possède déjà dans la finition précédente.
 // Coût = cendres de base de la rareté × ce facteur ; toujours plus que ce que la carte rapporte brûlée (burnFinish).
 export const SUBLIME_ASH = { holo: 10, gold: 25, galaxy: 60 }; /* v557 : ×2,5 (avant 4, 10, 24 : « ça ne coûte pas assez cher ») ; plus utilisé depuis v615 */
 /* v615 (décision du propriétaire) : Sublimer se paie en obsidiennes, prix = base de la finition × facteur de rareté, arrondi à 10 */
-export const SUBLIME_OBS = { holo: 30, gold: 80, galaxy: 200 };
+export const SUBLIME_OBS = { holo: 30, gold: 80, galaxy: 200, crystal: 350, prism: 500 };
 export const SUBLIME_OBS_RAR = { C: 1, PC: 1.25, R: 1.5, HR: 2, M: 3, S: 4 };
 export const sublimeObs = (rarity, to) => Math.round((SUBLIME_OBS[to] || 0) * (SUBLIME_OBS_RAR[rarity] || 1) / 10) * 10;
 // Anciennes variantes retirées : les exemplaires possédés deviennent la variante indiquée.
 export const OLD_VARIANTS = { chroma: 'holo', corrupt: 'holo', alt: 'holo', ancestral: 'gold', special: 'normal' };
 // Ordre d'affichage par défaut : la finition la plus rare possédée
-export const SHOW_ORDER = ['galaxy', 'gold', 'holo', 'normal'];
+export const SHOW_ORDER = ['prism', 'crystal', 'galaxy', 'gold', 'holo', 'normal'];
+// v617 : ordre de rareté des finitions (de la plus commune à la plus rare)
+export const FIN_ORDER = ['normal', 'holo', 'gold', 'galaxy', 'crystal', 'prism'];
 
 export const VARIANTS = {
   normal:    { name: 'Normale',                  short: 'Normale' },
   holo:      { name: 'Argentée',                 short: 'Argentée' }, /* v417 : ex-Holographique (clé inchangée) */
   gold:      { name: 'Enluminée',                short: 'Enluminée' }, /* v415 : ex-Feuille d’or (clé inchangée) */
   galaxy:    { name: 'Abyssale',                 short: 'Abyssale' }, /* v415 : ex-Cosmique (clé inchangée) */
+  crystal:   { name: 'Cristalline',              short: 'Cristalline' }, /* v617 : éclats de glace prismatiques */
+  prism:     { name: 'Prismatique',              short: 'Prismatique' }, /* v617 : arc-en-ciel holographique */
 };
 
 // Événements hebdomadaires : rotation chaque lundi (heure locale).
@@ -96,7 +100,7 @@ export const ECONOMY = {
   discoveryShards: { C: 1, PC: 2, R: 3, HR: 7, M: 12, S: 25 },
   // Fournaise : cendres rendues par un exemplaire brûlé (rareté × finition)
   burnAsh: { C: 5, PC: 10, R: 25, HR: 60, M: 150, S: 375 },
-  burnFinish: { normal: 1, holo: 3, gold: 8, galaxy: 20 },
+  burnFinish: { normal: 1, holo: 3, gold: 8, galaxy: 20, crystal: 40, prism: 80 },
   // Niveau des créatures : passer du niveau n à n+1 coûte levelAsh × n cendres (niveau 10 au plus)
   levelAsh: { C: 10, PC: 15, R: 25, HR: 40, M: 60, S: 80 },
   craftAsh: { C: 40, PC: 100, R: 250, HR: 600, M: 1600 }, // invocation retirée : sert seulement à rembourser les cartes retirées du jeu

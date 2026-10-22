@@ -14,7 +14,7 @@ import { RARITY_ORDER, FACTION_ORDER } from '../config.js';
 import { withPlate } from '../ui/vitrine.js'; /* v564 */
 
 let cache = null; // dernière liste reçue (pour afficher la fiche sans attendre)
-const VBEST = ['galaxy', 'gold', 'holo', 'normal'];
+const VBEST = ['prism', 'crystal', 'galaxy', 'gold', 'holo', 'normal'];
 const GAMES = [['sceaux', 'Duels des Sceaux'], ['pacte', 'Le Pacte'], ['cryptes', 'Les Cryptes'], ['encheres', 'Les Enchères']];
 
 export default function friends(app, root, params = []) {

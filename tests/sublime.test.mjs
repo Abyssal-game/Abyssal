@@ -9,12 +9,12 @@ const catalog = loadCatalog();
 const newGame = () => { const g = noWelcome(new Game(catalog, new MemoryStorage(), { rng: rngFrom('sub'), clock: () => new Date(2026, 9, 12, 12) })); g.s.settings.dev = true; g.s.devCodex = true; return g; };
 const pick = (r, v) => catalog.cards.find((c) => c.rarity === r && c.variants.includes(v));
 
-test('chaîne normale → argentée → enluminée → abyssale, payée en obsidiennes', () => {
+test('chaîne normale → argentée → enluminée → abyssale → cristalline → prismatique, payée en obsidiennes', () => {
   const g = newGame(), c = pick('M', 'gold');
   assert.equal(g.sublimeInfo(c.id), null, 'carte non possédée');
   g.addCard(c.id, 'normal', 'reward');
   g.s.obs = 1e6; const ash = g.s.ash;
-  for (const v of ['holo', 'gold', 'galaxy']) {
+  for (const v of ['holo', 'gold', 'galaxy', 'crystal', 'prism']) {
     const x = g.sublimeInfo(c.id);
     assert.equal(x.to, v);
     assert.equal(x.cost, sublimeObs('M', v));
@@ -37,7 +37,7 @@ test('pas assez d’obsidiennes : refusé sans rien changer', () => {
 });
 
 test('prix croissants avec la rareté et la finition', () => {
-  const R = ['C', 'PC', 'R', 'HR', 'M', 'S'], V = ['holo', 'gold', 'galaxy'];
+  const R = ['C', 'PC', 'R', 'HR', 'M', 'S'], V = ['holo', 'gold', 'galaxy', 'crystal', 'prism'];
   for (const v of V) for (let i = 1; i < R.length; i++) assert.ok(sublimeObs(R[i], v) > sublimeObs(R[i - 1], v));
   for (const r of R) for (let i = 1; i < V.length; i++) assert.ok(sublimeObs(r, V[i]) > sublimeObs(r, V[i - 1]));
 });

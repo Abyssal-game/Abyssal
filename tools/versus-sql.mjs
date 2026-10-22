@@ -9,12 +9,14 @@ const cards = [];
 for (const f of fs.readdirSync(new URL('data/cards/', root)).filter((x) => x.endsWith('.json')).sort()) {
   for (const c of JSON.parse(fs.readFileSync(new URL(`data/cards/${f}`, root)))) cards.push(c);
 }
+/* v617 : le serveur du Pari garde les 3 finitions d'origine (pas de SQL à recoller) */
+const SRV_RATES = { holo: VARIANT_RATES.holo, gold: VARIANT_RATES.gold, galaxy: VARIANT_RATES.galaxy };
 const q = (s) => `'${String(s).replace(/'/g, "''")}'`;
-const rows = cards.map((c) => `(${q(c.id)},${q(c.rarity)},${q(c.faction)},'{${c.variants.filter((v) => v in VARIANT_RATES).join(',')}}')`).join(',\n');
+const rows = cards.map((c) => `(${q(c.id)},${q(c.rarity)},${q(c.faction)},'{${c.variants.filter((v) => v in SRV_RATES).join(',')}}')`).join(',\n');
 const used = [...new Set(VERSUS_TYPES.flatMap((t) => BOOSTERS[t].slots))];
 const poids = used.map((t) => `    when ${q(t)} then ${q(JSON.stringify(TABLES[t].weights))}::jsonb`).join('\n') + '\n    else null';
 const boosters = VERSUS_TYPES.map((t) => `    when ${q(t)} then slots := array[${BOOSTERS[t].slots.map(q).join(',')}]; mult := ${BOOSTERS[t].variantMult};`).join('\n');
-const fin = Object.entries(VARIANT_RATES).map(([v, p]) =>
+const fin = Object.entries(SRV_RATES).map(([v, p]) =>
   `    if v = 'normal' and ${q(v)} = any(c.variants) then if x >= 0 and x < ${p} * mult then v := ${q(v)}; end if; x := x - ${p} * mult; end if;`).join('\n');
 const pts = ['C', 'PC', 'R', 'HR', 'M', 'S'].map((r) => `when ${q(r)} then ${LUCK_POINTS[r]}`).join(' ') + ' else 0';
 const prix = VERSUS_TYPES.map((t) => `when ${q(t)} then ${BOOSTERS[t].price}`).join(' ');

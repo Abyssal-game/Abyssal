@@ -29,7 +29,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "serpent",
@@ -69,7 +71,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "fish",
@@ -109,7 +113,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "tentacle",
@@ -150,7 +156,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "insect",
@@ -189,7 +197,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "spectre",
@@ -229,7 +239,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "tentacle",
@@ -266,7 +278,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "fish",
@@ -307,7 +321,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "bird",
@@ -349,7 +365,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "hum",
@@ -393,7 +411,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "insect",
@@ -433,7 +453,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "swarm",
@@ -475,7 +497,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "beast",
@@ -513,7 +537,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "skeleton",
@@ -553,7 +579,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "hum",
@@ -596,7 +624,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "blob",
@@ -638,7 +668,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "bird",
@@ -678,7 +710,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "hum",
@@ -723,7 +757,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "fish",
@@ -764,7 +800,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "hum",
@@ -810,7 +848,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "beast",
@@ -848,7 +888,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "tentacle",
@@ -888,7 +930,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "fish",
@@ -927,7 +971,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "beast",
@@ -969,7 +1015,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "beast",
@@ -1012,7 +1060,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "spectre",
@@ -1054,7 +1104,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "hum",
@@ -1097,7 +1149,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "tree",
@@ -1141,7 +1195,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "hum",
@@ -1189,7 +1245,9 @@
   "variants": [
    "normal",
    "holo",
-   "galaxy"
+   "galaxy",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "serpent",
@@ -1233,7 +1291,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "tentacle",
@@ -1280,7 +1340,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "orb",
@@ -1323,7 +1385,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "hum",
@@ -1374,7 +1438,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "fish",
@@ -1419,7 +1485,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "beast",
@@ -1462,7 +1530,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "fish",
@@ -1504,7 +1574,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "serpent",
@@ -1549,7 +1621,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "fish",
@@ -1596,7 +1670,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "fish",
@@ -1645,7 +1721,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "tentacle",
@@ -1692,7 +1770,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "hum",
@@ -1739,7 +1819,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "fish",
@@ -1785,7 +1867,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "tentacle",
@@ -1830,7 +1914,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "fish",
@@ -1878,7 +1964,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "hum",
@@ -1930,7 +2018,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "serpent",
@@ -1979,7 +2069,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "serpent",
@@ -2026,7 +2118,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "tentacle",
@@ -2079,7 +2173,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "tentacle",
@@ -2126,7 +2222,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "tentacle",
@@ -2171,7 +2269,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "beast",
@@ -2214,7 +2314,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "fish",
@@ -2262,7 +2364,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "hum",
@@ -2313,7 +2417,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "tentacle",
@@ -2357,7 +2463,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "serpent",
@@ -2399,7 +2507,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "insect",
@@ -2439,7 +2549,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "serpent",
@@ -2480,7 +2592,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "beast",
@@ -2524,7 +2638,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "hum",
@@ -2570,7 +2686,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "hum",
@@ -2619,7 +2737,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "tentacle",
@@ -2662,7 +2782,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "serpent",
@@ -2706,7 +2828,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "fish",
@@ -2749,7 +2873,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "tentacle",
@@ -2791,7 +2917,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "fish",
@@ -2832,7 +2960,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "tentacle",
@@ -2876,7 +3006,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "tentacle",
@@ -2923,7 +3055,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "fish",
@@ -2970,7 +3104,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "fish",
@@ -3013,7 +3149,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "insect",
@@ -3056,7 +3194,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "hum",
@@ -3105,7 +3245,9 @@
    "normal",
    "holo",
    "galaxy",
-   "gold"
+   "gold",
+   "crystal",
+   "prism"
   ],
   "art": {
    "form": "beast",

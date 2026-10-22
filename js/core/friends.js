@@ -2,7 +2,7 @@
 // collection (finitions et niveaux), succès, ensembles, statistiques. Lu par l'écran Amis (js/screens/friends.js).
 export const CARD_VERSION = 1;
 // finitions possédées d'une carte, en bits (normale, argentée, enluminée, abyssale)
-export const VARIANT_BITS = { normal: 1, holo: 2, gold: 4, galaxy: 8 };
+export const VARIANT_BITS = { normal: 1, holo: 2, gold: 4, galaxy: 8, crystal: 16, prism: 32 };
 
 export function friendCard(g) {
   const s = g.s, col = {};
@@ -48,7 +48,7 @@ export function cleanCard(d) {
   const col = {};
   if (d.col && typeof d.col === 'object') for (const [id, x] of Object.entries(d.col).slice(0, 3000)) {
     if (!key(id)) continue;
-    col[id] = Array.isArray(x) ? [int(x[0], 15), Math.max(1, int(x[1], 99))] : int(x, 15);
+    col[id] = Array.isArray(x) ? [int(x[0], 63), Math.max(1, int(x[1], 99))] : int(x, 63);
   }
   const st = d.st && typeof d.st === 'object' ? d.st : {}, gm = st.games && typeof st.games === 'object' ? st.games : {};
   const games = {};

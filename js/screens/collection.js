@@ -66,7 +66,7 @@ export default function collection(app, root, params) {
       if (st.show === 'missing' && e) return false;
       if (st.show === 'fav' && !g.isFav(c.id)) return false;
       if (st.show === 'new' && !(e && e.isNew)) return false;
-      if (st.show === 'var' && !(e && ['holo', 'gold', 'galaxy'].some((v) => e.v?.[v] > 0))) return false; // v348 : finitions possédées
+      if (st.show === 'var' && !(e && ['holo', 'gold', 'galaxy', 'crystal', 'prism'].some((v) => e.v?.[v] > 0))) return false; // v348 : finitions possédées
       if (q) {
         const known = g.nameKnown(c.id);
         const hay = norm(`${c.id} ${known ? `${c.name} ${c.title} ${tw(c.name)} ${tw(c.title)}` : ''} ${e ? `${c.category} ${tw(c.category)}` : ''}`);
@@ -88,7 +88,7 @@ export default function collection(app, root, params) {
 
   function bestVariant(e) {
     if (e.show && e.v[e.show] > 0) return e.show;
-    for (const v of ['galaxy', 'gold', 'holo']) if (e.v[v]) return v;
+    for (const v of ['prism', 'crystal', 'galaxy', 'gold', 'holo']) if (e.v[v]) return v;
     return 'normal';
   }
 

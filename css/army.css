@@ -5858,3 +5858,9 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
     linear-gradient(var(--c), var(--c)) 0 100% / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 0 100% / var(--w) var(--l),
     linear-gradient(var(--c), var(--c)) 100% 100% / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 100% 100% / var(--w) var(--l);
   background-repeat: no-repeat; }
+
+/* v617 : bandeau d'ouverture et liserés des finitions Cristalline et Prismatique ; Abyssale aux couleurs de sa nacre */
+.op-banner.op-variant.v-galaxy { background: linear-gradient(110deg, #E9DBFF, #9FFFF2 45%, #FFB8F0 75%, #E9DBFF); -webkit-background-clip: text; background-clip: text; }
+.op-banner.op-variant.v-crystal { background: linear-gradient(110deg, #FFFFFF, #BFE3FF 40%, #E6D2FF 70%, #FFFFFF); -webkit-background-clip: text; background-clip: text; }
+.op-banner.op-variant.v-prism { background: linear-gradient(110deg, #FF8FA8, #FFD37A 25%, #9CFFC8 50%, #8FE3FF 75%, #D2A8FF); -webkit-background-clip: text; background-clip: text; }
+.sh-c.v-crystal { border-color: #BFE3FF; } .sh-c.v-prism { border-color: #FF8FD8; }

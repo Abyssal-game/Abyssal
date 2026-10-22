@@ -12,7 +12,7 @@ import { withPlate } from '../ui/vitrine.js'; /* v564 : plaque de pseudo */
 export default function profile(app, root) {
   const g = app.game, cat = app.catalog;
 
-  const VORDER = ['galaxy', 'gold', 'holo'];
+  const VORDER = ['prism', 'crystal', 'galaxy', 'gold', 'holo'];
   function luckHTML() {
     const s = g.s, st = s.stats;
     if (!st.boosters) return '';

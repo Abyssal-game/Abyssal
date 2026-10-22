@@ -7,7 +7,7 @@ import { duelUnit } from '../core/duel.js';
 import { MAX_LEVEL } from '../core/army.js';
 import { unlockAt } from '../core/kits.js';
 
-const FIN_ORDER = ['normal', 'holo', 'gold', 'galaxy'];
+const FIN_ORDER = ['normal', 'holo', 'gold', 'galaxy', 'crystal', 'prism'];
 
 // Monte d'un niveau (bouton « Niveau suivant » des fiches)
 export function upgradeCard(app, id) {

@@ -365,3 +365,85 @@ html.reduce-motion .tcg.apex::before { animation: none; }
 .v-gold .tcg-vframe { background-image: url(../assets/variants/enluminee-frame2.webp); background-size: 100% 100%; }
 /* v448 : cadre Argentée refait de la même façon (calé sur le bord) ; l'Abyssale, déjà calée, garde son cadre */
 .v-holo .tcg-vframe { background-image: url(../assets/variants/argentee-frame2.webp); background-size: 100% 100%; }
+
+/* v617 (demande du propriétaire : « de nouvelles couleurs, comme du holographique, un filtre qui change la carte mais très joli ; pas de cadres ») :
+   l'Abyssale perd son cadre peint et son voile violet (la créature garde ses vraies couleurs) et devient une nacre des profondeurs ;
+   deux finitions plus rares, sans cadre peint : Cristalline (éclats de glace qui s'allument au doigt) et Prismatique (arc-en-ciel holographique).
+   Tout reste dans la carte (aucun calque plus grand qu'elle) ; dans les grilles, rien n'est animé. */
+
+/* Abyssale : nacre des abysses (violet, turquoise, magenta) qui glisse avec l'inclinaison */
+.v-galaxy { --frame: conic-gradient(from var(--ang, 0deg), #1A0B33, #7A3CFF, #2EE6D6, #120720, #FF4FD8, #3A1A7A, #1A0B33); box-shadow: 0 6px 18px rgba(0, 0, 0, .65), 0 0 22px rgba(120, 70, 255, .45), 0 0 34px rgba(46, 230, 214, .18); }
+.v-galaxy .tcg-frame { animation: spinFrame 9s linear infinite; }
+.v-galaxy .tcg-vframe { display: none !important; }
+.v-galaxy .tcg-art::before { display: none; }
+.v-galaxy .tcg-art img { filter: saturate(1.12) contrast(1.08) brightness(1.03); }
+.v-galaxy .tcg-art::after {
+  -webkit-mask: none; mask: none; mix-blend-mode: screen; opacity: .85;
+  background:
+    radial-gradient(circle, rgba(140, 255, 240, .9) 0 .7px, transparent 1.3px) 0 0 / 29px 29px,
+    radial-gradient(circle, rgba(210, 160, 255, .85) 0 .6px, transparent 1.2px) 13px 9px / 19px 19px,
+    radial-gradient(ellipse 80% 70% at 50% 45%, transparent 58%, rgba(60, 20, 140, .45) 100%);
+  animation: abyssMotes 16s linear infinite;
+}
+@keyframes abyssMotes { to { background-position: 0 -58px, 13px -29px, 0 0; } }
+.v-galaxy .tcg-shine {
+  background: linear-gradient(125deg, transparent 8%, rgba(122, 60, 255, .55) 22%, rgba(46, 230, 214, .55) 34%, rgba(255, 79, 216, .5) 46%, rgba(80, 120, 255, .5) 58%, rgba(46, 230, 214, .5) 70%, rgba(122, 60, 255, .55) 82%, transparent 94%);
+  background-size: 260% 260%; background-position: var(--mx) var(--my); mix-blend-mode: overlay; opacity: .75; animation: sweep 8s ease-in-out infinite;
+}
+.tiltable.v-galaxy .tcg-shine { opacity: calc(.6 + var(--tilt, 0) * .4); }
+.v-galaxy::after { animation: none; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .7), inset 0 0 0 2px rgba(150, 110, 255, .6), inset 0 0 22px rgba(46, 230, 214, .22); }
+.v-galaxy .tcg-nm { background: linear-gradient(100deg, #E9DBFF, #9FFFF2 40%, #FFB8F0 70%, #E9DBFF); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .9)); }
+.v-galaxy .tcg-vbadge { background: linear-gradient(110deg, #3A1A7A, #7A3CFF 40%, #2EE6D6 75%, #3A1A7A); color: #fff; }
+
+/* Cristalline : la carte prise dans la glace ; des facettes s'allument en couleurs quand on l'incline */
+.v-crystal { --frame: linear-gradient(135deg, #F4FBFF, #8DB6D6 18%, #FFFFFF 34%, #6E9CC4 52%, #E3F4FF 68%, #8DB6D6 84%, #F4FBFF); box-shadow: 0 6px 18px rgba(0, 0, 0, .55), 0 0 22px rgba(180, 225, 255, .45); }
+.v-crystal .tcg-art img { filter: saturate(1.08) contrast(1.08) brightness(1.06); }
+.v-crystal .tcg-art::after {
+  mix-blend-mode: color-dodge; opacity: .55;
+  background: linear-gradient(120deg, #FF9FD0, #FFE29A 16%, #A6FFCF 32%, #9AD8FF 48%, #C6A6FF 64%, #FF9FD0 80%, #FFE29A);
+  background-size: 300% 300%; background-position: var(--mx) var(--my);
+  -webkit-mask: url(../assets/variants/cristal-facettes.webp) 0 0 / 62% auto repeat; mask: url(../assets/variants/cristal-facettes.webp) 0 0 / 62% auto repeat;
+}
+.v-crystal .tcg-shine {
+  background: radial-gradient(circle at var(--mx) var(--my), rgba(255, 255, 255, .95), rgba(220, 240, 255, .35) 30%, transparent 55%);
+  -webkit-mask: url(../assets/variants/cristal-facettes.webp) 37% 21% / 48% auto repeat; mask: url(../assets/variants/cristal-facettes.webp) 37% 21% / 48% auto repeat;
+  mix-blend-mode: overlay; opacity: .9; animation: crystalGlint 6s ease-in-out infinite;
+}
+@keyframes crystalGlint { 0%, 100% { -webkit-mask-position: 37% 21%; mask-position: 37% 21%; } 50% { -webkit-mask-position: 41% 26%; mask-position: 41% 26%; } }
+.v-crystal::after { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .6), inset 0 0 0 2px rgba(220, 240, 255, .7), inset 0 0 26px rgba(170, 220, 255, .35); }
+.v-crystal .tcg-nm { background: linear-gradient(180deg, #FFFFFF, #CFEAFF 45%, #8DB6D6 70%, #F4FBFF); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .9)); }
+.v-crystal .tcg-vbadge { background: linear-gradient(110deg, #FFFFFF, #BFE3FF 40%, #E6D2FF 70%, #FFFFFF); color: #10202E; }
+
+/* Prismatique : arc-en-ciel holographique qui court sur toute la carte, paillettes, cadre irisé qui tourne */
+.v-prism { --frame: conic-gradient(from var(--ang, 0deg), #FF5A7A, #FFB347, #FFF27A, #6BFFB0, #5AD7FF, #8A7BFF, #FF6BE0, #FF5A7A); box-shadow: 0 6px 18px rgba(0, 0, 0, .55), 0 0 22px rgba(255, 140, 220, .35), 0 0 30px rgba(90, 215, 255, .3); }
+.v-prism .tcg-frame { animation: spinFrame 6s linear infinite; }
+.v-prism .tcg-art img { filter: saturate(1.15) contrast(1.06) brightness(1.05); }
+.v-prism .tcg-art::after {
+  mix-blend-mode: color-dodge; opacity: .5;
+  background: repeating-linear-gradient(115deg, #FF5A7A 0%, #FFB347 4%, #FFF27A 8%, #6BFFB0 12%, #5AD7FF 16%, #8A7BFF 20%, #FF6BE0 24%, #FF5A7A 28%);
+  background-size: 220% 220%; background-position: var(--mx) var(--my);
+}
+.v-prism .tcg-shine {
+  mix-blend-mode: screen; opacity: .8; animation: sparkle 3.2s ease-in-out infinite alternate;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='1' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 16 0 0 0 -11.4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23s)'/%3E%3C/svg%3E") 0 0 / 200px 200px,
+    radial-gradient(circle at var(--mx) var(--my), rgba(255, 255, 255, .45), transparent 45%);
+}
+.v-prism::after { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .6), inset 0 0 0 2px rgba(255, 255, 255, .55), inset 0 0 24px rgba(255, 160, 230, .25); }
+.v-prism .tcg-nm { background: linear-gradient(100deg, #FF8FA8, #FFD37A 25%, #9CFFC8 50%, #8FE3FF 75%, #D2A8FF); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .9)); }
+.v-prism .tcg-vbadge { background: linear-gradient(110deg, #FF8FA8, #FFD37A 25%, #9CFFC8 50%, #8FE3FF 75%, #D2A8FF); color: #1A1024; }
+
+/* grilles : effets figés, plus discrets */
+.tcg-mini.v-galaxy .tcg-frame, .tcg-mini.v-prism .tcg-frame { animation: none; }
+.tcg-mini.v-crystal .tcg-shine, .tcg-mini.v-prism .tcg-shine, .tcg-mini.v-galaxy .tcg-shine { opacity: .45; animation: none; }
+.tcg-mini.v-crystal .tcg-art::after, .tcg-mini.v-prism .tcg-art::after { display: block; opacity: .35; }
+@media (prefers-reduced-motion: reduce) { .v-galaxy .tcg-frame, .v-galaxy .tcg-art::after, .v-galaxy .tcg-shine, .v-prism .tcg-frame, .v-prism .tcg-shine, .v-crystal .tcg-shine { animation: none; } }
+/* v617 (réglage après essai) : Cristalline en vitraux de glace pastel lumineux (plus de traits sombres), Prismatique un peu moins couvrante */
+.v-crystal .tcg-art::after { mix-blend-mode: screen; opacity: .32; }
+.v-crystal .tcg-shine { mix-blend-mode: screen; opacity: .55; background: radial-gradient(circle at var(--mx) var(--my), rgba(255, 255, 255, .9), rgba(200, 235, 255, .45) 28%, rgba(200, 235, 255, .12) 55%, transparent 75%); }
+.tiltable.v-crystal .tcg-shine { opacity: calc(.4 + var(--tilt, 0) * .45); }
+.v-prism .tcg-art::after { opacity: .36; }
+.tiltable.v-prism .tcg-art::after { opacity: calc(.28 + var(--tilt, 0) * .18); }
+.v-crystal .tcg-art img { filter: saturate(.92) contrast(1.1) brightness(1.08); }
+.v-crystal .tcg-art::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(170deg, #EAF8FF, #9CCBEA 55%, #5E8FB8); mix-blend-mode: soft-light; opacity: .55; }
+.v-crystal .tcg-art::after { opacity: .55; z-index: 2; }
+.tcg-mini.v-crystal .tcg-art::after { opacity: .45; }

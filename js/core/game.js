@@ -10,7 +10,7 @@ export const CHALLENGES = [
 export const WEEK_DAYS = 5; // jours joués dans la semaine pour le coffre de la semaine
 export const FIRST_WIN = 50;
 export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par combat n'augmentent plus // éclats de la toute première victoire
-import { FINAL_FLOOR, BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, sublimeObs, VARIANTS } from '../config.js';
+import { FINAL_FLOOR, BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, sublimeObs, VARIANTS, FIN_ORDER } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
 import { CODEX, CODEX_XP, SHOP, CATALOG, FREE_EMOTES, codexTier, seasonFor, tiersOf, freshCodex, pendingOf } from './codex.js';
@@ -492,7 +492,7 @@ export class Game {
   sublimeInfo(id) {
     const card = this.catalog.get(id), e = this.s.collection[id];
     if (!card || !e) return null;
-    const order = ['normal', ...['holo', 'gold', 'galaxy'].filter((v) => card.variants.includes(v))];
+    const order = FIN_ORDER.filter((v) => v === 'normal' || card.variants.includes(v));
     const to = order.find((v, i) => i > 0 && !e.v[v] && e.v[order[i - 1]]);
     if (!to) return null;
     return { to, from: order[order.indexOf(to) - 1], cost: sublimeObs(card.rarity, to) }; /* v615 : en obsidiennes */

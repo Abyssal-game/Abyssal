@@ -40,7 +40,7 @@ export function buildLot(lot, factions = Object.fromEntries(FACTION_ORDER.map((f
       z: z.z, card: {
         id, number: n, name: z.name, title: z.title, faction: z.faction, rarity: z.rarity, category: z.category,
         power: tpl.power, role: tpl.role, stats: { ...tpl.stats }, abilities, visual: z.visual, lore: z.lore, evolution: null, sets: [],
-        variants: ['normal', 'holo', 'galaxy', 'gold'], art: { ...tpl.art }, image: `assets/art/${id}.webp`,
+        variants: ['normal', 'holo', 'galaxy', 'gold', 'crystal', 'prism'], art: { ...tpl.art }, image: `assets/art/${id}.webp`,
         artPrompt: `${z.name} — ${z.visual} Illustration de carte de jeu dark fantasy, ${style[z.faction]}, particules magiques en suspension, ${TAIL[z.rarity]}, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo.`,
       },
     });

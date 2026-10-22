@@ -98,7 +98,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     const idx = list ? list.indexOf(current) : -1;
     const nav = list && list.length > 1 ? `<div class="detail-nav"><button class="icon-btn" data-act="prev" aria-label="Carte précédente" ${idx <= 0 ? 'disabled' : ''}>${icon('prev')}</button><span class="small muted">${idx + 1} / ${list.length}</span><button class="icon-btn" data-act="next" aria-label="Carte suivante" ${idx >= list.length - 1 ? 'disabled' : ''}>${icon('next')}</button></div>` : '';
 
-    const variantsRow = owned ? `<div class="variant-row" role="group" aria-label="Variantes">${['normal', 'holo', 'gold', 'galaxy'].filter((v) => card.variants.includes(v)).map((v) => { // v288 : ordre de rareté
+    const variantsRow = owned ? `<div class="variant-row" role="group" aria-label="Variantes">${['normal', 'holo', 'gold', 'galaxy', 'crystal', 'prism'].filter((v) => card.variants.includes(v)).map((v) => { // v288 : ordre de rareté
       const has = ownedVariants.includes(v);
       return `<button class="chip" data-act="variant" data-v="${v}" aria-pressed="${v === shownVariant}" ${has ? '' : 'disabled'} title="${has ? 'Afficher' : 'Pas encore obtenue'}">${has ? '' : icon('lock')}${VARIANTS[v].short}${has && e.v[v] > 1 ? ` ×${e.v[v]}` : ''}</button>`;
     }).join('')}</div>${ownedVariants.length > 1 ? (g.shownVariant(current) === shownVariant
@@ -125,9 +125,9 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
           ${line ? `<h3 class="section-title">${esc(line.name)}</h3><div class="strip">${line.cards.map((c) => cardHTML(c, { mystery: !g.owns(c.id), nameKnown: g.nameKnown(c.id) })).join('')}</div><p class="small muted">Stade ${card.evolution.stage} sur ${card.evolution.stages}.</p>` : ''}
           ${sets.length ? `<h3 class="section-title">Ensembles</h3><div class="stack">${sets.map((s) => { const p = g.setProgress(s.key); return `<a class="set-link panel" href="#/succes/ensembles"><b class="set-h">${setIcon(s.key)}<span>${esc(s.name)}</span></b><span class="small muted">${p.owned} / ${p.total}${p.done ? ' · complété' : ''}</span><span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span></a>`; }).join('')}</div>` : ''}`,
         rarity: `<p>${odds(card)}</p><p class="small muted">Chance de la trouver dans une version spéciale, par booster standard :</p><div class="var-odds">${variantOdds(card)}</div>
-          <p class="small muted">Toutes cartes confondues, environ un booster standard sur ${anyOdds('holo')} contient une argentée, un sur ${anyOdds('gold')} une enluminée et un sur ${anyOdds('galaxy')} une abyssale (deux fois plus souvent dans un premium).</p>
+          <p class="small muted">Toutes cartes confondues, environ un booster standard sur ${anyOdds('holo')} contient une argentée, un sur ${anyOdds('gold')} une enluminée, un sur ${anyOdds('galaxy')} une abyssale, un sur ${anyOdds('crystal')} une cristalline et un sur ${anyOdds('prism')} une prismatique (deux fois plus souvent dans un premium).</p>
           ${sublimeHTML()}
-          <p class="small muted">Brûlée dans la Fournaise, une carte argentée vaut ×${ECONOMY.burnFinish.holo} cendres, enluminée ×${ECONOMY.burnFinish.gold}, abyssale ×${ECONOMY.burnFinish.galaxy}.</p>`,
+          <p class="small muted">Brûlée dans la Fournaise, une carte argentée vaut ×${ECONOMY.burnFinish.holo} cendres, enluminée ×${ECONOMY.burnFinish.gold}, abyssale ×${ECONOMY.burnFinish.galaxy}, cristalline ×${ECONOMY.burnFinish.crystal}, prismatique ×${ECONOMY.burnFinish.prism}.</p>`,
       };
       body = `
         <div class="dt-sum">
