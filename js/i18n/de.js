@@ -1,5 +1,10 @@
 // Dictionnaire allemand (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Sachet vivant du Spectre vert": "Lebendiges Päckchen des Grünen Gespensts",
+  "Sachet vivant de l’Automate": "Lebendiges Päckchen des Automaten",
+  "Sachet vivant des Ailes d’or": "Lebendiges Päckchen der Goldenen Schwingen",
+  "Sachet vivant des Cornes ardentes": "Lebendiges Päckchen der Glühenden Hörner",
+  "Sachet vivant de l’Empereur": "Lebendiges Päckchen des Kaisers",
   "Dos vivant des Ailes d’or": "Lebendige Rückseite der Goldenen Schwingen",
   "Dos vivant de la Main d’ombre": "Lebendige Rückseite der Schattenhand",
   "Dos vivant du Masque d’apparat": "Lebendige Rückseite der Prunkmaske",

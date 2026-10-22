@@ -1,5 +1,10 @@
 // Dictionnaire espagnol (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Sachet vivant du Spectre vert": "Sobre vivo del Espectro verde",
+  "Sachet vivant de l’Automate": "Sobre vivo del Autómata",
+  "Sachet vivant des Ailes d’or": "Sobre vivo de las Alas de oro",
+  "Sachet vivant des Cornes ardentes": "Sobre vivo de los Cuernos ardientes",
+  "Sachet vivant de l’Empereur": "Sobre vivo del Emperador",
   "Dos vivant des Ailes d’or": "Dorso vivo de las Alas de oro",
   "Dos vivant de la Main d’ombre": "Dorso vivo de la Mano de sombra",
   "Dos vivant du Masque d’apparat": "Dorso vivo de la Máscara de gala",

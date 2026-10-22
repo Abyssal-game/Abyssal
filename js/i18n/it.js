@@ -1,5 +1,10 @@
 // Dictionnaire italien (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Sachet vivant du Spectre vert": "Bustina vivente dello Spettro verde",
+  "Sachet vivant de l’Automate": "Bustina vivente dell’Automa",
+  "Sachet vivant des Ailes d’or": "Bustina vivente delle Ali d’oro",
+  "Sachet vivant des Cornes ardentes": "Bustina vivente delle Corna ardenti",
+  "Sachet vivant de l’Empereur": "Bustina vivente dell’Imperatore",
   "Dos vivant des Ailes d’or": "Dorso vivente delle Ali d’oro",
   "Dos vivant de la Main d’ombre": "Dorso vivente della Mano d’ombra",
   "Dos vivant du Masque d’apparat": "Dorso vivente della Maschera di gala",

@@ -1,5 +1,10 @@
 // Anglais (v506-v507) : texte français → traduction. Généré à partir des lots de traduction ; on peut corriger à la main.
 export default {
+  "Sachet vivant du Spectre vert": "Living Green Specter Pack",
+  "Sachet vivant de l’Automate": "Living Automaton Pack",
+  "Sachet vivant des Ailes d’or": "Living Golden Wings Pack",
+  "Sachet vivant des Cornes ardentes": "Living Burning Horns Pack",
+  "Sachet vivant de l’Empereur": "Living Emperor Pack",
   "Dos vivant des Ailes d’or": "Living Golden Wings Back",
   "Dos vivant de la Main d’ombre": "Living Shadow Hand Back",
   "Dos vivant du Masque d’apparat": "Living Ceremonial Mask Back",

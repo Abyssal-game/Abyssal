@@ -45,7 +45,8 @@ const SKINNED = ['standard', 'event', 'premium'], SKIN_TOP = { 'sachet-ames': 66
   'sachet-obsidienne': 72, 'sachet-grimoire': 71, 'sachet-braise': 71.5, 'sachet-givre': 69, 'sachet-lune-sang': 71, 'sachet-souverain': 75.5,
   'sachet-vif-abysse': 70.5, 'sachet-vif-spectre': 71, 'sachet-vif-eclipse': 71, /* v578 */ 'sachet-vif-phenix': 75, 'sachet-vif-kraken': 75, 'sachet-vif-tresor': 71,
   'sachet-vif-dragon': 69.7, 'sachet-vif-astrolabe': 67.3, 'sachet-vif-sang': 66, 'sachet-vif-givre-noir': 66, 'sachet-vif-ecrin': 65.6,
-  'sachet-vif-orage': 68.2, 'sachet-vif-foret': 67.5 }; /* v570 */
+  'sachet-vif-orage': 68.2, 'sachet-vif-foret': 67.5,
+  /* v579 */ 'sachet-vif-necro': 66.5, 'sachet-vif-automate': 73, 'sachet-vif-celeste': 73.5, 'sachet-vif-infernal': 73, 'sachet-vif-empereur': 72.5 }; /* v570 */
 export function packHTML(type, cat, { faction, event, skin = getPackSkin() } = {}) {
   const def = BOOSTERS[type] || { name: type === 'shadow' ? 'Booster des Ombres' : 'Booster' };
   let label = type === 'shadow' ? 'Ombres' : def.name.replace('Booster ', '');

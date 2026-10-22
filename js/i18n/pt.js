@@ -1,5 +1,10 @@
 // Dictionnaire portugais du Brésil (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Sachet vivant du Spectre vert": "Pacote vivo do Espectro Verde",
+  "Sachet vivant de l’Automate": "Pacote vivo do Autômato",
+  "Sachet vivant des Ailes d’or": "Pacote vivo das Asas de Ouro",
+  "Sachet vivant des Cornes ardentes": "Pacote vivo dos Chifres Ardentes",
+  "Sachet vivant de l’Empereur": "Pacote vivo do Imperador",
   "Dos vivant des Ailes d’or": "Verso vivo das Asas de Ouro",
   "Dos vivant de la Main d’ombre": "Verso vivo da Mão Sombria",
   "Dos vivant du Masque d’apparat": "Verso vivo da Máscara de Gala",
