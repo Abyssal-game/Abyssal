@@ -78,8 +78,10 @@ export const enemyScale = (floor) => 1 + 0.06 * Math.min(19, floor - 1) + 0.03 *
 // FOE_EASE pour les combats ordinaires et les élites, BOSS_EASE pour les gardiens (multiplie PV et attaque).
 // v502 : premiers étages relevés (« zéro difficulté jusqu'à l'étage 6 » : 3 % de PV perdus par combat), la force
 // effective (enemyScale × FOE_EASE) monte doucement de 1,3 à l'étage 1 jusqu'au réglage précédent vers l'étage 12.
-export const FOE_EASE = [[1, 1.45], [2, 1.37], [3, 1.304], [4, 1.254], [6, 1.169], [8, 1.099], [9, 1.068], [12, 0.976], [20, 0.85], [30, 0.88], [60, 0.9], [85, 0.88], [100, 0.84]];
-export const BOSS_EASE = [[1, 1.15], [5, 1.15], [10, 0.85], [15, 1], [25, 1], [30, 0.9], [40, 1], [80, 1], [100, 0.82]];
+/* v598 : notes du propriétaire au Labo des combats (22 octobre 2026) : combats et élites +25 % de l'étage 14 à 20, puis
+   retour au réglage d'avant vers l'étage 52 ; étages 1-10 inchangés (pas de note). Gardiens : 5-25 inchangés, +25 % au 50, +10 % au 100. */
+export const FOE_EASE = [[1, 1.45], [2, 1.37], [3, 1.304], [4, 1.254], [6, 1.169], [8, 1.099], [9, 1.068], [10, 1.038], [11, 1.07], [12, 1.098], [13, 1.141], [14, 1.181], [15, 1.161], [16, 1.142], [17, 1.122], [18, 1.102], [19, 1.083], [20, 1.063], [21, 1.049], [22, 1.035], [23, 1.022], [24, 1.009], [25, 0.996], [26, 0.984], [27, 0.972], [28, 0.96], [29, 0.949], [30, 0.943], [34, 0.934], [38, 0.926], [42, 0.917], [46, 0.908], [52, 0.895], [60, 0.9], [85, 0.88], [100, 0.84]];
+export const BOSS_EASE = [[1, 1.15], [5, 1.15], [10, 0.85], [15, 1], [20, 1], [25, 1], [30, 0.945], [35, 1.045], [40, 1.15], [45, 1.2], [50, 1.25], [55, 1.235], [60, 1.22], [65, 1.205], [70, 1.19], [75, 1.175], [80, 1.16], [85, 1.093], [90, 1.028], [95, 0.964], [100, 0.902]];
 const ease = (pts, f) => {
   if (f <= pts[0][0]) return pts[0][1];
   for (let i = 1; i < pts.length; i++) if (f <= pts[i][0]) { const [a, x] = pts[i - 1], [b, y] = pts[i]; return x + (y - x) * (f - a) / (b - a); }
