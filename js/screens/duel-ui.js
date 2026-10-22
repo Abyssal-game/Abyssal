@@ -350,13 +350,13 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   // ——— Effets ———
   // v365 : secousse et caméra en animations directes sur le plateau (avant : une classe ajoutée sur tout le plateau,
   // donc tous les styles recalculés, et une mise en page forcée à chaque coup)
-  const SHAKE = { small: [220, [[-3, 1], [3, -1], [-1, 0]]], norm: [300, [[-5, 2], [5, -2], [-3, 1], [2, 0]]], big: [500, [[-9, 4, -0.4], [8, -4, 0.4], [-6, 3], [5, -2], [-3, 1]]] };
+  const SHAKE = { small: [220, [[-3, 1], [3, -1], [-1, 0]]], norm: [300, [[-5, 2], [5, -2], [-3, 1], [2, 0]]], big: [500, [[-9, 4], [8, -4], [-6, 3], [5, -2], [-3, 1]]] }; /* v597 : plus de rotation (Safari laissait un grand rectangle noir sur l'écran : tout le plateau était redessiné de travers) */
   let shakeA = null, camA = null;
   const shake = (big, small = false) => {
     if (reduced) return; const d = $('.dv'); if (!d?.animate) return;
     const [dur, pts] = SHAKE[big ? 'big' : small ? 'small' : 'norm'];
     shakeA?.cancel();
-    shakeA = d.animate([{ transform: 'none' }, ...pts.map(([x, y, r = 0]) => ({ transform: `translate(${x}px, ${y}px) rotate(${r}deg)` })), { transform: 'none' }], { duration: T(dur), easing: 'ease' });
+    shakeA = d.animate([{ transform: 'none' }, ...pts.map(([x, y]) => ({ transform: `translate(${x}px, ${y}px)` })), { transform: 'none' }], { duration: T(dur), easing: 'ease' });
   };
   // v346 : éclair d'impact — une lumière blanche et dorée jaillit du point touché
   const impactFlash = (uid, big) => { if (reduced || light) return; const t = el(uid), box = $('.dv'); if (!t || !box) return; const b = box.getBoundingClientRect(), r = t.getBoundingClientRect(); const f = document.createElement('span'); f.className = `dv-iflash ${big ? 'big' : ''} ${st.units[uid]?.side === 'ally' ? 'foe' : ''}`; f.style.cssText = `left:${r.left - b.left + r.width / 2}px;top:${r.top - b.top + r.height / 2}px`; box.appendChild(f); setTimeout(() => f.remove(), 420); };

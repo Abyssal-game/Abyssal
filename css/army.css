@@ -3033,7 +3033,7 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 .dv.shake.small { animation: dvShakeSmall .22s ease; }
 .dv.shake.big { animation: dvShakeBig .5s ease; }
 @keyframes dvShakeSmall { 25% { transform: translate(-3px, 1px); } 50% { transform: translate(3px, -1px); } 75% { transform: translate(-1px, 0); } }
-@keyframes dvShakeBig { 10% { transform: translate(-9px, 4px) rotate(-.4deg); } 25% { transform: translate(8px, -4px) rotate(.4deg); } 40% { transform: translate(-6px, 3px); } 55% { transform: translate(5px, -2px); } 70% { transform: translate(-3px, 1px); } 85% { transform: translate(2px, 0); } }
+@keyframes dvShakeBig { 10% { transform: translate(-9px, 4px); } 25% { transform: translate(8px, -4px); } 40% { transform: translate(-6px, 3px); } 55% { transform: translate(5px, -2px); } 70% { transform: translate(-3px, 1px); } 85% { transform: translate(2px, 0); } }
 /* 2. Coup de caméra plus franc : léger zoom vers la cible */
 @keyframes cbCam { 30% { translate: var(--cx, 0) var(--cy, 0); scale: 1.035; } 100% { translate: 0 0; scale: 1; } }
 /* 3. Éclair d'impact au point touché */
@@ -5743,3 +5743,5 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .lf-b input { width: 22px; height: 22px; flex: none; accent-color: #F2C14E; }
 .lf-acts { padding: 6px 0 10px; }
 .lf-try { display: flex; justify-content: flex-end; margin: -2px 0 8px; }
+/* v597 : grand rectangle noir sur l'iPhone après une grosse secousse (Assaut d'un gardien) : le plateau entier tourné d'un
+   demi-degré n'était pas redessiné à temps par Safari. Plus de rotation dans les secousses (js/screens/duel-ui.js, dvShakeBig). */
