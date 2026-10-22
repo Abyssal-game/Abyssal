@@ -112,7 +112,7 @@ export default function codexScreen(app, root) {
       : it.give.emotes ? `<span class="re-fan">${it.give.emotes.slice(0, 4).map((k) => `<span class="re-pic">${emotePic(k)}</span>`).join('')}</span>`
       : `<span class="cx-fan">${it.give.backs.slice(0, 4).map((b) => `<img alt="" src="assets/backs/${b}.webp">`).join('')}</span>`;
     const tile = (it) => { const own = g.catalogOwned(it.id), cost = g.catalogCost(it.id), r = rank(it);
-      return `<button class="cxs-t r-${r} ${it.kind} ${own ? 'own' : ''}" data-cx="see" data-id="${it.id}"><span class="cxs-pic">${pic(it)}</span><span class="cxs-rk">${RANK[r]}</span>${it.live ? '<span class="cxs-live">Vivant</span>' : ''}<b>${esc(name(it))}</b>
+      return `<button class="cxs-t r-${r} ${it.kind} ${own ? 'own' : ''}" data-cx="see" data-id="${it.id}"><span class="cxs-pic">${pic(it)}</span><span class="cxs-rk">${RANK[r]}</span><b>${esc(name(it))}</b>
         ${own ? `<span class="cxs-own">${icon('check')}Possédé</span>` : `<span class="cxs-pr ${cost <= have ? '' : 'short'}">${obsTxt(cost)}</span>`}</button>`; };
     const CATS = [['frame', 'Cadres'], ['plate', 'Plaques'], ['live', 'Dos vivants'], ['back', 'Dos'], ['sachet', 'Sachets'], ['emote', 'Réactions'], ['bundle', 'Lots'], ['obs', OBS.name]]; /* v569 : finitions retirées, dos vivants */
     const CATS2 = CATS.filter(([k]) => k !== 'back' || CATALOG.some((x) => x.kind === 'back' && !x.live)); /* v573 : plus de dos fixes à vendre */
