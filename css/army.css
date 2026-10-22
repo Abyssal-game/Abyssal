@@ -5575,3 +5575,15 @@ body.battle-mode .prog-chip { top: calc(var(--safe-t, env(safe-area-inset-top, 0
 .pf-cx-vif-soleil-noir { --fr: url(../assets/frames/cx-vif-soleil-noir-4.webp); }
 .pf-cx-vif-maree { --fr: url(../assets/frames/cx-vif-maree-4.webp); }
 .pf-cx-vif-rouages { --fr: url(../assets/frames/cx-vif-rouages-4.webp); }
+
+/* v584 : tous les cosmétiques sont vivants : les cadres gratuits (dessinés en CSS) reçoivent un reflet qui court le long
+   de l'anneau, les portraits des réactions aussi (rotation d'un pseudo-élément : peu coûteux) */
+.pf:not([class*="pf-cx-"]), .re-pic { position: relative; }
+.pf:not([class*="pf-cx-"])::after, .re-pic::after { content: ''; position: absolute; inset: 0; border-radius: 50%; z-index: 2; pointer-events: none;
+  background: conic-gradient(transparent 0deg 285deg, rgba(255, 244, 214, .9) 330deg, transparent 360deg);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3px)); mask: radial-gradient(farthest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3px));
+  animation: pfSweep 3.6s linear infinite; }
+.pf-oeil::after, .pf-abysse::after, .pf-abyssal::after, .pf-neant::after { background: conic-gradient(transparent 0deg 285deg, rgba(200, 150, 255, .95) 330deg, transparent 360deg); }
+.pf-infernal::after, .pf-braise::after, .pf-phenix::after, .pf-forge::after { background: conic-gradient(transparent 0deg 285deg, rgba(255, 170, 90, .95) 330deg, transparent 360deg); }
+@keyframes pfSweep { to { transform: rotate(1turn); } }
+html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: none; opacity: 0; }

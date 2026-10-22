@@ -70,16 +70,16 @@ test('échoppe : fermée hors Mode Créateur, achat simulé ensuite (une seule f
 
 test('obsidiennes : achats du catalogue, manque signalé, lot au prix réduit', () => {
   const g = mk();
-  g.s.settings.dev = true; g.s.devCodex = true; g.s.obs = 480; /* v583 : cx-yeux supprimé, cadre vivant à 420 */
+  g.s.settings.dev = true; g.s.devCodex = true; g.s.obs = 340; /* v584 : prix par rareté (cadre Épique 280) */
   g.catalogBuy('cx-vif-ames');
   assert.ok(g.s.frames.includes('cx-vif-ames')); assert.equal(g.obs(), 60);
   assert.throws(() => g.catalogBuy('cx-vif-ames'), /déjà/);
-  assert.throws(() => g.catalogBuy('dos-infernal'), /manque 140/); /* v573 : dos vivant à 200 */
+  assert.throws(() => g.catalogBuy('dos-infernal'), /manque 220/); /* v584 : dos Épique à 280 */
   g.s.obs = 300; g.catalogBuy('dos-infernal');
-  assert.equal(g.catalogCost('royaumes'), Math.round(1000 * 6 / 7));
+  assert.equal(g.catalogCost('royaumes'), Math.round(CATALOG.find((i) => i.id === 'royaumes').cost * 6 / 7));
   g.s.obs = 5000; g.catalogBuy('royaumes');
   assert.ok(g.catalogOwned('royaumes') && g.s.backs.length === 7);
-  assert.equal(g.obs(), 5000 - Math.round(1000 * 6 / 7));
+  assert.equal(g.obs(), 5000 - Math.round(CATALOG.find((i) => i.id === 'royaumes').cost * 6 / 7));
 });
 
 test('dos de cartes : seulement un dos possédé, retour au dos par défaut possible', () => {

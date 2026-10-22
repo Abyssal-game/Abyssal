@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """v565 : « dos vivant » : anime un dos de carte fixe (assets/backs/<clé>.webp, fait par back-art.py) en WebP animé qui boucle.
-Usage : python3 tools/back-anim.py <clé> <mode> [--sachet | --cadre]     modes : bougies (flammes qui vacillent + rubis qui pulse),
+Usage : python3 tools/back-anim.py <clé> <mode> [--sachet | --cadre | --plaque]     modes : bougies (flammes qui vacillent + rubis qui pulse),
         aurore (aurore qui ondule + étoile de givre qui scintille), coeur (lumière rouge qui bat, deux coups),
         reflet:<teinte> (v573 : reflet en biais + cœur qui s'allume, pour tout dos),
         lueur:<teinte>[:<source>] (v569 : les couleurs vives proches de la teinte, en degrés, s'allument et s'éteignent
@@ -14,7 +14,7 @@ from PIL import Image, ImageFilter
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 key, mode = sys.argv[1], sys.argv[2]
-DIR = 'packs' if '--sachet' in sys.argv else 'frames' if '--cadre' in sys.argv else 'backs'  # v582 : --cadre anime un cadre de profil (assets/frames/<clé>.webp, ex. cx-vif-brasier-4)  # v572 : --sachet anime un sachet de booster (assets/packs/<clé>.webp)
+DIR = 'packs' if '--sachet' in sys.argv else 'frames' if '--cadre' in sys.argv else 'plates' if '--plaque' in sys.argv else 'backs'  # v582 : --cadre anime un cadre de profil (assets/frames/<clé>.webp, ex. cx-vif-brasier-4)  # v572 : --sachet anime un sachet de booster (assets/packs/<clé>.webp)
 src = os.path.join(ROOT, f'assets/{DIR}', f'{key}.webp')
 fixe = os.path.join(ROOT, f'store/{DIR}', f'{key}-fixe.webp')
 parts = mode.split(':')
@@ -100,7 +100,7 @@ elif parts[0] == 'reflet':  # v573 : pour tout dos : un reflet passe en biais su
     dh = np.abs((hue - hue0 + 180) % 360 - 180)
     rr = np.hypot((xx / W - .5) / .5, (yy / H - .5) / .5)
     centre = np.exp(-(rr / .55) ** 2)
-    if '--cadre' in sys.argv: centre = np.ones_like(rr)  # v582 : un cadre n'a pas de cœur : tout l'anneau s'allume
+    if '--cadre' in sys.argv or '--plaque' in sys.argv: centre = np.ones_like(rr)  # v584 : plaque de pseudo, tout s'allume aussi  # v582 : un cadre n'a pas de cœur : tout l'anneau s'allume
     glow = ((sat > .3) & (mx > 60) & (dh < 30)).astype(np.float32) * np.clip(mx / 255, 0, 1) * (.25 + .75 * centre)
     mg, hg = blur(glow, 2), blur(glow, 18)
     col = (rgb * glow[..., None]).sum(axis=(0, 1)) / max(glow.sum(), 1)

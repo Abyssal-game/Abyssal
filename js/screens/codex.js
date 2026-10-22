@@ -48,7 +48,7 @@ export default function codexScreen(app, root) {
   const myAv = () => { const c = cat.get(g.shownAvatar()); return c ? `<img alt="" src="${artUrl(c, { lite: true })}">` : EMBLEM; };
   const opt = (src, cls = '') => `<img class="${cls}" alt="" src="${src}" onerror="this.remove()">`;
   /* rang d'un objet selon son prix (couleur de la tuile) */
-  const rank = (it) => { const c = it.cost || 0; return it.kind === 'bundle' ? 'leg' : c >= 450 ? 'myth' : c >= 250 ? 'leg' : c >= 180 ? 'epic' : 'rare'; };
+  const rank = (it) => { if (it.r) return it.r; /* v584 : rareté choisie selon la beauté */ const c = it.cost || 0; return it.kind === 'bundle' ? 'leg' : c >= 450 ? 'myth' : c >= 250 ? 'leg' : c >= 180 ? 'epic' : 'rare'; };
   const RANK = { rare: 'Rare', epic: 'Épique', leg: 'Légendaire', myth: 'Mythique' };
   // Une récompense du Codex en grand (visuel + libellé)
   const rwBig = (r) => {

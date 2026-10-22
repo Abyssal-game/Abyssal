@@ -155,27 +155,48 @@ export const ROYAUMES = ['dos-infernal', 'dos-abyssal', 'dos-celeste', 'dos-sauv
 export const REMOVED_COSM = ['cx-encre', 'cx-sang', 'cx-or', 'cx-abime', 'cx-givre', 'cx-braise', 'cx-serpents', 'cx-vitrail', 'cx-rouages', 'cx-racines', 'cx-yeux', 'cx-houx', 'cx-aurore', 'cx-roses', 'cx-prince', 'cx-leviathan', 'cx-seraphin', 'cx-liche', 'cx-ouroboros', 'cx-automate', 'cx-gueule', 'cx-horloger', 'cx-constellation', 'cx-sablier', 'cx-souverain', 'cx-guirlandes', 'cx-glace-noire', 'cx-loups-neige', 'cx-coeurs', 'cx-epines', 'cx-mandragore', 'cx-arbre-monde', 'cx-masques', 'cx-arlequin', 'cx-lune-pale', 'cx-jardin-lune', 'cx-lune-reine', 'cx-flammes', 'cx-solstice-feu', 'cx-marees', 'cx-corail', 'cx-profondeurs', 'cx-forge-titans', 'cx-enclume', 'cx-titan', 'cx-plumes', 'cx-epis', 'cx-faucheur', 'cx-anniversaire', 'cx-veilleuses', 'cx-reliquaire-ames', 'cx-cristaux-sang', 'dos-blizzard', 'dos-hiver', 'dos-mandragore', 'dos-racines', 'dos-bal', 'dos-lune-pale', 'dos-jardin', 'dos-phenix', 'dos-brasier', 'dos-marees', 'dos-leviathan', 'dos-forge-titans', 'dos-marteau', 'dos-moissons', 'dos-epouvantail', 'dos-anniversaire', 'dos-glas', 'dos-veillee', 'sachet-ames'];
 export const RETIRED_COSM = ['cx-fondateur', 'cx-os', 'cx-ruche', 'cx-lanternes', 'cx-voile', 'cx-eclipse', 'cx-balance', 'cx-geode', 'cx-pages', 'cx-corbeau', 'cx-carnaval', 'cx-phalenes',
   'fin-vitrail', 'fin-constellee', 'fin-ossuaire', 'fin-nacree', 'fin-runique', 'fin-scellee', 'fin-draconique', 'fin-feux-follets', 'fin-houx', 'fin-noel', 'fin-roses', 'fin-coeurs', 'fin-hiver'];
-export const CATALOG = [ 
-  { ...F('cx-vif-brasier', 450), live: true }, { ...F('cx-vif-givre', 420), live: true }, { ...F('cx-vif-abysse', 480), live: true }, { ...F('cx-vif-sang', 450), live: true }, { ...F('cx-vif-foudre', 450), live: true }, { ...F('cx-vif-ames', 420), live: true }, { ...F('cx-vif-etoiles', 480), live: true }, { ...F('cx-vif-soleil-noir', 600), live: true }, { ...F('cx-vif-maree', 450), live: true }, { ...F('cx-vif-rouages', 480), live: true }, /* v582 : cadres vivants */
-  
-    /* v573 : tous ces dos sont maintenant vivants (prix relevés) ; les versions fixes des jumeaux des dos-vif-… sont retirées de la vente */
-  B('dos-abime', 220), B('dos-horloger', 300), B('dos-miroirs', 300), B('dos-jumeaux', 300), B('dos-titan', 300),
-  B('dos-tarot', 300), B('dos-mosaique', 300), B('dos-encre', 300), B('dos-alchimie', 300), B('dos-carte-abysse', 300), B('dos-reliquaire', 380), B('dos-tapisserie', 300), B('dos-art-deco', 380), B('dos-vivant', 380), B('dos-vitrail', 300), ...ROYAUMES.map((k) => B(k, 200)),
-  /* v569 : finitions de cartes retirées de la vente (« pas beau, ça ne rend pas bien ») */ B('dos-phalene', 300),
-  BV('dos-vif-nebuleuse', 450), BV('dos-vif-abysse', 480), BV('dos-vif-devoreur', 450), BV('dos-vif-eclipse', 450), BV('dos-vif-lune-sang', 450), BV('dos-vif-coeur-mecanique', 480),
-  BV('dos-vif-forge', 450), BV('dos-vif-chandelles', 450), BV('dos-vif-orage', 480), BV('dos-vif-ame', 450), BV('dos-vif-oeil-or', 480), /* v572 */
-  BV('dos-vif-phenix', 480), BV('dos-vif-kraken', 480), BV('dos-vif-couronne', 580), BV('dos-vif-sablier', 450), BV('dos-vif-coeur-dragon', 500), BV('dos-vif-portail', 560), BV('dos-vif-destrier', 420), BV('dos-vif-hydre', 480), BV('dos-vif-orchidee', 420), BV('dos-vif-astrolabe', 480), BV('dos-vif-meduse', 420), BV('dos-vif-geode', 420), BV('dos-vif-corbeau', 420), BV('dos-vif-tresor', 600), BV('dos-vif-arbre', 450), /* v577 : 15 dos vivants de prestige */
-  BV('dos-vif-ailes', 500), BV('dos-vif-main-ombre', 420), BV('dos-vif-masque', 440), BV('dos-vif-perle', 420), BV('dos-vif-trone', 650), /* v578 */
-  SA('sachet-obsidienne', 150), SA('sachet-grimoire', 200), SA('sachet-braise', 220), SA('sachet-givre', 220), SA('sachet-lune-sang', 300), SA('sachet-souverain', 480),
-  { ...SA('sachet-vif-abysse', 380), live: true }, { ...SA('sachet-vif-spectre', 350), live: true }, { ...SA('sachet-vif-eclipse', 380), live: true }, /* v572 : sachets vivants */
-  { ...SA('sachet-vif-phenix', 400), live: true }, { ...SA('sachet-vif-kraken', 400), live: true }, { ...SA('sachet-vif-tresor', 480), live: true }, { ...SA('sachet-vif-dragon', 400), live: true }, { ...SA('sachet-vif-astrolabe', 350), live: true }, { ...SA('sachet-vif-sang', 400), live: true }, { ...SA('sachet-vif-givre-noir', 350), live: true }, { ...SA('sachet-vif-ecrin', 420), live: true }, { ...SA('sachet-vif-orage', 350), live: true }, { ...SA('sachet-vif-foret', 350), live: true }, /* v578 : sachets vivants de prestige */
-  { ...SA('sachet-vif-necro', 400), live: true }, { ...SA('sachet-vif-automate', 380), live: true }, { ...SA('sachet-vif-celeste', 420), live: true }, { ...SA('sachet-vif-infernal', 400), live: true }, { ...SA('sachet-vif-empereur', 580), live: true }, /* v579 */
-  PL('pl-obsidienne', 120), PL('pl-grimoire', 180), PL('pl-braise', 200), PL('pl-givre', 200), PL('pl-or-noir', 250), PL('pl-abysse', 280), PL('pl-souverain', 450),
-  PL('pl-pierre', 180), PL('pl-ossuaire', 200), PL('pl-nacre', 220), PL('pl-sang', 250), PL('pl-dragon', 250), PL('pl-eclipse', 250), /* v572 */
-  PL('pl-phenix', 260), PL('pl-kraken', 260), PL('pl-tresor', 420), PL('pl-cristal', 200), PL('pl-foudre', 220), PL('pl-foret', 200), PL('pl-automate', 220), PL('pl-empereur', 480), /* v580 */
-  ...PAID_EMOTES.map((k) => RE(k, 100)),
+/* v584 : l'Échoppe rangée (demande du propriétaire du 22 octobre 2026) : 20 objets par catégorie (cadres, dos, sachets,
+   plaques), une rareté selon la beauté de l'objet (les plus beaux sont les plus rares et les plus chers), un prix par rareté.
+   Les dos et sachets qui ne sont plus en vente vont dans PASS_RESERVE (gardés pour les saisons du Codex). Tout est vivant. */
+export const COSM_PRICE = { rare: 180, epic: 280, leg: 420, myth: 600 };
+export const COSM_RARITY = {
+  /* cadres (10 en vente ; 10 de plus attendus, prompts §257-266) */
+  'cx-vif-soleil-noir': 'myth', 'cx-vif-sang': 'leg', 'cx-vif-brasier': 'leg', 'cx-vif-givre': 'leg',
+  'cx-vif-ames': 'epic', 'cx-vif-abysse': 'epic', 'cx-vif-maree': 'epic', 'cx-vif-foudre': 'rare', 'cx-vif-etoiles': 'rare', 'cx-vif-rouages': 'rare',
+  /* dos */
+  'dos-vif-phenix': 'myth', 'dos-vif-ailes': 'myth', 'dos-vif-couronne': 'myth', 'dos-vif-kraken': 'myth', 'dos-vif-tresor': 'myth', 'dos-vif-portail': 'myth',
+  'dos-vif-nebuleuse': 'leg', 'dos-vitrail': 'leg', 'dos-vif-lune-sang': 'leg', 'dos-vif-trone': 'leg', 'dos-vif-eclipse': 'leg', 'dos-vif-meduse': 'leg', 'dos-vif-coeur-dragon': 'leg', 'dos-vif-corbeau': 'leg', 'dos-vif-abysse': 'leg', 'dos-vif-coeur-mecanique': 'leg',
+  'dos-vif-astrolabe': 'epic', 'dos-vif-orchidee': 'epic', 'dos-vif-sablier': 'epic', 'dos-vif-hydre': 'epic', 'dos-abyssal': 'epic', 'dos-infernal': 'epic', 'dos-vif-perle': 'epic', 'dos-vif-masque': 'epic', 'dos-mosaique': 'epic', 'dos-vif-destrier': 'epic', 'dos-vif-ame': 'epic', 'dos-vif-oeil-or': 'epic', 'dos-vif-main-ombre': 'epic', 'dos-vif-arbre': 'epic', 'dos-vif-geode': 'epic', 'dos-vif-devoreur': 'epic',
+  'dos-sauvage': 'rare', 'dos-necrotique': 'rare', 'dos-primordial': 'rare', 'dos-artificiel': 'rare', 'dos-celeste': 'rare', 'dos-phalene': 'rare', 'dos-art-deco': 'rare', 'dos-vif-chandelles': 'rare', 'dos-miroirs': 'rare', 'dos-reliquaire': 'rare', 'dos-horloger': 'rare', 'dos-abime': 'rare', 'dos-vif-orage': 'rare', 'dos-vif-forge': 'rare', 'dos-tarot': 'rare', 'dos-jumeaux': 'rare', 'dos-titan': 'rare', 'dos-encre': 'rare', 'dos-tapisserie': 'rare', 'dos-carte-abysse': 'rare', 'dos-vivant': 'rare', 'dos-alchimie': 'rare',
+  /* sachets */
+  'sachet-vif-dragon': 'myth', 'sachet-vif-eclipse': 'myth', 'sachet-vif-tresor': 'myth',
+  'sachet-vif-phenix': 'leg', 'sachet-vif-abysse': 'leg', 'sachet-vif-empereur': 'leg', 'sachet-vif-ecrin': 'leg',
+  'sachet-vif-sang': 'epic', 'sachet-vif-kraken': 'epic', 'sachet-vif-astrolabe': 'epic', 'sachet-vif-infernal': 'epic', 'sachet-vif-spectre': 'epic', 'sachet-souverain': 'epic',
+  'sachet-vif-celeste': 'rare', 'sachet-vif-givre-noir': 'rare', 'sachet-braise': 'rare', 'sachet-vif-orage': 'rare', 'sachet-lune-sang': 'rare', 'sachet-vif-necro': 'rare', 'sachet-vif-automate': 'rare',
+  'sachet-givre': 'rare', 'sachet-vif-foret': 'rare', 'sachet-grimoire': 'rare', 'sachet-obsidienne': 'rare',
+  /* plaques */
+  'pl-empereur': 'myth', 'pl-tresor': 'myth', 'pl-phenix': 'myth',
+  'pl-sang': 'leg', 'pl-kraken': 'leg', 'pl-cristal': 'leg', 'pl-automate': 'leg',
+  'pl-braise': 'epic', 'pl-givre': 'epic', 'pl-souverain': 'epic', 'pl-nacre': 'epic', 'pl-dragon': 'epic', 'pl-foret': 'epic',
+  'pl-eclipse': 'rare', 'pl-or-noir': 'rare', 'pl-ossuaire': 'rare', 'pl-abysse': 'rare', 'pl-foudre': 'rare', 'pl-grimoire': 'rare', 'pl-obsidienne': 'rare', 'pl-pierre': 'rare',
+};
+const SHOP_FRAMES = ['cx-vif-soleil-noir', 'cx-vif-sang', 'cx-vif-brasier', 'cx-vif-givre', 'cx-vif-ames', 'cx-vif-abysse', 'cx-vif-maree', 'cx-vif-foudre', 'cx-vif-etoiles', 'cx-vif-rouages'];
+const SHOP_BACKS = ['dos-vif-phenix', 'dos-vif-ailes', 'dos-vif-couronne', 'dos-vif-nebuleuse', 'dos-vitrail', 'dos-vif-lune-sang', 'dos-vif-trone',
+  'dos-vif-astrolabe', 'dos-vif-orchidee', 'dos-vif-sablier', 'dos-vif-hydre', 'dos-abyssal', 'dos-infernal',
+  'dos-sauvage', 'dos-necrotique', 'dos-primordial', 'dos-artificiel', 'dos-celeste', 'dos-phalene', 'dos-art-deco'];
+const SHOP_SACHETS = ['sachet-vif-dragon', 'sachet-vif-eclipse', 'sachet-vif-tresor', 'sachet-vif-phenix', 'sachet-vif-abysse', 'sachet-vif-empereur', 'sachet-vif-ecrin',
+  'sachet-vif-sang', 'sachet-vif-kraken', 'sachet-vif-astrolabe', 'sachet-vif-infernal', 'sachet-vif-spectre', 'sachet-souverain',
+  'sachet-vif-celeste', 'sachet-vif-givre-noir', 'sachet-braise', 'sachet-vif-orage', 'sachet-lune-sang', 'sachet-vif-necro', 'sachet-vif-automate'];
+const SHOP_PLATES = ['pl-empereur', 'pl-tresor', 'pl-phenix', 'pl-sang', 'pl-kraken', 'pl-cristal', 'pl-automate', 'pl-braise', 'pl-givre', 'pl-souverain', 'pl-nacre', 'pl-dragon', 'pl-foret',
+  'pl-eclipse', 'pl-or-noir', 'pl-ossuaire', 'pl-abysse', 'pl-foudre', 'pl-grimoire', 'pl-obsidienne'];
+/* gardés pour les saisons du Codex (plus en vente ; ceux qui les ont les gardent) */
+export const PASS_RESERVE = [...Object.keys(COSM_RARITY).filter((k) => /^(dos|sachet|pl)-/.test(k) && ![...SHOP_BACKS, ...SHOP_SACHETS, ...SHOP_PLATES].includes(k))];
+const RZ = (mk, k, extra) => ({ ...mk(k, COSM_PRICE[COSM_RARITY[k]]), r: COSM_RARITY[k], live: true, ...extra });
+export const CATALOG = [
+  ...SHOP_FRAMES.map((k) => RZ(F, k)), ...SHOP_BACKS.map((k) => RZ(B, k)), ...SHOP_SACHETS.map((k) => RZ(SA, k)), ...SHOP_PLATES.map((k) => RZ(PL, k)),
+  ...PAID_EMOTES.map((k) => ({ ...RE(k, 100), r: 'rare' })),
   { id: 'arbitres', kind: 'bundle', name: 'Le Cercle des arbitres', give: { emotes: PAID_EMOTES }, cost: 600, desc: 'Les huit réactions des arbitres d’un coup (800 à l’unité).' },
-  { id: 'royaumes', kind: 'bundle', name: 'Les sept royaumes', give: { backs: ROYAUMES }, cost: 1000, desc: 'Les sept dos vivants des royaumes d’un coup, moins cher qu’à l’unité.' },
+  { id: 'royaumes', kind: 'bundle', name: 'Les sept royaumes', give: { backs: ROYAUMES }, cost: Math.round(ROYAUMES.reduce((n, k) => n + COSM_PRICE[COSM_RARITY[k]], 0) * 0.8 / 10) * 10, desc: 'Les sept dos vivants des royaumes d’un coup, moins cher qu’à l’unité.' },
 ];
 // Exclusifs du Codex enluminé (jamais en vente). v547 : tous les cosmétiques de la voie enluminée (Saison I : l'hiver),
 // plus les anciens objets du Codex gardés pour une saison future (encre, sang, enluminé, Abîme, dos du Codex).

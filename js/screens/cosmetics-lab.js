@@ -2,7 +2,7 @@
 // les essayer en grand et les trier (garder, retirer, à revoir). Le tri reste sur l'appareil (localStorage) ;
 // « Copier mon tri » donne un texte à coller dans la conversation pour appliquer les choix dans le jeu.
 // Outil du propriétaire, en français seulement (translate="no").
-import { CODEX_FRAMES, CODEX_BACKS, FINISHES, CATALOG, SEASONS, SHOP, CODEX_ONLY, RETIRED_COSM, PLATES, EMOTES, SACHETS, LIVE_BACKS } from '../core/codex.js';
+import { CODEX_FRAMES, CODEX_BACKS, FINISHES, CATALOG, SEASONS, SHOP, CODEX_ONLY, RETIRED_COSM, PASS_RESERVE, COSM_RARITY, PLATES, EMOTES, SACHETS, LIVE_BACKS } from '../core/codex.js';
 import { FRAMES } from '../config.js';
 import { icon, EMBLEM } from '../ui/icons.js';
 import { esc, toast, openSheet, confirmBox } from '../ui/dom.js';
@@ -24,8 +24,10 @@ function origins() {
     const r = t.prem; if (!r) continue;
     for (const k of [r.frame, r.back, r.finish, r.sachet]) add(k, `Saison ${se.num} · ${se.name} · palier ${t.tier}${t.tier === 30 ? ' (ultime)' : ''}`, `s:${se.key}`);
   }
-  for (const it of CATALOG) for (const k of [it.give.frame, it.give.back, it.give.finish, it.give.plate, it.give.emote, it.give.sachet, ...(it.give.backs || [])]) add(k, it.kind === 'bundle' ? `Échoppe · lot « ${it.name} »` : `Échoppe · ${it.cost} obsidiennes`, 'shop');
+  for (const it of CATALOG) for (const k of [it.give.frame, it.give.back, it.give.finish, it.give.plate, it.give.emote, it.give.sachet, ...(it.give.backs || [])]) add(k, it.kind === 'bundle' ? `Échoppe · lot « ${it.name} »` : `Échoppe · ${it.cost} obsidiennes${it.r ? ` · ${({ rare: 'Rare', epic: 'Épique', leg: 'Légendaire', myth: 'Mythique' })[it.r]}` : ''}`, 'shop');
   for (const it of SHOP) for (const k of [it.give?.frame, it.give?.back, it.give?.sachet]) add(k, `Échoppe · ${it.name}`, 'shop');
+  const RN = { rare: 'Rare', epic: 'Épique', leg: 'Légendaire', myth: 'Mythique' };
+  for (const k of PASS_RESERVE) add(k, `Réserve des saisons du Codex · ${RN[COSM_RARITY[k]] || ''}`, 'none'); /* v584 */
   for (const k of RETIRED_COSM) add(k, 'Retiré · ton tri du 21 octobre 2026', 'none'); /* v562 */
   for (const k of CODEX_ONLY) add(k, 'Codex · aucune saison pour l’instant', 'none');
   return o;
