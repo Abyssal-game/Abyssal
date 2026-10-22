@@ -1171,6 +1171,7 @@ export default {
   "Téléchargement de la mise à jour : {0} / {1} fichiers…": "Descargando la actualización: {0} / {1} archivos…",
   "Mise à jour v{0} prête : elle s’installera au prochain lancement de l’app.": "Actualización v{0} lista: se instalará la próxima vez que abras la app.",
   "Ton jeu est à jour.": "Tu juego está al día.",
+  "Une nouvelle version demande de mettre à jour l’application sur le Play Store.": "Una nueva versión requiere actualizar la aplicación en Play Store.",
   "Une nouvelle version demande de mettre à jour l’application sur l’App Store.": "Una nueva versión requiere actualizar la aplicación en la App Store.",
   "Impossible de vérifier les mises à jour pour l’instant.": "No se pueden comprobar las actualizaciones por ahora.",
   "Mise à jour refusée : elle n’est pas signée.": "Actualización rechazada: no está firmada.",

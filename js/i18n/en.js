@@ -1171,6 +1171,7 @@ export default {
   "Téléchargement de la mise à jour : {0} / {1} fichiers…": "Downloading the update: {0} / {1} files…",
   "Mise à jour v{0} prête : elle s’installera au prochain lancement de l’app.": "Update v{0} ready: it will install the next time you launch the app.",
   "Ton jeu est à jour.": "Your game is up to date.",
+  "Une nouvelle version demande de mettre à jour l’application sur le Play Store.": "A new version requires updating the app on the Play Store.",
   "Une nouvelle version demande de mettre à jour l’application sur l’App Store.": "A new version requires updating the app on the App Store.",
   "Impossible de vérifier les mises à jour pour l’instant.": "Unable to check for updates right now.",
   "Mise à jour refusée : elle n’est pas signée.": "Update refused: it is not signed.",

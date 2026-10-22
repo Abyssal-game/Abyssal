@@ -7,18 +7,22 @@
 //    (WebView.setServerBasePath, mécanisme fourni par Capacitor). Si la nouvelle version démarre bien, elle est gardée
 //    (persistServerBasePath) ; si elle plante, le lancement suivant revient à l'ancienne et cette version est écartée.
 // 3. Quand l'application elle-même est mise à jour par l'App Store, Capacitor revient tout seul au jeu embarqué.
-// Seulement sur iPhone pour l'instant (Android : à faire avant sa sortie). Rien ne s'active dans un navigateur.
+// iPhone et, depuis v621, Android (le jeu embarqué y est recopié par le petit plugin natif LiveCopy,
+// android/app/src/main/java/com/abyssalgame/abyssal/LiveCopyPlugin.java). Rien ne s'active dans un navigateur.
 import { VERSION, LIVE_BASES, LIVE_NATIVE, LIVE_KEY } from './config.js';
 
 const KEY = 'abyssal.live';
-const LIB = 'LIBRARY_NO_CLOUD';
-const DIR = 'ionic_built_snapshots';
+const cap = () => (typeof window !== 'undefined' ? window.Capacitor : null);
+const isAndroid = () => cap()?.getPlatform?.() === 'android';
+/* iPhone : Capacitor ne garde un dossier que s'il est dans Library/NoCloud/ionic_built_snapshots ;
+   Android : n'importe quel dossier de l'application (files/live) */
+const LIB_ = () => (isAndroid() ? 'DATA' : 'LIBRARY_NO_CLOUD');
+const DIR_ = () => (isAndroid() ? 'live' : 'ionic_built_snapshots');
 const RESUME_MS = 20 * 60e3; // retour dans l'app après 20 min : on peut installer une version prête
 const CHECK_MS = 60 * 60e3; // au plus une recherche par heure (sauf demande depuis Réglages)
 
-const cap = () => (typeof window !== 'undefined' ? window.Capacitor : null);
 const plug = (n) => cap()?.Plugins?.[n] || cap()?.registerPlugin?.(n) || null;
-export const liveOn = () => !!cap()?.isNativePlatform?.() && cap()?.getPlatform?.() === 'ios';
+export const liveOn = () => !!cap()?.isNativePlatform?.() && ['ios', 'android'].includes(cap()?.getPlatform?.());
 const num = (v) => +String(v).replace(/\D/g, '') || 0;
 const RUNNING = num(VERSION);
 const later = (f, ms) => { const t = setTimeout(f, ms); t?.unref?.(); }; // unref : rien ne retient les tests sous Node
@@ -51,9 +55,9 @@ function b64(buf) {
   for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000));
   return btoa(s);
 }
-const snapPath = (v) => `${DIR}/v${v}`;
+const snapPath = (v) => `${DIR_()}/v${v}`;
 async function absPath(v) {
-  const { uri } = await plug('Filesystem').getUri({ directory: LIB, path: snapPath(v) });
+  const { uri } = await plug('Filesystem').getUri({ directory: LIB_(), path: snapPath(v) });
   return decodeURIComponent(String(uri).replace(/^file:\/\//, '')).replace(/\/$/, '');
 }
 async function basePath() { try { return (await plug('WebView').getServerBasePath()).path || ''; } catch (e) { return ''; } }
@@ -114,12 +118,17 @@ export async function liveCheck({ force = false } = {}) {
     if (st.ready === v) { setStatus({ state: 'ready', v }); return liveStatus(); }
     const own = await (await fetch('live.json', { cache: 'no-store' })).json();
     const FS = plug('Filesystem');
-    const target = snapPath(v);
-    try { await FS.rmdir({ directory: LIB, path: target, recursive: true }); } catch (e) { /* absent */ }
-    try { await FS.mkdir({ directory: LIB, path: DIR, recursive: true }); } catch (e) { /* déjà là */ }
+    const LIB = LIB_(), target = snapPath(v);
     const from = await basePath();
     if (!from) throw new Error('chemin du jeu inconnu');
-    await FS.copy({ from: 'file://' + encodeURI(from), to: target, toDirectory: LIB });
+    if (isAndroid()) {
+      /* le jeu embarqué (« public ») ou la version téléchargée en cours, recopié par le plugin natif */
+      await plug('LiveCopy').copy({ from, to: await absPath(v) });
+    } else {
+      try { await FS.rmdir({ directory: LIB, path: target, recursive: true }); } catch (e) { /* absent */ }
+      try { await FS.mkdir({ directory: LIB, path: DIR_(), recursive: true }); } catch (e) { /* déjà là */ }
+      await FS.copy({ from: 'file://' + encodeURI(from), to: target, toDirectory: LIB });
+    }
     const { get, drop } = liveDiff(own, m);
     setStatus({ state: 'downloading', v, done: 0, total: get.length });
     let done = 0, i = 0;
@@ -162,7 +171,7 @@ export async function initLive({ idle = () => true } = {}) {
   if (!liveOn()) return;
   const st = load();
   const here = await basePath();
-  const inSnap = here.includes(`/${DIR}/`);
+  const inSnap = here.includes(`/${DIR_()}/`);
   if (st.trying && st.trying !== RUNNING) {
     // la version essayée n'a pas tenu (plantage, ou retour au jeu embarqué) : on ne la reprend plus
     st.bad = [...new Set([...(st.bad || []), st.trying])].slice(-10); st.trying = null; save(st);
@@ -175,6 +184,7 @@ export async function initLive({ idle = () => true } = {}) {
         await plug('WebView').persistServerBasePath();
         const s = load(); s.trying = null; s.ok = RUNNING; save(s);
         const FS = plug('Filesystem');
+        const LIB = LIB_(), DIR = DIR_();
         const { files } = await FS.readdir({ directory: LIB, path: DIR });
         for (const f of files || []) { const n = typeof f === 'string' ? f : f.name; if (n !== `v${RUNNING}`) { try { await FS.rmdir({ directory: LIB, path: `${DIR}/${n}`, recursive: true }); } catch (e) { /* suivant */ } } }
       } catch (e) { /* on réessaiera au prochain lancement */ }

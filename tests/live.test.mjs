@@ -127,3 +127,32 @@ test('live : une version qui n’a pas tenu est écartée', async () => {
   const st = await L.liveCheck({ force: true });
   assert.equal(st.state, 'uptodate');
 });
+
+test('live : Android, le jeu embarqué est recopié par le plugin natif LiveCopy', async () => {
+  mem.clear(); disk.clear(); calls.length = 0;
+  const C = globalThis.window.Capacitor;
+  C.getPlatform = () => 'android';
+  const dirs = [];
+  const fsGetUri = FS.getUri;
+  FS.getUri = async (o) => { dirs.push(o.directory); return fsGetUri(o); };
+  C.Plugins.LiveCopy = { async copy({ from, to }) {
+    assert.equal(from, 'public', 'jeu embarqué (assets « public »)');
+    const rel = to.replace('/lib/NoCloud/', '');
+    for (const [f, c] of Object.entries(builtin)) disk.set(`${rel}/${f}`, Buffer.from(c));
+    return { path: to };
+  } };
+  WebView.getServerBasePath = async () => ({ path: 'public' });
+  try {
+    assert.ok(L.liveOn());
+    const text = JSON.stringify(listOf(remote, NEXT + 1));
+    served = { 'live.json': text, 'live.sig': liveSign(text, pem), 'index.html': 'accueil v2', 'js/b.js': 'nouveau' };
+    const st = await L.liveCheck({ force: true });
+    assert.equal(st.state, 'ready');
+    const dir = `live/v${NEXT + 1}`;
+    assert.equal(disk.get(`${dir}/js/b.js`).toString(), 'nouveau');
+    assert.equal(disk.get(`${dir}/js/a.js`).toString(), 'a1');
+    assert.ok(dirs.every((d) => d === 'DATA'), 'dossier de l’application sur Android');
+    await L.initLive();
+    assert.deepEqual(calls.at(-1), ['set', `/lib/NoCloud/${dir}`]);
+  } finally { C.getPlatform = () => 'ios'; delete C.Plugins.LiveCopy; FS.getUri = fsGetUri; }
+});

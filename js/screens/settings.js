@@ -27,7 +27,7 @@ function liveLine(st = liveStatus()) {
     case 'downloading': return `Téléchargement de la mise à jour : ${st.done} / ${st.total} fichiers…`;
     case 'ready': return `Mise à jour v${st.v} prête : elle s’installera au prochain lancement de l’app.`;
     case 'uptodate': return 'Ton jeu est à jour.';
-    case 'needApp': return 'Une nouvelle version demande de mettre à jour l’application sur l’App Store.';
+    case 'needApp': return window.Capacitor?.getPlatform?.() === 'android' ? 'Une nouvelle version demande de mettre à jour l’application sur le Play Store.' : 'Une nouvelle version demande de mettre à jour l’application sur l’App Store.';
     case 'offline': return 'Impossible de vérifier les mises à jour pour l’instant.';
     case 'unsigned': return 'Mise à jour refusée : elle n’est pas signée.';
     case 'error': return 'La mise à jour n’a pas pu se télécharger : nouvel essai plus tard.';
