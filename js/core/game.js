@@ -1402,34 +1402,39 @@ export class Game {
     if (key) this.s.stats.pacts = (this.s.stats.pacts || 0) + 1;
     return this.startBattle(room, { room, pact: key });
   }
+  // v595 : ennemis d'une salle de la Descente (même calcul pour le vrai combat et le banc d'essai du Labo)
+  foesFor(run, room, rule = this.rule(run.day)) {
+    const eff = room === 'boss' ? run.floor : Math.max(run.floor, run.minFloor || 1);
+    const sc = enemyScale(eff);
+    const lvl = enemyLevel(eff, room);
+    const list = floorEnemies(this.catalog, run.day, run.floor, room) /* v434 : plus d'événement de la semaine dans la Descente */;
+    const enemies = list.map((e) => duelUnit(this.catalog.get(e.id), { side: 'enemy', scale: sc, level: e.boss || e.elite ? lvl : enemyLevel(eff, 'fight'), boss: e.boss, elite: e.elite }));
+    for (const e of enemies) {
+      // combats ordinaires : des ennemis qui frappent plus fort, pour que chaque combat ait un enjeu
+      if (!e.boss && !e.elite) e.atk = Math.round(e.atk * FIGHT_ATK + 0.4);
+      const f = this.catalog.get(e.id)?.faction;
+      if (rule.key === 'furie' && f === rule.faction) e.atk = Math.round(e.atk * 1.25 + 0.4);
+      if (rule.key === 'sommeil' && f === rule.faction) { e.maxHp = Math.max(1, Math.round(e.maxHp * 0.75)); e.hp = e.maxHp; }
+      const nt = nightTier(run); if (nt) { e.maxHp = Math.round(e.maxHp * nt.hp); e.hp = e.maxHp; e.atk = Math.round(e.atk * nt.atk + 0.4); }
+      if (run.omen === 'avare') e.atk = Math.round(e.atk * 1.1 + 0.4);
+      { const k = (e.boss ? bossEase(run.floor) : lateSoft(run.floor)) * (run.nightmare || run.noGrit ? 1 : this.gritMult(chapterOf(run.start || 1))); if (k !== 1) { e.maxHp = Math.max(1, Math.round(e.maxHp * k)); e.hp = e.maxHp; e.atk = Math.max(1, Math.round(e.atk * k)); } if (!run.nightmare) { const h = earlyHp(run.floor, e.boss); if (h !== 1) { e.maxHp = Math.max(1, Math.round(e.maxHp * h)); e.hp = e.maxHp; } } } /* v460, v509 */
+      // Gardien éveillé (Cauchemar, ou à partir de l'étage 30) : sa phase 2 commence dès le premier tour
+      if (e.boss && (run.nightmare || run.floor >= AWAKEN_AT)) e.awakened = true;
+    }
+    // un ennemi nommé : plus coriace, il rapporte un butin en plus
+    if (!(this.novice() && run.floor < 4)) foeTraits(run.day, run.floor, room, enemies.length).forEach((t, i) => { if (t && !enemies[i].boss && !enemies[i].weekly) { enemies[i].trait = t; if (t === 'carapace') enemies[i].shield = 1; } });
+    if (rule.key === 'nuee') enemies.forEach((e) => { if (!e.boss && !e.elite && !e.weekly && !e.trait) e.trait = 'explosif'; });
+    const nm = namedFoe(run.day, run.floor, room), nf = nm && enemies.find((e) => !e.boss && !e.weekly);
+    if (nf) { nf.title = nm; nf.named = true; nf.maxHp = Math.round(nf.maxHp * 1.3); nf.hp = nf.maxHp; nf.atk = Math.round(nf.atk * 1.15 + 0.4); }
+    return enemies;
+  }
   startBattle(room, out = { room }) {
     const run = this.s.descent.run;
     const rule = this.rule(run.day);
     if (room === 'fight' || room === 'elite' || room === 'boss') {
       // les créatures du Bestiaire, corrompues ; l'état du duel est gardé dans l'expédition (reprise exacte)
       // plancher : ennemis ordinaires et élites au moins au niveau de l'étage équivalent à l'équipe (pas les gardiens)
-      const eff = room === 'boss' ? run.floor : Math.max(run.floor, run.minFloor || 1);
-      const sc = enemyScale(eff);
-      const lvl = enemyLevel(eff, room);
-      const list = floorEnemies(this.catalog, run.day, run.floor, room) /* v434 : plus d'événement de la semaine dans la Descente */;
-      const enemies = list.map((e) => duelUnit(this.catalog.get(e.id), { side: 'enemy', scale: sc, level: e.boss || e.elite ? lvl : enemyLevel(eff, 'fight'), boss: e.boss, elite: e.elite }));
-      for (const e of enemies) {
-        // combats ordinaires : des ennemis qui frappent plus fort, pour que chaque combat ait un enjeu
-        if (!e.boss && !e.elite) e.atk = Math.round(e.atk * FIGHT_ATK + 0.4);
-        const f = this.catalog.get(e.id)?.faction;
-        if (rule.key === 'furie' && f === rule.faction) e.atk = Math.round(e.atk * 1.25 + 0.4);
-        if (rule.key === 'sommeil' && f === rule.faction) { e.maxHp = Math.max(1, Math.round(e.maxHp * 0.75)); e.hp = e.maxHp; }
-        const nt = nightTier(run); if (nt) { e.maxHp = Math.round(e.maxHp * nt.hp); e.hp = e.maxHp; e.atk = Math.round(e.atk * nt.atk + 0.4); }
-        if (run.omen === 'avare') e.atk = Math.round(e.atk * 1.1 + 0.4);
-        { const k = (e.boss ? bossEase(run.floor) : lateSoft(run.floor)) * (run.nightmare ? 1 : this.gritMult(chapterOf(run.start || 1))); if (k !== 1) { e.maxHp = Math.max(1, Math.round(e.maxHp * k)); e.hp = e.maxHp; e.atk = Math.max(1, Math.round(e.atk * k)); } if (!run.nightmare) { const h = earlyHp(run.floor, e.boss); if (h !== 1) { e.maxHp = Math.max(1, Math.round(e.maxHp * h)); e.hp = e.maxHp; } } } /* v460, v509 */
-        // Gardien éveillé (Cauchemar, ou à partir de l'étage 30) : sa phase 2 commence dès le premier tour
-        if (e.boss && (run.nightmare || run.floor >= AWAKEN_AT)) e.awakened = true;
-      }
-      // un ennemi nommé : plus coriace, il rapporte un butin en plus
-      if (!(this.novice() && run.floor < 4)) foeTraits(run.day, run.floor, room, enemies.length).forEach((t, i) => { if (t && !enemies[i].boss && !enemies[i].weekly) { enemies[i].trait = t; if (t === 'carapace') enemies[i].shield = 1; } });
-      if (rule.key === 'nuee') enemies.forEach((e) => { if (!e.boss && !e.elite && !e.weekly && !e.trait) e.trait = 'explosif'; });
-      const nm = namedFoe(run.day, run.floor, room), nf = nm && enemies.find((e) => !e.boss && !e.weekly);
-      if (nf) { nf.title = nm; nf.named = true; nf.maxHp = Math.round(nf.maxHp * 1.3); nf.hp = nf.maxHp; nf.atk = Math.round(nf.atk * 1.15 + 0.4); }
+      const enemies = this.foesFor(run, room, rule); /* v595 : construction des ennemis partagée avec le banc d'essai du Mode Créateur */
       const known = {};
       enemies.forEach((e) => { if (this.knows(e.id)) known[e.id] = true; });
       run.battle = createDuel(this.runUnits(), enemies, { fervor: run.gauge || 0, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, boss: room === 'boss' ? bossOf(run.floor) : null, pact: room === 'fight' ? null : run.pact || null, relics: OMENS[run.omen]?.relic ? [OMENS[run.omen].relic] : [], blessings: run.blessings, discovered: this.s.weakSeen || {}, seed: this.seed('duel'), goal: this.goalFor(run, room), refPow: refPowFor(Math.max(run.floor, run.minFloor || 1)) });

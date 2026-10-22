@@ -38,6 +38,49 @@ const SPECIAL = ['heavy', 'blast', 'shield', 'heal', 'rally', 'hunt', 'charge', 
 // v383 : grosses attaques de zone des nouveaux gardiens (multiplicateur par créature) et actions préparées un tour à l'avance
 const AOE_M = { swarm: 0.6, lament: 0.7, price: 0.9 };
 const PREP = ['charge', 'channel', 'gather', 'mimic', 'brood', 'sentence', 'chant', 'wind', 'wish'];
+/* v596 : attaques inventées dans le Labo des combats (Mode Créateur). Elles ne servent que dans un combat d'essai du Labo
+   (st.labAtk) : jamais dans une vraie partie, jamais sur le serveur. Clés lab0, lab1… (et labp0… pour leur préparation). */
+const LAB_K = {};
+export function labKinds(defs = []) {
+  for (const k of Object.keys(LAB_K)) {
+    delete LAB_K[k]; delete INTENTS[k]; delete INTENTS[k.replace('lab', 'labp')]; delete AOE_M[k];
+    for (const L of [SINGLE, BIG, PREP]) for (const x of [k, k.replace('lab', 'labp')]) { const i = L.indexOf(x); if (i >= 0) L.splice(i, 1); }
+  }
+  defs.forEach((d, i) => {
+    const k = `lab${i}`, kp = `labp${i}`;
+    LAB_K[k] = d;
+    INTENTS[k] = { name: d.name || `Attaque ${i + 1}`, icon: 'skull', desc: d.desc || 'Attaque inventée dans le Labo.' };
+    INTENTS[kp] = { name: `Prépare : ${d.name || `Attaque ${i + 1}`}`, icon: 'sparkle', desc: 'N’attaque pas ce tour-ci : l’attaque part au tour suivant.' };
+    if (d.target === 'all') AOE_M[k] = d.mult * (d.hits || 1); else SINGLE.push(k);
+    if (d.big) BIG.push(k);
+    PREP.push(kp);
+  });
+}
+const labOf = (k) => LAB_K[k] || null;
+/* v598 : pouvoirs inventés au Labo (st.labSkills : compétences ; st.labUlt : pouvoir d'équipe). Combat d'essai seulement. */
+const LSK_TARGET = { enemy: 'enemy', allEnemies: 'none', ally: 'ally', allAllies: 'none', self: 'none' };
+function labPowerDo(st, u, t, d, ev) {
+  const foes = front(st, 'enemy'), allies = front(st, 'ally');
+  const tg = d.target === 'enemy' ? [t] : d.target === 'allEnemies' ? foes : d.target === 'ally' ? [t] : d.target === 'allAllies' ? allies : [u];
+  const onFoe = d.target === 'enemy' || d.target === 'allEnemies';
+  if (tg.length > 1 && onFoe) ev.push({ t: 'aoe', u: u.uid, side: 'ally' });
+  for (const x of tg) {
+    if (!x || x.hp <= 0) continue;
+    if (onFoe) {
+      for (let h = 0; h < Math.max(1, d.hits || 1) && x.hp > 0; h++) if (d.mult > 0) { const dd = hurt(st, x, dmgOf(st, u, x, d.mult), ev, u.uid); if (dd && d.brk) breakHit(st, x, d.brk, ev, u); }
+      if (x.hp > 0 && d.poison) addPoison(st, x, d.poison, ev, u);
+      if (x.hp > 0 && d.freeze) freeze(st, x, ev, 1);
+      if (x.hp > 0 && d.mark) { x.mark = 2; x.markBy = u.uid; ev.push({ t: 'status', u: x.uid, s: 'Marquée', k: 'mark' }); }
+    } else {
+      if (d.heal) heal(x, x.maxHp * d.heal, ev, u);
+      if (d.shield) { x.shield = 1; ev.push({ t: 'status', u: x.uid, s: 'Bouclier', k: 'guard' }); }
+      if (d.boost) { x.boost = (x.boost || 0) + d.boost; ev.push({ t: 'status', u: x.uid, s: `+${d.boost} ATQ`, k: 'charge' }); }
+      if (d.cleanse && (x.poison || x.frozen || x.stunned)) { x.poison = 0; x.frozen = 0; x.stunned = false; ev.push({ t: 'status', u: x.uid, s: 'Purifiée', k: 'heal' }); }
+      if (d.paGain && st.init) gainPA(x, d.paGain, ev);
+    }
+  }
+  if (d.fervorGain) gainFervor(st, d.fervorGain, ev);
+}
 
 let seq = 0;
 // Une carte de combat. scale : force (niveau pour les alliés, profondeur pour les ennemis).
@@ -641,6 +684,13 @@ export function actionsFor(st, uid) {
     else if (c.ok && !actionTargets(st, uid, 'duo').length) { c.ok = false; c.why = 'Il faut un ennemi Fêlé, Brisé ou Marqué.'; }
     out.push(c);
   }
+  (st.labSkills || []).forEach((L, i) => { /* v598 : compétences inventées au Labo */
+    if (!L || (L.who && L.who !== 'all' && L.who !== u.role)) return;
+    const b = base(`lsk${i}`, { name: L.name || `Pouvoir ${i + 1}`, icon: 'p:sparkle', ap: L.ap ?? 1, pa: L.ap ?? 1, fervor: L.fervor || 0, target: LSK_TARGET[L.target] || 'enemy', desc: L.desc || 'Pouvoir inventé dans le Labo.' });
+    if (b.ok && b.target !== 'none' && !actionTargets(st, uid, b.key).length) { b.ok = false; b.why = 'Aucune cible possible.'; }
+    if (b.ok && L.once && (u.lskUsed || {})[i]) { b.ok = false; b.why = 'Une fois par combat.'; }
+    b.lab = true; out.push(b);
+  });
   const sw = out.find((x) => x.key === 'swap'), d = out.find((x) => x.key === 'defend');
   if (sw.ok && st.swapped) { sw.ok = false; sw.why = 'Une seule permutation par tour.'; }
   if (sw.ok && !reserve(st, 'ally').length) { sw.ok = false; sw.why = 'Ta réserve est vide.'; }
@@ -660,6 +710,7 @@ export function actionTargets(st, uid, key) {
   if (key === 'swap') return reserve(st, 'ally').map((x) => x.uid);
   if (key === 'hate') return front(st, 'ally').filter((x) => x.uid !== uid && st.init && st.init.indexOf(x.uid) > (st.ip ?? -1) + 1 && x.skipTurn !== st.round).map((x) => x.uid);
   if (key === 'duo') return targetsFor(st, 'ally', u).filter((id) => { const t = st.units[id]; return t.cracked || t.broken || t.mark; });
+  if (/^lsk\d/.test(key)) { const L = st.labSkills?.[+key.slice(3)]; const tg = LSK_TARGET[L?.target] || 'enemy'; return tg === 'enemy' ? targetsFor(st, 'ally', u) : tg === 'ally' ? front(st, 'ally').map((x) => x.uid) : []; }
   const M = moveFor(u, key);
   if (M) {
     if (M.targets) return M.targets(st, u, API);
@@ -749,6 +800,7 @@ export function act(st, uid, key, tUid = null) {
   ev.push({ t: 'act', u: uid, key, tgt: tUid, name: a.name, skill: !['attack', 'defend', 'swap'].includes(key) });
   if (key === 'estoc' || key === 'raz' || key === 'contagion') { u.struck = true; u.lastStruck = st.round; } // v310 : une créature qui frappe n'est plus Insaisissable
   if (key === 'attack') basicAttack(st, u, t, ev);
+  else if (/^lsk\d/.test(key)) { const i = +key.slice(3), L = st.labSkills[i]; (u.lskUsed ||= {})[i] = true; u.struck = true; labPowerDo(st, u, t, L, ev); }
   else if (key === 'defend') { u.defend = true; ev.push({ t: 'status', u: uid, s: 'En défense', k: 'defend' }); }
   else if (key === 'swap') doSwap(st, u, t, ev);
   else if (key === 'hate') {
@@ -986,17 +1038,19 @@ export function useUlt(st) {
   if (!ultReady(st)) return ev;
   st.fervor = 0; st.gauge = 0; if (!st.init) st.ap -= ULT_COST.ap; st.ultUsed = true; st.seq = (st.seq || 0) + 1; // en ordre d'initiative : ne coûte aucun PA et ne termine pas le tour
   st.stats.ults = (st.stats.ults || 0) + 1;
+  const ultK = st.labUlt ? null : st.ult;
   const p = st.power || 1, allies = front(st, 'ally'), foes = front(st, 'enemy');
   ev.push({ t: 'ult', key: st.ult });
-  if (st.ult === 'sceau' && st.init && allies.some((u) => u.hp < u.maxHp * 0.3)) allies.forEach((u) => gainPA(u, 1, ev)); // à condition : un allié en danger
-  if (st.ult === 'sceau') allies.forEach((u) => { heal(u, u.maxHp * 0.3 * p, ev); u.ward = Math.max(u.ward || 0, Math.round(u.maxHp * SEAL_WARD)); ev.push({ t: 'status', u: u.uid, s: `Sceau : ${u.ward}` }); });
-  else if (st.ult === 'revive') {
+  if (st.labUlt) labPowerDo(st, allies[0] || front(st, 'ally')[0], null, { ...st.labUlt, target: st.labUlt.target === 'enemy' ? 'allEnemies' : st.labUlt.target === 'ally' ? 'allAllies' : st.labUlt.target }, ev); /* v598 : pouvoir d'équipe inventé (aucun des pouvoirs du jeu ne joue alors) */
+  if (ultK === 'sceau' && st.init && allies.some((u) => u.hp < u.maxHp * 0.3)) allies.forEach((u) => gainPA(u, 1, ev)); // à condition : un allié en danger
+  if (ultK === 'sceau') allies.forEach((u) => { heal(u, u.maxHp * 0.3 * p, ev); u.ward = Math.max(u.ward || 0, Math.round(u.maxHp * SEAL_WARD)); ev.push({ t: 'status', u: u.uid, s: `Sceau : ${u.ward}` }); });
+  else if (ultK === 'revive') {
     const fallen = st.order.ally.map((id) => st.units[id]).filter((u) => u.hp <= 0);
     if (fallen.length) fallen.forEach((u) => { u.hp = Math.round(u.maxHp * 0.5 * p); u.poison = 0; u.inPlay = false; u.down = false; toBack(st, u); ev.push({ t: 'revive', u: u.uid }); });
     else allies.forEach((u) => heal(u, u.maxHp * 0.4 * p, ev));
-  } else if (st.ult === 'nova') foes.forEach((u) => { hurt(st, u, Math.round((3 + st.round) * p * (u.broken || u.cracked ? 1.5 : 1)), ev); breakHit(st, u, 2, ev, { side: 'ally' }); });
-  else if (st.ult === 'smite') { const t = foes.slice().sort((x, y) => (y.broken || y.cracked ? 1e4 : 0) + y.hp - ((x.broken || x.cracked ? 1e4 : 0) + x.hp))[0]; if (t) { hurt(st, t, Math.round((8 + 2 * st.round) * p * (t.broken || t.cracked ? 1.5 : 1)), ev); breakHit(st, t, 4, ev, { side: 'ally' }); } }
-  else if (st.ult === 'aegis') { allies.forEach((u) => { u.shield = 1; u.stunned = false; u.frozen = 0; ev.push({ t: 'status', u: u.uid, s: 'Égide' }); if (st.init) gainPA(u, 2); }); if (!st.init) st.ap += 2; }
+  } else if (ultK === 'nova') foes.forEach((u) => { hurt(st, u, Math.round((3 + st.round) * p * (u.broken || u.cracked ? 1.5 : 1)), ev); breakHit(st, u, 2, ev, { side: 'ally' }); });
+  else if (ultK === 'smite') { const t = foes.slice().sort((x, y) => (y.broken || y.cracked ? 1e4 : 0) + y.hp - ((x.broken || x.cracked ? 1e4 : 0) + x.hp))[0]; if (t) { hurt(st, t, Math.round((8 + 2 * st.round) * p * (t.broken || t.cracked ? 1.5 : 1)), ev); breakHit(st, t, 4, ev, { side: 'ally' }); } }
+  else if (ultK === 'aegis') { allies.forEach((u) => { u.shield = 1; u.stunned = false; u.frozen = 0; ev.push({ t: 'status', u: u.uid, s: 'Égide' }); if (st.init) gainPA(u, 2); }); if (!st.init) st.ap += 2; }
   check(st, ev);
   // v310 : si l'actrice a quitté le combat pendant le pouvoir (tombée, repoussée), le tour passe à la suivante
   if (st.init && !st.over && st.turn === 'ally' && st.actor) { const ac = st.units[st.actor]; if (!ac || ac.hp <= 0 || !front(st, 'ally').includes(ac)) advance(st, ev); }
@@ -1403,6 +1457,27 @@ export function enemyAct(st, aUid, defense = 'none') {
   } else if (kind === 'verdict') {
     st.forbid = it.forbid; logBoss(st, 'Verdict');
     ev.push({ t: 'boss', u: aUid, s: `Verdict : interdit de ${FORBID[it.forbid]}` }); ev.push({ t: 'law', forbid: it.forbid });
+  } else if (/^labp\d/.test(kind)) { e.charged = kind.replace('labp', 'lab'); ev.push({ t: 'status', u: aUid, s: 'Se prépare…', k: 'charge' }); }
+  else if (labOf(kind)) {
+    /* v596 : attaque du Labo : n coups, une cible ou toute l'équipe, effets si le coup passe */
+    const d = labOf(kind), hits = Math.max(1, d.hits || 1); e.charged = null;
+    const fx = (x) => {
+      if (!x || x.hp <= 0) return;
+      if (d.poison) addPoison(st, x, d.poison, ev, e);
+      if (d.freeze) { x.frozen = 1; ev.push({ t: 'status', u: x.uid, s: 'Gelée', k: 'frost' }); }
+      if (d.strip && (x.shield || x.boost)) { x.shield = 0; x.boost = 0; ev.push({ t: 'status', u: x.uid, s: 'Bonus emportés', k: 'bad' }); }
+    };
+    if (d.target === 'all') {
+      ev.push({ t: 'aoe', u: aUid, side: 'enemy' });
+      if (defense !== 'none') defended(st, e, null, ev, defense, 'blast');
+      if (defense !== 'parry') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; for (let h = 0; h < hits && x.hp > 0; h++) hurt(st, x, dmgOf(st, e, x, d.mult * pow * (defense === 'dodge' ? GRAZE : 1)), ev, aUid, { graze: defense === 'dodge' }); if (defense === 'none') fx(x); }
+    } else {
+      let t = st.units[it.t], hitT = null;
+      for (let h = 0; h < hits && t && t.hp > 0 && e.hp > 0; h++) { hitT = strike(t, d.mult); if (!hitT) break; t = hitT; }
+      if (hitT && defense === 'none') fx(hitT);
+    }
+    if (d.fervor && defense === 'none' && st.fervor > 0) { const n = Math.min(d.fervor, st.fervor); gainFervor(st, -n, ev); ev.push({ t: 'status', u: aUid, s: `−${n} Ferveur`, k: 'bad' }); }
+    if (d.drain && e.hp > 0) { const got = ev.slice(evStart).filter((x) => x.t === 'dmg' && st.units[x.u]?.side === 'ally').reduce((n, x) => n + x.d, 0); if (got > 0) heal(e, Math.ceil(got * d.drain), ev); }
   } else if (kind === 'flurry') {
     /* v558 : Rafale, trois coups ; une défense réussie compte une fois pour toute la rafale */
     const t0 = st.units[it.t];
@@ -1658,13 +1733,20 @@ function planIntents(st) {
     if (kind === 'verdict') { const ks = Object.keys(FORBID).filter((k) => k !== st.forbid); extra.forbid = ks[Math.floor(rand(st) * ks.length)]; }
     if (kind === 'ambush') { t = front(st, 'ally').filter((x) => x.hp > 0).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp || x.hp - y.hp)[0]?.uid || null; e.veiled = true; }
     if (kind === 'slumber') e.asleep = true;
+    if (labOf(kind) && labOf(kind).target !== 'all') { const ts = targetsFor(st, 'enemy', e).map((id) => st.units[id]).filter((x) => x.hp > 0), tg = labOf(kind).target;
+      if (tg === 'weakest') t = ts.sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0]?.uid || t; else if (tg === 'strongest') t = ts.sort((x, y) => (y.atk + (y.boost || 0)) - (x.atk + (x.boost || 0)))[0]?.uid || t; }
     if (kind === 'chain') t = targetsFor(st, 'enemy', e).map((id) => st.units[id]).sort((x, y) => (y.atk + (y.boost || 0)) - (x.atk + (x.boost || 0)))[0]?.uid || null;
     e.intent = { kind, t, qte: qteFor(e, kind) || (kind === 'copy' && ['estoc', 'entrave', 'raz', 'contagion'].includes(extra.copy)), ...extra };
   }
 }
-const qteFor = (e, kind) => ['hit', 'poison', 'tick2', 'flurry', 'grab', 'heavy', 'blast', 'frost', 'gorge', 'blizzard', 'swarm', 'execute', 'lament', 'chain', 'ambush', 'price', 'quake'].includes(kind);
+const qteFor = (e, kind) => !!LAB_K[kind] || ['hit', 'poison', 'tick2', 'flurry', 'grab', 'heavy', 'blast', 'frost', 'gorge', 'blizzard', 'swarm', 'execute', 'lament', 'chain', 'ambush', 'price', 'quake'].includes(kind);
 function intentKind(st, e) {
   if (e.charged) return e.charged;
+  if (st.labAtk?.length) { /* v596 : attaques du Labo, tirées selon leur fréquence */
+    for (const i of st.labAtk) { const d = LAB_K[`lab${i}`]; if (!d) continue;
+      const who = d.who || 'any'; if (who !== 'any' && who !== (e.boss ? 'boss' : e.elite ? 'elite' : 'normal')) continue;
+      if (rand(st) < (d.chance ?? 0.3)) return d.prep ? `labp${i}` : `lab${i}`; }
+  }
   if (e.boss && st.bossKey === 'abysse') {
     const ph = e.ph || 1;
     if (ph === 1) return st.round % 3 === 0 ? 'channel' : 'hit';
@@ -1704,7 +1786,7 @@ export function intentInfo(st, e) {
   const eff = g && inFront(st, g) ? g : t;
   let dmg = 0;
   const copyM = it.kind === 'copy' ? { estoc: 2, entrave: 0.6, marque: 1.5 }[it.copy] : null;
-  const m = copyM || { hit: 1, heavy: e.boss ? 2.5 : 2.2, poison: 0.6, frost: 0.5, flurry: 1.35, grab: 0.7, gorge: 1.6, chain: 0.8, tick2: 1.2, ambush: 2.2, execute: t && t.hp <= t.maxHp / 2 ? 3 : 2 }[it.kind];
+  const m = copyM || (labOf(it.kind) && labOf(it.kind).target !== 'all' ? labOf(it.kind).mult * (labOf(it.kind).hits || 1) : null) || { hit: 1, heavy: e.boss ? 2.5 : 2.2, poison: 0.6, frost: 0.5, flurry: 1.35, grab: 0.7, gorge: 1.6, chain: 0.8, tick2: 1.2, ambush: 2.2, execute: t && t.hp <= t.maxHp / 2 ? 3 : 2 }[it.kind];
   const capd = (x, n) => Math.min(n, allyCap(x, it.kind, st));
   const pw = it.qte ? QTE_HIT : PLAIN_HIT; /* v502 : les dégâts annoncés sont ceux d'un coup non défendu */
   if (m && eff) dmg = capd(eff, dmgOf(st, e, eff, m * pw * (eff !== t ? 0.6 : 1)));

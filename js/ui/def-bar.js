@@ -31,6 +31,13 @@ export const BOSS_ASSAULT = {
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/* v597 : défenses inventées dans le Labo des combats (Mode Créateur) : un chiffre 0 à 9 dans une séquence = la défense
+   inventée n° 0 à 9. Briques : toucher ou maintenir, vitesse, taille de la zone d'or et du trait blanc, accélération,
+   feinte, zone mobile, zone cachée (visible seulement quand le curseur approche), curseur qui part de la droite (sens
+   inverse), curseur qui rebondit (seul le retour compte). Jugées sur la position du curseur au moment du toucher. */
+export const CUSTOM_QTE = {};
+export const QTE_BRICKS = { name: 'Défense inventée', base: 'tap', speed: 1, zone: 1, parry: 0.2, accel: 1.7, feint: false, move: 0, hide: 0, reverse: false, bounce: false };
+
 /* bilan d'une séquence pour le moteur : tout paré = parade ; trop de ratés = touché ; sinon esquive */
 export const defVerdict = (res, T) => res.every((r) => r === 'parry') ? 'parry' : res.filter((r) => r === 'none').length / res.length > T.missShare + 0.005 ? 'none' : 'dodge';
 
@@ -53,6 +60,7 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
       setTimeout(() => { bar.remove(); mid.classList.remove('qte'); dv?.classList.remove('qte-on'); resolve(out); }, 260);
     };
     const pass = (i) => new Promise((done1) => {
+      if (CUSTOM_QTE[letters[i]]) return passCustom(i, { ...QTE_BRICKS, ...CUSTOM_QTE[letters[i]] }, done1);
       const L = letters[i], hold = L === 'h' || L === 'H', feint = L === 'x' || L === 'H', moving = L === 'm' || (strong && L === 'n' && i % 2 === 1);
       const w = typeof win === 'function' ? win(L) : win;
       const D = D0 * (L === 'f' ? T.multFast : L === 'l' ? T.multSlow : 1) * (feint ? T.multFeint : 1) * (beat ? T.multBeat : 1);
@@ -119,6 +127,63 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
       const gap = i === 0 ? (reduced ? 250 : T.gapFirst) + Math.random() * T.gapFirstRand : beat || T.gapMin + Math.random() * T.gapRand; /* rythme irrégulier entre les coups (sauf l'Horloger) */
       setTimeout(() => { if (!fin && alive()) { t0 = performance.now(); raf = requestAnimationFrame(step); } else if (!alive()) end('none'); }, gap);
     });
+    /* défense inventée : même barre, positions calculées par la fonction posAt (sens, rebond), jugement au temps */
+    const passCustom = (i, C, done1) => {
+      const hold = C.base === 'hold', w0 = typeof win === 'function' ? win('n') : win;
+      const dodge = Math.max(30, w0.dodge * C.zone), parry = Math.max(15, Math.min(dodge, Math.round(dodge * C.parry)));
+      const D = D0 * C.speed * (C.feint ? T.multFeint : 1) * (C.bounce ? 1.6 : 1);
+      const fa = 0.25 + Math.random() * 0.1, fb = fa + 0.22 + Math.random() * 0.12, fp = 0.28 + Math.random() * 0.12;
+      const ease = C.feint ? (x) => x <= 0 ? 0 : x < fa ? fp * (x / fa) ** 0.8 : x < fb ? fp + 0.035 * (x - fa) / (fb - fa) : fp + 0.035 + (1 - fp - 0.035) * ((x - fb) / (1 - fb)) ** 1.6
+        : (x) => Math.max(0, x) ** C.accel;
+      const H = 0.45; /* rebond : aller jusqu'à 45 % du temps, puis retour */
+      const posAt = (x) => { x = Math.min(1, Math.max(0, x)); let p = C.bounce ? (x < H ? ease(x / H) : 1 - ease((x - H) / (1 - H)) * 0.97) : ease(x); return C.reverse ? 1 - p : p; };
+      const imp = Math.min(0.99, T.impactMin + Math.random() * T.impactRand);
+      const tb = C.bounce ? D * (H + (1 - H) * imp) : C.feint ? D * (fb + (1 - fb) * Math.min(0.99, imp)) : D * imp;
+      const ta = Math.max(C.bounce ? D * H : 0, tb - dodge), tp = tb - parry;
+      const pa = posAt(ta / D), pb = posAt(tb / D), pp = posAt(tp / D);
+      const z0 = Math.min(pa, pb), zw = Math.max(0.004, Math.abs(pb - pa));
+      const pz0 = Math.min(pp, pb), pw = Math.max(0.002, Math.abs(pb - pp));
+      zEl.style.cssText = `left:${z0 * 100}%;width:${zw * 100}%`; zEl.style.transform = '';
+      pEl.style.cssText = `left:${((pz0 - z0) / zw) * 100}%;width:${(pw / zw) * 100}%`;
+      cur.style.transform = `translateX(${(posAt(0) * bw).toFixed(1)}px)`;
+      bar.classList.remove('ok', 'ko', 'r-parry', 'r-dodge', 'r-none', 'go', 'pp', 'held', 'cb-hold', 'q-hide');
+      if (hold) bar.classList.add('cb-hold');
+      if (C.hide > 0) bar.classList.add('q-hide');
+      pips[i]?.classList.add('now');
+      hint.textContent = `${C.name || 'Défense inventée'} · ${hold ? 'maintiens, relâche dans l’or' : 'touche dans l’or'}${C.bounce ? ' · au retour' : ''}` + (n > 1 ? ` · coup ${i + 1}/${n}` : '');
+      let t0 = 0, fin = false, raf = 0, lit = '';
+      const end = (res, when = null) => {
+        if (fin) return; fin = true; cancelAnimationFrame(raf); setTap(null); letGo = null; held = false;
+        bar.classList.remove('go', 'pp', 'held', 'q-hide', 'q-show'); bar.classList.add(res === 'none' ? 'ko' : 'ok', `r-${res}`);
+        pips[i]?.classList.remove('now'); pips[i]?.classList.add(`r-${res}`);
+        const stamp = document.createElement('div'); stamp.className = `dv-stamp s-${res}${n > 1 ? ' small' : ''}`;
+        stamp.innerHTML = `<b>${res === 'parry' ? 'Parade parfaite !' : res === 'dodge' ? 'Esquive !' : 'Touché…'}</b>`;
+        dv?.appendChild(stamp); setTimeout(() => stamp.remove(), n > 1 ? 520 : 900);
+        if (res === 'none') { sfx.miss?.(); hap(2); } else if (i < n - 1) { (res === 'parry' ? sfx.parry : sfx.hit)?.(); hap(1); }
+        out.push(res);
+        onResult?.({ i, letter: letters[i], res, ms: when != null && t0 ? Math.round(when - (t0 + tb)) : null, dodge, parry, dur: Math.round(D) });
+        done1();
+      };
+      const step = () => {
+        const now = performance.now(), x = (now - t0) / D, ph = (now - t0) / D, mv = C.move ? Math.sin(ph * 9) * C.move : 0, pos = posAt(x);
+        cur.style.transform = `translateX(${(pos * bw).toFixed(1)}px)`;
+        if (C.move) zEl.style.transform = `translateX(${(mv * bw).toFixed(1)}px)`;
+        if (C.hide > 0) bar.classList.toggle('q-show', Math.abs(pos - (z0 + zw / 2 + mv)) <= C.hide + zw / 2);
+        const k = C.bounce && x < H ? '' : pos >= pz0 + mv && pos <= pz0 + mv + pw ? 'pp' : pos >= z0 + mv && pos <= z0 + mv + zw ? 'go' : '';
+        if (k !== lit) { if (lit) bar.classList.remove(lit); if (k) bar.classList.add(k); lit = k; }
+        if (x >= 1) end('none'); else raf = requestAnimationFrame(step);
+      };
+      const judgeAt = (at) => {
+        /* jugé sur la position du curseur à l'instant du toucher, par rapport à la zone (déplacée si elle bouge) */
+        const now = performance.now(), when = at && at <= now && now - at < 500 ? at : now, dt = when - t0, tol = T.tolPx / Math.max(80, bw);
+        const mv = C.move ? Math.sin((dt / D) * 9) * C.move : 0, pos = posAt(dt / D);
+        end(C.bounce && dt < D * H ? 'none' : pos >= pz0 + mv - tol && pos <= pz0 + mv + pw + tol ? 'parry' : pos >= z0 + mv - tol && pos <= z0 + mv + zw + tol ? 'dodge' : 'none', when);
+      };
+      letGo = (ev) => { if (!hold || !held || fin) return; held = false; bar.classList.remove('held'); if (!t0) return end('none'); judgeAt(ev.timeStamp); };
+      setTap((at) => { if (hold) { held = true; bar.classList.add('held'); return; } if (!t0) return; judgeAt(at); });
+      const gap = i === 0 ? (reduced ? 250 : T.gapFirst) + Math.random() * T.gapFirstRand : T.gapMin + Math.random() * T.gapRand;
+      setTimeout(() => { if (!fin && alive()) { t0 = performance.now(); raf = requestAnimationFrame(step); } else if (!alive()) end('none'); }, gap);
+    };
     (async () => {
       for (let i = 0; i < n && alive(); i++) { await pass(i); if (i < n - 1) await wait(T.pause); }
       bar.classList.add('fin');

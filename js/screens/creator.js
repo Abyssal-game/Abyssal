@@ -69,9 +69,9 @@ export function openCreator(app) {
         <p class="small muted">Tous les cadres, dos et finitions en aperçu, pour trier ceux à garder, à retirer ou à revoir.</p>
         <div class="row gap wrap">${B('lab', 'Ouvrir l’Atelier', 'gold')}${B('revue', 'Revue des doublons', '')}</div></section>
 
-      <section class="cr-sec"><h3>Labo des défenses</h3>
-        <p class="small muted">Teste la barre de défense contre chaque attaque (ennemis, élites, assauts des gardiens) autant de fois que tu veux, règle-la en direct, puis copie tes réglages pour me les envoyer.</p>
-        <div class="row gap wrap">${B('deflab', 'Ouvrir le Labo des défenses', 'gold')}</div></section>
+      <section class="cr-sec"><h3>Labo des combats</h3>
+        <p class="small muted">Essaie des combats de la Descente à n’importe quel étage, règle la force des ennemis, note chaque étage : une courbe règle les autres. Et la barre de défense, réglable en direct. Copie ensuite ton rapport pour me l’envoyer.</p>
+        <div class="row gap wrap">${B('labo', 'Ouvrir le Labo des combats', 'gold')}${B('deflab', 'Labo des défenses', '')}</div></section>
 
       <section class="cr-sec"><h3>Affronter un gardien</h3>
         <p class="small muted">Te place devant la porte du gardien (un chapitre est lancé si besoin, le présage est passé). Coche la case pour monter ton équipe au niveau attendu à cet étage.</p>
@@ -121,6 +121,7 @@ export function openCreator(app) {
       if (x === 'lab') { openCosmeticsLab(app); return; } /* v556 */
       if (x === 'revue') { openCosmeticsReview(app); return; } /* v592 */
       if (x === 'deflab') { openDefenseLab(app); return; } /* v594 */
+      if (x === 'labo') { sheet.close(); app.go('labo'); return; } /* v595 */
       if (x === 'codexgo') { sheet.close(); app.go('codex'); return; }
       if (x === 'off') { g.s.settings.devCode = false; g.setSetting('dev', false); sheet.close(); toast('Mode Créateur désactivé.', { icon: 'crown' }); return; }
       if (!['snap', 'restore'].includes(x)) toast('C’est fait.', { kind: 'success', icon: 'crown' });

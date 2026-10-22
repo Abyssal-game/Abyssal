@@ -53,15 +53,16 @@ const DANGER = ['', '', 'Danger', 'Mortel'];
 // les intentions des gardiens réutilisent les icônes peintes les plus proches
 const FORBID_SHORT = { attack: 'attaque', skill: 'compétences', defend: 'défense' };
 const IN_PIC = { flurry: 'hit', grab: 'frost', gorge: 'heavy', gather: 'channel', blizzard: 'frost', mimic: 'channel', copy: 'heavy', decree: 'rally', shift: 'charge', brood: 'channel', swarm: 'poison', sentence: 'charge', execute: 'heavy', chant: 'channel', lament: 'blast', chain: 'frost', wind: 'charge', rewind: 'heal', tick2: 'hit', mirror: 'shield', ambush: 'heavy', wish: 'heal', price: 'blast', slumber: 'shield', quake: 'blast', verdict: 'rally' };
-const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${IN_PIC[k] || k}.webp">`;
+const intentIcon = (k) => `<img class="iicon" alt="" src="assets/icons/in-${IN_PIC[k] || (/^labp\d/.test(k) ? 'charge' : /^lab\d/.test(k) ? 'heavy' : k)}.webp">`; /* v596 : attaques inventées au Labo */
 
-export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = null, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.' }) {
+export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = null, run: runOpt = null, pause = 'Combat en pause : il t’attend dans la Descente.', engine = null }) {
   // v493 : force attendue à l'étage ÷ force moyenne de l'équipe (1 = à niveau)
   const gapOf = (st) => { if (!st.refPow) return 1; const al = st.order.ally.map((id) => st.units[id]).filter((u) => u.pow); return al.length ? st.refPow / (al.reduce((a, u) => a + u.pow, 0) / al.length) : 1; };
   const firstSteps = () => !!run?.day && !run.free && !run.trial && g.novice() && (run.floor || 0) <= 2; /* v398 : premiers pas */
   const settling = () => { const d = app.game.s.descent; return (d.runs || 0) <= 1 && (d.run?.floor || 1) <= 2; }; // v328 : voir plus haut
   const g = app.game, cat = app.catalog, run = runOpt || g.descent().run, st = run.battle;
-  const where = run.trial ? 'trial' : 'run'; /* v540 : chaque coup passe par le jeu (g.duel…) : le serveur de partie rejoue le combat */
+  const where = run.lab ? 'lab' : run.trial ? 'trial' : 'run';
+  const E = engine || g; /* v595 : le banc d'essai du Labo joue sur son propre combat (js/core/lab.js), hors sauvegarde et serveur */ /* v540 : chaque coup passe par le jeu (g.duel…) : le serveur de partie rejoue le combat */
   const ui = (app.state.duel ||= { fast: 0 });
   ui.fast = g.s.settings.combatFast ? 1 : 0; // v331 : bouton ×2 de retour (étude joueurs : un combat ≈ 1,2 min) ; la défense active garde son rythme
   const reduced = app.reduced();
@@ -992,7 +993,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   }
   async function enemyTurn() {
     log ||= [];
-    for (let n = g.duelNext(where); n && alive_; n = g.duelNext(where)) {
+    for (let n = E.duelNext(where); n && alive_; n = E.duelNext(where)) {
       const s = n.s, skips = n.skips;
       logEvents(skips);
       if (skips.length) await play(skips);
@@ -1007,14 +1008,14 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       }
       if (!alive_) return;
       acting = s.a; drawTimeline();
-      const ev = g.duelEnemy(where, s.a, res);
+      const ev = E.duelEnemy(where, s.a, res);
       logEvents(ev);
       lastDef = res; // pas de gros plan d'impact si le coup est esquivé ou paré
       await play(ev);
       lastDef = 'none'; acting = null;
     }
     if (!alive_) return;
-    const ev = g.duelEndEnemy(where);
+    const ev = E.duelEndEnemy(where);
     logEvents(ev.filter((e) => e.t !== 'eact'));
     await play(ev);
   }
@@ -1029,7 +1030,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   async function doEnd() {
     if (busy || st.turn !== 'ally' || st.over) return;
     busy = true; mode = null; if (!st.init) sel = null; draw();
-    const ev = g.duelPass(where); // en ordre d'initiative : « Passer »
+    const ev = E.duelPass(where); // en ordre d'initiative : « Passer »
     await play(ev);
     if (!st.over && st.turn === 'enemy') await foesPlay();
     busy = false; draw();
@@ -1073,11 +1074,11 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     // compétence propre : son effet est rappelé la première fois dans le combat
     if (a.own && !seenMv.has(sel + key)) { seenMv.add(sel + key); toast(`<b>${esc(a.name)}</b> : ${esc(a.desc)}`, { icon: 'sparkle', ms: 4200 }); }
     const u = sel;
-    if (a.target === 'none') { mode = null; return exec(() => g.duelAct(where, u, key)); }
+    if (a.target === 'none') { mode = null; return exec(() => E.duelAct(where, u, key)); }
     const ts = actionTargets(st, u, key);
-    if (key === 'swap') { if (ts.length === 1) { mode = null; return exec(() => g.duelAct(where, u, 'swap', ts[0])); } return pickReserve(); }
+    if (key === 'swap') { if (ts.length === 1) { mode = null; return exec(() => E.duelAct(where, u, 'swap', ts[0])); } return pickReserve(); }
     if (a.dice && !g.s.tips?.['cb-dice3'] && !settling()) await tuto(app, 'cb-dice3');
-    if (ts.length === 1 && (key === 'rempart' || key === 'priere')) { mode = null; return exec(() => g.duelAct(where, u, key, ts[0])); }
+    if (ts.length === 1 && (key === 'rempart' || key === 'priere')) { mode = null; return exec(() => E.duelAct(where, u, key, ts[0])); }
     mode = { key, name: a.name, dice: !!a.dice, target: a.target };
     draw();
   }
@@ -1105,14 +1106,14 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       rh = await rhythmQTE(a.name, u); /* v509 : lancer chargé dès le premier combat (avant v509 : automatique aux étages 1-2) */
       if (!alive_) return;
     }
-    return exec(() => g.duelAct(where, u, key, uid, rh));
+    return exec(() => E.duelAct(where, u, key, uid, rh));
   }
   async function pickReserve() {
     if (!g.s.tips?.['cb-entrance']) await tuto(app, 'cb-entrance');
     const r = reserve(st, 'ally'), su = st.units[sel];
     const sh = openSheet(`<h2>Qui entre en jeu ?</h2><p class="small muted">À la place de <b>${esc(cat.get(su.id).name)}</b>. ${st.init ? `Gratuit : elle prend sa place dans l’ordre des tours et joue tout de suite${st.freeSwap ? ' (Relais d’ombre : +2 PA)' : ''}` : `Coût : ${st.freeSwap ? 'gratuit (Relais d’ombre)' : '1 action'}. Elle peut agir ce tour-ci`} ; PV, PA et états sont conservés.</p>
       <div class="dv-pick">${r.map((x) => `<button class="dv-pick-c" data-in="${x.uid}"><img alt="" src="${artUrl(cat.get(x.id), { lite: true })}"><b>${esc(cat.get(x.id).name)}</b><span>${esc(KITS[x.role].name)} · ${icon('swords')}${x.atk} · ${icon('heart')}${x.hp}/${x.maxHp}</span>${ENTRANCES[x.role] ? `<small class="dv-pick-e"><b>${esc(ENTRANCES[x.role].name)}</b> : ${esc(ENTRANCES[x.role].desc)}</small>` : ''}</button>`).join('')}</div>`, { label: 'Permuter' });
-    sh.body.addEventListener('click', (ev) => { const p = ev.target.closest('[data-in]'); if (p) { sh.close(); const u = sel; mode = null; exec(() => g.duelAct(where, u, 'swap', p.dataset.in)); } });
+    sh.body.addEventListener('click', (ev) => { const p = ev.target.closest('[data-in]'); if (p) { sh.close(); const u = sel; mode = null; exec(() => E.duelAct(where, u, 'swap', p.dataset.in)); } });
   }
 
   // Règles en vigueur : pacte, loi de l'Architecte, aspect de l'Éclipse, reliques
@@ -1148,7 +1149,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       const k = b.dataset.d;
       if (k === 'quit') {
         if (!onAbandon) { toast(pause, { icon: 'swords' }); app.go(''); return; }
-        const sh = openSheet(`<div class="cb-pause"><h2>${icon('swords')} Pause</h2>
+        const sh = openSheet(run.lab ? `<div class="cb-pause"><h2>${icon('swords')} Pause</h2>
+          <button class="btn primary block" data-p="abandon">Quitter le combat d’essai</button><p class="small muted">Retour au Labo des combats. Rien n’est gagné ni perdu.</p>
+          <button class="btn ghost block" data-p="back">Reprendre le combat</button></div>` : `<div class="cb-pause"><h2>${icon('swords')} Pause</h2>
           <button class="btn primary block" data-p="pause">Mettre en pause</button><p class="small muted">Le combat t’attend ${run.trial ? 'dans les Épreuves' : 'dans la Descente'}, exactement là où tu l’as laissé.</p>
           <button class="btn ghost block cb-abandon" data-p="abandon">${icon('p:abandon')}${run.trial ? 'Abandonner l’Épreuve' : 'Abandonner le chapitre'}</button><p class="small muted">${run.trial ? 'Elle comptera comme perdue pour aujourd’hui.' : 'Tu gardes ton butin ; le chapitre recommencera à son premier étage.'}</p>
           <button class="btn ghost block" data-p="back">Reprendre le combat</button></div>`, { label: 'Pause' });
@@ -1189,7 +1192,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       return;
     }
     // ennemi touché avec une créature choisie : attaque directe (raccourci)
-    if (sel && actionsFor(st, sel)[0].ok && actionTargets(st, sel, 'attack').includes(u.uid)) { const a = sel; return exec(() => g.duelAct(where, a, 'attack', u.uid)); }
+    if (sel && actionsFor(st, sel)[0].ok && actionTargets(st, sel, 'attack').includes(u.uid)) { const a = sel; return exec(() => E.duelAct(where, a, 'attack', u.uid)); }
     /* v444 : ennemi hors d'atteinte (couvert par un Protecteur…) : on dit qui viser au lieu d'ouvrir sa fiche (appui long) */
     if (sel && actionsFor(st, sel)[0].ok && !u.dead) { const ok = actionTargets(st, sel, 'attack'); if (ok.length) { app.sfx.tap?.(); toast(tr('{name} est protégé : vise d’abord {list}.', { name: esc(tw(uName(u))), list: ok.map((x) => `<b>${esc(tw(uName(st.units[x])))}</b>`).join(tr(' ou ')) }), { icon: 'shield' }); return; } }
     info(u);
@@ -1217,7 +1220,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   async function castUlt() {
     if (!ultReady(st)) return;
     sel = null; mode = null; busy = true; draw();
-    const ev = g.duelUlt(where);
+    const ev = E.duelUlt(where);
     await play(ev);
     const healed = ev.filter((x) => x.t === 'heal').reduce((a, x) => a + x.d, 0);
     const dmg = ev.filter((x) => x.t === 'dmg').reduce((a, x) => a + x.d, 0);

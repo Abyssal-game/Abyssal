@@ -5684,3 +5684,62 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .dl-sel { max-width: 100%; }
 .dl-go { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
 .dl-go .btn { padding-left: 12px; padding-right: 12px; }
+
+/* v595 : Labo des combats (Mode Créateur, route #/labo) */
+.lb-wrap { padding: 4px 0 30px; }
+.lb-title { margin: 6px 0 4px; }
+.lb-tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 6px; margin: 12px 0; }
+.lb-tabs button, .lb-seg button { min-height: 44px; padding: 0 6px; border-radius: 10px; border: 1px solid rgba(201, 158, 74, .4); background: rgba(255, 255, 255, .04); color: var(--ink, #EDE3CC); font: 700 .82rem var(--f-ui); }
+.lb-tabs button.on, .lb-seg button.on { background: linear-gradient(#F2C14E, #A8741E); color: #20140A; }
+.lb-seg { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 5px; margin: 8px 0; }
+.lb-box { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+.lb-box h3 { margin: 0 0 4px; display: flex; align-items: center; gap: 6px; }
+.lb-row { display: grid; grid-template-columns: auto minmax(0, 1fr) 2.4em; align-items: center; gap: 8px; }
+.lb-row .dl-step { width: 36px; font-size: .9rem; }
+.lb-fl { font: 800 1.2rem var(--f-display); color: var(--gold-hi); text-align: center; }
+.lb-lab { margin: 6px 0 0; font-weight: 700; }
+.lb-sl { padding: 4px 0; }
+.lb-slh { display: flex; align-items: center; gap: 8px; font-size: .88rem; }
+.lb-slh b { flex: 1; } .lb-slh span { font: 700 .9rem var(--f-ui); color: var(--gold-hi); }
+.lb-prev { display: grid; gap: 4px; padding: 8px 10px; border-radius: 10px; background: rgba(0, 0, 0, .3); }
+.lb-prev p { margin: 0 0 2px; }
+.lb-foe { display: flex; justify-content: space-between; gap: 8px; font-size: .85rem; }
+.lb-foe small { color: var(--mute); white-space: nowrap; }
+.lb-foe.elite b { color: #F2C14E; } .lb-foe.boss b { color: #FF8A98; }
+.lb-go { min-height: 52px; margin-top: 4px; }
+.lb-simrow { display: grid; gap: 6px; margin-top: 6px; }
+.lb-simres { margin: 0; padding: 8px 10px; border-radius: 10px; background: rgba(255, 255, 255, .05); }
+.lb-notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 6px; }
+.lb-n { min-height: 46px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, .2); background: rgba(255, 255, 255, .05); color: #fff; font: 700 .82rem var(--f-ui); }
+.lb-n.n-easy2 { border-color: #7FB8FF; } .lb-n.n-easy { border-color: #9FD0FF; } .lb-n.n-ok { border-color: #7FE0A0; background: rgba(127, 224, 160, .12); }
+.lb-n.n-hard { border-color: #FFB86B; } .lb-n.n-hard2 { border-color: #FF6B7F; }
+.lb-nl { display: grid; gap: 4px; }
+.lb-ni { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 10px; background: rgba(255, 255, 255, .04); }
+.lb-ni span { flex: 1; min-width: 0; display: grid; font-size: .85rem; }
+.lb-ni small { color: var(--mute); } .lb-ni .lb-keep { color: var(--gold-hi); }
+.lb-chart { width: 100%; height: auto; display: block; background: rgba(0, 0, 0, .35); border-radius: 10px; }
+.lb-chart text { fill: rgba(237, 227, 204, .6); font: 9px var(--f-ui); }
+.lb-chart .grid { stroke: rgba(255, 255, 255, .07); }
+.lb-chart .base { stroke: rgba(255, 255, 255, .7); stroke-width: 1; }
+.lb-chart path { fill: none; stroke-width: 2; }
+.lb-chart path.foe { stroke: #F2C14E; } .lb-chart path.boss { stroke: #FF6B7F; }
+.lb-chart path.atk { stroke-dasharray: 4 3; }
+.lb-chart circle.foe { fill: #F2C14E; } .lb-chart circle.boss { fill: #FF6B7F; } .lb-chart circle.atk { fill: none; stroke-width: 1.5; } .lb-chart circle.foe.atk { stroke: #F2C14E; } .lb-chart circle.boss.atk { stroke: #FF6B7F; }
+.lb-leg { margin: 4px 0; } .lb-leg .foe { color: #F2C14E; } .lb-leg .boss { color: #FF8A98; }
+.lb-tab { width: 100%; border-collapse: collapse; }
+.lb-tab th, .lb-tab td { padding: 4px 6px; border-bottom: 1px solid rgba(255, 255, 255, .08); text-align: center; }
+.lb-tab th { color: var(--gold-hi); font-size: .75rem; }
+/* v596-v598 : ateliers du Labo (attaques, défenses, pouvoirs inventés) */
+.cb-def.q-hide .dv-dodge-bar .z { opacity: 0; transition: opacity .08s; }
+.cb-def.q-hide.q-show .dv-dodge-bar .z { opacity: 1; }
+.lf-it summary { gap: 8px; }
+.lf-form { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 6px 0 4px; }
+.lf-r { display: grid; gap: 4px; font-size: .85rem; }
+.lf-r select, .lf-r input.input { width: 100%; min-height: 44px; }
+.lf-r small { font-size: .72rem; }
+.lf-n span b { color: var(--gold-hi); }
+.lf-n input[type="range"] { width: 100%; accent-color: #F2C14E; height: 32px; }
+.lf-b { display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: .85rem; }
+.lf-b input { width: 22px; height: 22px; flex: none; accent-color: #F2C14E; }
+.lf-acts { padding: 6px 0 10px; }
+.lf-try { display: flex; justify-content: flex-end; margin: -2px 0 8px; }

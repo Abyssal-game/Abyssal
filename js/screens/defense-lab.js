@@ -6,7 +6,8 @@
 import { icon } from '../ui/icons.js';
 import { esc, toast, openSheet, confirmBox } from '../ui/dom.js';
 import { hap } from '../ui/sound.js';
-import { playBar, defVerdict, FAM_RHYTHM, KIND_RHYTHM, BOSS_ASSAULT } from '../ui/def-bar.js';
+import { playBar, defVerdict, FAM_RHYTHM, KIND_RHYTHM, BOSS_ASSAULT, CUSTOM_QTE } from '../ui/def-bar.js';
+import { syncLab } from './lab-forge.js';
 import { DEF_DEFAULTS, DEF_GROUPS, getTune, readTune, saveTune, tuneInGame, setTuneInGame } from '../ui/def-tune.js';
 import { defenseWindow } from '../core/duel.js';
 import { INTENTS } from '../core/skills.js';
@@ -18,6 +19,7 @@ const FAM = { predateur: 'Prédateur', assassin: 'Assassin', berserker: 'Berserk
 /* durée de base de la zone d'or selon l'attaque (defenseWindow) : on prend le type d'attaque qui correspond le mieux */
 const KIND_OF = { h: 'heavy', H: 'heavy' };
 const PARAMS = DEF_GROUPS.flatMap(([, list]) => list);
+const LN = (L) => LETTERS[L] || (CUSTOM_QTE[L] ? `n° ${L} ${CUSTOM_QTE[L].name || ''}` : L);
 const fmtV = (v, step) => (step < 1 ? (+v).toFixed(step < 0.1 ? 2 : 1).replace('.', ',') : String(Math.round(v)));
 
 /* toutes les attaques qu'on peut tester : [id, groupe, nom, séquence, rang imposé, gardien, kind] */
@@ -26,20 +28,22 @@ function attacks() {
   for (const [k, n] of Object.entries(LETTERS)) L.push([`l-${k}`, 'Un seul coup', n, k, null, null, KIND_OF[k] || 'hit']);
   for (const [k, q] of Object.entries(FAM_RHYTHM)) L.push([`f-${k}`, 'Familles d’ennemis (coup ordinaire)', FAM[k] || k, q, null, null, 'hit']);
   for (const [k, q] of Object.entries(KIND_RHYTHM)) L.push([`k-${k}`, 'Attaques spéciales', INTENTS[k]?.name || k, q, null, null, k]);
+  for (const [k, q] of Object.entries(CUSTOM_QTE)) L.push([`q-${k}`, 'Mes défenses inventées', `n° ${k} · ${q.name || 'Défense inventée'}`, k, null, null, 'hit']);
   for (const [k, A] of Object.entries(BOSS_ASSAULT)) L.push([`b-${k}`, 'Assauts des gardiens', `${BOSSES[k]?.name || k} · ${A.name}`, A.seq, 'boss', k, 'heavy']);
   return L;
 }
 
-export function openDefenseLab(app) {
+export function openDefenseLab(app, { seq = null } = {}) {
+  syncLab(); /* v597 : défenses inventées (chiffres 0 à 9) */
   const ALL = attacks();
-  const ui = { tier: 'normal', atk: 'l-n', custom: '', loop: false, running: false, last: null, open: {} };
+  const ui = { tier: 'normal', atk: seq ? 'custom' : 'l-n', custom: seq || '', loop: false, running: false, last: null, open: {} };
   let stats = { seq: 0, parry: 0, dodge: 0, none: 0, hits: [] };
   let tune = readTune();
   let tap = null, alive = true;
   const T = () => getTune(true);
   const cur = () => ALL.find((a) => a[0] === ui.atk) || ALL[0];
   const tierOf = () => cur()[4] || ui.tier;
-  const seqOf = () => (ui.atk === 'custom' ? (ui.custom.replace(/[^nflxmhH]/g, '') || 'n') : cur()[3]);
+  const seqOf = () => (ui.atk === 'custom' ? (ui.custom.replace(/[^nflxmhH0-9]/g, '') || 'n') : cur()[3]);
   const beatOf = () => (cur()[5] ? BOSS_ASSAULT[cur()[5]].beat || 0 : 0);
   const fakeSt = (L) => ({ units: { a: { intent: { kind: ui.atk === 'custom' ? KIND_OF[L] || 'hit' : (/[hH]/.test(L) ? 'heavy' : cur()[6]) }, level: 1, boss: tierOf() === 'boss', elite: tierOf() === 'elite' }, t: { level: 1 } } });
   const winOf = (L) => defenseWindow(fakeSt(L), 'a', 't', T());
@@ -66,7 +70,7 @@ export function openDefenseLab(app) {
     const l = ui.last; if (!l) return '<p class="small muted center">Lance une attaque, puis touche n’importe où dans le cadre noir au bon moment.</p>';
     const nm = { parry: 'Parade', dodge: 'Esquive', none: 'Touché' };
     return `<div class="dl-last"><b class="r-${l.verdict}">Bilan : ${l.verdict === 'parry' ? 'tout paré (contre-attaque)' : l.verdict === 'dodge' ? 'esquivé (éraflé)' : 'touché'}</b>
-      ${l.hits.map((x) => `<span class="r-${x.res}">Coup ${x.i + 1} (${esc(LETTERS[x.letter] || x.letter)}) : ${nm[x.res]}${x.ms != null ? ` · ${x.ms > 0 ? '+' : ''}${x.ms} ms` : ' · pas touché'}</span>`).join('')}
+      ${l.hits.map((x) => `<span class="r-${x.res}">Coup ${x.i + 1} (${esc(LN(x.letter))}) : ${nm[x.res]}${x.ms != null ? ` · ${x.ms > 0 ? '+' : ''}${x.ms} ms` : ' · pas touché'}</span>`).join('')}
       <small class="muted">Écart = moment du toucher par rapport à l’impact (fin de la zone d’or) : négatif = en avance.</small></div>`;
   }
   function infoHTML() {
@@ -74,6 +78,7 @@ export function openDefenseLab(app) {
     const D0 = tierOf() === 'boss' ? t.durBoss : tierOf() === 'elite' ? t.durElite : t.durNormal;
     const rows = [...new Set(q)].map((L) => { const w = winOf(L), feint = L === 'x' || L === 'H';
       const D = D0 * (L === 'f' ? t.multFast : L === 'l' ? t.multSlow : 1) * (feint ? t.multFeint : 1) * (beatOf() ? t.multBeat : 1);
+      if (CUSTOM_QTE[L]) { const C = CUSTOM_QTE[L]; return `<span><b>${esc(LN(L))}</b> : passage ${Math.round(D0 * (C.speed || 1) * (C.feint ? t.multFeint : 1) * (C.bounce ? 1.6 : 1))} ms · zone d’or ×${C.zone || 1} · trait blanc ${Math.round((C.parry || 0.2) * 100)} % de la zone</span>`; }
       return `<span><b>${esc(LETTERS[L])}</b> : passage ${Math.round(D)} ms · zone d’or ${w.dodge} ms · trait blanc ${w.parry} ms</span>`; });
     return `<div class="dl-info small">${rows.join('')}</div>`;
   }
@@ -94,8 +99,8 @@ export function openDefenseLab(app) {
         <div class="dl-tier ${cur()[4] ? 'off' : ''}">${['normal', 'elite', 'boss'].map((t) => `<button class="${tierOf() === t ? 'on' : ''}" data-l="tier" data-v="${t}">${{ normal: 'Ennemi', elite: 'Élite', boss: 'Gardien' }[t]}</button>`).join('')}</div>
         <select class="input plain dl-sel" data-l="atk">${groups.map((gname) => `<optgroup label="${esc(gname)}">${ALL.filter((a) => a[1] === gname).map((a) => `<option value="${a[0]}" ${a[0] === ui.atk ? 'selected' : ''}>${esc(a[2])} · ${esc(a[3])}</option>`).join('')}</optgroup>`).join('')}
           <option value="custom" ${ui.atk === 'custom' ? 'selected' : ''}>Séquence libre…</option></select>
-        ${ui.atk === 'custom' ? `<input class="input plain dl-cust" data-l="cust" value="${esc(ui.custom)}" placeholder="ex. nfxh (lettres n f l x m h H)" maxlength="8">` : ''}
-        <p class="small muted dl-legend">n simple · f rapide · l lent · x feinte · m zone mobile · h chargé (maintenir, relâcher) · H chargé avec feinte</p>
+        ${ui.atk === 'custom' ? `<input class="input plain dl-cust" data-l="cust" value="${esc(ui.custom)}" placeholder="ex. nfxh, ou 0 pour ta défense n° 0" maxlength="8">` : ''}
+        <p class="small muted dl-legend">n simple · f rapide · l lent · x feinte · m zone mobile · h chargé (maintenir, relâcher) · H chargé avec feinte · 0 à 9 : tes défenses inventées</p>
         ${infoHTML()}
         <div class="row gap dl-go"><button class="btn gold block" data-l="go" ${ui.running ? 'disabled' : ''}>${icon('swords')}Lancer l’attaque</button>
           <button class="btn ${ui.loop ? 'gold' : ''}" data-l="loop">${ui.loop ? 'Enchaîner ✓' : 'Enchaîner'}</button></div>
