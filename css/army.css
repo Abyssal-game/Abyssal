@@ -5878,3 +5878,6 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 
 /* v625 : la grille du Labo des combats (.lb-row, v595) écrasait celle des classements (rang, portrait, pseudo, score) : pseudo coupé, score renvoyé à la ligne */
 .lb-row:has(> .lb-rank) { grid-template-columns: 28px 34px minmax(0, 1fr) auto; gap: 10px; }
+
+/* v627 : titres des bannières (Épreuves du jour et les autres) : l'ombre de texte passait par-dessus le dégradé doré (texte « découpé ») et le rendait noir ; halo posé derrière les lettres */
+.ui-hero.bn-trial h1, .screen-head.ui-hero h1 { text-shadow: none; filter: drop-shadow(0 2px 1px rgba(0, 0, 0, .95)) drop-shadow(0 0 10px rgba(0, 0, 0, .85)); background: linear-gradient(180deg, #FFF6DA, #F2C14E 60%, #C8913A); -webkit-background-clip: text; background-clip: text; color: transparent; }
