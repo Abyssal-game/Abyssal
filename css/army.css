@@ -5596,3 +5596,9 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .pf-cx-vif-nacre { --fr: url(../assets/frames/cx-vif-nacre-4.webp); }
 /* v586 : réactions des gardiens : figure peinte cadrée sur la tête */
 .re-pic img.re-boss { object-fit: cover; object-position: 50% 6%; transform: scale(1.35); transform-origin: 50% 12%; }
+
+/* v588 : 4 cadres vivants de plus (Venin, Chandelles, Ambre, Obsidienne) */
+.pf-cx-vif-venin { --fr: url(../assets/frames/cx-vif-venin-4.webp); }
+.pf-cx-vif-chandelles { --fr: url(../assets/frames/cx-vif-chandelles-4.webp); }
+.pf-cx-vif-ambre { --fr: url(../assets/frames/cx-vif-ambre-4.webp); }
+.pf-cx-vif-obsidienne { --fr: url(../assets/frames/cx-vif-obsidienne-4.webp); }
