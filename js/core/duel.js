@@ -328,7 +328,7 @@ export const BOSS_HIT_CAP = 0.4;
 const bossCap = (u) => Math.max(1, Math.round(u.maxHp * BOSS_HIT_CAP));
 export const MULT_CAP = 3;
 // Tes créatures : un coup normal retire au plus 45 % de leurs PV max, un coup annoncé (chargé, déflagration…) 75 %
-export const ALLY_HIT_CAP = 0.45, ALLY_BIG_CAP = 0.75;
+export const ALLY_HIT_CAP = 0.6, ALLY_BIG_CAP = 0.9; /* v604 : 0,45 / 0,75 → 0,6 / 0,9 : un coup ennemi ne pouvait jamais retirer plus de 45 % des PV, les combats devenaient sans risque */
 const BIG = ['heavy', 'blast', 'gorge', 'blizzard', 'copy', 'swarm', 'execute', 'lament', 'ambush', 'price', 'quake'];
 // v392 : Verdict du Juge des Sceaux (action interdite à toute ton équipe jusqu'à son action suivante)
 export const FORBID = { attack: 'attaquer', skill: 'utiliser une compétence', defend: 'se défendre' };
@@ -800,7 +800,7 @@ export function act(st, uid, key, tUid = null) {
   if (key !== 'swap') u.acts++;
   const t = tUid ? st.units[tUid] : null;
   ev.push({ t: 'act', u: uid, key, tgt: tUid, name: a.name, skill: !['attack', 'defend', 'swap'].includes(key) });
-  if (key === 'estoc' || key === 'raz' || key === 'contagion') { u.struck = true; u.lastStruck = st.round; } // v310 : une créature qui frappe n'est plus Insaisissable
+  if (!['defend', 'swap'].includes(key)) { u.struck = true; u.lastStruck = st.round; } /* v604 : toute action (soin, Marque, Rempart, Hâte…) la rend visible, plus seulement les frappes */
   if (key === 'attack') basicAttack(st, u, t, ev);
   else if (/^lsk\d/.test(key)) { const i = +key.slice(3), L = st.labSkills[i]; (u.lskUsed ||= {})[i] = true; u.struck = true; labPowerDo(st, u, t, L, ev); }
   else if (key === 'defend') { u.defend = true; ev.push({ t: 'status', u: uid, s: 'En défense', k: 'defend' }); }
@@ -915,7 +915,7 @@ function basicAttack(st, u, t, ev) {
   weakBonus(st, u, t, ev);
   const S = strikeOf(u), frozen = t.frozen > 0, hits = S.hits || 1;
   let m = strikeMult(u, t), rush = 0;
-  if (hasP(u, 'ruee') && !u.rushed) { u.rushed = true; m *= boosted(u, 'ruee') ? 2.5 : 2; rush = 1; pfx(ev, u, 'ruee'); }
+  if (hasP(u, 'ruee') && !u.rushed) { u.rushed = true; m *= boosted(u, 'ruee') ? 2 : 1.6; /* v604 : +100 / +150 % → +60 / +100 % */ rush = 1; pfx(ev, u, 'ruee'); }
   u.struck = true; u.lastStruck = st.round;
   const marked = !!(t.mark || t.broken), poisoned = t.poison > 0;
   // Riposte chargée (v265) : les coups encaissés pour un allié et les parades du Protecteur renforcent sa prochaine attaque
@@ -1034,7 +1034,7 @@ function entrance(st, u, aimed, ev) {
 
 // ——— Pouvoir d'équipe : coûte 1 PA et toute la Ferveur, une seule fois par combat ———
 export const ultReady = (st) => !st.over && !st.ultUsed && st.turn === 'ally' && st.fervor >= ULT_COST.fervor && (st.init ? !!st.actor : st.ap >= ULT_COST.ap);
-export const SEAL_WARD = 0.5; // bouclier du Sceau : absorbe jusqu'à 50 % des PV max
+export const SEAL_WARD = 0.3, SEAL_HEAL = 0.2; // bouclier du Sceau : absorbe jusqu'à 30 % des PV max ; soin 20 % (v604 : 50 % et 30 %)
 export function useUlt(st) {
   const ev = [];
   if (!ultReady(st)) return ev;
@@ -1045,7 +1045,7 @@ export function useUlt(st) {
   ev.push({ t: 'ult', key: st.ult });
   if (st.labUlt) labPowerDo(st, allies[0] || front(st, 'ally')[0], null, { ...st.labUlt, target: st.labUlt.target === 'enemy' ? 'allEnemies' : st.labUlt.target === 'ally' ? 'allAllies' : st.labUlt.target }, ev); /* v598 : pouvoir d'équipe inventé (aucun des pouvoirs du jeu ne joue alors) */
   if (ultK === 'sceau' && st.init && allies.some((u) => u.hp < u.maxHp * 0.3)) allies.forEach((u) => gainPA(u, 1, ev)); // à condition : un allié en danger
-  if (ultK === 'sceau') allies.forEach((u) => { heal(u, u.maxHp * 0.3 * p, ev); u.ward = Math.max(u.ward || 0, Math.round(u.maxHp * SEAL_WARD)); ev.push({ t: 'status', u: u.uid, s: `Sceau : ${u.ward}` }); });
+  if (ultK === 'sceau') allies.forEach((u) => { heal(u, u.maxHp * SEAL_HEAL * p, ev); u.ward = Math.max(u.ward || 0, Math.round(u.maxHp * SEAL_WARD)); ev.push({ t: 'status', u: u.uid, s: `Sceau : ${u.ward}` }); });
   else if (ultK === 'revive') {
     const fallen = st.order.ally.map((id) => st.units[id]).filter((u) => u.hp <= 0);
     if (fallen.length) fallen.forEach((u) => { u.hp = Math.round(u.maxHp * 0.5 * p); u.poison = 0; u.inPlay = false; u.down = false; toBack(st, u); ev.push({ t: 'revive', u: u.uid }); });

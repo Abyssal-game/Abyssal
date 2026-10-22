@@ -1211,7 +1211,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
 
   // ——— Pouvoir d'équipe : explication avant, récapitulatif après ———
   const ULT_HOW = {
-    sceau: 'Chacune de tes créatures au combat récupère 30 % de ses PV et reçoit un bouclier qui absorbe des dégâts jusqu’à la moitié de ses PV max.',
+    sceau: 'Chacune de tes créatures au combat récupère 20 % de ses PV et reçoit un bouclier qui absorbe des dégâts jusqu’à 30 % de ses PV max.',
     revive: 'Tes créatures tombées reviennent au combat avec la moitié de leurs PV. Si aucune n’est tombée, tes créatures au combat récupèrent 40 % de leurs PV.',
     nova: 'Chaque ennemi au combat subit des dégâts (plus forts à chaque tour qui passe) et sa jauge de Brisure baisse.',
     smite: 'L’ennemi qui a le plus de PV subit un coup énorme (plus fort à chaque tour) et sa jauge de Brisure baisse fortement.',

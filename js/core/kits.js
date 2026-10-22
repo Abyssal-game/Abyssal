@@ -132,7 +132,7 @@ export const PASSIVES = {
   blindage: { name: 'Blindage', desc: 'Les coups ennemis qu’elle reçoit font 12 % de dégâts en moins.', awaken: '20 %.' },
   augure: { name: 'Augure', desc: 'Au début d’un combat, +1 Ferveur si ton équipe en a moins de 3.', awaken: 'Moins de 4.' },
   cataclysme: { name: 'Cataclysme', desc: 'Au début de chaque combat, frappe tous les ennemis à 30 % de son attaque.', awaken: '50 %.' },
-  insaisissable: { name: 'Insaisissable', desc: 'Les ennemis visent une autre de tes créatures tant qu’elle n’a pas frappé dans le combat.', awaken: 'Elle redevient insaisissable à chaque tour où elle n’attaque pas.' },
+  insaisissable: { name: 'Insaisissable', desc: 'Les ennemis visent une autre de tes créatures tant qu’elle n’a pas agi dans le combat (se défendre ou changer de place ne compte pas).', awaken: 'Elle redevient insaisissable à chaque tour où elle n’agit pas.' },
   devoreur: { name: 'Vorace', desc: 'Chaque ennemi qu’elle achève : +1 ATQ pour le combat (+3 au plus).', awaken: '+5 au plus, et 15 % de PV rendus.' },
   effroi: { name: 'Effroi', desc: 'Les ennemis ordinaires qui la frappent font 20 % de dégâts en moins (pas les élites ni les gardiens).', awaken: '30 % de moins.' },
 };
