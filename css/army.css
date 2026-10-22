@@ -5587,3 +5587,10 @@ body.battle-mode .prog-chip { top: calc(var(--safe-t, env(safe-area-inset-top, 0
 .pf-infernal::after, .pf-braise::after, .pf-phenix::after, .pf-forge::after { background: conic-gradient(transparent 0deg 285deg, rgba(255, 170, 90, .95) 330deg, transparent 360deg); }
 @keyframes pfSweep { to { transform: rotate(1turn); } }
 html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: none; opacity: 0; }
+/* v585 : 6 cadres vivants de plus (Dragon, Phénix, Améthyste, Kraken, Forêt ancienne, Nacre noire) */
+.pf-cx-vif-dragon { --fr: url(../assets/frames/cx-vif-dragon-4.webp); }
+.pf-cx-vif-phenix { --fr: url(../assets/frames/cx-vif-phenix-4.webp); }
+.pf-cx-vif-amethyste { --fr: url(../assets/frames/cx-vif-amethyste-4.webp); }
+.pf-cx-vif-kraken { --fr: url(../assets/frames/cx-vif-kraken-4.webp); }
+.pf-cx-vif-foret { --fr: url(../assets/frames/cx-vif-foret-4.webp); }
+.pf-cx-vif-nacre { --fr: url(../assets/frames/cx-vif-nacre-4.webp); }

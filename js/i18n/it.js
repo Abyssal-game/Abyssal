@@ -1,5 +1,11 @@
 // Dictionnaire italien (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Cadre vivant du Dragon": "Cornice vivente del Drago",
+  "Cadre vivant du Phénix": "Cornice vivente della Fenice",
+  "Cadre vivant de l’Améthyste": "Cornice vivente d’Ametista",
+  "Cadre vivant du Kraken": "Cornice vivente del Kraken",
+  "Cadre vivant de la Forêt ancienne": "Cornice vivente della Foresta antica",
+  "Cadre vivant de la Nacre noire": "Cornice vivente di Madreperla nera",
   "Une récompense à chaque palier : cadres, dos de cartes et titres du Réveil des Racines, introuvables à l’Échoppe.": "Una ricompensa a ogni livello: cornici, dorsi e titoli del Risveglio delle Radici, introvabili nella Bottega.",
   "Une récompense à chaque palier : cadres, dos de cartes et titres du Carnaval des Ombres, introuvables à l’Échoppe.": "Una ricompensa a ogni livello: cornici, dorsi e titoli del Carnevale delle Ombre, introvabili nella Bottega.",
   "Une récompense à chaque palier : cadres, dos de cartes et titres des Jardins de la Lune pâle, introuvables à l’Échoppe.": "Una ricompensa a ogni livello: cornici, dorsi e titoli dei Giardini della Luna pallida, introvabili nella Bottega.",

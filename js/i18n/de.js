@@ -1,5 +1,11 @@
 // Dictionnaire allemand (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Cadre vivant du Dragon": "Lebender Drachenrahmen",
+  "Cadre vivant du Phénix": "Lebender Phönixrahmen",
+  "Cadre vivant de l’Améthyste": "Lebender Amethystrahmen",
+  "Cadre vivant du Kraken": "Lebender Krakenrahmen",
+  "Cadre vivant de la Forêt ancienne": "Lebender Rahmen des Urwalds",
+  "Cadre vivant de la Nacre noire": "Lebender Rahmen aus schwarzem Perlmutt",
   "Une récompense à chaque palier : cadres, dos de cartes et titres du Réveil des Racines, introuvables à l’Échoppe.": "Eine Belohnung auf jeder Stufe: Rahmen, Kartenrücken und Titel zum Erwachen der Wurzeln, die es im Laden nicht gibt.",
   "Une récompense à chaque palier : cadres, dos de cartes et titres du Carnaval des Ombres, introuvables à l’Échoppe.": "Eine Belohnung auf jeder Stufe: Rahmen, Kartenrücken und Titel zum Karneval der Schatten, die es im Laden nicht gibt.",
   "Une récompense à chaque palier : cadres, dos de cartes et titres des Jardins de la Lune pâle, introuvables à l’Échoppe.": "Eine Belohnung auf jeder Stufe: Rahmen, Kartenrücken und Titel der Gärten des bleichen Mondes, die es im Laden nicht gibt.",

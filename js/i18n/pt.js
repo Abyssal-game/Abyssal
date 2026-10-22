@@ -1,5 +1,11 @@
 // Dictionnaire portugais du Brésil (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Cadre vivant du Dragon": "Moldura viva do Dragão",
+  "Cadre vivant du Phénix": "Moldura viva da Fênix",
+  "Cadre vivant de l’Améthyste": "Moldura viva de Ametista",
+  "Cadre vivant du Kraken": "Moldura viva do Kraken",
+  "Cadre vivant de la Forêt ancienne": "Moldura viva da Floresta antiga",
+  "Cadre vivant de la Nacre noire": "Moldura viva de Nácar negro",
   "Une récompense à chaque palier : cadres, dos de cartes et titres du Réveil des Racines, introuvables à l’Échoppe.": "Uma recompensa em cada nível: molduras, versos e títulos do Despertar das Raízes, impossíveis de achar na Loja.",
   "Une récompense à chaque palier : cadres, dos de cartes et titres du Carnaval des Ombres, introuvables à l’Échoppe.": "Uma recompensa em cada nível: molduras, versos e títulos do Carnaval das Sombras, impossíveis de achar na Loja.",
   "Une récompense à chaque palier : cadres, dos de cartes et titres des Jardins de la Lune pâle, introuvables à l’Échoppe.": "Uma recompensa em cada nível: molduras, versos e títulos dos Jardins da Lua Pálida, impossíveis de achar na Loja.",

@@ -1,5 +1,11 @@
 // Anglais (v506-v507) : texte français → traduction. Généré à partir des lots de traduction ; on peut corriger à la main.
 export default {
+  "Cadre vivant du Dragon": "Living Dragon Frame",
+  "Cadre vivant du Phénix": "Living Phoenix Frame",
+  "Cadre vivant de l’Améthyste": "Living Amethyst Frame",
+  "Cadre vivant du Kraken": "Living Kraken Frame",
+  "Cadre vivant de la Forêt ancienne": "Living Ancient Forest Frame",
+  "Cadre vivant de la Nacre noire": "Living Black Nacre Frame",
   "Une récompense à chaque palier : cadres, dos de cartes et titres du Réveil des Racines, introuvables à l’Échoppe.": "A reward at every tier: Awakening of the Roots frames, card backs and titles, never sold in the Emporium.",
   "Une récompense à chaque palier : cadres, dos de cartes et titres du Carnaval des Ombres, introuvables à l’Échoppe.": "A reward at every tier: Carnival of Shadows frames, card backs and titles, never sold in the Emporium.",
   "Une récompense à chaque palier : cadres, dos de cartes et titres des Jardins de la Lune pâle, introuvables à l’Échoppe.": "A reward at every tier: Pale Moon Gardens frames, card backs and titles, never sold in the Emporium.",

@@ -1,5 +1,11 @@
 // Dictionnaire espagnol (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Cadre vivant du Dragon": "Marco viviente del Dragón",
+  "Cadre vivant du Phénix": "Marco viviente del Fénix",
+  "Cadre vivant de l’Améthyste": "Marco viviente de Amatista",
+  "Cadre vivant du Kraken": "Marco viviente del Kraken",
+  "Cadre vivant de la Forêt ancienne": "Marco viviente del Bosque antiguo",
+  "Cadre vivant de la Nacre noire": "Marco viviente de Nácar negro",
   "Une récompense à chaque palier : cadres, dos de cartes et titres du Réveil des Racines, introuvables à l’Échoppe.": "Una recompensa en cada nivel: marcos, reversos y títulos del Despertar de las Raíces, imposibles de encontrar en el Bazar.",
   "Une récompense à chaque palier : cadres, dos de cartes et titres du Carnaval des Ombres, introuvables à l’Échoppe.": "Una recompensa en cada nivel: marcos, reversos y títulos del Carnaval de las Sombras, imposibles de encontrar en el Bazar.",
   "Une récompense à chaque palier : cadres, dos de cartes et titres des Jardins de la Lune pâle, introuvables à l’Échoppe.": "Una recompensa en cada nivel: marcos, reversos y títulos de los Jardines de la Luna pálida, imposibles de encontrar en el Bazar.",

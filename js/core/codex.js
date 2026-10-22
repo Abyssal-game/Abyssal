@@ -42,7 +42,7 @@ export const CODEX_FRAMES = {
     'cx-fondateur': 'Cadre du Fondateur',   /* v472 : réserve (saison II ou Échoppe), images prêtes dans assets/frames/ */
   'cx-os': 'Couronne d’ossements',   'cx-chaines': 'Cadre des chaînes forgées', 'cx-ruche': 'Cadre de la ruche d’ambre',
   /* v479 : catalogue de l'Échoppe (store/boutique-cosmetiques.md) : Nuit des Âmes, Hiver éternel, Cœurs maudits, les sept trônes, trophées des gardiens */
-  'cx-lanternes': 'Cadre des lanternes d’âmes', 'cx-voile': 'Cadre du voile des trépassés',   /* v582 */ 'cx-vif-brasier': 'Cadre vivant du Brasier', 'cx-vif-givre': 'Cadre vivant du Givre éternel', 'cx-vif-abysse': 'Cadre vivant de l’Abysse', 'cx-vif-sang': 'Cadre vivant du Sang royal', 'cx-vif-foudre': 'Cadre vivant de la Foudre', 'cx-vif-ames': 'Cadre vivant des Âmes errantes', 'cx-vif-etoiles': 'Cadre vivant de la Voûte céleste', 'cx-vif-soleil-noir': 'Cadre vivant du Soleil noir', 'cx-vif-maree': 'Cadre vivant de la Marée luminescente', 'cx-vif-rouages': 'Cadre vivant des Rouages',   'cx-meute': 'Cadre de la meute',   'cx-eclipse': 'Cadre de l’Éclipse', 'cx-balance': 'Cadre du Juge des Sceaux',
+  'cx-lanternes': 'Cadre des lanternes d’âmes', 'cx-voile': 'Cadre du voile des trépassés',   /* v582 */ 'cx-vif-brasier': 'Cadre vivant du Brasier', 'cx-vif-givre': 'Cadre vivant du Givre éternel', 'cx-vif-abysse': 'Cadre vivant de l’Abysse', 'cx-vif-sang': 'Cadre vivant du Sang royal', 'cx-vif-foudre': 'Cadre vivant de la Foudre', 'cx-vif-ames': 'Cadre vivant des Âmes errantes', 'cx-vif-etoiles': 'Cadre vivant de la Voûte céleste', 'cx-vif-soleil-noir': 'Cadre vivant du Soleil noir', 'cx-vif-maree': 'Cadre vivant de la Marée luminescente', 'cx-vif-rouages': 'Cadre vivant des Rouages', /* v585 */ 'cx-vif-dragon': 'Cadre vivant du Dragon', 'cx-vif-phenix': 'Cadre vivant du Phénix', 'cx-vif-amethyste': 'Cadre vivant de l’Améthyste', 'cx-vif-kraken': 'Cadre vivant du Kraken', 'cx-vif-foret': 'Cadre vivant de la Forêt ancienne', 'cx-vif-nacre': 'Cadre vivant de la Nacre noire',   'cx-meute': 'Cadre de la meute',   'cx-eclipse': 'Cadre de l’Éclipse', 'cx-balance': 'Cadre du Juge des Sceaux',
   /* v480 */ 'cx-geode': 'Cadre de la géode d’améthyste', 'cx-pages': 'Cadre du grimoire déchiré', 'cx-corbeau': 'Cadre des corbeaux',   /* v550 : Saison I « La Nuit des Âmes » et Saison II « La Veillée de Noël » (images Gemini attendues) */
   'cx-citrouilles': 'Cadre des citrouilles sculptées', 'cx-ames': 'Couronne du Passeur des Âmes',
   'cx-noel': 'Couronne de la Veillée',
@@ -161,7 +161,7 @@ export const RETIRED_COSM = ['cx-fondateur', 'cx-os', 'cx-ruche', 'cx-lanternes'
 export const COSM_PRICE = { rare: 180, epic: 280, leg: 420, myth: 600 };
 export const COSM_RARITY = {
   /* cadres (10 en vente ; 10 de plus attendus, prompts §257-266) */
-  'cx-vif-soleil-noir': 'myth', 'cx-vif-sang': 'leg', 'cx-vif-brasier': 'leg', 'cx-vif-givre': 'leg',
+  'cx-vif-soleil-noir': 'myth', 'cx-vif-dragon': 'myth', 'cx-vif-phenix': 'myth', 'cx-vif-amethyste': 'leg', 'cx-vif-kraken': 'epic', 'cx-vif-foret': 'epic', 'cx-vif-nacre': 'epic', 'cx-vif-sang': 'leg', 'cx-vif-brasier': 'leg', 'cx-vif-givre': 'leg',
   'cx-vif-ames': 'epic', 'cx-vif-abysse': 'epic', 'cx-vif-maree': 'epic', 'cx-vif-foudre': 'rare', 'cx-vif-etoiles': 'rare', 'cx-vif-rouages': 'rare',
   /* dos */
   'dos-vif-phenix': 'myth', 'dos-vif-ailes': 'myth', 'dos-vif-couronne': 'myth', 'dos-vif-kraken': 'myth', 'dos-vif-tresor': 'myth', 'dos-vif-portail': 'myth',
@@ -180,7 +180,7 @@ export const COSM_RARITY = {
   'pl-braise': 'epic', 'pl-givre': 'epic', 'pl-souverain': 'epic', 'pl-nacre': 'epic', 'pl-dragon': 'epic', 'pl-foret': 'epic',
   'pl-eclipse': 'rare', 'pl-or-noir': 'rare', 'pl-ossuaire': 'rare', 'pl-abysse': 'rare', 'pl-foudre': 'rare', 'pl-grimoire': 'rare', 'pl-obsidienne': 'rare', 'pl-pierre': 'rare',
 };
-const SHOP_FRAMES = ['cx-vif-soleil-noir', 'cx-vif-sang', 'cx-vif-brasier', 'cx-vif-givre', 'cx-vif-ames', 'cx-vif-abysse', 'cx-vif-maree', 'cx-vif-foudre', 'cx-vif-etoiles', 'cx-vif-rouages'];
+const SHOP_FRAMES = ['cx-vif-dragon', 'cx-vif-phenix', 'cx-vif-soleil-noir', 'cx-vif-amethyste', 'cx-vif-sang', 'cx-vif-brasier', 'cx-vif-givre', 'cx-vif-kraken', 'cx-vif-nacre', 'cx-vif-foret', 'cx-vif-ames', 'cx-vif-abysse', 'cx-vif-maree', 'cx-vif-foudre', 'cx-vif-etoiles', 'cx-vif-rouages'];
 const SHOP_BACKS = ['dos-vif-phenix', 'dos-vif-ailes', 'dos-vif-couronne', 'dos-vif-nebuleuse', 'dos-vitrail', 'dos-vif-lune-sang', 'dos-vif-trone',
   'dos-vif-astrolabe', 'dos-vif-orchidee', 'dos-vif-sablier', 'dos-vif-hydre', 'dos-abyssal', 'dos-infernal',
   'dos-sauvage', 'dos-necrotique', 'dos-primordial', 'dos-artificiel', 'dos-celeste', 'dos-phalene', 'dos-art-deco'];
