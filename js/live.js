@@ -73,18 +73,19 @@ export async function liveVerify(text, sig, key = pubKey) {
 }
 
 async function fetchManifest() {
+  let why = '';
   for (const base of LIVE_BASES) {
     try {
       const t = Date.now();
       const [r, s] = await Promise.all([fetch(`${base}live.json?t=${t}`, { cache: 'no-store' }), fetch(`${base}live.sig?t=${t}`, { cache: 'no-store' })]);
-      if (!r.ok) continue;
+      if (!r.ok) { why = `live.json ${r.status}`; continue; }
       const text = await r.text();
       if (!s.ok || !(await liveVerify(text, await s.text()))) return { unsigned: true };
       const m = JSON.parse(text);
       if (m && m.files) return { m, text, base: /^https:\/\//.test(m.base || '') ? m.base : base };
-    } catch (e) { /* adresse suivante */ }
+    } catch (e) { why = String(e?.message || e).slice(0, 80); /* adresse suivante */ }
   }
-  return null;
+  return { offline: true, why };
 }
 
 // Numéro de build de l'application installée (CFBundleVersion = numéro du jeu au moment de l'archive) :
@@ -105,7 +106,7 @@ export async function liveCheck({ force = false } = {}) {
   try {
     st.checked = Date.now(); save(st);
     const got = await fetchManifest();
-    if (!got) { setStatus({ state: 'offline' }); return liveStatus(); }
+    if (got.offline) { setStatus({ state: 'offline', msg: got.why }); return liveStatus(); }
     if (got.unsigned) { setStatus({ state: 'unsigned' }); return liveStatus(); }
     const { m, text, base } = got, v = num(m.v);
     const native = await binBuild();

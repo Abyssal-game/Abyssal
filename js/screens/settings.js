@@ -34,6 +34,8 @@ function liveLine(st = liveStatus()) {
     default: return st.ready ? `Mise à jour v${st.ready} prête : elle s’installera au prochain lancement de l’app.` : 'Le jeu se met à jour tout seul.';
   }
 }
+/* v620 : cause technique d'un échec (aide au diagnostic), jamais traduite */
+function liveWhy(st = liveStatus()) { return (st.state === 'offline' || st.state === 'error') && st.msg ? esc(st.msg) : ''; }
 import { LANGS, LANG, setLang } from '../i18n.js';
 /* v418 : code du Mode Créateur choisi par le propriétaire ; seule son empreinte SHA-256 (en majuscules) est dans le code */
 const CREATOR_HASH = 'a0f19d9e26a8d1b7c87d32cc8bbfb9f61d58de4b518cf9e145d36c787a37ac37';
@@ -121,7 +123,7 @@ export default function settings(app, root) {
         <p class="small">ABYSSAL — Le Bestiaire interdit.</p>
         <p class="small muted" data-act="vtap">Version ${esc(app.version)} · ${app.catalog.cards.length} cartes</p>
         <p class="small muted set-partie">${partieLine()}</p>
-        ${liveOn() ? `<p class="small muted set-live">${liveLine()}</p><button class="btn ghost small" data-act="livecheck">${icon('eye')} Chercher une mise à jour</button>` : ''}
+        ${liveOn() ? `<p class="small muted set-live">${liveLine()}</p><p class="small muted set-live-why" translate="no">${liveWhy()}</p><button class="btn ghost small" data-act="livecheck">${icon('eye')} Chercher une mise à jour</button>` : ''}
         ${s.dev ? `<p class="small muted set-audio">${(() => { const a = audioInfo(); return `Son : ${esc(a.state)} · ${a.samples}${a.expected != null ? `/${a.expected}` : ''} sons chargés · session ${esc(String(a.session))}${a.enabled ? '' : ' · coupé dans les réglages'}${a.diag.failGet || a.diag.failDecode || a.diag.err ? ` · échecs lecture ${a.diag.failGet}, décodage ${a.diag.failDecode}${a.diag.err ? ` · ${esc(a.diag.err)}` : ''}` : ''}`; })()}</p>
         <button class="btn ghost small" data-act="sndtest">${icon('dodge')} Tester le son</button>` : ''}
         <a class="btn ghost small" href="confidentialite.html" target="_blank" rel="noopener">${icon('book')} Politique de confidentialité</a>
@@ -217,7 +219,7 @@ export default function settings(app, root) {
   refreshProfile(false);
   // v413 : joueurs en ligne, seulement ici (en bas de À propos), mis à jour en direct
   const offP = onPresence(paintPill);
-  const offL = onLiveStatus((st) => { const el = root.querySelector('.set-live'); if (el) el.textContent = liveLine(st); });
+  const offL = onLiveStatus((st) => { const el = root.querySelector('.set-live'); if (el) el.textContent = liveLine(st); const w = root.querySelector('.set-live-why'); if (w) w.innerHTML = liveWhy(st); });
   return () => { off(); offP(); offL(); };
 }
 
