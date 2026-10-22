@@ -5936,3 +5936,19 @@ html[data-mat="tp-mammon"] .sc-cell { background: rgba(40, 0, 0, .3); box-shadow
    le voile rouge de la défense ne pulse plus (une opacité animée sur tout l'écran, redessinée à chaque image) */
 .dv { will-change: auto; }
 .dv.qte-on::after { animation: none; opacity: .85; }
+
+/* v635 : rectangle noir penché pendant un Assaut à 3 coups (capture du propriétaire, app iPhone, contre le Dévoreur) : les cartes
+   de combat étaient inclinées en vraie 3D (rotateX 6-8°, perspective des rangées) et le coup reçu ajoutait une rotation ; une carte
+   3D frappée plusieurs fois de suite, avec ses effets accrochés, devenait une couche que l'app ne savait plus dessiner (morceau noir
+   penché du même angle). Plus aucune 3D dans le combat : carte à plat, coup reçu = recul et écrasement, sans rotation. */
+.dv-row { perspective: none; }
+.dv-c { transform: none; }
+.dv-c.sel { transform: translateY(-10px) scale(1.06); }
+@keyframes dvHit2 {
+  0% { transform: translateY(var(--kb)) scale(.93); filter: brightness(2.2) saturate(0); }
+  22% { transform: translate(-6px, calc(var(--kb) * .45)) scale(.97); filter: brightness(1.4) saturate(.6); }
+  48% { transform: translate(5px, 0); filter: none; }
+  72% { transform: translateX(-2px); }
+  100% { transform: none; }
+}
+@keyframes dvHit { 20% { transform: translateX(-6px); filter: brightness(2.2) saturate(0); } 55% { transform: translateX(5px); } }
