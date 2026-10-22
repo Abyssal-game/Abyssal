@@ -1,5 +1,15 @@
 // Anglais (v506-v507) : texte français → traduction. Généré à partir des lots de traduction ; on peut corriger à la main.
 export default {
+  "Cadre vivant de la Méduse": "Living Jellyfish Frame",
+  "Cadre vivant du Corbeau": "Living Raven Frame",
+  "Cadre vivant du Serpent": "Living Serpent Frame",
+  "Cadre vivant du Sablier": "Living Hourglass Frame",
+  "Cadre vivant de la Veuve noire": "Living Black Widow Frame",
+  "Cadre vivant du Loup de givre": "Living Frost Wolf Frame",
+  "Cadre vivant de la Lune d’argent": "Living Silver Moon Frame",
+  "Cadre vivant du Rubis": "Living Ruby Frame",
+  "Cadre vivant de la Perle": "Living Pearl Frame",
+  "Cadre vivant de l’Orchidée": "Living Orchid Frame",
   "Plaque de la Méduse": "Medusa Plate",
   "Plaque du Corbeau": "Raven Plate",
   "Plaque du Serpent": "Serpent Plate",

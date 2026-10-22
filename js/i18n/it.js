@@ -1,5 +1,15 @@
 // Dictionnaire italien (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Cadre vivant de la Méduse": "Cornice viva della Medusa",
+  "Cadre vivant du Corbeau": "Cornice viva del Corvo",
+  "Cadre vivant du Serpent": "Cornice viva del Serpente",
+  "Cadre vivant du Sablier": "Cornice viva della Clessidra",
+  "Cadre vivant de la Veuve noire": "Cornice viva della Vedova Nera",
+  "Cadre vivant du Loup de givre": "Cornice viva del Lupo di Brina",
+  "Cadre vivant de la Lune d’argent": "Cornice viva della Luna d’Argento",
+  "Cadre vivant du Rubis": "Cornice viva del Rubino",
+  "Cadre vivant de la Perle": "Cornice viva della Perla",
+  "Cadre vivant de l’Orchidée": "Cornice viva dell’Orchidea",
   "Plaque de la Méduse": "Placca della Medusa",
   "Plaque du Corbeau": "Placca del Corvo",
   "Plaque du Serpent": "Placca del Serpente",

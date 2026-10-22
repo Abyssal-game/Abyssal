@@ -1,5 +1,15 @@
 // Dictionnaire espagnol (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Cadre vivant de la Méduse": "Marco vivo de la Medusa",
+  "Cadre vivant du Corbeau": "Marco vivo del Cuervo",
+  "Cadre vivant du Serpent": "Marco vivo de la Serpiente",
+  "Cadre vivant du Sablier": "Marco vivo del Reloj de Arena",
+  "Cadre vivant de la Veuve noire": "Marco vivo de la Viuda Negra",
+  "Cadre vivant du Loup de givre": "Marco vivo del Lobo de Escarcha",
+  "Cadre vivant de la Lune d’argent": "Marco vivo de la Luna de Plata",
+  "Cadre vivant du Rubis": "Marco vivo del Rubí",
+  "Cadre vivant de la Perle": "Marco vivo de la Perla",
+  "Cadre vivant de l’Orchidée": "Marco vivo de la Orquídea",
   "Plaque de la Méduse": "Placa de la Medusa",
   "Plaque du Corbeau": "Placa del Cuervo",
   "Plaque du Serpent": "Placa de la Serpiente",

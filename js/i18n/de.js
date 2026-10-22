@@ -1,5 +1,15 @@
 // Dictionnaire allemand (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Cadre vivant de la Méduse": "Lebender Quallen-Rahmen",
+  "Cadre vivant du Corbeau": "Lebender Raben-Rahmen",
+  "Cadre vivant du Serpent": "Lebender Schlangen-Rahmen",
+  "Cadre vivant du Sablier": "Lebender Stundenglas-Rahmen",
+  "Cadre vivant de la Veuve noire": "Lebender Schwarze-Witwe-Rahmen",
+  "Cadre vivant du Loup de givre": "Lebender Frostwolf-Rahmen",
+  "Cadre vivant de la Lune d’argent": "Lebender Silbermond-Rahmen",
+  "Cadre vivant du Rubis": "Lebender Rubin-Rahmen",
+  "Cadre vivant de la Perle": "Lebender Perlen-Rahmen",
+  "Cadre vivant de l’Orchidée": "Lebender Orchideen-Rahmen",
   "Plaque de la Méduse": "Medusa-Plakette",
   "Plaque du Corbeau": "Raben-Plakette",
   "Plaque du Serpent": "Schlangen-Plakette",

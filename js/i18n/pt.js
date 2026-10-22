@@ -1,5 +1,15 @@
 // Dictionnaire portugais du Brésil (v537, traduit depuis le français ; même forme que en.js). Généré par tools/i18n/assemble.mjs.
 export default {
+  "Cadre vivant de la Méduse": "Moldura viva da Medusa",
+  "Cadre vivant du Corbeau": "Moldura viva do Corvo",
+  "Cadre vivant du Serpent": "Moldura viva da Serpente",
+  "Cadre vivant du Sablier": "Moldura viva da Ampulheta",
+  "Cadre vivant de la Veuve noire": "Moldura viva da Viúva-Negra",
+  "Cadre vivant du Loup de givre": "Moldura viva do Lobo de Gelo",
+  "Cadre vivant de la Lune d’argent": "Moldura viva da Lua de Prata",
+  "Cadre vivant du Rubis": "Moldura viva do Rubi",
+  "Cadre vivant de la Perle": "Moldura viva da Pérola",
+  "Cadre vivant de l’Orchidée": "Moldura viva da Orquídea",
   "Plaque de la Méduse": "Placa da Medusa",
   "Plaque du Corbeau": "Placa do Corvo",
   "Plaque du Serpent": "Placa da Serpente",

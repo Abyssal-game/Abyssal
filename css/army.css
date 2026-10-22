@@ -5614,3 +5614,15 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .np-pl-ambre { --npb: rgba(255, 170, 60, .8); background-image: url(../assets/plates/pl-ambre.webp), linear-gradient(90deg, #0e0904, #3a2610 50%, #0e0904); color: #FFE2B8; }
 .np-pl-astrolabe { --npb: rgba(235, 200, 120, .8); background-image: url(../assets/plates/pl-astrolabe.webp), linear-gradient(90deg, #0a0906, #2c2616 50%, #0a0906); color: #FFF0CC; }
 .np-pl-orchidee { --npb: rgba(220, 120, 255, .8); background-image: url(../assets/plates/pl-orchidee.webp), linear-gradient(90deg, #0b0610, #2a1438 50%, #0b0610); color: #F4DDFF; }
+
+/* v591 : 10 cadres vivants (images Gemini) */
+.pf-cx-vif-meduse { --fr: url(../assets/frames/cx-vif-meduse-4.webp); }
+.pf-cx-vif-corbeau { --fr: url(../assets/frames/cx-vif-corbeau-4.webp); }
+.pf-cx-vif-serpent { --fr: url(../assets/frames/cx-vif-serpent-4.webp); }
+.pf-cx-vif-sablier { --fr: url(../assets/frames/cx-vif-sablier-4.webp); }
+.pf-cx-vif-araignee { --fr: url(../assets/frames/cx-vif-araignee-4.webp); }
+.pf-cx-vif-loup { --fr: url(../assets/frames/cx-vif-loup-4.webp); }
+.pf-cx-vif-lune { --fr: url(../assets/frames/cx-vif-lune-4.webp); }
+.pf-cx-vif-rubis { --fr: url(../assets/frames/cx-vif-rubis-4.webp); }
+.pf-cx-vif-perle { --fr: url(../assets/frames/cx-vif-perle-4.webp); }
+.pf-cx-vif-orchidee { --fr: url(../assets/frames/cx-vif-orchidee-4.webp); }
