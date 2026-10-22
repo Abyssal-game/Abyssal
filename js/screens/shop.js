@@ -78,7 +78,7 @@ export function showOdds(app, type) {
     <h3>Variantes</h3>
     <p class="small">Chaque carte peut sortir en finition argentée (${VARIANT_RATES.holo.toString().replace('.', ',')} %), enluminée (${VARIANT_RATES.gold.toString().replace('.', ',')} %) ou abyssale (${VARIANT_RATES.galaxy.toString().replace('.', ',')} %). Une finition est purement visuelle. On l’obtient dans les boosters, ou en sublimant une carte que tu possèdes (Collection → Fournaise, ou fiche de la carte, onglet Rareté).${def.variantMult > 1 ? ` Ce booster multiplie leurs chances par ${String(def.variantMult).replace('.', ',')}.` : ''}</p>
     <h3>Doublons</h3>
-    <p class="small">Un doublon se brûle dans la Fournaise pour des cendres (${RARITIES.map((r) => `${r.short} ${ECONOMY.burnAsh[r.key]}`).join(', ')} ; ×${ECONOMY.burnFinish.holo} argentée, ×${ECONOMY.burnFinish.gold} enluminée, ×${ECONOMY.burnFinish.galaxy} abyssale). Les cendres font monter le niveau de tes créatures et servent à sublimer une carte.</p>`, { label: 'Probabilités' });
+    <p class="small">Un doublon se brûle dans la Fournaise pour des cendres (${RARITIES.map((r) => `${r.short} ${ECONOMY.burnAsh[r.key]}`).join(', ')} ; ×${ECONOMY.burnFinish.holo} argentée, ×${ECONOMY.burnFinish.gold} enluminée, ×${ECONOMY.burnFinish.galaxy} abyssale). Les cendres font monter le niveau de tes créatures.</p>`, { label: 'Probabilités' });
 }
 
 

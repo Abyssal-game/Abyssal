@@ -10,7 +10,7 @@ export const CHALLENGES = [
 export const WEEK_DAYS = 5; // jours joués dans la semaine pour le coffre de la semaine
 export const FIRST_WIN = 50;
 export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par combat n'augmentent plus // éclats de la toute première victoire
-import { FINAL_FLOOR, BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, SUBLIME_ASH, VARIANTS } from '../config.js';
+import { FINAL_FLOOR, BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, sublimeObs, VARIANTS } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
 import { CODEX, CODEX_XP, SHOP, CATALOG, FREE_EMOTES, codexTier, seasonFor, tiersOf, freshCodex, pendingOf } from './codex.js';
@@ -495,13 +495,12 @@ export class Game {
     const order = ['normal', ...['holo', 'gold', 'galaxy'].filter((v) => card.variants.includes(v))];
     const to = order.find((v, i) => i > 0 && !e.v[v] && e.v[order[i - 1]]);
     if (!to) return null;
-    return { to, from: order[order.indexOf(to) - 1], cost: Math.round((ECONOMY.burnAsh[card.rarity] || 0) * SUBLIME_ASH[to]) };
+    return { to, from: order[order.indexOf(to) - 1], cost: sublimeObs(card.rarity, to) }; /* v615 : en obsidiennes */
   }
   sublime(id) {
     const x = this.sublimeInfo(id);
     if (!x) throw new Error('Rien à sublimer pour cette carte.');
-    if (this.s.ash < x.cost) throw new Error(`Il te manque ${x.cost - this.s.ash} cendres (tu en as ${this.s.ash}).`);
-    this.s.ash -= x.cost;
+    this.spendObs(x.cost); /* v615 : obsidiennes au lieu des cendres */
     this.addCard(id, x.to, 'reward');
     const progress = this.checkProgress();
     this.persist();
@@ -1300,10 +1299,10 @@ export class Game {
       if (!d.run && team.every((id) => this.cardLevel(id) <= 1)) out.unshift(forge); else out.push(forge);
     }
     // v328 : équipe au niveau maximal et cendres qui dorment : Sublimer (finition supérieure) devient l'objectif
-    if (team.length && team.every((id) => this.cardLevel(id) >= MAX_LEVEL)) {
-      const sub = Object.keys(this.s.collection).map((id) => ({ id, x: this.sublimeInfo(id) })).filter((o) => o.x && o.x.cost <= this.s.ash)
+    if (team.length && this.codexOn() && team.every((id) => this.cardLevel(id) >= MAX_LEVEL)) { /* v615 : en obsidiennes, seulement quand l'Échoppe est ouverte */
+      const sub = Object.keys(this.s.collection).map((id) => ({ id, x: this.sublimeInfo(id) })).filter((o) => o.x && o.x.cost <= this.obs())
         .sort((a, b) => (this.isFav(b.id) - this.isFav(a.id)) || (b.x.cost - a.x.cost))[0];
-      if (sub) out.push({ kind: 'sublime', title: `Sublime ${this.catalog.get(sub.id).name}`, sub: `${VARIANTS[sub.x.to].name} pour ${sub.x.cost} cendres (tu en as ${this.s.ash}) · Fournaise → Sublimer`, href: '#/fournaise', icon: 'holo' });
+      if (sub) out.push({ kind: 'sublime', title: `Sublime ${this.catalog.get(sub.id).name}`, sub: `${VARIANTS[sub.x.to].name} pour ${sub.x.cost} obsidiennes (tu en as ${this.obs()}) · Fournaise → Sublimer`, href: '#/fournaise', icon: 'holo' });
     }
     if (bf && bf > best && out.length < 3 && !out.some((x) => x.sub?.includes(BOSSES[bossOf(bf)].name))) { /* v411 : jamais un gardien déjà dépassé */ const B = BOSSES[bossOf(bf)]; out.push({ kind: 'boss', title: `Vaincs ${B.name}`, sub: `Gardien de l’étage ${bf} · son récit t’attend dans le Bestiaire`, href: '#/descente', icon: 'crest-boss' }); }
     else if (!bf && this.sceauxOpen()) {

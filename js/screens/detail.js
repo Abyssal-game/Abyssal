@@ -57,14 +57,15 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
   }
   // v280 : chance qu'un booster standard (3 cartes) contienne au moins une carte de cette finition
   const anyOdds = (v) => Math.round(1 / (1 - (1 - VARIANT_RATES[v] / 100) ** 3));
-  // v280 : Sublimer — la finition suivante contre des cendres
+  // v280 : Sublimer — la finition suivante ; v615 : contre des obsidiennes (seulement quand l'Échoppe est ouverte)
+  const OBS = '<img class="obs-i" alt="" src="assets/icons/obsidienne.webp">';
   function sublimeHTML() {
-    const x = g.sublimeInfo(current);
+    const x = g.codexOn() && g.sublimeInfo(current);
     if (!x) return '';
-    const can = g.s.ash >= x.cost;
+    const can = g.obs() >= x.cost;
     return `<div class="panel dt-sub"><b>${icon('sparkle')} Sublimer en ${esc(VARIANTS[x.to].name.toLowerCase())}</b>
-      <span class="small muted">Tu la possèdes en ${esc(VARIANTS[x.from].name.toLowerCase())} : obtiens un exemplaire ${esc(VARIANTS[x.to].name.toLowerCase())} contre des cendres. Ta carte actuelle est conservée.</span>
-      <button class="btn small ${can ? 'gold' : ''}" data-act="sub" ${can ? '' : 'disabled'}>Sublimer · ${x.cost.toLocaleString('fr-FR')} ${icon('ash')}${can ? '' : ` · tu en as ${g.s.ash.toLocaleString('fr-FR')}`}</button></div>`;
+      <span class="small muted">Tu la possèdes en ${esc(VARIANTS[x.from].name.toLowerCase())} : obtiens un exemplaire ${esc(VARIANTS[x.to].name.toLowerCase())} contre des obsidiennes. Ta carte actuelle est conservée.</span>
+      <button class="btn small ${can ? 'gold' : ''}" data-act="sub" ${can ? '' : 'disabled'}>Sublimer · ${x.cost.toLocaleString('fr-FR')} ${OBS}${can ? '' : ` · tu en as ${g.obs().toLocaleString('fr-FR')}`}</button></div>`;
   }
   // Forme corrompue : présentation, condition d'éveil et choix de la forme emmenée au combat
   function formHTML(card) {
@@ -167,7 +168,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     next() { const i = list.indexOf(current); if (i < list.length - 1) { current = list[i + 1]; shownVariant = null; draw(); } },
     variant(el) { shownVariant = el.dataset.v; draw(); },
     dress(el) { try { const k = el.dataset.v || null; g.setDress(current, k); app.sfx?.tap?.(); toast(k ? `Finition <b>${esc(FINISHES[k].name)}</b> posée sur cette carte.` : 'Finition retirée.', { icon: 'sparkle' }); draw(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } },
-    sub() { try { const x = g.sublime(current); shownVariant = x.to; app.sfx?.levelup?.(); toast(`Carte sublimée : la voici en <b>${esc(VARIANTS[x.to].name.toLowerCase())}</b> (−${x.cost.toLocaleString('fr-FR')} cendres).`, { kind: 'success', icon: 'sparkle' }); draw(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } },
+    sub() { try { const x = g.sublime(current); shownVariant = x.to; app.sfx?.levelup?.(); toast(`Carte sublimée : la voici en <b>${esc(VARIANTS[x.to].name.toLowerCase())}</b> (−${x.cost.toLocaleString('fr-FR')} obsidiennes).`, { kind: 'success', icon: 'sparkle' }); draw(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } },
     showv() { try { g.setShownVariant(current, shownVariant); app.sfx.tap(); toast(`Apparence <b>${esc(VARIANTS[shownVariant].name.toLowerCase())}</b> affichée partout.`, { icon: 'eye' }); draw(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } },
     fav() { const on = g.toggleFav(current); app.sfx?.tap?.(); toast(on ? 'Ajoutée à tes favoris : elle ne pourra pas être brûlée par erreur.' : 'Retirée de tes favoris.', { icon: 'star' }); draw(); },
     chal(el) { try { const x = g.claimChallenge(current, el.dataset.k); app.sfx?.levelup?.(); toast(`Défi « ${esc(x.name)} » réussi : <b>+${x.ash} cendres</b> et +${x.fame} Renommée`, { kind: 'success', icon: 'ash' }); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },

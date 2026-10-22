@@ -69,13 +69,15 @@ export function furnaceScreen(app, root) {
   }
   // v328 : Sublimer à côté des cendres (avant, seulement dans l'onglet Rareté d'une fiche : presque personne ne le trouvait)
   function sublimeHTML() {
+    if (!g.codexOn()) return ''; /* v615 : Sublimer se paie en obsidiennes : caché tant que l'Échoppe n'est pas ouverte */
+    const OBS = '<img class="obs-i" alt="" src="assets/icons/obsidienne.webp">';
     const list = Object.keys(g.s.collection).map((id) => ({ c: cat.get(id), x: g.sublimeInfo(id) })).filter((o) => o.c && o.x)
       .sort((a, b) => (g.isFav(b.c.id) - g.isFav(a.c.id)) || (g.s.team.includes(b.c.id) - g.s.team.includes(a.c.id)) || (a.x.cost - b.x.cost));
     if (!list.length) return '';
-    const shown = list.slice(0, ui.subAll ? 60 : 6), can = list.filter((o) => o.x.cost <= g.s.ash).length;
+    const shown = list.slice(0, ui.subAll ? 60 : 6), can = list.filter((o) => o.x.cost <= g.obs()).length;
     return `<section class="panel"><h2 class="section-title">Sublimer</h2>
-      <p class="small muted">Donne à une carte que tu possèdes sa finition suivante (argentée, puis enluminée, puis abyssale) contre des cendres. Tes favorites et ton équipe d’abord.${can ? ` Tu peux en sublimer <b>${can}</b> maintenant.` : ''}</p>
-      <div class="fg-grid">${shown.map(({ c, x }) => `<button class="fg-cell ${x.cost <= g.s.ash ? '' : 'fg-dim'}" data-act="sub" data-id="${c.id}">${mini(c)}<b>${esc(c.name)}</b><small class="fg-sub"><span>${esc(VARIANTS[x.to].name)}</span><span>${icon('ash')}${fmt(x.cost)}</span></small></button>`).join('')}</div>
+      <p class="small muted">Donne à une carte que tu possèdes sa finition suivante (argentée, puis enluminée, puis abyssale) contre des obsidiennes (tu en as ${fmt(g.obs())}). Tes favorites et ton équipe d’abord.${can ? ` Tu peux en sublimer <b>${can}</b> maintenant.` : ''}</p>
+      <div class="fg-grid">${shown.map(({ c, x }) => `<button class="fg-cell ${x.cost <= g.obs() ? '' : 'fg-dim'}" data-act="sub" data-id="${c.id}">${mini(c)}<b>${esc(c.name)}</b><small class="fg-sub"><span>${esc(VARIANTS[x.to].name)}</span><span>${OBS}${fmt(x.cost)}</span></small></button>`).join('')}</div>
       ${list.length > shown.length ? `<button class="btn small ghost block" data-act="subAll">Voir les ${list.length} cartes sublimables</button>` : ''}
     </section>`;
   }
@@ -127,14 +129,14 @@ export function furnaceScreen(app, root) {
     async sub(el) {
       const id = el.dataset.id, c = cat.get(id), x = g.sublimeInfo(id);
       if (!x) return;
-      if (x.cost > g.s.ash) { toast(`Il te manque <b>${fmt(x.cost - g.s.ash)} cendres</b> pour sublimer ${esc(c.name)}.`, { icon: 'ash' }); return; }
-      if (!(await confirmBox(`Sublimer <b>${esc(c.name)}</b> en <b>${esc(VARIANTS[x.to].name.toLowerCase())}</b> pour <b>${fmt(x.cost)} cendres</b> ?`, { ok: 'Sublimer' }))) return;
+      if (x.cost > g.obs()) { toast(`Il te manque <b>${fmt(x.cost - g.obs())} obsidiennes</b> pour sublimer ${esc(c.name)}.`); return; }
+      if (!(await confirmBox(`Sublimer <b>${esc(c.name)}</b> en <b>${esc(VARIANTS[x.to].name.toLowerCase())}</b> pour <b>${fmt(x.cost)} obsidiennes</b> ?`, { ok: 'Sublimer' }))) return;
       try {
         app.pendingProgress = [];
         const r = g.sublime(id);
         g.setShownVariant?.(id, r.to);
         app.sfx.levelup?.();
-        toast(`Carte sublimée : <b>${esc(c.name)}</b> en <b>${esc(VARIANTS[r.to].name.toLowerCase())}</b> (−${fmt(r.cost)} cendres).`, { kind: 'epic', icon: 'sparkle' });
+        toast(`Carte sublimée : <b>${esc(c.name)}</b> en <b>${esc(VARIANTS[r.to].name.toLowerCase())}</b> (−${fmt(r.cost)} obsidiennes).`, { kind: 'epic', icon: 'sparkle' });
         app.flushProgress(); app.chrome?.();
       } catch (err) { app.pendingProgress = null; app.sfx.error(); toast(esc(err.message), { kind: 'error' }); }
       draw();

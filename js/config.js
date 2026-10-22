@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v614'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v615'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -64,7 +64,11 @@ export const FINAL_FLOOR = 100; // v394 : le fond de la Descente (pour l'instant
 export const VARIANT_RATES = { holo: 4, gold: 1.2, galaxy: 0.4 };
 // Sublimer : obtenir la finition suivante d'une carte qu'on possède déjà dans la finition précédente.
 // Coût = cendres de base de la rareté × ce facteur ; toujours plus que ce que la carte rapporte brûlée (burnFinish).
-export const SUBLIME_ASH = { holo: 10, gold: 25, galaxy: 60 }; /* v557 : ×2,5 (avant 4, 10, 24 : « ça ne coûte pas assez cher ») */
+export const SUBLIME_ASH = { holo: 10, gold: 25, galaxy: 60 }; /* v557 : ×2,5 (avant 4, 10, 24 : « ça ne coûte pas assez cher ») ; plus utilisé depuis v615 */
+/* v615 (décision du propriétaire) : Sublimer se paie en obsidiennes, prix = base de la finition × facteur de rareté, arrondi à 10 */
+export const SUBLIME_OBS = { holo: 30, gold: 80, galaxy: 200 };
+export const SUBLIME_OBS_RAR = { C: 1, PC: 1.25, R: 1.5, HR: 2, M: 3, S: 4 };
+export const sublimeObs = (rarity, to) => Math.round((SUBLIME_OBS[to] || 0) * (SUBLIME_OBS_RAR[rarity] || 1) / 10) * 10;
 // Anciennes variantes retirées : les exemplaires possédés deviennent la variante indiquée.
 export const OLD_VARIANTS = { chroma: 'holo', corrupt: 'holo', alt: 'holo', ancestral: 'gold', special: 'normal' };
 // Ordre d'affichage par défaut : la finition la plus rare possédée
