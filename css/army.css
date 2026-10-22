@@ -5640,3 +5640,47 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .rv-it.drop { border-color: rgba(220, 80, 80, .8); }
 .rv-it.drop .rv-pic { opacity: .45; }
 .rv-it.k-plate .np-demo { font-size: 1.15rem; padding: .55em 2.6em; min-width: 240px; text-align: center; }
+
+/* v594 : Labo des défenses (Mode Créateur) */
+.dl-lab h2 { margin-bottom: 4px; }
+.dl-arena { position: relative; height: 230px; margin: 10px 0 12px; border-radius: 14px; overflow: hidden; background: radial-gradient(ellipse at 50% 40%, #2a1420, #0a0709 75%); border: 1px solid rgba(201, 158, 74, .45); touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.dl-arena.qte-on { touch-action: none; }
+.dl-figw img { position: absolute; left: 50%; top: 4px; height: 92%; translate: -50% 0; opacity: .5; pointer-events: none; filter: drop-shadow(0 0 18px rgba(255, 60, 70, .35)); }
+.dl-arena .dv-mid { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.dl-arena .dv-msg { font: 600 .8rem/1.2 var(--f-ui); color: var(--mute); align-self: flex-end; margin-bottom: 10px; text-align: center; }
+.dl-arena .dv-stamp { top: 22%; }
+.dl-ctl { display: grid; gap: 8px; }
+.dl-tier { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.dl-tier button { min-height: 44px; border-radius: 10px; border: 1px solid rgba(201, 158, 74, .4); background: rgba(255, 255, 255, .04); color: var(--ink, #EDE3CC); font: 700 .85rem var(--f-ui); }
+.dl-tier button.on { background: linear-gradient(#F2C14E, #A8741E); color: #20140A; }
+.dl-tier.off { opacity: .45; pointer-events: none; }
+.dl-sel, .dl-cust { width: 100%; min-height: 44px; }
+.dl-legend { margin: 0; }
+.dl-info { display: grid; gap: 3px; padding: 8px 10px; border-radius: 10px; background: rgba(255, 255, 255, .04); }
+.dl-info b { color: var(--gold-hi); }
+.dl-go { align-items: stretch; }
+.dl-go .btn { min-height: 48px; white-space: nowrap; }
+.dl-res { margin: 12px 0; display: grid; gap: 8px; }
+.dl-last { display: grid; gap: 3px; padding: 8px 10px; border-radius: 10px; background: rgba(255, 255, 255, .04); font-size: .85rem; }
+.dl-last .r-parry { color: #FFFFFF; } .dl-last .r-dodge { color: #9FF0B8; } .dl-last .r-none { color: #FF8A98; }
+.dl-stats { display: flex; flex-wrap: wrap; gap: 6px; }
+.dl-stats span { padding: 4px 9px; border-radius: 99px; background: rgba(255, 255, 255, .06); font-size: .78rem; }
+.dl-stats .p b { color: #fff; } .dl-stats .d b { color: #9FF0B8; } .dl-stats .k b { color: #FF8A98; }
+.dl-h { margin: 16px 0 6px; } .dl-h small { color: var(--gold-hi); font-size: .75rem; }
+.dl-g { margin: 6px 0; border: 1px solid rgba(201, 158, 74, .3); border-radius: 12px; padding: 0 10px; background: rgba(0, 0, 0, .25); }
+.dl-g summary { min-height: 44px; display: flex; align-items: center; font: 700 .95rem var(--f-display); color: var(--gold-hi); cursor: pointer; }
+.dl-p { padding: 8px 0; border-top: 1px solid rgba(255, 255, 255, .06); }
+.dl-p.chg .dl-v { color: #FFB86B; }
+.dl-ph { display: flex; align-items: center; gap: 8px; font-size: .85rem; }
+.dl-ph b { flex: 1; min-width: 0; }
+.dl-v { font: 700 .85rem var(--f-ui); color: var(--gold-hi); white-space: nowrap; }
+.dl-rst { min-height: 32px; padding: 0 8px; border-radius: 8px; border: 1px solid rgba(255, 184, 107, .5); background: none; color: #FFB86B; font-size: .75rem; white-space: nowrap; }
+.dl-pr { display: flex; align-items: center; gap: 8px; margin: 4px 0 2px; }
+.dl-pr input { flex: 1; min-width: 0; accent-color: #F2C14E; height: 32px; }
+.dl-step { width: 40px; height: 40px; flex: none; border-radius: 10px; border: 1px solid rgba(201, 158, 74, .45); background: rgba(255, 255, 255, .05); color: var(--gold-hi); font: 700 1.2rem var(--f-ui); }
+.dl-ingame { display: flex; gap: 10px; align-items: flex-start; margin: 14px 0; font-size: .85rem; }
+.dl-ingame input { width: 22px; height: 22px; flex: none; accent-color: #F2C14E; }
+.dl-ctl { grid-template-columns: minmax(0, 1fr); }
+.dl-sel { max-width: 100%; }
+.dl-go { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+.dl-go .btn { padding-left: 12px; padding-right: 12px; }

@@ -6,6 +6,7 @@ import { migrate } from '../core/save.js';
 import { BOSSES, BOSS_ORDER } from '../core/bosses.js';
 import { openCosmeticsLab } from './cosmetics-lab.js';
 import { openCosmeticsReview } from './cosmetics-review.js'; /* v592 */
+import { openDefenseLab } from './defense-lab.js'; /* v594 */
 
 const SNAP = 'abyssal.snapshot';
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -68,6 +69,10 @@ export function openCreator(app) {
         <p class="small muted">Tous les cadres, dos et finitions en aperçu, pour trier ceux à garder, à retirer ou à revoir.</p>
         <div class="row gap wrap">${B('lab', 'Ouvrir l’Atelier', 'gold')}${B('revue', 'Revue des doublons', '')}</div></section>
 
+      <section class="cr-sec"><h3>Labo des défenses</h3>
+        <p class="small muted">Teste la barre de défense contre chaque attaque (ennemis, élites, assauts des gardiens) autant de fois que tu veux, règle-la en direct, puis copie tes réglages pour me les envoyer.</p>
+        <div class="row gap wrap">${B('deflab', 'Ouvrir le Labo des défenses', 'gold')}</div></section>
+
       <section class="cr-sec"><h3>Affronter un gardien</h3>
         <p class="small muted">Te place devant la porte du gardien (un chapitre est lancé si besoin, le présage est passé). Coche la case pour monter ton équipe au niveau attendu à cet étage.</p>
         <label class="small cr-bpow"><input type="checkbox" id="bpow" ${ui.bpow ? 'checked' : ''}> Équipe à la puissance de l’étage</label>
@@ -115,6 +120,7 @@ export function openCreator(app) {
       if (x === 'codex') { g.s.devCodex = !g.s.devCodex; g.persist(); app.chrome?.(); } /* v470 */
       if (x === 'lab') { openCosmeticsLab(app); return; } /* v556 */
       if (x === 'revue') { openCosmeticsReview(app); return; } /* v592 */
+      if (x === 'deflab') { openDefenseLab(app); return; } /* v594 */
       if (x === 'codexgo') { sheet.close(); app.go('codex'); return; }
       if (x === 'off') { g.s.settings.devCode = false; g.setSetting('dev', false); sheet.close(); toast('Mode Créateur désactivé.', { icon: 'crown' }); return; }
       if (!['snap', 'restore'].includes(x)) toast('C’est fait.', { kind: 'success', icon: 'crown' });

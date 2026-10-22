@@ -1745,19 +1745,21 @@ const API = {
 };
 
 // Défense active : durée (ms) de la zone d'esquive ; la parade parfaite en est le dernier instant
-export function defenseWindow(st, aUid, tUid) {
+export function defenseWindow(st, aUid, tUid, T = null) {
+  /* v594 : T = réglages du Labo des défenses (js/ui/def-tune.js) ; sans T, les valeurs du jeu */
+  T ||= { dodgeMul: 1, floorNormal: 170, floorElite: 150, floorBoss: 130, dodgeMax: 270, eliteMinus: 15, bossMinus: 30, parryRatio: 0.2, parryMinNormal: 45, parryMinElite: 40, parryMinBoss: 36 };
   const e = st.units[aUid], u = st.units[tUid] || front(st, 'ally')[0];
   const kind = e?.intent?.kind || 'hit';
   /* v558 : fenêtres resserrées (« je réussis les parades à chaque fois ») : esquive ≈ 15 % plus courte, parade ≈ 2/3 de l'ancienne */
-  let w = { hit: 200, poison: 200, frost: 185, flurry: 190, grab: 190, heavy: 165, blast: 175 }[kind] || 190;
+  let w = ({ hit: 200, poison: 200, frost: 185, flurry: 190, grab: 190, heavy: 165, blast: 175 }[kind] || 190) * T.dodgeMul;
   // écart de niveau : il aide (ou gêne) un peu, sans jamais rendre l'esquive impossible
   w += Math.max(-25, Math.min(35, 8 * ((u?.level || 1) - (e?.level || 1))));
   // plancher selon la catégorie de l'ennemi : 170 ms (normal), 150 ms (élite), 130 ms (gardien)
-  const floor = e?.boss ? 130 : e?.elite ? 150 : 170;
-  if (e?.boss) w -= 30; else if (e?.elite) w -= 15;
-  w = Math.max(floor, Math.min(270, Math.round(w)));
+  const floor = e?.boss ? T.floorBoss : e?.elite ? T.floorElite : T.floorNormal;
+  if (e?.boss) w -= T.bossMinus; else if (e?.elite) w -= T.eliteMinus;
+  w = Math.max(floor, Math.min(T.dodgeMax, Math.round(w)));
   // parade : le tout dernier instant avant l'impact (environ 1/5 de l'esquive)
-  return { dodge: w, parry: Math.max(e?.boss ? 36 : e?.elite ? 40 : 45, Math.round(w * 0.2)) };
+  return { dodge: w, parry: Math.min(w, Math.max(e?.boss ? T.parryMinBoss : e?.elite ? T.parryMinElite : T.parryMinNormal, Math.round(w * T.parryRatio))) };
 }
 
 // ——— Pilote automatique (bouton Auto et simulations) ———

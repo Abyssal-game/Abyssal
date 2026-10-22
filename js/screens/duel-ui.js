@@ -28,6 +28,8 @@ import { ULTS } from '../core/army.js';
 import { mountDiorama, roomFor } from '../ui/diorama.js';
 import { moveIconUrl, passivesOf, passiveIconUrl, moveFor, PASSIVES } from '../core/kits.js';
 import { hap } from '../ui/sound.js';
+import { playBar, defVerdict, FAM_RHYTHM, KIND_RHYTHM, BOSS_ASSAULT } from '../ui/def-bar.js'; /* v594 */
+import { getTune } from '../ui/def-tune.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 // Décor selon la profondeur (salle du Gardien à part) et effets illustrés (fond noir fondu en mode « écran »)
@@ -901,32 +903,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
      pour chaque coup, et chaque ennemi a son rythme, qu'on apprend en jouant. Lettres d'une séquence :
      n coup simple · f rapide · l lent · x feinte (le curseur s'arrête, puis fonce) · m zone mobile · h coup chargé (maintenir,
      relâcher dans l'or) · H coup chargé avec feinte. Parade parfaite de toute la séquence = contre-attaque (moteur). */
-  const FAM_RHYTHM = { predateur: 'nf', assassin: 'ff', berserker: 'x', protecteur: 'n', mage: 'l', parasite: 'nf', controleur: 'm', soutien: 'n', gardien: 'nx' };
-  const KIND_RHYTHM = { tick2: 'ff', poison: 'nf', flurry: 'fff', grab: 'nx', chain: 'nnf', frost: 'm', heavy: 'h', gorge: 'h', execute: 'H', ambush: 'xf', blast: 'lx' };
   const ASSAULT_K = ['heavy', 'blast', 'gorge', 'blizzard', 'copy', 'swarm', 'execute', 'lament', 'ambush', 'price', 'quake', 'chain', 'tick2'];
-  /* chaque gardien : nom de son Assaut et sa séquence (de 3 à 5 coups, rythme propre ; l'Horloger frappe en mesure) */
-  const BOSS_ASSAULT = {
-    devoreur: { name: 'La Faim sans fond', seq: 'fxh' },
-    matriarche: { name: 'L’Hiver mordant', seq: 'mmx' },
-    roi: { name: 'Le Reflet volé', seq: 'xnx' },
-    architecte: { name: 'L’Effondrement', seq: 'lxH' },
-    eclipse: { name: 'Éclipse totale', seq: 'mhx' },
-    essaim: { name: 'La Nuée', seq: 'ffff' },
-    bourreau: { name: 'La Hache du Bourreau', seq: 'hxH' },
-    choeur: { name: 'Le Chant des Noyés', seq: 'lmx' },
-    chaines: { name: 'Les Mille Chaînes', seq: 'nnnf' },
-    horloge: { name: 'L’Heure exacte', seq: 'nnnn', beat: 320 },
-    miroirs: { name: 'Le Palais des Miroirs', seq: 'xxn' },
-    golem: { name: 'Avalanche de cendres', seq: 'llH' },
-    peste: { name: 'Le Souffle gris', seq: 'mfx' },
-    chasseur: { name: 'La Traque', seq: 'fxf' },
-    voeux: { name: 'Le Prix à payer', seq: 'nmh' },
-    titan: { name: 'Le Réveil du Titan', seq: 'Hxf' },
-    jumeaux: { name: 'Crépuscule double', seq: 'ffxx' },
-    juge: { name: 'Le Jugement', seq: 'hnx' },
-    bete: { name: 'L’Apocalypse', seq: 'fxmH' },
-    abysse: { name: 'La Nuit sans fin', seq: 'xfmxH' },
-  };
+  /* v594 : FAM_RHYTHM, KIND_RHYTHM, BOSS_ASSAULT dans js/ui/def-bar.js (partagés avec le Labo des défenses) */
   /* séquence d'une attaque : propre au coup, sinon au rythme de la famille ; une élite ajoute un coup rapide */
   function seqFor(s) {
     const e = st.units[s.a];
@@ -935,7 +913,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     return q;
   }
   /* bilan d'une séquence pour le moteur : tout paré = parade ; un raté sur trois coups ou plus = esquive ; sinon touché */
-  const verdict = (res) => res.every((r) => r === 'parry') ? 'parry' : res.filter((r) => r === 'none').length * 3 > res.length ? 'none' : 'dodge';
+  const verdict = (res) => defVerdict(res, getTune()); /* v594 : règle réglable au Labo des défenses */
   async function tipFor(q) {
     for (const k of ['cb-def-tap', /[hH]/.test(q) && 'cb-def-hold', q.length > 1 && 'cb-def-combo', /[xH]/.test(q) && 'cb-def-feint'].filter(Boolean)) {
       if (!g.s.tips?.[k]) await tuto(app, k);
@@ -972,99 +950,17 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     await wait(reduced ? 250 : 650);
     return r;
   }
-  /* La barre : un passage du curseur par lettre de la séquence. Zone réglée en TEMPS (v388), toucher jugé sur l'image
-     affichée à cet instant (v509). Retourne la liste des résultats ('parry' | 'dodge' | 'none'), un par coup. */
-  function barQTE(s, q = 'n', { beat = 0, title = '' } = {}) {
-    return new Promise((resolve) => {
-      const e = st.units[s.a], letters = [...q], n = letters.length;
-      const tEls = s.kind === 'blast' || intentInfo(st, e)?.aoe ? front(st, 'ally').map((u) => el(u.uid)) : [el(s.t)];
-      el(s.a)?.classList.add('aim'); tEls.forEach((x) => x?.classList.add('aimed'));
-      const def = INTENTS[s.kind] || INTENTS.hit;
-      const bar = document.createElement('div');
-      bar.className = 'dv-dodge cb-def';
-      bar.innerHTML = `<span class="dv-dodge-t">${intentIcon(s.kind)} ${esc(title || `${def.name} !`)} <small></small></span>${n > 1 ? `<span class="cb-hits">${letters.map(() => '<i></i>').join('')}</span>` : ''}<span class="dv-dodge-bar"><i class="rail"></i><i class="z"><i class="p"></i></i><i class="c"></i></span>`;
-      $('.dv-mid').appendChild(bar); $('.dv-mid').classList.add('qte'); $('.dv')?.classList.add('qte-on');
-      const cur = bar.querySelector('.c'), zEl = bar.querySelector('.z'), pEl = bar.querySelector('.p'), hint = bar.querySelector('small'), pips = bar.querySelectorAll('.cb-hits i');
-      const bw = bar.querySelector('.dv-dodge-bar').offsetWidth; /* une seule mesure : le curseur glisse ensuite en transform */
-      const D0 = e?.boss ? 780 : e?.elite ? 840 : 900;
-      const out = [];
-      let held = false, letGo = null;
-      const upH = (ev) => letGo?.(ev);
-      addEventListener('pointerup', upH, true); addEventListener('pointercancel', upH, true);
-      const close = () => {
-        defTap = null; removeEventListener('pointerup', upH, true); removeEventListener('pointercancel', upH, true);
-        setTimeout(() => { bar.remove(); $('.dv-mid')?.classList.remove('qte'); $('.dv')?.classList.remove('qte-on'); el(s.a)?.classList.remove('aim'); tEls.forEach((x) => x?.classList.remove('aimed')); resolve(out); }, 260);
-      };
-      const pass = (i) => new Promise((done1) => {
-        const L = letters[i], hold = L === 'h' || L === 'H', feint = L === 'x' || L === 'H', moving = L === 'm' || ((e?.boss || e?.elite) && L === 'n' && i % 2 === 1);
-        const w = defenseWindow(st, s.a, s.t);
-        const D = D0 * (L === 'f' ? 0.72 : L === 'l' ? 1.3 : 1) * (feint ? 1.45 : 1) * (beat ? 0.85 : 1);
-        /* trajet du curseur : accéléré (puissance K) ; feinte : il avance, s'arrête presque, puis fonce */
-        const K = e?.boss || e?.elite ? 1.3 + Math.random() * 1.0 : 1.7;
-        const fa = 0.25 + Math.random() * 0.1, fb = fa + 0.22 + Math.random() * 0.12, fp = 0.28 + Math.random() * 0.12;
-        const ease = feint
-          ? (x) => x <= 0 ? 0 : x < fa ? fp * (x / fa) ** 0.8 : x < fb ? fp + 0.035 * (x - fa) / (fb - fa) : fp + 0.035 + (1 - fp - 0.035) * ((x - fb) / (1 - fb)) ** 1.6
-          : (x) => Math.max(0, x) ** K;
-        const tb = feint ? D * (fb + (1 - fb) * (0.55 + Math.random() * 0.3)) : D * (0.55 + Math.random() * 0.35);
-        const ta = tb - w.dodge, tp = tb - w.parry; /* fin de zone = impact ; parade = son dernier instant */
-        const za = ease(ta / D), zb = ease(tb / D), pz0 = ease(tp / D);
-        const zw = zb - za, pw = zb - pz0, z0 = za;
-        zEl.style.cssText = `left:${z0 * 100}%;width:${zw * 100}%`; zEl.style.transform = '';
-        pEl.style.cssText = `left:${((zw - pw) / zw) * 100}%;width:${(pw / zw) * 100}%`;
-        cur.style.transform = 'translateX(0px)';
-        bar.classList.remove('ok', 'ko', 'r-parry', 'r-dodge', 'r-none', 'go', 'pp', 'held', 'cb-hold');
-        if (hold) bar.classList.add('cb-hold');
-        pips[i]?.classList.add('now');
-        hint.textContent = (hold ? 'Maintiens le doigt, relâche dans l’or · trait blanc : parade' : 'Touche dans l’or : esquive · trait blanc : parade') + (n > 1 ? ` · coup ${i + 1}/${n}` : '');
-        let t0 = 0, fin = false, raf = 0, lit = '';
-        const zoneAt = (x) => (moving ? Math.min(0.97 - zw, Math.max(0.3, z0 + Math.sin(x * 9) * 0.1)) : z0);
-        const end = (res) => {
-          if (fin) return; fin = true; cancelAnimationFrame(raf); defTap = null; letGo = null; held = false;
-          bar.classList.remove('go', 'pp', 'held'); bar.classList.add(res === 'none' ? 'ko' : 'ok', `r-${res}`);
-          pips[i]?.classList.remove('now'); pips[i]?.classList.add(`r-${res}`);
-          {
-            const stamp = document.createElement('div'); stamp.className = `dv-stamp s-${res}${n > 1 ? ' small' : ''}`;
-            stamp.innerHTML = `<b>${res === 'parry' ? 'Parade parfaite !' : res === 'dodge' ? 'Esquive !' : 'Touché…'}</b>`;
-            $('.dv')?.appendChild(stamp); setTimeout(() => stamp.remove(), n > 1 ? 520 : 900);
-          }
-          if (res === 'none') { app.sfx.miss(); hap(2); } else if (i < n - 1) { (res === 'parry' ? app.sfx.parry : app.sfx.hit)?.(); hap(1); } /* le dernier coup sonne avec son impact */
-          out.push(res); done1();
-        };
-        const shown = [];
-        const step = () => {
-          const now0 = performance.now(), x = (now0 - t0) / D, pos = ease(Math.min(1, x)), zz = moving ? zoneAt(x) : z0;
-          cur.style.transform = `translateX(${(pos * bw).toFixed(1)}px)`;
-          shown.push([now0, pos, zz]); if (shown.length > 12) shown.shift();
-          if (moving) zEl.style.transform = `translateX(${((zz - z0) * bw).toFixed(1)}px)`;
-          const pz = zz + zw - pw, now = pos >= pz && pos <= pz + pw ? 'pp' : pos >= zz && pos <= zz + zw ? 'go' : '';
-          if (now !== lit) { if (lit) bar.classList.remove(lit); if (now) bar.classList.add(now); lit = now; }
-          if (x >= 1) end('none'); else raf = requestAnimationFrame(step);
-        };
-        const judgeAt = (at) => {
-          const now = performance.now(), when = at && at <= now && now - at < 500 ? at : now;
-          const seen = shown.filter((r) => r[0] <= when).slice(-2);
-          if (!seen.length) { const x = (when - t0) / D; seen.push([when, ease(Math.min(1, x)), zoneAt(x)]); }
-          const tol = 5 / Math.max(80, bw), rank = { parry: 2, dodge: 1, none: 0 };
-          const res = seen.map(([, pos, zz]) => { const pz = zz + zw - pw;
-            return pos >= pz - tol && pos <= zz + zw + tol ? 'parry' : pos >= zz - tol && pos < pz - tol ? 'dodge' : 'none'; });
-          end(res.sort((a, b) => rank[b] - rank[a])[0]);
-        };
-        /* coup chargé : on appuie quand on veut, c'est le moment où l'on relâche qui compte */
-        letGo = (ev) => { if (!hold || !held || fin) return; held = false; bar.classList.remove('held'); if (!t0) return end('none'); judgeAt(ev.timeStamp); };
-        defTap = (at) => {
-          if (hold) { held = true; bar.classList.add('held'); return; }
-          if (!t0) return; /* v575 : un toucher avant le départ du curseur ne compte pas (avant : raté) — on ne peut pas « deviner » le rythme */
-          judgeAt(at);
-        };
-        const gap = i === 0 ? (reduced ? 250 : 300) + Math.random() * 450 : beat || 140 + Math.random() * 360; /* rythme irrégulier entre les coups (sauf l'Horloger) */
-        setTimeout(() => { if (!fin && alive_) { t0 = performance.now(); raf = requestAnimationFrame(step); } else if (!alive_) end('none'); }, gap);
-      });
-      (async () => {
-        for (let i = 0; i < n && alive_; i++) { await pass(i); if (i < n - 1) await wait(180); }
-        bar.classList.add('fin');
-        close();
-      })();
-    });
+  /* La barre : v594, code commun avec le Labo des défenses (js/ui/def-bar.js) ; réglages du Labo si le Créateur l'a demandé */
+  async function barQTE(s, q = 'n', { beat = 0, title = '' } = {}) {
+    const e = st.units[s.a], T = getTune();
+    const tEls = s.kind === 'blast' || intentInfo(st, e)?.aoe ? front(st, 'ally').map((u) => el(u.uid)) : [el(s.t)];
+    el(s.a)?.classList.add('aim'); tEls.forEach((x) => x?.classList.add('aimed'));
+    const def = INTENTS[s.kind] || INTENTS.hit;
+    const out = await playBar({ mid: $('.dv-mid'), dv: $('.dv'), letters: [...q], tier: e?.boss ? 'boss' : e?.elite ? 'elite' : 'normal',
+      win: () => defenseWindow(st, s.a, s.t, T), beat, titleHTML: `${intentIcon(s.kind)} ${esc(title || `${def.name} !`)}`,
+      reduced, alive: () => alive_, setTap: (f) => { defTap = f; }, sfx: app.sfx, hap, T });
+    el(s.a)?.classList.remove('aim'); tEls.forEach((x) => x?.classList.remove('aimed'));
+    return out;
   }
   // Résumé du tour ennemi : une ligne par ennemi, affichée au début de ton tour
   let log = null;
