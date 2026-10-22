@@ -165,8 +165,9 @@ test('changement de rareté : une variante devenue impossible passe en holograph
   g.addCard(c.id);
   const pc = catalog.byRarity.PC[0];
   g.addCard(pc.id);
-  g.s.collection[pc.id].v.gold = 2; // l'or n'existe pas pour les Peu communes
-  g.fixVariants();
+  g.s.collection[pc.id].v.gold = 2;
+  const keep = pc.variants; pc.variants = keep.filter((v) => v !== 'gold'); /* v626 : toutes les cartes ont l'Enluminée, on simule une finition retirée */
+  try { g.fixVariants(); } finally { pc.variants = keep; }
   assert.equal(g.s.collection[pc.id].v.gold, undefined);
   assert.equal(g.s.collection[pc.id].v.holo, 2);
 });
