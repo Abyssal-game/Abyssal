@@ -357,17 +357,20 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   // v365 : secousse et caméra en animations directes sur le plateau (avant : une classe ajoutée sur tout le plateau,
   // donc tous les styles recalculés, et une mise en page forcée à chaque coup)
   const SHAKE = { small: [220, [[-3, 1], [3, -1], [-1, 0]]], norm: [300, [[-5, 2], [5, -2], [-3, 1], [2, 0]]], big: [500, [[-9, 4], [8, -4], [-6, 3], [5, -2], [-3, 1]]] }; /* v597 : plus de rotation (Safari laissait un grand rectangle noir sur l'écran : tout le plateau était redessiné de travers) */
-  let shakeA = null, camA = null;
+  let shakeA = [], camA = [];
+  /* v633 : secousse et caméra posées sur les deux rangées de cartes, plus jamais sur tout l'écran du combat : sur iPhone, Safari
+     laissait un grand rectangle noir quand tout l'écran (une seule très grande couche) bougeait à chaque coup d'un Assaut */
+  const moveEls = () => [...root.querySelectorAll('.dv-row')];
   /* v611 : positions lues une seule fois par image pendant un coup (caméra, éclair, effet peint) : avant, chaque lecture
      après un ajout d'élément forçait la page à se recalculer, plusieurs fois au même instant */
   const rcache = new Map(); let rcRaf = 0;
   const rectOf = (n) => { if (!rcRaf) rcRaf = requestAnimationFrame(() => { rcache.clear(); rcRaf = 0; }); let r = rcache.get(n); if (!r) { r = n.getBoundingClientRect(); rcache.set(n, r); } return r; };
   const shake = (big, small = false) => {
     perfMark(big ? 'grosse secousse' : 'secousse');
-    if (reduced) return; const d = $('.dv'); if (!d?.animate) return;
+    if (reduced) return; const rows = moveEls(); if (!rows.length || !rows[0].animate) return;
     const [dur, pts] = SHAKE[big ? 'big' : small ? 'small' : 'norm'];
-    shakeA?.cancel();
-    shakeA = d.animate([{ transform: 'none' }, ...pts.map(([x, y]) => ({ transform: `translate(${x}px, ${y}px)` })), { transform: 'none' }], { duration: T(dur), easing: 'ease' });
+    shakeA.forEach((a) => a.cancel());
+    shakeA = rows.map((d) => d.animate([{ transform: 'none' }, ...pts.map(([x, y]) => ({ transform: `translate(${x}px, ${y}px)` })), { transform: 'none' }], { duration: T(dur), easing: 'ease' }));
   };
   // v346 : éclair d'impact — une lumière blanche et dorée jaillit du point touché
   const impactFlash = (uid, big) => { if (reduced || light) return; const t = el(uid), box = $('.dv'); if (!t || !box) return; const b = rectOf(box), r = rectOf(t); const f = document.createElement('span'); f.className = `dv-iflash ${big ? 'big' : ''} ${st.units[uid]?.side === 'ally' ? 'foe' : ''}`; f.style.cssText = `left:${r.left - b.left + r.width / 2}px;top:${r.top - b.top + r.height / 2}px`; box.appendChild(f); setTimeout(() => f.remove(), 420); };
@@ -396,9 +399,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const d = $('.dv'), t = el(uid); if (!d || !t) return;
     const b = rectOf(d), r = rectOf(t);
     const cx = ((r.left + r.width / 2 - b.left) / b.width - 0.5) * -10 * k, cy = ((r.top + r.height / 2 - b.top) / b.height - 0.5) * -10 * k;
-    if (!d.animate) return;
-    camA?.cancel();
-    camA = d.animate([{ translate: '0 0' }, { translate: `${cx.toFixed(1)}px ${cy.toFixed(1)}px`, offset: 0.3 }, { translate: '0 0' }], { duration: T(450), easing: 'ease-out' });
+    if (!d.animate || d.classList.contains('qte-on')) return; /* v633 : pas de caméra pendant une défense */
+    camA.forEach((a) => a.cancel());
+    camA = moveEls().map((r) => r.animate([{ translate: '0 0' }, { translate: `${cx.toFixed(1)}px ${cy.toFixed(1)}px`, offset: 0.3 }, { translate: '0 0' }], { duration: T(450), easing: 'ease-out' }));
   };
   // Arrêt sur image : le coup « pèse » un instant
   /* v509 : PV d'une carte mis à jour au moment du coup (chiffre ET anneau de vie ; avant, l'anneau attendait le dessin suivant) */
@@ -902,7 +905,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         die.style.translate = '';
         res.textContent = bonus === RHYTHM.perfect ? `Parfait ! +${bonus}` : bonus ? `Bien ! +${bonus}` : v === null ? 'Lancé au hasard' : 'Raté';
         if (bonus && !reduced) { const n = document.createElement('span'); n.className = `kx-sprite fxs ry2-burst${bonus === RHYTHM.perfect ? '' : ' small'}`; n.style.cssText = `--d:${bonus === RHYTHM.perfect ? 760 : 600}ms;background-image:url(assets/fx/dice-perfect.webp)`; ov.querySelector('.ry2-c').appendChild(n); } // v356 : éclat d'or au lâcher réussi
-        if (bonus === RHYTHM.perfect) { app.sfx.perfect(); if (!reduced) { const d = $('.dv'); d.classList.remove('ry-shake'); void d.offsetWidth; d.classList.add('ry-shake'); d.addEventListener('animationend', () => d.classList.remove('ry-shake'), { once: true }); /* v607 : la secousse ne reste plus posée sur le plateau */ } }
+        if (bonus === RHYTHM.perfect) { app.sfx.perfect(); if (!reduced) { shake(true); /* v633 : plus de secousse sur tout l'écran */ /* v607 : la secousse ne reste plus posée sur le plateau */ } }
         else if (bonus) app.sfx.hit(); else app.sfx.miss();
         app.sfx.swipe?.();
         lastThrow = 1;
@@ -953,7 +956,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const ov = document.createElement('div'); ov.className = 'cb-assault';
     ov.innerHTML = `<div class="cb-as-in"><small>Assaut · ${esc(uName(e))}</small><b>${esc(A.name)}</b></div>`;
     $('.dv')?.appendChild(ov); app.sfx.boss?.();
-    if (!reduced) { const d = $('.dv'); d.classList.remove('ry-shake'); void d.offsetWidth; d.classList.add('ry-shake'); d.addEventListener('animationend', () => d.classList.remove('ry-shake'), { once: true }); /* v607 : la secousse ne reste plus posée sur le plateau */ }
+    if (!reduced) { shake(true); /* v633 : plus de secousse sur tout l'écran */ /* v607 : la secousse ne reste plus posée sur le plateau */ }
     await wait(reduced ? 500 : 1100);
     ov.classList.add('out'); setTimeout(() => ov.remove(), 250);
     const res = await barQTE(s, A.seq, { beat: A.beat, title: A.name });

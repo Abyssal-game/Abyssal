@@ -5930,3 +5930,9 @@ html[data-mat="tp-mammon"] .sc-cell { background: rgba(40, 0, 0, .3); box-shadow
 .cx-pv-prof.has-fond { background: linear-gradient(90deg, rgba(10, 9, 16, .82) 28%, rgba(10, 9, 16, .35) 58%, rgba(10, 9, 16, 0) 80%), var(--pf-bg) right center / cover no-repeat, #0B0C12 !important; min-height: 150px; padding: 16px; border-radius: 12px; }
 .profile-head.has-fond { background: linear-gradient(90deg, rgba(10, 9, 16, .7), rgba(10, 9, 16, .55) 55%, rgba(10, 9, 16, .25)), var(--pf-bg) right center / cover no-repeat, #0B0C12 !important; }
 .profile-head.has-fond .ph-text { text-shadow: 0 1px 2px #000, 0 0 10px rgba(0, 0, 0, .9); }
+
+/* v633 : rectangle noir pendant l'Assaut d'un gardien (capture du propriétaire, iPhone) : l'écran du combat n'est plus une
+   grande couche permanente (will-change) et ne bouge plus jamais d'un bloc (secousse et caméra sur les rangées, js/screens/duel-ui.js) ;
+   le voile rouge de la défense ne pulse plus (une opacité animée sur tout l'écran, redessinée à chaque image) */
+.dv { will-change: auto; }
+.dv.qte-on::after { animation: none; opacity: .85; }
