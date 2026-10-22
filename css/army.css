@@ -5626,3 +5626,27 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .pf-cx-vif-rubis { --fr: url(../assets/frames/cx-vif-rubis-4.webp); }
 .pf-cx-vif-perle { --fr: url(../assets/frames/cx-vif-perle-4.webp); }
 .pf-cx-vif-orchidee { --fr: url(../assets/frames/cx-vif-orchidee-4.webp); }
+
+/* v592 : Revue des doublons (Mode Créateur) */
+.rv-count { color: #EBD9B0; font-weight: 700; }
+.rv-sec { margin: 22px 0 6px; font: 700 1rem var(--f-title, serif); color: #E8C877; border-bottom: 1px solid rgba(201, 164, 90, .3); padding-bottom: 4px; }
+.rv-grp { margin: 10px 0 14px; padding: 10px 8px; border: 1px solid rgba(201, 164, 90, .2); border-radius: 4px 12px 4px 12px; background: rgba(12, 12, 20, .6); }
+.rv-gt { margin: 0 0 8px; font-size: .8rem; color: #CFC3A8; }
+.rv-gt em { display: inline-block; min-width: 22px; padding: 1px 6px; margin-right: 4px; border-radius: 8px; background: #B8892E; color: #1A1206; font-style: normal; font-weight: 800; text-align: center; }
+.rv-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: 8px; }
+.rv-lab .rv-it { display: grid; justify-items: center; align-content: start; gap: 4px; padding: 8px 4px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, .08); background: rgba(0, 0, 0, .25); min-width: 0; text-align: center; }
+.rv-it.k-plate { grid-column: 1 / -1; }
+.rv-it b { font: 700 .72rem/1.15 var(--f-ui); color: #EBD9B0; overflow-wrap: anywhere; }
+.rv-it small { font-size: .58rem; color: #8E8699; overflow-wrap: anywhere; }
+.rv-pic { display: grid; place-items: center; min-height: 92px; }
+.rv-pic .avatar-big { width: 70px; height: 70px; }
+.rv-back { width: 92px; height: auto; max-height: 150px; object-fit: contain; border-radius: 6px; }
+.rv-it.k-plate .rv-pic { min-height: 56px; }
+.rv-vote { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; width: 100%; }
+.rv-v { flex: 1 1 88px; min-height: 40px; font-size: .7rem; padding: 4px 6px; }
+.rv-v.keep.on { background: #2E7D4F; color: #fff; border-color: #2E7D4F; }
+.rv-v.drop.on { background: #A33636; color: #fff; border-color: #A33636; }
+.rv-it.keep { border-color: rgba(80, 200, 130, .7); }
+.rv-it.drop { border-color: rgba(220, 80, 80, .8); }
+.rv-it.drop .rv-pic { opacity: .45; }
+.rv-it.k-plate .np-demo { font-size: 1.15rem; padding: .55em 2.6em; min-width: 240px; text-align: center; }
