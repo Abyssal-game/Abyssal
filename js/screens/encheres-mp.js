@@ -59,7 +59,7 @@ export function createEncheresMp(app, root, { modeBar }) {
       ${lot ? `<div class="en-onlot ${fresh ? 'fresh' : ''}">${lotCard(v, lot)}</div>
       ${banner ? '' : `<div class="en-plaque"><small>Lot ${s.i + 1} / ${s.total || 15}</small><b>${lot.v > 0 ? `${esc(fname(lot.f))} · ${lot.v} pt${lot.v > 1 ? 's' : ''}` : `Malédiction · ${lot.v}`}</b>
         ${s.pot?.length ? `<span class="en-pot">+ ${s.pot.length} lot${s.pot.length > 1 ? 's' : ''} resté${s.pot.length > 1 ? 's' : ''} : en jeu ${pv > 0 ? '+' : ''}${pv}</span>` : ''}
-        <span>${pv > 0 ? 'La <b>plus haute</b> offrande seule l’emporte' : 'La <b>plus basse</b> offrande seule l’hérite !'}</span></div>`}` : ''}${ban}</div>`;
+        <span>${pv > 0 ? 'La <b>plus haute</b> offrande seule l’emporte' : 'La <b>plus basse</b> offrande seule en hérite !'}</span></div>`}` : ''}${ban}</div>`;
   }
   function drawGame(v, ctx) {
     if (!ctx.alive) return;

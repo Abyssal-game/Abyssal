@@ -45,7 +45,7 @@ export function liveWanted(m, { running = RUNNING, native = LIVE_NATIVE, bad = [
 let status = { state: 'idle' };
 const listeners = new Set();
 const setStatus = (s) => { status = s; listeners.forEach((f) => { try { f(s); } catch (e) { /* écran fermé */ } }); };
-export const liveStatus = () => ({ ...status, ready: load().ready || null });
+export const liveStatus = () => { const r = load().ready; return { ...status, ready: r > RUNNING ? r : null }; };
 export const onLiveStatus = (f) => { listeners.add(f); return () => listeners.delete(f); };
 
 const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
@@ -175,6 +175,19 @@ export async function initLive({ idle = () => true } = {}) {
   if (st.trying && st.trying !== RUNNING) {
     // la version essayée n'a pas tenu (plantage, ou retour au jeu embarqué) : on ne la reprend plus
     st.bad = [...new Set([...(st.bad || []), st.trying])].slice(-10); st.trying = null; save(st);
+  }
+  /* v623 : l'app a été mise à jour par le store (jeu embarqué plus récent) : une version téléchargée dépassée
+     n'est plus annoncée, et ses dossiers sont effacés (sur Android, une copie complète ≈ 200 Mo) */
+  if (!inSnap && !st.trying) {
+    if (st.ready && st.ready <= RUNNING) { st.ready = null; save(st); }
+    if (!st.ready) later(async () => {
+      if (busy || load().ready) return;
+      try {
+        const FS = plug('Filesystem'), LIB = LIB_(), DIR = DIR_();
+        const { files } = await FS.readdir({ directory: LIB, path: DIR });
+        for (const f of files || []) { const n = typeof f === 'string' ? f : f.name; try { await FS.rmdir({ directory: LIB, path: `${DIR}/${n}`, recursive: true }); } catch (e) { /* suivant */ } }
+      } catch (e) { /* dossier absent */ }
+    }, 5000);
   }
   if (st.trying === RUNNING && inSnap) {
     // nouvelle version lancée : si elle tient 8 secondes, on la garde pour les prochains lancements

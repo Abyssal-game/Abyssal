@@ -32,7 +32,7 @@ export default function profile(app, root) {
           <div><b>${ratio === null ? 'Chance à mesurer' : `${Math.round(ratio * 100)} % de la moyenne`}</b><p class="small muted">${verdict}</p><p class="small muted">Hyper rares ou mieux obtenues : ${st.gotHR} (moyenne attendue : ${st.expHR.toFixed(1).replace('.', ',')}).</p></div>
         </div>
         <div class="luck-grid">${['R', 'HR', 'M', 'S', 'PC', 'C'].map((r) => `<div><b style="color:${RARITY[r].color}">${p[r] || 0}</b><span>${RARITY[r].name}${(p[r] || 0) > 1 ? 's' : ''}</span></div>`).join('')}</div>
-        <p class="small muted">Cartes tirées dans les boosters depuis la mise à jour.</p>
+        <p class="small muted">Cartes tirées dans les boosters depuis que le jeu les compte.</p>
       </div>
       ${rarest ? `<div class="panel rarest"><div>${cardHTML(rarest, { variant: rv })}</div><div><span class="small muted">Ta carte la plus rare</span><h3>${esc(rarest.name)}</h3><p class="small"><b style="color:${RARITY[rarest.rarity].color}">${RARITY[rarest.rarity].name}</b>${rv !== 'normal' ? ` · ${esc(VARIANTS[rv].name)}` : ''}</p><p class="small muted">Trouvée le ${new Date(g.entry(rarest.id).first).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}.</p></div></div>` : ''}
       ${s.best.length ? `<h3>Tes plus belles ouvertures</h3><div class="stack">${s.best.map((b, i) => `<div class="panel hist best-op"><span class="best-rank">${i + 1}</span><div><div class="row between small"><b>${esc(BOOSTERS[b.type]?.name || b.type)}</b><span class="muted">${new Date(b.t).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} · ${b.score} pts</span></div><div class="hist-cards">${b.cards.map((c) => { const card = cat.get(c.id); return card ? `<button class="hist-c" data-id="${c.id}" style="--rc:${RARITY[card.rarity].color}" title="${esc(card.name)}"><img alt="${esc(card.name)}" loading="lazy" src="${artUrl(card, { lite: true })}">${c.v !== 'normal' ? `<em>${esc(VARIANTS[c.v].short)}</em>` : ''}</button>` : ''; }).join('')}</div></div></div>`).join('')}</div>` : ''}</div></details>`;
@@ -153,7 +153,7 @@ export default function profile(app, root) {
       <details class="panel dc-fold"><summary>${picon('stats')} Statistiques détaillées</summary><div>
         <div class="stats-grid">
           <div class="panel stat"><b>${fmt(s.stats.cards)}</b><span>cartes obtenues</span></div>
-          <div class="panel stat"><b>${g.variantCount()}</b><span>variantes</span></div>
+          <div class="panel stat"><b>${g.variantCount()}</b><span>finitions</span></div>
           <div class="panel stat"><b>${g.rarityCount('M')}</b><span>mythiques</span></div>
           <div class="panel stat"><b>${g.rarityCount('S')}</b><span>secrètes</span></div>
         </div>

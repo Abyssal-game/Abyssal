@@ -98,7 +98,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     const idx = list ? list.indexOf(current) : -1;
     const nav = list && list.length > 1 ? `<div class="detail-nav"><button class="icon-btn" data-act="prev" aria-label="Carte précédente" ${idx <= 0 ? 'disabled' : ''}>${icon('prev')}</button><span class="small muted">${idx + 1} / ${list.length}</span><button class="icon-btn" data-act="next" aria-label="Carte suivante" ${idx >= list.length - 1 ? 'disabled' : ''}>${icon('next')}</button></div>` : '';
 
-    const variantsRow = owned ? `<div class="variant-row" role="group" aria-label="Variantes">${['normal', 'holo', 'gold', 'galaxy', 'crystal', 'prism'].filter((v) => card.variants.includes(v)).map((v) => { // v288 : ordre de rareté
+    const variantsRow = owned ? `<div class="variant-row" role="group" aria-label="Finitions">${['normal', 'holo', 'gold', 'galaxy', 'crystal', 'prism'].filter((v) => card.variants.includes(v)).map((v) => { // v288 : ordre de rareté
       const has = ownedVariants.includes(v);
       return `<button class="chip" data-act="variant" data-v="${v}" aria-pressed="${v === shownVariant}" ${has ? '' : 'disabled'} title="${has ? 'Afficher' : 'Pas encore obtenue'}">${has ? '' : icon('lock')}${VARIANTS[v].short}${has && e.v[v] > 1 ? ` ×${e.v[v]}` : ''}</button>`;
     }).join('')}</div>${ownedVariants.length > 1 ? (g.shownVariant(current) === shownVariant

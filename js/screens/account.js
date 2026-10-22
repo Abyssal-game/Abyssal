@@ -80,7 +80,7 @@ export default function account(app, root) {
           <button class="btn primary block" type="submit" ${busy ? 'disabled' : ''}>${icon(forgot ? 'key' : 'user')}${busy ? 'Un instant…' : forgot ? 'Envoyer le lien' : signup ? 'Créer mon compte' : 'Se connecter'}</button>
           ${signup ? `<p class="small muted">En créant un compte, tu acceptes la <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité</a>. Il faut avoir 13 ans ou plus.</p>` : forgot ? `<button type="button" class="btn ghost small" data-mode="login">Retour</button>` : `<button type="button" class="btn ghost small" data-mode="forgot">Mot de passe oublié ?</button>`}
         </form>
-        <p class="small muted acc-privacy">${icon('lock')} Données conservées : ton e-mail, ton pseudo et ta sauvegarde de jeu. Rien d’autre. Tu peux supprimer ton compte à tout moment.</p>`;
+        <p class="small muted acc-privacy">${icon('lock')} Données conservées : ton e-mail, ton pseudo, ta sauvegarde et ce qui sert aux fonctions en ligne (amis, parties, classements). Détails dans la politique de confidentialité. Tu peux supprimer ton compte à tout moment.</p>`;
       root.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => { lastEmail = root.querySelector('[name=email]')?.value || lastEmail; mode = b.dataset.mode; render(); }));
       root.querySelector('#login').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -130,7 +130,7 @@ export default function account(app, root) {
           : `<form class="row gap acc-pseudo" id="pseudo"><input class="input plain" name="pseudo" maxlength="16" minlength="3" placeholder="Ton pseudo" value="${esc(isMaskedPseudo(p?.pseudo) ? '' : p?.pseudo || '')}" required><button class="btn primary" type="submit">OK</button></form><p class="small muted">Attention : une fois choisi, ton pseudo est définitif.</p>`}
         ${p?.pseudo ? '' : '<p class="small acc-warn">Choisis un pseudo pour apparaître aux classements.</p>'}
         ${isMaskedPseudo(p?.pseudo) ? '<p class="small acc-warn">Ton pseudo a été signalé par plusieurs joueurs et a été masqué. Choisis-en un autre.</p>' : ''}
-        <p class="small muted">Dans un classement, touche le pseudo d’un joueur pour le signaler ou le masquer.${blockedIds().length ? ` Joueurs masqués sur cet appareil : <b>${blockedIds().length}</b>.` : ''}</p>
+        <p class="small muted">Touche le pseudo d’un joueur (classement, partie en ligne) pour ouvrir son profil : tu peux l’y signaler ou le masquer.${blockedIds().length ? ` Joueurs masqués sur cet appareil : <b>${blockedIds().length}</b>.` : ''}</p>
         ${blockedIds().length ? `<button class="btn small" data-act="unblock">${icon('eye')}Réafficher les joueurs masqués</button>` : ''}
       </section>
       ${serverMode() ? '' /* v544 : la partie est tenue par le serveur : plus rien à sauvegarder ni à récupérer à la main */ : `<section class="panel stack">

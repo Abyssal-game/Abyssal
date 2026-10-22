@@ -81,7 +81,7 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
     if (c.variant !== 'normal') s += ` · <span class="vtag">${VARIANTS[c.variant].name}</span>`;
     if (preset) s += ` · <b class="op-pts">+${c.pts} point${c.pts > 1 ? 's' : ''}</b>${c.double ? ' <span class="muted">(ta faction : ×2)</span>' : ''}`;
     else if (c.isNewCard) { const card = cat.get(c.id), fp = app.game.factionProgress(card.faction); s += ` · <span class="newtag">Nouvelle entrée au Bestiaire</span><br><span class="op-gain">${icon('book')} ${esc(cat.faction[card.faction].name)} : ${fp.owned} / ${fp.total}</span> <span class="op-gain">${icon('swords')} Elle peut rejoindre ton équipe</span>`; }
-    else if (c.isNewVariant) s += ` · <span class="newtag">Nouvelle variante</span>`;
+    else if (c.isNewVariant) s += ` · <span class="newtag">Nouvelle finition</span>`;
     else s += ` · doublon <span class="muted">à brûler : ${icon('ash')} ${c.burn} cendres</span>`;
     // rôle et capacité en combat
     const card = cat.get(c.id), role = ROLES[roleOf(card)], kw = KEYWORDS[keywordOf(card)];

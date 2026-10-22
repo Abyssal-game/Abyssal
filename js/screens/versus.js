@@ -21,7 +21,7 @@ const RES = { win: 'Victoire', tie: 'Égalité', lose: 'Défaite' };
 // v516 : « Comment ça marche » dans le style des autres jeux (étapes illustrées)
 const HOW = [['booster', '#E8C35A', 'Compose ton défi', `Choisis jusqu’à ${VERSUS_MAX} boosters, de types différents si tu veux (par exemple un standard et un de faction Céleste). Les deux joueurs ouvrent les mêmes.`],
   ['cur-shard', '#7FA8D8', 'La mise', 'Chaque joueur paie le prix des boosters en éclats.'],
-  ['amis', '#9FE0FF', 'Ton adversaire', `Ton défi est ouvert à tous, ou envoyé à un ami. Il reste ${VERSUS_HOURS} h ; sinon ta mise t’est rendue.`],
+  ['amis', '#9FE0FF', 'Ton adversaire', `Ton défi est ouvert à tous, ou envoyé à un ami. S’il n’est pas relevé en ${VERSUS_HOURS} h, ta mise t’est rendue.`],
   ['cards', '#C9A45A', 'Les points', `Quand un joueur relève le défi, les boosters des deux joueurs s’ouvrent. Commune ${LUCK_POINTS.C}, Peu commune ${LUCK_POINTS.PC}, Rare ${LUCK_POINTS.R}, Hyper rare ${LUCK_POINTS.HR}, Mythique ${LUCK_POINTS.M}, Secrète ${LUCK_POINTS.S}, +${LUCK_POINTS.variant} par finition.`],
   ['crown', '#F2C14E', 'La victoire', 'Le meilleur total remporte toutes les cartes : les siennes et celles de l’adversaire. Le perdant ne garde rien.'],
   ['seal', '#7FE0A0', 'Égalité', 'Chacun repart avec les cartes de ses propres boosters.'],

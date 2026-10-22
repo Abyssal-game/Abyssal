@@ -19,7 +19,7 @@
  { "key": "boosters_10",   "name": "Briseur de sceaux",       "desc": "Ouvre 10 boosters.",                               "cond": { "type": "boosters", "n": 10 },         "reward": { "shards": 25 } },
  { "key": "boosters_50",   "name": "Insatiable",              "desc": "Ouvre 50 boosters.",                               "cond": { "type": "boosters", "n": 50 },         "reward": { "shards": 75, "tickets": { "premium": 1 } } },
  { "key": "boosters_150",  "name": "Pilleur de bibliothèques", "desc": "Ouvre 150 boosters.",                             "cond": { "type": "boosters", "n": 150 },        "reward": { "shards": 150, "title": "Pilleur de grimoires" } },
- { "key": "variant_1",     "name": "Reflet changeant",        "desc": "Obtiens une première finition (Argentée, Enluminée ou Abyssale).",        "cond": { "type": "variants", "n": 1 },          "reward": { "shards": 15 } },
+ { "key": "variant_1",     "name": "Reflet changeant",        "desc": "Obtiens une première finition (Argentée, Enluminée, Abyssale, Cristalline ou Prismatique).",        "cond": { "type": "variants", "n": 1 },          "reward": { "shards": 15 } },
  { "key": "variant_15",    "name": "Galerie des reflets",     "desc": "Possède 15 finitions.",                "cond": { "type": "variants", "n": 15 },         "reward": { "shards": 60, "frame": "prisme" } },
  { "key": "craft_1",       "name": "Premières cendres",   "desc": "Brûle une carte dans la Fournaise.",        "cond": { "type": "burned", "n": 1 },             "reward": { "shards": 10 } },
  { "key": "daily_7",       "name": "Fidèle des sceaux",       "desc": "Récupère 7 offrandes quotidiennes.",               "cond": { "type": "daily", "n": 7 },             "reward": { "shards": 40 } },

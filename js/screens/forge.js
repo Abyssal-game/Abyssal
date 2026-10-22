@@ -76,7 +76,7 @@ export function furnaceScreen(app, root) {
     if (!list.length) return '';
     const shown = list.slice(0, ui.subAll ? 60 : 6), can = list.filter((o) => o.x.cost <= g.obs()).length;
     return `<section class="panel"><h2 class="section-title">Sublimer</h2>
-      <p class="small muted">Donne à une carte que tu possèdes sa finition suivante (argentée, puis enluminée, puis abyssale) contre des obsidiennes (tu en as ${fmt(g.obs())}). Tes favorites et ton équipe d’abord.${can ? ` Tu peux en sublimer <b>${can}</b> maintenant.` : ''}</p>
+      <p class="small muted">Donne à une carte que tu possèdes sa finition suivante (argentée, enluminée, abyssale, cristalline, puis prismatique) contre des obsidiennes (tu en as ${fmt(g.obs())}). Tes favorites et ton équipe d’abord.${can ? ` Tu peux en sublimer <b>${can}</b> maintenant.` : ''}</p>
       <div class="fg-grid">${shown.map(({ c, x }) => `<button class="fg-cell ${x.cost <= g.obs() ? '' : 'fg-dim'}" data-act="sub" data-id="${c.id}">${mini(c)}<b>${esc(c.name)}</b><small class="fg-sub"><span>${esc(VARIANTS[x.to].name)}</span><span>${OBS}${fmt(x.cost)}</span></small></button>`).join('')}</div>
       ${list.length > shown.length ? `<button class="btn small ghost block" data-act="subAll">Voir les ${list.length} cartes sublimables</button>` : ''}
     </section>`;

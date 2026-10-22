@@ -153,8 +153,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     u.mirror ? st_('shield', 'Miroir : le prochain coup qu’elle reçoit se retourne contre l’attaquant (60 %). Le poison passe à travers.') : '',
     u.ashArmor ? st_('guard', `Armure de cendres : −${u.ashArmor * 6} % de dégâts reçus (une Brisure la fait tomber)`, u.ashArmor) : '',
     u.veiled ? st_('slow', u.mark ? 'Dans l’ombre, mais la Marque le révèle' : 'Dans l’ombre : −70 % de dégâts reçus (une Marque le révèle)') : '',
-    u.slow ? st_('slow', 'Ralenti : prochaine attaque -50 %') : '',
-    u.defend ? st_('defend', 'Défense : -50 % de dégâts') : '',
+    u.slow ? st_('slow', 'Ralenti : prochaine attaque −50 %') : '',
+    u.defend ? st_('defend', 'Défense : −50 % de dégâts') : '',
     u.guardBy ? st_('guard', 'Protégé par un Rempart') : '',
     u.exposed ? st_('exposed', 'Déséquilibrée : +25 % de dégâts subis') : '',
     u.trait && TRAITS[u.trait] ? st_(traitIcon(u.trait), `${TRAITS[u.trait].name} : ${TRAITS[u.trait].desc}`) : '',
@@ -1293,7 +1293,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     if (u.slow) s.push('Ralenti : sa prochaine attaque fait moitié moins mal.');
     if (u.mark) s.push('Marqué : le prochain coup d’une autre de tes créatures fait +50 % et +2 Brisure, +3 aux jets de dés contre lui.');
     if (u.broken) s.push('Brisé : +50 % de dégâts subis, +5 aux jets.');
-    if (u.defend) s.push('En défense : -50 % de dégâts.');
+    if (u.defend) s.push('En défense : −50 % de dégâts.');
     if (u.guardBy) s.push('Protégé par un Rempart.');
     return s.join(' ');
   }
@@ -1301,7 +1301,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     openSheet(`<h2>Le combat</h2><ul class="small">
       <li><b>Chacun son tour</b> : toutes les créatures, les tiennes et les ennemies, jouent une fois par tour, dans l’ordre de leur vitesse. L’ordre s’affiche en haut de l’écran ; « T2 » marque le début du tour suivant. Quand c’est le tour d’une de tes créatures, ses actions s’ouvrent : choisis l’action, puis la cible. Raccourci : touche un ennemi pour l’attaquer.</li>
       <li><b>PA</b> (points d’action, ${PA_MAX} au plus) : chaque créature a les siens. Elle en gagne 1 au début de chacun de ses tours, 1 en attaquant, 1 en se défendant et 1 sur une parade parfaite. Ses compétences les dépensent : alterne attaques et compétences, et fais jouer toute ton équipe.</li>
-      <li><b>Attaque</b> (gratuite, +1 PA) : dégâts fiables, +1 Ferveur. <b>Défense</b> (gratuite, +1 PA) : -50 % de dégâts jusqu’à son prochain tour. <b>Passer</b> : elle ne fait rien. <b>Permuter</b> (une fois par tour) : une créature de la réserve prend sa place et joue tout de suite ; PV, PA et états sont gardés, et la réserve récupère 10 % de PV par tour. En entrant, elle déclenche un petit effet lié à son rôle (bouclier, soin, Ferveur, ralentissement…).</li>
+      <li><b>Attaque</b> (gratuite, +1 PA) : dégâts fiables, +1 Ferveur. <b>Défense</b> (gratuite, +1 PA) : −50 % de dégâts jusqu’à son prochain tour. <b>Passer</b> : elle ne fait rien. <b>Permuter</b> (une fois par tour) : une créature de la réserve prend sa place et joue tout de suite ; PV, PA et états sont gardés, et la réserve récupère 10 % de PV par tour. En entrant, elle déclenche un petit effet lié à son rôle (bouclier, soin, Ferveur, ralentissement…).</li>
       <li><b>Brisure</b> : en visant une élite ou un gardien, la cible affiche la Brisure que ton coup va infliger (◆), et « BRISE ! » quand il va le briser. Un seul coup ne retire jamais plus de 40 % des PV d’un gardien.</li>
       <li><b>Ferveur</b> (${FERVOR_MAX} au plus, commune à l’équipe ; tu en gardes 3 au plus d’un combat à l’autre) : attaques, faiblesses, esquives (+1), parades parfaites (+2) et Brisures (+2) la remplissent. Pleine, elle lance le <b>pouvoir d’équipe</b> (${esc(ult.name)} : ${esc(ult.desc)}), pendant le tour d’une de tes créatures, sans le terminer.</li>
       <li><b>Voir une carte</b> : garde le doigt appuyé sur une carte (ennemie ou alliée) pour ouvrir sa fiche : PV, attaque, intention, passifs. Un toucher court sur un ennemi attaque toujours directement.</li>
@@ -1318,7 +1318,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       <li><b>Serviteurs</b> : chaque serviteur encore debout renforce la grosse attaque du gardien (+20 %, +40 % au plus). Les abattre d’abord l’affaiblit.</li>
       <li><b>Annonces</b> : les grosses attaques des gardiens et des élites s’affichent sur la frise, à côté de leur portrait. Brise-les avant qu’ils jouent pour les annuler.</li>
       <li><b>Riposte chargée</b> : chaque coup encaissé par un Protecteur charge sa riposte (3 au plus) : +1 dégât et +1 Brisure par charge à sa prochaine attaque. <b>Prière</b> : le soin en trop devient un bouclier.</li>
-      <li><b>Faiblesses</b> : chaque faction en craint une autre (+50 % de dégâts) ; contre sa propre faction : -25 %. ★ sur une cible = faiblesse exploitée.</li>
+      <li><b>Faiblesses</b> : chaque faction en craint une autre (+50 % de dégâts) ; contre sa propre faction : −25 %. ★ sur une cible = faiblesse exploitée.</li>
       <li><b>Instinct de meute</b> : tes Communes font +${PACK_BONUS} dégât aux élites et aux gardiens.</li></ul>
       <h3>L’identité des créatures</h3><p class="small">Chaque créature a sa propre identité, qui se révèle en montant de niveau : sa <b>frappe</b> (niveau 1) remplace l’attaque de son rôle, puis viennent un <b>passif</b> (niveau 3), une <b>compétence propre</b> (niveau 6, la case violette à côté de la compétence dorée de son rôle), l’<b>Éveil</b> (niveau 9) et l’<b>Apogée</b> (niveau 10). Tout est détaillé sur la fiche de la carte.</p>
       <h3>Les rôles</h3>${Object.values(KITS).map((k) => `<p class="small">${roleIcon(k.kw)} <b>${esc(k.name)}</b> · <b>${esc(k.skill.name)}</b> (${k.skill.pa} PA) : ${esc(k.skill.desc)} <i>${esc(k.passive.name)} : ${esc(k.passive.desc)}</i></p>`).join('')}
