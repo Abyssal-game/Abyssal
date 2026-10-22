@@ -273,13 +273,13 @@ ${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone || dail
       ${st.tiebreak ? `<p class="sc-caps"><b>Égalité de cartes</b> : ${st.over === 'won' ? 'tu tiens' : 'il tient'} le cœur du Sceau.</p>` : ''}
       <p class="sc-caps">Tes captures : <b>${caps.p}</b> · Les siennes : <b>${caps.o}</b></p>
       ${out.trophy?.length ? `<div class="sc-trophy"><img class="sc-tico" alt="" src="assets/icons/sc-trophy.webp"><b>Butin du jour</b><span class="small">Garde une de ces cartes :</span><div class="sc-tro-row">${out.trophy.map((id) => `<button class="sc-tro" data-tro="${id}">${scCard(cat, id, { owner: 'p' })}</button>`).join('')}</div></div>` : ''}
-      <p class="sc-say">${rivalPic(cat, R)}<span>« ${esc(st.over === 'won' ? R.win : st.over === 'lost' ? R.lose : 'Partie nulle. On recommence ?')} »</span></p>
       ${out.shards ? `<p class="sc-gain">${icon('crystal')} <b>+${fmt(out.shards)}</b> éclats${out.first ? ' (première victoire)' : ''}</p>` : ''}
       ${out.chests?.length ? `<a class="sc-gain sc-chestwin" href="#/coffres">${icon('p:chest')} <b>${out.chests.map((c) => esc(SC_CHEST_NAME[c])).join(' et ')}</b> gagné${out.chests.length > 1 ? 's' : ''} !</a>` : ''}
       ${out.xp && !out.capped ? `<p class="small muted center">+${out.xp} XP de profil</p>` : ''}
       ${out.capped ? `<p class="small muted">Tes ${SC.SCEAUX_REWARD.dailyPaid} victoires bien payées du jour sont faites : celle-ci rapporte ${SC.SCEAUX_REWARD.afterCap} éclats et ${SC.SCEAUX_REWARD.xp} XP.</p>` : ''}
       ${out.title ? `<p class="sc-gain">${icon('p:titles')} Nouveau titre : <b>${esc(out.title)}</b></p>` : ''}
       ${out.frame ? `<p class="sc-gain">${icon('p:titles')} Nouveau cadre de profil : <b>Cadre des Sceaux</b></p>` : ''}
+      <p class="sc-say">${rivalPic(cat, R)}<span>« ${esc(st.over === 'won' ? R.win : st.over === 'lost' ? R.lose : 'Partie nulle. On recommence ?')} »</span></p>
       <div class="sc-end-act">${st.daily ? '' : '<button class="btn primary dc-plq dc-plq-red" data-x="again">Rejouer</button>'}<button class="btn dc-plq dc-plq-dark" data-x="back">Retour</button></div></div>`;
     document.body.appendChild(el);
     el.addEventListener('click', (e) => {

@@ -18,7 +18,7 @@ export const SP = { sceau: { name: 'Sceau', img: 'assets/jeux/pa-sceau.webp', de
   gardien: { name: 'Gardien', img: 'assets/jeux/pa-gardien.webp', desc: 'Arrêt forcé : tu encaisses tout de suite ce que tu as devant toi.' },
   offrande: { name: 'Offrande', img: 'assets/jeux/pa-offrande.webp', desc: 'La prochaine carte de faction compte double.' },
   oracle: { name: 'Présage', img: 'assets/jeux/pa-presage.webp', desc: 'Tu vois la carte suivante avant de choisir : tirer ou t’arrêter.' }, /* v557 */
-  curse: { name: 'Malédiction', img: 'assets/jeux/pa-malediction.webp', desc: 'Ton adversaire devra tirer une carte de plus à son prochain tour avant de pouvoir s’arrêter.' } }; /* v561 */
+  curse: { name: 'Malédiction', img: null, /* v624 : image pas encore livrée (elle était redemandée à chaque dessin) */ desc: 'Ton adversaire devra tirer une carte de plus à son prochain tour avant de pouvoir s’arrêter.' } }; /* v561 */
 // v464 : les sept sceaux de cire du parchemin (assets/jeux/pa-table2.webp, 450 × 330), position en % et faction de chacun
 export const SEALS = [['infernal', 47, 170], ['artificiel', 100, 207], ['celeste', 160, 233], ['necrotique', 225, 245], ['sauvage', 292, 235], ['abyssal', 353, 207], ['primordial', 405, 170]];
 const HOW = [['cards', '#7FA8D8', 'Ton tour', 'Tire des cartes une à une et pose-les devant toi. Chaque carte de faction vaut de 1 à 7 points.'],
@@ -100,7 +100,7 @@ export default function pacteScreen(app, root) {
     el.style.backgroundImage = `url(${PA.tableBg(g.s.pacte.cur?.table)})`;
   }
   const cardHTML = (c, cls = '') => {
-    if (c.sp) return `<span class="pa-card sp sp-${c.sp} ${cls}">${c.sp === 'oracle' ? `<i class="pa-sp-ic">${icon('eye')}</i>` : c.sp === 'curse' ? `<i class="pa-sp-ic">${icon('p:danger')}</i>` : ''}<img alt="" src="${SP[c.sp].img}" onerror="this.remove()"><span class="pa-cn">${SP[c.sp].name}</span></span>`;
+    if (c.sp) return `<span class="pa-card sp sp-${c.sp} ${cls}">${c.sp === 'oracle' ? `<i class="pa-sp-ic">${icon('eye')}</i>` : c.sp === 'curse' ? `<i class="pa-sp-ic">${icon('p:danger')}</i>` : ''}${SP[c.sp].img ? `<img alt="" src="${SP[c.sp].img}" onerror="this.remove()">` : ''}<span class="pa-cn">${SP[c.sp].name}</span></span>`;
     const card = c.id && cat.get(c.id);
     return `<span class="pa-card f-${c.f} ${c.x2 ? 'x2' : ''} ${cls}" style="--fc:${cat.faction[c.f]?.colors.secondary || '#888'}"><img alt="" src="${card ? artUrl(card, { lite: true }) : 'assets/sceaux/dos.webp'}">
       <b class="pa-v">${c.v}${c.x2 ? '<small>×2</small>' : ''}</b><span class="pa-cf">${sigil(c.f)}</span></span>`;

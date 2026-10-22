@@ -5864,3 +5864,14 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .op-banner.op-variant.v-crystal { background: linear-gradient(110deg, #FFFFFF, #BFE3FF 40%, #E6D2FF 70%, #FFFFFF); -webkit-background-clip: text; background-clip: text; }
 .op-banner.op-variant.v-prism { background: linear-gradient(110deg, #FF8FA8, #FFD37A 25%, #9CFFC8 50%, #8FE3FF 75%, #D2A8FF); -webkit-background-clip: text; background-clip: text; }
 .sh-c.v-crystal { border-color: #BFE3FF; } .sh-c.v-prism { border-color: #FF8FD8; }
+
+/* v624 : tour de l'app (iPhone SE) */
+@media (max-height: 700px) {
+  .sc-end-in { gap: 6px; }
+  .sc-end-in .sc-crest { width: min(52%, 180px); }
+  .sc-end-in .sc-trophy { margin: 4px 0; padding: 8px; }
+  .sc-end-in .sc-tro { width: 60px; }
+}
+.ck-fg { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; } /* Renforcer : palier suivant sur deux lignes au besoin */
+.cxs-hero.sachet .cx-sa { max-height: min(240px, 34vh); width: auto; } /* Échoppe : sachet à la une sans déborder sur le titre */
+.cxs-hero-pic { max-width: 100%; overflow: hidden; }
