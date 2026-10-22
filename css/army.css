@@ -5803,3 +5803,7 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .op-pack .pk-foil { display: none !important; }
 .pk-foil::before { width: 300%; height: 100%; animation-name: foil3; }
 @keyframes foil3 { 0%, 100% { transform: translateX(-66.667%); } 50% { transform: translateX(0); } }
+
+/* v611 (rapport du moniteur de fluidité, saccades au moment des coups) : étincelles sans ombre floue (chaque étincelle
+   animée était un calque dont l'ombre devait être dessinée à part) : même éclat avec un dégradé */
+.dv-burst i { width: 12px; height: 12px; margin: -6px; box-shadow: none !important; background: radial-gradient(circle, #fff 0 18%, #FFE6A0 32%, rgba(255, 179, 71, .55) 52%, rgba(255, 179, 71, 0) 72%); }

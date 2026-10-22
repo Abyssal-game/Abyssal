@@ -358,6 +358,10 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   // donc tous les styles recalculés, et une mise en page forcée à chaque coup)
   const SHAKE = { small: [220, [[-3, 1], [3, -1], [-1, 0]]], norm: [300, [[-5, 2], [5, -2], [-3, 1], [2, 0]]], big: [500, [[-9, 4], [8, -4], [-6, 3], [5, -2], [-3, 1]]] }; /* v597 : plus de rotation (Safari laissait un grand rectangle noir sur l'écran : tout le plateau était redessiné de travers) */
   let shakeA = null, camA = null;
+  /* v611 : positions lues une seule fois par image pendant un coup (caméra, éclair, effet peint) : avant, chaque lecture
+     après un ajout d'élément forçait la page à se recalculer, plusieurs fois au même instant */
+  const rcache = new Map(); let rcRaf = 0;
+  const rectOf = (n) => { if (!rcRaf) rcRaf = requestAnimationFrame(() => { rcache.clear(); rcRaf = 0; }); let r = rcache.get(n); if (!r) { r = n.getBoundingClientRect(); rcache.set(n, r); } return r; };
   const shake = (big, small = false) => {
     perfMark(big ? 'grosse secousse' : 'secousse');
     if (reduced) return; const d = $('.dv'); if (!d?.animate) return;
@@ -366,7 +370,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     shakeA = d.animate([{ transform: 'none' }, ...pts.map(([x, y]) => ({ transform: `translate(${x}px, ${y}px)` })), { transform: 'none' }], { duration: T(dur), easing: 'ease' });
   };
   // v346 : éclair d'impact — une lumière blanche et dorée jaillit du point touché
-  const impactFlash = (uid, big) => { if (reduced || light) return; const t = el(uid), box = $('.dv'); if (!t || !box) return; const b = box.getBoundingClientRect(), r = t.getBoundingClientRect(); const f = document.createElement('span'); f.className = `dv-iflash ${big ? 'big' : ''} ${st.units[uid]?.side === 'ally' ? 'foe' : ''}`; f.style.cssText = `left:${r.left - b.left + r.width / 2}px;top:${r.top - b.top + r.height / 2}px`; box.appendChild(f); setTimeout(() => f.remove(), 420); };
+  const impactFlash = (uid, big) => { if (reduced || light) return; const t = el(uid), box = $('.dv'); if (!t || !box) return; const b = rectOf(box), r = rectOf(t); const f = document.createElement('span'); f.className = `dv-iflash ${big ? 'big' : ''} ${st.units[uid]?.side === 'ally' ? 'foe' : ''}`; f.style.cssText = `left:${r.left - b.left + r.width / 2}px;top:${r.top - b.top + r.height / 2}px`; box.appendChild(f); setTimeout(() => f.remove(), 420); };
   const sparks = (uid, cls = '') => {
     if (reduced || light) return;
     const t = el(uid); if (!t) return;
@@ -377,9 +381,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const fxAt = (uid, name, { big = false, center = false } = {}) => {
     if (reduced) return;
     const box = $('.dv'); if (!box) return;
-    const b = box.getBoundingClientRect();
+    const b = rectOf(box);
     let x = b.width / 2, y = b.height / 2, size = b.width * 0.9;
-    if (!center) { const t = el(uid); if (!t) return; const r = t.getBoundingClientRect(); x = r.left - b.left + r.width / 2; y = r.top - b.top + r.height / 2; size = r.width * (big ? 1.9 : 1.45); }
+    if (!center) { const t = el(uid); if (!t) return; const r = rectOf(t); x = r.left - b.left + r.width / 2; y = r.top - b.top + r.height / 2; size = r.width * (big ? 1.9 : 1.45); }
     const im = document.createElement('img');
     im.className = `dv-fx fx-${name}${center ? ' center' : ''}`; im.alt = ''; im.src = fxUrl(name);
     im.style.cssText = `left:${x}px;top:${y}px;width:${size}px;height:${size}px`;
@@ -390,7 +394,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     perfMark('caméra');
     if (reduced || light) return;
     const d = $('.dv'), t = el(uid); if (!d || !t) return;
-    const b = d.getBoundingClientRect(), r = t.getBoundingClientRect();
+    const b = rectOf(d), r = rectOf(t);
     const cx = ((r.left + r.width / 2 - b.left) / b.width - 0.5) * -10 * k, cy = ((r.top + r.height / 2 - b.top) / b.height - 0.5) * -10 * k;
     if (!d.animate) return;
     camA?.cancel();

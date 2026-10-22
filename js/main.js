@@ -284,6 +284,8 @@ function render() {
     lastTabIdx = ti;
     view.style.setProperty('--vdx', `${dir * 26}px`);
     view.classList.add('view-in');
+    /* v611 : l'animation d'entrée restait « posée » sur toute la page (remplissage) pendant tout l'écran, combats compris */
+    view.addEventListener('animationend', (e) => { if (e.target === view) view.classList.remove('view-in'); }, { once: true });
   }
   view.innerHTML = '';
   app.cleanup = screen(app, view, app.params) || null;
