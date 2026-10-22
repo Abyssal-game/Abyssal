@@ -18,6 +18,22 @@ const isGardien = () => (sync.profile?.pseudo || '').trim().toLowerCase() === 'l
 import { openCreator } from './creator.js';
 import { showWelcome } from './welcome.js';
 import { onPresence, presence } from '../cloud/presence.js';
+import { liveOn, liveStatus, liveCheck, onLiveStatus } from '../live.js';
+
+/* v618 : état des mises à jour à distance (application iPhone) */
+function liveLine(st = liveStatus()) {
+  switch (st.state) {
+    case 'checking': return 'Recherche d’une mise à jour…';
+    case 'downloading': return `Téléchargement de la mise à jour : ${st.done} / ${st.total} fichiers…`;
+    case 'ready': return `Mise à jour v${st.v} prête : elle s’installera au prochain lancement de l’app.`;
+    case 'uptodate': return 'Ton jeu est à jour.';
+    case 'needApp': return 'Une nouvelle version demande de mettre à jour l’application sur l’App Store.';
+    case 'offline': return 'Impossible de vérifier les mises à jour pour l’instant.';
+    case 'unsigned': return 'Mise à jour refusée : elle n’est pas signée.';
+    case 'error': return 'La mise à jour n’a pas pu se télécharger : nouvel essai plus tard.';
+    default: return st.ready ? `Mise à jour v${st.ready} prête : elle s’installera au prochain lancement de l’app.` : 'Le jeu se met à jour tout seul.';
+  }
+}
 import { LANGS, LANG, setLang } from '../i18n.js';
 /* v418 : code du Mode Créateur choisi par le propriétaire ; seule son empreinte SHA-256 (en majuscules) est dans le code */
 const CREATOR_HASH = 'a0f19d9e26a8d1b7c87d32cc8bbfb9f61d58de4b518cf9e145d36c787a37ac37';
@@ -105,6 +121,7 @@ export default function settings(app, root) {
         <p class="small">ABYSSAL — Le Bestiaire interdit.</p>
         <p class="small muted" data-act="vtap">Version ${esc(app.version)} · ${app.catalog.cards.length} cartes</p>
         <p class="small muted set-partie">${partieLine()}</p>
+        ${liveOn() ? `<p class="small muted set-live">${liveLine()}</p><button class="btn ghost small" data-act="livecheck">${icon('eye')} Chercher une mise à jour</button>` : ''}
         ${s.dev ? `<p class="small muted set-audio">${(() => { const a = audioInfo(); return `Son : ${esc(a.state)} · ${a.samples}${a.expected != null ? `/${a.expected}` : ''} sons chargés · session ${esc(String(a.session))}${a.enabled ? '' : ' · coupé dans les réglages'}${a.diag.failGet || a.diag.failDecode || a.diag.err ? ` · échecs lecture ${a.diag.failGet}, décodage ${a.diag.failDecode}${a.diag.err ? ` · ${esc(a.diag.err)}` : ''}` : ''}`; })()}</p>
         <button class="btn ghost small" data-act="sndtest">${icon('dodge')} Tester le son</button>` : ''}
         <a class="btn ghost small" href="confidentialite.html" target="_blank" rel="noopener">${icon('book')} Politique de confidentialité</a>
@@ -172,6 +189,7 @@ export default function settings(app, root) {
     tab(el) { ui.tab = el.dataset.k; sfx.tap(); render(); },
     online() { openOnline(); },
     sndtest() { app.applySettings(); sfx.victory?.(); setTimeout(render, 900); },
+    livecheck() { liveCheck({ force: true }); },
     tuto(el) { tuto(app, el.dataset.k, { force: true }).then(() => render()); },
     welcome() { showWelcome(app, { force: true }); },
     guide() { resetTips(app); toast('Les bulles d’aide réapparaîtront au bon moment.', { icon: 'info' }); render(); },
@@ -199,6 +217,7 @@ export default function settings(app, root) {
   refreshProfile(false);
   // v413 : joueurs en ligne, seulement ici (en bas de À propos), mis à jour en direct
   const offP = onPresence(paintPill);
-  return () => { off(); offP(); };
+  const offL = onLiveStatus((st) => { const el = root.querySelector('.set-live'); if (el) el.textContent = liveLine(st); });
+  return () => { off(); offP(); offL(); };
 }
 

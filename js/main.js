@@ -51,6 +51,7 @@ import { syncDaily, maybeAsk } from './notify.js';
 import { onAuth } from './cloud/cloud.js';
 import { setScene } from './ui/scene.js';
 import { initNative, isNative } from './native.js';
+import { initLive } from './live.js';
 startTranslator();
 
 const ROUTES = {
@@ -444,6 +445,8 @@ document.addEventListener('load', (e) => { const t = e.target; if (t && t.tagNam
 
 // Application des stores : bouton retour, son coupé en arrière-plan (rien dans un navigateur)
 initNative({ suspendAudio: () => audioCtxIfAny()?.suspend?.().catch(() => {}), resumeAudio: () => audioCtxIfAny()?.resume?.().catch(() => {}) }); // v370 : ne crée plus le son hors d'un toucher
+/* v618 : mises à jour à distance (application iPhone) : jamais pendant un combat, une ouverture ou une fenêtre */
+initLive({ idle: () => !document.querySelector('.dv, .opening, .vd, .chx, .bx-intro, .mq-game') && !document.body.classList.contains('has-sheet') });
 
 // Service worker et mises à jour (version web seulement : l'application des stores se met à jour par le store)
 if ('serviceWorker' in navigator && location.protocol !== 'file:' && !isNative()) {

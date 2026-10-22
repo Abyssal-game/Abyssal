@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v617'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v618'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -56,6 +56,13 @@ BOOSTERS.abysse = {
   rewardOnly: true, name: 'Booster de l’Abysse', price: 0, slots: ['rPlus', 'rPlus', 'rPlus', 'hrPlus', 'mPlus'], pool: 'all', variantMult: 4, minVariant: 'holo',
   desc: '5 cartes : trois Rares ou mieux, une Hyper rare ou mieux, une Mythique ou mieux. Toutes au moins argentées. La première fois : une Secrète que tu n’as pas encore.',
 };
+// v618 : mises à jour à distance de l'application iPhone (js/live.js) : adresses où le jeu est publié, et plus petit
+// numéro de build de l'application capable de lancer cette version (à relever quand on ajoute un module natif).
+export const LIVE_BASES = ['https://abyssal-game.github.io/Abyssal/'];
+export const LIVE_NATIVE = 618;
+// Clé PUBLIQUE de signature des mises à jour (ECDSA P-256, coordonnées x et y). La clé secrète n'est jamais dans le dépôt :
+// elle est gardée par le propriétaire et dans le secret GitHub LIVE_SIGN_KEY. Tant qu'elle vaut null, aucune mise à jour n'est prise.
+export const LIVE_KEY = null;
 export const FINAL_FLOOR = 100; // v394 : le fond de la Descente (pour l'instant)
 
 // Chance (en %) qu'une carte tirée sorte dans chaque finition (×2 dans un booster premium).

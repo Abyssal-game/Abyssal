@@ -7,11 +7,13 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'www');
-const KEEP = ['index.html', 'manifest.webmanifest', 'confidentialite.html', 'sw.js', 'css', 'js', 'data', 'assets', 'icons'];
+import { KEEP, liveText } from './live-manifest.mjs';
 
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT);
 for (const k of KEEP) fs.cpSync(path.join(ROOT, k), path.join(OUT, k), { recursive: true });
+/* v618 : empreintes des fichiers embarqués : l'app les compare avec celles du site pour ses mises à jour à distance */
+fs.writeFileSync(path.join(OUT, 'live.json'), liveText());
 let n = 0, bytes = 0;
 (function walk(d) { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const f = path.join(d, e.name); if (e.isDirectory()) walk(f); else { n++; bytes += fs.statSync(f).size; } } })(OUT);
 console.log(`www/ : ${n} fichiers, ${(bytes / 1e6).toFixed(1)} Mo`);
