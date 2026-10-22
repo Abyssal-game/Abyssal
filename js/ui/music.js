@@ -3,6 +3,7 @@
 // tirée au hasard dans une gamme : elle ne se répète jamais exactement.
 // Passage d'une ambiance à l'autre en fondu. Volume séparé des effets sonores.
 import { audioCtx, hooks, getBytes, decodeBytes, listV } from './sound.js';
+import { perfMark } from './perf.js'; /* v603 : le moniteur de fluidité note le décodage des musiques */
 
 let ctx = null, out = null, verb = null, duckG = null, on = true, vol = 0.5;
 let cur = null, want = 'antre', preview = null, timer = null, brown = null;
@@ -162,7 +163,7 @@ function loadTracks() {
 function needTrack(key) {
   if (!trackList?.has(key) || trackGet[key]) return;
   trackGet[key] = getBytes(`assets/music/${key}.mp3`) /* v371 : lecture robuste (application iPhone) */
-    .then((b) => b && decodeBytes(b))
+    .then((b) => { if (b) perfMark(`musique : décodage (${key})`); return b && decodeBytes(b); })
     .then((buf) => { if (!buf) return; tracks[key] = buf; if (cur && cur.key === key && cur.pending) { stopTheme(cur); cur = startTheme(key); } }) // le silence d'attente cède la place au fichier
     .catch(() => { delete trackGet[key]; }); // nouvel essai à la prochaine visite
 }
@@ -256,7 +257,7 @@ function tick() {
   // en combat : l'ambiance suit l'écran (combat, gardien)
   let key = preview || hold?.key || want;
   if (!preview && document.body.classList.contains('battle-mode') && (key === 'descente')) key = document.querySelector('.dv-c.boss:not(.dead)') ? (document.querySelector('.dv-c.boss:not(.dead) .dv-bfig[src*="bosses/abysse"]') ? 'abysse' : 'boss') : 'combat'; /* v442 : L'Abysse a sa musique */
-  if (!cur || cur.key !== key) { if (cur) stopTheme(cur); cur = startTheme(key); }
+  if (!cur || cur.key !== key) { if (cur) stopTheme(cur); perfMark(`musique : ${key}`); cur = startTheme(key); }
   schedule(cur);
 }
 

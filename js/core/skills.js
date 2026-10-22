@@ -38,7 +38,7 @@ export const KITS = {
   soin: {
     kw: 'soin', name: 'Soigneur', icon: 'heart',
     basic: { name: 'Frappe', desc: 'Dégâts normaux.' },
-    skill: { key: 'priere', pa: 2, name: 'Prière', icon: 'heart', ap: 1, fervor: 2, target: 'ally', desc: 'Soigne un allié de 40 % de ses PV maximum ; ce qui dépasse devient un bouclier (20 % de ses PV max au plus). Le libère du poison et du gel (+1 PA s’il en avait).' },
+    skill: { key: 'priere', pa: 2, name: 'Prière', icon: 'heart', ap: 1, fervor: 2, target: 'ally', desc: 'Soigne un allié de 30 % de ses PV maximum ; ce qui dépasse devient un bouclier (20 % de ses PV max au plus). Le libère du poison et du gel (+1 PA s’il en avait).' },
     passive: { name: 'Souffle de vie', desc: 'À la fin de ton tour, soigne un peu l’allié le plus blessé.' },
   },
   poison: {

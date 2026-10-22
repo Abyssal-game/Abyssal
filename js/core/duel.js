@@ -262,6 +262,8 @@ export function dmgOf(st, a, t, mult = 1, { basic = false } = {}) {
 // Enchaînement : +1 dégât par autre créature de ton équipe qui a déjà frappé cette cible ce tour-ci (+2 au plus)
 export const COMBO_MAX = 2;
 export const MARK_MULT = 1.5, MARK_BRK = 2, RIPOSTE_MAX = 3, HEAL_WARD = 0.2;
+/* v603 : soins des Soigneurs ramenés à la taille de la créature soignée (avant : le Souffle de vie rendait ATQ + 1 PV, presque tous les PV d'une petite Commune, et la Prière 40 %) */
+export const PRAYER_HEAL = 0.3, BREATH_HEAL = 0.08;
 // v269 : Hâte, Assaut conjoint, détonation du poison
 export const SERVANT_POWER = 0.2;
 export const HASTE_PA = 2, DUO_FERVOR = 3, DUO_MULT = 1.25, DETONATE_AT = 6, DETONATE_MULT = 1.5;
@@ -811,7 +813,7 @@ export function act(st, uid, key, tUid = null) {
   } else if (key === 'duo') duoStrike(st, u, t, ev);
   else if (key === 'rempart') { t.guardBy = uid; u.rempart = tUid; ev.push({ t: 'status', u: tUid, s: 'Rempart', k: 'guard' }); }
   else if (key === 'priere') {
-    const raw = Math.round(t.maxHp * 0.4 * (t.healMult || 1)), got = heal(t, t.maxHp * 0.4, ev, u);
+    const raw = Math.round(t.maxHp * PRAYER_HEAL * (t.healMult || 1)), got = heal(t, t.maxHp * PRAYER_HEAL, ev, u);
     const over = Math.min(raw - got, Math.round(t.maxHp * HEAL_WARD));
     if (over > 0 && (t.ward || 0) < over) { t.ward = over; ev.push({ t: 'status', u: tUid, s: `Bouclier de soin ${over}`, k: 'guard', syn: true }); }
     if (t.guardBy && !t.shield) { t.shield = 1; st.stats.named = (st.stats.named || 0) + 1; ev.push({ t: 'status', u: tUid, s: 'Bastion !', syn: true, combo: 'bastion', k: 'guard', by: t.guardBy, a: uid }); }
@@ -1120,7 +1122,7 @@ export function beginEnemyTurn(st) {
 function breathOfLife(st, ev) {
   for (const u of front(st, 'ally').filter((x) => x.kw === 'soin')) {
     const w = front(st, 'ally').filter((x) => x.hp < x.maxHp).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
-    if (w) heal(w, Math.max(2, Math.round(u.atk + 1)), ev);
+    if (w) heal(w, Math.max(1, Math.round(w.maxHp * BREATH_HEAL)), ev);
   }
 }
 // Effets de tour côté ennemi : Épuisement, poison des ennemis, pouvoirs et phases des gardiens

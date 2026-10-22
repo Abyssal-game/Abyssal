@@ -5750,3 +5750,18 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .perf-pill { position: fixed; top: calc(var(--safe-t, 0px) + 4px); left: 6px; z-index: 99999; pointer-events: none; font: 600 11px/1 system-ui, sans-serif; padding: 4px 7px; border-radius: 8px; background: rgba(10, 30, 15, .82); color: #8ff0a4; border: 1px solid rgba(143, 240, 164, .4); }
 .perf-pill.mid { background: rgba(40, 32, 6, .85); color: #ffd56b; border-color: rgba(255, 213, 107, .45); }
 .perf-pill.bad { background: rgba(50, 8, 8, .88); color: #ff8a8a; border-color: rgba(255, 138, 138, .5); }
+
+/* v603 : moniteur de fluidité du propriétaire (iPhone, app de l'écran d'accueil) : les saccades tombaient surtout à la mort
+   d'une créature (3 images de 150 à 290 ms) et contre les gardiens (jusqu'à 424 ms). Sur Safari, un filtre (ombre portée,
+   flou, luminosité) ou un masque animé sur une grande image oblige à la redessiner à chaque image : on les remplace par
+   des mouvements et des fondus simples, et par des lueurs déjà peintes (dégradés posés sous la figure). */
+.dv-c.has-fig .dv-bfig, .dv-c.has-fig.p2 .dv-bfig, .dv-c.has-fig.twin .dv-bfig { filter: none !important; }
+.dv-c.has-fig::before { content: ''; position: absolute; z-index: 2; left: 50%; bottom: 38%; width: 120%; height: 70%; translate: -50% 0; pointer-events: none; border-radius: 50%; background: radial-gradient(closest-side, rgba(0, 0, 0, .55), transparent); opacity: .9; }
+.dv-c.has-fig.p2::before { background: radial-gradient(closest-side, rgba(255, 40, 70, .42), rgba(0, 0, 0, .35) 60%, transparent); }
+.dv-c.has-fig.twin::before { background: radial-gradient(closest-side, rgba(140, 110, 255, .36), rgba(0, 0, 0, .35) 60%, transparent); }
+.dv-c.cracking::after, .dv-c.cracked::after { filter: none !important; opacity: .9; }
+.dv-c.dying:not(.ashes) { -webkit-mask: none !important; mask: none !important; animation: cbDie2 .62s cubic-bezier(.4, 0, .85, .45) both !important; }
+@keyframes cbDie2 { 0% { transform: none; opacity: 1; } 16% { transform: translateX(-5px) rotate(-2deg); opacity: 1; } 100% { transform: translateY(18px) scale(.86); opacity: 0; } }
+.dv-c.dying.ashes { filter: none !important; }
+.kx-shatter { filter: none !important; }
+@media (prefers-reduced-motion: reduce) { .dv-c.dying:not(.ashes) { animation: none !important; opacity: 0; } }

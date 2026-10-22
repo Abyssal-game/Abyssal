@@ -19,6 +19,8 @@ export function perfMark(name) {
   marks.push([t, name]); if (marks.length > 40) marks.shift();
   sess.counts[name] = (sess.counts[name] || 0) + 1;
 }
+/* v603 : animations en cours au moment d'une saccade (nom de l'animation CSS, ou classe de l'élément animé) */
+const anims = () => { try { const a = document.getAnimations?.() || []; const names = {}; for (const x of a) { const n = x.animationName || x.transitionProperty || (x.effect?.target?.className?.baseVal ?? x.effect?.target?.className ?? '').toString().split(' ')[0] || '?'; names[n] = (names[n] || 0) + 1; } return { n: a.length, top: Object.entries(names).sort((p, q) => q[1] - p[1]).slice(0, 5).map(([k, v]) => `${k}×${v}`).join(' ') }; } catch (e) { return null; } };
 const recent = (t) => [...new Set(marks.filter(([m]) => t - m < 600).map(([, n]) => n))].slice(-4).join(' + ') || 'aucune action notée';
 
 function onTap(e) {
@@ -49,7 +51,7 @@ export function perfStart(label) {
       const dt = t - last; sess.frames++; sess.dts.push(Math.round(dt * 10) / 10); if (sess.dts.length > 20000) sess.dts.shift();
       const base = sess.base || 16.7;
       if (sess.frames === 60) { const s = sess.dts.slice().sort((a, b) => a - b); sess.base = s[Math.floor(s.length / 2)]; }
-      if (dt > Math.max(40, base * 2.5) && !document.hidden) sess.hitches.push({ t: Math.round(t - sess.t0), ms: Math.round(dt), what: recent(t), nodes: document.getElementsByTagName('*').length });
+      if (dt > Math.max(40, base * 2.5) && !document.hidden) sess.hitches.push({ t: Math.round(t - sess.t0), ms: Math.round(dt), what: recent(t), nodes: document.getElementsByTagName('*').length, anim: anims() });
       winN++;
       if (t - winT >= 500) { const fps = Math.round((winN * 1000) / (t - winT)); winN = 0; winT = t; if (pill) { pill.textContent = `${fps} i/s`; pill.className = `perf-pill ${fps < 40 ? 'bad' : fps < 55 ? 'mid' : ''}`; } }
     }
@@ -92,7 +94,7 @@ export function perfReport(info = {}) {
     `■ ${r.label} · ${new Date(r.at).toLocaleString('fr-FR')} · ${Math.round(r.dur / 1000)} s`,
     `  ${r.fps} i/s en moyenne (écran ≈ ${r.hz} Hz) · image médiane ${r.p50} ms, 95 % ${r.p95} ms, 99 % ${r.p99} ms, pire ${Math.round(r.max)} ms · images lentes ${r.slowShare} %`,
     `  Saccades : ${r.nHitch}${r.cause.length ? ` · surtout pendant : ${r.cause.map(([w, ms]) => `${w} (${ms} ms)`).join(', ')}` : ''}`,
-    ...r.hitches.slice(0, 8).map((h) => `   - à ${(h.t / 1000).toFixed(1)} s : ${h.ms} ms · ${h.what} · ${h.nodes} éléments`),
+    ...r.hitches.slice(0, 8).map((h) => `   - à ${(h.t / 1000).toFixed(1)} s : ${h.ms} ms · ${h.what} · ${h.nodes} éléments${h.anim ? ` · ${h.anim.n} animations (${h.anim.top})` : ''}`),
     `  Touchers : ${r.taps}${r.tapMed != null ? `, délai médian ${r.tapMed} ms` : ''}${r.slowTaps.length ? ` · lents : ${r.slowTaps.map((x) => `${x.ms} ms (${x.what})`).join(', ')}` : ''}`,
     ...(r.long.length ? [`  Tâches longues : ${r.long.map((x) => `${x.ms} ms (${x.what})`).join(', ')}`] : []),
   ].join('\n'))].join('\n\n');
