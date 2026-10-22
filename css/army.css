@@ -1715,7 +1715,7 @@ i.cmb { font-style: normal; color: #FFC266; font-weight: 800; }
 
 /* Sceaux : icônes des règles, cœur du Sceau, combinaisons, trophée */
 .sc-ricon { width: 22px; height: 22px; object-fit: contain; margin-right: 4px; vertical-align: -5px; }
-.sc-cell.heart::before { inset: 14% !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important; background: url(../assets/icons/sc-heart2.webp) center / contain no-repeat; opacity: .55; }
+.sc-cell.heart::before { inset: 14% !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important; background: url(../assets/icons/sc-heart3.webp) center / contain no-repeat; opacity: .55; }
 .sc-cell.full.heart::before { inset: auto 4px 4px auto !important; width: 26%; height: 26%; opacity: .95; z-index: 4; filter: drop-shadow(0 1px 3px #000); }
 .sc-combo { display: flex; align-items: center; gap: 8px; overflow: visible; }
 .sc-combo .sc-cburst { position: absolute; left: 50%; top: 50%; width: 240px; height: 240px; transform: translate(-50%, -50%); mix-blend-mode: screen; z-index: -1; pointer-events: none; animation: scBurst 1s ease-out forwards; }
