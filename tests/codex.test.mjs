@@ -31,7 +31,7 @@ test('codex : voie gratuite récupérable, voie enluminée fermée sans achat', 
   g.codex().premium = true;
   const r3 = CODEX_TIERS[2].prem, obs3 = g.s.obs || 0; /* v562 : le palier 3 de la saison I donne des obsidiennes (cadre retiré) */
   g.codexClaim('prem', 3);
-  assert.ok(r3.frame ? g.s.frames.includes(r3.frame) : (g.s.obs || 0) === obs3 + r3.obs);
+  assert.ok(r3.frame ? g.s.frames.includes(r3.frame) : r3.plate ? g.s.plates.includes(r3.plate) : (g.s.obs || 0) === obs3 + r3.obs); /* v630 : plaque des Lanternes */
   assert.equal(claimable(g.codex()), 2); // paliers 1 et 2 de la voie enluminée (titre, obsidiennes)
 });
 
@@ -155,4 +155,18 @@ test('v564 : plaques de pseudo et réactions en ligne (achat, choix, lot qui ne 
   assert.equal(g.catalogCost('arbitres'), 525, 'le lot retire la réaction déjà achetée');
   g.catalogBuy('arbitres'); assert.equal(g.emotesOwned().length, 12);
   g.setPlate(null); assert.equal(g.s.plate, null);
+});
+
+test('v630 : la Saison I a un objet à chaque palier, chacun avec son image et absent de l’Échoppe', async () => {
+  const fs = await import('node:fs');
+  const { SEASONS, CATALOG, EMOTES } = await import('../js/core/codex.js');
+  const se = SEASONS.find((x) => x.key === 's1-ames');
+  const items = se.items;
+  assert.equal(items.filter(Boolean).length, 10);
+  const file = (r) => r.frame ? `assets/frames/${r.frame}-4.webp` : r.back ? `assets/backs/${r.back}.webp` : r.sachet ? `assets/packs/${r.sachet}.webp` : r.plate ? `assets/plates/${r.plate}.webp` : `assets/emotes/${EMOTES[r.emote].pic}.webp`;
+  for (const r of items) {
+    const k = r.frame || r.back || r.sachet || r.plate || r.emote;
+    assert.ok(fs.existsSync(new URL(`../${file(r)}`, import.meta.url)), k);
+    assert.ok(!CATALOG.some((it) => it.id === k), `${k} ne doit pas être vendu`);
+  }
 });

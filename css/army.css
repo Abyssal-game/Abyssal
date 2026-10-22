@@ -5881,3 +5881,14 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 
 /* v627 : titres des bannières (Épreuves du jour et les autres) : l'ombre de texte passait par-dessus le dégradé doré (texte « découpé ») et le rendait noir ; halo posé derrière les lettres */
 .ui-hero.bn-trial h1, .screen-head.ui-hero h1 { text-shadow: none; filter: drop-shadow(0 2px 1px rgba(0, 0, 0, .95)) drop-shadow(0 0 10px rgba(0, 0, 0, .85)); background: linear-gradient(180deg, #FFF6DA, #F2C14E 60%, #C8913A); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* v630 : Saison I du Codex : cadres vivants, plaques, et plaques / réactions dans la piste du Codex */
+.pf-cx-vif-feux-follets { --fr: url(../assets/frames/cx-vif-feux-follets-4.webp); }
+.pf-cx-vif-brume { --fr: url(../assets/frames/cx-vif-brume-4.webp); }
+.np-pl-lanternes { --npb: rgba(120, 220, 255, .8); background-image: url(../assets/plates/pl-lanternes.webp), linear-gradient(90deg, #06090d, #16222e 50%, #06090d); color: #DDF4FF; }
+.np-pl-barque { --npb: rgba(140, 190, 255, .8); background-image: url(../assets/plates/pl-barque.webp), linear-gradient(90deg, #06080e, #141c2e 50%, #06080e); color: #E0ECFF; }
+.cxr-np { display: inline-block; max-width: 132px; font-size: .62rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cx-r .cxr-np { max-width: 96px; margin-right: 6px; vertical-align: middle; }
+.re-pic.cxr-re { width: 40px; height: 40px; flex: none; }
+.cx-r .re-pic.cxr-re { width: 24px; height: 24px; margin-right: 6px; vertical-align: middle; display: inline-block; }
+.cxr .cxr-np { min-width: 120px; max-width: 140px; padding: .35em 1.1em; font-size: .72rem; }

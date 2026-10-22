@@ -7399,6 +7399,18 @@ export default {
   "Mise invalide.": "Aposta inválida.",
   "Requête illisible.": "Pedido ilegível.",
   "Aucun combat en cours.": "Nenhum combate em andamento.",
+  "Cadre vivant des Feux follets": "Moldura viva dos Fogos-fátuos",
+  "Cadre vivant de la Brume des âmes": "Moldura viva da Bruma das almas",
+  "Dos vivant des Lanternes flottantes": "Verso vivo das Lanternas flutuantes",
+  "Sachet vivant de la Nuit des Âmes": "Pacote vivo da Noite das Almas",
+  "Plaque des Lanternes": "Placa das Lanternas",
+  "Plaque de la Barque du Passeur": "Placa do Barco do Barqueiro",
+  "Je t’ai vu…": "Eu te vi…",
+  "Ton tour viendra.": "Sua vez chegará.",
+  "Le Feu follet": "O Fogo-fátuo",
+  "Le Passeur des Âmes": "O Barqueiro das Almas",
+  "Réaction": "Reação",
+  "Une récompense à chaque palier : cadres vivants, dos de cartes, sachet, plaques, réactions et titres de la Nuit des Âmes, introuvables à l’Échoppe. Au palier 30, la Couronne du Passeur des Âmes et le Dos vivant du Passeur.": "Uma recompensa em cada nível: molduras vivas, versos de cartas, pacote, placas, reações e títulos da Noite das Almas, impossíveis de achar na Loja. No nível 30, a Coroa do Barqueiro das Almas e o Verso vivo do Barqueiro.",
 };
 
 export const names = {

@@ -7410,6 +7410,18 @@ export default {
   "Mise invalide.": "Invalid stake.",
   "Requête illisible.": "Unreadable request.",
   "Aucun combat en cours.": "No battle in progress.",
+  "Cadre vivant des Feux follets": "Living Will-o’-the-Wisp Frame",
+  "Cadre vivant de la Brume des âmes": "Living Frame of the Soul Mist",
+  "Dos vivant des Lanternes flottantes": "Living Floating Lanterns Back",
+  "Sachet vivant de la Nuit des Âmes": "Living Night of Souls Pack",
+  "Plaque des Lanternes": "Lanterns Plate",
+  "Plaque de la Barque du Passeur": "Ferryman’s Boat Plate",
+  "Je t’ai vu…": "I saw you…",
+  "Ton tour viendra.": "Your turn will come.",
+  "Le Feu follet": "The Will-o’-the-Wisp",
+  "Le Passeur des Âmes": "The Ferryman of Souls",
+  "Réaction": "Reaction",
+  "Une récompense à chaque palier : cadres vivants, dos de cartes, sachet, plaques, réactions et titres de la Nuit des Âmes, introuvables à l’Échoppe. Au palier 30, la Couronne du Passeur des Âmes et le Dos vivant du Passeur.": "A reward at every tier: living frames, card backs, a pack, plates, reactions and titles of the Night of Souls, never sold in the Shop. At tier 30, the Crown of the Ferryman of Souls and the Ferryman’s Living Back.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

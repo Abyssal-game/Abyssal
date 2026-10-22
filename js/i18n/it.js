@@ -7399,6 +7399,18 @@ export default {
   "Mise invalide.": "Puntata non valida.",
   "Requête illisible.": "Richiesta illeggibile.",
   "Aucun combat en cours.": "Nessun combattimento in corso.",
+  "Cadre vivant des Feux follets": "Cornice vivente dei Fuochi fatui",
+  "Cadre vivant de la Brume des âmes": "Cornice vivente della Bruma delle anime",
+  "Dos vivant des Lanternes flottantes": "Dorso vivente delle Lanterne galleggianti",
+  "Sachet vivant de la Nuit des Âmes": "Bustina vivente della Notte delle Anime",
+  "Plaque des Lanternes": "Targa delle Lanterne",
+  "Plaque de la Barque du Passeur": "Targa della Barca del Traghettatore",
+  "Je t’ai vu…": "Ti ho visto…",
+  "Ton tour viendra.": "Verrà il tuo turno.",
+  "Le Feu follet": "Il Fuoco fatuo",
+  "Le Passeur des Âmes": "Il Traghettatore delle Anime",
+  "Réaction": "Reazione",
+  "Une récompense à chaque palier : cadres vivants, dos de cartes, sachet, plaques, réactions et titres de la Nuit des Âmes, introuvables à l’Échoppe. Au palier 30, la Couronne du Passeur des Âmes et le Dos vivant du Passeur.": "Una ricompensa a ogni livello: cornici viventi, dorsi di carte, bustina, targhe, reazioni e titoli della Notte delle Anime, introvabili nella Bottega. Al livello 30, la Corona del Traghettatore delle Anime e il Dorso vivente del Traghettatore.",
 };
 
 export const names = {

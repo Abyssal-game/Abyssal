@@ -39,6 +39,7 @@ export const CODEX_XP_LABEL = { floor: 'Étage franchi (1re fois)', boss: 'Gardi
 
 // Cosmétiques propres au Codex et à l'Échoppe (v472 : cadres peints par Gemini, assets/frames/<clé>.webp, posés par .pf-<clé>)
 export const CODEX_FRAMES = {
+  /* v630 : Saison I « La Nuit des Âmes », voie enluminée */ 'cx-vif-feux-follets': 'Cadre vivant des Feux follets', 'cx-vif-brume': 'Cadre vivant de la Brume des âmes',
     'cx-fondateur': 'Cadre du Fondateur',   /* v472 : réserve (saison II ou Échoppe), images prêtes dans assets/frames/ */
   'cx-os': 'Couronne d’ossements',   'cx-chaines': 'Cadre des chaînes forgées', 'cx-ruche': 'Cadre de la ruche d’ambre',
   /* v479 : catalogue de l'Échoppe (store/boutique-cosmetiques.md) : Nuit des Âmes, Hiver éternel, Cœurs maudits, les sept trônes, trophées des gardiens */
@@ -51,7 +52,7 @@ export const CODEX_FRAMES = {
   /* v552 : Saisons IV à XII (février à octobre 2027, images Gemini attendues) */
   'cx-coeur-maudit': 'Couronne du Cœur maudit',   /* v565 : remplacements après le tri du 21 octobre 2026 */   /* v532 */ 'cx-carnaval': 'Cadre du carnaval des ombres', 'cx-phalenes': 'Cadre des phalènes', };
 // Dos de cartes (v473 : images Gemini, assets/backs/<clé>.webp, tools/back-art.py ; choisis au Profil)
-export const CODEX_BACKS = { 'dos-codex': 'Dos du Codex', 'dos-abime': 'Dos de l’Abîme', 'dos-fondateur': 'Dos du Fondateur',
+export const CODEX_BACKS = { /* v630 */ 'dos-vif-lanternes': 'Dos vivant des Lanternes flottantes', 'dos-codex': 'Dos du Codex', 'dos-abime': 'Dos de l’Abîme', 'dos-fondateur': 'Dos du Fondateur',
   /* réserve : collection « Les sept royaumes » (Échoppe ou saison II) */
   'dos-infernal': 'Dos du royaume Infernal', 'dos-abyssal': 'Dos du royaume Abyssal', 'dos-celeste': 'Dos du royaume Céleste', 'dos-sauvage': 'Dos du royaume Sauvage',
   'dos-necrotique': 'Dos du royaume Nécrotique', 'dos-primordial': 'Dos du royaume Primordial', 'dos-artificiel': 'Dos du royaume Artificiel',
@@ -120,17 +121,17 @@ const FN = (k, cost) => ({ id: k, kind: 'finish', give: { finish: k }, cost });
    décor CSS en attendant) et réactions en ligne (pendant une partie contre un joueur ; portraits des arbitres des jeux) */
 // v565 : « dos vivants » (WebP animés, tools/back-anim.py) et habillages de booster (« sachets » : remplacent le visuel des boosters
 // standard, Alliances et premium ; les boosters de faction gardent le leur ; assets/packs/<clé>.webp, tools/sachet-art.py)
-export const LIVE_BACKS = ['dos-vif-veillee', 'dos-vif-hiver', 'dos-vif-coeur', 'dos-vif-passeur', 'dos-vif-nebuleuse', 'dos-vif-abysse', 'dos-vif-devoreur', 'dos-vif-lune-sang', 'dos-vif-coeur-mecanique', 'dos-vif-forge', 'dos-vif-chandelles', 'dos-vif-orage', 'dos-vif-ame', 'dos-vif-oeil-or',
+export const LIVE_BACKS = ['dos-vif-lanternes', 'dos-vif-veillee', 'dos-vif-hiver', 'dos-vif-coeur', 'dos-vif-passeur', 'dos-vif-nebuleuse', 'dos-vif-abysse', 'dos-vif-devoreur', 'dos-vif-lune-sang', 'dos-vif-coeur-mecanique', 'dos-vif-forge', 'dos-vif-chandelles', 'dos-vif-orage', 'dos-vif-ame', 'dos-vif-oeil-or',
   /* v573 : tous les dos peints passent en dos vivants (même clé, fichier animé ; l'image fixe reste dans store/backs/<clé>-fixe.webp).
      dos-abysse, dos-coeur-mecanique, dos-devoreur, dos-eclipse, dos-lune-sang, dos-nebuleuse, dos-passeur montrent désormais l'animation de leur jumeau dos-vif-… (version fixe supprimée) */
   'dos-codex', 'dos-abime', 'dos-fondateur', 'dos-infernal', 'dos-abyssal', 'dos-celeste', 'dos-sauvage', 'dos-necrotique', 'dos-primordial', 'dos-artificiel', 'dos-ames', 'dos-roses', 'dos-horloger', 'dos-miroirs', 'dos-jumeaux', 'dos-titan', 'dos-mosaique', 'dos-encre', 'dos-alchimie', 'dos-reliquaire', 'dos-tapisserie', 'dos-vivant', 'dos-vitrail', 'dos-cimetiere', 'dos-presents', 'dos-coeurs', 'dos-aurore', 'dos-carnaval', 'dos-phalene', 'dos-abysse', 'dos-coeur-mecanique', 'dos-devoreur', 'dos-lune-sang', 'dos-nebuleuse', 'dos-passeur', 'dos-vif-phenix', 'dos-vif-kraken', 'dos-vif-couronne', 'dos-vif-sablier', 'dos-vif-coeur-dragon', 'dos-vif-portail', 'dos-vif-destrier', 'dos-vif-hydre', 'dos-vif-orchidee', 'dos-vif-astrolabe', 'dos-vif-meduse', 'dos-vif-geode', 'dos-vif-corbeau', 'dos-vif-tresor', 'dos-vif-arbre', 'dos-vif-ailes', 'dos-vif-main-ombre', 'dos-vif-masque', 'dos-vif-perle', 'dos-vif-trone'];
 const BV = (k, cost) => ({ id: k, kind: 'back', live: true, give: { back: k }, cost }); /* v569 : dos vivant vendu à l'Échoppe */
-export const SACHETS = { 'sachet-veillee': 'Sachet de la Veillée', 'sachet-fondateur': 'Sachet du Fondateur',
+export const SACHETS = { /* v630 */ 'sachet-vif-ames': 'Sachet vivant de la Nuit des Âmes', 'sachet-veillee': 'Sachet de la Veillée', 'sachet-fondateur': 'Sachet du Fondateur',
   /* v570 : sachets vendus à l'Échoppe */ 'sachet-braise': 'Sachet de braise', 'sachet-lune-sang': 'Sachet de la Lune de sang', 'sachet-souverain': 'Sachet du Souverain',
   /* v572 : sachets vivants */ 'sachet-vif-spectre': 'Sachet vivant du spectre', 'sachet-vif-eclipse': 'Sachet vivant de l’éclipse',
   /* v578 */ 'sachet-vif-phenix': 'Sachet vivant du Phénix', 'sachet-vif-kraken': 'Sachet vivant du Kraken', 'sachet-vif-tresor': 'Sachet vivant du Trésor', 'sachet-vif-dragon': 'Sachet vivant du Dragon', 'sachet-vif-astrolabe': 'Sachet vivant de l’Astrolabe', 'sachet-vif-givre-noir': 'Sachet vivant du Givre noir', 'sachet-vif-orage': 'Sachet vivant de l’Orage', 'sachet-vif-foret': 'Sachet vivant de la Forêt ancienne', /* v579 */ 'sachet-vif-necro': 'Sachet vivant du Spectre vert', 'sachet-vif-automate': 'Sachet vivant de l’Automate', 'sachet-vif-celeste': 'Sachet vivant des Ailes d’or', 'sachet-vif-infernal': 'Sachet vivant des Cornes ardentes', 'sachet-vif-empereur': 'Sachet vivant de l’Empereur', /* v588 */ 'sachet-vif-meduse': 'Sachet vivant de la Méduse', 'sachet-vif-corbeau': 'Sachet vivant du Corbeau', 'sachet-vif-sablier': 'Sachet vivant du Sablier', 'sachet-vif-araignee': 'Sachet vivant de la Veuve noire', 'sachet-vif-scorpion': 'Sachet vivant du Scorpion', 'sachet-vif-loup': 'Sachet vivant du Loup de givre', 'sachet-vif-lanterne': 'Sachet vivant de la Lanterne', 'sachet-vif-orchidee': 'Sachet vivant de l’Orchidée', 'sachet-vif-geode': 'Sachet vivant de la Géode', 'sachet-vif-coeur': 'Sachet vivant du Cœur de rubis' };
 const SA = (k, cost) => ({ id: k, kind: 'sachet', give: { sachet: k }, cost });
-export const PLATES = { 'pl-braise': 'Plaque de braise',
+export const PLATES = { /* v630 */ 'pl-lanternes': 'Plaque des Lanternes', 'pl-barque': 'Plaque de la Barque du Passeur', 'pl-braise': 'Plaque de braise',
   'pl-givre': 'Plaque de givre', 'pl-or-noir': 'Plaque d’or noir', 'pl-souverain': 'Plaque du Souverain',
   /* v572 */ 'pl-sang': 'Plaque de sang', 'pl-nacre': 'Plaque de nacre noire', 'pl-dragon': 'Plaque du dragon',
   /* v580 */ 'pl-phenix': 'Plaque du Phénix', 'pl-kraken': 'Plaque du Kraken', 'pl-tresor': 'Plaque du Trésor', 'pl-cristal': 'Plaque d’améthyste', 'pl-foudre': 'Plaque de la Foudre', 'pl-foret': 'Plaque de la Forêt ancienne', 'pl-automate': 'Plaque de l’Automate', 'pl-empereur': 'Plaque de l’Empereur',
@@ -163,6 +164,9 @@ export const EMOTES = {
   're-g-juge': { text: 'Coupable.', boss: 'juge', name: 'Le Juge des Sceaux' },
   're-g-bete': { text: 'Tout finira.', boss: 'bete', name: 'La Bête de l’Apocalypse' },
   're-g-abysse': { text: 'L’Abysse te regarde.', boss: 'abysse', name: 'L’Abysse' },
+  /* v630 : réactions de la Saison I (portrait propre assets/emotes/<clé>.webp, exclusives au Codex : jamais à l'Échoppe) */
+  're-feu-follet': { text: 'Je t’ai vu…', pic: 're-feu-follet', name: 'Le Feu follet', codex: true },
+  're-passeur': { text: 'Ton tour viendra.', pic: 're-passeur', name: 'Le Passeur des Âmes', codex: true },
 };
 export const FREE_EMOTES = Object.keys(EMOTES).filter((k) => EMOTES[k].free);
 export const PAID_EMOTES = Object.keys(EMOTES).filter((k) => !EMOTES[k].free);
@@ -222,7 +226,7 @@ export const PASS_RESERVE = [...Object.keys(COSM_RARITY).filter((k) => /^(dos|sa
 const RZ = (mk, k, extra) => ({ ...mk(k, COSM_PRICE[COSM_RARITY[k]]), r: COSM_RARITY[k], live: true, ...extra });
 export const CATALOG = [
   ...SHOP_FRAMES.map((k) => RZ(F, k)), ...SHOP_BACKS.map((k) => RZ(B, k)), ...SHOP_SACHETS.map((k) => RZ(SA, k)), ...SHOP_PLATES.map((k) => RZ(PL, k)),
-  ...PAID_EMOTES.map((k) => ({ ...RE(k, 100), r: 'rare' })),
+  ...PAID_EMOTES.filter((k) => !EMOTES[k].codex).map((k) => ({ ...RE(k, 100), r: 'rare' })), /* v630 : sans les réactions du Codex */
   { id: 'arbitres', kind: 'bundle', name: 'Le Cercle des arbitres', give: { emotes: ARBITRE_EMOTES }, cost: 600, desc: 'Les huit réactions des arbitres d’un coup (800 à l’unité).' },
   { id: 'gardiens', kind: 'bundle', name: 'Les vingt gardiens', give: { emotes: BOSS_EMOTES }, cost: 1500, desc: 'Les vingt réactions des gardiens d’un coup (2 000 à l’unité).' },
   { id: 'royaumes', kind: 'bundle', name: 'Les sept royaumes', give: { backs: ROYAUMES }, cost: Math.round(ROYAUMES.reduce((n, k) => n + COSM_PRICE[COSM_RARITY[k]], 0) * 0.8 / 10) * 10, desc: 'Les sept dos vivants des royaumes d’un coup, moins cher qu’à l’unité.' },
@@ -258,9 +262,10 @@ function premOf({ titles, items, ultimate }) {
 }
 export const SEASONS = [
   { key: 's1-ames', num: 'I', name: 'La Nuit des Âmes', starts: '2026-11-01', ends: '2026-11-30', art: 'assets/ui/cx-saison-ames.webp',
-    best: ['cx-ames', 'dos-vif-passeur', 'dos-ames'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes et titres de la Nuit des Âmes, introuvables à l’Échoppe. Au palier 30, la Couronne du Passeur des Âmes et le Dos vivant du Passeur.',
+    best: ['cx-ames', 'dos-vif-passeur', 'dos-vif-lanternes'], pitch: 'Une récompense à chaque palier : cadres vivants, dos de cartes, sachet, plaques, réactions et titres de la Nuit des Âmes, introuvables à l’Échoppe. Au palier 30, la Couronne du Passeur des Âmes et le Dos vivant du Passeur.',
     titles: ['Veilleur des tombes', 'Porteur de lanterne', 'Ami des feux follets', 'Voix des trépassés', 'Gardien des âmes perdues', 'Celui qui ne dort pas'],
-    items: [null, { back: 'dos-ames' }, null /* v573 : dos fixe du Passeur retiré (le palier 30 donne le dos vivant) */, null, null, { back: 'dos-cimetiere' }, null, null],
+    /* v630 : les 8 places vides remplies (paliers 3, 6, 8, 10, 14, 15, 18, 20, 24, 25) */
+    items: [{ plate: 'pl-lanternes' }, { back: 'dos-ames' }, { emote: 're-feu-follet' }, { frame: 'cx-vif-feux-follets' }, { sachet: 'sachet-vif-ames' }, { back: 'dos-cimetiere' }, { emote: 're-passeur' }, { back: 'dos-vif-lanternes' }, { plate: 'pl-barque' }, { frame: 'cx-vif-brume' }],
     ultimate: { frame: 'cx-ames', back: 'dos-vif-passeur', title: 'Passeur des Âmes' } },
   { key: 's2-noel', num: 'II', name: 'La Veillée de Noël', starts: '2026-12-01', ends: '2026-12-31', art: 'assets/ui/cx-saison-noel.webp',
     best: ['cx-noel', 'dos-vif-veillee'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes et titres de la Veillée de Noël, introuvables à l’Échoppe. Au palier 30, la Couronne de la Veillée et le Dos vivant de la Veillée.',
@@ -320,7 +325,7 @@ export const SEASONS = [
     ultimate: { title: 'Témoin de la première année' } },
 ];
 for (const se of SEASONS) { /* v552 : tout objet d'une voie enluminée est exclusif au Codex */
-  for (const r of [...se.items, se.ultimate]) for (const k of [r?.frame, r?.back, r?.finish, r?.sachet]) if (k && !CODEX_ONLY.includes(k)) CODEX_ONLY.push(k);
+  for (const r of [...se.items, se.ultimate]) for (const k of [r?.frame, r?.back, r?.finish, r?.sachet, r?.plate, r?.emote]) /* v630 : plaques et réactions aussi */ if (k && !CODEX_ONLY.includes(k)) CODEX_ONLY.push(k);
   se.title = `Saison ${se.num} · ${se.name}`; se.prem = premOf(se); se.tiers = Array.from({ length: CODEX.tiers }, (_, i) => ({ tier: i + 1, free: FREE(i + 1), prem: se.prem[i + 1] || null })); }
 // la saison d'un jour (date du joueur) : celle qui le contient, sinon la prochaine, sinon la dernière
 export function seasonFor(day) { return SEASONS.find((se) => day <= se.ends) || SEASONS[SEASONS.length - 1]; }

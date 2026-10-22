@@ -7399,6 +7399,18 @@ export default {
   "Mise invalide.": "Apuesta no válida.",
   "Requête illisible.": "Solicitud ilegible.",
   "Aucun combat en cours.": "Ningún combate en curso.",
+  "Cadre vivant des Feux follets": "Marco viviente de los Fuegos fatuos",
+  "Cadre vivant de la Brume des âmes": "Marco viviente de la Bruma de las almas",
+  "Dos vivant des Lanternes flottantes": "Dorso viviente de los Farolillos flotantes",
+  "Sachet vivant de la Nuit des Âmes": "Sobre viviente de la Noche de las Almas",
+  "Plaque des Lanternes": "Placa de los Farolillos",
+  "Plaque de la Barque du Passeur": "Placa de la Barca del Barquero",
+  "Je t’ai vu…": "Te he visto…",
+  "Ton tour viendra.": "Tu turno llegará.",
+  "Le Feu follet": "El Fuego fatuo",
+  "Le Passeur des Âmes": "El Barquero de las Almas",
+  "Réaction": "Reacción",
+  "Une récompense à chaque palier : cadres vivants, dos de cartes, sachet, plaques, réactions et titres de la Nuit des Âmes, introuvables à l’Échoppe. Au palier 30, la Couronne du Passeur des Âmes et le Dos vivant du Passeur.": "Una recompensa en cada nivel: marcos vivientes, dorsos de cartas, sobre, placas, reacciones y títulos de la Noche de las Almas, imposibles de encontrar en la Tienda. En el nivel 30, la Corona del Barquero de las Almas y el Dorso viviente del Barquero.",
 };
 
 export const names = {

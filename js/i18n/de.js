@@ -7399,6 +7399,18 @@ export default {
   "Mise invalide.": "Ungültiger Einsatz.",
   "Requête illisible.": "Unlesbare Anfrage.",
   "Aucun combat en cours.": "Kein laufender Kampf.",
+  "Cadre vivant des Feux follets": "Lebendiger Irrlicht-Rahmen",
+  "Cadre vivant de la Brume des âmes": "Lebendiger Rahmen des Seelennebels",
+  "Dos vivant des Lanternes flottantes": "Lebendige Rückseite der Treibenden Laternen",
+  "Sachet vivant de la Nuit des Âmes": "Lebendiges Päckchen der Nacht der Seelen",
+  "Plaque des Lanternes": "Laternen-Plakette",
+  "Plaque de la Barque du Passeur": "Plakette des Fährmannsboots",
+  "Je t’ai vu…": "Ich hab dich gesehen…",
+  "Ton tour viendra.": "Deine Zeit wird kommen.",
+  "Le Feu follet": "Das Irrlicht",
+  "Le Passeur des Âmes": "Der Fährmann der Seelen",
+  "Réaction": "Reaktion",
+  "Une récompense à chaque palier : cadres vivants, dos de cartes, sachet, plaques, réactions et titres de la Nuit des Âmes, introuvables à l’Échoppe. Au palier 30, la Couronne du Passeur des Âmes et le Dos vivant du Passeur.": "Eine Belohnung auf jeder Stufe: lebendige Rahmen, Kartenrückseiten, ein Päckchen, Plaketten, Reaktionen und Titel der Nacht der Seelen, nie im Laden erhältlich. Auf Stufe 30 die Krone des Fährmanns der Seelen und die lebendige Rückseite des Fährmanns.",
 };
 
 export const names = {

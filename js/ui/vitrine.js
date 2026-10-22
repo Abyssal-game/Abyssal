@@ -15,9 +15,10 @@ export const frameCls = (k) => (okKey(k) ? `pf pf-${k}` : '');
 // une réaction : portrait de l'arbitre (ou l'emblème du jeu pour les réactions offertes) et sa phrase
 export const emotePic = (k) => {
   const e = EMOTES[k];
+  if (e?.pic) return `<img alt="" src="assets/emotes/${e.pic}.webp">`; /* v630 : portrait propre (réactions du Codex) */
   return e?.who ? `<img alt="" src="assets/sceaux/rival-${e.who}.webp">` : e?.boss ? `<img class="re-boss" alt="" src="assets/bosses/${e.boss}.webp">` : EMBLEM;
 };
-export const emoteHTML = (k) => `<span class="re-pic ${EMOTES[k]?.who || EMOTES[k]?.boss ? '' : 're-free'}">${emotePic(k)}</span><span class="re-txt">${esc(EMOTES[k]?.text || '')}</span>`;
+export const emoteHTML = (k) => `<span class="re-pic ${EMOTES[k]?.who || EMOTES[k]?.boss || EMOTES[k]?.pic ? '' : 're-free'}">${emotePic(k)}</span><span class="re-txt">${esc(EMOTES[k]?.text || '')}</span>`;
 
 // bulle de réaction au-dessus (adversaire) ou au-dessous (toi) de la partie, 2,8 s
 const live = {};

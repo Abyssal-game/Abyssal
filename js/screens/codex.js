@@ -10,7 +10,7 @@ import { artUrl } from '../art/assets.js';
 import { EMBLEM } from '../ui/icons.js';
 import { setScene } from '../ui/scene.js';
 import { t, tx } from '../i18n.js'; /* v574 */
-import { emoteHTML, emotePic } from '../ui/vitrine.js'; /* v564 : plaques de pseudo et réactions en ligne */
+import { emoteHTML, emotePic, emoteLabel } from '../ui/vitrine.js'; /* v564 : plaques de pseudo et réactions en ligne */
 import { sync } from '../cloud/sync.js';
 import { packHTML } from './shop.js'; /* v570 : aperçu des sachets */
 
@@ -37,6 +37,8 @@ export default function codexScreen(app, root) {
     if (r.title) parts.push(`<span class="cx-r">${picon('titles')}Titre « ${esc(r.title)} »</span>`);
     if (r.back) parts.push(`<span class="cx-r"><img class="cx-back" alt="" src="assets/backs/${r.back}.webp">${esc(CODEX_BACKS[r.back] || r.back)}</span>`);
     if (r.sachet) parts.push(`<span class="cx-r"><img class="cx-back" alt="" src="assets/packs/${r.sachet}.webp">${esc(SACHETS[r.sachet] || r.sachet)}</span>`); /* v565 */
+    if (r.plate) parts.push(`<span class="cx-r"><span class="np np-${r.plate} cxr-np" translate="no">${esc(myName())}</span>${esc(PLATES[r.plate] || r.plate)}</span>`); /* v630 */
+    if (r.emote) parts.push(`<span class="cx-r"><span class="re-pic cxr-re">${emotePic(r.emote)}</span>${esc(t('Réaction'))} : ${esc(emoteLabel(r.emote))}</span>`); /* v630 */
     if (r.finish) parts.push(`<span class="cx-r">${picon('holo')}Finition ${esc(FINISHES[r.finish]?.name || r.finish)}</span>`);
     if (r.obs) parts.push(`<span class="cx-r">${obsTxt(r.obs)}&nbsp;${esc(OBS.name.toLowerCase())}</span>`);
     return parts.join('');
@@ -61,6 +63,8 @@ export default function codexScreen(app, root) {
     if (r.frame) items.push([`<span class="avatar-mini pf pf-${r.frame}">${myAv()}</span>`, '', esc(ALL_FRAMES[r.frame] || r.frame)]);
     if (r.back) items.push([`<img class="cxr-back" alt="" src="assets/backs/${r.back}.webp">`, '', esc(CODEX_BACKS[r.back] || r.back)]);
     if (r.sachet) items.push([`<img class="cxr-pack" alt="" src="assets/packs/${r.sachet}.webp">`, '', esc(SACHETS[r.sachet] || r.sachet)]); /* v565 */
+    if (r.plate) items.push([`<span class="np np-${r.plate} cxr-np" translate="no">${esc(myName())}</span>`, '', esc(PLATES[r.plate] || r.plate)]); /* v630 */
+    if (r.emote) items.push([`<span class="re-pic cxr-re">${emotePic(r.emote)}</span>`, esc(t('Réaction')), esc(emoteLabel(r.emote))]); /* v630 */
     if (r.finish) items.push([`<span class="cx-fin cxr-fin"><img alt="" src="assets/art/lite/${esc(g.bestCards(1)[0]?.id || 'ABY-039')}.webp"><img alt="" src="assets/variants/${r.finish}-frame.webp" onerror="this.remove()"></span>`, '', `Finition ${esc(FINISHES[r.finish]?.name || r.finish)}`]);
     if (r.title) items.push([`<span class="cxr-ic">${picon('titles')}</span>`, 'Titre', `« ${esc(r.title)} »`]);
     if (r.obs) items.push([`<span class="cxr-ic">${OBS_I}</span>`, `+${fmt(r.obs)}`, esc(OBS.name.toLowerCase())]);
