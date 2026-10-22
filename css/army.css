@@ -5436,12 +5436,9 @@ body.battle-mode .prog-chip { top: calc(var(--safe-t, env(safe-area-inset-top, 0
   box-shadow: inset 0 0 0 1px var(--npb, rgba(201, 164, 90, .55)), 0 2px 6px rgba(0, 0, 0, .45); line-height: 1.25; white-space: nowrap; text-overflow: ellipsis; vertical-align: middle; }
 .np-none { background: rgba(255, 255, 255, .04); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14); color: var(--muted, #b8b0a0); text-shadow: none; }
 .np-demo { font: 700 .82rem/1.2 var(--f-display); letter-spacing: .02em; }
-.np-pl-obsidienne { --npb: rgba(170, 130, 255, .55); background-image: url(../assets/plates/pl-obsidienne.webp), linear-gradient(90deg, #0d0a14, #2a2040 30%, #120e1c 55%, #2a2040 80%, #0d0a14); }
-.np-pl-grimoire { --npb: rgba(214, 178, 110, .7); background-image: url(../assets/plates/pl-grimoire.webp), linear-gradient(180deg, #4a2c16, #2c190c); }
 .np-pl-braise { --npb: rgba(255, 140, 60, .7); background-image: url(../assets/plates/pl-braise.webp), radial-gradient(120% 140% at 50% 120%, #c2410c, #5c1a06 45%, #1a0703 80%); }
 .np-pl-givre { --npb: rgba(190, 230, 255, .75); background-image: url(../assets/plates/pl-givre.webp), linear-gradient(90deg, #0b1a28, #2e5a78 50%, #0b1a28); color: #F2FAFF; }
 .np-pl-or-noir { --npb: rgba(242, 193, 78, .85); background-image: url(../assets/plates/pl-or-noir.webp), linear-gradient(90deg, #120d04, #3b2c0c 25%, #16110a 50%, #3b2c0c 75%, #120d04); color: #FFE7A6; }
-.np-pl-abysse { --npb: rgba(190, 120, 255, .8); background-image: url(../assets/plates/pl-abysse.webp), radial-gradient(90% 160% at 50% 50%, #5b2196, #22093d 60%, #0c0418); }
 .np-pl-souverain { --npb: rgba(255, 215, 120, .95); background-image: url(../assets/plates/pl-souverain.webp), linear-gradient(90deg, #3a0810, #8a6a1c 30%, #4a0c14 50%, #8a6a1c 70%, #3a0810); color: #FFF0C2;
   box-shadow: inset 0 0 0 1px var(--npb), 0 0 10px rgba(255, 190, 80, .45), 0 2px 6px rgba(0, 0, 0, .5); }
 .np-pl-souverain::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgba(255, 240, 200, .55) 50%, transparent 65%); transform: translateX(-120%); animation: npSheen 3.6s ease-in-out infinite; pointer-events: none; }
@@ -5512,12 +5509,9 @@ body.battle-mode .prog-chip { top: calc(var(--safe-t, env(safe-area-inset-top, 0
 .cx-pv-packs .pack { width: 132px; }
 
 /* v572 : six plaques de pseudo de plus */
-.np-pl-ossuaire { --npb: rgba(230, 215, 180, .7); background-image: url(../assets/plates/pl-ossuaire.webp), linear-gradient(90deg, #2a2418, #5a4e38 50%, #2a2418); color: #F5EBD2; }
 .np-pl-sang { --npb: rgba(220, 40, 60, .8); background-image: url(../assets/plates/pl-sang.webp), linear-gradient(90deg, #1a0306, #4a0a12 50%, #1a0306); color: #FFD9DD; }
-.np-pl-pierre { --npb: rgba(150, 200, 170, .6); background-image: url(../assets/plates/pl-pierre.webp), linear-gradient(90deg, #2a2e2c, #4c5450 50%, #2a2e2c); }
 .np-pl-nacre { --npb: rgba(200, 230, 220, .7); background-image: url(../assets/plates/pl-nacre.webp), linear-gradient(90deg, #101414, #3a4644 50%, #101414); color: #EEF7F4; }
 .np-pl-dragon { --npb: rgba(205, 160, 100, .75); background-image: url(../assets/plates/pl-dragon.webp), linear-gradient(90deg, #1c1208, #4a3420 50%, #1c1208); color: #FBE3BC; }
-.np-pl-eclipse { --npb: rgba(255, 210, 130, .85); background-image: url(../assets/plates/pl-eclipse.webp), linear-gradient(90deg, #0c0a06, #3a2e14 50%, #0c0a06); color: #FFEBC0; }
 
 /* v574 : en « animations réduites », la barre de temps des gestes se vidait d'un coup (règle générale de base.css) : elle garde sa vraie durée */
 
@@ -5592,7 +5586,6 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .pf-cx-vif-phenix { --fr: url(../assets/frames/cx-vif-phenix-4.webp); }
 .pf-cx-vif-amethyste { --fr: url(../assets/frames/cx-vif-amethyste-4.webp); }
 .pf-cx-vif-kraken { --fr: url(../assets/frames/cx-vif-kraken-4.webp); }
-.pf-cx-vif-foret { --fr: url(../assets/frames/cx-vif-foret-4.webp); }
 .pf-cx-vif-nacre { --fr: url(../assets/frames/cx-vif-nacre-4.webp); }
 /* v586 : réactions des gardiens : figure peinte cadrée sur la tête */
 .re-pic img.re-boss { object-fit: cover; object-position: 50% 6%; transform: scale(1.35); transform-origin: 50% 12%; }
@@ -5617,14 +5610,11 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 
 /* v591 : 10 cadres vivants (images Gemini) */
 .pf-cx-vif-meduse { --fr: url(../assets/frames/cx-vif-meduse-4.webp); }
-.pf-cx-vif-corbeau { --fr: url(../assets/frames/cx-vif-corbeau-4.webp); }
 .pf-cx-vif-serpent { --fr: url(../assets/frames/cx-vif-serpent-4.webp); }
 .pf-cx-vif-sablier { --fr: url(../assets/frames/cx-vif-sablier-4.webp); }
 .pf-cx-vif-araignee { --fr: url(../assets/frames/cx-vif-araignee-4.webp); }
 .pf-cx-vif-loup { --fr: url(../assets/frames/cx-vif-loup-4.webp); }
 .pf-cx-vif-lune { --fr: url(../assets/frames/cx-vif-lune-4.webp); }
-.pf-cx-vif-rubis { --fr: url(../assets/frames/cx-vif-rubis-4.webp); }
-.pf-cx-vif-perle { --fr: url(../assets/frames/cx-vif-perle-4.webp); }
 .pf-cx-vif-orchidee { --fr: url(../assets/frames/cx-vif-orchidee-4.webp); }
 
 /* v592 : Revue des doublons (Mode Créateur) */

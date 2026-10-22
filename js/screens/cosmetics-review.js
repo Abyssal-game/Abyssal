@@ -2,7 +2,7 @@
 // ressemblent, posés côte à côte groupe par groupe, puis les moins beaux et ceux à surveiller (symboles), avec pour
 // chacun « À garder » ou « À supprimer ». Le choix reste sur l'appareil (localStorage) ; « Copier mon choix » donne
 // un texte à coller dans la conversation pour appliquer les suppressions. Outil en français seulement (translate="no").
-import { CODEX_FRAMES, CODEX_BACKS, SACHETS, PLATES } from '../core/codex.js';
+import { CODEX_FRAMES, CODEX_BACKS, SACHETS, PLATES, REMOVED_COSM } from '../core/codex.js';
 import { icon, EMBLEM } from '../ui/icons.js';
 import { esc, toast, openSheet, confirmBox } from '../ui/dom.js';
 import { artUrl } from '../art/assets.js';
@@ -57,6 +57,10 @@ const SECTIONS = [
     ['30', 'Œil dans un disque solaire', ['sachet-grimoire']],
   ] },
 ];
+
+/* v593 : les objets supprimés après la revue du 22 octobre 2026 ne s'affichent plus (un groupe vidé disparaît) */
+const GONE = new Set(REMOVED_COSM);
+for (const sec of SECTIONS) sec.groups = sec.groups.map(([n, l, list]) => [n, l, list.filter((id) => !GONE.has(id))]).filter((gr) => gr[2].length);
 
 const kindOf = (id) => id.startsWith('cx-') ? 'frame' : id.startsWith('dos-') ? 'back' : id.startsWith('sachet-') ? 'sachet' : 'plate';
 const nameOf = (id) => {
