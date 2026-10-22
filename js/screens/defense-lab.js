@@ -14,7 +14,7 @@ import { INTENTS } from '../core/skills.js';
 import { BOSSES } from '../core/bosses.js';
 import { VERSION } from '../config.js';
 
-const LETTERS = { n: 'Coup simple', f: 'Coup rapide', l: 'Coup lent', x: 'Feinte', m: 'Zone mobile', h: 'Coup chargé (maintenir)', H: 'Coup chargé avec feinte' };
+const LETTERS = { n: 'Coup simple', f: 'Coup rapide', l: 'Coup lent', x: 'Feinte', m: 'Zone mobile', h: 'Coup chargé', H: 'Coup chargé avec feinte' };
 const FAM = { predateur: 'Prédateur', assassin: 'Assassin', berserker: 'Berserker', protecteur: 'Garde du corps', mage: 'Mage', parasite: 'Parasite', controleur: 'Contrôleur', soutien: 'Instigateur', gardien: 'Gardien' };
 /* durée de base de la zone d'or selon l'attaque (defenseWindow) : on prend le type d'attaque qui correspond le mieux */
 const KIND_OF = { h: 'heavy', H: 'heavy' };
@@ -100,7 +100,7 @@ export function openDefenseLab(app, { seq = null } = {}) {
         <select class="input plain dl-sel" data-l="atk">${groups.map((gname) => `<optgroup label="${esc(gname)}">${ALL.filter((a) => a[1] === gname).map((a) => `<option value="${a[0]}" ${a[0] === ui.atk ? 'selected' : ''}>${esc(a[2])} · ${esc(a[3])}</option>`).join('')}</optgroup>`).join('')}
           <option value="custom" ${ui.atk === 'custom' ? 'selected' : ''}>Séquence libre…</option></select>
         ${ui.atk === 'custom' ? `<input class="input plain dl-cust" data-l="cust" value="${esc(ui.custom)}" placeholder="ex. nfxh, ou 0 pour ta défense n° 0" maxlength="8">` : ''}
-        <p class="small muted dl-legend">n simple · f rapide · l lent · x feinte · m zone mobile · h chargé (maintenir, relâcher) · H chargé avec feinte · 0 à 9 : tes défenses inventées</p>
+        <p class="small muted dl-legend">n simple · f rapide · l lent · x feinte · m zone mobile · h chargé · H chargé avec feinte · 0 à 9 : tes défenses inventées</p>
         ${infoHTML()}
         <div class="row gap dl-go"><button class="btn gold block" data-l="go" ${ui.running ? 'disabled' : ''}>${icon('swords')}Lancer l’attaque</button>
           <button class="btn ${ui.loop ? 'gold' : ''}" data-l="loop">${ui.loop ? 'Enchaîner ✓' : 'Enchaîner'}</button></div>

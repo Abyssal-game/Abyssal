@@ -38,7 +38,7 @@ export const FIELDS = {
     ['seq', 'Séquence de défense', 'seq'],
   ],
   qte: [
-    ['name', 'Nom', 'text'], ['base', 'Geste', 'sel', [['tap', 'Toucher'], ['hold', 'Maintenir puis relâcher']]],
+    ['name', 'Nom', 'text'], ['base', 'Geste', 'sel', [['tap', 'Toucher'], ['hold', 'Maintenir puis relâcher (essai seulement)']]],
     ['speed', 'Durée du passage (× normale)', 'num', [0.4, 2.5, 0.05]], ['zone', 'Taille de la zone d’or (×)', 'num', [0.3, 2.5, 0.05]],
     ['parry', 'Taille du trait blanc (part de la zone)', 'num', [0.05, 0.8, 0.01]], ['accel', 'Accélération (1 = régulière)', 'num', [1, 3, 0.05]],
     ['feint', 'Feinte (s’arrête puis fonce)', 'bool'], ['move', 'Zone mobile (amplitude)', 'num', [0, 0.3, 0.01]],

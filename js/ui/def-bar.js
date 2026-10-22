@@ -61,7 +61,7 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
     };
     const pass = (i) => new Promise((done1) => {
       if (CUSTOM_QTE[letters[i]]) return passCustom(i, { ...QTE_BRICKS, ...CUSTOM_QTE[letters[i]] }, done1);
-      const L = letters[i], hold = L === 'h' || L === 'H', feint = L === 'x' || L === 'H', moving = L === 'm' || (strong && L === 'n' && i % 2 === 1);
+      const L = letters[i], hold = false /* v596 : plus jamais « maintenir puis relâcher » (demande du propriétaire) : un coup chargé se défend d'un toucher */, feint = L === 'x' || L === 'H', moving = L === 'm' || (strong && L === 'n' && i % 2 === 1);
       const w = typeof win === 'function' ? win(L) : win;
       const D = D0 * (L === 'f' ? T.multFast : L === 'l' ? T.multSlow : 1) * (feint ? T.multFeint : 1) * (beat ? T.multBeat : 1);
       /* trajet du curseur : accéléré (puissance K) ; feinte : il avance, s'arrête presque, puis fonce */
@@ -81,7 +81,7 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
       bar.classList.remove('ok', 'ko', 'r-parry', 'r-dodge', 'r-none', 'go', 'pp', 'held', 'cb-hold');
       if (hold) bar.classList.add('cb-hold');
       pips[i]?.classList.add('now');
-      hint.textContent = (hold ? 'Maintiens le doigt, relâche dans l’or · trait blanc : parade' : 'Touche dans l’or : esquive · trait blanc : parade') + (n > 1 ? ` · coup ${i + 1}/${n}` : '');
+      hint.textContent = 'Touche dans l’or : esquive · trait blanc : parade' + (n > 1 ? ` · coup ${i + 1}/${n}` : '');
       let t0 = 0, fin = false, raf = 0, lit = '';
       const zoneAt = (x) => (moving ? Math.min(0.97 - zw, Math.max(0.3, z0 + Math.sin(x * 9) * T.moveAmp)) : z0);
       const end = (res, when = null) => {
@@ -124,7 +124,7 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
         if (!t0) return; /* v575 : un toucher avant le départ du curseur ne compte pas */
         judgeAt(at);
       });
-      const gap = i === 0 ? (reduced ? 250 : T.gapFirst) + Math.random() * T.gapFirstRand : beat || T.gapMin + Math.random() * T.gapRand; /* rythme irrégulier entre les coups (sauf l'Horloger) */
+      const gap = i === 0 ? (reduced ? 500 : T.gapFirst) + Math.random() * T.gapFirstRand : beat || T.gapMin + Math.random() * T.gapRand; /* rythme irrégulier entre les coups (sauf l'Horloger) */
       setTimeout(() => { if (!fin && alive()) { t0 = performance.now(); raf = requestAnimationFrame(step); } else if (!alive()) end('none'); }, gap);
     });
     /* défense inventée : même barre, positions calculées par la fonction posAt (sens, rebond), jugement au temps */
@@ -181,7 +181,7 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
       };
       letGo = (ev) => { if (!hold || !held || fin) return; held = false; bar.classList.remove('held'); if (!t0) return end('none'); judgeAt(ev.timeStamp); };
       setTap((at) => { if (hold) { held = true; bar.classList.add('held'); return; } if (!t0) return; judgeAt(at); });
-      const gap = i === 0 ? (reduced ? 250 : T.gapFirst) + Math.random() * T.gapFirstRand : T.gapMin + Math.random() * T.gapRand;
+      const gap = i === 0 ? (reduced ? 500 : T.gapFirst) + Math.random() * T.gapFirstRand : T.gapMin + Math.random() * T.gapRand;
       setTimeout(() => { if (!fin && alive()) { t0 = performance.now(); raf = requestAnimationFrame(step); } else if (!alive()) end('none'); }, gap);
     };
     (async () => {

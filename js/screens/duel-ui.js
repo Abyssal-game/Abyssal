@@ -902,8 +902,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   /* v575 : toute la défense se joue sur la barre (le glisser, les cercles, le martèlement et les points faibles sont retirés,
      « seule la barre fonctionne bien »). Comme dans Clair Obscur, une attaque est une SÉQUENCE de coups : le curseur repasse
      pour chaque coup, et chaque ennemi a son rythme, qu'on apprend en jouant. Lettres d'une séquence :
-     n coup simple · f rapide · l lent · x feinte (le curseur s'arrête, puis fonce) · m zone mobile · h coup chargé (maintenir,
-     relâcher dans l'or) · H coup chargé avec feinte. Parade parfaite de toute la séquence = contre-attaque (moteur). */
+     n coup simple · f rapide · l lent · x feinte (le curseur s'arrête, puis fonce) · m zone mobile · h coup chargé (v596 : un simple toucher,
+     comme les autres) · H coup chargé avec feinte. Parade parfaite de toute la séquence = contre-attaque (moteur). */
   const ASSAULT_K = ['heavy', 'blast', 'gorge', 'blizzard', 'copy', 'swarm', 'execute', 'lament', 'ambush', 'price', 'quake', 'chain', 'tick2'];
   /* v594 : FAM_RHYTHM, KIND_RHYTHM, BOSS_ASSAULT dans js/ui/def-bar.js (partagés avec le Labo des défenses) */
   /* séquence d'une attaque : propre au coup, sinon au rythme de la famille ; une élite ajoute un coup rapide */
@@ -916,7 +916,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   /* bilan d'une séquence pour le moteur : tout paré = parade ; un raté sur trois coups ou plus = esquive ; sinon touché */
   const verdict = (res) => defVerdict(res, getTune()); /* v594 : règle réglable au Labo des défenses */
   async function tipFor(q) {
-    for (const k of ['cb-def-tap', /[hH]/.test(q) && 'cb-def-hold', q.length > 1 && 'cb-def-combo', /[xH]/.test(q) && 'cb-def-feint'].filter(Boolean)) {
+    for (const k of ['cb-def-tap', q.length > 1 && 'cb-def-combo', /[xH]/.test(q) && 'cb-def-feint'].filter(Boolean)) {
       if (!g.s.tips?.[k]) await tuto(app, k);
       if (!alive_) return;
     }
@@ -1290,7 +1290,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       <li><b>Brisure</b> : en visant une élite ou un gardien, la cible affiche la Brisure que ton coup va infliger (◆), et « BRISE ! » quand il va le briser. Un seul coup ne retire jamais plus de 40 % des PV d’un gardien.</li>
       <li><b>Ferveur</b> (${FERVOR_MAX} au plus, commune à l’équipe ; tu en gardes 3 au plus d’un combat à l’autre) : attaques, faiblesses, esquives (+1), parades parfaites (+2) et Brisures (+2) la remplissent. Pleine, elle lance le <b>pouvoir d’équipe</b> (${esc(ult.name)} : ${esc(ult.desc)}), pendant le tour d’une de tes créatures, sans le terminer.</li>
       <li><b>Voir une carte</b> : garde le doigt appuyé sur une carte (ennemie ou alliée) pour ouvrir sa fiche : PV, attaque, intention, passifs. Un toucher court sur un ennemi attaque toujours directement.</li>
-      <li><b>Défense active</b> (toutes les attaques ennemies) : coup simple, touche dans l’or pour esquiver (ta créature est éraflée, +1 Ferveur), sur le trait blanc, au tout dernier instant, pour parer (aucun dégât, +1 PA, +2 Ferveur, Brisure, contre-attaque des Protecteurs et des Attaquants) ; coup chargé, garde le doigt appuyé et relâche au bon moment ; enchaînement, le curseur repasse pour chaque coup (tout parer pour une parade parfaite, un raté sur trois coups = éraflé) ; feinte, le curseur s’arrête puis fonce. Chaque famille d’ennemis a son rythme. La grosse attaque de chaque gardien est un <b>Assaut</b> : une longue séquence, toujours la même pour lui.</li>
+      <li><b>Défense active</b> (toutes les attaques ennemies) : coup simple, touche dans l’or pour esquiver (ta créature est éraflée, +1 Ferveur), sur le trait blanc, au tout dernier instant, pour parer (aucun dégât, +1 PA, +2 Ferveur, Brisure, contre-attaque des Protecteurs et des Attaquants) ; coup chargé, il frappe plus fort mais se défend du même toucher ; enchaînement, le curseur repasse pour chaque coup (tout parer pour une parade parfaite, un raté sur trois coups = éraflé) ; feinte, le curseur s’arrête puis fonce. Chaque famille d’ennemis a son rythme. La grosse attaque de chaque gardien est un <b>Assaut</b> : une longue séquence, toujours la même pour lui.</li>
       <li><b>Dés</b> : Coup d’estoc, Contagion et Entrave lancent un D20 contre une difficulté (DD). 1 : échec critique ; sous le DD : réussite partielle ; DD atteint : réussite ; 20 : critique. Marque, gel, Brisure et faiblesse donnent des bonus.</li>
       <li><b>Chaîne</b> : chaque créature qui frappe un ennemi déjà touché ce tour-ci par une autre de tes créatures gagne +1 dégât (+2 au plus). Le « +1 » doré sur la cible l’annonce.</li>
       <li><b>Coup de grâce</b> : achever un ennemi donne +1 Ferveur.</li>
