@@ -5875,3 +5875,6 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .ck-fg { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; } /* Renforcer : palier suivant sur deux lignes au besoin */
 .cxs-hero.sachet .cx-sa { max-height: min(240px, 34vh); width: auto; } /* Échoppe : sachet à la une sans déborder sur le titre */
 .cxs-hero-pic { max-width: 100%; overflow: hidden; }
+
+/* v625 : la grille du Labo des combats (.lb-row, v595) écrasait celle des classements (rang, portrait, pseudo, score) : pseudo coupé, score renvoyé à la ligne */
+.lb-row:has(> .lb-rank) { grid-template-columns: 28px 34px minmax(0, 1fr) auto; gap: 10px; }
