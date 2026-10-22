@@ -10,7 +10,7 @@ import { artUrl } from '../art/assets.js';
 import { EMBLEM } from '../ui/icons.js';
 import { setScene } from '../ui/scene.js';
 import { t, tx } from '../i18n.js'; /* v574 */
-import { emoteHTML, emotePic, emoteLabel, fondStyle } from '../ui/vitrine.js'; /* v564 : plaques de pseudo et réactions en ligne */
+import { emoteHTML, emotePic, emoteLabel, fondStyle, withPlate } from '../ui/vitrine.js'; /* v564 : plaques de pseudo et réactions en ligne */
 import { sync } from '../cloud/sync.js';
 import { packHTML } from './shop.js'; /* v570 : aperçu des sachets */
 
@@ -71,16 +71,24 @@ export default function codexScreen(app, root) {
     return items.map(([v, n, l]) => `<span class="cxr">${v}<span class="cxr-t">${n ? `<b>${n}</b>` : ''}<small>${l}</small></span></span>`).join('');
   };
 
+  /* v636 : une récompense cosmétique du Codex, vue comme un objet (aperçu) */
+  const seasonItem = (r, tier) => { const k = ['frame', 'back', 'sachet', 'plate', 'emote', 'mat', 'fond'].find((x) => r?.[x]); return k ? { id: r[k], kind: k, season: true, tier } : null; };
   function codexTab() {
     const c = g.codex(), t = codexTier(c), n = claimable(c), max = t >= CODEX.tiers;
     const cell = (tier, tr, r) => {
       if (!r) return `<div class="cxk-c ${tr} void"></div>`;
       const got = c[tr].includes(tier), lockedPrem = tr === 'prem' && !c.premium, reached = tier <= t;
       const state = got ? 'got' : !reached ? 'far' : lockedPrem ? 'lock' : 'ready';
-      return `<div class="cxk-c ${tr} ${state}" ${state === 'ready' ? `data-cx="claim" data-tr="${tr}" data-t="${tier}" role="button" tabindex="0"` : ''}>${rwBig(r)}
+      const look = state !== 'ready' && tr === 'prem' && seasonItem(r, tier); /* v636 : toucher une récompense cosmétique = son aperçu */
+      return `<div class="cxk-c ${tr} ${state} ${look ? 'look' : ''}" ${state === 'ready' ? `data-cx="claim" data-tr="${tr}" data-t="${tier}" role="button" tabindex="0"` : look ? `data-cx="seez" data-t="${tier}" role="button" tabindex="0"` : ''}>${rwBig(r)}
         ${state === 'ready' ? '<span class="cxk-go">Récupérer</span>' : state === 'got' ? `<span class="cxk-ok">${icon('check')}</span>` : state === 'lock' ? `<span class="cxk-lk">${icon('lock')}</span>` : ''}</div>`;
     };
     const se = g.codexSeason(), best = se.best; /* v550 : les plus belles pièces de la saison */
+    /* v636 : toutes les récompenses cosmétiques de la saison, en vitrine (toucher = aperçu) ; jours restants */
+    const loot = tiersOf(c.season).map((x) => ({ x, it: seasonItem(x.prem, x.tier) })).filter((o) => o.it).reverse();
+    const left = Math.max(0, Math.ceil((new Date(`${se.ends}T23:59:59`) - g.clock()) / 864e5));
+    const lootHTML = loot.length ? `<section class="cx-loot"><h3 class="cxs-sh">${icon('star')}À gagner cette saison <small>${loot.length} objets</small></h3>
+      <div class="cxs-rail">${loot.map(({ x, it }) => `<button class="cxs-t wide r-season ${it.kind} ${ownedOf(it) ? 'own' : ''}" data-cx="seez" data-t="${x.tier}"><span class="cxs-pic">${picOf(it)}</span><span class="cxs-rk">Palier ${x.tier}</span><b>${esc(nameOf(it))}</b>${ownedOf(it) ? `<span class="cxs-own">${icon('check')}Possédé</span>` : ''}</button>`).join('')}</div></section>` : '';
     const pitch = c.premium ? '' : `<section class="cx-pitch">
         ${opt('assets/ui/cx-enlumine.webp', 'cx-pitch-art')}
         <div class="cx-pitch-in"><small class="cx-kick">Voie enluminée</small><h2>${esc(CODEX.premiumName)}</h2>
@@ -90,13 +98,14 @@ export default function codexScreen(app, root) {
     return `<section class="cx-season">
         ${opt(se.art, 'cx-season-art')}
         <div class="cx-season-in"><small class="cx-kick">Du ${esc(se.starts.split('-').reverse().join('/'))} au ${esc(se.ends.split('-').reverse().join('/'))}${g.codexLive() ? '' : ' · bientôt'}</small>
-          <h2>${esc(se.title)}</h2>
+          <h2>${esc(se.title)}</h2>${g.codexLive() ? `<p class="small cx-left">${icon('bell')}Encore ${left} jour${left > 1 ? 's' : ''}</p>` : ''}
           ${(() => { const p = g.s.codexPast, old = p && seasonByKey(p.season); return old && p.day >= se.starts ? `<p class="small cx-past">${icon('check')} Fin de la ${esc(old.title)} : ${p.n} récompense${p.n > 1 ? 's' : ''} oubliée${p.n > 1 ? 's' : ''} t’${p.n > 1 ? 'ont' : 'a'} été donnée${p.n > 1 ? 's' : ''}.</p>` : ''; })()}
           <div class="cx-season-row"><span class="cx-medal"><b>${t}</b><small>/ ${CODEX.tiers}</small></span>
             <span class="cx-season-p"><span>${max ? 'Codex terminé pour cette saison !' : `Palier ${t + 1} · ${c.xp % CODEX.xpPerTier} / ${CODEX.xpPerTier} points`}</span><span class="cx-bar2"><i style="width:${Math.round(tierProgress(c) * 100)}%"></i></span></span></div>
           ${c.premium ? `<span class="cx-badge on">${icon('star')}${esc(CODEX.premiumName)} acquis</span>` : ''}</div></section>
       ${n ? `<button class="btn primary block dc-plq dc-plq-red cx-all" data-cx="all">${icon('chest')}Tout récupérer (${n})</button>` : ''}
       ${pitch}
+      ${lootHTML}
       <div class="cxk-head"><span>Voie de l'Abîme<small>gratuite</small></span><span></span><span class="prem">Voie enluminée<small>${c.premium ? 'à toi' : 'à débloquer'}</small></span></div>
       <ol class="cxk">${tiersOf(c.season).map((x) => `<li class="cxk-r ${x.tier <= t ? 'reached' : ''} ${x.tier === t + 1 ? 'next' : ''} ${x.tier === CODEX.tiers ? 'ult' : ''}" ${x.tier === Math.min(CODEX.tiers, t + 1) ? 'id="cx-now"' : ''}>${cell(x.tier, 'free', x.free)}<span class="cxk-n">${x.tier}</span>${cell(x.tier, 'prem', x.prem)}</li>`).join('')}</ol>
       <details class="panel dc-fold"><summary>${picon('help')}<span class="dc-sum-t">Gagner des points de Codex</span></summary>
@@ -104,51 +113,96 @@ export default function codexScreen(app, root) {
         <p class="small muted">La voie de gauche se gagne en jouant. La voie enluminée s’achète une fois par saison : une récompense à chaque palier, sur le thème de la saison, jamais en vente à l’Échoppe et jamais de puissance.</p></details>`;
   }
 
+  /* v636 : l'Échoppe refaite (demande du propriétaire : « que les menus donnent envie, que les cosmétiques soient mis en valeur,
+     bien rangés, faciles à trouver, avec de beaux aperçus ») : un accueil (vitrine de la semaine, nouveautés, rayons illustrés),
+     puis un rayon par famille, rangé par rareté, avec filtres ; l'aperçu passe d'un objet à l'autre et permet d'équiper. */
+  const KINDS = {
+    frame: ['Cadres', 'Cadre de profil', 'Autour de ton portrait, partout où il apparaît'],
+    live: ['Dos de cartes', 'Dos de cartes', 'Le dos animé de toutes tes cartes face cachée'],
+    sachet: ['Sachets', 'Sachet de booster', 'L’habillage de tes boosters standard et premium'],
+    plate: ['Plaques', 'Plaque de pseudo', 'La bannière derrière ton pseudo'],
+    fond: ['Fonds de profil', 'Fond de profil', 'La scène derrière ton portrait, vue par tous'],
+    mat: ['Tapis', 'Tapis de jeu', 'Le plateau de tes Duels des Sceaux'],
+    emote: ['Réactions', 'Réaction', 'Des bulles à envoyer en partie en ligne'],
+    bundle: ['Lots', 'Lot', 'Plusieurs objets, moins chers qu’à l’unité'],
+  };
+  const kindOf = (it) => (it.kind === 'back' ? 'live' : it.kind);
+  const nameOf = (it) => it.name || (it.kind === 'frame' ? ALL_FRAMES[it.id] : it.kind === 'finish' ? `Finition ${FINISHES[it.id].name}` : it.kind === 'plate' ? PLATES[it.id] : it.kind === 'sachet' ? SACHETS[it.id] : it.kind === 'mat' ? TAPIS[it.id] : it.kind === 'fond' ? FONDS[it.id] : it.kind === 'emote' ? EMOTES[it.id].name : CODEX_BACKS[it.id]) || it.id;
+  const picOf = (it, big = false) => it.kind === 'frame' ? `<span class="${big ? 'avatar-big' : 'avatar-mini'} pf pf-${it.id}">${myAv()}</span>`
+    : it.kind === 'back' ? `<img class="cx-bk" alt="" src="assets/backs/${it.id}.webp">`
+    : it.kind === 'sachet' ? `<img class="cx-sa" alt="" src="assets/packs/${it.id}.webp">`
+    : it.kind === 'plate' ? `<span class="np np-${it.id} np-demo" translate="no">${esc(myName())}</span>`
+    : it.kind === 'mat' ? `<img class="cx-mat" alt="" src="assets/tapis/${it.id}.webp">`
+    : it.kind === 'fond' ? `<span class="cx-fondt has-fond"${fondStyle(it.id)}><span class="avatar-mini pf pf-${g.s.frame}">${myAv()}</span></span>`
+    : it.kind === 'emote' ? `<span class="re-tile">${emoteHTML(it.id)}</span>`
+    : it.give?.emotes ? `<span class="re-fan">${it.give.emotes.slice(0, 4).map((k) => `<span class="re-pic">${emotePic(k)}</span>`).join('')}</span>`
+    : it.give?.backs ? `<span class="cx-fan">${it.give.backs.slice(0, 4).map((b) => `<img alt="" src="assets/backs/${b}.webp">`).join('')}</span>` : '';
+  /* l'objet est-il porté en ce moment ? (et comment le porter) */
+  const worn = (it) => { const s = g.s; return it.kind === 'frame' ? s.frame === it.id : it.kind === 'back' ? s.back === it.id : it.kind === 'sachet' ? s.sachet === it.id || s.sachetPrem === it.id : it.kind === 'plate' ? s.plate === it.id : it.kind === 'mat' ? s.mat === it.id : it.kind === 'fond' ? s.fond === it.id : false; };
+  const wearable = (it) => ['frame', 'back', 'sachet', 'plate', 'mat', 'fond'].includes(it.kind);
+  const wear = (it) => {
+    if (it.kind === 'frame') g.setFrame(it.id); if (it.kind === 'back') g.setBack(it.id); if (it.kind === 'sachet') g.setSachet(it.id, 'standard');
+    if (it.kind === 'plate') g.setPlate(it.id); if (it.kind === 'mat') g.setMat(it.id); if (it.kind === 'fond') g.setFond(it.id);
+    app.applySettings?.(); app.chrome?.();
+  };
+  const ownedOf = (it) => (it.season ? g.s[{ frame: 'frames', back: 'backs', sachet: 'sachets', plate: 'plates', emote: 'emotes', mat: 'mats', fond: 'fonds' }[it.kind]]?.includes(it.id) : g.catalogOwned(it.id));
+  const RANKS = ['myth', 'leg', 'epic', 'rare'];
+  const NEW = ['tp-', 'fp-']; /* nouveautés (préfixes des derniers ajouts) */
+
   function shopTab() {
     const have = g.obs();
-    const name = (it) => it.name || (it.kind === 'frame' ? ALL_FRAMES[it.id] : it.kind === 'finish' ? `Finition ${FINISHES[it.id].name}` : it.kind === 'plate' ? PLATES[it.id] : it.kind === 'sachet' ? SACHETS[it.id] : it.kind === 'mat' ? TAPIS[it.id] : it.kind === 'fond' ? FONDS[it.id] : it.kind === 'emote' ? EMOTES[it.id].name : CODEX_BACKS[it.id]) || it.id;
-    const pic = (it, big = false) => it.kind === 'frame' ? `<span class="${big ? 'avatar-big' : 'avatar-mini'} pf pf-${it.id}">${myAv()}</span>`
-      : it.kind === 'back' ? `<img class="cx-bk" alt="" src="assets/backs/${it.id}.webp">`
-      : it.kind === 'finish' ? (big ? cardHTML(g.bestCards(1)[0] || cat.get('ABY-039'), { dress: it.id }) : `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"><img alt="" src="assets/variants/${it.id}-frame.webp"></span>`)
-      : it.kind === 'sachet' ? `<img class="cx-sa" alt="" src="assets/packs/${it.id}.webp">`
-      : it.kind === 'plate' ? `<span class="np np-${it.id} np-demo">${esc(myName())}</span>`
-      : it.kind === 'mat' ? `<img class="cx-mat" alt="" src="assets/tapis/${it.id}.webp">` /* v632 */
-      : it.kind === 'fond' ? `<img class="cx-fond" alt="" src="assets/fonds/${it.id}.webp">` /* v632 */
-      : it.kind === 'emote' ? `<span class="re-tile">${emoteHTML(it.id)}</span>`
-      : it.give.emotes ? `<span class="re-fan">${it.give.emotes.slice(0, 4).map((k) => `<span class="re-pic">${emotePic(k)}</span>`).join('')}</span>`
-      : `<span class="cx-fan">${it.give.backs.slice(0, 4).map((b) => `<img alt="" src="assets/backs/${b}.webp">`).join('')}</span>`;
-    const tile = (it) => { const own = g.catalogOwned(it.id), cost = g.catalogCost(it.id), r = rank(it);
-      return `<button class="cxs-t r-${r} ${it.kind} ${own ? 'own' : ''}" data-cx="see" data-id="${it.id}"><span class="cxs-pic">${pic(it)}</span><span class="cxs-rk">${RANK[r]}</span><b>${esc(name(it))}</b>
-        ${own ? `<span class="cxs-own">${icon('check')}Possédé</span>` : `<span class="cxs-pr ${cost <= have ? '' : 'short'}">${obsTxt(cost)}</span>`}</button>`; };
-    const CATS = [['frame', 'Cadres'], ['plate', 'Plaques'], ['live', 'Dos vivants'], ['back', 'Dos'], ['sachet', 'Sachets'], ['mat', 'Tapis'], ['fond', 'Fonds de profil'], ['emote', 'Réactions'], ['bundle', 'Lots'], ['obs', OBS.name]]; /* v569 : finitions retirées, dos vivants */
-    const CATS2 = CATS.filter(([k]) => k !== 'back' || CATALOG.some((x) => x.kind === 'back' && !x.live)); /* v573 : plus de dos fixes à vendre */
-    const cur = CATS2.some(([k]) => k === ui.cat) ? ui.cat : 'frame';
-    const inCat = (x) => (cur === 'live' ? x.kind === 'back' && x.live : cur === 'back' ? x.kind === 'back' && !x.live : x.kind === cur);
-    const list = CATALOG.filter(inCat).slice().sort((a, b) => (g.catalogOwned(a.id) - g.catalogOwned(b.id)) || (b.cost - a.cost));
-    /* à la une : un bel objet par semaine (le même pour tous), pas encore possédé */
+    const tile = (it, wide = false) => { const own = g.catalogOwned(it.id), cost = g.catalogCost(it.id), r = rank(it), on = own && worn(it);
+      return `<button class="cxs-t r-${r} ${it.kind} ${own ? 'own' : ''} ${wide ? 'wide' : ''}" data-cx="see" data-id="${it.id}"><span class="cxs-pic">${picOf(it)}</span><span class="cxs-rk">${RANK[r]}</span><b>${esc(nameOf(it))}</b>
+        ${on ? `<span class="cxs-own on">${icon('check')}Équipé</span>` : own ? `<span class="cxs-own">${icon('check')}Possédé</span>` : `<span class="cxs-pr ${cost <= have ? '' : 'short'}">${obsTxt(cost)}</span>`}</button>`; };
+    const wallet = `<section class="cxs-wallet"><span class="cxs-w-n">${obsTxt(have)}</span><span class="small">${esc(OBS.name)} · seulement pour des cosmétiques</span>
+        <button class="btn small primary" data-cx="cat" data-v="obs">Obtenir</button></section>`;
+    const inKind = (k) => CATALOG.filter((x) => kindOf(x) === k);
+    /* — un rayon — */
+    if (ui.cat && ui.cat !== 'obs' && KINDS[ui.cat]) {
+      const k = ui.cat, [label, , desc] = KINDS[k], all = inKind(k), owned = all.filter((x) => g.catalogOwned(x.id)).length;
+      const rar = RANKS.includes(ui.rar) ? ui.rar : null;
+      const list = all.filter((x) => (!rar || rank(x) === rar) && (!ui.hideOwned || !g.catalogOwned(x.id)));
+      const groups = RANKS.map((r) => [r, list.filter((x) => rank(x) === r).sort((a, b) => (g.catalogOwned(a.id) - g.catalogOwned(b.id)) || (b.cost - a.cost))]).filter(([, l]) => l.length);
+      const tabs = Object.keys(KINDS).filter((x) => inKind(x).length);
+      return `${wallet}
+        <nav class="cxs-nav" aria-label="Rayons"><button class="cxs-home" data-cx="cat" data-v="">${icon('prev')}Accueil</button>${tabs.map((x) => `<button class="cxs-cat ${x === k ? 'on' : ''}" data-cx="cat" data-v="${x}">${KINDS[x][0]}</button>`).join('')}</nav>
+        <section class="cxs-aisle"><h2>${label}</h2><p class="small muted">${desc}</p><p class="small cxs-cnt"><b>${owned} / ${all.length}</b> possédés</p>
+          <div class="cxs-filt">${[[null, 'Toutes'], ...RANKS.map((r) => [r, RANK[r]])].filter(([r]) => !r || all.some((x) => rank(x) === r)).map(([r, l]) => `<button class="chip ${r ? `r-${r}` : ''}" data-cx="rar" data-v="${r || ''}" aria-pressed="${(rar || null) === r}">${l}</button>`).join('')}
+            <button class="chip" data-cx="hide" aria-pressed="${!!ui.hideOwned}">${icon('eye')}Masquer ce que j’ai</button></div></section>
+        ${groups.length ? groups.map(([r, l]) => `<h3 class="cxs-gh r-${r}"><span>${RANK[r]}</span><small>${l.length}</small></h3><div class="cxs-grid ${k === 'live' ? 'back' : k}">${l.map((x) => tile(x)).join('')}</div>`).join('')
+          : `<p class="muted center cxs-none">${ui.hideOwned ? 'Tu as déjà tout ce rayon. Bravo !' : 'Rien ici pour l’instant.'}</p>`}`;
+    }
+    /* — les obsidiennes — */
+    if (ui.cat === 'obs') {
+      const euro = (it, i) => { const own = it.once && g.shopOwned(it.id); const art = it.kind === 'obs' ? `assets/ui/obs-${Math.min(4, i + 1)}.webp` : 'assets/ui/ech-fondateur.webp';
+        return `<article class="cxs-e ${it.kind === 'obs' ? 'obs' : 'founder'} ${own ? 'own' : ''}">${opt(art, 'cxs-e-art')}
+          <div class="cxs-e-in"><b>${it.kind === 'obs' ? obsTxt(it.give.obs) : esc(it.name)}</b>${it.bonus ? `<span class="cx-bonus">+${it.bonus} offertes</span>` : ''}
+          ${it.desc ? `<small>${esc(it.desc)}</small>` : ''}</div>
+          ${own ? `<span class="cxs-own">${icon('check')}Possédé</span>` : `<button class="btn primary small" data-cx="buy" data-id="${it.id}">${esc(it.price)}</button>`}</article>`; };
+      let obsI = 0;
+      return `${wallet}<nav class="cxs-nav"><button class="cxs-home" data-cx="cat" data-v="">${icon('prev')}Accueil</button></nav>
+        <section class="cxs-aisle"><h2>${esc(OBS.name)}</h2><p class="small muted">Elles ne servent qu’aux cosmétiques : rien ici ne rend tes créatures plus fortes.</p></section>
+        <div class="cxs-euro" id="cx-euro">${SHOP.filter((it) => it.kind !== 'codex').map((it) => euro(it, it.kind === 'obs' ? obsI++ : 0)).join('')}</div>
+        <button class="btn ghost block" data-cx="restore">Restaurer mes achats</button>
+        <p class="small muted center">Pendant l'aperçu, tout achat en euros est simulé : aucun paiement.</p>`;
+    }
+    /* — l'accueil — */
     const week = Math.floor(g.clock().getTime() / 864e5 / 7);
-    const stars = CATALOG.filter((x) => x.kind !== 'bundle' && x.cost >= 250 && !g.catalogOwned(x.id) /* v574 : 700 depuis la baisse des prix, plus rien n'était à la une */);
+    const stars = CATALOG.filter((x) => x.kind !== 'bundle' && x.cost >= 250 && !g.catalogOwned(x.id));
     const hero = stars.length ? stars[week % stars.length] : null;
     const heroHTML = hero ? `<section class="cxs-hero r-${rank(hero)} ${hero.kind}">${opt('assets/ui/ech-vitrine.webp', 'cxs-hero-bg')}
         <small class="cx-kick">À la une cette semaine</small>
-        <button class="cxs-hero-pic" data-cx="see" data-id="${hero.id}">${pic(hero, true)}</button>
-        <b class="cxs-hero-n">${esc(name(hero))}</b><span class="cxs-rk">${RANK[rank(hero)]}</span>
+        <button class="cxs-hero-pic" data-cx="see" data-id="${hero.id}">${picOf(hero, true)}</button>
+        <b class="cxs-hero-n">${esc(nameOf(hero))}</b><span class="cxs-rk">${RANK[rank(hero)]} · ${KINDS[kindOf(hero)][1]}</span>
         <div class="cxs-hero-f"><button class="btn small ghost" data-cx="see" data-id="${hero.id}">${icon('eye')}Aperçu</button><button class="btn small primary" data-cx="get" data-id="${hero.id}">${obsTxt(g.catalogCost(hero.id))}</button></div></section>` : '';
-    const euro = (it, i) => { const own = it.once && g.shopOwned(it.id); const art = it.kind === 'obs' ? `assets/ui/obs-${Math.min(4, i + 1)}.webp` : 'assets/ui/ech-fondateur.webp';
-      return `<article class="cxs-e ${it.kind === 'obs' ? 'obs' : 'founder'} ${own ? 'own' : ''}">${opt(art, 'cxs-e-art')}
-        <div class="cxs-e-in"><b>${it.kind === 'obs' ? obsTxt(it.give.obs) : esc(it.name)}</b>${it.bonus ? `<span class="cx-bonus">+${it.bonus} offertes</span>` : ''}
-        ${it.desc ? `<small>${esc(it.desc)}</small>` : ''}</div>
-        ${own ? `<span class="cxs-own">${icon('check')}Possédé</span>` : `<button class="btn primary small" data-cx="buy" data-id="${it.id}">${esc(it.price)}</button>`}</article>`; };
-    let obsI = 0;
-    return `<section class="cxs-wallet"><span class="cxs-w-n">${obsTxt(have)}</span><span class="small">${esc(OBS.name)} · seulement pour des cosmétiques</span>
-        <button class="btn small primary" data-cx="cat" data-v="obs">Obtenir</button></section>
-      ${cur !== 'obs' ? heroHTML : ''}
-      <div class="cxs-cats" role="tablist">${CATS2.map(([k, l]) => `<button class="cxs-cat ${k === cur ? 'on' : ''}" data-cx="cat" data-v="${k}" role="tab" aria-selected="${k === cur}">${l}</button>`).join('')}</div>
-      ${cur === 'obs' ? `<div class="cxs-euro" id="cx-euro">${SHOP.filter((it) => it.kind !== 'codex').map((it) => euro(it, it.kind === 'obs' ? obsI++ : 0)).join('')}</div>
-        <button class="btn ghost block" data-cx="restore">Restaurer mes achats</button>
-        <p class="small muted center">Pendant l'aperçu, tout achat en euros est simulé : aucun paiement. Rien ici ne rend tes créatures plus fortes.</p>`
-      : `<div class="cxs-grid ${cur === 'live' ? 'back' : cur}">${list.map(tile).join('')}</div>
-        ${cur === 'live' ? '<p class="small muted center">Des dos de cartes animés : ils s’animent partout où tes cartes se montrent face cachée (boosters, coffres, jeux).</p>' : ''}`}`;
+    const news = CATALOG.filter((x) => NEW.some((p) => x.id.startsWith(p)));
+    const rail = news.length ? `<section class="cxs-rail-s"><h3 class="cxs-sh">${icon('star')}Nouveautés</h3><div class="cxs-rail">${news.map((x) => tile(x, true)).join('')}</div></section>` : '';
+    const aisles = Object.keys(KINDS).filter((k) => inKind(k).length).map((k) => { const l = inKind(k), own = l.filter((x) => g.catalogOwned(x.id)).length;
+      const show = l.slice().sort((a, b) => RANKS.indexOf(rank(a)) - RANKS.indexOf(rank(b)))[0];
+      return `<button class="cxs-aisle-t k-${k}" data-cx="cat" data-v="${k}"><span class="cxs-at-pic">${picOf(show)}</span><b>${KINDS[k][0]}</b><small>${KINDS[k][2]}</small><span class="cxs-at-n">${own} / ${l.length}</span></button>`; }).join('');
+    return `${wallet}${heroHTML}${rail}
+      <h3 class="cxs-sh">${icon('chest')}Les rayons</h3><div class="cxs-aisles">${aisles}
+        <button class="cxs-aisle-t k-obs" data-cx="cat" data-v="obs"><span class="cxs-at-pic">${OBS_I}</span><b>${esc(OBS.name)}</b><small>Paquets et Pack du Fondateur</small></button></div>`;
   }
 
   function devTab() {
@@ -184,22 +238,23 @@ export default function codexScreen(app, root) {
   }
 
   /* v484 : aperçu « en vrai » d'un objet de l'Échoppe, avant de l'acheter */
-  function preview(id) {
-    const it = CATALOG.find((x) => x.id === id); if (!it) return;
+  function preview(id, ids = null) {
+    /* v636 : un objet de l'Échoppe (clé) ou une récompense du Codex (objet avec season) ; ids = le rayon, pour passer d'un objet à l'autre */
+    let it = typeof id === 'string' ? CATALOG.find((x) => x.id === id) : id; if (!it) return;
     const s = g.s, av = s.avatar && cat.get(s.avatar);
     const avImg = av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM;
     const mine = g.bestCards(6).filter(Boolean);
     let pick = 0, plain = false, bare = false, stopTilt = null;
-    const nm = it.name || ALL_FRAMES[it.id] || CODEX_BACKS[it.id] || PLATES[it.id] || SACHETS[it.id] || TAPIS[it.id] || FONDS[it.id] || (EMOTES[it.id] && `${EMOTES[it.id].name} · « ${EMOTES[it.id].text} »`) || (FINISHES[it.id] && `Finition ${FINISHES[it.id].name}`);
+    let nm = '';
     const body = () => {
       if (it.kind === 'frame') return `<p class="cx-pv-cap">Sur ton profil</p>
-        <div class="cx-pv-prof"><span class="avatar-big pf pf-${it.id}">${avImg}</span><div><b>${esc(s.name || 'Ton nom')}</b><span>${esc(s.title)}</span></div></div>
+        <div class="cx-pv-prof ${s.fond ? 'has-fond' : ''}"${fondStyle(s.fond)}><span class="avatar-big pf pf-${it.id}">${avImg}</span><div><b>${withPlate(s.plate, esc(myName()))}</b><span>${esc(s.title)}</span></div></div>
         <p class="cx-pv-cap">En haut de l'écran et au classement</p>
         <div class="cx-pv-bar"><span class="top-avatar pf pf-${it.id}">${avImg}</span><b>${esc(s.name || 'Toi')}</b><span class="cx-pv-rank"><i>1</i><span class="avatar-mini pf pf-${it.id}">${avImg}</span>${esc(s.name || 'Toi')}<em>étage ${g.descent().best || 0}</em></span></div>
         <p class="cx-pv-cap">À côté de ton cadre actuel</p>
         <div class="cx-pv-vs"><div><span class="avatar-mini pf pf-${s.frame}">${avImg}</span><small>Actuel</small></div><div><span class="avatar-mini pf pf-${it.id}">${avImg}</span><small>${esc(nm)}</small></div></div>`;
       if (it.kind === 'back') return `<p class="cx-pv-cap">Le dos de toutes tes cartes face cachée</p>
-        <div class="cx-pv-back"><img alt="" src="assets/backs/${it.id}.webp"></div>
+        <div class="cx-pv-back"><img class="cx-pv-bigback" alt="" src="assets/backs/${it.id}.webp"></div>
         <p class="cx-pv-cap">À l'ouverture d'un booster</p>
         <div class="cx-pv-fan">${[0, 1, 2].map(() => `<img alt="" src="assets/backs/${it.id}.webp">`).join('')}</div>
         <p class="cx-pv-cap">À côté de ton dos actuel</p>
@@ -221,9 +276,13 @@ export default function codexScreen(app, root) {
         <div class="cx-pv-packs">${['standard', 'premium'].map((t) => packHTML(t, null, { skin: it.id })).join('')}</div>
         <p class="cx-pv-cap">Au Pari des Boosters, ton adversaire voit le sachet de ton booster standard.</p>`;
       if (it.kind === 'mat') return `<p class="cx-pv-cap">Le plateau de tes Duels des Sceaux, contre l’Abysse et en ligne</p>
-        <img class="cx-pv-mat" alt="" src="assets/tapis/${it.id}.webp">`; /* v632 */
+        <div class="cx-pv-board"><div class="sc-board" data-pmat="${it.id}"><div class="sc-plate">${Array.from({ length: 9 }, (_, i) => { const c = [0, 4, 8].includes(i) ? mine[[0, 4, 8].indexOf(i)] : null; return `<span class="sc-cell ${i === 4 && !c ? 'heart' : ''}">${c ? `<img class="cx-pv-sc" alt="" src="${artUrl(c, { lite: true })}">` : ''}</span>`; }).join('')}</div></div></div>
+        <p class="cx-pv-cap">À côté de ton plateau actuel</p>
+        <div class="cx-pv-vs"><div><img class="cx-pv-sm" alt="" src="assets/${s.mat ? `tapis/${s.mat}` : 'sceaux/plateau'}.webp"><small>Actuel</small></div><div><img class="cx-pv-sm" alt="" src="assets/tapis/${it.id}.webp"><small>${esc(nm)}</small></div></div>`; /* v636 : un vrai plateau */
       if (it.kind === 'fond') return `<p class="cx-pv-cap">Sur ton profil, et chez les autres joueurs quand ils ouvrent ta fiche</p>
-        <div class="cx-pv-prof cx-pv-fond has-fond" ${fondStyle(it.id)}><span class="avatar-big pf pf-${s.frame}">${avImg}</span><div><b>${esc(myName())}</b><span>${esc(s.title)}</span></div></div>`; /* v632 */
+        <div class="cx-pv-prof cx-pv-fond has-fond" ${fondStyle(it.id)}><span class="avatar-big pf pf-${s.frame}">${avImg}</span><div><b>${withPlate(s.plate, esc(myName()))}</b><span>${esc(s.title)}</span><small>Niveau ${g.levelInfo().level}</small></div></div>
+        <p class="cx-pv-cap">À côté de ton fond actuel</p>
+        <div class="cx-pv-vs"><div><span class="cx-fondt ${s.fond ? 'has-fond' : 'bn-profile'}"${fondStyle(s.fond)}></span><small>Actuel</small></div><div><span class="cx-fondt has-fond"${fondStyle(it.id)}></span><small>${esc(nm)}</small></div></div>`; /* v632, v636 */
       if (it.kind === 'plate') return `<p class="cx-pv-cap">Sur ton profil</p>
         <div class="cx-pv-prof"><span class="avatar-big pf pf-${s.frame}">${avImg}</span><div><b><span class="np np-${it.id}">${esc(myName())}</span></b><span>${esc(s.title)}</span></div></div>
         <p class="cx-pv-cap">Au classement, vu par tous les joueurs</p>
@@ -236,12 +295,17 @@ export default function codexScreen(app, root) {
       if (it.give?.emotes) return `<p class="cx-pv-cap">Les réactions du lot</p><div class="re-grid">${it.give.emotes.map((k) => `<span class="re-pick">${emoteHTML(k)}</span>`).join('')}</div>`;
       return `<p class="cx-pv-cap">Les sept dos du lot</p><div class="cx-pv-grid">${it.give.backs.map((b) => `<figure><img alt="" src="assets/backs/${b}.webp"><figcaption>${esc((CODEX_BACKS[b] || b).replace('Dos du royaume ', ''))}</figcaption></figure>`).join('')}</div>`;
     };
-    const foot = () => { const own = g.catalogOwned(it.id), cost = g.catalogCost(it.id);
-      return `<div class="cx-pv-foot">${own ? `<span class="cx-badge on">${icon('check')}Déjà à toi</span>` : `<button class="btn primary cx-pv-buy" data-pv="buy">Acheter · ${obsTxt(cost)}</button><small class="muted">Tu as ${obsTxt(g.obs())}</small>`}</div>`; };
+    const foot = () => { const own = ownedOf(it);
+      if (it.season) return `<div class="cx-pv-foot">${own ? (wearable(it) && !worn(it) ? `<button class="btn primary cx-pv-buy" data-pv="wear">${icon('check')}Équiper</button>` : `<span class="cx-badge on">${icon('check')}${worn(it) ? 'Équipé' : 'Déjà à toi'}</span>`) : `<span class="cx-badge">${icon('star')}Voie enluminée · palier ${it.tier}</span><small class="muted">Introuvable à l’Échoppe</small>`}</div>`;
+      const cost = g.catalogCost(it.id);
+      return `<div class="cx-pv-foot">${own ? (wearable(it) && !worn(it) ? `<button class="btn primary cx-pv-buy" data-pv="wear">${icon('check')}Équiper</button>` : `<span class="cx-badge on">${icon('check')}${worn(it) ? 'Équipé' : 'Déjà à toi'}</span>`) : `<button class="btn primary cx-pv-buy" data-pv="buy">Acheter · ${obsTxt(cost)}</button><small class="muted">Tu as ${obsTxt(g.obs())}</small>`}</div>`; };
     const sh = openSheet('', { label: 'Aperçu', full: true, cls: 'cx-pv', onClose: () => stopTilt?.() });
     const paint = () => {
       stopTilt?.();
-      sh.setContent(`<h2 class="center cx-pv-title">${esc(nm)}</h2>${it.desc ? `<p class="small muted center">${esc(it.desc)}</p>` : ''}${body()}${foot()}`);
+      nm = nameOf(it);
+      const r = it.season ? null : rank(it), at = ids ? ids.indexOf(it.id) : -1;
+      const nav = at >= 0 && ids.length > 1 ? `<button class="cx-pv-nav prev" data-pv="nav" data-d="-1" aria-label="Précédent">${icon('prev')}</button><button class="cx-pv-nav next" data-pv="nav" data-d="1" aria-label="Suivant">${icon('next')}</button>` : '';
+      sh.setContent(`<header class="cx-pv-head ${r ? `r-${r}` : 'r-season'}">${nav}<small class="cx-kick">${KINDS[kindOf(it)]?.[1] || ''}${r ? ` · <span class="cx-pv-rk">${RANK[r]}</span>` : ' · <span class="cx-pv-rk">Codex enluminé</span>'}</small><h2 class="cx-pv-title">${esc(nm)}</h2>${at >= 0 && ids.length > 1 ? `<small class="cx-pv-pos">${at + 1} / ${ids.length}</small>` : ''}</header>${it.desc ? `<p class="small muted center">${esc(it.desc)}</p>` : ''}${body()}${foot()}`);
       const dc = sh.body.querySelector('.cx-pvf-card'); stopTilt = dc ? enableTilt(dc, { reduced: app.reduced?.() }) : null;
       if (bare) dc?.querySelector('.tcg')?.classList.add('art-only');
     };
@@ -261,6 +325,8 @@ export default function codexScreen(app, root) {
       if (b.dataset.pv === 'pick') { pick = +b.dataset.i; app.sfx.tap?.(); paint(); sh.el.scrollTo?.({ top: 0, behavior: 'smooth' }); }
       if (b.dataset.pv === 'plain' || b.dataset.pv === 'dress') { plain = b.dataset.pv === 'plain'; app.sfx.tap?.(); paint(); }
       if (b.dataset.pv === 'buy') { try { if (await buy(it.id)) { paint(); app.chrome?.(); draw(); } } catch (err) { toast(esc(err.message), { kind: 'error' }); } }
+      if (b.dataset.pv === 'wear') { wear(it); app.sfx.tap?.(); toast(t('{name} : équipé.', { name: esc(tx(nm)) }), { kind: 'success', icon: 'check' }); paint(); draw(); }
+      if (b.dataset.pv === 'nav') { const at = ids.indexOf(it.id); it = CATALOG.find((x) => x.id === ids[(at + +b.dataset.d + ids.length) % ids.length]) || it; pick = 0; plain = false; bare = false; app.sfx.tap?.(); paint(); sh.el.scrollTo?.({ top: 0 }); }
     });
   }
 
@@ -277,8 +343,13 @@ export default function codexScreen(app, root) {
         g.shopBuy(it.id); app.sfx.levelup?.(); toast(`${esc(it.name)} : acquis (achat simulé).`, { kind: 'success', icon: 'star' });
       }
       if (k === 'jump') { ui.cat = 'obs'; draw(); return; }
-      if (k === 'cat') { ui.cat = b.dataset.v; app.sfx.tap?.(); return draw(); }
-      if (k === 'see') { preview(b.dataset.id); return; } /* v484 */
+      if (k === 'cat') { ui.cat = b.dataset.v || null; ui.rar = null; app.sfx.tap?.(); draw(); root.querySelector('.cxs-wallet')?.scrollIntoView({ block: 'start' }); return; }
+      if (k === 'rar') { ui.rar = b.dataset.v || null; app.sfx.tap?.(); return draw(); } /* v636 */
+      if (k === 'hide') { ui.hideOwned = !ui.hideOwned; app.sfx.tap?.(); return draw(); }
+      if (k === 'see') { /* v484, v636 : on passe d'un objet à l'autre dans le rayon ouvert */
+        const it = CATALOG.find((x) => x.id === b.dataset.id); const ids = it ? [...root.querySelectorAll('[data-cx="see"]')].map((x) => x.dataset.id).filter((v, i, a) => a.indexOf(v) === i) : null;
+        preview(b.dataset.id, ids); return; }
+      if (k === 'seez') { const tr = tiersOf(g.codex().season)[+b.dataset.t - 1]; const r = tr?.prem; if (r) preview(seasonItem(r, +b.dataset.t)); return; } /* v636 : récompense du Codex */
       if (k === 'unlock') { /* v548 : 4,99 € (achat simulé tant que l'App Store n'est pas branché) */
         if (!(await confirmBox(`<b>Achat simulé</b> : ${esc(CODEX.premiumName)} (${esc(CODEX.price)}).<br>Aperçu Créateur : aucun paiement, la voie enluminée est simplement débloquée.`, { ok: 'Simuler l’achat' }))) return;
         g.shopBuy('codex'); app.sfx.levelup?.(); toast(`${esc(CODEX.premiumName)} : débloqué (achat simulé).`, { kind: 'success', icon: 'star' });
