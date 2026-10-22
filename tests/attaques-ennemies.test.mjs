@@ -38,5 +38,5 @@ test('fenêtres de défense : parade courte, toujours jouable', () => {
   const { st, foe, t } = setup('hit');
   const w = D.defenseWindow(st, foe.uid, t.uid);
   assert.ok(w.dodge >= 170 && w.dodge <= 270);
-  assert.ok(w.parry >= 36 && w.parry <= 60);
+  assert.ok(w.parry >= 12 && w.parry <= 60); /* v599 : trait blanc resserré (Labo des défenses) */
 });

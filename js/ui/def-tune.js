@@ -4,14 +4,15 @@
 // sur cet appareil (localStorage). Rien de tout ça ne change le moteur ni le serveur : seul le geste du joueur est jugé ici.
 
 export const DEF_DEFAULTS = {
-  durNormal: 900, durElite: 840, durBoss: 780,
+  /* v599 : réglages du propriétaire au Labo des défenses (22 octobre 2026) */
+  durNormal: 820, durElite: 800, durBoss: 780,
   multFast: 0.72, multSlow: 1.3, multFeint: 1.45, multBeat: 0.85,
   accelNormal: 1.7, accelElite: 1.3, accelEliteRand: 1.0,
   impactMin: 0.55, impactRand: 0.35,
-  dodgeMul: 1, floorNormal: 170, floorElite: 150, floorBoss: 130, dodgeMax: 270, eliteMinus: 15, bossMinus: 30,
-  parryRatio: 0.2, parryMinNormal: 45, parryMinElite: 40, parryMinBoss: 36,
+  dodgeMul: 1, floorNormal: 170, floorElite: 150, floorBoss: 130, dodgeMax: 270, eliteMinus: 50, bossMinus: 100,
+  parryRatio: 0.05, parryMinNormal: 30, parryMinElite: 20, parryMinBoss: 12,
   gapFirst: 650, gapFirstRand: 450, gapMin: 140, gapRand: 360, pause: 180,
-  moveAmp: 0.1, tolPx: 5, missShare: 0.33,
+  moveAmp: 0.1, tolPx: 2, missShare: 0.33,
 };
 
 // [clé, nom, explication, min, max, pas, unité]
