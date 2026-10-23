@@ -1887,3 +1887,12 @@ Cadre décoratif rectangulaire pour une case de récompense précieuse dans l'in
 ```
 Décor horizontal pour la récompense finale d'un pass de saison dans un jeu de cartes dark fantasy haut de gamme, vu de face, format paysage 16:9, sur fond noir pur. Au centre, un autel de pierre noire et d'or ancien, bas et large, vu de face, sur lequel tombe un rai de lumière dorée venu d'en haut ; au-dessus de l'autel, un grand espace VIDE et sombre, éclairé par la lumière (le jeu y posera lui-même les récompenses : une couronne de portrait et une carte) ; de part et d'autre, deux hautes chandelles de cire noire et de minces volutes de fumée dorée ; poussière d'or en suspension dans le rai de lumière ; les bords gauche et droit de l'image se fondent dans le noir. Couleurs : noir, or ancien, lumière dorée chaude, une touche de violet profond dans les ombres. STYLE : adulte, sombre et solennel, peinture numérique très détaillée comme une illustration de jeu de cartes premium ; surtout pas mignon, pas cartoon, pas de couleurs bonbon. Aucun objet posé sur l'autel, aucun personnage, aucun texte, aucune lettre, aucun chiffre, aucun logo, aucune couronne, aucune étoile, aucune rune, aucune croix, aucun symbole religieux ou politique, aucune marque d'un autre jeu.
 ```
+
+## Sachets de base refaits (23 octobre 2026, demande du propriétaire)
+Deux propositions par sachet ; le propriétaire choisit. À l'arrivée : nouveaux fichiers `assets/packs/standard3.webp` / `event3.webp` (`PACK_FILE` dans `js/screens/shop.js`), case du nom mesurée et texte centré comme pour `SKIN_BOX`.
+
+### 327. Booster standard, proposition A — « Le Sceau de cire »
+### 328. Booster standard, proposition B — « Le Grimoire d'obsidienne »
+### 329. Booster des Alliances, proposition A — « Les deux sceaux liés »
+### 330. Booster des Alliances, proposition B — « Le Pacte des deux royaumes »
+(Textes complets des prompts : donnés dans la conversation du 23 octobre 2026, identiques à ceux ci-dessous dans la réponse.)
