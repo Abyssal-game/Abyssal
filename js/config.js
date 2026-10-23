@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v681'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v682'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -65,7 +65,7 @@ export const LIVE_NATIVE = 618;
 export const LIVE_KEY = { x: 'o0UvHUxr62DiBrjrD6a-CyZiQfbXwx0UIdnVeOuWIyY', y: '4ekFbtWuvGMmUg3_23Kyf67F-F2AAdT2-gdjpJoR0vU' }; /* v619 : clé créée par le propriétaire sur son Mac le 22 octobre 2026 */
 // v680 : clés PUBLIQUES RevenueCat (paiements dans l'app ; faites pour être dans l'app). Tant qu'elles valent null,
 // les achats en euros restent fermés. La clé SECRÈTE n'est jamais ici : secret REVENUECAT_SECRET de la fonction Supabase.
-export const IAP_KEY = { ios: null, android: null };
+export const IAP_KEY = { ios: 'appl_MDPGtxYAssEAbwJfuGfKeZqbjeM', android: null };
 export const FINAL_FLOOR = 100; // v394 : le fond de la Descente (pour l'instant)
 
 // Chance (en %) qu'une carte tirée sorte dans chaque finition (×2 dans un booster premium).
