@@ -1,7 +1,7 @@
 // v421 : l'histoire de la Descente, chapitre par chapitre (un récit au début de chaque chapitre, et l'épilogue à l'étage 100).
 // Le fil : le Bestiaire interdit a été déchiré ; ses chapitres sont tombés dans l'Abysse, et chacun a réveillé son gardien.
 // Le joueur descend refermer les chapitres un à un, jusqu'à ce qui attend au fond.
-export const PROLOGUE = 'Le Bestiaire interdit a été écrit par les premiers Scelleurs pour enfermer ce qui ne devait plus marcher sous le ciel. Une nuit, quelqu’un l’a déchiré. Ses pages se sont envolées dans les boosters scellés, et ses vingt chapitres sont tombés dans l’Abysse. Tu es le dernier à savoir lire les sceaux : descends, et referme-les.';
+export const PROLOGUE = 'Les sept royaumes ont forgé le Bestiaire interdit pour enfermer ce qui ne devait plus marcher sous le ciel, et sept gardiens, un par royaume, l’ont scellé : ce furent les premiers Scelleurs. Une nuit, quelqu’un l’a déchiré. Ses pages se sont envolées dans les boosters scellés, et ses vingt chapitres sont tombés dans l’Abysse. Tu es le dernier à savoir lire les sceaux : descends, et referme-les.';
 
 export const CHAPTER_STORY = [
   null,
@@ -14,7 +14,7 @@ export const CHAPTER_STORY = [
   { title: 'Le tribunal des cloches', text: 'Une cloche sonne à chaque marche que tu descends. On juge ici ceux qui sont tombés dans l’Abysse, et le verdict est toujours le même. Le Bourreau n’a jamais lu le chapitre qui le concerne : il ne sait pas qu’il en est le prisonnier.' },
   { title: 'Les eaux qui chantent', text: 'L’eau noire monte jusqu’aux chevilles, puis jusqu’aux genoux. Elle chante avec les voix de tous les noyés de l’ancienne mer. Le chapitre qui les berçait s’est mouillé, et ils se sont réveillés en chœur.' },
   { title: 'La forge des captifs', text: 'Chaque coup d’enclume fait trembler la page que tu tiens. Ici, un seigneur forge des chaînes pour tout ce qui a voulu fuir l’Abysse. Celles des premiers Scelleurs pendent encore au plafond.' },
-  { title: 'Le temps arrêté', text: 'Mi-chemin. Les aiguilles des horloges reculent quand tu avances. Le gardien de ce chapitre a volé du temps aux Scelleurs, assez pour les voir vieillir et mourir. Il en a encore en réserve, et il compte bien s’en servir.' },
+  { title: 'Le temps arrêté', text: 'Mi-chemin. Les aiguilles des horloges reculent quand tu avances. Le gardien de ce chapitre a volé du temps aux Scelleurs, assez pour les voir vieillir et mourir, et il en a encore en réserve. Sur son établi traîne une page pliée en quatre, d’un vélin qui ne ressemble à aucun autre : il la cache dès que tu approches.' },
   { title: 'Le palais des reflets', text: 'Tu te vois partout, sauf là où tu es. Une sorcière a fait de chaque miroir une porte, et de chaque reflet un témoin. Frappe-la, et c’est toi qui sentiras le coup.' },
   { title: 'Les cendres des premiers Scelleurs', text: 'Le sol est couvert de cendres tièdes. Ce sont celles des premiers Scelleurs, qui ont brûlé leurs propres corps pour sceller ce chapitre. Quelque chose s’est levé de leur bûcher, et il durcit à chaque coup qu’on lui porte.' },
   { title: 'La ville qui tousse', text: 'Une cité entière dort sous la brume grise, et ses habitants toussent dans leur sommeil. La Peste ne tue pas : elle voyage. Le chapitre l’avait enfermée dans une seule page ; elle en a maintenant mille.' },
@@ -24,9 +24,9 @@ export const CHAPTER_STORY = [
   { title: 'Le jour et la nuit', text: 'Deux silhouettes liées par une chaîne de lumière se partagent cet étage : l’une n’existe que quand l’autre dort. Le chapitre les avait séparées en deux pages. Elles se sont retrouvées en tombant.' },
   { title: 'Le procès', text: 'Un tribunal de pierre t’attend, et le Juge connaît chaque sceau que tu as refermé. Il t’accuse d’avoir lu le Bestiaire interdit, ce qui est vrai. Il te reste à prouver que tu en es digne.' },
   { title: 'Les sept couronnes', text: 'L’avant-dernier chapitre ne devait jamais être lu. Une bête aux sept têtes y grandit à chaque instant où on la laisse vivre. Les Scelleurs l’avaient fait taire en arrachant sa page eux-mêmes. Quelqu’un l’a recollée.' },
-  { title: 'Ce qui attend au fond', text: 'Il n’y a plus d’étage. Plus de mur. Seulement le noir, et un œil immense qui s’ouvre lentement. Tu comprends enfin qui a déchiré le Bestiaire : l’Abysse voulait être lu.' },
+  { title: 'Ce qui attend au fond', text: 'Il n’y a plus d’étage. Plus de mur. Seulement le noir, et un œil immense qui s’ouvre lentement. Tu comprends enfin qui a déchiré le Bestiaire : l’Abysse voulait être lu. Mais un œil qui s’ouvre appartient toujours à quelqu’un.' },
 ];
 
-export const EPILOGUE = { title: 'La dernière page', text: 'L’œil se referme. Dans le silence, une page glisse jusqu’à toi : la toute première du Bestiaire interdit, celle que personne n’avait jamais vue. Sous les noms des premiers Scelleurs, une ligne d’encre fraîche s’écrit toute seule. C’est ton nom. Les vingt chapitres sont refermés… mais l’Abysse, lui, ne dort jamais vraiment.' };
+export const EPILOGUE = { title: 'La dernière page', text: 'L’œil se referme. Dans le silence, une page glisse jusqu’à toi : la toute première du Bestiaire interdit, celle que personne n’avait jamais vue. Sept noms y sont signés, ceux des premiers Scelleurs ; le septième a été gratté jusqu’au vélin. Dessous, une ligne d’encre fraîche s’écrit toute seule : c’est ton nom. Les vingt chapitres sont refermés. Mais au fond de la page blanche, quelque chose vient d’ouvrir les yeux.' };
 
 export const chapterStory = (ch) => CHAPTER_STORY[ch] || null;

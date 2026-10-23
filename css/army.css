@@ -6446,3 +6446,9 @@ button.v2-mini.fallen::after { content: ''; position: absolute; inset: 0; border
 @keyframes dfHeart { 0% { opacity: .55; } 12% { opacity: 1; } 24% { opacity: .65; } 36% { opacity: .95; } 60%, 100% { opacity: .55; } }
 @media (prefers-reduced-motion: reduce) { .dv.qte-on::after { animation: none; opacity: .85; } .stamp-host .dv-stamp::after { display: none; } }
 html.fx-light .dv.qte-on::after { animation: none; opacity: .85; }
+
+/* v673 : épilogue, l'ombre de celui qui rêve sous la page blanche (silhouette sans nom) */
+.st-dreamer { display: flex; align-items: center; gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(120, 220, 230, .18); }
+.st-dreamer img { width: 64px; aspect-ratio: 5 / 7; object-fit: cover; border-radius: 6px; filter: grayscale(1) brightness(.45) contrast(1.3); box-shadow: 0 0 18px rgba(80, 210, 220, .25); }
+.st-dreamer b { display: block; font-family: var(--font-display, serif); letter-spacing: .04em; }
+.st-dreamer small { color: rgba(140, 225, 230, .8); font-style: italic; }

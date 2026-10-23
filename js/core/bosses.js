@@ -96,7 +96,7 @@ export const BOSSES = {
     intro: 'Un tic-tac emplit la salle, trop lent, puis trop rapide. Au centre, des rouages dorés tournent autour d’une silhouette sans âge.',
     mechanic: 'Il annonce « Remonter le temps » : au tour suivant, il retrouve les PV qu’il avait à l’annonce (un quart de ses PV au plus). En phase 2, le temps s’emballe et il frappe deux fois de suite.',
     counter: 'Brise-le ou gèle-le pendant qu’il remonte le temps, ou garde tes plus gros coups pour juste après.',
-    story: 'Il a réglé l’horloge des Sceaux pour qu’elle ne sonne jamais la fin. Depuis, chaque seconde qui passe lui appartient un peu plus.',
+    story: 'Il a réglé l’horloge des Sceaux pour qu’elle ne sonne jamais la fin. Celui que tu affrontes n’est qu’un rêve de l’Abysse à son image : le vrai Horloger, l’un des sept qui posèrent la main sur la reliure, personne ne l’a revu depuis.',
     pattern: (phase, round) => (round % 3 === 1 ? 'wind' : phase === 2 ? 'tick2' : 'hit'),
   },
   // v387 : étages 55 à 75
@@ -178,7 +178,7 @@ export const BOSSES = {
     intro: 'Il n’y a plus de salle, plus de mur, plus de sol. Seulement un œil immense qui s’ouvre dans le noir, et qui te reconnaît.',
     mechanic: 'Le combat final, en trois phases. Phase 1 : il frappe et lance des déflagrations. Sous 2/3 de ses PV, il rappelle les pouvoirs des gardiens vaincus. Sous 1/3, il se déchaîne : la nuit dévore tes créatures à chaque tour et ses coups redoublent.',
     counter: 'Garde ta Ferveur et tes meilleures créatures pour la dernière phase, et brise-le pour retenir la nuit.',
-    story: 'Les Sceaux n’ont jamais enfermé des monstres. Ils enfermaient l’Abysse lui-même, et tous les gardiens n’étaient que ses rêves. Tu viens de le réveiller.',
+    story: 'Les Sceaux n’enfermaient pas seulement des monstres : ils gardaient l’Abysse endormi, et tous les gardiens n’étaient que ses rêves. Mais l’Abysse lui-même est le rêve de quelque chose qui dort sous toutes les fosses. Tu viens de le réveiller.',
     pattern: (phase, round) => (round % 3 === 0 ? 'channel' : 'hit'),
   },
 };
