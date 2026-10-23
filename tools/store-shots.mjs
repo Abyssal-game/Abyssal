@@ -40,7 +40,7 @@ async function open(mode = '') {
 }
 const wait = (ms) => p.waitForTimeout(ms);
 const go = async (hash, ms = 1800) => { await p.evaluate((h) => { location.hash = h; }, hash); await wait(ms); await p.evaluate(() => window.scrollTo(0, 0)); await wait(300); };
-const shot = async (name) => { await p.evaluate(() => document.querySelectorAll('.toast').forEach((t) => t.remove())); await wait(200); await p.screenshot({ path: path.join(OUT, `${name}.png`) }); console.log('capture', name); };
+const shot = async (name) => { await p.addStyleTag({ content: '.toast, .prog-chip { display: none !important; }' }); await p.evaluate(() => document.querySelectorAll('.toast, .prog-chip').forEach((t) => t.remove()) /* v678 : pastille des récompenses aussi */); await wait(200); await p.screenshot({ path: path.join(OUT, `${name}.png`) }); console.log('capture', name); };
 const tap = async (sel, ms = 1200) => { await p.locator(sel).first().click(); await wait(ms); };
 
 const only = process.argv.slice(2);

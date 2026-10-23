@@ -13,12 +13,12 @@ const url = (p) => pathToFileURL(path.join(ROOT, p)).href;
 
 // Ordre d'affichage dans les stores : la première image est la plus vue.
 export const SHOTS = [
-  ['carte', '500 créatures légendaires', 'Démons, dieux oubliés, dragons primordiaux…'],
-  ['ouverture', 'Ouvre tes boosters', 'Holo, Or, Cosmique : chaque carte peut surprendre'],
+  ['carte', '506 créatures légendaires', 'Démons, dieux oubliés, dragons primordiaux…'],
+  ['ouverture', 'Ouvre tes boosters', 'Six finitions, de l’Argentée à la Prismatique'],
   ['combat', 'Combats tactiques', '20 gardiens, esquive, parade et Brisure'],
   ['equipe', 'Forge ton équipe', '3 au combat, 2 en réserve, synergies de factions'],
-  ['collection', 'Complète le Bestiaire', '7 factions, 6 raretés, 17 ensembles'],
-  ['sceaux', 'Les Duels des Sceaux', 'Un second jeu de cartes, contre 8 rivaux'],
+  ['collection', 'Complète le Bestiaire', '7 royaumes, 6 raretés, 18 ensembles'],
+  ['sceaux', 'Les Duels des Sceaux', 'Et trois autres jeux, seul ou en ligne'],
   ['bestiaire', 'Un monde à découvrir', 'Chaque créature a son histoire'],
   ['accueil', 'Gratuit, sans publicité', 'Ta collection sauvegardée en ligne'],
 ];

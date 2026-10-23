@@ -48,12 +48,12 @@ Jeu de cartes dark fantasy
 
 ### Description courte (Google Play, 80 caractères au plus)
 ```
-Ouvre des boosters, collectionne 500 créatures et descends dans l'Abysse.
+Ouvre des boosters, collectionne 506 créatures et descends dans l'Abysse.
 ```
 
 ### Texte promotionnel (App Store, 170 caractères au plus, modifiable à tout moment)
 ```
-500 créatures, 20 gardiens et 100 étages jusqu'au fond de l'Abysse. Gratuit, sans publicité et sans achat : toutes les cartes se gagnent en jouant.
+506 créatures, 20 gardiens et 100 étages jusqu'au fond de l'Abysse. Gratuit, sans publicité et sans achat : toutes les cartes se gagnent en jouant.
 ```
 
 ### Mots-clés (App Store, 100 caractères au plus, séparés par des virgules, sans espace)
@@ -66,13 +66,13 @@ collection,booster,tcg,ccg,démons,monstres,mythologie,roguelite,stratégie,deck
 ```
 Avant le temps, il n'existait que le Néant. Puis quelque chose s'éveilla.
 
-ABYSSAL est un jeu de cartes à collectionner dark fantasy. Ouvre des boosters, rassemble 500 créatures tirées des mythes et des légendes, forme ton équipe et descends dans l'Abysse, étage après étage.
+ABYSSAL est un jeu de cartes à collectionner dark fantasy. Ouvre des boosters, rassemble 506 créatures tirées des mythes et des légendes, forme ton équipe et descends dans l'Abysse, étage après étage.
 
 COLLECTIONNE
-• 500 créatures illustrées : démons, anges déchus, dieux oubliés, dragons primordiaux, golems, spectres…
+• 506 créatures illustrées : démons, anges déchus, dieux oubliés, dragons primordiaux, golems, spectres…
 • 7 factions : Infernal, Abyssal, Céleste, Sauvage, Nécrotique, Primordial et Artificiel
-• 6 raretés, de Commune à Secrète, et des finitions Argentée, Enluminée et Abyssale
-• 17 ensembles à compléter : les Sept Péchés capitaux, la Goétie, les Dragons primordiaux…
+• 6 raretés, de Commune à Secrète, et six finitions, de l'Argentée à la Prismatique
+• 18 ensembles à compléter : les Sept Péchés capitaux, la Goétie, les Dragons primordiaux…
 • Les probabilités de chaque booster sont affichées, avec des garanties réelles
 
 COMBATS TACTIQUES
@@ -83,11 +83,13 @@ COMBATS TACTIQUES
 • Esquive et pare les coups au bon moment, brise la garde des gardiens
 • Rapporte des coffres, et le légendaire Booster de l'Abysse
 
-LA SALLE DES JEUX
+LE CERCLE DE L'ABYSSE
 • Les Duels des Sceaux : pose tes créatures sur le plateau et capture celles de l'adversaire, contre 8 rivaux
 • Les Enchères de Mammon : des enchères à l'aveugle où miser pareil ne rapporte rien
 • Le Pacte : tire des cartes, encore une… et arrête-toi avant de briser le pacte
 • Les Cryptes : un jeu de mémoire où chaque paire réveille le pouvoir de sa faction
+• Joue contre d'autres joueurs, en partie rapide ou à ton rythme, et défie tes amis
+• Le Pari des Boosters : ouvre tes boosters face à un autre joueur, le meilleur tirage remporte tout
 
 UN MONDE À DÉCOUVRIR
 • Un Bestiaire illustré, avec l'histoire de chaque créature
@@ -99,7 +101,7 @@ UN MONDE À DÉCOUVRIR
 • Aucun achat : toutes les cartes se gagnent en jouant
 • Un booster gratuit chaque jour
 • Partie sauvegardée en ligne sur ton compte, jouable aussi hors ligne
-• Ta collection sauvegardée en ligne avec ton compte, et les classements du monde entier
+• Des amis, des profils à visiter et des classements chaque mois
 
 Le Bestiaire interdit t'attend. Jusqu'où oseras-tu descendre ?
 ```
@@ -240,6 +242,7 @@ Aucun achat intégré, aucune publicité, aucun pistage.
 - [x] Retirer du jeu la phrase « sur invitation » (fait en v318).
 - [x] Refaire l'illustration de Pandore (ART-068), habillée (fait en v300).
 - [ ] Vérifier que le nom « ABYSSAL » n'est pas déjà pris sur les deux stores et en marque déposée (base INPI / EUIPO).
-- [ ] Créer les comptes développeur : Google (25 $ une fois), Apple (99 $ par an).
+- [x] Créer les comptes développeur : Google (25 $ une fois), Apple (99 $ par an).
+- [ ] Google : confirmer l'accès à un vrai téléphone Android (exigé par la Play Console) : **Android mis de côté le 23 octobre 2026** (le propriétaire n'a pas d'appareil Android). Version signée prête (`abyssal-play-store`).
 - [ ] Google, compte personnel récent : test fermé avec au moins 12 testeurs pendant 14 jours avant la publication.
 - [ ] Emballer l'application (Capacitor) et la tester sur un vrai téléphone Android et sur iPhone (TestFlight).
