@@ -46,9 +46,8 @@ export const CODEX_FRAMES = {
   'cx-lanternes': 'Cadre des lanternes d’âmes', 'cx-voile': 'Cadre du voile des trépassés',   /* v582 */ 'cx-vif-brasier': 'Cadre vivant du Brasier', 'cx-vif-givre': 'Cadre vivant du Givre éternel', 'cx-vif-abysse': 'Cadre vivant de l’Abysse', 'cx-vif-sang': 'Cadre vivant du Sang royal', 'cx-vif-foudre': 'Cadre vivant de la Foudre', 'cx-vif-ames': 'Cadre vivant des Âmes errantes', 'cx-vif-etoiles': 'Cadre vivant de la Voûte céleste', 'cx-vif-soleil-noir': 'Cadre vivant du Soleil noir', 'cx-vif-maree': 'Cadre vivant de la Marée luminescente', 'cx-vif-rouages': 'Cadre vivant des Rouages', /* v588 */ 'cx-vif-venin': 'Cadre vivant du Venin', 'cx-vif-chandelles': 'Cadre vivant des Chandelles', 'cx-vif-ambre': 'Cadre vivant de l’Ambre', 'cx-vif-obsidienne': 'Cadre vivant de l’Obsidienne', /* v591 */ 'cx-vif-meduse': 'Cadre vivant de la Méduse', 'cx-vif-serpent': 'Cadre vivant du Serpent', 'cx-vif-sablier': 'Cadre vivant du Sablier', 'cx-vif-araignee': 'Cadre vivant de la Veuve noire', 'cx-vif-loup': 'Cadre vivant du Loup de givre', 'cx-vif-lune': 'Cadre vivant de la Lune d’argent', 'cx-vif-orchidee': 'Cadre vivant de l’Orchidée', /* v585 */ 'cx-vif-dragon': 'Cadre vivant du Dragon', 'cx-vif-phenix': 'Cadre vivant du Phénix', 'cx-vif-amethyste': 'Cadre vivant de l’Améthyste', 'cx-vif-kraken': 'Cadre vivant du Kraken', 'cx-vif-nacre': 'Cadre vivant de la Nacre noire',   'cx-meute': 'Cadre de la meute',   'cx-eclipse': 'Cadre de l’Éclipse', 'cx-balance': 'Cadre du Juge des Sceaux',
   /* v480 */ 'cx-geode': 'Cadre de la géode d’améthyste', 'cx-pages': 'Cadre du grimoire déchiré', 'cx-corbeau': 'Cadre des corbeaux',   /* v550 : Saison I « La Nuit des Âmes » et Saison II « La Veillée de Noël » (images Gemini attendues) */
   'cx-citrouilles': 'Cadre des citrouilles sculptées', 'cx-ames': 'Couronne du Passeur des Âmes',
-  'cx-noel': 'Couronne de la Veillée',
   /* v547 : Saison III « L'Hiver éternel », exclusifs de la voie enluminée (images Gemini attendues) */
-  /* v565 : nouvelle image */ 'cx-hiver': 'Couronne de la Reine de l’Hiver',
+  /* v565 : nouvelle image */ 'cx-hiver': 'Couronne de la Matriarche du Givre',
   /* v552 : Saisons IV à XII (février à octobre 2027, images Gemini attendues) */
   'cx-coeur-maudit': 'Couronne du Cœur maudit',   /* v565 : remplacements après le tri du 21 octobre 2026 */   /* v532 */ 'cx-carnaval': 'Cadre du carnaval des ombres', 'cx-phalenes': 'Cadre des phalènes', };
 // Dos de cartes (v473 : images Gemini, assets/backs/<clé>.webp, tools/back-art.py ; choisis au Profil)
@@ -58,9 +57,9 @@ export const CODEX_BACKS = { /* v630 */ 'dos-vif-lanternes': 'Dos vivant des Lan
   'dos-necrotique': 'Dos du royaume Nécrotique', 'dos-primordial': 'Dos du royaume Primordial', 'dos-artificiel': 'Dos du royaume Artificiel',
   /* v480 : catalogue de l'Échoppe */ 'dos-ames': 'Dos de la Nuit des Âmes', 'dos-roses': 'Dos des cœurs maudits', 'dos-lune-sang': 'Dos de la Lune de sang', 'dos-devoreur': 'Dos du Dévoreur', 'dos-horloger': 'Dos de l’Horloger', 'dos-miroirs': 'Dos de la Sorcière des Miroirs', 'dos-jumeaux': 'Dos des Jumeaux du Crépuscule', 'dos-titan': 'Dos du Titan Endormi',
   /* v481 */ 'dos-abysse': 'Dos de L’Abysse', 'dos-mosaique': 'Dos de la mosaïque d’or', 'dos-encre': 'Dos de l’encre et du dragon', 'dos-alchimie': 'Dos de l’alchimiste', 'dos-reliquaire': 'Dos du reliquaire', 'dos-tapisserie': 'Dos de la chasse maudite', 'dos-vivant': 'Dos de chair vivante', 'dos-nebuleuse': 'Dos de la nébuleuse', 'dos-vitrail': 'Dos du vitrail de cathédrale',
-  /* v550 */ 'dos-cimetiere': 'Dos du cimetière des âmes', 'dos-presents': 'Dos des présents',
+  /* v550 */ 'dos-cimetiere': 'Dos du cimetière des âmes',
   /* v547 */   /* v552 */ 'dos-coeurs': 'Dos du cœur enchaîné',   /* v565 */ 'dos-passeur': 'Dos du Passeur', 'dos-aurore': 'Dos de l’aurore noire',
-  'dos-vif-veillee': 'Dos vivant de la Veillée', 'dos-vif-hiver': 'Dos vivant de l’Hiver', 'dos-vif-coeur': 'Dos vivant du Cœur maudit',
+  'dos-vif-hiver': 'Dos vivant de l’Hiver', 'dos-vif-coeur': 'Dos vivant du Cœur maudit',
   /* v569 : dos vivants de l'Échoppe (dos fixes animés par tools/back-anim.py, mode lueur) et palier 30 de la Saison I */
   'dos-vif-nebuleuse': 'Dos vivant de la nébuleuse', 'dos-vif-abysse': 'Dos vivant de L’Abysse', 'dos-vif-devoreur': 'Dos vivant du Dévoreur',
   'dos-vif-lune-sang': 'Dos vivant de la Lune de sang', 'dos-vif-coeur-mecanique': 'Dos vivant du cœur mécanique', 'dos-vif-passeur': 'Dos vivant du Passeur',
@@ -121,12 +120,12 @@ const FN = (k, cost) => ({ id: k, kind: 'finish', give: { finish: k }, cost });
    décor CSS en attendant) et réactions en ligne (pendant une partie contre un joueur ; portraits des arbitres des jeux) */
 // v565 : « dos vivants » (WebP animés, tools/back-anim.py) et habillages de booster (« sachets » : remplacent le visuel des boosters
 // standard, Alliances et premium ; les boosters de faction gardent le leur ; assets/packs/<clé>.webp, tools/sachet-art.py)
-export const LIVE_BACKS = ['dos-vif-lanternes', 'dos-vif-veillee', 'dos-vif-hiver', 'dos-vif-coeur', 'dos-vif-passeur', 'dos-vif-nebuleuse', 'dos-vif-abysse', 'dos-vif-devoreur', 'dos-vif-lune-sang', 'dos-vif-coeur-mecanique', 'dos-vif-forge', 'dos-vif-chandelles', 'dos-vif-orage', 'dos-vif-ame', 'dos-vif-oeil-or',
+export const LIVE_BACKS = ['dos-vif-lanternes', 'dos-vif-hiver', 'dos-vif-coeur', 'dos-vif-passeur', 'dos-vif-nebuleuse', 'dos-vif-abysse', 'dos-vif-devoreur', 'dos-vif-lune-sang', 'dos-vif-coeur-mecanique', 'dos-vif-forge', 'dos-vif-chandelles', 'dos-vif-orage', 'dos-vif-ame', 'dos-vif-oeil-or',
   /* v573 : tous les dos peints passent en dos vivants (même clé, fichier animé ; l'image fixe reste dans store/backs/<clé>-fixe.webp).
      dos-abysse, dos-coeur-mecanique, dos-devoreur, dos-eclipse, dos-lune-sang, dos-nebuleuse, dos-passeur montrent désormais l'animation de leur jumeau dos-vif-… (version fixe supprimée) */
   'dos-codex', 'dos-abime', 'dos-fondateur', 'dos-vif-fondateur', 'dos-infernal', 'dos-abyssal', 'dos-celeste', 'dos-sauvage', 'dos-necrotique', 'dos-primordial', 'dos-artificiel', 'dos-ames', 'dos-roses', 'dos-horloger', 'dos-miroirs', 'dos-jumeaux', 'dos-titan', 'dos-mosaique', 'dos-encre', 'dos-alchimie', 'dos-reliquaire', 'dos-tapisserie', 'dos-vivant', 'dos-vitrail', 'dos-cimetiere', 'dos-presents', 'dos-coeurs', 'dos-aurore', 'dos-carnaval', 'dos-phalene', 'dos-abysse', 'dos-coeur-mecanique', 'dos-devoreur', 'dos-lune-sang', 'dos-nebuleuse', 'dos-passeur', 'dos-vif-phenix', 'dos-vif-kraken', 'dos-vif-couronne', 'dos-vif-sablier', 'dos-vif-coeur-dragon', 'dos-vif-portail', 'dos-vif-destrier', 'dos-vif-hydre', 'dos-vif-orchidee', 'dos-vif-astrolabe', 'dos-vif-meduse', 'dos-vif-geode', 'dos-vif-corbeau', 'dos-vif-tresor', 'dos-vif-arbre', 'dos-vif-ailes', 'dos-vif-main-ombre', 'dos-vif-masque', 'dos-vif-perle', 'dos-vif-trone'];
 const BV = (k, cost) => ({ id: k, kind: 'back', live: true, give: { back: k }, cost }); /* v569 : dos vivant vendu à l'Échoppe */
-export const SACHETS = { /* v630 */ 'sachet-vif-ames': 'Sachet vivant de la Nuit des Âmes', 'sachet-veillee': 'Sachet de la Veillée', 'sachet-fondateur': 'Sachet du Fondateur', /* v638 */ 'sachet-vif-fondateur': 'Sachet vivant du Fondateur',
+export const SACHETS = { /* v630 */ 'sachet-vif-ames': 'Sachet vivant de la Nuit des Âmes', 'sachet-fondateur': 'Sachet du Fondateur', /* v638 */ 'sachet-vif-fondateur': 'Sachet vivant du Fondateur',
   /* v570 : sachets vendus à l'Échoppe */ 'sachet-braise': 'Sachet de braise', 'sachet-lune-sang': 'Sachet de la Lune de sang', 'sachet-souverain': 'Sachet du Souverain',
   /* v572 : sachets vivants */ 'sachet-vif-spectre': 'Sachet vivant du spectre', 'sachet-vif-eclipse': 'Sachet vivant de l’éclipse',
   /* v578 */ 'sachet-vif-phenix': 'Sachet vivant du Phénix', 'sachet-vif-kraken': 'Sachet vivant du Kraken', 'sachet-vif-tresor': 'Sachet vivant du Trésor', 'sachet-vif-dragon': 'Sachet vivant du Dragon', 'sachet-vif-astrolabe': 'Sachet vivant de l’Astrolabe', 'sachet-vif-givre-noir': 'Sachet vivant du Givre noir', 'sachet-vif-orage': 'Sachet vivant de l’Orage', 'sachet-vif-foret': 'Sachet vivant de la Forêt ancienne', /* v579 */ 'sachet-vif-necro': 'Sachet vivant du Spectre vert', 'sachet-vif-automate': 'Sachet vivant de l’Automate', 'sachet-vif-celeste': 'Sachet vivant des Ailes d’or', 'sachet-vif-infernal': 'Sachet vivant des Cornes ardentes', 'sachet-vif-empereur': 'Sachet vivant de l’Empereur', /* v588 */ 'sachet-vif-meduse': 'Sachet vivant de la Méduse', 'sachet-vif-corbeau': 'Sachet vivant du Corbeau', 'sachet-vif-sablier': 'Sachet vivant du Sablier', 'sachet-vif-araignee': 'Sachet vivant de la Veuve noire', 'sachet-vif-scorpion': 'Sachet vivant du Scorpion', 'sachet-vif-loup': 'Sachet vivant du Loup de givre', 'sachet-vif-lanterne': 'Sachet vivant de la Lanterne', 'sachet-vif-orchidee': 'Sachet vivant de l’Orchidée', 'sachet-vif-geode': 'Sachet vivant de la Géode', 'sachet-vif-coeur': 'Sachet vivant du Cœur de rubis' };
@@ -190,7 +189,8 @@ export const REMOVED_COSM = ['cx-encre', 'cx-sang', 'cx-or', 'cx-abime', 'cx-giv
   /* v593 : revue des doublons du 22 octobre 2026 (Mode Créateur) : 21 objets supprimés, plus dos-eclipse (même image que dos-vif-eclipse) */
   'cx-vif-corbeau', 'cx-vif-rubis', 'cx-vif-perle', 'cx-vif-foret', 'dos-vif-eclipse', 'dos-eclipse', 'dos-solstice', 'dos-carte-abysse', 'dos-art-deco', 'dos-tarot',
   'sachet-vif-sang', 'sachet-givre', 'sachet-vif-ecrin', 'sachet-obsidienne', 'sachet-vif-abysse', 'sachet-grimoire',
-  'pl-obsidienne', 'pl-grimoire', 'pl-ossuaire', 'pl-pierre', 'pl-eclipse', 'pl-abysse'];
+  'pl-obsidienne', 'pl-grimoire', 'pl-ossuaire', 'pl-pierre', 'pl-eclipse', 'pl-abysse',
+  /* v674 : plus de saison de Noël : ses objets sont supprimés */ 'cx-noel', 'dos-vif-veillee', 'sachet-veillee', 'dos-presents'];
 export const RETIRED_COSM = ['cx-fondateur', 'cx-os', 'cx-ruche', 'cx-lanternes', 'cx-voile', 'cx-eclipse', 'cx-balance', 'cx-geode', 'cx-pages', 'cx-corbeau', 'cx-carnaval', 'cx-phalenes',
   'fin-vitrail', 'fin-constellee', 'fin-ossuaire', 'fin-nacree', 'fin-runique', 'fin-scellee', 'fin-draconique', 'fin-feux-follets', 'fin-houx', 'fin-noel', 'fin-roses', 'fin-coeurs', 'fin-hiver'];
 /* v584 : l'Échoppe rangée (demande du propriétaire du 22 octobre 2026) : 20 objets par catégorie (cadres, dos, sachets,
@@ -243,7 +243,6 @@ export const CATALOG = [
 // plus les anciens objets du Codex gardés pour une saison future (encre, sang, enluminé, Abîme, dos du Codex).
 export const CODEX_ONLY = ['dos-codex',
   /* v550 */ 'cx-lanternes', 'cx-voile', 'cx-citrouilles', 'cx-ames', 'dos-ames', 'dos-cimetiere', 'fin-spectrale', 'fin-feux-follets', 'fin-ames',
-  'cx-noel', 'dos-presents', 'fin-houx', 'fin-noel',
   'cx-hiver', 'fin-givree', 'fin-aurore', 'fin-hiver'];
 
 // Paliers. v547 (retour du propriétaire : « on gagne énormément en gratuit et peu en payant ») : la voie gratuite donne un
@@ -268,69 +267,67 @@ function premOf({ titles, items, ultimate }) {
   out[CODEX.tiers] = ultimate;
   return out;
 }
+/* v674 (décision du propriétaire du 23 octobre 2026 : « des saisons qui ont vraiment un sens avec l'identité du jeu, pas de
+   fêtes de la vraie vie ») : plus de saison de Noël ni de Saint-Valentin. Chaque saison est une « veille » : depuis que le
+   Rêveur remue sous la Fosse (docs/canon.md), un royaume ou une figure du Bestiaire veille pour qu'il ne s'éveille pas.
+   Les clés restent (rien n'est encore sorti) ; seuls l'ordre, les dates et les noms changent. */
 export const SEASONS = [
   { key: 's1-ames', num: 'I', name: 'La Nuit des Âmes', starts: '2026-11-01', ends: '2026-11-30', art: 'assets/ui/cx-saison-ames.webp',
-    best: ['cx-ames', 'dos-vif-passeur', 'dos-vif-lanternes'], pitch: 'Une récompense à chaque palier : cadres vivants, dos de cartes, sachet, plaques, réactions et titres de la Nuit des Âmes, introuvables à l’Échoppe. Au palier 30, la Couronne du Passeur des Âmes et le Dos vivant du Passeur.',
+    best: ['cx-ames', 'dos-vif-passeur', 'dos-vif-lanternes'], pitch: 'Au royaume Nécrotique, les morts veillent, lanterne à la main, sur le passage des âmes. Une récompense à chaque palier : cadres vivants, dos de cartes, sachet, plaques, réactions et titres de la Nuit des Âmes, introuvables à l’Échoppe. Au palier 30, la Couronne du Passeur des Âmes et le Dos vivant du Passeur.',
     titles: ['Veilleur des tombes', 'Porteur de lanterne', 'Ami des feux follets', 'Voix des trépassés', 'Gardien des âmes perdues', 'Celui qui ne dort pas'],
     /* v630 : les 8 places vides remplies (paliers 3, 6, 8, 10, 14, 15, 18, 20, 24, 25) */
     items: [{ plate: 'pl-lanternes' }, { back: 'dos-ames' }, { emote: 're-feu-follet' }, { frame: 'cx-vif-feux-follets' }, { sachet: 'sachet-vif-ames' }, { back: 'dos-cimetiere' }, { emote: 're-passeur' }, { back: 'dos-vif-lanternes' }, { plate: 'pl-barque' }, { frame: 'cx-vif-brume' }],
     ultimate: { frame: 'cx-ames', back: 'dos-vif-passeur', title: 'Passeur des Âmes' } },
-  { key: 's2-noel', num: 'II', name: 'La Veillée de Noël', starts: '2026-12-01', ends: '2026-12-31', art: 'assets/ui/cx-saison-noel.webp',
-    best: ['cx-noel', 'dos-vif-veillee'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes et titres de la Veillée de Noël, introuvables à l’Échoppe. Au palier 30, la Couronne de la Veillée et le Dos vivant de la Veillée.',
-    titles: ['Porteur de chandelles', 'Chanteur de minuit', 'Gardien du houx', 'Hôte de la Veillée', 'Messager des présents', 'Cœur de braise'],
-    items: [null, null /* v593 : dos du solstice supprimé */, { sachet: 'sachet-veillee' }, null, null, null],
-    ultimate: { frame: 'cx-noel', back: 'dos-vif-veillee', title: 'Gardien de la Veillée' } },
-  { key: 's3-hiver', num: 'III', name: 'L’Hiver éternel', starts: '2027-01-01', ends: '2027-01-31', art: 'assets/ui/cx-saison1.webp',
-    best: ['cx-hiver', 'dos-vif-hiver', 'dos-aurore'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier 30, la Couronne de la Reine de l’Hiver et le Dos vivant de l’Hiver.',
-    titles: ['Veilleur du long hiver', 'Marcheur des neiges', 'Chasseur d’aurores', 'Cœur de givre', 'Voix du blizzard', 'Gardien du solstice'],
+  { key: 's3-hiver', num: 'II', name: 'L’Hiver éternel', starts: '2026-12-01', ends: '2026-12-31', art: 'assets/ui/cx-saison1.webp',
+    best: ['cx-hiver', 'dos-vif-hiver', 'dos-aurore'], pitch: 'La Matriarche du Givre a offert son royaume à l’hiver pour qu’il ne change jamais, et son froid tient les dormeurs éveillés. Une récompense à chaque palier : cadres, dos de cartes et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier 30, la Couronne de la Matriarche du Givre et le Dos vivant de l’Hiver.',
+    titles: ['Veilleur du long hiver', 'Marcheur des neiges', 'Chasseur d’aurores', 'Cœur de givre', 'Voix du blizzard', 'Sujet de la Matriarche'],
     items: [null, null, null, null, null, null, null, { back: 'dos-aurore' }, null],
     ultimate: { frame: 'cx-hiver', back: 'dos-vif-hiver', title: 'Souverain de l’Hiver éternel' } },
-  /* v552 : une saison par mois toute l'année (calendrier validé par le propriétaire le 21 octobre 2026) */
-  { key: 's4-coeurs', num: 'IV', name: 'Les Cœurs maudits', starts: '2027-02-01', ends: '2027-02-28', art: 'assets/ui/cx-saison-coeurs.webp',
-    best: ['cx-coeur-maudit', 'dos-vif-coeur', 'dos-coeurs'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes et titres des Cœurs maudits, introuvables à l’Échoppe. Au palier 30, la Couronne du Cœur maudit et le Dos vivant du Cœur maudit.',
-    titles: ['Amant des ombres', 'Porteur de roses noires', 'Cœur épineux', 'Âme liée', 'Briseur de serments', 'Soupir de l’Abysse'],
-    items: [null, { back: 'dos-roses' }, null, null, null, { back: 'dos-coeurs' }, null, null],
-    ultimate: { frame: 'cx-coeur-maudit', back: 'dos-vif-coeur', title: 'Souverain des Cœurs maudits' } },
-  { key: 's5-racines', num: 'V', name: 'Le Réveil des Racines', starts: '2027-03-01', ends: '2027-03-31', art: 'assets/ui/cx-saison-racines.webp',
-    best: [], pitch: 'Une récompense à chaque palier : cadres, dos de cartes et titres du Réveil des Racines, introuvables à l’Échoppe.',
-    titles: ['Graine de l’Abysse', 'Éveilleur de sève', 'Ami des mandragores', 'Voix de la forêt', 'Cœur de chêne', 'Racine profonde'],
-    items: [null, null, null, null, null, null],
-    ultimate: { title: 'Gardien des Racines' } },
-  { key: 's6-carnaval', num: 'VI', name: 'Le Carnaval des Ombres', starts: '2027-04-01', ends: '2027-04-30', art: 'assets/ui/cx-saison-carnaval.webp',
-    best: ['dos-carnaval'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes et titres du Carnaval des Ombres, introuvables à l’Échoppe.',
-    titles: ['Danseur masqué', 'Visage de velours', 'Rire dans l’ombre', 'Maître des confettis', 'Invité du bal', 'Celui qui change de visage'],
-    items: [null, { back: 'dos-carnaval' }, null, null, null, null],
-    ultimate: { title: 'Maître du Carnaval' } },
-  { key: 's7-lune', num: 'VII', name: 'Les Jardins de la Lune pâle', starts: '2027-05-01', ends: '2027-05-31', art: 'assets/ui/cx-saison-lune.webp',
-    best: [], pitch: 'Une récompense à chaque palier : cadres, dos de cartes et titres des Jardins de la Lune pâle, introuvables à l’Échoppe.',
-    titles: ['Cueilleur de rosée', 'Ami des phalènes', 'Promeneur nocturne', 'Fleur de minuit', 'Enfant de la lune', 'Gardien des jardins'],
-    items: [null, null, null, null, null, null],
-    ultimate: { title: 'Jardinier de la Lune pâle' } },
-  { key: 's8-solstice', num: 'VIII', name: 'Le Solstice de feu', starts: '2027-06-01', ends: '2027-06-30', art: 'assets/ui/cx-saison-solstice.webp',
-    best: [], pitch: 'Une récompense à chaque palier : cadres, dos de cartes et titres du Solstice de feu, introuvables à l’Échoppe.',
-    titles: ['Porteur de torche', 'Danseur des braises', 'Enfant du brasier', 'Cœur ardent', 'Flamme qui ne s’éteint pas', 'Ami du phénix'],
-    items: [null, null, null, null, null, null],
-    ultimate: { title: 'Enfant du Solstice' } },
-  { key: 's9-marees', num: 'IX', name: 'Les Marées noires', starts: '2027-07-01', ends: '2027-07-31', art: 'assets/ui/cx-saison-marees.webp',
-    best: [], pitch: 'Une récompense à chaque palier : cadres, dos de cartes et titres des Marées noires, introuvables à l’Échoppe.',
+  { key: 's9-marees', num: 'III', name: 'Les Marées noires', starts: '2027-01-01', ends: '2027-01-31', art: 'assets/ui/cx-saison-marees.webp',
+    best: [], pitch: 'Sous la Fosse, quelque chose rêve. Les Abyssaux veillent à ce que les marées le bercent encore. Une récompense à chaque palier : cadres, dos de cartes et titres des Marées noires, introuvables à l’Échoppe.',
     titles: ['Écume noire', 'Chanteur des profondeurs', 'Pêcheur de perles', 'Marcheur des abysses', 'Voix de la marée', 'Cœur de corail'],
     items: [null, null, null, null, null, null],
     ultimate: { title: 'Seigneur des Marées' } },
-  { key: 's10-forge', num: 'X', name: 'La Forge des Titans', starts: '2027-08-01', ends: '2027-08-31', art: 'assets/ui/cx-saison-forge.webp',
-    best: [], pitch: 'Une récompense à chaque palier : cadres, dos de cartes et titres de la Forge des Titans, introuvables à l’Échoppe.',
-    titles: ['Apprenti forgeron', 'Frappeur d’enclume', 'Main de fer', 'Souffle de la forge', 'Cœur d’acier', 'Marteau des Titans'],
+  { key: 's5-racines', num: 'IV', name: 'Le Réveil des Racines', starts: '2027-02-01', ends: '2027-02-28', art: 'assets/ui/cx-saison-racines.webp',
+    best: [], pitch: 'La Forêt Première ne dort que d’un œil : ses racines sentent ce qui remue sous la terre. Une récompense à chaque palier : cadres, dos de cartes et titres du Réveil des Racines, introuvables à l’Échoppe.',
+    titles: ['Graine de l’Abysse', 'Éveilleur de sève', 'Ami des mandragores', 'Voix de la forêt', 'Cœur de chêne', 'Racine profonde'],
     items: [null, null, null, null, null, null],
-    ultimate: { title: 'Forgeron des Titans' } },
-  { key: 's11-moissons', num: 'XI', name: 'Les Moissons d’ombre', starts: '2027-09-01', ends: '2027-09-30', art: 'assets/ui/cx-saison-moissons.webp',
-    best: [], pitch: 'Une récompense à chaque palier : cadres, dos de cartes et titres des Moissons d’ombre, introuvables à l’Échoppe.',
+    ultimate: { title: 'Gardien des Racines' } },
+  { key: 's6-carnaval', num: 'V', name: 'La Cour sans Visage', starts: '2027-03-01', ends: '2027-03-31', art: 'assets/ui/cx-saison-cour.webp',
+    best: ['dos-carnaval'], pitch: 'Les courtisans du Roi sans Visage dansent encore, et chaque masque cache un dormeur. Une récompense à chaque palier : cadres, dos de cartes et titres de la Cour sans Visage, introuvables à l’Échoppe.',
+    titles: ['Danseur masqué', 'Visage de velours', 'Rire dans l’ombre', 'Courtisan sans visage', 'Invité du bal', 'Celui qui change de visage'],
+    items: [null, { back: 'dos-carnaval' }, null, null, null, null],
+    ultimate: { title: 'Héritier du Roi sans Visage' } },
+  { key: 's4-coeurs', num: 'VI', name: 'Le Pacte de sang', starts: '2027-04-01', ends: '2027-04-30', art: 'assets/ui/cx-saison-pacte.webp',
+    best: ['cx-coeur-maudit', 'dos-vif-coeur', 'dos-coeurs'], pitch: 'À la Géhenne, on vend son cœur aux démons pour ne jamais s’endormir. Le prix se paie toujours. Une récompense à chaque palier : cadres, dos de cartes et titres du Pacte de sang, introuvables à l’Échoppe. Au palier 30, la Couronne du Cœur maudit et le Dos vivant du Cœur maudit.',
+    titles: ['Signataire de sang', 'Porteur de roses noires', 'Cœur épineux', 'Âme engagée', 'Briseur de serments', 'Créancier des démons'],
+    items: [null, { back: 'dos-roses' }, null, null, null, { back: 'dos-coeurs' }, null, null],
+    ultimate: { frame: 'cx-coeur-maudit', back: 'dos-vif-coeur', title: 'Souverain des Cœurs maudits' } },
+  { key: 's7-lune', num: 'VII', name: 'Les Jardins de la Lune pâle', starts: '2027-05-01', ends: '2027-05-31', art: 'assets/ui/cx-saison-lune.webp',
+    best: [], pitch: 'Dans les jardins des Sept Cieux, la lune pâle veille sur ceux qui refusent de dormir. Une récompense à chaque palier : cadres, dos de cartes et titres des Jardins de la Lune pâle, introuvables à l’Échoppe.',
+    titles: ['Cueilleur de rosée', 'Ami des phalènes', 'Promeneur nocturne', 'Fleur de minuit', 'Enfant de la lune', 'Gardien des jardins'],
+    items: [null, null, null, null, null, null],
+    ultimate: { title: 'Jardinier de la Lune pâle' } },
+  { key: 's10-forge', num: 'VIII', name: 'La Forge sans Maître', starts: '2027-06-01', ends: '2027-06-30', art: 'assets/ui/cx-saison-forge.webp',
+    best: [], pitch: 'Depuis que l’Horloger a disparu, la Forge n’a jamais cessé de produire. Personne ne sait pour qui. Une récompense à chaque palier : cadres, dos de cartes et titres de la Forge sans Maître, introuvables à l’Échoppe.',
+    titles: ['Apprenti forgeron', 'Frappeur d’enclume', 'Main de fer', 'Souffle de la forge', 'Cœur d’acier', 'Rouage infatigable'],
+    items: [null, null, null, null, null, null],
+    ultimate: { title: 'Héritier de la Forge' } },
+  { key: 's8-solstice', num: 'IX', name: 'Le Brasier des Titans', starts: '2027-07-01', ends: '2027-07-31', art: 'assets/ui/cx-saison-titans.webp',
+    best: [], pitch: 'Les Titans dorment sous les montagnes, et leur sommeil retient le Rêveur. Leur brasier, lui, ne s’éteint jamais. Une récompense à chaque palier : cadres, dos de cartes et titres du Brasier des Titans, introuvables à l’Échoppe.',
+    titles: ['Porteur de torche', 'Danseur des braises', 'Enfant du brasier', 'Cœur ardent', 'Flamme qui ne s’éteint pas', 'Ami du phénix'],
+    items: [null, null, null, null, null, null],
+    ultimate: { title: 'Cœur des Titans' } },
+  { key: 's11-moissons', num: 'X', name: 'Les Moissons d’ombre', starts: '2027-08-01', ends: '2027-08-31', art: 'assets/ui/cx-saison-moissons.webp',
+    best: [], pitch: 'Dans les champs d’ombre, on fauche ce que le Rêveur a semé dans les songes des vivants. Une récompense à chaque palier : cadres, dos de cartes et titres des Moissons d’ombre, introuvables à l’Échoppe.',
     titles: ['Glaneur d’ombres', 'Ami des corbeaux', 'Gardien des champs', 'Lame de la récolte', 'Veilleur des granges', 'Épouvantail vivant'],
     items: [null, null, null, null, null, null],
     ultimate: { title: 'Faucheur des Ombres' } },
-  { key: 's12-anniv', num: 'XII', name: 'L’Anniversaire de l’Abysse', starts: '2027-10-01', ends: '2027-10-31', art: 'assets/ui/cx-saison-anniv.webp',
-    best: ['dos-codex'], pitch: 'Une récompense à chaque palier : cadres, dos de cartes et titres de l’Anniversaire de l’Abysse, introuvables à l’Échoppe.',
-    titles: ['Lecteur du Bestiaire', 'Témoin de l’Abysse', 'Fidèle de la première heure', 'Gardien des pages', 'Plume de l’Abysse', 'Mémoire du Bestiaire'],
+  { key: 's12-anniv', num: 'XI', name: 'Les Pages perdues', starts: '2027-09-01', ends: '2027-09-30', art: 'assets/ui/cx-saison-pages.webp',
+    best: ['dos-codex'], pitch: 'Chaque page retrouvée rend un peu de sens au Bestiaire. Certaines n’auraient jamais dû être écrites. Une récompense à chaque palier : cadres, dos de cartes et titres des Pages perdues, introuvables à l’Échoppe.',
+    titles: ['Lecteur du Bestiaire', 'Témoin de l’Abysse', 'Chercheur de pages', 'Gardien des pages', 'Plume de l’Abysse', 'Mémoire du Bestiaire'],
     items: [null, { back: 'dos-codex' }, null, null, null, null, null, null],
-    ultimate: { title: 'Témoin de la première année' } },
+    ultimate: { title: 'Gardien des Pages perdues' } },
 ];
 for (const se of SEASONS) { /* v552 : tout objet d'une voie enluminée est exclusif au Codex */
   for (const r of [...se.items, se.ultimate]) for (const k of [r?.frame, r?.back, r?.finish, r?.sachet, r?.plate, r?.emote]) /* v630 : plaques et réactions aussi */ if (k && !CODEX_ONLY.includes(k)) CODEX_ONLY.push(k);

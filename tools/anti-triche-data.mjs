@@ -5,7 +5,8 @@ import { SEASONS, SHOP } from '../js/core/codex.js';
 
 // titres retirés du jeu mais encore dans des sauvegardes (jeux retirés, anciens noms)
 const RETIRED = ['Novice des Sceaux', 'Éveilleur des Sceaux', 'Maître des Masques', 'Prêtre des Trois Autels',
-  /* v547 : titres de l'ancienne ébauche du Codex */ 'Scribe de l’Abîme', 'Enlumineur', 'Gardien des pages', 'Maître du Codex', 'Lecteur assidu'];
+  /* v547 : titres de l'ancienne ébauche du Codex */ 'Scribe de l’Abîme', 'Enlumineur', 'Gardien des pages', 'Maître du Codex', 'Lecteur assidu',
+  /* v674 : titres des saisons de Noël et de la Saint-Valentin, et anciens noms de saisons */ 'Porteur de chandelles', 'Chanteur de minuit', 'Gardien du houx', 'Hôte de la Veillée', 'Messager des présents', 'Cœur de braise', 'Gardien de la Veillée', 'Gardien du solstice', 'Amant des ombres', 'Âme liée', 'Soupir de l’Abysse', 'Maître des confettis', 'Maître du Carnaval', 'Marteau des Titans', 'Forgeron des Titans', 'Enfant du Solstice', 'Fidèle de la première heure', 'Témoin de la première année'];
 
 export function allTitles() {
   const cat = loadCatalog(), out = new Set(unlockSources(cat).titles.map((t) => t.name));

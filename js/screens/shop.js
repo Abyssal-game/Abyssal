@@ -44,7 +44,7 @@ const PACK_FILE = { abysse: 'abysse2', standard: 'standard3', event: 'event4' };
 const SKINNED = ['standard', 'premium']; /* v587 : les Alliances gardent leur sachet */
 /* v643 : case sombre de chaque sachet mesurée sur l'image (haut, bas, gauche, droite en % du sachet ; 5e valeur : taille du texte si la case est petite) : le nom et « 3 cartes » y sont centrés */
 const SKIN_BOX = {
-  'sachet-vif-ames': [67.5, 87.5, 9, 9], 'sachet-veillee': [72, 89, 9.5, 9.5], 'sachet-fondateur': [71, 88.5, 6, 6], 'sachet-vif-fondateur': [66, 85.5, 33, 31],
+  'sachet-vif-ames': [67.5, 87.5, 9, 9], 'sachet-fondateur': [71, 88.5, 6, 6], 'sachet-vif-fondateur': [66, 85.5, 33, 31],
   'sachet-braise': [71.5, 88, 6, 6], 'sachet-lune-sang': [71, 85.8, 9.5, 9.5], 'sachet-souverain': [75.4, 85.4, 10.5, 10.5, .8],
   'sachet-vif-spectre': [68.2, 84.6, 10.5, 10], 'sachet-vif-eclipse': [71.3, 85.6, 9.5, 10], 'sachet-vif-phenix': [73.2, 89, 7, 7], 'sachet-vif-kraken': [72.3, 89, 7, 7], 'sachet-vif-tresor': [70.2, 86, 6, 6],
   'sachet-vif-dragon': [69.6, 87, 9, 9], 'sachet-vif-astrolabe': [67.4, 84.4, 10.5, 10], 'sachet-vif-givre-noir': [65.3, 82.9, 13.5, 13], 'sachet-vif-orage': [68.2, 83.6, 13.5, 13.5], 'sachet-vif-foret': [67, 85.6, 10.5, 10.5],

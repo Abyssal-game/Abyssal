@@ -128,20 +128,20 @@ test('codex : rien ne se gagne avant la saison, et les points d’avant sont rem
   assert.equal(g.codex().xp, 150, 'une seule remise à zéro');
 });
 
-test('codex v550 : trois saisons d’un mois, les récompenses oubliées sont données au changement de saison', () => {
+test('codex v550 : saisons d’un mois, les récompenses oubliées sont données au changement de saison', () => {
   const day = (m, d) => new Date(m <= 12 ? 2026 : 2027, (m - 1) % 12, d, 12);
   let now = day(11, 10);
   const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('cx3'), clock: () => now });
   assert.equal(g.codexSeason().key, 's1-ames');
   now = day(11, 30); assert.equal(g.codexSeason().key, 's1-ames');
-  now = day(12, 1); assert.equal(g.codexSeason().key, 's2-noel');
-  now = day(13, 31); assert.equal(g.codexSeason().key, 's3-hiver');
+  now = day(12, 1); assert.equal(g.codexSeason().key, 's3-hiver');
+  now = day(13, 31); assert.equal(g.codexSeason().key, 's9-marees');
   now = day(11, 10);
   g.codex(); g.codexXp(CODEX.xpPerTier * 6, 'win'); g.codex().premium = true;
   const shards = g.s.shards, frames = (g.s.backs || []).length; /* v562 : palier 6 = dos de la Nuit des Âmes */
   now = day(12, 1);
   const c = g.codex();
-  assert.equal(c.season, 's2-noel'); assert.equal(c.xp, 0); assert.ok(!c.premium, 'le Codex enluminé se rachète à chaque saison');
+  assert.equal(c.season, 's3-hiver'); assert.equal(c.xp, 0); assert.ok(!c.premium, 'le Codex enluminé se rachète à chaque saison');
   assert.ok(g.s.shards > shards, 'éclats des paliers gratuits donnés'); assert.ok((g.s.backs || []).length > frames, 'dos du palier 6 donné');
   assert.equal(g.s.codexPast.season, 's1-ames');
 });
