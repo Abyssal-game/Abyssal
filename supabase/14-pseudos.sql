@@ -61,5 +61,18 @@ begin
   return true;
 end $$;
 
+
+-- ABYSSAL:empreinte (écrite par tools/sql-stamp.mjs, ne pas modifier)
+create table if not exists public.sql_stamps (file text primary key, stamp text not null, at timestamptz not null default now());
+alter table public.sql_stamps enable row level security;
+revoke all on public.sql_stamps from public, anon, authenticated;
+insert into public.sql_stamps (file, stamp) values ('14', '7ca403d91fff') on conflict (file) do update set stamp = excluded.stamp, at = now();
+create or replace function public.sql_stamps() returns jsonb language sql stable security definer set search_path = public as $$
+  select coalesce(jsonb_object_agg(file, stamp), '{}'::jsonb) from public.sql_stamps;
+$$;
+revoke execute on function public.sql_stamps() from public, anon;
+grant execute on function public.sql_stamps() to authenticated;
+-- ABYSSAL:fin
+
 -- Vérification : doit afficher false, true, false, false, false.
 select public.pseudo_ok('Gros con') as gros_con, public.pseudo_ok('Faucon noir') as faucon, public.pseudo_ok('C0NN4RD') as leet, public.pseudo_ok('L3  G4rd1en') as reserve, public.pseudo_ok('B 1 T C H') as espaces;

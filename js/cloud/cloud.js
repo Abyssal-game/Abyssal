@@ -277,3 +277,17 @@ export function badgeHTML(key) {
   const b = BADGES[key];
   return b ? `<span class="pbadge ${b.cls}">${b.name}</span>` : '';
 }
+
+/* v678 : sonde sans effet pour l'écran « État du serveur » (Mode Créateur) : ne lève jamais d'erreur */
+export async function probe(path, body) {
+  try {
+    const res = await fetch(CLOUD.url + path, {
+      method: body === undefined ? 'GET' : 'POST',
+      headers: { apikey: CLOUD.key, 'Content-Type': 'application/json', ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}) },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+    const txt = await res.text(); let data = null;
+    try { data = txt ? JSON.parse(txt) : null; } catch (e) { data = txt; }
+    return { ok: res.ok, status: res.status, code: data?.code || '', msg: String(data?.message || data?.msg || ''), data };
+  } catch (e) { return { ok: false, status: 0, code: 'net', msg: 'Pas de connexion au serveur.' }; }
+}

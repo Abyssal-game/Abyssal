@@ -6,7 +6,8 @@ import { Game } from '../js/core/game.js';
 import { CODEX, CODEX_TIERS, SEASONS, SHOP, CATALOG, CODEX_ONLY, codexTier, claimable } from '../js/core/codex.js';
 
 const catalog = loadCatalog();
-const clock = () => new Date(2026, 10, 5, 12); // pendant la Saison I (Nuit des Âmes)
+const [Y0, M0] = SEASONS[0].starts.split('-').map(Number);
+const clock = () => new Date(Y0, M0 - 1, 5, 12); // pendant la Saison I (Nuit des Âmes)
 const mk = (c = clock) => new Game(catalog, new MemoryStorage(), { rng: rngFrom('cx'), clock: c });
 
 test('codex : points plafonnés au dernier palier, paliers atteints', () => {
@@ -110,8 +111,10 @@ test('v482 / v569 : finitions de prestige retirées de la vente, encore posées 
 });
 
 // v538 : la saison commence le 1er décembre ; les points d'avant ne comptent pas
-test('codex : rien ne se gagne avant la saison, et les points d’avant sont remis à zéro à son ouverture', () => {
-  let now = new Date(2026, 9, 20, 12);
+test('codex : rien ne se gagne avant la saison, et les points d’avant sont remis à zéro à son ouverture', async () => {
+  const { SEASONS: SE } = await import('../js/core/codex.js');
+  const [y, m] = SE[0].starts.split('-').map(Number);
+  let now = new Date(y, m - 2, 20, 12);
   const st = new MemoryStorage(), g = new Game(catalog, st, { rng: rngFrom('cx2'), clock: () => now });
   g.codexXp(300, 'win');
   assert.equal(g.codex().xp, 0, 'avant la saison');
@@ -119,8 +122,8 @@ test('codex : rien ne se gagne avant la saison, et les points d’avant sont rem
   g.codexXp(300, 'dev');
   assert.equal(g.codex().xp, 300, 'essai du Mode Créateur');
   g.codex().premium = true;
-  now = new Date(2026, 10, 1, 0, 5);
-  assert.equal(g.codex().xp, 0, 'remis à zéro le 1er novembre à minuit');
+  now = new Date(y, m - 1, 1, 0, 5);
+  assert.equal(g.codex().xp, 0, 'remis à zéro le premier jour de la saison à minuit');
   assert.ok(g.codex().premium, 'la voie enluminée reste');
   g.s.settings.dev = false;
   g.codexXp(150, 'win');
@@ -128,14 +131,16 @@ test('codex : rien ne se gagne avant la saison, et les points d’avant sont rem
   assert.equal(g.codex().xp, 150, 'une seule remise à zéro');
 });
 
-test('codex v550 : saisons d’un mois, les récompenses oubliées sont données au changement de saison', () => {
-  const day = (m, d) => new Date(m <= 12 ? 2026 : 2027, (m - 1) % 12, d, 12);
+test('codex v550 : saisons d’un mois, les récompenses oubliées sont données au changement de saison', async () => {
+  const { SEASONS: SE } = await import('../js/core/codex.js');
+  const [y0, m0] = SE[0].starts.split('-').map(Number);
+  const day = (m, d) => new Date(y0, m0 - 1 + (m - 11), d, 12); /* m = 11 : le mois de la Saison I */
   let now = day(11, 10);
   const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('cx3'), clock: () => now });
   assert.equal(g.codexSeason().key, 's1-ames');
-  now = day(11, 30); assert.equal(g.codexSeason().key, 's1-ames');
+  now = new Date(y0, m0 - 1, Number(SE[0].ends.slice(8)), 12); assert.equal(g.codexSeason().key, 's1-ames');
   now = day(12, 1); assert.equal(g.codexSeason().key, 's3-hiver');
-  now = day(13, 31); assert.equal(g.codexSeason().key, 's9-marees');
+  now = new Date(y0, m0 + 1, 15, 12); assert.equal(g.codexSeason().key, 's9-marees');
   now = day(11, 10);
   g.codex(); g.codexXp(CODEX.xpPerTier * 6, 'win'); g.codex().premium = true;
   const shards = g.s.shards, frames = (g.s.backs || []).length; /* v562 : palier 6 = dos de la Nuit des Âmes */

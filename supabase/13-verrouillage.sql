@@ -32,5 +32,18 @@ do $$ begin
   end if;
 end $$;
 
+
+-- ABYSSAL:empreinte (écrite par tools/sql-stamp.mjs, ne pas modifier)
+create table if not exists public.sql_stamps (file text primary key, stamp text not null, at timestamptz not null default now());
+alter table public.sql_stamps enable row level security;
+revoke all on public.sql_stamps from public, anon, authenticated;
+insert into public.sql_stamps (file, stamp) values ('13', '54feb2250611') on conflict (file) do update set stamp = excluded.stamp, at = now();
+create or replace function public.sql_stamps() returns jsonb language sql stable security definer set search_path = public as $$
+  select coalesce(jsonb_object_agg(file, stamp), '{}'::jsonb) from public.sql_stamps;
+$$;
+revoke execute on function public.sql_stamps() from public, anon;
+grant execute on function public.sql_stamps() to authenticated;
+-- ABYSSAL:fin
+
 -- Vérification
 select (select count(*) from public.parties where data is not null) as parties_sur_le_serveur, 'verrouillage fait' as etat;

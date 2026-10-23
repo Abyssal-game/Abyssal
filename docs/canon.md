@@ -42,16 +42,18 @@ Arc 1 « La Première Veille » : le Rêveur éveillé, les royaumes qui luttent
 ## Saisons du Codex (v674)
 Pas de fêtes de la vraie vie (ni Noël, ni Saint-Valentin…). Chaque saison est une **veille** : depuis que le Rêveur remue, un royaume ou une figure du Bestiaire veille pour qu'il ne s'éveille pas. L'accroche de chaque saison (`pitch`, `js/core/codex.js`) le dit en une phrase.
 
+<!-- v678 : dates calculées depuis CODEX.from (js/core/codex.js) ; changer ce seul mois décale tout. -->
+
 | N° | Clé | Saison | Royaume / figure | Dates |
 |---|---|---|---|---|
-| I | s1-ames | La Nuit des Âmes | Nécrotique (le Passeur) | nov. 2026 |
-| II | s3-hiver | L'Hiver éternel | la Matriarche du Givre | déc. 2026 |
-| III | s9-marees | Les Marées noires | Abyssal (la Fosse du Rêveur) | janv. 2027 |
-| IV | s5-racines | Le Réveil des Racines | Sauvage (la Forêt Première) | févr. 2027 |
-| V | s6-carnaval | La Cour sans Visage | le Roi sans Visage | mars 2027 |
-| VI | s4-coeurs | Le Pacte de sang | Infernal (la Géhenne) | avr. 2027 |
-| VII | s7-lune | Les Jardins de la Lune pâle | Céleste (les Sept Cieux) | mai 2027 |
-| VIII | s10-forge | La Forge Sans Maître | Artificiel (indice sur l'Horloger) | juin 2027 |
-| IX | s8-solstice | Le Brasier des Titans | Primordial (les Titans endormis) | juil. 2027 |
-| X | s11-moissons | Les Moissons d'ombre | les songes semés par le Rêveur | août 2027 |
-| XI | s12-anniv | Les Pages perdues | le Bestiaire lui-même | sept. 2027 |
+| I | s1-ames | La Nuit des Âmes | Nécrotique (le Passeur) | févr. 2027 |
+| II | s3-hiver | L'Hiver éternel | la Matriarche du Givre | mars 2027 |
+| III | s9-marees | Les Marées noires | Abyssal (la Fosse du Rêveur) | avr. 2027 |
+| IV | s5-racines | Le Réveil des Racines | Sauvage (la Forêt Première) | mai 2027 |
+| V | s6-carnaval | La Cour sans Visage | le Roi sans Visage | juin 2027 |
+| VI | s4-coeurs | Le Pacte de sang | Infernal (la Géhenne) | juil. 2027 |
+| VII | s7-lune | Les Jardins de la Lune pâle | Céleste (les Sept Cieux) | août 2027 |
+| VIII | s10-forge | La Forge Sans Maître | Artificiel (indice sur l'Horloger) | sept. 2027 |
+| IX | s8-solstice | Le Brasier des Titans | Primordial (les Titans endormis) | oct. 2027 |
+| X | s11-moissons | Les Moissons d'ombre | les songes semés par le Rêveur | nov. 2027 |
+| XI | s12-anniv | Les Pages perdues | le Bestiaire lui-même | déc. 2027 |

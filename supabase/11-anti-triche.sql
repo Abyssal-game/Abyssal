@@ -744,5 +744,18 @@ update public.profiles set title = null where title is not null and title not in
 update public.profiles set avatar = null where avatar is not null and avatar not in (select id from public.game_cards);
 update public.profiles set owned = least(owned, (select count(*) from public.game_cards)::int), level = greatest(1, least(level, 999));
 
+
+-- ABYSSAL:empreinte (écrite par tools/sql-stamp.mjs, ne pas modifier)
+create table if not exists public.sql_stamps (file text primary key, stamp text not null, at timestamptz not null default now());
+alter table public.sql_stamps enable row level security;
+revoke all on public.sql_stamps from public, anon, authenticated;
+insert into public.sql_stamps (file, stamp) values ('11', 'f5958fa88d48') on conflict (file) do update set stamp = excluded.stamp, at = now();
+create or replace function public.sql_stamps() returns jsonb language sql stable security definer set search_path = public as $$
+  select coalesce(jsonb_object_agg(file, stamp), '{}'::jsonb) from public.sql_stamps;
+$$;
+revoke execute on function public.sql_stamps() from public, anon;
+grant execute on function public.sql_stamps() to authenticated;
+-- ABYSSAL:fin
+
 -- Vérification
 select (select count(*) from public.game_titles) as titres, (select count(*) from public.game_cards) as cartes, 'contrôles prêts' as etat;

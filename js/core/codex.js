@@ -13,6 +13,9 @@ export const CODEX = {
   xpPerTier: 150,                        // points de Codex par palier (v550 : 150 pour une saison d'un mois : ≈ 18 jours pour un joueur très actif, ≈ un mois pour un joueur régulier)
   price: '4,99 €',                       // v548 : le Codex enluminé se paie en euros (décision du propriétaire), plus en obsidiennes
   store: 'com.abyssalgame.abyssal.codex',
+  /* v678 (décision du propriétaire du 23 octobre 2026) : les saisons commencent quand le vrai paiement marche.
+     Saison I = ce mois-là, puis une saison par mois dans l'ordre de SEASONS. Pour tout décaler : changer ce seul mois. */
+  from: '2027-02',
 };
 
 // ——— v474 : la monnaie payante, les Obsidiennes (achetées en euros, dépensées seulement en cosmétiques) ———
@@ -272,63 +275,70 @@ function premOf({ titles, items, ultimate }) {
    Rêveur remue sous la Fosse (docs/canon.md), un royaume ou une figure du Bestiaire veille pour qu'il ne s'éveille pas.
    Les clés restent (rien n'est encore sorti) ; seuls l'ordre, les dates et les noms changent. */
 export const SEASONS = [
-  { key: 's1-ames', num: 'I', name: 'La Nuit des Âmes', starts: '2026-11-01', ends: '2026-11-30', art: 'assets/ui/cx-saison-ames.webp',
+  { key: 's1-ames', num: 'I', name: 'La Nuit des Âmes', art: 'assets/ui/cx-saison-ames.webp',
     best: ['cx-ames', 'dos-vif-passeur', 'dos-vif-lanternes'], pitch: 'Au royaume Nécrotique, les morts veillent, lanterne à la main, sur le passage des âmes. Une récompense à chaque palier : cadres vivants, dos de cartes, sachet, plaques, réactions et titres de la Nuit des Âmes, introuvables à l’Échoppe. Au palier 30, la Couronne du Passeur des Âmes et le Dos vivant du Passeur.',
     titles: ['Veilleur des tombes', 'Porteur de lanterne', 'Ami des feux follets', 'Voix des trépassés', 'Gardien des âmes perdues', 'Celui qui ne dort pas'],
     /* v630 : les 8 places vides remplies (paliers 3, 6, 8, 10, 14, 15, 18, 20, 24, 25) */
     items: [{ plate: 'pl-lanternes' }, { back: 'dos-ames' }, { emote: 're-feu-follet' }, { frame: 'cx-vif-feux-follets' }, { sachet: 'sachet-vif-ames' }, { back: 'dos-cimetiere' }, { emote: 're-passeur' }, { back: 'dos-vif-lanternes' }, { plate: 'pl-barque' }, { frame: 'cx-vif-brume' }],
     ultimate: { frame: 'cx-ames', back: 'dos-vif-passeur', title: 'Passeur des Âmes' } },
-  { key: 's3-hiver', num: 'II', name: 'L’Hiver éternel', starts: '2026-12-01', ends: '2026-12-31', art: 'assets/ui/cx-saison1.webp',
+  { key: 's3-hiver', num: 'II', name: 'L’Hiver éternel', art: 'assets/ui/cx-saison1.webp',
     best: ['cx-hiver', 'dos-vif-hiver', 'dos-aurore'], pitch: 'La Matriarche du Givre a offert son royaume à l’hiver pour qu’il ne change jamais, et son froid tient les dormeurs éveillés. Une récompense à chaque palier : cadres, dos de cartes et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier 30, la Couronne de la Matriarche du Givre et le Dos vivant de l’Hiver.',
     titles: ['Veilleur du long hiver', 'Marcheur des neiges', 'Chasseur d’aurores', 'Cœur de givre', 'Voix du blizzard', 'Sujet de la Matriarche'],
     items: [null, null, null, null, null, null, null, { back: 'dos-aurore' }, null],
     ultimate: { frame: 'cx-hiver', back: 'dos-vif-hiver', title: 'Souverain de l’Hiver éternel' } },
-  { key: 's9-marees', num: 'III', name: 'Les Marées noires', starts: '2027-01-01', ends: '2027-01-31', art: 'assets/ui/cx-saison-marees.webp',
+  { key: 's9-marees', num: 'III', name: 'Les Marées noires', art: 'assets/ui/cx-saison-marees.webp',
     best: [], pitch: 'Sous la Fosse, quelque chose rêve. Les Abyssaux veillent à ce que les marées le bercent encore. Une récompense à chaque palier : cadres, dos de cartes et titres des Marées noires, introuvables à l’Échoppe.',
     titles: ['Écume noire', 'Chanteur des profondeurs', 'Pêcheur de perles', 'Marcheur des abysses', 'Voix de la marée', 'Cœur de corail'],
     items: [null, null, null, null, null, null],
     ultimate: { title: 'Seigneur des Marées' } },
-  { key: 's5-racines', num: 'IV', name: 'Le Réveil des Racines', starts: '2027-02-01', ends: '2027-02-28', art: 'assets/ui/cx-saison-racines.webp',
+  { key: 's5-racines', num: 'IV', name: 'Le Réveil des Racines', art: 'assets/ui/cx-saison-racines.webp',
     best: [], pitch: 'La Forêt Première ne dort que d’un œil : ses racines sentent ce qui remue sous la terre. Une récompense à chaque palier : cadres, dos de cartes et titres du Réveil des Racines, introuvables à l’Échoppe.',
     titles: ['Graine de l’Abysse', 'Éveilleur de sève', 'Ami des mandragores', 'Voix de la forêt', 'Cœur de chêne', 'Racine profonde'],
     items: [null, null, null, null, null, null],
     ultimate: { title: 'Gardien des Racines' } },
-  { key: 's6-carnaval', num: 'V', name: 'La Cour sans Visage', starts: '2027-03-01', ends: '2027-03-31', art: 'assets/ui/cx-saison-cour.webp',
+  { key: 's6-carnaval', num: 'V', name: 'La Cour sans Visage', art: 'assets/ui/cx-saison-cour.webp',
     best: ['dos-carnaval'], pitch: 'Les courtisans du Roi sans Visage dansent encore, et chaque masque cache un dormeur. Une récompense à chaque palier : cadres, dos de cartes et titres de la Cour sans Visage, introuvables à l’Échoppe.',
     titles: ['Danseur masqué', 'Visage de velours', 'Rire dans l’ombre', 'Courtisan sans visage', 'Invité du bal', 'Celui qui change de visage'],
     items: [null, { back: 'dos-carnaval' }, null, null, null, null],
     ultimate: { title: 'Héritier du Roi sans Visage' } },
-  { key: 's4-coeurs', num: 'VI', name: 'Le Pacte de sang', starts: '2027-04-01', ends: '2027-04-30', art: 'assets/ui/cx-saison-pacte.webp',
+  { key: 's4-coeurs', num: 'VI', name: 'Le Pacte de sang', art: 'assets/ui/cx-saison-pacte.webp',
     best: ['cx-coeur-maudit', 'dos-vif-coeur', 'dos-coeurs'], pitch: 'À la Géhenne, on vend son cœur aux démons pour ne jamais s’endormir. Le prix se paie toujours. Une récompense à chaque palier : cadres, dos de cartes et titres du Pacte de sang, introuvables à l’Échoppe. Au palier 30, la Couronne du Cœur maudit et le Dos vivant du Cœur maudit.',
     titles: ['Signataire de sang', 'Porteur de roses noires', 'Cœur épineux', 'Âme engagée', 'Briseur de serments', 'Créancier des démons'],
     items: [null, { back: 'dos-roses' }, null, null, null, { back: 'dos-coeurs' }, null, null],
     ultimate: { frame: 'cx-coeur-maudit', back: 'dos-vif-coeur', title: 'Souverain des Cœurs maudits' } },
-  { key: 's7-lune', num: 'VII', name: 'Les Jardins de la Lune pâle', starts: '2027-05-01', ends: '2027-05-31', art: 'assets/ui/cx-saison-lune.webp',
+  { key: 's7-lune', num: 'VII', name: 'Les Jardins de la Lune pâle', art: 'assets/ui/cx-saison-lune.webp',
     best: [], pitch: 'Dans les jardins des Sept Cieux, la lune pâle veille sur ceux qui refusent de dormir. Une récompense à chaque palier : cadres, dos de cartes et titres des Jardins de la Lune pâle, introuvables à l’Échoppe.',
     titles: ['Cueilleur de rosée', 'Ami des phalènes', 'Promeneur nocturne', 'Fleur de minuit', 'Enfant de la lune', 'Gardien des jardins'],
     items: [null, null, null, null, null, null],
     ultimate: { title: 'Jardinier de la Lune pâle' } },
-  { key: 's10-forge', num: 'VIII', name: 'La Forge Sans Maître', starts: '2027-06-01', ends: '2027-06-30', art: 'assets/ui/cx-saison-forge.webp',
+  { key: 's10-forge', num: 'VIII', name: 'La Forge Sans Maître', art: 'assets/ui/cx-saison-forge.webp',
     best: [], pitch: 'Depuis que l’Horloger a disparu, la Forge n’a jamais cessé de produire. Personne ne sait pour qui. Une récompense à chaque palier : cadres, dos de cartes et titres de la Forge Sans Maître, introuvables à l’Échoppe.',
     titles: ['Apprenti forgeron', 'Frappeur d’enclume', 'Main de fer', 'Souffle de la forge', 'Cœur d’acier', 'Rouage infatigable'],
     items: [null, null, null, null, null, null],
     ultimate: { title: 'Héritier de la Forge' } },
-  { key: 's8-solstice', num: 'IX', name: 'Le Brasier des Titans', starts: '2027-07-01', ends: '2027-07-31', art: 'assets/ui/cx-saison-titans.webp',
+  { key: 's8-solstice', num: 'IX', name: 'Le Brasier des Titans', art: 'assets/ui/cx-saison-titans.webp',
     best: [], pitch: 'Les Titans font semblant de dormir sous les montagnes : tant qu’ils veillent, le Rêveur ne s’éveille pas. Leur brasier, lui, ne s’éteint jamais. Une récompense à chaque palier : cadres, dos de cartes et titres du Brasier des Titans, introuvables à l’Échoppe.',
     titles: ['Porteur de torche', 'Danseur des braises', 'Enfant du brasier', 'Cœur ardent', 'Flamme qui ne s’éteint pas', 'Ami du phénix'],
     items: [null, null, null, null, null, null],
     ultimate: { title: 'Cœur des Titans' } },
-  { key: 's11-moissons', num: 'X', name: 'Les Moissons d’ombre', starts: '2027-08-01', ends: '2027-08-31', art: 'assets/ui/cx-saison-moissons.webp',
+  { key: 's11-moissons', num: 'X', name: 'Les Moissons d’ombre', art: 'assets/ui/cx-saison-moissons.webp',
     best: [], pitch: 'Dans les champs d’ombre, on fauche ce que le Rêveur a semé dans les songes des vivants. Une récompense à chaque palier : cadres, dos de cartes et titres des Moissons d’ombre, introuvables à l’Échoppe.',
     titles: ['Glaneur d’ombres', 'Ami des corbeaux', 'Gardien des champs', 'Lame de la récolte', 'Veilleur des granges', 'Épouvantail vivant'],
     items: [null, null, null, null, null, null],
     ultimate: { title: 'Faucheur des Ombres' } },
-  { key: 's12-anniv', num: 'XI', name: 'Les Pages perdues', starts: '2027-09-01', ends: '2027-09-30', art: 'assets/ui/cx-saison-pages.webp',
+  { key: 's12-anniv', num: 'XI', name: 'Les Pages perdues', art: 'assets/ui/cx-saison-pages.webp',
     best: ['dos-codex'], pitch: 'Chaque page retrouvée rend un peu de sens au Bestiaire. Certaines n’auraient jamais dû être écrites. Une récompense à chaque palier : cadres, dos de cartes et titres des Pages perdues, introuvables à l’Échoppe.',
     titles: ['Lecteur du Bestiaire', 'Témoin de l’Abysse', 'Chercheur de pages', 'Gardien des pages', 'Plume de l’Abysse', 'Mémoire du Bestiaire'],
     items: [null, { back: 'dos-codex' }, null, null, null, null, null, null],
     ultimate: { title: 'Gardien des Pages perdues' } },
 ];
+/* v678 : dates calculées depuis CODEX.from (un mois par saison, du 1er au dernier jour du mois) */
+SEASONS.forEach((se, i) => {
+  const [y0, m0] = CODEX.from.split('-').map(Number), m = m0 - 1 + i, y = y0 + Math.floor(m / 12), mo = (m % 12) + 1;
+  const last = [31, (y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][mo - 1];
+  const ym = `${y}-${String(mo).padStart(2, '0')}`;
+  se.starts = `${ym}-01`; se.ends = `${ym}-${last}`;
+});
 for (const se of SEASONS) { /* v552 : tout objet d'une voie enluminée est exclusif au Codex */
   for (const r of [...se.items, se.ultimate]) for (const k of [r?.frame, r?.back, r?.finish, r?.sachet, r?.plate, r?.emote]) /* v630 : plaques et réactions aussi */ if (k && !CODEX_ONLY.includes(k)) CODEX_ONLY.push(k);
   se.title = `Saison ${se.num} · ${se.name}`; se.prem = premOf(se); se.tiers = Array.from({ length: CODEX.tiers }, (_, i) => ({ tier: i + 1, free: FREE(i + 1), prem: se.prem[i + 1] || null })); }

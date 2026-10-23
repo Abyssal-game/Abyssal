@@ -8,6 +8,7 @@ import { openCosmeticsLab } from './cosmetics-lab.js';
 import { openCosmeticsReview } from './cosmetics-review.js'; /* v592 */
 import { openDefenseLab } from './defense-lab.js'; /* v594 */
 import { sfx, audioInfo } from '../ui/sound.js'; /* v622 */
+import { openServerState } from './server-state.js'; /* v678 */
 import { perfOn, setPerf, perfLog, perfClear, perfReport } from '../ui/perf.js'; /* v601 */
 
 const SNAP = 'abyssal.snapshot';
@@ -27,6 +28,10 @@ export function openCreator(app) {
       <h2>${icon('crown')} Mode Créateur</h2>
       <p class="small muted">Tous les pouvoirs sur ta partie. Tant que le mode est actif, tes scores de Descente ne sont pas envoyés au classement mondial, pour qu’il reste équitable.</p>
       <div class="cr-state small">${fmt(g.s.shards)} éclats · ${fmt(g.s.ash)} cendres · ${g.uniqueCount()}/${g.total()} créatures</div>
+
+      <section class="cr-sec"><h3>État du serveur</h3>
+        <p class="small muted">Vérifie ce qui est installé sur Supabase et dit quels fichiers SQL coller ou recoller.</p>
+        <div class="row gap wrap">${B('srv', 'Vérifier le serveur', 'gold')}</div></section>
 
       <section class="cr-sec"><h3>Sauvegarde de sécurité</h3>
         <p class="small muted">${snap ? `Copie de ta vraie partie du ${new Date(snap.t).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })} (${Object.keys(snap.s.collection || {}).length} créatures).` : 'Fais une copie de ta vraie partie avant de jouer les dieux : tu pourras la retrouver d’un geste.'}</p>
@@ -129,6 +134,7 @@ export function openCreator(app) {
       if (x === 'missions') g.devMissions();
       if (x === 'games') { g.s.devGames = !g.s.devGames; g.persist(); app.chrome?.(); }
       if (x === 'codex') { g.s.devCodex = !g.s.devCodex; g.persist(); app.chrome?.(); } /* v470 */
+      if (x === 'srv') { openServerState(); return; } /* v678 */
       if (x === 'lab') { openCosmeticsLab(app); return; } /* v556 */
       if (x === 'revue') { openCosmeticsReview(app); return; } /* v592 */
       if (x === 'deflab') { openDefenseLab(app); return; } /* v594 */
