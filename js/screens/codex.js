@@ -86,7 +86,7 @@ export default function codexScreen(app, root) {
     };
     const se = g.codexSeason(), best = se.best; /* v550 : les plus belles pièces de la saison */
     /* v636 : toutes les récompenses cosmétiques de la saison, en vitrine (toucher = aperçu) ; jours restants */
-    const loot = tiersOf(c.season).flatMap((x) => seasonItems(x.prem, x.tier).map((it) => ({ x, it }))).reverse(); ui.loot = loot.map((o) => o.it); /* v640 : tous les objets, palier 30 compris */
+    const loot = tiersOf(c.season).flatMap((x) => seasonItems(x.prem, x.tier).map((it) => ({ x, it }))); ui.loot = loot.map((o) => o.it); /* v640 : tous les objets, palier 30 compris */
     const left = Math.max(0, Math.ceil((new Date(`${se.ends}T23:59:59`) - g.clock()) / 864e5));
     const lootHTML = loot.length ? `<section class="cx-loot"><h3 class="cxs-sh">${icon('star')}À gagner cette saison <small>${loot.length} objets</small></h3>
       <div class="cxs-rail">${loot.map(({ x, it }) => `<button class="cxs-t wide r-season ${it.kind} ${ownedOf(it) ? 'own' : ''}" data-cx="seel" data-i="${loot.findIndex((o) => o.it === it)}"><span class="cxs-pic">${picOf(it)}</span><span class="cxs-rk">Palier ${x.tier}</span><b>${esc(nameOf(it))}</b>${ownedOf(it) ? `<span class="cxs-own">${icon('check')}Possédé</span>` : ''}</button>`).join('')}</div></section>` : '';
@@ -203,7 +203,7 @@ export default function codexScreen(app, root) {
   /* v637 : ce que contient le Pack du Fondateur (aperçu de chaque objet) */
   function founder() {
     const it = SHOP.find((x) => x.id === 'fondateur'), gv = it.give, own = g.shopOwned(it.id), s = g.s;
-    const av = s.avatar && cat.get(s.avatar), avImg = av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM;
+    const av = cat.get(g.shownAvatar()), avImg = av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM;
     const rows = [];
     if (gv.frame) rows.push(['Cadre de profil', ALL_FRAMES[gv.frame], `<span class="avatar-big pf pf-${gv.frame}">${avImg}</span>`]);
     if (gv.back) rows.push(['Dos de cartes', CODEX_BACKS[gv.back], `<span class="cx-fd-backs">${[0, 1, 2].map(() => `<img alt="" src="assets/backs/${gv.back}.webp">`).join('')}</span>`]);
@@ -262,7 +262,7 @@ export default function codexScreen(app, root) {
     let items = (list || [start]).map((x) => (typeof x === 'string' ? CATALOG.find((c) => c.id === x) : x)).filter(Boolean);
     let at = Math.max(0, items.findIndex((x) => x === start || (typeof start === 'string' ? x.id === start : x.id === start?.id && x.kind === start?.kind)));
     if (!items.length) return;
-    const s = g.s, av = s.avatar && cat.get(s.avatar);
+    const s = g.s, av = cat.get(g.shownAvatar());
     const avImg = av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM;
     const mine = g.bestCards(6).filter(Boolean);
     let mode = 'with', pick = 0, plain = false, bare = false, stopTilt = null;

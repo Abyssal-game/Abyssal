@@ -6196,3 +6196,10 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 .pv2-emote-scene .re-bubble { z-index: 1 !important; margin-left: 30px; }
 /* v641 : nouvelle image du Pack du Fondateur (Gemini, store/ui/ech-fondateur2-source.jpg) : tuile et haut de sa fenêtre */
 .cx-fd-hero { display: block; width: calc(100% + 32px); max-width: none; margin: -16px -16px 10px; aspect-ratio: 16 / 9; object-fit: cover; -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent); mask-image: linear-gradient(180deg, #000 70%, transparent); }
+/* v642 : fenêtre du Pack du Fondateur aérée (libellé au-dessus de l'objet), tuiles des tapis et fonds sans débordement */
+.cx-fd-row { gap: 12px; padding: 14px 10px 16px; }
+.cx-fd-v { padding: 14px 0 6px; }
+.cxs-t .cxs-pic { height: 92px; overflow: hidden; }
+.cxs-t .cx-mat { height: 86px; }
+.cxs-t { overflow: hidden; }
+.cxs-t .cxs-pr { margin-top: 2px; }

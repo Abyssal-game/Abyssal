@@ -41,7 +41,7 @@ export function pityHTML(g) {
 const PACK_FILE = { abysse: 'abysse2', standard: 'standard2', event: 'event2' };
 /* v565 : sachet choisi au Profil : remplace le visuel des boosters standard, Alliances et premium (pas ceux des factions) ;
    SKIN_TOP = haut de la plaque sombre où s'écrit le nom (mesuré sur chaque image) ; skin: null = visuel d'origine (l'adversaire au Pari) */
-const SKINNED = ['standard', 'premium'], /* v587 : les Alliances gardent leur sachet */ SKIN_TOP = { 'sachet-vif-ames': 68.5, /* v630 */ 'sachet-veillee': 70.5, 'sachet-fondateur': 69, 'sachet-vif-fondateur': 63.5, /* v638 */
+const SKINNED = ['standard', 'premium'], /* v587 : les Alliances gardent leur sachet */ SKIN_TOP = { 'sachet-vif-ames': 68.5, /* v630 */ 'sachet-veillee': 70.5, 'sachet-fondateur': 69, 'sachet-vif-fondateur': 70, /* v642 */ /* v638 */
   'sachet-braise': 71.5, 'sachet-lune-sang': 71, 'sachet-souverain': 75.5,
   'sachet-vif-spectre': 71, 'sachet-vif-eclipse': 71, /* v578 */ 'sachet-vif-phenix': 75, 'sachet-vif-kraken': 75, 'sachet-vif-tresor': 71,
   'sachet-vif-dragon': 69.7, 'sachet-vif-astrolabe': 67.3, 'sachet-vif-givre-noir': 66,
