@@ -374,7 +374,7 @@ export function questsFor(seasonKey, week) {
 export const SHOP = [
   ...OBS_PACKS.map((p) => ({ id: p.id, kind: 'obs', name: `${p.n + p.bonus} obsidiennes`, price: p.price, store: p.store, give: { obs: p.n + p.bonus }, bonus: p.bonus })),
   { id: 'codex', kind: 'codex', name: 'Codex enluminé', price: CODEX.price, store: CODEX.store, give: { codexPremium: true }, refund: 500 }, /* v680 : acheté deux fois pour une même saison : 500 obsidiennes à la place */ /* v548 : vendu dans l'onglet du Codex, une fois par saison */
-  { id: 'fondateur', name: 'Pack du Fondateur', price: '4,99 €', store: 'com.abyssalgame.abyssal.fondateur', once: true, refund: 600,
+  { id: 'fondateur', name: 'Pack du Fondateur', price: '4,99 €', store: 'com.abyssalgame.abyssal.pack.fondateur', once: true, refund: 600,
     /* v638 : pack refait (images Gemini « Premiers Gardiens ») : cadre, dos, sachet et plaque vivants, fond de profil */
     give: { title: 'Fondateur', frame: 'cx-vif-fondateur', back: 'dos-vif-fondateur', sachet: 'sachet-vif-fondateur', plate: 'pl-fondateur', fond: 'fp-fondateur', obs: 600 },
     desc: 'Vendu une seule fois. Le cadre, le dos de cartes, le sachet de booster et la plaque vivants du Fondateur, son fond de profil, le titre « Fondateur » (badge au classement) et 600 obsidiennes.' },

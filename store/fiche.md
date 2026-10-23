@@ -263,7 +263,7 @@ Paiement par **RevenueCat** (module `@revenuecat/purchases-capacitor`, `js/iap.j
 | `com.abyssalgame.abyssal.obsidiennes.1000` | Consommable | 1 300 obsidiennes | 9,99 € |
 | `com.abyssalgame.abyssal.obsidiennes.2000` | Consommable | 2 800 obsidiennes | 19,99 € |
 | `com.abyssalgame.abyssal.codex` | Consommable | Codex enluminé (une saison) | 4,99 € |
-| `com.abyssalgame.abyssal.fondateur` | Non consommable | Pack du Fondateur | 4,99 € |
+| `com.abyssalgame.abyssal.pack.fondateur` | Non consommable | Pack du Fondateur | 4,99 € |
 
 Le Codex enluminé est **consommable** : il se rachète à chaque saison ; le serveur le rattache à la saison en cours (acheté deux fois la même saison : 500 obsidiennes à la place).
 
