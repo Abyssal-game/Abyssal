@@ -25,7 +25,7 @@ export const OPS = {
   // Descente
   chooseOmen: { kind: 'sync' }, startRun: { kind: 'sync' }, startBattle: { kind: 'sync' }, choosePact: { kind: 'sync' }, chooseTalent: { kind: 'sync' },
   chooseReward: { kind: 'sync' }, cancelAltar: { kind: 'sync' }, chooseBlessing: { kind: 'sync' }, swapRunTeam: { kind: 'sync' }, nextFloor: { kind: 'sync' },
-  cancelRun: { kind: 'sync' }, abandonRun: { kind: 'sync' },
+  cancelRun: { kind: 'sync' }, abandonRun: { kind: 'sync' }, reviveFallen: { kind: 'sync' }, buyBraise: { kind: 'sync' }, /* v668 : Braises de vie */
   finishBattle: { kind: 'sync' },
   // coups d'un combat (Descente ou Épreuve) : rejoués un par un
   duelAct: { kind: 'sync' }, duelUlt: { kind: 'sync' }, duelPass: { kind: 'sync' }, duelNext: { kind: 'sync' }, duelEnemy: { kind: 'sync' }, duelEndEnemy: { kind: 'sync' },
@@ -79,7 +79,7 @@ function sessPrint(x) {
 export function digest(s) {
   const col = Object.keys(s.collection || {}).sort().map((id) => { const e = s.collection[id] || {}; return `${id}:${e.lv || 1}:${Object.entries(e.v || {}).filter(([, n]) => n > 0).map(([k, n]) => `${k}${n}`).sort().join('')}`; }).join(',');
   const parts = [s.shards, s.ash, s.obs || 0, s.xp, JSON.stringify(s.tickets || {}), JSON.stringify(s.chests || {}), col,
-    s.descent?.best || 0, s.descent?.run ? `${s.descent.run.floor}:${s.descent.run.phase}:${s.descent.run.shards}` : '-',
+    s.descent?.best || 0, s.braises || 0, Object.keys(s.fallen || {}).sort().join(','), /* v668 */ s.descent?.run ? `${s.descent.run.floor}:${s.descent.run.phase}:${s.descent.run.shards}` : '-',
     (s.titles || []).length, (s.frames || []).length, (s.backs || []).length, (s.sachets || []).length, (s.plates || []).length, (s.emotes || []).length, (s.mats || []).length, (s.fonds || []).length, (s.finishes || []).length, /* v574 : cosmétiques comptés */ Object.keys(s.achievements || {}).length, (s.missions?.list || []).map((x) => `${x.p}${x.claimed ? 'c' : ''}`).join(''),
     s.seedBase ?? '-', s.seedN || 0, ...SESS.map((p) => sessPrint(getPath(s, p)))];
   let h = 2166136261;

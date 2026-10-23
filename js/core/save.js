@@ -35,6 +35,9 @@ export function defaultSave(now = Date.now()) {
     showcase: [],         // jusqu'à 3 cartes mises en avant
     daily: { last: null, streak: 0 },
     freePack: { day: null }, // booster standard gratuit du jour (jour de la dernière ouverture)
+    fallen: {},           // v668 : créatures tombées dans la Descente, à ranimer par une Braise de vie (id -> 1)
+    braises: 0,           // v668 : Braises de vie gagnées ou achetées (la braise offerte du jour est dans braiseFree)
+    braiseFree: { day: null },
     stats: { boosters: 0, cards: 0, crafted: 0, daily: 0, ashEarned: 0, shardsSpent: 0, fused: 0, rituals: 0, ritualsWon: 0, pulls: { C: 0, PC: 0, R: 0, HR: 0, M: 0, S: 0 }, expHR: 0, gotHR: 0 },
     missions: { day: null, list: [], bonus: false }, // missions du jour
     best: [],             // plus belles ouvertures (score décroissant)
@@ -119,7 +122,7 @@ export function migrate(raw) {
   if (!Array.isArray(s.team)) s.team = [];
   if (!Array.isArray(s.teamPresets)) s.teamPresets = [];
   s.teamPresets = s.teamPresets.filter((p) => p && typeof p.name === 'string' && Array.isArray(p.ids)).slice(0, 4);
-  for (const k of ['items', 'bossWins', 'fervor', 'collection', 'deciphered', 'achievements', 'setsDone', 'factionsDone', 'hunt', 'fame', 'favs', 'cstats', 'cdone', 'bossesBeaten', 'relations', 'forms', 'lore']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
+  for (const k of ['items', 'bossWins', 'fervor', 'collection', 'deciphered', 'achievements', 'setsDone', 'factionsDone', 'hunt', 'fame', 'favs', 'cstats', 'cdone', 'bossesBeaten', 'relations', 'forms', 'lore', 'fallen', 'braiseFree']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
   delete s.salles; // les Salles Oubliées ont été supprimées (v206)
   for (const [k, sub] of [['sceaux', 'beaten'], ['masques', 'beaten'], ['encheres', 'beaten'], ['pacte', 'beaten'], ['cryptes', 'beaten'], ['encheres', 'feats'], ['pacte', 'feats'], ['cryptes', 'feats'], ['autels', 'beaten'], ['war', 'used'], ['war', 'claimed'], ['versus', 'done']]) if (!s[k][sub] || typeof s[k][sub] !== 'object') s[k][sub] = {};
   for (const [k, sub] of [['sceaux', 'history'], ['masques', 'history'], ['encheres', 'history'], ['pacte', 'history'], ['cryptes', 'history'], ['autels', 'history'], ['war', 'history']]) if (!Array.isArray(s[k][sub])) s[k][sub] = [];

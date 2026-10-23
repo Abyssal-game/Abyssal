@@ -99,6 +99,7 @@ test('première victoire : un cadeau une seule fois ; record d’étage signalé
   }
   assert.ok(wins >= 1); assert.equal(first, FIRST_WIN);
   assert.equal(g.s.descent.last.record, true, 'première expédition : record');
+  g.s.fallen = {}; /* v668 : les créatures tombées restent à terre */
   g.startRun(); g.endRun(false);
   assert.ok(!g.s.descent.last.record, 'expédition plus courte : pas de record');
 });

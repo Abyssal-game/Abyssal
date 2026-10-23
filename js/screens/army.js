@@ -16,6 +16,7 @@ import { TAGS, toName } from '../core/synergy.js';
 import { openPack } from './opening.js';
 import { openChestScene } from './chest-open.js';
 import { upgradeCard } from './furnace.js';
+import { openRevive } from '../ui/braise.js';
 
 // Étiquettes posées sur une carte : capacité, niveau, coût, attaque et PV
 export const armyBadges = (g, c) => {
@@ -122,7 +123,7 @@ export function teamScreen(app, root) {
   };
   const draw = () => {
     const team = g.team(), ult = g.ultimate(team), run = g.descent().run;
-    const slot = (i) => { const c = team[i] && cat.get(team[i]); return c ? `<div class="v2-slot full">${armyCard(g, c)}${run ? '' : `<span class="tm-ctl"><button class="tm-b" data-act="move" data-id="${c.id}" aria-label="${i < TEAM.active ? 'Mettre en réserve' : 'Envoyer au combat'}">${i < TEAM.active ? '▼' : '▲'}</button><button class="tm-b x" data-act="drop" data-id="${c.id}" aria-label="Retirer de l’équipe">✕</button></span>`}</div>` : `<div class="v2-slot"><span>+</span><small>${i < TEAM.active ? 'Combat' : 'Réserve'}</small></div>`; };
+    const slot = (i) => { const c = team[i] && cat.get(team[i]); return c ? `<div class="v2-slot full ${g.isFallen(c.id) ? 'fallen' : ''}">${armyCard(g, c)}${g.isFallen(c.id) ? `<img class="v2-skull" alt="" src="assets/icons/mort.webp">${run ? '' : `<button class="btn small tm-revive" data-act="revive" data-id="${c.id}">Ranimer</button>`}` : ''}${run ? '' : `<span class="tm-ctl"><button class="tm-b" data-act="move" data-id="${c.id}" aria-label="${i < TEAM.active ? 'Mettre en réserve' : 'Envoyer au combat'}">${i < TEAM.active ? '▼' : '▲'}</button><button class="tm-b x" data-act="drop" data-id="${c.id}" aria-label="Retirer de l’équipe">✕</button></span>`}</div>` : `<div class="v2-slot"><span>+</span><small>${i < TEAM.active ? 'Combat' : 'Réserve'}</small></div>`; };
     const owned = Object.keys(g.s.collection).map((id) => cat.get(id)).filter(Boolean);
     const RI = (r) => ['C', 'PC', 'R', 'HR', 'M', 'S'].indexOf(r);
     if (ui.role) { const keep = owned.filter((c) => roleOf(c) === ui.role); owned.length = 0; owned.push(...keep); } /* v422 : filtre par rôle */
@@ -156,6 +157,7 @@ export function teamScreen(app, root) {
   bindActions(root, {
     sort() { ui.sort = ui.sort === 'cost' ? 'power' : 'cost'; draw(); },
     rolef(el) { ui.role = el.dataset.v || null; draw(); },
+    revive(el) { openRevive(app, el.dataset.id, () => draw()); },
     quick(el) { if (toggleTeam(app, el.dataset.id)) draw(); },
     drop(el) { if (toggleTeam(app, el.dataset.id)) draw(); },
     move(el) {

@@ -10,7 +10,7 @@ export const CHALLENGES = [
 export const WEEK_DAYS = 5; // jours joués dans la semaine pour le coffre de la semaine
 export const FIRST_WIN = 50;
 export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par combat n'augmentent plus // éclats de la toute première victoire
-import { FINAL_FLOOR, BOOSTERS, FREE_PACK, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, sublimeObs, VARIANTS, FIN_ORDER } from '../config.js';
+import { FINAL_FLOOR, BOOSTERS, FREE_PACK, BRAISE, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, sublimeObs, VARIANTS, FIN_ORDER } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
 import { CODEX, CODEX_XP, SHOP, CATALOG, FREE_EMOTES, codexTier, seasonFor, tiersOf, freshCodex, pendingOf } from './codex.js';
@@ -190,6 +190,38 @@ export class Game {
     const stock = !fp.day ? Math.min(FREE_PACK.max, FREE_PACK.perDay * (1 + Math.max(0, dayGap(start, day)))) : fp.day === day ? (fp.left || 0) : Math.min(FREE_PACK.max, (fp.left || 0) + dayGap(fp.day, day) * FREE_PACK.perDay);
     const midnight = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1).getTime();
     return { stock, nextAt: stock ? null : midnight };
+  }
+
+  // v668 : Braises de vie. Une créature tombée dans la Descente reste à terre d'un chapitre à l'autre (s.fallen) ;
+  // une Braise de vie la ranime (entre deux chapitres). La braise offerte chaque jour se garde (BRAISE.max en réserve),
+  // comme le booster gratuit ; les autres viennent des gardiens (première victoire) ou des cendres.
+  isFallen(id) { return !!this.s.fallen?.[id]; }
+  fallenIds() { return Object.keys(this.s.fallen || {}).filter((id) => this.owns(id)); }
+  braises(now = this.clock().getTime()) {
+    const d = new Date(now), day = today(d), bf = this.s.braiseFree || {};
+    const start = this.s.createdAt ? today(new Date(this.s.createdAt)) : day;
+    const free = Math.max(0, !bf.day ? Math.min(BRAISE.max, BRAISE.perDay * (1 + Math.max(0, dayGap(start, day)))) : bf.day === day ? (bf.left || 0) : Math.min(BRAISE.max, (bf.left || 0) + Math.max(0, dayGap(bf.day, day)) * BRAISE.perDay));
+    const earned = Math.max(0, this.s.braises || 0);
+    return { free, earned, total: free + earned, nextAt: free < BRAISE.max ? new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1).getTime() : null };
+  }
+  reviveFallen(id) {
+    if (!this.s.fallen?.[id]) throw new Error('Cette créature n’est pas tombée.');
+    if (this.s.descent.run) throw new Error('Termine d’abord ton chapitre : une Braise de vie se pose entre deux chapitres.');
+    const b = this.braises();
+    if (b.free > 0) this.s.braiseFree = { day: today(this.clock()), left: b.free - 1 };
+    else if (b.earned > 0) this.s.braises = b.earned - 1;
+    else throw new Error('Tu n’as plus de Braise de vie.');
+    delete this.s.fallen[id];
+    this.s.stats.revived = (this.s.stats.revived || 0) + 1;
+    this.persist();
+    return this.braises();
+  }
+  buyBraise() {
+    if (this.s.ash < BRAISE.ash) throw new Error(`Il te faut ${BRAISE.ash} cendres.`);
+    this.s.ash -= BRAISE.ash;
+    this.s.braises = Math.max(0, this.s.braises || 0) + 1;
+    this.persist();
+    return this.braises();
   }
 
   canBuy(type) {
@@ -606,14 +638,14 @@ export class Game {
   welcomePending() { return this.uniqueCount() < TEAM.active && (this.s.tickets.standard || 0) > 0; }
   // Équipe suggérée : force, synergies et rôles complémentaires (synergy.js)
   suggestTeam() {
-    const owned = Object.keys(this.s.collection).map((id) => this.catalog.get(id)).filter(Boolean);
+    const owned = Object.keys(this.s.collection).filter((id) => !this.isFallen(id)).map((id) => this.catalog.get(id)).filter(Boolean); /* v668 */
     return suggestTeam(owned, (id) => this.cardLevel(id));
   }
   teamSynergies(ids = this.team()) { return teamSynergies(ids.map((id) => this.catalog.get(id)).filter(Boolean), (id) => this.cardLevel(id)); }
   // Complète l'équipe avec les meilleures cartes possédées
   autoTeam(keep = []) {
     const t = keep.slice(), size = TEAM.active + TEAM.reserve;
-    const cards = Object.keys(this.s.collection).map((id) => this.catalog.get(id)).filter((c) => c && !t.includes(c.id))
+    const cards = Object.keys(this.s.collection).map((id) => this.catalog.get(id)).filter((c) => c && !t.includes(c.id) && !this.isFallen(c.id)) /* v668 : jamais une créature à terre */
       .sort((a, b) => this.cardPower(b.id) - this.cardPower(a.id) || RI(b.rarity) - RI(a.rarity) || b.power - a.power); /* v495 : plus de budget, les plus fortes d'abord (rareté × niveau) */
     for (const c of cards) {
       if (t.length >= size) break;
@@ -761,7 +793,8 @@ export class Game {
   // Première victoire à cet étage (campagne : record ; Cauchemar : record du palier)
   firstClear(run, floor = run.floor) { return run.nightmare ? !this.nightFloors(run.nightTier || 1).includes(floor) : floor > (this.descent().best || 0); }
   floorReward(run, floor = run.floor) {
-    const r = floorFirstReward(floor), nt = nightTier(run);
+    const r = { ...floorFirstReward(floor) }, nt = nightTier(run);
+    if (floor % CHAPTER === 0) r.braises = chapterOf(floor) >= BRAISE.lateFrom ? BRAISE.bossLate : BRAISE.boss; /* v668 : Braises de vie du gardien */
     if (!nt) return r;
     const out = { ...r };
     if (r.shards) out.shards = Math.round(r.shards * nt.shards);
@@ -800,13 +833,14 @@ export class Game {
     if (d.run) throw new Error('Un chapitre est déjà en cours.');
     const team = this.team();
     if (team.length < TEAM.active) throw new Error(`Il faut au moins ${TEAM.active} créatures dans ton équipe.`);
+    if (team.filter((id) => !this.isFallen(id)).length < TEAM.active) throw new Error(`Il faut au moins ${TEAM.active} créatures debout dans ton équipe : ranime les autres avec une Braise de vie, ou remplace-les.`); /* v668 */
     const free = false; /* v406 : plus de torches, la campagne se joue librement */
     d.runs = (d.runs || 0) + 1;
     const ult = this.ultimate(team);
     d.run = {
       v: 3, day: d.day, floor: start, cleared: start - 1, start, phase: 'doors', cursed: false, free, nightmare: !!tier, nightTier: tier || undefined, blessings: [], altar: null,
       gauge: this.rule(d.day).key === 'lune' ? FERVOR_MAX - 2 : this.rule(d.day).key === 'reserve' ? 0 : FERVOR_START, ult: { key: ult.key, power: ult.power, card: ult.card },
-      team: team.map((id) => { const u = duelUnit(this.catalog.get(id), { level: this.cardLevel(id), form: this.formOf(id) }); return { id, hp: u.maxHp, maxHp: u.maxHp, fallen: false, form: this.formOf(id) }; }),
+      team: team.map((id) => { const u = duelUnit(this.catalog.get(id), { level: this.cardLevel(id), form: this.formOf(id) }); const dn = this.isFallen(id); return { id, hp: dn ? 0 : u.maxHp, maxHp: u.maxHp, fallen: dn, form: this.formOf(id) }; }).sort((a, b) => (a.fallen ? 1 : 0) - (b.fallen ? 1 : 0)), /* v668 : les créatures à terre restent à terre, derrière les autres */
       shards: 0, chests: [], kills: {}, bestBefore: d.best || 0, nightBefore: tier ? this.nightBest(tier) : undefined, minFloor: tier ? floorFloor(team.reduce((a, id) => a + this.cardLevel(id), 0) / team.length) : 1, /* v420 : campagne = force fixe par étage ; le plancher ne vaut plus qu'en Cauchemar */
     };
     // v334 : présage de départ, dès que le premier gardien est tombé
@@ -1586,6 +1620,7 @@ export class Game {
         const r = this.floorReward(run);
         if (r.shards) { this.s.shards += r.shards; this.s.stats.shardsEarned = (this.s.stats.shardsEarned || 0) + r.shards; }
         if (r.ash) { this.s.ash += r.ash; this.s.stats.ashEarned += r.ash; }
+        if (r.braises) { this.s.braises = Math.max(0, this.s.braises || 0) + r.braises; out.braises = r.braises; }
         for (const [c, n] of Object.entries(r.chests || {})) for (let i = 0; i < n; i++) { run.chests.push(c); out.chest = c; }
         out.first = r; this.codexXp(run.floor % 5 === 0 ? CODEX_XP.boss : CODEX_XP.floor, run.floor % 5 === 0 ? 'boss' : 'floor');
         const fl = (run.firstLoot ||= { shards: 0, ash: 0 }); fl.shards += r.shards || 0; fl.ash += r.ash || 0;
@@ -1610,7 +1645,7 @@ export class Game {
         if (summit) out.summit = true;
         out.summary = this.endRun(false);
         if (this.s.descent.grit?.ch === out.chapter) delete this.s.descent.grit;
-        Object.assign(out.summary, { chapterDone: out.chapter, summit: !!summit, report: out.report, abyss: !!out.abyss, abyssPack: !!out.abyssPack, free: !!run.free, boss: out.boss, bossChest: out.first ? out.chest : null });
+        Object.assign(out.summary, { chapterDone: out.chapter, summit: !!summit, report: out.report, abyss: !!out.abyss, abyssPack: !!out.abyssPack, free: !!run.free, boss: out.boss, bossChest: out.first ? out.chest : null, braises: out.braises || 0 });
         return out;
       }
       run.phase = 'reward';
@@ -1766,8 +1801,13 @@ export class Game {
     // v406 : plus de coffre de fin ni de perte : tout ce qui a été gagné est gardé ; une équipe tombée recommence le chapitre
     const shards = run.shards, chests = run.chests.slice();
     chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });
+    /* v668 : chapitre gagné : les créatures tombées restent à terre (une Braise de vie les ranime). Chapitre perdu ou abandonné :
+       il recommence et toute l'équipe repart debout (mesuré : avec les morts gardées après une défaite, il aurait fallu
+       ranimer 6 à 9 créatures par chapitre) */
+    const down = wiped ? [] : run.team.filter((m) => m.fallen).map((m) => m.id);
+    if (down.length) { const f = (this.s.fallen ||= {}); down.forEach((id) => { f[id] = 1; }); }
     this.s.shards += shards;
-    const summary = { wiped, floor: run.cleared, day: run.day, chests, shards, kills: run.kills, free: run.free, cursed: run.cursed, nightmare: !!run.nightmare, nightTier: run.nightmare ? run.nightTier || 1 : 0, start: run.start || 1, chapter: chapterOf(run.start || 1), firstLoot: run.firstLoot || null };
+    const summary = { wiped, floor: run.cleared, day: run.day, chests, shards, kills: run.kills, free: run.free, cursed: run.cursed, nightmare: !!run.nightmare, nightTier: run.nightmare ? run.nightTier || 1 : 0, start: run.start || 1, chapter: chapterOf(run.start || 1), firstLoot: run.firstLoot || null, fallen: down };
     if (!run.free && run.cleared > 0 && run.bestBefore !== undefined && run.cleared > run.bestBefore) summary.record = true;
     // bilan : la créature qui a achevé le plus d'ennemis, le prochain palier de coffre, les éclats vers un booster
     if (run.feats) summary.feats = { ...run.feats };
@@ -2096,7 +2136,7 @@ export class Game {
   devResetCampaign() {
     const d = this.descent();
     d.run = null; d.best = 0; d.bestToday = 0; d.bestNightmare = 0; d.nightBest = {}; d.nightFloors = {}; d.last = null; d.risk = {};
-    this.s.bossesBeaten = {}; this.s.bossWins = {}; this.s.storySeen = {};
+    this.s.bossesBeaten = {}; this.s.bossWins = {}; this.s.storySeen = {}; this.s.fallen = {}; /* v668 */
     this.persist();
   }
   devFreePacks() { this.s.freePack = { day: null }; this.persist(); }
@@ -2116,7 +2156,7 @@ export class Game {
   devBoss(key, { power = false } = {}) {
     const i = BOSS_ORDER.indexOf(key);
     if (i < 0) throw new Error('Gardien inconnu.');
-    if (!this.s.descent.run) this.startRun();
+    if (!this.s.descent.run) { this.s.fallen = {}; this.startRun(); } /* v668 : outil d'essai, l'équipe repart debout */
     const run = this.s.descent.run;
     if (run.phase === 'omen') this.chooseOmen(run.omenOffer[0]);
     run.battle = null; run.altar = null; run.rewards = null; run.talentOffer = null;

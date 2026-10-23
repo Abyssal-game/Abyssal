@@ -6368,3 +6368,33 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 .dv-c.dying { transform: scale(.7); }
 .dv-ghost { mix-blend-mode: normal; filter: none; opacity: .5; }
 .cb-def.ok, .cb-def.ko, .cb-def .dv-dodge-bar::before { filter: none; }
+/* v668 : Braises de vie (créatures à terre d'un chapitre à l'autre) */
+.br-ic { width: 1.25em; height: 1.25em; object-fit: contain; vertical-align: -.25em; filter: drop-shadow(0 0 6px rgba(255, 140, 60, .6)); }
+.br-bar { display: flex; align-items: center; gap: 10px; margin: 8px 0 4px; padding: 8px 10px; border-radius: 12px; background: rgba(40, 18, 10, .55); border: 1px solid rgba(255, 140, 60, .28); }
+.br-bar.down { border-color: rgba(255, 110, 60, .6); box-shadow: inset 0 0 18px rgba(255, 90, 40, .15); }
+.br-bar-ic .br-ic { width: 34px; height: 34px; }
+.br-bar-t { flex: 1; min-width: 0; display: grid; gap: 2px; text-align: left; }
+.br-bar-t b { color: #FFC28A; font-size: .95rem; }
+.br-bar-t small { color: var(--muted, #b9aa96); font-size: .78rem; line-height: 1.25; }
+.br-info { flex: none; }
+button.v2-mini.fallen { cursor: pointer; border: none; padding: 0; font: inherit; }
+button.v2-mini.fallen::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 2px rgba(255, 130, 60, .7); animation: brPulse 1.6s ease-in-out infinite; pointer-events: none; }
+@keyframes brPulse { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { button.v2-mini.fallen::after { animation: none; } }
+.br-sheet .br-big { display: grid; place-items: center; margin: 4px 0 8px; }
+.br-sheet .br-big .br-ic { width: 72px; height: 72px; }
+.br-sheet .br-list { list-style: none; padding: 0; margin: 10px 0; display: grid; gap: 8px; }
+.br-sheet .br-list li { display: flex; gap: 8px; align-items: flex-start; font-size: .9rem; }
+.br-sheet .br-card { position: relative; width: 132px; margin: 6px auto 10px; aspect-ratio: 5 / 7; border-radius: 10px; overflow: hidden; }
+.br-sheet .br-card > img:first-child { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) brightness(.32); }
+.br-sheet .br-card .v2-skull { position: absolute; left: 50%; top: 46%; width: 70%; translate: -50% -50%; }
+.br-sheet .btn.block { margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.br-won, .br-down { display: flex; align-items: center; gap: 8px; text-align: left; }
+.br-down .br-skull { width: 26px; height: 26px; flex: none; }
+.rw-i.rw-br { color: #FFC28A; }
+.v2-slot.full.fallen { position: relative; }
+.v2-slot.full.fallen .tcg, .v2-slot.full.fallen > :first-child { filter: grayscale(1) brightness(.4); }
+.v2-slot.full.fallen > .v2-skull { position: absolute; left: 50%; top: 36%; width: 58%; translate: -50% -50%; pointer-events: none; filter: drop-shadow(0 0 8px rgba(160, 20, 20, .7)); }
+.v2-slot.full .tm-revive { display: block; margin: 6px auto 0; min-height: 38px; color: #FFC28A; border-color: rgba(255, 140, 60, .6); }
+.br-sheet .btn .br-ic, .br-bar .br-ic { filter: drop-shadow(0 0 6px rgba(255, 140, 60, .7)); }
+.br-sheet .btn .br-ic { width: 1.7em; height: 1.7em; }
