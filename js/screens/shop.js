@@ -38,7 +38,7 @@ export function pityHTML(g) {
 }
 
 // v438 : nouveaux sachets (nouveaux noms : le service worker garderait les anciens)
-const PACK_FILE = { abysse: 'abysse2', standard: 'standard2', event: 'event2' };
+const PACK_FILE = { abysse: 'abysse2', standard: 'standard3', event: 'event3' };
 /* v565 : sachet choisi au Profil : remplace le visuel des boosters standard, Alliances et premium (pas ceux des factions) ;
    SKIN_BOX = case sombre où s’écrit le nom ; skin: null = visuel d'origine (l'adversaire au Pari) */
 const SKINNED = ['standard', 'premium']; /* v587 : les Alliances gardent leur sachet */

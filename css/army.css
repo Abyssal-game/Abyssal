@@ -4389,8 +4389,8 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
 .pk-inside { top: 9%; left: 6%; right: 6%; height: 25%; border-radius: 0 0 45% 45% / 0 0 30% 30%; box-shadow: none;
   background: radial-gradient(ellipse 62% 90% at 50% 0, rgba(5, 5, 7, .95) 35%, rgba(5, 5, 7, .55) 65%, transparent 100%); }
 /* v489 : sachets à marges transparentes : le reflet ne déborde plus de la forme du sachet (rectangle grisé autour) */
-.pack-standard .pk-foil { -webkit-mask: url(../assets/packs/standard2.webp) center / 100% 100% no-repeat; mask: url(../assets/packs/standard2.webp) center / 100% 100% no-repeat; }
-.pack-event .pk-foil { -webkit-mask: url(../assets/packs/event2.webp) center / 100% 100% no-repeat; mask: url(../assets/packs/event2.webp) center / 100% 100% no-repeat; }
+.pack-standard .pk-foil { -webkit-mask: url(../assets/packs/standard3.webp) center / 100% 100% no-repeat; mask: url(../assets/packs/standard3.webp) center / 100% 100% no-repeat; }
+.pack-event .pk-foil { -webkit-mask: url(../assets/packs/event3.webp) center / 100% 100% no-repeat; mask: url(../assets/packs/event3.webp) center / 100% 100% no-repeat; }
 .pack-abysse .pk-foil { -webkit-mask: url(../assets/packs/abysse2.webp) center / 100% 100% no-repeat; mask: url(../assets/packs/abysse2.webp) center / 100% 100% no-repeat; }
 
 /* v492 : salles 5 à 8 des trois jeux (règle de la salle) et hauts faits */
@@ -6261,3 +6261,9 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 .wl-page.on { visibility: visible; opacity: 1; }
 .wl-page .wl-art { width: 100%; }
 .wl-page p { margin-bottom: 16px; }
+/* v650 : nouveaux sachets d'origine (standard3 : grimoire d'obsidienne ; event3 : deux sceaux liés) : plus de « ABYSSAL » écrit par le jeu, nom centré dans la plaque peinte (mesurée) */
+.pack-standard:not(.pack-skin) .pk-logo, .pack-event:not(.pack-skin) .pk-logo { display: none; }
+.pack-standard:not(.pack-skin) .pk-label { top: 72.8%; bottom: auto; left: 18%; right: 17%; gap: 2.2cqw; }
+.pack-standard:not(.pack-skin) .pk-name { height: 14.5cqw; font-size: 6.2cqw; }
+.pack-event:not(.pack-skin) .pk-label { top: 66.2%; bottom: 19.8%; left: 11%; right: 11%; justify-content: center; gap: 2.6cqw; }
+.pack-event:not(.pack-skin) .pk-name { height: auto; }

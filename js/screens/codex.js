@@ -59,7 +59,7 @@ export default function codexScreen(app, root) {
     if (r.shards) items.push([`<span class="cxr-ic">${icon('crystal')}</span>`, `+${fmt(r.shards)}`, 'éclats']);
     if (r.ash) items.push([`<span class="cxr-ic">${icon('ash')}</span>`, `+${fmt(r.ash)}`, 'cendres']);
     for (const [k, n] of Object.entries(r.chests || {})) items.push([`<img class="cxr-chest" alt="" src="assets/chests/${k}.webp">`, n > 1 ? `${n} ×` : '', esc(CHESTS[k]?.name || k)]);
-    for (const [k, n] of Object.entries(r.tickets || {})) items.push([`<img class="cxr-pack" alt="" src="assets/packs/${k === 'standard' ? 'standard2' : k}.webp">`, `${n} ×`, esc(PACK_NAME[k] || k)]);
+    for (const [k, n] of Object.entries(r.tickets || {})) items.push([`<img class="cxr-pack" alt="" src="assets/packs/${k === 'standard' ? 'standard3' : k}.webp">`, `${n} ×`, esc(PACK_NAME[k] || k)]);
     if (r.frame) items.push([`<span class="avatar-mini pf pf-${r.frame}">${myAv()}</span>`, '', esc(ALL_FRAMES[r.frame] || r.frame)]);
     if (r.back) items.push([`<img class="cxr-back" alt="" src="assets/backs/${r.back}.webp">`, '', esc(CODEX_BACKS[r.back] || r.back)]);
     if (r.sachet) items.push([`<img class="cxr-pack" alt="" src="assets/packs/${r.sachet}.webp">`, '', esc(SACHETS[r.sachet] || r.sachet)]); /* v565 */
