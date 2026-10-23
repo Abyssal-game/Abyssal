@@ -3,7 +3,7 @@ import { tw, LANG } from '../i18n.js';
 import { tuto } from '../ui/tutos.js';
 import { cardHTML, lazyArt, fillGrid } from '../ui/card.js';
 import { icon, sigil } from '../ui/icons.js';
-import { esc, bindActions, pct } from '../ui/dom.js';
+import { esc, bindActions, pct, openSheet } from '../ui/dom.js';
 import { RARITIES, FACTION_ORDER, RARITY_ORDER, RARITY } from '../config.js';
 import { ROLES, roleOf } from '../core/army.js';
 import { CREATURE_KITS, PASSIVES } from '../core/kits.js';
@@ -33,20 +33,13 @@ export default function collection(app, root, params) {
       <div class="seg" role="group" aria-label="Mode d’affichage">${[['grid', 'Grille'], ['album', 'Classeur']].map(([k, l]) => `<button class="seg-b" data-act="view" data-v="${k}" aria-pressed="${(st.view || 'grid') === k}">${l}</button>`).join('')}</div>
     </div>
     </header>
-    <div class="col-order" role="group" aria-label="Ranger les cartes"><span class="small muted">Ranger :</span><div class="seg">${ORDERS.map(([k, l]) => `<button class="seg-b" data-act="order" data-v="${k}" aria-pressed="${ord() === k}">${l}</button>`).join('')}</div></div>
-    <div id="col-main">
-    <div class="col-tools">
-      <label class="input-wrap"><span class="sr">Rechercher une créature</span>${icon('search')}<input class="input" id="col-q" type="search" placeholder="Rechercher une créature…" value="${esc(st.q)}" autocomplete="off" enterkeyhint="search"></label>
-      <div class="seg wide" role="group" aria-label="Afficher">${[['all', 'Toutes'], ['owned', 'Possédées'], ['missing', 'Manquantes'], ['new', 'Nouvelles'], ['var', 'Finitions'], ['fav', 'Favoris']].map(([k, l]) => `<button class="seg-b" data-act="show" data-v="${k}" aria-pressed="${st.show === k}">${l}</button>`).join('')}</div>
-      <details class="dc-fold col-filters" ${nf() ? 'open' : ''}><summary>${icon('filter')} Filtres et tri${nf() ? ` <span class="badge">${nf()}</span>` : ''}</summary>
-        <div class="chips fac-grid" role="group" aria-label="Filtrer par faction">${FACTION_ORDER.map((f) => `<button class="chip" data-act="fac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.factions.includes(f)}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>
-        <div class="chips" role="group" aria-label="Filtrer par rareté">${RARITIES.map((r) => `<button class="chip" data-act="rar" data-v="${r.key}" style="--chip:${r.color}" aria-pressed="${st.rarities.includes(r.key)}"><span class="dot" style="background:${r.color}"></span>${r.name}</button>`).join('')}</div>
-        <div class="chips" role="group" aria-label="Filtrer par rôle">${Object.entries(ROLES).map(([k, r]) => `<button class="chip" data-act="role" data-v="${k}" style="--chip:${r.color}" aria-pressed="${st.roles.includes(k)}">${esc(r.name)}</button>`).join('')}</div>
-        <label class="sort"><span class="sr">Filtrer par passif</span>${icon('sparkle')}<select class="input" id="col-pass"><option value="">Tous les passifs</option>${passOpts.map((k) => `<option value="${k}" ${st.passive === k ? 'selected' : ''}>${esc(PASSIVES[k].name)}</option>`).join('')}</select></label>
-        <div class="row between gap wrap"><label class="sort"><span class="sr">Trier par</span>${icon('sort')}<select class="input" id="col-sort">${[['num', 'Numéro'], ['name', 'Nom'], ['rarity', 'Rareté'], ['date', 'Date de découverte']].map(([k, l]) => `<option value="${k}" ${st.sort === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label><button class="linkish" data-act="reset">Réinitialiser</button></div>
-      </details>
-      <div class="row between small"><span id="col-count" class="muted" aria-live="polite"></span><button class="linkish" data-act="seen" id="col-seen">Tout marquer comme vu</button></div>
+    <div class="col-bar">
+      <label class="input-wrap col-search"><span class="sr">Rechercher une créature</span>${icon('search')}<input class="input" id="col-q" type="search" placeholder="Rechercher une créature…" value="${esc(st.q)}" autocomplete="off" enterkeyhint="search"></label>
+      <button class="col-fbtn" data-act="filters" aria-label="Filtres et rangement">${icon('filter')}<span id="col-fl">Filtres</span><b class="badge" id="col-fn" hidden></b></button>
     </div>
+    <div class="col-active" id="col-active"></div>
+    <div id="col-main">
+    <div class="row between small col-countrow"><span id="col-count" class="muted" aria-live="polite"></span><button class="linkish" data-act="seen" id="col-seen">Tout marquer comme vu</button></div>
     <div class="grid-cards" id="col-grid"></div>
     <p class="empty muted center" id="col-empty" hidden>Aucune carte ne correspond à ces filtres.</p>
     </div>
@@ -185,35 +178,83 @@ export default function collection(app, root, params) {
     if (album) drawAlbum(); else drawGrid();
   }
 
-  function syncPressed() {
-    root.querySelectorAll('[data-act="fac"]').forEach((b) => b.setAttribute('aria-pressed', st.factions.includes(b.dataset.v)));
-    root.querySelectorAll('[data-act="rar"]').forEach((b) => b.setAttribute('aria-pressed', st.rarities.includes(b.dataset.v)));
-    root.querySelectorAll('[data-act="role"]').forEach((b) => b.setAttribute('aria-pressed', st.roles.includes(b.dataset.v)));
-    root.querySelectorAll('[data-act="show"]').forEach((b) => b.setAttribute('aria-pressed', st.show === b.dataset.v));
-    root.querySelectorAll('[data-act="order"]').forEach((b) => b.setAttribute('aria-pressed', ord() === b.dataset.v));
+  /* v646 : un seul bouton « Filtres » (fenêtre) au lieu de quatre rangées ; les filtres actifs en pastilles qu'on retire d'un toucher */
+  const SHOWS = [['all', 'Toutes'], ['owned', 'Possédées'], ['missing', 'Manquantes'], ['new', 'Nouvelles'], ['var', 'Finitions'], ['fav', 'Favoris']];
+  const SORTS = [...ORDERS, ['date', 'Récentes']];
+  const album = () => st.view === 'album';
+  const actives = () => {
+    if (album()) return [];
+    const l = [];
+    if (st.show !== 'all') l.push(['show', '', esc(SHOWS.find(([k]) => k === st.show)?.[1])]);
+    if (st.sort !== 'num') l.push(['sort', '', `Rangées : <b>${SORTS.find(([k]) => k === st.sort)?.[1]}</b>`]);
+    st.factions.forEach((f) => l.push(['fac', f, esc(cat.faction[f].name)]));
+    st.rarities.forEach((r) => l.push(['rar', r, esc(RARITY[r].name)]));
+    st.roles.forEach((r) => l.push(['role', r, esc(ROLES[r].name)]));
+    if (st.passive) l.push(['pass', '', esc(PASSIVES[st.passive].name)]);
+    return l;
+  };
+  function drawBar() {
+    const l = actives();
+    root.querySelector('.col-search').hidden = album();
+    root.querySelector('#col-fl').innerHTML = album() ? (ord() === 'num' ? 'Ranger' : `Ranger : <b>${ORDERS.find(([k]) => k === ord())[1]}</b>`) : 'Filtres';
+    const n = root.querySelector('#col-fn'); n.hidden = !l.length; n.textContent = l.length;
+    root.querySelector('#col-active').innerHTML = l.length ? `${l.map(([k, v, lab]) => `<button class="col-pill" data-act="unf" data-k="${k}" data-v="${esc(v)}"><span class="sr">Retirer</span><span>${lab}</span><i aria-hidden="true">✕</i></button>`).join('')}${l.length > 1 ? '<button class="linkish col-clear" data-act="reset">Tout effacer</button>' : ''}` : '';
   }
+  const pick = (act, v, lab, on, extra = '') => `<button class="chip" data-f="${act}" data-v="${v}" ${extra} aria-pressed="${on}">${lab}</button>`;
+  function sheetHTML() {
+    const n = album() ? 0 : filtered().length;
+    const sec = (t, h) => `<section class="cf-sec"><h3>${t}</h3>${h}</section>`;
+    return `<h2>${album() ? 'Ranger le classeur' : 'Filtres et rangement'}</h2>
+      ${album() ? '' : sec('Afficher', `<div class="chips">${SHOWS.map(([k, l]) => pick('show', k, l, st.show === k)).join('')}</div>`)}
+      ${sec('Ranger par', `<div class="chips">${(album() ? ORDERS : SORTS).map(([k, l]) => pick('sort', k, l, (album() ? ord() : st.sort) === k)).join('')}</div>`)}
+      ${album() ? '' : sec('Royaume', `<div class="chips fac-grid">${FACTION_ORDER.map((f) => pick('fac', f, `${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span>`, st.factions.includes(f), `style="--chip:${cat.faction[f].colors.secondary}"`)).join('')}</div>`)
+        + sec('Rareté', `<div class="chips">${RARITIES.map((r) => pick('rar', r.key, `<span class="dot" style="background:${r.color}"></span>${r.name}`, st.rarities.includes(r.key), `style="--chip:${r.color}"`)).join('')}</div>`)
+        + sec('Rôle', `<div class="chips">${Object.entries(ROLES).map(([k, r]) => pick('role', k, esc(r.name), st.roles.includes(k), `style="--chip:${r.color}"`)).join('')}</div>`)
+        + sec('Passif', `<label class="sort"><span class="sr">Filtrer par passif</span>${icon('sparkle')}<select class="input" id="cf-pass"><option value="">Tous les passifs</option>${passOpts.map((k) => `<option value="${k}" ${st.passive === k ? 'selected' : ''}>${esc(PASSIVES[k].name)}</option>`).join('')}</select></label>`)}
+      <div class="cf-foot">${album() ? '' : '<button class="btn ghost" data-f="reset">Réinitialiser</button>'}<button class="btn primary" data-f="close">${album() ? 'Fermer' : `Voir ${n} carte${n > 1 ? 's' : ''}`}</button></div>`;
+  }
+  function apply() { st.albumPage = 0; drawBar(); drawView(); }
+  function openFilters() {
+    const sh = openSheet(sheetHTML(), { label: 'Filtres et rangement', cls: 'col-fsheet' });
+    const redraw = () => { const y = sh.el.scrollTop; sh.setContent(sheetHTML()); sh.el.scrollTop = y; };
+    sh.body.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-f]'); if (!b) return;
+      const f = b.dataset.f, v = b.dataset.v;
+      if (f === 'close') return sh.close();
+      if (f === 'show') st.show = v;
+      if (f === 'sort') st.sort = v;
+      if (f === 'fac') st.factions = toggle(st.factions, v);
+      if (f === 'rar') st.rarities = toggle(st.rarities, v);
+      if (f === 'role') st.roles = toggle(st.roles, v);
+      if (f === 'reset') resetAll();
+      app.sfx?.tap?.(); apply(); redraw();
+    });
+    sh.body.addEventListener('change', (e) => { if (e.target.id === 'cf-pass') { st.passive = e.target.value; apply(); redraw(); } });
+  }
+  function resetAll() { Object.assign(st, { q: '', factions: [], rarities: [], roles: [], passive: '', show: 'all', sort: 'num' }); root.querySelector('#col-q').value = ''; }
   const toggle = (arr, v) => (arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
 
   bindActions(root, {
-    fac(el) { st.factions = toggle(st.factions, el.dataset.v); syncPressed(); drawGrid(); },
-    rar(el) { st.rarities = toggle(st.rarities, el.dataset.v); syncPressed(); drawGrid(); },
-    role(el) { st.roles = toggle(st.roles, el.dataset.v); syncPressed(); drawGrid(); },
-    show(el) { st.show = el.dataset.v; syncPressed(); drawGrid(); },
-    reset() { Object.assign(st, { q: '', factions: [], rarities: [], roles: [], passive: '', show: 'all', sort: 'num' }); const ps = root.querySelector('#col-pass'); if (ps) ps.value = ''; root.querySelector('#col-q').value = ''; root.querySelector('#col-sort').value = 'num'; syncPressed(); drawGrid(); },
+    filters() { openFilters(); },
+    unf(el) {
+      const k = el.dataset.k, v = el.dataset.v;
+      if (k === 'show') st.show = 'all'; if (k === 'sort') st.sort = 'num'; if (k === 'pass') st.passive = '';
+      if (k === 'fac') st.factions = toggle(st.factions, v); if (k === 'rar') st.rarities = toggle(st.rarities, v); if (k === 'role') st.roles = toggle(st.roles, v);
+      app.sfx?.tap?.(); apply();
+    },
+    reset() { resetAll(); apply(); },
     seen() { g.markAllSeen(); drawGrid(); },
-    view(el) { st.view = el.dataset.v; drawView(); },
-    order(el) { st.sort = el.dataset.v; st.albumPage = 0; app.sfx?.tap?.(); const s = root.querySelector('#col-sort'); if (s) s.value = st.sort; syncPressed(); drawView(); },
+    view(el) { st.view = el.dataset.v; drawBar(); drawView(); },
     afac(el) { app.sfx?.sheet?.(); st.albumFac = el.dataset.v; st.albumPage = 0; drawAlbum(); }, // v359 : un petit froissement de page à chaque faction
   });
   let tq;
   root.querySelector('#col-q').addEventListener('input', (e) => { clearTimeout(tq); tq = setTimeout(() => { st.q = e.target.value; drawGrid(); }, 140); });
-  root.querySelector('#col-sort').addEventListener('change', (e) => { st.sort = e.target.value; syncPressed(); drawGrid(); });
-  root.querySelector('#col-pass').addEventListener('change', (e) => { st.passive = e.target.value; drawGrid(); });
   const open = (t) => app.openCard(t.dataset.id, { list: ids });
   for (const box of [root.querySelector('#col-grid'), root.querySelector('#col-album')]) {
     box.addEventListener('click', (e) => { const t = e.target.closest('.tcg, .slot-empty'); if (t) open(t); });
     box.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.tcg, .slot-empty')) { e.preventDefault(); open(e.target); } });
   }
+  drawBar();
   drawView();
   app.refreshView = () => { const y = window.scrollY; if (st.view === 'album') drawView(); else patchGrid(); window.scrollTo(0, y); };
   return () => { app.refreshView = null; };

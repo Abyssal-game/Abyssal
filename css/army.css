@@ -6227,3 +6227,25 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 .dl-day span { display: flex; align-items: center; gap: 6px; font-size: .86rem; }
 .dl-day .picon, .dl-day img { width: 22px; height: 22px; object-fit: contain; }
 .dl-day.chest { grid-column: 1 / -1; border-color: rgba(232, 195, 90, .6); background: radial-gradient(circle at 20% 50%, rgba(242, 193, 78, .14), transparent 70%), rgba(255, 255, 255, .04); }
+/* v646 : Collection : recherche + un seul bouton Filtres, filtres actifs en pastilles, fenêtre des filtres */
+.col-bar { display: flex; align-items: center; gap: 8px; margin: 10px 0 6px; }
+.col-bar .col-search { flex: 1; min-width: 0; margin: 0; }
+.col-bar .col-search[hidden] { display: none !important; }
+.col-fbtn { position: relative; flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 46px; padding: 0 14px; border-radius: 14px; font: 700 .9rem var(--f-ui); color: #F2E3BF; background: linear-gradient(180deg, #2A2236, #15111C); border: 1px solid rgba(201, 164, 90, .5); box-shadow: 0 3px 10px rgba(0, 0, 0, .45); }
+.col-bar .col-search[hidden] + .col-fbtn { margin-left: auto; }
+.col-fbtn .ic { width: 18px; height: 18px; }
+.col-fbtn .badge { position: absolute; top: -6px; right: -6px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; display: grid; place-items: center; font: 800 .7rem/1 var(--f-ui); color: #1A1206; background: linear-gradient(#F2D58A, #C99B3E); }
+.col-fbtn .badge[hidden] { display: none; }
+.col-active { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 6px; }
+.col-active:empty { display: none; }
+.col-pill { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 8px 0 12px; border-radius: 999px; font: 700 .78rem var(--f-ui); color: #F2E3BF; background: rgba(242, 193, 78, .12); border: 1px solid rgba(242, 193, 78, .45); }
+.col-pill .ic { width: 14px; height: 14px; opacity: .8; }
+.col-clear { font-size: .78rem; }
+.col-countrow { margin: 2px 0 8px; }
+.col-fsheet .cf-sec { margin: 14px 0 0; }
+.col-fsheet .cf-sec h3 { margin: 0 0 8px; font: 800 .78rem/1.2 var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: #C9A45A; }
+.col-fsheet .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.col-fsheet .cf-foot { position: sticky; bottom: -1px; display: flex; gap: 8px; margin-top: 18px; padding: 12px 0 4px; background: linear-gradient(180deg, transparent, var(--bg-2, #12101A) 30%); }
+.col-fsheet .cf-foot .btn { flex: 1; }
+.col-pill i { font-style: normal; font-size: .72rem; opacity: .75; margin-left: 2px; }
+.col-fsheet .cf-foot .btn { white-space: nowrap; font-size: .82rem; padding-left: 8px; padding-right: 8px; }
