@@ -260,7 +260,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         const tu = st.units[id], synOk = tu.side === 'enemy' && p.dmg && ((tu.breach && tu.breach.by !== sel) || (tu.mark && tu.markBy !== sel) || (tu.frozen > 0 && pk === 'estoc'));
         // v270 : une valeur et une seule mention, la plus importante (K.O. > Brise > Fêle > Marque/Synergie > Enchaînement > Brisure)
         const ko = !p.roll && p.dmg && p.dmg >= tu.hp && tu.side === 'enemy';
-        const tag = ko ? '' : p.breaks || p.cracks ? bk : synOk ? ` <i class="cmb sy">${tu.mark && tu.markBy !== sel ? '+50 %' : 'Syn.'}</i>` : cb ? cbTxt : bk;
+        const tag = ko ? '' : p.breaks || p.cracks ? bk : synOk ? (tu.mark && tu.markBy !== sel ? ` <i class="cmb sy mk">Marque ×1,5</i>` : ` <i class="cmb sy">Synergie</i>`) /* v667 : mention écrite en clair */ : cb ? cbTxt : bk;
         tgtInfo[id] = (p.roll ? `${p.roll.chance}%` : p.dmg ? (ko ? '<b class="ko">K.O.</b>' : `-${p.dmg}${p.weak ? '★' : ''}`) : 'Cible') + tag;
       }
     }

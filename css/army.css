@@ -6338,3 +6338,13 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 .v2-mini.fallen > img:first-child { filter: grayscale(1) brightness(.32); }
 .v2-mini > .v2-skull { position: absolute; left: 50%; top: 44%; width: 72%; height: auto; translate: -50% -50%; filter: drop-shadow(0 0 8px rgba(160, 20, 20, .7)); pointer-events: none; }
 .v2-mini img.v2-skull { width: 72%; height: auto; aspect-ratio: 1; object-fit: contain; filter: drop-shadow(0 0 8px rgba(160, 20, 20, .7)); }
+
+/* v667 : aperçu du coup sur la cible : plaque sombre et or, mentions en émail (plus de dégradés arc-en-ciel) */
+.dv.cb .dv-c .cb-tgt { background: linear-gradient(180deg, #1C1610, #0B0907); border: 1px solid #B8923F; color: #F3D98C; box-shadow: 0 2px 8px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 228, 160, .18); display: inline-flex; align-items: center; gap: .3em; }
+.dv.cb .dv-c .cb-tgt i { font-style: normal; margin-left: 0; padding: .12em .45em; border-radius: 5px; font-family: var(--f-display); letter-spacing: .03em; text-transform: none; line-height: 1.15; }
+.cb-tgt .cmb, .cb-tgt .cmb.sy { background: #2A2116; color: #F3D98C; border: 1px solid rgba(184, 146, 63, .7); }
+.cb-tgt .cmb.sy.mk { background: #4A0F18; color: #F6DDA6; border: 1px solid #B8923F; }
+.cb-tgt .brk { background: rgba(184, 146, 63, .14); color: #E7CF95; border: 1px solid rgba(184, 146, 63, .45); }
+.cb-tgt .brk.fl { background: #3A2A0E; color: #FFD677; border: 1px solid #D8A940; }
+.cb-tgt .brk.on { background: #7A1020; color: #FFF0D0; border: 1px solid #E0B04E; }
+.cb-tgt .ko { background: #7A1020; color: #FFF0D0; border: 1px solid #E0B04E; }

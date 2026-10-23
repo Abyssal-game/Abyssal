@@ -8598,4 +8598,5 @@ export const names = {
   "apporte sa Marque à": "empresta sua Marca a",
   "<b>{n0}</b> apporte de l’attaque à <b>{n1}</b>.": "<b>{n0}</b> empresta ataque a <b>{n1}</b>.",
   "apporte de l’attaque à": "empresta ataque a",
+  "Marque ×{0},{1}": "Marca ×{0},{1}",
 };
