@@ -107,7 +107,7 @@ export default function codexScreen(app, root) {
       ${n ? `<button class="btn primary block dc-plq dc-plq-red cx-all" data-cx="all">${icon('chest')}Tout récupérer (${n})</button>` : ''}
       ${pitch}
       ${lootHTML}
-      <div class="cxk-head"><span>Voie de l'Abîme<small>gratuite</small></span><span></span><span class="prem">Voie enluminée<small>${c.premium ? 'à toi' : 'à débloquer'}</small></span></div>
+      <div class="cxk-head"><span>Voie de l’Abîme<small>gratuite</small></span><span></span><span class="prem">Voie enluminée<small>${c.premium ? 'à toi' : 'à débloquer'}</small></span></div>
       <ol class="cxk">${tiersOf(c.season).map((x) => `<li class="cxk-r ${x.tier <= t ? 'reached' : ''} ${x.tier === t + 1 ? 'next' : ''} ${x.tier === CODEX.tiers ? 'ult' : ''}" ${x.tier === Math.min(CODEX.tiers, t + 1) ? 'id="cx-now"' : ''}>${cell(x.tier, 'free', x.free)}<span class="cxk-n">${x.tier}</span>${cell(x.tier, 'prem', x.prem)}</li>`).join('')}</ol>
       <details class="panel dc-fold"><summary>${picon('help')}<span class="dc-sum-t">Gagner des points de Codex</span></summary>
         <ul class="cx-xp">${Object.entries(CODEX_XP).map(([k, v]) => `<li><span>${esc(CODEX_XP_LABEL[k])}</span><b>+${v}</b><small class="muted">${fmt(c.log[k] || 0)} gagnés</small></li>`).join('')}</ul>
@@ -185,7 +185,7 @@ export default function codexScreen(app, root) {
         <section class="cxs-aisle"><h2>${esc(OBS.name)}</h2><p class="small muted">Elles ne servent qu’aux cosmétiques : rien ici ne rend tes créatures plus fortes.</p></section>
         <div class="cxs-euro" id="cx-euro">${SHOP.filter((it) => it.kind === 'obs').map((it) => euro(it, it.kind === 'obs' ? obsI++ : 0)).join('')}</div>
         <button class="btn ghost block" data-cx="restore">Restaurer mes achats</button>
-        <p class="small muted center">Pendant l'aperçu, tout achat en euros est simulé : aucun paiement.</p>`;
+        <p class="small muted center">Pendant l’aperçu, tout achat en euros est simulé : aucun paiement.</p>`;
     }
     /* — l'accueil (v637 : sans vitrine ni nouveautés ; obsidiennes et Pack du Fondateur en tête, bien visibles) — */
     const aisles = Object.keys(KINDS).filter((k) => inKind(k).length).map((k) => { const l = inKind(k), own = l.filter((x) => g.catalogOwned(x.id)).length;
@@ -219,14 +219,14 @@ export default function codexScreen(app, root) {
       ${rows.map(([k, n, v]) => `<section class="cx-fd-row"><p class="cx-pv-cap">${k}</p><div class="cx-fd-v">${v}</div><b class="cx-fd-n">${esc(n || '')}</b></section>`).join('')}
       <div class="cx-pv-foot">${own ? `<span class="cx-badge on">${icon('check')}Déjà à toi</span>` : `<button class="btn primary cx-pv-buy" data-fd="buy">Acheter · ${esc(it.price)}</button><small class="muted">Aperçu Créateur : achat simulé</small>`}</div>`);
     sh.body.addEventListener('click', async (e) => { if (!e.target.closest('[data-fd="buy"]')) return;
-      if (!(await confirmBox(`<b>Achat simulé</b> : ${esc(it.name)} (${esc(it.price)}).<br>Aperçu Créateur : aucun paiement, l'achat est simplement ajouté à ton profil.`, { ok: 'Simuler l’achat' }))) return;
+      if (!(await confirmBox(`<b>Achat simulé</b> : ${esc(it.name)} (${esc(it.price)}).<br>Aperçu Créateur : aucun paiement, l’achat est simplement ajouté à ton profil.`, { ok: 'Simuler l’achat' }))) return;
       try { g.shopBuy(it.id); app.sfx.levelup?.(); toast(`${esc(it.name)} : acquis (achat simulé).`, { kind: 'success', icon: 'star' }); sh.close?.(); app.chrome?.(); draw(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } });
   }
 
   function devTab() {
     const c = g.codex();
-    return `<details class="panel dc-fold cx-dev"><summary>${picon('settings')}<span class="dc-sum-t">Réglages de l'aperçu (Créateur)</span></summary>
-      <p class="small muted">Pour voir ce que ça donne : ces boutons ne servent qu'à l'essai. Les paliers et les prix se règlent dans <code>js/core/codex.js</code> (demande-moi).</p>
+    return `<details class="panel dc-fold cx-dev"><summary>${picon('settings')}<span class="dc-sum-t">Réglages de l’aperçu (Créateur)</span></summary>
+      <p class="small muted">Pour voir ce que ça donne : ces boutons ne servent qu’à l’essai. Les paliers et les prix se règlent dans <code>js/core/codex.js</code> (demande-moi).</p>
       <div class="row gap wrap"><button class="btn small" data-cx="xp" data-v="100">+100 points</button><button class="btn small" data-cx="xp" data-v="1000">+10 paliers</button><button class="btn small" data-cx="obs">+1000 obsidiennes</button><button class="btn small" data-cx="obs0">Obsidiennes à 0</button>
       <button class="btn small" data-cx="prem">${c.premium ? 'Retirer' : 'Donner'} le ${esc(CODEX.premiumName)}</button><button class="btn small" data-cx="reset">Remettre le Codex à zéro</button></div></details>`;
   }
@@ -302,7 +302,7 @@ export default function codexScreen(app, root) {
     const scenes = (o) => { const L = look();
       if (['frame', 'plate', 'fond', 'title'].includes(o.kind)) return `<p class="pv2-cap">Ton profil</p>${profMock(L)}
           ${o.kind !== 'fond' ? `<p class="pv2-cap">Au classement</p>${lbMock(L)}` : ''}${['frame', 'plate'].includes(o.kind) ? `<p class="pv2-cap">En partie en ligne, chez ton adversaire</p>${seatMock(L)}` : ''}`;
-      if (o.kind === 'back') return `<p class="pv2-cap">À l'ouverture d'un booster</p><div class="cx-pv-fan pv2-fan">${[0, 1, 2].map(() => `<img alt="" src="${backOf(L.back)}">`).join('')}</div>`;
+      if (o.kind === 'back') return `<p class="pv2-cap">À l’ouverture d’un booster</p><div class="cx-pv-fan pv2-fan">${[0, 1, 2].map(() => `<img alt="" src="${backOf(L.back)}">`).join('')}</div>`;
       if (o.kind === 'sachet') return `<p class="pv2-cap">Dans la boutique des boosters (au choix : standard ou premium)</p><div class="cx-pv-packs">${['standard', 'premium'].map((t) => packHTML(t, null, { skin: L.sachet || null })).join('')}</div>`;
       if (o.kind === 'mat') return `<p class="pv2-cap">Ton plateau des Duels des Sceaux</p>${board(L.mat)}`;
       if (o.kind === 'emote') return `<p class="pv2-cap">Chez ton adversaire, pendant une partie en ligne</p><div class="pv2-emote-scene">${seatMock(L)}<div class="re-bubble demo on">${emoteHTML(o.id)}<small>${esc(myName())}</small></div></div>`;
@@ -363,7 +363,7 @@ export default function codexScreen(app, root) {
       if (k === 'all') { const got = g.codexClaimAll(); app.sfx.chest?.(); toast(`${got.length} récompense${got.length > 1 ? 's' : ''} du Codex récupérée${got.length > 1 ? 's' : ''}.`, { kind: 'success', icon: 'star' }); }
       if (k === 'buy') {
         const it = SHOP.find((x) => x.id === b.dataset.id);
-        if (!(await confirmBox(`<b>Achat simulé</b> : ${esc(it.name)} (${esc(it.price)}).<br>Aperçu Créateur : aucun paiement, l'achat est simplement ajouté à ton profil.`, { ok: 'Simuler l’achat' }))) return;
+        if (!(await confirmBox(`<b>Achat simulé</b> : ${esc(it.name)} (${esc(it.price)}).<br>Aperçu Créateur : aucun paiement, l’achat est simplement ajouté à ton profil.`, { ok: 'Simuler l’achat' }))) return;
         g.shopBuy(it.id); app.sfx.levelup?.(); toast(`${esc(it.name)} : acquis (achat simulé).`, { kind: 'success', icon: 'star' });
       }
       if (k === 'jump') { ui.cat = 'obs'; draw(); return; }

@@ -305,7 +305,7 @@
  {
   "key": "merveilles",
   "name": "Les Merveilles mécaniques",
-  "desc": "Les automates des cours royales, des horloges de cathédrale et des légendes antiques. Certains jouaient. D'autres attendaient.",
+  "desc": "Les automates des cours royales, des horloges de cathédrale et des légendes antiques. Certains jouaient. D’autres attendaient.",
   "reward": {
    "shards": 500,
    "title": "Horloger de l'impossible"
@@ -322,7 +322,7 @@
  },
  {
   "key": "objets",
-  "name": "Les Objets qui s'éveillent",
+  "name": "Les Objets qui s’éveillent",
   "desc": "Un parapluie, une lanterne, un livre, une poupée. Laisse-les cent ans dans le noir et ils ouvriront les yeux.",
   "reward": {
    "shards": 400,

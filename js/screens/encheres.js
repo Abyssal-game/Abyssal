@@ -15,7 +15,7 @@ const pic = (key) => `<img alt="" src="assets/sceaux/rival-${key}.webp">`;
 const HOW = [['cards', '#7FA8D8', 'La vente', 'Mammon met en vente 15 lots, un par manche : en général 10 créatures (de 1 à 10 points) et 5 malédictions (de −1 à −5). Certaines salles changent les lots.'],
   ['crystal', '#E8C35A', 'Tes offrandes', 'Tu as 15 offrandes, numérotées de 1 à 15. À chaque manche, chacun en pose une en secret. Une offrande jouée est perdue.'],
   ['rule', '#B48CFF', 'Qui remporte le lot', 'On révèle les offrandes. Celles qui sont jouées par deux joueurs ou plus s’annulent. Parmi les autres, la plus haute prend une créature… et la plus basse prend une malédiction.'],
-  ['crown', '#F2C14E', 'La victoire', 'Après le 15e lot, on compte les points. Le plus de points gagne.'],
+  ['crown', '#F2C14E', 'La victoire', 'Après le 15e lot, on compte les points. Celui qui a le plus de points gagne.'],
   ['hourglass', '#9FE0FF', 'Tout s’annule ?', 'Si toutes les offrandes s’annulent, le lot reste sur la table et s’ajoute au suivant : on se dispute les deux à la fois.'],
   ['book', '#7FE0A0', 'Les familles', 'Trois créatures d’une même faction rapportent +5 points (+10 à la Vente des lignées).'],
   ['eye', '#C9A45A', 'Lire les enchérisseurs', 'Les offrandes qui restent à chacun sont visibles. Chaque enchérisseur a son style : certains se lisent facilement, d’autres misent n’importe quoi.'],

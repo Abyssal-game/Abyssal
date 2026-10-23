@@ -83,7 +83,7 @@ export function openCosmeticsLab(app) {
     const n = (s) => all.filter((it) => (s === 'todo' ? !tri[it.id] : tri[it.id] === s)).length;
     sheet.setContent(`
       <h2>${icon('crown')} Atelier des cosmétiques</h2>
-      <p class="small muted">Tous les cosmétiques qui existent encore dans le jeu (gratuits, Échoppe, Pack du Fondateur, saisons du Codex) : <b>${items.length} objets</b>. Les objets déjà retirés n'apparaissent plus. Touche un objet pour le voir en grand, puis choisis <b>Garder</b>, <b>Retirer</b> ou <b>À revoir</b>. Ton tri reste sur ce téléphone ; « Copier mon tri » te donne un texte à me coller pour que je l'applique.</p>
+      <p class="small muted">Tous les cosmétiques qui existent encore dans le jeu (gratuits, Échoppe, Pack du Fondateur, saisons du Codex) : <b>${items.length} objets</b>. Les objets déjà retirés n’apparaissent plus. Touche un objet pour le voir en grand, puis choisis <b>Garder</b>, <b>Retirer</b> ou <b>À revoir</b>. Ton tri reste sur ce téléphone ; « Copier mon tri » te donne un texte à me coller pour que je l’applique.</p>
       <div class="seg wide cl-seg">${Object.entries(KINDS).map(([k, v]) => `<button class="seg-b ${ui.kind === k ? 'on' : ''}" data-cl="kind" data-v="${k}">${v} (${items.filter((it) => it.kind === k).length})</button>`).join('')}</div>
       <div class="cl-chips">${[['all', `Tous (${all.length})`], ['todo', `À trier (${n('todo')})`], ['keep', `Gardés (${n('keep')})`], ['drop', `À retirer (${n('drop')})`], ['maybe', `À revoir (${n('maybe')})`]].map(([k, v]) => `<button class="chip" aria-pressed="${ui.st === k}" data-cl="st" data-v="${k}">${v}</button>`).join('')}</div>
       <div class="cl-chips">${groups().filter(([k]) => k !== 'none').map(([k, v]) => `<button class="chip" aria-pressed="${ui.from === k}" data-cl="from" data-v="${k}">${esc(v)}</button>`).join('')}</div>
@@ -104,11 +104,11 @@ export function openCosmeticsLab(app) {
         <p class="cx-pv-cap">En petit (barre du haut, classements)</p>
         <div class="cx-pv-vs"><div><span class="top-avatar pf pf-${esc(it.id)}">${avImg}</span><small>Barre du haut</small></div><div><span class="avatar-mini pf pf-${esc(it.id)}">${avImg}</span><small>Classement</small></div><div><span class="avatar-mini pf pf-${esc(g.s.frame)}">${avImg}</span><small>Ton cadre actuel</small></div></div>`;
       if (it.kind === 'back') return `<div class="cx-pv-back"><img alt="" src="${backSrc(it.id)}"></div>
-        <p class="cx-pv-cap">À l'ouverture d'un booster</p><div class="cx-pv-fan">${[0, 1, 2].map(() => `<img alt="" src="${backSrc(it.id)}">`).join('')}</div>`;
+        <p class="cx-pv-cap">À l’ouverture d’un booster</p><div class="cx-pv-fan">${[0, 1, 2].map(() => `<img alt="" src="${backSrc(it.id)}">`).join('')}</div>`;
       if (it.kind === 'sachet') return `<div class="cx-pv-back"><img alt="" src="assets/packs/${esc(it.id)}.webp"></div>`;
       if (it.kind === 'plate') return `<div class="cx-pv-prof"><span class="avatar-big pf pf-${esc(g.s.frame)}">${avImg}</span><div><b><span class="np np-${esc(it.id)}">${esc(g.s.name || 'Ton pseudo')}</span></b><span>${esc(g.s.title || '')}</span></div></div>
         <p class="cx-pv-cap">Au classement</p><div class="lb-row cx-pv-lb"><span class="lb-rank">1</span><span class="lb-av">${avImg}</span><span class="lb-name"><b><span class="np np-${esc(it.id)}">${esc(g.s.name || 'Ton pseudo')}</span></b><span class="small muted">${esc(g.s.title || '')}</span></span><span class="lb-floor">412 pts</span></div>`;
-      if (it.kind === 'emote') return `<p class="cx-pv-cap">Ce que voit l'adversaire</p><div class="re-bubble demo on">${emoteHTML(it.id)}<small>${esc(g.s.name || 'Pseudo')}</small></div>`;
+      if (it.kind === 'emote') return `<p class="cx-pv-cap">Ce que voit l’adversaire</p><div class="re-bubble demo on">${emoteHTML(it.id)}<small>${esc(g.s.name || 'Pseudo')}</small></div>`;
       const c = cards[pick % cards.length];
       return `<div class="cx-pvf-stage"><div class="detail-card cx-pvf-card">${cardHTML(c, { size: 'full', variant: 'normal', dress: plain ? null : it.id })}</div></div>
         <div class="cx-pvf-seg"><button class="${plain ? 'on' : ''}" data-pv="plain">Sans finition</button><button class="${plain ? '' : 'on'}" data-pv="dress">Avec</button></div>

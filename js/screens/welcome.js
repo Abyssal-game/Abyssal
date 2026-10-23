@@ -17,7 +17,7 @@ const PAGES = [
   { bn: 'trial', t: 'Les Épreuves du jour', p: 'Toujours dans Aventure : trois combats par jour, réglés sur la force de tes meilleures cartes. Chaque victoire rapporte un coffre, et fait avancer la saison du mois.' },
   { bn: 'sceaux', t: 'Une autre aventure', p: 'Toujours dans Aventure, le Cercle de l’Abysse réunit cinq jeux de cartes à part : les Duels des Sceaux, les Cryptes (un jeu de mémoire), le Pacte (tenter sa chance), les Enchères de Mammon et le Pari des Boosters (contre un autre joueur).' },
   { bn: 'shadow', t: 'Coffres et Tirage des Ombres', p: 'Dans l’onglet Butin, ouvre tes boosters et les coffres gagnés en jouant. Le Tirage des Ombres donne un booster par jour : sa valeur compte pour le classement de la semaine, et les 3 premiers gagnent un coffre.' },
-  { img: 4, t: 'Reviens chaque jour', p: 'L’Accueil rassemble ce qui t’attend : ton prochain objectif, l’offrande, les Épreuves, les missions et les coffres. Le Sanctuaire garde ton profil, tes succès, le bestiaire et les réglages (son, musique, vibrations, tutoriels).' },
+  { img: 4, t: 'Reviens chaque jour', p: 'L’Accueil rassemble ce qui t’attend : ton prochain objectif, l’offrande, les Épreuves, les missions et les coffres. Le Sanctuaire garde ton profil, tes succès, le Bestiaire et les réglages (son, musique, vibrations, tutoriels).' },
 ];
 
 export function showWelcome(app, { force = false } = {}) {

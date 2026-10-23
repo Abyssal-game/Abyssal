@@ -2200,7 +2200,7 @@
    }
   ],
   "visual": "Titan endormi à tête de pieuvre, grandes ailes membraneuses repliées, recroquevillé au fond de la fosse, un seul œil immense entrouvert, tentacules en éventail.",
-  "lore": "Il dort depuis avant le temps. Chaque carte de ce bestiaire est peut-être l’un de ses rêves.",
+  "lore": "Il dort depuis avant le temps. Chaque carte de ce Bestiaire est peut-être l’un de ses rêves.",
   "evolution": null,
   "sets": [
    "neant"
@@ -2227,7 +2227,7 @@
   "id": "ABY-049",
   "number": 49,
   "name": "Cthulhu",
-  "title": "Celui qui rêve sous la mer",
+  "title": "Le seigneur de R’lyeh",
   "faction": "abyssal",
   "rarity": "M",
   "category": "Entité abyssale",
@@ -2580,7 +2580,7 @@
    }
   ],
   "visual": "Petit céphalopode rouge sombre aux yeux bleus démesurés, membranes entre les bras formant une cape qu'il retourne sur lui, pointes molles, nuage de mucus lumineux bleu, abysses noirs.",
-  "lore": "Il ne boit pas de sang. Mais il s'enveloppe dans sa cape comme s'il en avait honte.",
+  "lore": "Il ne boit pas de sang. Mais il s’enveloppe dans sa cape comme s’il en avait honte.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2717,7 +2717,7 @@
    }
   ],
   "visual": "Créature amphibie massive au corps de phoque, tête de chien à longues défenses, pelage sombre et trempé, surgissant d'un marécage brumeux bordé d'eucalyptus à l'aube.",
-  "lore": "On l'entend la nuit au bord des points d'eau. On ne le voit qu'une fois.",
+  "lore": "On l’entend la nuit au bord des points d’eau. On ne le voit qu’une fois.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2768,7 +2768,7 @@
    }
   ],
   "visual": "Silhouette humanoïde blanche et lisse, longue comme un navire, sans traits sauf deux yeux noirs et une fente de bouche, émergeant à demi d'une mer polaire noire entre des icebergs, sous un ciel nocturne.",
-  "lore": "Les marins des mers du Sud l'ont vu flotter à côté de la coque. Il les a regardés partir.",
+  "lore": "Les marins des mers du Sud l’ont vu flotter à côté de la coque. Il les a regardés partir.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2814,7 +2814,7 @@
    }
   ],
   "visual": "Dauphin d'eau douce rose pâle au long bec, à demi transformé en homme élégant en blanc avec un chapeau, sortant d'un fleuve de forêt tropicale sous la lune, lucioles.",
-  "lore": "Il vient aux fêtes sous un chapeau qu'il n'enlève jamais. À l'aube, quelqu'un a disparu avec lui.",
+  "lore": "Il vient aux fêtes sous un chapeau qu’il n’enlève jamais. À l’aube, quelqu’un a disparu avec lui.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2860,7 +2860,7 @@
    }
   ],
   "visual": "Monstre de lac massif mi-castor mi-crocodile, écailles et fourrure mêlées, queue plate énorme, dents orange, retenant un barrage de troncs dans un lac gallois brumeux.",
-  "lore": "Tant qu'il dort dans le lac, la vallée reste sèche. Ne le réveille pas.",
+  "lore": "Tant qu’il dort dans le lac, la vallée reste sèche. Ne le réveille pas.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2885,7 +2885,7 @@
   "id": "ABY-064",
   "number": 64,
   "name": "Jenny Dents-Vertes",
-  "title": "Elle attend sous les lentilles d'eau",
+  "title": "Elle attend sous les lentilles d’eau",
   "faction": "abyssal",
   "rarity": "C",
   "category": "Esprit des eaux",
@@ -2905,7 +2905,7 @@
    }
   ],
   "visual": "Vieille sorcière des eaux à la peau verdâtre, longs cheveux emmêlés de lentilles d'eau, dents vertes et pointues, bras maigres tendus hors d'un étang couvert de plantes, nuit brumeuse.",
-  "lore": "Quand l'étang est vert et lisse comme un pré, c'est qu'elle est juste dessous.",
+  "lore": "Quand l’étang est vert et lisse comme un pré, c’est qu’elle est juste dessous.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2929,7 +2929,7 @@
   "id": "ABY-065",
   "number": 65,
   "name": "Sazae-oni",
-  "title": "L'escargot de mer devenu démon",
+  "title": "L’escargot de mer devenu démon",
   "faction": "abyssal",
   "rarity": "PC",
   "category": "Yōkai",
@@ -2949,7 +2949,7 @@
    }
   ],
   "visual": "Énorme coquillage turbo hérissé de pointes, d'où sort un corps de démon visqueux à cornes et à grands yeux, tentacules à la place des mains, sur un rocher battu par les vagues la nuit.",
-  "lore": "Trente ans dans la mer et le coquillage s'est mis à penser. À manger, surtout.",
+  "lore": "Trente ans dans la mer et le coquillage s’est mis à penser. À manger, surtout.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2992,7 +2992,7 @@
    }
   ],
   "visual": "Anémone de mer géante aux tentacules rouge et blanc ondulants, bouche centrale entrouverte, petits poissons qui s'approchent, éclairage de récif sombre et bioluminescent.",
-  "lore": "Elle a l'air d'une fleur. C'est tout ce qu'on lui demande.",
+  "lore": "Elle a l’air d’une fleur. C’est tout ce qu’on lui demande.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -3038,7 +3038,7 @@
    }
   ],
   "visual": "Trois-mâts fantôme aux voiles déchirées rouge sang, coque rongée et couverte de coquillages, lanternes vertes, équipage de silhouettes translucides, voguant au-dessus des vagues dans une tempête nocturne.",
-  "lore": "Son capitaine a juré de franchir le cap, dût-il naviguer jusqu'au Jugement. On l'a pris au mot.",
+  "lore": "Son capitaine a juré de franchir le cap, dût-il naviguer jusqu’au Jugement. On l’a pris au mot.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -3064,7 +3064,7 @@
   "id": "ABY-068",
   "number": 68,
   "name": "Mosasaure",
-  "title": "Le roi des mers d'avant",
+  "title": "Le roi des mers d’avant",
   "faction": "abyssal",
   "rarity": "HR",
   "category": "Bête primordiale",
@@ -3087,7 +3087,7 @@
    }
   ],
   "visual": "Reptile marin géant au corps de varan allongé, nageoires puissantes, mâchoires immenses à double rangée de dents, gueule ouverte sur un banc de poissons, eaux préhistoriques bleu-vert.",
-  "lore": "Avant les requins, avant les baleines, il y avait lui. Il n'a pas fini sa journée.",
+  "lore": "Avant les requins, avant les baleines, il y avait lui. Il n’a pas fini sa journée.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -3136,7 +3136,7 @@
    }
   ],
   "visual": "Poisson cuirassé préhistorique énorme, tête couverte de plaques osseuses sombres, mâchoire en lames tranchantes à la place des dents, nageant dans une mer obscure parmi des fossiles géants.",
-  "lore": "Il n'a pas de dents. Ses os tranchent mieux.",
+  "lore": "Il n’a pas de dents. Ses os tranchent mieux.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -3181,7 +3181,7 @@
    }
   ],
   "visual": "Grand trilobite à la carapace segmentée bronze et noire, yeux en cristal de calcite brillants, pointes sur les flancs, rampant sur des sédiments luminescents au fond de l'océan.",
-  "lore": "Il a survécu à trois fins du monde. Celle-ci ne l'inquiète pas.",
+  "lore": "Il a survécu à trois fins du monde. Celle-ci ne l’inquiète pas.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -3226,7 +3226,7 @@
    }
   ],
   "visual": "Femme au buste humain pâle vêtue d'un corsage d'écailles noires et de perles, longs cheveux noirs, bas du corps en huit tentacules de pieuvre violets, colliers de perles noires, dans une grotte sous-marine pleine de fioles et d'ossements.",
-  "lore": "Elle échange tout ce que tu veux. Elle prend toujours plus que tu n'as offert.",
+  "lore": "Elle échange tout ce que tu veux. Elle prend toujours plus que tu n’as offert.",
   "evolution": null,
   "sets": [],
   "variants": [

@@ -1965,7 +1965,7 @@
   "id": "NEC-043",
   "number": 43,
   "name": "Ereshkigal",
-  "title": "Reine du Pays sans retour",
+  "title": "Reine du Pays sans Retour",
   "faction": "necrotique",
   "rarity": "M",
   "category": "Divinité mésopotamienne",
@@ -3046,7 +3046,7 @@
    }
   ],
   "visual": "Grand cygne noir majestueux aux yeux rouges, glissant sur une rivière sombre et immobile, brume au ras de l'eau, rive des morts plantée de pins noirs, reflet parfait.",
-  "lore": "Tirer sur lui, c'est entrer dans l'histoire. Personne ne dit comment elle finit.",
+  "lore": "Tirer sur lui, c’est entrer dans l’histoire. Personne ne dit comment elle finit.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -3096,7 +3096,7 @@
    }
   ],
   "visual": "Dieu aztèque de la mort au corps squelettique taché de sang, crâne souriant, coiffe de plumes de hibou et de papier, collier d'yeux, assis sur un trône d'ossements dans une caverne souterraine éclairée de braises.",
-  "lore": "Quatre ans de voyage pour atteindre sa demeure. À l'arrivée, il te demande ce que tu as apporté.",
+  "lore": "Quatre ans de voyage pour atteindre sa demeure. À l’arrivée, il te demande ce que tu as apporté.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -3146,7 +3146,7 @@
    }
   ],
   "visual": "Femme pâle aux longs cheveux noirs en long manteau sombre, visage à demi caché par un masque blanc, grands ciseaux à la main, sous un réverbère dans une rue japonaise déserte la nuit.",
-  "lore": "Elle pose une seule question. Il n'existe aucune bonne réponse.",
+  "lore": "Elle pose une seule question. Il n’existe aucune bonne réponse.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -3190,7 +3190,7 @@
    }
   ],
   "visual": "Statue funéraire de chevalier en pierre se redressant de son tombeau, mains encore jointes sur l'épée, lion sculpté à ses pieds, poussière qui tombe, crypte gothique aux vitraux brisés.",
-  "lore": "On l'a sculpté pour qu'il prie pour toujours. Il a fini sa prière.",
+  "lore": "On l’a sculpté pour qu’il prie pour toujours. Il a fini sa prière.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -3215,7 +3215,7 @@
   "id": "NEC-069",
   "number": 69,
   "name": "Jack-la-Lanterne",
-  "title": "Ni le ciel ni l'enfer",
+  "title": "Ni le ciel ni l’enfer",
   "faction": "necrotique",
   "rarity": "C",
   "category": "Esprit",

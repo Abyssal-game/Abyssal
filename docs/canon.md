@@ -6,9 +6,9 @@ Référence unique pour tout texte d'histoire (récits de la Descente, fiches de
 1. **Le Bestiaire** a été forgé par les **sept royaumes** pour enfermer leurs créatures (Le Premier Souffle). Chaque page est un sceau, chaque sceau une créature.
 2. **Les premiers Scelleurs** sont les **sept gardiens**, un par royaume, qui ont posé la main sur la reliure et juré de ne jamais l'ouvrir (Chronique II, prologue).
 3. **Le Menteur est l'Horloger**, gardien des Artificiels, dernier artisan de la Forge Sans Maître. Il a glissé dans le livre **une page de trop** : le **Rêveur Sous la Fosse** (ABY-048). Il a aussi réglé l'horloge des Sceaux pour qu'elle ne sonne jamais la fin. Il a disparu (Chronique VII) : son nom, le septième, est **gratté** sur la première page.
-4. **Le Rêveur** dort sous toutes les fosses. **L'Abysse est le plus grand de ses rêves** ; les **vingt gardiens** de la Descente sont les rêves de l'Abysse (des souvenirs déformés : l'Architecte, le Seigneur des Chaînes, le Juge croient avoir bâti, forgé ou écrit les Sceaux).
+4. **Le Rêveur** dort sous toutes les fosses. **L'Abysse est le plus grand de ses rêves** ; les **vingt gardiens** de la Descente sont les rêves de l'Abysse (des souvenirs déformés : l'Architecte, le Seigneur des Chaînes, le Juge **croient** avoir bâti, forgé ou écrit les Sceaux ; leurs fiches le disent ainsi). Le Golem du chapitre 12 est fait des cendres de la Fournaise, pas de celles des Scelleurs..
 5. **Qui a déchiré le Bestiaire** : l'Abysse, qui voulait être lu, pour que celui qui rêve se réveille.
-6. **Les royaumes se battent pour rester éveillés** : si tous dorment, le Rêveur s'éveille (Chronique X, Titans).
+6. **Les royaumes se battent pour rester éveillés** : si tous dorment, le Rêveur s'éveille (Chronique X). Les Titans **font semblant de dormir** : sous leurs paupières closes, ils veillent (mystère « Le sommeil des Titans »).
 7. **Fin de la Descente** : vaincre l'Abysse referme l'œil… et **réveille le Rêveur** (« quelque chose vient d'ouvrir les yeux »). C'est la porte de la suite.
 
 ## Les indices déjà posés (dans l'ordre où le joueur les trouve)
@@ -48,7 +48,7 @@ Pas de fêtes de la vraie vie (ni Noël, ni Saint-Valentin…). Chaque saison es
 | V | s6-carnaval | La Cour sans Visage | le Roi sans Visage | mars 2027 |
 | VI | s4-coeurs | Le Pacte de sang | Infernal (la Géhenne) | avr. 2027 |
 | VII | s7-lune | Les Jardins de la Lune pâle | Céleste (les Sept Cieux) | mai 2027 |
-| VIII | s10-forge | La Forge sans Maître | Artificiel (indice sur l'Horloger) | juin 2027 |
+| VIII | s10-forge | La Forge Sans Maître | Artificiel (indice sur l'Horloger) | juin 2027 |
 | IX | s8-solstice | Le Brasier des Titans | Primordial (les Titans endormis) | juil. 2027 |
 | X | s11-moissons | Les Moissons d'ombre | les songes semés par le Rêveur | août 2027 |
 | XI | s12-anniv | Les Pages perdues | le Bestiaire lui-même | sept. 2027 |

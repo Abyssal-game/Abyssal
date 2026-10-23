@@ -47,7 +47,7 @@ export const BOSSES = {
     intro: 'Des lignes de lumière se tracent sur le sol. Quelque chose mesure la salle, et toi avec.',
     mechanic: 'Tous les deux tours, il impose une nouvelle Loi qui change les règles du combat. Chaque Loi est annoncée un tour avant.',
     counter: 'Adapte-toi à chaque Loi : brise-le sous la Loi du fer, ménage tes compétences sous la Loi du silence.',
-    story: 'Il a bâti les Sceaux. Personne ne lui a dit qu’il serait enfermé derrière. Depuis, il retouche les plans de sa prison, une règle à la fois, en attendant que l’une d’elles finisse par céder.',
+    story: 'Il croit avoir bâti les Sceaux. Personne ne lui a dit qu’il serait enfermé derrière. Depuis, il retouche les plans de sa prison, une règle à la fois, en attendant que l’une d’elles finisse par céder.',
     pattern: (phase, round) => (round % 2 === 1 ? 'decree' : phase === 2 && round % 4 === 0 ? 'charge' : 'hit'),
   },
   eclipse: {
@@ -88,7 +88,7 @@ export const BOSSES = {
     intro: 'Des chaînes chauffées à blanc pendent du plafond. Une enclume résonne, et chaque coup fait trembler tes os.',
     mechanic: 'Il lance ses Chaînes sur ta créature la plus forte : elle est frappée et enchaînée (elle ne pourra pas agir à ton prochain tour). En phase 2, sa forge s’embrase : il gagne +1 ATQ à chaque tour où il n’est pas brisé.',
     counter: 'Esquive les Chaînes, libère l’enchaînée avec une Prière, et brise-le souvent pour éteindre sa forge.',
-    story: 'Il a forgé les chaînes qui tiennent l’Abysse fermé. Puis il a compris qu’on ne lui ouvrirait jamais, et il s’est mis à forger pour l’autre camp.',
+    story: 'Il se souvient d’avoir forgé les chaînes qui tiennent l’Abysse fermé. Puis il a compris qu’on ne lui ouvrirait jamais, et il s’est mis à forger pour l’autre camp.',
     pattern: (phase, round) => (round % (phase === 2 ? 2 : 3) === 2 ? 'chain' : 'hit'),
   },
   horloge: {
@@ -162,7 +162,7 @@ export const BOSSES = {
     intro: 'Un marteau frappe trois coups. « L’accusé se lèvera », dit une voix sans visage. Tu comprends que l’accusé, c’est toi.',
     mechanic: 'Un tour sur deux, il rend un Verdict : à ton tour suivant, une action est interdite à toute ton équipe (attaquer, utiliser une compétence, ou se défendre).',
     counter: 'Lis le Verdict et prépare ton tour : si l’attaque est interdite, garde des PA pour les compétences, et inversement.',
-    story: 'Il a écrit les lois des Sceaux, puis il a jugé ceux qui les avaient écrites avec lui. Personne n’a jamais gagné un procès contre lui. Personne n’a jamais su de quoi il était accusé.',
+    story: 'Il croit avoir écrit les lois des Sceaux, puis il a jugé ceux qui les auraient écrites avec lui. Personne n’a jamais gagné un procès contre lui. Personne n’a jamais su de quoi il était accusé.',
     pattern: (phase, round) => (round % 2 === 1 ? 'verdict' : round % 4 === 0 ? 'charge' : 'hit'),
   },
   bete: {
@@ -178,7 +178,7 @@ export const BOSSES = {
     intro: 'Il n’y a plus de salle, plus de mur, plus de sol. Seulement un œil immense qui s’ouvre dans le noir, et qui te reconnaît.',
     mechanic: 'Le combat final, en trois phases. Phase 1 : il frappe et lance des déflagrations. Sous 2/3 de ses PV, il rappelle les pouvoirs des gardiens vaincus. Sous 1/3, il se déchaîne : la nuit dévore tes créatures à chaque tour et ses coups redoublent.',
     counter: 'Garde ta Ferveur et tes meilleures créatures pour la dernière phase, et brise-le pour retenir la nuit.',
-    story: 'Les Sceaux n’enfermaient pas seulement des monstres : ils gardaient l’Abysse endormi, et tous les gardiens n’étaient que ses rêves. Mais l’Abysse lui-même est le rêve de quelque chose qui dort sous toutes les fosses. Tu viens de le réveiller.',
+    story: 'Les Sceaux n’enfermaient pas seulement des monstres : ils gardaient l’Abysse endormi, et tous les gardiens que tu as vaincus n’étaient que ses rêves. Mais l’Abysse lui-même est le rêve de quelque chose qui dort sous toutes les fosses. Tu viens de le réveiller.',
     pattern: (phase, round) => (round % 3 === 0 ? 'channel' : 'hit'),
   },
 };

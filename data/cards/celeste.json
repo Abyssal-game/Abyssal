@@ -523,7 +523,7 @@
    }
   ],
   "visual": "Ange aux yeux bandés d’or qui récite un psautier ouvert flottant devant elle, lettres de lumière qui s’échappent des pages.",
-  "lore": "Chaque psaume qu’elle récite à voix haute affame un peu moins les ténèbres.",
+  "lore": "Chaque psaume qu’elle récite à voix haute affame un peu plus les ténèbres.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2127,7 +2127,7 @@
    }
   ],
   "visual": "Archange immense aux trente-six ailes de lumière dorée, visage serein, tenant un livre de feu ouvert, entouré d’anneaux d’yeux célestes.",
-  "lore": "Il écrit tout ce qui a été et tout ce qui sera. Les pages qu’il a déchirées sont devenues ce bestiaire.",
+  "lore": "Il écrit tout ce qui a été et tout ce qui sera. Une seule page du Bestiaire lui a toujours échappé.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2475,7 +2475,7 @@
    }
   ],
   "visual": "Roi d’ivoire et de laiton sans visage, couronne en forme d’astrolabe, sept sceaux lumineux tournant autour de lui.",
-  "lore": "Il a gravé le premier Sceau, puis le dernier. Depuis, il veille à ce que personne ne les brise.",
+  "lore": "Les sept gardiens l’ont taillé dans la pierre pour veiller sur leurs Sceaux. Depuis, il veille à ce que personne ne les brise.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2786,7 +2786,7 @@
    }
   ],
   "visual": "Femme céleste vêtue d'une robe de soie blanche et de bijoux d'or, ailes et pattes de cygne blanc, tenant une petite harpe, posée au bord d'un lac de lotus sous une lumière dorée.",
-  "lore": "Son chant guérit ceux qui l'écoutent jusqu'au bout. Peu y parviennent.",
+  "lore": "Son chant guérit ceux qui l’écoutent jusqu’au bout. Peu y parviennent.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2908,7 +2908,7 @@
   "id": "CEL-062",
   "number": 62,
   "name": "Le Lièvre de Jade",
-  "title": "Il pile l'élixir sur la lune",
+  "title": "Il pile l’élixir sur la lune",
   "faction": "celeste",
   "rarity": "C",
   "category": "Créature céleste",
@@ -2929,7 +2929,7 @@
    }
   ],
   "visual": "Lièvre blanc lumineux au pelage nacré, debout sur ses pattes arrière, pilant un élixir dans un mortier de jade avec un grand pilon, sur la surface argentée de la lune, Terre au loin.",
-  "lore": "Depuis des siècles il pile la même potion. Il dit qu'elle sera bientôt prête.",
+  "lore": "Depuis des siècles il pile la même potion. Il dit qu’elle sera bientôt prête.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -3008,7 +3008,7 @@
   "id": "CEL-064",
   "number": 64,
   "name": "Râ",
-  "title": "L'œil du jour",
+  "title": "L’œil du jour",
   "faction": "celeste",
   "rarity": "S",
   "category": "Dieu ancien",
@@ -3033,7 +3033,7 @@
    }
   ],
   "visual": "Dieu égyptien à tête de faucon coiffé d'un immense disque solaire entouré d'un cobra dressé, sceptre d'or, debout à la proue d'une barque solaire qui traverse un ciel embrasé.",
-  "lore": "Chaque nuit il traverse le monde des morts. Chaque matin il revient. Pour l'instant.",
+  "lore": "Chaque nuit il traverse le monde des morts. Chaque matin il revient. Pour l’instant.",
   "evolution": null,
   "sets": [
    "pantheons2"
@@ -3084,7 +3084,7 @@
    }
   ],
   "visual": "Déesse guerrière grecque au casque corinthien à haut cimier, égide à tête de gorgone sur la poitrine, lance et grand bouclier rond, chouette perchée sur l'épaule, devant un temple de marbre.",
-  "lore": "Elle n'aime pas la guerre. Elle aime la gagner.",
+  "lore": "Elle n’aime pas la guerre. Elle aime la gagner.",
   "evolution": null,
   "sets": [
    "pantheons2"
@@ -3180,7 +3180,7 @@
    }
   ],
   "visual": "Esprit de l'air presque transparent, silhouette élancée faite de courants de vent et de volutes blanches, ailes de libellule, feuilles et plumes emportées autour, au sommet d'une falaise.",
-  "lore": "Tu l'as sentie passer sur ta nuque. Elle t'a déjà oublié.",
+  "lore": "Tu l’as sentie passer sur ta nuque. Elle t’a déjà oublié.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -3205,7 +3205,7 @@
   "id": "CEL-068",
   "number": 68,
   "name": "Pixiu",
-  "title": "Il garde ce qu'il avale",
+  "title": "Il garde ce qu’il avale",
   "faction": "celeste",
   "rarity": "R",
   "category": "Créature céleste",
@@ -3228,7 +3228,7 @@
    }
   ],
   "visual": "Lion ailé chinois trapu à une corne, crinière bouclée de jade, écailles dorées sur le dos, gueule ouverte sur des pièces d'or, posé sur un toit de temple aux tuiles vertes.",
-  "lore": "Tout ce qu'il mange reste en lui. Les trésors, et les voleurs.",
+  "lore": "Tout ce qu’il mange reste en lui. Les trésors, et les voleurs.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -3252,7 +3252,7 @@
   "id": "CEL-069",
   "number": 69,
   "name": "Byakko",
-  "title": "Le Tigre Blanc de l'Ouest",
+  "title": "Le Tigre Blanc de l’Ouest",
   "faction": "celeste",
   "rarity": "R",
   "category": "Créature céleste",
@@ -3275,7 +3275,7 @@
    }
   ],
   "visual": "Tigre blanc immense aux rayures argentées, yeux d'or, aura de vent d'automne et de feuilles rouges, bondissant au-dessus d'une porte de temple à l'ouest, lune pâle.",
-  "lore": "Le Dragon garde l'Orient. Lui garde l'Occident, et il ne partage pas.",
+  "lore": "Le Dragon garde l’Orient. Lui garde l’Occident, et il ne partage pas.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -3325,7 +3325,7 @@
    }
   ],
   "visual": "Géant à demi-céleste haut comme une colline, ailes atrophiées et grises dans le dos, armure de bronze antique, visage noble et affamé, dominant une ville antique de briques au crépuscule.",
-  "lore": "Ni ange ni homme. Le ciel l'a renié, la terre ne peut pas le nourrir.",
+  "lore": "Ni ange ni homme. Le ciel l’a renié, la terre ne peut pas le nourrir.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -3421,7 +3421,7 @@
    }
   ],
   "visual": "Esprit céleste en forme de grand cerf translucide dont les bois sont des rubans d'aurore boréale verte et violette, galopant dans le ciel au-dessus d'une toundra enneigée.",
-  "lore": "Les anciens disaient qu'il ne fallait pas siffler sous les aurores. Il pourrait répondre.",
+  "lore": "Les anciens disaient qu’il ne fallait pas siffler sous les aurores. Il pourrait répondre.",
   "evolution": null,
   "sets": [],
   "variants": [

@@ -10,7 +10,7 @@
  {
   "key": "abyssal", "name": "Abyssal", "realm": "Le Royaume des Fosses", "prefix": "ABY",
   "motto": "Ce qui coule ne remonte pas.",
-  "desc": "Léviathans, monstres marins et entités englouties. Sous la dernière mer se trouvent les Fosses, où la pression broie la lumière et où des choses très anciennes rêvent sans jamais se réveiller.",
+  "desc": "Léviathans, monstres marins et entités englouties. Sous la dernière mer se trouvent les Fosses, où la pression broie la lumière et où des choses très anciennes rêvent, qu’il ne faut jamais réveiller.",
   "colors": { "primary": "#1C6F95", "secondary": "#35BDE5", "accent": "#AEB9CC" },
   "passive": { "name": "Emprise", "desc": "Une créature blessée par une créature abyssale ne peut pas attaquer à son prochain tour." },
   "featured": "ABY-046"

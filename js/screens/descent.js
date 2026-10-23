@@ -140,12 +140,12 @@ export default function descent(app, root) {
     /* v448 : dans une fenêtre, plus d'encadré dans le cadre : titre en tête (à côté de la croix), sachet au centre */
     if (full) return `<div class="center dc-smh"><b class="dc-sm-k">${done ? 'Fond de l’Abysse atteint' : 'Le fond de l’Abysse'}</b><h2>Étage ${FINAL_FLOOR} · L’Abysse</h2></div>
       <div class="dc-sms"><img class="dc-sms-pack" alt="" src="assets/packs/abysse2.webp">
-        <p>Le dernier étage de la Descente. La première victoire contre L’Abysse donne le <b>Booster de l’Abysse</b> : 5 cartes, une Mythique ou mieux, toutes au moins argentées, avec <b>une Secrète que tu n’as pas</b>.</p>
+        <p>Le dernier étage de la Descente. La première victoire contre l’Abysse donne le <b>Booster de l’Abysse</b> : 5 cartes, une Mythique ou mieux, toutes au moins argentées, avec <b>une Secrète que tu n’as pas</b>.</p>
         ${done ? '' : '<p class="small muted">Première victoire : titre « Vainqueur de l’Abysse », Cadre de l’Œil et 2 coffres abyssaux.</p>'}
         <div class="dc-sm-bar"><span class="progress"><i style="width:${(best / FINAL_FLOOR) * 100}%"></i></span><small>Ton record : ${best} / ${FINAL_FLOOR}</small></div></div>`;
     return `<section class="panel dc-summit ${done ? 'done' : ''}"><img class="dc-sm-pack" alt="" src="assets/packs/abysse2.webp">
       <div class="dc-sm-body"><b class="dc-sm-k">${done ? 'Fond de l’Abysse atteint' : 'Le fond de l’Abysse'}</b><h2>Étage ${FINAL_FLOOR} · L’Abysse</h2>
-        <p class="small">Le dernier étage de la Descente. La première victoire contre L’Abysse donne le <b>Booster de l’Abysse</b> : 5 cartes, une Mythique ou mieux, toutes au moins argentées, avec <b>une Secrète que tu n’as pas</b>.</p>
+        <p class="small">Le dernier étage de la Descente. La première victoire contre l’Abysse donne le <b>Booster de l’Abysse</b> : 5 cartes, une Mythique ou mieux, toutes au moins argentées, avec <b>une Secrète que tu n’as pas</b>.</p>
         ${done ? '' : '<p class="small muted">Première victoire : titre « Vainqueur de l’Abysse », Cadre de l’Œil et 2 coffres abyssaux.</p>'}
         <div class="dc-sm-bar"><span class="progress"><i style="width:${(best / FINAL_FLOOR) * 100}%"></i></span><small>Ton record : ${best} / ${FINAL_FLOOR}</small></div></div></section>`;
   }
@@ -226,7 +226,7 @@ export default function descent(app, root) {
         ${w ? `<div class="vx-loot"><span class="vx-chip">${icon('crystal')}+${fmt(w.shards + (w.first?.shards || 0))}</span>${w.ash + (w.first?.ash || 0) ? `<span class="vx-chip">${icon('ash')}+${fmt(w.ash + (w.first?.ash || 0))}</span>` : ''}${w.chest ? `<span class="vx-chip gold" style="--cc:${CHESTS[w.chest].color}">${icon('p:chest')}${esc(CHESTS[w.chest].name)}</span>` : ''}${feats.length ? `<span class="vx-chip feat">${icon('p:feats')}${feats.join(' · ')}</span>` : ''}</div>` : ''}
         ${w?.named ? `<p class="vx-week">${icon('skull')} <b>${esc(w.named.title)}</b> a succombé : butin de <b>+${fmt(w.named.shards)} éclats</b>.</p>` : ''}
         ${w?.firstWin ? `<p class="vx-week vx-first">${icon('star')} <b>Ta toute première victoire !</b> L’Abysse t’offre <b>+${fmt(w.firstWin)} éclats</b>.</p>` : ''}
-        ${w?.abyss ? `<p class="vx-week vx-first">${icon('crown')} <b>Tu as vaincu L’Abysse.</b> Titre « Vainqueur de l’Abysse », Cadre de l’Œil de l’Abysse et <b>2 coffres abyssaux</b> !</p>` : ''}
+        ${w?.abyss ? `<p class="vx-week vx-first">${icon('crown')} <b>Tu as vaincu l’Abysse.</b> Titre « Vainqueur de l’Abysse », Cadre de l’Œil de l’Abysse et <b>2 coffres abyssaux</b> !</p>` : ''}
         ${w?.bossTicket ? `<p class="vx-week">${icon('crown')} Le gardien laisse un <b>ticket de booster premium</b> derrière lui !</p>` : ''}
         ${w?.weekly ? `<p class="vx-week">${icon('sparkle')} <b>${esc(cat.get(w.weekly).name)}</b> rejoint ta collection !</p>` : ''}
         ${w?.boss ? bossRecap(w.boss) : ''}

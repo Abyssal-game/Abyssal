@@ -689,7 +689,7 @@
    }
   ],
   "visual": "Créature à l’avant d’aigle et à l’arrière de cheval, ailes rousses, serres et sabots mêlés.",
-  "lore": "L’Arioste le fit naître d’un griffon et d’une jument. On disait l’union impossible : d’où son nom.",
+  "lore": "L’Arioste le fit naître d’un griffon et d’une jument. On disait l’union impossible : il est né quand même.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2331,7 +2331,7 @@
    }
   ],
   "visual": "Le premier fauve, gravé dans l’or : crinière de rayons, griffes de lumière, regard qui a vu naître la peur.",
-  "lore": "Avant lui, rien ne fuyait. Toutes les bêtes de ce bestiaire portent un peu de sa trace.",
+  "lore": "Avant lui, rien ne fuyait. Toutes les bêtes de ce Bestiaire portent un peu de sa trace.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -3086,7 +3086,7 @@
    }
   ],
   "visual": "Troll massif à la peau de roche moussue, long nez crochu, petits yeux brillants, bras démesurés traînant au sol, caverne humide éclairée par des champignons.",
-  "lore": "Coupe-lui un bras : il te regardera le faire repousser.",
+  "lore": "Coupe-lui un bras : il le fera repousser sous tes yeux.",
   "evolution": null,
   "sets": [
    "legendes"
@@ -3416,7 +3416,7 @@
    }
   ],
   "visual": "Créature humanoïde grise aux immenses ailes de papillon de nuit, sans tête distincte, deux grands yeux rouges luisants dans le torse, perchée sur la poutre d'un vieux pont métallique dans la brume.",
-  "lore": "On le voit toujours juste avant. Personne ne sait s'il prévient ou s'il attend.",
+  "lore": "On le voit toujours juste avant. Personne ne sait s’il prévient ou s’il attend.",
   "evolution": null,
   "sets": [],
   "variants": [

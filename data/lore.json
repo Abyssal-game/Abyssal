@@ -9,8 +9,8 @@
   ]
  },
  "chronicles": [
-  { "at": 1, "title": "I. La première page", "text": "Une page se détache toujours en premier. On dit que c’est la plus légère, celle qui tenait le moins. Ceux qui la trouvent entendent, pendant une seconde, un battement qui n’est pas le leur, régulier comme un tic-tac. Le Bestiaire t’a remarqué." },
-  { "at": 10, "title": "II. Les Sept Sceaux", "text": "Le Bestiaire fut scellé par sept gardiens, un par royaume. Chacun posa sa main sur la reliure et promit de ne jamais l’ouvrir. Les livres anciens disent qu’un seul d’entre eux a menti. Ils ne disent pas lequel." },
+  { "at": 1, "title": "I. La page la plus légère", "text": "Une page se détache toujours en premier. On dit que c’est la plus légère, celle qui tenait le moins. Ceux qui la trouvent entendent, pendant une seconde, un battement qui n’est pas le leur, régulier comme un tic-tac. Le Bestiaire t’a remarqué." },
+  { "at": 10, "title": "II. Les Sept Gardiens", "text": "Le Bestiaire fut scellé par sept gardiens, un par royaume. Chacun posa sa main sur la reliure et promit de ne jamais l’ouvrir. Les livres anciens disent qu’un seul d’entre eux a menti. Ils ne disent pas lequel." },
   { "at": 25, "title": "III. La Chute", "text": "Le premier conflit opposa la Lumière à elle-même. Une partie des Sept Cieux se jeta vers le bas, entraînant ses anges dans la Géhenne naissante. La Chute dura neuf jours. Depuis, l’Infernal et le Céleste parlent la même langue et se haïssent dans le même accent." },
   { "at": 50, "title": "IV. La Titanomachie", "text": "Les Titans des Terres d’Avant régnaient sur un monde encore tiède. Leurs enfants se révoltèrent et les enfermèrent sous les montagnes. Les Primordiaux n’ont jamais reconnu cette défaite : pour eux, dix mille ans ne sont qu’un repos un peu long." },
   { "at": 80, "title": "V. Le Traité des Fosses", "text": "Les Abyssaux n’ont jamais combattu. Ils ont attendu que les autres s’épuisent, puis ont proposé un traité : la mer garderait tout ce qui y tombe. Depuis, chaque navire coulé, chaque cité engloutie et chaque noyé appartiennent légalement aux Fosses." },
@@ -32,13 +32,13 @@
   { "name": "Le Rêveur Sous la Fosse", "text": "La page en trop. Il dort au fond de toutes les mers à la fois, et ses rêves prennent forme dans le monde éveillé. L’Abysse est le plus grand de ses rêves." },
   { "name": "Lilith", "text": "Elle était présente lorsque les sceaux furent posés. Elle sait lequel des sept gardiens a menti, et elle attend qu’on lui pose la question correctement." },
   { "name": "Le Roi Sans Tombe", "text": "Aucune terre n’a accepté son corps. Il marche vers le Bestiaire, et chaque sceau brisé raccourcit son chemin." },
-  { "name": "L’Horloger", "text": "Le dernier artisan de la Forge Sans Maître, et le gardien qui scella le Bestiaire au nom des Artificiels. Ses automates le cherchent encore. L’Horloge de la Fin, peut-être, est son testament." },
+  { "name": "L’Horloger", "text": "Le dernier artisan de la Forge Sans Maître, et le gardien qui scella le Bestiaire au nom des Artificiels. Ses automates le cherchent encore. Le Gardien du Temps, peut-être, est son testament." },
   { "name": "Le Gardien du Septième Ciel", "text": "Il garde la dernière porte. Il a reçu l’ordre de ne jamais l’ouvrir, mais personne ne lui a dit de l’autre côté de quelle porte il se trouvait." }
  ],
  "mysteries": [
   { "set": "neant", "title": "Le motif", "text": "Les Entités du Néant ne sont pas des créatures. Ce sont des absences qui ont pris une forme pour pouvoir être enfermées." },
-  { "set": "peches", "title": "Le huitième péché", "text": "Les sept princes des péchés gardent un secret : il existe un huitième péché, celui d’avoir posé les sceaux. Ils ne disent pas qui l’a commis." },
-  { "set": "titans", "title": "Le sommeil des Titans", "text": "Les douze Titans ne sont pas emprisonnés. Ils dorment, volontairement, parce que leur sommeil tient le Rêveur endormi." },
+  { "set": "peches", "title": "Le huitième péché", "text": "Les sept princes des péchés gardent un secret : il existe un huitième péché, celui d’avoir menti en posant les sceaux. Ils ne disent pas qui l’a commis." },
+  { "set": "titans", "title": "Le sommeil des Titans", "text": "Les douze Titans ne sont pas emprisonnés. Ils font semblant de dormir : sous leurs paupières closes, ils veillent, car si tous s’endormaient, le Rêveur se réveillerait." },
   { "set": "plaies", "title": "Les plaies n’étaient pas des punitions", "text": "Chaque plaie libérée a été un signal. Quelqu’un essaie de réveiller les royaumes, pour qu’ils restent éveillés." }
  ]
 }

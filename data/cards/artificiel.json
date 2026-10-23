@@ -1978,7 +1978,7 @@
   "id": "ART-043",
   "number": 43,
   "name": "Le Gardien du Temps",
-  "title": "Le dernier horloger",
+  "title": "Le remonteur du monde",
   "faction": "artificiel",
   "rarity": "R",
   "category": "Automate cosmique",
@@ -2292,7 +2292,7 @@
    }
   ],
   "visual": "Ballerine automate en porcelaine fêlée, tutu de dentelle jauni, articulations à ressorts apparentes, tournant sur la pointe sur le couvercle d'une boîte à musique géante ouverte, mécanisme doré visible, poussière qui danse dans la lumière.",
-  "lore": "Tant que la mélodie joue, elle danse. Quand elle s'arrête, elle te cherche.",
+  "lore": "Tant que la mélodie joue, elle danse. Quand elle s’arrête, elle te cherche.",
   "evolution": null,
   "sets": [
    "objets"
@@ -2318,7 +2318,7 @@
   "id": "ART-050",
   "number": 50,
   "name": "Le Turc Mécanique",
-  "title": "Il n'a jamais perdu",
+  "title": "Il n’a jamais perdu",
   "faction": "artificiel",
   "rarity": "R",
   "category": "Automate",
@@ -2342,7 +2342,7 @@
    }
   ],
   "visual": "Automate joueur d'échecs du XVIIIe siècle assis derrière un grand meuble en bois verni, turban et robe ottomane, bras articulé tendu vers un échiquier, rouages visibles par les portes ouvertes du meuble, regard de verre fixe, salon de cour éclairé aux bougies.",
-  "lore": "On a ouvert le meuble cent fois pour y chercher un homme. On n'a jamais pensé à regarder dans ses yeux.",
+  "lore": "On a ouvert le meuble cent fois pour y chercher un homme. On n’a jamais pensé à regarder dans ses yeux.",
   "evolution": null,
   "sets": [
    "merveilles"
@@ -2392,7 +2392,7 @@
    }
   ],
   "visual": "Canard automate en cuivre doré posé sur un piédestal ouvragé, plumes en lamelles de métal, ventre transparent laissant voir des tubes et des engrenages, bec ouvert picorant des graines, atelier d'horloger encombré.",
-  "lore": "On le nourrit de grain, il ne meurt jamais de faim. On ne sait pas ce qu'il digère vraiment.",
+  "lore": "On le nourrit de grain, il ne meurt jamais de faim. On ne sait pas ce qu’il digère vraiment.",
   "evolution": null,
   "sets": [
    "merveilles"
@@ -2418,7 +2418,7 @@
  {
   "id": "ART-052",
   "number": 52,
-  "name": "La Tête d'Airain",
+  "name": "La Tête d’Airain",
   "title": "Le temps est, le temps fut",
   "faction": "artificiel",
   "rarity": "R",
@@ -2442,7 +2442,7 @@
    }
   ],
   "visual": "Tête humaine géante en bronze patiné posée sur un autel de pierre, bouche entrouverte d'où sort une lueur, yeux creux brillants, cabinet d'alchimiste plein de manuscrits et de sabliers renversés.",
-  "lore": "Elle n'a parlé que trois fois. La troisième, la tour s'est effondrée.",
+  "lore": "Elle n’a parlé que trois fois. La troisième, la tour s’est effondrée.",
   "evolution": null,
   "sets": [
    "merveilles"
@@ -2469,7 +2469,7 @@
  {
   "id": "ART-053",
   "number": 53,
-  "name": "Mannequin d'Atelier",
+  "name": "Mannequin d’Atelier",
   "title": "Il prend tes mesures",
   "faction": "artificiel",
   "rarity": "C",
@@ -2490,7 +2490,7 @@
    }
   ],
   "visual": "Mannequin de couture sans tête en toile beige recousue, pied en fonte, épingles plantées dans le torse, bras en bois articulés qui tiennent des ciseaux, atelier de tailleur sombre plein de rouleaux de tissu.",
-  "lore": "Le tailleur est parti. Le mannequin, lui, a gardé ses mesures en tête. Il cherche quelqu'un qui leur corresponde.",
+  "lore": "Le tailleur est parti. Le mannequin, lui, a gardé ses mesures en tête. Il cherche quelqu’un qui leur corresponde.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2558,7 +2558,7 @@
  {
   "id": "ART-055",
   "number": 55,
-  "name": "L'Homme d'Osier",
+  "name": "L’Homme d’Osier",
   "title": "La cage qui marche",
   "faction": "artificiel",
   "rarity": "HR",
@@ -2584,7 +2584,7 @@
    }
   ],
   "visual": "Géant d'osier tressé haut comme une tour, cage thoracique creuse et vide, braises qui couvent entre les tiges, cornes de branchages, debout au milieu d'une lande de pierres levées sous un ciel d'orage.",
-  "lore": "On l'a construit pour le brûler. Il a décidé de ne pas attendre.",
+  "lore": "On l’a construit pour le brûler. Il a décidé de ne pas attendre.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2632,7 +2632,7 @@
    }
   ],
   "visual": "Lion émeraude translucide comme du verre liquide, crinière de vapeur verte, gueule ouverte qui avale un soleil d'or, symboles alchimiques gravés dans l'air, laboratoire envahi de cornues brisées.",
-  "lore": "Le vitriol des sages. Il ronge l'or, puis il ronge celui qui le tenait.",
+  "lore": "Le vitriol des sages. Il ronge l’or, puis il ronge celui qui le tenait.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2661,7 +2661,7 @@
   "id": "ART-057",
   "number": 57,
   "name": "Alambic Vivant",
-  "title": "Il distille ce qu'il attrape",
+  "title": "Il distille ce qu’il attrape",
   "faction": "artificiel",
   "rarity": "PC",
   "category": "Créature alchimique",
@@ -2681,7 +2681,7 @@
    }
   ],
   "visual": "Alambic de cuivre bosselé monté sur six pattes d'araignée en laiton, serpentin enroulé comme une queue, liquide vert bouillonnant dans la cucurbite, vapeur toxique, cave d'alchimiste.",
-  "lore": "Ce qui entre dans son ballon en ressort goutte à goutte. Il n'en reste jamais beaucoup.",
+  "lore": "Ce qui entre dans son ballon en ressort goutte à goutte. Il n’en reste jamais beaucoup.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2727,7 +2727,7 @@
    }
   ],
   "visual": "Silhouette humaine découpée dans du papier blanc, couverte de calligraphies à l'encre rouge, volant en se pliant et se dépliant, nuée de petits papiers qui la suivent, temple japonais nocturne.",
-  "lore": "Un souffle d'onmyōji, un papier plié, et le voilà prêt à servir. Ou à frapper.",
+  "lore": "Un souffle d’onmyōji, un papier plié, et le voilà prêt à servir. Ou à frapper.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2820,7 +2820,7 @@
    }
   ],
   "visual": "Cheval de bois colossal aux planches cloutées de bronze, trappe ouverte dans le ventre d'où descendent des ombres armées, yeux peints, roues massives, porte d'une cité antique en flammes la nuit.",
-  "lore": "Une ville l'a fait entrer en chantant. Elle n'a plus jamais chanté.",
+  "lore": "Une ville l’a fait entrer en chantant. Elle n’a plus jamais chanté.",
   "evolution": null,
   "sets": [
    "merveilles"
@@ -2874,7 +2874,7 @@
    }
   ],
   "visual": "Char volant en forme de temple à étages doré et ciselé, propulsé par des flammes bleues, rubans et clochettes, survolant des nuages au-dessus de montagnes au crépuscule, rayons de lumière.",
-  "lore": "Les épopées disent qu'il allait plus vite que la pensée. Elles ne disent pas qui le pilote aujourd'hui.",
+  "lore": "Les épopées disent qu’il allait plus vite que la pensée. Elles ne disent pas qui le pilote aujourd’hui.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -2926,7 +2926,7 @@
    }
   ],
   "visual": "Petit automate astronome bossu au corps de laiton, tête en lunette télescopique, portant sur le dos un grand astrolabe plat gravé de constellations comme une carapace, doigt fin pointé vers une étoile, coupole d'observatoire ouverte sur la nuit.",
-  "lore": "Chacun de ses anneaux suit une étoile. L'un d'eux suit la tienne.",
+  "lore": "Chacun de ses anneaux suit une étoile. L’un d’eux suit la tienne.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -3016,7 +3016,7 @@
    }
   ],
   "visual": "Longue bande d'étoffe de coton blanc flottant dans le ciel nocturne comme un serpent, deux petits yeux noirs à une extrémité, s'enroulant autour d'un réverbère de papier au-dessus de toits de tuiles.",
-  "lore": "Le soir, un tissu blanc passe au-dessus des toits. Celui qu'il frôle ne respire plus.",
+  "lore": "Le soir, un tissu blanc passe au-dessus des toits. Celui qu’il frôle ne respire plus.",
   "evolution": null,
   "sets": [
    "objets"
@@ -3043,7 +3043,7 @@
   "id": "ART-065",
   "number": 65,
   "name": "Locomotive Hurlante",
-  "title": "Elle n'a pas besoin de rails",
+  "title": "Elle n’a pas besoin de rails",
   "faction": "artificiel",
   "rarity": "R",
   "category": "Automate",
@@ -3066,7 +3066,7 @@
    }
   ],
   "visual": "Locomotive à vapeur noire déformée en bête, chasse-pierres en mâchoire d'acier, phares rouges comme des yeux, cheminée crachant une fumée violette, roues motrices écrasant des rails tordus dans un tunnel.",
-  "lore": "Le dernier train de la nuit. Il ne s'arrête dans aucune gare.",
+  "lore": "Le dernier train de la nuit. Il ne s’arrête dans aucune gare.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -3110,7 +3110,7 @@
    }
   ],
   "visual": "Main desséchée de pendu tenant cinq chandelles noires allumées au bout des doigts, flammes bleues immobiles, posée sur un coussin de velours dans une chambre où dorment des silhouettes.",
-  "lore": "Tant qu'elle brûle, personne ne se réveille. Les voleurs l'aiment beaucoup.",
+  "lore": "Tant qu’elle brûle, personne ne se réveille. Les voleurs l’aiment beaucoup.",
   "evolution": null,
   "sets": [
    "objets"
@@ -3159,7 +3159,7 @@
    }
   ],
   "visual": "Énorme grimoire relié de cuir sombre et de fermoirs de fer, pages couvertes de rangées de dents, sceau-œil sur la couverture, chaînes brisées, flottant au-dessus d'une bibliothèque interdite pleine de pages arrachées.",
-  "lore": "Chaque page porte le nom de quelqu'un qui a voulu savoir.",
+  "lore": "Chaque page porte le nom de quelqu’un qui a voulu savoir.",
   "evolution": null,
   "sets": [
    "objets"
@@ -3213,7 +3213,7 @@
    }
   ],
   "visual": "Femme façonnée dans l'argile et l'or, vêtue d'une longue robe grecque bleu nuit à bordures dorées, veines lumineuses de forge sur le visage et les bras, tenant contre elle une grande jarre antique entrouverte d'où s'échappent des ombres ailées, une petite lumière restée au fond, temple grec au crépuscule.",
-  "lore": "Tout s'est envolé. Sauf ce qui était au fond, et c'est pour ça qu'elle ne referme jamais tout à fait.",
+  "lore": "Tout s’est envolé. Sauf ce qui était au fond, et c’est pour ça qu’elle ne referme jamais tout à fait.",
   "evolution": null,
   "sets": [
    "merveilles"
@@ -3239,7 +3239,7 @@
   "id": "ART-069",
   "number": 69,
   "name": "Le Coq de Strasbourg",
-  "title": "Il chante l'heure de trop",
+  "title": "Il chante l’heure de trop",
   "faction": "artificiel",
   "rarity": "PC",
   "category": "Automate",
@@ -3284,8 +3284,8 @@
  {
   "id": "ART-070",
   "number": 70,
-  "name": "L'Éléphant-Horloge",
-  "title": "La merveille d'al-Jazari",
+  "name": "L’Éléphant-Horloge",
+  "title": "La merveille d’al-Jazari",
   "faction": "artificiel",
   "rarity": "HR",
   "category": "Automate",
@@ -3309,7 +3309,7 @@
    }
   ],
   "visual": "Éléphant mécanique paré d'or et de mosaïques portant sur son dos une tour-horloge ornée, scribe automate et serpents de bronze sur la tour, oiseau mécanique au sommet, cour d'un palais oriental la nuit.",
-  "lore": "Toutes les demi-heures, l'oiseau siffle et les serpents se tournent. Personne ne sait vers quoi ils regardent.",
+  "lore": "Toutes les demi-heures, l’oiseau siffle et les serpents se tournent. Personne ne sait vers quoi ils regardent.",
   "evolution": null,
   "sets": [
    "merveilles"
@@ -3336,7 +3336,7 @@
   "id": "ART-071",
   "number": 71,
   "name": "Nain de Jardin Maudit",
-  "title": "Il n'était pas là hier",
+  "title": "Il n’était pas là hier",
   "faction": "artificiel",
   "rarity": "C",
   "category": "Objet maudit",

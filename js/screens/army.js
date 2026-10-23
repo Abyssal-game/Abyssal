@@ -208,7 +208,7 @@ export function chestsScreen(app, root) {
         <span class="ch-art">${chestSVG(t)}</span>${n ? `<span class="ch-n">${n}</span>` : ''}<b>${esc(CHESTS[t].name)}</b><span class="small">${esc(CHESTS[t].desc)}</span></button>`; }).join('')}</div>
       <details class="panel dc-fold"><summary>${icon('info')} D’où viennent les coffres ?</summary><ul class="small">
         <li>Descente : la première victoire au 3e étage de chaque chapitre donne un coffre (bois, puis fer dès l’étage 15, or dès l’étage 50).</li>
-        <li>Épreuves du jour : un coffre par victoire, plus beau à mesure que tu descends dans la Descente.</li>
+        <li>Épreuves du jour : un coffre par victoire, plus beau à mesure que ton record avance dans la Descente.</li>
         <li>Chaque gardien vaincu pour la première fois donne un coffre d’or (étages 5, 15, 25…) ou abyssal (étages 10, 20, 30…).</li>
         <li>Le Cauchemar redonne ces coffres, d’une qualité au-dessus.</li></ul></details>`;
   };

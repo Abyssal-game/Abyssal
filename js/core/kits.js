@@ -153,7 +153,7 @@ export const ROLE_TXT = {
   poison: ['Son poison ronge les grosses cibles et traverse les boucliers.', 'Lente à faire effet contre une cible fragile.', 'Entraveurs (Givre-venin), Venin du chasseur.'],
   controle: ['Annule les coups dangereux en gelant ou en ralentissant.', 'Peu de dégâts ; les gardiens résistent au gel.', 'Attaquants (Bris de glace), Empoisonneurs.'],
   soutien: ['Rend toute l’équipe plus forte (Cri de guerre, Marque, Ferveur).', 'Faible seule : elle brille avec des attaquants.', 'Attaquants et Fléaux.'],
-  zone: ['Frappe plusieurs ennemis à la fois.', 'Chaque coup est faible contre une seule grosse cible.', 'Soutiens (Cri de guerre : Raz-de-marée), Brisure.'],
+  zone: ['Frappe plusieurs ennemis à la fois.', 'Chaque coup est faible contre une seule grosse cible.', 'Soutiens (Cri de guerre : Grande marée), Brisure.'],
 };
 // Une entrée compacte de kits-data.js → la même forme qu'un kit écrit à la main
 function expandKit(g) {

@@ -28,7 +28,7 @@ export default function bestiary(app, root) {
       <div class="realms">${cat.factions.map((f) => `<a class="panel realm" href="#/faction/${f.key}" style="--fc:${f.colors.secondary}"><span class="realm-sig">${sigil(f.key)}</span><div><h3>${esc(f.realm)}</h3><p class="small muted">${esc(f.motto)}</p></div></a>`).join('')}</div>
       <h2 class="section-title">Le Livre interdit</h2>
       <details class="panel dc-fold"><summary>${picon('genesis')} ${esc(lore.genesis.title)}</summary><div>${lore.genesis.text.map((p) => `<p class="lore">${esc(p)}</p>`).join('')}</div></details>
-      <details class="panel dc-fold"><summary>${picon('chronicles')} Chroniques du Néant <span class="small muted">${open.length} / ${lore.chronicles.length}</span></summary><div>
+      <details class="panel dc-fold"><summary>${picon('chronicles')} Chroniques du Bestiaire <span class="small muted">${open.length} / ${lore.chronicles.length}</span></summary><div>
         ${open.map((c) => `<h3>${esc(c.title)}</h3><p class="lore">${esc(c.text)}</p>`).join('')}
         ${sealed.length ? `<p class="small muted">${icon('lock')} ${sealed.length} page${sealed.length > 1 ? 's' : ''} encore scellée${sealed.length > 1 ? 's' : ''}.${nextAt ? ` La prochaine s’ouvre à ${nextAt} créatures découvertes (tu en as ${n}).` : ''}</p>` : ''}
       </div></details>
@@ -55,7 +55,7 @@ export default function bestiary(app, root) {
     const keys = Object.keys(groups).sort((a, b) => (a === 'Pages scellées') - (b === 'Pages scellées') || a.localeCompare(b, 'fr'));
     return `
       <div class="chips fac-grid" role="group" aria-label="Faction">${FACTION_ORDER.map((f) => `<button class="chip" data-act="fac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>
-      <label class="input-wrap"><span class="sr">Rechercher dans le bestiaire</span>${icon('search')}<input class="input" id="best-q" type="search" placeholder="Rechercher une créature connue…" value="${esc(st.q)}"></label>
+      <label class="input-wrap"><span class="sr">Rechercher dans le Bestiaire</span>${icon('search')}<input class="input" id="best-q" type="search" placeholder="Rechercher une créature connue…" value="${esc(st.q)}"></label>
       <p class="small muted">${fp.owned} entrée${fp.owned > 1 ? 's' : ''} sur ${fp.total} dans ${esc(lowArt(cat.faction[st.faction].realm))}.</p>
       ${keys.map((k) => `<h3 class="section-title">${esc(k)}</h3><div class="codex">${groups[k].map((c) => entry(c)).join('')}</div>`).join('') || '<p class="muted">Aucune créature connue ne correspond.</p>'}
       ${sealedN && !q ? `<p class="small muted center sealed-n">${icon('lock')} ${sealedN} page${sealedN > 1 ? 's' : ''} encore scellée${sealedN > 1 ? 's' : ''} dans ce royaume. Ouvre des boosters pour les révéler.</p>` : ''}`;

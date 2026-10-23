@@ -91,7 +91,7 @@ export default function friends(app, root, params = []) {
     if (!d) {
       root.innerHTML = `<section class="panel ornate profile-head bn-profile fr-head"><div class="av-col"><span class="avatar-big pf pf-fer">${pic(f.avatar)}</span></div>
         <div class="ph-text"><h1><span class="ph-name">${esc(name)}</span></h1><p class="ph-title">${esc(f.title || '')}</p><p class="muted small">Niveau ${f.level || 1}</p></div></section>
-        <p class="panel small center">${t('{name} n’a pas encore partagé son profil : il apparaîtra quand il aura ouvert le jeu à jour.', { name: esc(name) })}</p>${actsHTML(f, name)}`;
+        <p class="panel small center">${t('{name} n’a pas encore partagé son profil : il apparaîtra la prochaine fois qu’il ouvrira le jeu.', { name: esc(name) })}</p>${actsHTML(f, name)}`;
       return;
     }
     const ids = Object.keys(d.col || {}).filter((x) => cat.get(x));
