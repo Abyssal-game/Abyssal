@@ -400,7 +400,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const d = $('.dv'), t = el(uid); if (!d || !t) return;
     const b = rectOf(d), r = rectOf(t);
     const cx = ((r.left + r.width / 2 - b.left) / b.width - 0.5) * -10 * k, cy = ((r.top + r.height / 2 - b.top) / b.height - 0.5) * -10 * k;
-    if (!d.animate || d.classList.contains('qte-on')) return; /* v633 : pas de caméra pendant une défense */
+    if (!d.animate) return; /* v672 : caméra de nouveau permise pendant une défense (v633 l'avait retirée par erreur de piste) */
     camA.forEach((a) => a.cancel());
     camA = moveEls().map((r) => r.animate([{ translate: '0 0' }, { translate: `${cx.toFixed(1)}px ${cy.toFixed(1)}px`, offset: 0.3 }, { translate: '0 0' }], { duration: T(450), easing: 'ease-out' }));
   };

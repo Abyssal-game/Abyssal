@@ -6410,3 +6410,39 @@ button.v2-mini.fallen::after { content: ''; position: absolute; inset: 0; border
 .stamp-host .dv-stamp { top: 44%; }
 .stamp-host .dv-stamp.small { top: 36%; }
 .stamp-host .dv-stamp.dv-stamp-end { top: 30%; }
+/* v672 : effets remis après la vraie cause de l'écran noir (v670 : classe « as »), en mieux. Seulement des déplacements, rotations
+   à plat et fondus sur de petits éléments (jamais de 3D, de flou ni de mouvement de tout l'écran du combat).
+   --kr : sens de la bascule selon le camp (un ennemi bascule vers l'arrière-haut, une de tes créatures vers l'arrière-bas). */
+.dv-row.enemy .dv-c { --kr: 1; }
+.dv-row.ally .dv-c { --kr: -1; }
+/* coup reçu : écrasement, recul, bascule franche puis retour amorti */
+@keyframes dvHit2 {
+  0% { transform: translateY(var(--kb)) scale(.92, .9); filter: brightness(2.2) saturate(0); }
+  18% { transform: translate(calc(var(--kr) * -7px), calc(var(--kb) * .5)) rotate(calc(var(--kr) * -3.5deg)) scale(.97); filter: brightness(1.4) saturate(.6); }
+  42% { transform: translate(calc(var(--kr) * 5px), 0) rotate(calc(var(--kr) * 2deg)); filter: none; }
+  66% { transform: translateX(calc(var(--kr) * -2px)) rotate(calc(var(--kr) * -.8deg)); }
+  100% { transform: none; }
+}
+@keyframes dvHit { 20% { transform: translateX(-6px) rotate(-2deg); filter: brightness(2.2) saturate(0); } 55% { transform: translateX(5px) rotate(1.2deg); } }
+/* esquive : la carte se jette de côté en penchant, puis revient se placer */
+@keyframes dvDodge { 0% { transform: none; } 28% { transform: translateX(-36px) rotate(-8deg) scale(.96); opacity: .7; } 62% { transform: translateX(9px) rotate(2.5deg); opacity: 1; } 100% { transform: none; } }
+/* parade : l'attaquant est repoussé et chancelle */
+@keyframes dvRecoil { 0% { transform: none; } 22% { transform: translateY(calc(var(--kr) * -24px)) rotate(calc(var(--kr) * -5deg)) scale(.95); filter: brightness(1.6); } 55% { transform: translateY(calc(var(--kr) * -8px)) rotate(calc(var(--kr) * 2.5deg)); filter: none; } 80% { transform: rotate(calc(var(--kr) * -1deg)); } 100% { transform: none; } }
+/* rugissement : la carte gonfle et tremble */
+@keyframes dvRoar { 0% { transform: none; } 20% { transform: scale(1.12); filter: brightness(1.5) saturate(1.3); } 34% { transform: scale(1.09) rotate(-2.5deg); } 48% { transform: scale(1.1) rotate(2.5deg); } 62% { transform: scale(1.06) rotate(-1.2deg); filter: none; } 100% { transform: none; } }
+/* sceau : il tourne en se posant */
+@keyframes dvSeal { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.3) rotate(-40deg); } 30% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0); } 75% { opacity: .9; } to { opacity: 0; transform: translate(-50%, -50%) scale(1.25) rotate(25deg); } }
+.dv-c.dying { transform: scale(.7) rotate(-6deg); }
+/* tampons « Esquive ! / Parade ! / Touché » : ils tombent penchés comme un coup de tampon, puis une onde de choc part */
+@keyframes dfStamp672 { 0% { opacity: 0; transform: translateY(-50%) scale(1.9) rotate(-9deg); } 16% { opacity: 1; transform: translateY(-50%) scale(.94) rotate(-3deg); } 28%, 74% { opacity: 1; transform: translateY(-50%) scale(1) rotate(-3deg); } 100% { opacity: 0; transform: translateY(-62%) scale(1.03) rotate(-3deg); } }
+.stamp-host .dv-stamp, .dl-arena .dv-stamp { animation-name: dfStamp672; }
+.stamp-host .dv-stamp::after { content: ''; position: absolute; left: 50%; top: 50%; width: 150px; height: 150px; margin: -75px 0 0 -75px; border-radius: 50%; border: 3px solid var(--sw, rgba(255, 255, 255, .8)); opacity: 0; animation: dfWave .55s .08s ease-out both; pointer-events: none; }
+.stamp-host .dv-stamp.s-dodge { --sw: rgba(127, 224, 160, .85); }
+.stamp-host .dv-stamp.s-parry { --sw: rgba(230, 245, 255, .95); }
+.stamp-host .dv-stamp.s-none { --sw: rgba(255, 84, 104, .8); }
+@keyframes dfWave { 0% { opacity: .9; transform: scale(.3); } 100% { opacity: 0; transform: scale(1.7); } }
+/* voile rouge de la défense : il bat comme un cœur */
+.dv.qte-on::after { opacity: 1; animation: dfHeart 1s ease-in-out infinite; }
+@keyframes dfHeart { 0% { opacity: .55; } 12% { opacity: 1; } 24% { opacity: .65; } 36% { opacity: .95; } 60%, 100% { opacity: .55; } }
+@media (prefers-reduced-motion: reduce) { .dv.qte-on::after { animation: none; opacity: .85; } .stamp-host .dv-stamp::after { display: none; } }
+html.fx-light .dv.qte-on::after { animation: none; opacity: .85; }
