@@ -6267,3 +6267,5 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 .pack-standard:not(.pack-skin) .pk-name { height: 14.5cqw; font-size: 6.2cqw; }
 .pack-event:not(.pack-skin) .pk-label { top: 66.2%; bottom: 19.8%; left: 11%; right: 11%; justify-content: center; gap: 2.6cqw; }
 .pack-event:not(.pack-skin) .pk-name { height: auto; }
+/* v651 : Équipe, les 2 cases de réserve centrées et un peu plus grandes (avant : 2 cases sur une grille de 3, vide à droite) */
+.v2-slots.res { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; width: 78%; max-width: 420px; margin-left: auto; margin-right: auto; }
