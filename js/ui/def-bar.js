@@ -41,6 +41,16 @@ export const QTE_BRICKS = { name: 'Défense inventée', base: 'tap', speed: 1, z
 /* bilan d'une séquence pour le moteur : tout paré = parade ; trop de ratés = touché ; sinon esquive */
 export const defVerdict = (res, T) => res.every((r) => r === 'parry') ? 'parry' : res.filter((r) => r === 'none').length / res.length > T.missShare + 0.005 ? 'none' : 'dodge';
 
+/* v670 : les tampons (« Esquive ! », « Parade ! », « Assaut amorti »…) ne sont plus posés dans l'écran du combat : sur l'iPhone,
+   le tampon de fin d'Assaut faisait passer tout l'écran au noir le temps de son affichage (vidéo du propriétaire, Dévoreur).
+   Ils vont dans un calque à part, fixe, hors du combat. Le Labo des défenses garde son arène. */
+export function stampHost(dv) {
+  if (dv && !dv.classList.contains('dv')) return dv;
+  let h = document.getElementById('stamp-host');
+  if (!h) { h = document.createElement('div'); h.id = 'stamp-host'; h.className = 'stamp-host'; h.setAttribute('aria-hidden', 'true'); document.body.appendChild(h); }
+  return h;
+}
+
 export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titleHTML = '', reduced = false, alive = () => true, setTap, sfx = {}, hap = () => {}, T, onResult = null }) {
   return new Promise((resolve) => {
     const n = letters.length, strong = tier !== 'normal';
@@ -91,7 +101,7 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
         {
           const stamp = document.createElement('div'); stamp.className = `dv-stamp s-${res}${n > 1 ? ' small' : ''}`;
           stamp.innerHTML = `<b>${res === 'parry' ? 'Parade parfaite !' : res === 'dodge' ? 'Esquive !' : 'Touché…'}</b>`;
-          dv?.appendChild(stamp); setTimeout(() => stamp.remove(), n > 1 ? 520 : 900);
+          stampHost(dv).appendChild(stamp); setTimeout(() => stamp.remove(), n > 1 ? 520 : 900);
         }
         if (res === 'none') { sfx.miss?.(); hap(2); } else if (i < n - 1) { (res === 'parry' ? sfx.parry : sfx.hit)?.(); hap(1); } /* le dernier coup sonne avec son impact */
         out.push(res);
@@ -158,7 +168,7 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
         pips[i]?.classList.remove('now'); pips[i]?.classList.add(`r-${res}`);
         const stamp = document.createElement('div'); stamp.className = `dv-stamp s-${res}${n > 1 ? ' small' : ''}`;
         stamp.innerHTML = `<b>${res === 'parry' ? 'Parade parfaite !' : res === 'dodge' ? 'Esquive !' : 'Touché…'}</b>`;
-        dv?.appendChild(stamp); setTimeout(() => stamp.remove(), n > 1 ? 520 : 900);
+        stampHost(dv).appendChild(stamp); setTimeout(() => stamp.remove(), n > 1 ? 520 : 900);
         if (res === 'none') { sfx.miss?.(); hap(2); } else if (i < n - 1) { (res === 'parry' ? sfx.parry : sfx.hit)?.(); hap(1); }
         out.push(res);
         onResult?.({ i, letter: letters[i], res, ms: when != null && t0 ? Math.round(when - (t0 + tb)) : null, dodge, parry, dur: Math.round(D) });

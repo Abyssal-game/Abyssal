@@ -2965,7 +2965,7 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 .dc-door.r-gouffre.has-art .dc-door-art { background: linear-gradient(0deg, rgba(8, 9, 13, 0) 50%, rgba(8, 9, 13, .82) 72%, rgba(8, 9, 13, .95)), var(--art) center 92% / cover no-repeat; }
 /* v339 : plan en pleine illustration, refait : vrai plein écran (posé sur la page), entrée en coup de lame, lignes
    d'énergie, braises de la faction, titre qui frappe, sortie en éclair. Remplace le plan de la v338. */
-.as { position: fixed; left: 0; right: 0; top: 0; height: var(--app-h, 100dvh); z-index: 79; overflow: hidden; background: #040306; pointer-events: auto; }
+/* v670 : règle .as (plan plein écran retiré en v357) supprimée : la classe servait aussi au tampon de fin d’Assaut */
 .as.out { opacity: 0; transition: opacity .22s ease-in; }
 .as-art { position: absolute; inset: 0; animation: asReveal var(--as) cubic-bezier(.2, .8, .2, 1) both; }
 .as-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 34%; transform-origin: 50% 38%; animation: asPush var(--as) cubic-bezier(.15, .7, .25, 1) both; }
@@ -3000,7 +3000,7 @@ html.standalone .op-pile { width: min(78vw, 340px, calc((var(--app-h, 100dvh) - 
 @keyframes asSlam { 0%, 16% { opacity: 0; transform: scale(2.2); letter-spacing: .3em; } 28% { opacity: 1; transform: scale(1); } 86% { opacity: 1; transform: scale(1.04); } 100% { opacity: 0; transform: scale(1.3); } }
 @keyframes asRule { 0%, 24% { transform: scaleX(0); } 40%, 100% { transform: scaleX(1); } }
 .as.again .as-lines { display: none; }
-.as { z-index: 81; }
+
 .as-k b { font-size: clamp(1.25rem, 7.2vw, 2.4rem); }
 @media (max-width: 380px) { .as-who { letter-spacing: .1em; font-size: .72rem; } .as-k .aicon, .as-k .iicon, .as-k img { width: 30px; height: 30px; } }
 /* v340 : image de la fenêtre de phase 2 des gardiens : la règle générale img { max-width: 100% } l'empêchait de remplir
@@ -5524,7 +5524,7 @@ body.battle-mode .prog-chip { top: calc(var(--safe-t, env(safe-area-inset-top, 0
 .cb-hits i.r-none { background: #FF5468; border-color: #FF5468; }
 .dv-stamp.small { top: 36%; animation-duration: .52s; }
 .dv-stamp.small b { font-size: 1.3rem; }
-.dv-stamp.as { top: 30%; }
+.dv-stamp.dv-stamp-end { top: 30%; }
 .cb-assault.out { opacity: 0; transition: opacity .25s; }
 /* v576 : retour immédiat au toucher (onglets, sous-onglets, puces, choix) : le doigt voit l'appui avant que l'écran change */
 .tab:active .tab-pic, .tab:active .orb { transform: scale(.9); transition-duration: .05s; }
@@ -6398,3 +6398,15 @@ button.v2-mini.fallen::after { content: ''; position: absolute; inset: 0; border
 .v2-slot.full .tm-revive { display: block; margin: 6px auto 0; min-height: 38px; color: #FFC28A; border-color: rgba(255, 140, 60, .6); }
 .br-sheet .btn .br-ic, .br-bar .br-ic { filter: drop-shadow(0 0 6px rgba(255, 140, 60, .7)); }
 .br-sheet .btn .br-ic { width: 1.7em; height: 1.7em; }
+/* v670 : écran noir après l'Assaut d'un gardien (vidéo du propriétaire, Dévoreur, 3 coups) : le noir couvrait tout l'écran pile le temps
+   du tampon de fin « Assaut amorti », dont seule la lueur restait visible (lueur posée derrière lui, z-index -1, dans l'écran du combat).
+   Les tampons vont maintenant dans un calque fixe hors du combat, sans élément derrière eux : la lueur est leur propre fond. */
+.stamp-host { position: fixed; left: 0; right: 0; top: 0; height: var(--app-h, 100vh); pointer-events: none; z-index: 950; overflow: hidden; }
+.dv-stamp { padding: 54px 0; background: none; }
+.dv-stamp::before { content: none; display: none; }
+.dv-stamp.s-dodge { background: radial-gradient(closest-side, rgba(127, 224, 160, .42), transparent) center / 220px 100% no-repeat; }
+.dv-stamp.s-parry { background: radial-gradient(closest-side, rgba(220, 240, 255, .55), transparent) center / 220px 100% no-repeat; }
+.dv-stamp.s-none { background: radial-gradient(closest-side, rgba(255, 60, 80, .38), transparent) center / 220px 100% no-repeat; }
+.stamp-host .dv-stamp { top: 44%; }
+.stamp-host .dv-stamp.small { top: 36%; }
+.stamp-host .dv-stamp.dv-stamp-end { top: 30%; }

@@ -28,7 +28,7 @@ import { ULTS, roleOf } from '../core/army.js';
 import { mountDiorama, roomFor } from '../ui/diorama.js';
 import { moveIconUrl, passivesOf, passiveIconUrl, moveFor, PASSIVES } from '../core/kits.js';
 import { hap } from '../ui/sound.js';
-import { playBar, defVerdict, FAM_RHYTHM, KIND_RHYTHM, BOSS_ASSAULT } from '../ui/def-bar.js'; /* v594 */
+import { playBar, stampHost, defVerdict, FAM_RHYTHM, KIND_RHYTHM, BOSS_ASSAULT } from '../ui/def-bar.js'; /* v594 */
 import { getTune } from '../ui/def-tune.js';
 import { perfStart, perfStop, perfMark } from '../ui/perf.js'; /* v601 : moniteur de fluidité */
 
@@ -965,9 +965,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     ov.classList.add('out'); setTimeout(() => ov.remove(), 250);
     const res = await barQTE(s, A.seq, { beat: A.beat, title: A.name });
     const r = verdict(res.length ? res : ['none']);
-    const end = document.createElement('div'); end.className = `dv-stamp s-${r} as`;
+    const end = document.createElement('div'); end.className = `dv-stamp s-${r} dv-stamp-end`; /* v670 : avant « as », classe du plan plein écran retiré en v357 (fond noir fixe) : tout l’écran passait au noir */
     end.innerHTML = `<b>${r === 'parry' ? 'Assaut brisé !' : r === 'dodge' ? 'Assaut amorti' : 'Assaut subi…'}</b>`;
-    $('.dv')?.appendChild(end); setTimeout(() => end.remove(), 1000);
+    stampHost($('.dv')).appendChild(end); setTimeout(() => end.remove(), 1000); /* v670 : hors de l'écran du combat */
     if (r === 'parry') app.sfx.perfect?.();
     await wait(reduced ? 250 : 650);
     return r;
