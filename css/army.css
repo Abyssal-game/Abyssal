@@ -6114,3 +6114,83 @@ html .sc-board[data-pmat="tp-givre"] .sc-plate { top: 13%; bottom: 13%; left: 17
 .pf-cx-vif-fondateur { --fr: url(../assets/frames/cx-vif-fondateur-4.webp); }
 .np-pl-fondateur { --npb: rgba(242, 193, 78, .85); background-image: url(../assets/plates/pl-fondateur.webp), linear-gradient(90deg, #0a0806, #2a1d0c 50%, #0a0806); color: #F7E2A8; }
 .cx-fd-v > .np { font-size: 1.15rem; min-width: 220px; padding: .55em 1.6em; }
+
+/* v640 : aperçu des cosmétiques refait : vitrine éclairée à la couleur de la rareté, objet en grand qui flotte, mises en situation */
+.sheet.pv2 { background: #0A0910; }
+.sheet.pv2 .sheet-body { padding: 0 0 calc(120px + var(--safe-b, 0px)); }
+.pv2-stage { position: relative; overflow: hidden; display: grid; justify-items: center; padding: 26px 16px 18px; text-align: center;
+  background: radial-gradient(70% 60% at 50% 42%, color-mix(in srgb, var(--rk) 34%, transparent), transparent 72%), radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--rk) 16%, #1A1424), #0A0910 80%);
+  border-bottom: 1px solid color-mix(in srgb, var(--rk) 40%, transparent); }
+.pv2-ray { position: absolute; left: 50%; top: -20%; width: 70%; height: 95%; transform: translateX(-50%); pointer-events: none;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--rk) 30%, transparent), transparent 85%); clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%); opacity: .55; }
+.pv2-dust { position: absolute; inset: 0; pointer-events: none; opacity: .5;
+  background-image: radial-gradient(1.5px 1.5px at 20% 30%, #fff8, transparent), radial-gradient(1px 1px at 70% 20%, #fff7, transparent), radial-gradient(1.5px 1.5px at 80% 60%, #fff6, transparent), radial-gradient(1px 1px at 30% 70%, #fff6, transparent), radial-gradient(1px 1px at 55% 45%, #fff8, transparent);
+  animation: pv2Dust 9s linear infinite; }
+@keyframes pv2Dust { from { transform: translateY(8px); } to { transform: translateY(-14px); } }
+.pv2-kick { position: relative; z-index: 1; display: flex; align-items: center; gap: 8px; margin: 0 0 6px; font: 700 .7rem/1 var(--f-display, inherit); letter-spacing: .14em; text-transform: uppercase; color: #CDBF9E; }
+.pv2-rk { padding: 4px 9px; border-radius: 999px; color: #0B0A0F; background: var(--rk); box-shadow: 0 0 14px color-mix(in srgb, var(--rk) 60%, transparent); letter-spacing: .08em; }
+.pv2-show { position: relative; z-index: 1; display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; width: 100%; min-height: 236px; }
+.pv2-obj { grid-column: 2; display: grid; place-items: center; animation: pv2Float 4.2s ease-in-out infinite; filter: drop-shadow(0 14px 22px rgba(0, 0, 0, .65)) drop-shadow(0 0 22px color-mix(in srgb, var(--rk) 45%, transparent)); }
+@keyframes pv2Float { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(5px); } }
+.pv2-ped { position: absolute; left: 50%; bottom: 4px; width: 62%; height: 22px; transform: translateX(-50%); border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--rk) 55%, transparent), transparent); opacity: .8; }
+.pv2-nav { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: #F2C14E; background: rgba(0, 0, 0, .5); border: 1px solid rgba(232, 201, 135, .4); box-shadow: 0 4px 10px rgba(0, 0, 0, .5); }
+.pv2-nav.prev { grid-column: 1; } .pv2-nav.next { grid-column: 3; }
+.pv2-nav svg { width: 18px; height: 18px; } .pv2-nav:active { transform: scale(.92); }
+.pv2-name { position: relative; z-index: 1; margin: 8px 0 4px; font-family: var(--f-display, inherit); font-size: 1.45rem; line-height: 1.12; color: #F7E7C0; text-shadow: 0 2px 10px #000, 0 0 18px color-mix(in srgb, var(--rk) 40%, transparent); }
+.pv2-desc { position: relative; z-index: 1; margin: 6px 0 0; max-width: 30em; font-size: .86rem; color: rgba(233, 223, 200, .78); }
+.pv2-dots { position: relative; z-index: 1; display: flex; gap: 6px; justify-content: center; margin: 4px 0 2px; }
+.pv2-dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, .22); }
+.pv2-dots i.on { width: 20px; border-radius: 4px; background: var(--rk); box-shadow: 0 0 8px var(--rk); }
+.pv2-pos { position: relative; z-index: 1; color: #CDBF9E; }
+/* les objets en grand */
+.pv2-big-av { width: 150px !important; height: 150px !important; }
+.pv2-big-back { width: 150px; aspect-ratio: 5 / 7; border-radius: 10px; transform: rotate(-4deg); }
+.pv2-big-pack .pack { width: 132px; }
+.pv2-big-np { display: inline-block; min-width: 250px; font-size: 1.3rem; padding: .6em 1.8em; }
+.pv2-big-mat { height: 230px; width: auto; border-radius: 8px; }
+.pv2-big-fond { display: grid; place-items: center start; width: min(320px, 78vw); aspect-ratio: 16 / 9; padding-left: 16px; border-radius: 14px; background: linear-gradient(90deg, rgba(10, 9, 16, .6), transparent 70%), var(--pf-bg) right center / cover no-repeat, #0B0C12; }
+.pv2-big-fond .avatar-mini { width: 64px !important; height: 64px !important; }
+.pv2-big-emote .re-pic { width: 130px; height: 130px; }
+.pv2-big-emote { display: grid; justify-items: center; gap: 6px; font-family: var(--f-display, inherit); font-size: 1.05rem; color: #F3E3BA; }
+.pv2-big-title { display: grid; justify-items: center; gap: 10px; padding: 18px 26px; border-radius: 14px; background: linear-gradient(180deg, rgba(40, 28, 10, .85), rgba(12, 9, 6, .9)); border: 1px solid color-mix(in srgb, var(--rk) 60%, #8a6a2a); }
+.pv2-big-title img, .pv2-big-title svg { width: 54px; height: 54px; }
+.pv2-big-title b { font-family: var(--f-display, inherit); font-size: 1.35rem; color: #F2C14E; text-shadow: 0 0 14px rgba(242, 193, 78, .45); }
+.pv2-big-fan img { width: 74px !important; }
+/* mises en situation */
+.pv2-body { padding: 14px 16px 0; }
+.pv2-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; margin: 0 0 6px; border-radius: 14px; background: rgba(255, 255, 255, .05); border: 1px solid rgba(232, 201, 135, .18); }
+.pv2-seg button { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 42px; border-radius: 10px; color: #CDBF9E; font: 700 .86rem var(--f-display, inherit); }
+.pv2-seg button svg { width: 14px; height: 14px; }
+.pv2-seg button.on { color: #1A1006; background: linear-gradient(180deg, #F7D98B, #C9962E); box-shadow: 0 2px 10px rgba(242, 193, 78, .35); }
+.pv2-cap { margin: 16px 0 8px; font: 700 .72rem/1.2 var(--f-display, inherit); letter-spacing: .12em; text-transform: uppercase; color: #C9A85C; }
+.pv2-prof { display: flex; align-items: center; gap: 16px; padding: 16px; border-radius: 16px; background: linear-gradient(135deg, #1B1526, #0D0B12); border: 1px solid rgba(232, 201, 135, .22); box-shadow: 0 10px 22px rgba(0, 0, 0, .45); }
+.pv2-prof.has-fond { background: linear-gradient(90deg, rgba(10, 9, 16, .78), rgba(10, 9, 16, .15) 75%), var(--pf-bg) right center / cover no-repeat, #0B0C12; }
+.pv2-prof .avatar-big { width: 96px !important; height: 96px !important; }
+.pv2-prof-t { display: grid; gap: 4px; min-width: 0; }
+.pv2-prof-t b { font-family: var(--f-display, inherit); font-size: 1.1rem; color: #F7E7C0; }
+.pv2-ttl { color: #E8C987; font-size: .9rem; } .pv2-prof-t small { color: rgba(233, 223, 200, .65); }
+.pv2-lb { border-radius: 12px; background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .08); }
+.pv2-seat { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 999px; background: rgba(0, 0, 0, .45); border: 1px solid rgba(232, 201, 135, .25); width: fit-content; }
+.pv2-seat .avatar-mini { width: 44px !important; height: 44px !important; }
+.pv2-seat b { color: #F7E7C0; } .pv2-seat small { color: #8FD18F; font-size: .74rem; }
+.pv2-emote-scene { display: grid; gap: 10px; justify-items: start; }
+.pv2-fan img { width: 96px; }
+.pv2-where { display: flex; flex-wrap: wrap; gap: 6px; }
+.pv2-where span { padding: 6px 10px; border-radius: 999px; font-size: .78rem; color: #E9DFC8; background: rgba(255, 255, 255, .06); border: 1px solid rgba(232, 201, 135, .2); }
+.pv2-foot { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; display: grid; justify-items: center; gap: 6px; padding: 12px 16px calc(12px + var(--safe-b, 0px));
+  background: linear-gradient(180deg, rgba(10, 9, 16, .2), #0A0910 30%); border-top: 1px solid rgba(232, 201, 135, .18); }
+.pv2-buy { min-width: 240px; }
+.pv2-src { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 14px; color: #6FD3C9; background: rgba(111, 211, 201, .08); border: 1px solid rgba(111, 211, 201, .35); }
+.pv2-src span { display: grid; text-align: left; } .pv2-src b { color: #CFF5F0; } .pv2-src small { color: rgba(207, 245, 240, .7); }
+.pv2-src svg { width: 20px; height: 20px; }
+html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
+@media (prefers-reduced-motion: reduce) { .pv2-obj, .pv2-dust { animation: none; } }
+.pv2-seg button:not(.on) { background: transparent !important; border: 0 !important; box-shadow: none !important; color: #CDBF9E !important; }
+.pv2-seg button.on { border: 0 !important; }
+.pv2-show { grid-template-columns: 44px minmax(0, 1fr) 44px; }
+.pv2-big-fond { width: 100%; max-width: 300px; }
+.pv2-name { max-width: 100%; overflow-wrap: anywhere; }
+.pv2-big-np { min-width: 0; width: 100%; max-width: 280px; }
+.pv2-emote-scene .re-bubble { position: relative !important; inset: auto !important; left: auto !important; right: auto !important; bottom: auto !important; top: auto !important; transform: none !important; margin: 0; }
+.pv2-emote-scene .re-bubble { z-index: 1 !important; margin-left: 30px; }
