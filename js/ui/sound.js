@@ -49,6 +49,7 @@ function ensure() {
 let quietT = 0;
 export function audioQuiet() {
   if (!ctx || !endG) return;
+  if (document.hidden || window.Capacitor?.isNativePlatform?.()) needKick = true;
   clearTimeout(quietT);
   try { const t = ctx.currentTime; endG.gain.cancelScheduledValues(t); endG.gain.setValueAtTime(endG.gain.value, t); endG.gain.linearRampToValueAtTime(0, t + 0.04); } catch (e) { /* rien */ }
   quietT = setTimeout(() => { if (ctx.state === 'running') ctx.suspend().catch(() => {}); }, 70);
@@ -58,6 +59,8 @@ export function audioWake() {
   clearTimeout(quietT);
   const up = () => { try { const t = ctx.currentTime; endG.gain.cancelScheduledValues(t); endG.gain.setValueAtTime(endG.gain.value, t); endG.gain.linearRampToValueAtTime(1, t + 0.12); } catch (e) { /* rien */ } };
   if (ctx.state !== 'running') ctx.resume().then(up).catch(() => {}); else up();
+  /* v662 : si la relance ne répond pas (son « interrompu » au retour), on garde la main au prochain toucher */
+  setTimeout(() => { if (ctx.state !== 'running') needKick = true; else if (endG.gain.value < 0.5 && !document.hidden) up(); }, 600);
 }
 export function configureSound({ sound, volume: v, haptics: h, loud: l }) {
   enabled = sound !== false;
@@ -75,14 +78,23 @@ export const audioCtxIfAny = () => ctx;
 export const audioOut = () => endG || ctx?.destination; /* v622 : la musique passe aussi par la sortie commune */
 // v370 : déblocage robuste (iPhone, surtout dans l'application) : à chaque fin de toucher, si le son est suspendu
 // ou interrompu, on le relance et on joue un échantillon muet (geste accepté par WebKit)
-let unlocking = false;
+let unlocking = false, needKick = false;
+/* v662 (le propriétaire : « je sors de l'app sans la fermer, je reviens : plus de son ») : au retour, l'iPhone laisse
+   souvent le son « interrompu » ; sa relance peut ne jamais répondre, et l'ancien déblocage restait alors bloqué pour
+   toujours (unlocking jamais remis à faux). Désormais : au premier toucher après un retour, le son est relancé
+   (suspendu puis repris s'il se dit déjà en marche, cas où WebKit reste muet), avec un délai de secours, et on
+   réessaie à chaque toucher tant qu'il n'est pas reparti. */
 const kick = () => {
-  if (!ctx || ctx.state === 'running' || unlocking) return;
+  if (!ctx || unlocking) return;
+  if (ctx.state === 'running' && !needKick) return;
   unlocking = true;
+  const t0 = setTimeout(() => { unlocking = false; }, 900);
+  const done = () => { clearTimeout(t0); unlocking = false; if (ctx.state === 'running') { needKick = false; if (!document.hidden) audioWake(); } };
   try { const b = ctx.createBuffer(1, 1, 22050), src = ctx.createBufferSource(); src.buffer = b; src.connect(ctx.destination); src.start(0); } catch (e) { /* rien */ }
-  ctx.resume().catch(() => {}).finally(() => { unlocking = false; if (!document.hidden) audioWake(); });
+  const p = ctx.state === 'running' ? ctx.suspend().then(() => ctx.resume()) : ctx.resume();
+  p.catch(() => {}).finally(done);
 };
-if (typeof document !== 'undefined') ['touchend', 'click', 'keydown'].forEach((t) => document.addEventListener(t, kick, { capture: true, passive: true }));
+if (typeof document !== 'undefined') ['touchstart', 'touchend', 'click', 'keydown'].forEach((t) => document.addEventListener(t, kick, { capture: true, passive: true }));
 // v370 : état du son, affiché dans Réglages → À propos (diagnostic sur téléphone)
 export function audioInfo() {
   return { state: ctx ? ctx.state : 'pas encore créé', samples: Object.keys(samples).length, expected: sampleList ? sampleList.size : null, diag: audioDiag, session: navigator.audioSession ? navigator.audioSession.type : 'sans objet', enabled, volume };
