@@ -48,3 +48,18 @@ export const setPackSkin = (std, prem) => { packSkin.standard = skinKey(std); pa
 export const getPackSkin = (type) => packSkin[type] || null;
 export const skinOk = (k) => (okKey(k) && k.startsWith('sachet-') ? k : null); // sachet venu d'un autre joueur
 export const emoteLabel = (k) => t(EMOTES[k]?.text || '');
+
+/* v644 : un pseudo trop long pour sa plaque (petites cases de Personnaliser, de l'Échoppe…) : la taille du texte baisse jusqu'à ce qu'il tienne en entier */
+export function fitPlate(el) {
+  el.style.fontSize = '';
+  let fs = parseFloat(getComputedStyle(el).fontSize) || 12;
+  for (let i = 0; i < 10 && el.scrollWidth > el.clientWidth + 1 && fs > 6; i++) { fs *= 0.9; el.style.fontSize = `${fs.toFixed(2)}px`; }
+}
+export function watchPlates() {
+  let queued = false;
+  const run = () => { queued = false; document.querySelectorAll('.np-demo').forEach((el) => { if (el.isConnected && el.offsetParent) fitPlate(el); }); };
+  const ask = () => { if (!queued) { queued = true; requestAnimationFrame(run); } };
+  new MutationObserver((list) => { for (const m of list) for (const n of m.addedNodes) if (n.nodeType === 1 && (n.classList.contains('np-demo') || n.querySelector('.np-demo'))) return ask(); })
+    .observe(document.body, { childList: true, subtree: true });
+  document.fonts?.ready.then(ask);
+}

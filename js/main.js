@@ -10,7 +10,7 @@ import { icon, EMBLEM } from './ui/icons.js';
 import { toast, esc, fmt, reducedMotion, closeTopSheet, openSheet, handlePopstate, afterHistory } from './ui/dom.js';
 import { sfx, configureSound, audioCtx, audioCtxIfAny, audioQuiet, audioWake } from './ui/sound.js';
 import { musicRoute, configureMusic } from './ui/music.js';
-import { setPackSkin, getPackSkin } from './ui/vitrine.js'; /* v565 : sachet de booster */
+import { setPackSkin, getPackSkin, watchPlates } from './ui/vitrine.js'; /* v565 : sachet de booster */
 import { stillOf, backUrl } from './ui/still.js';
 import { VERSION } from './config.js';
 import { openCardDetail } from './screens/detail.js';
@@ -53,6 +53,7 @@ import { setScene } from './ui/scene.js';
 import { initNative, isNative } from './native.js';
 import { initLive } from './live.js';
 startTranslator();
+watchPlates(); /* v644 : pseudos à leur taille dans les plaques */
 
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,

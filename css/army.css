@@ -6212,3 +6212,5 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 .pack-skin .pk-name { font-size: calc(6.2cqw * var(--ls, 1)); }
 .pack-skin .pk-tag { font-size: calc(4.6cqw * var(--ls, 1)); padding: calc(1.4cqw * var(--ls, 1)) calc(3cqw * var(--ls, 1)); }
 .pack-skin .pk-label { gap: calc(2.6cqw * var(--ls, 1) * var(--ls, 1)); }
+/* v644 : plaque de la rangée Personnaliser : le pseudo entier (la taille baisse au besoin, fitPlate) */
+.cs-row .cs-pic .np-demo { max-width: 94%; padding: .12em .5em; }

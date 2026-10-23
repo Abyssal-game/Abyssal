@@ -62,7 +62,7 @@ export default function profile(app, root) {
       ['avatar', 'Avatar', av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM, av ? esc(av.name) : 'Une de tes créatures', Object.keys(s.collection).length],
       ['titles', 'Titres', picon('titles'), esc(s.title), `${s.titles.length}`],
       ['frames', 'Cadres de profil', `<span class="avatar-mini pf pf-${s.frame}">${avImg}</span>`, esc(({ ...FRAMES, ...CODEX_FRAMES })[s.frame] || ''), `${ownF.length}`],
-      ['plates', 'Plaque de pseudo', `<span class="np ${s.plate ? `np-${s.plate}` : 'np-none'} np-demo">${esc(shownName.slice(0, 8))}</span>`, esc(PLATES[s.plate] || 'Aucune plaque'), `${(s.plates || []).length}`], /* v564 */
+      ['plates', 'Plaque de pseudo', `<span class="np ${s.plate ? `np-${s.plate}` : 'np-none'} np-demo" translate="no">${esc(shownName)}</span>`, esc(PLATES[s.plate] || 'Aucune plaque'), `${(s.plates || []).length}`], /* v564 */
       ['backs', 'Dos de cartes', `<img alt="" src="${backNow[2]}">`, esc(backNow[1]), `${backs.length}`],
       ['sachets', 'Sachets de booster', `<img alt="" src="assets/packs/${s.sachet || 'standard2'}.webp">`, esc(SACHETS[s.sachet] || 'Sachets d’origine'), `${(s.sachets || []).length}`], /* v565 */
       ['mats', 'Tapis de jeu', `<img class="cs-mat" alt="" src="assets/${s.mat ? `tapis/${s.mat}` : 'sceaux/plateau'}.webp">`, esc(TAPIS[s.mat] || 'Plateau d’origine'), `${(s.mats || []).length}`], /* v632 */
