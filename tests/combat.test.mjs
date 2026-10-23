@@ -12,7 +12,7 @@ const card = (id) => catalog.get(id);
 const A = (id, o = {}) => D.duelUnit(card(id), o);
 const E = (id, o = {}) => D.duelUnit(card(id), { side: 'enemy', ...o });
 // Rôles (faction infernale côté joueur, nécrotique côté ennemi : pas de faiblesse entre elles)
-const ASSAUT = 'INF-001', GARDE = 'INF-009', SOIN = 'INF-003', VENIN = 'INF-006', GEL = 'INF-011', CRI = 'INF-005', ZONE = 'INF-008';
+const ASSAUT = 'INF-001', GARDE = 'INF-015', SOIN = 'INF-024', VENIN = 'INF-006', GEL = 'INF-011', CRI = 'INF-005', ZONE = 'INF-008';
 const FOE = 'NEC-002', FOE2 = 'NEC-004', FOE3 = 'NEC-006';
 const units = (st, side) => st.order[side].map((id) => st.units[id]);
 const clone = (st) => JSON.parse(JSON.stringify(st));

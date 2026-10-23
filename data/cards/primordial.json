@@ -59,6 +59,7 @@
   "category": "Élémentaire",
   "power": 2,
   "role": "T",
+  "combatRole": "zone",
   "stats": {
    "atk": 3,
    "def": 1,
@@ -283,6 +284,7 @@
   "category": "Élémentaire",
   "power": 1,
   "role": "S",
+  "combatRole": "zone",
   "stats": {
    "atk": 4,
    "def": 1,
@@ -1220,6 +1222,7 @@
   "category": "Titan",
   "power": 6,
   "role": "U",
+  "combatRole": "soutien",
   "stats": {
    "atk": 6,
    "def": 3,
@@ -1363,6 +1366,7 @@
   "category": "Titanide",
   "power": 6,
   "role": "M",
+  "combatRole": "controle",
   "stats": {
    "atk": 5,
    "def": 2,
@@ -2120,6 +2124,7 @@
   "category": "Titan",
   "power": 9,
   "role": "B",
+  "combatRole": "zone",
   "stats": {
    "atk": 12,
    "def": 4,
@@ -2679,6 +2684,7 @@
   "category": "Entité du Néant",
   "power": 9,
   "role": "B",
+  "combatRole": "controle",
   "stats": {
    "atk": 12,
    "def": 4,

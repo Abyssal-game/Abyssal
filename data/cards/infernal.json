@@ -108,6 +108,7 @@
   "category": "Démon",
   "power": 2,
   "role": "T",
+  "combatRole": "poison",
   "stats": {
    "atk": 2,
    "def": 2,
@@ -286,6 +287,7 @@
   "category": "Spectre",
   "power": 1,
   "role": "E",
+  "combatRole": "controle",
   "stats": {
    "atk": 3,
    "def": 0,
@@ -377,6 +379,7 @@
   "category": "Bête infernale",
   "power": 1,
   "role": "T",
+  "combatRole": "soutien",
   "stats": {
    "atk": 1,
    "def": 1,
@@ -687,6 +690,7 @@
   "category": "Bête infernale",
   "power": 2,
   "role": "T",
+  "combatRole": "controle",
   "stats": {
    "atk": 2,
    "def": 1,
@@ -1433,6 +1437,7 @@
   "category": "Plante infernale",
   "power": 3,
   "role": "T",
+  "combatRole": "poison",
   "stats": {
    "atk": 3,
    "def": 3,
@@ -1867,6 +1872,7 @@
   "category": "Dieu oublié",
   "power": 7,
   "role": "T",
+  "combatRole": "zone",
   "stats": {
    "atk": 6,
    "def": 6,
@@ -2123,6 +2129,7 @@
   "category": "Démon",
   "power": 7,
   "role": "M",
+  "combatRole": "soutien",
   "stats": {
    "atk": 6,
    "def": 3,
@@ -2332,6 +2339,7 @@
   "category": "Ange déchu",
   "power": 8,
   "role": "B",
+  "combatRole": "zone",
   "stats": {
    "atk": 12,
    "def": 4,

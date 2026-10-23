@@ -10,7 +10,7 @@ const A = (id, o = {}) => D.duelUnit(catalog.get(id), o);
 const E = (id, o = {}) => D.duelUnit(catalog.get(id), { side: 'enemy', ...o });
 const units = (st, side) => st.order[side].map((id) => st.units[id]);
 const boss = (st) => units(st, 'enemy').find((u) => u.boss);
-const team = () => [A('INF-001', { level: 5 }), A('INF-009', { level: 5 }), A('INF-003', { level: 5 })];
+const team = () => [A('INF-001', { level: 5 }), A('INF-015', { level: 5 }), A('INF-024', { level: 5 })];
 const duel = (key) => D.createDuel(team(), [E('NEC-010', { boss: true, scale: 1.2 })], { seed: 7, boss: key });
 // le gardien joue l'intention donnée (sans défense)
 const play = (st, intent) => { const b = boss(st); b.intent = intent; D.beginEnemyTurn(st); const s = D.nextEnemy(st); D.enemyAct(st, s.a, 'none'); D.endEnemyTurn(st); return b; };

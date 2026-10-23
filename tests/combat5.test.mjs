@@ -15,9 +15,9 @@ const playEnemies = (st, ev = []) => { while (D.nextEnemy(st)) ev.push(...D.enem
 
 test('Hurlement (initiative) : lancé en fin de tour, il couvre tout le tour ennemi suivant, puis s’arrête', () => {
   // Cerbère (SAU-043) + un second protecteur : sans provocation, les deux Gardes sont visables
-  const st = neutral(D.createDuel([A('SAU-043', 6), A('INF-009', 6), A('ABY-001', 6)], [E('NEC-010'), E('NEC-011'), E('NEC-012')], { seed: 3 }));
+  const st = neutral(D.createDuel([A('SAU-043', 6), A('INF-015', 6), A('ABY-001', 6)], [E('NEC-010'), E('NEC-011'), E('NEC-012')], { seed: 3 }));
   D.startInitiative(st);
-  const p = Object.values(st.units).find((u) => u.id === 'SAU-043'), other = Object.values(st.units).find((u) => u.id === 'INF-009');
+  const p = Object.values(st.units).find((u) => u.id === 'SAU-043'), other = Object.values(st.units).find((u) => u.id === 'INF-015');
   assert.deepEqual(D.targetsFor(st, 'enemy'), [p.uid, other.uid]);
   // le Cerbère joue en dernier : tous les ennemis ont déjà agi ce tour-ci
   st.init = [...st.init.filter((id) => id !== p.uid), p.uid]; st.ip = st.init.length - 1; st.actor = p.uid; st.turn = 'ally'; p.pa = 3; p.acts = 0;
@@ -37,9 +37,9 @@ test('Hurlement (initiative) : lancé en fin de tour, il couvre tout le tour enn
 });
 
 test('Hurlement (initiative) : lancé avant les ennemis, il couvre leurs actions du tour en cours seulement', () => {
-  const st = neutral(D.createDuel([A('SAU-043', 6), A('INF-009', 6), A('ABY-001', 6)], [E('NEC-010'), E('NEC-011'), E('NEC-012')], { seed: 3 }));
+  const st = neutral(D.createDuel([A('SAU-043', 6), A('INF-015', 6), A('ABY-001', 6)], [E('NEC-010'), E('NEC-011'), E('NEC-012')], { seed: 3 }));
   D.startInitiative(st);
-  const p = Object.values(st.units).find((u) => u.id === 'SAU-043'), other = Object.values(st.units).find((u) => u.id === 'INF-009');
+  const p = Object.values(st.units).find((u) => u.id === 'SAU-043'), other = Object.values(st.units).find((u) => u.id === 'INF-015');
   st.init = [p.uid, ...st.init.filter((id) => id !== p.uid)]; st.ip = 0; st.actor = p.uid; st.turn = 'ally'; p.pa = 3; p.acts = 0;
   const r0 = st.round;
   D.act(st, p.uid, 'hurlement');
@@ -52,8 +52,8 @@ test('Hurlement (initiative) : lancé avant les ennemis, il couvre leurs actions
 });
 
 test('Hurlement (tour par tour) : il couvre le tour ennemi en cours et s’arrête au tour suivant', () => {
-  const st = neutral(D.createDuel([A('SAU-043', 6), A('INF-009', 6)], [E('NEC-010'), E('NEC-011')], { seed: 3 }));
-  const p = Object.values(st.units).find((u) => u.id === 'SAU-043'), other = Object.values(st.units).find((u) => u.id === 'INF-009');
+  const st = neutral(D.createDuel([A('SAU-043', 6), A('INF-015', 6)], [E('NEC-010'), E('NEC-011')], { seed: 3 }));
+  const p = Object.values(st.units).find((u) => u.id === 'SAU-043'), other = Object.values(st.units).find((u) => u.id === 'INF-015');
   D.act(st, p.uid, 'hurlement');
   assert.deepEqual(D.targetsFor(st, 'enemy'), [p.uid]);
   D.beginEnemyTurn(st);
@@ -106,7 +106,7 @@ test('Rémanence : la Malédiction et l’effet « marque » des compétences pr
 
 test('Dévoreur : la digestion passe par la voie normale de la mort (Renaissance, Ténacité, puis chute enregistrée)', () => {
   const mk = () => {
-    const st = D.createDuel([A('CEL-031', 3), A('ABY-001'), A('INF-009')], [E('NEC-010', { boss: true, scale: 3 })], { seed: 3, boss: 'devoreur' });
+    const st = D.createDuel([A('CEL-031', 3), A('ABY-001'), A('INF-015')], [E('NEC-010', { boss: true, scale: 3 })], { seed: 3, boss: 'devoreur' });
     const b = foes(st)[0], v = Object.values(st.units).find((x) => x.id === 'CEL-031');
     v.hp = v.maxHp; D.front(st, 'ally').forEach((x) => { if (x !== v) x.hp = 1; }); // le Phénix, le plus vigoureux, sera avalé
     b.hp = Math.floor(b.maxHp / 2) - 1;

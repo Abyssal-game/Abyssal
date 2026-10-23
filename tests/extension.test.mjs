@@ -14,7 +14,7 @@ const catalog = loadCatalog();
 const card = (id) => catalog.get(id);
 const A = (id, o = {}) => D.duelUnit(card(id), o);
 const E = (id, o = {}) => D.duelUnit(card(id), { side: 'enemy', ...o });
-const ASSAUT = 'INF-001', GARDE = 'INF-009', SOIN = 'INF-003', GEL = 'INF-011';
+const ASSAUT = 'INF-001', GARDE = 'INF-015', SOIN = 'INF-024', GEL = 'INF-011';
 const FOE = 'NEC-002';
 const units = (st, side) => st.order[side].map((id) => st.units[id]);
 const boss = (st) => units(st, 'enemy').find((u) => u.boss);
@@ -189,8 +189,8 @@ test('formes corrompues : un autre passif, sans toucher à la carte d’origine'
 
 test('Descente : plus de pacte avant le gardien (v250), combat direct contre le gardien de l’étage', () => {
   const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom(9) });
-  ['INF-001', 'INF-009', 'INF-003', 'INF-011', 'INF-005'].forEach((id) => g.addCard(id));
-  g.setTeam(['INF-001', 'INF-009', 'INF-003', 'INF-011', 'INF-005']);
+  ['INF-001', 'INF-015', 'INF-024', 'INF-011', 'INF-005'].forEach((id) => g.addCard(id));
+  g.setTeam(['INF-001', 'INF-015', 'INF-024', 'INF-011', 'INF-005']);
   g.startRun();
   const run = g.descent().run;
   run.floor = 5;

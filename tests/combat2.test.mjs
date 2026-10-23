@@ -95,7 +95,7 @@ test('équipes enregistrées : 4 au plus, rechargées d’un toucher, gardées p
   const { migrate, defaultSave } = await import('../js/core/save.js');
   const storage = new MemoryStorage();
   const g = new Game(catalog, storage, { rng: rngFrom('tp'), clock: () => new Date(2026, 9, 12, 12) });
-  const a = ['INF-001', 'INF-009', 'INF-003', 'INF-011', 'INF-005'], b = ['ABY-003', 'ABY-004', 'CEL-004', 'CEL-005', 'SAU-014'];
+  const a = ['INF-001', 'INF-015', 'INF-024', 'INF-011', 'INF-005'], b = ['ABY-003', 'ABY-004', 'CEL-004', 'CEL-005', 'SAU-014'];
   [...a, ...b].forEach((id) => g.addCard(id));
   g.setTeam(a); g.saveTeamPreset('Feu');
   g.setTeam(b); g.saveTeamPreset('Mer');

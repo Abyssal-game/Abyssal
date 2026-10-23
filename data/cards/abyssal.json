@@ -181,6 +181,7 @@
   "category": "Mort-vivant",
   "power": 2,
   "role": "E",
+  "combatRole": "controle",
   "stats": {
    "atk": 3,
    "def": 1,
@@ -399,6 +400,7 @@
   "category": "Créature marine",
   "power": 2,
   "role": "T",
+  "combatRole": "zone",
   "stats": {
    "atk": 2,
    "def": 2,
@@ -617,6 +619,7 @@
   "category": "Créature marine",
   "power": 1,
   "role": "T",
+  "combatRole": "poison",
   "stats": {
    "atk": 1,
    "def": 1,
@@ -1154,6 +1157,7 @@
   "category": "Créature marine",
   "power": 3,
   "role": "T",
+  "combatRole": "protecteur",
   "stats": {
    "atk": 3,
    "def": 2,
@@ -1198,6 +1202,7 @@
   "category": "Créature marine",
   "power": 4,
   "role": "M",
+  "combatRole": "soutien",
   "stats": {
    "atk": 3,
    "def": 2,
@@ -1825,6 +1830,7 @@
   "category": "Créature marine",
   "power": 8,
   "role": "B",
+  "combatRole": "zone",
   "stats": {
    "atk": 12,
    "def": 3,
@@ -1967,6 +1973,7 @@
   "category": "Divinité marine",
   "power": 7,
   "role": "U",
+  "combatRole": "soutien",
   "stats": {
    "atk": 5,
    "def": 4,
@@ -2322,6 +2329,7 @@
   "category": "Dragon",
   "power": 8,
   "role": "B",
+  "combatRole": "controle",
   "stats": {
    "atk": 12,
    "def": 3,
@@ -2419,6 +2427,7 @@
   "category": "Dieu ancien",
   "power": 9,
   "role": "M",
+  "combatRole": "zone",
   "stats": {
    "atk": 6,
    "def": 4,
@@ -2790,6 +2799,7 @@
   "category": "Esprit des eaux",
   "power": 4,
   "role": "U",
+  "combatRole": "controle",
   "stats": {
    "atk": 3,
    "def": 2,

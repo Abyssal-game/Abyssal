@@ -187,6 +187,7 @@
   "category": "Spectre",
   "power": 2,
   "role": "U",
+  "combatRole": "controle",
   "stats": {
    "atk": 3,
    "def": 2,
@@ -499,6 +500,7 @@
   "category": "Mort-vivant",
   "power": 2,
   "role": "T",
+  "combatRole": "poison",
   "stats": {
    "atk": 3,
    "def": 2,
@@ -678,6 +680,7 @@
   "category": "Mort-vivant",
   "power": 2,
   "role": "E",
+  "combatRole": "degats",
   "stats": {
    "atk": 3,
    "def": 2,
@@ -1092,6 +1095,7 @@
   "category": "Mort-vivant",
   "power": 4,
   "role": "T",
+  "combatRole": "protecteur",
   "stats": {
    "atk": 4,
    "def": 3,

@@ -8,7 +8,7 @@ const catalog = loadCatalog();
 const A = (id, o = {}) => D.duelUnit(catalog.get(id), o);
 const E = (id, o = {}) => D.duelUnit(catalog.get(id), { side: 'enemy', ...o });
 const units = (st, side) => st.order[side].map((id) => st.units[id]);
-const duel = () => D.createDuel([A('INF-001', { level: 5 }), A('INF-009', { level: 5 }), A('INF-003', { level: 5 })], [E('NEC-002', { scale: 2 })], { seed: 3 });
+const duel = () => D.createDuel([A('INF-001', { level: 5 }), A('INF-015', { level: 5 }), A('INF-024', { level: 5 })], [E('NEC-002', { scale: 2 })], { seed: 3 });
 const setup = (kind) => {
   const st = duel(), foe = units(st, 'enemy')[0], t = units(st, 'ally')[0];
   t.maxHp = t.hp = 500; foe.intent = { kind, t: t.uid, qte: true };

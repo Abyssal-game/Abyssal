@@ -6289,3 +6289,22 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 .on-inline { margin: 8px auto 0; max-width: 420px; padding: 10px 14px; border-radius: 14px; background: rgba(0,0,0,.28); border: 1px solid rgba(214,178,94,.22); display: flex; flex-direction: column; gap: 6px; }
 .on-inline .on-name { padding: 6px 4px; border-bottom: 1px solid rgba(255,255,255,.06); cursor: pointer; min-height: 32px; display: flex; align-items: center; gap: 2px; }
 .on-inline .on-name:last-child { border-bottom: 0; }
+
+/* v658 : les rangées qui défilent de côté ne bougent plus de haut en bas sous le doigt (elles « descendaient » d'un cran et coupaient leurs boutons) */
+.chips, .tm-roles, .dc-altar:has(.dc-bl), .dc-starts-row, .col-tools .seg.wide, .cx-pvf-pick, .fr-flt, .vs-friends, .cxs-cats, .cl-chips, .cxs-rail, .cxs-nav, .strip, .table-wrap, .treasures, .album { overflow-y: hidden; overscroll-behavior-x: contain; }
+.tm-roles, .chips { align-items: center; padding-top: 4px; padding-bottom: 8px; }
+.tm-roles .chip, .chips .chip { flex: none; }
+
+/* v658 : rôle de la créature sous la carte du booster : icône et nom sur la même ligne */
+.op-role { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.op-role .ricon { display: inline-block; flex: none; margin: 0; }
+
+/* v658 : offrande du jour, cases centrées */
+.dl-day { justify-items: center; text-align: center; }
+.dl-day span { justify-content: center; }
+
+/* v658 : récompense d'une mission (fenêtre au toucher) */
+.td-row[data-act="minfo"], .td-row[data-act="wkinfo"] { cursor: pointer; }
+.mi-reward { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0; padding: 12px 14px; border-radius: 12px; background: rgba(242, 193, 78, .08); border: 1px solid rgba(232, 195, 90, .4); }
+.mi-reward b { display: inline-flex; align-items: center; gap: 8px; font-size: 1.05rem; color: #F2E3BF; }
+.mi-reward .picon, .mi-reward img { width: 28px; height: 28px; object-fit: contain; }

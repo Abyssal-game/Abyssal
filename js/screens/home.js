@@ -38,13 +38,13 @@ export default function home(app, root) {
     if (chests) rows.push(`<a class="td-row" href="#/coffres"><span class="td-ic mi" style="--mc:#E8C35A">${picon('chest')}</span><span class="td-t"><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Éclats et boosters</span></span>${icon('next')}</a>`);
     // v521 : ce qui t'attend en ligne (à toi de jouer, défis, duels à voir, demandes d'ami), en tête
     for (const it of mpw.items) rows.unshift(`<a class="td-row td-live" href="${it.href}"><span class="td-ic mi" style="--mc:#F2C14E">${picon(it.icon)}</span><span class="td-t"><b>${it.title}</b><span class="small muted">${it.sub}</span></span><span class="td-new">!</span>${icon('next')}</a>`);
-    rows.push('<h3 class="td-sub">Missions du jour</h3>');
+    rows.push('<h3 class="td-sub">Missions</h3>'); /* v658 : « Missions » (le coffre de la semaine n'est pas une mission du jour) */
     m.list.forEach((x, i) => {
       const done = x.p >= x.n;
-      rows.push(`<div class="td-row ${x.claimed ? 'done' : ''}"><span class="td-ic mi" style="--mc:${x.faction ? cat.faction[x.faction].colors.secondary : MISSION_LOOK[x.kind]?.[1] || '#C8A45D'}">${x.claimed ? icon('check') : x.faction ? sigil(x.faction) : picon(MISSION_LOOK[x.kind]?.[0] || 'seal')}</span><span class="td-t"><b>${esc(x.text)}</b>${x.claimed ? '' : `<span class="progress"><i style="width:${(x.p / x.n) * 100}%"></i></span>`}</span>${x.claimed ? '<span class="small muted">Fait</span>' : done ? `<span class="td-auto" title="Arrive tout seul">+${x.shards}</span>` : `<span class="td-n small muted">${x.p}/${x.n}</span>`}</div>`);
+      rows.push(`<div class="td-row ${x.claimed ? 'done' : ''}" data-act="minfo" data-i="${i}" role="button"><span class="td-ic mi" style="--mc:${x.faction ? cat.faction[x.faction].colors.secondary : MISSION_LOOK[x.kind]?.[1] || '#C8A45D'}">${x.claimed ? icon('check') : x.faction ? sigil(x.faction) : picon(MISSION_LOOK[x.kind]?.[0] || 'seal')}</span><span class="td-t"><b>${esc(x.text)}</b>${x.claimed ? '' : `<span class="progress"><i style="width:${(x.p / x.n) * 100}%"></i></span>`}</span>${x.claimed ? '<span class="small muted">Fait</span>' : done ? `<span class="td-auto" title="Arrive tout seul">+${x.shards}</span>` : `<span class="td-n small muted">${x.p}/${x.n}</span>`}</div>`);
     });
     const wch = g.weekChest();
-    if (!wch.claimed) rows.push(`<div class="td-row ${wch.ready ? '' : 'wait'}"><span class="td-ic mi" style="--mc:#F2C14E">${picon('chest')}</span><span class="td-t"><b>Coffre de la semaine</b><span class="small muted">${wch.ready ? 'Tu as joué 5 jours cette semaine : un coffre d’or t’attend !' : `Joue ${wch.need} jours cette semaine pour un coffre d’or · ${wch.days} / ${wch.need}`}</span>${wch.ready ? '' : `<span class="progress"><i style="width:${(wch.days / wch.need) * 100}%"></i></span>`}</span>${wch.ready ? '<span class="td-auto">Coffre</span>' : ''}</div>`);
+    if (!wch.claimed) rows.push(`<div class="td-row ${wch.ready ? '' : 'wait'}" data-act="wkinfo" role="button"><span class="td-ic mi" style="--mc:#F2C14E">${picon('chest')}</span><span class="td-t"><b>Coffre de la semaine</b><span class="small muted">${wch.ready ? 'Tu as joué 5 jours cette semaine : un coffre d’or t’attend !' : `Joue ${wch.need} jours cette semaine pour un coffre d’or · ${wch.days} / ${wch.need}`}</span>${wch.ready ? '' : `<span class="progress"><i style="width:${(wch.days / wch.need) * 100}%"></i></span>`}</span>${wch.ready ? '<span class="td-auto">Coffre</span>' : ''}</div>`);
     return `<section class="panel today"><div class="today-head"><h2>Aujourd’hui</h2></div>${rows.join('')}</section>`;
   }
 
@@ -56,12 +56,6 @@ export default function home(app, root) {
       <span class="td-ic mi">${x.faction ? sigil(x.faction) : picon(x.icon)}</span>
       <span class="td-t">${cls === 'hg-main' ? '<span class="hg-k">Ton prochain objectif</span>' : ''}<b>${esc(x.title)}</b><span class="small muted">${esc(x.sub)}</span>${x.n ? `<span class="progress"><i style="width:${(x.p / x.n) * 100}%"></i></span>` : ''}</span>${icon('next')}</a>`;
   function mainGoalHTML() { return goals.length ? `<section class="panel ornate hg-main-wrap">${goalRow(goals[0], 'hg-main')}</section>` : ''; }
-  function goalsHTML() {
-    const list = goals.slice(1);
-    if (!list.length) return '';
-    return `<section class="panel hg"><h2>Tes prochains objectifs</h2>${list.map((x) => goalRow(x)).join('')}</section>`;
-  }
-
   root.innerHTML = `
     <section class="home-brand">
       <h1 class="hb-title"><img src="assets/brand/title.webp" alt="ABYSSAL — Le Bestiaire interdit"></h1>
@@ -71,7 +65,6 @@ export default function home(app, root) {
     ${mainGoalHTML()}
 
     ${todayHTML()}
-    ${goalsHTML()}
     <p class="home-col small muted center"><a href="#/collection">${owned} / ${total} créatures découvertes</a></p>
   `;
   // (v413 : le nombre de joueurs en ligne n'est plus sur l'Accueil : Réglages → À propos, tout en bas)
@@ -79,6 +72,21 @@ export default function home(app, root) {
   lazyArt(root);
   setScene('home');
   bindActions(root, {
+    minfo(el) { /* v658 : toucher une mission montre sa récompense */
+      const x = g.missions().list[Number(el.dataset.i)]; if (!x) return;
+      const done = x.p >= x.n;
+      openSheet(`<h2>Mission</h2><p><b>${esc(x.text)}</b></p>
+        <p class="small muted">${x.claimed ? 'Mission accomplie : récompense reçue.' : done ? 'Mission accomplie : la récompense arrive toute seule.' : `Progression : ${x.p} / ${x.n}`}</p>
+        ${x.claimed ? '' : `<span class="progress"><i style="width:${(x.p / x.n) * 100}%"></i></span>`}
+        <div class="mi-reward"><span class="small muted">Récompense</span><b>${picon('crystal')}${x.shards} éclats</b></div>
+        <p class="small muted">Les missions changent chaque jour à minuit.</p>`, { cls: 'sheet-small', label: 'Mission' });
+    },
+    wkinfo() {
+      const w = g.weekChest();
+      openSheet(`<h2>Coffre de la semaine</h2><p class="small muted">Joue ${w.need} jours différents dans la semaine (du lundi au dimanche) : un coffre d’or t’attend.</p>
+        <span class="progress"><i style="width:${Math.min(100, (w.days / w.need) * 100)}%"></i></span><p class="small muted">${w.days} / ${w.need} jours cette semaine</p>
+        <div class="mi-reward"><span class="small muted">Récompense</span><b><img alt="" src="assets/chests/or.webp">un coffre d’or</b></div>`, { cls: 'sheet-small', label: 'Coffre de la semaine' });
+    },
     dailyinfo() { /* v644 : ce que rapporte l'offrande, jour par jour */
       const E = ECONOMY.daily, sh = picon('crystal');
       openSheet(`<h2>Offrande du jour</h2><p class="muted">Chaque jour où tu ouvres le jeu, l’offrande arrive toute seule. Plus ta série de jours d’affilée est longue, plus elle rapporte.</p>

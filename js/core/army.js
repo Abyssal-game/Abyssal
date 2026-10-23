@@ -16,6 +16,7 @@ export const ROLES = {
   zone:       { name: 'Fléau',      icon: 'flame',  color: '#FF8A3D', desc: 'Frappe toute la ligne ennemie.' },
 };
 export function roleOf(card) {
+  if (card.combatRole && ROLES[card.combatRole]) return card.combatRole; /* v658 : rôle choisi selon le physique de la créature */
   const a = new Set((card.abilities || []).map((x) => x.key));
   if (a.has('guard') || a.has('armor') || a.has('aegis')) return 'protecteur';
   if (a.has('regen') || a.has('bless')) return 'soin';

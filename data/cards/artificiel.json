@@ -459,6 +459,7 @@
   "category": "Golem",
   "power": 2,
   "role": "T",
+  "combatRole": "protecteur",
   "stats": {
    "atk": 2,
    "def": 3,
@@ -548,6 +549,7 @@
   "category": "Automate",
   "power": 2,
   "role": "T",
+  "combatRole": "controle",
   "stats": {
    "atk": 3,
    "def": 3,
@@ -826,6 +828,7 @@
   "category": "Automate",
   "power": 4,
   "role": "S",
+  "combatRole": "protecteur",
   "stats": {
    "atk": 5,
    "def": 2,
@@ -1287,6 +1290,7 @@
   "category": "Automate",
   "power": 5,
   "role": "M",
+  "combatRole": "soutien",
   "stats": {
    "atk": 4,
    "def": 2,
@@ -1732,6 +1736,7 @@
   "category": "Automate",
   "power": 8,
   "role": "B",
+  "combatRole": "soutien",
   "stats": {
    "atk": 11,
    "def": 5,
@@ -1880,6 +1885,7 @@
   "category": "Automate",
   "power": 10,
   "role": "M",
+  "combatRole": "zone",
   "stats": {
    "atk": 8,
    "def": 5,
@@ -2025,6 +2031,7 @@
   "category": "Créature alchimique",
   "power": 7,
   "role": "M",
+  "combatRole": "degats",
   "stats": {
    "atk": 6,
    "def": 3,
@@ -2079,6 +2086,7 @@
   "category": "Automate",
   "power": 2,
   "role": "S",
+  "combatRole": "controle",
   "stats": {
    "atk": 3,
    "def": 2,
@@ -2368,6 +2376,7 @@
   "category": "Automate",
   "power": 1,
   "role": "U",
+  "combatRole": "soutien",
   "stats": {
    "atk": 1,
    "def": 1,
@@ -2556,6 +2565,7 @@
   "category": "Construction maudite",
   "power": 8,
   "role": "T",
+  "combatRole": "zone",
   "stats": {
    "atk": 5,
    "def": 7,
@@ -2898,6 +2908,7 @@
   "category": "Automate cosmique",
   "power": 6,
   "role": "T",
+  "combatRole": "soutien",
   "stats": {
    "atk": 5,
    "def": 6,
@@ -3130,6 +3141,7 @@
   "category": "Objet maudit",
   "power": 6,
   "role": "B",
+  "combatRole": "controle",
   "stats": {
    "atk": 10,
    "def": 2,
@@ -3181,6 +3193,7 @@
   "category": "Construction",
   "power": 9,
   "role": "U",
+  "combatRole": "poison",
   "stats": {
    "atk": 6,
    "def": 6,
