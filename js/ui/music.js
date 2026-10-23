@@ -261,6 +261,10 @@ function tick() {
   schedule(cur);
 }
 
+/* v679 : prépare (télécharge et décode) une musique à l'avance, pendant un écran calme (présentation du gardien) :
+   le décodage ne tombe plus sur la première image du combat */
+export function musicPrefetch(key) { if (!on || !init()) return; loadTracks(); if (trackList) needTrack(key); }
+
 // Appelé à chaque changement de page
 export function musicRoute(route) {
   want = ROUTE_THEME[route] || 'antre';

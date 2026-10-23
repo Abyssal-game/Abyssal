@@ -20,6 +20,7 @@ import { setScene, sceneUrl } from '../ui/scene.js';
 import { PROLOGUE, EPILOGUE, chapterStory } from '../core/story.js';
 import { BRAISE_IC, braiseBar, openRevive, openBraiseInfo } from '../ui/braise.js';
 import { t, tw } from '../i18n.js';
+import { musicPrefetch } from '../ui/music.js'; /* v679 */
 
 // Illustrations des portes et des bonus
 const DOOR_ART = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss', rest: 'rest', altar: 'altar', treasure: 'treasure' };
@@ -353,6 +354,7 @@ export default function descent(app, root) {
     window.scrollTo(0, 0);
     const run = g.descent().run;
     const key = run.battle?.bossKey;
+    if (key) musicPrefetch(key === 'abysse' ? 'abysse' : 'boss'); /* v679 : décodée pendant la présentation du gardien */
     if (!key || app.reduced()) return battleView(run);
     const b = BOSSES[key], seen = g.s.bossesBeaten[key];
     const el = document.createElement('div');

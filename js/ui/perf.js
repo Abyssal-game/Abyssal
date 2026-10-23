@@ -47,6 +47,8 @@ export function perfStart(label) {
   }
   const loop = (t) => {
     if (!sess) return;
+    /* v679 : un trou de plus d'une seconde = app mise de côté (écran verrouillé, autre app) : pas une saccade, et ce temps ne compte pas */
+    if (last && t - last > 1000) { sess.paused = (sess.paused || 0) + (t - last); last = 0; winN = 0; winT = t; }
     if (last) {
       const dt = t - last; sess.frames++; sess.dts.push(Math.round(dt * 10) / 10); if (sess.dts.length > 20000) sess.dts.shift();
       const base = sess.base || 16.7;
@@ -66,14 +68,14 @@ export function perfStop() {
   try { sess.obs?.disconnect(); } catch (e) { /* rien */ }
   pill?.remove(); pill = null;
   const s = sess; sess = null;
-  const dur = Math.round(performance.now() - s.t0);
+  const dur = Math.round(performance.now() - s.t0 - (s.paused || 0));
   if (dur < 3000) return;
   const dts = s.dts.slice().sort((a, b) => a - b), q = (p) => dts[Math.min(dts.length - 1, Math.floor(dts.length * p))] || 0;
   const base = s.base || q(0.5) || 16.7;
   const cause = {};
   for (const h of s.hitches) for (const w of h.what.split(' + ')) cause[w] = (cause[w] || 0) + h.ms;
   const rec = {
-    label: s.label, at: s.at, dur, frames: s.frames, fps: Math.round((s.frames * 1000) / dur), hz: Math.round(1000 / base),
+    label: s.label, at: s.at, dur, paused: Math.round((s.paused || 0) / 1000), frames: s.frames, fps: Math.round((s.frames * 1000) / dur), hz: Math.round(1000 / base),
     p50: q(0.5), p95: q(0.95), p99: q(0.99), max: dts[dts.length - 1] || 0,
     slowShare: Math.round((100 * dts.filter((x) => x > base * 1.8).length) / Math.max(1, dts.length)),
     hitches: s.hitches.sort((a, b) => b.ms - a.ms).slice(0, 15), nHitch: s.hitches.length,
@@ -91,7 +93,7 @@ export function perfReport(info = {}) {
   const head = [`Moniteur de fluidité (${info.version || ''}) :`, `Appareil : ${navigator.userAgent}`, `Écran : ${screen.width} × ${screen.height}, densité ${devicePixelRatio}${info.extra ? ` · ${info.extra}` : ''}`, ''];
   if (!log.length) return [...head, 'Aucun combat relevé.'].join('\n');
   return [...head, ...log.map((r) => [
-    `■ ${r.label} · ${new Date(r.at).toLocaleString('fr-FR')} · ${Math.round(r.dur / 1000)} s`,
+    `■ ${r.label} · ${new Date(r.at).toLocaleString('fr-FR')} · ${Math.round(r.dur / 1000)} s${r.paused ? ` (+ ${r.paused} s app en retrait, non comptées)` : ''}`,
     `  ${r.fps} i/s en moyenne (écran ≈ ${r.hz} Hz) · image médiane ${r.p50} ms, 95 % ${r.p95} ms, 99 % ${r.p99} ms, pire ${Math.round(r.max)} ms · images lentes ${r.slowShare} %`,
     `  Saccades : ${r.nHitch}${r.cause.length ? ` · surtout pendant : ${r.cause.map(([w, ms]) => `${w} (${ms} ms)`).join(', ')}` : ''}`,
     ...r.hitches.slice(0, 8).map((h) => `   - à ${(h.t / 1000).toFixed(1)} s : ${h.ms} ms · ${h.what} · ${h.nodes} éléments${h.anim ? ` · ${h.anim.n} animations (${h.anim.top})` : ''}`),
