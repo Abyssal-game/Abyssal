@@ -6269,3 +6269,8 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 .pack-event:not(.pack-skin) .pk-name { height: auto; }
 /* v651 : Équipe, les 2 cases de réserve centrées et un peu plus grandes (avant : 2 cases sur une grille de 3, vide à droite) */
 .v2-slots.res { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; width: 78%; max-width: 420px; margin-left: auto; margin-right: auto; }
+/* v652 : Équipe, « Suggérer une équipe » et « Mes équipes » centrés */
+.tm-tools { justify-content: center; }
+.tp { text-align: center; }
+.tp-row { display: flex; flex-wrap: wrap; justify-content: center; }
+.tp-row > .tp-c, .tp-row > .tp-new { flex: 0 1 calc(50% - 4px); min-width: 140px; max-width: 220px; }
