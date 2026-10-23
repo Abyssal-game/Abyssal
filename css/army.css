@@ -6456,3 +6456,28 @@ html.fx-light .dv.qte-on::after { animation: none; opacity: .85; }
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: rgba(201, 164, 90, .7); text-align: center; }
 .set-ghost b { font-family: var(--font-display, serif); font-size: 26px; letter-spacing: .1em; text-decoration: line-through; text-decoration-thickness: 2px; }
 .set-ghost small { font-size: 11px; font-style: italic; opacity: .85; }
+
+/* v676 : Bestiaire, onglet Histoire (tout le récit découvert) et galerie des Rêves vaincus (gardiens vaincus, silhouettes pour les autres) */
+.hs-top .lore { margin-top: 0; }
+.hs-prog { display: grid; grid-template-columns: repeat(auto-fit, minmax(72px, 1fr)); gap: 8px; margin-top: 10px; }
+.hs-prog span { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 8px 4px; border-radius: 12px; background: rgba(201, 164, 90, .07); border: 1px solid rgba(201, 164, 90, .2); }
+.hs-prog b { font: 700 1.05rem/1.1 var(--f-display); color: var(--gold, #E8C35A); }
+.hs-prog small { font-size: 11px; color: var(--mute); }
+.hs-ch summary { display: flex; align-items: center; gap: 8px; }
+.hs-n { flex: 0 0 26px; height: 26px; border-radius: 50%; display: inline-grid; place-items: center; font: 700 .8rem var(--f-display); color: #120d06; background: linear-gradient(#e8c35a, #a8803a); }
+.drm-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.drm-t { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 8px 10px; border-radius: 14px; border: 1px solid rgba(201, 164, 90, .3); background: rgba(12, 13, 20, .92); color: inherit; font: inherit; text-align: center; }
+.drm-t small { font-size: 11px; color: var(--mute); }
+.drm-t b { font: 700 .9rem/1.15 var(--f-display); }
+.drm-art { position: relative; display: block; width: 100%; aspect-ratio: 5 / 7; border-radius: 10px; overflow: hidden; background: #0b0a0f center / cover no-repeat; margin-bottom: 4px; }
+.drm-art img { position: absolute; left: 50%; bottom: 0; width: 120%; height: 96%; object-fit: contain; object-position: bottom; translate: -50% 0; }
+.drm-t.locked { border-style: dashed; opacity: .75; }
+.drm-t.locked .drm-art { background: radial-gradient(circle at 50% 70%, rgba(110, 60, 160, .25), transparent 70%), #08070b; }
+.drm-t.locked .drm-art img { filter: brightness(0) drop-shadow(0 0 6px rgba(150, 90, 220, .35)); opacity: .9; }
+.drm-t.locked b { color: var(--mute); font: 600 .85rem var(--f-ui); }
+.drm-sheet .drm-art.big { width: min(240px, 70%); margin: 0 auto 8px; }
+.dc-chron { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; border-color: rgba(201, 164, 90, .45); }
+.dc-chron span { display: flex; flex-direction: column; }
+.dc-chron small { color: var(--mute); }
+/* v676 : cinq onglets dans le Bestiaire, ils tiennent sur un petit écran */
+.seg.wide:has(> [data-v="histoire"]) .seg-b { font-size: 12.5px; padding-left: 4px; padding-right: 4px; min-width: 0; }

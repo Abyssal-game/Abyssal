@@ -164,6 +164,7 @@ export default function descent(app, root) {
       <h2>${title}</h2>
       <p class="dc-sum2-sub">${sub}</p>
       ${s.boss && s.chapterDone ? bossRecap(s.boss) : ''}
+      ${s.chapterDone && s.bossChest ? cat.lore.chronicles.filter((c) => c.ch === s.chapterDone && typeof c.at === 'number' && g.uniqueCount() < c.at).map((c) => `<a class="panel dc-chron" href="#/bestiaire">${icon('book')}<span><b>Une Chronique s’est ouverte</b><small><span>${esc(c.title)}</span> · Bestiaire, onglet Royaumes</small></span></a>`).join('') /* v676 */ : ''}
       ${s.abyssPack ? `<a class="panel dc-summit-win" href="#/boutique"><img alt="" src="assets/packs/abysse2.webp"><span><b>Booster de l’Abysse</b><span class="small">Il t’attend dans les Boosters.${s.abyss ? ' Avec une Secrète que tu n’as pas encore.' : ''}</span></span></a>` : ''}
       ${s.abyss ? `<div class="panel st-epi"><span class="bx-k">Épilogue</span><h3>${esc(EPILOGUE.title)}</h3><p>${esc(EPILOGUE.text)}</p>${cat.get('ABY-048') ? `<div class="st-dreamer"><img alt="" src="${artUrl(cat.get('ABY-048'), { lite: true })}"><span><b>Celui qui rêve</b><small>Il ne dort plus.</small></span></div>` /* v673 : l’ombre du Rêveur, sans son nom */ : ''}</div><p class="vx-week vx-first">${icon('crown')} Titre « Vainqueur de l’Abysse », Cadre de l’Œil de l’Abysse et <b>2 coffres abyssaux</b> !</p>` : ''}
       ${chChest}${chNext}

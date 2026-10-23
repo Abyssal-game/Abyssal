@@ -87,7 +87,7 @@ export function furnaceScreen(app, root) {
     const q = norm(ui.q || '');
     const owned = Object.keys(g.s.collection).map((id) => cat.get(id)).filter((c) => c && !g.isFav(c.id) && (!q || norm(c.name).includes(q)))
       .sort((a, b) => RI(a.rarity) - RI(b.rarity) || a.name.localeCompare(b.name, 'fr'));
-    root.innerHTML = `${forgeSeg('fournaise')}<header class="screen-head ui-hero bn-furnace"><h1>La Fournaise</h1><p class="muted">Brûle des cartes pour des cendres. Les cendres font monter tes créatures de niveau (Forge → Renforcer).</p>${ashLine(g)}</header>
+    root.innerHTML = `${forgeSeg('fournaise')}<header class="screen-head ui-hero bn-furnace"><h1>La Fournaise</h1><p class="muted">Tes doublons ne sont que des échos de pages déjà retrouvées. Brûle des cartes pour des cendres. Les cendres font monter tes créatures de niveau (Forge → Renforcer).</p>${ashLine(g)}</header>
       ${sublimeHTML()}
       <section class="panel"><h2 class="section-title">Tes doublons</h2>
         ${sp.n ? `<button class="btn primary block" data-act="all">${icon('p:furnace')}Tout brûler (${sp.n}) · +${fmt(sp.ash)} ${icon('ash')}</button>

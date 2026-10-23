@@ -9,15 +9,15 @@ import { openPack } from './opening.js';
 const GUIDE_V = 2;
 // img : illustration (assets/ui/tuto-N.webp) ; bn : bannière d'une page du jeu (assets/ui/bn-*.webp)
 const PAGES = [
-  { img: 1, t: 'Bienvenue dans l’Abysse', p: 'Le Bestiaire interdit a été déchiré. Ses créatures se cachent dans des boosters scellés. À toi de les retrouver, de les renforcer et de les mener au combat.' },
-  { img: 2, t: 'Ouvre des boosters', p: 'Le gros bouton du milieu. Déchire le paquet du doigt, puis retourne les cartes. Un booster gratuit t’attend chaque jour. Certaines cartes sortent en finition rare : argentée, enluminée, abyssale, cristalline ou prismatique.' },
+  { img: 1, t: 'Bienvenue dans l’Abysse', p: 'Les sept royaumes avaient enfermé leurs monstres dans un livre : le Bestiaire interdit. Une nuit, il a été déchiré. Ses pages se sont envolées, ses chapitres sont tombés dans l’Abysse. Tu es le dernier à savoir lire les sceaux : retrouve les pages, et referme les chapitres.' },
+  { img: 2, t: 'Ouvre des boosters', p: 'Chaque booster scellé renferme des pages perdues : chaque carte est une créature du Bestiaire. Déchire le paquet du doigt, puis retourne les cartes. Un booster gratuit t’attend chaque jour. Certaines pages sortent en finition rare : argentée, enluminée, abyssale, cristalline ou prismatique.' },
   { bn: 'collection', t: 'Ta collection', p: 'L’onglet Collection a trois pages, en haut : Cartes (tout le Bestiaire), Équipe (tes 5 combattants) et Forge (Renforcer et Fournaise).' },
-  { bn: 'furnace', t: 'Cendres et niveaux', p: 'Dans la Fournaise, brûle tes doublons : ils deviennent des cendres. Dans Renforcer, les cendres font monter tes créatures de niveau, pour plus d’attaque et de PV.' },
-  { img: 3, t: 'La Descente', p: 'Dans l’onglet Aventure, ton équipe descend dans l’Abysse : 3 créatures au combat, 2 en réserve. 20 chapitres de 5 étages, un gardien à la fin de chacun, et une récompense à chaque étage gagné.' },
-  { bn: 'trial', t: 'Les Épreuves du jour', p: 'Toujours dans Aventure : trois combats par jour, réglés sur la force de tes meilleures cartes. Chaque victoire rapporte un coffre, et fait avancer la saison du mois.' },
-  { bn: 'sceaux', t: 'Une autre aventure', p: 'Toujours dans Aventure, le Cercle de l’Abysse réunit cinq jeux de cartes à part : les Duels des Sceaux, les Cryptes (un jeu de mémoire), le Pacte (tenter sa chance), les Enchères de Mammon et le Pari des Boosters (contre un autre joueur).' },
+  { bn: 'furnace', t: 'Cendres et niveaux', p: 'Une page que tu possèdes déjà n’est qu’un écho. Dans la Fournaise, brûle tes échos : ils deviennent des cendres. Dans Renforcer, les cendres font monter tes créatures de niveau, pour plus d’attaque et de PV.' },
+  { img: 3, t: 'La Descente', p: 'Chaque chapitre tombé a réveillé un gardien, un rêve de l’Abysse. Dans l’onglet Aventure, descends avec ton équipe (3 créatures au combat, 2 en réserve) : 20 chapitres de 5 étages, et un gardien à vaincre au bout de chacun pour refermer son chapitre.' },
+  { bn: 'trial', t: 'Les Épreuves du jour', p: 'Chaque nuit, l’Abysse t’envoie trois rêves pour te mettre à l’épreuve : trois combats, dans l’onglet Aventure, réglés sur la force de tes meilleures cartes. Chaque victoire rapporte un coffre, et fait avancer la saison du mois.' },
+  { bn: 'sceaux', t: 'Une autre aventure', p: 'Au Cercle de l’Abysse, les habitants de l’Abîme jouent leurs pages et leurs éclats. Cinq jeux à part, toujours dans Aventure : les Duels des Sceaux, les Cryptes (un jeu de mémoire), le Pacte (tenter sa chance), les Enchères de Mammon et le Pari des Boosters (contre un autre joueur).' },
   { bn: 'shadow', t: 'Coffres et Tirage des Ombres', p: 'Dans l’onglet Butin, ouvre tes boosters et les coffres gagnés en jouant. Le Tirage des Ombres donne un booster par jour : sa valeur compte pour le classement de la semaine, et les 3 premiers gagnent un coffre.' },
-  { img: 4, t: 'Reviens chaque jour', p: 'L’Accueil rassemble ce qui t’attend : ton prochain objectif, l’offrande, les Épreuves, les missions et les coffres. Le Sanctuaire garde ton profil, tes succès, le Bestiaire et les réglages (son, musique, vibrations, tutoriels).' },
+  { img: 4, t: 'Reviens chaque jour', p: 'L’Accueil rassemble ce qui t’attend : ton prochain objectif, l’offrande, les Épreuves, les missions et les coffres. Le Sanctuaire garde ton profil, tes succès, le Bestiaire et les réglages. Dans le Bestiaire, l’onglet Histoire rassemble tout ce que tu as découvert du récit.' },
 ];
 
 export function showWelcome(app, { force = false } = {}) {

@@ -72,3 +72,11 @@ export function markLoreRead(g, keys) {
   if (n) g.persist();
   return n;
 }
+
+// v676 : une Chronique s'ouvre avec la collection (« at » créatures découvertes) ou en refermant le chapitre « ch » de la Descente,
+// pour que l'histoire arrive à temps à ceux qui avancent vite (ex. IX. Le Menteur en battant l'Horloger, chapitre 10).
+export function chronicleOpen(g, c) {
+  const n = g.uniqueCount();
+  if (c.at === 'all' ? n >= g.total() : n >= c.at) return true;
+  return !!c.ch && (g.descent().best || 0) >= c.ch * 5;
+}

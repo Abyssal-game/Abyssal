@@ -3,12 +3,14 @@
 import { tw } from '../i18n.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, EMBLEM, picon } from '../ui/icons.js';
-import { esc, bindActions } from '../ui/dom.js';
+import { esc, bindActions, openSheet } from '../ui/dom.js';
 import { deName, lowArt } from '../core/synergy.js';
 import { FACTION_ORDER, RARITY } from '../config.js';
 import { HUNT_STAGES, huntStage } from '../core/descent.js';
 import { AI_FAMILIES, aiFamily } from '../core/skills.js';
-import { loreEntries, markLoreRead, unreadLore } from '../core/lore.js';
+import { loreEntries, markLoreRead, unreadLore, chronicleOpen } from '../core/lore.js';
+import { PROLOGUE, CHAPTER_STORY, EPILOGUE } from '../core/story.js';
+import { BOSSES, BOSS_ORDER } from '../core/bosses.js';
 
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
@@ -18,9 +20,8 @@ export default function bestiary(app, root) {
 
   function chronicles() {
     const n = g.uniqueCount();
-    const unlocked = (at) => (at === 'all' ? n >= g.total() : n >= at);
-    const open = lore.chronicles.filter((c) => unlocked(c.at));
-    const sealed = lore.chronicles.filter((c) => !unlocked(c.at));
+    const open = lore.chronicles.filter((c) => chronicleOpen(g, c)); /* v676 : aussi en refermant les chapitres de la Descente */
+    const sealed = lore.chronicles.filter((c) => !chronicleOpen(g, c));
     const nextAt = sealed.find((c) => c.at !== 'all')?.at;
     const myst = lore.mysteries.filter((m) => g.s.setsDone[m.set]);
     return `
@@ -30,7 +31,7 @@ export default function bestiary(app, root) {
       <details class="panel dc-fold"><summary>${picon('genesis')} ${esc(lore.genesis.title)}</summary><div>${lore.genesis.text.map((p) => `<p class="lore">${esc(p)}</p>`).join('')}</div></details>
       <details class="panel dc-fold"><summary>${picon('chronicles')} Chroniques du Bestiaire <span class="small muted">${open.length} / ${lore.chronicles.length}</span></summary><div>
         ${open.map((c) => `<h3>${esc(c.title)}</h3><p class="lore">${esc(c.text)}</p>`).join('')}
-        ${sealed.length ? `<p class="small muted">${icon('lock')} ${sealed.length} page${sealed.length > 1 ? 's' : ''} encore scellée${sealed.length > 1 ? 's' : ''}.${nextAt ? ` La prochaine s’ouvre à ${nextAt} créatures découvertes (tu en as ${n}).` : ''}</p>` : ''}
+        ${sealed.length ? `<p class="small muted">${icon('lock')} ${sealed.length} page${sealed.length > 1 ? 's' : ''} encore scellée${sealed.length > 1 ? 's' : ''}.${nextAt ? ` La prochaine s’ouvre à ${nextAt} créatures découvertes (tu en as ${n}), ou en refermant des chapitres de la Descente.` : ''}</p>` : ''}
       </div></details>
       <details class="panel dc-fold"><summary>${picon('conflicts')} Conflits</summary><div>
         ${lore.conflicts.map((c) => `<h3>${esc(c.title)}</h3><p class="small">${c.sides.map((s) => `<span style="color:${cat.faction[s].colors.secondary}">${esc(cat.faction[s].name)}</span>`).join(' contre ')}</p><p class="lore">${esc(c.text)}</p>`).join('')}
@@ -93,9 +94,11 @@ export default function bestiary(app, root) {
     const head = (t, list) => `<h2 class="section-title">${t} <span class="lr-count">${list.filter((e) => e.unlocked).length} / ${list.length}</span></h2>`;
     const of = (k) => all.filter((e) => e.kind === k);
     const html = `<p class="small muted">${open.length} récit${open.length > 1 ? 's' : ''} sur ${all.length}. Ils s’ouvrent en jouant : gardiens vaincus, formes libérées, relations rencontrées, royaumes complétés.</p>
-      ${head('Les gardiens de l’Abîme', of('boss'))}
-      <div class="stack">${of('boss').filter((e) => e.unlocked).map((e) => (e.unlocked ? `<div class="lr-e boss">${nb(e)}<b>${esc(e.title)}</b><span class="small lr-sub">${esc(e.sub)}</span><p class="lore">${esc(e.text)}</p><p class="small"><b>Sa mécanique.</b> ${esc(e.mechanic)}</p><p class="small"><b>Pour le contrer.</b> ${esc(e.counter)}</p></div>` : lock(e))).join('')}</div>
-      ${locks(of('boss').filter((e) => !e.unlocked), () => 'Gardien scellé')}
+      ${head('Les Rêves vaincus', of('boss'))}
+      <p class="small muted">Les gardiens de la Descente ne sont que des rêves de l’Abysse. Chaque rêve vaincu rejoint cette galerie : il ne se bat jamais à tes côtés.</p>
+      <div class="drm-grid">${of('boss').map((e) => { const ch = BOSS_ORDER.indexOf(e.boss) + 1; /* v676 : galerie des gardiens vaincus (figure peinte), silhouette pour les autres */
+        return e.unlocked ? `<button class="drm-t" data-act="dream" data-k="${e.boss}">${nb(e)}<span class="drm-art" style="background-image:url(assets/bosses/carte-${e.boss}.webp)"><img alt="" loading="lazy" src="assets/bosses/${e.boss}.webp"></span><small>Chapitre ${ch}</small><b translate="no">${esc(tw(e.title))}</b></button>`
+          : `<div class="drm-t locked"><span class="drm-art"><img alt="" loading="lazy" src="assets/bosses/${e.boss}.webp"></span><small>Chapitre ${ch}</small><b>Rêve scellé</b></div>`; }).join('')}</div>
       ${head('Formes corrompues', of('form'))}
       <div class="stack">${of('form').filter((e) => e.unlocked).map((e) => { const c = cat.get(e.id); return e.unlocked ? `<button class="lr-e form" data-act="card" data-id="${e.id}">${nb(e)}<span class="lr-th"><img alt="" src="${artUrl(c, { lite: true })}"></span><span><b>${esc(e.title)}</b><span class="small lr-sub">${esc(c.name)} · ${esc(e.sub)}</span><p class="lore small">${esc(e.text)}</p></span></button>` : lock(e); }).join('')}</div>
       ${locks(of('form').filter((e) => !e.unlocked), () => 'Forme endormie')}
@@ -107,6 +110,22 @@ export default function bestiary(app, root) {
     // les récits affichés une fois ne sont plus « nouveaux »
     setTimeout(() => markLoreRead(g, [...fresh]), 0);
     return html;
+  }
+
+  // v676 : toute l'histoire découverte, dans l'ordre : prologue, chapitres refermés ou commencés, épilogue
+  function histoire() {
+    const best = g.descent().best || 0, seen = g.s.storySeen || {};
+    const chOpen = (ch) => !!seen[ch] || best >= (ch - 1) * 5 + 1 || (ch === 1);
+    const done = Math.min(20, Math.floor(best / 5)), dreams = BOSS_ORDER.filter((k) => g.s.bossesBeaten?.[k]).length;
+    const chron = lore.chronicles.filter((c) => chronicleOpen(g, c)).length, seal = cat.set.scelleurs ? g.setProgress('scelleurs') : null;
+    const won = !!g.s.bossesBeaten?.abysse;
+    return `<section class="panel hs-top"><p class="lore">Le Bestiaire interdit a été déchiré, ses vingt chapitres sont tombés dans l’Abysse. Tu es le dernier à savoir lire les sceaux. Voici tout ce que tu as découvert.</p>
+      <div class="hs-prog"><span><b>${done} / 20</b><small>chapitres refermés</small></span><span><b>${dreams} / 20</b><small>rêves vaincus</small></span><span><b>${chron} / ${lore.chronicles.length}</b><small>Chroniques</small></span>${seal ? `<span><b>${seal.owned} / 7</b><small>Premiers Scelleurs</small></span>` : ''}</div></section>
+      <details class="panel dc-fold" open><summary>${picon('book')} Prologue</summary><div><p class="lore">${esc(PROLOGUE)}</p></div></details>
+      ${CHAPTER_STORY.slice(1).map((s, i) => { const ch = i + 1; return chOpen(ch) ? `<details class="panel dc-fold hs-ch"><summary><span class="hs-n">${ch}</span> <span>${esc(s.title)}</span>${best >= ch * 5 ? ` ${icon('check')}` : ''}</summary><div><p class="lore">${esc(s.text)}</p></div></details>` : ''; }).join('')}
+      ${CHAPTER_STORY.slice(1).some((s, i) => !chOpen(i + 1)) ? `<p class="small muted center">${icon('lock')} Les chapitres suivants t’attendent plus bas dans la Descente.</p>` : ''}
+      ${won ? `<details class="panel dc-fold st-epi" open><summary>${icon('crown')} Épilogue · ${esc(EPILOGUE.title)}</summary><div><p class="lore">${esc(EPILOGUE.text)}</p></div></details>` : ''}
+      <p class="small muted center">Les Chroniques, les Figures et les Mystères sont dans l’onglet Royaumes ; les Rêves vaincus, dans l’onglet Récits.</p>`;
   }
 
   function entry(c) {
@@ -121,8 +140,8 @@ export default function bestiary(app, root) {
   function render() {
     root.innerHTML = `
       <header class="screen-head ui-hero bn-bestiary"><h1>Bestiaire</h1><p class="muted">Le livre interdit, page après page.</p></header>
-      <div class="seg wide" role="tablist">${[['creatures', 'Créatures'], ['chroniques', 'Royaumes'], ['recits', 'Récits'], ['chasse', 'Chasse']] /* v422 : Royaumes plus haut */.map(([k, l]) => `<button class="seg-b" role="tab" data-act="tab" data-v="${k}" aria-selected="${st.tab === k}" aria-pressed="${st.tab === k}">${l}${k === 'recits' && st.tab !== 'recits' && unreadLore(g, cat).length ? '<i class="lr-dot"></i>' : ''}</button>`).join('')}</div>
-      <div class="stack best-body">${st.tab === 'chroniques' ? chronicles() : st.tab === 'chasse' ? hunt() : st.tab === 'recits' ? recits() : creatures()}</div>`;
+      <div class="seg wide" role="tablist">${[['creatures', 'Créatures'], ['histoire', 'Histoire'], ['chroniques', 'Royaumes'], ['recits', 'Récits'], ['chasse', 'Chasse']] /* v422 : Royaumes plus haut */.map(([k, l]) => `<button class="seg-b" role="tab" data-act="tab" data-v="${k}" aria-selected="${st.tab === k}" aria-pressed="${st.tab === k}">${l}${k === 'recits' && st.tab !== 'recits' && unreadLore(g, cat).length ? '<i class="lr-dot"></i>' : ''}</button>`).join('')}</div>
+      <div class="stack best-body">${st.tab === 'histoire' ? histoire() : st.tab === 'chroniques' ? chronicles() : st.tab === 'chasse' ? hunt() : st.tab === 'recits' ? recits() : creatures()}</div>`;
     const q = root.querySelector('#best-q');
     if (q) q.addEventListener('input', (e) => { st.q = e.target.value; const pos = e.target.selectionStart; render(); const n = root.querySelector('#best-q'); n.focus(); n.setSelectionRange(pos, pos); });
   }
@@ -130,6 +149,8 @@ export default function bestiary(app, root) {
     tab(el) { st.tab = el.dataset.v; render(); },
     fac(el) { st.faction = el.dataset.v; render(); },
     card() {},
+    dream(el) { const b = BOSSES[el.dataset.k]; if (!b) return; app.sfx.page?.(); /* v676 */
+      openSheet(`<div class="drm-sheet"><span class="drm-art big" style="background-image:url(assets/bosses/carte-${el.dataset.k}.webp)"><img alt="" src="assets/bosses/${el.dataset.k}.webp"></span><h2 class="center" translate="no">${esc(tw(b.name))}</h2><p class="center small lr-sub">${esc(b.title)}</p><p class="lore">${esc(b.story)}</p><p class="small"><b>Sa mécanique.</b> ${esc(b.mechanic)}</p><p class="small"><b>Pour le contrer.</b> ${esc(b.counter)}</p></div>`, { label: b.name, cls: 'dc-sheet' }); },
   });
   root.addEventListener('click', (e) => {
     const lf = e.target.closest('.lr-e.form');
