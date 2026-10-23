@@ -158,7 +158,7 @@ L'iPad n'est pas prévu : l'application sera déclarée « iPhone uniquement »,
 
 ## 5. Classification par âge
 
-**Objectif : 13+ chez Apple, PEGI 12 en Europe chez Google.** Le jeu montre des créatures inquiétantes et des combats, mais sans sang réaliste ni contenu sexuel. Il n'y a ni achat, ni pari, ni discussion entre joueurs.
+**Objectif : 13+ chez Apple, PEGI 12 en Europe chez Google.** Le jeu montre des créatures inquiétantes et des combats, mais sans sang réaliste ni contenu sexuel. Il n'y a ni achat ni discussion entre joueurs (seulement des réactions prédéfinies) ; le Pari des Boosters se joue avec la monnaie du jeu, jamais avec de l'argent réel.
 
 Pandore (ART-068), autrefois dessinée nue, a été refaite habillée en v300 : aucune nudité n'est à déclarer.
 
@@ -172,7 +172,7 @@ Pandore (ART-068), autrefois dessinée nue, a été refaite habillée en v300 : 
 | Contenu sexuel, nudité | Aucun |
 | Grossièretés, humour vulgaire | Aucun |
 | Alcool, tabac, drogues | Aucun |
-| Jeux d'argent simulés | Aucun (les boosters se gagnent en jouant, on ne mise rien) |
+| Jeux d'argent simulés | **Rare ou modéré** : le Pari des Boosters fait miser des éclats (monnaie du jeu, jamais achetable) sur des boosters ouverts face à un autre joueur. Aucun argent réel. |
 | Concours | Non |
 | Thèmes médicaux | Aucun |
 | Contenu généré par les utilisateurs | Oui, uniquement les pseudos : filtre, signalement et masquage dans le jeu |
@@ -225,9 +225,9 @@ Résultat attendu : PEGI 12 en Europe (au pire PEGI 7). Public cible (Contenu de
 ```
 Au premier lancement, ABYSSAL demande de créer un compte (e-mail et mot de passe) : la progression est liée au compte (sauvegarde en ligne, amis, classements, défis entre joueurs). Vous pouvez utiliser le compte de démonstration ci-dessus (onglet « Se connecter »). Touchez l'écran d'ouverture, puis ouvrez les 2 boosters de bienvenue (onglet Butin) pour former votre équipe.
 
-Pourquoi un compte est proposé : la collection de cartes (500 créatures, plusieurs semaines de jeu) est sauvegardée en ligne pour ne jamais être perdue (changement ou perte de téléphone, suppression de l'application) ; il sert aussi aux classements quotidiens, aux saisons, au Tirage des Ombres et au profil public. Seuls un e-mail et un pseudo sont demandés, et le compte se supprime dans le jeu. Suppression du compte dans le jeu : Sanctuaire → Compte → Supprimer mon compte.
+Pourquoi un compte est nécessaire : la partie de chaque joueur est tenue par notre serveur (comme dans les jeux en ligne), pour qu'elle ne soit jamais perdue (changement ou perte de téléphone, suppression de l'application) et pour que les parties contre d'autres joueurs restent équitables. Le compte sert aussi aux amis, aux profils, aux jeux en ligne (Duels des Sceaux, Pacte, Enchères, Pari des Boosters) et aux classements du mois. Seuls un e-mail et un pseudo sont demandés. Suppression du compte dans le jeu : Sanctuaire → Compte → Supprimer mon compte.
 
-Modération des pseudos (seul contenu créé par les joueurs) : les pseudos insultants sont refusés. Dans un classement (par exemple Butin → Tirage → classement de la semaine), touchez le pseudo d'un autre joueur pour le signaler ou le masquer. Un pseudo signalé par plusieurs joueurs est remplacé automatiquement. Contact : contact@abyssal-game.fr
+Modération (seul contenu créé par les joueurs : les pseudos ; en partie en ligne, seules des réactions prédéfinies, sans texte libre) : les pseudos insultants sont refusés. Touchez le pseudo ou le portrait d'un autre joueur (classements, parties en ligne) pour ouvrir son profil, puis « Signaler ou masquer ce joueur ». Un pseudo signalé par plusieurs joueurs est remplacé automatiquement. Contact : contact@abyssal-game.fr
 
 Aucun achat intégré, aucune publicité, aucun pistage.
 ```
