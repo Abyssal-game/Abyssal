@@ -351,7 +351,7 @@ function paintProgress() {
     document.body.appendChild(progEl);
   }
   const one = progList.length === 1 ? progList[0] : null;
-  progEl.innerHTML = `<span class="pc-ic">${one?.kind === 'level' ? '<img class="picon" alt="" src="assets/icons/xp.webp">' : icon(one ? KIND_ICON[one.kind] || 'trophy' : 'trophy')}</span>
+  progEl.innerHTML = `<span class="pc-ic">${one?.kind === 'level' ? '<img class="picon" alt="" src="assets/icons/xp2.webp">' : icon(one ? KIND_ICON[one.kind] || 'trophy' : 'trophy')}</span>
     <span class="pc-t">${one ? `<small>${KIND_LABEL[one.kind] || ''}</small><b>${one.kind === 'level' ? one.level : esc(one.name)}</b>` : `<b>${progList.length} récompenses</b>`}</span><span class="pc-go">Voir</span>`;
   requestAnimationFrame(() => progEl.classList.add('in'));
   clearTimeout(progTimer); progTimer = setTimeout(hideProgress, 7000);
@@ -361,7 +361,7 @@ function openProgress(list) {
   if (!list.length) return;
   const total = list.reduce((t, e) => t + (e.reward?.shards || 0), 0);
   const sh = openSheet(`<h2 class="center">${list.length > 1 ? `${list.length} récompenses` : esc(KIND_LABEL[list[0].kind] || 'Récompense')}</h2>
-    <div class="prog-list">${list.map((e) => `<div class="prog-row"><span class="pc-ic">${e.kind === 'level' ? '<img class="picon" alt="" src="assets/icons/xp.webp">' : icon(KIND_ICON[e.kind] || 'trophy')}</span><span><small>${KIND_LABEL[e.kind] || ''}</small><b>${progLine(e)}</b>${rewardText(e.reward) ? `<em>${rewardText(e.reward)}</em>` : ''}</span></div>`).join('')}</div>
+    <div class="prog-list">${list.map((e) => `<div class="prog-row"><span class="pc-ic">${e.kind === 'level' ? '<img class="picon" alt="" src="assets/icons/xp2.webp">' : icon(KIND_ICON[e.kind] || 'trophy')}</span><span><small>${KIND_LABEL[e.kind] || ''}</small><b>${progLine(e)}</b>${rewardText(e.reward) ? `<em>${rewardText(e.reward)}</em>` : ''}</span></div>`).join('')}</div>
     ${total ? `<p class="small muted center">+${fmt(total)} éclats au total.</p>` : ''}
     <button class="btn block" data-prog="succes">Voir mes succès</button>`, { label: 'Récompenses' });
   sh.el.querySelector('[data-prog]')?.addEventListener('click', () => { sh.close(); app.go('succes'); });

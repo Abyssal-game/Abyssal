@@ -399,7 +399,7 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
       <div class="op-loot">
         ${r.shards ? `<span>${icon('crystal')}<b>+${fmt(r.shards)}</b><small>éclats</small></span>` : ''}
         ${r.ash ? `<span>${icon('ash')}<b>+${fmt(r.ash)}</b><small>cendres</small></span>` : ''}
-        ${r.xp ? `<span>${picon('xp')}<b>+${fmt(r.xp)}</b><small>XP</small></span>` : ''}
+        ${r.xp ? `<span>${picon('xp2')}<b>+${fmt(r.xp)}</b><small>XP</small></span>` : ''}
         ${dupAsh ? `<button class="op-burn" data-op="burn" aria-label="Brûler les doublons de ce booster pour ${fmt(dupAsh)} cendres">${icon('p:furnace')}<b>Brûler</b><small>+${fmt(dupAsh)} ${icon('ash')}</small></button>` : ''}
       </div>
       <p class="small muted center op-sum-hint">Touche une carte pour l’examiner.</p>
