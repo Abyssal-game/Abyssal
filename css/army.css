@@ -6194,3 +6194,5 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 .pv2-big-np { min-width: 0; width: 100%; max-width: 280px; }
 .pv2-emote-scene .re-bubble { position: relative !important; inset: auto !important; left: auto !important; right: auto !important; bottom: auto !important; top: auto !important; transform: none !important; margin: 0; }
 .pv2-emote-scene .re-bubble { z-index: 1 !important; margin-left: 30px; }
+/* v641 : nouvelle image du Pack du Fondateur (Gemini, store/ui/ech-fondateur2-source.jpg) : tuile et haut de sa fenêtre */
+.cx-fd-hero { display: block; width: calc(100% + 32px); max-width: none; margin: -16px -16px 10px; aspect-ratio: 16 / 9; object-fit: cover; -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent); mask-image: linear-gradient(180deg, #000 70%, transparent); }

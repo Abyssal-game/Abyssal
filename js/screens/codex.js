@@ -174,7 +174,7 @@ export default function codexScreen(app, root) {
     }
     /* — les obsidiennes — */
     if (ui.cat === 'obs') {
-      const euro = (it, i) => { const own = it.once && g.shopOwned(it.id); const art = it.kind === 'obs' ? `assets/ui/obs-${Math.min(4, i + 1)}.webp` : 'assets/ui/ech-fondateur.webp';
+      const euro = (it, i) => { const own = it.once && g.shopOwned(it.id); const art = it.kind === 'obs' ? `assets/ui/obs-${Math.min(4, i + 1)}.webp` : 'assets/ui/ech-fondateur2.webp';
         return `<article class="cxs-e ${it.kind === 'obs' ? 'obs' : 'founder'} ${own ? 'own' : ''}">${opt(art, 'cxs-e-art')}
           <div class="cxs-e-in"><b>${it.kind === 'obs' ? obsTxt(it.give.obs) : esc(it.name)}</b>${it.bonus ? `<span class="cx-bonus">+${it.bonus} offertes</span>` : ''}
           ${it.desc ? `<small>${esc(it.desc)}</small>` : ''}</div>
@@ -194,7 +194,7 @@ export default function codexScreen(app, root) {
     const big = `<div class="cxs-bigs">
         <button class="cxs-big k-obs" data-cx="cat" data-v="obs"><span class="cxs-big-pic">${[1, 2, 3, 4].map((n) => opt(`assets/ui/obs-${n}.webp`)).join('')}</span>
           <span class="cxs-big-t"><b>${esc(OBS.name)}</b><small>De 100 à 2 800 · bonus offert sur les gros paquets</small></span><span class="cxs-big-go">${icon('next')}</span></button>
-        ${fd ? `<button class="cxs-big k-founder ${fdOwn ? 'own' : ''}" data-cx="founder">${opt('assets/ui/ech-fondateur.webp', 'cxs-big-bg')}
+        ${fd ? `<button class="cxs-big k-founder ${fdOwn ? 'own' : ''}" data-cx="founder">${opt('assets/ui/ech-fondateur2.webp', 'cxs-big-bg')}
           <span class="cxs-big-t"><small class="cx-kick">Une seule fois</small><b>${esc(fd.name)}</b><small>${fdOwn ? `${icon('check')}Déjà à toi` : `Voir ce qu’il contient · ${esc(fd.price)}`}</small></span><span class="cxs-big-go">${icon('next')}</span></button>` : ''}</div>`;
     return `${wallet}${big}
       <h3 class="cxs-sh">${icon('chest')}Les rayons</h3><div class="cxs-aisles">${aisles}</div>`;
@@ -213,7 +213,7 @@ export default function codexScreen(app, root) {
     if (gv.title) rows.push(['Titre', '', `<span class="cx-fd-title">${picon('titles')}<b>${esc(gv.title)}</b><small>avec son badge au classement</small></span>`]);
     if (gv.obs) rows.push([esc(OBS.name), `${fmt(gv.obs)} obsidiennes`, `<span class="cx-fd-obs">${OBS_I}<b>${fmt(gv.obs)}</b></span>`]);
     const sh = openSheet('', { label: it.name, full: true, cls: 'cx-pv cx-fd' });
-    sh.setContent(`<header class="cx-pv-head r-myth"><small class="cx-kick">Vendu une seule fois</small><h2 class="cx-pv-title">${esc(it.name)}</h2><small class="cx-pv-pos">${rows.length} récompenses</small></header>
+    sh.setContent(`<img class="cx-fd-hero" alt="" src="assets/ui/ech-fondateur2-large.webp" onerror="this.remove()"><header class="cx-pv-head r-myth"><small class="cx-kick">Vendu une seule fois</small><h2 class="cx-pv-title">${esc(it.name)}</h2><small class="cx-pv-pos">${rows.length} récompenses</small></header>
       <p class="small muted center">Pour celles et ceux qui soutiennent l’Abysse dès le début : des objets introuvables ailleurs, jamais de puissance.</p>
       ${rows.map(([k, n, v]) => `<section class="cx-fd-row"><p class="cx-pv-cap">${k}</p><div class="cx-fd-v">${v}</div><b class="cx-fd-n">${esc(n || '')}</b></section>`).join('')}
       <div class="cx-pv-foot">${own ? `<span class="cx-badge on">${icon('check')}Déjà à toi</span>` : `<button class="btn primary cx-pv-buy" data-fd="buy">Acheter · ${esc(it.price)}</button><small class="muted">Aperçu Créateur : achat simulé</small>`}</div>`);
