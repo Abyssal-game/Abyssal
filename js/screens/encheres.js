@@ -1,4 +1,5 @@
 // v427 : Les Enchères de Mammon — accueil (tables, défi du jour), vente à trois et fin de vente.
+import { t, tw } from '../i18n.js';
 import * as EN from '../core/encheres.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, picon, crestHTML } from '../ui/icons.js';
@@ -164,7 +165,7 @@ export default function encheresScreen(app, root) {
       <p class="sc-caps">${st.final.order.map((x) => `${esc(who(st, x).name)} : <b>${sc[x]}</b>`).join(' · ')}</p>
       ${sayer.key ? `<p class="sc-say">${pic(sayer.key)}<span>« ${esc(won ? sayer.beaten : sayer.gloat)} »</span></p>` : ''}
       ${out.shards ? `<p class="sc-gain">${icon('crystal')} <b>+${fmt(out.shards)}</b> éclats${out.first ? ' (première victoire)' : ''}</p>` : ''}
-      ${out.chests?.length ? `<a class="sc-gain sc-chestwin" href="#/coffres">${icon('p:chest')} <b>${out.chests.map((c) => esc(CHEST_NAME[c])).join(' et ')}</b> gagné${out.chests.length > 1 ? 's' : ''} !</a>` : ''}
+      ${out.chests?.length ? `<a class="sc-gain sc-chestwin" href="#/coffres">${icon('p:chest')} ${out.chests.map((c) => `<b translate="no">${esc(t(CHEST_NAME[c]))}</b>`).join(' et ')} gagné${out.chests.length > 1 ? 's' : ''} !</a>` : ''}
       ${out.xp && !out.capped ? `<p class="small muted center">+${out.xp} XP de profil</p>` : ''}
       ${out.capped ? `<p class="small muted">Tes ${EN.ENCHERES_REWARD.dailyPaid} victoires bien payées du jour sont faites : celle-ci rapporte ${EN.ENCHERES_REWARD.afterCap} éclats et ${EN.ENCHERES_REWARD.xp} XP.</p>` : ''}
       ${out.feat ? `<p class="sc-gain gm-featwin"><img class="gm-hf big" alt="" src="assets/icons/haut-fait.webp"> Haut fait réussi : <b>${esc(out.feat)}</b></p>` : ''}

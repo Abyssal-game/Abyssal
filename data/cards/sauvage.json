@@ -3437,5 +3437,60 @@
   },
   "image": "assets/art/SAU-073.webp",
   "artPrompt": "Mothman — Créature humanoïde grise aux immenses ailes de papillon de nuit, sans tête distincte, deux grands yeux rouges luisants dans le torse, perchée sur la poutre d'un vieux pont métallique dans la brume. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "SAU-074",
+  "number": 74,
+  "name": "Le Scelleur des Bois",
+  "title": "Gardien du sceau de la Forêt Première",
+  "faction": "sauvage",
+  "rarity": "M",
+  "category": "Premier Scelleur",
+  "power": 10,
+  "role": "T",
+  "stats": {
+   "atk": 8,
+   "def": 8,
+   "spd": 4,
+   "mag": 5,
+   "hp": 26,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "regen",
+    "value": 3
+   }
+  ],
+  "visual": "Vieux druide à la peau d’écorce et aux bois de cerf brisés, manteau de mousse, une main sur les racines qui enserrent un livre fermé, un grand loup gris couché à ses côtés, lucioles vertes.",
+  "lore": "Les racines tiennent encore le livre fermé. Son loup attend toujours qu’il se relève.",
+  "evolution": null,
+  "sets": [
+   "scelleurs"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold",
+   "crystal",
+   "prism"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "many",
+   "body": "bulky",
+   "wings": "bat",
+   "arms": "spread",
+   "legs": "goat",
+   "tail": true,
+   "hornScale": 1.3
+  },
+  "image": "assets/art/SAU-074.webp",
+  "artPrompt": "Le Scelleur des Bois — Vieux druide à la peau d’écorce et aux bois de cerf brisés, manteau de mousse, une main sur les racines qui enserrent un livre fermé, un grand loup gris couché à ses côtés, lucioles vertes. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs ambrées et vert toxique, forêt maudite dans la brume, clair de lune, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

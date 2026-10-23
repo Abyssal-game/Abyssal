@@ -3297,5 +3297,56 @@
   },
   "image": "assets/art/ABY-072.webp",
   "artPrompt": "Bénitier Géant — Bénitier colossal aux valves ondulées couvertes de coraux, manteau charnu bleu électrique, perle énorme au centre qui ressemble à un œil, posé sur un récif sombre. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "ABY-073",
+  "number": 73,
+  "name": "Le Scelleur des Fosses",
+  "title": "Gardien du sceau des mers",
+  "faction": "abyssal",
+  "rarity": "M",
+  "category": "Premier Scelleur",
+  "power": 10,
+  "role": "T",
+  "stats": {
+   "atk": 7,
+   "def": 8,
+   "spd": 5,
+   "mag": 4,
+   "hp": 26,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "aegis"
+   },
+   {
+    "key": "drown"
+   }
+  ],
+  "visual": "Vieil homme immense à la barbe mêlée d’algues, armure de nacre noire, les deux mains posées sur une dalle de pierre gravée de vagues qui ferme une crevasse lumineuse au fond de l’océan, bancs de poissons pâles.",
+  "lore": "Il a posé la dalle sur la Fosse et n’a plus jamais relevé les mains. Ce qui dort dessous l’a senti vieillir.",
+  "evolution": null,
+  "sets": [
+   "scelleurs"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold",
+   "crystal",
+   "prism"
+  ],
+  "art": {
+   "form": "serpent",
+   "fins": true,
+   "frill": true,
+   "horns": "back",
+   "scale": 1.15,
+   "scene": "ocean"
+  },
+  "image": "assets/art/ABY-073.webp",
+  "artPrompt": "Le Scelleur des Fosses — Vieil homme immense à la barbe mêlée d’algues, armure de nacre noire, les deux mains posées sur une dalle de pierre gravée de vagues qui ferme une crevasse lumineuse au fond de l’océan, bancs de poissons pâles. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs cyan bioluminescentes, eaux noires des profondeurs, rayons de lumière filtrant d’en haut, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

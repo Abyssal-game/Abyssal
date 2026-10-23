@@ -26,6 +26,9 @@ Référence unique pour tout texte d'histoire (récits de la Descente, fiches de
 | Chapitre 20 | « un œil qui s'ouvre appartient toujours à quelqu'un » |
 | Épilogue | 7 noms, le septième gratté ; quelque chose ouvre les yeux ; ombre de « Celui qui rêve » |
 
+## Les Premiers Scelleurs en cartes (v676)
+Six cartes Mythiques, une par royaume (INF-073, ABY-073, CEL-073, SAU-074, NEC-072, PRI-072), ensemble « Les Premiers Scelleurs » : ce qui reste d'eux, leur page du Bestiaire (ils sont morts, vieillis trop vite : l'Horloger leur a volé du temps). La septième place (Artificiel) est montrée vide, « Nom gratté » (`.set-ghost`, `js/screens/achievements.js`) : elle sera remplie par l'Horloger quand le Menteur sera révélé. Sources des images et lot : `store/scelleurs/`.
+
 ## Ce que le joueur ne doit **pas** encore lire en clair
 - Que l'Horloger est le Menteur (seulement des indices). La révélation est pour le premier arc après la sortie.
 - Le nom du Rêveur dans la Descente (on montre son ombre, sans nom).

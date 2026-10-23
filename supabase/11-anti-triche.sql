@@ -93,6 +93,7 @@ insert into public.game_titles (name) values
 ('Horloger de l''impossible'),
 ('Héritier de la Forge'),
 ('Héritier de la Titanomachie'),
+('Héritier des Sceaux'),
 ('Héritier du Roi sans Visage'),
 ('Hôte de la Veillée'),
 ('Initié des Sceaux'),
@@ -248,6 +249,7 @@ insert into public.game_cards (id) values
 ('ABY-070'),
 ('ABY-071'),
 ('ABY-072'),
+('ABY-073'),
 ('ART-001'),
 ('ART-002'),
 ('ART-003'),
@@ -390,6 +392,7 @@ insert into public.game_cards (id) values
 ('CEL-070'),
 ('CEL-071'),
 ('CEL-072'),
+('CEL-073'),
 ('INF-001'),
 ('INF-002'),
 ('INF-003'),
@@ -462,6 +465,7 @@ insert into public.game_cards (id) values
 ('INF-070'),
 ('INF-071'),
 ('INF-072'),
+('INF-073'),
 ('NEC-001'),
 ('NEC-002'),
 ('NEC-003'),
@@ -533,6 +537,7 @@ insert into public.game_cards (id) values
 ('NEC-069'),
 ('NEC-070'),
 ('NEC-071'),
+('NEC-072'),
 ('PRI-001'),
 ('PRI-002'),
 ('PRI-003'),
@@ -604,6 +609,7 @@ insert into public.game_cards (id) values
 ('PRI-069'),
 ('PRI-070'),
 ('PRI-071'),
+('PRI-072'),
 ('SAU-001'),
 ('SAU-002'),
 ('SAU-003'),
@@ -676,7 +682,8 @@ insert into public.game_cards (id) values
 ('SAU-070'),
 ('SAU-071'),
 ('SAU-072'),
-('SAU-073')
+('SAU-073'),
+('SAU-074')
 on conflict do nothing;
 
 create or replace function public.profiles_sane()

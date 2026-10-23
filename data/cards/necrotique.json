@@ -3354,5 +3354,58 @@
   },
   "image": "assets/art/NEC-071.webp",
   "artPrompt": "Baba Yaga — Vieille sorcière slave au long nez crochu et aux dents de fer, assise dans un mortier volant avec un pilon et un balai, cabane en rondins sur deux pattes de poule géantes derrière elle, clôture de crânes, forêt enneigée. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, contre-plongée imposante, armure ou anatomie très ornementée, effets magiques intenses, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "NEC-072",
+  "number": 72,
+  "name": "La Scelleuse des Tombes",
+  "title": "Gardienne du sceau du Pays sans Retour",
+  "faction": "necrotique",
+  "rarity": "M",
+  "category": "Premier Scelleur",
+  "power": 10,
+  "role": "B",
+  "stats": {
+   "atk": 12,
+   "def": 4,
+   "spd": 7,
+   "mag": 4,
+   "hp": 18,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "relic"
+   },
+   {
+    "key": "curse",
+    "value": 3
+   }
+  ],
+  "visual": "Femme âgée en voile de deuil noir assise sur un trône de pierres tombales, un livre fermé sous une chaîne et un cadenas posé sur ses genoux, lanterne à flamme violette, brume de nécropole.",
+  "lore": "Elle a vu les autres Scelleurs mourir un à un, bien trop vite. Elle a gardé la clé du cadenas, et une question.",
+  "evolution": null,
+  "sets": [
+   "scelleurs"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold",
+   "crystal",
+   "prism"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "skull",
+   "body": "cloak",
+   "arms": "spread",
+   "horns": "crown",
+   "wings": "bone",
+   "halo": "spike"
+  },
+  "image": "assets/art/NEC-072.webp",
+  "artPrompt": "La Scelleuse des Tombes — Femme âgée en voile de deuil noir assise sur un trône de pierres tombales, un livre fermé sous une chaîne et un cadenas posé sur ses genoux, lanterne à flamme violette, brume de nécropole. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs violettes spectrales, brume de crypte, éclats magiques pourpres, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

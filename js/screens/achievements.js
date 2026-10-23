@@ -39,7 +39,7 @@ export default function achievements(app, root, params) {
         <p class="small muted">${esc(s.desc)}</p>
         <span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span>
         <p class="small">${icon('star')} Récompense : ${app.rewardText(s.reward)}${p.done ? ' · <span class="ok">obtenue</span>' : ''}</p>
-        <div class="strip" data-set="${s.key}">${s.cards.map((id) => { const c = cat.get(id); return g.owns(id) ? cardHTML(c, { lazy: true }) : cardHTML(c, { lazy: true, mystery: true, nameKnown: g.nameKnown(id) }); }).join('')}</div>
+        <div class="strip" data-set="${s.key}">${s.cards.map((id) => { const c = cat.get(id); return g.owns(id) ? cardHTML(c, { lazy: true }) : cardHTML(c, { lazy: true, mystery: true, nameKnown: g.nameKnown(id) }); }).join('')}${s.key === 'scelleurs' ? '<div class="set-ghost" aria-label="Septième Scelleur : nom gratté"><b>VII</b><small>Nom gratté</small></div>' /* v676 : la place du Menteur reste vide */ : ''}</div>
       </article>`;
     }).join('');
   }

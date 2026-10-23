@@ -3472,5 +3472,60 @@
   },
   "image": "assets/art/INF-072.webp",
   "artPrompt": "Hannya — Démone à visage de masque japonais blanc aux cornes pointues, yeux dorés, bouche fendue jusqu'aux oreilles, kimono rouge déchiré, longs cheveux noirs, sur une scène de théâtre nô éclairée aux flambeaux. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "INF-073",
+  "number": 73,
+  "name": "La Scelleuse de Braise",
+  "title": "Gardienne du sceau de la Géhenne",
+  "faction": "infernal",
+  "rarity": "M",
+  "category": "Premier Scelleur",
+  "power": 10,
+  "role": "T",
+  "stats": {
+   "atk": 8,
+   "def": 8,
+   "spd": 4,
+   "mag": 5,
+   "hp": 26,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "guard"
+   },
+   {
+    "key": "curse",
+    "value": 3
+   }
+  ],
+  "visual": "Femme très âgée et majestueuse, robe de cuir sombre aux bords consumés, cheveux blancs tressés, une main posée sur un énorme livre fermé dont le fermoir rougeoie, l’autre tenant une chaîne qui s’enfonce dans le sol fissuré de lave.",
+  "lore": "Elle a tenu la chaîne jusqu’à ce que ses mains blanchissent. La page, elle, n’a jamais lâché.",
+  "evolution": null,
+  "sets": [
+   "scelleurs"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold",
+   "crystal",
+   "prism"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "beast",
+   "horns": "many",
+   "body": "bulky",
+   "wings": "bat",
+   "arms": "spread",
+   "legs": "goat",
+   "tail": true,
+   "hornScale": 1.3
+  },
+  "image": "assets/art/INF-073.webp",
+  "artPrompt": "La Scelleuse de Braise — Femme très âgée et majestueuse, robe de cuir sombre aux bords consumés, cheveux blancs tressés, une main posée sur un énorme livre fermé dont le fermoir rougeoie, l’autre tenant une chaîne qui s’enfonce dans le sol fissuré de lave. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lueurs rouge sang et braises orangées, fumée et cendres, ruines de cuivre en fusion, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

@@ -3478,5 +3478,56 @@
   },
   "image": "assets/art/PRI-071.webp",
   "artPrompt": "Coatlicue — Déesse aztèque colossale à la tête faite de deux serpents qui se font face, jupe de serpents entrelacés, collier de mains et de cœurs, griffes aux pieds, sculpture de pierre vivante sur une pyramide sous un soleil noir. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, composition iconique et luxueuse, accents dorés, aura irréelle, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "PRI-072",
+  "number": 72,
+  "name": "Le Scelleur des Montagnes",
+  "title": "Gardien du sceau des Terres d’Avant",
+  "faction": "primordial",
+  "rarity": "M",
+  "category": "Premier Scelleur",
+  "power": 10,
+  "role": "T",
+  "stats": {
+   "atk": 9,
+   "def": 8,
+   "spd": 5,
+   "mag": 5,
+   "hp": 26,
+   "cost": 10
+  },
+  "abilities": [
+   {
+    "key": "armor",
+    "value": 3
+   },
+   {
+    "key": "cataclysm",
+    "value": 3
+   }
+  ],
+  "visual": "Géant de pierre très ancien assis au sommet d’un volcan endormi, barbe de lichen et de stalactites, une main de roche posée sur un livre fermé gigantesque, ciel d’orage, oiseaux qui tournent autour de sa tête.",
+  "lore": "Il a posé la main sur le livre pour qu’il ne s’ouvre jamais. Les siècles ont fait de lui une montagne.",
+  "evolution": null,
+  "sets": [
+   "scelleurs"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold",
+   "crystal",
+   "prism"
+  ],
+  "art": {
+   "form": "dragon",
+   "legs": 4,
+   "horns": "long",
+   "scene": "cosmos"
+  },
+  "image": "assets/art/PRI-072.webp",
+  "artPrompt": "Le Scelleur des Montagnes — Géant de pierre très ancien assis au sommet d’un volcan endormi, barbe de lichen et de stalactites, une main de roche posée sur un livre fermé gigantesque, ciel d’orage, oiseaux qui tournent autour de sa tête. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lave incandescente et or ancien, ciel cosmique ou volcanique, échelle titanesque, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

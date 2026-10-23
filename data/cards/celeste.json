@@ -3443,5 +3443,57 @@
   },
   "image": "assets/art/CEL-072.webp",
   "artPrompt": "Gardien des Aurores — Esprit céleste en forme de grand cerf translucide dont les bois sont des rubans d'aurore boréale verte et violette, galopant dans le ciel au-dessus d'une toundra enneigée. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, pose dynamique, quelques effets lumineux, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
+ },
+ {
+  "id": "CEL-073",
+  "number": 73,
+  "name": "La Scelleuse des Cieux",
+  "title": "Gardienne du sceau des Sept Cieux",
+  "faction": "celeste",
+  "rarity": "M",
+  "category": "Premier Scelleur",
+  "power": 10,
+  "role": "T",
+  "stats": {
+   "atk": 8,
+   "def": 8,
+   "spd": 5,
+   "mag": 5,
+   "hp": 26,
+   "cost": 9
+  },
+  "abilities": [
+   {
+    "key": "bless",
+    "value": 3
+   },
+   {
+    "key": "aegis"
+   }
+  ],
+  "visual": "Femme ailée âgée aux ailes grises qui perdent leurs plumes, armure d’argent patinée, yeux clos, serrant contre sa poitrine un livre fermé par une boucle d’argent, au-dessus des nuages.",
+  "lore": "Elle a fermé les yeux en serrant le livre. On dit qu’elle compte encore les années qu’on lui a volées.",
+  "evolution": null,
+  "sets": [
+   "scelleurs"
+  ],
+  "variants": [
+   "normal",
+   "holo",
+   "galaxy",
+   "gold",
+   "crystal",
+   "prism"
+  ],
+  "art": {
+   "form": "hum",
+   "head": "helm",
+   "wings": "six",
+   "body": "armor",
+   "arms": "sword",
+   "halo": "ring"
+  },
+  "image": "assets/art/CEL-073.webp",
+  "artPrompt": "La Scelleuse des Cieux — Femme ailée âgée aux ailes grises qui perdent leurs plumes, armure d’argent patinée, yeux clos, serrant contre sa poitrine un livre fermé par une boucle d’argent, au-dessus des nuages. Illustration de carte de jeu dark fantasy, peinture numérique semi-réaliste, encrage marqué et coups de pinceau visibles, éclairage dramatique en contre-jour, lumière dorée et blanc spectral, plumes, auréoles, nuées divines, particules magiques en suspension, composition épique plein cadre, aura immense, présence divine, très détaillé, format vertical 5:7, sans texte, sans bordure, sans logo."
  }
 ]

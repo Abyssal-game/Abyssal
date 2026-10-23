@@ -92,6 +92,7 @@ insert into public.shadow_cards (id, rarity, faction, variants) values
 ('ABY-070','C','abyssal','{holo,galaxy,gold}'),
 ('ABY-071','R','abyssal','{holo,galaxy,gold}'),
 ('ABY-072','PC','abyssal','{holo,galaxy,gold}'),
+('ABY-073','M','abyssal','{holo,galaxy,gold}'),
 ('ART-001','C','artificiel','{holo,gold,galaxy}'),
 ('ART-002','C','artificiel','{holo,gold,galaxy}'),
 ('ART-003','C','artificiel','{holo,gold,galaxy}'),
@@ -234,6 +235,7 @@ insert into public.shadow_cards (id, rarity, faction, variants) values
 ('CEL-070','R','celeste','{holo,galaxy,gold}'),
 ('CEL-071','R','celeste','{holo,galaxy,gold}'),
 ('CEL-072','PC','celeste','{holo,galaxy,gold}'),
+('CEL-073','M','celeste','{holo,galaxy,gold}'),
 ('INF-001','C','infernal','{holo,gold,galaxy}'),
 ('INF-002','C','infernal','{holo,gold,galaxy}'),
 ('INF-003','C','infernal','{holo,gold,galaxy}'),
@@ -306,6 +308,7 @@ insert into public.shadow_cards (id, rarity, faction, variants) values
 ('INF-070','R','infernal','{holo,galaxy,gold}'),
 ('INF-071','M','infernal','{holo,galaxy,gold}'),
 ('INF-072','PC','infernal','{holo,galaxy,gold}'),
+('INF-073','M','infernal','{holo,galaxy,gold}'),
 ('NEC-001','C','necrotique','{holo,gold,galaxy}'),
 ('NEC-002','C','necrotique','{holo,gold,galaxy}'),
 ('NEC-003','C','necrotique','{holo,gold,galaxy}'),
@@ -377,6 +380,7 @@ insert into public.shadow_cards (id, rarity, faction, variants) values
 ('NEC-069','C','necrotique','{holo,galaxy,gold}'),
 ('NEC-070','HR','necrotique','{holo,galaxy,gold}'),
 ('NEC-071','HR','necrotique','{holo,galaxy,gold}'),
+('NEC-072','M','necrotique','{holo,galaxy,gold}'),
 ('PRI-001','C','primordial','{holo,gold,galaxy}'),
 ('PRI-002','C','primordial','{holo,gold,galaxy}'),
 ('PRI-003','C','primordial','{holo,gold,galaxy}'),
@@ -448,6 +452,7 @@ insert into public.shadow_cards (id, rarity, faction, variants) values
 ('PRI-069','HR','primordial','{holo,galaxy,gold}'),
 ('PRI-070','HR','primordial','{holo,galaxy,gold}'),
 ('PRI-071','S','primordial','{holo,galaxy,gold}'),
+('PRI-072','M','primordial','{holo,galaxy,gold}'),
 ('SAU-001','C','sauvage','{holo,gold,galaxy}'),
 ('SAU-002','C','sauvage','{holo,gold,galaxy}'),
 ('SAU-003','C','sauvage','{holo,gold,galaxy}'),
@@ -520,7 +525,8 @@ insert into public.shadow_cards (id, rarity, faction, variants) values
 ('SAU-070','PC','sauvage','{holo,galaxy,gold}'),
 ('SAU-071','C','sauvage','{holo,galaxy,gold}'),
 ('SAU-072','HR','sauvage','{holo,galaxy,gold}'),
-('SAU-073','PC','sauvage','{holo,galaxy,gold}')
+('SAU-073','PC','sauvage','{holo,galaxy,gold}'),
+('SAU-074','M','sauvage','{holo,galaxy,gold}')
 on conflict (id) do update set rarity = excluded.rarity, faction = excluded.faction, variants = excluded.variants;
 
 -- ——— Défis ————————————————————————————————————————————————————————————

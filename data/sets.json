@@ -358,5 +358,25 @@
    "CEL-071",
    "PRI-071"
   ]
+ },
+ {
+  "key": "scelleurs",
+  "name": "Les Premiers Scelleurs",
+  "desc": "Ils étaient sept, un par royaume, à poser la main sur la reliure. Six pages sont revenues. Le septième nom a été gratté.",
+  "reward": {
+   "shards": 800,
+   "tickets": {
+    "premium": 1
+   },
+   "title": "Héritier des Sceaux"
+  },
+  "cards": [
+   "INF-073",
+   "ABY-073",
+   "CEL-073",
+   "SAU-074",
+   "NEC-072",
+   "PRI-072"
+  ]
  }
 ]

@@ -589,6 +589,7 @@ export class Game {
   // Une créature qui quitte la collection quitte aussi l'équipe, la vitrine, l'avatar et sa forme
   forget(id) {
     delete this.s.collection[id];
+    if (this.s.fallen) delete this.s.fallen[id]; /* v676 : une créature qui revient repart debout */
     this.s.team = (this.s.team || []).filter((x) => x !== id);
     this.s.showcase = this.s.showcase.filter((x) => x !== id);
     if (this.s.avatar === id) this.s.avatar = null;
@@ -836,7 +837,7 @@ export class Game {
     if (team.filter((id) => !this.isFallen(id)).length < TEAM.active) throw new Error(`Il faut au moins ${TEAM.active} créatures debout dans ton équipe : ranime les autres avec une Braise de vie, ou remplace-les.`); /* v668 */
     const free = false; /* v406 : plus de torches, la campagne se joue librement */
     d.runs = (d.runs || 0) + 1;
-    const ult = this.ultimate(team);
+    const ult = this.ultimate(team.filter((id) => !this.isFallen(id))); /* v676 : le pouvoir d'équipe vient des créatures debout */
     d.run = {
       v: 3, day: d.day, floor: start, cleared: start - 1, start, phase: 'doors', cursed: false, free, nightmare: !!tier, nightTier: tier || undefined, blessings: [], altar: null,
       gauge: this.rule(d.day).key === 'lune' ? FERVOR_MAX - 2 : this.rule(d.day).key === 'reserve' ? 0 : FERVOR_START, ult: { key: ult.key, power: ult.power, card: ult.card },
@@ -1622,7 +1623,7 @@ export class Game {
         if (r.ash) { this.s.ash += r.ash; this.s.stats.ashEarned += r.ash; }
         if (r.braises) { this.s.braises = Math.max(0, this.s.braises || 0) + r.braises; out.braises = r.braises; }
         for (const [c, n] of Object.entries(r.chests || {})) for (let i = 0; i < n; i++) { run.chests.push(c); out.chest = c; }
-        out.first = r; this.codexXp(run.floor % 5 === 0 ? CODEX_XP.boss : CODEX_XP.floor, run.floor % 5 === 0 ? 'boss' : 'floor');
+        out.first = r; run.wonFirst = run.floor; /* v676 : pour l'en-tête après la victoire */ this.codexXp(run.floor % 5 === 0 ? CODEX_XP.boss : CODEX_XP.floor, run.floor % 5 === 0 ? 'boss' : 'floor');
         const fl = (run.firstLoot ||= { shards: 0, ash: 0 }); fl.shards += r.shards || 0; fl.ash += r.ash || 0;
       }
       // toute première victoire : un vrai cadeau (une seule fois)
@@ -1766,7 +1767,7 @@ export class Game {
     const run = this.s.descent.run;
     if (!run || run.battle) return false;
     if (run.phase === 'omen') return true;
-    return run.phase === 'doors' && run.floor === (run.start || 1) && run.cleared === (run.start || 1) - 1 && !run.shards && !run.chests.length && !run.blessings.length && run.team.every((m) => !m.fallen && m.hp === m.maxHp);
+    return run.phase === 'doors' && run.floor === (run.start || 1) && run.cleared === (run.start || 1) - 1 && !run.shards && !run.chests.length && !run.blessings.length && run.team.every((m) => (m.fallen ? this.isFallen(m.id) : m.hp === m.maxHp)) /* v676 : une créature déjà à terre au départ n'empêche pas d'annuler */;
   }
   cancelRun() {
     const d = this.s.descent, run = d.run;
