@@ -6348,3 +6348,23 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 .cb-tgt .brk.fl { background: #3A2A0E; color: #FFD677; border: 1px solid #D8A940; }
 .cb-tgt .brk.on { background: #7A1020; color: #FFF0D0; border: 1px solid #E0B04E; }
 .cb-tgt .ko { background: #7A1020; color: #FFF0D0; border: 1px solid #E0B04E; }
+/* v668 : rectangle noir après un Assaut de gardien à 3 coups (app iPhone). Chaque coup de la séquence pose un tampon
+   (« Esquive ! », « Parade ! », « Touché ») qui tournait de -2° (dfStamp), avec de grandes ombres floues et une largeur
+   qui débordait : une couche penchée que l'app ne sait plus dessiner (bord penché de 2-3° signalé). Plus aucune rotation,
+   flou ni mélange dans les animations du combat. */
+.dv-stamp { left: 0; right: 0; width: auto; text-align: center; transform: translateY(-50%); animation-name: dfStamp668; will-change: auto; }
+.dv-stamp::before { width: 200px; height: 200px; }
+.dv-stamp b { -webkit-text-stroke: 0; }
+.dv-stamp.s-dodge b { text-shadow: 0 3px 0 #0B3A1C, 0 0 10px rgba(127, 224, 160, .9); }
+.dv-stamp.s-parry b { text-shadow: 0 3px 0 #1A2B45, 0 0 10px rgba(200, 230, 255, .95); }
+.dv-stamp.s-none b { text-shadow: 0 3px 0 #3A0610, 0 0 10px rgba(255, 84, 104, .85); }
+@keyframes dfStamp668 { 0% { opacity: 0; transform: translateY(-50%) scale(.5); } 22% { opacity: 1; transform: translateY(-50%) scale(1.1); } 35%, 72% { opacity: 1; transform: translateY(-50%) scale(1); } 100% { opacity: 0; transform: translateY(-62%) scale(1); } }
+@keyframes asTitle { from { transform: scale(1.8); opacity: 0; } 60% { transform: scale(.96); opacity: 1; } to { transform: scale(1); } }
+.cb-assault b { text-shadow: 0 0 10px rgba(255, 60, 40, .9), 0 3px 0 #2A0004; }
+@keyframes dvRecoil { 0% { transform: none; } 25% { transform: translateY(-20px) scale(.96); } 60% { transform: translateY(-8px); } 100% { transform: none; } }
+@keyframes dvDodge { 30% { transform: translateX(-30px); opacity: .75; } 70% { transform: translateX(8px); } }
+@keyframes dvRoar { 25% { transform: scale(1.1); } 50% { transform: scale(1.05); } }
+@keyframes dvSeal { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.3); } 30% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 75% { opacity: .9; } to { opacity: 0; transform: translate(-50%, -50%) scale(1.25); } }
+.dv-c.dying { transform: scale(.7); }
+.dv-ghost { mix-blend-mode: normal; filter: none; opacity: .5; }
+.cb-def.ok, .cb-def.ko, .cb-def .dv-dodge-bar::before { filter: none; }
