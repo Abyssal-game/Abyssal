@@ -6249,3 +6249,6 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 .col-fsheet .cf-foot .btn { flex: 1; }
 .col-pill i { font-style: normal; font-size: .72rem; opacity: .75; margin-left: 2px; }
 .col-fsheet .cf-foot .btn { white-space: nowrap; font-size: .82rem; padding-left: 8px; padding-right: 8px; }
+/* v647 : Booster des Ombres : ni « ABYSSAL » ni « Ombres » sur le sachet, « 5 cartes » centré dans la bande sombre sous le cadre (82,5-91 % du sachet) */
+.pack-shadow .pk-logo, .pack-shadow .pk-name { display: none; }
+.pack-shadow .pk-label { top: 83.5%; bottom: 8%; left: 10%; right: 10%; justify-content: center; align-items: center; }
