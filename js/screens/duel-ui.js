@@ -9,7 +9,7 @@ import { icon, EMBLEM, sigil, roleIcon, actIcon, crestHTML } from '../ui/icons.j
 import { esc, openSheet, toast, frSpaces } from '../ui/dom.js';
 import { deName } from '../core/synergy.js';
 import { LANG, t as tr, tx, tw } from '../i18n.js';
-import { coach } from '../ui/coach.js';
+import { coach, coachIdle } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
 import { cardHTML } from '../ui/card.js';
 import {
@@ -210,9 +210,10 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   };
   const resHTML = (side) => {
     const r = reserve(st, side);
-    if (!r.length) return '';
-    if (side === 'enemy') return `<span class="dv-res" title="Réserve ennemie">+${r.length}</span>`;
-    return `<button class="dv-resv cb-resv" data-d="reserve" aria-label="Voir la réserve">${r.map((u) => `<img alt="" src="${artUrl(cat.get(u.id), { lite: true })}" title="${esc(cat.get(u.id).name)} : ${u.hp}/${u.maxHp} PV">`).join('')}<small>Réserve</small></button>`;
+    if (side === 'enemy') return r.length ? `<span class="dv-res" title="Réserve ennemie">+${r.length}</span>` : '';
+    const dead = fallenAllies(); /* v661 : les créatures tombées se voient aussi, assombries */
+    if (!r.length && !dead.length) return '';
+    return `<button class="dv-resv cb-resv" data-d="reserve" aria-label="Voir la réserve">${r.map((u) => `<img alt="" src="${artUrl(cat.get(u.id), { lite: true })}" title="${esc(cat.get(u.id).name)} : ${u.hp}/${u.maxHp} PV">`).join('')}${dead.map((u) => `<img class="dead" alt="" src="${artUrl(cat.get(u.id), { lite: true })}">`).join('')}<small>Réserve</small></button>`;
   };
 
   // ——— Barre d'actions de la créature choisie ———
@@ -564,6 +565,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   async function play(ev) {
     for (let ei = 0; ei < ev.length; ei++) {
       const e = ev[ei];
+      await coachIdle(); /* v661 : une bulle d'aide fige le combat derrière elle */
       if (!alive_) return;
       perfMark(e.kind ? `${e.t}:${e.kind}` : e.t);
       switch (e.t) {
@@ -944,6 +946,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     if (A) return assaultQTE(s, A);
     const q = seqFor(s);
     await tipFor(q);
+    await coachIdle(); /* v661 : jamais de barre de défense sous une bulle d'aide */
     if (!alive_) return 'none';
     return verdict(await barQTE(s, q));
   }
@@ -952,6 +955,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const e = st.units[s.a];
     if (!g.s.tips?.['cb-assault']) await tuto(app, 'cb-assault');
     await tipFor(A.seq);
+    await coachIdle();
     if (!alive_) return 'none';
     const ov = document.createElement('div'); ov.className = 'cb-assault';
     ov.innerHTML = `<div class="cb-as-in"><small>Assaut · ${esc(uName(e))}</small><b>${esc(A.name)}</b></div>`;
@@ -1040,7 +1044,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   // Les ennemis jouent jusqu'au tour de ta prochaine créature (v262 : l'ordre alterne entre les deux camps)
   async function foesPlay() {
     log = [];
-    for (let k = 0; k < 16 && alive_ && !st.over && st.turn === 'enemy'; k++) await enemyTurn();
+    for (let k = 0; k < 16 && alive_ && !st.over && st.turn === 'enemy'; k++) { await coachIdle(); await enemyTurn(); }
     if (guide) endGuide();
     if (!alive_ || st.over) return;
     setTimeout(() => { if (alive_ && !busy && st.turn === 'ally') showLog(); }, reduced ? 0 : 1000); // après le bandeau « À toi ! »
@@ -1276,15 +1280,18 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       <p class="small muted">${statusLines(u)}</p></div>`, { label: uName(u) });
   }
   // v289 : la réserve au toucher — les cartes des créatures en attente, pour juger d'un remplacement
+  function fallenAllies() { return st.order.ally.map((id) => st.units[id]).filter((u) => u && u.hp <= 0 && !u.swallowed); }
   function reserveSheet() {
-    const r = reserve(st, 'ally');
-    if (!r.length) return;
-    const sh = openSheet(`<h2>${icon('team')} Ta réserve</h2>
-      <p class="small muted">Pour faire entrer l’une d’elles, choisis l’action <b>Permuter</b> de la créature qui joue. Touche une carte pour tout voir.</p>
-      <div class="cb-rsv">${r.map((x) => { const c = cat.get(x.id), kit = KITS[x.role]; return `<button class="cb-rsv-c" data-u="${x.uid}">
-        <span class="cb-rsv-card">${cardHTML(c, { size: 'full', nameKnown: true, variant: g.shownVariant(x.id) })}</span>
-        <span class="cb-rsv-st"><span>${roleIcon(kit.kw)}<b>${esc(kit.name)}</b></span><span>${icon('swords')}${x.atk + (x.boost || 0)}</span><span>${icon('heart')}${Math.max(0, x.hp)}/${x.maxHp}</span></span>
-        ${ENTRANCES[x.role] ? `<small class="cb-rsv-e"><b>En entrant</b> : ${esc(ENTRANCES[x.role].desc)}</small>` : ''}</button>`; }).join('')}</div>`, { label: 'Réserve' });
+    const r = reserve(st, 'ally'), dead = fallenAllies();
+    if (!r.length && !dead.length) return;
+    const card = (x, fell) => { const c = cat.get(x.id), kit = KITS[x.role]; return `<button class="cb-rsv-c${fell ? ' fell' : ''}" data-u="${x.uid}">
+        <span class="cb-rsv-card">${cardHTML(c, { size: 'full', nameKnown: true, variant: g.shownVariant(x.id) })}${fell ? `<span class="cb-rsv-skull" aria-hidden="true">${icon('skull')}<img alt="" src="assets/icons/mort.webp" onload="this.parentNode.classList.add('pic')" onerror="this.remove()"></span>` : ''}</span>
+        <span class="cb-rsv-st"><span>${roleIcon(kit.kw)}<b>${esc(kit.name)}</b></span>${fell ? '' : `<span>${icon('swords')}${x.atk + (x.boost || 0)}</span>`}<span>${icon('heart')}${Math.max(0, x.hp)}/${x.maxHp}</span></span>
+        ${fell ? '<small class="cb-rsv-dead">Tombée au combat</small>' : ENTRANCES[x.role] ? `<small class="cb-rsv-e"><b>En entrant</b> : ${esc(ENTRANCES[x.role].desc)}</small>` : ''}</button>`; };
+    const sh = openSheet(`<h2 class="cb-rsv-h">${icon('team')} Ta réserve</h2>
+      ${r.length ? `<p class="small muted">Pour faire entrer l’une d’elles, choisis l’action <b>Permuter</b> de la créature qui joue. Touche une carte pour tout voir.</p>
+      <div class="cb-rsv">${r.map((x) => card(x, false)).join('')}</div>` : '<p class="small muted center">Plus aucune créature en réserve.</p>'}
+      ${dead.length ? `<h3 class="cb-rsv-h3">${icon('skull')} Tombées au combat</h3><div class="cb-rsv">${dead.map((x) => card(x, true)).join('')}</div>` : ''}`, { label: 'Réserve', cls: 'cb-rsv-sheet' });
     sh.body.addEventListener('click', (ev) => { const id = ev.target.closest('[data-u]')?.dataset.u; if (id) { sh.close(); info(st.units[id]); } });
   }
   function statusLines(u) {

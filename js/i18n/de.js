@@ -8598,4 +8598,7 @@ export const names = {
   "apporte sa Marque à": "verleiht sein Mal an",
   "<b>{n0}</b> apporte de l’attaque à <b>{n1}</b>.": "<b>{n0}</b> verleiht <b>{n1}</b> Angriff.",
   "apporte de l’attaque à": "verleiht Angriff an",
+  "Tombées au combat": "Im Kampf gefallen",
+  "Tombée au combat": "Im Kampf gefallen",
+  "Plus aucune créature en réserve.": "Keine Kreatur mehr in Reserve.",
 };

@@ -6308,3 +6308,18 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 .mi-reward { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0; padding: 12px 14px; border-radius: 12px; background: rgba(242, 193, 78, .08); border: 1px solid rgba(232, 195, 90, .4); }
 .mi-reward b { display: inline-flex; align-items: center; gap: 8px; font-size: 1.05rem; color: #F2E3BF; }
 .mi-reward .picon, .mi-reward img { width: 28px; height: 28px; object-fit: contain; }
+
+/* v661 : réserve du combat : titre centré, créatures tombées assombries avec une tête de mort */
+.cb-rsv-sheet .sheet-body > h2.cb-rsv-h { text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.cb-rsv-h3 { margin: 16px 0 8px; text-align: center; font-family: var(--f-display); color: #C9B9A0; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.cb-rsv-h3 .ic { width: 18px; height: 18px; }
+.cb-rsv-card { position: relative; display: block; }
+.cb-rsv-c.fell { border-color: rgba(160, 60, 60, .35); background: rgba(6, 4, 8, .7); }
+.cb-rsv-c.fell .cb-rsv-card .tcg { filter: grayscale(1) brightness(.38) contrast(1.05); }
+.cb-rsv-skull { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.cb-rsv-skull > .ic { width: 46%; height: auto; aspect-ratio: 1; color: #E8DCC6; opacity: .85; filter: drop-shadow(0 0 10px rgba(180, 30, 30, .8)); }
+.cb-rsv-skull > img { position: absolute; width: 62%; height: auto; }
+.cb-rsv-skull.pic > .ic { display: none; }
+.cb-rsv-dead { font-size: .74rem; color: #D98C8C; font-style: italic; }
+.dv-resv img.dead { filter: grayscale(1) brightness(.35); }
+.cb-rsv-sheet .cb-rsv { justify-content: center; grid-template-columns: repeat(auto-fit, minmax(0, 170px)); }

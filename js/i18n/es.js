@@ -8598,4 +8598,7 @@ export const names = {
   "apporte sa Marque à": "aporta su Marca a",
   "<b>{n0}</b> apporte de l’attaque à <b>{n1}</b>.": "<b>{n0}</b> aporta ataque a <b>{n1}</b>.",
   "apporte de l’attaque à": "aporta ataque a",
+  "Tombées au combat": "Caídas en combate",
+  "Tombée au combat": "Caída en combate",
+  "Plus aucune créature en réserve.": "No queda ninguna criatura en la reserva.",
 };

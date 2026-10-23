@@ -7,6 +7,11 @@ export function tipSeen(app, key) { return !!app.game.s.tips?.[key]; }
 import { frSpaces } from './dom.js';
 export { frSpaces };
 
+/* v661 : bulles ouvertes ; le combat attend qu'elles soient fermées (coachIdle) avant de jouer la suite */
+let openN = 0, waiters = [];
+export function coachIdle() { return openN ? new Promise((r) => waiters.push(r)) : Promise.resolve(); }
+export function coachOpen() { return openN > 0; }
+
 export function coach(app, key, html, { title = '' } = {}) {
   html = frSpaces(html); title = frSpaces(title);
   const g = app.game;
@@ -22,11 +27,11 @@ export function coach(app, key, html, { title = '' } = {}) {
       ${title ? `<b class="coach-t">${icon('info')} ${title}</b>` : ''}
       <p>${html}</p>
       <button class="btn primary small" type="button">J’ai compris</button></div>`;
-    document.body.appendChild(el);
+    document.body.appendChild(el); openN++;
     requestAnimationFrame(() => el.classList.add('on'));
     // v311 : la bulle se ferme aussi avec Échap, et toute seule si on change d'écran (elle restait affichée par-dessus)
     let shut = false;
-    const done = () => { if (shut) return; shut = true; window.removeEventListener('hashchange', done); document.removeEventListener('keydown', esc); el.classList.remove('on'); setTimeout(() => el.remove(), 250); resolve(true); };
+    const done = () => { if (shut) return; shut = true; openN = Math.max(0, openN - 1); if (!openN) { const w = waiters; waiters = []; w.forEach((f) => f()); } window.removeEventListener('hashchange', done); document.removeEventListener('keydown', esc); el.classList.remove('on'); setTimeout(() => el.remove(), 250); resolve(true); };
     const esc = (e) => { if (e.key === 'Escape') done(); };
     el.querySelector('button').addEventListener('click', done, { once: true });
     window.addEventListener('hashchange', done); document.addEventListener('keydown', esc);
