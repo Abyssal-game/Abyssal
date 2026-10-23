@@ -40,14 +40,19 @@ export function pityHTML(g) {
 // v438 : nouveaux sachets (nouveaux noms : le service worker garderait les anciens)
 const PACK_FILE = { abysse: 'abysse2', standard: 'standard2', event: 'event2' };
 /* v565 : sachet choisi au Profil : remplace le visuel des boosters standard, Alliances et premium (pas ceux des factions) ;
-   SKIN_TOP = haut de la plaque sombre où s'écrit le nom (mesuré sur chaque image) ; skin: null = visuel d'origine (l'adversaire au Pari) */
-const SKINNED = ['standard', 'premium'], /* v587 : les Alliances gardent leur sachet */ SKIN_TOP = { 'sachet-vif-ames': 68.5, /* v630 */ 'sachet-veillee': 70.5, 'sachet-fondateur': 69, 'sachet-vif-fondateur': 70, /* v642 */ /* v638 */
-  'sachet-braise': 71.5, 'sachet-lune-sang': 71, 'sachet-souverain': 75.5,
-  'sachet-vif-spectre': 71, 'sachet-vif-eclipse': 71, /* v578 */ 'sachet-vif-phenix': 75, 'sachet-vif-kraken': 75, 'sachet-vif-tresor': 71,
-  'sachet-vif-dragon': 69.7, 'sachet-vif-astrolabe': 67.3, 'sachet-vif-givre-noir': 66,
-  'sachet-vif-orage': 68.2, 'sachet-vif-foret': 67.5,
-  /* v579 */ 'sachet-vif-necro': 66.5, 'sachet-vif-automate': 73, 'sachet-vif-celeste': 73.5, 'sachet-vif-infernal': 73, 'sachet-vif-empereur': 72.5,
-  /* v588 */ 'sachet-vif-meduse': 74.5, 'sachet-vif-corbeau': 72, 'sachet-vif-sablier': 70.5, 'sachet-vif-araignee': 68.5, 'sachet-vif-scorpion': 72.5, 'sachet-vif-loup': 73, 'sachet-vif-lanterne': 72.5, 'sachet-vif-orchidee': 70.5, 'sachet-vif-geode': 73.5, 'sachet-vif-coeur': 71 }; /* v570 */
+   SKIN_BOX = case sombre où s’écrit le nom ; skin: null = visuel d'origine (l'adversaire au Pari) */
+const SKINNED = ['standard', 'premium']; /* v587 : les Alliances gardent leur sachet */
+/* v643 : case sombre de chaque sachet mesurée sur l'image (haut, bas, gauche, droite en % du sachet ; 5e valeur : taille du texte si la case est petite) : le nom et « 3 cartes » y sont centrés */
+const SKIN_BOX = {
+  'sachet-vif-ames': [67.5, 87.5, 9, 9], 'sachet-veillee': [72, 89, 9.5, 9.5], 'sachet-fondateur': [71, 88.5, 6, 6], 'sachet-vif-fondateur': [66, 85.5, 33, 31],
+  'sachet-braise': [71.5, 88, 6, 6], 'sachet-lune-sang': [71, 85.8, 9.5, 9.5], 'sachet-souverain': [75.4, 85.4, 10.5, 10.5, .8],
+  'sachet-vif-spectre': [68.2, 84.6, 10.5, 10], 'sachet-vif-eclipse': [71.3, 85.6, 9.5, 10], 'sachet-vif-phenix': [73.2, 89, 7, 7], 'sachet-vif-kraken': [72.3, 89, 7, 7], 'sachet-vif-tresor': [70.2, 86, 6, 6],
+  'sachet-vif-dragon': [69.6, 87, 9, 9], 'sachet-vif-astrolabe': [67.4, 84.4, 10.5, 10], 'sachet-vif-givre-noir': [65.3, 82.9, 13.5, 13], 'sachet-vif-orage': [68.2, 83.6, 13.5, 13.5], 'sachet-vif-foret': [67, 85.6, 10.5, 10.5],
+  'sachet-vif-necro': [66.2, 83.9, 12, 12.5], 'sachet-vif-automate': [70.8, 88.4, 9, 9], 'sachet-vif-celeste': [72.4, 89, 7.5, 7.5], 'sachet-vif-infernal': [72, 88.2, 7, 7], 'sachet-vif-empereur': [71, 87, 7, 7],
+  'sachet-vif-meduse': [72.5, 88.7, 10.5, 10.5], 'sachet-vif-corbeau': [70.1, 86, 9, 8], 'sachet-vif-sablier': [69.4, 87.7, 8, 8], 'sachet-vif-araignee': [67.9, 85.8, 9, 8],
+  'sachet-vif-scorpion': [71.3, 89, 8, 8], 'sachet-vif-loup': [71.5, 88.7, 8, 8], 'sachet-vif-lanterne': [71.3, 86.3, 13.5, 14.5], 'sachet-vif-orchidee': [69.1, 87.7, 11.5, 11.5],
+  'sachet-vif-geode': [70.8, 88.5, 10.5, 10], 'sachet-vif-coeur': [69.5, 88, 7, 7] };
+const skinVars = (k) => { const [t, b, l, r, s = 1] = SKIN_BOX[k] || [70, 86, 12, 12]; return `--lt:${t}%;--lb:${100 - b}%;--ll:${l}%;--lr:${r}%;--ls:${s}`; };
 export function packHTML(type, cat, { faction, event, skin = getPackSkin(type) } = {}) {
   const def = BOOSTERS[type] || { name: type === 'shadow' ? 'Booster des Ombres' : 'Booster' };
   let label = type === 'shadow' ? 'Ombres' : def.name.replace('Booster ', '');
@@ -56,7 +61,7 @@ export function packHTML(type, cat, { faction, event, skin = getPackSkin(type) }
   if (type === 'event') label = 'Alliances';
   const tag = type === 'abysse' ? '5 cartes' : type === 'premium' ? 'Rare garantie' : '3 cartes';
   const sk = skin && SKINNED.includes(type) ? skin : null;
-  return `<div class="pack pack-${type} ${sk ? 'pack-skin' : ''}"${sk ? ` style="--lt:${SKIN_TOP[sk] || 70}%"` : ''}>
+  return `<div class="pack pack-${type} ${sk ? 'pack-skin' : ''}"${sk ? ` style="${skinVars(sk)}"` : ''}>
     <img class="pk-img" alt="" src="assets/packs/${sk || PACK_FILE[key] || key}.webp">
     <div class="pk-logo">ABYSSAL</div>
     <div class="pk-label"><span class="pk-name">${esc(label)}</span><span class="pk-tag">${tag}</span></div>

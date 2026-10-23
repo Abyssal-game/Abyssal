@@ -6203,3 +6203,12 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 .cxs-t .cx-mat { height: 86px; }
 .cxs-t { overflow: hidden; }
 .cxs-t .cxs-pr { margin-top: 2px; }
+/* v643 : nom et « 3 cartes » centrés dans la case sombre de chaque sachet (SKIN_BOX dans js/screens/shop.js) */
+.pack-skin .pk-label { top: var(--lt, 70%); bottom: var(--lb, 14%); left: var(--ll, 12%); right: var(--lr, 12%); justify-content: center; align-items: center; gap: 2.6cqw; }
+.pack-skin .pk-name { height: auto; line-height: 1.05; max-width: 100%; }
+.pack-standard:not(.pack-skin) .pk-label, .pack-event:not(.pack-skin) .pk-label { top: 76%; }
+.cx-ttl { display: grid; place-items: center; width: 78px; height: 78px; border-radius: 50%; background: radial-gradient(circle, rgba(242, 193, 78, .22), transparent 70%); }
+.cx-ttl .picon { width: 64px; height: 64px; }
+.pack-skin .pk-name { font-size: calc(6.2cqw * var(--ls, 1)); }
+.pack-skin .pk-tag { font-size: calc(4.6cqw * var(--ls, 1)); padding: calc(1.4cqw * var(--ls, 1)) calc(3cqw * var(--ls, 1)); }
+.pack-skin .pk-label { gap: calc(2.6cqw * var(--ls, 1) * var(--ls, 1)); }

@@ -86,7 +86,7 @@ export default function codexScreen(app, root) {
     };
     const se = g.codexSeason(), best = se.best; /* v550 : les plus belles pièces de la saison */
     /* v636 : toutes les récompenses cosmétiques de la saison, en vitrine (toucher = aperçu) ; jours restants */
-    const loot = tiersOf(c.season).flatMap((x) => seasonItems(x.prem, x.tier).map((it) => ({ x, it }))); ui.loot = loot.map((o) => o.it); /* v640 : tous les objets, palier 30 compris */
+    const loot = tiersOf(c.season).flatMap((x) => seasonItems(x.prem, x.tier, x.tier === 30).map((it) => ({ x, it }))); /* v643 : le titre ultime aussi */ ui.loot = loot.map((o) => o.it); /* v640 : tous les objets, palier 30 compris */
     const left = Math.max(0, Math.ceil((new Date(`${se.ends}T23:59:59`) - g.clock()) / 864e5));
     const lootHTML = loot.length ? `<section class="cx-loot"><h3 class="cxs-sh">${icon('star')}À gagner cette saison <small>${loot.length} objets</small></h3>
       <div class="cxs-rail">${loot.map(({ x, it }) => `<button class="cxs-t wide r-season ${it.kind} ${ownedOf(it) ? 'own' : ''}" data-cx="seel" data-i="${loot.findIndex((o) => o.it === it)}"><span class="cxs-pic">${picOf(it)}</span><span class="cxs-rk">Palier ${x.tier}</span><b>${esc(nameOf(it))}</b>${ownedOf(it) ? `<span class="cxs-own">${icon('check')}Possédé</span>` : ''}</button>`).join('')}</div></section>` : '';
@@ -135,6 +135,7 @@ export default function codexScreen(app, root) {
     : it.kind === 'plate' ? `<span class="np np-${it.id} np-demo" translate="no">${esc(myName())}</span>`
     : it.kind === 'mat' ? `<img class="cx-mat" alt="" src="assets/tapis/${it.id}.webp">`
     : it.kind === 'fond' ? `<span class="cx-fondt has-fond"${fondStyle(it.id)}><span class="avatar-mini pf pf-${g.s.frame}">${myAv()}</span></span>`
+    : it.kind === 'title' ? `<span class="cx-ttl">${picon('titles')}</span>`
     : it.kind === 'emote' ? `<span class="re-tile">${emoteHTML(it.id)}</span>`
     : it.give?.emotes ? `<span class="re-fan">${it.give.emotes.slice(0, 4).map((k) => `<span class="re-pic">${emotePic(k)}</span>`).join('')}</span>`
     : it.give?.backs ? `<span class="cx-fan">${it.give.backs.slice(0, 4).map((b) => `<img alt="" src="assets/backs/${b}.webp">`).join('')}</span>` : '';
