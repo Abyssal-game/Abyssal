@@ -5355,7 +5355,7 @@ export default {
   "Ton équipe est complète : retire d’abord une créature.": "Tu equipo está completo: quita primero una criatura.",
   "Ton équipe est vide : compose-la dans l’onglet Équipe.": "Tu equipo está vacío: fórmalo en la pestaña Equipo.",
   "Ton équipe est vide.": "Tu equipo está vacío.",
-  "Ton équipe n’a plus de limite de rareté. Une équipe très en dessous de la force de l’étage se fait vite abattre ; à force égale, ce sont <b>tes esquives, tes parades et la Brisure</b> qui décident : chaque attaque ennemie frappe fort si tu ne la défends pas.": "Tu equipo ya no tiene límite de rareza. Un equipo muy por debajo del Poder del piso cae enseguida; a igual Poder, son <b>tus esquivas, tus paradas y el Quiebre</b> los que deciden: cada ataque enemigo golpea fuerte si no lo defiendes.",
+  "Une équipe très en dessous de la force de l’étage se fait vite abattre ; à force égale, ce sont <b>tes esquives, tes parades et la Brisure</b> qui décident : chaque attaque ennemie frappe fort si tu ne la défends pas.": "Un equipo muy por debajo del Poder del piso cae enseguida; a igual Poder, son <b>tus esquivas, tus paradas y el Quiebre</b> los que deciden: cada ataque enemigo golpea fuerte si no lo defiendes.",
   "Totalité": "Totalidad",
   "Totalité : seules ses faiblesses le blessent pleinement": "Totalidad: solo sus debilidades lo hieren de lleno",
   "Touche <b>+</b> sous une créature pour l’ajouter, <b>▲▼</b> pour la passer du combat à la réserve, <b>✕</b> pour la retirer.": "Toca <b>+</b> bajo una criatura para añadirla, <b>▲▼</b> para pasarla del combate a la reserva, <b>✕</b> para quitarla.",

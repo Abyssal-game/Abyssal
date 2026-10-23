@@ -5355,7 +5355,7 @@ export default {
   "Ton équipe est complète : retire d’abord une créature.": "Dein Team ist voll: Entferne zuerst eine Kreatur.",
   "Ton équipe est vide : compose-la dans l’onglet Équipe.": "Dein Team ist leer: Stelle es im Reiter Team zusammen.",
   "Ton équipe est vide.": "Dein Team ist leer.",
-  "Ton équipe n’a plus de limite de rareté. Une équipe très en dessous de la force de l’étage se fait vite abattre ; à force égale, ce sont <b>tes esquives, tes parades et la Brisure</b> qui décident : chaque attaque ennemie frappe fort si tu ne la défends pas.": "Dein Team hat keine Seltenheitsgrenze mehr. Ein Team weit unter der Stärke der Ebene wird schnell niedergemacht; bei gleicher Stärke entscheiden <b>dein Ausweichen, deine Paraden und der Bruch</b>: Jeder feindliche Angriff trifft hart, wenn du ihn nicht abwehrst.",
+  "Une équipe très en dessous de la force de l’étage se fait vite abattre ; à force égale, ce sont <b>tes esquives, tes parades et la Brisure</b> qui décident : chaque attaque ennemie frappe fort si tu ne la défends pas.": "Ein Team weit unter der Stärke der Ebene wird schnell niedergemacht; bei gleicher Stärke entscheiden <b>dein Ausweichen, deine Paraden und der Bruch</b>: Jeder feindliche Angriff trifft hart, wenn du ihn nicht abwehrst.",
   "Totalité": "Ganzheit",
   "Totalité : seules ses faiblesses le blessent pleinement": "Ganzheit: Nur seine Schwächen verletzen ihn voll",
   "Touche <b>+</b> sous une créature pour l’ajouter, <b>▲▼</b> pour la passer du combat à la réserve, <b>✕</b> pour la retirer.": "Tippe auf <b>+</b> unter einer Kreatur, um sie hinzuzufügen, auf <b>▲▼</b>, um sie zwischen Kampf und Reserve zu wechseln, auf <b>✕</b>, um sie zu entfernen.",

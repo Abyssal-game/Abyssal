@@ -5355,7 +5355,7 @@ export default {
   "Ton équipe est complète : retire d’abord une créature.": "Your team is full: remove a creature first.",
   "Ton équipe est vide : compose-la dans l’onglet Équipe.": "Your team is empty: build it in the Team tab.",
   "Ton équipe est vide.": "Your team is empty.",
-  "Ton équipe n’a plus de limite de rareté. Une équipe très en dessous de la force de l’étage se fait vite abattre ; à force égale, ce sont <b>tes esquives, tes parades et la Brisure</b> qui décident : chaque attaque ennemie frappe fort si tu ne la défends pas.": "Your team no longer has a rarity limit. A team far below the floor's Power is quickly cut down; at equal Power, <b>your dodges, your parries and Break</b> decide the outcome: every enemy attack hits hard if you don't defend it.",
+  "Une équipe très en dessous de la force de l’étage se fait vite abattre ; à force égale, ce sont <b>tes esquives, tes parades et la Brisure</b> qui décident : chaque attaque ennemie frappe fort si tu ne la défends pas.": "A team far below the floor's Power is quickly cut down; at equal Power, <b>your dodges, your parries and Break</b> decide the outcome: every enemy attack hits hard if you don't defend it.",
   "Totalité": "Totality",
   "Totalité : seules ses faiblesses le blessent pleinement": "Wholeness: only its weaknesses hurt it fully",
   "Touche <b>+</b> sous une créature pour l’ajouter, <b>▲▼</b> pour la passer du combat à la réserve, <b>✕</b> pour la retirer.": "Tap <b>+</b> under a creature to add it, <b>▲▼</b> to move it between combat and reserve, <b>✕</b> to remove it.",

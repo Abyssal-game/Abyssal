@@ -5355,7 +5355,7 @@ export default {
   "Ton équipe est complète : retire d’abord une créature.": "La tua squadra è completa: prima togli una creatura.",
   "Ton équipe est vide : compose-la dans l’onglet Équipe.": "La tua squadra è vuota: componila nella scheda Squadra.",
   "Ton équipe est vide.": "La tua squadra è vuota.",
-  "Ton équipe n’a plus de limite de rareté. Une équipe très en dessous de la force de l’étage se fait vite abattre ; à force égale, ce sont <b>tes esquives, tes parades et la Brisure</b> qui décident : chaque attaque ennemie frappe fort si tu ne la défends pas.": "La tua squadra non ha più limiti di rarità. Una squadra molto al di sotto della forza del piano viene abbattuta in fretta; a parità di forza, sono <b>le tue schivate, le tue parate e la Rottura</b> a decidere: ogni attacco nemico colpisce forte se non lo difendi.",
+  "Une équipe très en dessous de la force de l’étage se fait vite abattre ; à force égale, ce sont <b>tes esquives, tes parades et la Brisure</b> qui décident : chaque attaque ennemie frappe fort si tu ne la défends pas.": "Una squadra molto al di sotto della forza del piano viene abbattuta in fretta; a parità di forza, sono <b>le tue schivate, le tue parate e la Rottura</b> a decidere: ogni attacco nemico colpisce forte se non lo difendi.",
   "Totalité": "Totalità",
   "Totalité : seules ses faiblesses le blessent pleinement": "Totalità: solo le sue debolezze lo feriscono pienamente",
   "Touche <b>+</b> sous une créature pour l’ajouter, <b>▲▼</b> pour la passer du combat à la réserve, <b>✕</b> pour la retirer.": "Tocca <b>+</b> sotto una creatura per aggiungerla, <b>▲▼</b> per spostarla dal combattimento alla riserva, <b>✕</b> per toglierla.",
