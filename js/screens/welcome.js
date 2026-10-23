@@ -26,22 +26,26 @@ export function showWelcome(app, { force = false } = {}) {
   let i = 0;
   const sheet = openSheet('', { cls: 'welcome', label: 'Bienvenue', onClose: () => { g.s.seenIntro = GUIDE_V; g.persist(); if (!force) setTimeout(() => showGift(app), 350); } });
   PAGES.forEach((pg) => { new Image().src = pg.img ? `assets/ui/tuto-${pg.img}.webp` : `assets/ui/bn-${pg.bn}.webp`; });
-  const draw = () => {
-    const pg = PAGES[i];
-    const art = pg.img ? `<img class="wl-art" alt="" src="assets/ui/tuto-${pg.img}.webp">`
-      : pg.bn ? `<img class="wl-art wl-bn" alt="" src="assets/ui/bn-${pg.bn}.webp">` : `<div class="wl-ic">${pg.ic ? icon(pg.ic) : EMBLEM}</div>`;
-    sheet.setContent(`<div class="wl">
-      ${art}
-      <h2>${pg.t}</h2><p>${pg.p}</p>
-      <div class="wl-dots">${PAGES.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</div>
-      <div class="row gap wl-btns">${i ? '<button class="btn ghost" data-w="prev">Retour</button>' : '<button class="btn ghost" data-w="skip">Passer</button>'}<button class="btn primary" data-w="next">${i < PAGES.length - 1 ? 'Suivant' : 'C’est parti !'}</button></div>
+  /* v649 : toutes les pages posées l'une sur l'autre dans la même case : la fenêtre garde la taille de la plus grande, rien ne bouge en changeant de page */
+  const artOf = (pg) => (pg.img ? `<img class="wl-art" alt="" src="assets/ui/tuto-${pg.img}.webp">`
+    : pg.bn ? `<img class="wl-art wl-bn" alt="" src="assets/ui/bn-${pg.bn}.webp">` : `<div class="wl-ic">${pg.ic ? icon(pg.ic) : EMBLEM}</div>`);
+  sheet.setContent(`<div class="wl">
+      <div class="wl-deck">${PAGES.map((pg, k) => `<div class="wl-page" data-p="${k}">${artOf(pg)}<h2>${pg.t}</h2><p>${pg.p}</p></div>`).join('')}</div>
+      <div class="wl-dots">${PAGES.map(() => '<i></i>').join('')}</div>
+      <div class="row gap wl-btns"><button class="btn ghost" data-w="back"></button><button class="btn primary" data-w="next"></button></div>
     </div>`);
+  const draw = () => {
+    sheet.body.querySelectorAll('.wl-page').forEach((el, k) => { el.classList.toggle('on', k === i); el.setAttribute('aria-hidden', k === i ? 'false' : 'true'); });
+    sheet.body.querySelectorAll('.wl-dots i').forEach((el, k) => el.classList.toggle('on', k === i));
+    const back = sheet.body.querySelector('[data-w="back"]');
+    back.textContent = i ? 'Retour' : 'Passer'; back.dataset.act = i ? 'prev' : 'skip';
+    sheet.body.querySelector('[data-w="next"]').textContent = i < PAGES.length - 1 ? 'Suivant' : 'C’est parti !';
   };
   sheet.body.addEventListener('click', (e) => {
     const b = e.target.closest('[data-w]'); if (!b) return;
     if (b.dataset.w === 'next') { if (i < PAGES.length - 1) { i++; draw(); } else sheet.close(); }
-    if (b.dataset.w === 'prev') { i = Math.max(0, i - 1); draw(); }
-    if (b.dataset.w === 'skip') sheet.close();
+    if (b.dataset.w === 'back' && b.dataset.act === 'prev') { i = Math.max(0, i - 1); draw(); }
+    if (b.dataset.w === 'back' && b.dataset.act === 'skip') sheet.close();
   });
   draw();
 }

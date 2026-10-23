@@ -6255,3 +6255,9 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 /* v648 : coffre ouvert : butin, coffre, message et boutons centrés ensemble dans la hauteur de l'écran (avant : posés vers le haut, grand vide en bas sur iPhone) */
 .chx-stage:has(.chx-chest.open) { justify-content: safe center; padding-top: 12px; padding-bottom: calc(18px + max(env(safe-area-inset-bottom), var(--safe-b, 0px), var(--vh-gap, 0px))); }
 .chx-stage:has(.chx-chest.open) .chx-packs { align-items: center; }
+/* v649 : guide de bienvenue : pages superposées dans une même case (hauteur de la plus grande), seule la page en cours est visible */
+.wl-deck { display: grid; }
+.wl-page { grid-area: 1 / 1; display: flex; flex-direction: column; align-items: center; visibility: hidden; opacity: 0; transition: opacity .2s ease; }
+.wl-page.on { visibility: visible; opacity: 1; }
+.wl-page .wl-art { width: 100%; }
+.wl-page p { margin-bottom: 16px; }
