@@ -319,6 +319,9 @@ export class Game {
     this.s.week.claimed = true; this.addChests({ or: 1 }); this.persist();
     return 'or';
   }
+  /* v644 : éclats de l'offrande pour le n-ième jour d'une série (affichage) */
+  dailyGainFor(n) { return ECONOMY.daily.base + Math.min(ECONOMY.daily.maxStreakBonus, (Math.max(1, n) - 1) * ECONOMY.daily.perStreakDay); }
+
   claimDaily() {
     if (!this.canDailyClaim()) throw new Error('L’offrande du jour a déjà été récupérée.');
     const { streak, amount } = this.dailyAmount();

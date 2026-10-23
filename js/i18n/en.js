@@ -7511,6 +7511,22 @@ export default {
   "Boutique des boosters": "Booster shop",
   "Duels en ligne": "Online duels",
   "Codex · palier {0}": "Codex · tier {0}",
+  "Jour {0} sur {1} · aujourd’hui {2} éclats": "Day {0} of {1} · today {2} Shards",
+  "Jour {0} sur {1} · aujourd’hui {2} éclats et un coffre de fer": "Day {0} of {1} · today {2} Shards and an iron chest",
+  "aujourd’hui {0} éclats": "today {0} Shards",
+  "Reçue : {0} éclats · demain {1} éclats": "Received: {0} Shards · tomorrow {1} Shards",
+  "Reçue : {0} éclats et un coffre de fer · demain {1} éclats": "Received: {0} Shards and an iron chest · tomorrow {1} Shards",
+  "<b>Ouvre {0} boosters</b>{e0}": "<b>Open {0} boosters</b>{e0}",
+  "<b>Remporte {0} combats (Descente ou Épreuves)</b>{e0}": "<b>Win {0} battles (Descent or Trials)</b>{e0}",
+  "Offrande du jour": "Daily Offering",
+  "Chaque jour où tu ouvres le jeu, l’offrande arrive toute seule. Plus ta série de jours d’affilée est longue, plus elle rapporte.": "Every day you open the game, the offering arrives on its own. The longer your streak of consecutive days, the more it gives.",
+  "<b>Jour {0}</b>{e0}": "<b>Day {0}</b>{e0}",
+  "<b>Jour {0}</b>{e0}{e1}": "<b>Day {0}</b>{e0}{e1}",
+  "Jour {0}": "Day {0}",
+  "{e0}{0} éclats": "{e0}{0} Shards",
+  "{e0}+ un coffre de fer": "{e0}+ an iron chest",
+  "+ un coffre de fer": "+ an iron chest",
+  "Après le {0}e jour, la série continue : {1} éclats chaque jour, et un coffre de fer tous les {2} jours. Un jour manqué fait seulement reculer la série d’un jour.": "After day {0}, the streak goes on: {1} Shards every day, and an iron chest every {2} days. A missed day only sets the streak back by one day.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

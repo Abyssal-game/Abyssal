@@ -3,8 +3,8 @@ import { mpw } from '../cloud/mpwatch.js';
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { artUrl, hasRealArt } from '../art/assets.js';
 import { icon, EMBLEM, sigil, picon } from '../ui/icons.js';
-import { esc, fmt, toast, bindActions, pct } from '../ui/dom.js';
-import { FACTION_ORDER } from '../config.js';
+import { esc, fmt, toast, bindActions, pct, openSheet } from '../ui/dom.js';
+import { FACTION_ORDER, ECONOMY } from '../config.js';
 import { seeded } from '../art/geometry.js';
 import { today } from '../core/save.js';
 import { setScene } from '../ui/scene.js';
@@ -26,8 +26,10 @@ export default function home(app, root) {
     const rows = [];
     // Série de jours : 7 cases, un coffre de fer au 7e jour
     const sd = g.canDailyClaim() ? daily.streak : (s.daily.streak || 0), pos = ((sd - 1) % 7) + 1;
-    const streakBar = `<span class="td-streak">${Array.from({ length: 7 }, (_, k) => `<i class="${k < (g.canDailyClaim() ? pos - 1 : pos) ? 'on' : ''} ${k === pos - 1 && g.canDailyClaim() ? 'now' : ''} ${k === 6 ? 'chest' : ''}">${k === 6 ? icon('lock') : k + 1}</i>`).join('')}</span>`;
-    rows.push(`<div class="td-row td-daily ${g.canDailyClaim() ? '' : 'done'}"><span class="td-ic mi" style="--mc:#F2C14E">${picon('streak')}</span><span class="td-t"><b>Offrande du jour</b><span class="small muted">${g.canDailyClaim() ? `Jour ${pos} sur 7${pos === 7 ? ' : un coffre de fer en plus !' : ''}` : `Récupérée · série de ${sd} jour${sd > 1 ? 's' : ''}`}</span>${streakBar}</span>${g.canDailyClaim() ? `<span class="td-auto" title="Arrive tout seul">+${daily.amount}</span>` : `<span class="small muted">Reçue</span>`}</div>`);
+    /* v644 : chaque case montre ce que rapporte son jour (éclats, coffre de fer au 7e) ; toucher l'offrande ouvre le détail */
+    const dayGain = (k) => g.dailyGainFor(sd - pos + k + 1);
+    const streakBar = `<span class="td-streak">${Array.from({ length: 7 }, (_, k) => `<i class="${k < (g.canDailyClaim() ? pos - 1 : pos) ? 'on' : ''} ${k === pos - 1 && g.canDailyClaim() ? 'now' : ''} ${k === 6 ? 'chest' : ''}">${k === 6 ? '<img alt="" src="assets/chests/fer.webp">' : `<em>${k + 1}</em>`}<small>${dayGain(k)}</small></i>`).join('')}</span>`;
+    rows.push(`<div class="td-row td-daily ${g.canDailyClaim() ? '' : 'done'}" data-act="dailyinfo" role="button"><span class="td-ic mi" style="--mc:#F2C14E">${picon('streak')}</span><span class="td-t"><b>Offrande du jour</b><span class="small muted">${g.canDailyClaim() ? `Jour ${pos} sur 7 · aujourd’hui ${daily.amount} éclats${pos === 7 ? ' et un coffre de fer' : ''}` : `Reçue : ${dayGain(pos - 1)} éclats${pos === 7 ? ' et un coffre de fer' : ''} · demain ${pos === 7 ? g.dailyGainFor(sd + 1) : dayGain(pos)} éclats`}</span>${streakBar}</span>${g.canDailyClaim() ? `<span class="td-auto" title="Arrive tout seul">+${daily.amount}</span>` : `<span class="small muted">Reçue</span>`}</div>`);
     // v411 : ce qui se joue aujourd'hui, puis les missions, puis le coffre de la semaine (avant : tout mélangé)
     const tl = g.trials().done.filter((x) => !x).length, tw = g.trials().done.filter((x) => x === 'won').length;
     if (g.team().length >= 3) rows.push(`<a class="td-row ${tl ? '' : 'done'}" href="#/epreuves"><span class="td-ic mi" style="--mc:#E0485E">${picon('crest-elite')}</span><span class="td-t"><b>Épreuves du jour</b><span class="small muted">${tl ? `${tl} combat${tl > 1 ? 's' : ''} à jouer · un coffre par victoire` : `Terminées : ${tw} victoire${tw > 1 ? 's' : ''} sur 3 · retour demain`}</span></span>${tl ? icon('next') : '<span class="small muted">Demain</span>'}</a>`);
@@ -77,6 +79,12 @@ export default function home(app, root) {
   lazyArt(root);
   setScene('home');
   bindActions(root, {
+    dailyinfo() { /* v644 : ce que rapporte l'offrande, jour par jour */
+      const E = ECONOMY.daily, sh = picon('crystal');
+      openSheet(`<h2>Offrande du jour</h2><p class="muted">Chaque jour où tu ouvres le jeu, l’offrande arrive toute seule. Plus ta série de jours d’affilée est longue, plus elle rapporte.</p>
+        <div class="dl-days">${Array.from({ length: 7 }, (_, k) => `<div class="dl-day ${k === 6 ? 'chest' : ''}"><b>Jour ${k + 1}</b><span>${sh}${E.base + Math.min(E.maxStreakBonus, k * E.perStreakDay)} éclats</span>${k === 6 ? '<span><img alt="" src="assets/chests/fer.webp">+ un coffre de fer</span>' : ''}</div>`).join('')}</div>
+        <p class="small muted">Après le 7e jour, la série continue : ${E.base + E.maxStreakBonus} éclats chaque jour, et un coffre de fer tous les 7 jours. Un jour manqué fait seulement reculer la série d’un jour.</p>`, { label: 'Offrande du jour' });
+    },
     weekchest() {
       try { g.claimWeekChest(); app.sfx.chest?.(); toast('Coffre de la semaine : <b>un coffre d’or</b> rejoint tes coffres !', { kind: 'epic', icon: 'trophy' }); app.refresh(); }
       catch (e) { toast(esc(e.message), { kind: 'error' }); }

@@ -6214,3 +6214,16 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 .pack-skin .pk-label { gap: calc(2.6cqw * var(--ls, 1) * var(--ls, 1)); }
 /* v644 : plaque de la rangée Personnaliser : le pseudo entier (la taille baisse au besoin, fitPlate) */
 .cs-row .cs-pic .np-demo { max-width: 94%; padding: .12em .5em; }
+/* v644 : offrande du jour : le gain de chaque jour dans sa case, fenêtre de détail */
+.td-daily[data-act] { cursor: pointer; }
+.td-streak { gap: 5px; }
+.td-streak i { width: 30px; height: 36px; grid-template-rows: auto auto; align-content: center; gap: 2px; }
+.td-streak i em { font: 800 .6rem/1 var(--f-ui); font-style: normal; opacity: .75; }
+.td-streak i small { font: 800 .62rem/1 var(--f-ui); }
+.td-streak i.chest img { width: 20px; height: 20px; object-fit: contain; }
+.dl-days { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
+.dl-day { display: grid; gap: 4px; padding: 10px; border-radius: 12px; background: rgba(255, 255, 255, .04); border: 1px solid rgba(201, 164, 90, .25); }
+.dl-day b { font: 800 .82rem var(--f-display); color: #F2E3BF; }
+.dl-day span { display: flex; align-items: center; gap: 6px; font-size: .86rem; }
+.dl-day .picon, .dl-day img { width: 22px; height: 22px; object-fit: contain; }
+.dl-day.chest { grid-column: 1 / -1; border-color: rgba(232, 195, 90, .6); background: radial-gradient(circle at 20% 50%, rgba(242, 193, 78, .14), transparent 70%), rgba(255, 255, 255, .04); }

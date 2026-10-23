@@ -7500,6 +7500,22 @@ export default {
   "Boutique des boosters": "Loja de boosters",
   "Duels en ligne": "Duelos online",
   "Codex · palier {0}": "Códice · nível {0}",
+  "Jour {0} sur {1} · aujourd’hui {2} éclats": "Dia {0} de {1} · hoje {2} fragmentos",
+  "Jour {0} sur {1} · aujourd’hui {2} éclats et un coffre de fer": "Dia {0} de {1} · hoje {2} fragmentos e um baú de ferro",
+  "aujourd’hui {0} éclats": "hoje {0} fragmentos",
+  "Reçue : {0} éclats · demain {1} éclats": "Recebida: {0} fragmentos · amanhã {1} fragmentos",
+  "Reçue : {0} éclats et un coffre de fer · demain {1} éclats": "Recebida: {0} fragmentos e um baú de ferro · amanhã {1} fragmentos",
+  "<b>Ouvre {0} boosters</b>{e0}": "<b>Abra {0} pacotes</b>{e0}",
+  "<b>Remporte {0} combats (Descente ou Épreuves)</b>{e0}": "<b>Vença {0} combates (Descida ou Provas)</b>{e0}",
+  "Offrande du jour": "Oferenda do dia",
+  "Chaque jour où tu ouvres le jeu, l’offrande arrive toute seule. Plus ta série de jours d’affilée est longue, plus elle rapporte.": "Todo dia em que você abre o jogo, a oferenda chega sozinha. Quanto maior sua sequência de dias seguidos, mais ela rende.",
+  "<b>Jour {0}</b>{e0}": "<b>Dia {0}</b>{e0}",
+  "<b>Jour {0}</b>{e0}{e1}": "<b>Dia {0}</b>{e0}{e1}",
+  "Jour {0}": "Dia {0}",
+  "{e0}{0} éclats": "{e0}{0} fragmentos",
+  "{e0}+ un coffre de fer": "{e0}+ um baú de ferro",
+  "+ un coffre de fer": "+ um baú de ferro",
+  "Après le {0}e jour, la série continue : {1} éclats chaque jour, et un coffre de fer tous les {2} jours. Un jour manqué fait seulement reculer la série d’un jour.": "Depois do dia {0}, a sequência continua: {1} fragmentos por dia e um baú de ferro a cada {2} dias. Um dia perdido só faz a sequência recuar um dia.",
 };
 
 export const names = {

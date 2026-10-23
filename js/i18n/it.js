@@ -7500,6 +7500,22 @@ export default {
   "Boutique des boosters": "Negozio delle bustine",
   "Duels en ligne": "Duelli online",
   "Codex · palier {0}": "Codice · livello {0}",
+  "Jour {0} sur {1} · aujourd’hui {2} éclats": "Giorno {0} di {1} · oggi {2} schegge",
+  "Jour {0} sur {1} · aujourd’hui {2} éclats et un coffre de fer": "Giorno {0} di {1} · oggi {2} schegge e un forziere di ferro",
+  "aujourd’hui {0} éclats": "oggi {0} schegge",
+  "Reçue : {0} éclats · demain {1} éclats": "Ricevuta: {0} schegge · domani {1} schegge",
+  "Reçue : {0} éclats et un coffre de fer · demain {1} éclats": "Ricevuta: {0} schegge e un forziere di ferro · domani {1} schegge",
+  "<b>Ouvre {0} boosters</b>{e0}": "<b>Apri {0} buste</b>{e0}",
+  "<b>Remporte {0} combats (Descente ou Épreuves)</b>{e0}": "<b>Vinci {0} combattimenti (Discesa o Prove)</b>{e0}",
+  "Offrande du jour": "Offerta del giorno",
+  "Chaque jour où tu ouvres le jeu, l’offrande arrive toute seule. Plus ta série de jours d’affilée est longue, plus elle rapporte.": "Ogni giorno in cui apri il gioco, l’offerta arriva da sola. Più lunga è la tua serie di giorni consecutivi, più ti dà.",
+  "<b>Jour {0}</b>{e0}": "<b>Giorno {0}</b>{e0}",
+  "<b>Jour {0}</b>{e0}{e1}": "<b>Giorno {0}</b>{e0}{e1}",
+  "Jour {0}": "Giorno {0}",
+  "{e0}{0} éclats": "{e0}{0} schegge",
+  "{e0}+ un coffre de fer": "{e0}+ un forziere di ferro",
+  "+ un coffre de fer": "+ un forziere di ferro",
+  "Après le {0}e jour, la série continue : {1} éclats chaque jour, et un coffre de fer tous les {2} jours. Un jour manqué fait seulement reculer la série d’un jour.": "Dopo il giorno {0}, la serie continua: {1} schegge ogni giorno e un forziere di ferro ogni {2} giorni. Un giorno saltato fa solo indietreggiare la serie di un giorno.",
 };
 
 export const names = {

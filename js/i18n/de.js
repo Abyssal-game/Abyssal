@@ -7500,6 +7500,22 @@ export default {
   "Boutique des boosters": "Booster-Laden",
   "Duels en ligne": "Online-Duelle",
   "Codex · palier {0}": "Kodex · Stufe {0}",
+  "Jour {0} sur {1} · aujourd’hui {2} éclats": "Tag {0} von {1} · heute {2} Splitter",
+  "Jour {0} sur {1} · aujourd’hui {2} éclats et un coffre de fer": "Tag {0} von {1} · heute {2} Splitter und eine Eisentruhe",
+  "aujourd’hui {0} éclats": "heute {0} Splitter",
+  "Reçue : {0} éclats · demain {1} éclats": "Erhalten: {0} Splitter · morgen {1} Splitter",
+  "Reçue : {0} éclats et un coffre de fer · demain {1} éclats": "Erhalten: {0} Splitter und eine Eisentruhe · morgen {1} Splitter",
+  "<b>Ouvre {0} boosters</b>{e0}": "<b>Öffne {0} Booster</b>{e0}",
+  "<b>Remporte {0} combats (Descente ou Épreuves)</b>{e0}": "<b>Gewinne {0} Kämpfe (Abstieg oder Prüfungen)</b>{e0}",
+  "Offrande du jour": "Tägliche Opfergabe",
+  "Chaque jour où tu ouvres le jeu, l’offrande arrive toute seule. Plus ta série de jours d’affilée est longue, plus elle rapporte.": "Jeden Tag, an dem du das Spiel öffnest, kommt die Opfergabe von selbst. Je länger deine Serie aufeinanderfolgender Tage, desto mehr bringt sie.",
+  "<b>Jour {0}</b>{e0}": "<b>Tag {0}</b>{e0}",
+  "<b>Jour {0}</b>{e0}{e1}": "<b>Tag {0}</b>{e0}{e1}",
+  "Jour {0}": "Tag {0}",
+  "{e0}{0} éclats": "{e0}{0} Splitter",
+  "{e0}+ un coffre de fer": "{e0}+ eine Eisentruhe",
+  "+ un coffre de fer": "+ eine Eisentruhe",
+  "Après le {0}e jour, la série continue : {1} éclats chaque jour, et un coffre de fer tous les {2} jours. Un jour manqué fait seulement reculer la série d’un jour.": "Nach Tag {0} geht die Serie weiter: {1} Splitter pro Tag und alle {2} Tage eine Eisentruhe. Ein verpasster Tag wirft die Serie nur um einen Tag zurück.",
 };
 
 export const names = {
