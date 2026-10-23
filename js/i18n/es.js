@@ -7537,6 +7537,10 @@ export default {
   "Emplacement {0} vide, Hyper rare": "Espacio {0} vacío, Hiperrara",
   "Emplacement {0} vide, Mythique": "Espacio {0} vacío, Mítica",
   "Emplacement {0} vide, Secrète": "Espacio {0} vacío, Secreta",
+  "La saison du mois": "La temporada del mes",
+  "Une victoire de plus pour la saison du mois.": "Una victoria más para la temporada del mes.",
+  "Tes victoires du mois font avancer la saison : chaque palier atteint est récompensé. Pas de classement entre joueurs : chacun affronte des combats réglés sur ses propres cartes.": "Tus victorias del mes hacen avanzar la temporada: cada nivel alcanzado tiene recompensa. No hay clasificación entre jugadores: cada uno se enfrenta a combates ajustados a sus propias cartas.",
+  "Chaque Épreuve gagnée donne un coffre et des éclats ; le coffre grandit avec ta progression dans la Descente. Une seule tentative : une Épreuve perdue revient demain.": "Cada Prueba ganada da un cofre y Esquirlas; el cofre crece con tu progreso en el Descenso. Un solo intento: una Prueba perdida vuelve mañana.",
 };
 
 export const names = {

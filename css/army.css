@@ -6279,3 +6279,5 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 /* v654 : boutique, bouton « Probabilités » centré sous le bouton d'achat (tous les boosters) */
 .product-info .row:has(> [data-act="odds"]) { justify-content: center; }
 .product-info .row:has(> [data-act="odds"]) + p.small.muted { text-align: center; }
+/* v655 : Épreuves, plus que deux tuiles (Saison, Comment ça marche) */
+.dc-links.ep-links2 { grid-template-columns: repeat(2, 1fr); }

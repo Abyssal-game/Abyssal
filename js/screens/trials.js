@@ -1,5 +1,5 @@
 // v407 : les Épreuves du jour. Trois combats par jour (combat, élite, gardien), réglés sur la force réelle du joueur ;
-// une tentative chacun, une récompense par victoire. La saison du mois et le classement du jour se jouent ici.
+// une tentative chacun, une récompense par victoire. La saison du mois se joue ici (v655 : plus de classement du jour : les combats sont réglés sur les cartes de chacun, ce ne serait pas équitable).
 import { RARITY } from '../config.js';
 import { CHESTS } from '../core/descent.js';
 import { TEAM } from '../core/army.js';
@@ -47,7 +47,7 @@ export default function trials(app, root) {
     return `<section class="dc-sum2 ep-res ${r.won ? 'won' : 'lost'}">
       ${crestHTML(r.won, ['I', 'II', 'III'][r.i], 'Épreuve', 'dc-sum2-crest')}
       <h2>${r.won ? 'Épreuve gagnée' : 'Épreuve perdue'}</h2>
-      <p class="dc-sum2-sub">${r.won ? `+${r.points} points au classement du jour.` : 'Elle reviendra demain, avec de nouveaux ennemis.'}</p>
+      <p class="dc-sum2-sub">${r.won ? 'Une victoire de plus pour la saison du mois.' : 'Elle reviendra demain, avec de nouveaux ennemis.'}</p>
       ${r.won && r.reward ? `<div class="ep-rws center">${rewardChips(r.reward)}</div>` : ''}
       ${r.won && r.reward?.chests ? `<a class="btn primary block dc-plq dc-plq-red" href="#/coffres">${icon('p:chest')}Ouvrir mon coffre</a>` : ''}
       ${r.firstWin ? `<p class="vx-week vx-first">${icon('star')} <b>Ta toute première victoire !</b> L’Abysse t’offre <b>+${fmt(r.firstWin)} éclats</b>.</p>` : ''}
@@ -91,9 +91,8 @@ export default function trials(app, root) {
       <div class="ep-list">${TRIALS.map((_, i) => cardHTML(i)).join('')}</div>
       <section class="panel ep-team">${teamStrip(team)}<div class="dc-teambtns"><a class="btn small ghost dc-plq dc-plq-dark" href="#/equipe">${icon('p:team-ic')}Mon équipe</a><a class="btn small ghost dc-plq dc-plq-dark" href="#/renfort">${icon('p:level-up')}Renforcer</a></div></section>
       ${r.off ? '' : `<section class="panel dc-rule bn-rule" style="--rf:${r.faction ? cat.faction[r.faction].colors.secondary : 'var(--gold)'}"><span class="dc-rule-ic">${r.faction ? sigil(r.faction) : picon('rule')}</span><span><span class="small muted">Règle du jour</span><b>${esc(r.name)}</b><span class="small">${esc(r.desc)}</span></span></section>`}
-      <div class="dc-links">
+      <div class="dc-links ep-links2">
         <button class="dc-link" data-act="open" data-f="season">${picon('season')}<b>Saison</b><small>paliers du mois</small></button>
-        <button class="dc-link" data-act="open" data-f="board">${picon('crown')}<b>Classement</b><small>du jour</small></button>
         <button class="dc-link" data-act="open" data-f="how">${picon('help')}<b>Comment ça marche</b><small>les Épreuves</small></button>
       </div>`;
   }
@@ -155,7 +154,7 @@ export default function trials(app, root) {
         ['swords', '#E0485E', 'Trois combats', 'Chaque jour : un combat, une élite et un gardien que tu as déjà vaincu dans la Descente. Ton équipe commence chaque Épreuve avec tous ses PV.'],
         ['level-up', '#7FA8D8', 'À ta mesure', 'La force des ennemis suit tes 5 meilleures cartes (rareté et niveau), même si elles ne sont pas dans ton équipe. Renforcer tes créatures rend donc les Épreuves plus dures ; leurs coffres, eux, grandissent avec ton record dans la Descente.'],
         ['chest', '#E8C35A', 'Une récompense par victoire', 'Chaque Épreuve gagnée donne un coffre et des éclats ; le coffre grandit avec ta progression dans la Descente. Une seule tentative : une Épreuve perdue revient demain.'],
-        ['crown', '#B04BFF', 'Saison et classement', 'Tes victoires du mois font avancer la saison (paliers récompensés). Le classement du jour compte tes points : 100 par victoire, plus les PV qui restent à ton équipe.'],
+        ['crown', '#B04BFF', 'La saison du mois', 'Tes victoires du mois font avancer la saison : chaque palier atteint est récompensé. Pas de classement entre joueurs : chacun affronte des combats réglés sur ses propres cartes.'],
       ].map(([ic, c, t2, d], k) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${k + 1}</em></span><span><b>${t2}</b><span class="small">${d}</span></span></li>`).join('')}</ol>`, { label: 'Aide', cls: 'dc-sheet' });
     },
   });

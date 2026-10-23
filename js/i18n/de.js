@@ -7537,6 +7537,10 @@ export default {
   "Emplacement {0} vide, Hyper rare": "Leerer Platz {0}, Hyperselten",
   "Emplacement {0} vide, Mythique": "Leerer Platz {0}, Mythisch",
   "Emplacement {0} vide, Secrète": "Leerer Platz {0}, Geheim",
+  "La saison du mois": "Die Saison des Monats",
+  "Une victoire de plus pour la saison du mois.": "Ein Sieg mehr für die Saison des Monats.",
+  "Tes victoires du mois font avancer la saison : chaque palier atteint est récompensé. Pas de classement entre joueurs : chacun affronte des combats réglés sur ses propres cartes.": "Deine Siege des Monats bringen die Saison voran: Jede erreichte Stufe wird belohnt. Keine Rangliste zwischen Spielern: Jeder bestreitet Kämpfe, die auf seine eigenen Karten abgestimmt sind.",
+  "Chaque Épreuve gagnée donne un coffre et des éclats ; le coffre grandit avec ta progression dans la Descente. Une seule tentative : une Épreuve perdue revient demain.": "Jede gewonnene Prüfung bringt eine Truhe und Splitter; die Truhe wächst mit deinem Fortschritt im Abstieg. Nur ein Versuch: Eine verlorene Prüfung kommt morgen wieder.",
 };
 
 export const names = {

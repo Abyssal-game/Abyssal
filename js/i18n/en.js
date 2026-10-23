@@ -7548,6 +7548,10 @@ export default {
   "Emplacement {0} vide, Hyper rare": "Empty slot {0}, Hyper Rare",
   "Emplacement {0} vide, Mythique": "Empty slot {0}, Mythic",
   "Emplacement {0} vide, Secrète": "Empty slot {0}, Secret",
+  "La saison du mois": "This month's season",
+  "Une victoire de plus pour la saison du mois.": "One more win for this month's season.",
+  "Tes victoires du mois font avancer la saison : chaque palier atteint est récompensé. Pas de classement entre joueurs : chacun affronte des combats réglés sur ses propres cartes.": "Your wins this month advance the season: every tier you reach is rewarded. No ranking between players: everyone faces battles tuned to their own cards.",
+  "Chaque Épreuve gagnée donne un coffre et des éclats ; le coffre grandit avec ta progression dans la Descente. Une seule tentative : une Épreuve perdue revient demain.": "Each Trial won gives a chest and Shards; the chest grows with your progress in the Descent. One attempt only: a lost Trial comes back tomorrow.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

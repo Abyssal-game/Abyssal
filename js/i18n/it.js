@@ -7537,6 +7537,10 @@ export default {
   "Emplacement {0} vide, Hyper rare": "Spazio {0} vuoto, Iper rara",
   "Emplacement {0} vide, Mythique": "Spazio {0} vuoto, Mitica",
   "Emplacement {0} vide, Secrète": "Spazio {0} vuoto, Segreta",
+  "La saison du mois": "La stagione del mese",
+  "Une victoire de plus pour la saison du mois.": "Una vittoria in più per la stagione del mese.",
+  "Tes victoires du mois font avancer la saison : chaque palier atteint est récompensé. Pas de classement entre joueurs : chacun affronte des combats réglés sur ses propres cartes.": "Le tue vittorie del mese fanno avanzare la stagione: ogni livello raggiunto viene premiato. Nessuna classifica tra giocatori: ognuno affronta combattimenti calibrati sulle proprie carte.",
+  "Chaque Épreuve gagnée donne un coffre et des éclats ; le coffre grandit avec ta progression dans la Descente. Une seule tentative : une Épreuve perdue revient demain.": "Ogni Prova vinta dà un forziere e schegge; il forziere cresce con i tuoi progressi nella Discesa. Un solo tentativo: una Prova persa torna domani.",
 };
 
 export const names = {
