@@ -147,8 +147,7 @@ export default function codexScreen(app, root) {
   };
   const ownedOf = (it) => (it.season ? g.s[{ frame: 'frames', back: 'backs', sachet: 'sachets', plate: 'plates', emote: 'emotes', mat: 'mats', fond: 'fonds' }[it.kind]]?.includes(it.id) : g.catalogOwned(it.id));
   const RANKS = ['myth', 'leg', 'epic', 'rare'];
-  const NEW = ['tp-', 'fp-']; /* nouveautés (préfixes des derniers ajouts) */
-
+  
   function shopTab() {
     const have = g.obs();
     const tile = (it, wide = false) => { const own = g.catalogOwned(it.id), cost = g.catalogCost(it.id), r = rank(it), on = own && worn(it);
@@ -182,27 +181,44 @@ export default function codexScreen(app, root) {
       let obsI = 0;
       return `${wallet}<nav class="cxs-nav"><button class="cxs-home" data-cx="cat" data-v="">${icon('prev')}Accueil</button></nav>
         <section class="cxs-aisle"><h2>${esc(OBS.name)}</h2><p class="small muted">Elles ne servent qu’aux cosmétiques : rien ici ne rend tes créatures plus fortes.</p></section>
-        <div class="cxs-euro" id="cx-euro">${SHOP.filter((it) => it.kind !== 'codex').map((it) => euro(it, it.kind === 'obs' ? obsI++ : 0)).join('')}</div>
+        <div class="cxs-euro" id="cx-euro">${SHOP.filter((it) => it.kind === 'obs').map((it) => euro(it, it.kind === 'obs' ? obsI++ : 0)).join('')}</div>
         <button class="btn ghost block" data-cx="restore">Restaurer mes achats</button>
         <p class="small muted center">Pendant l'aperçu, tout achat en euros est simulé : aucun paiement.</p>`;
     }
-    /* — l'accueil — */
-    const week = Math.floor(g.clock().getTime() / 864e5 / 7);
-    const stars = CATALOG.filter((x) => x.kind !== 'bundle' && x.cost >= 250 && !g.catalogOwned(x.id));
-    const hero = stars.length ? stars[week % stars.length] : null;
-    const heroHTML = hero ? `<section class="cxs-hero r-${rank(hero)} ${hero.kind}">${opt('assets/ui/ech-vitrine.webp', 'cxs-hero-bg')}
-        <small class="cx-kick">À la une cette semaine</small>
-        <button class="cxs-hero-pic" data-cx="see" data-id="${hero.id}">${picOf(hero, true)}</button>
-        <b class="cxs-hero-n">${esc(nameOf(hero))}</b><span class="cxs-rk">${RANK[rank(hero)]} · ${KINDS[kindOf(hero)][1]}</span>
-        <div class="cxs-hero-f"><button class="btn small ghost" data-cx="see" data-id="${hero.id}">${icon('eye')}Aperçu</button><button class="btn small primary" data-cx="get" data-id="${hero.id}">${obsTxt(g.catalogCost(hero.id))}</button></div></section>` : '';
-    const news = CATALOG.filter((x) => NEW.some((p) => x.id.startsWith(p)));
-    const rail = news.length ? `<section class="cxs-rail-s"><h3 class="cxs-sh">${icon('star')}Nouveautés</h3><div class="cxs-rail">${news.map((x) => tile(x, true)).join('')}</div></section>` : '';
+    /* — l'accueil (v637 : sans vitrine ni nouveautés ; obsidiennes et Pack du Fondateur en tête, bien visibles) — */
     const aisles = Object.keys(KINDS).filter((k) => inKind(k).length).map((k) => { const l = inKind(k), own = l.filter((x) => g.catalogOwned(x.id)).length;
       const show = l.slice().sort((a, b) => RANKS.indexOf(rank(a)) - RANKS.indexOf(rank(b)))[0];
       return `<button class="cxs-aisle-t k-${k}" data-cx="cat" data-v="${k}"><span class="cxs-at-pic">${picOf(show)}</span><b>${KINDS[k][0]}</b><small>${KINDS[k][2]}</small><span class="cxs-at-n">${own} / ${l.length}</span></button>`; }).join('');
-    return `${wallet}${heroHTML}${rail}
-      <h3 class="cxs-sh">${icon('chest')}Les rayons</h3><div class="cxs-aisles">${aisles}
-        <button class="cxs-aisle-t k-obs" data-cx="cat" data-v="obs"><span class="cxs-at-pic">${OBS_I}</span><b>${esc(OBS.name)}</b><small>Paquets et Pack du Fondateur</small></button></div>`;
+    const fd = SHOP.find((x) => x.id === 'fondateur'), fdOwn = fd && g.shopOwned(fd.id);
+    const big = `<div class="cxs-bigs">
+        <button class="cxs-big k-obs" data-cx="cat" data-v="obs"><span class="cxs-big-pic">${[1, 2, 3, 4].map((n) => opt(`assets/ui/obs-${n}.webp`)).join('')}</span>
+          <span class="cxs-big-t"><b>${esc(OBS.name)}</b><small>De 100 à 2 800 · bonus offert sur les gros paquets</small></span><span class="cxs-big-go">${icon('next')}</span></button>
+        ${fd ? `<button class="cxs-big k-founder ${fdOwn ? 'own' : ''}" data-cx="founder">${opt('assets/ui/ech-fondateur.webp', 'cxs-big-bg')}
+          <span class="cxs-big-t"><small class="cx-kick">Une seule fois</small><b>${esc(fd.name)}</b><small>${fdOwn ? `${icon('check')}Déjà à toi` : `Voir ce qu’il contient · ${esc(fd.price)}`}</small></span><span class="cxs-big-go">${icon('next')}</span></button>` : ''}</div>`;
+    return `${wallet}${big}
+      <h3 class="cxs-sh">${icon('chest')}Les rayons</h3><div class="cxs-aisles">${aisles}</div>`;
+  }
+
+  /* v637 : ce que contient le Pack du Fondateur (aperçu de chaque objet) */
+  function founder() {
+    const it = SHOP.find((x) => x.id === 'fondateur'), gv = it.give, own = g.shopOwned(it.id), s = g.s;
+    const av = s.avatar && cat.get(s.avatar), avImg = av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM;
+    const rows = [];
+    if (gv.frame) rows.push(['Cadre de profil', ALL_FRAMES[gv.frame], `<span class="avatar-big pf pf-${gv.frame}">${avImg}</span>`]);
+    if (gv.back) rows.push(['Dos de cartes', CODEX_BACKS[gv.back], `<span class="cx-fd-backs">${[0, 1, 2].map(() => `<img alt="" src="assets/backs/${gv.back}.webp">`).join('')}</span>`]);
+    if (gv.sachet) rows.push(['Sachet de booster', SACHETS[gv.sachet], `<span class="cx-pv-packs">${packHTML('standard', null, { skin: gv.sachet })}</span>`]);
+    if (gv.plate) rows.push(['Plaque de pseudo', PLATES[gv.plate], `<span class="np np-${gv.plate}">${esc(myName())}</span>`]);
+    if (gv.fond) rows.push(['Fond de profil', FONDS[gv.fond], `<span class="cx-fondt has-fond"${fondStyle(gv.fond)}><span class="avatar-mini pf pf-${s.frame}">${avImg}</span></span>`]);
+    if (gv.title) rows.push(['Titre', '', `<span class="cx-fd-title">${picon('titles')}<b>${esc(gv.title)}</b><small>avec son badge au classement</small></span>`]);
+    if (gv.obs) rows.push([esc(OBS.name), `${fmt(gv.obs)} obsidiennes`, `<span class="cx-fd-obs">${OBS_I}<b>${fmt(gv.obs)}</b></span>`]);
+    const sh = openSheet('', { label: it.name, full: true, cls: 'cx-pv cx-fd' });
+    sh.setContent(`<header class="cx-pv-head r-myth"><small class="cx-kick">Vendu une seule fois</small><h2 class="cx-pv-title">${esc(it.name)}</h2><small class="cx-pv-pos">${rows.length} récompenses</small></header>
+      <p class="small muted center">Pour celles et ceux qui soutiennent l’Abysse dès le début : des objets introuvables ailleurs, jamais de puissance.</p>
+      ${rows.map(([k, n, v]) => `<section class="cx-fd-row"><p class="cx-pv-cap">${k}</p><div class="cx-fd-v">${v}</div><b class="cx-fd-n">${esc(n || '')}</b></section>`).join('')}
+      <div class="cx-pv-foot">${own ? `<span class="cx-badge on">${icon('check')}Déjà à toi</span>` : `<button class="btn primary cx-pv-buy" data-fd="buy">Acheter · ${esc(it.price)}</button><small class="muted">Aperçu Créateur : achat simulé</small>`}</div>`);
+    sh.body.addEventListener('click', async (e) => { if (!e.target.closest('[data-fd="buy"]')) return;
+      if (!(await confirmBox(`<b>Achat simulé</b> : ${esc(it.name)} (${esc(it.price)}).<br>Aperçu Créateur : aucun paiement, l'achat est simplement ajouté à ton profil.`, { ok: 'Simuler l’achat' }))) return;
+      try { g.shopBuy(it.id); app.sfx.levelup?.(); toast(`${esc(it.name)} : acquis (achat simulé).`, { kind: 'success', icon: 'star' }); sh.close?.(); app.chrome?.(); draw(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } });
   }
 
   function devTab() {
@@ -216,7 +232,7 @@ export default function codexScreen(app, root) {
   function draw() {
     if (!g.codexOn()) { location.replace('#/boutique'); return; } /* caché : rien ne doit trahir le pass hors Mode Créateur */
     root.innerHTML = `<header class="screen-head ui-hero ${ui.tab === 'shop' ? 'bn-echoppe' : 'bn-codex'} cx-top"><h1>${ui.tab === 'shop' ? 'L’Échoppe' : esc(CODEX.name)}</h1><span class="sc-rec">Aperçu Créateur · invisible pour les joueurs</span></header>
-      <div class="seg cx-seg" role="group">${[['codex', 'Le Codex'], ['shop', 'L’Échoppe']].map(([k, l]) => `<button class="seg-b" data-cx="tab" data-v="${k}" aria-pressed="${ui.tab === k}">${l}</button>`).join('')}</div>
+      <nav class="cx-tabs2" aria-label="Codex et Échoppe">${[['codex', 'Le Codex', 'Paliers de la saison', 'book'], ['shop', 'L’Échoppe', 'Cosmétiques', 'obsidienne']].map(([k, l, sub, ic]) => `<button class="cx-tab2 t-${k}" data-cx="tab" data-v="${k}" aria-pressed="${ui.tab === k}"><img alt="" src="assets/icons/${ic}.webp"><span><b>${l}</b><small>${sub}</small></span></button>`).join('')}</nav>
       ${ui.tab === 'shop' ? shopTab() : codexTab()}
       ${devTab()}`;
     if (ui.tab !== 'shop' && !ui.scrolled) { ui.scrolled = true; requestAnimationFrame(() => document.getElementById('cx-now')?.scrollIntoView({ block: 'center' })); }
@@ -343,6 +359,7 @@ export default function codexScreen(app, root) {
         g.shopBuy(it.id); app.sfx.levelup?.(); toast(`${esc(it.name)} : acquis (achat simulé).`, { kind: 'success', icon: 'star' });
       }
       if (k === 'jump') { ui.cat = 'obs'; draw(); return; }
+      if (k === 'founder') { app.sfx.tap?.(); founder(); return; } /* v637 */
       if (k === 'cat') { ui.cat = b.dataset.v || null; ui.rar = null; app.sfx.tap?.(); draw(); root.querySelector('.cxs-wallet')?.scrollIntoView({ block: 'start' }); return; }
       if (k === 'rar') { ui.rar = b.dataset.v || null; app.sfx.tap?.(); return draw(); } /* v636 */
       if (k === 'hide') { ui.hideOwned = !ui.hideOwned; app.sfx.tap?.(); return draw(); }

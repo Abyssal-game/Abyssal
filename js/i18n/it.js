@@ -7464,6 +7464,16 @@ export default {
   "Encore {0} jour": "Ancora {0} giorno",
   "Précédent": "Precedente",
   "Rayons": "Reparti",
+  "Codex et Échoppe": "Codice e Bottega",
+  "Paliers de la saison": "Livelli della stagione",
+  "Cosmétiques": "Cosmetici",
+  "De {0} à {1} · bonus offert sur les gros paquets": "Da {0} a {1} · bonus sui pacchetti grandi",
+  "Voir ce qu’il contient · {0} €": "Scopri cosa contiene · {0} €",
+  "Une seule fois": "Una sola volta",
+  "Vendu une seule fois": "Venduto una sola volta",
+  "Pour celles et ceux qui soutiennent l’{n0} dès le début : des objets introuvables ailleurs, jamais de puissance.": "Per chi sostiene {n0} fin dall’inizio: oggetti introvabili altrove, mai potenza.",
+  "avec son badge au classement": "con il suo distintivo in classifica",
+  "Aperçu Créateur : achat simulé": "Anteprima Creatore: acquisto simulato",
 };
 
 export const names = {

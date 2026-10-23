@@ -7475,6 +7475,16 @@ export default {
   "Encore {0} jour": "{0} day left",
   "Précédent": "Previous",
   "Rayons": "Aisles",
+  "Codex et Échoppe": "Codex and Shop",
+  "Paliers de la saison": "Season tiers",
+  "Cosmétiques": "Cosmetics",
+  "De {0} à {1} · bonus offert sur les gros paquets": "From {0} to {1} · bonus on bigger bundles",
+  "Voir ce qu’il contient · {0} €": "See what’s inside · €{0}",
+  "Une seule fois": "Only once",
+  "Vendu une seule fois": "Sold only once",
+  "Pour celles et ceux qui soutiennent l’{n0} dès le début : des objets introuvables ailleurs, jamais de puissance.": "For those who support {n0} from the very start: items found nowhere else, never any power.",
+  "avec son badge au classement": "with its leaderboard badge",
+  "Aperçu Créateur : achat simulé": "Creator preview: simulated purchase",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

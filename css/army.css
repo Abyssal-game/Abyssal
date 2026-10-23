@@ -6026,3 +6026,71 @@ html[data-mat="tp-mammon"] .sc-cell { background: rgba(40, 0, 0, .3); box-shadow
 .cx-pv-board { height: min(46vh, 340px); }
 .cxs-at-pic .np-demo { font-size: .9rem; min-width: 130px; padding: .4em 1.2em; }
 .cx-pv-foot { z-index: 6; }
+
+/* v637 : tapis de jeu : les cartes des cases des coins ne mordent plus sur les médaillons des angles (grille resserrée, mesurée sur chaque image) */
+html[data-mat="tp-abysse"] .sc-plate { top: 9.6%; bottom: 9.6%; left: 13%; right: 13%; }
+html[data-mat="tp-mammon"] .sc-plate { top: 14%; bottom: 14%; left: 19%; right: 19%; }
+html[data-mat="tp-givre"] .sc-plate { top: 13%; bottom: 13%; left: 17.5%; right: 17.5%; }
+html .sc-board[data-pmat="tp-obsidienne"] .sc-plate { top: 11.5%; bottom: 11.5%; left: 16%; right: 16%; }
+html .sc-board[data-pmat="tp-abysse"] .sc-plate { top: 9.6%; bottom: 9.6%; left: 13%; right: 13%; }
+html .sc-board[data-pmat="tp-mammon"] .sc-plate { top: 14%; bottom: 14%; left: 19%; right: 19%; }
+html .sc-board[data-pmat="tp-givre"] .sc-plate { top: 13%; bottom: 13%; left: 17.5%; right: 17.5%; }
+/* v637 : portrait toujours rond et contenu dans son cadre (tuiles des rayons, fonds de profil, aperçus) : l'illustration ne déborde plus du cadre */
+:is(.cxs-aisle-t, .cx-fondt, .cx-pv, .cxs-rail) :is(.avatar-big, .avatar-mini) { display: inline-block; position: relative; flex: none; border-radius: 50%; aspect-ratio: 1; background: radial-gradient(circle, #2A2340, #0B0C12); vertical-align: middle; }
+:is(.cxs-aisle-t, .cx-fondt, .cx-pv, .cxs-rail) :is(.avatar-big, .avatar-mini) > img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+:is(.cxs-aisle-t, .cx-fondt, .cx-pv, .cxs-rail) :is(.avatar-big, .avatar-mini) > svg { width: 100%; height: 100%; }
+/* v637 : onglets Codex / Échoppe en deux grandes tuiles illustrées sur toute la largeur */
+.cx-tabs2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 14px; }
+.cx-tab2 { position: relative; display: flex; align-items: center; gap: 10px; min-height: 74px; padding: 10px 12px; border-radius: 16px; overflow: hidden; text-align: left; color: #E9DFC8;
+  border: 1.5px solid rgba(232, 201, 135, .22); background: linear-gradient(90deg, rgba(8, 7, 12, .92) 20%, rgba(8, 7, 12, .45)), var(--bn) center / cover no-repeat, #0E0C14;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, .5); filter: saturate(.55) brightness(.75); transition: filter .2s, border-color .2s, transform .12s; }
+.cx-tab2.t-codex { --bn: url(../assets/ui/bn-codex.webp); }
+.cx-tab2.t-shop { --bn: url(../assets/ui/bn-echoppe.webp); }
+.cx-tab2 img { width: 40px; height: 40px; flex: none; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .8)); }
+.cx-tab2 span { display: grid; gap: 2px; min-width: 0; }
+.cx-tab2 b { font-family: var(--font-title, inherit); font-size: 1.05rem; line-height: 1.1; color: #F3E3BA; text-shadow: 0 2px 6px #000; }
+.cx-tab2 small { font-size: .74rem; color: rgba(233, 223, 200, .75); text-shadow: 0 1px 4px #000; }
+.cx-tab2[aria-pressed="true"] { filter: none; border-color: #E8C987; box-shadow: 0 0 0 1px rgba(232, 201, 135, .35), 0 0 22px rgba(232, 201, 135, .28), 0 8px 18px rgba(0, 0, 0, .5); }
+.cx-tab2[aria-pressed="true"]::after { content: ''; position: absolute; left: 16%; right: 16%; bottom: 0; height: 3px; border-radius: 3px 3px 0 0; background: linear-gradient(90deg, transparent, #F2C14E, transparent); }
+.cx-tab2:active { transform: scale(.97); }
+/* v637 : Échoppe : obsidiennes et Pack du Fondateur en grandes tuiles en tête de l'accueil */
+.cxs-bigs { display: grid; gap: 10px; margin: 0 0 16px; }
+.cxs-big { position: relative; display: flex; align-items: center; gap: 12px; min-height: 96px; padding: 12px 14px; border-radius: 18px; overflow: hidden; text-align: left; color: #E9DFC8;
+  border: 1.5px solid rgba(232, 201, 135, .5); box-shadow: 0 0 20px rgba(168, 120, 255, .18), 0 10px 22px rgba(0, 0, 0, .55); }
+.cxs-big.k-obs { background: radial-gradient(circle at 18% 50%, rgba(160, 110, 255, .4), transparent 55%), linear-gradient(120deg, #1D1330, #0C0A14 70%); border-color: rgba(190, 150, 255, .6); }
+.cxs-big.k-founder { background: linear-gradient(90deg, rgba(8, 7, 12, .25), rgba(8, 7, 12, .92) 62%), #120D0A; border-color: #E8C987; box-shadow: 0 0 22px rgba(242, 193, 78, .22), 0 10px 22px rgba(0, 0, 0, .55); min-height: 120px; }
+.cxs-big-bg { position: absolute; inset: 0; width: 62%; height: 100%; object-fit: cover; object-position: center; z-index: 0; -webkit-mask-image: linear-gradient(90deg, #000 55%, transparent); mask-image: linear-gradient(90deg, #000 55%, transparent); }
+.cxs-big.k-founder .cxs-big-t { margin-left: auto; text-align: right; max-width: 55%; }
+.cxs-big-pic { position: relative; z-index: 1; display: flex; align-items: flex-end; flex: none; }
+.cxs-big-pic img { width: 40px; height: 40px; object-fit: contain; margin-left: -12px; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .7)); }
+.cxs-big-pic img:first-child { margin-left: 0; width: 34px; height: 34px; }
+.cxs-big-pic img:last-child { width: 56px; height: 56px; }
+.cxs-big-t { position: relative; z-index: 1; display: grid; gap: 3px; min-width: 0; flex: 1; }
+.cxs-big-t b { font-family: var(--font-title, inherit); font-size: 1.15rem; color: #F3E3BA; text-shadow: 0 2px 6px #000; }
+.cxs-big-t small { font-size: .78rem; color: rgba(233, 223, 200, .82); text-shadow: 0 1px 4px #000; }
+.cxs-big-t .cx-kick { color: #F2C14E; letter-spacing: .12em; text-transform: uppercase; font-size: .68rem; }
+.cxs-big-go { position: relative; z-index: 1; flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: rgba(0, 0, 0, .45); border: 1px solid rgba(232, 201, 135, .4); color: #F2C14E; }
+.cxs-big-go svg { width: 16px; height: 16px; }
+.cxs-big.own { border-color: rgba(120, 200, 140, .55); }
+.cxs-big:active { transform: scale(.98); }
+/* contenu du Pack du Fondateur */
+.cx-fd-row { display: grid; justify-items: center; gap: 6px; margin: 4px 0 16px; padding: 12px 10px 14px; border-radius: 16px; background: radial-gradient(circle at 50% 30%, rgba(242, 193, 78, .1), transparent 70%), rgba(255, 255, 255, .03); border: 1px solid rgba(232, 201, 135, .16); }
+.cx-fd-row .cx-pv-cap { margin: 0; }
+.cx-fd-v { display: grid; place-items: center; min-height: 64px; }
+.cx-fd-n { font-family: var(--font-title, inherit); color: #F3E3BA; text-align: center; }
+.cx-fd-backs { display: flex; }
+.cx-fd-backs img { width: 86px; aspect-ratio: 5 / 7; border-radius: 7px; box-shadow: 0 8px 18px rgba(0, 0, 0, .6); margin: 0 -14px; }
+.cx-fd-backs img:nth-child(1) { transform: rotate(-9deg) translateY(6px); }
+.cx-fd-backs img:nth-child(2) { position: relative; z-index: 1; width: 96px; }
+.cx-fd-backs img:nth-child(3) { transform: rotate(9deg) translateY(6px); }
+.cx-fd .cx-pv-packs .pack { width: 120px; }
+.cx-fd .avatar-big { width: 96px; height: 96px; }
+.cx-fd .cx-fondt { width: 220px; }
+.cx-fd .cx-fondt .avatar-mini { width: 54px; height: 54px; }
+.cx-fd-title { display: grid; justify-items: center; gap: 2px; }
+.cx-fd-title img, .cx-fd-title svg { width: 42px; height: 42px; }
+.cx-fd-title b { font-family: var(--font-title, inherit); font-size: 1.2rem; color: #F2C14E; }
+.cx-fd-title small { color: rgba(233, 223, 200, .7); font-size: .75rem; }
+.cx-fd-obs { display: flex; align-items: center; gap: 8px; font-size: 1.5rem; color: #E4D3FF; }
+.cx-fd-obs .obs-i { width: 44px; height: 44px; }
+.cx-fd .cx-fd-v .pack { width: 108px !important; max-width: 108px; }
