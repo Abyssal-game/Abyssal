@@ -24,7 +24,7 @@ const CB_ICON = new Set(['bastion', 'chasse', 'glace']); // images présentes da
 import { PACTS } from '../core/pacts.js';
 import { TRAITS, traitIcon, OMENS } from '../core/descent.js';
 import { RELICS } from '../core/relics.js';
-import { ULTS } from '../core/army.js';
+import { ULTS, roleOf } from '../core/army.js';
 import { mountDiorama, roomFor } from '../ui/diorama.js';
 import { moveIconUrl, passivesOf, passiveIconUrl, moveFor, PASSIVES } from '../core/kits.js';
 import { hap } from '../ui/sound.js';
@@ -1280,18 +1280,23 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       <p class="small muted">${statusLines(u)}</p></div>`, { label: uName(u) });
   }
   // v289 : la réserve au toucher — les cartes des créatures en attente, pour juger d'un remplacement
-  function fallenAllies() { return st.order.ally.map((id) => st.units[id]).filter((u) => u && u.hp <= 0 && !u.swallowed); }
+  /* v666 : aussi les créatures tombées lors des combats précédents du chapitre (elles ne sont plus dans ce combat) */
+  function fallenAllies() {
+    const here = st.order.ally.map((id) => st.units[id]).filter(Boolean), ids = new Set(here.map((u) => u.id));
+    const before = (run?.team || []).filter((m) => m.fallen && !ids.has(m.id) && cat.get(m.id)).map((m) => ({ uid: null, id: m.id, role: roleOf(cat.get(m.id)), hp: 0, maxHp: m.maxHp || 1, atk: 0 }));
+    return [...here.filter((u) => u.hp <= 0 && !u.swallowed), ...before];
+  }
   function reserveSheet() {
     const r = reserve(st, 'ally'), dead = fallenAllies();
     if (!r.length && !dead.length) return;
-    const card = (x, fell) => { const c = cat.get(x.id), kit = KITS[x.role]; return `<button class="cb-rsv-c${fell ? ' fell' : ''}" data-u="${x.uid}">
+    const card = (x, fell) => { const c = cat.get(x.id), kit = KITS[x.role]; return `<button class="cb-rsv-c${fell ? ' fell' : ''}"${x.uid ? ` data-u="${x.uid}"` : ''}>
         <span class="cb-rsv-card">${cardHTML(c, { size: 'full', nameKnown: true, variant: g.shownVariant(x.id) })}${fell ? `<span class="cb-rsv-skull" aria-hidden="true">${icon('skull')}<img alt="" src="assets/icons/mort.webp" onload="this.parentNode.classList.add('pic')" onerror="this.remove()"></span>` : ''}</span>
         <span class="cb-rsv-st"><span>${roleIcon(kit.kw)}<b>${esc(kit.name)}</b></span>${fell ? '' : `<span>${icon('swords')}${x.atk + (x.boost || 0)}</span>`}<span>${icon('heart')}${Math.max(0, x.hp)}/${x.maxHp}</span></span>
         ${!fell && ENTRANCES[x.role] ? `<small class="cb-rsv-e"><b>En entrant</b> : ${esc(ENTRANCES[x.role].desc)}</small>` : ''}</button>`; };
     const all = [...r.map((x) => card(x, false)), ...dead.map((x) => card(x, true))]; /* v664 : toutes côte à côte, les tombées assombries */
     const sh = openSheet(`<h2 class="cb-rsv-h">${icon('team')} Ta réserve</h2>
       ${r.length ? '<p class="small muted">Pour faire entrer l’une d’elles, choisis l’action <b>Permuter</b> de la créature qui joue. Touche une carte pour tout voir.</p>' : ''}
-      <div class="cb-rsv cb-rsv-row" style="--n:${Math.min(all.length, 3)}">${all.join('')}</div>`, { label: 'Réserve', cls: 'cb-rsv-sheet' });
+      <div class="cb-rsv cb-rsv-row" style="--n:${Math.max(2, Math.min(all.length, 3))}">${all.join('')}</div>`, { label: 'Réserve', cls: 'cb-rsv-sheet' });
     sh.body.addEventListener('click', (ev) => { const id = ev.target.closest('[data-u]')?.dataset.u; if (id) { sh.close(); info(st.units[id]); } });
   }
   function statusLines(u) {
