@@ -7474,6 +7474,12 @@ export default {
   "Pour celles et ceux qui soutiennent l’{n0} dès le début : des objets introuvables ailleurs, jamais de puissance.": "Para quem apoia {n0} desde o início: itens que não existem em nenhum outro lugar, nunca poder.",
   "avec son badge au classement": "com seu emblema no ranking",
   "Aperçu Créateur : achat simulé": "Prévia do Criador: compra simulada",
+  "Cadre vivant du Fondateur": "Moldura viva do Fundador",
+  "Dos vivant du Fondateur": "Verso vivo do Fundador",
+  "Sachet vivant du Fondateur": "Pacote vivo do Fundador",
+  "Plaque du Fondateur": "Placa do Fundador",
+  "Fond de la Salle des Premiers Gardiens": "Fundo do Salão dos Primeiros Guardiões",
+  "Vendu une seule fois. Le cadre, le dos de cartes, le sachet de booster et la plaque vivants du Fondateur, son fond de profil, le titre « Fondateur » (badge au classement) et {0} obsidiennes.": "Vendido uma única vez. A moldura, o verso, o pacote e a placa vivos do Fundador, seu fundo de perfil, o título “Fundador” (emblema no ranking) e {0} obsidianas.",
 };
 
 export const names = {

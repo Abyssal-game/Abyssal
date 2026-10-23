@@ -7485,6 +7485,12 @@ export default {
   "Pour celles et ceux qui soutiennent l’{n0} dès le début : des objets introuvables ailleurs, jamais de puissance.": "For those who support {n0} from the very start: items found nowhere else, never any power.",
   "avec son badge au classement": "with its leaderboard badge",
   "Aperçu Créateur : achat simulé": "Creator preview: simulated purchase",
+  "Cadre vivant du Fondateur": "Founder’s Living Frame",
+  "Dos vivant du Fondateur": "Founder’s Living Card Back",
+  "Sachet vivant du Fondateur": "Founder’s Living Pack",
+  "Plaque du Fondateur": "Founder’s Nameplate",
+  "Fond de la Salle des Premiers Gardiens": "Hall of the First Keepers Background",
+  "Vendu une seule fois. Le cadre, le dos de cartes, le sachet de booster et la plaque vivants du Fondateur, son fond de profil, le titre « Fondateur » (badge au classement) et {0} obsidiennes.": "Sold only once. The Founder’s living frame, card back, booster pack skin and nameplate, its profile background, the “Founder” title (Leaderboard badge) and {0} Obsidians.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

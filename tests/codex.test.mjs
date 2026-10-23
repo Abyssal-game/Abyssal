@@ -58,7 +58,7 @@ test('échoppe : fermée hors Mode Créateur, achat simulé ensuite (une seule f
   assert.throws(() => g.shopBuy('fondateur'), /pas encore ouverte/);
   g.s.settings.dev = true; g.s.devCodex = true;
   g.shopBuy('fondateur');
-  assert.ok(g.s.titles.includes('Fondateur') && g.s.backs.includes('dos-fondateur'));
+  assert.ok(g.s.titles.includes('Fondateur') && g.s.backs.includes('dos-vif-fondateur') && g.s.frames.includes('cx-vif-fondateur') && g.s.plates.includes('pl-fondateur') && g.s.fonds.includes('fp-fondateur')); /* v638 */
   assert.throws(() => g.shopBuy('fondateur'), /Déjà/);
   assert.equal(g.obs(), 600);
   g.shopBuy('obs-100'); g.shopBuy('obs-100');
@@ -175,7 +175,7 @@ test('v632 : tapis de jeu et fonds de profil : achat, choix, fiche vue par les a
   const { TAPIS, FONDS, CATALOG } = await import('../js/core/codex.js');
   const { friendCard, cleanCard } = await import('../js/core/friends.js');
   const g = mk(); g.s.obs = 5000; g.s.settings.dev = true; g.s.devCodex = true; /* l'Échoppe n'est ouverte qu'en Mode Créateur */
-  for (const k of [...Object.keys(TAPIS), ...Object.keys(FONDS)]) assert.ok(CATALOG.some((it) => it.id === k), `${k} en vente`);
+  for (const k of [...Object.keys(TAPIS), ...Object.keys(FONDS)].filter((k) => k !== 'fp-fondateur') /* v638 : Pack du Fondateur seulement */) assert.ok(CATALOG.some((it) => it.id === k), `${k} en vente`);
   g.setMat('tp-mammon'); assert.equal(g.s.mat ?? null, null, 'pas de tapis sans l’avoir acheté');
   g.catalogBuy('tp-mammon'); g.setMat('tp-mammon'); assert.equal(g.s.mat, 'tp-mammon');
   g.catalogBuy('fp-trone'); g.setFond('fp-trone'); assert.equal(g.s.fond, 'fp-trone');
@@ -183,4 +183,11 @@ test('v632 : tapis de jeu et fonds de profil : achat, choix, fiche vue par les a
   const card = cleanCard(friendCard(g));
   assert.equal(card.fond, 'fp-trone');
   assert.equal(cleanCard({ ...friendCard(g), fond: '<img onerror=x>' }).fond, null);
+});
+
+test('v638 : les objets du Pack du Fondateur existent et ne sont pas vendus à l’Échoppe', async () => {
+  const fs = await import('node:fs');
+  const fd = SHOP.find((x) => x.id === 'fondateur').give;
+  for (const k of [fd.frame, fd.back, fd.sachet, fd.plate, fd.fond]) assert.ok(!CATALOG.some((it) => it.id === k), `${k} hors de l’Échoppe`);
+  for (const f of [`assets/frames/${fd.frame}-4.webp`, `assets/backs/${fd.back}.webp`, `assets/packs/${fd.sachet}.webp`, `assets/plates/${fd.plate}.webp`, `assets/fonds/${fd.fond}.webp`]) assert.ok(fs.existsSync(new URL(`../${f}`, import.meta.url)), f);
 });

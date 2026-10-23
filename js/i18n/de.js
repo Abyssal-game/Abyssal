@@ -7474,6 +7474,12 @@ export default {
   "Pour celles et ceux qui soutiennent l’{n0} dès le début : des objets introuvables ailleurs, jamais de puissance.": "Für alle, die {n0} von Anfang an unterstützen: Gegenstände, die es nirgendwo sonst gibt, niemals Stärke.",
   "avec son badge au classement": "mit Abzeichen in der Rangliste",
   "Aperçu Créateur : achat simulé": "Ersteller-Vorschau: simulierter Kauf",
+  "Cadre vivant du Fondateur": "Lebender Rahmen des Gründers",
+  "Dos vivant du Fondateur": "Lebende Kartenrückseite des Gründers",
+  "Sachet vivant du Fondateur": "Lebendes Booster-Päckchen des Gründers",
+  "Plaque du Fondateur": "Namensschild des Gründers",
+  "Fond de la Salle des Premiers Gardiens": "Hintergrund: Halle der Ersten Hüter",
+  "Vendu une seule fois. Le cadre, le dos de cartes, le sachet de booster et la plaque vivants du Fondateur, son fond de profil, le titre « Fondateur » (badge au classement) et {0} obsidiennes.": "Nur einmal erhältlich. Lebender Rahmen, Kartenrückseite, Booster-Päckchen und Namensschild des Gründers, sein Profilhintergrund, der Titel „Gründer“ (Abzeichen in der Rangliste) und {0} Obsidiane.",
 };
 
 export const names = {
