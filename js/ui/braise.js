@@ -7,8 +7,8 @@ import { icon } from './icons.js';
 import { esc, fmt, toast, openSheet } from './dom.js';
 import { t, tw } from '../i18n.js';
 
-/* icône provisoire (torche allumée) en attendant l'image peinte de la Braise de vie */
-export const BRAISE_IC = '<img class="br-ic" alt="" src="assets/icons/torch-on.webp">';
+/* v671 : image peinte de la Braise de vie (Gemini, source store/icons/braise-source.jpg) */
+export const BRAISE_IC = '<img class="br-ic" alt="" src="assets/icons/braise.webp">';
 
 const nextFree = (b) => (b.free < BRAISE.max ? 'Une Braise de vie t’est offerte chaque jour.' : '');
 
