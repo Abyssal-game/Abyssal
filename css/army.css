@@ -4390,7 +4390,7 @@ html.fx-light .cr-show-pair::after, .rm .cr-show-pair::after { animation: none; 
   background: radial-gradient(ellipse 62% 90% at 50% 0, rgba(5, 5, 7, .95) 35%, rgba(5, 5, 7, .55) 65%, transparent 100%); }
 /* v489 : sachets à marges transparentes : le reflet ne déborde plus de la forme du sachet (rectangle grisé autour) */
 .pack-standard .pk-foil { -webkit-mask: url(../assets/packs/standard3.webp) center / 100% 100% no-repeat; mask: url(../assets/packs/standard3.webp) center / 100% 100% no-repeat; }
-.pack-event .pk-foil { -webkit-mask: url(../assets/packs/event3.webp) center / 100% 100% no-repeat; mask: url(../assets/packs/event3.webp) center / 100% 100% no-repeat; }
+.pack-event .pk-foil { -webkit-mask: url(../assets/packs/event4.webp) center / 100% 100% no-repeat; mask: url(../assets/packs/event4.webp) center / 100% 100% no-repeat; }
 .pack-abysse .pk-foil { -webkit-mask: url(../assets/packs/abysse2.webp) center / 100% 100% no-repeat; mask: url(../assets/packs/abysse2.webp) center / 100% 100% no-repeat; }
 
 /* v492 : salles 5 à 8 des trois jeux (règle de la salle) et hauts faits */
@@ -6281,3 +6281,6 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 .product-info .row:has(> [data-act="odds"]) + p.small.muted { text-align: center; }
 /* v655 : Épreuves, plus que deux tuiles (Saison, Comment ça marche) */
 .dc-links.ep-links2 { grid-template-columns: repeat(2, 1fr); }
+/* v656 : sachet des Alliances refait en grand (event4) : plaque mesurée à 69,4-81,5 % */
+.pack-event:not(.pack-skin) .pk-label { top: 70%; bottom: 19%; left: 17%; right: 17%; gap: 1.4cqw; }
+.pack-event:not(.pack-skin) .pk-name { font-size: 5.8cqw; }
