@@ -6276,3 +6276,6 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 .tp-row > .tp-c, .tp-row > .tp-new { flex: 0 1 calc(50% - 4px); min-width: 140px; max-width: 220px; }
 /* v653 : plus de halo lumineux qui tourne sur les cadres de profil (posé en v584) ; les portraits des réactions gardent le leur */
 .pf:not([class*="pf-cx-"])::after { content: none; animation: none; }
+/* v654 : boutique, bouton « Probabilités » centré sous le bouton d'achat (tous les boosters) */
+.product-info .row:has(> [data-act="odds"]) { justify-content: center; }
+.product-info .row:has(> [data-act="odds"]) + p.small.muted { text-align: center; }
