@@ -8578,4 +8578,7 @@ export const names = {
   "La liste n’est pas encore ouverte sur le serveur : colle <b>supabase/16-en-ligne.sql</b> dans Supabase.": "La lista non è ancora aperta sul server: incolla <b>supabase/16-en-ligne.sql</b> in Supabase.",
   "Liste indisponible pour l’instant. Réessaie dans un moment.": "Lista non disponibile al momento. Riprova tra poco.",
   "Aucun compte connecté pour l’instant.": "Nessun account connesso al momento.",
+  "Chargement des pseudos…": "Caricamento dei nomi…",
+  "La liste n’est pas encore ouverte sur le serveur : colle <b>supabase/16-en-ligne.sql</b> dans Supabase → SQL Editor → New query → Run.": "L’elenco non è ancora aperto sul server: incolla <b>supabase/16-en-ligne.sql</b> in Supabase → SQL Editor → New query → Run.",
+  "Le serveur ne reconnaît pas ce compte comme « Le Gardien ».": "Il server non riconosce questo account come «Le Gardien».",
 };

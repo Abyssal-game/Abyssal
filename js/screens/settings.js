@@ -126,7 +126,7 @@ export default function settings(app, root) {
         ${liveOn() ? `<p class="small muted set-live">${liveLine()}</p><p class="small muted set-live-why" translate="no">${liveWhy()}</p><button class="btn ghost small" data-act="livecheck">${icon('eye')} Chercher une mise à jour</button>` : ''}
         <a class="btn ghost small" href="confidentialite.html" target="_blank" rel="noopener">${icon('book')} Politique de confidentialité</a>
       </section>
-      ${isGardien() ? `<button class="online-pill gardien" data-act="online" aria-live="polite"><img class="on-ic" alt="" src="assets/icons/online.webp"><span class="on-dot"></span><span class="on-t">Connexion…</span><span class="on-see">Voir</span></button>` : ''}`;
+      ${isGardien() ? `<button class="online-pill gardien" data-act="online" aria-live="polite"><img class="on-ic" alt="" src="assets/icons/online.webp"><span class="on-dot"></span><span class="on-t">Connexion…</span><span class="on-see">Voir</span></button><div class="on-inline"><p class="small muted center">Chargement des pseudos…</p></div>` : ''}`;
   }
   function paintPill(p = presence) {
     const pill = root.querySelector('.online-pill'); if (!pill) return;
@@ -139,7 +139,7 @@ export default function settings(app, root) {
     const load = async () => {
       let rows;
       try { rows = await onlineList(); } catch (e) {
-        if (!sh.closed) sh.setContent(`<h2>Joueurs en ligne</h2><p class="small muted">${/404|PGRST202|function/i.test(String(e?.message || e)) ? 'La liste n’est pas encore ouverte sur le serveur : colle <b>supabase/16-en-ligne.sql</b> dans Supabase.' : 'Liste indisponible pour l’instant. Réessaie dans un moment.'}</p>`);
+        if (!sh.closed) sh.setContent(`<h2>Joueurs en ligne</h2><p class="small muted">${onErr(e)}</p>`);
         return;
       }
       if (sh.closed) return;
@@ -154,6 +154,15 @@ export default function settings(app, root) {
     };
     load();
   }
+  /* v657 : les pseudos des joueurs connectés s'affichent directement sous la pastille (avant : seulement dans la fenêtre « Voir ») */
+  const onErr = (e) => /404|PGRST202|function|schema cache/i.test(String(e?.message || e) + ' ' + (e?.status || '')) ? 'La liste n’est pas encore ouverte sur le serveur : colle <b>supabase/16-en-ligne.sql</b> dans Supabase → SQL Editor → New query → Run.' : /créateur|gardien|42501|P0001/i.test(String(e?.message || e)) ? 'Le serveur ne reconnaît pas ce compte comme « Le Gardien ».' : 'Liste indisponible pour l’instant. Réessaie dans un moment.';
+  async function paintInline() {
+    const box = root.querySelector('.on-inline'); if (!box) return;
+    let rows;
+    try { rows = await onlineList(); } catch (e) { if (box.isConnected) box.innerHTML = `<p class="small muted center">${onErr(e)}</p>`; return; }
+    if (!box.isConnected) return;
+    box.innerHTML = rows.length ? `<p class="small muted">Comptes connectés : <b>${fmt(rows.length)}</b></p>` + rows.map((r) => `<div class="on-name"${profileAttrs(r.id)}><b translate="no">${esc(r.pseudo || '?')}</b><span class="small muted"> · Niv. ${fmt(r.level || 1)}</span></div>`).join('') : '<p class="small muted center">Aucun compte connecté pour l’instant.</p>';
+  }
   function render() {
     const s = g.s.settings;
     const body = { jeu: (x) => tabJeu(x) + tabSave(), tutos: tabTutos, about: tabAbout }[ui.tab] || ((x) => tabJeu(x) + tabSave());
@@ -161,7 +170,7 @@ export default function settings(app, root) {
       <header class="screen-head ui-hero bn-settings"><h1>Réglages</h1><p class="muted">Langue, son, combat, tutoriels.</p></header>
       <nav class="set-tabs" role="tablist">${TABS.map(([k, l, ic, fb]) => `<button class="set-tab" role="tab" aria-selected="${ui.tab === k}" data-act="tab" data-k="${k}">${tabIcon(ic, fb)}<span>${l}</span></button>`).join('')}</nav>
       <div class="set-body">${body(s)}</div>`;
-    paintPill();
+    paintPill(); if (isGardien() && ui.tab === 'about') paintInline();
     root.querySelectorAll('[data-mus]').forEach((b) => b.addEventListener('click', () => { musicPreview(MUSIC_DEMO[+b.dataset.mus][1]); root.querySelectorAll('[data-mus]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); }));
     root.querySelector('#mvol')?.addEventListener('input', (e) => { g.s.settings.musicVol = Number(e.target.value); app.applySettings(); });
     root.querySelector('#mvol')?.addEventListener('change', (e) => g.setSetting('musicVol', Number(e.target.value)));
@@ -209,11 +218,13 @@ export default function settings(app, root) {
   render();
   // le badge peut arriver du serveur après l'affichage
   const before = sync.profile?.badge;
-  const off = onSync(() => { if (sync.profile?.badge !== before) render(); });
+  let wasG = isGardien();
+  const off = onSync(() => { if (sync.profile?.badge !== before || isGardien() !== wasG) { wasG = isGardien(); render(); } });
+  const onTick = setInterval(() => { if (!document.hidden && isGardien() && ui.tab === 'about') paintInline(); }, 30000);
   refreshProfile(false);
   // v413 : joueurs en ligne, seulement ici (en bas de À propos), mis à jour en direct
   const offP = onPresence(paintPill);
   const offL = onLiveStatus((st) => { const el = root.querySelector('.set-live'); if (el) el.textContent = liveLine(st); const w = root.querySelector('.set-live-why'); if (w) w.innerHTML = liveWhy(st); });
-  return () => { off(); offP(); offL(); };
+  return () => { off(); offP(); offL(); clearInterval(onTick); };
 }
 

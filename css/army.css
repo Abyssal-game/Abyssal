@@ -6284,3 +6284,8 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 /* v656 : sachet des Alliances refait en grand (event4) : plaque mesurée à 69,4-81,5 % */
 .pack-event:not(.pack-skin) .pk-label { top: 70%; bottom: 19%; left: 17%; right: 17%; gap: 1.4cqw; }
 .pack-event:not(.pack-skin) .pk-name { font-size: 5.8cqw; }
+
+/* v657 : pseudos des joueurs connectés affichés directement sous la pastille (compte « Le Gardien ») */
+.on-inline { margin: 8px auto 0; max-width: 420px; padding: 10px 14px; border-radius: 14px; background: rgba(0,0,0,.28); border: 1px solid rgba(214,178,94,.22); display: flex; flex-direction: column; gap: 6px; }
+.on-inline .on-name { padding: 6px 4px; border-bottom: 1px solid rgba(255,255,255,.06); cursor: pointer; min-height: 32px; display: flex; align-items: center; gap: 2px; }
+.on-inline .on-name:last-child { border-bottom: 0; }
