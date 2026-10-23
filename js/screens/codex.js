@@ -1,10 +1,12 @@
 // v470 : ÉBAUCHE du pass de saison (« Le Codex de l'Abîme ») et de la boutique en argent réel (« L'Échoppe »).
-// Visible seulement en Mode Créateur (option « Codex et Échoppe ») ; les achats sont simulés (aucun paiement).
+// v680 : ouverts à tous le premier jour de la Saison I (1er décembre 2026) ; les achats en euros passent par l'App Store
+// (js/iap.js, RevenueCat) et sont vérifiés par le serveur. Avant l'ouverture : aperçu Créateur, achats simulés.
+import { iapStatus, IAP_WHY, iapBuy, iapRestore, priceOf } from '../iap.js'; /* v680 */
 import { CODEX, CODEX_XP, CODEX_XP_LABEL, tiersOf, seasonByKey, CODEX_FRAMES, CODEX_BACKS, FINISHES, PLATES, EMOTES, SACHETS, TAPIS, FONDS, SHOP, CATALOG, OBS, codexTier, tierProgress, claimable, freshCodex } from '../core/codex.js';
 import { FRAMES } from '../config.js';
 import { CHESTS } from '../core/descent.js';
 import { icon, picon } from '../ui/icons.js';
-import { esc, fmt, toast, confirmBox, openSheet } from '../ui/dom.js';
+import { esc, fmt, toast, confirmBox, openSheet, withPending } from '../ui/dom.js';
 import { cardHTML, enableTilt } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
 import { EMBLEM } from '../ui/icons.js';
@@ -74,6 +76,17 @@ export default function codexScreen(app, root) {
   /* v636 : une récompense cosmétique du Codex, vue comme un objet (aperçu) */
   /* v640 : toutes les récompenses d'un palier (le palier 30 donne une couronne, un dos et un titre), titre compris si demandé */
   const seasonItems = (r, tier, titles = false) => ['frame', 'back', 'sachet', 'plate', 'emote', 'mat', 'fond', ...(titles ? ['title'] : [])].filter((x) => r?.[x]).map((k) => ({ id: r[k], kind: k, season: true, tier }));
+  /* v680 : défis de la semaine (trois, les mêmes pour tous) et achat d'un palier en obsidiennes */
+  function questsHTML(max) {
+    if (!g.codexLive()) return '';
+    const q = g.quests(), d = q.ends.split('-').reverse().slice(0, 2).join('/');
+    return `<section class="cx-quests"><h3 class="cxs-sh">${icon('star')}Défis de la semaine <small>semaine ${q.week} · jusqu’au ${d}</small></h3>
+      <ul>${q.list.map((x) => `<li class="cx-q ${x.done ? 'done' : ''}"><span class="cx-q-t">${esc(x.label.replace('{n}', x.n))}</span>
+        <span class="cx-q-n">${x.done ? `${icon('check')}+${CODEX.questXp}` : `${x.have} / ${x.n}`}</span>
+        <span class="cx-q-bar"><i style="width:${Math.round((x.have / x.n) * 100)}%"></i></span></li>`).join('')}</ul>
+      <p class="small muted">Chaque défi rempli donne ${CODEX.questXp} points (un palier). Trois nouveaux défis chaque semaine.</p>
+      ${max ? '' : `<button class="btn ghost block cx-tierbuy" data-cx="tier">${icon('plus')}Acheter un palier · ${obsTxt(CODEX.tierObs)}</button>`}</section>`;
+  }
   function codexTab() {
     const c = g.codex(), t = codexTier(c), n = claimable(c), max = t >= CODEX.tiers;
     const cell = (tier, tr, r) => {
@@ -95,7 +108,7 @@ export default function codexScreen(app, root) {
         <div class="cx-pitch-in"><small class="cx-kick">Voie enluminée</small><h2>${esc(CODEX.premiumName)}</h2>
           <p>${esc(se.pitch)}</p>
           <div class="cx-pitch-show">${best.map((k) => k.startsWith('dos') ? `<img class="cxr-back" alt="" src="assets/backs/${k}.webp" onerror="this.remove()">` : `<span class="avatar-mini pf pf-${k}">${myAv()}</span>`).join('')}</div>
-          <button class="btn dc-plq dc-plq-red cx-unlock2" data-cx="unlock">${icon('star')}<span>Débloquer</span><b class="cx-eur">${esc(CODEX.price)}</b></button></div></section>`;
+          <button class="btn dc-plq dc-plq-red cx-unlock2" data-cx="unlock">${icon('star')}<span>Débloquer</span><b class="cx-eur">${esc(priceOf(SHOP.find((x) => x.id === 'codex')))}</b></button>${payNote()}</div></section>`;
     return `<section class="cx-season">
         ${opt(se.art, 'cx-season-art')}
         <div class="cx-season-in"><small class="cx-kick">Du ${esc(se.starts.split('-').reverse().join('/'))} au ${esc(se.ends.split('-').reverse().join('/'))}${g.codexLive() ? '' : ' · bientôt'}</small>
@@ -105,12 +118,13 @@ export default function codexScreen(app, root) {
             <span class="cx-season-p"><span>${max ? 'Codex terminé pour cette saison !' : `Palier ${t + 1} · ${c.xp % CODEX.xpPerTier} / ${CODEX.xpPerTier} points`}</span><span class="cx-bar2"><i style="width:${Math.round(tierProgress(c) * 100)}%"></i></span></span></div>
           ${c.premium ? `<span class="cx-badge on">${icon('star')}${esc(CODEX.premiumName)} acquis</span>` : ''}</div></section>
       ${n ? `<button class="btn primary block dc-plq dc-plq-red cx-all" data-cx="all">${icon('chest')}Tout récupérer (${n})</button>` : ''}
+      ${questsHTML(max)}
       ${pitch}
       ${lootHTML}
       <div class="cxk-head"><span>Voie de l’Abîme<small>gratuite</small></span><span></span><span class="prem">Voie enluminée<small>${c.premium ? 'à toi' : 'à débloquer'}</small></span></div>
       <ol class="cxk">${tiersOf(c.season).map((x) => `<li class="cxk-r ${x.tier <= t ? 'reached' : ''} ${x.tier === t + 1 ? 'next' : ''} ${x.tier === CODEX.tiers ? 'ult' : ''}" ${x.tier === Math.min(CODEX.tiers, t + 1) ? 'id="cx-now"' : ''}>${cell(x.tier, 'free', x.free)}<span class="cxk-n">${x.tier}</span>${cell(x.tier, 'prem', x.prem)}</li>`).join('')}</ol>
       <details class="panel dc-fold"><summary>${picon('help')}<span class="dc-sum-t">Gagner des points de Codex</span></summary>
-        <ul class="cx-xp">${Object.entries(CODEX_XP).map(([k, v]) => `<li><span>${esc(CODEX_XP_LABEL[k])}</span><b>+${v}</b><small class="muted">${fmt(c.log[k] || 0)} gagnés</small></li>`).join('')}</ul>
+        <ul class="cx-xp">${[...Object.entries(CODEX_XP), ['quest', CODEX.questXp]].map(([k, v]) => `<li><span>${esc(CODEX_XP_LABEL[k])}</span><b>+${v}</b><small class="muted">${fmt(c.log[k] || 0)} gagnés</small></li>`).join('')}</ul>
         <p class="small muted">La voie de gauche se gagne en jouant. La voie enluminée s’achète une fois par saison : une récompense à chaque palier, sur le thème de la saison, jamais en vente à l’Échoppe et jamais de puissance.</p></details>`;
   }
 
@@ -179,13 +193,14 @@ export default function codexScreen(app, root) {
         return `<article class="cxs-e ${it.kind === 'obs' ? 'obs' : 'founder'} ${own ? 'own' : ''}">${opt(art, 'cxs-e-art')}
           <div class="cxs-e-in"><b>${it.kind === 'obs' ? obsTxt(it.give.obs) : esc(it.name)}</b>${it.bonus ? `<span class="cx-bonus">+${it.bonus} offertes</span>` : ''}
           ${it.desc ? `<small>${esc(it.desc)}</small>` : ''}</div>
-          ${own ? `<span class="cxs-own">${icon('check')}Possédé</span>` : `<button class="btn primary small" data-cx="buy" data-id="${it.id}">${esc(it.price)}</button>`}</article>`; };
+          ${own ? `<span class="cxs-own">${icon('check')}Possédé</span>` : `<button class="btn primary small" data-cx="buy" data-id="${it.id}">${esc(priceOf(it))}</button>`}</article>`; };
       let obsI = 0;
       return `${wallet}<nav class="cxs-nav"><button class="cxs-home" data-cx="cat" data-v="">${icon('prev')}Accueil</button></nav>
         <section class="cxs-aisle"><h2>${esc(OBS.name)}</h2><p class="small muted">Elles ne servent qu’aux cosmétiques : rien ici ne rend tes créatures plus fortes.</p></section>
         <div class="cxs-euro" id="cx-euro">${SHOP.filter((it) => it.kind === 'obs').map((it) => euro(it, it.kind === 'obs' ? obsI++ : 0)).join('')}</div>
+        ${payNote()}
         <button class="btn ghost block" data-cx="restore">Restaurer mes achats</button>
-        <p class="small muted center">Pendant l’aperçu, tout achat en euros est simulé : aucun paiement.</p>`;
+        <p class="small muted center">Le paiement passe par ton compte de l’App Store. Les obsidiennes ne servent qu’aux cosmétiques.</p>`;
     }
     /* — l'accueil (v637 : sans vitrine ni nouveautés ; obsidiennes et Pack du Fondateur en tête, bien visibles) — */
     const aisles = Object.keys(KINDS).filter((k) => inKind(k).length).map((k) => { const l = inKind(k), own = l.filter((x) => g.catalogOwned(x.id)).length;
@@ -196,7 +211,7 @@ export default function codexScreen(app, root) {
         <button class="cxs-big k-obs" data-cx="cat" data-v="obs"><span class="cxs-big-pic">${[1, 2, 3, 4].map((n) => opt(`assets/ui/obs-${n}.webp`)).join('')}</span>
           <span class="cxs-big-t"><b>${esc(OBS.name)}</b><small>De 100 à 2 800 · bonus offert sur les gros paquets</small></span><span class="cxs-big-go">${icon('next')}</span></button>
         ${fd ? `<button class="cxs-big k-founder ${fdOwn ? 'own' : ''}" data-cx="founder">${opt('assets/ui/ech-fondateur2.webp', 'cxs-big-bg')}
-          <span class="cxs-big-t"><small class="cx-kick">Une seule fois</small><b>${esc(fd.name)}</b><small>${fdOwn ? `${icon('check')}Déjà à toi` : `Voir ce qu’il contient · ${esc(fd.price)}`}</small></span><span class="cxs-big-go">${icon('next')}</span></button>` : ''}</div>`;
+          <span class="cxs-big-t"><small class="cx-kick">Une seule fois</small><b>${esc(fd.name)}</b><small>${fdOwn ? `${icon('check')}Déjà à toi` : `Voir ce qu’il contient · ${esc(priceOf(fd))}`}</small></span><span class="cxs-big-go">${icon('next')}</span></button>` : ''}</div>`;
     return `${wallet}${big}
       <h3 class="cxs-sh">${icon('chest')}Les rayons</h3><div class="cxs-aisles">${aisles}</div>`;
   }
@@ -217,10 +232,30 @@ export default function codexScreen(app, root) {
     sh.setContent(`<img class="cx-fd-hero" alt="" src="assets/ui/ech-fondateur2-large.webp" onerror="this.remove()"><header class="cx-pv-head r-myth"><small class="cx-kick">Vendu une seule fois</small><h2 class="cx-pv-title">${esc(it.name)}</h2><small class="cx-pv-pos">${rows.length} récompenses</small></header>
       <p class="small muted center">Pour celles et ceux qui soutiennent l’Abysse dès le début : des objets introuvables ailleurs, jamais de puissance.</p>
       ${rows.map(([k, n, v]) => `<section class="cx-fd-row"><p class="cx-pv-cap">${k}</p><div class="cx-fd-v">${v}</div><b class="cx-fd-n">${esc(n || '')}</b></section>`).join('')}
-      <div class="cx-pv-foot">${own ? `<span class="cx-badge on">${icon('check')}Déjà à toi</span>` : `<button class="btn primary cx-pv-buy" data-fd="buy">Acheter · ${esc(it.price)}</button><small class="muted">Aperçu Créateur : achat simulé</small>`}</div>`);
+      <div class="cx-pv-foot">${own ? `<span class="cx-badge on">${icon('check')}Déjà à toi</span>` : `<button class="btn primary cx-pv-buy" data-fd="buy">Acheter · ${esc(priceOf(it))}</button>${payNote()}`}</div>`);
     sh.body.addEventListener('click', async (e) => { if (!e.target.closest('[data-fd="buy"]')) return;
-      if (!(await confirmBox(`<b>Achat simulé</b> : ${esc(it.name)} (${esc(it.price)}).<br>Aperçu Créateur : aucun paiement, l’achat est simplement ajouté à ton profil.`, { ok: 'Simuler l’achat' }))) return;
-      try { g.shopBuy(it.id); app.sfx.levelup?.(); toast(`${esc(it.name)} : acquis (achat simulé).`, { kind: 'success', icon: 'star' }); sh.close?.(); app.chrome?.(); draw(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } });
+      try { if (await pay(it.id)) { sh.close?.(); app.chrome?.(); draw(); } } catch (err) { toast(esc(err.message), { kind: 'error' }); } });
+  }
+
+  /* v680 : aperçu Créateur avant l'ouverture (achats simulés) */
+  const preview0 = () => !!(g.s.settings?.dev && g.s.devCodex) && !g.codexLive() && iapStatus() !== 'ok';
+  const payNote = () => { const st = iapStatus(); return st === 'ok' ? '' : `<small class="muted cx-paynote">${preview0() ? 'Aperçu Créateur : achat simulé' : esc(IAP_WHY[st])}</small>`; };
+  /* un achat en euros : App Store (vérifié par le serveur), ou achat simulé en aperçu Créateur ; vrai si fait */
+  async function pay(id) {
+    const it = SHOP.find((x) => x.id === id); if (!it) return false;
+    if (iapStatus() === 'ok') {
+      const got = await withPending(iapBuy(app, id), t('Paiement…'));
+      if (!got) return false; /* annulé */
+      app.sfx.levelup?.();
+      toast(got.length ? t('{name} : acquis. Merci pour ton soutien !', { name: esc(tx(it.name)) }) : t('Paiement reçu : vérification en cours.'), { kind: 'success', icon: 'star' });
+      return true;
+    }
+    if (preview0() || (g.s.settings?.dev && g.s.devCodex)) {
+      if (!(await confirmBox(`<b>Achat simulé</b> : ${esc(it.name)} (${esc(priceOf(it))}).<br>Aperçu Créateur : aucun paiement, l’achat est simplement ajouté à ton profil.`, { ok: 'Simuler l’achat' }))) return false;
+      g.shopBuy(it.id); app.sfx.levelup?.(); toast(`${esc(it.name)} : acquis (achat simulé).`, { kind: 'success', icon: 'star' });
+      return true;
+    }
+    toast(esc(t(IAP_WHY[iapStatus()])), { icon: 'info' }); return false;
   }
 
   function devTab() {
@@ -233,10 +268,10 @@ export default function codexScreen(app, root) {
 
   function draw() {
     if (!g.codexOn()) { location.replace('#/boutique'); return; } /* caché : rien ne doit trahir le pass hors Mode Créateur */
-    root.innerHTML = `<header class="screen-head ui-hero ${ui.tab === 'shop' ? 'bn-echoppe' : 'bn-codex'} cx-top"><h1>${ui.tab === 'shop' ? 'L’Échoppe' : esc(CODEX.name)}</h1><span class="sc-rec">Aperçu Créateur · invisible pour les joueurs</span></header>
+    root.innerHTML = `<header class="screen-head ui-hero ${ui.tab === 'shop' ? 'bn-echoppe' : 'bn-codex'} cx-top"><h1>${ui.tab === 'shop' ? 'L’Échoppe' : esc(CODEX.name)}</h1>${preview0() ? '<span class="sc-rec">Aperçu Créateur · invisible pour les joueurs</span>' : ''}</header>
       <nav class="cx-tabs2" aria-label="Codex et Échoppe">${[['codex', 'Le Codex', 'Paliers de la saison', 'book'], ['shop', 'L’Échoppe', 'Cosmétiques', 'obsidienne']].map(([k, l, sub, ic]) => `<button class="cx-tab2 t-${k}" data-cx="tab" data-v="${k}" aria-pressed="${ui.tab === k}"><img alt="" src="assets/icons/${ic}.webp"><span><b>${l}</b><small>${sub}</small></span></button>`).join('')}</nav>
       ${ui.tab === 'shop' ? shopTab() : codexTab()}
-      ${devTab()}`;
+      ${g.s.settings?.dev ? devTab() : ''}`;
     if (ui.tab !== 'shop' && !ui.scrolled) { ui.scrolled = true; requestAnimationFrame(() => document.getElementById('cx-now')?.scrollIntoView({ block: 'center' })); }
   }
 
@@ -361,11 +396,7 @@ export default function codexScreen(app, root) {
       if (k === 'tab') { ui.tab = b.dataset.v; app.sfx.tap?.(); return draw(); }
       if (k === 'claim') { g.codexClaim(b.dataset.tr, +b.dataset.t); app.sfx.chest?.(); toast('Récompense du Codex récupérée.', { kind: 'success', icon: 'star' }); }
       if (k === 'all') { const got = g.codexClaimAll(); app.sfx.chest?.(); toast(`${got.length} récompense${got.length > 1 ? 's' : ''} du Codex récupérée${got.length > 1 ? 's' : ''}.`, { kind: 'success', icon: 'star' }); }
-      if (k === 'buy') {
-        const it = SHOP.find((x) => x.id === b.dataset.id);
-        if (!(await confirmBox(`<b>Achat simulé</b> : ${esc(it.name)} (${esc(it.price)}).<br>Aperçu Créateur : aucun paiement, l’achat est simplement ajouté à ton profil.`, { ok: 'Simuler l’achat' }))) return;
-        g.shopBuy(it.id); app.sfx.levelup?.(); toast(`${esc(it.name)} : acquis (achat simulé).`, { kind: 'success', icon: 'star' });
-      }
+      if (k === 'buy') { if (!(await pay(b.dataset.id))) return; }
       if (k === 'jump') { ui.cat = 'obs'; draw(); return; }
       if (k === 'founder') { app.sfx.tap?.(); founder(); return; } /* v637 */
       if (k === 'cat') { ui.cat = b.dataset.v || null; ui.rar = null; app.sfx.tap?.(); draw(); root.querySelector('.cxs-wallet')?.scrollIntoView({ block: 'start' }); return; }
@@ -376,15 +407,21 @@ export default function codexScreen(app, root) {
         preview(it || b.dataset.id, ids); return; }
       if (k === 'seez') { const tr = tiersOf(g.codex().season)[+b.dataset.t - 1]; const l = seasonItems(tr?.prem, +b.dataset.t, true); if (l.length) preview(l[0], l); return; } /* v640 : toutes les récompenses du palier */
       if (k === 'seel') { const l = ui.loot || []; if (l[+b.dataset.i]) preview(l[+b.dataset.i], l); return; } /* v640 : vitrine de la saison */
-      if (k === 'unlock') { /* v548 : 4,99 € (achat simulé tant que l'App Store n'est pas branché) */
-        if (!(await confirmBox(`<b>Achat simulé</b> : ${esc(CODEX.premiumName)} (${esc(CODEX.price)}).<br>Aperçu Créateur : aucun paiement, la voie enluminée est simplement débloquée.`, { ok: 'Simuler l’achat' }))) return;
-        g.shopBuy('codex'); app.sfx.levelup?.(); toast(`${esc(CODEX.premiumName)} : débloqué (achat simulé).`, { kind: 'success', icon: 'star' });
+      if (k === 'unlock') { if (!(await pay('codex'))) return; } /* v680 : App Store (RevenueCat), vérifié par le serveur */
+      if (k === 'tier') { /* v680 : acheter un palier en obsidiennes */
+        if (g.obs() < CODEX.tierObs) { if (await confirmBox(t('Il te manque <b>{n} obsidiennes</b> pour {name}.', { n: fmt(CODEX.tierObs - g.obs()), name: esc(t('un palier du Codex')) }), { ok: 'Obtenir des obsidiennes' })) { ui.tab = 'shop'; ui.cat = 'obs'; draw(); } return; }
+        if (!(await confirmBox(t('Échanger <b>{n} obsidiennes</b> contre {name} ?', { n: fmt(CODEX.tierObs), name: esc(t('un palier du Codex')) }), { ok: 'Confirmer' }))) return;
+        const n = g.codexBuyTier(); app.sfx.levelup?.(); toast(t('Palier {n} atteint.', { n }), { kind: 'success', icon: 'star' });
       }
       if (k === 'get') { if (!(await buy(b.dataset.id))) return; }
       /* v539 : outils d'essai passés par le serveur de partie (refusés sans le badge Créateur) */
       if (k === 'obs') await app.partie.first('devObs', 1000);
       if (k === 'obs0') await app.partie.first('devObs', null);
-      if (k === 'restore') toast('« Restaurer mes achats » marchera avec l’App Store, quand les achats seront ouverts.', { icon: 'info' });
+      if (k === 'restore') { /* v680 */
+        const st = iapStatus(); if (st !== 'ok') { toast(esc(t(IAP_WHY[st])), { icon: 'info' }); return; }
+        const got = await withPending(iapRestore(app), t('Vérification de tes achats…'));
+        toast(got.length ? t('{n} achat(s) ajouté(s).', { n: got.length }) : t('Tout est déjà à toi : rien à restaurer.'), { kind: got.length ? 'success' : 'info', icon: got.length ? 'star' : 'check' });
+      }
       if (k === 'xp') await app.partie.first('devCodexXp', +b.dataset.v);
       if (k === 'prem') await app.partie.first('devCodexPrem');
       if (k === 'reset') { if (!(await confirmBox('Remettre le Codex à zéro (points, récompenses récupérées, voie enluminée) ? Les objets déjà gagnés restent.', { ok: 'Remettre à zéro' }))) return; await app.partie.first('devCodexReset'); }

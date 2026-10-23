@@ -60,6 +60,11 @@ const NET = {
     if (!(await c.db.shadowDrew(c.uid, day))) throw new Error('Aucun tirage ce jour-là.');
     return g.shadowPay(day);
   },
+  /* v680 : achats payés : la liste vient de RevenueCat (jamais du téléphone) ; chaque achat n'est donné qu'une fois */
+  async iapSync(c, g) {
+    if (!c.iap) throw new Error('Les achats ne sont pas encore ouverts sur le serveur.');
+    return g.iapApply(await c.iap(c.uid));
+  },
   async shadowClaim(c, g, week) {
     const rank = await c.db.rpc('shadow_claim', { p_week: week }, c.token);
     const sh = g.shadowState(); sh.asked = week;
@@ -78,7 +83,7 @@ const DEV = {
 };
 
 // Une requête : { ops: [{ q, m, a, s }], dev, free, tz, digest, want }
-export async function handle({ uid, token, body }, { db, now = () => Date.now(), rng = cryptoRng }) {
+export async function handle({ uid, token, body }, { db, now = () => Date.now(), rng = cryptoRng, iap = null }) {
   if (!uid) return { status: 401, body: { error: 'Connecte-toi d’abord.' } };
   const b = body && typeof body === 'object' ? body : {};
   const ops = Array.isArray(b.ops) ? b.ops.slice(0, MAX_OPS) : [];
@@ -100,7 +105,7 @@ export async function handle({ uid, token, body }, { db, now = () => Date.now(),
     const rets = {}, errs = {}, prog = {};
     let curQ = 0;
     g.on('progress', (ev) => { if (curQ) (prog[curQ] ||= []).push(...ev); }); // annonces (succès, niveaux…) rendues au téléphone
-    const c = { uid, token, db, g };
+    const c = { uid, token, db, g, iap };
     // réglages et marques de l'interface (libres), outils du Mode Créateur (créateur seulement)
     // v574 : appliqués AVANT de rejouer les actions (un achat à l'Échoppe juste après l'ouverture de l'aperçu était refusé)
     if (b.free && typeof b.free === 'object') {

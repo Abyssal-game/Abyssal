@@ -1,5 +1,5 @@
 // Point d'entrée : chargement des données, état du joueur, navigation.
-import { startTranslator } from './i18n.js'; /* v506 : langues (en premier : le dictionnaire est chargé avant le reste) */
+import { startTranslator, t } from './i18n.js'; /* v506 : langues (en premier : le dictionnaire est chargé avant le reste) */
 import { loadCatalogData, createCatalog } from './core/catalog.js';
 import { Game } from './core/game.js';
 import { loadArtManifest, artUrl, hasRealArt, setCardBack } from './art/assets.js';
@@ -41,7 +41,8 @@ import shadowScreen, { claimShadowPrize } from './screens/shadow.js';
 import { forgeScreen, furnaceScreen } from './screens/forge.js';
 import { teamScreen, chestsScreen } from './screens/army.js';
 import { startSync, sync, onSync } from './cloud/sync.js';
-import { startPartie, first, firstMany, flush as flushPartie } from './cloud/partie.js';
+import { startPartie, first, firstMany, flush as flushPartie, onPartie } from './cloud/partie.js';
+import { iapResume, loadPrices } from './iap.js'; /* v680 : paiements dans l'app */
 import { consumeAuthHash, isLoggedIn } from './cloud/cloud.js';
 import { startPresence } from './cloud/presence.js';
 import { showWelcome } from './screens/welcome.js';
@@ -340,10 +341,10 @@ function rewardText(r = {}) {
 app.rewardText = rewardText;
 /* v557 (demande du propriétaire : les succès et niveaux couvraient l'écran) : une petite pastille en haut de l'écran
    (« Succès · nom », « Niveau 12 », « 3 récompenses ») ; un toucher ouvre le détail. Les annonces suivantes s'y ajoutent. */
-const KIND_LABEL = { achievement: 'Succès', set: 'Ensemble complété', faction: 'Faction complétée', fame: 'Renommée', season: 'Saison', level: 'Niveau' };
-const KIND_ICON = { achievement: 'trophy', set: 'star', faction: 'shield', fame: 'star', season: 'trophy', level: 'up' };
+const KIND_LABEL = { codex: 'Codex de l’Abîme', quest: 'Défi du Codex rempli', achievement: 'Succès', set: 'Ensemble complété', faction: 'Faction complétée', fame: 'Renommée', season: 'Saison', level: 'Niveau' };
+const KIND_ICON = { codex: 'star', quest: 'trophy', achievement: 'trophy', set: 'star', faction: 'shield', fame: 'star', season: 'trophy', level: 'up' };
 let progList = [], progEl = null, progTimer = 0;
-function progLine(e) { return e.kind === 'level' ? `Niveau ${e.level}` : esc(e.name); }
+function progLine(e) { return e.kind === 'level' ? `Niveau ${e.level}` : e.kind === 'codex' ? (e.up ? `Palier ${e.tier} atteint ! (+${e.xp} points)` : `+${e.xp} points · palier ${e.tier}`) : esc(e.name); }
 function paintProgress() {
   if (!progEl) {
     progEl = document.createElement('button'); progEl.className = 'prog-chip'; progEl.type = 'button';
@@ -352,7 +353,7 @@ function paintProgress() {
   }
   const one = progList.length === 1 ? progList[0] : null;
   progEl.innerHTML = `<span class="pc-ic">${one?.kind === 'level' ? '<img class="picon" alt="" src="assets/icons/xp2.webp">' : icon(one ? KIND_ICON[one.kind] || 'trophy' : 'trophy')}</span>
-    <span class="pc-t">${one ? `<small>${KIND_LABEL[one.kind] || ''}</small><b>${one.kind === 'level' ? one.level : esc(one.name)}</b>` : `<b>${progList.length} récompenses</b>`}</span><span class="pc-go">Voir</span>`;
+    <span class="pc-t">${one ? `<small>${KIND_LABEL[one.kind] || ''}</small><b>${one.kind === 'level' ? one.level : progLine(one)}</b>` : `<b>${progList.length} récompenses</b>`}</span><span class="pc-go">Voir</span>`;
   requestAnimationFrame(() => progEl.classList.add('in'));
   clearTimeout(progTimer); progTimer = setTimeout(hideProgress, 7000);
 }
@@ -363,15 +364,19 @@ function openProgress(list) {
   const sh = openSheet(`<h2 class="center">${list.length > 1 ? `${list.length} récompenses` : esc(KIND_LABEL[list[0].kind] || 'Récompense')}</h2>
     <div class="prog-list">${list.map((e) => `<div class="prog-row"><span class="pc-ic">${e.kind === 'level' ? '<img class="picon" alt="" src="assets/icons/xp2.webp">' : icon(KIND_ICON[e.kind] || 'trophy')}</span><span><small>${KIND_LABEL[e.kind] || ''}</small><b>${progLine(e)}</b>${rewardText(e.reward) ? `<em>${rewardText(e.reward)}</em>` : ''}</span></div>`).join('')}</div>
     ${total ? `<p class="small muted center">+${fmt(total)} éclats au total.</p>` : ''}
-    <button class="btn block" data-prog="succes">Voir mes succès</button>`, { label: 'Récompenses' });
-  sh.el.querySelector('[data-prog]')?.addEventListener('click', () => { sh.close(); app.go('succes'); });
+    ${list.some((e) => e.kind === 'codex' || e.kind === 'quest') ? '<button class="btn primary block" data-prog="codex">Voir le Codex</button>' : ''}
+    ${list.some((e) => e.kind !== 'codex' && e.kind !== 'quest') ? '<button class="btn block" data-prog="succes">Voir mes succès</button>' : ''}`, { label: 'Récompenses' });
+  sh.el.querySelectorAll('[data-prog]').forEach((b) => b.addEventListener('click', () => { sh.close(); app.go(b.dataset.prog); }));
 }
 function onProgress(events) {
   const lv = events.filter((e) => e.kind === 'level');
   if (lv.length > 1) events = [...events.filter((e) => e.kind !== 'level'), { kind: 'level', level: lv[lv.length - 1].level, reward: lv.reduce((r, e) => ({ shards: (r.shards || 0) + (e.reward?.shards || 0), tickets: { ...r.tickets, ...e.reward?.tickets }, title: e.reward?.title || r.title }), {}) }];
   if (!events.length) return;
+  /* v680 : les points du Codex se cumulent en une seule ligne ; pas de son pour de simples points (le propriétaire déteste les bips) */
+  const cx = [...progList, ...events].filter((e) => e.kind === 'codex');
+  if (cx.length) { const m = { kind: 'codex', xp: cx.reduce((n, e) => n + e.xp, 0), tier: cx[cx.length - 1].tier, up: cx.some((e) => e.up) }; progList = progList.filter((e) => e.kind !== 'codex'); events = [...events.filter((e) => e.kind !== 'codex'), m]; }
   const k = events[events.length - 1].kind;
-  try { (k === 'fame' ? sfx.fame : k === 'season' ? sfx.season : sfx.achievement)(); } catch (e) { /* le son ne bloque rien */ }
+  try { if (k !== 'codex' || events.some((e) => e.up)) (k === 'codex' ? sfx.season : k === 'fame' ? sfx.fame : k === 'season' ? sfx.season : sfx.achievement)(); } catch (e) { /* le son ne bloque rien */ }
   progList = [...progList.filter((e) => !(e.kind === 'level' && events.some((x) => x.kind === 'level'))), ...events];
   paintProgress();
 }
@@ -400,6 +405,11 @@ async function boot() {
     const authLink = consumeAuthHash();
     startPartie(app); /* v539 : serveur de partie (anti-triche) */
     app.partie = { first, firstMany, flush: flushPartie };
+    /* v680 : dès que le serveur de partie répond : prix de l'App Store, et achat payé pas encore vérifié (app fermée trop tôt) */
+    let iapDone = false;
+    onPartie((p) => { if (p.mode !== 'server' || iapDone) return; iapDone = true;
+      loadPrices().then(() => { if (/codex/.test(location.hash)) app.refresh?.(); });
+      iapResume(app).then((got) => { if (got.length) { toast(got.length > 1 ? t('{n} achat(s) ajouté(s).', { n: got.length }) : t('{name} : ajouté.', { name: esc(got[0].name) }), { kind: 'success', icon: 'star' }); app.chrome?.(); if (/codex/.test(location.hash)) app.refresh?.(); } }); });
     startSync(app);
     let shownPseudo = null;
     onSync(() => { const ps = sync.profile?.pseudo || null; if (ps !== shownPseudo) { shownPseudo = ps; renderChrome(); } }); /* v422 : le pseudo en ligne s'affiche en haut dès qu'il arrive */

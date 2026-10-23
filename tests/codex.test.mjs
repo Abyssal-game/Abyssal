@@ -54,9 +54,9 @@ test('codex v547 : une récompense enluminée à chaque palier, aucune n’est �
   assert.ok(obs <= 450, 'les obsidiennes de la voie enluminée restent modestes');
 });
 
-test('échoppe : fermée hors Mode Créateur, achat simulé ensuite (une seule fois pour le Fondateur)', () => {
+test('échoppe : achat simulé réservé au Mode Créateur (une seule fois pour le Fondateur)', () => {
   const g = mk();
-  assert.throws(() => g.shopBuy('fondateur'), /pas encore ouverte/);
+  assert.throws(() => g.shopBuy('fondateur'), /Mode Créateur/);
   g.s.settings.dev = true; g.s.devCodex = true;
   g.shopBuy('fondateur');
   assert.ok(g.s.titles.includes('Fondateur') && g.s.backs.includes('dos-vif-fondateur') && g.s.frames.includes('cx-vif-fondateur') && g.s.plates.includes('pl-fondateur') && g.s.fonds.includes('fp-fondateur')); /* v638 */
@@ -195,4 +195,50 @@ test('v638 : les objets du Pack du Fondateur existent et ne sont pas vendus à l
   const fd = SHOP.find((x) => x.id === 'fondateur').give;
   for (const k of [fd.frame, fd.back, fd.sachet, fd.plate, fd.fond]) assert.ok(!CATALOG.some((it) => it.id === k), `${k} hors de l’Échoppe`);
   for (const f of [`assets/frames/${fd.frame}-4.webp`, `assets/backs/${fd.back}.webp`, `assets/packs/${fd.sachet}.webp`, `assets/plates/${fd.plate}.webp`, `assets/fonds/${fd.fond}.webp`]) assert.ok(fs.existsSync(new URL(`../${f}`, import.meta.url)), f);
+});
+
+// v680 : ouverture le 1er jour de la Saison I, achats payés vérifiés par le serveur, défis de la semaine, paliers achetés
+const before = () => new Date(Y0, M0 - 2, 20, 12);
+test('codex v680 : fermé avant la Saison I, ouvert à tous le premier jour', () => {
+  assert.equal(mk(before).codexOn(), false);
+  assert.equal(mk().codexOn(), true);
+});
+
+test('achats payés : chaque transaction donnée une seule fois, déjà acquis = obsidiennes', () => {
+  const g = mk();
+  const tx = (id, p) => ({ id, product: SHOP.find((x) => x.id === p).store });
+  let got = g.iapApply([tx('t1', 'obs-500'), tx('t2', 'codex')]);
+  assert.equal(got.length, 2); assert.equal(g.obs(), 600); assert.ok(g.codex().premium);
+  got = g.iapApply([tx('t1', 'obs-500'), tx('t2', 'codex')]);
+  assert.equal(got.length, 0, 'déjà données'); assert.equal(g.obs(), 600);
+  g.iapApply([tx('t3', 'codex')]);
+  assert.equal(g.obs(), 1100, 'Codex déjà débloqué : 500 obsidiennes à la place');
+  g.iapApply([tx('t4', 'fondateur')]); assert.ok(g.s.titles.includes('Fondateur')); assert.equal(g.obs(), 1700);
+  g.iapApply([{ id: 't5', product: 'inconnu' }, null, { product: SHOP[0].store }]);
+  assert.equal(g.obs(), 1700, 'produit inconnu ou sans identifiant : rien');
+});
+
+test('défis de la semaine : trois, les mêmes pour tous, un palier chacun', async () => {
+  const { questsFor } = await import('../js/core/codex.js');
+  const a = mk(), b = mk();
+  assert.deepEqual(a.quests().list.map((q) => [q.key, q.n]), b.quests().list.map((q) => [q.key, q.n]));
+  assert.equal(a.quests().list.length, 3);
+  assert.ok(new Set([0, 1, 2, 3, 4].map((w) => JSON.stringify(questsFor(SEASONS[0].key, w)))).size > 1, 'les défis changent d’une semaine à l’autre');
+  const q = a.quests().list[0], why = { descent: 'win', trial: 'trial', game: 'game', mission: 'mission' }[q.key];
+  for (let i = 0; i < q.n; i++) a.codexXp(1, why);
+  const done = a.quests().list.find((x) => x.key === q.key);
+  assert.ok(done.done); assert.equal(a.codex().xp, q.n + CODEX.questXp);
+  a.codexXp(1, why); assert.equal(a.codex().xp, q.n + 1 + CODEX.questXp, 'un défi ne paie qu’une fois');
+  assert.equal(mk(before).quests().list.every((x) => !x.done && x.have === 0), true);
+});
+
+test('acheter un palier : obsidiennes, pas au-delà du dernier', () => {
+  const g = mk();
+  assert.throws(() => g.codexBuyTier(), /manque/);
+  g.s.obs = CODEX.tierObs * 2;
+  g.codexXp(10, 'mission');
+  assert.equal(g.codexBuyTier(), 1); assert.equal(codexTier(g.codex()), 1); assert.equal(g.obs(), CODEX.tierObs);
+  g.codexXp(1e6, 'dev');
+  assert.throws(() => g.codexBuyTier(), /dernier palier/);
+  assert.throws(() => mk(before).codexBuyTier(), /pas encore commencé/);
 });

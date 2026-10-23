@@ -177,7 +177,7 @@ Pandore (ART-068), autrefois dessinée nue, a été refaite habillée en v300 : 
 | Thèmes médicaux | Aucun |
 | Contenu généré par les utilisateurs | Oui, uniquement les pseudos : filtre, signalement et masquage dans le jeu |
 | Messagerie ou discussion | Non |
-| Achats intégrés | Non |
+| Achats intégrés | Non en 1.0 ; **Oui à partir de la 1.1** (obsidiennes, Codex enluminé, Pack du Fondateur : cosmétiques seulement) |
 | Publicité | Non |
 | Accès web sans restriction | Non |
 
@@ -189,7 +189,7 @@ Si Apple calcule un âge plus bas que 13+, choisis quand même **13+** (Apple pe
 - Peur, horreur : oui, **éléments effrayants légers** (créatures démoniaques, ambiance sombre).
 - Sexualité, nudité, grossièretés, drogues, jeux d'argent : **non**.
 - Les utilisateurs peuvent-ils interagir ou échanger du contenu ? **Oui, un pseudo visible dans les classements.** Pas de discussion. Modération : filtre de mots et signalement.
-- Achats numériques : **non**.
+- Achats numériques : **non** en 1.0, **oui** à partir de la 1.1 (cosmétiques seulement).
 
 Résultat attendu : PEGI 12 en Europe (au pire PEGI 7). Public cible (Contenu de l'appli → Public cible) : **13 ans et plus**. Si on coche « moins de 13 ans », Google impose les règles « Familles ».
 
@@ -217,6 +217,7 @@ Résultat attendu : PEGI 12 en Europe (au pire PEGI 7). Public cible (Contenu de
   - Coordonnées → **Adresse e-mail**
   - Identifiants → **Identifiant utilisateur**
   - Contenu utilisateur → **Contenu de jeu** (sauvegarde, scores) et **Autre contenu utilisateur** (pseudo)
+  - **À ajouter avec la 1.1** : Achats → **Historique d'achats** (associé à l'identité, « Fonctionnalités de l'app », pas de pistage)
 - Tout le reste : **Non collecté**.
 
 ---
@@ -246,3 +247,28 @@ Aucun achat intégré, aucune publicité, aucun pistage.
 - [ ] Google : confirmer l'accès à un vrai téléphone Android (exigé par la Play Console) : **Android mis de côté le 23 octobre 2026** (le propriétaire n'a pas d'appareil Android). Version signée prête (`abyssal-play-store`).
 - [ ] Google, compte personnel récent : test fermé avec au moins 12 testeurs pendant 14 jours avant la publication.
 - [ ] Emballer l'application (Capacitor) et la tester sur un vrai téléphone Android et sur iPhone (TestFlight).
+
+
+---
+
+## 9. Achats intégrés (version 1.1, Saison I du Codex le 1er décembre 2026)
+
+Paiement par **RevenueCat** (module `@revenuecat/purchases-capacitor`, `js/iap.js`) ; le serveur de partie vérifie chaque achat auprès de RevenueCat (`serveur/iap.mjs`) avant de le donner.
+
+### Produits à créer dans App Store Connect (Fonctionnalités → Achats intégrés)
+| Identifiant du produit | Type | Nom de référence | Prix |
+|---|---|---|---|
+| `com.abyssalgame.abyssal.obsidiennes.100` | Consommable | 100 obsidiennes | 0,99 € |
+| `com.abyssalgame.abyssal.obsidiennes.500` | Consommable | 600 obsidiennes | 4,99 € |
+| `com.abyssalgame.abyssal.obsidiennes.1000` | Consommable | 1 300 obsidiennes | 9,99 € |
+| `com.abyssalgame.abyssal.obsidiennes.2000` | Consommable | 2 800 obsidiennes | 19,99 € |
+| `com.abyssalgame.abyssal.codex` | Consommable | Codex enluminé (une saison) | 4,99 € |
+| `com.abyssalgame.abyssal.fondateur` | Non consommable | Pack du Fondateur | 4,99 € |
+
+Le Codex enluminé est **consommable** : il se rachète à chaque saison ; le serveur le rattache à la saison en cours (acheté deux fois la même saison : 500 obsidiennes à la place).
+
+### Réglages
+- Apple : contrat des applications payantes signé, **Small Business Program** (15 %), DSA « commerçant » une fois la micro-entreprise créée.
+- RevenueCat : projet « ABYSSAL », app iOS (identifiant `com.abyssalgame.abyssal`, clé d'achats intégrés d'App Store Connect), **Transfer behavior : Keep with original App User ID** (un achat reste sur le compte qui l'a payé).
+- Clé publique RevenueCat (`appl_…`) → `IAP_KEY.ios` dans `js/config.js` ; clé secrète (`sk_…`) → Supabase → Edge Functions → Secrets → **`REVENUECAT_SECRET`** (jamais dans le dépôt ni dans la conversation).
+- Confidentialité de l'app : ajouter « Historique d'achats » (voir partie 6). Mettre à jour la page de confidentialité du site `abyssal-game.fr` (dépôt `site`) à la sortie de la 1.1.

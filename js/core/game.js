@@ -13,7 +13,7 @@ export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par c
 import { FINAL_FLOOR, BOOSTERS, FREE_PACK, BRAISE, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, sublimeObs, VARIANTS, FIN_ORDER } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
-import { CODEX, CODEX_XP, SHOP, CATALOG, FREE_EMOTES, codexTier, seasonFor, tiersOf, freshCodex, pendingOf } from './codex.js';
+import { CODEX, CODEX_XP, SHOP, CATALOG, FREE_EMOTES, codexTier, seasonFor, tiersOf, freshCodex, pendingOf, CODEX_OPEN, QUEST_KINDS, questsFor, seasonWeek } from './codex.js';
 import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, lateSoft, bossEase, earlyHp, expectedLevel, cardPower, powerFor, advisedPower, floorForPower, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative, act as duelActRaw, useUlt, beginEnemyTurn, nextEnemy, takeSkips, enemyAct, endEnemyTurn, RHYTHM } from './duel.js';
 import { bossOf, BOSSES, BOSS_ORDER } from './bosses.js';
@@ -1952,7 +1952,8 @@ export class Game {
   }
 
   // ——— v470 : ÉBAUCHE du pass de saison (Codex) et de la boutique en argent réel (Échoppe), cachés hors Mode Créateur ———
-  codexOn() { return !!(this.s.settings?.dev && this.s.devCodex); }
+  /* v680 : ouverts à tous le premier jour de la Saison I (CODEX_OPEN) ; avant, seulement en aperçu Créateur */
+  codexOn() { return today(this.clock()) >= CODEX_OPEN || !!(this.s.settings?.dev && this.s.devCodex); }
   /* v538 : la saison commence le CODEX.starts. Les points gagnés avant (anciennes versions, essais du Mode Créateur) sont remis à zéro
      au premier passage après cette date ; la voie enluminée déjà débloquée reste. */
   /* v550 : trois saisons d'un mois (SEASONS), à l'heure du joueur ; un Codex par saison */
@@ -1976,7 +1977,43 @@ export class Game {
     if (!this.codexLive() && !this.codexOn()) return; /* v538 : avant la saison, rien ne se gagne (sauf essais du Mode Créateur) */
     const c = this.codex(), max = CODEX.tiers * CODEX.xpPerTier;
     const add = Math.max(0, Math.min(n, max - c.xp));
+    const before = codexTier(c);
     c.xp += add; c.log[why] = (c.log[why] || 0) + add;
+    if (add && why !== 'dev' && this.codexLive()) this.emit('progress', [{ kind: 'codex', xp: add, tier: codexTier(c), up: codexTier(c) > before }]); /* v680 : « +N points du Codex » */
+    this.questBump(why);
+  }
+  /* v680 : défis de la saison (trois par semaine, les mêmes pour tous). Un défi rempli donne CODEX.questXp points. */
+  quests() {
+    const c = this.codex(), se = this.codexSeason(), w = seasonWeek(se, today(this.clock()));
+    const qw = c.qw && c.qw.w === w ? c.qw : { w, n: {}, done: [] }; /* lecture seule : la semaine n'est écrite que par questBump */
+    const list = questsFor(se.key, w).map((q) => ({ ...q, have: Math.min(q.n, qw.n[q.key] || 0), done: qw.done.includes(q.key) }));
+    const next = new Date(`${se.starts}T00:00:00`); next.setDate(next.getDate() + 7 * (w + 1));
+    return { week: w + 1, list, ends: today(next) > se.ends ? se.ends : today(new Date(next - 864e5)) };
+  }
+  questBump(why) {
+    if (!this.codexLive()) return;
+    const kind = Object.keys(QUEST_KINDS).find((k) => QUEST_KINDS[k].why.includes(why));
+    if (!kind) return;
+    const { list } = this.quests(), q = list.find((x) => x.key === kind), c = this.s.codex, w = seasonWeek(this.codexSeason(), today(this.clock()));
+    if (!q || q.done) return;
+    if (!c.qw || c.qw.w !== w) c.qw = { w, n: {}, done: [] };
+    c.qw.n[kind] = (c.qw.n[kind] || 0) + 1;
+    if (c.qw.n[kind] >= q.n) {
+      c.qw.done.push(kind);
+      const max = CODEX.tiers * CODEX.xpPerTier, add = Math.max(0, Math.min(CODEX.questXp, max - c.xp));
+      c.xp += add; c.log.quest = (c.log.quest || 0) + add;
+      this.emit('progress', [{ kind: 'quest', name: q.label.replace('{n}', q.n), reward: null }]);
+    }
+  }
+  /* v680 : acheter un palier en obsidiennes (pendant la saison) */
+  codexBuyTier() {
+    if (!this.codexLive()) throw new Error('La saison n’a pas encore commencé.');
+    const c = this.codex(), t = codexTier(c);
+    if (t >= CODEX.tiers) throw new Error('Tu as déjà atteint le dernier palier.');
+    this.spendObs(CODEX.tierObs);
+    c.xp = Math.max(c.xp, (t + 1) * CODEX.xpPerTier); c.log.bought = (c.log.bought || 0) + 1;
+    this.persist();
+    return t + 1;
   }
   codexClaim(track, tier) {
     const c = this.codex(), t = tiersOf(c.season)[tier - 1];
@@ -1998,7 +2035,8 @@ export class Game {
   }
   /* Achat SIMULÉ en euros (aperçu Créateur) : le vrai paiement passera par l'App Store (identifiant `store` de chaque article) */
   shopBuy(id) {
-    if (!this.codexOn()) throw new Error('L’Échoppe n’est pas encore ouverte.');
+    /* v680 : achat simulé réservé à l'aperçu Créateur (le vrai paiement passe par iapApply, vérifié par le serveur) */
+    if (!(this.s.settings?.dev && this.s.devCodex)) throw new Error('Achat simulé réservé au Mode Créateur.');
     const it = SHOP.find((x) => x.id === id), bought = (this.s.purchases ||= []);
     if (!it) throw new Error('Article inconnu.');
     if (it.once && bought.includes(id)) throw new Error('Déjà acheté.');
@@ -2008,6 +2046,23 @@ export class Game {
     return it;
   }
   shopOwned(id) { return !!(this.s.purchases || []).includes(id); }
+  /* v680 : achats payés (App Store, Google Play), vérifiés par le serveur auprès de RevenueCat (serveur/iap.mjs) :
+     chaque transaction n'est donnée qu'une fois (`s.iapDone`). Appelée seulement par le serveur de partie (op `iapSync`). */
+  iapApply(txs) {
+    const done = (this.s.iapDone ||= []), bought = (this.s.purchases ||= []), got = [];
+    for (const t of Array.isArray(txs) ? txs : []) {
+      const id = String(t?.id || ''), it = SHOP.find((x) => x.store === t?.product);
+      if (!id || !it || done.includes(id)) continue;
+      done.push(id);
+      let give = it.give;
+      if ((it.kind === 'codex' && this.codex().premium) || (it.once && bought.includes(it.id))) give = { obs: it.refund || 0 }; /* déjà acquis : jamais perdu */
+      this.grant(give, 'shop');
+      if (!bought.includes(it.id)) bought.push(it.id);
+      got.push({ id: it.id, name: it.name, give });
+    }
+    if (got.length) this.persist();
+    return got;
+  }
   // v474 : dépenses en obsidiennes (cosmétiques seulement)
   obs() { return this.s.obs || 0; }
   spendObs(n) {

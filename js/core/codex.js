@@ -14,8 +14,12 @@ export const CODEX = {
   price: '4,99 €',                       // v548 : le Codex enluminé se paie en euros (décision du propriétaire), plus en obsidiennes
   store: 'com.abyssalgame.abyssal.codex',
   /* v678 (décision du propriétaire du 23 octobre 2026) : les saisons commencent quand le vrai paiement marche.
-     Saison I = ce mois-là, puis une saison par mois dans l'ordre de SEASONS. Pour tout décaler : changer ce seul mois. */
-  from: '2027-02',
+     Saison I = ce mois-là, puis une saison par mois dans l'ordre de SEASONS. Pour tout décaler : changer ce seul mois.
+     v680 (décision du propriétaire du 23 octobre 2026) : Saison I le 1er décembre 2026, avec le vrai paiement (RevenueCat).
+     Le Codex et l'Échoppe s'ouvrent à tous le premier jour de la Saison I (`g.codexOn()`). */
+  from: '2026-12',
+  tierObs: 100,                          // v680 : prix d'un palier acheté en obsidiennes (« Acheter un palier »)
+  questXp: 150,                          // v680 : points de Codex d'un défi de la saison (un palier)
 };
 
 // ——— v474 : la monnaie payante, les Obsidiennes (achetées en euros, dépensées seulement en cosmétiques) ———
@@ -38,7 +42,7 @@ export const CODEX_XP = {
   game: 15,       // partie gagnée dans le Cercle de l’Abysse
   mission: 15,    // mission du jour encaissée
 };
-export const CODEX_XP_LABEL = { floor: 'Étage franchi (1re fois)', boss: 'Gardien vaincu (1re fois)', win: 'Autre victoire dans la Descente', trial: 'Épreuve du jour gagnée', game: 'Partie gagnée dans le Cercle de l’Abysse', mission: 'Mission du jour' };
+export const CODEX_XP_LABEL = { floor: 'Étage franchi (1re fois)', boss: 'Gardien vaincu (1re fois)', win: 'Autre victoire dans la Descente', trial: 'Épreuve du jour gagnée', game: 'Partie gagnée dans le Cercle de l’Abysse', mission: 'Mission du jour', quest: 'Défi de la semaine' }; /* v680 */
 
 // Cosmétiques propres au Codex et à l'Échoppe (v472 : cadres peints par Gemini, assets/frames/<clé>.webp, posés par .pf-<clé>)
 export const CODEX_FRAMES = {
@@ -347,12 +351,30 @@ export function seasonFor(day) { return SEASONS.find((se) => day <= se.ends) || 
 export const seasonByKey = (k) => SEASONS.find((se) => se.key === k) || null;
 export const tiersOf = (k) => (seasonByKey(k) || SEASONS[0]).tiers;
 export const CODEX_TIERS = SEASONS[0].tiers; // (tests, outils) : la première saison
+export const CODEX_OPEN = SEASONS[0].starts; // v680 : le Codex et l'Échoppe s'ouvrent à tous ce jour-là
+
+// ——— v680 : défis de la saison (demande du propriétaire : « on fait les 3 améliorations ») ———
+// Trois défis par semaine de saison (semaine 1 = jours 1 à 7 du mois…), les mêmes pour tous. Ils se remplissent avec ce qui
+// donne déjà des points de Codex (`codexXp(n, why)`) ; un défi rempli donne CODEX.questXp points tout de suite.
+export const QUEST_KINDS = {
+  descent: { why: ['floor', 'boss', 'win'], label: 'Gagne {n} combats dans la Descente', n: [8, 10, 12] },
+  trial: { why: ['trial'], label: 'Gagne {n} Épreuves du jour', n: [4, 5, 6] },
+  game: { why: ['game'], label: 'Gagne {n} parties du Cercle de l’Abysse', n: [3, 4, 5] },
+  mission: { why: ['mission'], label: 'Récupère {n} missions du jour', n: [8, 10, 12] },
+};
+const dayNum = (d) => Math.round(Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10)) / 864e5);
+export const seasonWeek = (se, day) => Math.max(0, Math.floor((dayNum(day) - dayNum(se.starts)) / 7)); // 0 = première semaine
+export function questsFor(seasonKey, week) {
+  let h = 2166136261; for (const ch of `${seasonKey}:${week}`) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
+  const keys = Object.keys(QUEST_KINDS), skip = h % keys.length; /* trois des quatre sortes, une différente chaque semaine */
+  return keys.filter((_, i) => i !== skip).map((k, i) => { const q = QUEST_KINDS[k]; return { key: k, n: q.n[(h >>> (4 + i * 3)) % q.n.length], label: q.label }; });
+}
 
 // ——— L'Échoppe en euros : les obsidiennes et le Pack du Fondateur (prix affichés seulement) ———
 export const SHOP = [
   ...OBS_PACKS.map((p) => ({ id: p.id, kind: 'obs', name: `${p.n + p.bonus} obsidiennes`, price: p.price, store: p.store, give: { obs: p.n + p.bonus }, bonus: p.bonus })),
-  { id: 'codex', kind: 'codex', name: 'Codex enluminé', price: CODEX.price, store: CODEX.store, give: { codexPremium: true } }, /* v548 : vendu dans l'onglet du Codex, une fois par saison */
-  { id: 'fondateur', name: 'Pack du Fondateur', price: '4,99 €', store: 'com.abyssalgame.abyssal.fondateur', once: true,
+  { id: 'codex', kind: 'codex', name: 'Codex enluminé', price: CODEX.price, store: CODEX.store, give: { codexPremium: true }, refund: 500 }, /* v680 : acheté deux fois pour une même saison : 500 obsidiennes à la place */ /* v548 : vendu dans l'onglet du Codex, une fois par saison */
+  { id: 'fondateur', name: 'Pack du Fondateur', price: '4,99 €', store: 'com.abyssalgame.abyssal.fondateur', once: true, refund: 600,
     /* v638 : pack refait (images Gemini « Premiers Gardiens ») : cadre, dos, sachet et plaque vivants, fond de profil */
     give: { title: 'Fondateur', frame: 'cx-vif-fondateur', back: 'dos-vif-fondateur', sachet: 'sachet-vif-fondateur', plate: 'pl-fondateur', fond: 'fp-fondateur', obs: 600 },
     desc: 'Vendu une seule fois. Le cadre, le dos de cartes, le sachet de booster et la plaque vivants du Fondateur, son fond de profil, le titre « Fondateur » (badge au classement) et 600 obsidiennes.' },

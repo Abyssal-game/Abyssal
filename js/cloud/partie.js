@@ -116,6 +116,7 @@ export async function firstMany(list) {
 
 // L'ancien système (sans serveur de partie) : ce que faisait le jeu avant v539
 const LEGACY = {
+  iapSync() { throw new Error('Les achats demandent le serveur de partie : réessaie dans un instant.'); }, /* v680 */
   openBooster: (type, opts) => g.openBooster(type, opts),
   async versusCreate(lineup, to, stake) {
     g.versusPay(stake);

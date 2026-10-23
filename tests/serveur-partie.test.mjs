@@ -203,3 +203,24 @@ test('serveur de partie : Pari des Boosters, la mise est prise et les gains vien
   assert.equal(out.body.rets[q2].res.result, 'win');
   assert.equal(out.body.rets[q3].out, null, 'encaissé une seule fois');
 });
+
+// v680 : achats payés : la liste vient de RevenueCat (jamais du téléphone), chaque achat donné une seule fois
+test('serveur : iapSync donne les achats vérifiés auprès de RevenueCat, une seule fois', async () => {
+  const { revenueCatTx, createRevenueCat } = await import('../serveur/iap.mjs');
+  const { SHOP } = await import('../js/core/codex.js');
+  const store = (id) => SHOP.find((x) => x.id === id).store;
+  const json = { subscriber: { non_subscriptions: { [store('obs-1000')]: [{ id: 'rc1', store_transaction_id: '2000001', purchase_date: '2026-12-02T10:00:00Z', is_sandbox: true, store: 'app_store' }] } } };
+  assert.deepEqual(revenueCatTx(json).map((t) => [t.id, t.product]), [['2000001', store('obs-1000')]]);
+  let asked = null;
+  const iap = createRevenueCat({ key: 'sk_test', fetch: async (url, o) => { asked = { url, auth: o.headers.Authorization }; return { ok: true, status: 200, json: async () => json }; } });
+  const db = memDb();
+  const call = (q) => handle({ uid: 'u9', token: 't', body: { ops: [{ q, m: 'iapSync', a: [] }], dev: 'dev1', want: true } }, { db, iap, now: () => NOW });
+  let r = await call(1);
+  assert.equal(r.status, 200); assert.equal(r.body.rets[1].length, 1); assert.equal(r.body.data.obs, 1300);
+  assert.match(asked.url, /subscribers\/u9$/); assert.equal(asked.auth, 'Bearer sk_test');
+  r = await call(2);
+  assert.equal(r.body.rets[2].length, 0, 'déjà donné'); assert.equal(r.body.data.obs, 1300);
+  r = await handle({ uid: 'u9', token: 't', body: { ops: [{ q: 3, m: 'iapSync', a: [] }], dev: 'dev1' } }, { db, now: () => NOW });
+  assert.match(r.body.errs[3], /pas encore ouverts/, 'sans clé RevenueCat : refusé');
+  assert.equal(createRevenueCat({ key: '' }), null);
+});

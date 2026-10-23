@@ -1,13 +1,13 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v679';
+const VERSION = 'abyssal-v680';
 const ART_CACHE = 'abyssal-media';  // images du jeu : gardées entre les versions
 const FONT_CACHE = 'abyssal-fonts';
 const CORE = [
   './', 'index.html', 'manifest.webmanifest',
   'css/base.css', 'css/card.css', 'css/screens.css', 'css/army.css', 'css/diorama.css',
-  'js/main.js', 'js/i18n.js', 'js/config.js', 'js/native.js', 'js/live.js',
+  'js/main.js', 'js/i18n.js', 'js/config.js', 'js/native.js', 'js/live.js', 'js/iap.js',
   'js/core/catalog.js', 'js/core/game.js', 'js/core/save.js', 'js/core/boosters.js', 'js/core/bosses.js', 'js/core/relations.js', 'js/core/pacts.js', 'js/core/forms.js', 'js/core/relics.js', 'js/core/sceaux.js', 'js/screens/sceaux.js', 'js/screens/games.js', 'js/core/encheres.js', 'js/core/pacte.js', 'js/core/cryptes.js', 'js/screens/encheres.js', 'js/screens/pacte.js', 'js/screens/cryptes.js', 'js/core/lore.js',
   'js/art/geometry.js', 'js/art/scenes.js', 'js/art/creatures.js', 'js/art/procedural.js', 'js/art/assets.js',
   'js/ui/dom.js', 'js/ui/icons.js', 'js/ui/vitrine.js', 'js/ui/still.js', 'js/ui/card.js', 'js/ui/sound.js', 'js/ui/music.js', 'js/ui/diorama.js',

@@ -3,6 +3,7 @@
 // Elle tient la progression de chaque compte : voir serveur/partie.mjs. Écrite en JavaScript (sans types).
 import { handle } from '../../../serveur/partie.mjs';
 import { createRestDb } from '../../../serveur/db-rest.mjs';
+import { createRevenueCat } from '../../../serveur/iap.mjs';
 
 const env = (k) => Deno.env.get(k) || '';
 const pick = (k) => { try { const o = JSON.parse(env(k) || '{}'); return o.default || Object.values(o)[0] || ''; } catch (e) { return ''; } };
@@ -11,6 +12,8 @@ const db = createRestDb({
   secret: pick('SUPABASE_SECRET_KEYS') || env('SUPABASE_SERVICE_ROLE_KEY'),
   publishable: pick('SUPABASE_PUBLISHABLE_KEYS') || env('SUPABASE_ANON_KEY'),
 });
+// v680 : clé secrète RevenueCat (Supabase → Edge Functions → Secrets → REVENUECAT_SECRET), jamais dans le dépôt
+const iap = createRevenueCat({ key: env('REVENUECAT_SECRET') });
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
 const json = (status, body) => new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
 
@@ -23,6 +26,6 @@ Deno.serve(async (req) => {
   if (!uid) return json(401, { error: 'Session expirée : reconnecte-toi.' });
   let body = null;
   try { body = await req.json(); } catch (e) { return json(400, { error: 'Requête illisible.' }); }
-  try { const out = await handle({ uid, token, body }, { db }); return json(out.status, out.body); }
+  try { const out = await handle({ uid, token, body }, { db, iap }); return json(out.status, out.body); }
   catch (e) { return json(500, { error: String(e?.message || e).slice(0, 200) }); }
 });

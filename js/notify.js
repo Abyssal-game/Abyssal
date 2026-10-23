@@ -5,9 +5,10 @@
 // Les alertes en direct (« ton adversaire a joué », « ton défi a été relevé », demande d'ami) demandent des
 // notifications envoyées par le serveur : prévues ensuite (clé Apple à créer par le propriétaire).
 import { isNative } from './native.js';
+import { CODEX, codexTier } from './core/codex.js';
 
 const LN = () => (isNative() ? window.Capacitor?.Plugins?.LocalNotifications : null);
-const DAILY_ID = 1001;
+const DAILY_ID = 1001, CODEX_ID = 1002; /* v680 : fin de saison du Codex */
 const REMIND_BASE = 20000;
 const REMIND_HOURS = 2;
 export const notifSupported = () => !!LN();
@@ -36,6 +37,21 @@ export async function syncDaily(g) {
   try {
     await L.schedule({ notifications: [{ id: DAILY_ID, title: 'ABYSSAL', body: 'Ton booster gratuit du jour t’attend !', schedule: { at, allowWhileIdle: true } }] });
   } catch (e) { /* rien */ }
+  await syncCodex(g);
+}
+
+// v680 : 3 jours avant la fin de la saison du Codex, à 18 h, si le palier 30 n'est pas atteint
+async function syncCodex(g) {
+  const L = LN(); if (!L) return;
+  await cancel([CODEX_ID]);
+  try {
+    if (!g.s.settings.notif || !g.codexLive()) return;
+    const tier = codexTier(g.codex()), se = g.codexSeason();
+    if (tier >= CODEX.tiers) return;
+    const at = new Date(`${se.ends}T18:00:00`); at.setDate(at.getDate() - 3);
+    if (at.getTime() < Date.now() + 60000) return;
+    await L.schedule({ notifications: [{ id: CODEX_ID, title: 'Le Codex de l’Abîme', body: `Plus que 3 jours pour finir la saison « ${se.name} » : tu es au palier ${tier} sur ${CODEX.tiers}.`, schedule: { at, allowWhileIdle: true } }] });
+  } catch (e) { /* rien */ }
 }
 
 // Parties en ligne où c'est à toi de jouer : rappel avant la fin du délai (les autres rappels sont retirés)
@@ -53,7 +69,7 @@ export async function syncReminders(g, turns) {
 
 export async function clearAll() {
   const L = LN(); if (!L) return;
-  await cancel((await pendingIds()).filter((id) => id === DAILY_ID || (id >= REMIND_BASE && id < REMIND_BASE + 9000)));
+  await cancel((await pendingIds()).filter((id) => id === DAILY_ID || id === CODEX_ID || (id >= REMIND_BASE && id < REMIND_BASE + 9000)));
 }
 
 // Une seule fois, dans l'app : proposer les notifications (après l'arrivée du joueur, sur l'Accueil, sans fenêtre ouverte)
