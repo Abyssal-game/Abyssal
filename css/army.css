@@ -6323,3 +6323,7 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 .cb-rsv-dead { font-size: .74rem; color: #D98C8C; font-style: italic; }
 .dv-resv img.dead { filter: grayscale(1) brightness(.35); }
 .cb-rsv-sheet .cb-rsv { justify-content: center; grid-template-columns: repeat(auto-fit, minmax(0, 170px)); }
+
+/* v663 : le titre de chaque fenêtre est centré (« Le combat », règles, aides…) */
+.sheet-body > h1:first-child, .sheet-body > h2:first-child, .sheet-body > h3:first-child,
+.sheet-body > :first-child > h1:first-child, .sheet-body > :first-child > h2:first-child { text-align: center; justify-content: center; margin-left: auto; margin-right: auto; }
