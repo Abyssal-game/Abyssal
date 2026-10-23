@@ -6327,3 +6327,9 @@ html.fx-light .pv2-obj, html.fx-light .pv2-dust { animation: none; }
 /* v663 : le titre de chaque fenêtre est centré (« Le combat », règles, aides…) */
 .sheet-body > h1:first-child, .sheet-body > h2:first-child, .sheet-body > h3:first-child,
 .sheet-body > :first-child > h1:first-child, .sheet-body > :first-child > h2:first-child { text-align: center; justify-content: center; margin-left: auto; margin-right: auto; }
+/* v664 : réserve sur une seule rangée, cartes côte à côte (tombées comprises) ; tête de mort peinte */
+.cb-rsv-sheet .cb-rsv.cb-rsv-row { grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr)); justify-content: stretch; gap: 8px; }
+.cb-rsv-row .cb-rsv-c { padding: 6px; }
+.cb-rsv-row .cb-rsv-card { max-width: none; }
+.cb-rsv-c.fell .cb-rsv-card .tcg { filter: grayscale(1) brightness(.32); }
+.cb-rsv-skull > img { width: 70%; filter: drop-shadow(0 0 12px rgba(160, 20, 20, .7)); }

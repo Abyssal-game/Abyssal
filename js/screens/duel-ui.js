@@ -1287,11 +1287,11 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const card = (x, fell) => { const c = cat.get(x.id), kit = KITS[x.role]; return `<button class="cb-rsv-c${fell ? ' fell' : ''}" data-u="${x.uid}">
         <span class="cb-rsv-card">${cardHTML(c, { size: 'full', nameKnown: true, variant: g.shownVariant(x.id) })}${fell ? `<span class="cb-rsv-skull" aria-hidden="true">${icon('skull')}<img alt="" src="assets/icons/mort.webp" onload="this.parentNode.classList.add('pic')" onerror="this.remove()"></span>` : ''}</span>
         <span class="cb-rsv-st"><span>${roleIcon(kit.kw)}<b>${esc(kit.name)}</b></span>${fell ? '' : `<span>${icon('swords')}${x.atk + (x.boost || 0)}</span>`}<span>${icon('heart')}${Math.max(0, x.hp)}/${x.maxHp}</span></span>
-        ${fell ? '<small class="cb-rsv-dead">Tombée au combat</small>' : ENTRANCES[x.role] ? `<small class="cb-rsv-e"><b>En entrant</b> : ${esc(ENTRANCES[x.role].desc)}</small>` : ''}</button>`; };
+        ${!fell && ENTRANCES[x.role] ? `<small class="cb-rsv-e"><b>En entrant</b> : ${esc(ENTRANCES[x.role].desc)}</small>` : ''}</button>`; };
+    const all = [...r.map((x) => card(x, false)), ...dead.map((x) => card(x, true))]; /* v664 : toutes côte à côte, les tombées assombries */
     const sh = openSheet(`<h2 class="cb-rsv-h">${icon('team')} Ta réserve</h2>
-      ${r.length ? `<p class="small muted">Pour faire entrer l’une d’elles, choisis l’action <b>Permuter</b> de la créature qui joue. Touche une carte pour tout voir.</p>
-      <div class="cb-rsv">${r.map((x) => card(x, false)).join('')}</div>` : '<p class="small muted center">Plus aucune créature en réserve.</p>'}
-      ${dead.length ? `<h3 class="cb-rsv-h3">${icon('skull')} Tombées au combat</h3><div class="cb-rsv">${dead.map((x) => card(x, true)).join('')}</div>` : ''}`, { label: 'Réserve', cls: 'cb-rsv-sheet' });
+      ${r.length ? '<p class="small muted">Pour faire entrer l’une d’elles, choisis l’action <b>Permuter</b> de la créature qui joue. Touche une carte pour tout voir.</p>' : ''}
+      <div class="cb-rsv cb-rsv-row" style="--n:${Math.min(all.length, 3)}">${all.join('')}</div>`, { label: 'Réserve', cls: 'cb-rsv-sheet' });
     sh.body.addEventListener('click', (ev) => { const id = ev.target.closest('[data-u]')?.dataset.u; if (id) { sh.close(); info(st.units[id]); } });
   }
   function statusLines(u) {
