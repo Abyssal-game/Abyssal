@@ -6520,3 +6520,21 @@ html.fx-light .dv.qte-on::after { animation: none; opacity: .85; }
 .shr-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .shr-foot .btn.danger { background: #7a1c1c; border-color: #c94a4a; color: #fff; }
 .pv2:has(.shr-foot) .pv2-body { padding-bottom: 200px; }
+
+/* v690 : 8 nouveaux tapis de jeu (images Gemini §340-347) ; grille posée dans l'intérieur mesuré de chaque tapis */
+html[data-mat="tp-braise"] .sc-board, .sc-board[data-pmat="tp-braise"] { --mat-img: url(../assets/tapis/tp-braise.webp); }
+html[data-mat="tp-braise"] .sc-plate, html .sc-board[data-pmat="tp-braise"] .sc-plate { top: 13%; bottom: 13%; left: 17%; right: 17%; }
+html[data-mat="tp-marees"] .sc-board, .sc-board[data-pmat="tp-marees"] { --mat-img: url(../assets/tapis/tp-marees.webp); }
+html[data-mat="tp-marees"] .sc-plate, html .sc-board[data-pmat="tp-marees"] .sc-plate { top: 11.5%; bottom: 11.5%; left: 15%; right: 15%; }
+html[data-mat="tp-racines"] .sc-board, .sc-board[data-pmat="tp-racines"] { --mat-img: url(../assets/tapis/tp-racines.webp); }
+html[data-mat="tp-racines"] .sc-plate, html .sc-board[data-pmat="tp-racines"] .sc-plate { top: 12.5%; bottom: 12.5%; left: 17%; right: 17%; }
+html[data-mat="tp-celeste"] .sc-board, .sc-board[data-pmat="tp-celeste"] { --mat-img: url(../assets/tapis/tp-celeste.webp); }
+html[data-mat="tp-celeste"] .sc-plate, html .sc-board[data-pmat="tp-celeste"] .sc-plate { top: 10%; bottom: 10%; left: 13%; right: 13%; }
+html[data-mat="tp-rouages"] .sc-board, .sc-board[data-pmat="tp-rouages"] { --mat-img: url(../assets/tapis/tp-rouages.webp); }
+html[data-mat="tp-rouages"] .sc-plate, html .sc-board[data-pmat="tp-rouages"] .sc-plate { top: 11%; bottom: 11%; left: 14.5%; right: 14.5%; }
+html[data-mat="tp-tombes"] .sc-board, .sc-board[data-pmat="tp-tombes"] { --mat-img: url(../assets/tapis/tp-tombes.webp); }
+html[data-mat="tp-tombes"] .sc-plate, html .sc-board[data-pmat="tp-tombes"] .sc-plate { top: 11.5%; bottom: 11.5%; left: 14.5%; right: 14.5%; }
+html[data-mat="tp-dragon"] .sc-board, .sc-board[data-pmat="tp-dragon"] { --mat-img: url(../assets/tapis/tp-dragon.webp); }
+html[data-mat="tp-dragon"] .sc-plate, html .sc-board[data-pmat="tp-dragon"] .sc-plate { top: 11.5%; bottom: 11.5%; left: 15%; right: 15%; }
+html[data-mat="tp-eclipse"] .sc-board, .sc-board[data-pmat="tp-eclipse"] { --mat-img: url(../assets/tapis/tp-eclipse.webp); }
+html[data-mat="tp-eclipse"] .sc-plate, html .sc-board[data-pmat="tp-eclipse"] .sc-plate { top: 9.5%; bottom: 9.5%; left: 12%; right: 12%; }
