@@ -96,6 +96,7 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
       const zoneAt = (x) => (moving ? Math.min(0.97 - zw, Math.max(0.3, z0 + Math.sin(x * 9) * T.moveAmp)) : z0);
       const end = (res, when = null) => {
         if (fin) return; fin = true; cancelAnimationFrame(raf); setTap(null); letGo = null; held = false;
+        anims.forEach((a) => { try { a.commitStyles?.(); a.cancel(); } catch (e) {} }); anims = [];
         bar.classList.remove('go', 'pp', 'held'); bar.classList.add(res === 'none' ? 'ko' : 'ok', `r-${res}`);
         pips[i]?.classList.remove('now'); pips[i]?.classList.add(`r-${res}`);
         {
@@ -108,23 +109,32 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
         onResult?.({ i, letter: L, res, ms: when != null && t0 ? Math.round(when - (t0 + tb)) : null, dodge: w.dodge, parry: w.parry, dur: Math.round(D) });
         done1();
       };
-      const shown = [];
+      /* v727 : le curseur (et la zone qui bouge) glissent par une animation du compositeur (Web Animations) : elle avance même si
+         le reste du jeu prend du retard ; le toucher est jugé sur le temps exact (position calculée), plus sur les images affichées */
+      let anims = [];
+      const frames = (f) => Array.from({ length: 49 }, (_, k) => ({ offset: k / 48, transform: `translateX(${(f(k / 48) * bw).toFixed(1)}px)` }));
       const step = () => {
-        const now0 = performance.now(), x = (now0 - t0) / D, pos = ease(Math.min(1, x)), zz = moving ? zoneAt(x) : z0;
-        cur.style.transform = `translateX(${(pos * bw).toFixed(1)}px)`;
-        shown.push([now0, pos, zz]); if (shown.length > 12) shown.shift();
-        if (moving) zEl.style.transform = `translateX(${((zz - z0) * bw).toFixed(1)}px)`;
+        const x = (performance.now() - t0) / D, pos = ease(Math.min(1, x)), zz = moving ? zoneAt(x) : z0;
         const pz = zz + zw - pw, now = pos >= pz && pos <= pz + pw ? 'pp' : pos >= zz && pos <= zz + zw ? 'go' : '';
         if (now !== lit) { if (lit) bar.classList.remove(lit); if (now) bar.classList.add(now); lit = now; }
         if (x >= 1) end('none'); else raf = requestAnimationFrame(step);
       };
+      const startRun = () => {
+        t0 = performance.now();
+        if (cur.animate) {
+          anims = [cur.animate(frames((x) => ease(x)), { duration: D, easing: 'linear', fill: 'forwards' })];
+          if (moving) anims.push(zEl.animate(frames((x) => zoneAt(x) - z0), { duration: D, easing: 'linear', fill: 'forwards' }));
+          anims[0].ready?.then(() => { if (!fin && typeof anims[0].startTime === 'number') t0 = anims[0].startTime; }).catch(() => {});
+        }
+        raf = requestAnimationFrame(step);
+      };
       const judgeAt = (at) => {
         const now = performance.now(), when = at && at <= now && now - at < 500 ? at : now;
-        const seen = shown.filter((r) => r[0] <= when).slice(-2);
-        if (!seen.length) { const x = (when - t0) / D; seen.push([when, ease(Math.min(1, x)), zoneAt(x)]); }
         const tol = T.tolPx / Math.max(80, bw), rank = { parry: 2, dodge: 1, none: 0 };
-        const res = seen.map(([, pos, zz]) => { const pz = zz + zw - pw;
+        /* position au toucher, et une image plus tôt (ce que l'œil voyait encore) : le meilleur des deux */
+        const res = [when, when - 17].map((tt) => { const x = (tt - t0) / D, pos = ease(Math.min(1, Math.max(0, x))), zz = zoneAt(x), pz = zz + zw - pw;
           return pos >= pz - tol && pos <= zz + zw + tol ? 'parry' : pos >= zz - tol && pos < pz - tol ? 'dodge' : 'none'; });
+        anims.forEach((a) => { try { a.pause(); } catch (e) {} });
         end(res.sort((a, b) => rank[b] - rank[a])[0], when);
       };
       /* coup chargé : on appuie quand on veut, c'est le moment où l'on relâche qui compte */
@@ -135,7 +145,7 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
         judgeAt(at);
       });
       const gap = i === 0 ? (reduced ? 500 : T.gapFirst) + Math.random() * T.gapFirstRand : beat || T.gapMin + Math.random() * T.gapRand; /* rythme irrégulier entre les coups (sauf l'Horloger) */
-      setTimeout(() => { if (!fin && alive()) { t0 = performance.now(); raf = requestAnimationFrame(step); } else if (!alive()) end('none'); }, gap);
+      setTimeout(() => { if (!fin && alive()) startRun(); else if (!alive()) end('none'); }, gap);
     });
     /* défense inventée : même barre, positions calculées par la fonction posAt (sens, rebond), jugement au temps */
     const passCustom = (i, C, done1) => {

@@ -111,6 +111,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     Object.values(st.units).forEach((u) => { if (u.side !== 'ally') return; const c = cat.get(u.id); if (c) keep.add(`circle-${c.faction}`); const k = KITS[u.role]?.skill?.key; if (k) keep.add(`sk-${k}`); });
     keep.forEach((n) => { const im = new Image(); im.src = `assets/fx/${n}.webp`; im.decode?.().catch(() => {}); });
     /* v603 : effets de mort et figures du gardien (2e forme comprise) décodés d'avance : ils saccadaient la 1re fois */
+    /* v727 : images de la barre de défense décodées d'avance (sinon décodées à la 1re apparition de la barre) */
+    ['assets/ui/dodge-sword.webp', 'assets/ui/plate-title.webp'].forEach((u) => { const im = new Image(); im.src = u; im.decode?.().catch(() => {}); });
     ['kill-crack', 'kill-shatter', 'kill-embers', 'death'].forEach((n) => { const im = new Image(); im.src = `assets/fx/${n}.webp`; im.decode?.().catch(() => {}); });
     if (st.bossKey) [st.bossKey, `carte-${st.bossKey}`, { abysse: 'abysse-2', jumeaux: 'jumeaux-nuit' }[st.bossKey], ...[st.bossKey, { abysse: 'abysse-2', jumeaux: 'jumeaux-nuit' }[st.bossKey]].filter((k) => k && BOSS_CARD.has(k)).map((k) => `combat-${k}`)].filter(Boolean).forEach((n) => { const im = new Image(); im.onerror = () => {}; im.src = `assets/bosses/${n}.webp`; im.decode?.().catch(() => {}); });
   }

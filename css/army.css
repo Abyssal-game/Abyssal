@@ -6776,3 +6776,22 @@ html.reduce-motion .dc-bscene, html.reduce-motion .bx-scene, html.fx-light .dc-b
 /* v724 : Rêves vaincus du Bestiaire : la carte peinte du gardien (la même qu'en combat) remplit la vignette et la fiche */
 .drm-art.drm-card img { left: 0; bottom: auto; top: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; translate: none; }
 .drm-art.drm-card { border: 1px solid rgba(232, 195, 90, .45); }
+/* v727 (« aucune latence quand la barre d'esquive apparaît ») : la barre ne se redessine plus pendant que le curseur glisse.
+   Avant : ombres en `filter` sur toute la barre (recalculées à chaque image, car le curseur bouge dedans), reflet animé de la
+   zone d'or (fond qui défile), et un `filter: brightness` + une nouvelle ombre posés pile quand le curseur entre dans la zone
+   (un redessin juste au moment du toucher). Maintenant : lueurs fixes, zone et curseur dans leurs propres calques, l'éclat
+   « dans la zone » est un calque déjà dessiné dont seule l'opacité change ; le décor et les lueurs des cartes s'arrêtent
+   pendant la défense. */
+.dv-dodge.cb-def, .cb-def.ok, .cb-def.ko { filter: none !important; }
+.cb-def .dv-dodge-bar::before { filter: none; }
+.cb-def .dv-dodge-bar { contain: layout style; }
+.cb-def .dv-dodge-bar .z { animation: none !important; background-size: 100% 100%; will-change: transform; transform: translateZ(0); }
+.cb-def .dv-dodge-bar .c { will-change: transform; }
+.cb-def.go .dv-dodge-bar .z { filter: none; }
+.cb-def .dv-dodge-bar .z::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(90deg, rgba(255, 240, 190, .35), rgba(255, 255, 230, .75) 50%, rgba(255, 240, 190, .35)); opacity: 0; transition: opacity .06s linear; pointer-events: none; }
+.cb-def.go .dv-dodge-bar .z::after { opacity: 1; }
+.cb-def.pp .dv-dodge-bar .z .p { box-shadow: 0 0 12px #fff, 0 0 22px rgba(170, 210, 255, .9); }
+.cb-def .dv-dodge-bar .z .p { z-index: 1; }
+.cb-def.ok .dv-dodge-t { text-shadow: 0 0 10px rgba(127, 224, 160, .8); }
+.dv.qte-on .dio *, .dv.qte-on .dv-c::before, .dv.qte-on .dv-c::after, .dv.qte-on .dv-c .dv-art::after { animation-play-state: paused !important; }
+.cb-def .df-go, .cb-def .df-pp { will-change: opacity; }
