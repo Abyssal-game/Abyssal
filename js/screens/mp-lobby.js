@@ -360,7 +360,15 @@ export function createMpLobby(app, root, spec) {
     else if (document.visibilityState === 'visible' && alive && !ui.open) lobby();
   };
   return {
-    show() { alive = true; document.addEventListener('visibilitychange', onVis); return ui.open ? open(ui.open) : lobby(); },
+    show() {
+      alive = true; document.addEventListener('visibilitychange', onVis);
+      /* v696 : défi accepté depuis l'Accueil (« Le Cercle t'attend ») : on le rejoint puis on ouvre la partie */
+      if (ui.join) {
+        const id = ui.join; ui.join = null; busy = true;
+        return withPending(spec.join(id)).then(() => { busy = false; return open(id); }, (e) => { busy = false; toast(esc(errMsg(e)), { kind: 'error' }); return lobby(); });
+      }
+      return ui.open ? open(ui.open) : lobby();
+    },
     stop() {
       alive = false; stopPoll(); document.removeEventListener('visibilitychange', onVis);
       /* v527 : une recherche rapide s'annule quand on quitte l'écran (sinon la partie démarrerait sans toi et serait perdue au temps) */

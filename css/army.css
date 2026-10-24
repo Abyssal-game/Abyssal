@@ -6554,3 +6554,25 @@ html[data-mat="tp-eclipse"] .sc-plate, html .sc-board[data-pmat="tp-eclipse"] .s
 .fz-row > .btn { flex: none; }
 /* v695 : la bulle de l’arbitre des Sceaux cachait le début de la consigne */
 body:has(.sc-dlg) .sc-game .sc-msg { visibility: hidden; }
+/* v696 : Accueil, « Le Cercle t’attend » : parties à jouer, défis, duels du Pari, demandes d’ami, avec leurs boutons */
+.ol-wrap { padding: 12px; display: grid; gap: 10px; border-color: rgba(242, 193, 78, .55); box-shadow: 0 0 0 1px rgba(242, 193, 78, .18), 0 8px 26px rgba(242, 193, 78, .14); }
+.ol-h { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0; font-size: 1.12rem; color: #F2D79A; }
+.ol-h .mi, .ol-h img { width: 26px; height: 26px; }
+.ol-n { min-width: 24px; height: 24px; padding: 0 7px; border-radius: 12px; background: #C8323F; color: #fff; font-size: .85rem; display: inline-grid; place-items: center; box-shadow: 0 0 10px rgba(224, 72, 94, .6); }
+.ol-card { position: relative; display: grid; grid-template-columns: 54px minmax(0, 1fr); grid-template-areas: "av t" "acts acts"; gap: 8px 12px; align-items: center; padding: 12px; border-radius: 14px; overflow: hidden; isolation: isolate; border: 1px solid rgba(200, 164, 93, .45); background: #120d14; }
+.ol-card::before { content: ""; position: absolute; inset: 0; z-index: -2; background: var(--bn) center / cover no-repeat; opacity: .55; }
+.ol-card::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(10, 7, 12, .94) 0%, rgba(10, 7, 12, .78) 55%, rgba(10, 7, 12, .5) 100%); }
+.ol-card.hot { border-color: rgba(242, 193, 78, .85); animation: olGlow 2.4s ease-in-out infinite; }
+@keyframes olGlow { 50% { box-shadow: 0 0 16px rgba(242, 193, 78, .35); } }
+.ol-av { grid-area: av; width: 54px; height: 54px; border-radius: 50%; overflow: hidden; border: 2px solid #C8A45D; background: #1a1320; display: grid; place-items: center; }
+.ol-av img, .ol-av svg { width: 100%; height: 100%; object-fit: cover; }
+.ol-t { grid-area: t; display: grid; gap: 2px; min-width: 0; }
+.ol-k { font-size: .74rem; letter-spacing: .04em; text-transform: uppercase; color: #F2C14E; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.ol-tag { font-style: normal; text-transform: none; letter-spacing: 0; font-size: .7rem; padding: 1px 7px; border-radius: 8px; background: rgba(255, 255, 255, .1); color: #ddd; }
+.ol-tag.fast { background: rgba(224, 72, 94, .3); color: #FFC9D0; }
+.ol-l { font-size: .98rem; color: #f3ead8; overflow-wrap: anywhere; }
+.ol-time { font-size: .78rem; color: #c9bba0; }
+.ol-acts { grid-area: acts; display: flex; gap: 8px; }
+.ol-acts .btn { flex: 1 1 0; min-height: 44px; justify-content: center; }
+@media (prefers-reduced-motion: reduce) { .ol-card.hot { animation: none; } }
+.ol-h .ol-em { width: 30px; height: 30px; border-radius: 50%; }

@@ -1,9 +1,12 @@
 // Accueil : logo, deux accès principaux et ce qui est à faire aujourd'hui.
-import { mpw } from '../cloud/mpwatch.js';
+import { mpw, checkTurns } from '../cloud/mpwatch.js';
+import * as cloud from '../cloud/cloud.js';
+import { shownName, profileAttrs } from '../ui/report.js';
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { artUrl, hasRealArt } from '../art/assets.js';
 import { icon, EMBLEM, sigil, picon } from '../ui/icons.js';
 import { esc, fmt, toast, bindActions, pct, openSheet } from '../ui/dom.js';
+import { t } from '../i18n.js';
 import { FACTION_ORDER, ECONOMY } from '../config.js';
 import { seeded } from '../art/geometry.js';
 import { today } from '../core/save.js';
@@ -36,8 +39,7 @@ export default function home(app, root) {
     /* v466 : défis du jour de la Salle des jeux encore à relever */
     { const gl = g.gamesDailyLeft(); if (gl.length) rows.push(`<a class="td-row" href="#/jeux"><span class="td-ic mi" style="--mc:#C9A45A">${picon('seal')}</span><span class="td-t"><b>Jeux du jour</b><span class="small muted">${gl.length} défi${gl.length > 1 ? 's' : ''} à relever · un coffre de bois par victoire</span></span>${icon('next')}</a>`); }
     if (chests) rows.push(`<a class="td-row" href="#/coffres"><span class="td-ic mi" style="--mc:#E8C35A">${picon('chest')}</span><span class="td-t"><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Éclats et boosters</span></span>${icon('next')}</a>`);
-    // v521 : ce qui t'attend en ligne (à toi de jouer, défis, duels à voir, demandes d'ami), en tête
-    for (const it of mpw.items) rows.unshift(`<a class="td-row td-live" href="${it.href}"><span class="td-ic mi" style="--mc:#F2C14E">${picon(it.icon)}</span><span class="td-t"><b>${it.title}</b><span class="small muted">${it.sub}</span></span><span class="td-new">!</span>${icon('next')}</a>`);
+    // v696 : ce qui t'attend en ligne est maintenant dans « Le Cercle t'attend », en tête de l'Accueil
     rows.push('<h3 class="td-sub">Missions</h3>'); /* v658 : « Missions » (le coffre de la semaine n'est pas une mission du jour) */
     m.list.forEach((x, i) => {
       const done = x.p >= x.n;
@@ -48,6 +50,45 @@ export default function home(app, root) {
     return `<section class="panel today"><div class="today-head"><h2>Aujourd’hui</h2></div>${rows.join('')}</section>`;
   }
 
+
+  // v696 : « Le Cercle t'attend » : chaque partie à jouer, défi reçu, duel du Pari à voir et demande d'ami,
+  // avec son bouton (Jouer, Accepter, Refuser, Voir) : plus besoin d'aller chercher le défi dans le menu du jeu.
+  const GAME = {
+    sceaux: { name: 'Duels des Sceaux', bn: 'bn-sceaux', mode: 'sceaux', route: 'sceaux' },
+    pacte: { name: 'Le Pacte', bn: 'bn-pacte', mode: 'pacte', route: 'pacte' },
+    encheres: { name: 'Les Enchères', bn: 'bn-encheres', mode: 'encheresMode', route: 'encheres' },
+    cryptes: { name: 'Les Cryptes', bn: 'bn-cryptes', mode: 'cryptesMode', route: 'cryptes' },
+    versus: { name: 'Le Pari des Boosters', bn: 'bn-versus', route: 'versus' },
+    amis: { name: 'Amis', bn: 'bn-amis', route: 'amis' },
+  };
+  const portrait = (id) => { const c = id && cat.get(id); return c ? `<img alt="" src="${artUrl(c, { lite: true })}">` : EMBLEM; };
+  const leftOf = (x) => {
+    const ms = new Date(x.deadline).getTime() - Date.now();
+    if (!(ms > 0)) return '';
+    if (x.pace === 'fast') return t('{n} s pour jouer', { n: Math.ceil(ms / 1000) });
+    const h = Math.floor(ms / 3600000), mn = Math.floor((ms % 3600000) / 60000);
+    return h ? t('{h} h {m} pour jouer', { h, m: String(mn).padStart(2, '0') }) : t('{m} min pour jouer', { m: mn });
+  };
+  function circleHTML() {
+    const list = mpw.cards || [];
+    if (!list.length) return '';
+    const card = (x, i) => {
+      const G = GAME[x.game] || GAME.sceaux, who = `<b translate="no">${esc(shownName(x.foe.id, x.foe.pseudo))}</b>`;
+      const pace = x.pace === 'fast' ? `<i class="ol-tag fast">${t('Rapide')}</i>` : x.pace ? `<i class="ol-tag">${t('Lente')}</i>` : '';
+      let kick, line, acts;
+      if (x.k === 'turn') { kick = 'À toi de jouer'; line = t('Contre {name}', { name: who }); acts = `<button class="btn small primary" data-act="olplay" data-i="${i}">${icon('swords')}Jouer</button>`; }
+      else if (x.k === 'inv') { kick = 'Défi reçu'; line = t('{name} te défie', { name: who }); acts = `<button class="btn small primary" data-act="oljoin" data-i="${i}">Accepter</button><button class="btn small ghost" data-act="olno" data-i="${i}">Refuser</button>`; }
+      else if (x.k === 'pari-see') { kick = 'Duel à voir'; line = t('{name} a relevé ton défi', { name: who }); acts = `<button class="btn small primary" data-act="olgo" data-i="${i}">Voir le duel</button>`; }
+      else if (x.k === 'pari-inv') { kick = 'Défi reçu'; line = t('{name} te défie', { name: who }); acts = `<button class="btn small primary" data-act="olgo" data-i="${i}">Voir le défi</button>`; }
+      else { kick = 'Demande d’ami'; line = t('{name} veut devenir ton ami', { name: who }); acts = `<button class="btn small primary" data-act="olfyes" data-i="${i}">Accepter</button><button class="btn small ghost" data-act="olfno" data-i="${i}">Refuser</button>`; }
+      const time = x.k === 'turn' ? leftOf(x) : '';
+      return `<div class="ol-card ${G.bn} ${x.k === 'turn' ? 'hot' : ''}">
+        <span class="ol-av"${profileAttrs(x.foe.id)}>${portrait(x.foe.avatar)}</span>
+        <span class="ol-t"><span class="ol-k">${kick} · ${t(G.name)}${pace}</span><span class="ol-l">${line}</span>${time ? `<span class="ol-time">${time}</span>` : ''}</span>
+        <span class="ol-acts">${acts}</span></div>`;
+    };
+    return `<section class="panel ornate ol-wrap"><h2 class="ol-h"><img class="ol-em" alt="" src="assets/brand/emblem.webp">Le Cercle t’attend<span class="ol-n">${list.length}</span></h2>${list.map(card).join('')}</section>`;
+  }
   // Objectifs : un proche, un de progression, un de collection ; chacun mène à son écran
   // Objectifs : le premier en grand en haut de l'accueil (« Ton prochain objectif »), les autres plus bas
   const goals = g.welcomePending() ? [] : g.goals().filter((x) => x.kind !== 'trial'); /* v411 : les Épreuves sont dans « Aujourd'hui » */
@@ -62,6 +103,7 @@ export default function home(app, root) {
     </section>
 
     ${g.welcomePending() ? `<a class="panel ornate hw-welcome" href="#/boutique"><span class="hw-ic">${picon('ticket')}</span><span><b>${g.s.welcomeGift > 0 ? `Cadeau de bienvenue : ${g.s.welcomeGift > 1 ? `${g.s.welcomeGift} boosters offerts` : '1 booster offert'} !` : g.s.tickets.standard > 1 ? `Tes ${g.s.tickets.standard} boosters de bienvenue t’attendent` : 'Ton booster de bienvenue t’attend'}</b><span class="small">${g.s.welcomeGift > 0 && g.freePack().stock ? 'Plus ton booster gratuit du jour. ' : ''}Ouvre-les pour découvrir tes premières créatures : elles formeront ton équipe.</span></span>${icon('next')}</a>` : ''}
+    ${circleHTML()}
     ${mainGoalHTML()}
 
     ${todayHTML()}
@@ -71,7 +113,35 @@ export default function home(app, root) {
   document.querySelectorAll('body > .online-pill').forEach((x) => x.remove());
   lazyArt(root);
   setScene('home');
+  function openMatch(x, join) {
+    const G = GAME[x.game]; if (!G) return;
+    (app.state[G.mode] ||= { mode: 'solo' }).mode = 'mp';
+    const ui = (app.state[`mp_${x.game}`] ||= { open: null, sel: null });
+    if (join) { ui.open = null; ui.join = x.id; } else { ui.join = null; ui.open = x.id; }
+    app.sfx.tap?.();
+    app.go(G.route);
+  }
+  async function friendAnswer(el, yes) {
+    const x = mpw.cards[Number(el.dataset.i)]; if (!x) return;
+    el.disabled = true;
+    try { await cloud.friendRespond(x.id, yes); toast(yes ? 'Vous êtes maintenant amis !' : 'Demande refusée.', { kind: yes ? 'success' : undefined, icon: 'user' }); } catch (e) { toast(esc(e.message), { kind: 'error' }); }
+    await checkTurns(app, { force: true }); app.refresh();
+  }
+  /* v696 : l'Accueil relit ce qui t'attend en ligne (au plus toutes les 15 s) */
+  checkTurns(app, { gap: 15000, force: true });
   bindActions(root, {
+    /* v696 : boutons de « Le Cercle t'attend » */
+    olplay(el) { const x = mpw.cards[Number(el.dataset.i)]; if (x) openMatch(x, false); },
+    oljoin(el) { const x = mpw.cards[Number(el.dataset.i)]; if (x) openMatch(x, true); },
+    olgo(el) { const x = mpw.cards[Number(el.dataset.i)]; if (x) app.go((GAME[x.game] || GAME.amis).route); },
+    async olno(el) {
+      const x = mpw.cards[Number(el.dataset.i)]; if (!x) return;
+      el.disabled = true;
+      try { await cloud.mpLeave(x.id); toast('Défi refusé.', { icon: 'user' }); } catch (e) { toast(esc(e.message), { kind: 'error' }); }
+      await checkTurns(app, { force: true }); app.refresh();
+    },
+    async olfyes(el) { await friendAnswer(el, true); },
+    async olfno(el) { await friendAnswer(el, false); },
     minfo(el) { /* v658 : toucher une mission montre sa récompense */
       const x = g.missions().list[Number(el.dataset.i)]; if (!x) return;
       const done = x.p >= x.n;

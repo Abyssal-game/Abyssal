@@ -231,6 +231,7 @@ function renderChrome() {
     const dot = '<span class="badge dot"></span>';
     const badge = key === 'boutique' && ticketCount + g.chestCount() ? `<span class="badge">${ticketCount + g.chestCount()}</span>` /* v428 : boosters et coffres à ouvrir */
       : key === 'collection' && nNew ? dot
+      : key === 'antre' && mpw.cards?.length ? `<span class="badge">${mpw.cards.length}</span>` /* v696 : « Le Cercle t'attend » sur l'Accueil */
       : key === 'antre' && (g.canDailyClaim() || g.missionsToClaim()) ? dot
       : key === 'descente' && (mpw.turns + mpw.games) ? `<span class="badge">${mpw.turns + mpw.games}</span>` /* v521 : en ligne, à toi de jouer ou défi à voir */
       : key === 'menu' && mpw.friends ? `<span class="badge">${mpw.friends}</span>` /* v521 : demandes d'ami */
