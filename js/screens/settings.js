@@ -3,7 +3,7 @@ import { notifSupported, pushSupported, enable as notifEnable } from '../notify.
 import { resetTips } from '../ui/coach.js';
 import { TUTOS, tuto } from '../ui/tutos.js';
 import { icon, EMBLEM } from '../ui/icons.js';
-import { esc, fmt, toast, confirmBox, openSheet, bindActions, withPending } from '../ui/dom.js';
+import { esc, fmt, toast, confirmBox, openSheet, bindActions, withPending, paint } from '../ui/dom.js';
 import { sfx, haptic } from '../ui/sound.js';
 import { partie, pendingOps } from '../cloud/partie.js';
 /* v539 : où vit la progression (serveur de partie, ou ancienne sauvegarde tant qu'il n'est pas en place) */
@@ -172,15 +172,18 @@ export default function settings(app, root) {
   function render() {
     const s = g.s.settings;
     const body = { jeu: (x) => tabJeu(x) + tabSave(), tutos: tabTutos, about: tabAbout }[ui.tab] || ((x) => tabJeu(x) + tabSave());
-    root.innerHTML = `
+    paint(root, `
       <header class="screen-head ui-hero bn-settings"><h1>Réglages</h1><p class="muted">Langue, son, combat, tutoriels.</p></header>
       <nav class="set-tabs" role="tablist">${TABS.map(([k, l, ic, fb]) => `<button class="set-tab" role="tab" aria-selected="${ui.tab === k}" data-act="tab" data-k="${k}">${tabIcon(ic, fb)}<span>${l}</span></button>`).join('')}</nav>
-      <div class="set-body">${body(s)}</div>`;
+      <div class="set-body">${body(s)}</div>`);
     paintPill(); if (isGardien() && ui.tab === 'about') paintInline();
-    root.querySelectorAll('[data-mus]').forEach((b) => b.addEventListener('click', () => { musicPreview(MUSIC_DEMO[+b.dataset.mus][1]); root.querySelectorAll('[data-mus]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); }));
-    root.querySelector('#mvol')?.addEventListener('input', (e) => { g.s.settings.musicVol = Number(e.target.value); app.applySettings(); });
-    root.querySelector('#mvol')?.addEventListener('change', (e) => g.setSetting('musicVol', Number(e.target.value)));
-    root.querySelector('#vol')?.addEventListener('change', (e) => { g.setSetting('volume', Number(e.target.value)); app.applySettings(); sfx.tap(); });
+    root.querySelectorAll('[data-mus]').forEach((b) => !b.__b && (b.__b = 1) && b.addEventListener('click', () => { musicPreview(MUSIC_DEMO[+b.dataset.mus][1]); root.querySelectorAll('[data-mus]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); }));
+    /* v707 : paint() garde les blocs inchangés : on n'ajoute un écouteur qu'une fois */
+    const once = (el) => (el && !el.__b ? ((el.__b = 1), el) : null);
+    const mv = once(root.querySelector('#mvol'));
+    mv?.addEventListener('input', (e) => { g.s.settings.musicVol = Number(e.target.value); app.applySettings(); });
+    mv?.addEventListener('change', (e) => g.setSetting('musicVol', Number(e.target.value)));
+    once(root.querySelector('#vol'))?.addEventListener('change', (e) => { g.setSetting('volume', Number(e.target.value)); app.applySettings(); sfx.tap(); });
   }
 
   bindActions(root, {
@@ -198,7 +201,15 @@ export default function settings(app, root) {
       toast(online === false && isLoggedIn() ? 'Progression effacée sur ce téléphone, mais pas encore en ligne (réseau). Garde l’app ouverte quelques secondes.' : 'Progression effacée.', { icon: 'trash' });
       app.go('');
     },
-    tab(el) { ui.tab = el.dataset.k; sfx.tap(); render(); },
+    /* v707 : changer d'onglet quand les onglets sont collés en haut : on repart du début du nouvel onglet,
+       onglets à la même place (avant, la page sautait quand le nouvel onglet était plus court) */
+    tab(el) {
+      const nav = root.querySelector('.set-tabs'), head = root.querySelector('.screen-head');
+      const lim = head && nav ? Math.max(0, head.getBoundingClientRect().bottom + window.scrollY + (parseFloat(getComputedStyle(nav).marginTop) || 0) - (parseFloat(getComputedStyle(nav).top) || 0)) : 0;
+      const stuck = window.scrollY > lim;
+      ui.tab = el.dataset.k; sfx.tap(); render();
+      if (stuck) window.scrollTo(0, lim);
+    },
     online() { openOnline(); },
     livecheck() { liveCheck({ force: true }); },
     async restore() {
@@ -206,7 +217,8 @@ export default function settings(app, root) {
       try { const got = await withPending(iapRestore(app), t('Vérification de tes achats…')); toast(got.length ? t('{n} achat(s) ajouté(s).', { n: got.length }) : t('Tout est déjà à toi : rien à restaurer.'), { kind: got.length ? 'success' : 'info', icon: got.length ? 'star' : 'check' }); }
       catch (err) { toast(esc(err.message), { kind: 'error' }); }
     },
-    tuto(el) { tuto(app, el.dataset.k, { force: true }).then(() => render()); },
+    /* v707 : à la fermeture de la bulle, seule la ligne change (« Déjà vu ») : plus de page redessinée qui saute */
+    tuto(el) { tuto(app, el.dataset.k, { force: true }).then(() => { const b = root.querySelector(`[data-act="tuto"][data-k="${el.dataset.k}"]`); if (!b) return render(); b.classList.remove('new'); const m = b.querySelector('.small.muted'); if (m) m.textContent = t('Déjà vu'); }); },
     welcome() { showWelcome(app, { force: true }); },
     guide() { resetTips(app); toast('Les bulles d’aide réapparaîtront au bon moment.', { icon: 'info' }); render(); },
     // v412 : Mode Créateur sans badge en ligne (l'app iPhone n'a pas toujours le profil) : 7 touchers sur la version, puis le code

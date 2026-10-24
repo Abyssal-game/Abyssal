@@ -2,7 +2,7 @@
 import { fondStyle, fondCls } from '../ui/vitrine.js'; /* v700 : ton fond de profil sur la tuile */
 import { icon, EMBLEM, picon } from '../ui/icons.js';
 import { artUrl } from '../art/assets.js';
-import { esc, fmt } from '../ui/dom.js';
+import { esc, fmt, paint } from '../ui/dom.js';
 import { sync } from '../cloud/sync.js';
 import { isLoggedIn, friendList } from '../cloud/cloud.js';
 import { openCreator } from './creator.js';
@@ -18,7 +18,7 @@ export default function menu(app, root) {
   // v316 : le Profil est une grande tuile en largeur (avatar, nom, niveau), les quatre autres forment un carré ;
   // la tuile du Créateur, rare, prend aussi toute la largeur en bas.
   const profile = `<a class="mn-tile mn-wide mn-prof ${fondCls(s.fond)}" href="#/profil"${fondStyle(s.fond)}><span class="mn-tile-ic avatar-big pf pf-${s.frame}">${av ? `<img alt="" src="${artUrl(av)}">` : EMBLEM}</span><b>${esc(sync.profile?.pseudo || s.name || 'Ton profil')}</b><span>Niveau ${lv.level} · ${esc(s.title)}</span><em>Vitrine, titres, statistiques</em></a>`;
-  root.innerHTML = `
+  paint(root, `
     <header class="screen-head mn-head ui-hero bn-sanctuary"><h1>Le Sanctuaire</h1><p class="muted">Ton profil, tes amis, tes succès et les réglages du jeu.</p></header>
     <nav class="mn-grid">
       ${profile}
@@ -28,7 +28,7 @@ export default function menu(app, root) {
       ${T('#/compte', 'account', 'Compte', 'Pseudo, mot de passe, déconnexion')}
       ${T('#/parametres', 'settings', 'Réglages', 'Langue, son, combat, tutoriels')}
       ${creator ? A('creator', 'creator', 'Mode Créateur', s.settings.dev ? 'Actif' : 'Pouvoirs du créateur').replace('class="mn-tile"', 'class="mn-tile mn-wide"') : ''}
-    </nav>`;
+    </nav>`);
   root.addEventListener('click', (e) => {
     const b = e.target.closest('[data-mn]');
     if (!b) return;

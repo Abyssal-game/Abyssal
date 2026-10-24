@@ -3,7 +3,7 @@ import { tuto } from '../ui/tutos.js';
 import { BOOSTERS, RARITIES, PITY, FACTION_ORDER, ECONOMY, VARIANT_RATES } from '../config.js';
 import { boosterOdds } from '../core/boosters.js';
 import { icon, sigil, EMBLEM } from '../ui/icons.js';
-import { esc, fmt, openSheet, bindActions, toast } from '../ui/dom.js';
+import { esc, fmt, openSheet, bindActions, toast, paint } from '../ui/dom.js';
 import { artUrl, hasRealArt } from '../art/assets.js';
 import { RARITY } from '../config.js';
 import { openPack } from './opening.js';
@@ -150,7 +150,7 @@ export default function shop(app, root, params = []) {
         ${below ? `<div class="product-below">${below}</div>` : ''}
       </article>`;
     };
-    root.innerHTML = `
+    paint(root, `
       ${giftHTML(g, cat)}
       <!-- v428 : plus de bannière ni d'encart du Tirage (il a son sous-onglet) : les boosters directement -->
       ${(() => { const n = ownedPacks(); return n >= 2 ? `<button class="btn gold block dc-plq dc-plq-dark shop-all" data-act="openall">${icon('ticket')}Ouvrir mes ${n} boosters</button>` : ''; })()}
@@ -161,7 +161,7 @@ export default function shop(app, root, params = []) {
         ${card('premium')}
         ${g.s.tickets.abysse ? card('abysse') : ''}
       </div>
-    `;
+    `);
     requestAnimationFrame(fitBuy); setTimeout(fitBuy, 600); document.fonts?.ready.then(fitBuy); /* après la traduction et la police */
   }
   // v529 : le texte d'un bouton d'ouverture se réduit juste assez pour rester dans son cadre (il débordait sur le bord doré)

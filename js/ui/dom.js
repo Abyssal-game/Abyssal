@@ -151,3 +151,32 @@ export const EMPTY_ART = true;
 export function emptyHTML(text) {
   return `<div class="empty-art">${EMPTY_ART ? '<img alt="" src="assets/ui/vide.webp">' : ''}<p class="small muted center">${text}</p></div>`;
 }
+
+/* v707 : redessiner un écran sans tout effacer. Avant, root.innerHTML = … recréait toute la page (bannière, onglets, icônes) :
+   sur iPhone, la page devenait vide une image puis sautait de haut en bas (vidéo du propriétaire, 24 octobre 2026).
+   paint() garde chaque bloc dont le code n'a pas changé, descend d'un ou deux niveaux dans les blocs de même nature,
+   et ne remplace que ce qui a changé. On compare le code d'origine (__src), pas le DOM vivant (traduit, retouché). */
+const srcOf = (n) => n.outerHTML;
+const openTag = (n) => { const c = n.cloneNode(false); c.innerHTML = ''; return c.outerHTML; };
+const textless = (n) => { for (const c of n.childNodes) if (c.nodeType === 3 ? c.nodeValue.trim() : c.nodeType !== 1 && c.nodeType !== 8) return false; return true; };
+function keepChildren(live, fresh, depth) {
+  const nu = [...fresh.children], old = [...live.children];
+  nu.forEach((n, i) => {
+    const o = old[i];
+    n.__src = srcOf(n);
+    if (o && o.__src === n.__src) return;
+    if (o && depth > 0 && o.__open && o.__open === openTag(n) && textless(o) && textless(n)) {
+      keepChildren(o, n, depth - 1); o.__src = n.__src; return;
+    }
+    n.__open = openTag(n);
+    if (o) o.replaceWith(n); else live.appendChild(n);
+    for (const c of n.querySelectorAll('*')) { c.__src = c.outerHTML; c.__open = openTag(c); }
+  });
+  for (let i = nu.length; i < old.length; i++) old[i].remove();
+}
+export function paint(root, html, depth = 2) {
+  const t = document.createElement('template'); t.innerHTML = html;
+  if (!root.children.length || !textless(t.content)) { root.innerHTML = html; for (const c of root.querySelectorAll('*')) { c.__src = c.outerHTML; c.__open = openTag(c); } return; }
+  const holder = document.createElement('div'); holder.append(t.content);
+  keepChildren(root, holder, depth);
+}

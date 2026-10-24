@@ -6,7 +6,7 @@ import { CODEX, CODEX_XP, CODEX_XP_LABEL, tiersOf, seasonByKey, CODEX_FRAMES, CO
 import { FRAMES } from '../config.js';
 import { CHESTS } from '../core/descent.js';
 import { icon, picon } from '../ui/icons.js';
-import { esc, fmt, toast, confirmBox, openSheet, withPending } from '../ui/dom.js';
+import { esc, fmt, toast, confirmBox, openSheet, withPending, paint } from '../ui/dom.js';
 import { cardHTML, enableTilt } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
 import { EMBLEM } from '../ui/icons.js';
@@ -289,10 +289,10 @@ export default function codexScreen(app, root) {
 
   function draw() {
     if (!g.shopOn() && !reviewing) { location.replace('#/boutique'); return; } /* caché : rien ne doit trahir le pass hors Mode Créateur */
-    root.innerHTML = `<header class="screen-head ui-hero ${ui.tab === 'shop' ? 'bn-echoppe' : 'bn-codex'} cx-top"><h1>${ui.tab === 'shop' ? 'L’Échoppe' : esc(CODEX.name)}</h1>${preview0() ? '<span class="sc-rec">Aperçu Créateur · invisible pour les joueurs</span>' : ''}</header>
+    paint(root, `<header class="screen-head ui-hero ${ui.tab === 'shop' ? 'bn-echoppe' : 'bn-codex'} cx-top"><h1>${ui.tab === 'shop' ? 'L’Échoppe' : esc(CODEX.name)}</h1>${preview0() ? '<span class="sc-rec">Aperçu Créateur · invisible pour les joueurs</span>' : ''}</header>
       <nav class="cx-tabs2" aria-label="Codex et Échoppe">${[['codex', 'Le Codex', 'Paliers de la saison', 'book'], ['shop', 'L’Échoppe', 'Cosmétiques', 'obsidienne']].map(([k, l, sub, ic]) => `<button class="cx-tab2 t-${k}" data-cx="tab" data-v="${k}" aria-pressed="${ui.tab === k}"><img alt="" src="assets/icons/${ic}.webp"><span><b>${l}</b><small>${sub}</small></span></button>`).join('')}</nav>
       ${ui.tab === 'shop' ? shopTab() : g.codexOn() ? codexTab() : soonTab()}
-      ${g.s.settings?.dev ? devTab() : ''}`;
+      ${g.s.settings?.dev ? devTab() : ''}`);
     if (ui.tab !== 'shop' && !ui.scrolled) { ui.scrolled = true; requestAnimationFrame(() => document.getElementById('cx-now')?.scrollIntoView({ block: 'center' })); }
   }
 

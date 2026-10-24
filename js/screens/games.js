@@ -1,3 +1,4 @@
+import { paint } from '../ui/dom.js';
 // v425 : le Cercle de l’Abysse (Aventure → Jeux) : les jeux de cartes à part (Duels des Sceaux, Enchères, Pacte, Cryptes).
 import { icon } from '../ui/icons.js';
 import { setScene } from '../ui/scene.js';
@@ -24,7 +25,7 @@ export default function gamesScreen(app, root) {
   const nextHTML = (k) => { const n = nextOf[k]?.(); return n ? `<span class="gm-next">${n.map((r) => `<img alt="" src="assets/sceaux/rival-${r}.webp">`).join('')}<small>Prochain défi</small></span>` : ''; };
   const tile = (href, cls, title, sub, info, img) => `<a class="panel gm-tile ${cls}" href="${href}"><span class="gm-art" style="background-image:url(${img})"></span>
     <span class="gm-txt"><b>${title}</b><span class="small">${sub}</span><span class="small muted">${info}</span>${nextHTML(href.slice(2))}${daily(href.slice(2))}</span>${icon('next')}</a>`;
-  root.innerHTML = `<header class="screen-head ui-hero bn-jeux"><h1>Le Cercle de l’Abysse</h1><p class="muted">Des jeux de cartes contre les arbitres de l’Abysse, ou contre d’autres joueurs.</p></header>
+  paint(root, `<header class="screen-head ui-hero bn-jeux"><h1>Le Cercle de l’Abysse</h1><p class="muted">Des jeux de cartes contre les arbitres de l’Abysse, ou contre d’autres joueurs.</p></header>
     ${g.sceauxOpen() ? '' : `<section class="panel tr-lock">${icon('lock')}<b>Encore scellée</b><p class="small">Vaincs ton <b>premier gardien</b> dans la Descente (étage 5) pour ouvrir le Cercle de l’Abysse.</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`}
     <div class="gm-list ${g.sceauxOpen() ? '' : 'locked'}">
       ${tile('#/sceaux', 'gm-sceaux', 'Duels des Sceaux', 'Pose tes cartes sur un plateau de 3 × 3 et capture celles de l’adversaire.', `${rec(sc.wins, sc.losses)} · ${Object.keys(sc.beaten || {}).length} / 8 adversaires battus`, 'assets/ui/bn-sceaux.webp')}
@@ -32,7 +33,7 @@ export default function gamesScreen(app, root) {
       ${tile('#/pacte', 'gm-pacte', 'Le Pacte', 'Tire des cartes, encore une… et arrête-toi avant de briser le pacte.', `${rec(pa.wins, pa.losses)} · ${Object.keys(pa.beaten || {}).length} / ${PA.TABLES.length} pactes gagnés`, 'assets/ui/bn-pacte.webp')}
       ${tile('#/versus', 'gm-versus', 'Le Pari des Boosters', 'Contre un autre joueur : ouvrez vos boosters face à face, le meilleur total remporte toutes les cartes.', vs.played ? `${vs.played} duel${vs.played > 1 ? 's' : ''} · ${vs.wins} victoire${vs.wins > 1 ? 's' : ''} · ${vs.won} cartes gagnées` : 'Joue en ligne contre d’autres joueurs', 'assets/ui/bn-versus.webp')}
       ${tile('#/encheres', 'gm-encheres', 'Les Enchères de Mammon', 'Enchères à l’aveugle à trois : offre plus que les autres… sans jamais offrir pareil.', `${rec(en.wins, en.losses)} · ${Object.keys(en.beaten || {}).length} / ${EN.TABLES.length} ventes gagnées`, 'assets/ui/bn-encheres.webp')}
-    </div>`;
+    </div>`);
   /* v519 : parties en ligne qui attendent ton coup (v523 : Sceaux et Pacte) */
   if (cloud.isLoggedIn()) for (const gm of ['sceaux', 'pacte', 'encheres', 'cryptes']) cloud.mpList(gm).then((L) => {
     const n = L.filter((v) => v.status === 'playing' && (v.turn === v.me || v.turn === 'ab')).length;

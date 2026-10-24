@@ -3,7 +3,7 @@ import { sync } from '../cloud/sync.js';
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, EMBLEM, picon, setIcon } from '../ui/icons.js';
-import { esc, fmt, pct, bindActions, toast, openSheet } from '../ui/dom.js';
+import { esc, fmt, pct, bindActions, toast, openSheet, paint } from '../ui/dom.js';
 import { unlockSources } from '../core/unlocks.js';
 import { RARITIES, FRAMES, BOOSTERS, FACTION_ORDER, VARIANTS, RARITY, RARITY_ORDER } from '../config.js';
 import { CODEX_FRAMES, CODEX_BACKS, FINISHES, PLATES, SACHETS, TAPIS, FONDS, LIVE_BACKS, CATALOG, SEASONS, SHOP } from '../core/codex.js';
@@ -135,7 +135,7 @@ export default function profile(app, root) {
     const owned = g.uniqueCount(), total = g.total();
     const av = g.shownAvatar() && cat.get(g.shownAvatar());
     const show = (s.showcase.length ? s.showcase.map((id) => cat.get(id)) : g.bestCards(3)).filter(Boolean);
-    root.innerHTML = `
+    paint(root, `
       <section class="panel ornate profile-head bn-profile ${fondCls(s.fond)}"${fondStyle(s.fond)} data-act="custom">
         <div class="av-col"><button class="avatar-big pf pf-${s.frame}" data-act="custom" aria-label="Personnaliser ton profil">${av ? `<img alt="" src="${artUrl(av)}">` : EMBLEM}</button></div>
         <div class="ph-text">
@@ -176,7 +176,7 @@ export default function profile(app, root) {
       </div></details>
 
       ${s.history.length ? `<details class="panel dc-fold"><summary>${picon('openings')} Dernières ouvertures</summary><div class="history">${s.history.slice(0, 10).map((h) => `<div class="panel hist"><div class="row between small"><b>${esc(BOOSTERS[h.type]?.name || h.type)}${h.faction ? ` · ${esc(cat.faction[h.faction].name)}` : ''}</b><span class="muted">${new Date(h.t).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}</span></div><div class="hist-cards">${h.cards.map((c) => { const card = cat.get(c.id); return card ? `<button class="hist-c" data-id="${c.id}" style="--rc:${RARITIES.find((r) => r.key === card.rarity).color}" title="${esc(card.name)}"><img alt="${esc(card.name)}" loading="lazy" src="${artUrl(card, { lite: true })}">${c.n ? '<i>N</i>' : ''}${c.v !== 'normal' ? `<em>${esc(VARIANTS[c.v].short)}</em>` : ''}</button>` : ''; }).join('')}</div></div>`).join('')}</div></details>` : ''}
-    `;
+    `);
     lazyArt(root);
   }
   bindActions(root, {

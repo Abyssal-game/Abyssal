@@ -1,7 +1,7 @@
 // Succès et ensembles thématiques.
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { icon, setIcon } from '../ui/icons.js';
-import { esc, bindActions, fmt, toast, confirmBox } from '../ui/dom.js';
+import { esc, bindActions, fmt, toast, confirmBox, paint } from '../ui/dom.js';
 
 export default function achievements(app, root, params) {
   const g = app.game, cat = app.catalog;
@@ -46,10 +46,10 @@ export default function achievements(app, root, params) {
 
   function render() {
     const doneA = Object.keys(g.s.achievements).length, doneS = Object.keys(g.s.setsDone).length;
-    root.innerHTML = `
+    paint(root, `
       <header class="screen-head ui-hero bn-trophies"><h1>Succès</h1><p class="muted">${doneA} / ${cat.achievements.length} succès · ${doneS} / ${cat.sets.length} ensembles complétés</p></header>
       <div class="seg wide" role="tablist">${[['succes', 'Succès'], ['ensembles', 'Ensembles']].map(([k, l]) => `<button class="seg-b" role="tab" data-act="tab" data-v="${k}" aria-selected="${st.tab === k}" aria-pressed="${st.tab === k}">${l}</button>`).join('')}</div>
-      <div class="stack">${st.tab === 'succes' ? succes() : ensembles()}</div>`;
+      <div class="stack">${st.tab === 'succes' ? succes() : ensembles()}</div>`);
     lazyArt(root);
   }
   bindActions(root, {

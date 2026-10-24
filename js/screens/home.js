@@ -5,7 +5,7 @@ import { shownName, profileAttrs } from '../ui/report.js';
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { artUrl, hasRealArt } from '../art/assets.js';
 import { icon, EMBLEM, sigil, picon } from '../ui/icons.js';
-import { esc, fmt, toast, bindActions, pct, openSheet } from '../ui/dom.js';
+import { esc, fmt, toast, bindActions, pct, openSheet, paint } from '../ui/dom.js';
 import { t } from '../i18n.js';
 import { FACTION_ORDER, ECONOMY } from '../config.js';
 import { seeded } from '../art/geometry.js';
@@ -107,7 +107,7 @@ export default function home(app, root) {
     return `<a class="btn primary block big-cta dc-plq dc-plq-red hm-play" href="#/descente">${icon('p:descend')}<span><b>${label}</b><small>${sub}</small></span></a>`;
   }
   function mainGoalHTML() { return goals.length ? `<section class="panel ornate hg-main-wrap">${goalRow(goals[0], 'hg-main')}</section>` : ''; }
-  root.innerHTML = `
+  paint(root, `
     <section class="home-brand">
       <h1 class="hb-title"><img src="assets/brand/title.webp" alt="ABYSSAL — Le Bestiaire interdit"></h1>
     </section>
@@ -119,7 +119,7 @@ export default function home(app, root) {
 
     ${todayHTML()}
     <p class="home-col small muted center"><a href="#/collection">${owned} / ${total} créatures découvertes</a></p>
-  `;
+  `);
   // (v413 : le nombre de joueurs en ligne n'est plus sur l'Accueil : Réglages → À propos, tout en bas)
   document.querySelectorAll('body > .online-pill').forEach((x) => x.remove());
   lazyArt(root);
