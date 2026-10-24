@@ -72,6 +72,10 @@ export function openCreator(app) {
         <p class="small muted">${g.s.devCodex ? 'Affichés : onglet Butin → Codex. Toi seul les vois (Mode Créateur).' : 'Le futur pass de saison et la boutique en argent réel, encore cachés aux joueurs. Les achats y sont simulés.'}</p>
         <div class="row gap wrap">${B('codex', g.s.devCodex ? 'Cacher le Codex et l’Échoppe' : 'Afficher le Codex et l’Échoppe', g.s.devCodex ? '' : 'gold')}${g.s.devCodex ? B('codexgo', 'Ouvrir le Codex', '') : ''}</div></section>
 
+      <section class="cr-sec"><h3>Revue de l’Échoppe</h3>
+        <p class="small muted">Chaque objet en vente, un par un, tel que les joueurs le verront (profil, classement, partie en ligne, booster, plateau). Touche Garder ou Supprimer, puis « Copier la liste à supprimer » et colle-la dans la conversation avec Claude. Ton tri reste sur ce téléphone.</p>
+        <div class="row gap wrap">${B('shoprev', 'Passer l’Échoppe en revue', 'gold')}</div></section>
+
       <section class="cr-sec"><h3>Atelier des cosmétiques</h3>
         <p class="small muted">Tous les cadres, dos et finitions en aperçu, pour trier ceux à garder, à retirer ou à revoir.</p>
         <div class="row gap wrap">${B('lab', 'Ouvrir l’Atelier', 'gold')}${B('revue', 'Revue des doublons', '')}</div></section>
@@ -137,6 +141,7 @@ export function openCreator(app) {
       if (x === 'srv') { openServerState(); return; } /* v678 */
       if (x === 'lab') { openCosmeticsLab(app); return; } /* v556 */
       if (x === 'revue') { openCosmeticsReview(app); return; } /* v592 */
+      if (x === 'shoprev') { sheet.close(); app.shopReview = true; app.go('codex'); return; } /* v688 */
       if (x === 'deflab') { openDefenseLab(app); return; } /* v594 */
       if (x === 'labo') { sheet.close(); app.go('labo'); return; } /* v595 */
       if (x === 'sndtest') { app.applySettings(); sfx.victory?.(); setTimeout(draw, 900); return; } /* v622 */

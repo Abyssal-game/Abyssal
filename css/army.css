@@ -6530,3 +6530,9 @@ html.fx-light .dv.qte-on::after { animation: none; opacity: .85; }
 
 /* v686 : plus de halo lumineux qui tourne non plus sur les portraits des réactions (Échoppe, lots, partie en ligne) */
 .re-pic::after { content: none; animation: none; }
+
+/* v688 : Revue de l'Échoppe (Mode Créateur) : pied Garder / Supprimer */
+.shr-foot { flex-direction: column; gap: 6px; align-items: stretch; text-align: center; }
+.shr-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.shr-foot .btn.danger { background: #7a1c1c; border-color: #c94a4a; color: #fff; }
+.pv2:has(.shr-foot) .pv2-body { padding-bottom: 200px; }

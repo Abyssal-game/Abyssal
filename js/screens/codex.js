@@ -25,6 +25,8 @@ const obsTxt = (n) => `<span class="obs-n">${OBS_I}${fmt(n)}</span>`;
 export default function codexScreen(app, root) {
   const g = app.game, cat = app.catalog;
   const ui = (app.state.codex ||= { tab: 'codex' });
+  /* v688 : Mode Créateur → « Revue de l'Échoppe » : tous les objets en vente passés un à un dans l'aperçu, avec Garder / Supprimer */
+  const reviewing = !!app.shopReview; app.shopReview = false;
   setScene('shop');
 
   // Une récompense en une ligne (icône + texte)
@@ -286,7 +288,7 @@ export default function codexScreen(app, root) {
   }
 
   function draw() {
-    if (!g.shopOn()) { location.replace('#/boutique'); return; } /* caché : rien ne doit trahir le pass hors Mode Créateur */
+    if (!g.shopOn() && !reviewing) { location.replace('#/boutique'); return; } /* caché : rien ne doit trahir le pass hors Mode Créateur */
     root.innerHTML = `<header class="screen-head ui-hero ${ui.tab === 'shop' ? 'bn-echoppe' : 'bn-codex'} cx-top"><h1>${ui.tab === 'shop' ? 'L’Échoppe' : esc(CODEX.name)}</h1>${preview0() ? '<span class="sc-rec">Aperçu Créateur · invisible pour les joueurs</span>' : ''}</header>
       <nav class="cx-tabs2" aria-label="Codex et Échoppe">${[['codex', 'Le Codex', 'Paliers de la saison', 'book'], ['shop', 'L’Échoppe', 'Cosmétiques', 'obsidienne']].map(([k, l, sub, ic]) => `<button class="cx-tab2 t-${k}" data-cx="tab" data-v="${k}" aria-pressed="${ui.tab === k}"><img alt="" src="assets/icons/${ic}.webp"><span><b>${l}</b><small>${sub}</small></span></button>`).join('')}</nav>
       ${ui.tab === 'shop' ? shopTab() : g.codexOn() ? codexTab() : soonTab()}
@@ -313,7 +315,7 @@ export default function codexScreen(app, root) {
      flèches et points pour passer d'un objet à l'autre, puis l'objet « en situation » (profil, classement, partie, ouverture…)
      avec la bascule « Avec cet objet / Mon actuel », les endroits où on le verra, et le pied d'achat ou d'équipement.
      start : un objet (Échoppe ou récompense du Codex) ; list : les objets entre lesquels on navigue (rayon, saison, palier). */
-  function preview(start, list = null) {
+  function preview(start, list = null, opts = {}) {
     let items = (list || [start]).map((x) => (typeof x === 'string' ? CATALOG.find((c) => c.id === x) : x)).filter(Boolean);
     let at = Math.max(0, items.findIndex((x) => x === start || (typeof start === 'string' ? x.id === start : x.id === start?.id && x.kind === start?.kind)));
     if (!items.length) return;
@@ -367,7 +369,15 @@ export default function codexScreen(app, root) {
       return '';
     };
     const toggle = (o) => (['frame', 'plate', 'fond', 'title', 'back', 'sachet', 'mat'].includes(o.kind) ? `<div class="pv2-seg" role="group" aria-label="Comparer"><button class="${mode === 'with' ? 'on' : ''}" data-pv="mode" data-v="with">${icon('star')}Avec cet objet</button><button class="${mode === 'now' ? 'on' : ''}" data-pv="mode" data-v="now">Mon actuel</button></div>` : '');
-    const foot = (o) => { const own = ownedOf(o), on = own && worn(o);
+    /* v688 : pied de la revue (tri gardé sur l'appareil, rien n'est envoyé) */
+    const TRI = 'abyssal.shopTri';
+    const tri = () => { try { return JSON.parse(localStorage.getItem(TRI) || '{}'); } catch { return {}; } };
+    const setTri = (id, v) => { const m = tri(); if (v) m[id] = v; else delete m[id]; try { localStorage.setItem(TRI, JSON.stringify(m)); } catch {} };
+    const reviewFoot = (o) => { const m = tri(), v = m[o.id], ids = items.map((x) => x.id), done = ids.filter((i) => m[i]).length, del = ids.filter((i) => m[i] === 'del').length;
+      return `<div class="pv2-foot shr-foot" translate="no"><div class="shr-btns"><button class="btn ${v === 'keep' ? 'primary' : ''}" data-pv="tri" data-v="keep">${icon('check')}Garder</button><button class="btn ${v === 'del' ? 'danger' : ''}" data-pv="tri" data-v="del">${icon('close')}Supprimer</button></div>
+        <small class="muted">${esc(o.id)} · ${at + 1} / ${items.length} · triés ${done} · à supprimer ${del}</small>
+        <div class="shr-btns"><button class="btn small" data-pv="next-todo">Prochain non trié</button><button class="btn small" data-pv="copy">Copier la liste à supprimer</button></div></div>`; };
+    const foot = (o) => { if (opts.review) return reviewFoot(o); const own = ownedOf(o), on = own && worn(o);
       const wearBtn = own && wearable(o) && !on ? `<button class="btn primary pv2-buy" data-pv="wear">${icon('check')}Équiper</button>` : '';
       if (o.season) return `<div class="pv2-foot">${own ? (wearBtn || `<span class="cx-badge on">${icon('check')}${on ? 'Équipé' : 'Déjà à toi'}</span>`) : `<span class="pv2-src">${icon('star')}<span><b>Voie enluminée · palier ${o.tier}</b><small>Introuvable à l’Échoppe</small></span></span>`}</div>`;
       const cost = g.catalogCost(o.id);
@@ -398,6 +408,13 @@ export default function codexScreen(app, root) {
       const b = e.target.closest('[data-pv]'); if (!b) return;
       const o = it(), v = b.dataset.pv;
       if (v === 'mode') { mode = b.dataset.v; app.sfx.tap?.(); paint(); return; }
+      if (v === 'tri') { setTri(o.id, tri()[o.id] === b.dataset.v ? null : b.dataset.v); app.sfx.tap?.(); if (at < items.length - 1 && tri()[o.id]) { at++; mode = 'with'; } paint(); sh.el.scrollTo?.({ top: 0 }); return; }
+      if (v === 'next-todo') { const m = tri(), i = items.findIndex((x, j) => j > at && !m[x.id]), k = i >= 0 ? i : items.findIndex((x) => !m[x.id]); if (k < 0) { toast('Tout est trié.', { icon: 'check' }); return; } at = k; mode = 'with'; paint(); sh.el.scrollTo?.({ top: 0 }); return; }
+      if (v === 'copy') { const m = tri(), del = items.filter((x) => m[x.id] === 'del'), keep = items.filter((x) => m[x.id] === 'keep').length, todo = items.filter((x) => !m[x.id]).length;
+        const txt = `Revue de l'Échoppe (${items.length} objets : ${keep} gardés, ${del.length} à supprimer, ${todo} non triés)\nÀ SUPPRIMER :\n${del.map((x) => `- ${x.id} · ${nameOf(x)} (${KINDS[kindOf(x)]?.[1] || x.kind})`).join('\n') || '- (aucun)'}`;
+        try { await navigator.clipboard.writeText(txt); toast('Liste copiée : colle-la dans la conversation avec Claude.', { kind: 'success', icon: 'check' }); }
+        catch { openSheet(`<h3>Liste à supprimer</h3><p class="small muted">Copie ce texte à la main :</p><textarea class="input plain" style="width:100%;height:50vh" readonly>${esc(txt)}</textarea>`); }
+        return; }
       if (v === 'nav') { at = (at + +b.dataset.d + items.length) % items.length; mode = 'with'; pick = 0; plain = false; bare = false; app.sfx.tap?.(); paint(); sh.el.scrollTo?.({ top: 0 }); return; }
       if (v === 'buy') { try { if (await buy(o.id)) { paint(); app.chrome?.(); draw(); } } catch (err) { toast(esc(err.message), { kind: 'error' }); } }
       if (v === 'wear') { wear(o); app.sfx.tap?.(); toast(t('{name} : équipé.', { name: esc(tx(nameOf(o))) }), { kind: 'success', icon: 'check' }); paint(); draw(); }
@@ -448,4 +465,10 @@ export default function codexScreen(app, root) {
     app.chrome?.(); draw();
   });
   draw();
+  if (reviewing) { /* v688 : rayon par rayon, du moins rare au plus rare ; reprend au premier objet non trié */
+    const ord = Object.keys(KINDS), rk = ['rare', 'epic', 'leg', 'myth'];
+    const list = CATALOG.filter((x) => x.kind !== 'bundle' && KINDS[kindOf(x)]).sort((a, b) => ord.indexOf(kindOf(a)) - ord.indexOf(kindOf(b)) || rk.indexOf(rank(a)) - rk.indexOf(rank(b)));
+    let m = {}; try { m = JSON.parse(localStorage.getItem('abyssal.shopTri') || '{}'); } catch {}
+    preview(list.find((x) => !m[x.id]) || list[0], list, { review: true });
+  }
 }
