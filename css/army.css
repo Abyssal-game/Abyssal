@@ -6517,3 +6517,7 @@ html.fx-light .dv.qte-on::after { animation: none; opacity: .85; }
 .cx-quests > .small { margin: 0 0 10px; }
 .cx-tierbuy { display: flex; align-items: center; justify-content: center; gap: 8px; }
 .cx-paynote { display: block; margin-top: 6px; text-align: center; }
+/* v684 : annonce du Codex avant son ouverture (l'Échoppe ouvre avant) : texte sur toute la largeur, sans illustration à droite */
+.cx-pitch.cx-soon-txt { min-height: 0; }
+.cx-soon-txt .cx-pitch-in { max-width: none; }
+.cx-soon-shop { text-align: center; margin: 16px 0 8px; }

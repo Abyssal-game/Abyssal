@@ -2,7 +2,7 @@
 // v680 : ouverts à tous le premier jour de la Saison I (1er décembre 2026) ; les achats en euros passent par l'App Store
 // (js/iap.js, RevenueCat) et sont vérifiés par le serveur. Avant l'ouverture : aperçu Créateur, achats simulés.
 import { iapStatus, IAP_WHY, iapBuy, iapRestore, priceOf } from '../iap.js'; /* v680 */
-import { CODEX, CODEX_XP, CODEX_XP_LABEL, tiersOf, seasonByKey, CODEX_FRAMES, CODEX_BACKS, FINISHES, PLATES, EMOTES, SACHETS, TAPIS, FONDS, SHOP, CATALOG, OBS, codexTier, tierProgress, claimable, freshCodex } from '../core/codex.js';
+import { CODEX, CODEX_XP, CODEX_XP_LABEL, tiersOf, seasonByKey, CODEX_FRAMES, CODEX_BACKS, FINISHES, PLATES, EMOTES, SACHETS, TAPIS, FONDS, SHOP, CATALOG, OBS, codexTier, tierProgress, claimable, freshCodex, SEASONS } from '../core/codex.js';
 import { FRAMES } from '../config.js';
 import { CHESTS } from '../core/descent.js';
 import { icon, picon } from '../ui/icons.js';
@@ -86,6 +86,25 @@ export default function codexScreen(app, root) {
         <span class="cx-q-bar"><i style="width:${Math.round((x.have / x.n) * 100)}%"></i></span></li>`).join('')}</ul>
       <p class="small muted">Chaque défi rempli donne ${CODEX.questXp} points (un palier). Trois nouveaux défis chaque semaine.</p>
       ${max ? '' : `<button class="btn ghost block cx-tierbuy" data-cx="tier">${icon('plus')}Acheter un palier · ${obsTxt(CODEX.tierObs)}</button>`}</section>`;
+  }
+  /* v684 : l'Échoppe est ouverte mais pas encore le Codex : l'annonce de la première saison et ce qu'elle donnera */
+  function soonTab() {
+    const se = SEASONS[0], d = se.starts.split('-').reverse().join('/');
+    const days = Math.max(1, Math.ceil((new Date(`${se.starts}T00:00:00`) - g.clock()) / 864e5));
+    const loot = tiersOf(se.key).flatMap((x) => seasonItems(x.prem, x.tier, x.tier === 30).map((it) => ({ x, it }))); ui.loot = loot.map((o) => o.it);
+    return `<section class="cx-season cx-soon">
+        ${opt(se.art, 'cx-season-art')}
+        <div class="cx-season-in"><small class="cx-kick">Bientôt</small>
+          <h2>${esc(se.title)}</h2>
+          <p>${t('Le premier Codex de l’Abîme s’ouvre le {d}.', { d })}</p>
+          <p class="small cx-left">${icon('bell')}${days > 1 ? t('Plus que {n} jours.', { n: days }) : 'Ouverture demain.'}</p></div></section>
+      <section class="cx-pitch cx-soon-txt"><div class="cx-pitch-in">
+        <p>Trente paliers à franchir en jouant : la voie gratuite donne des éclats, des cendres, des coffres et des boosters ; la voie enluminée, des cosmétiques exclusifs de la saison. Les points se gagnent à partir de l’ouverture.</p>
+        <p>${esc(se.pitch)}</p></div></section>
+      ${loot.length ? `<section class="cx-loot"><h3 class="cxs-sh">${icon('star')}À gagner cette saison <small>${loot.length} objets</small></h3>
+      <div class="cxs-rail">${loot.map(({ x, it }, i) => `<button class="cxs-t wide r-season ${it.kind}" data-cx="seel" data-i="${i}"><span class="cxs-pic">${picOf(it)}</span><span class="cxs-rk">Palier ${x.tier}</span><b>${esc(nameOf(it))}</b></button>`).join('')}</div></section>` : ''}
+      <p class="small muted cx-soon-shop">En attendant, l’Échoppe est ouverte.</p>
+      <button class="btn primary block dc-plq dc-plq-red" data-cx="tab" data-v="shop">${OBS_I}Voir l’Échoppe</button>`;
   }
   function codexTab() {
     const c = g.codex(), t = codexTier(c), n = claimable(c), max = t >= CODEX.tiers;
@@ -267,10 +286,10 @@ export default function codexScreen(app, root) {
   }
 
   function draw() {
-    if (!g.codexOn()) { location.replace('#/boutique'); return; } /* caché : rien ne doit trahir le pass hors Mode Créateur */
+    if (!g.shopOn()) { location.replace('#/boutique'); return; } /* caché : rien ne doit trahir le pass hors Mode Créateur */
     root.innerHTML = `<header class="screen-head ui-hero ${ui.tab === 'shop' ? 'bn-echoppe' : 'bn-codex'} cx-top"><h1>${ui.tab === 'shop' ? 'L’Échoppe' : esc(CODEX.name)}</h1>${preview0() ? '<span class="sc-rec">Aperçu Créateur · invisible pour les joueurs</span>' : ''}</header>
       <nav class="cx-tabs2" aria-label="Codex et Échoppe">${[['codex', 'Le Codex', 'Paliers de la saison', 'book'], ['shop', 'L’Échoppe', 'Cosmétiques', 'obsidienne']].map(([k, l, sub, ic]) => `<button class="cx-tab2 t-${k}" data-cx="tab" data-v="${k}" aria-pressed="${ui.tab === k}"><img alt="" src="assets/icons/${ic}.webp"><span><b>${l}</b><small>${sub}</small></span></button>`).join('')}</nav>
-      ${ui.tab === 'shop' ? shopTab() : codexTab()}
+      ${ui.tab === 'shop' ? shopTab() : g.codexOn() ? codexTab() : soonTab()}
       ${g.s.settings?.dev ? devTab() : ''}`;
     if (ui.tab !== 'shop' && !ui.scrolled) { ui.scrolled = true; requestAnimationFrame(() => document.getElementById('cx-now')?.scrollIntoView({ block: 'center' })); }
   }

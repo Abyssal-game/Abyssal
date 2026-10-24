@@ -7750,6 +7750,13 @@ export default {
   "Les achats ne sont pas encore ouverts sur le serveur.": "As compras ainda não estão abertas no servidor.",
   "Les achats demandent le serveur de partie : réessaie dans un instant.": "As compras precisam do servidor de jogo: tente de novo em instantes.",
   "Achat simulé réservé au Mode Créateur.": "Compra simulada reservada ao Modo Criador.",
+  "Bientôt": "Em breve",
+  "Le premier Codex de l’Abîme s’ouvre le {d}.": "O primeiro Códice do Abismo abre em {d}.",
+  "Plus que {n} jours.": "Faltam só {n} dias.",
+  "Ouverture demain.": "Abre amanhã.",
+  "Trente paliers à franchir en jouant : la voie gratuite donne des éclats, des cendres, des coffres et des boosters ; la voie enluminée, des cosmétiques exclusifs de la saison. Les points se gagnent à partir de l’ouverture.": "Trinta graus para superar jogando: a trilha gratuita dá Fragmentos, Cinzas, baús e pacotes; a trilha iluminada, cosméticos exclusivos da temporada. Os pontos são ganhos a partir da abertura.",
+  "En attendant, l’Échoppe est ouverte.": "Enquanto isso, a Loja está aberta.",
+  "Voir l’Échoppe": "Ver a Loja",
 };
 
 export const names = {

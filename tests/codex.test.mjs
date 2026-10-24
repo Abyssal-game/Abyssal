@@ -204,6 +204,21 @@ test('codex v680 : fermé avant la Saison I, ouvert à tous le premier jour', ()
   assert.equal(mk().codexOn(), true);
 });
 
+test('v684 : l’Échoppe peut ouvrir avant le Codex (CODEX.shopFrom)', () => {
+  const was = CODEX.shopFrom;
+  try {
+    CODEX.shopFrom = null;
+    assert.equal(mk(before).shopOn(), false, 'fermée tant que shopFrom est vide');
+    assert.equal(mk().shopOn(), true, 'ouverte avec le Codex');
+    const d = before(); CODEX.shopFrom = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
+    const g = mk(before);
+    assert.equal(g.shopOn(), true); assert.equal(g.codexOn(), false, 'le Codex reste fermé');
+    g.s.obs = 1000; const it = CATALOG.find((x) => x.kind === 'frame');
+    g.catalogBuy(it.id); assert.ok(g.catalogOwned(it.id), 'achat possible à l’Échoppe avant le Codex');
+    g.codexXp(20, 'floor'); assert.equal(g.codex().xp, 0, 'aucun point de Codex avant la saison');
+  } finally { CODEX.shopFrom = was; }
+});
+
 test('achats payés : chaque transaction donnée une seule fois, déjà acquis = obsidiennes', () => {
   const g = mk();
   const tx = (id, p) => ({ id, product: SHOP.find((x) => x.id === p).store });

@@ -7750,6 +7750,13 @@ export default {
   "Les achats ne sont pas encore ouverts sur le serveur.": "Käufe sind auf dem Server noch nicht geöffnet.",
   "Les achats demandent le serveur de partie : réessaie dans un instant.": "Käufe brauchen den Spielserver: versuch es gleich noch einmal.",
   "Achat simulé réservé au Mode Créateur.": "Simulierter Kauf nur im Schöpfermodus.",
+  "Bientôt": "Demnächst",
+  "Le premier Codex de l’Abîme s’ouvre le {d}.": "Der erste Kodex des Abgrunds öffnet am {d}.",
+  "Plus que {n} jours.": "Nur noch {n} Tage.",
+  "Ouverture demain.": "Öffnet morgen.",
+  "Trente paliers à franchir en jouant : la voie gratuite donne des éclats, des cendres, des coffres et des boosters ; la voie enluminée, des cosmétiques exclusifs de la saison. Les points se gagnent à partir de l’ouverture.": "Dreißig Stufen, die du beim Spielen erklimmst: Der freie Pfad gibt Splitter, Asche, Truhen und Booster; der illuminierte Pfad exklusive Kosmetik der Saison. Punkte gibt es ab der Eröffnung.",
+  "En attendant, l’Échoppe est ouverte.": "Bis dahin ist der Laden geöffnet.",
+  "Voir l’Échoppe": "Zum Laden",
 };
 
 export const names = {

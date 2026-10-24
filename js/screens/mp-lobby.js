@@ -255,7 +255,7 @@ export function createMpLobby(app, root, spec) {
     const id = ui.open, mute = !!g.s.settings.reMute;
     const sh = openSheet(`<h2>Réactions</h2><p class="small muted">Ton adversaire la voit tout de suite.</p>
       <div class="re-grid">${g.emotesOwned().map((k) => `<button class="re-pick" data-re="${k}">${emoteHTML(k)}</button>`).join('')}</div>
-      ${g.codexOn() ? '<p class="small muted">D’autres réactions t’attendent à l’Échoppe.</p>' : ''}
+      ${g.shopOn() ? '<p class="small muted">D’autres réactions t’attendent à l’Échoppe.</p>' : ''}
       <button class="btn ghost block small" data-re-mute>${mute ? 'Montrer les réactions de l’adversaire' : 'Masquer les réactions de l’adversaire'}</button>`, { cls: 'sheet-small', label: 'Réactions' });
     sh.body.addEventListener('click', async (e) => {
       if (e.target.closest('[data-re-mute]')) { g.setSetting('reMute', !mute); sh.close(); toast(mute ? 'Réactions de l’adversaire visibles.' : 'Réactions de l’adversaire masquées.'); return; }

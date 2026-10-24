@@ -7761,6 +7761,13 @@ export default {
   "Les achats ne sont pas encore ouverts sur le serveur.": "Purchases are not open on the server yet.",
   "Les achats demandent le serveur de partie : réessaie dans un instant.": "Purchases need the game server: try again in a moment.",
   "Achat simulé réservé au Mode Créateur.": "Simulated purchase reserved for Creator Mode.",
+  "Bientôt": "Coming soon",
+  "Le premier Codex de l’Abîme s’ouvre le {d}.": "The first Codex of the Abyss opens on {d}.",
+  "Plus que {n} jours.": "Only {n} days left.",
+  "Ouverture demain.": "Opens tomorrow.",
+  "Trente paliers à franchir en jouant : la voie gratuite donne des éclats, des cendres, des coffres et des boosters ; la voie enluminée, des cosmétiques exclusifs de la saison. Les points se gagnent à partir de l’ouverture.": "Thirty tiers to climb by playing: the free path gives Shards, Ashes, chests and boosters; the illuminated path gives cosmetics exclusive to the season. Points can be earned from the opening day.",
+  "En attendant, l’Échoppe est ouverte.": "Meanwhile, the Emporium is open.",
+  "Voir l’Échoppe": "See the Emporium",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

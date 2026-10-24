@@ -1337,7 +1337,7 @@ export class Game {
       if (!d.run && team.every((id) => this.cardLevel(id) <= 1)) out.unshift(forge); else out.push(forge);
     }
     // v328 : équipe au niveau maximal et cendres qui dorment : Sublimer (finition supérieure) devient l'objectif
-    if (team.length && this.codexOn() && team.every((id) => this.cardLevel(id) >= MAX_LEVEL)) { /* v615 : en obsidiennes, seulement quand l'Échoppe est ouverte */
+    if (team.length && this.shopOn() && team.every((id) => this.cardLevel(id) >= MAX_LEVEL)) { /* v615 : en obsidiennes, seulement quand l'Échoppe est ouverte */
       const sub = Object.keys(this.s.collection).map((id) => ({ id, x: this.sublimeInfo(id) })).filter((o) => o.x && o.x.cost <= this.obs())
         .sort((a, b) => (this.isFav(b.id) - this.isFav(a.id)) || (b.x.cost - a.x.cost))[0];
       if (sub) out.push({ kind: 'sublime', title: `Sublime ${this.catalog.get(sub.id).name}`, sub: `${VARIANTS[sub.x.to].name} pour ${sub.x.cost} obsidiennes (tu en as ${this.obs()}) · Fournaise → Sublimer`, href: '#/fournaise', icon: 'holo' });
@@ -1954,6 +1954,8 @@ export class Game {
   // ——— v470 : ÉBAUCHE du pass de saison (Codex) et de la boutique en argent réel (Échoppe), cachés hors Mode Créateur ———
   /* v680 : ouverts à tous le premier jour de la Saison I (CODEX_OPEN) ; avant, seulement en aperçu Créateur */
   codexOn() { return today(this.clock()) >= CODEX_OPEN || !!(this.s.settings?.dev && this.s.devCodex); }
+  /* v684 : l'Échoppe peut ouvrir avant le Codex (CODEX.shopFrom) ; le Codex montre alors « bientôt » */
+  shopOn() { return this.codexOn() || !!(CODEX.shopFrom && today(this.clock()) >= CODEX.shopFrom); }
   /* v538 : la saison commence le CODEX.starts. Les points gagnés avant (anciennes versions, essais du Mode Créateur) sont remis à zéro
      au premier passage après cette date ; la voie enluminée déjà débloquée reste. */
   /* v550 : trois saisons d'un mois (SEASONS), à l'heure du joueur ; un Codex par saison */
@@ -2066,7 +2068,7 @@ export class Game {
   // v474 : dépenses en obsidiennes (cosmétiques seulement)
   obs() { return this.s.obs || 0; }
   spendObs(n) {
-    if (!this.codexOn()) throw new Error('L’Échoppe n’est pas encore ouverte.');
+    if (!this.shopOn()) throw new Error('L’Échoppe n’est pas encore ouverte.');
     if (this.obs() < n) throw new Error(`Il te manque ${n - this.obs()} obsidiennes.`);
     this.s.obs -= n;
   }

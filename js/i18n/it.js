@@ -7750,6 +7750,13 @@ export default {
   "Les achats ne sont pas encore ouverts sur le serveur.": "Gli acquisti non sono ancora aperti sul server.",
   "Les achats demandent le serveur de partie : réessaie dans un instant.": "Gli acquisti richiedono il server di gioco: riprova tra un attimo.",
   "Achat simulé réservé au Mode Créateur.": "Acquisto simulato riservato alla Modalità Creatore.",
+  "Bientôt": "Prossimamente",
+  "Le premier Codex de l’Abîme s’ouvre le {d}.": "Il primo Codice dell’Abisso si apre il {d}.",
+  "Plus que {n} jours.": "Mancano solo {n} giorni.",
+  "Ouverture demain.": "Apre domani.",
+  "Trente paliers à franchir en jouant : la voie gratuite donne des éclats, des cendres, des coffres et des boosters ; la voie enluminée, des cosmétiques exclusifs de la saison. Les points se gagnent à partir de l’ouverture.": "Trenta gradi da superare giocando: la via gratuita dà Schegge, Ceneri, forzieri e buste; la via miniata, cosmetici esclusivi della stagione. I punti si guadagnano dall’apertura.",
+  "En attendant, l’Échoppe est ouverte.": "Nel frattempo, la Bottega è aperta.",
+  "Voir l’Échoppe": "Vai alla Bottega",
 };
 
 export const names = {

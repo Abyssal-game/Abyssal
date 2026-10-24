@@ -69,7 +69,7 @@ export function furnaceScreen(app, root) {
   }
   // v328 : Sublimer à côté des cendres (avant, seulement dans l'onglet Rareté d'une fiche : presque personne ne le trouvait)
   function sublimeHTML() {
-    if (!g.codexOn()) return ''; /* v615 : Sublimer se paie en obsidiennes : caché tant que l'Échoppe n'est pas ouverte */
+    if (!g.shopOn()) return ''; /* v615 : Sublimer se paie en obsidiennes : caché tant que l'Échoppe n'est pas ouverte */
     const OBS = '<img class="obs-i" alt="" src="assets/icons/obsidienne.webp">';
     const list = Object.keys(g.s.collection).map((id) => ({ c: cat.get(id), x: g.sublimeInfo(id) })).filter((o) => o.c && o.x)
       .sort((a, b) => (g.isFav(b.c.id) - g.isFav(a.c.id)) || (g.s.team.includes(b.c.id) - g.s.team.includes(a.c.id)) || (a.x.cost - b.x.cost));

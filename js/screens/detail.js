@@ -60,7 +60,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
   // v280 : Sublimer — la finition suivante ; v615 : contre des obsidiennes (seulement quand l'Échoppe est ouverte)
   const OBS = '<img class="obs-i" alt="" src="assets/icons/obsidienne.webp">';
   function sublimeHTML() {
-    const x = g.codexOn() && g.sublimeInfo(current);
+    const x = g.shopOn() && g.sublimeInfo(current);
     if (!x) return '';
     const can = g.obs() >= x.cost;
     return `<div class="panel dt-sub"><b>${icon('sparkle')} Sublimer en ${esc(VARIANTS[x.to].name.toLowerCase())}</b>

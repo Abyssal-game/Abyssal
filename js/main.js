@@ -191,9 +191,9 @@ function renderChrome() {
     <div class="wallet">
       <button class="pill shards" data-wallet="shards" title="Éclats" aria-label="${fmt(s.shards)} éclats : à quoi ça sert ?">${icon('crystal')}<span>${fmt(s.shards)}</span></button>
       <button class="pill ash" data-wallet="ash" title="Cendres" aria-label="${fmt(s.ash)} cendres : à quoi ça sert ?">${icon('ash')}<span>${fmt(s.ash)}</span></button>
-      ${g.codexOn() ? `<button class="pill obs" data-obs title="Obsidiennes" aria-label="${fmt(g.obs())} obsidiennes : ouvrir l’Échoppe"><img class="obs-i" alt="" src="assets/icons/obsidienne.webp"><span>${fmt(g.obs())}</span></button>` : ''}
+      ${g.shopOn() ? `<button class="pill obs" data-obs title="Obsidiennes" aria-label="${fmt(g.obs())} obsidiennes : ouvrir l’Échoppe"><img class="obs-i" alt="" src="assets/icons/obsidienne.webp"><span>${fmt(g.obs())}</span></button>` : ''}
     </div>`);
-  top.classList.toggle('has-obs', g.codexOn()); /* v489 : obsidiennes à côté des cendres (tant que l'Échoppe est cachée, seulement en Mode Créateur) */
+  top.classList.toggle('has-obs', g.shopOn()); /* v489 : obsidiennes à côté des cendres (tant que l'Échoppe est cachée, seulement en Mode Créateur) */
   // v319 : le bouton retour du haut revient en arrière dans l'historique quand la page précédente est bien le parent,
   // sinon il remplace la page courante : jamais d'entrée d'historique en plus
   const tb = top.querySelector('.top-back');
@@ -219,7 +219,7 @@ function renderChrome() {
   const nNewSub = g.newCount() > 99 ? '99+' : g.newCount();
   const sn = document.getElementById('subnav');
   // v404 : sous-onglets encore fermés cachés (Sceaux avant le premier gardien, Tirage sans compte)
-  const shown0 = sub && sub.filter(([r]) => (r !== 'tirage' || isLoggedIn() || app.route === 'tirage') && (r !== 'codex' || g.codexOn()));
+  const shown0 = sub && sub.filter(([r]) => (r !== 'tirage' || isLoggedIn() || app.route === 'tirage') && (r !== 'codex' || g.shopOn()));
   const shown = shown0 && shown0.length > 1 ? shown0 : null; /* v422 : pas de barre pour un seul sous-onglet */
   document.body.classList.toggle('has-subnav', !!shown);
   setIf(sn, shown ? shown.map(([r, ic, label]) => { const bd = subBadge(r); return `<a class="sn-tab${r === 'jeux' && !g.sceauxOpen() ? ' locked' : ''}" href="#/${r}"${r === (SUB_OF[app.route] || app.route) ? ' aria-current="page"' : ''}><img class="sn-ic" alt="" src="assets/icons/${ic}.webp"><span>${label}</span>${bd ? `<i class="sn-badge">${bd}</i>` : ''}</a>`; }).join('') : '');
