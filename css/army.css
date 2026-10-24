@@ -6665,3 +6665,15 @@ details.dc-fold > summary:has(.gm-tease) { flex-wrap: wrap; }
 .td-go { flex: none; padding: 6px 14px; border-radius: 999px; font-weight: 800; font-size: 13px; color: #1A0E2E; background: linear-gradient(180deg, #D9C2FF, #9B6BFF); box-shadow: 0 0 12px rgba(155, 107, 255, .55); }
 @media (prefers-reduced-motion: no-preference) { html:not(.fx-light) .td-row.td-shadow:not(.done) .td-go { animation: tdGo 2.4s ease-in-out infinite; } }
 @keyframes tdGo { 50% { box-shadow: 0 0 20px rgba(155, 107, 255, .9); } }
+
+/* v710 : fenêtre « Être prévenu ? » : le titre occupe la hauteur de la croix (le texte passait dessous),
+   les deux boutons sur deux colonnes égales, centrés */
+.notif-ask h2 { margin: 0 0 6px; min-height: 58px; padding: 0 58px; display: flex; align-items: center; justify-content: center; text-align: center; }
+.notif-ask p { text-align: left; }
+.notif-ask .row.gap { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+.notif-ask .row.gap .btn { width: 100%; min-width: 0; justify-content: center; text-align: center; padding-left: 10px; padding-right: 10px; text-wrap: balance; }
+/* v710 : ligne du Tirage des Ombres : marges intérieures (l'icône et le bouton « Tirer » touchaient les bords du cadre) */
+.today .td-row.td-shadow:not(.done) { padding: 12px 12px 12px 10px; margin: 6px 0; border-top: 1px solid rgba(155, 107, 255, .55); }
+.td-row.td-shadow .td-t { min-width: 0; flex: 1; }
+.td-row.td-shadow .td-go { margin-left: 4px; }
+.notif-ask .row.gap .btn { font-size: 13px; letter-spacing: .04em; white-space: nowrap; }
