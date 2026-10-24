@@ -6576,3 +6576,11 @@ body:has(.sc-dlg) .sc-game .sc-msg { visibility: hidden; }
 .ol-acts .btn { flex: 1 1 0; min-height: 44px; justify-content: center; }
 @media (prefers-reduced-motion: reduce) { .ol-card.hot { animation: none; } }
 .ol-h .ol-em { width: 30px; height: 30px; border-radius: 50%; }
+/* v697 : le titre d’un chapitre ou d’un gardien (« La porte rassasiée ») apparaissait avec ses lettres très espacées
+   qui se resserraient : pendant l’animation il passait sur 2 lignes, puis revenait sur une seule.
+   L’espacement ne bouge plus (seuls l’opacité et la taille), et les lignes sont équilibrées. */
+.bx-in h1 { animation-name: bxTitle697; text-wrap: balance; }
+@keyframes bxTitle697 { from { opacity: 0; transform: scale(1.08); } to { opacity: 1; transform: none; } }
+/* même chose pour le bandeau d’ouverture de booster (« Hyper rare ! », finitions) */
+.op-banner { animation-name: banner697; text-wrap: balance; }
+@keyframes banner697 { 0% { opacity: 0; transform: scale(2); } 20% { opacity: 1; transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-20px); } }
