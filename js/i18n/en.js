@@ -7418,6 +7418,7 @@ export default {
   "Tapis de l’Autel de l’Abysse": "Abyss Altar Mat",
   "Tapis d’obsidienne et d’or": "Obsidian and Gold Mat",
   "Tapis de la Glace noire": "Black Ice Mat",
+  "Gardien · étage {0}": "Guardian · floor {0}",
   "Tirage des Ombres": "Shadow Draw",
   "Ton booster gratuit du jour t’attend · classement de la semaine": "Your free booster of the day awaits · weekly ranking",
   "Tiré aujourd’hui · ton score compte pour la semaine · retour demain": "Drawn today · your score counts for the week · back tomorrow",

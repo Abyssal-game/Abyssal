@@ -7407,6 +7407,7 @@ export default {
   "Tapis de l’Autel de l’Abysse": "Spielmatte des Abgrund-Altars",
   "Tapis d’obsidienne et d’or": "Spielmatte aus Obsidian und Gold",
   "Tapis de la Glace noire": "Spielmatte des Schwarzen Eises",
+  "Gardien · étage {0}": "Wächter · Ebene {0}",
   "Tirage des Ombres": "Schattenziehung",
   "Ton booster gratuit du jour t’attend · classement de la semaine": "Dein kostenloser Booster des Tages wartet · Wochenrangliste",
   "Tiré aujourd’hui · ton score compte pour la semaine · retour demain": "Heute gezogen · deine Punkte zählen für die Woche · morgen wieder",

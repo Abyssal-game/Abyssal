@@ -7407,6 +7407,7 @@ export default {
   "Tapis de l’Autel de l’Abysse": "Tapete do Altar do Abismo",
   "Tapis d’obsidienne et d’or": "Tapete de obsidiana e ouro",
   "Tapis de la Glace noire": "Tapete do Gelo negro",
+  "Gardien · étage {0}": "Guardião · andar {0}",
   "Tirage des Ombres": "Sorteio das Sombras",
   "Ton booster gratuit du jour t’attend · classement de la semaine": "Seu booster grátis do dia te espera · ranking da semana",
   "Tiré aujourd’hui · ton score compte pour la semaine · retour demain": "Sorteado hoje · sua pontuação conta para a semana · volte amanhã",
