@@ -47,7 +47,7 @@ export default function descent(app, root) {
   /* v469 : chaque gain dans sa pastille, espacées (avant : icônes et chiffres collés) */
   const rewardLine = (r) => `<span class="rw-line">${[r.shards && `<span class="rw-i">${icon('crystal')}+${fmt(r.shards)}</span>`, r.ash && `<span class="rw-i">${icon('ash')}+${fmt(r.ash)}</span>`, ...Object.keys(r.chests || {}).map((c) => `<span class="rw-i" style="color:${CHESTS[c].color}">${icon('p:chest')}${esc(CHESTS[c].name)}</span>`), r.braises && `<span class="rw-i rw-br">${BRAISE_IC}+${r.braises}</span>`].filter(Boolean).join('')}</span>`;
   /* v700 : bandeau peint de chaque chapitre (images Gemini, assets/chapitres/chap-N.webp) : ajouter le numéro ici à l'arrivée de l'image */
-  const CHAP_ART = new Set([1]);
+  const CHAP_ART = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
   function chapterHTML() {
     const d = g.descent(), best = d.best || 0, start = startFloor(), ch = chapterOf(start), done = chapDone(ch), bk = bossOf(ch * CHAPTER), B = BOSSES[bk];
     const floors = Array.from({ length: CHAPTER }, (_, i) => start + i);
