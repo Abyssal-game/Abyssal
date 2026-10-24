@@ -6538,3 +6538,11 @@ html[data-mat="tp-dragon"] .sc-board, .sc-board[data-pmat="tp-dragon"] { --mat-i
 html[data-mat="tp-dragon"] .sc-plate, html .sc-board[data-pmat="tp-dragon"] .sc-plate { top: 11.5%; bottom: 11.5%; left: 15%; right: 15%; }
 html[data-mat="tp-eclipse"] .sc-board, .sc-board[data-pmat="tp-eclipse"] { --mat-img: url(../assets/tapis/tp-eclipse.webp); }
 html[data-mat="tp-eclipse"] .sc-plate, html .sc-board[data-pmat="tp-eclipse"] .sc-plate { top: 9.5%; bottom: 9.5%; left: 12%; right: 12%; }
+
+/* v692 : 6 plaques de pseudo vivantes (images Gemini §356-361) */
+.np-pl-titan { --npb: rgba(255, 190, 110, .8); background-image: url(../assets/plates/pl-titan.webp), linear-gradient(90deg, #0c0a08, #2e2820 50%, #0c0a08); color: #FFE6C4; }
+.np-pl-forge { --npb: rgba(255, 150, 70, .8); background-image: url(../assets/plates/pl-forge.webp), linear-gradient(90deg, #0e0806, #36221a 50%, #0e0806); color: #FFDCC2; }
+.np-pl-racines { --npb: rgba(200, 220, 120, .8); background-image: url(../assets/plates/pl-racines.webp), linear-gradient(90deg, #080a06, #24301a 50%, #080a06); color: #EAF5D2; }
+.np-pl-aile { --npb: rgba(255, 225, 150, .85); background-image: url(../assets/plates/pl-aile.webp), linear-gradient(90deg, #080a14, #1e2440 50%, #080a14); color: #FFF2D2; }
+.np-pl-tombes { --npb: rgba(150, 230, 190, .8); background-image: url(../assets/plates/pl-tombes.webp), linear-gradient(90deg, #08090c, #262c34 50%, #08090c); color: #E2F5EC; }
+.np-pl-encre { --npb: rgba(190, 140, 255, .8); background-image: url(../assets/plates/pl-encre.webp), linear-gradient(90deg, #08080e, #22203a 50%, #08080e); color: #EADCFF; }
