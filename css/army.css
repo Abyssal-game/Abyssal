@@ -6521,3 +6521,9 @@ html.fx-light .dv.qte-on::after { animation: none; opacity: .85; }
 .cx-pitch.cx-soon-txt { min-height: 0; }
 .cx-soon-txt .cx-pitch-in { max-width: none; }
 .cx-soon-shop { text-align: center; margin: 16px 0 8px; }
+
+/* v685 : Saison II du Codex « L’Hiver éternel » : cadres vivants et plaques */
+.pf-cx-vif-aurore { --fr: url(../assets/frames/cx-vif-aurore-4.webp); }
+.pf-cx-vif-blizzard { --fr: url(../assets/frames/cx-vif-blizzard-4.webp); }
+.np-pl-glacier { --npb: rgba(120, 200, 255, .8); background-image: url(../assets/plates/pl-glacier.webp), linear-gradient(90deg, #05080e, #10203a 50%, #05080e); color: #DDF0FF; }
+.np-pl-cerf-givre { --npb: rgba(150, 200, 255, .8); background-image: url(../assets/plates/pl-cerf-givre.webp), linear-gradient(90deg, #05070d, #121d33 50%, #05070d); color: #E2EEFF; }

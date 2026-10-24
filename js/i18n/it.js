@@ -7757,6 +7757,17 @@ export default {
   "Trente paliers à franchir en jouant : la voie gratuite donne des éclats, des cendres, des coffres et des boosters ; la voie enluminée, des cosmétiques exclusifs de la saison. Les points se gagnent à partir de l’ouverture.": "Trenta gradi da superare giocando: la via gratuita dà Schegge, Ceneri, forzieri e buste; la via miniata, cosmetici esclusivi della stagione. I punti si guadagnano dall’apertura.",
   "En attendant, l’Échoppe est ouverte.": "Nel frattempo, la Bottega è aperta.",
   "Voir l’Échoppe": "Vai alla Bottega",
+  "Cadre vivant de l’Aurore": "Cornice vivente dell’Aurora",
+  "Cadre vivant du Blizzard": "Cornice vivente della Tormenta",
+  "Dos vivant du Lac gelé": "Dorso vivente del Lago ghiacciato",
+  "Sachet vivant de l’Hiver éternel": "Bustina vivente dell’Inverno eterno",
+  "Plaque du Glacier": "Targa del Ghiacciaio",
+  "Plaque du Cerf de givre": "Targa del Cervo di brina",
+  "Le froid te gagne.": "Il freddo ti prende.",
+  "Nul ne passe.": "Nessuno passa.",
+  "Le Blizzard": "La Tormenta",
+  "La Sentinelle du givre": "La Sentinella del gelo",
+  "La Matriarche du Givre a offert son royaume à l’hiver pour qu’il ne change jamais, et son froid tient les dormeurs éveillés. Une récompense à chaque palier : cadres vivants, dos de cartes, sachet, plaques, réactions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Matriarche du Givre et le Dos vivant de l’Hiver.": "La Matriarca del Gelo ha offerto il suo regno all’inverno perché non cambiasse mai, e il suo freddo tiene svegli i dormienti. Una ricompensa a ogni livello: cornici vive, dorsi, involucro, targhe, reazioni e titoli dell’Inverno eterno, introvabili nella Bottega. Al livello {0}, la Corona della Matriarca del Gelo e il Dorso vivo dell’Inverno.",
 };
 
 export const names = {

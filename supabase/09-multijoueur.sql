@@ -1276,7 +1276,7 @@ returns jsonb language plpgsql volatile security definer set search_path = publi
 declare m public.mp_matches; me text; e jsonb; owned jsonb; n int;
 begin
   if auth.uid() is null then raise exception 'Connecte-toi d’abord.'; end if;
-  if p_key is null or not (p_key = any (array['re-salut', 're-bien', 're-merci', 're-aie', 're-mammon', 're-souveraine', 're-archiviste', 're-ilda', 're-orvel', 're-vesna', 're-maitre', 're-echo', 're-g-devoreur', 're-g-matriarche', 're-g-roi', 're-g-architecte', 're-g-eclipse', 're-g-essaim', 're-g-bourreau', 're-g-choeur', 're-g-chaines', 're-g-horloge', 're-g-miroirs', 're-g-golem', 're-g-peste', 're-g-chasseur', 're-g-voeux', 're-g-titan', 're-g-jumeaux', 're-g-juge', 're-g-bete', 're-g-abysse', 're-feu-follet', 're-passeur'])) then raise exception 'Réaction inconnue.'; end if;
+  if p_key is null or not (p_key = any (array['re-salut', 're-bien', 're-merci', 're-aie', 're-mammon', 're-souveraine', 're-archiviste', 're-ilda', 're-orvel', 're-vesna', 're-maitre', 're-echo', 're-g-devoreur', 're-g-matriarche', 're-g-roi', 're-g-architecte', 're-g-eclipse', 're-g-essaim', 're-g-bourreau', 're-g-choeur', 're-g-chaines', 're-g-horloge', 're-g-miroirs', 're-g-golem', 're-g-peste', 're-g-chasseur', 're-g-voeux', 're-g-titan', 're-g-jumeaux', 're-g-juge', 're-g-bete', 're-g-abysse', 're-feu-follet', 're-passeur', 're-blizzard', 're-sentinelle'])) then raise exception 'Réaction inconnue.'; end if;
   select * into m from public.mp_matches where id = p_id and auth.uid() in (a, b) for update;
   if not found then raise exception 'Partie introuvable.'; end if;
   if m.status <> 'playing' and not (m.status = 'done' and m.updated_at > now() - interval '10 minutes') then raise exception 'La partie n’est pas en cours.'; end if;
@@ -1403,7 +1403,7 @@ grant execute on function public.mp_ranking(text, int) to authenticated;
 create table if not exists public.sql_stamps (file text primary key, stamp text not null, at timestamptz not null default now());
 alter table public.sql_stamps enable row level security;
 revoke all on public.sql_stamps from public, anon, authenticated;
-insert into public.sql_stamps (file, stamp) values ('09', '7f18c9b866d8') on conflict (file) do update set stamp = excluded.stamp, at = now();
+insert into public.sql_stamps (file, stamp) values ('09', 'abcc6f574484') on conflict (file) do update set stamp = excluded.stamp, at = now();
 create or replace function public.sql_stamps() returns jsonb language sql stable security definer set search_path = public as $$
   select coalesce(jsonb_object_agg(file, stamp), '{}'::jsonb) from public.sql_stamps;
 $$;

@@ -38,6 +38,6 @@ export const SQL_STAMPS = {
   },
   "09": {
     "file": "09-multijoueur.sql",
-    "stamp": "7f18c9b866d8"
+    "stamp": "abcc6f574484"
   }
 };

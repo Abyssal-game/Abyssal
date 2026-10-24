@@ -7757,6 +7757,17 @@ export default {
   "Trente paliers à franchir en jouant : la voie gratuite donne des éclats, des cendres, des coffres et des boosters ; la voie enluminée, des cosmétiques exclusifs de la saison. Les points se gagnent à partir de l’ouverture.": "Trinta graus para superar jogando: a trilha gratuita dá Fragmentos, Cinzas, baús e pacotes; a trilha iluminada, cosméticos exclusivos da temporada. Os pontos são ganhos a partir da abertura.",
   "En attendant, l’Échoppe est ouverte.": "Enquanto isso, a Loja está aberta.",
   "Voir l’Échoppe": "Ver a Loja",
+  "Cadre vivant de l’Aurore": "Moldura viva da Aurora",
+  "Cadre vivant du Blizzard": "Moldura viva da Nevasca",
+  "Dos vivant du Lac gelé": "Verso vivo do Lago congelado",
+  "Sachet vivant de l’Hiver éternel": "Pacote vivo do Inverno eterno",
+  "Plaque du Glacier": "Placa da Geleira",
+  "Plaque du Cerf de givre": "Placa do Cervo de geada",
+  "Le froid te gagne.": "O frio está te dominando.",
+  "Nul ne passe.": "Ninguém passa.",
+  "Le Blizzard": "A Nevasca",
+  "La Sentinelle du givre": "A Sentinela da geada",
+  "La Matriarche du Givre a offert son royaume à l’hiver pour qu’il ne change jamais, et son froid tient les dormeurs éveillés. Une récompense à chaque palier : cadres vivants, dos de cartes, sachet, plaques, réactions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Matriarche du Givre et le Dos vivant de l’Hiver.": "A Matriarca da Geada ofereceu seu reino ao inverno para que nunca mudasse, e seu frio mantém os adormecidos acordados. Uma recompensa em cada nível: molduras vivas, versos, envelope, placas, reações e títulos do Inverno eterno, impossíveis de achar na Loja. No nível {0}, a Coroa da Matriarca da Geada e o Verso vivo do Inverno.",
 };
 
 export const names = {

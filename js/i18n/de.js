@@ -7757,6 +7757,17 @@ export default {
   "Trente paliers à franchir en jouant : la voie gratuite donne des éclats, des cendres, des coffres et des boosters ; la voie enluminée, des cosmétiques exclusifs de la saison. Les points se gagnent à partir de l’ouverture.": "Dreißig Stufen, die du beim Spielen erklimmst: Der freie Pfad gibt Splitter, Asche, Truhen und Booster; der illuminierte Pfad exklusive Kosmetik der Saison. Punkte gibt es ab der Eröffnung.",
   "En attendant, l’Échoppe est ouverte.": "Bis dahin ist der Laden geöffnet.",
   "Voir l’Échoppe": "Zum Laden",
+  "Cadre vivant de l’Aurore": "Lebendiger Polarlicht-Rahmen",
+  "Cadre vivant du Blizzard": "Lebendiger Schneesturm-Rahmen",
+  "Dos vivant du Lac gelé": "Lebendige Rückseite des Gefrorenen Sees",
+  "Sachet vivant de l’Hiver éternel": "Lebendiges Päckchen des Ewigen Winters",
+  "Plaque du Glacier": "Gletscher-Plakette",
+  "Plaque du Cerf de givre": "Frosthirsch-Plakette",
+  "Le froid te gagne.": "Die Kälte packt dich.",
+  "Nul ne passe.": "Keiner kommt vorbei.",
+  "Le Blizzard": "Der Schneesturm",
+  "La Sentinelle du givre": "Der Frostwächter",
+  "La Matriarche du Givre a offert son royaume à l’hiver pour qu’il ne change jamais, et son froid tient les dormeurs éveillés. Une récompense à chaque palier : cadres vivants, dos de cartes, sachet, plaques, réactions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Matriarche du Givre et le Dos vivant de l’Hiver.": "Die Frostmatriarchin hat ihr Reich dem Winter geschenkt, damit es sich nie verändert, und ihre Kälte hält die Schläfer wach. Eine Belohnung auf jeder Stufe: lebende Rahmen, Kartenrücken, Hülle, Plaketten, Reaktionen und Titel des ewigen Winters, die es im Laden nicht gibt. Auf Stufe {0} die Krone der Frostmatriarchin und der lebende Rücken des Winters.",
 };
 
 export const names = {

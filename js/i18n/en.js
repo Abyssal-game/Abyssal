@@ -7768,6 +7768,17 @@ export default {
   "Trente paliers à franchir en jouant : la voie gratuite donne des éclats, des cendres, des coffres et des boosters ; la voie enluminée, des cosmétiques exclusifs de la saison. Les points se gagnent à partir de l’ouverture.": "Thirty tiers to climb by playing: the free path gives Shards, Ashes, chests and boosters; the illuminated path gives cosmetics exclusive to the season. Points can be earned from the opening day.",
   "En attendant, l’Échoppe est ouverte.": "Meanwhile, the Emporium is open.",
   "Voir l’Échoppe": "See the Emporium",
+  "Cadre vivant de l’Aurore": "Living Aurora Frame",
+  "Cadre vivant du Blizzard": "Living Blizzard Frame",
+  "Dos vivant du Lac gelé": "Living Frozen Lake Back",
+  "Sachet vivant de l’Hiver éternel": "Living Eternal Winter Pack",
+  "Plaque du Glacier": "Glacier Plate",
+  "Plaque du Cerf de givre": "Frost Stag Plate",
+  "Le froid te gagne.": "The cold is taking you.",
+  "Nul ne passe.": "None shall pass.",
+  "Le Blizzard": "The Blizzard",
+  "La Sentinelle du givre": "The Frost Sentinel",
+  "La Matriarche du Givre a offert son royaume à l’hiver pour qu’il ne change jamais, et son froid tient les dormeurs éveillés. Une récompense à chaque palier : cadres vivants, dos de cartes, sachet, plaques, réactions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Matriarche du Givre et le Dos vivant de l’Hiver.": "The Frost Matriarch gave her kingdom to winter so that it would never change, and her cold keeps the sleepers awake. A reward at every tier: living frames, card backs, a pack, plates, reactions and titles of the Eternal Winter, never sold in the Emporium. At tier {0}, the Crown of the Frost Matriarch and the Living Back of Winter.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {
