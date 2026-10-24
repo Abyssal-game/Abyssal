@@ -27,7 +27,7 @@ export const FRAGMENTS = {
   sauvage: [
     { title: 'Avant les villes', text: 'La Forêt Première couvrait tout. Les premiers humains y vivaient comme des proies polies, et la forêt les tolérait comme on tolère une mauvaise herbe.' },
     { title: 'La mémoire des souches', text: 'Chaque arbre abattu laisse une souche qui se souvient. Sous la terre, les racines se parlent, et elles tiennent le compte. La forêt n’oublie rien : elle attend.' },
-    { title: 'La Grande Chasse', text: 'Une nuit, déjà, toutes les bêtes de la Forêt ont couru ensemble : les loups l’appellent la Grande Chasse. Quand la dernière ville tombera, elles courront de nouveau. Ils s’y entraînent à chaque pleine lune.' },
+    { title: 'La Grande Chasse', text: 'Une nuit, déjà, toutes les bêtes de la Forêt ont couru ensemble : les loups l’appellent la Grande Chasse. Elles courront de nouveau, jusqu’à ce que tombe la dernière ville. Les loups s’y entraînent à chaque pleine lune.' },
   ],
   necrotique: [
     { title: 'Les portes mal fermées', text: 'Chaque tombe est une porte vers le Pays sans Retour. La plupart sont bien scellées. Les autres grincent les soirs de brume, et quelque chose les pousse doucement de l’autre côté.' },
@@ -35,9 +35,9 @@ export const FRAGMENTS = {
     { title: 'La reine des cendres', text: 'Au cœur du Pays sans Retour règne une reine qui a payé tous ses souvenirs pour ne plus jamais souffrir. Elle ne sait plus pourquoi elle règne, mais elle n’abandonnera jamais son trône.' },
   ],
   primordial: [
-    { title: 'La carte', text: 'Les Terres d’Avant ne sont sur aucune carte : elles sont le relief sur lequel tout a été posé. Les montagnes sont des épaules de titans qui ont oublié de se relever.' },
+    { title: 'La carte', text: 'Les Terres d’Avant ne sont sur aucune carte : elles sont le relief sur lequel tout a été posé. Les montagnes sont des épaules de Titans qui font semblant de dormir.' },
     { title: 'Le premier feu', text: 'Les dragons anciens ont allumé le premier feu pour se réchauffer, pas pour éclairer. La lumière est venue après, par accident, et elle leur a toujours fait un peu mal aux yeux.' },
-    { title: 'Le réveil des Titans', text: 'Si les Titans se relèvent, les royaumes glisseront de leurs épaules comme la neige d’un toit. Les Scelleurs l’ont compris : c’est pour eux, d’abord, qu’ils ont gravé les Sceaux.' },
+    { title: 'Le réveil des Titans', text: 'Si les Titans se relevaient, les royaumes glisseraient de leurs épaules comme la neige d’un toit. Mais ils ne bougent pas : sous leurs paupières closes, ils veillent.' },
   ],
   artificiel: [
     { title: 'L’artisan', text: 'La Forge Sans Maître avait un maître. Il a construit la première machine pour l’aider, puis une seconde pour aider la première. Un matin, plus personne n’a eu besoin de lui.' },

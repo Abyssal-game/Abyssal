@@ -76,6 +76,9 @@ export function tx(text) {
     // citation entre guillemets, ou morceaux séparés par « · » : chacun traduit à part
     const q = text.match(/^(\s*)«\s*([\s\S]+?)\s*»(\s*)$/);
     if (q) { const v = tx(q[2]); if (v !== q[2]) return `${q[1]}“${v}”${q[3]}`; }
+    /* v694 : « Titre « Passeur des Âmes » » : le mot et la citation traduits chacun à part */
+    const pq = text.match(/^(\s*)([^«»]+?)\s*«\s*([^«»]+?)\s*»(\s*)$/);
+    if (pq) { const a = tx(pq[2]), v = tx(pq[3]); if (a !== pq[2] || v !== pq[3]) return `${pq[1]}${a} “${v}”${pq[4]}`; }
     if (text.includes(' · ')) { const parts = text.split(' · '), v = parts.map((x) => tx(x)); if (v.some((x, i) => x !== parts[i])) return v.join(' · '); }
   }
   miss(key); return text;

@@ -34,8 +34,8 @@ export function unlockSources(cat) {
     add(titles, M.LAST_TITLE, `Gagne « ${M.TABLES.at(-1).name} » dans ${game} (Aventure › Jeux).`);
     add(titles, M.FEATS_TITLE, `Réussis les ${M.TABLES.length} hauts faits dans ${game} (Aventure › Jeux).`);
   }
-  add(titles, 'Vainqueur de l’Abysse', 'Vaincs L’Abysse, le gardien de l’étage 100 de la Descente.');
-  add(frames, 'oeil', 'Vaincs L’Abysse, le gardien de l’étage 100 de la Descente.');
+  add(titles, 'Vainqueur de l’Abysse', 'Vaincs l’Abysse, le gardien de l’étage 100 de la Descente.');
+  add(frames, 'oeil', 'Vaincs l’Abysse, le gardien de l’étage 100 de la Descente.');
   return {
     titles: [...titles].map(([name, how]) => ({ name, how: how.join(' Ou : ') })),
     frames: Object.keys(FRAMES).filter((k) => frames.has(k)).map((k) => ({ key: k, name: FRAMES[k], how: frames.get(k).join(' Ou : ') })),

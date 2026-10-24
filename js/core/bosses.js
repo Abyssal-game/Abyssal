@@ -88,7 +88,7 @@ export const BOSSES = {
     intro: 'Des chaînes chauffées à blanc pendent du plafond. Une enclume résonne, et chaque coup fait trembler tes os.',
     mechanic: 'Il lance ses Chaînes sur ta créature la plus forte : elle est frappée et enchaînée (elle ne pourra pas agir à ton prochain tour). En phase 2, sa forge s’embrase : il gagne +1 ATQ à chaque tour où il n’est pas brisé.',
     counter: 'Esquive les Chaînes, libère l’enchaînée avec une Prière, et brise-le souvent pour éteindre sa forge.',
-    story: 'Il se souvient d’avoir forgé les chaînes qui tiennent l’Abysse fermé. Puis il a compris qu’on ne lui ouvrirait jamais, et il s’est mis à forger pour l’autre camp.',
+    story: 'Il croit avoir forgé les chaînes des Sceaux, celles qui tiennent l’Abysse fermé. Puis il a compris qu’on ne lui ouvrirait jamais, et il s’est mis à forger pour l’autre camp.',
     pattern: (phase, round) => (round % (phase === 2 ? 2 : 3) === 2 ? 'chain' : 'hit'),
   },
   horloge: {
@@ -137,7 +137,7 @@ export const BOSSES = {
     intro: 'Une femme voilée t’attend, un plateau d’argent à la main. « Fais un vœu », dit-elle. « Je te l’accorde. Le prix viendra plus tard. »',
     mechanic: 'Elle exauce un Vœu : tu gagnes 3 Ferveur et tes créatures 1 PA. Au tour suivant, elle réclame son Prix : un coup sur toute ton équipe, qui la soigne de la moitié des dégâts.',
     counter: 'Profite du cadeau tout de suite (pouvoir d’équipe, compétences), puis esquive ou pare le Prix.',
-    story: 'Elle a exaucé tous les vœux des Scelleurs : la gloire, la puissance, l’oubli. Le prix, c’était l’Abysse. Elle attend encore qu’ils finissent de payer.',
+    story: 'Elle a exaucé tous les vœux des Scelleurs : la gloire, la puissance, l’oubli. Le prix était écrit dans le Bestiaire, et la ligne a été effacée. Elle attend encore qu’on le lui paie.',
     pattern: (phase, round) => (round % 3 === 1 ? 'wish' : 'hit'),
   },
   // v392 : étages 80 à 100
