@@ -6593,3 +6593,40 @@ body:has(.sc-dlg) .sc-game .sc-msg { visibility: hidden; }
 .prog-chip.docked .pc-go { padding: 3px 6px; font-size: .6rem; }
 /* v698 : Descente, la rangée d’équipe vide laissait un grand trou sous la carte du chapitre */
 .v2-strip:empty { display: none; }
+/* v699 : Accueil, grand bouton « Jouer » sous le logo */
+.home-brand + .hm-play { margin-top: -6px; }
+.hm-play { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 64px; margin: 0 0 14px; text-decoration: none; }
+.hm-play > span { display: grid; gap: 2px; text-align: left; }
+.hm-play b { font: 800 1rem/1.1 var(--f-display); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.hm-play small { font: 600 .72rem/1.1 var(--f-ui); letter-spacing: .02em; text-transform: none; opacity: .85; }
+/* v699 : Équipe, la collection s'ouvre dans une fenêtre de choix */
+button.v2-slot { font: inherit; color: inherit; cursor: pointer; }
+.tm-pick { margin: 12px 0 4px; }
+.tm-pick-sheet .tm-pk-bar { display: flex; align-items: center; gap: 8px; margin: 6px 0 10px; }
+.tm-pick-sheet .tm-pk-bar .chips { flex: 1 1 auto; min-width: 0; margin: 0; }
+.tm-pick-sheet .tm-pk-bar .linkish { flex: none; white-space: nowrap; }
+.tm-pick-sheet .tm-pk-foot { position: sticky; bottom: 0; z-index: 3; padding: 10px 0 calc(var(--safe-b, 0px) + 6px); background: linear-gradient(180deg, transparent, #0d0f17 30%); }
+/* v699 : Probabilités en lien discret sous le bouton d'achat (un gros bouton par booster chargeait la page ; Apple demande qu'elles restent visibles) */
+.shop-odds { display: inline-flex; align-items: center; gap: 4px; margin: 6px auto 0; padding: 8px 10px; min-height: 36px; color: var(--muted, #b9b2a2); text-decoration: underline; text-underline-offset: 3px; background: none; border: 0; }
+.shop-odds .ic { width: 14px; height: 14px; }
+/* v699 : portraits en silhouette des adversaires et salles à venir */
+details.dc-fold > summary .gm-tease { display: flex; flex-basis: 100%; gap: 6px; margin-top: 8px; padding-left: 2px; overflow: hidden; }
+details.dc-fold > summary .gm-tease img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; filter: brightness(.08) sepia(1) hue-rotate(220deg) saturate(2); border: 1px solid rgba(201, 164, 90, .35); box-shadow: 0 0 10px rgba(120, 70, 200, .35); }
+details.dc-fold[open] > summary .gm-tease { display: none; }
+details.dc-fold > summary:has(.gm-tease) { flex-wrap: wrap; }
+/* v699 : Bestiaire, types repliables avec leur compteur */
+.bs-cat { margin: 8px 0; border: 1px solid rgba(201, 164, 90, .22); border-radius: 12px; background: rgba(18, 16, 26, .7); }
+.bs-cat > summary { display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 8px 14px; cursor: pointer; list-style: none; }
+.bs-cat > summary::-webkit-details-marker { display: none; }
+.bs-cat > summary::after { content: '›'; margin-left: 6px; color: #C9A45A; font-size: 1.2rem; transition: transform .2s; }
+.bs-cat[open] > summary::after { transform: rotate(90deg); }
+.bs-cat-n { flex: 1 1 auto; font: 700 .86rem/1.1 var(--f-display); letter-spacing: .1em; text-transform: uppercase; color: #E8C35A; }
+.bs-cat-c { font: 700 .78rem/1 var(--f-ui); color: #B9B2A2; }
+.bs-cat-c.full { color: #8FD18F; }
+.bs-cat > .codex { padding: 0 10px 10px; }
+/* v699 : textes trop petits relevés (mesurés à moins de 11 px sur le tour des écrans) */
+#tabbar .tab { font-size: .74rem; }
+.top-lv .lv { font-size: .66rem; }
+.v2-mini small, .td-streak i small, .dc-chap-floors small { font-size: .68rem; }
+.dc-link small { font-size: .72rem; }
+.fg-cell small, .fg-cell b { font-size: .72rem; }

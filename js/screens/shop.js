@@ -142,7 +142,7 @@ export default function shop(app, root, params = []) {
             <button class="btn ${can ? 'primary dc-plq dc-plq-red' : 'dc-plq dc-plq-dark'} shop-buy" data-act="buy" data-type="${type}" ${can ? '' : 'disabled'}>
               ${payLabel(g, type)}
             </button>
-            <button class="btn ghost small" data-act="odds" data-type="${type}">${icon('info')}Probabilités</button>
+            <button class="linkish small shop-odds" data-act="odds" data-type="${type}">${icon('info')}Probabilités</button>
           </div>
           ${!can ? `<p class="small muted">Il te manque ${fmt(def.price - s.shards)} éclats.</p>` : ''}
           ${type === 'standard' ? freeLine() : ''}

@@ -82,7 +82,7 @@ export default function cryptesScreen(app, root) {
         <ul class="mq-clist">${CR.TABLES.filter((_, i) => CR.tableUnlocked(g.s, i)).map((t) => { const R = CR.RIVALS[t.rival]; return `<li><span class="sc-por">${pic(t.rival)}</span><span><b>${esc(R.name)}</b><span class="small muted">${esc(R.hint)}</span></span></li>`; }).join('')}</ul></details>
       <p class="small muted center">Récompenses : ${CR.CRYPTES_REWARD.dailyPaid} victoires payées par jour (${Math.max(0, CR.CRYPTES_REWARD.dailyPaid - (cr.day === todayKey() ? cr.paidToday : 0))} restantes aujourd’hui). Au-delà, tu peux jouer pour le plaisir.</p>
       <details class="panel dc-fold dc-how"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/help.webp"><span class="dc-sum-t">Comment ça marche</span></summary>${howHTML()}</details>`;
-    tuto(app, 'cryptes');
+    /* v699 : la bulle des règles attend la première partie (elle couvrait la liste des salles) */
   }
 
   // ——— Partie ———
@@ -249,7 +249,7 @@ export default function cryptesScreen(app, root) {
     app.sfx.enter?.();
     banner = { cls: 'intro', html: `<span class="sc-med">${pic(st.rival)}</span><span><b>« ${esc(R.hello)} »</b><span class="small">10 paires à trouver. Tu commences.${CR.TABLE[st.table].rule ? `<em class="gm-ruleline">${esc(CR.TABLE[st.table].rule)}</em>` : ''}</span></span>` };
     busy = true; view();
-    tuto(app, 'cryptes-play').then(() => wait(1400)).then(() => { banner = null; busy = false; if (!gone) view(); });
+    tuto(app, 'cryptes').then(() => tuto(app, 'cryptes-play')).then(() => wait(1400)).then(() => { banner = null; busy = false; if (!gone) view(); });
   }
   function rules() { openSheet(`<div class="sc-rules"><h2>Les Cryptes</h2>${howHTML()}</div>`, { label: 'Règles des Cryptes' }); }
   function powers() { openSheet(`<div class="sc-rules"><h2>Pouvoirs des factions</h2><p class="small muted">Chaque paire déclenche le pouvoir de sa faction.</p>${powersHTML()}</div>`, { label: 'Pouvoirs des factions' }); }

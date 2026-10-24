@@ -96,7 +96,7 @@ ${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone || dail
         ${howHTML()}
         <h3 class="sc-rg-h">Les règles en animation</h3>${ruleTiles()}
         <p class="small muted center">Toutes les cartes ont le même total de valeurs (20) : une Commune bien placée peut capturer une Mythique.</p></details>`;
-    tuto(app, 'sceaux').then(() => { if (Object.keys(sc.beaten || {}).length) tuto(app, 'sceaux-awake'); });
+    if (Object.keys(sc.beaten || {}).length) tuto(app, 'sceaux-awake'); /* v699 : la bulle des règles attend la première partie */
   }
   const todayKey = () => { const d = g.clock(), p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; };
 
@@ -307,7 +307,7 @@ ${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone || dail
     boardView({ intro: true });
     app.sfx.enter?.();
     dialog(R, R.hello, st.first === 'p' ? 'Tu commences.' : `${esc(R.name)} commence.`);
-    tuto(app, 'sceaux-board').then(() => (SC.ruleHas(st, 'identique') || SC.ruleHas(st, 'somme') ? tuto(app, 'sceaux-combo') : null))
+    tuto(app, 'sceaux').then(() => tuto(app, 'sceaux-board')).then(() => (SC.ruleHas(st, 'identique') || SC.ruleHas(st, 'somme') ? tuto(app, 'sceaux-combo') : null))
       .then(() => (SC.ruleHas(st, 'sacre') ? tuto(app, 'sceaux-sacre') : null)) /* v402 : Cases sacrées avaient pas de bulle */
       .then(() => { if ([...st.hands.p, ...st.hands.o].some((id) => SC.perksOf(cat.get(id)).length)) tuto(app, 'sceaux-perks'); });
     aiTurn();

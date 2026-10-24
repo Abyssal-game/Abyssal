@@ -58,7 +58,7 @@ export default function bestiary(app, root) {
       <div class="chips fac-grid" role="group" aria-label="Faction">${FACTION_ORDER.map((f) => `<button class="chip" data-act="fac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>
       <label class="input-wrap"><span class="sr">Rechercher dans le Bestiaire</span>${icon('search')}<input class="input" id="best-q" type="search" placeholder="Rechercher une créature connue…" value="${esc(st.q)}"></label>
       <p class="small muted">${fp.owned} entrée${fp.owned > 1 ? 's' : ''} sur ${fp.total} dans ${esc(lowArt(cat.faction[st.faction].realm))}.</p>
-      ${keys.map((k) => `<h3 class="section-title">${esc(k)}</h3><div class="codex">${groups[k].map((c) => entry(c)).join('')}</div>`).join('') || '<p class="muted">Aucune créature connue ne correspond.</p>'}
+      ${keys.map((k) => { const tot = k === 'Pages scellées' ? groups[k].length : cat.byFaction[st.faction].filter((c) => c.category === k).length; const own = k === 'Pages scellées' ? 0 : groups[k].length; return `<details class="bs-cat" data-cat="${esc(k)}" ${q || (st.oc ||= {})[k] ? 'open' : ''}><summary><span class="bs-cat-n">${esc(k)}</span>${k === 'Pages scellées' ? `<span class="bs-cat-c">${tot}</span>` : `<span class="bs-cat-c ${own >= tot ? 'full' : ''}">${own} / ${tot}</span>`}</summary><div class="codex">${groups[k].map((c) => entry(c)).join('')}</div></details>`; }).join('') || '<p class="muted">Aucune créature connue ne correspond.</p>'}
       ${sealedN && !q ? `<p class="small muted center sealed-n">${icon('lock')} ${sealedN} page${sealedN > 1 ? 's' : ''} encore scellée${sealedN > 1 ? 's' : ''} dans ce royaume. Ouvre des boosters pour les révéler.</p>` : ''}`;
   }
 
@@ -152,6 +152,7 @@ export default function bestiary(app, root) {
     dream(el) { const b = BOSSES[el.dataset.k]; if (!b) return; app.sfx.page?.(); /* v676 */
       openSheet(`<div class="drm-sheet"><span class="drm-art big" style="background-image:url(assets/bosses/carte-${el.dataset.k}.webp)"><img alt="" src="assets/bosses/${el.dataset.k}.webp"></span><h2 class="center" translate="no">${esc(tw(b.name))}</h2><p class="center small lr-sub">${esc(b.title)}</p><p class="lore">${esc(b.story)}</p><p class="small"><b>Sa mécanique.</b> ${esc(b.mechanic)}</p><p class="small"><b>Pour le contrer.</b> ${esc(b.counter)}</p></div>`, { label: b.name, cls: 'dc-sheet' }); },
   });
+  root.addEventListener('toggle', (e) => { const d = e.target; if (d.classList?.contains('bs-cat')) (st.oc ||= {})[d.dataset.cat] = d.open; }, true); /* v699 : types repliables, gardés ouverts */
   root.addEventListener('click', (e) => {
     const lf = e.target.closest('.lr-e.form');
     if (lf) return app.openCard(lf.dataset.id);

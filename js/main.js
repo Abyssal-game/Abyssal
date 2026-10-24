@@ -228,13 +228,13 @@ function renderChrome() {
   setIf(document.getElementById('tabbar'), TABS.map(([key, ic, label]) => {
     const cur = key === tab ? ' aria-current="page"' : '';
     // moins de pastilles : un chiffre seulement pour ce qui attend d'être ouvert (boosters, coffres), sinon un simple point
-    const dot = '<span class="badge dot"></span>';
-    const badge = key === 'boutique' && ticketCount + g.chestCount() ? `<span class="badge">${ticketCount + g.chestCount()}</span>` /* v428 : boosters et coffres à ouvrir */
+    const dot = '<span class="badge dot"></span>', nCap = (n) => (n > 9 ? '9+' : n); /* v699 : « 20 » sur l'onglet faisait pression : 9+ au-delà */
+    const badge = key === 'boutique' && ticketCount + g.chestCount() ? `<span class="badge">${nCap(ticketCount + g.chestCount())}</span>` /* v428 : boosters et coffres à ouvrir */
       : key === 'collection' && nNew ? dot
-      : key === 'antre' && mpw.cards?.length ? `<span class="badge">${mpw.cards.length}</span>` /* v696 : « Le Cercle t'attend » sur l'Accueil */
+      : key === 'antre' && mpw.cards?.length ? `<span class="badge">${nCap(mpw.cards.length)}</span>` /* v696 : « Le Cercle t'attend » sur l'Accueil */
       : key === 'antre' && (g.canDailyClaim() || g.missionsToClaim()) ? dot
-      : key === 'descente' && (mpw.turns + mpw.games) ? `<span class="badge">${mpw.turns + mpw.games}</span>` /* v521 : en ligne, à toi de jouer ou défi à voir */
-      : key === 'menu' && mpw.friends ? `<span class="badge">${mpw.friends}</span>` /* v521 : demandes d'ami */
+      : key === 'descente' && (mpw.turns + mpw.games) ? `<span class="badge">${nCap(mpw.turns + mpw.games)}</span>` /* v521 : en ligne, à toi de jouer ou défi à voir */
+      : key === 'menu' && mpw.friends ? `<span class="badge">${nCap(mpw.friends)}</span>` /* v521 : demandes d'ami */
       : key === 'descente' && g.team().length >= 3 && (g.descent().run || g.trials().done.some((x) => !x)) ? dot : ''; /* v407 : Épreuves du jour à jouer */
     if (key === 'boutique') return `<a class="tab tab-main" href="#/boutique"${cur}><span class="orb">${tabIcon(ic)}</span>${label}${badge}</a>`;
     return `<a class="tab" href="#/${key}"${cur}>${tabIcon(ic)}${label}${badge}</a>`;
@@ -294,6 +294,7 @@ function render() {
   }
   view.innerHTML = '';
   app.cleanup = screen(app, view, app.params) || null;
+  teaseWatch(view);
   pruneLazy(); /* v576 : plus d'images de l'écran quitté sous surveillance */
   window.scrollTo(0, keepY);
   scrollKey = key;
@@ -349,7 +350,7 @@ function progLine(e) { return e.kind === 'level' ? `Niveau ${e.level}` : e.kind 
 /* v695 : la pastille attend la fin d'un combat, d'une ouverture, d'un coffre ou d'une présentation de gardien
    (elle cachait des titres et des annonces) */
 let progWait = 0;
-const progBusy = () => document.body.classList.contains('battle-mode') || !!document.querySelector('.opening, .bx-intro, .chx-stage, .vd');
+const progBusy = () => document.body.classList.contains('battle-mode') || !!document.querySelector('.opening, .bx-intro, .chx-stage, .vd, .sheet-wrap'); /* v699 : ni par-dessus une fenêtre */
 function paintProgress() {
   clearTimeout(progWait);
   if (progBusy()) { progEl?.classList.remove('in'); progWait = setTimeout(() => { if (progList.length) paintProgress(); }, 1500); return; }
@@ -400,6 +401,26 @@ function onProgress(events) {
   try { if (k !== 'codex' || events.some((e) => e.up)) (k === 'codex' ? sfx.season : k === 'fame' ? sfx.fame : k === 'season' ? sfx.season : sfx.achievement)(); } catch (e) { /* le son ne bloque rien */ }
   progList = [...progList.filter((e) => !(e.kind === 'level' && events.some((x) => x.kind === 'level'))), ...events];
   paintProgress();
+}
+
+/* v699 (tour du 24 octobre 2026) : les listes repliées « … à venir » montrent les portraits qui attendent, en silhouette,
+   pour donner envie d'avancer (avant : un simple bouton replié) */
+let teaseObs = null;
+function teaseFolds(root) {
+  root.querySelectorAll('details.dc-fold:not([data-tz])').forEach((d) => {
+    const sum = d.querySelector(':scope > summary'), t = sum?.querySelector('.dc-sum-t');
+    if (!t || !/à venir/.test(t.dataset.fr || t.textContent) && !d.querySelector('.sc-rivals')) return;
+    d.dataset.tz = '1';
+    const pics = [...d.querySelectorAll('.sc-rivals > *')].map((row) => row.querySelector('img:not(.picon)')).filter(Boolean).slice(0, 7);
+    if (!pics.length) return;
+    sum.insertAdjacentHTML('beforeend', `<span class="gm-tease" aria-hidden="true">${pics.map((i) => `<img alt="" src="${i.getAttribute('src')}">`).join('')}</span>`);
+  });
+}
+function teaseWatch(view) {
+  teaseObs?.disconnect();
+  teaseFolds(view);
+  teaseObs = new MutationObserver(() => teaseFolds(view));
+  teaseObs.observe(view, { childList: true, subtree: true });
 }
 
 async function boot() {

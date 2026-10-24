@@ -72,7 +72,7 @@ export default function encheresScreen(app, root) {
         <ul class="mq-clist">${EN.TABLES.filter((_, i) => EN.tableUnlocked(g.s, i)).flatMap((t) => t.seats).map((k) => { const C = EN.BIDDERS[k]; return `<li><span class="sc-por">${pic(k)}</span><span><b>${esc(C.name)}</b><span class="small muted">${esc(C.hint)}</span></span></li>`; }).join('')}</ul></details>
       <p class="small muted center">Récompenses : ${EN.ENCHERES_REWARD.dailyPaid} victoires payées par jour (${Math.max(0, EN.ENCHERES_REWARD.dailyPaid - (en.day === todayKey() ? en.paidToday : 0))} restantes aujourd’hui). Au-delà, tu peux jouer pour le plaisir.</p>
       <details class="panel dc-fold dc-how"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/help.webp"><span class="dc-sum-t">Comment ça marche</span></summary>${howHTML()}</details>`;
-    tuto(app, 'encheres');
+    /* v699 : la bulle des règles attend la première partie (elle couvrait la liste des salles) */
   }
 
   // ——— Vente ———
@@ -187,7 +187,7 @@ export default function encheresScreen(app, root) {
     const H = st.table === 'grande' ? { ...M, key: 'banquier' } : A; /* v492 : la réplique sous le bon portrait */
     banner = { cls: 'intro', html: `<span class="sc-med">${pic(H.key)}</span><span class="mq-vd"><small>${esc(H.name)}${H.key === 'banquier' ? ', maître des ventes' : ''}</small><b>« ${esc(H.hello)} »</b><span>15 lots, 15 offrandes. Que la vente commence.${EN.TABLE[st.table].rule ? `<em class="gm-ruleline">${esc(EN.TABLE[st.table].rule)}</em>` : ''}</span></span>` };
     busy = true; view();
-    tuto(app, 'encheres-play').then(() => wait(1400)).then(() => { banner = null; busy = false; if (!gone) view(); });
+    tuto(app, 'encheres').then(() => tuto(app, 'encheres-play')).then(() => wait(1400)).then(() => { banner = null; busy = false; if (!gone) view(); });
   }
   function rules() { openSheet(`<div class="sc-rules"><h2>Les Enchères de Mammon</h2>${howHTML()}</div>`, { label: 'Règles des Enchères' }); }
 

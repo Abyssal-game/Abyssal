@@ -61,17 +61,7 @@ export default function settings(app, root) {
         <h2>Langue</h2>
         <div class="seg lang-grid" role="radiogroup" aria-label="Langue" translate="no">${Object.entries(LANGS).map(([k, l]) => `<button class="seg-b" role="radio" data-act="lang" data-v="${k}" aria-checked="${LANG === k}" aria-pressed="${LANG === k}">${l}</button>`).join('')}</div>
       </section>
-      <section class="panel stack">
-        <h2>Son et musique</h2>
-        ${toggle('sound', 'Effets sonores', 'Ouverture, révélation, combat. Le mode silencieux de l’iPhone peut les couper.')}
-        <div class="set-row col"><label for="vol"><b>Volume</b></label><input id="vol" type="range" min="0" max="1" step="0.05" value="${s.volume}" ${s.sound ? '' : 'disabled'}></div>
-        ${toggle('music', 'Musique d’ambiance', 'Une ambiance différente selon le lieu : Accueil, Butin, Descente, combat, gardien, et chaque jeu du Cercle de l’Abysse.')}
-        <div class="set-row col"><label for="mvol"><b>Volume de la musique</b></label><input id="mvol" type="range" min="0" max="1" step="0.05" value="${s.musicVol ?? 0.55}" ${s.sound && s.music !== false ? '' : 'disabled'}></div>
-        ${s.sound && s.music !== false ? `<div class="set-row col"><b>Écouter les ambiances</b><div class="set-sfx">${MUSIC_DEMO.map(([n], i) => `<button class="chip" data-mus="${i}">${n}</button>`).join('')}</div></div>` : ''}
-        ${window.Capacitor?.isNativePlatform?.() ? '' : toggle('loud', 'Son même en mode silencieux', 'Le jeu reste audible quand le bouton silencieux de l’iPhone est activé (iOS 17 ou plus). Peut couper la musique d’une autre app.')}
-        ${toggle('haptics', 'Vibrations', 'Petites vibrations sur les coups, les victoires et les cartes rares. Dans l’app, le téléphone vibre vraiment ; sur le site web, l’iPhone ne vibre presque pas.')}
-        ${notifSupported() ? `<div class="set-row"><div><b>Notifications</b><p class="small muted">${pushSupported() ? 'Booster gratuit du jour (10 h), à toi de jouer en ligne, défis reçus, Pari relevé, demandes d’ami.' : 'Booster gratuit du jour (10 h) et rappel 2 h avant la fin du délai quand c’est à toi de jouer en ligne.'}</p></div><button class="switch" role="switch" aria-checked="${!!s.notif}" data-act="notif" aria-label="Notifications"><i></i></button></div>` : ''}
-      </section>
+      <!-- v699 : le combat juste après la langue (réglage le plus utilisé) ; les ambiances repliées -->
       <section class="panel stack">
         <h2>Combat</h2>
         ${seg('defense', 'Défense active en combat', [['on', 'Manuelle'], ['auto', 'Automatique']])}
@@ -80,6 +70,17 @@ export default function settings(app, root) {
         <p class="small muted set-note">Sobre : la salle reste en place, sans particules ni flammes qui vacillent. Plus reposant, et un peu plus économe en batterie.</p>
         ${seg('quality', 'Effets des combats', [['auto', 'Complets'], ['light', 'Allégés']])}
         <p class="small muted set-note">Allégés : moins de particules, ni secousses de caméra ni éclairs, décor sobre. À essayer si les combats saccadent.</p>
+      </section>
+      <section class="panel stack">
+        <h2>Son et musique</h2>
+        ${toggle('sound', 'Effets sonores', 'Ouverture, révélation, combat. Le mode silencieux de l’iPhone peut les couper.')}
+        <div class="set-row col"><label for="vol"><b>Volume</b></label><input id="vol" type="range" min="0" max="1" step="0.05" value="${s.volume}" ${s.sound ? '' : 'disabled'}></div>
+        ${toggle('music', 'Musique d’ambiance', 'Une ambiance différente selon le lieu : Accueil, Butin, Descente, combat, gardien, et chaque jeu du Cercle de l’Abysse.')}
+        <div class="set-row col"><label for="mvol"><b>Volume de la musique</b></label><input id="mvol" type="range" min="0" max="1" step="0.05" value="${s.musicVol ?? 0.55}" ${s.sound && s.music !== false ? '' : 'disabled'}></div>
+        ${s.sound && s.music !== false ? `<details class="dc-fold set-amb"><summary>${icon('sound')} Écouter les ambiances</summary><div class="set-sfx">${MUSIC_DEMO.map(([n], i) => `<button class="chip" data-mus="${i}">${n}</button>`).join('')}</div></details>` : ''}
+        ${window.Capacitor?.isNativePlatform?.() ? '' : toggle('loud', 'Son même en mode silencieux', 'Le jeu reste audible quand le bouton silencieux de l’iPhone est activé (iOS 17 ou plus). Peut couper la musique d’une autre app.')}
+        ${toggle('haptics', 'Vibrations', 'Petites vibrations sur les coups, les victoires et les cartes rares. Dans l’app, le téléphone vibre vraiment ; sur le site web, l’iPhone ne vibre presque pas.')}
+        ${notifSupported() ? `<div class="set-row"><div><b>Notifications</b><p class="small muted">${pushSupported() ? 'Booster gratuit du jour (10 h), à toi de jouer en ligne, défis reçus, Pari relevé, demandes d’ami.' : 'Booster gratuit du jour (10 h) et rappel 2 h avant la fin du délai quand c’est à toi de jouer en ligne.'}</p></div><button class="switch" role="switch" aria-checked="${!!s.notif}" data-act="notif" aria-label="Notifications"><i></i></button></div>` : ''}
       </section>
       <section class="panel stack">
         <h2>Affichage</h2>

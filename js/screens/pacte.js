@@ -89,7 +89,7 @@ export default function pacteScreen(app, root) {
         <ul class="mq-clist">${PA.TABLES.filter((_, i) => PA.tableUnlocked(g.s, i)).map((t) => { const R = PA.RIVALS[t.rival]; return `<li><span class="sc-por">${pic(t.rival)}</span><span><b>${esc(R.name)}</b><span class="small muted">${esc(R.hint)}</span></span></li>`; }).join('')}</ul></details>
       <p class="small muted center">Récompenses : ${PA.PACTE_REWARD.dailyPaid} victoires payées par jour (${Math.max(0, PA.PACTE_REWARD.dailyPaid - (pa.day === todayKey() ? pa.paidToday : 0))} restantes aujourd’hui). Au-delà, tu peux jouer pour le plaisir.</p>
       <details class="panel dc-fold dc-how"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/help.webp"><span class="dc-sum-t">Comment ça marche</span></summary>${howHTML()}</details>`;
-    tuto(app, 'pacte');
+    /* v699 : la bulle des règles attend la première partie (elle couvrait la liste des salles) */
   }
 
   // ——— Partie ———
@@ -248,7 +248,7 @@ export default function pacteScreen(app, root) {
     app.sfx.enter?.();
     banner = { cls: 'intro', html: `<span class="sc-med">${pic(st.rival)}</span><span class="mq-vd"><small>${esc(R.name)}</small><b>« ${esc(R.hello)} »</b><span>Le premier à ${PA.tgt(st)} points gagne.${st.scores.a ? ` ${esc(R.name)} commence avec ${st.scores.a} points.` : ''}${PA.TABLE[st.table].rule ? `<em class="gm-ruleline">${esc(PA.TABLE[st.table].rule)}</em>` : ''}</span></span>` };
     busy = true; view();
-    tuto(app, 'pacte-play').then(() => wait(1400)).then(() => { banner = null; busy = false; if (!gone) view(); });
+    tuto(app, 'pacte').then(() => tuto(app, 'pacte-play')).then(() => wait(1400)).then(() => { banner = null; busy = false; if (!gone) view(); });
   }
   function rules() { openSheet(`<div class="sc-rules"><h2>Le Pacte</h2>${howHTML()}</div>`, { label: 'Règles du Pacte' }); }
   function cardInfo(i) {

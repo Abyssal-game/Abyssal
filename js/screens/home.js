@@ -91,11 +91,21 @@ export default function home(app, root) {
   }
   // Objectifs : un proche, un de progression, un de collection ; chacun mène à son écran
   // Objectifs : le premier en grand en haut de l'accueil (« Ton prochain objectif »), les autres plus bas
-  const goals = g.welcomePending() ? [] : g.goals().filter((x) => x.kind !== 'trial'); /* v411 : les Épreuves sont dans « Aujourd'hui » */
+  const goals = g.welcomePending() ? [] : g.goals().filter((x) => x.kind !== 'trial' && x.kind !== 'run' && x.title !== 'Commence la Descente'); /* v411 : les Épreuves sont dans « Aujourd'hui » ; v699 : « Commence la Descente » = le bouton Jouer */
   const GCOL = { run: '#E0485E', depth: '#9C7BFF', boss: '#FF6B7F', sceaux: '#E8C35A', collection: '#7FA8D8', forge: '#F08A3C', sublime: '#C9A8FF', shop: '#F2C14E', trial: '#E0485E' };
   const goalRow = (x, cls = 'hg-row') => `<a class="${cls}" href="${x.href}" style="--mc:${x.faction ? cat.faction[x.faction].colors.secondary : GCOL[x.kind]}">
       <span class="td-ic mi">${x.faction ? sigil(x.faction) : picon(x.icon)}</span>
       <span class="td-t">${cls === 'hg-main' ? '<span class="hg-k">Ton prochain objectif</span>' : ''}<b>${esc(x.title)}</b><span class="small muted">${esc(x.sub)}</span>${x.n ? `<span class="progress"><i style="width:${(x.p / x.n) * 100}%"></i></span>` : ''}</span>${icon('next')}</a>`;
+  /* v699 : un grand bouton « Jouer » sous le logo (reprendre ou continuer la Descente en un toucher) */
+  function playHTML() {
+    if (g.welcomePending()) return '';
+    const run = g.s.descent.run, d = g.descent();
+    const ch = run ? Math.ceil((run.floor || 1) / 5) : g.chapterNow();
+    const done = !run && (d.best || 0) >= 100;
+    const label = run ? `Reprendre le chapitre ${ch}` : done ? 'Retourner dans l’Abysse' : d.best ? `Continuer · chapitre ${ch}` : 'Descendre';
+    const sub = run ? `Étage ${run.floor} en cours` : done ? 'Rejoue un chapitre ou tente le Cauchemar' : 'La Descente t’attend';
+    return `<a class="btn primary block big-cta dc-plq dc-plq-red hm-play" href="#/descente">${icon('p:descend')}<span><b>${label}</b><small>${sub}</small></span></a>`;
+  }
   function mainGoalHTML() { return goals.length ? `<section class="panel ornate hg-main-wrap">${goalRow(goals[0], 'hg-main')}</section>` : ''; }
   root.innerHTML = `
     <section class="home-brand">
@@ -103,6 +113,7 @@ export default function home(app, root) {
     </section>
 
     ${g.welcomePending() ? `<a class="panel ornate hw-welcome" href="#/boutique"><span class="hw-ic">${picon('ticket')}</span><span><b>${g.s.welcomeGift > 0 ? `Cadeau de bienvenue : ${g.s.welcomeGift > 1 ? `${g.s.welcomeGift} boosters offerts` : '1 booster offert'} !` : g.s.tickets.standard > 1 ? `Tes ${g.s.tickets.standard} boosters de bienvenue t’attendent` : 'Ton booster de bienvenue t’attend'}</b><span class="small">${g.s.welcomeGift > 0 && g.freePack().stock ? 'Plus ton booster gratuit du jour. ' : ''}Ouvre-les pour découvrir tes premières créatures : elles formeront ton équipe.</span></span>${icon('next')}</a>` : ''}
+    ${playHTML()}
     ${circleHTML()}
     ${mainGoalHTML()}
 

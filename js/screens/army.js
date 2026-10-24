@@ -123,11 +123,7 @@ export function teamScreen(app, root) {
   };
   const draw = () => {
     const team = g.team(), ult = g.ultimate(team), run = g.descent().run;
-    const slot = (i) => { const c = team[i] && cat.get(team[i]); return c ? `<div class="v2-slot full ${g.isFallen(c.id) ? 'fallen' : ''}">${armyCard(g, c)}${g.isFallen(c.id) ? `<img class="v2-skull" alt="" src="assets/icons/mort.webp">${run ? '' : `<button class="btn small tm-revive" data-act="revive" data-id="${c.id}">Ranimer</button>`}` : ''}${run ? '' : `<span class="tm-ctl"><button class="tm-b" data-act="move" data-id="${c.id}" aria-label="${i < TEAM.active ? 'Mettre en réserve' : 'Envoyer au combat'}">${i < TEAM.active ? '▼' : '▲'}</button><button class="tm-b x" data-act="drop" data-id="${c.id}" aria-label="Retirer de l’équipe">✕</button></span>`}</div>` : `<div class="v2-slot"><span>+</span><small>${i < TEAM.active ? 'Combat' : 'Réserve'}</small></div>`; };
-    const owned = Object.keys(g.s.collection).map((id) => cat.get(id)).filter(Boolean);
-    const RI = (r) => ['C', 'PC', 'R', 'HR', 'M', 'S'].indexOf(r);
-    if (ui.role) { const keep = owned.filter((c) => roleOf(c) === ui.role); owned.length = 0; owned.push(...keep); } /* v422 : filtre par rôle */
-    owned.sort(ui.sort === 'cost' ? (a, b) => RI(b.rarity) - RI(a.rarity) || g.cardLevel(b.id) - g.cardLevel(a.id) : (a, b) => g.cardLevel(b.id) - g.cardLevel(a.id) || RI(b.rarity) - RI(a.rarity));
+    const slot = (i) => { const c = team[i] && cat.get(team[i]); return c ? `<div class="v2-slot full ${g.isFallen(c.id) ? 'fallen' : ''}">${armyCard(g, c)}${g.isFallen(c.id) ? `<img class="v2-skull" alt="" src="assets/icons/mort.webp">${run ? '' : `<button class="btn small tm-revive" data-act="revive" data-id="${c.id}">Ranimer</button>`}` : ''}${run ? '' : `<span class="tm-ctl"><button class="tm-b" data-act="move" data-id="${c.id}" aria-label="${i < TEAM.active ? 'Mettre en réserve' : 'Envoyer au combat'}">${i < TEAM.active ? '▼' : '▲'}</button><button class="tm-b x" data-act="drop" data-id="${c.id}" aria-label="Retirer de l’équipe">✕</button></span>`}</div>` : `<button class="v2-slot" data-act="${run ? 'none' : 'pick'}"><span>+</span><small>${i < TEAM.active ? 'Combat' : 'Réserve'}</small></button>`; };
     root.innerHTML = `<header class="screen-head ui-hero bn-team"><h1>Mon équipe</h1><p class="muted">3 créatures au combat, 2 en réserve qui prennent la relève.</p></header>
       ${run ? `<p class="panel small center">${icon('info')} Un chapitre de la Descente est en cours : l’équipe ne peut pas changer avant la fin du chapitre (ou son abandon).</p>` : ''}
       <section class="panel v2-team">
@@ -135,6 +131,7 @@ export function teamScreen(app, root) {
         ${team.length < TEAM.active ? `<p class="small v2-warn">${icon('info')} Il faut au moins ${TEAM.active} créatures pour partir dans la Descente (encore ${TEAM.active - team.length}).</p>` : ''}
         <h3 class="section-title">Au combat</h3><div class="v2-slots">${[0, 1, 2].map(slot).join('')}</div>
         <h3 class="section-title">En réserve</h3><div class="v2-slots res">${[3, 4].map(slot).join('')}</div>
+        ${run ? '' : `<button class="btn primary block tm-pick" data-act="pick">${icon('p:team-ic')}Choisir mes créatures</button>`}
         ${synHTML(team)}
         <div class="panel v2-skill ult" style="--uc:${ult.color}"><b>${icon('p:power')} Pouvoir : ${esc(ult.name)}</b><p class="small">${esc(ult.desc)}</p><p class="small muted">${ult.card ? `Porté par ${esc(cat.get(ult.card).name)}.` : 'Ajoute une Mythique ou une Secrète pour un pouvoir plus puissant.'}</p></div>
         ${run ? '' : `<div class="tm-tools"><button class="btn small primary" data-act="auto">${icon('sparkle')}Suggérer une équipe</button>${team.length ? '<button class="btn small ghost" data-act="clear">Vider</button>' : ''}</div>`}
@@ -142,21 +139,55 @@ export function teamScreen(app, root) {
         <details class="dc-fold tm-more"><summary>${icon('info')} Comment composer ton équipe</summary>
           <p class="small muted">Aucune limite de rareté : tu peux aligner tes créatures les plus fortes, ou celles qui se complètent le mieux.</p>
           <p class="small muted">La force d’une créature dépend de sa rareté et de son niveau : une Secrète au niveau 1 est plus faible qu’une Hyper rare au niveau 5.</p>
-          <p class="small muted">Touche <b>+</b> sous une créature pour l’ajouter, <b>▲▼</b> pour la passer du combat à la réserve, <b>✕</b> pour la retirer.</p>
+          <p class="small muted">Touche une case vide ou <b>Choisir mes créatures</b> pour ajouter une créature, <b>▲▼</b> pour la passer du combat à la réserve, <b>✕</b> pour la retirer.</p>
         </details>
       </section>
-      <h2 class="section-title">Ta collection <span class="more small"><button class="linkish" data-act="sort">${ui.sort === 'cost' ? 'Trier par niveau' : 'Trier par rareté'}</button></span></h2>
-      <div class="chips tm-roles" role="group" aria-label="Filtrer par rôle"><button class="chip" data-act="rolef" data-v="" aria-pressed="${!ui.role}">Tous</button>${Object.entries(ROLES).map(([k, r]) => `<button class="chip" data-act="rolef" data-v="${k}" style="--chip:${r.color}" aria-pressed="${ui.role === k}">${esc(r.name)}</button>`).join('')}</div>
-      <div class="grid-cards v2-grid" id="tm-grid"></div>`;
+`;
     lazyArt(root);
-    // v391 : la grille de la collection par paquets (216 cartes d'un coup bloquaient l'écran plus d'une seconde, à chaque ajout)
-    const grid = root.querySelector('#tm-grid'), html = (c) => `<div class="v2-pick ${team.includes(c.id) ? 'in' : ''}">${armyCard(g, c)}${run ? '' : `<button class="tm-add ${team.includes(c.id) ? 'in' : ''}" data-act="quick" data-id="${c.id}">${team.includes(c.id) ? '✓ Dans l’équipe' : '+ Ajouter'}</button>`}</div>`;
-    fillGrid(grid, owned, html, { first: 12, step: 12 }); /* v576 : complétée au fil du défilement */
   };
+  /* v699 (tour du 24 octobre 2026) : la collection n'est plus sous l'équipe (l'écran faisait 25 hauteurs d'écran) :
+     elle s'ouvre dans une fenêtre, filtrée par rôle, la plus forte d'abord */
+  function openPicker() {
+    const sh = openSheet('<div class="tm-picker"></div>', { cls: 'tm-pick-sheet', label: 'Choisir mes créatures', full: true, onClose: () => draw() });
+    const box = sh.body.querySelector('.tm-picker');
+    const RI = (r) => ['C', 'PC', 'R', 'HR', 'M', 'S'].indexOf(r);
+    const paint = () => {
+      const team = g.team();
+      const owned = Object.keys(g.s.collection).map((id) => cat.get(id)).filter(Boolean).filter((c) => !ui.role || roleOf(c) === ui.role);
+      owned.sort(ui.sort === 'cost' ? (a, b) => RI(b.rarity) - RI(a.rarity) || g.cardLevel(b.id) - g.cardLevel(a.id) : (a, b) => g.cardLevel(b.id) - g.cardLevel(a.id) || RI(b.rarity) - RI(a.rarity));
+      box.innerHTML = `<h2 class="center">Choisir mes créatures</h2>
+        <p class="small muted center tm-pk-n">Équipe : <b>${team.length} / ${TEAM.active + 2}</b> · les trois premières combattent, les deux suivantes attendent en réserve.</p>
+        <div class="tm-pk-bar"><div class="chips tm-roles" role="group" aria-label="Filtrer par rôle"><button class="chip" data-p="role" data-v="" aria-pressed="${!ui.role}">Tous</button>${Object.entries(ROLES).map(([k, r]) => `<button class="chip" data-p="role" data-v="${k}" style="--chip:${r.color}" aria-pressed="${ui.role === k}">${esc(r.name)}</button>`).join('')}</div>
+        <button class="linkish small" data-p="sort">${ui.sort === 'cost' ? 'Trier par niveau' : 'Trier par rareté'}</button></div>
+        <div class="grid-cards v2-grid" id="tm-grid"></div>
+        <div class="tm-pk-foot"><button class="btn primary block" data-p="done">Terminé</button></div>`;
+      const html = (c) => `<div class="v2-pick ${team.includes(c.id) ? 'in' : ''}">${armyCard(g, c)}<button class="tm-add ${team.includes(c.id) ? 'in' : ''}" data-p="quick" data-id="${c.id}">${team.includes(c.id) ? '✓ Dans l’équipe' : '+ Ajouter'}</button></div>`;
+      fillGrid(box.querySelector('#tm-grid'), owned, html, { first: 12, step: 12 });
+    };
+    box.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-p]');
+      if (!b) { const t = e.target.closest('.tcg'); if (t) openCreature(app, t.dataset.id, { onChange: paint }); return; }
+      const p = b.dataset.p;
+      if (p === 'done') return sh.close();
+      if (p === 'role') { ui.role = b.dataset.v || null; paint(); }
+      if (p === 'sort') { ui.sort = ui.sort === 'cost' ? 'power' : 'cost'; paint(); }
+      if (p === 'quick') {
+        const top = sh.body.scrollTop;
+        if (toggleTeam(app, b.dataset.id)) {
+          const inTeam = g.team().includes(b.dataset.id);
+          b.classList.toggle('in', inTeam); b.closest('.v2-pick')?.classList.toggle('in', inTeam);
+          b.textContent = inTeam ? '✓ Dans l’équipe' : '+ Ajouter';
+          const n = box.querySelector('.tm-pk-n b'); if (n) n.textContent = `${g.team().length} / ${TEAM.active + 2}`;
+          sh.body.scrollTop = top;
+        }
+      }
+    });
+    paint();
+  }
   root.addEventListener('click', (e) => { if (e.target.closest('[data-act]')) return; const t = e.target.closest('.tcg'); if (t) openCreature(app, t.dataset.id, { onChange: draw }); });
   bindActions(root, {
-    sort() { ui.sort = ui.sort === 'cost' ? 'power' : 'cost'; draw(); },
-    rolef(el) { ui.role = el.dataset.v || null; draw(); },
+    pick() { openPicker(); },
+    none() {},
     revive(el) { openRevive(app, el.dataset.id, () => draw()); },
     quick(el) { if (toggleTeam(app, el.dataset.id)) draw(); },
     drop(el) { if (toggleTeam(app, el.dataset.id)) draw(); },

@@ -117,7 +117,7 @@ export function fillGrid(grid, list, html, { first = 24, step = 24, ahead = 1400
     grid.style.minHeight = `${Math.ceil(list.length / cols) * (k0.offsetHeight + gap)}px`;
   }
   let queued = false;
-  const stop = () => { removeEventListener('scroll', queue); removeEventListener('resize', queue); };
+  const stop = () => { removeEventListener('scroll', queue, true); removeEventListener('resize', queue); };
   function tick() {
     queued = false;
     if (run !== grid.fillRun || !grid.isConnected) return stop();
@@ -130,7 +130,7 @@ export function fillGrid(grid, list, html, { first = 24, step = 24, ahead = 1400
     queue();
   }
   function queue() { if (!queued) { queued = true; requestAnimationFrame(() => setTimeout(tick, 0)); } }
-  addEventListener('scroll', queue, { passive: true }); addEventListener('resize', queue);
+  addEventListener('scroll', queue, { passive: true, capture: true }); addEventListener('resize', queue); /* v699 : capture = aussi le défilement d'une fenêtre (choix de l'équipe) */
   queue();
   return { count: () => n };
 }
