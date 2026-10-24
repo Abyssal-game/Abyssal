@@ -97,7 +97,7 @@ export default function bestiary(app, root) {
       ${head('Les Rêves vaincus', of('boss'))}
       <p class="small muted">Les gardiens de la Descente ne sont que des rêves de l’Abysse. Chaque rêve vaincu rejoint cette galerie : il ne se bat jamais à tes côtés.</p>
       <div class="drm-grid">${of('boss').map((e) => { const ch = BOSS_ORDER.indexOf(e.boss) + 1; /* v676 : galerie des gardiens vaincus (figure peinte), silhouette pour les autres */
-        return e.unlocked ? `<button class="drm-t" data-act="dream" data-k="${e.boss}">${nb(e)}<span class="drm-art" style="background-image:url(assets/bosses/carte-${e.boss}.webp)"><img alt="" loading="lazy" src="assets/bosses/${e.boss}.webp"></span><small>Chapitre ${ch}</small><b translate="no">${esc(tw(e.title))}</b></button>`
+        return e.unlocked ? `<button class="drm-t" data-act="dream" data-k="${e.boss}">${nb(e)}<span class="drm-art drm-card"><img alt="" loading="lazy" src="assets/bosses/combat-${e.boss}.webp"></span><small>Chapitre ${ch}</small><b translate="no">${esc(tw(e.title))}</b></button>`
           : `<div class="drm-t locked"><span class="drm-art"><img alt="" loading="lazy" src="assets/bosses/${e.boss}.webp"></span><small>Chapitre ${ch}</small><b>Rêve scellé</b></div>`; }).join('')}</div>
       ${head('Formes corrompues', of('form'))}
       <div class="stack">${of('form').filter((e) => e.unlocked).map((e) => { const c = cat.get(e.id); return e.unlocked ? `<button class="lr-e form" data-act="card" data-id="${e.id}">${nb(e)}<span class="lr-th"><img alt="" src="${artUrl(c, { lite: true })}"></span><span><b>${esc(e.title)}</b><span class="small lr-sub">${esc(c.name)} · ${esc(e.sub)}</span><p class="lore small">${esc(e.text)}</p></span></button>` : lock(e); }).join('')}</div>
@@ -150,7 +150,7 @@ export default function bestiary(app, root) {
     fac(el) { st.faction = el.dataset.v; render(); },
     card() {},
     dream(el) { const b = BOSSES[el.dataset.k]; if (!b) return; app.sfx.page?.(); /* v676 */
-      openSheet(`<div class="drm-sheet"><span class="drm-art big" style="background-image:url(assets/bosses/carte-${el.dataset.k}.webp)"><img alt="" src="assets/bosses/${el.dataset.k}.webp"></span><h2 class="center" translate="no">${esc(tw(b.name))}</h2><p class="center small lr-sub">${esc(b.title)}</p><p class="lore">${esc(b.story)}</p><p class="small"><b>Sa mécanique.</b> ${esc(b.mechanic)}</p><p class="small"><b>Pour le contrer.</b> ${esc(b.counter)}</p></div>`, { label: b.name, cls: 'dc-sheet' }); },
+      openSheet(`<div class="drm-sheet"><span class="drm-art drm-card big"><img alt="" src="assets/bosses/combat-${el.dataset.k}.webp"></span><h2 class="center" translate="no">${esc(tw(b.name))}</h2><p class="center small lr-sub">${esc(b.title)}</p><p class="lore">${esc(b.story)}</p><p class="small"><b>Sa mécanique.</b> ${esc(b.mechanic)}</p><p class="small"><b>Pour le contrer.</b> ${esc(b.counter)}</p></div>`, { label: b.name, cls: 'dc-sheet' }); },
   });
   root.addEventListener('toggle', (e) => { const d = e.target; if (d.classList?.contains('bs-cat')) (st.oc ||= {})[d.dataset.cat] = d.open; }, true); /* v699 : types repliables, gardés ouverts */
   root.addEventListener('click', (e) => {
