@@ -6652,3 +6652,9 @@ details.dc-fold > summary:has(.gm-tease) { flex-wrap: wrap; }
 .mp-unknown img { width: 52px; height: 52px; border-radius: 50%; animation: mpUnk 2.2s ease-in-out infinite; }
 .mp-unknown .mp-spin { position: absolute; inset: -4px; width: auto; height: auto; }
 @keyframes mpUnk { 50% { opacity: .55; } }
+
+/* v706 : capture du propriétaire : les sélecteurs (.seg) défilaient de haut en bas dans leur cadre (leurs boutons dépassent de 2 px,
+   et overflow-x: auto rendait l'axe vertical défilable sur iPhone). Plus jamais de défilement vertical ; seuls les .seg.wide
+   (rangées de filtres) gardent le défilement de côté. */
+.seg:not(.lang-grid) { overflow-y: hidden !important; overscroll-behavior: contain; }
+.seg:not(.wide):not(.lang-grid) { overflow-x: hidden; }
