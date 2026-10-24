@@ -1,4 +1,4 @@
-# v539 : publie la fonction serveur « partie » (serveur de partie, anti-triche) sur Supabase à chaque changement du moteur.
+# v539 : publie la fonction serveur « partie » (et v693 : « push », les notifications) (serveur de partie, anti-triche) sur Supabase à chaque changement du moteur.
 # Il faut le secret GitHub SUPABASE_ACCESS_TOKEN (jeton personnel Supabase : Account → Access Tokens). Sans lui, rien n'est publié.
 name: Serveur de partie
 on:
@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: 22
       - name: Essais du serveur de partie
-        run: node --test tests/serveur-partie.test.mjs tests/serveur-rejeu.test.mjs
+        run: node --test tests/serveur-partie.test.mjs tests/serveur-rejeu.test.mjs tests/notifications.test.mjs
       - name: Jeton absent
         if: env.SUPABASE_ACCESS_TOKEN == ''
         run: |
@@ -29,3 +29,6 @@ jobs:
       - name: Publier la fonction « partie »
         if: env.SUPABASE_ACCESS_TOKEN != ''
         run: supabase functions deploy partie --project-ref zwyxnrvvctanzsssyirm --use-api --no-verify-jwt
+      - name: Publier la fonction « push » (notifications, v693)
+        if: env.SUPABASE_ACCESS_TOKEN != ''
+        run: supabase functions deploy push --project-ref zwyxnrvvctanzsssyirm --use-api --no-verify-jwt

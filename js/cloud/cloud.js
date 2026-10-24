@@ -208,6 +208,9 @@ export async function versusClaim(id) { return authed('/rest/v1/rpc/versus_claim
 // ——— Mini-jeux contre d'autres joueurs (v519, supabase/09-multijoueur.sql) ——————————————
 const rpc = (fn, body = {}) => authed(`/rest/v1/rpc/${fn}`, { method: 'POST', body });
 /* v608 : joueurs en ligne (liste lisible par le seul compte « Le Gardien », supabase/16-en-ligne.sql) */
+/* v693 : adresse de notification du téléphone (supabase/17-notifications.sql) */
+export const pushRegister = (token, platform, lang) => rpc('push_register', { p_token: token, p_platform: platform, p_lang: lang });
+export const pushUnregister = (token) => rpc('push_unregister', { p_token: token });
 export const onlinePing = () => rpc('online_ping');
 export const onlineLeave = () => rpc('online_leave');
 export const onlineList = async () => (await rpc('online_list')) || [];

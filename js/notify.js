@@ -2,9 +2,11 @@
 // Notifications locales programmées par l'app elle-même (Capacitor LocalNotifications), sans serveur :
 //  • le booster gratuit du jour, à 10 h, s'il n'est pas encore ouvert ;
 //  • les parties en ligne : rappel 2 h avant la fin du délai quand c'est à toi de jouer.
-// Les alertes en direct (« ton adversaire a joué », « ton défi a été relevé », demande d'ami) demandent des
-// notifications envoyées par le serveur : prévues ensuite (clé Apple à créer par le propriétaire).
+// v693 : les alertes en direct (« ton adversaire a joué », défi reçu, Pari relevé, demande d'ami…) sont envoyées par
+// le serveur, même app fermée (supabase/17-notifications.sql, fonction « push ») : l'app donne son adresse de
+// notification au serveur (syncPush), seulement dans l'app iPhone qui a le module (version 1.1 et suivantes).
 import { isNative } from './native.js';
+import { LANG } from './i18n.js';
 import { CODEX, codexTier } from './core/codex.js';
 
 const LN = () => (isNative() ? window.Capacitor?.Plugins?.LocalNotifications : null);
@@ -12,6 +14,45 @@ const DAILY_ID = 1001, CODEX_ID = 1002; /* v680 : fin de saison du Codex */
 const REMIND_BASE = 20000;
 const REMIND_HOURS = 2;
 export const notifSupported = () => !!LN();
+export const pushSupported = () => !!PN();
+/* v693 : notifications du serveur (iPhone seulement pour l'instant : Android demandera Firebase) */
+const PN = () => {
+  const C = isNative() ? window.Capacitor : null;
+  return C && C.getPlatform?.() === 'ios' && C.isPluginAvailable?.('PushNotifications') ? C.Plugins.PushNotifications : null;
+};
+const TOK = 'abyssal.pushToken';
+const tokGet = () => { try { return localStorage.getItem(TOK) || ''; } catch (e) { return ''; } };
+let wired = false;
+// Donne (ou retire) l'adresse de notification de ce téléphone au serveur, selon le réglage et le compte connecté
+export async function syncPush(app) {
+  const P = PN(); if (!P) return;
+  const g = app.game;
+  const cloud = await import('./cloud/cloud.js');
+  if (!wired) {
+    wired = true;
+    try {
+      await P.addListener('registration', ({ value }) => {
+        try { localStorage.setItem(TOK, value); } catch (e) { /* rien */ }
+        if (cloud.isLoggedIn() && g.s.settings.notif) cloud.pushRegister(value, 'ios', LANG).catch(() => {});
+      });
+      await P.addListener('pushNotificationActionPerformed', (a) => {
+        const r = a?.notification?.data?.route;
+        if (typeof r === 'string' && /^#\/[a-z-]*$/.test(r)) app.go(r.slice(2));
+      });
+    } catch (e) { /* rien */ }
+  }
+  if (!cloud.isLoggedIn()) return;
+  if (!g.s.settings.notif) { await pushOff(); return; }
+  try {
+    const p = await P.checkPermissions();
+    if (p.receive === 'granted') await P.register();
+  } catch (e) { /* rien */ }
+}
+// Notifications coupées ou déconnexion : le serveur oublie l'adresse de ce téléphone (à appeler avant la déconnexion)
+export async function pushOff() {
+  const tok = tokGet(); if (!tok || !PN()) return;
+  try { const cloud = await import('./cloud/cloud.js'); if (cloud.isLoggedIn()) await cloud.pushUnregister(tok); } catch (e) { /* rien */ }
+}
 
 // Demande l'autorisation au téléphone ; renvoie true si les notifications sont permises
 export async function askPermission() {
@@ -19,6 +60,8 @@ export async function askPermission() {
   try {
     let p = await L.checkPermissions();
     if (p.display !== 'granted') p = await L.requestPermissions();
+    const P = PN(); /* v693 : la même autorisation de l'iPhone sert aux notifications du serveur */
+    if (P && p.display === 'granted') { try { const q = await P.checkPermissions(); if (q.receive !== 'granted') await P.requestPermissions(); } catch (e) { /* rien */ } }
     return p.display === 'granted';
   } catch (e) { return false; }
 }
@@ -79,7 +122,7 @@ export async function maybeAsk(app) {
   g.s.notifAsked = true; g.persist();
   const { openSheet } = await import('./ui/dom.js');
   const sh = openSheet(`<div class="notif-ask"><h2>Être prévenu ?</h2>
-      <p>ABYSSAL peut t’envoyer une notification quand ton <b>booster gratuit du jour</b> t’attend, et avant la fin du délai quand c’est <b>à toi de jouer</b> contre un autre joueur.</p>
+      <p>${PN() ? 'ABYSSAL peut te prévenir quand ton <b>booster gratuit du jour</b> t’attend, quand c’est <b>à toi de jouer</b> contre un autre joueur, quand on te lance un <b>défi</b> et quand on te demande en <b>ami</b>.' : 'ABYSSAL peut t’envoyer une notification quand ton <b>booster gratuit du jour</b> t’attend, et avant la fin du délai quand c’est <b>à toi de jouer</b> contre un autre joueur.'}</p>
       <p class="small muted">Tu peux changer d’avis à tout moment : Réglages → Jeu → Notifications.</p>
       <div class="row gap"><button class="btn ghost" data-n="no">Non merci</button><button class="btn primary" data-n="yes">Oui, me prévenir</button></div></div>`, { cls: 'sheet-small', label: 'Notifications' });
   sh.body.addEventListener('click', async (e) => {
@@ -97,7 +140,9 @@ export async function enable(app, on) {
     toast('Notifications refusées : autorise-les dans les Réglages du téléphone → ABYSSAL → Notifications.', { kind: 'error', icon: 'info', ms: 6000 });
     return false;
   }
+  if (!on) await pushOff(); /* v693 : avant de couper, le serveur oublie ce téléphone */
   g.setSetting('notif', !!on);
   if (on) await syncDaily(g); else await clearAll();
+  syncPush(app).catch(() => {});
   return on;
 }

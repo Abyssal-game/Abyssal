@@ -7415,6 +7415,8 @@ export default {
   "Tapis de l’Autel de l’Abysse": "Spielmatte des Abgrund-Altars",
   "Tapis d’obsidienne et d’or": "Spielmatte aus Obsidian und Gold",
   "Tapis de la Glace noire": "Spielmatte des Schwarzen Eises",
+  "Booster gratuit du jour (10 h), à toi de jouer en ligne, défis reçus, Pari relevé, demandes d’ami.": "Gratis-Booster des Tages (10 Uhr), du bist online am Zug, erhaltene Herausforderungen, angenommene Wette, Freundschaftsanfragen.",
+  "ABYSSAL peut te prévenir quand ton <b>booster gratuit du jour</b> t’attend, quand c’est <b>à toi de jouer</b> contre un autre joueur, quand on te lance un <b>défi</b> et quand on te demande en <b>ami</b>.": "ABYSSAL kann dich benachrichtigen, wenn dein <b>Gratis-Booster des Tages</b> wartet, wenn du gegen einen anderen Spieler <b>am Zug bist</b>, wenn dir jemand eine <b>Herausforderung</b> schickt und wenn dich jemand als <b>Freund</b> hinzufügen möchte.",
   "Plaque du Titan": "Titanen-Plakette",
   "Plaque de la Forge": "Schmiede-Plakette",
   "Plaque des Racines": "Wurzel-Plakette",

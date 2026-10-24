@@ -19,6 +19,9 @@
       "insetsHandling": "native",
       "initialViewportFitValueHint": "cover",
       "style": "DARK"
+    },
+    "PushNotifications": {
+      "presentationOptions": []
     }
   }
 }

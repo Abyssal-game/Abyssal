@@ -48,7 +48,7 @@ import { startPresence } from './cloud/presence.js';
 import { showWelcome } from './screens/welcome.js';
 import { showGate } from './ui/gate.js';
 import { mpw, checkTurns } from './cloud/mpwatch.js';
-import { syncDaily, maybeAsk } from './notify.js';
+import { syncDaily, maybeAsk, syncPush } from './notify.js';
 import { onAuth } from './cloud/cloud.js';
 import { setScene } from './ui/scene.js';
 import { initNative, isNative } from './native.js';
@@ -417,7 +417,7 @@ async function boot() {
     setInterval(autoClaim, 5000);
     setTimeout(() => checkTurns(app, { force: true }), 6000); setInterval(() => checkTurns(app), 120000); /* v519 : « À toi de jouer » en ligne */
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkTurns(app); else syncDaily(app.game); }); /* v521 : notification du booster du jour reprogrammée en quittant l'app */
-    setTimeout(() => syncDaily(app.game), 8000); setInterval(() => maybeAsk(app), 30000); /* v422 : l'Accueil n'a plus de boutons « +50 » : on encaisse aussi sans changer de page */
+    setTimeout(() => { syncDaily(app.game); syncPush(app).catch(() => {}); }, 8000); setInterval(() => maybeAsk(app), 30000); /* v422 : l'Accueil n'a plus de boutons « +50 » : on encaisse aussi sans changer de page */
     setTimeout(() => claimShadowPrize(app), 5000); // coffre du Tirage des Ombres de la semaine passée
     lastShards = app.game.s.shards;
     window.addEventListener('hashchange', render);
@@ -426,7 +426,7 @@ async function boot() {
     let done = false;
     const finish = () => { if (done) return; done = true; applySettings(); render(); bootEl.classList.add('out'); setTimeout(() => bootEl.remove(), 900); setTimeout(() => showGate(app, () => showWelcome(app)), 700); };
     // v325 : compte obligatoire — après une déconnexion ou une suppression du compte, l'écran de compte revient
-    onAuth((sess) => { if (!sess && done) setTimeout(() => showGate(app), 300); });
+    onAuth((sess) => { if (!sess && done) setTimeout(() => showGate(app), 300); if (sess) syncPush(app).catch(() => {}); }); /* v693 : notifications du serveur pour le compte connecté */
     // v293 : iPhone et navigateurs n'autorisent le son qu'après un premier toucher. L'écran d'ouverture attend donc
     // « Touche pour entrer » : ce toucher lance la musique et les sons dès l'arrivée au menu (sauf si on a déjà touché l'écran, ex. code d'accès).
     setTimeout(() => {

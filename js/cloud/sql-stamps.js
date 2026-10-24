@@ -28,6 +28,10 @@ export const SQL_STAMPS = {
     "file": "16-en-ligne.sql",
     "stamp": "c0b3b3814490"
   },
+  "17": {
+    "file": "17-notifications.sql",
+    "stamp": "18907fa281ee"
+  },
   "05": {
     "file": "05-tirage.sql",
     "stamp": "f221529b32d6"

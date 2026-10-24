@@ -7426,6 +7426,8 @@ export default {
   "Tapis de l’Autel de l’Abysse": "Abyss Altar Mat",
   "Tapis d’obsidienne et d’or": "Obsidian and Gold Mat",
   "Tapis de la Glace noire": "Black Ice Mat",
+  "Booster gratuit du jour (10 h), à toi de jouer en ligne, défis reçus, Pari relevé, demandes d’ami.": "Free daily booster (10 a.m.), your turn online, challenges received, Wager taken, friend requests.",
+  "ABYSSAL peut te prévenir quand ton <b>booster gratuit du jour</b> t’attend, quand c’est <b>à toi de jouer</b> contre un autre joueur, quand on te lance un <b>défi</b> et quand on te demande en <b>ami</b>.": "ABYSSAL can let you know when your <b>free daily booster</b> is waiting, when it’s <b>your turn</b> against another player, when someone sends you a <b>challenge</b> and when someone asks to be your <b>friend</b>.",
   "Plaque du Titan": "Titan Plate",
   "Plaque de la Forge": "Forge Plate",
   "Plaque des Racines": "Roots Plate",

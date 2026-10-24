@@ -1,5 +1,5 @@
 // Réglages : son, animations, accessibilité, sauvegarde (le Mode Créateur est dans creator.js).
-import { notifSupported, enable as notifEnable } from '../notify.js';
+import { notifSupported, pushSupported, enable as notifEnable } from '../notify.js';
 import { resetTips } from '../ui/coach.js';
 import { TUTOS, tuto } from '../ui/tutos.js';
 import { icon, EMBLEM } from '../ui/icons.js';
@@ -70,7 +70,7 @@ export default function settings(app, root) {
         ${s.sound && s.music !== false ? `<div class="set-row col"><b>Écouter les ambiances</b><div class="set-sfx">${MUSIC_DEMO.map(([n], i) => `<button class="chip" data-mus="${i}">${n}</button>`).join('')}</div></div>` : ''}
         ${window.Capacitor?.isNativePlatform?.() ? '' : toggle('loud', 'Son même en mode silencieux', 'Le jeu reste audible quand le bouton silencieux de l’iPhone est activé (iOS 17 ou plus). Peut couper la musique d’une autre app.')}
         ${toggle('haptics', 'Vibrations', 'Petites vibrations sur les coups, les victoires et les cartes rares. Dans l’app, le téléphone vibre vraiment ; sur le site web, l’iPhone ne vibre presque pas.')}
-        ${notifSupported() ? `<div class="set-row"><div><b>Notifications</b><p class="small muted">Booster gratuit du jour (10 h) et rappel 2 h avant la fin du délai quand c’est à toi de jouer en ligne.</p></div><button class="switch" role="switch" aria-checked="${!!s.notif}" data-act="notif" aria-label="Notifications"><i></i></button></div>` : ''}
+        ${notifSupported() ? `<div class="set-row"><div><b>Notifications</b><p class="small muted">${pushSupported() ? 'Booster gratuit du jour (10 h), à toi de jouer en ligne, défis reçus, Pari relevé, demandes d’ami.' : 'Booster gratuit du jour (10 h) et rappel 2 h avant la fin du délai quand c’est à toi de jouer en ligne.'}</p></div><button class="switch" role="switch" aria-checked="${!!s.notif}" data-act="notif" aria-label="Notifications"><i></i></button></div>` : ''}
       </section>
       <section class="panel stack">
         <h2>Combat</h2>

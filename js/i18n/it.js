@@ -7415,6 +7415,8 @@ export default {
   "Tapis de l’Autel de l’Abysse": "Tappeto dell’Altare dell’Abisso",
   "Tapis d’obsidienne et d’or": "Tappeto di ossidiana e oro",
   "Tapis de la Glace noire": "Tappeto del Ghiaccio nero",
+  "Booster gratuit du jour (10 h), à toi de jouer en ligne, défis reçus, Pari relevé, demandes d’ami.": "Busta gratuita del giorno (ore 10), tocca a te online, sfide ricevute, Scommessa accettata, richieste di amicizia.",
+  "ABYSSAL peut te prévenir quand ton <b>booster gratuit du jour</b> t’attend, quand c’est <b>à toi de jouer</b> contre un autre joueur, quand on te lance un <b>défi</b> et quand on te demande en <b>ami</b>.": "ABYSSAL può avvisarti quando la tua <b>busta gratuita del giorno</b> ti aspetta, quando <b>tocca a te</b> contro un altro giocatore, quando qualcuno ti lancia una <b>sfida</b> e quando qualcuno ti chiede l’<b>amicizia</b>.",
   "Plaque du Titan": "Targa del Titano",
   "Plaque de la Forge": "Targa della Forgia",
   "Plaque des Racines": "Targa delle Radici",

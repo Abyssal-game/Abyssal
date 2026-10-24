@@ -5,7 +5,7 @@ import { sync, onSync, afterLogin, pushNow, restoreFromCloud, setPseudo, refresh
 import { icon } from '../ui/icons.js';
 import { esc, toast, confirmBox, bindActions, openSheet } from '../ui/dom.js';
 import { blockedIds, clearBlocked, isMaskedPseudo } from '../core/moderation.js';
-import { clearAll } from '../notify.js';
+import { clearAll, pushOff } from '../notify.js';
 import { resetWatch } from '../cloud/mpwatch.js';
 import { serverMode } from '../cloud/partie.js';
 
@@ -182,6 +182,7 @@ export default function account(app, root) {
       /* v515 : la partie est liée au compte : elle part en ligne, puis quitte cet appareil (le suivant qui se connecte ne la récupère pas) */
       await pushNow();
       if (sync.status !== 'ok' && !(await confirmBox('Ta dernière progression n’a pas pu être envoyée sur ton compte (pas de réseau ?). Si tu te déconnectes maintenant, <b>elle sera perdue</b>.', { ok: 'Me déconnecter quand même', cancel: 'Rester connecté', danger: true }))) return;
+      await pushOff(); /* v693 : ce téléphone ne reçoit plus les notifications du compte */
       await cloud.signOut();
       wipeLocal();
       toast('Déconnecté. Ta partie t’attend sur ton compte.', { icon: 'user' });
