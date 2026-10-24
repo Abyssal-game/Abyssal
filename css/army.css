@@ -6677,3 +6677,17 @@ details.dc-fold > summary:has(.gm-tease) { flex-wrap: wrap; }
 .td-row.td-shadow .td-t { min-width: 0; flex: 1; }
 .td-row.td-shadow .td-go { margin-left: 4px; }
 .notif-ask .row.gap .btn { font-size: 13px; letter-spacing: .04em; white-space: nowrap; }
+
+/* v711 : écrans larges (pliables ouverts : Galaxy Z Fold, futur iPhone pliable, tablettes ; Android 16 ignore le blocage
+   en portrait sur ces écrans) : le combat garde des proportions de téléphone, en colonne centrée ; le décor remplit le reste.
+   Avant, le panneau d'actions s'étirait sur toute la largeur et les créatures devenaient minuscules. */
+@media (min-width: 521px) {
+  .dv > :not(.dio) { width: 100%; max-width: max(380px, calc(var(--app-h, 100dvh) * .6)); margin-left: auto; margin-right: auto; }
+}
+@media (min-width: 521px) {
+  .mq-game { max-width: max(380px, calc(var(--app-h, 100dvh) * .6)) !important; margin-left: auto !important; margin-right: auto !important; }
+}
+@media (min-width: 521px) { /* Cryptes sur écran large : plateau dimensionné par la hauteur, pour que les 4 rangées et ta place tiennent */
+  .cr-game .cr-grid { flex: 0 0 auto; grid-template-rows: none; width: min(100%, calc((var(--app-h, 100dvh) - 330px) * .85)); margin-left: auto; margin-right: auto; }
+  .cr-game .cr-c { aspect-ratio: 5 / 7; height: auto; max-height: none; }
+}
