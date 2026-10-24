@@ -71,6 +71,12 @@ export default function descent(app, root) {
     if (g.s.armyNews) { delete g.s.armyNews; g.persist(); } // ancien message de transition (héros → cartes) : retiré
     const start = startFloor(), ch = chapterOf(start), replay = chapDone(ch), night = ui.nightmare && replay && g.nightmareUnlocked();
     const standing = team.filter((id) => !g.isFallen(id)).length; /* v668 */
+    /* v721 : un bilan (fin de chapitre, défaite, abandon) s'affiche seul ; « Continuer » ramène à la Descente */
+    if (last) {
+      root.innerHTML = summaryHTML(last);
+      if (last.record && !last.cheered) { last.cheered = true; setTimeout(() => app.sfx.achievement?.(), 250); root.querySelector('.dc-sum2')?.classList.add('cheer'); }
+      return;
+    }
     root.innerHTML = `<header class="screen-head dc-head ui-hero bn-descente"><h1>La Descente</h1><p class="muted">${g.campaignDone() ? 'Tu as atteint le fond de l’Abysse' : d.best ? `Chapitre ${chapNow()} sur ${CHAPTERS} · record : étage ${d.best}` : 'Descends étage par étage jusqu’au fond de l’Abysse.'}</p></header>
       ${last ? summaryHTML(last) : ''}
       ${'' /* v548 : rappel des coffres retiré de la Descente (déjà sur l'Accueil et sur l'onglet Butin) */}
@@ -160,31 +166,33 @@ export default function descent(app, root) {
     const bk = s.boss?.key, nextB = next ? bossOf(next * CHAPTER) : null;
     /* v421 : fin de chapitre marquante : le gardien vaincu s'efface, le coffre gagné en grand, le chapitre suivant se dévoile */
     const chEnd = s.chapterDone && bk ? `<div class="dc-chend">${BOSS_FIGS.has(bk) ? `<img class="dc-chend-fig" alt="" src="assets/bosses/${bk}.webp">` : ''}<span class="dc-chend-seal">${icon('check')} Chapitre refermé</span></div>` : '';
-    const chChest = s.chapterDone && s.bossChest ? `<div class="dc-chend-chest" style="--cc:${CHESTS[s.bossChest].color}">${chestSVG(s.bossChest)}<b>${esc(CHESTS[s.bossChest].name)}</b></div>` : '';
     const chNext = nextB ? `<div class="panel dc-chnext">${BOSS_FIGS.has(nextB) ? `<img alt="" src="assets/bosses/${nextB}.webp">` : ''}<span><span class="dc-chap-k">Chapitre ${next} · ouvert</span><b>${esc(chapterStory(next)?.title || '')}</b><small>${esc(BOSSES[nextB].name)} t’attend à l’étage ${next * CHAPTER}</small></span></div>` : '';
-    return `<section class="dc-sum2 ${s.wiped ? 'lost' : 'won'} ${s.chapterDone ? 'chapter' : ''}">
+    /* v721 (« trop d'informations, on ne s'y retrouve plus ») : bilan rangé : le gardien vaincu, le titre, le butin en une rangée,
+       les boutons, le chapitre suivant ; le détail du combat (récit, exploits, ce qui s'est passé) est replié */
+    const loot = `${s.chests.map((c) => `<span class="dc-sum2-chest" style="--cc:${CHESTS[c].color}">${chestSVG(c)}<b>${esc(CHESTS[c].name)}</b></span>`).join('')}${(fl?.shards || 0) + s.shards ? `<span class="dc-sum2-shards">${icon('crystal')}<b>+${fmt((fl?.shards || 0) + s.shards)}</b><small>éclats</small></span>` : ''}${fl?.ash ? `<span class="dc-sum2-shards">${icon('ash')}<b>+${fmt(fl.ash)}</b><small>cendres</small></span>` : ''}${s.braises ? `<span class="dc-sum2-shards dc-sum2-br">${BRAISE_IC}<b>+${s.braises}</b><small>Braise${s.braises > 1 ? 's' : ''} de vie</small></span>` : ''}`;
+    const feats = s.feats && s.feats.wins ? `<div class="dc-feats">${[[s.feats.hit, 'Plus gros coup', 'hit'], [s.feats.kills, 'Ennemis vaincus', 'kills'], [s.feats.syn, 'Synergies', 'syn'], [s.feats.breaks, 'Brisures', 'breaks'], [s.feats.perfect, 'Frappes parfaites', 'perfect'], [s.feats.parries, 'Parades', 'parries']].filter(([n]) => n > 0).map(([n, l, ic]) => `<span class="dc-feat"><img class="dc-feat-ic" alt="" src="assets/icons/ft-${ic}.webp"><b>${n}</b><small>${l}</small></span>`).join('')}</div>` : '';
+    const mvp = s.mvp && cat.get(s.mvp.id) ? `<p class="vx-week dc-mvp">${icon('star')} <b>${esc(cat.get(s.mvp.id).name)}</b> a achevé ${s.mvp.n} ennemis pendant le chapitre.</p>` : '';
+    const report = s.report?.length ? `<div class="dc-why"><b>${icon('info')} Ce qui s’est passé</b>${s.report.map((l) => `<p class="small">${esc(l)}</p>`).join('')}${s.wiped && g.s.settings.defense === 'auto' ? '<p class="small">Ta défense est en <b>automatique</b> : elle n’esquive que 4 coups sur 10 et ne pare jamais. Essaie la défense <b>manuelle</b> (Réglages → Jeu).</p>' : ''}</div>` : '';
+    const details = `${s.boss && s.chapterDone ? bossRecap(s.boss) : ''}${feats}${mvp}${s.wiped ? '' : report}`;
+    return `<section class="dc-sum2 dc-sum3 ${s.wiped ? 'lost' : 'won'} ${s.chapterDone ? 'chapter' : ''}">
       ${chEnd || crestHTML(!s.wiped, s.chapterDone ? ch : s.floor, s.chapterDone ? 'Chapitre' : (s.floor > 1 ? 'Étages' : 'Étage'), 'dc-sum2-crest')}
       <h2>${title}</h2>
       <p class="dc-sum2-sub">${sub}</p>
-      ${s.boss && s.chapterDone ? bossRecap(s.boss) : ''}
-      ${s.chapterDone && s.bossChest ? cat.lore.chronicles.filter((c) => c.ch === s.chapterDone && typeof c.at === 'number' && g.uniqueCount() < c.at).map((c) => `<a class="panel dc-chron" href="#/bestiaire">${icon('book')}<span><b>Une Chronique s’est ouverte</b><small><span>${esc(c.title)}</span> · Bestiaire, onglet Royaumes</small></span></a>`).join('') /* v676 */ : ''}
-      ${s.abyssPack ? `<a class="panel dc-summit-win" href="#/boutique"><img alt="" src="assets/packs/abysse2.webp"><span><b>Booster de l’Abysse</b><span class="small">Il t’attend dans les Boosters.${s.abyss ? ' Avec une Secrète que tu n’as pas encore.' : ''}</span></span></a>` : ''}
-      ${s.abyss ? `<div class="panel st-epi"><span class="bx-k">Épilogue</span><h3>${esc(EPILOGUE.title)}</h3><p>${esc(EPILOGUE.text)}</p>${cat.get('ABY-048') ? `<div class="st-dreamer"><img alt="" src="${artUrl(cat.get('ABY-048'), { lite: true })}"><span><b>Celui qui rêve</b><small>Il ne dort plus.</small></span></div>` /* v673 : l’ombre du Rêveur, sans son nom */ : ''}</div><p class="vx-week vx-first">${icon('crown')} Titre « Vainqueur de l’Abysse », Cadre de l’Œil de l’Abysse et <b>2 coffres abyssaux</b> !</p>` : ''}
-      ${chChest}${chNext}
-      ${s.braises ? `<p class="vx-week br-won">${BRAISE_IC} <b>+${s.braises} Braise${s.braises > 1 ? 's' : ''} de vie</b> : de quoi ranimer une créature tombée.</p>` : ''}
-      ${s.fallen?.length ? `<p class="vx-week br-down"><img class="br-skull" alt="" src="assets/icons/mort.webp"> ${s.fallen.length > 1 ? `${s.fallen.length} créatures restent à terre : touche-les dans ton équipe pour les ranimer` : `<span translate="no">${esc(t('{name} reste à terre : touche-la dans ton équipe pour la ranimer avec une Braise de vie.', { name: tw(cat.get(s.fallen[0])?.name || 'Une créature') }))}</span>`}${s.fallen.length > 1 ? ' avec une Braise de vie.' : ''}</p>` : ''}
-      ${next ? `<button class="btn primary block big-cta dc-plq dc-plq-red" data-act="nextchap" data-c="${next}">${icon('p:descend')}Commencer le chapitre ${next}</button>` : ''}
-      ${s.chests.length ? `<a class="btn ${next ? 'gold' : 'primary'} block dc-plq ${next ? 'dc-plq-dark' : 'dc-plq-red'} dc-chestcta" href="#/coffres">${icon('p:chest')}Ouvrir ${s.chests.length > 1 ? 'mes coffres' : 'mon coffre'}</a>` : ''}
       ${s.record && !s.chapterDone ? `<p class="vx-week dc-record">${icon('crown')} <b>Nouveau record !</b> Jamais tu n’étais descendu aussi bas : étage ${s.floor}.</p>` : ''}
       ${s.nightmareRecord ? `<p class="vx-week">${icon('skull')} Nouveau record en ${(NIGHT_TIERS[s.nightTier || 1] || NIGHT_TIERS[1]).name} : étage ${s.floor} !</p>` : ''}
-      ${s.wiped && app.state.lastEnemyTurn ? `<details class="dc-why dc-last"><summary>${icon('eye')} Voir le dernier tour ennemi</summary><ul class="dc-last-ul">${app.state.lastEnemyTurn}</ul></details>` : ''}
-      ${s.feats && s.feats.wins ? `<div class="dc-feats">${[[s.feats.hit, 'Plus gros coup', 'hit'], [s.feats.kills, 'Ennemis vaincus', 'kills'], [s.feats.syn, 'Synergies', 'syn'], [s.feats.breaks, 'Brisures', 'breaks'], [s.feats.perfect, 'Frappes parfaites', 'perfect'], [s.feats.parries, 'Parades', 'parries']].filter(([n]) => n > 0).map(([n, l, ic]) => `<span class="dc-feat"><img class="dc-feat-ic" alt="" src="assets/icons/ft-${ic}.webp"><b>${n}</b><small>${l}</small></span>`).join('')}</div>` : ''}
-      ${s.mvp && cat.get(s.mvp.id) ? `<p class="vx-week dc-mvp">${icon('star')} <b>${esc(cat.get(s.mvp.id).name)}</b> a achevé ${s.mvp.n} ennemis pendant le chapitre.</p>` : ''}
-      ${s.shardsNow !== undefined ? boosterProgressHTML(s.shardsNow) : ''}
+      ${loot ? `<div class="dc-sum2-loot">${loot}</div>` : '<p class="dc-sum2-sub">Aucun butin cette fois.</p>'}
+      ${s.abyssPack ? `<a class="panel dc-summit-win" href="#/boutique"><img alt="" src="assets/packs/abysse2.webp"><span><b>Booster de l’Abysse</b><span class="small">Il t’attend dans les Boosters.${s.abyss ? ' Avec une Secrète que tu n’as pas encore.' : ''}</span></span></a>` : ''}
+      ${s.abyss ? `<div class="panel st-epi"><span class="bx-k">Épilogue</span><h3>${esc(EPILOGUE.title)}</h3><p>${esc(EPILOGUE.text)}</p>${cat.get('ABY-048') ? `<div class="st-dreamer"><img alt="" src="${artUrl(cat.get('ABY-048'), { lite: true })}"><span><b>Celui qui rêve</b><small>Il ne dort plus.</small></span></div>` /* v673 : l’ombre du Rêveur, sans son nom */ : ''}</div><p class="vx-week vx-first">${icon('crown')} Titre « Vainqueur de l’Abysse », Cadre de l’Œil de l’Abysse et <b>2 coffres abyssaux</b> !</p>` : ''}
+      ${next ? `<button class="btn primary block big-cta dc-plq dc-plq-red" data-act="nextchap" data-c="${next}">${icon('p:descend')}Commencer le chapitre ${next}</button>` : ''}
+      ${s.chests.length ? `<a class="btn ${next ? 'gold' : 'primary'} block dc-plq ${next ? 'dc-plq-dark' : 'dc-plq-red'} dc-chestcta" href="#/coffres">${icon('p:chest')}Ouvrir ${s.chests.length > 1 ? 'mes coffres' : 'mon coffre'}</a>` : ''}
+      ${chNext}
+      ${s.chapterDone && s.bossChest ? cat.lore.chronicles.filter((c) => c.ch === s.chapterDone && typeof c.at === 'number' && g.uniqueCount() < c.at).map((c) => `<a class="panel dc-chron" href="#/bestiaire">${icon('book')}<span><b>Une Chronique s’est ouverte</b><small><span>${esc(c.title)}</span> · Bestiaire, onglet Royaumes</small></span></a>`).join('') /* v676 */ : ''}
+      ${s.fallen?.length ? `<p class="vx-week br-down"><img class="br-skull" alt="" src="assets/icons/mort.webp"> ${s.fallen.length > 1 ? `${s.fallen.length} créatures restent à terre : touche-les dans ton équipe pour les ranimer` : `<span translate="no">${esc(t('{name} reste à terre : touche-la dans ton équipe pour la ranimer avec une Braise de vie.', { name: tw(cat.get(s.fallen[0])?.name || 'Une créature') }))}</span>`}${s.fallen.length > 1 ? ' avec une Braise de vie.' : ''}</p>` : ''}
       ${s.wiped ? weakHint((s.floor || 0) + 1) : ''}
-      ${s.report?.length ? `<div class="dc-why"><b>${icon('info')} Ce qui s’est passé</b>${s.report.map((l) => `<p class="small">${esc(l)}</p>`).join('')}${s.wiped && g.s.settings.defense === 'auto' ? '<p class="small">Ta défense est en <b>automatique</b> : elle n’esquive que 4 coups sur 10 et ne pare jamais. Essaie la défense <b>manuelle</b> (Réglages → Jeu).</p>' : ''}</div>` : ''}
-      <div class="dc-sum2-loot">${s.chests.map((c) => `<span class="dc-sum2-chest" style="--cc:${CHESTS[c].color}">${chestSVG(c)}<b>${esc(CHESTS[c].name)}</b></span>`).join('')}${(fl?.shards || 0) + s.shards ? `<span class="dc-sum2-shards">${icon('crystal')}<b>+${fmt((fl?.shards || 0) + s.shards)}</b><small>éclats</small></span>` : ''}${fl?.ash ? `<span class="dc-sum2-shards">${icon('ash')}<b>+${fmt(fl.ash)}</b><small>cendres</small></span>` : ''}${!s.chests.length && !s.shards && !fl?.shards ? '<span class="dc-sum2-sub">Aucun butin cette fois.</span>' : ''}</div>
-      <div class="dc-sum2-row"><button class="btn dc-plq dc-plq-dark" data-act="share">${icon('copy')}Partager</button><button class="btn dc-plq dc-plq-dark" data-act="dismiss">Continuer</button></div>
+      ${s.wiped ? report : ''}
+      ${s.wiped && app.state.lastEnemyTurn ? `<details class="dc-why dc-last"><summary>${icon('eye')} Voir le dernier tour ennemi</summary><ul class="dc-last-ul">${app.state.lastEnemyTurn}</ul></details>` : ''}
+      ${details ? `<details class="dc-sum2-more"><summary>${icon('scroll')} Le détail du combat</summary>${details}</details>` : ''}
+      <div class="dc-sum2-row"><button class="btn dc-plq dc-plq-dark" data-act="share">${icon('copy')}Partager</button><button class="btn dc-plq dc-plq-dark" data-act="dismiss">${next ? 'Plus tard' : 'Continuer'}</button></div>
     </section>`;
   }
 
@@ -369,7 +377,7 @@ export default function descent(app, root) {
     // v348 : gardien déjà vaincu 3 fois : présentation courte (nom, mécanique, contre), qui se ferme seule après 2 s
     const short = (g.s.bossWins?.[key] || 0) >= 3;
     if (short) {
-      el.classList.add('short');
+      el.classList.add('short'); if (scene) el.classList.add('poster');
       el.innerHTML = `${bg}<div class="bx-in"><span class="bx-k">Étage ${run.floor} · Gardien</span><h1>${esc(b.name)}</h1><p class="bx-m"><b>Sa mécanique</b> ${esc(b.mechanic)}</p><p class="bx-m good"><b>Pour le contrer</b> ${esc(b.counter)}</p><span class="bx-tap">Touche pour combattre</span></div>`;
       document.body.appendChild(el); app.sfx.boss?.();
       let done = false;
@@ -377,6 +385,22 @@ export default function descent(app, root) {
       el.addEventListener('click', go); setTimeout(go, 2000);
       return;
     }
+    /* v721 (« les 3 onglets sous l'affiche, ça fait trop et ça cache l'affiche ») : avec un tableau, le texte se pose en bas,
+       et la mécanique, la Furie, le contre et la récompense deviennent des onglets repliés (un toucher ouvre, le reste lance le combat) */
+    if (scene) {
+      const tabs = [['m', 'Sa mécanique', esc(b.mechanic)], PHASE2[key] && ['f', 'Sa Furie', `<b>${esc(PHASE2[key].name)}</b> ${esc(PHASE2[key].desc)}`], seen && ['c', 'Le contrer', esc(b.counter)], ['r', 'Récompense', `${g.firstClear(run) && run.floor >= FINAL_FLOOR ? 'Première victoire : le Booster de l’Abysse et un coffre abyssal.' : g.firstClear(run) ? `Première victoire : ${esc(CHESTS[(run.floor / CHAPTER) % 2 ? 'or' : 'abyssal'].name.toLowerCase())}, et le chapitre ${chapterOf(run.floor) + 1} s’ouvre.` : 'Déjà vaincu : la victoire termine le chapitre.'}`]].filter(Boolean);
+      el.classList.add('poster');
+      el.innerHTML = `${bg}<div class="bx-in"><span class="bx-k">Étage ${run.floor} · Gardien</span><h1>${esc(b.name)}</h1><p class="bx-t">${esc(b.title)}</p><p class="bx-p">${esc(b.intro)}</p><div class="bx-tabs">${tabs.map(([k, l]) => `<button class="bx-tab ${k === 'c' ? 'good' : ''}" data-t="${k}">${l}</button>`).join('')}</div><div class="bx-pane" hidden></div><span class="bx-tap">Touche l’affiche pour combattre</span></div>`;
+      const pane = el.querySelector('.bx-pane');
+      el.querySelectorAll('.bx-tab').forEach((t) => t.addEventListener('click', (e) => {
+        e.stopPropagation(); app.sfx.tap?.();
+        const on = t.classList.contains('on');
+        el.querySelectorAll('.bx-tab').forEach((x) => x.classList.remove('on'));
+        if (on) { pane.hidden = true; return; }
+        t.classList.add('on'); pane.innerHTML = tabs.find(([k]) => k === t.dataset.t)[2]; pane.hidden = false;
+      }));
+      pane.addEventListener('click', (e) => e.stopPropagation());
+    } else
     el.innerHTML = `${bg}<div class="bx-in"><span class="bx-k">Étage ${run.floor} · Gardien</span><h1>${esc(b.name)}</h1><p class="bx-t">${esc(b.title)}</p><p class="bx-p">${esc(b.intro)}</p><p class="bx-m"><b>Sa mécanique</b> ${esc(b.mechanic)}</p><p class="bx-m bx-loot"><b>Récompense</b> ${g.firstClear(run) && run.floor >= FINAL_FLOOR ? 'Première victoire : le Booster de l’Abysse et un coffre abyssal.' : g.firstClear(run) ? `Première victoire : ${esc(CHESTS[(run.floor / CHAPTER) % 2 ? 'or' : 'abyssal'].name.toLowerCase())}, et le chapitre ${chapterOf(run.floor) + 1} s’ouvre.` : 'Déjà vaincu : la victoire termine le chapitre.'}</p>${PHASE2[key] ? `<p class="bx-m"><img class="bx-ph" alt="" src="assets/ui/ph-${key}.webp" onerror="this.remove()"><b>À mi-vie : ${esc(PHASE2[key].name)}</b> ${esc(PHASE2[key].desc)}</p>` : ''}${seen ? `<p class="bx-m good"><b>Pour le contrer</b> ${esc(b.counter)}</p>` : ''}<span class="bx-tap">Touche pour combattre</span></div>`;
     document.body.appendChild(el);
     app.sfx.boss?.();

@@ -6736,3 +6736,31 @@ html.reduce-motion .dc-bscene, html.reduce-motion .bx-scene, html.fx-light .dc-b
 /* v720 : Mythique et Secrète : la lumière de la carte monte avec le son pendant toute la charge (2,2 à 2,7 s) */
 .opening.hush-big .op-card.charging .tcg-back { transition: filter 2.4s ease-in, box-shadow 2.4s ease-in; }
 .opening.hush-big .op-bg::after { transition-duration: 2.2s; }
+/* v721 : écrans de récit et de présentation des gardiens : plus de barre de défilement visible */
+.bx-intro { scrollbar-width: none; }
+.bx-intro::-webkit-scrollbar { display: none; }
+/* v721 : présentation d'un gardien sur son tableau : texte posé en bas, détails en onglets repliés, l'affiche reste visible */
+.bx-intro.has-scene.poster { overflow: hidden; }
+.bx-intro.has-scene.poster .bx-in { position: absolute; left: 0; right: 0; bottom: 0; min-height: 0; gap: 8px; padding: 110px 20px calc(var(--safe-b) + 20px); background: linear-gradient(180deg, transparent 0, rgba(6, 4, 10, .7) 90px, rgba(6, 4, 10, .95) 100%); }
+.bx-intro.has-scene.poster .bx-p { margin: 0; font-size: .92rem; line-height: 1.45; color: #EDE6D6; text-shadow: 0 1px 6px #000; }
+.bx-intro.has-scene.poster .bx-t { margin: -4px 0 0; }
+.bx-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin-top: 4px; }
+.bx-tab { min-height: 36px; padding: 6px 12px; border-radius: 999px; background: rgba(10, 6, 14, .72); border: 1px solid rgba(255, 110, 125, .45); color: #F6D6CC; font: 800 .68rem/1 var(--f-ui); text-transform: uppercase; letter-spacing: .08em; cursor: pointer; }
+.bx-tab.good { border-color: rgba(130, 215, 150, .5); color: #CDEFD6; }
+.bx-tab.on { background: rgba(150, 30, 48, .82); border-color: #FF8A9A; color: #fff; }
+.bx-tab.good.on { background: rgba(40, 110, 60, .82); border-color: #A8EBB8; }
+.bx-pane { text-align: left; padding: 10px 13px; border-radius: 12px; background: rgba(8, 5, 12, .86); border: 1px solid rgba(255, 90, 110, .3); font-size: .88rem; line-height: 1.45; color: #EDE6D6; animation: bxPane .2s ease both; cursor: default; }
+.bx-pane b { color: #FF9AA8; }
+@keyframes bxPane { from { opacity: 0; transform: translateY(6px); } }
+.bx-intro.has-scene.poster.short .bx-in { padding-top: 90px; }
+/* v721 : bilan de fin de chapitre seul à l'écran, rangé ; le détail du combat est replié */
+.dc-sum3 { margin-top: 6px; }
+.dc-sum3 .dc-sum2-loot { margin: 4px 0 2px; }
+.dc-sum2-br .br-ic { width: 30px; height: 30px; }
+.dc-sum2-more { margin-top: 4px; border-radius: 14px; border: 1px solid rgba(240, 199, 94, .22); background: rgba(0, 0, 0, .25); padding: 4px 12px; text-align: left; }
+.dc-sum2-more > summary { cursor: pointer; padding: 10px 0; font: 700 .86rem var(--f-ui); color: #E8D7B0; list-style: none; display: flex; align-items: center; gap: 8px; justify-content: center; }
+.dc-sum2-more > summary::-webkit-details-marker { display: none; }
+.dc-sum2-more[open] > summary { border-bottom: 1px solid rgba(240, 199, 94, .15); margin-bottom: 10px; }
+.dc-sum2-more > *:not(summary) { margin-bottom: 10px; }
+.bx-tabs { flex-wrap: nowrap; gap: 5px; }
+.bx-tab { flex: 0 1 auto; min-width: 0; padding: 6px 9px; font-size: .6rem; letter-spacing: .04em; white-space: nowrap; }
