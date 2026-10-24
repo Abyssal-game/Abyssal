@@ -6764,3 +6764,10 @@ html.reduce-motion .dc-bscene, html.reduce-motion .bx-scene, html.fx-light .dc-b
 .dc-sum2-more > *:not(summary) { margin-bottom: 10px; }
 .bx-tabs { flex-wrap: nowrap; gap: 5px; }
 .bx-tab { flex: 0 1 auto; min-width: 0; padding: 6px 9px; font-size: .6rem; letter-spacing: .04em; white-space: nowrap; }
+/* v722 : carte du chapitre sans figure du gardien ; aperçu du chapitre suivant avec son bandeau */
+.dc-chap-h > span { flex: 1; min-width: 0; }
+.panel.dc-chnext { position: relative; overflow: hidden; }
+.dc-chnext img.dc-chnext-bn { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .35; z-index: 0; border-radius: 0; filter: none; }
+.dc-chnext > span { position: relative; z-index: 1; }
+/* v722 : fin de chapitre : la carte peinte du gardien vaincu, éteinte, à la place de l'ancienne figure grise */
+.dc-chend-fig.dc-chend-card { width: 112px; height: 157px; object-fit: cover; border-radius: 10px; border: 2px solid rgba(232, 195, 90, .55); filter: grayscale(.75) brightness(.6) drop-shadow(0 6px 14px #000); }
