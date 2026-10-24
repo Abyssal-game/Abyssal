@@ -22,7 +22,7 @@ export default function menu(app, root) {
     <header class="screen-head mn-head ui-hero bn-sanctuary"><h1>Le Sanctuaire</h1><p class="muted">Ton profil, tes amis, tes succès et les réglages du jeu.</p></header>
     <nav class="mn-grid">
       ${profile}
-      ${T('#/amis', 'amis', 'Amis', '<span class="mn-fr">Collections et succès de tes amis</span>').replace('class="mn-tile"', 'class="mn-tile mn-wide mn-friends"')}
+      ${T('#/amis', 'amis2', 'Amis', '<span class="mn-fr">Collections et succès de tes amis</span>').replace('class="mn-tile"', 'class="mn-tile mn-wide mn-friends"')}
       ${T('#/succes', 'crown2', 'Succès', `${achDone} / ${cat.achievements.length} débloqués`)}
       ${T('#/bestiaire', 'book', 'Bestiaire', 'Créatures, royaumes, histoire')}
       ${T('#/compte', 'account', 'Compte', 'Pseudo, mot de passe, déconnexion')}
