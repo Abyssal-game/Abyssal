@@ -12,6 +12,8 @@ import { roleOf, ROLES } from '../core/army.js';
 import { keywordOf, KEYWORDS } from '../core/duel.js';
 import { hapPattern } from '../ui/sound.js';
 
+// v720 : temps entre le début du son monté (reveal-m-full, reveal-s-full) et le retournement, pour que la carte arrive sur le sommet du son
+const RISE_MS = { M: 2230, S: 2730 };
 const RI = (r) => ['C', 'PC', 'R', 'HR', 'M', 'S'].indexOf(r);
 
 // preset : ouverture déjà tirée ailleurs (Tirage des Ombres) : rien n'est ajouté à la collection
@@ -294,9 +296,10 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
       btn.classList.add('charging');
       el.classList.add('hush');
       if (big) el.classList.add('hush-big');
-      (big ? app.sfx.suspensebig : app.sfx.suspense)();
+      /* v720 : Mythique et Secrète : le son monte pendant la charge, la carte se retourne sur son sommet */
+      if (big) app.sfx.revealRise(c.rarity); else app.sfx.suspense();
       hapPattern(big ? [40, 60, 40, 60, 60, 40, 120] : [30, 50, 40]); /* v521 : vraies vibrations dans l'app */
-      await wait(big ? 1300 : 600);
+      await wait(big ? RISE_MS[c.rarity] : 600);
       if (phase === 'summary') { busy = false; return; }
       btn.classList.remove('charging');
       el.classList.remove('hush', 'hush-big');
@@ -315,7 +318,7 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
     dots[index].style.background = RARITY[c.rarity].color;
     dots[index].classList.add('on');
     stage.querySelector('.op-label').innerHTML = statusLine(c);
-    if (RI(c.rarity) >= 4) epic(c.rarity);
+    if (RI(c.rarity) >= 4) epic(c.rarity, !reduced);
     else app.sfx.reveal(c.rarity);
     if (c.variant !== 'normal') shine(c.variant, RI(c.rarity) >= 4 ? 1400 : 200);
     if (c.isNewCard) { /* v272 : plus de carillon ici, il couvrait le son de la rareté (le badge « Nouvelle » suffit) */ if (!reduced) { const cc = stage.querySelector('.op-card, .tcg'); cc?.classList.add('op-first'); setTimeout(() => cc?.classList.remove('op-first'), 1300); } }
@@ -339,8 +342,8 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
     }, delay);
   }
 
-  function epic(r) {
-    app.sfx.reveal(r);
+  function epic(r, risen) {
+    app.sfx.reveal(r, { risen });
     if (r === 'S') app.sfx.rumble?.(1.6); // v329 : grondement grave sous la révélation d'une Secrète
     el.classList.add('epic', `epic-${r}`);
     const banner = document.createElement('div');

@@ -6733,3 +6733,6 @@ html.reduce-motion .dc-bscene, html.reduce-motion .bx-scene, html.fx-light .dc-b
     linear-gradient(var(--c), var(--c)) 0 100% / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 0 100% / var(--w) var(--l),
     linear-gradient(var(--c), var(--c)) 100% 100% / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 100% 100% / var(--w) var(--l);
   background-repeat: no-repeat; }
+/* v720 : Mythique et Secrète : la lumière de la carte monte avec le son pendant toute la charge (2,2 à 2,7 s) */
+.opening.hush-big .op-card.charging .tcg-back { transition: filter 2.4s ease-in, box-shadow 2.4s ease-in; }
+.opening.hush-big .op-bg::after { transition-duration: 2.2s; }

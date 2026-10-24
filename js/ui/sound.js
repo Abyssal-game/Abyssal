@@ -446,6 +446,7 @@ export const sfx = {
   recover() { osc(N.D3, { type: 'sawtooth', dur: 0.5, gain: 0.04, to: N.A3, lp: 500, lpTo: 1500, wet: 0.4 }); thump(90, { gain: 0.2, delay: 0.3 }); },
   suspense() { sfx.rumble(0.6); },
   suspensebig() { sfx.rumble(1.3); },
+  revealRise() { sfx.rumble(1.3); }, // v720 : montée de la Mythique / Secrète pendant la charge (fichiers reveal-m-full, reveal-s-full)
   defeat() {
     pad([N.D3, N.F3, N.A3], { dur: 2.2, gain: 0.04, attack: 0.3, lp: 700, lpTo: 200 });
     bell(98, { dur: 3, gain: 0.12, ratio: 1.41, index: 3, delay: 0.1, wet: 0.8 }); thump(55, { to: 28, dur: 1, gain: 0.5, delay: 0.1 });
@@ -491,10 +492,11 @@ const sampleKey = (k, a) => {
   return 'reveal-c';
 };
 // v308 (audit audio mesuré à l'ffmpeg) : volume propre à certains fichiers, et aigus adoucis pour ceux qui sonnaient comme des bips
-const SAMPLE_GAIN = { 'reveal-c': 7, chest: 1.4, tear: 1.4, bossvictory: 1.26, 'reveal-s': 2.2, // v329 : la Secrète doit claquer (demande du propriétaire) ; le compresseur du bus évite la saturation
+const SAMPLE_GAIN = { 'reveal-c': 7, chest: 1.4, tear: 1.4, bossvictory: 1.26, 'reveal-s': 1.5, 'reveal-s-full': 1.5, 'reveal-m': 1.2, 'reveal-m-full': 1.2, // v720 : nouveaux sons ElevenLabs (v329 : 2,2 pour l'ancien) : la Secrète doit claquer (demande du propriétaire) ; le compresseur du bus évite la saturation
   unlock: 1.6, 'pa-bank': 3, 'cr-miss': 2, 'cr-flip': 1.6, 'pa-guard': 1.3 }; /* v439 */
 const SAMPLE_LOWPASS = { yourturn: 1200, passive: 1200, mark: 1400 };
 const lastPlay = {}, playing = {};
+let risenAt = -1e9;
 function playSample(key, gain = 1) {
   const buf = samples[key];
   if (!buf || !ensure()) return false;
@@ -522,11 +524,11 @@ const HAP = {
   'pa-draw': 'light', 'en-coin': 'light', 'cr-miss': 'light', 'vd-flip': 'light', boost: 'light',
   smash: 'medium', capture: 'medium', summon: 'medium', explode: 'medium', burnall: 'medium', 'cr-power': 'medium', 'pa-seal': 'medium', 'pa-guard': 'medium', 'pa-bank': 'medium', 'pa-offer': 'medium',
   'cr-pair': 'double', miss: 'hurt', tear: 'tear', 'vd-tear': 'tear', parry: 'parry', crit: 'crit', perfect: 'crit', finisher: 'crit', shatter: 'shatter', death: 'death',
-  ult: 'ult', boss: 'boss', fury: 'fury', enrage: 'warning', suspensebig: 'heartbeat', chest: 'chest', gavel: 'heavy', 'vd-rare': 'heavy',
+  ult: 'ult', boss: 'boss', fury: 'fury', enrage: 'warning', suspensebig: 'heartbeat', revealRise: 'heartbeat', chest: 'chest', gavel: 'heavy', 'vd-rare': 'heavy',
   victory: 'victory', 'vd-win': 'victory', 'pa-seven': 'success', bossvictory: 'bossvictory', defeat: 'defeat', 'vd-lose': 'defeat', 'pa-bust': 'error', error: 'error',
   achievement: 'success', levelup: 'success', unlock: 'success', apogee: 'success', fame: 'success', season: 'success',
 };
-const DUCK = { bossvictory: 5, victory: 3.5, defeat: 4, ult: 2.5, achievement: 2, boss: 2, apogee: 2.5, fame: 2, season: 2 };
+const DUCK = { revealRise: 5.5, bossvictory: 5, victory: 3.5, defeat: 4, ult: 2.5, achievement: 2, boss: 2, apogee: 2.5, fame: 2, season: 2 };
 for (const k of Object.keys(sfx)) {
   const f = sfx[k];
   sfx[k] = (...a) => {
@@ -536,8 +538,9 @@ for (const k of Object.keys(sfx)) {
     try {
       if (!ensure()) return undefined;
       loadSamples();
-      const key = sampleKey(k, a);
-      if (playSample(key, k === 'actor' ? 0.6 : 1)) return undefined;
+      if (k === 'reveal' && a[1]?.risen && performance.now() - risenAt < 8000) return undefined; // v720 : le son monté pendant la charge (revealRise) joue déjà
+      const key = k === 'revealRise' ? `reveal-${String(a[0]).toLowerCase()}-full` : sampleKey(k, a);
+      if (playSample(key, k === 'actor' ? 0.6 : 1)) { if (k === 'revealRise') risenAt = performance.now(); return undefined; }
       // v308 : fichier pas encore chargé (ou introuvable) : silence plutôt qu'un son synthétisé (bips)
       return SYNTH_ONLY.has(k) ? f(...a) : undefined;
     } catch (e) { return undefined; }
