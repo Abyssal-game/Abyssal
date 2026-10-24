@@ -130,7 +130,7 @@ async function syncShadow(g) {
     const cloud = await import('./cloud/cloud.js');
     if (!cloud.isLoggedIn()) return;
     const now = new Date(), at = new Date(now); at.setHours(19, 0, 0, 0);
-    if (g.s.shadow?.paid?.[parisDay(now)] || at.getTime() < now.getTime() + 60000) at.setDate(at.getDate() + 1);
+    if (g.s.shadow?.drew === parisDay(now) || g.s.shadow?.paid?.[parisDay(now)] || at.getTime() < now.getTime() + 60000) at.setDate(at.getDate() + 1);
     await L.schedule({ notifications: [{ id: SHADOW_ID, title: t('Le Tirage des Ombres'), body: t('Les Ombres ont battu les cartes. Ton tirage du jour t’attend : il compte pour le classement de la semaine.'), schedule: { at, allowWhileIdle: true }, extra: { route: '#/tirage' } }] });
   } catch (e) { /* rien */ }
 }

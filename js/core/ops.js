@@ -57,7 +57,7 @@ export const OPS = {
 export const SESS = ['descent.run.battle', 'trials.battle', 'sceaux.cur', 'pacte.cur', 'cryptes.cur', 'encheres.cur'];
 
 // Réglages et petites marques de l'interface : libres (ils ne rapportent rien). Les outils du Mode Créateur seulement au créateur.
-export const FREE = ['settings', 'tips', 'seenIntro', 'giftShown', 'notifAsked', 'storySeen', 'lore', 'armyNews', 'shadow.asked'];
+export const FREE = ['settings', 'tips', 'seenIntro', 'giftShown', 'notifAsked', 'storySeen', 'lore', 'armyNews', 'shadow.asked', 'shadow.drew'];
 export const FREE_DEV = ['devForce', 'devGames', 'devCodex'];
 
 export const getPath = (o, p) => p.split('.').reduce((x, k) => (x == null ? undefined : x[k]), o);

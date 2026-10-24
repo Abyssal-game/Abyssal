@@ -20,6 +20,19 @@ const addDays = (day, n) => { const t = new Date(`${day}T12:00:00Z`); t.setUTCDa
 export const weekOf = (day) => { const t = new Date(`${day}T12:00:00Z`); return addDays(day, -((t.getUTCDay() + 6) % 7)); };
 const MEDAL = ['#F2C14E', '#C9D1DE', '#C98A4E'];
 
+/* v712 : tirage du jour fait ? Marque locale posée dès que le serveur confirme un tirage (doDraw, écran du Tirage, ou
+   relecture au lancement : shadowCheck), en plus de la participation payée. Avant, seule la participation comptait :
+   si son paiement échouait, l'Accueil proposait encore le Tirage déjà fait. */
+export const shadowDone = (g, day = parisDay()) => { const sh = g.s.shadow || {}; return sh.drew === day || !!sh.paid?.[day]; };
+export function markShadow(g, day = parisDay()) { if (!g.s.shadow || typeof g.s.shadow !== 'object') g.s.shadow = {}; if (g.s.shadow.drew === day) return; g.s.shadow.drew = day; g.persist(); }
+let checked = '';
+export async function shadowCheck(app) {
+  const g = app.game, day = parisDay();
+  if (!cloud.isLoggedIn() || shadowDone(g, day) || checked === day) return;
+  checked = day;
+  try { if (await cloud.shadowMine(day)) { markShadow(g, day); app.chrome?.(); if (app.route === '') app.refresh?.(); } } catch (e) { checked = ''; }
+}
+
 // Prix de la semaine passée : demandé au serveur une fois par semaine (rien si déjà réclamé)
 export async function claimShadowPrize(app) {
   const g = app.game;
@@ -103,7 +116,7 @@ export default function shadowScreen(app, root) {
   async function load() {
     day = parisDay();
     if (!cloud.isLoggedIn()) { loading = false; return draw(); }
-    try { mine = await cloud.shadowMine(day); err = null; }
+    try { mine = await cloud.shadowMine(day); err = null; if (mine) markShadow(g, day); }
     catch (e) { err = e.status === 404 ? 'Le Tirage des Ombres n’est pas encore activé sur le serveur.' : e.message; }
     loading = false;
     draw();
@@ -116,6 +129,7 @@ export default function shadowScreen(app, root) {
     try { res = await cloud.shadowDraw(ui.faction); }
     catch (e) { busy = false; app.sfx.error(); toast(esc(e.status === 404 ? 'Le Tirage des Ombres n’est pas encore activé sur le serveur.' : e.message), { kind: 'error' }); return load(); }
     busy = false;
+    markShadow(g, parisDay());
     const cards = (res.cards || []).filter((c) => cat.get(c.id));
     mine = { cards, score: res.score, faction: ui.faction, day: res.day };
     let shards = 0;

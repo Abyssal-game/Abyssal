@@ -37,7 +37,7 @@ import versusScreen from './screens/versus.js';
 import pacteScreen from './screens/pacte.js';
 import cryptesScreen from './screens/cryptes.js';
 import trialsScreen from './screens/trials.js';
-import shadowScreen, { claimShadowPrize, parisDay } from './screens/shadow.js';
+import shadowScreen, { claimShadowPrize, shadowDone, shadowCheck } from './screens/shadow.js';
 import { forgeScreen, furnaceScreen } from './screens/forge.js';
 import { teamScreen, chestsScreen } from './screens/army.js';
 import { startSync, sync, onSync } from './cloud/sync.js';
@@ -206,7 +206,7 @@ function renderChrome() {
   const tab = TAB_OF[app.route] ?? 'antre';
   // sous-onglets : seulement sur les pages d'un groupe
   const sub = SUBNAV[tab] && SUBNAV[tab].some(([r]) => r === (SUB_OF[app.route] || app.route)) ? SUBNAV[tab] : null;
-  const shadowDue = () => isLoggedIn() && !g.s.shadow?.paid?.[parisDay()];
+  const shadowDue = () => isLoggedIn() && !shadowDone(g);
   const subBadge = (r) => {
     if (r === 'coffres') return g.chestCount() || '';
     if (r === 'tirage') return shadowDue() ? 1 : ''; /* v709 : tirage du jour pas encore fait */
@@ -461,8 +461,8 @@ async function boot() {
     startPresence();
     setInterval(autoClaim, 5000);
     setTimeout(() => checkTurns(app, { force: true }), 6000); setInterval(() => checkTurns(app), 120000); /* v519 : « À toi de jouer » en ligne */
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkTurns(app); else syncDaily(app.game); }); /* v521 : notification du booster du jour reprogrammée en quittant l'app */
-    setTimeout(() => { syncDaily(app.game); syncPush(app).catch(() => {}); }, 8000); setInterval(() => maybeAsk(app), 30000); /* v422 : l'Accueil n'a plus de boutons « +50 » : on encaisse aussi sans changer de page */
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { checkTurns(app); shadowCheck(app); } else syncDaily(app.game); }); /* v521 : notification du booster du jour reprogrammée en quittant l'app */
+    setTimeout(() => { syncDaily(app.game); syncPush(app).catch(() => {}); shadowCheck(app); }, 8000); setInterval(() => maybeAsk(app), 30000); /* v422 : l'Accueil n'a plus de boutons « +50 » : on encaisse aussi sans changer de page */
     setTimeout(() => claimShadowPrize(app), 5000); // coffre du Tirage des Ombres de la semaine passée
     lastShards = app.game.s.shards;
     window.addEventListener('hashchange', render);
