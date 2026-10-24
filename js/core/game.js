@@ -830,7 +830,7 @@ export class Game {
   startRun({ cursed = false, nightmare = false, start = 1 } = {}) {
     const tier = nightmare === true ? 1 : Math.max(0, Math.min(3, Number(nightmare) || 0));
     if (tier && !this.nightmareUnlocked()) throw new Error(`Le mode Cauchemar s’ouvre quand tu as atteint l’étage ${NIGHTMARE_AT}.`);
-    if (tier > 1 && !this.nightTierOpen(tier)) throw new Error(`${NIGHT_TIERS[tier].name} s’ouvre quand tu as atteint l’étage ${NIGHT_TIER_OPEN} en ${NIGHT_TIERS[tier - 1].name}.`);
+    if (tier > 1 && !this.nightTierOpen(tier)) throw new Error(`${NIGHT_TIERS[tier].name} s’ouvre quand tu as gagné ${NIGHT_TIER_OPEN} étages en ${NIGHT_TIERS[tier - 1].name}.`);
     if (!this.startFloors().includes(start)) throw new Error('Ce chapitre n’est pas encore ouvert : bats d’abord le gardien qui le précède.');
     /* v406 : le Cauchemar se joue sur les chapitres déjà terminés */
     if (tier && start + CHAPTER - 1 > (this.descent().best || 0)) throw new Error('Le Cauchemar se joue sur un chapitre que tu as déjà terminé.');
@@ -1611,7 +1611,7 @@ export class Game {
       const hunt = room === 'elite' && this.rule(run.day).key === 'chasse';
       out.shards = this.gainShards((8 + 2 * Math.min(run.floor, SHARD_FLOOR_CAP)) * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1) * (hunt ? 2 : 1));
       // cendres de combat : de quoi faire monter son équipe même sans doublons (pas en descente libre)
-      if (!run.free) { out.ash = Math.round((2 + Math.min(run.floor, SHARD_FLOOR_CAP) / 2) * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1)); this.s.ash += out.ash; this.s.stats.ashEarned += out.ash; }
+      if (!run.free) { out.ash = Math.round((2 + Math.min(run.floor, SHARD_FLOOR_CAP) / 2) * (room === 'boss' ? 3 : room === 'elite' ? 2 : 1)); this.s.ash += out.ash; this.s.stats.ashEarned += out.ash; run.ashGot = (run.ashGot || 0) + out.ash; /* v729 : compté dans le bilan */ }
       const named = Object.values(st.units).find((u) => u.side === 'enemy' && u.named);
       if (named) out.named = { title: named.title, id: named.id, shards: this.gainShards(20 + Math.min(run.floor, SHARD_FLOOR_CAP) * 4) };
       // objectif réussi : éclats en plus et 1 Ferveur pour la suite
@@ -1802,7 +1802,7 @@ export class Game {
   endRun(wiped = false) {
     const d = this.s.descent, run = d.run;
     if (!run) throw new Error('Aucun chapitre en cours.');
-    if (wiped && !run.nightmare) { const c = chapterOf(run.start || 1); d.grit = { ch: c, n: d.grit?.ch === c ? Math.min(GRIT.max, (d.grit.n || 0) + 1) : 1 }; }
+    if (wiped && !run.nightmare && chapterOf(run.start || 1) >= this.chapterNow()) { const c = chapterOf(run.start || 1); d.grit = { ch: c, n: d.grit?.ch === c ? Math.min(GRIT.max, (d.grit.n || 0) + 1) : 1 }; }
     // v406 : plus de coffre de fin ni de perte : tout ce qui a été gagné est gardé ; une équipe tombée recommence le chapitre
     const shards = run.shards, chests = run.chests.slice();
     chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });
@@ -1812,7 +1812,7 @@ export class Game {
     const down = wiped ? [] : run.team.filter((m) => m.fallen).map((m) => m.id);
     if (down.length) { const f = (this.s.fallen ||= {}); down.forEach((id) => { f[id] = 1; }); }
     this.s.shards += shards;
-    const summary = { wiped, floor: run.cleared, day: run.day, chests, shards, kills: run.kills, free: run.free, cursed: run.cursed, nightmare: !!run.nightmare, nightTier: run.nightmare ? run.nightTier || 1 : 0, start: run.start || 1, chapter: chapterOf(run.start || 1), firstLoot: run.firstLoot || null, fallen: down };
+    const summary = { wiped, floor: run.cleared, day: run.day, chests, shards, kills: run.kills, free: run.free, cursed: run.cursed, nightmare: !!run.nightmare, nightTier: run.nightmare ? run.nightTier || 1 : 0, start: run.start || 1, chapter: chapterOf(run.start || 1), firstLoot: run.firstLoot || null, fallen: down, ash: run.ashGot || 0 };
     if (!run.free && run.cleared > 0 && run.bestBefore !== undefined && run.cleared > run.bestBefore) summary.record = true;
     // bilan : la créature qui a achevé le plus d'ennemis, le prochain palier de coffre, les éclats vers un booster
     if (run.feats) summary.feats = { ...run.feats };

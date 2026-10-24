@@ -1192,6 +1192,10 @@ function bossPhase(st, ev) {
   else if (st.bossKey === 'eclipse') { b.totality = true; }
   else if (st.bossKey === 'choeur') { b.tide = true; }
   else if (st.bossKey === 'chaines') { b.forge = true; }
+  else if (st.bossKey === 'jumeaux') { /* v729 : Lien de sang : le Jumeau de la Nuit frappe aussi plus fort */
+    const t = st.order.enemy.map((id) => st.units[id]).find((x) => x.twin && x.hp > 0);
+    if (t) t.atk = Math.round(t.atk * 1.2 + 0.5);
+  }
 }
 // Le Dévoreur relâche sa proie (Brisure ou mort du gardien)
 // v310 : une créature qui revient (Renaissance, proie relâchée) reprend place en fin de file : elle ne repousse plus
@@ -1291,6 +1295,8 @@ export function nextEnemy(st) {
 function skipUnit(st, e) {
   if (e.frozen) { e.frozen -= 1; st.skipEv.push({ t: 'status', u: e.uid, s: e.frozen ? 'Gelé : passe son tour (encore 1)' : 'Gelé : passe son tour', k: 'frost' }); }
   else if (e.brokenSkip) { e.brokenSkip = false; st.skipEv.push({ t: 'status', u: e.uid, s: 'Brisé : passe son tour', k: 'broken' }); }
+  /* v729 : le Verdict du Juge ne dure que jusqu'à sa prochaine action, même s'il passe son tour */
+  if (e.boss && st.bossKey === 'juge' && st.forbid && e.intent?.kind !== 'verdict') { st.forbid = null; st.skipEv.push({ t: 'law', forbid: null }); }
   e.intent = null;
 }
 export function takeSkips(st) { const e = st.skipEv || []; st.skipEv = []; return e; }

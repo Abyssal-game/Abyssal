@@ -64,6 +64,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const firstSteps = () => !!run?.day && !run.free && !run.trial && g.novice() && (run.floor || 0) <= 2; /* v398 : premiers pas */
   const settling = () => { const d = app.game.s.descent; return (d.runs || 0) <= 1 && (d.run?.floor || 1) <= 2; }; // v328 : voir plus haut
   const g = app.game, cat = app.catalog, run = runOpt || g.descent().run, st = run.battle;
+  app.state.lastEnemyTurn = null; /* v729 : le dernier tour ennemi d'un ancien combat ne s'affiche plus */
   const where = run.lab ? 'lab' : run.trial ? 'trial' : 'run';
   perfStart(`${where === 'lab' ? 'Labo' : where === 'trial' ? 'Épreuve' : 'Descente'} · étage ${run.floor || '?'}${run.room === 'boss' || st.bossKey ? ` · gardien ${st.bossKey || ''}` : run.room === 'elite' ? ' · élite' : ''}`);
   const E = engine || g; /* v595 : le banc d'essai du Labo joue sur son propre combat (js/core/lab.js), hors sauvegarde et serveur */ /* v540 : chaque coup passe par le jeu (g.duel…) : le serveur de partie rejoue le combat */
@@ -734,7 +735,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
             dio.fallen();
             app.sfx.boss(); await hitstop(220); app.sfx.death();
             fxAt(e.u, 'death', { big: true }); sparks(e.u, 'big'); deathFx(e.u); el(e.u)?.classList.add('dying', 'ashes'); shake(true);
-            banner(`${esc(uName(u))} est vaincu`, 'finisher', 1300);
+            banner(`Gardien vaincu : ${esc(uName(u))}`, 'finisher', 1300); /* v729 : neutre (« La Matriarche … est vaincu ») */
             await wait(T(1100)); d?.classList.remove('slowmo', 'bossfall'); draw(); break;
           }
           // coup fatal : le dernier ennemi tombe sous un coup allié → gros plan, une fois par combat

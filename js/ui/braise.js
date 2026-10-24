@@ -16,7 +16,7 @@ export function braiseInfoHTML() {
   return `<h2 class="center">Les Braises de vie</h2>
     <div class="br-big">${BRAISE_IC}</div>
     <p>Une créature qui tombe pendant un chapitre que tu <b>gagnes</b> reste à terre au chapitre suivant. Une Braise de vie la ranime, avec tous ses PV.</p>
-    <p>Si le chapitre est <b>perdu ou abandonné</b>, il recommence et toute ton équipe se relève.</p>
+    <p>Si le chapitre est <b>perdu ou abandonné</b>, il recommence et les créatures tombées pendant ce chapitre se relèvent.</p>
     <ul class="br-list">
       <li>${icon('crown')}<span>Chaque gardien vaincu pour la première fois : <b>${BRAISE.boss}</b> Braise de vie (<b>${BRAISE.bossLate}</b> à partir du chapitre ${BRAISE.lateFrom}).</span></li>
       <li>${icon('star')}<span><b>Une offerte chaque jour</b>, qui se garde (${BRAISE.max} au plus en réserve).</span></li>
