@@ -6584,3 +6584,12 @@ body:has(.sc-dlg) .sc-game .sc-msg { visibility: hidden; }
 /* même chose pour le bandeau d’ouverture de booster (« Hyper rare ! », finitions) */
 .op-banner { animation-name: banner697; text-wrap: balance; }
 @keyframes banner697 { 0% { opacity: 0; transform: scale(2); } 20% { opacity: 1; transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-20px); } }
+
+/* v698 : la pastille des récompenses se pose à la place du pseudo, entre le portrait et les compteurs (elle cachait les éclats) */
+.prog-chip.docked { transform: translateY(-10px); gap: 5px; font-size: .66rem; letter-spacing: -.01em; }
+.prog-chip.docked .pc-ic { width: 20px; height: 20px; }
+.prog-chip.docked.in { transform: none; }
+.prog-chip.docked .pc-t small { display: none; }
+.prog-chip.docked .pc-go { padding: 3px 6px; font-size: .6rem; }
+/* v698 : Descente, la rangée d’équipe vide laissait un grand trou sous la carte du chapitre */
+.v2-strip:empty { display: none; }

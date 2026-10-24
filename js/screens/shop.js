@@ -153,7 +153,7 @@ export default function shop(app, root, params = []) {
     root.innerHTML = `
       ${giftHTML(g, cat)}
       <!-- v428 : plus de bannière ni d'encart du Tirage (il a son sous-onglet) : les boosters directement -->
-      ${(() => { const n = ownedPacks(); return n >= 2 ? `<button class="btn gold block dc-plq dc-plq-dark shop-all" data-act="openall">${icon('ticket')}Ouvrir mes ${n} boosters d’un coup</button>` : ''; })()}
+      ${(() => { const n = ownedPacks(); return n >= 2 ? `<button class="btn gold block dc-plq dc-plq-dark shop-all" data-act="openall">${icon('ticket')}Ouvrir mes ${n} boosters</button>` : ''; })()}
       <div class="products">
         ${card('standard')}
         ${card('faction', '', `<div class="chips fac-pick fac-grid" role="radiogroup" aria-label="Faction du booster">${FACTION_ORDER.map((f) => `<button class="chip" role="radio" data-act="pickfac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}" aria-checked="${st.faction === f}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>`)}

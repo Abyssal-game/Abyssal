@@ -361,10 +361,24 @@ function paintProgress() {
   const one = progList.length === 1 ? progList[0] : null;
   progEl.innerHTML = `<span class="pc-ic">${one?.kind === 'level' ? '<img class="picon" alt="" src="assets/icons/xp2.webp">' : icon(one ? KIND_ICON[one.kind] || 'trophy' : 'trophy')}</span>
     <span class="pc-t">${one ? `<small>${KIND_LABEL[one.kind] || ''}</small><b>${one.kind === 'level' ? one.level : progLine(one)}</b>` : `<b>${progList.length} récompenses</b>`}</span><span class="pc-go">Voir</span>`;
+  dockProgress();
   requestAnimationFrame(() => progEl.classList.add('in'));
   clearTimeout(progTimer); progTimer = setTimeout(hideProgress, 7000);
+  /* v698 : si une ouverture, un combat ou un coffre commence pendant que la pastille est là, elle s'efface et attend */
+  clearInterval(progWatch); progWatch = setInterval(() => { if (progBusy() && progList.length) { clearInterval(progWatch); paintProgress(); } }, 400);
 }
-function hideProgress() { clearTimeout(progTimer); progList = []; progEl?.classList.remove('in'); }
+/* v698 : la pastille se pose à la place du pseudo, entre le portrait et les compteurs (elle cachait le nombre d'éclats) */
+let progWatch = 0;
+function dockProgress() {
+  const meta = document.querySelector('#topbar .top-meta'), pill = document.querySelector('#topbar .pill');
+  if (!meta || !pill || document.body.classList.contains('battle-mode')) { progEl.classList.remove('docked'); progEl.style.left = progEl.style.maxWidth = progEl.style.top = ''; return; }
+  const a = meta.getBoundingClientRect(), b = pill.getBoundingClientRect();
+  const w = b.left - a.left - 6;
+  if (w < 120) { progEl.classList.remove('docked'); progEl.style.left = progEl.style.maxWidth = progEl.style.top = ''; return; }
+  progEl.classList.add('docked'); progEl.style.left = `${a.left - 4}px`; progEl.style.maxWidth = `${w + 4}px`;
+  progEl.style.top = `${a.top + a.height / 2 - 17}px`;
+}
+function hideProgress() { clearTimeout(progTimer); clearInterval(progWatch); progList = []; progEl?.classList.remove('in'); }
 function openProgress(list) {
   if (!list.length) return;
   const total = list.reduce((t, e) => t + (e.reward?.shards || 0), 0);
