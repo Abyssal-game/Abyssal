@@ -16,7 +16,7 @@ export default function factions(app, root, params) {
       const p = g.factionProgress(f.key);
       const feat = cat.get(f.featured);
       return `<a class="fac-card" href="#/faction/${f.key}" style="--fc:${f.colors.secondary};--fp:${f.colors.primary}">
-        <img alt="" loading="lazy" class="${g.owns(feat.id) ? '' : 'veiled'}" src="${artUrl(feat, { mystery: !g.owns(feat.id), lite: true })}">
+        ${g.owns(feat.id) ? `<img alt="" loading="lazy" src="${artUrl(feat, { lite: true })}">` : `<img alt="" loading="lazy" src="assets/realms/${f.key === 'infernal' ? 'infernal' : `${f.key}-3`}.webp">` /* v731 : royaume peint tant que la créature vedette n’est pas trouvée (avant : carte noire) */}
         <span class="fac-veil"></span>
         <span class="fac-text">
           <span class="fac-sig">${sigil(f.key)}</span>

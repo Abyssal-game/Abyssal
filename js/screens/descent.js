@@ -286,7 +286,7 @@ export default function descent(app, root) {
       app.chrome();
       if (out.lost) { app.sfx.error(); ui.outcome = out.summary; ui.win = null; render(); }
       else if (out.summit) { app.sfx.reveal('S'); ui.outcome = out.summary; ui.win = null; ui.start = null; ui.nightmare = false; render(); toast(out.abyssPack ? '<b>Tu as atteint le fond de l’Abysse !</b> Le Booster de l’Abysse t’attend dans les Boosters.' : '<b>L’Abysse est vaincu, une fois de plus.</b>', { kind: 'epic', icon: 'crown', ms: 7000 }); }
-      else if (out.chapter) { app.sfx.reveal('M'); ui.outcome = out.summary; ui.win = null; ui.start = null; render(); if (out.first) toast(`<b>Chapitre ${out.chapter} terminé !</b> ${out.chest ? `${esc(CHESTS[out.chest].name)} gagné.` : ''}`, { kind: 'epic', icon: 'crown', ms: 5000 }); }
+      else if (out.chapter) { app.sfx.reveal('M'); ui.outcome = out.summary; ui.win = null; ui.start = null; render(); /* v731 : plus d’annonce en double, le bilan dit déjà tout */ }
       else {
         app.sfx.reveal(out.room === 'boss' ? 'M' : 'R');
         const r = g.descent().run;

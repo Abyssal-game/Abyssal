@@ -22,7 +22,7 @@ export const BOSSES = {
     name: 'Le Dévoreur', title: 'La faim qui ne dort jamais',
     intro: 'Une gueule s’ouvre dans la roche. Elle a avalé des armées entières, et elle a encore faim.',
     mechanic: 'Il annonce « Dévorer » : il arrache des PV à ta créature la plus vigoureuse et s’en nourrit. Chaque festin réussi le rend plus fort.',
-    counter: 'Gèle-le ou brise-le pendant qu’il prépare son festin. Un Rempart réduit la morsure.',
+    counter: 'Gèle-le ou brise-le pendant qu’il prépare son festin. Un Protecteur réduit la morsure.',
     story: 'Avant les Sceaux, le Dévoreur était un gouffre sans fond où l’on jetait les condamnés. À force de recevoir, il a appris à réclamer. Les premiers Scelleurs ne l’ont pas vaincu : ils l’ont seulement rassasié assez longtemps pour fermer la porte.',
     pattern: (phase, round) => (round % (phase === 2 ? 2 : 3) === 2 ? 'gorge' : 'hit'),
   },

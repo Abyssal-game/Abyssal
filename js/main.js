@@ -378,7 +378,7 @@ function dockProgress() {
   if (!meta || !pill || document.body.classList.contains('battle-mode')) { progEl.classList.remove('docked'); progEl.style.left = progEl.style.maxWidth = progEl.style.top = ''; return; }
   const a = meta.getBoundingClientRect(), b = pill.getBoundingClientRect();
   const w = b.left - a.left - 6;
-  if (w < 120) { progEl.classList.remove('docked'); progEl.style.left = progEl.style.maxWidth = progEl.style.top = ''; return; }
+  if (w < 96) { progEl.classList.remove('docked'); progEl.style.left = progEl.style.maxWidth = progEl.style.top = ''; return; }
   progEl.classList.add('docked'); progEl.style.left = `${a.left - 4}px`; progEl.style.maxWidth = `${w + 4}px`;
   progEl.style.top = `${a.top + a.height / 2 - 17}px`;
 }

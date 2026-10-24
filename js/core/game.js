@@ -1346,7 +1346,7 @@ export class Game {
         .sort((a, b) => (this.isFav(b.id) - this.isFav(a.id)) || (b.x.cost - a.x.cost))[0];
       if (sub) out.push({ kind: 'sublime', title: `Sublime ${this.catalog.get(sub.id).name}`, sub: `${VARIANTS[sub.x.to].name} pour ${sub.x.cost} obsidiennes (tu en as ${this.obs()}) · Fournaise → Sublimer`, href: '#/fournaise', icon: 'holo' });
     }
-    if (bf && bf > best && out.length < 3 && !out.some((x) => x.sub?.includes(BOSSES[bossOf(bf)].name))) { /* v411 : jamais un gardien déjà dépassé */ const B = BOSSES[bossOf(bf)]; out.push({ kind: 'boss', title: `Vaincs ${B.name}`, sub: `Gardien de l’étage ${bf} · son récit t’attend dans le Bestiaire`, href: '#/descente', icon: 'crest-boss' }); }
+    if (bf && bf > best && out.length < 3 && !out.some((x) => x.sub?.includes(BOSSES[bossOf(bf)].name))) { /* v411 : jamais un gardien déjà dépassé */ const B = BOSSES[bossOf(bf)]; out.push({ kind: 'boss', title: `Vaincs ${B.name.replace(/^(Le|La|Les|L’) ?/, (m) => m.toLowerCase())}`, /* v731 : article en minuscule */ sub: `Gardien de l’étage ${bf} · son récit t’attend dans le Bestiaire`, href: '#/descente', icon: 'crest-boss' }); }
     else if (!bf && this.sceauxOpen()) {
       const i = SC.RIVALS.findIndex((r) => !this.s.sceaux.beaten[r.key]);
       if (i >= 0 && SC.rivalUnlocked(this.s, i)) out.push({ kind: 'sceaux', title: `Bats ${SC.RIVALS[i].name} aux Duels des Sceaux`, sub: `${SC.RIVALS[i].title} · première victoire : +${SC.SCEAUX_REWARD.firstWin} éclats`, href: '#/sceaux', icon: 'seal' });

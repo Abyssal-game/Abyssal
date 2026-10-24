@@ -6798,3 +6798,22 @@ html.reduce-motion .dc-bscene, html.reduce-motion .bx-scene, html.fx-light .dc-b
 
 /* v729 : badge « Fondateur » au classement (titre du Pack du Fondateur) */
 .pbadge.pb-fondateur { background: linear-gradient(90deg, #5A3A10, #C9A45A); color: #1A1206; }
+
+/* v731 : retouches du tour visuel du 24 octobre 2026 */
+/* annonces : pendant un combat, une ouverture ou un mini-jeu, posées sous l'en-tête (elles cachaient titre, croix et « Tout révéler ») */
+body.battle-mode #toasts, body:has(.opening) #toasts, body:has(.mq-game) #toasts { top: calc(var(--safe-t) + 92px); bottom: auto; }
+/* accents des majuscules (« Étincelles ») coupés sur la première ligne du nom d'une carte */
+.tcg-nm { line-height: 1.2; padding-top: .08em; }
+.op-banner.op-variant { line-height: 1.25; padding-top: .12em; }
+/* Équipe : l'icône de rôle ne cache plus l'étiquette de finition */
+.v2-badges ~ .tcg-vbadge, .tcg:has(.v2-badges) .tcg-vbadge { z-index: 7; }
+.tcg:has(.v2-badges) .tcg-vbadge { top: auto; bottom: 26%; }
+/* pointillés de déchirure dans le sachet peint, pas dans ses marges transparentes */
+.pk-tearline { left: 9%; right: 9%; }
+/* affiche du gardien, onglet Récompense */
+.bx-rw { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.bx-rw .rw-line { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.bx-rw2 { display: block; margin-top: 6px; }
+/* bilan de fin de chapitre : butin sur une rangée, bouton sur une ligne */
+.dc-sum3 .dc-sum2-loot { grid-template-columns: repeat(auto-fit, minmax(68px, 1fr)) !important; max-width: 380px; }
+.dc-sum3 .big-cta[data-act="nextchap"] { white-space: nowrap; font-size: clamp(.82rem, 4.2vw, 1.05rem); letter-spacing: .02em; }
