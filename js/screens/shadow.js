@@ -55,7 +55,7 @@ export default function shadowScreen(app, root) {
 
   const row = (r, i, val, sub) => {
     const hid = isBlocked(r.user_id), av = !hid && (r.profiles?.avatar || r.avatar), c = av && cat.get(av), uid = cloud.currentUser()?.id, me = r.user_id === uid, pseudo = r.profiles?.pseudo || r.pseudo;
-    return `<div class="lb-row ${me ? 'me' : ''}"${rowAttrs(r.user_id, pseudo, uid)}><span class="lb-rank" ${i < 3 ? `style="color:${MEDAL[i]}"` : ''}>${i + 1}</span><span class="lb-av ${hid ? '' : frameCls(r.profiles?.frame || r.frame)}">${c ? `<img alt="" src="${artUrl(c, { lite: true })}">` : EMBLEM}</span><span class="lb-name"><b>${withPlate(hid ? null : r.profiles?.plate || r.plate, esc(shownName(r.user_id, pseudo)))}${hid ? '' : cloud.badgeHTML(r.profiles?.badge || r.badge)}</b><span class="small muted">${sub}</span></span><span class="lb-floor">${fmt(val)}</span></div>`;
+    return `<div class="lb-row ${me ? 'me' : ''}"${rowAttrs(r.user_id, pseudo, uid)}><span class="lb-rank" ${i < 3 ? `style="color:${MEDAL[i]}"` : ''}>${i + 1}</span><span class="lb-av ${hid ? '' : frameCls(r.profiles?.frame || r.frame)}">${c ? `<img alt="" src="${artUrl(c, { lite: true })}">` : EMBLEM}</span><span class="lb-name"><b>${withPlate(hid ? null : r.profiles?.plate || r.plate, esc(shownName(r.user_id, pseudo)))}${hid ? '' : cloud.badgeHTML(r.profiles?.badge || r.badge)}${!hid && r.profiles?.title === 'Fondateur' ? '<span class="pbadge pb-fondateur">Fondateur</span>' : '' /* v729 : badge du Pack du Fondateur */}</b><span class="small muted">${sub}</span></span><span class="lb-floor">${fmt(val)}</span></div>`;
   };
 
   function draw() {

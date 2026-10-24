@@ -185,7 +185,7 @@ function applyPower(st, who, f, ev, rng) {
   if (f === 'celeste') st.grace[who]++;
   else if (f === 'primordial') st.bonus[who]++;
   else if (f === 'artificiel') st.block[opp] = true;
-  else if (f === 'necrotique') { const k = st.pairs[opp].pop(); if (k != null) { st.pairs[who].push(k); ev.stolen = k; if (st.stats) st.stats.stolen[opp]++; } else ev.empty = true; }
+  else if (f === 'necrotique') { const k = st.pairs[opp].pop(); if (k != null) { st.pairs[who].push(k); ev.stolen = k; if (st.curse?.includes(k)) { st.bonus[who]--; st.bonus[opp]++; } /* v729 : une paire maudite volée garde sa malédiction */ if (st.stats) st.stats.stolen[opp]++; } else ev.empty = true; }
   else if (POWERS[f]?.pick) {
     if (hidden(st).length < POWERS[f].pick) { ev.empty = true; return; }
     if (who === 'p') st.pending = { power: f, pick: POWERS[f].pick };

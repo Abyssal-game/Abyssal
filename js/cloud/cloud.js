@@ -269,7 +269,7 @@ export async function shadowMine(day) {
   return rows?.[0] || null;
 }
 export async function shadowDay(day, limit = 10) {
-  return withCosm((x) => `/rest/v1/shadow_draws?day=eq.${day}&select=score,faction,user_id,created_at,profiles(pseudo,avatar,badge${x})&order=score.desc,created_at.asc&limit=${limit}`);
+  return withCosm((x) => `/rest/v1/shadow_draws?day=eq.${day}&select=score,faction,user_id,created_at,profiles(pseudo,avatar,title,badge${x})&order=score.desc,created_at.asc&limit=${limit}`);
 }
 export async function shadowWeek(week, limit = 10) { return authed('/rest/v1/rpc/shadow_week', { method: 'POST', body: { p_week: week, p_limit: limit } }); }
 export async function shadowClaim(week) { return authed('/rest/v1/rpc/shadow_claim', { method: 'POST', body: { p_week: week } }); }

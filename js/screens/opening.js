@@ -300,7 +300,8 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
       if (big) app.sfx.revealRise(c.rarity); else app.sfx.suspense();
       hapPattern(big ? [40, 60, 40, 60, 60, 40, 120] : [30, 50, 40]); /* v521 : vraies vibrations dans l'app */
       await wait(big ? RISE_MS[c.rarity] : 600);
-      if (phase === 'summary') { busy = false; return; }
+      if (phase === 'summary') { busy = false; el.classList.remove('hush', 'hush-big'); btn.classList.remove('charging'); return; } /* v729 : « Tout révéler » pendant la charge */
+      tapQueued = false; /* v729 : un toucher pendant la charge ne fait plus passer la grande carte sans la voir */
       btn.classList.remove('charging');
       el.classList.remove('hush', 'hush-big');
       el.classList.add('flash');

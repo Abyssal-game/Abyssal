@@ -180,7 +180,7 @@ export default function shop(app, root, params = []) {
   // v422 : boosters déjà à toi (tickets et boosters gratuits), ouverts d'un coup avec un récapitulatif
   function ownedPacks() {
     if (g.welcomePending() || g.s.welcomeGift > 0) return 0; /* v518 : pendant le cadeau de bienvenue, un booster à la fois */
-    return Object.entries(g.s.tickets).filter(([k, n]) => n > 0 && BOOSTERS[k]).reduce((a, [, n]) => a + n, 0) + g.freePack().stock;
+    return Object.entries(g.s.tickets).filter(([k, n]) => n > 0 && BOOSTERS[k] && k !== 'abysse').reduce((a, [, n]) => a + n, 0) + g.freePack().stock;
   }
   let allBusy = false;
   async function openAll() {
@@ -189,7 +189,8 @@ export default function shop(app, root, params = []) {
     app.pendingProgress = [];
     /* v539 : tous les boosters partent ensemble au serveur de partie, qui les tire */
     const list = [];
-    for (const type of Object.keys(BOOSTERS)) for (let i = 0; i < (g.s.tickets[type] || 0); i++) list.push(['openBooster', [type, { faction: type === 'faction' ? st.faction : undefined }]]);
+    /* v729 : le Booster de l’Abysse s’ouvre seul, avec sa mise en scène */
+    for (const type of Object.keys(BOOSTERS)) if (type !== 'abysse') for (let i = 0; i < (g.s.tickets[type] || 0); i++) list.push(['openBooster', [type, { faction: type === 'faction' ? st.faction : undefined }]]);
     for (let i = 0; i < g.freePack().stock; i++) list.push(['openBooster', ['standard']]);
     allBusy = true;
     try {

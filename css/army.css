@@ -6795,3 +6795,6 @@ html.reduce-motion .dc-bscene, html.reduce-motion .bx-scene, html.fx-light .dc-b
 .cb-def.ok .dv-dodge-t { text-shadow: 0 0 10px rgba(127, 224, 160, .8); }
 .dv.qte-on .dio *, .dv.qte-on .dv-c::before, .dv.qte-on .dv-c::after, .dv.qte-on .dv-c .dv-art::after { animation-play-state: paused !important; }
 .cb-def .df-go, .cb-def .df-pp { will-change: opacity; }
+
+/* v729 : badge « Fondateur » au classement (titre du Pack du Fondateur) */
+.pbadge.pb-fondateur { background: linear-gradient(90deg, #5A3A10, #C9A45A); color: #1A1206; }

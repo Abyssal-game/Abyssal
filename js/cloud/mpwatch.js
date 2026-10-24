@@ -72,9 +72,9 @@ async function check(app) {
     const mine = d?.mine || [];
     const see = mine.filter((r) => r.status === 'done' && !r.claimed);
     const inv = mine.filter((r) => r.status === 'open' && !r.mine);
-    for (const r of see) cards.push({ k: 'pari-see', game: 'versus', id: r.id, foe: { id: (r.mine ? r.b : r.a) || null, pseudo: r.pseudo || '', avatar: r.avatar || null } });
+    for (const r of see) cards.push({ k: 'pari-see', game: 'versus', id: r.id, mine: !!r.mine, foe: { id: (r.mine ? r.b : r.a) || null, pseudo: r.pseudo || '', avatar: r.avatar || null } });
     for (const r of inv) cards.push({ k: 'pari-inv', game: 'versus', id: r.id, foe: { id: (r.mine ? r.b : r.a) || null, pseudo: r.pseudo || '', avatar: r.avatar || null } });
-    for (const r of see) say(`pari:${r.id}`, t('{name} a relevé ton défi au Pari des Boosters : va voir le duel !', { name: who(r.pseudo) }), 'crystal', 'versus');
+    for (const r of see) say(`pari:${r.id}`, t(r.mine ? '{name} a relevé ton défi au Pari des Boosters : va voir le duel !' : 'Ton duel du Pari des Boosters contre {name} est prêt : va le voir !', { name: who(r.pseudo) }), 'crystal', 'versus'); /* v729 */
     for (const r of inv) say(`pinv:${r.id}`, t('{name} te défie au Pari des Boosters !', { name: who(r.pseudo) }), 'crystal', 'versus');
     if (see.length) items.push({ href: '#/versus', icon: 'booster', title: t(see.length > 1 ? '{n} duels du Pari à voir' : 'Un duel du Pari à voir', { n: see.length }), sub: t('Ton défi a été relevé') });
     if (inv.length) items.push({ href: '#/versus', icon: 'booster', title: t(inv.length > 1 ? '{n} défis reçus au Pari des Boosters' : 'Un défi reçu au Pari des Boosters', { n: inv.length }), sub: inv.map((r) => esc(r.pseudo || '')).join(', ') });

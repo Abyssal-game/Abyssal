@@ -245,7 +245,7 @@ export default function cryptesScreen(app, root) {
   function start(opts) {
     try { g.cryptesStart(opts); } catch (e) { toast(esc(e.message), { kind: 'error' }); return; }
     const st = g.s.cryptes.cur, R = CR.RIVALS[st.rival];
-    ui.up.clear(); ui.glow.clear(); ui.picks = []; ui.swap.clear();
+    ui.up.clear(); ui.glow.clear(); ui.picks = []; ui.swap.clear(); ui.peek.clear(); ui.last = null; /* v729 : rien de la partie précédente */
     app.sfx.enter?.();
     banner = { cls: 'intro', html: `<span class="sc-med">${pic(st.rival)}</span><span><b>« ${esc(R.hello)} »</b><span class="small">10 paires à trouver. Tu commences.${CR.TABLE[st.table].rule ? `<em class="gm-ruleline">${esc(CR.TABLE[st.table].rule)}</em>` : ''}</span></span>` };
     busy = true; view();

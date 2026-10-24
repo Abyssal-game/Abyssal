@@ -37,7 +37,7 @@ export default function home(app, root) {
     /* v709 : Tirage des Ombres, mis en avant juste sous l'offrande tant que le tirage du jour n'est pas fait (compte connecté) */
     if (cloud.isLoggedIn()) {
       const shDone = shadowDone(g);
-      rows.push(`<a class="td-row td-shadow ${shDone ? 'done' : ''}" href="#/tirage"><span class="td-ic mi" style="--mc:#9B6BFF">${picon('shadow')}</span><span class="td-t"><b>Tirage des Ombres</b><span class="small muted">${shDone ? 'Tiré aujourd’hui · ton score compte pour la semaine · retour demain' : 'Ton booster gratuit du jour t’attend · classement de la semaine'}</span></span>${shDone ? '<span class="small muted">Demain</span>' : `<span class="td-go">Tirer</span>`}</a>`);
+      rows.push(`<a class="td-row td-shadow ${shDone ? 'done' : ''}" href="#/tirage"><span class="td-ic mi" style="--mc:#9B6BFF">${picon('shadow')}</span><span class="td-t"><b>Tirage des Ombres</b><span class="small muted">${shDone ? 'Tiré aujourd’hui · ton score compte pour la semaine · retour demain' : 'Ton tirage du jour t’attend · classement de la semaine'}</span></span>${shDone ? '<span class="small muted">Demain</span>' : `<span class="td-go">Tirer</span>`}</a>`);
     }
     // v411 : ce qui se joue aujourd'hui, puis les missions, puis le coffre de la semaine (avant : tout mélangé)
     const tl = g.trials().done.filter((x) => !x).length, tw = g.trials().done.filter((x) => x === 'won').length;
@@ -84,7 +84,7 @@ export default function home(app, root) {
       let kick, line, acts;
       if (x.k === 'turn') { kick = 'À toi de jouer'; line = t('Contre {name}', { name: who }); acts = `<button class="btn small primary" data-act="olplay" data-i="${i}">${icon('swords')}Jouer</button>`; }
       else if (x.k === 'inv') { kick = 'Défi reçu'; line = t('{name} te défie', { name: who }); acts = `<button class="btn small primary" data-act="oljoin" data-i="${i}">Accepter</button><button class="btn small ghost" data-act="olno" data-i="${i}">Refuser</button>`; }
-      else if (x.k === 'pari-see') { kick = 'Duel à voir'; line = t('{name} a relevé ton défi', { name: who }); acts = `<button class="btn small primary" data-act="olgo" data-i="${i}">Voir le duel</button>`; }
+      else if (x.k === 'pari-see') { kick = 'Duel à voir'; line = t(x.mine === false ? 'Ton duel contre {name} est prêt' : '{name} a relevé ton défi', { name: who }); acts = `<button class="btn small primary" data-act="olgo" data-i="${i}">Voir le duel</button>`; }
       else if (x.k === 'pari-inv') { kick = 'Défi reçu'; line = t('{name} te défie', { name: who }); acts = `<button class="btn small primary" data-act="olgo" data-i="${i}">Voir le défi</button>`; }
       else { kick = 'Demande d’ami'; line = t('{name} veut devenir ton ami', { name: who }); acts = `<button class="btn small primary" data-act="olfyes" data-i="${i}">Accepter</button><button class="btn small ghost" data-act="olfno" data-i="${i}">Refuser</button>`; }
       const time = x.k === 'turn' ? leftOf(x) : '';
