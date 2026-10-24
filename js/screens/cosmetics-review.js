@@ -16,14 +16,14 @@ const SECTIONS = [
   { title: 'Doublons · cadres', groups: [
     ['1', 'Anneaux noirs presque nus', ['cx-vif-corbeau', 'cx-vif-obsidienne']],
     ['2', 'Anneau sombre et gemmes rouges', ['cx-vif-araignee', 'cx-vif-sang', 'cx-vif-rubis']],
-    ['3', 'Argent et pierres blanches', ['cx-vif-lune', 'cx-vif-perle']],
+    ['3', 'Argent et pierres blanches', ['cx-vif-perle']],
     ['4', 'Lueur vert-turquoise', ['cx-vif-serpent', 'cx-vif-maree']],
     ['5', 'Bleu pâle', ['cx-vif-loup', 'cx-vif-foudre']],
     ['6', 'Sombre à reflets verts', ['cx-vif-kraken', 'cx-vif-foret']],
   ] },
   { title: 'Doublons · dos', groups: [
     ['7', 'Spirale ou trou noir au centre', ['dos-vif-nebuleuse', 'dos-vif-portail', 'dos-vif-eclipse']],
-    ['8', 'Grand œil au centre', ['dos-vif-oeil-or', 'dos-vif-abysse', 'dos-vif-kraken']],
+    ['8', 'Grand œil au centre', ['dos-vif-abysse', 'dos-vif-kraken']],
     ['9', 'Cœur au centre', ['dos-vif-coeur-dragon', 'dos-vif-coeur-mecanique']],
   ] },
   { title: 'Doublons · sachets', groups: [

@@ -5435,12 +5435,6 @@ body.battle-mode .prog-chip { top: calc(var(--safe-t, env(safe-area-inset-top, 0
 .np-demo { font: 700 .82rem/1.2 var(--f-display); letter-spacing: .02em; }
 .np-pl-braise { --npb: rgba(255, 140, 60, .7); background-image: url(../assets/plates/pl-braise.webp), radial-gradient(120% 140% at 50% 120%, #c2410c, #5c1a06 45%, #1a0703 80%); }
 .np-pl-givre { --npb: rgba(190, 230, 255, .75); background-image: url(../assets/plates/pl-givre.webp), linear-gradient(90deg, #0b1a28, #2e5a78 50%, #0b1a28); color: #F2FAFF; }
-.np-pl-or-noir { --npb: rgba(242, 193, 78, .85); background-image: url(../assets/plates/pl-or-noir.webp), linear-gradient(90deg, #120d04, #3b2c0c 25%, #16110a 50%, #3b2c0c 75%, #120d04); color: #FFE7A6; }
-.np-pl-souverain { --npb: rgba(255, 215, 120, .95); background-image: url(../assets/plates/pl-souverain.webp), linear-gradient(90deg, #3a0810, #8a6a1c 30%, #4a0c14 50%, #8a6a1c 70%, #3a0810); color: #FFF0C2;
-  box-shadow: inset 0 0 0 1px var(--npb), 0 0 10px rgba(255, 190, 80, .45), 0 2px 6px rgba(0, 0, 0, .5); }
-.np-pl-souverain::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgba(255, 240, 200, .55) 50%, transparent 65%); transform: translateX(-120%); animation: npSheen 3.6s ease-in-out infinite; pointer-events: none; }
-@keyframes npSheen { 0%, 55% { transform: translateX(-120%); } 85%, 100% { transform: translateX(120%); } }
-@media (prefers-reduced-motion: reduce) { .np-pl-souverain::after { animation: none; display: none; } }
 .lb-name b .np, .ph-name .np, .cs-name .np { font: inherit; }
 .lb-name b:has(.np) { display: flex; align-items: center; gap: 4px; min-width: 0; }
 .lb-av.pf { overflow: visible; }
@@ -5507,7 +5501,6 @@ body.battle-mode .prog-chip { top: calc(var(--safe-t, env(safe-area-inset-top, 0
 
 /* v572 : six plaques de pseudo de plus */
 .np-pl-sang { --npb: rgba(220, 40, 60, .8); background-image: url(../assets/plates/pl-sang.webp), linear-gradient(90deg, #1a0306, #4a0a12 50%, #1a0306); color: #FFD9DD; }
-.np-pl-nacre { --npb: rgba(200, 230, 220, .7); background-image: url(../assets/plates/pl-nacre.webp), linear-gradient(90deg, #101414, #3a4644 50%, #101414); color: #EEF7F4; }
 .np-pl-dragon { --npb: rgba(205, 160, 100, .75); background-image: url(../assets/plates/pl-dragon.webp), linear-gradient(90deg, #1c1208, #4a3420 50%, #1c1208); color: #FBE3BC; }
 
 /* v574 : en « animations réduites », la barre de temps des gestes se vidait d'un coup (règle générale de base.css) : elle garde sa vraie durée */
@@ -5542,12 +5535,7 @@ body.battle-mode .prog-chip { top: calc(var(--safe-t, env(safe-area-inset-top, 0
 @keyframes pendSpin { to { transform: rotate(360deg); } }
 
 /* v580 : 8 plaques de pseudo de prestige (images Gemini) */
-.np-pl-phenix { --npb: rgba(255, 170, 110, .8); background-image: url(../assets/plates/pl-phenix.webp), linear-gradient(90deg, #1c0e08, #4a2a18 50%, #1c0e08); color: #FFE0C4; }
 .np-pl-kraken { --npb: rgba(120, 200, 190, .8); background-image: url(../assets/plates/pl-kraken.webp), linear-gradient(90deg, #06141a, #163a40 50%, #06141a); color: #D4F4EE; }
-.np-pl-tresor { --npb: rgba(255, 200, 110, .8); background-image: url(../assets/plates/pl-tresor.webp), linear-gradient(90deg, #120c04, #3e2e12 50%, #120c04); color: #FFE9B8; }
-.np-pl-cristal { --npb: rgba(190, 150, 255, .8); background-image: url(../assets/plates/pl-cristal.webp), linear-gradient(90deg, #0e0818, #2e2048 50%, #0e0818); color: #EADCFF; }
-.np-pl-foudre { --npb: rgba(160, 200, 255, .8); background-image: url(../assets/plates/pl-foudre.webp), linear-gradient(90deg, #060a14, #1c2a44 50%, #060a14); color: #DDEBFF; }
-.np-pl-foret { --npb: rgba(220, 180, 110, .8); background-image: url(../assets/plates/pl-foret.webp), linear-gradient(90deg, #0e0a06, #2e2416 50%, #0e0a06); color: #F6E2BC; }
 .np-pl-automate { --npb: rgba(230, 160, 110, .8); background-image: url(../assets/plates/pl-automate.webp), linear-gradient(90deg, #140c06, #3c2614 50%, #140c06); color: #FBE0C6; }
 .np-pl-empereur { --npb: rgba(255, 215, 140, .8); background-image: url(../assets/plates/pl-empereur.webp), linear-gradient(90deg, #0a0806, #2e2616 50%, #0a0806); color: #FFEFC6; }
 
@@ -5589,7 +5577,6 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 
 /* v588 : 4 cadres vivants de plus (Venin, Chandelles, Ambre, Obsidienne) */
 .pf-cx-vif-venin { --fr: url(../assets/frames/cx-vif-venin-4.webp); }
-.pf-cx-vif-chandelles { --fr: url(../assets/frames/cx-vif-chandelles-4.webp); }
 .pf-cx-vif-ambre { --fr: url(../assets/frames/cx-vif-ambre-4.webp); }
 .pf-cx-vif-obsidienne { --fr: url(../assets/frames/cx-vif-obsidienne-4.webp); }
 
@@ -5597,13 +5584,11 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .np-pl-meduse { --npb: rgba(120, 190, 255, .8); background-image: url(../assets/plates/pl-meduse.webp), linear-gradient(90deg, #06101c, #16324a 50%, #06101c); color: #D4ECFF; }
 .np-pl-corbeau { --npb: rgba(200, 60, 70, .8); background-image: url(../assets/plates/pl-corbeau.webp), linear-gradient(90deg, #0a0606, #2a1214 50%, #0a0606); color: #FFD6D6; }
 .np-pl-serpent { --npb: rgba(110, 220, 160, .8); background-image: url(../assets/plates/pl-serpent.webp), linear-gradient(90deg, #060c08, #163022 50%, #060c08); color: #D2F5E0; }
-.np-pl-sablier { --npb: rgba(255, 200, 120, .8); background-image: url(../assets/plates/pl-sablier.webp), linear-gradient(90deg, #0c0906, #33261a 50%, #0c0906); color: #FFE9C6; }
 .np-pl-araignee { --npb: rgba(230, 50, 70, .8); background-image: url(../assets/plates/pl-araignee.webp), linear-gradient(90deg, #0c0507, #2e0e14 50%, #0c0507); color: #FFD0D6; }
 .np-pl-loup { --npb: rgba(170, 215, 255, .8); background-image: url(../assets/plates/pl-loup.webp), linear-gradient(90deg, #070b10, #1c2a3a 50%, #070b10); color: #E2F1FF; }
 .np-pl-lune { --npb: rgba(210, 220, 240, .8); background-image: url(../assets/plates/pl-lune.webp), linear-gradient(90deg, #08090c, #24283a 50%, #08090c); color: #EEF2FF; }
 .np-pl-ambre { --npb: rgba(255, 170, 60, .8); background-image: url(../assets/plates/pl-ambre.webp), linear-gradient(90deg, #0e0904, #3a2610 50%, #0e0904); color: #FFE2B8; }
 .np-pl-astrolabe { --npb: rgba(235, 200, 120, .8); background-image: url(../assets/plates/pl-astrolabe.webp), linear-gradient(90deg, #0a0906, #2c2616 50%, #0a0906); color: #FFF0CC; }
-.np-pl-orchidee { --npb: rgba(220, 120, 255, .8); background-image: url(../assets/plates/pl-orchidee.webp), linear-gradient(90deg, #0b0610, #2a1438 50%, #0b0610); color: #F4DDFF; }
 
 /* v591 : 10 cadres vivants (images Gemini) */
 .pf-cx-vif-meduse { --fr: url(../assets/frames/cx-vif-meduse-4.webp); }
@@ -5611,7 +5596,6 @@ html.reduce-motion .pf::after, html.reduce-motion .re-pic::after { animation: no
 .pf-cx-vif-sablier { --fr: url(../assets/frames/cx-vif-sablier-4.webp); }
 .pf-cx-vif-araignee { --fr: url(../assets/frames/cx-vif-araignee-4.webp); }
 .pf-cx-vif-loup { --fr: url(../assets/frames/cx-vif-loup-4.webp); }
-.pf-cx-vif-lune { --fr: url(../assets/frames/cx-vif-lune-4.webp); }
 .pf-cx-vif-orchidee { --fr: url(../assets/frames/cx-vif-orchidee-4.webp); }
 
 /* v592 : Revue des doublons (Mode Créateur) */

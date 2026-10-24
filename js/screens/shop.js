@@ -47,11 +47,11 @@ const SKIN_BOX = {
   /* v685 */ 'sachet-vif-hiver': [69.2, 83.2, 10, 10],
   'sachet-vif-ames': [67.5, 87.5, 9, 9], 'sachet-fondateur': [71, 88.5, 6, 6], 'sachet-vif-fondateur': [66, 85.5, 33, 31],
   'sachet-braise': [71.5, 88, 6, 6], 'sachet-lune-sang': [71, 85.8, 9.5, 9.5], 'sachet-souverain': [75.4, 85.4, 10.5, 10.5, .8],
-  'sachet-vif-spectre': [68.2, 84.6, 10.5, 10], 'sachet-vif-eclipse': [71.3, 85.6, 9.5, 10], 'sachet-vif-phenix': [73.2, 89, 7, 7], 'sachet-vif-kraken': [72.3, 89, 7, 7], 'sachet-vif-tresor': [70.2, 86, 6, 6],
+  'sachet-vif-eclipse': [71.3, 85.6, 9.5, 10], 'sachet-vif-phenix': [73.2, 89, 7, 7], 'sachet-vif-kraken': [72.3, 89, 7, 7], 
   'sachet-vif-dragon': [69.6, 87, 9, 9], 'sachet-vif-astrolabe': [67.4, 84.4, 10.5, 10], 'sachet-vif-givre-noir': [65.3, 82.9, 13.5, 13], 'sachet-vif-orage': [68.2, 83.6, 13.5, 13.5], 'sachet-vif-foret': [67, 85.6, 10.5, 10.5],
-  'sachet-vif-necro': [66.2, 83.9, 12, 12.5], 'sachet-vif-automate': [70.8, 88.4, 9, 9], 'sachet-vif-celeste': [72.4, 89, 7.5, 7.5], 'sachet-vif-infernal': [72, 88.2, 7, 7], 'sachet-vif-empereur': [71, 87, 7, 7],
+  'sachet-vif-necro': [66.2, 83.9, 12, 12.5], 'sachet-vif-automate': [70.8, 88.4, 9, 9], 'sachet-vif-celeste': [72.4, 89, 7.5, 7.5], 'sachet-vif-infernal': [72, 88.2, 7, 7], 
   'sachet-vif-meduse': [72.5, 88.7, 10.5, 10.5], 'sachet-vif-corbeau': [70.1, 86, 9, 8], 'sachet-vif-sablier': [69.4, 87.7, 8, 8], 'sachet-vif-araignee': [67.9, 85.8, 9, 8],
-  'sachet-vif-scorpion': [71.3, 89, 8, 8], 'sachet-vif-loup': [71.5, 88.7, 8, 8], 'sachet-vif-lanterne': [71.3, 86.3, 13.5, 14.5], 'sachet-vif-orchidee': [69.1, 87.7, 11.5, 11.5],
+  'sachet-vif-scorpion': [71.3, 89, 8, 8], 'sachet-vif-loup': [71.5, 88.7, 8, 8], 'sachet-vif-orchidee': [69.1, 87.7, 11.5, 11.5],
   'sachet-vif-geode': [70.8, 88.5, 10.5, 10], 'sachet-vif-coeur': [69.5, 88, 7, 7] };
 const skinVars = (k) => { const [t, b, l, r, s = 1] = SKIN_BOX[k] || [70, 86, 12, 12]; return `--lt:${t}%;--lb:${100 - b}%;--ll:${l}%;--lr:${r}%;--ls:${s}`; };
 export function packHTML(type, cat, { faction, event, skin = getPackSkin(type) } = {}) {
