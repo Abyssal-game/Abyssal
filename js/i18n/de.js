@@ -7768,6 +7768,7 @@ export default {
   "Le Blizzard": "Der Schneesturm",
   "La Sentinelle du givre": "Der Frostwächter",
   "La Matriarche du Givre a offert son royaume à l’hiver pour qu’il ne change jamais, et son froid tient les dormeurs éveillés. Une récompense à chaque palier : cadres vivants, dos de cartes, sachet, plaques, réactions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Matriarche du Givre et le Dos vivant de l’Hiver.": "Die Frostmatriarchin hat ihr Reich dem Winter geschenkt, damit es sich nie verändert, und ihre Kälte hält die Schläfer wach. Eine Belohnung auf jeder Stufe: lebende Rahmen, Kartenrücken, Hülle, Plaketten, Reaktionen und Titel des ewigen Winters, die es im Laden nicht gibt. Auf Stufe {0} die Krone der Frostmatriarchin und der lebende Rücken des Winters.",
+  "Dos vivant de la Larme de givre": "Lebendige Rückseite der Frostträne",
 };
 
 export const names = {

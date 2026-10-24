@@ -7768,6 +7768,7 @@ export default {
   "Le Blizzard": "A Nevasca",
   "La Sentinelle du givre": "A Sentinela da geada",
   "La Matriarche du Givre a offert son royaume à l’hiver pour qu’il ne change jamais, et son froid tient les dormeurs éveillés. Une récompense à chaque palier : cadres vivants, dos de cartes, sachet, plaques, réactions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Matriarche du Givre et le Dos vivant de l’Hiver.": "A Matriarca da Geada ofereceu seu reino ao inverno para que nunca mudasse, e seu frio mantém os adormecidos acordados. Uma recompensa em cada nível: molduras vivas, versos, envelope, placas, reações e títulos do Inverno eterno, impossíveis de achar na Loja. No nível {0}, a Coroa da Matriarca da Geada e o Verso vivo do Inverno.",
+  "Dos vivant de la Larme de givre": "Verso vivo da Lágrima de geada",
 };
 
 export const names = {

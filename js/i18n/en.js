@@ -7779,6 +7779,7 @@ export default {
   "Le Blizzard": "The Blizzard",
   "La Sentinelle du givre": "The Frost Sentinel",
   "La Matriarche du Givre a offert son royaume à l’hiver pour qu’il ne change jamais, et son froid tient les dormeurs éveillés. Une récompense à chaque palier : cadres vivants, dos de cartes, sachet, plaques, réactions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Matriarche du Givre et le Dos vivant de l’Hiver.": "The Frost Matriarch gave her kingdom to winter so that it would never change, and her cold keeps the sleepers awake. A reward at every tier: living frames, card backs, a pack, plates, reactions and titles of the Eternal Winter, never sold in the Emporium. At tier {0}, the Crown of the Frost Matriarch and the Living Back of Winter.",
+  "Dos vivant de la Larme de givre": "Living Frost Tear Back",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

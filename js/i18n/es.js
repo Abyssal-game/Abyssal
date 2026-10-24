@@ -7768,6 +7768,7 @@ export default {
   "Le Blizzard": "La Ventisca",
   "La Sentinelle du givre": "El Centinela de la escarcha",
   "La Matriarche du Givre a offert son royaume à l’hiver pour qu’il ne change jamais, et son froid tient les dormeurs éveillés. Une récompense à chaque palier : cadres vivants, dos de cartes, sachet, plaques, réactions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Matriarche du Givre et le Dos vivant de l’Hiver.": "La Matriarca de la Escarcha ofreció su reino al invierno para que nunca cambiara, y su frío mantiene despiertos a los durmientes. Una recompensa en cada nivel: marcos vivos, reversos, sobre, placas, reacciones y títulos del Invierno eterno, imposibles de encontrar en el Bazar. En el nivel {0}, la Corona de la Matriarca de la Escarcha y el Reverso vivo del Invierno.",
+  "Dos vivant de la Larme de givre": "Dorso viviente de la Lágrima de escarcha",
 };
 
 export const names = {

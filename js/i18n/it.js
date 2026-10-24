@@ -7768,6 +7768,7 @@ export default {
   "Le Blizzard": "La Tormenta",
   "La Sentinelle du givre": "La Sentinella del gelo",
   "La Matriarche du Givre a offert son royaume à l’hiver pour qu’il ne change jamais, et son froid tient les dormeurs éveillés. Une récompense à chaque palier : cadres vivants, dos de cartes, sachet, plaques, réactions et titres de l’Hiver éternel, introuvables à l’Échoppe. Au palier {0}, la Couronne de la Matriarche du Givre et le Dos vivant de l’Hiver.": "La Matriarca del Gelo ha offerto il suo regno all’inverno perché non cambiasse mai, e il suo freddo tiene svegli i dormienti. Una ricompensa a ogni livello: cornici vive, dorsi, involucro, targhe, reazioni e titoli dell’Inverno eterno, introvabili nella Bottega. Al livello {0}, la Corona della Matriarca del Gelo e il Dorso vivo dell’Inverno.",
+  "Dos vivant de la Larme de givre": "Dorso vivente della Lacrima di brina",
 };
 
 export const names = {
