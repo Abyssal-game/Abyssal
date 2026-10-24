@@ -6,11 +6,11 @@
 // le serveur, même app fermée (supabase/17-notifications.sql, fonction « push ») : l'app donne son adresse de
 // notification au serveur (syncPush), seulement dans l'app iPhone qui a le module (version 1.1 et suivantes).
 import { isNative } from './native.js';
-import { LANG } from './i18n.js';
+import { LANG, t } from './i18n.js';
 import { CODEX, codexTier } from './core/codex.js';
 
 const LN = () => (isNative() ? window.Capacitor?.Plugins?.LocalNotifications : null);
-const DAILY_ID = 1001, CODEX_ID = 1002; /* v680 : fin de saison du Codex */
+const DAILY_ID = 1001, CODEX_ID = 1002, STREAK_ID = 1003; /* v680 : fin de saison du Codex ; v708 : série d'offrandes brisée */
 const REMIND_BASE = 20000;
 const REMIND_HOURS = 2;
 export const notifSupported = () => !!LN();
@@ -78,9 +78,25 @@ export async function syncDaily(g) {
   const fresh = g.freePack().stock > 0;
   if (fresh && at > now) { /* aujourd'hui à 10 h */ } else { at.setDate(at.getDate() + 1); }
   try {
-    await L.schedule({ notifications: [{ id: DAILY_ID, title: 'ABYSSAL', body: 'Ton booster gratuit du jour t’attend !', schedule: { at, allowWhileIdle: true } }] });
+    await L.schedule({ notifications: [{ id: DAILY_ID, title: 'ABYSSAL', body: t('Ton booster gratuit du jour t’attend !'), schedule: { at, allowWhileIdle: true } }] });
   } catch (e) { /* rien */ }
+  await syncStreak(g);
   await syncCodex(g);
+}
+
+/* v708 : le lendemain d'un jour sans visite (offrande manquée), à 11 h : la série d'offrandes a reculé d'un cran.
+   Programmée à chaque sortie de l'app pour le surlendemain de la dernière offrande ; revenir avant la repousse. */
+async function syncStreak(g) {
+  const L = LN(); if (!L) return;
+  await cancel([STREAK_ID]);
+  try {
+    const d = g.s.daily || {};
+    if (!g.s.settings.notif || !d.last || (d.streak || 0) < 2) return;
+    const [y, m, j] = d.last.split('-').map(Number);
+    const at = new Date(y, m - 1, j + 2, 11, 0, 0, 0);
+    if (at.getTime() < Date.now() + 60000) return;
+    await L.schedule({ notifications: [{ id: STREAK_ID, title: t('L’Abysse a remarqué ton absence'), body: t('Hier, nul n’est venu recevoir l’offrande : ta série de {n} jours se fissure. Reviens aujourd’hui, avant que la flamme ne s’éteigne.', { n: d.streak }), schedule: { at, allowWhileIdle: true } }] });
+  } catch (e) { /* rien */ }
 }
 
 // v680 : 3 jours avant la fin de la saison du Codex, à 18 h, si le palier 30 n'est pas atteint
@@ -93,7 +109,7 @@ async function syncCodex(g) {
     if (tier >= CODEX.tiers) return;
     const at = new Date(`${se.ends}T18:00:00`); at.setDate(at.getDate() - 3);
     if (at.getTime() < Date.now() + 60000) return;
-    await L.schedule({ notifications: [{ id: CODEX_ID, title: 'Le Codex de l’Abîme', body: `Plus que 3 jours pour finir la saison « ${se.name} » : tu es au palier ${tier} sur ${CODEX.tiers}.`, schedule: { at, allowWhileIdle: true } }] });
+    await L.schedule({ notifications: [{ id: CODEX_ID, title: t('Le Codex de l’Abîme'), body: t('Plus que 3 jours pour finir la saison « {name} » : tu es au palier {tier} sur {max}.', { name: t(se.name), tier, max: CODEX.tiers }), schedule: { at, allowWhileIdle: true } }] });
   } catch (e) { /* rien */ }
 }
 
@@ -106,13 +122,13 @@ export async function syncReminders(g, turns) {
   const list = turns.map((v) => ({ v, at: new Date(new Date(v.deadline).getTime() - REMIND_HOURS * 3600000) })).filter((x) => x.at.getTime() > Date.now() + 60000);
   if (!list.length) return;
   try {
-    await L.schedule({ notifications: list.map(({ v, at }) => ({ id: idOf(v.id), title: { pacte: 'Le Pacte', encheres: 'Les Enchères de Mammon', cryptes: 'Les Cryptes' }[v.game] || 'Duels des Sceaux', body: `Plus que ${REMIND_HOURS} h pour jouer ton coup contre ${v.foe?.pseudo || 'ton adversaire'}, sinon la partie est perdue !`, schedule: { at, allowWhileIdle: true } })) });
+    await L.schedule({ notifications: list.map(({ v, at }) => ({ id: idOf(v.id), title: t({ pacte: 'Le Pacte', encheres: 'Les Enchères de Mammon', cryptes: 'Les Cryptes' }[v.game] || 'Duels des Sceaux'), body: t('Plus que {h} h pour jouer ton coup contre {foe}, sinon la partie est perdue !', { h: REMIND_HOURS, foe: v.foe?.pseudo || t('ton adversaire') }), schedule: { at, allowWhileIdle: true } })) });
   } catch (e) { /* rien */ }
 }
 
 export async function clearAll() {
   const L = LN(); if (!L) return;
-  await cancel((await pendingIds()).filter((id) => id === DAILY_ID || id === CODEX_ID || (id >= REMIND_BASE && id < REMIND_BASE + 9000)));
+  await cancel((await pendingIds()).filter((id) => id === DAILY_ID || id === CODEX_ID || id === STREAK_ID || (id >= REMIND_BASE && id < REMIND_BASE + 9000)));
 }
 
 // Une seule fois, dans l'app : proposer les notifications (après l'arrivée du joueur, sur l'Accueil, sans fenêtre ouverte)
