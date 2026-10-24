@@ -6725,3 +6725,11 @@ html.reduce-motion .dc-bscene, html.reduce-motion .bx-scene, html.fx-light .dc-b
 .dv-c.has-fig.has-card .dv-art.dv-bart::before { display: none; }
 .dv-c.has-fig.has-card .dv-art.dv-bart::after { background: linear-gradient(180deg, rgba(0, 0, 0, .25) 0%, transparent 16%, transparent 62%, rgba(0, 0, 0, .78) 100%); }
 .dv-row.enemy .dv-c.has-fig.has-card { translate: 0 -2%; scale: 1.08; }
+/* v718 : sur une carte peinte, le halo rouge de Furie (.has-fig.p2::before) recouvrait l’illustration : seulement les coins ciselés ; la Furie reste lisible par le liseré rouge */
+.dv-c.has-fig.has-card.has-card::before {
+  background:
+    linear-gradient(var(--c), var(--c)) 0 0 / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 0 0 / var(--w) var(--l),
+    linear-gradient(var(--c), var(--c)) 100% 0 / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 100% 0 / var(--w) var(--l),
+    linear-gradient(var(--c), var(--c)) 0 100% / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 0 100% / var(--w) var(--l),
+    linear-gradient(var(--c), var(--c)) 100% 100% / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 100% 100% / var(--w) var(--l);
+  background-repeat: no-repeat; }

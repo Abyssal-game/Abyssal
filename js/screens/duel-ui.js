@@ -32,7 +32,7 @@ import { playBar, stampHost, defVerdict, FAM_RHYTHM, KIND_RHYTHM, BOSS_ASSAULT }
 import { getTune } from '../ui/def-tune.js';
 import { perfStart, perfStop, perfMark } from '../ui/perf.js'; /* v601 : moniteur de fluidité */
 /* v716 : carte de combat peinte de chaque gardien (assets/bosses/combat-<clé>.webp, tools/boss-card.py) : remplace le fond et la figure qui déborde */
-const BOSS_CARD = new Set([]);
+const BOSS_CARD = new Set(['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs']);
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 // Décor selon la profondeur (salle du Gardien à part) et effets illustrés (fond noir fondu en mode « écran »)
