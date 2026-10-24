@@ -46,10 +46,12 @@ export default function descent(app, root) {
   const bossChest = (ch) => ((ch % 2) ? 'or' : 'abyssal');
   /* v469 : chaque gain dans sa pastille, espacées (avant : icônes et chiffres collés) */
   const rewardLine = (r) => `<span class="rw-line">${[r.shards && `<span class="rw-i">${icon('crystal')}+${fmt(r.shards)}</span>`, r.ash && `<span class="rw-i">${icon('ash')}+${fmt(r.ash)}</span>`, ...Object.keys(r.chests || {}).map((c) => `<span class="rw-i" style="color:${CHESTS[c].color}">${icon('p:chest')}${esc(CHESTS[c].name)}</span>`), r.braises && `<span class="rw-i rw-br">${BRAISE_IC}+${r.braises}</span>`].filter(Boolean).join('')}</span>`;
+  /* v700 : bandeau peint de chaque chapitre (images Gemini, assets/chapitres/chap-N.webp) : ajouter le numéro ici à l'arrivée de l'image */
+  const CHAP_ART = new Set([]);
   function chapterHTML() {
     const d = g.descent(), best = d.best || 0, start = startFloor(), ch = chapterOf(start), done = chapDone(ch), bk = bossOf(ch * CHAPTER), B = BOSSES[bk];
     const floors = Array.from({ length: CHAPTER }, (_, i) => start + i);
-    return `<div class="dc-chap ${done ? 'done' : ''}">
+    return `<div class="dc-chap ${done ? 'done' : ''}">${CHAP_ART.has(ch) ? `<img class="dc-chap-bn" alt="" src="assets/chapitres/chap-${ch}.webp">` : ''}
       <div class="dc-chap-h">${BOSS_FIGS.has(bk) ? `<img class="dc-chap-fig" alt="" src="assets/bosses/${bk}.webp">` : ''}<span><span class="dc-chap-k">Chapitre ${ch} / ${CHAPTERS}${done ? ' · terminé' : ''}</span><b>${esc(chapterStory(ch)?.title || B.name)}</b><small>${esc(B.name)} · ${esc(B.title)}</small></span><button class="dc-chap-read icon-btn" data-act="story" data-c="${ch}" aria-label="Lire le récit du chapitre">${icon('book')}</button></div>
       <ol class="dc-chap-floors">${floors.map((f) => `<li class="${f <= best ? 'ok' : ''} ${f === best + 1 ? 'next' : ''} ${f % CHAPTER === 0 ? 'boss' : ''}"><span>${f <= best ? icon('check') : f % CHAPTER === 0 ? icon('crown') : f}</span><small>${f % CHAPTER === 0 ? 'Gardien' : `Étage ${f}`}</small></li>`).join('')}</ol>
       <p class="small dc-chap-rw">${done ? `Chapitre déjà terminé : le rejouer ne rapporte que les petits gains des combats${g.nightmareUnlocked() ? ', sauf en <b>Cauchemar</b>' : ''}.` : `Chaque étage gagné pour la première fois rapporte des éclats et des cendres. Gardien vaincu : <b style="color:${CHESTS[bossChest(ch)].color}">${esc(CHESTS[bossChest(ch)].name.toLowerCase())}</b>.`}</p>

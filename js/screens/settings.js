@@ -3,7 +3,7 @@ import { notifSupported, pushSupported, enable as notifEnable } from '../notify.
 import { resetTips } from '../ui/coach.js';
 import { TUTOS, tuto } from '../ui/tutos.js';
 import { icon, EMBLEM } from '../ui/icons.js';
-import { esc, fmt, toast, confirmBox, openSheet, bindActions } from '../ui/dom.js';
+import { esc, fmt, toast, confirmBox, openSheet, bindActions, withPending } from '../ui/dom.js';
 import { sfx } from '../ui/sound.js';
 import { partie, pendingOps } from '../cloud/partie.js';
 /* v539 : où vit la progression (serveur de partie, ou ancienne sauvegarde tant qu'il n'est pas en place) */
@@ -36,7 +36,8 @@ function liveLine(st = liveStatus()) {
 }
 /* v620 : cause technique d'un échec (aide au diagnostic), jamais traduite */
 function liveWhy(st = liveStatus()) { return (st.state === 'offline' || st.state === 'error') && st.msg ? esc(st.msg) : ''; }
-import { LANGS, LANG, setLang } from '../i18n.js';
+import { LANGS, LANG, setLang, t } from '../i18n.js';
+import { iapStatus, iapRestore, IAP_WHY } from '../iap.js';
 /* v418 : code du Mode Créateur choisi par le propriétaire ; seule son empreinte SHA-256 (en majuscules) est dans le code */
 const CREATOR_HASH = 'a0f19d9e26a8d1b7c87d32cc8bbfb9f61d58de4b518cf9e145d36c787a37ac37';
 async function sha256(t) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join(''); }
@@ -126,6 +127,9 @@ export default function settings(app, root) {
         <p class="small muted set-partie">${partieLine()}</p>
         ${liveOn() ? `<p class="small muted set-live">${liveLine()}</p><p class="small muted set-live-why" translate="no">${liveWhy()}</p><button class="btn ghost small" data-act="livecheck">${icon('eye')} Chercher une mise à jour</button>` : ''}
         <a class="btn ghost small" href="confidentialite.html" target="_blank" rel="noopener">${icon('book')} Politique de confidentialité</a>
+        <!-- v700 : Apple vérifie qu'on trouve facilement la restauration des achats et la suppression du compte -->
+        ${iapStatus() !== 'web' ? `<button class="btn ghost small" data-act="restore">${icon('star')} Restaurer mes achats</button>` : ''}
+        <a class="btn ghost small" href="#/compte">${icon('user')} Mon compte (mot de passe, suppression)</a>
       </section>
       ${isGardien() ? `<button class="online-pill gardien" data-act="online" aria-live="polite"><img class="on-ic" alt="" src="assets/icons/online.webp"><span class="on-dot"></span><span class="on-t">Connexion…</span><span class="on-see">Voir</span></button><div class="on-inline"><p class="small muted center">Chargement des pseudos…</p></div>` : ''}`;
   }
@@ -196,6 +200,11 @@ export default function settings(app, root) {
     tab(el) { ui.tab = el.dataset.k; sfx.tap(); render(); },
     online() { openOnline(); },
     livecheck() { liveCheck({ force: true }); },
+    async restore() {
+      const st = iapStatus(); if (st !== 'ok') { toast(esc(t(IAP_WHY[st])), { icon: 'info' }); return; }
+      try { const got = await withPending(iapRestore(app), t('Vérification de tes achats…')); toast(got.length ? t('{n} achat(s) ajouté(s).', { n: got.length }) : t('Tout est déjà à toi : rien à restaurer.'), { kind: got.length ? 'success' : 'info', icon: got.length ? 'star' : 'check' }); }
+      catch (err) { toast(esc(err.message), { kind: 'error' }); }
+    },
     tuto(el) { tuto(app, el.dataset.k, { force: true }).then(() => render()); },
     welcome() { showWelcome(app, { force: true }); },
     guide() { resetTips(app); toast('Les bulles d’aide réapparaîtront au bon moment.', { icon: 'info' }); render(); },

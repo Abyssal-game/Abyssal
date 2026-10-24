@@ -144,3 +144,10 @@ export function bindActions(root, handlers) {
     if (fn) { e.preventDefault(); fn(el, e); }
   });
 }
+
+/* v700 : écran vide illustré (une page blanche du Bestiaire, image Gemini assets/ui/vide.webp) ;
+   EMPTY_ART passe à true à l'arrivée de l'image */
+export const EMPTY_ART = false;
+export function emptyHTML(text) {
+  return `<div class="empty-art">${EMPTY_ART ? '<img alt="" src="assets/ui/vide.webp">' : ''}<p class="small muted center">${text}</p></div>`;
+}

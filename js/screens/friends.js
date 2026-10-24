@@ -6,7 +6,7 @@ import { cardEntry, cleanCard } from '../core/friends.js';
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, EMBLEM } from '../ui/icons.js';
-import { esc, fmt, toast, confirmBox } from '../ui/dom.js';
+import { esc, fmt, toast, confirmBox, emptyHTML } from '../ui/dom.js';
 import { FRIEND_MSG, MASKED_NAME, openReport } from '../ui/report.js';
 import { isBlocked } from '../core/moderation.js';
 import { t } from '../i18n.js';
@@ -55,7 +55,7 @@ export default function friends(app, root, params = []) {
     box.innerHTML = `
       ${inc.length ? `<h2 class="section-title">Demandes reçues <span class="pill-n">${inc.length}</span></h2>${inc.map((r) => row(r, `<span class="fr-acts"><button class="btn small primary" data-yes="${esc(r.id)}">Accepter</button><button class="btn small ghost" data-no="${esc(r.id)}">Refuser</button></span>`)).join('')}` : ''}
       <h2 class="section-title">Tes amis${ok.length ? ` <span class="pill-n">${ok.length}</span>` : ''}</h2>
-      ${ok.length ? ok.map((r) => row(r, `<span class="fr-go">${icon('next')}</span>`)).join('') : '<p class="small muted center">Pas encore d’ami. Ajoute un joueur avec son pseudo, ou touche un pseudo dans un classement.</p>'}
+      ${ok.length ? ok.map((r) => row(r, `<span class="fr-go">${icon('next')}</span>`)).join('') : emptyHTML('Pas encore d’ami. Ajoute un joueur avec son pseudo, ou touche un pseudo dans un classement.')}
       ${out.length ? `<h2 class="section-title">Demandes envoyées</h2>${out.map((r) => row(r, `<span class="fr-acts"><span class="small muted">En attente</span><button class="btn small ghost" data-cancel="${esc(r.id)}">Annuler</button></span>`)).join('')}` : ''}`;
   }
   async function act(fn, msg, back = null) {

@@ -6630,3 +6630,20 @@ details.dc-fold > summary:has(.gm-tease) { flex-wrap: wrap; }
 .v2-mini small, .td-streak i small, .dc-chap-floors small { font-size: .68rem; }
 .dc-link small { font-size: .72rem; }
 .fg-cell small, .fg-cell b { font-size: .72rem; }
+/* v700 : bandeau peint du chapitre en tête de sa carte */
+.dc-chap-bn { display: block; width: calc(100% + 28px); max-width: none; margin: -14px -14px 0; aspect-ratio: 21 / 9; object-fit: cover; border-radius: 14px 14px 0 0;
+  -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent); mask-image: linear-gradient(180deg, #000 70%, transparent); }
+/* v700 : prochain adversaire sur les tuiles du Cercle */
+.gm-next { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; }
+.gm-next img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(232, 195, 90, .7); box-shadow: 0 0 8px rgba(0, 0, 0, .7); }
+.gm-next img + img { margin-left: -10px; }
+.gm-next small { margin-left: 4px; font: 700 .68rem/1 var(--f-ui); letter-spacing: .06em; text-transform: uppercase; color: #E8C35A; }
+/* v700 : Sanctuaire, ton fond de profil derrière la tuile Profil */
+.mn-prof.has-fond { background-image: linear-gradient(90deg, rgba(10, 8, 14, .55), rgba(10, 8, 14, .85) 60%), var(--pf-bg); background-size: cover; background-position: center; }
+/* v700 : écrans vides */
+.empty-art { display: grid; justify-items: center; gap: 8px; padding: 18px 12px; }
+.empty-art img { width: 120px; height: 120px; object-fit: contain; opacity: .9; }
+/* v700 : combat, petits textes du panneau d'actions un peu plus grands (9 px mesurés) */
+.dv.cb .cb-acts .cb-a b { font-size: .64rem; line-height: 1.05; }
+.dv.cb .cb-acts .cb-a .cb-cost { font-size: .6rem; }
+.dv.cb .cb-who .cb-role, .dv.cb .cb-res .cb-fv small { font-size: .66rem !important; }
