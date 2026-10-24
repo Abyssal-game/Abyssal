@@ -192,7 +192,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const figKey = (u) => (u.twin ? 'jumeaux-nuit' : st.bossKey === 'abysse' && u.form === 2 ? 'abysse-2' : st.bossKey);
   const hasCard = (u) => isFig(u) && BOSS_CARD.has(figKey(u));
   const uName = (u) => (u?.twin ? 'Le Jumeau de la Nuit' : u?.boss && st.bossKey === 'jumeaux' ? 'Le Jumeau du Jour' : u?.boss && st.bossKey && BOSSES[st.bossKey] ? BOSSES[st.bossKey].name : cat.get(u.id)?.name || '');
-  const uPic = (u) => (isFig(u) ? `assets/bosses/${figKey(u)}.webp` : artUrl(cat.get(u.id), { lite: true }));
+  /* v725 : portraits (frise, etc.) : la carte peinte du gardien plutôt que l'ancienne figure détourée */
+  const uPic = (u) => (isFig(u) ? (BOSS_CARD.has(figKey(u)) ? `assets/bosses/combat-${figKey(u)}.webp` : `assets/bosses/${figKey(u)}.webp`) : artUrl(cat.get(u.id), { lite: true }));
   const cardEl = (u) => {
     const c = cat.get(u.id), kit = KITS[u.role];
     const dead = u.hp <= 0, enemy = u.side === 'enemy';
