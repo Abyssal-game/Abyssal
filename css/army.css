@@ -6771,3 +6771,5 @@ html.reduce-motion .dc-bscene, html.reduce-motion .bx-scene, html.fx-light .dc-b
 .dc-chnext > span { position: relative; z-index: 1; }
 /* v722 : fin de chapitre : la carte peinte du gardien vaincu, éteinte, à la place de l'ancienne figure grise */
 .dc-chend-fig.dc-chend-card { width: 112px; height: 157px; object-fit: cover; border-radius: 10px; border: 2px solid rgba(232, 195, 90, .55); filter: grayscale(.75) brightness(.6) drop-shadow(0 6px 14px #000); }
+/* v723 : fiche d'un gardien (appui long en combat) : sa carte peinte, comme sur le plateau */
+.tb-info-boss img.tb-info-bcard { width: min(240px, 62vw); aspect-ratio: 5 / 7; object-fit: cover; border-radius: 12px; border: 2px solid rgba(232, 195, 90, .6); box-shadow: 0 10px 26px rgba(0, 0, 0, .7), 0 0 22px rgba(255, 60, 80, .25); filter: none; }
