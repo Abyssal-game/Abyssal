@@ -10,7 +10,7 @@ export const SQL_STAMPS = {
   },
   "12": {
     "file": "12-serveur-de-partie.sql",
-    "stamp": "bfe43d3770df"
+    "stamp": "0cfe98104c61"
   },
   "13": {
     "file": "13-verrouillage.sql",

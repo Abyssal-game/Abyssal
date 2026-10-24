@@ -28,7 +28,7 @@ function guessTitle(g, type) {
 function canPay(g, type) {
   const def = BOOSTERS[type];
   if ((g.s.tickets[type] || 0) > 0 || (type === 'standard' && g.freePack().stock > 0)) return true;
-  if (g.s.shards >= def.price) return true;
+  if (!def.rewardOnly && g.s.shards >= def.price) return true; /* v728 */
   throw new Error(`Il te manque ${def.price - g.s.shards} éclats (tu en as ${g.s.shards}). La Descente et les Duels des Sceaux en rapportent.`);
 }
 export async function openPack(app, type, { faction, onDone, preset = null, title = null, packKey = null } = {}) {

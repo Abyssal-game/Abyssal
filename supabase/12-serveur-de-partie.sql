@@ -67,7 +67,7 @@ returns jsonb language plpgsql stable security definer set search_path = public 
 declare r jsonb;
 begin
   if to_regclass('public.versus_duels') is null then return null; end if;
-  execute 'select jsonb_build_object(''stake'', stake, ''status'', status) from public.versus_duels where id = $1' into r using p_id;
+  execute 'select jsonb_build_object(''stake'', stake, ''status'', status, ''created_at'', created_at) from public.versus_duels where id = $1' into r using p_id; -- v728 : date, pour ne rembourser que les mises payées
   return r;
 end $$;
 
@@ -126,7 +126,7 @@ end $$;
 create table if not exists public.sql_stamps (file text primary key, stamp text not null, at timestamptz not null default now());
 alter table public.sql_stamps enable row level security;
 revoke all on public.sql_stamps from public, anon, authenticated;
-insert into public.sql_stamps (file, stamp) values ('12', 'bfe43d3770df') on conflict (file) do update set stamp = excluded.stamp, at = now();
+insert into public.sql_stamps (file, stamp) values ('12', '0cfe98104c61') on conflict (file) do update set stamp = excluded.stamp, at = now();
 create or replace function public.sql_stamps() returns jsonb language sql stable security definer set search_path = public as $$
   select coalesce(jsonb_object_agg(file, stamp), '{}'::jsonb) from public.sql_stamps;
 $$;

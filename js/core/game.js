@@ -238,7 +238,8 @@ export class Game {
     let gift = 0;
     if ((this.s.tickets[type] || 0) > 0) { this.s.tickets[type]--; paidWith = 'ticket'; if (type === 'standard' && this.s.welcomeGift > 0) { gift = (ECONOMY.start.tickets.standard || 2) - this.s.welcomeGift + 1; this.s.welcomeGift--; } }
     else if (free && free.stock > 0) { this.s.freePack = { day: today(this.clock()), left: free.stock - 1 }; paidWith = 'free'; }
-    else if (this.s.shards >= def.price) { this.s.shards -= def.price; this.s.stats.shardsSpent += def.price; paidWith = 'shards'; }
+    else if (!def.rewardOnly && this.s.shards >= def.price) { this.s.shards -= def.price; /* v728 : un booster de récompense (Abysse, prix 0) ne s'achète jamais */ this.s.stats.shardsSpent += def.price; paidWith = 'shards'; }
+    else if (def.rewardOnly) throw new Error('Ce booster ne s’obtient qu’en récompense.');
     else throw new Error(`Il te manque ${def.price - this.s.shards} éclats (tu en as ${this.s.shards}). La Descente et les Duels des Sceaux en rapportent.`);
 
     const ev = this.event();
@@ -452,7 +453,10 @@ export class Game {
   shadowPay(day) {
     const sh = this.shadowState();
     if (sh.paid[day]) return 0;
-    sh.paid = Object.fromEntries(Object.entries(sh.paid).slice(-13));
+    /* v728 : un jour de plus de 13 jours (sorti de la liste) ne se repaie pas ; liste rangée par date */
+    const old = Object.keys(sh.paid).sort();
+    if (old.length >= 13 && day <= old[old.length - 13]) return 0;
+    sh.paid = Object.fromEntries(Object.entries(sh.paid).sort(([a], [b]) => (a < b ? -1 : 1)).slice(-13));
     sh.paid[day] = true;
     this.s.shards += SHADOW.participation;
     this.persist();
@@ -1976,7 +1980,7 @@ export class Game {
   }
   codexXp(n, why) {
     if (!n) return;
-    if (!this.codexLive() && !this.codexOn()) return; /* v538 : avant la saison, rien ne se gagne (sauf essais du Mode Créateur) */
+    if (!this.codexLive() && why !== 'dev') return; /* v728 : hors saison (avant ou après la dernière), rien ne se gagne ; v538 : avant la saison, rien ne se gagne (sauf essais du Mode Créateur) */
     const c = this.codex(), max = CODEX.tiers * CODEX.xpPerTier;
     const add = Math.max(0, Math.min(n, max - c.xp));
     const before = codexTier(c);
@@ -2013,7 +2017,7 @@ export class Game {
     const c = this.codex(), t = codexTier(c);
     if (t >= CODEX.tiers) throw new Error('Tu as déjà atteint le dernier palier.');
     this.spendObs(CODEX.tierObs);
-    c.xp = Math.max(c.xp, (t + 1) * CODEX.xpPerTier); c.log.bought = (c.log.bought || 0) + 1;
+    c.xp = Math.min(CODEX.tiers * CODEX.xpPerTier, c.xp + CODEX.xpPerTier); /* v728 : un palier entier en plus (avant : la progression déjà faite était perdue) */ c.log.bought = (c.log.bought || 0) + 1;
     this.persist();
     return t + 1;
   }

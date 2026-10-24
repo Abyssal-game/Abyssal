@@ -83,6 +83,7 @@ export function digest(s) {
   const parts = [s.shards, s.ash, s.obs || 0, s.xp, JSON.stringify(s.tickets || {}), JSON.stringify(s.chests || {}), col,
     s.descent?.best || 0, s.braises || 0, Object.keys(s.fallen || {}).sort().join(','), /* v668 */ s.descent?.run ? `${s.descent.run.floor}:${s.descent.run.phase}:${s.descent.run.shards}` : '-',
     (s.titles || []).length, (s.frames || []).length, (s.backs || []).length, (s.sachets || []).length, (s.plates || []).length, (s.emotes || []).length, (s.mats || []).length, (s.fonds || []).length, (s.finishes || []).length, /* v574 : cosmétiques comptés */ Object.keys(s.achievements || {}).length, (s.missions?.list || []).map((x) => `${x.p}${x.claimed ? 'c' : ''}`).join(''),
+    s.codex ? `${s.codex.season}:${s.codex.premium ? 1 : 0}:${s.codex.xp || 0}:${(s.codex.free || []).length}:${(s.codex.prem || []).length}` : '-', (s.purchases || []).length, /* v728 : Codex et achats comptés (un Codex payé n'arrivait jamais sur le téléphone) */
     s.seedBase ?? '-', s.seedN || 0, ...SESS.map((p) => sessPrint(getPath(s, p)))];
   let h = 2166136261;
   for (const ch of parts.join('|')) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;

@@ -28,6 +28,13 @@ export function gameFor(data, { tz = 0, rng = cryptoRng, now = () => Date.now() 
   return g;
 }
 
+const VERSUS_PAID_FROM = Date.parse('2026-10-25T00:00:00Z');
+function markPaid(g, id, stake) {
+  if (!id) return;
+  const p = (g.s.versus.paid ||= {}); p[id] = stake;
+  const ks = Object.keys(p); if (ks.length > 60) for (const k of ks.slice(0, ks.length - 60)) delete p[k];
+  g.persist();
+}
 // Opérations qui demandent le réseau : le serveur fait lui-même l'appel en ligne et applique ce qu'il reçoit
 const NET = {
   async versusCreate(c, g, lineup, to = null) {
@@ -35,7 +42,7 @@ const NET = {
     if (!(stake > 0)) throw new Error('Mise invalide.');
     if (g.s.shards < stake) throw new Error(`Il te manque ${stake - g.s.shards} éclats pour cette mise.`);
     const id = await c.db.rpc('versus_create_mix', { p_lineup: lineup, p_to: to }, c.token);
-    g.versusPay(stake);
+    g.versusPay(stake); markPaid(g, id, stake);
     return { id, stake };
   },
   async versusAccept(c, g, id) {
@@ -43,20 +50,32 @@ const NET = {
     if (!d) throw new Error('Défi introuvable.');
     if (g.s.shards < d.stake) throw new Error(`Il te manque ${d.stake - g.s.shards} éclats.`);
     const r = await c.db.rpc('versus_accept', { p_id: id }, c.token);
-    g.versusPay(d.stake);
+    g.versusPay(d.stake); markPaid(g, id, d.stake);
     return { ok: true, r };
   },
   async versusClaim(c, g, id) {
     const res = await c.db.rpc('versus_claim', { p_id: id }, c.token);
+    /* v728 : on ne rend une mise et on ne donne des cartes que pour un défi payé par ce serveur (un défi créé ou relevé par un
+       appel direct, sans payer, ne rapporte rien) ; les défis d'avant cette règle restent encaissables */
+    if (!g.s.versus.paid?.[id] && ['win', 'tie', 'lose', 'refund'].includes(res?.result)) {
+      const d = await c.db.versusDuel(id).catch(() => null);
+      if (d?.created_at && !(new Date(d.created_at).getTime() < VERSUS_PAID_FROM)) /* sans date (SQL 12 pas recollé) : comme avant */ { g.s.versus.done[id] = 'unpaid'; g.persist(); return { res, out: null }; }
+    }
     const out = g.versusApply(id, res);
+    if (g.s.versus.paid) delete g.s.versus.paid[id];
     return { res, out };
   },
   async mpClaim(c, g, game, id, friendsOnly = false) {
+    /* v728 : le jeu de la partie est lu sur le serveur (avant : celui envoyé par le téléphone, une victoire aux Cryptes
+       pouvait être réclamée comme une victoire aux Sceaux) */
+    const view = await c.db.rpc('mp_get', { p_id: id }, c.token).catch(() => null);
+    if (view?.game) game = view.game;
     const r = await c.db.rpc('mp_claim', { p_id: id }, c.token);
     const out = friendsOnly || game === 'cryptes' ? { shards: 0 } : g.mpReward(game, id, r);
     return { r, out };
   },
   async shadowPay(c, g, day) {
+    if (typeof day !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(day) || Date.now() - Date.parse(day + 'T00:00:00Z') > 14 * 864e5) throw new Error('Ce tirage est trop ancien.'); /* v728 */
     if (!(await c.db.shadowDrew(c.uid, day))) throw new Error('Aucun tirage ce jour-là.');
     return g.shadowPay(day);
   },
