@@ -60,7 +60,7 @@ export function defaultSave(now = Date.now()) {
     descent: { day: null, used: 0, bestToday: 0, best: 0, runs: 0, run: null },
     history: [],          // dernières ouvertures
     recent: [],           // dernières découvertes (ids)
-    settings: { sound: true, volume: 0.7, music: true, musicVol: 0.55, haptics: true, notif: false, loud: false, motion: 'auto', decor: 'riche', quality: 'auto', fastOpen: false, defense: 'on', textSize: 'normal', contrast: false, dev: false },
+    settings: { sound: true, volume: 0.7, music: true, musicVol: 0.55, haptics: true, hapLevel: '1', notif: false, loud: false, motion: 'auto', decor: 'riche', quality: 'auto', fastOpen: false, defense: 'on', textSize: 'normal', contrast: false, dev: false },
     seenIntro: false,
     // Extension : gardiens vaincus, relations découvertes, formes choisies, récits, Duels des Sceaux,
     // Chasse aux Reliques et Guerre des Factions. Tous facultatifs : une sauvegarde ancienne les reçoit vides.

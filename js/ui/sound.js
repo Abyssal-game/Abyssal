@@ -66,6 +66,7 @@ export function configureSound({ sound, volume: v, haptics: h, loud: l }) {
   enabled = sound !== false;
   if (typeof v === 'number') volume = v;
   haptics = h !== false; loud = !!l;
+  setHapLevel(Number(arguments[0]?.hapLevel ?? 1));
   if (master) master.gain.value = volume * 0.9;
   // iPhone (iOS 17+) : « playback » joue même quand le bouton silencieux est activé
   // v369 : dans l'application iPhone, toujours « playback » (sinon « ambient » ici annulait le réglage de l'app : jeu muet)
@@ -104,7 +105,6 @@ export function audioInfo() {
 // mais basculer un interrupteur natif (<input type=checkbox switch>) produit un petit retour haptique.
 let hapEl = null;
 function hapOnce() {
-  if (navigator.vibrate) { try { navigator.vibrate(18); } catch (e) { /* rien */ } return; }
   if (!hapEl) {
     hapEl = document.createElement('label');
     hapEl.setAttribute('aria-hidden', 'true');
@@ -115,22 +115,72 @@ function hapOnce() {
   }
   hapEl.click();
 }
-// v521 : dans l'app (iPhone et Android), le vrai moteur de vibrations du téléphone (Capacitor Haptics) :
-// 1 = léger, 2 = moyen, 3 = fort. Sur le site, repli ci-dessus (Android : navigator.vibrate).
+/* v705 : un vocabulaire de vibrations. Dans l'app, le moteur du téléphone (Capacitor Haptics) :
+   sel = petit cran (comme une molette), L / M / H = choc léger, moyen, fort, ok / warn / err = réussite, alerte, échec.
+   Chaque retour est une suite [délai en ms, pas]. Intensité (Réglages) : 0 discrète (ni crans ni chocs légers),
+   1 normale, 2 intense (chaque pas monte d'un cran). Sur le site : navigator.vibrate (Android), sinon l'interrupteur. */
+const HSEQ = {
+  tick: [[0, 'sel']], light: [[0, 'L']], medium: [[0, 'M']], heavy: [[0, 'H']],
+  success: [[0, 'ok']], warning: [[0, 'warn']], error: [[0, 'err']],
+  double: [[0, 'M'], [90, 'M']],
+  tear: [[0, 'L'], [45, 'L'], [90, 'M']],
+  hurt: [[0, 'M'], [70, 'L']],
+  parry: [[0, 'H'], [50, 'L']],
+  crit: [[0, 'H'], [70, 'M']],
+  shatter: [[0, 'H'], [60, 'H'], [150, 'M']],
+  death: [[0, 'M'], [120, 'L']],
+  ult: [[0, 'M'], [80, 'H'], [200, 'M']],
+  boss: [[0, 'H'], [220, 'M'], [440, 'H']],
+  fury: [[0, 'warn'], [180, 'H'], [300, 'H']],
+  heartbeat: [[0, 'M'], [150, 'L'], [700, 'M'], [850, 'L']],
+  chest: [[0, 'M'], [240, 'ok']],
+  victory: [[0, 'ok'], [200, 'M'], [330, 'H']],
+  bossvictory: [[0, 'H'], [130, 'H'], [300, 'ok'], [520, 'H']],
+  defeat: [[0, 'err'], [320, 'L']],
+  rareHR: [[0, 'M'], [110, 'L']],
+  rareM: [[0, 'M'], [170, 'M'], [340, 'H']],
+  rareS: [[0, 'L'], [130, 'M'], [260, 'M'], [390, 'H'], [560, 'H'], [760, 'ok']],
+};
+const HUP = { sel: 'L', L: 'M', M: 'H', H: 'H' };
+const HWEIGHT = { sel: 0, L: 1, M: 2, H: 3, ok: 2, warn: 2, err: 3 };
+const HVIB = { sel: 8, L: 14, M: 24, H: 40, ok: [18, 60, 28], warn: [30, 70, 30], err: [40, 50, 40, 50, 40] };
+let hapLevel = 1, hapLast = 0, hapLastW = -1, selReady = false;
+export function setHapLevel(n) { hapLevel = n === 0 || n === 2 ? n : 1; }
 const nativeHaptics = () => (typeof window !== 'undefined' ? window.Capacitor?.Plugins?.Haptics : null);
-export function hap(n = 1) {
-  if (!haptics) return;
+function hapStep(step) {
+  if (hapLevel === 0 && (step === 'sel' || step === 'L')) return;
+  if (hapLevel === 2 && HUP[step]) step = HUP[step];
   const H = nativeHaptics();
-  if (H) { try { H.impact({ style: n >= 3 ? 'HEAVY' : n === 2 ? 'MEDIUM' : 'LIGHT' }); if (n >= 3) setTimeout(() => H.impact({ style: 'HEAVY' }), 140); } catch (e) { /* rien */ } return; }
-  if (!enabled) return;
-  for (let i = 0; i < n; i++) setTimeout(hapOnce, i * 90);
+  try {
+    if (H) {
+      if (step === 'sel') {
+        if (!selReady) { selReady = true; H.selectionStart?.(); }
+        H.selectionChanged?.();
+      } else if (step === 'ok' || step === 'warn' || step === 'err') H.notification({ type: step === 'ok' ? 'SUCCESS' : step === 'warn' ? 'WARNING' : 'ERROR' });
+      else H.impact({ style: step === 'H' ? 'HEAVY' : step === 'M' ? 'MEDIUM' : 'LIGHT' });
+      return;
+    }
+    if (navigator.vibrate) { navigator.vibrate(HVIB[step]); return; }
+    if (enabled && HWEIGHT[step] >= 1) hapOnce();
+  } catch (e) { /* rien */ }
 }
+/* un retour par nom ; un retour plus faible arrivé dans les 60 ms d'un autre est sauté (pas de bouillie de vibrations) */
+export function haptic(kind) {
+  if (!haptics) return;
+  const seq = HSEQ[kind]; if (!seq) return;
+  const w = Math.max(...seq.map(([, s]) => HWEIGHT[s]));
+  const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+  if (now - hapLast < 60 && w <= hapLastW) return;
+  hapLast = now; hapLastW = w;
+  for (const [t, s] of seq) { if (t) setTimeout(() => hapStep(s), t); else hapStep(s); }
+}
+// 1 = léger, 2 = moyen, 3 = fort (appels plus anciens)
+export function hap(n = 1) { if (n > 0) haptic(n >= 3 ? 'heavy' : n === 2 ? 'medium' : 'light'); }
 // Rythme de vibrations (motif en ms : vibration, pause, vibration…), comme navigator.vibrate
 export function hapPattern(pattern) {
   if (!haptics) return;
-  const H = nativeHaptics();
-  if (H) { let t = 0; pattern.forEach((ms, i) => { if (i % 2 === 0) setTimeout(() => { try { H.impact({ style: ms >= 60 ? 'HEAVY' : ms >= 35 ? 'MEDIUM' : 'LIGHT' }); } catch (e) { /* rien */ } }, t); t += ms; }); return; }
-  try { navigator.vibrate?.(pattern); } catch (e) { /* rien */ }
+  let t = 0;
+  pattern.forEach((ms, i) => { if (i % 2 === 0) { const st = ms >= 60 ? 'H' : ms >= 35 ? 'M' : 'L'; setTimeout(() => hapStep(st), t); } t += ms; });
 }
 
 function impulse(sec, decay) {
@@ -464,14 +514,24 @@ function playSample(key, gain = 1) {
 // sons sans fichier : seuls ceux-là restent synthétisés (bruits, jamais des notes)
 const SYNTH_ONLY = new Set(['rip', 'rumble']);
 
-// Vibrations associées (nombre de petites impulsions) et baisse de la musique pendant les grands moments
-const HAP = { explode: 2, finisher: 2, synergy: 1, enemyturn: 1, suspensebig: 2, bossvictory: 3, shield: 1, taunt: 1, hit: 1, slash: 1, smash: 2, crit: 2, capture: 1, block: 1, parry: 1, shatter: 3, boss: 3, ult: 2, victory: 3, defeat: 2, error: 1, dice: 1, tear: 1, achievement: 2, pose: 1, fury: 2, death: 1, levelup: 1, burnall: 2, chest: 2, apogee: 2, fame: 1, season: 1, summon: 1 };
+// Vibrations associées (v705 : nom du retour, voir HSEQ) et baisse de la musique pendant les grands moments
+const HAP = {
+  tap: 'tick', nav: 'tick', swipe: 'tick', coin: 'tick', mark: 'tick', heal: 'tick', dodge: 'tick', 'cr-flip': 'tick',
+  flip: 'light', discover: 'light', hit: 'light', slash: 'light', pose: 'light', block: 'light', skill: 'light', poison: 'light', freeze: 'light',
+  shield: 'light', taunt: 'light', dice: 'light', burn: 'light', enter: 'light', enemyturn: 'light', yourturn: 'light', synergy: 'light', chain: 'light',
+  'pa-draw': 'light', 'en-coin': 'light', 'cr-miss': 'light', 'vd-flip': 'light', boost: 'light',
+  smash: 'medium', capture: 'medium', summon: 'medium', explode: 'medium', burnall: 'medium', 'cr-power': 'medium', 'pa-seal': 'medium', 'pa-guard': 'medium', 'pa-bank': 'medium', 'pa-offer': 'medium',
+  'cr-pair': 'double', miss: 'hurt', tear: 'tear', 'vd-tear': 'tear', parry: 'parry', crit: 'crit', perfect: 'crit', finisher: 'crit', shatter: 'shatter', death: 'death',
+  ult: 'ult', boss: 'boss', fury: 'fury', enrage: 'warning', suspensebig: 'heartbeat', chest: 'chest', gavel: 'heavy', 'vd-rare': 'heavy',
+  victory: 'victory', 'vd-win': 'victory', 'pa-seven': 'success', bossvictory: 'bossvictory', defeat: 'defeat', 'vd-lose': 'defeat', 'pa-bust': 'error', error: 'error',
+  achievement: 'success', levelup: 'success', unlock: 'success', apogee: 'success', fame: 'success', season: 'success',
+};
 const DUCK = { bossvictory: 5, victory: 3.5, defeat: 4, ult: 2.5, achievement: 2, boss: 2, apogee: 2.5, fame: 2, season: 2 };
 for (const k of Object.keys(sfx)) {
   const f = sfx[k];
   sfx[k] = (...a) => {
-    if (k === 'reveal') { const big = a[0] === 'M' || a[0] === 'S'; if (big || a[0] === 'HR') { hooks.duck?.(a[0] === 'S' ? 5 : big ? 3.5 : 2, a[0] === 'S' ? 0.08 : 0.25); } hap(big ? 3 : a[0] === 'R' || a[0] === 'HR' ? 1 : 0); }
-    else { if (HAP[k]) hap(HAP[k]); if (DUCK[k]) hooks.duck?.(DUCK[k]); }
+    if (k === 'reveal') { const big = a[0] === 'M' || a[0] === 'S'; if (big || a[0] === 'HR') { hooks.duck?.(a[0] === 'S' ? 5 : big ? 3.5 : 2, a[0] === 'S' ? 0.08 : 0.25); } haptic(a[0] === 'S' ? 'rareS' : a[0] === 'M' ? 'rareM' : a[0] === 'HR' ? 'rareHR' : a[0] === 'R' ? 'light' : a[0] === 'PC' ? 'tick' : ''); }
+    else { if (HAP[k]) haptic(HAP[k]); if (DUCK[k]) hooks.duck?.(DUCK[k]); }
     // un son ne doit jamais bloquer le jeu (v265) : toute erreur audio est ignorée
     try {
       if (!ensure()) return undefined;

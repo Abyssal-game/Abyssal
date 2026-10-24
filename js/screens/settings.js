@@ -4,7 +4,7 @@ import { resetTips } from '../ui/coach.js';
 import { TUTOS, tuto } from '../ui/tutos.js';
 import { icon, EMBLEM } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, openSheet, bindActions, withPending } from '../ui/dom.js';
-import { sfx } from '../ui/sound.js';
+import { sfx, haptic } from '../ui/sound.js';
 import { partie, pendingOps } from '../cloud/partie.js';
 /* v539 : où vit la progression (serveur de partie, ou ancienne sauvegarde tant qu'il n'est pas en place) */
 const partieLine = () => (partie.mode === 'server' ? `Progression gardée par le serveur${pendingOps() ? ` · ${pendingOps()} action${pendingOps() > 1 ? 's' : ''} à envoyer` : ''}` : partie.mode === 'legacy' ? 'Progression : ancienne sauvegarde en ligne' : 'Progression : serveur pas encore joint');
@@ -81,6 +81,7 @@ export default function settings(app, root) {
         ${s.sound && s.music !== false ? `<details class="dc-fold set-amb"><summary>${icon('sound')} Écouter les ambiances</summary><div class="set-sfx">${MUSIC_DEMO.map(([n], i) => `<button class="chip" data-mus="${i}">${n}</button>`).join('')}</div></details>` : ''}
         ${window.Capacitor?.isNativePlatform?.() ? '' : toggle('loud', 'Son même en mode silencieux', 'Le jeu reste audible quand le bouton silencieux de l’iPhone est activé (iOS 17 ou plus). Peut couper la musique d’une autre app.')}
         ${toggle('haptics', 'Vibrations', 'Petites vibrations sur les coups, les victoires et les cartes rares. Dans l’app, le téléphone vibre vraiment ; sur le site web, l’iPhone ne vibre presque pas.')}
+        ${s.haptics !== false ? `${seg('hapLevel', 'Force des vibrations', [['0', 'Discrètes'], ['1', 'Normales'], ['2', 'Intenses']])}<p class="small muted set-note">Discrètes : seulement les grands moments (coups forts, victoires, cartes rares). Intenses : chaque vibration est plus marquée.</p>` : ''}
         ${notifSupported() ? `<div class="set-row"><div><b>Notifications</b><p class="small muted">${pushSupported() ? 'Booster gratuit du jour (10 h), à toi de jouer en ligne, défis reçus, Pari relevé, demandes d’ami.' : 'Booster gratuit du jour (10 h) et rappel 2 h avant la fin du délai quand c’est à toi de jouer en ligne.'}</p></div><button class="switch" role="switch" aria-checked="${!!s.notif}" data-act="notif" aria-label="Notifications"><i></i></button></div>` : ''}
       </section>
       <section class="panel stack">
@@ -184,7 +185,7 @@ export default function settings(app, root) {
 
   bindActions(root, {
     toggle(el) { g.setSetting(el.dataset.k, !g.s.settings[el.dataset.k]); app.applySettings(); render(); },
-    seg(el) { g.setSetting(el.dataset.k, el.dataset.v); app.applySettings(); render(); },
+    seg(el) { g.setSetting(el.dataset.k, el.dataset.v); app.applySettings(); render(); if (el.dataset.k === 'hapLevel') haptic('crit'); /* v705 : essai de la force choisie */ },
     async notif() { await notifEnable(app, !g.s.settings.notif); render(); },
     lang(el) { if (el.dataset.v !== LANG) setLang(el.dataset.v); },
     async reset() {

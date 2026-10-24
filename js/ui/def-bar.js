@@ -103,7 +103,7 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
           stamp.innerHTML = `<b>${res === 'parry' ? 'Parade parfaite !' : res === 'dodge' ? 'Esquive !' : 'Touché…'}</b>`;
           stampHost(dv).appendChild(stamp); setTimeout(() => stamp.remove(), n > 1 ? 520 : 900);
         }
-        if (res === 'none') { sfx.miss?.(); hap(2); } else if (i < n - 1) { (res === 'parry' ? sfx.parry : sfx.hit)?.(); hap(1); } /* le dernier coup sonne avec son impact */
+        if (res === 'none') { sfx.miss?.(); } else if (i < n - 1) { (res === 'parry' ? sfx.parry : sfx.hit)?.(); } /* v705 : la vibration vient du son (raté, parade, coup) */ /* le dernier coup sonne avec son impact */
         out.push(res);
         onResult?.({ i, letter: L, res, ms: when != null && t0 ? Math.round(when - (t0 + tb)) : null, dodge: w.dodge, parry: w.parry, dur: Math.round(D) });
         done1();
@@ -169,7 +169,7 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
         const stamp = document.createElement('div'); stamp.className = `dv-stamp s-${res}${n > 1 ? ' small' : ''}`;
         stamp.innerHTML = `<b>${res === 'parry' ? 'Parade parfaite !' : res === 'dodge' ? 'Esquive !' : 'Touché…'}</b>`;
         stampHost(dv).appendChild(stamp); setTimeout(() => stamp.remove(), n > 1 ? 520 : 900);
-        if (res === 'none') { sfx.miss?.(); hap(2); } else if (i < n - 1) { (res === 'parry' ? sfx.parry : sfx.hit)?.(); hap(1); }
+        if (res === 'none') { sfx.miss?.(); } else if (i < n - 1) { (res === 'parry' ? sfx.parry : sfx.hit)?.(); } /* v705 : la vibration vient du son (raté, parade, coup) */
         out.push(res);
         onResult?.({ i, letter: letters[i], res, ms: when != null && t0 ? Math.round(when - (t0 + tb)) : null, dodge, parry, dur: Math.round(D) });
         done1();
