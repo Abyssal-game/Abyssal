@@ -1896,3 +1896,18 @@ Deux propositions par sachet ; le propriétaire choisit. À l'arrivée : nouveau
 ### 329. Booster des Alliances, proposition A — « Les deux sceaux liés »
 ### 330. Booster des Alliances, proposition B — « Le Pacte des deux royaumes »
 (Textes complets des prompts : donnés dans la conversation du 23 octobre 2026, identiques à ceux ci-dessous dans la réponse.)
+
+## Saison II « L’Hiver éternel » : les 9 objets manquants (24 octobre 2026)
+
+Paliers 3, 6, 8, 10, 14, 15, 18, 24, 25 de la voie enluminée (le palier 20 a déjà `dos-aurore`, le 30 la couronne `cx-hiver` et `dos-vif-hiver`). Tout sur le thème : la Matriarche du Givre a offert son royaume à l’hiver, et son froid tient les dormeurs éveillés. Différents des objets givre déjà en vente (`cx-vif-givre`, `cx-vif-loup`, `sachet-vif-givre-noir`, `sachet-vif-loup`, `pl-givre`, `pl-loup`). À l’arrivée : mêmes recettes que la Saison I (§300-307).
+
+### 331. `pl-glacier` — Plaque du Glacier (plaque de pseudo, Saison II palier 3)
+### 332. `dos-sceptre-givre` — Dos du Sceptre de givre (dos vivant, Saison II palier 6 ; teinte 195)
+### 333. `re-blizzard` — Réaction « Le froid te gagne. » (portrait de réaction, Saison II palier 8)
+### 334. `cx-vif-aurore` — Cadre vivant de l’Aurore (cadre vivant, Saison II palier 10)
+### 335. `sachet-vif-hiver` — Sachet vivant de l’Hiver éternel (sachet vivant, Saison II palier 14)
+### 336. `dos-lac-gele` — Dos du Lac gelé (dos vivant, Saison II palier 15 ; teinte 200)
+### 337. `re-sentinelle` — Réaction « Nul ne passe. » (portrait de réaction, Saison II palier 18)
+### 338. `pl-cerf-givre` — Plaque du Cerf de givre (plaque de pseudo, Saison II palier 24)
+### 339. `cx-vif-blizzard` — Cadre vivant du Blizzard (cadre vivant, Saison II palier 25)
+(Textes complets des prompts : donnés au propriétaire le 24 octobre 2026, même gabarit que §300-307.)
