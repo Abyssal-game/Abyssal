@@ -21,7 +21,7 @@ export const frameCls = (k) => (okKey(k) ? `pf pf-${k}` : '');
 export const emotePic = (k) => {
   const e = EMOTES[k];
   if (e?.pic) return `<img alt="" src="assets/emotes/${e.pic}.webp">`; /* v630 : portrait propre (réactions du Codex) */
-  return e?.who ? `<img alt="" src="assets/sceaux/rival-${e.who}.webp">` : e?.boss ? `<img class="re-boss" alt="" src="assets/bosses/${e.boss}.webp">` : EMBLEM;
+  return e?.who ? `<img alt="" src="assets/sceaux/rival-${e.who}.webp">` : e?.boss ? `<img alt="" src="assets/emotes/g-${e.boss}.webp">` /* v726 : visage tiré du tableau de présentation du gardien */ : EMBLEM;
 };
 export const emoteHTML = (k) => `<span class="re-pic ${EMOTES[k]?.who || EMOTES[k]?.boss || EMOTES[k]?.pic ? '' : 're-free'}">${emotePic(k)}</span><span class="re-txt">${esc(EMOTES[k]?.text || '')}</span>`;
 
