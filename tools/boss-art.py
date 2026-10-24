@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # v713 : tableau d'apparition d'un gardien (image Gemini verticale 9:16, peinture pleine page avec son décor).
 # Usage : python3 tools/boss-art.py <clé> <image> [décalage vertical -1..1]
-# Recadre en 9:16 (centre, ou plus haut / plus bas), 720 × 1280, WebP → assets/bosses/scene-<clé>.webp ;
+# Recadre en 9:16 (centre, ou plus haut / plus bas), 720 × 1280 au plus, WebP → assets/bosses/scene-<clé>.webp ;
 # la source est gardée dans store/bosses/scene-<clé>-source.jpg. Ajouter ensuite la clé à BOSS_ART (js/screens/descent.js).
 import sys, shutil, os
 from PIL import Image
@@ -13,6 +13,7 @@ W, H = im.size
 h = round(W * 16 / 9)
 if h > H: w = round(H * 9 / 16); x = (W - w) // 2; box = (x, 0, x + w, H)
 else: y = round((H - h) / 2 * (1 + shift)); y = max(0, min(H - h, y)); box = (0, y, W, y + h)
-out = im.crop(box).resize((720, 1280), Image.LANCZOS)
+cw = box[2] - box[0]; tw = min(720, cw)  # v714 : jamais agrandie (Gemini rend 572 × 1024)
+out = im.crop(box).resize((tw, round(tw * 16 / 9)), Image.LANCZOS)
 out.save(f'assets/bosses/scene-{k}.webp', 'WEBP', quality=80, method=6)
 print(f'assets/bosses/scene-{k}.webp', out.size, os.path.getsize(f'assets/bosses/scene-{k}.webp') // 1024, 'Ko')

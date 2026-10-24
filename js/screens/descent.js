@@ -192,7 +192,7 @@ export default function descent(app, root) {
   // v373 : porte du gardien épurée (figure, nom, titre, pastille « déchaîné ») ; son mécanisme est expliqué sur sa présentation
   const BOSS_FIGS = new Set(['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'golem', 'peste', 'chasseur', 'voeux', 'titan', 'jumeaux', 'juge', 'bete', 'abysse']);
   /* v713 : tableau peint de chaque gardien (assets/bosses/scene-<clé>.webp, tools/boss-art.py) : porte et présentation */
-  const BOSS_ART = new Set([]);
+  const BOSS_ART = new Set(['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge']);
   const sceneOf = (k) => BOSS_ART.has(k) ? `assets/bosses/scene-${k}.webp` : null;
   const bossDoor = (run) => { const k = bossOf(run.floor), b = BOSSES[k], wild = run.nightmare || run.floor >= AWAKEN_AT;
     if (sceneOf(k)) return `<span class="dc-bdoor sc"><span class="dc-bk">Gardien · étage ${run.floor}</span><b class="dc-bname">${esc(b.name)}</b><span class="dc-btitle">${esc(b.title)}</span>${wild ? '<span class="dc-bwild">Déchaîné · Furie dès le 1er tour</span>' : ''}</span>`;

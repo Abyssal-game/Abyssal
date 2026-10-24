@@ -6714,3 +6714,9 @@ details.dc-fold > summary:has(.gm-tease) { flex-wrap: wrap; }
 @keyframes bxPush { from { transform: scale(1.14); opacity: 0; } 12% { opacity: 1; } to { transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) { .dc-bscene, .bx-scene { animation: none; } }
 html.reduce-motion .dc-bscene, html.reduce-motion .bx-scene, html.fx-light .dc-bscene { animation: none; }
+/* v714 : tableaux reçus (9:16) : porte en 2:3 pour garder le gardien presque entier, présentation qui laisse voir le tableau avant le texte */
+.dc-door.r-boss.has-scene { aspect-ratio: 2 / 3; max-height: 76vh; }
+.dc-bscene { background-position: center 40%; }
+.bx-scene { background-position: center 30%; }
+.bx-veil { background: linear-gradient(180deg, rgba(6, 4, 10, .45) 0%, rgba(6, 4, 10, 0) 14%, rgba(6, 4, 10, 0) 60%, rgba(6, 4, 10, .75) 78%, rgba(6, 4, 10, .95) 92%), radial-gradient(90% 40% at 50% 100%, rgba(150, 10, 30, .35), transparent 70%); }
+.bx-intro.has-scene .bx-in { padding-top: calc(var(--app-h, 100vh) * .7); background: linear-gradient(180deg, transparent calc(var(--app-h, 100vh) * .64), rgba(6, 4, 10, .6) calc(var(--app-h, 100vh) * .76), rgba(6, 4, 10, .94) calc(var(--app-h, 100vh) * .92)); }
