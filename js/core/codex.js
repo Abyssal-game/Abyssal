@@ -187,7 +187,8 @@ const PL = (k, cost) => ({ id: k, kind: 'plate', give: { plate: k }, cost });
    vu aussi par les autres joueurs : assets/fonds/<clé>.webp, 1024 × 572) */
 export const TAPIS = { 'tp-mammon': 'Tapis du Banquier Mammon', 'tp-abysse': 'Tapis de l’Autel de l’Abysse', 'tp-obsidienne': 'Tapis d’obsidienne et d’or', 'tp-givre': 'Tapis de la Glace noire',
   /* v690 */ 'tp-braise': 'Tapis de la Forge infernale', 'tp-marees': 'Tapis des Marées noires', 'tp-racines': 'Tapis du Réveil des Racines', 'tp-celeste': 'Tapis du Parvis céleste', 'tp-rouages': 'Tapis de la Forge sans Maître', 'tp-tombes': 'Tapis de la Nécropole', 'tp-dragon': 'Tapis du Dragon primordial', 'tp-eclipse': 'Tapis de l’Éclipse' };
-export const FONDS = { 'fp-trone': 'Fond du Trône de braise', 'fp-cathedrale': 'Fond de la Cathédrale engloutie', 'fp-bibliotheque': 'Fond de la Bibliothèque interdite', 'fp-foret': 'Fond de la Forêt sous la lune', /* v638 */ 'fp-fondateur': 'Fond de la Salle des Premiers Gardiens' };
+export const FONDS = { 'fp-trone': 'Fond du Trône de braise', 'fp-cathedrale': 'Fond de la Cathédrale engloutie', 'fp-bibliotheque': 'Fond de la Bibliothèque interdite', 'fp-foret': 'Fond de la Forêt sous la lune', /* v638 */ 'fp-fondateur': 'Fond de la Salle des Premiers Gardiens',
+  /* v691 */ 'fp-abysse': 'Fond du Bord de l’Abysse', 'fp-glacier': 'Fond du Palais de la Matriarche', 'fp-forge': 'Fond de la Forge sans Maître', 'fp-titan': 'Fond du Titan endormi', 'fp-necropole': 'Fond de la Nécropole des lanternes', 'fp-ciel': 'Fond des Ruines célestes', 'fp-tresor': 'Fond de l’Antre du Trésor', 'fp-epave': 'Fond du Cimetière des navires' };
 const TP = (k, cost) => ({ id: k, kind: 'mat', give: { mat: k }, cost });
 const FP = (k, cost) => ({ id: k, kind: 'fond', give: { fond: k }, cost });
 const RE = (k, cost) => ({ id: k, kind: 'emote', give: { emote: k }, cost });
@@ -228,7 +229,7 @@ export const COSM_RARITY = {
   'pl-empereur': 'myth', 
   'pl-sang': 'leg', 'pl-kraken': 'leg', 'pl-automate': 'leg',
   'pl-braise': 'epic', 'pl-givre': 'epic', 'pl-dragon': 'epic', 
-  /* v632 : tapis et fonds de profil */ 'tp-mammon': 'leg', 'tp-abysse': 'leg', 'tp-obsidienne': 'epic', 'tp-givre': 'epic', /* v690 */ 'tp-braise': 'epic', 'tp-marees': 'epic', 'tp-racines': 'rare', 'tp-celeste': 'epic', 'tp-rouages': 'leg', 'tp-tombes': 'epic', 'tp-dragon': 'leg', 'tp-eclipse': 'leg', 'fp-trone': 'leg', 'fp-cathedrale': 'leg', 'fp-bibliotheque': 'epic', 'fp-foret': 'epic',
+  /* v632 : tapis et fonds de profil */ 'tp-mammon': 'leg', 'tp-abysse': 'leg', 'tp-obsidienne': 'epic', 'tp-givre': 'epic', /* v690 */ 'tp-braise': 'epic', 'tp-marees': 'epic', 'tp-racines': 'rare', 'tp-celeste': 'epic', 'tp-rouages': 'leg', 'tp-tombes': 'epic', 'tp-dragon': 'leg', 'tp-eclipse': 'leg', 'fp-trone': 'leg', 'fp-cathedrale': 'leg', 'fp-bibliotheque': 'epic', 'fp-foret': 'epic', /* v691 */ 'fp-abysse': 'leg', 'fp-glacier': 'epic', 'fp-forge': 'leg', 'fp-titan': 'myth', 'fp-necropole': 'epic', 'fp-ciel': 'leg', 'fp-tresor': 'epic', 'fp-epave': 'epic',
   /* v589 */ 'pl-corbeau': 'leg', 'pl-loup': 'leg', 'pl-araignee': 'epic', 'pl-ambre': 'epic', 'pl-meduse': 'rare', 'pl-serpent': 'rare', 'pl-lune': 'rare', 'pl-astrolabe': 'rare',
 };
 const SHOP_FRAMES = ['cx-vif-dragon', 'cx-vif-phenix', 'cx-vif-soleil-noir', 'cx-vif-amethyste', 'cx-vif-sablier', 'cx-vif-sang', 'cx-vif-brasier', 'cx-vif-givre', 'cx-vif-kraken', 'cx-vif-nacre', 'cx-vif-ames', 'cx-vif-abysse', 'cx-vif-maree', 'cx-vif-meduse', 'cx-vif-serpent', 'cx-vif-loup', 'cx-vif-foudre', 'cx-vif-etoiles', 'cx-vif-rouages', 'cx-vif-venin', 'cx-vif-ambre', 'cx-vif-obsidienne', 'cx-vif-araignee', 'cx-vif-orchidee'];
