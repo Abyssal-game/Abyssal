@@ -6720,3 +6720,8 @@ html.reduce-motion .dc-bscene, html.reduce-motion .bx-scene, html.fx-light .dc-b
 .bx-scene { background-position: center 30%; }
 .bx-veil { background: linear-gradient(180deg, rgba(6, 4, 10, .45) 0%, rgba(6, 4, 10, 0) 14%, rgba(6, 4, 10, 0) 60%, rgba(6, 4, 10, .75) 78%, rgba(6, 4, 10, .95) 92%), radial-gradient(90% 40% at 50% 100%, rgba(150, 10, 30, .35), transparent 70%); }
 .bx-intro.has-scene .bx-in { padding-top: calc(var(--app-h, 100vh) * .7); background: linear-gradient(180deg, transparent calc(var(--app-h, 100vh) * .64), rgba(6, 4, 10, .6) calc(var(--app-h, 100vh) * .76), rgba(6, 4, 10, .94) calc(var(--app-h, 100vh) * .92)); }
+/* v716 : carte de combat peinte du gardien (.has-card) : l’illustration remplit la carte, plus de figure qui déborde ni d’aura ajoutée */
+.dv-c.has-fig.has-card .dv-art.dv-bart > img { filter: none !important; transform: none; object-position: 50% 30%; }
+.dv-c.has-fig.has-card .dv-art.dv-bart::before { display: none; }
+.dv-c.has-fig.has-card .dv-art.dv-bart::after { background: linear-gradient(180deg, rgba(0, 0, 0, .25) 0%, transparent 16%, transparent 62%, rgba(0, 0, 0, .78) 100%); }
+.dv-row.enemy .dv-c.has-fig.has-card { translate: 0 -2%; scale: 1.08; }

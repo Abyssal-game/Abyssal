@@ -31,6 +31,8 @@ import { hap } from '../ui/sound.js';
 import { playBar, stampHost, defVerdict, FAM_RHYTHM, KIND_RHYTHM, BOSS_ASSAULT } from '../ui/def-bar.js'; /* v594 */
 import { getTune } from '../ui/def-tune.js';
 import { perfStart, perfStop, perfMark } from '../ui/perf.js'; /* v601 : moniteur de fluidité */
+/* v716 : carte de combat peinte de chaque gardien (assets/bosses/combat-<clé>.webp, tools/boss-card.py) : remplace le fond et la figure qui déborde */
+const BOSS_CARD = new Set([]);
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 // Décor selon la profondeur (salle du Gardien à part) et effets illustrés (fond noir fondu en mode « écran »)
@@ -110,7 +112,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     keep.forEach((n) => { const im = new Image(); im.src = `assets/fx/${n}.webp`; im.decode?.().catch(() => {}); });
     /* v603 : effets de mort et figures du gardien (2e forme comprise) décodés d'avance : ils saccadaient la 1re fois */
     ['kill-crack', 'kill-shatter', 'kill-embers', 'death'].forEach((n) => { const im = new Image(); im.src = `assets/fx/${n}.webp`; im.decode?.().catch(() => {}); });
-    if (st.bossKey) [st.bossKey, `carte-${st.bossKey}`, { abysse: 'abysse-2', jumeaux: 'jumeaux-nuit' }[st.bossKey]].filter(Boolean).forEach((n) => { const im = new Image(); im.onerror = () => {}; im.src = `assets/bosses/${n}.webp`; im.decode?.().catch(() => {}); });
+    if (st.bossKey) [st.bossKey, `carte-${st.bossKey}`, { abysse: 'abysse-2', jumeaux: 'jumeaux-nuit' }[st.bossKey], ...[st.bossKey, { abysse: 'abysse-2', jumeaux: 'jumeaux-nuit' }[st.bossKey]].filter((k) => k && BOSS_CARD.has(k)).map((k) => `combat-${k}`)].filter(Boolean).forEach((n) => { const im = new Image(); im.onerror = () => {}; im.src = `assets/bosses/${n}.webp`; im.decode?.().catch(() => {}); });
   }
   const enEl = $('.dv-row.enemy'), alEl = $('.dv-row.ally'), msgEl = $('.dv-msg'), actsEl = $('.cb-acts');
   const say = (h) => { msgEl.innerHTML = frSpaces(h); }; // v319 : « » et : ! ? ne se retrouvent plus seuls en début de ligne
@@ -188,6 +190,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   // v392 : le jumeau de la Nuit a sa propre figure ; l'Abysse change de forme dans sa dernière phase
   const isFig = (u) => (u?.boss || u?.twin) && BOSS_FIG.has(st.bossKey);
   const figKey = (u) => (u.twin ? 'jumeaux-nuit' : st.bossKey === 'abysse' && u.form === 2 ? 'abysse-2' : st.bossKey);
+  const hasCard = (u) => isFig(u) && BOSS_CARD.has(figKey(u));
   const uName = (u) => (u?.twin ? 'Le Jumeau de la Nuit' : u?.boss && st.bossKey === 'jumeaux' ? 'Le Jumeau du Jour' : u?.boss && st.bossKey && BOSSES[st.bossKey] ? BOSSES[st.bossKey].name : cat.get(u.id)?.name || '');
   const uPic = (u) => (isFig(u) ? `assets/bosses/${figKey(u)}.webp` : artUrl(cat.get(u.id), { lite: true }));
   const cardEl = (u) => {
@@ -195,9 +198,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const dead = u.hp <= 0, enemy = u.side === 'enemy';
     const ready = !enemy && st.turn === 'ally' && actionsFor(st, u.uid).some((a) => a.ok && a.key !== 'swap');
     const tgt = tgtInfo[u.uid];
-    return `<button class="dv-c ${u.side} ${isFig(u) ? 'has-fig' : ''} ${u.twin ? 'twin' : ''} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${!dead && u.hp <= u.maxHp * 0.3 ? 'hp3' : !dead && u.hp <= u.maxHp * 0.6 ? 'hp2' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.phase2 ? 'p2' : ''} ${u.defend ? 'def' : ''} ${!enemy && !dead && (u.frozen || u.stunned) ? 'unav' : ''} ${u.broken ? 'broken' : ''} ${u.cracked ? 'fele' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" data-rar="${u.rarity}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(uName(u))}, ${Math.max(0, u.hp)} PV">
+    return `<button class="dv-c ${u.side} ${isFig(u) ? 'has-fig' : ''} ${hasCard(u) ? 'has-card' : ''} ${u.twin ? 'twin' : ''} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${!dead && u.hp <= u.maxHp * 0.3 ? 'hp3' : !dead && u.hp <= u.maxHp * 0.6 ? 'hp2' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.phase2 ? 'p2' : ''} ${u.defend ? 'def' : ''} ${!enemy && !dead && (u.frozen || u.stunned) ? 'unav' : ''} ${u.broken ? 'broken' : ''} ${u.cracked ? 'fele' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" data-rar="${u.rarity}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(uName(u))}, ${Math.max(0, u.hp)} PV">
       <span class="dv-base" aria-hidden="true"></span>
-      ${isFig(u) ? `<span class="dv-art dv-bart" aria-hidden="true"><img alt="" decoding="async" src="assets/bosses/carte-${st.bossKey}.webp"><span class="dv-crk" aria-hidden="true"></span></span><img class="dv-bfig" alt="" src="assets/bosses/${figKey(u)}.webp">` /* v605 : le gardien a de nouveau sa carte (fond peint de sa Furie), sa figure en déborde */ : `<span class="dv-art"><img alt="" decoding="async" src="${artUrl(c, { lite: true })}"><span class="dv-crk" aria-hidden="true"></span></span>`}
+      ${hasCard(u) ? `<span class="dv-art dv-bart dv-bcard" aria-hidden="true"><img alt="" decoding="async" src="assets/bosses/combat-${figKey(u)}.webp"><span class="dv-crk" aria-hidden="true"></span></span>` : isFig(u) ? `<span class="dv-art dv-bart" aria-hidden="true"><img alt="" decoding="async" src="assets/bosses/carte-${st.bossKey}.webp"><span class="dv-crk" aria-hidden="true"></span></span><img class="dv-bfig" alt="" src="assets/bosses/${figKey(u)}.webp">` /* v605 : le gardien a de nouveau sa carte (fond peint de sa Furie), sa figure en déborde */ : `<span class="dv-art"><img alt="" decoding="async" src="${artUrl(c, { lite: true })}"><span class="dv-crk" aria-hidden="true"></span></span>`}
       <span class="dv-kw ${enemy && u.fam ? 'fam' : ''}" title="${esc(enemy && u.fam ? AI_FAMILIES[u.fam].desc : kit.name)}">${roleIcon(kit.kw)}<em>${esc(enemy && u.fam ? AI_FAMILIES[u.fam].name : kit.name)}</em></span>
       ${u.boss ? `<span class="dv-boss"><img alt="" src="assets/icons/crest-boss.webp">${u.phase2 ? 'Furie' : 'Gardien'}</span>` : u.elite ? '<span class="dv-boss elite"><img alt="" src="assets/icons/crest-elite.webp">Élite</span>' : ''}
       <span class="dv-nm ${u.named || ((u.boss || u.twin) && st.bossKey) ? 'named' : ''}">${esc((u.boss || u.twin) && st.bossKey && BOSSES[st.bossKey] ? uName(u) : u.named ? u.title : c.name)}</span>
