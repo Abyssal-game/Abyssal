@@ -42,7 +42,11 @@ export async function checkServer() {
     let state = 'unknown', note = '';
     if (r && r.code === 'net') state = 'unknown', note = r.msg;
     else if (r && missing(r)) state = 'missing';
-    else if (want) state = stamps[f.n] === want ? 'ok' : (r && !present(r) ? 'unknown' : 'stale'), note = stamps[f.n] ? 'Version plus ancienne que celle du jeu.' : 'Version inconnue (collé avant le marquage).';
+    else if (want) {
+      state = stamps[f.n] === want ? 'ok' : (r && !present(r) ? 'unknown' : 'stale');
+      /* v683 : la note n'accompagne qu'une version qui n'est pas celle du jeu (avant, elle s'affichait aussi sous « À jour ») */
+      if (state !== 'ok') note = stamps[f.n] ? 'Version plus ancienne que celle du jeu.' : 'Version inconnue (collé avant le marquage).';
+    }
     else if (r) state = present(r) ? 'ok' : 'unknown', note = present(r) ? '' : `${r.status} ${r.code} ${r.msg}`.trim();
     return { ...f, state, note };
   }));
