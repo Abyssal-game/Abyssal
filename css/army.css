@@ -6546,3 +6546,11 @@ html[data-mat="tp-eclipse"] .sc-plate, html .sc-board[data-pmat="tp-eclipse"] .s
 .np-pl-aile { --npb: rgba(255, 225, 150, .85); background-image: url(../assets/plates/pl-aile.webp), linear-gradient(90deg, #080a14, #1e2440 50%, #080a14); color: #FFF2D2; }
 .np-pl-tombes { --npb: rgba(150, 230, 190, .8); background-image: url(../assets/plates/pl-tombes.webp), linear-gradient(90deg, #08090c, #262c34 50%, #08090c); color: #E2F5EC; }
 .np-pl-encre { --npb: rgba(190, 140, 255, .8); background-image: url(../assets/plates/pl-encre.webp), linear-gradient(90deg, #08080e, #22203a 50%, #08080e); color: #EADCFF; }
+
+/* v695 : la pastille des récompenses se pose sur la barre du haut (elle cachait les sous-onglets et les titres) */
+.prog-chip, body.battle-mode .prog-chip { top: calc(var(--safe-t, env(safe-area-inset-top, 0px)) + 8px); }
+/* v695 : Fournaise, la ligne de finition garde sa place à côté du bouton */
+.fz-row > span { flex: 1 1 auto; }
+.fz-row > .btn { flex: none; }
+/* v695 : la bulle de l’arbitre des Sceaux cachait le début de la consigne */
+body:has(.sc-dlg) .sc-game .sc-msg { visibility: hidden; }

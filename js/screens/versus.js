@@ -53,7 +53,7 @@ export default function versusScreen(app, root) {
   const left = (t) => Math.max(0, VERSUS_HOURS - Math.floor((Date.now() - new Date(t)) / 3600000));
 
   function head() {
-    return `<header class="screen-head ui-hero bn-versus"><h1>Le Pari des Boosters</h1><p class="muted">Ouvrez vos boosters face à face : le meilleur total remporte <b>toutes</b> les cartes.</p></header>`;
+    return `<header class="screen-head ui-hero bn-versus"><h1>Le Pari des Boosters</h1><p class="muted">Vos boosters s’ouvrent face à face : le meilleur total remporte <b>toutes</b> les cartes.</p></header>`;
   }
 
   function draw() {

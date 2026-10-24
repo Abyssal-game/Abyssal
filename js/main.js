@@ -345,7 +345,13 @@ const KIND_LABEL = { codex: 'Codex de l’Abîme', quest: 'Défi du Codex rempli
 const KIND_ICON = { codex: 'star', quest: 'trophy', achievement: 'trophy', set: 'star', faction: 'shield', fame: 'star', season: 'trophy', level: 'up' };
 let progList = [], progEl = null, progTimer = 0;
 function progLine(e) { return e.kind === 'level' ? `Niveau ${e.level}` : e.kind === 'codex' ? (e.up ? `Palier ${e.tier} atteint ! (+${e.xp} points)` : `+${e.xp} points · palier ${e.tier}`) : esc(e.name); }
+/* v695 : la pastille attend la fin d'un combat, d'une ouverture, d'un coffre ou d'une présentation de gardien
+   (elle cachait des titres et des annonces) */
+let progWait = 0;
+const progBusy = () => document.body.classList.contains('battle-mode') || !!document.querySelector('.opening, .bx-intro, .chx-stage, .vd');
 function paintProgress() {
+  clearTimeout(progWait);
+  if (progBusy()) { progEl?.classList.remove('in'); progWait = setTimeout(() => { if (progList.length) paintProgress(); }, 1500); return; }
   if (!progEl) {
     progEl = document.createElement('button'); progEl.className = 'prog-chip'; progEl.type = 'button';
     progEl.addEventListener('click', () => { const list = progList; hideProgress(); openProgress(list); });

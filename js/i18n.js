@@ -52,7 +52,7 @@ export function setLang(k) {
 export const langChosen = () => { try { return !!localStorage.getItem(KEY); } catch (e) { return false; } };
 
 // ——— Clés ———————————————————————————————————————————————————————————————
-const NUM = /\d+(?:[  .,]\d{3})*(?:[.,]\d+)?/g;
+const NUM = /\d+(?:[\u00a0\u202f.,]\d{3})*(?:[.,]\d+)?/g; /* v695 : espaces des milliers de fr-FR (U+202F), avant deux espaces simples qui ne servaient pas */
 const space = (s) => s.replace(/\s+/g, ' ').trim();
 /* v527 : « {0}th » → 1st, 2nd, 3rd, 11th… selon le nombre remis */
 const ord = (n) => { const x = +n % 100; return (x > 10 && x < 14) ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' })[x % 10] || 'th'; };
@@ -68,7 +68,7 @@ export function t(fr, vars) {
 export function tx(text) {
   if (!dict && !collecting) return text;
   const nums = [];
-  const key = space(text).replace(NUM, (m) => `{${nums.push(m) - 1}}`);
+  const key = space(text.replace(NUM, (m) => `{${nums.push(m) - 1}}`));
   const hit = look(key);
   const lead = text.match(/^\s*/)[0], tail = text.match(/\s*$/)[0];
   if (hit) return lead + fillNames(fill(hit.tr, nums), hit.nm) + tail;
@@ -103,9 +103,9 @@ if (collecting) {
     const box = document.createElement('div'); box.innerHTML = html; const out = new Set();
     const walk = (el) => {
       if (SKIP.has(el.tagName)) return;
-      for (const a of ATTRS) { const v = el.getAttribute?.(a); if (v && LETTERS.test(v)) out.add(space(v).replace(NUM, (() => { let i = 0; return () => `{${i++}}`; })())); }
+      for (const a of ATTRS) { const v = el.getAttribute?.(a); if (v && LETTERS.test(v)) out.add(space(v.replace(NUM, (() => { let i = 0; return () => `{${i++}}`; })()))); }
       if (el !== box && isBlock(el)) { out.add(keyOf(el).key); keyOf(el).els.forEach(walk); return; }
-      for (const n of el.childNodes) { if (n.nodeType === 3 && LETTERS.test(n.data)) { let i = 0; out.add(space(n.data).replace(NUM, () => `{${i++}}`)); } else if (n.nodeType === 1) walk(n); }
+      for (const n of el.childNodes) { if (n.nodeType === 3 && LETTERS.test(n.data)) { let i = 0; out.add(space(n.data.replace(NUM, () => `{${i++}}`))); } else if (n.nodeType === 1) walk(n); }
     };
     if (isBlock(box)) { out.add(keyOf(box).key); keyOf(box).els.forEach(walk); } else walk(box);
     return [...out];

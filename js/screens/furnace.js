@@ -50,7 +50,7 @@ export function openBurn(app, id, { onClose } = {}) {
     sheet.setContent(`<div class="fz-burn">
       <h2>${icon('p:furnace')} Fournaise</h2>
       <p class="small muted">${esc(card.name)} · ${e.n} exemplaire${e.n > 1 ? 's' : ''} · niveau ${g.cardLevel(id)}. Une carte brûlée disparaît et laisse des cendres. Les finitions rares en laissent bien plus.</p>
-      ${sp.n ? `<button class="btn primary block" data-fz="spares">${icon('p:furnace')}Brûler les ${sp.n} doublon${sp.n > 1 ? 's' : ''} · +${fmt(sp.ash)} cendres</button>` : ''}
+      ${sp.n ? `<button class="btn primary block" data-fz="spares">${icon('p:furnace')}${sp.n > 1 ? `Brûler les ${sp.n} doublons` : 'Brûler le doublon'} · +${fmt(sp.ash)} cendres</button>` : ''}
       <div class="fz-rows">${rows}</div>
       <p class="small muted">Tu as ${icon('ash')} <b>${fmt(g.s.ash)}</b> cendres.</p>
     </div>`);

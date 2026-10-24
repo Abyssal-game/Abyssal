@@ -1133,7 +1133,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   async function pickReserve() {
     if (!g.s.tips?.['cb-entrance']) await tuto(app, 'cb-entrance');
     const r = reserve(st, 'ally'), su = st.units[sel];
-    const sh = openSheet(`<h2>Qui entre en jeu ?</h2><p class="small muted">À la place de <b>${esc(cat.get(su.id).name)}</b>. ${st.init ? `Gratuit : elle prend sa place dans l’ordre des tours et joue tout de suite${st.freeSwap ? ' (Relais d’ombre : +2 PA)' : ''}` : `Coût : ${st.freeSwap ? 'gratuit (Relais d’ombre)' : '1 action'}. Elle peut agir ce tour-ci`} ; PV, PA et états sont conservés.</p>
+    const sh = openSheet(`<h2>Qui entre en jeu ?</h2><p class="small muted">À la place de <b>${esc(cat.get(su.id).name)}</b>. ${st.init ? `Gratuit : elle prend sa place dans l’ordre des tours et joue tout de suite${st.freeSwap ? ' (Relais d’ombre : +2 PA)' : ''}` : `Coût : ${st.freeSwap ? 'gratuit (Relais d’ombre)' : '1 action'}. Elle peut agir ce tour-ci`} ; PV, PA et états sont conservés.</p>
       <div class="dv-pick">${r.map((x) => `<button class="dv-pick-c" data-in="${x.uid}"><img alt="" src="${artUrl(cat.get(x.id), { lite: true })}"><b>${esc(cat.get(x.id).name)}</b><span>${esc(KITS[x.role].name)} · ${icon('swords')}${x.atk} · ${icon('heart')}${x.hp}/${x.maxHp}</span>${ENTRANCES[x.role] ? `<small class="dv-pick-e"><b>${esc(ENTRANCES[x.role].name)}</b> : ${esc(ENTRANCES[x.role].desc)}</small>` : ''}</button>`).join('')}</div>`, { label: 'Permuter' });
     sh.body.addEventListener('click', (ev) => { const p = ev.target.closest('[data-in]'); if (p) { sh.close(); const u = sel; mode = null; exec(() => E.duelAct(where, u, 'swap', p.dataset.in)); } });
   }
