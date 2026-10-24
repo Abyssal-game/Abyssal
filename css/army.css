@@ -6658,3 +6658,10 @@ details.dc-fold > summary:has(.gm-tease) { flex-wrap: wrap; }
    (rangées de filtres) gardent le défilement de côté. */
 .seg:not(.lang-grid) { overflow-y: hidden !important; overscroll-behavior: contain; }
 .seg:not(.wide):not(.lang-grid) { overflow-x: hidden; }
+
+/* v709 : Tirage des Ombres mis en avant dans « Aujourd'hui » tant que le tirage du jour n'est pas fait */
+.td-row.td-shadow:not(.done) { position: relative; border: 1px solid rgba(155, 107, 255, .55); background: linear-gradient(100deg, rgba(74, 40, 130, .5), rgba(20, 14, 34, .85) 70%), url(../assets/ui/bn-shadow.webp) right center / cover no-repeat; box-shadow: 0 0 18px rgba(155, 107, 255, .25); border-radius: 12px; }
+.td-row.td-shadow:not(.done) b { color: #E6D8FF; }
+.td-go { flex: none; padding: 6px 14px; border-radius: 999px; font-weight: 800; font-size: 13px; color: #1A0E2E; background: linear-gradient(180deg, #D9C2FF, #9B6BFF); box-shadow: 0 0 12px rgba(155, 107, 255, .55); }
+@media (prefers-reduced-motion: no-preference) { html:not(.fx-light) .td-row.td-shadow:not(.done) .td-go { animation: tdGo 2.4s ease-in-out infinite; } }
+@keyframes tdGo { 50% { box-shadow: 0 0 20px rgba(155, 107, 255, .9); } }

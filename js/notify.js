@@ -10,7 +10,7 @@ import { LANG, t } from './i18n.js';
 import { CODEX, codexTier } from './core/codex.js';
 
 const LN = () => (isNative() ? window.Capacitor?.Plugins?.LocalNotifications : null);
-const DAILY_ID = 1001, CODEX_ID = 1002, STREAK_ID = 1003; /* v680 : fin de saison du Codex ; v708 : série d'offrandes brisée */
+const DAILY_ID = 1001, CODEX_ID = 1002, STREAK_ID = 1003, EVE_ID = 1004, SHADOW_ID = 1005; /* v680 : fin de saison du Codex ; v708 : série d'offrandes brisée ; v709 : offrande du soir, Tirage des Ombres */
 const REMIND_BASE = 20000;
 const REMIND_HOURS = 2;
 export const notifSupported = () => !!LN();
@@ -70,8 +70,11 @@ async function pendingIds() { try { return ((await LN().getPending()).notificati
 async function cancel(ids) { if (ids.length) { try { await LN().cancel({ notifications: ids.map((id) => ({ id })) }); } catch (e) { /* rien */ } } }
 
 // Booster du jour : prochain 10 h où le booster gratuit est disponible et pas encore ouvert
+let lnWired = false;
 export async function syncDaily(g) {
   const L = LN(); if (!L) return;
+  /* v709 : toucher une notification locale qui porte une page (Tirage des Ombres) ouvre cette page */
+  if (!lnWired) { lnWired = true; try { L.addListener?.('localNotificationActionPerformed', (a) => { const r = a?.notification?.extra?.route; if (r && /^#\//.test(r)) location.hash = r; }); } catch (e) { /* rien */ } }
   await cancel([DAILY_ID]);
   if (!g.s.settings.notif) return;
   const now = new Date(), at = new Date(now); at.setHours(10, 0, 0, 0);
@@ -81,6 +84,8 @@ export async function syncDaily(g) {
     await L.schedule({ notifications: [{ id: DAILY_ID, title: 'ABYSSAL', body: t('Ton booster gratuit du jour t’attend !'), schedule: { at, allowWhileIdle: true } }] });
   } catch (e) { /* rien */ }
   await syncStreak(g);
+  await syncEve(g);
+  await syncShadow(g);
   await syncCodex(g);
 }
 
@@ -96,6 +101,37 @@ async function syncStreak(g) {
     const at = new Date(y, m - 1, j + 2, 11, 0, 0, 0);
     if (at.getTime() < Date.now() + 60000) return;
     await L.schedule({ notifications: [{ id: STREAK_ID, title: t('L’Abysse a remarqué ton absence'), body: t('Hier, nul n’est venu recevoir l’offrande : ta série de {n} jours se fissure. Reviens aujourd’hui, avant que la flamme ne s’éteigne.', { n: d.streak }), schedule: { at, allowWhileIdle: true } }] });
+  } catch (e) { /* rien */ }
+}
+
+/* v709 : le lendemain de la dernière offrande, à 20 h, si l'app n'a pas été ouverte de la journée (l'offrande se prend
+   toute seule à l'ouverture) : la série tient encore jusqu'à minuit */
+async function syncEve(g) {
+  const L = LN(); if (!L) return;
+  await cancel([EVE_ID]);
+  try {
+    const d = g.s.daily || {};
+    if (!g.s.settings.notif || !d.last || (d.streak || 0) < 2) return;
+    const [y, m, j] = d.last.split('-').map(Number);
+    const at = new Date(y, m - 1, j + 1, 20, 0, 0, 0);
+    if (at.getTime() < Date.now() + 60000) return;
+    await L.schedule({ notifications: [{ id: EVE_ID, title: t('L’offrande brûle encore'), body: t('L’autel attend ton offrande de ce soir. Avant minuit, ta série de {n} jours tient toujours.', { n: d.streak }), schedule: { at, allowWhileIdle: true } }] });
+  } catch (e) { /* rien */ }
+}
+
+/* v709 : Tirage des Ombres (jour à l'heure de Paris, comme le serveur) : 19 h le jour même s'il n'est pas encore fait,
+   sinon le lendemain à 19 h ; seulement avec un compte (le Tirage se joue en ligne) */
+const parisDay = (d = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
+async function syncShadow(g) {
+  const L = LN(); if (!L) return;
+  await cancel([SHADOW_ID]);
+  try {
+    if (!g.s.settings.notif) return;
+    const cloud = await import('./cloud/cloud.js');
+    if (!cloud.isLoggedIn()) return;
+    const now = new Date(), at = new Date(now); at.setHours(19, 0, 0, 0);
+    if (g.s.shadow?.paid?.[parisDay(now)] || at.getTime() < now.getTime() + 60000) at.setDate(at.getDate() + 1);
+    await L.schedule({ notifications: [{ id: SHADOW_ID, title: t('Le Tirage des Ombres'), body: t('Les Ombres ont battu les cartes. Ton tirage du jour t’attend : il compte pour le classement de la semaine.'), schedule: { at, allowWhileIdle: true }, extra: { route: '#/tirage' } }] });
   } catch (e) { /* rien */ }
 }
 
@@ -128,7 +164,7 @@ export async function syncReminders(g, turns) {
 
 export async function clearAll() {
   const L = LN(); if (!L) return;
-  await cancel((await pendingIds()).filter((id) => id === DAILY_ID || id === CODEX_ID || id === STREAK_ID || (id >= REMIND_BASE && id < REMIND_BASE + 9000)));
+  await cancel((await pendingIds()).filter((id) => id === DAILY_ID || id === CODEX_ID || id === STREAK_ID || id === EVE_ID || id === SHADOW_ID || (id >= REMIND_BASE && id < REMIND_BASE + 9000)));
 }
 
 // Une seule fois, dans l'app : proposer les notifications (après l'arrivée du joueur, sur l'Accueil, sans fenêtre ouverte)

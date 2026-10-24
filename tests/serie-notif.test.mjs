@@ -35,3 +35,13 @@ test('rien à perdre (série de 1) ou notifications coupées : pas de notificati
   await syncDaily(game({ last: ymd(new Date()), streak: 6 }, false));
   assert.ok(!sched.some((x) => x.id === 1003));
 });
+
+test('rappel du soir (20 h) le lendemain de la dernière offrande', async () => {
+  sched.length = 0;
+  const now = new Date();
+  await syncDaily(game({ last: ymd(now), streak: 4 }));
+  const n = sched.find((x) => x.id === 1004);
+  assert.ok(n, 'rappel du soir programmé');
+  assert.equal(n.schedule.at.getTime(), new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 20, 0, 0, 0).getTime());
+  assert.match(n.body, /\b4\b/);
+});

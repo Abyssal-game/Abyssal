@@ -11,6 +11,7 @@ import { FACTION_ORDER, ECONOMY } from '../config.js';
 import { seeded } from '../art/geometry.js';
 import { today } from '../core/save.js';
 import { setScene } from '../ui/scene.js';
+import { parisDay } from './shadow.js';
 
 // Icône et couleur de chaque type de mission du jour
 const MISSION_LOOK = { booster: ['booster', '#E0485E'], new: ['book', '#B48CFF'], rare: ['crystal', '#6FB4FF'], variant: ['holo', '#FF8AD8'], burn: ['furnace', '#FF9A3A'], depth: ['depth', '#9C7BFF'], trial: ['crest-elite', '#E0485E'], win: ['crown', '#F2C14E'], daily: ['crystal', '#7FD3FF'], chest: ['chest', '#E8C35A'] };
@@ -33,6 +34,11 @@ export default function home(app, root) {
     const dayGain = (k) => g.dailyGainFor(sd - pos + k + 1);
     const streakBar = `<span class="td-streak">${Array.from({ length: 7 }, (_, k) => `<i class="${k < (g.canDailyClaim() ? pos - 1 : pos) ? 'on' : ''} ${k === pos - 1 && g.canDailyClaim() ? 'now' : ''} ${k === 6 ? 'chest' : ''}">${k === 6 ? '<img alt="" src="assets/chests/fer.webp">' : `<em>${k + 1}</em>`}<small>${dayGain(k)}</small></i>`).join('')}</span>`;
     rows.push(`<div class="td-row td-daily ${g.canDailyClaim() ? '' : 'done'}" data-act="dailyinfo" role="button"><span class="td-ic mi" style="--mc:#F2C14E">${picon('streak')}</span><span class="td-t"><b>Offrande du jour</b><span class="small muted">${g.canDailyClaim() ? `Jour ${pos} sur 7 · aujourd’hui ${daily.amount} éclats${pos === 7 ? ' et un coffre de fer' : ''}` : `Reçue : ${dayGain(pos - 1)} éclats${pos === 7 ? ' et un coffre de fer' : ''} · demain ${pos === 7 ? g.dailyGainFor(sd + 1) : dayGain(pos)} éclats`}</span>${streakBar}</span>${g.canDailyClaim() ? `<span class="td-auto" title="Arrive tout seul">+${daily.amount}</span>` : `<span class="small muted">Reçue</span>`}</div>`);
+    /* v709 : Tirage des Ombres, mis en avant juste sous l'offrande tant que le tirage du jour n'est pas fait (compte connecté) */
+    if (cloud.isLoggedIn()) {
+      const shDone = !!s.shadow?.paid?.[parisDay()];
+      rows.push(`<a class="td-row td-shadow ${shDone ? 'done' : ''}" href="#/tirage"><span class="td-ic mi" style="--mc:#9B6BFF">${picon('shadow')}</span><span class="td-t"><b>Tirage des Ombres</b><span class="small muted">${shDone ? 'Tiré aujourd’hui · ton score compte pour la semaine · retour demain' : 'Ton booster gratuit du jour t’attend · classement de la semaine'}</span></span>${shDone ? '<span class="small muted">Demain</span>' : `<span class="td-go">Tirer</span>`}</a>`);
+    }
     // v411 : ce qui se joue aujourd'hui, puis les missions, puis le coffre de la semaine (avant : tout mélangé)
     const tl = g.trials().done.filter((x) => !x).length, tw = g.trials().done.filter((x) => x === 'won').length;
     if (g.team().length >= 3) rows.push(`<a class="td-row ${tl ? '' : 'done'}" href="#/epreuves"><span class="td-ic mi" style="--mc:#E0485E">${picon('crest-elite')}</span><span class="td-t"><b>Épreuves du jour</b><span class="small muted">${tl ? `${tl} combat${tl > 1 ? 's' : ''} à jouer · un coffre par victoire` : `Terminées : ${tw} victoire${tw > 1 ? 's' : ''} sur 3 · retour demain`}</span></span>${tl ? icon('next') : '<span class="small muted">Demain</span>'}</a>`);
