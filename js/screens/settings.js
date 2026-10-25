@@ -131,11 +131,11 @@ export default function settings(app, root) {
         <p class="small">ABYSSAL — Le Bestiaire interdit.</p>
         <p class="small muted" data-act="vtap">Version ${esc(app.version)} · ${app.catalog.cards.length} cartes</p>
         <p class="small muted set-partie">${partieLine()}</p>
-        ${liveOn() ? `<p class="small muted set-live">${liveLine()}</p><p class="small muted set-live-why" translate="no">${liveWhy()}</p><button class="btn ghost small" data-act="livecheck">${icon('eye')} Chercher une mise à jour</button>` : ''}
-        <a class="btn ghost small" href="confidentialite.html" target="_blank" rel="noopener">${icon('book')} Politique de confidentialité</a>
+        ${liveOn() ? `<p class="small muted set-live">${liveLine()}</p><p class="small muted set-live-why" translate="no">${liveWhy()}</p><button class="btn ghost small block" data-act="livecheck">${icon('eye')} Chercher une mise à jour</button>` : ''}
+        <a class="btn ghost small block" href="confidentialite.html" target="_blank" rel="noopener">${icon('book')} Politique de confidentialité</a>
         <!-- v700 : Apple vérifie qu'on trouve facilement la restauration des achats et la suppression du compte -->
-        ${iapStatus() !== 'web' ? `<button class="btn ghost small" data-act="restore">${icon('star')} Restaurer mes achats</button>` : ''}
-        <a class="btn ghost small" href="#/compte">${icon('user')} Mon compte (mot de passe, suppression)</a>
+        ${iapStatus() !== 'web' ? `<button class="btn ghost small block" data-act="restore">${icon('star')} Restaurer mes achats</button>` : ''}
+        <a class="btn ghost small block" href="#/compte">${icon('user')} Mon compte (mot de passe, suppression)</a>
       </section>
       ${isGardien() ? `<button class="online-pill gardien" data-act="online" aria-live="polite"><img class="on-ic" alt="" src="assets/icons/online.webp"><span class="on-dot"></span><span class="on-t">Connexion…</span><span class="on-see">Voir</span></button><div class="on-inline"><p class="small muted center">Chargement des pseudos…</p></div>` : ''}`;
   }

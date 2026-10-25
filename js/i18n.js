@@ -80,6 +80,11 @@ export function tx(text) {
     const pq = text.match(/^(\s*)([^«»]+?)\s*«\s*([^«»]+?)\s*»(\s*)$/);
     if (pq) { const a = tx(pq[2]), v = tx(pq[3]); if (a !== pq[2] || v !== pq[3]) return `${pq[1]}${a} “${v}”${pq[4]}`; }
     if (text.includes(' · ')) { const parts = text.split(' · '), v = parts.map((x) => tx(x)); if (v.some((x, i) => x !== parts[i])) return v.join(' · '); }
+    /* v738 : « : texte », « (2 PA) : texte » ou « Nom : texte » (aides du combat) : chaque côté traduit à part */
+    const pre = text.match(/^(\s*(?:\([^()]*\)\s*)?[:·]\s*)([\s\S]+)$/);
+    if (pre) { const v = tx(pre[2]); if (v !== pre[2]) return pre[1].replace(/\s+:/, ':') + v; }
+    const ci = text.indexOf(' : ');
+    if (ci > 0) { const a = text.slice(0, ci), b = text.slice(ci + 3), va = tx(a), vb = tx(b); if (vb !== b) return `${va}: ${vb}`; }
   }
   miss(key); return text;
 }

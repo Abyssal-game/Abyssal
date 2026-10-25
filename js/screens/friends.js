@@ -27,7 +27,7 @@ export default function friends(app, root, params = []) {
   async function list() {
     const me = cloud.isLoggedIn() && sync.profile?.pseudo; /* v528 : compte obligatoire, seul le pseudo peut manquer */
     root.innerHTML = `${head('Ajoute des joueurs grâce à leur pseudo et découvre leur collection, leurs succès et leurs exploits.')}
-      ${me ? `<section class="panel stack fr-me"><p class="small">Ton pseudo : <b>${esc(me)}</b> · donne-le à tes amis pour qu’ils t’ajoutent.</p>
+      ${me ? `<section class="panel stack fr-me"><p class="small">Ton pseudo : <b class="notranslate">${esc(me)}</b> · donne-le à tes amis pour qu’ils t’ajoutent.</p>
         <form class="row gap fr-add" id="fr-add"><input class="input plain" name="pseudo" maxlength="16" minlength="3" placeholder="Pseudo d’un joueur" autocomplete="off" required><button class="btn primary" type="submit">Ajouter</button></form></section>`
         : `<section class="panel stack center"><p>Choisis d’abord ton pseudo : c’est grâce à lui que tes amis te trouvent.</p><a class="btn primary block" href="#/compte">Choisir mon pseudo</a></section>`}
       <div id="fr-list"><p class="small muted center">Chargement…</p></div>`;

@@ -146,7 +146,7 @@ export default function descent(app, root) {
   function summitHTML(d, full = false) {
     const best = Math.min(FINAL_FLOOR, d.best || 0), done = !!g.s.bossesBeaten?.abysse;
     // v404 : une simple ligne tant que le record est loin du fond (le grand encart écrasait le premier écran)
-    if (!full && best < 50 && !done) return `<button class="panel dc-summit-line" data-act="open" data-f="summit"><img alt="" src="assets/packs/abysse2.webp"><span><b>Objectif ultime : l’étage ${FINAL_FLOOR}</b><small>L’Abysse et son Booster de l’Abysse · ton record : ${best} / ${FINAL_FLOOR}</small></span>${icon('next')}</button>`;
+    if (!full && best < 50 && !done) return `<button class="panel dc-summit-line" data-act="open" data-f="summit"><img alt="" src="assets/packs/abysse2.webp"><span><b>Objectif ultime : l’étage ${FINAL_FLOOR}</b><small>L’Abysse et son Booster de l’Abysse · ton record : ${best}&nbsp;/&nbsp;${FINAL_FLOOR}</small></span>${icon('next')}</button>`;
     /* v448 : dans une fenêtre, plus d'encadré dans le cadre : titre en tête (à côté de la croix), sachet au centre */
     if (full) return `<div class="center dc-smh"><b class="dc-sm-k">${done ? 'Fond de l’Abysse atteint' : 'Le fond de l’Abysse'}</b><h2>Étage ${FINAL_FLOOR} · L’Abysse</h2></div>
       <div class="dc-sms"><img class="dc-sms-pack" alt="" src="assets/packs/abysse2.webp">

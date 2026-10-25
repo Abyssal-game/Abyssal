@@ -1,5 +1,5 @@
 // v427 : Les Enchères de Mammon — accueil (tables, défi du jour), vente à trois et fin de vente.
-import { t, tw } from '../i18n.js';
+import { t, tw, LANG } from '../i18n.js';
 import * as EN from '../core/encheres.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, picon, crestHTML } from '../ui/icons.js';
@@ -162,7 +162,7 @@ export default function encheresScreen(app, root) {
     const el = document.createElement('div');
     el.className = `sc-end ${won ? 'won' : 'lost'}`;
     el.innerHTML = `${won && !app.reduced() ? '<div class="sc-rays"></div>' : ''}<div class="sc-end-in">${crestHTML(won, won ? 'Victoire' : 'Défaite', '', 'sc-crest')}
-      <p class="sc-caps">${st.final.order.map((x) => `${esc(who(st, x).name)} : <b>${sc[x]}</b>`).join(' · ')}</p>
+      <p class="sc-caps" translate="no">${st.final.order.map((x) => `${esc(x === 'p' ? t('Toi') : tw(who(st, x).name))}${LANG === 'fr' ? ' : ' : ': '}<b>${sc[x]}</b>`).join(' · ')}</p>
       ${sayer.key ? `<p class="sc-say">${pic(sayer.key)}<span>« ${esc(won ? sayer.beaten : sayer.gloat)} »</span></p>` : ''}
       ${out.shards ? `<p class="sc-gain">${icon('crystal')} <b>+${fmt(out.shards)}</b> éclats${out.first ? ' (première victoire)' : ''}</p>` : ''}
       ${out.chests?.length ? `<a class="sc-gain sc-chestwin" href="#/coffres">${icon('p:chest')} ${out.chests.map((c) => `<b translate="no">${esc(t(CHEST_NAME[c]))}</b>`).join(' et ')} gagné${out.chests.length > 1 ? 's' : ''} !</a>` : ''}
