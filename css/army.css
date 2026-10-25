@@ -7009,3 +7009,7 @@ html.fx-light .pa-game.defy::after { animation: none; opacity: .7; }
    pendant l'ouverture, seulement dans le corps du sachet (une copie ; les 12 lanières de la déchirure n'en ont pas) */
 .op-pack .pk-body .pk-glow { display: block; }
 html.fx-light .op-pack .pk-body .pk-glow { display: none; }
+
+/* v747 (capture du propriétaire : « les cartes dépassent sur le plateau ») : intérieur du plateau d'origine remesuré
+   (velours de x 160 à 733, y 186 à 1010 sur 896 × 1200) : la rangée du bas descendait dans la bande de cuir (bas 10,6 % au lieu de 16 %) */
+html:not([data-mat^="tp-"]) .sc-board:not([data-pmat^="tp-"]) .sc-plate { top: 16%; bottom: 16.2%; left: 18.5%; right: 18.8%; }
