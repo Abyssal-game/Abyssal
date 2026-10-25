@@ -6536,8 +6536,6 @@ html[data-mat="tp-tombes"] .sc-board, .sc-board[data-pmat="tp-tombes"] { --mat-i
 html[data-mat="tp-tombes"] .sc-plate, html .sc-board[data-pmat="tp-tombes"] .sc-plate { top: 11.5%; bottom: 11.5%; left: 14.5%; right: 14.5%; }
 html[data-mat="tp-dragon"] .sc-board, .sc-board[data-pmat="tp-dragon"] { --mat-img: url(../assets/tapis/tp-dragon.webp); }
 html[data-mat="tp-dragon"] .sc-plate, html .sc-board[data-pmat="tp-dragon"] .sc-plate { top: 11.5%; bottom: 11.5%; left: 15%; right: 15%; }
-html[data-mat="tp-eclipse"] .sc-board, .sc-board[data-pmat="tp-eclipse"] { --mat-img: url(../assets/tapis/tp-eclipse.webp); }
-html[data-mat="tp-eclipse"] .sc-plate, html .sc-board[data-pmat="tp-eclipse"] .sc-plate { top: 9.5%; bottom: 9.5%; left: 12%; right: 12%; }
 
 /* v692 : 6 plaques de pseudo vivantes (images Gemini §356-361) */
 .np-pl-titan { --npb: rgba(255, 190, 110, .8); background-image: url(../assets/plates/pl-titan.webp), linear-gradient(90deg, #0c0a08, #2e2820 50%, #0c0a08); color: #FFE6C4; }

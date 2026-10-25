@@ -153,6 +153,8 @@ export function migrate(raw) {
   if (gone.has(s.sachet)) s.sachet = null;
   if (gone.has(s.sachetPrem)) s.sachetPrem = null;
   if (gone.has(s.plate)) s.plate = null; /* v593 : plaques supprimées */
+  if (gone.has(s.mat)) s.mat = null; /* v758 : tapis supprimés */
+  if (gone.has(s.fond)) s.fond = null;
   return s;
 }
 
