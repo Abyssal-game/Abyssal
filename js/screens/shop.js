@@ -56,7 +56,7 @@ const SKIN_BOX = {
 const skinVars = (k) => { const [t, b, l, r, s = 1] = SKIN_BOX[k] || [70, 86, 12, 12]; return `--lt:${t}%;--lb:${100 - b}%;--ll:${l}%;--lr:${r}%;--ls:${s}`; };
 export function packHTML(type, cat, { faction, event, skin = getPackSkin(type) } = {}) {
   const def = BOOSTERS[type] || { name: type === 'shadow' ? 'Booster des Ombres' : 'Booster' };
-  let label = type === 'shadow' ? 'Ombres' : def.name.replace('Booster ', '');
+  let label = type === 'shadow' ? 'Ombres' : type === 'abysse' ? 'L’Abysse' /* v772 */ : def.name.replace('Booster ', '');
   let key = type;
   if (type === 'faction' && faction) { label = cat.faction[faction].name; key = faction; }
   if (type === 'event') label = 'Alliances';

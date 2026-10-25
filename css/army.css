@@ -7175,3 +7175,7 @@ img.pa-defy-tag { width: 30%; height: auto; font-size: 0; text-shadow: none; fil
 .hs-end { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
 .hs-end .endx-card { width: min(46vw, 190px); }
 @media (prefers-reduced-motion: reduce) { .endx *, .endx-s::before { animation-duration: .01s !important; animation-delay: 0s !important; } }
+
+/* v772 : sachet de l'Abysse : le corps peint va de 2 à 89 % de l'image (débris à droite), textes centrés dessus */
+.pack-abysse .pk-logo { left: 2%; right: 11%; padding-left: .22em; }
+.pack-abysse .pk-label { left: 8%; right: 17%; }
