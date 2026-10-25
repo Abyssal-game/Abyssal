@@ -334,7 +334,7 @@ export default function codexScreen(app, root) {
     const lbMock = (L) => `<div class="lb-row pv2-lb"><span class="lb-rank">1</span><span class="lb-av pf pf-${L.frame}">${avImg}</span><span class="lb-name"><b>${withPlate(L.plate, esc(myName()))}</b><span class="small muted">${esc(L.title || '')}</span></span><span class="lb-floor">412 pts</span></div>`;
     const seatMock = (L) => `<div class="pv2-seat"><span class="avatar-mini pf pf-${L.frame}">${avImg}</span><b>${withPlate(L.plate, esc(myName()))}</b><small>à toi de jouer</small></div>`;
     const backOf = (k) => (k ? `assets/backs/${k}.webp` : 'assets/backs/back.webp');
-    const matOf = (k) => (k ? `assets/tapis/${k}.webp` : 'assets/sceaux/plateau.webp');
+    const matOf = (k) => (k ? `assets/tapis/${k}.webp` : 'assets/sceaux/plateau2.webp');
     const board = (k) => `<div class="cx-pv-board"><div class="sc-board" ${k ? `data-pmat="${k}"` : ''}><div class="sc-plate">${Array.from({ length: 9 }, (_, i) => { const c = [0, 4, 8].includes(i) ? mine[[0, 4, 8].indexOf(i)] : null; return `<span class="sc-cell ${i === 4 && !c ? 'heart' : ''}">${c ? `<img class="cx-pv-sc" alt="" src="${artUrl(c, { lite: true })}">` : ''}</span>`; }).join('')}</div></div></div>`;
     /* l'objet en grand, au centre de la vitrine */
     const hero = (o) => {

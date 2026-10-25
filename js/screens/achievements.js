@@ -7,7 +7,7 @@ import { esc, bindActions, fmt, toast, confirmBox, paint } from '../ui/dom.js';
    (famille absente de ACH_PAINTED), l'ancienne icône reste. */
 const ACH_FAM = { unique: 'collection', rarity: 'collection', factions: 'collection', evolines: 'collection', boosters: 'boosters', daily: 'boosters',
   depth: 'descente', hunted: 'combat', trophies: 'combat', trialWins: 'combat', trialPerfect: 'combat', sets: 'ensembles', variants: 'finitions', finish: 'finitions', burned: 'forge', mastered: 'forge', cardLevel: 'forge' };
-const ACH_PAINTED = new Set([]);
+const ACH_PAINTED = new Set(['collection', 'boosters', 'descente', 'combat', 'ensembles', 'finitions', 'forge']);
 const achIc = (a, done) => { const f = ACH_FAM[a.cond?.type] || 'collection';
   return ACH_PAINTED.has(f) ? `<span class="ach-ic med ${done ? '' : 'off'}"><img alt="" src="assets/icons/ach-${f}.webp"></span>` : `<span class="ach-ic">${icon(done ? 'trophy' : 'star')}</span>`; };
 

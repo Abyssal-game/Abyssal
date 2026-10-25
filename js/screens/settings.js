@@ -92,7 +92,7 @@ export default function settings(app, root) {
 `;
   }
   /* v732 : médaillon de chaque groupe de tutoriels (images peintes : assets/icons/tuto-<clé>.webp quand elles arrivent) */
-  const TUTO_PAINTED = new Set([]);
+  const TUTO_PAINTED = new Set(['combat', 'descente', 'cercle', 'cartes']);
   const tic = (k, fb) => picon(TUTO_PAINTED.has(k) ? `tuto-${k}` : fb);
   const TUTO_IC = { 'Combat': tic('combat', 'swords'), 'Descente': tic('descente', 'door-boss'), 'Cercle de l’Abysse': tic('cercle', 'seal'), 'Cartes': tic('cartes', 'cards'), 'Réglages': tic('reglages', 'settings') };
   function tabTutos() {
