@@ -30,7 +30,7 @@ export function playEnding(app, { name } = {}) {
 export function playPrologue(app) {
   const scenes = [
     { img: 'p1', text: 'Les sept royaumes ont forgé le Bestiaire interdit pour enfermer ce qui ne devait plus marcher sous le ciel.', sfx: () => app.sfx.rumble?.() },
-    { img: 'p2', text: 'Sept gardiens, un par royaume, l’ont scellé de leur main. Ce furent les premiers Scelleurs.', sfx: () => app.sfx.page?.() },
+    { img: 'p2b', text: 'Sept gardiens, un par royaume, l’ont scellé de leur main. Ce furent les premiers Scelleurs.', sfx: () => app.sfx.page?.() },
     { img: 'p3', text: 'Une nuit, quelqu’un l’a déchiré.', sfx: () => app.sfx.rip?.() },
     { img: 'p4', text: 'Ses pages se sont envolées, et ses vingt chapitres sont tombés dans l’Abysse. Quelque chose les attendait.', sfx: () => app.sfx.rumble?.() },
     { img: 'p5', cls: 'last', text: 'Tu es le dernier à savoir lire les sceaux. Descends, et referme-les.', sfx: () => app.sfx.page?.(), after: '<button class="btn gold endx-go" data-endx="close">Commencer</button>' },
