@@ -1658,7 +1658,7 @@ export class Game {
       if (named) out.named = { title: named.title, id: named.id, shards: this.gainShards(20 + Math.min(run.floor, SHARD_FLOOR_CAP) * 4) };
       // objectif réussi : éclats en plus et 1 Ferveur pour la suite
       if (goal?.state === 'done') { out.goalShards = this.gainShards((3 + Math.min(run.floor, SHARD_FLOOR_CAP)) * (room === 'boss' ? 2 : 1)); run.gauge = Math.min(carry, run.gauge + 1); this.s.stats.goals = (this.s.stats.goals || 0) + 1; }
-      if (room === 'elite') { const t = this.talentOffers(run); if (t.length) { run.talentOffer = t; out.talents = t; } }
+      /* v753 : plus de talent après une élite (décision du propriétaire : un choix de plus, et ça baissait la difficulté) */
       // exploits de l'expédition (fêtés dans le résumé)
       const F = (run.feats ||= { hit: 0, syn: 0, breaks: 0, parries: 0, perfect: 0, crits: 0, kills: 0, wins: 0 }), S = st.stats || {};
       F.hit = Math.max(F.hit, S.maxHit || 0); F.syn += (S.named || 0) + (S.combos || 0); F.breaks += S.breaks || 0; F.parries += S.parries || 0; F.perfect += S.perfect || 0; F.crits += S.crits || 0; F.kills += st.kills.length; F.wins++; if (run.free || !this.firstClear(run)) this.codexXp(CODEX_XP.win, 'win');

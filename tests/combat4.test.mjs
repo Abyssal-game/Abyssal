@@ -119,7 +119,7 @@ test('proie désignée : tous les ennemis la visent et frappent plus fort', () =
   assert.ok(D.dmgOf(st, foe(st)[1], prey) > before);
 });
 
-test('talents : proposés après une élite, à choisir avant le bonus, appliqués au combat', () => {
+test('v753 : plus de talent proposé après une élite', () => {
   const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('tal'), clock });
   const ids = catalog.cards.filter((c) => c.rarity === 'C').slice(0, 5).map((c) => c.id);
   ids.forEach((id) => g.addCard(id)); g.s.team = ids; g.s.teamSet = true;
@@ -129,12 +129,8 @@ test('talents : proposés après une élite, à choisir avant le bonus, appliqu�
   g.startBattle('elite');
   const st = run.battle; foe(st).forEach((e) => { e.hp = 0; }); st.over = 'won';
   const out = g.finishBattle();
-  assert.equal(out.talents.length, 3);
-  assert.throws(() => g.chooseReward(run.rewards[0]), /talent/);
-  const o = g.chooseTalent(0);
-  assert.equal(run.team.find((m) => m.id === o.id).talent, o.talent);
+  assert.equal(out.talents, undefined); assert.ok(!run.talentOffer); /* v753 : plus de talent */
   g.chooseReward(run.rewards[0]);
-  assert.ok(g.runUnits().some((u) => u.talent === o.talent));
 });
 
 test('mode Cauchemar : verrouillé avant l’étage 20, ennemis renforcés, gardien éveillé dès le début', () => {

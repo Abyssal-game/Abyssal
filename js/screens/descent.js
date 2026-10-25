@@ -126,7 +126,7 @@ export default function descent(app, root) {
     if (team.length < 3) return '';
     // v345 : force de l'équipe (rareté × niveau) plutôt que niveau seul
     const avg = avgLevel(team), tp = g.teamPower(team), target = Math.max((d.best || 0) + 1, 5), need = powerFor(target), top = maxed(team) && tp < need * 0.95, ok = tp >= need * 0.95 || top;
-    return `<p class="small center dc-lvl ${ok ? 'ok' : 'low'}">${icon('p:level-up')} Force de ton équipe : <b>${powerPts(tp)}</b>${top ? ' · <b>au maximum</b> : à cette profondeur, tout se joue sur ta défense, la Brisure, les talents et les présages' : ` · conseillée pour l’étage ${target} : <b>${powerPts(need)}</b>${ok ? '' : ' · <a href="#/renfort">la renforcer</a>'}`}</p>
+    return `<p class="small center dc-lvl ${ok ? 'ok' : 'low'}">${icon('p:level-up')} Force de ton équipe : <b>${powerPts(tp)}</b>${top ? ' · <b>au maximum</b> : à cette profondeur, tout se joue sur ta défense, la Brisure et les présages' : ` · conseillée pour l’étage ${target} : <b>${powerPts(need)}</b>${ok ? '' : ' · <a href="#/renfort">la renforcer</a>'}`}</p>
       <details class="dc-floorhelp small muted"><summary>Comment la difficulté marche</summary><p>La <b>force</b> d’une créature dépend de sa rareté et de son niveau : une Mythique au niveau 1 vaut une Commune au niveau 8. Monter de niveau ou aligner des créatures plus rares rend l’équipe plus forte.</p><p>Dans la Descente, chaque étage a <b>sa force fixe</b> : renforcer ton équipe rend donc les chapitres plus faciles. Les <b>Épreuves du jour</b> et le <b>Cauchemar</b>, eux, s’adaptent à ta force (dès l’étage 1 en Cauchemar, les ennemis valent ceux de l’étage ${floorFloor(avg)} au moins).</p><p>Une équipe très en dessous de la force de l’étage se fait vite abattre ; à force égale, ce sont <b>tes esquives, tes parades et la Brisure</b> qui décident : chaque attaque ennemie frappe fort si tu ne la défends pas.</p></details>`;
   }
   function weakHint(floor) {
@@ -212,7 +212,7 @@ export default function descent(app, root) {
     ${run.phase !== 'battle' && run.team.filter((m) => !m.fallen).length > 1 ? `<p class="dc-swap-hint small muted">${ui.tsel != null ? 'Touche la créature avec qui échanger sa place.' : 'Touche deux créatures pour échanger leur place : les 3 premières combattent.'}</p>` : ''}
     ${g.rule(run.day).off ? '' : `<p class="dc-rule-line small">${picon('rule')} <b>${esc(g.rule(run.day).name)}</b> · ${esc(g.rule(run.day).desc)}</p>`}`; /* v469 : règles du jour retirées (v430) : plus de ligne vide */
   /* v735 : Torches de la Descente (une par combat, TORCHES par jour, sans réserve) */
-  const torchBar = () => { const tc = g.torches(); return `<button class="dc-torch-row ${tc.left ? '' : 'out'}" data-act="torchinfo"><span class="dc-torches">${Array.from({ length: tc.max }, (_, i) => `<i class="${i < tc.left ? 'on' : ''}"><img class="picon" alt="" src="assets/icons/torch-${i < tc.left ? 'on' : 'off'}.webp"></i>`).join('')}</span><span class="dc-torch-t"><b>${tc.left ? `Torches : ${tc.left} / ${tc.max}` : 'Torches éteintes'}</b><small>${tc.left ? 'Une Torche par combat' : 'Ton équipe se repose jusqu’à minuit'}</small></span>${icon('info')}</button>`; };
+  const torchBar = () => { const tc = g.torches(); return `<div class="dc-torch-row ${tc.left ? '' : 'out'}"><span class="dc-torches">${Array.from({ length: tc.max }, (_, i) => `<i class="${i < tc.left ? 'on' : ''}"><img class="picon" alt="" src="assets/icons/torch-${i < tc.left ? 'on' : 'off'}.webp"></i>`).join('')}</span><span class="dc-torch-t"><b>${tc.left ? `Torches : ${tc.left} / ${tc.max}` : 'Torches éteintes'}</b><small>${tc.left ? 'Une Torche par combat' : 'Ton équipe se repose jusqu’à minuit'}</small></span><button class="icon-btn br-info" data-act="torchinfo" aria-label="Les Torches">${icon('info')}</button></div>`; }; /* v753 : même bouton que les Braises de vie */
   function doorsView(run) {
     const doors = g.doors();
     root.innerHTML = `${runHead(run)}<p class="dc-prompt">${!g.torches().left ? 'Tes Torches sont éteintes. Ton équipe se repose : le chapitre t’attendra demain, à l’étage où tu en es.' : doors.includes('boss') ? 'Un gardien barre la route.' : doors.length > 1 ? 'Deux passages. Le plus dangereux rapporte plus.' : 'Des créatures barrent le passage.'}</p>
@@ -296,7 +296,6 @@ export default function descent(app, root) {
         const r = g.descent().run;
         ui.win = { goal: out.goal || null, goalShards: out.goalShards || 0, floor: r.floor, room: out.room, shards: out.shards, ash: out.ash || 0, chest: out.chest || null, disc: out.discovered.filter((id) => cat.get(id)), weekly: out.weekly?.id || null, bossTicket: out.bossTicket || 0, abyss: !!out.abyss, stats, boss: out.boss || null, relNew: out.relNew || [], report: out.report || [], firstWin: out.firstWin || 0, named: out.named || null, first: out.first || null };
         rewardView(r);
-        if (r.talentOffer?.length) tuto(app, 'cb-talent');
       }
       window.scrollTo(0, 0);
       app.flushProgress();

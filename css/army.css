@@ -7050,3 +7050,5 @@ img.pa-defy-tag { width: 30%; height: auto; font-size: 0; text-shadow: none; fil
 @media (max-width: 380px) { .pa-duo { gap: 4px; padding: 5px 6px; } .pa-side { gap: 4px; padding: 3px; } .pa-side .sc-med { width: 34px; height: 34px; } .pa-sn b { font-size: .7rem; } .pa-sp b { font-size: 1.15rem; } }
 /* v752 : Enchères, points du pouvoir annoncé d’un enchérisseur */
 .en-pow { color: #FFB49A; font-weight: 700; }
+/* v753 : rangée des Torches, bouton d'aide comme celui des Braises de vie */
+.dc-torch-row > .br-info { margin-left: auto; }

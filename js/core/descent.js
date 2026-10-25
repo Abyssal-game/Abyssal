@@ -133,7 +133,7 @@ const pick = (rng, list) => list[Math.floor(rng() * list.length)];
 // ——— Étages ———————————————————————————————————————————————————————
 export const ROOMS = {
   fight:    { name: 'Combat',         desc: 'Des créatures barrent le passage. Victoire : un bonus au choix.' },
-  elite:    { name: 'Élite',          desc: 'Plus dangereux : éclats doublés, 3 bonus au choix et un talent pour une de tes créatures.' },
+  elite:    { name: 'Élite',          desc: 'Plus dangereux : éclats doublés, 3 bonus au choix.' },
   altar:    { name: 'Autel ancien',   desc: 'Choisis une bénédiction pour tout le chapitre.' },
   rest:     { name: 'Source sacrée',  desc: 'Tes créatures récupèrent 30 % de leurs PV.' },
   treasure: { name: 'Trésor oublié',  desc: 'Une poignée d’éclats.' },
