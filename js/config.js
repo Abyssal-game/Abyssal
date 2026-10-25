@@ -1,15 +1,15 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v748'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v749'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
   { key: 'PC', name: 'Peu commune', short: 'PC', color: '#5FD08F' },
   { key: 'R',  name: 'Rare',        short: 'R',  color: '#5DAEFF' },
   { key: 'HR', name: 'Hyper rare',  short: 'HR', color: '#C266FF' },
-  { key: 'M',  name: 'Mythique',    short: 'M',  color: '#F0C75E' },
-  { key: 'S',  name: 'Secrète',     short: 'S',  color: '#FF5C8A' },
+  { key: 'M',  name: 'Mythique',    short: 'M',  color: '#FF5C8A' },
+  { key: 'S',  name: 'Secrète',     short: 'S',  color: '#F0C75E' },
 ];
 export const RARITY = Object.fromEntries(RARITIES.map((r, i) => [r.key, { ...r, index: i }]));
 export const RARITY_ORDER = RARITIES.map((r) => r.key);

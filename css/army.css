@@ -7025,3 +7025,8 @@ html:not([data-mat^="tp-"]) .sc-board:not([data-pmat^="tp-"]) .sc-plate { top: 1
 @keyframes paDefiGlow { 0%, 100% { filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .65)); } 50% { filter: drop-shadow(0 0 8px rgba(255, 70, 50, .85)); } }
 .pa-game.rm .pa-dbl2.on img { animation: none; }
 img.pa-defy-tag { width: 30%; height: auto; font-size: 0; text-shadow: none; filter: drop-shadow(0 0 14px rgba(220, 20, 40, .8)); }
+
+/* v749 (demande du propriétaire) : couleurs de rareté Mythique et Secrète inversées (Mythique rose, Secrète or : RARITIES dans js/config.js) */
+.op-card.glow-M.charging .tcg-back { --rc: #FF5C8A; }
+.epic-M .op-banner { color: #FFD6E4; text-shadow: 0 0 20px #FF5C8A, 0 0 60px #C8A45D; }
+.epic-S .op-banner { color: #FFF0C2; text-shadow: 0 0 20px #F0C75E, 0 0 60px #FFB84A; }
