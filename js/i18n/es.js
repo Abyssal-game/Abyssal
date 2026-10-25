@@ -8132,6 +8132,7 @@ export default {
   "Tu as déjà défié le pacte dans cette partie.": "Ya has desafiado el pacto en esta partida.",
   "Défier le pacte : pose d’abord une carte de faction (pas pendant un Présage).": "Desafiar el pacto: primero coloca una carta de facción (no durante un Presagio).",
   "Défier le pacte : tu tires une dernière carte. Si le pacte tient, tout le tour compte double, cette carte comprise (pour l’instant {n} points ×2). S’il se brise, tu perds tout. Une seule fois par partie.": "Desafiar el pacto: robas una última carta. Si el pacto aguanta, todo el turno cuenta doble, esa carta incluida (ahora {n} puntos ×2). Si se rompe, lo pierdes todo. Solo una vez por partida.",
+  "pour gagner": "para ganar",
 };
 
 export const names = {

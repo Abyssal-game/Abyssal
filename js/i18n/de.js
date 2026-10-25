@@ -8132,6 +8132,7 @@ export default {
   "Tu as déjà défié le pacte dans cette partie.": "Du hast den Pakt in dieser Partie schon herausgefordert.",
   "Défier le pacte : pose d’abord une carte de faction (pas pendant un Présage).": "Den Pakt herausfordern: Lege zuerst eine Fraktionskarte (nicht während eines Omens).",
   "Défier le pacte : tu tires une dernière carte. Si le pacte tient, tout le tour compte double, cette carte comprise (pour l’instant {n} points ×2). S’il se brise, tu perds tout. Une seule fois par partie.": "Den Pakt herausfordern: Du ziehst eine letzte Karte. Hält der Pakt, zählt der ganze Zug doppelt, diese Karte inklusive (derzeit {n} Punkte ×2). Bricht er, verlierst du alles. Nur einmal pro Partie.",
+  "pour gagner": "zum Sieg",
 };
 
 export const names = {

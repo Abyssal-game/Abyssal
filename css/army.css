@@ -6944,3 +6944,63 @@ html:not([data-mat^="tp-"]) .sc-board:not([data-pmat^="tp-"]) .sc-cell { backgro
 @keyframes pkGlow743 { 0%, 100% { opacity: .2; } 45% { opacity: 1; } 60% { opacity: .85; } }
 .op-pack .pk-glow, html.fx-light .pk-glow { display: none; }
 @media (prefers-reduced-motion: reduce) { .pk-glow { animation: none; opacity: .7; } }
+
+/* v745 : Pacte, embellissements (demande du propriétaire, points 1 à 5) */
+/* 5. un seul tableau des scores en tête : l'adversaire à gauche, toi à droite, le but au milieu */
+.pa-duo { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 6px; padding: 6px 8px; border-radius: 4px 14px 4px 14px;
+  background: linear-gradient(180deg, rgba(24, 16, 10, .94), rgba(10, 8, 12, .94)); border: 1px solid rgba(201, 164, 90, .4); box-shadow: inset 0 1px 0 rgba(255, 220, 150, .08), 0 6px 16px rgba(0, 0, 0, .45); }
+.pa-side { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 6px; min-width: 0; padding: 4px; border-radius: 10px; transition: background .25s, box-shadow .25s; }
+.pa-side.s-p { grid-template-columns: auto minmax(0, 1fr) auto; direction: rtl; }
+.pa-side.s-p > * { direction: ltr; }
+.pa-side .sc-med { width: 40px; height: 40px; flex: none; }
+.pa-side.on { background: rgba(242, 193, 78, .1); box-shadow: inset 0 0 0 1px rgba(242, 193, 78, .7), 0 0 12px rgba(242, 193, 78, .25); }
+.pa-side.s-a.on { background: rgba(224, 72, 94, .1); box-shadow: inset 0 0 0 1px rgba(224, 72, 94, .7), 0 0 12px rgba(224, 72, 94, .25); }
+.pa-sn { display: grid; gap: 4px; min-width: 0; }
+.pa-sn b { font: 700 .8rem/1.1 var(--f-display); color: #F2D9A0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pa-side.s-p .pa-sn b { text-align: right; }
+.pa-side.s-p .pa-bar { transform: scaleX(-1); }
+.pa-sn .pa-bar { height: 6px; }
+.pa-sp b { font: 800 1.35rem/1 var(--f-display); color: #FFE7A6; text-shadow: 0 2px 6px rgba(0, 0, 0, .6); }
+.pa-vs { display: grid; justify-items: center; line-height: 1; padding: 0 2px; }
+.pa-vs b { font: 800 .95rem/1 var(--f-display); color: #C9A45A; }
+.pa-vs small { font-size: .55rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+
+/* 1. la carte tirée vole de la pioche et se retourne : plus d'apparition de toutes les cartes à chaque dessin */
+.pa-game:not(.mp-pa) .pa-parch .pa-card { animation: none; }
+.pa-cback { position: absolute; inset: 0; z-index: 3; background: url(../assets/sceaux/dos.webp) center / cover; border-radius: inherit; pointer-events: none; }
+
+/* 2. le sceau de la faction posée s'embrase : flamme de cire, onde, étincelles à sa couleur */
+.pa-game:not(.mp-pa) .pa-seal.on { animation: none; }
+.pa-seal.pa-ignite { animation: paIgnite .7s cubic-bezier(.2, .8, .3, 1) both; }
+.pa-seal.pa-ignite::after { content: ''; position: absolute; inset: -30%; border-radius: 50%; border: 2px solid var(--fc); opacity: 0; animation: paIgniteRing .7s ease-out both; }
+@keyframes paIgnite { 0% { scale: 1; } 30% { scale: 1.55; filter: brightness(1.8); } 100% { scale: 1.12; filter: none; } }
+@keyframes paIgniteRing { 0% { opacity: .9; scale: .5; } 100% { opacity: 0; scale: 1.6; } }
+.pa-spark { position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; margin: -2.5px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, #fff 0 30%, var(--fc) 60%, transparent 72%); animation: paSpark .8s ease-out forwards; }
+@keyframes paSpark { 0% { transform: translate(0, 0) scale(1.2); opacity: 1; } 100% { transform: translate(var(--sx), var(--sy)) scale(.3); opacity: 0; } }
+
+/* 3. brisure : le parchemin tremble et se fend, les cartes brûlent puis partent en cendres */
+.pa-parch.pa-cracking { animation: paShake .45s ease-in-out; }
+@keyframes paShake { 0%, 100% { translate: 0 0; } 20% { translate: -5px 1px; } 40% { translate: 5px -1px; } 60% { translate: -3px 0; } 80% { translate: 2px 1px; } }
+.pa-crack { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; overflow: visible; }
+.pa-crack path { fill: none; stroke: #2A0A06; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 420; stroke-dashoffset: 420; animation: paCrack .5s ease-out forwards; }
+.pa-crack path + path { stroke-width: 2; animation-delay: .18s; }
+@keyframes paCrack { to { stroke-dashoffset: 0; } }
+.pa-card.pa-burning::after { content: ''; position: absolute; inset: 0; z-index: 4; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(circle at 50% 100%, #FFE08A 0, #FF7A1A 30%, #8A1A06 62%, #120604 90%); opacity: 0; animation: paChar .55s ease-in var(--bd, 0ms) forwards; }
+.pa-card.pa-burning { animation: paAsh .5s ease-in calc(var(--bd, 0ms) + 450ms) forwards !important; }
+@keyframes paChar { 0% { opacity: 0; } 60% { opacity: .95; } 100% { opacity: 1; background-color: #120604; } }
+@keyframes paAsh { 0% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-10px) scale(.82); } }
+.pa-ember { position: absolute; bottom: 20%; width: 4px; height: 4px; border-radius: 50%; pointer-events: none; z-index: 5;
+  background: radial-gradient(circle, #FFF2B0 0 30%, #FF8A2A 60%, transparent 72%); opacity: 0; animation: paEmber 1s ease-out var(--ed, 0ms) forwards; }
+@keyframes paEmber { 0% { opacity: 0; transform: translate(0, 0); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--ex, 0), -60px) scale(.4); } }
+
+/* 4. Défier le pacte : parchemin rougi, lueur de sang, bord de l'écran qui bat jusqu'à la carte décisive */
+.pa-parch.defy { box-shadow: 0 0 0 2px rgba(180, 20, 30, .8), 0 0 26px 6px rgba(200, 20, 40, .55), 0 10px 24px rgba(0, 0, 0, .65); }
+.pa-parch.defy::before { content: ''; position: absolute; inset: 0; z-index: 1; border-radius: inherit; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, rgba(160, 10, 20, 0) 35%, rgba(140, 6, 18, .45) 100%); animation: paDefyPulse .9s ease-in-out infinite; }
+.pa-defy-tag { position: absolute; left: 50%; top: 52%; z-index: 2; translate: -50% -50%; font: 900 2.6rem/1 var(--f-display); color: #FFD9A0; text-shadow: 0 0 10px #E0203A, 0 0 22px #B0101E, 0 2px 4px #000; pointer-events: none; animation: paDefyTag .9s ease-in-out infinite; }
+.pa-game.defy::after { content: ''; position: fixed; inset: 0; z-index: 30; pointer-events: none; box-shadow: inset 0 0 60px 18px rgba(170, 10, 24, .7); animation: paDefyPulse .9s ease-in-out infinite; }
+@keyframes paDefyPulse { 0%, 100% { opacity: .55; } 15% { opacity: 1; } 30% { opacity: .65; } 45% { opacity: .95; } }
+@keyframes paDefyTag { 0%, 100% { scale: 1; } 15% { scale: 1.12; } 30% { scale: 1; } 45% { scale: 1.07; } }
+.pa-game.rm .pa-parch.defy::before, .pa-game.rm .pa-defy-tag, .pa-game.rm.defy::after { animation: none; }
+html.fx-light .pa-game.defy::after { animation: none; opacity: .7; }

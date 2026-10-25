@@ -8143,6 +8143,7 @@ export default {
   "Tu as déjà défié le pacte dans cette partie.": "You have already defied the Pact this game.",
   "Défier le pacte : pose d’abord une carte de faction (pas pendant un Présage).": "Defy the Pact: first play a faction card (not during an Omen).",
   "Défier le pacte : tu tires une dernière carte. Si le pacte tient, tout le tour compte double, cette carte comprise (pour l’instant {n} points ×2). S’il se brise, tu perds tout. Une seule fois par partie.": "Defy the Pact: you draw one last card. If the pact holds, the whole turn counts double, that card included (currently {n} points ×2). If it breaks, you lose everything. Only once per game.",
+  "pour gagner": "to win",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

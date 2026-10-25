@@ -45,7 +45,9 @@ export const howHTML = () => `<ol class="how-steps">${HOW.map(howLi).join('')}</
 
 export default function pacteScreen(app, root) {
   const g = app.game, cat = app.catalog;
-  let busy = false, timer = 0, gone = false, banner = null;
+  let busy = false, timer = 0, gone = false, banner = null, defy = null;
+  /* v745 : effets du Pacte (carte qui vole de la pioche, sceau qui s'embrase) : ce que l'écran montrait au dessin précédent */
+  let prevSig = [], prevLit = new Set();
   const wait = (ms) => new Promise((r) => { timer = setTimeout(r, app.reduced() ? Math.min(ms, 150) : ms); });
   const fname = (f) => cat.faction[f]?.name || f;
   const todayKey = () => { const d = g.clock(), p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; };
@@ -105,20 +107,13 @@ export default function pacteScreen(app, root) {
     return `<span class="pa-card f-${c.f} ${c.x2 ? 'x2' : ''} ${cls}" style="--fc:${cat.faction[c.f]?.colors.secondary || '#888'}"><img alt="" src="${card ? artUrl(card, { lite: true }) : 'assets/sceaux/dos.webp'}">
       <b class="pa-v">${c.v}${c.x2 ? '<small>×2</small>' : ''}</b><span class="pa-cf">${sigil(c.f)}</span></span>`;
   };
-  const seat = (st, x) => {
-    const sc = st.scores[x], R = PA.RIVALS[st.rival];
-    return `<div class="pa-seat s-${x} ${st.turn === x && !st.over ? 'on' : ''}">
-      <span class="sc-med ${x === 'p' ? 'mq-me' : ''}">${x === 'p' ? me() : pic(st.rival)}</span>
-      <span class="pa-sc"><b>${x === 'p' ? 'Toi' : esc(R.name)}</b><span class="pa-bar"><i style="width:${Math.min(100, (sc / PA.tgt(st)) * 100)}%"></i></span></span>
-      <span class="pa-pts"><b>${sc}</b><small>/ ${PA.tgt(st)}</small></span></div>`;
-  };
   function center(st) {
     /* v464 : la table est un parchemin : la rangée dans le cadre rouge, un sceau de cire s'allume pour chaque faction posée */
     const v = PA.rowValue(st), risk = Math.round(PA.bustChance(st) * 100), fs = PA.rowFactions(st), nf = fs.size;
     /* v511 : la gravure d'origine des sceaux (dont des étoiles à six branches) est effacée dans pa-table2.webp : chaque sceau porte l'emblème de sa faction */
-    const seals = SEALS.map(([f, x, y]) => `<i class="pa-seal ${fs.has(f) ? 'on' : ''}" style="left:${(x / 4.5).toFixed(1)}%;top:${(y / 3.3).toFixed(1)}%;--fc:${cat.faction[f]?.colors.secondary || '#C9A45A'}">${sigil(f)}</i>`).join('');
+    const seals = SEALS.map(([f, x, y]) => `<i class="pa-seal ${fs.has(f) ? 'on' : ''}" data-f="${f}" style="left:${(x / 4.5).toFixed(1)}%;top:${(y / 3.3).toFixed(1)}%;--fc:${cat.faction[f]?.colors.secondary || '#C9A45A'}">${sigil(f)}</i>`).join('');
     const ban = banner ? `<div class="pa-ban">${banner.bust ? '<img class="pa-burn" alt="" src="assets/jeux/pa-brisure.webp">' : ''}<div class="mq-banner ${banner.cls}">${banner.html}</div></div>` : '';
-    return `<div class="pa-parch">
+    return `<div class="pa-parch ${defy ? 'defy' : ''}">${defy && !banner ? `<span class="pa-defy-tag">×2</span>` : ''}
       <div class="pa-row" style="--n:${Math.max(1, st.row.length)}">${st.row.length ? st.row.map((c) => cardHTML(c)).join('') : `<span class="pa-empty">${st.turn === 'p' ? 'Tire ta première carte.' : '…'}</span>`}</div>
       ${seals}
       <div class="pa-info"><span>Ce tour : <b>${v}</b> point${v > 1 ? 's' : ''}</span><span class="pa-fac">${nf} / 7 sceaux</span>
@@ -135,7 +130,7 @@ export default function pacteScreen(app, root) {
       <div class="pa-pfs">${facs}</div>${sps ? `<div class="pa-pss">${sps}</div>` : ''}</div>`;
   }
   function controls(st) {
-    if (st.over || busy || st.turn !== 'p') return `<div class="mq-ctl"><p class="mq-q">${st.over ? '' : `Tour de ${esc(PA.RIVALS[st.rival].name)}…`}</p></div>`;
+    if (st.over || busy || st.turn !== 'p') return `<div class="mq-ctl"><p class="mq-q">${st.over || st.turn === 'p' ? '' : `Tour de ${esc(PA.RIVALS[st.rival].name)}…`}</p></div>`;
     const v = PA.rowValue(st), must = st.must > 0, canStop = st.row.some((c) => c.f) && !must;
     /* v561 : Malédiction (tirer encore) et Défier le pacte (une fois par partie) */
     return `<div class="mq-ctl pa-ctl"><button class="btn primary dc-plq dc-plq-red" data-pa="draw">${icon('cards')}Tirer</button>
@@ -159,14 +154,79 @@ export default function pacteScreen(app, root) {
     document.body.classList.add('battle-mode');
     setScene(null); scene();
     const T = PA.TABLE[st.table];
-    root.innerHTML = `<div class="mq-game pa-game ${app.reduced() ? 'rm' : ''}">
+    root.innerHTML = `<div class="mq-game pa-game ${app.reduced() ? 'rm' : ''} ${defy ? 'defy' : ''}">
       <div class="mq-bar"><button class="btn small ghost" data-pa="rules" aria-label="Règles">${icon('p:help')}</button><b>${esc(T.name)}</b><button class="btn small ghost" data-pa="quit" aria-label="Quitter la partie">${icon('close')}</button></div>
-      ${seat(st, 'a')}
+      ${duo(st)}
       ${pioche(st)}
       <div class="mq-table pa-table">${center(st)}</div>
       ${st.peek && st.turn === 'p' && st.deck.length && !busy ? `<div class="pa-peek">${cardHTML(st.deck[st.deck.length - 1])}<span><b>Présage</b> <span class="small">La prochaine carte sera celle-ci. Tire-la ou arrête-toi.</span></span></div>` : ''}
-      ${seat(st, 'p')}
       ${controls(st)}</div>`;
+    fx(st);
+  }
+  /* v745 : un seul tableau des scores en tête (adversaire à gauche, toi à droite) au lieu de deux grands cadres */
+  function duo(st) {
+    const R = PA.RIVALS[st.rival], T = PA.tgt(st), side = (x) => {
+      const sc = st.scores[x], on = st.turn === x && !st.over;
+      return `<span class="pa-side s-${x} ${on ? 'on' : ''}"><span class="sc-med ${x === 'p' ? 'mq-me' : ''}">${x === 'p' ? me() : pic(st.rival)}</span>
+        <span class="pa-sn"><b>${x === 'p' ? 'Toi' : esc(R.name)}</b><span class="pa-bar"><i style="width:${Math.min(100, (sc / T) * 100)}%"></i></span></span>
+        <span class="pa-sp"><b>${sc}</b></span></span>`;
+    };
+    return `<div class="pa-duo">${side('a')}<span class="pa-vs"><b>${T}</b><small>pour gagner</small></span>${side('p')}</div>`;
+  }
+  const sigOf = (c) => c.sp ? `s:${c.sp}` : `${c.f}:${c.v}:${c.id || ''}`;
+  /* v745 : la carte qui vient d'être tirée part de la pioche, vole jusqu'au parchemin et se retourne ; le sceau de sa faction s'embrase */
+  function fx(st) {
+    const sig = st.row.map(sigOf), fs = PA.rowFactions(st);
+    const grew = sig.length === prevSig.length + 1 && prevSig.every((x, i) => x === sig[i]);
+    const lit = grew ? [...fs].filter((f) => !prevLit.has(f)) : [];
+    prevSig = sig; prevLit = new Set(fs);
+    if (!grew || app.reduced()) return;
+    const card = root.querySelector('.pa-parch .pa-row .pa-card:last-child'), pile = root.querySelector('.pa-pioche .pa-pile');
+    if (card && pile && card.animate) {
+      const a = card.getBoundingClientRect(), b = pile.getBoundingClientRect();
+      const dx = b.left + b.width / 2 - (a.left + a.width / 2), dy = b.top + b.height / 2 - (a.top + a.height / 2), k = Math.min(1, b.width / Math.max(1, a.width));
+      const back = document.createElement('i'); back.className = 'pa-cback'; card.appendChild(back);
+      card.animate([
+        { transform: `translate(${dx}px, ${dy}px) scale(${k})`, offset: 0 },
+        { transform: 'translate(0, -10px) scale(1.08)', offset: 0.55 },
+        { transform: 'translate(0, -6px) scale(0.02, 1.1)', offset: 0.75 },
+        { transform: 'translate(0, -4px) scale(1.06)', offset: 0.9 },
+        { transform: 'none', offset: 1 }], { duration: 560, easing: 'cubic-bezier(.3, .7, .3, 1)' });
+      back.animate([{ opacity: 1, offset: 0 }, { opacity: 1, offset: 0.74 }, { opacity: 0, offset: 0.76 }, { opacity: 0, offset: 1 }], { duration: 560, fill: 'forwards' }).onfinish = () => back.remove();
+    }
+    for (const f of lit) {
+      const el = root.querySelector(`.pa-seal[data-f="${f}"]`);
+      if (!el) continue;
+      setTimeout(() => { if (!el.isConnected) return; el.classList.add('pa-ignite'); sparks(el, 8); }, 420);
+    }
+  }
+  function sparks(el, n) {
+    for (let i = 0; i < n; i++) {
+      const s = document.createElement('i'), a = (i / n) * Math.PI * 2 + Math.random() * 0.6;
+      s.className = 'pa-spark'; s.style.setProperty('--sx', `${Math.cos(a) * (22 + Math.random() * 16)}px`); s.style.setProperty('--sy', `${Math.sin(a) * (22 + Math.random() * 16) - 10}px`);
+      el.appendChild(s); setTimeout(() => s.remove(), 900);
+    }
+  }
+  /* v745 : brisure : le parchemin se fend, les cartes du tour brûlent et partent en cendres */
+  async function burnRow() {
+    const parch = root.querySelector('.pa-parch');
+    if (!parch || app.reduced()) return;
+    parch.classList.add('pa-cracking');
+    parch.insertAdjacentHTML('beforeend', `<svg class="pa-crack" viewBox="0 0 450 330" preserveAspectRatio="none" aria-hidden="true"><path d="M225 8 L212 52 L236 88 L205 130 L232 170 L214 214 L240 262 L220 322"/><path d="M212 52 L170 70 L140 64"/><path d="M236 88 L286 104 L318 96"/><path d="M205 130 L160 150"/><path d="M232 170 L280 190 L300 214"/><path d="M214 214 L176 236"/></svg>`);
+    parch.querySelectorAll('.pa-row .pa-card').forEach((c, i) => { c.style.setProperty('--bd', `${i * 70}ms`); c.classList.add('pa-burning'); });
+    const row = parch.querySelector('.pa-row');
+    if (row) for (let i = 0; i < 14; i++) {
+      const e = document.createElement('i'); e.className = 'pa-ember';
+      e.style.left = `${8 + Math.random() * 84}%`; e.style.setProperty('--ed', `${Math.random() * 400}ms`); e.style.setProperty('--ex', `${(Math.random() - 0.5) * 40}px`);
+      row.appendChild(e);
+    }
+    await wait(1000);
+  }
+  /* v745 : Défier le pacte : le parchemin rougit, le bord de l'écran bat comme un cœur jusqu'à la carte décisive */
+  async function defyMoment(who, paint) {
+    defy = who; paint();
+    app.sfx.suspensebig?.();
+    await wait(1500);
   }
   // Annonce d'un événement (brisure, protection, arrêt…)
   async function say(st, ev, ms = 1500) {
@@ -193,6 +253,7 @@ export default function pacteScreen(app, root) {
     let drawn = 0;
     for (const ev of evs) {
       if (gone) return;
+      if (ev.dbl) { await defyMoment('a', () => renderShown(shown)); if (gone) return; }
       if (ev.card) { drawn++; ui.deckView = snap.deck.length >= drawn ? snap.deck.slice(0, snap.deck.length - drawn) : null; }
       if (ev.card) {
         if (ev.result === 'ok') {
@@ -209,9 +270,10 @@ export default function pacteScreen(app, root) {
         await say(g.s.pacte.cur, ev, 1300); renderShown(shown); await wait(400); continue;
       }
       if (ev.card) shown.row.push(ev.x2 ? { ...ev.card, x2: true } : ev.card);
-      renderShown(shown); await wait(450);
+      renderShown(shown); await wait(ev.card ? 650 : 450);
+      if (ev.result === 'bust') await burnRow();
       shown.row = []; shown.sceaux = 0; shown.offer = false;
-      await say(g.s.pacte.cur, ev, 1500);
+      await say(g.s.pacte.cur, ev, 1500); defy = null;
     }
     busy = false; ui.deckView = null;
     if (gone) return;
@@ -258,7 +320,7 @@ export default function pacteScreen(app, root) {
     const st = g.s.pacte.cur, R = PA.RIVALS[st.rival];
     app.sfx.enter?.();
     banner = { cls: 'intro', html: `<span class="sc-med">${pic(st.rival)}</span><span class="mq-vd"><small>${esc(R.name)}</small><b>« ${esc(R.hello)} »</b><span>Le premier à ${PA.tgt(st)} points gagne.${st.scores.a ? ` ${esc(R.name)} commence avec ${st.scores.a} points.` : ''}${PA.TABLE[st.table].rule ? `<em class="gm-ruleline">${esc(PA.TABLE[st.table].rule)}</em>` : ''}</span></span>` };
-    busy = true; view();
+    busy = true; prevSig = []; prevLit = new Set(); view();
     tuto(app, 'pacte').then(() => tuto(app, 'pacte-play')).then(() => wait(1400)).then(() => { banner = null; busy = false; if (!gone) view(); });
   }
   function rules() { openSheet(`<div class="sc-rules"><h2>Le Pacte</h2>${howHTML()}</div>`, { label: 'Règles du Pacte' }); }
@@ -294,14 +356,18 @@ export default function pacteScreen(app, root) {
     try { ev = k === 'draw' ? g.pacteDraw() : k === 'stop' ? g.pacteStop() : k === 'double' ? g.pacteDouble() : null; } catch (err) { toast(esc(err.message), { kind: 'error' }); return; }
     if (!ev) return;
     busy = true;
+    if (ev.dbl) await defyMoment('p', () => renderShown(before, 'p'));
     if (ev.card && ev.result === 'ok') app.sfx[ev.card.sp === 'offrande' ? 'pa-offer' : 'pa-draw']?.();
     if (ev.result === 'ok' && ev.curse) { await say(st, ev, 1500); busy = false; if (!gone) view(); return; }
     if (ev.result === 'ok') { busy = false; view(); return; }
     if (ev.card && ev.result !== 'saved') {
       // la carte qui brise (ou arrête, ou complète les sept) se voit un instant dans la rangée avant l'annonce
-      renderShown({ ...before, row: [...before.row, ev.x2 ? { ...ev.card, x2: true } : ev.card] }, 'p'); await wait(450);
+      if (ev.dbl || ev.result === 'bust') app.sfx['pa-draw']?.();
+      renderShown({ ...before, row: [...before.row, ev.x2 ? { ...ev.card, x2: true } : ev.card] }, 'p'); await wait(650);
+      if (ev.result === 'bust') await burnRow();
     }
     await say(st, ev);
+    defy = null;
     busy = false;
     if (gone) return;
     view();
