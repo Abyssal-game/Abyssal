@@ -7179,3 +7179,8 @@ img.pa-defy-tag { width: 30%; height: auto; font-size: 0; text-shadow: none; fil
 /* v772 : sachet de l'Abysse : le corps peint va de 2 à 89 % de l'image (débris à droite), textes centrés dessus */
 .pack-abysse .pk-logo { left: 2%; right: 11%; padding-left: .22em; }
 .pack-abysse .pk-label { left: 8%; right: 17%; }
+
+/* v773 : « Rejouer un chapitre » en grille de 5 (avant : rangée qui sortait de l'écran, le chapitre 8 coupé) */
+.dc-starts-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; overflow: visible; padding: 2px 0 4px; }
+.dc-starts .dc-st { min-width: 0; width: 100%; min-height: 44px; padding: 0; border-radius: 14px; position: relative; font-size: .95rem; }
+.dc-st.cur::after { content: ""; position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 6px var(--gold); }

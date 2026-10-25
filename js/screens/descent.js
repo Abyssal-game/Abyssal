@@ -63,7 +63,7 @@ export default function descent(app, root) {
     const fl = g.startFloors();
     if (fl.length < 2) return '';
     const s = startFloor();
-    return `<details class="dc-starts" ${chapterOf(s) !== chapNow() ? 'open' : ''}><summary class="small muted">Rejouer un chapitre</summary><div class="dc-starts-row">${fl.map((f) => { const c = chapterOf(f); return `<button class="dc-st ${f === s ? 'on' : ''}" data-act="startat" data-f="${f}" aria-pressed="${f === s}">${c === chapNow() && !chapDone(c) ? `${c} · en cours` : c}</button>`; }).join('')}</div></details>`;
+    return `<details class="dc-starts" ${chapterOf(s) !== chapNow() ? 'open' : ''}><summary class="small muted">Rejouer un chapitre</summary><div class="dc-starts-row">${fl.map((f) => { const c = chapterOf(f); const cur = c === chapNow() && !chapDone(c); return `<button class="dc-st ${f === s ? 'on' : ''} ${cur ? 'cur' : ''}" data-act="startat" data-f="${f}" aria-pressed="${f === s}"${cur ? ' aria-label="Chapitre en cours"' : ''}>${c}</button>`; /* v773 : grille, plus de « · en cours » */ }).join('')}</div></details>`;
   }
 
   // ——— Accueil de l'Aventure ———————————————————————————————————————————
