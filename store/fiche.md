@@ -85,7 +85,7 @@ COMBATS TACTIQUES
 
 LE CERCLE DE L'ABYSSE
 • Les Duels des Sceaux : pose tes créatures sur le plateau et capture celles de l'adversaire, contre 8 rivaux
-• Les Enchères de Mammon : des enchères à l'aveugle où miser pareil ne rapporte rien
+• Les Enchères de Mammon : des offrandes secrètes, et deux offrandes égales s'annulent
 • Le Pacte : tire des cartes, encore une… et arrête-toi avant de briser le pacte
 • Les Cryptes : un jeu de mémoire où chaque paire réveille le pouvoir de sa faction
 • Joue contre d'autres joueurs, en partie rapide ou à ton rythme, et défie tes amis
