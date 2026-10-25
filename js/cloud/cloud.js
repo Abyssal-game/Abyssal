@@ -38,7 +38,7 @@ function frError(status, body) {
   if (m.includes('duplicate') || m.includes('profiles_pseudo_key') || status === 409) return 'Ce pseudo est déjà pris.';
   if (m.includes('check constraint') || m.includes('violates check')) return 'Pseudo invalide : 3 à 16 lettres, chiffres, espaces, - ou _.';
   if (m.includes('mp_') || m.includes('sceaux_mp') || m.includes('pacte_mp')) return 'Les parties contre d’autres joueurs ne sont pas encore ouvertes sur le serveur.'; /* v519 : supabase/09-multijoueur.sql pas encore collé */
-  if (m.includes('versus_')) return 'Le Pari des Boosters n’est pas encore ouvert sur le serveur.'; /* v512 : supabase/08-versus.sql pas encore collé */
+  if (m.includes('versus_')) return 'Le Choc des Boosters n’est pas encore ouvert sur le serveur.'; /* v512 : supabase/08-versus.sql pas encore collé */
   if (m.includes('friend_') || m.includes('player_cards')) return 'Les amis ne sont pas encore ouverts sur le serveur.';
   if (status === 401 || status === 403) return 'Session expirée : reconnecte-toi.';
   if (status >= 500) return 'Le serveur ne répond pas correctement. Réessaie dans un instant.';

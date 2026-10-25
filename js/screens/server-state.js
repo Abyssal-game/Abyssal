@@ -17,7 +17,7 @@ const FILES = [
   { n: '05', file: '05-tirage.sql', what: 'Tirage des Ombres', test: R('shadow_today') },
   { n: '06', file: '06-signalements.sql', what: 'Signalement des pseudos', test: T('pseudo_reports?select=*&limit=0') },
   { n: '07', file: '07-amis.sql', what: 'Amis et pseudo définitif', test: R('friend_list') },
-  { n: '08', file: '08-versus.sql', what: 'Pari des Boosters (et cartes du serveur)', test: R('versus_list') },
+  { n: '08', file: '08-versus.sql', what: 'Choc des Boosters (et cartes du serveur)', test: R('versus_list') },
   { n: '09', file: '09-multijoueur.sql', what: 'Jeux en ligne', test: R('mp_list', { p_game: 'sceaux' }) },
   { n: '10', file: '10-profils.sql', what: 'Profil de n’importe quel joueur', test: () => R('public_profile', { p_id: cloud.currentUser()?.id })() },
   { n: '11', file: '11-anti-triche.sql', what: 'Contrôles anti-triche (titres, cartes, Épreuves)', test: T('game_titles?select=*&limit=0') },

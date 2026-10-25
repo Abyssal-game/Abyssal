@@ -10,9 +10,10 @@ export const CHALLENGES = [
 export const WEEK_DAYS = 5; // jours joués dans la semaine pour le coffre de la semaine
 export const FIRST_WIN = 50;
 export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par combat n'augmentent plus // éclats de la toute première victoire
-import { FINAL_FLOOR, BOOSTERS, FREE_PACK, BRAISE, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, sublimeObs, VARIANTS, FIN_ORDER } from '../config.js';
+import { FINAL_FLOOR, BOOSTERS, FREE_PACK, BRAISE, TORCHES, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, sublimeObs, VARIANTS, FIN_ORDER } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
+import { VERSUS_PRIZE } from './versus.js'; /* v735 */
 import { CODEX, CODEX_XP, SHOP, CATALOG, FREE_EMOTES, codexTier, seasonFor, tiersOf, freshCodex, pendingOf, CODEX_OPEN, QUEST_KINDS, questsFor, seasonWeek } from './codex.js';
 import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, lateSoft, bossEase, earlyHp, expectedLevel, cardPower, powerFor, advisedPower, floorForPower, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative, act as duelActRaw, useUlt, beginEnemyTurn, nextEnemy, takeSkips, enemyAct, endEnemyTurn, RHYTHM } from './duel.js';
@@ -475,22 +476,23 @@ export class Game {
   // v512 : Versus Booster. La mise est payée par le jeu (éclats de la sauvegarde) ; le serveur ouvre les boosters
   // et dit ce que chaque joueur encaisse (supabase/08-versus.sql). Chaque défi n'est encaissé qu'une fois.
   versusPay(stake) {
-    if (!(stake > 0)) throw new Error('Mise invalide.');
-    if (this.s.shards < stake) throw new Error(`Il te manque ${stake - this.s.shards} éclats pour cette mise.`);
+    if (!(stake > 0)) throw new Error('Prix invalide.');
+    if (this.s.shards < stake) throw new Error(`Il te manque ${stake - this.s.shards} éclats pour ce défi.`);
     this.s.shards -= stake;
     this.s.stats.shardsSpent += stake;
     this.s.versus.spent += stake;
     this.persist();
   }
   versusRefund(stake) { if (stake > 0) { this.s.shards += stake; this.s.stats.shardsSpent = Math.max(0, this.s.stats.shardsSpent - stake); this.s.versus.spent = Math.max(0, this.s.versus.spent - stake); this.persist(); } }
-  // res = réponse de versus_claim : { result: win|tie|lose|refund|already|wait, cards, stake }
+  // res = réponse de versus_claim : { result: win|tie|lose|refund|already|wait, cards, stake, packs, trophy, chest }
+  // v735 : chacun garde ses cartes ; butin du gagnant donné par le jeu (VERSUS_PRIZE, js/core/versus.js)
   versusApply(id, res) {
     const v = this.s.versus;
     if (!res || v.done[id] || !['win', 'tie', 'lose', 'refund'].includes(res.result)) return null;
     v.done[id] = res.result;
     const keys = Object.keys(v.done);
     if (keys.length > 200) for (const k of keys.slice(0, keys.length - 200)) delete v.done[k];
-    const out = { result: res.result, cards: [], shards: 0 };
+    const out = { result: res.result, cards: [], shards: 0, trophy: null, chest: null };
     if (res.result === 'refund') { this.versusRefund(res.stake); out.shards = res.stake; return out; }
     v.played++;
     if (res.result === 'win') v.wins++; else if (res.result === 'tie') v.ties++; else v.losses++;
@@ -499,7 +501,24 @@ export class Game {
       const r = this.addCard(c.id, c.variant || 'normal', 'booster');
       out.cards.push({ ...c, ...r });
     }
-    v.won += out.cards.length;
+    // butin du jeu : seulement pour les boosters du jour qui comptent encore
+    const day = today(this.clock());
+    if (v.prizeDay !== day) { v.prizeDay = day; v.prizePacks = 0; }
+    const packs = Math.max(1, Math.min(3, res.packs || 1)), counted = Math.max(0, Math.min(packs, VERSUS_PRIZE.packsPerDay - (v.prizePacks || 0)));
+    v.prizePacks = (v.prizePacks || 0) + counted;
+    out.counted = counted; out.packs = packs;
+    if (counted > 0 && (res.result === 'win' || res.result === 'tie')) {
+      out.shards = Math.round((res.stake || 0) * VERSUS_PRIZE[res.result] * counted / packs / 5) * 5;
+      if (out.shards > 0) this.grant({ shards: out.shards }, 'versus');
+    }
+    if (counted > 0 && res.result === 'win') {
+      const tr = res.trophy, tc = tr && this.catalog.get(tr.id);
+      if (tc && VERSUS_PRIZE.trophyRar.includes(tc.rarity)) { const r = this.addCard(tr.id, tr.variant || 'normal', 'booster'); out.trophy = { ...tr, ...r }; }
+      else if (res.chest === 'abyssal' || tc) { this.addChests({ abyssal: 1 }); out.chest = 'abyssal'; }
+    }
+    v.streak = res.result === 'win' ? (v.streak || 0) + 1 : res.result === 'lose' ? 0 : (v.streak || 0);
+    v.best = Math.max(v.best || 0, v.streak);
+    v.won += out.cards.length + (out.trophy ? 1 : 0);
     this.s.xp += 10;
     out.progress = this.checkProgress();
     this.persist();
@@ -1469,10 +1488,17 @@ export class Game {
     if (nf) { nf.title = nm; nf.named = true; nf.maxHp = Math.round(nf.maxHp * 1.3); nf.hp = nf.maxHp; nf.atk = Math.round(nf.atk * 1.15 + 0.4); }
     return enemies;
   }
+  // v735 : Torches de la Descente (TORCHES par jour, sans réserve ; d.used remis à zéro chaque jour par descent())
+  torches() { const d = this.descent(); return { left: Math.max(0, TORCHES - (d.used || 0)), max: TORCHES }; }
   startBattle(room, out = { room }) {
     const run = this.s.descent.run;
     const rule = this.rule(run.day);
     if (room === 'fight' || room === 'elite' || room === 'boss') {
+      if (!run.devFree) { /* v735 : une Torche par combat (les essais du Mode Créateur n'en brûlent pas) */
+        const d = this.descent();
+        if ((d.used || 0) >= TORCHES) throw new Error('Tes Torches sont éteintes : ton équipe se repose. Elles se rallument à minuit.');
+        d.used = (d.used || 0) + 1;
+      }
       // les créatures du Bestiaire, corrompues ; l'état du duel est gardé dans l'expédition (reprise exacte)
       // plancher : ennemis ordinaires et élites au moins au niveau de l'étage équivalent à l'équipe (pas les gardiens)
       const enemies = this.foesFor(run, room, rule); /* v595 : construction des ennemis partagée avec le banc d'essai du Mode Créateur */
@@ -2221,6 +2247,7 @@ export class Game {
     if (!this.s.descent.run) { this.s.fallen = {}; this.startRun(); } /* v668 : outil d'essai, l'équipe repart debout */
     const run = this.s.descent.run;
     if (run.phase === 'omen') this.chooseOmen(run.omenOffer[0]);
+    run.devFree = true; /* v735 : essais du Mode Créateur, sans Torche */
     run.battle = null; run.altar = null; run.rewards = null; run.talentOffer = null;
     return { floor: (i + 1) * DESCENT.bossEvery, level: this.devFloor((i + 1) * DESCENT.bossEvery, { power }) };
   }

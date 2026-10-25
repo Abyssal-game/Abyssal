@@ -1,4 +1,4 @@
-// v521 : le face-à-face du Pari des Boosters, en plein écran (demande du propriétaire : « que ça prenne l'écran entier,
+// v521 : le face-à-face du Choc des Boosters, en plein écran (demande du propriétaire : « que ça prenne l'écran entier,
 // un beau décor, les boosters déchirés en même temps, les 3 cartes qui sortent, puis on enchaîne… et du suspense »).
 // Pour chaque booster de la composition : les deux sachets apparaissent face à face, tremblent, se déchirent ensemble,
 // les cartes jaillissent face cachée vers leur place, puis se retournent une à une, en alternance, avec leurs points.
@@ -56,7 +56,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
   el.className = `vd ${app.reduced() ? 'rm' : ''} n${lineup.length}`;
   el.setAttribute('role', 'dialog');
   el.setAttribute('aria-modal', 'true');
-  el.setAttribute('aria-label', t('Le Pari des Boosters'));
+  el.setAttribute('aria-label', t('Le Choc des Boosters'));
   el.innerHTML = `<div class="vd-board"><span class="vd-embers"></span>
       ${plate('foe', esc(foeName), r.avatar)}
       ${rows(foePacks, 'foe')}
@@ -170,15 +170,23 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
     setScore('me'); setScore('foe'); lead();
     q('.vd-mid').classList.remove('show');
     q('.vd-skip').hidden = true; q('.vd-step').textContent = '';
-    const nWon = out?.cards?.length || (res === 'win' ? mine.length + theirs.length : res === 'tie' ? mine.length : 0);
+    /* v735 : chacun garde ses cartes ; le gagnant reçoit le butin du jeu (copie, coffre abyssal, éclats) */
+    const nWon = out?.cards?.length || mine.length;
     const fresh = (out?.cards || []).filter((c) => c.isNewCard).length;
+    const tc = out?.trophy && app.catalog.get(out.trophy.id);
+    const loot = [tc ? `<span class="vd-loot"><img alt="" src="${artUrl(tc, { lite: true })}"><span>${t('Copie de <b>{card}</b>', { card: esc(tc.name) })}${out.trophy.isNewCard ? ` <em>${t('Nouvelle !')}</em>` : ''}</span></span>` : '',
+      out?.chest ? `<span class="vd-loot"><img alt="" src="assets/icons/chest.webp"><span>${t('Coffre abyssal')}</span></span>` : '',
+      out?.shards ? `<span class="vd-loot"><img alt="" src="assets/icons/cur-shard.webp"><span>+${fmt(out.shards)} ${t('éclats')}</span></span>` : ''].filter(Boolean).join('');
+    const noPrize = out && out.counted === 0 && res !== 'lose';
     el.classList.add('end', res);
     const end = q('.vd-end');
     end.hidden = false;
     end.innerHTML = `<div class="vd-burst"></div><img class="vd-emb ${res}" alt="" src="assets/versus/${EMB[res]}.webp"><h2 class="vd-title ${res}">${t(RES[res])}</h2>
       <p class="vd-tally"><b>${fmt(sc.me)}</b> <span>${t('contre')}</span> <b>${fmt(sc.foe)}</b></p>
-      <p>${res === 'win' ? t(fresh ? 'Tu remportes <b>les {n} cartes</b> du duel, dont <b>{f} nouvelles</b> !' : 'Tu remportes <b>les {n} cartes</b> du duel !', { n: nWon, f: fresh })
-        : res === 'tie' ? t('Même total : tu gardes <b>les {n} cartes</b> de tes boosters.', { n: nWon }) : t('{name} remporte toutes les cartes.', { name: esc(foeName) })}</p>
+      <p>${t(fresh ? 'Tu gardes <b>tes {n} cartes</b>, dont <b>{f} nouvelles</b>.' : 'Tu gardes <b>tes {n} cartes</b>.', { n: nWon, f: fresh })}
+        ${res === 'win' ? t('Et l’Abysse t’offre le butin :') : res === 'tie' ? t('Même total : chacun reçoit une part du butin.') : t('{name} gagne le butin. Tu ne perds rien.', { name: esc(foeName) })}</p>
+      ${loot ? `<div class="vd-loots">${loot}</div>` : ''}
+      ${noPrize ? `<p class="small">${t('Butin du jour déjà gagné : ce duel était pour la gloire.')}</p>` : ''}
       <button class="btn primary block big-cta dc-plq dc-plq-red" data-v="close">${t('Fermer')}</button>`;
     if (res === 'win') app.sfx['vd-win']?.(); else if (res === 'lose') app.sfx['vd-lose']?.(); else app.sfx['vd-flip']?.();
   }

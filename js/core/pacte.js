@@ -15,7 +15,7 @@ export const SPECIALS = { sceau: 3, gardien: 3, offrande: 3 };
 /* v557 : nouvelle carte du Pacte contre l'Abysse : le Présage (on voit la carte suivante avant de choisir). Les parties en ligne gardent le paquet d'origine (moteur SQL). */
 export const ORACLES = 2;
 /* v561 (idées choisies par le propriétaire) : la Malédiction (l'adversaire devra tirer une carte de plus à son prochain tour)
-   et le Double ou rien (une fois par partie : une dernière carte, puis le tour compte double… ou tout est perdu). Contre l'Abysse seulement. */
+   et Défier le pacte (une fois par partie : une dernière carte, puis le tour compte double… ou tout est perdu). Contre l'Abysse seulement. */
 export const CURSES = 2;
 
 function hash(str) {
@@ -214,10 +214,10 @@ export function stop(st) {
   return ev;
 }
 
-// v561 : Double ou rien : une dernière carte ; si le pacte tient, le tour compte double (une fois par partie)
+// v561 : Défier le pacte : une dernière carte ; si le pacte tient, le tour compte double (une fois par partie)
 export const canDouble = (st) => !st.over && !!st.dbl?.[st.turn] && st.row.some((c) => c.f) && !st.peek && (st.must || 0) <= 1;
 export function double(st) {
-  if (!canDouble(st)) throw new Error('Le Double ou rien n’est pas possible maintenant.');
+  if (!canDouble(st)) throw new Error('Défier le pacte n’est pas possible maintenant.');
   const who = st.turn;
   st.dbl[who] = false; st.dblOn = true;
   const ev = draw(st);
@@ -257,11 +257,11 @@ export function aiWants(st, rng = Math.random) {
   const loss = p * v * protect;
   return gain * (1 + R.risk + R.race * (behind + 0.5 * oppNear) - R.cool * ahead) > loss * R.caution;
 }
-// v561 : l'adversaire tente le Double ou rien quand le risque est faible et le tour assez gros
+// v561 : l'adversaire tente Défier le pacte quand le risque est faible et le tour assez gros
 function aiDoubles(st, rng) {
   if (!canDouble(st)) return false;
   const R = RIVALS[st.rival];
-  if (R.caution > 1.2) return false; /* les prudents (Ilda, Orvel) ne tentent jamais le Double ou rien */
+  if (R.caution > 1.2) return false; /* les prudents (Ilda, Orvel) ne tentent jamais Défier le pacte */
   const v = rowValue(st), p = bustChance(st) * (st.sceaux ? 0.15 : 1);
   if (st.scores[st.turn] + v >= tgt(st)) return false;
   return v >= 8 && p < 0.12 + (R.risk || 0) * 0.6 && rng() > R.noise;

@@ -54,6 +54,7 @@ test('v406 : un chapitre se termine sur son gardien ; récompenses à la premiè
   g.team();
   const sh0 = g.s.shards;
   const play = () => {
+    g.descent().used = 0; /* v735 : les Torches (5 par jour) se rallument pour l'essai */
     for (let k = 0; k < 300 && g.s.descent.run; k++) {
       const r = g.s.descent.run;
       if (r.phase === 'doors') { const o = g.chooseDoor(g.doors()[0]); if (o.battle) { r.battle.units && Object.values(r.battle.units).forEach((u) => { if (u.side === 'enemy') u.hp = 0; }); r.battle.over = 'won'; const out = g.finishBattle(); if (out.chapter) return out; } }

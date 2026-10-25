@@ -6867,3 +6867,21 @@ body.battle-mode #toasts, body:has(.opening) #toasts, body:has(.mq-game) #toasts
 html:not([data-mat^="tp-"]) .sc-board:not([data-pmat^="tp-"]) { background-image: url(../assets/sceaux/plateau2.webp), linear-gradient(#141018, #07080c); }
 html:not([data-mat^="tp-"]) .sc-board:not([data-pmat^="tp-"]) .sc-plate { top: 15.6%; bottom: 10.6%; left: 18.8%; right: 18.8%; }
 html:not([data-mat^="tp-"]) .sc-board:not([data-pmat^="tp-"]) .sc-cell { background: rgba(0, 0, 0, .26); box-shadow: inset 0 0 0 1px rgba(242, 193, 78, .18), inset 0 4px 12px rgba(0, 0, 0, .55); }
+
+/* v735 : butin du Choc des Boosters (plus de mise : copie de la plus belle carte adverse, coffre abyssal, éclats) */
+.vd-loots { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 4px 0 10px; }
+.vd-loot { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 12px; background: rgba(10, 8, 14, .72); border: 1px solid rgba(242, 193, 78, .4); font-size: .85rem; }
+.vd-loot img { width: 34px; height: 34px; object-fit: cover; border-radius: 6px; }
+.vd-loot em { font-style: normal; color: #7FE0A0; }
+.vs-prize { margin: 2px 0 6px; }
+/* v735 : Torches de la Descente */
+.dc-torch-row { display: flex; align-items: center; gap: 10px; width: 100%; margin: 6px 0; padding: 6px 12px; border-radius: 12px; border: 1px solid rgba(255, 177, 92, .3); background: linear-gradient(90deg, rgba(60, 30, 10, .55), rgba(20, 14, 24, .4)); color: inherit; text-align: left; }
+.dc-torch-row .dc-torches { display: flex; flex: none; }
+.dc-torch-t { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.dc-torch-t small { color: var(--mute); font-size: .78rem; }
+.dc-torch-row > .ic { opacity: .6; width: 16px; height: 16px; }
+.dc-torch-row.out { border-color: rgba(160, 160, 180, .25); background: rgba(16, 14, 22, .6); }
+.dc-torch-row.out .dc-torch-t b { color: #C9C2D6; }
+.dc-doors.dark .dc-door { filter: grayscale(.85) brightness(.55); }
+.dc-torch-big { display: flex; justify-content: center; gap: 4px; }
+.dc-torch-big img { height: 54px; width: auto; }

@@ -43,7 +43,7 @@ export const OPS = {
   codexClaim: { kind: 'sync' }, codexClaimAll: { kind: 'sync' }, catalogBuy: { kind: 'sync' }, codexUnlock: { kind: 'dev' }, codexBuyTier: { kind: 'sync' }, /* v680 */
   // v680 : achats payés (App Store) : le serveur les vérifie lui-même auprès de RevenueCat (serveur/iap.mjs)
   iapSync: { kind: 'first', net: true },
-  // en ligne : le serveur vérifie lui-même le résultat (Pari des Boosters, parties en ligne, Tirage des Ombres)
+  // en ligne : le serveur vérifie lui-même le résultat (Choc des Boosters, parties en ligne, Tirage des Ombres)
   versusCreate: { kind: 'first', net: true }, versusAccept: { kind: 'first', net: true }, versusClaim: { kind: 'first', net: true },
   mpClaim: { kind: 'first', net: true }, shadowPay: { kind: 'first', net: true }, shadowClaim: { kind: 'first', net: true },
   // Mode Créateur

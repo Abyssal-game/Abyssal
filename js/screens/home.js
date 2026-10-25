@@ -64,7 +64,7 @@ export default function home(app, root) {
     pacte: { name: 'Le Pacte', bn: 'bn-pacte', mode: 'pacte', route: 'pacte' },
     encheres: { name: 'Les Enchères', bn: 'bn-encheres', mode: 'encheresMode', route: 'encheres' },
     cryptes: { name: 'Les Cryptes', bn: 'bn-cryptes', mode: 'cryptesMode', route: 'cryptes' },
-    versus: { name: 'Le Pari des Boosters', bn: 'bn-versus', route: 'versus' },
+    versus: { name: 'Le Choc des Boosters', bn: 'bn-versus', route: 'versus' },
     amis: { name: 'Amis', bn: 'bn-amis', route: 'amis' },
   };
   const portrait = (id) => { const c = id && cat.get(id); return c ? `<img alt="" src="${artUrl(c, { lite: true })}">` : EMBLEM; };

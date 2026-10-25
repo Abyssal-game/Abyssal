@@ -89,7 +89,7 @@ LE CERCLE DE L'ABYSSE
 • Le Pacte : tire des cartes, encore une… et arrête-toi avant de briser le pacte
 • Les Cryptes : un jeu de mémoire où chaque paire réveille le pouvoir de sa faction
 • Joue contre d'autres joueurs, en partie rapide ou à ton rythme, et défie tes amis
-• Le Pari des Boosters : ouvre tes boosters face à un autre joueur, le meilleur tirage remporte tout
+• Le Choc des Boosters : ouvre tes boosters face à un autre joueur ; chacun garde ses cartes, le meilleur tirage gagne un butin
 
 UN MONDE À DÉCOUVRIR
 • Un Bestiaire illustré, avec l'histoire de chaque créature
@@ -158,7 +158,7 @@ L'iPad n'est pas prévu : l'application sera déclarée « iPhone uniquement »,
 
 ## 5. Classification par âge
 
-**Objectif : 13+ chez Apple, PEGI 12 en Europe chez Google.** Le jeu montre des créatures inquiétantes et des combats, mais sans sang réaliste ni contenu sexuel. Il n'y a ni achat ni discussion entre joueurs (seulement des réactions prédéfinies) ; le Pari des Boosters se joue avec la monnaie du jeu, jamais avec de l'argent réel.
+**Objectif : 13+ chez Apple, PEGI 12 en Europe chez Google.** Le jeu montre des créatures inquiétantes et des combats, mais sans sang réaliste ni contenu sexuel. Il n'y a ni achat ni discussion entre joueurs (seulement des réactions prédéfinies) ; le Choc des Boosters se joue avec la monnaie du jeu, jamais avec de l'argent réel.
 
 Pandore (ART-068), autrefois dessinée nue, a été refaite habillée en v300 : aucune nudité n'est à déclarer.
 
@@ -172,7 +172,7 @@ Pandore (ART-068), autrefois dessinée nue, a été refaite habillée en v300 : 
 | Contenu sexuel, nudité | Aucun |
 | Grossièretés, humour vulgaire | Aucun |
 | Alcool, tabac, drogues | Aucun |
-| Jeux d'argent simulés | **Rare ou modéré** : le Pari des Boosters fait miser des éclats (monnaie du jeu, jamais achetable) sur des boosters ouverts face à un autre joueur. Aucun argent réel. |
+| Jeux d'argent simulés | **Aucun** (depuis v735) : rien ne se mise ni ne se perd au hasard. Au Choc des Boosters, chacun paie ses boosters au prix normal et garde ses cartes ; le gagnant reçoit un butin offert par le jeu. Apple refuse les jeux d'argent simulés aux comptes de particuliers (refus du 24 octobre 2026). |
 | Concours | Non |
 | Thèmes médicaux | Aucun |
 | Contenu généré par les utilisateurs | Oui, uniquement les pseudos : filtre, signalement et masquage dans le jeu |
@@ -226,7 +226,7 @@ Résultat attendu : PEGI 12 en Europe (au pire PEGI 7). Public cible (Contenu de
 ```
 Au premier lancement, ABYSSAL demande de créer un compte (e-mail et mot de passe) : la progression est liée au compte (sauvegarde en ligne, amis, classements, défis entre joueurs). Vous pouvez utiliser le compte de démonstration ci-dessus (onglet « Se connecter »). Touchez l'écran d'ouverture, puis ouvrez les 2 boosters de bienvenue (onglet Butin) pour former votre équipe.
 
-Pourquoi un compte est nécessaire : la partie de chaque joueur est tenue par notre serveur (comme dans les jeux en ligne), pour qu'elle ne soit jamais perdue (changement ou perte de téléphone, suppression de l'application) et pour que les parties contre d'autres joueurs restent équitables. Le compte sert aussi aux amis, aux profils, aux jeux en ligne (Duels des Sceaux, Pacte, Enchères, Pari des Boosters) et aux classements du mois. Seuls un e-mail et un pseudo sont demandés. Suppression du compte dans le jeu : Sanctuaire → Compte → Supprimer mon compte.
+Pourquoi un compte est nécessaire : la partie de chaque joueur est tenue par notre serveur (comme dans les jeux en ligne), pour qu'elle ne soit jamais perdue (changement ou perte de téléphone, suppression de l'application) et pour que les parties contre d'autres joueurs restent équitables. Le compte sert aussi aux amis, aux profils, aux jeux en ligne (Duels des Sceaux, Pacte, Enchères, Choc des Boosters) et aux classements du mois. Seuls un e-mail et un pseudo sont demandés. Suppression du compte dans le jeu : Sanctuaire → Compte → Supprimer mon compte.
 
 Modération (seul contenu créé par les joueurs : les pseudos ; en partie en ligne, seules des réactions prédéfinies, sans texte libre) : les pseudos insultants sont refusés. Touchez le pseudo ou le portrait d'un autre joueur (classements, parties en ligne) pour ouvrir son profil, puis « Signaler ou masquer ce joueur ». Un pseudo signalé par plusieurs joueurs est remplacé automatiquement. Contact : contact@abyssal-game.fr
 

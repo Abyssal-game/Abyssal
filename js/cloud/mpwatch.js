@@ -1,5 +1,5 @@
 // v519 : ce qui t'attend en ligne. Vérifié au lancement, au retour dans l'app et toutes les 2 minutes ;
-// v521 : aussi le Pari des Boosters (défi relevé, défi reçu), les défis et parties trouvées des Sceaux et les demandes
+// v521 : aussi le Choc des Boosters (défi relevé, défi reçu), les défis et parties trouvées des Sceaux et les demandes
 // d'ami. Chaque nouvelle est annoncée une fois (annonce en bas de l'écran), comptée dans la pastille du sous-onglet
 // Jeux, et listée dans « Aujourd'hui » sur l'Accueil (mpw.items).
 import * as cloud from './cloud.js';
@@ -66,7 +66,7 @@ async function check(app) {
     } catch (e) { /* serveur sans les parties en ligne : rien */ }
   }
   mpw.turns = nTurns;
-  // Pari des Boosters
+  // Choc des Boosters
   try {
     const d = await cloud.versusList();
     const mine = d?.mine || [];
@@ -74,10 +74,10 @@ async function check(app) {
     const inv = mine.filter((r) => r.status === 'open' && !r.mine);
     for (const r of see) cards.push({ k: 'pari-see', game: 'versus', id: r.id, mine: !!r.mine, foe: { id: (r.mine ? r.b : r.a) || null, pseudo: r.pseudo || '', avatar: r.avatar || null } });
     for (const r of inv) cards.push({ k: 'pari-inv', game: 'versus', id: r.id, foe: { id: (r.mine ? r.b : r.a) || null, pseudo: r.pseudo || '', avatar: r.avatar || null } });
-    for (const r of see) say(`pari:${r.id}`, t(r.mine ? '{name} a relevé ton défi au Pari des Boosters : va voir le duel !' : 'Ton duel du Pari des Boosters contre {name} est prêt : va le voir !', { name: who(r.pseudo) }), 'crystal', 'versus'); /* v729 */
-    for (const r of inv) say(`pinv:${r.id}`, t('{name} te défie au Pari des Boosters !', { name: who(r.pseudo) }), 'crystal', 'versus');
-    if (see.length) items.push({ href: '#/versus', icon: 'booster', title: t(see.length > 1 ? '{n} duels du Pari à voir' : 'Un duel du Pari à voir', { n: see.length }), sub: t('Ton défi a été relevé') });
-    if (inv.length) items.push({ href: '#/versus', icon: 'booster', title: t(inv.length > 1 ? '{n} défis reçus au Pari des Boosters' : 'Un défi reçu au Pari des Boosters', { n: inv.length }), sub: inv.map((r) => esc(r.pseudo || '')).join(', ') });
+    for (const r of see) say(`pari:${r.id}`, t(r.mine ? '{name} a relevé ton défi au Choc des Boosters : va voir le duel !' : 'Ton duel du Choc des Boosters contre {name} est prêt : va le voir !', { name: who(r.pseudo) }), 'crystal', 'versus'); /* v729 */
+    for (const r of inv) say(`pinv:${r.id}`, t('{name} te défie au Choc des Boosters !', { name: who(r.pseudo) }), 'crystal', 'versus');
+    if (see.length) items.push({ href: '#/versus', icon: 'booster', title: t(see.length > 1 ? '{n} duels du Choc à voir' : 'Un duel du Choc à voir', { n: see.length }), sub: t('Ton défi a été relevé') });
+    if (inv.length) items.push({ href: '#/versus', icon: 'booster', title: t(inv.length > 1 ? '{n} défis reçus au Choc des Boosters' : 'Un défi reçu au Choc des Boosters', { n: inv.length }), sub: inv.map((r) => esc(r.pseudo || '')).join(', ') });
     mpw.games = see.length + inv.length;
   } catch (e) { /* rien */ }
   // Demandes d'ami

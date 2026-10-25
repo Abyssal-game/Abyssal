@@ -5,7 +5,8 @@
 import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
 import { BOOSTERS, LUCK_POINTS, RARITY, FACTION_ORDER, VARIANTS } from '../config.js';
-import { VERSUS_TYPES, VERSUS_MAX, VERSUS_HOURS, scoreOf, lineupStake, lineupOf, lineupOk } from '../core/versus.js';
+import { VERSUS_TYPES, VERSUS_MAX, VERSUS_HOURS, VERSUS_PRIZE, scoreOf, lineupStake, lineupOf, lineupOk } from '../core/versus.js';
+import { today } from '../core/save.js';
 import { isBlocked } from '../core/moderation.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, EMBLEM, picon } from '../ui/icons.js';
@@ -16,15 +17,16 @@ import { playDuel } from './versus-duel.js';
 import { checkTurns } from '../cloud/mpwatch.js';
 import { t, tx } from '../i18n.js';
 
-const OFF = 'Le Pari des Boosters n’est pas encore ouvert sur le serveur.';
+const OFF = 'Le Choc des Boosters n’est pas encore ouvert sur le serveur.';
 const RES = { win: 'Victoire', tie: 'Égalité', lose: 'Défaite' };
 // v516 : « Comment ça marche » dans le style des autres jeux (étapes illustrées)
 const HOW = [['booster', '#E8C35A', 'Compose ton défi', `Choisis jusqu’à ${VERSUS_MAX} boosters, de types différents si tu veux (par exemple un standard et un de faction Céleste). Les deux joueurs ouvrent les mêmes.`],
-  ['cur-shard', '#7FA8D8', 'La mise', 'Chaque joueur paie le prix des boosters en éclats.'],
-  ['amis', '#9FE0FF', 'Ton adversaire', `Ton défi est ouvert à tous, ou envoyé à un ami. S’il n’est pas relevé en ${VERSUS_HOURS} h, ta mise t’est rendue.`],
+  ['cur-shard', '#7FA8D8', 'Tes boosters', 'Chaque joueur paie ses boosters en éclats, au prix de la boutique, et garde toujours toutes les cartes qu’il ouvre.'],
+  ['amis', '#9FE0FF', 'Ton adversaire', `Ton défi est ouvert à tous, ou envoyé à un ami. S’il n’est pas relevé en ${VERSUS_HOURS} h, tes éclats te sont rendus.`],
   ['cards', '#C9A45A', 'Les points', `Quand un joueur relève le défi, les boosters des deux joueurs s’ouvrent. Commune ${LUCK_POINTS.C}, Peu commune ${LUCK_POINTS.PC}, Rare ${LUCK_POINTS.R}, Hyper rare ${LUCK_POINTS.HR}, Mythique ${LUCK_POINTS.M}, Secrète ${LUCK_POINTS.S}, +${LUCK_POINTS.variant} par finition.`],
-  ['crown', '#F2C14E', 'La victoire', 'Le meilleur total remporte toutes les cartes : les siennes et celles de l’adversaire. Le perdant ne garde rien.'],
-  ['seal', '#7FE0A0', 'Égalité', 'Chacun repart avec les cartes de ses propres boosters.'],
+  ['crown', '#F2C14E', 'La victoire', `Le meilleur total gagne un butin offert par l’Abysse : une copie de la plus belle carte de son adversaire (une Mythique ou une Secrète est remplacée par un coffre abyssal) et ${Math.round(VERSUS_PRIZE.win * 100)} % du prix de ses boosters en éclats. L’adversaire ne perd rien.`],
+  ['seal', '#7FE0A0', 'Égalité', `Chacun reçoit ${Math.round(VERSUS_PRIZE.tie * 100)} % du prix de ses boosters en éclats.`],
+  ['hourglass', '#C9A45A', 'Chaque jour', `Le butin compte pour ${VERSUS_PRIZE.packsPerDay} boosters par jour. Au-delà, on joue pour la gloire : chacun garde toujours ses cartes.`],
   ['ui-eye', '#E0485E', 'Aucune triche', 'Les boosters sont ouverts par le serveur : personne ne peut truquer les tirages.']];
 const TYPE_NAME = { standard: 'Standard', faction: 'Faction', event: 'Alliances', premium: 'Premium' };
 const howLi = ([ic, c, ti, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${ti}</b><span class="small">${d}</span></span></li>`;
@@ -53,7 +55,7 @@ export default function versusScreen(app, root) {
   const left = (t) => Math.max(0, VERSUS_HOURS - Math.floor((Date.now() - new Date(t)) / 3600000));
 
   function head() {
-    return `<header class="screen-head ui-hero bn-versus"><h1>Le Pari des Boosters</h1><p class="muted">Vos boosters s’ouvrent face à face : le meilleur total remporte <b>toutes</b> les cartes.</p></header>`;
+    return `<header class="screen-head ui-hero bn-versus"><h1>Le Choc des Boosters</h1><p class="muted">Vos boosters s’ouvrent face à face. Chacun garde ses cartes, le meilleur total gagne un butin.</p></header>`;
   }
 
   function draw() {
@@ -82,7 +84,7 @@ export default function versusScreen(app, root) {
       </section>
       ${waiting.length ? `<section class="panel vs-sec"><h2 class="section-title">Tes défis en attente</h2>
         ${waiting.map((r) => row(r, `<button class="btn small ghost" data-act="cancel" data-id="${esc(r.id)}">Annuler</button>`, `${lbl(r)} · ${r.public ? 'ouvert à tous' : 'pour ton ami'} · encore ${left(r.created_at)} h`, true)).join('')}
-        <p class="small muted">Ta mise est rendue si personne ne relève ton défi en ${VERSUS_HOURS} h, ou si tu l’annules.</p></section>` : ''}
+        <p class="small muted">Tes éclats te sont rendus si personne ne relève ton défi en ${VERSUS_HOURS} h, ou si tu l’annules.</p></section>` : ''}
       ${past.length ? `<details class="panel dc-fold vs-sec"><summary><span class="dc-sum-t">Derniers duels</span></summary>
         ${past.map((r) => { const res = r.my_score > r.their_score ? 'win' : r.my_score === r.their_score ? 'tie' : 'lose'; return row(r, `<button class="btn small ghost" data-act="replay" data-id="${esc(r.id)}"><b class="vs-res ${res}">${RES[res]}</b> ${fmt(r.my_score)} – ${fmt(r.their_score)}</button>`, lbl(r)); }).join('')}</details>` : ''}
       ${rulesHTML()}
@@ -116,7 +118,8 @@ export default function versusScreen(app, root) {
       ${cur.type === 'event' ? `<p class="small muted">Alliées cette semaine : <b>${e.factions.map(facName).join(' et ')}</b>.</p>` : ''}
       <div class="vs-line"><span class="small">Adversaire</span><div class="seg vs-to" role="group" aria-label="Adversaire"><button class="seg-b" data-act="to" data-v="all" aria-pressed="${ui.to !== 'friend'}">Ouvert à tous</button><button class="seg-b" data-act="to" data-v="friend" aria-pressed="${ui.to === 'friend'}">Un ami</button></div></div>
       ${ui.to === 'friend' ? (ok.length ? `<div class="vs-friends">${ok.map((f) => `<button class="vs-fr ${ui.friend === f.id ? 'on' : ''}" data-act="friend" data-v="${esc(f.id)}" aria-pressed="${ui.friend === f.id}"><span class="fr-av">${pic(f.avatar)}</span><b>${esc(f.pseudo)}</b></button>`).join('')}</div>` : `<p class="small muted">Pas encore d’ami. <a href="#/amis">Ajouter un ami</a></p>`) : ''}
-      <p class="vs-stake">Mise : <b>${fmt(stake)}</b> ${icon('crystal')} <span class="small muted">chacun · tu as ${fmt(g.s.shards)} éclats</span></p>
+      <p class="small muted center vs-prize">${prizeLeft() ? `Butin du jour : encore <b>${prizeLeft()}</b> booster${prizeLeft() > 1 ? 's' : ''}` : 'Butin du jour déjà gagné : on joue pour la gloire'}</p>
+      <p class="vs-stake">Prix : <b>${fmt(stake)}</b> ${icon('crystal')} <span class="small muted">chacun · tu as ${fmt(g.s.shards)} éclats</span></p>
       <button class="btn primary block big-cta dc-plq dc-plq-red" data-act="create" ${can ? '' : 'disabled'}>${icon('p:shadow')}${!okFac ? 'Choisis une faction' : !okFriend ? 'Choisis un ami' : g.s.shards < stake ? `Il te manque ${fmt(stake - g.s.shards)} éclats` : `Lancer le défi · ${fmt(stake)} éclats`}</button>
     </section>`;
   }
@@ -125,6 +128,7 @@ export default function versusScreen(app, root) {
     return `<details class="panel dc-fold dc-how vs-rules"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/help.webp"><span class="dc-sum-t">Comment ça marche</span></summary><ol class="how-steps">${HOW.map(howLi).join('')}</ol></details>`;
   }
 
+  const prizeLeft = () => { const v = g.s.versus; return v.prizeDay === today(g.clock()) ? Math.max(0, VERSUS_PRIZE.packsPerDay - (v.prizePacks || 0)) : VERSUS_PRIZE.packsPerDay; };
   function statsHTML() {
     const v = g.s.versus;
     if (!v.played) return '';
@@ -176,7 +180,7 @@ export default function versusScreen(app, root) {
     const r = [...(data?.open || []), ...(data?.mine || [])].find((x) => x.id === id);
     if (!r || busy) return;
     if (g.s.shards < r.stake) { app.sfx.error(); toast(`Il te manque ${fmt(r.stake - g.s.shards)} éclats.`, { kind: 'error', icon: 'crystal' }); return; }
-    const ok = await confirmBox(t('Relever le défi de <b>{name}</b> : {pack}.<br>Mise : <b>{stake} éclats</b>. Le meilleur total remporte toutes les cartes ; le perdant ne garde rien.', { name: esc(name(r)), pack: lbl(r), stake: fmt(r.stake) }), { ok: 'Relever le défi' });
+    const ok = await confirmBox(t('Relever le défi de <b>{name}</b> : {pack}.<br>Prix : <b>{stake} éclats</b>. Chacun garde ses cartes ; le meilleur total gagne le butin.', { name: esc(name(r)), pack: lbl(r), stake: fmt(r.stake) }), { ok: 'Relever le défi' });
     if (!ok) return;
     busy = true;
     /* v539 : la mise est prise par le serveur de partie, au moment où le duel a lieu (rendue s'il échoue) */
@@ -198,8 +202,8 @@ export default function versusScreen(app, root) {
     const to = ui.to === 'friend' ? ui.friend : null;
     const fr = to && friends.find((f) => f.id === to);
     const pk = lbl({ lineup });
-    const ok = await confirmBox(to ? t('Défier <b>{name}</b> : {pack}.<br>Mise : <b>{stake} éclats</b>, rendue s’il refuse ou ne relève pas le défi en {h} h.', { name: esc(fr?.pseudo || ''), pack: pk, stake: fmt(stake), h: VERSUS_HOURS })
-      : t('Lancer un défi ouvert à tous : {pack}.<br>Mise : <b>{stake} éclats</b>, rendue si personne ne le relève en {h} h.', { pack: pk, stake: fmt(stake), h: VERSUS_HOURS }), { ok: 'Lancer le défi' });
+    const ok = await confirmBox(to ? t('Défier <b>{name}</b> : {pack}.<br>Prix : <b>{stake} éclats</b>, rendus s’il refuse ou ne relève pas le défi en {h} h.', { name: esc(fr?.pseudo || ''), pack: pk, stake: fmt(stake), h: VERSUS_HOURS })
+      : t('Lancer un défi ouvert à tous : {pack}.<br>Prix : <b>{stake} éclats</b>, rendus si personne ne le relève en {h} h.', { pack: pk, stake: fmt(stake), h: VERSUS_HOURS }), { ok: 'Lancer le défi' });
     if (!ok) return;
     busy = true;
     /* v539 : la mise est prise par le serveur de partie quand le défi est créé */
@@ -215,7 +219,7 @@ export default function versusScreen(app, root) {
 
   async function cancel(id, decline = false) {
     if (busy) return;
-    const ok = await confirmBox(decline ? 'Refuser ce défi ? Ton ami récupère sa mise.' : 'Annuler ce défi ? Ta mise t’est rendue.', { ok: decline ? 'Refuser' : 'Annuler le défi', cancel: 'Retour' });
+    const ok = await confirmBox(decline ? 'Refuser ce défi ? Ton ami récupère ses éclats.' : 'Annuler ce défi ? Tes éclats te sont rendus.', { ok: decline ? 'Refuser' : 'Annuler le défi', cancel: 'Retour' });
     if (!ok) return;
     busy = true;
     try {

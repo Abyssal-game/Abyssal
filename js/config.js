@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v734'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v735'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -150,6 +150,9 @@ export const ASH_FRAMES = { braise: 600, forge: 2000, phenix: 6000 };
 export const FREE_PACK = { perDay: 1, max: 2 }; // v348 : cumulable jusqu'à 2
 /* v668 : Braises de vie (ranimer une créature tombée dans la Descente) : une offerte par jour (2 au plus en réserve), achetées en cendres,
    gagnées au premier gardien vaincu de chaque chapitre (bossLate dès le chapitre lateFrom) */
+/* v735 : Torches de la Descente (décision du propriétaire du 25 octobre 2026) : chaque combat de la Descente (gagné ou perdu,
+   chapitres rejoués et Cauchemar compris) en brûle une ; 5 par jour, elles ne s'accumulent pas. Sans Torche, le chapitre attend le lendemain. */
+export const TORCHES = 5;
 export const BRAISE = { perDay: 1, max: 2, ash: 150, boss: 1, bossLate: 2, lateFrom: 11 };
 
 export const FACTION_ORDER = ['infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel'];

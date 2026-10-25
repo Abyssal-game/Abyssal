@@ -26,7 +26,7 @@ const HOW = [['cards', '#7FA8D8', 'Ton tour', 'Tire des cartes une à une et pos
   ['danger', '#E0485E', 'Le pacte se brise', 'Si tu tires une faction que tu as déjà posée ce tour-ci, le pacte se brise : tu perds tout ce que tu avais gagné ce tour-ci.'],
   ['crown', '#F2C14E', 'La victoire', `Le premier à ${PA.TARGET} points gagne (certaines salles changent ce but). Ton adversaire joue toujours autant de tours que toi.`],
   ['seal', '#9FE0FF', 'Les cartes spéciales', 'Sceau : il protège d’une brisure. Gardien : arrêt forcé, tu encaisses tout de suite. Offrande : la prochaine carte compte double. Présage (contre l’Abysse) : tu vois la carte suivante avant de choisir. Malédiction (contre l’Abysse) : ton adversaire devra tirer une carte de plus à son prochain tour.'],
-  ['crystal', '#E0485E', 'Double ou rien', 'Une fois par partie (contre l’Abysse), au lieu de t’arrêter : tu tires une dernière carte. Si le pacte tient, tout le tour compte double. S’il se brise, tu perds tout.'],
+  ['crystal', '#E0485E', 'Défier le pacte', 'Une fois par partie (contre l’Abysse), au lieu de t’arrêter : tu tires une dernière carte. Si le pacte tient, tout le tour compte double. S’il se brise, tu perds tout.'],
   ['cards', '#C9A0FF', 'La pioche', 'En haut de la table, la pioche montre combien il reste de cartes de chaque faction et de chaque carte spéciale. Une faction déjà posée ce tour-ci est entourée de rouge : la tirer briserait le pacte.'],
   ['book', '#7FE0A0', 'Les sept factions', `Pose les 7 factions dans le même tour : +${PA.SEVEN_BONUS} points, et ton tour s’arrête.`],
   ['eye', '#C9A45A', 'Le risque', 'Le jeu t’affiche la chance que la prochaine carte brise ton pacte : elle compte les cartes déjà sorties.'],
@@ -137,10 +137,10 @@ export default function pacteScreen(app, root) {
   function controls(st) {
     if (st.over || busy || st.turn !== 'p') return `<div class="mq-ctl"><p class="mq-q">${st.over ? '' : `Tour de ${esc(PA.RIVALS[st.rival].name)}…`}</p></div>`;
     const v = PA.rowValue(st), must = st.must > 0, canStop = st.row.some((c) => c.f) && !must;
-    /* v561 : Malédiction (tirer encore) et Double ou rien (une fois par partie) */
+    /* v561 : Malédiction (tirer encore) et Défier le pacte (une fois par partie) */
     return `<div class="mq-ctl pa-ctl"><button class="btn primary dc-plq dc-plq-red" data-pa="draw">${icon('cards')}Tirer</button>
       <button class="btn dc-plq dc-plq-dark" data-pa="stop" ${canStop ? '' : 'disabled'}>${must && st.row.some((c) => c.f) ? 'Tire encore' : canStop ? `S’arrêter (+${v})` : 'S’arrêter'}</button>
-      ${st.dbl ? `<button class="btn pa-dbl" data-pa="double" ${PA.canDouble(st) ? '' : 'disabled'}>${st.dbl.p ? `<span>Double ou rien${PA.canDouble(st) ? ` (+${v * 2} ou 0)` : ''}</span><small>1 fois par partie</small>` : 'Double ou rien déjà utilisé'}</button>` : ''}</div>`;
+      ${st.dbl ? `<button class="btn pa-dbl" data-pa="double" ${PA.canDouble(st) ? '' : 'disabled'}>${st.dbl.p ? `<span>Défier le pacte${PA.canDouble(st) ? ` (×2 ou 0)` : ''}</span><small>1 fois par partie</small>` : 'Pacte déjà défié'}</button>` : ''}</div>`;
   }
   function view() {
     const st = g.s.pacte.cur;
@@ -163,7 +163,7 @@ export default function pacteScreen(app, root) {
     const fn = ev.card?.f ? fname(ev.card.f) : '';
     let H = sayText(ev, { mine, nm, fn, seven: PA.sevenOf(st) });
     if (ev.curse && ev.result === 'ok') H = [mine ? 'ok' : 'ko', t('Malédiction !'), mine ? t('{name} devra tirer une carte de plus à son prochain tour.', { name: esc(tw(R.name)) }) : t('Tu devras tirer une carte de plus à ton prochain tour.')];
-    if (H && ev.dbl) H = ev.result === 'bust' ? [H[0], t('Double ou rien… perdu !'), H[2]] : [mine ? 'ok' : 'ko', t('Double ou rien réussi !'), mine ? t('Le tour compte double : +{n}.', { n: ev.gain }) : t('{name} double son tour : +{n}.', { name: nm, n: ev.gain })];
+    if (H && ev.dbl) H = ev.result === 'bust' ? [H[0], t('Défi perdu… le pacte se brise !'), H[2]] : [mine ? 'ok' : 'ko', t('Pacte défié avec succès !'), mine ? t('Le tour compte double : +{n}.', { n: ev.gain }) : t('{name} double son tour : +{n}.', { name: nm, n: ev.gain })];
     if (!H) return;
     /* v457 : sons propres au Pacte (ElevenLabs) */
     app.sfx[{ bust: 'pa-bust', saved: 'pa-seal', forced: 'pa-guard', seven: 'pa-seven', stop: 'pa-bank' }[ev.result]]?.();

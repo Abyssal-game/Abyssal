@@ -740,7 +740,7 @@ end $$;
 -- éclats à rendre (refund = la mise du créateur).
 create or replace function public.versus_claim(p_id uuid)
 returns jsonb language plpgsql volatile security definer set search_path = public as $$
-declare me uuid := auth.uid(); d public.versus_duels; mine int; theirs int; res text; cards jsonb := '[]'::jsonb;
+declare me uuid := auth.uid(); d public.versus_duels; mine int; theirs int; res text; cards jsonb := '[]'::jsonb; trophy jsonb; chest text;
 begin
   if me is null then raise exception 'Connecte-toi d’abord.'; end if;
   perform public.versus_expire();
@@ -755,13 +755,21 @@ begin
     update public.versus_duels set a_claimed = true where id = p_id;
     return jsonb_build_object('result', 'refund', 'cards', '[]'::jsonb, 'stake', d.stake);
   end if;
+  -- v735 : plus de mise. Chacun garde les cartes de ses propres boosters ; le gagnant reçoit en plus une copie de la
+  -- plus belle carte de l'adversaire (le jeu donne un coffre abyssal à la place d'une Mythique ou d'une Secrète)
   if d.a = me then mine := d.a_score; theirs := d.b_score; else mine := d.b_score; theirs := d.a_score; end if;
-  if mine > theirs then res := 'win'; cards := d.a_cards || d.b_cards;
-  elsif mine = theirs then res := 'tie'; cards := case when d.a = me then d.a_cards else d.b_cards end;
+  cards := coalesce(case when d.a = me then d.a_cards else d.b_cards end, '[]'::jsonb);
+  if mine > theirs then
+    res := 'win';
+    select x into trophy from jsonb_array_elements(case when d.a = me then d.b_cards else d.a_cards end) x
+      order by (x->>'pts')::int desc, array_position(array['C','PC','R','HR','M','S'], x->>'rarity') desc nulls last limit 1;
+    if trophy is not null and trophy->>'rarity' in ('M', 'S') then chest := 'abyssal'; trophy := null; end if;
+  elsif mine = theirs then res := 'tie';
   else res := 'lose'; end if;
   if d.a = me then update public.versus_duels set a_claimed = true where id = p_id;
   else update public.versus_duels set b_claimed = true where id = p_id; end if;
-  return jsonb_build_object('result', res, 'cards', cards, 'stake', d.stake);
+  return jsonb_build_object('result', res, 'cards', cards, 'stake', d.stake, 'trophy', trophy, 'chest', chest,
+    'packs', greatest(1, coalesce(jsonb_array_length(d.lineup), d.packs, 1)));
 end $$;
 
 -- ——— Listes : défis ouverts des autres, et mes défis (30 derniers) ————————————————————
@@ -811,7 +819,7 @@ grant execute on function public.versus_list() to authenticated;
 create table if not exists public.sql_stamps (file text primary key, stamp text not null, at timestamptz not null default now());
 alter table public.sql_stamps enable row level security;
 revoke all on public.sql_stamps from public, anon, authenticated;
-insert into public.sql_stamps (file, stamp) values ('08', 'ef2b2033cf38') on conflict (file) do update set stamp = excluded.stamp, at = now();
+insert into public.sql_stamps (file, stamp) values ('08', 'c9fcdc71f6df') on conflict (file) do update set stamp = excluded.stamp, at = now();
 create or replace function public.sql_stamps() returns jsonb language sql stable security definer set search_path = public as $$
   select coalesce(jsonb_object_agg(file, stamp), '{}'::jsonb) from public.sql_stamps;
 $$;

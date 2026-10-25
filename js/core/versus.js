@@ -17,3 +17,9 @@ export const lineupOf = (r) => (Array.isArray(r?.lineup) && r.lineup.length ? r.
   : Array.from({ length: r?.packs || 1 }, () => ({ type: r?.type, faction: r?.faction || undefined, factions: r?.factions || undefined })));
 export const lineupOk = (lineup) => Array.isArray(lineup) && lineup.length >= 1 && lineup.length <= VERSUS_MAX
   && lineup.every((it) => VERSUS_TYPES.includes(it.type) && (it.type !== 'faction' || !!it.faction));
+
+/* v735 : plus de mise (refus d'Apple : un jeu où l'on mise et où l'on peut perdre au hasard est un « jeu d'argent simulé »).
+   Chacun garde les cartes de ses propres boosters ; le jeu offre au gagnant un butin : une copie de la plus belle carte
+   de l'adversaire (Hyper rare au plus ; à la place d'une Mythique ou d'une Secrète, un coffre abyssal) et un bonus
+   d'éclats proportionnel au prix de ses boosters. Seuls `packsPerDay` boosters par jour comptent pour le butin. */
+export const VERSUS_PRIZE = { win: 0.4, tie: 0.15, packsPerDay: 6, trophyRar: ['C', 'PC', 'R', 'HR'] };

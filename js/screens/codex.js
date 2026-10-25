@@ -353,7 +353,7 @@ export default function codexScreen(app, root) {
     /* où on le verra */
     const WHERE = { frame: ['Profil', 'Barre du haut', 'Classements', 'Parties en ligne', 'Fiche vue par les autres'], plate: ['Profil', 'Classements', 'Parties en ligne', 'Fiche vue par les autres'],
       fond: ['Profil', 'Fiche vue par les autres'], title: ['Profil', 'Classements', 'Fiche vue par les autres'], back: ['Ouverture des boosters', 'Cartes face cachée', 'Jeux de cartes'],
-      sachet: ['Boutique des boosters', 'Ouverture', 'Pari des Boosters'], mat: ['Duels des Sceaux', 'Duels en ligne'], emote: ['Parties en ligne'] };
+      sachet: ['Boutique des boosters', 'Ouverture', 'Choc des Boosters'], mat: ['Duels des Sceaux', 'Duels en ligne'], emote: ['Parties en ligne'] };
     /* l'objet en situation */
     const scenes = (o) => { const L = look();
       if (['frame', 'plate', 'fond', 'title'].includes(o.kind)) return `<p class="pv2-cap">Ton profil</p>${profMock(L)}

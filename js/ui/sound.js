@@ -308,7 +308,7 @@ export const sfx = {
   // v439 : sons enregistrés seulement (ElevenLabs), sans repli synthétisé
   gavel() {}, cancel() {}, page() {}, 'en-coin'() {}, /* v465 : pièce posée aux Enchères */
   /* v457 : sons propres au Pacte (pa-) et aux Cryptes (cr-) ; v463 : ceux des Trois Autels retirés avec le jeu */
-  'pa-draw'() {}, 'pa-bust'() {}, 'pa-seal'() {}, 'pa-guard'() {}, 'pa-offer'() {}, 'pa-seven'() {}, 'pa-bank'() {}, 'cr-flip'() {}, 'cr-pair'() {}, 'cr-miss'() {}, 'cr-power'() {}, 'vd-tear'() {}, 'vd-flip'() {}, 'vd-rare'() {}, 'vd-win'() {}, 'vd-lose'() {}, /* v561 : sons du Pari des Boosters (ElevenLabs) */
+  'pa-draw'() {}, 'pa-bust'() {}, 'pa-seal'() {}, 'pa-guard'() {}, 'pa-offer'() {}, 'pa-seven'() {}, 'pa-bank'() {}, 'cr-flip'() {}, 'cr-pair'() {}, 'cr-miss'() {}, 'cr-power'() {}, 'vd-tear'() {}, 'vd-flip'() {}, 'vd-rare'() {}, 'vd-win'() {}, 'vd-lose'() {}, /* v561 : sons du Choc des Boosters (ElevenLabs) */
   tap() { noise({ dur: 0.03, gain: 0.5, freq: vary(3200, 0.1), q: 1.2, wet: 0.05 }); osc(vary(1500, 0.05), { dur: 0.05, gain: 0.1, to: 900, wet: 0.05 }); },
   error() { osc(N.A3, { type: 'triangle', dur: 0.14, gain: 0.12, lp: 900, wet: 0.15 }); osc(N.F3, { type: 'triangle', dur: 0.22, gain: 0.12, lp: 700, delay: 0.1, wet: 0.2 }); },
   coin() { bell(vary(N.A6 * 0.75, 0.02), { dur: 0.35, gain: 0.14, ratio: 2.76, index: 1.2 }); bell(N.A6, { dur: 0.5, ratio: 2.76, index: 1.2, delay: 0.06, pan: 0.2, gain: 0.12 }); noise({ dur: 0.12, gain: 0.04, type: 'highpass', freq: 7000, delay: 0.04 }); },
