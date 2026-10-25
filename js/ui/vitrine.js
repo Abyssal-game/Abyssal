@@ -57,9 +57,11 @@ export function fitPlate(el) {
 }
 export function watchPlates() {
   let queued = false;
-  const run = () => { queued = false; document.querySelectorAll('.np-demo').forEach((el) => { if (el.isConnected && el.offsetParent) fitPlate(el); }); };
+  /* v766 : toutes les plaques (Profil, classements, parties en ligne…), plus seulement les petites cases */
+  const run = () => { queued = false; document.querySelectorAll('.np').forEach((el) => { if (el.isConnected && el.offsetParent) fitPlate(el); }); };
   const ask = () => { if (!queued) { queued = true; requestAnimationFrame(run); } };
-  new MutationObserver((list) => { for (const m of list) for (const n of m.addedNodes) if (n.nodeType === 1 && (n.classList.contains('np-demo') || n.querySelector('.np-demo'))) return ask(); })
+  new MutationObserver((list) => { for (const m of list) for (const n of m.addedNodes) if (n.nodeType === 1 && (n.classList.contains('np') || n.querySelector('.np'))) return ask(); })
     .observe(document.body, { childList: true, subtree: true });
   document.fonts?.ready.then(ask);
+  addEventListener('resize', ask);
 }
