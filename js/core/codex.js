@@ -148,10 +148,10 @@ export const PLATES = { /* v685 */ 'pl-glacier': 'Plaque du Glacier', 'pl-cerf-g
 export const EMOTES = {
   're-salut': { text: 'Salutations.', free: true }, 're-bien': { text: 'Bien joué.', free: true },
   're-merci': { text: 'Merci.', free: true }, 're-aie': { text: 'Aïe…', free: true },
-  're-mammon': { text: 'Hé hé hé…', who: 'banquier', name: 'Mammon' }, 're-souveraine': { text: 'À genoux.', who: 'souverain', name: 'La Souveraine du Néant' },
-  're-archiviste': { text: 'Prévisible.', who: 'archiviste', name: 'L’Archiviste' }, 're-ilda': { text: 'Oh non… !', who: 'initie', name: 'Ilda' },
-  're-orvel': { text: 'Quel coup !', who: 'collectionneur', name: 'Maître Orvel' }, 're-vesna': { text: 'Patience.', who: 'stratege', name: 'Sœur Vesna' },
-  're-maitre': { text: 'Les règles sont les règles.', who: 'maitre', name: 'Le Maître des Sceaux' }, 're-echo': { text: 'L’Abîme t’attend.', who: 'echo', name: 'L’Écho de l’Abîme' },
+  're-mammon': { text: 'Tu me dois déjà trois cartes.', who: 'banquier', name: 'Mammon' }, 're-souveraine': { text: 'Incline-toi, ce sera plus simple.', who: 'souverain', name: 'La Souveraine du Néant' },
+  're-archiviste': { text: 'J’ai déjà archivé ta défaite.', who: 'archiviste', name: 'L’Archiviste' }, 're-ilda': { text: 'Même moi, j’aurais vu ce coup.', who: 'initie', name: 'Ilda' },
+  're-orvel': { text: 'Cette carte ira bien dans ma vitrine.', who: 'collectionneur', name: 'Maître Orvel' }, 're-vesna': { text: 'Trois coups d’avance. Toi ? Zéro.', who: 'stratege', name: 'Sœur Vesna' },
+  're-maitre': { text: 'Relis les règles. Lentement.', who: 'maitre', name: 'Le Maître des Sceaux' }, 're-echo': { text: 'L’Abîme a ri. Moi aussi.', who: 'echo', name: 'L’Écho de l’Abîme' },
   /* v586 : réactions des 20 gardiens (portrait = leur figure peinte, assets/bosses) */
   're-g-devoreur': { text: 'Ta main ? Un amuse-bouche.', boss: 'devoreur', name: 'Le Dévoreur' },
   're-g-matriarche': { text: 'Tu trembles ? C’est le froid.', boss: 'matriarche', name: 'La Matriarche du Givre' },
@@ -174,10 +174,10 @@ export const EMOTES = {
   're-g-bete': { text: 'Ta défaite était écrite.', boss: 'bete', name: 'La Bête de l’Apocalypse' },
   're-g-abysse': { text: 'Plus tu descends, plus je souris.', boss: 'abysse', name: 'L’Abysse' },
   /* v630 : réactions de la Saison I (portrait propre assets/emotes/<clé>.webp, exclusives au Codex : jamais à l'Échoppe) */
-  're-feu-follet': { text: 'Je t’ai vu…', pic: 're-feu-follet', name: 'Le Feu follet', codex: true },
-  're-passeur': { text: 'Ton tour viendra.', pic: 're-passeur', name: 'Le Passeur des Âmes', codex: true },
-  /* v685 : Saison II */ 're-blizzard': { text: 'Le froid te gagne.', pic: 're-blizzard', name: 'Le Blizzard', codex: true },
-  're-sentinelle': { text: 'Nul ne passe.', pic: 're-sentinelle', name: 'La Sentinelle du givre', codex: true },
+  're-feu-follet': { text: 'Suis-moi… droit vers ta défaite.', pic: 're-feu-follet', name: 'Le Feu follet', codex: true },
+  're-passeur': { text: 'Prépare ta pièce, je t’emmène.', pic: 're-passeur', name: 'Le Passeur des Âmes', codex: true },
+  /* v685 : Saison II */ 're-blizzard': { text: 'Tu as froid aux yeux ?', pic: 're-blizzard', name: 'Le Blizzard', codex: true },
+  're-sentinelle': { text: 'Nul ne passe. Toi encore moins.', pic: 're-sentinelle', name: 'La Sentinelle du givre', codex: true },
 };
 export const FREE_EMOTES = Object.keys(EMOTES).filter((k) => EMOTES[k].free);
 export const PAID_EMOTES = Object.keys(EMOTES).filter((k) => !EMOTES[k].free);
