@@ -146,8 +146,8 @@ export const PLATES = { /* v685 */ 'pl-glacier': 'Plaque du Glacier', 'pl-cerf-g
   /* v589 */ 'pl-meduse': 'Plaque de la Méduse', 'pl-corbeau': 'Plaque du Corbeau', 'pl-serpent': 'Plaque du Serpent', 'pl-araignee': 'Plaque de la Veuve noire', 'pl-loup': 'Plaque du Loup de givre', 'pl-lune': 'Plaque de la Lune d’argent', 'pl-ambre': 'Plaque de l’Ambre', 'pl-astrolabe': 'Plaque de l’Astrolabe',
   /* v692 */ 'pl-titan': 'Plaque du Titan', 'pl-forge': 'Plaque de la Forge', 'pl-racines': 'Plaque des Racines', 'pl-aile': 'Plaque de l’Aile céleste', 'pl-tombes': 'Plaque de la Nécropole', 'pl-encre': 'Plaque de l’Encre de l’Abysse' };
 export const EMOTES = {
-  're-salut': { text: 'Salutations.', free: true }, 're-bien': { text: 'Bien joué.', free: true },
-  're-merci': { text: 'Merci.', free: true }, 're-aie': { text: 'Aïe…', free: true },
+  're-salut': { text: 'Salutations.', free: true, pic: 'o-salut' }, 're-bien': { text: 'Bien joué.', free: true, pic: 'o-bien' },
+  're-merci': { text: 'Merci.', free: true, pic: 'o-merci' }, 're-aie': { text: 'Aïe…', free: true, pic: 'o-aie' },
   're-mammon': { text: 'Tu me dois déjà trois cartes.', who: 'banquier', name: 'Mammon' }, 're-souveraine': { text: 'Incline-toi, ce sera plus simple.', who: 'souverain', name: 'La Souveraine du Néant' },
   're-archiviste': { text: 'J’ai déjà archivé ta défaite.', who: 'archiviste', name: 'L’Archiviste' }, 're-ilda': { text: 'Même moi, j’aurais vu ce coup.', who: 'initie', name: 'Ilda' },
   're-orvel': { text: 'Cette carte ira bien dans ma vitrine.', who: 'collectionneur', name: 'Maître Orvel' }, 're-vesna': { text: 'Trois coups d’avance. Toi ? Zéro.', who: 'stratege', name: 'Sœur Vesna' },
