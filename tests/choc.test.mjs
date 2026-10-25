@@ -35,3 +35,23 @@ test('v735 : le perdant garde ses cartes, le gagnant reçoit une copie, un coffr
   assert.equal(w5.trophy, null);
   assert.equal(g.versusApply('d5', { result: 'win', cards: [] }), null, 'encaissé une seule fois');
 });
+
+test('v736 : le gagnant choisit sa carte parmi celles de l’adversaire, une seule fois', () => {
+  const g = fresh(), hr = pick('HR'), c = pick('C');
+  const w = g.versusApply('p1', { result: 'win', cards: [{ id: c.id }], stake: 400, packs: 1, choices: [{ id: hr.id, rarity: 'HR' }, { id: c.id, rarity: 'C' }], pick: true });
+  assert.equal(w.pick, true);
+  assert.equal(w.trophy, null);
+  assert.ok(g.s.versus.pick.p1);
+  const o = g.versusPickApply('p1', { trophy: { id: hr.id, rarity: 'HR' } });
+  assert.equal(o.trophy.id, hr.id);
+  assert.ok(g.owns(hr.id));
+  assert.equal(g.versusPickApply('p1', { trophy: { id: hr.id } }), null, 'une seule fois');
+  // une Mythique choisie devient un coffre abyssal ; pas de choix quand le butin du jour est épuisé
+  g.versusApply('p2', { result: 'win', cards: [], stake: 400, packs: 1, choices: [{ id: pick('M').id, rarity: 'M' }], pick: true });
+  const ch = g.s.chests.abyssal || 0;
+  assert.equal(g.versusPickApply('p2', { trophy: null, chest: 'abyssal' }).chest, 'abyssal');
+  assert.equal((g.s.chests.abyssal || 0) - ch, 1);
+  g.s.versus.prizePacks = 6;
+  const late = g.versusApply('p3', { result: 'win', cards: [], stake: 400, packs: 1, choices: [{ id: hr.id, rarity: 'HR' }], pick: true });
+  assert.ok(!late.pick);
+});

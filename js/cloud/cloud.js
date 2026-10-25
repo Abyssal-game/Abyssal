@@ -203,6 +203,7 @@ export async function versusCreate(type, faction, factions, packs, to = null) {
 export async function versusCreateMix(lineup, to = null) { return authed('/rest/v1/rpc/versus_create_mix', { method: 'POST', body: { p_lineup: lineup, p_to: to } }); }
 export async function versusAccept(id) { return authed('/rest/v1/rpc/versus_accept', { method: 'POST', body: { p_id: id } }); }
 export async function versusCancel(id) { return authed('/rest/v1/rpc/versus_cancel', { method: 'POST', body: { p_id: id } }); }
+export async function versusPick(id, idx) { return authed('/rest/v1/rpc/versus_pick', { method: 'POST', body: { p_id: id, p_idx: idx } }); } /* v736 */
 export async function versusClaim(id) { return authed('/rest/v1/rpc/versus_claim', { method: 'POST', body: { p_id: id } }); }
 
 // ——— Mini-jeux contre d'autres joueurs (v519, supabase/09-multijoueur.sql) ——————————————

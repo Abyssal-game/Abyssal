@@ -468,7 +468,7 @@ export default function descent(app, root) {
     torchinfo() {
       const tc = g.torches();
       openSheet(`<h2 class="center">Les Torches</h2>
-        <p class="center dc-torch-big">${Array.from({ length: tc.max }, (_, i) => `<img alt="" src="assets/icons/torch-${i < tc.left ? 'on' : 'off'}.webp">`).join('')}</p>
+        <p class="center dc-torch-big">${Array.from({ length: tc.max }, (_, i) => `<img alt="" src="assets/icons/torch-${i < tc.left ? 'on' : 'off'}.webp">`).join('')}</p>
         <p>Chaque combat de la Descente brûle une Torche, qu’il soit gagné ou perdu : combats, élites, gardiens, chapitres rejoués et Cauchemar.</p>
         <p>Tu as <b>5 Torches par jour</b>. Elles se rallument à minuit et ne se gardent pas d’un jour à l’autre.</p>
         <p>Sans Torche, ton équipe se repose. Ton chapitre reste ouvert : demain, tu repars de l’étage où tu en es, avec les mêmes PV.</p>

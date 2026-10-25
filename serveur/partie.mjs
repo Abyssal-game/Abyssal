@@ -65,6 +65,11 @@ const NET = {
     if (g.s.versus.paid) delete g.s.versus.paid[id];
     return { res, out };
   },
+  async versusPick(c, g, id, idx) {
+    if (!g.s.versus.pick?.[id]) throw new Error('Pas de butin à choisir pour ce duel.');
+    const res = await c.db.rpc('versus_pick', { p_id: id, p_idx: idx }, c.token);
+    return { res, out: g.versusPickApply(id, res) };
+  },
   async mpClaim(c, g, game, id, friendsOnly = false) {
     /* v728 : le jeu de la partie est lu sur le serveur (avant : celui envoyé par le téléphone, une victoire aux Cryptes
        pouvait être réclamée comme une victoire aux Sceaux) */

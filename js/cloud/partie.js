@@ -136,6 +136,7 @@ const LEGACY = {
     }
   },
   async versusClaim(id) { const res = await cloud.versusClaim(id); return { res, out: g.versusApply(id, res) }; },
+  async versusPick(id, idx) { const res = await cloud.versusPick(id, idx); return { res, out: g.versusPickApply(id, res) }; }, /* v736 */
   async mpClaim(game, id, friendsOnly = false) { const r = await cloud.mpClaim(id); return { r, out: friendsOnly ? { shards: 0 } : g.mpReward(game, id, r) }; },
   shadowPay: (day) => g.shadowPay(day),
   async shadowClaim(week) {

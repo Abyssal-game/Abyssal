@@ -35,7 +35,14 @@ function musicPlan(packs) {
   return { tears, scale, start: Math.max(0, tears[0] - APPEAR - 0.5) };
 }
 
-export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
+/* v736 : le gagnant choisit une carte parmi celles de l'adversaire (une Mythique ou une Secrète devient un coffre abyssal) */
+export function pickGridHTML(app, cards) {
+  const cat = app.catalog, g = app.game;
+  return `<div class="vd-pick-grid">${(cards || []).map((x, i) => { const c = cat.get(x.id); if (!c) return '';
+    const big = x.rarity === 'M' || x.rarity === 'S';
+    return `<button class="vd-pick-c ${big ? 'big' : ''}" data-v="pick" data-i="${i}" style="--rc:${RARITY[c.rarity]?.color || '#999'}"><img alt="" src="${artUrl(c, { lite: true })}"><b>${esc(c.name)}</b><small>${big ? t('Coffre abyssal à la place') : g.owns(c.id) ? t('Déjà à toi') : t('Nouvelle !')}</small></button>`; }).join('')}</div>`;
+}
+export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick } = {}) {
   const g = app.game, cat = app.catalog;
   const mine = r.my_cards || [], theirs = r.their_cards || [];
   const res = out?.result && RES[out.result] ? out.result : r.my_score > r.their_score ? 'win' : r.my_score === r.their_score ? 'tie' : 'lose';
@@ -174,19 +181,20 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
     const nWon = out?.cards?.length || mine.length;
     const fresh = (out?.cards || []).filter((c) => c.isNewCard).length;
     const tc = out?.trophy && app.catalog.get(out.trophy.id);
-    const loot = [tc ? `<span class="vd-loot"><img alt="" src="${artUrl(tc, { lite: true })}"><span>${t('Copie de <b>{card}</b>', { card: esc(tc.name) })}${out.trophy.isNewCard ? ` <em>${t('Nouvelle !')}</em>` : ''}</span></span>` : '',
-      out?.chest ? `<span class="vd-loot"><img alt="" src="assets/icons/chest.webp"><span>${t('Coffre abyssal')}</span></span>` : '',
-      out?.shards ? `<span class="vd-loot"><img alt="" src="assets/icons/cur-shard.webp"><span>+${fmt(out.shards)} ${t('éclats')}</span></span>` : ''].filter(Boolean).join('');
+    const loot = [tc ? `<span class="vd-loot"><img alt="" src="${artUrl(tc, { lite: true })}"><span>${t('Copie de <b>{card}</b>', { card: esc(tc.name) })}${out.trophy.isNewCard ? ` <em>${t('Nouvelle !')}</em>` : ''}</span></span>` : '',
+      out?.chest ? `<span class="vd-loot"><img alt="" src="assets/icons/chest.webp"><span>${t('Coffre abyssal')}</span></span>` : '',
+      out?.shards ? `<span class="vd-loot"><img alt="" src="assets/icons/cur-shard.webp"><span>+${fmt(out.shards)} ${t('éclats')}</span></span>` : ''].filter(Boolean).join('');
     const noPrize = out && out.counted === 0 && res !== 'lose';
     el.classList.add('end', res);
     const end = q('.vd-end');
     end.hidden = false;
     end.innerHTML = `<div class="vd-burst"></div><img class="vd-emb ${res}" alt="" src="assets/versus/${EMB[res]}.webp"><h2 class="vd-title ${res}">${t(RES[res])}</h2>
       <p class="vd-tally"><b>${fmt(sc.me)}</b> <span>${t('contre')}</span> <b>${fmt(sc.foe)}</b></p>
-      <p>${t(fresh ? 'Tu gardes <b>tes {n} cartes</b>, dont <b>{f} nouvelles</b>.' : 'Tu gardes <b>tes {n} cartes</b>.', { n: nWon, f: fresh })}
+      <p>${t(fresh ? 'Tu gardes <b>tes {n} cartes</b>, dont <b>{f} nouvelles</b>.' : 'Tu gardes <b>tes {n} cartes</b>.', { n: nWon, f: fresh })}
         ${res === 'win' ? t('Et l’Abysse t’offre le butin :') : res === 'tie' ? t('Même total : chacun reçoit une part du butin.') : t('{name} gagne le butin. Tu ne perds rien.', { name: esc(foeName) })}</p>
-      ${loot ? `<div class="vd-loots">${loot}</div>` : ''}
-      ${noPrize ? `<p class="small">${t('Butin du jour déjà gagné : ce duel était pour la gloire.')}</p>` : ''}
+      ${out?.pick ? `<div class="vd-pick"><p class="small">${t('Choisis ta carte parmi celles de {name} :', { name: esc(foeName) })}</p>${pickGridHTML(app, theirs)}</div>` : ''}
+      ${loot ? `<div class="vd-loots">${loot}</div>` : ''}
+      ${noPrize ? `<p class="small">${t('Butin du jour déjà gagné : ce duel était pour la gloire.')}</p>` : ''}
       <button class="btn primary block big-cta dc-plq dc-plq-red" data-v="close">${t('Fermer')}</button>`;
     if (res === 'win') app.sfx['vd-win']?.(); else if (res === 'lose') app.sfx['vd-lose']?.(); else app.sfx['vd-flip']?.();
   }
@@ -199,10 +207,22 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose } = {}) {
     setTimeout(() => el.remove(), 300);
     onClose?.();
   }
+  let picking = false;
   el.addEventListener('click', (e) => {
     const b = e.target.closest('[data-v]');
     if (b?.dataset.v === 'close') return close();
     if (b?.dataset.v === 'all') return finish();
+    if (b?.dataset.v === 'pick' && onPick && !picking) {
+      picking = true;
+      el.querySelectorAll('.vd-pick-c').forEach((x) => x.classList.toggle('on', x === b));
+      onPick(+b.dataset.i).then((o) => {
+        const tc = o?.trophy && app.catalog.get(o.trophy.id);
+        const box = el.querySelector('.vd-pick');
+        if (box) box.outerHTML = `<div class="vd-loots">${tc ? `<span class="vd-loot"><img alt="" src="${artUrl(tc, { lite: true })}"><span>${t('Copie de <b>{card}</b>', { card: esc(tc.name) })}${o.trophy.isNewCard ? ` <em>${t('Nouvelle !')}</em>` : ''}</span></span>` : ''}${o?.chest ? `<span class="vd-loot"><img alt="" src="assets/icons/chest.webp"><span>${t('Coffre abyssal')}</span></span>` : ''}</div>`;
+        app.sfx.achievement?.();
+      }).catch(() => { picking = false; el.querySelectorAll('.vd-pick-c').forEach((x) => x.classList.remove('on')); });
+      return;
+    }
     if (!done) { speed = 4; sync = false; }
   });
   run();

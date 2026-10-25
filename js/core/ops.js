@@ -44,7 +44,7 @@ export const OPS = {
   // v680 : achats payés (App Store) : le serveur les vérifie lui-même auprès de RevenueCat (serveur/iap.mjs)
   iapSync: { kind: 'first', net: true },
   // en ligne : le serveur vérifie lui-même le résultat (Choc des Boosters, parties en ligne, Tirage des Ombres)
-  versusCreate: { kind: 'first', net: true }, versusAccept: { kind: 'first', net: true }, versusClaim: { kind: 'first', net: true },
+  versusCreate: { kind: 'first', net: true }, versusAccept: { kind: 'first', net: true }, versusClaim: { kind: 'first', net: true }, versusPick: { kind: 'first', net: true },
   mpClaim: { kind: 'first', net: true }, shadowPay: { kind: 'first', net: true }, shadowClaim: { kind: 'first', net: true },
   // Mode Créateur
   shopBuy: { kind: 'dev' }, devGrant: { kind: 'dev' }, devGive: { kind: 'dev' }, devAllVariants: { kind: 'dev' }, devDuplicates: { kind: 'dev' },

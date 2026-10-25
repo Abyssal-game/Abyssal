@@ -44,6 +44,9 @@ create table if not exists public.versus_duels (
 );
 -- v516 : composition libre (jusqu'à 3 boosters de types différents, les mêmes pour les deux joueurs)
 alter table public.versus_duels add column if not exists lineup jsonb;
+-- v736 : le gagnant choisit sa carte parmi celles de l'adversaire (index dans ses cartes)
+alter table public.versus_duels add column if not exists a_pick int;
+alter table public.versus_duels add column if not exists b_pick int;
 alter table public.versus_duels drop constraint if exists versus_duels_type_check;
 alter table public.versus_duels add constraint versus_duels_type_check check (type in ('standard', 'faction', 'event', 'premium', 'mix'));
 create index if not exists versus_open on public.versus_duels (status, created_at desc);
@@ -226,7 +229,7 @@ end $$;
 -- éclats à rendre (refund = la mise du créateur).
 create or replace function public.versus_claim(p_id uuid)
 returns jsonb language plpgsql volatile security definer set search_path = public as $$
-declare me uuid := auth.uid(); d public.versus_duels; mine int; theirs int; res text; cards jsonb := '[]'::jsonb; trophy jsonb; chest text;
+declare me uuid := auth.uid(); d public.versus_duels; mine int; theirs int; res text; cards jsonb := '[]'::jsonb; choices jsonb;
 begin
   if me is null then raise exception 'Connecte-toi d’abord.'; end if;
   perform public.versus_expire();
@@ -241,22 +244,42 @@ begin
     update public.versus_duels set a_claimed = true where id = p_id;
     return jsonb_build_object('result', 'refund', 'cards', '[]'::jsonb, 'stake', d.stake);
   end if;
-  -- v735 : plus de mise. Chacun garde les cartes de ses propres boosters ; le gagnant reçoit en plus une copie de la
-  -- plus belle carte de l'adversaire (le jeu donne un coffre abyssal à la place d'une Mythique ou d'une Secrète)
+  -- v735 : plus de mise. Chacun garde les cartes de ses propres boosters. v736 : le gagnant choisit ensuite une carte
+  -- parmi celles de l'adversaire (versus_pick) ; le jeu donne un coffre abyssal à la place d'une Mythique ou d'une Secrète
   if d.a = me then mine := d.a_score; theirs := d.b_score; else mine := d.b_score; theirs := d.a_score; end if;
   cards := coalesce(case when d.a = me then d.a_cards else d.b_cards end, '[]'::jsonb);
   if mine > theirs then
     res := 'win';
-    select x into trophy from jsonb_array_elements(case when d.a = me then d.b_cards else d.a_cards end) x
-      order by (x->>'pts')::int desc, array_position(array['C','PC','R','HR','M','S'], x->>'rarity') desc nulls last limit 1;
-    if trophy is not null and trophy->>'rarity' in ('M', 'S') then chest := 'abyssal'; trophy := null; end if;
+    choices := coalesce(case when d.a = me then d.b_cards else d.a_cards end, '[]'::jsonb);
   elsif mine = theirs then res := 'tie';
   else res := 'lose'; end if;
   if d.a = me then update public.versus_duels set a_claimed = true where id = p_id;
   else update public.versus_duels set b_claimed = true where id = p_id; end if;
-  return jsonb_build_object('result', res, 'cards', cards, 'stake', d.stake, 'trophy', trophy, 'chest', chest,
+  return jsonb_build_object('result', res, 'cards', cards, 'stake', d.stake, 'choices', choices, 'pick', res = 'win',
     'packs', greatest(1, coalesce(jsonb_array_length(d.lineup), d.packs, 1)));
 end $$;
+
+-- ——— v736 : butin du gagnant : une carte choisie parmi celles de l'adversaire (une seule fois) ——————————————————
+create or replace function public.versus_pick(p_id uuid, p_idx int)
+returns jsonb language plpgsql volatile security definer set search_path = public as $$
+declare me uuid := auth.uid(); d public.versus_duels; mine int; theirs int; foe jsonb; c jsonb;
+begin
+  if me is null then raise exception 'Connecte-toi d’abord.'; end if;
+  select * into d from public.versus_duels where id = p_id and me in (a, b) for update;
+  if not found then raise exception 'Défi introuvable.'; end if;
+  if d.status <> 'done' then raise exception 'Ce duel n’est pas encore joué.'; end if;
+  if d.a = me then mine := d.a_score; theirs := d.b_score; foe := d.b_cards; else mine := d.b_score; theirs := d.a_score; foe := d.a_cards; end if;
+  if not (mine > theirs) then raise exception 'Seul le gagnant choisit un butin.'; end if;
+  if (d.a = me and d.a_pick is not null) or (d.a <> me and d.b_pick is not null) then raise exception 'Butin déjà choisi.'; end if;
+  if p_idx is null or p_idx < 0 or p_idx >= coalesce(jsonb_array_length(foe), 0) then raise exception 'Carte inconnue.'; end if;
+  c := foe -> p_idx;
+  if d.a = me then update public.versus_duels set a_pick = p_idx where id = p_id;
+  else update public.versus_duels set b_pick = p_idx where id = p_id; end if;
+  if c->>'rarity' in ('M', 'S') then return jsonb_build_object('trophy', null, 'chest', 'abyssal'); end if;
+  return jsonb_build_object('trophy', c, 'chest', null);
+end $$;
+revoke execute on function public.versus_pick(uuid, int) from public, anon;
+grant execute on function public.versus_pick(uuid, int) to authenticated;
 
 -- ——— Listes : défis ouverts des autres, et mes défis (30 derniers) ————————————————————
 -- v565 : apparence de l'adversaire (sachet de booster, cadre, plaque : colonnes aussi créées par 15-vitrine.sql)

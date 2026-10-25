@@ -13,7 +13,7 @@ import { icon, sigil, EMBLEM, picon } from '../ui/icons.js';
 import { profileAttrs } from '../ui/report.js';
 import { esc, fmt, toast, confirmBox, openSheet, bindActions, pending, withPending } from '../ui/dom.js';
 import { packHTML } from './shop.js';
-import { playDuel } from './versus-duel.js';
+import { playDuel, pickGridHTML } from './versus-duel.js';
 import { checkTurns } from '../cloud/mpwatch.js';
 import { t, tx } from '../i18n.js';
 
@@ -24,7 +24,7 @@ const HOW = [['booster', '#E8C35A', 'Compose ton défi', `Choisis jusqu’à ${V
   ['cur-shard', '#7FA8D8', 'Tes boosters', 'Chaque joueur paie ses boosters en éclats, au prix de la boutique, et garde toujours toutes les cartes qu’il ouvre.'],
   ['amis', '#9FE0FF', 'Ton adversaire', `Ton défi est ouvert à tous, ou envoyé à un ami. S’il n’est pas relevé en ${VERSUS_HOURS} h, tes éclats te sont rendus.`],
   ['cards', '#C9A45A', 'Les points', `Quand un joueur relève le défi, les boosters des deux joueurs s’ouvrent. Commune ${LUCK_POINTS.C}, Peu commune ${LUCK_POINTS.PC}, Rare ${LUCK_POINTS.R}, Hyper rare ${LUCK_POINTS.HR}, Mythique ${LUCK_POINTS.M}, Secrète ${LUCK_POINTS.S}, +${LUCK_POINTS.variant} par finition.`],
-  ['crown', '#F2C14E', 'La victoire', `Le meilleur total gagne un butin offert par l’Abysse : une copie de la plus belle carte de son adversaire (une Mythique ou une Secrète est remplacée par un coffre abyssal) et ${Math.round(VERSUS_PRIZE.win * 100)} % du prix de ses boosters en éclats. L’adversaire ne perd rien.`],
+  ['crown', '#F2C14E', 'La victoire', `Le meilleur total gagne un butin offert par l’Abysse : la copie d’une carte de son choix parmi celles de l’adversaire (une Mythique ou une Secrète donne un coffre abyssal) et ${Math.round(VERSUS_PRIZE.win * 100)} % du prix de ses boosters en éclats. L’adversaire ne perd rien.`],
   ['seal', '#7FE0A0', 'Égalité', `Chacun reçoit ${Math.round(VERSUS_PRIZE.tie * 100)} % du prix de ses boosters en éclats.`],
   ['hourglass', '#C9A45A', 'Chaque jour', `Le butin compte pour ${VERSUS_PRIZE.packsPerDay} boosters par jour. Au-delà, on joue pour la gloire : chacun garde toujours ses cartes.`],
   ['ui-eye', '#E0485E', 'Aucune triche', 'Les boosters sont ouverts par le serveur : personne ne peut truquer les tirages.']];
@@ -76,6 +76,8 @@ export default function versusScreen(app, root) {
       ${err ? `<p class="panel small center">${icon('info')} ${esc(err)}</p>` : ''}
       ${toSee.length ? `<section class="panel vs-sec vs-hot"><h2 class="section-title">Duels à voir <span class="pill-n">${toSee.length}</span></h2>
         ${toSee.map((r) => row(r, `<button class="btn small primary" data-act="see" data-id="${esc(r.id)}">Voir le duel</button>`, `${lbl(r)} · ton défi a été relevé`)).join('')}</section>` : ''}
+      ${mine.filter((r) => g.s.versus.pick?.[r.id]).length ? `<section class="panel vs-sec vs-hot"><h2 class="section-title">Butin à choisir</h2>
+        ${mine.filter((r) => g.s.versus.pick?.[r.id]).map((r) => row(r, `<button class="btn small primary" data-act="pickloot" data-id="${esc(r.id)}">${icon('crown')} Choisir</button>`, `${lbl(r)} · ${t('tu as gagné ce duel')}`)).join('')}</section>` : ''}
       ${incoming.length ? `<section class="panel vs-sec"><h2 class="section-title">Défis reçus</h2>
         ${incoming.map((r) => row(r, `<span class="vs-acts"><button class="btn small primary" data-act="accept" data-id="${esc(r.id)}">Relever · ${fmt(r.stake)} ${icon('crystal')}</button><button class="btn small ghost" data-act="decline" data-id="${esc(r.id)}">Refuser</button></span>`, lbl(r))).join('')}</section>` : ''}
       ${createHTML()}
@@ -86,7 +88,7 @@ export default function versusScreen(app, root) {
         ${waiting.map((r) => row(r, `<button class="btn small ghost" data-act="cancel" data-id="${esc(r.id)}">Annuler</button>`, `${lbl(r)} · ${r.public ? 'ouvert à tous' : 'pour ton ami'} · encore ${left(r.created_at)} h`, true)).join('')}
         <p class="small muted">Tes éclats te sont rendus si personne ne relève ton défi en ${VERSUS_HOURS} h, ou si tu l’annules.</p></section>` : ''}
       ${past.length ? `<details class="panel dc-fold vs-sec"><summary><span class="dc-sum-t">Derniers duels</span></summary>
-        ${past.map((r) => { const res = r.my_score > r.their_score ? 'win' : r.my_score === r.their_score ? 'tie' : 'lose'; return row(r, `<button class="btn small ghost" data-act="replay" data-id="${esc(r.id)}"><b class="vs-res ${res}">${RES[res]}</b> ${fmt(r.my_score)} – ${fmt(r.their_score)}</button>`, lbl(r)); }).join('')}</details>` : ''}
+        ${past.map((r) => { const res = r.my_score > r.their_score ? 'win' : r.my_score === r.their_score ? 'tie' : 'lose'; return row(r, g.s.versus.pick?.[r.id] ? `<button class="btn small primary" data-act="pickloot" data-id="${esc(r.id)}">${icon('crown')} Choisir mon butin</button>` : `<button class="btn small ghost" data-act="replay" data-id="${esc(r.id)}"><b class="vs-res ${res}">${RES[res]}</b> ${fmt(r.my_score)} – ${fmt(r.their_score)}</button>`, lbl(r)); }).join('')}</details>` : ''}
       ${rulesHTML()}
       ${statsHTML()}`;
   }
@@ -232,8 +234,22 @@ export default function versusScreen(app, root) {
   }
 
   // ——— Le face-à-face (v521 : plein écran, js/screens/versus-duel.js) ———
+  /* v736 : le gagnant choisit sa carte parmi celles de l'adversaire */
+  async function pickLoot(id, i) {
+    try { const { out } = await withPending(app.partie.first('versusPick', id, i)); app.chrome?.(); if (out?.progress?.length) { app.pendingProgress = out.progress; app.flushProgress?.(); } return out; }
+    catch (e) { app.sfx.error(); toast(esc(e.status === 404 ? OFF : e.message), { kind: 'error', icon: 'info' }); throw e; }
+  }
+  function pickSheet(r) {
+    const sh = openSheet(`<h2 class="center">${t('Ton butin')}</h2><p class="small center">${t('Choisis ta carte parmi celles de {name} :', { name: esc(name({ a: r.mine ? r.b : r.a, pseudo: r.pseudo })) })}</p>${pickGridHTML(app, r.their_cards)}`, { label: t('Ton butin') });
+    sh.body.addEventListener('click', async (e) => {
+      const b = e.target.closest('[data-v="pick"]'); if (!b || sh.busy) return;
+      sh.busy = true;
+      try { const o = await pickLoot(r.id, +b.dataset.i); const tc = o?.trophy && cat.get(o.trophy.id); sh.close(); toast(tc ? t('Copie de <b>{card}</b>', { card: esc(tc.name) }) : t('Coffre abyssal'), { kind: 'success', icon: 'crown' }); draw(); }
+      catch (er) { sh.busy = false; }
+    });
+  }
   function duel(r, out) {
-    playDuel(app, r, out, { foeName: name({ a: r.mine ? r.b : r.a, pseudo: r.pseudo }), myAvatar: g.shownAvatar() || sync.profile?.avatar,
+    playDuel(app, r, out, { foeName: name({ a: r.mine ? r.b : r.a, pseudo: r.pseudo }), myAvatar: g.shownAvatar() || sync.profile?.avatar, onPick: (i) => pickLoot(r.id, i),
       onClose: () => { if (out?.progress?.length) { app.pendingProgress = out.progress; app.flushProgress?.(); out.progress = null; } draw(); } });
   }
 
@@ -250,6 +266,7 @@ export default function versusScreen(app, root) {
     decline(el) { cancel(el.dataset.id, true); },
     cancel(el) { cancel(el.dataset.id); },
     see(el) { see(el.dataset.id); },
+    pickloot(el) { const r = data?.mine?.find((x) => x.id === el.dataset.id); if (r) pickSheet(r); },
     replay(el) { const r = data?.mine?.find((x) => x.id === el.dataset.id); if (r) duel(r, null); },
   });
   draw();

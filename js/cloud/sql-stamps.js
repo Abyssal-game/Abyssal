@@ -38,7 +38,7 @@ export const SQL_STAMPS = {
   },
   "08": {
     "file": "08-versus.sql",
-    "stamp": "c9fcdc71f6df"
+    "stamp": "51026b0cf559"
   },
   "09": {
     "file": "09-multijoueur.sql",

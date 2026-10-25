@@ -511,7 +511,10 @@ export class Game {
       out.shards = Math.round((res.stake || 0) * VERSUS_PRIZE[res.result] * counted / packs / 5) * 5;
       if (out.shards > 0) this.grant({ shards: out.shards }, 'versus');
     }
-    if (counted > 0 && res.result === 'win') {
+    if (counted > 0 && res.result === 'win' && Array.isArray(res.choices) && res.choices.length) {
+      /* v736 : le gagnant choisit ensuite sa carte parmi celles de l'adversaire (versusPick) */
+      (v.pick ||= {})[id] = true; out.pick = true; out.choices = res.choices;
+    } else if (counted > 0 && res.result === 'win') {
       const tr = res.trophy, tc = tr && this.catalog.get(tr.id);
       if (tc && VERSUS_PRIZE.trophyRar.includes(tc.rarity)) { const r = this.addCard(tr.id, tr.variant || 'normal', 'booster'); out.trophy = { ...tr, ...r }; }
       else if (res.chest === 'abyssal' || tc) { this.addChests({ abyssal: 1 }); out.chest = 'abyssal'; }
@@ -520,6 +523,19 @@ export class Game {
     v.best = Math.max(v.best || 0, v.streak);
     v.won += out.cards.length + (out.trophy ? 1 : 0);
     this.s.xp += 10;
+    out.progress = this.checkProgress();
+    this.persist();
+    return out;
+  }
+  // v736 : butin choisi par le gagnant (réponse de versus_pick : { trophy } ou { chest: 'abyssal' }), une seule fois
+  versusPickApply(id, res) {
+    const v = this.s.versus;
+    if (!v.pick?.[id] || !res) return null;
+    delete v.pick[id];
+    const out = { trophy: null, chest: null };
+    const tc = res.trophy && this.catalog.get(res.trophy.id);
+    if (tc && VERSUS_PRIZE.trophyRar.includes(tc.rarity)) { const r = this.addCard(res.trophy.id, res.trophy.variant || 'normal', 'booster'); out.trophy = { ...res.trophy, ...r }; v.won++; }
+    else if (res.chest === 'abyssal' || tc) { this.addChests({ abyssal: 1 }); out.chest = 'abyssal'; }
     out.progress = this.checkProgress();
     this.persist();
     return out;
