@@ -98,7 +98,7 @@ export default function settings(app, root) {
   function tabTutos() {
     const seen = g.s.tips || {};
     /* v545 : l'ancien groupe « Aventure » séparé en Descente et Cercle de l’Abysse (jeux regroupés) */
-    const DESC = ['army-doors', 'trials', 'cb-talent', 'dc-nightmare'];
+    const DESC = ['army-doors', 'dc-torches', 'trials', 'cb-talent', 'dc-nightmare'];
     const GAMES = ['sceaux', 'sceaux-board', 'sceaux-sacre', 'sceaux-combo', 'sceaux-perks', 'sceaux-awake', 'pacte', 'pacte-play', 'cryptes', 'cryptes-play', 'encheres', 'encheres-play'];
     const grp = (t) => (GAMES.includes(t.key) ? 'Cercle de l’Abysse' : DESC.includes(t.key) || t.group === 'Aventure' ? 'Descente' : t.group);
     const ord = (t) => { const k = [DESC, GAMES].map((l) => l.indexOf(t.key)).find((x) => x >= 0); return k ?? TUTOS.indexOf(t); };

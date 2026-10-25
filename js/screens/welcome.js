@@ -12,7 +12,7 @@ const GUIDE_V = 2;
 const PAGES = [
   { img: 1, t: 'Bienvenue dans l’Abysse', p: 'Les sept royaumes avaient enfermé leurs monstres dans un livre : le Bestiaire interdit. Une nuit, il a été déchiré. Ses pages se sont envolées, ses chapitres sont tombés dans l’Abysse. Tu es le dernier à savoir lire les sceaux : retrouve les pages, et referme les chapitres.' },
   { img: 2, t: 'Ouvre des boosters', p: 'Chaque booster renferme des pages perdues du Bestiaire : chaque carte est une créature. Déchire le paquet du doigt, puis retourne les cartes. Un booster gratuit t’attend chaque jour, et tes meilleures créatures forment ton équipe.' },
-  { img: 3, t: 'La Descente', p: 'Chaque chapitre tombé est gardé par un rêve de l’Abysse. Dans Aventure, descends avec ton équipe : 20 chapitres de 5 étages, et un gardien au bout de chacun. Tes doublons deviennent des cendres, qui font monter tes créatures de niveau.' },
+  { img: 3, t: 'La Descente', p: 'Chaque chapitre tombé est gardé par un rêve de l’Abysse. Dans Aventure, descends avec ton équipe : 20 chapitres de 5 étages, et un gardien au bout de chacun. Chaque jour, 5 Torches : une par combat. Tes doublons deviennent des cendres, qui font monter tes créatures de niveau.' },
   { img: 4, t: 'Reviens chaque jour', p: 'L’Accueil rassemble ce qui t’attend : les Épreuves du jour, les missions, les coffres et tes parties du Cercle de l’Abysse, contre ses arbitres ou d’autres joueurs. Les bulles d’aide t’expliqueront le reste au bon moment.' },
 ];
 

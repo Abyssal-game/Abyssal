@@ -39,8 +39,8 @@ function markPaid(g, id, stake) {
 const NET = {
   async versusCreate(c, g, lineup, to = null) {
     const stake = lineupStake(lineup);
-    if (!(stake > 0)) throw new Error('Mise invalide.');
-    if (g.s.shards < stake) throw new Error(`Il te manque ${stake - g.s.shards} éclats pour cette mise.`);
+    if (!(stake > 0)) throw new Error('Prix invalide.');
+    if (g.s.shards < stake) throw new Error(`Il te manque ${stake - g.s.shards} éclats pour ces boosters.`);
     const id = await c.db.rpc('versus_create_mix', { p_lineup: lineup, p_to: to }, c.token);
     g.versusPay(stake); markPaid(g, id, stake);
     return { id, stake };

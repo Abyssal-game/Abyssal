@@ -62,7 +62,7 @@ export default function pacteScreen(app, root) {
     document.querySelector('.sc-scene')?.remove();
     setScene('menu');
     if (!g.sceauxOpen()) {
-      root.innerHTML = `<header class="screen-head ui-hero bn-pacte"><h1>Le Pacte</h1><p class="muted">Tente ta chance… sans briser le pacte.</p></header>
+      root.innerHTML = `<header class="screen-head ui-hero bn-pacte"><h1>Le Pacte</h1><p class="muted">Encore une carte… sans briser le pacte.</p></header>
         <section class="panel tr-lock">${icon('lock')}<b>Encore scellé</b><p class="small">Vaincs ton <b>premier gardien</b> dans la Descente (étage 5) pour ouvrir le Cercle de l’Abysse.</p><a class="btn primary block" href="#/descente">${icon('p:descend')}Aller à la Descente</a></section>`;
       return;
     }

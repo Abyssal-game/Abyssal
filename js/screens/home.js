@@ -109,7 +109,8 @@ export default function home(app, root) {
     const ch = run ? Math.ceil((run.floor || 1) / 5) : g.chapterNow();
     const done = !run && (d.best || 0) >= 100;
     const label = run ? `Reprendre le chapitre ${ch}` : done ? 'Retourner dans l’Abysse' : d.best ? `Continuer · chapitre ${ch}` : 'Descendre';
-    const sub = run ? `Étage ${run.floor} en cours` : done ? 'Rejoue un chapitre ou tente le Cauchemar' : 'La Descente t’attend';
+    const tc = g.torches();
+    const sub = !tc.left ? 'Torches éteintes · retour demain' : run ? `Étage ${run.floor} en cours · ${tc.left} Torche${tc.left > 1 ? 's' : ''}` : done ? 'Rejoue un chapitre ou tente le Cauchemar' : `La Descente t’attend · ${tc.left} Torche${tc.left > 1 ? 's' : ''}`;
     return `<a class="btn primary block big-cta dc-plq dc-plq-red hm-play" href="#/descente">${icon('p:descend')}<span><b>${label}</b><small>${sub}</small></span></a>`;
   }
   function mainGoalHTML() { return goals.length ? `<section class="panel ornate hg-main-wrap">${goalRow(goals[0], 'hg-main')}</section>` : ''; }

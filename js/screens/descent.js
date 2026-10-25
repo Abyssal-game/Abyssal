@@ -90,7 +90,7 @@ export default function descent(app, root) {
         <div class="dc-teambtns"><a class="btn small ghost dc-plq dc-plq-dark" href="#/equipe">${icon('p:team-ic')}Mon équipe</a><a class="btn small ghost dc-plq dc-plq-dark" href="#/renfort">${icon('p:level-up')}Renforcer</a></div>
         ${team.length < TEAM.active ? (g.welcomePending() ? `<a class="btn gold block" href="#/boutique">${icon('ticket')}Ouvrir mon cadeau</a>` : `<p class="small v2-warn center">${icon('info')} Ajoute au moins ${TEAM.active} créatures à ton équipe pour descendre.</p>`) : ''}
         ${team.length >= TEAM.active && standing < TEAM.active ? `<p class="small v2-warn center">${icon('info')} Il faut ${TEAM.active} créatures debout pour descendre : ranime-les avec une Braise de vie, ou remplace-les dans ton équipe.</p>` : ''}
-        <button class="btn primary block big-cta dc-plq dc-plq-red" data-act="start" ${standing >= TEAM.active ? '' : 'disabled'}>${icon('p:descend')}${replay ? `Rejouer le chapitre ${ch}` : d.best ? `Commencer le chapitre ${ch}` : 'Descendre'}</button>
+        <button class="btn primary block big-cta dc-plq dc-plq-red" data-act="start" ${standing >= TEAM.active && g.torches().left ? '' : 'disabled'}>${icon('p:descend')}${!g.torches().left ? 'Torches éteintes' : replay ? `Rejouer le chapitre ${ch}` : d.best ? `Commencer le chapitre ${ch}` : 'Descendre'}</button>
         ${replay ? `<div class="dc-opts">
           ${g.nightmareUnlocked() ? `<button class="dc-opt dc-opt-night ${ui.nightmare ? 'on' : ''}" data-act="night" aria-pressed="${!!ui.nightmare}">${icon('skull')}<b>Cauchemar</b><small>${g.nightBest(nt()) ? `record : étage ${g.nightBest(nt())}` : `ennemis +${Math.round((NIGHT_TIERS[nt()].hp - 1) * 100)} % PV, +${Math.round((NIGHT_TIERS[nt()].atk - 1) * 100)} % ATQ`} · récompenses ×${String(NIGHT_TIERS[nt()].shards).replace('.', ',')}</small></button>` : `<button class="dc-opt off" data-act="optinfo">${icon('lock')}<b>Cauchemar</b><small>dès l’étage ${NIGHTMARE_AT}</small></button>`}
           <button class="dc-opt-info icon-btn" data-act="optinfo" aria-label="Explications du Cauchemar">${icon('info')}</button>
@@ -420,6 +420,7 @@ export default function descent(app, root) {
     const run = g.descent().run;
     setScene(run?.phase === 'battle' && !ui.paused ? null : 'descent');
     if (run?.phase !== 'battle') ui.paused = false;
+    if (!run || run.phase === 'doors') setTimeout(() => { if (root.isConnected && /^#\/descente/.test(location.hash)) tuto(app, 'dc-torches'); }, 600); /* v737 : les Torches expliquées une fois */
     if (!run) return lobby();
     if (run.phase === 'doors') return doorsView(run);
     if (run.phase === 'altar') return altarView(run);
