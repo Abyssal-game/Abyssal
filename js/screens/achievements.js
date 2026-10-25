@@ -3,6 +3,14 @@ import { cardHTML, lazyArt } from '../ui/card.js';
 import { icon, setIcon } from '../ui/icons.js';
 import { esc, bindActions, fmt, toast, confirmBox, paint } from '../ui/dom.js';
 
+/* v732 : un médaillon peint par famille de succès (assets/icons/ach-<famille>.webp). Tant qu'une image manque
+   (famille absente de ACH_PAINTED), l'ancienne icône reste. */
+const ACH_FAM = { unique: 'collection', rarity: 'collection', factions: 'collection', evolines: 'collection', boosters: 'boosters', daily: 'boosters',
+  depth: 'descente', hunted: 'combat', trophies: 'combat', trialWins: 'combat', trialPerfect: 'combat', sets: 'ensembles', variants: 'finitions', finish: 'finitions', burned: 'forge', mastered: 'forge', cardLevel: 'forge' };
+const ACH_PAINTED = new Set([]);
+const achIc = (a, done) => { const f = ACH_FAM[a.cond?.type] || 'collection';
+  return ACH_PAINTED.has(f) ? `<span class="ach-ic med ${done ? '' : 'off'}"><img alt="" src="assets/icons/ach-${f}.webp"></span>` : `<span class="ach-ic">${icon(done ? 'trophy' : 'star')}</span>`; };
+
 export default function achievements(app, root, params) {
   const g = app.game, cat = app.catalog;
   const st = (app.state.ach ||= { tab: 'succes' });
@@ -15,7 +23,7 @@ export default function achievements(app, root, params) {
       const cur = Math.min(g.achievementValue(a), g.achievementTarget(a));
       const tgt = g.achievementTarget(a);
       return `<article class="panel ach ${done ? 'done' : ''}">
-        <span class="ach-ic">${icon(done ? 'trophy' : 'star')}</span>
+        ${achIc(a, done)}
         <div class="ach-body"><h3>${esc(a.name)}</h3><p class="small muted">${esc(a.desc)}</p>
           ${done ? '' : `<span class="progress"><i style="width:${(cur / tgt) * 100}%"></i></span>`}
           <span class="small muted">${done ? `Débloqué le ${new Date(done).toLocaleDateString('fr-FR')}` : `${cur} / ${tgt}`} · ${app.rewardText(a.reward)}</span>

@@ -2,7 +2,7 @@
 import { notifSupported, pushSupported, enable as notifEnable } from '../notify.js';
 import { resetTips } from '../ui/coach.js';
 import { TUTOS, tuto } from '../ui/tutos.js';
-import { icon, EMBLEM } from '../ui/icons.js';
+import { icon, EMBLEM, picon } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, openSheet, bindActions, withPending, paint } from '../ui/dom.js';
 import { sfx, haptic } from '../ui/sound.js';
 import { partie, pendingOps } from '../cloud/partie.js';
@@ -91,12 +91,16 @@ export default function settings(app, root) {
       </section>
 `;
   }
+  /* v732 : médaillon de chaque groupe de tutoriels (images peintes : assets/icons/tuto-<clé>.webp quand elles arrivent) */
+  const TUTO_PAINTED = new Set([]);
+  const tic = (k, fb) => picon(TUTO_PAINTED.has(k) ? `tuto-${k}` : fb);
+  const TUTO_IC = { 'Combat': tic('combat', 'swords'), 'Descente': tic('descente', 'door-boss'), 'Cercle de l’Abysse': tic('cercle', 'seal'), 'Cartes': tic('cartes', 'cards'), 'Réglages': tic('reglages', 'settings') };
   function tabTutos() {
     const seen = g.s.tips || {};
     /* v545 : l'ancien groupe « Aventure » séparé en Descente et Cercle de l’Abysse (jeux regroupés) */
     const DESC = ['army-doors', 'trials', 'cb-talent', 'dc-nightmare'];
     const GAMES = ['sceaux', 'sceaux-board', 'sceaux-sacre', 'sceaux-combo', 'sceaux-perks', 'sceaux-awake', 'pacte', 'pacte-play', 'cryptes', 'cryptes-play', 'encheres', 'encheres-play'];
-    const grp = (t) => (DESC.includes(t.key) ? 'Descente' : GAMES.includes(t.key) ? 'Cercle de l’Abysse' : t.group);
+    const grp = (t) => (GAMES.includes(t.key) ? 'Cercle de l’Abysse' : DESC.includes(t.key) || t.group === 'Aventure' ? 'Descente' : t.group);
     const ord = (t) => { const k = [DESC, GAMES].map((l) => l.indexOf(t.key)).find((x) => x >= 0); return k ?? TUTOS.indexOf(t); };
     const ORDER = ['Combat', 'Descente', 'Cercle de l’Abysse', 'Cartes', 'Réglages'];
     const groups = [...new Set(TUTOS.map(grp))].sort((a, b) => (ORDER.indexOf(a) + 99) % 99 - (ORDER.indexOf(b) + 99) % 99);
@@ -105,7 +109,8 @@ export default function settings(app, root) {
         <h2>Revoir les tutoriels</h2>
         <p class="small muted">Touche un tutoriel pour le relire. Ceux que tu n’as pas encore rencontrés apparaîtront d’eux-mêmes au bon moment, ou touche-les pour les lire dès maintenant.</p>
         <button class="set-tuto big" data-act="welcome"><span class="set-tuto-ic">${icon('sparkle')}</span><span><b>Le guide de départ</b><span class="small muted">Les bases d’ABYSSAL en quelques pages</span></span>${icon('next')}</button>
-        ${groups.map((gr) => `<h3 class="set-tuto-g">${esc(gr)}</h3>${inGroup(gr).map((t) => `<button class="set-tuto ${seen[t.key] ? '' : 'new'}" data-act="tuto" data-k="${t.key}"><span class="set-tuto-ic">${icon('info')}</span><span><b>${esc(t.title)}</b><span class="small muted">${seen[t.key] ? 'Déjà vu' : 'Pas encore rencontré'}</span></span>${icon('next')}</button>`).join('')}`).join('')}
+        ${groups.map((gr) => { const list = inGroup(gr), left = list.filter((t) => !seen[t.key]).length; /* v732 : un groupe replié par thème */
+          return `<details class="set-tuto-grp" data-g="${esc(gr)}"${ui.tg?.has(gr) ? ' open' : ''}><summary><span class="set-tuto-gic">${TUTO_IC[gr] || picon('book')}</span><span><b>${esc(gr)}</b><span class="small muted">${list.length} tutoriel${list.length > 1 ? 's' : ''}${left ? ` · <em>${left} à découvrir</em>` : ''}</span></span>${icon('next')}</summary><div class="set-tuto-in">${list.map((t) => `<button class="set-tuto ${seen[t.key] ? '' : 'new'}" data-act="tuto" data-k="${t.key}"><span class="set-tuto-ic">${icon('info')}</span><span><b>${esc(t.title)}</b><span class="small muted">${seen[t.key] ? 'Déjà vu' : 'Pas encore rencontré'}</span></span>${icon('next')}</button>`).join('')}</div></details>`; }).join('')}
         <button class="btn small ghost" data-act="guide">${icon('back')}Réactiver toutes les bulles d’aide</button>
       </section>`;
   }
@@ -186,6 +191,8 @@ export default function settings(app, root) {
     once(root.querySelector('#vol'))?.addEventListener('change', (e) => { g.setSetting('volume', Number(e.target.value)); app.applySettings(); sfx.tap(); });
   }
 
+  /* v732 : on retient les groupes de tutoriels ouverts */
+  root.addEventListener('toggle', (e) => { const d = e.target; if (!d.matches?.('.set-tuto-grp')) return; ui.tg ||= new Set(); if (d.open) ui.tg.add(d.dataset.g); else ui.tg.delete(d.dataset.g); }, true);
   bindActions(root, {
     toggle(el) { g.setSetting(el.dataset.k, !g.s.settings[el.dataset.k]); app.applySettings(); render(); },
     seg(el) { g.setSetting(el.dataset.k, el.dataset.v); app.applySettings(); render(); if (el.dataset.k === 'hapLevel') haptic('crit'); /* v705 : essai de la force choisie */ },

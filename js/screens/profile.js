@@ -52,7 +52,18 @@ export default function profile(app, root) {
     const backNow = backs.find(([k]) => (s.back || null) === k) || backs[0];
     const fins = (s.finishes || []).filter((k) => FINISHES[k]);
     const dressed = Object.keys(s.dress || {}).length;
-    const frameBtn = ([k, name]) => { const has = s.frames.includes(k), how = U.frames.find((f) => f.key === k)?.how || ''; return `<button class="frame-pick ${has ? '' : 'pf-lock'}" data-cs="${has ? 'frame' : 'how'}" data-v="${has ? k : esc(name)}" data-how="${esc(how)}" aria-pressed="${s.frame === k}"><span class="avatar-mini pf pf-${k}">${has ? avImg : icon('lock')}</span><span class="small">${esc(name)}</span></button>`; };
+    const frameBtn = ([k, name]) => { const has = s.frames.includes(k), how = U.frames.find((f) => f.key === k)?.how || ''; return `<button class="frame-pick ${has ? '' : 'pf-lock'}" data-cs="${has ? 'frame' : 'how'}" data-v="${has ? k : esc(name)}" data-how="${esc(how)}" aria-pressed="${s.frame === k}"><span class="avatar-mini pf pf-${k}">${avImg}${has ? '' : `<i class="cs-lk">${icon('lock')}</i>`}</span><span class="small">${esc(name)}</span></button>`; };
+    /* v732 : rangée « À l’Échoppe » sous chaque rayon : ce qu'on n'a pas encore, grisé, et un lien vers le rayon */
+    const shopRow = (kind, ray) => {
+      if (!g.shopOn()) return '';
+      const miss = CATALOG.filter((it) => it.kind === kind && it.id && !g.catalogOwned(it.id));
+      if (!miss.length) return '';
+      const pic = (it) => kind === 'frame' ? `<span class="avatar-mini pf pf-${it.id}">${avImg}</span>` : kind === 'plate' ? `<span class="np np-${it.id} np-demo" translate="no">${esc(shownName)}</span>`
+        : `<img alt="" loading="lazy" src="assets/${{ back: 'backs', sachet: 'packs', mat: 'tapis', fond: 'fonds' }[kind]}/${it.id}.webp">`;
+      return `<div class="cs-shop k-${kind}"><h3 class="pf-tf-h">${picon('obsidienne')} ${miss.length} à l’Échoppe</h3>
+        <div class="cs-shop-row">${miss.slice(0, 8).map((it) => `<button class="cs-shop-it" data-cs="shop" data-v="${ray}" aria-label="${esc(it.name || '')}">${pic(it)}</button>`).join('')}</div>
+        <button class="btn ghost small" data-cs="shop" data-v="${ray}">${icon('next')} Voir le rayon</button></div>`;
+    };
     /* v557 : menu Personnaliser refait (scène illustrée, rangées avec aperçu, nombre possédé sur le total, barre) */
     const shownName = sync.profile?.pseudo || s.name || 'Toi';
     const avImg = av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM;
@@ -82,23 +93,23 @@ export default function profile(app, root) {
         ${lockedT.length ? `<h3 class="pf-tf-h">${icon('lock')} ${lockedT.length} titre${lockedT.length > 1 ? 's' : ''} à gagner</h3><p class="small muted">Touche un titre pour savoir comment l’obtenir.</p><div class="chips pf-titles">${lockedT.map((x) => `<button class="chip pf-lock" data-cs="how" data-how="${esc(x.how)}" data-v="${esc(x.name)}">${icon('lock')}${esc(x.name)}</button>`).join('')}</div>` : ''}`;
     } else if (csTab === 'frames') {
       body = `<div class="frames">${ownF.map(frameBtn).join('')}</div>
-        ${lockedF.length ? `<h3 class="pf-tf-h">${icon('lock')} ${lockedF.length} cadre${lockedF.length > 1 ? 's' : ''} à gagner</h3><p class="small muted">Touche un cadre pour savoir comment l’obtenir.</p><div class="frames">${lockedF.map(frameBtn).join('')}</div>` : ''}`;
+        ${lockedF.length ? `<h3 class="pf-tf-h">${icon('lock')} ${lockedF.length} cadre${lockedF.length > 1 ? 's' : ''} à gagner</h3><p class="small muted">Touche un cadre pour savoir comment l’obtenir.</p><div class="frames">${lockedF.map(frameBtn).join('')}</div>` : ''}${shopRow('frame', 'frame')}`;
     } else if (csTab === 'plates') {
       const pl = [[null, 'Aucune plaque'], ...(s.plates || []).map((k) => [k, PLATES[k] || k])];
-      body = `<p class="small muted">La bannière derrière ton pseudo : sur ton profil, aux classements et chez tes adversaires en ligne.</p><div class="cs-plates">${pl.map(([k, n]) => `<button class="cs-plate" data-cs="plate" data-v="${k || ''}" aria-pressed="${(s.plate || null) === k}"><span class="np ${k ? `np-${k}` : 'np-none'}">${esc(shownName)}</span><small>${esc(n)}</small></button>`).join('')}</div>${g.shopOn() ? '<p class="small muted">D’autres plaques à l’Échoppe.</p>' : ''}`;
+      body = `<p class="small muted">La bannière derrière ton pseudo : sur ton profil, aux classements et chez tes adversaires en ligne.</p><div class="cs-plates">${pl.map(([k, n]) => `<button class="cs-plate" data-cs="plate" data-v="${k || ''}" aria-pressed="${(s.plate || null) === k}"><span class="np ${k ? `np-${k}` : 'np-none'}">${esc(shownName)}</span><small>${esc(n)}</small></button>`).join('')}</div>${shopRow('plate', 'plate')}`;
     } else if (csTab === 'sachets') {
       const prem = csSlot === 'premium', cur = (prem ? s.sachetPrem : s.sachet) || null;
       const sa = [[null, 'Sachet d’origine', prem ? 'premium' : 'standard3'], ...(s.sachets || []).map((k) => [k, SACHETS[k] || k, k])];
       body = `<div class="seg cs-slot" role="radiogroup" aria-label="Booster à habiller">${[['standard', 'Booster standard'], ['premium', 'Booster premium']].map(([k, n]) => `<button class="seg-b" role="radio" aria-checked="${csSlot === k}" aria-pressed="${csSlot === k}" data-cs="slot" data-v="${k}">${n}</button>`).join('')}</div>
-        <p class="small muted">${prem ? 'L’habillage de ton booster premium.' : 'L’habillage de ton booster standard. Ton adversaire le voit au Pari des Boosters.'} Les boosters de faction et des Alliances gardent leur sachet d’origine.</p><div class="cs-sachets">${sa.map(([k, n, f]) => `<button class="cs-sachet" data-cs="sachet" data-v="${k || ''}" aria-pressed="${cur === k}"><img alt="" src="assets/packs/${f}.webp"><small>${esc(n)}</small></button>`).join('')}</div>`;
+        <p class="small muted">${prem ? 'L’habillage de ton booster premium.' : 'L’habillage de ton booster standard. Ton adversaire le voit au Pari des Boosters.'} Les boosters de faction et des Alliances gardent leur sachet d’origine.</p><div class="cs-sachets">${sa.map(([k, n, f]) => `<button class="cs-sachet" data-cs="sachet" data-v="${k || ''}" aria-pressed="${cur === k}"><img alt="" src="assets/packs/${f}.webp"><small>${esc(n)}</small></button>`).join('')}</div>${shopRow('sachet', 'sachet')}`;
     } else if (csTab === 'mats') { /* v632 */
       const ms = [[null, 'Plateau d’origine', 'sceaux/plateau'], ...(s.mats || []).map((k) => [k, TAPIS[k] || k, `tapis/${k}`])];
-      body = `<p class="small muted">Le plateau de tes Duels des Sceaux, contre l’Abysse et en ligne.</p><div class="cs-mats">${ms.map(([k, n, f]) => `<button class="cs-matb" data-cs="mat" data-v="${k || ''}" aria-pressed="${(s.mat || null) === k}"><img alt="" src="assets/${f}.webp"><small>${esc(n)}</small></button>`).join('')}</div>`;
+      body = `<p class="small muted">Le plateau de tes Duels des Sceaux, contre l’Abysse et en ligne.</p><div class="cs-mats">${ms.map(([k, n, f]) => `<button class="cs-matb" data-cs="mat" data-v="${k || ''}" aria-pressed="${(s.mat || null) === k}"><img alt="" src="assets/${f}.webp"><small>${esc(n)}</small></button>`).join('')}</div>${shopRow('mat', 'mat')}`;
     } else if (csTab === 'fonds') { /* v632 */
       const fs = [[null, 'Fond d’origine', 'ui/bn-profile'], ...(s.fonds || []).map((k) => [k, FONDS[k] || k, `fonds/${k}`])];
-      body = `<p class="small muted">La scène derrière ton portrait : sur ton profil, et chez les autres joueurs quand ils ouvrent ta fiche.</p><div class="cs-fonds">${fs.map(([k, n, f]) => `<button class="cs-fondb" data-cs="fond" data-v="${k || ''}" aria-pressed="${(s.fond || null) === k}"><img alt="" src="assets/${f}.webp"><small>${esc(n)}</small></button>`).join('')}</div>`;
+      body = `<p class="small muted">La scène derrière ton portrait : sur ton profil, et chez les autres joueurs quand ils ouvrent ta fiche.</p><div class="cs-fonds">${fs.map(([k, n, f]) => `<button class="cs-fondb" data-cs="fond" data-v="${k || ''}" aria-pressed="${(s.fond || null) === k}"><img alt="" src="assets/${f}.webp"><small>${esc(n)}</small></button>`).join('')}</div>${shopRow('fond', 'fond')}`;
     } else if (csTab === 'backs') {
-      body = `<p class="small muted">Le dos de toutes les cartes face cachée du jeu.</p><div class="pf-backs">${backs.map(([k, n, u]) => `<button class="pf-back" data-cs="cardback" data-v="${k || ''}" aria-pressed="${(s.back || null) === k}"><img alt="" src="${u}"><span class="small">${esc(n)}</span></button>`).join('')}</div>`;
+      body = `<p class="small muted">Le dos de toutes les cartes face cachée du jeu.</p><div class="pf-backs">${backs.map(([k, n, u]) => `<button class="pf-back" data-cs="cardback" data-v="${k || ''}" aria-pressed="${(s.back || null) === k}"><img alt="" src="${u}"><span class="small">${esc(n)}</span></button>`).join('')}</div>${shopRow('back', 'live')}`;
     } else if (csTab === 'finishes') {
       body = fins.length ? `<p class="small muted">Un contour peint posé sur une carte que tu possèdes. Choisis une finition, puis touche les cartes à habiller (touche encore pour retirer).</p>
         <div class="cs-fins">${fins.map((k) => `<button class="cs-fin" data-cs="fin" data-v="${k}" aria-pressed="${cs?.fin === k}"><span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"><img alt="" src="assets/variants/${k}-frame.webp"></span><small>${esc(FINISHES[k].name)}</small></button>`).join('')}</div>
@@ -114,6 +125,7 @@ export default function profile(app, root) {
       const b = e.target.closest('[data-cs]'); if (!b) return;
       const k = b.dataset.cs, v = b.dataset.v;
       if (k === 'tab') { csTab = v || null; cs.fin = null; app.sfx.tap?.(); paint(); cs.body.scrollTop = 0; return; }
+      if (k === 'shop') { app.state.codex = { ...(app.state.codex || {}), tab: 'shop', cat: v }; cs.close(); app.go('codex'); return; } /* v732 */
       if (k === 'how') { toast(`${icon('lock')} <b>${esc(v)}</b><br><span class="small">${esc(b.dataset.how || 'Pas encore disponible.')}</span>`, { ms: 6000 }); return; }
       if (k === 'avatar') g.setAvatar(v);
       if (k === 'title') g.setTitle(v);
