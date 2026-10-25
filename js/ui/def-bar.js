@@ -94,9 +94,11 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
       hint.textContent = 'Touche dans l’or : esquive · trait blanc : parade' + (n > 1 ? ` · coup ${i + 1}/${n}` : '');
       let t0 = 0, fin = false, raf = 0, lit = '';
       const zoneAt = (x) => (moving ? Math.min(0.97 - zw, Math.max(0.3, z0 + Math.sin(x * 9) * T.moveAmp)) : z0);
-      const end = (res, when = null) => {
+      const end = (res, when = null, freeze = null) => {
         if (fin) return; fin = true; cancelAnimationFrame(raf); setTap(null); letGo = null; held = false;
         anims.forEach((a) => { try { a.commitStyles?.(); a.cancel(); } catch (e) {} }); anims = [];
+        /* v742 : le curseur s'arrête là où le toucher a été jugé (avant : là où il était quand le jeu traitait le toucher, plus loin) */
+        if (freeze) { cur.style.transform = `translateX(${(freeze.pos * bw).toFixed(1)}px)`; if (moving) zEl.style.transform = `translateX(${((freeze.zz - z0) * bw).toFixed(1)}px)`; }
         bar.classList.remove('go', 'pp', 'held'); bar.classList.add(res === 'none' ? 'ko' : 'ok', `r-${res}`);
         pips[i]?.classList.remove('now'); pips[i]?.classList.add(`r-${res}`);
         {
@@ -132,10 +134,13 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
         const now = performance.now(), when = at && at <= now && now - at < 500 ? at : now;
         const tol = T.tolPx / Math.max(80, bw), rank = { parry: 2, dodge: 1, none: 0 };
         /* position au toucher, et une image plus tôt (ce que l'œil voyait encore) : le meilleur des deux */
-        const res = [when, when - 17].map((tt) => { const x = (tt - t0) / D, pos = ease(Math.min(1, Math.max(0, x))), zz = zoneAt(x), pz = zz + zw - pw;
-          return pos >= pz - tol && pos <= zz + zw + tol ? 'parry' : pos >= zz - tol && pos < pz - tol ? 'dodge' : 'none'; });
+        /* v742 : jugé à l'instant du toucher + l'avance de l'affichage (T.leadMs), et une image plus tôt : le meilleur des deux */
+        const lead = T.leadMs || 0;
+        const res = [when + lead, when + lead - 17].map((tt) => { const x = (tt - t0) / D, pos = ease(Math.min(1, Math.max(0, x))), zz = zoneAt(x), pz = zz + zw - pw;
+          return { pos, zz, r: pos >= pz - tol && pos <= zz + zw + tol ? 'parry' : pos >= zz - tol && pos < pz - tol ? 'dodge' : 'none' }; });
         anims.forEach((a) => { try { a.pause(); } catch (e) {} });
-        end(res.sort((a, b) => rank[b] - rank[a])[0], when);
+        const best = res.sort((a, b) => rank[b.r] - rank[a.r])[0];
+        end(best.r, when + lead, best);
       };
       /* coup chargé : on appuie quand on veut, c'est le moment où l'on relâche qui compte */
       letGo = (ev) => { if (!hold || !held || fin) return; held = false; bar.classList.remove('held'); if (!t0) return end('none'); judgeAt(ev.timeStamp); };

@@ -13,6 +13,10 @@ export const DEF_DEFAULTS = {
   parryRatio: 0.05, parryMinNormal: 30, parryMinElite: 20, parryMinBoss: 17,
   gapFirst: 650, gapFirstRand: 450, gapMin: 140, gapRand: 360, pause: 180,
   moveAmp: 0.1, tolPx: 2, missShare: 0.33,
+  /* v742 : avance de l'affichage. Vidéo du propriétaire (app iPhone, 25 octobre 2026) : le curseur affiché par l'iPhone est
+     ≈ 2 images en avance sur sa position calculée ; un toucher pile sur le trait blanc était jugé « esquive », un toucher en
+     retard « parade ». Le toucher est jugé à son instant + cette avance (0 hors iPhone : Chromium affiche à l'heure). */
+  leadMs: /iPhone|iPad|iPod/.test(globalThis.navigator?.userAgent || '') ? 33 : 0,
 };
 
 // [clé, nom, explication, min, max, pas, unité]
@@ -53,6 +57,7 @@ export const DEF_GROUPS = [
     ['gapMin', 'Attente entre deux coups', '', 0, 1500, 10, 'ms'],
     ['gapRand', 'Attente entre deux coups · hasard', '', 0, 1500, 10, 'ms'],
     ['pause', 'Pause après chaque coup', 'Temps où le résultat reste affiché.', 0, 800, 10, 'ms'],
+    ['leadMs', 'Avance de l’affichage', 'Décalage entre ce que l’écran montre et le calcul : le toucher est jugé à son instant plus ce temps. Si un toucher pile sur le trait blanc donne une esquive, monte-le ; si un toucher en retard donne une parade, baisse-le.', 0, 120, 1, 'ms'],
     ['tolPx', 'Tolérance du toucher', 'Marge autour de la zone, en pixels de barre.', 0, 30, 1, 'px'],
     ['missShare', 'Ratés permis pour une esquive', 'Au-delà de cette part de coups ratés, la séquence compte comme « touché » (0,33 = un sur trois).', 0, 1, 0.01, ''],
   ]],
