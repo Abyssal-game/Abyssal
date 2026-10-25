@@ -309,6 +309,8 @@ export const sfx = {
   gavel() {}, cancel() {}, page() {}, 'en-coin'() {}, /* v465 : pièce posée aux Enchères */
   /* v457 : sons propres au Pacte (pa-) et aux Cryptes (cr-) ; v463 : ceux des Trois Autels retirés avec le jeu */
   'pa-draw'() {}, 'pa-bust'() {}, 'pa-seal'() {}, 'pa-guard'() {}, 'pa-offer'() {}, 'pa-seven'() {}, 'pa-bank'() {}, 'cr-flip'() {}, 'cr-pair'() {}, 'cr-miss'() {}, 'cr-power'() {}, 'vd-tear'() {}, 'vd-flip'() {}, 'vd-rare'() {}, 'vd-win'() {}, 'vd-lose'() {}, /* v561 : sons du Choc des Boosters (ElevenLabs) */
+  /* v779 : bruitages des cinématiques (prologue et fin de la Descente), joués seulement s'ils sont livrés */
+  'ci-forge'() {}, 'ci-sceller'() {}, 'ci-dechirer'() {}, 'ci-chute'() {}, 'ci-abime'() {}, 'ci-oeil'() {}, 'ci-page'() {}, 'ci-plume'() {}, 'ci-reveil'() {}, 'ci-trophee'() {},
   tap() { noise({ dur: 0.03, gain: 0.5, freq: vary(3200, 0.1), q: 1.2, wet: 0.05 }); osc(vary(1500, 0.05), { dur: 0.05, gain: 0.1, to: 900, wet: 0.05 }); },
   error() { osc(N.A3, { type: 'triangle', dur: 0.14, gain: 0.12, lp: 900, wet: 0.15 }); osc(N.F3, { type: 'triangle', dur: 0.22, gain: 0.12, lp: 700, delay: 0.1, wet: 0.2 }); },
   coin() { bell(vary(N.A6 * 0.75, 0.02), { dur: 0.35, gain: 0.14, ratio: 2.76, index: 1.2 }); bell(N.A6, { dur: 0.5, ratio: 2.76, index: 1.2, delay: 0.06, pan: 0.2, gain: 0.12 }); noise({ dur: 0.12, gain: 0.04, type: 'highpass', freq: 7000, delay: 0.04 }); },
@@ -513,6 +515,26 @@ function playSample(key, gain = 1) {
   out.connect(g); g.connect(bus); src.start();
   return true;
 }
+/* v779 : un son enregistré est-il prêt ? (les cinématiques gardent leur ancien son tant que le nouveau n'est pas livré) */
+export const hasSample = (k) => !!samples[k];
+/* v779 : voix du narrateur des cinématiques (assets/voix/<langue>/<scène>.mp3) : la musique baisse pendant qu'elle parle */
+const voiceBufs = {};
+export function loadVoice(url) {
+  if (!ensure()) return Promise.resolve(null);
+  return (voiceBufs[url] ||= getBytes(url).then(decodeBytes).catch(() => { delete voiceBufs[url]; return null; }));
+}
+export async function playVoice(url) {
+  const buf = await loadVoice(url);
+  if (!buf || !ensure()) return null;
+  try {
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const g = ctx.createGain(); g.gain.value = 1.15;
+    src.connect(g); g.connect(bus); src.start();
+    hooks.duck?.(buf.duration + 0.4, 0.35);
+    return { ms: buf.duration * 1000, stop() { try { g.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.08); src.stop(ctx.currentTime + 0.4); } catch (e) { /* rien */ } } };
+  } catch (e) { return null; }
+}
+export function clearVoices() { for (const k of Object.keys(voiceBufs)) delete voiceBufs[k]; }
 // sons sans fichier : seuls ceux-là restent synthétisés (bruits, jamais des notes)
 const SYNTH_ONLY = new Set(['rip', 'rumble']);
 

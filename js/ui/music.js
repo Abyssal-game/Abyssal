@@ -40,7 +40,7 @@ const THEMES = {
     drone: 0.04, lp: 460, every: [8, 11], pad: 0.012, bells: [7, 12], bell: 0.016, choir: 0.012, wind: 0, pluck: [2.5, 5],
   },
 };
-THEMES.abysse = THEMES.boss; THEMES.encheres = THEMES.sceaux; THEMES.pacte = THEMES.sceaux; THEMES.cryptes = THEMES.sceaux; THEMES.duels = THEMES.sceaux; THEMES.pari = THEMES.sceaux; /* v561 : musique du Choc des Boosters */ /* v467 : musique des Duels des Sceaux */ /* v458 : musiques du Pacte, des Cryptes et des Trois Autels */ /* v443 : Enchères et Énigmes */ /* v442 : combat contre L'Abysse (assets/music/abysse.mp3) */
+THEMES.prologue = THEMES.descente; THEMES.fin = THEMES.descente; /* v779 : musiques des cinématiques */ THEMES.abysse = THEMES.boss; THEMES.encheres = THEMES.sceaux; THEMES.pacte = THEMES.sceaux; THEMES.cryptes = THEMES.sceaux; THEMES.duels = THEMES.sceaux; THEMES.pari = THEMES.sceaux; /* v561 : musique du Choc des Boosters */ /* v467 : musique des Duels des Sceaux */ /* v458 : musiques du Pacte, des Cryptes et des Trois Autels */ /* v443 : Enchères et Énigmes */ /* v442 : combat contre L'Abysse (assets/music/abysse.mp3) */
 /* v463 : Cour des Masques, Énigmes et Trois Autels retirés du jeu (et leurs musiques) */
 export const MUSIC_DEMO = [['Accueil', 'antre'], ['Butin', 'boutique'], ['Descente', 'descente'], ['Combat', 'combat'], ['Gardien', 'boss'], ['Cercle de l’Abysse', 'sceaux'], ['Duels des Sceaux', 'duels'], ['Enchères', 'encheres'], ['Le Pacte', 'pacte'], ['Les Cryptes', 'cryptes'], ['Le Choc des Boosters', 'pari'], ['L’Abysse', 'abysse']];
 
@@ -288,6 +288,13 @@ export function musicSeek(off) {
   old.g.gain.cancelScheduledValues(t); old.g.gain.setValueAtTime(old.g.gain.value, t); old.g.gain.linearRampToValueAtTime(0.0001, t + 0.25);
   setTimeout(() => { try { old.s.stop(); } catch (e) { /* rien */ } }, 400);
   fileSource(cur, hold.key, 0.12);
+}
+/* v779 : musique d'une cinématique, depuis son début, seulement si son fichier est livré (sinon la musique du lieu continue) */
+export async function musicCinema(key) {
+  if (!on || !init()) return false;
+  loadTracks(); await trackLoad;
+  if (!trackList?.has(key)) return false;
+  musicCue(key, 0); return true;
 }
 // la musique redevient celle du lieu (si c'est la même, elle continue sans coupure)
 export function musicRelease() { hold = null; }

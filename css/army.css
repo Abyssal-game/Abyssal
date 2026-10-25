@@ -7211,3 +7211,60 @@ img.pa-defy-tag { width: 30%; height: auto; font-size: 0; text-shadow: none; fil
 .pw-eye { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; display: grid; place-items: center; border: 0; background: none; color: var(--gold, #d4af37); opacity: .8; cursor: pointer; }
 .pw-eye svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
 .pw-eye:active { opacity: 1; }
+/* v779 : cinématiques vivantes (prologue, fin de la Descente) : transitions, caméra, brume, particules, texte écrit à l'encre, progression */
+.endx-prog { position: absolute; top: calc(var(--safe-t, 0px) + 8px); left: 14px; right: 104px; z-index: 5; display: flex; gap: 4px; pointer-events: none; }
+.endx-prog i { flex: 1; height: 3px; border-radius: 2px; background: rgba(237,227,207,.16); overflow: hidden; }
+.endx-prog b { display: block; width: 0; height: 100%; background: linear-gradient(90deg, #B8892E, #F0C75E); }
+.endx-prog i.on b { width: 100%; }
+.endx-prog i.cur.run b { animation: endxProg linear forwards; }
+@keyframes endxProg { to { width: 100%; } }
+.endx-s > .endx-fx, .endx-s > .endx-fog { position: absolute; pointer-events: none; }
+.endx-fx { inset: 0; width: 100%; height: 100%; z-index: 2; }
+.endx-fog { inset: -25%; z-index: 1; opacity: .9; background: radial-gradient(ellipse 45% 22% at 30% 70%, rgba(150,110,210,.16), transparent 70%), radial-gradient(ellipse 40% 18% at 72% 58%, rgba(120,90,180,.13), transparent 70%); animation: endxFog 19s ease-in-out infinite alternate; }
+.endx-fog::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse 50% 20% at 55% 82%, rgba(30,20,50,.5), transparent 70%), radial-gradient(ellipse 35% 14% at 20% 40%, rgba(160,130,220,.1), transparent 70%); animation: endxFog2 11s ease-in-out infinite alternate; }
+@keyframes endxFog { to { transform: translate3d(9%, -4%, 0); } }
+@keyframes endxFog2 { to { transform: translate3d(-12%, 3%, 0); } }
+/* texte écrit à l'encre : chaque lettre s'allume d'or puis sèche */
+.endx-t.ink { animation: none; }
+.endx-t.ink .w { white-space: nowrap; }
+.endx-t.ink i { font-style: normal; opacity: 0; animation: endxInkL .6s calc(700ms + var(--i) * 26ms) ease-out forwards; }
+@keyframes endxInkL { 0% { opacity: 0; color: #FFE6A8; text-shadow: 0 0 12px rgba(255,200,110,.95), 0 2px 8px #000; } 35% { opacity: 1; } 100% { opacity: 1; } }
+.endx-s.written .endx-t.ink i { animation: none; opacity: 1; }
+.endx-s .endx-tap { animation: none; opacity: 0; transition: opacity .8s; }
+.endx-s.written .endx-tap { opacity: .5; }
+.endx-s .endx-go { animation: none; transition: opacity .6s; }
+.endx-s:not(.written) .endx-go { opacity: 0; pointer-events: none; }
+/* transitions entre les scènes */
+.endx-s.gone { animation: endxGone 1.1s ease forwards; pointer-events: none; }
+@keyframes endxGone { to { opacity: 0; } }
+.endx-s.tr-fade { animation: endxIn 1.2s ease both; }
+.endx-s.tr-black { animation: endxIn 1s .55s ease both; }
+.endx-s.gone:has(~ .endx-s.tr-black) { animation-duration: .5s; }
+.endx-s.tr-ink { animation: endxInk2 1.6s cubic-bezier(.55,0,.3,1) both; -webkit-mask: radial-gradient(circle at 50% 50%, #000 42%, rgba(0,0,0,.6) 52%, transparent 68%) 50% 55% / 0% 0% no-repeat; mask: radial-gradient(circle at 50% 50%, #000 42%, rgba(0,0,0,.6) 52%, transparent 68%) 50% 55% / 0% 0% no-repeat; }
+@keyframes endxInk2 { to { -webkit-mask-size: 340% 340%; mask-size: 340% 340%; } }
+.endx-s.tr-page { animation: endxPage 1.15s cubic-bezier(.6,0,.25,1) both; box-shadow: -18px 0 30px rgba(0,0,0,.7); }
+@keyframes endxPage { from { clip-path: inset(0 0 0 100%); } to { clip-path: inset(0 0 0 0); } }
+.endx-s.gone:has(~ .endx-s.tr-page) { animation: endxPageOut 1.15s cubic-bezier(.6,0,.25,1) forwards; }
+@keyframes endxPageOut { to { transform: translateX(-20%); opacity: .2; } }
+.endx-s.tr-flash { animation: endxIn .3s ease both; }
+.endx-flash { position: absolute; inset: 0; z-index: 6; pointer-events: none; background: radial-gradient(circle at 50% 45%, #fff 0, rgba(215,175,255,.95) 22%, rgba(120,60,200,.45) 55%, transparent 82%); animation: endxFlash 1s ease-out forwards; }
+@keyframes endxFlash { 0% { opacity: 0; } 10% { opacity: 1; } 100% { opacity: 0; } }
+/* caméra lente sur les images */
+.endx-s.cam-in .endx-bg { animation: endxCamIn 18s ease-out both; }
+.endx-s.cam-out .endx-bg { animation: endxCamOut 18s ease-out both; }
+.endx-s.cam-up .endx-bg { animation: endxCamUp 18s ease-in-out both; }
+.endx-s.cam-down .endx-bg { animation: endxCamDown 14s ease-in-out both; }
+.endx-s.cam-shake .endx-bg { animation: endxCamShake 14s ease-out both; }
+@keyframes endxCamIn { from { transform: scale(1.02); } to { transform: scale(1.16); } }
+@keyframes endxCamOut { from { transform: scale(1.2); } to { transform: scale(1.03); } }
+@keyframes endxCamUp { from { transform: translateY(-5%) scale(1.14); } to { transform: translateY(5%) scale(1.14); } }
+@keyframes endxCamDown { from { transform: translateY(5%) scale(1.14); } to { transform: translateY(-5%) scale(1.14); } }
+@keyframes endxCamShake { 0% { transform: scale(1.14); } 1% { transform: translate(-1.4%, .9%) scale(1.14); } 2% { transform: translate(1.2%, -1%) scale(1.14); } 3% { transform: translate(-.8%, .7%) scale(1.14); } 4.5% { transform: scale(1.14); } 100% { transform: scale(1.04); } }
+/* texte en haut (l'image garde son bas : les yeux du gouffre) */
+.endx-s.top { justify-content: flex-start; padding-top: calc(var(--safe-t, 0px) + 58px); }
+.endx-s.top::after { background: linear-gradient(0deg, transparent 52%, rgba(3,2,6,.85) 90%); }
+/* gros plans animés (planches Gemini de 8 images, bande horizontale) */
+.endx-s.close { justify-content: center; background: radial-gradient(ellipse at 50% 45%, rgba(70,35,110,.35), transparent 70%), #030206; }
+.endx-s.close::after { display: none; }
+.endx-close { width: min(90vw, 420px); aspect-ratio: 4 / 5; background-repeat: no-repeat; background-size: 800% 100%; background-position: 0 0; -webkit-mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 60%, transparent 100%); mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 60%, transparent 100%); }
+@media (prefers-reduced-motion: reduce) { .endx-fog, .endx-fog::after { animation: none !important; } }
