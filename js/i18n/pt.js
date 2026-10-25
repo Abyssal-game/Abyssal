@@ -8125,6 +8125,7 @@ export default {
   "Booster gratuit du jour ({0} h), à toi de jouer en ligne, défis reçus, défi relevé au Choc des Boosters, demandes d’ami.": "Booster grátis do dia ({0} h), sua vez on-line, desafios recebidos, Batalha aceita, pedidos de amizade.",
   "Ton duel du Choc des Boosters contre {name} est prêt : va le voir !": "Seu duelo da Batalha dos Pacotes contra {name} está pronto: vá ver!",
   "Booster gratuit du jour (10 h), à toi de jouer en ligne, défis reçus, défi relevé au Choc des Boosters, demandes d’ami.": "Booster grátis do dia (10 h), sua vez on-line, desafios recebidos, Batalha aceita, pedidos de amizade.",
+  'Le serveur n’a pas reçu la fin de ce combat : il reprend là où le serveur l’a compté.': 'O servidor não recebeu o fim deste combate: ele continua de onde o servidor o contou.',
 };
 
 export const names = {

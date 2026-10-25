@@ -8136,6 +8136,7 @@ export default {
   "Booster gratuit du jour ({0} h), à toi de jouer en ligne, défis reçus, défi relevé au Choc des Boosters, demandes d’ami.": "Free daily booster ({0} a.m.), your turn online, challenges received, Clash taken, friend requests.",
   "Ton duel du Choc des Boosters contre {name} est prêt : va le voir !": "Your Booster Clash duel against {name} is ready: go and see it!",
   "Booster gratuit du jour (10 h), à toi de jouer en ligne, défis reçus, défi relevé au Choc des Boosters, demandes d’ami.": "Free daily booster (10 a.m.), your turn online, challenges received, Clash taken, friend requests.",
+  'Le serveur n’a pas reçu la fin de ce combat : il reprend là où le serveur l’a compté.': "The server didn't receive the end of this battle: it resumes where the server counted it.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

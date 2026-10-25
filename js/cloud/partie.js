@@ -8,6 +8,7 @@ import * as cloud from './cloud.js';
 import { recordOps } from '../core/oprec.js';
 import { FREE, FREE_DEV, getPath, setPath, clone, digest } from '../core/ops.js';
 import { migrate } from '../core/save.js';
+import { toast } from '../ui/dom.js';
 
 export const partie = { mode: 'unknown', error: null, last: 0 };
 const K = { queue: 'abyssal.ops', seq: 'abyssal.opseq', dev: 'abyssal.device', mode: 'abyssal.partieMode' };
@@ -44,8 +45,22 @@ function freeSnap() {
   return o;
 }
 const safe = () => !queue.length && !document.body.classList.contains('battle-mode') && !document.querySelector('.opening');
+// v740 : actions refusées par le serveur, gardées sur l'appareil (Mode Créateur → Journal du serveur) pour comprendre un écart
+const ERR_KEY = 'abyssal.partieErrs';
+export function partieErrs() { try { return JSON.parse(lsGet(ERR_KEY) || '[]'); } catch (e) { return []; } }
+function noteErrs(ops, errs) {
+  const ks = Object.keys(errs || {});
+  if (!ks.length) return;
+  const byQ = Object.fromEntries(ops.map((o) => [o.q, o.m]));
+  const list = [...ks.map((q) => ({ t: Date.now(), m: byQ[q] || '?', e: String(errs[q]).slice(0, 160) })), ...partieErrs()].slice(0, 30);
+  lsSet(ERR_KEY, JSON.stringify(list));
+}
+// combat terminé sur le téléphone mais pas sur le serveur : on le dit au lieu de relancer le combat sans explication
+const openFights = (s) => [s?.trials?.battle && !s.trials.battle.over ? 'trial' : null, s?.descent?.run?.battle && !s.descent.run.battle.over ? 'run' : null].filter(Boolean);
 export function adopt(data) {
   if (digest(data) === digest(g.s)) { waiting = null; return; } // rien qui compte n'a changé : on ne redessine pas
+  const back = openFights(data).filter((k) => !openFights(g.s).includes(k));
+  if (back.length) { noteErrs([{ q: 0, m: 'adopt' }], { 0: `combat repris du serveur (${back.join(', ')})` }); toast('Le serveur n’a pas reçu la fin de ce combat : il reprend là où le serveur l’a compté.', { kind: 'error', ms: 6000 }); }
   const m = clone(data);
   for (const p of [...FREE, ...FREE_DEV]) { const v = getPath(g.s, p); if (v !== undefined) setPath(m, p, clone(v)); }
   waiting = null;
@@ -67,6 +82,7 @@ export function flush({ want = false } = {}) {
     inflight = null;
     if (uid() !== who) return null; // compte changé entre-temps
     if (partie.mode !== 'server') { partie.mode = 'server'; lsSet(K.mode, `server:${who}`); }
+    noteErrs(ops, res?.errs);
     queue = queue.filter((o) => o.q > sent); saveQueue();
     if (queue.length) { clearTimeout(timer); timer = setTimeout(() => flush().catch(() => {}), 300); } // la suite des coups en attente
     lastFree = frTxt; partie.error = null; partie.last = Date.now();

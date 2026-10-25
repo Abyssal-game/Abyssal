@@ -121,6 +121,7 @@ export async function handle({ uid, token, body }, { db, now = () => Date.now(),
     if (!data) { const old = await db.legacySave(uid); data = old ? migrate(old) : defaultSave(now()); data.serverSince = now(); }
     let tz = okTz(row.tz) ? row.tz : 0, tzAt = row.tz_at || 0;
     if (okTz(b.tz) && b.tz !== tz && (!row.tz_at || now() - tzAt > TZ_LOCK_DAYS * 864e5 || row.tz == null)) { tz = b.tz; tzAt = now(); }
+    else if (okTz(b.tz) && Math.abs(b.tz - tz) === 60) tz = b.tz; /* v740 : heure d'été / d'hiver : une heure d'écart passe toujours (le 25 octobre 2026, le serveur gardait l'heure d'été une semaine et changeait de jour à 23 h) */
     const creator = await db.isCreator(uid);
     const g = gameFor(data, { tz, rng, now });
     if (!Number.isInteger(g.s.seedBase)) g.s.seedBase = Math.floor(rng() * 2 ** 31); // v540 : graine des combats et mini-jeux (le téléphone la reçoit)

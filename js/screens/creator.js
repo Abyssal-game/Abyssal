@@ -10,6 +10,7 @@ import { openDefenseLab } from './defense-lab.js'; /* v594 */
 import { sfx, audioInfo } from '../ui/sound.js'; /* v622 */
 import { openServerState } from './server-state.js'; /* v678 */
 import { perfOn, setPerf, perfLog, perfClear, perfReport } from '../ui/perf.js'; /* v601 */
+import { partieErrs } from '../cloud/partie.js'; /* v740 */
 
 const SNAP = 'abyssal.snapshot';
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -89,6 +90,11 @@ export function openCreator(app) {
         <p class="small">${perfOn() ? '<b class="dc-good">Allumé</b>' : 'Éteint'} · ${perfLog().length} combat(s) relevé(s)${perfLog()[0] ? ` · dernier : ${perfLog()[0].fps} i/s, ${perfLog()[0].nHitch} saccade(s)` : ''}</p>
         <div class="row gap wrap">${B('perf', perfOn() ? 'Éteindre le moniteur' : 'Allumer le moniteur', perfOn() ? '' : 'gold')}${B('perfcopy', 'Copier le rapport', '')}${perfLog().length ? B('perfclear', 'Effacer les relevés', '') : ''}</div></section>
 
+      <section class="cr-sec" translate="no"><h3>Journal du serveur</h3>
+        <p class="small muted">Actions que le serveur de partie a refusées sur cet appareil (les 30 dernières). Si un combat revient tout seul, copie ce journal et colle-le dans la conversation.</p>
+        <p class="small">${partieErrs().length ? partieErrs().slice(0, 6).map((x) => `${esc(new Date(x.t).toLocaleString('fr-FR'))} · <b>${esc(x.m)}</b> · ${esc(x.e)}`).join('<br>') : 'Rien de refusé.'}</p>
+        <div class="row gap wrap">${B('errcopy', 'Copier le journal', '')}</div></section>
+
       <section class="cr-sec" translate="no"><h3>Son (diagnostic)</h3>
         <p class="small muted">${(() => { const a = audioInfo(); return `Son : ${esc(a.state)} · ${a.samples}${a.expected != null ? `/${a.expected}` : ''} sons chargés · session ${esc(String(a.session))}${a.enabled ? '' : ' · coupé dans les réglages'}${a.diag.failGet || a.diag.failDecode || a.diag.err ? ` · échecs lecture ${a.diag.failGet}, décodage ${a.diag.failDecode}${a.diag.err ? ` · ${esc(a.diag.err)}` : ''}` : ''}`; })()}</p>
         <div class="row gap wrap">${B('sndtest', 'Tester le son', '')}</div></section>
@@ -147,6 +153,12 @@ export function openCreator(app) {
       if (x === 'sndtest') { app.applySettings(); sfx.victory?.(); setTimeout(draw, 900); return; } /* v622 */
       if (x === 'perf') { setPerf(!perfOn()); toast(perfOn() ? 'Moniteur allumé : lance un combat.' : 'Moniteur éteint.', { icon: 'check' }); return draw(); } /* v601 */
       if (x === 'perfclear') { perfClear(); return draw(); }
+      if (x === 'errcopy') {
+        const txt = `Journal du serveur · ${VERSION}\n` + (partieErrs().map((e) => `${new Date(e.t).toISOString()} ${e.m} : ${e.e}`).join('\n') || 'Rien de refusé.');
+        try { await navigator.clipboard.writeText(txt); toast('Journal copié : colle-le dans la conversation avec Claude.', { kind: 'success', icon: 'check' }); }
+        catch (e) { openSheet(`<h3>Journal du serveur</h3><textarea class="input plain" style="width:100%;height:50vh" readonly>${esc(txt)}</textarea>`); }
+        return;
+      }
       if (x === 'perfcopy') {
         const st = g.s.settings || {}, txt = perfReport({ version: VERSION, extra: `effets ${st.quality === 'light' ? 'allégés' : 'complets'} · vitesse ${st.combatFast || 1} · animations réduites ${matchMedia('(prefers-reduced-motion: reduce)').matches ? 'oui' : 'non'}${document.documentElement.classList.contains('standalone') ? ' · app de l’écran d’accueil' : ''}` });
         try { await navigator.clipboard.writeText(txt); toast('Rapport copié : colle-le dans la conversation avec Claude.', { kind: 'success', icon: 'check' }); }
