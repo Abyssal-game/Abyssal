@@ -7184,3 +7184,17 @@ img.pa-defy-tag { width: 30%; height: auto; font-size: 0; text-shadow: none; fil
 .dc-starts-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; overflow: visible; padding: 2px 0 4px; }
 .dc-starts .dc-st { min-width: 0; width: 100%; min-height: 44px; padding: 0; border-radius: 14px; position: relative; font-size: .95rem; }
 .dc-st.cur::after { content: ""; position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 6px var(--gold); }
+
+/* v774 : fin de la Descente : l'œil qui se ferme en 8 images, signatures peintes des Scelleurs, ton pseudo à l'encre */
+.endx-s.eye { justify-content: center; }
+.endx-s.eye::before { display: none; }
+.endx-s.eye::after { display: none; }
+.endx-eyeanim { width: min(88vw, 400px); aspect-ratio: 240 / 294; background: url(../assets/fin/oeil-ferme.webp) 0 0 / 800% 100% no-repeat; -webkit-mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, transparent 100%); mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, transparent 100%); animation: endxIn 1.2s ease both; margin-bottom: 4vh; }
+.endx-s.eye .endx-t { margin-bottom: 0; }
+.endx-names { gap: 1.1vh; }
+.endx-names span { display: block; text-align: center; }
+.endx-names span img { display: block; width: min(76vw, 340px); height: auto; max-height: 7.5vh; object-fit: contain; margin: 0 auto; }
+.endx-names .scr { filter: none; letter-spacing: normal; }
+.endx-names .scr img { opacity: .85; max-height: 8.5vh; }
+.endx-names .me { margin-top: 1.6vh; font-family: 'Pinyon Script', var(--font-display, serif); font-style: normal; font-size: min(9.5vw, 42px); line-height: 1.15; color: #1B0F2A; text-shadow: 0 0 6px rgba(120,60,200,.35); max-width: 78vw; overflow-wrap: anywhere; }
+.endx-s.velin .endx-names { margin-top: -9vh; }
