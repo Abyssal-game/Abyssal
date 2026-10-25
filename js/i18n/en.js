@@ -8268,6 +8268,21 @@ export default {
   "Revoir l’ouverture": "Watch the opening",
   "{0} nouvelles créatures": "{0} new creatures",
   "{0} nouvelle créature": "{0} new creature",
+  "L’œil se referme.": "The eye closes.",
+  "Dans le silence, une page glisse jusqu’à toi : la toute première du Bestiaire interdit, celle que personne n’avait jamais vue.": "In the silence, a page drifts toward you: the very first page of the Forbidden Bestiary, the one no one had ever seen.",
+  "Sept noms y sont signés, ceux des premiers Scelleurs ; le septième a été gratté jusqu’au vélin. Dessous, une ligne d’encre fraîche s’écrit toute seule : c’est ton nom.": "Seven names are signed on it, those of the first Sealers; the seventh has been scraped down to the vellum. Beneath them, a line of fresh ink writes itself: it is your name.",
+  "Les vingt chapitres sont refermés. Mais au bas de la page, quelque chose vient d’ouvrir les yeux.": "The twenty chapters are closed. But at the bottom of the page, something has just opened its eyes.",
+  "Le dernier rêve": "The last dream",
+  "Le plus grand rêve": "The greatest dream",
+  "Page scellée · Trophée": "Sealed page · Trophy",
+  "Tu n’as pas dompté l’Abysse : tu l’as refermé dans une page. Il ne combat pour personne. Il attend celui qui rêve.": "You did not tame the Abyss: you closed it inside a page. It fights for no one. It waits for the one who dreams.",
+  "Elle t’attend dans le Bestiaire, onglet Histoire.": "It awaits you in the Bestiary, History tab.",
+  "Arc I": "Arc I",
+  "La Première Veille": "The First Vigil",
+  "Celui qui rêve est réveillé. Le Bestiaire n’est pas encore fini.": "The one who dreams is awake. The Bestiary is not finished yet.",
+  "Une page scellée, pas une créature : elle ne combat pas et ne quitte jamais le Bestiaire.": "A sealed page, not a creature: it never fights and never leaves the Bestiary.",
+  "Revoir la fin": "Watch the ending again",
+  "Revoir la fin de la Descente": "Watch the Descent ending again",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

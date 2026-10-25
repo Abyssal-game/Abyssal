@@ -7120,3 +7120,58 @@ img.pa-defy-tag { width: 30%; height: auto; font-size: 0; text-shadow: none; fil
 .opening.obg.epic .op-bg { background: linear-gradient(180deg, rgba(6, 5, 10, .1), rgba(6, 5, 10, .35)), url(../assets/ui/open/epique-2.webp) center 60% / cover no-repeat, #08070C !important; }
 .opening.obg .op-rays { opacity: .1 !important; }
 .opening.obg.epic .op-rays { opacity: .35 !important; }
+
+/* v771 : la fin de la Descente (js/screens/ending.js) */
+.endx { position: fixed; inset: 0; z-index: 200; background: #030206; color: #EDE3CF; overflow: hidden; animation: endxIn .6s ease both; touch-action: manipulation; }
+.endx.out { animation: endxOut .4s ease both; }
+@keyframes endxIn { from { opacity: 0; } }
+@keyframes endxOut { to { opacity: 0; } }
+.endx-s { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding: calc(var(--safe-t, 0px) + 24px) 22px calc(var(--safe-b, 0px) + 28px); animation: endxIn 1.2s ease both; }
+.endx-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+.endx-s > :not(.endx-bg) { position: relative; z-index: 2; }
+.endx-s::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, transparent 45%, rgba(3,2,6,.85) 88%); }
+.endx-s.velin::after, .endx-s.trophy::after, .endx-s.tease::after { display: none; }
+.endx-t { margin: 0 0 14px; max-width: 34em; text-align: center; font-family: var(--font-display, serif); font-size: 18px; line-height: 1.45; text-wrap: balance; text-shadow: 0 2px 8px #000; animation: endxTxt 1.4s .5s ease both; }
+@keyframes endxTxt { from { opacity: 0; transform: translateY(8px); } }
+.endx-tap { font-size: 12px; opacity: .55; animation: endxTxt 1s 2.4s ease both; }
+.endx-skip { position: absolute; top: calc(var(--safe-t, 0px) + 12px); right: 14px; z-index: 5; min-height: 44px; padding: 0 16px; border-radius: 22px; border: 1px solid rgba(237,227,207,.25); background: rgba(0,0,0,.45); color: inherit; font-size: 13px; }
+/* l'œil qui se ferme : deux paupières d'ombre */
+.endx-s.eye .endx-bg { animation: endxZoom 6s ease-out both; }
+.endx-s.eye::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, #030206 0 50%, transparent 50%) top / 100% 0 no-repeat, linear-gradient(0deg, #030206 0 50%, transparent 50%) bottom / 100% 0 no-repeat; animation: endxLid 3.2s 1.2s ease-in both; }
+@keyframes endxLid { to { background-size: 100% 62%, 100% 62%; } }
+@keyframes endxZoom { from { transform: scale(1.08); } }
+.endx-s.page .endx-bg { animation: endxDrift 7s ease-out both; }
+@keyframes endxDrift { from { transform: translateY(-14%) rotate(-4deg) scale(.9); opacity: 0; } 30% { opacity: 1; } }
+/* le vélin : les noms s'écrivent un à un */
+.endx-s.velin { justify-content: center; }
+.endx-s.velin .endx-t { position: absolute; left: 0; right: 0; bottom: calc(var(--safe-b, 0px) + 28px); margin: 0 auto; padding: 10px 14px; border-radius: 12px; background: rgba(3,2,6,.78); width: min(92%, 34em); font-size: 15px; }
+.endx-s.velin .endx-tap { position: absolute; bottom: calc(var(--safe-b, 0px) + 8px); }
+.endx-names { display: flex; flex-direction: column; align-items: center; gap: 1.6vh; margin-top: -22vh; }
+.endx-names span { font-family: var(--font-display, serif); font-style: italic; font-size: min(5vw, 21px); color: #3A2414; opacity: 0; clip-path: inset(0 100% 0 0); animation: endxInk 1s var(--d) ease-out forwards; }
+.endx-names .scr { color: #5B3E28; letter-spacing: -.08em; filter: blur(.4px); }
+.endx-names .me { margin-top: 1.4vh; font-size: min(6.4vw, 26px); color: #1B0F2A; text-shadow: 0 0 6px rgba(120,60,200,.45); }
+@keyframes endxInk { to { opacity: 1; clip-path: inset(0 0 0 0); } }
+/* celui qui rêve : les deux yeux s'ouvrent */
+.endx-s.dream .endx-bg { animation: endxZoom 8s ease-out both; }
+.endx-eyes { position: absolute; left: 50%; top: 68%; width: 30%; height: 6%; transform: translate(-50%, -50%); z-index: 1; pointer-events: none; background: radial-gradient(closest-side, rgba(220,190,255,.9), rgba(160,110,255,.35) 45%, transparent) 4% 50% / 34% 100% no-repeat, radial-gradient(closest-side, rgba(220,190,255,.9), rgba(160,110,255,.35) 45%, transparent) 96% 50% / 34% 100% no-repeat; opacity: 0; animation: endxOpen 3s 1.5s ease-in forwards; }
+@keyframes endxOpen { 60% { opacity: 1; } 75% { opacity: .5; } to { opacity: 1; } }
+/* la page scellée de l'Abysse */
+.endx-s.trophy, .endx-s.tease { justify-content: center; background: radial-gradient(ellipse at 50% 42%, rgba(110,60,190,.35), transparent 65%), #030206; }
+.endx-tro, .endx-arc { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; max-width: 30em; }
+.endx-tro p, .endx-arc p { margin: 0; font-size: 15px; line-height: 1.45; text-wrap: balance; }
+.endx-tro small { opacity: .65; }
+.endx-k { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: #F0C75E; }
+.endx-card { position: relative; width: min(58vw, 250px); aspect-ratio: 5 / 7; border-radius: 14px; overflow: hidden; border: 2px solid #F0C75E; box-shadow: 0 0 0 4px rgba(18,10,30,.9), 0 0 38px rgba(170,110,255,.55); }
+.endx-tro .endx-card { animation: endxCard 1.6s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes endxCard { from { transform: rotateY(90deg) scale(.7); opacity: 0; } }
+.endx-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.endx-cn { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 8px 8px; background: linear-gradient(transparent, rgba(5,3,10,.92) 55%); display: flex; flex-direction: column; align-items: center; }
+.endx-cn b { font-family: var(--font-display, serif); font-size: 18px; color: #F6E7C0; }
+.endx-cn small { font-size: 11px; opacity: .75; }
+.endx-tag { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); padding: 3px 10px; border-radius: 10px; background: rgba(5,3,10,.8); color: #F0C75E; font-size: 10px; white-space: nowrap; }
+.endx-arc h2 { margin: 0; font-family: var(--font-display, serif); font-size: 30px; color: #F6E7C0; text-shadow: 0 0 18px rgba(170,110,255,.6); animation: endxTxt 1.6s ease both; }
+.endx-soon { padding: 6px 16px; border: 1px solid #F0C75E; border-radius: 16px; color: #F0C75E; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; }
+.endx-arc .btn { margin-top: 8px; min-width: 160px; }
+.hs-end { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.hs-end .endx-card { width: min(46vw, 190px); }
+@media (prefers-reduced-motion: reduce) { .endx *, .endx-s::before { animation-duration: .01s !important; animation-delay: 0s !important; } }

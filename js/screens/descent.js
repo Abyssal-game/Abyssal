@@ -18,6 +18,7 @@ import { PHASE2 } from '../core/duel.js';
 import { WEEKLY_FLOOR, NIGHTMARE_AT, AWAKEN_AT, NIGHT_TIERS, NIGHT_TIER_OPEN, nightTier } from '../core/game.js';
 import { setScene, sceneUrl } from '../ui/scene.js';
 import { PROLOGUE, EPILOGUE, chapterStory } from '../core/story.js';
+import { playEnding } from './ending.js';
 import { BRAISE_IC, braiseBar, openRevive, openBraiseInfo } from '../ui/braise.js';
 import { t, tw } from '../i18n.js';
 import { musicPrefetch } from '../ui/music.js'; /* v679 */
@@ -296,7 +297,7 @@ export default function descent(app, root) {
       try { out = g.finishBattle(); } catch (e) { app.flushProgress(); toast(esc(e.message), { kind: 'error' }); return render(); }
       app.chrome();
       if (out.lost) { app.sfx.error(); ui.outcome = out.summary; ui.win = null; render(); }
-      else if (out.summit) { app.sfx.reveal('S'); ui.outcome = out.summary; ui.win = null; ui.start = null; ui.nightmare = false; render(); toast(out.abyssPack ? '<b>Tu as atteint le fond de l’Abysse !</b> Le Booster de l’Abysse t’attend dans les Boosters.' : '<b>L’Abysse est vaincu, une fois de plus.</b>', { kind: 'epic', icon: 'crown', ms: 7000 }); }
+      else if (out.summit) { ui.outcome = out.summary; ui.win = null; ui.start = null; ui.nightmare = false; if (out.abyss) { playEnding(app).then(() => render()); render(); return; } /* v771 : la fin, à la première victoire */ app.sfx.reveal('S'); render(); toast(out.abyssPack ? '<b>Tu as atteint le fond de l’Abysse !</b> Le Booster de l’Abysse t’attend dans les Boosters.' : '<b>L’Abysse est vaincu, une fois de plus.</b>', { kind: 'epic', icon: 'crown', ms: 7000 }); }
       else if (out.chapter) { app.sfx.reveal('M'); ui.outcome = out.summary; ui.win = null; ui.start = null; render(); /* v731 : plus d’annonce en double, le bilan dit déjà tout */ }
       else {
         app.sfx.reveal(out.room === 'boss' ? 'M' : 'R');

@@ -11,6 +11,7 @@ import { AI_FAMILIES, aiFamily } from '../core/skills.js';
 import { loreEntries, markLoreRead, unreadLore, chronicleOpen } from '../core/lore.js';
 import { PROLOGUE, CHAPTER_STORY, EPILOGUE } from '../core/story.js';
 import { BOSSES, BOSS_ORDER } from '../core/bosses.js';
+import { playEnding, abyssPageHTML } from './ending.js';
 
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
@@ -124,7 +125,8 @@ export default function bestiary(app, root) {
       <details class="panel dc-fold" open><summary>${picon('book')} Prologue</summary><div><p class="lore">${esc(PROLOGUE)}</p></div></details>
       ${CHAPTER_STORY.slice(1).map((s, i) => { const ch = i + 1; return chOpen(ch) ? `<details class="panel dc-fold hs-ch"><summary><span class="hs-n">${ch}</span> <span>${esc(s.title)}</span>${best >= ch * 5 ? ` ${icon('check')}` : ''}</summary><div><p class="lore">${esc(s.text)}</p></div></details>` : ''; }).join('')}
       ${CHAPTER_STORY.slice(1).some((s, i) => !chOpen(i + 1)) ? `<p class="small muted center">${icon('lock')} Les chapitres suivants t’attendent plus bas dans la Descente.</p>` : ''}
-      ${won ? `<details class="panel dc-fold st-epi" open><summary>${icon('crown')} Épilogue · ${esc(EPILOGUE.title)}</summary><div><p class="lore">${esc(EPILOGUE.text)}</p></div></details>` : ''}
+      ${won ? `<details class="panel dc-fold st-epi" open><summary>${icon('crown')} Épilogue · ${esc(EPILOGUE.title)}</summary><div><p class="lore">${esc(EPILOGUE.text)}</p></div></details>
+      <section class="panel hs-end"><span class="bx-k">Le dernier rêve</span>${abyssPageHTML()}<p class="small">Une page scellée, pas une créature : elle ne combat pas et ne quitte jamais le Bestiaire.</p><button class="btn gold" data-act="ending">Revoir la fin</button></section>` /* v771 */ : ''}
       <p class="small muted center">Les Chroniques, les Figures et les Mystères sont dans l’onglet Royaumes ; les Rêves vaincus, dans l’onglet Récits.</p>`;
   }
 
@@ -149,6 +151,7 @@ export default function bestiary(app, root) {
     tab(el) { st.tab = el.dataset.v; render(); },
     fac(el) { st.faction = el.dataset.v; render(); },
     card() {},
+    ending() { playEnding(app); },
     dream(el) { const b = BOSSES[el.dataset.k]; if (!b) return; app.sfx.page?.(); /* v676 */
       openSheet(`<div class="drm-sheet"><span class="drm-art drm-card big"><img alt="" src="assets/bosses/combat-${el.dataset.k}.webp"></span><h2 class="center" translate="no">${esc(tw(b.name))}</h2><p class="center small lr-sub">${esc(b.title)}</p><p class="lore">${esc(b.story)}</p><p class="small"><b>Sa mécanique.</b> ${esc(b.mechanic)}</p><p class="small"><b>Pour le contrer.</b> ${esc(b.counter)}</p></div>`, { label: b.name, cls: 'dc-sheet' }); },
   });

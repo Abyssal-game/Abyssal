@@ -8257,6 +8257,21 @@ export default {
   "Revoir l’ouverture": "Öffnung ansehen",
   "{0} nouvelles créatures": "{0} neue Kreaturen",
   "{0} nouvelle créature": "{0} neue Kreatur",
+  "L’œil se referme.": "Das Auge schließt sich.",
+  "Dans le silence, une page glisse jusqu’à toi : la toute première du Bestiaire interdit, celle que personne n’avait jamais vue.": "In der Stille gleitet eine Seite zu dir: die allererste des Verbotenen Bestiariums, die noch nie jemand gesehen hat.",
+  "Sept noms y sont signés, ceux des premiers Scelleurs ; le septième a été gratté jusqu’au vélin. Dessous, une ligne d’encre fraîche s’écrit toute seule : c’est ton nom.": "Sieben Namen stehen darauf, die der ersten Siegler; der siebte wurde bis aufs Pergament abgekratzt. Darunter schreibt sich eine Zeile frischer Tinte von selbst: dein Name.",
+  "Les vingt chapitres sont refermés. Mais au bas de la page, quelque chose vient d’ouvrir les yeux.": "Die zwanzig Kapitel sind geschlossen. Doch am Fuß der Seite hat etwas gerade die Augen geöffnet.",
+  "Le dernier rêve": "Der letzte Traum",
+  "Le plus grand rêve": "Der größte Traum",
+  "Page scellée · Trophée": "Versiegelte Seite · Trophäe",
+  "Tu n’as pas dompté l’Abysse : tu l’as refermé dans une page. Il ne combat pour personne. Il attend celui qui rêve.": "Du hast den Abgrund nicht gezähmt: Du hast ihn in eine Seite eingeschlossen. Er kämpft für niemanden. Er wartet auf den, der träumt.",
+  "Elle t’attend dans le Bestiaire, onglet Histoire.": "Sie wartet im Bestiarium auf dich, Reiter Geschichte.",
+  "Arc I": "Arc I",
+  "La Première Veille": "Die Erste Wache",
+  "Celui qui rêve est réveillé. Le Bestiaire n’est pas encore fini.": "Der Träumende ist erwacht. Das Bestiarium ist noch nicht zu Ende.",
+  "Une page scellée, pas une créature : elle ne combat pas et ne quitte jamais le Bestiaire.": "Eine versiegelte Seite, keine Kreatur: Sie kämpft nie und verlässt das Bestiarium nie.",
+  "Revoir la fin": "Das Ende noch einmal ansehen",
+  "Revoir la fin de la Descente": "Das Ende des Abstiegs noch einmal ansehen",
 };
 
 export const names = {

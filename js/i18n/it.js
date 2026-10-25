@@ -8257,6 +8257,21 @@ export default {
   "Revoir l’ouverture": "Rivedi l’apertura",
   "{0} nouvelles créatures": "{0} nuove creature",
   "{0} nouvelle créature": "{0} nuova creatura",
+  "L’œil se referme.": "L’occhio si chiude.",
+  "Dans le silence, une page glisse jusqu’à toi : la toute première du Bestiaire interdit, celle que personne n’avait jamais vue.": "Nel silenzio, una pagina scivola fino a te: la primissima del Bestiario proibito, quella che nessuno aveva mai visto.",
+  "Sept noms y sont signés, ceux des premiers Scelleurs ; le septième a été gratté jusqu’au vélin. Dessous, une ligne d’encre fraîche s’écrit toute seule : c’est ton nom.": "Vi sono firmati sette nomi, quelli dei primi Sigillatori; il settimo è stato raschiato fino alla pergamena. Sotto, una riga d’inchiostro fresco si scrive da sola: è il tuo nome.",
+  "Les vingt chapitres sont refermés. Mais au bas de la page, quelque chose vient d’ouvrir les yeux.": "I venti capitoli sono chiusi. Ma in fondo alla pagina, qualcosa ha appena aperto gli occhi.",
+  "Le dernier rêve": "L’ultimo sogno",
+  "Le plus grand rêve": "Il sogno più grande",
+  "Page scellée · Trophée": "Pagina sigillata · Trofeo",
+  "Tu n’as pas dompté l’Abysse : tu l’as refermé dans une page. Il ne combat pour personne. Il attend celui qui rêve.": "Non hai domato l’Abisso: l’hai rinchiuso in una pagina. Non combatte per nessuno. Attende colui che sogna.",
+  "Elle t’attend dans le Bestiaire, onglet Histoire.": "Ti aspetta nel Bestiario, scheda Storia.",
+  "Arc I": "Arco I",
+  "La Première Veille": "La Prima Veglia",
+  "Celui qui rêve est réveillé. Le Bestiaire n’est pas encore fini.": "Colui che sogna si è svegliato. Il Bestiario non è ancora finito.",
+  "Une page scellée, pas une créature : elle ne combat pas et ne quitte jamais le Bestiaire.": "Una pagina sigillata, non una creatura: non combatte mai e non lascia mai il Bestiario.",
+  "Revoir la fin": "Rivedi il finale",
+  "Revoir la fin de la Descente": "Rivedi il finale della Discesa",
 };
 
 export const names = {

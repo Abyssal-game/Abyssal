@@ -12,6 +12,7 @@ import { openServerState } from './server-state.js'; /* v678 */
 import { perfOn, setPerf, perfLog, perfClear, perfReport } from '../ui/perf.js'; /* v601 */
 import { partieErrs } from '../cloud/partie.js'; /* v740 */
 import { openPack } from './opening.js'; /* v769 */
+import { playEnding } from './ending.js';
 
 const SNAP = 'abyssal.snapshot';
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -55,7 +56,7 @@ export function openCreator(app) {
 
       <section class="cr-sec"><h3>Booster de l’Abysse</h3>
         <p class="small muted">Ouvre-le quand tu veux, avec toute sa mise en scène. « Comme la première fois » garantit une Secrète que tu n’as pas encore. Le réglage « Prochain booster » ci-dessous s’applique aussi à sa dernière carte.${g.s.tickets.abysse ? ` Tu en as ${g.s.tickets.abysse} en réserve (onglet Butin).` : ''}</p>
-        <div class="row gap wrap">${B('abyss', 'Ouvrir un Booster de l’Abysse', 'gold')}${B('abyss1', 'Comme la première fois')}${B('abyss5', '+5 en réserve')}</div></section>
+        <div class="row gap wrap">${B('abyss', 'Ouvrir un Booster de l’Abysse', 'gold')}${B('abyss1', 'Comme la première fois')}${B('abyss5', '+5 en réserve')}${B('ending', 'Revoir la fin de la Descente')}</div></section>
 
       <section class="cr-sec"><h3>Prochain booster</h3>
         <p class="small muted">${f ? `Imposé : une carte <b>${esc(RARITIES.find((r) => r.key === f.rarity)?.name || f.rarity)}</b>${f.variant ? ` en <b>${esc(VARIANTS[f.variant].name)}</b>` : ''} en dernière position.` : 'La dernière carte du prochain booster peut être imposée.'}</p>
@@ -144,6 +145,7 @@ export function openCreator(app) {
       if (x === 'free') g.devFreePacks();
       if (x === 'abyss' || x === 'abyss1') { g.devAbyss(x === 'abyss1'); sheet.close(); setTimeout(() => openPack(app, 'abysse', { onDone: () => openCreator(app) }), 350); return; } /* v769 : fenêtre fermée pendant l'ouverture, rouverte après */
       if (x === 'abyss5') g.devAbyss(false, 5);
+      if (x === 'ending') { sheet.close(); setTimeout(() => playEnding(app).then(() => openCreator(app)), 350); return; } /* v771 */
       if (x === 'all') g.devUnlockAll();
       if (x === 'variants') g.devAllVariants();
       if (x === 'dups') g.devDuplicates(10);

@@ -8257,6 +8257,21 @@ export default {
   "Revoir l’ouverture": "Volver a ver la apertura",
   "{0} nouvelles créatures": "{0} criaturas nuevas",
   "{0} nouvelle créature": "{0} criatura nueva",
+  "L’œil se referme.": "El ojo se cierra.",
+  "Dans le silence, une page glisse jusqu’à toi : la toute première du Bestiaire interdit, celle que personne n’avait jamais vue.": "En el silencio, una página se desliza hacia ti: la primerísima del Bestiario prohibido, la que nadie había visto jamás.",
+  "Sept noms y sont signés, ceux des premiers Scelleurs ; le septième a été gratté jusqu’au vélin. Dessous, une ligne d’encre fraîche s’écrit toute seule : c’est ton nom.": "Siete nombres la firman, los de los primeros Selladores; el séptimo ha sido raspado hasta la vitela. Debajo, una línea de tinta fresca se escribe sola: es tu nombre.",
+  "Les vingt chapitres sont refermés. Mais au bas de la page, quelque chose vient d’ouvrir les yeux.": "Los veinte capítulos están cerrados. Pero al pie de la página, algo acaba de abrir los ojos.",
+  "Le dernier rêve": "El último sueño",
+  "Le plus grand rêve": "El sueño más grande",
+  "Page scellée · Trophée": "Página sellada · Trofeo",
+  "Tu n’as pas dompté l’Abysse : tu l’as refermé dans une page. Il ne combat pour personne. Il attend celui qui rêve.": "No has domado al Abismo: lo has encerrado en una página. No combate por nadie. Espera al que sueña.",
+  "Elle t’attend dans le Bestiaire, onglet Histoire.": "Te espera en el Bestiario, pestaña Historia.",
+  "Arc I": "Arco I",
+  "La Première Veille": "La Primera Vigilia",
+  "Celui qui rêve est réveillé. Le Bestiaire n’est pas encore fini.": "El que sueña ha despertado. El Bestiario aún no ha terminado.",
+  "Une page scellée, pas une créature : elle ne combat pas et ne quitte jamais le Bestiaire.": "Una página sellada, no una criatura: nunca combate y nunca sale del Bestiario.",
+  "Revoir la fin": "Volver a ver el final",
+  "Revoir la fin de la Descente": "Volver a ver el final del Descenso",
 };
 
 export const names = {
