@@ -8126,6 +8126,7 @@ export default {
   "Ton duel du Choc des Boosters contre {name} est prêt : va le voir !": "Tu duelo de la Batalla de los Sobres contra {name} está listo: ¡ve a verlo!",
   "Booster gratuit du jour (10 h), à toi de jouer en ligne, défis reçus, défi relevé au Choc des Boosters, demandes d’ami.": "Sobre gratis del día (10 h), tu turno en línea, desafíos recibidos, Batalla aceptada, solicitudes de amistad.",
   'Le serveur n’a pas reçu la fin de ce combat : il reprend là où le serveur l’a compté.': 'El servidor no recibió el final de este combate: se reanuda donde el servidor lo contó.',
+  'Les cadeaux déjà reçus ne seront pas redonnés : ni les {0} boosters de bienvenue, ni le booster gratuit, l’offrande, les Torches et les Épreuves du jour.': 'Los regalos ya recibidos no se devolverán: ni los {0} sobres de bienvenida, ni el sobre gratuito, la ofrenda, las Antorchas y las Pruebas del día.',
 };
 
 export const names = {

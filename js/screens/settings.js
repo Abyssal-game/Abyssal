@@ -200,7 +200,7 @@ export default function settings(app, root) {
     lang(el) { if (el.dataset.v !== LANG) setLang(el.dataset.v); },
     async reset() {
       if (!(await confirmBox('Effacer définitivement toute ta progression, sur cet appareil <b>et sur ton compte en ligne</b> ?', { ok: 'Effacer', danger: true }))) return;
-      if (!(await confirmBox('Dernière confirmation : la collection, les éclats et les succès seront perdus.', { ok: 'Tout effacer', danger: true }))) return;
+      if (!(await confirmBox('Dernière confirmation : la collection, les éclats et les succès seront perdus.<br>Les cadeaux déjà reçus ne seront pas redonnés : ni les 2 boosters de bienvenue, ni le booster gratuit, l’offrande, les Torches et les Épreuves du jour.', { ok: 'Tout effacer', danger: true }))) return;
       g.reset();
       app.applySettings();
       let online = null;
