@@ -8272,6 +8272,13 @@ export default {
   "Une page scellée, pas une créature : elle ne combat pas et ne quitte jamais le Bestiaire.": "Eine versiegelte Seite, keine Kreatur: Sie kämpft nie und verlässt das Bestiarium nie.",
   "Revoir la fin": "Das Ende noch einmal ansehen",
   "Revoir la fin de la Descente": "Das Ende des Abstiegs noch einmal ansehen",
+  "Les sept royaumes ont forgé le Bestiaire interdit pour enfermer ce qui ne devait plus marcher sous le ciel.": "Die sieben Reiche schmiedeten das Verbotene Bestiarium, um wegzusperren, was nie wieder unter dem Himmel wandeln durfte.",
+  "Sept gardiens, un par royaume, l’ont scellé de leur main. Ce furent les premiers Scelleurs.": "Sieben Wächter, einer für jedes Reich, versiegelten es mit eigener Hand. Sie waren die ersten Siegler.",
+  "Une nuit, quelqu’un l’a déchiré.": "Eines Nachts hat es jemand zerrissen.",
+  "Ses pages se sont envolées, et ses vingt chapitres sont tombés dans l’Abysse. Quelque chose les attendait.": "Seine Seiten flogen davon, und seine zwanzig Kapitel stürzten in den Abgrund. Etwas wartete auf sie.",
+  "Tu es le dernier à savoir lire les sceaux. Descends, et referme-les.": "Du bist der Letzte, der die Siegel lesen kann. Steig hinab und verschließe sie wieder.",
+  "Commencer": "Beginnen",
+  "Revoir le prologue": "Den Prolog noch einmal ansehen",
 };
 
 export const names = {

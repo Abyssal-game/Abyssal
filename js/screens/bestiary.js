@@ -11,7 +11,7 @@ import { AI_FAMILIES, aiFamily } from '../core/skills.js';
 import { loreEntries, markLoreRead, unreadLore, chronicleOpen } from '../core/lore.js';
 import { PROLOGUE, CHAPTER_STORY, EPILOGUE } from '../core/story.js';
 import { BOSSES, BOSS_ORDER } from '../core/bosses.js';
-import { playEnding, abyssPageHTML } from './ending.js';
+import { playEnding, playPrologue, abyssPageHTML } from './ending.js';
 
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
@@ -122,7 +122,7 @@ export default function bestiary(app, root) {
     const won = !!g.s.bossesBeaten?.abysse;
     return `<section class="panel hs-top"><p class="lore">Le Bestiaire interdit a été déchiré, ses vingt chapitres sont tombés dans l’Abysse. Tu es le dernier à savoir lire les sceaux. Voici tout ce que tu as découvert.</p>
       <div class="hs-prog"><span><b>${done} / 20</b><small>chapitres refermés</small></span><span><b>${dreams} / 20</b><small>rêves vaincus</small></span><span><b>${chron} / ${lore.chronicles.length}</b><small>Chroniques</small></span>${seal ? `<span><b>${seal.owned} / 7</b><small>Premiers Scelleurs</small></span>` : ''}</div></section>
-      <details class="panel dc-fold" open><summary>${picon('book')} Prologue</summary><div><p class="lore">${esc(PROLOGUE)}</p></div></details>
+      <details class="panel dc-fold" open><summary>${picon('book')} Prologue</summary><div><p class="lore">${esc(PROLOGUE)}</p><button class="btn small" data-act="prologue">Revoir le prologue</button></div></details>
       ${CHAPTER_STORY.slice(1).map((s, i) => { const ch = i + 1; return chOpen(ch) ? `<details class="panel dc-fold hs-ch"><summary><span class="hs-n">${ch}</span> <span>${esc(s.title)}</span>${best >= ch * 5 ? ` ${icon('check')}` : ''}</summary><div><p class="lore">${esc(s.text)}</p></div></details>` : ''; }).join('')}
       ${CHAPTER_STORY.slice(1).some((s, i) => !chOpen(i + 1)) ? `<p class="small muted center">${icon('lock')} Les chapitres suivants t’attendent plus bas dans la Descente.</p>` : ''}
       ${won ? `<details class="panel dc-fold st-epi" open><summary>${icon('crown')} Épilogue · ${esc(EPILOGUE.title)}</summary><div><p class="lore">${esc(EPILOGUE.text)}</p></div></details>
@@ -152,6 +152,7 @@ export default function bestiary(app, root) {
     fac(el) { st.faction = el.dataset.v; render(); },
     card() {},
     ending() { playEnding(app); },
+    prologue() { playPrologue(app); }, /* v775 */
     dream(el) { const b = BOSSES[el.dataset.k]; if (!b) return; app.sfx.page?.(); /* v676 */
       openSheet(`<div class="drm-sheet"><span class="drm-art drm-card big"><img alt="" src="assets/bosses/combat-${el.dataset.k}.webp"></span><h2 class="center" translate="no">${esc(tw(b.name))}</h2><p class="center small lr-sub">${esc(b.title)}</p><p class="lore">${esc(b.story)}</p><p class="small"><b>Sa mécanique.</b> ${esc(b.mechanic)}</p><p class="small"><b>Pour le contrer.</b> ${esc(b.counter)}</p></div>`, { label: b.name, cls: 'dc-sheet' }); },
   });

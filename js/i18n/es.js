@@ -8272,6 +8272,13 @@ export default {
   "Une page scellée, pas une créature : elle ne combat pas et ne quitte jamais le Bestiaire.": "Una página sellada, no una criatura: nunca combate y nunca sale del Bestiario.",
   "Revoir la fin": "Volver a ver el final",
   "Revoir la fin de la Descente": "Volver a ver el final del Descenso",
+  "Les sept royaumes ont forgé le Bestiaire interdit pour enfermer ce qui ne devait plus marcher sous le ciel.": "Los siete reinos forjaron el Bestiario prohibido para encerrar lo que nunca más debía caminar bajo el cielo.",
+  "Sept gardiens, un par royaume, l’ont scellé de leur main. Ce furent les premiers Scelleurs.": "Siete guardianes, uno por reino, lo sellaron con sus propias manos. Fueron los primeros Selladores.",
+  "Une nuit, quelqu’un l’a déchiré.": "Una noche, alguien lo desgarró.",
+  "Ses pages se sont envolées, et ses vingt chapitres sont tombés dans l’Abysse. Quelque chose les attendait.": "Sus páginas salieron volando y sus veinte capítulos cayeron al Abismo. Algo los estaba esperando.",
+  "Tu es le dernier à savoir lire les sceaux. Descends, et referme-les.": "Eres el último que sabe leer los sellos. Desciende y vuelve a cerrarlos.",
+  "Commencer": "Empezar",
+  "Revoir le prologue": "Volver a ver el prólogo",
 };
 
 export const names = {

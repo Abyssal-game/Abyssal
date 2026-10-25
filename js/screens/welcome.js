@@ -4,6 +4,7 @@ import { icon, EMBLEM } from '../ui/icons.js';
 import { openSheet } from '../ui/dom.js';
 import { packHTML, GIFT_N } from './shop.js';
 import { openPack } from './opening.js';
+import { playPrologue } from './ending.js';
 
 // Version du guide : l'augmenter le remontre une fois à tout le monde
 const GUIDE_V = 2;
@@ -19,6 +20,9 @@ const PAGES = [
 export function showWelcome(app, { force = false } = {}) {
   const g = app.game;
   if ((g.s.seenIntro || 0) >= GUIDE_V && !force) { showGift(app); return; }
+  /* v775 : un nouveau joueur voit d'abord le prologue (une fois, sur cet appareil), puis le guide */
+  let seenPro = true; try { seenPro = !!localStorage.getItem('abyssal.prologue'); } catch { /* stockage indisponible */ }
+  if (!force && !seenPro) { try { localStorage.setItem('abyssal.prologue', '1'); } catch { /* idem */ } playPrologue(app).then(() => showWelcome(app)); return; }
   let i = 0;
   const sheet = openSheet('', { cls: 'welcome', label: 'Bienvenue', onClose: () => { g.s.seenIntro = GUIDE_V; g.persist(); if (!force) setTimeout(() => showGift(app), 350); } });
   PAGES.forEach((pg) => { new Image().src = pg.img ? `assets/ui/tuto-${pg.img}.webp` : `assets/ui/bn-${pg.bn}.webp`; });

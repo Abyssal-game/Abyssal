@@ -8283,6 +8283,13 @@ export default {
   "Une page scellée, pas une créature : elle ne combat pas et ne quitte jamais le Bestiaire.": "A sealed page, not a creature: it never fights and never leaves the Bestiary.",
   "Revoir la fin": "Watch the ending again",
   "Revoir la fin de la Descente": "Watch the Descent ending again",
+  "Les sept royaumes ont forgé le Bestiaire interdit pour enfermer ce qui ne devait plus marcher sous le ciel.": "The seven realms forged the Forbidden Bestiary to lock away what must never again walk beneath the sky.",
+  "Sept gardiens, un par royaume, l’ont scellé de leur main. Ce furent les premiers Scelleurs.": "Seven guardians, one for each realm, sealed it with their own hands. They were the first Sealers.",
+  "Une nuit, quelqu’un l’a déchiré.": "One night, someone tore it apart.",
+  "Ses pages se sont envolées, et ses vingt chapitres sont tombés dans l’Abysse. Quelque chose les attendait.": "Its pages flew away, and its twenty chapters fell into the Abyss. Something was waiting for them.",
+  "Tu es le dernier à savoir lire les sceaux. Descends, et referme-les.": "You are the last one who can read the seals. Descend, and close them again.",
+  "Commencer": "Begin",
+  "Revoir le prologue": "Watch the prologue again",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {
