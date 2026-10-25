@@ -83,6 +83,10 @@ export function afterHistory(fn) {
 }
 // changement de page pendant qu'une feuille est ouverte : on la ferme sans toucher à l'historique
 window.addEventListener('hashchange', () => { while (stack.length) stack[stack.length - 1].close(true); });
+/* v754 : le combat attend qu'aucune fenêtre ne soit ouverte (Pause, aide, fiche) avant le tour ennemi et la barre de défense :
+   avant, l'ennemi frappait sous la fenêtre et la défense était ratée d'office */
+const sheetWaiters = [];
+export function sheetIdle() { return stack.length ? new Promise((r) => sheetWaiters.push(r)) : Promise.resolve(); }
 export function openSheet(html, { cls = '', onClose, label = 'Fenêtre', full = false } = {}) {
   const root = document.getElementById('overlay-root');
   const wrap = document.createElement('div');
@@ -104,6 +108,7 @@ export function openSheet(html, { cls = '', onClose, label = 'Fenêtre', full = 
       wrap.classList.remove('in');
       const i = stack.indexOf(api); if (i >= 0) stack.splice(i, 1);
       if (!stack.length && !document.querySelector('.opening')) { document.body.classList.remove('has-sheet'); }
+      if (!stack.length) sheetWaiters.splice(0).forEach((r) => r()); /* v754 */
       setTimeout(() => wrap.remove(), 260);
       onClose && onClose();
       prevFocus && prevFocus.focus && prevFocus.focus({ preventScroll: true });

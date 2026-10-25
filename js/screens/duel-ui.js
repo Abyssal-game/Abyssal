@@ -9,7 +9,10 @@ import { icon, EMBLEM, sigil, roleIcon, actIcon, crestHTML } from '../ui/icons.j
 import { esc, openSheet, toast, frSpaces } from '../ui/dom.js';
 import { deName } from '../core/synergy.js';
 import { LANG, t as tr, tx, tw } from '../i18n.js';
-import { coach, coachIdle } from '../ui/coach.js';
+import { coach, coachIdle as coachIdle0 } from '../ui/coach.js';
+import { sheetIdle } from '../ui/dom.js';
+/* v754 : ni bulle d'aide ni fenêtre ouverte (Pause, aide, fiche) pendant que l'ennemi joue */
+const coachIdle = async () => { await coachIdle0(); await sheetIdle(); await coachIdle0(); };
 import { tuto } from '../ui/tutos.js';
 import { cardHTML } from '../ui/card.js';
 import {
@@ -1166,7 +1169,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const ab = e.target.closest('[data-a]'); clearTimeout(holdT); held = false;
     // v329 : appui long sur une carte (ennemie ou alliée) = sa fiche ; le toucher court garde l'attaque rapide
     const cd = !ab && e.target.closest('.dv-c');
-    if (cd) { const u = st.units[cd.dataset.uid]; if (u) holdT = setTimeout(() => { held = true; app.sfx.tap?.(); hap(1); info(u); }, 420); return; }
+    if (cd) { const u = st.units[cd.dataset.uid]; if (u && !defTap) holdT = setTimeout(() => { held = true; app.sfx.tap?.(); hap(1); info(u); }, 420); return; }
     if (!ab || busy || !sel) return; holdT = setTimeout(() => { held = true; actInfo(ab.dataset.a); }, 420);
   }, { signal: ctl.signal });
   for (const t of ['pointerup', 'pointercancel']) root.addEventListener(t, () => clearTimeout(holdT), { signal: ctl.signal });

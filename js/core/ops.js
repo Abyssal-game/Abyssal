@@ -89,3 +89,53 @@ export function digest(s) {
   for (const ch of parts.join('|')) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
   return h.toString(36);
 }
+
+/* v754 : forme des arguments que le serveur accepte pour chaque opération. Une app modifiée pouvait envoyer "5" au lieu de 5
+   (palier du Codex encaissé à l'infini, carte des Sceaux rejouée sans quitter la main, même carte des Cryptes retournée deux fois).
+   i = entier, I = entier ou rien, n = nombre ou rien, s = texte, S = texte ou rien, b = vrai/faux ou rien,
+   as = liste de textes, AS = liste de textes ou rien, ai = liste d'entiers, o = objet ou rien (vérifié par la méthode), * = tout.
+   Une opération absente de la liste n'est pas vérifiée ici (la méthode s'en charge). Au-delà des arguments décrits : refusé. */
+export const ARGS = {
+  markSeen: ['s'], markAllSeen: [], decipher: ['s'], setShownVariant: ['s', 'S'], sublime: ['s'], burn: ['s', 'S', 'I'], burnSpares: ['AS'], upgrade: ['s'],
+  buyAshFrame: ['s'], openChest: ['s'], openAllChests: [], openBooster: ['s', { faction: 'S' }],
+  claimDaily: [], claimMission: ['i'], claimWeekChest: [], missions: [], team: [],
+  setTeam: ['as'], saveTeamPreset: ['S', 'AS'], deleteTeamPreset: ['i'], setForm: ['s', 'S'], toggleFav: ['s'], claimChallenge: ['s', 's'],
+  setTitle: ['S'], setFrame: ['S'], setDress: ['s', 'S'], setBack: ['S'], setPlate: ['S'], setMat: ['S'], setFond: ['S'], setSachet: ['S', 'S'],
+  setName: ['S'], setAvatar: ['S'], toggleShowcase: ['s'], reset: [],
+  chooseOmen: ['s'], startRun: [{ cursed: 'b', nightmare: '*', start: 'I' }], startBattle: ['s', { room: 'S', pact: 'S' }], choosePact: ['S'], chooseTalent: ['i'],
+  chooseReward: ['s'], cancelAltar: [], chooseBlessing: ['s'], swapRunTeam: ['i', 'i'], nextFloor: [], cancelRun: [], abandonRun: [], reviveFallen: ['s'], buyBraise: [],
+  finishBattle: [], duelAct: ['s', 's', 's', 'S', 'n'], duelUlt: ['s'], duelPass: ['s'], duelNext: ['s'], duelEnemy: ['s', 's', 'S'], duelEndEnemy: ['s'],
+  startTrial: ['i'], finishTrial: [], abandonTrial: [],
+  setSceauxHand: ['as'], sceauxStart: [{ rival: 'S', daily: 'b', awake: 'b' }], sceauxFinish: [], sceauxTrophy: ['s'], sceauxQuit: [],
+  pacteStart: [{ table: 'S', daily: 'b' }], pacteFinish: [], pacteQuit: [], cryptesStart: [{ table: 'S', daily: 'b' }], cryptesFinish: [], cryptesQuit: [], cryptesResume: [],
+  encheresStart: [{ table: 'S', daily: 'b' }], encheresFinish: [], encheresQuit: [], gameForfeit: ['s'],
+  sceauxPlay: ['i', 'i'], sceauxAi: [], pacteDraw: [], pacteStop: [], pacteDouble: [], pacteAi: [], cryptesFlip: ['i'], cryptesPower: ['ai'], cryptesAi: [], encheresBid: ['i'],
+  codex: [], codexClaim: ['s', 'i'], codexClaimAll: [], catalogBuy: ['s'], codexBuyTier: [], shadowPay: ['s'],
+};
+const isInt = (v) => Number.isInteger(v);
+function argOk(t, v) {
+  if (t === '*') return true;
+  if (t && typeof t === 'object') {
+    if (v == null) return true;
+    if (typeof v !== 'object' || Array.isArray(v)) return false;
+    return Object.keys(v).every((k) => Object.hasOwn(t, k) && argOk(t[k], v[k]));
+  }
+  if (v == null) return ['I', 'n', 'S', 'b', 'AS', 'o'].includes(t);
+  switch (t) {
+    case 'i': case 'I': return isInt(v);
+    case 'n': return typeof v === 'number' && Number.isFinite(v);
+    case 's': case 'S': return typeof v === 'string' && v.length <= 200;
+    case 'b': return typeof v === 'boolean';
+    case 'as': case 'AS': return Array.isArray(v) && v.length <= 600 && v.every((x) => typeof x === 'string' && x.length <= 200);
+    case 'ai': return Array.isArray(v) && v.length <= 40 && v.every(isInt);
+    case 'o': return typeof v === 'object' && !Array.isArray(v);
+    default: return false;
+  }
+}
+// vrai si les arguments ont la forme attendue (ou si l'opération n'a pas de forme décrite)
+export function argsOk(m, args) {
+  const spec = ARGS[m];
+  if (!spec) return true;
+  if (!Array.isArray(args) || args.length > spec.length) return false;
+  return spec.every((t, i) => (i < args.length ? argOk(t, args[i]) : !(t === 'i' || t === 's' || t === 'as' || t === 'ai')));
+}

@@ -17,6 +17,7 @@ const lsSet = (k, v) => { try { v === null ? localStorage.removeItem(k) : localS
 let app = null, g = null, timer = 0, inflight = null, waiting = null, lastFree = '', seq = Number(lsGet(K.seq)) || 0;
 let queue = [];
 const firstQs = new Set();
+const firstRes = new Map(); /* v754 : réponses des actions « first », gardées d’un paquet à l’autre */
 const listeners = new Set();
 export const onPartie = (fn) => { listeners.add(fn); return () => listeners.delete(fn); };
 const emit = () => listeners.forEach((f) => f(partie));
@@ -83,6 +84,8 @@ export function flush({ want = false } = {}) {
     if (uid() !== who) return null; // compte changé entre-temps
     if (partie.mode !== 'server') { partie.mode = 'server'; lsSet(K.mode, `server:${who}`); }
     noteErrs(ops, res?.errs);
+    for (const [q, v] of Object.entries(res?.rets || {})) if (firstQs.has(Number(q))) firstRes.set(Number(q), { ret: v }); /* v754 */
+    for (const [q, v] of Object.entries(res?.errs || {})) if (firstQs.has(Number(q))) firstRes.set(Number(q), { err: v });
     queue = queue.filter((o) => o.q > sent); saveQueue();
     if (queue.length) { clearTimeout(timer); timer = setTimeout(() => flush().catch(() => {}), 300); } // la suite des coups en attente
     lastFree = frTxt; partie.error = null; partie.last = Date.now();
@@ -109,14 +112,18 @@ export async function probe() {
 
 // Action faite d'abord par le serveur (boosters, récompenses en ligne) : on attend sa réponse
 async function viaServer(list) {
-  if (partie.mode !== 'server') { const m = await probe(); if (m !== 'server') return null; }
+  /* v754 : sans réseau, on ne repasse plus à l'ancien système (le booster s'ouvrait sur le téléphone, puis le serveur l'effaçait) */
+  if (partie.mode !== 'server') { const m = await probe(); if (m === 'legacy') return null; if (m !== 'server') throw new Error('Connexion au serveur impossible : vérifie ton réseau et réessaie.'); }
   const qs = list.map(([m, a]) => { const q = enqueue({ m, a: clone(a) }); firstQs.add(q); return q; });
   clearTimeout(timer);
   let res;
-  try { res = await flush(); }
-  catch (e) { queue = queue.filter((o) => !qs.includes(o.q)); saveQueue(); throw new Error('Connexion au serveur impossible : vérifie ton réseau et réessaie.'); }
+  try {
+    /* v754 : plus de 1 500 actions en attente : on envoie paquet après paquet jusqu'aux nôtres (avant : réponse vide, ouverture en erreur) */
+    for (let k = 0; k < 40; k++) { res = await flush(); if (!queue.some((o) => qs.includes(o.q))) break; }
+    if (queue.some((o) => qs.includes(o.q))) throw new Error('non envoyé');
+  } catch (e) { queue = queue.filter((o) => !qs.includes(o.q)); saveQueue(); qs.forEach((q) => { firstQs.delete(q); firstRes.delete(q); }); throw new Error('Connexion au serveur impossible : vérifie ton réseau et réessaie.'); }
   if (res?.data) adopt(res.data);
-  return qs.map((q) => (res.errs?.[q] ? { err: res.errs[q] } : { ret: res.rets?.[q] }));
+  return qs.map((q) => { const r = firstRes.get(q) || { ret: undefined }; firstRes.delete(q); return r; });
 }
 export async function first(m, ...args) {
   if (partie.mode !== 'legacy' && cloud.isLoggedIn()) {
@@ -170,7 +177,7 @@ const LEGACY = {
 export function startPartie(theApp) {
   app = theApp; g = app.game;
   loadState();
-  recordOps(g, enqueue, () => partie.mode === 'server' && cloud.isLoggedIn());
+  recordOps(g, enqueue, () => partie.mode !== 'legacy' && cloud.isLoggedIn()); /* v754 : notées dès qu'un compte est connecté (avant : perdues si le premier contact avec le serveur échouait) */
   cloud.onAuth((s) => {
     if (!s) { queue = []; saveQueue(); partie.mode = 'unknown'; firstQs.clear(); lastFree = ''; emit(); return; }
     loadState();

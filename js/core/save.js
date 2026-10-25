@@ -130,7 +130,8 @@ export function migrate(raw) {
   for (const k of ['best', 'recent', 'history', 'showcase', 'titles', 'frames']) if (!Array.isArray(s[k])) s[k] = d[k];
   // Variantes retirées : les exemplaires deviennent holographiques ou or (rien n'est perdu)
   for (const e of Object.values(s.collection)) {
-    if (!e || !e.v) continue;
+    if (!e || typeof e !== 'object') continue;
+    if (!e.v || typeof e.v !== 'object') e.v = { normal: Math.max(1, e.n || 1) }; /* v754 : entrée abîmée réparée (sinon l'offrande et les boosters plantaient) */
     for (const [o, to] of Object.entries(OLD_VARIANTS)) if (e.v[o]) { e.v[to] = (e.v[to] || 0) + e.v[o]; delete e.v[o]; }
     // Fournaise : le niveau ne vient plus des doublons, il est enregistré (ancien niveau conservé)
     if (!e.lv) e.lv = levelFromDups(Math.max(0, (e.n || 1) - 1)).level;

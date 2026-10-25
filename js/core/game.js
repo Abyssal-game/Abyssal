@@ -104,6 +104,7 @@ export class Game {
     if (restored) { this.restoredStash = true; try { writeSave(storage, save); storage.removeItem(SAVE_STASH_KEY); } catch (e) { /* rien */ } }
     try { this.convertHeroes(); } catch (e) { /* rien */ }
     try { this.fixVariants(); } catch (e) { /* rien */ }
+    this.noteCreatedDay();
     try { this.dropRemoved(); } catch (e) { /* rien */ }
   }
 
@@ -187,7 +188,7 @@ export class Game {
   freePack(now = this.clock().getTime()) {
     const d = new Date(now), fp = this.s.freePack, day = today(d);
     /* v536 : sans ouverture encore, la réserve se remplit depuis la création de la partie (avant : bloquée à 1) */
-    const start = this.s.createdAt ? today(new Date(this.s.createdAt)) : day;
+    const start = this.s.createdAt ? (this.s.createdDay || today(new Date(this.s.createdAt))) /* v754 : jour de création à l’heure du joueur (createdDay), le même sur le téléphone et le serveur */ : day;
     const stock = !fp.day ? Math.min(FREE_PACK.max, FREE_PACK.perDay * (1 + Math.max(0, dayGap(start, day)))) : fp.day === day ? (fp.left || 0) : Math.min(FREE_PACK.max, (fp.left || 0) + dayGap(fp.day, day) * FREE_PACK.perDay);
     const midnight = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1).getTime();
     return { stock, nextAt: stock ? null : midnight };
@@ -200,7 +201,7 @@ export class Game {
   fallenIds() { return Object.keys(this.s.fallen || {}).filter((id) => this.owns(id)); }
   braises(now = this.clock().getTime()) {
     const d = new Date(now), day = today(d), bf = this.s.braiseFree || {};
-    const start = this.s.createdAt ? today(new Date(this.s.createdAt)) : day;
+    const start = this.s.createdAt ? (this.s.createdDay || today(new Date(this.s.createdAt))) : day;
     const free = Math.max(0, !bf.day ? Math.min(BRAISE.max, BRAISE.perDay * (1 + Math.max(0, dayGap(start, day)))) : bf.day === day ? (bf.left || 0) : Math.min(BRAISE.max, (bf.left || 0) + Math.max(0, dayGap(bf.day, day)) * BRAISE.perDay));
     const earned = Math.max(0, this.s.braises || 0);
     return { free, earned, total: free + earned, nextAt: free < BRAISE.max ? new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1).getTime() : null };
@@ -420,6 +421,7 @@ export class Game {
     return m.list.filter((x) => x.p >= x.n && !x.claimed).length;
   }
   claimMission(i) {
+    if (!Number.isInteger(i)) throw new Error('Mission pas encore accomplie.'); /* v754 */
     const m = this.missions();
     const x = m.list[i];
     if (!x || x.claimed || x.p < x.n) throw new Error('Mission pas encore accomplie.');
@@ -584,7 +586,7 @@ export class Game {
   // Brûle n exemplaires d'une finition. Le dernier exemplaire peut partir : la créature quitte alors la collection.
   burn(id, variant = 'normal', n = 1) {
     const e = this.s.collection[id];
-    if (!e || !((e.v[variant] || 0) >= n) || n < 1) throw new Error('Tu ne possèdes pas assez d’exemplaires de cette version.');
+    if (!e || !((e.v[variant] || 0) >= n) || !Number.isInteger(n) || n < 1) throw new Error('Tu ne possèdes pas assez d’exemplaires de cette version.');
     const last = e.n - n <= 0;
     if (last) {
       if (this.isFav(id)) throw new Error('Cette créature est dans tes favoris : retire-la des favoris pour pouvoir la brûler.');
@@ -1115,7 +1117,7 @@ export class Game {
       if (sc.trophyDay !== day) { const ch = SC.trophyChoices(this.catalog, st); if (ch.length) { st.trophy = ch; out.trophy = ch; } }
     } else if (st.over === 'lost') { sc.losses++; sc.streak = 0; } else { sc.draws++; if (st.daily && sc.dailyDone !== (st.dailyDay || day)) { sc.dailyDone = st.dailyDay || day; out.shards += 10; } }
     this.s.shards += out.shards;
-    out.xp = SC.SCEAUX_REWARD.xp; this.s.xp += out.xp; // v348 : chaque partie terminée donne un peu d'expérience
+    out.xp = st.forfeit ? 0 : SC.SCEAUX_REWARD.xp; this.s.xp += out.xp; /* v754 : pas d'expérience pour un abandon */ // v348 : chaque partie terminée donne un peu d'expérience
     sc.history.unshift({ t: Date.now(), rival: R.key, r: st.over, s: st.final });
     sc.history = sc.history.slice(0, 20);
     st.rewarded = true; st.result = out;
@@ -1192,7 +1194,7 @@ export class Game {
       for (const t of titles) if (!this.s.titles.includes(t)) { this.s.titles.push(t); out.title = out.title ? `${out.title}, ${t}` : t; }
     } else { en.losses++; en.streak = 0; }
     this.s.shards += out.shards;
-    out.xp = R.xp; this.s.xp += out.xp;
+    out.xp = st.forfeit ? 0 : R.xp; this.s.xp += out.xp; /* v754 : pas d'expérience pour un abandon */
     en.history.unshift({ t: Date.now(), table: T.key, r: st.over, s: st.final?.scores });
     en.history = en.history.slice(0, 20);
     st.rewarded = true; st.result = out;
@@ -1264,7 +1266,7 @@ export class Game {
       for (const t of titles) if (!this.s.titles.includes(t)) { this.s.titles.push(t); out.title = out.title ? `${out.title}, ${t}` : t; }
     } else { pa.losses++; pa.streak = 0; }
     this.s.shards += out.shards;
-    out.xp = R.xp; this.s.xp += out.xp;
+    out.xp = st.forfeit ? 0 : R.xp; this.s.xp += out.xp; /* v754 : pas d'expérience pour un abandon */
     pa.history.unshift({ t: Date.now(), table: T.key, r: st.over, s: st.final?.scores });
     pa.history = pa.history.slice(0, 20);
     st.rewarded = true; st.result = out;
@@ -1278,6 +1280,7 @@ export class Game {
   gameForfeit(k) {
     const st = this.s[k]?.cur;
     if (!st || st.over) return null;
+    st.forfeit = true; /* v754 : un abandon ne rapporte pas d'expérience (sinon : lancer puis quitter en boucle) */
     if (k === 'sceaux') { st.over = 'lost'; st.final = SC.score(st); return this.sceauxFinish(); }
     if (k === 'pacte') { st.over = 'lost'; st.final = { scores: { ...st.scores } }; return this.pacteFinish(); }
     if (k === 'cryptes') { st.over = 'lost'; st.final = { scores: { p: CR.scoreOf(st, 'p'), a: CR.scoreOf(st, 'a') } }; return this.cryptesFinish(); }
@@ -1339,7 +1342,7 @@ export class Game {
       for (const t of titles) if (!this.s.titles.includes(t)) { this.s.titles.push(t); out.title = out.title ? `${out.title}, ${t}` : t; }
     } else { cr.losses++; cr.streak = 0; }
     this.s.shards += out.shards;
-    out.xp = R.xp; this.s.xp += out.xp;
+    out.xp = st.forfeit ? 0 : R.xp; this.s.xp += out.xp; /* v754 : pas d'expérience pour un abandon */
     cr.history.unshift({ t: Date.now(), table: T.key, r: st.over, s: st.final?.scores });
     cr.history = cr.history.slice(0, 20);
     st.rewarded = true; st.result = out;
@@ -1476,7 +1479,8 @@ export class Game {
     const room = run.pendingRoom;
     run.pact = key || null; run.pactOffer = null; run.pendingRoom = null;
     if (key) this.s.stats.pacts = (this.s.stats.pacts || 0) + 1;
-    return this.startBattle(room, { room, pact: key });
+    this._pactGo = room; /* v754 : startBattle n'accepte une salle qu'à travers une porte ouverte (ou un pacte accepté) */
+    try { return this.startBattle(room, { room, pact: key }); } finally { this._pactGo = null; }
   }
   // v595 : ennemis d'une salle de la Descente (même calcul pour le vrai combat et le banc d'essai du Labo)
   foesFor(run, room, rule = this.rule(run.day)) {
@@ -1508,6 +1512,10 @@ export class Game {
   torches() { const d = this.descent(); return { left: Math.max(0, TORCHES - (d.used || 0)), max: TORCHES }; }
   startBattle(room, out = { room }) {
     const run = this.s.descent.run;
+    /* v754 : seulement devant ses portes, et par une porte proposée : avant, une app modifiée pouvait lancer le gardien
+       depuis n'importe quel étage, ou relancer un combat mal parti */
+    if (!run || !((run.phase === 'doors' && this.doors().includes(room)) || (this._pactGo && this._pactGo === room))) throw new Error('Aucune porte à choisir.');
+    out = { room, ...(out?.pact ? { pact: out.pact } : {}) };
     const rule = this.rule(run.day);
     if (room === 'fight' || room === 'elite' || room === 'boss') {
       if (!run.devFree) { /* v735 : une Torche par combat (les essais du Mode Créateur n'en brûlent pas) */
@@ -2064,6 +2072,7 @@ export class Game {
     return t + 1;
   }
   codexClaim(track, tier) {
+    if (!Number.isInteger(tier) || (track !== 'free' && track !== 'prem')) throw new Error('Palier pas encore atteint.'); /* v754 : "5" ou "05" encaissait le même palier à l'infini */
     const c = this.codex(), t = tiersOf(c.season)[tier - 1];
     if (!t || tier > codexTier(c)) throw new Error('Palier pas encore atteint.');
     if (track === 'prem' && !c.premium) throw new Error(`La voie enluminée demande le ${CODEX.premiumName}.`);
@@ -2292,7 +2301,9 @@ export class Game {
     this.s.resetAt = Date.now(); /* v412 : partie effacée exprès : la partie en ligne ne doit pas revenir toute seule */
     this.persist();
   }
-  replaceSave(save) { this.s = save; try { this.convertHeroes(); this.fixVariants(); } catch (e) { /* rien */ } this.persist(); }
+  /* v754 : jour de création à l’heure du joueur (le serveur tourne à l’heure universelle, décalée de son fuseau par `clock`) */
+  noteCreatedDay() { try { if (!this.s.createdDay && this.s.createdAt) this.s.createdDay = today(new Date(this.s.createdAt + (this.clock().getTime() - Date.now()))); } catch (e) { /* rien */ } }
+  replaceSave(save) { this.s = save; this.noteCreatedDay(); try { this.convertHeroes(); this.fixVariants(); } catch (e) { /* rien */ } this.persist(); }
   bestCards(n = 3) {
     return Object.keys(this.s.collection)
       .map((id) => this.catalog.get(id))

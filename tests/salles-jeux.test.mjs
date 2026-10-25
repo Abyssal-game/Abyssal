@@ -64,7 +64,7 @@ test('v752 : pouvoirs annoncés des Cryptes (Mammon, Souveraine, Maître) et des
   const e = EN.newGame(catalog, { table: 'neant', seed: 9 });
   e.won.p.push({ v: -4, f: null }); assert.equal(EN.scoreOf(e, 'a').pow, 2);
   const h = EN.newGame(catalog, { table: 'maudite', seed: 9 });
-  h.won.b.push({ v: -5, f: null }); assert.equal(EN.scoreOf(h, 'b').total, -3);
+  h.won.b.push({ v: -5, f: null }); assert.equal(EN.scoreOf(h, 'b').total, -2); // v754 : moitié de 5 arrondie en sa faveur
   const l = EN.newGame(catalog, { table: 'lignees', seed: 9 });
   l.won.b.push({ v: 7, f: 'infernal' }, { v: 3, f: 'abyssal' }); assert.equal(EN.scoreOf(l, 'b').total, 17);
 });

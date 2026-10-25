@@ -3,9 +3,9 @@
 import * as cloud from './cloud.js';
 import { pseudoProblem } from '../core/moderation.js';
 import { friendCard } from '../core/friends.js';
-import { migrate, today } from '../core/save.js';
+import { migrate, today, defaultSave } from '../core/save.js';
 import { openSheet, esc, toast } from '../ui/dom.js';
-import { serverMode, probe, flush } from './partie.js';
+import { serverMode, probe, flush, pendingOps } from './partie.js';
 
 export const sync = { status: 'off', lastPush: 0, error: null, profile: null };
 let app = null, timer = 0, busy = false, pending = false;
@@ -25,6 +25,8 @@ function profilePayload() {
 const SYNCED_KEY = 'abyssal.syncedAt', PAUSED_KEY = 'abyssal.syncPaused';
 /* v536 : marque exacte (updated_at) de la dernière sauvegarde en ligne écrite ou lue par cet appareil : si elle a changé, un autre appareil a écrit */
 const STAMP_KEY = 'abyssal.syncedStamp';
+const OWNER_KEY = 'abyssal.owner'; /* v754 : compte à qui appartient la partie de cet appareil */
+export const clearOwner = () => lsSet(OWNER_KEY, null);
 const ms = (x) => new Date(x).getTime() || 0;
 const lsGet = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
 const lsSet = (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) { /* rien */ } };
@@ -35,7 +37,7 @@ export async function pushNow(force = false) {
   /* v539 : serveur de partie : la partie, le profil et la fiche d'ami sont tenus par le serveur ; on envoie seulement les actions */
   if (serverMode()) {
     sync.status = 'saving'; emit();
-    try { await flush(); sync.status = 'ok'; sync.error = null; sync.lastPush = Date.now(); } catch (e) { sync.status = 'error'; sync.error = e.message; }
+    try { for (let k = 0; k < 40; k++) { await flush(); if (!pendingOps()) break; } if (pendingOps()) throw new Error('Une partie de ta progression attend encore d’être envoyée.'); sync.status = 'ok'; /* v754 : tout envoyer (par paquets de 1 500), pas seulement le premier paquet */ sync.error = null; sync.lastPush = Date.now(); } catch (e) { sync.status = 'error'; sync.error = e.message; }
     emit();
     return;
   }
@@ -128,6 +130,15 @@ export function afterLogin() {
   sync.pending = (async () => {
     try { sync.profile = await cloud.getProfile(); } catch (e) { sync.profile = null; }
     lsSet(SYNCED_KEY, null); lsSet(STAMP_KEY, null);
+    /* v754 : la partie de cet appareil appartient à un autre compte (session perdue sans déconnexion) : elle ne part jamais
+       sur celui-ci (sinon le nouveau compte recevait toute la collection de l'ancien) ; l'appareil repart d'une partie neuve */
+    const me = cloud.currentUser()?.id || null, owner = lsGet(OWNER_KEY);
+    if (me && owner && owner !== me) {
+      const keep = { ...app.game.s.settings, dev: false, devCode: false };
+      const neuf = migrate(defaultSave()); neuf.settings = { ...neuf.settings, ...keep };
+      app.game.replaceSave(neuf); app.refresh?.();
+    }
+    if (me) lsSet(OWNER_KEY, me);
     /* v539 : une partie déjà jouée sur cet appareil (ancien invité) part d'abord sur le compte, comme avant ; puis le serveur de partie la reprend */
     let k = null;
     if (!serverMode() && !fresh(app.game.s)) k = await reconcile({ intro: 'Ce compte a déjà une partie en ligne.', auto: false });
@@ -183,6 +194,7 @@ export async function refreshProfile(force = true) {
 let lastBack = 0;
 export function startSync(theApp) {
   app = theApp;
+  { const me = cloud.isLoggedIn() ? cloud.currentUser()?.id : null; if (me && !lsGet(OWNER_KEY)) lsSet(OWNER_KEY, me); } /* v754 */
   app.game.on('change', () => { if (cloud.isLoggedIn() && sync.status !== 'paused' && !serverMode()) schedule(); });
   // v407 : le classement du jour compte les points des Épreuves du jour (la Descente est devenue la campagne)
   app.game.on('trialEnd', (out) => {

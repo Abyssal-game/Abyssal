@@ -147,6 +147,7 @@ function finish(st) {
 export function flip(st, i, rng = Math.random) {
   if (st.over) throw new Error('La partie est terminée.');
   if (st.pending) throw new Error('Choisis d’abord la cible du pouvoir.');
+  if (!Number.isInteger(i)) throw new Error('Cette carte ne peut pas être retournée.'); /* v754 */
   const c = st.cards[i];
   if (!c || c.gone || st.open.includes(i)) throw new Error('Cette carte ne peut pas être retournée.');
   const who = st.turn;
@@ -163,7 +164,7 @@ export function flip(st, i, rng = Math.random) {
     const ev = { who, kind: 'match', i: [x, y], f: c.f, k: c.k, power: c.f, blocked: false };
     const S = st.stats;
     if (S) { S.cur++; S.run[who] = Math.max(S.run[who], S.cur); }
-    if (who === 'a' && isPow(st, 'collect') && st.pairs.a.length % powerOf(st).n === 0) { st.bonus.a++; ev.collect = true; } /* Orvel : Collection */
+    if (who === 'a' && isPow(st, 'collect')) { st.pw ||= {}; st.pw.found = (st.pw.found || 0) + 1; if (st.pw.found % powerOf(st).n === 0) { st.bonus.a++; ev.collect = true; } } /* Orvel : Collection (v754 : ses paires trouvées, pas celles volées) */
     if (st.curse?.includes(c.k)) {
       ev.cursed = true; if (S) S.cursed[who]++;
       if (who === 'a' && isPow(st, 'gold')) ev.gold = true; /* Mammon : l'or des tombes, la malédiction ne le touche pas */
@@ -208,7 +209,7 @@ export function usePower(st, picks, rng = Math.random) {
   const P = st.pending;
   if (!P) throw new Error('Aucun pouvoir en attente.');
   const hid = hidden(st);
-  if (picks.length !== P.pick || picks.some((i) => !hid.includes(i)) || new Set(picks).size !== picks.length) throw new Error('Choisis une carte face cachée.');
+  if (!Array.isArray(picks) || !picks.every(Number.isInteger) || picks.length !== P.pick || picks.some((i) => !hid.includes(i)) || new Set(picks).size !== picks.length) throw new Error('Choisis une carte face cachée.');
   st.pending = null;
   const ev = { who: 'p', kind: 'power', power: P.power, i: picks };
   if (P.power === 'infernal') ev.card = st.cards[picks[0]];

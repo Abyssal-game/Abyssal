@@ -1,7 +1,7 @@
 // Compte : connexion, pseudo public, sauvegarde en ligne, déconnexion, suppression du compte.
 import * as cloud from '../cloud/cloud.js';
 import { defaultSave, migrate } from '../core/save.js';
-import { sync, onSync, afterLogin, pushNow, restoreFromCloud, setPseudo, refreshProfile, resumeSync } from '../cloud/sync.js';
+import { sync, onSync, afterLogin, pushNow, restoreFromCloud, setPseudo, refreshProfile, resumeSync, clearOwner } from '../cloud/sync.js';
 import { icon } from '../ui/icons.js';
 import { esc, toast, confirmBox, bindActions, openSheet } from '../ui/dom.js';
 import { blockedIds, clearBlocked, isMaskedPseudo } from '../core/moderation.js';
@@ -164,6 +164,7 @@ export default function account(app, root) {
     const fresh = migrate(defaultSave());
     fresh.settings = { ...fresh.settings, ...keep };
     app.game.replaceSave(fresh);
+    clearOwner(); /* v754 */
     /* v527 : rien de l'ancien compte ne reste (rappels du téléphone, nouvelles en ligne, parties ouvertes) */
     clearAll().catch(() => {}); resetWatch();
     Object.keys(app.state || {}).filter((k) => k.startsWith('mp_') || k === 'versus').forEach((k) => delete app.state[k]);

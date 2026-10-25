@@ -191,6 +191,7 @@ export const neighbors = (i) => [i >= 3 ? i - 3 : -1, i % 3 < 2 ? i + 1 : -1, i 
 export function place(cat, st, who, handIdx, cell) {
   if (st.over) throw new Error('La partie est terminée.');
   if (st.turn !== who) throw new Error('Ce n’est pas ton tour.');
+  if (!Number.isInteger(handIdx) || !Number.isInteger(cell)) throw new Error('Carte introuvable.'); /* v754 */
   if (!(cell >= 0 && cell < 9) || st.board[cell]) throw new Error('Cette case est déjà prise.');
   const id = st.hands[who][handIdx];
   if (!id) throw new Error('Carte introuvable.');

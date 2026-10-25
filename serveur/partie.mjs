@@ -7,7 +7,7 @@ import { migrate, defaultSave } from '../js/core/save.js';
 import { SAVE_KEY } from '../js/config.js';
 import { lineupStake } from '../js/core/versus.js';
 import { friendCard } from '../js/core/friends.js';
-import { OPS, FREE, FREE_DEV, setPath, clone, digest } from '../js/core/ops.js';
+import { OPS, FREE, FREE_DEV, setPath, clone, digest, argsOk } from '../js/core/ops.js';
 import { catalogue } from './catalogue.mjs';
 
 export const PARTIE_VERSION = 1;
@@ -147,6 +147,7 @@ export async function handle({ uid, token, body }, { db, now = () => Date.now(),
         if (!def || def.kind === 'local') throw new Error('Opération refusée.');
         if (def.kind === 'dev' && !creator) throw new Error('Réservé au Mode Créateur.');
         const args = Array.isArray(op.a) ? clone(op.a) : [];
+        if (!argsOk(op.m, args)) throw new Error('Opération refusée.'); /* v754 : forme des arguments vérifiée (ARGS) */
         let r;
         if (NET[op.m]) r = await NET[op.m](c, g, ...args);
         else if (DEV[op.m]) r = DEV[op.m](g, ...args);

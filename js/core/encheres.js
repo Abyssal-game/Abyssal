@@ -136,7 +136,7 @@ export const powerOf = (st) => TABLE[st.table]?.power || null;
 function powBonus(st, who, sets) {
   const P = powerOf(st);
   if (!P || P.who !== who) return 0;
-  if (P.k === 'halfcurse') return st.won[who].filter((l) => l.v < 0).reduce((a, l) => a + Math.floor(-l.v / 2), 0);
+  if (P.k === 'halfcurse') return st.won[who].filter((l) => l.v < 0).reduce((a, l) => a + Math.ceil(-l.v / 2), 0); /* v754 : arrondi en sa faveur, comme le dit le texte */
   if (P.k === 'setplus') return sets * P.n;
   if (P.k === 'echo') return Math.max(0, ...st.won[who].map((l) => l.v));
   if (P.k === 'tribute') return st.won.p.filter((l) => l.v < 0).length * P.n;
