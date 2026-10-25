@@ -2252,6 +2252,8 @@ export class Game {
     this.s.bossesBeaten = {}; this.s.bossWins = {}; this.s.storySeen = {}; this.s.fallen = {}; /* v668 */
     this.persist();
   }
+  /* v769 : Mode Créateur : Booster(s) de l'Abysse à volonté ; first = rejouer la première fois (Secrète pas encore possédée garantie) */
+  devAbyss(first = false, n = 1) { const k = Math.max(1, Math.min(50, +n || 1)); this.s.tickets.abysse = (this.s.tickets.abysse || 0) + k; if (first) this.s.stats.abyssSecret = 0; this.persist(); }
   devFreePacks() { this.s.freePack = { day: null }; this.persist(); }
   devMissions() { this.missions().list.forEach((x) => { x.p = x.n; }); this.persist(); }
   // power : l'équipe prend le niveau attendu à cet étage (pour essayer la difficulté réelle)
