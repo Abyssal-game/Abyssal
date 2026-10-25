@@ -8127,6 +8127,11 @@ export default {
   "Booster gratuit du jour (10 h), à toi de jouer en ligne, défis reçus, défi relevé au Choc des Boosters, demandes d’ami.": "Gratis-Booster des Tages (10 Uhr), du bist online am Zug, erhaltene Herausforderungen, angenommene Schlacht, Freundschaftsanfragen.",
   'Le serveur n’a pas reçu la fin de ce combat : il reprend là où le serveur l’a compté.': 'Der Server hat das Ende dieses Kampfes nicht erhalten: Er geht dort weiter, wo der Server ihn gezählt hat.',
   'Les cadeaux déjà reçus ne seront pas redonnés : ni les {0} boosters de bienvenue, ni le booster gratuit, l’offrande, les Torches et les Épreuves du jour.': 'Bereits erhaltene Geschenke gibt es nicht noch einmal: weder die {0} Willkommens-Booster noch den Gratis-Booster, die Opfergabe, die Fackeln und die Prüfungen des Tages.',
+  "Défier": "Fordern",
+  "Défié": "Gefordert",
+  "Tu as déjà défié le pacte dans cette partie.": "Du hast den Pakt in dieser Partie schon herausgefordert.",
+  "Défier le pacte : pose d’abord une carte de faction (pas pendant un Présage).": "Den Pakt herausfordern: Lege zuerst eine Fraktionskarte (nicht während eines Omens).",
+  "Défier le pacte : tu tires une dernière carte. Si le pacte tient, tout le tour compte double, cette carte comprise (pour l’instant {n} points ×2). S’il se brise, tu perds tout. Une seule fois par partie.": "Den Pakt herausfordern: Du ziehst eine letzte Karte. Hält der Pakt, zählt der ganze Zug doppelt, diese Karte inklusive (derzeit {n} Punkte ×2). Bricht er, verlierst du alles. Nur einmal pro Partie.",
 };
 
 export const names = {

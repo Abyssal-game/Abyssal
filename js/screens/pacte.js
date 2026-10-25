@@ -140,7 +140,18 @@ export default function pacteScreen(app, root) {
     /* v561 : Malédiction (tirer encore) et Défier le pacte (une fois par partie) */
     return `<div class="mq-ctl pa-ctl"><button class="btn primary dc-plq dc-plq-red" data-pa="draw">${icon('cards')}Tirer</button>
       <button class="btn dc-plq dc-plq-dark" data-pa="stop" ${canStop ? '' : 'disabled'}>${must && st.row.some((c) => c.f) ? 'Tire encore' : canStop ? `S’arrêter (+${v})` : 'S’arrêter'}</button>
-      ${st.dbl ? `<button class="btn pa-dbl" data-pa="double" ${PA.canDouble(st) ? '' : 'disabled'}>${st.dbl.p ? `<span>Défier le pacte${PA.canDouble(st) ? ` (×2 ou 0)` : ''}</span><small>1 fois par partie</small>` : 'Pacte déjà défié'}</button>` : ''}</div>`;
+      ${st.dbl ? dblSeal(st) : ''}</div>`;
+  }
+  /* v743 (le propriétaire : « le pouvoir ×2 prend toute la place, on doit faire défiler ») : Défier le pacte devient un petit sceau de cire
+     à côté des deux boutons ; un toucher explique et demande confirmation */
+  const dblSeal = (st) => {
+    const on = PA.canDouble(st), used = !st.dbl.p;
+    return `<button class="pa-dbl2 ${on ? 'on' : ''} ${used ? 'used' : ''}" data-pa="double" aria-label="${esc(t('Défier le pacte'))}"><b>×2</b><small>${used ? 'Défié' : 'Défier'}</small></button>`;
+  };
+  async function askDouble(st) {
+    if (!st.dbl.p) return void toast(t('Tu as déjà défié le pacte dans cette partie.'));
+    if (!PA.canDouble(st)) return void toast(t('Défier le pacte : pose d’abord une carte de faction (pas pendant un Présage).'));
+    return confirmBox(t('Défier le pacte : tu tires une dernière carte. Si le pacte tient, tout le tour compte double, cette carte comprise (pour l’instant {n} points ×2). S’il se brise, tu perds tout. Une seule fois par partie.', { n: PA.rowValue(st) }), { ok: t('Défier le pacte'), cancel: t('Annuler') });
   }
   function view() {
     const st = g.s.pacte.cur;
@@ -153,7 +164,7 @@ export default function pacteScreen(app, root) {
       ${seat(st, 'a')}
       ${pioche(st)}
       <div class="mq-table pa-table">${center(st)}</div>
-      ${st.peek && st.turn === 'p' && st.deck.length && !busy ? `<div class="pa-peek">${cardHTML(st.deck[st.deck.length - 1])}<span><b>Présage</b><span class="small">La prochaine carte sera celle-ci. Tire-la ou arrête-toi.</span></span></div>` : ''}
+      ${st.peek && st.turn === 'p' && st.deck.length && !busy ? `<div class="pa-peek">${cardHTML(st.deck[st.deck.length - 1])}<span><b>Présage</b> <span class="small">La prochaine carte sera celle-ci. Tire-la ou arrête-toi.</span></span></div>` : ''}
       ${seat(st, 'p')}
       ${controls(st)}</div>`;
   }
@@ -276,6 +287,8 @@ export default function pacteScreen(app, root) {
     }
     const st = g.s.pacte.cur;
     if (!st || st.over || busy || st.turn !== 'p') return;
+    if (k === 'double' && !(await askDouble(st))) return;
+    if (!g.s.pacte.cur || st.over || busy || st.turn !== 'p') return;
     const before = { row: st.row.slice(), sceaux: st.sceaux, offer: st.offer };
     let ev;
     try { ev = k === 'draw' ? g.pacteDraw() : k === 'stop' ? g.pacteStop() : k === 'double' ? g.pacteDouble() : null; } catch (err) { toast(esc(err.message), { kind: 'error' }); return; }

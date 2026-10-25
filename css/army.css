@@ -6894,3 +6894,46 @@ html:not([data-mat^="tp-"]) .sc-board:not([data-pmat^="tp-"]) .sc-cell { backgro
 .vd-pick-c small { font-size: .62rem; color: #7FE0A0; }
 .vd-pick-c.big small { color: #C79BFF; }
 .vd-pick-c.on { outline: 2px solid var(--gold-hi); box-shadow: 0 0 14px rgba(242, 193, 78, .6); }
+
+/* v743 : Pacte, « Défier le pacte » en petit sceau de cire à côté de Tirer / S’arrêter (il prenait une rangée entière et
+   obligeait à faire défiler) ; Présage plus mince ; l'écran tient sans défiler sur iPhone 13 et SE */
+.pa-game .pa-ctl:has(.pa-dbl2) { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 64px; gap: 8px; align-items: center; }
+.pa-dbl2 { position: relative; width: 64px; height: 64px; border-radius: 50%; padding: 0; border: 0; cursor: pointer; display: grid; place-content: center; gap: 0;
+  background: radial-gradient(circle at 38% 32%, #C2354A, #7A1022 52%, #3A0710 100%);
+  box-shadow: inset 0 0 0 2px rgba(242, 193, 78, .85), inset 0 0 0 5px rgba(58, 7, 16, .9), inset 0 -6px 10px rgba(0, 0, 0, .45), 0 3px 10px rgba(0, 0, 0, .6);
+  color: #FFE7A6; text-shadow: 0 1px 2px #000; -webkit-tap-highlight-color: transparent; }
+.pa-dbl2 b { font: 800 1.3rem/1 var(--f-display); letter-spacing: .02em; }
+.pa-dbl2 small { font: 700 .58rem/1 var(--f-ui, inherit); text-transform: uppercase; letter-spacing: .06em; color: #F6CFA0; margin-top: 2px; }
+.pa-dbl2.on::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 2px solid rgba(242, 193, 78, .7); animation: paDbl743 1.8s ease-in-out infinite; pointer-events: none; }
+@keyframes paDbl743 { 0%, 100% { transform: scale(.94); opacity: .2; } 50% { transform: scale(1.06); opacity: .9; } }
+.pa-dbl2:not(.on) { filter: grayscale(.75) brightness(.7); }
+.pa-dbl2.used { filter: grayscale(1) brightness(.55); }
+.pa-dbl2:active { transform: scale(.94); }
+.pa-game .pa-ctl:has(.pa-dbl2) .btn { min-height: 56px; }
+.pa-game .pa-peek { gap: 10px; padding: 5px 10px; }
+.pa-game .pa-peek .pa-card { width: 32px; }
+.pa-game .pa-peek .pa-card .pa-v { font-size: .7rem; }
+.pa-game .pa-peek > span { display: block; font-size: .8rem; line-height: 1.25; }
+.pa-game .pa-peek > span .small { font-size: .78rem; }
+@media (prefers-reduced-motion: reduce) { .pa-dbl2.on::after { animation: none; opacity: .6; } }
+@media (max-height: 700px) {
+  .pa-game .pa-ctl:has(.pa-dbl2) { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 54px; }
+  .pa-dbl2 { width: 54px; height: 54px; }
+  .pa-dbl2 b { font-size: 1.1rem; }
+  .pa-game .pa-ctl:has(.pa-dbl2) .btn { min-height: 50px; }
+}
+.pa-game .pa-ph > span:last-child { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 8px; }
+.pa-game .pa-pioche .pa-pile, .pa-game .pa-pioche .pa-pile img { width: 24px; }
+@media (max-height: 700px) {
+  .pa-game .pa-parch { max-width: 258px; }
+  .pa-game .pa-pf { padding: 3px 0 2px; gap: 1px; }
+  .pa-game .pa-pf .sigil, .pa-game .pa-pf svg { width: 15px; height: 15px; }
+  .pa-game .pa-ps { padding: 2px 7px; }
+  .pa-game .pa-peek > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; font-size: .74rem; }
+  .pa-game .pa-peek > span .small { font-size: .72rem; }
+  .pa-game .pa-peek .pa-card { width: 26px; }
+}
+/* v743 : le parchemin prend la hauteur qui reste (zones réservées de l'iPhone comprises) au lieu de pousser l'écran */
+.pa-game { height: calc(var(--app-h, 100dvh) - var(--safe-t, 0px) - max(var(--safe-b, 0px), var(--vh-gap, 0px)) - 20px); }
+.pa-game .mq-table { flex: 1 1 0; min-height: 150px; container-type: size; display: flex; justify-content: center; }
+.pa-game .mq-table .pa-parch { width: min(100%, 100cqh * 450 / 330); max-width: none; margin: auto; }

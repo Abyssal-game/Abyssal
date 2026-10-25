@@ -8127,6 +8127,11 @@ export default {
   "Booster gratuit du jour (10 h), à toi de jouer en ligne, défis reçus, défi relevé au Choc des Boosters, demandes d’ami.": "Booster grátis do dia (10 h), sua vez on-line, desafios recebidos, Batalha aceita, pedidos de amizade.",
   'Le serveur n’a pas reçu la fin de ce combat : il reprend là où le serveur l’a compté.': 'O servidor não recebeu o fim deste combate: ele continua de onde o servidor o contou.',
   'Les cadeaux déjà reçus ne seront pas redonnés : ni les {0} boosters de bienvenue, ni le booster gratuit, l’offrande, les Torches et les Épreuves du jour.': 'Os presentes já recebidos não serão dados de novo: nem os {0} pacotes de boas-vindas, nem o pacote grátis, a oferenda, as Tochas e as Provas do dia.',
+  "Défier": "Desafiar",
+  "Défié": "Desafiado",
+  "Tu as déjà défié le pacte dans cette partie.": "Você já desafiou o pacto nesta partida.",
+  "Défier le pacte : pose d’abord une carte de faction (pas pendant un Présage).": "Desafiar o pacto: primeiro jogue uma carta de facção (não durante um Presságio).",
+  "Défier le pacte : tu tires une dernière carte. Si le pacte tient, tout le tour compte double, cette carte comprise (pour l’instant {n} points ×2). S’il se brise, tu perds tout. Une seule fois par partie.": "Desafiar o pacto: você compra uma última carta. Se o pacto aguentar, todo o turno vale o dobro, essa carta incluída (agora {n} pontos ×2). Se ele se romper, você perde tudo. Só uma vez por partida.",
 };
 
 export const names = {
