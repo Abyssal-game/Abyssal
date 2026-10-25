@@ -12,7 +12,7 @@ import { createEncheresMp } from './encheres-mp.js';
 
 const CHEST_NAME = Object.fromEntries(Object.entries(CHESTS).map(([k, c]) => [k, c.name]));
 const stars = (n) => `${'★'.repeat(n)}${'☆'.repeat(Math.max(0, 5 - n))}`;
-const pic = (key) => `<img alt="" src="assets/sceaux/rival-${key}.webp">`;
+const pic = (key) => `<img alt="" src="assets/sceaux/rival2-${key}.webp">`;
 const HOW = [['cards', '#7FA8D8', 'La vente', 'Mammon met en vente 15 lots, un par manche : en général 10 créatures (de 1 à 10 points) et 5 malédictions (de −1 à −5). Certaines salles changent les lots.'],
   ['crystal', '#E8C35A', 'Tes offrandes', 'Tu as 15 offrandes, numérotées de 1 à 15. À chaque manche, chacun en pose une en secret. Une offrande jouée est perdue.'],
   ['rule', '#B48CFF', 'Qui remporte le lot', 'On révèle les offrandes. Celles qui sont jouées par deux joueurs ou plus s’annulent. Parmi les autres, la plus haute prend une créature… et la plus basse prend une malédiction.'],

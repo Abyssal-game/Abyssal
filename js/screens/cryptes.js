@@ -13,7 +13,7 @@ import { createCryptesMp } from './cryptes-mp.js';
 
 const CHEST_NAME = Object.fromEntries(Object.entries(CHESTS).map(([k, c]) => [k, c.name]));
 const stars = (n) => `${'★'.repeat(n)}${'☆'.repeat(Math.max(0, 5 - n))}`;
-const pic = (key) => `<img alt="" src="assets/sceaux/rival-${key}.webp">`;
+const pic = (key) => `<img alt="" src="assets/sceaux/rival2-${key}.webp">`;
 const HOW = [['cards', '#7FA8D8', 'Les cryptes', '20 cartes face cachée, en 10 paires. À ton tour, retourne deux cartes.'],
   ['crystal', '#E8C35A', 'Une paire', 'Deux fois la même créature : tu la gardes, son pouvoir se déclenche, et tu rejoues.'],
   ['danger', '#E0485E', 'Pas de paire', 'Les deux cartes se referment et la main passe. Retiens bien où elles sont !'],

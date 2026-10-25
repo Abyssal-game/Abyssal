@@ -39,8 +39,8 @@ const themeOf = (r) => THEME[r] || 'salle';
 // v358 : les explications animées en tuiles (icône, nom, résumé, lecture), à la place de la liste de textes
 const RULE_SHORT = { classique: 'Plus fort que la carte d’en face : capturée. Et les pouvoirs de rareté.', sacre: 'Une case bénie (+1) et une case maudite (−1).', identique: 'Deux égalités d’un coup (tes cartes comptent aussi) : les cartes adverses parmi elles sont prises.', somme: 'Deux fois la même somme (tes cartes comptent aussi) : les cartes adverses parmi elles sont prises.', abime: 'Identique, Somme et cases sacrées à la fois.' };
 const ruleTiles = () => `<div class="sc-rgrid">${SC.RULE_LIST.map((k) => `<button class="sc-rtile k-${k}" data-sc="demo" data-k="${k}"><span class="sc-rt-ic">${RULE_MED[k] || RULE_ICON[k] ? `<img alt="" src="assets/icons/${RULE_MED[k] || RULE_ICON[k]}.webp">` : picon('swords')}</span><b>${k === 'classique' ? 'Les bases' : esc(SC.RULES[k].name)}</b><small>${esc(RULE_SHORT[k] || SC.RULES[k].desc)}</small><span class="sc-rt-play" aria-hidden="true">▶</span></button>`).join('')}</div>`;
-// Portrait peint de l'adversaire (assets/sceaux/rival-*.webp), avec l'ancienne image de créature en secours
-const rivalPic = (cat, R) => `<img alt="" src="assets/sceaux/rival-${R.key}.webp" onerror="this.onerror=null;this.src='${artUrl(cat.get(R.portrait), { lite: true })}'">`;
+// Portrait peint de l'adversaire (assets/sceaux/rival2-*.webp), avec l'ancienne image de créature en secours
+const rivalPic = (cat, R) => `<img alt="" src="assets/sceaux/rival2-${R.key}.webp" onerror="this.onerror=null;this.src='${artUrl(cat.get(R.portrait), { lite: true })}'">`;
 // Petite carte du jeu : illustration, nom, emblème de faction et quatre valeurs sur les bords
 export function scCard(cat, id, { vals = null, owner = '', cls = '', back = false, guard = null, perks = true } = {}) {
   const c = cat.get(id);

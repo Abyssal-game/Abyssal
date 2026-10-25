@@ -174,10 +174,10 @@ export const EMOTES = {
   're-g-bete': { text: 'Ta défaite était écrite.', boss: 'bete', name: 'La Bête de l’Apocalypse' },
   're-g-abysse': { text: 'Plus tu descends, plus je souris.', boss: 'abysse', name: 'L’Abysse' },
   /* v630 : réactions de la Saison I (portrait propre assets/emotes/<clé>.webp, exclusives au Codex : jamais à l'Échoppe) */
-  're-feu-follet': { text: 'Suis-moi… droit vers ta défaite.', pic: 're-feu-follet', name: 'Le Feu follet', codex: true },
-  're-passeur': { text: 'Prépare ta pièce, je t’emmène.', pic: 're-passeur', name: 'Le Passeur des Âmes', codex: true },
-  /* v685 : Saison II */ 're-blizzard': { text: 'Tu as froid aux yeux ?', pic: 're-blizzard', name: 'Le Blizzard', codex: true },
-  're-sentinelle': { text: 'Nul ne passe. Toi encore moins.', pic: 're-sentinelle', name: 'La Sentinelle du givre', codex: true },
+  're-feu-follet': { text: 'Suis-moi… droit vers ta défaite.', pic: 'a-feu-follet', name: 'Le Feu follet', codex: true },
+  're-passeur': { text: 'Prépare ta pièce, je t’emmène.', pic: 'a-passeur', name: 'Le Passeur des Âmes', codex: true },
+  /* v685 : Saison II */ 're-blizzard': { text: 'Tu as froid aux yeux ?', pic: 'a-blizzard', name: 'Le Blizzard', codex: true },
+  're-sentinelle': { text: 'Nul ne passe. Toi encore moins.', pic: 'a-sentinelle', name: 'La Sentinelle du givre', codex: true },
 };
 export const FREE_EMOTES = Object.keys(EMOTES).filter((k) => EMOTES[k].free);
 export const PAID_EMOTES = Object.keys(EMOTES).filter((k) => !EMOTES[k].free);

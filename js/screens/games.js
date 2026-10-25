@@ -22,7 +22,7 @@ export default function gamesScreen(app, root) {
     pacte: () => { const t = firstLeft(PA.TABLES, pa.beaten); return t ? [t.rival] : null; },
     cryptes: () => { const t = firstLeft(CR.TABLES, cr.beaten); return t ? [t.rival] : null; },
     encheres: () => { const t = firstLeft(EN.TABLES, en.beaten); return t ? t.seats : null; } };
-  const nextHTML = (k) => { const n = nextOf[k]?.(); return n ? `<span class="gm-next">${n.map((r) => `<img alt="" src="assets/sceaux/rival-${r}.webp">`).join('')}<small>Prochain défi</small></span>` : ''; };
+  const nextHTML = (k) => { const n = nextOf[k]?.(); return n ? `<span class="gm-next">${n.map((r) => `<img alt="" src="assets/sceaux/rival2-${r}.webp">`).join('')}<small>Prochain défi</small></span>` : ''; };
   const tile = (href, cls, title, sub, info, img) => `<a class="panel gm-tile ${cls}" href="${href}"><span class="gm-art" style="background-image:url(${img})"></span>
     <span class="gm-txt"><b>${title}</b><span class="small">${sub}</span><span class="small muted">${info}</span>${nextHTML(href.slice(2))}${daily(href.slice(2))}</span>${icon('next')}</a>`;
   paint(root, `<header class="screen-head ui-hero bn-jeux"><h1>Le Cercle de l’Abysse</h1><p class="muted">Des jeux de cartes contre les arbitres de l’Abysse, ou contre d’autres joueurs.</p></header>
