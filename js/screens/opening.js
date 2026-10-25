@@ -44,7 +44,7 @@ export function resumeOpening(app, tries = 0) {
   if ((p.owner && !currentUser()) || document.querySelector('.gate, .sheet-wrap, .opening, .dv, .bx-intro')) { if (tries < 40) setTimeout(() => resumeOpening(app, tries + 1), 1500); return; }
   keepPending(null);
   confirmBox(`<b>Ton ouverture de booster a été interrompue.</b><br>Tes ${p.opening.cards.length} cartes sont bien dans ta collection. Veux-tu revoir l’ouverture ?`, { ok: 'Revoir l’ouverture', cancel: 'Plus tard' })
-    .then((yes) => { if (yes) openPack(app, p.type, { preset: p.opening, replay: true, title: p.title, packKey: p.packKey }); });
+    .then((yes) => { if (yes) openPack(app, p.type, { faction: p.faction, preset: p.opening, replay: true, title: p.title, packKey: p.packKey }); });
 }
 
 export async function openPack(app, type, { faction, onDone, preset = null, title = null, packKey = null, replay = false } = {}) {
@@ -61,7 +61,7 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
   const got = (async () => (preset ? { opening: preset } : viaServer ? app.partie.first('openBooster', type, { faction }) : g.openBooster(type, { faction })))()
     .then((r) => {
       opening = r.opening; asking = false;
-      if (!preset) keepPending({ type, title: title || BOOSTERS[type].name, packKey, at: Date.now(), owner: currentUser()?.id || null, opening: { cards: opening.cards, rewards: opening.rewards || {}, guaranteed: opening.guaranteed || null } });
+      if (!preset) keepPending({ type, faction, title: title || BOOSTERS[type].name, packKey, at: Date.now(), owner: currentUser()?.id || null, opening: { cards: opening.cards, rewards: opening.rewards || {}, guaranteed: opening.guaranteed || null } });
       return opening;
     }, (e) => { fail(e); throw e; });
   got.catch(() => {});
@@ -76,7 +76,10 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
   const ev = g.event();
 
   const el = document.createElement('div');
-  el.className = 'opening';
+  /* v768 : un décor peint par booster (factions : celui de la faction) */
+  const OBG = { standard: 'standard', premium: 'premium', event: 'alliances', abysse: 'abysse' };
+  const bgKey = packKey === 'shadow' ? 'ombres' : type === 'faction' ? (faction || preset?.faction || '') : OBG[type] || '';
+  el.className = `opening${bgKey ? ` obg obg-${bgKey}` : ''}`;
   el.setAttribute('role', 'dialog');
   el.setAttribute('aria-modal', 'true');
   el.setAttribute('aria-label', `Ouverture : ${title || def.name}`);
