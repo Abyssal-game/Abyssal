@@ -2274,9 +2274,21 @@ export class Game {
     return progress;
   }
   reset() {
-    const settings = this.s.settings;
+    const settings = this.s.settings, old = this.s;
     this.s = defaultSave();
     this.s.settings = { ...this.s.settings, ...settings };
+    /* v739 : effacer sa partie ne redonne pas les cadeaux déjà reçus (sinon : effacer et rouvrir les boosters de bienvenue
+       jusqu'à tirer une carte très rare). Pas de 2e cadeau de bienvenue, booster gratuit, offrande et Épreuves du jour gardés. */
+    this.s.createdAt = old.createdAt || this.s.createdAt;
+    this.s.tickets.standard = Math.max(0, this.s.tickets.standard - (ECONOMY.start.tickets.standard || 0));
+    this.s.welcomeGift = 0; this.s.giftShown = true;
+    this.s.erased = (old.erased || 0) + 1;
+    if (old.freePack) this.s.freePack = { ...old.freePack };
+    if (old.daily?.last) this.s.daily = { last: old.daily.last, streak: 0 };
+    if (old.trials?.day) this.s.trials = { ...this.s.trials, day: old.trials.day, done: [...(old.trials.done || [null, null, null])], score: old.trials.score || 0 };
+    if (old.missions?.day) this.s.missions = old.missions;
+    if (old.braiseFree) this.s.braiseFree = { ...old.braiseFree };
+    if (old.descent?.day) this.s.descent = { ...this.s.descent, day: old.descent.day, used: old.descent.used || 0 };
     this.s.resetAt = Date.now(); /* v412 : partie effacée exprès : la partie en ligne ne doit pas revenir toute seule */
     this.persist();
   }

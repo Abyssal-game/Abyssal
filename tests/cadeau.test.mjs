@@ -25,3 +25,16 @@ test('cadeau : une ancienne partie déjà commencée n’a pas de cadeau', () =>
   const neuve = defaultSave(); delete neuve.welcomeGift;
   assert.equal(migrate(neuve).welcomeGift, 2);
 });
+
+test('cadeau : effacer sa partie ne redonne ni le cadeau ni le booster du jour (v739)', () => {
+  const g = mk();
+  g.openBooster('standard'); g.openBooster('standard'); g.openBooster('standard');
+  g.reset();
+  assert.equal(g.s.welcomeGift, 0);
+  assert.equal(g.s.tickets.standard || 0, 0);
+  assert.equal(g.freePack().stock, 0);
+  assert.equal(g.canBuy('standard'), false);
+  g.reset();
+  assert.equal(g.s.erased, 2);
+  assert.equal(g.s.tickets.standard || 0, 0);
+});
