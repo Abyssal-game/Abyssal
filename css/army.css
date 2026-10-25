@@ -7004,3 +7004,8 @@ html:not([data-mat^="tp-"]) .sc-board:not([data-pmat^="tp-"]) .sc-cell { backgro
 @keyframes paDefyTag { 0%, 100% { scale: 1; } 15% { scale: 1.12; } 30% { scale: 1; } 45% { scale: 1.07; } }
 .pa-game.rm .pa-parch.defy::before, .pa-game.rm .pa-defy-tag, .pa-game.rm.defy::after { animation: none; }
 html.fx-light .pa-game.defy::after { animation: none; opacity: .7; }
+
+/* v746 (capture du propriétaire : « pendant l'ouverture du booster il ne rougit pas ») : la fissure de l'œil s'allume aussi
+   pendant l'ouverture, seulement dans le corps du sachet (une copie ; les 12 lanières de la déchirure n'en ont pas) */
+.op-pack .pk-body .pk-glow { display: block; }
+html.fx-light .op-pack .pk-body .pk-glow { display: none; }
