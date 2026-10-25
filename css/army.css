@@ -7204,3 +7204,10 @@ img.pa-defy-tag { width: 30%; height: auto; font-size: 0; text-shadow: none; fil
 .endx-s.last .endx-t { font-size: 20px; margin-bottom: 18px; }
 .endx-go { min-width: 200px; margin-bottom: 6px; animation: endxTxt 1s 1.6s ease both; }
 .endx-s.velin .endx-bg { animation: none; }
+
+/* v777 : œil pour afficher le mot de passe */
+.pw-box { position: relative; display: block; }
+.pw-box .input { width: 100%; padding-right: 54px !important; }
+.pw-eye { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; display: grid; place-items: center; border: 0; background: none; color: var(--gold, #d4af37); opacity: .8; cursor: pointer; }
+.pw-eye svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+.pw-eye:active { opacity: 1; }

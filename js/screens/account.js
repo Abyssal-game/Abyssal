@@ -40,7 +40,21 @@ const ago = (t) => {
 
 export default function account(app, root) {
   let busy = false, lastEmail = '', mode = app.params?.[0] === 'motdepasse' ? 'newpass' : app.params?.[0] === 'inscription' ? 'signup' : 'login';
-  function render() {
+  /* v777 : un œil pour afficher le mot de passe qu'on tape (création de compte, connexion, nouveau mot de passe) */
+  const EYE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+  const EYE_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/><path d="M4 4l16 16"/></svg>';
+  function addEyes() {
+    root.querySelectorAll('input[type="password"]:not([data-eye])').forEach((inp) => {
+      inp.dataset.eye = '1';
+      const box = document.createElement('span'); box.className = 'pw-box';
+      inp.replaceWith(box); box.appendChild(inp);
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'pw-eye'; b.setAttribute('aria-label', 'Afficher le mot de passe'); b.innerHTML = EYE;
+      b.addEventListener('click', (e) => { e.preventDefault(); const show = inp.type === 'password'; inp.type = show ? 'text' : 'password'; b.innerHTML = show ? EYE_OFF : EYE; b.setAttribute('aria-label', show ? 'Masquer le mot de passe' : 'Afficher le mot de passe'); inp.focus({ preventScroll: true }); });
+      box.appendChild(b);
+    });
+  }
+  function render() { render0(); addEyes(); }
+  function render0() {
     const u = cloud.currentUser();
     // v318 : nouveau mot de passe après un lien de récupération (adresse #/compte/motdepasse), même connecté
     if (mode === 'newpass' && u) {

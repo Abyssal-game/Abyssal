@@ -8291,6 +8291,8 @@ export default {
   "Commencer": "Begin",
   "Revoir le prologue": "Watch the prologue again",
   "Choc": "Clash",
+  "Afficher le mot de passe": "Show password",
+  "Masquer le mot de passe": "Hide password",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

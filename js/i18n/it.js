@@ -8280,6 +8280,8 @@ export default {
   "Commencer": "Inizia",
   "Revoir le prologue": "Rivedi il prologo",
   "Choc": "Sfida",
+  "Afficher le mot de passe": "Mostra la password",
+  "Masquer le mot de passe": "Nascondi la password",
 };
 
 export const names = {
