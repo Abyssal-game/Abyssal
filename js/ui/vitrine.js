@@ -18,12 +18,10 @@ export const fondStyle = (k) => (fondOk(k) ? ` style="--pf-bg:url('${fondUrl(k)}
 export const frameCls = (k) => (okKey(k) ? `pf pf-${k}` : '');
 
 // une réaction : portrait de l'arbitre (ou l'emblème du jeu pour les réactions offertes) et sa phrase
-/* v760 : gardiens dont le portrait de réaction peint (assets/emotes/gp-<clé>.webp) est arrivé */
-const GP_EMOTES = new Set(['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'peste', 'chasseur', 'voeux', 'titan', 'jumeaux', 'juge', 'bete', 'abysse']);
 export const emotePic = (k) => {
   const e = EMOTES[k];
   if (e?.pic) return `<img alt="" src="assets/emotes/${e.pic}.webp">`; /* v630 : portrait propre (réactions du Codex) */
-  return e?.who ? `<img alt="" src="assets/sceaux/rival-${e.who}.webp">` : e?.boss ? `<img alt="" src="assets/emotes/${GP_EMOTES.has(e.boss) ? 'gp' : 'gs'}-${e.boss}.webp">` /* v760 : portrait peint par Gemini (tools/emote-gemini.py), sinon visage tiré de l’affiche (tools/emote-boss.py) */ : EMBLEM;
+  return e?.who ? `<img alt="" src="assets/sceaux/rival-${e.who}.webp">` : e?.boss ? `<img alt="" src="assets/emotes/gp-${e.boss}.webp">` /* v762 : portrait peint par Gemini (tools/emote-gemini.py) */ : EMBLEM;
 };
 export const emoteHTML = (k) => `<span class="re-pic ${EMOTES[k]?.who || EMOTES[k]?.boss || EMOTES[k]?.pic ? '' : 're-free'}">${emotePic(k)}</span><span class="re-txt">${esc(EMOTES[k]?.text || '')}</span>`;
 
