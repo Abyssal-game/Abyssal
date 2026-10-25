@@ -34,23 +34,21 @@ export default function home(app, root) {
     const dayGain = (k) => g.dailyGainFor(sd - pos + k + 1);
     const streakBar = `<span class="td-streak">${Array.from({ length: 7 }, (_, k) => `<i class="${k < (g.canDailyClaim() ? pos - 1 : pos) ? 'on' : ''} ${k === pos - 1 && g.canDailyClaim() ? 'now' : ''} ${k === 6 ? 'chest' : ''}">${k === 6 ? '<img alt="" src="assets/chests/fer.webp">' : `<em>${k + 1}</em>`}<small>${dayGain(k)}</small></i>`).join('')}</span>`;
     rows.push(`<div class="td-row td-daily ${g.canDailyClaim() ? '' : 'done'}" data-act="dailyinfo" role="button"><span class="td-ic mi" style="--mc:#F2C14E">${picon('streak')}</span><span class="td-t"><b>Offrande du jour</b><span class="small muted">${g.canDailyClaim() ? `Jour ${pos} sur 7 · aujourd’hui ${daily.amount} éclats${pos === 7 ? ' et un coffre de fer' : ''}` : `Reçue : ${dayGain(pos - 1)} éclats${pos === 7 ? ' et un coffre de fer' : ''} · demain ${pos === 7 ? g.dailyGainFor(sd + 1) : dayGain(pos)} éclats`}</span>${streakBar}</span>${g.canDailyClaim() ? `<span class="td-auto" title="Arrive tout seul">+${daily.amount}</span>` : `<span class="small muted">Reçue</span>`}</div>`);
-    /* v709 : Tirage des Ombres, mis en avant juste sous l'offrande tant que le tirage du jour n'est pas fait (compte connecté) */
-    if (cloud.isLoggedIn()) {
-      const shDone = shadowDone(g);
-      rows.push(`<a class="td-row td-shadow ${shDone ? 'done' : ''}" href="#/tirage"><span class="td-ic mi" style="--mc:#9B6BFF">${picon('shadow')}</span><span class="td-t"><b>Tirage des Ombres</b><span class="small muted">${shDone ? 'Tiré aujourd’hui · ton score compte pour la semaine · retour demain' : 'Ton tirage du jour t’attend · classement de la semaine'}</span></span>${shDone ? '<span class="small muted">Demain</span>' : `<span class="td-go">Tirer</span>`}</a>`);
-    }
-    // v411 : ce qui se joue aujourd'hui, puis les missions, puis le coffre de la semaine (avant : tout mélangé)
-    const tl = g.trials().done.filter((x) => !x).length, tw = g.trials().done.filter((x) => x === 'won').length;
-    if (g.team().length >= 3) rows.push(`<a class="td-row ${tl ? '' : 'done'}" href="#/epreuves"><span class="td-ic mi" style="--mc:#E0485E">${picon('crest-elite')}</span><span class="td-t"><b>Épreuves du jour</b><span class="small muted">${tl ? `${tl} combat${tl > 1 ? 's' : ''} à jouer · un coffre par victoire` : `Terminées : ${tw} victoire${tw > 1 ? 's' : ''} sur 3 · retour demain`}</span></span>${tl ? icon('next') : '<span class="small muted">Demain</span>'}</a>`);
-    /* v466 : défis du jour de la Salle des jeux encore à relever */
-    { const gl = g.gamesDailyLeft(); if (gl.length) rows.push(`<a class="td-row" href="#/jeux"><span class="td-ic mi" style="--mc:#C9A45A">${picon('seal')}</span><span class="td-t"><b>Jeux du jour</b><span class="small muted">${gl.length} défi${gl.length > 1 ? 's' : ''} à relever · un coffre de bois par victoire</span></span>${icon('next')}</a>`); }
-    if (chests) rows.push(`<a class="td-row" href="#/coffres"><span class="td-ic mi" style="--mc:#E8C35A">${picon('chest')}</span><span class="td-t"><b>${chests} coffre${chests > 1 ? 's' : ''} à ouvrir</b><span class="small muted">Éclats et boosters</span></span>${icon('next')}</a>`);
+    /* v755 : Tirage, Épreuves, Jeux du jour et coffres sur une rangée de tuiles (avant : quatre longues lignes) */
+    const tiles = [];
+    const tile = (href, ic, col, title, sub, hot) => `<a class="td-tile ${hot ? 'hot' : 'done'}" href="${href}" style="--mc:${col}"><span class="td-tile-ic">${picon(ic)}</span><b>${title}</b><small>${sub}</small></a>`;
+    if (cloud.isLoggedIn()) { const shDone = shadowDone(g); tiles.push(tile('#/tirage', 'shadow', '#9B6BFF', 'Tirage des Ombres', shDone ? 'Fait · demain' : 'À tirer', !shDone)); }
+    const tl = g.trials().done.filter((x) => !x).length;
+    if (g.team().length >= 3) tiles.push(tile('#/epreuves', 'crest-elite', '#E0485E', 'Épreuves du jour', tl ? `${tl} à jouer` : 'Terminées', !!tl));
+    { const gl = g.gamesDailyLeft(); if (gl.length) tiles.push(tile('#/jeux', 'seal', '#C9A45A', 'Jeux du jour', `${gl.length} défi${gl.length > 1 ? 's' : ''}`, true)); }
+    if (chests) tiles.push(tile('#/coffres', 'chest', '#E8C35A', 'Coffres', `${chests} à ouvrir`, true));
+    if (tiles.length) rows.push(`<div class="td-tiles" style="--n:${tiles.length}">${tiles.join('')}</div>`);
     // v696 : ce qui t'attend en ligne est maintenant dans « Le Cercle t'attend », en tête de l'Accueil
     rows.push('<h3 class="td-sub">Missions</h3>'); /* v658 : « Missions » (le coffre de la semaine n'est pas une mission du jour) */
-    m.list.forEach((x, i) => {
-      const done = x.p >= x.n;
-      rows.push(`<div class="td-row ${x.claimed ? 'done' : ''}" data-act="minfo" data-i="${i}" role="button"><span class="td-ic mi" style="--mc:${x.faction ? cat.faction[x.faction].colors.secondary : MISSION_LOOK[x.kind]?.[1] || '#C8A45D'}">${x.claimed ? icon('check') : x.faction ? sigil(x.faction) : picon(MISSION_LOOK[x.kind]?.[0] || 'seal')}</span><span class="td-t"><b>${esc(x.text)}</b>${x.claimed ? '' : `<span class="progress"><i style="width:${(x.p / x.n) * 100}%"></i></span>`}</span>${x.claimed ? '<span class="small muted">Fait</span>' : done ? `<span class="td-auto" title="Arrive tout seul">+${x.shards}</span>` : `<span class="td-n small muted">${x.p}/${x.n}</span>`}</div>`);
-    });
+    /* v755 : missions déjà faites repliées sous les autres */
+    const mRow = (x, i) => { const done = x.p >= x.n; return `<div class="td-row ${x.claimed ? 'done' : ''}" data-act="minfo" data-i="${i}" role="button"><span class="td-ic mi" style="--mc:${x.faction ? cat.faction[x.faction].colors.secondary : MISSION_LOOK[x.kind]?.[1] || '#C8A45D'}">${x.claimed ? icon('check') : x.faction ? sigil(x.faction) : picon(MISSION_LOOK[x.kind]?.[0] || 'seal')}</span><span class="td-t"><b>${esc(x.text)}</b>${x.claimed ? '' : `<span class="progress"><i style="width:${(x.p / x.n) * 100}%"></i></span>`}</span>${x.claimed ? '<span class="small muted">Fait</span>' : done ? `<span class="td-auto" title="Arrive tout seul">+${x.shards}</span>` : `<span class="td-n small muted">${x.p}/${x.n}</span>`}</div>`; };
+    m.list.forEach((x, i) => { if (!x.claimed) rows.push(mRow(x, i)); });
+    { const fin = m.list.map((x, i) => (x.claimed ? mRow(x, i) : '')).filter(Boolean); if (fin.length) rows.push(`<details class="td-fin"><summary class="small muted">${fin.length > 1 ? `${fin.length} missions faites` : '1 mission faite'}</summary>${fin.join('')}</details>`); }
     const wch = g.weekChest();
     if (!wch.claimed) rows.push(`<div class="td-row ${wch.ready ? '' : 'wait'}" data-act="wkinfo" role="button"><span class="td-ic mi" style="--mc:#F2C14E">${picon('chest')}</span><span class="td-t"><b>Coffre de la semaine</b><span class="small muted">${wch.ready ? 'Tu as joué 5 jours cette semaine : un coffre d’or t’attend !' : `Joue ${wch.need} jours cette semaine pour un coffre d’or · ${wch.days} / ${wch.need}`}</span>${wch.ready ? '' : `<span class="progress"><i style="width:${(wch.days / wch.need) * 100}%"></i></span>`}</span>${wch.ready ? '<span class="td-auto">Coffre</span>' : ''}</div>`);
     return `<section class="panel today"><div class="today-head"><h2>Aujourd’hui</h2></div>${rows.join('')}</section>`;

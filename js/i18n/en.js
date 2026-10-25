@@ -8247,6 +8247,21 @@ export default {
   "Saint": "Saint",
   "Lycanthrope": "Lycanthrope",
   "Yōkai": "Yōkai",
+  "Torches du jour": "Today’s Torches",
+  "Force de l’équipe": "Team strength",
+  "Force · {0} conseillée": "Strength · {0} advised",
+  "Force de ton équipe": "Your team’s strength",
+  "Fait · demain": "Done · tomorrow",
+  "À tirer": "Ready to draw",
+  "{0} à jouer": "{0} to play",
+  "Terminées": "Finished",
+  "Épreuves du jour": "Daily Trials",
+  "Jeux du jour": "Today’s games",
+  "{0} défi": "{0} challenge",
+  "{0} défis": "{0} challenges",
+  "{0} à ouvrir": "{0} to open",
+  "{0} missions faites": "{0} missions done",
+  "{0} mission faite": "{0} mission done",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

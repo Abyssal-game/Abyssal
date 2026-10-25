@@ -82,21 +82,19 @@ export default function descent(app, root) {
       ${'' /* v548 : rappel des coffres retiré de la Descente (déjà sur l'Accueil et sur l'onglet Butin) */}
       <section class="panel dc-go">
         ${chapterHTML()}
-        ${teamStrip(team)}
-        ${braiseBar(g, team)}
-        ${torchBar()}
-        <p class="small muted center">Pouvoir : <b>${esc(g.ultimate(team).name)}</b></p>
-        ${levelHint(team, d)}
-        <div class="dc-teambtns"><a class="btn small ghost dc-plq dc-plq-dark" href="#/equipe">${icon('p:team-ic')}Mon équipe</a><a class="btn small ghost dc-plq dc-plq-dark" href="#/renfort">${icon('p:level-up')}Renforcer</a></div>
         ${team.length < TEAM.active ? (g.welcomePending() ? `<a class="btn gold block" href="#/boutique">${icon('ticket')}Ouvrir mon cadeau</a>` : `<p class="small v2-warn center">${icon('info')} Ajoute au moins ${TEAM.active} créatures à ton équipe pour descendre.</p>`) : ''}
         ${team.length >= TEAM.active && standing < TEAM.active ? `<p class="small v2-warn center">${icon('info')} Il faut ${TEAM.active} créatures debout pour descendre : ranime-les avec une Braise de vie, ou remplace-les dans ton équipe.</p>` : ''}
-        <button class="btn primary block big-cta dc-plq dc-plq-red" data-act="start" ${standing >= TEAM.active && g.torches().left ? '' : 'disabled'}>${icon('p:descend')}${!g.torches().left ? 'Torches éteintes' : replay ? `Rejouer le chapitre ${ch}` : d.best ? `Commencer le chapitre ${ch}` : 'Descendre'}</button>
         ${replay ? `<div class="dc-opts">
           ${g.nightmareUnlocked() ? `<button class="dc-opt dc-opt-night ${ui.nightmare ? 'on' : ''}" data-act="night" aria-pressed="${!!ui.nightmare}">${icon('skull')}<b>Cauchemar</b><small>${g.nightBest(nt()) ? `record : étage ${g.nightBest(nt())}` : `ennemis +${Math.round((NIGHT_TIERS[nt()].hp - 1) * 100)} % PV, +${Math.round((NIGHT_TIERS[nt()].atk - 1) * 100)} % ATQ`} · récompenses ×${String(NIGHT_TIERS[nt()].shards).replace('.', ',')}</small></button>` : `<button class="dc-opt off" data-act="optinfo">${icon('lock')}<b>Cauchemar</b><small>dès l’étage ${NIGHTMARE_AT}</small></button>`}
           <button class="dc-opt-info icon-btn" data-act="optinfo" aria-label="Explications du Cauchemar">${icon('info')}</button>
         </div>` : ''}
         ${night ? `<div class="dc-ntiers" role="radiogroup" aria-label="Palier du Cauchemar">${[1, 2, 3].map((t) => { const open = g.nightTierOpen(t); return `<button class="dc-nt ${nt() === t ? 'on' : ''} ${open ? '' : 'off'}" role="radio" aria-checked="${nt() === t}" data-act="ntier" data-t="${t}" ${open ? '' : 'disabled'}><b>${['', 'I', 'II', 'III'][t]}</b><small>${open ? `coffres +${NIGHT_TIERS[t].chest} · éclats ×${String(NIGHT_TIERS[t].shards).replace('.', ',')}` : `${icon('lock')} ${NIGHT_TIER_OPEN} étages gagnés en ${['', 'I', 'II'][t - 1]}`}</small></button>`; }).join('')}</div>
         <p class="small dc-riskwarn">${icon('skull')} ${NIGHT_TIERS[nt()].name} : les ennemis ont la force de l’<b>étage ${g.nightmareEquiv(start, nt())}</b> en mode normal, et les gardiens sont déchaînés. Chaque étage gagné pour la première fois à ce palier redonne sa récompense, en plus généreux.${riskAdvice()}</p>` : ''}
+        <button class="btn primary block big-cta dc-plq dc-plq-red" data-act="start" ${standing >= TEAM.active && g.torches().left ? '' : 'disabled'}>${icon('p:descend')}${!g.torches().left ? 'Torches éteintes' : replay ? `Rejouer le chapitre ${ch}` : d.best ? `Commencer le chapitre ${ch}` : 'Descendre'}</button>
+        ${teamStrip(team)}
+        ${team.some((id) => g.isFallen(id)) ? braiseBar(g, team) : ''}
+        ${statStrip(team, d)} ${'' /* v755 : « Descendre » remonte juste sous l'équipe ; Torches, Braises de vie et force tiennent sur une rangée */}
+        <div class="dc-teambtns"><a class="btn small ghost dc-plq dc-plq-dark" href="#/equipe">${icon('p:team-ic')}Mon équipe</a><a class="btn small ghost dc-plq dc-plq-dark" href="#/renfort">${icon('p:level-up')}Renforcer</a></div>
       </section>
       ${summitHTML(d)}
       ${g.rule().off ? '' : ruleHTML(g.rule())}
@@ -121,6 +119,15 @@ export default function descent(app, root) {
     if (tp < need * 0.95 && !maxed(team)) return ` <b>Ton équipe est sous la force conseillée</b> (${powerPts(tp)} pour ${powerPts(need)}) : le risque est élevé.`;
     const r = [ui.nightmare && d.risk?.night].filter((x) => x && x.n >= 3).sort((a, b) => b.lost / b.n - a.lost / a.n)[0];
     return r && r.lost / r.n >= 0.5 ? ` Tu as perdu ${r.lost} de tes ${r.n} derniers chapitres dans ce mode.` : '';
+  }
+  /* v755 : Torches, Braises de vie et force de l'équipe en trois cases (un toucher = l'explication) */
+  function statStrip(team, d) {
+    const tc = g.torches(), b = g.braises(), target = Math.max((d.best || 0) + 1, 5), tp = g.teamPower(team), need = powerFor(target), ok = tp >= need * 0.95 || maxed(team);
+    return `<div class="dc-stat3">
+      <button class="dc-st3 ${tc.left ? '' : 'low'}" data-act="torchinfo"><span class="dc-st3-ic"><img class="picon" alt="" src="assets/icons/torch-${tc.left ? 'on' : 'off'}.webp"></span><b>${tc.left} / ${tc.max}</b><small>Torches du jour</small></button>
+      <button class="dc-st3" data-act="braiseinfo"><span class="dc-st3-ic">${BRAISE_IC}</span><b>${b.total}</b><small>Braises de vie</small></button>
+      ${team.length >= 3 ? `<button class="dc-st3 ${ok ? 'ok' : 'low'}" data-act="forceinfo"><span class="dc-st3-ic">${icon('p:level-up')}</span><b>${powerPts(tp)}</b><small>${ok ? 'Force de l’équipe' : `Force · ${powerPts(need)} conseillée`}</small></button>` : ''}
+    </div>`;
   }
   function levelHint(team, d) {
     if (team.length < 3) return '';
@@ -465,6 +472,7 @@ export default function descent(app, root) {
       if (f === 'summit') openSheet(summitHTML(g.descent(), true), { label: 'Le fond de l’Abysse', cls: 'dc-sheet' });
       else openSheet(`<h2 class="center">Comment ça marche</h2><ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol><p class="small muted center">5 Torches par jour : 5 combats, rallumés à minuit.</p>`, { label: 'Aide', cls: 'dc-sheet' });
     },
+    forceinfo() { const team = g.team(); openSheet(`<h2 class="center">Force de ton équipe</h2>${levelHint(team, g.descent())}<p class="small center">Pouvoir : <b>${esc(g.ultimate(team).name)}</b></p><a class="btn primary block dc-plq dc-plq-red" href="#/renfort">${icon('p:level-up')}Renforcer</a>`, { label: 'Force', cls: 'dc-sheet' }); },
     torchinfo() {
       const tc = g.torches();
       openSheet(`<h2 class="center">Les Torches</h2>

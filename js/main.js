@@ -207,15 +207,17 @@ function renderChrome() {
   // sous-onglets : seulement sur les pages d'un groupe
   const sub = SUBNAV[tab] && SUBNAV[tab].some(([r]) => r === (SUB_OF[app.route] || app.route)) ? SUBNAV[tab] : null;
   const shadowDue = () => isLoggedIn() && !shadowDone(g);
+  /* v755 : rouge chiffré seulement pour ce qui attend quelqu'un (à toi de jouer en ligne) ; le reste (coffres, Tirage, Épreuves…) = petite lueur dorée */
   const subBadge = (r) => {
-    if (r === 'coffres') return g.chestCount() || '';
-    if (r === 'tirage') return shadowDue() ? 1 : ''; /* v709 : tirage du jour pas encore fait */
-    if (r === 'codex') return claimable(g.codex()) || '';
+    const calm = (on) => (on ? 'calm' : '');
+    if (r === 'coffres') return calm(g.chestCount());
+    if (r === 'tirage') return calm(shadowDue()); /* v709 : tirage du jour pas encore fait */
+    if (r === 'codex') return calm(claimable(g.codex()));
     // v404 : pastilles plus calmes — plus de « 99+ » permanent sur la Fournaise ; Renforcer seulement si l'Accueil le conseille aussi
-    if (r === 'renfort') return g.goals().some((x) => x.kind === 'forge' && /Renforce/.test(x.title)) ? '↑' : '';
-    if (r === 'collection') return nNewSub || '';
-    if (r === 'jeux') return (g.gamesDailyLeft().length + mpw.turns + mpw.games) || ''; /* v466 : défis du jour à relever ; v519 : coups à jouer en ligne */
-    if (r === 'epreuves') { const n = g.trials().done.filter((x) => !x).length; return g.team().length >= 3 && n ? n : ''; } /* v407 */
+    if (r === 'renfort') return calm(g.goals().some((x) => x.kind === 'forge' && /Renforce/.test(x.title)));
+    if (r === 'collection') return calm(nNewSub);
+    if (r === 'jeux') return (mpw.turns + mpw.games) || calm(g.gamesDailyLeft().length); /* v466 : défis du jour à relever ; v519 : coups à jouer en ligne */
+    if (r === 'epreuves') return calm(g.team().length >= 3 && g.trials().done.some((x) => !x)); /* v407 */
     return '';
   };
   const nNewSub = g.newCount() > 99 ? '99+' : g.newCount();
@@ -224,15 +226,15 @@ function renderChrome() {
   const shown0 = sub && sub.filter(([r]) => (r !== 'tirage' || isLoggedIn() || app.route === 'tirage') && (r !== 'codex' || g.shopOn()));
   const shown = shown0 && shown0.length > 1 ? shown0 : null; /* v422 : pas de barre pour un seul sous-onglet */
   document.body.classList.toggle('has-subnav', !!shown);
-  setIf(sn, shown ? shown.map(([r, ic, label]) => { const bd = subBadge(r); return `<a class="sn-tab${r === 'jeux' && !g.sceauxOpen() ? ' locked' : ''}" href="#/${r}"${r === (SUB_OF[app.route] || app.route) ? ' aria-current="page"' : ''}><img class="sn-ic" alt="" src="assets/icons/${ic}.webp"><span>${label}</span>${bd ? `<i class="sn-badge">${bd}</i>` : ''}</a>`; }).join('') : '');
+  setIf(sn, shown ? shown.map(([r, ic, label]) => { const bd = subBadge(r); return `<a class="sn-tab${r === 'jeux' && !g.sceauxOpen() ? ' locked' : ''}" href="#/${r}"${r === (SUB_OF[app.route] || app.route) ? ' aria-current="page"' : ''}><img class="sn-ic" alt="" src="assets/icons/${ic}.webp"><span>${label}</span>${bd === 'calm' ? '<i class="sn-badge calm"></i>' : bd ? `<i class="sn-badge">${bd}</i>` : ''}</a>`; }).join('') : '');
   const nNew = g.newCount();
   const ticketCount = Object.values(s.tickets).reduce((a, b) => a + b, 0) + (g.welcomePending() ? 0 : g.freePack().stock); /* v404 : « 2 » comme l'annonce l'Accueil au tout début */
   setIf(document.getElementById('tabbar'), TABS.map(([key, ic, label]) => {
     const cur = key === tab ? ' aria-current="page"' : '';
     // moins de pastilles : un chiffre seulement pour ce qui attend d'être ouvert (boosters, coffres), sinon un simple point
-    const dot = '<span class="badge dot"></span>', nCap = (n) => (n > 9 ? '9+' : n); /* v699 : « 20 » sur l'onglet faisait pression : 9+ au-delà */
+    const dot = '<span class="badge dot calm"></span>', nCap = (n) => (n > 9 ? '9+' : n); /* v699 : « 20 » sur l'onglet faisait pression : 9+ au-delà */
     const bq = ticketCount + g.chestCount() + (shadowDue() ? 1 : 0); /* v709 : + le Tirage des Ombres du jour */
-    const badge = key === 'boutique' && bq ? `<span class="badge">${nCap(bq)}</span>` /* v428 : boosters et coffres à ouvrir */
+    const badge = key === 'boutique' && bq ? dot /* v428 : boosters et coffres à ouvrir ; v755 : lueur dorée, plus de chiffre */
       : key === 'collection' && nNew ? dot
       : key === 'antre' && mpw.cards?.length ? `<span class="badge">${nCap(mpw.cards.length)}</span>` /* v696 : « Le Cercle t'attend » sur l'Accueil */
       : key === 'antre' && (g.canDailyClaim() || g.missionsToClaim()) ? dot

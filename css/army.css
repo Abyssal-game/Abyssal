@@ -7052,3 +7052,48 @@ img.pa-defy-tag { width: 30%; height: auto; font-size: 0; text-shadow: none; fil
 .en-pow { color: #FFB49A; font-weight: 700; }
 /* v753 : rangée des Torches, bouton d'aide comme celui des Braises de vie */
 .dc-torch-row > .br-info { margin-left: auto; }
+
+/* v755 : Descente, Torches, Braises de vie et force de l'équipe en trois cases sous « Descendre » */
+.dc-stat3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 8px; margin: 10px 0 6px; }
+.dc-st3 { display: grid; justify-items: center; gap: 2px; min-height: 64px; padding: 8px 4px; border-radius: 12px; border: 1px solid rgba(255, 177, 92, .28); background: linear-gradient(180deg, rgba(60, 30, 10, .5), rgba(20, 14, 24, .45)); color: inherit; text-align: center; }
+.dc-st3:active { transform: scale(.97); }
+.dc-st3-ic { width: 26px; height: 26px; display: grid; place-items: center; }
+.dc-st3-ic img, .dc-st3-ic .br-ic, .dc-st3-ic .ic { width: 26px; height: 26px; }
+.dc-st3 b { font-size: 1rem; color: #FFD9A0; line-height: 1.1; }
+.dc-st3 small { font-size: .72rem; line-height: 1.15; color: var(--muted, #b9aa96); }
+.dc-st3.low { border-color: rgba(255, 90, 70, .6); }
+.dc-st3.low b { color: #FF8A70; }
+.dc-st3.ok b { color: #9EE6A0; }
+.dc-go > .big-cta { margin-top: 4px; }
+
+/* v755 : pastilles calmes (rien d'urgent : coffres, boosters, Tirage, Épreuves…) : petite lueur dorée sans chiffre ;
+   le rouge chiffré reste pour ce qui attend quelqu'un (Le Cercle t'attend, à toi de jouer, demande d'ami) */
+.tab .badge.dot.calm, .sn-badge.calm { min-width: 0; width: 9px; height: 9px; padding: 0; border-radius: 50%; background: #F0C75E; border: 1px solid #FFF0C0; box-shadow: 0 0 6px rgba(240, 199, 94, .8); }
+.sn-badge.calm { top: 4px; right: 8px; }
+
+/* v755 : Accueil, tuiles du jour (Tirage, Épreuves, Jeux du jour, coffres) et missions faites repliées */
+.td-tiles { display: grid; grid-template-columns: repeat(min(var(--n), 4), minmax(0, 1fr)); gap: 8px; margin: 10px 0 4px; }
+.td-tiles[style*="--n:4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.td-tile { display: grid; justify-items: center; align-content: start; gap: 3px; padding: 10px 4px 9px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--mc) 45%, transparent); background: linear-gradient(180deg, color-mix(in srgb, var(--mc) 18%, rgba(14, 10, 18, .9)), rgba(14, 10, 18, .85)); color: inherit; text-decoration: none; text-align: center; }
+.td-tile:active { transform: scale(.97); }
+.td-tile-ic { width: 34px; height: 34px; display: grid; place-items: center; }
+.td-tile-ic img, .td-tile-ic .ic { width: 32px; height: 32px; }
+.td-tile b { font-size: .8rem; line-height: 1.15; }
+.td-tile small { font-size: .72rem; line-height: 1.15; color: var(--muted, #b9aa96); }
+.td-tile.hot small { color: color-mix(in srgb, var(--mc) 60%, #fff); font-weight: 700; }
+.td-tile.done { opacity: .62; }
+.td-fin { margin: 4px 0 2px; }
+.td-fin > summary { list-style: none; cursor: pointer; padding: 6px 4px; text-align: center; }
+.td-fin > summary::-webkit-details-marker { display: none; }
+.td-fin > summary::after { content: ' ▾'; }
+.td-fin[open] > summary::after { content: ' ▴'; }
+/* v755 : vestibule de la Descente plus court, pour que « Descendre » se voie sans faire défiler (iPhone 13 et SE) */
+.dc-head.ui-hero { min-height: 0; padding-top: 14px; padding-bottom: 14px; }
+.dc-head.ui-hero p { margin-top: 2px; }
+.dc-go .dc-chap-bn { aspect-ratio: 3 / 1; }
+.dc-go .dc-chap-rw { font-size: .78rem; }
+@media (max-height: 760px) {
+  .dc-head.ui-hero { padding-top: 10px; padding-bottom: 10px; }
+  .dc-head.ui-hero p { display: none; }
+  .dc-go .dc-chap-bn { aspect-ratio: 4 / 1; }
+}

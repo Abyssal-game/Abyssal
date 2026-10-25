@@ -8236,6 +8236,21 @@ export default {
   "Saint": "Santo",
   "Lycanthrope": "Licantropo",
   "Yōkai": "Yōkai",
+  "Torches du jour": "Tochas do dia",
+  "Force de l’équipe": "Força da equipe",
+  "Force · {0} conseillée": "Força · {0} recomendada",
+  "Force de ton équipe": "Força da sua equipe",
+  "Fait · demain": "Feito · amanhã",
+  "À tirer": "Pronto para tirar",
+  "{0} à jouer": "{0} para jogar",
+  "Terminées": "Concluídas",
+  "Épreuves du jour": "Provas do dia",
+  "Jeux du jour": "Jogos do dia",
+  "{0} défi": "{0} desafio",
+  "{0} défis": "{0} desafios",
+  "{0} à ouvrir": "{0} para abrir",
+  "{0} missions faites": "{0} missões feitas",
+  "{0} mission faite": "{0} missão feita",
 };
 
 export const names = {

@@ -44,7 +44,7 @@ async function check(app) {
   try { seen = JSON.parse(localStorage.getItem(SEEN) || '{}'); } catch (e) { /* rien */ }
   const items = [], cards = [];
   const foeOf = (v) => ({ id: v.foe?.id || null, pseudo: v.foe?.pseudo || '', avatar: v.foe?.avatar || null });
-  const say = (key, msg, icon = 'hourglass', where = null) => { if (seen[key]) return; seen[key] = 1; if (app.route !== where) toast(msg, { icon, ms: 5500 }); };
+  const say = (key, msg, icon = 'hourglass', where = null) => { if (seen[key]) return; seen[key] = 1; if (app.route !== where && app.route !== '' && app.route !== 'antre') toast(msg, { icon, ms: 5500 }); /* v755 : sur l'Accueil, « Le Cercle t'attend » le montre déjà */ };
   const who = (p) => `<b>${esc(p || t('un joueur'))}</b>`;
   let turns = [];
   // Duels des Sceaux et Pacte en ligne (v523 : le Pacte aussi)
