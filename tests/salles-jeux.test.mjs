@@ -17,12 +17,19 @@ test('jeux : 8 salles par jeu, chacune avec un haut fait, et les nouvelles avec 
   }
 });
 
-test('pacte : règles des salles (but, cartes spéciales, avance de l’adversaire)', () => {
+test('pacte : règles des salles (but, cartes spéciales, aucune avance, dette de Mammon)', () => {
   const st = PA.newGame(catalog, { table: 'neant', seed: 3 });
-  assert.equal(st.target, 70); assert.equal(st.scores.a, 12);
+  assert.equal(st.target, 70); assert.equal(st.scores.a, 0); /* v750 : plus d’avance donnée aux adversaires */
   assert.equal(st.deck.filter((c) => c.sp === 'sceau').length, 0);
   assert.equal(st.deck.filter((c) => c.sp === 'gardien').length, 5);
   assert.equal(PA.newGame(catalog, { table: 'minuit', seed: 3 }).target, 80);
+  // v750 : la dette de Mammon : une brisure coûte aussi 4 points déjà gagnés, aux deux joueurs
+  const m = PA.newGame(catalog, { table: 'mammon', seed: 3 });
+  assert.equal(m.scores.a, 0);
+  m.scores.p = 10; const f = m.deck.find((c) => c.f).f;
+  m.row = [{ f, v: 3 }]; m.sceaux = 0; m.deck.push({ f, v: 2 });
+  const ev = PA.draw(m);
+  assert.equal(ev.result, 'bust'); assert.equal(ev.debt, 4); assert.equal(m.scores.p, 6);
 });
 
 test('cryptes : paires maudites (−1 point, pas de pouvoir) et crypte mouvante', () => {

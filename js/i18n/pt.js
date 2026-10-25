@@ -1557,8 +1557,6 @@ export default {
   "Cadres de profil": "Molduras de perfil",
   "Caladrius : Coup chargé": "Caladrius: Golpe carregado",
   "Calcule chaque risque et ne se laisse jamais distancer.": "Calcula cada risco e nunca fica para trás.",
-  "Calcule tout, ose davantage quand il est mené, et commence avec {0} points : la part de la maison.": "Calcula tudo, ousa mais quando está perdendo, e começa com {0} pontos: a parte da casa.",
-  "Calcule tout, ose quand elle est menée, et commence avec {0} points.": "Calcula tudo, ousa quando está perdendo, e começa com {0} pontos.",
   "Cantique abyssal": "Cântico abissal",
   "Cantique céleste": "Cântico celestial",
   "Cantique de Baron Samedi": "Cântico do Barão Samedi",
@@ -6009,7 +6007,6 @@ export default {
   "{0} oct. · {1} pts": "{0} out. · {1} pts",
   "{0} points de Codex · saison du {1}/{2}/{3} au {4}/{5}/{6}": "{0} pontos de Códice · temporada de {1}/{2}/{3} a {4}/{5}/{6}",
   "{0} points · le plus haut palier": "{0} pontos · o grau mais alto",
-  "{0} points, aucun Sceau, cinq Gardiens. La Souveraine commence à {1}.": "{0} pontos, nenhum Selo, cinco Guardiões. A Soberana começa com {1}.",
   "{0} récit sur {1}. Ils s’ouvrent en jouant : gardiens vaincus, formes libérées, relations rencontrées, royaumes complétés.": "{0} relato de {1}. Eles se abrem jogando: guardiões derrotados, formas libertadas, relações encontradas, reinos completos.",
   "{0} récits sur {1}. Ils s’ouvrent en jouant : gardiens vaincus, formes libérées, relations rencontrées, royaumes complétés.": "{0} relatos de {1}. Eles se abrem jogando: guardiões derrotados, formas libertadas, relações encontradas, reinos completos.",
   "{0} sur {1} gagnée · {2} points": "{0} de {1} vencida · {2} pontos",
@@ -6398,7 +6395,6 @@ export default {
   "{e0}Voir dans la collection": "{e0}Ver na coleção",
   "{e0}Voir la carte": "{e0}Ver a carta",
   "{e0}{0} booster standards": "{e0}{0} pacotes padrão",
-  "{e0}{0} points, aucun Sceau, cinq Gardiens. La Souveraine commence à {1}.": "{e0}{0} pontos, nenhum Selo, cinco Guardiões. A Soberana começa com {1}.",
   "{e0}{0} · +{1} ATQ": "{e0}{0} · +{1} ATQ",
   "{e0}{0} · +{1} ATQ +{2} PV": "{e0}{0} · +{1} ATQ +{2} PV",
   "{e0}{0} · +{1} PV": "{e0}{0} · +{1} PV",
@@ -8133,6 +8129,13 @@ export default {
   "Défier le pacte : pose d’abord une carte de faction (pas pendant un Présage).": "Desafiar o pacto: primeiro jogue uma carta de facção (não durante um Presságio).",
   "Défier le pacte : tu tires une dernière carte. Si le pacte tient, tout le tour compte double, cette carte comprise (pour l’instant {n} points ×2). S’il se brise, tu perds tout. Une seule fois par partie.": "Desafiar o pacto: você compra uma última carta. Se o pacto aguentar, todo o turno vale o dobro, essa carta incluída (agora {n} pontos ×2). Se ele se romper, você perde tudo. Só uma vez por partida.",
   "pour gagner": "para vencer",
+  "Calcule tout, ose davantage quand il est mené, et réclame sa dette à chaque brisure.": "Calcula tudo, ousa mais quando está atrás e cobra sua dívida a cada ruptura.",
+  "Calcule tout et ose quand elle est menée.": "Calcula tudo e ousa quando está atrás.",
+  "La dette de Mammon : chaque brisure coûte aussi {0} points déjà gagnés, à toi comme à lui.": "A dívida de Mammon: cada ruptura também custa {0} pontos já ganhos, para você e para ele.",
+  "{e0}La dette de Mammon : chaque brisure coûte aussi {0} points déjà gagnés, à toi comme à lui.": "{e0}A dívida de Mammon: cada ruptura também custa {0} pontos já ganhos, para você e para ele.",
+  "{0} points, aucun Sceau, cinq Gardiens.": "{0} pontos, nenhum Selo, cinco Guardiões.",
+  "{e0}{0} points, aucun Sceau, cinq Gardiens.": "{e0}{0} pontos, nenhum Selo, cinco Guardiões.",
+  "La dette de Mammon : −{d} points.": "A dívida de Mammon: −{d} pontos.",
 };
 
 export const names = {

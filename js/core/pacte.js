@@ -39,28 +39,28 @@ export const RIVALS = {
     hello: 'Une carte de plus ? Ou une de trop… tout est là.', beaten: 'J’ai été trop sage, cette fois.', gloat: 'La sagesse paie toujours.' },
   maitre: { name: 'Le Maître des Sceaux', caution: 1, risk: 0, race: 0.5, cool: 0.2, noise: 0.04, hint: 'Compte les cartes déjà tirées, pèse chaque risque, se presse quand tu approches du but.',
     hello: 'Chaque pacte a un prix. Je connais toujours le prix.', beaten: 'Le hasard… a mal compté.', gloat: 'Le compte était juste.' },
-  banquier: { name: 'Mammon', caution: 0.9, risk: 0.12, race: 0.8, cool: 0.1, noise: 0.02, head: 6, hint: 'Calcule tout, ose davantage quand il est mené, et commence avec 6 points : la part de la maison.',
+  banquier: { name: 'Mammon', caution: 0.9, risk: 0.12, race: 0.8, cool: 0.1, noise: 0.02, hint: 'Calcule tout, ose davantage quand il est mené, et réclame sa dette à chaque brisure.',
     hello: 'Signe ici, et ici. Les petites lignes ? Elles sont pour moi.', beaten: 'Un pacte rompu… à mes dépens ? Inadmissible.', gloat: 'La maison gagne toujours.' },
   // v492 : quatre nouveaux adversaires pour les salles 5 à 8
-  stratege: { name: 'Sœur Vesna', caution: 1.1, risk: 0, race: 0.4, cool: 0.3, noise: 0.03, head: 5, hint: 'Calcule chaque risque et ne se laisse jamais distancer.',
+  stratege: { name: 'Sœur Vesna', caution: 1.1, risk: 0, race: 0.4, cool: 0.3, noise: 0.03, hint: 'Calcule chaque risque et ne se laisse jamais distancer.',
     hello: 'Sans Sceau, chaque carte est une prière. Prie bien.', beaten: 'J’ai prié… une carte trop tard.', gloat: 'La patience est une arme.' },
-  echo: { name: 'L’Écho de l’Abîme', caution: 0.75, risk: 0.3, race: 0.6, cool: 0, noise: 0.08, head: 12, hint: 'Audacieux : il tire plus que de raison, et ça lui réussit souvent.',
+  echo: { name: 'L’Écho de l’Abîme', caution: 0.75, risk: 0.3, race: 0.6, cool: 0, noise: 0.08, hint: 'Audacieux : il tire plus que de raison, et ça lui réussit souvent.',
     hello: 'Encore une. Et encore une. Tu entends l’écho ?', beaten: '… l’écho se brise.', gloat: 'Tu as eu peur de tirer. Moi, jamais.' },
-  archiviste: { name: 'L’Archiviste', caution: 0.95, risk: 0.05, race: 0.7, cool: 0.15, noise: 0.01, head: 8, hint: 'Compte chaque carte sortie, sans jamais se tromper.',
+  archiviste: { name: 'L’Archiviste', caution: 0.95, risk: 0.05, race: 0.7, cool: 0.15, noise: 0.01, hint: 'Compte chaque carte sortie, sans jamais se tromper.',
     hello: 'J’ai noté chaque carte de ce paquet. Toutes.', beaten: 'Erreur… de calcul ? Impossible.', gloat: 'Le registre ne ment pas.' },
-  souverain: { name: 'La Souveraine du Néant', caution: 0.85, risk: 0.1, race: 0.9, cool: 0.1, noise: 0, head: 12, hint: 'Calcule tout, ose quand elle est menée, et commence avec 12 points.',
+  souverain: { name: 'La Souveraine du Néant', caution: 0.85, risk: 0.1, race: 0.9, cool: 0.1, noise: 0, hint: 'Calcule tout et ose quand elle est menée.',
     hello: 'Signe. Ton nom finira dans le Néant, comme les autres.', beaten: 'Le Néant… a perdu un pacte ?', gloat: 'Retourne au silence.' },
 };
 export const TABLES = [
   { key: 'novice', name: 'Le Pacte du novice', stars: 1, rival: 'initie', reward: 25, chest: 'bois', bg: 'salle-pacte-novice' },
   { key: 'six', name: 'Le Pacte des six', stars: 2, rival: 'collectionneur', reward: 35, chest: 'fer', bg: 'salle-pacte-six' },
   { key: 'sceaux', name: 'Le Pacte des Sceaux', stars: 3, rival: 'maitre', reward: 50, chest: 'or', bg: 'salle-pacte-sceaux' },
-  { key: 'mammon', name: 'Le Pacte de Mammon', stars: 4, rival: 'banquier', reward: 70, chest: 'abyssal', bg: 'salle-pacte-mammon' },
+  { key: 'mammon', name: 'Le Pacte de Mammon', stars: 4, rival: 'banquier', reward: 70, chest: 'abyssal', bg: 'salle-pacte-mammon', rule: 'La dette de Mammon : chaque brisure coûte aussi 4 points déjà gagnés, à toi comme à lui.', rules: { debt: 4 } },
   // v492 : salles 5 à 8, chacune avec sa règle (rules : target, seven, sp = cartes spéciales du paquet)
   { key: 'cendres', name: 'Le Pacte des cendres', stars: 4, rival: 'stratege', reward: 80, chest: 'or', bg: 'salle-pacte-cendres', rule: 'Aucun Sceau dans le paquet : rien ne te protège d’une brisure.', rules: { sp: { sceau: 0, gardien: 3, offrande: 3 } } },
   { key: 'minuit', name: 'Le Pacte de minuit', stars: 5, rival: 'echo', reward: 90, chest: 'or', bg: 'salle-pacte-minuit', rule: 'Partie longue : 80 points. Les sept factions rapportent +25.', rules: { target: 80, seven: 25 } },
   { key: 'registre', name: 'Le Pacte du registre', stars: 5, rival: 'archiviste', reward: 100, chest: 'abyssal', bg: 'salle-pacte-registre', rule: 'Six Offrandes et un seul Gardien : les gros tours sont possibles… pour les deux.', rules: { sp: { sceau: 2, gardien: 1, offrande: 6 } } },
-  { key: 'neant', name: 'Le Pacte du Néant', stars: 5, rival: 'souverain', reward: 120, chest: 'abyssal', bg: 'salle-pacte-neant', rule: '70 points, aucun Sceau, cinq Gardiens. La Souveraine commence à 12.', rules: { target: 70, sp: { sceau: 0, gardien: 5, offrande: 3 } } },
+  { key: 'neant', name: 'Le Pacte du Néant', stars: 5, rival: 'souverain', reward: 120, chest: 'abyssal', bg: 'salle-pacte-neant', rule: '70 points, aucun Sceau, cinq Gardiens.', rules: { target: 70, sp: { sceau: 0, gardien: 5, offrande: 3 } } },
 ];
 // v492 : un haut fait par salle (payé une fois, en plus de la victoire)
 export const FEATS = {
@@ -110,7 +110,7 @@ export function newGame(cat, { table, seed = Date.now(), daily = false }) {
   const T = TABLE[table];
   if (!T) throw new Error('Table inconnue.');
   const r = mulberry(seed), RU = T.rules || {};
-  return { table, daily, seed, shuf: 0, rival: T.rival, target: RU.target || TARGET, seven: RU.seven || SEVEN_BONUS, deck: buildDeck(cat, r, { ...(RU.sp || SPECIALS), oracle: ORACLES, curse: CURSES }), discard: [], scores: { p: 0, a: RIVALS[T.rival].head || 0 },
+  return { table, daily, seed, shuf: 0, rival: T.rival, target: RU.target || TARGET, seven: RU.seven || SEVEN_BONUS, deck: buildDeck(cat, r, { ...(RU.sp || SPECIALS), oracle: ORACLES, curse: CURSES }), discard: [], scores: { p: 0, a: 0 }, /* v750 : plus d’avance donnée aux adversaires (le propriétaire : « c’est juste de la triche ») */
     turn: 'p', row: [], sceaux: 0, offer: false, must: 0, curse: { p: 0, a: 0 }, dbl: { p: true, a: true }, dblOn: false, round: 1, turns: { p: 0, a: 0 }, last: null, over: null, final: null, stats: { busts: { p: 0, a: 0 }, best: { p: 0, a: 0 }, sevens: { p: 0, a: 0 } } };
 }
 
@@ -128,6 +128,7 @@ function takeCard(st) {
 }
 
 // Chance que la prochaine carte brise le pacte (le Sceau n'est pas compté ici : il protège, la carte reste brisante)
+export const debtOf = (st) => TABLE[st.table]?.rules?.debt || 0;
 export function bustChance(st) {
   const fs = rowFactions(st);
   if (!fs.size) return 0;
@@ -188,6 +189,8 @@ export function draw(st) {
         if (st.offer) st.offer = false;
       } else {
         st.row.push(c); ev.result = 'bust'; ev.lost = rowValue(st) - c.v * (st.offer ? 2 : 1);
+        /* v750 : la dette de Mammon, la même pour les deux joueurs : une brisure coûte aussi des points déjà gagnés */
+        const debt = Math.min(debtOf(st), st.scores[who]); if (debt) { st.scores[who] -= debt; ev.debt = debt; }
         st.stats.busts[who]++; endTurn(st, who);
       }
     } else {
@@ -254,7 +257,7 @@ export function aiWants(st, rng = Math.random) {
   const behind = Math.max(0, opp - me) / TARGET, ahead = Math.max(0, me - opp) / TARGET;
   const oppNear = Math.max(0, opp - TARGET * 0.75) / (TARGET * 0.25); // l'autre approche du but : il faut se presser
   const gain = (1 - p) * meanSafe(st) * (st.offer ? 2 : 1) + (rowFactions(st).size === 6 ? (1 - p) * SEVEN_BONUS : 0);
-  const loss = p * v * protect;
+  const loss = p * (v + Math.min(debtOf(st), me)) * protect;
   return gain * (1 + R.risk + R.race * (behind + 0.5 * oppNear) - R.cool * ahead) > loss * R.caution;
 }
 // v561 : l'adversaire tente Défier le pacte quand le risque est faible et le tour assez gros

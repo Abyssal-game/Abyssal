@@ -1557,8 +1557,6 @@ export default {
   "Cadres de profil": "Profile Frames",
   "Caladrius : Coup chargé": "Caladrius: Charged Strike",
   "Calcule chaque risque et ne se laisse jamais distancer.": "Calculates every risk and never falls behind.",
-  "Calcule tout, ose davantage quand il est mené, et commence avec {0} points : la part de la maison.": "Calculates everything, dares more when behind, and starts with {0} points: the house's share.",
-  "Calcule tout, ose quand elle est menée, et commence avec {0} points.": "Calculates everything, dares when behind, and starts with {0} points.",
   "Cantique abyssal": "Abyssal Canticle",
   "Cantique céleste": "Celestial Canticle",
   "Cantique de Baron Samedi": "Baron Samedi's Canticle",
@@ -6009,7 +6007,6 @@ export default {
   "{0} oct. · {1} pts": "Oct. {0} · {1} pts",
   "{0} points de Codex · saison du {1}/{2}/{3} au {4}/{5}/{6}": "{0} Codex points · season from {1}/{2}/{3} to {4}/{5}/{6}",
   "{0} points · le plus haut palier": "{0} points · the highest tier",
-  "{0} points, aucun Sceau, cinq Gardiens. La Souveraine commence à {1}.": "{0} points, no Seals, five Guardians. The Sovereign starts at {1}.",
   "{0} récit sur {1}. Ils s’ouvrent en jouant : gardiens vaincus, formes libérées, relations rencontrées, royaumes complétés.": "{0} tale of {1}. They unlock as you play: guardians defeated, forms freed, relationships encountered, realms completed.",
   "{0} récits sur {1}. Ils s’ouvrent en jouant : gardiens vaincus, formes libérées, relations rencontrées, royaumes complétés.": "{0} of {1} tales. They unlock as you play: guardians defeated, forms unleashed, bonds encountered, realms completed.",
   "{0} sur {1} gagnée · {2} points": "{0} of {1} won · {2} points",
@@ -6398,7 +6395,6 @@ export default {
   "{e0}Voir dans la collection": "{e0}View in Collection",
   "{e0}Voir la carte": "{e0}View card",
   "{e0}{0} booster standards": "{e0}{0} standard boosters",
-  "{e0}{0} points, aucun Sceau, cinq Gardiens. La Souveraine commence à {1}.": "{e0}{0} points, no Seals, five Guardians. The Sovereign starts at {1}.",
   "{e0}{0} · +{1} ATQ": "{e0}{0} · +{1} ATK",
   "{e0}{0} · +{1} ATQ +{2} PV": "{e0}{0} · +{1} ATK +{2} HP",
   "{e0}{0} · +{1} PV": "{e0}{0} · +{1} HP",
@@ -8144,6 +8140,13 @@ export default {
   "Défier le pacte : pose d’abord une carte de faction (pas pendant un Présage).": "Defy the Pact: first play a faction card (not during an Omen).",
   "Défier le pacte : tu tires une dernière carte. Si le pacte tient, tout le tour compte double, cette carte comprise (pour l’instant {n} points ×2). S’il se brise, tu perds tout. Une seule fois par partie.": "Defy the Pact: you draw one last card. If the pact holds, the whole turn counts double, that card included (currently {n} points ×2). If it breaks, you lose everything. Only once per game.",
   "pour gagner": "to win",
+  "Calcule tout, ose davantage quand il est mené, et réclame sa dette à chaque brisure.": "Calculates everything, dares more when behind, and collects his debt at every break.",
+  "Calcule tout et ose quand elle est menée.": "Calculates everything and dares when behind.",
+  "La dette de Mammon : chaque brisure coûte aussi {0} points déjà gagnés, à toi comme à lui.": "Mammon’s debt: every break also costs {0} points already earned, for you and for him.",
+  "{e0}La dette de Mammon : chaque brisure coûte aussi {0} points déjà gagnés, à toi comme à lui.": "{e0}Mammon’s debt: every break also costs {0} points already earned, for you and for him.",
+  "{0} points, aucun Sceau, cinq Gardiens.": "{0} points, no Seals, five Guardians.",
+  "{e0}{0} points, aucun Sceau, cinq Gardiens.": "{e0}{0} points, no Seals, five Guardians.",
+  "La dette de Mammon : −{d} points.": "Mammon’s debt: −{d} points.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

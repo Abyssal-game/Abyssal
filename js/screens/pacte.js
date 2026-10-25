@@ -35,7 +35,7 @@ const howLi = ([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">
 // v523 : textes des annonces (brisure, Sceau, Gardien, sept factions, arrêt), traduisibles ; commun au jeu en ligne
 export function sayText(ev, { mine, nm, fn, seven }) {
   const f = tw(fn), n = ev.result === 'bust' ? ev.lost : ev.gain;
-  return ev.result === 'bust' ? [mine ? 'ko' : 'ok', t('Le pacte se brise !'), mine ? t(n > 1 ? '{f} en double : tu perds {n} points.' : '{f} en double : tu perds {n} point.', { f, n }) : t('{f} en double : {name} perd {n} points.', { f, name: nm, n })]
+  return ev.result === 'bust' ? [mine ? 'ko' : 'ok', t('Le pacte se brise !'), (mine ? t(n > 1 ? '{f} en double : tu perds {n} points.' : '{f} en double : tu perds {n} point.', { f, n }) : t('{f} en double : {name} perd {n} points.', { f, name: nm, n })) + (ev.debt ? ` ${t('La dette de Mammon : −{d} points.', { d: ev.debt })}` : '')]
     : ev.result === 'saved' ? ['', t('Le Sceau protège !'), t('{f} en double, jeté sans briser le pacte.', { f })]
     : ev.result === 'forced' ? ['', t('Le Gardien arrête le tour'), mine ? t('Tu encaisses +{n}.', { n }) : t('{name} encaisse +{n}.', { name: nm, n })]
     : ev.result === 'seven' ? [mine ? 'ok' : 'ko', t('Les sept factions !'), mine ? t('+{b} de bonus : tu encaisses +{n}.', { b: seven, n }) : t('+{b} de bonus : {name} encaisse +{n}.', { b: seven, name: nm, n })]

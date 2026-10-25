@@ -1557,8 +1557,6 @@ export default {
   "Cadres de profil": "Profilrahmen",
   "Caladrius : Coup chargé": "Caladrius: Aufgeladener Schlag",
   "Calcule chaque risque et ne se laisse jamais distancer.": "Berechnet jedes Risiko und fällt nie zurück.",
-  "Calcule tout, ose davantage quand il est mené, et commence avec {0} points : la part de la maison.": "Berechnet alles, wagt mehr, wenn er zurückliegt, und startet mit {0} Punkten: der Anteil des Hauses.",
-  "Calcule tout, ose quand elle est menée, et commence avec {0} points.": "Berechnet alles, wagt etwas, wenn sie zurückliegt, und startet mit {0} Punkten.",
   "Cantique abyssal": "Abgründiger Lobgesang",
   "Cantique céleste": "Himmlischer Lobgesang",
   "Cantique de Baron Samedi": "Lobgesang des Baron Samedi",
@@ -6009,7 +6007,6 @@ export default {
   "{0} oct. · {1} pts": "{0}. Okt. · {1} Pkt.",
   "{0} points de Codex · saison du {1}/{2}/{3} au {4}/{5}/{6}": "{0} Kodex-Punkte · Saison vom {1}.{2}.{3} bis {4}.{5}.{6}",
   "{0} points · le plus haut palier": "{0} Punkte · die höchste Stufe",
-  "{0} points, aucun Sceau, cinq Gardiens. La Souveraine commence à {1}.": "{0} Punkte, keine Siegel, fünf Wächter. Die Herrscherin beginnt mit {1}.",
   "{0} récit sur {1}. Ils s’ouvrent en jouant : gardiens vaincus, formes libérées, relations rencontrées, royaumes complétés.": "{0} von {1} Erzählung. Sie öffnen sich beim Spielen: besiegte Wächter, befreite Formen, entdeckte Beziehungen, vervollständigte Reiche.",
   "{0} récits sur {1}. Ils s’ouvrent en jouant : gardiens vaincus, formes libérées, relations rencontrées, royaumes complétés.": "{0} von {1} Erzählungen. Sie öffnen sich beim Spielen: besiegte Wächter, befreite Formen, entdeckte Beziehungen, vervollständigte Reiche.",
   "{0} sur {1} gagnée · {2} points": "{0} von {1} gewonnen · {2} Punkte",
@@ -6398,7 +6395,6 @@ export default {
   "{e0}Voir dans la collection": "{e0}In der Sammlung ansehen",
   "{e0}Voir la carte": "{e0}Karte ansehen",
   "{e0}{0} booster standards": "{e0}{0} Standard-Booster",
-  "{e0}{0} points, aucun Sceau, cinq Gardiens. La Souveraine commence à {1}.": "{e0}{0} Punkte, keine Siegel, fünf Wächter. Die Herrscherin beginnt mit {1}.",
   "{e0}{0} · +{1} ATQ": "{e0}{0} · +{1} ANG",
   "{e0}{0} · +{1} ATQ +{2} PV": "{e0}{0} · +{1} ANG +{2} LP",
   "{e0}{0} · +{1} PV": "{e0}{0} · +{1} LP",
@@ -8133,6 +8129,13 @@ export default {
   "Défier le pacte : pose d’abord une carte de faction (pas pendant un Présage).": "Den Pakt herausfordern: Lege zuerst eine Fraktionskarte (nicht während eines Omens).",
   "Défier le pacte : tu tires une dernière carte. Si le pacte tient, tout le tour compte double, cette carte comprise (pour l’instant {n} points ×2). S’il se brise, tu perds tout. Une seule fois par partie.": "Den Pakt herausfordern: Du ziehst eine letzte Karte. Hält der Pakt, zählt der ganze Zug doppelt, diese Karte inklusive (derzeit {n} Punkte ×2). Bricht er, verlierst du alles. Nur einmal pro Partie.",
   "pour gagner": "zum Sieg",
+  "Calcule tout, ose davantage quand il est mené, et réclame sa dette à chaque brisure.": "Berechnet alles, wagt mehr, wenn er zurückliegt, und treibt bei jedem Bruch seine Schuld ein.",
+  "Calcule tout et ose quand elle est menée.": "Berechnet alles und wagt etwas, wenn sie zurückliegt.",
+  "La dette de Mammon : chaque brisure coûte aussi {0} points déjà gagnés, à toi comme à lui.": "Mammons Schuld: Jeder Bruch kostet zusätzlich {0} bereits gewonnene Punkte, dich wie ihn.",
+  "{e0}La dette de Mammon : chaque brisure coûte aussi {0} points déjà gagnés, à toi comme à lui.": "{e0}Mammons Schuld: Jeder Bruch kostet zusätzlich {0} bereits gewonnene Punkte, dich wie ihn.",
+  "{0} points, aucun Sceau, cinq Gardiens.": "{0} Punkte, kein Siegel, fünf Wächter.",
+  "{e0}{0} points, aucun Sceau, cinq Gardiens.": "{e0}{0} Punkte, kein Siegel, fünf Wächter.",
+  "La dette de Mammon : −{d} points.": "Mammons Schuld: −{d} Punkte.",
 };
 
 export const names = {
