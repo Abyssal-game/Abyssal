@@ -54,10 +54,10 @@ export const TABLES = [
   { key: 'grande', name: 'La Grande Vente', stars: 4, seats: ['banquier', 'souverain'], reward: 70, chest: 'abyssal', bg: 'salle-encheres-grande' },
   // v492 : ventes 5 à 8, chacune avec ses lots (rules : creatures = valeurs des créatures, curses = valeurs des malédictions,
   // facs = nombre de factions parmi les créatures, set = bonus d'une famille de trois)
-  { key: 'maudite', name: 'La Vente maudite', stars: 4, seats: ['stratege', 'archiviste'], reward: 80, chest: 'or', bg: 'salle-encheres-maudite', rule: 'Sept malédictions (jusqu’à −7) pour huit créatures.', rules: { creatures: [3, 4, 5, 6, 7, 8, 9, 10], curses: [1, 2, 3, 4, 5, 6, 7], boost: { a: { skill: 3, lam: 0.35, temp: 1.5, noise: 0.1 }, b: { skill: 2, noise: 0.15, bias: 0.1 } } } },
-  { key: 'tresors', name: 'La Vente des trésors', stars: 5, seats: ['collectionneur', 'banquier'], reward: 90, chest: 'or', bg: 'salle-encheres-tresors', rule: 'Douze créatures, jusqu’à 12 points, et seulement trois malédictions.', rules: { creatures: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], curses: [2, 4, 6], boost: { a: { skill: 3, read: true, lam: 0.75, temp: 3, noise: 0.1 }, b: { skill: 2, noise: 0.15, bias: 0.1 } } } },
-  { key: 'lignees', name: 'La Vente des lignées', stars: 5, seats: ['maitre', 'echo'], reward: 100, chest: 'abyssal', bg: 'salle-encheres-lignees', rule: 'Trois factions seulement, et une famille de trois rapporte +10.', rules: { facs: 3, set: 10, boost: { a: { skill: 2, noise: 0.15, bias: 0.1 }, b: { skill: 3, read: true, lam: 0.45, temp: 2, noise: 0.1 } } } },
-  { key: 'neant', name: 'La Vente du Néant', stars: 5, seats: ['souverain', 'archiviste'], reward: 120, chest: 'abyssal', bg: 'salle-encheres-neant', rule: 'Malédictions doublées : de −2 à −10.', rules: { curses: [2, 4, 6, 8, 10], boost: { a: { skill: 3, lam: 0.35, temp: 1.5, noise: 0.1 }, b: { skill: 2, noise: 0.15, bias: 0.1 } } } },
+  { key: 'maudite', name: 'La Vente maudite', stars: 4, seats: ['stratege', 'archiviste'], reward: 80, chest: 'or', bg: 'salle-encheres-maudite', power: { who: 'b', k: 'halfcurse', name: 'Contre-sort', text: 'Les malédictions que prend l’Archiviste ne lui coûtent que la moitié (arrondie en sa faveur).' }, rule: 'Sept malédictions (jusqu’à −7) pour huit créatures.', rules: { creatures: [3, 4, 5, 6, 7, 8, 9, 10], curses: [1, 2, 3, 4, 5, 6, 7], boost: { a: { skill: 3, lam: 0.35, temp: 1.5, noise: 0.1 }, b: { skill: 2, noise: 0.15, bias: 0.1 } } } },
+  { key: 'tresors', name: 'La Vente des trésors', stars: 5, seats: ['collectionneur', 'banquier'], reward: 90, chest: 'or', bg: 'salle-encheres-tresors', power: { who: 'b', k: 'setplus', n: 5, name: 'Collection de la maison', text: 'Chaque famille de trois de Mammon lui rapporte 5 points de plus.' }, rule: 'Douze créatures, jusqu’à 12 points, et seulement trois malédictions.', rules: { creatures: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], curses: [2, 4, 6], boost: { a: { skill: 3, read: true, lam: 0.75, temp: 3, noise: 0.1 }, b: { skill: 2, noise: 0.15, bias: 0.1 } } } },
+  { key: 'lignees', name: 'La Vente des lignées', stars: 5, seats: ['maitre', 'echo'], reward: 100, chest: 'abyssal', bg: 'salle-encheres-lignees', power: { who: 'b', k: 'echo', name: 'Résonance', text: 'À la fin de la vente, la plus belle créature de l’Écho compte double.' }, rule: 'Trois factions seulement, et une famille de trois rapporte +10.', rules: { facs: 3, set: 10, boost: { a: { skill: 2, noise: 0.15, bias: 0.1 }, b: { skill: 3, read: true, lam: 0.45, temp: 2, noise: 0.1 } } } },
+  { key: 'neant', name: 'La Vente du Néant', stars: 5, seats: ['souverain', 'archiviste'], reward: 120, chest: 'abyssal', bg: 'salle-encheres-neant', power: { who: 'a', k: 'tribute', n: 2, name: 'Tribut du Néant', text: 'Chaque malédiction que tu prends donne 2 points à la Souveraine.' }, rule: 'Malédictions doublées : de −2 à −10.', rules: { curses: [2, 4, 6, 8, 10], boost: { a: { skill: 3, lam: 0.35, temp: 1.5, noise: 0.1 }, b: { skill: 2, noise: 0.15, bias: 0.1 } } } },
 ];
 // v492 : un haut fait par vente (payé une fois, en plus de la victoire)
 const curses = (st) => st.won.p.filter((l) => l.v < 0).length;
@@ -128,7 +128,19 @@ export function scoreOf(st, who) {
   const n = {};
   lots.forEach((l) => { if (l.f) n[l.f] = (n[l.f] || 0) + 1; });
   const sets = Object.values(n).reduce((a, k) => a + Math.floor(k / 3), 0);
-  return { lots: lots.reduce((a, l) => a + l.v, 0), sets, total: lots.reduce((a, l) => a + l.v, 0) + sets * setBonus(st) };
+  const pow = powBonus(st, who, sets);
+  return { lots: lots.reduce((a, l) => a + l.v, 0), sets, pow, total: lots.reduce((a, l) => a + l.v, 0) + sets * setBonus(st) + pow };
+}
+// v752 : pouvoir annoncé d'un enchérisseur des ventes 5 à 8 (TABLES[].power, la même règle pour tous, affichée avant la vente)
+export const powerOf = (st) => TABLE[st.table]?.power || null;
+function powBonus(st, who, sets) {
+  const P = powerOf(st);
+  if (!P || P.who !== who) return 0;
+  if (P.k === 'halfcurse') return st.won[who].filter((l) => l.v < 0).reduce((a, l) => a + Math.floor(-l.v / 2), 0);
+  if (P.k === 'setplus') return sets * P.n;
+  if (P.k === 'echo') return Math.max(0, ...st.won[who].map((l) => l.v));
+  if (P.k === 'tribute') return st.won.p.filter((l) => l.v < 0).length * P.n;
+  return 0;
 }
 
 // Une manche : bids = { p, a, b } (offrandes). Renvoie le détail pour l'écran.
@@ -165,9 +177,12 @@ const sorted = (a) => a.slice().sort((x, y) => x - y);
 function feltValue(st, who, prof) {
   const pile = [...st.pot, st.lots[st.i]];
   let v = pile.reduce((a, l) => a + l.v, 0);
+  const P = powerOf(st), own = P && P.who === who;
+  if (v < 0 && own && P.k === 'halfcurse') v = Math.ceil(v / 2);
+  const sb = setBonus(st) + (own && P.k === 'setplus' ? P.n : 0);
   if (v > 0) pile.filter((l) => l.f).forEach((l) => {
     const mine = st.won[who].filter((x) => x.f === l.f).length % 3;
-    if (mine === 2) v += setBonus(st) * prof.sets; else if (mine === 1) v += 1.2 * prof.sets * setBonus(st) / SET_BONUS;
+    if (mine === 2) v += sb * prof.sets; else if (mine === 1) v += 1.2 * prof.sets * setBonus(st) / SET_BONUS;
     if (prof.skill >= 2) SEATS.filter((x) => x !== who).forEach((x) => { if (st.won[x].filter((y) => y.f === l.f).length % 3 === 2) v += 2; });
   });
   return v;

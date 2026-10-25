@@ -51,6 +51,24 @@ test('cryptes : paires maudites (−1 point, pas de pouvoir) et crypte mouvante'
   assert.equal(m.kind, 'miss'); assert.equal(m.drift.length, 2);
 });
 
+test('v752 : pouvoirs annoncés des Cryptes (Mammon, Souveraine, Maître) et des Enchères', () => {
+  const m = CR.newGame(catalog, { table: 'maudite', seed: 5 });
+  assert.equal(CR.powerOf(m).k, 'gold');
+  const k = m.curse[0], [a, b] = m.cards.map((c, i) => (c.k === k ? i : -1)).filter((i) => i >= 0);
+  CR.flip(m, a, () => 0.5); const ev = CR.flip(m, b, () => 0.5);
+  assert.ok(ev.goldTax); assert.equal(CR.scoreOf(m, 'p'), 0); assert.equal(m.bonus.a, 1);
+  const n = CR.newGame(catalog, { table: 'nef', seed: 5 });
+  assert.equal(n.pw.grace, 2);
+  for (const t of CR.TABLES.slice(3)) assert.ok(CR.RIVALS[t.rival].power?.name, t.key);
+  for (const t of EN.TABLES.slice(4)) assert.ok(t.power?.name, t.key);
+  const e = EN.newGame(catalog, { table: 'neant', seed: 9 });
+  e.won.p.push({ v: -4, f: null }); assert.equal(EN.scoreOf(e, 'a').pow, 2);
+  const h = EN.newGame(catalog, { table: 'maudite', seed: 9 });
+  h.won.b.push({ v: -5, f: null }); assert.equal(EN.scoreOf(h, 'b').total, -3);
+  const l = EN.newGame(catalog, { table: 'lignees', seed: 9 });
+  l.won.b.push({ v: 7, f: 'infernal' }, { v: 3, f: 'abyssal' }); assert.equal(EN.scoreOf(l, 'b').total, 17);
+});
+
 test('enchères : lots propres aux salles (15 lots), familles à +10 aux lignées', () => {
   for (const t of EN.TABLES) assert.equal(EN.newGame(catalog, { table: t.key, seed: 9 }).lots.length, 15, t.key);
   const m = EN.newGame(catalog, { table: 'maudite', seed: 9 });

@@ -57,7 +57,7 @@ export default function encheresScreen(app, root) {
       return [open, `<button class="sc-rival mq-tbl ${open ? '' : 'locked'} ${won ? 'won' : ''}" data-en="play" data-t="${t.key}" ${open ? '' : 'disabled'} style="background-image:linear-gradient(90deg, rgba(12, 13, 20, .97) 42%, rgba(12, 13, 20, .45) 76%, rgba(12, 13, 20, .15)), url(${EN.tableBg(t.key)})">
         <span class="mq-pors"><span class="sc-por">${pic(t.seats[0])}</span><span class="sc-por">${pic(t.seats[1])}</span></span>
         <span class="sc-ri"><b>${esc(t.name)}</b><span class="small">${esc(A.name)} et ${esc(B.name)} · ${stars(t.stars)}</span>
-        <span class="small muted">${open ? `+${t.reward} éclats${won ? '' : ` · 1re victoire : +${EN.ENCHERES_REWARD.firstWin} et ${esc(CHEST_NAME[t.chest].toLowerCase())}`}` : `Gagne à ${esc(EN.TABLES[i - 1].name)} pour y entrer`}</span>${t.rule ? `<span class="small gm-rule">${icon('p:rule')}${esc(t.rule)}</span>` : ''}${open && EN.FEATS[t.key] ? `<span class="small gm-feat ${en.feats?.[t.key] ? 'done' : ''}">${en.feats?.[t.key] ? icon('check') : '<img class="gm-hf" alt="" src="assets/icons/haut-fait.webp">'} Haut fait : ${esc(EN.FEATS[t.key].text)}${en.feats?.[t.key] ? '' : ` (+${EN.FEAT_SHARDS})`}</span>` : ''}</span>
+        <span class="small muted">${open ? `+${t.reward} éclats${won ? '' : ` · 1re victoire : +${EN.ENCHERES_REWARD.firstWin} et ${esc(CHEST_NAME[t.chest].toLowerCase())}`}` : `Gagne à ${esc(EN.TABLES[i - 1].name)} pour y entrer`}</span>${t.rule ? `<span class="small gm-rule">${icon('p:rule')}${esc(t.rule)}</span>` : ''}${t.power ? `<span class="small gm-rule pa-powl">${icon('p:danger')}<b>${esc(t.power.name)}</b> : ${esc(t.power.text)}</span>` : ''}${open && EN.FEATS[t.key] ? `<span class="small gm-feat ${en.feats?.[t.key] ? 'done' : ''}">${en.feats?.[t.key] ? icon('check') : '<img class="gm-hf" alt="" src="assets/icons/haut-fait.webp">'} Haut fait : ${esc(EN.FEATS[t.key].text)}${en.feats?.[t.key] ? '' : ` (+${EN.FEAT_SHARDS})`}</span>` : ''}</span>
         ${won ? `<span class="sc-won">${icon('check')}</span>` : open ? icon('next') : icon('p:mysteries')}</button>`];
     });
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
@@ -93,7 +93,7 @@ export default function encheresScreen(app, root) {
   const seat = (st, x) => {
     const W = who(st, x), sc = EN.scoreOf(st, x);
     return `<div class="mq-seat en-seat s-${x}" data-seat="${x}">
-      <span class="mq-top">${x === 'p' ? `<span class="sc-med mq-me">${me()}</span>` : `<span class="sc-med">${pic(W.key)}</span>`}<span class="mq-nm"><b>${esc(W.name)}</b><small>${sc.total} point${Math.abs(sc.total) > 1 ? 's' : ''}${sc.sets ? ` · ${sc.sets} famille${sc.sets > 1 ? 's' : ''}` : ''}</small></span></span>
+      <span class="mq-top">${x === 'p' ? `<span class="sc-med mq-me">${me()}</span>` : `<span class="sc-med">${pic(W.key)}</span>`}<span class="mq-nm"><b>${esc(W.name)}</b><small>${sc.total} point${Math.abs(sc.total) > 1 ? 's' : ''}${sc.sets ? ` · ${sc.sets} famille${sc.sets > 1 ? 's' : ''}` : ''}${sc.pow ? ` · <b class="en-pow">+${sc.pow} ${esc(EN.powerOf(st).name)}</b>` : ''}</small></span></span>
       <span class="mq-front">${wonHTML(st, x)}</span>${x === 'p' ? '' : offersHTML(st, x)}</div>`;
   };
   const lotCard = (l, cls = '') => (l.v > 0
@@ -185,7 +185,7 @@ export default function encheresScreen(app, root) {
     const st = g.s.encheres.cur, M = EN.BIDDERS.banquier, A = who(st, 'a');
     app.sfx.enter?.();
     const H = st.table === 'grande' ? { ...M, key: 'banquier' } : A; /* v492 : la réplique sous le bon portrait */
-    banner = { cls: 'intro', html: `<span class="sc-med">${pic(H.key)}</span><span class="mq-vd"><small>${esc(H.name)}${H.key === 'banquier' ? ', maître des ventes' : ''}</small><b>« ${esc(H.hello)} »</b><span>15 lots, 15 offrandes. Que la vente commence.${EN.TABLE[st.table].rule ? `<em class="gm-ruleline">${esc(EN.TABLE[st.table].rule)}</em>` : ''}</span></span>` };
+    banner = { cls: 'intro', html: `<span class="sc-med">${pic(H.key)}</span><span class="mq-vd"><small>${esc(H.name)}${H.key === 'banquier' ? ', maître des ventes' : ''}</small><b>« ${esc(H.hello)} »</b><span>15 lots, 15 offrandes. Que la vente commence.${EN.TABLE[st.table].rule ? `<em class="gm-ruleline">${esc(EN.TABLE[st.table].rule)}</em>` : ''}${EN.powerOf(st) ? `<em class="gm-ruleline pa-powl"><b>${esc(EN.powerOf(st).name)}</b> : ${esc(EN.powerOf(st).text)}</em>` : ''}</span></span>` };
     busy = true; view();
     tuto(app, 'encheres').then(() => tuto(app, 'encheres-play')).then(() => wait(1400)).then(() => { banner = null; busy = false; if (!gone) view(); });
   }

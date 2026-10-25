@@ -7048,3 +7048,5 @@ img.pa-defy-tag { width: 30%; height: auto; font-size: 0; text-shadow: none; fil
 .pa-side .sc-med .pa-pown { position: absolute; right: -4px; bottom: -3px; margin: 0; padding: 2px; border-radius: 50%; background: #2A0A10; border: 1px solid rgba(255, 120, 110, .8); box-shadow: 0 0 6px rgba(224, 72, 94, .6); }
 .pa-side .sc-med .pa-pown .picon, .pa-side .sc-med .pa-pown img, .pa-side .sc-med .pa-pown .ic { width: 12px; height: 12px; display: block; }
 @media (max-width: 380px) { .pa-duo { gap: 4px; padding: 5px 6px; } .pa-side { gap: 4px; padding: 3px; } .pa-side .sc-med { width: 34px; height: 34px; } .pa-sn b { font-size: .7rem; } .pa-sp b { font-size: 1.15rem; } }
+/* v752 : Enchères, points du pouvoir annoncé d’un enchérisseur */
+.en-pow { color: #FFB49A; font-weight: 700; }

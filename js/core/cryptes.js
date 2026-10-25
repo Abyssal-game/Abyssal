@@ -41,16 +41,16 @@ export const RIVALS = {
     hello: 'Chaque tombe garde un nom. Je les récite tous les soirs.', beaten: 'Ma litanie avait un trou.', gloat: 'La prière garde la mémoire.' },
   archiviste: { name: 'L’Archiviste', mem: 0.72, fade: 0.07, spite: 0.7, confuse: 0.08, hint: 'Retient beaucoup, et échange les cartes que tu viens de voir.',
     hello: 'J’ai catalogué chaque crypte. Chaque dalle. Chaque os.', beaten: 'Erreur… d’inventaire.', gloat: 'Tout est noté. Tout.' },
-  echo: { name: 'L’Écho de l’Abîme', mem: 0.9, fade: 0.03, spite: 0.9, confuse: 0.03, hint: 'N’oublie presque rien, et brouille sans cesse tes souvenirs.',
+  echo: { name: 'L’Écho de l’Abîme', power: { k: 'grace', grace: 1, name: 'Résonance', text: 'Sa première erreur de la partie ne lui fait pas passer la main.' }, mem: 0.9, fade: 0.03, spite: 0.9, confuse: 0.03, hint: 'N’oublie presque rien, et brouille sans cesse tes souvenirs.',
     hello: 'Chaque carte retournée résonne en moi… à jamais.', beaten: '… l’écho se tait.', gloat: 'Tu m’as entendu ? Moi, je me souviens de tout.' },
   // v492 : quatre nouveaux adversaires pour les cryptes 5 à 8
-  collectionneur: { name: 'Maître Orvel', mem: 0.85, fade: 0.04, spite: 0.5, confuse: 0.06, hint: 'Bonne mémoire, et il suit les cartes qui bougent.',
+  collectionneur: { name: 'Maître Orvel', power: { k: 'collect', n: 5, name: 'Collection', text: 'Chaque 5e paire qu’il trouve lui rapporte 1 point de plus.' }, mem: 0.85, fade: 0.04, spite: 0.5, confuse: 0.06, hint: 'Bonne mémoire, et il suit les cartes qui bougent.',
     hello: 'Les rois bougent dans leurs tombes. Moi, je les suis du regard.', beaten: 'Une tombe m’a échappé.', gloat: 'Rien ne bouge sans que je le voie.' },
-  banquier: { name: 'Mammon', mem: 0.88, fade: 0.04, spite: 0.6, confuse: 0.05, hint: 'Retient presque tout, et ne touche jamais une paire maudite… s’il peut l’éviter.',
+  banquier: { name: 'Mammon', power: { k: 'gold', name: 'L’or des tombes', text: 'Les paires maudites ne lui coûtent rien, et chaque paire maudite que tu prends lui donne 1 point.' }, mem: 0.88, fade: 0.04, spite: 0.6, confuse: 0.05, hint: 'Retient presque tout, et ne touche jamais une paire maudite… s’il peut l’éviter.',
     hello: 'Des paires maudites ? Elles seront pour toi. Je ne prends que l’or.', beaten: 'Une malédiction… sur MOI ?', gloat: 'L’or pour moi, la malédiction pour toi.' },
-  maitre: { name: 'Le Maître des Sceaux', mem: 0.92, fade: 0.02, spite: 0.8, confuse: 0.03, hint: 'Une mémoire presque parfaite. Ici, pas de pouvoir pour le gêner.',
+  maitre: { name: 'Le Maître des Sceaux', power: { k: 'lastword', grace: 2, name: 'Dernier mot', text: 'Ses 2 premières erreurs ne lui font pas passer la main, et il gagne les égalités.' }, mem: 0.92, fade: 0.02, spite: 0.8, confuse: 0.03, hint: 'Une mémoire presque parfaite. Ici, pas de pouvoir pour le gêner.',
     hello: 'Dans la Nef, les pouvoirs se taisent. Il ne reste que la mémoire.', beaten: 'Ma mémoire… a failli.', gloat: 'Le silence révèle les meilleurs.' },
-  souverain: { name: 'La Souveraine du Néant', mem: 0.95, fade: 0.015, spite: 1, confuse: 0.015, hint: 'N’oublie rien, évite les malédictions et brouille tout ce que tu vois.',
+  souverain: { name: 'La Souveraine du Néant', power: { k: 'void', n: 4, name: 'Le Néant', text: 'Toutes les 4 erreurs que tu fais, elle te vole ta dernière paire.' }, mem: 0.95, fade: 0.015, spite: 1, confuse: 0.015, hint: 'N’oublie rien, évite les malédictions et brouille tout ce que tu vois.',
     hello: 'Le Tombeau bouge, le Tombeau maudit. Et moi, je n’oublie jamais.', beaten: 'Le Néant… a oublié une carte ?', gloat: 'Ton souvenir s’efface déjà.' },
 };
 export const TABLES = [
@@ -104,11 +104,14 @@ export function newGame(cat, { table, seed = Date.now(), daily = false }) {
   const RU = T.rules || {};
   const curse = RU.curse ? shuffle(pairs.map((p) => p.k), r).slice(0, RU.curse) : [];
   return { table, daily, seed, rival: T.rival, cards, turn: 'p', open: [], pairs: { p: [], a: [] }, bonus: { p: 0, a: 0 },
-    grace: { p: 0, a: 0 }, block: { p: false, a: false }, pending: null, shown: [], mem: {}, turns: 0, last: null, over: null, final: null,
+    grace: { p: 0, a: 0 }, pw: { miss: 0, grace: RIVALS[T.rival].power?.grace || 0 }, block: { p: false, a: false }, pending: null, shown: [], mem: {}, turns: 0, last: null, over: null, final: null,
     drift: !!RU.drift, silence: !!RU.silence, curse, stats: { run: { p: 0, a: 0 }, cur: 0, stolen: { p: 0, a: 0 }, cursed: { p: 0, a: 0 } } };
 }
 
 const other = (x) => (x === 'p' ? 'a' : 'p');
+/* v752 : pouvoir annoncé de l'adversaire des cryptes 4 à 8 (comme au Pacte) */
+export const powerOf = (st) => RIVALS[st.rival]?.power || null;
+const isPow = (st, k) => powerOf(st)?.k === k;
 export const scoreOf = (st, x) => st.pairs[x].length + st.bonus[x];
 export const hidden = (st) => st.cards.map((c, i) => (c.gone ? -1 : i)).filter((i) => i >= 0 && !st.open.includes(i));
 export const left = (st) => st.cards.filter((c) => !c.gone).length / 2;
@@ -136,7 +139,7 @@ function finish(st) {
   if (st.cards.some((c) => !c.gone)) return;
   const p = scoreOf(st, 'p'), a = scoreOf(st, 'a');
   // égalité : celui qui a pris la dernière paire l'emporte
-  st.over = p > a || (p === a && st.lastPair === 'p') ? 'won' : 'lost';
+  st.over = p > a || (p === a && st.lastPair === 'p' && !isPow(st, 'lastword')) ? 'won' : 'lost'; /* Dernier mot : à égalité, le Maître gagne */
   st.final = { scores: { p, a } };
 }
 
@@ -160,7 +163,12 @@ export function flip(st, i, rng = Math.random) {
     const ev = { who, kind: 'match', i: [x, y], f: c.f, k: c.k, power: c.f, blocked: false };
     const S = st.stats;
     if (S) { S.cur++; S.run[who] = Math.max(S.run[who], S.cur); }
-    if (st.curse?.includes(c.k)) { ev.cursed = true; st.bonus[who]--; if (S) S.cursed[who]++; }
+    if (who === 'a' && isPow(st, 'collect') && st.pairs.a.length % powerOf(st).n === 0) { st.bonus.a++; ev.collect = true; } /* Orvel : Collection */
+    if (st.curse?.includes(c.k)) {
+      ev.cursed = true; if (S) S.cursed[who]++;
+      if (who === 'a' && isPow(st, 'gold')) ev.gold = true; /* Mammon : l'or des tombes, la malédiction ne le touche pas */
+      else { st.bonus[who]--; if (who === 'p' && isPow(st, 'gold')) { st.bonus.a++; ev.goldTax = true; } }
+    }
     else if (st.silence) ev.silent = true;
     else if (st.block[who]) { st.block[who] = false; ev.blocked = true; }
     else applyPower(st, who, c.f, ev, rng);
@@ -169,8 +177,10 @@ export function flip(st, i, rng = Math.random) {
     return ev;
   }
   const ev = { who, kind: 'miss', i: [x, y], graced: false };
+  if (who === 'p' && isPow(st, 'void')) { st.pw.miss = (st.pw.miss || 0) + 1; if (st.pw.miss % powerOf(st).n === 0 && st.pairs.p.length) { const k = st.pairs.p.pop(); st.pairs.a.push(k); ev.voidSteal = k; if (st.curse?.includes(k)) { st.bonus.p++; st.bonus.a--; } } } /* la Souveraine : le Néant */
   if (st.stats) st.stats.cur = 0;
   if (st.grace[who] > 0) { st.grace[who]--; ev.graced = true; }
+  else if (who === 'a' && st.pw?.grace > 0) { st.pw.grace--; ev.graced = true; ev.pwGrace = true; } /* Résonance, Dernier mot */
   else {
     st.turn = other(who); st.turns++; fadeMem(st, rng);
     // crypte mouvante : deux cartes face cachée échangent leur place (sous les yeux des deux joueurs)
@@ -253,7 +263,7 @@ export function aiPick(st, rng = Math.random) {
   const R = RIVALS[st.rival], hid = hidden(st), byK = {}, kn = {};
   for (const i of hid) { const k = knownOf(st, i, rng); if (k != null) { kn[i] = k; (byK[k] ||= []).push(i); } }
   const pickOf = (l) => l[Math.floor(rng() * l.length)];
-  const cursed = (k) => (st.curse || []).includes(k);
+  const cursed = (k) => !isPow(st, 'gold') && (st.curse || []).includes(k);
   if (st.open.length === 1) {
     const o = st.open[0], k = st.cards[o].k;
     const known = (byK[k] || []).find((i) => i !== o);
