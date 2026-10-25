@@ -8,6 +8,8 @@ P = {
  'devoreur': (.5, .44, .86), 'matriarche': (.5, .42, .84), 'roi': (.48, .40, .84), 'architecte': (.5, .44, .80),
  'eclipse': (.5, .44, .84), 'essaim': (.5, .38, .80), 'bourreau': (.5, .46, .90), 'choeur': (.5, .42, .84),
  'chaines': (.5, .40, .84), 'horloge': (.5, .38, .80),
+ 'miroirs': (.48, .42, .80), 'peste': (.5, .42, .82), 'chasseur': (.5, .44, .80), 'voeux': (.5, .55, .80),
+ 'titan': (.5, .42, .84), 'jumeaux': (.5, .5, .88), 'juge': (.5, .42, .84), 'bete': (.5, .42, .86), 'abysse': (.5, .40, .84),
 }
 if len(sys.argv) > 2: P.update({k: tuple(v) for k, v in json.loads(sys.argv[2]).items()})
 KEYS = [k for k in ['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'golem', 'peste', 'chasseur', 'voeux', 'titan', 'jumeaux', 'juge', 'bete', 'abysse'] if os.path.exists(f'store/emotes/g-{k}-source.jpg')]

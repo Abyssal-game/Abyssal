@@ -19,7 +19,7 @@ export const frameCls = (k) => (okKey(k) ? `pf pf-${k}` : '');
 
 // une réaction : portrait de l'arbitre (ou l'emblème du jeu pour les réactions offertes) et sa phrase
 /* v760 : gardiens dont le portrait de réaction peint (assets/emotes/gp-<clé>.webp) est arrivé */
-const GP_EMOTES = new Set(['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge']);
+const GP_EMOTES = new Set(['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'peste', 'chasseur', 'voeux', 'titan', 'jumeaux', 'juge', 'bete', 'abysse']);
 export const emotePic = (k) => {
   const e = EMOTES[k];
   if (e?.pic) return `<img alt="" src="assets/emotes/${e.pic}.webp">`; /* v630 : portrait propre (réactions du Codex) */
