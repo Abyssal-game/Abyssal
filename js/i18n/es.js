@@ -8251,6 +8251,12 @@ export default {
   "{0} à ouvrir": "{0} por abrir",
   "{0} missions faites": "{0} misiones hechas",
   "{0} mission faite": "{0} misión hecha",
+  "Ton ouverture de booster a été interrompue.": "Tu apertura de sobre se interrumpió.",
+  "<b>Ton ouverture de booster a été interrompue.</b><br>Tes {0} cartes sont bien dans ta collection. Veux-tu revoir l’ouverture ?": "<b>Tu apertura de sobre se interrumpió.</b><br>Tus {0} cartas están en tu colección. ¿Quieres volver a ver la apertura?",
+  "Tes {0} cartes sont bien dans ta collection. Veux-tu revoir l’ouverture ?": "Tus {0} cartas están en tu colección. ¿Quieres volver a ver la apertura?",
+  "Revoir l’ouverture": "Volver a ver la apertura",
+  "{0} nouvelles créatures": "{0} criaturas nuevas",
+  "{0} nouvelle créature": "{0} criatura nueva",
 };
 
 export const names = {

@@ -46,6 +46,7 @@ import { iapResume, loadPrices } from './iap.js'; /* v680 : paiements dans l'app
 import { consumeAuthHash, isLoggedIn } from './cloud/cloud.js';
 import { startPresence } from './cloud/presence.js';
 import { showWelcome } from './screens/welcome.js';
+import { resumeOpening } from './screens/opening.js';
 import { showGate } from './ui/gate.js';
 import { mpw, checkTurns } from './cloud/mpwatch.js';
 import { syncDaily, maybeAsk, syncPush } from './notify.js';
@@ -471,7 +472,7 @@ async function boot() {
     render();
     const wait = Math.max(0, (window.__introUntil || 0) - performance.now());
     let done = false;
-    const finish = () => { if (done) return; done = true; applySettings(); render(); bootEl.classList.add('out'); setTimeout(() => bootEl.remove(), 900); setTimeout(() => showGate(app, () => showWelcome(app)), 700); };
+    const finish = () => { if (done) return; done = true; applySettings(); render(); bootEl.classList.add('out'); setTimeout(() => bootEl.remove(), 900); setTimeout(() => showGate(app, () => showWelcome(app)), 700); setTimeout(() => resumeOpening(app), 3000); /* v767 : ouverture coupée par l'iPhone : la revoir */ };
     // v325 : compte obligatoire — après une déconnexion ou une suppression du compte, l'écran de compte revient
     onAuth((sess) => { if (!sess && done) setTimeout(() => showGate(app), 300); if (sess) syncPush(app).catch(() => {}); }); /* v693 : notifications du serveur pour le compte connecté */
     // v293 : iPhone et navigateurs n'autorisent le son qu'après un premier toucher. L'écran d'ouverture attend donc

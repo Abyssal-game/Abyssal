@@ -7099,3 +7099,8 @@ img.pa-defy-tag { width: 30%; height: auto; font-size: 0; text-shadow: none; fil
 /* v766 : capture du propriétaire : sur le Profil, les lettres du pseudo touchaient les ornements des bouts de la plaque peinte. Plus de marge sur les côtés des plaques peintes ; si la plaque ne tient plus, le texte rapetisse (fitPlate) */
 .np[class*="np-pl-"] { padding-inline: 1.75em; }
 .cs-row .cs-pic .np-demo[class*="np-pl-"], .cxs-pic .np-demo[class*="np-pl-"], .cxs-at-pic .np-demo[class*="np-pl-"], .cs-shop.k-plate .cs-shop-it .np[class*="np-pl-"] { padding-inline: 1.3em; }
+/* v767 : le propriétaire, app iPhone : l'app s'est fermée à l'ouverture du Booster de l'Abysse (non reproduit dans Chromium).
+   Allègement de l'écran d'ouverture : les rayons qui tournent ne font plus 2 × 2 écrans (4 écrans de surface en mémoire graphique)
+   mais un carré à la taille de la diagonale ; étincelles de la grande révélation sans ombre floue (20 au lieu de 36) */
+.op-rays { inset: auto; left: 50%; top: 50%; width: 118vmax; height: 118vmax; margin: -59vmax 0 0 -59vmax; }
+.op-particles i { box-shadow: none; background: radial-gradient(circle, #FFF6D0 0 35%, rgba(240, 199, 94, .55) 60%, transparent 72%); width: 9px; height: 9px; }

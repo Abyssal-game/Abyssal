@@ -5,12 +5,13 @@ import { BOOSTERS, RARITY, VARIANTS } from '../config.js';
 import { cardHTML } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM, roleIcon, picon } from '../ui/icons.js';
-import { esc, fmt, toast } from '../ui/dom.js';
+import { esc, fmt, toast, confirmBox } from '../ui/dom.js';
 import { packHTML, payLabel, GIFT_N } from './shop.js';
 import { stillOf, stillNow, backUrl } from '../ui/still.js';
 import { roleOf, ROLES } from '../core/army.js';
 import { keywordOf, KEYWORDS } from '../core/duel.js';
 import { hapPattern } from '../ui/sound.js';
+import { currentUser } from '../cloud/cloud.js';
 
 // v720 : temps entre le début du son monté (reveal-m-full, reveal-s-full) et le retournement, pour que la carte arrive sur le sommet du son
 const RISE_MS = { M: 2230, S: 2730 };
@@ -31,7 +32,22 @@ function canPay(g, type) {
   if (!def.rewardOnly && g.s.shards >= def.price) return true; /* v728 */
   throw new Error(`Il te manque ${def.price - g.s.shards} éclats (tu en as ${g.s.shards}). La Descente et les Duels des Sceaux en rapportent.`);
 }
-export async function openPack(app, type, { faction, onDone, preset = null, title = null, packKey = null } = {}) {
+/* v767 : une ouverture coupée (l'app fermée par l'iPhone pendant les animations) est gardée sur l'appareil :
+   au retour, on propose de la revoir. Les cartes sont déjà dans la collection, la revoir ne redonne rien. */
+const PENDING = 'abyssal.openPending';
+const keepPending = (v) => { try { if (v) localStorage.setItem(PENDING, JSON.stringify(v)); else localStorage.removeItem(PENDING); } catch (e) { /* rien */ } };
+export function resumeOpening(app, tries = 0) {
+  let p = null;
+  try { p = JSON.parse(localStorage.getItem(PENDING) || 'null'); } catch (e) { p = null; }
+  if (!p || !p.opening?.cards?.length || !BOOSTERS[p.type] || Date.now() - (p.at || 0) > 7 * 864e5) { keepPending(null); return; }
+  if (p.owner && currentUser()?.id && p.owner !== currentUser().id) { keepPending(null); return; } /* partie d'un autre compte */
+  if ((p.owner && !currentUser()) || document.querySelector('.gate, .sheet-wrap, .opening, .dv, .bx-intro')) { if (tries < 40) setTimeout(() => resumeOpening(app, tries + 1), 1500); return; }
+  keepPending(null);
+  confirmBox(`<b>Ton ouverture de booster a été interrompue.</b><br>Tes ${p.opening.cards.length} cartes sont bien dans ta collection. Veux-tu revoir l’ouverture ?`, { ok: 'Revoir l’ouverture', cancel: 'Plus tard' })
+    .then((yes) => { if (yes) openPack(app, p.type, { preset: p.opening, replay: true, title: p.title, packKey: p.packKey }); });
+}
+
+export async function openPack(app, type, { faction, onDone, preset = null, title = null, packKey = null, replay = false } = {}) {
   const g = app.game, cat = app.catalog;
   if (asking) return;
   const fail = (e) => { asking = false; app.pendingProgress = null; app.sfx.error(); toast(esc(e.message), { kind: 'error', icon: 'info' }); };
@@ -43,7 +59,11 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
   // v541 : le booster s'affiche tout de suite ; le serveur tire les cartes pendant qu'on le déchire
   let opening = null;
   const got = (async () => (preset ? { opening: preset } : viaServer ? app.partie.first('openBooster', type, { faction }) : g.openBooster(type, { faction })))()
-    .then((r) => { opening = r.opening; asking = false; return opening; }, (e) => { fail(e); throw e; });
+    .then((r) => {
+      opening = r.opening; asking = false;
+      if (!preset) keepPending({ type, title: title || BOOSTERS[type].name, packKey, at: Date.now(), owner: currentUser()?.id || null, opening: { cards: opening.cards, rewards: opening.rewards || {}, guaranteed: opening.guaranteed || null } });
+      return opening;
+    }, (e) => { fail(e); throw e; });
   got.catch(() => {});
   if (!viaServer || g.s.settings.fastOpen) { try { await got; } catch (e) { return; } }
   // illustrations chargées dès que les cartes sont connues : la carte se retourne sans passer par un fond noir
@@ -354,7 +374,7 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
     if (!reduced) {
       const parts = document.createElement('div');
       parts.className = 'op-particles';
-      parts.innerHTML = Array.from({ length: 36 }, (_, i) => `<i style="--a:${i * 10}deg;--d:${0.6 + Math.random() * 0.8}s;--r:${120 + Math.random() * 160}px"></i>`).join('');
+      parts.innerHTML = Array.from({ length: 20 }, (_, i) => `<i style="--a:${i * 18}deg;--d:${0.6 + Math.random() * 0.8}s;--r:${120 + Math.random() * 160}px"></i>`).join('');
       el.appendChild(parts);
       setTimeout(() => parts.remove(), 2200);
     }
@@ -383,6 +403,7 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
     if (phase === 'summary') return;
     if (!opening) { got.then(() => summary(), () => close()); return; }
     phase = 'summary';
+    if (!preset) keepPending(null); /* v767 : toutes les cartes sont révélées */
     el.querySelector('.op-all')?.setAttribute('hidden', ''); // v311 : tout est révélé, le bouton n'a plus de sens
     busy = false;
     el.classList.add('is-summary');
@@ -396,10 +417,10 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
     const dupAsh = !preset && dupIds.length ? g.spareAsh(dupIds).ash : 0;
     el.scrollLeft = 0; el.scrollTop = 0; /* v373 : jamais de contenu décalé */
     stage.innerHTML = `<div class="op-summary">
-      <h2 class="op-sum-title"><span>${preset ? `${fmt(preset.score)} points` : newCount ? `${newCount} nouvelle${newCount > 1 ? 's' : ''} créature${newCount > 1 ? 's' : ''}` : 'Booster ouvert'}</span></h2>
+      <h2 class="op-sum-title"><span>${preset && !replay ? `${fmt(preset.score)} points` : newCount ? `${newCount} nouvelle${newCount > 1 ? 's' : ''} créature${newCount > 1 ? 's' : ''}` : 'Booster ouvert'}</span></h2>
       ${opening.gift ? `<p class="small op-gift">${icon('ticket')} ${opening.gift < GIFT_N ? `Cadeau de bienvenue : encore ${GIFT_N - opening.gift} booster${GIFT_N - opening.gift > 1 ? 's' : ''} offert${GIFT_N - opening.gift > 1 ? 's' : ''} à ouvrir.` : g.freePack().stock ? 'Ton cadeau de bienvenue est ouvert ! Il te reste ton booster gratuit du jour.' : 'Ton cadeau de bienvenue est ouvert !'}</p>` : ''}
       ${opening.guaranteed ? `<p class="small guarantee">${icon('star')} Garantie appliquée : ${opening.guaranteed === 'm' ? 'Mythique ou mieux' : 'Hyper rare ou mieux'}.</p>` : ''}
-      <div class="op-grid">${opening.cards.map((c, i) => `<div class="op-cell" style="--i:${i}">${cardHTML(cat.get(c.id), { variant: c.variant, isNew: c.isNewCard || c.isNewVariant, lazy: false })}<span class="op-tag">${preset ? `+${c.pts} pts${c.double ? ' ×2' : ''}` : c.isNewCard ? 'Nouvelle recrue' : c.isNewVariant ? VARIANTS[c.variant].short : `Doublon · ${c.burn} ${icon('ash')}`}</span></div>`).join('')}</div>
+      <div class="op-grid">${opening.cards.map((c, i) => `<div class="op-cell" style="--i:${i}">${cardHTML(cat.get(c.id), { variant: c.variant, isNew: c.isNewCard || c.isNewVariant, lazy: false })}<span class="op-tag">${preset && !replay ? `+${c.pts} pts${c.double ? ' ×2' : ''}` : c.isNewCard ? 'Nouvelle recrue' : c.isNewVariant ? VARIANTS[c.variant].short : `Doublon · ${c.burn} ${icon('ash')}`}</span></div>`).join('')}</div>
       <div class="op-loot">
         ${r.shards ? `<span>${icon('crystal')}<b>+${fmt(r.shards)}</b><small>éclats</small></span>` : ''}
         ${r.ash ? `<span>${icon('ash')}<b>+${fmt(r.ash)}</b><small>cendres</small></span>` : ''}
@@ -424,6 +445,7 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
   function close() {
     if (closed) return;
     closed = true;
+    if (!preset) keepPending(null);
     el.classList.add('out');
     document.body.classList.remove('has-sheet', 'lock-scroll');
     // Un second toucher (ou un toucher fantôme d'iOS) ne doit pas atteindre la page dessous,

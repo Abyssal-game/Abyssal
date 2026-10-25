@@ -8262,6 +8262,12 @@ export default {
   "{0} à ouvrir": "{0} to open",
   "{0} missions faites": "{0} missions done",
   "{0} mission faite": "{0} mission done",
+  "Ton ouverture de booster a été interrompue.": "Your booster opening was interrupted.",
+  "<b>Ton ouverture de booster a été interrompue.</b><br>Tes {0} cartes sont bien dans ta collection. Veux-tu revoir l’ouverture ?": "<b>Your booster opening was interrupted.</b><br>Your {0} cards are safely in your collection. Do you want to watch the opening again?",
+  "Tes {0} cartes sont bien dans ta collection. Veux-tu revoir l’ouverture ?": "Your {0} cards are safely in your collection. Do you want to watch the opening again?",
+  "Revoir l’ouverture": "Watch the opening",
+  "{0} nouvelles créatures": "{0} new creatures",
+  "{0} nouvelle créature": "{0} new creature",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {
