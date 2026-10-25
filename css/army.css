@@ -6937,3 +6937,10 @@ html:not([data-mat^="tp-"]) .sc-board:not([data-pmat^="tp-"]) .sc-cell { backgro
 .pa-game { height: calc(var(--app-h, 100dvh) - var(--safe-t, 0px) - max(var(--safe-b, 0px), var(--vh-gap, 0px)) - 20px); }
 .pa-game .mq-table { flex: 1 1 0; min-height: 150px; container-type: size; display: flex; justify-content: center; }
 .pa-game .mq-table .pa-parch { width: min(100%, 100cqh * 450 / 330); max-width: none; margin: auto; }
+
+/* v743 : booster standard, la fissure rouge de l'œil s'allume et s'éteint doucement (calque des seules fissures,
+   standard3-glow.webp ; opacité seule, jamais pendant la déchirure : le sachet y est copié 13 fois) */
+.pk-glow { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; pointer-events: none; opacity: .3; animation: pkGlow743 2.8s ease-in-out infinite; }
+@keyframes pkGlow743 { 0%, 100% { opacity: .2; } 45% { opacity: 1; } 60% { opacity: .85; } }
+.op-pack .pk-glow, html.fx-light .pk-glow { display: none; }
+@media (prefers-reduced-motion: reduce) { .pk-glow { animation: none; opacity: .7; } }

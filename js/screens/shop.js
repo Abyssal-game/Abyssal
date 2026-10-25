@@ -63,7 +63,7 @@ export function packHTML(type, cat, { faction, event, skin = getPackSkin(type) }
   const tag = type === 'abysse' || type === 'shadow' ? '5 cartes' : type === 'premium' ? 'Rare garantie' : '3 cartes';
   const sk = skin && SKINNED.includes(type) ? skin : null;
   return `<div class="pack pack-${type} ${sk ? 'pack-skin' : ''}"${sk ? ` style="${skinVars(sk)}"` : ''}>
-    <img class="pk-img" alt="" src="assets/packs/${sk || PACK_FILE[key] || key}.webp">
+    <img class="pk-img" alt="" src="assets/packs/${sk || PACK_FILE[key] || key}.webp">${type === 'standard' && !sk ? '<img class="pk-glow" alt="" src="assets/packs/standard3-glow.webp">' : ''}
     <div class="pk-logo">ABYSSAL</div>
     <div class="pk-label"><span class="pk-name">${esc(label)}</span><span class="pk-tag">${tag}</span></div>
     <div class="pk-tearline"></div>
