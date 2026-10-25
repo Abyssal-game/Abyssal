@@ -8290,6 +8290,7 @@ export default {
   "Tu es le dernier à savoir lire les sceaux. Descends, et referme-les.": "You are the last one who can read the seals. Descend, and close them again.",
   "Commencer": "Begin",
   "Revoir le prologue": "Watch the prologue again",
+  "Choc": "Clash",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

@@ -72,14 +72,14 @@ const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique
 // Fond illustré de chaque page (l'Accueil et la Descente posent le leur)
 const ROUTE_SCENE = { boutique: 'shop', codex: 'shop', tirage: 'shadow', renfort: 'collection', fournaise: 'collection', collection: 'collection', equipe: 'team', coffres: 'chests', bestiaire: 'bestiary', succes: 'trophies', profil: 'profile', menu: 'menu', parametres: 'menu', compte: 'menu', amis: 'menu', factions: 'factions', faction: 'factions' };
 // Page parente des sous-pages (bouton retour en haut)
-const PARENT = { labo: 'parametres', amis: 'menu', bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente', arsenal: 'coffres', marchand: 'descente', sceaux: 'jeux', encheres: 'jeux', versus: 'jeux', pacte: 'jeux', cryptes: 'jeux' };
+const PARENT = { labo: 'parametres', amis: 'menu', bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente', arsenal: 'coffres', marchand: 'descente', sceaux: 'jeux', encheres: 'jeux', pacte: 'jeux', cryptes: 'jeux' };
 // Sous-onglets de chaque onglet principal (barre en haut de la page)
 // v425 : pages rangées sous un autre sous-onglet (allumé sur elles)
-const SUB_OF = { fournaise: 'renfort', sceaux: 'jeux', encheres: 'jeux', versus: 'jeux', pacte: 'jeux', cryptes: 'jeux' };
+const SUB_OF = { fournaise: 'renfort', sceaux: 'jeux', encheres: 'jeux', pacte: 'jeux', cryptes: 'jeux' };
 const SUBNAV = {
   collection: [['collection', 'cards', 'Cartes'], ['equipe', 'team-ic', 'Équipe'], ['renfort', 'furnace', 'Forge']], /* v422 : Renforcer + Fournaise */
   boutique: [['boutique', 'booster', 'Boosters'], ['coffres', 'chest', 'Coffres'], ['tirage', 'shadow', 'Tirage'], ['codex', 'book', 'Codex']], /* v470 : Codex et Échoppe, en Mode Créateur seulement */ /* v428 : les coffres rejoignent le Butin */
-  descente: [['descente', 'descend', 'Descente'], ['epreuves', 'crest-elite', 'Épreuves'], ['jeux', 'seal', 'Jeux']],
+  descente: [['descente', 'descend', 'Descente'], ['epreuves', 'crest-elite', 'Épreuves'], ['versus', 'booster', 'Choc'], ['jeux', 'seal', 'Jeux']], /* v776 : le Choc des Boosters a son propre sous-onglet */
 };
 
 function storageOrMemory() {
@@ -217,7 +217,8 @@ function renderChrome() {
     // v404 : pastilles plus calmes — plus de « 99+ » permanent sur la Fournaise ; Renforcer seulement si l'Accueil le conseille aussi
     if (r === 'renfort') return calm(g.goals().some((x) => x.kind === 'forge' && /Renforce/.test(x.title)));
     if (r === 'collection') return calm(nNewSub);
-    if (r === 'jeux') return (mpw.turns + mpw.games) || calm(g.gamesDailyLeft().length); /* v466 : défis du jour à relever ; v519 : coups à jouer en ligne */
+    if (r === 'jeux') return mpw.turns || calm(g.gamesDailyLeft().length); /* v466 : défis du jour à relever ; v519 : coups à jouer en ligne */
+    if (r === 'versus') return mpw.games; /* v776 : duels à voir et défis reçus au Choc */
     if (r === 'epreuves') return calm(g.team().length >= 3 && g.trials().done.some((x) => !x)); /* v407 */
     return '';
   };

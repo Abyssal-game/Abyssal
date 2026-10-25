@@ -8279,6 +8279,7 @@ export default {
   "Tu es le dernier à savoir lire les sceaux. Descends, et referme-les.": "Du bist der Letzte, der die Siegel lesen kann. Steig hinab und verschließe sie wieder.",
   "Commencer": "Beginnen",
   "Revoir le prologue": "Den Prolog noch einmal ansehen",
+  "Choc": "Schlacht",
 };
 
 export const names = {

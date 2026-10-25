@@ -31,7 +31,6 @@ export default function gamesScreen(app, root) {
       ${tile('#/sceaux', 'gm-sceaux', 'Duels des Sceaux', 'Pose tes cartes sur un plateau de 3 × 3 et capture celles de l’adversaire.', `${rec(sc.wins, sc.losses)} · ${Object.keys(sc.beaten || {}).length} / 8 adversaires battus`, 'assets/ui/bn-sceaux.webp')}
       ${tile('#/cryptes', 'gm-cryptes', 'Les Cryptes', 'Un jeu de mémoire : retrouve les paires et réveille les pouvoirs des factions.', `${rec(cr.wins, cr.losses)} · ${Object.keys(cr.beaten || {}).length} / ${CR.TABLES.length} cryptes gagnées`, 'assets/ui/bn-cryptes.webp')}
       ${tile('#/pacte', 'gm-pacte', 'Le Pacte', 'Tire des cartes, encore une… et arrête-toi avant de briser le pacte.', `${rec(pa.wins, pa.losses)} · ${Object.keys(pa.beaten || {}).length} / ${PA.TABLES.length} pactes gagnés`, 'assets/ui/bn-pacte.webp')}
-      ${tile('#/versus', 'gm-versus', 'Le Choc des Boosters', 'Contre un autre joueur : ouvrez vos boosters face à face. Chacun garde ses cartes, le meilleur total gagne un butin.', vs.played ? `${vs.played} duel${vs.played > 1 ? 's' : ''} · ${vs.wins} victoire${vs.wins > 1 ? 's' : ''} · ${vs.won} cartes gagnées` : 'Joue en ligne contre d’autres joueurs', 'assets/ui/bn-versus.webp')}
       ${tile('#/encheres', 'gm-encheres', 'Les Enchères de Mammon', 'Enchères à l’aveugle à trois : offre plus que les autres… sans jamais offrir pareil.', `${rec(en.wins, en.losses)} · ${Object.keys(en.beaten || {}).length} / ${EN.TABLES.length} ventes gagnées`, 'assets/ui/bn-encheres.webp')}
     </div>`);
   /* v519 : parties en ligne qui attendent ton coup (v523 : Sceaux et Pacte) */
@@ -39,11 +38,5 @@ export default function gamesScreen(app, root) {
     const n = L.filter((v) => v.status === 'playing' && (v.turn === v.me || v.turn === 'ab')).length;
     const t = root.querySelector(`.gm-${gm} .gm-txt`);
     if (n && t) t.insertAdjacentHTML('beforeend', `<span class="gm-daily">${icon('p:hourglass')}À toi de jouer en ligne (${n})</span>`);
-  }).catch(() => {});
-  /* v512 : duels du Versus relevés pendant ton absence */
-  if (g.sceauxOpen() && cloud.isLoggedIn()) cloud.versusList().then((d) => {
-    const n = (d?.mine || []).filter((r) => r.status === 'done' && !r.claimed).length;
-    const t = root.querySelector('.gm-versus .gm-txt');
-    if (n && t && !t.querySelector('.gm-daily')) t.insertAdjacentHTML('beforeend', `<span class="gm-daily">${icon('p:hourglass')}${n} duel${n > 1 ? 's' : ''} à voir</span>`);
   }).catch(() => {});
 }

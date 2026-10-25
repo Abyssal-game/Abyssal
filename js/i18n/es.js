@@ -8279,6 +8279,7 @@ export default {
   "Tu es le dernier à savoir lire les sceaux. Descends, et referme-les.": "Eres el último que sabe leer los sellos. Desciende y vuelve a cerrarlos.",
   "Commencer": "Empezar",
   "Revoir le prologue": "Volver a ver el prólogo",
+  "Choc": "Batalla",
 };
 
 export const names = {
