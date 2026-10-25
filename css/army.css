@@ -7030,3 +7030,21 @@ img.pa-defy-tag { width: 30%; height: auto; font-size: 0; text-shadow: none; fil
 .op-card.glow-M.charging .tcg-back { --rc: #FF5C8A; }
 .epic-M .op-banner { color: #FFD6E4; text-shadow: 0 0 20px #FF5C8A, 0 0 60px #C8A45D; }
 .epic-S .op-banner { color: #FFF0C2; text-shadow: 0 0 20px #F0C75E, 0 0 60px #FFB84A; }
+
+/* v751 : pouvoirs annoncés des adversaires du Pacte (à la place de l'avance de points) */
+.pa-powl { display: flex; gap: 5px; align-items: flex-start; color: #F2B8A8; }
+.pa-powl b { color: #FFB49A; }
+.pa-powl .picon, .pa-powl img, .pa-powl .ic { width: 14px; height: 14px; flex: none; margin-top: 2px; }
+.pa-pown { display: inline-flex; align-items: center; gap: 3px; margin-left: 6px; padding: 0 6px; border-radius: 999px; background: rgba(224, 72, 94, .16); border: 1px solid rgba(224, 72, 94, .45); font: 600 .58rem/1.4 var(--f-ui, inherit); color: #FFC2B4; vertical-align: middle; white-space: nowrap; }
+.pa-pown .picon, .pa-pown img, .pa-pown .ic { width: 10px; height: 10px; }
+.pa-side[data-pa="power"] { cursor: pointer; }
+.pa-side .pa-sn b:has(.pa-pown) { display: flex; align-items: center; min-width: 0; }
+.gm-rule.pa-powl, .pa-powl { display: block; }
+.gm-rule.pa-powl b, .pa-powl b { font: inherit; font-weight: 700; text-transform: none; letter-spacing: 0; display: inline; }
+.gm-rule.pa-powl > .picon, .gm-rule.pa-powl > img, .gm-rule.pa-powl > .ic { display: inline-block; vertical-align: -2px; margin-right: 4px; }
+.pa-pown { padding: 1px 3px; margin-left: 4px; }
+.pa-pown .picon, .pa-pown img, .pa-pown .ic { width: 12px; height: 12px; }
+.pa-side .sc-med { position: relative; overflow: visible; }
+.pa-side .sc-med .pa-pown { position: absolute; right: -4px; bottom: -3px; margin: 0; padding: 2px; border-radius: 50%; background: #2A0A10; border: 1px solid rgba(255, 120, 110, .8); box-shadow: 0 0 6px rgba(224, 72, 94, .6); }
+.pa-side .sc-med .pa-pown .picon, .pa-side .sc-med .pa-pown img, .pa-side .sc-med .pa-pown .ic { width: 12px; height: 12px; display: block; }
+@media (max-width: 380px) { .pa-duo { gap: 4px; padding: 5px 6px; } .pa-side { gap: 4px; padding: 3px; } .pa-side .sc-med { width: 34px; height: 34px; } .pa-sn b { font-size: .7rem; } .pa-sp b { font-size: 1.15rem; } }

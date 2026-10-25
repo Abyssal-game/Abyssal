@@ -8147,6 +8147,23 @@ export default {
   "{0} points, aucun Sceau, cinq Gardiens.": "{0} points, no Seals, five Guardians.",
   "{e0}{0} points, aucun Sceau, cinq Gardiens.": "{e0}{0} points, no Seals, five Guardians.",
   "La dette de Mammon : −{d} points.": "Mammon’s debt: −{d} points.",
+  "Calcule tout et ose davantage quand il est mené.": "Calculates everything and dares more when behind.",
+  "La part de la maison": "The House’s Share",
+  "Résonance": "Resonance",
+  "Archives": "Archives",
+  "Le Néant": "The Void",
+  "Quand tu encaisses {0} points ou plus en un tour, Mammon en prend {1} pour lui.": "When you bank {0} points or more in one turn, Mammon takes {1} for himself.",
+  "Une fois par partie, sa brisure est pardonnée, comme si elle avait un Sceau.": "Once per game, her break is forgiven, as if she had a Seal.",
+  "Un tour sur deux, sa première carte de faction compte double.": "Every other turn, his first faction card counts double.",
+  "Quand il brise le pacte, il garde quand même {0} % des points de son tour.": "When he breaks the pact, he still keeps {0}% of his turn’s points.",
+  "Chacune de tes brisures te coûte aussi {0} % des points que tu as déjà gagnés.": "Each of your breaks also costs you {0}% of the points you have already earned.",
+  "Prière !": "Prayer!",
+  "{name} est pardonnée : sa brisure ne compte pas.": "{name} is forgiven: her break does not count.",
+  "La part de la maison : Mammon en prend {n}.": "The House’s Share: Mammon takes {n}.",
+  "Archives : il garde quand même {n} points.": "Archives: he still keeps {n} points.",
+  "Le Néant : tu perds aussi {n} points déjà gagnés.": "The Void: you also lose {n} points already earned.",
+  "Résonance !": "Resonance!",
+  "Sa première carte de faction compte double.": "His first faction card counts double.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

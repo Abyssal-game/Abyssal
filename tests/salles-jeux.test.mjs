@@ -17,19 +17,26 @@ test('jeux : 8 salles par jeu, chacune avec un haut fait, et les nouvelles avec 
   }
 });
 
-test('pacte : règles des salles (but, cartes spéciales, aucune avance, dette de Mammon)', () => {
+test('pacte : règles des salles (but, cartes spéciales, aucune avance, pouvoirs des adversaires)', () => {
   const st = PA.newGame(catalog, { table: 'neant', seed: 3 });
   assert.equal(st.target, 70); assert.equal(st.scores.a, 0); /* v750 : plus d’avance donnée aux adversaires */
   assert.equal(st.deck.filter((c) => c.sp === 'sceau').length, 0);
   assert.equal(st.deck.filter((c) => c.sp === 'gardien').length, 5);
   assert.equal(PA.newGame(catalog, { table: 'minuit', seed: 3 }).target, 80);
-  // v750 : la dette de Mammon : une brisure coûte aussi 4 points déjà gagnés, aux deux joueurs
+  // v751 : pouvoirs annoncés (plus d’avance de points)
   const m = PA.newGame(catalog, { table: 'mammon', seed: 3 });
   assert.equal(m.scores.a, 0);
-  m.scores.p = 10; const f = m.deck.find((c) => c.f).f;
-  m.row = [{ f, v: 3 }]; m.sceaux = 0; m.deck.push({ f, v: 2 });
-  const ev = PA.draw(m);
-  assert.equal(ev.result, 'bust'); assert.equal(ev.debt, 4); assert.equal(m.scores.p, 6);
+  const fs = [...new Set(m.deck.filter((c) => c.f).map((c) => c.f))];
+  m.row = [{ f: fs[0], v: 7 }, { f: fs[1], v: 7 }, { f: fs[2], v: 3 }];
+  const e1 = PA.stop(m); assert.equal(e1.gain, 15); assert.equal(e1.house, 2); assert.equal(m.scores.a, 2);
+  const v = PA.newGame(catalog, { table: 'cendres', seed: 3 });
+  v.turn = 'a'; v.row = [{ f: fs[0], v: 3 }]; v.deck.push({ f: fs[0], v: 2 });
+  const e2 = PA.draw(v); assert.equal(e2.result, 'saved'); assert.ok(e2.prayer);
+  v.row = [{ f: fs[0], v: 3 }]; v.deck.push({ f: fs[0], v: 2 });
+  assert.equal(PA.draw(v).result, 'bust');
+  const n = PA.newGame(catalog, { table: 'neant', seed: 3 });
+  n.scores.p = 20; n.row = [{ f: fs[0], v: 3 }]; n.sceaux = 0; n.deck.push({ f: fs[0], v: 2 });
+  const e3 = PA.draw(n); assert.equal(e3.result, 'bust'); assert.equal(e3.voidCost, 8); assert.equal(n.scores.p, 12);
 });
 
 test('cryptes : paires maudites (−1 point, pas de pouvoir) et crypte mouvante', () => {

@@ -76,7 +76,7 @@ export default function pacteScreen(app, root) {
       return [open, `<button class="sc-rival gm-tbl ${open ? '' : 'locked'} ${won ? 'won' : ''}" data-pa="play" data-t="${t.key}" ${open ? '' : 'disabled'} style="background-image:linear-gradient(90deg, rgba(12, 13, 20, .97) 42%, rgba(12, 13, 20, .5) 78%, rgba(12, 13, 20, .2)), url(${PA.tableBg(t.key)})">
         <span class="sc-por">${pic(t.rival)}</span>
         <span class="sc-ri"><b>${esc(t.name)}</b><span class="small">contre ${esc(R.name)} · ${stars(t.stars)}</span>
-        <span class="small muted">${open ? `+${t.reward} éclats${won ? '' : ` · 1re victoire : +${PA.PACTE_REWARD.firstWin} et ${esc(CHEST_NAME[t.chest].toLowerCase())}`}` : `Gagne ${esc(PA.TABLES[i - 1].name)} pour y entrer`}</span>${t.rule ? `<span class="small gm-rule">${icon('p:rule')}${esc(t.rule)}</span>` : ''}${open && PA.FEATS[t.key] ? `<span class="small gm-feat ${pa.feats?.[t.key] ? 'done' : ''}">${pa.feats?.[t.key] ? icon('check') : '<img class="gm-hf" alt="" src="assets/icons/haut-fait.webp">'} Haut fait : ${esc(PA.FEATS[t.key].text)}${pa.feats?.[t.key] ? '' : ` (+${PA.FEAT_SHARDS})`}</span>` : ''}</span>
+        <span class="small muted">${open ? `+${t.reward} éclats${won ? '' : ` · 1re victoire : +${PA.PACTE_REWARD.firstWin} et ${esc(CHEST_NAME[t.chest].toLowerCase())}`}` : `Gagne ${esc(PA.TABLES[i - 1].name)} pour y entrer`}</span>${t.rule ? `<span class="small gm-rule">${icon('p:rule')}${esc(t.rule)}</span>` : ''}${R.power ? `<span class="small gm-rule pa-powl">${icon('p:danger')}<b>${esc(R.power.name)}</b> : ${esc(R.power.text)}</span>` : ''}${open && PA.FEATS[t.key] ? `<span class="small gm-feat ${pa.feats?.[t.key] ? 'done' : ''}">${pa.feats?.[t.key] ? icon('check') : '<img class="gm-hf" alt="" src="assets/icons/haut-fait.webp">'} Haut fait : ${esc(PA.FEATS[t.key].text)}${pa.feats?.[t.key] ? '' : ` (+${PA.FEAT_SHARDS})`}</span>` : ''}</span>
         ${won ? `<span class="sc-won">${icon('check')}</span>` : open ? icon('next') : icon('p:mysteries')}</button>`];
     });
     const o = tables.filter((x) => x[0]).map((x) => x[1]).join(''), l = tables.filter((x) => !x[0]);
@@ -88,7 +88,7 @@ export default function pacteScreen(app, root) {
       <div class="sc-rivals">${o}</div>
       ${l.length ? `<details class="panel dc-fold"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/mysteries.webp"><span class="dc-sum-t">Pactes à venir (${l.length})</span></summary><div class="sc-rivals">${l.map((x) => x[1]).join('')}</div></details>` : ''}
       <details class="panel dc-fold mq-court"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/inconnu.webp"><span class="dc-sum-t">Les adversaires</span></summary>
-        <ul class="mq-clist">${PA.TABLES.filter((_, i) => PA.tableUnlocked(g.s, i)).map((t) => { const R = PA.RIVALS[t.rival]; return `<li><span class="sc-por">${pic(t.rival)}</span><span><b>${esc(R.name)}</b><span class="small muted">${esc(R.hint)}</span></span></li>`; }).join('')}</ul></details>
+        <ul class="mq-clist">${PA.TABLES.filter((_, i) => PA.tableUnlocked(g.s, i)).map((t) => { const R = PA.RIVALS[t.rival]; return `<li><span class="sc-por">${pic(t.rival)}</span><span><b>${esc(R.name)}</b><span class="small muted">${esc(R.hint)}</span>${R.power ? `<span class="small pa-powl"><b>${esc(R.power.name)}</b> : ${esc(R.power.text)}</span>` : ''}</span></li>`; }).join('')}</ul></details>
       <p class="small muted center">Récompenses : ${PA.PACTE_REWARD.dailyPaid} victoires payées par jour (${Math.max(0, PA.PACTE_REWARD.dailyPaid - (pa.day === todayKey() ? pa.paidToday : 0))} restantes aujourd’hui). Au-delà, tu peux jouer pour le plaisir.</p>
       <details class="panel dc-fold dc-how"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/help.webp"><span class="dc-sum-t">Comment ça marche</span></summary>${howHTML()}</details>`;
     /* v699 : la bulle des règles attend la première partie (elle couvrait la liste des salles) */
@@ -167,7 +167,7 @@ export default function pacteScreen(app, root) {
   function duo(st) {
     const R = PA.RIVALS[st.rival], T = PA.tgt(st), side = (x) => {
       const sc = st.scores[x], on = st.turn === x && !st.over;
-      return `<span class="pa-side s-${x} ${on ? 'on' : ''}"><span class="sc-med ${x === 'p' ? 'mq-me' : ''}">${x === 'p' ? me() : pic(st.rival)}</span>
+      return `<span class="pa-side s-${x} ${on ? 'on' : ''}" ${x === 'a' && R.power ? 'data-pa="power" role="button"' : ''}><span class="sc-med ${x === 'p' ? 'mq-me' : ''}">${x === 'p' ? me() : pic(st.rival)}${x === 'a' && R.power ? `<small class="pa-pown" aria-label="${esc(R.power.name)}">${icon('p:danger')}</small>` : ''}</span>
         <span class="pa-sn"><b>${x === 'p' ? 'Toi' : esc(R.name)}</b><span class="pa-bar"><i style="width:${Math.min(100, (sc / T) * 100)}%"></i></span></span>
         <span class="pa-sp"><b>${sc}</b></span></span>`;
     };
@@ -233,6 +233,13 @@ export default function pacteScreen(app, root) {
     const R = PA.RIVALS[st.rival], mine = ev.who === 'p', nm = mine ? 'Tu' : esc(tw(R.name));
     const fn = ev.card?.f ? fname(ev.card.f) : '';
     let H = sayText(ev, { mine, nm, fn, seven: PA.sevenOf(st) });
+    /* v751 : les pouvoirs des adversaires sont annoncés quand ils jouent */
+    const PW = PA.powerOf(st);
+    if (H && ev.prayer) H = ['ko', t('Prière !'), t('{name} est pardonnée : sa brisure ne compte pas.', { name: nm })];
+    if (H && ev.house) H = [H[0], H[1], `${H[2]} ${t('La part de la maison : Mammon en prend {n}.', { n: ev.house })}`];
+    if (H && ev.kept) H = [H[0], H[1], `${H[2]} ${t('Archives : il garde quand même {n} points.', { n: ev.kept })}`];
+    if (H && ev.voidCost) H = [H[0], H[1], `${H[2]} ${t('Le Néant : tu perds aussi {n} points déjà gagnés.', { n: ev.voidCost })}`];
+    if (!H && ev.echo && PW) H = ['ko', t('Résonance !'), t('Sa première carte de faction compte double.')];
     if (ev.curse && ev.result === 'ok') H = [mine ? 'ok' : 'ko', t('Malédiction !'), mine ? t('{name} devra tirer une carte de plus à son prochain tour.', { name: esc(tw(R.name)) }) : t('Tu devras tirer une carte de plus à ton prochain tour.')];
     if (H && ev.dbl) H = ev.result === 'bust' ? [H[0], t('Défi perdu… le pacte se brise !'), H[2]] : [mine ? 'ok' : 'ko', t('Pacte défié avec succès !'), mine ? t('Le tour compte double : +{n}.', { n: ev.gain }) : t('{name} double son tour : +{n}.', { name: nm, n: ev.gain })];
     if (!H) return;
@@ -263,7 +270,7 @@ export default function pacteScreen(app, root) {
         }
         app.sfx[ev.card.sp === 'offrande' ? 'pa-offer' : 'pa-draw']?.();
       }
-      if (ev.result === 'ok') { renderShown(shown); await wait(650); if (ev.curse) await say(g.s.pacte.cur, ev, 1500); continue; }
+      if (ev.result === 'ok') { renderShown(shown); await wait(650); if (ev.curse || ev.echo) await say(g.s.pacte.cur, ev, ev.curse ? 1500 : 1100); continue; }
       if (ev.result === 'saved') {
         const i = shown.row.findIndex((c) => c.sp === 'sceau'); if (i >= 0) shown.row.splice(i, 1);
         shown.sceaux = Math.max(0, shown.sceaux - 1); shown.offer = false;
@@ -319,9 +326,9 @@ export default function pacteScreen(app, root) {
     try { g.pacteStart(opts); } catch (e) { toast(esc(e.message), { kind: 'error' }); return; }
     const st = g.s.pacte.cur, R = PA.RIVALS[st.rival];
     app.sfx.enter?.();
-    banner = { cls: 'intro', html: `<span class="sc-med">${pic(st.rival)}</span><span class="mq-vd"><small>${esc(R.name)}</small><b>« ${esc(R.hello)} »</b><span>Le premier à ${PA.tgt(st)} points gagne.${st.scores.a ? ` ${esc(R.name)} commence avec ${st.scores.a} points.` : ''}${PA.TABLE[st.table].rule ? `<em class="gm-ruleline">${esc(PA.TABLE[st.table].rule)}</em>` : ''}</span></span>` };
+    banner = { cls: 'intro', html: `<span class="sc-med">${pic(st.rival)}</span><span class="mq-vd"><small>${esc(R.name)}</small><b>« ${esc(R.hello)} »</b><span>Le premier à ${PA.tgt(st)} points gagne.${st.scores.a ? ` ${esc(R.name)} commence avec ${st.scores.a} points.` : ''}${PA.TABLE[st.table].rule ? `<em class="gm-ruleline">${esc(PA.TABLE[st.table].rule)}</em>` : ''}${R.power ? `<em class="gm-ruleline pa-powl"><b>${esc(R.power.name)}</b> : ${esc(R.power.text)}</em>` : ''}</span></span>` };
     busy = true; prevSig = []; prevLit = new Set(); view();
-    tuto(app, 'pacte').then(() => tuto(app, 'pacte-play')).then(() => wait(1400)).then(() => { banner = null; busy = false; if (!gone) view(); });
+    tuto(app, 'pacte').then(() => tuto(app, 'pacte-play')).then(() => wait(R.power ? 3200 : 1400)).then(() => { banner = null; busy = false; if (!gone) view(); });
   }
   function rules() { openSheet(`<div class="sc-rules"><h2>Le Pacte</h2>${howHTML()}</div>`, { label: 'Règles du Pacte' }); }
   function cardInfo(i) {
@@ -341,6 +348,7 @@ export default function pacteScreen(app, root) {
     if (k === 'play') return start({ table: b.dataset.t });
     if (k === 'daily') return start({ daily: true });
     if (k === 'rules') return rules();
+    if (k === 'power') { const st0 = g.s.pacte.cur, P = st0 && PA.powerOf(st0); if (P) openSheet(`<div class="sc-rules"><h2>${esc(P.name)}</h2><p class="muted"><span translate="no">${esc(tw(PA.RIVALS[st0.rival].name))}</span></p><p>${esc(P.text)}</p></div>`, { label: P.name, cls: 'sheet-small' }); return; }
     if (k === 'quit') {
       if (busy) return;
       const leave = () => { g.gameForfeit('pacte'); g.pacteQuit(); lobby(); }; /* v540 : l'abandon passe par le jeu (rejoué par le serveur de partie) */

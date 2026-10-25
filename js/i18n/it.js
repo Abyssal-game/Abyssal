@@ -8136,6 +8136,23 @@ export default {
   "{0} points, aucun Sceau, cinq Gardiens.": "{0} punti, nessun Sigillo, cinque Guardiani.",
   "{e0}{0} points, aucun Sceau, cinq Gardiens.": "{e0}{0} punti, nessun Sigillo, cinque Guardiani.",
   "La dette de Mammon : −{d} points.": "Il debito di Mammon: −{d} punti.",
+  "Calcule tout et ose davantage quand il est mené.": "Calcola tutto e osa di più quando è in svantaggio.",
+  "La part de la maison": "La parte della casa",
+  "Résonance": "Risonanza",
+  "Archives": "Archivi",
+  "Le Néant": "Il Nulla",
+  "Quand tu encaisses {0} points ou plus en un tour, Mammon en prend {1} pour lui.": "Quando incassi {0} punti o più in un turno, Mammon ne prende {1} per sé.",
+  "Une fois par partie, sa brisure est pardonnée, comme si elle avait un Sceau.": "Una volta per partita, la sua rottura viene perdonata, come se avesse un Sigillo.",
+  "Un tour sur deux, sa première carte de faction compte double.": "Un turno su due, la sua prima carta di fazione conta doppio.",
+  "Quand il brise le pacte, il garde quand même {0} % des points de son tour.": "Quando spezza il patto, tiene comunque il {0} % dei punti del suo turno.",
+  "Chacune de tes brisures te coûte aussi {0} % des points que tu as déjà gagnés.": "Ogni tua rottura ti costa anche il {0} % dei punti già guadagnati.",
+  "Prière !": "Preghiera!",
+  "{name} est pardonnée : sa brisure ne compte pas.": "{name} è perdonata: la sua rottura non conta.",
+  "La part de la maison : Mammon en prend {n}.": "La parte della casa: Mammon ne prende {n}.",
+  "Archives : il garde quand même {n} points.": "Archivi: tiene comunque {n} punti.",
+  "Le Néant : tu perds aussi {n} points déjà gagnés.": "Il Nulla: perdi anche {n} punti già guadagnati.",
+  "Résonance !": "Risonanza!",
+  "Sa première carte de faction compte double.": "La sua prima carta di fazione conta doppio.",
 };
 
 export const names = {
