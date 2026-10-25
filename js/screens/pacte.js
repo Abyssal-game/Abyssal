@@ -113,7 +113,7 @@ export default function pacteScreen(app, root) {
     /* v511 : la gravure d'origine des sceaux (dont des étoiles à six branches) est effacée dans pa-table2.webp : chaque sceau porte l'emblème de sa faction */
     const seals = SEALS.map(([f, x, y]) => `<i class="pa-seal ${fs.has(f) ? 'on' : ''}" data-f="${f}" style="left:${(x / 4.5).toFixed(1)}%;top:${(y / 3.3).toFixed(1)}%;--fc:${cat.faction[f]?.colors.secondary || '#C9A45A'}">${sigil(f)}</i>`).join('');
     const ban = banner ? `<div class="pa-ban">${banner.bust ? '<img class="pa-burn" alt="" src="assets/jeux/pa-brisure.webp">' : ''}<div class="mq-banner ${banner.cls}">${banner.html}</div></div>` : '';
-    return `<div class="pa-parch ${defy ? 'defy' : ''}">${defy && !banner ? `<span class="pa-defy-tag">×2</span>` : ''}
+    return `<div class="pa-parch ${defy ? 'defy' : ''}">${defy && !banner ? `<img class="pa-defy-tag" alt="×2" src="assets/jeux/pa-defi.webp">` : ''}
       <div class="pa-row" style="--n:${Math.max(1, st.row.length)}">${st.row.length ? st.row.map((c) => cardHTML(c)).join('') : `<span class="pa-empty">${st.turn === 'p' ? 'Tire ta première carte.' : '…'}</span>`}</div>
       ${seals}
       <div class="pa-info"><span>Ce tour : <b>${v}</b> point${v > 1 ? 's' : ''}</span><span class="pa-fac">${nf} / 7 sceaux</span>
@@ -126,7 +126,7 @@ export default function pacteScreen(app, root) {
     const n = (pred) => src.filter(pred).length;
     const facs = FACTION_ORDER.map((f) => { const k = n((c) => c.f === f); return `<span class="pa-pf ${fs.has(f) ? 'danger' : ''} ${k ? '' : 'none'}" style="--fc:${cat.faction[f]?.colors.secondary || '#888'}" title="${esc(fname(f))}">${sigil(f)}<b>${k}</b></span>`; }).join('');
     const sps = Object.keys(SP).map((k) => { const m = n((c) => c.sp === k); return m ? `<span class="pa-ps sp-${k}" title="${esc(SP[k].name)}">${esc(SP[k].name)} <b>${m}</b></span>` : ''; }).join('');
-    return `<div class="pa-pioche"><div class="pa-ph"><span class="pa-pile"><img alt="" src="assets/sceaux/dos.webp"><b>${src.length}</b></span><span><b>Pioche</b><span class="small muted">Tour ${st.round}${st.turn === 'p' ? ' · à toi' : ` · à ${esc(PA.RIVALS[st.rival].name)}`}</span></span></div>
+    return `<div class="pa-pioche"><div class="pa-ph"><span class="pa-pile"><img alt="" src="assets/jeux/pa-pioche.webp"><b>${src.length}</b></span><span><b>Pioche</b><span class="small muted">Tour ${st.round}${st.turn === 'p' ? ' · à toi' : ` · à ${esc(PA.RIVALS[st.rival].name)}`}</span></span></div>
       <div class="pa-pfs">${facs}</div>${sps ? `<div class="pa-pss">${sps}</div>` : ''}</div>`;
   }
   function controls(st) {
@@ -141,7 +141,7 @@ export default function pacteScreen(app, root) {
      à côté des deux boutons ; un toucher explique et demande confirmation */
   const dblSeal = (st) => {
     const on = PA.canDouble(st), used = !st.dbl.p;
-    return `<button class="pa-dbl2 ${on ? 'on' : ''} ${used ? 'used' : ''}" data-pa="double" aria-label="${esc(t('Défier le pacte'))}"><b>×2</b><small>${used ? 'Défié' : 'Défier'}</small></button>`;
+    return `<button class="pa-dbl2 ${on ? 'on' : ''} ${used ? 'used' : ''}" data-pa="double" aria-label="${esc(t('Défier le pacte'))}"><img alt="" src="assets/jeux/pa-defi.webp"><small>${used ? 'Défié' : 'Défier'}</small></button>`;
   };
   async function askDouble(st) {
     if (!st.dbl.p) return void toast(t('Tu as déjà défié le pacte dans cette partie.'));
