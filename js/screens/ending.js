@@ -7,6 +7,9 @@ import { t, LANG } from '../i18n.js';
 import { sfx, haptic, hasSample, playVoice, loadVoice, clearVoices, getBytes, listV } from '../ui/sound.js';
 import { musicCinema, musicRelease } from '../ui/music.js';
 
+/* v787 : signatures peintes dans la langue de la cinématique (assets/fin/sig-<clé>-<langue>.webp) ; ajouter la langue ici à l'arrivée des images, sinon le français */
+const SIG_LANGS = new Set([]);
+const sigSrc = (k, l) => `assets/fin/sig-${k}${l !== 'fr' && SIG_LANGS.has(l) ? '-' + l : ''}.webp`;
 const NAMES = [['braise', 'La Scelleuse de Braise'], ['fosses', 'Le Scelleur des Fosses'], ['cieux', 'La Scelleuse des Cieux'], ['bois', 'Le Scelleur des Bois'], ['tombes', 'La Scelleuse des Tombes'], ['montagnes', 'Le Scelleur des Montagnes']]; /* v774 : une signature peinte par Scelleur */
 
 /* la page scellée de l'Abysse : affichée comme une carte, mais jamais dans la collection ni en combat */
@@ -22,6 +25,7 @@ export const CINE_SCENES = {
 
 export function playEnding(app, { name, lang, start } = {}) {
   const who = name || sync.profile?.pseudo || app.game?.s?.name || 'Toi';
+  const sigLang = lang || LANG;
   const nameAt = (i) => 0.5 + i * 0.55; /* secondes : apparition de chaque signature */
   const scenes = [
     { cls: 'eye', voice: 'fin-1', snd: ['ci-oeil', 'rumble'], hap: 'heavy', fx: 'motes', hold: 2600, text: 'L’œil se referme.',
@@ -29,7 +33,7 @@ export function playEnding(app, { name, lang, start } = {}) {
     { img: 'page', cls: 'page', tr: 'black', voice: 'fin-2', snd: ['ci-page', 'page'], hap: 'light', fx: 'dust', text: 'Dans le silence, une page glisse jusqu’à toi : la toute première du Bestiaire interdit, celle que personne n’avait jamais vue.' },
     { img: 'velin', cls: 'velin', tr: 'page', voice: 'fin-3', snd: [null, 'page'], fx: 'dust', hold: 5200, text: 'Sept noms y sont signés, ceux des premiers Scelleurs ; le septième a été gratté jusqu’au vélin. Dessous, une ligne d’encre fraîche s’écrit toute seule : c’est ton nom.',
       beats: [...NAMES.map((_, i) => nameAt(i)), nameAt(6), 0.4 + nameAt(7)], /* une plume et une petite vibration par signature */
-      extra: `<div class="endx-names">${NAMES.map(([k, n], i) => `<span style="--d:${nameAt(i)}s"><img alt="${esc(n)}" src="assets/fin/sig-${k}.webp"></span>`).join('')}<span class="scr" style="--d:${nameAt(6)}s"><img alt="" src="assets/fin/sig-gratte.webp"></span><span class="me" style="--d:${0.4 + nameAt(7)}s" translate="no">${esc(who)}</span></div>` },
+      extra: `<div class="endx-names">${NAMES.map(([k, n], i) => `<span style="--d:${nameAt(i)}s"><img alt="${esc(n)}" src="${sigSrc(k, sigLang)}"></span>`).join('')}<span class="scr" style="--d:${nameAt(6)}s"><img alt="" src="assets/fin/sig-gratte.webp"></span><span class="me" style="--d:${0.4 + nameAt(7)}s" translate="no">${esc(who)}</span></div>` },
     { img: 'reveur', cls: 'dream', tr: 'ink', fog: true, voice: 'fin-4', snd: ['ci-reveil', 'rumble'], hap: 'heartbeat', fx: 'motes', text: 'Les vingt chapitres sont refermés. Mais au bas de la page, quelque chose vient d’ouvrir les yeux.', extra: '<i class="endx-eyes"></i>' },
     { opt: 'assets/fin/reveil.webp', cls: 'close', tr: 'black', snd: [null, null], hap: 'heartbeat', fx: 'motes', hold: 1400, /* v779 : gros plan animé attendu (Gemini) : les yeux qui s'ouvrent */
       extra: '<div class="endx-close wide endx-anim" data-frames="6" data-first="700" data-step="330" data-last="520" style="background-image:url(assets/fin/reveil.webp);background-size:600% 100%"></div>' },
