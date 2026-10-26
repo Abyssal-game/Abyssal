@@ -7505,3 +7505,20 @@ html.kb-open .sheet-wrap:not(.sheet-full) .sheet { max-height: 100%; overflow-y:
 .dt-trophy dt .ic, .dt-trophy dt img { width: 16px; height: 16px; vertical-align: -3px; }
 .pf-choc { border-color: #E0485E #C9D2DE #C9D2DE #E0485E; border-style: double; border-width: 5px; box-shadow: 0 0 0 2px #1A0508, 0 0 12px rgba(224, 72, 94, .75), 0 0 24px rgba(242, 193, 78, .35); }
 .rm .vd-pack.clash, .fx-light .vd-flame.big img { animation: none; }
+
+/* v808 : encart qui explique un coup ennemi sans dégâts (prépare, condamne, désigne, protège…) ; un toucher le ferme */
+.dv .cb-enote { position: absolute; left: 50%; top: 44%; z-index: 95; width: min(92%, 360px); transform: translate(-50%, -50%); padding: 12px 14px 10px; border-radius: 14px; text-align: left;
+  background: linear-gradient(180deg, #1C141E, #0C090E); border: 1px solid rgba(201, 164, 90, .55); box-shadow: 0 10px 30px rgba(0, 0, 0, .6), inset 0 0 18px rgba(120, 30, 40, .18);
+  animation: enoteIn .22s ease-out both; }
+.dv .cb-enote.out { opacity: 0; transition: opacity .25s; }
+@keyframes enoteIn { from { opacity: 0; transform: translate(-50%, -46%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+.cb-enote-h { display: flex; align-items: center; gap: 10px; }
+.cb-enote-h .iicon { width: 34px; height: 34px; flex: none; }
+.cb-enote-h span { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.cb-enote-h small { color: #C9A45A; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; }
+.cb-enote-h b { font-family: 'Cinzel', serif; font-size: 1.02rem; color: #F2E6C9; }
+.cb-enote-h i { flex: none; font-style: normal; font-size: .7rem; padding: 3px 8px; border-radius: 999px; color: #BFE3C6; background: rgba(60, 120, 80, .25); border: 1px solid rgba(110, 190, 130, .4); }
+.cb-enote p { margin: 8px 0 0; font-size: .86rem; line-height: 1.38; color: #E6DED0; }
+.cb-enote .cb-enote-t { color: #FF9B8A; font-weight: 600; }
+.cb-enote-x { display: block; margin-top: 6px; text-align: right; color: #8E8678; font-size: .7rem; }
+@media (prefers-reduced-motion: reduce) { .dv .cb-enote { animation: none; } }

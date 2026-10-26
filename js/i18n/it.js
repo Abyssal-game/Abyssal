@@ -8672,6 +8672,9 @@ export default {
   "Souverain du Choc": "Sovrano della Sfida",
   "Atteins la ligue Abysse au Choc des Boosters.": "Raggiungi la lega Abisso nella Sfida delle Buste.",
   "Cadre du Choc": "Cornice della Sfida",
+  "Aucun dégât": "Nessun danno",
+  "Visée : {name}": "Bersaglio: {name}",
+  "Condamne ta créature la plus affaiblie : elle sera exécutée au tour suivant. Permute-la en réserve, défends-la, ou brise l’ennemi qui l’a condamnée.": "Condanna la tua creatura più indebolita: sarà giustiziata al turno successivo. Spostala nella riserva, difendila o spezza il nemico che l'ha condannata.",
 };
 
 export const names = {

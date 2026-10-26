@@ -8672,6 +8672,9 @@ export default {
   "Souverain du Choc": "Soberano da Batalha",
   "Atteins la ligue Abysse au Choc des Boosters.": "Alcança a liga Abismo na Batalha dos Pacotes.",
   "Cadre du Choc": "Moldura da Batalha",
+  "Aucun dégât": "Sem dano",
+  "Visée : {name}": "Alvo: {name}",
+  "Condamne ta créature la plus affaiblie : elle sera exécutée au tour suivant. Permute-la en réserve, défends-la, ou brise l’ennemi qui l’a condamnée.": "Condena tua criatura mais enfraquecida: ela será executada no turno seguinte. Troca-a para a reserva, defende-a ou quebra o inimigo que a condenou.",
 };
 
 export const names = {

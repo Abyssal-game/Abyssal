@@ -5348,7 +5348,7 @@ export default {
   "Touche le coffre pour l’ouvrir": "Tippe auf die Truhe, um sie zu öffnen",
   "Touche l’écran pour entrer": "Tippe auf den Bildschirm, um einzutreten",
   "Touche pour combattre": "Tippe, um zu kämpfen",
-  "Touche pour continuer": "Tippe, um fortzufahren",
+  "Touche pour continuer": "Tippen zum Fortfahren",
   "Touche pour descendre": "Tippe, um hinabzusteigen",
   "Touche pour fermer": "Tippe, um zu schließen",
   "Touche ton portrait pour te personnaliser": "Tippe auf dein Porträt, um dich anzupassen",
@@ -8672,6 +8672,9 @@ export default {
   "Souverain du Choc": "Souverän der Schlacht",
   "Atteins la ligue Abysse au Choc des Boosters.": "Erreiche die Liga Abgrund in der Booster-Schlacht.",
   "Cadre du Choc": "Schlacht-Rahmen",
+  "Aucun dégât": "Kein Schaden",
+  "Visée : {name}": "Ziel: {name}",
+  "Condamne ta créature la plus affaiblie : elle sera exécutée au tour suivant. Permute-la en réserve, défends-la, ou brise l’ennemi qui l’a condamnée.": "Verurteilt deine geschwächteste Kreatur: Sie wird in der nächsten Runde hingerichtet. Tausche sie in die Reserve, verteidige sie oder brich den Feind, der sie verurteilt hat.",
 };
 
 export const names = {

@@ -8683,6 +8683,9 @@ export default {
   "Souverain du Choc": "Sovereign of the Clash",
   "Atteins la ligue Abysse au Choc des Boosters.": "Reach the Abyss League in the Booster Clash.",
   "Cadre du Choc": "Clash Frame",
+  "Aucun dégât": "No damage",
+  "Visée : {name}": "Target: {name}",
+  "Condamne ta créature la plus affaiblie : elle sera exécutée au tour suivant. Permute-la en réserve, défends-la, ou brise l’ennemi qui l’a condamnée.": "Condemns your weakest creature: it will be executed next turn. Swap it to the reserve, defend it, or break the enemy who condemned it.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

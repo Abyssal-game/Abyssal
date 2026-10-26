@@ -1084,6 +1084,22 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     app.state.lastEnemyTurn = html0; // gardé pour « Voir ce qui s'est passé » après une défaite
     /* v409 : plus de fenêtre « Tour ennemi » pendant le combat (jugée pénible) ; le résumé reste lisible après une défaite */
   }
+  /* v808 (« on ne sait pas vraiment ce qu’elle fait ») : un coup ennemi qui ne retire aucun PV et ne se défend pas
+     (prépare, condamne, désigne, protège, soigne, change les règles…) est expliqué dans un encart ; un toucher le ferme */
+  const NOTE_KINDS = new Set(['charge', 'channel', 'shield', 'heal', 'hunt', 'rally', 'gather', 'mimic', 'decree', 'shift', 'brood', 'sentence', 'chant', 'wind', 'rewind', 'mirror', 'wish', 'slumber', 'verdict']);
+  async function actNote(s, ev) {
+    const k = s.kind, def = INTENTS[k];
+    if (!def || !(NOTE_KINDS.has(k) || /^labp\d/.test(k))) return;
+    if (ev.some((x) => x.t === 'dmg' && st.units[x.u]?.side === 'ally')) return;
+    const a = st.units[s.a], tg = s.t && st.units[s.t]?.side === 'ally' ? st.units[s.t] : null;
+    const host = $('.dv'); if (!host || !a) return;
+    const box = document.createElement('div'); box.className = 'cb-enote';
+    box.innerHTML = `<div class="cb-enote-h">${intentIcon(k)}<span><small translate="no">${esc(tw(uName(a)))}</small><b>${esc(def.name)}</b></span><i>${tr('Aucun dégât')}</i></div>
+      <p>${esc(def.desc)}</p>${tg ? `<p class="cb-enote-t" translate="no">${esc(tr('Visée : {name}', { name: tw(uName(tg)) }))}</p>` : ''}<small class="cb-enote-x">${tr('Touche pour continuer')}</small>`;
+    host.appendChild(box);
+    await new Promise((res) => { const done = () => { clearTimeout(tm); box.removeEventListener('pointerdown', done); res(); }; const tm = setTimeout(done, reduced ? 2600 : Math.max(2600, T(4200))); box.addEventListener('pointerdown', done); });
+    box.classList.add('out'); setTimeout(() => box.remove(), 300);
+  }
   async function enemyTurn() {
     log ||= [];
     for (let n = E.duelNext(where); n && alive_; n = E.duelNext(where)) {
@@ -1106,6 +1122,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       lastDef = res; // pas de gros plan d'impact si le coup est esquivé ou paré
       await play(ev);
       lastDef = 'none'; acting = null;
+      if (alive_ && !st.over) await actNote(s, ev);
     }
     if (!alive_) return;
     const ev = E.duelEndEnemy(where);

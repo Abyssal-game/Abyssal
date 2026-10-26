@@ -4,7 +4,7 @@ import { VERSION } from '../config.js';
 // Chaîne : chaque son → (sec + réverbération de salle) → compresseur → volume général.
 // Les sons sont faits de couches : transitoire (le « clic » du contact), corps (le grave), queue (la résonance).
 // Petites variations aléatoires de hauteur pour que les sons répétés ne sonnent pas mécaniques.
-let ctx = null, endG = null, master = null, bus = null, verb = null, enabled = true, volume = 0.7, haptics = true, loud = false;
+let ctx = null, endG = null, master = null, bus = null, fxDuck = null, voiceBus = null, verb = null, enabled = true, volume = 0.7, haptics = true, loud = false;
 // Branchements de la musique (js/ui/music.js) : baisse de la musique pendant les grands moments
 export const hooks = { duck: null };
 let noiseBuf = null, brownBuf = null, voices = 0;
@@ -22,7 +22,8 @@ function ensure() {
     comp.threshold.value = -16; comp.knee.value = 12; comp.ratio.value = 4; comp.attack.value = 0.004; comp.release.value = 0.2;
     endG = ctx.createGain(); endG.connect(ctx.destination); /* v622 : sortie commune (sons et musique), coupée en fondu */
     comp.connect(master).connect(endG);
-    bus = ctx.createGain(); bus.connect(comp);
+    fxDuck = ctx.createGain(); fxDuck.connect(comp); bus = ctx.createGain(); bus.connect(fxDuck); /* v808 : les bruitages baissent quand une voix parle */
+    voiceBus = ctx.createGain(); voiceBus.connect(comp);
     // Réverbération : réponse impulsionnelle générée (bruit stéréo qui décroît), comme une crypte
     verb = ctx.createConvolver();
     verb.buffer = impulse(2.4, 2.8);
@@ -528,10 +529,12 @@ export async function playVoice(url) {
   if (!buf || !ensure()) return null;
   try {
     const src = ctx.createBufferSource(); src.buffer = buf;
-    const g = ctx.createGain(); g.gain.value = 1.15;
-    src.connect(g); g.connect(bus); src.start();
-    hooks.duck?.(buf.duration + 0.4, 0.35);
-    return { ms: buf.duration * 1000, stop() { try { g.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.08); src.stop(ctx.currentTime + 0.4); } catch (e) { /* rien */ } } };
+    const g = ctx.createGain(); g.gain.value = 1.4;
+    src.connect(g); g.connect(voiceBus || bus); src.start();
+    /* v808 (« on n’entend pas bien le narrateur ») : la musique descend à 15 % et les bruitages à 40 % tant que la voix parle */
+    hooks.duck?.(buf.duration + 0.4, 0.15);
+    if (fxDuck) { const t = ctx.currentTime, fg = fxDuck.gain; fg.cancelScheduledValues(t); fg.setValueAtTime(fg.value, t); fg.linearRampToValueAtTime(0.4, t + 0.12); fg.setValueAtTime(0.4, t + buf.duration + 0.2); fg.linearRampToValueAtTime(1, t + buf.duration + 0.9); }
+    return { ms: buf.duration * 1000, stop() { try { g.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.08); src.stop(ctx.currentTime + 0.4); if (fxDuck) { const t = ctx.currentTime; fxDuck.gain.cancelScheduledValues(t); fxDuck.gain.setValueAtTime(fxDuck.gain.value, t); fxDuck.gain.linearRampToValueAtTime(1, t + 0.4); } } catch (e) { /* rien */ } } };
   } catch (e) { return null; }
 }
 export function clearVoices() { for (const k of Object.keys(voiceBufs)) delete voiceBufs[k]; }
