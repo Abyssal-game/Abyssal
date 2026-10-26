@@ -8779,6 +8779,9 @@ export default {
   "Ton Choc des Boosters contre {name} a commencé !": "La tua Sfida delle Buste contro {name} è iniziata!",
   "À toi de jouer au Choc des Boosters": "Tocca a te nella Sfida delle Buste",
   "À toi de jouer dans {n} Chocs des Boosters": "Tocca a te in {n} Sfide delle Buste",
+  "Série : {n}": "Serie: {n}",
+  "Série éteinte": "Serie spenta",
+  "Nouvelle": "Nuova",
 };
 
 export const names = {

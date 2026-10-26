@@ -57,7 +57,7 @@ export function createMpLobby(app, root, spec) {
     }
     drawLobby();
     try { list = await cloud.mpList(spec.game); err = null; } catch (e) { err = errMsg(e); list = list || []; }
-    if (!alive || ui.open) return;
+    if (!alive || ui.open || spec.busyLocal?.()) return;
     if (list[0]?.now) skew = new Date(list[0].now).getTime() - Date.now();
     // v522 : partie rapide trouvée pendant la recherche : on y va tout de suite
     const found = list.find((v) => v.pace === 'fast' && v.status === 'playing' && ui.searching === v.id);
@@ -66,7 +66,7 @@ export function createMpLobby(app, root, spec) {
     ui.searching = searching?.id || null; ui.searchingV = searching || null;
     if (spec.onLobby) { try { await spec.onLobby(list); } catch (e) { /* plus tard */ } } /* v811 : Choc (jetons rendus) */
     await claimAll();
-    if (!alive || ui.open) return; /* v527 : une partie ouverte pendant l'encaissement reste ouverte */
+    if (!alive || ui.open || spec.busyLocal?.()) return; /* v527 : une partie ouverte pendant l'encaissement reste ouverte */
     checkTurns(app, { force: true });
     drawLobby();
     schedule(lobby, ui.searching ? 3000 : 20000);

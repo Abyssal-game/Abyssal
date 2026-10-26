@@ -163,43 +163,45 @@ export function createChocGame(app, root) {
   }
 
   // ——— Fin de partie : manches, cartes gardées (les gagnantes + une au choix), carte prise à l'adversaire ———
+  /* v813 : écran de fin compact : tout tient sur l'écran, sans défiler (demande du propriétaire) */
   function endScreen(v, ctx) {
     const s = v.state, me = v.me, foe = foeOf(v);
     const r = s.winner === 'draw' ? 'draw' : s.winner === me ? 'win' : 'lose';
     const won = wonIdx(s, me), out = done[v.id];
     const hand = s.hand[me] || [], fh = s.hand[foe] || [];
-    const recap = s.rounds.map((x, j) => `<div class="kc-rec ${x.win === me ? 'w' : x.win ? 'l' : 'n'}"><small>${t('Manche {n}', { n: j + 1 })}</small>${cardHTML(x[me].card, { small: true, force: x[me].force })}<b>${x[me].force} – ${x[foe].force}</b>${cardHTML(x[foe].card, { small: true, force: x[foe].force })}</div>`).join('');
+    const mini = (c, f) => cardHTML(c, { small: true, force: f });
+    const recap = `<div class="kc-recs3">${s.rounds.map((x, j) => `<div class="kc-r3 ${x.win === me ? 'w' : x.win ? 'l' : 'n'}"><small>${t('Manche {n}', { n: j + 1 })}</small><span class="kc-r3c">${mini(x[me].card, x[me].force)}${mini(x[foe].card, x[foe].force)}</span><b>${x[me].force} – ${x[foe].force}</b></div>`).join('')}</div>`;
+    const reason = v.reason === 'timeout' ? (r === 'win' ? t('Ton adversaire n’a pas joué à temps.') : t('Tu n’as pas joué à temps.')) : v.reason === 'resign' ? (r === 'win' ? t('Ton adversaire a abandonné.') : t('Tu as abandonné.')) : '';
+    const head = `<div class="kc-ehead"><img class="vd-emb ${r}" alt="" src="assets/versus/${EMB[r]}.webp"><div><h2 class="vs-title ${r}">${t(RES[r])}</h2>
+      <p class="kc-tally">${t('Manches')} <b>${s.wins[me]} – ${s.wins[foe]}</b>${s.wins[me] === s.wins[foe] ? ` · ${t('forces {a} – {b}', { a: s.total[me], b: s.total[foe] })}` : ''}</p>${reason ? `<p class="small">${reason}</p>` : ''}</div></div>`;
+    const rematch = !ctx.train && v.foe ? `<button class="btn dc-plq" data-mp="rematch">${icon('swords')}${t('Revanche')}</button>` : '';
     let body = '';
-    if (ctx.train) body = `<p class="small">${t('Entraînement : rien n’est gagné ni perdu.')}</p><button class="btn primary block dc-plq dc-plq-red" data-mp="train">${icon('refresh')}${t('Rejouer')}</button>`;
-    else if (out) body = summary(v, out);
+    if (ctx.train) body = `<p class="small center">${t('Entraînement : rien n’est gagné ni perdu.')}</p><div class="kc-acts"><button class="btn primary dc-plq dc-plq-red" data-mp="train">${icon('refresh')}${t('Rejouer')}</button><button class="btn" data-mp="tback">${t('Revenir')}</button></div>`;
+    else if (out) body = `${summary(v, out)}<div class="kc-acts">${rematch}<button class="btn" data-mp="back">${t('Revenir')}</button></div>`;
     else if (!v.claimed) {
       const pickable = hand.map((c, i) => i).filter((i) => !won.includes(i));
       if (keep == null || won.includes(keep) || !hand[keep]) keep = pickable.length === 1 ? pickable[0] : null;
-      body = `<h3 class="kc-h">${t('Tes cartes')}</h3><p class="small">${won.length ? t('Celles qui ont gagné leur manche sont à toi. Choisis-en <b>une de plus</b> à garder :') : t('Choisis <b>une carte</b> à garder :')}</p>
-        <div class="kc-keep">${hand.map((c, i) => cardHTML(c, { i: won.includes(i) ? null : i, act: 'keep', on: keep === i, extra: won.includes(i) ? 'kept' : keep === i ? 'kept' : 'gone' })).join('')}</div>
-        ${r === 'win' && fh.length ? `<h3 class="kc-h">${t('Ton butin')}</h3><p class="small">${t('Prends la copie d’une carte de {name} :', { name: `<span translate="no">${esc(ctx.foeName(v))}</span>` })}</p>
-        <div class="kc-keep">${fh.map((c, i) => cardHTML(c, { i, act: 'take', on: take === i, extra: take === i ? 'kept' : '' })).join('')}</div>` : ''}
-        <p class="small muted">${t('Les autres retournent à l’Abysse.')}</p>
-        <button class="btn primary block big-cta dc-plq dc-plq-red" data-mp="claim" ${keep != null && (r !== 'win' || !fh.length || take != null) ? '' : 'disabled'}>${t('Garder mes cartes')}</button>`;
-    } else body = `<p class="small muted">${t('Tes cartes de cette partie sont déjà dans ta collection.')}</p>`;
+      body = `<p class="kc-h">${won.length ? t('Celles qui ont gagné leur manche sont à toi. Choisis-en <b>une de plus</b> à garder :') : t('Choisis <b>une carte</b> à garder :')}</p>
+        <div class="kc-keep9">${hand.map((c, i) => cardHTML(c, { small: true, i: won.includes(i) ? null : i, act: 'keep', on: keep === i, extra: won.includes(i) ? 'kept won' : keep === i ? 'kept' : 'gone' })).join('')}</div>
+        ${r === 'win' && fh.length ? `<p class="kc-h">${t('Prends la copie d’une carte de {name} :', { name: `<span translate="no">${esc(ctx.foeName(v))}</span>` })}</p>
+        <div class="kc-keep9">${fh.map((c, i) => cardHTML(c, { small: true, i, act: 'take', on: take === i, extra: take === i ? 'kept' : 'gone' })).join('')}</div>` : ''}
+        <p class="small muted center kc-gone">${t('Les autres retournent à l’Abysse.')}</p>
+        <button class="btn primary block dc-plq dc-plq-red" data-mp="claim" ${keep != null && (r !== 'win' || !fh.length || take != null) ? '' : 'disabled'}>${t('Garder mes cartes')}</button>`;
+    } else body = `<p class="small muted center">${t('Tes cartes de cette partie sont déjà dans ta collection.')}</p><div class="kc-acts">${rematch}<button class="btn" data-mp="back">${t('Revenir')}</button></div>`;
     root.innerHTML = `<div class="mq-game kc-game kc-end ${r}">
       <div class="mq-bar"><span></span><b>${t(ctx.train ? 'Entraînement' : 'Le Choc des Boosters')}</b><button class="btn small ghost" data-mp="${ctx.train ? 'tback' : 'back'}" aria-label="${t('Revenir')}">${icon('close')}</button></div>
-      <div class="panel kc-endbox"><img class="vd-emb ${r}" alt="" src="assets/versus/${EMB[r]}.webp"><h2 class="vs-title ${r}">${t(RES[r])}</h2>
-        <p class="kc-tally">${t('Manches')} <b>${s.wins[me]} – ${s.wins[foe]}</b>${s.wins[me] === s.wins[foe] ? ` · ${t('forces {a} – {b}', { a: s.total[me], b: s.total[foe] })}` : ''}</p>
-        ${v.reason === 'timeout' ? `<p class="small">${r === 'win' ? t('Ton adversaire n’a pas joué à temps.') : t('Tu n’as pas joué à temps.')}</p>` : v.reason === 'resign' ? `<p class="small">${r === 'win' ? t('Ton adversaire a abandonné.') : t('Tu as abandonné.')}</p>` : ''}
-        <div class="kc-recs">${recap}</div>${body}
-        ${!ctx.train && (out || v.claimed) && v.foe ? `<button class="btn block dc-plq" data-mp="rematch">${icon('swords')}${t('Revanche')}</button>` : ''}
-        ${ctx.train ? '' : `<button class="btn block" data-mp="back">${t('Revenir aux parties')}</button>`}</div></div>`;
+      <div class="panel kc-endbox">${head}${recap}${body}</div></div>`;
   }
   function summary(v, out) {
-    const kept = (out.cards || []).map((x) => { const k = cat.get(x.id); return k ? `<span class="vd-loot"><img alt="" src="${artUrl(k, { lite: true })}"><span>${esc(tw(k.name))}${x.isNewCard ? ` <em>${t('Nouvelle !')}</em>` : ''}</span></span>` : ''; }).join('');
-    const tk = out.take && cat.get(out.take.id);
+    const cards = [...(out.cards || []), ...(out.take ? [{ ...out.take, copy: true }] : [])];
+    const row = cards.map((x) => { const k = cat.get(x.id); return k ? `<span class="kc-kept">${cardHTML({ ...x, faction: k.faction, rarity: k.rarity }, { small: true })}${x.isNewCard ? `<em>${t('Nouvelle')}</em>` : x.copy ? `<em class="cp">${t('Copie')}</em>` : ''}</span>` : ''; }).join('');
     const st = out.streak, lg = out.league;
-    return `<h3 class="kc-h">${t('Gardées dans ta collection')}</h3><div class="vd-loots">${kept}${tk ? `<span class="vd-loot"><img alt="" src="${artUrl(tk, { lite: true })}"><span>${t('Copie de <b>{card}</b>', { card: esc(tw(tk.name)) })}</span></span>` : ''}
-      ${out.shards ? `<span class="vd-loot"><img alt="" src="assets/icons/cur-shard.webp"><span>+${fmt(out.shards)} ${t('éclats')}${out.mult > 1 ? ` <em>×${String(out.mult).replace('.', ',')}</em>` : ''}</span></span>` : ''}
-      ${out.streakChest ? `<span class="vd-loot"><img alt="" src="assets/chests/${out.streakChest}.webp"><span>${t('Coffre de série')}</span></span>` : ''}</div>
-      ${st ? (out.result === 'win' ? `<div class="vd-streak on">${flameHTML(st.after, 'big')}<span>${st.after >= 2 ? t('Série ardente : <b>{n} victoires</b> d’affilée.', { n: st.after }) : t('La Série ardente s’allume.')}<small>${t('Prochaine victoire : butin ×{m}', { m: String(streakMult(st.after + 1)).replace('.', ',') })}</small></span></div>` : st.broken ? `<div class="vd-streak out">${flameHTML(st.before, 'big dead')}<span>${t('Ta série de <b>{n} victoires</b> s’éteint.', { n: st.before })}</span></div>` : '') : ''}
-      ${lg ? `<div class="vd-league ${lg.after > lg.before ? 'up' : lg.after < lg.before ? 'down' : ''}">${leagueBadge(lg.after, 'big')}<span><b>${lg.after > lg.before ? t('Tu montes en ligue {l} !', { l: t(LEAGUES[lg.after].name) }) : lg.after < lg.before ? t('Tu redescends en ligue {l}…', { l: t(LEAGUES[lg.after].name) }) : t('Ligue {l}', { l: t(LEAGUES[lg.after].name) })}</b><small>${fmt(lg.pts)} ${t('points')} <em class="${lg.delta >= 0 ? 'pos' : 'neg'}">${lg.delta >= 0 ? '+' : '−'}${Math.abs(lg.delta)}</em></small></span></div>` : ''}`;
+    const chips = [out.shards ? `<span class="kc-chip"><img alt="" src="assets/icons/cur-shard.webp">+${fmt(out.shards)}${out.mult > 1 ? ` <em>×${String(out.mult).replace('.', ',')}</em>` : ''}</span>` : '',
+      out.streakChest ? `<span class="kc-chip"><img alt="" src="assets/chests/${out.streakChest}.webp">${t('Coffre de série')}</span>` : ''].filter(Boolean).join('');
+    const stHTML = !st ? '' : out.result === 'win' ? `<span class="kc-mini on">${flameHTML(st.after)}<small>${t('Série : {n}', { n: st.after })}</small></span>` : st.broken ? `<span class="kc-mini out">${flameHTML(st.before, 'dead')}<small>${t('Série éteinte')}</small></span>` : '';
+    const lgHTML = !lg ? '' : `<span class="kc-mini ${lg.after > lg.before ? 'up' : lg.after < lg.before ? 'down' : ''}">${leagueBadge(lg.after)}<small>${fmt(lg.pts)} ${t('points')} <em class="${lg.delta >= 0 ? 'pos' : 'neg'}">${lg.delta >= 0 ? '+' : '−'}${Math.abs(lg.delta)}</em></small></span>`;
+    return `<p class="kc-h">${t('Gardées dans ta collection')}</p><div class="kc-keep9 kc-keptrow">${row}</div>
+      ${chips ? `<div class="kc-chips">${chips}</div>` : ''}${stHTML || lgHTML ? `<div class="kc-minis">${stHTML}${lgHTML}</div>` : ''}`;
   }
 
   function wheelSheet() {

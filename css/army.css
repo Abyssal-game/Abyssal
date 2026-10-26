@@ -7662,3 +7662,52 @@ html.kb-open .sheet-wrap:not(.sheet-full) .sheet { max-height: 100%; overflow-y:
 .kc-cyc { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
 .kc-cyc .sigil { width: 14px; height: 14px; }
 .kc-wheel .picon, .kc-wheel img { width: 18px !important; height: 18px !important; }
+
+/* v813 : Choc : bouton Entraînement sur une ligne, écran de fin qui tient sans défiler, ligue et série dans les plaques */
+.kc-trainbtn { flex-direction: row; gap: 8px; }
+.kc-trainsub { margin: 4px 0 0; }
+.kc-end { min-height: 0; height: calc(var(--app-h, 100dvh) - var(--safe-t, 0px) - max(var(--safe-b, 0px), var(--vh-gap, 0px)) - 20px); overflow: hidden; }
+.kc-end .kc-endbox { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: stretch; justify-content: space-evenly; gap: 6px; padding: 10px 12px; text-align: left; }
+.kc-ehead { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.kc-ehead .vd-emb { width: 64px; height: 64px; object-fit: contain; margin: 0; }
+.kc-ehead h2 { margin: 0; font-size: 1.6rem; line-height: 1.1; }
+.kc-ehead p { margin: 2px 0 0; }
+.kc-recs3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.kc-r3 { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px; border-radius: 10px; background: rgba(255, 255, 255, .04); }
+.kc-r3 small { color: #B9B2A3; font-size: .66rem; }
+.kc-r3c { display: flex; gap: 3px; width: 100%; justify-content: center; }
+.kc-r3c .kc-c { width: min(40%, 44px); }
+.kc-r3 > b { font: 800 .95rem/1 var(--f-display); }
+.kc-r3.w { box-shadow: inset 0 0 0 1px rgba(242, 193, 78, .6); }
+.kc-r3.w > b { color: #FFE7A0; }
+.kc-r3.l > b { color: #FF9C9C; }
+.kc-end .kc-h { margin: 2px 0 0; font: 600 .8rem/1.3 var(--f-body, inherit); color: #E8E0CF; text-align: center; }
+.kc-keep9 { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; }
+.kc-keep9 .kc-c.gone { opacity: .55; filter: grayscale(.5); }
+.kc-keep9 .kc-c.kept { box-shadow: 0 0 0 2px #7FE0A0, 0 0 10px rgba(127, 224, 160, .7); }
+.kc-keep9 .kc-c.on { box-shadow: 0 0 0 2px #FFE7A0, 0 0 12px rgba(242, 193, 78, .9); opacity: 1; filter: none; transform: translateY(-3px); }
+.kc-keep9 .kc-c.won::after { content: '✓'; position: absolute; top: 1px; right: 2px; font: 800 .7rem/1 sans-serif; color: #7FE0A0; text-shadow: 0 0 4px #000; }
+.kc-keep9 .kc-c[data-mp] { cursor: pointer; }
+.kc-gone { margin: 0; font-size: .72rem; }
+.kc-keptrow { grid-template-columns: repeat(auto-fit, minmax(34px, 46px)); justify-content: center; }
+.kc-kept { position: relative; display: block; }
+.kc-kept em { position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); font: 700 .5rem/1 var(--f-body, inherit); font-style: normal; white-space: nowrap; color: #1A1206; background: #FFE7A0; padding: 2px 3px; border-radius: 4px; }
+.kc-kept em.cp { background: #9FD8FF; }
+.kc-chips, .kc-minis, .kc-acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.kc-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 12px; background: rgba(0, 0, 0, .35); box-shadow: inset 0 0 0 1px rgba(201, 164, 90, .4); font-size: .8rem; }
+.kc-chip img { width: 22px; height: 22px; object-fit: contain; }
+.kc-chip em { color: #FF8A3D; font-style: normal; font-weight: 700; }
+.kc-mini { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 4px; border-radius: 14px; background: rgba(0, 0, 0, .35); font-size: .76rem; }
+.kc-mini small { font-size: .74rem; }
+.kc-mini em.pos { color: #7FE0A0; font-style: normal; }
+.kc-mini em.neg { color: #FF9C9C; font-style: normal; }
+.kc-acts { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); }
+.kc-acts .btn { min-height: 46px; }
+/* anciens duels revus : la ligue et la série posées dans la plaque, sous le nom (elles cachaient les plateaux) */
+.vd-plate .vd-tags { top: auto !important; bottom: 3% !important; transform: translateX(-50%) scale(.62); transform-origin: 50% 100%; }
+.kc-keptrow { grid-template-columns: repeat(auto-fit, minmax(50px, 60px)); gap: 8px; }
+.kc-kept em { font-size: .46rem; padding: 2px 4px; bottom: -7px; }
+@media (min-height: 800px) {
+  .kc-keep9:not(.kc-keptrow) { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; padding: 0 6%; }
+  .kc-keep9:not(.kc-keptrow) .kc-c.sm .kc-f { min-width: 20px; height: 20px; font-size: .8rem; }
+}

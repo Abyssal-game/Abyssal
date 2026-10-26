@@ -172,7 +172,7 @@ export default function versusScreen(app, root) {
     busyLocal: () => !!train,
     modeBar: () => head(),
     note: t('Choisis ta vitesse. À chaque manche, vous posez une carte en même temps ; si tu ne joues pas à temps, <b>la partie est perdue</b>.'),
-    intro: () => `<button class="btn block dc-plq dc-plq-dark kc-trainbtn" data-mp="train">${icon('p:help')}${t('Entraînement contre l’Abysse')}<small>${t('Sans jeton, rien à gagner ni à perdre')}</small></button>`,
+    intro: () => `<button class="btn block dc-plq dc-plq-dark kc-trainbtn" data-mp="train">${icon('p:help')}${t('Entraînement contre l’Abysse')}</button><p class="small muted center kc-trainsub">${t('Sans jeton, rien à gagner ni à perdre')}</p>`, /* v813 : la ligne d'explication dépassait du bouton */
     canPlay: () => tokens() > 0,
     rewardNote: () => `<p class="small muted center">${tokens() > 0 ? t('Une partie coûte <b>1 jeton</b>. Tu gardes les cartes qui gagnent leur manche, plus une au choix.') : t('Plus de jeton aujourd’hui : un nouveau arrive demain. Tu peux t’entraîner contre l’Abysse.')}</p>`,
     onLobby: async () => { const n = await app.partie.first('chocRefund'); if (n > 0) { toast(t(n > 1 ? '{n} jetons du Choc rendus (parties jamais commencées).' : '{n} jeton du Choc rendu (partie jamais commencée).', { n }), { icon: 'info' }); app.chrome?.(); } },
@@ -214,7 +214,11 @@ export default function versusScreen(app, root) {
   });
 
   app.holdRefresh = () => alive; /* la partie du serveur (jetons, cartes gardées) arrive sans redessiner l'écran : il se redessine lui-même */
-  loadOld().finally(() => { if (alive) lobby.show(); });
+  loadOld().finally(() => {
+    if (!alive) return;
+    lobby.show();
+    if (app.state.chocTrain) { app.state.chocTrain = false; startTrain(); } /* v813 : lancé depuis le Mode Créateur */
+  });
   lastMonth();
   return () => { alive = false; app.holdRefresh = null; train = null; lobby.stop(); game.stop(); document.body.classList.remove('battle-mode'); document.querySelector('.sc-scene')?.remove(); };
 }

@@ -8790,6 +8790,9 @@ export default {
   "Ton Choc des Boosters contre {name} a commencé !": "Your Booster Clash against {name} has begun!",
   "À toi de jouer au Choc des Boosters": "Your turn in the Booster Clash",
   "À toi de jouer dans {n} Chocs des Boosters": "Your turn in {n} Booster Clashes",
+  "Série : {n}": "Streak: {n}",
+  "Série éteinte": "Streak lost",
+  "Nouvelle": "New",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

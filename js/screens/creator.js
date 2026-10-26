@@ -13,7 +13,6 @@ import { openServerState } from './server-state.js'; /* v678 */
 import { perfOn, setPerf, perfLog, perfClear, perfReport } from '../ui/perf.js'; /* v601 */
 import { partieErrs, partie } from '../cloud/partie.js'; /* v740 */
 import { openPack } from './opening.js'; /* v769 */
-import { playTestDuel, TEST_LINEUPS } from './versus-test.js'; /* v803 */
 import { playEnding, playPrologue, CINE_SCENES } from './ending.js';
 import { LANGS, LANG } from '../i18n.js';
 
@@ -35,8 +34,6 @@ export function openCreator(app) {
   if (!LANGS[cine.lang]) cine.lang = LANG;
   const saveCine = () => { try { localStorage.setItem(CINE_KEY, JSON.stringify(cine)); } catch (e) { /* rien */ } };
   /* v803 : réglages du duel d'essai du Choc, gardés sur l'appareil */
-  let chocDev = { lineup: 'std1', force: 'any', streak: 'mine' };
-  try { chocDev = { ...chocDev, ...JSON.parse(localStorage.getItem('abyssal.chocDev') || '{}') }; } catch (e) { /* rien */ }
   const B = (x, label, cls = '') => `<button class="btn small ${cls}" data-x="${x}">${label}</button>`;
   /* v804 : Mode Créateur rangé en 4 onglets (le dernier ouvert est retenu sur l'appareil) */
   const TABS = [['test', 'Tester'], ['partie', 'Ma partie'], ['ateliers', 'Ateliers'], ['diag', 'Diagnostic']];
@@ -55,11 +52,8 @@ export function openCreator(app) {
         <div class="cr-bosses">${SEASONS.filter((se) => VEILLES[se.key]).map((se) => `<button class="btn small" data-veille="${se.key}"><b>${se.num}</b> · ${esc(BOSSES[VEILLES[se.key].boss].name)}</button>`).join('')}</div>`)}
       ${S('Aller à un étage', `<form class="cr-give" id="floor"><input class="input plain" name="n" type="number" min="1" max="200" placeholder="Étage" ${d.run ? '' : 'disabled'}><button class="btn small" type="submit" ${d.run ? '' : 'disabled'}>Y aller</button><button class="btn small" type="submit" name="power" value="1" ${d.run ? '' : 'disabled'}>Avec la puissance attendue</button></form>
         ${P(d.run ? `Chapitre en cours : étage ${d.run.floor}.` : 'Lance d’abord un chapitre dans la Descente.')}`)}
-      ${S('Choc des Boosters (essai)', `${P('Un face-à-face complet contre un adversaire fictif, sans serveur ni autre joueur. Rien n’est payé, gagné ni enregistré.')}
-        <p class="small">Boosters</p>${row(...[['std1', '1 standard'], ['mix3', 'Standard + Faction + Premium'], ['prem3', '3 premium'], ['choc', 'Composition du Choc']].map(([k, l]) => `<button class="btn small ${chocDev.lineup === k ? 'gold' : 'ghost'}" data-choc="lineup" data-v="${k}">${l}</button>`))}
-        <p class="small">Résultat</p>${row(...[['any', 'Au hasard'], ['win', 'Victoire'], ['lose', 'Défaite'], ['tie', 'Égalité']].map(([k, l]) => `<button class="btn small ${chocDev.force === k ? 'gold' : 'ghost'}" data-choc="force" data-v="${k}">${l}</button>`))}
-        <p class="small">Série ardente avant le duel</p>${row(...[['mine', 'La mienne'], ['0', '0'], ['2', '2'], ['4', '4'], ['6', '6'], ['9', '9']].map(([k, l]) => `<button class="btn small ${String(chocDev.streak) === k ? 'gold' : 'ghost'}" data-choc="streak" data-v="${k}">${l}</button>`))}
-        ${row(B('choc', 'Lancer un duel d’essai', 'gold'))}`, 'cr-choc')}
+      ${S('Choc des Boosters (essai)', `${P('Une partie d’entraînement du nouveau Choc contre l’Abysse : ouverture des boosters, 3 manches, Sceau d’Ardeur, Renfort, écran de fin. Rien n’est gagné ni perdu.')}
+        ${row(B('choc', 'Lancer un Choc d’entraînement', 'gold'), B('choctok', '+3 jetons du Choc'))}`, 'cr-choc')}
       ${S('Cercle de l’Abysse', `${P(g.s.devGames ? 'Toutes les salles des quatre jeux sont ouvertes, même celles pas encore gagnées. Ta progression ne change pas.' : 'Ouvre toutes les salles des quatre jeux (Duels des Sceaux, Pacte, Cryptes, Enchères) sans avoir gagné les précédentes, pour tester un adversaire précis.')}
         ${row(B('games', g.s.devGames ? 'Refermer les salles' : 'Ouvrir toutes les salles', g.s.devGames ? '' : 'gold'))}`)}
       ${S('Boosters', `${P(f ? `Prochain booster : une carte <b>${esc(RARITIES.find((r) => r.key === f.rarity)?.name || f.rarity)}</b>${f.variant ? ` en <b>${esc(VARIANTS[f.variant].name)}</b>` : ''} en dernière position.` : 'Impose la dernière carte du prochain booster (aussi celui de l’Abysse) :')}
@@ -135,8 +129,6 @@ export function openCreator(app) {
     if (e.target.id === 'bpow') { ui.bpow = e.target.checked; return; }
     const tb = e.target.closest('[data-crtab]');
     if (tb) { tab = tb.dataset.crtab; try { localStorage.setItem('abyssal.crTab', tab); } catch (er) { /* rien */ } draw(); (sheet.el || sheet.body)?.scrollTo?.({ top: 0 }); return; }
-    const ch = e.target.closest('[data-choc]');
-    if (ch) { chocDev[ch.dataset.choc] = ch.dataset.v; try { localStorage.setItem('abyssal.chocDev', JSON.stringify(chocDev)); } catch (er) { /* rien */ } return draw(); }
     const cf = e.target.closest('[data-cfilm]'), cl = e.target.closest('[data-clang]');
     if (cf) { cine.film = cf.dataset.cfilm; cine.start = 0; saveCine(); return draw(); }
     if (cl) { cine.lang = cl.dataset.clang; saveCine(); return draw(); }
@@ -172,10 +164,7 @@ export function openCreator(app) {
       if (x === 'choctok') g.devChocTokens(); /* v811 */
       if (x === 'abyss' || x === 'abyss1') { g.devAbyss(x === 'abyss1'); sheet.close(); setTimeout(() => openPack(app, 'abysse', { onDone: () => openCreator(app) }), 350); return; } /* v769 : fenêtre fermée pendant l'ouverture, rouverte après */
       if (x === 'abyss5') g.devAbyss(false, 5);
-      if (x === 'choc') { /* v803 : duel d'essai du Choc des Boosters */
-        const lineup = chocDev.lineup === 'choc' ? (app.state.versus?.lineup || TEST_LINEUPS.std1) : TEST_LINEUPS[chocDev.lineup];
-        sheet.close(); setTimeout(() => playTestDuel(app, { lineup, force: chocDev.force, streak: chocDev.streak === 'mine' || chocDev.streak == null ? null : +chocDev.streak, onClose: () => openCreator(app) }), 350); return;
-      }
+      if (x === 'choc') { sheet.close(); app.state.chocTrain = true; setTimeout(() => app.go('versus'), 300); return; } /* v813 : le nouveau Choc (entraînement) */
       if (x === 'cine') { /* v785 : prologue ou fin, langue et scène de départ au choix */
         cine.start = +(sheet.el?.querySelector('#cine-start')?.value ?? document.getElementById('cine-start')?.value ?? 0) || 0;
         const nm = document.getElementById('cine-name'); if (nm) cine.name = nm.value.trim();

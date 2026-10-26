@@ -8779,6 +8779,9 @@ export default {
   "Ton Choc des Boosters contre {name} a commencé !": "Sua Batalha dos Pacotes contra {name} começou!",
   "À toi de jouer au Choc des Boosters": "Sua vez na Batalha dos Pacotes",
   "À toi de jouer dans {n} Chocs des Boosters": "Sua vez em {n} Batalhas dos Pacotes",
+  "Série : {n}": "Sequência: {n}",
+  "Série éteinte": "Sequência apagada",
+  "Nouvelle": "Nova",
 };
 
 export const names = {

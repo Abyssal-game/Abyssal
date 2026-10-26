@@ -1926,7 +1926,7 @@ export default {
   "Contre-attaque !": "¡Contraataque!",
   "Contrôle plusieurs ennemis à la fois.": "Controla a varios enemigos a la vez.",
   "Contrôleur": "Controlador",
-  "Copie": "Copiar",
+  "Copie": "Copia",
   "Copie ce texte et garde-le précieusement.": "Copia este texto y guárdalo bien.",
   "Copie de ta partie enregistrée sur cet appareil.": "Copia de tu partida guardada en este dispositivo.",
   "Corrompue": "Corrupta",
@@ -8779,6 +8779,9 @@ export default {
   "Ton Choc des Boosters contre {name} a commencé !": "¡Tu Batalla de los Sobres contra {name} ha empezado!",
   "À toi de jouer au Choc des Boosters": "Te toca en la Batalla de los Sobres",
   "À toi de jouer dans {n} Chocs des Boosters": "Te toca en {n} Batallas de los Sobres",
+  "Série : {n}": "Racha: {n}",
+  "Série éteinte": "Racha apagada",
+  "Nouvelle": "Nueva",
 };
 
 export const names = {
