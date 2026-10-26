@@ -8330,3 +8330,22 @@ html.fx-light .dv.cb.cb2 .cb-res.ready .cb-gems i.on { animation: none; }
    il ne chevauche plus les médaillons ATQ / PV ; médaillons des règles du haut jamais coupés (place autour des anneaux et des pastilles). */
 .dv.cb .dv-c.has-fig .cb-tgt { top: 5% !important; bottom: auto !important; }
 .dv.cb.cb2 .dv-top .cb-rules { max-height: none; height: auto; align-items: center; padding: 6px 6px 6px 4px; margin: -6px 0 -6px -4px; }
+
+/* v831 (le propriétaire : cartes trop petites en combat sur iPhone SE) : sur les écrans bas (≤ 720 px), frise, bandeau, menu du bas
+   et marges des rangées resserrés : la place gagnée va aux cartes. */
+@media (max-height: 720px) {
+  .dv.cb.cb2 .cb-tl { height: 40px; min-height: 0; padding-top: 0; padding-bottom: 0; align-items: center; }
+  .dv.cb.cb2 .cb-tl .cb-tlr { width: 32px !important; height: 32px !important; }
+  .dv.cb.cb2 .cb-tl .cb-tlr.now { width: 38px !important; height: 38px !important; }
+  .dv.cb.cb2 .cb-feed { height: 30px; margin-top: 0; }
+  .dv.cb.cb2 .dv-row.enemy { padding: 10px 0 18px !important; }
+  .dv.cb.cb2 .dv-row.ally { padding: 8px 0 22px !important; }
+  .dv.cb.cb2 .cb-acts .cb-a, .dv.cb.cb2 .cb-acts .cb-grid.n5 .cb-a, .dv.cb.cb2 .cb-acts .cb-grid.n8 .cb-a { aspect-ratio: 1.36; }
+  .dv.cb.cb2 .cb-head { height: 30px; min-height: 0; }
+  .dv.cb.cb2 .cb-head .cb-por { width: 30px; height: 30px; }
+  .dv.cb.cb2 .cb-dockbar { height: 40px; }
+  .dv.cb.cb2 .cb-dockbar > *, .dv.cb.cb2 .cb-dockbar .dv-resw > * { min-height: 0; }
+  .dv.cb.cb2 .cb-swap2 { width: 40px; }
+  .dv.cb.cb2 .cb-dock { gap: 3px; }
+  .dv.cb.cb2 .cb-dock .dv-msg { min-height: 40px; padding-top: 2px; padding-bottom: 2px; font-size: .64rem; line-height: 1.15; }
+}
