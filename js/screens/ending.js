@@ -14,7 +14,13 @@ export function abyssPageHTML() {
   return `<div class="endx-card"><img alt="" src="assets/fin/carte-abysse.webp"><span class="endx-cn"><b>L’Abysse</b><small>Le plus grand rêve</small></span><span class="endx-tag">Page scellée · Trophée</span></div>`;
 }
 
-export function playEnding(app, { name } = {}) {
+/* v785 : Mode Créateur → Cinématiques : chaque scène, pour démarrer où on veut */
+export const CINE_SCENES = {
+  prologue: ['Les royaumes forgent le Bestiaire', 'Les sept gardiens le scellent', 'Gros plan : le sceau', 'La déchirure', 'Le livre éclate', 'Les pages tombent dans l’Abysse', 'Le dernier à savoir lire les sceaux'],
+  fin: ['L’œil se referme', 'La page qui glisse', 'Le vélin et les signatures', 'Celui qui rêve', 'Gros plan : les yeux s’ouvrent', 'La page scellée de l’Abysse', 'Arc I · Bientôt'],
+};
+
+export function playEnding(app, { name, lang, start } = {}) {
   const who = name || sync.profile?.pseudo || app.game?.s?.name || 'Toi';
   const nameAt = (i) => 0.5 + i * 0.55; /* secondes : apparition de chaque signature */
   const scenes = [
@@ -30,11 +36,11 @@ export function playEnding(app, { name } = {}) {
     { cls: 'trophy', tr: 'flash', voice: 'fin-5', snd: ['ci-trophee', null], fx: 'sparks', hold: 5000, sfx: () => sfx.reveal?.('S'), extra: `<div class="endx-tro"><span class="endx-k">Le dernier rêve</span>${abyssPageHTML()}<p>Tu n’as pas dompté l’Abysse : tu l’as refermé dans une page. Il ne combat pour personne. Il attend celui qui rêve.</p><small>Elle t’attend dans le Bestiaire, onglet Histoire.</small></div>` },
     { cls: 'tease', tr: 'ink', voice: 'fin-6', snd: [null, 'sheet'], hap: 'success', fx: 'motes', auto: false, extra: `<div class="endx-arc"><span class="endx-k">Arc I</span><h2>La Première Veille</h2><p>Celui qui rêve est réveillé. Le Bestiaire n’est pas encore fini.</p><b class="endx-soon">Bientôt</b><button class="btn gold" data-endx="close">Fermer</button></div>` },
   ];
-  return playScenes(app, scenes, { dir: 'fin', music: 'fin', skipTo: scenes.findIndex((x) => x.cls === 'trophy') });
+  return playScenes(app, scenes, { dir: 'fin', music: 'fin', skipTo: scenes.findIndex((x) => x.cls === 'trophy'), lang, start });
 }
 
 /* v775 : le prologue, au tout premier lancement (avant le guide de bienvenue) ; revisible dans Bestiaire → Histoire */
-export function playPrologue(app) {
+export function playPrologue(app, { lang, start } = {}) {
   const scenes = [
     { img: 'p1', cam: 'in', voice: 'pro-1', snd: ['ci-forge', 'rumble'], hap: 'heavy', fx: 'embers', text: 'Les sept royaumes ont forgé le Bestiaire interdit pour enfermer ce qui ne devait plus marcher sous le ciel.' },
     { img: 'p2b', tr: 'ink', cam: 'up', voice: 'pro-2', hap: 'double', fx: 'dust', text: 'Sept gardiens, un par royaume, l’ont scellé de leur main. Ce furent les premiers Scelleurs.' },
@@ -49,7 +55,7 @@ export function playPrologue(app) {
     { img: 'p4', cls: 'top', tr: 'page', cam: 'down', fog: true, voice: 'pro-4', snd: ['ci-chute', 'rumble'], hap: 'heavy', fx: ['pages', 'ash'], hold: 3800, text: 'Ses pages se sont envolées, et ses vingt chapitres sont tombés dans l’Abysse. Quelque chose les attendait.' },
     { img: 'p5', cls: 'last', tr: 'ink', cam: 'out', fog: true, voice: 'pro-5', snd: ['ci-abime', 'page'], hap: 'heartbeat', fx: 'motes', auto: false, text: 'Tu es le dernier à savoir lire les sceaux. Descends, et referme-les.', after: '<button class="btn gold endx-go" data-endx="close">Commencer</button>' },
   ];
-  return playScenes(app, scenes, { dir: 'prologue', music: 'prologue' });
+  return playScenes(app, scenes, { dir: 'prologue', music: 'prologue', lang, start });
 }
 
 /* ——— v779 : lecteur des cinématiques ———
@@ -59,22 +65,38 @@ export function playPrologue(app) {
 const LETTER_MS = 26, TEXT_DELAY = 700;
 let voiceSet = null;
 const voices = () => (voiceSet ||= getBytes(`assets/voix/manifest.json${listV()}`).then((b) => new Set(JSON.parse(new TextDecoder().decode(b)))).catch(() => new Set()));
-const voiceUrl = (id) => `assets/voix/${LANG}/${id}.mp3`;
+/* v785 : langue de la cinématique (celle du jeu, ou une autre choisie dans le Mode Créateur, sans changer celle du jeu) */
+let CUR = LANG, DICT = null;
+const lt = (s) => (CUR === LANG ? t(s) : CUR === 'fr' ? s : (DICT?.[s] ?? s));
+const voiceUrl = (id) => `assets/voix/${CUR}/${id}.mp3`;
+/* textes posés en français dans le code (boutons, titres des scènes) : traduits dans la langue choisie */
+function localize(root) {
+  if (CUR === LANG) return;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  for (let n = w.nextNode(); n; n = w.nextNode()) {
+    const k = n.nodeValue.trim(); if (!k || n.parentNode.closest('.endx-t, [translate="no"].me')) continue;
+    const v = lt(k); if (v !== k) n.nodeValue = n.nodeValue.replace(k, v);
+  }
+  root.querySelectorAll('[alt]').forEach((a) => { const v = lt(a.alt); if (v) a.alt = v; });
+}
 const probe = (src) => new Promise((ok) => { const im = new Image(); im.onload = () => ok(true); im.onerror = () => ok(false); im.src = src; });
 
 /* le texte, déjà traduit, lettre par lettre (les mots ne se coupent jamais) */
 function inkHTML(text) {
   let n = 0;
-  return t(text).split(/( )/).map((w) => (w === ' ' ? ' ' : `<span class="w">${[...w].map((ch) => `<i style="--i:${n++}">${esc(ch)}</i>`).join('')}</span>`)).join('');
+  return lt(text).split(/( )/).map((w) => (w === ' ' ? ' ' : `<span class="w">${[...w].map((ch) => `<i style="--i:${n++}">${esc(ch)}</i>`).join('')}</span>`)).join('');
 }
-const inkMs = (text) => TEXT_DELAY + [...t(text)].length * LETTER_MS;
+const inkMs = (text) => TEXT_DELAY + [...lt(text)].length * LETTER_MS;
 
-function playScenes(app, scenes, { dir, skipTo = -1, music = null }) {
+async function playScenes(app, scenes, { dir, skipTo = -1, music = null, lang = null, start = 0 }) {
+  CUR = lang && lang !== LANG ? lang : LANG; DICT = null;
+  if (CUR !== LANG && CUR !== 'fr') { try { DICT = (await import(`../i18n/${CUR}.js`)).default; } catch (e) { DICT = null; } }
   return new Promise((done) => {
     const rm = reducedMotion(app.game?.s?.settings);
     const light = document.documentElement.classList.contains('fx-light');
     const el = document.createElement('div');
     el.className = 'endx';
+    if (CUR !== LANG) { el.setAttribute('translate', 'no'); el.lang = CUR; }
     const main = scenes.filter((s) => !s.opt);
     el.innerHTML = `<div class="endx-prog">${main.map(() => '<i><b></b></i>').join('')}</div><button class="endx-skip" data-endx="skip">Passer</button>`;
     scenes.forEach((s) => { if (s.opt) probe(s.opt).then((ok) => { s.ok = ok; }); });
@@ -112,6 +134,7 @@ function playScenes(app, scenes, { dir, skipTo = -1, music = null }) {
       node.className = `endx-s ${s.cls || ''} tr-${tr}${s.cam && !rm ? ` cam-${s.cam}` : ''}${rm ? ' written' : ''}`;
       node.innerHTML = `${s.img ? `<img class="endx-bg" alt="" src="assets/${dir}/${s.img}.webp">` : ''}${s.fog && !light ? '<i class="endx-fog"></i>' : ''}${s.fx && !rm ? '<canvas class="endx-fx"></canvas>' : ''}${s.extra || ''}${s.text ? `<p class="endx-t ink" translate="no">${inkHTML(s.text)}</p>` : ''}${s.after || ''}${s.auto === false ? '' : '<span class="endx-tap">Touche pour continuer</span>'}`;
       el.insertBefore(node, el.querySelector('.endx-prog'));
+      localize(node);
       if (old) { old.classList.add('gone'); setTimeout(() => old.remove(), 1300); }
       if (tr === 'flash') { const f = document.createElement('i'); f.className = 'endx-flash'; el.appendChild(f); setTimeout(() => f.remove(), 1100); }
       prog();
@@ -142,8 +165,8 @@ function playScenes(app, scenes, { dir, skipTo = -1, music = null }) {
         voiceOn = true;
         vs.then((set) => {
           if (my !== token) return;
-          if (!set.has(`${LANG}/${s.voice}`)) { voiceOn = false; setTimeout(() => { if (my === token) release?.(); }, s.text ? inkMs(s.text) + 300 : 600); maybeAuto(); return; }
-          if (nx?.voice && set.has(`${LANG}/${nx.voice}`)) loadVoice(voiceUrl(nx.voice));
+          if (!set.has(`${CUR}/${s.voice}`)) { voiceOn = false; setTimeout(() => { if (my === token) release?.(); }, s.text ? inkMs(s.text) + 300 : 600); maybeAuto(); return; }
+          if (nx?.voice && set.has(`${CUR}/${nx.voice}`)) loadVoice(voiceUrl(nx.voice));
           playVoice(voiceUrl(s.voice)).then((h) => {
             if (my !== token) { h?.stop(); return; }
             if (!h) { voiceOn = false; release?.(); maybeAuto(); return; }
@@ -166,6 +189,7 @@ function playScenes(app, scenes, { dir, skipTo = -1, music = null }) {
       clearTimeout(wrT); clearTimeout(autoT); beatT.forEach(clearTimeout);
       vh?.stop(); stopFx?.(); clearVoices();
       if (music) musicRelease();
+      CUR = LANG; DICT = null;
       el.classList.add('out'); setTimeout(() => { el.remove(); done(); }, 400);
     };
     el.addEventListener('click', (e) => {
@@ -180,7 +204,9 @@ function playScenes(app, scenes, { dir, skipTo = -1, music = null }) {
       next();
     });
     document.body.appendChild(el);
+    localize(el);
     if (music) musicCinema(music);
+    if (start > 0) i = Math.min(start, scenes.length - 1) - 1; /* v785 : départ à une scène choisie (Mode Créateur) */
     next();
   });
 }

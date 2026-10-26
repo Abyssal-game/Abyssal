@@ -12,7 +12,8 @@ import { openServerState } from './server-state.js'; /* v678 */
 import { perfOn, setPerf, perfLog, perfClear, perfReport } from '../ui/perf.js'; /* v601 */
 import { partieErrs } from '../cloud/partie.js'; /* v740 */
 import { openPack } from './opening.js'; /* v769 */
-import { playEnding, playPrologue } from './ending.js';
+import { playEnding, playPrologue, CINE_SCENES } from './ending.js';
+import { LANGS, LANG } from '../i18n.js';
 
 const SNAP = 'abyssal.snapshot';
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -24,6 +25,13 @@ export function openCreator(app) {
   const ui = { bpow: false };
   try { snap = JSON.parse(localStorage.getItem(SNAP) || 'null'); } catch (e) { snap = null; }
 
+  /* v785 : réglages des cinématiques, gardés sur l'appareil */
+  const CINE_KEY = 'abyssal.cineDev';
+  let cine = { film: 'prologue', lang: LANG, start: 0, name: '' };
+  try { cine = { ...cine, ...JSON.parse(localStorage.getItem(CINE_KEY) || '{}') }; } catch (e) { /* rien */ }
+  if (!CINE_SCENES[cine.film]) cine.film = 'prologue';
+  if (!LANGS[cine.lang]) cine.lang = LANG;
+  const saveCine = () => { try { localStorage.setItem(CINE_KEY, JSON.stringify(cine)); } catch (e) { /* rien */ } };
   const B = (x, label, cls = '') => `<button class="btn small ${cls}" data-x="${x}">${label}</button>`;
   function draw() {
     const d = g.descent(), f = g.s.devForce;
@@ -56,7 +64,17 @@ export function openCreator(app) {
 
       <section class="cr-sec"><h3>Booster de l’Abysse</h3>
         <p class="small muted">Ouvre-le quand tu veux, avec toute sa mise en scène. « Comme la première fois » garantit une Secrète que tu n’as pas encore. Le réglage « Prochain booster » ci-dessous s’applique aussi à sa dernière carte.${g.s.tickets.abysse ? ` Tu en as ${g.s.tickets.abysse} en réserve (onglet Butin).` : ''}</p>
-        <div class="row gap wrap">${B('abyss', 'Ouvrir un Booster de l’Abysse', 'gold')}${B('abyss1', 'Comme la première fois')}${B('abyss5', '+5 en réserve')}${B('ending', 'Revoir la fin de la Descente')}${B('prologue', 'Revoir le prologue')}</div></section>
+        <div class="row gap wrap">${B('abyss', 'Ouvrir un Booster de l’Abysse', 'gold')}${B('abyss1', 'Comme la première fois')}${B('abyss5', '+5 en réserve')}</div></section>
+
+      <section class="cr-sec cr-cine" translate="no"><h3>Cinématiques</h3>
+        <p class="small muted">Regarde le prologue ou la fin de la Descente quand tu veux, dans la langue que tu veux (texte et voix du narrateur), à partir de la scène de ton choix. La langue du jeu ne change pas.</p>
+        <div class="seg cr-cine-seg">${['prologue', 'fin'].map((k) => `<button class="seg-b" aria-pressed="${cine.film === k}" aria-checked="${cine.film === k}" data-cfilm="${k}">${k === 'prologue' ? 'Prologue' : 'Fin de la Descente'}</button>`).join('')}</div>
+        <div class="seg lang-grid cr-cine-seg">${Object.entries(LANGS).map(([k, n]) => `<button class="seg-b" aria-pressed="${cine.lang === k}" aria-checked="${cine.lang === k}" data-clang="${k}">${esc(n)}</button>`).join('')}</div>
+        <label class="small muted">À partir de la scène
+          <select class="input plain" id="cine-start">${CINE_SCENES[cine.film].map((n, i) => `<option value="${i}"${i === cine.start ? ' selected' : ''}>${i + 1} · ${esc(n)}</option>`).join('')}</select></label>
+        ${cine.film === 'fin' ? `<label class="small muted">Nom écrit sur le vélin
+          <input class="input plain" id="cine-name" maxlength="20" value="${esc(cine.name || '')}" placeholder="Ton pseudo"></label>` : ''}
+        <div class="row gap wrap">${B('cine', `Lancer ${cine.film === 'prologue' ? 'le prologue' : 'la fin'}`, 'gold')}</div></section>
 
       <section class="cr-sec"><h3>Prochain booster</h3>
         <p class="small muted">${f ? `Imposé : une carte <b>${esc(RARITIES.find((r) => r.key === f.rarity)?.name || f.rarity)}</b>${f.variant ? ` en <b>${esc(VARIANTS[f.variant].name)}</b>` : ''} en dernière position.` : 'La dernière carte du prochain booster peut être imposée.'}</p>
@@ -119,6 +137,9 @@ export function openCreator(app) {
     if (fr) { g.s.devForce = g.s.devForce?.rarity === fr.dataset.force ? null : { rarity: fr.dataset.force, variant: g.s.devForce?.variant || '' }; g.persist(); return draw(); }
     if (fv) { if (!g.s.devForce) g.s.devForce = { rarity: 'M', variant: '' }; g.s.devForce.variant = fv.dataset.fvar; g.persist(); return draw(); }
     if (e.target.id === 'bpow') { ui.bpow = e.target.checked; return; }
+    const cf = e.target.closest('[data-cfilm]'), cl = e.target.closest('[data-clang]');
+    if (cf) { cine.film = cf.dataset.cfilm; cine.start = 0; saveCine(); return draw(); }
+    if (cl) { cine.lang = cl.dataset.clang; saveCine(); return draw(); }
     const bb = e.target.closest('[data-boss]');
     if (bb) {
       try {
@@ -145,8 +166,15 @@ export function openCreator(app) {
       if (x === 'free') g.devFreePacks();
       if (x === 'abyss' || x === 'abyss1') { g.devAbyss(x === 'abyss1'); sheet.close(); setTimeout(() => openPack(app, 'abysse', { onDone: () => openCreator(app) }), 350); return; } /* v769 : fenêtre fermée pendant l'ouverture, rouverte après */
       if (x === 'abyss5') g.devAbyss(false, 5);
-      if (x === 'prologue') { sheet.close(); setTimeout(() => playPrologue(app).then(() => openCreator(app)), 350); return; } /* v775 */
-      if (x === 'ending') { sheet.close(); setTimeout(() => playEnding(app).then(() => openCreator(app)), 350); return; } /* v771 */
+      if (x === 'cine') { /* v785 : prologue ou fin, langue et scène de départ au choix */
+        cine.start = +(sheet.el?.querySelector('#cine-start')?.value ?? document.getElementById('cine-start')?.value ?? 0) || 0;
+        const nm = document.getElementById('cine-name'); if (nm) cine.name = nm.value.trim();
+        saveCine();
+        const o = { lang: cine.lang, start: cine.start };
+        sheet.close();
+        setTimeout(() => (cine.film === 'fin' ? playEnding(app, { ...o, name: cine.name || undefined }) : playPrologue(app, o)).then(() => openCreator(app)), 350);
+        return;
+      }
       if (x === 'all') g.devUnlockAll();
       if (x === 'variants') g.devAllVariants();
       if (x === 'dups') g.devDuplicates(10);
