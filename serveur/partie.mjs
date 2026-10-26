@@ -2,7 +2,7 @@
 // opération envoyée par le téléphone avec le même moteur (js/core/game.js), tire lui-même au hasard (boosters), vérifie les
 // récompenses en ligne, et c'est son résultat qui est gardé. Indépendant de l'hébergement : la fonction Supabase
 // (supabase/functions/partie/index.ts) lui fournit la base (`db`) ; les tests lui donnent une base en mémoire.
-import { Game } from '../js/core/game.js';
+import { Game, keepGifts } from '../js/core/game.js';
 import { migrate, defaultSave } from '../js/core/save.js';
 import { SAVE_KEY } from '../js/config.js';
 import { lineupStake } from '../js/core/versus.js';
@@ -118,7 +118,13 @@ export async function handle({ uid, token, body }, { db, now = () => Date.now(),
   const fx = { trials: [] };
   try {
     let data = row.data;
-    if (!data) { const old = await db.legacySave(uid); data = old ? migrate(old) : defaultSave(now()); data.serverSince = now(); }
+    if (!data) {
+      const old = await db.legacySave(uid);
+      data = old ? migrate(old) : defaultSave(now());
+      /* v796 : un compte supprimé puis recréé avec le même e-mail ne retrouve pas les cadeaux (boosters de bienvenue, booster du jour…) */
+      if (!old && db.giftMemory) { try { const mem = await db.giftMemory(uid); if (mem && typeof mem === 'object') { keepGifts(data, mem); data.giftsKept = true; } } catch (e) { /* SQL 19 pas encore collé */ } }
+      data.serverSince = now();
+    }
     let tz = okTz(row.tz) ? row.tz : 0, tzAt = row.tz_at || 0;
     if (okTz(b.tz) && b.tz !== tz && (!row.tz_at || now() - tzAt > TZ_LOCK_DAYS * 864e5 || row.tz == null)) { tz = b.tz; tzAt = now(); }
     else if (okTz(b.tz) && Math.abs(b.tz - tz) === 60) tz = b.tz; /* v740 : heure d'été / d'hiver : une heure d'écart passe toujours (le 25 octobre 2026, le serveur gardait l'heure d'été une semaine et changeait de jour à 23 h) */

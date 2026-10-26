@@ -8589,6 +8589,10 @@ export default {
   "Veille déjà tenue cette saison : la victoire termine la Veille.": "Watch already held this season: victory ends the Watch.",
   "Et {0} tickets premium.": "And {0} premium tickets.",
   "Série arrêtée. Ton meilleur score de la semaine : <b>{0} / {1}</b>. Recommence depuis la première manche.": "Streak over. Your best this week: <b>{0} / {1}</b>. Start again from the first round.",
+  "Déjà reçu": "Already received",
+  "Cette adresse e-mail a déjà reçu ses <b>boosters de bienvenue</b> avec un ancien compte. Ils ne s’offrent qu’une fois par adresse, et le booster gratuit du jour aussi.": "This email address already received its <b>welcome boosters</b> with a previous account. They are given only once per address, and so is today’s free booster.",
+  "Ta nouvelle aventure commence quand même : le booster gratuit revient chaque jour.": "Your new adventure still begins: the free booster comes back every day.",
+  "Cadeaux non repris en recréant un compte": "Gifts not reclaimed by recreating an account",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

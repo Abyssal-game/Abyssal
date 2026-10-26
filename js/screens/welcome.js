@@ -53,6 +53,13 @@ export function showWelcome(app, { force = false } = {}) {
 export function showGift(app) {
   const g = app.game, cat = app.catalog;
   const n = Math.min(g.s.welcomeGift || 0, g.s.tickets.standard || 0);
+  /* v796 : compte recréé avec une adresse e-mail qui a déjà reçu ses cadeaux (le serveur s’en souvient) : on le dit une fois */
+  if (g.s.giftsKept && !n) {
+    const k = `abyssal.giftsKeptSaid.${g.s.createdAt || 0}`;
+    let said = false; try { said = !!localStorage.getItem(k); localStorage.setItem(k, '1'); } catch (e) { /* rien */ }
+    if (!said) openSheet(`<div class="gift-sheet"><span class="gift-ribbon">Cadeau de bienvenue</span><h2>Déjà reçu</h2><p>Cette adresse e-mail a déjà reçu ses <b>boosters de bienvenue</b> avec un ancien compte. Ils ne s’offrent qu’une fois par adresse, et le booster gratuit du jour aussi.</p><p class="small muted">Ta nouvelle aventure commence quand même : le booster gratuit revient chaque jour.</p></div>`, { cls: 'sheet-small', label: 'Cadeau de bienvenue' });
+    return;
+  }
   if (!n || g.s.giftShown) return;
   const daily = g.freePack().stock;
   const sheet = openSheet(`<div class="gift-sheet">

@@ -28,6 +28,7 @@ export function createRestDb({ url, secret, publishable }) {
     unlock: (uid) => call('partie_unlock', { p_uid: uid }),
     save: (uid, r) => call('partie_save', { p_uid: uid, p_data: r.data, p_version: r.version, p_seqs: r.seqs, p_tz: r.tz, p_tz_at: r.tz_at }),
     legacySave: (uid) => call('partie_legacy', { p_uid: uid }),
+    giftMemory: (uid) => call('partie_gift_memory', { p_uid: uid }), // v796 : supabase/19-cadeaux.sql
     isCreator: (uid) => call('partie_creator', { p_uid: uid }),
     versusDuel: (id) => call('partie_versus', { p_id: id }),
     shadowDrew: (uid, day) => call('partie_shadow_drew', { p_uid: uid, p_day: day }),

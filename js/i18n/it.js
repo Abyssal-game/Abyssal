@@ -8578,6 +8578,10 @@ export default {
   "Veille déjà tenue cette saison : la victoire termine la Veille.": "Veglia già mantenuta in questa stagione: la vittoria conclude la Veglia.",
   "Et {0} tickets premium.": "E {0} ticket premium.",
   "Série arrêtée. Ton meilleur score de la semaine : <b>{0} / {1}</b>. Recommence depuis la première manche.": "Serie interrotta. Il tuo miglior punteggio della settimana: <b>{0} / {1}</b>. Ricomincia dal primo turno.",
+  "Déjà reçu": "Già ricevuto",
+  "Cette adresse e-mail a déjà reçu ses <b>boosters de bienvenue</b> avec un ancien compte. Ils ne s’offrent qu’une fois par adresse, et le booster gratuit du jour aussi.": "Questo indirizzo e-mail ha già ricevuto le sue <b>buste di benvenuto</b> con un account precedente. Si ricevono una sola volta per indirizzo, come la busta gratuita del giorno.",
+  "Ta nouvelle aventure commence quand même : le booster gratuit revient chaque jour.": "La tua nuova avventura comincia comunque: la busta gratuita torna ogni giorno.",
+  "Cadeaux non repris en recréant un compte": "Regali non ripresi ricreando un account",
 };
 
 export const names = {

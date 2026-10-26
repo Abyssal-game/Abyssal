@@ -8578,6 +8578,10 @@ export default {
   "Veille déjà tenue cette saison : la victoire termine la Veille.": "Wache in dieser Saison schon gehalten: Der Sieg beendet die Wache.",
   "Et {0} tickets premium.": "Und {0} Premium-Tickets.",
   "Série arrêtée. Ton meilleur score de la semaine : <b>{0} / {1}</b>. Recommence depuis la première manche.": "Serie beendet. Dein bestes Ergebnis der Woche: <b>{0} / {1}</b>. Fang wieder bei der ersten Runde an.",
+  "Déjà reçu": "Bereits erhalten",
+  "Cette adresse e-mail a déjà reçu ses <b>boosters de bienvenue</b> avec un ancien compte. Ils ne s’offrent qu’une fois par adresse, et le booster gratuit du jour aussi.": "Diese E-Mail-Adresse hat ihre <b>Willkommens-Booster</b> bereits mit einem früheren Konto erhalten. Sie gibt es nur einmal pro Adresse, ebenso den kostenlosen Booster des Tages.",
+  "Ta nouvelle aventure commence quand même : le booster gratuit revient chaque jour.": "Dein neues Abenteuer beginnt trotzdem: Der kostenlose Booster kommt jeden Tag wieder.",
+  "Cadeaux non repris en recréant un compte": "Geschenke nicht erneut durch neues Konto",
 };
 
 export const names = {

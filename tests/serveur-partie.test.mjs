@@ -25,6 +25,7 @@ function memDb({ creators = [], legacy = {}, rpc = {} } = {}) {
     async isCreator(uid) { return creators.includes(uid); },
     async versusDuel(id) { return rpc.duels?.[id] || null; },
     async shadowDrew() { return false; },
+    ...(rpc.giftMemory ? { giftMemory: rpc.giftMemory } : {}),
     async publish(uid, profile, card, trials) { published.push({ uid, profile, card, trials }); },
     async rpc(name, args) { if (!rpc[name]) throw new Error(`rpc ${name}`); return rpc[name](args); },
   };
@@ -55,6 +56,26 @@ test('serveur de partie : un nouveau compte reçoit une partie neuve', async () 
   assert.equal(out.body.v, 1);
   assert.ok(out.body.data && out.body.data.shards >= 0);
   assert.equal(db.rows.get('u1').version, 1);
+});
+
+test('serveur de partie : compte recréé avec le même e-mail : pas de 2e cadeau de bienvenue (v796)', async () => {
+  const fresh = await phone(memDb(), 'u0').send({ want: true });
+  const mem = { createdAt: 123, freePack: { day: '2026-10-21', left: 0 }, descent: { day: '2026-10-21', used: 4 } };
+  const db = memDb({ rpc: { giftMemory: async (uid) => (uid === 'u2' ? mem : null) } }), p = phone(db, 'u2');
+  const out = await p.send({ want: true });
+  assert.equal(out.status, 200);
+  const d = out.body.data;
+  assert.equal(d.welcomeGift, 0);
+  assert.equal(d.giftShown, true);
+  assert.equal(d.giftsKept, true);
+  assert.equal(d.tickets.standard, fresh.body.data.tickets.standard - 2);
+  assert.deepEqual(d.freePack, mem.freePack);
+  assert.equal(d.descent.used, 4);
+  assert.equal(d.createdAt, 123);
+  // e-mail jamais vu : partie neuve normale, et une base sans le SQL 19 ne bloque rien
+  const db2 = memDb({ rpc: { giftMemory: async () => { throw new Error('42883'); } } });
+  const o2 = await phone(db2, 'u3').send({ want: true });
+  assert.equal(o2.body.data.welcomeGift, 2);
 });
 
 test('serveur de partie : l’ancienne sauvegarde en ligne est reprise une fois', async () => {

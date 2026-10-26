@@ -8578,6 +8578,10 @@ export default {
   "Veille déjà tenue cette saison : la victoire termine la Veille.": "Vigília já mantida nesta temporada: a vitória encerra a Vigília.",
   "Et {0} tickets premium.": "E {0} tickets premium.",
   "Série arrêtée. Ton meilleur score de la semaine : <b>{0} / {1}</b>. Recommence depuis la première manche.": "Sequência encerrada. Sua melhor marca da semana: <b>{0} / {1}</b>. Recomece desde a primeira rodada.",
+  "Déjà reçu": "Já recebido",
+  "Cette adresse e-mail a déjà reçu ses <b>boosters de bienvenue</b> avec un ancien compte. Ils ne s’offrent qu’une fois par adresse, et le booster gratuit du jour aussi.": "Este endereço de e-mail já recebeu seus <b>pacotes de boas-vindas</b> com uma conta anterior. Eles só são dados uma vez por endereço, assim como o pacote grátis do dia.",
+  "Ta nouvelle aventure commence quand même : le booster gratuit revient chaque jour.": "Sua nova aventura começa mesmo assim: o pacote grátis volta todos os dias.",
+  "Cadeaux non repris en recréant un compte": "Presentes não recuperados ao recriar uma conta",
 };
 
 export const names = {

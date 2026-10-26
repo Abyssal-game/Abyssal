@@ -92,6 +92,24 @@ function sessRng(st) {
 }
 const sessSeed = (seed) => (Number(seed) ^ 0x2545F491) | 0;
 
+/* v796 : cadeaux déjà reçus gardés dans une partie neuve (effacement v739, et compte supprimé puis recréé avec le même e-mail :
+   le serveur se souvient de l'e-mail, supabase/19-cadeaux.sql). Pas de 2e cadeau de bienvenue ; booster gratuit, offrande,
+   Épreuves, missions, Torches et Braise du jour gardés ; date de création gardée. */
+export function keepGifts(s, old) {
+  if (!old || typeof old !== 'object') return s;
+  s.createdAt = old.createdAt || s.createdAt;
+  if (old.createdDay) s.createdDay = old.createdDay;
+  s.tickets.standard = Math.max(0, s.tickets.standard - (ECONOMY.start.tickets.standard || 0));
+  s.welcomeGift = 0; s.giftShown = true;
+  if (old.freePack) s.freePack = { ...old.freePack };
+  if (old.daily?.last) s.daily = { last: old.daily.last, streak: 0 };
+  if (old.trials?.day) s.trials = { ...s.trials, day: old.trials.day, done: [...(old.trials.done || [null, null, null])], score: old.trials.score || 0 };
+  if (old.missions?.day) s.missions = old.missions;
+  if (old.braiseFree) s.braiseFree = { ...old.braiseFree };
+  if (old.descent?.day) s.descent = { ...s.descent, day: old.descent.day, used: old.descent.used || 0 };
+  return s;
+}
+
 export class Game {
   constructor(catalog, storage, { rng = cryptoRandom, clock = () => new Date() } = {}) {
     this.catalog = catalog;
@@ -2353,16 +2371,8 @@ export class Game {
     this.s.settings = { ...this.s.settings, ...settings };
     /* v739 : effacer sa partie ne redonne pas les cadeaux déjà reçus (sinon : effacer et rouvrir les boosters de bienvenue
        jusqu'à tirer une carte très rare). Pas de 2e cadeau de bienvenue, booster gratuit, offrande et Épreuves du jour gardés. */
-    this.s.createdAt = old.createdAt || this.s.createdAt;
-    this.s.tickets.standard = Math.max(0, this.s.tickets.standard - (ECONOMY.start.tickets.standard || 0));
-    this.s.welcomeGift = 0; this.s.giftShown = true;
+    keepGifts(this.s, old);
     this.s.erased = (old.erased || 0) + 1;
-    if (old.freePack) this.s.freePack = { ...old.freePack };
-    if (old.daily?.last) this.s.daily = { last: old.daily.last, streak: 0 };
-    if (old.trials?.day) this.s.trials = { ...this.s.trials, day: old.trials.day, done: [...(old.trials.done || [null, null, null])], score: old.trials.score || 0 };
-    if (old.missions?.day) this.s.missions = old.missions;
-    if (old.braiseFree) this.s.braiseFree = { ...old.braiseFree };
-    if (old.descent?.day) this.s.descent = { ...this.s.descent, day: old.descent.day, used: old.descent.used || 0 };
     this.s.resetAt = Date.now(); /* v412 : partie effacée exprès : la partie en ligne ne doit pas revenir toute seule */
     this.persist();
   }
