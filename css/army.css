@@ -8027,3 +8027,19 @@ img, svg, canvas { -webkit-user-select: none; user-select: none; }
 }
 /* v821 : bouton Passer peint (Gemini) : le disque aux chevrons d'or posé dans le bouton rond doré, comme ×1, ? et quitter */
 .dv.cb.cb2 .cb-pass .cb-pass-i { inset: 16%; width: 68%; height: 68%; border-radius: 50%; }
+/* v822 : la défense prend la place du menu d'attaque, à la même taille : le cadre du menu passe au rouge,
+   ses actions s'effacent (place gardée) et la barre de l'épée occupe tout l'intérieur. */
+.dv.cb.cb2 .cb-dock::before { content: ''; position: absolute; inset: 10px; border-radius: 14px; pointer-events: none; opacity: 0; transition: opacity .18s;
+  background: radial-gradient(120% 90% at 50% 45%, rgba(150, 18, 28, .55), rgba(40, 4, 8, .92) 70%); box-shadow: inset 0 0 0 1px rgba(255, 90, 90, .45), inset 0 0 28px rgba(255, 40, 50, .35); }
+.dv.cb.cb2.qte-on .cb-dock::before { opacity: 1; }
+.dv.cb.cb2.qte-on .cb-dock > :not(.dv-mid) { visibility: hidden; }
+.dv.cb.cb2.qte-on .cb-dock .dv-msg { display: none; }
+.dv.cb.cb2 .cb-dock .dv-mid .dv-dodge.cb-def { inset: 10px; transform: none; translate: none; width: auto; justify-content: center; gap: 6px; padding: 8px 14px 6px;
+  border: 0; border-image: none; background: none !important; box-shadow: none; filter: none; animation: dfIn822 .2s ease-out both; }
+@keyframes dfIn822 { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
+.dv.cb.cb2 .cb-dock .cb-def .dv-dodge-bar { width: 64%; margin: 26px 0 24px; }
+@media (max-height: 720px) { .dv.cb.cb2 .cb-dock .cb-def .dv-dodge-bar { margin: 20px 0 18px; } .dv.cb.cb2 .cb-dock .cb-def .dv-dodge-t { font-size: 1rem; } }
+.dv.cb.cb2.qte-on .cb-dock > :not(.dv-mid) { opacity: 0; }
+.dv.cb.cb2 .cb-dock::before { background: radial-gradient(120% 90% at 50% 45%, #5A0C14, #1C0306 72%); }
+.dv.cb.cb2 .cb-dock .cb-def .dv-dodge-bar { width: 72%; }
+.dv.cb.cb2 .cb-dock::before { transition: none; }
