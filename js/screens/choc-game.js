@@ -46,27 +46,40 @@ export function createChocGame(app, root) {
   }
   const pips = (s, x) => s.rounds.map((r) => `<i class="${r.win === x ? 'w' : r.win ? 'l' : 'n'}"></i>`).join('') + Array.from({ length: CHOC.rounds - s.rounds.length }, () => '<i></i>').join('');
   const sealHTML = (used) => `<span class="kc-seal ${used ? 'used' : ''}" title="${t('Sceau d’Ardeur')}">${ARDEUR}</span>`;
-  function who(v, ctx, x) {
+  /* v815 (le propriétaire : « il faut refaire l'esthétique et le design complet, on ne voit pas bien ce qu'on doit faire ») :
+     l'adversaire en haut (sa main en éventail), la table au milieu (deux emplacements face à face, la manche en cours),
+     une consigne numérotée, ta main, puis le Sceau et « Poser » en bas. */
+  function tag(v, ctx, x) {
     const s = v.state, mine = x === v.me;
-    return `<div class="kc-who ${mine ? 'me' : 'foe'}"><span class="sc-med">${mine ? myPic() : ctx.avatar(v.foe?.avatar)}</span>
+    return `<div class="kc-tag ${mine ? 'me' : 'foe'}"><span class="sc-med">${mine ? myPic() : ctx.avatar(v.foe?.avatar)}</span>
       <b>${ctx.plate(v, mine, mine ? t('Toi') : `<span translate="no">${esc(ctx.foeName(v))}</span>`)}</b>
-      <span class="kc-pips">${pips(s, x)}</span>${sealHTML(s.seal?.[x])}</div>`;
+      <span class="kc-pips" title="${t('Manches')}">${pips(s, x)}</span>${sealHTML(s.seal?.[x])}</div>`;
   }
-  // l'arène : la manche en cours (cartes posées, face cachée) ou la dernière révélée
-  function arena(v) {
+  // la table : la manche en cours (cartes posées face cachée, ta carte choisie en aperçu) ou la dernière révélée
+  function arena(v, ctx, can) {
     const s = v.state, me = v.me, foe = foeOf(v);
-    if (banner) return `<div class="kc-arena rv ${banner.cls}">${banner.html}</div>`;
+    if (banner) return `<div class="kc-table"><div class="kc-arena rv ${banner.cls}">${banner.html}</div></div>`;
     const myPick = s.pick?.[me], foeIn = !!s.pick?.[foe];
-    return `<div class="kc-arena"><div class="kc-slot foe">${foeIn ? '<span class="kc-c back"></span>' : `<span class="kc-c empty"><small>${t('Réfléchit…')}</small></span>`}</div>
-      <div class="kc-mid"><img alt="" src="assets/versus/vd-vs.webp"><small>${t('Manche {n} / {m}', { n: Math.min(s.r, CHOC.rounds), m: CHOC.rounds })}</small>
-        <button class="btn small ghost kc-wheel" data-mp="wheel">${icon('p:help')}${t('Cercle des Royaumes')}</button></div>
-      <div class="kc-slot me">${myPick ? `${cardHTML(s.hand[me][myPick.i], { extra: 'placed' })}${myPick.seal ? '<span class="kc-sealon">+3</span>' : ''}` : '<span class="kc-c empty"></span>'}</div></div>`;
+    const c = !myPick && can && sel != null ? s.hand[me][sel] : null;
+    const mine = myPick ? `${cardHTML(s.hand[me][myPick.i], { extra: 'placed' })}${myPick.seal ? '<span class="kc-sealon">+3</span>' : ''}`
+      : c ? `${cardHTML(c, { extra: 'ghost', force: baseForce(c) + (seal ? CHOC.seal : 0) })}${seal ? '<span class="kc-sealon">+3</span>' : ''}` : '<span class="kc-c empty"><i>?</i></span>';
+    const tip = c ? (() => { const prey = preyOf(c.faction), hunter = CYCLE.find((f) => preyOf(f) === c.faction);
+      return `<p class="kc-tip"><span class="ok">${sigil(prey)}${t('+2 contre {f}', { f: fname(prey) })}</span><span class="ko">${sigil(hunter)}${t('{f} prend +2 contre elle', { f: fname(hunter) })}</span></p>`; })()
+      : `<button class="kc-tip kc-wheel2" data-mp="wheel">${CYCLE.map((f) => sigil(f)).join('')}<span>${t('Cercle des Royaumes')}</span></button>`;
+    return `<div class="kc-table"><p class="kc-round"><b>${t('Manche {n} / {m}', { n: Math.min(s.r, CHOC.rounds), m: CHOC.rounds })}</b></p>
+      <div class="kc-duel"><div class="kc-spot foe">${foeIn ? '<span class="kc-c back placed"></span>' : '<span class="kc-c empty"><i>?</i></span>'}<em>${foeIn ? t('Carte posée') : t('Réfléchit…')}</em></div>
+        <img class="kc-vs2" alt="" src="assets/versus/vd-vs.webp">
+        <div class="kc-spot me">${mine}<em>${myPick ? t('Carte posée') : c ? t('Force {n}', { n: baseForce(c) + (seal ? CHOC.seal : 0) }) : t('Ta carte')}</em></div></div>${tip}</div>`;
   }
-  function selInfo(v) {
-    const s = v.state, c = sel != null ? s.hand[v.me][sel] : null;
-    if (!c) return `<p class="kc-hint">${t('Choisis une carte, puis pose-la. Ton adversaire fait pareil, en secret.')}</p>`;
-    const prey = preyOf(c.faction), hunter = CYCLE.find((f) => preyOf(f) === c.faction);
-    return `<p class="kc-hint"><b>${t('Force {n}', { n: baseForce(c) + (seal ? CHOC.seal : 0) })}</b> · ${t('+2 contre {f}', { f: fname(prey) })} · <span class="kc-warn">${t('{f} prend +2 contre elle', { f: fname(hunter) })}</span></p>`;
+  function step(v, ctx, can) {
+    const s = v.state, me = v.me, foe = foeOf(v);
+    if (banner || v.status !== 'playing') return '';
+    const rf = s.r === CHOC.hand && s.extraN ? `<small class="kc-rf">${icon('booster')}${t('Après cette manche, le Renfort : un 3e booster pour chacun.')}</small>` : '';
+    if (s.pick?.[me]) return `<div class="kc-step wait"><span class="n">…</span><span>${t('Ta carte est posée. En attente de <b>{name}</b>…', { name: esc(ctx.foeName(v)) })}${rf}</span></div>`;
+    if (!can) return rf ? `<div class="kc-step">${rf}</div>` : '';
+    const foeIn = s.pick?.[foe] ? ` <em>${t('<b>{name}</b> a posé sa carte : à toi !', { name: esc(ctx.foeName(v)) })}</em>` : '';
+    return sel == null ? `<div class="kc-step"><span class="n">1</span><span>${t('Choisis une carte dans ta main.')}${foeIn}${rf}</span></div>`
+      : `<div class="kc-step go"><span class="n">2</span><span>${t('Pose-la. Le Sceau d’Ardeur ajoute +3, une fois par partie.')}${foeIn}${rf}</span></div>`;
   }
   function drawGame(v, ctx) {
     if (!ctx.alive) return;
@@ -75,27 +88,25 @@ export function createChocGame(app, root) {
     setScene(null);
     let sc = document.querySelector('.sc-scene');
     if (!sc) { sc = document.createElement('div'); document.body.prepend(sc); }
-    sc.className = 'sc-scene mq-scene'; sc.style.backgroundImage = 'url(assets/ui/vs-bg.webp)';
+    sc.className = 'sc-scene mq-scene kc-scene'; sc.style.backgroundImage = 'url(assets/ui/vs-bg.webp)';
     if (v.status !== 'playing' && v.status !== 'done') { root.innerHTML = `<div class="mq-game kc-game"><p class="sc-msg">${t('La partie commence dès que ton adversaire arrive.')}</p><button class="btn block" data-mp="${ctx.train ? 'tback' : 'back'}">${t('Revenir')}</button></div>`; return; }
     if (v.status === 'done' && !banner) return endScreen(v, ctx);
     const my = s.hand[me] || [], used = s.used?.[me] || [];
     if (sel != null && (used.includes(sel) || !my[sel])) sel = null;
     if (seal && s.seal?.[me]) seal = false;
     const can = !s.pick?.[me] && ctx.myTurn(v) && !ctx.busy && !anim && !banner;
-    const msg = banner ? '' : s.pick?.[me] ? t('Ta carte est posée. En attente de <b>{name}</b>…', { name: esc(ctx.foeName(v)) }) : s.pick?.[foe] ? t('<b>{name}</b> a posé sa carte : à toi !', { name: esc(ctx.foeName(v)) }) : '';
-    const rf = s.r === CHOC.hand && s.extraN ? `<p class="kc-rf">${icon('booster')}${t('Après cette manche, le Renfort : un 3e booster pour chacun.')}</p>` : '';
-    root.innerHTML = `<div class="mq-game kc-game ${app.reduced() ? 'rm' : ''}">
+    root.innerHTML = `<div class="mq-game kc-game kc2 ${app.reduced() ? 'rm' : ''}">
       <div class="mq-bar"><button class="btn small ghost" data-mp="rules" aria-label="${t('Règles')}">${icon('p:help')}</button><b>${t(ctx.train ? 'Entraînement' : 'Le Choc des Boosters')}</b><button class="btn small ghost" data-mp="${ctx.train ? 'tback' : 'back'}" aria-label="${t('Revenir')}">${icon('close')}</button></div>
-      ${who(v, ctx, foe)}
-      <div class="kc-hand foe">${(s.hand[foe] || []).map((c, i) => cardHTML(c, { small: true, used: s.used?.[foe]?.includes(i), extra: s.used?.[foe]?.includes(i) ? 'used' : '' })).join('')}</div>
-      ${arena(v)}
-      <div class="kc-hand me">${my.map((c, i) => cardHTML(c, { i: can ? i : null, on: sel === i, used: used.includes(i) })).join('')}</div>
-      ${who(v, ctx, me)}
-      ${v.status === 'playing' ? `${ctx.clockHTML(v)}${msg ? `<p class="sc-msg">${msg}</p>` : ''}${rf}
-      ${can ? `${selInfo(v)}<div class="kc-ctl">
-        <button class="kc-sealbtn ${seal ? 'on' : ''}" data-mp="seal" ${s.seal?.[me] ? 'disabled' : ''}>${ARDEUR}<span><b>${t('Sceau d’Ardeur')}</b><small>${s.seal?.[me] ? t('déjà utilisé') : seal ? t('+3 sur cette carte') : t('+3, une fois par partie')}</small></span></button>
-        <button class="btn primary block dc-plq dc-plq-red" data-mp="play" ${sel != null ? '' : 'disabled'}>${sel != null ? t('Poser cette carte') : t('Choisis une carte')}</button></div>` : ''}
-      ${ctx.train ? `<button class="btn small ghost mp-resign" data-mp="tback">${icon('close')}${t('Quitter l’entraînement')}</button>` : `<button class="btn small ghost mp-resign" data-mp="resign">${icon('p:danger')}${t('Abandonner')}</button>`}` : ''}
+      <div class="kc-side foe">${tag(v, ctx, foe)}
+        <div class="kc-fan">${(s.hand[foe] || []).map((c, i) => cardHTML(c, { small: true, extra: s.used?.[foe]?.includes(i) ? 'used' : '' })).join('')}</div></div>
+      ${arena(v, ctx, can)}
+      ${v.status === 'playing' ? ctx.clockHTML(v) : ''}
+      ${step(v, ctx, can)}
+      <div class="kc-side me"><div class="kc-hand me ${can ? 'can' : ''}">${my.map((c, i) => cardHTML(c, { i: can ? i : null, on: sel === i, used: used.includes(i) })).join('')}</div>${tag(v, ctx, me)}</div>
+      ${v.status === 'playing' ? `<div class="kc-ctl2">
+        <button class="kc-sealb ${seal ? 'on' : ''}" data-mp="seal" ${!can || s.seal?.[me] ? 'disabled' : ''} aria-pressed="${seal}">${ARDEUR}<b>+3</b><small>${s.seal?.[me] ? t('déjà utilisé') : t('Sceau d’Ardeur')}</small></button>
+        <button class="btn primary block dc-plq dc-plq-red kc-play" data-mp="play" ${can && sel != null ? '' : 'disabled'}>${s.pick?.[me] ? t('Carte posée') : sel != null && can ? t('Poser cette carte') : t('Choisis une carte')}</button></div>
+      ${ctx.train ? `<button class="kc-quit" data-mp="tback">${t('Quitter l’entraînement')}</button>` : `<button class="kc-quit" data-mp="resign">${t('Abandonner')}</button>`}` : ''}
     </div>`;
   }
 
@@ -137,7 +148,7 @@ export function createChocGame(app, root) {
     anim = true;
     try {
       drawGame(v, ctx);
-      root.querySelectorAll('.kc-hand .kc-c').forEach((c) => { if ([...c.parentNode.children].indexOf(c) >= from) c.classList.add('pre'); });
+      root.querySelectorAll('.kc-hand .kc-c, .kc-fan .kc-c').forEach((c) => { if ([...c.parentNode.children].indexOf(c) >= from) c.classList.add('pre'); });
       const side = (mine) => `<div class="kc-oside ${mine ? 'me' : 'foe'}"><span class="sc-med">${mine ? myPic() : ctx.avatar(v.foe?.avatar)}</span><b>${mine ? t('Toi') : `<span translate="no">${esc(ctx.foeName(v))}</span>`}</b></div>`;
       ov = document.createElement('div'); ov.className = `kc-open ${k}`;
       const st = v.state, foeK = foeOf(v), cnt = n * CHOC.packCards;

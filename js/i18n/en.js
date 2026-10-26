@@ -8793,6 +8793,10 @@ export default {
   "Série : {n}": "Streak: {n}",
   "Série éteinte": "Streak lost",
   "Nouvelle": "New",
+  "Carte posée": "Card played",
+  "Ta carte": "Your card",
+  "Choisis une carte dans ta main.": "Pick a card from your hand.",
+  "Pose-la. Le Sceau d’Ardeur ajoute +3, une fois par partie.": "Play it. The Seal of Ardor adds +3, once per match.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

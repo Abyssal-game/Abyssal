@@ -8782,6 +8782,10 @@ export default {
   "Série : {n}": "Racha: {n}",
   "Série éteinte": "Racha apagada",
   "Nouvelle": "Nueva",
+  "Carte posée": "Carta jugada",
+  "Ta carte": "Tu carta",
+  "Choisis une carte dans ta main.": "Elige una carta de tu mano.",
+  "Pose-la. Le Sceau d’Ardeur ajoute +3, une fois par partie.": "Juégala. El Sello del Ardor suma +3, una vez por partida.",
 };
 
 export const names = {

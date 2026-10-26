@@ -99,6 +99,8 @@ export function createMpLobby(app, root, spec) {
     const st = g.s.mp[spec.game] || { wins: 0, losses: 0, draws: 0 };
     const paidLeft = MP_REWARD.paidPerDay - (g.s.mp.day === dayKey() ? g.s.mp.paid : 0);
     const row = (v, sub, acts) => `<div class="mp-row ${myTurn(v) ? 'hot' : ''}" ${v.status !== 'waiting' ? `data-mp="open" data-id="${esc(v.id)}" role="button" tabindex="0"` : ''}><span class="fr-av"${v.foe ? profileAttrs(v.foe.id) : ''}>${v.foe ? avatar(v.foe.avatar) : EMBLEM}</span><span class="fr-t"><b>${esc(v.foe ? foeName(v) : 'Un joueur au hasard')}<i class="mp-tag ${v.pace === 'fast' ? 'fast' : ''}">${v.pace === 'fast' ? 'Rapide' : 'Lente'}</i></b><small>${sub}</small></span>${acts || icon('next')}</div>`;
+    /* v815 : la liste se relit toutes les 20 s : les volets ouverts (Comment ça marche…) restent ouverts, à la même position */
+    const opened = new Set([...root.querySelectorAll('details[open] > summary')].map((x) => x.textContent.trim())), keepY = window.scrollY;
     root.innerHTML = `${spec.modeBar()}
       ${err ? `<p class="panel small center">${icon('info')} ${esc(err)}</p>` : ''}
       ${spec.top ? spec.top(L, row) : ''}
@@ -117,6 +119,7 @@ export function createMpLobby(app, root, spec) {
         : spec.noRanking ? '' : `<details class="panel dc-fold mp-sec" id="mp-rank"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/crown2.webp"><span class="dc-sum-t">Classement du mois</span></summary><div class="lb-body small muted">Chargement…</div></details>
       ${spec.noRanking ? '' : `<p class="small muted center">Contre les joueurs : ${st.wins} victoire${st.wins > 1 ? 's' : ''} · ${st.losses} défaite${st.losses > 1 ? 's' : ''}</p>`}`}`;
     if (spec.bottom) root.insertAdjacentHTML('beforeend', spec.bottom());
+    if (opened.size) { root.querySelectorAll('details > summary').forEach((x) => { if (opened.has(x.textContent.trim())) x.parentNode.open = true; }); window.scrollTo(0, keepY); }
     root.querySelector('#mp-rank')?.addEventListener('toggle', (e) => { if (e.target.open) ranking(); }, { once: true });
     if (spec.friendsOnly) record();
   }

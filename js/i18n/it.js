@@ -8782,6 +8782,10 @@ export default {
   "Série : {n}": "Serie: {n}",
   "Série éteinte": "Serie spenta",
   "Nouvelle": "Nuova",
+  "Carte posée": "Carta giocata",
+  "Ta carte": "La tua carta",
+  "Choisis une carte dans ta main.": "Scegli una carta dalla tua mano.",
+  "Pose-la. Le Sceau d’Ardeur ajoute +3, une fois par partie.": "Giocala. Il Sigillo dell’Ardore aggiunge +3, una volta per partita.",
 };
 
 export const names = {

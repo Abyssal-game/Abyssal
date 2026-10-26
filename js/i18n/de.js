@@ -8782,6 +8782,10 @@ export default {
   "Série : {n}": "Serie: {n}",
   "Série éteinte": "Serie erloschen",
   "Nouvelle": "Neu",
+  "Carte posée": "Karte gelegt",
+  "Ta carte": "Deine Karte",
+  "Choisis une carte dans ta main.": "Wähle eine Karte aus deiner Hand.",
+  "Pose-la. Le Sceau d’Ardeur ajoute +3, une fois par partie.": "Leg sie. Das Siegel der Inbrunst gibt +3, einmal pro Partie.",
 };
 
 export const names = {
