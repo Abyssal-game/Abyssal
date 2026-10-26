@@ -8250,3 +8250,62 @@ html.fx-light .dv.cb.cb2 .cb-res.ready .cb-gems i.on { animation: none; }
   .dv.cb.cb2 .dv-top .cb-law.cb-runes img { width: 10px; height: 10px; }
 }
 .dv.cb.cb2 .cb-fvh { flex: 1 1 auto; min-width: 0; text-align: right; font-size: .62rem; color: #B9AE9C; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* v828 (6 captures du propriétaire, app iPhone) : titre de l'étage en petite pastille ; rond de la créature qui joue entier ;
+   intentions ennemies lisibles sur deux lignes ; PA plus serrés ; plus d'épée rouge dans la défense ; noms d'actions jamais coupés ;
+   toutes les actions sur une seule ligne, Permuter à côté de la réserve, Ferveur plus étroite. */
+.dv.cb.cb2 .dv-top > b { flex: none; min-height: 0; max-width: 34%; padding: 4px 9px !important; border: 1px solid rgba(201, 164, 90, .55); border-image: none; border-radius: 999px; background: rgba(12, 9, 16, .82);
+  font: 700 .62rem/1.1 var(--f-display); letter-spacing: .04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dv.cb.cb2 .dv-top .cb-rules { flex: 1 1 auto; justify-content: flex-start; }
+/* frise : le rond de la créature qui joue n'est plus agrandi ni coupé */
+.dv.cb.cb2 .cb-tl { height: 62px; padding: 2px 0 !important; overflow: hidden; }
+.dv.cb.cb2 .cb-tlr.now { scale: 1; }
+.dv.cb.cb2 .cb-tl .cb-tlr.now::before { filter: none; }
+.dv.cb.cb2 .cb-tl .cb-tlr.now .cb-tlp { box-shadow: 0 0 0 2px #F2C14E, 0 0 8px rgba(242, 193, 78, .7); }
+.dv.cb.cb2 .cb-tl .cb-tlr.foe.now .cb-tlp { box-shadow: 0 0 0 2px #FF5A4A, 0 0 8px rgba(255, 70, 60, .7); }
+/* intentions ennemies : texte entier, sur deux lignes s'il le faut */
+.dv.cb.cb2 .dv-c .cb-above .cb-oint { white-space: normal; text-overflow: clip; overflow: visible; max-width: 100%; text-align: center; line-height: 1.08; font-size: .62rem; padding: 2px 6px; }
+.dv.cb.cb2 .dv-c .cb-above .cb-oint > b { font-size: .74rem; }
+.dv.cb.cb2 .dv-c .cb-above .cb-oint img, .dv.cb.cb2 .dv-c .cb-above .cb-oint svg { width: 14px; height: 14px; flex: none; }
+.dv.cb.cb2 .dv-row.enemy { padding-top: 26px !important; }
+/* PA de la créature qui joue : plus petits et serrés, loin du coin du cadre */
+.dv.cb.cb2 .cb-head { padding-right: 10px; }
+.dv.cb.cb2 .cb-upips { gap: 2px; margin-right: 6px; }
+.dv.cb.cb2 .cb-upips i { width: 8px !important; height: 8px !important; border-radius: 2px; }
+/* défense : plus d'icône d'épée rouge dans la fenêtre */
+.dv.cb.cb2 .cb-dock .dv-dodge-t .iicon { display: none; }
+/* actions sur une seule ligne */
+.dv.cb.cb2 .cb-acts .cb-grid.cb-row1 { display: grid !important; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)) !important; gap: 5px; }
+.dv.cb.cb2 .cb-acts .cb-grid.cb-row1 .cb-a { aspect-ratio: .86 !important; width: auto; min-height: 0; max-height: none; }
+.dv.cb.cb2 .cb-dock .cb-acts { min-height: 0; }
+/* noms jamais coupés (police de l'iPhone plus haute) : rien n'est rogné, centré dans la plaque */
+.dv.cb.cb2 .cb-acts .cb-a > b, .dv.cb.cb2 .cb-acts .cb-a > b.two { overflow: visible !important; padding-top: 0; display: flex !important; align-items: center; justify-content: center; line-height: 1.12; }
+/* barre du bas : réserve, Permuter, Ferveur */
+.dv.cb.cb2 .cb-dockbar { grid-template-columns: auto minmax(0, 1fr) !important; }
+.dv.cb.cb2 .cb-dockbar .dv-resw { gap: 6px; }
+.dv.cb.cb2 .cb-swap2 { position: relative; flex: none; width: 46px; padding: 0 0 13px; margin: 0; border: 0; background: none; display: block; aspect-ratio: auto; height: auto; align-self: stretch; color: #E6DED0; }
+.dv.cb.cb2 .cb-swap2 > .cb-tile { position: absolute; left: 4px; right: 4px; top: 0; bottom: 13px; background: url(../assets/ui/act-tile3.webp) center / 100% 100% no-repeat; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .75)); }
+.dv.cb.cb2 .cb-swap2 .cb-ai { position: absolute; left: 50%; top: calc(50% - 7px); width: 22px; height: 22px; transform: translate(-50%, -50%) !important; }
+.dv.cb.cb2 .cb-swap2 .cb-ai img, .dv.cb.cb2 .cb-swap2 .cb-ai svg { width: 100%; height: 100%; }
+.dv.cb.cb2 .cb-swap2 > small { position: absolute; left: -4px; right: -4px; bottom: 0; text-align: center; font: 700 .52rem/1.1 var(--f-ui); color: #E6DED0; white-space: nowrap; }
+.dv.cb.cb2 .cb-swap2.off > .cb-tile { filter: grayscale(1) brightness(.5); }
+.dv.cb.cb2 .cb-swap2.off .cb-ai, .dv.cb.cb2 .cb-swap2.off > small { opacity: .45; }
+.dv.cb.cb2 .cb-swap2.on > .cb-tile { filter: brightness(1.3) drop-shadow(0 0 8px rgba(255, 225, 150, .95)); }
+.dv.cb.cb2 .cb-res { padding-left: 8px !important; padding-right: 8px !important; gap: 6px !important; }
+.dv.cb.cb2 .cb-res-nopw .cb-fvh { font-size: .56rem; }
+.dv.cb.cb2 .cb-acts .cb-grid.cb-row1 { display: flex !important; justify-content: center; gap: 5px; }
+.dv.cb.cb2 .cb-acts .cb-grid.cb-row1 .cb-a { flex: 0 0 calc((100% - (var(--c) - 1) * 5px) / var(--c)); }
+.dv.cb.cb2 .cb-swap2 .cb-ai { width: 26px; height: 26px; }
+.dv.cb.cb2 .cb-res:not(.cb-res-nopw) .cb-fv > small { display: none !important; }
+.dv.cb.cb2 .cb-dockbar { align-items: stretch; }
+.dv.cb.cb2 .cb-swap2 { width: 50px; min-height: 52px; padding-bottom: 12px; }
+.dv.cb.cb2 .cb-swap2 > .cb-tile { left: 2px; right: 2px; bottom: 12px; }
+.dv.cb.cb2 .cb-swap2 .cb-ai { top: calc(50% - 6px); width: 28px; height: 28px; z-index: 1; }
+.dv.cb.cb2 .cb-swap2 .cb-ai img { filter: brightness(1.15) drop-shadow(0 1px 2px #000); }
+@media (max-height: 720px) {
+  .dv.cb.cb2 .cb-acts .cb-grid.cb-row1 .cb-a { aspect-ratio: 1.15 !important; }
+  .dv.cb.cb2 .cb-acts .cb-grid.cb-row1 .cb-a .cb-ai { width: 34%; top: 40%; }
+  .dv.cb.cb2 .dv-row.enemy { padding-top: 22px !important; }
+  .dv.cb.cb2 .cb-swap2 { min-height: 44px; }
+}
+@media (max-height: 640px) { .dv.cb.cb2 .cb-feed { display: none; } }

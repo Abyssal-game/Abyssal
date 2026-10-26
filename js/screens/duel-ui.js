@@ -248,6 +248,13 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     return `<button class="cb-rsv2" data-d="reserve" aria-label="Voir la réserve"><small>Réserve</small><span class="cb-rsv2-l">${r.map((u) => mini(u, false)).join('')}${dead.map((u) => mini(u, true)).join('')}${!r.length && !dead.length ? '<em>vide</em>' : ''}</span></button>`;
   };
 
+  /* v828 : Permuter, à côté de la réserve (une case vide et grisée quand ce n'est pas possible, pour que rien ne bouge) */
+  function swapHTML() {
+    const u = sel && st.units[sel];
+    const a = !st.over && u && st.turn === 'ally' && u.hp > 0 ? actionsFor(st, u.uid).find((x) => x.key === 'swap') : null;
+    const live = a && a.ok;
+    return `<button class="cb-a k-swap cb-swap2 ${live ? '' : 'off'} ${mode?.key === 'swap' ? 'on' : ''}"${a ? ` data-a="swap"` : ''} aria-disabled="${!live}" aria-label="${esc(a?.name || 'Permuter')}"><span class="cb-tile" aria-hidden="true"></span><span class="cb-ai">${actIcon('swap', a?.icon)}</span><small>${esc(a?.name || 'Permuter')}</small></button>`;
+  }
   // ——— Barre d'actions de la créature choisie ———
   function actsHTML() {
     const u = sel && st.units[sel];
@@ -260,13 +267,13 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         <small class="cb-idle-h">${defMode === 'auto' ? tr('Défense automatique') : tr('Quand la barre apparaît, touche dans l’or pour esquiver, sur le trait blanc pour parer.')}</small></div>`;
     }
     const kit = KITS[u.role];
-    const list = actionsFor(st, u.uid).filter((a) => a.key !== 'duo' || (a.ok && !firstSteps())); // l'Assaut conjoint n'apparaît que lorsqu'il est possible
+    const list = actionsFor(st, u.uid).filter((a) => a.key !== 'swap' && (a.key !== 'duo' || (a.ok && !firstSteps()))); // l'Assaut conjoint n'apparaît que lorsqu'il est possible ; v828 : Permuter passe à côté de la réserve
     const c = cat.get(u.id), pa = u.pa || 0;
     // v262 : c'est son tour ; ses PA (points d'action personnels) s'affichent en losanges
     return `<div class="cb-panel ${busy ? 'wait' : ''}"><div class="cb-head"><span class="cb-por" style="--rc:${RARITY[c.rarity].color}"><img alt="" src="${artUrl(c, { lite: true })}"></span>
       <span class="cb-who"><b>${esc(c.name)}</b><span class="cb-role">${roleIcon(kit.kw)}${esc(kit.name)}<em class="cb-myturn"> · son tour</em></span></span>
       <span class="cb-upips" title="${pa} PA : attaque ou défense +1, compétences selon leur coût">${Array.from({ length: PA_MAX }, (_, i) => `<i class="${i < pa ? 'on' : ''}"></i>`).join('')}</span></div>
-      <div class="cb-grid ${list.length > 5 ? 'n8' : list.length > 4 ? 'n5' : ''}">${list.map((a) => `<button class="cb-a ${a.ok ? '' : 'off'} ${mode?.key === a.key ? 'on' : ''} ${a.key === kit.skill.key ? 'sig' : ''} ${a.own ? 'own' : ''} k-${a.key}" data-a="${a.key}" aria-disabled="${!a.ok}"${a.key === 'swap' ? ` aria-label="${esc(a.name)}"` : ''}><span class="cb-tile" aria-hidden="true"></span>
+      <div class="cb-grid cb-row1" style="--n:${list.length};--c:${Math.max(4, list.length)}">${list.map((a) => `<button class="cb-a ${a.ok ? '' : 'off'} ${mode?.key === a.key ? 'on' : ''} ${a.key === kit.skill.key ? 'sig' : ''} ${a.own ? 'own' : ''} k-${a.key}" data-a="${a.key}" aria-disabled="${!a.ok}"${a.key === 'swap' ? ` aria-label="${esc(a.name)}"` : ''}><span class="cb-tile" aria-hidden="true"></span>
         <span class="cb-ai">${a.own ? `<img class="aicon" alt="" src="${moveIconUrl(a.icon)}">` : actIcon(a.key, a.icon)}</span><b>${esc(a.name)}</b>
         <span class="cb-cost">${a.gain ? `<i class="gain">+${a.gain} PA</i>` : '<i class="pa"></i>'.repeat(a.ap) || (a.key === 'duo' ? '' : `<i class="free">${st.init ? 'libre' : '0'}</i>`)}${a.fervor ? `<i class="fv">${a.fervor}</i>` : ''}${a.dice ? '<i class="d20">D20</i>' : ''}${a.own && a.wait ? `<i class="cdw" title="Se recharge">${a.wait}</i>` : ''}</span></button>`).join('')}</div></div>`;
   }
@@ -335,7 +342,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     if (dvEl && dvEl.classList.contains('abyss-night') !== night) dvEl.classList.toggle('abyss-night', night);
     patchRow(alEl, front(st, 'ally').map((u) => ({ uid: u.uid, html: cardEl(u) })));
     const sw = st.swallowed && st.units[st.swallowed];
-    setHTML($('.dv-resw'), resHTML('ally') + (sw?.swallowed ? `<span class="cb-swal" title="Engloutie : brise le Dévoreur pour la libérer"><img alt="" src="${artUrl(cat.get(sw.id), { lite: true })}"><small>Engloutie · ${sw.hp} PV</small></span>` : ''));
+    setHTML($('.dv-resw'), resHTML('ally') + swapHTML() + (sw?.swallowed ? `<span class="cb-swal" title="Engloutie : brise le Dévoreur pour la libérer"><img alt="" src="${artUrl(cat.get(sw.id), { lite: true })}"><small>Engloutie · ${sw.hp} PV</small></span>` : ''));
     { const h0 = actsEl?._h; setHTML(actsEl, actsHTML()); if (actsEl && actsEl._h !== h0) fitNames(); } /* v820 : le menu du bas reste toujours en place (plus de saut de l'écran) */
     const pu = st.init ? st.units[st.actor] : null, paNow = st.init ? (st.turn === 'ally' && pu ? pu.pa || 0 : 0) : st.ap;
     setHTML($('.cb-pips'), Array.from({ length: st.init ? PA_MAX : Math.max(AP_MAX, st.ap) }, (_, i) => `<i class="${i < paNow ? 'on' : ''}"></i>`).join(''));
@@ -343,7 +350,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const ready = ultReady(st);
     if (ready && !g.s.tips?.['cb-ult'] && !settling()) tuto(app, 'cb-ult');
     $('.cb-res').classList.toggle('ready', ready);
-    if (ult) $('.cb-ult small').textContent = st.ultUsed ? 'Utilisé' : ready ? '' : `${st.fervor}/${FERVOR_MAX}`;
+    if (ult) $('.cb-ult small').textContent = st.ultUsed ? 'Utilisé' : ''; /* v828 : les braises disent déjà la Ferveur */
     const canMore = (st.init || st.ap > 0) && front(st, 'ally').some((u) => actionsFor(st, u.uid).some((a) => a.ok && a.key !== 'swap' && a.key !== 'defend'));
     $('.dv-end').classList.toggle('pulse', st.turn === 'ally' && !canMore && !busy);
     root.querySelectorAll('.cb-dockbar button, .cb-pass').forEach((b) => { const off = busy || st.turn !== 'ally' || !!st.over; b.disabled = off; b.classList.toggle('off', off); });
