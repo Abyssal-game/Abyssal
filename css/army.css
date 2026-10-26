@@ -8309,3 +8309,19 @@ html.fx-light .dv.cb.cb2 .cb-res.ready .cb-gems i.on { animation: none; }
   .dv.cb.cb2 .cb-swap2 { min-height: 44px; }
 }
 @media (max-height: 640px) { .dv.cb.cb2 .cb-feed { display: none; } }
+/* v829 (3 captures du propriétaire, app iPhone) : médaillons du haut jamais sous les boutons ×1 / ? (ils défilent de côté s'il y en a trop) ;
+   case Permuter sans espace vide : le mot est écrit dans la plaque ; menu de combat élargi jusqu'aux bords de l'écran. */
+.dv.cb.cb2 .dv-top > .row.gap { flex: none; }
+.dv.cb.cb2 .dv-top .cb-rules { flex: 1 1 0; min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; padding: 3px 4px 3px 0; margin: -3px 2px -3px 0; }
+.dv.cb.cb2 .dv-top .cb-rules::-webkit-scrollbar { display: none; }
+.dv.cb.cb2 .dv-top .cb-rules > * { flex: none; }
+.dv.cb.cb2 .dv-top .cb-law.cb-runes { gap: 0; padding: 0 5px; }
+.dv.cb.cb2 .dv-top .cb-law.cb-runes img { width: 11px; height: 11px; }
+.dv.cb.cb2 .cb-swap2 { width: 60px; min-height: 0; padding: 0; }
+.dv.cb.cb2 .cb-swap2 > .cb-tile { left: 0; right: 0; top: 0; bottom: 0; }
+.dv.cb.cb2 .cb-swap2 .cb-ai { top: 40%; width: 26px; height: 26px; }
+.dv.cb.cb2 .cb-swap2 > small { left: 13%; right: 13%; bottom: 7%; height: 17%; display: flex; align-items: center; justify-content: center; font: 700 .5rem/1 var(--f-display); letter-spacing: .02em; color: #F2E6CC; text-shadow: 0 1px 2px #000; overflow: visible; }
+.dv.cb.cb2 .cb-dock { margin-left: -12px; margin-right: -12px; padding-left: 4px; padding-right: 4px; }
+@media (max-height: 720px) { .dv.cb.cb2 .cb-dock { padding-left: 3px; padding-right: 3px; } .dv.cb.cb2 .cb-swap2 { width: 54px; } }
+.dv.cb.cb2 .cb-swap2 { width: 52px; height: auto; aspect-ratio: .86; align-self: center; }
+@media (max-height: 720px) { .dv.cb.cb2 .cb-swap2 { width: 46px; } }
