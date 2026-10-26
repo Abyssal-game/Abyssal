@@ -238,6 +238,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       ${(() => { const w = enemy && !dead ? cardWarn(u) || ordIntent(u) : ''; return `<span class="cb-above">${statusBand(u, !!w)}${w}</span>`; })()}
     </button>`;
   };
+  let rsvHitUntil = 0; /* v832 : la réserve pulse en rouge quand une de tes créatures tombe */
   const resHTML = (side) => {
     const r = reserve(st, side);
     if (side === 'enemy') return r.length ? `<span class="dv-res" title="Réserve ennemie">+${r.length}</span>` : '';
@@ -245,7 +246,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     /* v820 : la réserve est dans le menu du bas : ses créatures en petites cartes avec leurs PV, les tombées assombries */
     const pct = (u) => Math.max(0, Math.min(100, Math.round((Math.max(0, u.hp) / Math.max(1, u.maxHp)) * 100)));
     const mini = (u, dead) => `<span class="cb-rm ${dead ? 'dead' : ''}" style="--rc:${RARITY[cat.get(u.id).rarity].color}"><img alt="" src="${artUrl(cat.get(u.id), { lite: true })}">${dead ? '<img class="cb-rm-sk" alt="" src="assets/icons/mort.webp">' : `<i class="cb-rm-hp" style="--h:${pct(u)}%"></i><b>${Math.max(0, u.hp)}</b>`}</span>`;
-    return `<button class="cb-rsv2" data-d="reserve" aria-label="Voir la réserve"><small>Réserve</small><span class="cb-rsv2-l">${r.map((u) => mini(u, false)).join('')}${dead.map((u) => mini(u, true)).join('')}${!r.length && !dead.length ? '<em>vide</em>' : ''}</span></button>`;
+    return `<button class="cb-rsv2${Date.now() < rsvHitUntil ? ' hit' : ''}" data-d="reserve" aria-label="Voir la réserve"><small>Réserve</small><span class="cb-rsv2-l">${r.map((u) => mini(u, false)).join('')}${dead.map((u) => mini(u, true)).join('')}${!r.length && !dead.length ? '<em>vide</em>' : ''}</span></button>`;
   };
 
   /* v828 : Permuter, à côté de la réserve (une case vide et grisée quand ce n'est pas possible, pour que rien ne bouge) */
@@ -651,6 +652,38 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   let burstSrc = null, burstN = 0; // v499 : coups enchaînés d'une même créature (triple morsure, ruée…) : compteur ×2, ×3
   /* prochain coup de la même action (on saute les événements de jauge) : sert à enchaîner les coups sans arrêt sur image */
   const nextHit = (ev, i) => { for (let j = i + 1; j < ev.length; j++) { const x = ev[j]; if (x.t === 'dmg') return x; if (!['brk', 'fervor', 'pa', 'combo', 'status'].includes(x.t)) return null; } return null; };
+  /* v832 : mort d'une de tes créatures, bien signalée sans arrêter le combat */
+  async function allyDown(uid, ev, ei) {
+    const u = st.units[uid];
+    const nx = ev.slice(ei + 1).find((x) => x.t === 'enter' && st.units[x.u]?.side === 'ally');
+    /* la carte a souvent déjà laissé sa place à la remplaçante : on la remet le temps du deuil, à la place de celle-ci */
+    let t = el(uid), ghost = null, hidden = null;
+    if (!t && u) {
+      const tp = document.createElement('template'); tp.innerHTML = cardEl(u).trim(); ghost = tp.content.firstElementChild;
+      const rep = nx ? el(nx.u) : null, row = $('.dv-row.ally');
+      if (ghost && rep) { rep.before(ghost); rep.style.display = 'none'; hidden = rep; } else if (ghost && row) row.appendChild(ghost); else ghost = null;
+      t = ghost;
+    }
+    if (t && !t.querySelector('.dv-mourn')) { t.classList.add('mourn'); const m = document.createElement('span'); m.className = 'dv-mourn'; m.innerHTML = '<img alt="" src="assets/icons/mort.webp">'; t.appendChild(m); }
+    const dv = $('.dv'), tl = $('.cb-tl');
+    if (dv && u) {
+      dv.querySelector('.cb-fallen')?.remove();
+      const b = document.createElement('div'); b.className = 'cb-fallen';
+      const top = tl ? tl.getBoundingClientRect().bottom - dv.getBoundingClientRect().top + 4 : 90;
+      b.style.top = `${Math.round(top)}px`;
+      b.innerHTML = `<img class="cb-fl-p" alt="" src="${uPic(u)}"><img class="cb-fl-sk" alt="" src="assets/icons/mort.webp"><span><small>${esc(tr('Créature à terre'))}</small><b>${esc(tw(uName(u)))}</b>${nx ? `<em>${esc(tr('{name} prend sa place', { name: tw(uName(st.units[nx.u])) }))}</em>` : ''}</span>`;
+      dv.appendChild(b); setTimeout(() => b.classList.add('out'), T(1500)); setTimeout(() => b.remove(), T(1500) + 450);
+    }
+    rsvHitUntil = Date.now() + 1800;
+    const r = $('.cb-rsv2'); if (r) { r.classList.remove('hit'); void r.offsetWidth; r.classList.add('hit'); }
+    haptic('defeat');
+    await wait(T(800));
+    if (!ghost) return false;
+    /* puis elle part en cendres comme avant, et la remplaçante entre */
+    app.sfx.death(); sparks(uid, 'ember'); ghost.classList.add('dying', 'cracking'); await wait(T(640));
+    ghost.remove(); if (hidden) { hidden.style.display = ''; hidden.classList.add('enter'); }
+    return true;
+  }
   let lastAtk = null, fatalDone = false; // dernière créature alliée à avoir agi : gros plan du coup fatal sur le dernier ennemi
   const DICE_KEYS = ['estoc', 'contagion', 'entrave'];
   /* v820 : bandeau du dernier coup (entre la frise et les ennemis) : qui agit, quel coup, sur qui, et ce qu'il a fait.
@@ -864,6 +897,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
             await wait(T(reduced ? 1100 : 1500)); d?.classList.remove('slowmo', 'bossfall', 'grace'); draw(); break;
           }
           if (u?.side === 'ally') narrate('fall', { chance: 0.7, host: $('.dv') }); /* v794 */
+          if (u?.side === 'ally' && await allyDown(e.u, ev, ei)) { draw(); break; } /* v832 : la carte se grise sous la tête de mort, bandeau « Créature à terre », la réserve réagit */
           // coup fatal : le dernier ennemi tombe sous un coup allié → gros plan, une fois par combat
           if (u?.side === 'enemy' && st.over === 'won' && lastAtk && !fatalDone) { fatalDone = true; await closeup(lastAtk, e.u, 'Coup fatal', { crit: true, sub: '' }); }
           // ennemi K.O. : fissures et flash, la carte vole en éclats, les braises montent (planches Gemini, v256)

@@ -8841,6 +8841,8 @@ export default {
   "Elle sert à l’Assaut conjoint ({0} Ferveur, une fois par combat) : sur un ennemi Fêlé, Brisé ou Marqué, ta créature et celle qui joue juste après frappent ensemble. Il apparaît dans les actions quand c’est possible.": "Serve all’Assalto congiunto ({0} Fervore, una volta per combattimento): su un nemico Incrinato, Spezzato o Marchiato, la tua creatura e quella che gioca subito dopo colpiscono insieme. Compare tra le azioni quando è possibile.",
   "Avec une Mythique ou une Secrète dans l’équipe, la Ferveur pleine lance aussi un pouvoir d’équipe.": "Con una Mitica o una Segreta in squadra, il Fervore pieno scatena anche un potere di squadra.",
   "Ton équipe n’a pas de pouvoir d’équipe (il faut une Mythique ou une Secrète) : la Ferveur sert à l’Assaut conjoint.": "La tua squadra non ha un potere di squadra (serve una Mitica o una Segreta): il Fervore serve all’Assalto congiunto.",
+  "Créature à terre": "Creatura a terra",
+  "{name} prend sa place": "{name} prende il suo posto",
 };
 
 export const names = {

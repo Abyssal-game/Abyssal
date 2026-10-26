@@ -8349,3 +8349,24 @@ html.fx-light .dv.cb.cb2 .cb-res.ready .cb-gems i.on { animation: none; }
   .dv.cb.cb2 .cb-dock { gap: 3px; }
   .dv.cb.cb2 .cb-dock .dv-msg { min-height: 40px; padding-top: 2px; padding-bottom: 2px; font-size: .64rem; line-height: 1.15; }
 }
+
+/* v832 (le propriétaire : « on ne se rend pas compte qu'une de nos créatures meurt ») : la carte se grise sous la tête de mort
+   avant de partir en cendres ; bandeau « Créature à terre » sous la frise (s'efface seul, ne bloque rien) ; la réserve pulse en rouge. */
+.dv .dv-c.mourn .dv-art, .dv .dv-c.mourn .dv-base { filter: grayscale(1) brightness(.4); transition: filter .25s; }
+.dv .dv-mourn { position: absolute; inset: 0; z-index: 9; display: grid; place-items: center; pointer-events: none; }
+.dv .dv-mourn img { width: 62%; height: auto; filter: drop-shadow(0 2px 6px #000); animation: mourn832 .35s cubic-bezier(.2, 1.4, .4, 1) both; }
+@keyframes mourn832 { from { opacity: 0; transform: scale(1.6); } to { opacity: 1; transform: none; } }
+.dv .cb-fallen { position: absolute; left: 50%; z-index: 40; transform: translateX(-50%); display: flex; align-items: center; gap: 9px; max-width: 92%; box-sizing: border-box; padding: 6px 14px 6px 6px; border-radius: 12px;
+  background: linear-gradient(180deg, rgba(58, 10, 12, .96), rgba(22, 5, 7, .96)); border: 1px solid #8E2A24; box-shadow: 0 6px 18px rgba(0, 0, 0, .7), inset 0 1px 0 rgba(255, 140, 120, .15);
+  pointer-events: none; animation: fall832 .3s ease-out both; transition: opacity .4s, transform .4s; }
+.dv .cb-fallen.out { opacity: 0; transform: translate(-50%, -8px); }
+@keyframes fall832 { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translateX(-50%); } }
+.dv .cb-fallen .cb-fl-p { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; object-position: center 25%; filter: grayscale(1) brightness(.55); box-shadow: 0 0 0 2px #8E2A24; flex: none; }
+.dv .cb-fallen .cb-fl-sk { position: absolute; left: 13px; top: 50%; width: 24px; height: 24px; margin-top: -12px; }
+.dv .cb-fallen > span { display: flex; flex-direction: column; min-width: 0; line-height: 1.15; }
+.dv .cb-fallen small { font: 700 .56rem/1.2 var(--f-display); letter-spacing: .08em; text-transform: uppercase; color: #FF8A78; }
+.dv .cb-fallen b { font: 700 .82rem/1.2 var(--f-display); color: #F3E6CF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dv .cb-fallen em { font-style: normal; font-size: .66rem; color: #CFC3AE; }
+.dv.cb.cb2 .cb-rsv2.hit { animation: rsvHit832 .6s ease-in-out 3; }
+@keyframes rsvHit832 { 50% { box-shadow: 0 0 0 2px #E04040, 0 0 16px rgba(224, 64, 64, .8); } }
+@media (prefers-reduced-motion: reduce) { .dv .dv-mourn img, .dv .cb-fallen, .dv.cb.cb2 .cb-rsv2.hit { animation: none; } }

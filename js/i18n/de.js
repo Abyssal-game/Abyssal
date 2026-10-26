@@ -8841,6 +8841,8 @@ export default {
   "Elle sert à l’Assaut conjoint ({0} Ferveur, une fois par combat) : sur un ennemi Fêlé, Brisé ou Marqué, ta créature et celle qui joue juste après frappent ensemble. Il apparaît dans les actions quand c’est possible.": "Sie dient dem Gemeinsamen Angriff ({0} Inbrunst, einmal pro Kampf): Gegen einen angeknacksten, gebrochenen oder markierten Feind schlagen deine Kreatur und die nächste gemeinsam zu. Er erscheint bei den Aktionen, wenn er möglich ist.",
   "Avec une Mythique ou une Secrète dans l’équipe, la Ferveur pleine lance aussi un pouvoir d’équipe.": "Mit einer Mythischen oder Geheimen im Team löst volle Inbrunst auch eine Teamkraft aus.",
   "Ton équipe n’a pas de pouvoir d’équipe (il faut une Mythique ou une Secrète) : la Ferveur sert à l’Assaut conjoint.": "Dein Team hat keine Teamkraft (dafür braucht es eine Mythische oder Geheime): Die Inbrunst dient dem Gemeinsamen Angriff.",
+  "Créature à terre": "Kreatur gefallen",
+  "{name} prend sa place": "{name} nimmt ihren Platz ein",
 };
 
 export const names = {
