@@ -11,7 +11,8 @@ from PIL import Image
 key, lang = sys.argv[1], sys.argv[2]
 gain = float(sys.argv[3]) if len(sys.argv) > 3 else 1.5
 dark_mul = float(sys.argv[4]) if len(sys.argv) > 4 else 1.0  # assombrit l'encre (ex. 0.7)
-src = Image.open(f'store/fin/sig-{key}-{lang}-source.jpg').convert('RGB')
+suf = '' if lang == 'fr' else f'-{lang}'  # fr : la signature d'origine (sig-<clé>.webp)
+src = Image.open(f'store/fin/sig-{key}{suf}-source.jpg').convert('RGB')
 a = np.asarray(src).astype(np.float32) / 255.0
 
 # fond : blanc presque pur ; seuil doux pour ne pas garder le grain du papier
@@ -70,6 +71,6 @@ m = 10
 img = img.crop((max(0, bb[0] - m), max(0, bb[1] - m), min(img.width, bb[2] + m), min(img.height, bb[3] + m)))
 if img.width > 900:
     img = img.resize((900, round(img.height * 900 / img.width)), Image.LANCZOS)
-dst = f'assets/fin/sig-{key}-{lang}.webp'
+dst = f'assets/fin/sig-{key}{suf}.webp'
 img.save(dst, 'WEBP', quality=88, method=6)
 print(dst, img.size)
