@@ -983,7 +983,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     /* v794 : le narrateur : défaite, ou victoire arrachée de justesse */
     if (st.over === 'lost' && !run?.lab) narrate('defeat', { host: document.body });
     else if (st.over === 'won' && !st.bossKey) { const al = Object.values(st.units).filter((x) => x.side === 'ally'); const hp = al.reduce((a, x) => a + Math.max(0, x.hp), 0), mx = al.reduce((a, x) => a + x.maxHp, 0); if (mx && hp / mx < 0.2) narrate('close', { host: document.body }); }
-    $('.dv').insertAdjacentHTML('beforeend', `<div class="cb-end">${crestHTML(st.over === 'won', st.over === 'won' ? 'Victoire' : 'Défaite')}</div>`);
+    $('.dv').insertAdjacentHTML('beforeend', `<div class="cb-end cb-end2 ${st.over === 'won' ? 'won' : 'lost'}"><div class="cb-end-in"><img class="cb-end-em" alt="" src="assets/ui/cb-${st.over === 'won' ? 'victoire' : 'defaite'}.webp"><b>${st.over === 'won' ? 'Victoire' : 'Défaite'}</b></div></div>`); /* v826 : médailles peintes de fin de combat */
     await wait(T(st.over === 'won' ? 850 : 1200));
     if (alive_) { alive_ = false; musicMood('normal'); perfStop(); ctl.abort(); dio.destroy(); document.body.classList.remove('battle-mode'); onEnd(); }
   }
