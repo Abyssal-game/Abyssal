@@ -6,7 +6,7 @@
 // Les anciens duels (Choc payant, v513-v810) restent visibles jusqu'à ce qu'ils soient vus et encaissés.
 import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
-import { CHOC, CYCLE, VERB, preyOf, newGame, apply, aiPick, viewFor } from '../core/choc.js';
+import { CHOC, newGame, apply, aiPick, viewFor } from '../core/choc.js';
 import { LEAGUES, LEAGUE_PTS, LEAGUE_REWARD, STREAK_CHESTS, STREAK_MULT, streakMult, leagueIdx, lineupOf } from '../core/versus.js';
 import { drawBooster } from '../core/boosters.js';
 import { isBlocked } from '../core/moderation.js';
@@ -22,15 +22,14 @@ import { t, tw } from '../i18n.js';
 const HOW = () => [['p:seal', '#E8C35A', 'Un jeton par partie', 'Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour ({m} en réserve au plus) ; le coffre de la semaine, le Tournoi du Cercle et le Codex en donnent d’autres. Les jetons ne s’achètent pas.', { m: CHOC.tokensMax }],
   ['booster', '#C9A45A', 'Les boosters s’ouvrent', 'Toi et ton adversaire ouvrez deux boosters en même temps : six cartes chacun. De ses cartes, tu ne vois que la faction et la rareté.'],
   ['swords', '#E0485E', 'Trois manches', 'À chaque manche, vous posez une carte en même temps, en secret. Les deux se retournent : la plus forte gagne la manche.'],
-  ['crown', '#F2C14E', 'La force', 'Rareté : Commune 1, Peu commune 2, Rare 3, Hyper rare 4, Mythique 5, Secrète 6. +1 avec une finition, +2 si sa faction domine celle de la carte adverse.'],
-  ['p:help', '#9C7BFF', 'Le Cercle des Royaumes', 'Chaque royaume domine le suivant : {list}', { list: '' }],
-  ['p:seal', '#FF8A3D', 'Le Sceau d’Ardeur', 'Une fois par partie, ajoute +3 à la carte que tu poses. Ton adversaire ne le voit qu’au moment où les cartes se retournent.'],
+  ['crown', '#F2C14E', 'La force', 'Rareté : Commune 1, Peu commune 2, Rare 3, Hyper rare 4, Mythique 5, Secrète 6. +1 avec une finition. Égalité : manche nulle.'],
+  ['streak', '#FF8A3D', 'Les Flammes', 'Tu as {n} Flammes pour toute la partie. Pose jusqu’à {m} Flammes sur ta carte : chacune ajoute +1. Elles restent secrètes jusqu’à la révélation, mais chacun voit combien il en reste à l’autre.', { n: CHOC.flames, m: CHOC.flameMax }],
   ['booster', '#7FA8D8', 'Le Renfort', 'Après la deuxième manche, un troisième booster s’ouvre pour chacun : trois cartes de plus pour la dernière manche.'],
-  ['cards', '#7FE0A0', 'Ce que tu gardes', 'Le plus de manches gagnées l’emporte (à égalité, le total des forces). Chacun garde les cartes qui ont gagné leur manche, plus une au choix. Le gagnant prend aussi la copie d’une carte de l’adversaire. Le reste retourne à l’Abysse.'],
+  ['cards', '#7FE0A0', 'Ce que tu gardes', 'Le plus de manches gagnées l’emporte (à égalité, le total des forces). Une carte qui gagne sa manche est à toi : choisis bien où mettre tes Flammes. Chacun garde aussi une carte au choix, et le gagnant prend la copie d’une carte de l’adversaire. Partie nulle : pas de copie. Le reste retourne à l’Abysse.'],
   ['streak', '#FF8A3D', 'Série et Ligue', 'Victoire : {s} éclats × ta Série ardente (jusqu’à ×{x}), et un coffre à 3, 5, 7 et 10 victoires d’affilée. Ligue du mois : +{w} par victoire, −{l} par défaite.', { s: CHOC.winShards, x: STREAK_MULT.at(-1), w: LEAGUE_PTS.win, l: Math.abs(LEAGUE_PTS.lose) }],
   ['ui-eye', '#E0485E', 'Aucune triche', 'Les boosters sont ouverts et les manches jugées par le serveur : personne ne peut voir tes cartes ni truquer un tirage.']];
-const howLi = ([ic, c, ti, d, p], i, fac) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic.startsWith('p:') ? ic.slice(2) : ic)}<em>${i + 1}</em></span><span><b>${t(ti)}</b><span class="small">${t(d, p && 'list' in p ? { list: fac } : p)}</span></span></li>`;
-export const chocHowHTML = (cat) => { const fac = CYCLE.map((f) => `<span class="kc-cyc">${sigil(f)}${esc(tw(cat?.faction?.[f]?.name || f))}</span>`).join(' → '); return `<ol class="how-steps">${HOW().map((x, i) => howLi(x, i, fac)).join('')}</ol>`; };
+const howLi = ([ic, c, ti, d, p], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic.startsWith('p:') ? ic.slice(2) : ic)}<em>${i + 1}</em></span><span><b>${t(ti)}</b><span class="small">${t(d, p)}</span></span></li>`;
+export const chocHowHTML = () => `<ol class="how-steps">${HOW().map((x, i) => howLi(x, i)).join('')}</ol>`;
 const OFF = 'Le Choc des Boosters n’est pas encore ouvert sur le serveur.';
 const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
 
@@ -130,14 +129,14 @@ export default function versusScreen(app, root) {
     await game.openPacks(tview(), tctx, 'start').catch(() => {});
     if (train) game.drawGame(tview(), tctx);
   }
-  async function trainPlay(i, seal) {
+  async function trainPlay(i, f) {
     try {
-      train.st = apply(train.st, 'a', i, seal);
+      train.st = apply(train.st, 'a', i, f);
       tctx.busy = true; game.drawGame(tview(), tctx);
       await new Promise((r) => setTimeout(r, app.reduced() ? 150 : 900));
       if (!train) return;
       const ai = aiPick(train.st, 'b', Math.random);
-      train.st = apply(train.st, 'b', ai.i, ai.seal);
+      train.st = apply(train.st, 'b', ai.i, ai.f);
       tctx.busy = false;
       await game.reveal(tview(), train.st.last, tctx);
       if (train) game.drawGame(tview(), tctx);
@@ -145,9 +144,9 @@ export default function versusScreen(app, root) {
   }
 
   // ——— Une partie en ligne ———
-  async function play(i, seal, ctx) {
+  async function play(i, f, ctx) {
     const prev = ctx.view;
-    const v = await ctx.act(() => cloud.mpAct(ctx.ui.open, { pick: i, seal }));
+    const v = await ctx.act(() => cloud.mpAct(ctx.ui.open, { pick: i, flames: f }));
     if (!v) return;
     const ev = v.state?.last;
     if (ev && ev.n > (prev.state?.n || 0)) { try { await game.reveal(v, ev, ctx); } catch (e) { if (e !== game.STOP) throw e; } }

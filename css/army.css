@@ -7803,3 +7803,114 @@ html.kb-open .sheet-wrap:not(.sheet-full) .sheet { max-height: 100%; overflow-y:
   .kc-step { padding: 6px 10px; font-size: .8rem; }
   .kc-play { min-height: 48px; }
 }
+
+/* v816 : Choc, les Flammes (plus de Cercle des Royaumes ni de Sceau d'Ardeur) ; écran refait pour tout lire sans plisser les yeux :
+   grandes cartes, force en gros chiffre, rareté écrite en entier, cartes de l'adversaire en grosses pastilles, Flammes en boutons */
+.kc3 { --hcw: min(calc(var(--app-h, 100dvh) * .108), 98px); gap: 7px; justify-content: flex-start; }
+.kc3 .mq-bar b { font: 800 1.05rem/1 var(--f-display); letter-spacing: .06em; color: #FFE7A0; }
+.kc-game .kc-sig { display: none; }
+/* la carte vue de face */
+.kc-game .kc-c { box-shadow: 0 0 0 3px var(--rc, #888), 0 5px 12px rgba(0, 0, 0, .7); border-radius: 9px; }
+.kc-game .kc-c:not(.sm) .kc-f { left: 4px; top: 4px; right: auto; bottom: auto; min-width: 32px; height: 32px; padding: 0 5px; border-radius: 16px; font: 800 1.3rem/1 var(--f-display); color: #1A1206; background: radial-gradient(circle at 35% 30%, #FFF6D2, #E4A92A); box-shadow: 0 0 0 2px #000, 0 0 0 3.5px var(--rc), 0 3px 6px rgba(0, 0, 0, .8); }
+.kc-rn { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 2px 4px; text-align: center; font: 800 .74rem/1.05 var(--f-display); letter-spacing: .03em; text-transform: uppercase; color: var(--rc); background: linear-gradient(transparent, rgba(0, 0, 0, .78) 45%, rgba(0, 0, 0, .92)); text-shadow: 0 1px 2px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kc-game .kc-c:not(.sm) .kc-fin { left: auto; right: 4px; top: 4px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: .95rem; color: #E2F3FF; background: radial-gradient(circle, #3A5A86, #172338); box-shadow: 0 0 0 1.5px #9FD8FF, 0 0 8px rgba(159, 216, 255, .8); text-shadow: none; }
+.kc-game .kc-c.sm .kc-rn { left: 2px; right: auto; bottom: 2px; padding: 2px 3px; border-radius: 4px; font-size: .56rem; background: rgba(0, 0, 0, .78); }
+.kc-game .kc-c.hid:not(.sm) { display: block; background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--rc) 45%, #000), #0B080D 75%); }
+.kc-game .kc-c.hid:not(.sm) .kc-f { left: 50%; top: 40%; transform: translate(-50%, -50%); }
+/* l'adversaire : portrait, nom, ses cartes (rareté = force), ses Flammes */
+.kc3 .kc-side.foe { gap: 0; }
+.kc3 .kc-tag { align-items: center; gap: 8px; padding: 6px 10px; border-radius: 16px; background: rgba(8, 6, 10, .66); box-shadow: inset 0 0 0 1px rgba(201, 164, 90, .3); }
+.kc3 .kc-tag .sc-med { width: 44px; height: 44px; flex: none; }
+.kc-tg { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.kc-tg > b { font: 700 .95rem/1.15 var(--f-display); color: #E8C987; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kc-fchips { display: flex; flex-wrap: wrap; gap: 5px; }
+.kc-fc { width: 30px; height: 36px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: color-mix(in srgb, var(--rc) 22%, #0B080D); box-shadow: inset 0 0 0 2px var(--rc); }
+.kc-fc b { font: 800 1.1rem/1 var(--f-display); color: #FFF6E0; }
+.kc-fc small { font: 800 .52rem/1 var(--f-display); color: var(--rc); margin-top: 1px; }
+.kc-fc.pre { opacity: 0; }
+.kc-fc.flipin { animation: kcFlipIn .45s ease-out both; }
+.kc-flc { flex: none; display: inline-flex; align-items: center; gap: 2px; padding: 4px 9px 4px 5px; border-radius: 14px; background: rgba(60, 18, 6, .75); box-shadow: inset 0 0 0 1.5px rgba(255, 150, 70, .55); }
+.kc-flc .kc-fl-i { width: 22px; height: 22px; object-fit: contain; }
+.kc-flc b { font: 800 1.2rem/1 var(--f-display); color: #FFC070; }
+/* la table */
+.kc3t { flex: none; padding: 8px 10px 10px; gap: 6px; }
+.kc-score { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0 2px; }
+.kc-score small { font: 700 .72rem/1 var(--f-display); letter-spacing: .06em; color: #B9A77E; text-transform: uppercase; }
+.kc3 .kc-pips i { width: 16px; height: 16px; }
+.kc3 .kc-duel { gap: 8px; }
+.kc3 .kc-spot .kc-c { width: min(25vw, calc(var(--app-h, 100dvh) * .118), 108px); }
+.kc3 .kc-spot em { font-size: .8rem; }
+.kc-parts { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; min-height: 22px; }
+.kc-parts i { font: 700 .76rem/1 var(--f-display); font-style: normal; display: inline-flex; align-items: center; gap: 2px; padding: 4px 7px; border-radius: 10px; background: rgba(0, 0, 0, .65); white-space: nowrap; }
+.kc-parts .rr { color: var(--rc); } .kc-parts .fi { color: #CFE8FF; } .kc-parts .fl { color: #FFB060; }
+.kc-parts .kc-fl-i { width: 15px; height: 15px; object-fit: contain; }
+.kc3 .kc-step { width: 100%; padding: 6px 10px; font-size: .84rem; line-height: 1.3; background: rgba(0, 0, 0, .4); box-shadow: none; }
+.kc3 .kc-step small { color: #CDBF9E; font-size: .76rem; }
+.kc3 .kc-step .n { width: 24px; height: 24px; font-size: .85rem; }
+.kc3 .kc-step.go { box-shadow: inset 0 0 0 1.5px rgba(242, 193, 78, .7); }
+/* ta main : grandes cartes */
+.kc3 .kc-side.me { flex: 1; min-height: 0; justify-content: center; }
+.kc3 .kc-side .kc-hand.me { grid-template-columns: repeat(var(--cols, 3), minmax(0, min(var(--hcw), calc((100% - 30px) / var(--cols, 3))))); justify-content: center; gap: 10px 9px; padding: 8px 2px 0; }
+.kc3 .kc-hand.me .kc-c[data-mp] { box-shadow: 0 0 0 3px var(--rc, #888), 0 0 12px rgba(242, 193, 78, .3), 0 5px 12px rgba(0, 0, 0, .7); }
+.kc3 .kc-hand.me .kc-c.on { transform: translateY(-8px) scale(1.05); box-shadow: 0 0 0 3px #FFE7A0, 0 0 22px rgba(242, 193, 78, .95); z-index: 1; }
+.kc3 .kc-hand.me:not(.can) .kc-c { filter: brightness(.8); }
+/* les Flammes */
+.kc-flames { display: grid; grid-template-columns: auto repeat(5, minmax(0, 1fr)); gap: 6px; align-items: stretch; padding: 6px; border-radius: 16px; background: rgba(40, 12, 6, .78); box-shadow: inset 0 0 0 1.5px rgba(255, 140, 60, .45); }
+.kc-flames.off { opacity: .5; }
+.kc-fl-h { display: grid; grid-template-columns: auto auto; grid-template-rows: auto auto; align-items: center; column-gap: 3px; padding: 0 4px; }
+.kc-fl-h .kc-fl-i { width: 26px; height: 26px; object-fit: contain; grid-row: 1; }
+.kc-fl-h b { grid-row: 1; font: 800 1.35rem/1 var(--f-display); color: #FFC070; }
+.kc-fl-h small { grid-column: 1 / 3; font: 600 .62rem/1.1 var(--f-body, inherit); color: #E8D9C0; text-align: center; }
+.kc-fl { min-height: 50px; border: 0; border-radius: 12px; padding: 4px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #F6E6C8; background: rgba(0, 0, 0, .5); box-shadow: inset 0 0 0 1.5px rgba(201, 164, 90, .4); }
+.kc-fl b { font: 800 1.15rem/1 var(--f-display); }
+.kc-fl-st { display: flex; justify-content: center; }
+.kc-fl-st .kc-fl-i { width: 12px; height: 14px; object-fit: contain; margin: 0 -1px; }
+.kc-fl.on { color: #FFF4D8; background: radial-gradient(circle at 50% 30%, rgba(255, 150, 60, .65), rgba(90, 24, 8, .95)); box-shadow: inset 0 0 0 2px #FFB060, 0 0 14px rgba(255, 120, 40, .75); }
+.kc-fl:disabled { opacity: .3; }
+.kc3 .kc-play { min-height: 52px; font-size: 1.05rem; }
+.kc3 .kc-quit { min-height: 26px; padding: 0 10px; }
+/* la révélation : les deux cartes en grand, le détail de chaque force */
+.kc3 .kc-arena.rv { min-height: 0; width: 100%; padding-bottom: 0; }
+.kc3 .kc-rvc .kc-c { width: min(25vw, calc(var(--app-h, 100dvh) * .118), 108px); }
+.kc-who2 { font: 700 .76rem/1.1 var(--f-display); color: #E8C987; max-width: 30vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kc3 .kc-vs b { display: flex; align-items: center; gap: 6px; font-size: 1.9rem; }
+.kc3 .kc-vs b em { font-style: normal; font-size: 1.1rem; opacity: .7; }
+.kc3 .kc-verdict { position: static; margin-top: 4px; grid-column: 1 / -1; animation: kcVerd .4s ease-out both; }
+.kc3 .kc-verdict b { font-size: 1.2rem; }
+.kc3 .kc-arena.shown .kc-rvc.lose .kc-c { filter: grayscale(.8) brightness(.55); }
+@media (max-height: 720px) {
+  .kc3 { gap: 5px; }
+  .kc3 .kc-tag { padding: 4px 8px; }
+  .kc3 .kc-tag .sc-med { width: 36px; height: 36px; }
+  .kc-fc { width: 27px; height: 32px; }
+  .kc3t { padding: 6px 8px 8px; gap: 4px; }
+  .kc3 .kc-step { padding: 4px 8px; font-size: .78rem; }
+  .kc3 .kc-step small { display: none; }
+  .kc-fl { min-height: 44px; }
+  .kc3 .kc-play { min-height: 46px; }
+  .kc3 .kc-side .kc-hand.me { gap: 8px; padding-top: 6px; }
+}
+.kc-game .kc-c:not(.sm) { container-type: inline-size; }
+.kc-game .kc-c:not(.sm) .kc-rn { font-size: min(.74rem, 10.5cqw); letter-spacing: 0; }
+.kc3 { --hcw: min(calc(var(--app-h, 100dvh) * .1), 92px); }
+.kc3 .kc-spot .kc-c, .kc3 .kc-rvc .kc-c { width: min(25vw, calc(var(--app-h, 100dvh) * .11), 100px); }
+.kc-flames { padding: 5px; }
+.kc-fl-h { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1px; padding: 0 6px; }
+.kc-fl-h > .kc-fl-i { display: none; }
+.kc-fl-h b { font-size: 1.4rem; display: inline-flex; align-items: center; gap: 2px; }
+.kc-fl-h b::before { content: ''; width: 22px; height: 22px; background: url(../assets/jeux/kc-flamme.webp) center / contain no-repeat, url(../assets/versus/flamme.webp) center / contain no-repeat; }
+.kc-fl-h small { font-size: .66rem; }
+.kc-fl { min-height: 46px; }
+.kc3 .kc-step { font-size: .8rem; }
+.kc3 .kc-side .kc-hand.me { gap: 8px 8px; padding-top: 6px; }
+@media (max-height: 720px) { .kc-fl { min-height: 42px; } }
+.kc-game .kc-c:not(.sm) .kc-rn { font-size: min(.82rem, 15cqw); }
+.kc-game .kc-c.r-C:not(.sm) .kc-rn, .kc-game .kc-c.r-M:not(.sm) .kc-rn, .kc-game .kc-c.r-HR:not(.sm) .kc-rn, .kc-game .kc-c.r-S:not(.sm) .kc-rn { font-size: min(.82rem, 12.5cqw); }
+.kc-game .kc-c.r-PC:not(.sm) .kc-rn { font-size: min(.78rem, 10.5cqw); }
+.kc3 ~ * .kc-r3c .kc-c, .kc-end .kc-r3c .kc-c { width: min(46%, calc(var(--app-h, 100dvh) * .078)); }
+.kc-end .kc-r3 > b { font-size: 1.15rem; }
+.kc-end .kc-r3 small { font-size: .74rem; }
+@media (max-height: 720px) {
+  .kc3 { --hcw: min(calc(var(--app-h, 100dvh) * .094), 92px); gap: 4px; padding-bottom: 4px; }
+  .kc3 .kc-quit { min-height: 22px; font-size: .74rem; }
+}

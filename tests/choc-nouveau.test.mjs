@@ -5,47 +5,56 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { loadCatalog, MemoryStorage, rngFrom, noWelcome } from './helpers.mjs';
 import { Game } from '../js/core/game.js';
-import { CHOC, CYCLE, beats, forceOf, newGame, apply, viewFor, wonIdx, aiPick } from '../js/core/choc.js';
+import { CHOC, forceOf, newGame, apply, viewFor, wonIdx, aiPick, flameCap } from '../js/core/choc.js';
 import { OPS, ARGS } from '../js/core/ops.js';
 const catalog = loadCatalog();
 let now = new Date('2026-11-02T10:00:00');
 const fresh = () => noWelcome(new Game(catalog, new MemoryStorage(), { rng: rngFrom('c'), clock: () => now }));
 const C = (rarity, faction, variant = 'normal', id = 'INF-001') => ({ id, rarity, faction, variant });
 
-test('v811 : force = rareté, +1 finition, +2 si la faction domine, +3 avec le Sceau', () => {
-  assert.equal(CYCLE.length, 7);
-  for (let i = 0; i < 7; i++) assert.ok(beats(CYCLE[i], CYCLE[(i + 1) % 7]));
-  assert.ok(beats('primordial', 'infernal'));
-  assert.ok(!beats('sauvage', 'infernal'));
-  assert.equal(forceOf(C('R', 'infernal'), C('C', 'abyssal'), false), 3);
-  assert.equal(forceOf(C('R', 'infernal', 'holo'), C('C', 'sauvage'), true), 3 + 1 + 2 + 3);
+test('v816 : force = rareté, +1 finition, +1 par Flamme ; plus de bonus de faction', () => {
+  assert.equal(forceOf(C('R', 'infernal'), 0), 3);
+  assert.equal(forceOf(C('R', 'infernal', 'holo'), 2), 3 + 1 + 2);
+  assert.equal(forceOf(C('C', 'primordial'), 4), 5);
+  assert.equal(CHOC.flames, 8); assert.equal(CHOC.flameMax, 4);
 });
 
-test('v811 : trois manches, Renfort après la 2e, le plus de manches gagnées l’emporte, cartes gagnantes gardées', () => {
+test('v816 : trois manches, 8 Flammes (4 au plus par carte), Renfort après la 2e, cartes gagnantes gardées', () => {
   const hand = (f) => [C('C', f), C('PC', f), C('R', f), C('HR', f), C('M', f), C('S', f)];
   let st = newGame({ a: hand('infernal'), b: hand('abyssal') }, { a: [C('C', 'infernal'), C('C', 'infernal'), C('S', 'infernal')], b: [C('C', 'abyssal'), C('C', 'abyssal'), C('C', 'abyssal')] });
+  assert.throws(() => apply(st, 'a', 5, 5), /impossible/, 'pas plus de 4 Flammes sur une carte');
+  assert.throws(() => apply(st, 'a', 5, 1.5), /impossible/);
   st = apply(st, 'a', 5); // S
   assert.equal(st.turn, 'b');
   assert.throws(() => apply(st, 'a', 4), /déjà posée/);
-  st = apply(st, 'b', 0); // C
+  st = apply(st, 'b', 0, 4); // C + 4 = 5 contre S 6
   assert.equal(st.last.win, 'a'); assert.equal(st.r, 2);
-  st = apply(st, 'b', 5, true); st = apply(st, 'a', 0); // S+3 contre C
-  assert.equal(st.last.win, 'b'); assert.ok(st.seal.b);
-  assert.throws(() => apply(st, 'b', 1, true), /impossible/, 'le Sceau ne sert qu’une fois');
+  assert.deepEqual(st.flames, { a: 8, b: 4 }, 'les Flammes posées sont dépensées');
+  st = apply(st, 'b', 2, 4); st = apply(st, 'a', 4); // R + 4 = 7 contre M 5
+  assert.equal(st.last.win, 'b'); assert.equal(st.last.b.f, 4); assert.equal(st.flames.b, 0);
+  assert.equal(flameCap(st, 'b'), 0);
+  assert.throws(() => apply(st, 'b', 1, 1), /impossible/, 'plus de Flammes en réserve');
   assert.ok(st.last.renfort); assert.equal(st.hand.a.length, 9);
   assert.throws(() => apply(st, 'a', 5), /impossible/, 'une carte jouée ne revient pas');
   st = apply(st, 'a', 8); st = apply(st, 'b', 1); // S du Renfort contre PC
   assert.ok(st.over); assert.equal(st.winner, 'a');
   assert.deepEqual(wonIdx(st, 'a'), [5, 8]);
-  assert.deepEqual(wonIdx(st, 'b'), [5]);
+  assert.deepEqual(wonIdx(st, 'b'), [2]);
+});
+
+test('v816 : égalité de force = manche nulle', () => {
+  let st = newGame({ a: [C('R', 'infernal')], b: [C('C', 'abyssal')] }, { a: [], b: [] });
+  st = apply(st, 'a', 0); st = apply(st, 'b', 0, 2);
+  assert.equal(st.last.win, null); assert.deepEqual(st.wins, { a: 0, b: 0 });
 });
 
 test('v811 : de l’adversaire, on ne voit que faction et rareté (et pas sa carte posée)', () => {
   let st = newGame({ a: [C('R', 'celeste', 'gold', 'CEL-010')], b: [C('M', 'necrotique', 'holo', 'NEC-020'), C('C', 'sauvage')] }, { a: [], b: [] });
-  st = apply(st, 'b', 0, true);
+  st = apply(st, 'b', 0, 3);
   const v = viewFor(st, 'a');
   assert.deepEqual(v.hand.b[0], { rarity: 'M', faction: 'necrotique', hid: true });
-  assert.equal(v.pick.b, true);
+  assert.equal(v.pick.b, true, 'les Flammes posées restent secrètes');
+  assert.equal(v.flames.b, 8, 'la réserve ne baisse qu’à la révélation');
   assert.equal(v.extra, undefined);
   assert.equal(v.hand.a[0].id, 'CEL-010');
 });
@@ -57,7 +66,8 @@ test('v811 : l’IA de l’entraînement joue toujours une carte permise', () =>
   for (let k = 0; k < 30; k++) {
     const pick = (n) => Array.from({ length: n }, () => pool[Math.floor(rng() * pool.length)]);
     let st = newGame({ a: pick(6), b: pick(6) }, { a: pick(3), b: pick(3) });
-    while (!st.over) { const x = aiPick(st, 'a', rng), y = aiPick(st, 'b', rng); st = apply(apply(st, 'a', x.i, x.seal), 'b', y.i, y.seal); }
+    while (!st.over) { const x = aiPick(st, 'a', rng), y = aiPick(st, 'b', rng); st = apply(apply(st, 'a', x.i, x.f), 'b', y.i, y.f); }
+    assert.ok(st.flames.a >= 0 && st.flames.b >= 0);
     assert.ok(['a', 'b', 'draw'].includes(st.winner));
   }
 });

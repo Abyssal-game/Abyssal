@@ -8786,6 +8786,18 @@ export default {
   "Ta carte": "La tua carta",
   "Choisis une carte dans ta main.": "Scegli una carta dalla tua mano.",
   "Pose-la. Le Sceau d’Ardeur ajoute +3, une fois par partie.": "Giocala. Il Sigillo dell’Ardore aggiunge +3, una volta per partita.",
+  "Flammes": "Fiamme",
+  "{n} Flammes": "{n} Fiamme",
+  "Manches gagnées": "Round vinti",
+  "Si elle gagne la manche, elle est à toi.": "Se vince il round, è tua.",
+  "Ajoute des Flammes (+1 chacune), puis pose ta carte.": "Aggiungi Fiamme (+1 ciascuna), poi gioca la tua carta.",
+  "Poser · force {n}": "Gioca · forza {n}",
+  "Ta carte est à toi à la fin de la partie.": "La tua carta sarà tua alla fine della partita.",
+  "Sa carte lui reviendra à la fin de la partie.": "La sua carta sarà sua alla fine della partita.",
+  "Rareté : Commune 1, Peu commune 2, Rare 3, Hyper rare 4, Mythique 5, Secrète 6. +1 avec une finition. Égalité : manche nulle.": "Rarità: Comune 1, Non comune 2, Rara 3, Iper rara 4, Mitica 5, Segreta 6. +1 con una finitura. Parità: round nullo.",
+  "Les Flammes": "Le Fiamme",
+  "Tu as {n} Flammes pour toute la partie. Pose jusqu’à {m} Flammes sur ta carte : chacune ajoute +1. Elles restent secrètes jusqu’à la révélation, mais chacun voit combien il en reste à l’autre.": "Hai {n} Fiamme per tutta la partita. Metti fino a {m} Fiamme sulla tua carta: ognuna aggiunge +1. Restano segrete fino alla rivelazione, ma ognuno vede quante ne restano all’altro.",
+  "Le plus de manches gagnées l’emporte (à égalité, le total des forces). Une carte qui gagne sa manche est à toi : choisis bien où mettre tes Flammes. Chacun garde aussi une carte au choix, et le gagnant prend la copie d’une carte de l’adversaire. Partie nulle : pas de copie. Le reste retourne à l’Abysse.": "Vince chi conquista più round (in parità, la forza totale). Una carta che vince il suo round è tua: scegli bene dove mettere le tue Fiamme. Ognuno tiene anche una carta a scelta, e il vincitore prende la copia di una carta dell’avversario. Pareggio: nessuna copia. Il resto torna all’Abisso.",
 };
 
 export const names = {

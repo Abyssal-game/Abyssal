@@ -2,12 +2,13 @@
 // supabase/09-multijoueur.sql). Les deux joueurs ouvrent leurs 2 boosters en même temps (les sachets s'entrechoquent puis se
 // déchirent), jouent 3 manches en posant chacun une carte en secret, un 3e booster arrive après la 2e manche (le Renfort), puis
 // chacun choisit ce qu'il garde. Le même écran sert à l'entraînement contre l'Abysse (rien n'est gagné ni perdu).
-import { CHOC, CYCLE, VERB, RAR_FORCE, preyOf, baseForce, wonIdx } from '../core/choc.js';
-import { RARITY, RARITY_ORDER } from '../config.js';
-import { LEAGUES, streakMult } from '../core/versus.js';
+// v816 : les Flammes (0 à 4 sur la carte posée, 8 pour la partie) remplacent le Cercle des Royaumes et le Sceau d'Ardeur ;
+// écran refait pour que tout se lise sans plisser les yeux : grandes cartes, force en gros chiffre, rareté écrite en entier.
+import { CHOC, RAR_FORCE, baseForce, wonIdx, flamesLeft, flameCap } from '../core/choc.js';
+import { RARITY } from '../config.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil } from '../ui/icons.js';
-import { esc, fmt, openSheet, toast } from '../ui/dom.js';
+import { esc, fmt, openSheet } from '../ui/dom.js';
 import { setScene } from '../ui/scene.js';
 import { haptic } from '../ui/sound.js';
 import { packHTML } from './shop.js';
@@ -16,8 +17,8 @@ import { t, tw } from '../i18n.js';
 
 const RES = { win: 'Victoire', lose: 'Défaite', draw: 'Égalité' };
 const EMB = { win: 'vd-win', lose: 'vd-lose', draw: 'vd-tie' };
-/* images Gemini attendues (prompts donnés le 26 octobre 2026) ; en attendant, le médaillon du sceau */
-const ARDEUR = '<img alt="" src="assets/jeux/kc-ardeur.webp" onerror="this.onerror=null;this.src=\'assets/icons/seal.webp\'">';
+/* Flamme d'Ardeur : image Gemini attendue (assets/jeux/kc-flamme.webp) ; en attendant, la flamme de la Série ardente */
+const FLAME = '<img class="kc-fl-i" alt="" src="assets/jeux/kc-flamme.webp" onerror="this.onerror=null;this.src=\'assets/versus/flamme.webp\'">';
 const RLET = { C: 'C', PC: 'PC', R: 'R', HR: 'HR', M: 'M', S: 'S' };
 const seenKey = (id) => `abyssal.chocSeen.${id}`;
 const seen = (id, k) => { try { return (localStorage.getItem(seenKey(id)) || '').split(',').includes(k); } catch (e) { return true; } };
@@ -25,51 +26,53 @@ const markSeen = (id, k) => { try { const v = (localStorage.getItem(seenKey(id))
 
 export function createChocGame(app, root) {
   const g = app.game, cat = app.catalog;
-  let sel = null, seal = false, anim = false, banner = null, keep = null, take = null, done = {}, timer = 0, wake = null, alive = true;
+  let sel = null, fl = 0, anim = false, banner = null, keep = null, take = null, done = {}, timer = 0, wake = null, alive = true;
   const STOP = { stop: true };
-  const fname = (f) => tw(cat.faction[f]?.name || f);
   const fcol = (f) => cat.faction[f]?.colors?.secondary || '#888';
   const rcol = (r) => RARITY[r]?.color || '#999';
+  const rname = (r) => t(RARITY[r]?.name || r);
   const foeOf = (v) => (v.me === 'a' ? 'b' : 'a');
   const wait = (ms, v) => (!alive ? Promise.reject(STOP) : new Promise((r, j) => { wake = j; timer = setTimeout(r, (app.reduced() ? Math.min(ms, 120) : ms) * (v?.pace === 'fast' ? 0.6 : 1)); }));
   const myPic = () => { const c = cat.get(g.shownAvatar()); return `<img alt="" src="${c ? artUrl(c, { lite: true }) : 'assets/brand/emblem.webp'}">`; };
+  const hasFin = (c) => c?.variant && c.variant !== 'normal';
 
-  // une carte de ta main (ou une carte révélée) : illustration, faction, rareté, force de base
+  // une carte : illustration, grosse force en haut à gauche, rareté écrite en bas, ✦ si finition
   function cardHTML(c, { i = null, on = false, used = false, small = false, extra = '', act = 'pick', force = null } = {}) {
     if (!c) return '<span class="kc-c empty"></span>';
-    if (c.hid) return `<span class="kc-c hid r-${c.rarity} ${small ? 'sm' : ''} ${extra}" style="--fc:${fcol(c.faction)};--rc:${rcol(c.rarity)}"><span class="kc-hsig">${sigil(c.faction)}</span><b class="kc-gem">${RLET[c.rarity] || '?'}</b></span>`;
+    if (c.hid) return `<span class="kc-c hid r-${c.rarity} ${small ? 'sm' : ''} ${extra}" style="--fc:${fcol(c.faction)};--rc:${rcol(c.rarity)}"><b class="kc-f">${RAR_FORCE[c.rarity] || '?'}</b><small class="kc-rn">${small ? RLET[c.rarity] : rname(c.rarity)}</small></span>`;
     const k = cat.get(c.id), f = force ?? baseForce(c);
-    const tag = i != null && !used ? `data-mp="${act}" data-i="${i}" role="button" tabindex="0"` : '';
-    return `<span class="kc-c r-${c.rarity} v-${c.variant || 'normal'} ${on ? 'on' : ''} ${used ? 'used' : ''} ${small ? 'sm' : ''} ${extra}" ${tag} style="--fc:${fcol(c.faction)};--rc:${rcol(c.rarity)}">
+    const tag = i != null && !used ? `data-mp="${act}" data-i="${i}" role="button" tabindex="0" aria-label="${esc(k ? tw(k.name) : '')} · ${rname(c.rarity)} · ${t('Force {n}', { n: f })}"` : '';
+    return `<span class="kc-c kc3c r-${c.rarity} v-${c.variant || 'normal'} ${on ? 'on' : ''} ${used ? 'used' : ''} ${small ? 'sm' : ''} ${extra}" ${tag} style="--fc:${fcol(c.faction)};--rc:${rcol(c.rarity)}">
       ${k ? `<img alt="" src="${artUrl(k, { lite: true })}" loading="lazy">` : ''}<span class="kc-sig">${sigil(c.faction)}</span>
-      ${c.variant && c.variant !== 'normal' ? '<i class="kc-fin">✦</i>' : ''}<b class="kc-f">${f}</b><small class="kc-r">${RLET[c.rarity]}</small></span>`;
+      ${hasFin(c) ? '<i class="kc-fin" title="+1">✦</i>' : ''}<b class="kc-f">${f}</b><small class="kc-rn">${small ? RLET[c.rarity] : rname(c.rarity)}</small></span>`;
   }
+  // détail de la force : « Rare 3 · ✦ +1 · 🔥 +2 »
+  const parts = (c, f) => [`<i class="rr" style="--rc:${rcol(c.rarity)}">${rname(c.rarity)} ${RAR_FORCE[c.rarity]}</i>`,
+    hasFin(c) ? `<i class="fi">✦ +${CHOC.finish}</i>` : '', f ? `<i class="fl">${FLAME}+${f}</i>` : ''].filter(Boolean).join('');
   const pips = (s, x) => s.rounds.map((r) => `<i class="${r.win === x ? 'w' : r.win ? 'l' : 'n'}"></i>`).join('') + Array.from({ length: CHOC.rounds - s.rounds.length }, () => '<i></i>').join('');
-  const sealHTML = (used) => `<span class="kc-seal ${used ? 'used' : ''}" title="${t('Sceau d’Ardeur')}">${ARDEUR}</span>`;
-  /* v815 (le propriétaire : « il faut refaire l'esthétique et le design complet, on ne voit pas bien ce qu'on doit faire ») :
-     l'adversaire en haut (sa main en éventail), la table au milieu (deux emplacements face à face, la manche en cours),
-     une consigne numérotée, ta main, puis le Sceau et « Poser » en bas. */
+  const flameCount = (n) => `<span class="kc-flc" title="${t('Flammes')}">${FLAME}<b>${n}</b></span>`;
   function tag(v, ctx, x) {
     const s = v.state, mine = x === v.me;
     return `<div class="kc-tag ${mine ? 'me' : 'foe'}"><span class="sc-med">${mine ? myPic() : ctx.avatar(v.foe?.avatar)}</span>
-      <b>${ctx.plate(v, mine, mine ? t('Toi') : `<span translate="no">${esc(ctx.foeName(v))}</span>`)}</b>
-      <span class="kc-pips" title="${t('Manches')}">${pips(s, x)}</span>${sealHTML(s.seal?.[x])}</div>`;
+      <span class="kc-tg"><b>${ctx.plate(v, mine, mine ? t('Toi') : `<span translate="no">${esc(ctx.foeName(v))}</span>`)}</b>${mine ? '' : foeChips(s, x)}</span>${flameCount(flamesLeft(s, x))}</div>`;
   }
-  // la table : la manche en cours (cartes posées face cachée, ta carte choisie en aperçu) ou la dernière révélée
+  // les cartes de l'adversaire : seulement leur rareté (et donc leur force de base), en grosses pastilles
+  function foeChips(s, foe) {
+    return `<div class="kc-fchips">${(s.hand[foe] || []).map((c, i) => s.used?.[foe]?.includes(i) ? '' : `<span class="kc-fc" style="--rc:${rcol(c.rarity)}"><b>${RAR_FORCE[c.rarity] || '?'}</b><small>${RLET[c.rarity] || ''}</small></span>`).join('')}</div>`;
+  }
+  // la table : la carte de l'adversaire (cachée) face à la tienne (choisie, avec sa force totale)
   function arena(v, ctx, can) {
     const s = v.state, me = v.me, foe = foeOf(v);
-    if (banner) return `<div class="kc-table"><div class="kc-arena rv ${banner.cls}">${banner.html}</div></div>`;
+    const score = `<div class="kc-score"><span class="kc-pips">${pips(s, foe)}</span><small>${t('Manches gagnées')}</small><span class="kc-pips">${pips(s, me)}</span></div>`;
+    if (banner) return `<div class="kc-table kc3t">${score}<div class="kc-arena rv ${banner.cls}">${banner.html}</div></div>`;
     const myPick = s.pick?.[me], foeIn = !!s.pick?.[foe];
-    const c = !myPick && can && sel != null ? s.hand[me][sel] : null;
-    const mine = myPick ? `${cardHTML(s.hand[me][myPick.i], { extra: 'placed' })}${myPick.seal ? '<span class="kc-sealon">+3</span>' : ''}`
-      : c ? `${cardHTML(c, { extra: 'ghost', force: baseForce(c) + (seal ? CHOC.seal : 0) })}${seal ? '<span class="kc-sealon">+3</span>' : ''}` : '<span class="kc-c empty"><i>?</i></span>';
-    const tip = c ? (() => { const prey = preyOf(c.faction), hunter = CYCLE.find((f) => preyOf(f) === c.faction);
-      return `<p class="kc-tip"><span class="ok">${sigil(prey)}${t('+2 contre {f}', { f: fname(prey) })}</span><span class="ko">${sigil(hunter)}${t('{f} prend +2 contre elle', { f: fname(hunter) })}</span></p>`; })()
-      : `<button class="kc-tip kc-wheel2" data-mp="wheel">${CYCLE.map((f) => sigil(f)).join('')}<span>${t('Cercle des Royaumes')}</span></button>`;
-    return `<div class="kc-table"><p class="kc-round"><b>${t('Manche {n} / {m}', { n: Math.min(s.r, CHOC.rounds), m: CHOC.rounds })}</b></p>
+    const c = myPick ? s.hand[me][myPick.i] : can && sel != null ? s.hand[me][sel] : null;
+    const f = myPick ? (myPick.f || 0) : fl, tot = c ? baseForce(c) + f : 0;
+    const mine = c ? cardHTML(c, { extra: myPick ? 'placed' : 'ghost', force: tot }) : `<span class="kc-c empty"><i>?</i></span>`;
+    return `<div class="kc-table kc3t">${score}
       <div class="kc-duel"><div class="kc-spot foe">${foeIn ? '<span class="kc-c back placed"></span>' : '<span class="kc-c empty"><i>?</i></span>'}<em>${foeIn ? t('Carte posée') : t('Réfléchit…')}</em></div>
         <img class="kc-vs2" alt="" src="assets/versus/vd-vs.webp">
-        <div class="kc-spot me">${mine}<em>${myPick ? t('Carte posée') : c ? t('Force {n}', { n: baseForce(c) + (seal ? CHOC.seal : 0) }) : t('Ta carte')}</em></div></div>${tip}</div>`;
+        <div class="kc-spot me">${mine}${c ? `<span class="kc-parts">${parts(c, f)}</span>` : `<em>${t('Ta carte')}</em>`}</div></div>${step(v, ctx, can)}</div>`;
   }
   function step(v, ctx, can) {
     const s = v.state, me = v.me, foe = foeOf(v);
@@ -78,8 +81,15 @@ export function createChocGame(app, root) {
     if (s.pick?.[me]) return `<div class="kc-step wait"><span class="n">…</span><span>${t('Ta carte est posée. En attente de <b>{name}</b>…', { name: esc(ctx.foeName(v)) })}${rf}</span></div>`;
     if (!can) return rf ? `<div class="kc-step">${rf}</div>` : '';
     const foeIn = s.pick?.[foe] ? ` <em>${t('<b>{name}</b> a posé sa carte : à toi !', { name: esc(ctx.foeName(v)) })}</em>` : '';
-    return sel == null ? `<div class="kc-step"><span class="n">1</span><span>${t('Choisis une carte dans ta main.')}${foeIn}${rf}</span></div>`
-      : `<div class="kc-step go"><span class="n">2</span><span>${t('Pose-la. Le Sceau d’Ardeur ajoute +3, une fois par partie.')}${foeIn}${rf}</span></div>`;
+    return sel == null ? `<div class="kc-step"><span class="n">1</span><span>${t('Choisis une carte dans ta main.')} <small>${t('Si elle gagne la manche, elle est à toi.')}</small>${foeIn}${rf}</span></div>`
+      : `<div class="kc-step go"><span class="n">2</span><span>${t('Ajoute des Flammes (+1 chacune), puis pose ta carte.')}${foeIn}${rf}</span></div>`;
+  }
+  // le choix des Flammes : 0 à 4, jamais plus que ta réserve
+  function flamePicker(s, me, can) {
+    const left = flamesLeft(s, me), cap = can ? flameCap(s, me) : -1;
+    if (fl > Math.max(0, cap)) fl = 0;
+    return `<div class="kc-flames ${can ? '' : 'off'}"><div class="kc-fl-h">${FLAME}<b>${left}</b><small>${t('Flammes')}</small></div>
+      ${Array.from({ length: CHOC.flameMax + 1 }, (_, n) => `<button class="kc-fl ${n === fl && can ? 'on' : ''}" data-mp="fl" data-n="${n}" ${can && n <= cap ? '' : 'disabled'} aria-pressed="${n === fl}" aria-label="${t('{n} Flammes', { n })}"><b>${n ? `+${n}` : '0'}</b>${n ? `<span class="kc-fl-st">${Array.from({ length: n }, () => FLAME).join('')}</span>` : ''}</button>`).join('')}</div>`;
   }
   function drawGame(v, ctx) {
     if (!ctx.alive) return;
@@ -93,41 +103,34 @@ export function createChocGame(app, root) {
     if (v.status === 'done' && !banner) return endScreen(v, ctx);
     const my = s.hand[me] || [], used = s.used?.[me] || [];
     if (sel != null && (used.includes(sel) || !my[sel])) sel = null;
-    if (seal && s.seal?.[me]) seal = false;
     const can = !s.pick?.[me] && ctx.myTurn(v) && !ctx.busy && !anim && !banner;
-    root.innerHTML = `<div class="mq-game kc-game kc2 ${app.reduced() ? 'rm' : ''}">
-      <div class="mq-bar"><button class="btn small ghost" data-mp="rules" aria-label="${t('Règles')}">${icon('p:help')}</button><b>${t(ctx.train ? 'Entraînement' : 'Le Choc des Boosters')}</b><button class="btn small ghost" data-mp="${ctx.train ? 'tback' : 'back'}" aria-label="${t('Revenir')}">${icon('close')}</button></div>
-      <div class="kc-side foe">${tag(v, ctx, foe)}
-        <div class="kc-fan">${(s.hand[foe] || []).map((c, i) => cardHTML(c, { small: true, extra: s.used?.[foe]?.includes(i) ? 'used' : '' })).join('')}</div></div>
+    const left = my.map((c, i) => i).filter((i) => !used.includes(i));
+    const tot = sel != null && my[sel] ? baseForce(my[sel]) + fl : 0;
+    root.innerHTML = `<div class="mq-game kc-game kc3 ${app.reduced() ? 'rm' : ''}">
+      <div class="mq-bar"><button class="btn small ghost" data-mp="rules" aria-label="${t('Règles')}">${icon('p:help')}</button><b>${v.status === 'playing' || banner ? t('Manche {n} / {m}', { n: Math.min(banner?.r || s.r, CHOC.rounds), m: CHOC.rounds }) : t(ctx.train ? 'Entraînement' : 'Le Choc des Boosters')}</b><button class="btn small ghost" data-mp="${ctx.train ? 'tback' : 'back'}" aria-label="${t('Revenir')}">${icon('close')}</button></div>
+      <div class="kc-side foe">${tag(v, ctx, foe)}</div>
       ${arena(v, ctx, can)}
       ${v.status === 'playing' ? ctx.clockHTML(v) : ''}
-      ${step(v, ctx, can)}
-      <div class="kc-side me"><div class="kc-hand me ${can ? 'can' : ''}">${my.map((c, i) => cardHTML(c, { i: can ? i : null, on: sel === i, used: used.includes(i) })).join('')}</div>${tag(v, ctx, me)}</div>
-      ${v.status === 'playing' ? `<div class="kc-ctl2">
-        <button class="kc-sealb ${seal ? 'on' : ''}" data-mp="seal" ${!can || s.seal?.[me] ? 'disabled' : ''} aria-pressed="${seal}">${ARDEUR}<b>+3</b><small>${s.seal?.[me] ? t('déjà utilisé') : t('Sceau d’Ardeur')}</small></button>
-        <button class="btn primary block dc-plq dc-plq-red kc-play" data-mp="play" ${can && sel != null ? '' : 'disabled'}>${s.pick?.[me] ? t('Carte posée') : sel != null && can ? t('Poser cette carte') : t('Choisis une carte')}</button></div>
-      ${ctx.train ? `<button class="kc-quit" data-mp="tback">${t('Quitter l’entraînement')}</button>` : `<button class="kc-quit" data-mp="resign">${t('Abandonner')}</button>`}` : ''}
+      <div class="kc-side me">
+        <div class="kc-hand me ${can ? 'can' : ''}" style="--cols:${left.length > 6 ? 4 : 3}">${left.map((i) => cardHTML(my[i], { i: can ? i : null, on: sel === i })).join('')}</div></div>
+      ${v.status === 'playing' ? `${flamePicker(s, me, can && sel != null)}
+        <button class="btn primary block dc-plq dc-plq-red kc-play" data-mp="play" ${can && sel != null ? '' : 'disabled'}>${s.pick?.[me] ? t('Carte posée') : sel != null && can ? t('Poser · force {n}', { n: tot }) : t('Choisis une carte')}</button>
+      ${ctx.train ? '' : `<button class="kc-quit" data-mp="resign">${t('Abandonner')}</button>`}` : ''}
     </div>`;
   }
 
   // ——— Révélation d'une manche : les deux cartes se retournent, les forces se comptent ———
   async function reveal(v, ev, ctx) {
     const me = v.me, foe = foeOf(v), A = ev[me], B = ev[foe];
-    const part = (x, o) => {
-      const bits = [`${RLET[x.card.rarity]} ${RAR_FORCE[x.card.rarity]}`];
-      if (x.card.variant && x.card.variant !== 'normal') bits.push(`✦ +${CHOC.finish}`);
-      if (x.beat) bits.push(`${sigil(x.card.faction)} +${CHOC.beat}`);
-      if (x.seal) bits.push(`${t('Sceau')} +${CHOC.seal}`);
-      return `<span class="kc-rvc ${ev.win === o ? 'win' : ev.win ? 'lose' : ''}">${cardHTML(x.card, { force: x.force })}<span class="kc-bits">${bits.map((b) => `<i>${b}</i>`).join('')}</span></span>`;
-    };
+    const part = (x, o, who) => `<span class="kc-rvc ${ev.win === o ? 'win' : ev.win ? 'lose' : ''}"><small class="kc-who2">${who}</small>${cardHTML(x.card, { force: x.force })}<span class="kc-parts">${parts(x.card, x.f || 0)}</span></span>`;
     const res = ev.win === me ? 'win' : ev.win === foe ? 'lose' : 'nul';
-    const beatTxt = A.beat ? t('{a} {verb} {b} : +2', { a: fname(A.card.faction), verb: t(VERB[A.card.faction]), b: fname(B.card.faction) }) : B.beat ? t('{a} {verb} {b} : +2', { a: fname(B.card.faction), verb: t(VERB[B.card.faction]), b: fname(A.card.faction) }) : '';
-    banner = { cls: 'flip', html: `${part(B, foe)}<span class="kc-vs"><img alt="" src="assets/versus/vd-vs.webp"></span>${part(A, me)}` };
+    const fn = `<span translate="no">${esc(ctx.foeName(v))}</span>`;
+    banner = { r: ev.r, cls: 'flip', html: `${part(B, foe, fn)}<span class="kc-vs"><img alt="" src="assets/versus/vd-vs.webp"></span>${part(A, me, t('Toi'))}` };
     drawGame(v, ctx);
     app.sfx['vd-flip']?.(); haptic('medium');
     await wait(700, v);
-    banner = { cls: `shown ${res}`, html: `${part(B, foe)}<span class="kc-vs"><b>${A.force} – ${B.force}</b>${beatTxt ? `<small>${beatTxt}</small>` : ''}</span>${part(A, me)}
-      <div class="kc-verdict ${res}"><b>${res === 'win' ? t('Manche gagnée !') : res === 'lose' ? t('Manche perdue') : t('Manche nulle')}</b><small>${res === 'nul' ? t('Même force : personne ne la gagne.') : res === 'win' ? t('Ta carte est gardée à la fin.') : t('Sa carte sera gardée à la fin.')}</small></div>` };
+    banner = { r: ev.r, cls: `shown ${res}`, html: `${part(B, foe, fn)}<span class="kc-vs"><b>${B.force}<em>–</em>${A.force}</b></span>${part(A, me, t('Toi'))}
+      <div class="kc-verdict ${res}"><b>${res === 'win' ? t('Manche gagnée !') : res === 'lose' ? t('Manche perdue') : t('Manche nulle')}</b><small>${res === 'nul' ? t('Même force : personne ne la gagne.') : res === 'win' ? t('Ta carte est à toi à la fin de la partie.') : t('Sa carte lui reviendra à la fin de la partie.')}</small></div>` };
     drawGame(v, ctx);
     if (res === 'win') { app.sfx['vd-rare']?.(); haptic('success'); } else if (res === 'lose') { app.sfx.parry?.(); haptic('heavy'); } else app.sfx.tap?.();
     await wait(2300, v);
@@ -148,7 +151,8 @@ export function createChocGame(app, root) {
     anim = true;
     try {
       drawGame(v, ctx);
-      root.querySelectorAll('.kc-hand .kc-c, .kc-fan .kc-c').forEach((c) => { if ([...c.parentNode.children].indexOf(c) >= from) c.classList.add('pre'); });
+      const cnt0 = n * CHOC.packCards;
+      root.querySelectorAll('.kc-hand.me, .kc-fchips').forEach((row) => [...row.children].slice(-cnt0).forEach((c) => c.classList.add('pre')));
       const side = (mine) => `<div class="kc-oside ${mine ? 'me' : 'foe'}"><span class="sc-med">${mine ? myPic() : ctx.avatar(v.foe?.avatar)}</span><b>${mine ? t('Toi') : `<span translate="no">${esc(ctx.foeName(v))}</span>`}</b></div>`;
       ov = document.createElement('div'); ov.className = `kc-open ${k}`;
       const st = v.state, foeK = foeOf(v), cnt = n * CHOC.packCards;
@@ -188,7 +192,7 @@ export function createChocGame(app, root) {
     } catch (e) { if (e !== STOP) throw e; } finally {
       anim = false;
       if (ov) { ov.classList.remove('on'); const o = ov; setTimeout(() => o.remove(), 300); }
-      root.querySelectorAll('.kc-c.pre').forEach((c) => { c.classList.remove('pre'); c.classList.add('flipin'); });
+      root.querySelectorAll('.kc-c.pre, .kc-fc.pre').forEach((c) => { c.classList.remove('pre'); c.classList.add('flipin'); });
     }
     if (v.id) markSeen(v.id, k);
   }
@@ -254,29 +258,21 @@ export function createChocGame(app, root) {
       ${chips ? `<div class="kc-chips">${chips}</div>` : ''}${stHTML || lgHTML ? `<div class="kc-minis">${stHTML}${lgHTML}</div>` : ''}`;
   }
 
-  function wheelSheet() {
-    const R = 38, pts = CYCLE.map((f, i) => { const a = -Math.PI / 2 + (i * 2 * Math.PI) / CYCLE.length; return { f, x: 50 + R * Math.cos(a), y: 50 + R * Math.sin(a) }; });
-    openSheet(`<h2>${t('Le Cercle des Royaumes')}</h2><p class="small">${t('Chaque royaume domine le suivant : sa carte prend <b>+2</b> contre lui.')}</p>
-      <div class="kc-ring">${pts.map((p) => `<span class="kc-rs" style="left:${p.x}%;top:${p.y}%;--fc:${fcol(p.f)}">${sigil(p.f)}</span>`).join('')}<span class="kc-rarrow"></span></div>
-      <ul class="kc-rlist">${CYCLE.map((f) => `<li>${sigil(f)}<b>${fname(f)}</b> ${t(VERB[f])} ${sigil(preyOf(f))}<b>${fname(preyOf(f))}</b></li>`).join('')}</ul>`, { label: t('Le Cercle des Royaumes'), cls: 'sheet-small' });
-  }
-
   return {
-    drawGame, reveal, openPacks, wheelSheet, seen,
+    drawGame, reveal, openPacks, seen,
     get anim() { return anim; },
-    reset() { sel = null; seal = false; banner = null; keep = null; take = null; },
+    reset() { sel = null; fl = 0; banner = null; keep = null; take = null; },
     stop() { alive = false; clearTimeout(timer); const w = wake; wake = null; w?.(STOP); },
     start() { alive = true; },
     STOP,
     // clics de l'écran de partie ; renvoie vrai si le clic est traité
     async click(k, b, v, ctx, play) {
-      if (k === 'wheel') { wheelSheet(); return true; }
       if (!v) return false;
-      if (k === 'pick') { sel = +b.dataset.i; app.sfx.tap?.(); haptic('select'); drawGame(v, ctx); return true; }
-      if (k === 'seal') { seal = !seal; app.sfx.tap?.(); drawGame(v, ctx); return true; }
+      if (k === 'pick') { const i = +b.dataset.i; if (sel !== i) fl = 0; sel = i; app.sfx.tap?.(); haptic('select'); drawGame(v, ctx); return true; }
+      if (k === 'fl') { fl = +b.dataset.n; app.sfx.tap?.(); haptic('select'); drawGame(v, ctx); return true; }
       if (k === 'keep') { keep = +b.dataset.i; app.sfx.tap?.(); endScreen(v, ctx); return true; }
       if (k === 'take') { take = +b.dataset.i; app.sfx.tap?.(); endScreen(v, ctx); return true; }
-      if (k === 'play' && sel != null && !anim) { const i = sel, s2 = seal; sel = null; seal = false; app.sfx['en-coin']?.(); await play(i, s2); return true; }
+      if (k === 'play' && sel != null && !anim) { const i = sel, f = fl; sel = null; fl = 0; app.sfx['en-coin']?.(); await play(i, f); return true; }
       return false;
     },
     claimArgs: () => ({ keep, take }),

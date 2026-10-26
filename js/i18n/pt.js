@@ -8786,6 +8786,18 @@ export default {
   "Ta carte": "Sua carta",
   "Choisis une carte dans ta main.": "Escolha uma carta da sua mão.",
   "Pose-la. Le Sceau d’Ardeur ajoute +3, une fois par partie.": "Jogue-a. O Selo do Ardor soma +3, uma vez por partida.",
+  "Flammes": "Chamas",
+  "{n} Flammes": "{n} Chamas",
+  "Manches gagnées": "Rodadas vencidas",
+  "Si elle gagne la manche, elle est à toi.": "Se ela vencer a rodada, é sua.",
+  "Ajoute des Flammes (+1 chacune), puis pose ta carte.": "Adicione Chamas (+1 cada) e jogue sua carta.",
+  "Poser · force {n}": "Jogar · força {n}",
+  "Ta carte est à toi à la fin de la partie.": "Sua carta será sua no fim da partida.",
+  "Sa carte lui reviendra à la fin de la partie.": "A carta dele ficará com ele no fim da partida.",
+  "Rareté : Commune 1, Peu commune 2, Rare 3, Hyper rare 4, Mythique 5, Secrète 6. +1 avec une finition. Égalité : manche nulle.": "Raridade: Comum 1, Incomum 2, Rara 3, Hiper-rara 4, Mítica 5, Secreta 6. +1 com um acabamento. Empate: rodada nula.",
+  "Les Flammes": "As Chamas",
+  "Tu as {n} Flammes pour toute la partie. Pose jusqu’à {m} Flammes sur ta carte : chacune ajoute +1. Elles restent secrètes jusqu’à la révélation, mais chacun voit combien il en reste à l’autre.": "Você tem {n} Chamas para a partida toda. Coloque até {m} Chamas na sua carta: cada uma soma +1. Elas ficam secretas até a revelação, mas cada um vê quantas restam ao outro.",
+  "Le plus de manches gagnées l’emporte (à égalité, le total des forces). Une carte qui gagne sa manche est à toi : choisis bien où mettre tes Flammes. Chacun garde aussi une carte au choix, et le gagnant prend la copie d’une carte de l’adversaire. Partie nulle : pas de copie. Le reste retourne à l’Abysse.": "Vence quem ganhar mais rodadas (no empate, a força total). Uma carta que vence sua rodada é sua: escolha bem onde pôr suas Chamas. Cada um fica também com uma carta à escolha, e o vencedor leva a cópia de uma carta do adversário. Empate: sem cópia. O resto volta ao Abismo.",
 };
 
 export const names = {

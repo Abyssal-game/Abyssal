@@ -8786,6 +8786,18 @@ export default {
   "Ta carte": "Deine Karte",
   "Choisis une carte dans ta main.": "Wähle eine Karte aus deiner Hand.",
   "Pose-la. Le Sceau d’Ardeur ajoute +3, une fois par partie.": "Leg sie. Das Siegel der Inbrunst gibt +3, einmal pro Partie.",
+  "Flammes": "Flammen",
+  "{n} Flammes": "{n} Flammen",
+  "Manches gagnées": "Gewonnene Runden",
+  "Si elle gagne la manche, elle est à toi.": "Gewinnt sie die Runde, gehört sie dir.",
+  "Ajoute des Flammes (+1 chacune), puis pose ta carte.": "Füge Flammen hinzu (je +1) und lege dann deine Karte.",
+  "Poser · force {n}": "Legen · Stärke {n}",
+  "Ta carte est à toi à la fin de la partie.": "Deine Karte gehört dir am Ende der Partie.",
+  "Sa carte lui reviendra à la fin de la partie.": "Seine Karte gehört ihm am Ende der Partie.",
+  "Rareté : Commune 1, Peu commune 2, Rare 3, Hyper rare 4, Mythique 5, Secrète 6. +1 avec une finition. Égalité : manche nulle.": "Seltenheit: Gewöhnlich 1, Ungewöhnlich 2, Selten 3, Hyperselten 4, Mythisch 5, Geheim 6. +1 mit einer Veredelung. Gleichstand: Runde unentschieden.",
+  "Les Flammes": "Die Flammen",
+  "Tu as {n} Flammes pour toute la partie. Pose jusqu’à {m} Flammes sur ta carte : chacune ajoute +1. Elles restent secrètes jusqu’à la révélation, mais chacun voit combien il en reste à l’autre.": "Du hast {n} Flammen für die ganze Partie. Lege bis zu {m} Flammen auf deine Karte: Jede gibt +1. Sie bleiben bis zur Enthüllung geheim, aber jeder sieht, wie viele dem anderen bleiben.",
+  "Le plus de manches gagnées l’emporte (à égalité, le total des forces). Une carte qui gagne sa manche est à toi : choisis bien où mettre tes Flammes. Chacun garde aussi une carte au choix, et le gagnant prend la copie d’une carte de l’adversaire. Partie nulle : pas de copie. Le reste retourne à l’Abysse.": "Wer die meisten Runden gewinnt, siegt (bei Gleichstand die Gesamtstärke). Eine Karte, die ihre Runde gewinnt, gehört dir: Überlege gut, wohin deine Flammen gehen. Jeder behält außerdem eine Karte nach Wahl, und der Sieger nimmt die Kopie einer gegnerischen Karte. Unentschieden: keine Kopie. Der Rest kehrt in den Abgrund zurück.",
 };
 
 export const names = {

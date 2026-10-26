@@ -1125,9 +1125,9 @@ revoke execute on function public.cryptes_apply(jsonb, text, jsonb) from public,
 -- ——— v811 : le Choc des Boosters (même moteur que js/core/choc.js) ——————————————————————————————
 -- Le serveur ouvre pour chaque joueur 2 boosters standard (sa main de 6 cartes) et un 3e caché (le Renfort, révélé après la
 -- 2e manche) ; de l'adversaire, chacun ne voit que la faction et la rareté de ses cartes. 3 manches : les deux posent une
--- carte en même temps, en secret ; la plus forte gagne. Force = rareté (C 1 … S 6), +1 finition, +2 si la faction domine
--- celle de la carte adverse (Cercle des Royaumes), +3 avec le Sceau d'Ardeur (une fois). Une partie se crée seulement par
--- le serveur de partie (choc_new, choc_join : réservées à service_role), qui prend d'abord un jeton du Choc au joueur.
+-- carte en même temps, en secret, avec 0 à 4 Flammes ; la plus forte gagne. v816 : force = rareté (C 1 … S 6), +1 finition,
+-- +1 par Flamme (8 pour toute la partie) ; plus de domination entre factions ni de Sceau d'Ardeur. Une partie se crée
+-- seulement par le serveur de partie (choc_new, choc_join : réservées à service_role), qui prend d'abord un jeton du Choc.
 create or replace function public.choc_pack() returns jsonb language sql volatile security definer set search_path = public as $$
   select coalesce(jsonb_agg(jsonb_build_object('id', x ->> 'id', 'rarity', x ->> 'rarity', 'variant', x ->> 'variant', 'faction', c.faction) order by o), '[]')
   from jsonb_array_elements(public.versus_pack('standard', null, null)) with ordinality e(x, o) join public.shadow_cards c on c.id = x ->> 'id'
@@ -1136,47 +1136,44 @@ revoke execute on function public.choc_pack() from public, anon, authenticated;
 create or replace function public.choc_init() returns jsonb language sql volatile security definer set search_path = public as $$
   select jsonb_build_object('hand', jsonb_build_object('a', public.choc_pack() || public.choc_pack(), 'b', public.choc_pack() || public.choc_pack()),
     'extra', jsonb_build_object('a', public.choc_pack(), 'b', public.choc_pack()), 'used', jsonb_build_object('a', '[]'::jsonb, 'b', '[]'::jsonb),
-    'pick', jsonb_build_object('a', null, 'b', null), 'seal', jsonb_build_object('a', false, 'b', false), 'rounds', '[]'::jsonb,
+    'pick', jsonb_build_object('a', null, 'b', null), 'flames', jsonb_build_object('a', 8, 'b', 8), 'rounds', '[]'::jsonb,
     'wins', jsonb_build_object('a', 0, 'b', 0), 'total', jsonb_build_object('a', 0, 'b', 0), 'r', 1, 'n', 0, 'turn', 'ab', 'over', false)
 $$;
 revoke execute on function public.choc_init() from public, anon, authenticated;
-create or replace function public.choc_beats(x text, y text) returns boolean language sql immutable as $$
-  select coalesce((array['infernal', 'sauvage', 'artificiel', 'abyssal', 'celeste', 'necrotique', 'primordial'])[
-    (array_position(array['infernal', 'sauvage', 'artificiel', 'abyssal', 'celeste', 'necrotique', 'primordial'], x) % 7) + 1] = y, false)
-$$;
-create or replace function public.choc_force(c jsonb, foe jsonb, seal boolean) returns int language sql immutable as $$
+drop function if exists public.choc_beats(text, text);
+drop function if exists public.choc_force(jsonb, jsonb, boolean);
+create or replace function public.choc_force(c jsonb, fl int) returns int language sql immutable as $$
   select (case c ->> 'rarity' when 'C' then 1 when 'PC' then 2 when 'R' then 3 when 'HR' then 4 when 'M' then 5 when 'S' then 6 else 0 end)
-    + case when coalesce(c ->> 'variant', 'normal') <> 'normal' then 1 else 0 end
-    + case when public.choc_beats(c ->> 'faction', foe ->> 'faction') then 2 else 0 end
-    + case when seal then 3 else 0 end
+    + case when coalesce(c ->> 'variant', 'normal') <> 'normal' then 1 else 0 end + coalesce(fl, 0)
 $$;
--- mv = {"pick": 3, "seal": true}
+-- mv = {"pick": 3, "flames": 2}
 create or replace function public.choc_apply(st jsonb, who text, mv jsonb)
 returns jsonb language plpgsql volatile set search_path = public as $$
-declare foe text := case when who = 'a' then 'b' else 'a' end; i int; sl boolean; pa jsonb; pb jsonb; ca jsonb; cb jsonb; fa int; fb int; w text; ev jsonb; n int; r int;
+declare foe text := case when who = 'a' then 'b' else 'a' end; i int; fl int; pa jsonb; pb jsonb; ca jsonb; cb jsonb; fa int; fb int; w text; ev jsonb; n int; r int; left_ int;
 begin
   if (st ->> 'over')::boolean then raise exception 'Cette partie est terminée.'; end if;
   if (st -> 'pick' ->> who) is not null then raise exception 'Ta carte est déjà posée : on attend ton adversaire.'; end if;
   if jsonb_typeof(mv -> 'pick') <> 'number' then raise exception 'Carte impossible à jouer.'; end if;
-  i := (mv ->> 'pick')::int; sl := coalesce((mv ->> 'seal')::boolean, false);
+  if mv ? 'flames' and jsonb_typeof(mv -> 'flames') <> 'number' then raise exception 'Nombre de Flammes impossible.'; end if;
+  if not st ? 'flames' then st := st || jsonb_build_object('flames', jsonb_build_object('a', 8, 'b', 8)); end if;
+  i := (mv ->> 'pick')::int; fl := coalesce((mv ->> 'flames')::int, 0); left_ := (st -> 'flames' ->> who)::int;
   if i < 0 or i >= jsonb_array_length(st -> 'hand' -> who) or (st -> 'used' -> who) @> to_jsonb(i) then raise exception 'Carte impossible à jouer.'; end if;
-  if sl and (st -> 'seal' ->> who)::boolean then raise exception 'Ton Sceau d’Ardeur est déjà utilisé.'; end if;
-  st := jsonb_set(st, array['pick', who], jsonb_build_object('i', i, 'seal', sl));
+  if fl < 0 or fl > 4 or fl > left_ or (mv ->> 'flames')::numeric <> fl then raise exception 'Nombre de Flammes impossible.'; end if;
+  st := jsonb_set(st, array['pick', who], jsonb_build_object('i', i, 'f', fl));
   if (st -> 'pick' ->> foe) is null then return st || jsonb_build_object('turn', foe); end if;
   pa := st -> 'pick' -> 'a'; pb := st -> 'pick' -> 'b';
   ca := st -> 'hand' -> 'a' -> ((pa ->> 'i')::int); cb := st -> 'hand' -> 'b' -> ((pb ->> 'i')::int);
-  fa := public.choc_force(ca, cb, (pa ->> 'seal')::boolean); fb := public.choc_force(cb, ca, (pb ->> 'seal')::boolean);
+  fa := public.choc_force(ca, coalesce((pa ->> 'f')::int, 0)); fb := public.choc_force(cb, coalesce((pb ->> 'f')::int, 0));
   w := case when fa > fb then 'a' when fb > fa then 'b' else null end;
   st := jsonb_set(st, '{used,a}', (st -> 'used' -> 'a') || to_jsonb((pa ->> 'i')::int));
   st := jsonb_set(st, '{used,b}', (st -> 'used' -> 'b') || to_jsonb((pb ->> 'i')::int));
-  if (pa ->> 'seal')::boolean then st := jsonb_set(st, '{seal,a}', 'true'); end if;
-  if (pb ->> 'seal')::boolean then st := jsonb_set(st, '{seal,b}', 'true'); end if;
+  st := jsonb_set(st, '{flames}', jsonb_build_object('a', (st #>> '{flames,a}')::int - coalesce((pa ->> 'f')::int, 0), 'b', (st #>> '{flames,b}')::int - coalesce((pb ->> 'f')::int, 0)));
   st := jsonb_set(st, '{total}', jsonb_build_object('a', (st #>> '{total,a}')::int + fa, 'b', (st #>> '{total,b}')::int + fb));
   if w is not null then st := jsonb_set(st, array['wins', w], to_jsonb((st -> 'wins' ->> w)::int + 1)); end if;
   n := (st ->> 'n')::int + 1; r := (st ->> 'r')::int;
   ev := jsonb_build_object('n', n, 'r', r, 'win', w,
-    'a', jsonb_build_object('i', (pa ->> 'i')::int, 'card', ca, 'force', fa, 'seal', (pa ->> 'seal')::boolean, 'beat', public.choc_beats(ca ->> 'faction', cb ->> 'faction')),
-    'b', jsonb_build_object('i', (pb ->> 'i')::int, 'card', cb, 'force', fb, 'seal', (pb ->> 'seal')::boolean, 'beat', public.choc_beats(cb ->> 'faction', ca ->> 'faction')));
+    'a', jsonb_build_object('i', (pa ->> 'i')::int, 'card', ca, 'force', fa, 'f', coalesce((pa ->> 'f')::int, 0)),
+    'b', jsonb_build_object('i', (pb ->> 'i')::int, 'card', cb, 'force', fb, 'f', coalesce((pb ->> 'f')::int, 0)));
   st := jsonb_set(st, '{rounds}', (st -> 'rounds') || jsonb_build_array(jsonb_build_object('a', ev -> 'a', 'b', ev -> 'b', 'win', w)));
   st := st || jsonb_build_object('n', n, 'pick', jsonb_build_object('a', null, 'b', null), 'turn', 'ab');
   if r = 2 and st ? 'extra' then
@@ -1193,7 +1190,8 @@ begin
   return st || jsonb_build_object('last', ev);
 end $$;
 revoke execute on function public.choc_apply(jsonb, text, jsonb) from public, anon, authenticated;
--- ce que voit un joueur : sa main entière ; de l'adversaire, la faction et la rareté des cartes pas encore jouées (tout à la fin)
+-- ce que voit un joueur : sa main entière ; de l'adversaire, la faction et la rareté des cartes pas encore jouées (tout à la fin),
+-- ses Flammes restantes (celles qu'il vient de poser restent cachées : elles ne sont retirées qu'à la révélation)
 create or replace function public.choc_view(st jsonb, me text) returns jsonb language sql immutable as $$
   select case when coalesce((st ->> 'over')::boolean, false) then st - 'extra' else
     (st - 'extra' - 'pick') || jsonb_build_object('extraN', coalesce(jsonb_array_length(st -> 'extra' -> me), 0),
@@ -1572,7 +1570,7 @@ grant execute on function public.mp_ranking(text, int) to authenticated;
 create table if not exists public.sql_stamps (file text primary key, stamp text not null, at timestamptz not null default now());
 alter table public.sql_stamps enable row level security;
 revoke all on public.sql_stamps from public, anon, authenticated;
-insert into public.sql_stamps (file, stamp) values ('09', '7d1a2254256b') on conflict (file) do update set stamp = excluded.stamp, at = now();
+insert into public.sql_stamps (file, stamp) values ('09', '103a25011822') on conflict (file) do update set stamp = excluded.stamp, at = now();
 create or replace function public.sql_stamps() returns jsonb language sql stable security definer set search_path = public as $$
   select coalesce(jsonb_object_agg(file, stamp), '{}'::jsonb) from public.sql_stamps;
 $$;

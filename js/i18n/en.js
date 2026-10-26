@@ -8797,6 +8797,18 @@ export default {
   "Ta carte": "Your card",
   "Choisis une carte dans ta main.": "Pick a card from your hand.",
   "Pose-la. Le Sceau d’Ardeur ajoute +3, une fois par partie.": "Play it. The Seal of Ardor adds +3, once per match.",
+  "Flammes": "Flames",
+  "{n} Flammes": "{n} Flames",
+  "Manches gagnées": "Rounds won",
+  "Si elle gagne la manche, elle est à toi.": "If it wins the round, it’s yours.",
+  "Ajoute des Flammes (+1 chacune), puis pose ta carte.": "Add Flames (+1 each), then play your card.",
+  "Poser · force {n}": "Play · strength {n}",
+  "Ta carte est à toi à la fin de la partie.": "Your card is yours at the end of the game.",
+  "Sa carte lui reviendra à la fin de la partie.": "Their card goes to them at the end of the game.",
+  "Rareté : Commune 1, Peu commune 2, Rare 3, Hyper rare 4, Mythique 5, Secrète 6. +1 avec une finition. Égalité : manche nulle.": "Rarity: Common 1, Uncommon 2, Rare 3, Hyper Rare 4, Mythic 5, Secret 6. +1 with a finish. Tie: the round is a draw.",
+  "Les Flammes": "The Flames",
+  "Tu as {n} Flammes pour toute la partie. Pose jusqu’à {m} Flammes sur ta carte : chacune ajoute +1. Elles restent secrètes jusqu’à la révélation, mais chacun voit combien il en reste à l’autre.": "You have {n} Flames for the whole game. Put up to {m} Flames on your card: each adds +1. They stay secret until the reveal, but each player sees how many the other has left.",
+  "Le plus de manches gagnées l’emporte (à égalité, le total des forces). Une carte qui gagne sa manche est à toi : choisis bien où mettre tes Flammes. Chacun garde aussi une carte au choix, et le gagnant prend la copie d’une carte de l’adversaire. Partie nulle : pas de copie. Le reste retourne à l’Abysse.": "Most rounds won takes it (if tied, total strength). A card that wins its round is yours: choose carefully where to put your Flames. Each player also keeps one card of their choice, and the winner takes a copy of one of the opponent’s cards. Draw: no copy. The rest returns to the Abyss.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

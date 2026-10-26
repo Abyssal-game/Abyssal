@@ -52,7 +52,7 @@ export function openCreator(app) {
         <div class="cr-bosses">${SEASONS.filter((se) => VEILLES[se.key]).map((se) => `<button class="btn small" data-veille="${se.key}"><b>${se.num}</b> · ${esc(BOSSES[VEILLES[se.key].boss].name)}</button>`).join('')}</div>`)}
       ${S('Aller à un étage', `<form class="cr-give" id="floor"><input class="input plain" name="n" type="number" min="1" max="200" placeholder="Étage" ${d.run ? '' : 'disabled'}><button class="btn small" type="submit" ${d.run ? '' : 'disabled'}>Y aller</button><button class="btn small" type="submit" name="power" value="1" ${d.run ? '' : 'disabled'}>Avec la puissance attendue</button></form>
         ${P(d.run ? `Chapitre en cours : étage ${d.run.floor}.` : 'Lance d’abord un chapitre dans la Descente.')}`)}
-      ${S('Choc des Boosters (essai)', `${P('Une partie d’entraînement du nouveau Choc contre l’Abysse : ouverture des boosters, 3 manches, Sceau d’Ardeur, Renfort, écran de fin. Rien n’est gagné ni perdu.')}
+      ${S('Choc des Boosters (essai)', `${P('Une partie d’entraînement du Choc contre l’Abysse : ouverture des boosters, 3 manches, Flammes, Renfort, écran de fin. Rien n’est gagné ni perdu.')}
         ${row(B('choc', 'Lancer un Choc d’entraînement', 'gold'), B('choctok', '+3 jetons du Choc'))}`, 'cr-choc')}
       ${S('Cercle de l’Abysse', `${P(g.s.devGames ? 'Toutes les salles des quatre jeux sont ouvertes, même celles pas encore gagnées. Ta progression ne change pas.' : 'Ouvre toutes les salles des quatre jeux (Duels des Sceaux, Pacte, Cryptes, Enchères) sans avoir gagné les précédentes, pour tester un adversaire précis.')}
         ${row(B('games', g.s.devGames ? 'Refermer les salles' : 'Ouvrir toutes les salles', g.s.devGames ? '' : 'gold'))}`)}
