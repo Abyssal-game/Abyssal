@@ -8025,3 +8025,5 @@ img, svg, canvas { -webkit-user-select: none; user-select: none; }
   .dv.cb.cb2 .cb-feed { height: 40px; }
   .dv.cb.cb2 .cb-dock .cb-acts, .dv.cb.cb2 .cb-idle { min-height: 104px; }
 }
+/* v821 : bouton Passer peint (Gemini) : le disque aux chevrons d'or posé dans le bouton rond doré, comme ×1, ? et quitter */
+.dv.cb.cb2 .cb-pass .cb-pass-i { inset: 16%; width: 68%; height: 68%; border-radius: 50%; }

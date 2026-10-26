@@ -97,7 +97,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     <div class="dv-top"><b>${esc(title)}</b><span class="row gap">
       <button class="btn small ghost cb-speed ${ui.fast ? 'on' : ''}" data-d="speed" aria-label="Vitesse des animations" aria-pressed="${!!ui.fast}">×${ui.fast ? 2 : 1}</button>
       <button class="btn small ghost" data-d="help" aria-label="Règles du combat">?</button>
-      <button class="btn small ghost cb-pass dv-end" data-d="end" aria-label="Passer le tour" title="Passer le tour"><img class="cb-pass-i" alt="" src="assets/ui/cb-passer.webp" onerror="this.remove()"><span class="cb-pass-f">${icon('skip')}</span></button>
+      <button class="btn small ghost cb-pass dv-end" data-d="end" aria-label="Passer le tour" title="Passer le tour"><img class="cb-pass-i" alt="" src="assets/ui/cb-passer2.webp" onerror="this.remove()"><span class="cb-pass-f">${icon('skip')}</span></button>
       <button class="btn small ghost" data-d="quit" aria-label="Pause">${icon('close')}</button></span></div>
     <div class="cb-rules"></div>
     <div class="cb-tl" aria-label="Ordre des tours"></div>
