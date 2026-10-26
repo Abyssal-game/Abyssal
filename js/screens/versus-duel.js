@@ -3,7 +3,7 @@
 // Pour chaque booster de la composition : les deux sachets apparaissent face à face, tremblent, se déchirent ensemble,
 // les cartes jaillissent face cachée vers leur place, puis se retournent une à une, en alternance, avec leurs points.
 // Un toucher accélère (×4) ; « Tout révéler » termine d'un coup.
-import { BOOSTERS, RARITY } from '../config.js';
+import { BOOSTERS, RARITY, RARITY_ORDER } from '../config.js';
 import { lineupOf, scoreOf } from '../core/versus.js';
 import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM } from '../ui/icons.js';
@@ -38,9 +38,21 @@ function musicPlan(packs) {
 /* v736 : le gagnant choisit une carte parmi celles de l'adversaire (une Mythique ou une Secrète devient un coffre abyssal) */
 export function pickGridHTML(app, cards) {
   const cat = app.catalog, g = app.game;
-  return `<div class="vd-pick-grid">${(cards || []).map((x, i) => { const c = cat.get(x.id); if (!c) return '';
-    const big = x.rarity === 'M' || x.rarity === 'S';
-    return `<button class="vd-pick-c ${big ? 'big' : ''}" data-v="pick" data-i="${i}" style="--rc:${RARITY[c.rarity]?.color || '#999'}"><img alt="" src="${artUrl(c, { lite: true })}"><b>${esc(c.name)}</b><small>${big ? t('Coffre abyssal à la place') : g.owns(c.id) ? t('Déjà à toi') : t('Nouvelle !')}</small></button>`; }).join('')}</div>`;
+  /* v805 : les plus rares d'abord (index d'origine gardé pour le serveur) ; cartes déjà dans ta collection bien marquées */
+  const rk = (x) => RARITY_ORDER.indexOf(x.rarity);
+  const list = (cards || []).map((x, i) => ({ x, i })).sort((a, b) => rk(b.x) - rk(a.x) || (b.x.pts || 0) - (a.x.pts || 0) || a.i - b.i);
+  return `<div class="vd-pick-grid">${list.map(({ x, i }) => { const c = cat.get(x.id); if (!c) return '';
+    const big = x.rarity === 'M' || x.rarity === 'S', n = g.entry(c.id)?.n || 0, own = !big && n > 0;
+    const tag = big ? t('Coffre abyssal à la place') : own ? `${t('Déjà à toi')}${n > 1 ? ` ×${n}` : ''}` : t('Nouvelle !');
+    return `<button class="vd-pick-c ${big ? 'big' : ''} ${own ? 'owned' : big ? '' : 'fresh'}" data-v="pick" data-i="${i}" style="--rc:${RARITY[c.rarity]?.color || '#999'}"><span class="vd-pick-im"><img alt="" src="${artUrl(c, { lite: true })}">${own ? `<span class="vd-pick-own"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>` : ''}</span><b>${esc(c.name)}</b><small>${tag}</small></button>`; }).join('')}</div>`;
+}
+/* v805 : le pseudo entier tient dans sa plaque (la police rapetisse) */
+function fitNames(el) {
+  el.querySelectorAll('.vd-pname').forEach((n) => {
+    n.style.fontSize = '';
+    let f = parseFloat(getComputedStyle(n).fontSize), k = 0;
+    while (n.scrollWidth > n.clientWidth + 1 && f > 7 && k++ < 40) { f *= 0.94; n.style.fontSize = `${f}px`; }
+  });
 }
 export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick } = {}) {
   const g = app.game, cat = app.catalog;
@@ -77,7 +89,9 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick } = {
   /* v609 : dos de carte fixe pendant le face-à-face (jusqu'à 18 dos animés à la fois sinon) */
   stillOf(backUrl()).then((u) => { if (u) el.style.setProperty('--card-back', `url("${u}")`); });
   document.body.classList.add('has-sheet', 'lock-scroll');
-  requestAnimationFrame(() => el.classList.add('on'));
+  requestAnimationFrame(() => { el.classList.add('on'); fitNames(el); });
+  document.fonts?.ready?.then(() => fitNames(el));
+  const onRs = () => fitNames(el); addEventListener('resize', onRs);
 
   let speed = app.reduced() || g.s.settings.fastOpen ? 4 : 1, done = false, closed = false;
   const sc = { me: 0, foe: 0 };
@@ -93,7 +107,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick } = {
   const pace = (p) => (sync ? plan.scale[p] : 1);
   musicCue('pari', plan.start);
   const q = (s) => el.querySelector(s);
-  const setScore = (side) => { const n = q(`[data-sc="${side}"]`); n.textContent = fmt(sc[side]); n.classList.remove('bump'); void n.offsetWidth; n.classList.add('bump'); };
+  const setScore = (side) => { const n = q(`[data-sc="${side}"]`); n.textContent = fmt(sc[side]); n.dataset.len = String(n.textContent.length); n.classList.remove('bump'); void n.offsetWidth; n.classList.add('bump'); };
   const lead = () => { q('.vd-plate.me').classList.toggle('lead', sc.me > sc.foe); q('.vd-plate.foe').classList.toggle('lead', sc.foe > sc.me); };
   // v524 : éclat peint (assets/fx/vd-reveal.webp) quand une carte se retourne, plus grand pour une grosse carte
   const burst = (n, k) => {
@@ -202,6 +216,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick } = {
     if (closed) return;
     closed = true; done = true; sync = false;
     musicRelease();
+    removeEventListener('resize', onRs);
     el.classList.remove('on');
     document.body.classList.remove('has-sheet', 'lock-scroll');
     setTimeout(() => el.remove(), 300);

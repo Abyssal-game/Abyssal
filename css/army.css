@@ -7410,3 +7410,20 @@ html.kb-open .sheet-wrap:not(.sheet-full) .sheet { max-height: 100%; overflow-y:
 /* v804 : Mode Créateur en 4 onglets, collés en haut de la fenêtre */
 .creator .cr-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; position: sticky; top: 0; z-index: 3; margin: 6px 0 10px; }
 .creator .cr-tabs .seg-b { min-width: 0; padding-left: 2px; padding-right: 2px; font-size: .72rem; }
+
+/* v805 : Choc des Boosters, pseudo entier dans sa plaque (police réduite par fitNames), score centré dans son anneau quel que soit le nombre de chiffres */
+.vd-plate .vd-pname { text-overflow: clip; }
+.vd-plate .vd-sc { display: flex; align-items: center; justify-content: center; height: 62cqh; padding: 0; font-variant-numeric: tabular-nums; letter-spacing: 0; line-height: 1; }
+.vd-plate .vd-sc[data-len="2"] { font-size: 34cqh; }
+.vd-plate .vd-sc[data-len="3"] { font-size: 26cqh; }
+.vd-plate .vd-sc[data-len="4"], .vd-plate .vd-sc[data-len="5"] { font-size: 20cqh; }
+/* v805 : grille du butin, cartes déjà dans ta collection grisées et cochées, nouvelles mises en avant */
+.vd-pick-im { position: relative; display: block; width: 100%; }
+.vd-pick-im > img { display: block; width: 100%; aspect-ratio: 5 / 7; object-fit: cover; border-radius: 6px; }
+.vd-pick-own { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: rgba(8, 8, 12, .55); }
+.vd-pick-own svg { width: 44%; height: auto; padding: 7px; border-radius: 50%; background: #1F6B3E; color: #EFFFF4; box-shadow: 0 0 0 2px #9FF0BE, 0 2px 8px rgba(0, 0, 0, .6); }
+.vd-pick-c.owned { border-style: dashed; opacity: .82; }
+.vd-pick-c.owned img { filter: grayscale(.65) brightness(.75); }
+.vd-pick-c.owned small { color: #B9B2A3; font-weight: 700; }
+.vd-pick-c.fresh { box-shadow: 0 0 10px color-mix(in srgb, var(--rc) 55%, transparent); }
+.vd-pick-c.fresh small { color: #FFD97A; font-weight: 700; }
