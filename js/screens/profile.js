@@ -204,6 +204,10 @@ export default function profile(app, root) {
       sh.body.addEventListener('click', (e) => { const b = e.target.closest('.av-pick'); if (!b) return; g.setAvatar(b.dataset.id); app.sfx?.tap?.(); sh.close(); render(); app.chrome?.(); });
     },
     async rename() {
+      /* v797 : connecté sans pseudo, on choisit son pseudo (le nom affiché aux autres), pas un simple nom local */
+      if ((await import('../cloud/cloud.js')).isLoggedIn()) {
+        if (!sync.profile?.pseudo) { (await import('./account.js')).askPseudo(app); return; }
+      }
       const sh = openSheet('', { label: 'Ton nom', cls: 'sheet-small' });
       sh.setContent(`<h2 class="center">Ton nom</h2><p class="small muted center">Il s’affiche en haut de l’écran et sur ton profil.</p><input class="input" id="pf-name" maxlength="16" autocomplete="off" value="${esc(g.s.name || '')}" placeholder="Ton nom"><div class="row gap"><button class="btn ghost" data-n="no">Annuler</button><button class="btn primary" data-n="ok">Enregistrer</button></div>`);
       const inp = sh.body.querySelector('#pf-name'); setTimeout(() => inp.focus(), 50);

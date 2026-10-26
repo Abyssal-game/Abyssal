@@ -153,6 +153,19 @@ function fitHeight() {
   document.documentElement.classList.toggle('standalone', !!standalone);
 }
 window.visualViewport?.addEventListener('resize', () => fitHeight());
+/* v797 : clavier ouvert (iPhone) : la zone vraiment visible est plus petite et parfois décalée ; les fenêtres
+   s'y placent pour rester centrées au-dessus du clavier, titre compris (avant : poussées en haut, sous l'heure) */
+function fitKeyboard() {
+  const vv = window.visualViewport, de = document.documentElement;
+  if (!vv) return;
+  const open = innerHeight - vv.height > 120 || (screen.height - vv.height > 260 && document.activeElement?.matches?.('input, textarea'));
+  de.classList.toggle('kb-open', !!open);
+  if (open) { de.style.setProperty('--kb-top', `${Math.round(vv.offsetTop)}px`); de.style.setProperty('--kb-h', `${Math.round(vv.height)}px`); }
+}
+window.visualViewport?.addEventListener('resize', fitKeyboard);
+window.visualViewport?.addEventListener('scroll', fitKeyboard);
+addEventListener('focusin', () => setTimeout(fitKeyboard, 350));
+addEventListener('focusout', () => setTimeout(fitKeyboard, 350));
 fitHeight();
 addEventListener('resize', fitHeight);
 addEventListener('orientationchange', () => setTimeout(fitHeight, 300));

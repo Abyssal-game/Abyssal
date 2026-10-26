@@ -7373,3 +7373,6 @@ html:lang(ja) body { line-break: strict; }
 html:lang(ko) body { word-break: keep-all; overflow-wrap: anywhere; }
 html:lang(ja) :is(h1, h2, h3, h4, .section-title, .btn, .tab, .sn-tab), html:lang(ko) :is(h1, h2, h3, h4, .section-title, .btn, .tab, .sn-tab) { letter-spacing: .02em; }
 html:lang(ja) :is(.lore, i, em), html:lang(ko) :is(.lore, i, em) { font-style: normal; }
+/* v797 : clavier ouvert : la fenêtre se centre dans la zone visible au-dessus du clavier (--kb-top, --kb-h posés par fitKeyboard) */
+html.kb-open .sheet-wrap:not(.sheet-full) { top: var(--kb-top, 0) !important; height: var(--kb-h, 100%) !important; padding: max(10px, calc(var(--safe-t, 0px) - var(--kb-top, 0px))) 12px 10px !important; transition: top .2s, height .2s; }
+html.kb-open .sheet-wrap:not(.sheet-full) .sheet { max-height: 100%; overflow-y: auto; }
