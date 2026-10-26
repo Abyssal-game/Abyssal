@@ -38,4 +38,16 @@ export const BOSS_LINES = {
   juge: { in: "Accusé, levez-vous.", again: "Récidive. La peine sera double.", fury: "Verdict : coupable !", down: "La séance… est levée…" },
   bete: { in: "Le dernier Sceau tremble. J’arrive.", again: "Mes sept têtes se souviennent de toi.", fury: "Sept couronnes, sept colères !", down: "Pas… encore… le jour…" },
   abysse: { in: "Tu es descendu si loin. Pour moi ?", again: "Tu reviens au fond. Tu ne peux plus t’en passer.", fury: "Tous mes rêves, contre toi.", p3: "Alors vois ma nuit. Sans fin.", down: "Ferme les yeux… quelqu’un d’autre les ouvre…" },
+  /* v795 : les Veilleurs (chapitre de saison) */
+  'v-ames': { in: "Encore un vivant. Il en manque toujours un.", again: "Tu repasses le fleuve ? Il se souvient de toi.", fury: "Le fleuve se ferme derrière toi !", down: "Je dormais… debout… merci." },
+  'v-hiver': { in: "Ton souffle fume. Bientôt, il gèlera.", again: "Encore toi. L’hiver n’oublie pas.", fury: "Le dernier hiver, c’est maintenant !", down: "La neige… retombe enfin vers le sol." },
+  'v-marees': { in: "Toi, tu ne dors pas. Je t’envie.", again: "La marée te ramène toujours.", fury: "Que la mer noire monte !", down: "Je rentre au large… il dort encore ?" },
+  'v-racines': { in: "Mes épines ont rêvé de toi.", again: "Tu repousses comme une mauvaise herbe.", fury: "Que le bois se referme !", down: "Les racines… se taisent…" },
+  'v-cour': { in: "Quel masque portes-tu, ce soir ?", again: "Toujours le même visage. Que c’est ennuyeux.", fury: "Mille reflets, et aucun n’est toi !", down: "Enfin… quelqu’un m’a reconnu." },
+  'v-pacte': { in: "Fais un vœu. Je ne demanderai presque rien.", again: "Tu reviens payer ta dette ?", fury: "La nuit m’est due !", down: "Garde ta nuit… je la reprendrai." },
+  'v-lune': { in: "Laquelle de nous est la vraie ? Devine.", again: "Tu m’as trouvée une fois. Plus maintenant.", fury: "Neuf lueurs, neuf morsures !", down: "La lune pâlit… je peux dormir." },
+  'v-forge': { in: "Pousse-toi. J’ai des chaînes à forger.", again: "Tu reviens te faire marteler ?", fury: "Que l’enclume se fende !", down: "Pour qui… forgeais-je déjà ?" },
+  'v-titans': { in: "Le feu ne doit jamais s’éteindre. Toi, si.", again: "Encore un peu de bois pour mon brasier.", fury: "Brûle, et qu’ils restent couchés !", down: "Le brasier… tient encore…" },
+  'v-moissons': { in: "Donne-moi ton souvenir le plus cher.", again: "Tu as déjà oublié notre dernier combat ?", fury: "La grande moisson commence !", down: "Garde-les… tes souvenirs…" },
+  'v-pages': { in: "Il nous manque une page. Tu l’as lue ?", again: "Ton fil est plus court que la dernière fois.", fury: "La coupe tombe !", down: "La page est… à sa place." },
 };

@@ -1407,7 +1407,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       <h3>Les rôles</h3>${Object.values(KITS).map((k) => `<p class="small">${roleIcon(k.kw)} <b>${esc(k.name)}</b> · <b>${esc(k.skill.name)}</b> (${k.skill.pa} PA) : ${esc(k.skill.desc)} <i>${esc(k.passive.name)} : ${esc(k.passive.desc)}</i></p>`).join('')}
       <h3>Les combinaisons</h3>${SYNERGIES.map((x) => `<p class="small"><b class="dv-syn-n">${esc(x.name)}</b> : ${esc(x.desc)}</p>`).join('')}
       <h3>Les ennemis</h3>${Object.values(AI_FAMILIES).map((f) => `<p class="small"><b>${esc(f.name)}</b> : ${esc(f.desc)} <span class="dc-good">${esc(f.counter)}</span></p>`).join('')}
-      <h3>Les gardiens</h3>${Object.entries(BOSSES).map(([k, x]) => `<p class="small"><b>${esc(x.name)}</b> : ${esc(x.mechanic)}${g.s.bossesBeaten[k] ? ` <span class="dc-good">${esc(x.counter)}</span>` : ''}</p>`).join('')}
+      <h3>Les gardiens</h3>${Object.entries(BOSSES).filter(([k, x]) => !x.veille || g.s.bossesBeaten[k]).map(([k, x]) => `<p class="small"><b>${esc(x.name)}</b> : ${esc(x.mechanic)}${g.s.bossesBeaten[k] ? ` <span class="dc-good">${esc(x.counter)}</span>` : ''}</p>`).join('')}
       <p class="small muted">Sous la moitié de leurs PV, les gardiens entrent en <b>Furie</b> (leur phase 2, écusson « Furie ») : plus forts, ils déclenchent leur mécanique de Furie (une fenêtre l’annonce), accélèrent leur grosse attaque et visent tes Soigneurs. Un gardien <b>déchaîné</b> est en Furie dès le premier tour. Dès le 15e tour, l’Épuisement blesse les deux camps.</p>`, { label: 'Règles du combat' });
   }
 

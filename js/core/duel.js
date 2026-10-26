@@ -1165,6 +1165,18 @@ export const PHASE2 = {
   juge:       { name: 'Sentence finale', desc: 'Ses Verdicts tombent toujours un tour sur deux, et ses coups chargés frappent plus fort.' },
   bete:       { name: 'Apocalypse', desc: 'Elle grandit à chaque tour, et non plus un tour sur deux.' },
   abysse:     { name: 'L’Écho des gardiens', desc: 'L’Abysse rappelle les pouvoirs des gardiens vaincus : festin, tempête de givre, essaim, sentence, miroir, vœu.' },
+  /* v795 : Veilleurs (chapitre de saison) : à mi-vie, leurs pouvoirs reviennent plus souvent */
+  'v-ames':     { name: 'Le fleuve se ferme', desc: 'Ses sentences tombent un tour sur deux.' },
+  'v-hiver':    { name: 'Le dernier hiver', desc: 'Il bondit un tour sur deux.' },
+  'v-marees':   { name: 'La marée haute', desc: 'Il dévore un tour sur deux.' },
+  'v-racines':  { name: 'Le bois se referme', desc: 'Ses ronces t’enchaînent un tour sur deux.' },
+  'v-cour':     { name: 'Mille reflets', desc: 'Il dresse son miroir un tour sur deux.' },
+  'v-pacte':    { name: 'La nuit due', desc: 'Elle dévore un tour sur deux.' },
+  'v-lune':     { name: 'Neuf lueurs', desc: 'Son miroir revient tous les trois tours.' },
+  'v-forge':    { name: 'L’enclume enragée', desc: 'Ses coups chargés tombent un tour sur deux.' },
+  'v-titans':   { name: 'Le brasier éveillé', desc: 'Ses déflagrations tombent un tour sur deux.' },
+  'v-moissons': { name: 'La grande moisson', desc: 'Son essaim s’éveille un tour sur deux.' },
+  'v-pages':    { name: 'La coupe', desc: 'Les Moires condamnent un tour sur deux.' },
   abysse3:    { name: 'La Nuit sans fin', desc: 'L’Abysse se déchaîne : la nuit ronge tes créatures à chaque tour (8 % de leurs PV, jamais mortel) et ses coups redoublent. Une Brisure retient la nuit un tour.' },
 };
 export const DOOM_TURNS = 3;

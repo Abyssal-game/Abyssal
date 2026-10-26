@@ -35,7 +35,7 @@ export const OPS = {
   setSceauxHand: { kind: 'sync' }, sceauxStart: { kind: 'sync' }, sceauxFinish: { kind: 'sync' }, sceauxTrophy: { kind: 'sync' }, sceauxQuit: { kind: 'sync' },
   pacteStart: { kind: 'sync' }, pacteFinish: { kind: 'sync' }, pacteQuit: { kind: 'sync' },
   cryptesStart: { kind: 'sync' }, cryptesFinish: { kind: 'sync' }, cryptesQuit: { kind: 'sync' }, cryptesResume: { kind: 'sync' },
-  encheresStart: { kind: 'sync' }, encheresFinish: { kind: 'sync' }, encheresQuit: { kind: 'sync' }, gameForfeit: { kind: 'sync' },
+  encheresStart: { kind: 'sync' }, encheresFinish: { kind: 'sync' }, encheresQuit: { kind: 'sync' }, gameForfeit: { kind: 'sync' }, tourneyPlay: { kind: 'sync' },
   sceauxPlay: { kind: 'sync' }, sceauxAi: { kind: 'sync' }, pacteDraw: { kind: 'sync' }, pacteStop: { kind: 'sync' }, pacteDouble: { kind: 'sync' }, pacteAi: { kind: 'sync' },
   cryptesFlip: { kind: 'sync' }, cryptesPower: { kind: 'sync' }, cryptesAi: { kind: 'sync' }, encheresBid: { kind: 'sync' },
   // Codex et Échoppe (obsidiennes)
@@ -49,7 +49,7 @@ export const OPS = {
   // Mode Créateur
   shopBuy: { kind: 'dev' }, devGrant: { kind: 'dev' }, devGive: { kind: 'dev' }, devAllVariants: { kind: 'dev' }, devDuplicates: { kind: 'dev' },
   devChests: { kind: 'dev' }, devResetCampaign: { kind: 'dev' }, devFreePacks: { kind: 'dev' }, devAbyss: { kind: 'dev' }, devMissions: { kind: 'dev' }, devFloor: { kind: 'dev' },
-  devBoss: { kind: 'dev' }, devUnlockAll: { kind: 'dev' }, devObs: { kind: 'dev' }, devCodexXp: { kind: 'dev' }, devCodexPrem: { kind: 'dev' },
+  devBoss: { kind: 'dev' }, devVeille: { kind: 'dev' }, devUnlockAll: { kind: 'dev' }, devObs: { kind: 'dev' }, devCodexXp: { kind: 'dev' }, devCodexPrem: { kind: 'dev' },
   devCodexReset: { kind: 'dev' }, devSnapshot: { kind: 'dev' }, autoResolve: { kind: 'dev' }, autoTrial: { kind: 'dev' },
 };
 
@@ -103,13 +103,13 @@ export const ARGS = {
   setTeam: ['as'], saveTeamPreset: ['S', 'AS'], deleteTeamPreset: ['i'], setForm: ['s', 'S'], toggleFav: ['s'], claimChallenge: ['s', 's'],
   setTitle: ['S'], setFrame: ['S'], setDress: ['s', 'S'], setBack: ['S'], setPlate: ['S'], setMat: ['S'], setFond: ['S'], setSachet: ['S', 'S'],
   setName: ['S'], setAvatar: ['S'], toggleShowcase: ['s'], reset: [],
-  chooseOmen: ['s'], startRun: [{ cursed: 'b', nightmare: '*', start: 'I' }], startBattle: ['s', { room: 'S', pact: 'S' }], choosePact: ['S'], chooseTalent: ['i'],
+  chooseOmen: ['s'], startRun: [{ cursed: 'b', nightmare: '*', start: 'I', veille: 'b' }], startBattle: ['s', { room: 'S', pact: 'S' }], choosePact: ['S'], chooseTalent: ['i'],
   chooseReward: ['s'], cancelAltar: [], chooseBlessing: ['s'], swapRunTeam: ['i', 'i'], nextFloor: [], cancelRun: [], abandonRun: [], reviveFallen: ['s'], buyBraise: [],
   finishBattle: [], duelAct: ['s', 's', 's', 'S', 'n'], duelUlt: ['s'], duelPass: ['s'], duelNext: ['s'], duelEnemy: ['s', 's', 'S'], duelEndEnemy: ['s'],
   startTrial: ['i'], finishTrial: [], abandonTrial: [],
   setSceauxHand: ['as'], sceauxStart: [{ rival: 'S', daily: 'b', awake: 'b' }], sceauxFinish: [], sceauxTrophy: ['s'], sceauxQuit: [],
   pacteStart: [{ table: 'S', daily: 'b' }], pacteFinish: [], pacteQuit: [], cryptesStart: [{ table: 'S', daily: 'b' }], cryptesFinish: [], cryptesQuit: [], cryptesResume: [],
-  encheresStart: [{ table: 'S', daily: 'b' }], encheresFinish: [], encheresQuit: [], gameForfeit: ['s'],
+  encheresStart: [{ table: 'S', daily: 'b' }], encheresFinish: [], encheresQuit: [], gameForfeit: ['s'], tourneyPlay: [],
   sceauxPlay: ['i', 'i'], sceauxAi: [], pacteDraw: [], pacteStop: [], pacteDouble: [], pacteAi: [], cryptesFlip: ['i'], cryptesPower: ['ai'], cryptesAi: [], encheresBid: ['i'],
   codex: [], codexClaim: ['s', 'i'], codexClaimAll: [], catalogBuy: ['s'], codexBuyTier: [], shadowPay: ['s'],
 };

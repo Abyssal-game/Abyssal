@@ -17,13 +17,15 @@ import { VERSUS_PRIZE } from './versus.js'; /* v735 */
 import { CODEX, CODEX_XP, SHOP, CATALOG, FREE_EMOTES, codexTier, seasonFor, tiersOf, freshCodex, pendingOf, CODEX_OPEN, QUEST_KINDS, questsFor, seasonWeek } from './codex.js';
 import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, lateSoft, bossEase, earlyHp, expectedLevel, cardPower, powerFor, advisedPower, floorForPower, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative, act as duelActRaw, useUlt, beginEnemyTurn, nextEnemy, takeSkips, enemyAct, endEnemyTurn, RHYTHM } from './duel.js';
-import { bossOf, BOSSES, BOSS_ORDER } from './bosses.js';
+import { bossOf, BOSSES, BOSS_ORDER, VEILLES, VEILLE_START } from './bosses.js';
 import { pactChoices, PACTS } from './pacts.js';
 import { FORMS, formUnlocked } from './forms.js';
 import * as SC from './sceaux.js';
 import * as EN from './encheres.js';
 import * as PA from './pacte.js';
 import * as CR from './cryptes.js';
+export const TOURNEY_GAMES = ['sceaux', 'pacte', 'cryptes', 'encheres'];
+export const tourneyTables = (k) => (k === 'sceaux' ? SC.RIVALS : k === 'pacte' ? PA.TABLES : k === 'cryptes' ? CR.TABLES : EN.TABLES).map((x) => x.key);
 import { MP_REWARD } from './mp.js';
 import { FERVOR_START, FERVOR_MAX, FERVOR_CARRY, TALENTS } from './skills.js';
 // Créature de la semaine : à partir de cet étage ; gardien vaincu : chance de le recruter
@@ -832,10 +834,17 @@ export class Game {
   grit(ch) { const x = this.descent().grit; return x && x.ch === ch ? Math.min(GRIT.max, x.n || 0) : 0; }
   gritMult(ch) { return 1 - GRIT.step * this.grit(ch); }
   campaignDone() { return (this.descent().best || 0) >= FINAL_FLOOR; }
+  /* v795 : Les Veilles : chapitre de saison (étages 101 à 105) ouvert après la victoire contre l'Abysse ; un Veilleur par saison
+     du Codex, la saison venant du jour où le chapitre commence */
+  veilleKey(day = this.descent().day) { const k = seasonFor(day)?.key; return VEILLES[k] ? k : 's1-ames'; }
+  veilleOpen() { return !!this.s.bossesBeaten?.abysse; }
+  veille(day) { const key = this.veilleKey(day); return { key, ...VEILLES[key], open: this.veilleOpen(), state: (this.s.veilles || {})[key] || null }; }
+  runBoss(run) { return run?.veille && VEILLES[run.veille] ? VEILLES[run.veille].boss : bossOf(run.floor); }
   // Première victoire à cet étage (campagne : record ; Cauchemar : record du palier)
-  firstClear(run, floor = run.floor) { return run.nightmare ? !this.nightFloors(run.nightTier || 1).includes(floor) : floor > (this.descent().best || 0); }
+  firstClear(run, floor = run.floor) { if (run.veille) return !((this.s.veilles || {})[run.veille]?.floors || []).includes(floor); return run.nightmare ? !this.nightFloors(run.nightTier || 1).includes(floor) : floor > (this.descent().best || 0); }
   floorReward(run, floor = run.floor) {
     const r = { ...floorFirstReward(floor) }, nt = nightTier(run);
+    if (run.veille && floor % CHAPTER === 0) r.chests = { abyssal: 1 }; /* v795 : le Veilleur vaincu : coffre abyssal (et 2 tickets premium) */
     if (floor % CHAPTER === 0) r.braises = chapterOf(floor) >= BRAISE.lateFrom ? BRAISE.bossLate : BRAISE.boss; /* v668 : Braises de vie du gardien */
     if (!nt) return r;
     const out = { ...r };
@@ -864,11 +873,14 @@ export class Game {
     return out;
   }
   restHeal(run = this.s.descent.run) { const k = this.rule(run?.day).key; return k === 'sources' ? 0.6 : k === 'disette' ? 0.15 : 0.3; }
-  startRun({ cursed = false, nightmare = false, start = 1 } = {}) {
+  startRun({ cursed = false, nightmare = false, start = 1, veille = false } = {}) {
+    const vk = veille ? this.veilleKey() : null;
+    if (vk && !this.veilleOpen()) throw new Error('Les Veilles s’ouvrent quand tu as vaincu l’Abysse, au fond de la Descente.');
+    if (vk) { start = VEILLE_START; nightmare = 0; }
     const tier = nightmare === true ? 1 : Math.max(0, Math.min(3, Number(nightmare) || 0));
     if (tier && !this.nightmareUnlocked()) throw new Error(`Le mode Cauchemar s’ouvre quand tu as atteint l’étage ${NIGHTMARE_AT}.`);
     if (tier > 1 && !this.nightTierOpen(tier)) throw new Error(`${NIGHT_TIERS[tier].name} s’ouvre quand tu as gagné ${NIGHT_TIER_OPEN} étages en ${NIGHT_TIERS[tier - 1].name}.`);
-    if (!this.startFloors().includes(start)) throw new Error('Ce chapitre n’est pas encore ouvert : bats d’abord le gardien qui le précède.');
+    if (!vk && !this.startFloors().includes(start)) throw new Error('Ce chapitre n’est pas encore ouvert : bats d’abord le gardien qui le précède.');
     /* v406 : le Cauchemar se joue sur les chapitres déjà terminés */
     if (tier && start + CHAPTER - 1 > (this.descent().best || 0)) throw new Error('Le Cauchemar se joue sur un chapitre que tu as déjà terminé.');
     const d = this.descent();
@@ -880,7 +892,7 @@ export class Game {
     d.runs = (d.runs || 0) + 1;
     const ult = this.ultimate(team.filter((id) => !this.isFallen(id))); /* v676 : le pouvoir d'équipe vient des créatures debout */
     d.run = {
-      v: 3, day: d.day, floor: start, cleared: start - 1, start, phase: 'doors', cursed: false, free, nightmare: !!tier, nightTier: tier || undefined, blessings: [], altar: null,
+      v: 3, day: d.day, floor: start, cleared: start - 1, start, veille: vk || undefined, phase: 'doors', cursed: false, free, nightmare: !!tier, nightTier: tier || undefined, blessings: [], altar: null,
       gauge: this.rule(d.day).key === 'lune' ? FERVOR_MAX - 2 : this.rule(d.day).key === 'reserve' ? 0 : FERVOR_START, ult: { key: ult.key, power: ult.power, card: ult.card },
       team: team.map((id) => { const u = duelUnit(this.catalog.get(id), { level: this.cardLevel(id), form: this.formOf(id) }); const dn = this.isFallen(id); return { id, hp: dn ? 0 : u.maxHp, maxHp: u.maxHp, fallen: dn, form: this.formOf(id) }; }).sort((a, b) => (a.fallen ? 1 : 0) - (b.fallen ? 1 : 0)), /* v668 : les créatures à terre restent à terre, derrière les autres */
       shards: 0, chests: [], kills: {}, bestBefore: d.best || 0, nightBefore: tier ? this.nightBest(tier) : undefined, minFloor: tier ? floorFloor(team.reduce((a, id) => a + this.cardLevel(id), 0) / team.length) : 1, /* v420 : campagne = force fixe par étage ; le plancher ne vaut plus qu'en Cauchemar */
@@ -1120,6 +1132,7 @@ export class Game {
     out.xp = st.forfeit ? 0 : SC.SCEAUX_REWARD.xp; this.s.xp += out.xp; /* v754 : pas d'expérience pour un abandon */ // v348 : chaque partie terminée donne un peu d'expérience
     sc.history.unshift({ t: Date.now(), rival: R.key, r: st.over, s: st.final });
     sc.history = sc.history.slice(0, 20);
+    this.tourneyAfter(st, out); /* v795 */
     st.rewarded = true; st.result = out;
     this.track('sceaux', 1);
     this.checkProgress();
@@ -1137,6 +1150,38 @@ export class Game {
     return r;
   }
   sceauxQuit() { this.s.sceaux.cur = null; this.persist(); }
+  /* v795 : Tournoi du Cercle : chaque semaine (du lundi au dimanche), un des quatre jeux ; il faut battre ses 8 adversaires
+     d'affilée, dans l'ordre des salles. Une défaite (ou une égalité) arrête la série : on peut recommencer depuis la 1re manche.
+     4 manches gagnées : coffre d'or ; les 8 : coffre abyssal et 2 tickets premium (une fois par semaine chacun).
+     La meilleure manche de la semaine part sur la fiche du joueur (classement entre amis). */
+  tourneyWeek(day = today(this.clock())) { const [y, m, d] = day.split('-').map(Number); return Math.floor((Date.UTC(y, m - 1, d) / 86400000 + 3) / 7); }
+  tourney() {
+    const week = this.tourneyWeek(), game = TOURNEY_GAMES[week % TOURNEY_GAMES.length], t = this.s.tourney?.week === week ? this.s.tourney : null;
+    return { week, game, tables: tourneyTables(game), round: t?.round || 0, alive: t ? t.alive !== false : true, best: t?.best || 0, champ: !!t?.champ, gold: !!t?.gold, wins: this.s.tourneyWins || 0 };
+  }
+  tourneyPlay() {
+    const T = this.tourney();
+    let t = this.s.tourney;
+    if (!t || t.week !== T.week) t = this.s.tourney = { week: T.week, game: T.game, round: 0, alive: true, best: 0 };
+    if (t.alive === false || t.round >= T.tables.length) { t.round = 0; t.alive = true; }
+    const sv = this.s[T.game];
+    if (sv?.cur && !sv.cur.over) throw new Error('Termine d’abord ta partie en cours de ce jeu.');
+    const key = T.tables[t.round];
+    const cur = T.game === 'sceaux' ? this.sceauxStart({ rival: key }) : T.game === 'pacte' ? this.pacteStart({ table: key }) : T.game === 'cryptes' ? this.cryptesStart({ table: key }) : this.encheresStart({ table: key });
+    cur.tourney = { week: T.week, round: t.round };
+    this.persist();
+    return cur;
+  }
+  tourneyAfter(st, out) {
+    const t = this.s.tourney;
+    if (!st?.tourney || !t || t.week !== st.tourney.week || t.round !== st.tourney.round || t.alive === false) return;
+    if (st.over !== 'won' || st.forfeit) { t.alive = false; out.tourney = { lost: true, round: t.round }; return; }
+    t.round++; t.best = Math.max(t.best || 0, t.round);
+    const r = (out.tourney = { round: t.round, of: tourneyTables(t.game).length });
+    this.emit('progress', [{ kind: 'tourney', name: t.round >= r.of ? 'Champion du Cercle cette semaine !' : `Manche ${t.round} sur ${r.of} gagnée` }]);
+    if (t.round >= 4 && !t.gold) { t.gold = Date.now(); this.s.chests.or = (this.s.chests.or || 0) + 1; r.chest = 'or'; }
+    if (t.round >= r.of) { r.champ = true; if (!t.champ) { t.champ = Date.now(); this.s.tourneyWins = (this.s.tourneyWins || 0) + 1; this.s.chests.abyssal = (this.s.chests.abyssal || 0) + 1; this.grant({ tickets: { premium: 2 } }, 'tourney'); r.reward = true; } }
+  }
   // ——— v427 : les Enchères de Mammon (enchères à l'aveugle à trois), ouvertes avec la Salle des jeux ———
   encheresUnlocked() { return EN.TABLES.filter((_, i) => EN.tableUnlocked(this.s, i)).length; }
   encheresDailyOpen() { return !!this.s.encheres.beaten?.etal; }
@@ -1197,6 +1242,7 @@ export class Game {
     out.xp = st.forfeit ? 0 : R.xp; this.s.xp += out.xp; /* v754 : pas d'expérience pour un abandon */
     en.history.unshift({ t: Date.now(), table: T.key, r: st.over, s: st.final?.scores });
     en.history = en.history.slice(0, 20);
+    this.tourneyAfter(st, out); /* v795 */
     st.rewarded = true; st.result = out;
     this.track('encheres', 1);
     this.checkProgress();
@@ -1269,6 +1315,7 @@ export class Game {
     out.xp = st.forfeit ? 0 : R.xp; this.s.xp += out.xp; /* v754 : pas d'expérience pour un abandon */
     pa.history.unshift({ t: Date.now(), table: T.key, r: st.over, s: st.final?.scores });
     pa.history = pa.history.slice(0, 20);
+    this.tourneyAfter(st, out); /* v795 */
     st.rewarded = true; st.result = out;
     this.track('pacte', 1);
     this.checkProgress();
@@ -1345,6 +1392,7 @@ export class Game {
     out.xp = st.forfeit ? 0 : R.xp; this.s.xp += out.xp; /* v754 : pas d'expérience pour un abandon */
     cr.history.unshift({ t: Date.now(), table: T.key, r: st.over, s: st.final?.scores });
     cr.history = cr.history.slice(0, 20);
+    this.tourneyAfter(st, out); /* v795 */
     st.rewarded = true; st.result = out;
     this.track('cryptes', 1);
     this.checkProgress();
@@ -1488,6 +1536,7 @@ export class Game {
     const sc = enemyScale(eff);
     const lvl = enemyLevel(eff, room);
     const list = floorEnemies(this.catalog, run.day, run.floor, room) /* v434 : plus d'événement de la semaine dans la Descente */;
+    if (room === 'boss' && run.veille && VEILLES[run.veille] && this.catalog.get(VEILLES[run.veille].card)) list[0].id = VEILLES[run.veille].card; /* v795 : la créature qui veille */
     const enemies = list.map((e) => duelUnit(this.catalog.get(e.id), { side: 'enemy', scale: sc, level: e.boss || e.elite ? lvl : enemyLevel(eff, 'fight'), boss: e.boss, elite: e.elite }));
     for (const e of enemies) {
       // combats ordinaires : des ennemis qui frappent plus fort, pour que chaque combat ait un enjeu
@@ -1499,7 +1548,7 @@ export class Game {
       if (run.omen === 'avare') e.atk = Math.round(e.atk * 1.1 + 0.4);
       { const k = (e.boss ? bossEase(run.floor) : lateSoft(run.floor)) * (run.nightmare || run.noGrit ? 1 : this.gritMult(chapterOf(run.start || 1))); if (k !== 1) { e.maxHp = Math.max(1, Math.round(e.maxHp * k)); e.hp = e.maxHp; e.atk = Math.max(1, Math.round(e.atk * k)); } if (!run.nightmare) { const h = earlyHp(run.floor, e.boss); if (h !== 1) { e.maxHp = Math.max(1, Math.round(e.maxHp * h)); e.hp = e.maxHp; } } } /* v460, v509 */
       // Gardien éveillé (Cauchemar, ou à partir de l'étage 30) : sa phase 2 commence dès le premier tour
-      if (e.boss && (run.nightmare || run.floor >= AWAKEN_AT)) e.awakened = true;
+      if (e.boss && !run.veille && (run.nightmare || run.floor >= AWAKEN_AT)) e.awakened = true; /* v795 : un Veilleur entre en Furie à mi-vie */
     }
     // un ennemi nommé : plus coriace, il rapporte un butin en plus
     if (!(this.novice() && run.floor < 4)) foeTraits(run.day, run.floor, room, enemies.length).forEach((t, i) => { if (t && !enemies[i].boss && !enemies[i].weekly) { enemies[i].trait = t; if (t === 'carapace') enemies[i].shield = 1; } });
@@ -1528,7 +1577,7 @@ export class Game {
       const enemies = this.foesFor(run, room, rule); /* v595 : construction des ennemis partagée avec le banc d'essai du Mode Créateur */
       const known = {};
       enemies.forEach((e) => { if (this.knows(e.id)) known[e.id] = true; });
-      run.battle = createDuel(this.runUnits(), enemies, { fervor: run.gauge || 0, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, boss: room === 'boss' ? bossOf(run.floor) : null, pact: room === 'fight' ? null : run.pact || null, relics: OMENS[run.omen]?.relic ? [OMENS[run.omen].relic] : [], blessings: run.blessings, discovered: this.s.weakSeen || {}, seed: this.seed('duel'), goal: this.goalFor(run, room), refPow: refPowFor(Math.max(run.floor, run.minFloor || 1)) });
+      run.battle = createDuel(this.runUnits(), enemies, { fervor: run.gauge || 0, ult: run.ult.key, power: run.ult.power, known, ruleMult: rule.key === 'instable' ? 1.25 : 1, boss: room === 'boss' ? this.runBoss(run) : null, pact: room === 'fight' ? null : run.pact || null, relics: OMENS[run.omen]?.relic ? [OMENS[run.omen].relic] : [], blessings: run.blessings, discovered: this.s.weakSeen || {}, seed: this.seed('duel'), goal: this.goalFor(run, room), refPow: refPowFor(Math.max(run.floor, run.minFloor || 1)) });
       if (rule.key === 'marque') run.battle.markMult = 2;
       if (run.omen === 'soif') run.battle.soif = true;
       if (run.omen) run.battle.omen = run.omen;
@@ -1606,6 +1655,7 @@ export class Game {
   clearFloor() {
     const run = this.s.descent.run;
     run.cleared = run.floor;
+    if (run.veille) { const v = ((this.s.veilles ||= {})[run.veille] ||= { floors: [] }); if (!v.floors.includes(run.floor)) v.floors.push(run.floor); return; } /* v795 : le record de la Descente reste à 100 */
     /* v406 : en Cauchemar, le record du palier avance étage par étage (il décide des premières victoires) */
     if (run.nightmare) { const d = this.s.descent, t = run.nightTier || 1; const nf = this.nightFloors(t); if (!nf.includes(run.floor)) nf.push(run.floor); if (run.floor > this.nightBest(t)) (d.nightBest ||= {})[t] = run.floor; if (t === 1 && run.floor > (d.bestNightmare || 0)) d.bestNightmare = run.floor; }
     this.recordDepth(run.floor);
@@ -1692,15 +1742,16 @@ export class Game {
       // v394 : l'étage 100 est le fond de la Descente : la victoire contre L'Abysse donne le Booster de l'Abysse
       // (v406 : à la première victoire, et à la première de chaque palier de Cauchemar)
       if (room === 'boss') {
-        const summit = run.floor >= FINAL_FLOOR;
+        const summit = !run.veille && run.floor >= FINAL_FLOOR;
+        if (run.veille && out.first) { const v = ((this.s.veilles ||= {})[run.veille] ||= { floors: [] }); v.won = v.won || Date.now(); this.grant({ tickets: { premium: 2 } }, 'veille'); out.veilleWon = true; } /* v795 */
         if (summit && out.first) { this.grant({ tickets: { abysse: 1 } }, 'summit'); this.s.stats.summits = (this.s.stats.summits || 0) + 1; out.abyssPack = true; }
         this.clearFloor();
         this.track('win', 1);
-        out.chapter = chapterOf(run.floor);
+        out.chapter = run.veille ? 0 : chapterOf(run.floor);
         if (summit) out.summit = true;
         out.summary = this.endRun(false);
         if (this.s.descent.grit?.ch === out.chapter) delete this.s.descent.grit;
-        Object.assign(out.summary, { chapterDone: out.chapter, summit: !!summit, report: out.report, abyss: !!out.abyss, abyssPack: !!out.abyssPack, free: !!run.free, boss: out.boss, bossChest: out.first ? out.chest : null, braises: out.braises || 0 });
+        Object.assign(out.summary, { veilleWon: !!out.veilleWon, chapterDone: out.chapter, summit: !!summit, report: out.report, abyss: !!out.abyss, abyssPack: !!out.abyssPack, free: !!run.free, boss: out.boss, bossChest: out.first ? out.chest : null, braises: out.braises || 0 });
         return out;
       }
       run.phase = 'reward';
@@ -1852,7 +1903,7 @@ export class Game {
   endRun(wiped = false) {
     const d = this.s.descent, run = d.run;
     if (!run) throw new Error('Aucun chapitre en cours.');
-    if (wiped && !run.nightmare && chapterOf(run.start || 1) >= this.chapterNow()) { const c = chapterOf(run.start || 1); d.grit = { ch: c, n: d.grit?.ch === c ? Math.min(GRIT.max, (d.grit.n || 0) + 1) : 1 }; }
+    if (wiped && !run.nightmare && !run.veille && chapterOf(run.start || 1) >= this.chapterNow()) { const c = chapterOf(run.start || 1); d.grit = { ch: c, n: d.grit?.ch === c ? Math.min(GRIT.max, (d.grit.n || 0) + 1) : 1 }; }
     // v406 : plus de coffre de fin ni de perte : tout ce qui a été gagné est gardé ; une équipe tombée recommence le chapitre
     const shards = run.shards, chests = run.chests.slice();
     chests.forEach((c) => { this.s.chests[c] = (this.s.chests[c] || 0) + 1; });
@@ -1862,8 +1913,8 @@ export class Game {
     const down = wiped ? [] : run.team.filter((m) => m.fallen).map((m) => m.id);
     if (down.length) { const f = (this.s.fallen ||= {}); down.forEach((id) => { f[id] = 1; }); }
     this.s.shards += shards;
-    const summary = { wiped, floor: run.cleared, day: run.day, chests, shards, kills: run.kills, free: run.free, cursed: run.cursed, nightmare: !!run.nightmare, nightTier: run.nightmare ? run.nightTier || 1 : 0, start: run.start || 1, chapter: chapterOf(run.start || 1), firstLoot: run.firstLoot || null, fallen: down, ash: run.ashGot || 0 };
-    if (!run.free && run.cleared > 0 && run.bestBefore !== undefined && run.cleared > run.bestBefore) summary.record = true;
+    const summary = { wiped, floor: run.cleared, day: run.day, chests, shards, kills: run.kills, free: run.free, cursed: run.cursed, nightmare: !!run.nightmare, nightTier: run.nightmare ? run.nightTier || 1 : 0, start: run.start || 1, chapter: run.veille ? 0 : chapterOf(run.start || 1), veille: run.veille || undefined, firstLoot: run.firstLoot || null, fallen: down, ash: run.ashGot || 0 };
+    if (!run.free && !run.veille && run.cleared > 0 && run.bestBefore !== undefined && run.cleared > run.bestBefore) summary.record = true;
     // bilan : la créature qui a achevé le plus d'ennemis, le prochain palier de coffre, les éclats vers un booster
     if (run.feats) summary.feats = { ...run.feats };
     const mvp = Object.entries(run.fin || {}).sort((a, b) => b[1] - a[1])[0];
@@ -2277,6 +2328,18 @@ export class Game {
     run.devFree = true; /* v735 : essais du Mode Créateur, sans Torche */
     run.battle = null; run.altar = null; run.rewards = null; run.talentOffer = null;
     return { floor: (i + 1) * DESCENT.bossEvery, level: this.devFloor((i + 1) * DESCENT.bossEvery, { power }) };
+  }
+  /* v795 : Mode Créateur, affronter le Veilleur d'une saison (essai : la Veille s'ouvre même sans l'Abysse vaincu, sans Torche) */
+  devVeille(season, { power = false } = {}) {
+    if (!VEILLES[season]) throw new Error('Saison inconnue.');
+    const d = this.s.descent;
+    if (d.run && !d.run.veille) d.run = null;
+    if (!d.run) { this.s.fallen = {}; const had = this.s.bossesBeaten.abysse; this.s.bossesBeaten.abysse = had || 1; try { this.startRun({ veille: true }); } finally { if (!had) delete this.s.bossesBeaten.abysse; } }
+    const run = d.run;
+    if (run.phase === 'omen') this.chooseOmen(run.omenOffer[0]);
+    run.veille = season; run.devFree = true;
+    run.battle = null; run.altar = null; run.rewards = null; run.talentOffer = null;
+    return { floor: VEILLE_START + 4, level: this.devFloor(VEILLE_START + 4, { power }) };
   }
   devUnlockAll() {
     this.catalog.cards.forEach((c) => { if (!this.owns(c.id)) this.addCard(c.id, 'normal', 'reward'); });

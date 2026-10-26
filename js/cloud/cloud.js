@@ -188,6 +188,8 @@ export async function playerCard(id) {
   const rows = await authed(`/rest/v1/player_cards?id=eq.${id}&select=data,updated_at`);
   return rows && rows[0] ? rows[0] : null;
 }
+/* v795 : fiches de plusieurs amis d'un coup (classement du Tournoi du Cercle) */
+export async function playerCards(ids) { if (!ids.length) return []; return (await authed(`/rest/v1/player_cards?id=in.(${ids.slice(0, 60).join(',')})&select=id,data`)) || []; }
 // v528 : profil d'un joueur, ami ou non (supabase/10-profils.sql) : sans sa collection si on n'est pas amis
 export async function publicProfile(id) { return authed('/rest/v1/rpc/public_profile', { method: 'POST', body: { p_id: id } }); }
 export async function publishCard(data) {

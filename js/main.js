@@ -357,8 +357,8 @@ function rewardText(r = {}) {
 app.rewardText = rewardText;
 /* v557 (demande du propriétaire : les succès et niveaux couvraient l'écran) : une petite pastille en haut de l'écran
    (« Succès · nom », « Niveau 12 », « 3 récompenses ») ; un toucher ouvre le détail. Les annonces suivantes s'y ajoutent. */
-const KIND_LABEL = { codex: 'Codex de l’Abîme', quest: 'Défi du Codex rempli', achievement: 'Succès', set: 'Ensemble complété', faction: 'Faction complétée', fame: 'Renommée', season: 'Saison', level: 'Niveau' };
-const KIND_ICON = { codex: 'star', quest: 'trophy', achievement: 'trophy', set: 'star', faction: 'shield', fame: 'star', season: 'trophy', level: 'up' };
+const KIND_LABEL = { codex: 'Codex de l’Abîme', quest: 'Défi du Codex rempli', achievement: 'Succès', set: 'Ensemble complété', faction: 'Faction complétée', fame: 'Renommée', season: 'Saison', level: 'Niveau', tourney: 'Tournoi du Cercle' };
+const KIND_ICON = { codex: 'star', quest: 'trophy', achievement: 'trophy', set: 'star', faction: 'shield', fame: 'star', season: 'trophy', level: 'up', tourney: 'trophy' };
 let progList = [], progEl = null, progTimer = 0;
 function progLine(e) { return e.kind === 'level' ? `Niveau ${e.level}` : e.kind === 'codex' ? (e.up ? `Palier ${e.tier} atteint ! (+${e.xp} points)` : `+${e.xp} points · palier ${e.tier}`) : esc(e.name); }
 /* v695 : la pastille attend la fin d'un combat, d'une ouverture, d'un coffre ou d'une présentation de gardien

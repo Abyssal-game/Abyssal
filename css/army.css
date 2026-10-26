@@ -7330,3 +7330,37 @@ html.fx-light .dv.grace::after { display: none; }
 @keyframes bsayIn { from { opacity: 0; transform: translateY(6px) scale(.97); } to { opacity: 1; transform: none; } }
 @keyframes bsayOut { to { opacity: 0; transform: translateY(-4px); } }
 @media (prefers-reduced-motion: reduce) { .cb-bsay, .nar-cap { animation: none; } }
+
+/* v795 : Les Veilles (chapitre de saison après l'Abysse) */
+.dc-veille { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 12px; align-items: start; border: 1px solid rgba(160, 120, 255, .45); background: linear-gradient(160deg, rgba(48, 28, 80, .55), rgba(10, 8, 18, .85)); }
+.dc-veille.done { border-color: rgba(212, 175, 90, .5); }
+.dc-veille-art { width: 92px; aspect-ratio: 5 / 7; object-fit: cover; border-radius: 8px; border: 1px solid rgba(212, 175, 90, .6); box-shadow: 0 0 18px rgba(150, 100, 255, .35); }
+.dc-veille-b { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.dc-veille-b > b { font-family: var(--font-display, serif); font-size: 1.05rem; line-height: 1.2; }
+.dc-veille-b > small { color: var(--muted, #b9b2c8); }
+.dc-veille-b p { margin: 4px 0; }
+.dc-veille .dc-chap-floors { margin: 4px 0; }
+.dc-veille .btn { margin-top: 4px; }
+.dc-veille-tease { margin: 10px 16px; }
+@media (max-width: 380px) { .dc-veille { grid-template-columns: 72px minmax(0, 1fr); } .dc-veille-art { width: 72px; } }
+
+/* v795 : Tournoi du Cercle */
+.tn-box { margin: 12px 0; border: 1px solid rgba(212, 175, 90, .5); background: linear-gradient(170deg, rgba(60, 30, 20, .55), rgba(12, 9, 16, .9)); }
+.tn-box.champ { box-shadow: 0 0 22px rgba(240, 199, 94, .3); }
+.tn-h { display: flex; gap: 10px; align-items: center; }
+.tn-h > span { display: flex; flex-direction: column; min-width: 0; }
+.tn-h b { font-family: var(--font-display, serif); font-size: 1.1rem; }
+.tn-h small { color: var(--muted, #b9b2c8); }
+.tn-pips { list-style: none; margin: 10px 0 6px; padding: 0; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; }
+.tn-pips li { position: relative; aspect-ratio: 1; border-radius: 50%; overflow: hidden; border: 2px solid rgba(255, 255, 255, .15); filter: grayscale(.85) brightness(.55); }
+.tn-pips li img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn-pips li.ok { filter: none; border-color: #d4af5a; }
+.tn-pips li.cur { filter: none; border-color: #ff5c5c; box-shadow: 0 0 10px rgba(255, 92, 92, .55); }
+.tn-pips li i { position: absolute; inset: auto 0 0 auto; width: 46%; height: 46%; display: grid; place-items: center; background: #d4af5a; color: #1a1208; border-radius: 50%; }
+.tn-pips li i svg { width: 70%; height: 70%; }
+.tn-line, .tn-rw { margin: 4px 0; }
+.tn-rank { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 4px; }
+.tn-rank li { display: flex; justify-content: space-between; gap: 8px; padding: 6px 10px; border-radius: 8px; background: rgba(255, 255, 255, .05); }
+.tn-rank li.me { background: rgba(212, 175, 90, .15); }
+.tn-fr:empty { display: none; }
+.tn-fr { margin-top: 10px; }

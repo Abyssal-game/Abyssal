@@ -188,3 +188,86 @@ export const BOSS_ORDER = ['devoreur', 'matriarche', 'roi', 'architecte', 'eclip
 export const ABYSS_ECHOES = ['gorge', 'gather', 'brood', 'sentence', 'mirror', 'wish'];
 // Gardien d'un étage (tous les 5 étages)
 export const bossOf = (floor) => BOSS_ORDER[(Math.max(1, Math.floor(floor / 5)) - 1) % BOSS_ORDER.length];
+
+/* v795 : Les Veilles (chapitre de saison après l'étage 100, 5 étages, étages 101 à 105).
+   Depuis que le Rêveur remue, une créature du Bestiaire veille pour lui ; mais le sommeil la gagne et le rêve de l'Abysse
+   la retourne contre toi. Chaque saison du Codex a son Veilleur : la créature (carte qui porte ses valeurs et son image)
+   et un mélange de pouvoirs des gardiens. La saison vient du jour où le chapitre commence (seasonFor), la même pour tous. */
+const V = (name, title, intro, mechanic, counter, story, pattern) => ({ name, title, intro, mechanic, counter, story, pattern, veille: true });
+export const VEILLEURS = {
+  'v-ames': V('Ereshkigal, la Veilleuse des Âmes', 'Reine du Pays sans Retour',
+    'Les âmes ne passent plus le fleuve. Sur l’autre rive, une reine compte les vivants qu’il lui manque.',
+    'Elle condamne ta créature la plus affaiblie, puis l’exécute au tour suivant. Entre deux sentences, elle concentre une déflagration.',
+    'Mets la condamnée en réserve ou en défense, et brise la reine pendant qu’elle concentre sa déflagration.',
+    'Pendant la Nuit des Âmes, Ereshkigal tient la porte des morts fermée pour que le Rêveur n’entende pas leurs voix. Elle n’a pas dormi depuis un siècle.',
+    (phase, round) => (round % (phase === 2 ? 2 : 3) === 1 ? 'sentence' : round % 3 === 0 ? 'channel' : 'hit')),
+  'v-hiver': V('Le Loup des Derniers Hivers', 'Le froid qui mord',
+    'La neige tombe à l’envers, vers le ciel. Un loup immense marche sans laisser de traces.',
+    'Il rassemble le froid puis lâche une Tempête de givre sur toute ton équipe ; il disparaît dans la neige et bondit sur ta créature la plus affaiblie.',
+    'Interromps la tempête par le gel ou la Brisure. Pose la Marque sur lui quand il se cache : il redevient visible.',
+    'Le dernier loup de l’hiver garde le froid autour du Rêveur, pour que son sommeil reste lourd. Mais le froid commence à lui geler l’esprit.',
+    (phase, round) => (round % 3 === 1 ? 'gather' : round % (phase === 2 ? 2 : 4) === 0 ? 'ambush' : 'hit')),
+  'v-marees': V('Léviathan, le Veilleur des Marées', 'Prince de l’Envie',
+    'La mer monte dans la salle, noire et silencieuse. Quelque chose d’immense respire sous la surface.',
+    'Il chante une Complainte qui frappe toute ton équipe et vole ta Ferveur, puis dévore ta créature la plus vigoureuse.',
+    'Garde peu de Ferveur avant sa Complainte et interromps son festin par le gel ou la Brisure.',
+    'Léviathan tient les marées noires loin du rivage où dort le Rêveur. Il envie ceux qui dorment : c’est par là que le rêve est entré.',
+    (phase, round) => (round % 3 === 2 ? 'chant' : round % (phase === 2 ? 2 : 4) === 0 ? 'gorge' : 'hit')),
+  'v-racines': V('La Reine des Ronces', 'Couronne d’épines',
+    'Les racines ont percé le sol des Sceaux. Au cœur des ronces, une reine se lève, couverte de fleurs empoisonnées.',
+    'Elle éveille un essaim qui empoisonne toute ton équipe, et enchaîne ta créature la plus forte dans ses ronces.',
+    'Tes Soigneurs purifient le poison ; brise-la avant que l’essaim ne sorte.',
+    'Les racines de la Forêt Première tiennent le sol au-dessus du Rêveur. Leur reine veille depuis le premier printemps, et ses épines ont commencé à rêver.',
+    (phase, round) => (round % 3 === 1 ? 'brood' : round % (phase === 2 ? 2 : 3) === 0 ? 'chain' : 'hit')),
+  'v-cour': V('Tezcatlipoca, le Veilleur sans Visage', 'Le miroir fumant',
+    'Une fumée sombre s’élève d’un miroir d’obsidienne. Ton reflet te fait une révérence que tu n’as pas faite.',
+    'Il copie une compétence de ton équipe et la retourne contre toi ; il dresse un miroir qui renvoie ton prochain coup.',
+    'Frappe avec le poison quand le miroir est dressé, et brise-le pendant qu’il copie.',
+    'À la Cour sans Visage, chacun porte un masque pour que le Rêveur ne reconnaisse personne en rêve. Tezcatlipoca les a tous essayés.',
+    (phase, round) => (round % 3 === 1 ? 'mimic' : round % (phase === 2 ? 2 : 3) === 2 ? 'mirror' : 'hit')),
+  'v-pacte': V('Lilith, la Veilleuse du Pacte', 'Mère de la Nuit',
+    'Une main se tend vers toi, paume ouverte. « Fais un vœu. Je ne demanderai presque rien. »',
+    'Elle accorde un vœu (Ferveur et PA pour toi), puis réclame son prix sur toute ton équipe et s’en soigne ; elle dévore ta créature la plus vigoureuse.',
+    'Profite du vœu pour la briser avant que le prix ne tombe, et mets tes créatures en défense.',
+    'Lilith a signé un pacte de sang avec les royaumes : elle veille, et en échange on lui doit une nuit. La nuit est longue.',
+    (phase, round) => (round % 3 === 1 ? 'wish' : round % (phase === 2 ? 2 : 4) === 0 ? 'gorge' : 'hit')),
+  'v-lune': V('Kyūbi, la Veilleuse de la Lune pâle', 'Renarde aux neuf queues',
+    'Neuf lueurs dansent entre les arbres d’argent. Laquelle est la vraie renarde ?',
+    'Elle se cache sous un voile (presque aucun dégât) puis bondit sur ta créature la plus affaiblie ; elle dresse un miroir qui renvoie ton prochain coup.',
+    'La Marque la révèle ; frappe avec le poison quand le miroir est dressé.',
+    'Dans les jardins de la Lune pâle, Kyūbi garde les rêves légers loin du Rêveur. Les rêves lourds, elle les mange. Elle en a trop mangé.',
+    (phase, round) => (round % 2 === 0 ? 'ambush' : round % (phase === 2 ? 3 : 5) === 1 ? 'mirror' : 'hit')),
+  'v-forge': V('Héphaïstos, le Veilleur de la Forge', 'Le forgeron des dieux',
+    'L’enclume sonne seule dans la Forge Sans Maître. Le forgeron lève son marteau sans te regarder.',
+    'Il charge des coups énormes et enchaîne ta créature la plus forte ; en Furie, il frappe plus souvent.',
+    'Interromps ses charges par le gel ou la Brisure ; un Protecteur encaisse le coup chargé.',
+    'Héphaïstos forge les chaînes qui tiennent le Rêveur. Mais il ne se souvient plus pour qui il les forge.',
+    (phase, round) => (round % (phase === 2 ? 2 : 3) === 2 ? 'charge' : round % 3 === 0 ? 'chain' : 'hit')),
+  'v-titans': V('Surtr, le Veilleur du Brasier', 'Le Noir du Muspellheim',
+    'Le sol fond. Une épée de feu se lève au-dessus d’une silhouette noire comme le charbon.',
+    'Il rassemble la chaleur puis déchaîne une tempête de flammes sur toute ton équipe, et concentre des déflagrations.',
+    'Interromps ses incantations par le gel ou la Brisure ; garde tes Soigneurs debout.',
+    'Surtr entretient le brasier où les Titans font semblant de dormir. Si le feu s’éteint, ils se lèveront. Le feu le dévore lui aussi.',
+    (phase, round) => (round % 3 === 1 ? 'gather' : round % (phase === 2 ? 2 : 3) === 2 ? 'channel' : 'hit')),
+  'v-moissons': V('Le Faucheur des Souvenirs', 'Il prend ce qui reste',
+    'Les champs d’ombre sont mûrs. Une faux passe, et tu oublies le nom de ta première créature.',
+    'Il condamne ta créature la plus affaiblie puis l’exécute ; il éveille un essaim qui empoisonne toute ton équipe.',
+    'Mets la condamnée à l’abri, purifie le poison, et brise-le pendant ses préparatifs.',
+    'Le Faucheur moissonne les souvenirs qui pourraient réveiller le Rêveur. Il n’en garde aucun pour lui, et c’est ce qui le rend si triste.',
+    (phase, round) => (round % 3 === 1 ? 'sentence' : round % (phase === 2 ? 2 : 3) === 2 ? 'brood' : 'hit')),
+  'v-pages': V('Les Moires, Veilleuses des Pages perdues', 'Le fil, la mesure et la coupe',
+    'Trois sœurs tiennent un fil d’argent. L’une le file, l’autre le mesure. La troisième lève ses ciseaux.',
+    'Elles mesurent ta créature la plus affaiblie (condamnée), la coupent au tour suivant, et enchaînent ta créature la plus forte.',
+    'Mets la condamnée à l’abri ou en défense, et brise les Moires avant la coupe.',
+    'Les Moires rangent les pages perdues du Bestiaire pour que personne ne lise celle du Rêveur. Une page leur manque. Elles te soupçonnent.',
+    (phase, round) => (round % (phase === 2 ? 2 : 3) === 1 ? 'sentence' : round % 3 === 0 ? 'chain' : 'hit')),
+};
+Object.assign(BOSSES, VEILLEURS);
+// saison du Codex → son Veilleur et la carte qui le porte (image et valeurs)
+export const VEILLES = {
+  's1-ames': { boss: 'v-ames', card: 'NEC-043' }, 's3-hiver': { boss: 'v-hiver', card: 'SAU-048' }, 's9-marees': { boss: 'v-marees', card: 'ABY-045' },
+  's5-racines': { boss: 'v-racines', card: 'SAU-046' }, 's6-carnaval': { boss: 'v-cour', card: 'PRI-070' }, 's4-coeurs': { boss: 'v-pacte', card: 'INF-051' },
+  's7-lune': { boss: 'v-lune', card: 'SAU-045' }, 's10-forge': { boss: 'v-forge', card: 'ART-046' }, 's8-solstice': { boss: 'v-titans', card: 'PRI-041' },
+  's11-moissons': { boss: 'v-moissons', card: 'NEC-039' }, 's12-anniv': { boss: 'v-pages', card: 'NEC-070' },
+};
+export const VEILLE_START = 101; // étages 101 à 105

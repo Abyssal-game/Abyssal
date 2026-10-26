@@ -8,7 +8,7 @@ Généré par `node tools/voix-script.mjs` (v794). **Ne pas modifier à la main*
 3. Télécharge le MP3 et nomme-le **`<personnage>-<langue>.mp3`** (ex. `boss-devoreur-fr.mp3`), puis envoie-le-moi. Je le découpe et je l'intègre.
 4. Tu peux commencer par le **français** seulement : chaque langue s'ajoute quand tu veux. Sans voix, le jeu affiche simplement le texte.
 
-Personnages : 37 · répliques : 236 par langue.
+Personnages : 48 · répliques : 280 par langue.
 
 ---
 
@@ -2111,6 +2111,831 @@ Então veja a minha noite. Sem fim.
 Feche os olhos… outra pessoa abre os dela…
 <break time="1.5s" />
 Quanto mais você desce, mais eu sorrio.
+```
+
+---
+
+## boss-v-ames · Ereshkigal, la Veilleuse des Âmes
+
+Voix :
+```
+Regal, cold queen of the dead, low female voice, slow and weary, faint echo of a river.
+```
+
+Français → `boss-v-ames-fr.mp3`
+```
+Encore un vivant. Il en manque toujours un.
+<break time="1.5s" />
+Tu repasses le fleuve ? Il se souvient de toi.
+<break time="1.5s" />
+Le fleuve se ferme derrière toi !
+<break time="1.5s" />
+Je dormais… debout… merci.
+```
+
+English → `boss-v-ames-en.mp3`
+```
+Another living one. There is always one missing.
+<break time="1.5s" />
+Crossing the river again? It remembers you.
+<break time="1.5s" />
+The river closes behind you!
+<break time="1.5s" />
+I was sleeping… standing up… thank you.
+```
+
+Español → `boss-v-ames-es.mp3`
+```
+Otro vivo. Siempre falta uno.
+<break time="1.5s" />
+¿Vuelves a cruzar el río? Te recuerda.
+<break time="1.5s" />
+¡El río se cierra a tu espalda!
+<break time="1.5s" />
+Dormía… de pie… gracias.
+```
+
+Deutsch → `boss-v-ames-de.mp3`
+```
+Noch ein Lebender. Einer fehlt immer.
+<break time="1.5s" />
+Du überquerst den Fluss wieder? Er erinnert sich an dich.
+<break time="1.5s" />
+Der Fluss schließt sich hinter dir!
+<break time="1.5s" />
+Ich schlief… im Stehen… danke.
+```
+
+Italiano → `boss-v-ames-it.mp3`
+```
+Un altro vivo. Ne manca sempre uno.
+<break time="1.5s" />
+Riattraversi il fiume? Si ricorda di te.
+<break time="1.5s" />
+Il fiume si chiude alle tue spalle!
+<break time="1.5s" />
+Dormivo… in piedi… grazie.
+```
+
+Português (Brasil) → `boss-v-ames-pt.mp3`
+```
+Mais um vivo. Sempre falta um.
+<break time="1.5s" />
+Atravessando o rio de novo? Ele se lembra de você.
+<break time="1.5s" />
+O rio se fecha atrás de você!
+<break time="1.5s" />
+Eu dormia… de pé… obrigada.
+```
+
+---
+
+## boss-v-hiver · Le Loup des Derniers Hivers
+
+Voix :
+```
+Huge old wolf speaking, rough breathy growl, cold and tired, low male voice.
+```
+
+Français → `boss-v-hiver-fr.mp3`
+```
+Ton souffle fume. Bientôt, il gèlera.
+<break time="1.5s" />
+Encore toi. L’hiver n’oublie pas.
+<break time="1.5s" />
+Le dernier hiver, c’est maintenant !
+<break time="1.5s" />
+La neige… retombe enfin vers le sol.
+```
+
+English → `boss-v-hiver-en.mp3`
+```
+Your breath steams. Soon it will freeze.
+<break time="1.5s" />
+You again. Winter does not forget.
+<break time="1.5s" />
+The last winter is now!
+<break time="1.5s" />
+The snow… finally falls back down.
+```
+
+Español → `boss-v-hiver-es.mp3`
+```
+Tu aliento humea. Pronto se helará.
+<break time="1.5s" />
+Tú otra vez. El invierno no olvida.
+<break time="1.5s" />
+¡El último invierno es ahora!
+<break time="1.5s" />
+La nieve… por fin vuelve a caer al suelo.
+```
+
+Deutsch → `boss-v-hiver-de.mp3`
+```
+Dein Atem dampft. Bald wird er gefrieren.
+<break time="1.5s" />
+Schon wieder du. Der Winter vergisst nicht.
+<break time="1.5s" />
+Der letzte Winter ist jetzt!
+<break time="1.5s" />
+Der Schnee… fällt endlich wieder zu Boden.
+```
+
+Italiano → `boss-v-hiver-it.mp3`
+```
+Il tuo fiato fuma. Presto gelerà.
+<break time="1.5s" />
+Ancora tu. L’inverno non dimentica.
+<break time="1.5s" />
+L’ultimo inverno è adesso!
+<break time="1.5s" />
+La neve… ricade finalmente a terra.
+```
+
+Português (Brasil) → `boss-v-hiver-pt.mp3`
+```
+Seu fôlego fumega. Logo vai congelar.
+<break time="1.5s" />
+Você de novo. O inverno não esquece.
+<break time="1.5s" />
+O último inverno é agora!
+<break time="1.5s" />
+A neve… enfim volta a cair no chão.
+```
+
+---
+
+## boss-v-marees · Léviathan, le Veilleur des Marées
+
+Voix :
+```
+Enormous sea serpent, deep wet booming voice, envious and bitter, slow.
+```
+
+Français → `boss-v-marees-fr.mp3`
+```
+Toi, tu ne dors pas. Je t’envie.
+<break time="1.5s" />
+La marée te ramène toujours.
+<break time="1.5s" />
+Que la mer noire monte !
+<break time="1.5s" />
+Je rentre au large… il dort encore ?
+```
+
+English → `boss-v-marees-en.mp3`
+```
+You don’t sleep. I envy you.
+<break time="1.5s" />
+The tide always brings you back.
+<break time="1.5s" />
+Let the black sea rise!
+<break time="1.5s" />
+I’m going back out to sea… is he still asleep?
+```
+
+Español → `boss-v-marees-es.mp3`
+```
+Tú no duermes. Te envidio.
+<break time="1.5s" />
+La marea siempre te trae de vuelta.
+<break time="1.5s" />
+¡Que suba el mar negro!
+<break time="1.5s" />
+Vuelvo mar adentro… ¿sigue dormido?
+```
+
+Deutsch → `boss-v-marees-de.mp3`
+```
+Du schläfst nicht. Ich beneide dich.
+<break time="1.5s" />
+Die Flut bringt dich immer zurück.
+<break time="1.5s" />
+Das schwarze Meer soll steigen!
+<break time="1.5s" />
+Ich kehre aufs offene Meer zurück… schläft er noch?
+```
+
+Italiano → `boss-v-marees-it.mp3`
+```
+Tu non dormi. Ti invidio.
+<break time="1.5s" />
+La marea ti riporta sempre qui.
+<break time="1.5s" />
+Che il mare nero salga!
+<break time="1.5s" />
+Torno al largo… dorme ancora?
+```
+
+Português (Brasil) → `boss-v-marees-pt.mp3`
+```
+Você não dorme. Eu te invejo.
+<break time="1.5s" />
+A maré sempre te traz de volta.
+<break time="1.5s" />
+Que o mar negro suba!
+<break time="1.5s" />
+Volto para o mar aberto… ele ainda dorme?
+```
+
+---
+
+## boss-v-racines · La Reine des Ronces
+
+Voix :
+```
+Ancient queen of thorns, dry rustling female voice, proud and poisonous.
+```
+
+Français → `boss-v-racines-fr.mp3`
+```
+Mes épines ont rêvé de toi.
+<break time="1.5s" />
+Tu repousses comme une mauvaise herbe.
+<break time="1.5s" />
+Que le bois se referme !
+<break time="1.5s" />
+Les racines… se taisent…
+```
+
+English → `boss-v-racines-en.mp3`
+```
+My thorns dreamed of you.
+<break time="1.5s" />
+You keep growing back like a weed.
+<break time="1.5s" />
+Let the wood close in!
+<break time="1.5s" />
+The roots… fall silent…
+```
+
+Español → `boss-v-racines-es.mp3`
+```
+Mis espinas soñaron contigo.
+<break time="1.5s" />
+Vuelves a crecer como la mala hierba.
+<break time="1.5s" />
+¡Que se cierre el bosque!
+<break time="1.5s" />
+Las raíces… callan…
+```
+
+Deutsch → `boss-v-racines-de.mp3`
+```
+Meine Dornen haben von dir geträumt.
+<break time="1.5s" />
+Du wächst nach wie Unkraut.
+<break time="1.5s" />
+Der Wald soll sich schließen!
+<break time="1.5s" />
+Die Wurzeln… verstummen…
+```
+
+Italiano → `boss-v-racines-it.mp3`
+```
+Le mie spine ti hanno sognato.
+<break time="1.5s" />
+Ricresci come un’erbaccia.
+<break time="1.5s" />
+Che il bosco si richiuda!
+<break time="1.5s" />
+Le radici… tacciono…
+```
+
+Português (Brasil) → `boss-v-racines-pt.mp3`
+```
+Meus espinhos sonharam com você.
+<break time="1.5s" />
+Você volta a crescer como erva daninha.
+<break time="1.5s" />
+Que o bosque se feche!
+<break time="1.5s" />
+As raízes… se calam…
+```
+
+---
+
+## boss-v-cour · Tezcatlipoca, le Veilleur sans Visage
+
+Voix :
+```
+Smooth mocking masked god, voice with a smoky whisper behind it, playful and cruel.
+```
+
+Français → `boss-v-cour-fr.mp3`
+```
+Quel masque portes-tu, ce soir ?
+<break time="1.5s" />
+Toujours le même visage. Que c’est ennuyeux.
+<break time="1.5s" />
+Mille reflets, et aucun n’est toi !
+<break time="1.5s" />
+Enfin… quelqu’un m’a reconnu.
+```
+
+English → `boss-v-cour-en.mp3`
+```
+Which mask are you wearing tonight?
+<break time="1.5s" />
+Always the same face. How boring.
+<break time="1.5s" />
+A thousand reflections, and none of them is you!
+<break time="1.5s" />
+At last… someone recognized me.
+```
+
+Español → `boss-v-cour-es.mp3`
+```
+¿Qué máscara llevas esta noche?
+<break time="1.5s" />
+Siempre la misma cara. Qué aburrido.
+<break time="1.5s" />
+¡Mil reflejos, y ninguno eres tú!
+<break time="1.5s" />
+Por fin… alguien me ha reconocido.
+```
+
+Deutsch → `boss-v-cour-de.mp3`
+```
+Welche Maske trägst du heute Abend?
+<break time="1.5s" />
+Immer dasselbe Gesicht. Wie langweilig.
+<break time="1.5s" />
+Tausend Spiegelbilder, und keines bist du!
+<break time="1.5s" />
+Endlich… hat mich jemand erkannt.
+```
+
+Italiano → `boss-v-cour-it.mp3`
+```
+Che maschera porti stasera?
+<break time="1.5s" />
+Sempre lo stesso volto. Che noia.
+<break time="1.5s" />
+Mille riflessi, e nessuno sei tu!
+<break time="1.5s" />
+Finalmente… qualcuno mi ha riconosciuto.
+```
+
+Português (Brasil) → `boss-v-cour-pt.mp3`
+```
+Que máscara você usa esta noite?
+<break time="1.5s" />
+Sempre o mesmo rosto. Que tédio.
+<break time="1.5s" />
+Mil reflexos, e nenhum é você!
+<break time="1.5s" />
+Enfim… alguém me reconheceu.
+```
+
+---
+
+## boss-v-pacte · Lilith, la Veilleuse du Pacte
+
+Voix :
+```
+Seductive dark mother of night, velvet female voice, slow, smiling, dangerous.
+```
+
+Français → `boss-v-pacte-fr.mp3`
+```
+Fais un vœu. Je ne demanderai presque rien.
+<break time="1.5s" />
+Tu reviens payer ta dette ?
+<break time="1.5s" />
+La nuit m’est due !
+<break time="1.5s" />
+Garde ta nuit… je la reprendrai.
+```
+
+English → `boss-v-pacte-en.mp3`
+```
+Make a wish. I’ll ask for almost nothing.
+<break time="1.5s" />
+Come back to pay your debt?
+<break time="1.5s" />
+The night is owed to me!
+<break time="1.5s" />
+Keep your night… I’ll take it back.
+```
+
+Español → `boss-v-pacte-es.mp3`
+```
+Pide un deseo. No pediré casi nada.
+<break time="1.5s" />
+¿Vuelves a pagar tu deuda?
+<break time="1.5s" />
+¡Me deben la noche!
+<break time="1.5s" />
+Guarda tu noche… ya la recuperaré.
+```
+
+Deutsch → `boss-v-pacte-de.mp3`
+```
+Wünsch dir etwas. Ich verlange fast nichts.
+<break time="1.5s" />
+Kommst du, um deine Schuld zu bezahlen?
+<break time="1.5s" />
+Die Nacht gehört mir!
+<break time="1.5s" />
+Behalte deine Nacht… ich hole sie mir zurück.
+```
+
+Italiano → `boss-v-pacte-it.mp3`
+```
+Esprimi un desiderio. Non chiederò quasi niente.
+<break time="1.5s" />
+Torni a pagare il tuo debito?
+<break time="1.5s" />
+La notte mi è dovuta!
+<break time="1.5s" />
+Tieniti la tua notte… me la riprenderò.
+```
+
+Português (Brasil) → `boss-v-pacte-pt.mp3`
+```
+Faça um pedido. Não vou pedir quase nada.
+<break time="1.5s" />
+Voltou para pagar sua dívida?
+<break time="1.5s" />
+A noite me é devida!
+<break time="1.5s" />
+Guarde sua noite… eu a pego de volta.
+```
+
+---
+
+## boss-v-lune · Kyūbi, la Veilleuse de la Lune pâle
+
+Voix :
+```
+Sly fox spirit, light teasing female voice, echoing as if from several places.
+```
+
+Français → `boss-v-lune-fr.mp3`
+```
+Laquelle de nous est la vraie ? Devine.
+<break time="1.5s" />
+Tu m’as trouvée une fois. Plus maintenant.
+<break time="1.5s" />
+Neuf lueurs, neuf morsures !
+<break time="1.5s" />
+La lune pâlit… je peux dormir.
+```
+
+English → `boss-v-lune-en.mp3`
+```
+Which of us is the real one? Guess.
+<break time="1.5s" />
+You found me once. Not anymore.
+<break time="1.5s" />
+Nine glimmers, nine bites!
+<break time="1.5s" />
+The moon grows pale… I can sleep.
+```
+
+Español → `boss-v-lune-es.mp3`
+```
+¿Cuál de nosotras es la verdadera? Adivina.
+<break time="1.5s" />
+Me encontraste una vez. Ya no.
+<break time="1.5s" />
+¡Nueve destellos, nueve mordiscos!
+<break time="1.5s" />
+La luna palidece… puedo dormir.
+```
+
+Deutsch → `boss-v-lune-de.mp3`
+```
+Welche von uns ist die echte? Rate.
+<break time="1.5s" />
+Einmal hast du mich gefunden. Jetzt nicht mehr.
+<break time="1.5s" />
+Neun Lichter, neun Bisse!
+<break time="1.5s" />
+Der Mond erbleicht… ich darf schlafen.
+```
+
+Italiano → `boss-v-lune-it.mp3`
+```
+Quale di noi è quella vera? Indovina.
+<break time="1.5s" />
+Mi hai trovata una volta. Ora non più.
+<break time="1.5s" />
+Nove bagliori, nove morsi!
+<break time="1.5s" />
+La luna impallidisce… posso dormire.
+```
+
+Português (Brasil) → `boss-v-lune-pt.mp3`
+```
+Qual de nós é a verdadeira? Adivinhe.
+<break time="1.5s" />
+Você me achou uma vez. Não mais.
+<break time="1.5s" />
+Nove clarões, nove mordidas!
+<break time="1.5s" />
+A lua empalidece… posso dormir.
+```
+
+---
+
+## boss-v-forge · Héphaïstos, le Veilleur de la Forge
+
+Voix :
+```
+Gruff old divine blacksmith, deep tired male voice, hammering rhythm.
+```
+
+Français → `boss-v-forge-fr.mp3`
+```
+Pousse-toi. J’ai des chaînes à forger.
+<break time="1.5s" />
+Tu reviens te faire marteler ?
+<break time="1.5s" />
+Que l’enclume se fende !
+<break time="1.5s" />
+Pour qui… forgeais-je déjà ?
+```
+
+English → `boss-v-forge-en.mp3`
+```
+Move aside. I have chains to forge.
+<break time="1.5s" />
+Back for another hammering?
+<break time="1.5s" />
+Let the anvil split!
+<break time="1.5s" />
+Who… was I forging for again?
+```
+
+Español → `boss-v-forge-es.mp3`
+```
+Apártate. Tengo cadenas que forjar.
+<break time="1.5s" />
+¿Vuelves a que te martillee?
+<break time="1.5s" />
+¡Que se parta el yunque!
+<break time="1.5s" />
+¿Para quién… forjaba yo?
+```
+
+Deutsch → `boss-v-forge-de.mp3`
+```
+Geh zur Seite. Ich habe Ketten zu schmieden.
+<break time="1.5s" />
+Kommst du wieder, um gehämmert zu werden?
+<break time="1.5s" />
+Der Amboss soll bersten!
+<break time="1.5s" />
+Für wen… schmiedete ich noch gleich?
+```
+
+Italiano → `boss-v-forge-it.mp3`
+```
+Spostati. Ho catene da forgiare.
+<break time="1.5s" />
+Torni a farti martellare?
+<break time="1.5s" />
+Che l’incudine si spacchi!
+<break time="1.5s" />
+Per chi… stavo forgiando?
+```
+
+Português (Brasil) → `boss-v-forge-pt.mp3`
+```
+Sai da frente. Tenho correntes para forjar.
+<break time="1.5s" />
+Voltou para levar mais marteladas?
+<break time="1.5s" />
+Que a bigorna se parta!
+<break time="1.5s" />
+Para quem… eu forjava mesmo?
+```
+
+---
+
+## boss-v-titans · Surtr, le Veilleur du Brasier
+
+Voix :
+```
+Giant of black fire, very deep crackling voice, solemn and burning.
+```
+
+Français → `boss-v-titans-fr.mp3`
+```
+Le feu ne doit jamais s’éteindre. Toi, si.
+<break time="1.5s" />
+Encore un peu de bois pour mon brasier.
+<break time="1.5s" />
+Brûle, et qu’ils restent couchés !
+<break time="1.5s" />
+Le brasier… tient encore…
+```
+
+English → `boss-v-titans-en.mp3`
+```
+The fire must never go out. You, however, may.
+<break time="1.5s" />
+A little more wood for my blaze.
+<break time="1.5s" />
+Burn, and let them stay lying down!
+<break time="1.5s" />
+The blaze… still holds…
+```
+
+Español → `boss-v-titans-es.mp3`
+```
+El fuego nunca debe apagarse. Tú sí.
+<break time="1.5s" />
+Un poco más de leña para mi hoguera.
+<break time="1.5s" />
+¡Arde, y que sigan tumbados!
+<break time="1.5s" />
+La hoguera… aún resiste…
+```
+
+Deutsch → `boss-v-titans-de.mp3`
+```
+Das Feuer darf nie erlöschen. Du schon.
+<break time="1.5s" />
+Noch ein wenig Holz für meine Glut.
+<break time="1.5s" />
+Brenne, und mögen sie liegen bleiben!
+<break time="1.5s" />
+Die Glut… hält noch…
+```
+
+Italiano → `boss-v-titans-it.mp3`
+```
+Il fuoco non deve mai spegnersi. Tu sì.
+<break time="1.5s" />
+Ancora un po’ di legna per il mio braciere.
+<break time="1.5s" />
+Brucia, e che restino sdraiati!
+<break time="1.5s" />
+Il braciere… regge ancora…
+```
+
+Português (Brasil) → `boss-v-titans-pt.mp3`
+```
+O fogo nunca deve se apagar. Você, sim.
+<break time="1.5s" />
+Mais um pouco de lenha para minha fogueira.
+<break time="1.5s" />
+Queime, e que eles continuem deitados!
+<break time="1.5s" />
+A fogueira… ainda resiste…
+```
+
+---
+
+## boss-v-moissons · Le Faucheur des Souvenirs
+
+Voix :
+```
+Sad gentle reaper, soft hollow male voice, melancholic.
+```
+
+Français → `boss-v-moissons-fr.mp3`
+```
+Donne-moi ton souvenir le plus cher.
+<break time="1.5s" />
+Tu as déjà oublié notre dernier combat ?
+<break time="1.5s" />
+La grande moisson commence !
+<break time="1.5s" />
+Garde-les… tes souvenirs…
+```
+
+English → `boss-v-moissons-en.mp3`
+```
+Give me your dearest memory.
+<break time="1.5s" />
+Have you already forgotten our last fight?
+<break time="1.5s" />
+The great harvest begins!
+<break time="1.5s" />
+Keep them… your memories…
+```
+
+Español → `boss-v-moissons-es.mp3`
+```
+Dame tu recuerdo más querido.
+<break time="1.5s" />
+¿Ya has olvidado nuestro último combate?
+<break time="1.5s" />
+¡Empieza la gran cosecha!
+<break time="1.5s" />
+Guárdalos… tus recuerdos…
+```
+
+Deutsch → `boss-v-moissons-de.mp3`
+```
+Gib mir deine liebste Erinnerung.
+<break time="1.5s" />
+Hast du unseren letzten Kampf schon vergessen?
+<break time="1.5s" />
+Die große Ernte beginnt!
+<break time="1.5s" />
+Behalte sie… deine Erinnerungen…
+```
+
+Italiano → `boss-v-moissons-it.mp3`
+```
+Dammi il tuo ricordo più caro.
+<break time="1.5s" />
+Hai già dimenticato il nostro ultimo scontro?
+<break time="1.5s" />
+La grande mietitura comincia!
+<break time="1.5s" />
+Tienili… i tuoi ricordi…
+```
+
+Português (Brasil) → `boss-v-moissons-pt.mp3`
+```
+Me dê sua lembrança mais querida.
+<break time="1.5s" />
+Já esqueceu nosso último combate?
+<break time="1.5s" />
+A grande colheita começa!
+<break time="1.5s" />
+Guarde-as… suas lembranças…
+```
+
+---
+
+## boss-v-pages · Les Moires, Veilleuses des Pages perdues
+
+Voix :
+```
+Three old sisters speaking together, dry whispering female voices in unison.
+```
+
+Français → `boss-v-pages-fr.mp3`
+```
+Il nous manque une page. Tu l’as lue ?
+<break time="1.5s" />
+Ton fil est plus court que la dernière fois.
+<break time="1.5s" />
+La coupe tombe !
+<break time="1.5s" />
+La page est… à sa place.
+```
+
+English → `boss-v-pages-en.mp3`
+```
+We are missing a page. Did you read it?
+<break time="1.5s" />
+Your thread is shorter than last time.
+<break time="1.5s" />
+The cut falls!
+<break time="1.5s" />
+The page is… back in its place.
+```
+
+Español → `boss-v-pages-es.mp3`
+```
+Nos falta una página. ¿La has leído?
+<break time="1.5s" />
+Tu hilo es más corto que la última vez.
+<break time="1.5s" />
+¡Cae el corte!
+<break time="1.5s" />
+La página está… en su sitio.
+```
+
+Deutsch → `boss-v-pages-de.mp3`
+```
+Uns fehlt eine Seite. Hast du sie gelesen?
+<break time="1.5s" />
+Dein Faden ist kürzer als beim letzten Mal.
+<break time="1.5s" />
+Der Schnitt fällt!
+<break time="1.5s" />
+Die Seite ist… an ihrem Platz.
+```
+
+Italiano → `boss-v-pages-it.mp3`
+```
+Ci manca una pagina. L’hai letta?
+<break time="1.5s" />
+Il tuo filo è più corto dell’ultima volta.
+<break time="1.5s" />
+Il taglio cade!
+<break time="1.5s" />
+La pagina è… al suo posto.
+```
+
+Português (Brasil) → `boss-v-pages-pt.mp3`
+```
+Falta-nos uma página. Você a leu?
+<break time="1.5s" />
+Seu fio está mais curto que da última vez.
+<break time="1.5s" />
+O corte cai!
+<break time="1.5s" />
+A página está… no seu lugar.
 ```
 
 ---

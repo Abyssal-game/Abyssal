@@ -26,6 +26,7 @@ export function friendCard(g) {
       boosters: s.stats?.boosters || 0, best: s.descent?.best || 0, bosses: Object.keys(s.bossesBeaten || {}).length,
       trials: s.stats?.trialWins || 0, night: Math.max(0, ...Object.values(s.descent?.nightBest || {}).map(Number).filter((x) => x >= 0)),
       games: { sceaux: game('sceaux'), pacte: game('pacte'), cryptes: game('cryptes'), encheres: game('encheres') },
+      tn: { w: s.tourney?.week || 0, b: s.tourney?.best || 0, c: s.tourneyWins || 0 }, /* v795 : Tournoi du Cercle (classement entre amis) */
     },
   };
 }
@@ -56,7 +57,7 @@ export function cleanCard(d) {
   return {
     v: int(d.v, 99), lv: Math.max(1, int(d.lv, 9999)), title: typeof d.title === 'string' ? d.title.slice(0, 60) : '', frame: key(d.frame), plate: key(d.plate), fond: key(d.fond), avatar: key(d.avatar),
     show: keys(d.show, 3), titles: int(d.titles, 999), col, ach: keys(d.ach, 1000), sets: keys(d.sets, 500),
-    st: { boosters: int(st.boosters), best: int(st.best, 9999), bosses: int(st.bosses, 999), trials: int(st.trials), night: int(st.night, 9999), games },
+    st: { boosters: int(st.boosters), best: int(st.best, 9999), bosses: int(st.bosses, 999), trials: int(st.trials), night: int(st.night, 9999), games, tn: { w: int(st.tn?.w, 99999), b: int(st.tn?.b, 8), c: int(st.tn?.c, 9999) } },
     ...(d.n != null ? { n: int(d.n, 9999) } : {}), partial: !!d.partial,
   };
 }

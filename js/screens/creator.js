@@ -3,7 +3,8 @@ import { RARITIES, VARIANTS, BOOSTERS, VERSION } from '../config.js';
 import { icon } from '../ui/icons.js';
 import { openSheet, esc, toast, confirmBox, fmt } from '../ui/dom.js';
 import { migrate } from '../core/save.js';
-import { BOSSES, BOSS_ORDER } from '../core/bosses.js';
+import { BOSSES, BOSS_ORDER, VEILLES } from '../core/bosses.js';
+import { SEASONS } from '../core/codex.js';
 import { openCosmeticsLab } from './cosmetics-lab.js';
 import { openCosmeticsReview } from './cosmetics-review.js'; /* v592 */
 import { openDefenseLab } from './defense-lab.js'; /* v594 */
@@ -129,6 +130,11 @@ export function openCreator(app) {
         <div class="cr-bosses">${BOSS_ORDER.map((k, i) => `<button class="btn small" data-boss="${k}"><b>${(i + 1) * 5}</b> · ${esc(BOSSES[k].name)}</button>`).join('')}</div>
       </section>
 
+      <section class="cr-sec"><h3>Affronter un Veilleur (Les Veilles)</h3>
+        <p class="small muted">Te place devant le Veilleur d’une saison (étage 105), même sans avoir vaincu l’Abysse, sans Torche. La case du dessus monte aussi ton équipe.</p>
+        <div class="cr-bosses">${SEASONS.filter((se) => VEILLES[se.key]).map((se) => `<button class="btn small" data-veille="${se.key}"><b>${se.num}</b> · ${esc(BOSSES[VEILLES[se.key].boss].name)}</button>`).join('')}</div>
+      </section>
+
       <section class="cr-sec"><button class="btn danger block" data-x="off">Désactiver le Mode Créateur</button></section>`);
   }
 
@@ -140,6 +146,11 @@ export function openCreator(app) {
     const cf = e.target.closest('[data-cfilm]'), cl = e.target.closest('[data-clang]');
     if (cf) { cine.film = cf.dataset.cfilm; cine.start = 0; saveCine(); return draw(); }
     if (cl) { cine.lang = cl.dataset.clang; saveCine(); return draw(); }
+    const vb = e.target.closest('[data-veille]');
+    if (vb) {
+      try { g.devVeille(vb.dataset.veille, { power: ui.bpow }); sheet.close(); app.go('descente'); toast(`Étage 105 : ${esc(BOSSES[VEILLES[vb.dataset.veille].boss].name)}.`, { icon: 'crown' }); } catch (err) { toast(esc(err.message), { kind: 'error' }); }
+      return;
+    }
     const bb = e.target.closest('[data-boss]');
     if (bb) {
       try {

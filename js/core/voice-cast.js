@@ -1,7 +1,7 @@
 // v794 : la distribution des voix : qui dit quoi (répliques en français, dans l'ordre où elles sont lues dans ElevenLabs).
 // Sert aux outils (tools/voix-script.mjs, tools/voix-cut.mjs) ; le jeu, lui, trouve une voix par son texte (js/ui/voice.js).
 import { NARRATOR, BOSS_LINES } from './voices.js';
-import { BOSSES, BOSS_ORDER } from './bosses.js';
+import { BOSSES, BOSS_ORDER, VEILLEURS } from './bosses.js';
 import { RIVALS as SC } from './sceaux.js';
 import { RIVALS as PA } from './pacte.js';
 import { RIVALS as CR } from './cryptes.js';
@@ -14,7 +14,7 @@ const uniq = (a) => [...new Set(a.filter(Boolean))];
 /** [{ speaker, name, voice (description pour ElevenLabs, en anglais), lines: [français…] }] */
 export function voiceCast() {
   const out = [{ speaker: 'narrateur', name: 'Le narrateur', voice: 'SAME VOICE AS THE CINEMATICS NARRATOR (prologue and ending).', lines: Object.values(NARRATOR).flat() }];
-  for (const k of BOSS_ORDER) {
+  for (const k of [...BOSS_ORDER, ...Object.keys(VEILLEURS)]) { /* v795 : les Veilleurs aussi */
     const L = BOSS_LINES[k]; if (!L) continue;
     const re = Object.values(EMOTES).find((e) => e.boss === k)?.text;
     out.push({ speaker: `boss-${k}`, name: BOSSES[k].name, voice: BOSS_VOICE[k] || '', lines: uniq([L.in, L.again, L.fury, L.p3, L.down, re]) });
@@ -53,6 +53,17 @@ export const BOSS_VOICE = {
   jumeaux: 'Two voices speaking in unison, one bright male, one dark male, perfectly together; solemn and bound.',
   juge: 'Stern, authoritative old male judge, crisp diction, cold courtroom echo; merciless.',
   bete: 'Monstrous voice with seven overlapping growls; apocalyptic, deep, impatient.',
+  'v-ames': 'Regal, cold queen of the dead, low female voice, slow and weary, faint echo of a river.',
+  'v-hiver': 'Huge old wolf speaking, rough breathy growl, cold and tired, low male voice.',
+  'v-marees': 'Enormous sea serpent, deep wet booming voice, envious and bitter, slow.',
+  'v-racines': 'Ancient queen of thorns, dry rustling female voice, proud and poisonous.',
+  'v-cour': 'Smooth mocking masked god, voice with a smoky whisper behind it, playful and cruel.',
+  'v-pacte': 'Seductive dark mother of night, velvet female voice, slow, smiling, dangerous.',
+  'v-lune': 'Sly fox spirit, light teasing female voice, echoing as if from several places.',
+  'v-forge': 'Gruff old divine blacksmith, deep tired male voice, hammering rhythm.',
+  'v-titans': 'Giant of black fire, very deep crackling voice, solemn and burning.',
+  'v-moissons': 'Sad gentle reaper, soft hollow male voice, melancholic.',
+  'v-pages': 'Three old sisters speaking together, dry whispering female voices in unison.',
   abysse: 'Vast, ancient, genderless voice from the bottom of the world, very deep with a soft echo; patient, almost tender, terrifying.',
 };
 export const ARB_VOICE = {
