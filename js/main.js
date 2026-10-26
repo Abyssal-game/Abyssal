@@ -185,6 +185,9 @@ document.addEventListener('click', openProfile, true);
 /* v576 : sur iPhone, Safari n'affiche l'état « appuyé » (:active) d'un bouton que si la page écoute les touchers :
    sans cet écouteur vide, aucun bouton ne réagissait avant que l'écran suivant soit prêt */
 document.addEventListener('touchstart', () => {}, { passive: true });
+/* v817 : pas de menu « Enregistrer l’image » au toucher long (Android, navigateurs) ; les champs de saisie le gardent. */
+document.addEventListener('contextmenu', (e) => { if (!e.target.closest?.('input, textarea, [contenteditable]')) e.preventDefault(); });
+document.addEventListener('dragstart', (e) => { if (e.target.tagName === 'IMG') e.preventDefault(); });
 document.addEventListener('keydown', openProfile, true);
 
 document.addEventListener('click', (e) => {

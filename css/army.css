@@ -7914,3 +7914,10 @@ html.kb-open .sheet-wrap:not(.sheet-full) .sheet { max-height: 100%; overflow-y:
   .kc3 { --hcw: min(calc(var(--app-h, 100dvh) * .094), 92px); gap: 4px; padding-bottom: 4px; }
   .kc3 .kc-quit { min-height: 22px; font-size: .74rem; }
 }
+
+/* v817 : plus de menu « Enregistrer dans Photos / Copier » au toucher long sur une image ou un lien (iPhone, Android). Les champs de saisie gardent la sélection. */
+img, svg, canvas, a, .tcg, .tcg *, [style*="background-image"] {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+}
+img, svg, canvas { -webkit-user-select: none; user-select: none; }
