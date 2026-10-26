@@ -7434,7 +7434,7 @@ html.kb-open .sheet-wrap:not(.sheet-full) .sheet { max-height: 100%; overflow-y:
 
 /* v807 : Choc des Boosters : Série ardente, Ligues du mois, sachets qui s'affrontent, moment décisif, renversement, réactions, revanche */
 .vd-lg { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px 2px 3px; border-radius: 99px; background: rgba(8, 7, 12, .82); border: 1px solid color-mix(in srgb, var(--lgc) 70%, transparent); color: var(--lgc); font: 700 .66rem/1 var(--f-display); letter-spacing: .04em; white-space: nowrap; }
-.vd-lg img { width: 20px; height: 20px; object-fit: contain; }
+.vd-lg img { width: 24px; height: 24px; object-fit: contain; }
 .vd-lg:not(:has(img))::before { content: ''; width: 12px; height: 12px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff8, transparent 45%), var(--lgc); box-shadow: 0 0 8px var(--lgc); margin-left: 3px; }
 .vd-lg.big { font-size: .8rem; padding: 3px 10px 3px 4px; }
 .vd-lg.big img { width: 30px; height: 30px; }
@@ -7442,7 +7442,7 @@ html.kb-open .sheet-wrap:not(.sheet-full) .sheet { max-height: 100%; overflow-y:
 .vd-lg.huge img { width: 92px; height: 92px; }
 .vd-lg.huge:not(:has(img))::before { width: 46px; height: 46px; }
 .vd-flame { display: inline-flex; align-items: center; gap: 2px; padding: 1px 8px 1px 2px; border-radius: 99px; background: rgba(40, 12, 4, .85); border: 1px solid rgba(255, 138, 61, .75); color: #FFB36B; font: 800 .74rem/1 var(--f-display); box-shadow: 0 0 10px rgba(255, 110, 40, .45); white-space: nowrap; }
-.vd-flame img { width: 20px; height: 20px; object-fit: contain; }
+.vd-flame img { width: 22px; height: 22px; object-fit: contain; }
 .vd-flame.big { font-size: 1rem; }
 .vd-flame.big img { width: 32px; height: 32px; animation: vdFlick 1.6s ease-in-out infinite; }
 .vd-flame.dead { filter: grayscale(1) brightness(.7); border-color: rgba(160, 160, 170, .5); box-shadow: none; color: #9A94A0; }
