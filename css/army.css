@@ -7270,3 +7270,48 @@ img.pa-defy-tag { width: 30%; height: auto; font-size: 0; text-shadow: none; fil
 @media (prefers-reduced-motion: reduce) { .endx-fog, .endx-fog::after { animation: none !important; } }
 /* v781 : gros plan des yeux qui s'ouvrent (fin) en 4:3 */
 .endx-close.wide { width: min(94vw, 460px); aspect-ratio: 4 / 3; }
+
+/* v793 : compteur de chance dans la boutique */
+.pt-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.pt-head .ic { width: 16px; height: 16px; align-self: center; }
+.pt-head b { color: var(--gold, #e8c35a); font-family: var(--font-display, serif); letter-spacing: .04em; }
+.pt-head small { color: rgba(255,255,255,.55); font-size: 11.5px; }
+.products ~ .pity-box, .pity-box + .products { margin-top: 0; }
+/* v793 : phrase d'histoire sous « Touche l'écran » */
+.boot-lore { max-width: min(86vw, 420px); margin: 16px auto 0; font: italic 400 clamp(.82rem, 3.5vw, .98rem)/1.45 var(--f-body, serif); color: rgba(236, 226, 206, .72); text-shadow: 0 2px 6px #000; text-align: center; animation: dvIn 1.2s .35s ease-out both; }
+
+/* v793 : Accueil vivant (heure du joueur, profondeur de la Descente) */
+.home-sky { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.home-sky b, .home-sky .hs-motes { position: absolute; inset: 0; }
+.home-sky.tod-nuit .hs-tint { background: linear-gradient(180deg, rgba(10, 18, 52, .5), rgba(6, 8, 24, .35) 50%, rgba(4, 4, 12, .45)); }
+.home-sky.tod-aube .hs-tint { background: linear-gradient(0deg, rgba(232, 150, 70, .2), rgba(232, 150, 70, 0) 45%), linear-gradient(180deg, rgba(120, 80, 140, .14), transparent 40%); }
+.home-sky.tod-jour .hs-tint { background: linear-gradient(180deg, rgba(190, 200, 230, .07), transparent 60%); }
+.home-sky.tod-crepuscule .hs-tint { background: linear-gradient(0deg, rgba(190, 40, 50, .2), rgba(190, 40, 50, 0) 50%), linear-gradient(180deg, rgba(90, 30, 90, .18), transparent 45%); }
+.home-sky .hs-stars { background-image: radial-gradient(1.4px 1.4px at 12% 8%, #fff8, transparent), radial-gradient(1.2px 1.2px at 78% 5%, #fff8, transparent), radial-gradient(1.6px 1.6px at 55% 14%, #fffa, transparent), radial-gradient(1.1px 1.1px at 30% 20%, #fff6, transparent), radial-gradient(1.3px 1.3px at 90% 18%, #fff7, transparent), radial-gradient(1.2px 1.2px at 6% 26%, #fff6, transparent); animation: hsTwinkle 5s ease-in-out infinite alternate; }
+.home-sky .hs-vortex { inset: auto; left: 50%; top: 31%; width: 60vw; max-width: 340px; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; background: radial-gradient(circle, rgba(150, 90, 255, var(--va, .14)), rgba(110, 40, 220, 0) 68%); animation: hsPulse 6s ease-in-out infinite; }
+.home-sky.deep-0 .hs-vortex { --va: .06; }
+.home-sky.deep-1 .hs-vortex { --va: .12; }
+.home-sky.deep-2 .hs-vortex { --va: .2; }
+.home-sky.deep-3 .hs-vortex { --va: .28; animation-duration: 4.5s; }
+.home-sky.deep-4 .hs-vortex { --va: .36; animation-duration: 3.2s; background: radial-gradient(circle, rgba(200, 60, 140, var(--va)), rgba(110, 30, 200, 0) 68%); }
+.home-sky.deep-calme .hs-vortex { background: radial-gradient(circle, rgba(240, 199, 94, .2), rgba(240, 199, 94, 0) 66%); animation-duration: 9s; }
+.home-sky .hs-motes i { position: absolute; bottom: -10px; left: var(--x); width: 3px; height: 3px; border-radius: 50%; background: rgba(210, 180, 255, .55); opacity: 0; animation: hsMote var(--t) linear var(--d) infinite; }
+.home-sky.deep-calme .hs-motes i { background: rgba(240, 210, 130, .6); }
+@keyframes hsPulse { 0%, 100% { opacity: .7; scale: .94; } 50% { opacity: 1; scale: 1.06; } }
+@keyframes hsTwinkle { from { opacity: .45; } to { opacity: 1; } }
+@keyframes hsMote { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: .8; } 85% { opacity: .5; } 100% { transform: translateY(-80vh); opacity: 0; } }
+html.fx-light .home-sky .hs-motes, html.fx-light .home-sky .hs-vortex { animation: none; }
+html.fx-light .home-sky .hs-motes { display: none; }
+@media (prefers-reduced-motion: reduce) { .home-sky *, .home-sky .hs-motes i { animation: none !important; } .home-sky .hs-motes { display: none; } }
+/* v793 : effet de profondeur sur l'Accueil (--dx, --dy posés par js/ui/depth.js) */
+.home-sky .hs-vortex { translate: calc(-50% - var(--dx, 0) * 16px) calc(-50% - var(--dy, 0) * 12px); }
+.home-sky .hs-motes { translate: calc(var(--dx, 0) * 10px) calc(var(--dy, 0) * 8px); }
+.home-sky .hs-stars { translate: calc(var(--dx, 0) * -6px) calc(var(--dy, 0) * -4px); }
+/* v793 : coup de grâce d'un gardien (moitiés de carte qui s'écartent, entaille d'or, voile sombre) */
+.dv.grace::after { content: ''; position: absolute; inset: 0; z-index: 26; pointer-events: none; background: radial-gradient(ellipse at 50% 35%, transparent 30%, rgba(0, 0, 0, .55)); animation: graceVeil 1.5s ease-out both; }
+.dv-half { z-index: 27; pointer-events: none; animation: halfAway 1.6s cubic-bezier(.2, .7, .2, 1) .22s both; }
+.dv-gcut { position: absolute; z-index: 28; pointer-events: none; background: linear-gradient(to top right, transparent calc(50% - 2px), #fff6d0 50%, transparent calc(50% + 2px)); filter: drop-shadow(0 0 6px #f0c75e); animation: gcut .9s ease-out both; }
+@keyframes halfAway { 0% { transform: none; opacity: 1; } 25% { transform: translate(calc(var(--sd) * 6px), calc(var(--sd) * 4px)); opacity: 1; } 100% { transform: translate(calc(var(--sd) * 46px), calc(var(--sd) * 34px)); opacity: 0; } }
+@keyframes gcut { 0% { clip-path: inset(0 100% 0 0); opacity: 1; } 35% { clip-path: inset(0 0 0 0); opacity: 1; } 100% { opacity: 0; } }
+@keyframes graceVeil { 0% { opacity: 0; } 20% { opacity: 1; } 100% { opacity: 0; } }
+html.fx-light .dv.grace::after { display: none; }

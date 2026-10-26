@@ -120,7 +120,7 @@ function hapOnce() {
    Chaque retour est une suite [délai en ms, pas]. Intensité (Réglages) : 0 discrète (ni crans ni chocs légers),
    1 normale, 2 intense (chaque pas monte d'un cran). Sur le site : navigator.vibrate (Android), sinon l'interrupteur. */
 const HSEQ = {
-  tick: [[0, 'sel']], light: [[0, 'L']], medium: [[0, 'M']], heavy: [[0, 'H']],
+  tick: [[0, 'sel']], page: [[0, 'L'], [55, 'sel']], /* v793 : page du classeur */ light: [[0, 'L']], medium: [[0, 'M']], heavy: [[0, 'H']],
   success: [[0, 'ok']], warning: [[0, 'warn']], error: [[0, 'err']],
   double: [[0, 'M'], [90, 'M']],
   tear: [[0, 'L'], [45, 'L'], [90, 'M']],

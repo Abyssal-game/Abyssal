@@ -124,11 +124,22 @@ export default function home(app, root) {
 
     ${todayHTML()}
     <p class="home-col small muted center"><a href="#/collection">${owned} / ${total} créatures découvertes</a></p>
+    ${skyHTML()}
   `);
   // (v413 : le nombre de joueurs en ligne n'est plus sur l'Accueil : Réglages → À propos, tout en bas)
   document.querySelectorAll('body > .online-pill').forEach((x) => x.remove());
   lazyArt(root);
   setScene('home');
+  /* v793 : Accueil vivant : la lumière suit l'heure du joueur (nuit, aube, jour, crépuscule) et le tourbillon
+     s'intensifie à mesure que la Descente s'enfonce ; une fois l'Abysse vaincu, il devient un œil d'or apaisé */
+  function skyHTML() {
+    const h = new Date().getHours();
+    const tod = h >= 21 || h < 5 ? 'nuit' : h < 8 ? 'aube' : h < 18 ? 'jour' : 'crepuscule';
+    const best = g.s.descent?.best || 0, won = !!g.s.bossesBeaten?.abysse;
+    const deep = won ? 'calme' : best >= 75 ? 4 : best >= 50 ? 3 : best >= 20 ? 2 : best >= 5 ? 1 : 0;
+    const motes = Array.from({ length: 7 }, (_, i) => `<i style="--x:${(i * 37 + 11) % 100}%;--d:${(i * 1.7) % 9}s;--t:${11 + (i * 3) % 7}s"></i>`).join('');
+    return `<div class="home-sky tod-${tod} deep-${deep}" aria-hidden="true"><b class="hs-tint"></b><b class="hs-vortex"></b>${tod === 'nuit' ? '<b class="hs-stars"></b>' : ''}<span class="hs-motes">${motes}</span></div>`;
+  }
   function openMatch(x, join) {
     const G = GAME[x.game]; if (!G) return;
     (app.state[G.mode] ||= { mode: 'solo' }).mode = 'mp';

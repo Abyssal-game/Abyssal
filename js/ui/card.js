@@ -1,4 +1,5 @@
 // Composant carte : miniature (grilles) et grand format (vue détaillée, ouverture).
+import { onDepth } from './depth.js';
 import { RARITY, VARIANTS } from '../config.js';
 import { artUrl, hasRealArt } from '../art/assets.js';
 import { sigil, icon } from './icons.js';
@@ -156,11 +157,14 @@ export function enableTilt(el, { reduced = false } = {}) {
     card.style.setProperty('--tilt', (Math.min(1, Math.hypot(cur.x, cur.y) / MAX)).toFixed(3));
   };
   let frame = 0;
+  let gyro = null; /* v793 : effet de profondeur : quand le téléphone s'incline, les reflets suivent (jamais de rotation 3D) */
+  const offGyro = onDepth((v) => { gyro = Math.abs(v.x) + Math.abs(v.y) > 0.002 ? v : null; if (gyro && !touching && !raf && alive) { t0 = performance.now(); raf = requestAnimationFrame(loop); } });
   const loop = (now) => {
     if (!alive) return;
     if (!touching) {
       tgt.x = 0; tgt.y = 0; /* v419 : plus de balancement 3D au repos (voir apply) */
-      const t = (now - t0) / 1000; idle.x = Math.sin(t * 0.9) * 3; idle.y = Math.cos(t * 0.7) * 4.5; /* les reflets, eux, se balancent encore */
+      if (gyro) { idle.x += (-gyro.y * 14 - idle.x) * 0.3; idle.y += (gyro.x * 20 - idle.y) * 0.3; }
+      else { const t = (now - t0) / 1000; idle.x = Math.sin(t * 0.9) * 3; idle.y = Math.cos(t * 0.7) * 4.5; } /* les reflets, eux, se balancent encore */
     }
     const k = touching ? 0.45 : 0.07;
     cur.x += (tgt.x - cur.x) * k; cur.y += (tgt.y - cur.y) * k;
@@ -200,7 +204,7 @@ export function enableTilt(el, { reduced = false } = {}) {
   card.addEventListener('dragstart', (e) => e.preventDefault());
   card.classList.add('tiltable');
   raf = requestAnimationFrame(loop);
-  return () => { alive = false; cancelAnimationFrame(raf); };
+  return () => { alive = false; offGyro(); cancelAnimationFrame(raf); };
 }
 
 // Repli si une vraie illustration déclarée est introuvable.

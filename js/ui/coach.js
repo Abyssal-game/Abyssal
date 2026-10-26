@@ -17,6 +17,10 @@ export function coach(app, key, html, { title = '' } = {}) {
   const g = app.game;
   if (g.s.tips?.[key]) return Promise.resolve(false);
   if (document.body.classList.contains('gated')) return Promise.resolve(false); // v325 : pas de bulle derrière l'écran de compte
+  /* v793 : jamais par-dessus l'écran d'ouverture ni une cinématique (la bulle empêchait d'entrer dans le jeu) : elle attend */
+  if (document.getElementById('boot') || document.querySelector('.endx')) return new Promise((r) => {
+    const iv = setInterval(() => { if (document.getElementById('boot') || document.querySelector('.endx')) return; clearInterval(iv); coach(app, key, html, { title }).then(r); }, 400);
+  });
   g.s.tips = { ...(g.s.tips || {}), [key]: Date.now() };
   g.persist();
   return new Promise((resolve) => {

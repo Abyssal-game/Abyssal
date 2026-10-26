@@ -34,7 +34,7 @@ export function pityHTML(g) {
     const left = max - n;
     return `<div class="pt-row"><span class="pt-gem rgem" data-r="${r}" style="--rc:${RARITY[r].color}">${RARITY[r].short}</span><span class="pt-t"><b>${label}</b><small>${left <= 1 ? 'garantie au prochain booster !' : `garantie dans ${left} boosters au plus`}</small></span><span class="pt-bar"><i style="width:${Math.min(100, (n / (max - 1)) * 100)}%;--rc:${RARITY[r].color}"></i></span></div>`;
   };
-  return `<div class="pity-box" aria-label="Garanties">${row('HR', g.s.pity.sinceHR, PITY.hr, 'Hyper rare')}${row('M', g.s.pity.sinceM, PITY.m, 'Mythique')}</div>`;
+  return `<div class="pity-box" aria-label="Garanties"><div class="pt-head">${icon('sparkle')}<b>Ta chance</b><small>Garanties de rareté, communes à tous les boosters</small></div>${row('HR', g.s.pity.sinceHR, PITY.hr, 'Hyper rare')}${row('M', g.s.pity.sinceM, PITY.m, 'Mythique')}</div>`;
 }
 
 // v438 : nouveaux sachets (nouveaux noms : le service worker garderait les anciens)
@@ -154,6 +154,7 @@ export default function shop(app, root, params = []) {
       ${giftHTML(g, cat)}
       <!-- v428 : plus de bannière ni d'encart du Tirage (il a son sous-onglet) : les boosters directement -->
       ${(() => { const n = ownedPacks(); return n >= 2 ? `<button class="btn gold block dc-plq dc-plq-dark shop-all" data-act="openall">${icon('ticket')}Ouvrir mes ${n} boosters</button>` : ''; })()}
+      ${pityHTML(g)} <!-- v793 : compteur de chance visible -->
       <div class="products">
         ${card('standard')}
         ${card('faction', '', `<div class="chips fac-pick fac-grid" role="radiogroup" aria-label="Faction du booster">${FACTION_ORDER.map((f) => `<button class="chip" role="radio" data-act="pickfac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}" aria-checked="${st.faction === f}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>`)}

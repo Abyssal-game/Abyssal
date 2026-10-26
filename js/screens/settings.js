@@ -1,4 +1,5 @@
 // Réglages : son, animations, accessibilité, sauvegarde (le Mode Créateur est dans creator.js).
+import { depthSupported, depthNeedsPermission, askDepth } from '../ui/depth.js';
 import { notifSupported, pushSupported, enable as notifEnable } from '../notify.js';
 import { resetTips } from '../ui/coach.js';
 import { TUTOS, tuto } from '../ui/tutos.js';
@@ -42,6 +43,8 @@ import { iapStatus, iapRestore, IAP_WHY } from '../iap.js';
 const CREATOR_HASH = 'a0f19d9e26a8d1b7c87d32cc8bbfb9f61d58de4b518cf9e145d36c787a37ac37';
 async function sha256(t) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join(''); }
 
+/* v793 : effet de profondeur actif ? (par défaut oui là où aucun accord n'est demandé, sinon après l'accord du joueur) */
+export const depthOn = (s) => (s.depth == null ? !depthNeedsPermission() : !!s.depth);
 export default function settings(app, root) {
   const g = app.game;
 
@@ -88,6 +91,7 @@ export default function settings(app, root) {
         <h2>Affichage</h2>
         ${seg('motion', 'Animations', [['auto', 'Selon l’appareil'], ['reduced', 'Réduites'], ['full', 'Complètes']])}
         ${toggle('fastOpen', 'Ouverture rapide des boosters', 'Affiche directement le récapitulatif, sans révéler les cartes une par une.')}
+        ${depthSupported() ? `<div class="set-row"><div><b>Effet de profondeur</b><p class="small muted">Incline le téléphone : les reflets des cartes glissent comme sur une vraie carte holographique, et le décor de l’Accueil bouge derrière la page.</p></div><button class="switch" role="switch" aria-checked="${depthOn(s)}" data-act="depth" aria-label="Effet de profondeur"><i></i></button></div>` : ''}
       </section>
 `;
   }
@@ -195,6 +199,12 @@ export default function settings(app, root) {
   root.addEventListener('toggle', (e) => { const d = e.target; if (!d.matches?.('.set-tuto-grp')) return; ui.tg ||= new Set(); if (d.open) ui.tg.add(d.dataset.g); else ui.tg.delete(d.dataset.g); }, true);
   bindActions(root, {
     toggle(el) { g.setSetting(el.dataset.k, !g.s.settings[el.dataset.k]); app.applySettings(); render(); },
+    async depth() { /* v793 : sur iPhone, l'accord se demande pendant le toucher */
+      if (depthOn(g.s.settings)) { g.setSetting('depth', false); app.applySettings(); render(); return; }
+      const ok = await askDepth();
+      g.setSetting('depth', ok); app.applySettings(); render();
+      if (!ok) toast('L’iPhone n’a pas donné l’accès aux mouvements. Tu peux l’autoriser dans les réglages de l’iPhone, puis réessayer.', { icon: 'info', ms: 6000 });
+    },
     seg(el) { g.setSetting(el.dataset.k, el.dataset.v); app.applySettings(); render(); if (el.dataset.k === 'hapLevel') haptic('crit'); /* v705 : essai de la force choisie */ },
     async notif() { await notifEnable(app, !g.s.settings.notif); render(); },
     lang(el) { if (el.dataset.v !== LANG) setLang(el.dataset.v); },

@@ -1,4 +1,5 @@
 // Collection : recherche, filtres (faction, rareté, possession), tri, grille.
+import { hasSample, haptic } from '../ui/sound.js';
 import { tw, LANG } from '../i18n.js';
 import { tuto } from '../ui/tutos.js';
 import { cardHTML, lazyArt, fillGrid } from '../ui/card.js';
@@ -160,7 +161,9 @@ export default function collection(app, root, params) {
       const i = Math.round(al.scrollLeft / (al.clientWidth + 14));
       if (i !== st.albumPage) { // page tournée : petit effet de feuillet et bruit de page
         pgs[i]?.classList.remove('turn'); void pgs[i]?.offsetWidth; pgs[i]?.classList.add('turn');
-        app.sfx?.flip?.();
+        /* v793 : vrai bruit de page cartonnée et petite vibration ; page complète : un éclat d'or */
+        try { if (hasSample('ci-page')) app.sfx['ci-page']?.(); else app.sfx?.flip?.(); } catch (e) { /* son facultatif */ }
+        haptic(pgs[i]?.classList.contains('full') ? 'success' : 'page');
       }
       st.albumPage = i;
       dots.forEach((d, k) => d.classList.toggle('on', k === i));

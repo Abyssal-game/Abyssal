@@ -47,6 +47,10 @@ import { consumeAuthHash, isLoggedIn } from './cloud/cloud.js';
 import { startPresence } from './cloud/presence.js';
 import { showWelcome } from './screens/welcome.js';
 import { resumeOpening } from './screens/opening.js';
+import { resumeEnding } from './screens/ending.js';
+import { BOOT_LORE } from './core/lore-lines.js';
+import { setDepth } from './ui/depth.js';
+import { depthOn } from './screens/settings.js';
 import { showGate } from './ui/gate.js';
 import { mpw, checkTurns } from './cloud/mpwatch.js';
 import { syncDaily, maybeAsk, syncPush } from './notify.js';
@@ -123,6 +127,7 @@ function applySettings() {
   document.documentElement.classList.toggle('fx-light', s.quality === 'light');
   configureSound(s);
   configureMusic(s);
+  setDepth(depthOn(s)); /* v793 */
 }
 
 // Explication des deux monnaies (toucher le compteur en haut à droite)
@@ -323,7 +328,7 @@ setTimeout(() => {
 }, 4000);
 function autoClaim() {
   const g = app.game;
-  if (!g || claiming || document.body.classList.contains('gated') || document.getElementById('boot') || document.querySelector('.opening, .sheet-wrap')) return;
+  if (!g || claiming || document.body.classList.contains('gated') || document.getElementById('boot') || document.querySelector('.opening, .sheet-wrap, .endx')) return;
   if (g.welcomePending() || app.route === 'descente' && g.s.descent.run?.phase === 'battle' || app.route === 'epreuves' && g.s.trials?.battle || document.body.classList.contains('battle-mode')) return;
   claiming = true;
   try {
@@ -357,7 +362,7 @@ function progLine(e) { return e.kind === 'level' ? `Niveau ${e.level}` : e.kind 
 /* v695 : la pastille attend la fin d'un combat, d'une ouverture, d'un coffre ou d'une présentation de gardien
    (elle cachait des titres et des annonces) */
 let progWait = 0;
-const progBusy = () => document.body.classList.contains('battle-mode') || !!document.querySelector('.opening, .bx-intro, .chx-stage, .vd, .sheet-wrap'); /* v699 : ni par-dessus une fenêtre */
+const progBusy = () => document.body.classList.contains('battle-mode') || !!document.querySelector('.opening, .bx-intro, .chx-stage, .vd, .sheet-wrap, .endx'); /* v699 : ni par-dessus une fenêtre */
 function paintProgress() {
   clearTimeout(progWait);
   if (progBusy()) { progEl?.classList.remove('in'); progWait = setTimeout(() => { if (progList.length) paintProgress(); }, 1500); return; }
@@ -473,15 +478,16 @@ async function boot() {
     render();
     const wait = Math.max(0, (window.__introUntil || 0) - performance.now());
     let done = false;
-    const finish = () => { if (done) return; done = true; applySettings(); render(); bootEl.classList.add('out'); setTimeout(() => bootEl.remove(), 900); setTimeout(() => showGate(app, () => showWelcome(app)), 700); setTimeout(() => resumeOpening(app), 3000); /* v767 : ouverture coupée par l'iPhone : la revoir */ };
+    const finish = () => { if (done) return; done = true; applySettings(); render(); bootEl.classList.add('out'); setTimeout(() => bootEl.remove(), 900); setTimeout(() => showGate(app, () => showWelcome(app)), 700); setTimeout(() => resumeOpening(app), 3000); setTimeout(() => resumeEnding(app), 3200); /* v793 : fin coupée rejouée */ /* v767 : ouverture coupée par l'iPhone : la revoir */ };
     // v325 : compte obligatoire — après une déconnexion ou une suppression du compte, l'écran de compte revient
     onAuth((sess) => { if (!sess && done) setTimeout(() => showGate(app), 300); if (sess) syncPush(app).catch(() => {}); }); /* v693 : notifications du serveur pour le compte connecté */
     // v293 : iPhone et navigateurs n'autorisent le son qu'après un premier toucher. L'écran d'ouverture attend donc
     // « Touche pour entrer » : ce toucher lance la musique et les sons dès l'arrivée au menu (sauf si on a déjà touché l'écran, ex. code d'accès).
     setTimeout(() => {
       if (navigator.userActivation?.hasBeenActive) return finish();
-      const t = document.createElement('p'); t.className = 'boot-tap'; t.textContent = 'Touche l’écran pour entrer';
-      bootEl.querySelector('.boot-inner')?.appendChild(t);
+      const tp = document.createElement('p'); tp.className = 'boot-tap'; tp.textContent = t('Touche l’écran pour entrer');
+      const lo = document.createElement('p'); lo.className = 'boot-lore'; lo.textContent = t(BOOT_LORE[Math.floor(Math.random() * BOOT_LORE.length)]); /* v793 */
+      bootEl.querySelector('.boot-inner')?.append(tp, lo);
     }, wait);
     // « click » (après le relâchement du doigt) : c'est ce geste qu'iPhone accepte pour débloquer le son
     bootEl.addEventListener('click', () => { if (performance.now() >= (window.__introUntil || 0) - 2000) finish(); });

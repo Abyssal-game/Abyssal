@@ -30,7 +30,7 @@ import { RELICS } from '../core/relics.js';
 import { ULTS, roleOf } from '../core/army.js';
 import { mountDiorama, roomFor } from '../ui/diorama.js';
 import { moveIconUrl, passivesOf, passiveIconUrl, moveFor, PASSIVES } from '../core/kits.js';
-import { hap } from '../ui/sound.js';
+import { hap, haptic } from '../ui/sound.js';
 import { playBar, stampHost, defVerdict, FAM_RHYTHM, KIND_RHYTHM, BOSS_ASSAULT } from '../ui/def-bar.js'; /* v594 */
 import { getTune } from '../ui/def-tune.js';
 import { perfStart, perfStop, perfMark } from '../ui/perf.js'; /* v601 : moniteur de fluidité */
@@ -519,6 +519,22 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     n.innerHTML = Array.from({ length: light ? 6 : 12 }, () => `<i style="--x:${(Math.random() * 100 - 50).toFixed(0)}%;--y:${(Math.random() * 60 - 20).toFixed(0)}%;--dx:${(Math.random() * 80 - 40).toFixed(0)}px;--dl:${(Math.random() * 0.35).toFixed(2)}s;--sz:${(4 + Math.random() * 7).toFixed(1)}px;--rt:${Math.round(Math.random() * 360)}deg"></i>`).join('');
     box.appendChild(n); setTimeout(() => n.remove(), 1500);
   };
+  /* v793 : coup de grâce d'un gardien : la carte se fend en deux le long d'une entaille d'or, les deux moitiés s'écartent */
+  const splitFx = (uid) => {
+    if (reduced) return; const t = el(uid), box = $('.dv'); if (!t || !box) return;
+    const b = box.getBoundingClientRect(), r = t.getBoundingClientRect();
+    const halves = [['polygon(0 0, 100% 0, 100% 38%, 0 62%)', -1], ['polygon(0 62%, 100% 38%, 100% 100%, 0 100%)', 1]];
+    halves.forEach(([clip, side]) => {
+      const h = t.cloneNode(true); h.removeAttribute('data-uid'); h.querySelectorAll('[data-uid]').forEach((x) => x.removeAttribute('data-uid'));
+      h.className = `${t.className} dv-half`; h.classList.remove('dying', 'ashes', 'hit', 'aimed', 'aim', 'target');
+      h.style.cssText = `position:absolute;left:${r.left - b.left}px;top:${r.top - b.top}px;width:${r.width}px;height:${r.height}px;margin:0;clip-path:${clip};--sd:${side}`;
+      box.appendChild(h); setTimeout(() => h.remove(), 1700);
+    });
+    const c = document.createElement('i'); c.className = 'dv-gcut';
+    c.style.cssText = `left:${r.left - b.left}px;top:${r.top - b.top}px;width:${r.width}px;height:${r.height}px`;
+    box.appendChild(c); setTimeout(() => c.remove(), 1200);
+    t.style.visibility = 'hidden'; setTimeout(() => { if (t.isConnected) t.style.visibility = ''; }, 1650);
+  };
   const ring = (uid, cls) => { if (reduced) return; const t = el(uid); if (!t) return; const r = document.createElement('span'); r.className = `cb-ring ${cls}`; t.appendChild(r); setTimeout(() => r.remove(), 750); };
   const float = (uid, txt, cls) => { const t = el(uid); if (!t) return; const f = document.createElement('span'); f.className = `dv-float ${cls}`; f.textContent = txt; t.appendChild(f); setTimeout(() => f.remove(), 900); };
   const banner = (html, cls = '', ms = 900) => {
@@ -738,9 +754,12 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
             const d = $('.dv'); if (!reduced) d?.classList.add('slowmo', 'bossfall');
             dio.fallen();
             app.sfx.boss(); await hitstop(220); app.sfx.death();
-            fxAt(e.u, 'death', { big: true }); sparks(e.u, 'big'); deathFx(e.u); el(e.u)?.classList.add('dying', 'ashes'); shake(true);
-            banner(`Gardien vaincu : ${esc(uName(u))}`, 'finisher', 1300); /* v729 : neutre (« La Matriarche … est vaincu ») */
-            await wait(T(1100)); d?.classList.remove('slowmo', 'bossfall'); draw(); break;
+            /* v793 : coup de grâce : voile sombre, entaille d'or, la carte se fend en deux, puis cendres */
+            if (!reduced) { d?.classList.add('grace'); haptic('shatter'); }
+            fxAt(e.u, 'death', { big: true }); sparks(e.u, 'big'); deathFx(e.u); splitFx(e.u); shake(true);
+            if (reduced) el(e.u)?.classList.add('dying', 'ashes');
+            banner(`Gardien vaincu : ${esc(uName(u))}`, 'finisher', 1500); /* v729 : neutre (« La Matriarche … est vaincu ») */
+            await wait(T(reduced ? 1100 : 1500)); d?.classList.remove('slowmo', 'bossfall', 'grace'); draw(); break;
           }
           // coup fatal : le dernier ennemi tombe sous un coup allié → gros plan, une fois par combat
           if (u?.side === 'enemy' && st.over === 'won' && lastAtk && !fatalDone) { fatalDone = true; await closeup(lastAtk, e.u, 'Coup fatal', { crit: true, sub: '' }); }

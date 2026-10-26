@@ -3,6 +3,7 @@
 // celui qui rêve ouvre les yeux, la page scellée de l'Abysse (trophée : elle ne combat jamais), puis l'annonce de l'Arc I.
 import { esc, reducedMotion } from '../ui/dom.js';
 import { sync } from '../cloud/sync.js';
+import { currentUser } from '../cloud/cloud.js';
 import { t, LANG } from '../i18n.js';
 import { sfx, haptic, hasSample, playVoice, loadVoice, clearVoices, getBytes, listV } from '../ui/sound.js';
 import { musicCinema, musicRelease } from '../ui/music.js';
@@ -41,6 +42,22 @@ export function playEnding(app, { name, lang, start } = {}) {
     { cls: 'tease', tr: 'ink', voice: 'fin-6', snd: [null, 'sheet'], hap: 'success', fx: 'motes', auto: false, extra: `<div class="endx-arc"><span class="endx-k">Arc I</span><h2>La Première Veille</h2><p>Celui qui rêve est réveillé. Le Bestiaire n’est pas encore fini.</p><b class="endx-soon">Bientôt</b><button class="btn gold" data-endx="close">Fermer</button></div>` },
   ];
   return playScenes(app, scenes, { dir: 'fin', music: 'fin', skipTo: scenes.findIndex((x) => x.cls === 'trophy'), lang, start });
+}
+
+/* v793 : la fin se joue à CHAQUE victoire contre l'Abysse (étage 100) ; si l'app est fermée ou coupée pendant
+   la cinématique, elle est rejouée au lancement suivant (abyssal.endPending, effacé à la fin de la cinématique) */
+const END_PENDING = 'abyssal.endPending';
+export function playEndingSure(app) {
+  try { localStorage.setItem(END_PENDING, JSON.stringify({ at: Date.now(), owner: currentUser()?.id || null })); } catch (e) { /* stockage indisponible */ }
+  return playEnding(app).then(() => { try { localStorage.removeItem(END_PENDING); } catch (e) { /* idem */ } });
+}
+export function resumeEnding(app, tries = 0) {
+  let p = null;
+  try { p = JSON.parse(localStorage.getItem(END_PENDING) || 'null'); } catch (e) { p = null; }
+  if (!p) return;
+  if (Date.now() - (p.at || 0) > 30 * 864e5 || (p.owner && currentUser()?.id && p.owner !== currentUser().id)) { try { localStorage.removeItem(END_PENDING); } catch (e) { /* rien */ } return; }
+  if ((p.owner && !currentUser()) || document.body.classList.contains('gated') || document.body.classList.contains('battle-mode') || document.querySelector('.gate, .sheet-wrap, .opening, .dv, .bx-intro, .endx, #boot')) { if (tries < 60) setTimeout(() => resumeEnding(app, tries + 1), 1500); return; }
+  playEndingSure(app).then(() => app.refresh?.());
 }
 
 /* v775 : le prologue, au tout premier lancement (avant le guide de bienvenue) ; revisible dans Bestiaire → Histoire */
