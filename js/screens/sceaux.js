@@ -1,4 +1,5 @@
 // Duels des Sceaux : accueil (adversaires, défi du jour, main), plateau 3 × 3 et fin de partie.
+import { vsay } from '../ui/voice.js';
 import { t, tw } from '../i18n.js';
 import * as SC from '../core/sceaux.js';
 import { openRuleHelp } from '../ui/sceaux-demo.js';
@@ -280,7 +281,7 @@ ${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone || dail
       ${out.capped ? `<p class="small muted">Tes ${SC.SCEAUX_REWARD.dailyPaid} victoires bien payées du jour sont faites : celle-ci rapporte ${SC.SCEAUX_REWARD.afterCap} éclats et ${SC.SCEAUX_REWARD.xp} XP.</p>` : ''}
       ${out.title ? `<p class="sc-gain">${icon('p:titles')} Nouveau titre : <b>${esc(out.title)}</b></p>` : ''}
       ${out.frame ? `<p class="sc-gain">${icon('p:titles')} Nouveau cadre de profil : <b>Cadre des Sceaux</b></p>` : ''}
-      <p class="sc-say">${rivalPic(cat, R)}<span>« ${esc(st.over === 'won' ? R.win : st.over === 'lost' ? R.lose : 'Partie nulle. On recommence ?')} »</span></p>
+      <p class="sc-say">${rivalPic(cat, R)}<span>« ${esc(st.over === 'won' ? vsay(st, 'end', `arb-${R.key}`, R.win) : st.over === 'lost' ? vsay(st, 'end', `arb-${R.key}`, R.lose) : 'Partie nulle. On recommence ?')} »</span></p>
       <div class="sc-end-act">${st.daily ? '' : '<button class="btn primary dc-plq dc-plq-red" data-x="again">Rejouer</button>'}<button class="btn dc-plq dc-plq-dark" data-x="back">Retour</button></div></div>`;
     document.body.appendChild(el);
     el.addEventListener('click', (e) => {
@@ -306,7 +307,7 @@ ${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone || dail
     const st = g.s.sceaux.cur, R = RIVAL_OF(st);
     boardView({ intro: true });
     app.sfx.enter?.();
-    dialog(R, R.hello, st.first === 'p' ? 'Tu commences.' : `${esc(R.name)} commence.`);
+    dialog(R, vsay(st, 'hello', `arb-${R.key}`, R.hello), st.first === 'p' ? 'Tu commences.' : `${esc(R.name)} commence.`);
     tuto(app, 'sceaux').then(() => tuto(app, 'sceaux-board')).then(() => (SC.ruleHas(st, 'identique') || SC.ruleHas(st, 'somme') ? tuto(app, 'sceaux-combo') : null))
       .then(() => (SC.ruleHas(st, 'sacre') ? tuto(app, 'sceaux-sacre') : null)) /* v402 : Cases sacrées avaient pas de bulle */
       .then(() => { if ([...st.hands.p, ...st.hands.o].some((id) => SC.perksOf(cat.get(id)).length)) tuto(app, 'sceaux-perks'); });

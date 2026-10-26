@@ -7,7 +7,7 @@ import { perfMark } from './perf.js'; /* v603 : le moniteur de fluidité note le
 
 let ctx = null, out = null, verb = null, duckG = null, on = true, vol = 0.5;
 let cur = null, want = 'antre', preview = null, timer = null, brown = null;
-let hold = null; /* v563 : musique calée sur un écran ({ key, off, at }) : position = off + temps écoulé depuis at */
+let hold = null, moodF = null, moodG = null, mood = 'normal'; /* v563 : musique calée sur un écran ({ key, off, at }) : position = off + temps écoulé depuis at */
 
 const midi = (m) => 440 * Math.pow(2, (m - 69) / 12);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -55,6 +55,9 @@ function init() {
   duckG = ctx.createGain(); duckG.gain.value = 1;
   const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -20; comp.ratio.value = 3;
   duckG.connect(out).connect(comp).connect(audioOut()); /* v622 : fondu commun en quittant l'app */
+  /* v794 : intensité du combat : filtre et volume entre les musiques et la sortie (musicMood) */
+  moodF = ctx.createBiquadFilter(); moodF.type = 'lowpass'; moodF.frequency.value = 20000; moodF.Q.value = 0.7;
+  moodG = ctx.createGain(); moodG.gain.value = 1; moodF.connect(moodG).connect(duckG);
   // réverbération longue, comme une cathédrale souterraine
   verb = ctx.createConvolver();
   const n = Math.floor(ctx.sampleRate * 4.5), b = ctx.createBuffer(2, n, ctx.sampleRate);
@@ -174,15 +177,15 @@ const heldPos = (key, dur) => (hold && hold.key === key ? ((hold.off + (performa
 function fileSource(grp, key, fade) {
   const t = ctx.currentTime, s = ctx.createBufferSource(); s.buffer = tracks[key]; s.loop = !NO_LOOP.has(key);
   if (TRACK_LOOP[key]) { s.loopStart = TRACK_LOOP[key][0]; s.loopEnd = Math.min(TRACK_LOOP[key][1], s.buffer.duration); }
-  const g = ctx.createGain(), lvl = 1.6 * (TRACK_GAIN[key] || 1); // les fichiers sont mixés plus bas que les ambiances calculées
+  const g = ctx.createGain(), lvl = 1.6 * (TRACK_GAIN[key] || TRACK_GAIN[key.replace(/-intense$/, '')] || 1); // les fichiers sont mixés plus bas que les ambiances calculées
   if (fade) { g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(lvl, t + fade); } else g.gain.value = lvl;
   s.connect(g).connect(grp.g); s.start(t, heldPos(key, s.buffer.duration)); grp.stops.push(s); grp.src = { s, g }; grp.file = true;
 }
 function startTheme(key) {
-  const th = THEMES[key], t = ctx.currentTime, held = hold?.key === key;
+  const th = THEMES[key] || THEMES[key.replace(/-intense$/, '')], t = ctx.currentTime, held = hold?.key === key; /* v794 : versions intenses */
   const grp = { key, th, g: ctx.createGain(), stops: [], next: {}, chord: th.chords[0] };
   grp.g.gain.setValueAtTime(0.0001, t); grp.g.gain.linearRampToValueAtTime(1, t + (held ? 0.25 : 3));
-  grp.g.connect(duckG);
+  grp.g.connect(moodF || duckG);
   needTrack(key);
   if (tracks[key]) {
     // v308 : boucle sur le fichier entier (il boucle déjà proprement : couper 50 ms à chaque bout faisait sauter le rythme)
@@ -258,13 +261,26 @@ function tick() {
   if (!ctx || !on || document.hidden || ctx.state !== 'running') return;
   // en combat : l'ambiance suit l'écran (combat, gardien)
   let key = preview || hold?.key || want;
-  if (!preview && document.body.classList.contains('battle-mode') && (key === 'descente')) key = document.querySelector('.dv-c.boss:not(.dead)') ? (document.querySelector('.dv-c.boss:not(.dead) .dv-bfig[src*="bosses/abysse"]') ? 'abysse' : 'boss') : 'combat'; /* v442 : L'Abysse a sa musique */
+  if (!preview && document.body.classList.contains('battle-mode') && (key === 'descente')) key = document.querySelector('.dv-c.boss:not(.dead)') ? (document.querySelector('.dv-c.boss:not(.dead) img[src*="bosses/abysse"], .dv-c.boss:not(.dead) img[src*="combat-abysse"]') ? 'abysse' : 'boss') : 'combat'; /* v442 : L'Abysse a sa musique (v794 : aussi avec sa carte peinte) */
+  /* v794 : combat en danger (Furie d'un gardien, équipe presque à terre) : version intense de la musique si elle existe */
+  if (!preview && mood === 'intense' && (key === 'combat' || key === 'boss') && trackList?.has(`${key}-intense`)) key = `${key}-intense`;
   if (!cur || cur.key !== key) { if (cur) stopTheme(cur); perfMark(`musique : ${key}`); cur = startTheme(key); }
   schedule(cur);
 }
 
 /* v679 : prépare (télécharge et décode) une musique à l'avance, pendant un écran calme (présentation du gardien) :
    le décodage ne tombe plus sur la première image du combat */
+/* v794 : intensité de la musique en combat. 'calme' (étouffée), 'normal', 'intense' (plus présente ; et la version
+   « <musique>-intense » quand elle existe : assets/music/combat-intense.mp3, boss-intense.mp3) */
+export function musicMood(m = 'normal') {
+  if (m === mood) return;
+  mood = m;
+  if (!ctx || !moodF) return;
+  const t = ctx.currentTime, f = m === 'calme' ? 900 : 20000, v = m === 'calme' ? 0.8 : m === 'intense' ? 1.15 : 1;
+  moodF.frequency.cancelScheduledValues(t); moodF.frequency.setValueAtTime(moodF.frequency.value, t); moodF.frequency.exponentialRampToValueAtTime(f, t + 1.2);
+  moodG.gain.cancelScheduledValues(t); moodG.gain.setValueAtTime(moodG.gain.value, t); moodG.gain.linearRampToValueAtTime(v, t + 1.5);
+  tick();
+}
 export function musicPrefetch(key) { if (!on || !init()) return; loadTracks(); if (trackList) needTrack(key); }
 
 // Appelé à chaque changement de page

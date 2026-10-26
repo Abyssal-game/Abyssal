@@ -1,6 +1,7 @@
 // Ouverture de booster : sceau à briser, révélation carte par carte ou d'un coup,
 // effets selon la rareté, récapitulatif. Les cartes sont déjà enregistrées
 // dans la sauvegarde avant la première animation.
+import { narrate } from '../ui/voice.js';
 import { BOOSTERS, RARITY, VARIANTS } from '../config.js';
 import { cardHTML } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
@@ -369,6 +370,7 @@ export async function openPack(app, type, { faction, onDone, preset = null, titl
   function epic(r, risen) {
     app.sfx.reveal(r, { risen });
     if (r === 'S') app.sfx.rumble?.(1.6); // v329 : grondement grave sous la révélation d'une Secrète
+    if (r === 'S' || r === 'M') setTimeout(() => narrate(r === 'S' ? 'secret' : 'mythic'), 1400); /* v794 : le narrateur */
     el.classList.add('epic', `epic-${r}`);
     const banner = document.createElement('div');
     banner.className = 'op-banner';

@@ -1,5 +1,6 @@
 // v564 : ce que les autres joueurs voient de ton apparence (demande du propriétaire : « que ça apparaisse sur les
 // classements et pendant les jeux en ligne ») : plaque de pseudo (bannière peinte derrière le nom) et réactions en ligne.
+import { speak } from './voice.js';
 import { EMOTES } from '../core/codex.js';
 import { EMBLEM } from './icons.js';
 import { esc } from './dom.js';
@@ -27,6 +28,8 @@ export const emoteHTML = (k) => `<span class="re-pic ${EMOTES[k]?.who || EMOTES[
 
 // bulle de réaction au-dessus (adversaire) ou au-dessous (toi) de la partie, 2,8 s
 const live = {};
+/* v794 : qui dit une réaction : le gardien, l'arbitre, sinon la réaction elle-même (voix à part) */
+export const emoteSpeaker = (k) => (EMOTES[k]?.boss ? `boss-${EMOTES[k].boss}` : EMOTES[k]?.who ? `arb-${EMOTES[k].who}` : k);
 export function showEmote(k, side, name, sfx) {
   if (!EMOTES[k]) return;
   live[side]?.remove();
@@ -38,6 +41,7 @@ export function showEmote(k, side, name, sfx) {
   live[side] = el;
   requestAnimationFrame(() => el.classList.add('on'));
   sfx?.();
+  speak(emoteSpeaker(k), EMOTES[k].text); /* v794 : la réaction dite par son personnage, si sa voix existe */
   setTimeout(() => { el.classList.remove('on'); setTimeout(() => { el.remove(); if (live[side] === el) delete live[side]; }, 300); }, 2800);
 }
 // v565 : habillage des boosters choisi au Profil (posé par applySettings dans main.js, lu par packHTML)

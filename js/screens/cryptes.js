@@ -1,4 +1,5 @@
 // v450 : Les Cryptes — accueil (cryptes, défi du jour), partie de mémoire à deux et fin de partie.
+import { vsay } from '../ui/voice.js';
 import * as CR from '../core/cryptes.js';
 import { FACTION_ORDER } from '../config.js';
 import { artUrl } from '../art/assets.js';
@@ -228,7 +229,7 @@ export default function cryptesScreen(app, root) {
     el.className = `sc-end ${won ? 'won' : 'lost'}`;
     el.innerHTML = `${won && !app.reduced() ? '<div class="sc-rays"></div>' : ''}<div class="sc-end-in">${crestHTML(won, won ? 'Victoire' : 'Défaite', '', 'sc-crest')}
       <p class="sc-caps">Toi : <b>${st.final.scores.p}</b> · <span translate="no">${esc(tw(R.name))}</span> : <b>${st.final.scores.a}</b>${st.final.scores.p === st.final.scores.a ? ' (dernière paire décisive)' : ''}</p>
-      <p class="sc-say">${pic(st.rival)}<span>« ${esc(won ? R.beaten : R.gloat)} »</span></p>
+      <p class="sc-say">${pic(st.rival)}<span>« ${esc(vsay(st, 'end', `arb-${st.rival}`, won ? R.beaten : R.gloat))} »</span></p>
       ${out.shards ? `<p class="sc-gain">${icon('crystal')} <b>+${fmt(out.shards)}</b> éclats${out.first ? ' (première victoire)' : ''}</p>` : ''}
       ${out.chests?.length ? `<a class="sc-gain sc-chestwin" href="#/coffres">${icon('p:chest')} ${out.chests.map((c) => `<b translate="no">${esc(t(CHEST_NAME[c]))}</b>`).join(' et ')} gagné${out.chests.length > 1 ? 's' : ''} !</a>` : ''}
       ${out.xp && !out.capped ? `<p class="small muted center">+${out.xp} XP de profil</p>` : ''}
@@ -249,7 +250,7 @@ export default function cryptesScreen(app, root) {
     const st = g.s.cryptes.cur, R = CR.RIVALS[st.rival];
     ui.up.clear(); ui.glow.clear(); ui.picks = []; ui.swap.clear(); ui.peek.clear(); ui.last = null; /* v729 : rien de la partie précédente */
     app.sfx.enter?.();
-    banner = { cls: 'intro', html: `<span class="sc-med">${pic(st.rival)}</span><span><b>« ${esc(R.hello)} »</b><span class="small">10 paires à trouver. Tu commences.${CR.TABLE[st.table].rule ? `<em class="gm-ruleline">${esc(CR.TABLE[st.table].rule)}</em>` : ''}${R.power ? `<em class="gm-ruleline pa-powl"><b>${esc(R.power.name)}</b> : ${esc(R.power.text)}</em>` : ''}</span></span>` };
+    banner = { cls: 'intro', html: `<span class="sc-med">${pic(st.rival)}</span><span><b>« ${esc(vsay(st, 'hello', `arb-${st.rival}`, R.hello))} »</b><span class="small">10 paires à trouver. Tu commences.${CR.TABLE[st.table].rule ? `<em class="gm-ruleline">${esc(CR.TABLE[st.table].rule)}</em>` : ''}${R.power ? `<em class="gm-ruleline pa-powl"><b>${esc(R.power.name)}</b> : ${esc(R.power.text)}</em>` : ''}</span></span>` };
     busy = true; view();
     tuto(app, 'cryptes').then(() => tuto(app, 'cryptes-play')).then(() => wait(1400)).then(() => { banner = null; busy = false; if (!gone) view(); });
   }

@@ -83,6 +83,7 @@ export default function settings(app, root) {
         <div class="set-row col"><label for="mvol"><b>Volume de la musique</b></label><input id="mvol" type="range" min="0" max="1" step="0.05" value="${s.musicVol ?? 0.55}" ${s.sound && s.music !== false ? '' : 'disabled'}></div>
         ${s.sound && s.music !== false ? `<details class="dc-fold set-amb"><summary>${icon('sound')} Écouter les ambiances</summary><div class="set-sfx">${MUSIC_DEMO.map(([n], i) => `<button class="chip" data-mus="${i}">${n}</button>`).join('')}</div></details>` : ''}
         ${window.Capacitor?.isNativePlatform?.() ? '' : toggle('loud', 'Son même en mode silencieux', 'Le jeu reste audible quand le bouton silencieux de l’iPhone est activé (iOS 17 ou plus). Peut couper la musique d’une autre app.')}
+        <div class="set-row"><div><b>Voix des personnages</b><p class="small muted">Le narrateur, les gardiens et les arbitres parlent à voix haute, dans la langue du jeu, quand leur voix existe.</p></div><button class="switch" role="switch" aria-checked="${s.voices !== false}" data-act="voices" aria-label="Voix des personnages"><i></i></button></div>
         ${toggle('haptics', 'Vibrations', 'Petites vibrations sur les coups, les victoires et les cartes rares. Dans l’app, le téléphone vibre vraiment ; sur le site web, l’iPhone ne vibre presque pas.')}
         ${s.haptics !== false ? `${seg('hapLevel', 'Force des vibrations', [['0', 'Discrètes'], ['1', 'Normales'], ['2', 'Intenses']])}<p class="small muted set-note">Discrètes : seulement les grands moments (coups forts, victoires, cartes rares). Intenses : chaque vibration est plus marquée.</p>` : ''}
         ${notifSupported() ? `<div class="set-row"><div><b>Notifications</b><p class="small muted">${pushSupported() ? 'Booster du jour (10 h), offrande du soir, série en danger, Tirage des Ombres, à toi de jouer en ligne, défis reçus, défi relevé au Choc des Boosters, demandes d’ami.' : 'Booster du jour (10 h), offrande du soir, série en danger, Tirage des Ombres, et rappel 2 h avant la fin du délai quand c’est à toi de jouer en ligne.'}</p></div><button class="switch" role="switch" aria-checked="${!!s.notif}" data-act="notif" aria-label="Notifications"><i></i></button></div>` : ''}
@@ -199,6 +200,7 @@ export default function settings(app, root) {
   root.addEventListener('toggle', (e) => { const d = e.target; if (!d.matches?.('.set-tuto-grp')) return; ui.tg ||= new Set(); if (d.open) ui.tg.add(d.dataset.g); else ui.tg.delete(d.dataset.g); }, true);
   bindActions(root, {
     toggle(el) { g.setSetting(el.dataset.k, !g.s.settings[el.dataset.k]); app.applySettings(); render(); },
+    voices() { g.setSetting('voices', g.s.settings.voices === false); app.applySettings(); render(); }, /* v794 */
     async depth() { /* v793 : sur iPhone, l'accord se demande pendant le toucher */
       if (depthOn(g.s.settings)) { g.setSetting('depth', false); app.applySettings(); render(); return; }
       const ok = await askDepth();

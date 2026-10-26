@@ -50,6 +50,7 @@ import { resumeOpening } from './screens/opening.js';
 import { resumeEnding } from './screens/ending.js';
 import { BOOT_LORE } from './core/lore-lines.js';
 import { setDepth } from './ui/depth.js';
+import { setVoices } from './ui/voice.js';
 import { depthOn } from './screens/settings.js';
 import { showGate } from './ui/gate.js';
 import { mpw, checkTurns } from './cloud/mpwatch.js';
@@ -128,6 +129,7 @@ function applySettings() {
   configureSound(s);
   configureMusic(s);
   setDepth(depthOn(s)); /* v793 */
+  setVoices(s.voices !== false && s.sound !== false); /* v794 */
 }
 
 // Explication des deux monnaies (toucher le compteur en haut à droite)
