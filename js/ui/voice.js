@@ -9,7 +9,7 @@ import { vhash, vkey } from './voice-key.js';
 
 export { vhash, vkey };
 
-let set = null, on = true, playing = null, lastNar = 0;
+let set = null, on = true, playing = null, lastNar = -Infinity; /* v801 : avant, aucune phrase pendant les 20 premières secondes de l’app */
 const manifest = () => (set ||= getBytes(`assets/voix/manifest.json${listV()}`).then((b) => new Set(JSON.parse(new TextDecoder().decode(b)))).catch(() => new Set()));
 export function setVoices(v) { on = v !== false; if (!on) stopVoice(); }
 export function stopVoice() { try { playing?.stop(); } catch (e) { /* rien */ } playing = null; }
