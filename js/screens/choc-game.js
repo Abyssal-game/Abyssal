@@ -125,41 +125,80 @@ export function createChocGame(app, root) {
   }
 
   // ——— Ouverture des boosters : les deux sachets s'entrechoquent, se déchirent, les cartes rejoignent les mains ———
+  /* v814 (le propriétaire : « c'est quoi cet affichage moche ? refais ça ») : mise en scène plein écran : l'adversaire en haut,
+     toi en bas, chacun son sachet ; les sachets se jettent l'un sur l'autre au centre, éclair, ils tremblent, se déchirent, et
+     les 3 cartes de chacun volent face cachée jusqu'à sa main où elles se retournent. */
   async function openPacks(v, ctx, k) {
     if (!alive) return;
-    const n = k === 'start' ? CHOC.hand : CHOC.renfort, me = v.me, foe = foeOf(v);
+    const n = k === 'start' ? CHOC.hand : CHOC.renfort;
     const from = k === 'start' ? 0 : CHOC.hand * CHOC.packCards;
+    const title = k === 'start' ? t('Vos boosters s’ouvrent') : t('Le Renfort !');
+    let ov = null, skip = false;
     anim = true;
     try {
       drawGame(v, ctx);
-      const hide = () => root.querySelectorAll('.kc-hand .kc-c').forEach((c, j, all) => { const side = c.closest('.foe') ? 'foe' : 'me', idx = [...c.parentNode.children].indexOf(c); if (idx >= from) c.classList.add('pre'); });
-      hide();
-      const ov = document.createElement('div'); ov.className = 'kc-open';
-      ov.innerHTML = `<p class="kc-ot">${k === 'start' ? t('Vos boosters s’ouvrent') : t('Le Renfort !')}</p><div class="vd-pack foe"></div><span class="kc-ovs"></span><div class="vd-pack me"></div><button class="btn small ghost kc-oskip" data-mp="oskip">${t('Passer')}</button>`;
+      root.querySelectorAll('.kc-hand .kc-c').forEach((c) => { if ([...c.parentNode.children].indexOf(c) >= from) c.classList.add('pre'); });
+      const side = (mine) => `<div class="kc-oside ${mine ? 'me' : 'foe'}"><span class="sc-med">${mine ? myPic() : ctx.avatar(v.foe?.avatar)}</span><b>${mine ? t('Toi') : `<span translate="no">${esc(ctx.foeName(v))}</span>`}</b></div>`;
+      ov = document.createElement('div'); ov.className = `kc-open ${k}`;
+      const st = v.state, foeK = foeOf(v), cnt = n * CHOC.packCards;
+      const orow = (sd) => `<div class="kc-orow ${sd === v.me ? 'me' : 'foe'}" style="--n:${cnt}">${(st.hand[sd] || []).slice(from, from + cnt).map((c) => cardHTML(c, { small: true, extra: 'pre' })).join('')}</div>`;
+      ov.innerHTML = `<span class="vd-embers"></span><p class="kc-ot"><b>${title}</b><small></small></p>
+        ${side(false)}${orow(foeK)}<div class="vd-pack foe"></div><span class="kc-ovs"></span><div class="vd-pack me"></div>${orow(v.me)}${side(true)}
+        <button class="btn small ghost kc-oskip" data-mp="oskip">${t('Passer')}</button>`;
       root.querySelector('.kc-game')?.appendChild(ov);
-      let skip = false; ov.querySelector('.kc-oskip').onclick = (e) => { e.stopPropagation(); skip = true; };
+      requestAnimationFrame(() => ov?.classList.add('on'));
+      ov.querySelector('.kc-oskip').onclick = (e) => { e.stopPropagation(); skip = true; };
       for (let p = 0; p < n && !skip && alive; p++) {
         const fp = ov.querySelector('.vd-pack.foe'), mp = ov.querySelector('.vd-pack.me');
         fp.innerHTML = packHTML('standard', cat, { skin: null }); mp.innerHTML = packHTML('standard', cat);
         [fp, mp].forEach((x) => { x.className = `vd-pack ${x === fp ? 'foe' : 'me'} in`; });
-        ov.querySelector('.kc-ot').textContent = n > 1 ? `${k === 'start' ? t('Vos boosters s’ouvrent') : t('Le Renfort !')} · ${p + 1} / ${n}` : (k === 'start' ? t('Vos boosters s’ouvrent') : t('Le Renfort !'));
-        await wait(600, v);
-        if (!app.reduced()) { [fp, mp].forEach((x) => x.classList.add('clash')); app.sfx.suspense?.(); await wait(430, v); ov.classList.add('flash'); app.sfx.parry?.(); haptic('heavy'); await wait(300, v); ov.classList.remove('flash'); [fp, mp].forEach((x) => x.classList.remove('clash')); }
-        [fp, mp].forEach((x) => x.classList.add('shake'));
+        ov.querySelector('.kc-ot small').textContent = n > 1 ? `${p + 1} / ${n}` : '';
         await wait(650, v);
+        if (skip) break;
+        if (!app.reduced()) {
+          [fp, mp].forEach((x) => x.classList.add('clash')); app.sfx.suspense?.();
+          await wait(420, v);
+          ov.classList.add('flash'); app.sfx.parry?.(); haptic('heavy');
+          await wait(320, v);
+          ov.classList.remove('flash'); [fp, mp].forEach((x) => x.classList.remove('clash'));
+        }
+        [fp, mp].forEach((x) => x.classList.add('shake'));
+        await wait(600, v);
         [fp, mp].forEach((x) => { x.classList.remove('shake'); x.classList.add('torn'); });
         app.sfx['vd-tear']?.();
-        await wait(380, v);
-        // les cartes de ce booster apparaissent dans les deux mains
-        const a = from + p * CHOC.packCards;
-        for (const side of ['foe', 'me']) root.querySelectorAll(`.kc-hand.${side} .kc-c`).forEach((c, idx) => { if (idx >= a && idx < a + CHOC.packCards) { c.classList.remove('pre'); c.classList.add('drop'); } });
+        await wait(260, v);
+        // les cartes de ce booster volent jusqu'aux deux mains
+        const a = p * CHOC.packCards;
+        await Promise.all([['foe', fp], ['me', mp]].map(([sd, pk]) => fly(ov, sd, pk, a)));
         app.sfx['vd-flip']?.();
-        await wait(700, v);
+        await wait(450, v);
       }
-      ov.remove();
-      root.querySelectorAll('.kc-c.pre').forEach((c) => { c.classList.remove('pre'); c.classList.add('drop'); });
-    } catch (e) { if (e !== STOP) throw e; } finally { anim = false; }
+      if (!skip) await wait(700, v);
+    } catch (e) { if (e !== STOP) throw e; } finally {
+      anim = false;
+      if (ov) { ov.classList.remove('on'); const o = ov; setTimeout(() => o.remove(), 300); }
+      root.querySelectorAll('.kc-c.pre').forEach((c) => { c.classList.remove('pre'); c.classList.add('flipin'); });
+    }
     if (v.id) markSeen(v.id, k);
+  }
+  // 3 cartes face cachée sortent du sachet et filent vers leur place dans la main, puis se retournent
+  function fly(ov, sd, pk, a) {
+    const targets = [...ov.querySelectorAll(`.kc-orow.${sd} .kc-c`)].slice(a, a + CHOC.packCards);
+    const src = pk.getBoundingClientRect(), cx = src.left + src.width / 2, cy = src.top + src.height / 2;
+    return Promise.all(targets.map((tg, i) => new Promise((ok) => {
+      const r = tg.getBoundingClientRect();
+      const reveal = () => { tg.classList.remove('pre'); tg.classList.add('flipin'); ok(); };
+      if (app.reduced() || !r.width) return reveal();
+      const f = document.createElement('span'); f.className = 'kc-fly';
+      f.style.cssText = `left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px`;
+      document.body.appendChild(f);
+      const an = f.animate([
+        { transform: `translate(${cx - r.left - r.width / 2}px, ${cy - r.top - r.height / 2}px) scale(.5) rotate(${(i - 1) * 22}deg)`, opacity: 0 },
+        { opacity: 1, offset: 0.2 },
+        { transform: 'none', opacity: 1 }], { duration: 560, delay: i * 110, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'backwards' });
+      an.onfinish = () => { f.remove(); reveal(); };
+      an.oncancel = () => { f.remove(); reveal(); };
+    })));
   }
 
   // ——— Fin de partie : manches, cartes gardées (les gagnantes + une au choix), carte prise à l'adversaire ———

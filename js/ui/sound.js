@@ -48,12 +48,16 @@ function ensure() {
    le son était suspendu d'un coup, en pleine onde, puis l'iPhone fermait l'app : coupure sèche = petit « bip » / claquement.
    Désormais le volume général descend à zéro en 40 ms, puis le son est suspendu ; au retour, il remonte en douceur. */
 let quietT = 0;
+/* v814 (le « bip » revenait) : plus de suspension du son quand l'app passe en retrait : sur iPhone, mettre le contexte
+   audio en pause produit souvent un petit claquement. Le volume descend seulement à zéro en douceur ; l'iPhone arrête
+   ensuite l'app (et le son, devenu silencieux) tout seul. */
 export function audioQuiet() {
   if (!ctx || !endG) return;
   if (document.hidden || window.Capacitor?.isNativePlatform?.()) needKick = true;
   clearTimeout(quietT);
-  try { const t = ctx.currentTime; endG.gain.cancelScheduledValues(t); endG.gain.setValueAtTime(endG.gain.value, t); endG.gain.linearRampToValueAtTime(0, t + 0.04); } catch (e) { /* rien */ }
-  quietT = setTimeout(() => { if (ctx.state === 'running') ctx.suspend().catch(() => {}); }, 70);
+  try { const t = ctx.currentTime; endG.gain.cancelScheduledValues(t); endG.gain.setValueAtTime(endG.gain.value, t); endG.gain.setTargetAtTime(0, t, 0.03); } catch (e) { /* rien */ }
+  /* sur le site seulement (onglet caché), le son est mis en pause une fois bien silencieux, pour la batterie */
+  if (!window.Capacitor?.isNativePlatform?.()) quietT = setTimeout(() => { if (ctx.state === 'running' && document.hidden) ctx.suspend().catch(() => {}); }, 400);
 }
 export function audioWake() {
   if (!ctx || !endG) return;
@@ -93,7 +97,7 @@ const kick = () => {
   const t0 = setTimeout(() => { unlocking = false; }, 900);
   const done = () => { clearTimeout(t0); unlocking = false; if (ctx.state === 'running') { needKick = false; if (!document.hidden) audioWake(); } };
   try { const b = ctx.createBuffer(1, 1, 22050), src = ctx.createBufferSource(); src.buffer = b; src.connect(ctx.destination); src.start(0); } catch (e) { /* rien */ }
-  const p = ctx.state === 'running' ? ctx.suspend().then(() => ctx.resume()) : ctx.resume();
+  const p = ctx.state === 'running' ? Promise.resolve() : ctx.resume(); /* v814 : plus de pause puis reprise (claquement possible) */
   p.catch(() => {}).finally(done);
 };
 if (typeof document !== 'undefined') ['touchstart', 'touchend', 'click', 'keydown'].forEach((t) => document.addEventListener(t, kick, { capture: true, passive: true }));
