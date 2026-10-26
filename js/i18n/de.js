@@ -8833,6 +8833,14 @@ export default {
   "Barrière −{0} ({1})": "Barriere −{0} ({1})",
   "La barrière se brise": "Die Barriere zerbricht",
   "Dégâts annoncés sur cette créature": "Angekündigter Schaden an dieser Kreatur",
+  "Assaut conjoint · {0}": "Gemeinsamer Angriff · {0}",
+  "Ferveur : à quoi elle sert": "Inbrunst: wozu sie dient",
+  "La Ferveur": "Die Inbrunst",
+  "Une réserve commune à toute ton équipe ({0} au plus, {1} en ce moment).": "Ein gemeinsamer Vorrat deines ganzen Teams (höchstens {0}, gerade {1}).",
+  "Elle se gagne en attaquant, en exploitant une faiblesse, en esquivant (+1), en parant au dernier instant (+2) et en brisant un ennemi (+2).": "Du gewinnst sie durch Angriffe, ausgenutzte Schwächen, Ausweichen (+1), Parieren im letzten Moment (+2) und das Brechen eines Feindes (+2).",
+  "Elle sert à l’Assaut conjoint ({0} Ferveur, une fois par combat) : sur un ennemi Fêlé, Brisé ou Marqué, ta créature et celle qui joue juste après frappent ensemble. Il apparaît dans les actions quand c’est possible.": "Sie dient dem Gemeinsamen Angriff ({0} Inbrunst, einmal pro Kampf): Gegen einen angeknacksten, gebrochenen oder markierten Feind schlagen deine Kreatur und die nächste gemeinsam zu. Er erscheint bei den Aktionen, wenn er möglich ist.",
+  "Avec une Mythique ou une Secrète dans l’équipe, la Ferveur pleine lance aussi un pouvoir d’équipe.": "Mit einer Mythischen oder Geheimen im Team löst volle Inbrunst auch eine Teamkraft aus.",
+  "Ton équipe n’a pas de pouvoir d’équipe (il faut une Mythique ou une Secrète) : la Ferveur sert à l’Assaut conjoint.": "Dein Team hat keine Teamkraft (dafür braucht es eine Mythische oder Geheime): Die Inbrunst dient dem Gemeinsamen Angriff.",
 };
 
 export const names = {

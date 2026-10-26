@@ -8844,6 +8844,14 @@ export default {
   "Barrière −{0} ({1})": "Barrier −{0} ({1})",
   "La barrière se brise": "The barrier breaks",
   "Dégâts annoncés sur cette créature": "Damage announced on this creature",
+  "Assaut conjoint · {0}": "Joint Assault · {0}",
+  "Ferveur : à quoi elle sert": "Fervor: what it is for",
+  "La Ferveur": "Fervor",
+  "Une réserve commune à toute ton équipe ({0} au plus, {1} en ce moment).": "A pool shared by your whole team ({0} at most, {1} right now).",
+  "Elle se gagne en attaquant, en exploitant une faiblesse, en esquivant (+1), en parant au dernier instant (+2) et en brisant un ennemi (+2).": "You gain it by attacking, exploiting a weakness, dodging (+1), parrying at the last moment (+2) and breaking an enemy (+2).",
+  "Elle sert à l’Assaut conjoint ({0} Ferveur, une fois par combat) : sur un ennemi Fêlé, Brisé ou Marqué, ta créature et celle qui joue juste après frappent ensemble. Il apparaît dans les actions quand c’est possible.": "It powers the Joint Assault ({0} Fervor, once per combat): on a Cracked, Broken or Marked enemy, your creature and the next one to act strike together. It appears among the actions when it is possible.",
+  "Avec une Mythique ou une Secrète dans l’équipe, la Ferveur pleine lance aussi un pouvoir d’équipe.": "With a Mythic or a Secret in the team, full Fervor also unleashes a team power.",
+  "Ton équipe n’a pas de pouvoir d’équipe (il faut une Mythique ou une Secrète) : la Ferveur sert à l’Assaut conjoint.": "Your team has no team power (it takes a Mythic or a Secret): Fervor powers the Joint Assault.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

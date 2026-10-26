@@ -8833,6 +8833,14 @@ export default {
   "Barrière −{0} ({1})": "Barriera −{0} ({1})",
   "La barrière se brise": "La barriera si spezza",
   "Dégâts annoncés sur cette créature": "Danni annunciati su questa creatura",
+  "Assaut conjoint · {0}": "Assalto congiunto · {0}",
+  "Ferveur : à quoi elle sert": "Fervore: a cosa serve",
+  "La Ferveur": "Il Fervore",
+  "Une réserve commune à toute ton équipe ({0} au plus, {1} en ce moment).": "Una riserva comune a tutta la tua squadra ({0} al massimo, {1} in questo momento).",
+  "Elle se gagne en attaquant, en exploitant une faiblesse, en esquivant (+1), en parant au dernier instant (+2) et en brisant un ennemi (+2).": "Si guadagna attaccando, sfruttando una debolezza, schivando (+1), parando all’ultimo istante (+2) e spezzando un nemico (+2).",
+  "Elle sert à l’Assaut conjoint ({0} Ferveur, une fois par combat) : sur un ennemi Fêlé, Brisé ou Marqué, ta créature et celle qui joue juste après frappent ensemble. Il apparaît dans les actions quand c’est possible.": "Serve all’Assalto congiunto ({0} Fervore, una volta per combattimento): su un nemico Incrinato, Spezzato o Marchiato, la tua creatura e quella che gioca subito dopo colpiscono insieme. Compare tra le azioni quando è possibile.",
+  "Avec une Mythique ou une Secrète dans l’équipe, la Ferveur pleine lance aussi un pouvoir d’équipe.": "Con una Mitica o una Segreta in squadra, il Fervore pieno scatena anche un potere di squadra.",
+  "Ton équipe n’a pas de pouvoir d’équipe (il faut une Mythique ou une Secrète) : la Ferveur sert à l’Assaut conjoint.": "La tua squadra non ha un potere di squadra (serve una Mitica o una Segreta): il Fervore serve all’Assalto congiunto.",
 };
 
 export const names = {

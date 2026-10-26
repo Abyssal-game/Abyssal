@@ -16,7 +16,7 @@ const coachIdle = async () => { await coachIdle0(); await sheetIdle(); await coa
 import { tuto } from '../ui/tutos.js';
 import { cardHTML } from '../ui/card.js';
 import {
-  BOSS_POWERS, FORBID, INTENTS, SYNERGIES, PACK_BONUS, FERVOR_MAX, AP_MAX, PA_MAX, passTurn, speedOf, front, reserve, actionsFor, actionTargets, act, preview,
+  BOSS_POWERS, FORBID, INTENTS, SYNERGIES, PACK_BONUS, FERVOR_MAX, DUO_FERVOR, AP_MAX, PA_MAX, passTurn, speedOf, front, reserve, actionsFor, actionTargets, act, preview,
   ENTRANCES, GOALS, goalState, RUNES, runesLeft, SERVANT_POWER, RHYTHM, PHASE2, beginEnemyTurn, nextEnemy, enemyAct, endEnemyTurn, takeSkips, defenseWindow, intentInfo, useUlt, ultReady, autoActs, comboOf,
 } from '../core/duel.js';
 import { KITS, AI_FAMILIES, DICE_TIERS, WEAK_TO, TALENTS } from '../core/skills.js';
@@ -94,7 +94,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
      puis les ennemis face à tes créatures (rien entre les deux), et en bas le menu de combat : la créature qui joue,
      ses actions, la réserve et la Ferveur. « Passer » devient un petit bouton en haut à droite. */
   root.innerHTML = `<div class="dv cb cb2 ${run.room} has-bg" style="--bgimg:${room.paint ? `url(${abs(room.paint)})` : bgOf(run)}">
-    <div class="dv-top"><b>${esc(title)}</b><div class="cb-rules"></div><span class="row gap">
+    <div class="dv-top"><b>${(() => { const [a, ...r] = String(title).split(' · '); return esc(a) + (r.length ? `<span class="dv-tt2"> · ${esc(r.join(' · '))}</span>` : ''); })()}</b><div class="cb-rules"></div><span class="row gap">
       <button class="btn small ghost cb-speed ${ui.fast ? 'on' : ''}" data-d="speed" aria-label="Vitesse des animations" aria-pressed="${!!ui.fast}">×${ui.fast ? 2 : 1}</button>
       <button class="btn small ghost" data-d="help" aria-label="Règles du combat">?</button>
       <button class="btn small ghost cb-pass dv-end" data-d="end" aria-label="Passer le tour" title="Passer le tour"><img class="cb-pass-i" alt="" src="assets/ui/cb-passer2.webp" onerror="this.remove()"><span class="cb-pass-f">${icon('skip')}</span></button>
@@ -113,9 +113,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
           ${st.init ? '<span class="cb-pips" hidden></span>' : '<span class="cb-ap"><small>PA</small><span class="cb-pips"></span></span>'}
           <span class="cb-fv"><small>Ferveur</small><span class="cb-gems"></span></span>
           <span class="cb-ult"><img class="cb-pw" alt="" src="assets/icons/power.webp"><b>${esc(ult.name)}</b><small></small></span>
-        </button>` : `<div class="cb-res cb-res-nopw" title="Ferveur : sert à l’Assaut conjoint">
+        </button>` : `<button class="cb-res cb-res-nopw" data-d="fervor" aria-label="Ferveur : à quoi elle sert">
           ${st.init ? '<span class="cb-pips" hidden></span>' : '<span class="cb-ap"><small>PA</small><span class="cb-pips"></span></span>'}
-          <span class="cb-fv"><small>Ferveur</small><span class="cb-gems"></span></span></div>`}
+          <span class="cb-fv"><small>Ferveur</small><span class="cb-gems"></span></span><span class="cb-fvh">Assaut conjoint · ${DUO_FERVOR}</span><span class="cb-fvq">?</span></button>`}
       </div>
     </div>
   </div>`;
@@ -1318,6 +1318,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         return;
       }
       if (k === 'help') return help();
+      if (k === 'fervor') return fervorSheet();
       if (k === 'speed') { ui.fast = ui.fast ? 0 : 1; g.setSetting('combatFast', !!ui.fast); b.textContent = `×${ui.fast ? 2 : 1}`; b.classList.toggle('on', !!ui.fast); b.setAttribute('aria-pressed', String(!!ui.fast)); app.sfx.tap(); return; }
       if (k === 'rule') return ruleSheet(b.dataset.k);
       if (k === 'reserve') return reserveSheet();
@@ -1442,13 +1443,20 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     if (u.guardBy) s.push('Protégé par un Rempart.');
     return s.join(' ');
   }
+  function fervorSheet() { /* v827 : à quoi sert la Ferveur quand l'équipe n'a pas de pouvoir d'équipe */
+    openSheet(`<h2>La Ferveur</h2>
+      <p>Une réserve commune à toute ton équipe (${FERVOR_MAX} au plus, ${st.fervor} en ce moment).</p>
+      <p><b>Elle se gagne</b> en attaquant, en exploitant une faiblesse, en esquivant (+1), en parant au dernier instant (+2) et en brisant un ennemi (+2).</p>
+      <p><b>Elle sert à l’Assaut conjoint</b> (${DUO_FERVOR} Ferveur, une fois par combat) : sur un ennemi Fêlé, Brisé ou Marqué, ta créature et celle qui joue juste après frappent ensemble. Il apparaît dans les actions quand c’est possible.</p>
+      <p class="small muted">Avec une Mythique ou une Secrète dans l’équipe, la Ferveur pleine lance aussi un pouvoir d’équipe.</p>`, { label: 'Ferveur' });
+  }
   function help() {
     openSheet(`<h2>Le combat</h2><ul class="small">
       <li><b>Chacun son tour</b> : toutes les créatures, les tiennes et les ennemies, jouent une fois par tour, dans l’ordre de leur vitesse. L’ordre s’affiche en haut de l’écran ; « T2 » marque le début du tour suivant. Quand c’est le tour d’une de tes créatures, ses actions s’ouvrent : choisis l’action, puis la cible. Raccourci : touche un ennemi pour l’attaquer.</li>
       <li><b>PA</b> (points d’action, ${PA_MAX} au plus) : chaque créature a les siens. Elle en gagne 1 au début de chacun de ses tours, 1 en attaquant, 1 en se défendant et 1 sur une parade parfaite. Ses compétences les dépensent : alterne attaques et compétences, et fais jouer toute ton équipe.</li>
       <li><b>Attaque</b> (gratuite, +1 PA) : dégâts fiables, +1 Ferveur. <b>Défense</b> (gratuite, +1 PA) : −50 % de dégâts jusqu’à son prochain tour. <b>Passer</b> : elle ne fait rien. <b>Permuter</b> (une fois par tour) : une créature de la réserve prend sa place et joue tout de suite ; PV, PA et états sont gardés, et la réserve récupère 10 % de PV par tour. En entrant, elle déclenche un petit effet lié à son rôle (bouclier, soin, Ferveur, ralentissement…).</li>
       <li><b>Brisure</b> : en visant une élite ou un gardien, la cible affiche la Brisure que ton coup va infliger (◆), et « BRISE ! » quand il va le briser. Un seul coup ne retire jamais plus de 40 % des PV d’un gardien.</li>
-      <li><b>Ferveur</b> (${FERVOR_MAX} au plus, commune à l’équipe ; tu en gardes 3 au plus d’un combat à l’autre) : attaques, faiblesses, esquives (+1), parades parfaites (+2) et Brisures (+2) la remplissent. Pleine, elle lance le <b>pouvoir d’équipe</b> (<span class="cb-hult">${esc(ult.name)} : ${esc(ult.desc)}</span>), pendant le tour d’une de tes créatures, sans le terminer.</li>
+      <li><b>Ferveur</b> (${FERVOR_MAX} au plus, commune à l’équipe ; tu en gardes 3 au plus d’un combat à l’autre) : attaques, faiblesses, esquives (+1), parades parfaites (+2) et Brisures (+2) la remplissent. ${ult ? `Pleine, elle lance le <b>pouvoir d’équipe</b> (<span class="cb-hult">${esc(ult.name)} : ${esc(ult.desc)}</span>), pendant le tour d’une de tes créatures, sans le terminer.` : `Ton équipe n’a pas de pouvoir d’équipe (il faut une Mythique ou une Secrète) : la Ferveur sert à l’<b>Assaut conjoint</b>.`}</li>
       <li><b>Voir une carte</b> : garde le doigt appuyé sur une carte (ennemie ou alliée) pour ouvrir sa fiche : PV, attaque, intention, passifs. Un toucher court sur un ennemi attaque toujours directement.</li>
       <li><b>Défense active</b> (toutes les attaques ennemies) : coup simple, touche dans l’or pour esquiver (ta créature est éraflée, +1 Ferveur), sur le trait blanc, au tout dernier instant, pour parer (aucun dégât, +1 PA, +2 Ferveur, Brisure, contre-attaque des Protecteurs et des Attaquants) ; coup chargé, il frappe plus fort mais se défend du même toucher ; enchaînement, le curseur repasse pour chaque coup (tout parer pour une parade parfaite, un raté sur trois coups = éraflé) ; feinte, le curseur s’arrête puis fonce. Chaque famille d’ennemis a son rythme. La grosse attaque de chaque gardien est un <b>Assaut</b> : une longue séquence, toujours la même pour lui.</li>
       <li><b>Dés</b> : Coup d’estoc, Contagion et Entrave lancent un D20 contre une difficulté (DD). 1 : échec critique ; sous le DD : réussite partielle ; DD atteint : réussite ; 20 : critique. Marque, gel, Brisure et faiblesse donnent des bonus.</li>

@@ -8165,3 +8165,88 @@ html.fx-light .dv.cb.cb2 .cb-res.ready .cb-gems i.on { animation: none; }
 .dv.cb.cb2 .dv-row::before { left: -2%; right: -2%; bottom: -6px; }
 @media (max-height: 720px) { .dv.cb.cb2 .dv-row.ally { padding-bottom: 24px !important; } .dv.cb.cb2 .dv-row.enemy { padding-bottom: 20px !important; } }
 .dv.cb.cb2 .dv-row.enemy::before { left: -6%; right: -6%; }
+
+/* v827 (capture du propriétaire, iPhone 430 × 932) : la zone réservée du bas était comptée deux fois (vide sous le menu),
+   titre et médaillons du haut coupés, cartes trop petites, barre de vie coincée entre les médaillons ATQ / PV,
+   intentions ennemies qui se chevauchaient, Ferveur trop grosse. */
+.dv.cb.cb2 .cb-dock { margin: 0 2px 2px; gap: 5px; padding: 12px 14px 9px; }
+.dv.cb.cb2 .dv-top { min-height: 40px; }
+.dv.cb.cb2 .dv-top > b { flex: 0 1 auto; min-width: 0; max-width: none; font-size: .68rem; letter-spacing: .04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dv.cb.cb2 .dv-top .row.gap { flex: none; }
+.dv.cb.cb2 .dv-top .cb-rules { flex: 1 1 0; height: 40px; overflow: hidden; gap: 3px; }
+.dv.cb.cb2 .dv-top .cb-law { width: 28px; height: 28px; }
+.dv.cb.cb2 .dv-top .cb-law img, .dv.cb.cb2 .dv-top .cb-law svg, .dv.cb.cb2 .dv-top .cb-law .icon { width: 18px; height: 18px; }
+.dv.cb.cb2 .dv-top .cb-law > small { right: -3px; bottom: -3px; }
+.dv.cb.cb2 .cb-feed { height: 44px; }
+.dv.cb.cb2 .cb-fd-p { width: 32px; height: 32px; }
+/* cartes plus grandes : moins de marges dans les rangées */
+.dv.cb.cb2 .dv-row.enemy { padding: 20px 0 18px !important; }
+.dv.cb.cb2 .dv-row.ally { padding: 14px 0 18px !important; }
+.dv.cb.cb2 .cb-gap { margin: 1px 18%; }
+.dv.cb.cb2 .dv-row .dv-c { width: min(calc((100cqw - 18px) / 3), 71cqh, 170px) !important; }
+/* barre de vie sous la carte, sur toute sa largeur, plus coincée entre les médaillons */
+.dv.cb.cb2 .dv-hpb { left: 6%; right: 6%; bottom: -11px; height: 5px; }
+.dv.cb.cb2 .dv-c .dv-atk, .dv.cb.cb2 .dv-c .dv-hp { z-index: 5; }
+/* intentions ennemies : jamais plus larges que leur carte */
+.dv.cb.cb2 .cb-above { left: -4px; right: -4px; }
+.dv.cb.cb2 .cb-above > * { max-width: 100%; box-sizing: border-box; min-width: 0; }
+.dv.cb.cb2 .cb-oint { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .66rem; padding: 2px 6px; }
+.dv.cb.cb2 .cb-oint > b { font-size: .8rem; }
+/* barre du bas mince : réserve et Ferveur sur une seule ligne */
+.dv.cb.cb2 .cb-res { min-height: 34px !important; padding-top: 3px !important; padding-bottom: 3px !important; }
+.dv.cb.cb2 .cb-fv { flex-direction: row; align-items: center; gap: 8px; }
+.dv.cb.cb2 .cb-fv > small { flex: none; }
+.dv.cb.cb2 .cb-rsv2 { flex-direction: row; gap: 5px; padding: 3px 6px; }
+.dv.cb.cb2 .cb-rsv2 > small { writing-mode: vertical-rl; transform: rotate(180deg); font-size: .48rem; }
+.dv.cb.cb2 .cb-rm { width: 22px; height: 30px; }
+.dv.cb.cb2 .cb-res-nopw { font: inherit; color: inherit; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+.dv.cb.cb2 .cb-fvq { flex: none; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; border: 1px solid rgba(242, 193, 78, .6); color: #F2C14E; font: 800 .7rem/1 var(--f-ui); }
+@media (max-height: 720px) {
+  .dv.cb.cb2 .dv-row.enemy { padding: 18px 0 16px !important; }
+  .dv.cb.cb2 .dv-row.ally { padding: 12px 0 16px !important; }
+  .dv.cb.cb2 .cb-feed { height: 40px; }
+}
+.dv.cb.cb2 .dv-hpb { bottom: -18px; left: 3%; right: 3%; }
+.dv.cb.cb2 .dv-row.enemy { padding-bottom: 24px !important; }
+.dv.cb.cb2 .dv-row.ally { padding-bottom: 24px !important; }
+.dv.cb.cb2 .cb-res .cb-gems { flex: 0 0 auto; min-width: 0; }
+.dv.cb.cb2 .cb-res .cb-gems i { flex: none; width: 7px !important; min-width: 7px; }
+.dv.cb.cb2 .cb-res .cb-fv { flex: 0 0 auto; }
+.dv.cb.cb2 .cb-res .cb-fv > small { font-size: .56rem; }
+.dv.cb.cb2 .cb-res .cb-ult { flex: 1 1 auto; min-width: 0; }
+.dv.cb.cb2 .cb-res .cb-ult b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .7rem; }
+@media (max-height: 720px) { .dv.cb.cb2 .dv-row.enemy, .dv.cb.cb2 .dv-row.ally { padding-bottom: 22px !important; } }
+.dv.cb.cb2 .cb-res .cb-ult b { letter-spacing: 0; font-size: .66rem; text-transform: none; }
+.dv.cb.cb2 .cb-res .cb-fv > small { letter-spacing: .03em; }
+.dv.cb.cb2 .cb-res .cb-ult { gap: 4px; }
+@media (max-height: 720px) {
+  .dv.cb.cb2 .cb-feed { height: 36px; }
+  .dv.cb.cb2 .cb-fd-p { width: 28px; height: 28px; }
+  .dv.cb.cb2 .cb-fd-l2 em { -webkit-line-clamp: 1; }
+  .dv.cb.cb2 .dv-row.enemy { padding: 16px 0 21px !important; }
+  .dv.cb.cb2 .dv-row.ally { padding: 6px 0 21px !important; }
+  .dv.cb.cb2 .cb-idle { min-height: 96px; }
+  .dv.cb.cb2 .cb-dock { padding: 10px 12px 7px; gap: 4px; }
+  .dv.cb.cb2 .cb-res { min-height: 30px !important; }
+}
+.dv.cb.cb2 .dv-top .cb-rules { flex: 0 0 auto; overflow: visible; }
+.dv.cb.cb2 .dv-top > b { flex: 1 1 auto; }
+@media (max-width: 400px) {
+  .dv.cb.cb2 .dv-top > b { font-size: .6rem; letter-spacing: .02em; }
+  .dv.cb.cb2 .cb-res:not(.cb-res-nopw) .cb-fv > small { display: none; }
+}
+@media (max-width: 400px) {
+  .dv.cb.cb2 .cb-res:not(.cb-res-nopw) .cb-fv > small { display: none !important; }
+  .dv.cb.cb2 .dv-top .dv-tt2 { display: none; }
+}
+@media (max-width: 400px) {
+  .dv.cb.cb2 .dv-top { gap: 4px; }
+  .dv.cb.cb2 .dv-top > b { flex: none; padding-left: 12px !important; padding-right: 12px !important; }
+  .dv.cb.cb2 .dv-top .row.gap { gap: 4px; }
+  .dv.cb.cb2 .dv-top .cb-rules { gap: 2px; }
+  .dv.cb.cb2 .dv-top .cb-law { width: 25px; height: 25px; }
+  .dv.cb.cb2 .dv-top .cb-law img, .dv.cb.cb2 .dv-top .cb-law svg, .dv.cb.cb2 .dv-top .cb-law .icon { width: 16px; height: 16px; }
+  .dv.cb.cb2 .dv-top .cb-law.cb-runes { padding: 0 4px; }
+  .dv.cb.cb2 .dv-top .cb-law.cb-runes img { width: 10px; height: 10px; }
+}
+.dv.cb.cb2 .cb-fvh { flex: 1 1 auto; min-width: 0; text-align: right; font-size: .62rem; color: #B9AE9C; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

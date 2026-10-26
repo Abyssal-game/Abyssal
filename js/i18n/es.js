@@ -8833,6 +8833,14 @@ export default {
   "Barrière −{0} ({1})": "Barrera −{0} ({1})",
   "La barrière se brise": "La barrera se rompe",
   "Dégâts annoncés sur cette créature": "Daño anunciado sobre esta criatura",
+  "Assaut conjoint · {0}": "Asalto conjunto · {0}",
+  "Ferveur : à quoi elle sert": "Fervor: para qué sirve",
+  "La Ferveur": "El Fervor",
+  "Une réserve commune à toute ton équipe ({0} au plus, {1} en ce moment).": "Una reserva común a todo tu equipo ({0} como máximo, {1} ahora mismo).",
+  "Elle se gagne en attaquant, en exploitant une faiblesse, en esquivant (+1), en parant au dernier instant (+2) et en brisant un ennemi (+2).": "Se gana atacando, aprovechando una debilidad, esquivando (+1), parando en el último instante (+2) y quebrando a un enemigo (+2).",
+  "Elle sert à l’Assaut conjoint ({0} Ferveur, une fois par combat) : sur un ennemi Fêlé, Brisé ou Marqué, ta créature et celle qui joue juste après frappent ensemble. Il apparaît dans les actions quand c’est possible.": "Sirve para el Asalto conjunto ({0} de Fervor, una vez por combate): contra un enemigo Agrietado, Quebrado o Marcado, tu criatura y la que juega justo después golpean juntas. Aparece entre las acciones cuando es posible.",
+  "Avec une Mythique ou une Secrète dans l’équipe, la Ferveur pleine lance aussi un pouvoir d’équipe.": "Con una Mítica o una Secreta en el equipo, el Fervor lleno también lanza un poder de equipo.",
+  "Ton équipe n’a pas de pouvoir d’équipe (il faut une Mythique ou une Secrète) : la Ferveur sert à l’Assaut conjoint.": "Tu equipo no tiene poder de equipo (hace falta una Mítica o una Secreta): el Fervor sirve para el Asalto conjunto.",
 };
 
 export const names = {
