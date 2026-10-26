@@ -8,7 +8,7 @@ import { sfx, haptic, hasSample, playVoice, loadVoice, clearVoices, getBytes, li
 import { musicCinema, musicRelease } from '../ui/music.js';
 
 /* v787 : signatures peintes dans la langue de la cinématique (assets/fin/sig-<clé>-<langue>.webp) ; ajouter la langue ici à l'arrivée des images, sinon le français */
-const SIG_LANGS = new Set(['en', 'es', 'de', 'it']);
+const SIG_LANGS = new Set(['en', 'es', 'de', 'it', 'pt']);
 const sigSrc = (k, l) => `assets/fin/sig-${k}${l !== 'fr' && SIG_LANGS.has(l) ? '-' + l : ''}.webp`;
 const NAMES = [['braise', 'La Scelleuse de Braise'], ['fosses', 'Le Scelleur des Fosses'], ['cieux', 'La Scelleuse des Cieux'], ['bois', 'Le Scelleur des Bois'], ['tombes', 'La Scelleuse des Tombes'], ['montagnes', 'Le Scelleur des Montagnes']]; /* v774 : une signature peinte par Scelleur */
 
