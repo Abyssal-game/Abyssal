@@ -155,6 +155,8 @@ const tracks = {}, trackGet = {}; let trackList = null, trackLoad = null, recent
 const TRACK_GAIN = { duels: 1.3, boss: 1.26, boutique: 1.19, descente: 1.19, abysse: 1.26 };
 // v442 : musique jouée une fois depuis le début, puis boucle sur un passage (secondes) ; le fichier est préparé pour que la fin du passage s'enchaîne sur son début
 const TRACK_LOOP = { abysse: [50, 142] };
+// v782 : musiques des cinématiques jouées une seule fois (le fichier finit par un fondu de 2,5 s), jamais en boucle
+const NO_LOOP = new Set(['prologue', 'fin']);
 // Seule la liste est lue au démarrage ; chaque musique est téléchargée la première fois que son lieu est visité
 function loadTracks() {
   if (trackLoad) return;
@@ -170,7 +172,7 @@ function needTrack(key) {
 // v563 : position voulue d'une musique calée (en tenant compte du retard de la sortie audio)
 const heldPos = (key, dur) => (hold && hold.key === key ? ((hold.off + (performance.now() - hold.at) / 1000 + (ctx.outputLatency || ctx.baseLatency || 0)) % dur + dur) % dur : 0);
 function fileSource(grp, key, fade) {
-  const t = ctx.currentTime, s = ctx.createBufferSource(); s.buffer = tracks[key]; s.loop = true;
+  const t = ctx.currentTime, s = ctx.createBufferSource(); s.buffer = tracks[key]; s.loop = !NO_LOOP.has(key);
   if (TRACK_LOOP[key]) { s.loopStart = TRACK_LOOP[key][0]; s.loopEnd = Math.min(TRACK_LOOP[key][1], s.buffer.duration); }
   const g = ctx.createGain(), lvl = 1.6 * (TRACK_GAIN[key] || 1); // les fichiers sont mixés plus bas que les ambiances calculées
   if (fade) { g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(lvl, t + fade); } else g.gain.value = lvl;
