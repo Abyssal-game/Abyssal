@@ -64,6 +64,7 @@ export default function settings(app, root) {
     return `<section class="panel stack">
         <h2>Langue</h2>
         <div class="seg lang-grid" role="radiogroup" aria-label="Langue" translate="no">${Object.entries(LANGS).map(([k, l]) => `<button class="seg-b" role="radio" data-act="lang" data-v="${k}" aria-checked="${LANG === k}" aria-pressed="${LANG === k}">${l}</button>`).join('')}</div>
+        ${LANG !== 'fr' ? `<p class="small muted set-note">Une traduction te semble fausse ou maladroite ? <a href="mailto:contact@abyssal-game.fr?subject=${encodeURIComponent(`Traduction ${LANGS[LANG]}`)}">Écris-nous</a> : dis-nous l’écran, le texte et ta proposition.</p>` : ''} ${'' /* v796 : relecture par les joueurs natifs */}
       </section>
       <!-- v699 : le combat juste après la langue (réglage le plus utilisé) ; les ambiances repliées -->
       <section class="panel stack">

@@ -7364,3 +7364,12 @@ html.fx-light .dv.grace::after { display: none; }
 .tn-rank li.me { background: rgba(212, 175, 90, .15); }
 .tn-fr:empty { display: none; }
 .tn-fr { margin-top: 10px; }
+
+/* v796 : japonais et coréen : les lettres latines gardent les polices du jeu, les caractères japonais et coréens
+   prennent une police à empattements du téléphone (Hiragino Mincho / Apple Myungjo sur iPhone), moins d'espacement */
+html:lang(ja) { --f-display: 'Cinzel', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif CJK JP', 'Noto Serif JP', serif; --f-lore: 'Alegreya', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif CJK JP', serif; --f-ui: 'Alegreya Sans', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans CJK JP', system-ui, sans-serif; }
+html:lang(ko) { --f-display: 'Cinzel', 'AppleMyungjo', 'Nanum Myeongjo', 'Noto Serif CJK KR', 'Noto Serif KR', serif; --f-lore: 'Alegreya', 'AppleMyungjo', 'Nanum Myeongjo', 'Noto Serif CJK KR', serif; --f-ui: 'Alegreya Sans', 'Apple SD Gothic Neo', 'Noto Sans CJK KR', system-ui, sans-serif; }
+html:lang(ja) body { line-break: strict; }
+html:lang(ko) body { word-break: keep-all; overflow-wrap: anywhere; }
+html:lang(ja) :is(h1, h2, h3, h4, .section-title, .btn, .tab, .sn-tab), html:lang(ko) :is(h1, h2, h3, h4, .section-title, .btn, .tab, .sn-tab) { letter-spacing: .02em; }
+html:lang(ja) :is(.lore, i, em), html:lang(ko) :is(.lore, i, em) { font-style: normal; }
