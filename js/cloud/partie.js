@@ -6,7 +6,7 @@
 // Tant que le serveur de partie n'est pas en place (fonction pas publiée, SQL pas collé), l'ancien système reste (« legacy »).
 import * as cloud from './cloud.js';
 import { recordOps } from '../core/oprec.js';
-import { FREE, FREE_DEV, getPath, setPath, clone, digest } from '../core/ops.js';
+import { FREE, FREE_DEV, getPath, setPath, mergeFree, clone, digest } from '../core/ops.js';
 import { migrate } from '../core/save.js';
 import { toast } from '../ui/dom.js';
 
@@ -63,7 +63,7 @@ export function adopt(data) {
   const back = openFights(data).filter((k) => !openFights(g.s).includes(k));
   if (back.length) { noteErrs([{ q: 0, m: 'adopt' }], { 0: `combat repris du serveur (${back.join(', ')})` }); toast('Le serveur n’a pas reçu la fin de ce combat : il reprend là où le serveur l’a compté.', { kind: 'error', ms: 6000 }); }
   const m = clone(data);
-  for (const p of [...FREE, ...FREE_DEV]) { const v = getPath(g.s, p); if (v !== undefined) setPath(m, p, clone(v)); }
+  for (const p of [...FREE, ...FREE_DEV]) { const v = getPath(g.s, p); if (v !== undefined) setPath(m, p, clone(mergeFree(p, getPath(data, p), v))); } /* v810 : « déjà vu » réunis */
   waiting = null;
   g.replaceSave(migrate(m));
   app.applySettings?.();

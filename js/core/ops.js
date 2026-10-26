@@ -60,6 +60,16 @@ export const SESS = ['descent.run.battle', 'trials.battle', 'sceaux.cur', 'pacte
 // Réglages et petites marques de l'interface : libres (ils ne rapportent rien). Les outils du Mode Créateur seulement au créateur.
 export const FREE = ['settings', 'tips', 'seenIntro', 'giftShown', 'notifAsked', 'storySeen', 'lore', 'armyNews', 'shadow.asked', 'shadow.drew'];
 export const FREE_DEV = ['devForce', 'devGames', 'devCodex'];
+/* v810 : marques « déjà vu » (guide, cadeau, bulles, récits, Tirage) : réunies au lieu d'être écrasées. Avant, un téléphone remis à
+   neuf (déconnexion) envoyait « guide pas vu » à la connexion d'un ancien compte, qui revoyait le prologue et le guide. */
+const MERGE_FREE = new Set(['seenIntro', 'giftShown', 'notifAsked', 'tips', 'storySeen', 'shadow.asked', 'shadow.drew']);
+export function mergeFree(p, cur, inc) {
+  if (!MERGE_FREE.has(p) || cur == null) return inc;
+  if (inc == null) return cur;
+  if (typeof cur === 'object' && typeof inc === 'object' && !Array.isArray(cur) && !Array.isArray(inc)) { const o = { ...cur }; for (const [k, v] of Object.entries(inc)) o[k] = mergeFree(p, cur[k] ?? null, v); return o; }
+  if (typeof cur === 'boolean' || typeof inc === 'boolean') return cur || inc;
+  return inc > cur ? inc : cur;
+}
 
 export const getPath = (o, p) => p.split('.').reduce((x, k) => (x == null ? undefined : x[k]), o);
 export function setPath(o, p, v) {

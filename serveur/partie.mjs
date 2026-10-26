@@ -7,7 +7,7 @@ import { migrate, defaultSave } from '../js/core/save.js';
 import { SAVE_KEY } from '../js/config.js';
 import { lineupStake, leagueIdx } from '../js/core/versus.js';
 import { friendCard } from '../js/core/friends.js';
-import { OPS, FREE, FREE_DEV, setPath, clone, digest, argsOk } from '../js/core/ops.js';
+import { OPS, FREE, FREE_DEV, setPath, getPath, mergeFree, clone, digest, argsOk } from '../js/core/ops.js';
 import { catalogue } from './catalogue.mjs';
 
 export const PARTIE_VERSION = 1;
@@ -140,7 +140,7 @@ export async function handle({ uid, token, body }, { db, now = () => Date.now(),
     // réglages et marques de l'interface (libres), outils du Mode Créateur (créateur seulement)
     // v574 : appliqués AVANT de rejouer les actions (un achat à l'Échoppe juste après l'ouverture de l'aperçu était refusé)
     if (b.free && typeof b.free === 'object') {
-      for (const p of FREE) { const v = b.free[p]; if (v !== undefined && JSON.stringify(v).length < 20000) setPath(g.s, p, clone(v)); }
+      for (const p of FREE) { const v = b.free[p]; if (v !== undefined && JSON.stringify(v).length < 20000) setPath(g.s, p, clone(mergeFree(p, getPath(g.s, p), v))); } /* v810 */
       if (creator) for (const p of FREE_DEV) { if (b.free[p] !== undefined) setPath(g.s, p, clone(b.free[p])); }
       if (!creator && g.s.settings) g.s.settings.dev = false;
     }

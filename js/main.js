@@ -498,7 +498,7 @@ async function boot() {
     let done = false;
     const finish = () => { if (done) return; done = true; applySettings(); render(); bootEl.classList.add('out'); setTimeout(() => bootEl.remove(), 900); setTimeout(() => showGate(app, () => showWelcome(app)), 700); setTimeout(() => resumeOpening(app), 3000); setTimeout(() => resumeEnding(app), 3200); /* v793 : fin coupée rejouée */ /* v767 : ouverture coupée par l'iPhone : la revoir */ };
     // v325 : compte obligatoire — après une déconnexion ou une suppression du compte, l'écran de compte revient
-    onAuth((sess) => { if (!sess && done) setTimeout(() => showGate(app), 300); if (sess) syncPush(app).catch(() => {}); }); /* v693 : notifications du serveur pour le compte connecté */
+    onAuth((sess) => { if (!sess && done) { app._proPlayed = false; setTimeout(() => showGate(app, () => showWelcome(app)), 300); } /* v810 : un nouveau compte créé après une déconnexion voit aussi l'annonce, le prologue et le guide */ if (sess) syncPush(app).catch(() => {}); }); /* v693 : notifications du serveur pour le compte connecté */
     // v293 : iPhone et navigateurs n'autorisent le son qu'après un premier toucher. L'écran d'ouverture attend donc
     // « Touche pour entrer » : ce toucher lance la musique et les sons dès l'arrivée au menu (sauf si on a déjà touché l'écran, ex. code d'accès).
     setTimeout(() => {
