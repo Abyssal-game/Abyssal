@@ -495,7 +495,7 @@ const sampleKey = (k, a) => {
 };
 // v308 (audit audio mesuré à l'ffmpeg) : volume propre à certains fichiers, et aigus adoucis pour ceux qui sonnaient comme des bips
 const SAMPLE_GAIN = { 'reveal-c': 7, chest: 1.4, tear: 1.4, bossvictory: 1.26, 'reveal-s': 1.5, 'reveal-s-full': 1.5, 'reveal-m': 1.2, 'reveal-m-full': 1.2, // v720 : nouveaux sons ElevenLabs (v329 : 2,2 pour l'ancien) : la Secrète doit claquer (demande du propriétaire) ; le compresseur du bus évite la saturation
-  unlock: 1.6, 'pa-bank': 3, 'cr-miss': 2, 'cr-flip': 1.6, 'pa-guard': 1.3 }; /* v439 */
+  unlock: 1.6, 'ci-reveil': 0.65, 'ci-trophee': 0.7, 'ci-page': 1.6, 'ci-dechirer': 1.4, /* v780 : bruitages des cinématiques */ 'pa-bank': 3, 'cr-miss': 2, 'cr-flip': 1.6, 'pa-guard': 1.3 }; /* v439 */
 const SAMPLE_LOWPASS = { yourturn: 1200, passive: 1200, mark: 1400 };
 const lastPlay = {}, playing = {};
 let risenAt = -1e9;
