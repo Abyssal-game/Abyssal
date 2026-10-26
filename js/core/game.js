@@ -79,7 +79,7 @@ export const TRIALS = [
 // Réglage mesuré (pilote automatique, défense moyenne : 40 % d'esquives, 15 % de parades ; 8 profils d'équipe × 30 jours) :
 // environ 55 % de victoires au combat, 61 % à l'élite, 57 % au gardien ; un joueur qui défend à la main fait mieux.
 export const TRIAL_OFFSET = [11, 11, 9]; // étages en plus (se resserre avec la force)
-export const TRIAL_MULT = [1.4, 1.95, 1.35];
+export const TRIAL_MULT = [1.61, 2.24, 1.55]; // v800 : +15 % (le propriétaire gagnait trop facilement)
 export const TRIAL_RAR = 1; // PV et attaque des ennemis
 export const AWAKEN_AT = 30;   // gardiens éveillés à partir de cet étage
 

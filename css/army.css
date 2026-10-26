@@ -7398,3 +7398,11 @@ html.kb-open .sheet-wrap:not(.sheet-full) .sheet { max-height: 100%; overflow-y:
 .dv .cb-banner.synergy::before { left: 10px; }
 .dv .cb-banner.synergy::after { right: 10px; transform: scaleX(-1); }
 .dv .cb-banner.synergy .syn-t { display: block; white-space: nowrap; }
+/* v800 : vidéo du propriétaire (saccades de 2 s quand la barre de défense apparaît) : pendant la barre, plus rien ne
+   bouge à part elle. Le voile rouge ne bat plus (un pseudo-élément plein écran dont l'opacité change se redessine
+   en entier à chaque image sur l'iPhone), les boucles des cartes, des intentions et des boutons sont en pause,
+   le bandeau « Tour ennemi » disparaît, et la caméra ne bouge plus (duel-ui.js). */
+.dv.qte-on::after { animation: none !important; opacity: .85; }
+.dv.qte-on .dv-row, .dv.qte-on .dv-row *, .dv.qte-on .dv-row *::before, .dv.qte-on .dv-row *::after,
+.dv.qte-on .cb-a, .dv.qte-on .cb-a::after, .dv.qte-on .dv-int, .dv.qte-on .cb-int, .dv.qte-on .cb-warn, .dv.qte-on .dv-threat { animation-play-state: paused !important; }
+.dv.qte-on .cb-banner { display: none; }
