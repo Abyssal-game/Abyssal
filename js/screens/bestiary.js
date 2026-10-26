@@ -148,7 +148,7 @@ export default function bestiary(app, root) {
     if (q) q.addEventListener('input', (e) => { st.q = e.target.value; const pos = e.target.selectionStart; render(); const n = root.querySelector('#best-q'); n.focus(); n.setSelectionRange(pos, pos); });
   }
   bindActions(root, {
-    tab(el) { st.tab = el.dataset.v; render(); },
+    tab(el) { st.tab = el.dataset.v; render(); window.scrollTo(0, 0); },
     fac(el) { st.faction = el.dataset.v; render(); },
     card() {},
     ending() { playEnding(app, { intro: false }); },

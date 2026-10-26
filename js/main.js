@@ -277,7 +277,7 @@ function pulseWallet() {
   lastShards = s.shards;
 }
 
-// Mémoire de défilement : chaque page retrouve sa position quand on y revient.
+// Position de défilement : gardée quand une page se redessine ; v802 : une page ouverte (ou rouverte) commence toujours en haut.
 const scrollMem = new Map();
 let scrollKey = null;
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -295,7 +295,7 @@ function render() {
   const key = location.hash || '#/';
   if (app.curHash !== key) { app.prevHash = app.curHash; app.curHash = key; }
   const same = key === scrollKey;
-  const keepY = same ? window.scrollY : (scrollMem.get(key) || 0);
+  const keepY = same ? window.scrollY : 0; /* v802 : toute page s’ouvre en haut (avant : position gardée de la dernière visite) */
   scrollKey = null; // pas d'enregistrement pendant le changement de page
   const screen = ROUTES[route] || homeScreen;
   if (app.cleanup) { try { app.cleanup(); } catch (e) { /* rien */ } app.cleanup = null; }

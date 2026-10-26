@@ -247,7 +247,7 @@ export default function collection(app, root, params) {
     },
     reset() { resetAll(); apply(); },
     seen() { g.markAllSeen(); drawGrid(); },
-    view(el) { st.view = el.dataset.v; drawBar(); drawView(); },
+    view(el) { st.view = el.dataset.v; drawBar(); drawView(); window.scrollTo(0, 0); },
     afac(el) { app.sfx?.sheet?.(); st.albumFac = el.dataset.v; st.albumPage = 0; drawAlbum(); }, // v359 : un petit froissement de page à chaque faction
   });
   let tq;

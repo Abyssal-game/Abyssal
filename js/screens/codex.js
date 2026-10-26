@@ -293,7 +293,6 @@ export default function codexScreen(app, root) {
       <nav class="cx-tabs2" aria-label="Codex et Échoppe">${[['codex', 'Le Codex', 'Paliers de la saison', 'book'], ['shop', 'L’Échoppe', 'Cosmétiques', 'obsidienne']].map(([k, l, sub, ic]) => `<button class="cx-tab2 t-${k}" data-cx="tab" data-v="${k}" aria-pressed="${ui.tab === k}"><img alt="" src="assets/icons/${ic}.webp"><span><b>${l}</b><small>${sub}</small></span></button>`).join('')}</nav>
       ${ui.tab === 'shop' ? shopTab() : g.codexOn() ? codexTab() : soonTab()}
       ${g.s.settings?.dev ? devTab() : ''}`);
-    if (ui.tab !== 'shop' && !ui.scrolled) { ui.scrolled = true; requestAnimationFrame(() => document.getElementById('cx-now')?.scrollIntoView({ block: 'center' })); }
   }
 
 
@@ -429,7 +428,7 @@ export default function codexScreen(app, root) {
     const b = e.target.closest('[data-cx]'); if (!b) return;
     const k = b.dataset.cx;
     try {
-      if (k === 'tab') { ui.tab = b.dataset.v; app.sfx.tap?.(); return draw(); }
+      if (k === 'tab') { ui.tab = b.dataset.v; app.sfx.tap?.(); draw(); window.scrollTo(0, 0); return; } /* v802 : en haut */
       if (k === 'claim') { g.codexClaim(b.dataset.tr, +b.dataset.t); app.sfx.chest?.(); toast('Récompense du Codex récupérée.', { kind: 'success', icon: 'star' }); }
       if (k === 'all') { const got = g.codexClaimAll(); app.sfx.chest?.(); toast(`${got.length} récompense${got.length > 1 ? 's' : ''} du Codex récupérée${got.length > 1 ? 's' : ''}.`, { kind: 'success', icon: 'star' }); }
       if (k === 'buy') { if (!(await pay(b.dataset.id))) return; }

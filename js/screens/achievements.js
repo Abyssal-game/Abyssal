@@ -61,7 +61,7 @@ export default function achievements(app, root, params) {
     lazyArt(root);
   }
   bindActions(root, {
-    tab(el) { st.tab = el.dataset.v; render(); },
+    tab(el) { st.tab = el.dataset.v; render(); window.scrollTo(0, 0); },
   });
   root.addEventListener('click', (e) => {
     const t = e.target.closest('.strip .tcg');
