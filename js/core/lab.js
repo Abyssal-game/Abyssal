@@ -51,7 +51,7 @@ export function labBattle(g, { floor = 1, room = 'fight', level = 'mine', hp = 1
   }
   const al = labAllies(g, floor, level);
   const lead = al.cards[0] ? g.catalog.get(al.cards[0]) : null, uk = ultOf(lead);
-  const ult = { key: uk, ...ULTS[uk], card: lead?.id || null, power: 1 };
+  const ult = { key: uk, ...(ULTS[uk] || {}), card: lead?.id || null, power: 1 };
   const st = createDuel(al.units, enemies, { fervor: FERVOR_START, ult: uk, power: 1, known: {}, boss: room === 'boss' ? bossOf(floor) : null,
     seed: seed ?? ((Date.now() + seedN++ * 7919) % 2147483647), refPow: refPowFor(floor) });
   if (attacks?.length) { labKinds(attacks); st.labAtk = attacks.map((a, i) => (a.on === false ? -1 : i)).filter((i) => i >= 0); } /* v596 : attaques inventées */

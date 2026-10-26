@@ -43,10 +43,9 @@ export function levelFromDups(d = 0) {
 };
 
 // ——— Pouvoir ultime (un seul par équipe) ————————————————————————————————
-// Sans Mythique ni Secrète, l'équipe a le Sceau du Serment. Une Mythique ou une Secrète
-// de l'équipe le remplace par son pouvoir, selon sa faction.
+// v820 : seule une Mythique ou une Secrète de l'équipe donne un pouvoir, selon sa faction
+// (le Sceau du Serment, pouvoir des équipes sans Mythique ni Secrète, est supprimé).
 export const ULTS = {
-  sceau:  { name: 'Sceau du Serment', color: '#E8C35A', desc: 'Soigne tes créatures au combat (20 % des PV) et leur donne un bouclier qui absorbe jusqu’à 30 % de leurs PV.' },
   revive: { name: 'Renaissance',      color: '#FF9A3A', desc: 'Relève les créatures tombées (50 % des PV) ; sinon soigne l’équipe de 40 %.' },
   nova:   { name: 'Cataclysme',       color: '#FF5A3A', desc: 'Frappe tous les ennemis au combat, plus fort à chaque tour.' },
   smite:  { name: 'Croc du Néant',    color: '#7FD3FF', desc: 'Énorme coup sur l’ennemi qui a le plus de PV.' },
@@ -54,4 +53,4 @@ export const ULTS = {
 };
 const ULT_BY_FACTION = { celeste: 'revive', necrotique: 'revive', infernal: 'nova', primordial: 'nova', abyssal: 'smite', sauvage: 'smite', artificiel: 'aegis' };
 export const canUlt = (card) => card && (card.rarity === 'M' || card.rarity === 'S');
-export const ultOf = (card) => (canUlt(card) ? ULT_BY_FACTION[card.faction] || 'nova' : 'sceau');
+export const ultOf = (card) => (canUlt(card) ? ULT_BY_FACTION[card.faction] || 'nova' : null);

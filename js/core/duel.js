@@ -114,7 +114,7 @@ export function rand(st) {
 const d20 = (st) => 1 + Math.floor(rand(st) * 20);
 
 // ——— État ———
-export function createDuel(allies, enemies, { gauge = 0, fervor = gauge, ult = 'sceau', power = 1, known = {}, ruleMult = 1, bossPower = null, boss = null, pact = null, relics = [], blessings = [], seed = null, discovered = {}, goal = null, refPow = null } = {}) {
+export function createDuel(allies, enemies, { gauge = 0, fervor = gauge, ult = null, power = 1, known = {}, ruleMult = 1, bossPower = null, boss = null, pact = null, relics = [], blessings = [], seed = null, discovered = {}, goal = null, refPow = null } = {}) {
   const st = {
     ver: 2, units: {}, order: { ally: [], enemy: [] }, turn: 'ally', round: 1, ap: AP_MAX,
     fervor: Math.min(FERVOR_MAX, fervor + (blessings.includes('ferveur') ? 1 : 0)), gauge: 0,
@@ -357,7 +357,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false, graze = false } = {}) 
   if (u.ward > 0) {
     const took = Math.min(u.ward, Math.round(n));
     u.ward -= took; n = Math.round(n) - took;
-    ev.push({ t: 'status', u: u.uid, s: u.ward ? `Sceau −${took} (${u.ward})` : 'Le Sceau se brise', k: 'guard' });
+    ev.push({ t: 'status', u: u.uid, s: u.ward ? `Barrière −${took} (${u.ward})` : 'La barrière se brise', k: 'guard' });
     if (n <= 0) return 0;
   }
   // Carapace de glace (Matriarche, phase 2) : absorbe les coups ; l'Infernal la fait fondre deux fois plus vite
@@ -1033,8 +1033,8 @@ function entrance(st, u, aimed, ev) {
 }
 
 // ——— Pouvoir d'équipe : coûte 1 PA et toute la Ferveur, une seule fois par combat ———
-export const ultReady = (st) => !st.over && !st.ultUsed && st.turn === 'ally' && st.fervor >= ULT_COST.fervor && (st.init ? !!st.actor : st.ap >= ULT_COST.ap);
-export const SEAL_WARD = 0.3, SEAL_HEAL = 0.2; // bouclier du Sceau : absorbe jusqu'à 30 % des PV max ; soin 20 % (v604 : 50 % et 30 %)
+export const ultReady = (st) => (!!ULT_KEYS.has(st.ult) || !!st.labUlt) && !st.over && !st.ultUsed && st.turn === 'ally' && st.fervor >= ULT_COST.fervor && (st.init ? !!st.actor : st.ap >= ULT_COST.ap);
+const ULT_KEYS = new Set(['revive', 'nova', 'smite', 'aegis']); /* v820 : Sceau du Serment supprimé (une équipe sans Mythique ni Secrète n'a pas de pouvoir) */
 export function useUlt(st) {
   const ev = [];
   if (!ultReady(st)) return ev;
@@ -1044,9 +1044,7 @@ export function useUlt(st) {
   const p = st.power || 1, allies = front(st, 'ally'), foes = front(st, 'enemy');
   ev.push({ t: 'ult', key: st.ult });
   if (st.labUlt) labPowerDo(st, allies[0] || front(st, 'ally')[0], null, { ...st.labUlt, target: st.labUlt.target === 'enemy' ? 'allEnemies' : st.labUlt.target === 'ally' ? 'allAllies' : st.labUlt.target }, ev); /* v598 : pouvoir d'équipe inventé (aucun des pouvoirs du jeu ne joue alors) */
-  if (ultK === 'sceau' && st.init && allies.some((u) => u.hp < u.maxHp * 0.3)) allies.forEach((u) => gainPA(u, 1, ev)); // à condition : un allié en danger
-  if (ultK === 'sceau') allies.forEach((u) => { heal(u, u.maxHp * SEAL_HEAL * p, ev); u.ward = Math.max(u.ward || 0, Math.round(u.maxHp * SEAL_WARD)); ev.push({ t: 'status', u: u.uid, s: `Sceau : ${u.ward}` }); });
-  else if (ultK === 'revive') {
+  if (ultK === 'revive') {
     const fallen = st.order.ally.map((id) => st.units[id]).filter((u) => u.hp <= 0);
     if (fallen.length) fallen.forEach((u) => { u.hp = Math.round(u.maxHp * 0.5 * p); u.poison = 0; u.inPlay = false; u.down = false; toBack(st, u); ev.push({ t: 'revive', u: u.uid }); });
     else allies.forEach((u) => heal(u, u.maxHp * 0.4 * p, ev));
@@ -1898,7 +1896,7 @@ export function autoActs(st, { smart = true } = {}) {
 }
 function shouldUlt(st) {
   const hurtAllies = front(st, 'ally').some((u) => u.hp < u.maxHp * 0.45) || st.order.ally.some((id) => st.units[id].hp <= 0);
-  if (st.ult === 'sceau' || st.ult === 'revive') return hurtAllies;
+  if (st.ult === 'revive') return hurtAllies;
   return true;
 }
 function smartMove(st, go) {

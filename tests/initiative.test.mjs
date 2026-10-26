@@ -136,7 +136,7 @@ test('gel : la créature gelée passe son prochain tour', () => {
 test('pouvoir d’équipe : ne coûte aucun PA et ne termine pas le tour', () => {
   const st = mk();
   foesPlay(st);
-  st.fervor = 6;
+  st.fervor = 6; st.ult = 'aegis'; /* v820 : plus de Sceau du Serment par défaut */
   const a = st.actor, pa = st.units[a].pa;
   assert.ok(D.ultReady(st));
   D.useUlt(st);

@@ -493,7 +493,7 @@ export default function descent(app, root) {
       if (f === 'summit') openSheet(summitHTML(g.descent(), true), { label: 'Le fond de l’Abysse', cls: 'dc-sheet' });
       else openSheet(`<h2 class="center">Comment ça marche</h2><ol class="how-steps">${HOW.map(([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`).join('')}</ol><p class="small muted center">5 Torches par jour : 5 combats, rallumés à minuit.</p>`, { label: 'Aide', cls: 'dc-sheet' });
     },
-    forceinfo() { const team = g.team(); openSheet(`<h2 class="center">Force de ton équipe</h2>${levelHint(team, g.descent())}<p class="small center">Pouvoir : <b>${esc(g.ultimate(team).name)}</b></p><a class="btn primary block dc-plq dc-plq-red" href="#/renfort">${icon('p:level-up')}Renforcer</a>`, { label: 'Force', cls: 'dc-sheet' }); },
+    forceinfo() { const team = g.team(); openSheet(`<h2 class="center">Force de ton équipe</h2>${levelHint(team, g.descent())}${g.ultimate(team).key ? `<p class="small center">Pouvoir : <b>${esc(g.ultimate(team).name)}</b></p>` : ''}<a class="btn primary block dc-plq dc-plq-red" href="#/renfort">${icon('p:level-up')}Renforcer</a>`, { label: 'Force', cls: 'dc-sheet' }); },
     torchinfo() {
       const tc = g.torches();
       openSheet(`<h2 class="center">Les Torches</h2>

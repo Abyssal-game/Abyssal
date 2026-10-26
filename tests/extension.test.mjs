@@ -242,20 +242,14 @@ test('difficulté : plafond par coup sur tes créatures, cumul de bonus plafonn�
   assert.ok(D.defenseWindow(b, units(b, 'enemy')[0].uid, units(b, 'ally')[0].uid).dodge >= 130);
 });
 
-test('Sceau du Gardien : une fois par combat, bouclier qui absorbe la moitié des PV', () => {
-  const st = D.createDuel(team(), [E(FOE, { scale: 4 })], { seed: 4, fervor: 6, ult: 'sceau', power: 1 });
-  assert.ok(D.ultReady(st));
-  D.useUlt(st);
-  const v = units(st, 'ally')[0];
-  assert.equal(v.ward, Math.round(v.maxHp * D.SEAL_WARD));
-  st.fervor = 6; st.ap = 3;
-  assert.equal(D.ultReady(st), false, 'une seule fois par combat');
-  const hp = v.hp, ward = v.ward;
-  st.turn = 'enemy'; st.curKind = 'hit';
-  const foe = units(st, 'enemy')[0];
-  foe.intent = { kind: 'hit', t: v.uid };
-  units(st, 'ally').forEach((u) => { u.guardBy = null; });
-  D.enemyAct(st, foe.uid);
-  assert.ok(v.ward < ward || v.hp < hp, 'le coup entame le bouclier');
-  assert.ok(hp - v.hp <= Math.max(0, D.dmgOf(st, foe, v) - ward) + 1);
+test('v820 : Sceau du Serment supprimé : sans Mythique ni Secrète, pas de pouvoir d’équipe ; Égide une fois par combat', () => {
+  const st = D.createDuel(team(), [E(FOE, { scale: 4 })], { seed: 4, fervor: 6, ult: null, power: 1 });
+  assert.equal(D.ultReady(st), false);
+  const old = D.createDuel(team(), [E(FOE, { scale: 4 })], { seed: 4, fervor: 6, ult: 'sceau', power: 1 });
+  assert.equal(D.ultReady(old), false, 'un ancien combat au Sceau ne le lance plus');
+  const ok = D.createDuel(team(), [E(FOE, { scale: 4 })], { seed: 4, fervor: 6, ult: 'aegis', power: 1 });
+  assert.ok(D.ultReady(ok));
+  D.useUlt(ok);
+  ok.fervor = 6; ok.ap = 3;
+  assert.equal(D.ultReady(ok), false, 'une seule fois par combat');
 });

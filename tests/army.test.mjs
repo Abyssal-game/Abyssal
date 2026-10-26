@@ -46,7 +46,7 @@ test('v495 : plus de budget d’équipe ; pouvoir ultime', () => {
   g.setTeam(['ART-039', 'NEC-001', 'INF-001', 'CEL-001', 'SAU-014']);
   assert.equal(g.ultimate().key, 'aegis');
   g.setTeam(['NEC-001', 'INF-001', 'CEL-001']);
-  assert.equal(g.ultimate().key, 'sceau');
+  assert.equal(g.ultimate().key, null); /* v820 : plus de Sceau du Serment */
 });
 
 test('v406 : un chapitre se termine sur son gardien ; récompenses à la première victoire de chaque étage seulement', () => {

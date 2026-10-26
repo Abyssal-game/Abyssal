@@ -83,31 +83,41 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   let alive_ = true, busy = false, sel = null, mode = null; // mode : action en attente de cible
   let holdT = null, held = false; // appui long sur une action : sa description (v249, plus de fenêtre de confirmation)
   const ctl = new AbortController();
-  const ult = ULTS[st.ult];
+  const ult = ULTS[st.ult] || (st.labUlt ? { name: st.labUlt.name || 'Pouvoir d’équipe', color: '#C9A3FF', desc: '' } : null); /* v820 : sans Mythique ni Secrète, pas de pouvoir d'équipe */
   document.body.classList.add('battle-mode');
 
   FX.forEach((n) => { new Image().src = fxUrl(n); });
   new Image().src = 'assets/fx/fx-duo.webp'; // v276 : planche de l'Assaut conjoint, chargée d'avance
   // Décor de la salle : la peinture de l'étage, ou la salle propre au gardien
   const room = roomFor(floorBg(run.floor, run.room), st.bossKey);
-  root.innerHTML = `<div class="dv cb ${run.room} has-bg" style="--bgimg:${room.paint ? `url(${abs(room.paint)})` : bgOf(run)}">
+  /* v820 : écran de combat refait (demande du propriétaire) : en haut la frise des tours et le bandeau du dernier coup,
+     puis les ennemis face à tes créatures (rien entre les deux), et en bas le menu de combat : la créature qui joue,
+     ses actions, la réserve et la Ferveur. « Passer » devient un petit bouton en haut à droite. */
+  root.innerHTML = `<div class="dv cb cb2 ${run.room} has-bg" style="--bgimg:${room.paint ? `url(${abs(room.paint)})` : bgOf(run)}">
     <div class="dv-top"><b>${esc(title)}</b><span class="row gap">
       <button class="btn small ghost cb-speed ${ui.fast ? 'on' : ''}" data-d="speed" aria-label="Vitesse des animations" aria-pressed="${!!ui.fast}">×${ui.fast ? 2 : 1}</button>
       <button class="btn small ghost" data-d="help" aria-label="Règles du combat">?</button>
+      <button class="btn small ghost cb-pass dv-end" data-d="end" aria-label="Passer le tour" title="Passer le tour"><img class="cb-pass-i" alt="" src="assets/ui/cb-passer.webp" onerror="this.remove()"><span class="cb-pass-f">${icon('skip')}</span></button>
       <button class="btn small ghost" data-d="quit" aria-label="Pause">${icon('close')}</button></span></div>
     <div class="cb-rules"></div>
     <div class="cb-tl" aria-label="Ordre des tours"></div>
+    <div class="cb-feed" aria-live="polite"></div>
     <div class="dv-row enemy"></div>
-    <div class="dv-mid"><span class="dv-msg" aria-live="polite"></span><span class="dv-resw"></span></div>
-    <div class="cb-acts" hidden></div>
+    <div class="cb-gap" aria-hidden="true"></div>
     <div class="dv-row ally"></div>
-    <div class="dv-bar cb-bar">
-      <button class="cb-res" data-d="ult" style="--uc:${ult.color}" aria-label="Actions, Ferveur et pouvoir d’équipe">
-        ${st.init ? '<span class="cb-pips" hidden></span>' : '<span class="cb-ap"><small>PA</small><span class="cb-pips"></span></span>'}
-        <span class="cb-fv"><small>Ferveur</small><span class="cb-gems"></span></span>
-        <span class="cb-ult"><img class="cb-pw" alt="" src="assets/icons/power.webp"><b>${esc(ult.name)}</b><small></small></span>
-      </button>
-      <button class="btn primary dv-end" data-d="end">Passer</button>
+    <div class="cb-dock">
+      <div class="dv-mid"><span class="dv-msg"></span></div>
+      <div class="cb-acts"></div>
+      <div class="cb-dockbar dv-bar">
+        <div class="dv-resw"></div>
+        ${ult ? `<button class="cb-res" data-d="ult" style="--uc:${ult.color}" aria-label="Ferveur et pouvoir d’équipe">
+          ${st.init ? '<span class="cb-pips" hidden></span>' : '<span class="cb-ap"><small>PA</small><span class="cb-pips"></span></span>'}
+          <span class="cb-fv"><small>Ferveur</small><span class="cb-gems"></span></span>
+          <span class="cb-ult"><img class="cb-pw" alt="" src="assets/icons/power.webp"><b>${esc(ult.name)}</b><small></small></span>
+        </button>` : `<div class="cb-res cb-res-nopw" title="Ferveur : sert à l’Assaut conjoint">
+          ${st.init ? '<span class="cb-pips" hidden></span>' : '<span class="cb-ap"><small>PA</small><span class="cb-pips"></span></span>'}
+          <span class="cb-fv"><small>Ferveur</small><span class="cb-gems"></span></span></div>`}
+      </div>
     </div>
   </div>`;
   const $ = (s) => root.querySelector(s);
@@ -226,24 +236,33 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const r = reserve(st, side);
     if (side === 'enemy') return r.length ? `<span class="dv-res" title="Réserve ennemie">+${r.length}</span>` : '';
     const dead = fallenAllies(); /* v661 : les créatures tombées se voient aussi, assombries */
-    if (!r.length && !dead.length) return '';
-    return `<button class="dv-resv cb-resv" data-d="reserve" aria-label="Voir la réserve">${r.map((u) => `<img alt="" src="${artUrl(cat.get(u.id), { lite: true })}" title="${esc(cat.get(u.id).name)} : ${u.hp}/${u.maxHp} PV">`).join('')}${dead.map((u) => `<img class="dead" alt="" src="${artUrl(cat.get(u.id), { lite: true })}">`).join('')}<small>Réserve</small></button>`;
+    /* v820 : la réserve est dans le menu du bas : ses créatures en petites cartes avec leurs PV, les tombées assombries */
+    const pct = (u) => Math.max(0, Math.min(100, Math.round((Math.max(0, u.hp) / Math.max(1, u.maxHp)) * 100)));
+    const mini = (u, dead) => `<span class="cb-rm ${dead ? 'dead' : ''}" style="--rc:${RARITY[cat.get(u.id).rarity].color}"><img alt="" src="${artUrl(cat.get(u.id), { lite: true })}">${dead ? '<img class="cb-rm-sk" alt="" src="assets/icons/mort.webp">' : `<i class="cb-rm-hp" style="--h:${pct(u)}%"></i><b>${Math.max(0, u.hp)}</b>`}</span>`;
+    return `<button class="cb-rsv2" data-d="reserve" aria-label="Voir la réserve"><small>Réserve</small><span class="cb-rsv2-l">${r.map((u) => mini(u, false)).join('')}${dead.map((u) => mini(u, true)).join('')}${!r.length && !dead.length ? '<em>vide</em>' : ''}</span></button>`;
   };
 
   // ——— Barre d'actions de la créature choisie ———
   function actsHTML() {
     const u = sel && st.units[sel];
-    if (!u || st.turn !== 'ally' || busy) return '';
+    /* v820 : le menu du bas ne disparaît plus : au tour ennemi (ou à la fin), il dit ce qui se passe */
+    if (st.over) return `<div class="cb-idle ${st.over === 'won' ? 'won' : 'lost'}"><b>${st.over === 'won' ? 'Victoire !' : 'Défaite…'}</b></div>`;
+    if (!u || st.turn !== 'ally' || u.hp <= 0) {
+      if (st.turn !== 'enemy') return `<div class="cb-idle"><b>${st.init ? 'À toi !' : 'Touche une de tes créatures'}</b></div>`;
+      const a = st.units[acting] || st.units[st.queue?.[0]];
+      return `<div class="cb-idle foe">${a ? `<span class="cb-por foe"><img alt="" src="${uPic(a)}"></span>` : ''}<span class="cb-who"><b translate="no">${a ? esc(tw(uName(a))) : ''}</b><span class="cb-role">${tr('Tour des créatures corrompues')}</span></span>
+        <small class="cb-idle-h">${defMode === 'auto' ? tr('Défense automatique') : tr('Quand la barre apparaît, touche dans l’or pour esquiver, sur le trait blanc pour parer.')}</small></div>`;
+    }
     const kit = KITS[u.role];
     const list = actionsFor(st, u.uid).filter((a) => a.key !== 'duo' || (a.ok && !firstSteps())); // l'Assaut conjoint n'apparaît que lorsqu'il est possible
     const c = cat.get(u.id), pa = u.pa || 0;
     // v262 : c'est son tour ; ses PA (points d'action personnels) s'affichent en losanges
-    return `<div class="cb-head"><span class="cb-por" style="--rc:${RARITY[c.rarity].color}"><img alt="" src="${artUrl(c, { lite: true })}"></span>
+    return `<div class="cb-panel ${busy ? 'wait' : ''}"><div class="cb-head"><span class="cb-por" style="--rc:${RARITY[c.rarity].color}"><img alt="" src="${artUrl(c, { lite: true })}"></span>
       <span class="cb-who"><b>${esc(c.name)}</b><span class="cb-role">${roleIcon(kit.kw)}${esc(kit.name)}<em class="cb-myturn"> · son tour</em></span></span>
       <span class="cb-upips" title="${pa} PA : attaque ou défense +1, compétences selon leur coût">${Array.from({ length: PA_MAX }, (_, i) => `<i class="${i < pa ? 'on' : ''}"></i>`).join('')}</span></div>
       <div class="cb-grid ${list.length > 5 ? 'n8' : list.length > 4 ? 'n5' : ''}">${list.map((a) => `<button class="cb-a ${a.ok ? '' : 'off'} ${mode?.key === a.key ? 'on' : ''} ${a.key === kit.skill.key ? 'sig' : ''} ${a.own ? 'own' : ''} k-${a.key}" data-a="${a.key}" aria-disabled="${!a.ok}"${a.key === 'swap' ? ` aria-label="${esc(a.name)}"` : ''}><span class="cb-tile" aria-hidden="true"></span>
         <span class="cb-ai">${a.own ? `<img class="aicon" alt="" src="${moveIconUrl(a.icon)}">` : actIcon(a.key, a.icon)}</span><b>${esc(a.name)}</b>
-        <span class="cb-cost">${a.gain ? `<i class="gain">+${a.gain} PA</i>` : '<i class="pa"></i>'.repeat(a.ap) || (a.key === 'duo' ? '' : `<i class="free">${st.init ? 'libre' : '0'}</i>`)}${a.fervor ? `<i class="fv">${a.fervor}</i>` : ''}${a.dice ? '<i class="d20">D20</i>' : ''}${a.own && a.wait ? `<i class="cdw" title="Se recharge">${a.wait}</i>` : ''}</span></button>`).join('')}</div>`;
+        <span class="cb-cost">${a.gain ? `<i class="gain">+${a.gain} PA</i>` : '<i class="pa"></i>'.repeat(a.ap) || (a.key === 'duo' ? '' : `<i class="free">${st.init ? 'libre' : '0'}</i>`)}${a.fervor ? `<i class="fv">${a.fervor}</i>` : ''}${a.dice ? '<i class="d20">D20</i>' : ''}${a.own && a.wait ? `<i class="cdw" title="Se recharge">${a.wait}</i>` : ''}</span></button>`).join('')}</div></div>`;
   }
   // ——— Tutoriel du premier combat : une main dorée montre quoi toucher ———
   let guide = !g.s.tips?.['cb-guide'];
@@ -253,7 +272,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     let t = null, txt = '';
     if (mode?.key === 'attack') { t = el(actionTargets(st, sel, 'attack')[0]); txt = 'Touche un ennemi pour l’attaquer'; }
     else if (sel && actionsFor(st, sel)[0].ok) { t = actsEl.querySelector('[data-a="attack"]'); txt = LANG === 'fr' ? `C’est au tour ${esc(deName(cat.get(st.units[sel].id).name))} : « ${esc(actionsFor(st, sel)[0].name)} » attaque et rapporte 1 PA` : tr('C’est au tour de {name} : « {move} » attaque et rapporte 1 PA', { name: esc(tw(cat.get(st.units[sel].id).name)), move: esc(tw(actionsFor(st, sel)[0].name)) }); }
-    else { t = $('.dv-end'); txt = 'Rien à faire : touche « Passer »'; }
+    else { t = $('.dv-end'); txt = 'Rien à faire : touche « Passer » en haut à droite'; }
     if (t) { t.classList.add('guide'); say(`<b class="dc-good">${txt}</b>`); }
   }
   function endGuide() { if (!guide) return; guide = false; g.s.tips = { ...(g.s.tips || {}), 'cb-guide': Date.now() }; g.persist(); }
@@ -311,25 +330,23 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     patchRow(alEl, front(st, 'ally').map((u) => ({ uid: u.uid, html: cardEl(u) })));
     const sw = st.swallowed && st.units[st.swallowed];
     setHTML($('.dv-resw'), resHTML('ally') + (sw?.swallowed ? `<span class="cb-swal" title="Engloutie : brise le Dévoreur pour la libérer"><img alt="" src="${artUrl(cat.get(sw.id), { lite: true })}"><small>Engloutie · ${sw.hp} PV</small></span>` : ''));
-    const showActs = !!sel && st.turn === 'ally' && !busy && !st.over;
-    actsEl.hidden = !showActs;
-    setHTML(actsEl, showActs ? actsHTML() : '');
+    setHTML(actsEl, actsHTML()); /* v820 : le menu du bas reste toujours en place (plus de saut de l'écran) */
     const pu = st.init ? st.units[st.actor] : null, paNow = st.init ? (st.turn === 'ally' && pu ? pu.pa || 0 : 0) : st.ap;
     setHTML($('.cb-pips'), Array.from({ length: st.init ? PA_MAX : Math.max(AP_MAX, st.ap) }, (_, i) => `<i class="${i < paNow ? 'on' : ''}"></i>`).join(''));
     setHTML($('.cb-gems'), Array.from({ length: FERVOR_MAX }, (_, i) => `<i class="${i < st.fervor ? 'on' : ''}"></i>`).join(''));
     const ready = ultReady(st);
     if (ready && !g.s.tips?.['cb-ult'] && !settling()) tuto(app, 'cb-ult');
     $('.cb-res').classList.toggle('ready', ready);
-    $('.cb-ult small').textContent = st.ultUsed ? 'Utilisé' : ready ? '' : `${st.fervor}/${FERVOR_MAX}`;
+    if (ult) $('.cb-ult small').textContent = st.ultUsed ? 'Utilisé' : ready ? '' : `${st.fervor}/${FERVOR_MAX}`;
     const canMore = (st.init || st.ap > 0) && front(st, 'ally').some((u) => actionsFor(st, u.uid).some((a) => a.ok && a.key !== 'swap' && a.key !== 'defend'));
     $('.dv-end').classList.toggle('pulse', st.turn === 'ally' && !canMore && !busy);
-    root.querySelectorAll('.dv-bar button').forEach((b) => { const off = busy || st.turn !== 'ally' || !!st.over; b.disabled = off; b.classList.toggle('off', off); });
+    root.querySelectorAll('.cb-dockbar button, .cb-pass').forEach((b) => { const off = busy || st.turn !== 'ally' || !!st.over; b.disabled = off; b.classList.toggle('off', off); });
     if (!busy && st.turn === 'ally' && !st.over) {
       if (mode) say(`<b>${esc(mode.name)}</b><span class="cb-hint">${mode.key === 'duo' ? 'Choisis l’ennemi à frapper ensemble' : mode.key === 'rempart' ? 'Choisis l’allié à protéger' : mode.key === 'priere' ? 'Choisis l’allié à soigner' : mode.target === 'ally' ? 'Choisis un allié' : 'Choisis une cible'}</span><button class="cb-cancel" data-d="cancel">Annuler</button>`);
       else if (sel && st.init) say(''); // v270 : le panneau d'actions montre déjà qui joue et ses PA
       else if (sel) say(`Choisis une action · <b>${st.ap}</b> action${st.ap > 1 ? 's' : ''} pour l’équipe`);
-      else say(canMore ? `Touche une créature · <b>${st.ap}</b> action${st.ap > 1 ? 's' : ''} pour l’équipe` : 'Touche <b>Passer</b>');
-    } else if (st.turn === 'enemy' && !st.over) say('<b class="dc-bad">Tour des créatures corrompues</b>');
+      else say(canMore ? `Touche une créature · <b>${st.ap}</b> action${st.ap > 1 ? 's' : ''} pour l’équipe` : 'Touche <b>Passer</b> en haut à droite');
+    } else say('');
     guideStep();
     drawTimeline();
     $('.dv')?.classList.toggle('cb-aiming', !!mode); // v279 : en visée, la réserve s'efface
@@ -622,12 +639,46 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const nextHit = (ev, i) => { for (let j = i + 1; j < ev.length; j++) { const x = ev[j]; if (x.t === 'dmg') return x; if (!['brk', 'fervor', 'pa', 'combo', 'status'].includes(x.t)) return null; } return null; };
   let lastAtk = null, fatalDone = false; // dernière créature alliée à avoir agi : gros plan du coup fatal sur le dernier ennemi
   const DICE_KEYS = ['estoc', 'contagion', 'entrave'];
+  /* v820 : bandeau du dernier coup (entre la frise et les ennemis) : qui agit, quel coup, sur qui, et ce qu'il a fait.
+     Un coup ennemi sans dégâts (prépare, condamne, protège…) y donne son explication, sans arrêter le combat. */
+  const feedEl = $('.cb-feed');
+  let feed = null;
+  const fName = (uid) => { const u = st.units[uid]; return u ? esc(tw(uName(u))) : ''; };
+  const feedDraw = () => {
+    if (!feedEl) return;
+    if (!feed) {
+      const bk = st.bossKey && BOSSES[st.bossKey];
+      setHTML(feedEl, `<div class="cb-fd start" translate="no"><span class="cb-fd-p">${icon('swords')}</span><span class="cb-fd-b"><span class="cb-fd-l1"><b>${bk ? esc(tw(bk.name)) : esc(tr('Le combat commence'))}</b></span><span class="cb-fd-l2"><em>${esc(tr(bk ? 'Un gardien de l’Abysse te barre la route.' : 'Touche une action en bas, puis sa cible.'))}</em></span></span></div>`);
+      return;
+    }
+    const f = feed, a = f.a && st.units[f.a];
+    const pic = a ? `<span class="cb-fd-p"><img alt="" src="${uPic(a)}"></span>` : `<span class="cb-fd-p ult"><img alt="" src="assets/icons/power.webp"></span>`;
+    const to = f.parts.length ? '' : f.tgt && st.units[f.tgt] && f.tgt !== f.a ? `<span class="cb-fd-to">→ ${fName(f.tgt)}</span>` : f.aoe ? `<span class="cb-fd-to">→ ${esc(tr('tous'))}</span>` : '';
+    const l2 = f.parts.length ? f.parts.slice(0, 4).join('') : f.note ? `<em>${esc(tw(f.note))}</em>` : '';
+    setHTML(feedEl, `<div class="cb-fd ${f.side}" translate="no">${pic}<span class="cb-fd-b"><span class="cb-fd-l1">${a ? `<b>${fName(f.a)}</b>` : `<b>${esc(tr('Pouvoir d’équipe'))}</b>`}<i>${esc(tw(f.move || ''))}</i></span><span class="cb-fd-l2">${to}${l2}</span></span></div>`);
+  };
+  const feedPart = (cls, html) => { if (!feed) return; if (feed.parts.length >= 4) return; feed.parts.push(`<span class="fp ${cls}">${html}</span>`); feedDraw(); };
+  const feedUlt = () => { feed = { a: null, side: 'ally', move: ult?.name || '', parts: [] }; feedDraw(); };
+  function feedEv(e) {
+    if (e.t === 'act') { const ak = actionsFor(st, e.u).find((x) => x.key === e.key); feed = { a: e.u, side: 'ally', move: e.name || ak?.name || '', tgt: e.tgt, parts: [] }; feedDraw(); return; }
+    if (e.t === 'eact') { const d = INTENTS[e.kind]; feed = { a: e.a, side: 'foe', move: d?.name || '', tgt: e.tgt, aoe: !!intentInfo(st, st.units[e.a] || {})?.aoe && !e.tgt, note: (NOTE_KINDS.has(e.kind) || /^labp\d/.test(e.kind)) ? d?.desc : null, parts: [] }; feedDraw(); return; }
+    if (!feed) return;
+    if (e.t === 'dmg') feedPart(st.units[e.u]?.side === 'ally' ? 'bad' : 'hit', `${fName(e.u)} <b>−${e.d}</b>`);
+    else if (e.t === 'heal') feedPart('heal', `${fName(e.u)} <b>+${e.d}</b>`);
+    else if (e.t === 'die') feedPart('ko', `${fName(e.u)} ${esc(tr('tombe'))}`);
+    else if (e.t === 'dodge') feedPart('good', esc(tr('Esquive !')));
+    else if (e.t === 'parry') feedPart('good', esc(tr('Parade parfaite !')));
+    else if (e.t === 'block') feedPart('good', `${fName(e.u)} ${esc(tr('bloque'))}`);
+    else if (e.t === 'broken') feedPart('brk', `${fName(e.u)} ${esc(tr('brisé !'))}`);
+    else if (e.t === 'revive') feedPart('heal', `${fName(e.u)} ${esc(tr('se relève'))}`);
+  }
   async function play(ev) {
     for (let ei = 0; ei < ev.length; ei++) {
       const e = ev[ei];
       await coachIdle(); /* v661 : une bulle d'aide fige le combat derrière elle */
       if (!alive_) return;
       perfMark(e.kind ? `${e.t}:${e.kind}` : e.t);
+      feedEv(e);
       switch (e.t) {
         case 'act':
           lastAtk = st.units[e.u]?.side === 'ally' ? e.u : null; lastTier = null; pendingSkill = null; skillHit = null; burstSrc = null;
@@ -811,8 +862,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         case 'revive': draw(); app.sfx.summon?.(); float(e.u, 'Relevée !', 'heal'); await wait(T(280)); break;
         case 'actor': draw(); if (!reduced) { const t = el(e.u); t?.classList.remove('myturn'); void t?.offsetWidth; t?.classList.add('myturn'); } app.sfx.actor?.(); await wait(T(260)); break;
         case 'pa': { const t = el(e.u); if (t && st.units[e.u]?.side === 'ally') { float(e.u, `+${e.d} PA`, 'pa'); app.sfx.pa?.(); } break; }
-        case 'phase': draw(); say(e.side === 'enemy' ? '<b class="dc-bad">Tour des créatures corrompues</b>' : 'À toi !'); turnBanner(e.side); await wait(T(e.side === 'enemy' ? 520 : 420)); break;
-        case 'ult': if (st.ult === 'sceau') dio.seal(); else dio.ult(); narrate('ult', { chance: 0.5, host: $('.dv') }); /* v794 */ await ultFx(); break;
+        case 'phase': draw(); turnBanner(e.side); await wait(T(e.side === 'enemy' ? 520 : 420)); break;
+        case 'ult': feedUlt(); dio.ult(); narrate('ult', { chance: 0.5, host: $('.dv') }); /* v794 */ await ultFx(); break;
         case 'law':
           if ('forbid' in e) { draw(); if (e.forbid) { banner(`${icon('skull')} Verdict : interdit de ${esc(FORBID[e.forbid])}`, 'danger', 1300); await wait(T(800)); } break; }
           if (e.aspect) dio.aspect(e.aspect); draw(); banner(e.fatigue ? `${icon('skull')} Épuisement : chaque tour blesse tout le monde` : e.law ? esc(LAWS[e.law].name) : esc(ASPECTS[e.aspect].name), e.fatigue ? 'danger' : 'skill', 1300); await wait(T(e.fatigue ? 900 : 700)); break;
@@ -903,7 +954,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     $('.dv').appendChild(b);
     await new Promise((res) => { const go = () => { b.remove(); res(); }; b.addEventListener('pointerdown', go, { once: true }); }); // v295 : attend le toucher, plus de fermeture automatique
   }
-  const ULT_FX = { sceau: 'ult-sceau', revive: 'ult-revive', nova: 'ult-nova', smite: 'ult-smite', aegis: 'ult-aegis' }; // v354-v355 : une planche Gemini par pouvoir d'équipe
+  const ULT_FX = { revive: 'ult-revive', nova: 'ult-nova', smite: 'ult-smite', aegis: 'ult-aegis' }; // v354-v355 : une planche Gemini par pouvoir d'équipe
   async function ultFx() {
     const c = run.ult.card ? cat.get(run.ult.card) : null;
     const fx = document.createElement('div');
@@ -1084,22 +1135,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     app.state.lastEnemyTurn = html0; // gardé pour « Voir ce qui s'est passé » après une défaite
     /* v409 : plus de fenêtre « Tour ennemi » pendant le combat (jugée pénible) ; le résumé reste lisible après une défaite */
   }
-  /* v808 (« on ne sait pas vraiment ce qu’elle fait ») : un coup ennemi qui ne retire aucun PV et ne se défend pas
-     (prépare, condamne, désigne, protège, soigne, change les règles…) est expliqué dans un encart ; un toucher le ferme */
+  /* v820 : l'encart qui expliquait un coup ennemi sans dégâts (v808) coupait le combat : retiré, l'explication passe dans le bandeau du dernier coup */
   const NOTE_KINDS = new Set(['charge', 'channel', 'shield', 'heal', 'hunt', 'rally', 'gather', 'mimic', 'decree', 'shift', 'brood', 'sentence', 'chant', 'wind', 'rewind', 'mirror', 'wish', 'slumber', 'verdict']);
-  async function actNote(s, ev) {
-    const k = s.kind, def = INTENTS[k];
-    if (!def || !(NOTE_KINDS.has(k) || /^labp\d/.test(k))) return;
-    if (ev.some((x) => x.t === 'dmg' && st.units[x.u]?.side === 'ally')) return;
-    const a = st.units[s.a], tg = s.t && st.units[s.t]?.side === 'ally' ? st.units[s.t] : null;
-    const host = $('.dv'); if (!host || !a) return;
-    const box = document.createElement('div'); box.className = 'cb-enote';
-    box.innerHTML = `<div class="cb-enote-h">${intentIcon(k)}<span><small translate="no">${esc(tw(uName(a)))}</small><b>${esc(def.name)}</b></span><i>${tr('Aucun dégât')}</i></div>
-      <p>${esc(def.desc)}</p>${tg ? `<p class="cb-enote-t" translate="no">${esc(tr('Visée : {name}', { name: tw(uName(tg)) }))}</p>` : ''}<small class="cb-enote-x">${tr('Touche pour continuer')}</small>`;
-    host.appendChild(box);
-    await new Promise((res) => { const done = () => { clearTimeout(tm); box.removeEventListener('pointerdown', done); res(); }; const tm = setTimeout(done, reduced ? 2600 : Math.max(2600, T(4200))); box.addEventListener('pointerdown', done); });
-    box.classList.add('out'); setTimeout(() => box.remove(), 300);
-  }
   async function enemyTurn() {
     log ||= [];
     for (let n = E.duelNext(where); n && alive_; n = E.duelNext(where)) {
@@ -1122,7 +1159,6 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       lastDef = res; // pas de gros plan d'impact si le coup est esquivé ou paré
       await play(ev);
       lastDef = 'none'; acting = null;
-      if (alive_ && !st.over) await actNote(s, ev);
     }
     if (!alive_) return;
     const ev = E.duelEndEnemy(where);
@@ -1310,7 +1346,6 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
 
   // ——— Pouvoir d'équipe : explication avant, récapitulatif après ———
   const ULT_HOW = {
-    sceau: 'Chacune de tes créatures au combat récupère 20 % de ses PV et reçoit un bouclier qui absorbe des dégâts jusqu’à 30 % de ses PV max.',
     revive: 'Tes créatures tombées reviennent au combat avec la moitié de leurs PV. Si aucune n’est tombée, tes créatures au combat récupèrent 40 % de leurs PV.',
     nova: 'Chaque ennemi au combat subit des dégâts (plus forts à chaque tour qui passe) et sa jauge de Brisure baisse.',
     smite: 'L’ennemi qui a le plus de PV subit un coup énorme (plus fort à chaque tour) et sa jauge de Brisure baisse fortement.',
@@ -1335,7 +1370,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const healed = ev.filter((x) => x.t === 'heal').reduce((a, x) => a + x.d, 0);
     const dmg = ev.filter((x) => x.t === 'dmg').reduce((a, x) => a + x.d, 0);
     const revived = ev.filter((x) => x.t === 'revive').length;
-    const parts = [revived && `${revived} créature${revived > 1 ? 's' : ''} relevée${revived > 1 ? 's' : ''}`, healed && `+${healed} PV rendus`, dmg && `${dmg} dégâts infligés`, ['sceau', 'aegis'].includes(st.ult) && 'boucliers sur tes créatures', st.ult === 'aegis' && (st.init ? '+2 PA chacune' : '+2 actions')].filter(Boolean);
+    const parts = [revived && `${revived} créature${revived > 1 ? 's' : ''} relevée${revived > 1 ? 's' : ''}`, healed && `+${healed} PV rendus`, dmg && `${dmg} dégâts infligés`, st.ult === 'aegis' && 'boucliers sur tes créatures', st.ult === 'aegis' && (st.init ? '+2 PA chacune' : '+2 actions')].filter(Boolean);
     toast(`<b>${esc(ult.name)}</b> : ${parts.join(' · ') || 'aucun effet'}`, { icon: 'sparkle', kind: 'success' });
     busy = false; draw();
     if (st.over) finish();
@@ -1431,6 +1466,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       <p class="small muted">Sous la moitié de leurs PV, les gardiens entrent en <b>Furie</b> (leur phase 2, écusson « Furie ») : plus forts, ils déclenchent leur mécanique de Furie (une fenêtre l’annonce), accélèrent leur grosse attaque et visent tes Soigneurs. Un gardien <b>déchaîné</b> est en Furie dès le premier tour. Dès le 15e tour, l’Épuisement blesse les deux camps.</p>`, { label: 'Règles du combat' });
   }
 
+  feedDraw();
   draw();
   // passifs qui ont agi dès le début du combat (Égide, Augure, Engloutir, Éruption, Cataclysme) : on le dit une fois
   if (st.round === 1 && st.turn === 'ally' && !st.openShown) {

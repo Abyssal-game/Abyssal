@@ -842,7 +842,7 @@ export class Game {
   ultCard(ids = this.s.team) {
     return ids.map((id) => this.catalog.get(id)).filter(canUlt).sort((a, b) => RI(b.rarity) - RI(a.rarity))[0] || null;
   }
-  ultimate(ids = this.s.team) { const c = this.ultCard(ids); const key = ultOf(c); return { key, ...ULTS[key], card: c?.id || null, power: 1 + 0.08 * ((c ? this.cardLevel(c.id) : 1) - 1) }; }
+  ultimate(ids = this.s.team) { const c = this.ultCard(ids); const key = ultOf(c); return { key, ...(ULTS[key] || {}), card: c?.id || null, power: 1 + 0.08 * ((c ? this.cardLevel(c.id) : 1) - 1) }; }
 
   // Coffres : chaque coffre contient des boosters (ajoutés aux boosters à ouvrir)
   chestCount() { return Object.values(this.s.chests).reduce((a, n) => a + n, 0); }

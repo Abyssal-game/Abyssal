@@ -61,7 +61,7 @@ export function combatHTML(g, c) {
     </div>
     ${identityHTML(c, owned ? li.level : 1)}
     ${syn.length ? `<div class="panel v2-skill"><b>${icon('p:combo')} Combinaisons</b>${syn.map((x) => `<p class="small"><b>${esc(x.name)}</b> : ${esc(x.desc)}</p>`).join('')}</div>` : ''}
-    ${ult ? `<div class="panel v2-skill ult" style="--uc:${ult.color}"><b>${icon('p:power')} Pouvoir : ${esc(ult.name)}</b><p class="small">${esc(ult.desc)}</p><p class="small muted">Dans l’équipe, la Mythique ou Secrète la plus rare remplace le Sceau du Serment par son pouvoir.</p></div>` : ''}
+    ${ult ? `<div class="panel v2-skill ult" style="--uc:${ult.color}"><b>${icon('p:power')} Pouvoir : ${esc(ult.name)}</b><p class="small">${esc(ult.desc)}</p><p class="small muted">Dans l’équipe, la Mythique ou Secrète la plus rare donne son pouvoir d’équipe.</p></div>` : ''}
     ${owned ? `<div class="v2-lvl"><b>Niveau ${li.level} / ${MAX_LEVEL}</b><span class="xpbar"><i style="width:${(li.level / MAX_LEVEL) * 100}%"></i></span>${li.cost ? `<button class="btn small gold block fz-up" data-act="lvup">${icon('p:level-up')}Niveau ${li.level + 1} · ${li.cost} cendres${nx && (nx.atk > u.atk || nx.maxHp > u.maxHp) ? ` <small>(${nx.atk > u.atk ? `+${nx.atk - u.atk} ATQ ` : ''}${nx.maxHp > u.maxHp ? `+${nx.maxHp - u.maxHp} PV` : ''})</small>` : ''}${nextUnlock(c.id, li.level)?.lv === li.level + 1 ? ` <small class="ck-unl">+ ${esc(nextUnlock(c.id, li.level).name)}</small>` : ''}</button><span class="small muted">Tu as ${g.s.ash} cendres. Brûle tes doublons dans la Fournaise pour en gagner.</span>` : '<span class="small muted">Niveau maximum</span>'}</div>` : ''}
   </div>`;
 }
@@ -133,7 +133,7 @@ export function teamScreen(app, root) {
         <h3 class="section-title">En réserve</h3><div class="v2-slots res">${[3, 4].map(slot).join('')}</div>
         ${run ? '' : `<button class="btn primary block tm-pick" data-act="pick">${icon('p:team-ic')}Choisir mes créatures</button>`}
         ${synHTML(team)}
-        <div class="panel v2-skill ult" style="--uc:${ult.color}"><b>${icon('p:power')} Pouvoir : ${esc(ult.name)}</b><p class="small">${esc(ult.desc)}</p><p class="small muted">${ult.card ? `Porté par ${esc(cat.get(ult.card).name)}.` : 'Ajoute une Mythique ou une Secrète pour un pouvoir plus puissant.'}</p></div>
+        ${ult.key ? `<div class="panel v2-skill ult" style="--uc:${ult.color}"><b>${icon('p:power')} Pouvoir : ${esc(ult.name)}</b><p class="small">${esc(ult.desc)}</p><p class="small muted">Porté par ${esc(cat.get(ult.card).name)}.</p></div>` : `<div class="panel v2-skill ult"><b>${icon('p:power')} Pouvoir d’équipe</b><p class="small muted">Ajoute une Mythique ou une Secrète à ton équipe : elle lui donne un pouvoir d’équipe, lancé quand la Ferveur est pleine.</p></div>`}
         ${run ? '' : `<div class="tm-tools"><button class="btn small primary" data-act="auto">${icon('sparkle')}Suggérer une équipe</button>${team.length ? '<button class="btn small ghost" data-act="clear">Vider</button>' : ''}</div>`}
         ${run ? '' : presetsHTML()}
         <details class="dc-fold tm-more"><summary>${icon('info')} Comment composer ton équipe</summary>
