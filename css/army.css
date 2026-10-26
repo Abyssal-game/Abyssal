@@ -7427,3 +7427,7 @@ html.kb-open .sheet-wrap:not(.sheet-full) .sheet { max-height: 100%; overflow-y:
 .vd-pick-c.owned small { color: #B9B2A3; font-weight: 700; }
 .vd-pick-c.fresh { box-shadow: 0 0 10px color-mix(in srgb, var(--rc) 55%, transparent); }
 .vd-pick-c.fresh small { color: #FFD97A; font-weight: 700; }
+/* v806 : score posé sur le disque mesuré de chaque anneau (centre de la plaque adverse 87,8 % / 47,4 %, la tienne 86,8 % / 46,7 %) ; les chiffres de Cinzel ont leur encre au-dessus du centre de la ligne : décalés de 0,055 em vers le bas */
+.vd-plate .vd-sc { box-sizing: border-box; transform: none; justify-content: center; align-items: center; padding: .11em 0 0; text-indent: 0; }
+.vd-plate.foe .vd-sc { left: 80.8%; width: 14%; top: 17.2%; height: 60.3%; }
+.vd-plate.me .vd-sc { left: 80.3%; width: 13%; top: 17.5%; height: 58.4%; }
