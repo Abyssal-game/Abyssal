@@ -8798,6 +8798,19 @@ export default {
   "Les Flammes": "Las Llamas",
   "Tu as {n} Flammes pour toute la partie. Pose jusqu’à {m} Flammes sur ta carte : chacune ajoute +1. Elles restent secrètes jusqu’à la révélation, mais chacun voit combien il en reste à l’autre.": "Tienes {n} Llamas para toda la partida. Pon hasta {m} Llamas en tu carta: cada una suma +1. Son secretas hasta la revelación, pero cada uno ve cuántas le quedan al otro.",
   "Le plus de manches gagnées l’emporte (à égalité, le total des forces). Une carte qui gagne sa manche est à toi : choisis bien où mettre tes Flammes. Chacun garde aussi une carte au choix, et le gagnant prend la copie d’une carte de l’adversaire. Partie nulle : pas de copie. Le reste retourne à l’Abysse.": "Gana quien gane más rondas (en empate, la fuerza total). Una carta que gana su ronda es tuya: elige bien dónde poner tus Llamas. Cada uno se queda además una carta a elegir, y el ganador se lleva la copia de una carta del rival. Empate: sin copia. El resto vuelve al Abismo.",
+  "Gagne {0} duels au Choc des Boosters.": "Gana {0} duelos en la Batalla de los Sobres.",
+  "Atteins une Série ardente de {0} victoires au Choc des Boosters.": "Alcanza una Racha ardiente de {0} victorias en la Batalla de los Sobres.",
+  "{0} / {1} · {2} éclats, titre « Fléau des sachets »": "{0} / {1} · {2} esquirlas, título «Azote de los sobres»",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Fléau des sachets »": "Desbloqueado el {0}/{1}/{2} · {3} esquirlas, título «Azote de los sobres»",
+  "{0} / {1} · {2} éclats, titre « Flamme éternelle »": "{0} / {1} · {2} esquirlas, título «Llama eterna»",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Flamme éternelle »": "Desbloqueado el {0}/{1}/{2} · {3} esquirlas, título «Llama eterna»",
+  "{0} / {1} · {2} éclats, titre « Centurion du Choc », un cadre de profil": "{0} / {1} · {2} esquirlas, título «Centurión de la Batalla», un marco de perfil",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Centurion du Choc », un cadre de profil": "Desbloqueado el {0}/{1}/{2} · {3} esquirlas, título «Centurión de la Batalla», un marco de perfil",
+  "{0} / {1} · {2} éclats, titre « Souverain du Choc », {3} coffre abyssal": "{0} / {1} · {2} esquirlas, título «Soberano de la Batalla», {3} cofre abisal",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Souverain du Choc », {4} coffre abyssal": "Desbloqueado el {0}/{1}/{2} · {3} esquirlas, título «Soberano de la Batalla», {4} cofre abisal",
+  "<b>Alliées cette semaine</b> : {e0} et {e1}<br>{e2}": "<b>Aliadas esta semana</b>: {e0} y {e1}<br>{e2}",
+  "Une traduction te semble fausse ou maladroite ? {e0} : dis-nous l’écran, le texte et ta proposition.": "¿Una traducción te parece incorrecta o torpe? {e0}: dinos la pantalla, el texto y tu propuesta.",
+  "Écris-nous": "Escríbenos",
 };
 
 export const names = {

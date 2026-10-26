@@ -9,10 +9,10 @@ import { vhash, vkey } from './voice-key.js';
 
 export { vhash, vkey };
 
-let set = null, on = true, playing = null, lastNar = -Infinity; /* v801 : avant, aucune phrase pendant les 20 premières secondes de l’app */
+let voiceGen = 0, set = null, on = true, playing = null, lastNar = -Infinity; /* v801 : avant, aucune phrase pendant les 20 premières secondes de l’app */
 const manifest = () => (set ||= getBytes(`assets/voix/manifest.json${listV()}`).then((b) => new Set(JSON.parse(new TextDecoder().decode(b)))).catch(() => new Set()));
 export function setVoices(v) { on = v !== false; if (!on) stopVoice(); }
-export function stopVoice() { try { playing?.stop(); } catch (e) { /* rien */ } playing = null; }
+export function stopVoice() { voiceGen++; try { playing?.stop(); } catch (e) { /* rien */ } playing = null; }
 /** la réplique a-t-elle une voix dans la langue du joueur ? */
 export async function hasVoice(speaker, fr, lang = LANG) { return (await manifest()).has(`${lang}/${vkey(speaker, fr)}`); }
 
@@ -22,7 +22,9 @@ export async function speak(speaker, fr, { lang = LANG } = {}) {
   const k = `${lang}/${vkey(speaker, fr)}`;
   if (!(await manifest()).has(k)) return null;
   stopVoice();
+  const gen = ++voiceGen; /* v819 : deux répliques rapprochées ne se superposent plus (la plus récente gagne) */
   const h = await playVoice(`assets/voix/${k}.mp3`);
+  if (gen !== voiceGen || !on) { try { h?.stop(); } catch (e) { /* rien */ } return null; }
   playing = h;
   return h;
 }

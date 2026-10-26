@@ -158,7 +158,7 @@ export default function shop(app, root, params = []) {
       <div class="products">
         ${card('standard')}
         ${card('faction', '', `<div class="chips fac-pick fac-grid" role="radiogroup" aria-label="Faction du booster">${FACTION_ORDER.map((f) => `<button class="chip" role="radio" data-act="pickfac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${st.faction === f}" aria-checked="${st.faction === f}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>`)}
-        ${card('event', `<p class="event-line"><b>Alliées cette semaine</b> : ${ev.factions.map((f) => esc(cat.faction[f].name)).join(' et ')}<br><span class="small muted">Nouvelle alliance dans ${ev.daysLeft} jour${ev.daysLeft > 1 ? 's' : ''}.</span></p>`)}
+        ${card('event', `<p class="event-line"><b>Alliées cette semaine</b> : ${ev.factions.map((f) => `<span>${esc(cat.faction[f].name)}</span>`).join(' et ')}<br><span class="small muted">Nouvelle alliance dans ${ev.daysLeft} jour${ev.daysLeft > 1 ? 's' : ''}.</span></p>`)}
         ${card('premium')}
         ${g.s.tickets.abysse ? card('abysse') : ''}
       </div>

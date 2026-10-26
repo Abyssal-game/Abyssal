@@ -220,7 +220,9 @@ export function createChocGame(app, root) {
   /* v813 : écran de fin compact : tout tient sur l'écran, sans défiler (demande du propriétaire) */
   function endScreen(v, ctx) {
     const s = v.state, me = v.me, foe = foeOf(v);
-    const r = s.winner === 'draw' ? 'draw' : s.winner === me ? 'win' : 'lose';
+    /* v819 : partie finie par abandon ou temps dépassé : le gagnant n'est écrit que dans la partie du serveur (v.winner) */
+    const W = s.winner ?? v.winner;
+    const r = W === 'draw' ? 'draw' : W === me ? 'win' : 'lose';
     const won = wonIdx(s, me), out = done[v.id];
     const hand = s.hand[me] || [], fh = s.hand[foe] || [];
     const mini = (c, f) => cardHTML(c, { small: true, force: f });

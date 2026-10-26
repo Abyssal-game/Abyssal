@@ -8798,6 +8798,19 @@ export default {
   "Les Flammes": "Le Fiamme",
   "Tu as {n} Flammes pour toute la partie. Pose jusqu’à {m} Flammes sur ta carte : chacune ajoute +1. Elles restent secrètes jusqu’à la révélation, mais chacun voit combien il en reste à l’autre.": "Hai {n} Fiamme per tutta la partita. Metti fino a {m} Fiamme sulla tua carta: ognuna aggiunge +1. Restano segrete fino alla rivelazione, ma ognuno vede quante ne restano all’altro.",
   "Le plus de manches gagnées l’emporte (à égalité, le total des forces). Une carte qui gagne sa manche est à toi : choisis bien où mettre tes Flammes. Chacun garde aussi une carte au choix, et le gagnant prend la copie d’une carte de l’adversaire. Partie nulle : pas de copie. Le reste retourne à l’Abysse.": "Vince chi conquista più round (in parità, la forza totale). Una carta che vince il suo round è tua: scegli bene dove mettere le tue Fiamme. Ognuno tiene anche una carta a scelta, e il vincitore prende la copia di una carta dell’avversario. Pareggio: nessuna copia. Il resto torna all’Abisso.",
+  "Gagne {0} duels au Choc des Boosters.": "Vinci {0} duelli nella Sfida delle Buste.",
+  "Atteins une Série ardente de {0} victoires au Choc des Boosters.": "Raggiungi una Serie ardente di {0} vittorie nella Sfida delle Buste.",
+  "{0} / {1} · {2} éclats, titre « Fléau des sachets »": "{0} / {1} · {2} schegge, titolo «Flagello delle buste»",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Fléau des sachets »": "Sbloccato il {0}/{1}/{2} · {3} Schegge, titolo « Flagello delle buste »",
+  "{0} / {1} · {2} éclats, titre « Flamme éternelle »": "{0} / {1} · {2} schegge, titolo «Fiamma eterna»",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Flamme éternelle »": "Sbloccato il {0}/{1}/{2} · {3} Schegge, titolo « Fiamma eterna »",
+  "{0} / {1} · {2} éclats, titre « Centurion du Choc », un cadre de profil": "{0} / {1} · {2} schegge, titolo «Centurione della Sfida», una cornice del profilo",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Centurion du Choc », un cadre de profil": "Sbloccato il {0}/{1}/{2} · {3} Schegge, titolo « Centurione della Sfida », una cornice del profilo",
+  "{0} / {1} · {2} éclats, titre « Souverain du Choc », {3} coffre abyssal": "{0} / {1} · {2} schegge, titolo «Sovrano della Sfida», {3} forziere abissale",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Souverain du Choc », {4} coffre abyssal": "Sbloccato il {0}/{1}/{2} · {3} Schegge, titolo « Sovrano della Sfida », {4} forziere abissale",
+  "<b>Alliées cette semaine</b> : {e0} et {e1}<br>{e2}": "<b>Alleate questa settimana</b>: {e0} e {e1}<br>{e2}",
+  "Une traduction te semble fausse ou maladroite ? {e0} : dis-nous l’écran, le texte et ta proposition.": "Una traduzione ti sembra sbagliata o goffa? {e0}: dicci la schermata, il testo e la tua proposta.",
+  "Écris-nous": "Scrivici",
 };
 
 export const names = {

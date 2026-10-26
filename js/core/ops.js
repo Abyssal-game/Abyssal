@@ -68,6 +68,12 @@ const MERGE_FREE = new Set(['seenIntro', 'giftShown', 'notifAsked', 'tips', 'sto
 export function mergeFree(p, cur, inc) {
   if (!MERGE_FREE.has(p) || cur == null) return inc;
   if (inc == null) return cur;
+  /* v819 : « Revoir les bulles d'aide » pose tips._reset (date) : la remise à zéro la plus récente l'emporte en entier */
+  if (p === 'tips' && typeof cur === 'object' && typeof inc === 'object' && (cur._reset || inc._reset)) {
+    const R = Math.max(+cur._reset || 0, +inc._reset || 0), o = { _reset: R };
+    for (const src of [cur, inc]) for (const [k, v] of Object.entries(src)) if (k !== '_reset' && typeof v === 'number' && v >= R) o[k] = Math.max(o[k] || 0, v);
+    return o; /* une bulle vue avant la remise à zéro (ou marquée sans date) redevient à voir */
+  }
   if (typeof cur === 'object' && typeof inc === 'object' && !Array.isArray(cur) && !Array.isArray(inc)) { const o = { ...cur }; for (const [k, v] of Object.entries(inc)) o[k] = mergeFree(p, cur[k] ?? null, v); return o; }
   if (typeof cur === 'boolean' || typeof inc === 'boolean') return cur || inc;
   return inc > cur ? inc : cur;

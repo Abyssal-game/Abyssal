@@ -868,7 +868,11 @@ returns jsonb language plpgsql stable set search_path = public as $$
 declare st jsonb := m.state; foe text := case when me = 'a' then 'b' else 'a' end; i int;
 begin
   if m.game = 'sceaux' then return st - 'handA'; end if;
-  if m.game = 'choc' and st ? 'hand' then return public.choc_view(st, me); end if; -- v811
+  -- v811 ; v819 : partie finie par abandon ou temps dépassé : l'état est marqué fini (tout se voit, le gagnant est celui de la partie)
+  if m.game = 'choc' and st ? 'hand' then
+    if m.status = 'done' and not coalesce((st ->> 'over')::boolean, false) then st := st || jsonb_build_object('over', true, 'winner', m.winner); end if;
+    return public.choc_view(st, me);
+  end if;
   if m.game = 'pacte' then
     if st ? 'deck' then st := jsonb_set(st, '{deck}', coalesce((select jsonb_agg(x order by x::text) from jsonb_array_elements(st -> 'deck') x), '[]')); end if;
     return st;

@@ -8798,6 +8798,19 @@ export default {
   "Les Flammes": "Die Flammen",
   "Tu as {n} Flammes pour toute la partie. Pose jusqu’à {m} Flammes sur ta carte : chacune ajoute +1. Elles restent secrètes jusqu’à la révélation, mais chacun voit combien il en reste à l’autre.": "Du hast {n} Flammen für die ganze Partie. Lege bis zu {m} Flammen auf deine Karte: Jede gibt +1. Sie bleiben bis zur Enthüllung geheim, aber jeder sieht, wie viele dem anderen bleiben.",
   "Le plus de manches gagnées l’emporte (à égalité, le total des forces). Une carte qui gagne sa manche est à toi : choisis bien où mettre tes Flammes. Chacun garde aussi une carte au choix, et le gagnant prend la copie d’une carte de l’adversaire. Partie nulle : pas de copie. Le reste retourne à l’Abysse.": "Wer die meisten Runden gewinnt, siegt (bei Gleichstand die Gesamtstärke). Eine Karte, die ihre Runde gewinnt, gehört dir: Überlege gut, wohin deine Flammen gehen. Jeder behält außerdem eine Karte nach Wahl, und der Sieger nimmt die Kopie einer gegnerischen Karte. Unentschieden: keine Kopie. Der Rest kehrt in den Abgrund zurück.",
+  "Gagne {0} duels au Choc des Boosters.": "Gewinne {0} Duelle in der Booster-Schlacht.",
+  "Atteins une Série ardente de {0} victoires au Choc des Boosters.": "Erreiche eine Glühende Serie von {0} Siegen in der Booster-Schlacht.",
+  "{0} / {1} · {2} éclats, titre « Fléau des sachets »": "{0} / {1} · {2} Splitter, Titel „Geißel der Booster“",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Fléau des sachets »": "Freigeschaltet am {0}.{1}.{2} · {3} Splitter, Titel „Geißel der Booster“",
+  "{0} / {1} · {2} éclats, titre « Flamme éternelle »": "{0} / {1} · {2} Splitter, Titel „Ewige Flamme“",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Flamme éternelle »": "Freigeschaltet am {0}.{1}.{2} · {3} Splitter, Titel „Ewige Flamme“",
+  "{0} / {1} · {2} éclats, titre « Centurion du Choc », un cadre de profil": "{0} / {1} · {2} Splitter, Titel „Zenturio der Schlacht“, ein Profilrahmen",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Centurion du Choc », un cadre de profil": "Freigeschaltet am {0}.{1}.{2} · {3} Splitter, Titel „Zenturio der Schlacht“, ein Profilrahmen",
+  "{0} / {1} · {2} éclats, titre « Souverain du Choc », {3} coffre abyssal": "{0} / {1} · {2} Splitter, Titel „Souverän der Schlacht“, {3} Abgrundtruhe",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Souverain du Choc », {4} coffre abyssal": "Freigeschaltet am {0}.{1}.{2} · {3} Splitter, Titel „Souverän der Schlacht“, {4} Abgrundtruhe",
+  "<b>Alliées cette semaine</b> : {e0} et {e1}<br>{e2}": "<b>Diese Woche verbündet</b>: {e0} und {e1}<br>{e2}",
+  "Une traduction te semble fausse ou maladroite ? {e0} : dis-nous l’écran, le texte et ta proposition.": "Eine Übersetzung wirkt falsch oder holprig? {e0}: Nenne uns den Bildschirm, den Text und deinen Vorschlag.",
+  "Écris-nous": "Schreib uns",
 };
 
 export const names = {

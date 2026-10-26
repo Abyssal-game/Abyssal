@@ -1371,7 +1371,11 @@ returns jsonb language plpgsql stable set search_path = public as $$
 declare st jsonb := m.state; foe text := case when me = 'a' then 'b' else 'a' end; i int;
 begin
   if m.game = 'sceaux' then return st - 'handA'; end if;
-  if m.game = 'choc' and st ? 'hand' then return public.choc_view(st, me); end if; -- v811
+  -- v811 ; v819 : partie finie par abandon ou temps dépassé : l'état est marqué fini (tout se voit, le gagnant est celui de la partie)
+  if m.game = 'choc' and st ? 'hand' then
+    if m.status = 'done' and not coalesce((st ->> 'over')::boolean, false) then st := st || jsonb_build_object('over', true, 'winner', m.winner); end if;
+    return public.choc_view(st, me);
+  end if;
   if m.game = 'pacte' then
     if st ? 'deck' then st := jsonb_set(st, '{deck}', coalesce((select jsonb_agg(x order by x::text) from jsonb_array_elements(st -> 'deck') x), '[]')); end if;
     return st;
@@ -1570,7 +1574,7 @@ grant execute on function public.mp_ranking(text, int) to authenticated;
 create table if not exists public.sql_stamps (file text primary key, stamp text not null, at timestamptz not null default now());
 alter table public.sql_stamps enable row level security;
 revoke all on public.sql_stamps from public, anon, authenticated;
-insert into public.sql_stamps (file, stamp) values ('09', '103a25011822') on conflict (file) do update set stamp = excluded.stamp, at = now();
+insert into public.sql_stamps (file, stamp) values ('09', 'ee3437ae2d10') on conflict (file) do update set stamp = excluded.stamp, at = now();
 create or replace function public.sql_stamps() returns jsonb language sql stable security definer set search_path = public as $$
   select coalesce(jsonb_object_agg(file, stamp), '{}'::jsonb) from public.sql_stamps;
 $$;

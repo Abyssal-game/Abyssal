@@ -8798,6 +8798,19 @@ export default {
   "Les Flammes": "As Chamas",
   "Tu as {n} Flammes pour toute la partie. Pose jusqu’à {m} Flammes sur ta carte : chacune ajoute +1. Elles restent secrètes jusqu’à la révélation, mais chacun voit combien il en reste à l’autre.": "Você tem {n} Chamas para a partida toda. Coloque até {m} Chamas na sua carta: cada uma soma +1. Elas ficam secretas até a revelação, mas cada um vê quantas restam ao outro.",
   "Le plus de manches gagnées l’emporte (à égalité, le total des forces). Une carte qui gagne sa manche est à toi : choisis bien où mettre tes Flammes. Chacun garde aussi une carte au choix, et le gagnant prend la copie d’une carte de l’adversaire. Partie nulle : pas de copie. Le reste retourne à l’Abysse.": "Vence quem ganhar mais rodadas (no empate, a força total). Uma carta que vence sua rodada é sua: escolha bem onde pôr suas Chamas. Cada um fica também com uma carta à escolha, e o vencedor leva a cópia de uma carta do adversário. Empate: sem cópia. O resto volta ao Abismo.",
+  "Gagne {0} duels au Choc des Boosters.": "Vence {0} duelos na Batalha dos Pacotes.",
+  "Atteins une Série ardente de {0} victoires au Choc des Boosters.": "Alcança uma Sequência ardente de {0} vitórias na Batalha dos Pacotes.",
+  "{0} / {1} · {2} éclats, titre « Fléau des sachets »": "{0} / {1} · {2} Fragmentos, título “Flagelo dos pacotes”",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Fléau des sachets »": "Desbloqueado em {0}/{1}/{2} · {3} Fragmentos, título “Flagelo dos pacotes”",
+  "{0} / {1} · {2} éclats, titre « Flamme éternelle »": "{0} / {1} · {2} Fragmentos, título “Chama eterna”",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Flamme éternelle »": "Desbloqueado em {0}/{1}/{2} · {3} Fragmentos, título “Chama eterna”",
+  "{0} / {1} · {2} éclats, titre « Centurion du Choc », un cadre de profil": "{0} / {1} · {2} Fragmentos, título “Centurião da Batalha”, uma moldura de perfil",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Centurion du Choc », un cadre de profil": "Desbloqueado em {0}/{1}/{2} · {3} Fragmentos, título “Centurião da Batalha”, uma moldura de perfil",
+  "{0} / {1} · {2} éclats, titre « Souverain du Choc », {3} coffre abyssal": "{0} / {1} · {2} Fragmentos, título “Soberano da Batalha”, {3} baú abissal",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Souverain du Choc », {4} coffre abyssal": "Desbloqueado em {0}/{1}/{2} · {3} Fragmentos, título “Soberano da Batalha”, {4} baú abissal",
+  "<b>Alliées cette semaine</b> : {e0} et {e1}<br>{e2}": "<b>Aliadas nesta semana</b>: {e0} e {e1}<br>{e2}",
+  "Une traduction te semble fausse ou maladroite ? {e0} : dis-nous l’écran, le texte et ta proposition.": "Uma tradução parece errada ou estranha? {e0}: conta-nos a tela, o texto e a tua sugestão.",
+  "Écris-nous": "Escreve-nos",
 };
 
 export const names = {

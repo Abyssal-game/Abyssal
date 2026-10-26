@@ -43,4 +43,4 @@ export function coach(app, key, html, { title = '' } = {}) {
 }
 
 // Pour revoir toutes les bulles (depuis les Réglages)
-export function resetTips(app) { app.game.s.tips = {}; app.game.persist(); }
+export function resetTips(app) { app.game.s.tips = { _reset: Date.now() }; app.game.persist(); } /* v819 : marque de remise à zéro, gardée par mergeFree */

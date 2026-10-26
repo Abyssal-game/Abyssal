@@ -8809,6 +8809,19 @@ export default {
   "Les Flammes": "The Flames",
   "Tu as {n} Flammes pour toute la partie. Pose jusqu’à {m} Flammes sur ta carte : chacune ajoute +1. Elles restent secrètes jusqu’à la révélation, mais chacun voit combien il en reste à l’autre.": "You have {n} Flames for the whole game. Put up to {m} Flames on your card: each adds +1. They stay secret until the reveal, but each player sees how many the other has left.",
   "Le plus de manches gagnées l’emporte (à égalité, le total des forces). Une carte qui gagne sa manche est à toi : choisis bien où mettre tes Flammes. Chacun garde aussi une carte au choix, et le gagnant prend la copie d’une carte de l’adversaire. Partie nulle : pas de copie. Le reste retourne à l’Abysse.": "Most rounds won takes it (if tied, total strength). A card that wins its round is yours: choose carefully where to put your Flames. Each player also keeps one card of their choice, and the winner takes a copy of one of the opponent’s cards. Draw: no copy. The rest returns to the Abyss.",
+  "Gagne {0} duels au Choc des Boosters.": "Win {0} duels in the Booster Clash.",
+  "Atteins une Série ardente de {0} victoires au Choc des Boosters.": "Reach a Blazing Streak of {0} wins in the Booster Clash.",
+  "{0} / {1} · {2} éclats, titre « Fléau des sachets »": "{0} / {1} · {2} Shards, title “Scourge of Packs”",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Fléau des sachets »": "Unlocked on {0}/{1}/{2} · {3} Shards, title “Scourge of Packs”",
+  "{0} / {1} · {2} éclats, titre « Flamme éternelle »": "{0} / {1} · {2} Shards, title “Eternal Flame”",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Flamme éternelle »": "Unlocked on {0}/{1}/{2} · {3} Shards, title “Eternal Flame”",
+  "{0} / {1} · {2} éclats, titre « Centurion du Choc », un cadre de profil": "{0} / {1} · {2} Shards, title “Centurion of the Clash”, a profile frame",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Centurion du Choc », un cadre de profil": "Unlocked on {0}/{1}/{2} · {3} Shards, title “Centurion of the Clash”, a profile frame",
+  "{0} / {1} · {2} éclats, titre « Souverain du Choc », {3} coffre abyssal": "{0} / {1} · {2} Shards, title “Sovereign of the Clash”, {3} abyssal chest",
+  "Débloqué le {0}/{1}/{2} · {3} éclats, titre « Souverain du Choc », {4} coffre abyssal": "Unlocked on {0}/{1}/{2} · {3} Shards, title “Sovereign of the Clash”, {4} abyssal chest",
+  "<b>Alliées cette semaine</b> : {e0} et {e1}<br>{e2}": "<b>Allied this week</b>: {e0} and {e1}<br>{e2}",
+  "Une traduction te semble fausse ou maladroite ? {e0} : dis-nous l’écran, le texte et ta proposition.": "A translation seems wrong or awkward? {e0}: tell us the screen, the text and your suggestion.",
+  "Écris-nous": "Write to us",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

@@ -1179,6 +1179,7 @@ export class Game {
   sceauxDailyOpen() { return !!this.s.sceaux.beaten?.initie; } /* v403 : le défi du jour s'ouvre après une victoire contre Ilda */
   sceauxStart({ rival, daily = false, awake = false } = {}) {
     const sc = this.s.sceaux;
+    if (sc.cur?.over && !sc.cur.rewarded) this.sceauxFinish(); /* v819 : une partie finie mais pas encaissée (app coupée avant l'écran de fin) n'est plus écrasée sans ses récompenses */
     let R = SC.RIVAL[rival], seed = null;
     if (daily) {
       if (!this.sceauxDailyOpen()) throw new Error('Le défi du jour s’ouvre après ta première victoire contre Ilda.');
@@ -1300,6 +1301,7 @@ export class Game {
   encheresDaily() { const day = today(this.clock()); return { table: EN.dailyTable(day, this.encheresUnlocked()), seed: [...`encheres:${day}`].reduce((h, c) => (Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0), 2166136261) }; }
   encheresStart({ table, daily = false } = {}) {
     const en = this.s.encheres;
+    if (en.cur?.over && !en.cur.rewarded) this.encheresFinish(); /* v819 : une partie finie mais pas encaissée (app coupée avant l'écran de fin) n'est plus écrasée sans ses récompenses */
     if (!this.sceauxOpen()) throw new Error('Les Enchères de Mammon s’ouvrent après ton premier gardien.');
     let seed = null;
     if (daily) {
@@ -1377,6 +1379,7 @@ export class Game {
   pacteDaily() { const day = today(this.clock()); return { table: PA.dailyTable(day, this.pacteUnlocked()), seed: [...`pacte:${day}`].reduce((h, c) => (Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0), 2166136261) }; }
   pacteStart({ table, daily = false } = {}) {
     const pa = this.s.pacte;
+    if (pa.cur?.over && !pa.cur.rewarded) this.pacteFinish(); /* v819 : une partie finie mais pas encaissée (app coupée avant l'écran de fin) n'est plus écrasée sans ses récompenses */
     if (!this.sceauxOpen()) throw new Error('Le Pacte s’ouvre après ton premier gardien.');
     let seed = null;
     if (daily) {
@@ -1454,6 +1457,7 @@ export class Game {
   cryptesDaily() { const day = today(this.clock()); return { table: CR.dailyTable(day, this.cryptesUnlocked()), seed: [...`cryptes:${day}`].reduce((h, c) => (Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0), 2166136261) }; }
   cryptesStart({ table, daily = false } = {}) {
     const cr = this.s.cryptes;
+    if (cr.cur?.over && !cr.cur.rewarded) this.cryptesFinish(); /* v819 : une partie finie mais pas encaissée (app coupée avant l'écran de fin) n'est plus écrasée sans ses récompenses */
     if (!this.sceauxOpen()) throw new Error('Les Cryptes s’ouvrent après ton premier gardien.');
     let seed = null;
     if (daily) {
