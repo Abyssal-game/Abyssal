@@ -7921,3 +7921,12 @@ img, svg, canvas, a, .tcg, .tcg *, [style*="background-image"] {
   -webkit-user-drag: none;
 }
 img, svg, canvas { -webkit-user-select: none; user-select: none; }
+
+/* v818 : ouverture plus légère en mémoire (crash signalé à l'ouverture d'un booster premium sorti d'un coffre abyssal).
+   Les rayons tournants (carré de 118vmax : ≈ 44 Mo de mémoire graphique sur un écran ×3) ne sont plus là que pendant la grande révélation ;
+   sur les décors peints ils n'étaient visibles qu'à 10 %. Le tremblement de la grande révélation passe de toute la scène (≈ 34 Mo) à la seule carte. */
+.opening.obg:not(.epic) .op-rays, .opening.chx:not(.epic) .op-rays { display: none; }
+.opening.epic .op-stage { animation: none; }
+.opening.epic .op-pile { animation: shake .5s ease; }
+/* v818 : les morceaux du sachet déchiré tombent hors de l'écran : dans une scène qui défile, ils l'agrandissaient jusqu'à ≈ 2 écrans de haut (≈ 34 Mo de plus). Hors récapitulatif, la scène coupe ce qui dépasse. */
+.opening:not(.is-summary) .op-stage { overflow: clip; }
