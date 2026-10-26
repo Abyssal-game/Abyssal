@@ -8593,6 +8593,15 @@ export default {
   "Cette adresse e-mail a déjà reçu ses <b>boosters de bienvenue</b> avec un ancien compte. Ils ne s’offrent qu’une fois par adresse, et le booster gratuit du jour aussi.": "This email address already received its <b>welcome boosters</b> with a previous account. They are given only once per address, and so is today’s free booster.",
   "Ta nouvelle aventure commence quand même : le booster gratuit revient chaque jour.": "Your new adventure still begins: the free booster comes back every day.",
   "Cadeaux non repris en recréant un compte": "Gifts not reclaimed by recreating an account",
+  "Prologue": "Prologue",
+  "Une histoire va commencer": "A story is about to begin",
+  "Avant ta première descente, le narrateur va te raconter comment le Bestiaire interdit a été déchiré.": "Before your first descent, the narrator will tell you how the Forbidden Bestiary was torn apart.",
+  "Étage 100": "Floor 100",
+  "La fin de la Descente": "The end of the Descent",
+  "L’Abysse est vaincu. Le narrateur va te raconter ce qui se passe maintenant.": "The Abyss is defeated. The narrator will tell you what happens now.",
+  "{e0}<b>Monte le son</b> : la musique et la voix font partie de l’histoire.": "{e0}<b>Turn up the sound</b>: the music and the voice are part of the story.",
+  "<b>Monte le son</b> : la musique et la voix font partie de l’histoire.": "<b>Turn up the sound</b>: the music and the voice are part of the story.",
+  "Regarder": "Watch",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

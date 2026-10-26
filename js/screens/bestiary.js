@@ -151,8 +151,8 @@ export default function bestiary(app, root) {
     tab(el) { st.tab = el.dataset.v; render(); },
     fac(el) { st.faction = el.dataset.v; render(); },
     card() {},
-    ending() { playEnding(app); },
-    prologue() { playPrologue(app); }, /* v775 */
+    ending() { playEnding(app, { intro: false }); },
+    prologue() { playPrologue(app, { intro: false }); }, /* v775 */
     dream(el) { const b = BOSSES[el.dataset.k]; if (!b) return; app.sfx.page?.(); /* v676 */
       openSheet(`<div class="drm-sheet"><span class="drm-art drm-card big"><img alt="" src="assets/bosses/combat-${el.dataset.k}.webp"></span><h2 class="center" translate="no">${esc(tw(b.name))}</h2><p class="center small lr-sub">${esc(b.title)}</p><p class="lore">${esc(b.story)}</p><p class="small"><b>Sa mécanique.</b> ${esc(b.mechanic)}</p><p class="small"><b>Pour le contrer.</b> ${esc(b.counter)}</p></div>`, { label: b.name, cls: 'dc-sheet' }); },
   });

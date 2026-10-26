@@ -24,7 +24,35 @@ export const CINE_SCENES = {
   fin: ['L’œil se referme', 'La page qui glisse', 'Le vélin et les signatures', 'Celui qui rêve', 'Gros plan : les yeux s’ouvrent', 'La page scellée de l’Abysse', 'Arc I · Bientôt'],
 };
 
-export function playEnding(app, { name, lang, start } = {}) {
+
+/* v798 : avant une cinématique (prologue d'une nouvelle partie, fin après l'étage 100), un écran d'annonce : on sait
+   qu'une histoire va être racontée et on monte le son. Le toucher sur « Regarder » débloque aussi le son de l'iPhone. */
+const INTRO = {
+  prologue: { k: 'Prologue', h: 'Une histoire va commencer', p: 'Avant ta première descente, le narrateur va te raconter comment le Bestiaire interdit a été déchiré.' },
+  fin: { k: 'Étage 100', h: 'La fin de la Descente', p: 'L’Abysse est vaincu. Le narrateur va te raconter ce qui se passe maintenant.' },
+};
+function cineIntro(kind) {
+  const c = INTRO[kind];
+  if (!c) return Promise.resolve(true);
+  return new Promise((ok) => {
+    const el = document.createElement('div');
+    el.className = 'endx endx-intro';
+    el.innerHTML = `<div class="endx-in"><img class="endx-in-em" alt="" src="assets/brand/emblem.webp"><span class="endx-k">${esc(c.k)}</span><h2>${esc(c.h)}</h2><p>${esc(c.p)}</p>
+      <p class="endx-in-snd"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span><b>Monte le son</b> : la musique et la voix font partie de l’histoire.</span></p>
+      <button class="btn gold block" data-in="go">Regarder</button><button class="btn ghost small block" data-in="skip">Passer</button></div>`;
+    document.body.appendChild(el);
+    try { haptic('medium'); } catch (e) { /* vibration facultative */ }
+    el.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-in]'); if (!b) return;
+      try { sfx.tap?.(); } catch (er) { /* rien */ }
+      el.classList.add('out'); setTimeout(() => el.remove(), 380);
+      ok(b.dataset.in === 'go');
+    });
+  });
+}
+
+export async function playEnding(app, { name, lang, start, intro = true } = {}) {
+  if (intro && !start && !(await cineIntro('fin'))) return;
   const who = name || sync.profile?.pseudo || app.game?.s?.name || 'Toi';
   const sigLang = lang || LANG;
   const nameAt = (i) => 0.5 + i * 0.55; /* secondes : apparition de chaque signature */
@@ -61,7 +89,8 @@ export function resumeEnding(app, tries = 0) {
 }
 
 /* v775 : le prologue, au tout premier lancement (avant le guide de bienvenue) ; revisible dans Bestiaire → Histoire */
-export function playPrologue(app, { lang, start } = {}) {
+export async function playPrologue(app, { lang, start, intro = true } = {}) {
+  if (intro && !start && !(await cineIntro('prologue'))) return;
   const scenes = [
     { img: 'p1', cam: 'in', voice: 'pro-1', snd: ['ci-forge', 'rumble'], hap: 'heavy', fx: 'embers', text: 'Les sept royaumes ont forgé le Bestiaire interdit pour enfermer ce qui ne devait plus marcher sous le ciel.' },
     { img: 'p2b', tr: 'ink', cam: 'up', voice: 'pro-2', hap: 'double', fx: 'dust', text: 'Sept gardiens, un par royaume, l’ont scellé de leur main. Ce furent les premiers Scelleurs.' },

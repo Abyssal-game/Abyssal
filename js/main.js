@@ -73,7 +73,7 @@ const TABS = [
 ];
 // icônes peintes de la barre du bas (assets/icons)
 const tabIcon = (k) => `<img class="tab-pic" alt="" src="assets/icons/${k}.webp">`;
-const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', codex: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', amis: 'menu', equipe: 'collection', renfort: 'collection', fournaise: 'collection', coffres: 'boutique', heros: 'descente', arsenal: 'boutique', marchand: 'descente', sceaux: 'descente', encheres: 'descente', versus: 'descente', pacte: 'descente', cryptes: 'descente', jeux: 'descente', epreuves: 'descente', epreuve: 'descente', tirage: 'boutique', labo: 'menu' };
+const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', codex: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', amis: 'menu', equipe: 'collection', renfort: 'collection', fournaise: 'collection', coffres: 'boutique', heros: 'descente', arsenal: 'boutique', marchand: 'descente', sceaux: 'descente', encheres: 'descente', versus: 'boutique', pacte: 'descente', cryptes: 'descente', jeux: 'descente', epreuves: 'descente', epreuve: 'descente', tirage: 'boutique', labo: 'menu' };
 // Fond illustré de chaque page (l'Accueil et la Descente posent le leur)
 const ROUTE_SCENE = { boutique: 'shop', codex: 'shop', tirage: 'shadow', renfort: 'collection', fournaise: 'collection', collection: 'collection', equipe: 'team', coffres: 'chests', bestiaire: 'bestiary', succes: 'trophies', profil: 'profile', menu: 'menu', parametres: 'menu', compte: 'menu', amis: 'menu', factions: 'factions', faction: 'factions' };
 // Page parente des sous-pages (bouton retour en haut)
@@ -83,8 +83,8 @@ const PARENT = { labo: 'parametres', amis: 'menu', bestiaire: 'menu', factions: 
 const SUB_OF = { fournaise: 'renfort', sceaux: 'jeux', encheres: 'jeux', pacte: 'jeux', cryptes: 'jeux' };
 const SUBNAV = {
   collection: [['collection', 'cards', 'Cartes'], ['equipe', 'team-ic', 'Équipe'], ['renfort', 'furnace', 'Forge']], /* v422 : Renforcer + Fournaise */
-  boutique: [['boutique', 'booster', 'Boosters'], ['coffres', 'chest', 'Coffres'], ['tirage', 'shadow', 'Tirage'], ['codex', 'book', 'Codex']], /* v470 : Codex et Échoppe, en Mode Créateur seulement */ /* v428 : les coffres rejoignent le Butin */
-  descente: [['descente', 'descend', 'Descente'], ['epreuves', 'crest-elite', 'Épreuves'], ['versus', 'booster', 'Choc'], ['jeux', 'seal', 'Jeux']], /* v776 : le Choc des Boosters a son propre sous-onglet */
+  boutique: [['boutique', 'booster', 'Boosters'], ['coffres', 'chest', 'Coffres'], ['tirage', 'shadow', 'Tirage'], ['versus', 'swords', 'Choc'], ['codex', 'book', 'Codex']], /* v470 : Codex et Échoppe, en Mode Créateur seulement */ /* v428 : les coffres rejoignent le Butin */
+  descente: [['descente', 'descend', 'Descente'], ['epreuves', 'crest-elite', 'Épreuves'], ['jeux', 'seal', 'Jeux']], /* v798 : le Choc des Boosters passe dans le Butin, à côté du Tirage */
 };
 
 function storageOrMemory() {
@@ -256,11 +256,12 @@ function renderChrome() {
     // moins de pastilles : un chiffre seulement pour ce qui attend d'être ouvert (boosters, coffres), sinon un simple point
     const dot = '<span class="badge dot calm"></span>', nCap = (n) => (n > 9 ? '9+' : n); /* v699 : « 20 » sur l'onglet faisait pression : 9+ au-delà */
     const bq = ticketCount + g.chestCount() + (shadowDue() ? 1 : 0); /* v709 : + le Tirage des Ombres du jour */
-    const badge = key === 'boutique' && bq ? dot /* v428 : boosters et coffres à ouvrir ; v755 : lueur dorée, plus de chiffre */
+    const badge = key === 'boutique' && mpw.games ? `<span class="badge">${nCap(mpw.games)}</span>` /* v798 : Choc, duels à voir et défis reçus */
+      : key === 'boutique' && bq ? dot /* v428 : boosters et coffres à ouvrir ; v755 : lueur dorée, plus de chiffre */
       : key === 'collection' && nNew ? dot
       : key === 'antre' && mpw.cards?.length ? `<span class="badge">${nCap(mpw.cards.length)}</span>` /* v696 : « Le Cercle t'attend » sur l'Accueil */
       : key === 'antre' && (g.canDailyClaim() || g.missionsToClaim()) ? dot
-      : key === 'descente' && (mpw.turns + mpw.games) ? `<span class="badge">${nCap(mpw.turns + mpw.games)}</span>` /* v521 : en ligne, à toi de jouer ou défi à voir */
+      : key === 'descente' && mpw.turns ? `<span class="badge">${nCap(mpw.turns)}</span>` /* v521 : en ligne, à toi de jouer ou défi à voir */
       : key === 'menu' && mpw.friends ? `<span class="badge">${nCap(mpw.friends)}</span>` /* v521 : demandes d'ami */
       : key === 'descente' && g.team().length >= 3 && (g.descent().run || g.trials().done.some((x) => !x)) ? dot : ''; /* v407 : Épreuves du jour à jouer */
     if (key === 'boutique') return `<a class="tab tab-main" href="#/boutique"${cur}><span class="orb">${tabIcon(ic)}</span>${label}${badge}</a>`;

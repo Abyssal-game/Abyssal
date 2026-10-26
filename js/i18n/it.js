@@ -8582,6 +8582,15 @@ export default {
   "Cette adresse e-mail a déjà reçu ses <b>boosters de bienvenue</b> avec un ancien compte. Ils ne s’offrent qu’une fois par adresse, et le booster gratuit du jour aussi.": "Questo indirizzo e-mail ha già ricevuto le sue <b>buste di benvenuto</b> con un account precedente. Si ricevono una sola volta per indirizzo, come la busta gratuita del giorno.",
   "Ta nouvelle aventure commence quand même : le booster gratuit revient chaque jour.": "La tua nuova avventura comincia comunque: la busta gratuita torna ogni giorno.",
   "Cadeaux non repris en recréant un compte": "Regali non ripresi ricreando un account",
+  "Prologue": "Prologo",
+  "Une histoire va commencer": "Una storia sta per cominciare",
+  "Avant ta première descente, le narrateur va te raconter comment le Bestiaire interdit a été déchiré.": "Prima della tua prima discesa, il narratore ti racconterà come è stato strappato il Bestiario proibito.",
+  "Étage 100": "Piano 100",
+  "La fin de la Descente": "La fine della Discesa",
+  "L’Abysse est vaincu. Le narrateur va te raconter ce qui se passe maintenant.": "L’Abisso è sconfitto. Il narratore ti racconterà cosa succede ora.",
+  "{e0}<b>Monte le son</b> : la musique et la voix font partie de l’histoire.": "{e0}<b>Alza il volume</b>: la musica e la voce fanno parte della storia.",
+  "<b>Monte le son</b> : la musique et la voix font partie de l’histoire.": "<b>Alza il volume</b>: la musica e la voce fanno parte della storia.",
+  "Regarder": "Guarda",
 };
 
 export const names = {

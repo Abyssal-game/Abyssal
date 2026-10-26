@@ -183,7 +183,7 @@ export function openCreator(app) {
         saveCine();
         const o = { lang: cine.lang, start: cine.start };
         sheet.close();
-        setTimeout(() => (cine.film === 'fin' ? playEnding(app, { ...o, name: cine.name || undefined }) : playPrologue(app, o)).then(() => openCreator(app)), 350);
+        setTimeout(() => (cine.film === 'fin' ? playEnding(app, { ...o, intro: false, name: cine.name || undefined }) : playPrologue(app, { ...o, intro: false })).then(() => openCreator(app)), 350);
         return;
       }
       if (x === 'all') g.devUnlockAll();
