@@ -41,15 +41,17 @@ export const OPS = {
   // Codex et Échoppe (obsidiennes)
   codex: { kind: 'sync', lazy: (s) => `${s.codex?.season}:${s.codex?.live ? 1 : 0}` }, /* v550 : changement de saison (et récompenses oubliées données) */
   chocLeague: { kind: 'sync', lazy: (s) => s.versus?.lg?.m }, /* v807 : Ligues du Choc, changement de mois */
+  chocTokens: { kind: 'sync', lazy: (s) => (s.choc ? `${s.choc.day}:${s.choc.n}` : '') }, /* v811 : jetons du Choc rendus chaque jour */
   codexClaim: { kind: 'sync' }, codexClaimAll: { kind: 'sync' }, catalogBuy: { kind: 'sync' }, codexUnlock: { kind: 'dev' }, codexBuyTier: { kind: 'sync' }, /* v680 */
   // v680 : achats payés (App Store) : le serveur les vérifie lui-même auprès de RevenueCat (serveur/iap.mjs)
   iapSync: { kind: 'first', net: true },
   // en ligne : le serveur vérifie lui-même le résultat (Choc des Boosters, parties en ligne, Tirage des Ombres)
   versusCreate: { kind: 'first', net: true }, versusAccept: { kind: 'first', net: true }, versusClaim: { kind: 'first', net: true }, versusPick: { kind: 'first', net: true },
+  chocNew: { kind: 'first', net: true }, chocJoin: { kind: 'first', net: true }, chocRefund: { kind: 'first', net: true }, chocClaim: { kind: 'first', net: true }, /* v811 */
   mpClaim: { kind: 'first', net: true }, shadowPay: { kind: 'first', net: true }, shadowClaim: { kind: 'first', net: true },
   // Mode Créateur
   shopBuy: { kind: 'dev' }, devGrant: { kind: 'dev' }, devGive: { kind: 'dev' }, devAllVariants: { kind: 'dev' }, devDuplicates: { kind: 'dev' },
-  devChests: { kind: 'dev' }, devResetCampaign: { kind: 'dev' }, devFreePacks: { kind: 'dev' }, devAbyss: { kind: 'dev' }, devMissions: { kind: 'dev' }, devFloor: { kind: 'dev' },
+  devChests: { kind: 'dev' }, devResetCampaign: { kind: 'dev' }, devFreePacks: { kind: 'dev' }, devChocTokens: { kind: 'dev' }, devAbyss: { kind: 'dev' }, devMissions: { kind: 'dev' }, devFloor: { kind: 'dev' },
   devBoss: { kind: 'dev' }, devVeille: { kind: 'dev' }, devUnlockAll: { kind: 'dev' }, devObs: { kind: 'dev' }, devCodexXp: { kind: 'dev' }, devCodexPrem: { kind: 'dev' },
   devCodexReset: { kind: 'dev' }, devSnapshot: { kind: 'dev' }, autoResolve: { kind: 'dev' }, autoTrial: { kind: 'dev' },
 };
@@ -96,6 +98,7 @@ export function digest(s) {
     (s.titles || []).length, (s.frames || []).length, (s.backs || []).length, (s.sachets || []).length, (s.plates || []).length, (s.emotes || []).length, (s.mats || []).length, (s.fonds || []).length, (s.finishes || []).length, /* v574 : cosmétiques comptés */ Object.keys(s.achievements || {}).length, (s.missions?.list || []).map((x) => `${x.p}${x.claimed ? 'c' : ''}`).join(''),
     s.codex ? `${s.codex.season}:${s.codex.premium ? 1 : 0}:${s.codex.xp || 0}:${(s.codex.free || []).length}:${(s.codex.prem || []).length}` : '-', (s.purchases || []).length, /* v728 : Codex et achats comptés (un Codex payé n'arrivait jamais sur le téléphone) */
     `${s.versus?.streak || 0}:${s.versus?.lg?.m || ''}:${s.versus?.lg?.pts || 0}`, /* v807 : Série ardente et Ligue du Choc */
+    s.choc ? `${s.choc.n}:${Object.keys(s.choc.done || {}).length}` : '-', /* v811 : jetons du Choc */
     s.seedBase ?? '-', s.seedN || 0, ...SESS.map((p) => sessPrint(getPath(s, p)))];
   let h = 2166136261;
   for (const ch of parts.join('|')) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
@@ -123,6 +126,7 @@ export const ARGS = {
   pacteStart: [{ table: 'S', daily: 'b' }], pacteFinish: [], pacteQuit: [], cryptesStart: [{ table: 'S', daily: 'b' }], cryptesFinish: [], cryptesQuit: [], cryptesResume: [],
   encheresStart: [{ table: 'S', daily: 'b' }], encheresFinish: [], encheresQuit: [], gameForfeit: ['s'], tourneyPlay: [],
   sceauxPlay: ['i', 'i'], sceauxAi: [], pacteDraw: [], pacteStop: [], pacteDouble: [], pacteAi: [], cryptesFlip: ['i'], cryptesPower: ['ai'], cryptesAi: [], encheresBid: ['i'],
+  chocTokens: [], chocNew: ['S', 's'], chocJoin: ['s'], chocRefund: [], chocClaim: ['s', 'I', 'I'], /* v811 */
   codex: [], chocLeague: [], codexClaim: ['s', 'i'], codexClaimAll: [], catalogBuy: ['s'], codexBuyTier: [], shadowPay: ['s'],
 };
 const isInt = (v) => Number.isInteger(v);

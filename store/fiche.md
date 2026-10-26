@@ -89,7 +89,7 @@ LE CERCLE DE L'ABYSSE
 • Le Pacte : tire des cartes, encore une… et arrête-toi avant de briser le pacte
 • Les Cryptes : un jeu de mémoire où chaque paire réveille le pouvoir de sa faction
 • Joue contre d'autres joueurs, en partie rapide ou à ton rythme, et défie tes amis
-• Le Choc des Boosters : ouvre tes boosters face à un autre joueur ; chacun garde ses cartes, le meilleur tirage gagne un butin
+• Le Choc des Boosters : deux boosters chacun, ouverts face à un autre joueur, puis trois manches de cartes posées en secret ; garde les cartes qui gagnent leur manche
 
 UN MONDE À DÉCOUVRIR
 • Un Bestiaire illustré, avec l'histoire de chaque créature
@@ -158,7 +158,7 @@ L'iPad n'est pas prévu : l'application sera déclarée « iPhone uniquement »,
 
 ## 5. Classification par âge
 
-**Objectif : 13+ chez Apple, PEGI 12 en Europe chez Google.** Le jeu montre des créatures inquiétantes et des combats, mais sans sang réaliste ni contenu sexuel. Il n'y a ni achat ni discussion entre joueurs (seulement des réactions prédéfinies) ; le Choc des Boosters se joue avec la monnaie du jeu, jamais avec de l'argent réel.
+**Objectif : 13+ chez Apple, PEGI 12 en Europe chez Google.** Le jeu montre des créatures inquiétantes et des combats, mais sans sang réaliste ni contenu sexuel. Il n'y a ni achat ni discussion entre joueurs (seulement des réactions prédéfinies) ; le Choc des Boosters se joue avec un jeton offert chaque jour, jamais acheté.
 
 Pandore (ART-068), autrefois dessinée nue, a été refaite habillée en v300 : aucune nudité n'est à déclarer.
 
@@ -172,7 +172,7 @@ Pandore (ART-068), autrefois dessinée nue, a été refaite habillée en v300 : 
 | Contenu sexuel, nudité | Aucun |
 | Grossièretés, humour vulgaire | Aucun |
 | Alcool, tabac, drogues | Aucun |
-| Jeux d'argent simulés | **Aucun** (depuis v735) : rien ne se mise ni ne se perd au hasard. Au Choc des Boosters, chacun paie ses boosters au prix normal et garde ses cartes ; le gagnant reçoit un butin offert par le jeu. Apple refuse les jeux d'argent simulés aux comptes de particuliers (refus du 24 octobre 2026). |
+| Jeux d'argent simulés | **Aucun** (depuis v735) : rien ne se mise ni ne se perd au hasard. Au Choc des Boosters (v811), l'entrée est un jeton offert chaque jour (jamais en vente, ni en éclats ni en argent) ; les boosters du duel sont offerts par le jeu, et l'on garde les cartes qui gagnent leur manche plus une au choix : on ne perd jamais une carte de sa collection. Apple refuse les jeux d'argent simulés aux comptes de particuliers (refus du 24 octobre 2026). |
 | Concours | Non |
 | Thèmes médicaux | Aucun |
 | Contenu généré par les utilisateurs | Oui, uniquement les pseudos : filtre, signalement et masquage dans le jeu |

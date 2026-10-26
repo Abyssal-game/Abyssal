@@ -80,7 +80,7 @@ export function openCreator(app) {
     return `
       ${S('Sauvegarde de sécurité', `${P(snap ? `Copie de ta vraie partie du ${new Date(snap.t).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })} (${Object.keys(snap.s.collection || {}).length} créatures).` : 'Fais une copie de ta vraie partie avant de jouer les dieux : tu pourras la retrouver d’un geste.')}
         ${row(B('snap', `${icon('download')}Copier ma partie actuelle`), snap ? B('restore', `${icon('upload')}Revenir à la copie`, 'gold') : '')}`)}
-      ${S('Ressources', row(B('shards', '+10 000 éclats'), B('ash', '+10 000 cendres'), B('tickets', '+10 boosters de chaque'), B('chests', 'Des coffres de chaque'), B('free', 'Recharger les boosters gratuits')))}
+      ${S('Ressources', row(B('shards', '+10 000 éclats'), B('ash', '+10 000 cendres'), B('tickets', '+10 boosters de chaque'), B('chests', 'Des coffres de chaque'), B('free', 'Recharger les boosters gratuits'), B('choctok', '+3 jetons du Choc')))}
       ${S('Cartes', `${row(B('all', 'Toutes les cartes'), B('variants', 'Toutes les finitions'), B('dups', 'Doublons pour tester'))}
         <form class="cr-give" id="give">
           <input class="input plain" name="q" list="cr-cards" placeholder="Nom d’une carte…" autocomplete="off">
@@ -169,6 +169,7 @@ export function openCreator(app) {
       if (x === 'tickets') g.devGrant({ tickets: Object.fromEntries(Object.keys(BOOSTERS).map((k) => [k, 10])) });
       if (x === 'chests') g.devChests();
       if (x === 'free') g.devFreePacks();
+      if (x === 'choctok') g.devChocTokens(); /* v811 */
       if (x === 'abyss' || x === 'abyss1') { g.devAbyss(x === 'abyss1'); sheet.close(); setTimeout(() => openPack(app, 'abysse', { onDone: () => openCreator(app) }), 350); return; } /* v769 : fenêtre fermée pendant l'ouverture, rouverte après */
       if (x === 'abyss5') g.devAbyss(false, 5);
       if (x === 'choc') { /* v803 : duel d'essai du Choc des Boosters */

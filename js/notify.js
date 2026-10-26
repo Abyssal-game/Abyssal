@@ -158,7 +158,7 @@ export async function syncReminders(g, turns) {
   const list = turns.map((v) => ({ v, at: new Date(new Date(v.deadline).getTime() - REMIND_HOURS * 3600000) })).filter((x) => x.at.getTime() > Date.now() + 60000);
   if (!list.length) return;
   try {
-    await L.schedule({ notifications: list.map(({ v, at }) => ({ id: idOf(v.id), title: t({ pacte: 'Le Pacte', encheres: 'Les Enchères de Mammon', cryptes: 'Les Cryptes' }[v.game] || 'Duels des Sceaux'), body: t('Plus que {h} h pour jouer ton coup contre {foe}, sinon la partie est perdue !', { h: REMIND_HOURS, foe: v.foe?.pseudo || t('ton adversaire') }), schedule: { at, allowWhileIdle: true } })) });
+    await L.schedule({ notifications: list.map(({ v, at }) => ({ id: idOf(v.id), title: t({ pacte: 'Le Pacte', encheres: 'Les Enchères de Mammon', cryptes: 'Les Cryptes', choc: 'Le Choc des Boosters' }[v.game] || 'Duels des Sceaux'), body: t('Plus que {h} h pour jouer ton coup contre {foe}, sinon la partie est perdue !', { h: REMIND_HOURS, foe: v.foe?.pseudo || t('ton adversaire') }), schedule: { at, allowWhileIdle: true } })) });
   } catch (e) { /* rien */ }
 }
 

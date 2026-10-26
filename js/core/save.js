@@ -78,6 +78,7 @@ export function defaultSave(now = Date.now()) {
     enigmes: { day: null, tries: [0, 0, 0], stars: [0, 0, 0], done: [false, false, false], chest: null, streak: 0, lastFull: null, solved: 0, starsTotal: 0 }, /* v427 : les Énigmes des Sceaux */
     mp: { day: null, paid: 0, done: {} }, /* v519 : mini-jeux contre d'autres joueurs (récompenses du jour, parties déjà encaissées) */
     versus: { played: 0, wins: 0, losses: 0, ties: 0, won: 0, spent: 0, done: {} }, /* v512 : Versus Booster (défis de boosters entre joueurs) */
+    choc: null, /* v811 : jetons du Choc des Boosters ({ n, day }, posés par game.chocTokens) et parties encaissées */
     relics: { best: 0, runs: 0, wins: 0, run: null, last: null, day: null, paidToday: 0 },
     war: { week: null, side: null, points: 0, used: {}, claimed: {}, history: [], report: null },
   };

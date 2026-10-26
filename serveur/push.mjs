@@ -6,12 +6,12 @@
 
 export const TOPIC = 'com.abyssalgame.abyssal';
 const GAMES = {
-  fr: { sceaux: 'Duels des Sceaux', pacte: 'Le Pacte', encheres: 'Les Enchères de Mammon', cryptes: 'Les Cryptes' },
-  en: { sceaux: 'Seal Duels', pacte: 'The Pact', encheres: 'Mammon’s Auctions', cryptes: 'The Crypts' },
-  es: { sceaux: 'Duelos de los Sellos', pacte: 'El Pacto', encheres: 'Las Subastas de Mammon', cryptes: 'Las Criptas' },
-  de: { sceaux: 'Siegel-Duelle', pacte: 'Der Pakt', encheres: 'Mammons Auktionen', cryptes: 'Die Grüfte' },
-  it: { sceaux: 'Duelli dei Sigilli', pacte: 'Il Patto', encheres: 'Le Aste di Mammon', cryptes: 'Le Cripte' },
-  pt: { sceaux: 'Duelos dos Selos', pacte: 'O Pacto', encheres: 'Os Leilões de Mammon', cryptes: 'As Criptas' },
+  fr: { sceaux: 'Duels des Sceaux', pacte: 'Le Pacte', encheres: 'Les Enchères de Mammon', cryptes: 'Les Cryptes', choc: 'Le Choc des Boosters' },
+  en: { sceaux: 'Seal Duels', pacte: 'The Pact', encheres: 'Mammon’s Auctions', cryptes: 'The Crypts', choc: 'The Booster Clash' },
+  es: { sceaux: 'Duelos de los Sellos', pacte: 'El Pacto', encheres: 'Las Subastas de Mammon', cryptes: 'Las Criptas', choc: 'La Batalla de los Sobres' },
+  de: { sceaux: 'Siegel-Duelle', pacte: 'Der Pakt', encheres: 'Mammons Auktionen', cryptes: 'Die Grüfte', choc: 'Die Booster-Schlacht' },
+  it: { sceaux: 'Duelli dei Sigilli', pacte: 'Il Patto', encheres: 'Le Aste di Mammon', cryptes: 'Le Cripte', choc: 'La Sfida delle Buste' },
+  pt: { sceaux: 'Duelos dos Selos', pacte: 'O Pacto', encheres: 'Os Leilões de Mammon', cryptes: 'As Criptas', choc: 'A Batalha dos Pacotes' },
 };
 // {w} = pseudo de l'autre joueur, {g} = nom du jeu
 const TEXTS = {

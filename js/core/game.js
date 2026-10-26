@@ -13,6 +13,7 @@ export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par c
 import { FINAL_FLOOR, BOOSTERS, FREE_PACK, BRAISE, TORCHES, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, sublimeObs, VARIANTS, FIN_ORDER } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
+import { CHOC } from './choc.js'; /* v811 */
 import { VERSUS_PRIZE, streakMult, STREAK_CHESTS, LEAGUES, LEAGUE_REWARD, leagueIdx, leagueDelta, cardPts } from './versus.js'; /* v735, v807 */
 import { CODEX, CODEX_XP, SHOP, CATALOG, FREE_EMOTES, codexTier, seasonFor, tiersOf, freshCodex, pendingOf, CODEX_OPEN, QUEST_KINDS, questsFor, seasonWeek } from './codex.js';
 import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, lateSoft, bossEase, earlyHp, expectedLevel, cardPower, powerFor, advisedPower, floorForPower, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
@@ -371,7 +372,7 @@ export class Game {
   claimWeekChest() {
     const wc = this.weekChest();
     if (!wc.ready) throw new Error(wc.claimed ? 'Le coffre de la semaine est déjà ouvert.' : `Joue ${WEEK_DAYS} jours cette semaine pour l’ouvrir.`);
-    this.s.week.claimed = true; this.addChests({ or: 1 }); this.persist();
+    this.s.week.claimed = true; this.addChests({ or: 1 }); this.chocGive(1); /* v811 : + un jeton du Choc */ this.persist();
     return 'or';
   }
   /* v644 : éclats de l'offrande pour le n-ième jour d'une série (affichage) */
@@ -573,6 +574,65 @@ export class Game {
     v.best = Math.max(v.best || 0, v.streak);
     v.won += out.cards.length + (out.trophy ? 1 : 0);
     this.s.xp += 10;
+    out.progress = this.checkProgress();
+    this.persist();
+    return out;
+  }
+
+  /* v811 : le nouveau Choc des Boosters. Jetons : un rendu chaque jour jusqu'à CHOC.tokensMax ; ceux gagnés ailleurs
+     (coffre de la semaine, Tournoi du Cercle, Codex) vont jusqu'à CHOC.tokensCap. Jamais en vente. Lecture paresseuse (ops.js). */
+  chocTokens() {
+    const day = today(this.clock());
+    let c = this.s.choc;
+    if (!c || typeof c !== 'object') c = this.s.choc = { n: CHOC.tokensMax, day, done: {} };
+    c.done ||= {};
+    if (c.day !== day) {
+      const gap = c.day ? Math.max(1, Math.round((Date.parse(day) - Date.parse(c.day)) / 86400000)) : 1;
+      if (c.n < CHOC.tokensMax) c.n = Math.min(CHOC.tokensMax, c.n + gap);
+      c.day = day;
+    }
+    return c;
+  }
+  chocGive(n = 1) { const c = this.chocTokens(); c.n = Math.min(CHOC.tokensCap, c.n + Math.max(0, n | 0)); }
+  // pris par le serveur de partie juste avant de créer ou rejoindre une partie (rendu si elle ne commence jamais)
+  chocSpend() {
+    const c = this.chocTokens();
+    if (c.n < 1) throw new Error('Plus de jeton du Choc : un nouveau arrive demain.');
+    c.n--; this.persist();
+  }
+  // res = réponse de choc_claim : { result: win|draw|lose|already, cards: [cartes gardées], take: carte prise | null, foe }
+  chocApply(id, res) {
+    const c = this.chocTokens(), v = this.s.versus;
+    if (!res || c.done[id] || !['win', 'draw', 'lose'].includes(res.result)) return null;
+    c.done[id] = res.result;
+    const keys = Object.keys(c.done); if (keys.length > 200) for (const k of keys.slice(0, keys.length - 200)) delete c.done[k];
+    const result = res.result === 'draw' ? 'tie' : res.result;
+    const out = { result, cards: [], take: null, shards: 0 };
+    for (const x of res.cards || []) { if (!this.catalog.get(x?.id)) continue; const r = this.addCard(x.id, x.variant || 'normal', 'booster'); out.cards.push({ ...x, ...r }); }
+    v.played++;
+    if (result === 'win') v.wins++; else if (result === 'tie') v.ties++; else v.losses++;
+    const before = v.streak || 0, after = result === 'win' ? before + 1 : result === 'lose' ? 0 : before;
+    out.streak = { before, after, broken: result === 'lose' && before >= 2 };
+    out.mult = result === 'win' ? streakMult(after) : 1;
+    if (result === 'win') { out.shards = CHOC.winShards * out.mult; this.grant({ shards: out.shards }, 'versus'); }
+    if (result === 'win' && STREAK_CHESTS[after]) { const k = STREAK_CHESTS[after]; this.addChests({ [k]: 1 }); out.streakChest = k; }
+    const lg = this.chocLeague(), old = lg.pts || 0, tierBefore = leagueIdx(old);
+    lg.pts = Math.max(0, old + leagueDelta(result, before)); lg.played = (lg.played || 0) + 1;
+    const tierAfter = leagueIdx(lg.pts);
+    lg.top = Math.max(lg.top || 0, tierAfter); v.lgTop = Math.max(v.lgTop || 0, tierAfter);
+    out.league = { before: tierBefore, after: tierAfter, pts: lg.pts, delta: lg.pts - old };
+    const tk = res.take, tc = tk && this.catalog.get(tk.id);
+    if (result === 'win' && tc) {
+      const r = this.addCard(tk.id, tk.variant || 'normal', 'booster'); out.take = { ...tk, ...r };
+      const foe = typeof res.foe === 'string' ? res.foe.replace(/[<>&"]/g, '').slice(0, 24) : '';
+      const tr = (v.trophies ||= {}); tr[tk.id] = { f: foe, d: today(this.clock()) };
+      const ks = Object.keys(tr); if (ks.length > 30) for (const k of ks.slice(0, ks.length - 30)) delete tr[k];
+    }
+    for (const x of [...(res.cards || []), ...(tc ? [tk] : [])]) { const pts = cardPts(x); if (this.catalog.get(x.id) && pts > (v.bestCard?.pts || 0)) v.bestCard = { id: x.id, variant: x.variant || 'normal', pts }; }
+    v.streak = after; v.best = Math.max(v.best || 0, after);
+    v.won += out.cards.length + (out.take ? 1 : 0);
+    this.s.xp += 10;
+    this.markPlayed?.();
     out.progress = this.checkProgress();
     this.persist();
     return out;
@@ -1231,7 +1291,7 @@ export class Game {
     t.round++; t.best = Math.max(t.best || 0, t.round);
     const r = (out.tourney = { round: t.round, of: tourneyTables(t.game).length });
     this.emit('progress', [{ kind: 'tourney', name: t.round >= r.of ? 'Champion du Cercle cette semaine !' : `Manche ${t.round} sur ${r.of} gagnée` }]);
-    if (t.round >= 4 && !t.gold) { t.gold = Date.now(); this.s.chests.or = (this.s.chests.or || 0) + 1; r.chest = 'or'; }
+    if (t.round >= 4 && !t.gold) { t.gold = Date.now(); this.s.chests.or = (this.s.chests.or || 0) + 1; r.chest = 'or'; this.chocGive(1); /* v811 */ }
     if (t.round >= r.of) { r.champ = true; if (!t.champ) { t.champ = Date.now(); this.s.tourneyWins = (this.s.tourneyWins || 0) + 1; this.s.chests.abyssal = (this.s.chests.abyssal || 0) + 1; this.grant({ tickets: { premium: 2 } }, 'tourney'); r.reward = true; } }
   }
   // ——— v427 : les Enchères de Mammon (enchères à l'aveugle à trois), ouvertes avec la Salle des jeux ———
@@ -2106,6 +2166,7 @@ export class Game {
     if (reward.codexPremium) this.codex().premium = true; /* v548 : Codex enluminé acheté (4,99 €) */
     if (reward.obs) this.s.obs = (this.s.obs || 0) + reward.obs; /* v474 : obsidiennes (achetées en euros) */
     if (reward.chests) this.addChests(reward.chests);
+    if (reward.chocTok) this.chocGive(reward.chocTok); /* v811 : jetons du Choc */
   }
 
   // ——— v470 : ÉBAUCHE du pass de saison (Codex) et de la boutique en argent réel (Échoppe), cachés hors Mode Créateur ———
@@ -2361,6 +2422,7 @@ export class Game {
   /* v769 : Mode Créateur : Booster(s) de l'Abysse à volonté ; first = rejouer la première fois (Secrète pas encore possédée garantie) */
   devAbyss(first = false, n = 1) { const k = Math.max(1, Math.min(50, +n || 1)); this.s.tickets.abysse = (this.s.tickets.abysse || 0) + k; if (first) this.s.stats.abyssSecret = 0; this.persist(); }
   devFreePacks() { this.s.freePack = { day: null }; this.persist(); }
+  devChocTokens() { this.chocGive(3); this.persist(); } /* v811 */
   devMissions() { this.missions().list.forEach((x) => { x.p = x.n; }); this.persist(); }
   // power : l'équipe prend le niveau attendu à cet étage (pour essayer la difficulté réelle)
   devFloor(n, { power = false } = {}) {

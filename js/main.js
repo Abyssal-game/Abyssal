@@ -108,7 +108,7 @@ const app = {
   reduced() { return reducedMotion(app.game.s.settings); },
   sfx,
   hasRealArt,
-  refresh() { render(); },
+  refresh() { if (app.holdRefresh?.()) { app.chrome?.(); return; } render(); }, /* v811 : le Choc garde sa partie ouverte quand la partie du serveur arrive */
   chrome() { renderChrome(); },
 };
 if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__abyssal = app; /* accès pour les tests automatisés (v499 : seulement en local) */

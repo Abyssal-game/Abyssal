@@ -33,7 +33,7 @@ test('en ligne : le Pacte a son moteur côté serveur (v523)', async () => {
   const fs = await import('node:fs');
   const sql = fs.readFileSync(new URL('../supabase/09-multijoueur.sql', import.meta.url), 'utf8');
   for (const fn of ['pacte_deck', 'pacte_apply', 'pacte_start', 'pacte_mp_new', 'pacte_mp_join', 'pacte_mp_act']) assert.ok(sql.includes(`function public.${fn}(`), fn);
-  assert.ok(sql.includes("check (game in ('sceaux', 'pacte', 'encheres', 'cryptes'))"));
+  assert.ok(sql.includes("check (game in ('sceaux', 'pacte', 'encheres', 'cryptes', 'choc'))"));
   assert.ok(sql.includes('grant execute on function public.pacte_mp_act(uuid, text) to authenticated'));
   assert.ok(!/grant execute on function public\.pacte_apply/.test(sql), 'le moteur reste interne');
   const { MP_GAMES } = await import('../js/core/mp.js');

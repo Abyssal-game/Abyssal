@@ -34,5 +34,6 @@ export function createRestDb({ url, secret, publishable }) {
     shadowDrew: (uid, day) => call('partie_shadow_drew', { p_uid: uid, p_day: day }),
     publish: (uid, profile, card, trials) => call('partie_publish', { p_uid: uid, p_profile: profile, p_card: card, p_trials: trials }),
     rpc: (name, args, token) => call(name, args, { token }),
+    svc: (name, args) => call(name, args), // v811 : fonctions réservées au serveur (Choc des Boosters)
   };
 }

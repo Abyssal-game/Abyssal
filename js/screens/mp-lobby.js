@@ -46,6 +46,7 @@ export function createMpLobby(app, root, spec) {
 
   // ——— Accueil « Contre un joueur » ———
   async function lobby() {
+    if (spec.busyLocal?.()) return; /* v811 : entraînement du Choc en cours (rien du serveur à redessiner) */
     ui.open = null; view = null; clearInterval(clock); clock = 0; /* v574 */
     document.body.classList.remove('battle-mode');
     document.querySelector('.sc-scene')?.remove();
@@ -63,6 +64,7 @@ export function createMpLobby(app, root, spec) {
     if (found) { ui.searching = null; toast(t('Adversaire trouvé : <b>{name}</b> !', { name: esc(foeName(found)) }), { icon: 'user' }); app.sfx.achievement?.(); return open(found.id); }
     const searching = list.find((v) => v.pace === 'fast' && v.status === 'waiting' && v.me === 'a');
     ui.searching = searching?.id || null; ui.searchingV = searching || null;
+    if (spec.onLobby) { try { await spec.onLobby(list); } catch (e) { /* plus tard */ } } /* v811 : Choc (jetons rendus) */
     await claimAll();
     if (!alive || ui.open) return; /* v527 : une partie ouverte pendant l'encaissement reste ouverte */
     checkTurns(app, { force: true });
@@ -71,6 +73,7 @@ export function createMpLobby(app, root, spec) {
   }
   // résultats des parties terminées : récompense encaissée une seule fois
   async function claimAll() {
+    if (spec.noAutoClaim) return; /* v811 : le Choc s'encaisse sur l'écran de fin (cartes à garder) */
     for (const v of (list || []).filter((x) => x.status === 'done' && !x.claimed)) {
       try {
         const { r, out } = await app.partie.first('mpClaim', spec.game, v.id, !!spec.friendsOnly); /* v539 : encaissé par le serveur de partie */
@@ -83,11 +86,11 @@ export function createMpLobby(app, root, spec) {
   // recherche rapide, deux vitesses, défi à un ami et récompense (pas pour les jeux entre amis seulement)
   const quickHTML = (waiting, paidLeft) => `        ${ui.searching ? `<div class="mp-search"><span class="mp-unknown"><img alt="" src="assets/icons/inconnu.webp"><span class="mp-spin"></span></span><span><b>${ui.searchingV?.public === false ? t('En attente de {name}…', { name: esc(foeName(ui.searchingV)) }) : 'Recherche d’un adversaire…'}</b><small>Partie rapide · reste sur cet écran, la partie démarre dès qu’un joueur arrive.</small></span><button class="btn small ghost" data-mp="leave" data-own="1" data-id="${esc(ui.searching)}">Annuler</button></div>` : ''}
         <div class="mp-paces">
-          <button class="mp-pace fast" data-mp="quick" data-pace="fast" ${busy || ui.searching ? 'disabled' : ''}><img class="mp-pace-ic" alt="" src="assets/icons/mp-rapide.webp"><b>Partie rapide</b><span class="mp-pace-t">${MP_FAST_SECS} s par coup</span><small>Les deux joueurs connectés en même temps. Une partie dure quelques minutes.</small></button>
-          <button class="mp-pace slow" data-mp="quick" data-pace="slow" ${busy || waiting.some((v) => v.public && v.pace !== 'fast') ? 'disabled' : ''}><img class="mp-pace-ic" alt="" src="assets/icons/mp-lente.webp"><b>Partie lente</b><span class="mp-pace-t">${MP_HOURS} h par coup</span><small>${waiting.some((v) => v.public && v.pace !== 'fast') ? 'Recherche en cours : la partie commence dès qu’un joueur arrive.' : 'Chacun joue quand il veut. Tu es prévenu quand c’est ton tour.'}</small></button>
+          <button class="mp-pace fast" data-mp="quick" data-pace="fast" ${busy || ui.searching || spec.canPlay?.() === false ? 'disabled' : ''}><img class="mp-pace-ic" alt="" src="assets/icons/mp-rapide.webp"><b>Partie rapide</b><span class="mp-pace-t">${MP_FAST_SECS} s par coup</span><small>Les deux joueurs connectés en même temps. Une partie dure quelques minutes.</small></button>
+          <button class="mp-pace slow" data-mp="quick" data-pace="slow" ${busy || spec.canPlay?.() === false || waiting.some((v) => v.public && v.pace !== 'fast') ? 'disabled' : ''}><img class="mp-pace-ic" alt="" src="assets/icons/mp-lente.webp"><b>Partie lente</b><span class="mp-pace-t">${MP_HOURS} h par coup</span><small>${waiting.some((v) => v.public && v.pace !== 'fast') ? 'Recherche en cours : la partie commence dès qu’un joueur arrive.' : 'Chacun joue quand il veut. Tu es prévenu quand c’est ton tour.'}</small></button>
         </div>
         <button class="btn block dc-plq dc-plq-dark" data-mp="friend" ${busy ? 'disabled' : ''}>${icon('user')}Défier un ami</button>
-        <p class="small muted center">Victoire : +${MP_REWARD.win} éclats (${Math.max(0, paidLeft)} victoire${paidLeft > 1 ? 's' : ''} payée${paidLeft > 1 ? 's' : ''} restante${paidLeft > 1 ? 's' : ''} aujourd’hui) et une place au classement du mois.</p>`;
+        ${spec.rewardNote ? spec.rewardNote() : `<p class="small muted center">Victoire : +${MP_REWARD.win} éclats (${Math.max(0, paidLeft)} victoire${paidLeft > 1 ? 's' : ''} payée${paidLeft > 1 ? 's' : ''} restante${paidLeft > 1 ? 's' : ''} aujourd’hui) et une place au classement du mois.</p>`}`;
   function drawLobby() {
     const L = list || [];
     const mine = L.filter((v) => myTurn(v)), theirs = L.filter((v) => v.status === 'playing' && !myTurn(v));
@@ -98,6 +101,7 @@ export function createMpLobby(app, root, spec) {
     const row = (v, sub, acts) => `<div class="mp-row ${myTurn(v) ? 'hot' : ''}" ${v.status !== 'waiting' ? `data-mp="open" data-id="${esc(v.id)}" role="button" tabindex="0"` : ''}><span class="fr-av"${v.foe ? profileAttrs(v.foe.id) : ''}>${v.foe ? avatar(v.foe.avatar) : EMBLEM}</span><span class="fr-t"><b>${esc(v.foe ? foeName(v) : 'Un joueur au hasard')}<i class="mp-tag ${v.pace === 'fast' ? 'fast' : ''}">${v.pace === 'fast' ? 'Rapide' : 'Lente'}</i></b><small>${sub}</small></span>${acts || icon('next')}</div>`;
     root.innerHTML = `${spec.modeBar()}
       ${err ? `<p class="panel small center">${icon('info')} ${esc(err)}</p>` : ''}
+      ${spec.top ? spec.top(L, row) : ''}
       ${mine.length ? `<section class="panel mp-sec hot"><h2 class="section-title">À toi de jouer <span class="pill-n">${mine.length}</span></h2>${mine.map((v) => row(v, `${spec.sub(v)} · il te reste <b>${left(v)}</b>`)).join('')}</section>` : ''}
       ${invites.length ? `<section class="panel mp-sec"><h2 class="section-title">Défis reçus</h2>${invites.map((v) => row(v, 'Ton ami te défie', `<span class="vs-acts"><button class="btn small primary" data-mp="join" data-id="${esc(v.id)}">Accepter</button><button class="btn small ghost" data-mp="leave" data-id="${esc(v.id)}">Refuser</button></span>`)).join('')}</section>` : ''}
       <section class="panel mp-sec mp-new"><h2 class="section-title">Nouvelle partie</h2>
@@ -110,8 +114,9 @@ export function createMpLobby(app, root, spec) {
       ${waiting.some((v) => !(v.public && v.pace === 'fast')) ? `<section class="panel mp-sec"><h2 class="section-title">En attente</h2>${waiting.filter((v) => !(v.public && v.pace === 'fast')).map((v) => row(v, v.public ? 'Recherche d’un adversaire (jusqu’à 24 h)' : t('Défi envoyé à {name}', { name: esc(foeName(v)) }), `<button class="btn small ghost" data-mp="leave" data-own="1" data-id="${esc(v.id)}">Annuler</button>`)).join('')}</section>` : ''}
       ${done.length ? `<details class="panel dc-fold mp-sec"><summary><span class="dc-sum-t">Parties terminées</span></summary>${done.map((v) => { const r = resOf(v); const sc = spec.score(v); return row(v, `<b class="vs-res ${r}">${MP_RES[r]}</b>${sc ? ` · ${sc}` : ''}${v.reason === 'timeout' ? ' · temps écoulé' : v.reason === 'resign' ? ' · abandon' : ''}`); }).join('')}</details>` : ''}
       ${spec.friendsOnly ? '<section class="panel mp-sec" id="mp-rec"><h2 class="section-title">Ton bilan contre tes amis</h2><div class="lb-body small muted">Chargement…</div></section>'
-        : `<details class="panel dc-fold mp-sec" id="mp-rank"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/crown2.webp"><span class="dc-sum-t">Classement du mois</span></summary><div class="lb-body small muted">Chargement…</div></details>
-      <p class="small muted center">Contre les joueurs : ${st.wins} victoire${st.wins > 1 ? 's' : ''} · ${st.losses} défaite${st.losses > 1 ? 's' : ''}</p>`}`;
+        : spec.noRanking ? '' : `<details class="panel dc-fold mp-sec" id="mp-rank"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/crown2.webp"><span class="dc-sum-t">Classement du mois</span></summary><div class="lb-body small muted">Chargement…</div></details>
+      ${spec.noRanking ? '' : `<p class="small muted center">Contre les joueurs : ${st.wins} victoire${st.wins > 1 ? 's' : ''} · ${st.losses} défaite${st.losses > 1 ? 's' : ''}</p>`}`}`;
+    if (spec.bottom) root.insertAdjacentHTML('beforeend', spec.bottom());
     root.querySelector('#mp-rank')?.addEventListener('toggle', (e) => { if (e.target.open) ranking(); }, { once: true });
     if (spec.friendsOnly) record();
   }
@@ -216,7 +221,7 @@ export function createMpLobby(app, root, spec) {
     spec.drawGame(view, ctx, last);
     seenSave(view);
     emoteBtn();
-    if (view.status === 'done' && !view.claimed) claimOne(view);
+    if (view.status === 'done' && !view.claimed && !spec.noAutoClaim) claimOne(view);
   }
   async function claimOne(v) {
     try { const { r, out } = await app.partie.first('mpClaim', spec.game, v.id, !!spec.friendsOnly); v.claimed = true; if (out) { if (r === 'win') app.sfx.victory?.(); else app.sfx.defeat?.(); if (out.shards) toast(`+${out.shards} éclats`, { icon: 'crystal' }); app.chrome?.(); } } catch (e) { /* plus tard */ }

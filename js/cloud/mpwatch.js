@@ -28,6 +28,10 @@ const GAMES = [
   { game: 'cryptes', route: 'cryptes', key: (v) => v.state?.turns, started: (v) => v.state?.n,
     turn: 'À toi de jouer aux Cryptes contre {name} !', go: 'Ta partie des Cryptes contre {name} a commencé !', inv: '{name} te défie aux Cryptes !',
     turn1: 'À toi de jouer aux Cryptes', turnsN: 'À toi de jouer dans {n} parties des Cryptes', inv1: 'Un défi reçu aux Cryptes', invN: '{n} défis reçus aux Cryptes' },
+  /* v811 : le nouveau Choc des Boosters (pastille du Choc, dans le Butin) */
+  { game: 'choc', route: 'versus', bucket: 'games', key: (v) => v.state?.n, started: (v) => v.state?.n,
+    turn: 'À toi de jouer au Choc des Boosters contre {name} !', go: 'Ton Choc des Boosters contre {name} a commencé !', inv: '{name} te défie au Choc des Boosters !',
+    turn1: 'À toi de jouer au Choc des Boosters', turnsN: 'À toi de jouer dans {n} Chocs des Boosters', inv1: 'Un défi reçu au Choc des Boosters', invN: '{n} défis reçus au Choc des Boosters' },
 ];
 let last = 0, busy = false;
 
@@ -48,7 +52,7 @@ async function check(app) {
   const who = (p) => `<b>${esc(p || t('un joueur'))}</b>`;
   let turns = [];
   // Duels des Sceaux et Pacte en ligne (v523 : le Pacte aussi)
-  let nTurns = 0;
+  let nTurns = 0, nChoc = 0;
   for (const G of GAMES) {
     try {
       const L = await cloud.mpList(G.game);
@@ -62,10 +66,11 @@ async function check(app) {
       for (const v of inv) say(`inv:${v.id}`, t(G.inv, { name: who(v.foe?.pseudo) }), 'user', G.route);
       if (mine.length) items.push({ href: `#/${G.route}`, icon: 'hourglass', title: t(mine.length > 1 ? G.turnsN : G.turn1, { n: mine.length }), sub: mine.map((v) => esc(v.foe?.pseudo || '')).join(', ') });
       if (inv.length) items.push({ href: `#/${G.route}`, icon: 'seal', title: t(inv.length > 1 ? G.invN : G.inv1, { n: inv.length }), sub: inv.map((v) => esc(v.foe?.pseudo || '')).join(', ') });
-      nTurns += mine.length + inv.length;
+      if (G.bucket === 'games') nChoc += mine.length + inv.length + L.filter((v) => v.status === 'done' && !v.claimed).length; /* v811 : cartes à garder */
+      else nTurns += mine.length + inv.length;
     } catch (e) { /* serveur sans les parties en ligne : rien */ }
   }
-  mpw.turns = nTurns;
+  mpw.turns = nTurns; mpw.games = nChoc;
   // Choc des Boosters
   try {
     const d = await cloud.versusList();
@@ -78,7 +83,7 @@ async function check(app) {
     for (const r of inv) say(`pinv:${r.id}`, t('{name} te défie au Choc des Boosters !', { name: who(r.pseudo) }), 'crystal', 'versus');
     if (see.length) items.push({ href: '#/versus', icon: 'booster', title: t(see.length > 1 ? '{n} duels du Choc à voir' : 'Un duel du Choc à voir', { n: see.length }), sub: t('Ton défi a été relevé') });
     if (inv.length) items.push({ href: '#/versus', icon: 'booster', title: t(inv.length > 1 ? '{n} défis reçus au Choc des Boosters' : 'Un défi reçu au Choc des Boosters', { n: inv.length }), sub: inv.map((r) => esc(r.pseudo || '')).join(', ') });
-    mpw.games = see.length + inv.length;
+    mpw.games = see.length + inv.length + nChoc;
   } catch (e) { /* rien */ }
   // Demandes d'ami
   try {

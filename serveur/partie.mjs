@@ -70,6 +70,26 @@ const NET = {
     const res = await c.db.rpc('versus_pick', { p_id: id, p_idx: idx }, c.token);
     return { res, out: g.versusPickApply(id, res) };
   },
+  /* v811 : Choc des Boosters : un jeton pris avant de créer ou rejoindre une partie (rendu si la partie échoue ici, ou plus
+     tard par chocRefund si elle ne commence jamais) ; cartes gardées données une seule fois */
+  async chocNew(c, g, to = null, pace = 'slow') {
+    if (!['fast', 'slow'].includes(pace)) throw new Error('Vitesse inconnue.');
+    g.chocSpend();
+    try { return await c.db.svc('choc_new', { p_uid: c.uid, p_to: to, p_pace: pace }); } catch (e) { g.chocGive(1); g.persist(); throw e; }
+  },
+  async chocJoin(c, g, id) {
+    g.chocSpend();
+    try { return await c.db.svc('choc_join', { p_uid: c.uid, p_id: id }); } catch (e) { g.chocGive(1); g.persist(); throw e; }
+  },
+  async chocRefund(c, g) {
+    const n = +(await c.db.svc('choc_refunds', { p_uid: c.uid })) || 0;
+    if (n > 0) { g.chocGive(n); g.persist(); }
+    return n;
+  },
+  async chocClaim(c, g, id, keep, take = null) {
+    const res = await c.db.svc('choc_claim', { p_uid: c.uid, p_id: id, p_keep: keep, p_take: take });
+    return { res, out: g.chocApply(id, res) };
+  },
   async mpClaim(c, g, game, id, friendsOnly = false) {
     /* v728 : le jeu de la partie est lu sur le serveur (avant : celui envoyé par le téléphone, une victoire aux Cryptes
        pouvait être réclamée comme une victoire aux Sceaux) */

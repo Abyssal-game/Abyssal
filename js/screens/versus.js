@@ -1,82 +1,65 @@
-// v512 : Versus Booster (Salle des jeux). Un joueur lance un défi (1 à 3 boosters, de types au choix depuis v516), ouvert à tous
-// ou envoyé à un ami ; celui qui le relève paie la même mise en éclats. Le serveur ouvre les boosters des deux
-// joueurs (supabase/08-versus.sql) : le meilleur total de points remporte toutes les cartes ; égalité, chacun
-// garde les siennes. Le face-à-face révèle les cartes une à une, chez les deux joueurs.
+// v811 : le Choc des Boosters refait (décision du propriétaire du 26 octobre 2026 : un vrai enjeu, sans jeu d'argent).
+// Entrée : un jeton du Choc (un par jour, trois en réserve, jamais en vente). Chacun ouvre 2 boosters en même temps que
+// l'adversaire, puis 3 manches de cartes posées en secret ; un 3e booster arrive après la 2e manche. Chacun garde les cartes
+// qui ont gagné leur manche, plus une au choix ; le gagnant prend aussi la copie d'une carte adverse. Le reste retourne à
+// l'Abysse. Parties en ligne : supabase/09-multijoueur.sql (choc_*), créées et encaissées par le serveur de partie.
+// Les anciens duels (Choc payant, v513-v810) restent visibles jusqu'à ce qu'ils soient vus et encaissés.
 import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
-import { BOOSTERS, LUCK_POINTS, RARITY, FACTION_ORDER, VARIANTS } from '../config.js';
-import { VERSUS_TYPES, VERSUS_MAX, VERSUS_HOURS, VERSUS_PRIZE, scoreOf, lineupStake, lineupOf, lineupOk, LEAGUES, LEAGUE_PTS, LEAGUE_REWARD, STREAK_CHESTS, STREAK_MULT, streakMult, leagueIdx } from '../core/versus.js';
-import { today } from '../core/save.js';
+import { CHOC, CYCLE, VERB, preyOf, newGame, apply, aiPick, viewFor } from '../core/choc.js';
+import { LEAGUES, LEAGUE_PTS, LEAGUE_REWARD, STREAK_CHESTS, STREAK_MULT, streakMult, leagueIdx, lineupOf } from '../core/versus.js';
+import { drawBooster } from '../core/boosters.js';
 import { isBlocked } from '../core/moderation.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, EMBLEM, picon } from '../ui/icons.js';
 import { profileAttrs } from '../ui/report.js';
-import { esc, fmt, toast, confirmBox, openSheet, bindActions, pending, withPending } from '../ui/dom.js';
-import { packHTML } from './shop.js';
+import { esc, fmt, toast, confirmBox, openSheet, withPending } from '../ui/dom.js';
 import { playDuel, pickGridHTML, leagueBadge, flameHTML } from './versus-duel.js';
-import { checkTurns } from '../cloud/mpwatch.js';
-import { t, tx } from '../i18n.js';
+import { createMpLobby } from './mp-lobby.js';
+import { createChocGame } from './choc-game.js';
+import { t, tw } from '../i18n.js';
 
+const HOW = () => [['p:seal', '#E8C35A', 'Un jeton par partie', 'Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour ({m} en réserve au plus) ; le coffre de la semaine, le Tournoi du Cercle et le Codex en donnent d’autres. Les jetons ne s’achètent pas.', { m: CHOC.tokensMax }],
+  ['booster', '#C9A45A', 'Les boosters s’ouvrent', 'Toi et ton adversaire ouvrez deux boosters en même temps : six cartes chacun. De ses cartes, tu ne vois que la faction et la rareté.'],
+  ['swords', '#E0485E', 'Trois manches', 'À chaque manche, vous posez une carte en même temps, en secret. Les deux se retournent : la plus forte gagne la manche.'],
+  ['crown', '#F2C14E', 'La force', 'Rareté : Commune 1, Peu commune 2, Rare 3, Hyper rare 4, Mythique 5, Secrète 6. +1 avec une finition, +2 si sa faction domine celle de la carte adverse.'],
+  ['p:help', '#9C7BFF', 'Le Cercle des Royaumes', 'Chaque royaume domine le suivant : {list}', { list: '' }],
+  ['p:seal', '#FF8A3D', 'Le Sceau d’Ardeur', 'Une fois par partie, ajoute +3 à la carte que tu poses. Ton adversaire ne le voit qu’au moment où les cartes se retournent.'],
+  ['booster', '#7FA8D8', 'Le Renfort', 'Après la deuxième manche, un troisième booster s’ouvre pour chacun : trois cartes de plus pour la dernière manche.'],
+  ['cards', '#7FE0A0', 'Ce que tu gardes', 'Le plus de manches gagnées l’emporte (à égalité, le total des forces). Chacun garde les cartes qui ont gagné leur manche, plus une au choix. Le gagnant prend aussi la copie d’une carte de l’adversaire. Le reste retourne à l’Abysse.'],
+  ['streak', '#FF8A3D', 'Série et Ligue', 'Victoire : {s} éclats × ta Série ardente (jusqu’à ×{x}), et un coffre à 3, 5, 7 et 10 victoires d’affilée. Ligue du mois : +{w} par victoire, −{l} par défaite.', { s: CHOC.winShards, x: STREAK_MULT.at(-1), w: LEAGUE_PTS.win, l: Math.abs(LEAGUE_PTS.lose) }],
+  ['ui-eye', '#E0485E', 'Aucune triche', 'Les boosters sont ouverts et les manches jugées par le serveur : personne ne peut voir tes cartes ni truquer un tirage.']];
+const howLi = ([ic, c, ti, d, p], i, fac) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic.startsWith('p:') ? ic.slice(2) : ic)}<em>${i + 1}</em></span><span><b>${t(ti)}</b><span class="small">${t(d, p && 'list' in p ? { list: fac } : p)}</span></span></li>`;
+export const chocHowHTML = (cat) => { const fac = CYCLE.map((f) => `<span class="kc-cyc">${sigil(f)}${esc(tw(cat?.faction?.[f]?.name || f))}</span>`).join(' → '); return `<ol class="how-steps">${HOW().map((x, i) => howLi(x, i, fac)).join('')}</ol>`; };
 const OFF = 'Le Choc des Boosters n’est pas encore ouvert sur le serveur.';
-const RES = { win: 'Victoire', tie: 'Égalité', lose: 'Défaite' };
-// v516 : « Comment ça marche » dans le style des autres jeux (étapes illustrées)
-const HOW = [['booster', '#E8C35A', 'Compose ton défi', `Choisis jusqu’à ${VERSUS_MAX} boosters, de types différents si tu veux (par exemple un standard et un de faction Céleste). Les deux joueurs ouvrent les mêmes.`],
-  ['cur-shard', '#7FA8D8', 'Tes boosters', 'Chaque joueur paie ses boosters en éclats, au prix de la boutique, et garde toujours toutes les cartes qu’il ouvre.'],
-  ['amis', '#9FE0FF', 'Ton adversaire', `Ton défi est ouvert à tous, ou envoyé à un ami. S’il n’est pas relevé en ${VERSUS_HOURS} h, tes éclats te sont rendus.`],
-  ['cards', '#C9A45A', 'Les points', `Quand un joueur relève le défi, les boosters des deux joueurs s’ouvrent. Commune ${LUCK_POINTS.C}, Peu commune ${LUCK_POINTS.PC}, Rare ${LUCK_POINTS.R}, Hyper rare ${LUCK_POINTS.HR}, Mythique ${LUCK_POINTS.M}, Secrète ${LUCK_POINTS.S}, +${LUCK_POINTS.variant} par finition.`],
-  ['crown', '#F2C14E', 'La victoire', `Le meilleur total gagne un butin offert par l’Abysse : la copie d’une carte de son choix parmi celles de l’adversaire (une Mythique ou une Secrète donne un coffre abyssal) et ${Math.round(VERSUS_PRIZE.win * 100)} % du prix de ses boosters en éclats. L’adversaire ne perd rien.`],
-  ['seal', '#7FE0A0', 'Égalité', `Chacun reçoit ${Math.round(VERSUS_PRIZE.tie * 100)} % du prix de ses boosters en éclats.`],
-  ['streak', '#FF8A3D', 'La Série ardente', `Chaque victoire d’affilée multiplie ton butin en éclats (jusqu’à ×${STREAK_MULT.at(-1)}) ; à ${Object.keys(STREAK_CHESTS).join(', ')} victoires d’affilée, un coffre en plus. Une défaite éteint la série, une égalité la garde.`],
-  ['crown', '#9C7BFF', 'Les Ligues du mois', `Chaque duel rapporte ou coûte des points : victoire +${LEAGUE_PTS.win} (plus un bonus de série), défaite ${LEAGUE_PTS.lose}. Ligues ${LEAGUES.map((l) => l.name).join(', ')} : on peut monter et redescendre. Le mois fini, ta ligue te donne sa récompense, puis tout repart de zéro.`],
-  ['hourglass', '#C9A45A', 'Chaque jour', `Le butin compte pour ${VERSUS_PRIZE.packsPerDay} boosters par jour. Au-delà, on joue pour la gloire : chacun garde toujours ses cartes.`],
-  ['ui-eye', '#E0485E', 'Aucune triche', 'Les boosters sont ouverts par le serveur : personne ne peut truquer les tirages.']];
-const TYPE_NAME = { standard: 'Standard', faction: 'Faction', event: 'Alliances', premium: 'Premium' };
-const howLi = ([ic, c, ti, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic)}<em>${i + 1}</em></span><span><b>${ti}</b><span class="small">${d}</span></span></li>`;
+const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
 
 export default function versusScreen(app, root) {
   const g = app.game, cat = app.catalog;
-  const ui = (app.state.versus ||= { to: null });
-  if (!Array.isArray(ui.lineup) || !ui.lineup.length) ui.lineup = [{ type: 'standard' }];
-  ui.sel = Math.min(ui.sel || 0, ui.lineup.length - 1);
-  let data = null, friends = [], err = null, busy = false, alive = true;
-  const ev = () => g.event();
-  const name = (r) => (isBlocked(r.a) ? 'Joueur masqué' : r.pseudo || 'Joueur');
+  const game = createChocGame(app, root);
+  let old = null, train = null, alive = true;
   const pic = (id) => { const c = id && cat.get(id); return c ? `<img alt="" src="${artUrl(c, { lite: true })}">` : EMBLEM; };
-  const facName = (f) => cat.faction[f]?.name || f;
-  // v516 : nom court d'un booster de la composition, déjà traduit (affiché dans un bloc translate="no")
-  const itemName = (it) => it.type === 'faction' ? t('Faction {f}', { f: tx(facName(it.faction || '')) })
-    : it.type === 'event' ? (it.factions?.length === 2 ? t('Alliances {a} et {b}', { a: tx(facName(it.factions[0])), b: tx(facName(it.factions[1])) }) : t('Alliances'))
-    : t(it.type === 'premium' ? 'Premium' : 'Standard');
-  const packLabel = (r) => {
-    const groups = [];
-    for (const it of lineupOf(r)) { const n = itemName(it), last = groups[groups.length - 1]; if (last && last.n === n) last.k++; else groups.push({ n, k: 1 }); }
-    return groups.map((x) => (x.k > 1 ? `${x.k} × ${x.n}` : x.n)).join(' + ');
-  };
-  const lbl = (r) => `<span translate="no">${esc(packLabel(r))}</span>`;
-  const ago = (t) => { const h = Math.floor((Date.now() - new Date(t)) / 3600000); return h < 1 ? 'à l’instant' : h < 24 ? `il y a ${h} h` : `il y a ${Math.floor(h / 24)} j`; };
-  const left = (t) => Math.max(0, VERSUS_HOURS - Math.floor((Date.now() - new Date(t)) / 3600000));
+  const oname = (r) => (isBlocked(r.mine ? r.b : r.a) ? 'Joueur masqué' : r.pseudo || 'Joueur');
+  const tokens = () => g.chocTokens().n;
 
   function head() {
-    return `<header class="screen-head ui-hero bn-versus"><h1>Le Choc des Boosters</h1><p class="muted">Vos boosters s’ouvrent face à face. Chacun garde ses cartes, le meilleur total gagne un butin.</p></header>`;
+    const n = tokens();
+    return `<header class="screen-head ui-hero bn-versus"><h1>${t('Le Choc des Boosters')}</h1><p class="muted">${t('Deux boosters chacun, trois manches, et tes meilleures cartes en jeu.')}</p></header>
+      <section class="panel kc-tok"><div class="kc-toks">${Array.from({ length: Math.max(CHOC.tokensMax, n) }, (_, i) => `<span class="kc-tk ${i < n ? 'on' : ''}"><img alt="" src="assets/jeux/kc-jeton.webp" onerror="this.onerror=null;this.src='assets/icons/seal.webp'"></span>`).join('')}</div>
+        <span><b>${t(n > 1 ? '{n} jetons du Choc' : '{n} jeton du Choc', { n })}</b><small>${n < CHOC.tokensMax ? t('Un nouveau jeton chaque jour (jusqu’à {m}).', { m: CHOC.tokensMax }) : t('Réserve pleine : joue pour ne pas perdre le jeton de demain.')}</small></span></section>
+      ${leagueHTML()}`;
   }
-
-  /* v807 : ta Ligue du mois et ta Série ardente, en tête du Choc */
-  const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
   const monthName = (m) => `${t(MONTHS[+m.slice(5, 7) - 1] || '')} ${m.slice(0, 4)}`;
   function leagueHTML() {
     const lg = g.chocLeague(), v = g.s.versus, i = leagueIdx(lg.pts), L = LEAGUES[i], N = LEAGUES[i + 1];
-    const d = new Date(g.clock()), left = new Date(d.getFullYear(), d.getMonth() + 1, 1) - d, days = Math.max(1, Math.ceil(left / 86400000));
+    const d = new Date(g.clock()), days = Math.max(1, Math.ceil((new Date(d.getFullYear(), d.getMonth() + 1, 1) - d) / 86400000));
     const pct = N ? Math.round(((lg.pts - L.min) / (N.min - L.min)) * 100) : 100;
-    const rw = LEAGUE_REWARD[L.k], rwTxt = rw ? Object.entries(rw.chests || {}).map(([k]) => t(`coffre ${k === 'fer' ? 'de fer' : k === 'or' ? 'd’or' : 'abyssal'}`)).concat(rw.tickets?.premium ? [t('{n} tickets premium', { n: rw.tickets.premium })] : []).join(' + ') : t('aucune récompense');
     const s = v.streak || 0;
     return `<section class="panel vs-league" style="--lgc:${L.color}">
       <div class="vs-lg-top">${leagueBadge(i, 'big')}<div class="vs-lg-t"><b>${t('Ligue {l}', { l: t(L.name) })}</b><small>${fmt(lg.pts)} ${t('points')} · ${t('fin dans {n} j', { n: days })}</small></div>${s >= 1 ? flameHTML(s, 'big') : ''}</div>
       <div class="vs-lg-bar"><i style="width:${pct}%"></i></div>
-      <p class="small muted">${N ? t('Ligue {l} à {n} points.', { l: t(N.name), n: N.min }) : t('Tu es tout en haut : tiens bon jusqu’à la fin du mois.')} ${t('Si le mois finissait maintenant : {r}.', { r: rwTxt })}</p>
-      <p class="small">${s >= 1 ? t('Série ardente : <b>{n}</b> · prochaine victoire, butin ×{m}', { n: s, m: String(streakMult(s + 1)).replace('.', ',') }) : t('Gagne un duel pour allumer ta Série ardente.')}</p>
-    </section>`;
+      <p class="small muted">${N ? t('Ligue {l} à {n} points.', { l: t(N.name), n: N.min }) : t('Tu es tout en haut : tiens bon jusqu’à la fin du mois.')} ${s >= 1 ? t('Série ardente : <b>{n}</b> · prochaine victoire, butin ×{m}', { n: s, m: String(streakMult(s + 1)).replace('.', ',') }) : ''}</p></section>`;
   }
-  // résultat du mois passé, montré une fois
   function lastMonth() {
     const x = g.s.versus.lgLast; let seen = null;
     try { seen = localStorage.getItem('abyssal.chocSeen'); } catch (e) { /* stockage indisponible */ }
@@ -85,245 +68,153 @@ export default function versusScreen(app, root) {
     const L = LEAGUES[x.tier], rw = LEAGUE_REWARD[L.k];
     openSheet(`<div class="center stack">${leagueBadge(x.tier, 'huge')}<h2>${t('Fin de la Ligue · {m}', { m: monthName(x.m) })}</h2>
       <p>${t('Tu termines en ligue <b>{l}</b> avec {n} points.', { l: t(L.name), n: fmt(x.pts) })}</p>
-      <p class="small muted">${rw ? t('Ta récompense est dans tes coffres.') : t('Atteins la ligue Argent pour gagner une récompense.')}</p>
-      <p class="small muted">${t('Une nouvelle ligue commence : tout le monde repart de zéro.')}</p></div>`, { label: t('Ligue du mois') });
+      <p class="small muted">${rw ? t('Ta récompense est dans tes coffres.') : t('Atteins la ligue Argent pour gagner une récompense.')}</p></div>`, { label: t('Ligue du mois') });
   }
 
-  function draw() {
-    if (!alive) return;
-    /* v528 : le compte est obligatoire (porte du compte au lancement) : seul le pseudo peut manquer */
-    if (!cloud.isLoggedIn() || !sync.profile?.pseudo) {
-      root.innerHTML = `${head()}${rulesHTML()}<section class="panel stack center"><p>Choisis d’abord ton pseudo : c’est lui que verront tes adversaires.</p><a class="btn primary block" href="#/compte">Choisir mon pseudo</a></section>`;
-      return;
+  // ——— Anciens duels (Choc payant d'avant v811) : vus et encaissés normalement, plus de nouveaux ———
+  async function loadOld() {
+    try { old = await cloud.versusList(); } catch (e) { old = null; return; }
+    for (const r of (old?.mine || []).filter((x) => x.mine && !x.claimed && ['cancelled', 'declined', 'expired'].includes(x.status))) {
+      try { const { out } = await app.partie.first('versusClaim', r.id); r.claimed = true; if (out?.shards) toast(t('Ancien défi du Choc : <b>{n} éclats</b> rendus.', { n: fmt(out.shards) }), { icon: 'crystal' }); } catch (e) { /* plus tard */ }
     }
-    const me = cloud.currentUser()?.id;
-    const mine = data?.mine || [];
-    const toSee = mine.filter((r) => r.status === 'done' && !r.claimed);
-    const incoming = mine.filter((r) => r.status === 'open' && !r.mine);
-    const waiting = mine.filter((r) => r.status === 'open' && r.mine);
-    const past = mine.filter((r) => r.status === 'done' && r.claimed).slice(0, 10);
-    const open = (data?.open || []).filter((r) => !isBlocked(r.a) && r.a !== me);
-    root.innerHTML = `${head()}
-      ${err ? `<p class="panel small center">${icon('info')} ${esc(err)}</p>` : ''}
-      ${leagueHTML()}
-      ${toSee.length ? `<section class="panel vs-sec vs-hot"><h2 class="section-title">Duels à voir <span class="pill-n">${toSee.length}</span></h2>
-        ${toSee.map((r) => row(r, `<button class="btn small primary" data-act="see" data-id="${esc(r.id)}">Voir le duel</button>`, `${lbl(r)} · ton défi a été relevé`)).join('')}</section>` : ''}
-      ${mine.filter((r) => g.s.versus.pick?.[r.id]).length ? `<section class="panel vs-sec vs-hot"><h2 class="section-title">Butin à choisir</h2>
-        ${mine.filter((r) => g.s.versus.pick?.[r.id]).map((r) => row(r, `<button class="btn small primary" data-act="pickloot" data-id="${esc(r.id)}">${icon('crown')} Choisir</button>`, `${lbl(r)} · ${t('tu as gagné ce duel')}`)).join('')}</section>` : ''}
-      ${incoming.length ? `<section class="panel vs-sec"><h2 class="section-title">Défis reçus</h2>
-        ${incoming.map((r) => row(r, `<span class="vs-acts"><button class="btn small primary" data-act="accept" data-id="${esc(r.id)}">Relever · ${fmt(r.stake)} ${icon('crystal')}</button><button class="btn small ghost" data-act="decline" data-id="${esc(r.id)}">Refuser</button></span>`, lbl(r))).join('')}</section>` : ''}
-      ${createHTML()}
-      <section class="panel vs-sec"><h2 class="section-title">Défis ouverts</h2>
-        ${data ? (open.length ? open.map((r) => row(r, `<button class="btn small primary" data-act="accept" data-id="${esc(r.id)}" ${g.s.shards >= r.stake ? '' : 'disabled'}>Relever · ${fmt(r.stake)} ${icon('crystal')}</button>`, `${lbl(r)} · ${ago(r.created_at)}`)).join('') : '<p class="small muted center">Aucun défi ouvert pour l’instant. Lance le tien : un joueur pourra le relever.</p>') : '<p class="small muted center">Chargement…</p>'}
-      </section>
-      ${waiting.length ? `<section class="panel vs-sec"><h2 class="section-title">Tes défis en attente</h2>
-        ${waiting.map((r) => row(r, `<button class="btn small ghost" data-act="cancel" data-id="${esc(r.id)}">Annuler</button>`, `${lbl(r)} · ${r.public ? 'ouvert à tous' : 'pour ton ami'} · encore ${left(r.created_at)} h`, true)).join('')}
-        <p class="small muted">Tes éclats te sont rendus si personne ne relève ton défi en ${VERSUS_HOURS} h, ou si tu l’annules.</p></section>` : ''}
-      ${past.length ? `<details class="panel dc-fold vs-sec"><summary><span class="dc-sum-t">${t('Revoir mes derniers duels')}</span></summary>
-        ${past.map((r) => { const res = r.my_score > r.their_score ? 'win' : r.my_score === r.their_score ? 'tie' : 'lose'; return row(r, g.s.versus.pick?.[r.id] ? `<button class="btn small primary" data-act="pickloot" data-id="${esc(r.id)}">${icon('crown')} Choisir mon butin</button>` : `<button class="btn small ghost vs-replay" data-act="replay" data-id="${esc(r.id)}">${icon('refresh')}<b class="vs-res ${res}">${t(RES[res])}</b> ${fmt(r.my_score)} – ${fmt(r.their_score)}</button>`, lbl(r)); }).join('')}</details>` : ''}
-      ${rulesHTML()}
-      ${statsHTML()}`;
   }
-
-  function row(r, acts, sub, self = false) {
-    const who = self ? (r.public ? 'Ouvert à tous' : name({ a: r.b, pseudo: r.pseudo })) : name(r);
-    const av = self && r.public ? EMBLEM : pic(isBlocked(r.a) ? null : r.avatar);
-    const foe = self ? (r.public ? null : r.b) : (r.mine ? r.b : r.a);
-    return `<div class="vs-row"><span class="fr-av"${profileAttrs(foe)}>${av}</span><span class="fr-t"><b>${esc(who)}</b>${!self && r.badge ? ` ${cloud.badgeHTML(r.badge)}` : ''}<small>${sub}</small></span>${acts}</div>`;
+  function oldHTML() {
+    const mine = old?.mine || [];
+    const toSee = mine.filter((r) => r.status === 'done' && !r.claimed), picks = mine.filter((r) => g.s.versus.pick?.[r.id]);
+    const waiting = mine.filter((r) => r.status === 'open' && r.mine), incoming = mine.filter((r) => r.status === 'open' && !r.mine);
+    const past = mine.filter((r) => r.status === 'done' && r.claimed).slice(0, 6);
+    if (!toSee.length && !picks.length && !waiting.length && !incoming.length && !past.length) return '';
+    const row = (r, acts, sub) => `<div class="vs-row"><span class="fr-av"${profileAttrs(r.mine ? r.b : r.a)}>${pic(r.avatar)}</span><span class="fr-t"><b>${esc(r.public && r.mine ? t('Ouvert à tous') : oname(r))}</b><small>${sub}</small></span>${acts}</div>`;
+    return `<details class="panel dc-fold vs-sec" ${toSee.length || picks.length ? 'open' : ''}><summary><span class="dc-sum-t">${t('Anciens duels du Choc')}</span></summary>
+      <p class="small muted">${t('Les duels lancés avant la nouvelle formule se terminent et se paient comme avant.')}</p>
+      ${toSee.map((r) => row(r, `<button class="btn small primary" data-mp="v-see" data-id="${esc(r.id)}">${t('Voir le duel')}</button>`, t('Ton défi a été relevé'))).join('')}
+      ${picks.map((r) => row(r, `<button class="btn small primary" data-mp="v-pick" data-id="${esc(r.id)}">${icon('crown')} ${t('Choisir')}</button>`, t('Butin à choisir'))).join('')}
+      ${incoming.map((r) => row(r, `<button class="btn small ghost" data-mp="v-decline" data-id="${esc(r.id)}">${t('Refuser')}</button>`, t('Ancien défi reçu'))).join('')}
+      ${waiting.map((r) => row(r, `<button class="btn small ghost" data-mp="v-cancel" data-id="${esc(r.id)}">${t('Annuler')}</button>`, t('En attente · tes éclats te seront rendus'))).join('')}
+      ${past.map((r) => { const res = r.my_score > r.their_score ? 'win' : r.my_score === r.their_score ? 'tie' : 'lose'; return row(r, `<button class="btn small ghost vs-replay" data-mp="v-replay" data-id="${esc(r.id)}">${icon('refresh')}${fmt(r.my_score)} – ${fmt(r.their_score)}</button>`, t({ win: 'Victoire', tie: 'Égalité', lose: 'Défaite' }[res])); }).join('')}
+    </details>`;
   }
-
-  function createHTML() {
-    const L = ui.lineup, sel = ui.sel, cur = L[sel], stake = lineupStake(L), e = ev();
-    const okFac = L.every((it) => it.type !== 'faction' || it.faction);
-    const okFriend = ui.to !== 'friend' || ui.friend;
-    const can = okFac && okFriend && g.s.shards >= stake && !busy;
-    const ok = friends.filter((f) => f.status === 'accepted');
-    const pk = (it) => `<span class="vs-pk">${packHTML(it.type, cat, { faction: it.type === 'faction' ? (it.faction || 'infernal') : null, event: e })}</span>`;
-    return `<section class="panel vs-sec vs-new"><h2 class="section-title">Lancer un défi</h2>
-      <p class="small muted">Compose les boosters du duel, jusqu’à ${VERSUS_MAX} : les deux joueurs ouvrent les mêmes.</p>
-      <div class="vs-slots">${L.map((it, i) => `<div class="vs-slot ${i === sel ? 'on' : ''}" role="button" tabindex="0" data-act="sel" data-i="${i}" aria-pressed="${i === sel}">
-          ${pk(it)}<b translate="no">${esc(itemName(it))}</b><small>${fmt(BOOSTERS[it.type].price)} ${icon('crystal')}</small>
-          ${L.length > 1 ? `<button class="vs-x" data-act="rm" data-i="${i}" aria-label="Retirer ce booster">${icon('close')}</button>` : ''}</div>`).join('')}
-        ${L.length < VERSUS_MAX ? `<button class="vs-slot vs-add" data-act="add"><span class="vs-plus">+</span><b>Ajouter un booster</b></button>` : ''}</div>
-      <p class="small vs-edit">${L.length > 1 ? `Booster ${sel + 1} : choisis son type` : 'Choisis le type de booster'}</p>
-      <div class="vs-types">${VERSUS_TYPES.map((k) => `<button class="vs-type ${cur.type === k ? 'on' : ''}" data-act="type" data-v="${k}" aria-pressed="${cur.type === k}">
-        ${pk({ type: k, faction: cur.faction })}<b>${TYPE_NAME[k]}</b><small>${fmt(BOOSTERS[k].price)} ${icon('crystal')}</small></button>`).join('')}</div>
-      ${cur.type === 'faction' ? `<div class="chips fac-grid vs-fac" role="radiogroup" aria-label="Faction du booster">${FACTION_ORDER.map((f) => `<button class="chip" role="radio" data-act="fac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${cur.faction === f}" aria-checked="${cur.faction === f}">${sigil(f)}<span class="fg-n">${esc(facName(f))}</span></button>`).join('')}</div>` : ''}
-      ${cur.type === 'event' ? `<p class="small muted">Alliées cette semaine : <b>${e.factions.map(facName).join(' et ')}</b>.</p>` : ''}
-      <div class="vs-line"><span class="small">Adversaire</span><div class="seg vs-to" role="group" aria-label="Adversaire"><button class="seg-b" data-act="to" data-v="all" aria-pressed="${ui.to !== 'friend'}">Ouvert à tous</button><button class="seg-b" data-act="to" data-v="friend" aria-pressed="${ui.to === 'friend'}">Un ami</button></div></div>
-      ${ui.to === 'friend' ? (ok.length ? `<div class="vs-friends">${ok.map((f) => `<button class="vs-fr ${ui.friend === f.id ? 'on' : ''}" data-act="friend" data-v="${esc(f.id)}" aria-pressed="${ui.friend === f.id}"><span class="fr-av">${pic(f.avatar)}</span><b>${esc(f.pseudo)}</b></button>`).join('')}</div>` : `<p class="small muted">Pas encore d’ami. <a href="#/amis">Ajouter un ami</a></p>`) : ''}
-      <p class="small muted center vs-prize">${prizeLeft() ? `Butin du jour : encore <b>${prizeLeft()}</b> booster${prizeLeft() > 1 ? 's' : ''}` : 'Butin du jour déjà gagné : on joue pour la gloire'}</p>
-      <p class="vs-stake">Prix : <b>${fmt(stake)}</b> ${icon('crystal')} <span class="small muted">chacun · tu as ${fmt(g.s.shards)} éclats</span></p>
-      <button class="btn primary block big-cta dc-plq dc-plq-red" data-act="create" ${can ? '' : 'disabled'}>${icon('p:shadow')}${!okFac ? 'Choisis une faction' : !okFriend ? 'Choisis un ami' : g.s.shards < stake ? `Il te manque ${fmt(stake - g.s.shards)} éclats` : `Lancer le défi · ${fmt(stake)} éclats`}</button>
-    </section>`;
+  const oldErr = (e) => { app.sfx.error(); toast(esc(e.status === 404 ? OFF : e.message), { kind: 'error', icon: 'info' }); };
+  async function oldSee(id, ctx) {
+    const r = old?.mine?.find((x) => x.id === id); if (!r) return;
+    try { const { res, out: o } = await withPending(app.partie.first('versusClaim', id)); r.claimed = true; app.chrome?.(); oldDuel(r, o || { result: res.result, cards: [] }, ctx); } catch (e) { oldErr(e); }
   }
-
-  function rulesHTML() {
-    return `<details class="panel dc-fold dc-how vs-rules"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/help.webp"><span class="dc-sum-t">Comment ça marche</span></summary><ol class="how-steps">${HOW.map(howLi).join('')}</ol></details>`;
+  function oldDuel(r, out, ctx) {
+    playDuel(app, r, out, { foeName: oname(r), myAvatar: g.shownAvatar() || sync.profile?.avatar,
+      onPick: (i) => app.partie.first('versusPick', r.id, i).then((x) => { app.chrome?.(); return x.out; }),
+      onClose: () => { if (out?.progress?.length) { app.pendingProgress = out.progress; app.flushProgress?.(); } ctx.lobby(); } });
   }
-
-  const prizeLeft = () => { const v = g.s.versus; return v.prizeDay === today(g.clock()) ? Math.max(0, VERSUS_PRIZE.packsPerDay - (v.prizePacks || 0)) : VERSUS_PRIZE.packsPerDay; };
-  function statsHTML() {
-    const v = g.s.versus;
-    if (!v.played) return '';
-    return `<p class="small muted center vs-stats">${v.played} duel${v.played > 1 ? 's' : ''} · ${v.wins} victoire${v.wins > 1 ? 's' : ''} · ${v.ties} égalité${v.ties > 1 ? 's' : ''} · ${v.losses} défaite${v.losses > 1 ? 's' : ''} · ${fmt(v.won)} cartes gagnées</p>`;
-  }
-
-  async function load() {
-    if (!cloud.isLoggedIn() || !sync.profile?.pseudo) return draw();
-    try {
-      [data, friends] = await Promise.all([cloud.versusList(), cloud.friendList().catch(() => [])]);
-      err = null;
-    } catch (e) { err = e.status === 404 ? OFF : e.message; data = data || { open: [], mine: [] }; }
-    if (!alive) return;
-    await refunds();
-    checkTurns(app, { force: true }); /* v521 : pastilles et « Aujourd'hui » à jour */
-    draw();
-  }
-
-  // mises rendues : défis annulés, refusés ou expirés (encaissés sans rien montrer d'autre qu'une annonce)
-  async function refunds() {
-    for (const r of (data?.mine || []).filter((x) => x.mine && !x.claimed && ['cancelled', 'declined', 'expired'].includes(x.status))) {
-      try {
-        const { out } = await app.partie.first('versusClaim', r.id); /* v539 : encaissé par le serveur de partie */
-        r.claimed = true;
-        if (out?.shards) toast(`${r.status === 'declined' ? 'Défi refusé' : r.status === 'expired' ? 'Défi expiré' : 'Défi annulé'} : <b>${fmt(out.shards)} éclats</b> rendus.`, { icon: 'crystal' });
-      } catch (e) { /* on réessaiera à la prochaine visite */ }
-    }
-    app.chrome?.();
-  }
-
-  async function see(id) {
-    if (busy) return;
-    busy = true;
-    try {
-      if (!data?.mine?.some((r) => r.id === id)) data = await cloud.versusList();
-      const r = data.mine.find((x) => x.id === id);
-      if (!r || r.status !== 'done') throw new Error('Ce duel n’est pas encore joué.');
-      const { res, out: o } = await app.partie.first('versusClaim', id);
-      const out = o || { result: res.result, cards: [] };
-      r.claimed = true;
-      app.chrome?.();
-      duel(r, out);
-    } catch (e) { app.sfx.error(); toast(esc(e.status === 404 ? OFF : e.message), { kind: 'error', icon: 'info' }); }
-    busy = false;
-    draw();
-  }
-
-  async function accept(id) {
-    const r = [...(data?.open || []), ...(data?.mine || [])].find((x) => x.id === id);
-    if (!r || busy) return;
-    if (g.s.shards < r.stake) { app.sfx.error(); toast(`Il te manque ${fmt(r.stake - g.s.shards)} éclats.`, { kind: 'error', icon: 'crystal' }); return; }
-    const ok = await confirmBox(t('Relever le défi de <b>{name}</b> : {pack}.<br>Prix : <b>{stake} éclats</b>. Chacun garde ses cartes ; le meilleur total gagne le butin.', { name: esc(name(r)), pack: lbl(r), stake: fmt(r.stake) }), { ok: 'Relever le défi' });
-    if (!ok) return;
-    busy = true;
-    /* v539 : la mise est prise par le serveur de partie, au moment où le duel a lieu (rendue s'il échoue) */
-    const done = pending(t('Ouverture des boosters…'));
-    try { await app.partie.first('versusAccept', id, r.stake); }
-    catch (e) { done(); busy = false; app.sfx.error(); toast(esc(e.status === 404 ? OFF : e.message), { kind: 'error', icon: 'info' }); app.chrome?.(); return load(); }
-    app.chrome?.();
-    try { data = await cloud.versusList(); } catch (e) { /* on retentera */ }
-    done(); busy = false;
-    await see(id);
-  }
-
-  async function create() {
-    if (busy) return;
-    const e = ev();
-    const lineup = ui.lineup.map((it) => (it.type === 'faction' ? { type: 'faction', faction: it.faction } : it.type === 'event' ? { type: 'event', factions: e.factions } : { type: it.type }));
-    if (!lineupOk(lineup)) return;
-    const stake = lineupStake(lineup);
-    const to = ui.to === 'friend' ? ui.friend : null;
-    const fr = to && friends.find((f) => f.id === to);
-    const pk = lbl({ lineup });
-    const ok = await confirmBox(to ? t('Défier <b>{name}</b> : {pack}.<br>Prix : <b>{stake} éclats</b>, rendus s’il refuse ou ne relève pas le défi en {h} h.', { name: esc(fr?.pseudo || ''), pack: pk, stake: fmt(stake), h: VERSUS_HOURS })
-      : t('Lancer un défi ouvert à tous : {pack}.<br>Prix : <b>{stake} éclats</b>, rendus si personne ne le relève en {h} h.', { pack: pk, stake: fmt(stake), h: VERSUS_HOURS }), { ok: 'Lancer le défi' });
-    if (!ok) return;
-    busy = true;
-    /* v539 : la mise est prise par le serveur de partie quand le défi est créé */
-    try {
-      await withPending(app.partie.first('versusCreate', lineup, to, stake));
-      app.sfx.achievement?.();
-      toast(to ? 'Défi envoyé ! Il apparaîtra chez ton ami.' : 'Défi lancé ! Reviens voir quand un joueur l’aura relevé.', { kind: 'success', icon: 'crystal' });
-    } catch (er) { app.sfx.error(); toast(esc(er.status === 404 ? OFF : er.message), { kind: 'error', icon: 'info', ms: 6000 }); }
-    busy = false;
-    app.chrome?.();
-    load();
-  }
-
-  async function cancel(id, decline = false) {
-    if (busy) return;
-    const ok = await confirmBox(decline ? 'Refuser ce défi ? Ton ami récupère ses éclats.' : 'Annuler ce défi ? Tes éclats te sont rendus.', { ok: decline ? 'Refuser' : 'Annuler le défi', cancel: 'Retour' });
-    if (!ok) return;
-    busy = true;
-    try {
-      await cloud.versusCancel(id);
-      if (!decline) { const { out } = await app.partie.first('versusClaim', id); if (out?.shards) toast(`<b>${fmt(out.shards)} éclats</b> rendus.`, { icon: 'crystal' }); }
-    } catch (e) { app.sfx.error(); toast(esc(e.status === 404 ? OFF : e.message), { kind: 'error', icon: 'info' }); }
-    busy = false;
-    app.chrome?.();
-    load();
-  }
-
-  // ——— Le face-à-face (v521 : plein écran, js/screens/versus-duel.js) ———
-  /* v736 : le gagnant choisit sa carte parmi celles de l'adversaire */
-  async function pickLoot(id, i) {
-    try { const { out } = await withPending(app.partie.first('versusPick', id, i)); app.chrome?.(); if (out?.progress?.length) { app.pendingProgress = out.progress; app.flushProgress?.(); } return out; }
-    catch (e) { app.sfx.error(); toast(esc(e.status === 404 ? OFF : e.message), { kind: 'error', icon: 'info' }); throw e; }
-  }
-  function pickSheet(r) {
-    const sh = openSheet(`<h2 class="center">${t('Ton butin')}</h2><p class="small center">${t('Choisis ta carte parmi celles de {name} :', { name: esc(name({ a: r.mine ? r.b : r.a, pseudo: r.pseudo })) })}</p>${pickGridHTML(app, r.their_cards)}`, { label: t('Ton butin') });
+  function oldPick(id, ctx) {
+    const r = old?.mine?.find((x) => x.id === id); if (!r) return;
+    const sh = openSheet(`<h2 class="center">${t('Ton butin')}</h2><p class="small center">${t('Choisis ta carte parmi celles de {name} :', { name: esc(oname(r)) })}</p>${pickGridHTML(app, r.their_cards)}`, { label: t('Ton butin') });
     sh.body.addEventListener('click', async (e) => {
       const b = e.target.closest('[data-v="pick"]'); if (!b || sh.busy) return;
       sh.busy = true;
-      try { const o = await pickLoot(r.id, +b.dataset.i); const tc = o?.trophy && cat.get(o.trophy.id); sh.close(); toast(tc ? t('Copie de <b>{card}</b>', { card: esc(tc.name) }) : t('Coffre abyssal'), { kind: 'success', icon: 'crown' }); draw(); }
-      catch (er) { sh.busy = false; }
+      try { await withPending(app.partie.first('versusPick', r.id, +b.dataset.i)); app.chrome?.(); sh.close(); toast(t('Butin ajouté à ta collection.'), { kind: 'success', icon: 'crown' }); ctx.lobby(); } catch (er) { sh.busy = false; oldErr(er); }
     });
   }
-  /* v807 : revanche : même composition, défi envoyé à ce joueur (accepté par le serveur 3 jours après un duel, même sans être amis) */
-  async function rematch(r) {
-    const foe = r.mine ? r.b : r.a;
-    if (!foe || isBlocked(foe) || busy) return;
-    const lineup = lineupOf(r).map((it) => (it.type === 'faction' ? { type: 'faction', faction: it.faction } : it.type === 'event' ? { type: 'event', factions: it.factions?.length === 2 ? it.factions : ev().factions } : { type: it.type }));
-    if (!lineupOk(lineup)) return;
-    const stake = lineupStake(lineup);
-    if (g.s.shards < stake) { app.sfx.error(); toast(t('Il te manque {n} éclats pour la revanche.', { n: fmt(stake - g.s.shards) }), { kind: 'error', icon: 'crystal' }); return; }
-    const ok = await confirmBox(t('Revanche contre <b>{name}</b> : {pack}.<br>Prix : <b>{stake} éclats</b>, rendus s’il ne relève pas le défi en {h} h.', { name: esc(name({ a: foe, pseudo: r.pseudo })), pack: lbl({ lineup }), stake: fmt(stake), h: VERSUS_HOURS }), { ok: t('Lancer la revanche') });
-    if (!ok) return;
-    busy = true;
-    try { await withPending(app.partie.first('versusCreate', lineup, foe, stake)); app.sfx.achievement?.(); toast(t('Revanche envoyée !'), { kind: 'success', icon: 'swords' }); }
-    catch (er) { app.sfx.error(); toast(esc(er.status === 404 ? OFF : er.message), { kind: 'error', icon: 'info', ms: 6000 }); }
-    busy = false; app.chrome?.(); load();
-  }
-  async function react(r, k) {
-    try { await cloud.versusReact(r.id, k); r.my_react = k; }
-    catch (e) { app.sfx.error(); toast(esc(e.status === 404 ? t('Les réactions du Choc ne sont pas encore ouvertes sur le serveur.') : e.message), { kind: 'error', icon: 'info' }); throw e; }
-  }
-  function duel(r, out) {
-    const foe = r.mine ? r.b : r.a;
-    playDuel(app, r, out, { foeName: name({ a: foe, pseudo: r.pseudo }), myAvatar: g.shownAvatar() || sync.profile?.avatar, onPick: (i) => pickLoot(r.id, i),
-      onRematch: foe && !isBlocked(foe) ? () => rematch(r) : null, onReact: foe && !isBlocked(foe) ? (k) => react(r, k) : null,
-      onClose: () => { if (out?.progress?.length) { app.pendingProgress = out.progress; app.flushProgress?.(); out.progress = null; } draw(); } });
+  async function oldCancel(id, decline, ctx) {
+    if (!(await confirmBox(decline ? t('Refuser ce défi ? Ton ami récupère ses éclats.') : t('Annuler ce défi ? Tes éclats te sont rendus.'), { ok: t(decline ? 'Refuser' : 'Annuler le défi'), cancel: t('Retour') }))) return;
+    try { await cloud.versusCancel(id); if (!decline) { const { out } = await app.partie.first('versusClaim', id); if (out?.shards) toast(t('<b>{n} éclats</b> rendus.', { n: fmt(out.shards) }), { icon: 'crystal' }); } } catch (e) { oldErr(e); }
+    app.chrome?.(); await loadOld(); ctx.lobby();
   }
 
-  bindActions(root, {
-    type(el) { const it = ui.lineup[ui.sel]; it.type = el.dataset.v; if (it.type !== 'faction') delete it.faction; app.sfx.tap(); draw(); },
-    fac(el) { ui.lineup[ui.sel].faction = el.dataset.v; app.sfx.tap(); draw(); },
-    sel(el) { ui.sel = +el.dataset.i; app.sfx.tap(); draw(); },
-    add() { if (ui.lineup.length < VERSUS_MAX) { ui.lineup.push({ ...ui.lineup[ui.lineup.length - 1] }); ui.sel = ui.lineup.length - 1; app.sfx.tap(); draw(); } },
-    rm(el) { if (ui.lineup.length > 1) { ui.lineup.splice(+el.dataset.i, 1); ui.sel = Math.min(ui.sel, ui.lineup.length - 1); app.sfx.tap(); draw(); } },
-    to(el) { ui.to = el.dataset.v; app.sfx.tap(); draw(); },
-    friend(el) { ui.friend = el.dataset.v; app.sfx.tap(); draw(); },
-    create() { create(); },
-    accept(el) { accept(el.dataset.id); },
-    decline(el) { cancel(el.dataset.id, true); },
-    cancel(el) { cancel(el.dataset.id); },
-    see(el) { see(el.dataset.id); },
-    pickloot(el) { const r = data?.mine?.find((x) => x.id === el.dataset.id); if (r) pickSheet(r); },
-    replay(el) { const r = data?.mine?.find((x) => x.id === el.dataset.id); if (r) duel(r, null); },
+  // ——— Entraînement contre l'Abysse : même partie, jouée sur le téléphone, sans jeton ni récompense ———
+  const tctx = { train: true, alive: true, busy: false, myTurn: (v) => v.status === 'playing', foeName: () => t('L’Abysse'), avatar: () => '<img alt="" src="assets/brand/emblem.webp">',
+    plate: (v, mine, html) => html, clockHTML: () => '' };
+  const tview = () => ({ id: null, me: 'a', status: train.st.over ? 'done' : 'playing', state: viewFor(train.st, 'a'), foe: null, pace: 'slow', turn: train.st.turn, claimed: true, reason: 'score' });
+  const pack = () => drawBooster('standard', cat).cards.map((c) => ({ id: c.id, rarity: c.rarity, variant: c.variant || 'normal', faction: cat.get(c.id)?.faction }));
+  async function startTrain() {
+    game.reset(); game.start();
+    train = { st: newGame({ a: [...pack(), ...pack()], b: [...pack(), ...pack()] }, { a: pack(), b: pack() }) };
+    await game.openPacks(tview(), tctx, 'start').catch(() => {});
+    if (train) game.drawGame(tview(), tctx);
+  }
+  async function trainPlay(i, seal) {
+    try {
+      train.st = apply(train.st, 'a', i, seal);
+      tctx.busy = true; game.drawGame(tview(), tctx);
+      await new Promise((r) => setTimeout(r, app.reduced() ? 150 : 900));
+      if (!train) return;
+      const ai = aiPick(train.st, 'b', Math.random);
+      train.st = apply(train.st, 'b', ai.i, ai.seal);
+      tctx.busy = false;
+      await game.reveal(tview(), train.st.last, tctx);
+      if (train) game.drawGame(tview(), tctx);
+    } catch (e) { tctx.busy = false; if (e !== game.STOP) { toast(esc(e.message), { kind: 'error' }); if (train) game.drawGame(tview(), tctx); } }
+  }
+
+  // ——— Une partie en ligne ———
+  async function play(i, seal, ctx) {
+    const prev = ctx.view;
+    const v = await ctx.act(() => cloud.mpAct(ctx.ui.open, { pick: i, seal }));
+    if (!v) return;
+    const ev = v.state?.last;
+    if (ev && ev.n > (prev.state?.n || 0)) { try { await game.reveal(v, ev, ctx); } catch (e) { if (e !== game.STOP) throw e; } }
+    ctx.draw(); ctx.watch();
+  }
+  async function claim(ctx) {
+    const v = ctx.view; if (!v || v.claimed) return;
+    const { keep, take } = game.claimArgs();
+    try {
+      const { res, out } = await withPending(app.partie.first('chocClaim', v.id, keep, take));
+      v.claimed = true;
+      if (out) { game.setDone(v.id, out); if (out.result === 'win') app.sfx['vd-win']?.(); else if (out.result === 'lose') app.sfx['vd-lose']?.(); else app.sfx['vd-flip']?.(); }
+      else if (res?.result === 'already') toast(t('Tes cartes de cette partie sont déjà dans ta collection.'));
+      app.chrome?.();
+      ctx.draw();
+      if (out?.progress?.length) { app.pendingProgress = out.progress; app.flushProgress?.(); }
+    } catch (e) { app.sfx.error(); toast(esc(e.message), { kind: 'error' }); }
+  }
+
+  const lobby = createMpLobby(app, root, {
+    game: 'choc', noAutoClaim: true, noRanking: true,
+    busyLocal: () => !!train,
+    modeBar: () => head(),
+    note: t('Choisis ta vitesse. À chaque manche, vous posez une carte en même temps ; si tu ne joues pas à temps, <b>la partie est perdue</b>.'),
+    intro: () => `<button class="btn block dc-plq dc-plq-dark kc-trainbtn" data-mp="train">${icon('p:help')}${t('Entraînement contre l’Abysse')}<small>${t('Sans jeton, rien à gagner ni à perdre')}</small></button>`,
+    canPlay: () => tokens() > 0,
+    rewardNote: () => `<p class="small muted center">${tokens() > 0 ? t('Une partie coûte <b>1 jeton</b>. Tu gardes les cartes qui gagnent leur manche, plus une au choix.') : t('Plus de jeton aujourd’hui : un nouveau arrive demain. Tu peux t’entraîner contre l’Abysse.')}</p>`,
+    onLobby: async () => { const n = await app.partie.first('chocRefund'); if (n > 0) { toast(t(n > 1 ? '{n} jetons du Choc rendus (parties jamais commencées).' : '{n} jeton du Choc rendu (partie jamais commencée).', { n }), { icon: 'info' }); app.chrome?.(); } },
+    top: (L, row) => { const end = L.filter((v) => v.status === 'done' && !v.claimed); return end.length ? `<section class="panel mp-sec hot"><h2 class="section-title">${t('Cartes à garder')} <span class="pill-n">${end.length}</span></h2>${end.map((v) => row(v, t('Partie terminée : choisis tes cartes'))).join('')}</section>` : ''; },
+    bottom: () => `${oldHTML()}<details class="panel dc-fold dc-how vs-rules"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/help.webp"><span class="dc-sum-t">${t('Comment ça marche')}</span></summary>${chocHowHTML(cat)}</details>`,
+    create: async (pace, to) => { const id = await app.partie.first('chocNew', to, pace); app.chrome?.(); return id; },
+    join: async (id) => { const r = await app.partie.first('chocJoin', id); app.chrome?.(); return r; },
+    sub: (v) => (v.state?.wins ? t('Manche {n} · {a} – {b}', { n: Math.min(v.state.r, CHOC.rounds), a: v.state.wins[v.me], b: v.state.wins[v.me === 'a' ? 'b' : 'a'] }) : ''),
+    score: (v) => (v.state?.wins ? `${v.state.wins[v.me]} – ${v.state.wins[v.me === 'a' ? 'b' : 'a']}` : ''),
+    moveKey: (v) => `${v.status}:${v.state?.n || 0}:${v.turn}:${v.state?.pick ? JSON.stringify(v.state.pick) : ''}`,
+    drawGame: (v, ctx) => {
+      game.start();
+      if (v.status === 'playing' && v.id && (v.state?.n || 0) === 0 && !game.seen(v.id, 'start') && !game.anim) { game.openPacks(v, ctx, 'start').then(() => { if (ctx.view === v || ctx.view?.id === v.id) game.drawGame(ctx.view, ctx); }); return; }
+      if (game.anim) return;
+      game.drawGame(v, ctx);
+    },
+    updated: async (prev, v, ctx) => {
+      const ev = v.state?.last;
+      if (!ev || ev.n <= (prev.state?.n || 0)) return;
+      try { await game.reveal(v, ev, ctx); } catch (e) { if (e !== game.STOP) throw e; }
+    },
+    onStop: () => game.stop(),
+    click: async (k, b, ctx) => {
+      if (k === 'rules') return openSheet(`<div class="sc-rules"><h2>${t('Le Choc des Boosters')}</h2>${chocHowHTML(cat)}</div>`, { label: t('Règles du Choc') });
+      if (k === 'train') return startTrain();
+      if (k === 'tback') { train = null; game.stop(); document.body.classList.remove('battle-mode'); return ctx.lobby(); }
+      if (k === 'oskip') return;
+      if (k === 'v-see') return oldSee(b.dataset.id, ctx);
+      if (k === 'v-pick') return oldPick(b.dataset.id, ctx);
+      if (k === 'v-cancel') return oldCancel(b.dataset.id, false, ctx);
+      if (k === 'v-decline') return oldCancel(b.dataset.id, true, ctx);
+      if (k === 'v-replay') { const r = old?.mine?.find((x) => x.id === b.dataset.id); if (r) oldDuel(r, null, ctx); return; }
+      if (train) return game.click(k, b, tview(), tctx, (i, s) => trainPlay(i, s));
+      if (k === 'claim') return claim(ctx);
+      const v = ctx.view;
+      if (!v || ctx.busy) return;
+      return game.click(k, b, v, ctx, (i, s) => play(i, s, ctx));
+    },
   });
-  draw();
-  load();
+
+  app.holdRefresh = () => alive; /* la partie du serveur (jetons, cartes gardées) arrive sans redessiner l'écran : il se redessine lui-même */
+  loadOld().finally(() => { if (alive) lobby.show(); });
   lastMonth();
-  return () => { alive = false; };
+  return () => { alive = false; app.holdRefresh = null; train = null; lobby.stop(); game.stop(); document.body.classList.remove('battle-mode'); document.querySelector('.sc-scene')?.remove(); };
 }

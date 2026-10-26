@@ -33,7 +33,7 @@ test('codex : voie gratuite récupérable, voie enluminée fermée sans achat', 
   const r3 = CODEX_TIERS[2].prem, obs3 = g.s.obs || 0; /* v562 : le palier 3 de la saison I donne des obsidiennes (cadre retiré) */
   g.codexClaim('prem', 3);
   assert.ok(r3.frame ? g.s.frames.includes(r3.frame) : r3.plate ? g.s.plates.includes(r3.plate) : (g.s.obs || 0) === obs3 + r3.obs); /* v630 : plaque des Lanternes */
-  assert.equal(claimable(g.codex()), 2); // paliers 1 et 2 de la voie enluminée (titre, obsidiennes)
+  assert.equal(claimable(g.codex()), 3); // paliers 1 et 2 de la voie enluminée (titre, obsidiennes), palier 3 de la voie gratuite (v811 : jeton du Choc)
 });
 
 test('codex : la voie enluminée ne donne jamais de puissance (ni éclats, cendres, coffres ou tickets)', () => {
