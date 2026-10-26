@@ -38,6 +38,7 @@ export function createMpLobby(app, root, spec) {
     const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000);
     return h ? `${h} h ${String(m).padStart(2, '0')}` : `${m} min`;
   };
+  const live = (v) => v?.status === 'playing' || (!!spec.instant && v?.status === 'done' && !v.claimed); /* v833 : le Choc se joue dès que l'adversaire arrive */
   const myTurn = (v) => v.status === 'playing' && (v.turn === v.me || v.turn === 'ab'); /* v525 : 'ab' = les deux jouent en même temps (Enchères) */
   const resOf = (v) => (v.winner === 'draw' ? 'draw' : v.winner === v.me ? 'win' : 'lose');
   const errMsg = (e) => (e.status === 404 ? MP_OFF : e.message);
@@ -60,7 +61,7 @@ export function createMpLobby(app, root, spec) {
     if (!alive || ui.open || spec.busyLocal?.()) return;
     if (list[0]?.now) skew = new Date(list[0].now).getTime() - Date.now();
     // v522 : partie rapide trouvée pendant la recherche : on y va tout de suite
-    const found = list.find((v) => v.pace === 'fast' && v.status === 'playing' && ui.searching === v.id);
+    const found = list.find((v) => v.pace === 'fast' && live(v) && ui.searching === v.id);
     if (found) { ui.searching = null; toast(t('Adversaire trouvé : <b>{name}</b> !', { name: esc(foeName(found)) }), { icon: 'user' }); app.sfx.achievement?.(); return open(found.id); }
     const searching = list.find((v) => v.pace === 'fast' && v.status === 'waiting' && v.me === 'a');
     ui.searching = searching?.id || null; ui.searchingV = searching || null;
@@ -280,7 +281,7 @@ export function createMpLobby(app, root, spec) {
       const id = await spec.create(pace, null);
       const v = await cloud.mpGet(id);
       busy = false;
-      if (v?.status === 'playing') { toast(t('Adversaire trouvé : <b>{name}</b> !', { name: esc(foeName(v)) }), { icon: 'user' }); return open(id); }
+      if (live(v)) { toast(t('Adversaire trouvé : <b>{name}</b> !', { name: esc(foeName(v)) }), { icon: 'user' }); return open(id); }
       if (pace === 'fast') ui.searching = id;
       else toast('Recherche d’un adversaire : ta partie commencera dès qu’un joueur arrive. Reviens plus tard !', { icon: 'hourglass', ms: 5000 });
     } catch (e) { busy = false; app.sfx.error(); toast(esc(errMsg(e)), { kind: 'error', ms: 6000 }); }

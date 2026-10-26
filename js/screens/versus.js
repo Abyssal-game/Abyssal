@@ -9,6 +9,8 @@ import { sync } from '../cloud/sync.js';
 import { CHOC, newGame, apply, aiPick, viewFor } from '../core/choc.js';
 import { LEAGUES, LEAGUE_PTS, LEAGUE_REWARD, STREAK_CHESTS, STREAK_MULT, streakMult, leagueIdx, lineupOf } from '../core/versus.js';
 import { drawBooster } from '../core/boosters.js';
+import { LUCK_POINTS } from '../config.js';
+import { cardPts } from '../core/versus.js';
 import { isBlocked } from '../core/moderation.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, EMBLEM, picon } from '../ui/icons.js';
@@ -19,15 +21,14 @@ import { createMpLobby } from './mp-lobby.js';
 import { createChocGame } from './choc-game.js';
 import { t, tw } from '../i18n.js';
 
+/* v833 : « Le butin de la table » (retour à l'idée de départ du propriétaire) */
 const HOW = () => [['p:seal', '#E8C35A', 'Un jeton par partie', 'Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour ({m} en réserve au plus) ; le coffre de la semaine, le Tournoi du Cercle et le Codex en donnent d’autres. Les jetons ne s’achètent pas.', { m: CHOC.tokensMax }],
-  ['booster', '#C9A45A', 'Les boosters s’ouvrent', 'Toi et ton adversaire ouvrez deux boosters en même temps : six cartes chacun. De ses cartes, tu ne vois que la faction et la rareté.'],
-  ['swords', '#E0485E', 'Trois manches', 'À chaque manche, vous posez une carte en même temps, en secret. Les deux se retournent : la plus forte gagne la manche.'],
-  ['crown', '#F2C14E', 'La force', 'Rareté : Commune 1, Peu commune 2, Rare 3, Hyper rare 4, Mythique 5, Secrète 6. +1 avec une finition. Égalité : manche nulle.'],
-  ['streak', '#FF8A3D', 'Les Flammes', 'Tu as {n} Flammes pour toute la partie. Pose jusqu’à {m} Flammes sur ta carte : chacune ajoute +1. Elles restent secrètes jusqu’à la révélation, mais chacun voit combien il en reste à l’autre.', { n: CHOC.flames, m: CHOC.flameMax }],
-  ['booster', '#7FA8D8', 'Le Renfort', 'Après la deuxième manche, un troisième booster s’ouvre pour chacun : trois cartes de plus pour la dernière manche.'],
-  ['cards', '#7FE0A0', 'Ce que tu gardes', 'Le plus de manches gagnées l’emporte (à égalité, le total des forces). Une carte qui gagne sa manche est à toi : choisis bien où mettre tes Flammes. Chacun garde aussi une carte au choix, et le gagnant prend la copie d’une carte de l’adversaire. Partie nulle : pas de copie. Le reste retourne à l’Abysse.'],
+  ['booster', '#C9A45A', 'Les boosters s’ouvrent', 'Toi et ton adversaire ouvrez trois boosters chacun, en même temps. Les cartes tombent sur la table : elles ne sont encore à personne.'],
+  ['crown', '#F2C14E', 'Les points', 'Commune {c}, Peu commune {pc}, Rare {r}, Hyper rare {hr}, Mythique {mm}, Secrète {ss}, +{v} avec une finition.', { c: LUCK_POINTS.C, pc: LUCK_POINTS.PC, r: LUCK_POINTS.R, hr: LUCK_POINTS.HR, mm: LUCK_POINTS.M, ss: LUCK_POINTS.S, v: LUCK_POINTS.variant }],
+  ['swords', '#E0485E', 'Le butin de la table', 'Le meilleur total rafle toutes les cartes de la table : les siennes et celles de l’adversaire. Le perdant repart les mains vides. Égalité : chacun garde les siennes.'],
+  ['cards', '#7FE0A0', 'Rien à perdre de ta collection', 'Tu ne mises rien : ni éclats, ni cartes de ta collection. Seules les cartes ouvertes pendant la partie sont en jeu.'],
   ['streak', '#FF8A3D', 'Série et Ligue', 'Victoire : {s} éclats × ta Série ardente (jusqu’à ×{x}), et un coffre à 3, 5, 7 et 10 victoires d’affilée. Ligue du mois : +{w} par victoire, −{l} par défaite.', { s: CHOC.winShards, x: STREAK_MULT.at(-1), w: LEAGUE_PTS.win, l: Math.abs(LEAGUE_PTS.lose) }],
-  ['ui-eye', '#E0485E', 'Aucune triche', 'Les boosters sont ouverts et les manches jugées par le serveur : personne ne peut voir tes cartes ni truquer un tirage.']];
+  ['ui-eye', '#E0485E', 'Aucune triche', 'Les boosters sont ouverts et comptés par le serveur : personne ne peut truquer un tirage.']];
 const howLi = ([ic, c, ti, d, p], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic.startsWith('p:') ? ic.slice(2) : ic)}<em>${i + 1}</em></span><span><b>${t(ti)}</b><span class="small">${t(d, p)}</span></span></li>`;
 export const chocHowHTML = () => `<ol class="how-steps">${HOW().map((x, i) => howLi(x, i)).join('')}</ol>`;
 const OFF = 'Le Choc des Boosters n’est pas encore ouvert sur le serveur.';
@@ -43,7 +44,7 @@ export default function versusScreen(app, root) {
 
   function head() {
     const n = tokens();
-    return `<header class="screen-head ui-hero bn-versus"><h1>${t('Le Choc des Boosters')}</h1><p class="muted">${t('Deux boosters chacun, trois manches, et tes meilleures cartes en jeu.')}</p></header>
+    return `<header class="screen-head ui-hero bn-versus"><h1>${t('Le Choc des Boosters')}</h1><p class="muted">${t('Trois boosters chacun, ouverts en même temps. Le meilleur total rafle toute la table.')}</p></header>
       <section class="panel kc-tok"><div class="kc-toks">${Array.from({ length: Math.max(CHOC.tokensMax, n) }, (_, i) => `<span class="kc-tk ${i < n ? 'on' : ''}"><img alt="" src="assets/jeux/kc-jeton.webp" onerror="this.onerror=null;this.src='assets/icons/seal.webp'"></span>`).join('')}</div>
         <span><b>${t(n > 1 ? '{n} jetons du Choc' : '{n} jeton du Choc', { n })}</b><small>${n < CHOC.tokensMax ? t('Un nouveau jeton chaque jour (jusqu’à {m}).', { m: CHOC.tokensMax }) : t('Réserve pleine : joue pour ne pas perdre le jeton de demain.')}</small></span></section>
       ${leagueHTML()}`;
@@ -123,11 +124,12 @@ export default function versusScreen(app, root) {
     plate: (v, mine, html) => html, clockHTML: () => '' };
   const tview = () => ({ id: null, me: 'a', status: train.st.over ? 'done' : 'playing', state: viewFor(train.st, 'a'), foe: null, pace: 'slow', turn: train.st.turn, claimed: true, reason: 'score' });
   const pack = () => drawBooster('standard', cat).cards.map((c) => ({ id: c.id, rarity: c.rarity, variant: c.variant || 'normal', faction: cat.get(c.id)?.faction }));
-  async function startTrain() {
-    game.reset(); game.start();
-    train = { st: newGame({ a: [...pack(), ...pack()], b: [...pack(), ...pack()] }, { a: pack(), b: pack() }) };
-    await game.openPacks(tview(), tctx, 'start').catch(() => {});
-    if (train) game.drawGame(tview(), tctx);
+  /* v833 : entraînement du butin de la table : boosters tirés sur le téléphone, rien n'est gagné ni perdu */
+  function startTrain() {
+    const pk = () => drawBooster('standard', cat).cards.map((c) => { const x = { id: c.id, rarity: c.rarity, variant: c.variant || 'normal' }; return { ...x, pts: cardPts(x) }; });
+    const a = [pk(), pk(), pk()], b = [pk(), pk(), pk()], sum = (p) => p.flat().reduce((n, c) => n + c.pts, 0);
+    const r = { my_cards: a.flat(), their_cards: b.flat(), lineup: a.map(() => ({ type: 'standard' })), my_score: sum(a), their_score: sum(b) };
+    playDuel(app, r, null, { foeName: t('L’Abysse'), myAvatar: g.shownAvatar() || sync.profile?.avatar, table: true, train: true });
   }
   async function trainPlay(i, f) {
     try {
@@ -141,6 +143,26 @@ export default function versusScreen(app, root) {
       await game.reveal(tview(), train.st.last, tctx);
       if (train) game.drawGame(tview(), tctx);
     } catch (e) { tctx.busy = false; if (e !== game.STOP) { toast(esc(e.message), { kind: 'error' }); if (train) game.drawGame(tview(), tctx); } }
+  }
+
+  // ——— v833 : une partie du butin de la table (jouée par le serveur dès que les deux joueurs sont là) ———
+  let showing = null;
+  function tableR(v) {
+    const me = v.me, foe = me === 'a' ? 'b' : 'a', st = v.state;
+    return { my_cards: st.packs[me].flat(), their_cards: st.packs[foe].flat(), lineup: st.packs[me].map(() => ({ type: 'standard' })),
+      avatar: v.foe?.avatar, my_score: st.total[me], their_score: st.total[foe], sachet: v.foe?.sachet, choc: v.foe?.choc };
+  }
+  async function tableShow(v, ctx) {
+    if (showing === v.id) return;
+    showing = v.id;
+    root.innerHTML = `<div class="panel center kc-twait"><p>${t('Les boosters s’ouvrent…')}</p></div>`;
+    let out = null;
+    if (!v.claimed) {
+      try { const { out: o } = await withPending(app.partie.first('chocClaim', v.id, null, null)); v.claimed = true; out = o || null; app.chrome?.(); }
+      catch (e) { showing = null; app.sfx.error(); toast(esc(e.message), { kind: 'error' }); return ctx.lobby(); }
+    }
+    playDuel(app, tableR(v), out, { foeName: ctx.foeName(v), myAvatar: g.shownAvatar() || sync.profile?.avatar, table: true,
+      onClose: () => { showing = null; if (out?.progress?.length) { app.pendingProgress = out.progress; app.flushProgress?.(); } ctx.lobby(); } });
   }
 
   // ——— Une partie en ligne ———
@@ -167,22 +189,23 @@ export default function versusScreen(app, root) {
   }
 
   const lobby = createMpLobby(app, root, {
-    game: 'choc', noAutoClaim: true, noRanking: true,
+    game: 'choc', noAutoClaim: true, noRanking: true, instant: true,
     busyLocal: () => !!train,
     modeBar: () => head(),
-    note: t('Choisis ta vitesse. À chaque manche, vous posez une carte en même temps ; si tu ne joues pas à temps, <b>la partie est perdue</b>.'),
+    note: t('Lance une recherche : dès qu’un joueur arrive, vos boosters s’ouvrent en même temps. Le meilleur total rafle toute la table.'),
     intro: () => `<button class="btn block dc-plq dc-plq-dark kc-trainbtn" data-mp="train">${icon('p:help')}${t('Entraînement contre l’Abysse')}</button><p class="small muted center kc-trainsub">${t('Sans jeton, rien à gagner ni à perdre')}</p>`, /* v813 : la ligne d'explication dépassait du bouton */
     canPlay: () => tokens() > 0,
-    rewardNote: () => `<p class="small muted center">${tokens() > 0 ? t('Une partie coûte <b>1 jeton</b>. Tu gardes les cartes qui gagnent leur manche, plus une au choix.') : t('Plus de jeton aujourd’hui : un nouveau arrive demain. Tu peux t’entraîner contre l’Abysse.')}</p>`,
+    rewardNote: () => `<p class="small muted center">${tokens() > 0 ? t('Une partie coûte <b>1 jeton</b>. Le gagnant rafle toutes les cartes ouvertes, le perdant repart les mains vides.') : t('Plus de jeton aujourd’hui : un nouveau arrive demain. Tu peux t’entraîner contre l’Abysse.')}</p>`,
     onLobby: async () => { const n = await app.partie.first('chocRefund'); if (n > 0) { toast(t(n > 1 ? '{n} jetons du Choc rendus (parties jamais commencées).' : '{n} jeton du Choc rendu (partie jamais commencée).', { n }), { icon: 'info' }); app.chrome?.(); } },
-    top: (L, row) => { const end = L.filter((v) => v.status === 'done' && !v.claimed); return end.length ? `<section class="panel mp-sec hot"><h2 class="section-title">${t('Cartes à garder')} <span class="pill-n">${end.length}</span></h2>${end.map((v) => row(v, t('Partie terminée : choisis tes cartes'))).join('')}</section>` : ''; },
+    top: (L, row) => { const end = L.filter((v) => v.status === 'done' && !v.claimed); return end.length ? `<section class="panel mp-sec hot"><h2 class="section-title">${t('Boosters à ouvrir')} <span class="pill-n">${end.length}</span></h2>${end.map((v) => row(v, v.state?.table ? t('Ton adversaire est là : ouvre vos boosters') : t('Partie terminée : choisis tes cartes'))).join('')}</section>` : ''; },
     bottom: () => `${oldHTML()}<details class="panel dc-fold dc-how vs-rules"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/help.webp"><span class="dc-sum-t">${t('Comment ça marche')}</span></summary>${chocHowHTML(cat)}</details>`,
     create: async (pace, to) => { const id = await app.partie.first('chocNew', to, pace); app.chrome?.(); return id; },
     join: async (id) => { const r = await app.partie.first('chocJoin', id); app.chrome?.(); return r; },
-    sub: (v) => (v.state?.wins ? t('Manche {n} · {a} – {b}', { n: Math.min(v.state.r, CHOC.rounds), a: v.state.wins[v.me], b: v.state.wins[v.me === 'a' ? 'b' : 'a'] }) : ''),
-    score: (v) => (v.state?.wins ? `${v.state.wins[v.me]} – ${v.state.wins[v.me === 'a' ? 'b' : 'a']}` : ''),
+    sub: (v) => (v.state?.table ? (v.claimed ? `${fmt(v.state.total[v.me])} – ${fmt(v.state.total[v.me === 'a' ? 'b' : 'a'])}` : t('Boosters à ouvrir')) : v.state?.wins ? t('Manche {n} · {a} – {b}', { n: Math.min(v.state.r, CHOC.rounds), a: v.state.wins[v.me], b: v.state.wins[v.me === 'a' ? 'b' : 'a'] }) : ''),
+    score: (v) => (v.state?.table ? `${fmt(v.state.total[v.me])} – ${fmt(v.state.total[v.me === 'a' ? 'b' : 'a'])}` : v.state?.wins ? `${v.state.wins[v.me]} – ${v.state.wins[v.me === 'a' ? 'b' : 'a']}` : ''),
     moveKey: (v) => `${v.status}:${v.state?.n || 0}:${v.turn}:${v.state?.pick ? JSON.stringify(v.state.pick) : ''}`,
     drawGame: (v, ctx) => {
+      if (v.state?.table) return tableShow(v, ctx); /* v833 */
       game.start();
       if (v.status === 'playing' && v.id && (v.state?.n || 0) === 0 && !game.seen(v.id, 'start') && !game.anim) { game.openPacks(v, ctx, 'start').then(() => { if (ctx.view === v || ctx.view?.id === v.id) game.drawGame(ctx.view, ctx); }); return; }
       if (game.anim) return;

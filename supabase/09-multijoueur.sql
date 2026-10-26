@@ -1140,6 +1140,26 @@ create or replace function public.choc_init() returns jsonb language sql volatil
     'wins', jsonb_build_object('a', 0, 'b', 0), 'total', jsonb_build_object('a', 0, 'b', 0), 'r', 1, 'n', 0, 'turn', 'ab', 'over', false)
 $$;
 revoke execute on function public.choc_init() from public, anon, authenticated;
+-- v833 : « Le butin de la table » (choix du propriétaire du 27 octobre 2026, retour à son idée de départ) : chacun ouvre
+-- 3 boosters standard en même temps que l'adversaire ; ces cartes sont sur la table, à personne encore. Le meilleur total de
+-- points (même barème que l'ancien Pari : C 1, PC 2, R 6, HR 20, M 80, S 200, +8 avec une finition) rafle toutes les cartes
+-- de la table ; le perdant repart les mains vides. Égalité : chacun garde les siennes. Aucune mise : l'entrée est un jeton
+-- gratuit, jamais vendu. La partie est jouée dès que les deux joueurs sont là (le serveur ouvre et compte tout).
+create or replace function public.choc_tpack() returns jsonb language sql volatile security definer set search_path = public as $$
+  select coalesce(jsonb_agg(jsonb_build_object('id', x ->> 'id', 'rarity', x ->> 'rarity', 'variant', x ->> 'variant', 'pts', (x ->> 'pts')::int, 'faction', c.faction) order by o), '[]')
+  from jsonb_array_elements(public.versus_pack('standard', null, null)) with ordinality e(x, o) join public.shadow_cards c on c.id = x ->> 'id'
+$$;
+revoke execute on function public.choc_tpack() from public, anon, authenticated;
+create or replace function public.choc_table() returns jsonb language plpgsql volatile security definer set search_path = public as $$
+declare pa jsonb := jsonb_build_array(public.choc_tpack(), public.choc_tpack(), public.choc_tpack());
+  pb jsonb := jsonb_build_array(public.choc_tpack(), public.choc_tpack(), public.choc_tpack()); ta int; tb int;
+begin
+  select coalesce(sum((c ->> 'pts')::int), 0) into ta from jsonb_array_elements(pa) p, jsonb_array_elements(p) c;
+  select coalesce(sum((c ->> 'pts')::int), 0) into tb from jsonb_array_elements(pb) p, jsonb_array_elements(p) c;
+  return jsonb_build_object('table', true, 'packs', jsonb_build_object('a', pa, 'b', pb), 'total', jsonb_build_object('a', ta, 'b', tb),
+    'over', true, 'winner', case when ta > tb then 'a' when tb > ta then 'b' else 'draw' end);
+end $$;
+revoke execute on function public.choc_table() from public, anon, authenticated;
 drop function if exists public.choc_beats(text, text);
 drop function if exists public.choc_force(jsonb, jsonb, boolean);
 create or replace function public.choc_force(c jsonb, fl int) returns int language sql immutable as $$
@@ -1209,7 +1229,11 @@ returns void language plpgsql volatile security definer set search_path = public
 declare d public.mp_matches; first text := case when random() < 0.5 then 'a' else 'b' end; st jsonb;
 begin
   select * into d from public.mp_matches where id = p_id for update;
-  st := case d.game when 'encheres' then public.encheres_init() when 'cryptes' then public.cryptes_init(first) when 'choc' then public.choc_init() end;
+  st := case d.game when 'encheres' then public.encheres_init() when 'cryptes' then public.cryptes_init(first) when 'choc' then public.choc_table() end;
+  if d.game = 'choc' then -- v833 : le butin de la table se joue tout de suite
+    update public.mp_matches set status = 'done', winner = st ->> 'winner', reason = 'score', turn = null, deadline = null, updated_at = now(), state = st where id = p_id;
+    return;
+  end if;
   update public.mp_matches set status = 'playing', turn = st ->> 'turn', deadline = now() + public.mp_delay(d.pace, true), updated_at = now(), state = st where id = p_id;
 end $$;
 revoke execute on function public.mp_start(uuid) from public, anon, authenticated;
@@ -1322,6 +1346,13 @@ begin
   if (who = 'a' and m.a_claimed) or (who = 'b' and m.b_claimed) then return jsonb_build_object('result', 'already'); end if;
   st := m.state; hand := coalesce(st -> 'hand' -> who, '[]');
   res := case when m.winner = who then 'win' when m.winner = 'draw' then 'draw' else 'lose' end;
+  if st ? 'table' then -- v833 : le gagnant rafle toute la table, le perdant rien, égalité : chacun les siennes
+    select coalesce(jsonb_agg(c order by k, o), '[]') into cards from jsonb_array_elements(case res when 'win' then (st -> 'packs' -> who) || (st -> 'packs' -> foe)
+      when 'draw' then st -> 'packs' -> who else '[]'::jsonb end) with ordinality p(pk, k), jsonb_array_elements(pk) with ordinality x(c, o);
+    if who = 'a' then update public.mp_matches set a_claimed = true where id = p_id; else update public.mp_matches set b_claimed = true where id = p_id; end if;
+    select p.pseudo into pseudo from public.profiles p where p.id = case when who = 'a' then m.b else m.a end;
+    return jsonb_build_object('result', res, 'cards', cards, 'take', null, 'foe', pseudo, 'reason', m.reason, 'table', true);
+  end if;
   select coalesce(array_agg((r -> who ->> 'i')::int), '{}') into won from jsonb_array_elements(coalesce(st -> 'rounds', '[]')) r where r ->> 'win' = who;
   if jsonb_array_length(hand) > 0 then
     if p_keep is null or p_keep < 0 or p_keep >= jsonb_array_length(hand) or p_keep = any (won) then raise exception 'Choisis une carte à garder.'; end if;
@@ -1574,7 +1605,7 @@ grant execute on function public.mp_ranking(text, int) to authenticated;
 create table if not exists public.sql_stamps (file text primary key, stamp text not null, at timestamptz not null default now());
 alter table public.sql_stamps enable row level security;
 revoke all on public.sql_stamps from public, anon, authenticated;
-insert into public.sql_stamps (file, stamp) values ('09', 'ee3437ae2d10') on conflict (file) do update set stamp = excluded.stamp, at = now();
+insert into public.sql_stamps (file, stamp) values ('09', 'aee797c9e559') on conflict (file) do update set stamp = excluded.stamp, at = now();
 create or replace function public.sql_stamps() returns jsonb language sql stable security definer set search_path = public as $$
   select coalesce(jsonb_object_agg(file, stamp), '{}'::jsonb) from public.sql_stamps;
 $$;

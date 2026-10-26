@@ -89,7 +89,7 @@ LE CERCLE DE L'ABYSSE
 • Le Pacte : tire des cartes, encore une… et arrête-toi avant de briser le pacte
 • Les Cryptes : un jeu de mémoire où chaque paire réveille le pouvoir de sa faction
 • Joue contre d'autres joueurs, en partie rapide ou à ton rythme, et défie tes amis
-• Le Choc des Boosters : deux boosters chacun, ouverts face à un autre joueur, puis trois manches de cartes posées en secret, avec 8 Flammes à répartir pour renforcer tes cartes ; garde les cartes qui gagnent leur manche
+• Le Choc des Boosters : trois boosters chacun, ouverts en même temps face à un autre joueur ; le meilleur total rafle toutes les cartes de la table
 
 UN MONDE À DÉCOUVRIR
 • Un Bestiaire illustré, avec l'histoire de chaque créature
@@ -172,7 +172,7 @@ Pandore (ART-068), autrefois dessinée nue, a été refaite habillée en v300 : 
 | Contenu sexuel, nudité | Aucun |
 | Grossièretés, humour vulgaire | Aucun |
 | Alcool, tabac, drogues | Aucun |
-| Jeux d'argent simulés | **Aucun** (depuis v735) : rien ne se mise ni ne se perd au hasard. Au Choc des Boosters (v811), l'entrée est un jeton offert chaque jour (jamais en vente, ni en éclats ni en argent) ; les boosters du duel sont offerts par le jeu, et l'on garde les cartes qui gagnent leur manche plus une au choix : on ne perd jamais une carte de sa collection. Apple refuse les jeux d'argent simulés aux comptes de particuliers (refus du 24 octobre 2026). |
+| Jeux d'argent simulés | **Aucun** (depuis v735) : rien ne se mise ni ne se perd au hasard. Au Choc des Boosters (v811), l'entrée est un jeton offert chaque jour (jamais en vente, ni en éclats ni en argent) ; les boosters du duel sont offerts par le jeu ; v833 : le meilleur total rafle les cartes ouvertes pendant la partie, le perdant repart sans elles : on ne mise rien et on ne perd jamais une carte de sa collection ni un éclat. Apple refuse les jeux d'argent simulés aux comptes de particuliers (refus du 24 octobre 2026). |
 | Concours | Non |
 | Thèmes médicaux | Aucun |
 | Contenu généré par les utilisateurs | Oui, uniquement les pseudos : filtre, signalement et masquage dans le jeu |

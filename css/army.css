@@ -8370,3 +8370,12 @@ html.fx-light .dv.cb.cb2 .cb-res.ready .cb-gems i.on { animation: none; }
 .dv.cb.cb2 .cb-rsv2.hit { animation: rsvHit832 .6s ease-in-out 3; }
 @keyframes rsvHit832 { 50% { box-shadow: 0 0 0 2px #E04040, 0 0 16px rgba(224, 64, 64, .8); } }
 @media (prefers-reduced-motion: reduce) { .dv .dv-mourn img, .dv .cb-fallen, .dv.cb.cb2 .cb-rsv2.hit { animation: none; } }
+
+/* v833 : « Le butin de la table » : la fin du duel montre les cartes raflées en petites vignettes (les nouvelles dorées) */
+.vd-end .vd-tablemsg { margin: 4px 0 6px; }
+.vd-end .vd-tablemsg.lose { color: #E7A49A; }
+.vd-twon { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; max-width: 340px; margin: 2px auto 10px; }
+.vd-tw { position: relative; flex: none; width: 32px; aspect-ratio: 5 / 7; border-radius: 3px; overflow: hidden; box-shadow: 0 0 0 1px var(--rc), 0 2px 4px rgba(0, 0, 0, .6); }
+.vd-tw img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.vd-tw em { display: none; }
+.vd-tw.fresh { box-shadow: 0 0 0 1.5px #F2C14E, 0 0 7px rgba(242, 193, 78, .7); }

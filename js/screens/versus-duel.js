@@ -63,7 +63,7 @@ function fitNames(el) {
     while (n.scrollWidth > n.clientWidth + 1 && f > 7 && k++ < 40) { f *= 0.94; n.style.fontSize = `${f}px`; }
   });
 }
-export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick, onRematch, onReact } = {}) {
+export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick, onRematch, onReact, table = false, train = false } = {}) {
   const g = app.game, cat = app.catalog;
   const mine = r.my_cards || [], theirs = r.their_cards || [];
   const res = out?.result && RES[out.result] ? out.result : r.my_score > r.their_score ? 'win' : r.my_score === r.their_score ? 'tie' : 'lose';
@@ -143,6 +143,14 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick, onRe
   /* v807 : avant les boosters, ce qui est en jeu : ta Série ardente, celle de l'adversaire */
   async function stakes() {
     if (speed > 1 || done) return;
+    /* v833 : le butin de la table : tout ce qui va sortir est en jeu */
+    if (table) {
+      const n = mine.length + theirs.length, me = tags.me?.s || 0;
+      banner(`${flameHTML(Math.max(1, me), 'big')}<span>${t('<b>{n} cartes</b> vont tomber sur la table.', { n })}<br>${t('Le meilleur total rafle tout.')}${me >= 1 ? `<br>${t('Ta Série ardente : <b>{n}</b>. Une victoire de plus : butin ×{m}.', { n: me, m: String(streakMult(me + 1)).replace('.', ',') })}` : ''}</span>`, 'stake', 2800);
+      app.sfx.suspense?.();
+      await wait(2400);
+      return;
+    }
     const me = tags.me?.s || 0, foe = tags.foe?.s || 0, lines = [];
     if (me >= 1) lines.push(t('Ta Série ardente : <b>{n}</b>. Une victoire de plus : butin ×{m}.', { n: me, m: String(streakMult(me + 1)).replace('.', ',') }));
     if (foe >= 2) lines.push(t('{name} est sur une série de <b>{n}</b> : brise-la !', { name: esc(foeName), n: foe }));
@@ -266,7 +274,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick, onRe
     q('.vd-mid').classList.remove('show');
     q('.vd-skip').hidden = true; q('.vd-step').textContent = '';
     /* v735 : chacun garde ses cartes ; le gagnant reçoit le butin du jeu (copie, coffre abyssal, éclats) */
-    const nWon = out?.cards?.length || mine.length;
+    const nWon = out?.cards?.length || (table && res === 'win' ? mine.length + theirs.length : mine.length); /* v833 : le gagnant rafle toute la table */
     const fresh = (out?.cards || []).filter((c) => c.isNewCard).length;
     const tc = out?.trophy && app.catalog.get(out.trophy.id);
     const loot = [tc ? `<span class="vd-loot"><img alt="" src="${artUrl(tc, { lite: true })}"><span>${t('Copie de <b>{card}</b>', { card: esc(tc.name) })}${out.trophy.isNewCard ? ` <em>${t('Nouvelle !')}</em>` : ''}</span></span>` : '',
@@ -287,8 +295,12 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick, onRe
     end.hidden = false;
     end.innerHTML = `<div class="vd-burst"></div><img class="vd-emb ${res}" alt="" src="assets/versus/${EMB[res]}.webp"><h2 class="vd-title ${res}">${t(RES[res])}</h2>
       <p class="vd-tally"><b>${fmt(sc.me)}</b> <span>${t('contre')}</span> <b>${fmt(sc.foe)}</b></p>
-      <p>${t(fresh ? 'Tu gardes <b>tes {n} cartes</b>, dont <b>{f} nouvelles</b>.' : 'Tu gardes <b>tes {n} cartes</b>.', { n: nWon, f: fresh })}
-        ${res === 'win' ? t('Et l’Abysse t’offre le butin :') : res === 'tie' ? t('Même total : chacun reçoit une part du butin.') : t('{name} gagne le butin. Tu ne perds rien.', { name: esc(foeName) })}</p>
+      ${table ? `<p class="vd-tablemsg ${res}">${train ? t('Entraînement : rien n’est gagné ni perdu.')
+        : res === 'win' ? t(fresh ? 'Tu rafles la table : <b>{n} cartes</b> sont à toi, dont <b>{f} nouvelles</b>.' : 'Tu rafles la table : <b>{n} cartes</b> sont à toi.', { n: nWon, f: fresh })
+        : res === 'tie' ? t('Même total : chacun garde ses cartes.')
+        : t('{name} rafle la table. Tu repars les mains vides.', { name: esc(foeName) })}</p>${res === 'win' && !train && out?.cards?.length ? tableWon(out.cards) : ''}`
+      : `<p>${t(fresh ? 'Tu gardes <b>tes {n} cartes</b>, dont <b>{f} nouvelles</b>.' : 'Tu gardes <b>tes {n} cartes</b>.', { n: nWon, f: fresh })}
+        ${res === 'win' ? t('Et l’Abysse t’offre le butin :') : res === 'tie' ? t('Même total : chacun reçoit une part du butin.') : t('{name} gagne le butin. Tu ne perds rien.', { name: esc(foeName) })}</p>`}
       ${out?.pick ? `<div class="vd-pick"><p class="small">${t('Choisis ta carte parmi celles de {name} :', { name: esc(foeName) })}</p>${pickGridHTML(app, theirs)}</div>` : ''}
       ${loot ? `<div class="vd-loots">${loot}</div>` : ''}
       ${noPrize ? `<p class="small">${t('Butin du jour déjà gagné : ce duel était pour la gloire.')}</p>` : ''}
@@ -301,6 +313,12 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick, onRe
     if (lg && lg.after !== lg.before) setTimeout(() => { if (!closed) (lg.after > lg.before ? app.sfx.levelup : app.sfx.error)?.(); }, 900);
     /* v807 : la réaction que l'adversaire t'a laissée sur ce duel */
     if (r.their_react) setTimeout(() => { if (!closed) showEmote(r.their_react, 'foe', foeName); }, 1100);
+  }
+  /* v833 : les cartes raflées, les plus rares d'abord */
+  function tableWon(cards) {
+    const rk = (x) => RARITY_ORDER.indexOf(x.rarity);
+    const list = cards.map((x) => ({ x, c: cat.get(x.id) })).filter((o) => o.c).sort((a, b) => rk(b.x) - rk(a.x));
+    return `<div class="vd-twon">${list.map(({ x, c }) => `<span class="vd-tw ${x.isNewCard ? 'fresh' : ''}" style="--rc:${RARITY[c.rarity]?.color || '#999'}"><img alt="" src="${artUrl(c, { lite: true })}">${x.isNewCard ? `<em>${t('Nouvelle')}</em>` : ''}</span>`).join('')}</div>`;
   }
   function close() {
     if (closed) return;
