@@ -94,12 +94,11 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
      puis les ennemis face à tes créatures (rien entre les deux), et en bas le menu de combat : la créature qui joue,
      ses actions, la réserve et la Ferveur. « Passer » devient un petit bouton en haut à droite. */
   root.innerHTML = `<div class="dv cb cb2 ${run.room} has-bg" style="--bgimg:${room.paint ? `url(${abs(room.paint)})` : bgOf(run)}">
-    <div class="dv-top"><b>${esc(title)}</b><span class="row gap">
+    <div class="dv-top"><b>${esc(title)}</b><div class="cb-rules"></div><span class="row gap">
       <button class="btn small ghost cb-speed ${ui.fast ? 'on' : ''}" data-d="speed" aria-label="Vitesse des animations" aria-pressed="${!!ui.fast}">×${ui.fast ? 2 : 1}</button>
       <button class="btn small ghost" data-d="help" aria-label="Règles du combat">?</button>
       <button class="btn small ghost cb-pass dv-end" data-d="end" aria-label="Passer le tour" title="Passer le tour"><img class="cb-pass-i" alt="" src="assets/ui/cb-passer2.webp" onerror="this.remove()"><span class="cb-pass-f">${icon('skip')}</span></button>
       <button class="btn small ghost" data-d="quit" aria-label="Pause">${icon('close')}</button></span></div>
-    <div class="cb-rules"></div>
     <div class="cb-tl" aria-label="Ordre des tours"></div>
     <div class="cb-feed" aria-live="polite"></div>
     <div class="dv-row enemy"></div>
@@ -220,7 +219,10 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const dead = u.hp <= 0, enemy = u.side === 'enemy';
     const ready = !enemy && st.turn === 'ally' && actionsFor(st, u.uid).some((a) => a.ok && a.key !== 'swap');
     const tgt = tgtInfo[u.uid];
-    return `<button class="dv-c ${u.side} ${isFig(u) ? 'has-fig' : ''} ${hasCard(u) ? 'has-card' : ''} ${u.twin ? 'twin' : ''} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${!dead && u.hp <= u.maxHp * 0.3 ? 'hp3' : !dead && u.hp <= u.maxHp * 0.6 ? 'hp2' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.phase2 ? 'p2' : ''} ${u.defend ? 'def' : ''} ${!enemy && !dead && (u.frozen || u.stunned) ? 'unav' : ''} ${u.broken ? 'broken' : ''} ${u.cracked ? 'fele' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" data-rar="${u.rarity}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(uName(u))}, ${Math.max(0, u.hp)} PV">
+    /* v825 : dégâts annoncés sur cette créature par les ennemis (coups visés et coups de zone), au tour du joueur */
+    const inc = !enemy && !dead && st.turn === 'ally' && !st.over ? front(st, 'enemy').reduce((a, e) => { const i = e.hp > 0 ? intentInfo(st, e) : null; return a + (i && i.dmg && (i.aoe || e.intent?.t === u.uid) ? i.dmg : 0); }, 0) : 0;
+    const hpp = Math.max(0, Math.min(100, Math.round((Math.max(0, u.hp) / Math.max(1, u.maxHp)) * 100)));
+    return `<button class="dv-c ${inc ? 'incd' : ''} ${inc >= u.hp && u.hp > 0 ? 'incd-ko' : ''} ${u.side} ${isFig(u) ? 'has-fig' : ''} ${hasCard(u) ? 'has-card' : ''} ${u.twin ? 'twin' : ''} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${!dead && u.hp <= u.maxHp * 0.3 ? 'hp3' : !dead && u.hp <= u.maxHp * 0.6 ? 'hp2' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.phase2 ? 'p2' : ''} ${u.defend ? 'def' : ''} ${!enemy && !dead && (u.frozen || u.stunned) ? 'unav' : ''} ${u.broken ? 'broken' : ''} ${u.cracked ? 'fele' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" data-rar="${u.rarity}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(uName(u))}, ${Math.max(0, u.hp)} PV">
       <span class="dv-base" aria-hidden="true"></span>
       ${hasCard(u) ? `<span class="dv-art dv-bart dv-bcard" aria-hidden="true"><img alt="" decoding="async" src="assets/bosses/combat-${figKey(u)}.webp"><span class="dv-crk" aria-hidden="true"></span></span>` : isFig(u) ? `<span class="dv-art dv-bart" aria-hidden="true"><img alt="" decoding="async" src="assets/bosses/carte-${st.bossKey}.webp"><span class="dv-crk" aria-hidden="true"></span></span><img class="dv-bfig" alt="" src="assets/bosses/${figKey(u)}.webp">` /* v605 : le gardien a de nouveau sa carte (fond peint de sa Furie), sa figure en déborde */ : `<span class="dv-art"><img alt="" decoding="async" src="${artUrl(c, { lite: true })}"><span class="dv-crk" aria-hidden="true"></span></span>`}
       <span class="dv-kw ${enemy && u.fam ? 'fam' : ''}" title="${esc(enemy && u.fam ? AI_FAMILIES[u.fam].desc : kit.name)}">${roleIcon(kit.kw)}<em>${esc(enemy && u.fam ? AI_FAMILIES[u.fam].name : kit.name)}</em></span>
@@ -231,6 +233,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       <span class="dv-atk">${icon('swords')}<b>${u.atk + (u.boost || 0)}</b></span>
       <span class="dv-hp ${u.hp < u.maxHp ? 'hurt' : ''} ${u.hp > 0 && u.hp <= u.maxHp * 0.3 ? 'low' : ''}" style="--hpp:${Math.max(0, Math.min(100, Math.round((Math.max(0, u.hp) / Math.max(1, u.maxHp)) * 100)))}">${icon('heart')}<i class="hpr" aria-hidden="true"></i><b>${Math.max(0, u.hp)}</b></span>
             ${tgt ? `<span class="cb-tgt">${tgt}</span>` : ''}
+      <span class="dv-hpb" style="--hpp:${hpp}%" aria-hidden="true"><i class="lag"></i><i class="cur"></i></span>
+      ${inc ? `<span class="cb-inc" title="Dégâts annoncés sur cette créature">${icon('swords')}<b>−${inc}</b></span>` : ''}
       ${(() => { const w = enemy && !dead ? cardWarn(u) || ordIntent(u) : ''; return `<span class="cb-above">${statusBand(u, !!w)}${w}</span>`; })()}
     </button>`;
   };
@@ -320,9 +324,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const gap = gapOf(st); /* v493 : écart de niveau : ennemis trop forts pour l'équipe */
     const rules = [gap >= 1.1 ? `<span class="cb-law cb-gap" data-d="rule" data-k="gap">${icon('p:danger')}<b>Ennemis trop forts</b></span>` : '', gl ? `<span class="cb-law cb-goal s-${gl.state}" data-d="rule" data-k="goal"><img class="cb-gico" alt="" src="assets/icons/goal.webp">${gl.state === 'done' ? '✓ ' : gl.state === 'fail' ? '✗ ' : ''}<b>${esc(gl.name)}</b>${gl.p && gl.state === 'pending' ? ` <small>${gl.p}</small>` : ''}</span>` : '',
       st.pact && PACTS[st.pact] ? `<span class="cb-law" style="--pk:${PACTS[st.pact].color}" data-d="rule" data-k="pact">${icon('p:seal')}<b>${esc(PACTS[st.pact].name)}</b></span>` : '',
-      st.law ? `<span class="cb-law" data-d="rule" data-k="law"><b>${esc(LAWS[st.law].name)}</b></span>` : '',
-      st.forbid ? `<span class="cb-law cb-forbid" title="Verdict du Juge : interdit de ${esc(FORBID[st.forbid])} jusqu’à sa prochaine action"><b>Interdit : ${esc(FORBID_SHORT[st.forbid])}</b></span>` : '',
-      st.aspect ? `<span class="cb-law" data-d="rule" data-k="aspect"><b>${esc(ASPECTS[st.aspect].name)}</b></span>` : '',
+      st.law ? `<span class="cb-law" data-d="rule" data-k="law">${icon('p:rule')}<b>${esc(LAWS[st.law].name)}</b></span>` : '',
+      st.forbid ? `<span class="cb-law cb-forbid" title="Verdict du Juge : interdit de ${esc(FORBID[st.forbid])} jusqu’à sa prochaine action">${icon('p:danger')}<b>Interdit : ${esc(FORBID_SHORT[st.forbid])}</b></span>` : '',
+      st.aspect ? `<span class="cb-law" data-d="rule" data-k="aspect">${icon('p:rule')}<b>${esc(ASPECTS[st.aspect].name)}</b></span>` : '',
       st.runes ? `<span class="cb-law cb-runes" data-d="rule" data-k="runes" title="Runes du gardien">${st.runes.map((r) => `<img alt="" src="assets/ui/${r.broken ? 'rune-broken' : 'rune'}.webp" class="${r.broken ? 'off' : ''}">`).join('')}<b>${runesLeft(st) ? `−${runesLeft(st) * 10} %` : 'Rompues'}</b></span>` : '',
       st.omen && OMENS[st.omen] ? `<span class="cb-law" data-d="rule" data-k="omen">${icon(OMENS[st.omen].icon)}<b>Présage</b></span>` : (st.relics || []).length ? `<span class="cb-law" data-d="rule" data-k="relics">${icon('p:crown')}<b>${st.relics.length} relique${st.relics.length > 1 ? 's' : ''}</b></span>` : '',
       run?.day && g.rule(run.day) && !g.rule(run.day).off ? `<span class="cb-law cb-day" data-d="rule" data-k="day">${icon('p:rule')}<b>${esc(g.rule(run.day).name)}</b></span>` : ''].join(''); /* v400 : règle du jour en dernier */
@@ -458,6 +462,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const b = box.querySelector('b'); if (b) b.textContent = v;
     box.style.setProperty('--hpp', Math.max(0, Math.min(100, Math.round((v / mx) * 100))));
     box.classList.toggle('hurt', v < mx); box.classList.toggle('low', v > 0 && v <= mx * 0.3);
+    c.querySelector('.dv-hpb')?.style.setProperty('--hpp', `${Math.max(0, Math.min(100, Math.round((v / mx) * 100)))}%`); /* v825 : la barre de vie descend en deux temps */
   };
   const hitstop = async (ms) => {
     if (reduced) return;

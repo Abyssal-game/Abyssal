@@ -8832,6 +8832,7 @@ export default {
   "Ta <b>Ferveur</b> est pleine : ton <b>pouvoir d’équipe</b> est prêt (bouton en bas). Il se lance pendant le tour d’une de tes créatures, sans le terminer, et vide la Ferveur, <b>une fois par combat</b>.<br><br>Il vient de la <b>Mythique</b> ou de la <b>Secrète</b> de ton équipe, selon sa faction : Renaissance, Cataclysme, Croc du Néant ou Égide mécanique.": "Il tuo <b>Fervore</b> è pieno: il tuo <b>potere di squadra</b> è pronto (pulsante in basso). Si lancia durante il turno di una tua creatura, senza terminarlo, e svuota il Fervore, <b>una volta per combattimento</b>.<br><br>Viene dalla <b>Mitica</b> o dalla <b>Segreta</b> della tua squadra, secondo la sua fazione: Rinascita, Cataclisma, Zanna del Nulla o Egida meccanica.",
   "Barrière −{0} ({1})": "Barriera −{0} ({1})",
   "La barrière se brise": "La barriera si spezza",
+  "Dégâts annoncés sur cette créature": "Danni annunciati su questa creatura",
 };
 
 export const names = {

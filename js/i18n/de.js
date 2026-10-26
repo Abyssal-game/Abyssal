@@ -8832,6 +8832,7 @@ export default {
   "Ta <b>Ferveur</b> est pleine : ton <b>pouvoir d’équipe</b> est prêt (bouton en bas). Il se lance pendant le tour d’une de tes créatures, sans le terminer, et vide la Ferveur, <b>une fois par combat</b>.<br><br>Il vient de la <b>Mythique</b> ou de la <b>Secrète</b> de ton équipe, selon sa faction : Renaissance, Cataclysme, Croc du Néant ou Égide mécanique.": "Deine <b>Inbrunst</b> ist voll: deine <b>Teamkraft</b> ist bereit (Knopf unten). Sie wird im Zug einer deiner Kreaturen ausgelöst, ohne ihn zu beenden, und leert die Inbrunst, <b>einmal pro Kampf</b>.<br><br>Sie stammt von der <b>Mythischen</b> oder <b>Geheimen</b> deines Teams, je nach Fraktion: Wiedergeburt, Kataklysmus, Fangzahn des Nichts oder Mechanische Ägide.",
   "Barrière −{0} ({1})": "Barriere −{0} ({1})",
   "La barrière se brise": "Die Barriere zerbricht",
+  "Dégâts annoncés sur cette créature": "Angekündigter Schaden an dieser Kreatur",
 };
 
 export const names = {

@@ -8843,6 +8843,7 @@ export default {
   "Ta <b>Ferveur</b> est pleine : ton <b>pouvoir d’équipe</b> est prêt (bouton en bas). Il se lance pendant le tour d’une de tes créatures, sans le terminer, et vide la Ferveur, <b>une fois par combat</b>.<br><br>Il vient de la <b>Mythique</b> ou de la <b>Secrète</b> de ton équipe, selon sa faction : Renaissance, Cataclysme, Croc du Néant ou Égide mécanique.": "Your <b>Fervor</b> is full: your <b>team power</b> is ready (button at the bottom). It is cast during one of your creatures’ turns, without ending it, and empties the Fervor, <b>once per battle</b>.<br><br>It comes from your team’s <b>Mythic</b> or <b>Secret</b>, depending on its faction: Rebirth, Cataclysm, Void Fang or Mechanical Aegis.",
   "Barrière −{0} ({1})": "Barrier −{0} ({1})",
   "La barrière se brise": "The barrier breaks",
+  "Dégâts annoncés sur cette créature": "Damage announced on this creature",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {
