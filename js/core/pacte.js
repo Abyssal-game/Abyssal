@@ -81,7 +81,7 @@ export const TABLE = Object.fromEntries(TABLES.map((t) => [t.key, t]));
 export const tgt = (st) => st.target || TARGET;
 export const sevenOf = (st) => st.seven || SEVEN_BONUS;
 export const tableBg = (key) => `assets/sceaux/${TABLE[key]?.bg || 'salle-pacte'}.webp`; /* v494 : décor peint propre à la salle */
-export const tableUnlocked = (s, i) => i === 0 || !!s.pacte?.beaten?.[TABLES[i - 1].key];
+export const tableUnlocked = (s, i) => i === 0 || !!(s.settings?.dev && s.devGames) || !!s.pacte?.beaten?.[TABLES[i - 1].key];
 export const PACTE_REWARD = { firstWin: 100, daily: 40, dailyPaid: 5, afterCap: 5, xp: 10 };
 export const PACTE_TITLE = 'Signataire de l’Abîme';
 export const dailyTable = (day, unlocked) => TABLES[hash(`pacte:${day}`) % Math.max(1, Math.min(unlocked, TABLES.length))].key;

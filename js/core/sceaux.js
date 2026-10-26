@@ -94,7 +94,7 @@ export const RIVALS = [
 // v403 : étoiles = difficulté mesurée (tools/sceaux-sim.mjs : ≥ 70 % de victoires 1★, 50-70 % 2★, 30-50 % 3★, 20-30 % 4★, < 20 % 5★)
 export const awakened = (R) => ({ ...R, stars: R.starsAwake, awake: true, level: Math.min(5, R.level + 1), ai: R.aiAwake, reward: Math.round(R.reward * 1.5), name: R.name, title: `${R.title} · implacable` });
 export const RIVAL = Object.fromEntries(RIVALS.map((r) => [r.key, r]));
-export const rivalUnlocked = (s, i) => i === 0 || !!s.sceaux?.beaten?.[RIVALS[i - 1].key];
+export const rivalUnlocked = (s, i) => i === 0 || !!(s.settings?.dev && s.devGames) || !!s.sceaux?.beaten?.[RIVALS[i - 1].key];
 
 // Récompenses : plafonnées par jour pour qu'aucun mode ne devienne la seule source d'éclats
 export const SCEAUX_REWARD = { dailyPaid: 5, firstWin: 100, daily: 40, firstAwake: 150, afterCap: 5, xp: 10 };

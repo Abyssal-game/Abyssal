@@ -1,4 +1,6 @@
 // Point d'entrée : chargement des données, état du joueur, navigation.
+import { startErrLog } from './ui/errlog.js'; /* v804 : journal des erreurs (Mode Créateur) */
+startErrLog();
 import { startTranslator, t } from './i18n.js'; /* v506 : langues (en premier : le dictionnaire est chargé avant le reste) */
 import { loadCatalogData, createCatalog } from './core/catalog.js';
 import { Game } from './core/game.js';

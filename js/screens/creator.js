@@ -5,13 +5,13 @@ import { openSheet, esc, toast, confirmBox, fmt } from '../ui/dom.js';
 import { migrate } from '../core/save.js';
 import { BOSSES, BOSS_ORDER, VEILLES } from '../core/bosses.js';
 import { SEASONS } from '../core/codex.js';
-import { openCosmeticsLab } from './cosmetics-lab.js';
-import { openCosmeticsReview } from './cosmetics-review.js'; /* v592 */
+import { showWelcome } from './welcome.js'; /* v804 */
+import { errLog, errClear } from '../ui/errlog.js'; /* v804 */
 import { openDefenseLab } from './defense-lab.js'; /* v594 */
 import { sfx, audioInfo } from '../ui/sound.js'; /* v622 */
 import { openServerState } from './server-state.js'; /* v678 */
 import { perfOn, setPerf, perfLog, perfClear, perfReport } from '../ui/perf.js'; /* v601 */
-import { partieErrs } from '../cloud/partie.js'; /* v740 */
+import { partieErrs, partie } from '../cloud/partie.js'; /* v740 */
 import { openPack } from './opening.js'; /* v769 */
 import { playTestDuel, TEST_LINEUPS } from './versus-test.js'; /* v803 */
 import { playEnding, playPrologue, CINE_SCENES } from './ending.js';
@@ -38,114 +38,93 @@ export function openCreator(app) {
   let chocDev = { lineup: 'std1', force: 'any' };
   try { chocDev = { ...chocDev, ...JSON.parse(localStorage.getItem('abyssal.chocDev') || '{}') }; } catch (e) { /* rien */ }
   const B = (x, label, cls = '') => `<button class="btn small ${cls}" data-x="${x}">${label}</button>`;
-  function draw() {
-    const d = g.descent(), f = g.s.devForce;
-    sheet.setContent(`
-      <h2>${icon('crown')} Mode Créateur</h2>
-      <p class="small muted">Tous les pouvoirs sur ta partie. Tant que le mode est actif, tes scores de Descente ne sont pas envoyés au classement mondial, pour qu’il reste équitable.</p>
-      <div class="cr-state small">${fmt(g.s.shards)} éclats · ${fmt(g.s.ash)} cendres · ${g.uniqueCount()}/${g.total()} créatures</div>
-
-      <section class="cr-sec"><h3>État du serveur</h3>
-        <p class="small muted">Vérifie ce qui est installé sur Supabase et dit quels fichiers SQL coller ou recoller.</p>
-        <div class="row gap wrap">${B('srv', 'Vérifier le serveur', 'gold')}</div></section>
-
-      <section class="cr-sec"><h3>Sauvegarde de sécurité</h3>
-        <p class="small muted">${snap ? `Copie de ta vraie partie du ${new Date(snap.t).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })} (${Object.keys(snap.s.collection || {}).length} créatures).` : 'Fais une copie de ta vraie partie avant de jouer les dieux : tu pourras la retrouver d’un geste.'}</p>
-        <div class="row gap wrap">${B('snap', `${icon('download')}Copier ma partie actuelle`)}${snap ? B('restore', `${icon('upload')}Revenir à la copie`, 'gold') : ''}</div></section>
-
-      <section class="cr-sec"><h3>Ressources</h3><div class="row gap wrap">
-        ${B('shards', '+10 000 éclats')}${B('ash', '+10 000 cendres')}${B('tickets', '+10 boosters de chaque')}${B('chests', 'Des coffres de chaque')}${B('free', 'Recharger les boosters gratuits')}
-      </div></section>
-
-      <section class="cr-sec"><h3>Cartes</h3><div class="row gap wrap">
-        ${B('all', 'Toutes les cartes')}${B('variants', 'Toutes les variantes')}${B('dups', 'Doublons pour tester')}
-      </div>
-        <form class="cr-give" id="give">
-          <input class="input plain" name="q" list="cr-cards" placeholder="Nom d’une carte…" autocomplete="off">
-          <datalist id="cr-cards">${cat.cards.map((c) => `<option value="${esc(c.name)}">`).join('')}</datalist>
-          <select class="input plain" name="v">${Object.keys(VARIANTS).map((v) => `<option value="${v}">${esc(VARIANTS[v].name)}</option>`).join('')}</select>
-          <button class="btn small primary" type="submit">Donner</button>
-        </form></section>
-
-      <section class="cr-sec"><h3>Booster de l’Abysse</h3>
-        <p class="small muted">Ouvre-le quand tu veux, avec toute sa mise en scène. « Comme la première fois » garantit une Secrète que tu n’as pas encore. Le réglage « Prochain booster » ci-dessous s’applique aussi à sa dernière carte.${g.s.tickets.abysse ? ` Tu en as ${g.s.tickets.abysse} en réserve (onglet Butin).` : ''}</p>
-        <div class="row gap wrap">${B('abyss', 'Ouvrir un Booster de l’Abysse', 'gold')}${B('abyss1', 'Comme la première fois')}${B('abyss5', '+5 en réserve')}</div></section>
-
-      <section class="cr-sec cr-cine" translate="no"><h3>Cinématiques</h3>
-        <p class="small muted">Regarde le prologue ou la fin de la Descente quand tu veux, dans la langue que tu veux (texte et voix du narrateur), à partir de la scène de ton choix. La langue du jeu ne change pas.</p>
+  /* v804 : Mode Créateur rangé en 4 onglets (le dernier ouvert est retenu sur l'appareil) */
+  const TABS = [['test', 'Tester'], ['partie', 'Ma partie'], ['ateliers', 'Ateliers'], ['diag', 'Diagnostic']];
+  let tab = 'test';
+  try { tab = localStorage.getItem('abyssal.crTab') || 'test'; } catch (e) { /* rien */ }
+  if (!TABS.some(([k]) => k === tab)) tab = 'test';
+  const S = (title, body, cls = '') => `<section class="cr-sec ${cls}"><h3>${title}</h3>${body}</section>`;
+  const P = (txt) => `<p class="small muted">${txt}</p>`;
+  const row = (...bs) => `<div class="row gap wrap">${bs.join('')}</div>`;
+  function tabTest(d, f) {
+    return `
+      ${S('Affronter un gardien', `${P('Te place devant la porte du gardien (un chapitre est lancé si besoin, le présage est passé, sans Torche). Coche la case pour monter ton équipe au niveau attendu à cet étage.')}
+        <label class="small cr-bpow"><input type="checkbox" id="bpow" ${ui.bpow ? 'checked' : ''}> Équipe à la puissance de l’étage</label>
+        <div class="cr-bosses">${BOSS_ORDER.map((k, i) => `<button class="btn small" data-boss="${k}"><b>${(i + 1) * 5}</b> · ${esc(BOSSES[k].name)}</button>`).join('')}</div>
+        <p class="small">Les Veilles (étage 105)</p>
+        <div class="cr-bosses">${SEASONS.filter((se) => VEILLES[se.key]).map((se) => `<button class="btn small" data-veille="${se.key}"><b>${se.num}</b> · ${esc(BOSSES[VEILLES[se.key].boss].name)}</button>`).join('')}</div>`)}
+      ${S('Aller à un étage', `<form class="cr-give" id="floor"><input class="input plain" name="n" type="number" min="1" max="200" placeholder="Étage" ${d.run ? '' : 'disabled'}><button class="btn small" type="submit" ${d.run ? '' : 'disabled'}>Y aller</button><button class="btn small" type="submit" name="power" value="1" ${d.run ? '' : 'disabled'}>Avec la puissance attendue</button></form>
+        ${P(d.run ? `Chapitre en cours : étage ${d.run.floor}.` : 'Lance d’abord un chapitre dans la Descente.')}`)}
+      ${S('Choc des Boosters (essai)', `${P('Un face-à-face complet contre un adversaire fictif, sans serveur ni autre joueur. Rien n’est payé, gagné ni enregistré.')}
+        <p class="small">Boosters</p>${row(...[['std1', '1 standard'], ['mix3', 'Standard + Faction + Premium'], ['prem3', '3 premium'], ['choc', 'Composition du Choc']].map(([k, l]) => `<button class="btn small ${chocDev.lineup === k ? 'gold' : 'ghost'}" data-choc="lineup" data-v="${k}">${l}</button>`))}
+        <p class="small">Résultat</p>${row(...[['any', 'Au hasard'], ['win', 'Victoire'], ['lose', 'Défaite'], ['tie', 'Égalité']].map(([k, l]) => `<button class="btn small ${chocDev.force === k ? 'gold' : 'ghost'}" data-choc="force" data-v="${k}">${l}</button>`))}
+        ${row(B('choc', 'Lancer un duel d’essai', 'gold'))}`, 'cr-choc')}
+      ${S('Cercle de l’Abysse', `${P(g.s.devGames ? 'Toutes les salles des quatre jeux sont ouvertes, même celles pas encore gagnées. Ta progression ne change pas.' : 'Ouvre toutes les salles des quatre jeux (Duels des Sceaux, Pacte, Cryptes, Enchères) sans avoir gagné les précédentes, pour tester un adversaire précis.')}
+        ${row(B('games', g.s.devGames ? 'Refermer les salles' : 'Ouvrir toutes les salles', g.s.devGames ? '' : 'gold'))}`)}
+      ${S('Boosters', `${P(f ? `Prochain booster : une carte <b>${esc(RARITIES.find((r) => r.key === f.rarity)?.name || f.rarity)}</b>${f.variant ? ` en <b>${esc(VARIANTS[f.variant].name)}</b>` : ''} en dernière position.` : 'Impose la dernière carte du prochain booster (aussi celui de l’Abysse) :')}
+        <div class="row gap wrap">${RARITIES.map((r) => `<button class="chip" data-force="${r.key}" style="--chip:${r.color}" aria-pressed="${f?.rarity === r.key}">${r.name}</button>`).join('')}</div>
+        <div class="row gap wrap cr-fv">${['', 'holo', 'gold', 'galaxy', 'crystal', 'prism'].map((v) => `<button class="chip" data-fvar="${v}" aria-pressed="${(f?.variant || '') === v}">${v ? esc(VARIANTS[v].short) : 'Au hasard'}</button>`).join('')}</div>
+        <p class="small">Booster de l’Abysse${g.s.tickets.abysse ? ` · ${g.s.tickets.abysse} en réserve` : ''}</p>
+        ${row(B('abyss', 'Ouvrir un Booster de l’Abysse', 'gold'), B('abyss1', 'Comme la première fois'), B('abyss5', '+5 en réserve'))}`)}
+      ${S('Cinématiques et guide', `${P('Le prologue ou la fin, dans la langue de ton choix (texte et voix), à partir de la scène voulue. La langue du jeu ne change pas.')}
         <div class="seg cr-cine-seg">${['prologue', 'fin'].map((k) => `<button class="seg-b" aria-pressed="${cine.film === k}" aria-checked="${cine.film === k}" data-cfilm="${k}">${k === 'prologue' ? 'Prologue' : 'Fin de la Descente'}</button>`).join('')}</div>
         <div class="seg lang-grid cr-cine-seg">${Object.entries(LANGS).map(([k, n]) => `<button class="seg-b" aria-pressed="${cine.lang === k}" aria-checked="${cine.lang === k}" data-clang="${k}">${esc(n)}</button>`).join('')}</div>
         <label class="small muted">À partir de la scène
           <select class="input plain" id="cine-start">${CINE_SCENES[cine.film].map((n, i) => `<option value="${i}"${i === cine.start ? ' selected' : ''}>${i + 1} · ${esc(n)}</option>`).join('')}</select></label>
         ${cine.film === 'fin' ? `<label class="small muted">Nom écrit sur le vélin
           <input class="input plain" id="cine-name" maxlength="20" value="${esc(cine.name || '')}" placeholder="Ton pseudo"></label>` : ''}
-        <div class="row gap wrap">${B('cine', `Lancer ${cine.film === 'prologue' ? 'le prologue' : 'la fin'}`, 'gold')}</div></section>
-
-      <section class="cr-sec"><h3>Prochain booster</h3>
-        <p class="small muted">${f ? `Imposé : une carte <b>${esc(RARITIES.find((r) => r.key === f.rarity)?.name || f.rarity)}</b>${f.variant ? ` en <b>${esc(VARIANTS[f.variant].name)}</b>` : ''} en dernière position.` : 'La dernière carte du prochain booster peut être imposée.'}</p>
-        <div class="row gap wrap">${RARITIES.map((r) => `<button class="chip" data-force="${r.key}" style="--chip:${r.color}" aria-pressed="${f?.rarity === r.key}">${r.name}</button>`).join('')}</div>
-        <div class="row gap wrap cr-fv">${['', 'holo', 'gold', 'galaxy', 'crystal', 'prism'].map((v) => `<button class="chip" data-fvar="${v}" aria-pressed="${(f?.variant || '') === v}">${v ? esc(VARIANTS[v].short) : 'Au hasard'}</button>`).join('')}</div>
-      </section>
-
-      <section class="cr-sec"><h3>Descente</h3>
-        <div class="row gap wrap">${B('missions', 'Accomplir les missions')}${B('campaign', 'Remettre la campagne à zéro', 'danger')}</div>
-        <p class="small muted">Remettre à zéro : record, gardiens vaincus et Cauchemar repartent de rien, pour revivre la campagne et ses récompenses. Ta collection, tes niveaux et tes coffres ne bougent pas.</p>
-        <form class="cr-give" id="floor"><input class="input plain" name="n" type="number" min="1" max="200" placeholder="Étage" ${d.run ? '' : 'disabled'}><button class="btn small" type="submit" ${d.run ? '' : 'disabled'}>Aller à l’étage</button><button class="btn small" type="submit" name="power" value="1" ${d.run ? '' : 'disabled'}>Avec la puissance attendue</button></form>
-        <p class="small muted">${d.run ? `Chapitre en cours : étage ${d.run.floor}.` : 'Lance une Descente pour pouvoir sauter d’étage.'}</p>
-      </section>
-
-      <section class="cr-sec cr-choc" translate="no"><h3>Choc des Boosters (essai)</h3>
-        <p class="small muted">Un face-à-face complet contre un adversaire fictif, sans serveur ni autre joueur. Rien n’est payé, gagné ni enregistré.</p>
-        <p class="small">Boosters</p><div class="row gap wrap">${[['std1', '1 standard'], ['mix3', 'Standard + Faction + Premium'], ['prem3', '3 premium'], ['choc', 'Composition du Choc']].map(([k, l]) => `<button class="btn small ${chocDev.lineup === k ? 'gold' : 'ghost'}" data-choc="lineup" data-v="${k}">${l}</button>`).join('')}</div>
-        <p class="small">Résultat</p><div class="row gap wrap">${[['any', 'Au hasard'], ['win', 'Victoire'], ['lose', 'Défaite'], ['tie', 'Égalité']].map(([k, l]) => `<button class="btn small ${chocDev.force === k ? 'gold' : 'ghost'}" data-choc="force" data-v="${k}">${l}</button>`).join('')}</div>
-        <div class="row gap wrap">${B('choc', 'Lancer un duel d’essai', 'gold')}</div></section>
-
-      <section class="cr-sec"><h3>Cercle de l’Abysse</h3>
-        <p class="small muted">${g.s.devGames ? 'Ouverte : tu peux jouer aux jeux comme si le gardien de l’étage 5 était vaincu.' : 'Ouvre les jeux (Duels des Sceaux, Cryptes, Pacte, Enchères) comme si le gardien de l’étage 5 était vaincu.'} Ta campagne ne change pas, et tout se referme si tu désactives le Mode Créateur.</p>
-        <div class="row gap wrap">${B('games', g.s.devGames ? 'Refermer le Cercle de l’Abysse' : 'Ouvrir le Cercle de l’Abysse', g.s.devGames ? '' : 'gold')}</div></section>
-
-      <section class="cr-sec"><h3>Codex et Échoppe (ébauche)</h3>
-        <p class="small muted">${g.s.devCodex ? 'Affichés : onglet Butin → Codex. Toi seul les vois (Mode Créateur).' : 'Le futur pass de saison et la boutique en argent réel, encore cachés aux joueurs. Les achats y sont simulés.'}</p>
-        <div class="row gap wrap">${B('codex', g.s.devCodex ? 'Cacher le Codex et l’Échoppe' : 'Afficher le Codex et l’Échoppe', g.s.devCodex ? '' : 'gold')}${g.s.devCodex ? B('codexgo', 'Ouvrir le Codex', '') : ''}</div></section>
-
-      <section class="cr-sec"><h3>Revue de l’Échoppe</h3>
-        <p class="small muted">Chaque objet en vente, un par un, tel que les joueurs le verront (profil, classement, partie en ligne, booster, plateau). Touche Garder ou Supprimer, puis « Copier la liste à supprimer » et colle-la dans la conversation avec Claude. Ton tri reste sur ce téléphone.</p>
-        <div class="row gap wrap">${B('shoprev', 'Passer l’Échoppe en revue', 'gold')}</div></section>
-
-      <section class="cr-sec"><h3>Atelier des cosmétiques</h3>
-        <p class="small muted">Tous les cadres, dos et finitions en aperçu, pour trier ceux à garder, à retirer ou à revoir.</p>
-        <div class="row gap wrap">${B('lab', 'Ouvrir l’Atelier', 'gold')}${B('revue', 'Revue des doublons', '')}</div></section>
-
-      <section class="cr-sec"><h3>Labo des combats</h3>
-        <p class="small muted">Essaie des combats de la Descente à n’importe quel étage, règle la force des ennemis, note chaque étage : une courbe règle les autres. Et la barre de défense, réglable en direct. Copie ensuite ton rapport pour me l’envoyer.</p>
-        <div class="row gap wrap">${B('labo', 'Ouvrir le Labo des combats', 'gold')}${B('deflab', 'Labo des défenses', '')}</div></section>
-
-      <section class="cr-sec" translate="no"><h3>Moniteur de fluidité</h3>
-        <p class="small muted">Allumé, chaque combat est suivi image par image : un compteur d’images par seconde s’affiche en haut à gauche, et chaque saccade est notée avec ce que le combat faisait à ce moment-là (coup, effet, barre de défense…), ainsi que le délai entre tes touchers et l’écran. Joue quelques combats, puis copie le rapport et colle-le dans la conversation.</p>
+        ${row(B('cine', `Lancer ${cine.film === 'prologue' ? 'le prologue' : 'la fin'}`, 'gold'), B('guide', 'Revoir le guide de bienvenue'))}`, 'cr-cine')}`;
+  }
+  function tabPartie() {
+    return `
+      ${S('Sauvegarde de sécurité', `${P(snap ? `Copie de ta vraie partie du ${new Date(snap.t).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })} (${Object.keys(snap.s.collection || {}).length} créatures).` : 'Fais une copie de ta vraie partie avant de jouer les dieux : tu pourras la retrouver d’un geste.')}
+        ${row(B('snap', `${icon('download')}Copier ma partie actuelle`), snap ? B('restore', `${icon('upload')}Revenir à la copie`, 'gold') : '')}`)}
+      ${S('Ressources', row(B('shards', '+10 000 éclats'), B('ash', '+10 000 cendres'), B('tickets', '+10 boosters de chaque'), B('chests', 'Des coffres de chaque'), B('free', 'Recharger les boosters gratuits')))}
+      ${S('Cartes', `${row(B('all', 'Toutes les cartes'), B('variants', 'Toutes les finitions'), B('dups', 'Doublons pour tester'))}
+        <form class="cr-give" id="give">
+          <input class="input plain" name="q" list="cr-cards" placeholder="Nom d’une carte…" autocomplete="off">
+          <datalist id="cr-cards">${cat.cards.map((c) => `<option value="${esc(c.name)}">`).join('')}</datalist>
+          <select class="input plain" name="v">${Object.keys(VARIANTS).map((v) => `<option value="${v}">${esc(VARIANTS[v].name)}</option>`).join('')}</select>
+          <button class="btn small primary" type="submit">Donner</button>
+        </form>`)}
+      ${S('Descente', `${row(B('missions', 'Accomplir les missions du jour'), B('campaign', 'Remettre la campagne à zéro', 'danger'))}
+        ${P('Remettre à zéro : record, gardiens vaincus et Cauchemar repartent de rien, pour revivre la campagne et ses récompenses. Ta collection, tes niveaux et tes coffres ne bougent pas.')}`)}`;
+  }
+  function tabAteliers() {
+    return `
+      ${S('Labo des combats', `${P('Essaie des combats de la Descente à n’importe quel étage, règle la force des ennemis, note chaque étage : une courbe règle les autres. Le Labo des défenses règle la barre d’esquive et de parade en direct. Copie ensuite ton rapport pour me l’envoyer.')}
+        ${row(B('labo', 'Labo des combats', 'gold'), B('deflab', 'Labo des défenses'))}`)}
+      ${S('Codex et Échoppe', `${P(g.codexLive?.() ? 'Le Codex est ouvert à tous.' : g.s.devCodex ? 'Affichés pour toi seul : onglet Butin → Codex. Les achats y sont simulés.' : 'Le pass de saison et la boutique, encore cachés aux joueurs : affiche-les pour toi seul.')}
+        ${row(B('codex', g.s.devCodex ? 'Cacher le Codex et l’Échoppe' : 'Afficher le Codex et l’Échoppe', g.s.devCodex ? '' : 'gold'), g.s.devCodex ? B('codexgo', 'Ouvrir le Codex') : '')}
+        <p class="small">Revue de l’Échoppe</p>${P('Chaque objet en vente, un par un, tel que les joueurs le verront. Garder ou Supprimer, puis « Copier la liste à supprimer » et colle-la dans la conversation.')}
+        ${row(B('shoprev', 'Passer l’Échoppe en revue'))}`)}`;
+  }
+  function tabDiag() {
+    const errs = errLog();
+    return `
+      ${S('Signaler un problème', `${P('Copie en un geste tout ce qui m’aide à trouver un bug : version, appareil, état du serveur de partie, dernières erreurs de l’app et du serveur, dernier relevé de fluidité. Colle-le dans la conversation avec ta description.')}
+        ${row(B('report', `${icon('check')}Copier le rapport complet`, 'gold'))}`)}
+      ${S('Erreurs de l’app', `${P('Les 25 dernières erreurs survenues sur ce téléphone (même quand rien ne s’est vu à l’écran).')}
+        <p class="small">${errs.length ? errs.slice(0, 5).map((x) => `${esc(new Date(x.t).toLocaleString('fr-FR'))} · ${esc(x.r)} · <b>${esc(x.m)}</b>`).join('<br>') : 'Aucune erreur.'}</p>
+        ${row(errs.length ? B('errlogclear', 'Effacer') : '')}`)}
+      ${S('Journal du serveur', `${P('Actions que le serveur de partie a refusées sur cet appareil (les 30 dernières).')}
+        <p class="small">${partieErrs().length ? partieErrs().slice(0, 5).map((x) => `${esc(new Date(x.t).toLocaleString('fr-FR'))} · <b>${esc(x.m)}</b> · ${esc(x.e)}`).join('<br>') : 'Rien de refusé.'}</p>`)}
+      ${S('Moniteur de fluidité', `${P('Allumé, chaque combat est suivi image par image : compteur d’images par seconde en haut à gauche, chaque saccade notée avec ce que le combat faisait, et le délai entre tes touchers et l’écran. Joue quelques combats, puis copie le rapport.')}
         <p class="small">${perfOn() ? '<b class="dc-good">Allumé</b>' : 'Éteint'} · ${perfLog().length} combat(s) relevé(s)${perfLog()[0] ? ` · dernier : ${perfLog()[0].fps} i/s, ${perfLog()[0].nHitch} saccade(s)` : ''}</p>
-        <div class="row gap wrap">${B('perf', perfOn() ? 'Éteindre le moniteur' : 'Allumer le moniteur', perfOn() ? '' : 'gold')}${B('perfcopy', 'Copier le rapport', '')}${perfLog().length ? B('perfclear', 'Effacer les relevés', '') : ''}</div></section>
-
-      <section class="cr-sec" translate="no"><h3>Journal du serveur</h3>
-        <p class="small muted">Actions que le serveur de partie a refusées sur cet appareil (les 30 dernières). Si un combat revient tout seul, copie ce journal et colle-le dans la conversation.</p>
-        <p class="small">${partieErrs().length ? partieErrs().slice(0, 6).map((x) => `${esc(new Date(x.t).toLocaleString('fr-FR'))} · <b>${esc(x.m)}</b> · ${esc(x.e)}`).join('<br>') : 'Rien de refusé.'}</p>
-        <div class="row gap wrap">${B('errcopy', 'Copier le journal', '')}</div></section>
-
-      <section class="cr-sec" translate="no"><h3>Son (diagnostic)</h3>
-        <p class="small muted">${(() => { const a = audioInfo(); return `Son : ${esc(a.state)} · ${a.samples}${a.expected != null ? `/${a.expected}` : ''} sons chargés · session ${esc(String(a.session))}${a.enabled ? '' : ' · coupé dans les réglages'}${a.diag.failGet || a.diag.failDecode || a.diag.err ? ` · échecs lecture ${a.diag.failGet}, décodage ${a.diag.failDecode}${a.diag.err ? ` · ${esc(a.diag.err)}` : ''}` : ''}`; })()}</p>
-        <div class="row gap wrap">${B('sndtest', 'Tester le son', '')}</div></section>
-
-      <section class="cr-sec"><h3>Affronter un gardien</h3>
-        <p class="small muted">Te place devant la porte du gardien (un chapitre est lancé si besoin, le présage est passé). Coche la case pour monter ton équipe au niveau attendu à cet étage.</p>
-        <label class="small cr-bpow"><input type="checkbox" id="bpow" ${ui.bpow ? 'checked' : ''}> Équipe à la puissance de l’étage</label>
-        <div class="cr-bosses">${BOSS_ORDER.map((k, i) => `<button class="btn small" data-boss="${k}"><b>${(i + 1) * 5}</b> · ${esc(BOSSES[k].name)}</button>`).join('')}</div>
-      </section>
-
-      <section class="cr-sec"><h3>Affronter un Veilleur (Les Veilles)</h3>
-        <p class="small muted">Te place devant le Veilleur d’une saison (étage 105), même sans avoir vaincu l’Abysse, sans Torche. La case du dessus monte aussi ton équipe.</p>
-        <div class="cr-bosses">${SEASONS.filter((se) => VEILLES[se.key]).map((se) => `<button class="btn small" data-veille="${se.key}"><b>${se.num}</b> · ${esc(BOSSES[VEILLES[se.key].boss].name)}</button>`).join('')}</div>
-      </section>
-
-      <section class="cr-sec"><button class="btn danger block" data-x="off">Désactiver le Mode Créateur</button></section>`);
+        ${row(B('perf', perfOn() ? 'Éteindre le moniteur' : 'Allumer le moniteur', perfOn() ? '' : 'gold'), B('perfcopy', 'Copier le rapport'), perfLog().length ? B('perfclear', 'Effacer les relevés') : '')}`)}
+      ${S('État du serveur', `${P('Vérifie ce qui est installé sur Supabase et dit quels fichiers SQL coller ou recoller.')}${row(B('srv', 'Vérifier le serveur'))}`)}
+      ${S('Son', `${P((() => { const a = audioInfo(); return `Son : ${esc(a.state)} · ${a.samples}${a.expected != null ? `/${a.expected}` : ''} sons chargés · session ${esc(String(a.session))}${a.enabled ? '' : ' · coupé dans les réglages'}${a.diag.failGet || a.diag.failDecode || a.diag.err ? ` · échecs lecture ${a.diag.failGet}, décodage ${a.diag.failDecode}${a.diag.err ? ` · ${esc(a.diag.err)}` : ''}` : ''}`; })())}${row(B('sndtest', 'Tester le son'))}`)}`;
+  }
+  function draw() {
+    const d = g.descent(), f = g.s.devForce;
+    const body = tab === 'partie' ? tabPartie() : tab === 'ateliers' ? tabAteliers() : tab === 'diag' ? tabDiag() : tabTest(d, f);
+    sheet.setContent(`
+      <h2>${icon('crown')} Mode Créateur</h2>
+      <div class="cr-state small">${fmt(g.s.shards)} éclats · ${fmt(g.s.ash)} cendres · ${g.uniqueCount()}/${g.total()} créatures · ${esc(VERSION)}</div>
+      <div class="seg cr-tabs" role="tablist">${TABS.map(([k, l]) => `<button class="seg-b" role="tab" data-crtab="${k}" aria-pressed="${tab === k}" aria-selected="${tab === k}">${l}</button>`).join('')}</div>
+      ${body}
+      <section class="cr-sec"><button class="btn danger block" data-x="off">Désactiver le Mode Créateur</button>
+        ${P('Tant que le mode est actif, tes scores de Descente ne sont pas envoyés au classement mondial.')}</section>`);
   }
 
   sheet.body.addEventListener('click', async (e) => {
@@ -153,6 +132,8 @@ export function openCreator(app) {
     if (fr) { g.s.devForce = g.s.devForce?.rarity === fr.dataset.force ? null : { rarity: fr.dataset.force, variant: g.s.devForce?.variant || '' }; g.persist(); return draw(); }
     if (fv) { if (!g.s.devForce) g.s.devForce = { rarity: 'M', variant: '' }; g.s.devForce.variant = fv.dataset.fvar; g.persist(); return draw(); }
     if (e.target.id === 'bpow') { ui.bpow = e.target.checked; return; }
+    const tb = e.target.closest('[data-crtab]');
+    if (tb) { tab = tb.dataset.crtab; try { localStorage.setItem('abyssal.crTab', tab); } catch (er) { /* rien */ } draw(); (sheet.el || sheet.body)?.scrollTo?.({ top: 0 }); return; }
     const ch = e.target.closest('[data-choc]');
     if (ch) { chocDev[ch.dataset.choc] = ch.dataset.v; try { localStorage.setItem('abyssal.chocDev', JSON.stringify(chocDev)); } catch (er) { /* rien */ } return draw(); }
     const cf = e.target.closest('[data-cfilm]'), cl = e.target.closest('[data-clang]');
@@ -210,8 +191,22 @@ export function openCreator(app) {
       if (x === 'games') { g.s.devGames = !g.s.devGames; g.persist(); app.chrome?.(); }
       if (x === 'codex') { g.s.devCodex = !g.s.devCodex; g.persist(); app.chrome?.(); } /* v470 */
       if (x === 'srv') { openServerState(); return; } /* v678 */
-      if (x === 'lab') { openCosmeticsLab(app); return; } /* v556 */
-      if (x === 'revue') { openCosmeticsReview(app); return; } /* v592 */
+      if (x === 'guide') { sheet.close(); setTimeout(() => showWelcome(app, { force: true }), 350); return; } /* v804 */
+      if (x === 'errlogclear') { errClear(); return draw(); }
+      if (x === 'report') { /* v804 : rapport complet pour signaler un problème */
+        const st = g.s.settings || {}, pl = perfLog()[0];
+        const txt = [`Rapport ABYSSAL · ${VERSION} · ${new Date().toLocaleString('fr-FR')}`,
+          `Appareil : ${navigator.userAgent}`, `Écran : ${innerWidth} × ${innerHeight} · ${devicePixelRatio}x${document.documentElement.classList.contains('standalone') ? ' · app' : ''} · langue ${LANG}`,
+          `Serveur de partie : ${partie.mode === 'server' ? 'actif (progression gardée par le serveur)' : partie.mode === 'legacy' ? 'ancien système' : 'pas encore joint'}${partie.error ? ` · dernière erreur : ${partie.error}` : ''} · actions en attente ${(() => { try { return JSON.parse(localStorage.getItem('abyssal.ops') || '[]').length; } catch (er) { return '?'; } })()}`,
+          `Page : ${location.hash || '#/'} · effets ${st.quality === 'light' ? 'allégés' : 'complets'} · vitesse ${st.combatFast || 1}`,
+          `Partie : ${g.uniqueCount()}/${g.total()} créatures · record ${g.descent().best || 0} · chapitre en cours ${g.descent().run ? `étage ${g.descent().run.floor}` : 'aucun'}`,
+          '', 'Erreurs de l’app :', ...(errLog().map((x) => `${new Date(x.t).toISOString()} ${x.v} ${x.r} : ${x.m}${x.w ? ` (${x.w})` : ''}`).slice(0, 15)), errLog().length ? '' : 'aucune',
+          '', 'Refus du serveur :', ...(partieErrs().map((x) => `${new Date(x.t).toISOString()} ${x.m} : ${x.e}`).slice(0, 15)), partieErrs().length ? '' : 'aucun',
+          '', `Fluidité : ${pl ? `${pl.fps} i/s, ${pl.nHitch} saccade(s) au dernier combat relevé` : 'aucun relevé'}`].join('\n');
+        try { await navigator.clipboard.writeText(txt); toast('Rapport copié : colle-le dans la conversation avec ta description.', { kind: 'success', icon: 'check' }); }
+        catch (er) { openSheet(`<h3>Rapport</h3><p class="small muted">Copie ce texte à la main :</p><textarea class="input plain" style="width:100%;height:50vh" readonly>${esc(txt)}</textarea>`); }
+        return;
+      }
       if (x === 'shoprev') { sheet.close(); app.shopReview = true; app.go('codex'); return; } /* v688 */
       if (x === 'deflab') { openDefenseLab(app); return; } /* v594 */
       if (x === 'labo') { sheet.close(); app.go('labo'); return; } /* v595 */

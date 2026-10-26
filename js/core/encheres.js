@@ -78,7 +78,7 @@ export const FEATS_TITLE = 'Commissaire de l’Abîme';
 export const LAST_TITLE = 'Acquéreur du Néant';
 export const TABLE = Object.fromEntries(TABLES.map((t) => [t.key, t]));
 export const tableBg = (key) => `assets/sceaux/${TABLE[key]?.bg || 'salle-encheres'}.webp`; /* v494 : décor peint propre à la salle */
-export const tableUnlocked = (s, i) => i === 0 || !!s.encheres?.beaten?.[TABLES[i - 1].key];
+export const tableUnlocked = (s, i) => i === 0 || !!(s.settings?.dev && s.devGames) || !!s.encheres?.beaten?.[TABLES[i - 1].key];
 export const ENCHERES_REWARD = { firstWin: 100, daily: 40, dailyPaid: 5, afterCap: 5, xp: 10 };
 export const ENCHERES_TITLE = 'Favori de Mammon';
 export const dailyTable = (day, unlocked) => TABLES[hash(`encheres:${day}`) % Math.max(1, Math.min(unlocked, TABLES.length))].key;

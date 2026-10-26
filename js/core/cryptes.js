@@ -82,7 +82,7 @@ export const FEATS_TITLE = 'Mémoire des Cryptes';
 export const LAST_TITLE = 'Gardien du Tombeau';
 export const TABLE = Object.fromEntries(TABLES.map((t) => [t.key, t]));
 export const tableBg = (key) => `assets/sceaux/${TABLE[key]?.bg || 'salle-cryptes'}.webp`; /* v494 : décor peint propre à la salle */
-export const tableUnlocked = (s, i) => i === 0 || !!s.cryptes?.beaten?.[TABLES[i - 1].key];
+export const tableUnlocked = (s, i) => i === 0 || !!(s.settings?.dev && s.devGames) || !!s.cryptes?.beaten?.[TABLES[i - 1].key];
 export const CRYPTES_REWARD = { firstWin: 100, daily: 40, dailyPaid: 5, afterCap: 5, xp: 10 };
 export const CRYPTES_TITLE = 'Gardien des Cryptes';
 export const dailyTable = (day, unlocked) => TABLES[hash(`cryptes:${day}`) % Math.max(1, Math.min(unlocked, TABLES.length))].key;

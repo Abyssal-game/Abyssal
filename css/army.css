@@ -7406,3 +7406,7 @@ html.kb-open .sheet-wrap:not(.sheet-full) .sheet { max-height: 100%; overflow-y:
 .dv.qte-on .dv-row, .dv.qte-on .dv-row *, .dv.qte-on .dv-row *::before, .dv.qte-on .dv-row *::after,
 .dv.qte-on .cb-a, .dv.qte-on .cb-a::after, .dv.qte-on .dv-int, .dv.qte-on .cb-int, .dv.qte-on .cb-warn, .dv.qte-on .dv-threat { animation-play-state: paused !important; }
 .dv.qte-on .cb-banner { display: none; }
+
+/* v804 : Mode Créateur en 4 onglets, collés en haut de la fenêtre */
+.creator .cr-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; position: sticky; top: 0; z-index: 3; margin: 6px 0 10px; }
+.creator .cr-tabs .seg-b { min-width: 0; padding-left: 2px; padding-right: 2px; font-size: .72rem; }
