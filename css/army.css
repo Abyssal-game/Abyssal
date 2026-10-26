@@ -8043,3 +8043,13 @@ img, svg, canvas { -webkit-user-select: none; user-select: none; }
 .dv.cb.cb2 .cb-dock::before { background: radial-gradient(120% 90% at 50% 45%, #5A0C14, #1C0306 72%); }
 .dv.cb.cb2 .cb-dock .cb-def .dv-dodge-bar { width: 72%; }
 .dv.cb.cb2 .cb-dock::before { transition: none; }
+/* v823 : cadres peints du menu de combat (Gemini) : attaque (or, yeux en soleil, lames croisées) et défense (acier, rubis, écus) ;
+   découpe en neuf (tranches mesurées sur l'image), la défense remplace l'attaque à la même taille. */
+.dv.cb.cb2 .cb-dock { border-width: 27px 26px 28px; padding: 4px 6px 3px; border-image: url(../assets/ui/cb-panel-atk.webp) 87 80 90 80 fill / 31px 29px 32px 29px stretch; }
+.dv.cb.cb2.qte-on .cb-dock { border-image: url(../assets/ui/cb-panel-def.webp) 118 72 71 70 fill / 42px 26px 26px 25px stretch; }
+.dv.cb.cb2 .cb-dock::before { display: none; }
+.dv.cb.cb2 .cb-dock .dv-mid .dv-dodge.cb-def { inset: 6px 4px 2px; }
+.dv.cb.cb2 .cb-dock .dv-msg { left: 2px; right: 2px; top: 0; }
+@media (max-height: 720px) { .dv.cb.cb2 .cb-dock { border-width: 24px 24px 25px; padding: 3px 4px 2px; border-image-width: 28px 27px 29px 27px; } .dv.cb.cb2.qte-on .cb-dock { border-image-width: 38px 24px 24px 23px; } }
+.dv.cb.cb2 .cb-dock { border-width: 25px 20px 26px; padding: 4px 4px 3px; border-image-width: 28px 25px 29px 25px; }
+@media (max-height: 720px) { .dv.cb.cb2 .cb-dock { border-width: 22px 19px 23px; border-image-width: 25px 23px 26px 23px; } }
