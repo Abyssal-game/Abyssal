@@ -37,12 +37,15 @@ export function playEnding(app, { name } = {}) {
 export function playPrologue(app) {
   const scenes = [
     { img: 'p1', cam: 'in', voice: 'pro-1', snd: ['ci-forge', 'rumble'], hap: 'heavy', fx: 'embers', text: 'Les sept royaumes ont forgé le Bestiaire interdit pour enfermer ce qui ne devait plus marcher sous le ciel.' },
-    { img: 'p2b', tr: 'ink', cam: 'up', voice: 'pro-2', snd: ['ci-sceller', 'page'], hap: 'double', fx: 'dust', text: 'Sept gardiens, un par royaume, l’ont scellé de leur main. Ce furent les premiers Scelleurs.' },
+    { img: 'p2b', tr: 'ink', cam: 'up', voice: 'pro-2', hap: 'double', fx: 'dust', text: 'Sept gardiens, un par royaume, l’ont scellé de leur main. Ce furent les premiers Scelleurs.' },
     { opt: 'assets/prologue/sceau.webp', cls: 'close', tr: 'black', snd: ['ci-sceller', null], hap: 'medium', fx: 'embers', hold: 1300, /* v779 : gros plan animé attendu (Gemini) : la cire du sceau */
       extra: '<div class="endx-close endx-anim" data-frames="8" data-first="500" data-step="230" data-last="380" style="background-image:url(assets/prologue/sceau.webp)"></div>' },
-    { opt: 'assets/prologue/dechirure.webp', cls: 'close', tr: 'black', snd: ['ci-dechirer', 'rip'], hap: 'tear', fx: 'burst', hold: 900, /* v779 : gros plan animé attendu (Gemini) : le livre qui se déchire */
-      extra: '<div class="endx-close endx-anim" data-frames="8" data-first="600" data-step="170" data-last="300" style="background-image:url(assets/prologue/dechirure.webp)"></div>' },
-    { img: 'p3', tr: 'flash', cam: 'shake', voice: 'pro-3', snd: ['ci-dechirer', 'rip'], hap: 'shatter', fx: ['burst', 'pages'], text: 'Une nuit, quelqu’un l’a déchiré.' },
+    /* v784 : la déchirure en un seul temps : le narrateur parle pendant que les mains se posent sur le livre (image 2 tenue),
+       puis, sa phrase finie, le livre se déchire : bruitage, éclair, vibration et pages, une seule fois */
+    { cls: 'close tear', tr: 'black', voice: 'pro-3', fx: ['pages'], hold: 1500, text: 'Une nuit, quelqu’un l’a déchiré.',
+      climax: { snd: ['ci-dechirer', 'rip'], hitAt: 2, hap: 'shatter' },
+      extra: '<div class="endx-close endx-anim" data-frames="8" data-first="650" data-step="240" data-last="520" data-wait="1" style="background-image:url(assets/prologue/dechirure.webp)"></div>' },
+    { img: 'p3', tr: 'fade', cam: 'shake', hap: 'medium', fx: ['pages', 'ash'], hold: 2200 },
     { img: 'p4', cls: 'top', tr: 'page', cam: 'down', fog: true, voice: 'pro-4', snd: ['ci-chute', 'rumble'], hap: 'heavy', fx: ['pages', 'ash'], hold: 3800, text: 'Ses pages se sont envolées, et ses vingt chapitres sont tombés dans l’Abysse. Quelque chose les attendait.' },
     { img: 'p5', cls: 'last', tr: 'ink', cam: 'out', fog: true, voice: 'pro-5', snd: ['ci-abime', 'page'], hap: 'heartbeat', fx: 'motes', auto: false, text: 'Tu es le dernier à savoir lire les sceaux. Descends, et referme-les.', after: '<button class="btn gold endx-go" data-endx="close">Commencer</button>' },
   ];
@@ -77,7 +80,7 @@ function playScenes(app, scenes, { dir, skipTo = -1, music = null }) {
     scenes.forEach((s) => { if (s.opt) probe(s.opt).then((ok) => { s.ok = ok; }); });
     const vs = voices();
     let i = -1, busy = false, written = false, voiceOn = false, closed = false;
-    let node = null, wrT = 0, autoT = 0, beatT = [], vh = null, stopFx = null, token = 0;
+    let node = null, wrT = 0, autoT = 0, beatT = [], vh = null, stopFx = null, token = 0, release = null, held = false;
     const play = ([k, alt] = []) => { try { if (k && hasSample(k)) sfx[k]?.(); else if (alt) sfx[alt]?.(); } catch (e) { /* son facultatif */ } };
     const prog = () => {
       const k = main.indexOf(scenes[i]); if (k < 0) return; /* gros plan : la barre ne bouge pas */
@@ -93,13 +96,15 @@ function playScenes(app, scenes, { dir, skipTo = -1, music = null }) {
     };
     const finishText = () => {
       if (written) return;
+      /* v784 : scène à temps fort : un toucher fait éclater la déchirure ; la scène se termine avec la dernière image */
+      if (held) { node?.classList.add('written'); release?.(); return; }
       clearTimeout(wrT); written = true;
       node?.classList.add('written'); maybeAuto();
     };
     const show = () => {
       const s = scenes[i], my = ++token;
       clearTimeout(wrT); clearTimeout(autoT); autoT = 0; beatT.forEach(clearTimeout); beatT = [];
-      vh?.stop(); vh = null; voiceOn = false; written = false;
+      vh?.stop(); vh = null; voiceOn = false; written = false; release = null; held = false;
       stopFx?.(); stopFx = null;
       const old = node;
       node = document.createElement('div');
@@ -111,11 +116,25 @@ function playScenes(app, scenes, { dir, skipTo = -1, music = null }) {
       if (tr === 'flash') { const f = document.createElement('i'); f.className = 'endx-flash'; el.appendChild(f); setTimeout(() => f.remove(), 1100); }
       prog();
       try { s.sfx?.(); } catch (e) { /* son facultatif */ }
-      play(s.snd);
+      if (s.snd) play(s.snd);
       if (s.hap) haptic(s.hap);
       (s.beats || []).forEach((sec) => beatT.push(setTimeout(() => { if (hasSample('ci-plume')) sfx['ci-plume'](); haptic('tick'); }, sec * 1000)));
-      if (s.fx && !rm) { const cv = node.querySelector('.endx-fx'); requestAnimationFrame(() => { if (my === token) stopFx = runFx(cv, [].concat(s.fx), light); }); }
-      node.querySelectorAll('.endx-anim').forEach((a) => sprite(a, rm));
+      const startFx = () => { if (s.fx && !rm) { const cv = node.querySelector('.endx-fx'); requestAnimationFrame(() => { if (my === token && !stopFx) stopFx = runFx(cv, [].concat(s.fx), light); }); } };
+      const c = s.climax;
+      if (!c) startFx();
+      node.querySelectorAll('.endx-anim').forEach((a) => {
+        if (!c) return sprite(a, rm);
+        held = true;
+        release = sprite(a, rm, {
+          release: () => { if (my === token) play(c.snd); },
+          frame: (f) => {
+            if (my !== token || f !== c.hitAt) return;
+            haptic(c.hap); startFx();
+            const fl = document.createElement('i'); fl.className = 'endx-flash'; el.appendChild(fl); setTimeout(() => fl.remove(), 1100);
+          },
+          end: () => { if (my !== token) return; held = false; finishText(); },
+        });
+      });
       /* la scène suivante se prépare : image et voix */
       const nx = scenes.slice(i + 1).find((x) => !x.opt || x.ok);
       if (nx?.img) new Image().src = `assets/${dir}/${nx.img}.webp`;
@@ -123,17 +142,17 @@ function playScenes(app, scenes, { dir, skipTo = -1, music = null }) {
         voiceOn = true;
         vs.then((set) => {
           if (my !== token) return;
-          if (!set.has(`${LANG}/${s.voice}`)) { voiceOn = false; maybeAuto(); return; }
+          if (!set.has(`${LANG}/${s.voice}`)) { voiceOn = false; setTimeout(() => { if (my === token) release?.(); }, s.text ? inkMs(s.text) + 300 : 600); maybeAuto(); return; }
           if (nx?.voice && set.has(`${LANG}/${nx.voice}`)) loadVoice(voiceUrl(nx.voice));
           playVoice(voiceUrl(s.voice)).then((h) => {
             if (my !== token) { h?.stop(); return; }
-            if (!h) { voiceOn = false; maybeAuto(); return; }
-            vh = h; setTimeout(() => { if (my === token) { voiceOn = false; vh = null; maybeAuto(); } }, h.ms + 300);
+            if (!h) { voiceOn = false; release?.(); maybeAuto(); return; }
+            vh = h; setTimeout(() => { if (my === token) { voiceOn = false; vh = null; release?.(); maybeAuto(); } }, h.ms + 250);
           });
         });
       }
       /* fin de l'écriture : le texte, et le gros plan animé (l'œil) jusqu'à sa dernière image */
-      wrT = setTimeout(finishText, rm ? 600 : Math.max(s.text ? inkMs(s.text) : 400, animMs(node) + 400));
+      if (!held) wrT = setTimeout(finishText, rm ? 600 : Math.max(s.text ? inkMs(s.text) : 400, animMs(node) + 400));
     };
     const next = (auto) => {
       if (closed || (busy && !auto)) return;
@@ -173,13 +192,23 @@ function animMs(node) {
   return (+a.dataset.first || 0) + (n - 2) * (+a.dataset.step || 300) + (+a.dataset.last || 0);
 }
 /* planche d'images (bande horizontale) jouée image par image ; la première image est tenue un moment */
-function sprite(a, rm) {
+function sprite(a, rm, hooks = {}) {
   const n = +a.dataset.frames || 8, step = +a.dataset.step || 300, last = +a.dataset.last || step;
+  const wait = a.dataset.wait != null ? +a.dataset.wait : -1;
   const at = (f) => { a.style.backgroundPositionX = `${(f / (n - 1)) * 100}%`; };
-  if (rm) return at(n - 1);
-  let f = 0;
-  const go = () => { if (!a.isConnected || f >= n - 1) return; f++; at(f); setTimeout(go, f === n - 2 ? last : step); };
+  let f = 0, released = wait < 0, parked = false;
+  /* v784 : data-wait = image tenue jusqu'à ce que la scène relâche l'animation (fin de la voix, toucher) */
+  const go = () => {
+    if (!a.isConnected || f >= n - 1) return;
+    f++; at(f); hooks.frame?.(f);
+    if (f === n - 1) { setTimeout(() => hooks.end?.(), last); return; }
+    if (!released && f === wait) { parked = true; return; }
+    setTimeout(go, f === n - 2 ? last : step);
+  };
+  const release = () => { if (released) return; released = true; hooks.release?.(); if (parked) { parked = false; go(); } };
+  if (rm) { release(); at(n - 1); hooks.frame?.(n - 1); hooks.end?.(); return release; }
   setTimeout(go, +a.dataset.first || 0);
+  return release;
 }
 
 /* ——— particules (un canevas par scène) ——— */
