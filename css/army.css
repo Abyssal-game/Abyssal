@@ -8325,3 +8325,8 @@ html.fx-light .dv.cb.cb2 .cb-res.ready .cb-gems i.on { animation: none; }
 @media (max-height: 720px) { .dv.cb.cb2 .cb-dock { padding-left: 3px; padding-right: 3px; } .dv.cb.cb2 .cb-swap2 { width: 54px; } }
 .dv.cb.cb2 .cb-swap2 { width: 52px; height: auto; aspect-ratio: .86; align-self: center; }
 @media (max-height: 720px) { .dv.cb.cb2 .cb-swap2 { width: 46px; } }
+
+/* v830 (2 captures du propriétaire, app iPhone) : sur la carte d'un gardien (Jumeaux), l'aperçu du coup (« −6 ◆1 ») passe en haut de la carte,
+   il ne chevauche plus les médaillons ATQ / PV ; médaillons des règles du haut jamais coupés (place autour des anneaux et des pastilles). */
+.dv.cb .dv-c.has-fig .cb-tgt { top: 5% !important; bottom: auto !important; }
+.dv.cb.cb2 .dv-top .cb-rules { max-height: none; height: auto; align-items: center; padding: 6px 6px 6px 4px; margin: -6px 0 -6px -4px; }
