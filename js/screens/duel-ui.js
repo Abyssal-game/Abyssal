@@ -466,7 +466,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   // Synergie entre deux alliés : un trait de lumière relie la poseuse à celle qui exploite, et la bannière le nomme
   const synergy = (byUid, aUid, label) => {
     app.sfx.synergy?.();
-    banner(`<small>Synergie</small>${esc(label)}`, 'synergy', 1000);
+    const bn = banner(`<small>Synergie</small><span class="syn-t">${esc(label)}</span>`, 'synergy', 1000);
+    /* v799 : le texte tient toujours sur une ligne dans la plaque (il rapetisse au besoin, aussi une fois traduit) */
+    requestAnimationFrame(() => { const tx = bn.querySelector('.syn-t'); for (let f = 1; f > 0.6 && tx && tx.scrollWidth > bn.clientWidth - 56; f -= 0.06) tx.style.fontSize = `${f.toFixed(2)}em`; });
     if (reduced) return;
     const box = $('.dv'), a = el(byUid), b = el(aUid); if (!box || !a || !b) return;
     const r0 = box.getBoundingClientRect(), ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
@@ -570,6 +572,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const banner = (html, cls = '', ms = 900) => {
     const b = document.createElement('div'); b.className = `cb-banner ${cls}`; b.innerHTML = html;
     $('.dv').appendChild(b); setTimeout(() => b.remove(), T(ms) + 200);
+    return b;
   };
   const fervorPop = (d, why) => {
     const f = $('.cb-fv'); if (!f) return;

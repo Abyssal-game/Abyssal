@@ -7390,3 +7390,11 @@ html.kb-open .sheet-wrap:not(.sheet-full) .sheet { max-height: 100%; overflow-y:
 @keyframes endxInPulse { 50% { box-shadow: 0 0 60px rgba(232, 195, 90, .45); } }
 @keyframes endxSnd { 50% { transform: scale(1.12); } }
 @media (prefers-reduced-motion: reduce) { .endx-in-em, .endx-in-snd svg { animation: none; } }
+/* v799 : bandeau des synergies refait (le propriétaire : texte jamais bien dans le cadre, couleurs violettes hors de
+   l'identité du jeu) : plaque d'obsidienne liserée d'or, filet rouge sombre, texte sur une ligne qui rapetisse au besoin */
+.dv .cb-banner.synergy { background: linear-gradient(180deg, #17101a 0%, #0b080d 55%, #120a0c 100%) !important; border: 1px solid rgba(232, 195, 90, .75) !important; border-radius: 10px; box-shadow: 0 0 0 3px rgba(8, 5, 8, .9), 0 0 0 4px rgba(232, 195, 90, .35), 0 10px 34px rgba(0, 0, 0, .85), inset 0 0 22px rgba(150, 20, 34, .35) !important; padding: 12px 34px 13px; min-width: 0; width: max-content; max-width: calc(100% - 32px); gap: 4px; -webkit-text-stroke: 0; color: #F3DA94; text-shadow: 0 2px 0 #000, 0 0 16px rgba(232, 195, 90, .45); font: 800 clamp(.92rem, 4.4vw, 1.18rem)/1.15 var(--f-display); letter-spacing: .06em; white-space: nowrap; text-wrap: nowrap; }
+.dv .cb-banner.synergy small { font: 700 .6rem/1 var(--f-ui); letter-spacing: .32em; color: #D9475B; text-shadow: 0 1px 0 #000; -webkit-text-stroke: 0; }
+.dv .cb-banner.synergy::before, .dv .cb-banner.synergy::after { content: ''; position: absolute; top: 50%; width: 16px; height: 1px; background: linear-gradient(90deg, transparent, rgba(232, 195, 90, .9)); }
+.dv .cb-banner.synergy::before { left: 10px; }
+.dv .cb-banner.synergy::after { right: 10px; transform: scaleX(-1); }
+.dv .cb-banner.synergy .syn-t { display: block; white-space: nowrap; }
