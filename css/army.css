@@ -7268,3 +7268,5 @@ img.pa-defy-tag { width: 30%; height: auto; font-size: 0; text-shadow: none; fil
 .endx-s.close::after { display: none; }
 .endx-close { width: min(90vw, 420px); aspect-ratio: 4 / 5; background-repeat: no-repeat; background-size: 800% 100%; background-position: 0 0; -webkit-mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 60%, transparent 100%); mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 60%, transparent 100%); }
 @media (prefers-reduced-motion: reduce) { .endx-fog, .endx-fog::after { animation: none !important; } }
+/* v781 : gros plan des yeux qui s'ouvrent (fin) en 4:3 */
+.endx-close.wide { width: min(94vw, 460px); aspect-ratio: 4 / 3; }
