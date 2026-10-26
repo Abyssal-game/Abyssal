@@ -13,6 +13,7 @@ import { openServerState } from './server-state.js'; /* v678 */
 import { perfOn, setPerf, perfLog, perfClear, perfReport } from '../ui/perf.js'; /* v601 */
 import { partieErrs } from '../cloud/partie.js'; /* v740 */
 import { openPack } from './opening.js'; /* v769 */
+import { playTestDuel, TEST_LINEUPS } from './versus-test.js'; /* v803 */
 import { playEnding, playPrologue, CINE_SCENES } from './ending.js';
 import { LANGS, LANG } from '../i18n.js';
 
@@ -33,6 +34,9 @@ export function openCreator(app) {
   if (!CINE_SCENES[cine.film]) cine.film = 'prologue';
   if (!LANGS[cine.lang]) cine.lang = LANG;
   const saveCine = () => { try { localStorage.setItem(CINE_KEY, JSON.stringify(cine)); } catch (e) { /* rien */ } };
+  /* v803 : réglages du duel d'essai du Choc, gardés sur l'appareil */
+  let chocDev = { lineup: 'std1', force: 'any' };
+  try { chocDev = { ...chocDev, ...JSON.parse(localStorage.getItem('abyssal.chocDev') || '{}') }; } catch (e) { /* rien */ }
   const B = (x, label, cls = '') => `<button class="btn small ${cls}" data-x="${x}">${label}</button>`;
   function draw() {
     const d = g.descent(), f = g.s.devForce;
@@ -90,6 +94,12 @@ export function openCreator(app) {
         <p class="small muted">${d.run ? `Chapitre en cours : étage ${d.run.floor}.` : 'Lance une Descente pour pouvoir sauter d’étage.'}</p>
       </section>
 
+      <section class="cr-sec cr-choc" translate="no"><h3>Choc des Boosters (essai)</h3>
+        <p class="small muted">Un face-à-face complet contre un adversaire fictif, sans serveur ni autre joueur. Rien n’est payé, gagné ni enregistré.</p>
+        <p class="small">Boosters</p><div class="row gap wrap">${[['std1', '1 standard'], ['mix3', 'Standard + Faction + Premium'], ['prem3', '3 premium'], ['choc', 'Composition du Choc']].map(([k, l]) => `<button class="btn small ${chocDev.lineup === k ? 'gold' : 'ghost'}" data-choc="lineup" data-v="${k}">${l}</button>`).join('')}</div>
+        <p class="small">Résultat</p><div class="row gap wrap">${[['any', 'Au hasard'], ['win', 'Victoire'], ['lose', 'Défaite'], ['tie', 'Égalité']].map(([k, l]) => `<button class="btn small ${chocDev.force === k ? 'gold' : 'ghost'}" data-choc="force" data-v="${k}">${l}</button>`).join('')}</div>
+        <div class="row gap wrap">${B('choc', 'Lancer un duel d’essai', 'gold')}</div></section>
+
       <section class="cr-sec"><h3>Cercle de l’Abysse</h3>
         <p class="small muted">${g.s.devGames ? 'Ouverte : tu peux jouer aux jeux comme si le gardien de l’étage 5 était vaincu.' : 'Ouvre les jeux (Duels des Sceaux, Cryptes, Pacte, Enchères) comme si le gardien de l’étage 5 était vaincu.'} Ta campagne ne change pas, et tout se referme si tu désactives le Mode Créateur.</p>
         <div class="row gap wrap">${B('games', g.s.devGames ? 'Refermer le Cercle de l’Abysse' : 'Ouvrir le Cercle de l’Abysse', g.s.devGames ? '' : 'gold')}</div></section>
@@ -143,6 +153,8 @@ export function openCreator(app) {
     if (fr) { g.s.devForce = g.s.devForce?.rarity === fr.dataset.force ? null : { rarity: fr.dataset.force, variant: g.s.devForce?.variant || '' }; g.persist(); return draw(); }
     if (fv) { if (!g.s.devForce) g.s.devForce = { rarity: 'M', variant: '' }; g.s.devForce.variant = fv.dataset.fvar; g.persist(); return draw(); }
     if (e.target.id === 'bpow') { ui.bpow = e.target.checked; return; }
+    const ch = e.target.closest('[data-choc]');
+    if (ch) { chocDev[ch.dataset.choc] = ch.dataset.v; try { localStorage.setItem('abyssal.chocDev', JSON.stringify(chocDev)); } catch (er) { /* rien */ } return draw(); }
     const cf = e.target.closest('[data-cfilm]'), cl = e.target.closest('[data-clang]');
     if (cf) { cine.film = cf.dataset.cfilm; cine.start = 0; saveCine(); return draw(); }
     if (cl) { cine.lang = cl.dataset.clang; saveCine(); return draw(); }
@@ -177,6 +189,10 @@ export function openCreator(app) {
       if (x === 'free') g.devFreePacks();
       if (x === 'abyss' || x === 'abyss1') { g.devAbyss(x === 'abyss1'); sheet.close(); setTimeout(() => openPack(app, 'abysse', { onDone: () => openCreator(app) }), 350); return; } /* v769 : fenêtre fermée pendant l'ouverture, rouverte après */
       if (x === 'abyss5') g.devAbyss(false, 5);
+      if (x === 'choc') { /* v803 : duel d'essai du Choc des Boosters */
+        const lineup = chocDev.lineup === 'choc' ? (app.state.versus?.lineup || TEST_LINEUPS.std1) : TEST_LINEUPS[chocDev.lineup];
+        sheet.close(); setTimeout(() => playTestDuel(app, { lineup, force: chocDev.force, onClose: () => openCreator(app) }), 350); return;
+      }
       if (x === 'cine') { /* v785 : prologue ou fin, langue et scène de départ au choix */
         cine.start = +(sheet.el?.querySelector('#cine-start')?.value ?? document.getElementById('cine-start')?.value ?? 0) || 0;
         const nm = document.getElementById('cine-name'); if (nm) cine.name = nm.value.trim();
