@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v806';
+const VERSION = 'abyssal-v807';
 const ART_CACHE = 'abyssal-media';  // images du jeu : gardées entre les versions
 const FONT_CACHE = 'abyssal-fonts';
 const CORE = [
@@ -15,7 +15,7 @@ const CORE = [
   'js/screens/bestiary.js', 'js/screens/factions.js', 'js/screens/achievements.js', 'js/screens/profile.js',
   'js/screens/settings.js', 'js/screens/furnace.js', 'js/screens/shadow.js', 'js/screens/forge.js', 'js/screens/chest-open.js', 'js/screens/descent.js', 'js/screens/ending.js', 'js/screens/trials.js', 'js/screens/account.js', 'js/screens/creator.js', 'js/ui/errlog.js', 'js/screens/defense-lab.js', 'js/screens/lab.js', 'js/core/lab.js', 'js/screens/lab-forge.js', 'js/ui/def-bar.js', 'js/ui/def-tune.js', 'js/ui/perf.js', 'js/screens/menu.js', 'js/screens/welcome.js', 'js/cloud/cloud.js', 'js/cloud/sync.js', 'js/cloud/partie.js', 'js/core/ops.js', 'js/core/oprec.js', 'js/core/detmath.js', 'js/cloud/presence.js', 'js/cloud/sql-stamps.js', 'js/screens/server-state.js', 'js/ui/tutos.js', 'js/ui/report.js', 'js/ui/gate.js', 'js/ui/sceaux-demo.js', 'js/core/moderation.js', 'js/core/descent.js', 'js/core/story.js', 'js/core/skills.js', 'js/ui/coach.js', 'js/ui/braise.js', 'js/ui/depth.js', 'js/ui/voice.js', 'js/ui/voice-key.js', 'js/core/voices.js', 'js/core/voice-cast.js', 'js/core/lore-lines.js',
   /* v536 : modules qui manquaient (hors ligne après une mise à jour, l'app ne démarrait pas ; un test vérifie maintenant la liste) */
-  'js/cloud/mpwatch.js', 'js/core/codex.js', 'js/core/friends.js', 'js/core/mp.js', 'js/core/versus.js', 'js/i18n/en.js', 'js/notify.js', 'js/screens/codex.js', 'js/screens/cryptes-mp.js', 'js/screens/encheres-mp.js', 'js/screens/friends.js', 'js/screens/mp-lobby.js', 'js/screens/pacte-mp.js', 'js/screens/sceaux-mp.js', 'js/screens/versus-duel.js', 'js/screens/versus-test.js', 'js/screens/versus.js',
+  'js/cloud/mpwatch.js', 'js/core/codex.js', 'js/core/friends.js', 'js/core/mp.js', 'js/core/versus.js', 'js/ui/choc.js', 'js/i18n/en.js', 'js/notify.js', 'js/screens/codex.js', 'js/screens/cryptes-mp.js', 'js/screens/encheres-mp.js', 'js/screens/friends.js', 'js/screens/mp-lobby.js', 'js/screens/pacte-mp.js', 'js/screens/sceaux-mp.js', 'js/screens/versus-duel.js', 'js/screens/versus-test.js', 'js/screens/versus.js',
   'js/core/army.js', 'js/core/duel.js', 'js/core/kits.js', 'js/core/kits-data.js', 'js/core/synergy.js', 'js/core/renown.js', 'js/core/unlocks.js', 'js/screens/army.js', 'js/screens/duel-ui.js', 'js/ui/chest.js', 'js/ui/scene.js',
   'data/factions.json', 'data/sets.json', 'data/abilities.json', 'data/achievements.json', 'data/lore.json',
   'data/cards/infernal.json', 'data/cards/abyssal.json', 'data/cards/celeste.json', 'data/cards/sauvage.json',

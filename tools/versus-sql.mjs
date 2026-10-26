@@ -3,6 +3,7 @@
 import fs from 'node:fs';
 import { TABLES, BOOSTERS, VARIANT_RATES, LUCK_POINTS } from '../js/config.js';
 import { VERSUS_TYPES } from '../js/core/versus.js';
+import { EMOTES, FREE_EMOTES } from '../js/core/codex.js';
 
 const root = new URL('..', import.meta.url);
 const cards = [];
@@ -22,6 +23,7 @@ const pts = ['C', 'PC', 'R', 'HR', 'M', 'S'].map((r) => `when ${q(r)} then ${LUC
 const prix = VERSUS_TYPES.map((t) => `when ${q(t)} then ${BOOSTERS[t].price}`).join(' ');
 const sql = fs.readFileSync(new URL('tools/versus-template.sql', root), 'utf8')
   .replace('--CARTES--', rows).replace('--POIDS--', poids).replace('--BOOSTERS--', boosters)
-  .replace('--FINITIONS--', fin).replace('--POINTS--', pts).replace('--PTVAR--', String(LUCK_POINTS.variant)).replaceAll('--PRIX--', prix);
+  .replace('--FINITIONS--', fin).replace('--POINTS--', pts).replace('--PTVAR--', String(LUCK_POINTS.variant)).replaceAll('--PRIX--', prix)
+  .replace('--REACTIONS--', Object.keys(EMOTES).map(q).join(', ')).replace('--REACTIONS_LIBRES--', FREE_EMOTES.map(q).join(', ')); // v807
 fs.writeFileSync(new URL('supabase/08-versus.sql', root), sql);
 console.log(cards.length, 'cartes');

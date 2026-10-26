@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { loadCatalog, MemoryStorage, rngFrom, noWelcome } from './helpers.mjs';
 import { Game } from '../js/core/game.js';
-import { VERSUS_PRIZE } from '../js/core/versus.js';
+import { VERSUS_PRIZE, streakMult } from '../js/core/versus.js';
 const catalog = loadCatalog();
 const now = new Date('2026-11-02T10:00:00');
 const fresh = () => noWelcome(new Game(catalog, new MemoryStorage(), { rng: rngFrom('c'), clock: () => now }));
@@ -28,7 +28,7 @@ test('v735 : le perdant garde ses cartes, le gagnant reçoit une copie, un coffr
   // limite : 6 boosters par jour comptent pour le butin (2 + 1 + 1 déjà comptés)
   const w4 = g.versusApply('d4', { result: 'win', cards: [], stake: 1200, packs: 3, trophy: { id: hr.id } });
   assert.equal(w4.counted, 2);
-  assert.equal(w4.shards, Math.round(1200 * VERSUS_PRIZE.win * 2 / 3 / 5) * 5);
+  assert.equal(w4.shards, Math.round(1200 * VERSUS_PRIZE.win * streakMult(3) * 2 / 3 / 5) * 5, 'v807 : 3e victoire d’affilée, butin ×2');
   const w5 = g.versusApply('d5', { result: 'win', cards: [], stake: 400, packs: 1, trophy: { id: hr.id } });
   assert.equal(w5.counted, 0);
   assert.equal(w5.shards, 0);

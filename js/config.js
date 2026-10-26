@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v806'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v807'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -141,6 +141,7 @@ export const FRAMES = {
   sceaux: 'Cadre des Sceaux', reliques: 'Cadre des Reliques', guerre: 'Cadre de la Guerre',
   braise: 'Cadre de braise', forge: 'Cadre de la Forge', phenix: 'Cadre du Phénix',
   oeil: 'Cadre de l’Œil de l’Abysse', /* v392 : vaincre L’Abysse, étage 100 */
+  choc: 'Cadre du Choc', /* v807 : 100 victoires au Choc des Boosters */
 };
 // v348 : cadres de profil achetés avec des cendres à la Fournaise (purement cosmétiques : une utilité aux cendres
 // quand l'équipe est au niveau maximal)

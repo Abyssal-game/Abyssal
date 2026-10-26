@@ -13,7 +13,7 @@ export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par c
 import { FINAL_FLOOR, BOOSTERS, FREE_PACK, BRAISE, TORCHES, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, sublimeObs, VARIANTS, FIN_ORDER } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
-import { VERSUS_PRIZE } from './versus.js'; /* v735 */
+import { VERSUS_PRIZE, streakMult, STREAK_CHESTS, LEAGUES, LEAGUE_REWARD, leagueIdx, leagueDelta, cardPts } from './versus.js'; /* v735, v807 */
 import { CODEX, CODEX_XP, SHOP, CATALOG, FREE_EMOTES, codexTier, seasonFor, tiersOf, freshCodex, pendingOf, CODEX_OPEN, QUEST_KINDS, questsFor, seasonWeek } from './codex.js';
 import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, lateSoft, bossEase, earlyHp, expectedLevel, cardPower, powerFor, advisedPower, floorForPower, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative, act as duelActRaw, useUlt, beginEnemyTurn, nextEnemy, takeSkips, enemyAct, endEnemyTurn, RHYTHM } from './duel.js';
@@ -508,6 +508,21 @@ export class Game {
   versusRefund(stake) { if (stake > 0) { this.s.shards += stake; this.s.stats.shardsSpent = Math.max(0, this.s.stats.shardsSpent - stake); this.s.versus.spent = Math.max(0, this.s.versus.spent - stake); this.persist(); } }
   // res = réponse de versus_claim : { result: win|tie|lose|refund|already|wait, cards, stake, packs, trophy, chest }
   // v735 : chacun garde ses cartes ; butin du gagnant donné par le jeu (VERSUS_PRIZE, js/core/versus.js)
+  /* v807 : Ligues du Choc, une par mois (à l'heure du joueur). Au changement de mois, la ligue où l'on finit donne sa
+     récompense (s'il y a eu au moins un duel) ; les points repartent de zéro. Lecture paresseuse (ops.js : lazy). */
+  chocLeague() {
+    const v = this.s.versus, m = today(this.clock()).slice(0, 7);
+    if (!v.lg || typeof v.lg !== 'object') v.lg = { m, pts: 0, top: 0, played: 0 };
+    const lg = v.lg;
+    if (lg.m !== m) {
+      const tier = leagueIdx(lg.pts), rw = lg.played ? LEAGUE_REWARD[LEAGUES[tier].k] : null;
+      if (rw) this.grant(rw, 'choc');
+      v.lgLast = { m: lg.m, tier, pts: lg.pts || 0, top: lg.top || 0, played: lg.played || 0, reward: !!rw };
+      v.lg = { m, pts: 0, top: 0, played: 0 };
+      this.persist();
+    }
+    return v.lg;
+  }
   versusApply(id, res) {
     const v = this.s.versus;
     if (!res || v.done[id] || !['win', 'tie', 'lose', 'refund'].includes(res.result)) return null;
@@ -529,10 +544,23 @@ export class Game {
     const packs = Math.max(1, Math.min(3, res.packs || 1)), counted = Math.max(0, Math.min(packs, VERSUS_PRIZE.packsPerDay - (v.prizePacks || 0)));
     v.prizePacks = (v.prizePacks || 0) + counted;
     out.counted = counted; out.packs = packs;
+    /* v807 : la Série ardente (une défaite l'éteint, une égalité la garde) multiplie le butin en éclats d'une victoire */
+    const before = v.streak || 0, after = res.result === 'win' ? before + 1 : res.result === 'lose' ? 0 : before;
+    out.streak = { before, after, broken: res.result === 'lose' && before >= 2 };
+    out.mult = res.result === 'win' ? streakMult(after) : 1;
     if (counted > 0 && (res.result === 'win' || res.result === 'tie')) {
-      out.shards = Math.round((res.stake || 0) * VERSUS_PRIZE[res.result] * counted / packs / 5) * 5;
+      out.shards = Math.round((res.stake || 0) * VERSUS_PRIZE[res.result] * out.mult * counted / packs / 5) * 5;
       if (out.shards > 0) this.grant({ shards: out.shards }, 'versus');
     }
+    if (counted > 0 && res.result === 'win' && STREAK_CHESTS[after]) { const k = STREAK_CHESTS[after]; this.addChests({ [k]: 1 }); out.streakChest = k; }
+    /* v807 : Ligue du mois : points gagnés ou perdus à chaque duel (même au-delà du butin du jour) */
+    const lg = this.chocLeague(), old = lg.pts || 0, tierBefore = leagueIdx(old);
+    lg.pts = Math.max(0, old + leagueDelta(res.result, before)); lg.played = (lg.played || 0) + 1;
+    const tierAfter = leagueIdx(lg.pts);
+    lg.top = Math.max(lg.top || 0, tierAfter); v.lgTop = Math.max(v.lgTop || 0, tierAfter);
+    out.league = { before: tierBefore, after: tierAfter, pts: lg.pts, delta: lg.pts - old };
+    /* plus belle carte jamais sortie au Choc (tableau de chasse) */
+    for (const c of res.cards || []) { const pts = c.pts ?? cardPts(c); if (this.catalog.get(c.id) && pts > (v.bestCard?.pts || 0)) v.bestCard = { id: c.id, variant: c.variant || 'normal', pts }; }
     if (counted > 0 && res.result === 'win' && Array.isArray(res.choices) && res.choices.length) {
       /* v736 : le gagnant choisit ensuite sa carte parmi celles de l'adversaire (versusPick) */
       (v.pick ||= {})[id] = true; out.pick = true; out.choices = res.choices;
@@ -541,7 +569,7 @@ export class Game {
       if (tc && VERSUS_PRIZE.trophyRar.includes(tc.rarity)) { const r = this.addCard(tr.id, tr.variant || 'normal', 'booster'); out.trophy = { ...tr, ...r }; }
       else if (res.chest === 'abyssal' || tc) { this.addChests({ abyssal: 1 }); out.chest = 'abyssal'; }
     }
-    v.streak = res.result === 'win' ? (v.streak || 0) + 1 : res.result === 'lose' ? 0 : (v.streak || 0);
+    v.streak = after;
     v.best = Math.max(v.best || 0, v.streak);
     v.won += out.cards.length + (out.trophy ? 1 : 0);
     this.s.xp += 10;
@@ -556,7 +584,13 @@ export class Game {
     delete v.pick[id];
     const out = { trophy: null, chest: null };
     const tc = res.trophy && this.catalog.get(res.trophy.id);
-    if (tc && VERSUS_PRIZE.trophyRar.includes(tc.rarity)) { const r = this.addCard(res.trophy.id, res.trophy.variant || 'normal', 'booster'); out.trophy = { ...res.trophy, ...r }; v.won++; }
+    if (tc && VERSUS_PRIZE.trophyRar.includes(tc.rarity)) {
+      const r = this.addCard(res.trophy.id, res.trophy.variant || 'normal', 'booster'); out.trophy = { ...res.trophy, ...r }; v.won++;
+      /* v807 : carte trophée : « Gagnée au Choc contre X » (pseudo donné par le serveur, 30 dernières) */
+      const foe = typeof res.foe === 'string' ? res.foe.replace(/[<>&"]/g, '').slice(0, 24) : '';
+      const tr = (v.trophies ||= {}); tr[res.trophy.id] = { f: foe, d: today(this.clock()) };
+      const ks = Object.keys(tr); if (ks.length > 30) for (const k of ks.slice(0, ks.length - 30)) delete tr[k];
+    }
     else if (res.chest === 'abyssal' || tc) { this.addChests({ abyssal: 1 }); out.chest = 'abyssal'; }
     out.progress = this.checkProgress();
     this.persist();
@@ -2239,6 +2273,9 @@ export class Game {
       case 'trophies': return Object.values(this.s.hunt).filter((k) => k >= HUNT_STAGES[3].k).length;
       case 'trialWins': return this.s.stats.trialWins || 0; /* v421 */
       case 'trialPerfect': return this.s.stats.trialPerfect || 0;
+      case 'chocWins': return this.s.versus?.wins || 0; /* v807 : Choc des Boosters */
+      case 'chocStreak': return this.s.versus?.best || 0;
+      case 'chocLeague': return this.s.versus?.lgTop || 0;
       case 'finish': return Object.values(this.s.collection).filter((e) => (e.v?.[c.v] || 0) > 0).length;
       case 'cardLevel': return Math.max(0, ...Object.keys(this.s.collection).filter((id) => this.catalog.get(id)).map((id) => this.cardLevel(id)));
       default: return 0;

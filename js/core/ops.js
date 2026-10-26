@@ -40,6 +40,7 @@ export const OPS = {
   cryptesFlip: { kind: 'sync' }, cryptesPower: { kind: 'sync' }, cryptesAi: { kind: 'sync' }, encheresBid: { kind: 'sync' },
   // Codex et Échoppe (obsidiennes)
   codex: { kind: 'sync', lazy: (s) => `${s.codex?.season}:${s.codex?.live ? 1 : 0}` }, /* v550 : changement de saison (et récompenses oubliées données) */
+  chocLeague: { kind: 'sync', lazy: (s) => s.versus?.lg?.m }, /* v807 : Ligues du Choc, changement de mois */
   codexClaim: { kind: 'sync' }, codexClaimAll: { kind: 'sync' }, catalogBuy: { kind: 'sync' }, codexUnlock: { kind: 'dev' }, codexBuyTier: { kind: 'sync' }, /* v680 */
   // v680 : achats payés (App Store) : le serveur les vérifie lui-même auprès de RevenueCat (serveur/iap.mjs)
   iapSync: { kind: 'first', net: true },
@@ -84,6 +85,7 @@ export function digest(s) {
     s.descent?.best || 0, s.braises || 0, Object.keys(s.fallen || {}).sort().join(','), /* v668 */ s.descent?.run ? `${s.descent.run.floor}:${s.descent.run.phase}:${s.descent.run.shards}` : '-',
     (s.titles || []).length, (s.frames || []).length, (s.backs || []).length, (s.sachets || []).length, (s.plates || []).length, (s.emotes || []).length, (s.mats || []).length, (s.fonds || []).length, (s.finishes || []).length, /* v574 : cosmétiques comptés */ Object.keys(s.achievements || {}).length, (s.missions?.list || []).map((x) => `${x.p}${x.claimed ? 'c' : ''}`).join(''),
     s.codex ? `${s.codex.season}:${s.codex.premium ? 1 : 0}:${s.codex.xp || 0}:${(s.codex.free || []).length}:${(s.codex.prem || []).length}` : '-', (s.purchases || []).length, /* v728 : Codex et achats comptés (un Codex payé n'arrivait jamais sur le téléphone) */
+    `${s.versus?.streak || 0}:${s.versus?.lg?.m || ''}:${s.versus?.lg?.pts || 0}`, /* v807 : Série ardente et Ligue du Choc */
     s.seedBase ?? '-', s.seedN || 0, ...SESS.map((p) => sessPrint(getPath(s, p)))];
   let h = 2166136261;
   for (const ch of parts.join('|')) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
@@ -111,7 +113,7 @@ export const ARGS = {
   pacteStart: [{ table: 'S', daily: 'b' }], pacteFinish: [], pacteQuit: [], cryptesStart: [{ table: 'S', daily: 'b' }], cryptesFinish: [], cryptesQuit: [], cryptesResume: [],
   encheresStart: [{ table: 'S', daily: 'b' }], encheresFinish: [], encheresQuit: [], gameForfeit: ['s'], tourneyPlay: [],
   sceauxPlay: ['i', 'i'], sceauxAi: [], pacteDraw: [], pacteStop: [], pacteDouble: [], pacteAi: [], cryptesFlip: ['i'], cryptesPower: ['ai'], cryptesAi: [], encheresBid: ['i'],
-  codex: [], codexClaim: ['s', 'i'], codexClaimAll: [], catalogBuy: ['s'], codexBuyTier: [], shadowPay: ['s'],
+  codex: [], chocLeague: [], codexClaim: ['s', 'i'], codexClaimAll: [], catalogBuy: ['s'], codexBuyTier: [], shadowPay: ['s'],
 };
 const isInt = (v) => Number.isInteger(v);
 function argOk(t, v) {

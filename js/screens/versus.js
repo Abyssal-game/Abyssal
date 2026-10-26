@@ -5,7 +5,7 @@
 import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
 import { BOOSTERS, LUCK_POINTS, RARITY, FACTION_ORDER, VARIANTS } from '../config.js';
-import { VERSUS_TYPES, VERSUS_MAX, VERSUS_HOURS, VERSUS_PRIZE, scoreOf, lineupStake, lineupOf, lineupOk } from '../core/versus.js';
+import { VERSUS_TYPES, VERSUS_MAX, VERSUS_HOURS, VERSUS_PRIZE, scoreOf, lineupStake, lineupOf, lineupOk, LEAGUES, LEAGUE_PTS, LEAGUE_REWARD, STREAK_CHESTS, STREAK_MULT, streakMult, leagueIdx } from '../core/versus.js';
 import { today } from '../core/save.js';
 import { isBlocked } from '../core/moderation.js';
 import { artUrl } from '../art/assets.js';
@@ -13,7 +13,7 @@ import { icon, sigil, EMBLEM, picon } from '../ui/icons.js';
 import { profileAttrs } from '../ui/report.js';
 import { esc, fmt, toast, confirmBox, openSheet, bindActions, pending, withPending } from '../ui/dom.js';
 import { packHTML } from './shop.js';
-import { playDuel, pickGridHTML } from './versus-duel.js';
+import { playDuel, pickGridHTML, leagueBadge, flameHTML } from './versus-duel.js';
 import { checkTurns } from '../cloud/mpwatch.js';
 import { t, tx } from '../i18n.js';
 
@@ -26,6 +26,8 @@ const HOW = [['booster', '#E8C35A', 'Compose ton défi', `Choisis jusqu’à ${V
   ['cards', '#C9A45A', 'Les points', `Quand un joueur relève le défi, les boosters des deux joueurs s’ouvrent. Commune ${LUCK_POINTS.C}, Peu commune ${LUCK_POINTS.PC}, Rare ${LUCK_POINTS.R}, Hyper rare ${LUCK_POINTS.HR}, Mythique ${LUCK_POINTS.M}, Secrète ${LUCK_POINTS.S}, +${LUCK_POINTS.variant} par finition.`],
   ['crown', '#F2C14E', 'La victoire', `Le meilleur total gagne un butin offert par l’Abysse : la copie d’une carte de son choix parmi celles de l’adversaire (une Mythique ou une Secrète donne un coffre abyssal) et ${Math.round(VERSUS_PRIZE.win * 100)} % du prix de ses boosters en éclats. L’adversaire ne perd rien.`],
   ['seal', '#7FE0A0', 'Égalité', `Chacun reçoit ${Math.round(VERSUS_PRIZE.tie * 100)} % du prix de ses boosters en éclats.`],
+  ['streak', '#FF8A3D', 'La Série ardente', `Chaque victoire d’affilée multiplie ton butin en éclats (jusqu’à ×${STREAK_MULT.at(-1)}) ; à ${Object.keys(STREAK_CHESTS).join(', ')} victoires d’affilée, un coffre en plus. Une défaite éteint la série, une égalité la garde.`],
+  ['crown', '#9C7BFF', 'Les Ligues du mois', `Chaque duel rapporte ou coûte des points : victoire +${LEAGUE_PTS.win} (plus un bonus de série), défaite ${LEAGUE_PTS.lose}. Ligues ${LEAGUES.map((l) => l.name).join(', ')} : on peut monter et redescendre. Le mois fini, ta ligue te donne sa récompense, puis tout repart de zéro.`],
   ['hourglass', '#C9A45A', 'Chaque jour', `Le butin compte pour ${VERSUS_PRIZE.packsPerDay} boosters par jour. Au-delà, on joue pour la gloire : chacun garde toujours ses cartes.`],
   ['ui-eye', '#E0485E', 'Aucune triche', 'Les boosters sont ouverts par le serveur : personne ne peut truquer les tirages.']];
 const TYPE_NAME = { standard: 'Standard', faction: 'Faction', event: 'Alliances', premium: 'Premium' };
@@ -58,6 +60,35 @@ export default function versusScreen(app, root) {
     return `<header class="screen-head ui-hero bn-versus"><h1>Le Choc des Boosters</h1><p class="muted">Vos boosters s’ouvrent face à face. Chacun garde ses cartes, le meilleur total gagne un butin.</p></header>`;
   }
 
+  /* v807 : ta Ligue du mois et ta Série ardente, en tête du Choc */
+  const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+  const monthName = (m) => `${t(MONTHS[+m.slice(5, 7) - 1] || '')} ${m.slice(0, 4)}`;
+  function leagueHTML() {
+    const lg = g.chocLeague(), v = g.s.versus, i = leagueIdx(lg.pts), L = LEAGUES[i], N = LEAGUES[i + 1];
+    const d = new Date(g.clock()), left = new Date(d.getFullYear(), d.getMonth() + 1, 1) - d, days = Math.max(1, Math.ceil(left / 86400000));
+    const pct = N ? Math.round(((lg.pts - L.min) / (N.min - L.min)) * 100) : 100;
+    const rw = LEAGUE_REWARD[L.k], rwTxt = rw ? Object.entries(rw.chests || {}).map(([k]) => t(`coffre ${k === 'fer' ? 'de fer' : k === 'or' ? 'd’or' : 'abyssal'}`)).concat(rw.tickets?.premium ? [t('{n} tickets premium', { n: rw.tickets.premium })] : []).join(' + ') : t('aucune récompense');
+    const s = v.streak || 0;
+    return `<section class="panel vs-league" style="--lgc:${L.color}">
+      <div class="vs-lg-top">${leagueBadge(i, 'big')}<div class="vs-lg-t"><b>${t('Ligue {l}', { l: t(L.name) })}</b><small>${fmt(lg.pts)} ${t('points')} · ${t('fin dans {n} j', { n: days })}</small></div>${s >= 1 ? flameHTML(s, 'big') : ''}</div>
+      <div class="vs-lg-bar"><i style="width:${pct}%"></i></div>
+      <p class="small muted">${N ? t('Ligue {l} à {n} points.', { l: t(N.name), n: N.min }) : t('Tu es tout en haut : tiens bon jusqu’à la fin du mois.')} ${t('Si le mois finissait maintenant : {r}.', { r: rwTxt })}</p>
+      <p class="small">${s >= 1 ? t('Série ardente : <b>{n}</b> · prochaine victoire, butin ×{m}', { n: s, m: String(streakMult(s + 1)).replace('.', ',') }) : t('Gagne un duel pour allumer ta Série ardente.')}</p>
+    </section>`;
+  }
+  // résultat du mois passé, montré une fois
+  function lastMonth() {
+    const x = g.s.versus.lgLast; let seen = null;
+    try { seen = localStorage.getItem('abyssal.chocSeen'); } catch (e) { /* stockage indisponible */ }
+    if (!x || !x.played || seen === x.m) return;
+    try { localStorage.setItem('abyssal.chocSeen', x.m); } catch (e) { /* idem */ }
+    const L = LEAGUES[x.tier], rw = LEAGUE_REWARD[L.k];
+    openSheet(`<div class="center stack">${leagueBadge(x.tier, 'huge')}<h2>${t('Fin de la Ligue · {m}', { m: monthName(x.m) })}</h2>
+      <p>${t('Tu termines en ligue <b>{l}</b> avec {n} points.', { l: t(L.name), n: fmt(x.pts) })}</p>
+      <p class="small muted">${rw ? t('Ta récompense est dans tes coffres.') : t('Atteins la ligue Argent pour gagner une récompense.')}</p>
+      <p class="small muted">${t('Une nouvelle ligue commence : tout le monde repart de zéro.')}</p></div>`, { label: t('Ligue du mois') });
+  }
+
   function draw() {
     if (!alive) return;
     /* v528 : le compte est obligatoire (porte du compte au lancement) : seul le pseudo peut manquer */
@@ -74,6 +105,7 @@ export default function versusScreen(app, root) {
     const open = (data?.open || []).filter((r) => !isBlocked(r.a) && r.a !== me);
     root.innerHTML = `${head()}
       ${err ? `<p class="panel small center">${icon('info')} ${esc(err)}</p>` : ''}
+      ${leagueHTML()}
       ${toSee.length ? `<section class="panel vs-sec vs-hot"><h2 class="section-title">Duels à voir <span class="pill-n">${toSee.length}</span></h2>
         ${toSee.map((r) => row(r, `<button class="btn small primary" data-act="see" data-id="${esc(r.id)}">Voir le duel</button>`, `${lbl(r)} · ton défi a été relevé`)).join('')}</section>` : ''}
       ${mine.filter((r) => g.s.versus.pick?.[r.id]).length ? `<section class="panel vs-sec vs-hot"><h2 class="section-title">Butin à choisir</h2>
@@ -87,8 +119,8 @@ export default function versusScreen(app, root) {
       ${waiting.length ? `<section class="panel vs-sec"><h2 class="section-title">Tes défis en attente</h2>
         ${waiting.map((r) => row(r, `<button class="btn small ghost" data-act="cancel" data-id="${esc(r.id)}">Annuler</button>`, `${lbl(r)} · ${r.public ? 'ouvert à tous' : 'pour ton ami'} · encore ${left(r.created_at)} h`, true)).join('')}
         <p class="small muted">Tes éclats te sont rendus si personne ne relève ton défi en ${VERSUS_HOURS} h, ou si tu l’annules.</p></section>` : ''}
-      ${past.length ? `<details class="panel dc-fold vs-sec"><summary><span class="dc-sum-t">Derniers duels</span></summary>
-        ${past.map((r) => { const res = r.my_score > r.their_score ? 'win' : r.my_score === r.their_score ? 'tie' : 'lose'; return row(r, g.s.versus.pick?.[r.id] ? `<button class="btn small primary" data-act="pickloot" data-id="${esc(r.id)}">${icon('crown')} Choisir mon butin</button>` : `<button class="btn small ghost" data-act="replay" data-id="${esc(r.id)}"><b class="vs-res ${res}">${RES[res]}</b> ${fmt(r.my_score)} – ${fmt(r.their_score)}</button>`, lbl(r)); }).join('')}</details>` : ''}
+      ${past.length ? `<details class="panel dc-fold vs-sec"><summary><span class="dc-sum-t">${t('Revoir mes derniers duels')}</span></summary>
+        ${past.map((r) => { const res = r.my_score > r.their_score ? 'win' : r.my_score === r.their_score ? 'tie' : 'lose'; return row(r, g.s.versus.pick?.[r.id] ? `<button class="btn small primary" data-act="pickloot" data-id="${esc(r.id)}">${icon('crown')} Choisir mon butin</button>` : `<button class="btn small ghost vs-replay" data-act="replay" data-id="${esc(r.id)}">${icon('refresh')}<b class="vs-res ${res}">${t(RES[res])}</b> ${fmt(r.my_score)} – ${fmt(r.their_score)}</button>`, lbl(r)); }).join('')}</details>` : ''}
       ${rulesHTML()}
       ${statsHTML()}`;
   }
@@ -248,8 +280,29 @@ export default function versusScreen(app, root) {
       catch (er) { sh.busy = false; }
     });
   }
+  /* v807 : revanche : même composition, défi envoyé à ce joueur (accepté par le serveur 3 jours après un duel, même sans être amis) */
+  async function rematch(r) {
+    const foe = r.mine ? r.b : r.a;
+    if (!foe || isBlocked(foe) || busy) return;
+    const lineup = lineupOf(r).map((it) => (it.type === 'faction' ? { type: 'faction', faction: it.faction } : it.type === 'event' ? { type: 'event', factions: it.factions?.length === 2 ? it.factions : ev().factions } : { type: it.type }));
+    if (!lineupOk(lineup)) return;
+    const stake = lineupStake(lineup);
+    if (g.s.shards < stake) { app.sfx.error(); toast(t('Il te manque {n} éclats pour la revanche.', { n: fmt(stake - g.s.shards) }), { kind: 'error', icon: 'crystal' }); return; }
+    const ok = await confirmBox(t('Revanche contre <b>{name}</b> : {pack}.<br>Prix : <b>{stake} éclats</b>, rendus s’il ne relève pas le défi en {h} h.', { name: esc(name({ a: foe, pseudo: r.pseudo })), pack: lbl({ lineup }), stake: fmt(stake), h: VERSUS_HOURS }), { ok: t('Lancer la revanche') });
+    if (!ok) return;
+    busy = true;
+    try { await withPending(app.partie.first('versusCreate', lineup, foe, stake)); app.sfx.achievement?.(); toast(t('Revanche envoyée !'), { kind: 'success', icon: 'swords' }); }
+    catch (er) { app.sfx.error(); toast(esc(er.status === 404 ? OFF : er.message), { kind: 'error', icon: 'info', ms: 6000 }); }
+    busy = false; app.chrome?.(); load();
+  }
+  async function react(r, k) {
+    try { await cloud.versusReact(r.id, k); r.my_react = k; }
+    catch (e) { app.sfx.error(); toast(esc(e.status === 404 ? t('Les réactions du Choc ne sont pas encore ouvertes sur le serveur.') : e.message), { kind: 'error', icon: 'info' }); throw e; }
+  }
   function duel(r, out) {
-    playDuel(app, r, out, { foeName: name({ a: r.mine ? r.b : r.a, pseudo: r.pseudo }), myAvatar: g.shownAvatar() || sync.profile?.avatar, onPick: (i) => pickLoot(r.id, i),
+    const foe = r.mine ? r.b : r.a;
+    playDuel(app, r, out, { foeName: name({ a: foe, pseudo: r.pseudo }), myAvatar: g.shownAvatar() || sync.profile?.avatar, onPick: (i) => pickLoot(r.id, i),
+      onRematch: foe && !isBlocked(foe) ? () => rematch(r) : null, onReact: foe && !isBlocked(foe) ? (k) => react(r, k) : null,
       onClose: () => { if (out?.progress?.length) { app.pendingProgress = out.progress; app.flushProgress?.(); out.progress = null; } draw(); } });
   }
 
@@ -271,5 +324,6 @@ export default function versusScreen(app, root) {
   });
   draw();
   load();
+  lastMonth();
   return () => { alive = false; };
 }

@@ -12,6 +12,8 @@ import { isBlocked } from '../core/moderation.js';
 import { t } from '../i18n.js';
 import { RARITY_ORDER, FACTION_ORDER } from '../config.js';
 import { withPlate, fondCls, fondStyle } from '../ui/vitrine.js'; /* v564 */
+import { chocBoardHTML } from '../ui/choc.js'; /* v807 */
+import { today } from '../core/save.js';
 
 let cache = null; // dernière liste reçue (pour afficher la fiche sans attendre)
 const VBEST = ['prism', 'crystal', 'galaxy', 'gold', 'holo', 'normal'];
@@ -126,6 +128,7 @@ export default function friends(app, root, params = []) {
       <details class="panel dc-fold"><summary>${icon('crown')} Ses exploits</summary><div>
         <div class="stats-grid">${GAMES.map(([k, n]) => tile(gm[k]?.w || 0, `victoires · ${n}`)).join('')}${tile(d.titles || 0, 'titres gagnés')}${tile((d.sets || []).length, 'ensembles complétés')}${st.night ? tile(st.night, 'record en Cauchemar') : ''}</div>
       </div></details>
+      ${chocBoardHTML(st.ch, cat, today(app.game.clock()).slice(0, 7))}
       <details class="panel dc-fold"><summary>${icon('crown')} Ses succès (${achOk.length})</summary><div class="fr-ach">
         ${achOk.length ? cat.achievements.filter((a) => achOk.includes(a.key)).map((a) => `<div class="fr-ach-i"><b>${esc(a.name)}</b><span class="small muted">${esc(a.desc)}</span></div>`).join('') : '<p class="small muted">Aucun succès pour l’instant.</p>'}
       </div></details>

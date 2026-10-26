@@ -23,3 +23,23 @@ export const lineupOk = (lineup) => Array.isArray(lineup) && lineup.length >= 1 
    de l'adversaire (Hyper rare au plus ; à la place d'une Mythique ou d'une Secrète, un coffre abyssal) et un bonus
    d'éclats proportionnel au prix de ses boosters. Seuls `packsPerDay` boosters par jour comptent pour le butin. */
 export const VERSUS_PRIZE = { win: 0.4, tie: 0.15, packsPerDay: 6, trophyRar: ['C', 'PC', 'R', 'HR'] };
+
+/* v807 : l'enjeu sans rien perdre de sa collection (demande du propriétaire : « retrouver l'adrénaline »).
+   La Série ardente : chaque victoire d'affilée multiplie le butin en éclats du jeu ; une défaite l'éteint (une égalité la garde).
+   Paliers de série : un coffre offert en plus. Les Ligues du Choc : chaque duel fait gagner ou perdre des points ; une ligue
+   par mois (à l'heure du joueur), on peut redescendre ; au changement de mois, récompense de la ligue où l'on finit. */
+export const STREAK_MULT = [1, 1, 1.5, 2, 2.5, 3, 4, 5]; // index = série après la victoire (plafonnée au dernier)
+export const streakMult = (n) => STREAK_MULT[Math.max(0, Math.min(n, STREAK_MULT.length - 1))];
+export const STREAK_CHESTS = { 3: 'fer', 5: 'or', 7: 'abyssal', 10: 'abyssal' };
+export const LEAGUES = [
+  { k: 'bronze', name: 'Bronze', min: 0, color: '#C07A45' },
+  { k: 'argent', name: 'Argent', min: 100, color: '#C9D2DE' },
+  { k: 'or', name: 'Or', min: 250, color: '#F2C14E' },
+  { k: 'obsidienne', name: 'Obsidienne', min: 450, color: '#9C7BFF' },
+  { k: 'abysse', name: 'Abysse', min: 700, color: '#E0485E' },
+];
+export const LEAGUE_PTS = { win: 20, tie: 0, lose: -20, streakBonus: 2, streakMax: 10 };
+export const LEAGUE_REWARD = { bronze: null, argent: { chests: { fer: 1 } }, or: { chests: { or: 1 } }, obsidienne: { chests: { abyssal: 1 } }, abysse: { chests: { abyssal: 1 }, tickets: { premium: 2 } } };
+export const leagueIdx = (pts) => { let i = 0; LEAGUES.forEach((l, k) => { if ((pts || 0) >= l.min) i = k; }); return i; };
+export const leagueDelta = (result, streakBefore) => (result === 'win' ? LEAGUE_PTS.win + Math.min(LEAGUE_PTS.streakMax, LEAGUE_PTS.streakBonus * (streakBefore || 0))
+  : result === 'lose' ? LEAGUE_PTS.lose : LEAGUE_PTS.tie);

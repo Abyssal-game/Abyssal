@@ -6,11 +6,11 @@ export const SQL_STAMPS = {
   },
   "11": {
     "file": "11-anti-triche.sql",
-    "stamp": "f5958fa88d48"
+    "stamp": "acfe5569cf1a"
   },
   "12": {
     "file": "12-serveur-de-partie.sql",
-    "stamp": "0cfe98104c61"
+    "stamp": "14dcf43a2fc2"
   },
   "13": {
     "file": "13-verrouillage.sql",
@@ -22,7 +22,7 @@ export const SQL_STAMPS = {
   },
   "15": {
     "file": "15-vitrine.sql",
-    "stamp": "a01a85932189"
+    "stamp": "9fd3932fe844"
   },
   "16": {
     "file": "16-en-ligne.sql",
@@ -42,7 +42,7 @@ export const SQL_STAMPS = {
   },
   "08": {
     "file": "08-versus.sql",
-    "stamp": "51026b0cf559"
+    "stamp": "df806cac094a"
   },
   "09": {
     "file": "09-multijoueur.sql",

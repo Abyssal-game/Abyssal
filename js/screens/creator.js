@@ -35,7 +35,7 @@ export function openCreator(app) {
   if (!LANGS[cine.lang]) cine.lang = LANG;
   const saveCine = () => { try { localStorage.setItem(CINE_KEY, JSON.stringify(cine)); } catch (e) { /* rien */ } };
   /* v803 : réglages du duel d'essai du Choc, gardés sur l'appareil */
-  let chocDev = { lineup: 'std1', force: 'any' };
+  let chocDev = { lineup: 'std1', force: 'any', streak: 'mine' };
   try { chocDev = { ...chocDev, ...JSON.parse(localStorage.getItem('abyssal.chocDev') || '{}') }; } catch (e) { /* rien */ }
   const B = (x, label, cls = '') => `<button class="btn small ${cls}" data-x="${x}">${label}</button>`;
   /* v804 : Mode Créateur rangé en 4 onglets (le dernier ouvert est retenu sur l'appareil) */
@@ -58,6 +58,7 @@ export function openCreator(app) {
       ${S('Choc des Boosters (essai)', `${P('Un face-à-face complet contre un adversaire fictif, sans serveur ni autre joueur. Rien n’est payé, gagné ni enregistré.')}
         <p class="small">Boosters</p>${row(...[['std1', '1 standard'], ['mix3', 'Standard + Faction + Premium'], ['prem3', '3 premium'], ['choc', 'Composition du Choc']].map(([k, l]) => `<button class="btn small ${chocDev.lineup === k ? 'gold' : 'ghost'}" data-choc="lineup" data-v="${k}">${l}</button>`))}
         <p class="small">Résultat</p>${row(...[['any', 'Au hasard'], ['win', 'Victoire'], ['lose', 'Défaite'], ['tie', 'Égalité']].map(([k, l]) => `<button class="btn small ${chocDev.force === k ? 'gold' : 'ghost'}" data-choc="force" data-v="${k}">${l}</button>`))}
+        <p class="small">Série ardente avant le duel</p>${row(...[['mine', 'La mienne'], ['0', '0'], ['2', '2'], ['4', '4'], ['6', '6'], ['9', '9']].map(([k, l]) => `<button class="btn small ${String(chocDev.streak) === k ? 'gold' : 'ghost'}" data-choc="streak" data-v="${k}">${l}</button>`))}
         ${row(B('choc', 'Lancer un duel d’essai', 'gold'))}`, 'cr-choc')}
       ${S('Cercle de l’Abysse', `${P(g.s.devGames ? 'Toutes les salles des quatre jeux sont ouvertes, même celles pas encore gagnées. Ta progression ne change pas.' : 'Ouvre toutes les salles des quatre jeux (Duels des Sceaux, Pacte, Cryptes, Enchères) sans avoir gagné les précédentes, pour tester un adversaire précis.')}
         ${row(B('games', g.s.devGames ? 'Refermer les salles' : 'Ouvrir toutes les salles', g.s.devGames ? '' : 'gold'))}`)}
@@ -172,7 +173,7 @@ export function openCreator(app) {
       if (x === 'abyss5') g.devAbyss(false, 5);
       if (x === 'choc') { /* v803 : duel d'essai du Choc des Boosters */
         const lineup = chocDev.lineup === 'choc' ? (app.state.versus?.lineup || TEST_LINEUPS.std1) : TEST_LINEUPS[chocDev.lineup];
-        sheet.close(); setTimeout(() => playTestDuel(app, { lineup, force: chocDev.force, onClose: () => openCreator(app) }), 350); return;
+        sheet.close(); setTimeout(() => playTestDuel(app, { lineup, force: chocDev.force, streak: chocDev.streak === 'mine' || chocDev.streak == null ? null : +chocDev.streak, onClose: () => openCreator(app) }), 350); return;
       }
       if (x === 'cine') { /* v785 : prologue ou fin, langue et scène de départ au choix */
         cine.start = +(sheet.el?.querySelector('#cine-start')?.value ?? document.getElementById('cine-start')?.value ?? 0) || 0;

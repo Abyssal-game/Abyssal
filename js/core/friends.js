@@ -1,5 +1,6 @@
 // Amis (v500) : la fiche publiée pour ses amis. Un résumé de la partie (jamais la sauvegarde complète) :
 // collection (finitions et niveaux), succès, ensembles, statistiques. Lu par l'écran Amis (js/screens/friends.js).
+import { leagueIdx } from './versus.js';
 export const CARD_VERSION = 1;
 // finitions possédées d'une carte, en bits (normale, argentée, enluminée, abyssale)
 export const VARIANT_BITS = { normal: 1, holo: 2, gold: 4, galaxy: 8, crystal: 16, prism: 32 };
@@ -27,8 +28,16 @@ export function friendCard(g) {
       trials: s.stats?.trialWins || 0, night: Math.max(0, ...Object.values(s.descent?.nightBest || {}).map(Number).filter((x) => x >= 0)),
       games: { sceaux: game('sceaux'), pacte: game('pacte'), cryptes: game('cryptes'), encheres: game('encheres') },
       tn: { w: s.tourney?.week || 0, b: s.tourney?.best || 0, c: s.tourneyWins || 0 }, /* v795 : Tournoi du Cercle (classement entre amis) */
+      ch: chocCard(s), /* v807 : tableau de chasse du Choc des Boosters */
     },
   };
+}
+
+// v807 : tableau de chasse du Choc (victoires, série, ligue du mois, meilleure ligue, plus belle carte sortie)
+export function chocCard(s) {
+  const v = s.versus || {};
+  return { w: v.wins || 0, p: v.played || 0, s: v.streak || 0, b: v.best || 0, m: v.lg?.m || '', l: v.lg ? leagueIdx(v.lg.pts) : 0, t: v.lgTop || 0,
+    c: v.bestCard?.id || null, cv: v.bestCard?.variant || 'normal' };
 }
 
 // Lecture d'une fiche reçue : finitions et niveau d'une carte
@@ -57,7 +66,8 @@ export function cleanCard(d) {
   return {
     v: int(d.v, 99), lv: Math.max(1, int(d.lv, 9999)), title: typeof d.title === 'string' ? d.title.slice(0, 60) : '', frame: key(d.frame), plate: key(d.plate), fond: key(d.fond), avatar: key(d.avatar),
     show: keys(d.show, 3), titles: int(d.titles, 999), col, ach: keys(d.ach, 1000), sets: keys(d.sets, 500),
-    st: { boosters: int(st.boosters), best: int(st.best, 9999), bosses: int(st.bosses, 999), trials: int(st.trials), night: int(st.night, 9999), games, tn: { w: int(st.tn?.w, 99999), b: int(st.tn?.b, 8), c: int(st.tn?.c, 9999) } },
+    st: { boosters: int(st.boosters), best: int(st.best, 9999), bosses: int(st.bosses, 999), trials: int(st.trials), night: int(st.night, 9999), games, tn: { w: int(st.tn?.w, 99999), b: int(st.tn?.b, 8), c: int(st.tn?.c, 9999) },
+      ch: { w: int(st.ch?.w), p: int(st.ch?.p), s: int(st.ch?.s, 9999), b: int(st.ch?.b, 9999), m: typeof st.ch?.m === 'string' && /^\d{4}-\d{2}$/.test(st.ch.m) ? st.ch.m : '', l: int(st.ch?.l, 4), t: int(st.ch?.t, 4), c: key(st.ch?.c), cv: key(st.ch?.cv) || 'normal' } },
     ...(d.n != null ? { n: int(d.n, 9999) } : {}), partial: !!d.partial,
   };
 }

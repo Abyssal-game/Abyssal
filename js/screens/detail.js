@@ -10,6 +10,7 @@ import { FINISHES } from '../core/codex.js';
 import { icon, sigil, picon, setIcon } from '../ui/icons.js';
 import { FORMS, formUnlocked } from '../core/forms.js';
 import { relationsOf } from '../core/relations.js';
+import { t } from '../i18n.js';
 import { fameTier, fameNext, FAME_TIERS } from '../core/renown.js';
 
 // Chance réelle d'obtenir cette carte précise dans un booster standard.
@@ -77,6 +78,8 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
       ${open ? `<p class="small"><b>${esc(f.passiveName)}.</b> ${esc(f.passiveDesc)}</p><p class="lore small">« ${esc(f.lore)} »</p>
       <div class="seg fm-seg" role="group" aria-label="Forme au combat"><button class="seg-b" data-act="form" data-v="" aria-pressed="${!on}">Originelle</button><button class="seg-b" data-act="form" data-v="corrompue" aria-pressed="${on}">Corrompue</button></div>` : ''}</div>`;
   }
+  /* v807 : carte trophée, gagnée au Choc des Boosters (pseudo de l'adversaire donné par le serveur) */
+  const trophyHTML = (card) => { const tr = g.s.versus?.trophies?.[card.id]; return tr ? `<div class="dt-trophy"><dt>${icon('swords')} ${t('Trophée du Choc')}</dt><dd>${tr.f ? t('Gagnée contre {name}', { name: esc(tr.f) }) : t('Gagnée au Choc')}${tr.d ? ` · ${dateFr(new Date(tr.d + 'T12:00:00').getTime())}` : ''}</dd></div>` : ''; };
   // Relations de la créature : découvertes en combat, sinon seulement annoncées
   function relHTML(card) {
     const rs = relationsOf(card);
@@ -120,7 +123,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
         combat: `${formHTML(card)}${combatHTML(g, card)}`,
         chal: `${fameHTML(g.fameOf(current))}${challengesHTML(g, current)}`,
         story: `<p class="lore big">« ${esc(card.lore)} »</p>
-          <dl class="facts dt-facts"><div><dt>Catégorie</dt><dd>${esc(card.category)}</dd></div><div><dt>Faction</dt><dd><span class="fac-dot" style="color:${fac.colors.secondary}">${sigil(card.faction)}</span>${esc(fac.name)}</dd></div><div><dt>Découverte le</dt><dd>${dateFr(e.first)}</dd></div><div><dt>Numéro</dt><dd>${card.id}</dd></div></dl>
+          <dl class="facts dt-facts"><div><dt>Catégorie</dt><dd>${esc(card.category)}</dd></div><div><dt>Faction</dt><dd><span class="fac-dot" style="color:${fac.colors.secondary}">${sigil(card.faction)}</span>${esc(fac.name)}</dd></div><div><dt>Découverte le</dt><dd>${dateFr(e.first)}</dd></div><div><dt>Numéro</dt><dd>${card.id}</dd></div>${trophyHTML(card)}</dl>
           ${relHTML(card)}
           ${line ? `<h3 class="section-title">${esc(line.name)}</h3><div class="strip">${line.cards.map((c) => cardHTML(c, { mystery: !g.owns(c.id), nameKnown: g.nameKnown(c.id) })).join('')}</div><p class="small muted">Stade ${card.evolution.stage} sur ${card.evolution.stages}.</p>` : ''}
           ${sets.length ? `<h3 class="section-title">Ensembles</h3><div class="stack">${sets.map((s) => { const p = g.setProgress(s.key); return `<a class="set-link panel" href="#/succes/ensembles"><b class="set-h">${setIcon(s.key)}<span>${esc(s.name)}</span></b><span class="small muted">${p.owned} / ${p.total}${p.done ? ' · complété' : ''}</span><span class="progress"><i style="width:${(p.owned / p.total) * 100}%"></i></span></a>`; }).join('')}</div>` : ''}`,

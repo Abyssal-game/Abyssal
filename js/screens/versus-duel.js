@@ -4,7 +4,14 @@
 // les cartes jaillissent face cachée vers leur place, puis se retournent une à une, en alternance, avec leurs points.
 // Un toucher accélère (×4) ; « Tout révéler » termine d'un coup.
 import { BOOSTERS, RARITY, RARITY_ORDER } from '../config.js';
-import { lineupOf, scoreOf } from '../core/versus.js';
+import { lineupOf, scoreOf, LEAGUES, streakMult } from '../core/versus.js';
+import { today } from '../core/save.js';
+import { emoteHTML, showEmote } from '../ui/vitrine.js';
+import { EMOTES } from '../core/codex.js';
+const EMOTES_TXT = (k) => EMOTES[k]?.text || '';
+const BUBBLE = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H10l-4 3.5V16H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
+import { haptic } from '../ui/sound.js';
+import { leagueBadge, flameHTML } from '../ui/choc.js';
 import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM } from '../ui/icons.js';
 import { esc, fmt } from '../ui/dom.js';
@@ -35,6 +42,8 @@ function musicPlan(packs) {
   return { tears, scale, start: Math.max(0, tears[0] - APPEAR - 0.5) };
 }
 
+export { leagueBadge, flameHTML } from '../ui/choc.js';
+
 /* v736 : le gagnant choisit une carte parmi celles de l'adversaire (une Mythique ou une Secrète devient un coffre abyssal) */
 export function pickGridHTML(app, cards) {
   const cat = app.catalog, g = app.game;
@@ -54,7 +63,7 @@ function fitNames(el) {
     while (n.scrollWidth > n.clientWidth + 1 && f > 7 && k++ < 40) { f *= 0.94; n.style.fontSize = `${f}px`; }
   });
 }
-export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick } = {}) {
+export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick, onRematch, onReact } = {}) {
   const g = app.game, cat = app.catalog;
   const mine = r.my_cards || [], theirs = r.their_cards || [];
   const res = out?.result && RES[out.result] ? out.result : r.my_score > r.their_score ? 'win' : r.my_score === r.their_score ? 'tie' : 'lose';
@@ -70,7 +79,12 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick } = {
   // v524 : chaque booster est posé dans un plateau de la table (assets/versus/vd-table.webp) ; le premier booster de
   // chaque joueur dans le plateau le plus proche du centre, les suivants vers l'extérieur
   const rows = (packs, side) => packs.map((cs, p) => `<div class="vd-row t${side === 'foe' ? 2 - p : 3 + p}" data-side="${side}" data-p="${p}">${cs.map((c, i) => cardEl(c, side, p, i)).join('')}</div>`).join('');
-  const plate = (side, name, av) => `<div class="vd-plate ${side}"><span class="vd-pav">${pic(av)}</span><b class="vd-pname">${name}</b><span class="vd-sc" data-sc="${side}">0</span></div>`;
+  /* v807 : série et ligue de chacun, avant le duel (la tienne d'après le résultat encaissé, celle de l'adversaire d'après son profil) */
+  const month = today(g.clock()).slice(0, 7);
+  const tags = { me: out?.streak ? { s: out.streak.before, l: out.league?.before } : null,
+    foe: r.choc && typeof r.choc === 'object' ? { s: +r.choc.s || 0, l: r.choc.m === month ? +r.choc.l || 0 : null } : null };
+  const tagHTML = (x) => (x ? `<span class="vd-tags">${x.l != null ? leagueBadge(x.l) : ''}${x.s >= 2 ? flameHTML(x.s) : ''}</span>` : '');
+  const plate = (side, name, av) => `<div class="vd-plate ${side}"><span class="vd-pav">${pic(av)}</span><b class="vd-pname">${name}</b><span class="vd-sc" data-sc="${side}">0</span>${tagHTML(tags[side])}</div>`;
   const el = document.createElement('div');
   el.className = `vd ${app.reduced() ? 'rm' : ''} n${lineup.length}`;
   el.setAttribute('role', 'dialog');
@@ -84,6 +98,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick } = {
       ${plate('me', t('Toi'), myAvatar)}
     </div>
     <div class="vd-mid"><div class="vd-pack foe"></div><span class="vd-vs"></span><div class="vd-pack me"></div></div>
+    <div class="vd-ban" aria-live="polite"></div>
     <div class="vd-end" hidden></div>`;
   document.body.appendChild(el);
   /* v609 : dos de carte fixe pendant le face-à-face (jusqu'à 18 dos animés à la fois sinon) */
@@ -118,6 +133,24 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick } = {
     el.appendChild(f); setTimeout(() => f.remove(), 1000);
   };
 
+  /* v807 : grand bandeau au milieu de la table (enjeu, renversement, moment décisif) */
+  let banT = 0;
+  const banner = (html, cls = '', ms = 1800) => {
+    const b = q('.vd-ban'); if (!b) return;
+    b.className = `vd-ban on ${cls}`; b.innerHTML = html; clearTimeout(banT);
+    banT = setTimeout(() => { b.className = 'vd-ban'; }, ms / Math.min(speed, 2));
+  };
+  /* v807 : avant les boosters, ce qui est en jeu : ta Série ardente, celle de l'adversaire */
+  async function stakes() {
+    if (speed > 1 || done) return;
+    const me = tags.me?.s || 0, foe = tags.foe?.s || 0, lines = [];
+    if (me >= 1) lines.push(t('Ta Série ardente : <b>{n}</b>. Une victoire de plus : butin ×{m}.', { n: me, m: String(streakMult(me + 1)).replace('.', ',') }));
+    if (foe >= 2) lines.push(t('{name} est sur une série de <b>{n}</b> : brise-la !', { name: esc(foeName), n: foe }));
+    if (!lines.length) return;
+    banner(`${flameHTML(Math.max(me, foe), 'big')}<span>${lines.join('<br>')}</span>`, 'stake', 2600);
+    app.sfx.suspense?.();
+    await wait(2200);
+  }
   // un booster de chaque côté : apparition, tremblement, déchirure simultanée, cartes qui jaillissent
   async function tear(p) {
     if (done) return; /* v574 : « Tout révéler » touché pendant l'attente : plus de sachets par-dessus la fin */
@@ -130,8 +163,24 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick } = {
     q('.vd-mid').classList.add('show');
     await until(plan.tears[p] - 1, 550);
     if (done) return;
+    /* v807 : les deux sachets s'entrechoquent au milieu de la table avant de se déchirer */
+    if (!app.reduced() && speed === 1) {
+      [fp, mp].forEach((x) => x.classList.add('clash'));
+      app.sfx.suspense?.();
+      setTimeout(() => {
+        if (done) return;
+        const b = el.getBoundingClientRect(), m = q('.vd-vs').getBoundingClientRect(), w = Math.min(b.width * 0.7, 300);
+        const f = document.createElement('span'); f.className = 'kx-sprite vd-fxb vd-clashfx';
+        f.style.cssText = `left:${m.left - b.left + m.width / 2}px;top:${m.top - b.top + m.height / 2}px;width:${w}px;height:${w}px;--d:600ms;background-image:url(assets/fx/def-clash.webp)`;
+        el.appendChild(f); setTimeout(() => f.remove(), 900);
+        q('.vd-mid').classList.add('flash'); setTimeout(() => q('.vd-mid')?.classList.remove('flash'), 260);
+        app.sfx.parry?.(); haptic('heavy');
+      }, 430);
+      await wait(700);
+      [fp, mp].forEach((x) => x.classList.remove('clash'));
+    }
     [fp, mp].forEach((x) => x.classList.add('shake'));
-    app.sfx.suspense?.();
+    if (app.reduced() || speed > 1) app.sfx.suspense?.();
     await until(plan.tears[p], 1000);
     if (done) return;
     [fp, mp].forEach((x) => { x.classList.remove('shake'); x.classList.add('torn'); });
@@ -162,20 +211,45 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick } = {
     n.classList.add('on');
     if (big) { n.classList.add('big'); app.sfx['vd-rare']?.(); } else app.sfx['vd-flip']?.();
     burst(n, big ? 3.2 : 1.7);
+    const was = sc.me > sc.foe ? 'me' : sc.foe > sc.me ? 'foe' : null;
     sc[side] += c.pts;
     setScore(side); lead();
+    /* v807 : dans le dernier booster, celui qui était mené passe devant : renversement */
+    const now = sc.me > sc.foe ? 'me' : sc.foe > sc.me ? 'foe' : null;
+    if (!done && p === lineup.length - 1 && was && now && was !== now) {
+      banner(`<b>${t('Renversement !')}</b>`, `turn ${now}`, 1500);
+      app.sfx['vd-rare']?.(); haptic('crit');
+      el.classList.remove('jolt'); void el.offsetWidth; el.classList.add('jolt');
+    }
     await wait((big ? 900 : 560) * pace(p));
   }
+  /* v807 : moment décisif : avant la dernière carte, si elle peut tout changer (ou si l'écart est minime), tout s'arrête */
+  async function decisive(side, c) {
+    if (done || speed > 1) return;
+    const before = Math.sign(sc.me - sc.foe), after = Math.sign((sc.me + (side === 'me' ? c.pts : 0)) - (sc.foe + (side === 'foe' ? c.pts : 0)));
+    if (before === after && Math.abs(sc.me - sc.foe) > 10) return;
+    const n = q(`.vd-c[data-side="${side}"][data-p="${lineup.length - 1}"][data-i="${(side === 'me' ? myPacks : foePacks).at(-1).length - 1}"]`);
+    el.classList.add('decisive'); n?.classList.add('last');
+    banner(`<b>${t('Tout se joue sur cette carte')}</b>`, 'decide', 2200);
+    app.sfx.suspensebig?.(); haptic('heartbeat');
+    await wait(2000);
+    el.classList.remove('decisive'); n?.classList.remove('last');
+  }
   async function run() {
+    await stakes();
+    const lastP = lineup.length - 1, nLast = Math.max(myPacks[lastP].length, foePacks[lastP].length);
+    // la toute dernière carte retournée : la tienne si tu en as autant que l'adversaire
+    const final = myPacks[lastP].length >= foePacks[lastP].length ? ['me', myPacks[lastP].length - 1] : ['foe', foePacks[lastP].length - 1];
+    const step = async (side, p, i) => { if (p === lastP && side === final[0] && i === final[1]) await decisive(side, (side === 'me' ? myPacks : foePacks)[p][i]); if (!done) await reveal(side, p, i); };
     for (let p = 0; p < lineup.length && !done; p++) {
       await until(plan.tears[p] - APPEAR, p ? 0 : 500);
       if (done) break;
       await tear(p);
-      const n = Math.max(myPacks[p].length, foePacks[p].length);
+      const n = p === lastP ? nLast : Math.max(myPacks[p].length, foePacks[p].length);
       for (let i = 0; i < n && !done; i++) {
-        if (i < foePacks[p].length) await reveal('foe', p, i);
+        if (i < foePacks[p].length) await step('foe', p, i);
         if (done) break;
-        if (i < myPacks[p].length) await reveal('me', p, i);
+        if (i < myPacks[p].length) await step('me', p, i);
       }
       if (!done && p < lineup.length - 1 && !sync) await wait(700);
     }
@@ -197,7 +271,16 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick } = {
     const tc = out?.trophy && app.catalog.get(out.trophy.id);
     const loot = [tc ? `<span class="vd-loot"><img alt="" src="${artUrl(tc, { lite: true })}"><span>${t('Copie de <b>{card}</b>', { card: esc(tc.name) })}${out.trophy.isNewCard ? ` <em>${t('Nouvelle !')}</em>` : ''}</span></span>` : '',
       out?.chest ? `<span class="vd-loot"><img alt="" src="assets/icons/chest.webp"><span>${t('Coffre abyssal')}</span></span>` : '',
-      out?.shards ? `<span class="vd-loot"><img alt="" src="assets/icons/cur-shard.webp"><span>+${fmt(out.shards)} ${t('éclats')}</span></span>` : ''].filter(Boolean).join('');
+      out?.shards ? `<span class="vd-loot"><img alt="" src="assets/icons/cur-shard.webp"><span>+${fmt(out.shards)} ${t('éclats')}${out.mult > 1 ? ` <em>×${String(out.mult).replace('.', ',')}</em>` : ''}</span></span>` : '',
+      out?.streakChest ? `<span class="vd-loot"><img alt="" src="assets/chests/${out.streakChest}.webp"><span>${t('Coffre de série')}</span></span>` : ''].filter(Boolean).join('');
+    /* v807 : Série ardente et Ligue du mois */
+    const st = out?.streak, lg = out?.league;
+    const streakHTML = !st ? '' : res === 'win' ? `<div class="vd-streak on">${flameHTML(st.after, 'big')}<span>${st.after >= 2 ? t('Série ardente : <b>{n} victoires</b> d’affilée.', { n: st.after }) : t('La Série ardente s’allume.')}${streakMult(st.after + 1) > out.mult ? `<small>${t('Prochaine victoire : butin ×{m}', { m: String(streakMult(st.after + 1)).replace('.', ',') })}</small>` : ''}</span></div>`
+      : st.broken ? `<div class="vd-streak out">${flameHTML(st.before, 'big dead')}<span>${t('Ta série de <b>{n} victoires</b> s’éteint.', { n: st.before })}</span></div>`
+      : res === 'tie' && st.after >= 2 ? `<div class="vd-streak on">${flameHTML(st.after, 'big')}<span>${t('Égalité : ta série tient toujours.')}</span></div>` : '';
+    const leagueHTML = !lg ? '' : `<div class="vd-league ${lg.after > lg.before ? 'up' : lg.after < lg.before ? 'down' : ''}">${leagueBadge(lg.after, 'big')}<span>${lg.after > lg.before ? `<b>${t('Tu montes en ligue {l} !', { l: t(LEAGUES[lg.after].name) })}</b>` : lg.after < lg.before ? `<b>${t('Tu redescends en ligue {l}…', { l: t(LEAGUES[lg.after].name) })}</b>` : `<b>${t('Ligue {l}', { l: t(LEAGUES[lg.after].name) })}</b>`}
+      <small>${fmt(lg.pts)} ${t('points')} <em class="${lg.delta >= 0 ? 'pos' : 'neg'}">${lg.delta >= 0 ? '+' : '−'}${Math.abs(lg.delta)}</em>${LEAGUES[lg.after + 1] ? ` · ${t('ligue {l} à {n}', { l: t(LEAGUES[lg.after + 1].name), n: LEAGUES[lg.after + 1].min })}` : ''}</small></span></div>`;
+    const canReact = onReact && !r.my_react;
     const noPrize = out && out.counted === 0 && res !== 'lose';
     el.classList.add('end', res);
     const end = q('.vd-end');
@@ -209,8 +292,15 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick } = {
       ${out?.pick ? `<div class="vd-pick"><p class="small">${t('Choisis ta carte parmi celles de {name} :', { name: esc(foeName) })}</p>${pickGridHTML(app, theirs)}</div>` : ''}
       ${loot ? `<div class="vd-loots">${loot}</div>` : ''}
       ${noPrize ? `<p class="small">${t('Butin du jour déjà gagné : ce duel était pour la gloire.')}</p>` : ''}
-      <button class="btn primary block big-cta dc-plq dc-plq-red" data-v="close">${t('Fermer')}</button>`;
+      ${streakHTML}${leagueHTML}
+      ${canReact ? `<div class="vd-react"><button class="btn small ghost" data-v="react">${BUBBLE}${t('Laisser une réaction')}</button><div class="re-grid vd-regrid" hidden></div></div>` : r.my_react ? `<p class="small muted">${t('Ta réaction')} : ${esc(t(EMOTES_TXT(r.my_react)))}</p>` : ''}
+      <div class="vd-endbtns">${onRematch ? `<button class="btn block dc-plq" data-v="rematch">${icon('swords')}${t('Revanche')}</button>` : ''}
+      <button class="btn primary block big-cta dc-plq dc-plq-red" data-v="close">${t('Fermer')}</button></div>`;
     if (res === 'win') app.sfx['vd-win']?.(); else if (res === 'lose') app.sfx['vd-lose']?.(); else app.sfx['vd-flip']?.();
+    if (st?.broken) setTimeout(() => { if (!closed) haptic('defeat'); }, 600);
+    if (lg && lg.after !== lg.before) setTimeout(() => { if (!closed) (lg.after > lg.before ? app.sfx.levelup : app.sfx.error)?.(); }, 900);
+    /* v807 : la réaction que l'adversaire t'a laissée sur ce duel */
+    if (r.their_react) setTimeout(() => { if (!closed) showEmote(r.their_react, 'foe', foeName); }, 1100);
   }
   function close() {
     if (closed) return;
@@ -227,6 +317,19 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick } = {
     const b = e.target.closest('[data-v]');
     if (b?.dataset.v === 'close') return close();
     if (b?.dataset.v === 'all') return finish();
+    if (b?.dataset.v === 'rematch') { close(); onRematch?.(); return; }
+    if (b?.dataset.v === 'react') {
+      const grid = el.querySelector('.vd-regrid');
+      if (grid.hidden) grid.innerHTML = g.emotesOwned().map((k) => `<button class="re-pick" data-v="re" data-re="${k}">${emoteHTML(k)}</button>`).join('');
+      grid.hidden = !grid.hidden; app.sfx.tap?.(); return;
+    }
+    if (b?.dataset.v === 're' && onReact) {
+      const k = b.dataset.re, box = el.querySelector('.vd-react');
+      if (!box || box.dataset.busy) return; box.dataset.busy = '1';
+      onReact(k).then(() => { r.my_react = k; box.outerHTML = `<p class="small muted">${t('Ta réaction')} : ${esc(t(EMOTES_TXT(k)))}</p>`; showEmote(k, 'me', ''); })
+        .catch(() => { delete box.dataset.busy; });
+      return;
+    }
     if (b?.dataset.v === 'pick' && onPick && !picking) {
       picking = true;
       el.querySelectorAll('.vd-pick-c').forEach((x) => x.classList.toggle('on', x === b));

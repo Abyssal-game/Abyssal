@@ -41,5 +41,12 @@
  { "key": "trials_perfect", "name": "Sans faute", "desc": "Gagne les 3 Épreuves d’une même journée.", "cond": {"type": "trialPerfect", "n": 1}, "reward": {"shards": 100} },
  { "key": "finish_holo", "name": "Reflet d’argent", "desc": "Obtiens une carte en finition Argentée.", "cond": {"type": "finish", "v": "holo", "n": 1}, "reward": {"shards": 25} },
  { "key": "finish_gold", "name": "Page d’or", "desc": "Obtiens une carte en finition Enluminée.", "cond": {"type": "finish", "v": "gold", "n": 1}, "reward": {"shards": 60} },
- { "key": "finish_galaxy", "name": "Touchée par l’Abysse", "desc": "Obtiens une carte en finition Abyssale.", "cond": {"type": "finish", "v": "galaxy", "n": 1}, "reward": {"shards": 150, "title": "Marqué par l’Abysse"} }
+ { "key": "finish_galaxy", "name": "Touchée par l’Abysse", "desc": "Obtiens une carte en finition Abyssale.", "cond": {"type": "finish", "v": "galaxy", "n": 1}, "reward": {"shards": 150, "title": "Marqué par l’Abysse"} },
+ { "key": "choc_w10", "name": "Premier sang", "desc": "Gagne 10 duels au Choc des Boosters.", "cond": { "type": "chocWins", "n": 10 }, "reward": { "shards": 50 } },
+ { "key": "choc_w50", "name": "Fléau des sachets", "desc": "Gagne 50 duels au Choc des Boosters.", "cond": { "type": "chocWins", "n": 50 }, "reward": { "shards": 150, "title": "Fléau des sachets" } },
+ { "key": "choc_w100", "name": "Centurion du Choc", "desc": "Gagne 100 duels au Choc des Boosters.", "cond": { "type": "chocWins", "n": 100 }, "reward": { "shards": 300, "title": "Centurion du Choc", "frame": "choc" } },
+ { "key": "choc_s5", "name": "Main brûlante", "desc": "Atteins une Série ardente de 5 victoires au Choc des Boosters.", "cond": { "type": "chocStreak", "n": 5 }, "reward": { "shards": 80 } },
+ { "key": "choc_s10", "name": "Flamme éternelle", "desc": "Atteins une Série ardente de 10 victoires au Choc des Boosters.", "cond": { "type": "chocStreak", "n": 10 }, "reward": { "shards": 250, "title": "Flamme éternelle" } },
+ { "key": "choc_l_or", "name": "Lame d’or", "desc": "Atteins la ligue Or au Choc des Boosters.", "cond": { "type": "chocLeague", "n": 2 }, "reward": { "shards": 80 } },
+ { "key": "choc_l_abysse", "name": "Souverain du Choc", "desc": "Atteins la ligue Abysse au Choc des Boosters.", "cond": { "type": "chocLeague", "n": 4 }, "reward": { "shards": 300, "title": "Souverain du Choc", "chests": { "abyssal": 1 } } }
 ]

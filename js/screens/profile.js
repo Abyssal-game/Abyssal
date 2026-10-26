@@ -8,6 +8,9 @@ import { unlockSources } from '../core/unlocks.js';
 import { RARITIES, FRAMES, BOOSTERS, FACTION_ORDER, VARIANTS, RARITY, RARITY_ORDER } from '../config.js';
 import { CODEX_FRAMES, CODEX_BACKS, FINISHES, PLATES, SACHETS, TAPIS, FONDS, LIVE_BACKS, CATALOG, SEASONS, SHOP } from '../core/codex.js';
 import { withPlate, fondCls, fondStyle } from '../ui/vitrine.js'; /* v564 : plaque de pseudo */
+import { chocBoardHTML } from '../ui/choc.js'; /* v807 */
+import { chocCard } from '../core/friends.js';
+import { today } from '../core/save.js';
 
 export default function profile(app, root) {
   const g = app.game, cat = app.catalog;
@@ -171,6 +174,7 @@ export default function profile(app, root) {
       <button class="panel pf-custom-row" data-act="custom"><img class="pf-cr-ic" alt="" src="assets/icons/customize.webp" onerror="this.remove()"><span class="pf-cr-t"><b>Personnaliser</b><span class="small muted">Avatar, titres, cadres, plaques, dos, sachets, tapis, fonds</span></span><span class="pf-cr-go">${icon('next')}</span></button>
 
       ${luckHTML()}
+      ${chocBoardHTML(chocCard(s), cat, today(g.clock()).slice(0, 7), true)}
 
       <details class="panel dc-fold"><summary>${picon('stats')} Statistiques détaillées</summary><div>
         <div class="stats-grid">

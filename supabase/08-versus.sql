@@ -552,6 +552,8 @@ alter table public.versus_duels add column if not exists lineup jsonb;
 -- v736 : le gagnant choisit sa carte parmi celles de l'adversaire (index dans ses cartes)
 alter table public.versus_duels add column if not exists a_pick int;
 alter table public.versus_duels add column if not exists b_pick int;
+-- v807 : une réaction laissée par chaque joueur sur le duel ({ a: clé, b: clé }), vue par l'autre quand il regarde le duel
+alter table public.versus_duels add column if not exists reacts jsonb;
 alter table public.versus_duels drop constraint if exists versus_duels_type_check;
 alter table public.versus_duels add constraint versus_duels_type_check check (type in ('standard', 'faction', 'event', 'premium', 'mix'));
 create index if not exists versus_open on public.versus_duels (status, created_at desc);
@@ -646,7 +648,11 @@ begin
   if p_type = 'event' and (coalesce(array_length(p_factions, 1), 0) <> 2 or not (p_factions <@ facs) or p_factions[1] = p_factions[2]) then raise exception 'Alliance inconnue.'; end if;
   if p_to is not null then
     if p_to = me then raise exception 'Tu ne peux pas te défier toi-même.'; end if;
-    if not public.are_friends(me, p_to) then raise exception 'Ce joueur n’est pas ton ami.'; end if;
+    -- v807 : revanche : aussi un joueur contre qui on vient de jouer un duel (3 jours)
+    if not public.are_friends(me, p_to) and not exists (select 1 from public.versus_duels x where x.status = 'done'
+        and ((x.a = me and x.b = p_to) or (x.a = p_to and x.b = me)) and x.done_at > now() - interval '3 days') then
+      raise exception 'Ce joueur n’est pas ton ami.';
+    end if;
   end if;
   perform public.versus_expire();
   select count(*) into n from public.versus_duels where a = me and status = 'open';
@@ -683,7 +689,11 @@ begin
   end loop;
   if p_to is not null then
     if p_to = me then raise exception 'Tu ne peux pas te défier toi-même.'; end if;
-    if not public.are_friends(me, p_to) then raise exception 'Ce joueur n’est pas ton ami.'; end if;
+    -- v807 : revanche : aussi un joueur contre qui on vient de jouer un duel (3 jours)
+    if not public.are_friends(me, p_to) and not exists (select 1 from public.versus_duels x where x.status = 'done'
+        and ((x.a = me and x.b = p_to) or (x.a = p_to and x.b = me)) and x.done_at > now() - interval '3 days') then
+      raise exception 'Ce joueur n’est pas ton ami.';
+    end if;
   end if;
   perform public.versus_expire();
   select count(*) into n from public.versus_duels where a = me and status = 'open';
@@ -790,7 +800,9 @@ begin
   if d.a = me then update public.versus_duels set a_pick = p_idx where id = p_id;
   else update public.versus_duels set b_pick = p_idx where id = p_id; end if;
   if c->>'rarity' in ('M', 'S') then return jsonb_build_object('trophy', null, 'chest', 'abyssal'); end if;
-  return jsonb_build_object('trophy', c, 'chest', null);
+  -- v807 : le pseudo de l'adversaire (carte trophée : « Gagnée au Choc contre X »)
+  return jsonb_build_object('trophy', c, 'chest', null,
+    'foe', (select p.pseudo from public.profiles p where p.id = case when d.a = me then d.b else d.a end));
 end $$;
 revoke execute on function public.versus_pick(uuid, int) from public, anon;
 grant execute on function public.versus_pick(uuid, int) to authenticated;
@@ -800,6 +812,7 @@ grant execute on function public.versus_pick(uuid, int) to authenticated;
 alter table public.profiles add column if not exists frame text;
 alter table public.profiles add column if not exists plate text;
 alter table public.profiles add column if not exists sachet text;
+alter table public.profiles add column if not exists choc jsonb; -- v807 : série et ligue du Choc (publiées par le serveur de partie)
 create or replace function public.versus_list()
 returns jsonb language plpgsql volatile security definer set search_path = public as $$
 declare me uuid := auth.uid();
@@ -808,7 +821,7 @@ begin
   perform public.versus_expire();
   return jsonb_build_object(
     'open', coalesce((select jsonb_agg(x order by x.created_at desc) from (
-      select d.id, d.a, d.type, d.faction, d.factions, d.lineup, d.packs, d.stake, d.created_at, p.pseudo, p.avatar, p.badge, p.title, p.level
+      select d.id, d.a, d.type, d.faction, d.factions, d.lineup, d.packs, d.stake, d.created_at, p.pseudo, p.avatar, p.badge, p.title, p.level, p.choc
       from public.versus_duels d join public.profiles p on p.id = d.a
       where d.status = 'open' and d.public and d.a <> me
       order by d.created_at desc limit 40) x), '[]'::jsonb),
@@ -820,11 +833,36 @@ begin
              case when d.a = me then d.a_score else d.b_score end as my_score,
              case when d.a = me then d.b_score else d.a_score end as their_score,
              case when d.a = me then d.a_claimed else d.b_claimed end as claimed,
-             o.pseudo, o.avatar, o.badge, o.sachet, o.frame, o.plate
+             o.pseudo, o.avatar, o.badge, o.sachet, o.frame, o.plate, o.choc,
+             case when d.a = me then d.reacts ->> 'a' else d.reacts ->> 'b' end as my_react,
+             case when d.a = me then d.reacts ->> 'b' else d.reacts ->> 'a' end as their_react
       from public.versus_duels d left join public.profiles o on o.id = case when d.a = me then d.b else d.a end
       where me in (d.a, d.b)
       order by d.created_at desc limit 30) x), '[]'::jsonb));
 end $$;
+
+-- ——— v807 : une réaction laissée sur un duel joué (vue par l'adversaire quand il regarde le duel) ————————————
+create or replace function public.versus_react(p_id uuid, p_key text)
+returns jsonb language plpgsql volatile security definer set search_path = public as $$
+declare me uuid := auth.uid(); d public.versus_duels; owned jsonb; side text;
+begin
+  if me is null then raise exception 'Connecte-toi d’abord.'; end if;
+  if p_key is null or not (p_key = any (array['re-salut', 're-bien', 're-merci', 're-aie', 're-mammon', 're-souveraine', 're-archiviste', 're-ilda', 're-orvel', 're-vesna', 're-maitre', 're-echo', 're-g-devoreur', 're-g-matriarche', 're-g-roi', 're-g-architecte', 're-g-eclipse', 're-g-essaim', 're-g-bourreau', 're-g-choeur', 're-g-chaines', 're-g-horloge', 're-g-miroirs', 're-g-golem', 're-g-peste', 're-g-chasseur', 're-g-voeux', 're-g-titan', 're-g-jumeaux', 're-g-juge', 're-g-bete', 're-g-abysse', 're-feu-follet', 're-passeur', 're-blizzard', 're-sentinelle'])) then raise exception 'Réaction inconnue.'; end if;
+  select * into d from public.versus_duels where id = p_id and me in (a, b) for update;
+  if not found then raise exception 'Défi introuvable.'; end if;
+  if d.status <> 'done' then raise exception 'Ce duel n’est pas encore joué.'; end if;
+  -- réaction payante : vérifiée dans la partie tenue par le serveur
+  if not (p_key = any (array['re-salut', 're-bien', 're-merci', 're-aie'])) and to_regclass('public.parties') is not null then
+    execute 'select coalesce(data -> ''emotes'', ''[]''::jsonb) from public.parties where user_id = $1' into owned using me;
+    if owned is not null and not (owned ? p_key) then raise exception 'Tu n’as pas encore cette réaction.'; end if;
+  end if;
+  side := case when d.a = me then 'a' else 'b' end;
+  if (d.reacts ->> side) is not null then raise exception 'Tu as déjà réagi à ce duel.'; end if;
+  update public.versus_duels set reacts = coalesce(reacts, '{}'::jsonb) || jsonb_build_object(side, p_key) where id = p_id;
+  return jsonb_build_object('k', p_key);
+end $$;
+revoke execute on function public.versus_react(uuid, text) from public, anon;
+grant execute on function public.versus_react(uuid, text) to authenticated;
 
 revoke execute on function public.versus_create(text, text, text[], int, uuid) from public, anon;
 revoke execute on function public.versus_accept(uuid) from public, anon;
@@ -842,7 +880,7 @@ grant execute on function public.versus_list() to authenticated;
 create table if not exists public.sql_stamps (file text primary key, stamp text not null, at timestamptz not null default now());
 alter table public.sql_stamps enable row level security;
 revoke all on public.sql_stamps from public, anon, authenticated;
-insert into public.sql_stamps (file, stamp) values ('08', '51026b0cf559') on conflict (file) do update set stamp = excluded.stamp, at = now();
+insert into public.sql_stamps (file, stamp) values ('08', 'df806cac094a') on conflict (file) do update set stamp = excluded.stamp, at = now();
 create or replace function public.sql_stamps() returns jsonb language sql stable security definer set search_path = public as $$
   select coalesce(jsonb_object_agg(file, stamp), '{}'::jsonb) from public.sql_stamps;
 $$;
