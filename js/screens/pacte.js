@@ -5,7 +5,7 @@ import * as PA from '../core/pacte.js';
 import { FACTION_ORDER } from '../config.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, picon, crestHTML } from '../ui/icons.js';
-import { esc, fmt, toast, confirmBox, openSheet } from '../ui/dom.js';
+import { esc, fmt, toast, confirmBox, openSheet, fitEnd } from '../ui/dom.js';
 import { setScene } from '../ui/scene.js';
 import { tuto } from '../ui/tutos.js';
 import { CHESTS } from '../core/descent.js';
@@ -48,7 +48,7 @@ export const howHTML = () => `<ol class="how-steps">${HOW.map(howLi).join('')}</
 
 export default function pacteScreen(app, root) {
   const g = app.game, cat = app.catalog;
-  let busy = false, timer = 0, gone = false, banner = null, defy = null;
+  let busy = false, timer = 0, gone = false, banner = null, defy = null, hold = null; /* v851 : scores d'avant le tour de l'adversaire, montrés jusqu'à la fin de son tour */
   /* v745 : effets du Pacte (carte qui vole de la pioche, sceau qui s'embrase) : ce que l'écran montrait au dessin précédent */
   let prevSig = [], prevLit = new Set();
   const wait = (ms) => new Promise((r) => { timer = setTimeout(r, app.reduced() ? Math.min(ms, 150) : ms); });
@@ -169,7 +169,7 @@ export default function pacteScreen(app, root) {
   /* v745 : un seul tableau des scores en tête (adversaire à gauche, toi à droite) au lieu de deux grands cadres */
   function duo(st) {
     const R = PA.RIVALS[st.rival], T = PA.tgt(st), side = (x) => {
-      const sc = st.scores[x], on = st.turn === x && !st.over;
+      const sc = (hold || st.scores)[x], on = st.turn === x && !st.over;
       return `<span class="pa-side s-${x} ${on ? 'on' : ''}" ${x === 'a' && R.power ? 'data-pa="power" role="button"' : ''}><span class="sc-med ${x === 'p' ? 'mq-me' : ''}">${x === 'p' ? me() : pic(st.rival)}${x === 'a' && R.power ? `<small class="pa-pown" aria-label="${esc(R.power.name)}">${icon('p:danger')}</small>` : ''}</span>
         <span class="pa-sn"><b>${x === 'p' ? 'Toi' : esc(R.name)}</b><span class="pa-bar"><i style="width:${Math.min(100, (sc / T) * 100)}%"></i></span></span>
         <span class="pa-sp"><b>${sc}</b></span></span>`;
@@ -282,6 +282,7 @@ export default function pacteScreen(app, root) {
     // l'adversaire joue tout son tour d'un coup dans le moteur ; l'écran le rejoue carte par carte
     const snap = JSON.parse(JSON.stringify(st));
     const evs = g.pacteAi();
+    hold = { ...snap.scores };
     const shown = { ...snap, row: [], sceaux: 0, offer: false };
     let drawn = 0;
     for (const ev of evs) {
@@ -306,10 +307,10 @@ export default function pacteScreen(app, root) {
       renderShown(shown); await wait(ev.card ? 650 : 450);
       if (ev.result === 'bust') await burnRow();
       const rowWas = shown.row.slice();
-      shown.row = []; shown.sceaux = 0; shown.offer = false;
+      shown.row = []; shown.sceaux = 0; shown.offer = false; hold = null;
       await say(g.s.pacte.cur, { ...ev, _row: rowWas }, 1900); defy = null;
     }
-    busy = false; ui.deckView = null;
+    busy = false; ui.deckView = null; hold = null;
     if (gone) return;
     view();
     if (g.s.pacte.cur?.over) { await wait(300); end(); }
@@ -342,7 +343,7 @@ export default function pacteScreen(app, root) {
       ${out.title ? `<p class="sc-gain">${icon('p:titles')} Nouveau titre : <b>${esc(out.title)}</b></p>` : ''}
       ${tourneyLine(out)}
       <div class="sc-end-act">${st.daily ? '' : '<button class="btn primary dc-plq dc-plq-red" data-x="again">Rejouer</button>'}<button class="btn dc-plq dc-plq-dark" data-x="back">Retour</button></div></div>`;
-    document.body.appendChild(el);
+    document.body.appendChild(el); fitEnd(el); /* v851 */
     el.addEventListener('click', (e) => {
       const b = e.target.closest('[data-x]'); if (!b) return;
       el.remove(); document.body.classList.remove('sc-lost');

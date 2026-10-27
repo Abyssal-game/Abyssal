@@ -62,7 +62,7 @@ export function createCryptesMp(app, root, { modeBar }) {
     const left = (s.cards || []).filter((c) => !c.gone).length / 2;
     if (v.status !== 'playing') return '';
     if (last && !(s.pending && ctx.myTurn(v))) return `<div class="cr-msg cr-last ${last.cls}" style="--fc:${cat.faction[last.f]?.colors.secondary || '#C9A45A'}">${pwMed(last.f)}<span><b>${last.title}</b><span class="small">${last.text}</span></span></div>`;
-    if (s.pending && ctx.myTurn(v)) { const P = CR.POWERS[s.pending.power]; return `<div class="cr-msg gold">${sigil(s.pending.power)}<span><b>${esc(P.name)}</b> · ${s.pending.power === 'abyssal' ? `touche deux cartes face cachée à échanger${ui.picks.length ? ' (encore une)' : ''}` : s.pending.power === 'infernal' ? 'touche une carte face cachée pour la regarder en secret' : 'touche une carte face cachée : elle sera montrée à tous'}.</span></div>`; }
+    if (s.pending && ctx.myTurn(v)) { const P = CR.POWERS[s.pending.power]; return `<div class="cr-msg gold">${sigil(s.pending.power)}<span><b>${esc(P.name)}</b> · ${s.pending.power === 'abyssal' ? `touche deux cartes face cachée à échanger${ui.picks.length ? ' (encore une)' : ''}` : s.pending.power === 'infernal' ? 'touche une carte face cachée pour la regarder en secret' : 'touche une carte face cachée : elle sera montrée à tous'}.</span>${s.pending.power === 'abyssal' ? '<button class="btn small cr-skip" data-mp="skip">Ne pas échanger</button>' : ''}</div>`; }
     return `<div class="cr-msg">${ctx.myTurn(v) ? `<span>${(s.open || []).length ? 'Retourne une deuxième carte.' : 'À toi : retourne deux cartes.'}</span>` : `<span><span>${ctx.waitMsg(v)}</span></span>`}<span class="muted">${t(left > 1 ? '{n} paires à trouver' : '{n} paire à trouver', { n: left })}</span></div>`;
   }
   function popHTML(v, o) {
@@ -122,7 +122,8 @@ export function createCryptesMp(app, root, { modeBar }) {
       return;
     }
     if (ev.kind === 'power') {
-      if (ev.power === 'abyssal') { ev.i.forEach((i) => ui.swap.add(i)); banner = { cls: '', html: `${sigil('abyssal')}<span><b>Remous abyssal</b><span class="small">${mine ? 'Les deux cartes ont échangé leur place.' : t('{name} a échangé ces deux cartes de place.', { name: nm })}</span></span>` }; app.sfx.swipe?.(); }
+      if (ev.power === 'abyssal' && ev.skipped) { if (mine) return; banner = { cls: '', html: `${sigil('abyssal')}<span><b>Remous abyssal</b><span class="small">${t('{name} a préféré ne rien échanger.', { name: nm })}</span></span>` }; }
+      else if (ev.power === 'abyssal') { ev.i.forEach((i) => ui.swap.add(i)); banner = { cls: '', html: `${sigil('abyssal')}<span><b>Remous abyssal</b><span class="small">${mine ? 'Les deux cartes ont échangé leur place.' : t('{name} a échangé ces deux cartes de place.', { name: nm })}</span></span>` }; app.sfx.swipe?.(); }
       else if (ev.card) { ui.face.set(ev.i[0], ev.card); ui.glow.add(ev.i[0]); banner = { cls: 'gold', html: `${sigil(ev.power)}<span><b>${esc(CR.POWERS[ev.power].name)}</b><span class="small">${ev.power === 'infernal' ? 'Toi seul vois cette carte : retiens-la !' : mine ? 'Tout le monde voit cette carte.' : t('{name} montre cette carte à tout le monde.', { name: nm })}</span></span>` }; app.sfx['cr-flip']?.(); }
       else { ui.glow.add(ev.i[0]); banner = { cls: '', html: `${sigil('infernal')}<span><b>Regard infernal</b><span class="small">${t('{name} regarde cette carte en secret.', { name: nm })}</span></span>` }; }
       drawGame(v, ctx); await wait(ev.card && ev.power === 'infernal' ? 2000 : 1500);
@@ -165,6 +166,7 @@ export function createCryptesMp(app, root, { modeBar }) {
       if (k === 'rules') return openSheet(`<div class="sc-rules"><h2>Les Cryptes</h2>${howHTML()}</div>`, { label: 'Règles des Cryptes' });
       if (k === 'powers') return openSheet(`<div class="sc-rules"><h2>Pouvoirs des factions</h2><p class="small muted">Chaque paire déclenche le pouvoir de sa faction.</p>${powersHTML()}</div>`, { label: 'Pouvoirs des factions' });
       const v = ctx.view;
+      if (k === 'skip' && v?.state?.pending?.power === 'abyssal' && ctx.myTurn(v) && !ctx.busy && !anim) { ui.picks = []; return act(ctx, { picks: [] }); } /* v851 : Remous abyssal refusé */
       if (k !== 'c' || !v || !ctx.myTurn(v) || ctx.busy || anim) return;
       const i = Number(b.dataset.i), c = v.state.cards[i];
       if (!c || c.gone || c.k != null) return;

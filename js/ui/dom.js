@@ -185,3 +185,23 @@ export function paint(root, html, depth = 2) {
   const holder = document.createElement('div'); holder.append(t.content);
   keepChildren(root, holder, depth);
 }
+
+/* v851 : écran de fin des jeux du Cercle (.sc-end) : tout tient à l'écran, sans défilement ; si le contenu dépasse
+   (victoire avec butin, coffres, titre…), il est réduit d'un bloc pour que les boutons restent toujours visibles */
+export function fitEnd(el) {
+  const inn = el?.querySelector('.sc-end-in');
+  if (!inn) return;
+  const run = () => {
+    if (!el.isConnected) return;
+    inn.style.zoom = '';
+    const cs = getComputedStyle(el);
+    const avail = el.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    const h = inn.offsetHeight;
+    if (h > avail && avail > 0) inn.style.zoom = Math.max(0.5, avail / h - 0.01).toFixed(3); /* zoom (pas transform) : la mise en page suit, le bloc reste centré */
+  };
+  run(); requestAnimationFrame(run);
+  inn.querySelectorAll('img').forEach((im) => { if (!im.complete) im.addEventListener('load', run, { once: true }); });
+  new MutationObserver(run).observe(inn, { childList: true, subtree: true });
+  window.addEventListener('resize', run);
+  setTimeout(() => window.removeEventListener('resize', run), 600000);
+}

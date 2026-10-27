@@ -7,7 +7,7 @@ import { openRuleHelp } from '../ui/sceaux-demo.js';
 import { STARTER } from '../core/army.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, picon, crestHTML } from '../ui/icons.js';
-import { openSheet, esc, fmt, toast, confirmBox } from '../ui/dom.js';
+import { openSheet, esc, fmt, toast, confirmBox, fitEnd } from '../ui/dom.js';
 import { setScene } from '../ui/scene.js';
 import { tuto } from '../ui/tutos.js';
 import { CHESTS } from '../core/descent.js';
@@ -312,7 +312,7 @@ ${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone || dail
       ${out.frame ? `<p class="sc-gain">${icon('p:titles')} Nouveau cadre de profil : <b>Cadre des Sceaux</b></p>` : ''}
       <p class="sc-say">${rivalPic(cat, R)}<span>« ${esc(st.over === 'won' ? vsay(st, 'end', `arb-${R.key}`, R.win) : st.over === 'lost' ? vsay(st, 'end', `arb-${R.key}`, R.lose) : 'Partie nulle. On recommence ?')} »</span></p>
       <div class="sc-end-act">${st.daily ? '' : '<button class="btn primary dc-plq dc-plq-red" data-x="again">Rejouer</button>'}<button class="btn dc-plq dc-plq-dark" data-x="back">Retour</button></div></div>`;
-    document.body.appendChild(el);
+    document.body.appendChild(el); fitEnd(el); /* v851 */
     el.addEventListener('click', (e) => {
       const tb = e.target.closest('[data-tro]');
       if (tb) {

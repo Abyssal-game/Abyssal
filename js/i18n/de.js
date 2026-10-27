@@ -9269,6 +9269,11 @@ export default {
   "Malédictions": "Flüche",
   "Familles": "Familien",
   "Total": "Gesamt",
+  "Ne pas échanger": "Nicht tauschen",
+  "{name} a préféré ne rien échanger.": "{name} hat lieber nichts getauscht.",
+  "4 victoires : coffre d’or": "4 Siege: Goldtruhe",
+  "Coffre d’or.": "Goldtruhe.",
+  "Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour, à jouer avant minuit : il ne se garde pas. Les jetons ne s’achètent pas et ne se gagnent nulle part ailleurs.": "Jede Partie kostet eine Schlacht-Marke. Du bekommst jeden Tag eine, zu spielen vor Mitternacht: Sie lässt sich nicht aufheben. Marken kann man weder kaufen noch anderswo gewinnen.",
 };
 
 export const names = {

@@ -9281,6 +9281,11 @@ export default {
   "Malédictions": "Curses",
   "Familles": "Families",
   "Total": "Total",
+  "Ne pas échanger": "Don't swap",
+  "{name} a préféré ne rien échanger.": "{name} chose not to swap anything.",
+  "4 victoires : coffre d’or": "4 wins: gold chest",
+  "Coffre d’or.": "Gold chest.",
+  "Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour, à jouer avant minuit : il ne se garde pas. Les jetons ne s’achètent pas et ne se gagnent nulle part ailleurs.": "Each game costs one Clash token. You get one every day, to play before midnight: it can't be saved. Tokens can't be bought and can't be won anywhere else.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

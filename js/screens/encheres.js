@@ -5,7 +5,7 @@ import { t, tw, LANG } from '../i18n.js';
 import * as EN from '../core/encheres.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, picon, crestHTML } from '../ui/icons.js';
-import { esc, fmt, toast, confirmBox, openSheet } from '../ui/dom.js';
+import { esc, fmt, toast, confirmBox, openSheet, fitEnd } from '../ui/dom.js';
 import { setScene } from '../ui/scene.js';
 import { tuto } from '../ui/tutos.js';
 import { CHESTS } from '../core/descent.js';
@@ -211,7 +211,7 @@ export default function encheresScreen(app, root) {
       ${out.title ? `<p class="sc-gain">${icon('p:titles')} Nouveau titre : <b>${esc(out.title)}</b></p>` : ''}
       ${tourneyLine(out)}
       <div class="sc-end-act">${st.daily ? '' : '<button class="btn primary dc-plq dc-plq-red" data-x="again">Rejouer</button>'}<button class="btn dc-plq dc-plq-dark" data-x="back">Retour</button></div></div>`;
-    document.body.appendChild(el);
+    document.body.appendChild(el); fitEnd(el); /* v851 */
     el.addEventListener('click', (e) => {
       const b = e.target.closest('[data-x]'); if (!b) return;
       el.remove(); document.body.classList.remove('sc-lost');

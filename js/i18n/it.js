@@ -9268,6 +9268,11 @@ export default {
   "Malédictions": "Maledizioni",
   "Familles": "Famiglie",
   "Total": "Totale",
+  "Ne pas échanger": "Non scambiare",
+  "{name} a préféré ne rien échanger.": "{name} ha preferito non scambiare nulla.",
+  "4 victoires : coffre d’or": "4 vittorie: forziere d’oro",
+  "Coffre d’or.": "Forziere d’oro.",
+  "Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour, à jouer avant minuit : il ne se garde pas. Les jetons ne s’achètent pas et ne se gagnent nulle part ailleurs.": "Ogni partita costa un gettone della Sfida. Ne ricevi uno ogni giorno, da giocare prima di mezzanotte: non si conserva. I gettoni non si comprano e non si vincono da nessun’altra parte.",
 };
 
 export const names = {

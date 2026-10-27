@@ -267,7 +267,7 @@ export const CODEX_ONLY = ['dos-codex',
 const FREE = (t) => (t === CODEX.tiers ? { chests: { abyssal: 1 } }
   : t % 10 === 0 ? { chests: { [t < 15 ? 'fer' : 'or']: 1 } }
   : t === 5 || t === 15 || t === 25 ? { tickets: { standard: 1 } }
-  : t === 3 || t === 13 || t === 23 ? { chocTok: 1 } /* v811 : un jeton du Choc des Boosters */
+  : t === 3 || t === 13 || t === 23 ? { shards: 30 + 6 * t } /* v851 : éclats à la place du jeton du Choc (un seul jeton par jour) */
   : t % 2 === 0 ? (t % 4 === 0 ? { ash: 15 + 3 * t } : { shards: 30 + 6 * t })
   : null);
 // v550 : trois saisons d'un mois (décision du propriétaire, 21 octobre 2026). Dates à l'heure du joueur (minuit chez lui).

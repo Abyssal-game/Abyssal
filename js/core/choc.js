@@ -11,7 +11,7 @@
 
 export const CHOC = {
   tokensMax: 1, // v838 : un jeton par jour, qui ne se garde pas (rendez-vous quotidien : rien à mettre de côté pour le week-end)
-  tokensCap: 9, // plafond avec les jetons gagnés ailleurs (Tournoi, coffre de la semaine, Codex), à jouer le jour même
+  tokensCap: 9, // plafond de sécurité (v851 : plus aucun jeton gagné ailleurs)
   hand: 2, renfort: 1, packCards: 3, rounds: 3,
   finish: 1,
   flames: 8, flameMax: 4, // Flammes pour toute la partie, au plus 4 sur une même carte

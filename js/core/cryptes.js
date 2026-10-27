@@ -209,6 +209,8 @@ export function usePower(st, picks, rng = Math.random) {
   const P = st.pending;
   if (!P) throw new Error('Aucun pouvoir en attente.');
   const hid = hidden(st);
+  /* v851 : le Remous abyssal peut être refusé (aucune carte choisie) */
+  if (P.power === 'abyssal' && Array.isArray(picks) && !picks.length) { st.pending = null; st.last = { who: 'p', kind: 'power', power: P.power, i: [], skipped: true }; return st.last; }
   if (!Array.isArray(picks) || !picks.every(Number.isInteger) || picks.length !== P.pick || picks.some((i) => !hid.includes(i)) || new Set(picks).size !== picks.length) throw new Error('Choisis une carte face cachée.');
   st.pending = null;
   const ev = { who: 'p', kind: 'power', power: P.power, i: picks };

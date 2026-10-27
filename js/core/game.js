@@ -372,7 +372,7 @@ export class Game {
   claimWeekChest() {
     const wc = this.weekChest();
     if (!wc.ready) throw new Error(wc.claimed ? 'Le coffre de la semaine est déjà ouvert.' : `Joue ${WEEK_DAYS} jours cette semaine pour l’ouvrir.`);
-    this.s.week.claimed = true; this.addChests({ or: 1 }); this.chocGive(1); /* v811 : + un jeton du Choc */ this.persist();
+    this.s.week.claimed = true; this.addChests({ or: 1 }); /* v851 : plus de jeton du Choc en récompense (un seul par jour) */ this.persist();
     return 'or';
   }
   /* v644 : éclats de l'offrande pour le n-ième jour d'une série (affichage) */
@@ -1289,7 +1289,7 @@ export class Game {
     t.round++; t.best = Math.max(t.best || 0, t.round);
     const r = (out.tourney = { round: t.round, of: tourneyTables(t.game).length });
     this.emit('progress', [{ kind: 'tourney', name: t.round >= r.of ? 'Champion du Cercle cette semaine !' : `Manche ${t.round} sur ${r.of} gagnée` }]);
-    if (t.round >= 4 && !t.gold) { t.gold = Date.now(); this.s.chests.or = (this.s.chests.or || 0) + 1; r.chest = 'or'; this.chocGive(1); /* v811 */ }
+    if (t.round >= 4 && !t.gold) { t.gold = Date.now(); this.s.chests.or = (this.s.chests.or || 0) + 1; r.chest = 'or'; /* v851 : sans jeton du Choc */ }
     if (t.round >= r.of) { r.champ = true; if (!t.champ) { t.champ = Date.now(); this.s.tourneyWins = (this.s.tourneyWins || 0) + 1; this.s.chests.abyssal = (this.s.chests.abyssal || 0) + 1; this.grant({ tickets: { premium: 2 } }, 'tourney'); r.reward = true; } }
   }
   // ——— v427 : les Enchères de Mammon (enchères à l'aveugle à trois), ouvertes avec la Salle des jeux ———

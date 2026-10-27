@@ -9269,6 +9269,11 @@ export default {
   "Malédictions": "Maldiciones",
   "Familles": "Familias",
   "Total": "Total",
+  "Ne pas échanger": "No intercambiar",
+  "{name} a préféré ne rien échanger.": "{name} ha preferido no intercambiar nada.",
+  "4 victoires : coffre d’or": "4 victorias: cofre de oro",
+  "Coffre d’or.": "Cofre de oro.",
+  "Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour, à jouer avant minuit : il ne se garde pas. Les jetons ne s’achètent pas et ne se gagnent nulle part ailleurs.": "Cada partida cuesta una ficha de la Batalla. Recibes una cada día, para jugar antes de medianoche: no se guarda. Las fichas no se compran ni se ganan en ningún otro sitio.",
 };
 
 export const names = {

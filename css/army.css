@@ -8794,3 +8794,21 @@ table.odds th, table.odds td { white-space: normal; }
 .en-coin-back { position: relative; }
 .en-coin-back img { position: absolute; inset: -4%; width: 108%; height: 108%; object-fit: contain; border-radius: 50%; }
 .en-coin-back:has(img) { background: none; box-shadow: none; color: transparent; animation: none; filter: drop-shadow(0 0 10px rgba(242, 193, 78, .45)); }
+/* v851 : refuser le Remous abyssal */
+.cr-msg .cr-skip { flex: none; min-height: 36px; padding: 4px 10px; font-size: .78rem; white-space: nowrap; }
+/* v851 : étiquettes des cartes spéciales de la pioche centrées */
+.pa-pss { justify-content: center; }
+/* v851 : écrans de fin des jeux du Cercle : réduits d'un bloc s'ils dépassent (fitEnd), blason centré sur l'écu */
+.sc-end-in { flex: none; }
+.crest { translate: -2.7% 0; }
+.crest.lost { translate: 5% 0; }
+/* v851 : victoire avec Butin du jour : plateau et butin plus compacts (moins de réduction à l'écran) */
+.sc-end-in:has(.sc-trophy) { gap: 6px; }
+.sc-end-in:has(.sc-trophy) .sc-crest { width: min(50%, 190px); }
+.sc-end-in:has(.sc-trophy) .sc-endboard { width: min(34%, 124px); margin: 2px auto 0; }
+.sc-end-in .sc-trophy { grid-template-columns: auto auto; column-gap: 8px; row-gap: 4px; align-items: center; margin: 2px 0; padding: 8px 10px; }
+.sc-end-in .sc-trophy .sc-tico { grid-row: span 2; width: 34px; height: 40px; }
+.sc-end-in .sc-trophy > b, .sc-end-in .sc-trophy > .small { justify-self: start; text-align: left; }
+.sc-end-in .sc-trophy .sc-tro-row { grid-column: 1 / -1; }
+.sc-end-in .sc-trophy .sc-tro { width: 62px; }
+.sc-end-in:has(.sc-trophy) .sc-eblg, .sc-end-in:has(.sc-trophy) .sc-caps { margin: 0; }

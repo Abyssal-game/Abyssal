@@ -36,7 +36,7 @@ export default function gamesScreen(app, root) {
     <div class="tn-h">${icon('trophy')}<span><b>Tournoi du Cercle</b><small>Cette semaine : ${TNAME[TN.game]} · fin dimanche soir</small></span></div>
     <ol class="tn-pips">${TN.tables.map((k, i) => `<li class="${i < done ? 'ok' : ''} ${i === next && !TN.champ ? 'cur' : ''}"><img alt="" src="assets/sceaux/rival2-${tnPic(TN.game, i)}.webp">${i < done ? `<i>${icon('check')}</i>` : ''}</li>`).join('')}</ol>
     <p class="small tn-line">${TN.champ && TN.round >= TN.tables.length ? '<b>Champion du Cercle</b> cette semaine ! Tu peux rejouer pour le plaisir.' : !TN.alive ? `Série arrêtée. Ton meilleur score de la semaine : <b>${TN.best} / ${TN.tables.length}</b>. Recommence depuis la première manche.` : TN.round ? `${TN.round} victoire${TN.round > 1 ? 's' : ''} d’affilée. Une défaite, et la série s’arrête.` : 'Bats les 8 adversaires d’affilée, dans l’ordre des salles. Une défaite ou une égalité, et tout recommence.'}</p>
-    <p class="small muted tn-rw">${TN.gold ? icon('check') : ''} ${t('4 victoires : coffre d’or et un jeton du Choc')} · ${TN.champ ? icon('check') : ''} ${t('8 victoires : coffre abyssal et 2 tickets premium')}</p>
+    <p class="small muted tn-rw">${TN.gold ? icon('check') : ''} ${t('4 victoires : coffre d’or')} · ${TN.champ ? icon('check') : ''} ${t('8 victoires : coffre abyssal et 2 tickets premium')}</p>
     <button class="btn primary block dc-plq dc-plq-red" data-act="tplay">${icon('trophy')}${!TN.alive || TN.round >= TN.tables.length ? 'Recommencer le tournoi' : `Jouer la manche ${TN.round + 1}`}</button>
     <div class="tn-fr"></div>
   </section>`;

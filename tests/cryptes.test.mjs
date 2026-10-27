@@ -85,3 +85,13 @@ test('cryptes : récompenses et ouverture de la crypte suivante', () => {
   assert.ok(out.first); assert.equal(g.s.shards - before, CR.CRYPTES_REWARD.firstWin + CR.TABLE.ossuaire.reward);
   assert.ok(CR.tableUnlocked(g.s, 1)); assert.ok(g.cryptesDailyOpen());
 });
+
+test('cryptes : le Remous abyssal peut être refusé (v851), les autres pouvoirs non', () => {
+  const st = CR.newGame(null, { table: 'ossuaire', seed: 3 });
+  let [a, b] = pos(st, pairOf(st, 'abyssal')); CR.flip(st, a, rng0); CR.flip(st, b, rng0);
+  const before = st.cards.map((c) => c.k).join();
+  const ev = CR.usePower(st, [], rng0);
+  assert.ok(ev.skipped); assert.equal(st.pending, null); assert.equal(st.cards.map((c) => c.k).join(), before); assert.equal(st.turn, 'p');
+  [a, b] = pos(st, pairOf(st, 'infernal')); CR.flip(st, a, rng0); CR.flip(st, b, rng0);
+  assert.throws(() => CR.usePower(st, [], rng0), /Choisis/);
+});

@@ -25,7 +25,7 @@ import { devDayKind, devLeague, devHallOn } from './choc-dev.js'; /* v843 */
 import { t, tw } from '../i18n.js';
 
 /* v833 : « Le butin de la table » (retour à l'idée de départ du propriétaire) */
-const HOW = () => [['p:seal', '#E8C35A', 'Un jeton par partie', 'Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour, à jouer avant minuit : il ne se garde pas. Le coffre de la semaine, le Tournoi du Cercle et le Codex en donnent d’autres, à jouer le jour même. Les jetons ne s’achètent pas.'],
+const HOW = () => [['p:seal', '#E8C35A', 'Un jeton par partie', 'Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour, à jouer avant minuit : il ne se garde pas. Les jetons ne s’achètent pas et ne se gagnent nulle part ailleurs.'],
   ['booster', '#C9A45A', 'Les boosters s’ouvrent', 'Toi et ton adversaire ouvrez trois boosters chacun, en même temps. Les cartes tombent sur la table : elles ne sont encore à personne. Le samedi, le troisième booster est un booster premium. Le dimanche, les trois boosters sont tirés au hasard (standard, faction, Alliances ou premium), les mêmes pour les deux joueurs.'],
   ['crown', '#F2C14E', 'Les points', 'Commune {c}, Peu commune {pc}, Rare {r}, Hyper rare {hr}, Mythique {mm}, Secrète {ss}, +{v} avec une finition.', { c: LUCK_POINTS.C, pc: LUCK_POINTS.PC, r: LUCK_POINTS.R, hr: LUCK_POINTS.HR, mm: LUCK_POINTS.M, ss: LUCK_POINTS.S, v: LUCK_POINTS.variant }],
   ['swords', '#E0485E', 'Le butin de la table', 'Le meilleur total rafle toutes les cartes de la table : les siennes et celles de l’adversaire. Le perdant repart les mains vides. Égalité : chacun garde les siennes.'],

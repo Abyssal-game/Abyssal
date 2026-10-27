@@ -5,7 +5,7 @@ import * as CR from '../core/cryptes.js';
 import { FACTION_ORDER } from '../config.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, picon, crestHTML } from '../ui/icons.js';
-import { esc, fmt, toast, confirmBox, openSheet } from '../ui/dom.js';
+import { esc, fmt, toast, confirmBox, openSheet, fitEnd } from '../ui/dom.js';
 import { setScene } from '../ui/scene.js';
 import { tuto } from '../ui/tutos.js';
 import { t, tw } from '../i18n.js';
@@ -115,7 +115,7 @@ export default function cryptesScreen(app, root) {
   }
   function info(st) {
     if (banner) return `<div class="cr-msg ${banner.cls || ''}">${banner.html}</div>`;
-    if (st.pending && st.turn === 'p') { const P = CR.POWERS[st.pending.power]; return `<div class="cr-msg gold">${sigil(st.pending.power)}<span><b>${esc(P.name)}</b> · ${st.pending.power === 'abyssal' ? `touche deux cartes face cachée à échanger${ui.picks.length ? ' (encore une)' : ''}` : st.pending.power === 'infernal' ? 'touche une carte face cachée pour la regarder en secret' : 'touche une carte face cachée : elle sera montrée à tous'}.</span></div>`; }
+    if (st.pending && st.turn === 'p') { const P = CR.POWERS[st.pending.power]; return `<div class="cr-msg gold">${sigil(st.pending.power)}<span><b>${esc(P.name)}</b> · ${st.pending.power === 'abyssal' ? `touche deux cartes face cachée à échanger${ui.picks.length ? ' (encore une)' : ''}` : st.pending.power === 'infernal' ? 'touche une carte face cachée pour la regarder en secret' : 'touche une carte face cachée : elle sera montrée à tous'}.</span>${st.pending.power === 'abyssal' ? '<button class="btn small cr-skip" data-cr="skip">Ne pas échanger</button>' : ''}</div>`; }
     if (ui.last) { const L = ui.last; return `<div class="cr-msg cr-last ${L.cls}" style="--fc:${cat.faction[L.f]?.colors.secondary || '#C9A45A'}">${pwMed(L.f)}<span><b>${L.title}</b><span class="small">${L.text}</span></span></div>`; }
     return `<div class="cr-msg">${st.turn === 'p' ? `<span>${st.open.length ? 'Retourne une deuxième carte.' : 'À toi : retourne deux cartes.'}</span>` : `<span>${esc(CR.RIVALS[st.rival].name)} réfléchit…</span>`}<span class="muted">${CR.left(st)} paire${CR.left(st) > 1 ? 's' : ''} à trouver</span></div>`;
   }
@@ -249,7 +249,7 @@ export default function cryptesScreen(app, root) {
       ${out.title ? `<p class="sc-gain">${icon('p:titles')} Nouveau titre : <b>${esc(out.title)}</b></p>` : ''}
       ${tourneyLine(out)}
       <div class="sc-end-act">${st.daily ? '' : '<button class="btn primary dc-plq dc-plq-red" data-x="again">Rejouer</button>'}<button class="btn dc-plq dc-plq-dark" data-x="back">Retour</button></div></div>`;
-    document.body.appendChild(el);
+    document.body.appendChild(el); fitEnd(el); /* v851 */
     el.addEventListener('click', (e) => {
       const b = e.target.closest('[data-x]'); if (!b) return;
       el.remove(); document.body.classList.remove('sc-lost');
@@ -286,6 +286,11 @@ export default function cryptesScreen(app, root) {
       return leave();
     }
     const st = g.s.cryptes.cur;
+    /* v851 : le Remous abyssal se refuse */
+    if (k === 'skip' && st?.pending?.power === 'abyssal' && !st.over && !busy && st.turn === 'p') {
+      try { g.cryptesPower([]); } catch (err) { toast(esc(err.message), { kind: 'error' }); return; }
+      ui.picks = []; app.sfx.tap?.(); return view();
+    }
     if (k !== 'c' || !st || st.over || busy || st.turn !== 'p') return;
     const i = Number(b.dataset.i);
     // pouvoir en attente : on choisit sa (ses) carte(s)
