@@ -142,7 +142,7 @@ export default function encheresScreen(app, root) {
   async function revealFocus(st, ev) {
     if (app.reduced() || gone) return;
     const col = (x) => `<div class="en-fx-c ${x === 'p' ? 'me' : ''}" data-x="${x}"><span class="sc-med">${x === 'p' ? me() : pic(st.seats[x])}</span><small>${esc(x === 'p' ? t('Toi') : tw(who(st, x).name))}</small>
-      <div class="en-coin"><div class="en-coin-in"><span class="en-coin-back">?</span><span class="en-coin-face"><b>${ev.bids[x]}</b></span></div></div></div>`;
+      <div class="en-coin"><div class="en-coin-in"><span class="en-coin-back"><img alt="" src="assets/jeux/en-jeton-cache.webp" onerror="this.remove()">?</span><span class="en-coin-face"><b>${ev.bids[x]}</b></span></div></div></div>`;
     const el = document.createElement('div'); el.className = 'en-focus';
     el.innerHTML = `<div class="en-fx-lot">${lotCard(ev.lot)}</div><div class="en-fx-row">${['a', 'p', 'b'].map(col).join('')}</div><p class="en-fx-msg"></p>`;
     document.body.appendChild(el);

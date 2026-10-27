@@ -8790,3 +8790,7 @@ table.odds th, table.odds td { white-space: normal; }
 .pa-tc-face .pa-v { min-width: 34px; height: 34px; font-size: 1.25rem; left: 6px; top: 6px; border-radius: 17px; }
 .en-fx-lot .en-lot { display: block; width: 96px; }
 .en-fx-lot .en-lot .en-v { position: absolute; }
+/* v851 : face cachée peinte des offrandes (Gemini) ; le « ? » dessiné reste dessous si l'image manque */
+.en-coin-back { position: relative; }
+.en-coin-back img { position: absolute; inset: -4%; width: 108%; height: 108%; object-fit: contain; border-radius: 50%; }
+.en-coin-back:has(img) { background: none; box-shadow: none; color: transparent; animation: none; filter: drop-shadow(0 0 10px rgba(242, 193, 78, .45)); }
