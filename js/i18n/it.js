@@ -8906,6 +8906,9 @@ export default {
   "Dimanche mystère": "Domenica misteriosa",
   "Aujourd’hui, les trois boosters sont tirés au hasard à chaque partie : standard, faction, Alliances ou premium. Les mêmes pour les deux joueurs.": "Oggi, le tre buste sono estratte a caso a ogni partita: standard, di fazione, delle Alleanze o premium. Le stesse per i due giocatori.",
   "Toi et ton adversaire ouvrez trois boosters chacun, en même temps. Les cartes tombent sur la table : elles ne sont encore à personne. Le samedi, le troisième booster est un booster premium. Le dimanche, les trois boosters sont tirés au hasard (standard, faction, Alliances ou premium), les mêmes pour les deux joueurs.": "Tu e il tuo avversario aprite tre buste ciascuno, nello stesso momento. Le carte cadono sul tavolo: non sono ancora di nessuno. Il sabato, la terza busta è una busta premium. La domenica, le tre buste sono estratte a caso (standard, di fazione, delle Alleanze o premium), le stesse per i due giocatori.",
+  "Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour, à jouer avant minuit : il ne se garde pas. Le coffre de la semaine, le Tournoi du Cercle et le Codex en donnent d’autres, à jouer le jour même. Les jetons ne s’achètent pas.": "Ogni partita costa un gettone della Sfida. Ne ricevi uno ogni giorno, da giocare prima di mezzanotte: non si conserva. Il forziere della settimana, il Torneo del Cerchio e il Codice ne danno altri, da giocare lo stesso giorno. I gettoni non si comprano.",
+  "À jouer avant minuit : les jetons ne se gardent pas. Un nouveau chaque jour.": "Da giocare prima di mezzanotte: i gettoni non si conservano. Uno nuovo ogni giorno.",
+  "Un nouveau jeton arrive à minuit.": "Un nuovo gettone arriva a mezzanotte.",
 };
 
 export const names = {

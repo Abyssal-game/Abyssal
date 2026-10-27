@@ -8906,6 +8906,9 @@ export default {
   "Dimanche mystère": "Domingo misterioso",
   "Aujourd’hui, les trois boosters sont tirés au hasard à chaque partie : standard, faction, Alliances ou premium. Les mêmes pour les deux joueurs.": "Hoy, los tres sobres se sortean en cada partida: estándar, de facción, de las Alianzas o premium. Los mismos para los dos jugadores.",
   "Toi et ton adversaire ouvrez trois boosters chacun, en même temps. Les cartes tombent sur la table : elles ne sont encore à personne. Le samedi, le troisième booster est un booster premium. Le dimanche, les trois boosters sont tirés au hasard (standard, faction, Alliances ou premium), les mêmes pour les deux joueurs.": "Tú y tu rival abrís tres sobres cada uno, a la vez. Las cartas caen sobre la mesa: todavía no son de nadie. Los sábados, el tercer sobre es un sobre premium. Los domingos, los tres sobres se sortean (estándar, de facción, de las Alianzas o premium), los mismos para los dos jugadores.",
+  "Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour, à jouer avant minuit : il ne se garde pas. Le coffre de la semaine, le Tournoi du Cercle et le Codex en donnent d’autres, à jouer le jour même. Les jetons ne s’achètent pas.": "Cada partida cuesta una ficha de la Batalla. Recibes una cada día, para jugar antes de medianoche: no se guarda. El cofre de la semana, el Torneo del Círculo y el Códice dan otras, para jugar el mismo día. Las fichas no se compran.",
+  "À jouer avant minuit : les jetons ne se gardent pas. Un nouveau chaque jour.": "Para jugar antes de medianoche: las fichas no se guardan. Una nueva cada día.",
+  "Un nouveau jeton arrive à minuit.": "Una nueva ficha llega a medianoche.",
 };
 
 export const names = {

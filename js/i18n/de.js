@@ -8906,6 +8906,9 @@ export default {
   "Dimanche mystère": "Mysteriöser Sonntag",
   "Aujourd’hui, les trois boosters sont tirés au hasard à chaque partie : standard, faction, Alliances ou premium. Les mêmes pour les deux joueurs.": "Heute werden die drei Booster in jeder Partie zufällig gezogen: Standard, Fraktion, Allianzen oder Premium. Für beide Spieler dieselben.",
   "Toi et ton adversaire ouvrez trois boosters chacun, en même temps. Les cartes tombent sur la table : elles ne sont encore à personne. Le samedi, le troisième booster est un booster premium. Le dimanche, les trois boosters sont tirés au hasard (standard, faction, Alliances ou premium), les mêmes pour les deux joueurs.": "Du und dein Gegner öffnet gleichzeitig je drei Booster. Die Karten fallen auf den Tisch: Noch gehören sie niemandem. Samstags ist der dritte Booster ein Premium-Booster. Sonntags werden die drei Booster zufällig gezogen (Standard, Fraktion, Allianzen oder Premium), für beide Spieler dieselben.",
+  "Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour, à jouer avant minuit : il ne se garde pas. Le coffre de la semaine, le Tournoi du Cercle et le Codex en donnent d’autres, à jouer le jour même. Les jetons ne s’achètent pas.": "Jede Partie kostet einen Schlacht-Jeton. Du bekommst jeden Tag einen, zu spielen vor Mitternacht: Er lässt sich nicht aufheben. Die Wochentruhe, das Turnier des Zirkels und der Kodex geben weitere, am selben Tag zu spielen. Jetons kann man nicht kaufen.",
+  "À jouer avant minuit : les jetons ne se gardent pas. Un nouveau chaque jour.": "Vor Mitternacht spielen: Jetons lassen sich nicht aufheben. Jeden Tag ein neuer.",
+  "Un nouveau jeton arrive à minuit.": "Um Mitternacht kommt ein neuer Jeton.",
 };
 
 export const names = {

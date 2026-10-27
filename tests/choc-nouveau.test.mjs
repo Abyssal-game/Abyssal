@@ -72,18 +72,20 @@ test('v811 : l’IA de l’entraînement joue toujours une carte permise', () =>
   }
 });
 
-test('v811 : un jeton par jour jusqu’à 3, gagnés ailleurs jusqu’à 9, jamais achetés', () => {
+test('v838 : un jeton par jour qui ne se garde pas, gagnés ailleurs jusqu’à 9 le jour même, jamais achetés', () => {
   now = new Date('2026-11-02T10:00:00');
   const g = fresh();
-  assert.equal(g.chocTokens().n, CHOC.tokensMax);
-  g.chocSpend(); g.chocSpend(); g.chocSpend();
+  assert.equal(g.chocTokens().n, 1);
+  g.chocSpend();
   assert.throws(() => g.chocSpend(), /Plus de jeton/);
   now = new Date('2026-11-03T10:00:00');
   assert.equal(g.chocTokens().n, 1);
   now = new Date('2026-11-10T10:00:00');
-  assert.equal(g.chocTokens().n, CHOC.tokensMax, 'la réserve ne dépasse pas 3 avec les jetons du jour');
+  assert.equal(g.chocTokens().n, 1, 'les jours sans jouer ne s’accumulent pas');
   g.grant({ chocTok: 20 });
   assert.equal(g.chocTokens().n, CHOC.tokensCap);
+  now = new Date('2026-11-11T10:00:00');
+  assert.equal(g.chocTokens().n, 1, 'les jetons gagnés ailleurs ne passent pas la nuit');
   for (const k of Object.keys(OPS)) assert.ok(!/^choc(Give|Spend|Apply)$/.test(k), 'jetons jamais donnés par le téléphone');
 });
 

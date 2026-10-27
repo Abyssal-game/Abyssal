@@ -579,18 +579,15 @@ export class Game {
     return out;
   }
 
-  /* v811 : le nouveau Choc des Boosters. Jetons : un rendu chaque jour jusqu'à CHOC.tokensMax ; ceux gagnés ailleurs
-     (coffre de la semaine, Tournoi du Cercle, Codex) vont jusqu'à CHOC.tokensCap. Jamais en vente. Lecture paresseuse (ops.js). */
+  /* v811 : le nouveau Choc des Boosters. v838 : un jeton chaque jour, qui ne se garde pas ; ceux gagnés ailleurs
+     (coffre de la semaine, Tournoi du Cercle, Codex) vont jusqu'à CHOC.tokensCap et se jouent le jour même. Jamais en vente. Lecture paresseuse (ops.js). */
   chocTokens() {
     const day = today(this.clock());
     let c = this.s.choc;
     if (!c || typeof c !== 'object') c = this.s.choc = { n: CHOC.tokensMax, day, done: {} };
     c.done ||= {};
-    if (c.day !== day) {
-      const gap = c.day ? Math.max(1, Math.round((Date.parse(day) - Date.parse(c.day)) / 86400000)) : 1;
-      if (c.n < CHOC.tokensMax) c.n = Math.min(CHOC.tokensMax, c.n + gap);
-      c.day = day;
-    }
+    /* v838 : chaque jour, la réserve repart à un jeton : ceux qui n'ont pas servi la veille (jeton du jour ou gagné ailleurs) sont perdus */
+    if (c.day !== day) { c.n = CHOC.tokensMax; c.day = day; }
     return c;
   }
   chocGive(n = 1) { const c = this.chocTokens(); c.n = Math.min(CHOC.tokensCap, c.n + Math.max(0, n | 0)); }

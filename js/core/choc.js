@@ -10,8 +10,8 @@
 // l'entraînement contre l'Abysse et aux tests.
 
 export const CHOC = {
-  tokensMax: 3, // jetons rendus chaque jour (un par jour) jusqu'à ce plafond
-  tokensCap: 9, // plafond avec les jetons gagnés ailleurs (Tournoi, coffre de la semaine, Codex)
+  tokensMax: 1, // v838 : un jeton par jour, qui ne se garde pas (rendez-vous quotidien : rien à mettre de côté pour le week-end)
+  tokensCap: 9, // plafond avec les jetons gagnés ailleurs (Tournoi, coffre de la semaine, Codex), à jouer le jour même
   hand: 2, renfort: 1, packCards: 3, rounds: 3,
   finish: 1,
   flames: 8, flameMax: 4, // Flammes pour toute la partie, au plus 4 sur une même carte
