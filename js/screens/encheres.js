@@ -20,7 +20,7 @@ const HOW = [['cards', '#7FA8D8', 'La vente', 'Mammon met en vente 15 lots, un p
   ['crown', '#F2C14E', 'La victoire', 'Après le 15e lot, on compte les points. Celui qui a le plus de points gagne.'],
   ['hourglass', '#9FE0FF', 'Tout s’annule ?', 'Si toutes les offrandes s’annulent, le lot reste sur la table et s’ajoute au suivant : on se dispute les deux à la fois.'],
   ['book', '#7FE0A0', 'Les familles', 'Trois créatures d’une même faction rapportent +5 points (+10 à la Vente des lignées).'],
-  ['eye', '#C9A45A', 'Lire les enchérisseurs', 'Les offrandes qui restent à chacun sont visibles. Chaque enchérisseur a son style : certains se lisent facilement, d’autres misent n’importe quoi.'],
+  ['eye', '#C9A45A', 'Lire les enchérisseurs', 'Les offrandes qui restent à chacun sont visibles. Chaque enchérisseur a son style : certains se lisent facilement, d’autres offrent n’importe quoi.'],
   ['amis', '#9FE0FF', 'Contre un joueur', `En haut, « Contre un joueur » : une vente à deux contre un autre joueur (au hasard ou un ami), les mêmes lots pour les deux. Vous misez en même temps, en secret. Partie rapide : ${MP_FAST_SECS} s par mise ; partie lente : ${MP_HOURS} h. Mise pas posée à temps : vente perdue. Victoire : +${MP_REWARD.win} éclats et le classement du mois.`]];
 const howLi = ([ic, c, t, d], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic === 'eye' ? 'ui-eye' : ic === 'crystal' ? 'cur-shard' : ic)}<em>${i + 1}</em></span><span><b>${t}</b><span class="small">${d}</span></span></li>`;
 export const howHTML = () => `<ol class="how-steps">${HOW.map(howLi).join('')}</ol>`; /* v491 : tutoriel entier, sans « Pour aller plus loin » */

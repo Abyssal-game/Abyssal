@@ -115,7 +115,7 @@ export const PASSIVES = {
   faim: { name: 'Faim sans fin', desc: 'Chaque ennemi qu’il achève : +1 ATQ (pour le combat) et 20 % de PV rendus.', awaken: 'Et il peut agir une fois de plus ce tour-ci.' },
   renaissance: { name: 'Second souffle', desc: 'Une fois par combat, se relève avec 40 % de ses PV.', awaken: 'En renaissant, soigne toute l’équipe de 15 %.' },
   // — un passif par capacité imprimée sur les cartes (les créatures générées) —
-  ruee: { name: 'Ruée', desc: 'Sa première frappe de chaque combat fait +100 % de dégâts et +1 Brisure.', awaken: '+150 %.' },
+  ruee: { name: 'Ruée', desc: 'Sa première frappe de chaque combat fait +60 % de dégâts et +1 Brisure.', awaken: '+100 %.' },
   sentinelle: { name: 'Sentinelle', desc: 'Quand elle encaisse pour un allié (Rempart), elle prend 25 % de dégâts en moins.', awaken: '40 % de moins.' },
   drain: { name: 'Drain', desc: 'Ses coups lui rendent 20 % des dégâts infligés.', awaken: '30 %.' },
   premiere: { name: 'Première frappe', desc: '+40 % de dégâts sur un ennemi qui a encore tous ses PV.', awaken: '+60 %.' },

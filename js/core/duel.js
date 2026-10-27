@@ -1192,7 +1192,7 @@ function bossPhase(st, ev) {
   if (!b || b.phase2 || (b.hp > b.maxHp / 2 && !b.awakened)) return;
   b.phase2 = true; b.atk = Math.round(b.atk * 1.2 + 0.5);
   const P = PHASE2[st.bossKey];
-  ev.push({ t: 'phase2', u: b.uid, s: `${BOSSES[st.bossKey].name} : ${P ? P.name : 'phase 2'} !`, key: st.bossKey });
+  ev.push({ t: 'phase2', u: b.uid, s: `${BOSSES[st.bossKey].name} : ${P ? P.name : 'Furie'} !`, key: st.bossKey });
   logBoss(st, P ? P.name : 'Phase 2');
   if (st.bossKey === 'devoreur') {
     const v = front(st, 'ally').filter((x) => x.hp > 0).sort((x, y) => y.hp - x.hp)[0];
@@ -2008,7 +2008,7 @@ export const GOALS = {
   combo:  { name: 'Coordination', desc: 'Réussis une combinaison : Chasse, Bris de glace, Bastion ou une Chaîne.', rooms: ['fight', 'elite', 'boss'] },
   parry:  { name: 'Lame-miroir', desc: 'Réussis une parade parfaite.', rooms: ['elite', 'boss'] },
   brk:    { name: 'Briseur', desc: 'Brise l’ennemi au moins une fois.', rooms: ['elite', 'boss'] },
-  ferveur:{ name: 'Brasier', desc: 'Lance le pouvoir d’équipe.', rooms: ['fight', 'elite', 'boss'] },
+  ferveur:{ name: 'Brasier', desc: 'Lance le pouvoir d’équipe ou un Assaut conjoint.', rooms: ['fight', 'elite', 'boss'] },
 };
 export function goalState(st) {
   const k = st.goal, G = GOALS[k];
@@ -2021,7 +2021,7 @@ export function goalState(st) {
   else if (k === 'combo') state = (S.named || 0) + (S.combos || 0) > 0 ? 'done' : 'pending';
   else if (k === 'parry') state = S.parries > 0 ? 'done' : 'pending';
   else if (k === 'brk') state = S.breaks > 0 ? 'done' : 'pending';
-  else if (k === 'ferveur') state = S.ults > 0 ? 'done' : 'pending';
+  else if (k === 'ferveur') state = S.ults > 0 || S.duos > 0 ? 'done' : 'pending'; /* v841 : sans Mythique ni Secrète, pas de pouvoir d'équipe (v820) : l'Assaut conjoint compte */
   if (st.over === 'lost' && state !== 'done') state = 'fail';
   return { key: k, ...G, state, p };
 }

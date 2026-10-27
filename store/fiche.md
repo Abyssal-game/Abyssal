@@ -53,7 +53,7 @@ Ouvre des boosters, collectionne 506 créatures et descends dans l'Abysse.
 
 ### Texte promotionnel (App Store, 170 caractères au plus, modifiable à tout moment)
 ```
-506 créatures, 20 gardiens et 100 étages jusqu'au fond de l'Abysse. Gratuit, sans publicité et sans achat : toutes les cartes se gagnent en jouant.
+506 créatures, 20 gardiens et 100 étages jusqu'au fond de l'Abysse. Gratuit, sans publicité, sans achat qui rend plus fort : toutes les cartes se gagnent en jouant ; seuls des objets d'apparence s'achètent.
 ```
 
 ### Mots-clés (App Store, 100 caractères au plus, séparés par des virgules, sans espace)
@@ -98,7 +98,7 @@ UN MONDE À DÉCOUVRIR
 
 ÉQUITABLE
 • Gratuit, sans publicité
-• Aucun achat : toutes les cartes se gagnent en jouant
+• Aucun achat qui rend plus fort : toutes les cartes se gagnent en jouant ; seuls des objets d'apparence s'achètent
 • Un booster gratuit chaque jour
 • Partie sauvegardée en ligne sur ton compte, jouable aussi hors ligne
 • Des amis, des profils à visiter et des classements chaque mois
@@ -141,7 +141,7 @@ Première version d'ABYSSAL. Bonne descente dans l'Abysse !
 | `store/apple/icone-1024.png` | App Store (l'icône vient de l'app elle-même, voir plus bas) | 1024 × 1024 |
 
 Ordre des captures et titres affichés dessus :
-1. Carte en grand : « 500 créatures légendaires »
+1. Carte en grand : « 506 créatures légendaires »
 2. Ouverture de booster : « Ouvre tes boosters »
 3. Combat : « Combats tactiques »
 4. Équipe : « Forge ton équipe »
@@ -198,14 +198,14 @@ Résultat attendu : PEGI 12 en Europe (au pire PEGI 7). Public cible (Contenu de
 ## 6. Données personnelles
 
 ### Google Play → Contenu de l'appli → Sécurité des données
-- L'application collecte-t-elle des données ? **Oui** (seulement si le joueur crée un compte).
+- L'application collecte-t-elle des données ? **Oui** (un compte est nécessaire pour jouer).
 - Les données sont-elles chiffrées pendant le transfert ? **Oui** (HTTPS).
 - Les utilisateurs peuvent-ils demander la suppression ? **Oui** : dans le jeu, et par e-mail (adresse de suppression ci-dessus).
 - Partage avec des tiers : **Non** (Supabase est un prestataire qui héberge les données pour nous, ce n'est pas un partage).
 
 | Type de données | Collectée | Facultative | Usage |
 |---|---|---|---|
-| Informations personnelles → Adresse e-mail | Oui | Oui (compte facultatif, proposé au premier lancement) | Gestion du compte |
+| Informations personnelles → Adresse e-mail | Oui | Non (compte nécessaire pour jouer) | Gestion du compte |
 | Informations personnelles → ID utilisateur | Oui | Oui | Gestion du compte, fonctionnalités de l'appli |
 | Activité dans l'appli → Autre contenu généré par l'utilisateur (pseudo, sauvegarde, scores) | Oui | Oui | Fonctionnalités de l'appli |
 | Position, contacts, photos, audio, finances, santé, navigation | Non | — | — |
@@ -230,7 +230,7 @@ Pourquoi un compte est nécessaire : la partie de chaque joueur est tenue par no
 
 Modération (seul contenu créé par les joueurs : les pseudos ; en partie en ligne, seules des réactions prédéfinies, sans texte libre) : les pseudos insultants sont refusés. Touchez le pseudo ou le portrait d'un autre joueur (classements, parties en ligne) pour ouvrir son profil, puis « Signaler ou masquer ce joueur ». Un pseudo signalé par plusieurs joueurs est remplacé automatiquement. Contact : contact@abyssal-game.fr
 
-Aucun achat intégré, aucune publicité, aucun pistage.
+Aucun achat qui rend plus fort (seulement des objets d'apparence à partir de la version 1.1), aucune publicité, aucun pistage.
 ```
 **Compte de démonstration :** crée un compte réservé aux vérificateurs (par exemple `review.abyssal@gmail.com` avec un pseudo « Vérificateur »). Donne son e-mail et son mot de passe dans les champs « Sign-in information ». Google demande la même chose dans **Contenu de l'appli → Accès aux applis**.
 

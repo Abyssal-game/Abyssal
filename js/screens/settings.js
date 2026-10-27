@@ -78,16 +78,16 @@ export default function settings(app, root) {
       </section>
       <section class="panel stack">
         <h2>Son et musique</h2>
-        ${toggle('sound', 'Effets sonores', 'Ouverture, révélation, combat. Le mode silencieux de l’iPhone peut les couper.')}
+        ${toggle('sound', 'Effets sonores', window.Capacitor?.isNativePlatform?.() ? 'Ouverture, révélation, combat.' : 'Ouverture, révélation, combat. Le mode silencieux de l’iPhone peut les couper.')}
         <div class="set-row col"><label for="vol"><b>Volume</b></label><input id="vol" type="range" min="0" max="1" step="0.05" value="${s.volume}" ${s.sound ? '' : 'disabled'}></div>
         ${toggle('music', 'Musique d’ambiance', 'Une ambiance différente selon le lieu : Accueil, Butin, Descente, combat, gardien, et chaque jeu du Cercle de l’Abysse.')}
         <div class="set-row col"><label for="mvol"><b>Volume de la musique</b></label><input id="mvol" type="range" min="0" max="1" step="0.05" value="${s.musicVol ?? 0.55}" ${s.sound && s.music !== false ? '' : 'disabled'}></div>
         ${s.sound && s.music !== false ? `<details class="dc-fold set-amb"><summary>${icon('sound')} Écouter les ambiances</summary><div class="set-sfx">${MUSIC_DEMO.map(([n], i) => `<button class="chip" data-mus="${i}">${n}</button>`).join('')}</div></details>` : ''}
         ${window.Capacitor?.isNativePlatform?.() ? '' : toggle('loud', 'Son même en mode silencieux', 'Le jeu reste audible quand le bouton silencieux de l’iPhone est activé (iOS 17 ou plus). Peut couper la musique d’une autre app.')}
-        <div class="set-row"><div><b>Voix des personnages</b><p class="small muted">Le narrateur, les gardiens et les arbitres parlent à voix haute, dans la langue du jeu, quand leur voix existe.</p></div><button class="switch" role="switch" aria-checked="${s.voices !== false}" data-act="voices" aria-label="Voix des personnages"><i></i></button></div>
+        <div class="set-row"><div><b>Voix des personnages</b><p class="small muted">Le narrateur commente les grands moments des combats à voix haute, dans la langue du jeu ; les gardiens et les arbitres parlent dans des bulles.</p></div><button class="switch" role="switch" aria-checked="${s.voices !== false}" data-act="voices" aria-label="Voix des personnages"><i></i></button></div>
         ${toggle('haptics', 'Vibrations', 'Petites vibrations sur les coups, les victoires et les cartes rares. Dans l’app, le téléphone vibre vraiment ; sur le site web, l’iPhone ne vibre presque pas.')}
         ${s.haptics !== false ? `${seg('hapLevel', 'Force des vibrations', [['0', 'Discrètes'], ['1', 'Normales'], ['2', 'Intenses']])}<p class="small muted set-note">Discrètes : seulement les grands moments (coups forts, victoires, cartes rares). Intenses : chaque vibration est plus marquée.</p>` : ''}
-        ${notifSupported() ? `<div class="set-row"><div><b>Notifications</b><p class="small muted">${pushSupported() ? 'Booster du jour (10 h), offrande du soir, série en danger, Tirage des Ombres, à toi de jouer en ligne, défis reçus, défi relevé au Choc des Boosters, demandes d’ami.' : 'Booster du jour (10 h), offrande du soir, série en danger, Tirage des Ombres, et rappel 2 h avant la fin du délai quand c’est à toi de jouer en ligne.'}</p></div><button class="switch" role="switch" aria-checked="${!!s.notif}" data-act="notif" aria-label="Notifications"><i></i></button></div>` : ''}
+        ${notifSupported() ? `<div class="set-row"><div><b>Notifications</b><p class="small muted">${pushSupported() ? 'Booster du jour (10 h), offrande du soir, série en danger, Tirage des Ombres (19 h), jeton du Choc (21 h), à toi de jouer en ligne, défis reçus, demandes d’ami.' : 'Booster du jour (10 h), offrande du soir, série en danger, Tirage des Ombres, et rappel 2 h avant la fin du délai quand c’est à toi de jouer en ligne.'}</p></div><button class="switch" role="switch" aria-checked="${!!s.notif}" data-act="notif" aria-label="Notifications"><i></i></button></div>` : ''}
       </section>
       <section class="panel stack">
         <h2>Affichage</h2>
@@ -213,7 +213,7 @@ export default function settings(app, root) {
     lang(el) { if (el.dataset.v !== LANG) setLang(el.dataset.v); },
     async reset() {
       if (!(await confirmBox('Effacer définitivement toute ta progression, sur cet appareil <b>et sur ton compte en ligne</b> ?', { ok: 'Effacer', danger: true }))) return;
-      if (!(await confirmBox('Dernière confirmation : la collection, les éclats et les succès seront perdus.<br>Les cadeaux déjà reçus ne seront pas redonnés : ni les 2 boosters de bienvenue, ni le booster gratuit, l’offrande, les Torches et les Épreuves du jour.', { ok: 'Tout effacer', danger: true }))) return;
+      if (!(await confirmBox('Dernière confirmation : la collection, les éclats et les succès seront perdus.<br>Les cadeaux déjà reçus ne seront pas redonnés : ni les 2 boosters de bienvenue, ni le booster gratuit, ni l’offrande, ni les Torches, ni les Épreuves du jour.', { ok: 'Tout effacer', danger: true }))) return;
       g.reset();
       app.applySettings();
       let online = null;

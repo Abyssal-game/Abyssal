@@ -29,7 +29,7 @@ export const BOSSES = {
   matriarche: {
     name: 'La Matriarche du Givre', title: 'Mère des hivers éternels',
     intro: 'Le souffle se fige dans ta gorge. Sur un trône de glace, une silhouette lève lentement la main.',
-    mechanic: 'Elle rassemble le froid pendant un tour, puis déchaîne une Tempête de givre sur toute ton équipe et gèle ta créature la plus forte (deux en phase 2).',
+    mechanic: 'Elle rassemble le froid pendant un tour, puis déchaîne une Tempête de givre sur toute ton équipe et gèle ta créature la plus forte (deux en Furie).',
     counter: 'Interromps l’incantation (gel ou Brisure), mets ta créature menacée en défense. Tes Soigneurs dégèlent ton équipe.',
     story: 'Elle a gelé son propre royaume pour qu’il ne change plus jamais. Quand l’Abysse a voulu l’emporter, elle s’est offerte à lui en échange d’un hiver sans fin. On dit qu’elle pleure encore, mais que ses larmes gèlent avant de tomber.',
     pattern: (phase, round) => (round % 3 === 1 ? 'gather' : 'hit'),
@@ -78,7 +78,7 @@ export const BOSSES = {
   choeur: {
     name: 'Le Chœur des Noyés', title: 'Ils chantent pour ne pas oublier',
     intro: 'De l’eau noire monte entre les dalles. Des voix, des centaines, entonnent un chant que tu connais sans l’avoir jamais entendu.',
-    mechanic: 'Il entonne un Chant, puis lance sa Complainte au tour suivant : toute ton équipe est frappée, perd ses boucliers et ses bonus d’attaque, et tu perds 2 Ferveur. En phase 2, la marée monte et ronge tes créatures à chaque tour.',
+    mechanic: 'Il entonne un Chant, puis lance sa Complainte au tour suivant : toute ton équipe est frappée, perd ses boucliers et ses bonus d’attaque, et tu perds 2 Ferveur. En Furie, la marée monte et ronge tes créatures à chaque tour.',
     counter: 'Brise-le pendant le Chant, esquive la Complainte et dépense ta Ferveur avant qu’elle ne tombe. Une Brisure retient la marée un tour.',
     story: 'Ce sont les marins d’une flotte entière, engloutie en une nuit. Ils ont chanté jusqu’au fond, et l’Abysse a trouvé leur chant trop beau pour le laisser s’éteindre.',
     pattern: (phase, round) => (round % (phase === 2 ? 2 : 3) === 2 ? 'chant' : 'hit'),
@@ -86,7 +86,7 @@ export const BOSSES = {
   chaines: {
     name: 'Le Seigneur des Chaînes', title: 'Nul ne quitte sa forge',
     intro: 'Des chaînes chauffées à blanc pendent du plafond. Une enclume résonne, et chaque coup fait trembler tes os.',
-    mechanic: 'Il lance ses Chaînes sur ta créature la plus forte : elle est frappée et enchaînée (elle ne pourra pas agir à ton prochain tour). En phase 2, sa forge s’embrase : il gagne +1 ATQ à chaque tour où il n’est pas brisé.',
+    mechanic: 'Il lance ses Chaînes sur ta créature la plus forte : elle est frappée et enchaînée (elle ne pourra pas agir à ton prochain tour). En Furie, sa forge s’embrase : il gagne +1 ATQ à chaque tour où il n’est pas brisé.',
     counter: 'Esquive les Chaînes, libère l’enchaînée avec une Prière, et brise-le souvent pour éteindre sa forge.',
     story: 'Il croit avoir forgé les chaînes des Sceaux, celles qui tiennent l’Abysse fermé. Puis il a compris qu’on ne lui ouvrirait jamais, et il s’est mis à forger pour l’autre camp.',
     pattern: (phase, round) => (round % (phase === 2 ? 2 : 3) === 2 ? 'chain' : 'hit'),
@@ -94,7 +94,7 @@ export const BOSSES = {
   horloge: {
     name: 'L’Horloger', title: 'Le temps lui doit tout',
     intro: 'Un tic-tac emplit la salle, trop lent, puis trop rapide. Au centre, des rouages dorés tournent autour d’une silhouette sans âge.',
-    mechanic: 'Il annonce « Remonter le temps » : au tour suivant, il retrouve les PV qu’il avait à l’annonce (un quart de ses PV au plus). En phase 2, le temps s’emballe et il frappe deux fois de suite.',
+    mechanic: 'Il annonce « Remonter le temps » : au tour suivant, il retrouve les PV qu’il avait à l’annonce (un quart de ses PV au plus). En Furie, le temps s’emballe et il frappe deux fois de suite.',
     counter: 'Brise-le ou gèle-le pendant qu’il remonte le temps, ou garde tes plus gros coups pour juste après.',
     story: 'Il a réglé l’horloge des Sceaux pour qu’elle ne sonne jamais la fin. Celui que tu affrontes n’est qu’un rêve de l’Abysse à son image : le vrai Horloger, l’un des sept qui posèrent la main sur la reliure, personne ne l’a revu depuis.',
     pattern: (phase, round) => (round % 3 === 1 ? 'wind' : phase === 2 ? 'tick2' : 'hit'),
@@ -119,7 +119,7 @@ export const BOSSES = {
   peste: {
     name: 'La Peste Grise', title: 'Elle voyage de souffle en souffle',
     intro: 'Une brume grise rampe sur le sol. Là où elle passe, la pierre se couvre de taches.',
-    mechanic: 'Elle empoisonne sans relâche, et à chaque tour le poison saute d’une créature empoisonnée à ses voisines saines (deux fois plus en phase 2). Tous les trois tours, elle prépare une vague sur toute ton équipe.',
+    mechanic: 'Elle empoisonne sans relâche, et à chaque tour le poison saute d’une créature empoisonnée à ses voisines saines (deux fois plus en Furie). Tous les trois tours, elle prépare une vague sur toute ton équipe.',
     counter: 'Purifie vite (Prière) avant que la contagion ne gagne toute l’équipe, et brise-la pendant qu’elle prépare sa vague.',
     story: 'Elle n’a ni corps ni nom. Elle était une maladie, puis une prière murmurée par ceux qu’elle emportait, et l’Abysse a fini par lui donner un visage.',
     pattern: (phase, round) => (round % 3 === 2 ? 'channel' : 'poison'),
@@ -136,7 +136,7 @@ export const BOSSES = {
     name: 'La Dame des Vœux', title: 'Tout se paie, un jour',
     intro: 'Une femme voilée t’attend, un plateau d’argent à la main. « Fais un vœu », dit-elle. « Je te l’accorde. Le prix viendra plus tard. »',
     mechanic: 'Elle exauce un Vœu : tu gagnes 3 Ferveur et tes créatures 1 PA. Au tour suivant, elle réclame son Prix : un coup sur toute ton équipe, qui la soigne de la moitié des dégâts.',
-    counter: 'Profite du cadeau tout de suite (pouvoir d’équipe, compétences), puis esquive ou pare le Prix.',
+    counter: 'Profite du cadeau tout de suite (compétences, Assaut conjoint ou pouvoir d’équipe), puis esquive ou pare le Prix.',
     story: 'Elle a exaucé tous les vœux des Scelleurs : la gloire, la puissance, l’oubli. Le prix était écrit dans le Bestiaire, et la ligne a été effacée. Elle attend encore qu’on le lui paie.',
     pattern: (phase, round) => (round % 3 === 1 ? 'wish' : 'hit'),
   },
@@ -168,8 +168,8 @@ export const BOSSES = {
   bete: {
     name: 'La Bête de l’Apocalypse', title: 'Sept têtes, sept couronnes',
     intro: 'La salle tremble sous une respiration de forge. Sept têtes se lèvent, et chacune te regarde.',
-    mechanic: 'Elle grandit : +1 ATQ et 2 % de ses PV max en plus, un tour sur deux (à chaque tour en phase 2). Plus le combat dure, plus elle est terrible. Une Brisure la fait rétrécir.',
-    counter: 'Frappe vite et fort : garde ta Ferveur pour un pouvoir d’équipe tôt, et brise-la dès que possible.',
+    mechanic: 'Elle grandit : +1 ATQ et 2 % de ses PV max en plus, un tour sur deux (à chaque tour en Furie). Plus le combat dure, plus elle est terrible. Une Brisure la fait rétrécir.',
+    counter: 'Frappe vite et fort : dépense ta Ferveur tôt (pouvoir d’équipe ou Assaut conjoint), et brise-la dès que possible.',
     story: 'On dit qu’elle sortira le jour où le dernier Sceau cédera. Elle ne sait pas compter les jours, alors elle grandit en attendant.',
     pattern: (phase, round) => (round % 3 === 0 ? 'channel' : 'hit'),
   },
@@ -238,7 +238,7 @@ export const VEILLEURS = {
     'Dans les jardins de la Lune pâle, Kyūbi garde les rêves légers loin du Rêveur. Les rêves lourds, elle les mange. Elle en a trop mangé.',
     (phase, round) => (round % 2 === 0 ? 'ambush' : round % (phase === 2 ? 3 : 5) === 1 ? 'mirror' : 'hit')),
   'v-forge': V('Héphaïstos, le Veilleur de la Forge', 'Le forgeron des dieux',
-    'L’enclume sonne seule dans la Forge Sans Maître. Le forgeron lève son marteau sans te regarder.',
+    'L’enclume sonne seule dans la Forge Sans Maître. Un forgeron venu d’ailleurs lève son marteau sans te regarder.',
     'Il charge des coups énormes et enchaîne ta créature la plus forte ; en Furie, il frappe plus souvent.',
     'Interromps ses charges par le gel ou la Brisure ; un Protecteur encaisse le coup chargé.',
     'Héphaïstos forge les chaînes qui tiennent le Rêveur. Mais il ne se souvient plus pour qui il les forge.',

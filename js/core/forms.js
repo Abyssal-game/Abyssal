@@ -7,7 +7,7 @@ export const FORMS = {
     passive: 'vengeance', passiveName: 'Vengeance', passiveDesc: 'Gagne +2 ATQ chaque fois qu’une de tes créatures tombe. En échange, 20 % de PV max en moins.', hp: 0.8, atk: 1,
     lore: 'Le Dévoreur a mangé la crypte qu’elle gardait. Elle est restée debout dans le noir, à garder ce qui n’existe plus, et sa rancune a remplacé ses os.' },
   'CEL-005': { name: 'Statue Fêlée', title: 'L’ivoire a bu l’Abîme', cond: { level: 3 }, condText: 'Atteindre le niveau 3 avec cette carte',
-    passive: 'shatter', passiveName: 'Éclats', passiveDesc: 'Chacune de ses attaques retire 1 Brisure de plus. En échange, 25 % de PV max en moins.', hp: 0.75, atk: 1,
+    passive: 'shatter', passiveName: 'Éclats', passiveDesc: 'Chacune de ses attaques fait +1 Brisure. En échange, 25 % de PV max en moins.', hp: 0.75, atk: 1,
     lore: 'Une fissure, puis une autre. La sentinelle a cessé de protéger le jour où elle a compris qu’elle aimait le bruit de ce qui se brise.' },
   'SAU-001': { name: 'Loup de l’Abîme', title: 'Il hurle pour les absents', cond: { boss: 'matriarche' }, condText: 'Vaincre la Matriarche du Givre',
     passive: 'frenzy', passiveName: 'Meute brisée', passiveDesc: 'Inflige 50 % de dégâts en plus dès qu’une de tes créatures est tombée. En échange, −1 ATQ.', hp: 1, atk: -1,

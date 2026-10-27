@@ -6,7 +6,7 @@ export const NARRATOR = {
   "fall": ["Une page se froisse… mais le livre tient bon.", "Elle est tombée. Les autres doivent tenir.", "L’Abysse prend son dû."],
   "break": ["Brisé. Frappe, maintenant !", "Sa garde vole en éclats."],
   "parry": ["Parade parfaite. L’ennemi chancelle.", "Pas une égratignure."],
-  "ult": ["Toute l’équipe, d’un seul souffle.", "Le Sceau répond à ton appel."],
+  "ult": ["Toute l’équipe, d’un seul souffle."],
   "fury": ["Le rêve se déchire. Voici sa vraie colère.", "Prends garde : il ne retient plus ses coups."],
   "boss-down": ["Un rêve de moins. L’Abysse frissonne.", "Le gardien s’efface. La page est à toi.", "Il retourne au sommeil d’où il venait."],
   "close": ["De justesse… mais la victoire n’a pas de mémoire.", "Un souffle de plus, et tout était perdu."],
@@ -41,7 +41,7 @@ export const BOSS_LINES = {
   /* v795 : les Veilleurs (chapitre de saison) */
   'v-ames': { in: "Encore un vivant. Il en manque toujours un.", again: "Tu repasses le fleuve ? Il se souvient de toi.", fury: "Le fleuve se ferme derrière toi !", down: "Je dormais… debout… merci." },
   'v-hiver': { in: "Ton souffle fume. Bientôt, il gèlera.", again: "Encore toi. L’hiver n’oublie pas.", fury: "Le dernier hiver, c’est maintenant !", down: "La neige… retombe enfin vers le sol." },
-  'v-marees': { in: "Toi, tu ne dors pas. Je t’envie.", again: "La marée te ramène toujours.", fury: "Que la mer noire monte !", down: "Je rentre au large… il dort encore ?" },
+  'v-marees': { in: "Toi, tu ne dors pas. Je t’envie.", again: "La marée te ramène toujours.", fury: "Que la mer noire monte !", down: "Je rentre au large… il rêve encore ?" },
   'v-racines': { in: "Mes épines ont rêvé de toi.", again: "Tu repousses comme une mauvaise herbe.", fury: "Que le bois se referme !", down: "Les racines… se taisent…" },
   'v-cour': { in: "Quel masque portes-tu, ce soir ?", again: "Toujours le même visage. Que c’est ennuyeux.", fury: "Mille reflets, et aucun n’est toi !", down: "Enfin… quelqu’un m’a reconnu." },
   'v-pacte': { in: "Fais un vœu. Je ne demanderai presque rien.", again: "Tu reviens payer ta dette ?", fury: "La nuit m’est due !", down: "Garde ta nuit… je la reprendrai." },

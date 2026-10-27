@@ -24,7 +24,7 @@
    }
   ],
   "visual": "Jeune dragon aux écailles encore molles et rougeoyantes, ailes trop grandes pour lui, fumée aux naseaux.",
-  "lore": "Il crache plus de fumée que de feu. Laissez-lui mille ans.",
+  "lore": "Il crache plus de fumée que de feu. Laisse-lui mille ans.",
   "evolution": {
    "line": "magma",
    "name": "Lignée du Magma",
@@ -2632,7 +2632,7 @@
   "id": "PRI-055",
   "number": 55,
   "name": "Aži Dahāka",
-  "title": "Le dragon aux trois têtes",
+  "title": "Le fléau enchaîné du Damavand",
   "faction": "primordial",
   "rarity": "M",
   "category": "Dragon primordial",
@@ -2751,7 +2751,7 @@
    }
   ],
   "visual": "Homme grand et élégant à la peau sombre comme le vide, sourire trop large, mille visages esquissés dans son ombre.",
-  "lore": "Le messager des dieux extérieurs a mille formes. La plus dangereuse est celle qui vous sourit.",
+  "lore": "Le messager des dieux extérieurs a mille formes. La plus dangereuse est celle qui te sourit.",
   "evolution": null,
   "sets": [],
   "variants": [
@@ -3433,7 +3433,7 @@
   "title": "La jupe de serpents",
   "faction": "primordial",
   "rarity": "S",
-  "category": "Dieu ancien",
+  "category": "Déesse ancienne",
   "power": 10,
   "role": "M",
   "stats": {

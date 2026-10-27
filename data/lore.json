@@ -17,8 +17,8 @@
   { "at": 120, "title": "VI. La Grande Chasse", "ch": 8, "text": "Quand les hommes bâtirent leurs premières villes, la Forêt Première lança la Grande Chasse : une nuit où toutes les bêtes du monde coururent ensemble. Les remparts tinrent jusqu’à l’aube. Les loups disent qu’ils n’ont fait que s’échauffer." },
   { "at": 160, "title": "VII. La Forge Sans Maître", "ch": 9, "text": "Le dernier artisan de la Forge s’appelait, dit-on, l’Horloger. Il construisit tant de serviteurs qu’ils finirent par se construire entre eux. Un matin, l’Horloger n’était plus là. La Forge n’a jamais cessé de produire, et personne ne sait pour qui." },
   { "at": 200, "title": "VIII. Le Pays sans Retour", "ch": 12, "text": "Les Nécrotiques ne conquièrent rien : ils attendent. Tout finit par leur revenir. Mais depuis que les sceaux cèdent, des morts reviennent dans l’autre sens, et le Roi Sans Tombe s’est mis en marche. Même la mort, cette fois, semble inquiète." },
-  { "at": 250, "title": "IX. Le Menteur", "ch": 19, "text": "Le gardien qui a menti n’a pas ouvert le Bestiaire. Il a fait pire : il y a glissé une page de trop, une créature qui n’appartenait à aucun royaume. C’est elle qui ronge les sceaux de l’intérieur. Les Entités du Néant la reconnaissent. Elles l’appellent « le Rêveur »." },
-  { "at": 300, "title": "X. Avant la Lumière", "ch": 15, "text": "Celui qui rassemble assez de pages finit par voir le motif : les sept royaumes ne se sont jamais battus pour gagner. Ils se battaient pour rester éveillés. Car si tous s’endorment en même temps, le Rêveur se réveille, et il ne reste que le Néant." },
+  { "at": 250, "title": "IX. Le Menteur", "ch": 19, "text": "Le gardien qui a menti n’a pas ouvert le Bestiaire. Il a fait pire : il y a glissé une page de trop, une créature qui n’appartenait à aucun royaume, cachée parmi les pages des Fosses. C’est elle qui ronge les sceaux de l’intérieur. Les Entités du Néant la reconnaissent. Elles l’appellent « le Rêveur »." },
+  { "at": 300, "title": "X. Avant la Lumière", "ch": 20, "text": "Celui qui rassemble assez de pages finit par voir le motif : les sept royaumes ne se sont jamais battus pour gagner. Ils se battaient pour rester éveillés. Car si tous s’endorment en même temps, le Rêveur se réveille, et il ne reste que le Néant." },
   { "at": "all", "title": "XI. Le Bestiaire refermé", "text": "Toutes les pages sont retrouvées. Le livre pèse soudain très lourd dans tes mains. Tu peux le refermer, et les sceaux tiendront encore mille ans. Ou tu peux tourner la dernière page, celle qui est blanche, et écrire le premier nom d’une créature que personne n’a encore imaginée." }
  ],
  "conflicts": [
@@ -38,7 +38,7 @@
  "mysteries": [
   { "set": "neant", "title": "Le motif", "text": "Les Entités du Néant ne sont pas des créatures. Ce sont des absences qui ont pris une forme pour pouvoir être enfermées." },
   { "set": "peches", "title": "Le huitième péché", "text": "Les sept princes des péchés gardent un secret : il existe un huitième péché, celui d’avoir menti en posant les sceaux. Ils ne disent pas qui l’a commis." },
-  { "set": "titans", "title": "Le sommeil des Titans", "text": "Les douze Titans ne sont pas emprisonnés. Ils font semblant de dormir : sous leurs paupières closes, ils veillent, car si tous s’endormaient, le Rêveur se réveillerait." },
+  { "set": "titans", "title": "Le sommeil des Titans", "text": "On les croit prisonniers de leurs montagnes. Ils font semblant de dormir : sous leurs paupières closes, ils veillent, car si tous s’endormaient, le Rêveur se réveillerait." },
   { "set": "plaies", "title": "Les plaies n’étaient pas des punitions", "text": "Chaque plaie libérée a été un signal. Quelqu’un essaie de réveiller les royaumes, pour qu’ils restent éveillés." }
  ]
 }

@@ -26,7 +26,7 @@ export const KITS = {
   protecteur: {
     kw: 'garde', name: 'Protecteur', icon: 'shield',
     basic: { name: 'Coup de bouclier', desc: 'Dégâts normaux, +1 Brisure en plus.' },
-    skill: { key: 'rempart', pa: 1, name: 'Rempart', icon: 'shield', ap: 1, fervor: 1, target: 'ally', desc: 'Jusqu’à ton prochain tour, protège un allié : les coups qui le visent la frappent à sa place, et elle en prend 40 % de moins.' },
+    skill: { key: 'rempart', pa: 1, name: 'Rempart', icon: 'shield', ap: 1, fervor: 1, target: 'ally', desc: 'Jusqu’à ton prochain tour, protège un allié : les coups qui le visent frappent la Protectrice à sa place, avec 40 % de dégâts en moins.' },
     passive: { name: 'Riposte', desc: 'Les ennemis doivent la viser en premier (sauf les assassins). Chaque coup qu’elle encaisse charge sa riposte (3 au plus) : sa prochaine attaque fait +1 dégât et +1 Brisure par charge. Son attaque est un coup de rupture. Après une parade parfaite, elle contre-attaque.' },
   },
   degats: {
@@ -138,15 +138,15 @@ export const INTENTS = {
   rally:   { name: 'Renfort',        icon: 'sparkle', desc: 'Les autres ennemis gagnent +2 en attaque pour ce tour.' },
   poison:  { name: 'Empoisonnement', icon: 'skull',   desc: 'Frappe et empoisonne la cible (+3 poison).' },
   frost:   { name: 'Sort de gel',    icon: 'eye',     desc: 'Gèle la cible : elle ne pourra pas agir à ton prochain tour.' },
-  gorge:    { name: 'Dévorer',        icon: 'skull',   desc: 'Arrache des PV à la cible (plus d’une fois et demie sa force) et s’en nourrit. Chaque festin réussi lui donne +1 ATQ (+2 en phase 2). Gel ou Brisure l’interrompent.' },
+  gorge:    { name: 'Dévorer',        icon: 'skull',   desc: 'Arrache des PV à la cible (plus d’une fois et demie sa force) et s’en nourrit. Chaque festin réussi lui donne +1 ATQ (+2 en Furie). Gel ou Brisure l’interrompent.' },
   gather:   { name: 'Le froid monte', icon: 'sparkle', desc: 'N’attaque pas ce tour-ci : Tempête de givre au tour suivant. Gel ou Brisure l’interrompent.' },
-  blizzard: { name: 'Tempête de givre', icon: 'flame', desc: 'Frappe toute ton équipe et gèle ta créature la plus forte (deux en phase 2).' },
+  blizzard: { name: 'Tempête de givre', icon: 'flame', desc: 'Frappe toute ton équipe et gèle ta créature la plus forte (deux en Furie).' },
   mimic:    { name: 'Copie',          icon: 'eye',     desc: 'Observe ton équipe : au tour suivant, il retourne contre toi la compétence annoncée. Gel ou Brisure l’interrompent.' },
   copy:     { name: 'Imitation',      icon: 'skull',   desc: 'Utilise contre toi la compétence copiée.' },
   decree:   { name: 'Décret',         icon: 'sparkle', desc: 'Impose une nouvelle Loi qui change les règles du combat à partir de ton prochain tour.' },
   shift:    { name: 'Bascule',        icon: 'sparkle', desc: 'Change d’aspect : ses faiblesses et résistances s’inversent à partir de ton prochain tour.' },
   brood:    { name: 'La ruche s’éveille', icon: 'sparkle', desc: 'N’attaque pas ce tour-ci : Essaim au tour suivant. Gel ou Brisure l’interrompent.' },
-  swarm:    { name: 'Essaim',         icon: 'skull',   desc: 'Frappe toute ton équipe et empoisonne chaque créature (+3 poison, +5 en phase 2).' },
+  swarm:    { name: 'Essaim',         icon: 'skull',   desc: 'Frappe toute ton équipe et empoisonne chaque créature (+3 poison, +5 en Furie).' },
   sentence: { name: 'Sentence',       icon: 'eye',     desc: 'Condamne ta créature la plus affaiblie : elle sera exécutée au tour suivant. Permute-la en réserve, défends-la, ou brise l’ennemi qui l’a condamnée.' },
   execute:  { name: 'Coup de hache',  icon: 'skull',   desc: 'Frappe la condamnée avec deux fois sa force (trois fois si elle a perdu la moitié de ses PV). Si elle tombe, il gagne +3 ATQ.' },
   chant:    { name: 'Chant des noyés', icon: 'sparkle', desc: 'N’attaque pas ce tour-ci : Complainte au tour suivant. Gel ou Brisure l’interrompent.' },
@@ -168,10 +168,10 @@ export const INTENTS = {
 
 // Pouvoirs des gardiens. weak : la capacité qui les contre. Phase 2 sous 50 % des PV.
 export const BOSS_POWERS = {
-  carapace: { name: 'Carapace', desc: 'Un tour sur deux, se couvre d’un bouclier qui bloque un coup (à chaque tour en phase 2).', weak: 'venin', counter: 'Les Empoisonneurs traversent sa carapace.' },
-  givre:    { name: 'Souffle de givre', desc: 'Un tour sur deux, gèle ta créature la plus forte (à chaque tour en phase 2).', weak: 'soin', counter: 'Tes Soigneurs dégèlent tes créatures, et la Prière aussi.' },
-  fureur:   { name: 'Fureur croissante', desc: 'Gagne +1 en attaque à chaque tour (+2 en phase 2).', weak: 'gel', counter: 'Gelé ou brisé, il ne gagne pas de fureur.' },
-  devoreur: { name: 'Dévoreur', desc: 'Récupère 15 % de ses PV à chaque tour (20 % en phase 2).', weak: 'assaut', counter: 'Un coup d’Attaquant l’empêche de se soigner au tour suivant.' },
+  carapace: { name: 'Carapace', desc: 'Un tour sur deux, se couvre d’un bouclier qui bloque un coup (à chaque tour en Furie).', weak: 'venin', counter: 'Les Empoisonneurs traversent sa carapace.' },
+  givre:    { name: 'Souffle de givre', desc: 'Un tour sur deux, gèle ta créature la plus forte (à chaque tour en Furie).', weak: 'soin', counter: 'Tes Soigneurs dégèlent tes créatures, et la Prière aussi.' },
+  fureur:   { name: 'Fureur croissante', desc: 'Gagne +1 en attaque à chaque tour (+2 en Furie).', weak: 'gel', counter: 'Gelé ou brisé, il ne gagne pas de fureur.' },
+  devoreur: { name: 'Dévoreur', desc: 'Récupère 15 % de ses PV à chaque tour (20 % en Furie).', weak: 'assaut', counter: 'Un coup d’Attaquant l’empêche de se soigner au tour suivant.' },
 };
 export const bossPowerOf = (floor) => ['carapace', 'givre', 'fureur', 'devoreur'][(Math.max(1, Math.floor(floor / 5)) - 1) % 4];
 

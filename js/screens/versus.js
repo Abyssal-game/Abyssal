@@ -28,7 +28,7 @@ const HOW = () => [['p:seal', '#E8C35A', 'Un jeton par partie', 'Chaque partie c
   ['booster', '#C9A45A', 'Les boosters s’ouvrent', 'Toi et ton adversaire ouvrez trois boosters chacun, en même temps. Les cartes tombent sur la table : elles ne sont encore à personne. Le samedi, le troisième booster est un booster premium. Le dimanche, les trois boosters sont tirés au hasard (standard, faction, Alliances ou premium), les mêmes pour les deux joueurs.'],
   ['crown', '#F2C14E', 'Les points', 'Commune {c}, Peu commune {pc}, Rare {r}, Hyper rare {hr}, Mythique {mm}, Secrète {ss}, +{v} avec une finition.', { c: LUCK_POINTS.C, pc: LUCK_POINTS.PC, r: LUCK_POINTS.R, hr: LUCK_POINTS.HR, mm: LUCK_POINTS.M, ss: LUCK_POINTS.S, v: LUCK_POINTS.variant }],
   ['swords', '#E0485E', 'Le butin de la table', 'Le meilleur total rafle toutes les cartes de la table : les siennes et celles de l’adversaire. Le perdant repart les mains vides. Égalité : chacun garde les siennes.'],
-  ['cards', '#7FE0A0', 'Rien à perdre de ta collection', 'Tu ne mises rien : ni éclats, ni cartes de ta collection. Seules les cartes ouvertes pendant la partie sont en jeu.'],
+  ['cards', '#7FE0A0', 'Rien à perdre de ta collection', 'Rien à donner : ni éclats, ni cartes de ta collection. Seules les cartes ouvertes pendant la partie se gagnent.'],
   ['streak', '#FF8A3D', 'Série et Ligue', 'Victoire : {s} éclats × ta Série ardente (jusqu’à ×{x}), et un coffre à 3, 5, 7 et 10 victoires d’affilée. Ligue du mois : +{w} par victoire, −{l} par défaite.', { s: CHOC.winShards, x: STREAK_MULT.at(-1), w: LEAGUE_PTS.win, l: Math.abs(LEAGUE_PTS.lose) }],
   ['ui-eye', '#E0485E', 'Aucune triche', 'Les boosters sont ouverts et comptés par le serveur : personne ne peut truquer un tirage.']];
 const howLi = ([ic, c, ti, d, p], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic.startsWith('p:') ? ic.slice(2) : ic)}<em>${i + 1}</em></span><span><b>${t(ti)}</b><span class="small">${t(d, p)}</span></span></li>`;
@@ -132,7 +132,7 @@ export default function versusScreen(app, root) {
     if (!toSee.length && !picks.length && !waiting.length && !incoming.length && !past.length) return '';
     const row = (r, acts, sub) => `<div class="vs-row"><span class="fr-av"${profileAttrs(r.mine ? r.b : r.a)}>${pic(r.avatar)}</span><span class="fr-t"><b>${esc(r.public && r.mine ? t('Ouvert à tous') : oname(r))}</b><small>${sub}</small></span>${acts}</div>`;
     return `<details class="panel dc-fold vs-sec" ${toSee.length || picks.length ? 'open' : ''}><summary><span class="dc-sum-t">${t('Anciens duels du Choc')}</span></summary>
-      <p class="small muted">${t('Les duels lancés avant la nouvelle formule se terminent et se paient comme avant.')}</p>
+      <p class="small muted">${t('Tes anciens duels du Choc se terminent ici.')}</p>
       ${toSee.map((r) => row(r, `<button class="btn small primary" data-mp="v-see" data-id="${esc(r.id)}">${t('Voir le duel')}</button>`, t('Ton défi a été relevé'))).join('')}
       ${picks.map((r) => row(r, `<button class="btn small primary" data-mp="v-pick" data-id="${esc(r.id)}">${icon('crown')} ${t('Choisir')}</button>`, t('Butin à choisir'))).join('')}
       ${incoming.map((r) => row(r, `<button class="btn small ghost" data-mp="v-decline" data-id="${esc(r.id)}">${t('Refuser')}</button>`, t('Ancien défi reçu'))).join('')}

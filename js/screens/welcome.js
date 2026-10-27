@@ -57,7 +57,7 @@ export function showGift(app) {
   if (g.s.giftsKept && !n) {
     const k = `abyssal.giftsKeptSaid.${g.s.createdAt || 0}`;
     let said = false; try { said = !!localStorage.getItem(k); localStorage.setItem(k, '1'); } catch (e) { /* rien */ }
-    if (!said) openSheet(`<div class="gift-sheet"><span class="gift-ribbon">Cadeau de bienvenue</span><h2>Déjà reçu</h2><p>Cette adresse e-mail a déjà reçu ses <b>boosters de bienvenue</b> avec un ancien compte. Ils ne s’offrent qu’une fois par adresse, et le booster gratuit du jour aussi.</p><p class="small muted">Ta nouvelle aventure commence quand même : le booster gratuit revient chaque jour.</p></div>`, { cls: 'sheet-small', label: 'Cadeau de bienvenue' });
+    if (!said) openSheet(`<div class="gift-sheet"><span class="gift-ribbon">Cadeau de bienvenue</span><h2>Déjà reçu</h2><p>Cette adresse e-mail a déjà reçu ses <b>boosters de bienvenue</b> avec un ancien compte. Ils ne s’offrent qu’une fois par adresse. Le booster gratuit d’aujourd’hui a lui aussi déjà été pris : il revient demain.</p><p class="small muted">Ta nouvelle aventure commence quand même : le booster gratuit revient chaque jour.</p></div>`, { cls: 'sheet-small', label: 'Cadeau de bienvenue' });
     return;
   }
   if (!n || g.s.giftShown) return;
