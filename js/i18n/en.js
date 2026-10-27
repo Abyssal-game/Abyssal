@@ -9290,6 +9290,10 @@ export default {
   "Image de la carte enregistrée.": "Card image saved.",
   "Impossible de créer l’image de cette carte.": "Couldn't create an image of this card.",
   "Finition {f}": "{f} finish",
+  "Incline ton téléphone : la finition attrape la lumière, comme une vraie carte brillante.": "Tilt your phone: the finish catches the light, like a real shiny card.",
+  "Incline doucement ton téléphone pour faire briller la carte.": "Gently tilt your phone to make the card shine.",
+  "L’iPhone n’a pas donné l’accès aux mouvements. Tu peux l’autoriser dans les réglages de l’iPhone, puis l’activer dans Réglages → Jeu.": "The iPhone didn't grant motion access. You can allow it in the iPhone's settings, then turn it on in Settings → Game.",
+  "Activer": "Turn on",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

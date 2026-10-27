@@ -9278,6 +9278,10 @@ export default {
   "Image de la carte enregistrée.": "Kartenbild gespeichert.",
   "Impossible de créer l’image de cette carte.": "Das Bild dieser Karte konnte nicht erstellt werden.",
   "Finition {f}": "Veredelung: {f}",
+  "Incline ton téléphone : la finition attrape la lumière, comme une vraie carte brillante.": "Neige dein Handy: Die Veredelung fängt das Licht ein, wie bei einer echten Glanzkarte.",
+  "Incline doucement ton téléphone pour faire briller la carte.": "Neige dein Handy sanft, um die Karte glänzen zu lassen.",
+  "L’iPhone n’a pas donné l’accès aux mouvements. Tu peux l’autoriser dans les réglages de l’iPhone, puis l’activer dans Réglages → Jeu.": "Das iPhone hat keinen Zugriff auf die Bewegungen erlaubt. Du kannst ihn in den iPhone-Einstellungen erlauben und dann unter Einstellungen → Spiel aktivieren.",
+  "Activer": "Aktivieren",
 };
 
 export const names = {

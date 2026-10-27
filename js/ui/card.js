@@ -154,7 +154,8 @@ export function enableTilt(el, { reduced = false } = {}) {
     const ly = cur.y + (touching || reduced ? 0 : idle.y), lx = cur.x + (touching || reduced ? 0 : idle.x);
     card.style.setProperty('--mx', `${(50 + (ly / MAX) * 50).toFixed(1)}%`);
     card.style.setProperty('--my', `${(50 - (lx / MAX) * 50).toFixed(1)}%`);
-    card.style.setProperty('--tilt', (Math.min(1, Math.hypot(cur.x, cur.y) / MAX)).toFixed(3));
+    /* v857 : le téléphone incliné compte aussi : la lueur des finitions s'allume quand on penche la carte */
+    card.style.setProperty('--tilt', (Math.min(1, Math.max(Math.hypot(cur.x, cur.y) / MAX, gyro && !touching && !reduced ? Math.hypot(idle.x, idle.y) / 12 : 0))).toFixed(3));
   };
   let frame = 0;
   let gyro = null; /* v793 : effet de profondeur : quand le téléphone s'incline, les reflets suivent (jamais de rotation 3D) */
@@ -163,7 +164,7 @@ export function enableTilt(el, { reduced = false } = {}) {
     if (!alive) return;
     if (!touching) {
       tgt.x = 0; tgt.y = 0; /* v419 : plus de balancement 3D au repos (voir apply) */
-      if (gyro) { idle.x += (-gyro.y * 14 - idle.x) * 0.3; idle.y += (gyro.x * 20 - idle.y) * 0.3; }
+      if (gyro) { idle.x += (-gyro.y * 20 - idle.x) * 0.3; idle.y += (gyro.x * 26 - idle.y) * 0.3; } /* v857 : reflets qui voyagent plus loin */
       else { const t = (now - t0) / 1000; idle.x = Math.sin(t * 0.9) * 3; idle.y = Math.cos(t * 0.7) * 4.5; } /* les reflets, eux, se balancent encore */
     }
     const k = touching ? 0.45 : 0.07;

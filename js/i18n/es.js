@@ -9278,6 +9278,10 @@ export default {
   "Image de la carte enregistrée.": "Imagen de la carta guardada.",
   "Impossible de créer l’image de cette carte.": "No se pudo crear la imagen de esta carta.",
   "Finition {f}": "Acabado {f}",
+  "Incline ton téléphone : la finition attrape la lumière, comme une vraie carte brillante.": "Inclina tu teléfono: el acabado atrapa la luz, como una carta brillante de verdad.",
+  "Incline doucement ton téléphone pour faire briller la carte.": "Inclina suavemente tu teléfono para hacer brillar la carta.",
+  "L’iPhone n’a pas donné l’accès aux mouvements. Tu peux l’autoriser dans les réglages de l’iPhone, puis l’activer dans Réglages → Jeu.": "El iPhone no ha dado acceso a los movimientos. Puedes permitirlo en los ajustes del iPhone y luego activarlo en Ajustes → Juego.",
+  "Activer": "Activar",
 };
 
 export const names = {

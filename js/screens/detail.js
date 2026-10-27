@@ -11,6 +11,8 @@ import { icon, sigil, picon, setIcon } from '../ui/icons.js';
 import { FORMS, formUnlocked } from '../core/forms.js';
 import { relationsOf } from '../core/relations.js';
 import { shareCard } from '../ui/share-card.js';
+import { depthSupported, askDepth } from '../ui/depth.js';
+import { depthOn } from './settings.js';
 import { t, LANG } from '../i18n.js';
 import { fameTier, fameNext, FAME_TIERS } from '../core/renown.js';
 
@@ -162,6 +164,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
       <div class="detail-card ${owned && g.formOf(current) ? 'fm-on' : ''}">${cardHTML(card, { size: 'full', variant: shownVariant, mystery: !owned, nameKnown: known })}${owned && g.formOf(current) ? `<span class="fm-badge">${esc(FORMS[current].name)}</span>` : ''}</div>
       ${owned ? `<p class="tilt-hint small muted">${t('Touche la carte pour masquer ou remettre son texte · fais-la glisser pour la faire pivoter.')}</p>` : ''}
       ${variantsRow}
+      ${owned && shownVariant !== 'normal' && depthSupported() && !depthOn(g.s.settings) && !g.s.tips?.['depth-ask'] ? `<div class="dt-depth"><span>${icon('sparkle')} Incline ton téléphone : la finition attrape la lumière, comme une vraie carte brillante.</span><button class="btn small gold" data-act="depthon">Activer</button><button class="btn small ghost" data-act="depthno">Non merci</button></div>` : ''}
       ${dressRow}
       <div class="detail-info">${body}</div>
     </div>`);
@@ -177,6 +180,13 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     showv() { try { g.setShownVariant(current, shownVariant); app.sfx.tap(); toast(`Apparence <b>${esc(VARIANTS[shownVariant].name.toLowerCase())}</b> affichée partout.`, { icon: 'eye' }); draw(); } catch (err) { toast(esc(err.message), { kind: 'error' }); } },
     fav() { const on = g.toggleFav(current); app.sfx?.tap?.(); toast(on ? 'Ajoutée à tes favoris : elle ne pourra pas être brûlée par erreur.' : 'Retirée de tes favoris.', { icon: 'star' }); draw(); },
     chal(el) { try { const x = g.claimChallenge(current, el.dataset.k); app.sfx?.levelup?.(); toast(`Défi « ${esc(x.name)} » réussi : <b>+${x.ash} cendres</b> et +${x.fame} Renommée`, { kind: 'success', icon: 'ash' }); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
+    async depthon() { /* v857 : l'accord de l'iPhone se demande pendant le toucher */
+      const ok = await askDepth();
+      g.setSetting('depth', ok); g.s.tips = { ...(g.s.tips || {}), 'depth-ask': Date.now() }; g.persist(); app.applySettings();
+      toast(ok ? 'Incline doucement ton téléphone pour faire briller la carte.' : 'L’iPhone n’a pas donné l’accès aux mouvements. Tu peux l’autoriser dans les réglages de l’iPhone, puis l’activer dans Réglages → Jeu.', { icon: ok ? 'sparkle' : 'info', ms: ok ? 3500 : 6000 });
+      draw();
+    },
+    depthno() { g.s.tips = { ...(g.s.tips || {}), 'depth-ask': Date.now() }; g.persist(); app.sfx?.tap?.(); draw(); },
     async share(b) { /* v856 : la carte en image, à envoyer ou publier */
       if (b) b.disabled = true; app.sfx?.tap?.();
       try { const r = await shareCard(cat, cat.get(current), shownVariant); if (r === 'saved') toast('Image de la carte enregistrée.', { icon: 'check' }); }
