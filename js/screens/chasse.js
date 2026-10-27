@@ -14,7 +14,7 @@ import { isBlocked } from '../core/moderation.js';
 import { withPlate, frameCls } from '../ui/vitrine.js';
 import { runDuel } from './duel-ui.js';
 import * as cloud from '../cloud/cloud.js';
-import { serverMode } from '../cloud/partie.js';
+import { serverMode, flush, pendingOps } from '../cloud/partie.js';
 import { t } from '../i18n.js';
 
 const DAYS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
@@ -141,6 +141,8 @@ export default function chasse(app, root) {
     if (battle) return;
     const run = g.chasseRun();
     if (!run) return list();
+    /* v862 : en combat, la bête montre la vie commune (la même que la jauge de cette page, lue même si elle arrive après le début) */
+    Object.defineProperty(run, 'pool', { get: () => { const v = ui.view; return v?.hp_max ? { max: v.hp_max, left: Math.max(0, v.hp_max - (v.dmg || 0)) } : null; } });
     playing = true;
     battle = runDuel(app, root, { title: t('La Grande Chasse'), run, pause: t('Combat en pause : il t’attend dans la Grande Chasse.'),
       onAbandon: () => abandon(),
@@ -153,7 +155,7 @@ export default function chasse(app, root) {
         app.chrome(); app.sfx.reveal?.(out.survived ? 'M' : 'R');
         ui.result = out; render(); window.scrollTo(0, 0);
         app.flushProgress();
-        setTimeout(loadView, 2500); /* le serveur compte les dégâts après avoir rejoué le combat */
+        counted(out); /* v862 : le serveur compte les dégâts après avoir rejoué le combat */
       } });
   }
   async function abandon() {
@@ -165,7 +167,14 @@ export default function chasse(app, root) {
     try { ui.result = g.abandonChasse(); } catch (e) { toast(esc(e.message), { kind: 'error' }); }
     app.chrome(); render(); window.scrollTo(0, 0);
     app.flushProgress();
-    setTimeout(loadView, 2500);
+    counted(ui.result);
+  }
+  /* v862 : la jauge suit tout de suite tes dégâts, puis se recharge une fois tous les coups du combat reçus par le serveur
+     (avant : relue au bout de 2,5 s, souvent avant que le serveur ait rejoué le combat : « 600 / 600 ») */
+  async function counted(out) {
+    if (ui.view && out?.dmg) { ui.view = { ...ui.view, dmg: (ui.view.dmg || 0) + out.dmg }; if (!playing) render(); }
+    if (serverMode()) for (let k = 0; k < 30 && pendingOps(); k++) { try { await flush(); } catch (e) { break; } }
+    if (!gone) loadView();
   }
 
   function render() {

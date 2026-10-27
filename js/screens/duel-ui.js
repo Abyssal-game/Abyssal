@@ -78,6 +78,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const ui = (app.state.duel ||= { fast: 0 });
   ui.fast = g.s.settings.combatFast ? 1 : 0; // v331 : bouton ×2 de retour (étude joueurs : un combat ≈ 1,2 min) ; la défense active garde son rythme
   const reduced = app.reduced();
+  /* v862 : Grande Chasse : la bête montre la vie commune à tous les chasseurs (jauge du serveur au début du combat, moins tes coups) */
+  const hpOf = (u, hp = u?.hp ?? 0, pool = run.pool) => (pool && u?.boss ? { v: Math.max(0, Math.round(pool.left - (u.maxHp - Math.max(0, hp)))), mx: Math.max(1, pool.max) } : { v: Math.max(0, hp), mx: Math.max(1, u?.maxHp || 1) });
   const light = g.s.settings?.quality === 'light'; // v374 : « Effets allégés » (Réglages) pour les téléphones qui peinent
   const T = (ms) => (reduced ? Math.min(ms, 80) : ui.fast === 3 ? ms * 0.25 : ui.fast ? ms * 0.45 : ms); // vitesse ×1, ×2 ou ×3
   const defMode = g.s.settings?.defense === 'auto' ? 'auto' : 'on'; // v269 : manuelle ou automatique (v333 : mode « assistée » retiré, il redevient manuel)
@@ -224,8 +226,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const tgt = tgtInfo[u.uid];
     /* v825 : dégâts annoncés sur cette créature par les ennemis (coups visés et coups de zone), au tour du joueur */
     const inc = !enemy && !dead && st.turn === 'ally' && !st.over ? front(st, 'enemy').reduce((a, e) => { const i = e.hp > 0 ? intentInfo(st, e) : null; return a + (i && i.dmg && (i.aoe || e.intent?.t === u.uid) ? i.dmg : 0); }, 0) : 0;
-    const hpp = Math.max(0, Math.min(100, Math.round((Math.max(0, u.hp) / Math.max(1, u.maxHp)) * 100)));
-    return `<button class="dv-c ${inc ? 'incd' : ''} ${inc >= u.hp && u.hp > 0 ? 'incd-ko' : ''} ${u.side} ${isFig(u) ? 'has-fig' : ''} ${hasCard(u) ? 'has-card' : ''} ${u.twin ? 'twin' : ''} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${!dead && u.hp <= u.maxHp * 0.3 ? 'hp3' : !dead && u.hp <= u.maxHp * 0.6 ? 'hp2' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.phase2 ? 'p2' : ''} ${u.defend ? 'def' : ''} ${!enemy && !dead && (u.frozen || u.stunned) ? 'unav' : ''} ${u.broken ? 'broken' : ''} ${u.cracked ? 'fele' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" data-rar="${u.rarity}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(uName(u))}, ${Math.max(0, u.hp)} PV">
+    const H = hpOf(u), hpp = Math.max(0, Math.min(100, Math.round((H.v / H.mx) * 100)));
+    return `<button class="dv-c ${inc ? 'incd' : ''} ${inc >= u.hp && u.hp > 0 ? 'incd-ko' : ''} ${u.side} ${isFig(u) ? 'has-fig' : ''} ${hasCard(u) ? 'has-card' : ''} ${u.twin ? 'twin' : ''} ${enemy ? 'corrupt' : ''} ${dead ? 'dead' : ''} ${!dead && u.hp <= u.maxHp * 0.3 ? 'hp3' : !dead && u.hp <= u.maxHp * 0.6 ? 'hp2' : ''} ${ready ? 'ready' : ''} ${!enemy && st.turn === 'ally' && !ready ? 'spent' : ''} ${sel === u.uid ? 'sel' : ''} ${u.boss ? 'boss' : ''} ${u.phase2 ? 'p2' : ''} ${u.defend ? 'def' : ''} ${!enemy && !dead && (u.frozen || u.stunned) ? 'unav' : ''} ${u.broken ? 'broken' : ''} ${u.cracked ? 'fele' : ''} ${tgt ? 'target' : ''} ${u.brkMax ? 'has-brk' : ''} ${enemy && intentInfo(st, u) && st.turn === 'ally' ? 'has-int' : ''}" data-uid="${u.uid}" data-rar="${u.rarity}" style="--rc:${RARITY[u.rarity].color}" aria-label="${esc(uName(u))}, ${H.v} PV">
       <span class="dv-base" aria-hidden="true"></span>
       ${hasCard(u) ? `<span class="dv-art dv-bart dv-bcard" aria-hidden="true"><img alt="" decoding="async" src="assets/bosses/combat-${figKey(u)}.webp"><span class="dv-crk" aria-hidden="true"></span></span>` : isFig(u) ? `<span class="dv-art dv-bart" aria-hidden="true"><img alt="" decoding="async" src="assets/bosses/carte-${st.bossKey}.webp"><span class="dv-crk" aria-hidden="true"></span></span><img class="dv-bfig" alt="" src="assets/bosses/${figKey(u)}.webp">` /* v605 : le gardien a de nouveau sa carte (fond peint de sa Furie), sa figure en déborde */ : `<span class="dv-art"><img alt="" decoding="async" src="${artUrl(c, { lite: true })}"><span class="dv-crk" aria-hidden="true"></span></span>`}
       <span class="dv-kw ${enemy && u.fam ? 'fam' : ''}" title="${esc(enemy && u.fam ? AI_FAMILIES[u.fam].desc : kit.name)}">${roleIcon(kit.kw)}<em>${esc(enemy && u.fam ? AI_FAMILIES[u.fam].name : kit.name)}</em></span>
@@ -234,7 +236,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         return `<span class="dv-nm ${u.named || ((u.boss || u.twin) && st.bossKey) ? 'named' : ''}">${sh !== nm ? `<span class="nm-l">${esc(nm)}</span><span class="nm-s">${esc(sh)}</span>` : esc(nm)}</span>`; })()}
       ${u.brkMax ? `<span class="cb-brk ${u.broken || u.cracked ? 'is-broken' : ''} ${u.cracked ? 'is-fele' : ''}" title="Brisure">${u.broken ? '<img alt="" src="assets/icons/st-broken.webp"><b>BRISÉ</b>' : u.cracked ? '<b>À BRISER</b>' : `<i style="width:${(u.brk / u.brkMax) * 100}%"></i>`}</span>` : ''}
       <span class="dv-atk">${icon('swords')}<b>${u.atk + (u.boost || 0)}</b></span>
-      <span class="dv-hp ${u.hp < u.maxHp ? 'hurt' : ''} ${u.hp > 0 && u.hp <= u.maxHp * 0.3 ? 'low' : ''}" style="--hpp:${Math.max(0, Math.min(100, Math.round((Math.max(0, u.hp) / Math.max(1, u.maxHp)) * 100)))}">${icon('heart')}<i class="hpr" aria-hidden="true"></i><b>${Math.max(0, u.hp)}</b></span>
+      <span class="dv-hp ${H.v < H.mx ? 'hurt' : ''} ${u.hp > 0 && H.v <= H.mx * 0.3 ? 'low' : ''}" style="--hpp:${hpp}">${icon('heart')}<i class="hpr" aria-hidden="true"></i><b>${H.v}</b></span>
             ${tgt ? `<span class="cb-tgt">${tgt}</span>` : ''}
       <span class="dv-hpb" style="--hpp:${hpp}%" aria-hidden="true"><i class="lag"></i><i class="cur"></i></span>
       ${inc ? `<span class="cb-inc" title="Dégâts annoncés sur cette créature">${icon('swords')}<b>−${inc}</b></span>` : ''}
@@ -472,7 +474,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   /* v509 : PV d'une carte mis à jour au moment du coup (chiffre ET anneau de vie ; avant, l'anneau attendait le dessin suivant) */
   const setHp = (c, uid, hp) => {
     const box = c.querySelector('.dv-hp'); if (!box) return;
-    const u = st.units[uid], v = Math.max(0, hp ?? u?.hp ?? 0), mx = Math.max(1, u?.maxHp || 1);
+    const u = st.units[uid], { v, mx } = hpOf(u, hp ?? u?.hp ?? 0);
     const b = box.querySelector('b'); if (b) b.textContent = v;
     box.style.setProperty('--hpp', Math.max(0, Math.min(100, Math.round((v / mx) * 100))));
     box.classList.toggle('hurt', v < mx); box.classList.toggle('low', v > 0 && v <= mx * 0.3);
@@ -1437,7 +1439,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const tgtName = i?.target && st.units[i.target]?.side === 'ally' ? cat.get(st.units[i.target].id).name : '';
     openSheet(`<div class="tb-info">${isFig(u) ? `<div class="tb-info-boss">${hasCard(u) ? `<img class="tb-info-bcard" alt="" src="assets/bosses/combat-${figKey(u)}.webp">` /* v723 : même image que sa carte en combat */ : `<img alt="" src="${uPic(u)}">`}<small>${esc(BOSSES[st.bossKey].title || '')}</small></div>` : `<div class="tb-info-card ${u.side === 'enemy' ? 'corrupt' : ''}">${cardHTML(c, { size: 'full', nameKnown: true })}</div>`}
       <h3>${isFig(u) ? esc(uName(u)) : `${esc(c.name)}${u.side === 'enemy' ? ' corrompu' : ''}`}</h3>
-      <dl class="facts"><div><dt>Attaque</dt><dd>${u.atk + (u.boost || 0)}</dd></div><div><dt>PV</dt><dd>${Math.max(0, u.hp)} / ${u.maxHp}</dd></div><div><dt>Niveau</dt><dd>${u.level || 1}</dd></div>${st.init ? `<div><dt>Vitesse</dt><dd>${speedOf(u)}</dd></div>` : ''}${st.init && u.side === 'ally' ? `<div><dt>PA</dt><dd>${u.pa || 0} / ${PA_MAX}</dd></div>` : ''}${u.brkMax ? `<div><dt>Brisure</dt><dd>${u.broken ? 'Brisé' : `${u.brk} / ${u.brkMax}`}</dd></div>` : ''}</dl>
+      <dl class="facts"><div><dt>Attaque</dt><dd>${u.atk + (u.boost || 0)}</dd></div><div><dt>PV</dt><dd>${hpOf(u).v} / ${hpOf(u).mx}</dd></div><div><dt>Niveau</dt><dd>${u.level || 1}</dd></div>${st.init ? `<div><dt>Vitesse</dt><dd>${speedOf(u)}</dd></div>` : ''}${st.init && u.side === 'ally' ? `<div><dt>PA</dt><dd>${u.pa || 0} / ${PA_MAX}</dd></div>` : ''}${u.brkMax ? `<div><dt>Brisure</dt><dd>${u.broken ? 'Brisé' : `${u.brk} / ${u.brkMax}`}</dd></div>` : ''}</dl>
       ${u.side === 'enemy' && (bigOf(u, false) || bigOf(u, true)) ? `<p class="small dc-bad"><b>Annonce</b> : ${esc(bigOf(u, false) ? (PREP_IT[bigOf(u, false)] ? `il prépare ${INTENTS[PREP_IT[bigOf(u, false)]].name} pour le tour suivant` : `${INTENTS[bigOf(u, false)].name} à son prochain tour`) : `${INTENTS[bigOf(u, true)].name} au tour suivant`)}. ${esc(INTENTS[PREP_IT[bigOf(u, false)] || bigOf(u, false) || bigOf(u, true)].desc)} Brise-le pour l’annuler.</p>` : ''}
       ${u.trait && TRAITS[u.trait] ? `<p class="small dc-bad cb-trait"><img class="cb-trico" alt="" src="assets/icons/st-${traitIcon(u.trait)}.webp"><b>${esc(TRAITS[u.trait].name)}</b> : ${esc(TRAITS[u.trait].desc)}</p>` : ''}
       ${fam ? `<p class="small"><b>${esc(fam.name)}</b> : ${esc(fam.desc)} <span class="dc-good">${esc(fam.counter)}</span></p>` : ''}
