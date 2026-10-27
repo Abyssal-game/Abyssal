@@ -9274,6 +9274,9 @@ export default {
   "Coffre d’or.": "Forziere d’oro.",
   "Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour, à jouer avant minuit : il ne se garde pas. Les jetons ne s’achètent pas et ne se gagnent nulle part ailleurs.": "Ogni partita costa un gettone della Sfida. Ne ricevi uno ogni giorno, da giocare prima di mezzanotte: non si conserva. I gettoni non si comprano e non si vincono da nessun’altra parte.",
   "Le narrateur raconte l’histoire et salue tes plus belles ouvertures de boosters à voix haute, dans la langue du jeu ; les gardiens et les arbitres parlent dans des bulles.": "Il narratore racconta la storia e celebra ad alta voce le tue migliori aperture di booster, nella lingua del gioco; i guardiani e gli arbitri parlano nei fumetti.",
+  "Image de la carte enregistrée.": "Immagine della carta salvata.",
+  "Impossible de créer l’image de cette carte.": "Impossibile creare l’immagine di questa carta.",
+  "Finition {f}": "Finitura {f}",
 };
 
 export const names = {
