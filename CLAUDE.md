@@ -145,7 +145,7 @@ Le détail de chaque version (v297 à aujourd'hui : qui a demandé quoi, fichier
 - **Histoire** : référence unique `docs/canon.md` (le Menteur est l'Horloger, révélation gardée pour plus tard ; les Premiers Scelleurs ; le Rêveur Sous la Fosse).
 
 ### Serveur et publication
-- **`20-grande-chasse.sql` à coller une première fois (v858)** pour la jauge commune de la Grande Chasse.
+- `20-grande-chasse.sql` (Grande Chasse) : **collé par le propriétaire le 27 octobre 2026**.
 - SQL à recoller signalés depuis le 24 octobre 2026 (le serveur était alors à jour) : `09-multijoueur.sql` (plusieurs fois, dernière v837), `15`, `12`, `08`, `11` (v807). Pour savoir ce qui manque vraiment : Mode Créateur → Diagnostic → État du serveur.
 - App Store : version 1.1 (737) renvoyée à Apple le 25 octobre 2026 après le refus « simulated gambling », en attente ; le propriétaire joue sur TestFlight. Play Store : version signée construite par GitHub Actions, test fermé obligatoire (12 testeurs, 14 jours). Micro-entreprise demandée le 23 octobre 2026 (SIRET attendu, puis contrats d'Apple pour les achats).
 
