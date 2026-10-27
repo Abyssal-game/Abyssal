@@ -52,6 +52,10 @@ export function stampHost(dv) {
   return h;
 }
 
+/* v873 : images du cercle chargées d'avance (sinon le premier gros coup s'afficherait sans elles) */
+let ringArt = false;
+const loadRingArt = () => { if (ringArt || typeof Image === 'undefined') return; ringArt = true; for (const n of ['rosace', 'seal', 'target', 'ring', 'ring-fast']) new Image().src = `assets/ui/def/${n}.webp`; };
+loadRingArt();
 export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titleHTML = '', reduced = false, alive = () => true, setTap, sfx = {}, hap = () => {}, T, onResult = null }) {
   return new Promise((resolve) => {
     const n = letters.length, strong = tier !== 'normal';
@@ -174,10 +178,10 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
         if (hl) { x = x < ha ? x : x < ha + hl ? ha : x - hl; x = x / (1 - hl); }
         return x <= 1 ? x ** K : 1 + (x - 1) * 1.2;
       };
-      const S0 = 1.8, scaleAt = (t) => Math.max(0.45, S0 - (S0 - 1) * prog(t));
+      const S0 = 1.55, scaleAt = (t) => Math.max(0.45, S0 - (S0 - 1) * prog(t));
       /* v872 : le cercle prend la place de la barre, dans la case de défense en bas (demande du propriétaire) */
       const hr = bar.getBoundingClientRect(), tr = bar.querySelector('.dv-dodge-t').getBoundingClientRect();
-      const size = 100, fr = { left: hr.left, width: hr.width, top: tr.bottom + 18, height: size }; /* sous la consigne, l'anneau au plus grand (×1,8) ne la touche pas */
+      const size = 96, fr = { left: hr.left, width: hr.width, top: tr.bottom + 24, height: size }; /* sous la consigne, v873 : l'anneau peint au plus grand (×1,55) ne la touche pas */
       const box = document.createElement('div'); box.className = `cbr${fast ? ' fast' : ''}`;
       box.style.cssText = `left:${Math.round(fr.left - hr.left + fr.width / 2 - size / 2)}px;top:${Math.round(fr.top - hr.top + fr.height / 2 - size / 2)}px;width:${size}px;height:${size}px;--tw:${Math.max(2, Math.min(7, pw / 12)).toFixed(1)}px`;
       box.innerHTML = '<span class="cbr-glow"></span><span class="cbr-seal"></span><span class="cbr-tgt"></span><span class="cbr-ring"></span>';

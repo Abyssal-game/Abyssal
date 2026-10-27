@@ -8857,3 +8857,20 @@ body:has(.prog-chip.docked.in) #topbar .top-meta { opacity: 0; }
 @keyframes cbrWin { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.35); opacity: 0; } }
 @keyframes cbrOut { to { opacity: 0; } }
 .cb-def.ringing .dv-dodge-bar { visibility: hidden; }
+/* v873 : le cercle des gros coups habillé des images Gemini (assets/ui/def/, tools/def-ring-art.py) : rosace, sceau à l'œil,
+   anneau d'or (la cible), anneau d'argent qui se resserre (rouge et braises pour les coups rapides). Les anneaux sont recadrés
+   pour que leur ligne tombe au même rayon : au contact, l'anneau mobile recouvre exactement l'anneau d'or. */
+.cbr > span { background-position: center; background-size: 100% 100%; background-repeat: no-repeat; }
+.cbr-glow { inset: 4% !important; background-image: url(../assets/ui/def/rosace.webp); opacity: .92; filter: drop-shadow(0 0 10px rgba(0, 0, 0, .9)); }
+.cbr-seal { inset: 21% !important; background: url(../assets/ui/def/seal.webp) center / 100% 100% no-repeat; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .9)); opacity: 1; }
+.cbr-tgt, .cbr-ring { inset: 0 !important; border: 0 !important; border-radius: 0; box-shadow: none !important; }
+.cbr-tgt { background-image: url(../assets/ui/def/target.webp); transition: filter .08s; }
+.cbr-ring { background-image: url(../assets/ui/def/ring.webp); }
+.cbr.fast .cbr-ring { background-image: url(../assets/ui/def/ring-fast.webp); }
+.cbr.go .cbr-ring { filter: brightness(1.25); }
+.cbr.pp .cbr-tgt { filter: brightness(1.7) drop-shadow(0 0 8px rgba(255, 220, 140, .95)); }
+.cbr.pp .cbr-seal { filter: drop-shadow(0 0 10px rgba(255, 210, 120, .9)); }
+.cbr.r-parry .cbr-tgt, .cbr.r-parry .cbr-ring { filter: brightness(2) drop-shadow(0 0 14px rgba(255, 230, 160, 1)); }
+.cbr.r-dodge .cbr-ring { filter: drop-shadow(0 0 10px rgba(130, 200, 255, 1)); }
+.cbr.r-none .cbr-tgt { filter: sepia(1) saturate(5) hue-rotate(-40deg) drop-shadow(0 0 10px rgba(255, 50, 70, .9)); }
+.cbr.r-none .cbr-ring { filter: drop-shadow(0 0 8px rgba(255, 50, 70, .9)); }
