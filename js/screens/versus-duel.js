@@ -3,7 +3,7 @@
 // Pour chaque booster de la composition : les deux sachets apparaissent face à face, tremblent, se déchirent ensemble,
 // les cartes jaillissent face cachée vers leur place, puis se retournent une à une, en alternance, avec leurs points.
 // Un toucher accélère (×4) ; « Tout révéler » termine d'un coup.
-import { BOOSTERS, RARITY, RARITY_ORDER, VARIANTS } from '../config.js';
+import { BOOSTERS, RARITY, RARITY_ORDER, VARIANTS, LUCK_POINTS } from '../config.js';
 import { lineupOf, scoreOf, LEAGUES, streakMult } from '../core/versus.js';
 import { today } from '../core/save.js';
 import { emoteHTML, showEmote } from '../ui/vitrine.js';
@@ -261,10 +261,11 @@ export function playDuel(app, r, out, { foeName, myName, myAvatar, onClose, onPi
       }
     }
     if (done) return;
-    const face = (k) => { const c = cs[k], kc = c && cat.get(c.id); if (!kc) return '';
-      return `<div class="vd-dc ${k} r-${c.rarity} ${c.variant !== 'normal' ? 'fin' : ''}" style="--rc:${RARITY[c.rarity]?.color || '#888'}"><small class="vd-dc-who">${k === 'me' ? (myName ? esc(myName) : t('Toi')) : esc(foeName)}</small>
-        <div class="vd-dc-card"><div class="vd-dc-in"><span class="vd-dc-back"></span><span class="vd-dc-face"><img alt="" src="${artUrl(kc)}"></span></div></div>
-        <b class="vd-dc-nm">${esc(tw(kc.name))}</b><em class="vd-dc-pts">+${fmt(c.pts)}</em></div>`; };
+    const face = (k) => { const c = cs[k], kc = c && cat.get(c.id); if (!kc) return ''; const fin = c.variant && c.variant !== 'normal';
+      return `<div class="vd-dc ${k} r-${c.rarity} ${fin ? `fin fv-${c.variant}` : ''}" style="--rc:${RARITY[c.rarity]?.color || '#888'}"><small class="vd-dc-who">${k === 'me' ? (myName ? esc(myName) : t('Toi')) : esc(foeName)}</small>
+        <div class="vd-dc-card"><div class="vd-dc-in"><span class="vd-dc-back"></span><span class="vd-dc-face"><img alt="" src="${artUrl(kc)}">${fin ? `<span class="vd-dc-fin">${t(VARIANTS[c.variant]?.name || '')}</span>` : ''}</span></div></div>
+        <b class="vd-dc-nm">${esc(tw(kc.name))}</b><em class="vd-dc-pts">+${fmt(c.pts)}</em>
+        <small class="vd-dc-calc"><i>${t(RARITY[c.rarity]?.name || c.rarity)} ${fmt(LUCK_POINTS[c.rarity] || 0)}</i>${fin ? ` <b>+ ${t(VARIANTS[c.variant]?.name || '')} ${fmt(LUCK_POINTS.variant)}</b>` : ''}</small></div>`; };
     const ov = document.createElement('div'); ov.className = 'vd-duo';
     ov.innerHTML = `${face('foe')}<span class="vd-dc-vs"><img alt="" src="assets/versus/vd-vs.webp"></span>${face('me')}`;
     ov.style.setProperty('--sp', String(speed));
