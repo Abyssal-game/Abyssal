@@ -31,7 +31,7 @@ import { ULTS, roleOf } from '../core/army.js';
 import { mountDiorama, roomFor } from '../ui/diorama.js';
 import { moveIconUrl, passivesOf, passiveIconUrl, moveFor, PASSIVES } from '../core/kits.js';
 import { hap, haptic } from '../ui/sound.js';
-import { speak, narrate, stopVoice } from '../ui/voice.js'; /* v794 : voix */
+import { speak, stopVoice } from '../ui/voice.js'; /* v794 : voix */
 import { musicMood } from '../ui/music.js';
 import { BOSS_LINES } from '../core/voices.js';
 import { playBar, stampHost, defVerdict, FAM_RHYTHM, KIND_RHYTHM, BOSS_ASSAULT } from '../ui/def-bar.js'; /* v594 */
@@ -787,7 +787,6 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
           else if (!aoeHit) { if (crit) fxSheet(e.u, 'crit-strike', { k: 3.2, d: 900 }); else fxSheet(e.u, 'foe-strike', { k: heavy ? 3 : 2.6, d: 760 }); }
           if (!aoeHit) { if (!viaSkill) impactFlash(e.u, heavy); if (!chain) cam(e.u, heavy ? 1.6 : 1.1); }
           if (crit) dio.flare();
-          if (crit && sU?.side === 'ally') narrate('crit', { chance: 0.45, host: $('.dv') }); /* v794 */
           sparks(e.u, crit ? 'gold' : ''); if (!aoeHit) shake(!more && (crit || heavy || e.hp <= 0), more || !(crit || heavy || e.hp <= 0));
           if (!more) await hitstop(crit ? 140 : heavy ? 80 : 45); /* v499 : coups enchaînés sans arrêt sur image, seul le dernier pèse */
           await wait(T(more ? 170 : heavy ? 260 : 190));
@@ -802,7 +801,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
           await wait(T(320));
           break;
         }
-        case 'parry': app.sfx.parry(); dio.flare(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxSheet(e.u, 'def-clash', { k: 2.7, d: 760 }); fxSheet(e.u, 'fx-parry', { k: 2.1, d: 820 }); recoil(e.a); /* v361 : choc des lames (Gemini) + anneau d'or */ impactFlash(e.u, true); sparks(e.u, 'gold'); cam(e.u, -0.8); } else front(st, 'ally').forEach((x) => fxSheet(x.uid, 'fx-shelter', { k: 2.4, d: 900 })); /* v503 : attaque de zone évitée à temps : dôme */ banner(e.u ? 'Parade parfaite !' : 'À l’abri !', 'parry', 800); shake(false); if (e.u) narrate('parry', { chance: 0.3, host: $('.dv') }); /* v794 */ await wait(T(420)); break;
+        case 'parry': app.sfx.parry(); dio.flare(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxSheet(e.u, 'def-clash', { k: 2.7, d: 760 }); fxSheet(e.u, 'fx-parry', { k: 2.1, d: 820 }); recoil(e.a); /* v361 : choc des lames (Gemini) + anneau d'or */ impactFlash(e.u, true); sparks(e.u, 'gold'); cam(e.u, -0.8); } else front(st, 'ally').forEach((x) => fxSheet(x.uid, 'fx-shelter', { k: 2.4, d: 900 })); /* v503 : attaque de zone évitée à temps : dôme */ banner(e.u ? 'Parade parfaite !' : 'À l’abri !', 'parry', 800); shake(false); await wait(T(420)); break;
         case 'fervor': fervorPop(e.d, e.why); draw(); break;
         case 'passive': app.sfx.passive?.(); passivePop(e.u, e.p); float(e.u, PASSIVES[e.p]?.name || '', 'syn'); await wait(T(320)); break;
         case 'brk': { const t = el(e.u)?.querySelector('.cb-brk i'); if (t) t.style.width = `${(e.brk / e.max) * 100}%`; break; }
@@ -840,7 +839,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         case 'boss': { if (e.s === 'Effondrement !') fxSheet(null, 'fx-collapse', { center: true, d: 1100 }); app.sfx.boss(); dio.roar(); const t = el(e.u); if (t) { t.classList.remove('roar'); void t.offsetWidth; t.classList.add('roar'); } float(e.u, e.s, 'boss'); shake(true); await wait(T(650)); break; }
         case 'phase2': {
           app.sfx.boss(); dio.fury(); dio.roar(); draw(); banner(`${icon('skull')} ${esc(e.s)}`, 'danger', 1200); shake(true);
-          if (st.bossKey) { const ms = await bossSay(e.key === 'abysse3' ? 'p3' : 'fury'); if (!ms) narrate('fury', { chance: 0.6, host: $('.dv') }); } /* v794 */
+          if (st.bossKey) await bossSay(e.key === 'abysse3' ? 'p3' : 'fury'); /* v855 : plus de narrateur en combat */
           await wait(T(900));
           const P = PHASE2[e.key];
           if (P) await phaseCard(P);
@@ -896,10 +895,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
             fxAt(e.u, 'death', { big: true }); sparks(e.u, 'big'); deathFx(e.u); splitFx(e.u); shake(true);
             if (reduced) el(e.u)?.classList.add('dying', 'ashes');
             banner(`Gardien vaincu : ${esc(uName(u))}`, 'finisher', 1500); /* v729 : neutre (« La Matriarche … est vaincu ») */
-            bossSay('down').then((ms) => setTimeout(() => { if (st.bossKey !== 'abysse') narrate('boss-down', { host: document.body }); }, ms + 500)); /* v794 : sa dernière phrase, puis le narrateur */
+            bossSay('down'); /* v855 : sa dernière phrase, sans narrateur */
             await wait(T(reduced ? 1100 : 1500)); d?.classList.remove('slowmo', 'bossfall', 'grace'); draw(); break;
           }
-          if (u?.side === 'ally') narrate('fall', { chance: 0.7, host: $('.dv') }); /* v794 */
           if (u?.side === 'ally' && await allyDown(e.u, ev, ei)) { draw(); break; } /* v832 : la carte se grise sous la tête de mort, bandeau « Créature à terre », la réserve réagit */
           // coup fatal : le dernier ennemi tombe sous un coup allié → gros plan, une fois par combat
           if (u?.side === 'enemy' && st.over === 'won' && lastAtk && !fatalDone) { fatalDone = true; await closeup(lastAtk, e.u, 'Coup fatal', { crit: true, sub: '' }); }
@@ -914,7 +912,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         case 'actor': draw(); if (!reduced) { const t = el(e.u); t?.classList.remove('myturn'); void t?.offsetWidth; t?.classList.add('myturn'); } app.sfx.actor?.(); await wait(T(260)); break;
         case 'pa': { const t = el(e.u); if (t && st.units[e.u]?.side === 'ally') { float(e.u, `+${e.d} PA`, 'pa'); app.sfx.pa?.(); } break; }
         case 'phase': draw(); turnBanner(e.side); await wait(T(e.side === 'enemy' ? 520 : 420)); break;
-        case 'ult': feedUlt(); dio.ult(); narrate('ult', { chance: 0.5, host: $('.dv') }); /* v794 */ await ultFx(); break;
+        case 'ult': feedUlt(); dio.ult(); await ultFx(); break;
         case 'law':
           if ('forbid' in e) { draw(); if (e.forbid) { banner(`${icon('skull')} Verdict : interdit de ${esc(FORBID[e.forbid])}`, 'danger', 1300); await wait(T(800)); } break; }
           if (e.aspect) dio.aspect(e.aspect); draw(); banner(e.fatigue ? `${icon('skull')} Épuisement : chaque tour blesse tout le monde` : e.law ? esc(LAWS[e.law].name) : esc(ASPECTS[e.aspect].name), e.fatigue ? 'danger' : 'skill', 1300); await wait(T(e.fatigue ? 900 : 700)); break;
@@ -1024,9 +1022,6 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     busy = true; sel = null; mode = null; draw();
     say(st.over === 'won' ? '<b class="dc-good">Victoire !</b>' : '<b class="dc-bad">Défaite…</b>');
     (st.over === 'won' ? (st.bossKey ? app.sfx.bossvictory : app.sfx.victory) : app.sfx.defeat)();
-    /* v794 : le narrateur : défaite, ou victoire arrachée de justesse */
-    if (st.over === 'lost' && !run?.lab) narrate('defeat', { host: document.body });
-    else if (st.over === 'won' && !st.bossKey) { const al = Object.values(st.units).filter((x) => x.side === 'ally'); const hp = al.reduce((a, x) => a + Math.max(0, x.hp), 0), mx = al.reduce((a, x) => a + x.maxHp, 0); if (mx && hp / mx < 0.2) narrate('close', { host: document.body }); }
     $('.dv').insertAdjacentHTML('beforeend', `<div class="cb-end cb-end2 ${st.over === 'won' ? 'won' : 'lost'}"><div class="cb-end-in"><img class="cb-end-em" alt="" src="assets/ui/cb-${st.over === 'won' ? 'victoire' : 'defaite'}.webp"><b>${st.over === 'won' ? 'Victoire' : 'Défaite'}</b></div></div>`); /* v826 : médailles peintes de fin de combat */
     await wait(T(st.over === 'won' ? 850 : 1200));
     if (alive_) { alive_ = false; musicMood('normal'); perfStop(); ctl.abort(); dio.destroy(); document.body.classList.remove('battle-mode'); onEnd(); }

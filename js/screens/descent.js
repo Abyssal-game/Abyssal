@@ -1,6 +1,5 @@
 // L'Aventure (la Descente) : ton équipe de cartes descend dans l'Abysse, étage par étage,
 // affronte les créatures corrompues en duel et rapporte un coffre (éclats ou booster).
-import { narrate } from '../ui/voice.js';
 import { RARITY, BOOSTERS, FINAL_FLOOR } from '../config.js';
 import { DESCENT, ROOMS, BLESSINGS, CHESTS, floorFloor, OMENS, advisedPower as powerFor, powerPts, CHAPTER, CHAPTERS, chapterOf, chapterStart, floorFirstReward } from '../core/descent.js';
 import { TEAM } from '../core/army.js';
@@ -317,7 +316,7 @@ export default function descent(app, root) {
       app.chrome();
       if (out.lost) { app.sfx.error(); ui.outcome = out.summary; ui.win = null; render(); }
       else if (out.summit) { ui.outcome = out.summary; ui.win = null; ui.start = null; ui.nightmare = false; render(); playEndingSure(app).then(() => { render(); if (out.abyssPack && !out.abyss) toast('<b>Tu as atteint le fond de l’Abysse !</b> Le Booster de l’Abysse t’attend dans les Boosters.', { kind: 'epic', icon: 'crown', ms: 7000 }); }); return; } /* v793 : la fin à chaque victoire contre l'Abysse */
-      else if (out.chapter || (out.summary && !g.descent().run)) { /* v808 : la Veille tenue (out.chapter = 0) finissait ici sans bilan : écran bloqué sur « Victoire » */ app.sfx.reveal('M'); if (out.first) setTimeout(() => narrate('chapter'), 5200); /* v794 : après la dernière phrase du gardien */ ui.outcome = out.summary; ui.win = null; ui.start = null; render(); /* v731 : plus d’annonce en double, le bilan dit déjà tout */ }
+      else if (out.chapter || (out.summary && !g.descent().run)) { /* v808 : la Veille tenue (out.chapter = 0) finissait ici sans bilan : écran bloqué sur « Victoire » */ app.sfx.reveal('M'); /* v855 : plus de narrateur après un chapitre gagné */ ui.outcome = out.summary; ui.win = null; ui.start = null; render(); /* v731 : plus d’annonce en double, le bilan dit déjà tout */ }
       else {
         app.sfx.reveal(out.room === 'boss' ? 'M' : 'R');
         const r = g.descent().run;

@@ -2,6 +2,7 @@
 
 Ancienne section « 5. Décisions déjà prises » de `CLAUDE.md`, déplacée ici le 27 octobre 2026 pour alléger le mémo lu à chaque session. La plus récente en haut ; ajouter chaque nouvelle livraison en haut de la liste.
 
+- v855 (demande du propriétaire) : plus de narrateur en combat (voix et sous-titres) : appels `narrate` retirés de `js/screens/duel-ui.js` (coup critique, parade, Furie d'un gardien, gardien vaincu, créature tombée, pouvoir ultime, défaite, victoire de justesse) et de `js/screens/descent.js` (chapitre gagné). Les bulles des gardiens restent. Le narrateur reste pour le prologue, la fin de la Descente et les ouvertures de Mythique ou de Secrète ; texte de Réglages → Voix des personnages corrigé (5 langues). Rien testé sur un vrai iPhone.
 - v854 (capture du propriétaire, premier combat d'une Épreuve) : la main d'aide posée à gauche de la case d'action (`.cb-dock .cb-a.guide::before`, v841) avait une rotation que l'animation `guideHand` effaçait : elle pointait vers le bas, à côté de la case. Elle est retournée en miroir (`scaleX(-1)`) et pointe vers la case, avec sa propre animation `guideHandDock` qui garde ce sens. Vérifié dans Chromium (390 × 844, Épreuve). Rien testé sur un vrai iPhone.
 - v853 (demande du propriétaire) : Enchères, volet « Les enchérisseurs » : seuls les noms et portraits restent, l'indication de leur façon de jouer (`hint`) n'est plus affichée (`js/screens/encheres.js`). Rien testé sur un vrai iPhone.
 - v852 (retours du propriétaire, captures de l'app) :

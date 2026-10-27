@@ -9274,6 +9274,7 @@ export default {
   "4 victoires : coffre d’or": "4 victorias: cofre de oro",
   "Coffre d’or.": "Cofre de oro.",
   "Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour, à jouer avant minuit : il ne se garde pas. Les jetons ne s’achètent pas et ne se gagnent nulle part ailleurs.": "Cada partida cuesta una ficha de la Batalla. Recibes una cada día, para jugar antes de medianoche: no se guarda. Las fichas no se compran ni se ganan en ningún otro sitio.",
+  "Le narrateur raconte l’histoire et salue tes plus belles ouvertures de boosters à voix haute, dans la langue du jeu ; les gardiens et les arbitres parlent dans des bulles.": "El narrador cuenta la historia y celebra en voz alta tus mejores aperturas de boosters, en el idioma del juego; los guardianes y los árbitros hablan en bocadillos.",
 };
 
 export const names = {

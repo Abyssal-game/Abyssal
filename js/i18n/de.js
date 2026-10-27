@@ -9274,6 +9274,7 @@ export default {
   "4 victoires : coffre d’or": "4 Siege: Goldtruhe",
   "Coffre d’or.": "Goldtruhe.",
   "Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour, à jouer avant minuit : il ne se garde pas. Les jetons ne s’achètent pas et ne se gagnent nulle part ailleurs.": "Jede Partie kostet eine Schlacht-Marke. Du bekommst jeden Tag eine, zu spielen vor Mitternacht: Sie lässt sich nicht aufheben. Marken kann man weder kaufen noch anderswo gewinnen.",
+  "Le narrateur raconte l’histoire et salue tes plus belles ouvertures de boosters à voix haute, dans la langue du jeu ; les gardiens et les arbitres parlent dans des bulles.": "Der Erzähler erzählt die Geschichte und würdigt deine besten Booster-Öffnungen laut, in der Sprache des Spiels; Wächter und Schiedsrichter sprechen in Sprechblasen.",
 };
 
 export const names = {
