@@ -9246,6 +9246,7 @@ export default {
   "{0} PA": "{0} PA",
   "{0} PA · recharge {1} tours": "{0} PA · recarrega em {1} turnos",
   "recharge {0} tours": "recarrega em {0} turnos",
+  "Plus de jeton aujourd’hui : un nouveau arrive demain.": "Sem fichas hoje: amanhã chega uma nova.",
 };
 
 export const names = {

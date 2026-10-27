@@ -20,7 +20,8 @@ import { esc, fmt, toast, confirmBox, openSheet, withPending } from '../ui/dom.j
 import { playDuel, pickGridHTML, leagueBadge, flameHTML } from './versus-duel.js';
 import { createMpLobby } from './mp-lobby.js';
 import { createChocGame } from './choc-game.js';
-import { hallTileHTML, openHall, loadHall } from './choc-hall.js';
+import { hallTileHTML, openHall, loadHall, setHallSim } from './choc-hall.js';
+import { devDayKind, devLeague, devHallOn } from './choc-dev.js'; /* v843 */
 import { t, tw } from '../i18n.js';
 
 /* v833 : « Le butin de la table » (retour à l'idée de départ du propriétaire) */
@@ -57,6 +58,10 @@ export default function versusScreen(app, root) {
   const pic = (id) => { const c = id && cat.get(id); return c ? `<img alt="" src="${artUrl(c, { lite: true })}">` : EMBLEM; };
   const oname = (r) => (isBlocked(r.mine ? r.b : r.a) ? 'Joueur masqué' : r.pseudo || 'Joueur');
   const tokens = () => g.chocTokens().n;
+  /* v843 : jour, ligue et série imposés par le banc d'essai du Mode Créateur (affichage et partie d'essai seulement) */
+  const dayKind = () => devDayKind(g) || chocDayKind(g.clock());
+  const lgView = () => { const lg = g.chocLeague(), d = devLeague(g); return d.pts == null ? lg : { ...lg, pts: d.pts }; };
+  const streakView = () => { const d = devLeague(g); return d.streak == null ? (g.s.versus.streak || 0) : d.streak; };
 
   function head() {
     const n = tokens();
@@ -68,17 +73,17 @@ export default function versusScreen(app, root) {
       ${hallTileHTML(cat)}`;
   }
   function dayBanner() {
-    const k = chocDayKind(g.clock());
+    const k = dayKind();
     if (k === 'premium') return `<section class="panel kc-wkd"><img alt="" src="assets/packs/premium.webp" onerror="this.remove()"><span><b>${t('Samedi premium')}</b><small>${t('Aujourd’hui, le troisième booster de chacun est un booster premium.')}</small></span></section>`;
     if (k === 'mystere') return `<section class="panel kc-wkd kc-myst"><span class="kc-myst-q">?</span><span><b>${t('Dimanche mystère')}</b><small>${t('Aujourd’hui, les trois boosters sont tirés au hasard à chaque partie : standard, faction, Alliances ou premium. Les mêmes pour les deux joueurs.')}</small></span></section>`;
     return '';
   }
   const monthName = (m) => `${t(MONTHS[+m.slice(5, 7) - 1] || '')} ${m.slice(0, 4)}`;
   function leagueHTML() {
-    const lg = g.chocLeague(), v = g.s.versus, i = leagueIdx(lg.pts), L = LEAGUES[i], N = LEAGUES[i + 1];
+    const lg = lgView(), i = leagueIdx(lg.pts), L = LEAGUES[i], N = LEAGUES[i + 1];
     const d = new Date(g.clock()), days = Math.max(1, Math.ceil((new Date(d.getFullYear(), d.getMonth() + 1, 1) - d) / 86400000));
     const pct = N ? Math.round(((lg.pts - L.min) / (N.min - L.min)) * 100) : 100;
-    const s = v.streak || 0;
+    const s = streakView();
     return `<section class="panel vs-league" style="--lgc:${L.color}" data-mp="league" role="button" tabindex="0" aria-label="${t('Les Ligues du Choc')}">
       <div class="vs-lg-top">${leagueBadge(i, 'big')}<div class="vs-lg-t"><b>${t('Ligue {l}', { l: t(L.name) })}</b><small>${fmt(lg.pts)} ${t('points')} · ${t('fin dans {n} j', { n: days })}</small></div>${s >= 1 ? flameHTML(s, 'big') : ''}</div>
       <div class="vs-lg-bar"><i style="width:${pct}%"></i></div>
@@ -87,7 +92,7 @@ export default function versusScreen(app, root) {
   }
   /* v834 : toucher la Ligue = tout savoir (ligues, points, récompenses, Série ardente) */
   function leagueSheet() {
-    const lg = g.chocLeague(), cur = leagueIdx(lg.pts);
+    const lg = lgView(), cur = leagueIdx(lg.pts);
     const rwTxt = (k) => { const r = LEAGUE_REWARD[k]; if (!r) return t('Pas de récompense'); const out = [];
       for (const [c, n] of Object.entries(r.chests || {})) out.push((n > 1 ? `${n} × ` : '') + t(CHEST_NAME[c] || c));
       for (const [k2, n] of Object.entries(r.tickets || {})) if (k2 === 'premium') out.push(t(n > 1 ? '{n} tickets premium' : '{n} ticket premium', { n }));
@@ -106,11 +111,11 @@ export default function versusScreen(app, root) {
       <div class="lg-chips">${mults}</div>
       <p class="small">${t('Coffres de série :')}</p><div class="lg-chips">${chests}</div></div>`, { label: t('Les Ligues du Choc') });
   }
-  function lastMonth() {
-    const x = g.s.versus.lgLast; let seen = null;
+  function lastMonth(force) {
+    const x = force || g.s.versus.lgLast; let seen = null;
     try { seen = localStorage.getItem('abyssal.chocSeen'); } catch (e) { /* stockage indisponible */ }
-    if (!x || !x.played || seen === x.m) return;
-    try { localStorage.setItem('abyssal.chocSeen', x.m); } catch (e) { /* idem */ }
+    if (!x || !x.played || (!force && seen === x.m)) return;
+    if (!force) try { localStorage.setItem('abyssal.chocSeen', x.m); } catch (e) { /* idem */ }
     const L = LEAGUES[x.tier], rw = LEAGUE_REWARD[L.k];
     openSheet(`<div class="center stack">${leagueBadge(x.tier, 'huge')}<h2>${t('Fin de la Ligue · {m}', { m: monthName(x.m) })}</h2>
       <p>${t('Tu termines en ligue <b>{l}</b> avec {n} points.', { l: t(L.name), n: fmt(x.pts) })}</p>
@@ -172,7 +177,7 @@ export default function versusScreen(app, root) {
   const pack = () => drawBooster('standard', cat).cards.map((c) => ({ id: c.id, rarity: c.rarity, variant: c.variant || 'normal', faction: cat.get(c.id)?.faction }));
   /* v833 : entraînement du butin de la table : boosters tirés sur le téléphone, rien n'est gagné ni perdu */
   function startTrain() {
-    const lineup = chocLineup(chocDayKind(g.clock()));
+    const lineup = chocLineup(dayKind());
     const pk = (it) => drawBooster(it.type, cat, it.type === 'faction' ? { faction: it.faction } : it.type === 'event' ? { event: { factions: it.factions } } : {}).cards.map((c) => { const x = { id: c.id, rarity: c.rarity, variant: c.variant || 'normal' }; return { ...x, pts: cardPts(x) }; });
     const a = lineup.map(pk), b = lineup.map(pk), sum = (p) => p.flat().reduce((n, c) => n + c.pts, 0);
     const r = { my_cards: a.flat(), their_cards: b.flat(), lineup, my_score: sum(a), their_score: sum(b) };
@@ -240,10 +245,9 @@ export default function versusScreen(app, root) {
     busyLocal: () => !!train,
     modeBar: () => head(),
     note: t('Lance une recherche : dès qu’un joueur arrive, vos boosters s’ouvrent en même temps. Le meilleur total rafle toute la table.'),
-    intro: () => `<button class="btn block dc-plq dc-plq-dark kc-trainbtn" data-mp="train">${icon('p:help')}${t('Entraînement contre l’Abysse')}</button><p class="small muted center kc-trainsub">${t('Sans jeton, rien à gagner ni à perdre')}</p>`, /* v813 : la ligne d'explication dépassait du bouton */
     canPlay: () => tokens() > 0,
     livePace: ({ disabled }) => `<button class="btn primary block dc-plq dc-plq-red kc-live" data-mp="quick" data-pace="fast" ${disabled ? 'disabled' : ''}><span>${t('Jouer en direct')}</span><span class="kc-cost"><img alt="" src="assets/jeux/kc-jeton2.webp" onerror="this.onerror=null;this.src='assets/icons/seal.webp'">1</span></button>`,
-    rewardNote: () => `<p class="small muted center">${tokens() > 0 ? t('Une partie coûte <b>1 jeton</b>. Le gagnant rafle toutes les cartes ouvertes, le perdant repart les mains vides.') : t('Plus de jeton aujourd’hui : un nouveau arrive demain. Tu peux t’entraîner contre l’Abysse.')}</p>`,
+    rewardNote: () => `<p class="small muted center">${tokens() > 0 ? t('Une partie coûte <b>1 jeton</b>. Le gagnant rafle toutes les cartes ouvertes, le perdant repart les mains vides.') : t('Plus de jeton aujourd’hui : un nouveau arrive demain.')}</p>`,
     onLobby: async () => { const n = await app.partie.first('chocRefund'); if (n > 0) { toast(t(n > 1 ? '{n} jetons du Choc rendus (parties jamais commencées).' : '{n} jeton du Choc rendu (partie jamais commencée).', { n }), { icon: 'info' }); app.chrome?.(); } },
     top: (L, row) => { const end = L.filter((v) => v.status === 'done' && !v.claimed); return end.length ? `<section class="panel mp-sec hot"><h2 class="section-title">${t('Boosters à ouvrir')} <span class="pill-n">${end.length}</span></h2>${end.map((v) => row(v, v.state?.table ? t('Ton adversaire est là : ouvre vos boosters') : t('Partie terminée : choisis tes cartes'))).join('')}</section>` : ''; },
     bottom: () => `${oldHTML()}<details class="panel dc-fold dc-how vs-rules"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/help.webp"><span class="dc-sum-t">${t('Comment ça marche')}</span></summary>${chocHowHTML(cat)}</details>`,
@@ -286,12 +290,16 @@ export default function versusScreen(app, root) {
   });
 
   /* v835 : le Panthéon d'hier se charge en fond, puis sa tuile se met à jour */
+  setHallSim(devHallOn(g) ? cat : null, chocLineup, devDayKind(g) || 'normal'); /* v843 */
   loadHall().then(() => { const el = alive && root.querySelector('.kc-hall'); if (el) el.outerHTML = hallTileHTML(cat); });
   app.holdRefresh = () => alive; /* la partie du serveur (jetons, cartes gardées) arrive sans redessiner l'écran : il se redessine lui-même */
   loadOld().finally(() => {
     if (!alive) return;
     lobby.show();
     if (app.state.chocTrain) { app.state.chocTrain = false; startTrain(); } /* v813 : lancé depuis le Mode Créateur */
+    const dv = app.state.chocDev; app.state.chocDev = null; /* v843 : banc d'essai du Mode Créateur */
+    if (dv === 'hall') openHall(app);
+    if (dv?.month) lastMonth(dv.month);
   });
   lastMonth();
   return () => { alive = false; app.holdRefresh = null; document.querySelectorAll('.vd').forEach((x) => x.__kill?.()); train = null; lobby.stop(); game.stop(); document.body.classList.remove('battle-mode'); document.querySelector('.sc-scene')?.remove(); };

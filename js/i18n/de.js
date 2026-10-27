@@ -9247,6 +9247,7 @@ export default {
   "{0} PA": "{0} AP",
   "{0} PA · recharge {1} tours": "{0} AP · lädt in {1} Runden auf",
   "recharge {0} tours": "lädt in {0} Runden auf",
+  "Plus de jeton aujourd’hui : un nouveau arrive demain.": "Heute keine Marke mehr: Morgen kommt eine neue.",
 };
 
 export const names = {

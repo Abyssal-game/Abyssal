@@ -63,7 +63,7 @@ function fitNames(el) {
     while (n.scrollWidth > n.clientWidth + 1 && f > 7 && k++ < 40) { f *= 0.94; n.style.fontSize = `${f}px`; }
   });
 }
-export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick, onRematch, onReact, table = false, train = false } = {}) {
+export function playDuel(app, r, out, { foeName, myName, myAvatar, onClose, onPick, onRematch, onReact, table = false, train = false, replay = false } = {}) {
   const g = app.game, cat = app.catalog;
   const mine = r.my_cards || [], theirs = r.their_cards || [];
   const res = out?.result && RES[out.result] ? out.result : r.my_score > r.their_score ? 'win' : r.my_score === r.their_score ? 'tie' : 'lose';
@@ -95,7 +95,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick, onRe
       ${rows(foePacks, 'foe')}
       <div class="vd-center"><span class="vd-step"></span><img class="vd-medal" alt="" src="assets/versus/vd-vs.webp"><button class="vd-skip" data-v="all">${icon('skip')}Tout révéler</button></div>
       ${rows(myPacks, 'me')}
-      ${plate('me', t('Toi'), myAvatar)}
+      ${plate('me', myName ? esc(myName) : t('Toi'), myAvatar)}
     </div>
     <div class="vd-mid"><div class="vd-pack foe"></div><span class="vd-vs"></span><div class="vd-pack me"></div></div>
     <div class="vd-ban" aria-live="polite"></div>
@@ -295,7 +295,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick, onRe
     end.hidden = false;
     end.innerHTML = `<div class="vd-burst"></div><img class="vd-emb ${res}" alt="" src="assets/versus/${EMB[res]}.webp"><h2 class="vd-title ${res}">${t(RES[res])}</h2>
       <p class="vd-tally"><b>${fmt(sc.me)}</b> <span>${t('contre')}</span> <b>${fmt(sc.foe)}</b></p>
-      ${table ? `<p class="vd-tablemsg ${res}">${train ? t('Entraînement : rien n’est gagné ni perdu.')
+      ${table ? `<p class="vd-tablemsg ${res}">${replay ? (res === 'tie' ? t('Même total : chacun garde ses cartes.') : `${esc(res === 'win' ? myName : foeName)} rafle la table (partie simulée).`) : train ? t('Entraînement : rien n’est gagné ni perdu.')
         : res === 'win' ? t(fresh ? 'Tu rafles la table : <b>{n} cartes</b> sont à toi, dont <b>{f} nouvelles</b>.' : 'Tu rafles la table : <b>{n} cartes</b> sont à toi.', { n: nWon, f: fresh })
         : res === 'tie' ? t('Même total : chacun garde ses cartes.')
         : t('{name} rafle la table. Tu repars les mains vides.', { name: esc(foeName) })}</p>${res === 'win' && !train && out?.cards?.length ? tableWon(out.cards) : ''}`
