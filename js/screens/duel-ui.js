@@ -608,7 +608,14 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     t.style.visibility = 'hidden'; setTimeout(() => { if (t.isConnected) t.style.visibility = ''; }, 1650);
   };
   const ring = (uid, cls) => { if (reduced) return; const t = el(uid); if (!t) return; const r = document.createElement('span'); r.className = `cb-ring ${cls}`; t.appendChild(r); setTimeout(() => r.remove(), 750); };
-  const float = (uid, txt, cls) => { const t = el(uid); if (!t) return; const f = document.createElement('span'); f.className = `dv-float ${cls}`; f.textContent = txt; t.appendChild(f); setTimeout(() => f.remove(), 900); };
+  /* v865 : un texte (pas un chiffre de dégâts) s'écrit plus petit, passe à la ligne et reste dans l'écran (« Forge ardente : 17 ATQ » débordait des deux côtés) */
+  const float = (uid, txt, cls) => {
+    const t = el(uid); if (!t) return; const f = document.createElement('span');
+    f.className = `dv-float ${cls}${/[−+-]\d/.test(txt) ? '' : ' txt'}`; f.textContent = txt; t.appendChild(f); setTimeout(() => f.remove(), 900);
+    const box = $('.dv')?.getBoundingClientRect(), r = f.getBoundingClientRect(); if (!box || !r.width) return;
+    const pad = 8 + r.width * 0.08, dx = r.left < box.left + pad ? box.left + pad - r.left : r.right > box.right - pad ? box.right - pad - r.right : 0;
+    if (dx) f.style.marginLeft = `${Math.round(dx)}px`;
+  };
   const banner = (html, cls = '', ms = 900) => {
     const b = document.createElement('div'); b.className = `cb-banner ${cls}`; b.innerHTML = html;
     $('.dv').appendChild(b); setTimeout(() => b.remove(), T(ms) + 200);

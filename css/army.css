@@ -8895,3 +8895,5 @@ table.odds th, table.odds td { white-space: normal; }
 /* v864 : « ? » du combat dessiné (le glyphe de la police n'était pas centré dans son anneau, surtout sur iPhone) */
 .dv-top .btn.small.ghost.cb-help { display: inline-flex; align-items: center; justify-content: center; }
 .cb-help-q { display: block; width: 21px; height: 21px; color: #F2D68A; filter: drop-shadow(0 0 4px rgba(242, 193, 78, .55)) drop-shadow(0 1px 0 #000); }
+/* v865 : textes flottants du combat (états, pouvoirs, consignes) : plus petits que les dégâts, sur deux lignes au besoin, jamais coupés par l'écran (marge posée par float() dans duel-ui.js) */
+.dv-float.txt { font-size: clamp(.95rem, 4.6vw, 1.2rem) !important; line-height: 1.1; white-space: normal; width: max-content; max-width: min(230px, calc(100vw - 40px)); text-align: center; text-wrap: balance; -webkit-text-stroke: .6px #3a0410; }
