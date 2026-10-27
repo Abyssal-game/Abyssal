@@ -89,7 +89,7 @@ LE CERCLE DE L'ABYSSE
 • Le Pacte : tire des cartes, encore une… et arrête-toi avant de briser le pacte
 • Les Cryptes : un jeu de mémoire où chaque paire réveille le pouvoir de sa faction
 • Joue contre d'autres joueurs, en partie rapide ou à ton rythme, et défie tes amis
-• Le Choc des Boosters : trois boosters chacun, ouverts en même temps face à un autre joueur ; le meilleur total rafle toutes les cartes de la table
+• Le Choc des Boosters : trois boosters chacun, ouverts en même temps face à un autre joueur ; le meilleur total rafle toutes les cartes de la table (le week-end, le troisième booster est premium)
 
 UN MONDE À DÉCOUVRIR
 • Un Bestiaire illustré, avec l'histoire de chaque créature

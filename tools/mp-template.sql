@@ -641,18 +641,26 @@ revoke execute on function public.choc_init() from public, anon, authenticated;
 -- points (même barème que l'ancien Pari : C 1, PC 2, R 6, HR 20, M 80, S 200, +8 avec une finition) rafle toutes les cartes
 -- de la table ; le perdant repart les mains vides. Égalité : chacun garde les siennes. Aucune mise : l'entrée est un jeton
 -- gratuit, jamais vendu. La partie est jouée dès que les deux joueurs sont là (le serveur ouvre et compte tout).
-create or replace function public.choc_tpack() returns jsonb language sql volatile security definer set search_path = public as $$
+-- v834 : le samedi et le dimanche (heure de Paris), le 3e booster de chacun est un booster premium (« week-end premium »).
+drop function if exists public.choc_tpack();
+create or replace function public.choc_tpack(p_type text default 'standard') returns jsonb language sql volatile security definer set search_path = public as $$
   select coalesce(jsonb_agg(jsonb_build_object('id', x ->> 'id', 'rarity', x ->> 'rarity', 'variant', x ->> 'variant', 'pts', (x ->> 'pts')::int, 'faction', c.faction) order by o), '[]')
-  from jsonb_array_elements(public.versus_pack('standard', null, null)) with ordinality e(x, o) join public.shadow_cards c on c.id = x ->> 'id'
+  from jsonb_array_elements(public.versus_pack(case when p_type = 'premium' then 'premium' else 'standard' end, null, null)) with ordinality e(x, o) join public.shadow_cards c on c.id = x ->> 'id'
 $$;
-revoke execute on function public.choc_tpack() from public, anon, authenticated;
+revoke execute on function public.choc_tpack(text) from public, anon, authenticated;
+create or replace function public.choc_weekend() returns boolean language sql stable set search_path = public as $$
+  select extract(isodow from (now() at time zone 'Europe/Paris')) in (6, 7)
+$$;
+revoke execute on function public.choc_weekend() from public, anon, authenticated;
 create or replace function public.choc_table() returns jsonb language plpgsql volatile security definer set search_path = public as $$
-declare pa jsonb := jsonb_build_array(public.choc_tpack(), public.choc_tpack(), public.choc_tpack());
-  pb jsonb := jsonb_build_array(public.choc_tpack(), public.choc_tpack(), public.choc_tpack()); ta int; tb int;
+declare we boolean := public.choc_weekend(); t3 text := case when public.choc_weekend() then 'premium' else 'standard' end;
+  pa jsonb := jsonb_build_array(public.choc_tpack(), public.choc_tpack(), public.choc_tpack(t3));
+  pb jsonb := jsonb_build_array(public.choc_tpack(), public.choc_tpack(), public.choc_tpack(t3)); ta int; tb int;
 begin
   select coalesce(sum((c ->> 'pts')::int), 0) into ta from jsonb_array_elements(pa) p, jsonb_array_elements(p) c;
   select coalesce(sum((c ->> 'pts')::int), 0) into tb from jsonb_array_elements(pb) p, jsonb_array_elements(p) c;
   return jsonb_build_object('table', true, 'packs', jsonb_build_object('a', pa, 'b', pb), 'total', jsonb_build_object('a', ta, 'b', tb),
+    'types', jsonb_build_array('standard', 'standard', t3), 'weekend', we,
     'over', true, 'winner', case when ta > tb then 'a' when tb > ta then 'b' else 'draw' end);
 end $$;
 revoke execute on function public.choc_table() from public, anon, authenticated;
