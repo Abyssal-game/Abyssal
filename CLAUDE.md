@@ -125,6 +125,7 @@ Le détail de chaque version (v297 à aujourd'hui : qui a demandé quoi, fichier
 - Serveur de partie : toute méthode qui change la partie va dans `OPS` et `ARGS` (`js/core/ops.js`) ; règles de déterminisme du §1 bis.
 - Images : aucun symbole religieux ou politique réel (croix, étoile à six branches, heptagramme, runes proches de symboles…), aucune marque d'un autre jeu (Magic…) : retoucher ou refuser l'image. Style adulte (orfèvrerie, enluminure gothique), jamais enfantin.
 - Produit : pas de boosters ni de puissance vendus contre de l'argent réel ; achats seulement cosmétiques (Échoppe, Codex enluminé, Pack du Fondateur). **Le jeton du Choc n'est jamais achetable, même indirectement.** Aucun vocabulaire de jeu d'argent (refus d'Apple du 24 octobre 2026 pour « simulated gambling » : plus de « mise », « pari », « miser », « tenter sa chance »).
+- **Pas de nouveau mini-jeu** : le « Rituel interdit » (roguelite de score) a été abandonné le 27 octobre 2026 (« on a assez de jeux dans Abyssal »), ne pas le reproposer.
 - **Jamais d'échange ni de vente de cartes entre joueurs** (même en éclats) : décision du propriétaire du 27 octobre 2026 (faux comptes, triche, revente contre de l'argent réel, regard d'Apple sur les boosters).
 - Gardiens : toute retouche se vérifie sur plusieurs gardiens et au moins deux tailles d'écran. Rien ne vise au-delà de l'étage 100 (`FINAL_FLOOR`) sauf les Veilles.
 
