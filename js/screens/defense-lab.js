@@ -14,7 +14,7 @@ import { INTENTS } from '../core/skills.js';
 import { BOSSES } from '../core/bosses.js';
 import { VERSION } from '../config.js';
 
-const LETTERS = { n: 'Coup simple', f: 'Coup rapide', l: 'Coup lent', x: 'Feinte', m: 'Zone mobile', h: 'Coup chargé', H: 'Coup chargé avec feinte', o: 'Cercle (gros coup)', O: 'Cercle rapide avec hésitation' }; /* v871 : o, O */
+const LETTERS = { n: 'Coup simple', f: 'Coup rapide', l: 'Coup lent', x: 'Feinte', m: 'Zone mobile', h: 'Coup chargé', H: 'Coup chargé avec feinte', o: 'Cercle (gros coup)', O: 'Cercle rapide (anneau rouge)' }; /* v871 : o, O ; v874 : plus d'hésitation */
 const FAM = { predateur: 'Prédateur', assassin: 'Assassin', berserker: 'Berserker', protecteur: 'Garde du corps', mage: 'Mage', parasite: 'Parasite', controleur: 'Contrôleur', soutien: 'Instigateur', gardien: 'Gardien' };
 /* durée de base de la zone d'or selon l'attaque (defenseWindow) : on prend le type d'attaque qui correspond le mieux */
 const KIND_OF = { h: 'heavy', H: 'heavy', o: 'heavy', O: 'heavy' };

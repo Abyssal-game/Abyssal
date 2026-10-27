@@ -166,22 +166,18 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
        avec une hésitation), fenêtre de parade tirée de la fenêtre de défense (elle dépend aussi de l'écart de niveau entre ta
        créature et l'attaquant), finesse du sceau à la mesure de cette fenêtre, et nombre de cercles à la suite (oo). */
     const passRing = (i, L, done1) => {
+      /* v874 (« pas terrible, mal configuré ») : l'anneau descend à vitesse constante (plus d'accélération ni d'arrêt au hasard,
+         impossibles à lire), parcourt deux fois plus de chemin, rien ne s'allume avant le toucher (le joueur attendait la lueur
+         et touchait trop tard), fenêtre de parade de 90 à 160 ms placée un peu après le contact (temps du doigt), et sans
+         l'avance d'affichage de la barre (elle décalait chaque toucher de 33 ms vers « trop tard » sur iPhone). */
       const w = typeof win === 'function' ? win(L) : win, fast = L === 'O';
       const D = (tier === 'boss' ? T.ringBoss : tier === 'elite' ? T.ringElite : T.ringNormal) * (fast ? T.ringFast : 1);
       const pw = Math.max(T.ringParryMin, Math.min(T.ringParryMax, Math.round(w.dodge * T.ringParry))); /* fenêtre de parade (ms) */
-      const tb = D * 0.8, early = D * T.ringEarly; /* tb : le cercle touche le sceau ; avant « early » : beaucoup trop tôt */
-      const K = tier === 'normal' ? 1.15 : 1.45; /* il accélère vers la fin, plus contre les élites et les gardiens */
-      const ha = 0.42 + Math.random() * 0.12, hl = fast ? 0.16 + Math.random() * 0.08 : 0; /* hésitation (O) : il s'arrête un instant */
-      /* progression du cercle (0 → 1 au sceau → 1,3 après) avec l'éventuel arrêt */
-      const prog = (t) => {
-        let x = Math.max(0, t / tb);
-        if (hl) { x = x < ha ? x : x < ha + hl ? ha : x - hl; x = x / (1 - hl); }
-        return x <= 1 ? x ** K : 1 + (x - 1) * 1.2;
-      };
-      const S0 = 1.55, scaleAt = (t) => Math.max(0.45, S0 - (S0 - 1) * prog(t));
-      /* v872 : le cercle prend la place de la barre, dans la case de défense en bas (demande du propriétaire) */
+      const tb = D * 0.8, early = tb * T.ringEarly; /* tb : l'anneau d'argent recouvre l'anneau d'or ; avant « early » : beaucoup trop tôt */
+      const pa = tb - pw * 0.4, pb = tb + pw * 0.6; /* parade parfaite entre pa et pb */
+      const S0 = 2.2, scaleAt = (t) => Math.max(0.3, S0 - (S0 - 1) * (t / tb));
       const hr = bar.getBoundingClientRect(), tr = bar.querySelector('.dv-dodge-t').getBoundingClientRect();
-      const size = 96, fr = { left: hr.left, width: hr.width, top: tr.bottom + 24, height: size }; /* sous la consigne, v873 : l'anneau peint au plus grand (×1,55) ne la touche pas */
+      const size = 72, big = Math.round(size * 0.8 * S0), fr = { left: hr.left, width: hr.width, top: tr.bottom + 6 + (big - size) / 2, height: size }; /* l'anneau au plus grand (×2,2) tient sous la consigne */
       const box = document.createElement('div'); box.className = `cbr${fast ? ' fast' : ''}`;
       box.style.cssText = `left:${Math.round(fr.left - hr.left + fr.width / 2 - size / 2)}px;top:${Math.round(fr.top - hr.top + fr.height / 2 - size / 2)}px;width:${size}px;height:${size}px;--tw:${Math.max(2, Math.min(7, pw / 12)).toFixed(1)}px`;
       box.innerHTML = '<span class="cbr-glow"></span><span class="cbr-seal"></span><span class="cbr-tgt"></span><span class="cbr-ring"></span>';
@@ -189,8 +185,8 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
       const ringEl = box.querySelector('.cbr-ring');
       ringEl.style.transform = `scale(${S0})`;
       pips[i]?.classList.add('now');
-      hint.textContent = 'Touche quand le cercle se referme sur le sceau' + (n > 1 ? ` · coup ${i + 1}/${n}` : '');
-      let t0 = 0, fin = false, raf = 0, lit = '', anim = null;
+      hint.textContent = 'Touche quand le cercle touche l’anneau d’or' + (n > 1 ? ` · coup ${i + 1}/${n}` : '');
+      let t0 = 0, fin = false, raf = 0, anim = null;
       const end = (res, when = null, why = '') => {
         if (fin) return; fin = true; cancelAnimationFrame(raf); setTap(null); letGo = null;
         try { anim?.pause(); } catch (e) { /* rien */ }
@@ -207,24 +203,23 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
         done1();
       };
       const step = () => {
-        const t = performance.now() - t0, now = t >= tb - pw * 0.6 && t <= tb + pw * 0.4 ? 'pp' : t >= early ? 'go' : '';
-        if (now !== lit) { if (lit) box.classList.remove(lit); if (now) box.classList.add(now); lit = now; }
-        if (t >= D) end('none'); else raf = requestAnimationFrame(step);
+        const t = performance.now() - t0;
+        if (t >= D) end('none', null, 'late'); else raf = requestAnimationFrame(step);
       };
       const startRun = () => {
         t0 = performance.now();
         if (ringEl.animate) {
-          anim = ringEl.animate(Array.from({ length: 49 }, (_, k) => ({ offset: k / 48, transform: `scale(${scaleAt((k / 48) * D).toFixed(3)})` })), { duration: D, easing: 'linear', fill: 'forwards' });
+          anim = ringEl.animate(Array.from({ length: 49 }, (_, k) => ({ offset: k / 48, transform: `scale(${scaleAt((k / 48) * D).toFixed(3)})`, opacity: Math.min(1, k / 6) })), { duration: D, easing: 'linear', fill: 'forwards' });
           anim.ready?.then(() => { if (!fin && typeof anim.startTime === 'number') t0 = anim.startTime; }).catch(() => {});
         }
         raf = requestAnimationFrame(step);
       };
       setTap((at) => {
         if (!t0) return;
-        const now = performance.now(), when = (at && at <= now && now - at < 500 ? at : now) + (T.leadMs || 0), t = when - t0;
+        const now = performance.now(), when = at && at <= now && now - at < 500 ? at : now, t = when - t0;
         if (t < early) end('none', when, 'early');
-        else if (t < tb - pw * 0.6) end('dodge', when);
-        else if (t <= tb + pw * 0.4) end('parry', when);
+        else if (t < pa) end('dodge', when);
+        else if (t <= pb) end('parry', when);
         else end('none', when, 'late');
       });
       const gap = i === 0 ? (reduced ? 500 : T.gapFirst) + Math.random() * T.gapFirstRand : T.gapMin + Math.random() * T.gapRand;

@@ -9444,12 +9444,12 @@ export default {
   "Carapace de glace : absorbe {0} dégât": "Caparazón de hielo: absorbe {0} de daño",
   "Auto": "Auto",
   "Le cercle des gros coups": "El círculo de los golpes fuertes",
-  "Un <b>gros coup</b> arrive : un <b>cercle se resserre</b> autour d’un sceau, en bas de l’écran. Touche l’écran <b>au moment où il se referme sur le sceau</b> (il recouvre l’anneau d’or) : <b>parade parfaite</b>. Trop tôt : <b>défense partielle</b> (la moitié des dégâts). Trop tard : <b>touché</b>. Contre les élites et les gardiens, il va plus vite, et certains <b>hésitent</b> avant de se refermer.": "Llega un <b>golpe fuerte</b>: un <b>círculo se estrecha</b> alrededor de un sello, abajo en la pantalla. Toca la pantalla <b>en el momento en que se cierra sobre el sello</b> (cubre el anillo dorado): <b>parada perfecta</b>. Demasiado pronto: <b>defensa parcial</b> (la mitad del daño). Demasiado tarde: <b>golpeado</b>. Contra élites y guardianes va más rápido, y algunos <b>dudan</b> antes de cerrarse.",
+  "Un <b>gros coup</b> arrive : un <b>cercle se resserre</b> autour d’un sceau, en bas de l’écran. Touche l’écran <b>au moment où il se referme sur le sceau</b> (il recouvre l’anneau d’or) : <b>parade parfaite</b>. Trop tôt : <b>défense partielle</b> (la moitié des dégâts). Trop tard : <b>touché</b>. Contre les élites et les gardiens, il va plus vite ; l’<b>anneau rouge</b> est le plus rapide.": "Llega un <b>golpe fuerte</b>: un <b>círculo se estrecha</b> alrededor de un sello, abajo en la pantalla. Toca la pantalla <b>en el momento en que se cierra sobre el sello</b> (cubre el anillo dorado): <b>parada perfecta</b>. Demasiado pronto: <b>defensa parcial</b> (la mitad del daño). Demasiado tarde: <b>golpeado</b>. Contra élites y guardianes va más rápido; el <b>anillo rojo</b> es el más rápido.",
   "Défense partielle": "Defensa parcial",
   "Trop tôt…": "Demasiado pronto…",
   "Trop tard…": "Demasiado tarde…",
-  "Touche quand le cercle se referme sur le sceau": "Toca cuando el círculo se cierre sobre el sello",
-  "Touche quand le cercle se referme sur le sceau · coup {0}/{1}": "Toca cuando el círculo se cierre sobre el sello · golpe {0}/{1}",
+  "Touche quand le cercle touche l’anneau d’or": "Toca cuando el círculo toque el anillo dorado",
+  "Touche quand le cercle touche l’anneau d’or · coup {0}/{1}": "Toca cuando el círculo toque el anillo dorado · golpe {0}/{1}",
 };
 
 export const names = {
