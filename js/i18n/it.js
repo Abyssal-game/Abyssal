@@ -8980,6 +8980,11 @@ export default {
   "Jusqu’à ton prochain tour, protège un allié : les coups qui le visent frappent la Protectrice à sa place, avec {0} % de dégâts en moins.": "Fino al tuo prossimo turno, protegge un alleato: i colpi diretti a lui colpiscono la Protettrice al suo posto, con il {0} % di danni in meno.",
   "L’enclume sonne seule dans la Forge Sans Maître. Un forgeron venu d’ailleurs lève son marteau sans te regarder.": "L’incudine risuona da sola nella Forgia Senza Maestro. Un fabbro venuto da altrove alza il martello senza guardarti.",
   "Chacune de ses attaques fait +{0} Brisure. En échange, {1} % de PV max en moins.": "Ognuno dei suoi attacchi toglie {0} Rottura in più. In cambio, il {1}% di PV max in meno.",
+  "{0} booster premium et {1} cendres !": "{0} busta premium e {1} ceneri!",
+  "{0} booster et {1} cendres !": "{0} busta e {1} ceneri!",
+  "{0} boosters premium et {1} cendres !": "{0} buste premium e {1} ceneri!",
+  "{0} boosters et {1} cendres !": "{0} buste e {1} ceneri!",
+  "récompenses": "ricompense",
 };
 
 export const names = {

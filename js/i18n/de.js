@@ -8981,6 +8981,11 @@ export default {
   "Jusqu’à ton prochain tour, protège un allié : les coups qui le visent frappent la Protectrice à sa place, avec {0} % de dégâts en moins.": "Schützt bis zu deinem nächsten Zug einen Verbündeten: Schläge gegen ihn treffen stattdessen die Beschützerin, mit {0} % weniger Schaden.",
   "L’enclume sonne seule dans la Forge Sans Maître. Un forgeron venu d’ailleurs lève son marteau sans te regarder.": "Der Amboss klingt von selbst in der Meisterlosen Schmiede. Ein Schmied von anderswo hebt seinen Hammer, ohne dich anzusehen.",
   "Chacune de ses attaques fait +{0} Brisure. En échange, {1} % de PV max en moins.": "Jeder ihrer Angriffe entfernt {0} Bruch mehr. Dafür {1} % weniger max. LP.",
+  "{0} booster premium et {1} cendres !": "{0} Premium-Booster und {1} Asche!",
+  "{0} booster et {1} cendres !": "{0} Booster und {1} Asche!",
+  "{0} boosters premium et {1} cendres !": "{0} Premium-Booster und {1} Asche!",
+  "{0} boosters et {1} cendres !": "{0} Booster und {1} Asche!",
+  "récompenses": "Belohnungen",
 };
 
 export const names = {

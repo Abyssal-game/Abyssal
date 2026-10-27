@@ -8993,6 +8993,11 @@ export default {
   "Jusqu’à ton prochain tour, protège un allié : les coups qui le visent frappent la Protectrice à sa place, avec {0} % de dégâts en moins.": "Until your next turn, protects an ally: hits aimed at them strike the Protector instead, with {0}% less damage.",
   "L’enclume sonne seule dans la Forge Sans Maître. Un forgeron venu d’ailleurs lève son marteau sans te regarder.": "The anvil rings on its own in the Masterless Forge. A smith from elsewhere raises his hammer without looking at you.",
   "Chacune de ses attaques fait +{0} Brisure. En échange, {1} % de PV max en moins.": "Each of its attacks removes {0} more Break. In exchange, {1}% less max HP.",
+  "{0} booster premium et {1} cendres !": "{0} premium booster and {1} ashes!",
+  "{0} booster et {1} cendres !": "{0} booster and {1} ashes!",
+  "{0} boosters premium et {1} cendres !": "{0} premium boosters and {1} ashes!",
+  "{0} boosters et {1} cendres !": "{0} boosters and {1} ashes!",
+  "récompenses": "rewards",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

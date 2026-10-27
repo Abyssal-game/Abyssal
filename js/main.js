@@ -394,7 +394,7 @@ function paintProgress() {
   }
   const one = progList.length === 1 ? progList[0] : null;
   progEl.innerHTML = `<span class="pc-ic">${one?.kind === 'level' ? '<img class="picon" alt="" src="assets/icons/xp2.webp">' : icon(one ? KIND_ICON[one.kind] || 'trophy' : 'trophy')}</span>
-    <span class="pc-t">${one ? `<small>${KIND_LABEL[one.kind] || ''}</small><b>${one.kind === 'level' ? one.level : progLine(one)}</b>` : `<b>${progList.length} récompenses</b>`}</span><span class="pc-go">Voir</span>`;
+    <span class="pc-t">${one ? `<small>${KIND_LABEL[one.kind] || ''}</small><b>${one.kind === 'level' ? one.level : progLine(one)}</b>` : `<b><span class="pc-n">${progList.length}</span> <span class="pc-w">récompenses</span></b>`}</span><span class="pc-go">Voir</span>`;
   dockProgress();
   requestAnimationFrame(() => progEl.classList.add('in'));
   clearTimeout(progTimer); progTimer = setTimeout(hideProgress, 7000);

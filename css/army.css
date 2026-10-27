@@ -8481,3 +8481,27 @@ html.fx-light .dv.cb.cb2 .cb-res.ready .cb-gems i.on { animation: none; }
 .sh-toknote { margin: 6px 0 0; }
 .sh-next { display: flex; align-items: center; gap: 8px; }
 .sh-next .sh-tok-off { width: 30px; height: 30px; flex: none; filter: grayscale(.85) brightness(.7); }
+
+/* v841 : tour complet. Choix des créatures : filtres de rôle sur leur propre ligne, tri en dessous (le lien passait sur les puces) */
+.tm-pick-sheet .tm-pk-bar { flex-wrap: wrap; }
+.tm-pick-sheet .tm-pk-bar .chips { flex: 1 1 100%; flex-wrap: wrap; overflow: visible; }
+.tm-pick-sheet .tm-pk-bar .linkish { margin-left: auto; }
+/* v841 : Renforcer, le bouton du niveau suivant ne recouvre plus la carte (gain sur plusieurs lignes, largeur limitée) */
+.fg-up { max-width: 48%; flex: 0 1 auto; }
+.fg-up small { white-space: normal; flex-wrap: wrap; line-height: 1.2; }
+/* v841 : pastille des récompenses posée en haut, texte court sur petit écran */
+@media (max-width: 400px) { .prog-chip.docked .pc-t small { display: none; } .prog-chip.docked .pc-t b { font-size: .72rem; } }
+@media (max-width: 400px) { .prog-chip.docked .pc-w { display: none; } }
+/* v841 : NOUVEAU ne recouvre plus l'étiquette de finition (cartes argentées, enluminées…) */
+.tcg:not(.v-normal):not(.is-mystery) .tcg-new { top: 15cqw; }
+/* v841 : tableau des probabilités entier dans la fenêtre (la 3e colonne était coupée) */
+.table-wrap { overflow-x: auto; max-width: 100%; }
+table.odds { width: 100%; table-layout: fixed; font-size: .74rem; }
+table.odds th, table.odds td { padding: 4px 3px; word-break: normal; overflow-wrap: anywhere; }
+table.odds th:first-child, table.odds td:first-child { width: 34%; }
+table.odds { min-width: 0; }
+table.odds th, table.odds td { white-space: normal; }
+.sh-p b sup { text-transform: none; font-size: .6em; vertical-align: super; }
+/* v841 : boutons ronds du haut du combat et retour du haut : 44 px de zone tactile (sans changer leur dessin) */
+.dv.cb .dv-top button, .top-back { position: relative; }
+.dv.cb .dv-top button::after, .top-back::after { content: ''; position: absolute; inset: -4px; }

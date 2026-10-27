@@ -8981,6 +8981,11 @@ export default {
   "Jusqu’à ton prochain tour, protège un allié : les coups qui le visent frappent la Protectrice à sa place, avec {0} % de dégâts en moins.": "Hasta tu próximo turno, protege a un aliado: los golpes dirigidos a él golpean a la Protectora en su lugar, con un {0} % menos de daño.",
   "L’enclume sonne seule dans la Forge Sans Maître. Un forgeron venu d’ailleurs lève son marteau sans te regarder.": "El yunque suena solo en la Forja Sin Maestro. Un herrero venido de otra parte alza su martillo sin mirarte.",
   "Chacune de ses attaques fait +{0} Brisure. En échange, {1} % de PV max en moins.": "Cada uno de sus ataques quita {0} más de Quiebre. A cambio, un {1} % menos de PV máx.",
+  "{0} booster premium et {1} cendres !": "¡{0} sobre premium y {1} cenizas!",
+  "{0} booster et {1} cendres !": "¡{0} sobre y {1} cenizas!",
+  "{0} boosters premium et {1} cendres !": "¡{0} sobres premium y {1} cenizas!",
+  "{0} boosters et {1} cendres !": "¡{0} sobres y {1} cenizas!",
+  "récompenses": "recompensas",
 };
 
 export const names = {

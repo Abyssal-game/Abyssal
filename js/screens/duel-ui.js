@@ -138,6 +138,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   // setHTML : ne réécrit une zone que si son contenu a changé. patchRow : ne remplace que les cartes qui ont changé,
   // et une carte remplacée garde son illustration déjà décodée.
   /* v824 : le nom de chaque action tient sur la plaque de sa case peinte (taille réduite si besoin, après traduction) */
+  const fitCardNames = () => root.querySelectorAll('.dv-c .dv-nm').forEach((n) => { const b = n; if (b._fit === b.textContent) return; b._fit = b.textContent; b.style.removeProperty('font-size'); let f = parseFloat(getComputedStyle(b).fontSize); while (b.scrollWidth > b.clientWidth + 1 && f > 6.5) { f -= 0.5; b.style.setProperty('font-size', `${f}px`, 'important'); } });
   const fitNames = () => { const run = () => actsEl?.querySelectorAll('.cb-a > b').forEach((b) => { b.style.fontSize = ''; b.classList.remove('two'); let f = parseFloat(getComputedStyle(b).fontSize); while (b.scrollWidth > b.clientWidth + 1 && f > 7.5) { f -= 0.5; b.style.fontSize = `${f}px`; } if (b.scrollWidth > b.clientWidth + 1) { b.classList.add('two'); f = 7.5; b.style.fontSize = `${f}px`; while ((b.scrollHeight > b.clientHeight + 1 || b.scrollWidth > b.clientWidth + 1) && f > 5.5) { f -= 0.5; b.style.fontSize = `${f}px`; } } }); requestAnimationFrame(run); setTimeout(run, 160); };
   const setHTML = (node, html) => { if (node && node._h !== html) { node.innerHTML = html; node._h = html; } };
   const tpl = document.createElement('template');
@@ -344,7 +345,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     patchRow(alEl, front(st, 'ally').map((u) => ({ uid: u.uid, html: cardEl(u) })));
     const sw = st.swallowed && st.units[st.swallowed];
     setHTML($('.dv-resw'), resHTML('ally') + swapHTML() + (sw?.swallowed ? `<span class="cb-swal" title="Engloutie : brise le Dévoreur pour la libérer"><img alt="" src="${artUrl(cat.get(sw.id), { lite: true })}"><small>Engloutie · ${sw.hp} PV</small></span>` : ''));
-    { const h0 = actsEl?._h; setHTML(actsEl, actsHTML()); if (actsEl && actsEl._h !== h0) fitNames(); } /* v820 : le menu du bas reste toujours en place (plus de saut de l'écran) */
+    { const h0 = actsEl?._h; setHTML(actsEl, actsHTML()); if (actsEl && actsEl._h !== h0) fitNames(); }
+    requestAnimationFrame(fitCardNames); /* v841 : noms des cartes jamais coupés (Métatron, Ittan-momen) */ /* v820 : le menu du bas reste toujours en place (plus de saut de l'écran) */
     const pu = st.init ? st.units[st.actor] : null, paNow = st.init ? (st.turn === 'ally' && pu ? pu.pa || 0 : 0) : st.ap;
     setHTML($('.cb-pips'), Array.from({ length: st.init ? PA_MAX : Math.max(AP_MAX, st.ap) }, (_, i) => `<i class="${i < paNow ? 'on' : ''}"></i>`).join(''));
     setHTML($('.cb-gems'), Array.from({ length: FERVOR_MAX }, (_, i) => `<i class="${i < st.fervor ? 'on' : ''}"></i>`).join(''));

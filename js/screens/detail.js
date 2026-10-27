@@ -158,7 +158,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     sheet.setContent(`<div class="detail ${owned ? '' : 'is-sealed'}">
       ${nav}
       <div class="detail-card ${owned && g.formOf(current) ? 'fm-on' : ''}">${cardHTML(card, { size: 'full', variant: shownVariant, mystery: !owned, nameKnown: known })}${owned && g.formOf(current) ? `<span class="fm-badge">${esc(FORMS[current].name)}</span>` : ''}</div>
-      ${owned ? `<p class="tilt-hint small muted">${icon('refresh')} Touche la carte pour masquer ou remettre son texte · fais-la glisser pour la faire pivoter.</p>` : ''}
+      ${owned ? `<p class="tilt-hint small muted">Touche la carte pour masquer ou remettre son texte · fais-la glisser pour la faire pivoter.</p>` : ''}
       ${variantsRow}
       ${dressRow}
       <div class="detail-info">${body}</div>
