@@ -1,4 +1,5 @@
 // v450 : Les Cryptes — accueil (cryptes, défi du jour), partie de mémoire à deux et fin de partie.
+import { tourneyLine } from '../ui/tourney.js';
 import { vsay } from '../ui/voice.js';
 import * as CR from '../core/cryptes.js';
 import { FACTION_ORDER } from '../config.js';
@@ -27,7 +28,7 @@ export const howHTML = () => `<ol class="how-steps">${HOW.map(howLi).join('')}</
 
 /* v510 : pouvoirs plus lisibles : nom court sur chaque carte retournée, grande fenêtre à chaque paire (pourquoi, quoi, et « tu rejoues ») */
 export const PW_LABEL = { infernal: 'Regard', abyssal: 'Remous', celeste: 'Grâce', necrotique: 'Pillage', sauvage: 'Cri', primordial: 'Souffle', artificiel: 'Verrou' };
-export const PW_MINE = { infernal: 'Touche une carte face cachée : toi seul la verras.', abyssal: 'Touche deux cartes face cachée : elles échangent leur place. Ce que l’adversaire avait retenu ne vaut plus rien.', celeste: 'Ta prochaine erreur ne te fera pas perdre la main.', necrotique: '', sauvage: 'Touche une carte face cachée : elle sera montrée à tout le monde.', primordial: '+1 point de bonus pour toi.', artificiel: 'Le prochain pouvoir de ton adversaire ne marchera pas.' };
+export const PW_MINE = { infernal: 'Touche une carte face cachée : toi seul la verras.', abyssal: 'Touche deux cartes face cachée : elles échangent leur place, sous les yeux de tous. À chacun de suivre où elles sont parties.', celeste: 'Ta prochaine erreur ne te fera pas perdre la main.', necrotique: '', sauvage: 'Touche une carte face cachée : elle sera montrée à tout le monde.', primordial: '+1 point de bonus pour toi.', artificiel: 'Le prochain pouvoir de ton adversaire ne marchera pas.' };
 export const PW_FOE = { infernal: '{nm} regarde une carte en secret (celle qui brille).', abyssal: '{nm} échange deux cartes de place (celles qui brillent en bleu).', celeste: 'Sa prochaine erreur ne lui fera pas perdre la main.', necrotique: '', sauvage: '{nm} retourne une carte à la vue de tous.', primordial: '+1 point de bonus pour {nm}.', artificiel: 'Ton prochain pouvoir ne marchera pas.' };
 export const pwMed = (f) => `<span class="cr-pw-med">${sigil(f)}<img alt="" src="assets/jeux/cr-pw-${f}.webp" onerror="this.remove()"></span>`;
 
@@ -147,7 +148,7 @@ export default function cryptesScreen(app, root) {
     const P = CR.POWERS[ev.power], mine = ev.who === 'p', nm = mine ? 'Tu' : esc(CR.RIVALS[st.rival].name), foeName0 = esc(CR.RIVALS[st.rival].name);
     let txt = esc(P.short);
     if (ev.cursed || ev.silent) { /* v492 : paire maudite, crypte silencieuse */
-      banner = { cls: ev.cursed ? (mine ? 'ko' : 'ok') : '', html: ev.cursed ? `<img class="cr-curse-big" alt="" src="assets/icons/maudite.webp"><span><b>Paire maudite !</b><span class="small">${ev.gold ? t('L’or des tombes : {name} ne perd rien.', { name: nm }) : ev.goldTax ? t('Tu perds 1 point, et {name} en gagne 1 (L’or des tombes).', { name: foeName0 }) : `${mine ? 'Tu perds' : `${nm} perd`} 1 point, et aucun pouvoir ne se déclenche.`}</span></span>` : `${sigil(ev.f)}<span><b>Paire ${esc(fname(ev.f))}</b><span class="small">Silence : aucun pouvoir ici.</span></span>` };
+      banner = { cls: ev.cursed ? (mine ? 'ko' : 'ok') : '', html: ev.cursed ? `<img class="cr-curse-big" alt="" src="assets/icons/maudite.webp"><span><b>Paire maudite !</b><span class="small">${ev.gold ? t('L’or des tombes : elle rapporte quand même 1 point à {name}.', { name: nm }) : ev.goldTax ? t('Elle ne te rapporte rien, et {name} gagne 1 point (L’or des tombes).', { name: foeName0 }) : t('Elle ne rapporte aucun point, et aucun pouvoir ne se déclenche.')}</span></span>` : `${sigil(ev.f)}<span><b>Paire ${esc(fname(ev.f))}</b><span class="small">Silence : aucun pouvoir ici.</span></span>` };
       app.sfx[ev.cursed ? 'cr-miss' : 'cr-power']?.(); view(); await wait(1300); banner = null; return;
     }
     if (ev.blocked) txt = 'Bloqué par le Verrou artificiel : rien ne se passe.';
@@ -236,6 +237,7 @@ export default function cryptesScreen(app, root) {
       ${out.capped ? `<p class="small muted">Tes ${CR.CRYPTES_REWARD.dailyPaid} victoires bien payées du jour sont faites : celle-ci rapporte ${CR.CRYPTES_REWARD.afterCap} éclats et ${CR.CRYPTES_REWARD.xp} XP.</p>` : ''}
       ${out.feat ? `<p class="sc-gain gm-featwin"><img class="gm-hf big" alt="" src="assets/icons/haut-fait.webp"> Haut fait réussi : <b>${esc(out.feat)}</b></p>` : ''}
       ${out.title ? `<p class="sc-gain">${icon('p:titles')} Nouveau titre : <b>${esc(out.title)}</b></p>` : ''}
+      ${tourneyLine(out)}
       <div class="sc-end-act">${st.daily ? '' : '<button class="btn primary dc-plq dc-plq-red" data-x="again">Rejouer</button>'}<button class="btn dc-plq dc-plq-dark" data-x="back">Retour</button></div></div>`;
     document.body.appendChild(el);
     el.addEventListener('click', (e) => {
@@ -289,7 +291,7 @@ export default function cryptesScreen(app, root) {
         ui.up.add(ev.i[0]); ui.glow.add(ev.i[0]); app.sfx['cr-flip']?.();
         banner = { cls: 'ok', html: `${sigil(ev.card.f)}<span><b>${esc(CR.POWERS[ev.power].name)} : ${esc(fname(ev.card.f))}</b><span class="small">${ev.power === 'infernal' ? 'Toi seul l’as vue. Retiens bien sa place !' : 'Tout le monde l’a vue, l’adversaire aussi.'}</span></span>` };
         view(); await wait(1700);
-      } else { ev.i.forEach((x) => ui.swap.add(x)); app.sfx.swipe?.(); banner = { cls: 'ok', html: `${sigil('abyssal')}<span><b>Cartes échangées</b><span class="small">Ce que l’adversaire avait retenu ne vaut plus rien.</span></span>` }; view(); await wait(1100); }
+      } else { ev.i.forEach((x) => ui.swap.add(x)); app.sfx.swipe?.(); banner = { cls: 'ok', html: `${sigil('abyssal')}<span><b>Cartes échangées</b><span class="small">Sous les yeux de tous : à chacun de suivre où elles sont parties.</span></span>` }; view(); await wait(1100); }
       ui.up.clear(); ui.glow.clear(); ui.swap.clear(); banner = null; busy = false;
       if (!gone) view();
       return;

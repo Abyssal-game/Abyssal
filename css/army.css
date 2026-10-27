@@ -8505,3 +8505,6 @@ table.odds th, table.odds td { white-space: normal; }
 /* v841 : boutons ronds du haut du combat et retour du haut : 44 px de zone tactile (sans changer leur dessin) */
 .dv.cb .dv-top button, .top-back { position: relative; }
 .dv.cb .dv-top button::after, .top-back::after { content: ''; position: absolute; inset: -4px; }
+/* v841 : fin d'un Choc gagné sur petit écran : vignettes plus petites, « Fermer » toujours visible */
+.vd-end .vd-tw { width: 26px; }
+.vd-end [data-v="close"] { position: sticky; bottom: 0; z-index: 3; }

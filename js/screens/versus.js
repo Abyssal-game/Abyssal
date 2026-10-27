@@ -100,7 +100,7 @@ export default function versusScreen(app, root) {
       <p class="small"><b>${t('Ta ligue : {l} · {n} points', { l: t(LEAGUES[cur].name), n: fmt(lg.pts) })}</b></p>
       <ol class="lg-list">${rows}</ol>
       <h3>${t('Les points')}</h3>
-      <ul class="small lg-pts"><li>${t('Victoire : <b>+{w}</b> points, +{b} de plus par victoire déjà enchaînée (jusqu’à +{m}).', { w: LEAGUE_PTS.win, b: LEAGUE_PTS.streakBonus, m: LEAGUE_PTS.streakMax })}</li><li>${t('Défaite : <b>{l}</b> points (jamais sous 0).', { l: LEAGUE_PTS.lose })}</li><li>${t('Égalité : rien ne change.')}</li><li>${t('La récompense de fin de mois va dans tes coffres si tu as joué au moins une partie ce mois-ci.')}</li></ul>
+      <ul class="small lg-pts"><li>${t('Victoire : <b>+{w}</b> points, +{b} de plus par victoire déjà enchaînée (jusqu’à +{m}).', { w: LEAGUE_PTS.win, b: LEAGUE_PTS.streakBonus, m: LEAGUE_PTS.streakMax })}</li><li>${t('Défaite : <b>{l}</b> points (jamais sous 0).', { l: String(LEAGUE_PTS.lose).replace('-', '−') })}</li><li>${t('Égalité : rien ne change.')}</li><li>${t('La récompense de fin de mois va dans tes coffres si tu as joué au moins une partie ce mois-ci.')}</li></ul>
       <h3>${t('La Série ardente')}</h3>
       <p class="small">${t('Chaque victoire d’affilée attise ta Série : ton butin en éclats ({s} par victoire) est multiplié. Une défaite l’éteint, une égalité la garde.', { s: CHOC.winShards })}</p>
       <div class="lg-chips">${mults}</div>
@@ -200,7 +200,7 @@ export default function versusScreen(app, root) {
       avatar: v.foe?.avatar, my_score: st.total[me], their_score: st.total[foe], sachet: v.foe?.sachet, choc: v.foe?.choc };
   }
   async function tableShow(v, ctx) {
-    if (showing === v.id) return;
+    if (showing === v.id || document.querySelector('.vd')) return; /* v841 : jamais deux face-à-face l'un sur l'autre */
     showing = v.id;
     root.innerHTML = `<div class="panel center kc-twait"><p>${t('Les boosters s’ouvrent…')}</p></div>`;
     let out = null;
@@ -294,5 +294,5 @@ export default function versusScreen(app, root) {
     if (app.state.chocTrain) { app.state.chocTrain = false; startTrain(); } /* v813 : lancé depuis le Mode Créateur */
   });
   lastMonth();
-  return () => { alive = false; app.holdRefresh = null; train = null; lobby.stop(); game.stop(); document.body.classList.remove('battle-mode'); document.querySelector('.sc-scene')?.remove(); };
+  return () => { alive = false; app.holdRefresh = null; document.querySelectorAll('.vd').forEach((x) => x.__kill?.()); train = null; lobby.stop(); game.stop(); document.body.classList.remove('battle-mode'); document.querySelector('.sc-scene')?.remove(); };
 }

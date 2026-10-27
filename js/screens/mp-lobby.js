@@ -53,7 +53,7 @@ export function createMpLobby(app, root, spec) {
     document.querySelector('.sc-scene')?.remove();
     setScene('menu');
     if (!cloud.isLoggedIn() || !sync.profile?.pseudo) {
-      root.innerHTML = `${spec.modeBar()}<section class="panel stack center"><p>Choisis d’abord ton pseudo : c’est lui que verront tes adversaires.</p><a class="btn primary block" href="#/compte">${icon('user')}Choisir mon pseudo</a></section>${spec.bottom ? spec.bottom() : ''}`; /* v841 : les règles restent lisibles */ /* v528 : compte obligatoire, seul le pseudo peut manquer */
+      root.innerHTML = `${spec.modeBar()}<section class="panel stack center">${cloud.isLoggedIn() && !sync.profile ? '<p>Connexion au serveur impossible pour l’instant. Réessaie dans un moment.</p>' : `<p>Choisis d’abord ton pseudo : c’est lui que verront tes adversaires.</p><a class="btn primary block" href="#/compte">${icon('user')}Choisir mon pseudo</a>`}${spec.intro?.() || ''}</section>${spec.bottom ? spec.bottom() : ''}`; /* v841 : l'entraînement reste possible */ /* v841 : les règles restent lisibles */ /* v528 : compte obligatoire, seul le pseudo peut manquer */
       return;
     }
     drawLobby();

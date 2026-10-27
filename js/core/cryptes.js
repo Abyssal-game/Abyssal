@@ -46,7 +46,7 @@ export const RIVALS = {
   // v492 : quatre nouveaux adversaires pour les cryptes 5 à 8
   collectionneur: { name: 'Maître Orvel', power: { k: 'collect', n: 5, name: 'Collection', text: 'Chaque 5e paire qu’il trouve lui rapporte 1 point de plus.' }, mem: 0.85, fade: 0.04, spite: 0.5, confuse: 0.06, hint: 'Bonne mémoire, et il suit les cartes qui bougent.',
     hello: 'Les rois bougent dans leurs tombes. Moi, je les suis du regard.', beaten: 'Une tombe m’a échappé.', gloat: 'Rien ne bouge sans que je le voie.' },
-  banquier: { name: 'Mammon', power: { k: 'gold', name: 'L’or des tombes', text: 'Les paires maudites ne lui coûtent rien, et chaque paire maudite que tu prends lui donne 1 point.' }, mem: 0.88, fade: 0.04, spite: 0.6, confuse: 0.05, hint: 'Retient presque tout, et ne touche jamais une paire maudite… s’il peut l’éviter.',
+  banquier: { name: 'Mammon', power: { k: 'gold', name: 'L’or des tombes', text: 'Les paires maudites lui rapportent 1 point comme les autres, et chaque paire maudite que tu prends lui donne 1 point.' }, mem: 0.88, fade: 0.04, spite: 0.6, confuse: 0.05, hint: 'Retient presque tout ; les paires maudites ne lui font rien, il les prend sans hésiter.',
     hello: 'Des paires maudites ? Elles seront pour toi. Je ne prends que l’or.', beaten: 'Une malédiction… sur MOI ?', gloat: 'L’or pour moi, la malédiction pour toi.' },
   maitre: { name: 'Le Maître des Sceaux', power: { k: 'lastword', grace: 2, name: 'Dernier mot', text: 'Ses 2 premières erreurs ne lui font pas passer la main, et il gagne les égalités.' }, mem: 0.92, fade: 0.02, spite: 0.8, confuse: 0.03, hint: 'Une mémoire presque parfaite. Ici, pas de pouvoir pour le gêner.',
     hello: 'Dans la Nef, les pouvoirs se taisent. Il ne reste que la mémoire.', beaten: 'Ma mémoire… a failli.', gloat: 'Le silence révèle les meilleurs.' },
@@ -61,7 +61,7 @@ export const TABLES = [
   // v492 : cryptes 5 à 8, chacune avec sa règle : mouvante (à chaque fois que la main passe, deux cartes face cachée
   // échangent leur place, sous tes yeux), maudite (deux paires maudites : −1 point et pas de pouvoir), silence (aucun pouvoir)
   { key: 'cimetiere', name: 'Le Cimetière des rois', stars: 4, rival: 'collectionneur', reward: 80, chest: 'or', bg: 'salle-cryptes-cimetiere', rule: 'Crypte mouvante : chaque fois que la main passe, deux cartes face cachée échangent leur place, sous tes yeux.', rules: { drift: true } },
-  { key: 'maudite', name: 'La Crypte maudite', stars: 5, rival: 'banquier', reward: 90, chest: 'or', bg: 'salle-cryptes-maudite', rule: 'Deux paires maudites : les prendre coûte 1 point, sans pouvoir.', rules: { curse: 2 } },
+  { key: 'maudite', name: 'La Crypte maudite', stars: 5, rival: 'banquier', reward: 90, chest: 'or', bg: 'salle-cryptes-maudite', rule: 'Deux paires maudites : elles ne rapportent aucun point, et aucun pouvoir.', rules: { curse: 2 } },
   { key: 'nef', name: 'La Nef silencieuse', stars: 5, rival: 'maitre', reward: 100, chest: 'abyssal', bg: 'salle-cryptes-nef', rule: 'Silence : aucune paire ne déclenche de pouvoir. Seule la mémoire compte.', rules: { silence: true } },
   { key: 'tombeau', name: 'Le Tombeau du Néant', stars: 5, rival: 'souverain', reward: 120, chest: 'abyssal', bg: 'salle-cryptes-tombeau', rule: 'Crypte mouvante et deux paires maudites.', rules: { drift: true, curse: 2 } },
 ];

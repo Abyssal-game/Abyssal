@@ -1,4 +1,5 @@
 // v449 : Le Pacte — accueil (pactes, défi du jour), partie à deux et fin de partie.
+import { tourneyLine } from '../ui/tourney.js';
 import { vsay } from '../ui/voice.js';
 import * as PA from '../core/pacte.js';
 import { FACTION_ORDER } from '../config.js';
@@ -118,7 +119,7 @@ export default function pacteScreen(app, root) {
       <div class="pa-row" style="--n:${Math.max(1, st.row.length)}">${st.row.length ? st.row.map((c) => cardHTML(c)).join('') : `<span class="pa-empty">${st.turn === 'p' ? 'Tire ta première carte.' : '…'}</span>`}</div>
       ${seals}
       <div class="pa-info"><span>Ce tour : <b>${v}</b> point${v > 1 ? 's' : ''}</span><span class="pa-fac">${nf} / 7 sceaux</span>
-        ${st.sceaux ? `<span class="pa-tag ok">${icon('shield')}Protégé ×${st.sceaux}</span>` : ''}${st.offer ? '<span class="pa-tag gold">Offrande : la suivante ×2</span>' : ''}${st.must > 0 ? `<span class="pa-tag bad">Malédiction : encore ${st.must} carte${st.must > 1 ? 's' : ''}</span>` : ''}${st.curse?.[st.turn === 'p' ? 'a' : 'p'] ? `<span class="pa-tag bad">${st.turn === 'p' ? esc(PA.RIVALS[st.rival].name) : 'Toi'} : maudit au prochain tour</span>` : ''}
+        ${st.sceaux ? `<span class="pa-tag ok">${icon('shield')}Protégé ×${st.sceaux}</span>` : ''}${st.offer ? '<span class="pa-tag gold">Offrande : la suivante ×2</span>' : ''}${st.must > 0 ? `<span class="pa-tag bad">Malédiction : encore ${st.must} carte${st.must > 1 ? 's' : ''}</span>` : ''}${st.curse?.[st.turn === 'p' ? 'a' : 'p'] ? `<span class="pa-tag bad">${st.turn === 'p' ? t('Malédiction pour {name} au prochain tour', { name: esc(tw(PA.RIVALS[st.rival].name)) }) : t('Malédiction pour toi au prochain tour')}</span>` : ''}
         <span class="pa-risk ${risk >= 40 ? 'hi' : risk >= 20 ? 'mid' : ''}">Risque : <b>${risk} %</b></span></div>${ban}</div>`;
   }
   /* v557 (demande du propriétaire : jouer moins à l'aveugle) : la pioche montre ce qu'il reste, faction par faction */
@@ -314,6 +315,7 @@ export default function pacteScreen(app, root) {
       ${out.capped ? `<p class="small muted">Tes ${PA.PACTE_REWARD.dailyPaid} victoires bien payées du jour sont faites : celle-ci rapporte ${PA.PACTE_REWARD.afterCap} éclats et ${PA.PACTE_REWARD.xp} XP.</p>` : ''}
       ${out.feat ? `<p class="sc-gain gm-featwin"><img class="gm-hf big" alt="" src="assets/icons/haut-fait.webp"> Haut fait réussi : <b>${esc(out.feat)}</b></p>` : ''}
       ${out.title ? `<p class="sc-gain">${icon('p:titles')} Nouveau titre : <b>${esc(out.title)}</b></p>` : ''}
+      ${tourneyLine(out)}
       <div class="sc-end-act">${st.daily ? '' : '<button class="btn primary dc-plq dc-plq-red" data-x="again">Rejouer</button>'}<button class="btn dc-plq dc-plq-dark" data-x="back">Retour</button></div></div>`;
     document.body.appendChild(el);
     el.addEventListener('click', (e) => {

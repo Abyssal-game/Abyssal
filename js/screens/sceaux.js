@@ -1,4 +1,5 @@
 // Duels des Sceaux : accueil (adversaires, défi du jour, main), plateau 3 × 3 et fin de partie.
+import { tourneyLine } from '../ui/tourney.js';
 import { vsay } from '../ui/voice.js';
 import { t, tw } from '../i18n.js';
 import * as SC from '../core/sceaux.js';
@@ -272,14 +273,15 @@ ${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone || dail
     el.className = `sc-end ${st.over}`;
     el.innerHTML = `${st.over === 'won' && !app.reduced() ? '<div class="sc-rays"></div>' : ''}<div class="sc-end-in">${st.over === 'draw' ? '<h1 class="sc-draw">Égalité</h1>' : crestHTML(st.over === 'won', st.over === 'won' ? 'Victoire' : 'Défaite', '', 'sc-crest')}
       <div class="sc-final"><span class="sc-score"><b class="p">${f.p}</b><i>contre</i><b class="o">${f.o}</b></span></div>
-      ${st.tiebreak ? `<p class="sc-caps"><b>Égalité de cartes</b> : ${st.over === 'won' ? 'tu tiens' : 'il tient'} le cœur du Sceau.</p>` : ''}
-      <p class="sc-caps">Tes captures : <b>${caps.p}</b> · Les siennes : <b>${caps.o}</b></p>
+      ${st.tiebreak ? `<p class="sc-caps">${st.over === 'won' ? t('<b>Égalité de cartes</b> : tu tiens le cœur du Sceau.') : t('<b>Égalité de cartes</b> : {name} tient le cœur du Sceau.', { name: esc(tw(R.name)) })}</p>` : ''}
+      <p class="sc-caps">${t('Tes captures : <b>{a}</b> · Les siennes : <b>{b}</b>', { a: caps.p, b: caps.o })}</p>
       ${out.trophy?.length ? `<div class="sc-trophy"><img class="sc-tico" alt="" src="assets/icons/sc-trophy.webp"><b>Butin du jour</b><span class="small">Garde une de ces cartes :</span><div class="sc-tro-row">${out.trophy.map((id) => `<button class="sc-tro" data-tro="${id}">${scCard(cat, id, { owner: 'p' })}</button>`).join('')}</div></div>` : ''}
       ${out.shards ? `<p class="sc-gain">${icon('crystal')} <b>+${fmt(out.shards)}</b> éclats${out.first ? ' (première victoire)' : ''}</p>` : ''}
       ${out.chests?.length ? `<a class="sc-gain sc-chestwin" href="#/coffres">${icon('p:chest')} ${out.chests.map((c) => `<b translate="no">${esc(t(SC_CHEST_NAME[c]))}</b>`).join(' et ')} gagné${out.chests.length > 1 ? 's' : ''} !</a>` : ''}
       ${out.xp && !out.capped ? `<p class="small muted center">+${out.xp} XP de profil</p>` : ''}
       ${out.capped ? `<p class="small muted">Tes ${SC.SCEAUX_REWARD.dailyPaid} victoires bien payées du jour sont faites : celle-ci rapporte ${SC.SCEAUX_REWARD.afterCap} éclats et ${SC.SCEAUX_REWARD.xp} XP.</p>` : ''}
-      ${out.title ? `<p class="sc-gain">${icon('p:titles')} Nouveau titre : <b>${esc(out.title)}</b></p>` : ''}
+      ${out.title ? `<p class="sc-gain">${icon('p:titles')} ${t('Nouveau titre : <b>{t}</b>', { t: esc(tw(out.title)) })}</p>` : ''}
+      ${tourneyLine(out)}
       ${out.frame ? `<p class="sc-gain">${icon('p:titles')} Nouveau cadre de profil : <b>Cadre des Sceaux</b></p>` : ''}
       <p class="sc-say">${rivalPic(cat, R)}<span>« ${esc(st.over === 'won' ? vsay(st, 'end', `arb-${R.key}`, R.win) : st.over === 'lost' ? vsay(st, 'end', `arb-${R.key}`, R.lose) : 'Partie nulle. On recommence ?')} »</span></p>
       <div class="sc-end-act">${st.daily ? '' : '<button class="btn primary dc-plq dc-plq-red" data-x="again">Rejouer</button>'}<button class="btn dc-plq dc-plq-dark" data-x="back">Retour</button></div></div>`;

@@ -146,7 +146,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick, onRe
     /* v833 : le butin de la table : tout ce qui va sortir est en jeu */
     if (table) {
       const n = mine.length + theirs.length, me = tags.me?.s || 0;
-      banner(`${flameHTML(Math.max(1, me), 'big')}<span>${t('<b>{n} cartes</b> vont tomber sur la table.', { n })}<br>${t('Le meilleur total rafle tout.')}${me >= 1 ? `<br>${t('Ta Série ardente : <b>{n}</b>. Une victoire de plus : butin ×{m}.', { n: me, m: String(streakMult(me + 1)).replace('.', ',') })}` : ''}</span>`, 'stake', 2800);
+      banner(`${train ? '' : flameHTML(Math.max(1, me), 'big')}<span>${t('<b>{n} cartes</b> vont tomber sur la table.', { n })}<br>${t('Le meilleur total rafle tout.')}${me >= 1 ? `<br>${t('Ta Série ardente : <b>{n}</b>. Une victoire de plus : butin ×{m}.', { n: me, m: String(streakMult(me + 1)).replace('.', ',') })}` : ''}</span>`, 'stake', 2800);
       app.sfx.suspense?.();
       await wait(2400);
       return;
@@ -320,7 +320,7 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick, onRe
     const list = cards.map((x) => ({ x, c: cat.get(x.id) })).filter((o) => o.c).sort((a, b) => rk(b.x) - rk(a.x));
     return `<div class="vd-twon">${list.map(({ x, c }) => `<span class="vd-tw ${x.isNewCard ? 'fresh' : ''}" style="--rc:${RARITY[c.rarity]?.color || '#999'}"><img alt="" src="${artUrl(c, { lite: true })}">${x.isNewCard ? `<em>${t('Nouvelle')}</em>` : ''}</span>`).join('')}</div>`;
   }
-  function close() {
+  function close(silent) {
     if (closed) return;
     closed = true; done = true; sync = false;
     musicRelease();
@@ -328,8 +328,9 @@ export function playDuel(app, r, out, { foeName, myAvatar, onClose, onPick, onRe
     el.classList.remove('on');
     document.body.classList.remove('has-sheet', 'lock-scroll');
     setTimeout(() => el.remove(), 300);
-    onClose?.();
+    if (silent !== true) onClose?.();
   }
+  el.__kill = () => close(true); /* v841 : l'écran quitté ferme le face-à-face (il restait par-dessus l'Accueil) */
   let picking = false;
   el.addEventListener('click', (e) => {
     const b = e.target.closest('[data-v]');

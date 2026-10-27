@@ -1,4 +1,5 @@
 // v427 : Les Enchères de Mammon — accueil (tables, défi du jour), vente à trois et fin de vente.
+import { tourneyLine } from '../ui/tourney.js';
 import { vsay } from '../ui/voice.js';
 import { t, tw, LANG } from '../i18n.js';
 import * as EN from '../core/encheres.js';
@@ -113,7 +114,7 @@ export default function encheresScreen(app, root) {
     const ban = banner ? `<div class="en-ban">${banner.gavel ? '<img class="en-gavel" alt="" src="assets/jeux/en-marteau.webp">' : ''}<div class="mq-banner ${banner.cls}">${banner.html}</div></div>` : '';
     return `<div class="en-stage">${chair(st, 'a')}${chair(st, 'b')}
       ${lot ? `<div class="en-onlot ${fresh ? 'fresh' : ''}">${lotCard(lot)}</div>
-      ${banner ? '' : `<div class="en-plaque"><small>Lot ${st.i + 1} / ${st.lots.length}</small><b>${lot.v > 0 ? `${esc(fname(lot.f))} · ${lot.v} pt${lot.v > 1 ? 's' : ''}` : `Malédiction · ${lot.v}`}</b>
+      ${banner ? '' : `<div class="en-plaque"><small>Lot ${st.i + 1} / ${st.lots.length}</small><b>${lot.v > 0 ? `${esc(fname(lot.f))} · ${lot.v} pt${lot.v > 1 ? 's' : ''}` : `Malédiction · ${String(lot.v).replace("-", "−")}`}</b>
         ${st.pot.length ? `<span class="en-pot">+ ${st.pot.length} lot${st.pot.length > 1 ? 's' : ''} resté${st.pot.length > 1 ? 's' : ''} : en jeu ${v > 0 ? '+' : ''}${v}</span>` : ''}
         <span>${v > 0 ? 'La <b>plus haute</b> offrande seule l’emporte' : 'La <b>plus basse</b> offrande seule en hérite !'}</span></div>`}` : ''}${ban}</div>`;
   }
@@ -171,6 +172,7 @@ export default function encheresScreen(app, root) {
       ${out.capped ? `<p class="small muted">Tes ${EN.ENCHERES_REWARD.dailyPaid} victoires bien payées du jour sont faites : celle-ci rapporte ${EN.ENCHERES_REWARD.afterCap} éclats et ${EN.ENCHERES_REWARD.xp} XP.</p>` : ''}
       ${out.feat ? `<p class="sc-gain gm-featwin"><img class="gm-hf big" alt="" src="assets/icons/haut-fait.webp"> Haut fait réussi : <b>${esc(out.feat)}</b></p>` : ''}
       ${out.title ? `<p class="sc-gain">${icon('p:titles')} Nouveau titre : <b>${esc(out.title)}</b></p>` : ''}
+      ${tourneyLine(out)}
       <div class="sc-end-act">${st.daily ? '' : '<button class="btn primary dc-plq dc-plq-red" data-x="again">Rejouer</button>'}<button class="btn dc-plq dc-plq-dark" data-x="back">Retour</button></div></div>`;
     document.body.appendChild(el);
     el.addEventListener('click', (e) => {
