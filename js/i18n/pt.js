@@ -9251,6 +9251,7 @@ export default {
   "Les cartes de la table": "As cartas da mesa",
   "{n} cartes ouvertes": "{n} cartas abertas",
   "Le Cercle": "O Círculo",
+  "Tout se joue sur ces cartes": "Tudo se decide nestas cartas",
 };
 
 export const names = {

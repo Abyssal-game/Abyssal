@@ -9264,6 +9264,7 @@ export default {
   "Les cartes de la table": "The cards on the table",
   "{n} cartes ouvertes": "{n} cards opened",
   "Le Cercle": "The Circle",
+  "Tout se joue sur ces cartes": "It all comes down to these cards",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

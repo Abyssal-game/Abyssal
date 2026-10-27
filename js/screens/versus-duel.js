@@ -113,14 +113,20 @@ export function playDuel(app, r, out, { foeName, myName, myAvatar, onClose, onPi
   const wait = (ms) => new Promise((ok) => setTimeout(ok, ms / speed));
   /* v563 : horloge de la musique (voir musicPlan) ; un toucher (×4) ou « Tout révéler » quitte le calage */
   const plan = musicPlan(lineup.map((_, p) => [...myPacks[p], ...foePacks[p]]));
-  let sync = speed === 1;
+  let sync = speed === 1 && !table; /* v847 : au Choc (table), les gros plans prennent leur temps : la musique boucle sur ses phrases */
   const t0 = performance.now(), pos = () => plan.start + (performance.now() - t0) / 1000;
   const until = (x, ms) => (!sync ? wait(ms) : new Promise((ok) => {
     const f = () => { if (!sync || done) return ok(); const d = (x - pos()) * 1000; if (d <= 8) return ok(); setTimeout(f, Math.min(d, 250)); };
     f();
   }));
   const pace = (p) => (sync ? plan.scale[p] : 1);
-  musicCue('pari', plan.start);
+  musicCue('pari', table ? BEAT0 : plan.start);
+  let mOff = BEAT0, mAt = performance.now();
+  const loopT = table ? setInterval(() => { /* v847 : avant le silence de 42 s, on revient 5 phrases plus tôt (même temps fort) */
+    if (done || closed) return clearInterval(loopT);
+    const x = mOff + (performance.now() - mAt) / 1000;
+    if (x > BEAT0 + 6 * PH - 0.05) { mOff = x - 5 * PH; mAt = performance.now(); musicSeek(mOff); }
+  }, 150) : 0;
   const q = (s) => el.querySelector(s);
   const setScore = (side) => { const n = q(`[data-sc="${side}"]`); n.textContent = fmt(sc[side]); n.dataset.len = String(n.textContent.length); n.classList.remove('bump'); void n.offsetWidth; n.classList.add('bump'); };
   const lead = () => { q('.vd-plate.me').classList.toggle('lead', sc.me > sc.foe); q('.vd-plate.foe').classList.toggle('lead', sc.foe > sc.me); };
@@ -243,6 +249,66 @@ export function playDuel(app, r, out, { foeName, myName, myAvatar, onClose, onPi
     await wait(2000);
     el.classList.remove('decisive'); n?.classList.remove('last');
   }
+  /* v847 : Choc : la carte de chaque joueur en gros plan face à face (illustration, nom, points), puis elles filent sur la table */
+  async function duo(p, i, last) {
+    const cs = { foe: foePacks[p][i], me: myPacks[p][i] };
+    const sides = ['foe', 'me'].filter((k) => cs[k]);
+    if (last && !done && speed === 1) { /* moment décisif : les dernières cartes peuvent tout changer */
+      const d0 = sc.me - sc.foe, d1 = d0 + (cs.me?.pts || 0) - (cs.foe?.pts || 0);
+      if (Math.sign(d0) !== Math.sign(d1) || Math.abs(d0) <= 10) {
+        el.classList.add('decisive'); banner(`<b>${t('Tout se joue sur ces cartes')}</b>`, 'decide', 2200);
+        app.sfx.suspensebig?.(); haptic('heartbeat'); await wait(2000); el.classList.remove('decisive');
+      }
+    }
+    if (done) return;
+    const face = (k) => { const c = cs[k], kc = c && cat.get(c.id); if (!kc) return '';
+      return `<div class="vd-dc ${k} r-${c.rarity} ${c.variant !== 'normal' ? 'fin' : ''}" style="--rc:${RARITY[c.rarity]?.color || '#888'}"><small class="vd-dc-who">${k === 'me' ? (myName ? esc(myName) : t('Toi')) : esc(foeName)}</small>
+        <div class="vd-dc-card"><div class="vd-dc-in"><span class="vd-dc-back"></span><span class="vd-dc-face"><img alt="" src="${artUrl(kc)}"></span></div></div>
+        <b class="vd-dc-nm">${esc(tw(kc.name))}</b><em class="vd-dc-pts">+${fmt(c.pts)}</em></div>`; };
+    const ov = document.createElement('div'); ov.className = 'vd-duo';
+    ov.innerHTML = `${face('foe')}<span class="vd-dc-vs"><img alt="" src="assets/versus/vd-vs.webp"></span>${face('me')}`;
+    ov.style.setProperty('--sp', String(speed));
+    el.appendChild(ov);
+    requestAnimationFrame(() => ov.classList.add('on'));
+    await wait(500);
+    for (const k of sides) {
+      if (done) break;
+      const d = ov.querySelector(`.vd-dc.${k}`), big = isBig(cs[k]);
+      if (big && speed === 1) { d.classList.add('tease'); app.sfx.suspensebig?.(); haptic('heartbeat'); await wait(1100); d.classList.remove('tease'); }
+      d.classList.add('flip');
+      if (big) { d.classList.add('big'); app.sfx['vd-rare']?.(); haptic('crit'); } else app.sfx['vd-flip']?.();
+      burst(d.querySelector('.vd-dc-card'), big ? 2.6 : 1.5);
+      await wait(big ? 900 : 650);
+    }
+    if (!done) await wait(1500);
+    if (done) { ov.remove(); return; }
+    /* elles filent vers leur place sur la table */
+    const was = sc.me > sc.foe ? 'me' : sc.foe > sc.me ? 'foe' : null;
+    ov.classList.add('go');
+    const fly = sides.map((k) => {
+      const d = ov.querySelector(`.vd-dc.${k} .vd-dc-card`), n = q(`.vd-c[data-side="${k}"][data-p="${p}"][data-i="${i}"]`);
+      if (!d || !n || app.reduced()) return null;
+      const a = d.getBoundingClientRect(), b = n.getBoundingClientRect();
+      return d.animate([{ transform: 'none' }, { transform: `translate(${b.left + b.width / 2 - a.left - a.width / 2}px, ${b.top + b.height / 2 - a.top - a.height / 2}px) scale(${b.width / a.width})`, opacity: 0.6 }],
+        { duration: 520 / speed, easing: 'cubic-bezier(.5,0,.75,.4)', fill: 'forwards' }).finished.catch(() => {});
+    });
+    await Promise.all(fly.filter(Boolean));
+    ov.remove();
+    for (const k of sides) {
+      const n = q(`.vd-c[data-side="${k}"][data-p="${p}"][data-i="${i}"]`); if (!n) continue;
+      n.classList.add('on'); if (isBig(cs[k])) n.classList.add('big');
+      burst(n, 1.2);
+      sc[k] += cs[k].pts; setScore(k);
+    }
+    lead(); app.sfx.flip?.();
+    const now = sc.me > sc.foe ? 'me' : sc.foe > sc.me ? 'foe' : null;
+    if (p === lineup.length - 1 && was && now && was !== now) {
+      banner(`<b>${t('Renversement !')}</b>`, `turn ${now}`, 1500);
+      app.sfx['vd-rare']?.(); haptic('crit');
+      el.classList.remove('jolt'); void el.offsetWidth; el.classList.add('jolt');
+    }
+    await wait(450);
+  }
   async function run() {
     await stakes();
     const lastP = lineup.length - 1, nLast = Math.max(myPacks[lastP].length, foePacks[lastP].length);
@@ -254,20 +320,22 @@ export function playDuel(app, r, out, { foeName, myName, myAvatar, onClose, onPi
       if (done) break;
       await tear(p);
       const n = p === lastP ? nLast : Math.max(myPacks[p].length, foePacks[p].length);
-      for (let i = 0; i < n && !done; i++) {
+      if (table) { for (let i = 0; i < n && !done; i++) await duo(p, i, p === lastP && i === n - 1); }
+      else for (let i = 0; i < n && !done; i++) {
         if (i < foePacks[p].length) await step('foe', p, i);
         if (done) break;
         if (i < myPacks[p].length) await step('me', p, i);
       }
       if (!done && p < lineup.length - 1 && !sync) await wait(700);
     }
-    if (!done) await until(DROP, 0); /* le silence de la musique, puis le résultat sur l'explosion */
+    if (!done && !table) await until(DROP, 0); /* le silence de la musique, puis le résultat sur l'explosion */
     finish();
   }
   function finish() {
     if (done) return;
     if (!sync || Math.abs(pos() - DROP) > 0.35) musicSeek(DROP - 0.05);
-    done = true; sync = false;
+    done = true; sync = false; clearInterval(loopT);
+    el.querySelectorAll('.vd-duo').forEach((x) => x.remove());
     el.querySelectorAll('.vd-c').forEach((c) => c.classList.add('out', 'on'));
     sc.me = scoreOf(mine); sc.foe = scoreOf(theirs);
     setScore('me'); setScore('foe'); lead();
