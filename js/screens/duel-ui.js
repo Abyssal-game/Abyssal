@@ -16,7 +16,7 @@ const coachIdle = async () => { await coachIdle0(); await sheetIdle(); await coa
 import { tuto } from '../ui/tutos.js';
 import { cardHTML } from '../ui/card.js';
 import {
-  BOSS_POWERS, FORBID, INTENTS, SYNERGIES, PACK_BONUS, FERVOR_MAX, DUO_FERVOR, AP_MAX, PA_MAX, passTurn, speedOf, front, reserve, actionsFor, actionTargets, act, preview,
+  BOSS_POWERS, FORBID, INTENTS, SYNERGIES, PACK_BONUS, FERVOR_MAX, DUO_FERVOR, AP_MAX, PA_MAX, passTurn, speedOf, front, reserve, FRONT, actionsFor, actionTargets, act, preview,
   ENTRANCES, GOALS, goalState, RUNES, runesLeft, SERVANT_POWER, RHYTHM, PHASE2, beginEnemyTurn, nextEnemy, enemyAct, endEnemyTurn, takeSkips, defenseWindow, intentInfo, useUlt, ultReady, autoActs, comboOf,
 } from '../core/duel.js';
 import { KITS, AI_FAMILIES, DICE_TIERS, WEAK_TO, TALENTS } from '../core/skills.js';
@@ -77,7 +77,11 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const ui = (app.state.duel ||= { fast: 0 });
   ui.fast = g.s.settings.combatFast ? 1 : 0; // v331 : bouton ×2 de retour (étude joueurs : un combat ≈ 1,2 min) ; la défense active garde son rythme
   const reduced = app.reduced();
-  const hpOf = (u, hp = u?.hp ?? 0) => ({ v: Math.max(0, hp), mx: Math.max(1, u?.maxHp || 1) }); /* PV affichés (anneau, barre, fiche) */
+  /* v870 : une créature tuée par un coup pas encore joué à l'écran reste affichée, avec ses PV d'avant le coup, jusqu'à sa chute
+     (avant : un état intermédiaire redessinait la rangée, la carte disparaissait et le coup fatal n'affichait pas ses dégâts) */
+  const pendingDown = new Set(), preHp = new Map(); /* preHp : PV montrés pendant qu'une action se joue (ceux du moment, pas ceux de la fin de l'action) */
+  const shownFront = (side) => (pendingDown.size ? st.order[side].map((id) => st.units[id]).filter((u) => (u.hp > 0 && !u.swallowed) || pendingDown.has(u.uid)).slice(0, FRONT) : front(st, side));
+  const hpOf = (u, hp) => ({ v: Math.max(0, hp ?? (preHp.has(u?.uid) ? preHp.get(u.uid) : u?.hp ?? 0)), mx: Math.max(1, u?.maxHp || 1) }); /* PV affichés (anneau, barre, fiche) */
   const light = g.s.settings?.quality === 'light'; // v374 : « Effets allégés » (Réglages) pour les téléphones qui peinent
   const T = (ms) => (reduced ? Math.min(ms, 80) : ui.fast === 3 ? ms * 0.25 : ui.fast ? ms * 0.45 : ms); // vitesse ×1, ×2 ou ×3
   const defMode = g.s.settings?.defense === 'auto' ? 'auto' : 'on'; // v269 : manuelle ou automatique (v333 : mode « assistée » retiré, il redevient manuel)
@@ -149,10 +153,13 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const old = new Map([...row.children].filter((x) => x.dataset.uid).map((x) => [x.dataset.uid, x]));
     const out = parts.map(({ uid, html }) => {
       const o = uid && old.get(uid);
-      if (o && o._h === html) { if (o.className !== o._cls) o.className = o._cls; return o; } // comme une carte neuve, sans la reconstruire
+      if (o && o._h === html) { const keep = o.classList.contains('hit'); if (o.className !== o._cls) { o.className = o._cls; if (keep) o.classList.add('hit'); } return o; } // comme une carte neuve, sans la reconstruire
       tpl.innerHTML = html.trim(); const n = tpl.content.firstElementChild; n._h = html; n._cls = n.className;
       const oi = o?.querySelector('.dv-art img'), ni = n.querySelector('.dv-art img');
       if (oi && ni && oi.getAttribute('src') === ni.getAttribute('src')) ni.replaceWith(oi);
+      /* v870 : les effets passagers (chiffre de dégâts, nom d'un état, entaille, anneau) suivent la carte redessinée ; avant, ils
+         disparaissaient au bout de ~0,2 s quand un état changeait la carte (« Gelée », « Poison +2 » presque jamais lus) */
+      if (o) n.append(...o.querySelectorAll(':scope > .dv-float, :scope > .dv-cut, :scope > .dv-burst, :scope > .cb-ring'));
       return n;
     });
     if (out.length === row.children.length && out.every((n, i) => row.children[i] === n)) return;
@@ -172,8 +179,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     u.prey ? st_('prey', 'Proie désignée : tous les ennemis la visent (+20 % de dégâts)') : '',
     u.riposte ? `<i class="bo cb-rip" title="Riposte chargée : sa prochaine attaque fait +${u.riposte} dégât(s) et +${u.riposte} Brisure">⚔${u.riposte}</i>` : '',
     u.shield ? st_('shield', 'Bouclier : bloque un coup') : '',
-    u.ward ? st_('seal', `Barrière : absorbe encore ${u.ward} dégâts`, u.ward) : '',
-    u.poison ? st_('poison', `Poison : ${u.poison} dégâts au début de son tour`, u.poison) : '',
+    u.ward ? st_('seal', `Barrière : absorbe encore ${u.ward} dégât${u.ward > 1 ? 's' : ''}`, u.ward) : '',
+    u.poison ? st_('poison', `Poison : ${u.poison} dégât${u.poison > 1 ? 's' : ''} au début de son tour`, u.poison) : '',
     u.mirror ? st_('shield', 'Miroir : le prochain coup qu’elle reçoit se retourne contre l’attaquant (60 %). Le poison passe à travers.') : '',
     u.ashArmor ? st_('guard', `Armure de cendres : −${u.ashArmor * 6} % de dégâts reçus (une Brisure la fait tomber)`, u.ashArmor) : '',
     u.veiled ? st_('slow', u.mark ? 'Dans l’ombre, mais la Marque le révèle' : 'Dans l’ombre : −70 % de dégâts reçus (une Marque le révèle)') : '',
@@ -184,7 +191,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     u.trait && TRAITS[u.trait] ? st_(traitIcon(u.trait), `${TRAITS[u.trait].name} : ${TRAITS[u.trait].desc}`) : '',
     u.breach ? st_('breach', 'Brèche : le prochain coup d’un autre allié perce son bouclier, +20 % de dégâts, +3 Brisure') : '',
     u.boost ? `<i class="bo" title="Attaque renforcée pour ce tour">+${u.boost} ATQ</i>` : '',
-    u.ice ? st_('ice', `Carapace de glace : absorbe ${u.ice} dégâts`, u.ice) : '',
+    u.ice ? st_('ice', `Carapace de glace : absorbe ${u.ice} dégât${u.ice > 1 ? 's' : ''}`, u.ice) : '',
     u.doom != null && !u.broken ? st_('doom', `Effondrement dans ${u.doom} tour(s) : brise-le pour le repousser`, u.doom) : '',
     u.mask ? st_('mask', `Il porte le visage ${cat.faction[u.mask]?.name || u.mask} : il résiste à cette faction (−50 %)`) : '',
     u.totality ? st_('totality', 'Totalité : seules ses faiblesses le blessent pleinement') : '',
@@ -218,7 +225,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const uPic = (u) => (isFig(u) ? (BOSS_CARD.has(figKey(u)) ? `assets/bosses/combat-${figKey(u)}.webp` : `assets/bosses/${figKey(u)}.webp`) : artUrl(cat.get(u.id), { lite: true }));
   const cardEl = (u) => {
     const c = cat.get(u.id), kit = KITS[u.role];
-    const dead = u.hp <= 0, enemy = u.side === 'enemy';
+    const dead = u.hp <= 0 && !pendingDown.has(u.uid), enemy = u.side === 'enemy';
     const ready = !enemy && st.turn === 'ally' && actionsFor(st, u.uid).some((a) => a.ok && a.key !== 'swap');
     const tgt = tgtInfo[u.uid];
     /* v825 : dégâts annoncés sur cette créature par les ennemis (coups visés et coups de zone), au tour du joueur */
@@ -327,7 +334,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         tgtInfo[id] = (p.roll ? `${p.roll.chance}%` : p.dmg ? (ko ? '<b class="ko">K.O.</b>' : `-${p.dmg}${p.weak ? '★' : ''}`) : 'Cible') + tag;
       }
     }
-    patchRow(enEl, [...front(st, 'enemy').map((u) => ({ uid: u.uid, html: cardEl(u) })), ...(resHTML('enemy') ? [{ uid: null, html: resHTML('enemy') }] : [])]);
+    patchRow(enEl, [...shownFront('enemy').map((u) => ({ uid: u.uid, html: cardEl(u) })), ...(resHTML('enemy') ? [{ uid: null, html: resHTML('enemy') }] : [])]);
     const gl = goalState(st);
     if (gl && gl.state === 'done' && lastGoal !== 'done' && lastGoal !== null) { app.sfx.achievement?.(); banner(`${icon('star')} Objectif réussi !`, 'good', 1100); }
     if (gl && gl.state === 'fail' && lastGoal === 'pending') toast(tr('Objectif « {name} » manqué.', { name: esc(tr(gl.name)) }), { icon: 'info' });
@@ -344,7 +351,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const rulesEl = $('.cb-rules'); if (rulesEl) { setHTML(rulesEl, rules); rulesEl.hidden = !rules; }
     const night = st.bossKey === 'abysse' && Object.values(st.units).some((u) => u.boss && u.night && u.hp > 0), dvEl = $('.dv'); /* v392 : la Nuit sans fin assombrit et fissure la salle */
     if (dvEl && dvEl.classList.contains('abyss-night') !== night) dvEl.classList.toggle('abyss-night', night);
-    patchRow(alEl, front(st, 'ally').map((u) => ({ uid: u.uid, html: cardEl(u) })));
+    patchRow(alEl, shownFront('ally').map((u) => ({ uid: u.uid, html: cardEl(u) })));
     const sw = st.swallowed && st.units[st.swallowed];
     setHTML($('.dv-resw'), resHTML('ally') + swapHTML() + (sw?.swallowed ? `<span class="cb-swal" title="Engloutie : brise le Dévoreur pour la libérer"><img alt="" src="${artUrl(cat.get(sw.id), { lite: true })}"><small>Engloutie · ${sw.hp} PV</small></span>` : ''));
     { const h0 = actsEl?._h; setHTML(actsEl, actsHTML()); if (actsEl && actsEl._h !== h0) fitNames(); }
@@ -471,6 +478,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const setHp = (c, uid, hp) => {
     const box = c.querySelector('.dv-hp'); if (!box) return;
     const u = st.units[uid], { v, mx } = hpOf(u, hp ?? u?.hp ?? 0);
+    if (preHp.has(uid)) preHp.set(uid, v); /* v870 : la carte garde ce chiffre si elle est redessinée avant la fin de l'action */
     const b = box.querySelector('b'); if (b) b.textContent = v;
     box.style.setProperty('--hpp', Math.max(0, Math.min(100, Math.round((v / mx) * 100))));
     box.classList.toggle('hurt', v < mx); box.classList.toggle('low', v > 0 && v <= mx * 0.3);
@@ -614,7 +622,10 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   };
   const banner = (html, cls = '', ms = 900) => {
     const b = document.createElement('div'); b.className = `cb-banner ${cls}`; b.innerHTML = html;
-    $('.dv').appendChild(b); setTimeout(() => b.remove(), T(ms) + 200);
+    /* v870 : le bandeau reste lisible le temps demandé (l'animation durait toujours 0,9 s) ; en mouvement réduit, il s'affiche sans animation (il restait invisible) */
+    if (reduced) b.style.animation = 'none'; else b.style.animationDuration = `${Math.max(500, T(ms) + 200)}ms`;
+    const dv = $('.dv'); if (!dv) return b;
+    dv.appendChild(b); setTimeout(() => b.remove(), T(ms) + 200);
     return b;
   };
   const fervorPop = (d, why) => {
@@ -660,7 +671,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   let lastDef = 'none'; // résultat de la dernière défense active
   let pendingLunge = null; // élan d'une compétence à dé, joué après le jet (pas avant)
   let pendingSkill = null, skillHit = null; // v499 : planche d'une compétence à dé jouée après le jet, à la place de la lame du coup
-  let burstSrc = null, burstN = 0; // v499 : coups enchaînés d'une même créature (triple morsure, ruée…) : compteur ×2, ×3
+  let burstSrc = null, burstU = null, burstN = 0; // v499 : coups enchaînés d'une même créature (triple morsure, ruée…) : compteur ×2, ×3
   /* prochain coup de la même action (on saute les événements de jauge) : sert à enchaîner les coups sans arrêt sur image */
   const nextHit = (ev, i) => { for (let j = i + 1; j < ev.length; j++) { const x = ev[j]; if (x.t === 'dmg') return x; if (!['brk', 'fervor', 'pa', 'combo', 'status'].includes(x.t)) return null; } return null; };
   /* v832 : mort d'une de tes créatures, bien signalée sans arrêter le combat */
@@ -731,6 +742,14 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     else if (e.t === 'revive') feedPart('heal', `${fName(e.u)} ${esc(tr('se relève'))}`);
   }
   async function play(ev) {
+    for (const x of ev) {
+      if (x.t === 'die' && st.units[x.u]) pendingDown.add(x.u);
+      /* PV d'avant l'action : ceux du premier coup ou soin qui la touche */
+      if ((x.t === 'dmg' || (x.t === 'heal' && x.hp != null)) && st.units[x.u] && !preHp.has(x.u)) preHp.set(x.u, x.t === 'dmg' ? x.hp + x.d : x.hp - x.d);
+    }
+    try { await playEv(ev); } finally { pendingDown.clear(); preHp.clear(); aoeHit = false; }
+  }
+  async function playEv(ev) {
     for (let ei = 0; ei < ev.length; ei++) {
       const e = ev[ei];
       await coachIdle(); /* v661 : une bulle d'aide fige le combat derrière elle */
@@ -739,7 +758,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       feedEv(e);
       switch (e.t) {
         case 'act':
-          lastAtk = st.units[e.u]?.side === 'ally' ? e.u : null; lastTier = null; pendingSkill = null; skillHit = null; burstSrc = null;
+          lastAtk = st.units[e.u]?.side === 'ally' ? e.u : null; lastTier = null; pendingSkill = null; skillHit = null; burstSrc = null; aoeHit = false;
           if (e.skill) {
             const own = moveFor(st.units[e.u], e.key);
             const ic = own ? `<img class="aicon" alt="" src="${moveIconUrl(own.icon)}">` : actIcon(KITS[st.units[e.u].role].skill.key, KITS[st.units[e.u].role].skill.icon);
@@ -771,18 +790,27 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
           /* v499 : dégâts sans attaquant (poison, épuisement, marée, pacte…) : une simple marque, sans lame ni secousse */
           if (!e.src) {
             const tt = el(e.u);
+            if (preHp.has(e.u)) preHp.set(e.u, Math.max(0, e.hp));
             if (tt) setHp(tt, e.u, e.hp);
-            float(e.u, `-${e.d}`, `dmg tick ${st.units[e.u]?.poison ? 'venom' : ''}`); app.sfx.tap?.();
+            float(e.u, `−${e.d}`, `dmg tick ${st.units[e.u]?.poison ? 'venom' : ''}`); app.sfx.tap?.();
             await wait(T(170)); break;
           }
-          const nx = nextHit(ev, ei), chain = burstSrc === e.src, more = !!(nx && nx.src === e.src);
-          burstN = chain ? burstN + 1 : 1; burstSrc = more ? e.src : null;
+          /* v870 : éraflure après une esquive réussie : un coup léger (pas de griffes, d'arrêt sur image ni de grosse secousse) */
+          if (e.graze) {
+            const tg = el(e.u);
+            if (tg) setHp(tg, e.u, e.hp);
+            float(e.u, `−${e.d}`, 'dmg tick'); fxSheet(e.u, 'fx-graze', { k: 2, d: 600 }); app.sfx.tap?.();
+            await wait(T(200)); break;
+          }
+          const nx = nextHit(ev, ei), chain = burstSrc === e.src && burstU === e.u, more = !!(nx && nx.src === e.src && nx.u === e.u);
+          burstN = chain ? burstN + 1 : 1; burstSrc = more ? e.src : null; burstU = more ? e.u : null; /* v870 : « ×2 » seulement pour plusieurs coups sur la même carte */
           const t = el(e.u);
           const crit = lastTier === 'crit', heavy = crit || e.d >= 8;
           lastTier = null;
           const viaSkill = skillHit && skillHit === e.u; skillHit = null;
           /* v509 : tout part au même instant, l'impact : son, PV (chiffre et anneau), chiffre de dégâts, effets ; l'arrêt sur image vient après */
           (heavy ? app.sfx.smash : app.sfx.slash)();
+          if (preHp.has(e.u)) preHp.set(e.u, Math.max(0, e.hp));
           if (t) { t.classList.remove('hit'); void t.offsetWidth; t.classList.add('hit'); setHp(t, e.u, e.hp); }
           float(e.u, `${crit ? 'CRITIQUE ' : ''}−${e.d}${burstN > 1 ? ` ×${burstN}` : ''}`, crit ? 'dmg big crit' : heavy ? 'dmg big' : 'dmg');
           // v341 : chaque coup marque l'impact — entaille lumineuse sur la carte touchée et court arrêt sur image
@@ -879,13 +907,14 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
           else if (e.k === 'mark') { app.sfx.mark?.(); if (/Maudite/.test(e.s)) fxSheet(e.u, 'fx-curse', { k: 2.4, d: 880 }); else fxAt(e.u, 'seal'); ring(e.u, 'mark'); }
           if (/vole en éclats/.test(e.s)) { app.sfx.shatter(); fxSheet(e.u, 'fx-iceshatter', { k: 2.5, d: 820 }); }
           if (e.s === 'Proie désignée') fxSheet(e.u, 'fx-prey', { k: 2.4, d: 820 });
-          else if (e.syn) app.sfx.skill();
+          else if (e.syn && !e.combo) app.sfx.skill(); /* v870 : une combinaison a déjà son son (synergie) : plus deux sons à la fois */
           if (e.k === 'entrance') ring(e.u, 'enter');
           if (e.trait === 'explosif') { fxSheet(e.u, 'fx-explode', { k: 2.6, d: 760 }); app.sfx.explode?.(); shake(true); banner(`<img class="cb-trico" alt="" src="assets/icons/st-explosif.webp"> Explosion !`, 'danger', 800); }
+          else if (e.trait === 'carapace' || e.trait === 'voleur') (e.trait === 'carapace' ? app.sfx.shield : app.sfx.mark)?.(); /* v870 : traits ordinaires : un son léger, sans le rugissement du gardien ni bandeau */
           else if (e.trait) { if (e.trait === 'enrage') fxSheet(e.u, 'fx-enrage', { k: 1.9, d: 820 }); (e.trait === 'enrage' ? app.sfx.enrage : app.sfx.boss)?.(); banner(`<img class="cb-trico" alt="" src="assets/icons/st-${traitIcon(e.trait)}.webp"> ${esc(e.s)}`, 'danger', 800); }
           if (e.combo && e.by && e.a && e.by !== e.a && st.units[e.by]?.side === 'ally') { synergy(e.by, e.a, e.s); await wait(T(380)); if (!g.s.tips?.['cb-combo'] && !settling()) tuto(app, 'cb-combo'); }
           if (e.combo) comboPop(e.u, e.combo);
-          float(e.u, e.s, e.syn ? 'syn' : e.k === 'bad' ? 'dmg' : 'info');
+          { const nx2 = ev[ei + 1]; if (!(e.k === 'poison' && /^Poison [−-]\d/.test(e.s) && nx2?.t === 'dmg' && nx2.u === e.u && !nx2.src)) float(e.u, e.s, e.syn ? 'syn' : e.k === 'bad' ? 'dmg' : 'info'); } /* v870 : « Poison −3 » puis « −3 » : un seul chiffre */
           draw();
           await wait(T(e.syn ? 480 : 260));
           break;
@@ -946,6 +975,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const c = cat.get(u.id); if (!c) return false;
     const again = shotSeen.has(uid); shotSeen.add(uid);
     const d = T(again ? 520 : 760);
+    if (foe) app.sfx.enrage?.(); /* v870 : le coup spécial d'un gardien ou d'une élite s'annonce aussi au son */
     t.style.setProperty('--fc', foe ? '#FF3B4E' : cat.faction[c.faction]?.colors?.secondary || '#F2C14E');
     t.style.setProperty('--cd', `${d}ms`);
     t.classList.remove('cast', 'cast-foe'); void t.offsetWidth; t.classList.add(foe ? 'cast-foe' : 'cast');
@@ -1137,7 +1167,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     ov.innerHTML = `<div class="cb-as-in"><small>Assaut · ${esc(uName(e))}</small><b>${esc(A.name)}</b></div>`;
     $('.dv')?.appendChild(ov); app.sfx.boss?.();
     if (!reduced) { shake(true); /* v633 : plus de secousse sur tout l'écran */ /* v607 : la secousse ne reste plus posée sur le plateau */ }
-    await wait(reduced ? 500 : 1100);
+    await wait(T(reduced ? 500 : 1100)); /* v870 : raccourci en vitesse ×2 */
     ov.classList.add('out'); setTimeout(() => ov.remove(), 250);
     const res = await barQTE(s, A.seq, { beat: A.beat, title: A.name });
     const r = verdict(res.length ? res : ['none']);
@@ -1145,7 +1175,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     end.innerHTML = `<b>${r === 'parry' ? 'Assaut brisé !' : r === 'dodge' ? 'Assaut amorti' : 'Assaut subi…'}</b>`;
     stampHost($('.dv')).appendChild(end); setTimeout(() => end.remove(), 1000); /* v670 : hors de l'écran du combat */
     if (r === 'parry') app.sfx.perfect?.();
-    await wait(reduced ? 250 : 650);
+    await wait(T(reduced ? 250 : 650));
     return r;
   }
   /* La barre : v594, code commun avec le Labo des défenses (js/ui/def-bar.js) ; réglages du Labo si le Créateur l'a demandé */
@@ -1427,9 +1457,10 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const revived = ev.filter((x) => x.t === 'revive').length;
     const parts = [revived && `${revived} créature${revived > 1 ? 's' : ''} relevée${revived > 1 ? 's' : ''}`, healed && `+${healed} PV rendus`, dmg && `${dmg} dégâts infligés`, st.ult === 'aegis' && 'boucliers sur tes créatures', st.ult === 'aegis' && (st.init ? '+2 PA chacune' : '+2 actions')].filter(Boolean);
     toast(`<b>${esc(ult.name)}</b> : ${parts.join(' · ') || 'aucun effet'}`, { icon: 'sparkle', kind: 'success' });
+    if (!st.over && st.turn === 'enemy') await foesPlay(); /* v536 : le pouvoir peut faire passer la main aux ennemis (créature qui agissait tombée) */
     busy = false; draw();
-    if (st.over) finish();
-    else if (st.turn === 'enemy') await foesPlay(); /* v536 : le pouvoir peut faire passer la main aux ennemis (créature qui agissait tombée) */
+    if (st.over) return finish(); /* v870 : avant, une défaite ou une victoire pendant ce tour ennemi laissait le combat figé */
+    tips();
   }
 
   // ——— Fiches ———
@@ -1480,7 +1511,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   function statusLines(u) {
     const s = [];
     if (u.shield) s.push('Bouclier : bloque le prochain coup.');
-    if (u.ward) s.push(`Barrière : absorbe encore ${u.ward} dégâts.`);
+    if (u.ward) s.push(`Barrière : absorbe encore ${u.ward} dégât${u.ward > 1 ? 's' : ''}.`);
     if (u.poison) s.push(`Poison ${u.poison} : perd ${u.poison} PV au début de son tour, puis le poison diminue de moitié.`);
     if (u.frozen || u.stunned) s.push('Gelé : passe son prochain tour.');
     if (u.slow) s.push('Ralenti : sa prochaine attaque fait moitié moins mal.');

@@ -9447,6 +9447,14 @@ export default {
   "Mouvements reçus : l’effet marche.": "Motion received: the effect works.",
   "Aucun mouvement reçu pour l’instant : incline le téléphone. Si rien ne bouge, désactive puis réactive ce réglage.": "No motion received yet: tilt your phone. If nothing moves, turn this setting off and on again.",
   "L’iPhone refuse l’accès aux mouvements : désactive puis réactive ce réglage pour le redemander.": "The iPhone refuses access to motion: turn this setting off and on again to ask again.",
+  "Grande marée !": "Great tide!",
+  "Poison −{0}": "Poison −{0}",
+  "Poison : {0} dégât au début de son tour": "Poison: {0} damage at the start of its turn",
+  "Barrière : absorbe encore {0} dégât": "Barrier: absorbs {0} more damage",
+  "Barrière : absorbe encore {0} dégâts": "Barrier: absorbs {0} more damage",
+  "Barrière : absorbe encore {0} dégât.": "Barrier: absorbs {0} more damage.",
+  "Carapace de glace : absorbe {0} dégât": "Ice carapace: absorbs {0} damage",
+  "Auto": "Auto",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

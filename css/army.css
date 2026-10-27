@@ -8830,3 +8830,11 @@ table.odds th, table.odds td { white-space: normal; }
 .dv-float.txt { font-size: clamp(.95rem, 4.6vw, 1.2rem) !important; line-height: 1.1; white-space: normal; width: max-content; max-width: min(230px, calc(100vw - 40px)); text-align: center; text-wrap: balance; -webkit-text-stroke: .6px #3a0410; }
 /* v867 : état de l'effet de profondeur dans Réglages (aucun mouvement reçu, accès refusé) */
 .set-warn { margin-top: 4px; color: #FFC98A; }
+/* v870 : Renforcer : le bouton du niveau suivant n'est plus écrasé (le max-width en % se calculait sur la colonne « auto » de la grille) ; la colonne du milieu cède la place */
+.fg-row { grid-template-columns: 46px minmax(0, 1fr) auto !important; }
+.fg-up { max-width: 150px; min-width: 96px; }
+/* v870 : la pastille des récompenses posée à la place du pseudo : le pseudo et la barre d'XP s'effacent le temps qu'elle est là (on les lisait à travers) */
+#topbar .top-meta { transition: opacity .2s; }
+body:has(.prog-chip.docked.in) #topbar .top-meta { opacity: 0; }
+/* v870 : fiche d'une carte : la croix de fermeture (fixe en haut à droite) ne recouvre plus l'onglet « Rareté » quand les onglets arrivent en haut */
+.sheet-full .dt-tabs { margin-right: 50px; }

@@ -390,7 +390,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false, graze = false } = {}) 
   if (u.side === 'ally' && d >= u.hp && d > 0 && u.hp > 1 && u.talent === 'tenacite' && !u.tenSaved) { u.tenSaved = true; d = u.hp - 1; ev.push({ t: 'status', u: u.uid, s: 'Ténacité !', syn: true, k: 'guard' }); }
   if (u.side === 'ally' && d >= u.hp && st.sursis) { st.sursis = false; d = u.hp - 1; u.shield = 1; ev.push({ t: 'status', u: u.uid, s: 'Sursis !', syn: true }); }
   u.hp -= d;
-  if (d > 0) ev.push({ t: 'dmg', u: u.uid, d, hp: u.hp, src });
+  if (d > 0) ev.push({ t: 'dmg', u: u.uid, d, hp: u.hp, src, ...(graze ? { graze: true } : {}) }); /* v870 : éraflure marquée (écran : coup léger) */
   if (d > 0 && u.boss && st.bossKey === 'titan' && u.asleep) u.sleepDmg = (u.sleepDmg || 0) + d;
   if (d > 0 && u.hp <= 0 && st.bossKey === 'jumeaux' && (u.boss || u.twin)) {
     const o = st.order.enemy.map((id) => st.units[id]).find((x) => x !== u && (x.boss || x.twin) && x.hp > 0);
@@ -401,7 +401,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false, graze = false } = {}) 
   // v331 : traits des profondeurs (Vampire, Épineux)
   if (d > 0 && src && st.units[src]?.trait === 'vampire' && st.units[src].side === 'enemy' && st.units[src].hp > 0) {
     const v = st.units[src], h = Math.min(v.maxHp - v.hp, Math.ceil(d / 2));
-    if (h > 0) { v.hp += h; ev.push({ t: 'heal', u: v.uid, d: h }); }
+    if (h > 0) { v.hp += h; ev.push({ t: 'heal', u: v.uid, d: h, hp: v.hp }); }
   }
   if (d > 0 && u.trait === 'epineux' && u.side === 'enemy' && src && st.units[src]?.side === 'ally' && st.units[src].hp > 0) {
     ev.push({ t: 'status', u: src, s: 'Épines −2', k: 'bad' }); hurt(st, st.units[src], 2, ev, null);
@@ -496,7 +496,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false, graze = false } = {}) 
 function heal(u, n, ev, healer = null) {
   if (u.hp <= 0) return 0;
   const h = Math.min(u.maxHp - u.hp, Math.round(n * (u.healMult || 1)));
-  if (h > 0) { u.hp += h; ev.push({ t: 'heal', u: u.uid, d: h }); }
+  if (h > 0) { u.hp += h; ev.push({ t: 'heal', u: u.uid, d: h, hp: u.hp }); } /* v870 : PV au moment du soin (écran) */
   // Chœur : la créature soignée gagne de l'attaque pour ce tour (une fois par tour)
   if (h > 0 && healer && hasP(healer, 'choeur') && !u.chB) { u.chB = boosted(healer, 'choeur') ? 2 : 1; ev.push({ t: 'passive', u: healer.uid, p: 'choeur' }); u.boost = (u.boost || 0) + u.chB; ev.push({ t: 'status', u: u.uid, s: `Chœur : +${u.chB} ATQ`, syn: true }); }
   return h;
@@ -600,7 +600,7 @@ function fracture(st, t, ev) {
   if (t.intent) t.intent = { ...t.intent, cancelled: true };
   st.stats.breaks++;
   ev.push({ t: 'broken', u: t.uid });
-  if (!st.rempartUsed && front(st, 'ally').some((x) => x.talent === 'rempart')) { st.rempartUsed = true; front(st, 'ally').forEach((x) => { x.shield = 1; ev.push({ t: 'status', u: x.uid, s: 'Dernier rempart', k: 'guard', syn: true }); }); }
+  if (!st.rempartUsed && front(st, 'ally').some((x) => x.talent === 'rempart')) { st.rempartUsed = true; front(st, 'ally').forEach((x) => { x.shield = 1; ev.push({ t: 'status', u: x.uid, s: 'Dernière muraille', k: 'guard', syn: true }); }); }
   gainFervor(st, 2, ev, 'Brisure');
 }
 function discover(st, t, ev) {
@@ -948,7 +948,7 @@ function basicAttack(st, u, t, ev) {
   }
   if (u.role === 'zone') {
     const full = u.boost > 0, near = nb.filter((n) => n.hp > 0);
-    if (full && near.length) ev.push({ t: 'status', u: u.uid, s: 'Raz-de-marée !', syn: true });
+    if (full && near.length) ev.push({ t: 'status', u: u.uid, s: 'Grande marée !', syn: true });
     near.forEach((n) => hurt(st, n, full ? dmgOf(st, u, n) : Math.ceil(dmgOf(st, u, n) / 2), ev, u.uid));
   }
   if ((st.relics || []).includes('coeur')) { st.coeurTick = !st.coeurTick; if (st.coeurTick) return; }
@@ -1066,7 +1066,7 @@ function startAllyTurn(st, ev) {
   st.swapped = false; st.ombreUsed = false; st.hitBy = {}; st.curKind = null;
   const thief = st.round >= 3 && front(st, 'enemy').find((x) => x.trait === 'voleur' && x.hp > 0);
   // v331 : Carapace, le bouclier revient un tour sur deux
-  if (st.round > 1 && st.round % 2 === 1) for (const x of front(st, 'enemy')) if (x.trait === 'carapace' && x.hp > 0 && !x.shield) { x.shield = 1; ev.push({ t: 'status', u: x.uid, s: 'Carapace', k: 'bad', trait: 'carapace' }); }
+  if (st.round > 1 && st.round % 2 === 1) for (const x of front(st, 'enemy')) if (x.trait === 'carapace' && x.hp > 0 && !x.shield) { x.shield = 1; ev.push({ t: 'status', u: x.uid, s: 'Cuirasse', k: 'bad', trait: 'carapace' }); }
   if (st.init) {
     // Loi de la hâte : +1 PA à chacune ; Voleur : vole 1 PA à ta créature qui en a le plus
     if (st.law === 'hate') front(st, 'ally').forEach((u) => gainPA(u, 1));
@@ -1100,7 +1100,7 @@ function tickPoison(st, u, ev) {
   if (!u.poison || u.hp <= 0) return;
   const d = u.poison;
   u.poison = Math.floor(u.poison / 2);
-  ev.push({ t: 'status', u: u.uid, s: `Poison -${d}`, k: 'poison' });
+  ev.push({ t: 'status', u: u.uid, s: `Poison −${d}`, k: 'poison' });
   hurt(st, u, d, ev);
 }
 // Fin du tour du joueur : effets de fin de tour, puis début du tour ennemi.
@@ -1409,7 +1409,7 @@ export function enemyAct(st, aUid, defense = 'none') {
     else if (k === 'rempart') front(st, 'enemy').forEach((x) => { x.shield = 1; ev.push({ t: 'status', u: x.uid, s: 'Bouclier', k: 'guard' }); });
     else if (k === 'priere') heal(e, e.maxHp * 0.25, ev);
     else if (k === 'contagion') { if (defense !== 'none') defended(st, e, null, ev, defense, 'blast'); else front(st, 'ally').forEach((x) => addPoison(st, x, 3, ev, e)); }
-    else { ev.push({ t: 'aoe', u: aUid, side: 'enemy' }); if (defense !== 'none') defended(st, e, null, ev, defense, 'blast'); else for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, 0.7), ev, aUid); } }
+    else { ev.push({ t: 'aoe', u: aUid, side: 'enemy' }); if (defense !== 'none') defended(st, e, null, ev, defense, 'blast'); if (defense !== 'parry') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, 0.7 * (defense === 'dodge' ? GRAZE : 1)), ev, aUid, { graze: defense === 'dodge' }); } } /* v870 : l'esquive éraflé (GRAZE), comme pour la Déflagration ; seule la parade annule */
   } else if (kind === 'decree') {
     st.law = it.law; logBoss(st, LAWS[it.law].name);
     ev.push({ t: 'boss', u: aUid, s: LAWS[it.law].name }); ev.push({ t: 'law', law: it.law });
@@ -1429,7 +1429,8 @@ export function enemyAct(st, aUid, defense = 'none') {
     e.charged = null;
     ev.push({ t: 'aoe', u: aUid, side: 'enemy' });
     if (defense !== 'none') defended(st, e, null, ev, defense, 'blast');
-    else {
+    if (defense === 'dodge') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, AOE_M[kind] * pow * GRAZE), ev, aUid, { graze: true }); } /* v870 : l'esquive éraflé (GRAZE), comme pour la Déflagration ; seule la parade annule */
+    else if (defense === 'none') {
       for (const x of front(st, 'ally')) {
         if (e.hp <= 0) break;
         hurt(st, x, dmgOf(st, e, x, AOE_M[kind] * pow * (kind === 'price' && e.phase2 ? 1.25 : 1)), ev, aUid);
@@ -1472,7 +1473,7 @@ export function enemyAct(st, aUid, defense = 'none') {
     const m = 1 + Math.min(1, (e.sleepDmg || 0) / e.maxHp) * 1.5;
     logBoss(st, 'Séisme'); ev.push({ t: 'boss', u: aUid, s: `Le Titan s’éveille : Séisme ×${m.toFixed(1)}` }); ev.push({ t: 'aoe', u: aUid, side: 'enemy' });
     if (defense !== 'none') defended(st, e, null, ev, defense, 'blast');
-    else for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, 0.8 * m * pow), ev, aUid); }
+    if (defense !== 'parry') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, 0.8 * m * pow * (defense === 'dodge' ? GRAZE : 1)), ev, aUid, { graze: defense === 'dodge' }); } /* v870 : l'esquive éraflé (GRAZE), comme pour la Déflagration ; seule la parade annule */
   } else if (kind === 'verdict') {
     st.forbid = it.forbid; logBoss(st, 'Verdict');
     ev.push({ t: 'boss', u: aUid, s: `Verdict : interdit de ${FORBID[it.forbid]}` }); ev.push({ t: 'law', forbid: it.forbid });
@@ -1501,14 +1502,14 @@ export function enemyAct(st, aUid, defense = 'none') {
     /* v558 : Rafale, trois coups ; une défense réussie compte une fois pour toute la rafale */
     const t0 = st.units[it.t];
     if (defense !== 'none') strike(t0, 1.35);
-    else { const t = strike(t0, 0.45); for (let i = 0; i < 2 && t && t.hp > 0 && e.hp > 0; i++) strike(t, 0.45); }
+    else { let t = strike(t0, 0.45); for (let i = 0; i < 2 && t && e.hp > 0; i++) { const nt = t0.hp > 0 ? t0 : t; if (nt.hp <= 0) break; t = strike(nt, 0.45); } } /* v870 : chaque coup vise la cible d'origine : le Rempart d'un Protecteur joue sur chacun */
   } else if (kind === 'grab') {
     /* v558 : Étreinte, un coup puis la cible est agrippée (elle perd son prochain tour) si elle ne s'est pas libérée */
     const t = strike(st.units[it.t], 0.7);
     if (t && t.hp > 0 && defense === 'none') { t.frozen = 1; ev.push({ t: 'status', u: t.uid, s: 'Agrippée', k: 'frost' }); }
   } else if (kind === 'tick2') {
-    const t = strike(st.units[it.t], 0.6);
-    if (t && t.hp > 0 && e.hp > 0) strike(t, 0.6);
+    const t0 = st.units[it.t], t = strike(t0, 0.6);
+    if (t && e.hp > 0) { const nt = t0?.hp > 0 ? t0 : t; if (nt.hp > 0) strike(nt, 0.6); } /* v870 : idem (Rempart sur les deux coups) */
   }
   // Miroir de l'Abîme : la première grosse attaque du combat se retourne en partie contre l'ennemi
   if (big && st.miroir && e.hp > 0) {

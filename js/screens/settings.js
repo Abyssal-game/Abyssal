@@ -91,7 +91,7 @@ export default function settings(app, root) {
       </section>
       <section class="panel stack">
         <h2>Affichage</h2>
-        ${seg('motion', 'Animations', [['auto', 'Selon l’appareil'], ['reduced', 'Réduites'], ['full', 'Complètes']])}
+        ${seg('motion', 'Animations', [['auto', 'Auto'], ['reduced', 'Réduites'], ['full', 'Complètes']])}
         ${toggle('fastOpen', 'Ouverture rapide des boosters', 'Affiche directement le récapitulatif, sans révéler les cartes une par une.')}
         ${depthSupported() ? `<div class="set-row"><div><b>Effet de profondeur</b><p class="small muted">Incline le téléphone : les reflets des cartes glissent comme sur une vraie carte holographique, et le décor de l’Accueil bouge derrière la page.</p>${depthOn(s) ? `<p class="small ${depthStatus() === 'ok' ? 'muted' : 'set-warn'}">${{ ok: 'Mouvements reçus : l’effet marche.', waiting: 'Aucun mouvement reçu pour l’instant : incline le téléphone. Si rien ne bouge, désactive puis réactive ce réglage.', denied: 'L’iPhone refuse l’accès aux mouvements : désactive puis réactive ce réglage pour le redemander.', off: '' }[depthStatus()]}</p>` : ''}</div><button class="switch" role="switch" aria-checked="${depthOn(s)}" data-act="depth" aria-label="Effet de profondeur"><i></i></button></div>` : ''}
       </section>

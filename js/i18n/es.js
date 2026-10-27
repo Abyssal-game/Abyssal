@@ -9435,6 +9435,14 @@ export default {
   "Mouvements reçus : l’effet marche.": "Movimiento recibido: el efecto funciona.",
   "Aucun mouvement reçu pour l’instant : incline le téléphone. Si rien ne bouge, désactive puis réactive ce réglage.": "Aún no se ha recibido movimiento: inclina el teléfono. Si nada se mueve, desactiva y vuelve a activar este ajuste.",
   "L’iPhone refuse l’accès aux mouvements : désactive puis réactive ce réglage pour le redemander.": "El iPhone rechaza el acceso al movimiento: desactiva y vuelve a activar este ajuste para pedirlo de nuevo.",
+  "Grande marée !": "¡Gran marea!",
+  "Poison −{0}": "Veneno −{0}",
+  "Poison : {0} dégât au début de son tour": "Veneno: {0} de daño al inicio de su turno",
+  "Barrière : absorbe encore {0} dégât": "Barrera: absorbe {0} de daño más",
+  "Barrière : absorbe encore {0} dégâts": "Barrera: absorbe {0} de daño más",
+  "Barrière : absorbe encore {0} dégât.": "Barrera: absorbe {0} de daño más.",
+  "Carapace de glace : absorbe {0} dégât": "Caparazón de hielo: absorbe {0} de daño",
+  "Auto": "Auto",
 };
 
 export const names = {
