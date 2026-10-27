@@ -9443,6 +9443,13 @@ export default {
   "Barrière : absorbe encore {0} dégât.": "Barriere: absorbiert noch {0} Schaden.",
   "Carapace de glace : absorbe {0} dégât": "Eispanzer: absorbiert {0} Schaden",
   "Auto": "Auto",
+  "Le cercle des gros coups": "Der Kreis der schweren Schläge",
+  "Un <b>gros coup</b> arrive : un <b>cercle se resserre</b> autour d’un sceau posé sur ta créature. Touche l’écran <b>au moment où il se referme sur le sceau</b> (il devient doré) : <b>parade parfaite</b>. Trop tôt : <b>défense partielle</b> (la moitié des dégâts). Trop tard : <b>touché</b>. Contre les élites et les gardiens, il va plus vite, et certains <b>hésitent</b> avant de se refermer.": "Ein <b>schwerer Schlag</b> kommt: ein <b>Kreis zieht sich</b> um ein Siegel auf deiner Kreatur zusammen. Tippe <b>in dem Moment, in dem er sich um das Siegel schließt</b> (er wird golden): <b>perfekte Parade</b>. Zu früh: <b>teilweise Abwehr</b> (halber Schaden). Zu spät: <b>getroffen</b>. Gegen Elite und Wächter ist er schneller, und manche <b>zögern</b>, bevor sie sich schließen.",
+  "Défense partielle": "Teilweise Abwehr",
+  "Trop tôt…": "Zu früh…",
+  "Trop tard…": "Zu spät…",
+  "Touche quand le cercle se referme sur le sceau": "Tippe, wenn sich der Kreis um das Siegel schließt",
+  "Touche quand le cercle se referme sur le sceau · coup {0}/{1}": "Tippe, wenn sich der Kreis um das Siegel schließt · Schlag {0}/{1}",
 };
 
 export const names = {

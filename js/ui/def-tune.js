@@ -16,6 +16,8 @@ export const DEF_DEFAULTS = {
   /* v742 : avance de l'affichage. Vidéo du propriétaire (app iPhone, 25 octobre 2026) : le curseur affiché par l'iPhone est
      ≈ 2 images en avance sur sa position calculée ; un toucher pile sur le trait blanc était jugé « esquive », un toucher en
      retard « parade ». Le toucher est jugé à son instant + cette avance (0 hors iPhone : Chromium affiche à l'heure). */
+  /* v871 : cercle des gros coups (o, O) : durée du resserrement, part de la fenêtre d'esquive gardée pour la parade, bornes, début de la défense partielle */
+  ringNormal: 1250, ringElite: 1120, ringBoss: 1000, ringFast: 0.78, ringParry: 0.4, ringParryMin: 50, ringParryMax: 100, ringEarly: 0.42,
   leadMs: /iPhone|iPad|iPod/.test(globalThis.navigator?.userAgent || '') ? 33 : 0,
 };
 
@@ -50,6 +52,16 @@ export const DEF_GROUPS = [
     ['parryMinNormal', 'Minimum · normal', '', 10, 200, 1, 'ms'],
     ['parryMinElite', 'Minimum · élite', '', 10, 200, 1, 'ms'],
     ['parryMinBoss', 'Minimum · gardien', '', 10, 200, 1, 'ms'],
+  ]],
+  ['Cercle des gros coups (o, O)', [
+    ['ringNormal', 'Resserrement · normal', 'Temps pour que le cercle se referme sur le sceau (plus long = plus facile).', 500, 2500, 10, 'ms'],
+    ['ringElite', 'Resserrement · élite', '', 500, 2500, 10, 'ms'],
+    ['ringBoss', 'Resserrement · gardien', '', 500, 2500, 10, 'ms'],
+    ['ringFast', 'Cercle rapide (O)', 'Multiplie la durée ; ce cercle marque aussi une hésitation.', 0.4, 1.2, 0.01, '×'],
+    ['ringParry', 'Parade · part de la fenêtre', 'Part de la fenêtre d’esquive (qui dépend de l’ennemi et de l’écart de niveau) gardée pour la parade.', 0.1, 1, 0.01, '×'],
+    ['ringParryMin', 'Parade · minimum', '', 20, 200, 1, 'ms'],
+    ['ringParryMax', 'Parade · maximum', '', 30, 300, 1, 'ms'],
+    ['ringEarly', 'Début de la défense partielle', 'Avant cette part du temps, toucher compte comme « trop tôt » (rien n’est défendu).', 0, 0.8, 0.01, ''],
   ]],
   ['Rythme et jugement', [
     ['gapFirst', 'Attente avant le 1er coup', 'Plus un temps au hasard (ligne suivante).', 0, 1500, 10, 'ms'],

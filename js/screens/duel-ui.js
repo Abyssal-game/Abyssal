@@ -668,7 +668,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
 
   // ——— Lecture des événements (animations) ———
   let lastTier = null; // résultat du dernier jet de dé : le coup qui suit le montre
-  let lastDef = 'none'; // résultat de la dernière défense active
+  let lastDef = 'none', preShown = null; // résultat de la dernière défense active ; v871 : ennemi dont le coup spécial a été annoncé avant la barre
   let pendingLunge = null; // élan d'une compétence à dé, joué après le jet (pas avant)
   let pendingSkill = null, skillHit = null; // v499 : planche d'une compétence à dé jouée après le jet, à la place de la lame du coup
   let burstSrc = null, burstU = null, burstN = 0; // v499 : coups enchaînés d'une même créature (triple morsure, ruée…) : compteur ×2, ×3
@@ -778,9 +778,13 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
           lastAtk = null; lastTier = null; burstSrc = null;
           // v338 : la grosse attaque d'une élite, et chaque coup spécial d'un gardien, s'annoncent sur son illustration en plein écran
           const ua = st.units[e.a], bigK = ua?.boss ? BOSS_SHOT.has(e.kind) : ua?.elite && (e.kind === 'heavy' || e.kind === 'blast');
-          const shot = bigK && def && (await castFx(e.a, `${def.name} !`, { ic: intentIcon(e.kind), foe: true }));
-          if (!shot && (e.kind === 'heavy' || e.kind === 'blast')) banner(`${intentIcon(e.kind)} ${esc(def.name)} !`, 'danger', 700);
-          if (e.tgt && st.units[e.tgt]?.side === 'ally') { lunge(e.a, e.tgt); cam(e.tgt, 0.6); await wait(T(LUNGE_HIT)); }
+          /* v871 : annoncé avant la barre de défense (preShown) : pas une 2e fois après, le coup tombe tout de suite */
+          const pre = preShown === e.a; preShown = null;
+          const shot = !pre && bigK && def && (await castFx(e.a, `${def.name} !`, { ic: intentIcon(e.kind), foe: true }));
+          if (!pre && !shot && (e.kind === 'heavy' || e.kind === 'blast')) banner(`${intentIcon(e.kind)} ${esc(def.name)} !`, 'danger', 700);
+          /* v871 : l'élan part vers la créature qui prend vraiment le coup (un Protecteur peut l'intercepter avec son Rempart) */
+          const hitU = ev.slice(ei + 1).find((x) => x.t === 'attack' && x.a === e.a)?.u || e.tgt;
+          if (hitU && st.units[hitU]?.side === 'ally') { lunge(e.a, hitU); cam(hitU, 0.6); await wait(T(LUNGE_HIT)); }
           else await wait(T(200));
           break;
         }
@@ -831,13 +835,13 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         case 'heal': { app.sfx.heal(); fxSheet(e.u, 'role-heal', { k: 2.3, d: 850 }); float(e.u, `+${e.d}`, 'heal'); const hc = el(e.u); if (hc) setHp(hc, e.u, e.hp ?? st.units[e.u].hp); await wait(T(200)); break; }
         case 'block': lastTier = null; skillHit = null; app.sfx.block(); ring(e.u, 'guard'); float(e.u, 'Bloqué', 'info'); sparks(e.u, 'blue'); await wait(T(240)); break;
         case 'dodge': {
-          app.sfx.dodge();
+          if (lastDef !== 'dodge') app.sfx.dodge(); /* v871 : déjà sonné au toucher sur la barre */
           if (e.u) { ghost(e.u); fxSheet(e.u, 'fx-dodge', { k: 2.3, d: 720 }); fxSheet(e.u, 'fx-graze', { k: 2, d: 700 }); /* v503 : l'esquive érafle */ cam(e.u, 0.6); shake(false, true); const t = el(e.u); if (t) { t.classList.remove('dodge'); void t.offsetWidth; t.classList.add('dodge'); } float(e.u, 'Esquive !', 'dodge'); }
           else { front(st, 'ally').forEach((x) => fxSheet(x.uid, 'fx-graze', { k: 2, d: 700 })); banner('Éraflés…', 'good', 600); } /* v503 : attaque de zone, glissé tardif */
           await wait(T(320));
           break;
         }
-        case 'parry': app.sfx.parry(); dio.flare(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxSheet(e.u, 'def-clash', { k: 2.7, d: 760 }); fxSheet(e.u, 'fx-parry', { k: 2.1, d: 820 }); recoil(e.a); /* v361 : choc des lames (Gemini) + anneau d'or */ impactFlash(e.u, true); sparks(e.u, 'gold'); cam(e.u, -0.8); } else front(st, 'ally').forEach((x) => fxSheet(x.uid, 'fx-shelter', { k: 2.4, d: 900 })); /* v503 : attaque de zone évitée à temps : dôme */ banner(e.u ? 'Parade parfaite !' : 'À l’abri !', 'parry', 800); shake(false); await wait(T(420)); break;
+        case 'parry': if (lastDef !== 'parry') app.sfx.parry(); dio.flare(); await hitstop(120); if (e.u) { ring(e.u, 'parry'); fxSheet(e.u, 'def-clash', { k: 2.7, d: 760 }); fxSheet(e.u, 'fx-parry', { k: 2.1, d: 820 }); recoil(e.a); /* v361 : choc des lames (Gemini) + anneau d'or */ impactFlash(e.u, true); sparks(e.u, 'gold'); cam(e.u, -0.8); } else front(st, 'ally').forEach((x) => fxSheet(x.uid, 'fx-shelter', { k: 2.4, d: 900 })); /* v503 : attaque de zone évitée à temps : dôme */ banner(e.u ? 'Parade parfaite !' : 'À l’abri !', 'parry', 800); shake(false); await wait(T(420)); break;
         case 'fervor': fervorPop(e.d, e.why); draw(); break;
         case 'passive': app.sfx.passive?.(); passivePop(e.u, e.p); float(e.u, PASSIVES[e.p]?.name || '', 'syn'); await wait(T(320)); break;
         case 'brk': { const t = el(e.u)?.querySelector('.cb-brk i'); if (t) t.style.width = `${(e.brk / e.max) * 100}%`; break; }
@@ -1135,13 +1139,13 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   function seqFor(s) {
     const e = st.units[s.a];
     let q = KIND_RHYTHM[s.kind] || (intentInfo(st, e)?.aoe ? 'lx' : FAM_RHYTHM[e?.fam] || 'n');
-    if (e?.elite && !e.boss && q.length < 3 && !/[hH]/.test(q)) q += 'f';
+    if (e?.elite && !e.boss && q.length < 3 && !/[hHoO]/.test(q)) q += 'f';
     return q;
   }
   /* bilan d'une séquence pour le moteur : tout paré = parade ; un raté sur trois coups ou plus = esquive ; sinon touché */
   const verdict = (res) => defVerdict(res, getTune()); /* v594 : règle réglable au Labo des défenses */
   async function tipFor(q) {
-    for (const k of ['cb-def-tap', q.length > 1 && 'cb-def-combo', /[xH]/.test(q) && 'cb-def-feint'].filter(Boolean)) {
+    for (const k of [/[^oO]/.test(q) && 'cb-def-tap', /[oO]/.test(q) && 'cb-def-ring', q.length > 1 && 'cb-def-combo', /[xH]/.test(q) && 'cb-def-feint'].filter(Boolean)) {
       if (!g.s.tips?.[k]) await tuto(app, k);
       if (!alive_) return;
     }
@@ -1182,12 +1186,14 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   async function barQTE(s, q = 'n', { beat = 0, title = '' } = {}) {
     const e = st.units[s.a], T = getTune();
     perfMark(title ? 'Assaut de gardien' : 'barre de défense');
-    const tEls = s.kind === 'blast' || intentInfo(st, e)?.aoe ? front(st, 'ally').map((u) => el(u.uid)) : [el(s.t)];
+    const gU = st.units[s.t]?.guardBy && st.units[st.units[s.t].guardBy], realT = gU && gU.hp > 0 && front(st, 'ally').includes(gU) && gU.uid !== s.t ? gU.uid : s.t; /* v871 : le Protecteur qui interceptera */
+    const tEls = s.kind === 'blast' || intentInfo(st, e)?.aoe ? front(st, 'ally').map((u) => el(u.uid)) : [el(realT)];
     el(s.a)?.classList.add('aim'); tEls.forEach((x) => x?.classList.add('aimed'));
     const def = INTENTS[s.kind] || INTENTS.hit;
     const out = await playBar({ mid: $('.dv-mid'), dv: $('.dv'), letters: [...q], tier: e?.boss ? 'boss' : e?.elite ? 'elite' : 'normal',
       win: () => defenseWindow(st, s.a, s.t, T), beat, titleHTML: `${intentIcon(s.kind)} ${esc(title || `${def.name} !`)}`,
-      reduced, alive: () => alive_, setTap: (f) => { defTap = f; }, sfx: app.sfx, hap, T });
+      reduced, alive: () => alive_, setTap: (f) => { defTap = f; }, sfx: app.sfx, hap, T,
+      focus: () => (tEls.length > 1 ? $('.dv-row.ally') : tEls[0]) }); /* v871 : le cercle se pose sur la créature visée (sur la rangée pour un coup de zone) */
     el(s.a)?.classList.remove('aim'); tEls.forEach((x) => x?.classList.remove('aimed'));
     return out;
   }
@@ -1232,6 +1238,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       else if (s.qte && defMode !== 'off') {
         /* v558 : un conseil court à la première rencontre de chaque geste (tipFor), à la place du long texte cb-defense4 */
         if (!alive_) return;
+        { const ua = st.units[s.a], def0 = INTENTS[s.kind], bigK = ua?.boss ? BOSS_SHOT.has(s.kind) && !(ASSAULT_K.includes(s.kind) && BOSS_ASSAULT[st.bossKey]) : ua?.elite && (s.kind === 'heavy' || s.kind === 'blast');
+          if (ua?.boss && ASSAULT_K.includes(s.kind) && BOSS_ASSAULT[st.bossKey]) preShown = s.a; /* l'Assaut a sa propre annonce */
+          else if (bigK && def0) { const shot = await castFx(s.a, `${def0.name} !`, { ic: intentIcon(s.kind), foe: true }); if (!shot && (s.kind === 'heavy' || s.kind === 'blast')) banner(`${intentIcon(s.kind)} ${esc(def0.name)} !`, 'danger', 700); preShown = s.a; } } /* v871 : le coup s'annonce avant la défense, plus après */
         res = await defenseQTE(s);
         // v331 : après 3 défenses ratées dans l'expédition, on rappelle qu'il existe une défense assistée ou automatique (une seule fois)
         if (res === 'none') { run.defMiss = (run.defMiss || 0) + 1; if (run.defMiss >= 3 && !g.s.tips?.['def-help']) { g.s.tips = { ...(g.s.tips || {}), 'def-help': Date.now() }; toast('Les défenses sont difficiles ? Dans <b>Réglages → Jeu</b>, tu peux choisir la défense <b>automatique</b> (4 esquives sur 10, sans parade).', { icon: 'info', ms: 8000 }); } }

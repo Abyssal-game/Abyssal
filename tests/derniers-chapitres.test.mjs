@@ -7,8 +7,11 @@ test('réglage des ennemis : points reliés, bornes respectées', () => {
   assert.equal(lateSoft(1), FOE_EASE[0][1]); assert.ok(lateSoft(5) > 1, 'v502 : premiers étages relevés');
   assert.equal(lateSoft(100), FOE_EASE.at(-1)[1]); assert.equal(lateSoft(150), FOE_EASE.at(-1)[1]);
   assert.equal(bossEase(100), BOSS_EASE.at(-1)[1]);
-  for (let f = 1; f <= 100; f++) { assert.ok(lateSoft(f) > 0.5 && lateSoft(f) <= 1.9); assert.ok(bossEase(f) > 0.5 && bossEase(f) <= 1.6) /* v606 : gardien du 55 à ×1,54 */; }
+  for (let f = 1; f <= 100; f++) { assert.ok(lateSoft(f) > 0.5 && lateSoft(f) <= 2); assert.ok(bossEase(f) > 0.5 && bossEase(f) <= 1.8) /* v606 : gardien du 55 à ×1,54 ; v871 : recalage mesuré, gardien du 90 à ×1,72 */; }
 });
-test('la difficulté des combats ordinaires monte étage après étage (pas de marche arrière)', () => {
-  for (let f = 1; f < 100; f++) assert.ok(enemyScale(f + 1) * lateSoft(f + 1) >= enemyScale(f) * lateSoft(f), `étage ${f}`);
+/* v871 : la courbe suit la mesure des victoires (tools/campagne-sim.mjs) : la force brute peut baisser là où la composition
+   des ennemis faisait un mur (étages 12, 28), jamais de plus de 30 % d'un étage au suivant, et elle monte de bout en bout */
+test('la difficulté des combats ordinaires : pas de chute brutale, montée de bout en bout', () => {
+  for (let f = 1; f < 100; f++) assert.ok(enemyScale(f + 1) * lateSoft(f + 1) >= 0.7 * enemyScale(f) * lateSoft(f), `étage ${f}`);
+  assert.ok(enemyScale(99) * lateSoft(99) > 1.3 * enemyScale(20) * lateSoft(20));
 });

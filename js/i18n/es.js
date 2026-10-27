@@ -9443,6 +9443,13 @@ export default {
   "Barrière : absorbe encore {0} dégât.": "Barrera: absorbe {0} de daño más.",
   "Carapace de glace : absorbe {0} dégât": "Caparazón de hielo: absorbe {0} de daño",
   "Auto": "Auto",
+  "Le cercle des gros coups": "El círculo de los golpes fuertes",
+  "Un <b>gros coup</b> arrive : un <b>cercle se resserre</b> autour d’un sceau posé sur ta créature. Touche l’écran <b>au moment où il se referme sur le sceau</b> (il devient doré) : <b>parade parfaite</b>. Trop tôt : <b>défense partielle</b> (la moitié des dégâts). Trop tard : <b>touché</b>. Contre les élites et les gardiens, il va plus vite, et certains <b>hésitent</b> avant de se refermer.": "Llega un <b>golpe fuerte</b>: un <b>círculo se estrecha</b> alrededor de un sello colocado sobre tu criatura. Toca la pantalla <b>en el momento en que se cierra sobre el sello</b> (se vuelve dorado): <b>parada perfecta</b>. Demasiado pronto: <b>defensa parcial</b> (la mitad del daño). Demasiado tarde: <b>golpeado</b>. Contra élites y guardianes va más rápido, y algunos <b>dudan</b> antes de cerrarse.",
+  "Défense partielle": "Defensa parcial",
+  "Trop tôt…": "Demasiado pronto…",
+  "Trop tard…": "Demasiado tarde…",
+  "Touche quand le cercle se referme sur le sceau": "Toca cuando el círculo se cierre sobre el sello",
+  "Touche quand le cercle se referme sur le sceau · coup {0}/{1}": "Toca cuando el círculo se cierre sobre el sello · golpe {0}/{1}",
 };
 
 export const names = {

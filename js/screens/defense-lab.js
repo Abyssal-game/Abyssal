@@ -14,10 +14,10 @@ import { INTENTS } from '../core/skills.js';
 import { BOSSES } from '../core/bosses.js';
 import { VERSION } from '../config.js';
 
-const LETTERS = { n: 'Coup simple', f: 'Coup rapide', l: 'Coup lent', x: 'Feinte', m: 'Zone mobile', h: 'Coup chargé', H: 'Coup chargé avec feinte' };
+const LETTERS = { n: 'Coup simple', f: 'Coup rapide', l: 'Coup lent', x: 'Feinte', m: 'Zone mobile', h: 'Coup chargé', H: 'Coup chargé avec feinte', o: 'Cercle (gros coup)', O: 'Cercle rapide avec hésitation' }; /* v871 : o, O */
 const FAM = { predateur: 'Prédateur', assassin: 'Assassin', berserker: 'Berserker', protecteur: 'Garde du corps', mage: 'Mage', parasite: 'Parasite', controleur: 'Contrôleur', soutien: 'Instigateur', gardien: 'Gardien' };
 /* durée de base de la zone d'or selon l'attaque (defenseWindow) : on prend le type d'attaque qui correspond le mieux */
-const KIND_OF = { h: 'heavy', H: 'heavy' };
+const KIND_OF = { h: 'heavy', H: 'heavy', o: 'heavy', O: 'heavy' };
 const PARAMS = DEF_GROUPS.flatMap(([, list]) => list);
 const LN = (L) => LETTERS[L] || (CUSTOM_QTE[L] ? `n° ${L} ${CUSTOM_QTE[L].name || ''}` : L);
 const fmtV = (v, step) => (step < 1 ? (+v).toFixed(step < 0.1 ? 2 : 1).replace('.', ',') : String(Math.round(v)));
@@ -79,6 +79,7 @@ export function openDefenseLab(app, { seq = null } = {}) {
     const rows = [...new Set(q)].map((L) => { const w = winOf(L), feint = L === 'x' || L === 'H';
       const D = D0 * (L === 'f' ? t.multFast : L === 'l' ? t.multSlow : 1) * (feint ? t.multFeint : 1) * (beatOf() ? t.multBeat : 1);
       if (CUSTOM_QTE[L]) { const C = CUSTOM_QTE[L]; return `<span><b>${esc(LN(L))}</b> : passage ${Math.round(D0 * (C.speed || 1) * (C.feint ? t.multFeint : 1) * (C.bounce ? 1.6 : 1))} ms · zone d’or ×${C.zone || 1} · trait blanc ${Math.round((C.parry || 0.2) * 100)} % de la zone</span>`; }
+      if (L === 'o' || L === 'O') { const R = (tierOf() === 'boss' ? t.ringBoss : tierOf() === 'elite' ? t.ringElite : t.ringNormal) * (L === 'O' ? t.ringFast : 1); return `<span><b>${esc(LETTERS[L])}</b> : resserrement ${Math.round(R)} ms · parade ${Math.max(t.ringParryMin, Math.min(t.ringParryMax, Math.round(w.dodge * t.ringParry)))} ms</span>`; }
       return `<span><b>${esc(LETTERS[L])}</b> : passage ${Math.round(D)} ms · zone d’or ${w.dodge} ms · trait blanc ${w.parry} ms</span>`; });
     return `<div class="dl-info small">${rows.join('')}</div>`;
   }

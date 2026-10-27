@@ -1,32 +1,33 @@
 // v594 : la barre de défense, sortie de l'écran de combat (js/screens/duel-ui.js) pour que le Labo des défenses du Mode
 // Créateur joue exactement le même geste. Un passage du curseur par lettre de la séquence (n simple · f rapide · l lent ·
-// x feinte · m zone mobile · h chargé · H chargé avec feinte). Zone réglée en TEMPS (v388), toucher jugé sur l'image affichée
+// x feinte · m zone mobile · h chargé · H chargé avec feinte · v871 : o cercle · O cercle rapide avec hésitation). Zone réglée en TEMPS (v388), toucher jugé sur l'image affichée
 // à cet instant (v509). Retourne la liste des résultats ('parry' | 'dodge' | 'none'), un par coup.
 /* rythme des ennemis (déplacé de duel-ui.js en v594) */
 export const FAM_RHYTHM = { predateur: 'nf', assassin: 'ff', berserker: 'x', protecteur: 'n', mage: 'l', parasite: 'nf', controleur: 'm', soutien: 'n', gardien: 'nx' };
-export const KIND_RHYTHM = { tick2: 'ff', poison: 'nf', flurry: 'fff', grab: 'nx', chain: 'nnf', frost: 'm', heavy: 'h', gorge: 'h', execute: 'H', ambush: 'xf', blast: 'lx' };
+/* v871 : les gros coups se défendent au cercle (o : un cercle ; O : rapide, avec une hésitation ; oo : deux à la suite) */
+export const KIND_RHYTHM = { tick2: 'ff', poison: 'nf', flurry: 'fff', grab: 'nx', chain: 'nnf', frost: 'm', heavy: 'o', gorge: 'o', execute: 'oO', ambush: 'xf', blast: 'lo' };
 /* chaque gardien : nom de son Assaut et sa séquence (de 3 à 5 coups, rythme propre ; l'Horloger frappe en mesure) */
 export const BOSS_ASSAULT = {
-  devoreur: { name: 'La Faim sans fond', seq: 'fxh' },
+  devoreur: { name: 'La Faim sans fond', seq: 'fxo' },
   matriarche: { name: 'L’Hiver mordant', seq: 'mmx' },
   roi: { name: 'Le Reflet volé', seq: 'xnx' },
-  architecte: { name: 'L’Effondrement', seq: 'lxH' },
-  eclipse: { name: 'Éclipse totale', seq: 'mhx' },
+  architecte: { name: 'L’Effondrement', seq: 'lxO' },
+  eclipse: { name: 'Éclipse totale', seq: 'mox' },
   essaim: { name: 'La Nuée', seq: 'ffff' },
-  bourreau: { name: 'La Hache du Bourreau', seq: 'hxH' },
+  bourreau: { name: 'La Hache du Bourreau', seq: 'oxO' },
   choeur: { name: 'Le Chant des Noyés', seq: 'lmx' },
   chaines: { name: 'Les Mille Chaînes', seq: 'nnnf' },
   horloge: { name: 'L’Heure exacte', seq: 'nnnn', beat: 320 },
   miroirs: { name: 'Le Palais des Miroirs', seq: 'xxn' },
-  golem: { name: 'Avalanche de cendres', seq: 'llH' },
+  golem: { name: 'Avalanche de cendres', seq: 'llO' },
   peste: { name: 'Le Souffle gris', seq: 'mfx' },
   chasseur: { name: 'La Traque', seq: 'fxf' },
-  voeux: { name: 'Le Prix à payer', seq: 'nmh' },
-  titan: { name: 'Le Réveil du Titan', seq: 'Hxf' },
+  voeux: { name: 'Le Prix à payer', seq: 'nmo' },
+  titan: { name: 'Le Réveil du Titan', seq: 'Oxf' },
   jumeaux: { name: 'Crépuscule double', seq: 'ffxx' },
-  juge: { name: 'Le Jugement', seq: 'hnx' },
-  bete: { name: 'L’Apocalypse', seq: 'fxmH' },
-  abysse: { name: 'La Nuit sans fin', seq: 'xfmxH' },
+  juge: { name: 'Le Jugement', seq: 'onx' },
+  bete: { name: 'L’Apocalypse', seq: 'fxmO' },
+  abysse: { name: 'La Nuit sans fin', seq: 'xfmxO' },
 };
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -51,7 +52,7 @@ export function stampHost(dv) {
   return h;
 }
 
-export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titleHTML = '', reduced = false, alive = () => true, setTap, sfx = {}, hap = () => {}, T, onResult = null }) {
+export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titleHTML = '', reduced = false, alive = () => true, setTap, sfx = {}, hap = () => {}, T, onResult = null, focus = null }) {
   return new Promise((resolve) => {
     const n = letters.length, strong = tier !== 'normal';
     const bar = document.createElement('div');
@@ -70,6 +71,8 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
       setTimeout(() => { bar.remove(); mid.classList.remove('qte'); dv?.classList.remove('qte-on'); resolve(out); }, 260);
     };
     const pass = (i) => new Promise((done1) => {
+      bar.classList.toggle('ringing', letters[i] === 'o' || letters[i] === 'O');
+      if (letters[i] === 'o' || letters[i] === 'O') return passRing(i, letters[i], done1);
       if (CUSTOM_QTE[letters[i]]) return passCustom(i, { ...QTE_BRICKS, ...CUSTOM_QTE[letters[i]] }, done1);
       const L = letters[i], hold = false /* v596 : plus jamais « maintenir puis relâcher » (demande du propriétaire) : un coup chargé se défend d'un toucher */, feint = L === 'x' || L === 'H', moving = L === 'm' || (strong && L === 'n' && i % 2 === 1);
       const w = typeof win === 'function' ? win(L) : win;
@@ -106,7 +109,7 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
           stamp.innerHTML = `<b>${res === 'parry' ? 'Parade parfaite !' : res === 'dodge' ? 'Esquive !' : 'Touché…'}</b>`;
           stampHost(dv).appendChild(stamp); setTimeout(() => stamp.remove(), n > 1 ? 520 : 900);
         }
-        if (res === 'none') { sfx.miss?.(); } else if (i < n - 1) { (res === 'parry' ? sfx.parry : sfx.hit)?.(); } /* v705 : la vibration vient du son (raté, parade, coup) */ /* le dernier coup sonne avec son impact */
+        if (res === 'none') { sfx.miss?.(); } else (res === 'parry' ? sfx.parry : sfx.hit)?.(); /* v705 : la vibration vient du son (raté, parade, coup) */ /* v871 : le dernier coup aussi sonne au toucher (avant : jusqu'à 1 s plus tard, avec son impact) */
         out.push(res);
         onResult?.({ i, letter: L, res, ms: when != null && t0 ? Math.round(when - (t0 + tb)) : null, dodge: w.dodge, parry: w.parry, dur: Math.round(D) });
         done1();
@@ -152,6 +155,77 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
       const gap = i === 0 ? (reduced ? 500 : T.gapFirst) + Math.random() * T.gapFirstRand : beat || T.gapMin + Math.random() * T.gapRand; /* rythme irrégulier entre les coups (sauf l'Horloger) */
       setTimeout(() => { if (!fin && alive()) startRun(); else if (!alive()) end('none'); }, gap);
     });
+
+    /* v871 : deuxième défense, pour les gros coups (demande du propriétaire) : un cercle se contracte autour d'un sceau posé
+       sur la créature visée. Toucher trop tôt : défense partielle (esquive) ; au moment où il se referme sur le sceau : parade
+       parfaite ; trop tard : touché. Difficulté : vitesse selon l'ennemi (normal, élite, gardien) et le coup (O : plus rapide,
+       avec une hésitation), fenêtre de parade tirée de la fenêtre de défense (elle dépend aussi de l'écart de niveau entre ta
+       créature et l'attaquant), finesse du sceau à la mesure de cette fenêtre, et nombre de cercles à la suite (oo). */
+    const passRing = (i, L, done1) => {
+      const w = typeof win === 'function' ? win(L) : win, fast = L === 'O';
+      const D = (tier === 'boss' ? T.ringBoss : tier === 'elite' ? T.ringElite : T.ringNormal) * (fast ? T.ringFast : 1);
+      const pw = Math.max(T.ringParryMin, Math.min(T.ringParryMax, Math.round(w.dodge * T.ringParry))); /* fenêtre de parade (ms) */
+      const tb = D * 0.8, early = D * T.ringEarly; /* tb : le cercle touche le sceau ; avant « early » : beaucoup trop tôt */
+      const K = tier === 'normal' ? 1.15 : 1.45; /* il accélère vers la fin, plus contre les élites et les gardiens */
+      const ha = 0.42 + Math.random() * 0.12, hl = fast ? 0.16 + Math.random() * 0.08 : 0; /* hésitation (O) : il s'arrête un instant */
+      /* progression du cercle (0 → 1 au sceau → 1,3 après) avec l'éventuel arrêt */
+      const prog = (t) => {
+        let x = Math.max(0, t / tb);
+        if (hl) { x = x < ha ? x : x < ha + hl ? ha : x - hl; x = x / (1 - hl); }
+        return x <= 1 ? x ** K : 1 + (x - 1) * 1.2;
+      };
+      const S0 = 2.9, scaleAt = (t) => Math.max(0.45, S0 - (S0 - 1) * prog(t));
+      const host = stampHost(dv), fe = typeof focus === 'function' ? focus() : focus;
+      const hr = host.getBoundingClientRect(), fr = fe?.getBoundingClientRect?.() || (mid || host).getBoundingClientRect();
+      const size = Math.round(Math.max(72, Math.min(132, Math.min(fr.width, fr.height) * 0.74)));
+      const box = document.createElement('div'); box.className = `cbr${fast ? ' fast' : ''}`;
+      box.style.cssText = `left:${Math.round(fr.left - hr.left + fr.width / 2 - size / 2)}px;top:${Math.round(fr.top - hr.top + fr.height / 2 - size / 2)}px;width:${size}px;height:${size}px;--tw:${Math.max(2, Math.min(7, pw / 12)).toFixed(1)}px`;
+      box.innerHTML = '<span class="cbr-glow"></span><span class="cbr-seal"></span><span class="cbr-tgt"></span><span class="cbr-ring"></span>';
+      host.appendChild(box);
+      const ringEl = box.querySelector('.cbr-ring');
+      ringEl.style.transform = `scale(${S0})`;
+      pips[i]?.classList.add('now');
+      hint.textContent = 'Touche quand le cercle se referme sur le sceau' + (n > 1 ? ` · coup ${i + 1}/${n}` : '');
+      let t0 = 0, fin = false, raf = 0, lit = '', anim = null;
+      const end = (res, when = null, why = '') => {
+        if (fin) return; fin = true; cancelAnimationFrame(raf); setTap(null); letGo = null;
+        try { anim?.pause(); } catch (e) { /* rien */ }
+        box.classList.remove('pp', 'go'); box.classList.add(`r-${res}`);
+        bar.classList.remove('ok', 'ko', 'r-parry', 'r-dodge', 'r-none'); bar.classList.add(res === 'none' ? 'ko' : 'ok', `r-${res}`);
+        pips[i]?.classList.remove('now'); pips[i]?.classList.add(`r-${res}`);
+        const stamp = document.createElement('div'); stamp.className = `dv-stamp s-${res}${n > 1 ? ' small' : ''}`;
+        stamp.innerHTML = `<b>${res === 'parry' ? 'Parade parfaite !' : res === 'dodge' ? 'Défense partielle' : why === 'early' ? 'Trop tôt…' : 'Trop tard…'}</b>`;
+        stampHost(dv).appendChild(stamp); setTimeout(() => stamp.remove(), n > 1 ? 520 : 900);
+        if (res === 'none') { sfx.miss?.(); } else (res === 'parry' ? sfx.parry : sfx.hit)?.();
+        setTimeout(() => box.remove(), res === 'parry' ? 420 : 320);
+        out.push(res);
+        onResult?.({ i, letter: L, res, ms: when != null && t0 ? Math.round(when - (t0 + tb)) : null, dodge: Math.round(tb - early), parry: pw, dur: Math.round(D) });
+        done1();
+      };
+      const step = () => {
+        const t = performance.now() - t0, now = t >= tb - pw * 0.6 && t <= tb + pw * 0.4 ? 'pp' : t >= early ? 'go' : '';
+        if (now !== lit) { if (lit) box.classList.remove(lit); if (now) box.classList.add(now); lit = now; }
+        if (t >= D) end('none'); else raf = requestAnimationFrame(step);
+      };
+      const startRun = () => {
+        t0 = performance.now();
+        if (ringEl.animate) {
+          anim = ringEl.animate(Array.from({ length: 49 }, (_, k) => ({ offset: k / 48, transform: `scale(${scaleAt((k / 48) * D).toFixed(3)})` })), { duration: D, easing: 'linear', fill: 'forwards' });
+          anim.ready?.then(() => { if (!fin && typeof anim.startTime === 'number') t0 = anim.startTime; }).catch(() => {});
+        }
+        raf = requestAnimationFrame(step);
+      };
+      setTap((at) => {
+        if (!t0) return;
+        const now = performance.now(), when = (at && at <= now && now - at < 500 ? at : now) + (T.leadMs || 0), t = when - t0;
+        if (t < early) end('none', when, 'early');
+        else if (t < tb - pw * 0.6) end('dodge', when);
+        else if (t <= tb + pw * 0.4) end('parry', when);
+        else end('none', when, 'late');
+      });
+      const gap = i === 0 ? (reduced ? 500 : T.gapFirst) + Math.random() * T.gapFirstRand : T.gapMin + Math.random() * T.gapRand;
+      setTimeout(() => { if (!fin && alive()) startRun(); else if (!alive()) end('none'); }, gap);
+    };
     /* défense inventée : même barre, positions calculées par la fonction posAt (sens, rebond), jugement au temps */
     const passCustom = (i, C, done1) => {
       const hold = C.base === 'hold', w0 = typeof win === 'function' ? win('n') : win;
@@ -184,7 +258,7 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
         const stamp = document.createElement('div'); stamp.className = `dv-stamp s-${res}${n > 1 ? ' small' : ''}`;
         stamp.innerHTML = `<b>${res === 'parry' ? 'Parade parfaite !' : res === 'dodge' ? 'Esquive !' : 'Touché…'}</b>`;
         stampHost(dv).appendChild(stamp); setTimeout(() => stamp.remove(), n > 1 ? 520 : 900);
-        if (res === 'none') { sfx.miss?.(); } else if (i < n - 1) { (res === 'parry' ? sfx.parry : sfx.hit)?.(); } /* v705 : la vibration vient du son (raté, parade, coup) */
+        if (res === 'none') { sfx.miss?.(); } else (res === 'parry' ? sfx.parry : sfx.hit)?.(); /* v705 : la vibration vient du son (raté, parade, coup) */
         out.push(res);
         onResult?.({ i, letter: letters[i], res, ms: when != null && t0 ? Math.round(when - (t0 + tb)) : null, dodge, parry, dur: Math.round(D) });
         done1();

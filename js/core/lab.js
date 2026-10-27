@@ -100,7 +100,8 @@ export function labSimulate(g, opts, n = 20, def = 'mid') {
    notes : [{ floor, room, hp, atk, note }] ; valeur retenue d'une note = force essayée × multiplicateur de la note.
    Pour chaque famille (« foe » = combats et élites, « boss » = gardiens) : points reliés en ligne droite entre les étages
    notés (au-delà : la valeur du point le plus proche), puis la force réelle des ennemis (échelle de l'étage × réglage du jeu
-   × courbe) des combats ne doit jamais baisser d'un étage au suivant : si une note la fait baisser, la courbe est relevée au minimum. */
+   × courbe) des combats ne doit jamais baisser d'un étage au suivant plus que le réglage du jeu lui-même (v871 : FOE_EASE, recalé à la
+   mesure, baisse à quelques étages où la composition des ennemis faisait un mur) : si une note la fait baisser, la courbe est relevée au minimum. */
 export const noteValue = (n) => ({ hp: n.hp * (LAB_NOTES[n.note]?.[1] ?? 1), atk: n.atk * (LAB_NOTES[n.note]?.[1] ?? 1) });
 const lerp = (pts, f) => {
   if (!pts.length) return 1;
@@ -127,7 +128,8 @@ export function fitCurve(notes) {
       let m = lerp(pts[k][s], f);
       if (k === 'boss') { out[k][s].push(m); continue; } /* gardiens : chacun a sa propre force (pas de règle de progression), la courbe suit seulement les notes */
       const real = base(f, k) * m;
-      if (real < prev - 1e-9) { const m2 = prev / base(f, k); out.raised.push(`${k === 'boss' ? 'Gardien' : 'Combat'} ${s === 'hp' ? 'PV' : 'ATQ'} étage ${f} : ${m.toFixed(2)} → ${m2.toFixed(2)}`); m = m2; }
+      const floorMin = f > 1 ? prev * Math.min(1, base(f, k) / base(f - 1, k)) : 0;
+      if (real < floorMin - 1e-9) { const m2 = floorMin / base(f, k); out.raised.push(`${k === 'boss' ? 'Gardien' : 'Combat'} ${s === 'hp' ? 'PV' : 'ATQ'} étage ${f} : ${m.toFixed(2)} → ${m2.toFixed(2)}`); m = m2; }
       prev = base(f, k) * m;
       out[k][s].push(m);
     }

@@ -42,7 +42,7 @@ test('courbe : passe par les notes, jamais de baisse de force d’un étage au s
   const c = fitCurve([{ floor: 10, room: 'fight', hp: 1.2, atk: 1, note: 'ok' }, { floor: 30, room: 'fight', hp: 1, atk: 1, note: 'easy2' }, { floor: 31, room: 'fight', hp: 0.5, atk: 0.5, note: 'ok' }]);
   assert.ok(Math.abs(c.foe.hp[9] - 1.2) < 1e-9);
   assert.ok(Math.abs(c.foe.hp[29] - 1.25) < 1e-9);
-  for (let f = 2; f <= 100; f++) assert.ok(enemyScale(f) * lateSoft(f) * c.foe.hp[f - 1] >= enemyScale(f - 1) * lateSoft(f - 1) * c.foe.hp[f - 2] - 1e-9, `étage ${f}`);
+  for (let f = 2; f <= 100; f++) assert.ok(c.foe.hp[f - 1] >= c.foe.hp[f - 2] * Math.min(1, (enemyScale(f) * lateSoft(f)) / (enemyScale(f - 1) * lateSoft(f - 1))) - 1e-9 || enemyScale(f) * lateSoft(f) * c.foe.hp[f - 1] >= enemyScale(f - 1) * lateSoft(f - 1) * c.foe.hp[f - 2] - 1e-9, `étage ${f}`); /* v871 : jamais de baisse au-delà de celle du réglage du jeu */
   assert.ok(c.raised.length > 0, 'la baisse à l’étage 31 est corrigée');
   assert.deepEqual(c.at(5, 'boss'), { hp: 1, atk: 1 });
 });

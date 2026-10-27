@@ -9455,6 +9455,13 @@ export default {
   "Barrière : absorbe encore {0} dégât.": "Barrier: absorbs {0} more damage.",
   "Carapace de glace : absorbe {0} dégât": "Ice carapace: absorbs {0} damage",
   "Auto": "Auto",
+  "Le cercle des gros coups": "The circle of heavy blows",
+  "Un <b>gros coup</b> arrive : un <b>cercle se resserre</b> autour d’un sceau posé sur ta créature. Touche l’écran <b>au moment où il se referme sur le sceau</b> (il devient doré) : <b>parade parfaite</b>. Trop tôt : <b>défense partielle</b> (la moitié des dégâts). Trop tard : <b>touché</b>. Contre les élites et les gardiens, il va plus vite, et certains <b>hésitent</b> avant de se refermer.": "A <b>heavy blow</b> is coming: a <b>circle tightens</b> around a seal placed on your creature. Tap the screen <b>the moment it closes on the seal</b> (it turns golden): <b>perfect parry</b>. Too early: <b>partial defense</b> (half the damage). Too late: <b>hit</b>. Against elites and guardians it moves faster, and some <b>hesitate</b> before closing.",
+  "Défense partielle": "Partial defense",
+  "Trop tôt…": "Too early…",
+  "Trop tard…": "Too late…",
+  "Touche quand le cercle se referme sur le sceau": "Tap when the circle closes on the seal",
+  "Touche quand le cercle se referme sur le sceau · coup {0}/{1}": "Tap when the circle closes on the seal · strike {0}/{1}",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

@@ -8838,3 +8838,22 @@ table.odds th, table.odds td { white-space: normal; }
 body:has(.prog-chip.docked.in) #topbar .top-meta { opacity: 0; }
 /* v870 : fiche d'une carte : la croix de fermeture (fixe en haut à droite) ne recouvre plus l'onglet « Rareté » quand les onglets arrivent en haut */
 .sheet-full .dt-tabs { margin-right: 50px; }
+/* v871 : deuxième défense, le cercle des gros coups (js/ui/def-bar.js passRing) : un anneau se resserre sur un sceau posé sur la créature visée */
+.cbr { position: absolute; z-index: 5; pointer-events: none; }
+.cbr > span { position: absolute; inset: 0; border-radius: 50%; }
+.cbr-glow { background: radial-gradient(circle, rgba(242, 193, 78, .22), rgba(8, 9, 13, 0) 68%); }
+.cbr-seal { inset: 22% !important; background: url(../assets/icons/seal.webp) center / contain no-repeat; filter: drop-shadow(0 0 8px rgba(0, 0, 0, .9)); opacity: .95; }
+.cbr-tgt { inset: 20% !important; border: var(--tw, 3px) solid rgba(242, 193, 78, .75); box-shadow: 0 0 10px rgba(242, 193, 78, .55), inset 0 0 8px rgba(242, 193, 78, .35); }
+.cbr-ring { inset: 20% !important; border: 3px solid #F4EEE2; box-shadow: 0 0 12px rgba(255, 255, 255, .6); will-change: transform; }
+.cbr.fast .cbr-ring { border-color: #FFB4BE; box-shadow: 0 0 12px rgba(255, 90, 110, .7); }
+.cbr.go .cbr-ring { border-color: #FFE7A6; }
+.cbr.pp .cbr-ring { border-color: #F2C14E; box-shadow: 0 0 20px rgba(242, 193, 78, 1); }
+.cbr.pp .cbr-tgt { border-color: #FFF4CC; }
+.cbr.r-parry .cbr-tgt, .cbr.r-parry .cbr-ring { border-color: #FFF4CC; box-shadow: 0 0 26px rgba(242, 193, 78, 1); }
+.cbr.r-parry { animation: cbrWin .42s ease-out forwards; }
+.cbr.r-none .cbr-ring, .cbr.r-none .cbr-tgt { border-color: #FF5A6E; box-shadow: 0 0 16px rgba(255, 60, 80, .8); }
+.cbr.r-dodge .cbr-ring { border-color: #9FE0FF; }
+.cbr.r-none, .cbr.r-dodge { animation: cbrOut .32s ease-out forwards; }
+@keyframes cbrWin { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.35); opacity: 0; } }
+@keyframes cbrOut { to { opacity: 0; } }
+.cb-def.ringing .dv-dodge-bar { visibility: hidden; }
