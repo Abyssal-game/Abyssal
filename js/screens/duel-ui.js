@@ -100,7 +100,6 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       <button class="btn small ghost" data-d="help" aria-label="Règles du combat">?</button>
       <button class="btn small ghost cb-pass dv-end" data-d="end" aria-label="Passer le tour" title="Passer le tour"><img class="cb-pass-i" alt="" src="assets/ui/cb-passer2.webp" onerror="this.remove()"><span class="cb-pass-f">${icon('skip')}</span></button>
       <button class="btn small ghost" data-d="quit" aria-label="Pause">${icon('close')}</button></span></div>
-    ${run.chasse ? '<div class="gc-hud" aria-live="polite"></div>' : ''}
     <div class="cb-tl" aria-label="Ordre des tours"></div>
     <div class="cb-feed" aria-live="polite"></div>
     <div class="dv-row enemy"></div>
@@ -312,7 +311,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   function draw() {
     moodTick();
     if (!alive_) return;
-    if (st.huntMax) { const h = $('.gc-hud'); if (h) h.innerHTML = `<span>${icon('hourglass')} ${tr('Tour {r} / {m}', { r: Math.min(st.round, st.huntMax), m: st.huntMax })}</span><span>${icon('swords')} ${tr('Dégâts : {n}', { n: fmt(st.huntDmg || 0) })}</span>`; } /* v858 : Grande Chasse */
+    if (st.huntMax) { const h = $('.dv-top > b'); if (h) { h.classList.add('gc-hud'); h.innerHTML = `<span>${tr('Tour {r} / {m}', { r: Math.min(st.round, st.huntMax), m: st.huntMax })}</span><span>${icon('swords')}${fmt(st.huntDmg || 0)}</span>`; } } /* v858 : Grande Chasse ; v860 : dans le titre (il prenait de la hauteur aux cartes) */
     perfMark('dessin');
     // v262 : la créature dont c'est le tour est toujours celle qui est choisie
     if (st.init && st.turn === 'ally' && !st.over) sel = st.actor; else if (st.init) sel = null;

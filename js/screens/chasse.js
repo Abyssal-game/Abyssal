@@ -103,7 +103,7 @@ export default function chasse(app, root) {
 
   function list() {
     const c = g.chasse(), key = g.chasseBoss();
-    root.innerHTML = `<header class="screen-head dc-head ui-hero bn-trial gc-head"><h1>${t('La Grande Chasse')}</h1><p class="muted">${t('Une bête pour tous les joueurs. Chacun la blesse, ensemble on l’abat.')}</p></header>
+    root.innerHTML = `<header class="screen-head dc-head ui-hero gc-head gc-hero" style="--bn:url(${new URL(huntArt(cat, key), document.baseURI).href})"><h1>${t('La Grande Chasse')}</h1><p class="muted">${t('Une bête pour tous les joueurs. Chacun la blesse, ensemble on l’abat.')}</p></header>
       ${ui.result ? resultHTML(ui.result) : ''}
       ${claimHTML(c)}
       ${bossHTML(key)}
@@ -142,8 +142,7 @@ export default function chasse(app, root) {
     const run = g.chasseRun();
     if (!run) return list();
     playing = true;
-    const B = BOSSES[run.battle.bossKey];
-    battle = runDuel(app, root, { title: `${t('La Grande Chasse')} · ${B.name}`, run, pause: t('Combat en pause : il t’attend dans la Grande Chasse.'),
+    battle = runDuel(app, root, { title: t('La Grande Chasse'), run, pause: t('Combat en pause : il t’attend dans la Grande Chasse.'),
       onAbandon: () => abandon(),
       onPause: () => { if (battle) { battle.stop(); battle = null; } playing = false; ui.paused = true; app.chrome(); render(); window.scrollTo(0, 0); },
       onEnd: () => {
