@@ -30,8 +30,8 @@ Ton : tutoiement partout (es « tú », de « du », it « tu », pt « você »
 | Classement / Saison | Clasificación / Temporada | Rangliste / Saison | Classifica / Stagione | Ranking / Temporada |
 | Missions du jour / Offrande / Coffre de la semaine | Misiones del día / Ofrenda / Cofre semanal | Tagesmissionen / Opfergabe / Wochentruhe | Missioni del giorno / Offerta / Forziere settimanale | Missões do dia / Oferenda / Baú semanal |
 | carte / créature | carta / criatura | Karte / Kreatur | carta / creatura | carta / criatura |
-| booster / ticket | sobre / vale | Booster / Ticket | busta / biglietto | pacote / tíquete |
-| Booster de l'Abysse / des Alliances / premium | Sobre del Abismo / de las Alianzas / prémium | Abgrund-Booster / Allianz-Booster / Premium-Booster | Busta dell'Abisso / delle Alleanze / premium | Pacote do Abismo / das Alianças / premium |
+| booster / ticket | booster / vale | Booster / Ticket | booster (m., invariable) / biglietto | booster / tíquete |
+| Booster de l'Abysse / des Alliances / premium | Booster del Abismo / de las Alianzas / prémium | Abgrund-Booster / Allianz-Booster / Premium-Booster | Booster dell'Abisso / delle Alleanze / premium | Booster do Abismo / das Alianças / premium |
 | Tirage des Ombres | Tirada de las Sombras | Schattenziehung | Estrazione delle Ombre | Sorteio das Sombras |
 | coffre de bois / fer / or / abyssal | cofre de madera / hierro / oro / abisal | Holz- / Eisen- / Gold- / Abgrundtruhe | forziere di legno / ferro / oro / abissale | baú de madeira / ferro / ouro / abissal |
 | doubles | duplicados | Duplikate | doppioni | repetidas |
@@ -58,7 +58,7 @@ Ton : tutoiement partout (es « tú », de « du », it « tu », pt « você »
 | Victoire / Défaite / Abandonner | Victoria / Derrota / Rendirse | Sieg / Niederlage / Aufgeben | Vittoria / Sconfitta / Arrenditi | Vitória / Derrota / Desistir |
 | Duels des Sceaux / Sceau | Duelos de Sellos / Sello | Siegelduelle / Siegel | Duelli dei Sigilli / Sigillo | Duelos dos Selos / Selo |
 | Le Pacte / Les Cryptes / Les Enchères de Mammon | El Pacto / Las Criptas / La Subasta de Mammon | Der Pakt / Die Krypten / Mammons Auktion | Il Patto / Le Cripte / L'Asta di Mammon | O Pacto / As Criptas / O Leilão de Mammon |
-| Le Pari des Boosters | La Apuesta de los Sobres | Die Booster-Wette | La Scommessa delle Buste | A Aposta dos Pacotes |
+| Le Choc des Boosters (ex-Pari) | La Batalla de los Boosters | Die Booster-Schlacht | La Sfida dei Booster | A Batalha dos Boosters |
 | haut fait / revanche implacable / défi du jour | hazaña / revancha implacable / desafío del día | Heldentat / gnadenlose Revanche / Tagesherausforderung | impresa / rivincita implacabile / sfida del giorno | façanha / revanche implacável / desafio do dia |
 | Inviolable / Ardeur / Cases sacrées / Identique / Somme / Classique | Inviolable / Ardor / Casillas sagradas / Igual / Suma / Clásica | Unantastbar / Glut / Heilige Felder / Gleich / Summe / Klassisch | Inviolabile / Ardore / Caselle sacre / Identico / Somma / Classica | Inviolável / Ardor / Casas sagradas / Igual / Soma / Clássica |
 | partie rapide / partie lente | partida rápida / partida lenta | schnelle Partie / langsame Partie | partita rapida / partita lenta | partida rápida / partida lenta |
