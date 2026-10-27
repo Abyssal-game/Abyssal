@@ -25,7 +25,7 @@ import { t, tw } from '../i18n.js';
 
 /* v833 : « Le butin de la table » (retour à l'idée de départ du propriétaire) */
 const HOW = () => [['p:seal', '#E8C35A', 'Un jeton par partie', 'Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour ({m} en réserve au plus) ; le coffre de la semaine, le Tournoi du Cercle et le Codex en donnent d’autres. Les jetons ne s’achètent pas.', { m: CHOC.tokensMax }],
-  ['booster', '#C9A45A', 'Les boosters s’ouvrent', 'Toi et ton adversaire ouvrez trois boosters chacun, en même temps. Les cartes tombent sur la table : elles ne sont encore à personne. Le samedi et le dimanche, le troisième booster est un booster premium.'],
+  ['booster', '#C9A45A', 'Les boosters s’ouvrent', 'Toi et ton adversaire ouvrez trois boosters chacun, en même temps. Les cartes tombent sur la table : elles ne sont encore à personne. Le samedi, le troisième booster est un booster premium. Le dimanche, les trois boosters sont tirés au hasard (standard, faction, Alliances ou premium), les mêmes pour les deux joueurs.'],
   ['crown', '#F2C14E', 'Les points', 'Commune {c}, Peu commune {pc}, Rare {r}, Hyper rare {hr}, Mythique {mm}, Secrète {ss}, +{v} avec une finition.', { c: LUCK_POINTS.C, pc: LUCK_POINTS.PC, r: LUCK_POINTS.R, hr: LUCK_POINTS.HR, mm: LUCK_POINTS.M, ss: LUCK_POINTS.S, v: LUCK_POINTS.variant }],
   ['swords', '#E0485E', 'Le butin de la table', 'Le meilleur total rafle toutes les cartes de la table : les siennes et celles de l’adversaire. Le perdant repart les mains vides. Égalité : chacun garde les siennes.'],
   ['cards', '#7FE0A0', 'Rien à perdre de ta collection', 'Tu ne mises rien : ni éclats, ni cartes de ta collection. Seules les cartes ouvertes pendant la partie sont en jeu.'],
@@ -34,7 +34,18 @@ const HOW = () => [['p:seal', '#E8C35A', 'Un jeton par partie', 'Chaque partie c
 const howLi = ([ic, c, ti, d, p], i) => `<li style="--hc:${c}"><span class="how-ic">${picon(ic.startsWith('p:') ? ic.slice(2) : ic)}<em>${i + 1}</em></span><span><b>${t(ti)}</b><span class="small">${t(d, p)}</span></span></li>`;
 export const chocHowHTML = () => `<ol class="how-steps">${HOW().map((x, i) => howLi(x, i)).join('')}</ol>`;
 /* v834 : le samedi et le dimanche (heure de Paris, comme le serveur), le 3e booster de chacun est premium */
-export const chocWeekend = (now = Date.now()) => { try { const w = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Paris', weekday: 'short' }).format(new Date(now)); return w === 'Sat' || w === 'Sun'; } catch (e) { const d = new Date(now).getDay(); return d === 0 || d === 6; } };
+export const chocDayKind = (now = Date.now()) => { let w; try { w = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Paris', weekday: 'short' }).format(new Date(now)); } catch (e) { w = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][new Date(now).getDay()]; } return w === 'Sat' ? 'premium' : w === 'Sun' ? 'mystere' : 'normal'; };
+/* v837 : le dimanche, 3 boosters tirés au hasard (même tirage que le serveur, choc_lineup), les mêmes pour les deux joueurs */
+const FACS = ['infernal', 'abyssal', 'celeste', 'sauvage', 'necrotique', 'primordial', 'artificiel'];
+export function chocLineup(kind, r = Math.random) {
+  if (kind === 'premium') return [{ type: 'standard' }, { type: 'standard' }, { type: 'premium' }];
+  if (kind !== 'mystere') return [{ type: 'standard' }, { type: 'standard' }, { type: 'standard' }];
+  return [0, 1, 2].map(() => { const x = r() * 100;
+    if (x < 35) return { type: 'standard' };
+    if (x < 60) return { type: 'faction', faction: FACS[Math.floor(r() * FACS.length)] };
+    if (x < 75) { const f = FACS.slice(), a = f.splice(Math.floor(r() * f.length), 1)[0]; return { type: 'event', factions: [a, f[Math.floor(r() * f.length)]] }; }
+    return { type: 'premium' }; });
+}
 const CHEST_NAME = Object.fromEntries(Object.entries(CHESTS).map(([k, c]) => [k, c.name]));
 const OFF = 'Le Choc des Boosters n’est pas encore ouvert sur le serveur.';
 const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
@@ -52,9 +63,15 @@ export default function versusScreen(app, root) {
     return `<header class="screen-head ui-hero bn-versus"><h1>${t('Le Choc des Boosters')}</h1><p class="muted">${t('Trois boosters chacun, ouverts en même temps. Le meilleur total rafle toute la table.')}</p></header>
       <section class="panel kc-tok"><div class="kc-toks">${Array.from({ length: Math.max(CHOC.tokensMax, n) }, (_, i) => `<span class="kc-tk ${i < n ? 'on' : ''}"><img alt="" src="assets/jeux/kc-jeton.webp" onerror="this.onerror=null;this.src='assets/icons/seal.webp'"></span>`).join('')}</div>
         <span><b>${t(n > 1 ? '{n} jetons du Choc' : '{n} jeton du Choc', { n })}</b><small>${n < CHOC.tokensMax ? t('Un nouveau jeton chaque jour (jusqu’à {m}).', { m: CHOC.tokensMax }) : t('Réserve pleine : joue pour ne pas perdre le jeton de demain.')}</small></span></section>
-      ${chocWeekend(g.clock()) ? `<section class="panel kc-wkd"><img alt="" src="assets/packs/premium.webp" onerror="this.remove()"><span><b>${t('Week-end premium')}</b><small>${t('Aujourd’hui, le troisième booster de chacun est un booster premium.')}</small></span></section>` : ''}
+      ${dayBanner()}
       ${leagueHTML()}
       ${hallTileHTML(cat)}`;
+  }
+  function dayBanner() {
+    const k = chocDayKind(g.clock());
+    if (k === 'premium') return `<section class="panel kc-wkd"><img alt="" src="assets/packs/premium.webp" onerror="this.remove()"><span><b>${t('Samedi premium')}</b><small>${t('Aujourd’hui, le troisième booster de chacun est un booster premium.')}</small></span></section>`;
+    if (k === 'mystere') return `<section class="panel kc-wkd kc-myst"><span class="kc-myst-q">?</span><span><b>${t('Dimanche mystère')}</b><small>${t('Aujourd’hui, les trois boosters sont tirés au hasard à chaque partie : standard, faction, Alliances ou premium. Les mêmes pour les deux joueurs.')}</small></span></section>`;
+    return '';
   }
   const monthName = (m) => `${t(MONTHS[+m.slice(5, 7) - 1] || '')} ${m.slice(0, 4)}`;
   function leagueHTML() {
@@ -155,10 +172,10 @@ export default function versusScreen(app, root) {
   const pack = () => drawBooster('standard', cat).cards.map((c) => ({ id: c.id, rarity: c.rarity, variant: c.variant || 'normal', faction: cat.get(c.id)?.faction }));
   /* v833 : entraînement du butin de la table : boosters tirés sur le téléphone, rien n'est gagné ni perdu */
   function startTrain() {
-    const types = ['standard', 'standard', chocWeekend(g.clock()) ? 'premium' : 'standard'];
-    const pk = (ty = 'standard') => drawBooster(ty, cat).cards.map((c) => { const x = { id: c.id, rarity: c.rarity, variant: c.variant || 'normal' }; return { ...x, pts: cardPts(x) }; });
-    const a = types.map(pk), b = types.map(pk), sum = (p) => p.flat().reduce((n, c) => n + c.pts, 0);
-    const r = { my_cards: a.flat(), their_cards: b.flat(), lineup: types.map((type) => ({ type })), my_score: sum(a), their_score: sum(b) };
+    const lineup = chocLineup(chocDayKind(g.clock()));
+    const pk = (it) => drawBooster(it.type, cat, it.type === 'faction' ? { faction: it.faction } : it.type === 'event' ? { event: { factions: it.factions } } : {}).cards.map((c) => { const x = { id: c.id, rarity: c.rarity, variant: c.variant || 'normal' }; return { ...x, pts: cardPts(x) }; });
+    const a = lineup.map(pk), b = lineup.map(pk), sum = (p) => p.flat().reduce((n, c) => n + c.pts, 0);
+    const r = { my_cards: a.flat(), their_cards: b.flat(), lineup, my_score: sum(a), their_score: sum(b) };
     playDuel(app, r, null, { foeName: t('L’Abysse'), myAvatar: g.shownAvatar() || sync.profile?.avatar, table: true, train: true });
   }
   async function trainPlay(i, f) {
@@ -179,7 +196,7 @@ export default function versusScreen(app, root) {
   let showing = null;
   function tableR(v) {
     const me = v.me, foe = me === 'a' ? 'b' : 'a', st = v.state;
-    return { my_cards: st.packs[me].flat(), their_cards: st.packs[foe].flat(), lineup: st.packs[me].map((_, i) => ({ type: st.types?.[i] === 'premium' ? 'premium' : 'standard' })),
+    return { my_cards: st.packs[me].flat(), their_cards: st.packs[foe].flat(), lineup: Array.isArray(st.lineup) && st.lineup.length === st.packs[me].length ? st.lineup : st.packs[me].map((_, i) => ({ type: st.types?.[i] === 'premium' ? 'premium' : 'standard' })),
       avatar: v.foe?.avatar, my_score: st.total[me], their_score: st.total[foe], sachet: v.foe?.sachet, choc: v.foe?.choc };
   }
   async function tableShow(v, ctx) {

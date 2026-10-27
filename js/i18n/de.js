@@ -8902,6 +8902,10 @@ export default {
   "Égalité : chacun a gardé ses cartes.": "Unentschieden: Jeder hat seine Karten behalten.",
   "{n} parties jouées": "{n} Partien gespielt",
   "{n} partie jouée": "{n} Partie gespielt",
+  "Samedi premium": "Premium-Samstag",
+  "Dimanche mystère": "Mysteriöser Sonntag",
+  "Aujourd’hui, les trois boosters sont tirés au hasard à chaque partie : standard, faction, Alliances ou premium. Les mêmes pour les deux joueurs.": "Heute werden die drei Booster in jeder Partie zufällig gezogen: Standard, Fraktion, Allianzen oder Premium. Für beide Spieler dieselben.",
+  "Toi et ton adversaire ouvrez trois boosters chacun, en même temps. Les cartes tombent sur la table : elles ne sont encore à personne. Le samedi, le troisième booster est un booster premium. Le dimanche, les trois boosters sont tirés au hasard (standard, faction, Alliances ou premium), les mêmes pour les deux joueurs.": "Du und dein Gegner öffnet gleichzeitig je drei Booster. Die Karten fallen auf den Tisch: Noch gehören sie niemandem. Samstags ist der dritte Booster ein Premium-Booster. Sonntags werden die drei Booster zufällig gezogen (Standard, Fraktion, Allianzen oder Premium), für beide Spieler dieselben.",
 };
 
 export const names = {

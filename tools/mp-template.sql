@@ -641,26 +641,50 @@ revoke execute on function public.choc_init() from public, anon, authenticated;
 -- points (même barème que l'ancien Pari : C 1, PC 2, R 6, HR 20, M 80, S 200, +8 avec une finition) rafle toutes les cartes
 -- de la table ; le perdant repart les mains vides. Égalité : chacun garde les siennes. Aucune mise : l'entrée est un jeton
 -- gratuit, jamais vendu. La partie est jouée dès que les deux joueurs sont là (le serveur ouvre et compte tout).
--- v834 : le samedi et le dimanche (heure de Paris), le 3e booster de chacun est un booster premium (« week-end premium »).
+-- v834 / v837 : le samedi (heure de Paris), le 3e booster de chacun est premium ; le dimanche, « boosters mystère » :
+-- les 3 boosters sont tirés au hasard (standard 35 %, faction 25 %, Alliances 15 %, premium 25 %), les mêmes pour les deux joueurs.
 drop function if exists public.choc_tpack();
-create or replace function public.choc_tpack(p_type text default 'standard') returns jsonb language sql volatile security definer set search_path = public as $$
+drop function if exists public.choc_tpack(text);
+drop function if exists public.choc_weekend();
+create or replace function public.choc_tpack(p_type text default 'standard', p_faction text default null, p_factions text[] default null) returns jsonb language sql volatile security definer set search_path = public as $$
   select coalesce(jsonb_agg(jsonb_build_object('id', x ->> 'id', 'rarity', x ->> 'rarity', 'variant', x ->> 'variant', 'pts', (x ->> 'pts')::int, 'faction', c.faction) order by o), '[]')
-  from jsonb_array_elements(public.versus_pack(case when p_type = 'premium' then 'premium' else 'standard' end, null, null)) with ordinality e(x, o) join public.shadow_cards c on c.id = x ->> 'id'
+  from jsonb_array_elements(public.versus_pack(case when p_type in ('premium', 'faction', 'event') then p_type else 'standard' end, p_faction, p_factions)) with ordinality e(x, o) join public.shadow_cards c on c.id = x ->> 'id'
 $$;
-revoke execute on function public.choc_tpack(text) from public, anon, authenticated;
-create or replace function public.choc_weekend() returns boolean language sql stable set search_path = public as $$
-  select extract(isodow from (now() at time zone 'Europe/Paris')) in (6, 7)
+revoke execute on function public.choc_tpack(text, text, text[]) from public, anon, authenticated;
+create or replace function public.choc_daykind() returns text language sql stable set search_path = public as $$
+  select case extract(isodow from (now() at time zone 'Europe/Paris')) when 6 then 'premium' when 7 then 'mystere' else 'normal' end
 $$;
-revoke execute on function public.choc_weekend() from public, anon, authenticated;
-create or replace function public.choc_table() returns jsonb language plpgsql volatile security definer set search_path = public as $$
-declare we boolean := public.choc_weekend(); t3 text := case when public.choc_weekend() then 'premium' else 'standard' end;
-  pa jsonb := jsonb_build_array(public.choc_tpack(), public.choc_tpack(), public.choc_tpack(t3));
-  pb jsonb := jsonb_build_array(public.choc_tpack(), public.choc_tpack(), public.choc_tpack(t3)); ta int; tb int;
+revoke execute on function public.choc_daykind() from public, anon, authenticated;
+create or replace function public.choc_lineup(p_kind text) returns jsonb language plpgsql volatile security definer set search_path = public as $$
+declare out jsonb := '[]'::jsonb; k int; x float8; fs text[] := array(select distinct faction from public.shadow_cards order by 1); f text[];
 begin
+  if p_kind = 'premium' then return '[{"type":"standard"},{"type":"standard"},{"type":"premium"}]'::jsonb; end if;
+  if p_kind <> 'mystere' then return '[{"type":"standard"},{"type":"standard"},{"type":"standard"}]'::jsonb; end if;
+  for k in 1..3 loop
+    x := random() * 100;
+    if x < 35 then out := out || jsonb_build_array(jsonb_build_object('type', 'standard'));
+    elsif x < 60 then out := out || jsonb_build_array(jsonb_build_object('type', 'faction', 'faction', fs[1 + floor(random() * array_length(fs, 1))::int]));
+    elsif x < 75 then
+      f := array(select y from unnest(fs) y order by random() limit 2);
+      out := out || jsonb_build_array(jsonb_build_object('type', 'event', 'factions', to_jsonb(f)));
+    else out := out || jsonb_build_array(jsonb_build_object('type', 'premium')); end if;
+  end loop;
+  return out;
+end $$;
+revoke execute on function public.choc_lineup(text) from public, anon, authenticated;
+create or replace function public.choc_table() returns jsonb language plpgsql volatile security definer set search_path = public as $$
+declare dk text := public.choc_daykind(); lu jsonb := public.choc_lineup(public.choc_daykind()); it jsonb;
+  pa jsonb := '[]'::jsonb; pb jsonb := '[]'::jsonb; ta int; tb int; fa text[];
+begin
+  for it in select value from jsonb_array_elements(lu) loop
+    fa := array(select jsonb_array_elements_text(coalesce(it -> 'factions', '[]'::jsonb)));
+    pa := pa || jsonb_build_array(public.choc_tpack(it ->> 'type', it ->> 'faction', fa));
+    pb := pb || jsonb_build_array(public.choc_tpack(it ->> 'type', it ->> 'faction', fa));
+  end loop;
   select coalesce(sum((c ->> 'pts')::int), 0) into ta from jsonb_array_elements(pa) p, jsonb_array_elements(p) c;
   select coalesce(sum((c ->> 'pts')::int), 0) into tb from jsonb_array_elements(pb) p, jsonb_array_elements(p) c;
   return jsonb_build_object('table', true, 'packs', jsonb_build_object('a', pa, 'b', pb), 'total', jsonb_build_object('a', ta, 'b', tb),
-    'types', jsonb_build_array('standard', 'standard', t3), 'weekend', we,
+    'types', (select jsonb_agg(v -> 'type') from jsonb_array_elements(lu) v), 'lineup', lu, 'day', dk, 'weekend', dk <> 'normal',
     'over', true, 'winner', case when ta > tb then 'a' when tb > ta then 'b' else 'draw' end);
 end $$;
 revoke execute on function public.choc_table() from public, anon, authenticated;
@@ -679,7 +703,7 @@ begin
   select (select count(*) from g),
     coalesce((select jsonb_agg(t order by (t ->> 'sum')::int desc) from (
       select jsonb_build_object('id', g.id, 'winner', g.winner, 'sum', (g.state -> 'total' ->> 'a')::int + (g.state -> 'total' ->> 'b')::int,
-        'types', g.state -> 'types',
+        'types', g.state -> 'types', 'kind', g.state ->> 'day',
         'a', pa.j || jsonb_build_object('total', (g.state -> 'total' ->> 'a')::int, 'best', (select jsonb_agg(k order by (k ->> 'pts')::int desc) from (select k from jsonb_array_elements(g.state -> 'packs' -> 'a') p, jsonb_array_elements(p) k order by (k ->> 'pts')::int desc limit 3) z)),
         'b', pb.j || jsonb_build_object('total', (g.state -> 'total' ->> 'b')::int, 'best', (select jsonb_agg(k order by (k ->> 'pts')::int desc) from (select k from jsonb_array_elements(g.state -> 'packs' -> 'b') p, jsonb_array_elements(p) k order by (k ->> 'pts')::int desc limit 3) z))) t
       from g join pl pa on pa.id = g.a join pl pb on pb.id = g.b

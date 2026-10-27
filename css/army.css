@@ -8462,3 +8462,8 @@ html.fx-light .dv.cb.cb2 .cb-res.ready .cb-gems i.on { animation: none; }
 .hl-by em { font-style: normal; color: #F2C14E; }
 .hl-head img { display: block; margin: 0 auto; width: 56px; height: 56px; }
 .hl-by em { display: block; font-size: .74rem; }
+
+/* v837 : Dimanche mystère (Choc des Boosters) */
+.kc-myst { border-color: rgba(176, 75, 255, .6); background: linear-gradient(90deg, rgba(176, 75, 255, .18), rgba(20, 14, 30, .6)); }
+.kc-myst b { color: #D9A8FF; }
+.kc-myst-q { display: grid; place-items: center; width: 34px; height: 46px; flex: none; border-radius: 6px; font: 800 1.5rem/1 var(--font-title, serif); color: #F2C14E; background: linear-gradient(160deg, #2a1640, #120a1c); box-shadow: 0 0 0 1.5px rgba(242, 193, 78, .6), 0 0 10px rgba(176, 75, 255, .5); }

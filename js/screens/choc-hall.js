@@ -47,7 +47,7 @@ function tableHTML(cat, m, i) {
       ${av(cat, p)}<span class="hl-nm">${nm(p)}${!isBlocked(p.id) ? cloud.badgeHTML(p.badge) : ''}</span>
       <b class="hl-tot">${fmt(p.total)}</b>${m.winner === w ? `<span class="hl-crown">${t('rafle la table')}</span>` : ''}
       <span class="hl-best">${(p.best || []).map((x) => mini(cat, x)).join('')}</span></div>`;
-  return `<li class="hl-table" style="--mc:${MEDAL[i]}"><div class="hl-rank"><span>${i + 1}</span><small>${t('{n} points sur la table', { n: fmt(m.sum) })}${m.types?.[2] === 'premium' ? ` · ${t('Week-end premium')}` : ''}</small></div>
+  return `<li class="hl-table" style="--mc:${MEDAL[i]}"><div class="hl-rank"><span>${i + 1}</span><small>${t('{n} points sur la table', { n: fmt(m.sum) })}${m.kind === 'mystere' ? ` · ${t('Dimanche mystère')}` : m.kind === 'premium' || m.types?.[2] === 'premium' ? ` · ${t('Samedi premium')}` : ''}</small></div>
     <div class="hl-duel">${side(m.a, 'a')}<span class="hl-vs">VS</span>${side(m.b, 'b')}</div>
     <p class="hl-res small">${m.winner === 'draw' ? t('Égalité : chacun a gardé ses cartes.') : t('{name} est reparti avec {n} cartes.', { name: `<b>${esc(shownName((m.winner === 'a' ? m.a : m.b).id, (m.winner === 'a' ? m.a : m.b).pseudo))}</b>`, n: 18 })}</p></li>`;
 }

@@ -8902,6 +8902,10 @@ export default {
   "Égalité : chacun a gardé ses cartes.": "Empate: cada um ficou com suas cartas.",
   "{n} parties jouées": "{n} partidas jogadas",
   "{n} partie jouée": "{n} partida jogada",
+  "Samedi premium": "Sábado premium",
+  "Dimanche mystère": "Domingo misterioso",
+  "Aujourd’hui, les trois boosters sont tirés au hasard à chaque partie : standard, faction, Alliances ou premium. Les mêmes pour les deux joueurs.": "Hoje, os três pacotes são sorteados a cada partida: padrão, de facção, das Alianças ou premium. Os mesmos para os dois jogadores.",
+  "Toi et ton adversaire ouvrez trois boosters chacun, en même temps. Les cartes tombent sur la table : elles ne sont encore à personne. Le samedi, le troisième booster est un booster premium. Le dimanche, les trois boosters sont tirés au hasard (standard, faction, Alliances ou premium), les mêmes pour les deux joueurs.": "Você e seu adversário abrem três pacotes cada um, ao mesmo tempo. As cartas caem na mesa: ainda não são de ninguém. Aos sábados, o terceiro pacote é um pacote premium. Aos domingos, os três pacotes são sorteados (padrão, de facção, das Alianças ou premium), os mesmos para os dois jogadores.",
 };
 
 export const names = {
