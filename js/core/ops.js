@@ -129,7 +129,7 @@ export const ARGS = {
   chooseReward: ['s'], cancelAltar: [], chooseBlessing: ['s'], swapRunTeam: ['i', 'i'], nextFloor: [], cancelRun: [], abandonRun: [], reviveFallen: ['s'], buyBraise: [],
   finishBattle: [], duelAct: ['s', 's', 's', 'S', 'n'], duelUlt: ['s'], duelPass: ['s'], duelNext: ['s'], duelEnemy: ['s', 's', 'S'], duelEndEnemy: ['s'],
   startTrial: ['i'], finishTrial: [], abandonTrial: [],
-  startChasse: [], finishChasse: [], abandonChasse: [], chasseClaim: ['i'], autoChasse: [], chasse: [], /* v858 */
+  startChasse: ['I'], finishChasse: [], abandonChasse: [], chasseClaim: ['i'], autoChasse: [], chasse: [], /* v858 */
   setSceauxHand: ['as'], sceauxStart: [{ rival: 'S', daily: 'b', awake: 'b' }], sceauxFinish: [], sceauxTrophy: ['s'], sceauxQuit: [],
   pacteStart: [{ table: 'S', daily: 'b' }], pacteFinish: [], pacteQuit: [], cryptesStart: [{ table: 'S', daily: 'b' }], cryptesFinish: [], cryptesQuit: [], cryptesResume: [],
   encheresStart: [{ table: 'S', daily: 'b' }], encheresFinish: [], encheresQuit: [], gameForfeit: ['s'], tourneyPlay: [],

@@ -313,7 +313,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   function draw() {
     moodTick();
     if (!alive_) return;
-    if (st.huntMax) { const h = $('.dv-top > b'); if (h) { h.classList.add('gc-hud'); h.innerHTML = `<span>${tr('Tour {r} / {m}', { r: Math.min(st.round, st.huntMax), m: st.huntMax })}</span><span>${icon('swords')}${fmt(st.huntDmg || 0)}</span>`; } } /* v858 : Grande Chasse ; v860 : dans le titre (il prenait de la hauteur aux cartes) */
+    if (st.huntMax) { const h = $('.dv-top > b'); if (h) { h.classList.add('gc-hud'); const left = st.huntMax - st.round + 1, cata = st.huntWarn && left <= st.huntWarn && !st.over; /* v866 : compte à rebours du Cataclysme */
+      h.classList.toggle('gc-cata', !!cata);
+      h.innerHTML = `<span>${cata ? `${icon('p:danger')}${tr('Anéantissement : {n}', { n: left })}` : tr('Tour {r} / {m}', { r: Math.min(st.round, st.huntMax), m: st.huntMax })}</span><span>${icon('swords')}${fmt(st.huntDmg || 0)}</span>`; } } /* v858 : Grande Chasse ; v860 : dans le titre (il prenait de la hauteur aux cartes) */
     perfMark('dessin');
     // v262 : la créature dont c'est le tour est toujours celle qui est choisie
     if (st.init && st.turn === 'ally' && !st.over) sel = st.actor; else if (st.init) sel = null;
@@ -611,7 +613,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   /* v865 : un texte (pas un chiffre de dégâts) s'écrit plus petit, passe à la ligne et reste dans l'écran (« Forge ardente : 17 ATQ » débordait des deux côtés) */
   const float = (uid, txt, cls) => {
     const t = el(uid); if (!t) return; const f = document.createElement('span');
-    f.className = `dv-float ${cls}${/[−+-]\d/.test(txt) ? '' : ' txt'}`; f.textContent = txt; t.appendChild(f); setTimeout(() => f.remove(), 900);
+    f.className = `dv-float ${cls}${/^[−+-]?\d/.test(txt) || /^CRITIQUE/.test(txt) ? '' : ' txt'}`; /* v866 : un texte qui commence par une lettre (« Épines −1 ») reste petit */ f.textContent = txt; t.appendChild(f); setTimeout(() => f.remove(), 900);
     const box = $('.dv')?.getBoundingClientRect(), r = f.getBoundingClientRect(); if (!box || !r.width) return;
     const pad = 8 + r.width * 0.08, dx = r.left < box.left + pad ? box.left + pad - r.left : r.right > box.right - pad ? box.right - pad - r.right : 0;
     if (dx) f.style.marginLeft = `${Math.round(dx)}px`;
@@ -848,7 +850,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
           if (S && e.tier !== 'fumble' && skillFx(S.key, S.u, S.tgt)) skillHit = S.tgt; /* la planche de la compétence est l'impact du coup qui suit */
           break;
         }
-        case 'boss': { if (e.s === 'Effondrement !') fxSheet(null, 'fx-collapse', { center: true, d: 1100 }); app.sfx.boss(); dio.roar(); const t = el(e.u); if (t) { t.classList.remove('roar'); void t.offsetWidth; t.classList.add('roar'); } float(e.u, e.s, 'boss'); shake(true); await wait(T(650)); break; }
+        case 'boss': { if (e.s === 'Effondrement !' || e.s === 'Anéantissement !') fxSheet(null, 'fx-collapse', { center: true, d: 1100 }); app.sfx.boss(); dio.roar(); const t = el(e.u); if (t) { t.classList.remove('roar'); void t.offsetWidth; t.classList.add('roar'); } float(e.u, e.s, 'boss'); shake(true); await wait(T(650)); break; }
         case 'phase2': {
           app.sfx.boss(); dio.fury(); dio.roar(); draw(); banner(`${icon('skull')} ${esc(e.s)}`, 'danger', 1200); shake(true);
           if (st.bossKey) await bossSay(e.key === 'abysse3' ? 'p3' : 'fury'); /* v855 : plus de narrateur en combat */
@@ -926,6 +928,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         case 'phase': draw(); turnBanner(e.side); await wait(T(e.side === 'enemy' ? 520 : 420)); break;
         case 'ult': feedUlt(); dio.ult(); await ultFx(); break;
         case 'law':
+          if (e.huntCata) { draw(); shake(true); banner(`${icon('p:danger')} ${tr('Anéantissement ! Rien ne peut l’arrêter')}`, 'danger', 1600); await wait(T(1200)); break; } /* v866 : Grande Chasse */
           if (e.huntEnd) { draw(); banner(`${icon('p:hunt')} ${tr('La bête se détourne : ta chasse est terminée')}`, 'skill', 1600); await wait(T(1100)); break; } /* v858 : Grande Chasse */
           if ('forbid' in e) { draw(); if (e.forbid) { banner(`${icon('skull')} Verdict : interdit de ${esc(FORBID[e.forbid])}`, 'danger', 1300); await wait(T(800)); } break; }
           if (e.aspect) dio.aspect(e.aspect); draw(); banner(e.fatigue ? `${icon('skull')} Épuisement : chaque tour blesse tout le monde` : e.law ? esc(LAWS[e.law].name) : esc(ASPECTS[e.aspect].name), e.fatigue ? 'danger' : 'skill', 1300); await wait(T(e.fatigue ? 900 : 700)); break;

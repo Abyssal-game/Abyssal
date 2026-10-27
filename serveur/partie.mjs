@@ -180,6 +180,8 @@ export async function handle({ uid, token, body }, { db, now = () => Date.now(),
         if (def.kind === 'dev' && !creator) throw new Error('Réservé au Mode Créateur.');
         const args = Array.isArray(op.a) ? clone(op.a) : [];
         if (!argsOk(op.m, args)) throw new Error('Opération refusée.'); /* v754 : forme des arguments vérifiée (ARGS) */
+        /* v866 : palier de la bête de la Chasse : celui de la base (vie commune), jamais celui que le téléphone annonce */
+        if (op.m === 'startChasse' && !g.chasse().battle) { try { const t = await db.svc('chasse_tier', { p_week: g.chasse().cur }); if (Number.isInteger(t)) args[0] = t; } catch (e) { /* SQL 20 v866 pas encore collé */ } }
         let r;
         if (NET[op.m]) r = await NET[op.m](c, g, ...args);
         else if (DEV[op.m]) r = DEV[op.m](g, ...args);

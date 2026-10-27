@@ -8897,3 +8897,36 @@ table.odds th, table.odds td { white-space: normal; }
 .cb-help-q { display: block; width: 21px; height: 21px; color: #F2D68A; filter: drop-shadow(0 0 4px rgba(242, 193, 78, .55)) drop-shadow(0 1px 0 #000); }
 /* v865 : textes flottants du combat (états, pouvoirs, consignes) : plus petits que les dégâts, sur deux lignes au besoin, jamais coupés par l'écran (marge posée par float() dans duel-ui.js) */
 .dv-float.txt { font-size: clamp(.95rem, 4.6vw, 1.2rem) !important; line-height: 1.1; white-space: normal; width: max-content; max-width: min(230px, calc(100vw - 40px)); text-align: center; text-wrap: balance; -webkit-text-stroke: .6px #3a0410; }
+/* v866 : Grande Chasse : paliers de la bête (traits sur la jauge), coup de grâce, nouveau pouvoir, point faible, paliers personnels, derniers coups, part du combat, Cataclysme en combat */
+.gc-bar { position: relative; }
+.gc-tick { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: rgba(255, 240, 220, .55); box-shadow: 0 0 4px #000; text-decoration: none; }
+.gc-killer { margin: 8px 0 0; padding: 8px 12px; border-radius: 12px; text-align: center; font: 700 .92rem/1.25 var(--f-ui); color: #FFE7A6; background: linear-gradient(90deg, rgba(120, 80, 10, .35), rgba(242, 193, 78, .22), rgba(120, 80, 10, .35)); border: 1px solid rgba(242, 193, 78, .5); }
+.gc-tier { display: flex; align-items: center; gap: 8px; margin: 8px 0 0; padding: 8px 12px; border-radius: 12px; font: 600 .86rem/1.3 var(--f-ui); color: #FFD2D8; background: rgba(90, 8, 22, .55); border: 1px solid rgba(255, 90, 110, .55); }
+.gc-tier .ic { flex: none; width: 20px; height: 20px; }
+.gc-bane { display: flex; align-items: center; gap: 10px; margin: 8px 0 0; padding: 8px 12px; border-radius: 12px; background: rgba(10, 10, 16, .75); border: 1px solid color-mix(in srgb, var(--bc) 60%, transparent); }
+.gc-bane-s { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; color: var(--bc); background: color-mix(in srgb, var(--bc) 16%, #0B0C12); border: 1px solid color-mix(in srgb, var(--bc) 55%, transparent); }
+.gc-bane-s svg { width: 24px; height: 24px; }
+.gc-bane > span:last-child { display: grid; gap: 2px; text-align: left; }
+.gc-bane b { font-family: var(--f-display); color: var(--bc); font-size: .9rem; }
+.gc-bane small { font-size: .8rem; color: #D9D3C4; }
+.gc-miles { margin-top: 10px; }
+.gc-miles-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.gc-miles-h b { font-size: .86rem; color: #F2D9A0; }
+.gc-mbar { position: relative; height: 10px; margin: 16px 14px 18px; border-radius: 999px; background: rgba(255, 255, 255, .08); }
+.gc-mbar > i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #8A6420, #F2C14E); }
+.gc-mstep { position: absolute; top: 50%; width: 30px; height: 30px; transform: translate(-50%, -50%); display: grid; place-items: center; border-radius: 50%; background: #14110C; border: 1px solid rgba(242, 193, 78, .35); filter: grayscale(.85) brightness(.75); }
+.gc-mstep.done { filter: none; border-color: #F2C14E; box-shadow: 0 0 10px rgba(242, 193, 78, .6); }
+.gc-mstep svg { width: 22px; height: 22px; }
+.gc-feed { margin: 12px 0; }
+.gc-feed > b { display: flex; align-items: center; gap: 6px; font-family: var(--f-display); color: #F2D9A0; }
+.gc-feed ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 4px; }
+.gc-feed li { display: grid; grid-template-columns: 1fr auto auto; align-items: baseline; gap: 10px; padding: 5px 8px; border-radius: 8px; background: rgba(255, 255, 255, .03); font-size: .86rem; }
+.gc-feed li > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gc-feed li > b { color: #FF8A9A; font-family: var(--f-ui); }
+.gc-feed li.me { background: rgba(242, 193, 78, .1); }
+.gc-part { margin: 2px 0 6px; text-align: center; font: 700 .9rem/1.3 var(--f-ui); color: #F2D9A0; }
+.gc-res-miles { display: grid; justify-items: center; gap: 6px; margin: 10px 0 4px; padding: 10px; border-radius: 12px; background: rgba(242, 193, 78, .08); border: 1px solid rgba(242, 193, 78, .35); }
+.gc-res-miles > b { font-family: var(--f-display); color: #F2C14E; }
+.dv-top > b.gc-hud.gc-cata { color: #FFD0D8; animation: gcCata 1s ease-in-out infinite alternate; }
+.dv-top > b.gc-hud.gc-cata .ic { width: 15px; height: 15px; }
+@keyframes gcCata { from { text-shadow: 0 0 2px rgba(255, 60, 80, .4); } to { text-shadow: 0 0 10px rgba(255, 60, 80, 1); } }

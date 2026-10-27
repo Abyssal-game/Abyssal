@@ -226,6 +226,8 @@ export function dmgOf(st, a, t, mult = 1, { basic = false } = {}) {
   if (a.side === 'ally' && a.rarity === 'C' && (t.boss || t.elite)) n += PACK_BONUS;
   const flat = n * mult;
   n *= mult * (st.ruleMult || 1) * factionMult(a, t);
+  if (st.huntMax && a.side === 'enemy' && a.boss) n *= huntRamp(st); /* v866 : Grande Chasse : la bête monte en puissance */
+  if (st.huntBane && a.side === 'ally' && t.boss && a.faction === st.huntBane) n *= st.huntBaneMult || 1; /* v866 : point faible de la semaine */
   if (t.mark && !(a.side === 'ally' && a.uid === t.markBy)) n *= st.markMult || MARK_MULT; // Marque (v265) : le prochain coup d'un autre allié, puis elle part
   if (t.broken) n *= 1.5;
   if (t.broken && basic && a.side === 'ally' && has(st, 'curee')) n *= 1.5;
@@ -342,9 +344,11 @@ export const QTE_HIT = 1.8, PLAIN_HIT = 0.6; /* v575 : 1,6 → 1,8 (« même ave
 // une esquive n'évite plus tout : la créature est éraflée (GRAZE des dégâts) ; seule la parade parfaite annule le coup
 export const GRAZE = 0.5; /* v575 : 0,35 → 0,5 : l'esquive protège moins, la parade compte */
 export const HUNT_CAP = 2.1, HUNT_AURA = [0.09, 0.14]; /* v858 : plafond des coups de la bête, présence écrasante (part des PV, puis en Furie) */
+/* v866 : la bête de la Chasse frappe un peu plus fort à chaque tour (st.huntRamp par tour) */
+export const huntRamp = (st) => (st?.huntMax ? 1 + (st.huntRamp || 0) * Math.max(0, (st.round || 1) - 1) : 1);
 export const allyCap = (u, kind, st = null) => {
   const gap = st?.refPow && u.pow ? Math.max(1, st.refPow / u.pow) : 1;
-  const hunt = st?.huntMax ? HUNT_CAP : 1; /* v858 : la bête de la Grande Chasse frappe bien plus fort que les plafonds habituels */
+  const hunt = st?.huntMax ? HUNT_CAP * huntRamp(st) : 1; /* v858 : la bête de la Grande Chasse frappe bien plus fort que les plafonds habituels */
   return Math.max(1, Math.round(u.maxHp * ipow(gap, GAP_POW) * (BIG.includes(kind) ? ALLY_BIG_CAP : ALLY_HIT_CAP) * hunt));
 };
 function hurt(st, u, n, ev, src = null, { pierce = false, graze = false } = {}) {
@@ -394,6 +398,7 @@ function hurt(st, u, n, ev, src = null, { pierce = false, graze = false } = {}) 
   u.hp -= d;
   if (d > 0) ev.push({ t: 'dmg', u: u.uid, d, hp: u.hp, src });
   if (d > 0 && u.boss && u.side === 'enemy' && st.huntMax) st.huntDmg = (st.huntDmg || 0) + d; /* v858 : Grande Chasse, dégâts comptés pour tous */
+  if (d > 0 && u.thorns && u.boss && u.side === 'enemy' && sA?.side === 'ally' && sA.hp > 1) { const r = Math.min(sA.hp - 1, Math.max(1, Math.round(d * 0.1))); ev.push({ t: 'status', u: sA.uid, s: `Épines −${r}`, k: 'bad' }); hurt(st, sA, r, ev, null, { pierce: true }); } /* v866 : Carapace d'épines (jamais mortelle) */
   if (d > 0 && u.boss && st.bossKey === 'titan' && u.asleep) u.sleepDmg = (u.sleepDmg || 0) + d;
   if (d > 0 && u.hp <= 0 && st.bossKey === 'jumeaux' && (u.boss || u.twin)) {
     const o = st.order.enemy.map((id) => st.units[id]).find((x) => x !== u && (x.boss || x.twin) && x.hp > 0);
@@ -1182,11 +1187,25 @@ export const PHASE2 = {
   abysse3:    { name: 'La Nuit sans fin', desc: 'L’Abysse se déchaîne : la nuit ronge tes créatures à chaque tour (8 % de leurs PV, jamais mortel) et ses coups redoublent. Une Brisure retient la nuit un tour.' },
 };
 export const DOOM_TURNS = 3;
-/* v858 : Grande Chasse : le combat dure st.huntMax tours (la bête se détourne ensuite : ce n'est pas une défaite), et la bête
-   entre en Furie au tour st.huntFury, quels que soient ses PV (elle en a trop pour passer sous la moitié) */
+/* v858 : Grande Chasse : la bête entre en Furie au tour st.huntFury, quels que soient ses PV (elle en a trop pour passer sous la moitié).
+   v866 : à la fin du tour st.huntMax, elle lance le Anéantissement (ni parade ni esquive) : toute l'équipe tombe ; il est annoncé
+   st.huntWarn tours avant. Les dégâts infligés comptent toujours. */
 function huntRound(st, ev) {
   if (!st.huntMax || st.over) return false;
-  if (st.round > st.huntMax) { st.over = 'won'; st.huntDone = true; ev.push({ t: 'law', huntEnd: true }); ev.push({ t: 'over', r: 'won' }); return true; }
+  const b = st.order.enemy.map((id) => st.units[id]).find((u) => u.boss && u.hp > 0);
+  if (st.round > st.huntMax) {
+    st.huntDone = true; st.huntCata = true;
+    ev.push({ t: 'law', huntCata: true });
+    if (b) { ev.push({ t: 'boss', u: b.uid, s: 'Anéantissement !' }); ev.push({ t: 'aoe', u: b.uid, side: 'enemy' }); }
+    st.sursis = false;
+    for (const x of alive(st, 'ally')) { x.ckSaved = true; x.tenSaved = true; x.shield = 0; hurt(st, x, x.hp, ev, null, { pierce: true }); }
+    for (const x of alive(st, 'ally')) x.hp = 0;
+    check(st, ev);
+    if (!st.over) { st.over = 'lost'; ev.push({ t: 'over', r: 'lost' }); }
+    return true;
+  }
+  const left = st.huntMax - st.round + 1;
+  if (b && st.huntWarn && left <= st.huntWarn) ev.push({ t: 'status', u: b.uid, s: left > 1 ? `Anéantissement dans ${left} tours` : 'Anéantissement à la fin du tour !', k: 'charge', syn: true });
   if (st.huntFury && st.round >= st.huntFury) { const b = front(st, 'enemy').find((u) => u.boss && u.hp > 0); if (b && !b.phase2) b.awakened = true; }
   return false;
 }
@@ -1267,13 +1286,14 @@ function bossTick(st, ev) {
     for (const x of front(st, 'ally')) { if (x.hp > 1) hurt(st, x, Math.min(x.hp - 1, Math.max(1, Math.round(x.maxHp * 0.08))), ev, null, { pierce: true }); }
   }
   if (b && st.huntMax && !b.broken) { /* v858 : Grande Chasse : présence écrasante (peut être mortelle), plus forte en Furie */
-    const k = b.phase2 ? HUNT_AURA[1] : HUNT_AURA[0];
+    const k = (b.phase2 ? HUNT_AURA[1] : HUNT_AURA[0]) * (b.aura2 ? 1.5 : 1) * huntRamp(st); /* v866 : Écrasement ; elle pèse plus lourd à chaque tour */
     ev.push({ t: 'status', u: b.uid, s: 'Présence écrasante', k: 'bad' });
     for (const x of front(st, 'ally')) if (x.hp > 0) hurt(st, x, Math.max(1, Math.round(x.maxHp * k)), ev, null, { pierce: true });
     check(st, ev);
     if (st.over) return;
   }
   if (b && b.regen && !b.broken && b.hp < b.maxHp) { const r0 = Math.max(1, Math.round(b.maxHp * 0.02)); heal(b, r0, ev); ev.push({ t: 'status', u: b.uid, s: `Régénération +${r0}`, k: 'bad' }); } /* v858 */
+  if (b && b.bulwark && !b.broken && !b.shield && st.round % 3 === 0) { b.shield = 1; ev.push({ t: 'status', u: b.uid, s: 'Bouclier vivant', k: 'guard' }); } /* v866 */
   if (b && b.forge && !b.broken) { b.atk += 1; ev.push({ t: 'status', u: b.uid, s: `Forge ardente : ${b.atk} ATQ`, k: 'bad' }); }
   if (b && b.doom != null && !b.broken) {
     b.doom--;

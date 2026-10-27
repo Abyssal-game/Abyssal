@@ -4,7 +4,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { loadCatalog, MemoryStorage, rngFrom } from './helpers.mjs';
 import { Game } from '../js/core/game.js';
-import { HUNT, HUNT_ORDER, HUNT_BOSSES, huntBossOf, huntLoot, huntWeek } from '../js/core/chasse.js';
+import { HUNT, HUNT_ORDER, HUNT_BOSSES, HUNT_MILES, huntBossOf, huntLoot, huntWeek, huntTierOf } from '../js/core/chasse.js';
+import { autoTurn, dmgOf } from '../js/core/duel.js';
 import { BOSSES } from '../js/core/bosses.js';
 import { playDuelOps } from './duel-bot.mjs';
 import { digest } from '../js/core/ops.js';
@@ -46,13 +47,62 @@ test('chasse : la bête combat seule, un combat par jour, les dégâts sont comp
   assert.throws(() => g.startChasse(), /déjà chassé/);
 });
 
-test('chasse : le combat s’arrête au bout de HUNT.rounds tours (la bête se détourne)', () => {
+test('chasse : au bout de HUNT.rounds tours, l’Anéantissement balaie toute l’équipe (v866)', () => {
   const g = fresh('d');
   const st = g.startChasse().battle;
-  for (const u of Object.values(st.units)) if (u.side === 'ally') { u.maxHp *= 1000; u.hp = u.maxHp; } // une équipe immortelle : elle tient jusqu'au bout
-  const out = g.autoChasse();
-  assert.ok(out.survived);
+  const heal = () => { for (const u of Object.values(st.units)) if (u.side === 'ally' && u.hp > 0 && !st.huntCata) u.hp = u.maxHp; }; // une équipe qui tient jusqu'au bout
+  const evs = [];
+  for (let i = 0; i < 400 && !st.over; i++) { evs.push(...autoTurn(st)); heal(); }
+  assert.equal(st.over, 'lost');
+  assert.ok(st.huntCata, 'Anéantissement lancé');
+  assert.ok(Object.values(st.units).filter((u) => u.side === 'ally').every((u) => u.hp <= 0), 'toute l’équipe tombe');
+  assert.ok(evs.some((e) => e.t === 'status' && /^Anéantissement dans 3 tours/.test(e.s)), 'annoncé 3 tours avant');
+  const out = g.finishChasse();
+  assert.ok(out.survived && out.cata);
   assert.equal(out.rounds, HUNT.rounds);
+});
+
+test('chasse : la bête frappe plus fort à chaque tour (v866)', () => {
+  const st = fresh('r').startChasse().battle;
+  const b = Object.values(st.units).find((u) => u.boss), a = Object.values(st.units).find((u) => u.side === 'ally');
+  st.round = 1; const d1 = dmgOf(st, b, a, 1);
+  st.round = 6; const d6 = dmgOf(st, b, a, 1);
+  assert.ok(d6 > d1 * 1.8, `${d1} → ${d6}`);
+});
+
+test('chasse : palier de la bête et point faible de la semaine (v866)', () => {
+  assert.equal(huntTierOf(0, 1000), 0);
+  assert.equal(huntTierOf(250, 1000), 1);
+  assert.equal(huntTierOf(500, 1000), 2);
+  assert.equal(huntTierOf(800, 1000), 3);
+  const g0 = fresh('t'), g3 = fresh('t');
+  const s0 = g0.startChasse(0).battle, s3 = g3.startChasse(3).battle;
+  const b0 = Object.values(s0.units).find((u) => u.boss), b3 = Object.values(s3.units).find((u) => u.boss), B = HUNT_BOSSES[s3.bossKey];
+  assert.ok(b3.atk > b0.atk, 'plus forte');
+  for (const k of B.rise) assert.ok(b3[k], `pouvoir ${k}`);
+  assert.equal(s3.huntTier, 3);
+  assert.equal(s0.huntBane, B.bane);
+  const a = Object.values(s0.units).find((u) => u.side === 'ally');
+  const fa = a.faction; a.faction = 'x'; const base = dmgOf(s0, a, b0, 1); a.faction = B.bane; const boosted = dmgOf(s0, a, b0, 1); a.faction = fa;
+  assert.ok(boosted > base * 1.2, `point faible : ${base} → ${boosted}`);
+});
+
+test('chasse : paliers personnels de la semaine (v866)', () => {
+  const g = fresh('m');
+  g.startChasse();
+  const st = g.chasse().battle; st.over = 'lost'; st.huntDmg = HUNT_MILES[1].dmg + 5;
+  const before = { ...g.s.chests };
+  const out = g.finishChasse();
+  assert.equal(out.miles.length, 2);
+  assert.equal(g.chasse().weeks[out.week].miles, 2);
+  for (const m of out.miles) for (const [k, n] of Object.entries(m.reward.chests)) assert.ok((g.s.chests[k] || 0) >= (before[k] || 0) + n, k);
+});
+
+test('chasse : le coup de grâce donne son titre (v866)', () => {
+  const r = huntLoot({ days: 1, rank: 40, killer: true });
+  assert.equal(r.title2, 'Coup de grâce');
+  assert.ok(r.chests.abyssal);
+  assert.equal(huntLoot({ days: 1, rank: 40 }).title2, undefined);
 });
 
 test('chasse : butin de la semaine selon la participation', () => {
@@ -77,7 +127,7 @@ test('chasse : le serveur rejoue le combat, retrouve les mêmes dégâts et les 
     async unlock() {},
     async save(uid, r) { rows.set(uid, JSON.parse(JSON.stringify(r))); return true; },
     async legacySave() { return null; }, async isCreator() { return false; }, async publish() {},
-    async svc(name, args) { svcCalls.push({ name, args }); if (name === 'chasse_claim_info') return { killed: true, rank: 2 }; return { ok: true }; },
+    async svc(name, args) { svcCalls.push({ name, args }); if (name === 'chasse_claim_info') return { killed: true, rank: 2 }; if (name === 'chasse_tier') return 2; return { ok: true }; },
   };
   let q = 0; const queue = [];
   const g = new Game(catalog, new MemoryStorage(), { rng: rngFrom('tel'), clock: () => new Date(NOW) });
@@ -86,7 +136,7 @@ test('chasse : le serveur rejoue le combat, retrouve les mêmes dégâts et les 
   const base = fresh('srv-base'); base.s.seedBase = 4242; base.s.seedN = 0;
   rows.set('u1', { data: JSON.parse(JSON.stringify(base.s)), version: 1, seqs: {} });
   g.replaceSave(JSON.parse(JSON.stringify(base.s)));
-  g.startChasse();
+  g.startChasse(2); // le téléphone connaît le palier 2 (comme la base)
   playDuelOps(g, 'chasse', rngFrom('jeu'));
   const out = g.finishChasse();
   const res = await send();
@@ -102,4 +152,19 @@ test('chasse : le serveur rejoue le combat, retrouve les mêmes dégâts et les 
   const res2 = await send();
   const ret = Object.values(res2.body.rets)[0];
   assert.ok(ret?.chests?.or, 'butin donné');
+});
+
+test('chasse : le serveur impose le vrai palier de la bête (le téléphone ne peut pas l’adoucir) (v866)', async () => {
+  const rows = new Map();
+  const db = {
+    async lock() { const r = rows.get('u1'); return JSON.parse(JSON.stringify(r)); }, async unlock() {},
+    async save(uid, r) { rows.set(uid, JSON.parse(JSON.stringify(r))); return true; },
+    async legacySave() { return null; }, async isCreator() { return false; }, async publish() {},
+    async svc(name) { if (name === 'chasse_tier') return 3; return { ok: true }; },
+  };
+  const base = fresh('srv-t'); base.s.seedBase = 99; base.s.seedN = 0;
+  rows.set('u1', { data: JSON.parse(JSON.stringify(base.s)), version: 1, seqs: {} });
+  const res = await handle({ uid: 'u1', token: 't', body: { ops: [{ m: 'startChasse', a: [0], q: 1 }], dev: 'tel1', tz: 0, digest: 'x' } }, { db, now: () => NOW, rng: rngFrom('srv') });
+  assert.equal(res.status, 200);
+  assert.equal(rows.get('u1').data.chasse.battle.huntTier, 3);
 });

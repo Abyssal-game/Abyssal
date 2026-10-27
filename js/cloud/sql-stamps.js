@@ -38,7 +38,7 @@ export const SQL_STAMPS = {
   },
   "20": {
     "file": "20-grande-chasse.sql",
-    "stamp": "46cc03160c06"
+    "stamp": "e0109ccfc2cc"
   },
   "05": {
     "file": "05-tirage.sql",
