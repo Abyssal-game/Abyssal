@@ -2,6 +2,7 @@
 
 Ancienne section « 5. Décisions déjà prises » de `CLAUDE.md`, déplacée ici le 27 octobre 2026 pour alléger le mémo lu à chaque session. La plus récente en haut ; ajouter chaque nouvelle livraison en haut de la liste.
 
+- v853 (demande du propriétaire) : Enchères, volet « Les enchérisseurs » : seuls les noms et portraits restent, l'indication de leur façon de jouer (`hint`) n'est plus affichée (`js/screens/encheres.js`). Rien testé sur un vrai iPhone.
 - v852 (retours du propriétaire, captures de l'app) :
   - Cryptes : le Remous abyssal (échange de deux cartes) peut être refusé : bouton « Ne pas échanger » dans le bandeau du pouvoir (solo : `usePower(st, [])` renvoie `skipped`, accepté seulement pour `abyssal` ; en ligne : `cryptes_apply` avec `picks` vide, **`09-multijoueur.sql` à recoller**, essayé sur PostgreSQL 16 ; l'ami voit « … a préféré ne rien échanger »). Test ajouté dans `tests/cryptes.test.mjs`.
   - Pacte : étiquettes des cartes spéciales de la pioche centrées (`.pa-pss`). Les points de l'adversaire ne montent plus pendant son tour : le tableau des scores garde ceux d'avant (`hold` dans `js/screens/pacte.js`) jusqu'à la fin de son tour.

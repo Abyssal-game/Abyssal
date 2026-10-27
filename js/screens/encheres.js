@@ -71,7 +71,7 @@ export default function encheresScreen(app, root) {
       <div class="sc-rivals">${o}</div>
       ${l.length ? `<details class="panel dc-fold"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/mysteries.webp"><span class="dc-sum-t">Ventes à venir (${l.length})</span></summary><div class="sc-rivals">${l.map((x) => x[1]).join('')}</div></details>` : ''}
       <details class="panel dc-fold mq-court"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/inconnu.webp"><span class="dc-sum-t">Les enchérisseurs</span></summary>
-        <ul class="mq-clist">${EN.TABLES.filter((_, i) => EN.tableUnlocked(g.s, i)).flatMap((t) => t.seats).map((k) => { const C = EN.BIDDERS[k]; return `<li><span class="sc-por">${pic(k)}</span><span><b>${esc(C.name)}</b><span class="small muted">${esc(C.hint)}</span></span></li>`; }).join('')}</ul></details>
+        <ul class="mq-clist">${EN.TABLES.filter((_, i) => EN.tableUnlocked(g.s, i)).flatMap((t) => t.seats).map((k) => { const C = EN.BIDDERS[k]; return `<li><span class="sc-por">${pic(k)}</span><span><b>${esc(C.name)}</b></span></li>`; /* v853 : sans indication de leur façon de jouer */ }).join('')}</ul></details>
       <p class="small muted center">Récompenses : ${EN.ENCHERES_REWARD.dailyPaid} victoires payées par jour (${Math.max(0, EN.ENCHERES_REWARD.dailyPaid - (en.day === todayKey() ? en.paidToday : 0))} restantes aujourd’hui). Au-delà, tu peux jouer pour le plaisir.</p>
       <details class="panel dc-fold dc-how"><summary><img class="picon dc-sum-ic" alt="" src="assets/icons/help.webp"><span class="dc-sum-t">Comment ça marche</span></summary>${howHTML()}</details>`;
     /* v699 : la bulle des règles attend la première partie (elle couvrait la liste des salles) */
