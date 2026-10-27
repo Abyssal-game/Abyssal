@@ -8912,6 +8912,8 @@ export default {
   "Jeton à jouer": "Gettone da giocare",
   "Joué · demain": "Giocato · domani",
   "Ton jeton du jour s’éteint à minuit. Une partie, quelques secondes : le meilleur total rafle toute la table.": "Il tuo gettone del giorno si spegne a mezzanotte. Una partita, pochi secondi: il totale migliore fa piazza pulita del tavolo.",
+  "Un jeton des Ombres chaque jour, à jouer avant minuit (heure de Paris).": "Un gettone delle Ombre ogni giorno, da giocare prima di mezzanotte (ora di Parigi).",
+  "Prochain jeton des Ombres demain. Reviens chaque jour : chaque tirage s’ajoute à ton total de la semaine.": "Prossimo gettone delle Ombre domani. Torna ogni giorno: ogni estrazione si aggiunge al tuo totale della settimana.",
 };
 
 export const names = {

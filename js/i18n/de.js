@@ -8912,6 +8912,8 @@ export default {
   "Jeton à jouer": "Jeton zu spielen",
   "Joué · demain": "Gespielt · morgen",
   "Ton jeton du jour s’éteint à minuit. Une partie, quelques secondes : le meilleur total rafle toute la table.": "Dein Tages-Jeton erlischt um Mitternacht. Eine Partie, ein paar Sekunden: Die beste Summe räumt den ganzen Tisch ab.",
+  "Un jeton des Ombres chaque jour, à jouer avant minuit (heure de Paris).": "Jeden Tag ein Schatten-Jeton, zu spielen vor Mitternacht (Pariser Zeit).",
+  "Prochain jeton des Ombres demain. Reviens chaque jour : chaque tirage s’ajoute à ton total de la semaine.": "Der nächste Schatten-Jeton kommt morgen. Komm jeden Tag wieder: Jede Ziehung zählt zu deiner Wochensumme.",
 };
 
 export const names = {

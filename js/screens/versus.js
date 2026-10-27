@@ -61,7 +61,7 @@ export default function versusScreen(app, root) {
   function head() {
     const n = tokens();
     return `<header class="screen-head ui-hero bn-versus"><h1>${t('Le Choc des Boosters')}</h1><p class="muted">${t('Trois boosters chacun, ouverts en même temps. Le meilleur total rafle toute la table.')}</p></header>
-      <section class="panel kc-tok"><div class="kc-toks">${Array.from({ length: Math.max(CHOC.tokensMax, n) }, (_, i) => `<span class="kc-tk ${i < n ? 'on' : ''}"><img alt="" src="assets/jeux/kc-jeton.webp" onerror="this.onerror=null;this.src='assets/icons/seal.webp'"></span>`).join('')}</div>
+      <section class="panel kc-tok"><div class="kc-toks">${Array.from({ length: Math.max(CHOC.tokensMax, n) }, (_, i) => `<span class="kc-tk ${i < n ? 'on' : ''}"><img alt="" src="assets/jeux/kc-jeton2.webp" onerror="this.onerror=null;this.src='assets/icons/seal.webp'"></span>`).join('')}</div>
         <span><b>${t(n > 1 ? '{n} jetons du Choc' : '{n} jeton du Choc', { n })}</b><small>${n > 0 ? t('À jouer avant minuit : les jetons ne se gardent pas. Un nouveau chaque jour.') : t('Un nouveau jeton arrive à minuit.')}</small></span></section>
       ${dayBanner()}
       ${leagueHTML()}
@@ -242,7 +242,7 @@ export default function versusScreen(app, root) {
     note: t('Lance une recherche : dès qu’un joueur arrive, vos boosters s’ouvrent en même temps. Le meilleur total rafle toute la table.'),
     intro: () => `<button class="btn block dc-plq dc-plq-dark kc-trainbtn" data-mp="train">${icon('p:help')}${t('Entraînement contre l’Abysse')}</button><p class="small muted center kc-trainsub">${t('Sans jeton, rien à gagner ni à perdre')}</p>`, /* v813 : la ligne d'explication dépassait du bouton */
     canPlay: () => tokens() > 0,
-    livePace: ({ disabled }) => `<button class="btn primary block dc-plq dc-plq-red kc-live" data-mp="quick" data-pace="fast" ${disabled ? 'disabled' : ''}><span>${t('Jouer en direct')}</span><span class="kc-cost"><img alt="" src="assets/jeux/kc-jeton.webp" onerror="this.onerror=null;this.src='assets/icons/seal.webp'">1</span></button>`,
+    livePace: ({ disabled }) => `<button class="btn primary block dc-plq dc-plq-red kc-live" data-mp="quick" data-pace="fast" ${disabled ? 'disabled' : ''}><span>${t('Jouer en direct')}</span><span class="kc-cost"><img alt="" src="assets/jeux/kc-jeton2.webp" onerror="this.onerror=null;this.src='assets/icons/seal.webp'">1</span></button>`,
     rewardNote: () => `<p class="small muted center">${tokens() > 0 ? t('Une partie coûte <b>1 jeton</b>. Le gagnant rafle toutes les cartes ouvertes, le perdant repart les mains vides.') : t('Plus de jeton aujourd’hui : un nouveau arrive demain. Tu peux t’entraîner contre l’Abysse.')}</p>`,
     onLobby: async () => { const n = await app.partie.first('chocRefund'); if (n > 0) { toast(t(n > 1 ? '{n} jetons du Choc rendus (parties jamais commencées).' : '{n} jeton du Choc rendu (partie jamais commencée).', { n }), { icon: 'info' }); app.chrome?.(); } },
     top: (L, row) => { const end = L.filter((v) => v.status === 'done' && !v.claimed); return end.length ? `<section class="panel mp-sec hot"><h2 class="section-title">${t('Boosters à ouvrir')} <span class="pill-n">${end.length}</span></h2>${end.map((v) => row(v, v.state?.table ? t('Ton adversaire est là : ouvre vos boosters') : t('Partie terminée : choisis tes cartes'))).join('')}</section>` : ''; },

@@ -36,11 +36,11 @@ export default function home(app, root) {
     rows.push(`<div class="td-row td-daily ${g.canDailyClaim() ? '' : 'done'}" data-act="dailyinfo" role="button"><span class="td-ic mi" style="--mc:#F2C14E">${picon('streak')}</span><span class="td-t"><b>Offrande du jour</b><span class="small muted">${g.canDailyClaim() ? `Jour ${pos} sur 7 · aujourd’hui ${daily.amount} éclats${pos === 7 ? ' et un coffre de fer' : ''}` : `Reçue : ${dayGain(pos - 1)} éclats${pos === 7 ? ' et un coffre de fer' : ''} · demain ${pos === 7 ? g.dailyGainFor(sd + 1) : dayGain(pos)} éclats`}</span>${streakBar}</span>${g.canDailyClaim() ? `<span class="td-auto" title="Arrive tout seul">+${daily.amount}</span>` : `<span class="small muted">Reçue</span>`}</div>`);
     /* v755 : Tirage, Épreuves, Jeux du jour et coffres sur une rangée de tuiles (avant : quatre longues lignes) */
     const tiles = [];
-    const tile = (href, ic, col, title, sub, hot) => `<a class="td-tile ${hot ? 'hot' : 'done'}" href="${href}" style="--mc:${col}"><span class="td-tile-ic">${picon(ic)}</span><b>${title}</b><small>${sub}</small></a>`;
-    if (cloud.isLoggedIn()) { const shDone = shadowDone(g); tiles.push(tile('#/tirage', 'shadow', '#9B6BFF', 'Tirage des Ombres', shDone ? 'Fait · demain' : 'À tirer', !shDone));
+    const tile = (href, ic, col, title, sub, hot) => `<a class="td-tile ${hot ? 'hot' : 'done'}" href="${href}" style="--mc:${col}"><span class="td-tile-ic">${ic.startsWith('img:') ? `<img class="td-tok" alt="" src="${ic.slice(4)}">` : picon(ic)}</span><b>${title}</b><small>${sub}</small></a>`;
+    if (cloud.isLoggedIn()) { const shDone = shadowDone(g); tiles.push(tile('#/tirage', 'img:assets/jeux/sh-jeton.webp', '#9B6BFF', 'Tirage des Ombres', shDone ? 'Fait · demain' : 'À tirer', !shDone));
       /* v839 : le jeton du Choc ne se garde pas : rappel tant qu'il n'a pas servi aujourd'hui */
       const ck = g.s.choc, chocLeft = !ck || ck.day !== today() || ck.n > 0;
-      tiles.push(tile('#/versus', 'swords', '#E0485E', 'Choc des Boosters', chocLeft ? 'Jeton à jouer' : 'Joué · demain', chocLeft)); }
+      tiles.push(tile('#/versus', 'img:assets/jeux/kc-jeton2.webp', '#E0485E', 'Choc des Boosters', chocLeft ? 'Jeton à jouer' : 'Joué · demain', chocLeft)); }
     const tl = g.trials().done.filter((x) => !x).length;
     if (g.team().length >= 3) tiles.push(tile('#/epreuves', 'crest-elite', '#E0485E', 'Épreuves du jour', tl ? `${tl} à jouer` : 'Terminées', !!tl));
     { const gl = g.gamesDailyLeft(); if (gl.length) tiles.push(tile('#/jeux', 'seal', '#C9A45A', 'Jeux du jour', `${gl.length} défi${gl.length > 1 ? 's' : ''}`, true)); }

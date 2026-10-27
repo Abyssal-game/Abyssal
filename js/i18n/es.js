@@ -8912,6 +8912,8 @@ export default {
   "Jeton à jouer": "Ficha por jugar",
   "Joué · demain": "Jugado · mañana",
   "Ton jeton du jour s’éteint à minuit. Une partie, quelques secondes : le meilleur total rafle toute la table.": "Tu ficha del día se apaga a medianoche. Una partida, unos segundos: el mejor total se lleva toda la mesa.",
+  "Un jeton des Ombres chaque jour, à jouer avant minuit (heure de Paris).": "Una ficha de las Sombras cada día, para jugar antes de medianoche (hora de París).",
+  "Prochain jeton des Ombres demain. Reviens chaque jour : chaque tirage s’ajoute à ton total de la semaine.": "Próxima ficha de las Sombras mañana. Vuelve cada día: cada tirada se suma a tu total de la semana.",
 };
 
 export const names = {

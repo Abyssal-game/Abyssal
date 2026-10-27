@@ -78,14 +78,15 @@ export default function shadowScreen(app, root) {
     return `<section class="panel sh-pick"><h2 class="section-title">Ton tirage du jour</h2>
       <p class="small">Choisis d’abord une faction : ses cartes vaudront <b>le double</b>. Valeur : Commune ${LUCK_POINTS.C}, Peu commune ${LUCK_POINTS.PC}, Rare ${LUCK_POINTS.R}, Hyper rare ${LUCK_POINTS.HR}, Mythique ${LUCK_POINTS.M}, Secrète ${LUCK_POINTS.S}, +${LUCK_POINTS.variant} par finition.</p>
       <div class="chips fac-grid sh-fac" role="radiogroup" aria-label="Faction double">${FACTION_ORDER.map((f) => `<button class="chip" role="radio" data-act="fac" data-v="${f}" style="--chip:${cat.faction[f].colors.secondary}" aria-pressed="${ui.faction === f}" aria-checked="${ui.faction === f}">${sigil(f)}<span class="fg-n">${esc(cat.faction[f].name)}</span></button>`).join('')}</div>
-      <button class="btn primary block big-cta dc-plq dc-plq-red" data-act="draw" ${ui.faction && !busy ? '' : 'disabled'}>${icon('p:shadow')}${ui.faction ? 'Ouvrir le booster des Ombres' : 'Choisis une faction'}</button>
+      <button class="btn primary block big-cta dc-plq dc-plq-red sh-drawb" data-act="draw" ${ui.faction && !busy ? '' : 'disabled'}><span>${ui.faction ? 'Ouvrir le booster des Ombres' : 'Choisis une faction'}</span><span class="kc-cost"><img alt="" src="assets/jeux/sh-jeton.webp">1</span></button>
+      <p class="small muted center sh-toknote">Un jeton des Ombres chaque jour, à jouer avant minuit (heure de Paris).</p>
     </section>`;
   }
   function mineHTML() {
     return `<section class="panel sh-mine"><h2 class="section-title">Ton tirage du jour</h2>
       <p class="sh-score"><b>${fmt(mine.score)}</b> points <span class="small muted">· faction ${esc(cat.faction[mine.faction]?.name || '')} ×2</span></p>
       <div class="sh-cards">${mine.cards.map((c) => { const k = cat.get(c.id); return k ? `<span class="sh-c v-${c.variant}"><img alt="${esc(k.name)}" src="${artUrl(k, { lite: true })}"><small>+${c.pts}</small></span>` : ''; }).join('')}</div>
-      <p class="small muted">Prochain tirage demain. Reviens chaque jour : chaque tirage s’ajoute à ton total de la semaine.</p>
+      <p class="small muted sh-next"><img class="sh-tok-off" alt="" src="assets/jeux/sh-jeton.webp">Prochain jeton des Ombres demain. Reviens chaque jour : chaque tirage s’ajoute à ton total de la semaine.</p>
     </section>`;
   }
   async function loadWeek() {

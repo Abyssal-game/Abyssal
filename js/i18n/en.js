@@ -8923,6 +8923,8 @@ export default {
   "Jeton à jouer": "Token to play",
   "Joué · demain": "Played · tomorrow",
   "Ton jeton du jour s’éteint à minuit. Une partie, quelques secondes : le meilleur total rafle toute la table.": "Your daily token goes out at midnight. One game, a few seconds: the best total sweeps the whole table.",
+  "Un jeton des Ombres chaque jour, à jouer avant minuit (heure de Paris).": "One Shadow token every day, to play before midnight (Paris time).",
+  "Prochain jeton des Ombres demain. Reviens chaque jour : chaque tirage s’ajoute à ton total de la semaine.": "Next Shadow token tomorrow. Come back every day: each draw adds to your weekly total.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {
