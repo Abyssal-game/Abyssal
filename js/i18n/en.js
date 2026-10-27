@@ -9260,6 +9260,9 @@ export default {
   "{0} PA · recharge {1} tours": "{0} AP · recharges in {1} turns",
   "recharge {0} tours": "recharges in {0} turns",
   "Plus de jeton aujourd’hui : un nouveau arrive demain.": "No tokens left today: a new one arrives tomorrow.",
+  "Voir les {n} cartes de la table": "See the {n} cards on the table",
+  "Les cartes de la table": "The cards on the table",
+  "{n} cartes ouvertes": "{n} cards opened",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

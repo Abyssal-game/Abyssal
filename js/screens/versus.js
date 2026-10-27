@@ -75,7 +75,7 @@ export default function versusScreen(app, root) {
   function dayBanner() {
     const k = dayKind();
     if (k === 'premium') return `<section class="panel kc-wkd"><img alt="" src="assets/packs/premium.webp" onerror="this.remove()"><span><b>${t('Samedi premium')}</b><small>${t('Aujourd’hui, le troisième booster de chacun est un booster premium.')}</small></span></section>`;
-    if (k === 'mystere') return `<section class="panel kc-wkd kc-myst"><span class="kc-myst-q">?</span><span><b>${t('Dimanche mystère')}</b><small>${t('Aujourd’hui, les trois boosters sont tirés au hasard à chaque partie : standard, faction, Alliances ou premium. Les mêmes pour les deux joueurs.')}</small></span></section>`;
+    if (k === 'mystere') return `<section class="panel kc-wkd kc-myst"><span class="kc-myst-q"><img alt="" src="assets/jeux/kc-mystere.webp" onload="this.parentNode.classList.add('has')" onerror="this.remove()">?</span><span><b>${t('Dimanche mystère')}</b><small>${t('Aujourd’hui, les trois boosters sont tirés au hasard à chaque partie : standard, faction, Alliances ou premium. Les mêmes pour les deux joueurs.')}</small></span></section>`;
     return '';
   }
   const monthName = (m) => `${t(MONTHS[+m.slice(5, 7) - 1] || '')} ${m.slice(0, 4)}`;

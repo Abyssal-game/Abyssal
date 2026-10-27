@@ -8516,3 +8516,103 @@ table.odds th, table.odds td { white-space: normal; }
 .dv .cb-fallen .cb-fl-w .cb-fl-sk { left: 7px; }
 /* v841 : main du premier combat posée sous la case d'action (elle cachait le nom de la créature qui joue) */
 .cb-dock .cb-a.guide::before { top: 30%; bottom: auto; left: -26px; right: auto; width: 40px; height: 40px; transform: rotate(-90deg); }
+
+/* v844 : Panthéon d'hier refait (fond, médailles, duel, bouton Revoir), images Gemini posées si elles existent (.has) */
+.hl { position: relative; isolation: isolate; gap: 14px; padding: 4px 2px 18px; }
+.hl-bg { position: absolute; inset: -18px -16px -24px; z-index: -1; overflow: hidden; pointer-events: none;
+  background: radial-gradient(ellipse 90% 40% at 50% 0%, rgba(242, 193, 78, .2), transparent 70%), radial-gradient(ellipse 80% 50% at 50% 100%, rgba(176, 75, 255, .12), transparent 70%), linear-gradient(180deg, #160e1d, #0b080f 45%, #070609); }
+.hl-bg-img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; opacity: .5;
+  -webkit-mask-image: linear-gradient(#000 25%, rgba(0, 0, 0, .35) 70%, transparent); mask-image: linear-gradient(#000 25%, rgba(0, 0, 0, .35) 70%, transparent); }
+.hl-head { position: relative; padding-top: 6px; }
+.hl-head-art { display: none; }
+.hl-head.has .hl-head-art { display: block; width: min(100%, 420px); max-height: 150px; object-fit: contain; margin: 0 auto -6px; filter: drop-shadow(0 6px 18px rgba(0, 0, 0, .7)); }
+.hl-head.has .hl-crown-ic { display: none; }
+.hl-head h2 { font-family: var(--font-title, serif); letter-spacing: .06em; color: #F2C14E; text-shadow: 0 2px 10px rgba(0, 0, 0, .8), 0 0 18px rgba(242, 193, 78, .35); }
+.hl-sec { display: flex; align-items: center; gap: 10px; margin: 8px 0 -4px; font-family: var(--font-title, serif); text-transform: uppercase; letter-spacing: .12em; font-size: .86rem; }
+.hl-sec::before, .hl-sec::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(242, 193, 78, .7)); }
+.hl-sec::after { background: linear-gradient(90deg, rgba(242, 193, 78, .7), transparent); }
+.hl-sec span { white-space: nowrap; }
+.hl-list { gap: 14px; }
+.hl-table, .hl-pull { border: 0; border-radius: 16px; background: linear-gradient(180deg, color-mix(in srgb, var(--mc) 16%, #1b1424), #0e0a13 70%);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--mc) 55%, transparent), inset 0 1px 0 rgba(255, 255, 255, .07), 0 10px 26px rgba(0, 0, 0, .55); }
+.hl-table { padding: 12px 10px 12px; }
+.hl-table.r1, .hl-pull.r1 { box-shadow: 0 0 0 1.5px var(--mc), inset 0 1px 0 rgba(255, 240, 200, .14), 0 0 26px color-mix(in srgb, var(--mc) 30%, transparent), 0 10px 26px rgba(0, 0, 0, .55); }
+.hl-rank { gap: 10px; margin-bottom: 10px; }
+.hl-rank small { font-size: .78rem; color: color-mix(in srgb, var(--mc) 60%, #fff); }
+.hl-medal { position: relative; display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 50%; font: 800 1.1rem/1 var(--font-title, serif); color: #1a1208;
+  background: radial-gradient(circle at 35% 30%, #fff8 0, transparent 40%), linear-gradient(145deg, color-mix(in srgb, var(--mc) 80%, #fff), var(--mc) 50%, color-mix(in srgb, var(--mc) 55%, #000));
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, .5), 0 0 12px color-mix(in srgb, var(--mc) 55%, transparent); }
+.hl-medal-img { display: none; }
+.hl-medal.has { background: none; box-shadow: none; width: 48px; height: 48px; }
+.hl-medal.has .hl-medal-img { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .6)); }
+.hl-medal.has b { display: none; }
+.hl-pull .hl-medal { width: 32px; height: 32px; font-size: .9rem; }
+.hl-pull .hl-medal.has { width: 38px; height: 38px; }
+.hl-duel { gap: 4px; }
+.hl-side { gap: 4px; padding: 8px 4px 8px; background: rgba(0, 0, 0, .25); }
+.hl-side .hl-av { width: 56px; height: 56px; }
+.hl-side.win { background: linear-gradient(180deg, rgba(242, 193, 78, .16), rgba(242, 193, 78, .03)); box-shadow: inset 0 0 0 1px rgba(242, 193, 78, .55); }
+.hl-tot { font: 800 1.5rem/1 var(--font-title, serif); }
+.hl-crown { box-shadow: 0 0 10px rgba(242, 193, 78, .5); }
+.hl-best { gap: 4px; margin-top: 5px; }
+.hl-card { width: 38px; border-radius: 5px; }
+.hl-card em { font-size: .6rem; }
+.hl-vs { display: grid; place-items: center; }
+.hl-vs img { width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(224, 72, 94, .5)); }
+.hl-res { margin-top: 8px; font-size: .82rem; }
+.hl-replay { display: flex; align-items: center; gap: 10px; margin: 12px auto 2px; padding: 6px 18px 6px 6px; border-radius: 99px; border: 1px solid rgba(242, 193, 78, .65);
+  background: linear-gradient(180deg, #3b2b13, #1b1309); color: #F4E6BE; font: inherit; cursor: pointer; text-align: left;
+  box-shadow: inset 0 1px 0 rgba(255, 228, 160, .28), inset 0 -2px 6px rgba(0, 0, 0, .45), 0 0 16px rgba(242, 193, 78, .18); -webkit-tap-highlight-color: transparent; }
+.hl-replay:active { transform: translateY(1px) scale(.98); }
+.hl-rp-ic { position: relative; display: grid; place-items: center; width: 38px; height: 38px; flex: none; border-radius: 50%; color: #1a1208;
+  background: radial-gradient(circle at 35% 30%, #fff6 0, transparent 45%), linear-gradient(145deg, #FFE08A, #D9A13A 55%, #8A5A16); box-shadow: 0 0 0 2px rgba(0, 0, 0, .45), 0 0 10px rgba(242, 193, 78, .5); }
+.hl-rp-ic svg { width: 18px; height: 18px; margin-left: 2px; }
+.hl-rp-img { display: none; }
+.hl-rp-ic.has { background: none; box-shadow: none; width: 44px; height: 44px; margin: -3px 0; }
+.hl-rp-ic.has .hl-rp-img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.hl-rp-ic.has svg { display: none; }
+.hl-rp-t { display: flex; flex-direction: column; gap: 1px; }
+.hl-rp-t b { font-family: var(--font-title, serif); letter-spacing: .05em; font-size: .9rem; color: #F2C14E; }
+.hl-rp-t small { font-size: .64rem; opacity: .7; }
+.hl-pull { grid-template-columns: 38px 84px minmax(0, 1fr); padding: 10px 12px 10px 10px; }
+.hl-big { width: 84px; border-radius: 8px; }
+
+/* v844 : Dimanche mystère, sachet peint (Gemini) à la place du « ? » quand l'image existe */
+.kc-myst-q img { display: none; }
+.kc-myst-q.has { background: none; box-shadow: none; font-size: 0; width: 48px; height: 66px; }
+.kc-myst-q.has img { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 8px rgba(176, 75, 255, .55)); }
+
+/* v844 : récapitulatif en grand des cartes de la table, à la fin d'un Choc */
+.vd-recapbtn { border-color: rgba(242, 193, 78, .7); color: #F2C14E; }
+.vr { position: absolute; inset: 0; z-index: 30; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  background: radial-gradient(ellipse 90% 35% at 50% 0%, rgba(242, 193, 78, .14), transparent 70%), rgba(8, 6, 12, .97); animation: vrIn .3s ease-out; }
+@keyframes vrIn { from { opacity: 0; } }
+.vr-in { max-width: 540px; margin: 0 auto; padding: calc(var(--safe-t, 0px) + 14px) 12px calc(var(--safe-b, 0px) + 18px); display: flex; flex-direction: column; gap: 14px; }
+.vr-head { text-align: center; }
+.vr-head img { width: 54px; height: 54px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(224, 72, 94, .5)); }
+.vr-head h2 { margin: 2px 0; font-family: var(--font-title, serif); color: #F2C14E; letter-spacing: .05em; }
+.vr-head p { margin: 0; opacity: .75; }
+.vr-side { border-radius: 16px; padding: 10px 10px 12px; background: linear-gradient(180deg, #1b1424, #0e0a13); box-shadow: 0 0 0 1px rgba(201, 210, 222, .25), 0 8px 22px rgba(0, 0, 0, .5); }
+.vr-side.me { box-shadow: 0 0 0 1px rgba(201, 210, 222, .45), 0 8px 22px rgba(0, 0, 0, .5); }
+.vr-side.foe { background: linear-gradient(180deg, #24121a, #0e0a13); box-shadow: 0 0 0 1px rgba(224, 72, 94, .35), 0 8px 22px rgba(0, 0, 0, .5); }
+.vr-side.won { box-shadow: 0 0 0 1.5px #F2C14E, 0 0 24px rgba(242, 193, 78, .25), 0 8px 22px rgba(0, 0, 0, .5); }
+.vr-h { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 1rem; }
+.vr-h span { flex: 1; min-width: 0; overflow-wrap: anywhere; font-family: var(--font-title, serif); }
+.vr-h b { font: 800 1.45rem/1 var(--font-title, serif); color: #F2C14E; }
+.vr-h em { font-style: normal; font-size: .62rem; text-transform: uppercase; letter-spacing: .06em; color: #1a1208; background: #F2C14E; border-radius: 99px; padding: 2px 8px; }
+.vr-pack + .vr-pack { margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, .07); }
+.vr-pl { margin: 0 0 6px; font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; opacity: .65; }
+.vr-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.vr-c { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; text-align: center; }
+.vr-im { position: relative; width: 100%; aspect-ratio: 5 / 7; border-radius: 9px; overflow: hidden; box-shadow: 0 0 0 2px var(--rc), 0 6px 14px rgba(0, 0, 0, .5); }
+.vr-im img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.vr-c.fin .vr-im::after { content: ''; position: absolute; inset: 0; background: linear-gradient(125deg, transparent 30%, rgba(255, 255, 255, .28) 45%, rgba(190, 220, 255, .18) 52%, transparent 65%); pointer-events: none; }
+.vr-c.top .vr-im { box-shadow: 0 0 0 2px var(--rc), 0 0 18px color-mix(in srgb, var(--rc) 70%, transparent), 0 6px 14px rgba(0, 0, 0, .5); }
+.vr-pts { position: absolute; right: 4px; bottom: 4px; font-style: normal; font-weight: 800; font-size: .74rem; padding: 1px 6px; border-radius: 99px; color: #1a1208; background: var(--rc); box-shadow: 0 1px 4px rgba(0, 0, 0, .6); }
+.vr-new { position: absolute; left: 4px; top: 4px; font-style: normal; font-size: .58rem; font-weight: 800; text-transform: uppercase; color: #1a1208; background: #F2C14E; border-radius: 99px; padding: 1px 6px; }
+.vr-nm { font-size: .72rem; line-height: 1.15; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.vr-rr { font-size: .62rem; opacity: .85; }
+.vr-rr i { font-style: normal; color: var(--rc); font-weight: 700; }
+.vr-back { position: sticky; bottom: calc(var(--safe-b, 0px) + 8px); }
+.vr .vr-head img.vr-medal { position: static; display: block; margin: 0 auto 2px; width: 54px; height: 54px; transform: none; }
+.vr { background: radial-gradient(ellipse 90% 35% at 50% 0%, rgba(242, 193, 78, .14), transparent 70%), #08060c; }

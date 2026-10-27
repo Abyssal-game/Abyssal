@@ -3,7 +3,7 @@
 // Pour chaque booster de la composition : les deux sachets apparaissent face à face, tremblent, se déchirent ensemble,
 // les cartes jaillissent face cachée vers leur place, puis se retournent une à une, en alternance, avec leurs points.
 // Un toucher accélère (×4) ; « Tout révéler » termine d'un coup.
-import { BOOSTERS, RARITY, RARITY_ORDER } from '../config.js';
+import { BOOSTERS, RARITY, RARITY_ORDER, VARIANTS } from '../config.js';
 import { lineupOf, scoreOf, LEAGUES, streakMult } from '../core/versus.js';
 import { today } from '../core/save.js';
 import { emoteHTML, showEmote } from '../ui/vitrine.js';
@@ -16,7 +16,7 @@ import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM } from '../ui/icons.js';
 import { esc, fmt } from '../ui/dom.js';
 import { packHTML } from './shop.js';
-import { t } from '../i18n.js';
+import { t, tw } from '../i18n.js';
 import { musicCue, musicSeek, musicRelease } from '../ui/music.js';
 import { skinOk } from '../ui/vitrine.js';
 import { stillOf, backUrl } from '../ui/still.js';
@@ -306,13 +306,30 @@ export function playDuel(app, r, out, { foeName, myName, myAvatar, onClose, onPi
       ${noPrize ? `<p class="small">${t('Butin du jour déjà gagné : ce duel était pour la gloire.')}</p>` : ''}
       ${streakHTML}${leagueHTML}
       ${canReact ? `<div class="vd-react"><button class="btn small ghost" data-v="react">${BUBBLE}${t('Laisser une réaction')}</button><div class="re-grid vd-regrid" hidden></div></div>` : r.my_react ? `<p class="small muted">${t('Ta réaction')} : ${esc(t(EMOTES_TXT(r.my_react)))}</p>` : ''}
-      <div class="vd-endbtns">${onRematch ? `<button class="btn block dc-plq" data-v="rematch">${icon('swords')}${t('Revanche')}</button>` : ''}
+      <div class="vd-endbtns">${table ? `<button class="btn block dc-plq vd-recapbtn" data-v="recap">${icon('cards')}${t('Voir les {n} cartes de la table', { n: mine.length + theirs.length })}</button>` : ''}${onRematch ? `<button class="btn block dc-plq" data-v="rematch">${icon('swords')}${t('Revanche')}</button>` : ''}
       <button class="btn primary block big-cta dc-plq dc-plq-red" data-v="close">${t('Fermer')}</button></div>`;
     if (res === 'win') app.sfx['vd-win']?.(); else if (res === 'lose') app.sfx['vd-lose']?.(); else app.sfx['vd-flip']?.();
     if (st?.broken) setTimeout(() => { if (!closed) haptic('defeat'); }, 600);
     if (lg && lg.after !== lg.before) setTimeout(() => { if (!closed) (lg.after > lg.before ? app.sfx.levelup : app.sfx.error)?.(); }, 900);
     /* v807 : la réaction que l'adversaire t'a laissée sur ce duel */
     if (r.their_react) setTimeout(() => { if (!closed) showEmote(r.their_react, 'foe', foeName); }, 1100);
+  }
+  /* v844 : récapitulatif en grand des cartes de la table, booster par booster, pour les deux joueurs */
+  function recapHTML() {
+    const fresh = new Set((out?.cards || []).filter((x) => x.isNewCard).map((x) => x.id));
+    const top = Math.max(...[...mine, ...theirs].map((c) => c.pts || 0));
+    const big = (c, side) => { const k = cat.get(c.id); if (!k) return ''; const fin = c.variant && c.variant !== 'normal';
+      return `<span class="vr-c ${fin ? 'fin' : ''} ${c.pts === top && top > 0 ? 'top' : ''}" style="--rc:${RARITY[c.rarity]?.color || '#999'}">
+        <span class="vr-im"><img alt="" loading="lazy" src="${artUrl(k, { lite: true })}"><em class="vr-pts">+${fmt(c.pts || 0)}</em>${side === 'me' && fresh.has(c.id) ? `<i class="vr-new">${t('Nouvelle')}</i>` : ''}</span>
+        <b class="vr-nm">${esc(tw(k.name))}</b><small class="vr-rr"><i>${t(RARITY[c.rarity]?.name || c.rarity)}</i>${fin ? ` · ${t(VARIANTS[c.variant]?.name || '')}` : ''}</small></span>`; };
+    const side = (packs, who, name, total, won) => `<section class="vr-side ${who} ${won ? 'won' : ''}">
+        <h3 class="vr-h"><span>${name}</span><b>${fmt(total)}</b>${won ? `<em>${t('rafle la table')}</em>` : ''}</h3>
+        ${packs.map((p, i) => `<div class="vr-pack"><p class="vr-pl">${t(BOOSTERS[lineup[i]?.type]?.name || 'Booster')}</p><div class="vr-row">${p.map((c) => big(c, who)).join('')}</div></div>`).join('')}</section>`;
+    const meWon = res === 'win', foeWon = res === 'lose';
+    return `<div class="vr"><div class="vr-in"><header class="vr-head"><img class="vr-medal" alt="" src="assets/versus/vd-vs.webp"><h2>${t('Les cartes de la table')}</h2>
+        <p class="small">${t('{n} cartes ouvertes', { n: mine.length + theirs.length })}</p></header>
+      ${side(myPacks, 'me', myName ? esc(myName) : t('Toi'), sc.me, meWon)}${side(foePacks, 'foe', esc(foeName), sc.foe, foeWon)}
+      <button class="btn primary block dc-plq dc-plq-red vr-back" data-v="recapx">${t('Revenir')}</button></div></div>`;
   }
   /* v833 : les cartes raflées, les plus rares d'abord */
   function tableWon(cards) {
@@ -335,6 +352,8 @@ export function playDuel(app, r, out, { foeName, myName, myAvatar, onClose, onPi
   el.addEventListener('click', (e) => {
     const b = e.target.closest('[data-v]');
     if (b?.dataset.v === 'close') return close();
+    if (b?.dataset.v === 'recap') { el.querySelector('.vr')?.remove(); el.insertAdjacentHTML('beforeend', recapHTML()); app.sfx['vd-flip']?.(); return; }
+    if (b?.dataset.v === 'recapx') { el.querySelector('.vr')?.remove(); return; }
     if (b?.dataset.v === 'all') return finish();
     if (b?.dataset.v === 'rematch') { close(); onRematch?.(); return; }
     if (b?.dataset.v === 'react') {

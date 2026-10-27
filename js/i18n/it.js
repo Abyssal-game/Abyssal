@@ -9247,6 +9247,9 @@ export default {
   "{0} PA · recharge {1} tours": "{0} PA · si ricarica in {1} turni",
   "recharge {0} tours": "si ricarica in {0} turni",
   "Plus de jeton aujourd’hui : un nouveau arrive demain.": "Niente gettoni oggi: domani ne arriva uno nuovo.",
+  "Voir les {n} cartes de la table": "Vedi le {n} carte sul tavolo",
+  "Les cartes de la table": "Le carte sul tavolo",
+  "{n} cartes ouvertes": "{n} carte aperte",
 };
 
 export const names = {

@@ -9248,6 +9248,9 @@ export default {
   "{0} PA · recharge {1} tours": "{0} AP · lädt in {1} Runden auf",
   "recharge {0} tours": "lädt in {0} Runden auf",
   "Plus de jeton aujourd’hui : un nouveau arrive demain.": "Heute keine Marke mehr: Morgen kommt eine neue.",
+  "Voir les {n} cartes de la table": "Die {n} Karten auf dem Tisch ansehen",
+  "Les cartes de la table": "Die Karten auf dem Tisch",
+  "{n} cartes ouvertes": "{n} Karten geöffnet",
 };
 
 export const names = {

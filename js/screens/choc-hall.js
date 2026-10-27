@@ -15,6 +15,10 @@ import { fakeHall } from './choc-dev.js';
 
 const FIN = { holo: 'Argentée', gold: 'Enluminée', galaxy: 'Abyssale', crystal: 'Cristalline', prism: 'Prismatique' };
 const MEDAL = ['#F2C14E', '#C9D2DE', '#C07A45'];
+/* v844 : images peintes (Gemini) ; tant qu'une image manque, le décor dessiné en CSS reste (classe has posée au chargement) */
+const PIMG = (src, cls) => `<img class="${cls}" alt="" src="${src}" onload="this.parentNode.classList.add('has')" onerror="this.remove()">`;
+const BG = () => `<span class="hl-bg">${PIMG('assets/choc/pantheon-fond.webp', 'hl-bg-img')}</span>`;
+const medal = (i) => `<span class="hl-medal">${PIMG(`assets/choc/medaille-${i + 1}.webp`, 'hl-medal-img')}<b>${i + 1}</b></span>`;
 let cache = null, cacheAt = 0, loading = null, sim = null;
 /* v843 : Panthéon simulé du Mode Créateur (remplace celui du serveur tant qu'il est allumé) */
 export function setHallSim(cat, lineupOf, kind) { sim = cat ? fakeHall(cat, lineupOf, kind) : null; return sim; }
@@ -52,16 +56,16 @@ function tableHTML(cat, m, i) {
       ${av(cat, p)}<span class="hl-nm">${nm(p)}${!isBlocked(p.id) ? cloud.badgeHTML(p.badge) : ''}</span>
       <b class="hl-tot">${fmt(p.total)}</b>${m.winner === w ? `<span class="hl-crown">${t('rafle la table')}</span>` : ''}
       <span class="hl-best">${(p.best || []).map((x) => mini(cat, x)).join('')}</span></div>`;
-  return `<li class="hl-table" style="--mc:${MEDAL[i]}"><div class="hl-rank"><span>${i + 1}</span><small>${t('{n} points sur la table', { n: fmt(m.sum) })}${m.kind === 'mystere' ? ` · ${t('Dimanche mystère')}` : m.kind === 'premium' || m.types?.[2] === 'premium' ? ` · ${t('Samedi premium')}` : ''}</small></div>
-    <div class="hl-duel">${side(m.a, 'a')}<span class="hl-vs">VS</span>${side(m.b, 'b')}</div>
-    ${m.packs ? `<button class="btn small ghost hl-replay" data-hreplay="${i}" translate="no">▶ Revoir la partie (simulée)</button>` : ''}
+  return `<li class="hl-table r${i + 1}" style="--mc:${MEDAL[i]}"><div class="hl-rank">${medal(i)}<small>${t('{n} points sur la table', { n: fmt(m.sum) })}${m.kind === 'mystere' ? ` · ${t('Dimanche mystère')}` : m.kind === 'premium' || m.types?.[2] === 'premium' ? ` · ${t('Samedi premium')}` : ''}</small></div>
+    <div class="hl-duel">${side(m.a, 'a')}<span class="hl-vs"><img alt="" src="assets/versus/vd-vs.webp"></span>${side(m.b, 'b')}</div>
+    ${m.packs ? `<button class="hl-replay" data-hreplay="${i}" translate="no"><span class="hl-rp-ic">${PIMG('assets/choc/revoir.webp', 'hl-rp-img')}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></span><span class="hl-rp-t"><b>Revoir la partie</b><small>Partie simulée · Mode Créateur</small></span></button>` : ''}
     <p class="hl-res small">${m.winner === 'draw' ? t('Égalité : chacun a gardé ses cartes.') : t('{name} est reparti avec {n} cartes.', { name: `<b>${esc(shownName((m.winner === 'a' ? m.a : m.b).id, (m.winner === 'a' ? m.a : m.b).pseudo))}</b>`, n: 18 })}</p></li>`;
 }
 function cardHTML(cat, x, i) {
   const c = cat.get(x.card?.id); if (!c) return '';
   const fin = x.card.variant && x.card.variant !== 'normal' ? FIN[x.card.variant] : null;
-  return `<li class="hl-pull" style="--mc:${MEDAL[i]};--rc:${RARITY[c.rarity]?.color || '#999'}">
-    <span class="hl-pnum">${i + 1}</span>
+  return `<li class="hl-pull r${i + 1}" style="--mc:${MEDAL[i]};--rc:${RARITY[c.rarity]?.color || '#999'}">
+    ${medal(i)}
     <span class="hl-big ${fin ? 'fin' : ''}"><img alt="" src="${artUrl(c, { lite: true })}"></span>
     <span class="hl-pt"><b>${esc(tw(c.name))}</b><small><i style="color:var(--rc)">${t(RARITY[c.rarity]?.name || c.rarity)}</i>${fin ? ` · ${t(fin)}` : ''} · ${fmt(x.card.pts)} ${t('points')}</small>
       <span class="hl-by"${profileAttrs(x.player.id)}>${av(cat, x.player)}<span>${t('tirée par')} <b>${nm(x.player)}</b>${x.won ? `<em>${t('a raflé la table')}</em>` : ''}</span></span></span></li>`;
@@ -69,17 +73,17 @@ function cardHTML(cat, x, i) {
 
 export async function openHall(app) {
   const cat = app.catalog;
-  const sh = openSheet(`<div class="hl"><div class="hl-head"><img alt="" src="assets/icons/crown2.webp"><h2>${t('Le Panthéon d’hier')}</h2><p class="small muted">${t('Chargement…')}</p></div></div>`, { label: t('Le Panthéon d’hier'), full: true, cls: 'hl-sheet' });
+  const sh = openSheet(`<div class="hl">${BG()}<div class="hl-head"><img alt="" src="assets/icons/crown2.webp"><h2>${t('Le Panthéon d’hier')}</h2><p class="small muted">${t('Chargement…')}</p></div></div>`, { label: t('Le Panthéon d’hier'), full: true, cls: 'hl-sheet' });
   const h = await loadHall();
   if (!sh.body.isConnected) return;
-  const head = `<div class="hl-head"><img alt="" src="assets/icons/crown2.webp"><h2>${t('Le Panthéon d’hier')}</h2>
+  const head = `<div class="hl-head">${PIMG('assets/choc/pantheon-titre.webp', 'hl-head-art')}<img class="hl-crown-ic" alt="" src="assets/icons/crown2.webp"><h2>${t('Le Panthéon d’hier')}</h2>
     <p class="small muted">${h.day ? `${esc(dayLabel(h.day))} · ` : ''}${t(h.games > 1 ? '{n} parties jouées' : '{n} partie jouée', { n: fmt(h.games || 0) })}</p></div>`;
-  if (h.error) { sh.body.innerHTML = `<div class="hl">${head}<p class="panel small center">${/function|choc_hall|schema/i.test(h.error) ? t('Le Panthéon n’est pas encore ouvert sur le serveur.') : esc(h.error)}</p></div>`; return; }
-  if (!h.tables.length) { sh.body.innerHTML = `<div class="hl">${head}<p class="panel center hl-empty">${t('Personne n’a joué hier : à toi d’écrire la légende d’aujourd’hui.')}</p></div>`; return; }
-  sh.body.innerHTML = `<div class="hl">${head}${h.sim ? '<p class="panel small center" translate="no">Panthéon simulé (Mode Créateur) : ces joueurs et ces parties sont inventés.</p>' : ''}
-    <h3 class="hl-sec">${t('Les plus belles tables')}</h3><p class="small muted hl-why">${t('Les parties où les boosters ont donné le plus de points, les deux joueurs réunis.')}</p>
+  if (h.error) { sh.body.innerHTML = `<div class="hl">${BG()}${head}<p class="panel small center">${/function|choc_hall|schema/i.test(h.error) ? t('Le Panthéon n’est pas encore ouvert sur le serveur.') : esc(h.error)}</p></div>`; return; }
+  if (!h.tables.length) { sh.body.innerHTML = `<div class="hl">${BG()}${head}<p class="panel center hl-empty">${t('Personne n’a joué hier : à toi d’écrire la légende d’aujourd’hui.')}</p></div>`; return; }
+  sh.body.innerHTML = `<div class="hl">${BG()}${head}${h.sim ? '<p class="panel small center" translate="no">Panthéon simulé (Mode Créateur) : ces joueurs et ces parties sont inventés.</p>' : ''}
+    <h3 class="hl-sec"><span>${t('Les plus belles tables')}</span></h3><p class="small muted hl-why">${t('Les parties où les boosters ont donné le plus de points, les deux joueurs réunis.')}</p>
     <ol class="hl-list">${h.tables.map((m, i) => tableHTML(cat, m, i)).join('')}</ol>
-    <h3 class="hl-sec">${t('Les plus beaux tirages')}</h3><p class="small muted hl-why">${t('Les meilleures cartes sorties d’un booster du Choc hier.')}</p>
+    <h3 class="hl-sec"><span>${t('Les plus beaux tirages')}</span></h3><p class="small muted hl-why">${t('Les meilleures cartes sorties d’un booster du Choc hier.')}</p>
     <ol class="hl-list">${h.cards.map((x, i) => cardHTML(cat, x, i)).join('')}</ol>
     <p class="small muted center">${t('Chaque matin, le Panthéon montre les exploits de la veille. Touche un joueur pour voir son profil.')}</p></div>`;
   if (h.sim) sh.body.addEventListener('click', (e) => {
