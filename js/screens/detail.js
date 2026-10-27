@@ -48,7 +48,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
   let dtab = (() => { try { return localStorage.getItem('abyssal.dtab') || 'combat'; } catch (e) { return 'combat'; } })();
   const sheet = openSheet('', { full: true, cls: 'detail-sheet', label: 'Carte', onClose: () => { stopTilt(); app.refreshView && app.refreshView(); } });
 
-  const odds = (card) => `Une chance sur <b>${oddsFor(cat, card).toLocaleString('fr-FR')}</b> de la trouver dans un booster standard (sans compter les garanties).`;
+  const odds = (card) => t('Une chance sur {n} de la trouver dans un booster standard (sans compter les garanties).', { n: `<b>${fmt(oddsFor(cat, card))}</b>` });
   function variantOdds(card) {
     const pCard = 1 / oddsFor(cat, card);
     return Object.entries(VARIANT_RATES).filter(([v]) => card.variants.includes(v)).map(([v, pct]) => {
@@ -64,8 +64,8 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     const x = g.shopOn() && g.sublimeInfo(current);
     if (!x) return '';
     const can = g.obs() >= x.cost;
-    return `<div class="panel dt-sub"><b>${icon('sparkle')} Sublimer en ${esc(VARIANTS[x.to].name.toLowerCase())}</b>
-      <span class="small muted">Tu la possèdes en ${esc(VARIANTS[x.from].name.toLowerCase())} : obtiens un exemplaire ${esc(VARIANTS[x.to].name.toLowerCase())} contre des obsidiennes. Ta carte actuelle est conservée.</span>
+    return `<div class="panel dt-sub"><b>${icon('sparkle')} ${t('Sublimer en {fin}', { fin: esc(t(VARIANTS[x.to].name).toLowerCase()) })}</b>
+      <span class="small muted">${t('Tu la possèdes en {a} : obtiens un exemplaire {b} contre des obsidiennes. Ta carte actuelle est conservée.', { a: esc(t(VARIANTS[x.from].name).toLowerCase()), b: esc(t(VARIANTS[x.to].name).toLowerCase()) })}</span>
       <button class="btn small ${can ? 'gold' : ''}" data-act="sub" ${can ? '' : 'disabled'}>Sublimer · ${x.cost.toLocaleString('fr-FR')} ${OBS}${can ? '' : ` · tu en as ${g.obs().toLocaleString('fr-FR')}`}</button></div>`;
   }
   // Forme corrompue : présentation, condition d'éveil et choix de la forme emmenée au combat
@@ -151,7 +151,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
             <div><dt>Faction</dt><dd><span class="fac-dot" style="color:${fac.colors.secondary}">${sigil(card.faction)}</span>${esc(fac.name)}</dd></div>
             <div><dt>Rareté</dt><dd style="color:${r.color}">${r.name}</dd></div>
           </dl>
-          <p class="small">Page encore scellée : trouve la carte dans un booster ou dans la Descente. ${odds(card)}</p>
+          <p class="small">${t('Page encore scellée : trouve la carte dans un booster ou dans la Descente.')} ${odds(card)}</p>
           <p class="small muted">Son nom se révèle quand tu possèdes la moitié de sa faction.</p>
         </div>`;
     }

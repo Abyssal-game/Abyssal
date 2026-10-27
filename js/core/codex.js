@@ -251,7 +251,7 @@ export const CATALOG = [
   ...SHOP_FRAMES.map((k) => RZ(F, k)), ...SHOP_BACKS.map((k) => RZ(B, k)), ...SHOP_SACHETS.map((k) => RZ(SA, k)), ...SHOP_PLATES.map((k) => RZ(PL, k)), ...SHOP_MATS.map((k) => RZ(TP, k, { live: false })), ...SHOP_FONDS.map((k) => RZ(FP, k, { live: false })),
   ...PAID_EMOTES.filter((k) => !EMOTES[k].codex).map((k) => ({ ...RE(k, 100), r: 'rare' })), /* v630 : sans les réactions du Codex */
   { id: 'arbitres', kind: 'bundle', name: 'Le Cercle des arbitres', give: { emotes: ARBITRE_EMOTES }, cost: 600, desc: 'Les huit réactions des arbitres d’un coup (800 à l’unité).' },
-  { id: 'gardiens', kind: 'bundle', name: 'Les vingt gardiens', give: { emotes: BOSS_EMOTES }, cost: 1500, desc: 'Les vingt réactions des gardiens d’un coup (2 000 à l’unité).' },
+  { id: 'gardiens', kind: 'bundle', name: 'Les vingt gardiens', give: { emotes: BOSS_EMOTES }, cost: 1500, desc: 'Les vingt réactions des gardiens d’un coup (2 000 à l’unité).' },
   { id: 'royaumes', kind: 'bundle', name: 'Les sept royaumes', give: { backs: ROYAUMES }, cost: Math.round(ROYAUMES.reduce((n, k) => n + COSM_PRICE[COSM_RARITY[k]], 0) * 0.8 / 10) * 10, desc: 'Les sept dos vivants des royaumes d’un coup, moins cher qu’à l’unité.' },
 ];
 // Exclusifs du Codex enluminé (jamais en vente). v547 : tous les cosmétiques de la voie enluminée (Saison I : l'hiver),

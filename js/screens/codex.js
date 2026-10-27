@@ -230,7 +230,7 @@ export default function codexScreen(app, root) {
     const fd = SHOP.find((x) => x.id === 'fondateur'), fdOwn = fd && g.shopOwned(fd.id);
     const big = `<div class="cxs-bigs">
         <button class="cxs-big k-obs" data-cx="cat" data-v="obs"><span class="cxs-big-pic">${[1, 2, 3, 4].map((n) => opt(`assets/ui/obs-${n}.webp`)).join('')}</span>
-          <span class="cxs-big-t"><b>${esc(OBS.name)}</b><small>De 100 à 2 800 · bonus offert sur les gros paquets</small></span><span class="cxs-big-go">${icon('next')}</span></button>
+          <span class="cxs-big-t"><b>${esc(OBS.name)}</b><small>De 100 à 2 800 · bonus offert sur les gros paquets</small></span><span class="cxs-big-go">${icon('next')}</span></button>
         ${fd ? `<button class="cxs-big k-founder ${fdOwn ? 'own' : ''}" data-cx="founder">${opt('assets/ui/ech-fondateur2.webp', 'cxs-big-bg')}
           <span class="cxs-big-t"><small class="cx-kick">Une seule fois</small><b>${esc(fd.name)}</b><small>${fdOwn ? `${icon('check')}Déjà à toi` : `Voir ce qu’il contient · ${esc(priceOf(fd))}`}</small></span><span class="cxs-big-go">${icon('next')}</span></button>` : ''}</div>`;
     return `${wallet}${big}

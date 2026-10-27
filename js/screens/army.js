@@ -4,6 +4,7 @@ import { cardHTML, lazyArt, fillGrid } from '../ui/card.js';
 import { artUrl } from '../art/assets.js';
 import { icon, roleIcon, actIcon } from '../ui/icons.js';
 import { esc, fmt, toast, openSheet, bindActions, confirmBox } from '../ui/dom.js';
+import { t, tw, LANG } from '../i18n.js';
 import { coach } from '../ui/coach.js';
 import { tuto } from '../ui/tutos.js';
 import { chestSVG } from '../ui/chest.js';
@@ -33,13 +34,13 @@ export function identityHTML(c, level) {
   if (!k) return '';
   const nx = nextUnlock(c.id, level);
   return `<div class="panel ck-panel">
-    <div class="ck-h"><b>${icon('sparkle')} Propre à ${esc(c.name)} · ${esc(k.style)}</b><span class="small muted">Sa frappe, puis ce qu’elle débloque en montant de niveau</span></div>
+    <div class="ck-h"><b>${icon('sparkle')} ${t('Propre à {name}', { name: esc(tw(c.name)) })} · <span>${esc(k.style)}</span></b><span class="small muted">Sa frappe, puis ce qu’elle débloque en montant de niveau</span></div>
     <ol class="ck-steps">${kitSteps(c.id, level).map((x) => `<li class="ck-s ${x.open ? 'on' : 'locked'}">
       <span class="ck-lv">${x.open ? icon('check') : icon('lock')}<small>Niv. ${x.lv}</small></span>
       ${x.img ? `<img class="ck-ic" alt="" src="${x.img}">` : ''}
       <span class="ck-t"><b><span class="ck-k">${x.kind}</span> ${esc(x.name)}</b>${x.cost ? `<span class="cb-k">${x.cost}</span>` : ''}<span class="small">${esc(x.desc)}</span></span></li>`).join('')}</ol>
-    ${nx ? `<p class="small ck-next">${icon('p:level-up')} Prochain déblocage au niveau ${nx.lv} : <b>${esc(nx.kind === 'Éveil' ? 'l’Éveil' : nx.kind === 'Apogée' ? 'l’Apogée' : nx.name)}</b></p>` : '<p class="small ck-next gold">Identité complète : tout est débloqué.</p>'}
-    <div class="ck-traits"><p class="small"><b class="dc-good">Forces</b> ${esc(k.plus)}</p><p class="small"><b class="dc-bad">Faiblesses</b> ${esc(k.moins)}</p><p class="small"><b>Alliés</b> ${esc(k.synergy)}</p></div>
+    ${nx ? `<p class="small ck-next">${icon('p:level-up')} ${t('Prochain déblocage au niveau {lv} :', { lv: nx.lv })} <b>${esc(nx.kind === 'Éveil' ? t('l’Éveil') : nx.kind === 'Apogée' ? t('l’Apogée') : nx.name)}</b></p>` : '<p class="small ck-next gold">Identité complète : tout est débloqué.</p>'}
+    <div class="ck-traits"><p class="small"><b class="dc-good">Forces</b> <span>${esc(k.plus)}</span></p><p class="small"><b class="dc-bad">Faiblesses</b> <span>${esc(k.moins)}</span></p><p class="small"><b>Alliés</b> <span>${esc(k.synergy)}</span></p></div>
   </div>`;
 }
 
@@ -119,7 +120,7 @@ export function teamScreen(app, root) {
     if (team.length < 2) return '';
     const nm = (id) => esc(cat.get(id).name);
     const toB = (n) => { const t = toName(n), i = t.indexOf(' '); return `${t.slice(0, i)} <b>${esc(t.slice(i + 1))}</b>`; };
-    return `<div class="panel v2-skill tm-syn"><b>${icon('p:combo')} Synergies de l’équipe</b>${syn.length ? syn.slice(0, 6).map((x) => `<p class="small"><b>${nm(x.b)}</b> apporte ${esc(TAGS[x.tag])} ${toB(cat.get(x.a).name)}.</p>`).join('') : '<p class="small muted">Aucune pour l’instant : « Suggérer une équipe » cherche des créatures qui se complètent.</p>'}</div>`;
+    return `<div class="panel v2-skill tm-syn"><b>${icon('p:combo')} Synergies de l’équipe</b>${syn.length ? syn.slice(0, 6).map((x) => (LANG === 'fr' ? `<p class="small"><b>${nm(x.b)}</b> apporte ${esc(TAGS[x.tag])} ${toB(cat.get(x.a).name)}.</p>` : `<p class="small">${t(`{a} apporte ${TAGS[x.tag]} à {b}.`, { a: `<b>${esc(tw(cat.get(x.b).name))}</b>`, b: `<b>${esc(tw(cat.get(x.a).name))}</b>` })}</p>`)).join('') : '<p class="small muted">Aucune pour l’instant : « Suggérer une équipe » cherche des créatures qui se complètent.</p>'}</div>`;
   };
   const draw = () => {
     const team = g.team(), ult = g.ultimate(team), run = g.descent().run;
@@ -217,7 +218,7 @@ export function teamScreen(app, root) {
       sh.body.addEventListener('click', (e) => { const b = e.target.closest('[data-t]'); if (!b) return; if (b.dataset.t === 'ok') go(); else sh.close(); });
       inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
     },
-    auto() { try { g.setTeam(g.suggestTeam()); app.sfx.discover(); toast(`Équipe suggérée : tes créatures les plus fortes qui se complètent (${g.teamSynergies().length} synergie${g.teamSynergies().length > 1 ? 's' : ''}).`, { icon: 'sparkle' }); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
+    auto() { try { g.setTeam(g.suggestTeam()); app.sfx.discover(); toast(t(g.teamSynergies().length > 1 ? 'Équipe suggérée : tes créatures les plus fortes qui se complètent ({n} synergies).' : 'Équipe suggérée : tes créatures les plus fortes qui se complètent ({n} synergie).', { n: g.teamSynergies().length }), { icon: 'sparkle' }); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); } },
     async clear() { // v311 : confirmation (avant, un toucher effaçait l'équipe)
       if (!(await confirmBox('Retirer toutes les créatures de l’équipe ?', { ok: 'Vider l’équipe' }))) return;
       try { g.setTeam([]); app.sfx.sheet?.(); draw(); } catch (e) { toast(esc(e.message), { kind: 'error' }); }

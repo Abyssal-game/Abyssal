@@ -1,6 +1,7 @@
 // La Fournaise : on y brûle des cartes (doublons ou non) pour des cendres,
 // et les cendres font monter le niveau des créatures.
 import { VARIANTS } from '../config.js';
+import { t, tw } from '../i18n.js';
 import { icon } from '../ui/icons.js';
 import { openSheet, confirmBox, esc, toast, fmt } from '../ui/dom.js';
 import { duelUnit } from '../core/duel.js';
@@ -16,7 +17,7 @@ export function upgradeCard(app, id) {
     app.pendingProgress = [];
     const r = g.upgrade(id);
     app.sfx.levelup?.();
-    toast(`<b>${esc(c.name)}</b> passe au niveau <b>${r.level}</b> (−${fmt(r.cost)} cendres).`, { kind: 'success', icon: 'star' });
+    toast(t('{name} passe au niveau {lv} (−{cost} cendres).', { name: `<b>${esc(tw(c.name))}</b>`, lv: `<b>${r.level}</b>`, cost: fmt(r.cost) }), { kind: 'success', icon: 'star' });
     const un = unlockAt(id, r.level);
     if (un) { setTimeout(() => (un.kind === 'Apogée' ? app.sfx.apogee?.() : app.sfx.unlock?.()), 450); toast(`${un.kind === 'Éveil' ? `<b>${esc(c.name)}</b> s’éveille !` : un.kind === 'Apogée' ? `<b>${esc(c.name)}</b> atteint son Apogée !` : `${un.kind === 'Compétence' ? 'Nouvelle compétence' : 'Nouveau passif'} : <b>${esc(un.name)}</b>`}<br><span class="small">${esc(un.desc)}</span>`, { kind: 'success', icon: 'sparkle' }); app.sfx.fury?.(); }
     app.flushProgress();

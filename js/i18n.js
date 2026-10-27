@@ -85,6 +85,9 @@ export function tx(text) {
     if (pre) { const v = tx(pre[2]); if (v !== pre[2]) return pre[1].replace(/\s+:/, ':') + v; }
     const ci = text.indexOf(' : ');
     if (ci > 0) { const a = text.slice(0, ci), b = text.slice(ci + 3), va = tx(a), vb = tx(b); if (vb !== b) return `${va}: ${vb}`; }
+    /* v841 : plusieurs phrases (descriptions des créatures : « Nom : effet. Autre nom devient… ») : chacune traduite à part */
+    const sent = text.split(/(?<=[.!?])\s+(?=[A-ZÀ-ÖØ-Þ«{(+])/);
+    if (sent.length > 1) { const v = sent.map((x) => tx(x)); if (v.some((x, i) => x !== sent[i])) return lead + v.join(' ').trim() + tail; }
   }
   miss(key); return text;
 }

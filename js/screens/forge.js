@@ -4,6 +4,7 @@ import { RARITY, RARITY_ORDER, VARIANTS, FRAMES, ASH_FRAMES } from '../config.js
 import { artUrl } from '../art/assets.js';
 import { icon } from '../ui/icons.js';
 import { esc, fmt, toast, confirmBox, bindActions } from '../ui/dom.js';
+import { t, tw } from '../i18n.js';
 import { MAX_LEVEL } from '../core/army.js';
 import { upgradeCard, nextLevelGain, openBurn } from './furnace.js';
 import { nextUnlock } from '../core/kits.js';
@@ -129,7 +130,7 @@ export function furnaceScreen(app, root) {
     async sub(el) {
       const id = el.dataset.id, c = cat.get(id), x = g.sublimeInfo(id);
       if (!x) return;
-      if (x.cost > g.obs()) { toast(`Il te manque <b>${fmt(x.cost - g.obs())} obsidiennes</b> pour sublimer ${esc(c.name)}.`); return; }
+      if (x.cost > g.obs()) { toast(t('Il te manque {n} pour sublimer {name}.', { n: `<b>${t('{n} obsidiennes', { n: fmt(x.cost - g.obs()) })}</b>`, name: esc(tw(c.name)) })); return; }
       if (!(await confirmBox(`Sublimer <b>${esc(c.name)}</b> en <b>${esc(VARIANTS[x.to].name.toLowerCase())}</b> pour <b>${fmt(x.cost)} obsidiennes</b> ?`, { ok: 'Sublimer' }))) return;
       try {
         app.pendingProgress = [];

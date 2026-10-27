@@ -11,6 +11,7 @@ import { cardHTML, lazyArt } from '../ui/card.js';
 import { parisDay, claimShadowPrize } from './shadow.js';
 import * as cloud from '../cloud/cloud.js';
 import { getPackSkin } from '../ui/vitrine.js'; /* v565 */
+import { t, LANG } from '../i18n.js';
 
 export function waitText(ms) {
   const m = Math.max(1, Math.ceil(ms / 60000));
@@ -74,17 +75,20 @@ export function packHTML(type, cat, { faction, event, skin = getPackSkin(type) }
 export function showOdds(app, type) {
   const o = boosterOdds(type);
   const def = BOOSTERS[type];
-  const rows = RARITIES.map((r) => `<tr><th scope="row" style="color:${r.color}">${r.name}</th>${o.slots.map((s) => `<td>${s.odds[r.key] ? s.odds[r.key].toFixed(s.odds[r.key] < 1 ? 2 : 1).replace('.', ',') + ' %' : '—'}</td>`).join('')}</tr>`).join('');
-  openSheet(`<h2>Probabilités · ${esc(def.name)}</h2>
-    <p class="small muted">Chaque carte est tirée au hasard par le serveur du jeu : d’abord sa rareté selon la table de son emplacement, puis une créature de cette rareté. Ces valeurs sont celles réellement utilisées par le jeu.</p>
-    <div class="table-wrap"><table class="odds"><thead><tr><th></th>${o.slots.map((s, i) => `<th scope="col">Carte ${i + 1}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
-    <p class="small">Chance d’au moins une Hyper rare ou mieux : <b>${o.atLeastHR.toFixed(1).replace('.', ',')} %</b> · au moins une Mythique ou mieux : <b>${o.atLeastM.toFixed(1).replace('.', ',')} %</b>.</p>
-    <h3>Garanties</h3>
-    <ul class="small"><li>Après ${PITY.hr - 1} boosters d’affilée sans Hyper rare ou mieux, la dernière carte du suivant est <b>au moins Hyper rare</b>.</li><li>Après ${PITY.m - 1} boosters d’affilée sans Mythique ou mieux, la dernière carte du suivant est <b>au moins Mythique</b>.</li><li>Les compteurs sont communs à tous les boosters et repartent à zéro dès que la rareté est obtenue.</li></ul>
-    <h3>Finitions</h3>
-    <p class="small">Chaque carte peut sortir en finition argentée (${VARIANT_RATES.holo.toString().replace('.', ',')} %), enluminée (${VARIANT_RATES.gold.toString().replace('.', ',')} %), abyssale (${VARIANT_RATES.galaxy.toString().replace('.', ',')} %), cristalline (${VARIANT_RATES.crystal.toString().replace('.', ',')} %) ou prismatique (${VARIANT_RATES.prism.toString().replace('.', ',')} %). Une finition est purement visuelle. On l’obtient dans les boosters.${def.variantMult > 1 ? ` Ce booster multiplie leurs chances par ${String(def.variantMult).replace('.', ',')}.` : ''}</p>
-    <h3>Doublons</h3>
-    <p class="small">Un doublon se brûle dans la Fournaise pour des cendres (${RARITIES.map((r) => `${r.short} ${ECONOMY.burnAsh[r.key]}`).join(', ')} ; ×${ECONOMY.burnFinish.holo} argentée, ×${ECONOMY.burnFinish.gold} enluminée, ×${ECONOMY.burnFinish.galaxy} abyssale, ×${ECONOMY.burnFinish.crystal} cristalline, ×${ECONOMY.burnFinish.prism} prismatique). Les cendres font monter le niveau de tes créatures.</p>`, { label: 'Probabilités' });
+  /* v841 : tout passe par t() (la fenêtre restait en français dans les autres langues) */
+  const P = (x, d = 1) => `${x.toFixed(d).replace('.', LANG === 'fr' ? ',' : '.')}\u00a0%`;
+  const R = (k) => String(VARIANT_RATES[k]).replace('.', LANG === 'fr' ? ',' : '.');
+  const rows = RARITIES.map((r) => `<tr><th scope="row" style="color:${r.color}">${t(r.name)}</th>${o.slots.map((s) => `<td>${s.odds[r.key] ? P(s.odds[r.key], s.odds[r.key] < 1 ? 2 : 1) : '—'}</td>`).join('')}</tr>`).join('');
+  openSheet(`<h2>${t('Probabilités')} · ${esc(t(def.name))}</h2>
+    <p class="small muted">${t('Chaque carte est tirée au hasard par le serveur du jeu : d’abord sa rareté selon la table de son emplacement, puis une créature de cette rareté. Ces valeurs sont celles réellement utilisées par le jeu.')}</p>
+    <div class="table-wrap"><table class="odds"><thead><tr><th></th>${o.slots.map((s, i) => `<th scope="col">${t('Carte {n}', { n: i + 1 })}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
+    <p class="small">${t('Chance d’au moins une Hyper rare ou mieux : {a} · au moins une Mythique ou mieux : {b}.', { a: `<b>${P(o.atLeastHR)}</b>`, b: `<b>${P(o.atLeastM)}</b>` })}</p>
+    <h3>${t('Garanties')}</h3>
+    <ul class="small"><li>${t('Après {n} boosters d’affilée sans Hyper rare ou mieux, la dernière carte du suivant est au moins Hyper rare.', { n: PITY.hr - 1 })}</li><li>${t('Après {n} boosters d’affilée sans Mythique ou mieux, la dernière carte du suivant est au moins Mythique.', { n: PITY.m - 1 })}</li><li>${t('Les compteurs sont communs à tous les boosters et repartent à zéro dès que la rareté est obtenue.')}</li></ul>
+    <h3>${t('Finitions')}</h3>
+    <p class="small">${t('Chaque carte peut sortir en finition argentée ({a} %), enluminée ({b} %), abyssale ({c} %), cristalline ({d} %) ou prismatique ({e} %). Une finition est purement visuelle. On l’obtient dans les boosters.', { a: R('holo'), b: R('gold'), c: R('galaxy'), d: R('crystal'), e: R('prism') })}${def.variantMult > 1 ? ` ${t('Ce booster multiplie leurs chances par {n}.', { n: String(def.variantMult).replace('.', LANG === 'fr' ? ',' : '.') })}` : ''}</p>
+    <h3>${t('Doublons')}</h3>
+    <p class="small">${t('Un doublon se brûle dans la Fournaise pour des cendres ({list} ; ×{a} argentée, ×{b} enluminée, ×{c} abyssale, ×{d} cristalline, ×{e} prismatique). Les cendres font monter le niveau de tes créatures.', { list: RARITIES.map((r) => `${t(r.short)} ${ECONOMY.burnAsh[r.key]}`).join(', '), a: ECONOMY.burnFinish.holo, b: ECONOMY.burnFinish.gold, c: ECONOMY.burnFinish.galaxy, d: ECONOMY.burnFinish.crystal, e: ECONOMY.burnFinish.prism })}</p>`, { label: t('Probabilités') });
 }
 
 
@@ -112,7 +116,7 @@ export default function shop(app, root, params = []) {
   function freeLine() {
     const f = g.freePack();
     if (!f.nextAt) return `<p class="free-line full">${icon('p:free-pack')}<span><b>Booster gratuit du jour</b><small>Il se garde : jusqu’à 2 en réserve si tu ne l’ouvres pas tout de suite.</small></span></p>`;
-    return `<p class="free-line">${icon('hourglass')}<span>Prochain booster gratuit dans <b>${waitText(f.nextAt - Date.now())}</b><small>Un booster gratuit chaque jour, à minuit (jusqu’à 2 en réserve).</small></span></p>`;
+    return `<p class="free-line">${icon('hourglass')}<span>${t('Prochain booster gratuit dans {w}', { w: `<b>${waitText(f.nextAt - Date.now())}</b>` })}<small>${t('Un booster gratuit chaque jour, à minuit (jusqu’à 2 en réserve).')}</small></span></p>`;
   }
 
   function render() {
