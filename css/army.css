@@ -8890,3 +8890,5 @@ table.odds th, table.odds td { white-space: normal; }
 .ui-hero.gc-hero h1 { text-shadow: none; } /* titre en dégradé : jamais d'ombre (règle d'affichage) */
 .dv.cb.cb2.hunt .dv-row.enemy .dv-c { scale: 1.3; transform-origin: 50% 100%; }
 @media (max-height: 700px) { .dv.cb.cb2.hunt .dv-row.enemy .dv-c { scale: 1.15; } }
+/* v863 : bandeau propre à la Grande Chasse (chasseurs encapuchonnés face à la bête, Gemini ; source store/chasse/bandeau-source.jpg) */
+.ui-hero.gc-hero.bn-chasse { background: linear-gradient(90deg, rgba(8, 9, 13, .85) 25%, rgba(8, 9, 13, 0) 60%), url(../assets/ui/bn-chasse.webp) right 80% / cover no-repeat, #09090D; }

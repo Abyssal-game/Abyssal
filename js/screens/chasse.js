@@ -103,7 +103,7 @@ export default function chasse(app, root) {
 
   function list() {
     const c = g.chasse(), key = g.chasseBoss();
-    root.innerHTML = `<header class="screen-head dc-head ui-hero gc-head gc-hero" style="--bn:url(${new URL(huntArt(cat, key), document.baseURI).href})"><h1>${t('La Grande Chasse')}</h1><p class="muted">${t('Une bête pour tous les joueurs. Chacun la blesse, ensemble on l’abat.')}</p></header>
+    root.innerHTML = `<header class="screen-head dc-head ui-hero gc-head gc-hero bn-chasse"><h1>${t('La Grande Chasse')}</h1><p class="muted">${t('Une bête pour tous les joueurs. Chacun la blesse, ensemble on l’abat.')}</p></header>
       ${ui.result ? resultHTML(ui.result) : ''}
       ${claimHTML(c)}
       ${bossHTML(key)}
