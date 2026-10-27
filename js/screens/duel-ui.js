@@ -21,7 +21,6 @@ import {
 } from '../core/duel.js';
 import { KITS, AI_FAMILIES, DICE_TIERS, WEAK_TO, TALENTS } from '../core/skills.js';
 import { BOSSES, LAWS, ASPECTS } from '../core/bosses.js';
-import { HUNT_ART } from '../core/chasse.js'; /* v858 : Grande Chasse */
 // v328 : premier combat allégé — pendant les deux premiers étages de la première expédition, seules la main dorée et les
 // bulles de base s'affichent ; Marque/enchaînement, pouvoir d'équipe et dés attendent la suite (relisibles dans Réglages)
 const CB_ICON = new Set(['bastion', 'chasse', 'glace']); // images présentes dans assets/icons/cb-*.webp
@@ -72,14 +71,13 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const settling = () => { const d = app.game.s.descent; return (d.runs || 0) <= 1 && (d.run?.floor || 1) <= 2; }; // v328 : voir plus haut
   const g = app.game, cat = app.catalog, run = runOpt || g.descent().run, st = run.battle;
   app.state.lastEnemyTurn = null; /* v729 : le dernier tour ennemi d'un ancien combat ne s'affiche plus */
-  const where = run.lab ? 'lab' : run.trial ? 'trial' : run.chasse ? 'chasse' : 'run';
+  const where = run.lab ? 'lab' : run.trial ? 'trial' : 'run';
   perfStart(`${where === 'lab' ? 'Labo' : where === 'trial' ? 'Épreuve' : 'Descente'} · étage ${run.floor || '?'}${run.room === 'boss' || st.bossKey ? ` · gardien ${st.bossKey || ''}` : run.room === 'elite' ? ' · élite' : ''}`);
   const E = engine || g; /* v595 : le banc d'essai du Labo joue sur son propre combat (js/core/lab.js), hors sauvegarde et serveur */ /* v540 : chaque coup passe par le jeu (g.duel…) : le serveur de partie rejoue le combat */
   const ui = (app.state.duel ||= { fast: 0 });
   ui.fast = g.s.settings.combatFast ? 1 : 0; // v331 : bouton ×2 de retour (étude joueurs : un combat ≈ 1,2 min) ; la défense active garde son rythme
   const reduced = app.reduced();
-  /* v862 : Grande Chasse : la bête montre la vie commune à tous les chasseurs (jauge du serveur au début du combat, moins tes coups) */
-  const hpOf = (u, hp = u?.hp ?? 0, pool = run.pool) => (pool && u?.boss ? { v: Math.max(0, Math.round(pool.left - (u.maxHp - Math.max(0, hp)))), mx: Math.max(1, pool.max) } : { v: Math.max(0, hp), mx: Math.max(1, u?.maxHp || 1) });
+  const hpOf = (u, hp = u?.hp ?? 0) => ({ v: Math.max(0, hp), mx: Math.max(1, u?.maxHp || 1) }); /* PV affichés (anneau, barre, fiche) */
   const light = g.s.settings?.quality === 'light'; // v374 : « Effets allégés » (Réglages) pour les téléphones qui peinent
   const T = (ms) => (reduced ? Math.min(ms, 80) : ui.fast === 3 ? ms * 0.25 : ui.fast ? ms * 0.45 : ms); // vitesse ×1, ×2 ou ×3
   const defMode = g.s.settings?.defense === 'auto' ? 'auto' : 'on'; // v269 : manuelle ou automatique (v333 : mode « assistée » retiré, il redevient manuel)
@@ -96,7 +94,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   /* v820 : écran de combat refait (demande du propriétaire) : en haut la frise des tours et le bandeau du dernier coup,
      puis les ennemis face à tes créatures (rien entre les deux), et en bas le menu de combat : la créature qui joue,
      ses actions, la réserve et la Ferveur. « Passer » devient un petit bouton en haut à droite. */
-  root.innerHTML = `<div class="dv cb cb2 ${run.room} ${run.chasse ? 'hunt' : ''} has-bg" style="--bgimg:${room.paint ? `url(${abs(room.paint)})` : bgOf(run)}">
+  root.innerHTML = `<div class="dv cb cb2 ${run.room} has-bg" style="--bgimg:${room.paint ? `url(${abs(room.paint)})` : bgOf(run)}">
     <div class="dv-top"><b>${(() => { const [a, ...r] = String(title).split(' · '); return esc(a) + (r.length ? `<span class="dv-tt2">&nbsp;· ${esc(r.join(' · '))}</span>` : ''); })()}</b><div class="cb-rules"></div><span class="row gap">
       <button class="btn small ghost cb-speed ${ui.fast ? 'on' : ''}" data-d="speed" aria-label="Vitesse des animations" aria-pressed="${!!ui.fast}">×${ui.fast ? 2 : 1}</button>
       <button class="btn small ghost cb-help" data-d="help" aria-label="Règles du combat"><svg class="cb-help-q" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.6 9.2a3.4 3.4 0 1 1 5 3c-1.1.6-1.6 1.3-1.6 2.4v.7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="18.6" r="1.55" fill="currentColor"/></svg></button>
@@ -212,7 +210,6 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const BOSS_FIG = new Set(['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'golem', 'peste', 'chasseur', 'voeux', 'titan', 'jumeaux', 'juge', 'bete', 'abysse']);
   // v375 : un gardien n'est pas une carte de la collection — son nom et sa figure peinte partout en combat
   // v392 : le jumeau de la Nuit a sa propre figure ; l'Abysse change de forme dans sa dernière phase
-  HUNT_ART.forEach((k) => { BOSS_FIG.add(k); BOSS_CARD.add(k); }); /* v858 */
   const isFig = (u) => (u?.boss || u?.twin) && BOSS_FIG.has(st.bossKey);
   const figKey = (u) => (u.twin ? 'jumeaux-nuit' : st.bossKey === 'abysse' && u.form === 2 ? 'abysse-2' : st.bossKey);
   const hasCard = (u) => isFig(u) && BOSS_CARD.has(figKey(u));
@@ -313,9 +310,6 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   function draw() {
     moodTick();
     if (!alive_) return;
-    if (st.huntMax) { const h = $('.dv-top > b'); if (h) { h.classList.add('gc-hud'); const left = st.huntMax - st.round + 1, cata = st.huntWarn && left <= st.huntWarn && !st.over; /* v866 : compte à rebours du Cataclysme */
-      h.classList.toggle('gc-cata', !!cata);
-      h.innerHTML = `<span>${cata ? `${icon('p:danger')}${tr('Anéantissement : {n}', { n: left })}` : tr('Tour {r} / {m}', { r: Math.min(st.round, st.huntMax), m: st.huntMax })}</span><span>${icon('swords')}${fmt(st.huntDmg || 0)}</span>`; } } /* v858 : Grande Chasse ; v860 : dans le titre (il prenait de la hauteur aux cartes) */
     perfMark('dessin');
     // v262 : la créature dont c'est le tour est toujours celle qui est choisie
     if (st.init && st.turn === 'ally' && !st.over) sel = st.actor; else if (st.init) sel = null;
@@ -928,8 +922,6 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         case 'phase': draw(); turnBanner(e.side); await wait(T(e.side === 'enemy' ? 520 : 420)); break;
         case 'ult': feedUlt(); dio.ult(); await ultFx(); break;
         case 'law':
-          if (e.huntCata) { draw(); shake(true); banner(`${icon('p:danger')} ${tr('Anéantissement ! Rien ne peut l’arrêter')}`, 'danger', 1600); await wait(T(1200)); break; } /* v866 : Grande Chasse */
-          if (e.huntEnd) { draw(); banner(`${icon('p:hunt')} ${tr('La bête se détourne : ta chasse est terminée')}`, 'skill', 1600); await wait(T(1100)); break; } /* v858 : Grande Chasse */
           if ('forbid' in e) { draw(); if (e.forbid) { banner(`${icon('skull')} Verdict : interdit de ${esc(FORBID[e.forbid])}`, 'danger', 1300); await wait(T(800)); } break; }
           if (e.aspect) dio.aspect(e.aspect); draw(); banner(e.fatigue ? `${icon('skull')} Épuisement : chaque tour blesse tout le monde` : e.law ? esc(LAWS[e.law].name) : esc(ASPECTS[e.aspect].name), e.fatigue ? 'danger' : 'skill', 1300); await wait(T(e.fatigue ? 900 : 700)); break;
         default: break;

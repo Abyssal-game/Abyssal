@@ -65,7 +65,6 @@ export function openCreator(app) {
         <label class="small cr-bpow"><input type="checkbox" id="chall" ${cd.hall ? 'checked' : ''}> Panthéon d’hier simulé (joueurs et parties inventés, chaque partie se revoit)</label>
         ${row(B('chocgo', 'Ouvrir le Choc', 'gold'), B('choc', 'Jouer une partie d’essai'), B('chochall', 'Voir le Panthéon simulé'))}
         ${row(B('chocmonth', 'Bilan de fin de mois'), B('choctok', '+3 jetons du Choc'))}`, 'cr-choc')}
-      ${S('Grande Chasse', `${P('La Chasse se joue une fois par jour. Ce bouton la rouvre aujourd’hui pour un essai (les dégâts d’un 2e combat le même jour ne sont pas ajoutés à la jauge commune).')}${row(B('chasse', 'Rejouer la Chasse aujourd’hui', 'gold'))}`)}
       ${S('Boosters', `${P(f ? `Prochain booster : une carte <b>${esc(RARITIES.find((r) => r.key === f.rarity)?.name || f.rarity)}</b>${f.variant ? ` en <b>${esc(VARIANTS[f.variant].name)}</b>` : ''} en dernière position.` : 'Impose la dernière carte du prochain booster (aussi celui de l’Abysse) :')}
         <div class="row gap wrap">${RARITIES.map((r) => `<button class="chip" data-force="${r.key}" style="--chip:${r.color}" aria-pressed="${f?.rarity === r.key}">${r.name}</button>`).join('')}</div>
         <div class="row gap wrap cr-fv">${['', 'holo', 'gold', 'galaxy', 'crystal', 'prism'].map((v) => `<button class="chip" data-fvar="${v}" aria-pressed="${(f?.variant || '') === v}">${v ? esc(VARIANTS[v].short) : 'Au hasard'}</button>`).join('')}</div>
@@ -183,7 +182,6 @@ export function openCreator(app) {
       if (x === 'chests') g.devChests();
       if (x === 'free') g.devFreePacks();
       if (x === 'choctok') g.devChocTokens(); /* v811 */
-      if (x === 'chasse') { g.devChasseReset(); toast('La Chasse est rouverte pour aujourd’hui.', { icon: 'check' }); } /* v858 */
       if (x === 'abyss' || x === 'abyss1') { g.devAbyss(x === 'abyss1'); sheet.close(); setTimeout(() => openPack(app, 'abysse', { onDone: () => openCreator(app) }), 350); return; } /* v769 : fenêtre fermée pendant l'ouverture, rouverte après */
       if (x === 'abyss5') g.devAbyss(false, 5);
       if (x === 'chocgo' || x === 'chochall' || x === 'chocmonth') { /* v843 */

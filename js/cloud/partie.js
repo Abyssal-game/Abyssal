@@ -163,7 +163,6 @@ const LEGACY = {
   chocNew() { throw new Error('Le Choc des Boosters demande le serveur de partie : réessaie dans un instant.'); }, /* v811 */
   chocJoin() { throw new Error('Le Choc des Boosters demande le serveur de partie : réessaie dans un instant.'); },
   chocRefund() { return 0; },
-  chasseClaim() { throw new Error('La Grande Chasse demande le serveur de partie : réessaie dans un instant.'); }, /* v858 */
   chocClaim() { throw new Error('Le Choc des Boosters demande le serveur de partie : réessaie dans un instant.'); },
   async mpClaim(game, id, friendsOnly = false) { const r = await cloud.mpClaim(id); return { r, out: friendsOnly ? { shards: 0 } : g.mpReward(game, id, r) }; },
   shadowPay: (day) => g.shadowPay(day),

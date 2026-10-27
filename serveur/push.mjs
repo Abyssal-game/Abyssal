@@ -28,7 +28,6 @@ const TEXTS = {
     wager_done: ['Défi relevé !', '{w} a relevé ton défi au Choc des Boosters. Viens voir le résultat.'],
     friend: ['Demande d’ami', '{w} veut devenir ton ami.'],
     friend_ok: ['Nouvel ami', '{w} a accepté ta demande d’ami.'],
-    hunt_kill: ['La bête est tombée !', '{w} a porté le coup de grâce. Viens réclamer ton butin de la Grande Chasse.'], /* v866 */
   },
   en: {
     turn: ['Your turn!', '{w} played {g}. It’s your move.'],
@@ -42,7 +41,6 @@ const TEXTS = {
     wager_done: ['Challenge accepted!', '{w} accepted your Booster Clash. Come see the result.'],
     friend: ['Friend request', '{w} wants to be your friend.'],
     friend_ok: ['New friend', '{w} accepted your friend request.'],
-    hunt_kill: ['The beast has fallen!', '{w} dealt the killing blow. Come claim your Great Hunt loot.'],
   },
   es: {
     turn: ['¡Te toca!', '{w} ha jugado {g}. Es tu turno.'],
@@ -56,7 +54,6 @@ const TEXTS = {
     wager_done: ['¡Reto aceptado!', '{w} ha aceptado tu Batalla de los Boosters. Ven a ver el resultado.'],
     friend: ['Solicitud de amistad', '{w} quiere ser tu amigo.'],
     friend_ok: ['Nuevo amigo', '{w} ha aceptado tu solicitud de amistad.'],
-    hunt_kill: ['¡La bestia ha caído!', '{w} le dio el golpe de gracia. Ven a reclamar tu botín de la Gran Cacería.'],
   },
   de: {
     turn: ['Du bist dran!', '{w} hat {g} gespielt. Jetzt bist du am Zug.'],
@@ -70,7 +67,6 @@ const TEXTS = {
     wager_done: ['Herausforderung angenommen!', '{w} hat deine Booster-Schlacht angenommen. Sieh dir das Ergebnis an.'],
     friend: ['Freundschaftsanfrage', '{w} möchte dein Freund sein.'],
     friend_ok: ['Neuer Freund', '{w} hat deine Freundschaftsanfrage angenommen.'],
-    hunt_kill: ['Die Bestie ist gefallen!', '{w} hat den Gnadenstoß versetzt. Hol dir deine Beute der Großen Jagd.'],
   },
   it: {
     turn: ['Tocca a te!', '{w} ha giocato {g}. È il tuo turno.'],
@@ -84,7 +80,6 @@ const TEXTS = {
     wager_done: ['Sfida accettata!', '{w} ha accettato la tua Sfida dei Booster. Vieni a vedere il risultato.'],
     friend: ['Richiesta di amicizia', '{w} vuole essere tuo amico.'],
     friend_ok: ['Nuovo amico', '{w} ha accettato la tua richiesta di amicizia.'],
-    hunt_kill: ['La bestia è caduta!', '{w} ha inferto il colpo di grazia. Vieni a reclamare il tuo bottino della Grande Caccia.'],
   },
   pt: {
     turn: ['É a sua vez!', '{w} jogou {g}. É a sua vez.'],
@@ -98,12 +93,11 @@ const TEXTS = {
     wager_done: ['Desafio aceito!', '{w} aceitou sua Batalha dos Boosters. Venha ver o resultado.'],
     friend: ['Pedido de amizade', '{w} quer ser seu amigo.'],
     friend_ok: ['Novo amigo', '{w} aceitou seu pedido de amizade.'],
-    hunt_kill: ['A fera caiu!', '{w} desferiu o golpe de misericórdia. Venha resgatar seu espólio da Grande Caçada.'],
   },
 };
 // Page du jeu ouverte quand on touche la notification
 const gameRoute = (d) => `#/${d.game === 'choc' ? 'versus' : d.game}`; /* v841 : la page du Choc est #/versus */
-const ROUTE = { turn: gameRoute, challenge: gameRoute, accepted: gameRoute, found: gameRoute, end: gameRoute, wager: () => '#/versus', wager_done: () => '#/versus', friend: () => '#/amis', friend_ok: () => '#/amis', hunt_kill: () => '#/chasse' };
+const ROUTE = { turn: gameRoute, challenge: gameRoute, accepted: gameRoute, found: gameRoute, end: gameRoute, wager: () => '#/versus', wager_done: () => '#/versus', friend: () => '#/amis', friend_ok: () => '#/amis' };
 
 export function messageOf(kind, data = {}, lang = 'fr') {
   const L = TEXTS[lang] ? lang : 'fr';

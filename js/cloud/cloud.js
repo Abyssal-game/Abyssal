@@ -221,7 +221,6 @@ export const onlineList = async () => (await rpc('online_list')) || [];
 export const mpList = async (game) => (await rpc('mp_list', { p_game: game })) || [];
 export const mpGet = (id) => rpc('mp_get', { p_id: id });
 export const mpEmote = (id, key) => rpc('mp_emote', { p_id: id, p_key: key }); /* v564 : réaction en ligne */
-export const chasseView = (week) => rpc('chasse_view', { p_week: week }); /* v858 : Grande Chasse (supabase/20-grande-chasse.sql) */
 export const mpLeave = (id) => rpc('mp_leave', { p_id: id });
 export const mpCancel = (id) => rpc('mp_cancel', { p_id: id }); /* v527 : annule seulement une partie encore en attente */
 export const mpClaim = (id) => rpc('mp_claim', { p_id: id });

@@ -39,7 +39,6 @@ import versusScreen from './screens/versus.js';
 import pacteScreen from './screens/pacte.js';
 import cryptesScreen from './screens/cryptes.js';
 import trialsScreen from './screens/trials.js';
-import chasseScreen from './screens/chasse.js'; /* v858 : Grande Chasse */
 import shadowScreen, { claimShadowPrize, shadowDone, shadowCheck } from './screens/shadow.js';
 import { forgeScreen, furnaceScreen } from './screens/forge.js';
 import { teamScreen, chestsScreen } from './screens/army.js';
@@ -68,7 +67,7 @@ watchPlates(); /* v644 : pseudos à leur taille dans les plaques */
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,
   factions: factionsScreen, faction: factionsScreen, succes: achievementsScreen, profil: profileScreen,
-  chasse: chasseScreen, parametres: settingsScreen, descente: descentScreen, compte: accountScreen, amis: friendsScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen, sceaux: sceauxScreen, encheres: encheresScreen, versus: versusScreen, pacte: pacteScreen, cryptes: cryptesScreen, jeux: gamesScreen, codex: codexScreen, epreuves: trialsScreen, epreuve: descentScreen, tirage: shadowScreen, renfort: forgeScreen, fournaise: furnaceScreen, labo: labScreen,
+  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, amis: friendsScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen, sceaux: sceauxScreen, encheres: encheresScreen, versus: versusScreen, pacte: pacteScreen, cryptes: cryptesScreen, jeux: gamesScreen, codex: codexScreen, epreuves: trialsScreen, epreuve: descentScreen, tirage: shadowScreen, renfort: forgeScreen, fournaise: furnaceScreen, labo: labScreen,
 };
 const TABS = [
   ['antre', 'tab-home', 'Accueil'], ['collection', 'tab-collection', 'Collection'], ['boutique', 'tab-butin', 'Butin'], /* v428 : boosters, coffres et Tirage (v432 : « Butin ») */
@@ -76,7 +75,7 @@ const TABS = [
 ];
 // icônes peintes de la barre du bas (assets/icons)
 const tabIcon = (k) => `<img class="tab-pic" alt="" src="assets/icons/${k}.webp">`;
-const TAB_OF = { chasse: 'descente', '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', codex: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', amis: 'menu', equipe: 'collection', renfort: 'collection', fournaise: 'collection', coffres: 'boutique', heros: 'descente', arsenal: 'boutique', marchand: 'descente', sceaux: 'descente', encheres: 'descente', versus: 'boutique', pacte: 'descente', cryptes: 'descente', jeux: 'descente', epreuves: 'descente', epreuve: 'descente', tirage: 'boutique', labo: 'menu' };
+const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', codex: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', amis: 'menu', equipe: 'collection', renfort: 'collection', fournaise: 'collection', coffres: 'boutique', heros: 'descente', arsenal: 'boutique', marchand: 'descente', sceaux: 'descente', encheres: 'descente', versus: 'boutique', pacte: 'descente', cryptes: 'descente', jeux: 'descente', epreuves: 'descente', epreuve: 'descente', tirage: 'boutique', labo: 'menu' };
 // Fond illustré de chaque page (l'Accueil et la Descente posent le leur)
 const ROUTE_SCENE = { boutique: 'shop', codex: 'shop', tirage: 'shadow', renfort: 'collection', fournaise: 'collection', collection: 'collection', equipe: 'team', coffres: 'chests', bestiaire: 'bestiary', succes: 'trophies', profil: 'profile', menu: 'menu', parametres: 'menu', compte: 'menu', amis: 'menu', factions: 'factions', faction: 'factions' };
 // Page parente des sous-pages (bouton retour en haut)
@@ -87,7 +86,7 @@ const SUB_OF = { fournaise: 'renfort', sceaux: 'jeux', encheres: 'jeux', pacte: 
 const SUBNAV = {
   collection: [['collection', 'cards', 'Cartes'], ['equipe', 'team-ic', 'Équipe'], ['renfort', 'furnace', 'Forge']], /* v422 : Renforcer + Fournaise */
   boutique: [['boutique', 'booster', 'Boosters'], ['coffres', 'chest', 'Coffres'], ['tirage', 'shadow', 'Tirage'], ['versus', 'swords', 'Choc'], ['codex', 'book', 'Codex']], /* v470 : Codex et Échoppe, en Mode Créateur seulement */ /* v428 : les coffres rejoignent le Butin */
-  descente: [['descente', 'descend', 'Descente'], ['epreuves', 'crest-elite', 'Épreuves'], ['chasse', 'hunt', 'Chasse'], ['jeux', 'seal', 'Le Cercle']], /* v858 : Grande Chasse */ /* v798 : le Choc des Boosters passe dans le Butin, à côté du Tirage */
+  descente: [['descente', 'descend', 'Descente'], ['epreuves', 'crest-elite', 'Épreuves'], ['jeux', 'seal', 'Le Cercle']], /* v869 : Grande Chasse retirée */ /* v798 : le Choc des Boosters passe dans le Butin, à côté du Tirage */
 };
 
 function storageOrMemory() {
@@ -246,7 +245,6 @@ function renderChrome() {
     if (r === 'jeux') return mpw.turns || calm(g.gamesDailyLeft().length); /* v466 : défis du jour à relever ; v519 : coups à jouer en ligne */
     if (r === 'versus') return mpw.games; /* v776 : duels à voir et défis reçus au Choc */
     if (r === 'epreuves') return calm(g.team().length >= 3 && g.trials().done.some((x) => !x)); /* v407 */
-    if (r === 'chasse') return calm(g.team().length >= 3 && !g.chasseDone()); /* v858 */
     return '';
   };
   const nNewSub = g.newCount() > 99 ? '99+' : g.newCount();
@@ -352,7 +350,7 @@ setTimeout(() => {
 function autoClaim() {
   const g = app.game;
   if (!g || claiming || document.body.classList.contains('gated') || document.getElementById('boot') || document.querySelector('.opening, .sheet-wrap, .endx')) return;
-  if (g.welcomePending() || app.route === 'descente' && g.s.descent.run?.phase === 'battle' || app.route === 'epreuves' && g.s.trials?.battle || app.route === 'chasse' && g.s.chasse?.battle || document.body.classList.contains('battle-mode')) return;
+  if (g.welcomePending() || app.route === 'descente' && g.s.descent.run?.phase === 'battle' || app.route === 'epreuves' && g.s.trials?.battle || document.body.classList.contains('battle-mode')) return;
   claiming = true;
   try {
     let any = false;

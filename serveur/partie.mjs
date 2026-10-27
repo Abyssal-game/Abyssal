@@ -109,12 +109,6 @@ const NET = {
     if (!c.iap) throw new Error('Les achats ne sont pas encore ouverts sur le serveur.');
     return g.iapApply(await c.iap(c.uid));
   },
-  /* v858 : Grande Chasse : la bête est-elle tombée, et à quel rang ce joueur l'a-t-il blessée ? (supabase/20-grande-chasse.sql) */
-  async chasseClaim(c, g, week) {
-    if (!Number.isInteger(week)) throw new Error('Semaine inconnue.');
-    const info = await c.db.svc('chasse_claim_info', { p_uid: c.uid, p_week: week });
-    return g.chasseClaimApply(week, info || {});
-  },
   async shadowClaim(c, g, week) {
     const rank = await c.db.rpc('shadow_claim', { p_week: week }, c.token);
     const sh = g.shadowState(); sh.asked = week;
@@ -141,7 +135,7 @@ export async function handle({ uid, token, body }, { db, now = () => Date.now(),
   let row;
   try { row = await db.lock(uid); } catch (e) { return { status: 503, body: { error: String(e?.message || e).slice(0, 200) } }; } // ex. : SQL 12 pas encore collé
   if (!row) return { status: 423, body: { error: 'Ta partie est occupée sur un autre appareil. Réessaie dans un instant.' } };
-  const fx = { trials: [], hunt: [] };
+  const fx = { trials: [] };
   try {
     let data = row.data;
     if (!data) {
@@ -180,14 +174,11 @@ export async function handle({ uid, token, body }, { db, now = () => Date.now(),
         if (def.kind === 'dev' && !creator) throw new Error('Réservé au Mode Créateur.');
         const args = Array.isArray(op.a) ? clone(op.a) : [];
         if (!argsOk(op.m, args)) throw new Error('Opération refusée.'); /* v754 : forme des arguments vérifiée (ARGS) */
-        /* v866 : palier de la bête de la Chasse : celui de la base (vie commune), jamais celui que le téléphone annonce */
-        if (op.m === 'startChasse' && !g.chasse().battle) { try { const t = await db.svc('chasse_tier', { p_week: g.chasse().cur }); if (Number.isInteger(t)) args[0] = t; } catch (e) { /* SQL 20 v866 pas encore collé */ } }
         let r;
         if (NET[op.m]) r = await NET[op.m](c, g, ...args);
         else if (DEV[op.m]) r = DEV[op.m](g, ...args);
         else if (typeof g[op.m] === 'function') r = g[op.m](...args);
         else throw new Error('Opération inconnue.');
-        if ((op.m === 'finishChasse' || op.m === 'abandonChasse' || op.m === 'autoChasse') && r && Number.isInteger(r.week)) fx.hunt.push({ week: r.week, day: r.day, dmg: r.dmg }); /* v858 */
         if (op.m === 'finishTrial' || op.m === 'abandonTrial') { if (r?.won && r.points) fx.trials.push({ day: r.day, idx: r.i, hp: r.points - 100 }); }
         if (def.kind === 'first' || def.kind === 'dev' || op.r) rets[q] = r === undefined ? null : clone(r);
       } catch (e) { errs[q] = String(e?.message || e).slice(0, 200); }
@@ -205,8 +196,6 @@ export async function handle({ uid, token, body }, { db, now = () => Date.now(),
     if (!saved) { await db.unlock(uid).catch(() => {}); return { status: 409, body: { error: 'Ta partie a changé ailleurs : réessaie.' } }; }
     // ce que les autres voient : profil public, fiche d'ami, classement des Épreuves (tenus par le serveur)
     if (mustPub) { try { await db.publish(uid, profile, card, fx.trials); } catch (e) { /* jamais bloquant */ } }
-    /* v858 : dégâts de la Grande Chasse, ajoutés à ceux de tous les joueurs (une seule fois par jour et par joueur, vérifié en SQL) */
-    for (const h of fx.hunt) { try { await db.svc('chasse_add', { p_uid: uid, p_week: h.week, p_day: h.day, p_dmg: h.dmg }); } catch (e) { /* SQL 20 pas encore collé : jamais bloquant */ } }
     const res = { ok: true, v: (row.version || 0) + 1, digest: dg, rets, errs, prog, tz };
     if (b.want || b.digest !== dg) res.data = out; // la partie n'est renvoyée que si celle du téléphone diffère
     return { status: 200, body: res };
