@@ -31,6 +31,7 @@ export const OPS = {
   duelAct: { kind: 'sync' }, duelUlt: { kind: 'sync' }, duelPass: { kind: 'sync' }, duelNext: { kind: 'sync' }, duelEnemy: { kind: 'sync' }, duelEndEnemy: { kind: 'sync' },
   // Épreuves
   startTrial: { kind: 'sync' }, finishTrial: { kind: 'sync' }, abandonTrial: { kind: 'sync' },
+  startChasse: { kind: 'sync' }, finishChasse: { kind: 'sync' }, abandonChasse: { kind: 'sync' }, chasseClaim: { kind: 'first' }, autoChasse: { kind: 'dev' }, chasse: { kind: 'sync', lazy: (s) => s.chasse?.cur }, /* v858 : Grande Chasse */
   // mini-jeux contre l'Abysse : chaque coup (le tien et celui de l'adversaire) est rejoué
   setSceauxHand: { kind: 'sync' }, sceauxStart: { kind: 'sync' }, sceauxFinish: { kind: 'sync' }, sceauxTrophy: { kind: 'sync' }, sceauxQuit: { kind: 'sync' },
   pacteStart: { kind: 'sync' }, pacteFinish: { kind: 'sync' }, pacteQuit: { kind: 'sync' },
@@ -51,13 +52,13 @@ export const OPS = {
   mpClaim: { kind: 'first', net: true }, shadowPay: { kind: 'first', net: true }, shadowClaim: { kind: 'first', net: true },
   // Mode Créateur
   shopBuy: { kind: 'dev' }, devGrant: { kind: 'dev' }, devGive: { kind: 'dev' }, devAllVariants: { kind: 'dev' }, devDuplicates: { kind: 'dev' },
-  devChests: { kind: 'dev' }, devResetCampaign: { kind: 'dev' }, devFreePacks: { kind: 'dev' }, devChocTokens: { kind: 'dev' }, devAbyss: { kind: 'dev' }, devMissions: { kind: 'dev' }, devFloor: { kind: 'dev' },
+  devChests: { kind: 'dev' }, devResetCampaign: { kind: 'dev' }, devFreePacks: { kind: 'dev' }, devChocTokens: { kind: 'dev' }, devChasseReset: { kind: 'dev' }, devAbyss: { kind: 'dev' }, devMissions: { kind: 'dev' }, devFloor: { kind: 'dev' },
   devBoss: { kind: 'dev' }, devVeille: { kind: 'dev' }, devUnlockAll: { kind: 'dev' }, devObs: { kind: 'dev' }, devCodexXp: { kind: 'dev' }, devCodexPrem: { kind: 'dev' },
   devCodexReset: { kind: 'dev' }, devSnapshot: { kind: 'dev' }, autoResolve: { kind: 'dev' }, autoTrial: { kind: 'dev' },
 };
 
 // Parties en cours (combats, mini-jeux) : rejouées par le serveur ; leur empreinte entre dans `digest`
-export const SESS = ['descent.run.battle', 'trials.battle', 'sceaux.cur', 'pacte.cur', 'cryptes.cur', 'encheres.cur'];
+export const SESS = ['descent.run.battle', 'trials.battle', 'chasse.battle', 'sceaux.cur', 'pacte.cur', 'cryptes.cur', 'encheres.cur'];
 
 // Réglages et petites marques de l'interface : libres (ils ne rapportent rien). Les outils du Mode Créateur seulement au créateur.
 export const FREE = ['settings', 'tips', 'seenIntro', 'giftShown', 'notifAsked', 'storySeen', 'lore', 'armyNews', 'shadow.asked', 'shadow.drew'];
@@ -128,6 +129,7 @@ export const ARGS = {
   chooseReward: ['s'], cancelAltar: [], chooseBlessing: ['s'], swapRunTeam: ['i', 'i'], nextFloor: [], cancelRun: [], abandonRun: [], reviveFallen: ['s'], buyBraise: [],
   finishBattle: [], duelAct: ['s', 's', 's', 'S', 'n'], duelUlt: ['s'], duelPass: ['s'], duelNext: ['s'], duelEnemy: ['s', 's', 'S'], duelEndEnemy: ['s'],
   startTrial: ['i'], finishTrial: [], abandonTrial: [],
+  startChasse: [], finishChasse: [], abandonChasse: [], chasseClaim: ['i'], autoChasse: [], chasse: [], /* v858 */
   setSceauxHand: ['as'], sceauxStart: [{ rival: 'S', daily: 'b', awake: 'b' }], sceauxFinish: [], sceauxTrophy: ['s'], sceauxQuit: [],
   pacteStart: [{ table: 'S', daily: 'b' }], pacteFinish: [], pacteQuit: [], cryptesStart: [{ table: 'S', daily: 'b' }], cryptesFinish: [], cryptesQuit: [], cryptesResume: [],
   encheresStart: [{ table: 'S', daily: 'b' }], encheresFinish: [], encheresQuit: [], gameForfeit: ['s'], tourneyPlay: [],

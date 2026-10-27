@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import { OPS } from '../js/core/ops.js';
 
 // méthodes appelées seulement par d'autres méthodes du jeu, par le serveur ou au chargement
-const INTERNAL = ['dropRemoved', 'fixVariants', 'convertHeroes', 'replaceSave', 'versusPay', 'versusRefund', 'versusApply', 'versusPickApply', 'mpReward', 'shadowPrize', 'setSetting', 'endRun', 'iapApply', 'chocSpend', 'chocApply'];
+const INTERNAL = ['chasseClaimApply', 'dropRemoved', 'fixVariants', 'convertHeroes', 'replaceSave', 'versusPay', 'versusRefund', 'versusApply', 'versusPickApply', 'mpReward', 'shadowPrize', 'setSetting', 'endRun', 'iapApply', 'chocSpend', 'chocApply'];
 
 test('serveur de partie : chaque méthode qui change la partie est classée', () => {
   const s = fs.readFileSync(new URL('../js/core/game.js', import.meta.url), 'utf8');

@@ -19,6 +19,7 @@ import { CODEX, CODEX_XP, SHOP, CATALOG, FREE_EMOTES, codexTier, seasonFor, tier
 import { rngOf, DESCENT, CHESTS, CHEST_ORDER, CHEST_FLOORS, floorDoors, floorEnemies, namedFoe, floorRewards, enemyLevel, floorFloor, blessingChoices, dailyRule, chestForDepth, shiftChest, enemyScale, lateSoft, bossEase, earlyHp, expectedLevel, cardPower, powerFor, advisedPower, floorForPower, huntStage, HUNT_STAGES, foeTraits, OMENS, omenChoices, CHAPTER, chapterOf, floorFirstReward } from './descent.js';
 import { createDuel, autoDuel, duelUnit, bossPowerOf, upgradeDuel, battleReport, GOALS, goalState, startInitiative, act as duelActRaw, useUlt, beginEnemyTurn, nextEnemy, takeSkips, enemyAct, endEnemyTurn, RHYTHM } from './duel.js';
 import { bossOf, BOSSES, BOSS_ORDER, VEILLES, VEILLE_START } from './bosses.js';
+import { HUNT, huntWeek, huntBossOf, huntLoot } from './chasse.js'; /* v858 : Grande Chasse */
 import { pactChoices, PACTS } from './pacts.js';
 import { FORMS, formUnlocked } from './forms.js';
 import * as SC from './sceaux.js';
@@ -1120,11 +1121,86 @@ export class Game {
   }
   autoTrial() { autoDuel(this.trials().battle); return this.finishTrial(); }
 
+  // ——— v858 : La Grande Chasse : une bête par semaine pour tous les joueurs, un combat par jour (js/core/chasse.js) ———
+  chasse() {
+    const w = huntWeek(this.clock());
+    const c = (this.s.chasse ||= { weeks: {}, claimed: {}, battle: null });
+    c.weeks ||= {}; c.claimed ||= {};
+    if (!c.weeks[w]) c.weeks[w] = { days: {}, total: 0, best: 0 };
+    for (const k of Object.keys(c.weeks)) if (+k < w - 3) delete c.weeks[k];
+    for (const k of Object.keys(c.claimed)) if (+k < w - 3) delete c.claimed[k];
+    c.cur = w;
+    return c;
+  }
+  chasseBoss(week = this.chasse().cur) { return huntBossOf(week); }
+  chasseDone() { const c = this.chasse(); return c.weeks[c.cur].days[today(this.clock())] != null; }
+  startChasse() {
+    const c = this.chasse();
+    if (c.battle) return c;
+    const day = today(this.clock());
+    if (c.weeks[c.cur].days[day] != null) throw new Error('Tu as déjà chassé aujourd’hui : la bête t’attend demain.');
+    const team = this.team();
+    if (team.length < TEAM.active) throw new Error(`Il faut au moins ${TEAM.active} créatures dans ton équipe.`);
+    const key = huntBossOf(c.cur), B = BOSSES[key], card = this.catalog.get(B.card);
+    const F = Math.max(3, Math.min(FINAL_FLOOR, floorForPower(this.trialPower()) + HUNT.floorGap));
+    const boss = duelUnit(card, { side: 'enemy', scale: enemyScale(F), level: enemyLevel(F, 'boss'), boss: true });
+    boss.maxHp = Math.round(boss.maxHp * HUNT.hp); boss.hp = boss.maxHp; boss.atk = Math.round(boss.atk * HUNT.atk + 0.4);
+    for (const f of B.passive || []) boss[f] = true;
+    const ult = this.ultimate(team);
+    const allies = team.map((id) => duelUnit(this.catalog.get(id), { level: this.cardLevel(id), form: this.formOf(id) }));
+    const st = createDuel(allies, [boss], { fervor: FERVOR_START, ult: ult.key, power: ult.power, known: {}, boss: key, discovered: this.s.weakSeen || {}, seed: this.seed('chasse') });
+    st.huntMax = HUNT.rounds; st.huntFury = HUNT.fury;
+    startInitiative(st);
+    Object.assign(c, { battle: st, week: c.cur, day, floor: F, ult: { key: ult.key, power: ult.power, card: ult.card } });
+    this.persist();
+    return c;
+  }
+  chasseRun() { const c = this.chasse(); return c.battle ? { chasse: true, battle: c.battle, floor: c.floor, room: 'boss', day: c.day, ult: c.ult, team: [], free: false } : null; }
+  finishChasse() {
+    const c = this.chasse(), st = c.battle;
+    if (!st?.over) throw new Error('Aucune chasse terminée.');
+    const w = c.week ?? c.cur, W = (c.weeks[w] ||= { days: {}, total: 0, best: 0 });
+    const dmg = Math.max(0, Math.round(st.huntDmg || 0));
+    this.learnRelations(st);
+    this.s.weakSeen = { ...(this.s.weakSeen || {}), ...(st.discovered || {}) };
+    W.days[c.day] = dmg; W.total += dmg; W.best = Math.max(W.best || 0, dmg);
+    const rounds = Math.min(st.huntMax || HUNT.rounds, Math.max(1, (st.round || 1) - (st.huntDone ? 1 : 0)));
+    const out = { week: w, day: c.day, boss: st.bossKey, dmg, total: W.total, best: W.best, survived: !!st.huntDone, rounds, report: battleReport(st, (uid) => (st.units[uid]?.boss ? BOSSES[st.bossKey].name : this.catalog.get(st.units[uid]?.id)?.name) || 'Une créature') };
+    c.battle = null;
+    const r = { shards: HUNT.fightShards };
+    this.grant(r, 'chasse'); this.codexXp(CODEX_XP.trial, 'chasse');
+    out.reward = r;
+    this.s.stats.hunts = (this.s.stats.hunts || 0) + 1;
+    this.checkProgress();
+    this.persist();
+    return out;
+  }
+  abandonChasse() {
+    const c = this.chasse();
+    if (!c.battle) throw new Error('Aucune chasse en cours.');
+    c.battle.over = 'lost';
+    return this.finishChasse();
+  }
+  autoChasse() { autoDuel(this.chasse().battle); return this.finishChasse(); }
+  // Butin de la semaine : le serveur dit si la bête est tombée et le rang du joueur ; la participation vient de sa partie
+  chasseLootInfo(week) { const W = this.chasse().weeks[week]; return { days: W ? Object.keys(W.days).length : 0, total: W?.total || 0, claimed: !!this.chasse().claimed[week] }; }
+  chasseClaimApply(week, info) {
+    const c = this.chasse(), me = this.chasseLootInfo(week);
+    if (c.claimed[week]) throw new Error('Tu as déjà reçu le butin de cette chasse.');
+    if (!info?.killed) throw new Error('La bête n’est pas encore tombée.');
+    const r = huntLoot({ days: me.days, rank: Number(info.rank) || 0 });
+    if (!r) throw new Error('Tu n’as pas chassé cette bête.');
+    c.claimed[week] = Date.now();
+    this.grant(r, 'chasse');
+    this.persist();
+    return r;
+  }
+
   // ——— v540 : les coups d'un combat (Descente : 'run', Épreuve : 'trial') passent par le jeu : le serveur de partie les rejoue
   // un par un depuis le même départ (même graine) et c'est son combat qui compte. Seuls les résultats de défense (esquive,
   // parade) et du lancer chargé viennent du joueur.
   duelState(where) {
-    const st = where === 'trial' ? this.trials().battle : where === 'run' ? this.s.descent.run?.battle : null;
+    const st = where === 'trial' ? this.trials().battle : where === 'run' ? this.s.descent.run?.battle : where === 'chasse' ? this.s.chasse?.battle : null; /* v858 */
     if (!st) throw new Error('Aucun combat en cours.');
     return st;
   }
@@ -2424,6 +2500,7 @@ export class Game {
   devAbyss(first = false, n = 1) { const k = Math.max(1, Math.min(50, +n || 1)); this.s.tickets.abysse = (this.s.tickets.abysse || 0) + k; if (first) this.s.stats.abyssSecret = 0; this.persist(); }
   devFreePacks() { this.s.freePack = { day: null }; this.persist(); }
   devChocTokens() { this.chocGive(3); this.persist(); } /* v811 */
+  devChasseReset() { const c = this.chasse(), d = today(this.clock()), W = c.weeks[c.cur]; if (W.days[d] != null) { W.total -= W.days[d]; delete W.days[d]; } this.persist(); } /* v858 */
   devMissions() { this.missions().list.forEach((x) => { x.p = x.n; }); this.persist(); }
   // power : l'équipe prend le niveau attendu à cet étage (pour essayer la difficulté réelle)
   devFloor(n, { power = false } = {}) {
