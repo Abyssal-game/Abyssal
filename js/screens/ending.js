@@ -3,7 +3,7 @@
 // celui qui rêve ouvre les yeux, la page scellée de l'Abysse (trophée : elle ne combat jamais), puis l'annonce de l'Arc I.
 import { esc, reducedMotion } from '../ui/dom.js';
 import { sync } from '../cloud/sync.js';
-import { currentUser } from '../cloud/cloud.js';
+import { currentUser, isLoggedIn, getProfile } from '../cloud/cloud.js';
 import { t, LANG } from '../i18n.js';
 import { sfx, haptic, hasSample, playVoice, loadVoice, clearVoices, getBytes, listV } from '../ui/sound.js';
 import { musicCinema, musicRelease } from '../ui/music.js';
@@ -53,7 +53,11 @@ function cineIntro(kind) {
 
 export async function playEnding(app, { name, lang, start, intro = true } = {}) {
   if (intro && !start && !(await cineIntro('fin'))) return;
-  const who = name || sync.profile?.pseudo || app.game?.s?.name || 'Toi';
+  /* v868 : le pseudo du compte d'abord (le profil n'est pas toujours chargé : on le demande, 3 s au plus) ; l'ancien nom de la
+     partie (s.name, choisi avant les comptes) seulement en dernier recours. Avant : « Alexis » au lieu de « Le Gardien ». */
+  let pseudo = sync.profile?.pseudo;
+  if (!name && !pseudo && isLoggedIn()) { try { pseudo = (await Promise.race([getProfile(), new Promise((r) => setTimeout(r, 3000))]))?.pseudo; } catch (e) { /* hors ligne */ } }
+  const who = name || pseudo || app.game?.s?.name || 'Toi';
   const sigLang = lang || LANG;
   const nameAt = (i) => 0.5 + i * 0.55; /* secondes : apparition de chaque signature */
   const scenes = [
