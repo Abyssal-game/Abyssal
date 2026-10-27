@@ -93,7 +93,7 @@ export function playDuel(app, r, out, { foeName, myName, myAvatar, onClose, onPi
   el.innerHTML = `<div class="vd-board"><span class="vd-embers"></span>
       ${plate('foe', esc(foeName), r.avatar)}
       ${rows(foePacks, 'foe')}
-      <div class="vd-center"><span class="vd-step"></span><img class="vd-medal" alt="" src="assets/versus/vd-vs.webp"><button class="vd-skip" data-v="all">${icon('skip')}Tout révéler</button></div>
+      <div class="vd-center"><span class="vd-step"></span><img class="vd-medal" alt="" src="assets/versus/vd-vs.webp">${table ? '' : `<button class="vd-skip" data-v="all">${icon('skip')}Tout révéler</button>`}</div>
       ${rows(myPacks, 'me')}
       ${plate('me', myName ? esc(myName) : t('Toi'), myAvatar)}
     </div>
@@ -108,7 +108,7 @@ export function playDuel(app, r, out, { foeName, myName, myAvatar, onClose, onPi
   document.fonts?.ready?.then(() => fitNames(el));
   const onRs = () => fitNames(el); addEventListener('resize', onRs);
 
-  let speed = app.reduced() || g.s.settings.fastOpen ? 4 : 1, done = false, closed = false;
+  let speed = !table && (app.reduced() || g.s.settings.fastOpen) ? 4 : 1, done = false, closed = false;
   const sc = { me: 0, foe: 0 };
   const wait = (ms) => new Promise((ok) => setTimeout(ok, ms / speed));
   /* v563 : horloge de la musique (voir musicPlan) ; un toucher (×4) ou « Tout révéler » quitte le calage */
@@ -150,13 +150,7 @@ export function playDuel(app, r, out, { foeName, myName, myAvatar, onClose, onPi
   async function stakes() {
     if (speed > 1 || done) return;
     /* v833 : le butin de la table : tout ce qui va sortir est en jeu */
-    if (table) {
-      const n = mine.length + theirs.length, me = tags.me?.s || 0;
-      banner(`${train ? '' : flameHTML(Math.max(1, me), 'big')}<span>${t('<b>{n} cartes</b> vont tomber sur la table.', { n })}<br>${t('Le meilleur total rafle tout.')}${me >= 1 ? `<br>${t('Ta Série ardente : <b>{n}</b>. Une victoire de plus : butin ×{m}.', { n: me, m: String(streakMult(me + 1)).replace('.', ',') })}` : ''}</span>`, 'stake', 2800);
-      app.sfx.suspense?.();
-      await wait(2400);
-      return;
-    }
+    if (table) return; /* v849 : plus d'encadré d'annonce au début d'un Choc */
     const me = tags.me?.s || 0, foe = tags.foe?.s || 0, lines = [];
     if (me >= 1) lines.push(t('Ta Série ardente : <b>{n}</b>. Une victoire de plus : butin ×{m}.', { n: me, m: String(streakMult(me + 1)).replace('.', ',') }));
     if (foe >= 2) lines.push(t('{name} est sur une série de <b>{n}</b> : brise-la !', { name: esc(foeName), n: foe }));
@@ -341,7 +335,7 @@ export function playDuel(app, r, out, { foeName, myName, myAvatar, onClose, onPi
     sc.me = scoreOf(mine); sc.foe = scoreOf(theirs);
     setScore('me'); setScore('foe'); lead();
     q('.vd-mid').classList.remove('show');
-    q('.vd-skip').hidden = true; q('.vd-step').textContent = '';
+    const sk = q('.vd-skip'); if (sk) sk.hidden = true; q('.vd-step').textContent = '';
     /* v735 : chacun garde ses cartes ; le gagnant reçoit le butin du jeu (copie, coffre abyssal, éclats) */
     const nWon = out?.cards?.length || (table && res === 'win' ? mine.length + theirs.length : mine.length); /* v833 : le gagnant rafle toute la table */
     const fresh = (out?.cards || []).filter((c) => c.isNewCard).length;
@@ -423,7 +417,7 @@ export function playDuel(app, r, out, { foeName, myName, myAvatar, onClose, onPi
     if (b?.dataset.v === 'close') return close();
     if (b?.dataset.v === 'recap') { el.querySelector('.vr')?.remove(); el.insertAdjacentHTML('beforeend', recapHTML()); app.sfx['vd-flip']?.(); return; }
     if (b?.dataset.v === 'recapx') { el.querySelector('.vr')?.remove(); return; }
-    if (b?.dataset.v === 'all') return finish();
+    if (b?.dataset.v === 'all' && !table) return finish(); /* v849 : au Choc, pas de raccourci, toutes les cartes se dévoilent */
     if (b?.dataset.v === 'rematch') { close(); onRematch?.(); return; }
     if (b?.dataset.v === 'react') {
       const grid = el.querySelector('.vd-regrid');
@@ -448,7 +442,7 @@ export function playDuel(app, r, out, { foeName, myName, myAvatar, onClose, onPi
       }).catch(() => { picking = false; el.querySelectorAll('.vd-pick-c').forEach((x) => x.classList.remove('on')); });
       return;
     }
-    if (!done) { speed = 4; sync = false; }
+    if (!done && !table) { speed = 4; sync = false; }
   });
   run();
   return { close };
