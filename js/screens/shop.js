@@ -76,8 +76,8 @@ export function showOdds(app, type) {
   const o = boosterOdds(type);
   const def = BOOSTERS[type];
   /* v841 : tout passe par t() (la fenêtre restait en français dans les autres langues) */
-  const P = (x, d = 1) => `${x.toFixed(d).replace('.', LANG === 'fr' ? ',' : '.')}\u00a0%`;
-  const R = (k) => String(VARIANT_RATES[k]).replace('.', LANG === 'fr' ? ',' : '.');
+  const P = (x, d = 1) => `${x.toFixed(d).replace('.', LANG === 'en' ? '.' : ',')}\u00a0%`;
+  const R = (k) => String(VARIANT_RATES[k]).replace('.', LANG === 'en' ? '.' : ',');
   const rows = RARITIES.map((r) => `<tr><th scope="row" style="color:${r.color}">${t(r.name)}</th>${o.slots.map((s) => `<td>${s.odds[r.key] ? P(s.odds[r.key], s.odds[r.key] < 1 ? 2 : 1) : '—'}</td>`).join('')}</tr>`).join('');
   openSheet(`<h2>${t('Probabilités')} · ${esc(t(def.name))}</h2>
     <p class="small muted">${t('Chaque carte est tirée au hasard par le serveur du jeu : d’abord sa rareté selon la table de son emplacement, puis une créature de cette rareté. Ces valeurs sont celles réellement utilisées par le jeu.')}</p>
@@ -86,7 +86,7 @@ export function showOdds(app, type) {
     <h3>${t('Garanties')}</h3>
     <ul class="small"><li>${t('Après {n} boosters d’affilée sans Hyper rare ou mieux, la dernière carte du suivant est au moins Hyper rare.', { n: PITY.hr - 1 })}</li><li>${t('Après {n} boosters d’affilée sans Mythique ou mieux, la dernière carte du suivant est au moins Mythique.', { n: PITY.m - 1 })}</li><li>${t('Les compteurs sont communs à tous les boosters et repartent à zéro dès que la rareté est obtenue.')}</li></ul>
     <h3>${t('Finitions')}</h3>
-    <p class="small">${t('Chaque carte peut sortir en finition argentée ({a} %), enluminée ({b} %), abyssale ({c} %), cristalline ({d} %) ou prismatique ({e} %). Une finition est purement visuelle. On l’obtient dans les boosters.', { a: R('holo'), b: R('gold'), c: R('galaxy'), d: R('crystal'), e: R('prism') })}${def.variantMult > 1 ? ` ${t('Ce booster multiplie leurs chances par {n}.', { n: String(def.variantMult).replace('.', LANG === 'fr' ? ',' : '.') })}` : ''}</p>
+    <p class="small">${t('Chaque carte peut sortir en finition argentée ({a} %), enluminée ({b} %), abyssale ({c} %), cristalline ({d} %) ou prismatique ({e} %). Une finition est purement visuelle. On l’obtient dans les boosters.', { a: R('holo'), b: R('gold'), c: R('galaxy'), d: R('crystal'), e: R('prism') })}${def.variantMult > 1 ? ` ${t('Ce booster multiplie leurs chances par {n}.', { n: String(def.variantMult).replace('.', LANG === 'en' ? '.' : ',') })}` : ''}</p>
     <h3>${t('Doublons')}</h3>
     <p class="small">${t('Un doublon se brûle dans la Fournaise pour des cendres ({list} ; ×{a} argentée, ×{b} enluminée, ×{c} abyssale, ×{d} cristalline, ×{e} prismatique). Les cendres font monter le niveau de tes créatures.', { list: RARITIES.map((r) => `${t(r.short)} ${ECONOMY.burnAsh[r.key]}`).join(', '), a: ECONOMY.burnFinish.holo, b: ECONOMY.burnFinish.gold, c: ECONOMY.burnFinish.galaxy, d: ECONOMY.burnFinish.crystal, e: ECONOMY.burnFinish.prism })}</p>`, { label: t('Probabilités') });
 }

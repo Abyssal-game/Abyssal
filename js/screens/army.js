@@ -249,7 +249,7 @@ export function chestsScreen(app, root) {
     all() {
       const r = g.openAllChests(); app.sfx.chest?.();
       const packs = Object.entries(r.packs).map(([k, n]) => `${n} ${esc((BOOSTERS[k]?.name.toLowerCase() || k).replace(/^booster/, n > 1 ? 'boosters' : 'booster'))}`);
-      openSheet(`<h2 class="center">${r.n} coffres ouverts</h2><div class="ch-sum">${r.shards ? `<p>${icon('crystal')} <b>+${fmt(r.shards)}</b> éclats</p>` : ''}${r.ash ? `<p>${icon('ash')} <b>+${fmt(r.ash)}</b> cendres</p>` : ''}${packs.length ? `<p>${icon('ticket')} ${packs.join(', ')} : à ouvrir dans les Boosters</p>` : ''}</div>${packs.length ? '<a class="btn primary block" href="#/boutique">Ouvrir mes boosters</a>' : ''}`, { label: 'Coffres ouverts', cls: 'sheet-small' });
+      openSheet(`<h2 class="center">${r.n} coffres ouverts</h2><div class="ch-sum">${r.shards ? `<p>${icon('crystal')} <b>+${fmt(r.shards)}</b> éclats</p>` : ''}${r.ash ? `<p>${icon('ash')} <b>+${fmt(r.ash)}</b> cendres</p>` : ''}${packs.length ? `<p>${icon('ticket')} <span>${packs.join(', ')}</span> <span>${t('à ouvrir dans les Boosters')}</span></p>` : ''}</div>${packs.length ? '<a class="btn primary block" href="#/boutique">Ouvrir mes boosters</a>' : ''}`, { label: 'Coffres ouverts', cls: 'sheet-small' });
       app.flushProgress?.(); app.chrome?.(); draw();
     },
   });

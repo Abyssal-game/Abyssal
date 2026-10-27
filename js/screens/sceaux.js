@@ -143,7 +143,7 @@ ${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone || dail
       <div class="sc-sub"><span class="sc-ohand open" aria-label="Sa main : ${st.hands.o.length} cartes">${st.hands.o.map((id) => scCard(cat, id, { owner: 'o', cls: 'sc-mini' })).join('')}</span>
         <button class="sc-rule" data-sc="rules">${RULE_MED[st.rule] || RULE_ICON[st.rule] ? `<img class="sc-ricon" alt="" src="assets/icons/${RULE_MED[st.rule] || RULE_ICON[st.rule]}.webp">` : icon('p:rule')}${esc(SC.RULES[st.rule].name)}</button></div>
       <div class="sc-bwrap"><div class="sc-board ${intro ? 'intro' : ''} ${shake ? 'shake' : ''}"><div class="sc-plate">${st.board.map(cell).join('')}</div></div></div>
-      <p class="sc-msg">${st.over || (busy && st.turn === 'p') ? '' : myTurn ? (ui.sel == null ? (st.rule !== 'classique' && st.board.filter(Boolean).length < 2 ? `Règle « ${esc(SC.RULES[st.rule].name)} » : touche sa pastille en haut à droite pour la voir en animation.` : 'Touche une de tes cartes, puis une case libre.') : 'Touche une case libre pour poser la carte.') : `${esc(R.name)} réfléchit…`}</p>
+      <p class="sc-msg">${st.over || (busy && st.turn === 'p') ? '' : myTurn ? (ui.sel == null ? (st.rule !== 'classique' && st.board.filter(Boolean).length < 2 ? t('Règle « {r} » : touche sa pastille en haut à droite pour la voir en animation.', { r: esc(t(SC.RULES[st.rule].name)) }) : 'Touche une de tes cartes, puis une case libre.') : 'Touche une case libre pour poser la carte.') : `${esc(R.name)} réfléchit…`}</p>
       <div class="sc-tray ${myTurn ? 'on' : ''}"><div class="sc-hand-row">${st.hands.p.map((id, k) => `<button class="sc-hc ${ui.sel === k ? 'sel' : ''}" data-sc="pick" data-k="${k}" ${myTurn ? '' : 'disabled'}>${ui.sel === k ? '<span class="sc-halo"></span>' : ''}${scCard(cat, id, { owner: 'p' })}</button>`).join('')}</div></div>
     </div>`;
   }
@@ -309,7 +309,7 @@ ${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone || dail
     const st = g.s.sceaux.cur, R = RIVAL_OF(st);
     boardView({ intro: true });
     app.sfx.enter?.();
-    dialog(R, vsay(st, 'hello', `arb-${R.key}`, R.hello), st.first === 'p' ? 'Tu commences.' : `${esc(R.name)} commence.`);
+    dialog(R, vsay(st, 'hello', `arb-${R.key}`, R.hello), st.first === 'p' ? t('Tu commences.') : t('{name} commence.', { name: esc(tw(R.name)) }));
     tuto(app, 'sceaux').then(() => tuto(app, 'sceaux-board')).then(() => (SC.ruleHas(st, 'identique') || SC.ruleHas(st, 'somme') ? tuto(app, 'sceaux-combo') : null))
       .then(() => (SC.ruleHas(st, 'sacre') ? tuto(app, 'sceaux-sacre') : null)) /* v402 : Cases sacrées avaient pas de bulle */
       .then(() => { if ([...st.hands.p, ...st.hands.o].some((id) => SC.perksOf(cat.get(id)).length)) tuto(app, 'sceaux-perks'); });

@@ -10,7 +10,7 @@ import { FINISHES } from '../core/codex.js';
 import { icon, sigil, picon, setIcon } from '../ui/icons.js';
 import { FORMS, formUnlocked } from '../core/forms.js';
 import { relationsOf } from '../core/relations.js';
-import { t } from '../i18n.js';
+import { t, LANG } from '../i18n.js';
 import { fameTier, fameNext, FAME_TIERS } from '../core/renown.js';
 
 // Chance réelle d'obtenir cette carte précise dans un booster standard.
@@ -21,7 +21,7 @@ function oddsFor(cat, card) {
   return Math.round(1 / p);
 }
 
-const DATE_FR = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }); /* v576 : un seul formateur (en créer un à chaque date coûtait ~20 ms) */
+const DATE_FR = new Intl.DateTimeFormat(LANG === 'pt' ? 'pt-BR' : LANG, { day: 'numeric', month: 'long', year: 'numeric' }); /* v576 : un seul formateur (en créer un à chaque date coûtait ~20 ms) */
 const dateFr = (t) => DATE_FR.format(new Date(t));
 
 // Renommée : palier, points et prochain palier
@@ -103,7 +103,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
 
     const variantsRow = owned ? `<div class="variant-row" role="group" aria-label="Finitions">${['normal', 'holo', 'gold', 'galaxy', 'crystal', 'prism'].filter((v) => card.variants.includes(v)).map((v) => { // v288 : ordre de rareté
       const has = ownedVariants.includes(v);
-      return `<button class="chip" data-act="variant" data-v="${v}" aria-pressed="${v === shownVariant}" ${has ? '' : 'disabled'} title="${has ? 'Afficher' : 'Pas encore obtenue'}">${has ? '' : icon('lock')}${VARIANTS[v].short}${has && e.v[v] > 1 ? ` ×${e.v[v]}` : ''}</button>`;
+      return `<button class="chip" data-act="variant" data-v="${v}" aria-pressed="${v === shownVariant}" ${has ? '' : 'disabled'} title="${has ? 'Afficher' : 'Pas encore obtenue'}">${has ? '' : icon('lock')}<span>${VARIANTS[v].short}</span>${has && e.v[v] > 1 ? ` ×${e.v[v]}` : ''}</button>`;
     }).join('')}</div>${ownedVariants.length > 1 ? (g.shownVariant(current) === shownVariant
       ? `<p class="small muted center dt-showv">${icon('check')} Apparence affichée partout</p>`
       : `<button class="btn small gold dt-showv" data-act="showv">${icon('eye')}Afficher cette apparence partout</button>`) : ''}` : '';
@@ -136,7 +136,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
         <div class="dt-sum">
           <span class="dt-chip" style="--c:${r.color}">${r.name}</span>
           <span class="dt-chip" style="--c:${fac.colors.secondary}">${sigil(card.faction)}${esc(fac.name)}</span>
-          <span class="dt-chip">×${e.n} exemplaire${e.n > 1 ? 's' : ''}</span>
+          <span class="dt-chip">${t(e.n > 1 ? '×{n} exemplaires' : '×{n} exemplaire', { n: e.n })}</span>
           <span class="dt-chip gold">Niv. ${li.level}${li.level >= li.max ? ' · Apogée' : ''}</span>
           <span class="dt-acts"><button class="dt-chip dt-chipb ${g.isFav(current) ? 'on' : ''}" data-act="fav" aria-pressed="${g.isFav(current)}">${icon('star')}Favori</button>
           <button class="dt-chip dt-chipb ${g.s.showcase.includes(current) ? 'on' : ''}" data-act="showcase" aria-pressed="${g.s.showcase.includes(current)}">${picon('showcase')}Vitrine</button>
@@ -158,7 +158,7 @@ export function openCardDetail(app, id, { list = null, variant = null } = {}) {
     sheet.setContent(`<div class="detail ${owned ? '' : 'is-sealed'}">
       ${nav}
       <div class="detail-card ${owned && g.formOf(current) ? 'fm-on' : ''}">${cardHTML(card, { size: 'full', variant: shownVariant, mystery: !owned, nameKnown: known })}${owned && g.formOf(current) ? `<span class="fm-badge">${esc(FORMS[current].name)}</span>` : ''}</div>
-      ${owned ? `<p class="tilt-hint small muted">Touche la carte pour masquer ou remettre son texte · fais-la glisser pour la faire pivoter.</p>` : ''}
+      ${owned ? `<p class="tilt-hint small muted">${t('Touche la carte pour masquer ou remettre son texte · fais-la glisser pour la faire pivoter.')}</p>` : ''}
       ${variantsRow}
       ${dressRow}
       <div class="detail-info">${body}</div>

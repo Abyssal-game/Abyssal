@@ -41,7 +41,7 @@ function factionPage(app, root, key) {
     <section class="fac-hero" style="--fc:${f.colors.secondary};--fp:${f.colors.primary}">
       <img alt="" class="fac-realm" src="assets/realms/${key === 'infernal' ? key : `${key}-3`}.webp" onerror="this.remove()">
       <div class="fac-hero-veil"></div>
-      <div class="fac-hero-text"><span class="fac-sig big">${sigil(key)}</span><h1>${esc(f.name)}</h1><p class="lore">${esc(f.realm)} · «&nbsp;${esc(f.motto)}&nbsp;»</p></div>
+      <div class="fac-hero-text"><span class="fac-sig big">${sigil(key)}</span><h1>${esc(f.name)}</h1><p class="lore"><span>${esc(f.realm)}</span> · <span>«&nbsp;${esc(f.motto)}&nbsp;»</span></p></div>
     </section>
     <div class="panel"><p>${esc(f.desc)}</p></div>
     <h2 class="section-title">Progression</h2>

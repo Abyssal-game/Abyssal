@@ -115,7 +115,7 @@ export default function encheresScreen(app, root) {
     return `<div class="en-stage">${chair(st, 'a')}${chair(st, 'b')}
       ${lot ? `<div class="en-onlot ${fresh ? 'fresh' : ''}">${lotCard(lot)}</div>
       ${banner ? '' : `<div class="en-plaque"><small>Lot ${st.i + 1} / ${st.lots.length}</small><b>${lot.v > 0 ? `${esc(fname(lot.f))} · ${lot.v} pt${lot.v > 1 ? 's' : ''}` : `Malédiction · ${String(lot.v).replace("-", "−")}`}</b>
-        ${st.pot.length ? `<span class="en-pot">+ ${st.pot.length} lot${st.pot.length > 1 ? 's' : ''} resté${st.pot.length > 1 ? 's' : ''} : en jeu ${v > 0 ? '+' : ''}${v}</span>` : ''}
+        ${st.pot.length ? `<span class="en-pot">${t(st.pot.length > 1 ? '+ {n} lots restés : en jeu {v}' : '+ {n} lot resté : en jeu {v}', { n: st.pot.length, v: `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v)}` })}</span>` : ''}
         <span>${v > 0 ? 'La <b>plus haute</b> offrande seule l’emporte' : 'La <b>plus basse</b> offrande seule en hérite !'}</span></div>`}` : ''}${ban}</div>`;
   }
   function controls(st) {

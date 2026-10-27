@@ -329,7 +329,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     patchRow(enEl, [...front(st, 'enemy').map((u) => ({ uid: u.uid, html: cardEl(u) })), ...(resHTML('enemy') ? [{ uid: null, html: resHTML('enemy') }] : [])]);
     const gl = goalState(st);
     if (gl && gl.state === 'done' && lastGoal !== 'done' && lastGoal !== null) { app.sfx.achievement?.(); banner(`${icon('star')} Objectif réussi !`, 'good', 1100); }
-    if (gl && gl.state === 'fail' && lastGoal === 'pending') toast(`Objectif « ${esc(gl.name)} » manqué.`, { icon: 'info' });
+    if (gl && gl.state === 'fail' && lastGoal === 'pending') toast(tr('Objectif « {name} » manqué.', { name: esc(tr(gl.name)) }), { icon: 'info' });
     lastGoal = gl ? gl.state : null;
     const gap = gapOf(st); /* v493 : écart de niveau : ennemis trop forts pour l'équipe */
     const rules = [gap >= 1.1 ? `<span class="cb-law cb-gap" data-d="rule" data-k="gap">${icon('p:danger')}<b>Ennemis trop forts</b></span>` : '', gl ? `<span class="cb-law cb-goal s-${gl.state}" data-d="rule" data-k="goal"><img class="cb-gico" alt="" src="assets/icons/goal.webp">${gl.state === 'done' ? '✓ ' : gl.state === 'fail' ? '✗ ' : ''}<b>${esc(gl.name)}</b>${gl.p && gl.state === 'pending' ? ` <small>${gl.p}</small>` : ''}</span>` : '',
