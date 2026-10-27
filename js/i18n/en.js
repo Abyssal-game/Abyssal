@@ -9444,6 +9444,9 @@ export default {
   "Présence accablante": "Overwhelming Presence",
   "Toutes les bêtes de la Chasse : à chaque tour, tes créatures au combat perdent {0} % de leurs PV ({1} % en Furie), et un peu plus à chaque tour. Ça peut être mortel.": "Every beast of the Hunt: each round, your creatures in combat lose {0} % of their HP ({1} % in Fury), a little more every round. It can be deadly.",
   "Tes créatures de la faction {f} lui infligent +{p} %.": "Your creatures of the {f} faction deal +{p}% to it.",
+  "Mouvements reçus : l’effet marche.": "Motion received: the effect works.",
+  "Aucun mouvement reçu pour l’instant : incline le téléphone. Si rien ne bouge, désactive puis réactive ce réglage.": "No motion received yet: tilt your phone. If nothing moves, turn this setting off and on again.",
+  "L’iPhone refuse l’accès aux mouvements : désactive puis réactive ce réglage pour le redemander.": "The iPhone refuses access to motion: turn this setting off and on again to ask again.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

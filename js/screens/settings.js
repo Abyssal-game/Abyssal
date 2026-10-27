@@ -1,5 +1,5 @@
 // Réglages : son, animations, accessibilité, sauvegarde (le Mode Créateur est dans creator.js).
-import { depthSupported, depthNeedsPermission, askDepth } from '../ui/depth.js';
+import { depthSupported, depthNeedsPermission, askDepth, depthStatus } from '../ui/depth.js';
 import { notifSupported, pushSupported, enable as notifEnable } from '../notify.js';
 import { resetTips } from '../ui/coach.js';
 import { TUTOS, tuto } from '../ui/tutos.js';
@@ -93,7 +93,7 @@ export default function settings(app, root) {
         <h2>Affichage</h2>
         ${seg('motion', 'Animations', [['auto', 'Selon l’appareil'], ['reduced', 'Réduites'], ['full', 'Complètes']])}
         ${toggle('fastOpen', 'Ouverture rapide des boosters', 'Affiche directement le récapitulatif, sans révéler les cartes une par une.')}
-        ${depthSupported() ? `<div class="set-row"><div><b>Effet de profondeur</b><p class="small muted">Incline le téléphone : les reflets des cartes glissent comme sur une vraie carte holographique, et le décor de l’Accueil bouge derrière la page.</p></div><button class="switch" role="switch" aria-checked="${depthOn(s)}" data-act="depth" aria-label="Effet de profondeur"><i></i></button></div>` : ''}
+        ${depthSupported() ? `<div class="set-row"><div><b>Effet de profondeur</b><p class="small muted">Incline le téléphone : les reflets des cartes glissent comme sur une vraie carte holographique, et le décor de l’Accueil bouge derrière la page.</p>${depthOn(s) ? `<p class="small ${depthStatus() === 'ok' ? 'muted' : 'set-warn'}">${{ ok: 'Mouvements reçus : l’effet marche.', waiting: 'Aucun mouvement reçu pour l’instant : incline le téléphone. Si rien ne bouge, désactive puis réactive ce réglage.', denied: 'L’iPhone refuse l’accès aux mouvements : désactive puis réactive ce réglage pour le redemander.', off: '' }[depthStatus()]}</p>` : ''}</div><button class="switch" role="switch" aria-checked="${depthOn(s)}" data-act="depth" aria-label="Effet de profondeur"><i></i></button></div>` : ''}
       </section>
 `;
   }

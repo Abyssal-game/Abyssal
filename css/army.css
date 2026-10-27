@@ -8930,3 +8930,5 @@ table.odds th, table.odds td { white-space: normal; }
 .dv-top > b.gc-hud.gc-cata { color: #FFD0D8; animation: gcCata 1s ease-in-out infinite alternate; }
 .dv-top > b.gc-hud.gc-cata .ic { width: 15px; height: 15px; }
 @keyframes gcCata { from { text-shadow: 0 0 2px rgba(255, 60, 80, .4); } to { text-shadow: 0 0 10px rgba(255, 60, 80, 1); } }
+/* v867 : état de l'effet de profondeur dans Réglages (aucun mouvement reçu, accès refusé) */
+.set-warn { margin-top: 4px; color: #FFC98A; }

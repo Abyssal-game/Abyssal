@@ -9431,6 +9431,9 @@ export default {
   "Présence accablante": "Presenza opprimente",
   "Toutes les bêtes de la Chasse : à chaque tour, tes créatures au combat perdent {0} % de leurs PV ({1} % en Furie), et un peu plus à chaque tour. Ça peut être mortel.": "Tutte le bestie della Caccia: a ogni turno, le tue creature in combattimento perdono il {0} % dei loro PV ({1} % in Furia), e un po’ di più a ogni turno. Può essere mortale.",
   "Tes créatures de la faction {f} lui infligent +{p} %.": "Le tue creature della fazione {f} le infliggono +{p}%.",
+  "Mouvements reçus : l’effet marche.": "Movimento ricevuto: l’effetto funziona.",
+  "Aucun mouvement reçu pour l’instant : incline le téléphone. Si rien ne bouge, désactive puis réactive ce réglage.": "Nessun movimento ricevuto per ora: inclina il telefono. Se non si muove nulla, disattiva e riattiva questa impostazione.",
+  "L’iPhone refuse l’accès aux mouvements : désactive puis réactive ce réglage pour le redemander.": "L’iPhone rifiuta l’accesso ai movimenti: disattiva e riattiva questa impostazione per richiederlo.",
 };
 
 export const names = {
