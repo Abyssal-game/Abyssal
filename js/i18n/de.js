@@ -9251,6 +9251,7 @@ export default {
   "Voir les {n} cartes de la table": "Die {n} Karten auf dem Tisch ansehen",
   "Les cartes de la table": "Die Karten auf dem Tisch",
   "{n} cartes ouvertes": "{n} Karten geöffnet",
+  "Le Cercle": "Der Zirkel",
 };
 
 export const names = {
