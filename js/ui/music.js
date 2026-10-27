@@ -45,7 +45,7 @@ THEMES.prologue = THEMES.descente; THEMES.fin = THEMES.descente; /* v779 : musiq
 export const MUSIC_DEMO = [['Accueil', 'antre'], ['Butin', 'boutique'], ['Descente', 'descente'], ['Combat', 'combat'], ['Gardien', 'boss'], ['Cercle de l’Abysse', 'sceaux'], ['Duels des Sceaux', 'duels'], ['Enchères', 'encheres'], ['Le Pacte', 'pacte'], ['Les Cryptes', 'cryptes'], ['Le Choc des Boosters', 'pari'], ['L’Abysse', 'abysse']];
 
 // Lieu → ambiance
-const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', arsenal: 'boutique', descente: 'descente', heros: 'descente', marchand: 'descente', sceaux: 'duels', jeux: 'sceaux', encheres: 'encheres', pacte: 'pacte', cryptes: 'cryptes', versus: 'pari', epreuves: 'descente' }; /* v434 : le Cercle de l’Abysse */ /* v408 : Épreuves du jour = ambiance de la Descente, musique de combat en combat */
+const ROUTE_THEME = { boutique: 'boutique', coffres: 'boutique', tirage: 'boutique', arsenal: 'boutique', descente: 'descente', heros: 'descente', marchand: 'descente', sceaux: 'duels', jeux: 'sceaux', encheres: 'encheres', pacte: 'pacte', cryptes: 'cryptes', versus: 'pari', epreuves: 'descente', chasse: 'boss' }; /* v861 : Grande Chasse : musique de gardien, sur la page comme en combat */ /* v434 : le Cercle de l’Abysse */ /* v408 : Épreuves du jour = ambiance de la Descente, musique de combat en combat */
 
 function init() {
   if (ctx) return ctx;
