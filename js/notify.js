@@ -8,9 +8,10 @@
 import { isNative } from './native.js';
 import { LANG, t } from './i18n.js';
 import { CODEX, codexTier } from './core/codex.js';
+import { today } from './core/save.js';
 
 const LN = () => (isNative() ? window.Capacitor?.Plugins?.LocalNotifications : null);
-const DAILY_ID = 1001, CODEX_ID = 1002, STREAK_ID = 1003, EVE_ID = 1004, SHADOW_ID = 1005; /* v680 : fin de saison du Codex ; v708 : série d'offrandes brisée ; v709 : offrande du soir, Tirage des Ombres */
+const DAILY_ID = 1001, CODEX_ID = 1002, STREAK_ID = 1003, EVE_ID = 1004, SHADOW_ID = 1005, CHOC_ID = 1006; /* v839 : jeton du Choc */ /* v680 : fin de saison du Codex ; v708 : série d'offrandes brisée ; v709 : offrande du soir, Tirage des Ombres */
 const REMIND_BASE = 20000;
 const REMIND_HOURS = 2;
 export const notifSupported = () => !!LN();
@@ -86,6 +87,7 @@ export async function syncDaily(g) {
   await syncStreak(g);
   await syncEve(g);
   await syncShadow(g);
+  await syncChoc(g);
   await syncCodex(g);
 }
 
@@ -135,6 +137,22 @@ async function syncShadow(g) {
   } catch (e) { /* rien */ }
 }
 
+/* v839 : le jeton du Choc ne se garde pas (v838) : à 21 h, s'il n'a pas encore servi aujourd'hui, « il s'éteint à minuit » ;
+   sinon le lendemain à 21 h. Seulement avec un compte (le Choc se joue en ligne). Lecture sans toucher à la partie. */
+async function syncChoc(g) {
+  const L = LN(); if (!L) return;
+  await cancel([CHOC_ID]);
+  try {
+    if (!g.s.settings.notif) return;
+    const cloud = await import('./cloud/cloud.js');
+    if (!cloud.isLoggedIn()) return;
+    const now = new Date(), at = new Date(now); at.setHours(21, 0, 0, 0);
+    const c = g.s.choc, left = !c || c.day !== today(now) || c.n > 0;
+    if (!left || at.getTime() < now.getTime() + 60000) at.setDate(at.getDate() + 1);
+    await L.schedule({ notifications: [{ id: CHOC_ID, title: t('Le Choc des Boosters'), body: t('Ton jeton du jour s’éteint à minuit. Une partie, quelques secondes : le meilleur total rafle toute la table.'), schedule: { at, allowWhileIdle: true }, extra: { route: '#/versus' } }] });
+  } catch (e) { /* rien */ }
+}
+
 // v680 : 3 jours avant la fin de la saison du Codex, à 18 h, si le palier 30 n'est pas atteint
 async function syncCodex(g) {
   const L = LN(); if (!L) return;
@@ -164,7 +182,7 @@ export async function syncReminders(g, turns) {
 
 export async function clearAll() {
   const L = LN(); if (!L) return;
-  await cancel((await pendingIds()).filter((id) => id === DAILY_ID || id === CODEX_ID || id === STREAK_ID || id === EVE_ID || id === SHADOW_ID || (id >= REMIND_BASE && id < REMIND_BASE + 9000)));
+  await cancel((await pendingIds()).filter((id) => id === DAILY_ID || id === CODEX_ID || id === STREAK_ID || id === EVE_ID || id === SHADOW_ID || id === CHOC_ID || (id >= REMIND_BASE && id < REMIND_BASE + 9000)));
 }
 
 // Une seule fois, dans l'app : proposer les notifications (après l'arrivée du joueur, sur l'Accueil, sans fenêtre ouverte)

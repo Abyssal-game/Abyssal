@@ -37,7 +37,10 @@ export default function home(app, root) {
     /* v755 : Tirage, Épreuves, Jeux du jour et coffres sur une rangée de tuiles (avant : quatre longues lignes) */
     const tiles = [];
     const tile = (href, ic, col, title, sub, hot) => `<a class="td-tile ${hot ? 'hot' : 'done'}" href="${href}" style="--mc:${col}"><span class="td-tile-ic">${picon(ic)}</span><b>${title}</b><small>${sub}</small></a>`;
-    if (cloud.isLoggedIn()) { const shDone = shadowDone(g); tiles.push(tile('#/tirage', 'shadow', '#9B6BFF', 'Tirage des Ombres', shDone ? 'Fait · demain' : 'À tirer', !shDone)); }
+    if (cloud.isLoggedIn()) { const shDone = shadowDone(g); tiles.push(tile('#/tirage', 'shadow', '#9B6BFF', 'Tirage des Ombres', shDone ? 'Fait · demain' : 'À tirer', !shDone));
+      /* v839 : le jeton du Choc ne se garde pas : rappel tant qu'il n'a pas servi aujourd'hui */
+      const ck = g.s.choc, chocLeft = !ck || ck.day !== today() || ck.n > 0;
+      tiles.push(tile('#/versus', 'swords', '#E0485E', 'Choc des Boosters', chocLeft ? 'Jeton à jouer' : 'Joué · demain', chocLeft)); }
     const tl = g.trials().done.filter((x) => !x).length;
     if (g.team().length >= 3) tiles.push(tile('#/epreuves', 'crest-elite', '#E0485E', 'Épreuves du jour', tl ? `${tl} à jouer` : 'Terminées', !!tl));
     { const gl = g.gamesDailyLeft(); if (gl.length) tiles.push(tile('#/jeux', 'seal', '#C9A45A', 'Jeux du jour', `${gl.length} défi${gl.length > 1 ? 's' : ''}`, true)); }

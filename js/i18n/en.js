@@ -8920,6 +8920,9 @@ export default {
   "Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour, à jouer avant minuit : il ne se garde pas. Le coffre de la semaine, le Tournoi du Cercle et le Codex en donnent d’autres, à jouer le jour même. Les jetons ne s’achètent pas.": "Each game costs one Clash token. You get one every day, to play before midnight: it can't be saved. The weekly chest, the Circle Tournament and the Codex give extra ones, to play the same day. Tokens can't be bought.",
   "À jouer avant minuit : les jetons ne se gardent pas. Un nouveau chaque jour.": "Play before midnight: tokens can't be saved. A new one every day.",
   "Un nouveau jeton arrive à minuit.": "A new token arrives at midnight.",
+  "Jeton à jouer": "Token to play",
+  "Joué · demain": "Played · tomorrow",
+  "Ton jeton du jour s’éteint à minuit. Une partie, quelques secondes : le meilleur total rafle toute la table.": "Your daily token goes out at midnight. One game, a few seconds: the best total sweeps the whole table.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

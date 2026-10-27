@@ -8909,6 +8909,9 @@ export default {
   "Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour, à jouer avant minuit : il ne se garde pas. Le coffre de la semaine, le Tournoi du Cercle et le Codex en donnent d’autres, à jouer le jour même. Les jetons ne s’achètent pas.": "Cada partida custa uma ficha da Batalha. Você recebe uma por dia, para jogar antes da meia-noite: ela não se guarda. O baú da semana, o Torneio do Círculo e o Códice dão outras, para jogar no mesmo dia. As fichas não se compram.",
   "À jouer avant minuit : les jetons ne se gardent pas. Un nouveau chaque jour.": "Para jogar antes da meia-noite: as fichas não se guardam. Uma nova todo dia.",
   "Un nouveau jeton arrive à minuit.": "Uma nova ficha chega à meia-noite.",
+  "Jeton à jouer": "Ficha para jogar",
+  "Joué · demain": "Jogado · amanhã",
+  "Ton jeton du jour s’éteint à minuit. Une partie, quelques secondes : le meilleur total rafle toute la table.": "Sua ficha do dia se apaga à meia-noite. Uma partida, alguns segundos: o melhor total leva a mesa inteira.",
 };
 
 export const names = {

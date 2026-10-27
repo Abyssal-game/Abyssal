@@ -8909,6 +8909,9 @@ export default {
   "Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour, à jouer avant minuit : il ne se garde pas. Le coffre de la semaine, le Tournoi du Cercle et le Codex en donnent d’autres, à jouer le jour même. Les jetons ne s’achètent pas.": "Ogni partita costa un gettone della Sfida. Ne ricevi uno ogni giorno, da giocare prima di mezzanotte: non si conserva. Il forziere della settimana, il Torneo del Cerchio e il Codice ne danno altri, da giocare lo stesso giorno. I gettoni non si comprano.",
   "À jouer avant minuit : les jetons ne se gardent pas. Un nouveau chaque jour.": "Da giocare prima di mezzanotte: i gettoni non si conservano. Uno nuovo ogni giorno.",
   "Un nouveau jeton arrive à minuit.": "Un nuovo gettone arriva a mezzanotte.",
+  "Jeton à jouer": "Gettone da giocare",
+  "Joué · demain": "Giocato · domani",
+  "Ton jeton du jour s’éteint à minuit. Une partie, quelques secondes : le meilleur total rafle toute la table.": "Il tuo gettone del giorno si spegne a mezzanotte. Una partita, pochi secondi: il totale migliore fa piazza pulita del tavolo.",
 };
 
 export const names = {

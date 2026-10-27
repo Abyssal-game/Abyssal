@@ -8909,6 +8909,9 @@ export default {
   "Chaque partie coûte un jeton du Choc. Tu en reçois un chaque jour, à jouer avant minuit : il ne se garde pas. Le coffre de la semaine, le Tournoi du Cercle et le Codex en donnent d’autres, à jouer le jour même. Les jetons ne s’achètent pas.": "Jede Partie kostet einen Schlacht-Jeton. Du bekommst jeden Tag einen, zu spielen vor Mitternacht: Er lässt sich nicht aufheben. Die Wochentruhe, das Turnier des Zirkels und der Kodex geben weitere, am selben Tag zu spielen. Jetons kann man nicht kaufen.",
   "À jouer avant minuit : les jetons ne se gardent pas. Un nouveau chaque jour.": "Vor Mitternacht spielen: Jetons lassen sich nicht aufheben. Jeden Tag ein neuer.",
   "Un nouveau jeton arrive à minuit.": "Um Mitternacht kommt ein neuer Jeton.",
+  "Jeton à jouer": "Jeton zu spielen",
+  "Joué · demain": "Gespielt · morgen",
+  "Ton jeton du jour s’éteint à minuit. Une partie, quelques secondes : le meilleur total rafle toute la table.": "Dein Tages-Jeton erlischt um Mitternacht. Eine Partie, ein paar Sekunden: Die beste Summe räumt den ganzen Tisch ab.",
 };
 
 export const names = {
