@@ -664,6 +664,34 @@ begin
     'over', true, 'winner', case when ta > tb then 'a' when tb > ta then 'b' else 'draw' end);
 end $$;
 revoke execute on function public.choc_table() from public, anon, authenticated;
+-- v835 : le Panthéon d'hier. Les 3 plus belles tables (total des deux joueurs) et les 3 plus belles cartes tirées la veille
+-- (jour de Paris), avec le profil public des joueurs. Lisible par tout joueur connecté ; rien de caché (parties finies).
+create or replace function public.choc_hall(p_day date default null) returns jsonb
+language plpgsql stable security definer set search_path = public as $$
+declare d date := coalesce(p_day, (now() at time zone 'Europe/Paris')::date - 1); m jsonb; c jsonb; n int;
+begin
+  if d > (now() at time zone 'Europe/Paris')::date or d < (now() at time zone 'Europe/Paris')::date - 7 then raise exception 'Jour invalide.'; end if;
+  with g as (
+    select x.* from public.mp_matches x
+    where x.game = 'choc' and x.status = 'done' and x.state ? 'table' and x.b is not null
+      and x.created_at >= (d::timestamp at time zone 'Europe/Paris') and x.created_at < ((d + 1)::timestamp at time zone 'Europe/Paris')
+  ), pl as (select id, jsonb_build_object('id', id, 'pseudo', pseudo, 'avatar', avatar, 'frame', frame, 'plate', plate, 'badge', badge, 'title', title) j from public.profiles where id in (select a from g union select b from g))
+  select (select count(*) from g),
+    coalesce((select jsonb_agg(t order by (t ->> 'sum')::int desc) from (
+      select jsonb_build_object('id', g.id, 'winner', g.winner, 'sum', (g.state -> 'total' ->> 'a')::int + (g.state -> 'total' ->> 'b')::int,
+        'types', g.state -> 'types',
+        'a', pa.j || jsonb_build_object('total', (g.state -> 'total' ->> 'a')::int, 'best', (select jsonb_agg(k order by (k ->> 'pts')::int desc) from (select k from jsonb_array_elements(g.state -> 'packs' -> 'a') p, jsonb_array_elements(p) k order by (k ->> 'pts')::int desc limit 3) z)),
+        'b', pb.j || jsonb_build_object('total', (g.state -> 'total' ->> 'b')::int, 'best', (select jsonb_agg(k order by (k ->> 'pts')::int desc) from (select k from jsonb_array_elements(g.state -> 'packs' -> 'b') p, jsonb_array_elements(p) k order by (k ->> 'pts')::int desc limit 3) z))) t
+      from g join pl pa on pa.id = g.a join pl pb on pb.id = g.b
+      order by (g.state -> 'total' ->> 'a')::int + (g.state -> 'total' ->> 'b')::int desc, g.created_at limit 3) q), '[]'),
+    coalesce((select jsonb_agg(jsonb_build_object('card', k, 'player', pl.j, 'won', g.winner = w) order by (k ->> 'pts')::int desc, g.created_at) from (
+      select g.id, w, k from g, lateral (values ('a'), ('b')) s(w), jsonb_array_elements(g.state -> 'packs' -> w) p, jsonb_array_elements(p) k
+      order by (k ->> 'pts')::int desc, g.created_at limit 3) z join g on g.id = z.id join pl on pl.id = case when z.w = 'a' then g.a else g.b end), '[]')
+  into n, m, c;
+  return jsonb_build_object('day', d, 'games', n, 'tables', m, 'cards', c);
+end $$;
+revoke execute on function public.choc_hall(date) from public, anon;
+grant execute on function public.choc_hall(date) to authenticated;
 drop function if exists public.choc_beats(text, text);
 drop function if exists public.choc_force(jsonb, jsonb, boolean);
 create or replace function public.choc_force(c jsonb, fl int) returns int language sql immutable as $$

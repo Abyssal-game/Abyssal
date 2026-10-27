@@ -20,6 +20,7 @@ import { esc, fmt, toast, confirmBox, openSheet, withPending } from '../ui/dom.j
 import { playDuel, pickGridHTML, leagueBadge, flameHTML } from './versus-duel.js';
 import { createMpLobby } from './mp-lobby.js';
 import { createChocGame } from './choc-game.js';
+import { hallTileHTML, openHall, loadHall } from './choc-hall.js';
 import { t, tw } from '../i18n.js';
 
 /* v833 : « Le butin de la table » (retour à l'idée de départ du propriétaire) */
@@ -52,7 +53,8 @@ export default function versusScreen(app, root) {
       <section class="panel kc-tok"><div class="kc-toks">${Array.from({ length: Math.max(CHOC.tokensMax, n) }, (_, i) => `<span class="kc-tk ${i < n ? 'on' : ''}"><img alt="" src="assets/jeux/kc-jeton.webp" onerror="this.onerror=null;this.src='assets/icons/seal.webp'"></span>`).join('')}</div>
         <span><b>${t(n > 1 ? '{n} jetons du Choc' : '{n} jeton du Choc', { n })}</b><small>${n < CHOC.tokensMax ? t('Un nouveau jeton chaque jour (jusqu’à {m}).', { m: CHOC.tokensMax }) : t('Réserve pleine : joue pour ne pas perdre le jeton de demain.')}</small></span></section>
       ${chocWeekend(g.clock()) ? `<section class="panel kc-wkd"><img alt="" src="assets/packs/premium.webp" onerror="this.remove()"><span><b>${t('Week-end premium')}</b><small>${t('Aujourd’hui, le troisième booster de chacun est un booster premium.')}</small></span></section>` : ''}
-      ${leagueHTML()}`;
+      ${leagueHTML()}
+      ${hallTileHTML(cat)}`;
   }
   const monthName = (m) => `${t(MONTHS[+m.slice(5, 7) - 1] || '')} ${m.slice(0, 4)}`;
   function leagueHTML() {
@@ -250,6 +252,7 @@ export default function versusScreen(app, root) {
       if (k === 'rules') return openSheet(`<div class="sc-rules"><h2>${t('Le Choc des Boosters')}</h2>${chocHowHTML(cat)}</div>`, { label: t('Règles du Choc') });
       if (k === 'train') return startTrain();
       if (k === 'league') return leagueSheet();
+      if (k === 'hall') return openHall(app);
       if (k === 'tback') { train = null; game.stop(); document.body.classList.remove('battle-mode'); return ctx.lobby(); }
       if (k === 'oskip') return;
       if (k === 'v-see') return oldSee(b.dataset.id, ctx);
@@ -265,6 +268,8 @@ export default function versusScreen(app, root) {
     },
   });
 
+  /* v835 : le Panthéon d'hier se charge en fond, puis sa tuile se met à jour */
+  loadHall().then(() => { const el = alive && root.querySelector('.kc-hall'); if (el) el.outerHTML = hallTileHTML(cat); });
   app.holdRefresh = () => alive; /* la partie du serveur (jetons, cartes gardées) arrive sans redessiner l'écran : il se redessine lui-même */
   loadOld().finally(() => {
     if (!alive) return;

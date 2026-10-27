@@ -225,6 +225,7 @@ export const mpLeave = (id) => rpc('mp_leave', { p_id: id });
 export const mpCancel = (id) => rpc('mp_cancel', { p_id: id }); /* v527 : annule seulement une partie encore en attente */
 export const mpClaim = (id) => rpc('mp_claim', { p_id: id });
 export const mpRanking = async (game, limit = 30) => (await rpc('mp_ranking', { p_game: game, p_limit: limit })) || [];
+export const chocHall = async (day = null) => (await rpc('choc_hall', day ? { p_day: day } : {})) || null; /* v835 : le Panthéon d'hier */
 export const sceauxMpNew = (hand, to = null, pace = 'slow') => rpc('sceaux_mp_new', { p_hand: hand, p_to: to, p_pace: pace });
 export const sceauxMpJoin = (id, hand) => rpc('sceaux_mp_join', { p_id: id, p_hand: hand });
 export const sceauxMpPlay = (id, idx, cell) => rpc('sceaux_mp_play', { p_id: id, p_idx: idx, p_cell: cell });
