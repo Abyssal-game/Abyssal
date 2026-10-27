@@ -18,7 +18,7 @@ import { serverMode } from '../cloud/partie.js';
 import { t } from '../i18n.js';
 
 const DAYS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
-export const huntArt = (cat, key) => (HUNT_ART.has(key) ? `assets/bosses/combat-${key}.webp` : artUrl(cat.get(BOSSES[key].card)));
+export const huntArt = (cat, key) => (HUNT_ART.has(key) ? `assets/bosses/chasse-${key}.webp` /* v859 : 600 px, plus net en grande carte */ : artUrl(cat.get(BOSSES[key].card)));
 
 export default function chasse(app, root) {
   const g = app.game, cat = app.catalog;

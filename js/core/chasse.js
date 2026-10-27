@@ -80,7 +80,7 @@ export const HUNT_BOSSES = {
 Object.assign(BOSSES, HUNT_BOSSES);
 export const HUNT_ORDER = Object.keys(HUNT_BOSSES);
 // Monstres dont l'image Gemini est arrivée (assets/bosses/combat-<clé>.webp) ; les autres prennent l'illustration de leur carte
-export const HUNT_ART = new Set([]);
+export const HUNT_ART = new Set(['h-leviathan', 'h-hydre', 'h-colosse', 'h-tiamat', 'h-fenrir', 'h-moloch', 'h-apophis', 'h-horloge']); /* v859 : les 8 images Gemini */
 export const PASSIVES = {
   aura: { name: 'Présence écrasante', desc: 'Toutes les bêtes de la Chasse : à chaque tour, tes créatures au combat perdent 9 % de leurs PV (14 % en Furie). Ça peut être mortel.' },
   tide: { name: 'Marée noire', desc: 'Ronge tes créatures au combat à chaque tour (4 % de leurs PV, jamais mortel).' },
