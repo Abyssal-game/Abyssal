@@ -218,6 +218,15 @@ export default function cryptesScreen(app, root) {
     view();
     if (g.s.cryptes.cur?.over) { await wait(300); end(); }
   }
+  /* v850 : récapitulatif de fin : les paires de chacun, les paires maudites, les points de bonus */
+  function pairsRecap(st, R) {
+    const curse = st.curse || [];
+    const row = (x) => { const ks = st.pairs[x] || [], b = st.bonus?.[x] || 0;
+      return `<div class="cr-rc ${x}"><b class="cr-rc-n">${x === 'p' ? t('Tes paires') : t('Les paires de {name}', { name: esc(tw(R.name)) })}<em>${CR.scoreOf(st, x)}</em></b>
+        <div class="cr-rc-row">${ks.map((k) => { const c = st.cards.find((y) => y.k === k); return c ? `<span class="cr-rc-c ${curse.includes(k) ? 'cursed' : ''}">${face(c)}</span>` : ''; }).join('') || `<span class="small muted">${t('Aucune paire')}</span>`}</div>
+        ${b ? `<small class="cr-rc-b">${b > 0 ? '+' : '−'}${Math.abs(b)} ${t(Math.abs(b) > 1 ? 'points de bonus ou de malédiction' : 'point de bonus ou de malédiction')}</small>` : ''}</div>`; };
+    return `<div class="cr-recap">${row('p')}${row('a')}</div>`;
+  }
   function end() {
     const st = g.s.cryptes.cur;
     if (!st?.over) return;
@@ -230,6 +239,7 @@ export default function cryptesScreen(app, root) {
     el.className = `sc-end ${won ? 'won' : 'lost'}`;
     el.innerHTML = `${won && !app.reduced() ? '<div class="sc-rays"></div>' : ''}<div class="sc-end-in">${crestHTML(won, won ? 'Victoire' : 'Défaite', '', 'sc-crest')}
       <p class="sc-caps">Toi : <b>${st.final.scores.p}</b> · <span translate="no">${esc(tw(R.name))}</span> : <b>${st.final.scores.a}</b>${st.final.scores.p === st.final.scores.a ? ' (dernière paire décisive)' : ''}</p>
+      ${pairsRecap(st, R)}
       <p class="sc-say">${pic(st.rival)}<span>« ${esc(vsay(st, 'end', `arb-${st.rival}`, won ? R.beaten : R.gloat))} »</span></p>
       ${out.shards ? `<p class="sc-gain">${icon('crystal')} <b>+${fmt(out.shards)}</b> éclats${out.first ? ' (première victoire)' : ''}</p>` : ''}
       ${out.chests?.length ? `<a class="sc-gain sc-chestwin" href="#/coffres">${icon('p:chest')} ${out.chests.map((c) => `<b translate="no">${esc(t(CHEST_NAME[c]))}</b>`).join(' et ')} gagné${out.chests.length > 1 ? 's' : ''} !</a>` : ''}

@@ -11,6 +11,7 @@ import { tuto } from '../ui/tutos.js';
 import { CHESTS } from '../core/descent.js';
 import { MP_HOURS, MP_FAST_SECS, MP_REWARD } from '../core/mp.js';
 import { t, tw } from '../i18n.js';
+import { haptic } from '../ui/sound.js'; /* v850 */
 import { createPacteMp } from './pacte-mp.js';
 
 const CHEST_NAME = Object.fromEntries(Object.entries(CHESTS).map(([k, c]) => [k, c.name]));
@@ -230,6 +231,23 @@ export default function pacteScreen(app, root) {
     app.sfx.suspensebig?.();
     await wait(1500);
   }
+  /* v850 : quand le risque de briser est fort, la carte tirée arrive face cachée au centre, le cœur bat, puis elle se retourne en grand */
+  async function tension(ev, risk) {
+    if (app.reduced() || gone) return;
+    const bad = ev.result === 'bust';
+    const el = document.createElement('div'); el.className = 'pa-tense';
+    el.innerHTML = `<p class="pa-tr">${t('Risque de briser : {n} %', { n: Math.round(risk * 100) })}</p><div class="pa-tc"><div class="pa-tc-in"><span class="pa-tc-back"><img alt="" src="assets/sceaux/dos.webp"></span><span class="pa-tc-face">${cardHTML(ev.x2 ? { ...ev.card, x2: true } : ev.card, 'big')}</span></div></div>`;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('on'));
+    app.sfx.suspensebig?.(); haptic('heartbeat');
+    await wait(1300);
+    if (gone) return el.remove();
+    el.classList.add('flip', bad ? 'bad' : 'good');
+    app.sfx[bad ? 'pa-bust' : 'pa-draw']?.(); if (bad) haptic('defeat');
+    await wait(1100);
+    el.classList.remove('on'); setTimeout(() => el.remove(), 260);
+    await wait(200);
+  }
   // Annonce d'un événement (brisure, protection, arrêt…)
   async function say(st, ev, ms = 1500) {
     const R = PA.RIVALS[st.rival], mine = ev.who === 'p', nm = mine ? 'Tu' : esc(tw(R.name));
@@ -245,6 +263,12 @@ export default function pacteScreen(app, root) {
     if (ev.curse && ev.result === 'ok') H = [mine ? 'ok' : 'ko', t('Malédiction !'), mine ? t('{name} devra tirer une carte de plus à son prochain tour.', { name: esc(tw(R.name)) }) : t('Tu devras tirer une carte de plus à ton prochain tour.')];
     if (H && ev.dbl) H = ev.result === 'bust' ? [H[0], t('Défi perdu… le pacte se brise !'), H[2]] : [mine ? 'ok' : 'ko', t('Pacte défié avec succès !'), mine ? t('Le tour compte double : +{n}.', { n: ev.gain }) : t('{name} double son tour : +{n}.', { name: nm, n: ev.gain })];
     if (!H) return;
+    /* v850 : d'où viennent les points encaissés : chaque carte, l'Offrande, le bonus des sept factions */
+    if (ev._row && ['stop', 'forced', 'seven'].includes(ev.result)) {
+      const parts = ev._row.filter((c) => c.f).map((c) => `${esc(tw(fname(c.f)))} ${c.v}${c.x2 ? ' ×2' : ''}`);
+      if (ev.result === 'seven') parts.push(`${t('sept factions')} ${PA.sevenOf(st)}`);
+      if (parts.length > 1) H = [H[0], H[1], `${H[2]}<small class="pa-calc">${parts.join(' + ')} = <b>${ev.gain}</b></small>`];
+    }
     /* v457 : sons propres au Pacte (ElevenLabs) */
     app.sfx[{ bust: 'pa-bust', saved: 'pa-seal', forced: 'pa-guard', seven: 'pa-seven', stop: 'pa-bank' }[ev.result]]?.();
     banner = { cls: H[0], bust: ev.result === 'bust' && !app.reduced(), html: `${ev.card ? cardHTML(ev.card, 'big') : `<span class="sc-med">${mine ? me() : pic(st.rival)}</span>`}<span class="mq-vd"><b>${H[1]}</b><span>${H[2]}</span></span>` };
@@ -281,8 +305,9 @@ export default function pacteScreen(app, root) {
       if (ev.card) shown.row.push(ev.x2 ? { ...ev.card, x2: true } : ev.card);
       renderShown(shown); await wait(ev.card ? 650 : 450);
       if (ev.result === 'bust') await burnRow();
+      const rowWas = shown.row.slice();
       shown.row = []; shown.sceaux = 0; shown.offer = false;
-      await say(g.s.pacte.cur, ev, 1500); defy = null;
+      await say(g.s.pacte.cur, { ...ev, _row: rowWas }, 1900); defy = null;
     }
     busy = false; ui.deckView = null;
     if (gone) return;
@@ -363,11 +388,13 @@ export default function pacteScreen(app, root) {
     if (k === 'double' && !(await askDouble(st))) return;
     if (!g.s.pacte.cur || st.over || busy || st.turn !== 'p') return;
     const before = { row: st.row.slice(), sceaux: st.sceaux, offer: st.offer };
+    const riskBefore = k !== 'stop' && !st.peek ? PA.bustChance(st) : 0;
     let ev;
     try { ev = k === 'draw' ? g.pacteDraw() : k === 'stop' ? g.pacteStop() : k === 'double' ? g.pacteDouble() : null; } catch (err) { toast(esc(err.message), { kind: 'error' }); return; }
     if (!ev) return;
     busy = true;
     if (ev.dbl) await defyMoment('p', () => renderShown(before, 'p'));
+    if (ev.card && riskBefore >= 0.4) await tension(ev, riskBefore);
     if (ev.card && ev.result === 'ok') app.sfx[ev.card.sp === 'offrande' ? 'pa-offer' : 'pa-draw']?.();
     if (ev.result === 'ok' && ev.curse) { await say(st, ev, 1500); busy = false; if (!gone) view(); return; }
     if (ev.result === 'ok') { busy = false; view(); return; }
@@ -377,7 +404,7 @@ export default function pacteScreen(app, root) {
       renderShown({ ...before, row: [...before.row, ev.x2 ? { ...ev.card, x2: true } : ev.card] }, 'p'); await wait(650);
       if (ev.result === 'bust') await burnRow();
     }
-    await say(st, ev);
+    await say(st, { ...ev, _row: ev.result === 'stop' ? before.row : [...before.row, ev.x2 ? { ...ev.card, x2: true } : ev.card].filter(Boolean) }, ev.result === 'bust' ? 1500 : 1900);
     defy = null;
     busy = false;
     if (gone) return;

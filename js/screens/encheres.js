@@ -138,7 +138,36 @@ export default function encheresScreen(app, root) {
       ${controls(st)}</div>`;
   }
   // Révélation des trois offrandes : celles qui s'annulent sont barrées, puis le lot part (ou reste sur la table)
+  /* v850 : les trois offrandes en grand, face cachée, puis retournées ensemble ; les égales s'annulent sous les yeux ; le gagnant brille */
+  async function revealFocus(st, ev) {
+    if (app.reduced() || gone) return;
+    const col = (x) => `<div class="en-fx-c ${x === 'p' ? 'me' : ''}" data-x="${x}"><span class="sc-med">${x === 'p' ? me() : pic(st.seats[x])}</span><small>${esc(x === 'p' ? t('Toi') : tw(who(st, x).name))}</small>
+      <div class="en-coin"><div class="en-coin-in"><span class="en-coin-back">?</span><span class="en-coin-face"><b>${ev.bids[x]}</b></span></div></div></div>`;
+    const el = document.createElement('div'); el.className = 'en-focus';
+    el.innerHTML = `<div class="en-fx-lot">${lotCard(ev.lot)}</div><div class="en-fx-row">${['a', 'p', 'b'].map(col).join('')}</div><p class="en-fx-msg"></p>`;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('on'));
+    app.sfx.suspense?.();
+    await wait(900); if (gone) return el.remove();
+    el.classList.add('flip'); app.sfx['vd-flip']?.();
+    await wait(700);
+    const msg = el.querySelector('.en-fx-msg');
+    if (ev.cancelled.length) {
+      ev.cancelled.forEach((x) => el.querySelector(`.en-fx-c[data-x="${x}"]`)?.classList.add('off'));
+      msg.textContent = ev.cancelled.length === 3 ? t('Les trois offrandes s’annulent') : t('Offrandes égales : annulées !');
+      app.sfx.cancel?.();
+      await wait(800);
+    }
+    if (ev.taker) {
+      el.querySelector(`.en-fx-c[data-x="${ev.taker}"]`)?.classList.add('win');
+      msg.textContent = ev.taker === 'p' ? (ev.value > 0 ? t('Tu remportes le lot') : t('La malédiction est pour toi')) : t('{name} l’emporte', { name: tw(who(st, ev.taker).name) });
+    } else if (!ev.cancelled.length) msg.textContent = t('Le lot reste sur la table');
+    await wait(900);
+    el.classList.remove('on'); setTimeout(() => el.remove(), 260);
+    await wait(200);
+  }
   async function reveal(st, ev) {
+    await revealFocus(st, ev);
     const tk = ev.taker ? who(st, ev.taker) : null;
     const offer = (x) => `<span class="en-rv ${ev.cancelled.includes(x) ? 'off' : ''} ${ev.taker === x ? 'win' : ''}"><span class="sc-med">${x === 'p' ? me() : pic(st.seats[x])}</span><b>${ev.bids[x]}</b><small>${esc(who(st, x).name)}</small></span>`;
     banner = { cls: ev.taker === 'p' ? (ev.value > 0 ? 'ok' : 'ko') : ev.taker ? (ev.value > 0 ? 'ko' : 'ok') : '', gavel: !!ev.taker && !app.reduced(), lot: ev.lot, html: `<span class="en-rvrow">${['p', 'a', 'b'].map(offer).join('')}</span>
@@ -149,8 +178,15 @@ export default function encheresScreen(app, root) {
     /* v439 : offrandes annulées, puis coup de marteau du lot adjugé */
     if (ev.cancelled.length) setTimeout(() => app.sfx.cancel?.(), 350);
     if (ev.taker) setTimeout(() => app.sfx.gavel?.(), ev.cancelled.length ? 800 : 350);
-    await wait(2000);
+    await wait(app.reduced() ? 2000 : 1500);
     banner = null;
+  }
+  /* v850 : d'où vient le score de chacun : créatures, malédictions, familles de trois, pouvoir */
+  function scoreDetail(st) {
+    const P = EN.powerOf(st);
+    const row = (x) => { const sc = EN.scoreOf(st, x), cre = st.won[x].filter((l) => l.v > 0).reduce((a, l) => a + l.v, 0), cur = st.won[x].filter((l) => l.v < 0).reduce((a, l) => a + l.v, 0);
+      return `<tr class="${x === 'p' ? 'me' : ''}"><th>${esc(x === 'p' ? t('Toi') : tw(who(st, x).name))}</th><td>+${cre}</td><td class="neg">${cur ? `−${-cur}` : '0'}</td><td>${sc.sets ? `+${sc.sets * EN.setBonus(st)}` : '0'}</td>${P ? `<td>${sc.pow ? `+${sc.pow}` : '0'}</td>` : ''}<td class="tot">${sc.total}</td></tr>`; };
+    return `<table class="en-detail"><thead><tr><th></th><th>${t('Créatures')}</th><th>${t('Malédictions')}</th><th>${t('Familles')}</th>${P ? `<th>${esc(P.name)}</th>` : ''}<th>${t('Total')}</th></tr></thead><tbody>${st.final.order.map(row).join('')}</tbody></table>`;
   }
   function end() {
     const st = g.s.encheres.cur;
@@ -165,6 +201,7 @@ export default function encheresScreen(app, root) {
     el.className = `sc-end ${won ? 'won' : 'lost'}`;
     el.innerHTML = `${won && !app.reduced() ? '<div class="sc-rays"></div>' : ''}<div class="sc-end-in">${crestHTML(won, won ? 'Victoire' : 'Défaite', '', 'sc-crest')}
       <p class="sc-caps" translate="no">${st.final.order.map((x) => `${esc(x === 'p' ? t('Toi') : tw(who(st, x).name))}${LANG === 'fr' ? ' : ' : ': '}<b>${sc[x]}</b>`).join(' · ')}</p>
+      ${scoreDetail(st)}
       ${sayer.key ? `<p class="sc-say">${pic(sayer.key)}<span>« ${esc(vsay(st, 'end', `arb-${sayer.key}`, won ? sayer.beaten : sayer.gloat))} »</span></p>` : ''}
       ${out.shards ? `<p class="sc-gain">${icon('crystal')} <b>+${fmt(out.shards)}</b> éclats${out.first ? ' (première victoire)' : ''}</p>` : ''}
       ${out.chests?.length ? `<a class="sc-gain sc-chestwin" href="#/coffres">${icon('p:chest')} ${out.chests.map((c) => `<b translate="no">${esc(t(CHEST_NAME[c]))}</b>`).join(' et ')} gagné${out.chests.length > 1 ? 's' : ''} !</a>` : ''}

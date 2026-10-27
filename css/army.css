@@ -8672,3 +8672,121 @@ table.odds th, table.odds td { white-space: normal; }
 .vd-dc-calc b { color: #F2E3B8; }
 .vd-dc.flip .vd-dc-calc { opacity: .95; }
 .vd-dc.fin .vd-dc-face { box-shadow: 0 0 0 3px #EAF2FF, 0 0 30px rgba(220, 235, 255, .55), 0 14px 30px rgba(0, 0, 0, .7); }
+
+/* v850 : Duels des Sceaux, gros plan de chaque capture (les deux cartes face à face, les valeurs qui s'affrontent) */
+.sc-focus { position: fixed; left: 0; right: 0; top: 0; height: var(--app-h, 100dvh); z-index: 900; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 12px;
+  background: radial-gradient(ellipse 80% 50% at 50% 50%, rgba(10, 8, 16, .82), rgba(4, 3, 6, .9)); opacity: 0; transition: opacity .25s; pointer-events: none; }
+.sc-focus.on { opacity: 1; }
+.sc-fc { flex: 1 1 0; max-width: 170px; display: flex; flex-direction: column; align-items: center; gap: 6px; transform: scale(.85); transition: transform .35s cubic-bezier(.2, .9, .3, 1.25); }
+.sc-focus.on .sc-fc { transform: none; }
+.sc-fc small { font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; }
+.sc-fc .sc-card { width: 100%; }
+.sc-fc .sc-v { font-size: 1.15rem; }
+.sc-fc .sc-v.hot { transform-origin: center; animation: scHot .9s ease-in-out infinite alternate; color: #FFE7A6; text-shadow: 0 0 10px #F2C14E, 0 0 2px #000; z-index: 4; }
+.sc-fc .sc-v.t.hot, .sc-fc .sc-v.b.hot { translate: -50% 0; transform: none; }
+@keyframes scHot { to { scale: 1.35; } }
+.sc-fc.b .sc-v.hot { color: #FFB3A6; text-shadow: 0 0 10px #E0485E, 0 0 2px #000; }
+.sc-fc.b.taken .sc-card { animation: scTaken .38s ease-in forwards; }
+@keyframes scTaken { 50% { transform: rotateY(90deg) scale(.95); } to { transform: none; filter: brightness(1.2); } }
+.sc-focus.p .sc-fc.b.taken .sc-card { border-color: #7FB8E8; box-shadow: 0 0 22px rgba(127, 184, 232, .8); }
+.sc-focus.o .sc-fc.b.taken .sc-card { border-color: #D8413A; box-shadow: 0 0 22px rgba(216, 65, 58, .8); }
+.sc-fvs { flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 64px; font: 800 2.1rem/1 var(--f-display, serif); }
+.sc-fvs b.p { color: #9FD0F5; } .sc-fvs b.o { color: #FF8F84; }
+.sc-fvs i { font-style: normal; font-size: 1.5rem; color: #F2C14E; }
+.sc-fvs small { margin-top: 6px; font: 700 .7rem/1.2 var(--f-body, sans-serif); text-transform: uppercase; letter-spacing: .06em; color: #F2E3B8; text-align: center; max-width: 84px; }
+/* fin de partie : le plateau final */
+.sc-endboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: min(66%, 220px); margin: 6px auto 2px; }
+.sc-eb { position: relative; }
+.sc-eb.empty { aspect-ratio: 5 / 7; border-radius: 7px; background: rgba(255, 255, 255, .04); }
+.sc-eb .sc-card { width: 100%; }
+.sc-eb .sc-v { font-size: .62rem; }
+.sc-eb .sc-nm { display: none; }
+.sc-eb.took::after { content: '⟲'; position: absolute; right: -3px; top: -5px; z-index: 5; font-size: .8rem; color: #F2C14E; text-shadow: 0 0 4px #000; }
+.sc-eblg { margin: 0 0 6px; } .sc-eblg .p { color: #7FB8E8; } .sc-eblg .o { color: #D8413A; } .sc-eblg .tk { color: #F2C14E; }
+
+/* v850 : Pacte, moment de tension (risque ≥ 40 %) : la carte arrive face cachée, le cœur bat, puis elle se retourne en grand */
+.pa-tense { position: fixed; left: 0; right: 0; top: 0; height: var(--app-h, 100dvh); z-index: 900; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  background: radial-gradient(ellipse 70% 50% at 50% 50%, rgba(40, 6, 10, .7), rgba(4, 3, 6, .92)); opacity: 0; transition: opacity .25s; pointer-events: none; }
+.pa-tense.on { opacity: 1; }
+.pa-tr { margin: 0; font: 800 1rem/1.2 var(--f-display, serif); letter-spacing: .06em; color: #FF9A8A; text-transform: uppercase; text-shadow: 0 0 12px rgba(224, 72, 94, .6); }
+.pa-tc { width: min(46vw, 190px); aspect-ratio: 5 / 7; perspective: 900px; animation: paBeat .9s ease-in-out infinite; }
+.pa-tense.flip .pa-tc { animation: none; }
+@keyframes paBeat { 0%, 100% { transform: scale(1); } 14% { transform: scale(1.06); } 28% { transform: scale(1); } 42% { transform: scale(1.04); } }
+.pa-tc-in { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .5s cubic-bezier(.3, .7, .3, 1); }
+.pa-tense.flip .pa-tc-in { transform: rotateY(180deg); }
+.pa-tc-back, .pa-tc-face { position: absolute; inset: 0; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 10px; overflow: hidden; }
+.pa-tc-back { box-shadow: 0 0 0 2px rgba(224, 72, 94, .7), 0 0 30px rgba(224, 72, 94, .45); }
+.pa-tc-back img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pa-tc-face { transform: rotateY(180deg); }
+.pa-tc-face .pa-card { width: 100% !important; height: 100% !important; max-width: none; }
+.pa-tense.good .pa-tc-face { box-shadow: 0 0 0 3px #7FE0A0, 0 0 36px rgba(127, 224, 160, .6); }
+.pa-tense.bad .pa-tc-face { box-shadow: 0 0 0 3px #E0485E, 0 0 40px rgba(224, 72, 94, .8); }
+.pa-tense.bad .pa-tc { animation: paShake .4s ease-in-out 2; }
+@keyframes paShake { 25% { translate: -6px 0; } 75% { translate: 6px 0; } }
+/* v850 : détail des points encaissés */
+.pa-calc { display: block; margin-top: 4px; font-size: .72rem; opacity: .9; }
+.pa-calc b { color: #F2C14E; }
+
+/* v850 : Cryptes, la paire trouvée en grand (cartes plus grandes qui se retournent et s'assemblent) */
+.cr-pop-pair { margin: -60px 0 6px; gap: 0; }
+.cr-pop-c { width: 104px; box-shadow: 0 0 0 2px var(--fc, #C9A45A), 0 0 22px color-mix(in srgb, var(--fc, #C9A45A) 55%, transparent), 0 10px 22px rgba(0, 0, 0, .75); animation: crPopC .55s cubic-bezier(.2, .9, .3, 1.2) both; }
+.cr-pop-c:last-child { animation-delay: .12s; }
+@keyframes crPopC { from { transform: rotateY(90deg) scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+/* v850 : Cryptes, récapitulatif de fin (paires de chacun) */
+.cr-recap { display: grid; gap: 8px; margin: 6px 0 8px; text-align: left; }
+.cr-rc { padding: 8px 10px; border-radius: 12px; background: rgba(0, 0, 0, .35); box-shadow: inset 0 0 0 1px rgba(201, 164, 90, .3); }
+.cr-rc.p { box-shadow: inset 0 0 0 1px rgba(127, 184, 232, .55); }
+.cr-rc.a { box-shadow: inset 0 0 0 1px rgba(216, 65, 58, .5); }
+.cr-rc-n { display: flex; justify-content: space-between; align-items: baseline; font-size: .8rem; margin-bottom: 5px; }
+.cr-rc-n em { font-style: normal; font: 800 1.2rem/1 var(--f-display, serif); color: #F2C14E; }
+.cr-rc-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.cr-rc-c { position: relative; width: 34px; aspect-ratio: 5 / 7; border-radius: 4px; overflow: hidden; box-shadow: 0 0 0 1px rgba(201, 164, 90, .5); }
+.cr-rc-c > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cr-rc-c .cr-f, .cr-rc-c .cr-pwl { display: none; }
+.cr-rc-c .cr-curse { position: absolute; inset: auto 1px 1px auto; width: 14px; height: 14px; }
+.cr-rc-c .cr-curse img { width: 100%; height: 100%; }
+.cr-rc-c.cursed { box-shadow: 0 0 0 1.5px #E0485E; }
+.cr-rc-b { display: block; margin-top: 4px; opacity: .8; }
+
+/* v850 : Enchères, les trois offrandes révélées en grand */
+.en-focus { position: fixed; left: 0; right: 0; top: 0; height: var(--app-h, 100dvh); z-index: 900; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 0 10px;
+  background: radial-gradient(ellipse 80% 55% at 50% 50%, rgba(30, 20, 6, .8), rgba(4, 3, 6, .92)); opacity: 0; transition: opacity .25s; pointer-events: none; }
+.en-focus.on { opacity: 1; }
+.en-fx-lot .en-lot { width: 92px; }
+.en-fx-row { display: flex; gap: 14px; justify-content: center; }
+.en-fx-c { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 92px; transition: opacity .3s, transform .3s; }
+.en-fx-c .sc-med { width: 46px; height: 46px; }
+.en-fx-c small { font-size: .7rem; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.en-fx-c.me small { color: #9FD0F5; }
+.en-coin { width: 74px; height: 74px; perspective: 600px; }
+.en-coin-in { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .5s cubic-bezier(.3, .7, .3, 1.2); }
+.en-focus.flip .en-coin-in { transform: rotateY(180deg); }
+.en-coin-back, .en-coin-face { position: absolute; inset: 0; border-radius: 50%; display: grid; place-items: center; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+.en-coin-back { font: 800 1.8rem/1 var(--f-display, serif); color: #C9A45A; background: radial-gradient(circle at 35% 30%, #3a2c16, #120c06); box-shadow: inset 0 0 0 3px #6a5124, 0 4px 12px rgba(0, 0, 0, .7); animation: enCoin .7s ease-in-out infinite alternate; }
+@keyframes enCoin { to { box-shadow: inset 0 0 0 3px #C9A45A, 0 0 18px rgba(242, 193, 78, .5); } }
+.en-coin-face { transform: rotateY(180deg); background: url(../assets/jeux/en-jeton.webp) center / 100% 100% no-repeat; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .7)); }
+.en-coin-face b { font: 800 1.9rem/1 var(--f-display, serif); color: #2A1A06; text-shadow: 0 1px 0 rgba(255, 230, 160, .6); }
+.en-fx-c.off { opacity: .45; }
+.en-fx-c.off .en-coin::after { content: ''; position: absolute; left: 6%; right: 6%; top: 50%; height: 4px; border-radius: 2px; background: #E0485E; transform: rotate(-35deg); box-shadow: 0 0 8px #E0485E; }
+.en-coin { position: relative; }
+.en-fx-c.win { transform: scale(1.12); }
+.en-fx-c.win .en-coin-face { filter: drop-shadow(0 0 16px rgba(242, 193, 78, .95)); }
+.en-fx-msg { min-height: 1.4em; margin: 0; font: 800 1.05rem/1.2 var(--f-display, serif); color: #F2E3B8; text-align: center; text-shadow: 0 2px 8px #000; }
+/* v850 : Enchères, détail du score final */
+.en-detail { width: 100%; margin: 4px 0 8px; border-collapse: collapse; font-size: .74rem; }
+.en-detail th, .en-detail td { padding: 4px 3px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.en-detail thead th { font-size: .62rem; font-weight: 600; opacity: .7; text-transform: uppercase; letter-spacing: .04em; }
+.en-detail tbody th { text-align: left; font-weight: 700; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.en-detail tr.me th { color: #9FD0F5; }
+.en-detail .neg { color: #FF9A8A; }
+.en-detail .tot { font: 800 .95rem/1 var(--f-display, serif); color: #F2C14E; }
+.sc-fvn { display: flex; align-items: center; gap: 4px; }
+.sc-fvs { min-width: 78px; font-size: 1.75rem; }
+.sc-fvs i { font-size: 1.3rem; }
+.sc-fc { max-width: 140px; }
+.sc-endboard { width: min(46%, 158px); gap: 3px; }
+.sc-eb .sc-v { font-size: .5rem; }
+@media (max-height: 720px) { .sc-endboard { width: min(38%, 128px); } }
+.pa-tc-face .pa-v { min-width: 34px; height: 34px; font-size: 1.25rem; left: 6px; top: 6px; border-radius: 17px; }
+.en-fx-lot .en-lot { display: block; width: 96px; }
+.en-fx-lot .en-lot .en-v { position: absolute; }

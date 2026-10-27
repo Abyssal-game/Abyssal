@@ -9265,6 +9265,22 @@ export default {
   "{n} cartes ouvertes": "{n} cards opened",
   "Le Cercle": "The Circle",
   "Tout se joue sur ces cartes": "It all comes down to these cards",
+  "Plus fort : capturée !": "Stronger: captured!",
+  "Le plateau final": "The final board",
+  "capturée": "captured",
+  "Risque de briser : {n} %": "Risk of breaking: {n}%",
+  "sept factions": "seven factions",
+  "Tes paires": "Your pairs",
+  "Les paires de {name}": "{name}'s pairs",
+  "Aucune paire": "No pairs",
+  "points de bonus ou de malédiction": "bonus or curse points",
+  "point de bonus ou de malédiction": "bonus or curse point",
+  "Offrandes égales : annulées !": "Equal offerings: cancelled!",
+  "La malédiction est pour toi": "The curse is yours",
+  "{name} l’emporte": "{name} wins it",
+  "Malédictions": "Curses",
+  "Familles": "Families",
+  "Total": "Total",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

@@ -166,6 +166,29 @@ ${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone || dail
     n.style.cssText = `left:${r.left - b.left + r.width / 2}px;top:${r.top - b.top + r.height / 2}px;width:${r.width * k}px;height:${r.width * k}px;--d:${d}ms;background-image:url(assets/fx/${name}.webp)`;
     board.appendChild(n); setTimeout(() => n.remove(), d + 80);
   };
+  /* v850 : gros plan d'une capture : la carte qui prend et la carte prise face à face, les deux valeurs qui s'affrontent en grand */
+  const SIDE = ['t', 'r', 'b', 'l'];
+  async function capFocus(m, f, k) {
+    if (app.reduced()) return;
+    const st = g.s.sceaux.cur, a = st?.board[f.from ?? m.cell], b = st?.board[f.cell]; if (!a || !b) return;
+    const R = RIVAL_OF(st), foe = m.who === 'p' ? 'o' : 'p', nm = (w) => (w === 'p' ? t('Toi') : esc(tw(R.name)));
+    const sym = f.rule === 'identique' || f.rule === 'fureur' ? '=' : f.rule === 'somme' ? '+' : '&gt;';
+    const lab = { identique: t('Identique !'), somme: t('Somme !'), combo: t('Combo !'), fureur: t('Ardeur !') }[f.rule] || t('Plus fort : capturée !');
+    const el = document.createElement('div'); el.className = `sc-focus ${m.who}`;
+    el.style.flexDirection = f.dir === 3 ? 'row-reverse' : 'row'; /* la carte prise du côté où elle est sur le plateau */
+    el.innerHTML = `<div class="sc-fc a"><small>${nm(m.who)}</small>${scCard(cat, a.id, { vals: a.vals, owner: m.who, perks: false })}</div>
+      <div class="sc-fvs"><span class="sc-fvn" style="flex-direction:${f.dir === 3 ? 'row-reverse' : 'row'}"><b class="${m.who}">${V(f.mine)}</b><i>${f.dir === 3 && sym === '&gt;' ? '&lt;' : sym}</i><b class="${foe}">${V(f.theirs)}</b></span><small>${lab}</small></div>
+      <div class="sc-fc b"><small>${nm(foe)}</small>${scCard(cat, b.id, { vals: b.vals, owner: foe, perks: false })}</div>`;
+    el.querySelector(`.sc-fc.a .sc-v.${SIDE[f.dir]}`)?.classList.add('hot');
+    el.querySelector(`.sc-fc.b .sc-v.${SIDE[(f.dir + 2) % 4]}`)?.classList.add('hot');
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('on'));
+    await wait(k ? 950 : 1250);
+    el.querySelector('.sc-fc.b')?.classList.add('taken');
+    await wait(380);
+    el.classList.remove('on'); setTimeout(() => el.remove(), 260);
+    await wait(180);
+  }
   const react = (cls) => { const w = root.querySelector('.sc-who'); if (!w || app.reduced()) return; w.classList.remove('hurt', 'gloat'); void w.offsetWidth; w.classList.add(cls); };
   // Pose puis captures, une par une : trait, comparaison, carte qui se retourne, éclat du sceau, score
   async function animateMove(m, cellsBefore) {
@@ -203,6 +226,8 @@ ${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone || dail
         root.querySelector('.sc-board')?.appendChild(b); setTimeout(() => b.remove(), 1100);
         (f.rule === 'combo' ? app.sfx.crit : f.rule === 'fureur' ? app.sfx.fury : app.sfx.skill)?.(); await wait(380);
       }
+      await capFocus(m, f, m.flips.indexOf(f));
+      if (!root.querySelector('.sc-plate')) break;
       beam(grid, f.from ?? m.cell, f.cell, m.who);
       const cmp = f.rule === 'identique' || f.rule === 'fureur' ? `${V(f.mine)} = ${V(f.theirs)}` : f.rule === 'somme' ? `${V(f.mine)} + ${V(f.theirs)}` : `${V(f.mine)} &gt; ${V(f.theirs)}`;
       el.insertAdjacentHTML('beforeend', `<span class="sc-cmp d${(f.dir + 2) % 4}">${cmp}</span><span class="sc-seal ${m.who}"></span>`);
@@ -273,6 +298,8 @@ ${g.sceauxDailyOpen() ? `      <button class="panel sc-daily ${dailyDone || dail
     el.className = `sc-end ${st.over}`;
     el.innerHTML = `${st.over === 'won' && !app.reduced() ? '<div class="sc-rays"></div>' : ''}<div class="sc-end-in">${st.over === 'draw' ? '<h1 class="sc-draw">Égalité</h1>' : crestHTML(st.over === 'won', st.over === 'won' ? 'Victoire' : 'Défaite', '', 'sc-crest')}
       <div class="sc-final"><span class="sc-score"><b class="p">${f.p}</b><i>contre</i><b class="o">${f.o}</b></span></div>
+      <div class="sc-endboard" aria-label="${t('Le plateau final')}">${st.board.map((c) => (c ? `<span class="sc-eb ${c.owner}${c.from !== c.owner ? ' took' : ''}">${scCard(cat, c.id, { vals: c.vals, owner: c.owner, perks: false })}</span>` : '<span class="sc-eb empty"></span>')).join('')}</div>
+      <p class="small muted sc-eblg"><span class="p">■</span> ${t('Tes cartes')} · <span class="o">■</span> ${esc(tw(R.name))} · <span class="tk">⟲</span> ${t('capturée')}</p>
       ${st.tiebreak ? `<p class="sc-caps">${st.over === 'won' ? t('<b>Égalité de cartes</b> : tu tiens le cœur du Sceau.') : t('<b>Égalité de cartes</b> : {name} tient le cœur du Sceau.', { name: esc(tw(R.name)) })}</p>` : ''}
       <p class="sc-caps">${t('Tes captures : <b>{a}</b> · Les siennes : <b>{b}</b>', { a: caps.p, b: caps.o })}</p>
       ${out.trophy?.length ? `<div class="sc-trophy"><img class="sc-tico" alt="" src="assets/icons/sc-trophy.webp"><b>Butin du jour</b><span class="small">Garde une de ces cartes :</span><div class="sc-tro-row">${out.trophy.map((id) => `<button class="sc-tro" data-tro="${id}">${scCard(cat, id, { owner: 'p' })}</button>`).join('')}</div></div>` : ''}

@@ -9252,6 +9252,22 @@ export default {
   "{n} cartes ouvertes": "{n} cartas abertas",
   "Le Cercle": "O Círculo",
   "Tout se joue sur ces cartes": "Tudo se decide nestas cartas",
+  "Plus fort : capturée !": "Mais forte: capturada!",
+  "Le plateau final": "O tabuleiro final",
+  "capturée": "capturada",
+  "Risque de briser : {n} %": "Risco de quebrar: {n}%",
+  "sept factions": "sete facções",
+  "Tes paires": "Seus pares",
+  "Les paires de {name}": "Os pares de {name}",
+  "Aucune paire": "Nenhum par",
+  "points de bonus ou de malédiction": "pontos de bônus ou de maldição",
+  "point de bonus ou de malédiction": "ponto de bônus ou de maldição",
+  "Offrandes égales : annulées !": "Oferendas iguais: anuladas!",
+  "La malédiction est pour toi": "A maldição é sua",
+  "{name} l’emporte": "{name} leva",
+  "Malédictions": "Maldições",
+  "Familles": "Famílias",
+  "Total": "Total",
 };
 
 export const names = {
