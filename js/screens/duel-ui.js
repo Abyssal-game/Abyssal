@@ -99,7 +99,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   root.innerHTML = `<div class="dv cb cb2 ${run.room} ${run.chasse ? 'hunt' : ''} has-bg" style="--bgimg:${room.paint ? `url(${abs(room.paint)})` : bgOf(run)}">
     <div class="dv-top"><b>${(() => { const [a, ...r] = String(title).split(' · '); return esc(a) + (r.length ? `<span class="dv-tt2">&nbsp;· ${esc(r.join(' · '))}</span>` : ''); })()}</b><div class="cb-rules"></div><span class="row gap">
       <button class="btn small ghost cb-speed ${ui.fast ? 'on' : ''}" data-d="speed" aria-label="Vitesse des animations" aria-pressed="${!!ui.fast}">×${ui.fast ? 2 : 1}</button>
-      <button class="btn small ghost" data-d="help" aria-label="Règles du combat">?</button>
+      <button class="btn small ghost cb-help" data-d="help" aria-label="Règles du combat"><svg class="cb-help-q" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.6 9.2a3.4 3.4 0 1 1 5 3c-1.1.6-1.6 1.3-1.6 2.4v.7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="18.6" r="1.55" fill="currentColor"/></svg></button>
       <button class="btn small ghost cb-pass dv-end" data-d="end" aria-label="Passer le tour" title="Passer le tour"><img class="cb-pass-i" alt="" src="assets/ui/cb-passer2.webp" onerror="this.remove()"><span class="cb-pass-f">${icon('skip')}</span></button>
       <button class="btn small ghost" data-d="quit" aria-label="Pause">${icon('close')}</button></span></div>
     <div class="cb-tl" aria-label="Ordre des tours"></div>

@@ -8892,3 +8892,6 @@ table.odds th, table.odds td { white-space: normal; }
 @media (max-height: 700px) { .dv.cb.cb2.hunt .dv-row.enemy .dv-c { scale: 1.15; } }
 /* v863 : bandeau propre à la Grande Chasse (chasseurs encapuchonnés face à la bête, Gemini ; source store/chasse/bandeau-source.jpg) */
 .ui-hero.gc-hero.bn-chasse { background: linear-gradient(90deg, rgba(8, 9, 13, .85) 25%, rgba(8, 9, 13, 0) 60%), url(../assets/ui/bn-chasse.webp) right 80% / cover no-repeat, #09090D; }
+/* v864 : « ? » du combat dessiné (le glyphe de la police n'était pas centré dans son anneau, surtout sur iPhone) */
+.dv-top .btn.small.ghost.cb-help { display: inline-flex; align-items: center; justify-content: center; }
+.cb-help-q { display: block; width: 21px; height: 21px; color: #F2D68A; filter: drop-shadow(0 0 4px rgba(242, 193, 78, .55)) drop-shadow(0 1px 0 #000); }
