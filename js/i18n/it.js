@@ -9010,6 +9010,11 @@ export default {
   "Connexion au serveur impossible pour l’instant. Réessaie dans un moment.": "Impossibile raggiungere il server per ora. Riprova tra poco.",
   "4 victoires : coffre d’or et un jeton du Choc": "4 vittorie: forziere d’oro e un gettone della Sfida",
   "8 victoires : coffre abyssal et 2 tickets premium": "8 vittorie: forziere abissale e 2 biglietti premium",
+  "{n0} a succombé au tour {0}, sous une attaque du {n1}.": "{n0} è caduto al turno {0}, sotto un attacco di {n1}.",
+  "{n0} a succombé au tour {0}, sous une attaque des {n1}.": "{n0} è caduto al turno {0}, sotto un attacco di {n1}.",
+  "{n0} a succombé au tour {0}, sous une attaque de la {n1}.": "{n0} è caduto al turno {0}, sotto un attacco di {n1}.",
+  "{n0} a succombé au tour {0}, sous une attaque d’{n1}.": "{n0} è caduto al turno {0}, sotto un attacco di {n1}.",
+  "{n0} se réveillent du rêve de l’Abysse.": "{n0} si risvegliano dal sogno dell’Abisso.",
 };
 
 export const names = {

@@ -9023,6 +9023,11 @@ export default {
   "Connexion au serveur impossible pour l’instant. Réessaie dans un moment.": "Can’t reach the server right now. Try again in a moment.",
   "4 victoires : coffre d’or et un jeton du Choc": "4 wins: gold chest and a Clash token",
   "8 victoires : coffre abyssal et 2 tickets premium": "8 wins: abyssal chest and 2 premium tickets",
+  "{n0} a succombé au tour {0}, sous une attaque du {n1}.": "{n0} fell on turn {0}, to an attack from {n1}.",
+  "{n0} a succombé au tour {0}, sous une attaque des {n1}.": "{n0} fell on turn {0}, to an attack from {n1}.",
+  "{n0} a succombé au tour {0}, sous une attaque de la {n1}.": "{n0} fell on turn {0}, to an attack from {n1}.",
+  "{n0} a succombé au tour {0}, sous une attaque d’{n1}.": "{n0} fell on turn {0}, to an attack from {n1}.",
+  "{n0} se réveillent du rêve de l’Abysse.": "{n0} wake from the Abyss’s dream.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

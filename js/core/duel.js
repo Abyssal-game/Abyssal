@@ -16,6 +16,7 @@ import { BOSSES, LAWS, ASPECTS, ABYSS_ECHOES } from './bosses.js';
 import { familyOf, relationMult, activeLegends } from './relations.js';
 import { FORMS } from './forms.js';
 import { CREATURE_KITS, kitOf, moveOf, moveFor, hasP, boosted, awake, statShape, passiveMult, rechargeOf, ROLE_AWAKEN } from './kits.js';
+import { deName } from './synergy.js';
 import { ipow } from './detmath.js'; // v540 : puissances par multiplications (le serveur de partie rejoue les combats au bit près)
 
 export { KEYWORDS, keywordOf, INTENTS, BOSS_POWERS, bossPowerOf, SYNERGIES, FERVOR_MAX, AP_MAX, PA_MAX, BOSSES, LAWS, ASPECTS };
@@ -2031,7 +2032,7 @@ export function battleReport(st, name) {
     const top = Object.entries(st.taken || {}).sort((a, b) => b[1] - a[1])[0];
     if (top) out.push(`${name(top[0])} t’a infligé le plus de dégâts (${top[1]}).`);
     const first = (st.fallenLog || [])[0];
-    if (first) out.push(`${name(first.u)} a succombé${first.round ? ` au tour ${first.round}` : ''}${first.by ? `, sous ${KIND_TXT[first.kind] || 'une attaque'} de ${name(first.by)}` : ''}.`);
+    if (first) out.push(`${name(first.u)} a succombé${first.round ? ` au tour ${first.round}` : ''}${first.by ? `, sous ${KIND_TXT[first.kind] || 'une attaque'} ${deName(name(first.by))}` : ''}.`);
     if (s.missed) out.push(`${s.missed} attaque${s.missed > 1 ? 's' : ''} dangereuse${s.missed > 1 ? 's' : ''} n’${s.missed > 1 ? 'ont' : 'a'} pas été parée${s.missed > 1 ? 's' : ''}.`);
     // v331 : la Fêlure ratée, mécanique clé contre élites et gardiens, souvent ignorée (étude joueurs)
     const lost = (s.cracks || 0) - (s.breaks || 0);

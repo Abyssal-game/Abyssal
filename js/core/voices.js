@@ -8,7 +8,7 @@ export const NARRATOR = {
   "parry": ["Parade parfaite. L’ennemi chancelle.", "Pas une égratignure."],
   "ult": ["Toute l’équipe, d’un seul souffle."],
   "fury": ["Le rêve se déchire. Voici sa vraie colère.", "Prends garde : il ne retient plus ses coups."],
-  "boss-down": ["Un rêve de moins. L’Abysse frissonne.", "Le gardien s’efface. La page est à toi.", "Il retourne au sommeil d’où il venait."],
+  "boss-down": ["Un rêve de moins. L’Abysse frissonne.", "Le gardien s’efface. La page est à toi."],
   "close": ["De justesse… mais la victoire n’a pas de mémoire.", "Un souffle de plus, et tout était perdu."],
   "defeat": ["Le chapitre se referme sur toi. Pour cette fois.", "Relève-toi. Les pages t’attendent encore.", "L’Abysse sourit. Ce n’est qu’un recul."],
   "chapter": ["Un chapitre refermé. D’autres attendent dans les profondeurs.", "Une page de plus revient au Bestiaire."],

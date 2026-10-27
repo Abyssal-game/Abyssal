@@ -9011,6 +9011,11 @@ export default {
   "Connexion au serveur impossible pour l’instant. Réessaie dans un moment.": "Der Server ist gerade nicht erreichbar. Versuch es gleich noch einmal.",
   "4 victoires : coffre d’or et un jeton du Choc": "4 Siege: Goldtruhe und ein Schlacht-Jeton",
   "8 victoires : coffre abyssal et 2 tickets premium": "8 Siege: Abgrundtruhe und 2 Premium-Tickets",
+  "{n0} a succombé au tour {0}, sous une attaque du {n1}.": "{n0} ist in Runde {0} gefallen, durch einen Angriff von {n1}.",
+  "{n0} a succombé au tour {0}, sous une attaque des {n1}.": "{n0} ist in Runde {0} gefallen, durch einen Angriff von {n1}.",
+  "{n0} a succombé au tour {0}, sous une attaque de la {n1}.": "{n0} ist in Runde {0} gefallen, durch einen Angriff von {n1}.",
+  "{n0} a succombé au tour {0}, sous une attaque d’{n1}.": "{n0} ist in Runde {0} gefallen, durch einen Angriff von {n1}.",
+  "{n0} se réveillent du rêve de l’Abysse.": "{n0} erwachen aus dem Traum des Abgrunds.",
 };
 
 export const names = {

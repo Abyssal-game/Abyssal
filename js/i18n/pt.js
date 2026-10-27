@@ -9010,6 +9010,11 @@ export default {
   "Connexion au serveur impossible pour l’instant. Réessaie dans un moment.": "Não foi possível conectar ao servidor agora. Tente de novo em instantes.",
   "4 victoires : coffre d’or et un jeton du Choc": "4 vitórias: baú de ouro e uma ficha da Batalha",
   "8 victoires : coffre abyssal et 2 tickets premium": "8 vitórias: baú abissal e 2 ingressos premium",
+  "{n0} a succombé au tour {0}, sous une attaque du {n1}.": "{n0} sucumbiu no turno {0}, sob um ataque de {n1}.",
+  "{n0} a succombé au tour {0}, sous une attaque des {n1}.": "{n0} sucumbiu no turno {0}, sob um ataque de {n1}.",
+  "{n0} a succombé au tour {0}, sous une attaque de la {n1}.": "{n0} sucumbiu no turno {0}, sob um ataque de {n1}.",
+  "{n0} a succombé au tour {0}, sous une attaque d’{n1}.": "{n0} sucumbiu no turno {0}, sob um ataque de {n1}.",
+  "{n0} se réveillent du rêve de l’Abysse.": "{n0} despertam do sonho do Abismo.",
 };
 
 export const names = {

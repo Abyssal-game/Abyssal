@@ -7,6 +7,7 @@ import { RARITY } from '../config.js';
 import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM, sigil, roleIcon, actIcon, crestHTML } from '../ui/icons.js';
 import { esc, openSheet, toast, frSpaces } from '../ui/dom.js';
+import { deName } from '../core/synergy.js';
 import { LANG, t as tr, tx, tw } from '../i18n.js';
 import { coach, coachIdle as coachIdle0 } from '../ui/coach.js';
 import { sheetIdle } from '../ui/dom.js';
@@ -93,7 +94,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
      puis les ennemis face à tes créatures (rien entre les deux), et en bas le menu de combat : la créature qui joue,
      ses actions, la réserve et la Ferveur. « Passer » devient un petit bouton en haut à droite. */
   root.innerHTML = `<div class="dv cb cb2 ${run.room} has-bg" style="--bgimg:${room.paint ? `url(${abs(room.paint)})` : bgOf(run)}">
-    <div class="dv-top"><b>${(() => { const [a, ...r] = String(title).split(' · '); return esc(a) + (r.length ? `<span class="dv-tt2"> · ${esc(r.join(' · '))}</span>` : ''); })()}</b><div class="cb-rules"></div><span class="row gap">
+    <div class="dv-top"><b>${(() => { const [a, ...r] = String(title).split(' · '); return esc(a) + (r.length ? `<span class="dv-tt2">&nbsp;· ${esc(r.join(' · '))}</span>` : ''); })()}</b><div class="cb-rules"></div><span class="row gap">
       <button class="btn small ghost cb-speed ${ui.fast ? 'on' : ''}" data-d="speed" aria-label="Vitesse des animations" aria-pressed="${!!ui.fast}">×${ui.fast ? 2 : 1}</button>
       <button class="btn small ghost" data-d="help" aria-label="Règles du combat">?</button>
       <button class="btn small ghost cb-pass dv-end" data-d="end" aria-label="Passer le tour" title="Passer le tour"><img class="cb-pass-i" alt="" src="assets/ui/cb-passer2.webp" onerror="this.remove()"><span class="cb-pass-f">${icon('skip')}</span></button>
@@ -139,7 +140,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   // et une carte remplacée garde son illustration déjà décodée.
   /* v824 : le nom de chaque action tient sur la plaque de sa case peinte (taille réduite si besoin, après traduction) */
   const fitCardNames = () => root.querySelectorAll('.dv-c .dv-nm').forEach((n) => { const b = n; if (b._fit === b.textContent) return; b._fit = b.textContent; b.style.removeProperty('font-size'); let f = parseFloat(getComputedStyle(b).fontSize); while (b.scrollWidth > b.clientWidth + 1 && f > 6.5) { f -= 0.5; b.style.setProperty('font-size', `${f}px`, 'important'); } });
-  const fitNames = () => { const run = () => actsEl?.querySelectorAll('.cb-a > b').forEach((b) => { b.style.fontSize = ''; b.classList.remove('two'); let f = parseFloat(getComputedStyle(b).fontSize); while (b.scrollWidth > b.clientWidth + 1 && f > 7.5) { f -= 0.5; b.style.fontSize = `${f}px`; } if (b.scrollWidth > b.clientWidth + 1) { b.classList.add('two'); f = 7.5; b.style.fontSize = `${f}px`; while ((b.scrollHeight > b.clientHeight + 1 || b.scrollWidth > b.clientWidth + 1) && f > 5.5) { f -= 0.5; b.style.fontSize = `${f}px`; } } }); requestAnimationFrame(run); setTimeout(run, 160); };
+  const fitNames = () => { const run = () => actsEl?.querySelectorAll('.cb-a > b').forEach((b) => { b.style.fontSize = ''; b.classList.remove('two'); let f = parseFloat(getComputedStyle(b).fontSize); while (b.scrollWidth > b.clientWidth + 1 && f > 8.5) { f -= 0.5; b.style.fontSize = `${f}px`; } if (b.scrollWidth > b.clientWidth + 1) { b.classList.add('two'); f = 9; b.style.fontSize = `${f}px`; while ((b.scrollHeight > b.clientHeight + 1 || b.scrollWidth > b.clientWidth + 1) && f > 7) /* v841 : jamais sous 7 px (illisible sur iPhone SE) */ { f -= 0.5; b.style.fontSize = `${f}px`; } } }); requestAnimationFrame(run); setTimeout(run, 160); };
   const setHTML = (node, html) => { if (node && node._h !== html) { node.innerHTML = html; node._h = html; } };
   const tpl = document.createElement('template');
   const patchRow = (row, parts) => {
@@ -673,7 +674,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       const b = document.createElement('div'); b.className = 'cb-fallen';
       const top = tl ? tl.getBoundingClientRect().bottom - dv.getBoundingClientRect().top + 4 : 90;
       b.style.top = `${Math.round(top)}px`;
-      b.innerHTML = `<img class="cb-fl-p" alt="" src="${uPic(u)}"><img class="cb-fl-sk" alt="" src="assets/icons/mort.webp"><span><small>${esc(tr('Créature à terre'))}</small><b>${esc(tw(uName(u)))}</b>${nx ? `<em>${esc(tr('{name} prend sa place', { name: tw(uName(st.units[nx.u])) }))}</em>` : ''}</span>`;
+      b.innerHTML = `<span class="cb-fl-w"><img class="cb-fl-p" alt="" src="${uPic(u)}"><img class="cb-fl-sk" alt="" src="assets/icons/mort.webp"></span><span><small>${esc(tr('Créature à terre'))}</small><b>${esc(tw(uName(u)))}</b>${nx ? `<em>${esc(tr('{name} prend sa place', { name: tw(uName(st.units[nx.u])) }))}</em>` : ''}</span>`;
       dv.appendChild(b); setTimeout(() => b.classList.add('out'), T(1500)); setTimeout(() => b.remove(), T(1500) + 450);
     }
     rsvHitUntil = Date.now() + 1800;
@@ -1002,7 +1003,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     b.className = 'cb-phase';
     b.innerHTML = `${st.bossKey ? `<img class="cb-phimg" alt="" src="assets/ui/ph-${st.bossKey}.webp" onerror="this.remove()">` : ''}<b>${esc(P.name)}</b><p>${esc(P.desc)}</p><small>Touche pour continuer</small>`;
     $('.dv').appendChild(b);
-    await new Promise((res) => { const go = () => { b.remove(); res(); }; b.addEventListener('pointerdown', go, { once: true }); }); // v295 : attend le toucher, plus de fermeture automatique
+    await new Promise((res) => { const go = (e) => { if (e && b.contains(e.target) === false && !b.isConnected) return; document.removeEventListener('pointerdown', go, true); b.remove(); res(); }; setTimeout(() => document.addEventListener('pointerdown', go, true), 250); }); /* v841 : un toucher n'importe où ferme la carte (« Touche pour continuer ») */ // v295 : attend le toucher, plus de fermeture automatique
   }
   const ULT_FX = { revive: 'ult-revive', nova: 'ult-nova', smite: 'ult-smite', aegis: 'ult-aegis' }; // v354-v355 : une planche Gemini par pouvoir d'équipe
   async function ultFx() {
@@ -1307,7 +1308,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   async function pickReserve() {
     if (!g.s.tips?.['cb-entrance']) await tuto(app, 'cb-entrance');
     const r = reserve(st, 'ally'), su = st.units[sel];
-    const sh = openSheet(`<h2>Qui entre en jeu ?</h2><p class="small muted">À la place de <b>${esc(cat.get(su.id).name)}</b>. ${st.init ? `Gratuit : elle prend sa place dans l’ordre des tours et joue tout de suite${st.freeSwap ? ' (Relais d’ombre : +2 PA)' : ''}` : `Coût : ${st.freeSwap ? 'gratuit (Relais d’ombre)' : '1 action'}. Elle peut agir ce tour-ci`} ; PV, PA et états sont conservés.</p>
+    const sh = openSheet(`<h2>Qui entre en jeu ?</h2><p class="small muted">${LANG === 'fr' ? `À la place ${esc(deName(cat.get(su.id).name)).replace(/^(du |des |de la |d’|de )/, '$1<b>')}</b>.` : `À la place de <b>${esc(cat.get(su.id).name)}</b>.`} ${st.init ? `Gratuit : elle prend sa place dans l’ordre des tours et joue tout de suite${st.freeSwap ? ' (Relais d’ombre : +2 PA)' : ''}` : `Coût : ${st.freeSwap ? 'gratuit (Relais d’ombre)' : '1 action'}. Elle peut agir ce tour-ci`} ; PV, PA et états sont conservés.</p>
       <div class="dv-pick">${r.map((x) => `<button class="dv-pick-c" data-in="${x.uid}"><img alt="" src="${artUrl(cat.get(x.id), { lite: true })}"><b>${esc(cat.get(x.id).name)}</b><span>${esc(KITS[x.role].name)} · ${icon('swords')}${x.atk} · ${icon('heart')}${x.hp}/${x.maxHp}</span>${ENTRANCES[x.role] ? `<small class="dv-pick-e"><b>${esc(ENTRANCES[x.role].name)}</b> : ${esc(ENTRANCES[x.role].desc)}</small>` : ''}</button>`).join('')}</div>`, { label: 'Permuter' });
     sh.body.addEventListener('click', (ev) => { const p = ev.target.closest('[data-in]'); if (p) { sh.close(); const u = sel; mode = null; exec(() => E.duelAct(where, u, 'swap', p.dataset.in)); } });
   }
@@ -1315,7 +1316,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   // Règles en vigueur : pacte, loi de l'Architecte, aspect de l'Éclipse, reliques
   function ruleSheet(k) {
     let h = '';
-    if (k === 'gap') { const gp = gapOf(st), d = Math.round((1 - 1 / gp ** 2) * 100); h = `<h2>Ennemis trop forts</h2><p>Ces ennemis sont bien plus forts que ton équipe (environ ×${gp.toFixed(1)}).</p><p>Tes créatures leur font <b>${d} % de dégâts en moins</b>, et leurs coups ne sont plus retenus : ils peuvent abattre une créature d’un seul coup.</p><p class="small muted">Renforce ton équipe (Collection › Forge) ou choisis des créatures plus rares avant de descendre aussi bas.</p>`; }
+    if (k === 'gap') { const gp = gapOf(st), d = Math.round((1 - 1 / gp ** 2) * 100); h = `<h2>Ennemis trop forts</h2><p>Ces ennemis sont bien plus forts que ton équipe (environ ×${gp.toFixed(1).replace(".", ",")}).</p><p>Tes créatures leur font <b>${d} % de dégâts en moins</b>, et leurs coups ne sont plus retenus : ils peuvent abattre une créature d’un seul coup.</p><p class="small muted">Renforce ton équipe (Collection › Forge) ou choisis des créatures plus rares avant de descendre aussi bas.</p>`; }
     else if (k === 'goal') { const gl = goalState(st); if (gl) h = `<h2>Objectif : ${esc(gl.name)}</h2><p>${esc(gl.desc)}</p><p class="small muted">Facultatif. Réussi et combat gagné : des éclats en plus et 1 Ferveur pour la suite du chapitre.</p><p><b>${gl.state === 'done' ? 'Réussi !' : gl.state === 'fail' ? 'Manqué pour ce combat.' : `En cours${gl.p ? ` (${gl.p})` : ''}.`}</b></p>`; }
     else if (k === 'pact' && PACTS[st.pact]) h = `<h2>${esc(PACTS[st.pact].name)}</h2><p><b class="dc-good">Gain</b> : ${esc(PACTS[st.pact].gain)}</p><p><b class="dc-bad">Prix</b> : ${esc(PACTS[st.pact].cost)}</p>`;
     else if (k === 'law' && LAWS[st.law]) h = `<h2>${esc(LAWS[st.law].name)}</h2><p>${esc(LAWS[st.law].desc)}</p><p class="small muted">L’Architecte change de Loi tous les deux tours ; la prochaine est annoncée sur sa carte.</p>`;
