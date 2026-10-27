@@ -7,7 +7,6 @@ import { RARITY } from '../config.js';
 import { artUrl } from '../art/assets.js';
 import { icon, EMBLEM, sigil, roleIcon, actIcon, crestHTML } from '../ui/icons.js';
 import { esc, openSheet, toast, frSpaces } from '../ui/dom.js';
-import { deName } from '../core/synergy.js';
 import { LANG, t as tr, tx, tw } from '../i18n.js';
 import { coach, coachIdle as coachIdle0 } from '../ui/coach.js';
 import { sheetIdle } from '../ui/dom.js';
@@ -283,11 +282,12 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   function guideStep() {
     root.querySelectorAll('.guide').forEach((x) => x.classList.remove('guide'));
     if (!guide || busy || st.turn !== 'ally' || st.over) return;
-    let t = null, txt = '';
-    if (mode?.key === 'attack') { t = el(actionTargets(st, sel, 'attack')[0]); txt = 'Touche un ennemi pour l’attaquer'; }
-    else if (sel && actionsFor(st, sel)[0].ok) { t = actsEl.querySelector('[data-a="attack"]'); txt = LANG === 'fr' ? `C’est au tour ${esc(deName(cat.get(st.units[sel].id).name))} : « ${esc(actionsFor(st, sel)[0].name)} » attaque et rapporte 1 PA` : tr('C’est au tour de {name} : « {move} » attaque et rapporte 1 PA', { name: esc(tw(cat.get(st.units[sel].id).name)), move: esc(tw(actionsFor(st, sel)[0].name)) }); }
-    else { t = $('.dv-end'); txt = 'Rien à faire : touche « Passer » en haut à droite'; }
-    if (t) { t.classList.add('guide'); say(`<b class="dc-good">${txt}</b>`); }
+    /* v836 : plus de fenêtre de consigne (« C’est au tour de… ») : la main dorée et l'en-tête du menu suffisent */
+    let t = null;
+    if (mode?.key === 'attack') t = el(actionTargets(st, sel, 'attack')[0]);
+    else if (sel && actionsFor(st, sel)[0].ok) t = actsEl.querySelector('[data-a="attack"]');
+    else t = $('.dv-end');
+    if (t) t.classList.add('guide');
   }
   function endGuide() { if (!guide) return; guide = false; g.s.tips = { ...(g.s.tips || {}), 'cb-guide': Date.now() }; g.persist(); }
 
