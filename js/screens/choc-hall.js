@@ -76,7 +76,7 @@ export async function openHall(app) {
   const sh = openSheet(`<div class="hl">${BG()}<div class="hl-head"><img alt="" src="assets/icons/crown2.webp"><h2>${t('Le Panthéon d’hier')}</h2><p class="small muted">${t('Chargement…')}</p></div></div>`, { label: t('Le Panthéon d’hier'), full: true, cls: 'hl-sheet' });
   const h = await loadHall();
   if (!sh.body.isConnected) return;
-  const head = `<div class="hl-head">${PIMG('assets/choc/pantheon-titre.webp', 'hl-head-art')}<img class="hl-crown-ic" alt="" src="assets/icons/crown2.webp"><h2>${t('Le Panthéon d’hier')}</h2>
+  const head = `<div class="hl-head"><span class="hl-art">${PIMG('assets/choc/pantheon-titre.webp', 'hl-head-art')}<img class="hl-crown-ic" alt="" src="assets/icons/crown2.webp"></span><h2>${t('Le Panthéon d’hier')}</h2>
     <p class="small muted">${h.day ? `${esc(dayLabel(h.day))} · ` : ''}${t(h.games > 1 ? '{n} parties jouées' : '{n} partie jouée', { n: fmt(h.games || 0) })}</p></div>`;
   if (h.error) { sh.body.innerHTML = `<div class="hl">${BG()}${head}<p class="panel small center">${/function|choc_hall|schema/i.test(h.error) ? t('Le Panthéon n’est pas encore ouvert sur le serveur.') : esc(h.error)}</p></div>`; return; }
   if (!h.tables.length) { sh.body.innerHTML = `<div class="hl">${BG()}${head}<p class="panel center hl-empty">${t('Personne n’a joué hier : à toi d’écrire la légende d’aujourd’hui.')}</p></div>`; return; }
