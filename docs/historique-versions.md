@@ -2,6 +2,7 @@
 
 Ancienne section « 5. Décisions déjà prises » de `CLAUDE.md`, déplacée ici le 27 octobre 2026 pour alléger le mémo lu à chaque session. La plus récente en haut ; ajouter chaque nouvelle livraison en haut de la liste.
 
+- v854 (capture du propriétaire, premier combat d'une Épreuve) : la main d'aide posée à gauche de la case d'action (`.cb-dock .cb-a.guide::before`, v841) avait une rotation que l'animation `guideHand` effaçait : elle pointait vers le bas, à côté de la case. Elle est retournée en miroir (`scaleX(-1)`) et pointe vers la case, avec sa propre animation `guideHandDock` qui garde ce sens. Vérifié dans Chromium (390 × 844, Épreuve). Rien testé sur un vrai iPhone.
 - v853 (demande du propriétaire) : Enchères, volet « Les enchérisseurs » : seuls les noms et portraits restent, l'indication de leur façon de jouer (`hint`) n'est plus affichée (`js/screens/encheres.js`). Rien testé sur un vrai iPhone.
 - v852 (retours du propriétaire, captures de l'app) :
   - Cryptes : le Remous abyssal (échange de deux cartes) peut être refusé : bouton « Ne pas échanger » dans le bandeau du pouvoir (solo : `usePower(st, [])` renvoie `skipped`, accepté seulement pour `abyssal` ; en ligne : `cryptes_apply` avec `picks` vide, **`09-multijoueur.sql` à recoller**, essayé sur PostgreSQL 16 ; l'ami voit « … a préféré ne rien échanger »). Test ajouté dans `tests/cryptes.test.mjs`.
